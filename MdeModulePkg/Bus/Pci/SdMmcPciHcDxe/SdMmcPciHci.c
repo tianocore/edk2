@@ -17,6 +17,8 @@
 **/
 
 #include "SdMmcPciHcDxe.h"
+int g_deviceId = 0;
+
 
 /**
   Dump the content of SD/MMC host controller's Capability Register.
@@ -46,8 +48,7 @@ DumpCapabilityReg (
   DEBUG ((DEBUG_INFO, "   Voltage 3.3       %a\n", Capability->Voltage33 ? "TRUE" : "FALSE"));
   DEBUG ((DEBUG_INFO, "   Voltage 3.0       %a\n", Capability->Voltage30 ? "TRUE" : "FALSE"));
   DEBUG ((DEBUG_INFO, "   Voltage 1.8       %a\n", Capability->Voltage18 ? "TRUE" : "FALSE"));
-  DEBUG ((DEBUG_INFO, "   V4 64-bit Sys Bus %a\n", Capability->SysBus64V4 ? "TRUE" : "FALSE"));
-  DEBUG ((DEBUG_INFO, "   V3 64-bit Sys Bus %a\n", Capability->SysBus64V3 ? "TRUE" : "FALSE"));
+  DEBUG ((DEBUG_INFO, "   64-bit Sys Bus    %a\n", Capability->SysBus64 ? "TRUE" : "FALSE"));
   DEBUG ((DEBUG_INFO, "   Async Interrupt   %a\n", Capability->AsyncInt ? "TRUE" : "FALSE"));
   DEBUG ((DEBUG_INFO, "   SlotType          "));
   if (Capability->SlotType == 0x00) {
@@ -419,39 +420,9 @@ SdMmcHcWaitMmioSet (
 }
 
 /**
-  Get the controller version information from the specified slot.
-
-  @param[in]  PciIo           The PCI IO protocol instance.
-  @param[in]  Slot            The slot number of the SD card to send the command to.
-  @param[out] Version         The buffer to store the version information.
-
-  @retval EFI_SUCCESS         The operation executes successfully.
-  @retval Others              The operation fails.
-
-**/
-EFI_STATUS
-SdMmcHcGetControllerVersion (
-  IN     EFI_PCI_IO_PROTOCOL  *PciIo,
-  IN     UINT8                Slot,
-  OUT    UINT16               *Version
-  )
-{
-  EFI_STATUS                Status;
-
-  Status = SdMmcHcRwMmio (PciIo, Slot, SD_MMC_HC_CTRL_VER, TRUE, sizeof (UINT16), Version);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  *Version &= 0xFF;
-
-  return EFI_SUCCESS;
-}
-
-/**
   Software reset the specified SD/MMC host controller and enable all interrupts.
 
-  @param[in] Private        A pointer to the SD_MMC_HC_PRIVATE_DATA instance.
+  @param[in] PciIo          The PCI IO protocol instance.
   @param[in] Slot           The slot number of the SD card to send the command to.
 
   @retval EFI_SUCCESS       The software reset executes successfully.
@@ -460,38 +431,18 @@ SdMmcHcGetControllerVersion (
 **/
 EFI_STATUS
 SdMmcHcReset (
-  IN SD_MMC_HC_PRIVATE_DATA *Private,
+  IN EFI_PCI_IO_PROTOCOL    *PciIo,
   IN UINT8                  Slot
   )
 {
   EFI_STATUS                Status;
   UINT8                     SwReset;
-  EFI_PCI_IO_PROTOCOL       *PciIo;
 
-  //
-  // Notify the SD/MMC override protocol that we are about to reset
-  // the SD/MMC host controller.
-  //
-  if (mOverride != NULL && mOverride->NotifyPhase != NULL) {
-    Status = mOverride->NotifyPhase (
-                          Private->ControllerHandle,
-                          Slot,
-                          EdkiiSdMmcResetPre,
-                          NULL);
-    if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_WARN,
-        "%a: SD/MMC pre reset notifier callback failed - %r\n",
-        __FUNCTION__, Status));
-      return Status;
-    }
-  }
-
-  PciIo   = Private->PciIo;
-  SwReset = BIT0;
-  Status  = SdMmcHcOrMmio (PciIo, Slot, SD_MMC_HC_SW_RST, sizeof (SwReset), &SwReset);
+  SwReset = 0xFF;
+  Status  = SdMmcHcRwMmio (PciIo, Slot, SD_MMC_HC_SW_RST, FALSE, sizeof (SwReset), &SwReset);
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "SdMmcHcReset: write SW Reset for All fails: %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "SdMmcHcReset: write full 1 fails: %r\n", Status));
     return Status;
   }
 
@@ -500,7 +451,7 @@ SdMmcHcReset (
              Slot,
              SD_MMC_HC_SW_RST,
              sizeof (SwReset),
-             BIT0,
+             0xFF,
              0x00,
              SD_MMC_HC_GENERIC_TIMEOUT
              );
@@ -508,33 +459,10 @@ SdMmcHcReset (
     DEBUG ((DEBUG_INFO, "SdMmcHcReset: reset done with %r\n", Status));
     return Status;
   }
-
   //
   // Enable all interrupt after reset all.
   //
   Status = SdMmcHcEnableInterrupt (PciIo, Slot);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_INFO, "SdMmcHcReset: SdMmcHcEnableInterrupt done with %r\n",
-      Status));
-    return Status;
-  }
-
-  //
-  // Notify the SD/MMC override protocol that we have just reset
-  // the SD/MMC host controller.
-  //
-  if (mOverride != NULL && mOverride->NotifyPhase != NULL) {
-    Status = mOverride->NotifyPhase (
-                          Private->ControllerHandle,
-                          Slot,
-                          EdkiiSdMmcResetPost,
-                          NULL);
-    if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_WARN,
-        "%a: SD/MMC post reset notifier callback failed - %r\n",
-        __FUNCTION__, Status));
-    }
-  }
 
   return Status;
 }
@@ -753,8 +681,7 @@ SdMmcHcStopClock (
   @param[in] PciIo          The PCI IO protocol instance.
   @param[in] Slot           The slot number of the SD card to send the command to.
   @param[in] ClockFreq      The max clock frequency to be set. The unit is KHz.
-  @param[in] BaseClkFreq    The base clock frequency of host controller in MHz.
-  @param[in] ControllerVer  The version of host controller.
+  @param[in] Capability     The capability of the slot.
 
   @retval EFI_SUCCESS       The clock is supplied successfully.
   @retval Others            The clock isn't supplied successfully.
@@ -765,21 +692,23 @@ SdMmcHcClockSupply (
   IN EFI_PCI_IO_PROTOCOL    *PciIo,
   IN UINT8                  Slot,
   IN UINT64                 ClockFreq,
-  IN UINT32                 BaseClkFreq,
-  IN UINT16                 ControllerVer
+  IN SD_MMC_HC_SLOT_CAP     Capability
   )
 {
   EFI_STATUS                Status;
+  UINT32                    BaseClkFreq;
   UINT32                    SettingFreq;
   UINT32                    Divisor;
   UINT32                    Remainder;
+  UINT16                    ControllerVer;
   UINT16                    ClockCtrl;
 
   //
   // Calculate a divisor for SD clock frequency
   //
-  ASSERT (BaseClkFreq != 0);
+  ASSERT (Capability.BaseClkFreq != 0);
 
+  BaseClkFreq = Capability.BaseClkFreq;
   if (ClockFreq == 0) {
     return EFI_INVALID_PARAMETER;
   }
@@ -808,15 +737,17 @@ SdMmcHcClockSupply (
 
   DEBUG ((DEBUG_INFO, "BaseClkFreq %dMHz Divisor %d ClockFreq %dKhz\n", BaseClkFreq, Divisor, ClockFreq));
 
+  Status = SdMmcHcRwMmio (PciIo, Slot, SD_MMC_HC_CTRL_VER, TRUE, sizeof (ControllerVer), &ControllerVer);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
   //
   // Set SDCLK Frequency Select and Internal Clock Enable fields in Clock Control register.
   //
-  if ((ControllerVer >= SD_MMC_HC_CTRL_VER_300) &&
-      (ControllerVer <= SD_MMC_HC_CTRL_VER_420)) {
+  if (((ControllerVer & 0xFF) == 2) || ((ControllerVer & 0xFF) == 3)) {
     ASSERT (Divisor <= 0x3FF);
     ClockCtrl = ((Divisor & 0xFF) << 8) | ((Divisor & 0x300) >> 2);
-  } else if ((ControllerVer == SD_MMC_HC_CTRL_VER_100) ||
-             (ControllerVer == SD_MMC_HC_CTRL_VER_200)) {
+  } else if (((ControllerVer & 0xFF) == 0) || ((ControllerVer & 0xFF) == 1)) {
     //
     // Only the most significant bit can be used as divisor.
     //
@@ -964,62 +895,11 @@ SdMmcHcSetBusWidth (
 }
 
 /**
-  Configure V4 controller enhancements at initialization.
-
-  @param[in] PciIo          The PCI IO protocol instance.
-  @param[in] Slot           The slot number of the SD card to send the command to.
-  @param[in] Capability     The capability of the slot.
-  @param[in] ControllerVer  The version of host controller.
-
-  @retval EFI_SUCCESS       The clock is supplied successfully.
-
-**/
-EFI_STATUS
-SdMmcHcInitV4Enhancements (
-  IN EFI_PCI_IO_PROTOCOL    *PciIo,
-  IN UINT8                  Slot,
-  IN SD_MMC_HC_SLOT_CAP     Capability,
-  IN UINT16                 ControllerVer
-  )
-{
-  EFI_STATUS                Status;
-  UINT16                    HostCtrl2;
-
-  //
-  // Check if controller version V4 or higher
-  //
-  if (ControllerVer >= SD_MMC_HC_CTRL_VER_400) {
-    HostCtrl2 = SD_MMC_HC_V4_EN;
-    //
-    // Check if V4 64bit support is available
-    //
-    if (Capability.SysBus64V4 != 0) {
-      HostCtrl2 |= SD_MMC_HC_64_ADDR_EN;
-      DEBUG ((DEBUG_INFO, "Enabled V4 64 bit system bus support\n"));
-    }
-    //
-    // Check if controller version V4.10 or higher
-    //
-    if (ControllerVer >= SD_MMC_HC_CTRL_VER_410) {
-      HostCtrl2 |= SD_MMC_HC_26_DATA_LEN_ADMA_EN;
-      DEBUG ((DEBUG_INFO, "Enabled V4 26 bit data length ADMA support\n"));
-    }
-    Status = SdMmcHcOrMmio (PciIo, Slot, SD_MMC_HC_HOST_CTRL2, sizeof (HostCtrl2), &HostCtrl2);
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
-  }
-
-  return EFI_SUCCESS;
-}
-
-/**
   Supply SD/MMC card with lowest clock frequency at initialization.
 
   @param[in] PciIo          The PCI IO protocol instance.
   @param[in] Slot           The slot number of the SD card to send the command to.
-  @param[in] BaseClkFreq    The base clock frequency of host controller in MHz.
-  @param[in] ControllerVer  The version of host controller.
+  @param[in] Capability     The capability of the slot.
 
   @retval EFI_SUCCESS       The clock is supplied successfully.
   @retval Others            The clock isn't supplied successfully.
@@ -1029,20 +909,16 @@ EFI_STATUS
 SdMmcHcInitClockFreq (
   IN EFI_PCI_IO_PROTOCOL    *PciIo,
   IN UINT8                  Slot,
-  IN UINT32                 BaseClkFreq,
-  IN UINT16                 ControllerVer
+  IN SD_MMC_HC_SLOT_CAP     Capability
   )
 {
   EFI_STATUS                Status;
   UINT32                    InitFreq;
 
   //
-  // According to SDHCI specification ver. 4.2, BaseClkFreq field value of
-  // the Capability Register 1 can be zero, which means a need for obtaining
-  // the clock frequency via another method. Fail in case it is not updated
-  // by SW at this point.
+  // Calculate a divisor for SD clock frequency
   //
-  if (BaseClkFreq == 0) {
+  if (Capability.BaseClkFreq == 0) {
     //
     // Don't support get Base Clock Frequency information via another method
     //
@@ -1052,7 +928,7 @@ SdMmcHcInitClockFreq (
   // Supply 400KHz clock frequency at initialization phase.
   //
   InitFreq = 400;
-  Status = SdMmcHcClockSupply (PciIo, Slot, InitFreq, BaseClkFreq, ControllerVer);
+  Status = SdMmcHcClockSupply (PciIo, Slot, InitFreq, Capability);
   return Status;
 }
 
@@ -1113,6 +989,15 @@ SdMmcHcInitPowerVoltage (
   // Set SD Bus Voltage Select and SD Bus Power fields in Power Control Register
   //
   Status = SdMmcHcPowerControl (PciIo, Slot, MaxVoltage);
+  if (BhtHostPciSupport(PciIo)){
+	  // 1.8V signaling enable
+	  HostCtrl2  = BIT3;
+	  Status = SdMmcHcOrMmio (PciIo, Slot, SD_MMC_HC_HOST_CTRL2, sizeof (HostCtrl2), &HostCtrl2);
+	  gBS->Stall (5000);
+	  if (EFI_ERROR (Status)) {
+		return Status;
+	  }	  
+  }
 
   return Status;
 }
@@ -1148,8 +1033,9 @@ SdMmcHcInitTimeoutCtrl (
   Initial SD/MMC host controller with lowest clock frequency, max power and max timeout value
   at initialization.
 
-  @param[in] Private        A pointer to the SD_MMC_HC_PRIVATE_DATA instance.
+  @param[in] PciIo          The PCI IO protocol instance.
   @param[in] Slot           The slot number of the SD card to send the command to.
+  @param[in] Capability     The capability of the slot.
 
   @retval EFI_SUCCESS       The host controller is initialized successfully.
   @retval Others            The host controller isn't initialized successfully.
@@ -1157,161 +1043,93 @@ SdMmcHcInitTimeoutCtrl (
 **/
 EFI_STATUS
 SdMmcHcInitHost (
-  IN SD_MMC_HC_PRIVATE_DATA *Private,
-  IN UINT8                  Slot
-  )
-{
-  EFI_STATUS                Status;
-  EFI_PCI_IO_PROTOCOL       *PciIo;
-  SD_MMC_HC_SLOT_CAP        Capability;
-
-  //
-  // Notify the SD/MMC override protocol that we are about to initialize
-  // the SD/MMC host controller.
-  //
-  if (mOverride != NULL && mOverride->NotifyPhase != NULL) {
-    Status = mOverride->NotifyPhase (
-                          Private->ControllerHandle,
-                          Slot,
-                          EdkiiSdMmcInitHostPre,
-                          NULL);
-    if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_WARN,
-        "%a: SD/MMC pre init notifier callback failed - %r\n",
-        __FUNCTION__, Status));
-      return Status;
-    }
-  }
-
-  PciIo = Private->PciIo;
-  Capability = Private->Capability[Slot];
-
-  Status = SdMmcHcInitV4Enhancements (PciIo, Slot, Capability, Private->ControllerVersion[Slot]);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  Status = SdMmcHcInitClockFreq (PciIo, Slot, Private->BaseClkFreq[Slot], Private->ControllerVersion[Slot]);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  Status = SdMmcHcInitPowerVoltage (PciIo, Slot, Capability);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  Status = SdMmcHcInitTimeoutCtrl (PciIo, Slot);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  //
-  // Notify the SD/MMC override protocol that we are have just initialized
-  // the SD/MMC host controller.
-  //
-  if (mOverride != NULL && mOverride->NotifyPhase != NULL) {
-    Status = mOverride->NotifyPhase (
-                          Private->ControllerHandle,
-                          Slot,
-                          EdkiiSdMmcInitHostPost,
-                          NULL);
-    if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_WARN,
-        "%a: SD/MMC post init notifier callback failed - %r\n",
-        __FUNCTION__, Status));
-    }
-  }
-  return Status;
-}
-
-/**
-  Set SD Host Controler control 2 registry according to selected speed.
-
-  @param[in] ControllerHandle The handle of the controller.
-  @param[in] PciIo            The PCI IO protocol instance.
-  @param[in] Slot             The slot number of the SD card to send the command to.
-  @param[in] Timing           The timing to select.
-
-  @retval EFI_SUCCESS         The timing is set successfully.
-  @retval Others              The timing isn't set successfully.
-**/
-EFI_STATUS
-SdMmcHcUhsSignaling (
-  IN EFI_HANDLE             ControllerHandle,
   IN EFI_PCI_IO_PROTOCOL    *PciIo,
   IN UINT8                  Slot,
-  IN SD_MMC_BUS_MODE        Timing
+  IN SD_MMC_HC_SLOT_CAP     Capability
   )
 {
-  EFI_STATUS                 Status;
-  UINT8                      HostCtrl2;
+  EFI_STATUS       Status;
+  UINT32           value32;
+  
+  if (BhtHostPciSupport(PciIo)){
 
-  HostCtrl2 = (UINT8)~SD_MMC_HC_CTRL_UHS_MASK;
-  Status = SdMmcHcAndMmio (PciIo, Slot, SD_MMC_HC_HOST_CTRL2, sizeof (HostCtrl2), &HostCtrl2);
+		DbgMsg(L"find bht emmc chip\n");
+		/* FET on */
+		PciBhtOr32(PciIo, 0xEC, 0x3);
+		/* Led on */
+		//PciBhtAnd32(PciIo, 0x334, (UINT32)~BIT13);
+		PciBhtOr32(PciIo, 0xD4, BIT6);
+		/* Set 1.8v emmc signaling flag */
+		PciBhtOr32(PciIo, 0x308, BIT4);
+		/* Set 200MBaseClock */
+		value32 = PciBhtRead32(PciIo, 0x304);
+		value32 &= 0x0000FFFF;
+		value32 |= 0x25100000;
+		PciBhtWrite32(PciIo, 0x304, value32);
+		PciBhtOr32(PciIo, 0x3E4, BIT22);
+		PciBhtWrite32(PciIo, 0x300, 0x21400033);
+		
+		//enable internal clk
+		value32 = BIT0;
+		Status = SdMmcHcOrMmio (PciIo, Slot, SD_MMC_HC_CLOCK_CTRL,sizeof(value32), &value32);
+
+		//reset pll start	
+		Status = SdMmcHcRwMmio (PciIo, Slot, 0x1CC, TRUE, sizeof(value32), &value32);
+		value32 |= BIT12;	  
+		Status = SdMmcHcRwMmio (PciIo, Slot, 0x1CC, FALSE, sizeof(value32), &value32);		  
+		gBS->Stall(1);
+
+		//reset pll end
+		Status = SdMmcHcRwMmio (PciIo, Slot, 0x1CC, TRUE,sizeof(value32), &value32);
+		value32 &= ~BIT12;
+		value32 |= BIT18;
+		Status = SdMmcHcRwMmio (PciIo, Slot, 0x1CC, FALSE, sizeof(value32), &value32);
+		
+		//wait BaseClk stable 0x1CC bit14	
+		Status = SdMmcHcRwMmio (PciIo, Slot, 0x1CC, TRUE, sizeof(value32), &value32);
+		while(!(value32&BIT14)){
+			gBS->Stall(100);
+			Status = SdMmcHcRwMmio (PciIo, Slot, 0x1CC, TRUE, sizeof(value32), &value32);
+			DbgMsg(L"1CC=0x%08x\n", value32);
+		}
+
+		if (value32 & BIT18)
+		{
+		  //Wait 2nd Card Detect debounce Finished by wait twice of debounce max time
+		  while (1) {
+  		    Status = SdMmcHcRwMmio (PciIo, Slot, SD_MMC_HC_PRESENT_STATE, TRUE, sizeof(value32), &value32);
+            if (((value32 >> 16) & 0x01) == ((value32 >> 18) & 0x01))
+              break;
+		  }	
+		  //force pll active end
+		  Status = SdMmcHcRwMmio (PciIo, Slot, 0x1CC, TRUE, sizeof(value32), &value32);		
+		  value32 &= ~BIT18;
+		  Status = SdMmcHcRwMmio (PciIo, Slot, 0x1CC, FALSE, sizeof(value32), &value32);				
+		}				
+
+	  	Status = SdMmcHcInitPowerVoltage (PciIo, Slot, Capability);
+		if (EFI_ERROR (Status)) {
+		    DbgMsg(L"emmc host init failure\n");
+		    return Status;
+	 	 }
+
+	  	
+  }
+
+  Status = SdMmcHcInitClockFreq (PciIo, Slot, Capability);
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  switch (Timing) {
-    case SdMmcUhsSdr12:
-      HostCtrl2 = SD_MMC_HC_CTRL_UHS_SDR12;
-      break;
-    case SdMmcUhsSdr25:
-      HostCtrl2 = SD_MMC_HC_CTRL_UHS_SDR25;
-      break;
-    case SdMmcUhsSdr50:
-      HostCtrl2 = SD_MMC_HC_CTRL_UHS_SDR50;
-      break;
-    case SdMmcUhsSdr104:
-      HostCtrl2 = SD_MMC_HC_CTRL_UHS_SDR104;
-      break;
-    case SdMmcUhsDdr50:
-      HostCtrl2 = SD_MMC_HC_CTRL_UHS_DDR50;
-      break;
-    case SdMmcMmcLegacy:
-      HostCtrl2 = SD_MMC_HC_CTRL_MMC_LEGACY;
-      break;
-    case SdMmcMmcHsSdr:
-      HostCtrl2 = SD_MMC_HC_CTRL_MMC_HS_SDR;
-      break;
-    case SdMmcMmcHsDdr:
-      HostCtrl2 = SD_MMC_HC_CTRL_MMC_HS_DDR;
-      break;
-    case SdMmcMmcHs200:
-      HostCtrl2 = SD_MMC_HC_CTRL_MMC_HS200;
-      break;
-    case SdMmcMmcHs400:
-      HostCtrl2 = SD_MMC_HC_CTRL_MMC_HS400;
-      break;
-    default:
-     HostCtrl2 = 0;
-     break;
+  if (!BhtHostPciSupport(PciIo)){
+	  Status = SdMmcHcInitPowerVoltage (PciIo, Slot, Capability);
+	  if (EFI_ERROR (Status)) {
+	    return Status;
+	  }
   }
-  Status = SdMmcHcOrMmio (PciIo, Slot, SD_MMC_HC_HOST_CTRL2, sizeof (HostCtrl2), &HostCtrl2);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  if (mOverride != NULL && mOverride->NotifyPhase != NULL) {
-    Status = mOverride->NotifyPhase (
-                          ControllerHandle,
-                          Slot,
-                          EdkiiSdMmcUhsSignaling,
-                          &Timing
-                          );
-    if (EFI_ERROR (Status)) {
-      DEBUG ((
-        DEBUG_ERROR,
-        "%a: SD/MMC uhs signaling notifier callback failed - %r\n",
-        __FUNCTION__,
-        Status
-        ));
-      return Status;
-    }
-  }
-
-  return EFI_SUCCESS;
+  
+  Status = SdMmcHcInitTimeoutCtrl (PciIo, Slot);
+  return Status;
 }
 
 /**
@@ -1349,10 +1167,9 @@ SdMmcHcLedOnOff (
 /**
   Build ADMA descriptor table for transfer.
 
-  Refer to SD Host Controller Simplified spec 4.2 Section 1.13 for details.
+  Refer to SD Host Controller Simplified spec 3.0 Section 1.13 for details.
 
   @param[in] Trb            The pointer to the SD_MMC_HC_TRB instance.
-  @param[in] ControllerVer  The version of host controller.
 
   @retval EFI_SUCCESS       The ADMA descriptor table is created successfully.
   @retval Others            The ADMA descriptor table isn't created successfully.
@@ -1360,8 +1177,7 @@ SdMmcHcLedOnOff (
 **/
 EFI_STATUS
 BuildAdmaDescTable (
-  IN SD_MMC_HC_TRB          *Trb,
-  IN UINT16                 ControllerVer
+  IN SD_MMC_HC_TRB          *Trb
   )
 {
   EFI_PHYSICAL_ADDRESS      Data;
@@ -1369,93 +1185,49 @@ BuildAdmaDescTable (
   UINT64                    Entries;
   UINT32                    Index;
   UINT64                    Remaining;
-  UINT64                    Address;
+  UINT32                    Address;
   UINTN                     TableSize;
   EFI_PCI_IO_PROTOCOL       *PciIo;
   EFI_STATUS                Status;
   UINTN                     Bytes;
-  BOOLEAN                   AddressingMode64;
-  BOOLEAN                   DataLength26;
-  UINT32                    AdmaMaxDataPerLine;
-  UINT32                    DescSize;
-  VOID                      *AdmaDesc;
-
-  AddressingMode64   = FALSE;
-  DataLength26       = FALSE;
-  AdmaMaxDataPerLine = ADMA_MAX_DATA_PER_LINE_16B;
-  DescSize           = sizeof (SD_MMC_HC_ADMA_32_DESC_LINE);
-  AdmaDesc           = NULL;
 
   Data    = Trb->DataPhy;
   DataLen = Trb->DataLen;
   PciIo   = Trb->Private->PciIo;
-
   //
-  // Detect whether 64bit addressing is supported.
+  // Only support 32bit ADMA Descriptor Table
   //
-  if (ControllerVer >= SD_MMC_HC_CTRL_VER_400) {
-    Status = SdMmcHcCheckMmioSet(PciIo, Trb->Slot, SD_MMC_HC_HOST_CTRL2, sizeof(UINT16),
-                                 SD_MMC_HC_V4_EN|SD_MMC_HC_64_ADDR_EN, SD_MMC_HC_V4_EN|SD_MMC_HC_64_ADDR_EN);
-    if (!EFI_ERROR (Status)) {
-      AddressingMode64 = TRUE;
-      DescSize = sizeof (SD_MMC_HC_ADMA_64_DESC_LINE);
-    }
-  }
-  //
-  // Check for valid ranges in 32bit ADMA Descriptor Table
-  //
-  if (!AddressingMode64 &&
-      ((Data >= 0x100000000ul) || ((Data + DataLen) > 0x100000000ul))) {
+  if ((Data >= 0x100000000ul) || ((Data + DataLen) > 0x100000000ul)) {
     return EFI_INVALID_PARAMETER;
   }
   //
-  // Check address field alignment
+  // Address field shall be set on 32-bit boundary (Lower 2-bit is always set to 0)
+  // for 32-bit address descriptor table.
   //
-  if (AddressingMode64) {
-    //
-    // Address field shall be set on 64-bit boundary (Lower 3-bit is always set to 0)
-    //
-    if ((Data & (BIT0 | BIT1 | BIT2)) != 0) {
-      DEBUG ((DEBUG_INFO, "The buffer [0x%x] to construct ADMA desc is not aligned to 8 bytes boundary!\n", Data));
-    }
-  } else {
-    //
-    // Address field shall be set on 32-bit boundary (Lower 2-bit is always set to 0)
-    //
-    if ((Data & (BIT0 | BIT1)) != 0) {
-      DEBUG ((DEBUG_INFO, "The buffer [0x%x] to construct ADMA desc is not aligned to 4 bytes boundary!\n", Data));
-    }
-  }
-  //
-  // Detect whether 26bit data length is supported.
-  //
-  Status = SdMmcHcCheckMmioSet(PciIo, Trb->Slot, SD_MMC_HC_HOST_CTRL2, sizeof(UINT16),
-                               SD_MMC_HC_26_DATA_LEN_ADMA_EN, SD_MMC_HC_26_DATA_LEN_ADMA_EN);
-  if (!EFI_ERROR (Status)) {
-    DataLength26 = TRUE;
-    AdmaMaxDataPerLine = ADMA_MAX_DATA_PER_LINE_26B;
+  if ((Data & (BIT0 | BIT1)) != 0) {
+    DEBUG ((DEBUG_INFO, "The buffer [0x%x] to construct ADMA desc is not aligned to 4 bytes boundary!\n", Data));
   }
 
-  Entries   = DivU64x32 ((DataLen + AdmaMaxDataPerLine - 1), AdmaMaxDataPerLine);
-  TableSize = (UINTN)MultU64x32 (Entries, DescSize);
+  Entries   = DivU64x32 ((DataLen + ADMA_MAX_DATA_PER_LINE - 1), ADMA_MAX_DATA_PER_LINE);
+  TableSize = (UINTN)MultU64x32 (Entries, sizeof (SD_MMC_HC_ADMA_DESC_LINE));
   Trb->AdmaPages = (UINT32)EFI_SIZE_TO_PAGES (TableSize);
   Status = PciIo->AllocateBuffer (
                     PciIo,
                     AllocateAnyPages,
                     EfiBootServicesData,
                     EFI_SIZE_TO_PAGES (TableSize),
-                    (VOID **)&AdmaDesc,
+                    (VOID **)&Trb->AdmaDesc,
                     0
                     );
   if (EFI_ERROR (Status)) {
     return EFI_OUT_OF_RESOURCES;
   }
-  ZeroMem (AdmaDesc, TableSize);
+  ZeroMem (Trb->AdmaDesc, TableSize);
   Bytes  = TableSize;
   Status = PciIo->Map (
                     PciIo,
                     EfiPciIoOperationBusMasterCommonBuffer,
-                    AdmaDesc,
+                    Trb->AdmaDesc,
                     &Bytes,
                     &Trb->AdmaDescPhy,
                     &Trb->AdmaMap
@@ -1468,13 +1240,12 @@ BuildAdmaDescTable (
     PciIo->FreeBuffer (
              PciIo,
              EFI_SIZE_TO_PAGES (TableSize),
-             AdmaDesc
+             Trb->AdmaDesc
              );
     return EFI_OUT_OF_RESOURCES;
   }
 
-  if ((!AddressingMode64) &&
-      (UINT64)(UINTN)Trb->AdmaDescPhy > 0x100000000ul) {
+  if ((UINT64)(UINTN)Trb->AdmaDescPhy > 0x100000000ul) {
     //
     // The ADMA doesn't support 64bit addressing.
     //
@@ -1485,71 +1256,35 @@ BuildAdmaDescTable (
     PciIo->FreeBuffer (
       PciIo,
       EFI_SIZE_TO_PAGES (TableSize),
-      AdmaDesc
+      Trb->AdmaDesc
     );
     return EFI_DEVICE_ERROR;
   }
 
   Remaining = DataLen;
-  Address   = Data;
-  if (!AddressingMode64) {
-    Trb->Adma32Desc = AdmaDesc;
-    Trb->Adma64Desc = NULL;
-  } else {
-    Trb->Adma64Desc = AdmaDesc;
-    Trb->Adma32Desc = NULL;
-  }
+  Address   = (UINT32)Data;
   for (Index = 0; Index < Entries; Index++) {
-    if (!AddressingMode64) {
-      if (Remaining <= AdmaMaxDataPerLine) {
-        Trb->Adma32Desc[Index].Valid = 1;
-        Trb->Adma32Desc[Index].Act   = 2;
-        if (DataLength26) {
-          Trb->Adma32Desc[Index].UpperLength = (UINT16)RShiftU64 (Remaining, 16);
-        }
-        Trb->Adma32Desc[Index].LowerLength = (UINT16)(Remaining & MAX_UINT16);
-        Trb->Adma32Desc[Index].Address = (UINT32)Address;
-        break;
-      } else {
-        Trb->Adma32Desc[Index].Valid = 1;
-        Trb->Adma32Desc[Index].Act   = 2;
-        if (DataLength26) {
-          Trb->Adma32Desc[Index].UpperLength  = 0;
-        }
-        Trb->Adma32Desc[Index].LowerLength  = 0;
-        Trb->Adma32Desc[Index].Address = (UINT32)Address;
-      }
+    if (Remaining <= ADMA_MAX_DATA_PER_LINE) {
+      Trb->AdmaDesc[Index].Valid = 1;
+      Trb->AdmaDesc[Index].Act   = 2;
+      Trb->AdmaDesc[Index].Length  = (UINT16)Remaining;
+      Trb->AdmaDesc[Index].Address = Address;
+      break;
     } else {
-      if (Remaining <= AdmaMaxDataPerLine) {
-        Trb->Adma64Desc[Index].Valid = 1;
-        Trb->Adma64Desc[Index].Act   = 2;
-        if (DataLength26) {
-          Trb->Adma64Desc[Index].UpperLength  = (UINT16)RShiftU64 (Remaining, 16);
-        }
-        Trb->Adma64Desc[Index].LowerLength  = (UINT16)(Remaining & MAX_UINT16);
-        Trb->Adma64Desc[Index].LowerAddress = (UINT32)Address;
-        Trb->Adma64Desc[Index].UpperAddress = (UINT32)RShiftU64 (Address, 32);
-        break;
-      } else {
-        Trb->Adma64Desc[Index].Valid = 1;
-        Trb->Adma64Desc[Index].Act   = 2;
-        if (DataLength26) {
-          Trb->Adma64Desc[Index].UpperLength  = 0;
-        }
-        Trb->Adma64Desc[Index].LowerLength  = 0;
-        Trb->Adma64Desc[Index].LowerAddress = (UINT32)Address;
-        Trb->Adma64Desc[Index].UpperAddress = (UINT32)RShiftU64 (Address, 32);
-      }
+      Trb->AdmaDesc[Index].Valid = 1;
+      Trb->AdmaDesc[Index].Act   = 2;
+      Trb->AdmaDesc[Index].Length  = 0;
+      Trb->AdmaDesc[Index].Address = Address;
     }
 
-    Remaining -= AdmaMaxDataPerLine;
-    Address   += AdmaMaxDataPerLine;
+    Remaining -= ADMA_MAX_DATA_PER_LINE;
+    Address   += ADMA_MAX_DATA_PER_LINE;
   }
 
   //
   // Set the last descriptor line as end of descriptor table
   //
-  AddressingMode64 ? (Trb->Adma64Desc[Index].End = 1) : (Trb->Adma32Desc[Index].End = 1);
+  Trb->AdmaDesc[Index].End = 1;
   return EFI_SUCCESS;
 }
 
@@ -1647,7 +1382,7 @@ SdMmcCreateTrb (
       Trb->Mode = SdMmcNoData;
     } else if (Private->Capability[Slot].Adma2 != 0) {
       Trb->Mode = SdMmcAdmaMode;
-      Status = BuildAdmaDescTable (Trb, Private->ControllerVersion[Slot]);
+      Status = BuildAdmaDescTable (Trb);
       if (EFI_ERROR (Status)) {
         PciIo->Unmap (PciIo, Trb->DataMap);
         goto Error;
@@ -1693,18 +1428,11 @@ SdMmcFreeTrb (
       Trb->AdmaMap
     );
   }
-  if (Trb->Adma32Desc != NULL) {
+  if (Trb->AdmaDesc != NULL) {
     PciIo->FreeBuffer (
       PciIo,
       Trb->AdmaPages,
-      Trb->Adma32Desc
-    );
-  }
-  if (Trb->Adma64Desc != NULL) {
-    PciIo->FreeBuffer (
-      PciIo,
-      Trb->AdmaPages,
-      Trb->Adma64Desc
+      Trb->AdmaDesc
     );
   }
   if (Trb->DataMap != NULL) {
@@ -1844,15 +1572,12 @@ SdMmcExecTrb (
   UINT16                              Cmd;
   UINT16                              IntStatus;
   UINT32                              Argument;
-  UINT32                              BlkCount;
+  UINT16                              BlkCount;
   UINT16                              BlkSize;
   UINT16                              TransMode;
   UINT8                               HostCtrl1;
-  UINT64                              SdmaAddr;
+  UINT32                              SdmaAddr;
   UINT64                              AdmaAddr;
-  BOOLEAN                             AddressingMode64;
-
-  AddressingMode64 = FALSE;
 
   Packet = Trb->Packet;
   PciIo  = Trb->Private->PciIo;
@@ -1885,28 +1610,13 @@ SdMmcExecTrb (
 
   SdMmcHcLedOnOff (PciIo, Trb->Slot, TRUE);
 
-  if (Private->ControllerVersion[Trb->Slot] >= SD_MMC_HC_CTRL_VER_400) {
-    Status = SdMmcHcCheckMmioSet(PciIo, Trb->Slot, SD_MMC_HC_HOST_CTRL2, sizeof(UINT16),
-                                 SD_MMC_HC_V4_EN|SD_MMC_HC_64_ADDR_EN, SD_MMC_HC_V4_EN|SD_MMC_HC_64_ADDR_EN);
-    if (!EFI_ERROR (Status)) {
-      AddressingMode64 = TRUE;
-    }
-  }
-
   if (Trb->Mode == SdMmcSdmaMode) {
-    if ((!AddressingMode64) &&
-        ((UINT64)(UINTN)Trb->DataPhy >= 0x100000000ul)) {
+    if ((UINT64)(UINTN)Trb->DataPhy >= 0x100000000ul) {
       return EFI_INVALID_PARAMETER;
     }
 
-    SdmaAddr = (UINT64)(UINTN)Trb->DataPhy;
-
-    if (Private->ControllerVersion[Trb->Slot] >= SD_MMC_HC_CTRL_VER_400) {
-      Status = SdMmcHcRwMmio (PciIo, Trb->Slot, SD_MMC_HC_ADMA_SYS_ADDR, FALSE, sizeof (UINT64), &SdmaAddr);
-    } else {
-      Status = SdMmcHcRwMmio (PciIo, Trb->Slot, SD_MMC_HC_SDMA_ADDR, FALSE, sizeof (UINT32), &SdmaAddr);
-    }
-
+    SdmaAddr = (UINT32)(UINTN)Trb->DataPhy;
+    Status   = SdMmcHcRwMmio (PciIo, Trb->Slot, SD_MMC_HC_SDMA_ADDR, FALSE, sizeof (SdmaAddr), &SdmaAddr);
     if (EFI_ERROR (Status)) {
       return Status;
     }
@@ -1936,13 +1646,9 @@ SdMmcExecTrb (
     //
     // Calcuate Block Count.
     //
-    BlkCount = (Trb->DataLen / Trb->BlockSize);
+    BlkCount = (UINT16)(Trb->DataLen / Trb->BlockSize);
   }
-  if (Private->ControllerVersion[Trb->Slot] >= SD_MMC_HC_CTRL_VER_410) {
-    Status = SdMmcHcRwMmio (PciIo, Trb->Slot, SD_MMC_HC_SDMA_ADDR, FALSE, sizeof (UINT32), &BlkCount);
-  } else {
-    Status = SdMmcHcRwMmio (PciIo, Trb->Slot, SD_MMC_HC_BLK_COUNT, FALSE, sizeof (UINT16), &BlkCount);
-  }
+  Status   = SdMmcHcRwMmio (PciIo, Trb->Slot, SD_MMC_HC_BLK_COUNT, FALSE, sizeof (BlkCount), &BlkCount);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -2038,7 +1744,7 @@ SdMmcCheckTrbResult (
   EFI_SD_MMC_PASS_THRU_COMMAND_PACKET *Packet;
   UINT16                              IntStatus;
   UINT32                              Response[4];
-  UINT64                              SdmaAddr;
+  UINT32                              SdmaAddr;
   UINT8                               Index;
   UINT8                               SwReset;
   UINT32                              PioLength;
@@ -2162,19 +1868,8 @@ SdMmcCheckTrbResult (
     //
     // Update SDMA Address register.
     //
-    SdmaAddr = SD_MMC_SDMA_ROUND_UP ((UINTN)Trb->DataPhy, SD_MMC_SDMA_BOUNDARY);
-
-    if (Private->ControllerVersion[Trb->Slot] >= SD_MMC_HC_CTRL_VER_400) {
-      Status = SdMmcHcRwMmio (
-                 Private->PciIo,
-                 Trb->Slot,
-                 SD_MMC_HC_ADMA_SYS_ADDR,
-                 FALSE,
-                 sizeof (UINT64),
-                 &SdmaAddr
-                 );
-    } else {
-      Status = SdMmcHcRwMmio (
+    SdmaAddr = SD_MMC_SDMA_ROUND_UP ((UINT32)(UINTN)Trb->DataPhy, SD_MMC_SDMA_BOUNDARY);
+    Status   = SdMmcHcRwMmio (
                  Private->PciIo,
                  Trb->Slot,
                  SD_MMC_HC_SDMA_ADDR,
@@ -2182,12 +1877,10 @@ SdMmcCheckTrbResult (
                  sizeof (UINT32),
                  &SdmaAddr
                  );
-    }
-
     if (EFI_ERROR (Status)) {
       goto Done;
     }
-    Trb->DataPhy = (UINT64)(UINTN)SdmaAddr;
+    Trb->DataPhy = (UINT32)(UINTN)SdmaAddr;
   }
 
   if ((Packet->SdMmcCmdBlk->CommandType != SdMmcCommandTypeAdtc) &&
@@ -2306,5 +1999,283 @@ SdMmcWaitTrbResult (
   }
 
   return EFI_TIMEOUT;
+}
+
+BOOLEAN BhtHostPciSupport(EFI_PCI_IO_PROTOCOL *PciIo)
+{
+	PCI_TYPE00		Pci;
+
+	PciIo->Pci.Read (PciIo, EfiPciIoWidthUint32,		
+				  0, sizeof Pci / sizeof (UINT32), &Pci);
+
+	DEBUG ((DEBUG_INFO, "check device %04x:%04x\n", Pci.Hdr.VendorId, Pci.Hdr.DeviceId));
+
+	if (Pci.Hdr.VendorId != 0x1217)
+		goto end;
+
+	switch (Pci.Hdr.DeviceId)
+	{
+		case 0x8420:	//PCI_DEV_ID_SDS0
+		case 0x8421:	//PCI_DEV_ID_SDS1
+		case 0x8520:	//PCI_DEV_ID_FJ2
+		case 0x8620:	//PCI_DEV_ID_SB0
+		case 0x8621:	//PCI_DEV_ID_SB1
+			g_deviceId = Pci.Hdr.DeviceId;
+			return 1;
+		default:
+			break;
+	}
+
+	end:
+	return 0;
+}
+
+void DbgNull(IN CONST CHAR16 * fmt, ...)
+{
+}
+
+UINT32 bht_readl(EFI_PCI_IO_PROTOCOL *PciIo, UINT32 offset)
+{
+	UINT32 arg;
+	PciIo->Mem.Read(PciIo,EfiPciIoWidthUint32,1,offset,1,&arg);
+	return arg;
+}
+
+void bht_writel(EFI_PCI_IO_PROTOCOL *PciIo, UINT32 offset, UINT32 value)
+{
+	PciIo->Mem.Write(PciIo,EfiPciIoWidthUint32,1,offset,1,&value);
+}
+
+
+UINT32 PciBhtRead32(EFI_PCI_IO_PROTOCOL *PciIo, UINT32 offset)
+{
+	UINT32 i = 0;
+	UINT32 tmp[3] = {0};
+
+	if((g_deviceId == PCI_DEV_ID_SDS0) ||
+			(g_deviceId == PCI_DEV_ID_SDS1) ||
+			(g_deviceId == PCI_DEV_ID_FJ2) ||
+			(g_deviceId == PCI_DEV_ID_SB0) ||
+			(g_deviceId == PCI_DEV_ID_SB1))
+	{
+		// For Sandstorm, HW implement a mapping method by memory space reg to access PCI reg.
+		// Enable mapping
+	
+		// Check function conflict
+		if((g_deviceId == PCI_DEV_ID_SDS0) ||
+				(g_deviceId == PCI_DEV_ID_FJ2) ||
+				(g_deviceId == PCI_DEV_ID_SB0) ||
+				(g_deviceId == PCI_DEV_ID_SB1))
+		{
+			i = 0;
+			bht_writel(PciIo, BHT_PCIRMappingEn, 0x40000000);
+			while((bht_readl(PciIo, BHT_PCIRMappingEn) & 0x40000000) == 0)
+			{
+				if(i == 5)
+				{
+					//DbgMsg((DRIVERNAME " - %s() function 0 can't lock!\n", __FUNCTION__));
+					goto RD_DIS_MAPPING;
+				}
+						gBS->Stall(1000);
+				i++;
+					bht_writel(PciIo, BHT_PCIRMappingEn, 0x40000000);
+	
+			}
+		}
+		else if(g_deviceId == PCI_DEV_ID_SDS1)
+		{
+			i = 0;
+			bht_writel(PciIo, BHT_PCIRMappingEn, 0x20000000);
+			while((bht_readl(PciIo, BHT_PCIRMappingEn) & 0x20000000) == 0)
+			{
+				if(i == 5)
+				{
+					//DbgErr((DRIVERNAME " - %s() function 1 can't lock!\n", __FUNCTION__));
+					goto RD_DIS_MAPPING;
+				}
+				gBS->Stall(1000);
+				i++;
+				bht_writel(PciIo, BHT_PCIRMappingEn, 0x20000000);
+			}
+		}
+	
+		// Check last operation is complete
+		i = 0;
+		while(bht_readl(PciIo, BHT_PCIRMappingCtl) & 0xc0000000)
+		{
+			if(i == 5)
+			{
+				//DbgErr((DRIVERNAME " - [204] = 0x%x\n", RegisterRead32(ELN_dPCIRMappingCtl)));
+				//DbgErr((DRIVERNAME " - [208] = 0x%x\n", RegisterRead32(ELN_dPCIRMappingEn)));
+				//DbgErr((DRIVERNAME " - %s() check last operation complete timeout!!!\n", __FUNCTION__));
+				goto RD_DIS_MAPPING;
+			}
+			gBS->Stall(1000);
+			i += 1;
+		}
+	
+		// Set register address
+		tmp[0] |= 0x40000000;
+		tmp[0] |= offset;
+		bht_writel(PciIo, BHT_PCIRMappingCtl, tmp[0]);
+	
+		// Check read is complete
+		i = 0;
+		while(bht_readl(PciIo, BHT_PCIRMappingCtl) & 0x40000000)
+		{
+			if(i == 5)
+			{
+				//DbgErr((DRIVERNAME " - %s() check read operation complete timeout!!!\n", __FUNCTION__));
+				goto RD_DIS_MAPPING;
+			}
+			gBS->Stall(1000);
+			i += 1;
+		}
+	
+		// Get PCIR value
+		tmp[1] = bht_readl(PciIo, BHT_PCIRMappingVal);
+	
+RD_DIS_MAPPING:
+		// Disable mapping
+		bht_writel(PciIo, BHT_PCIRMappingEn, 0x80000000);
+	
+		//DbgDebug(L"%s offset=%x Value:%x\n", __FUNCTION__, offset, tmp[1]);
+		return tmp[1];
+	}
+	
+	//DbgDebug(L"%s offset=%x Value:%x\n", __FUNCTION__, offset, tmp[0]);
+	return tmp[0];	
+}
+
+void PciBhtWrite32(EFI_PCI_IO_PROTOCOL *PciIo, UINT32 offset, UINT32 value)
+{
+	UINT32 tmp = 0;
+    UINT32 i = 0;
+
+	if((g_deviceId == PCI_DEV_ID_SDS0) ||
+			(g_deviceId == PCI_DEV_ID_SDS1) ||
+			(g_deviceId == PCI_DEV_ID_FJ2) ||
+			(g_deviceId == PCI_DEV_ID_SB0) ||
+			(g_deviceId == PCI_DEV_ID_SB1))
+    {
+        // For Sandstorm, HW implement a mapping method by memory space reg to access PCI reg.
+        // Upper caller doesn't need to set 0xD0.
+
+        // Enable mapping
+
+        // Check function conflict
+		if((g_deviceId == PCI_DEV_ID_SDS0) ||
+				(g_deviceId == PCI_DEV_ID_FJ2) ||
+				(g_deviceId == PCI_DEV_ID_SB0) ||
+				(g_deviceId == PCI_DEV_ID_SB1))
+        {
+            i = 0;
+            bht_writel(PciIo, BHT_PCIRMappingEn, 0x40000000);
+            while((bht_readl(PciIo, BHT_PCIRMappingEn) & 0x40000000) == 0)
+            {
+                if(i == 5)
+                {
+                    //DbgErr((DRIVERNAME " - %s() function 0 can't lock!\n", __FUNCTION__));
+                    goto WR_DIS_MAPPING;
+                }
+
+                gBS->Stall(1000);
+                i++;
+                bht_writel(PciIo, BHT_PCIRMappingEn, 0x40000000);
+            }
+        }
+        else if(g_deviceId == PCI_DEV_ID_SDS1)
+        {
+            i = 0;
+            bht_writel(PciIo, BHT_PCIRMappingEn, 0x20000000);
+
+            while((bht_readl(PciIo, BHT_PCIRMappingEn) & 0x20000000) == 0)
+            {
+                if(i == 5)
+                {
+                    //DbgErr((DRIVERNAME " - %s() function 0 can't lock!\n", __FUNCTION__));
+                    goto WR_DIS_MAPPING;
+                }
+
+                gBS->Stall(1000);
+                i++;
+                bht_writel(PciIo, BHT_PCIRMappingEn, 0x20000000);
+            }
+        }
+
+        // Enable MEM access
+        bht_writel(PciIo, BHT_PCIRMappingVal, 0x80000000);
+        bht_writel(PciIo, BHT_PCIRMappingCtl, 0x800000D0);
+
+        // Check last operation is complete
+        i = 0;
+        while(bht_readl(PciIo, BHT_PCIRMappingCtl) & 0xc0000000)
+        {
+            if(i == 5)
+            {
+                //DbgErr((DRIVERNAME " - %s() check last operation complete timeout!!!\n", __FUNCTION__));
+                goto WR_DIS_MAPPING;
+            }
+            gBS->Stall(1000);
+            i += 1;
+        }
+
+        // Set write value
+        bht_writel(PciIo, BHT_PCIRMappingVal, value);
+        // Set register address
+        tmp |= 0x80000000;
+        tmp |= offset;
+        bht_writel(PciIo, BHT_PCIRMappingCtl, tmp);
+
+        // Check write is complete
+        i = 0;
+        while(bht_readl(PciIo, BHT_PCIRMappingCtl) & 0x80000000)
+        {
+            if(i == 5)
+            {
+                //DbgErr((DRIVERNAME " - %s() check write operation complete timeout!!!\n", __FUNCTION__));
+                goto WR_DIS_MAPPING;
+            }
+            gBS->Stall(1000);
+            i += 1;
+        }
+
+WR_DIS_MAPPING:
+        // Disable MEM access
+        bht_writel(PciIo, BHT_PCIRMappingVal, 0x80000001);
+        bht_writel(PciIo, BHT_PCIRMappingCtl, 0x800000D0);
+
+        // Check last operation is complete
+        i = 0;
+        while(bht_readl(PciIo, BHT_PCIRMappingCtl) & 0xc0000000)
+        {
+            if(i == 5)
+            {
+                //DbgErr((DRIVERNAME " - %s() check last operation complete timeout!!!\n", __FUNCTION__));
+                break;
+            }
+            gBS->Stall(1000);
+            i += 1;
+        }
+
+        // Disable function conflict
+
+        // Disable mapping
+        bht_writel(PciIo, BHT_PCIRMappingEn, 0x80000000);
+    }
+}
+
+void PciBhtOr32(EFI_PCI_IO_PROTOCOL *PciIo, UINT32 offset, UINT32 value)
+{
+	UINT32 arg;
+	arg = PciBhtRead32(PciIo, offset);
+	PciBhtWrite32(PciIo, offset, value | arg);
+}
+
+void PciBhtAnd32(EFI_PCI_IO_PROTOCOL *PciIo, UINT32 offset, UINT32 value)
+{
+	UINT32 arg;
+	arg = PciBhtRead32(PciIo, offset);
+	PciBhtWrite32(PciIo, offset, value & arg);
 }
 
