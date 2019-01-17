@@ -1,7 +1,6 @@
 /** @file
   This file provides some helper functions which are specific for EMMC device.
 
-  Copyright (c) 2018, NVIDIA CORPORATION. All rights reserved.
   Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -674,7 +673,6 @@ EmmcSwitchBusWidth (
   @param[in] Slot           The slot number of the SD card to send the command to.
   @param[in] Rca            The relative device address to be assigned.
   @param[in] HsTiming       The value to be written to HS_TIMING field of EXT_CSD register.
-  @param[in] Timing         The bus mode timing indicator.
   @param[in] ClockFreq      The max clock frequency to be set, the unit is MHz.
 
   @retval EFI_SUCCESS       The operation is done correctly.
