@@ -2,7 +2,6 @@
 
   Provides some data structure definitions used by the SD/MMC host controller driver.
 
-Copyright (c) 2018, NVIDIA CORPORATION. All rights reserved.
 Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -36,7 +35,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/DriverBinding.h>
 #include <Protocol/ComponentName.h>
 #include <Protocol/ComponentName2.h>
-#include <Protocol/SdMmcOverride.h>
 #include <Protocol/SdMmcPassThru.h>
 
 #include "SdMmcPciHci.h"
@@ -44,8 +42,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 extern EFI_COMPONENT_NAME_PROTOCOL  gSdMmcPciHcComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL gSdMmcPciHcComponentName2;
 extern EFI_DRIVER_BINDING_PROTOCOL  gSdMmcPciHcDriverBinding;
-
-extern EDKII_SD_MMC_OVERRIDE        *mOverride;
 
 #define SD_MMC_HC_PRIVATE_SIGNATURE  SIGNATURE_32 ('s', 'd', 't', 'f')
 
@@ -56,6 +52,7 @@ extern EDKII_SD_MMC_OVERRIDE        *mOverride;
 // Generic time out value, 1 microsecond as unit.
 //
 #define SD_MMC_HC_GENERIC_TIMEOUT     1 * 1000 * 1000
+#define SD_MMC_CLOCK_STABLE_TIMEOUT   3 * 1000
 
 //
 // SD/MMC async transfer timer interval, set by experience.
@@ -117,13 +114,8 @@ typedef struct {
   SD_MMC_HC_SLOT                      Slot[SD_MMC_HC_MAX_SLOT];
   SD_MMC_HC_SLOT_CAP                  Capability[SD_MMC_HC_MAX_SLOT];
   UINT64                              MaxCurrent[SD_MMC_HC_MAX_SLOT];
-  UINT16                              ControllerVersion[SD_MMC_HC_MAX_SLOT];
 
-  //
-  // Some controllers may require to override base clock frequency
-  // value stored in Capabilities Register 1.
-  //
-  UINT32                              BaseClkFreq[SD_MMC_HC_MAX_SLOT];
+  UINT32                              ControllerVersion;
 } SD_MMC_HC_PRIVATE_DATA;
 
 #define SD_MMC_HC_TRB_SIG             SIGNATURE_32 ('T', 'R', 'B', 'T')
@@ -150,8 +142,7 @@ typedef struct {
   BOOLEAN                             Started;
   UINT64                              Timeout;
 
-  SD_MMC_HC_ADMA_32_DESC_LINE         *Adma32Desc;
-  SD_MMC_HC_ADMA_64_DESC_LINE         *Adma64Desc;
+  SD_MMC_HC_ADMA_DESC_LINE            *AdmaDesc;
   EFI_PHYSICAL_ADDRESS                AdmaDescPhy;
   VOID                                *AdmaMap;
   UINT32                              AdmaPages;
@@ -790,39 +781,6 @@ EFI_STATUS
 SdCardIdentification (
   IN SD_MMC_HC_PRIVATE_DATA             *Private,
   IN UINT8                              Slot
-  );
-
-/**
-  Software reset the specified SD/MMC host controller.
-
-  @param[in] Private        A pointer to the SD_MMC_HC_PRIVATE_DATA instance.
-  @param[in] Slot           The slot number of the SD card to send the command to.
-
-  @retval EFI_SUCCESS       The software reset executes successfully.
-  @retval Others            The software reset fails.
-
-**/
-EFI_STATUS
-SdMmcHcReset (
-  IN SD_MMC_HC_PRIVATE_DATA *Private,
-  IN UINT8                  Slot
-  );
-
-/**
-  Initial SD/MMC host controller with lowest clock frequency, max power and max timeout value
-  at initialization.
-
-  @param[in] Private        A pointer to the SD_MMC_HC_PRIVATE_DATA instance.
-  @param[in] Slot           The slot number of the SD card to send the command to.
-
-  @retval EFI_SUCCESS       The host controller is initialized successfully.
-  @retval Others            The host controller isn't initialized successfully.
-
-**/
-EFI_STATUS
-SdMmcHcInitHost (
-  IN SD_MMC_HC_PRIVATE_DATA *Private,
-  IN UINT8                  Slot
   );
 
 #endif
