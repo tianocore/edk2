@@ -1195,8 +1195,11 @@ class PcdReport(object):
         HasDscOverride = False
         if struct:
             for _, Values in struct.items():
-                if Values[1] and Values[1].endswith('.dsc'):
-                    HasDscOverride = True
+                for Key, value in Values.items():
+                    if value[1] and value[1].endswith('.dsc'):
+                        HasDscOverride = True
+                        break
+                if HasDscOverride == True:
                     break
         return HasDscOverride
 
