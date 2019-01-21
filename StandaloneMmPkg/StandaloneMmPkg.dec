@@ -42,6 +42,3 @@
 [PcdsFeatureFlag]
   gStandaloneMmPkgTokenSpaceGuid.PcdStandaloneMmEnable|FALSE|BOOLEAN|0x00000001
 
-[Protocols]
-  gEfiMmConfigurationProtocolGuid          = { 0xc109319, 0xc149, 0x450e,  { 0xa3, 0xe3, 0xb9, 0xba, 0xdd, 0x9d, 0xc3, 0xa4 }}
-
