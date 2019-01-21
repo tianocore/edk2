@@ -43,7 +43,7 @@
   #
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
   BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
-  DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
+  DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
   DebugPrintErrorLevelLib|MdePkg/Library/BaseDebugPrintErrorLevelLib/BaseDebugPrintErrorLevelLib.inf
   FvLib|StandaloneMmPkg/Library/FvLib/FvLib.inf
   HobLib|StandaloneMmPkg/Library/StandaloneMmCoreHobLib/StandaloneMmCoreHobLib.inf
@@ -66,10 +66,6 @@
   ArmSvcLib|ArmPkg/Library/ArmSvcLib/ArmSvcLib.inf
   CacheMaintenanceLib|ArmPkg/Library/ArmCacheMaintenanceLib/ArmCacheMaintenanceLib.inf
   PeCoffExtraActionLib|StandaloneMmPkg/Library/StandaloneMmPeCoffExtraActionLib/StandaloneMmPeCoffExtraActionLib.inf
-  PL011UartLib|ArmPlatformPkg/Library/PL011UartLib/PL011UartLib.inf
-  PL011UartClockLib|ArmPlatformPkg/Library/PL011UartClockLib/PL011UartClockLib.inf
-  # ARM PL011 UART Driver
-  SerialPortLib|ArmPlatformPkg/Library/PL011SerialPortLib/PL011SerialPortLib.inf
 
   StandaloneMmCoreEntryPoint|StandaloneMmPkg/Library/StandaloneMmCoreEntryPoint/StandaloneMmCoreEntryPoint.inf
 
@@ -85,11 +81,6 @@
   gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x800000CF
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0xff
   gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0x0f
-
-[PcdsFixedAtBuild.AARCH64]
-  ## PL011 - Serial Terminal
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x1c0b0000
-  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate|115200
 
 ###################################################################################################
 #
