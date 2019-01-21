@@ -213,6 +213,7 @@ NvmExpressPeimEntry (
   )
 {
   EFI_STATUS                               Status;
+  EFI_BOOT_MODE                            BootMode;
   EDKII_NVM_EXPRESS_HOST_CONTROLLER_PPI    *NvmeHcPpi;
   UINT8                                    Controller;
   UINTN                                    MmioBase;
@@ -222,6 +223,15 @@ NvmExpressPeimEntry (
   EFI_PHYSICAL_ADDRESS                     DeviceAddress;
 
   DEBUG ((DEBUG_INFO, "%a: Enters.\n", __FUNCTION__));
+
+  //
+  // Get the current boot mode.
+  //
+  Status = PeiServicesGetBootMode (&BootMode);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: Fail to get the current boot mode.\n", __FUNCTION__));
+    return Status;
+  }
 
   //
   // Locate the NVME host controller PPI
@@ -273,6 +283,22 @@ NvmExpressPeimEntry (
     if (EFI_ERROR (Status)) {
       DEBUG ((
         DEBUG_ERROR, "%a: The device path is invalid for Controller %d.\n",
+        __FUNCTION__, Controller
+        ));
+      Controller++;
+      continue;
+    }
+
+    //
+    // For S3 resume performance consideration, not all NVM Express controllers
+    // will be initialized. The driver consumes the content within
+    // S3StorageDeviceInitList LockBox to see if a controller will be skipped
+    // during S3 resume.
+    //
+    if ((BootMode == BOOT_ON_S3_RESUME) &&
+        (NvmeS3SkipThisController (DevicePath, DevicePathLength))) {
+      DEBUG ((
+        DEBUG_ERROR, "%a: Controller %d is skipped during S3.\n",
         __FUNCTION__, Controller
         ));
       Controller++;

@@ -267,6 +267,26 @@ NvmePeimEndOfPei (
   );
 
 /**
+  Get the size of the current device path instance.
+
+  @param[in]  DevicePath             A pointer to the EFI_DEVICE_PATH_PROTOCOL
+                                     structure.
+  @param[out] InstanceSize           The size of the current device path instance.
+  @param[out] EntireDevicePathEnd    Indicate whether the instance is the last
+                                     one in the device path strucure.
+
+  @retval EFI_SUCCESS    The size of the current device path instance is fetched.
+  @retval Others         Fails to get the size of the current device path instance.
+
+**/
+EFI_STATUS
+GetDevicePathInstanceSize (
+  IN  EFI_DEVICE_PATH_PROTOCOL    *DevicePath,
+  OUT UINTN                       *InstanceSize,
+  OUT BOOLEAN                     *EntireDevicePathEnd
+  );
+
+/**
   Check the validity of the device path of a NVM Express host controller.
 
   @param[in] DevicePath          A pointer to the EFI_DEVICE_PATH_PROTOCOL
@@ -307,6 +327,22 @@ NvmeBuildDevicePath (
   IN  UINT64                              NamespaceUuid,
   OUT UINTN                               *DevicePathLength,
   OUT EFI_DEVICE_PATH_PROTOCOL            **DevicePath
+  );
+
+/**
+  Determine if a specific NVM Express controller can be skipped for S3 phase.
+
+  @param[in]  HcDevicePath          Device path of the controller.
+  @param[in]  HcDevicePathLength    Length of the device path specified by
+                                    HcDevicePath.
+
+  @retval    The number of ports that need to be enumerated.
+
+**/
+BOOLEAN
+NvmeS3SkipThisController (
+  IN  EFI_DEVICE_PATH_PROTOCOL    *HcDevicePath,
+  IN  UINTN                       HcDevicePathLength
   );
 
 #endif

@@ -40,6 +40,7 @@
   NvmExpressPeiHci.h
   NvmExpressPeiPassThru.c
   NvmExpressPeiPassThru.h
+  NvmExpressPeiS3.c
   NvmExpressPeiStorageSecurity.c
   NvmExpressPeiStorageSecurity.h
 
@@ -54,6 +55,7 @@
   BaseMemoryLib
   IoLib
   TimerLib
+  LockBoxLib
   PeimEntryPoint
 
 [Ppis]
@@ -64,9 +66,13 @@
   gEfiPeiVirtualBlockIo2PpiGuid                  ## SOMETIMES_PRODUCES
   gEdkiiPeiStorageSecurityCommandPpiGuid         ## SOMETIMES_PRODUCES
 
+[Guids]
+  gS3StorageDeviceInitListGuid                   ## SOMETIMES_CONSUMES ## UNDEFINED
+
 [Depex]
   gEfiPeiMemoryDiscoveredPpiGuid AND
-  gEdkiiPeiNvmExpressHostControllerPpiGuid
+  gEdkiiPeiNvmExpressHostControllerPpiGuid AND
+  gEfiPeiMasterBootModePpiGuid
 
 [UserExtensions.TianoCore."ExtraFiles"]
   NvmExpressPeiExtra.uni

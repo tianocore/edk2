@@ -89,6 +89,59 @@ NextDevicePathNode (
 }
 
 /**
+  Get the size of the current device path instance.
+
+  @param[in]  DevicePath             A pointer to the EFI_DEVICE_PATH_PROTOCOL
+                                     structure.
+  @param[out] InstanceSize           The size of the current device path instance.
+  @param[out] EntireDevicePathEnd    Indicate whether the instance is the last
+                                     one in the device path strucure.
+
+  @retval EFI_SUCCESS    The size of the current device path instance is fetched.
+  @retval Others         Fails to get the size of the current device path instance.
+
+**/
+EFI_STATUS
+GetDevicePathInstanceSize (
+  IN  EFI_DEVICE_PATH_PROTOCOL    *DevicePath,
+  OUT UINTN                       *InstanceSize,
+  OUT BOOLEAN                     *EntireDevicePathEnd
+  )
+{
+  EFI_DEVICE_PATH_PROTOCOL    *Walker;
+
+  if (DevicePath == NULL || InstanceSize == NULL || EntireDevicePathEnd == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Find the end of the device path instance
+  //
+  Walker = DevicePath;
+  while (Walker->Type != END_DEVICE_PATH_TYPE) {
+    Walker = NextDevicePathNode (Walker);
+  }
+
+  //
+  // Check if 'Walker' points to the end of an entire device path
+  //
+  if (Walker->SubType == END_ENTIRE_DEVICE_PATH_SUBTYPE) {
+    *EntireDevicePathEnd = TRUE;
+  } else if (Walker->SubType == END_INSTANCE_DEVICE_PATH_SUBTYPE) {
+    *EntireDevicePathEnd = FALSE;
+  } else {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Compute the size of the device path instance
+  //
+  *InstanceSize = ((UINTN) Walker - (UINTN) (DevicePath)) + sizeof (EFI_DEVICE_PATH_PROTOCOL);
+
+  return EFI_SUCCESS;
+}
+
+/**
   Check the validity of the device path of a NVM Express host controller.
 
   @param[in] DevicePath          A pointer to the EFI_DEVICE_PATH_PROTOCOL
