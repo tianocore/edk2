@@ -37,9 +37,6 @@
   MdePkg/MdePkg.dec
   StandaloneMmPkg/StandaloneMmPkg.dec
 
-[FeaturePcd]
-  gStandaloneMmPkgTokenSpaceGuid.PcdStandaloneMmEnable
-
 [LibraryClasses]
   StandaloneMmMmuLib
   PcdLib
