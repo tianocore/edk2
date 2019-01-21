@@ -232,9 +232,6 @@ _ModuleEntryPoint (
   VOID                                    *TeData;
   UINTN                                   TeDataSize;
 
-  Status = SerialPortInitialize ();
-  ASSERT_EFI_ERROR (Status);
-
   // Get Secure Partition Manager Version Information
   Status = GetSpmVersion ();
   if (EFI_ERROR (Status)) {
