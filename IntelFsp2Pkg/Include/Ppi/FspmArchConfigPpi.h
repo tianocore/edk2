@@ -1,7 +1,6 @@
 /** @file
   Header file for FSP-M Arch Config PPI for Dispatch mode
 
- @copyright
   Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available under
