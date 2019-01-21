@@ -192,6 +192,10 @@ class MetaFileParser(object):
         self._Version = 0
         self._GuidDict = {}  # for Parser PCD value {GUID(gTokeSpaceGuidName)}
 
+        self._PcdCodeValue = ""
+        self._PcdDataTypeCODE = False
+        self._CurrentPcdName = ""
+
     ## Store the parsed data in table
     def _Store(self, *Args):
         return self._Table.Insert(*Args)
@@ -482,6 +486,39 @@ class MetaFileParser(object):
         Macros.update(SpeSpeMacroDict)
 
         return Macros
+
+    def ProcessMultipleLineCODEValue(self,Content):
+        CODEBegin = False
+        CODELine = ""
+        continuelinecount = 0
+        newContent = []
+        for Index in range(0, len(Content)):
+            Line = Content[Index]
+            if CODEBegin:
+                CODELine = CODELine + Line
+                continuelinecount +=1
+                if ")}" in Line:
+                    newContent.append(CODELine)
+                    for _ in range(continuelinecount):
+                        newContent.append("")
+                    CODEBegin = False
+                    CODELine = ""
+                    continuelinecount = 0
+            else:
+                if not Line:
+                    newContent.append(Line)
+                    continue
+                if "{CODE(" not in Line:
+                    newContent.append(Line)
+                    continue
+                elif CODEPattern.findall(Line):
+                    newContent.append(Line)
+                    continue
+                else:
+                    CODEBegin = True
+                    CODELine = Line
+
+        return newContent
 
     _SectionParser = {}
 
@@ -907,9 +944,6 @@ class DscParser(MetaFileParser):
         #
         self._IdMapping = {-1:-1}
 
-        self._PcdCodeValue = ""
-        self._PcdDataTypeCODE = False
-        self._CurrentPcdName = ""
         self._Content = None
 
     ## Parser starter
@@ -1140,38 +1174,6 @@ class DscParser(MetaFileParser):
     def _LibraryInstanceParser(self):
         self._ValueList[0] = self._CurrentLine
 
-    def ProcessMultipleLineCODEValue(self,Content):
-        CODEBegin = False
-        CODELine = ""
-        continuelinecount = 0
-        newContent = []
-        for Index in range(0, len(Content)):
-            Line = Content[Index]
-            if CODEBegin:
-                CODELine = CODELine + Line
-                continuelinecount +=1
-                if ")}" in Line:
-                    newContent.append(CODELine)
-                    for _ in range(continuelinecount):
-                        newContent.append("")
-                    CODEBegin = False
-                    CODELine = ""
-                    continuelinecount = 0
-            else:
-                if not Line:
-                    newContent.append(Line)
-                    continue
-                if "{CODE(" not in Line:
-                    newContent.append(Line)
-                    continue
-                elif CODEPattern.findall(Line):
-                    newContent.append(Line)
-                    continue
-                else:
-                    CODEBegin = True
-                    CODELine = Line
-
-        return newContent
 
     def _DecodeCODEData(self):
         pass
@@ -1778,6 +1780,8 @@ class DecParser(MetaFileParser):
         self._include_flag = False
         self._package_flag = False
 
+        self._RestofValue = ""
+
     ## Parser starter
     def Start(self):
         Content = ''
@@ -1785,6 +1789,8 @@ class DecParser(MetaFileParser):
             Content = open(str(self.MetaFile), 'r').readlines()
         except:
             EdkLogger.error("Parser", FILE_READ_FAILURE, ExtraData=self.MetaFile)
+
+        Content = self.ProcessMultipleLineCODEValue(Content)
 
         self._DefinesCount = 0
         for Index in range(0, len(Content)):
@@ -1983,6 +1989,7 @@ class DecParser(MetaFileParser):
     #
     @ParseMacro
     def _PcdParser(self):
+
         if self._CurrentStructurePcdName:
             self._ValueList[0] = self._CurrentStructurePcdName
 
@@ -2028,7 +2035,29 @@ class DecParser(MetaFileParser):
                     self._ValueList[1] = TAB_SPLIT.join(PcdNames[2:])
                     self._ValueList[2] = PcdTockens[1]
         if not self._CurrentStructurePcdName:
+            if self._PcdDataTypeCODE:
+                if ")}" in self._CurrentLine:
+                    ValuePart,RestofValue = self._CurrentLine.split(")}")
+                    self._PcdCodeValue = self._PcdCodeValue + "\n " + ValuePart
+                    self._CurrentLine = "|".join((self._CurrentPcdName, self._PcdCodeValue,RestofValue))
+                    self._PcdDataTypeCODE = False
+                    self._PcdCodeValue = ""
+                else:
+                    self._PcdCodeValue = self._PcdCodeValue + "\n " + self._CurrentLine
+                    self._ValueList = None
+                    return
             TokenList = GetSplitValueList(self._CurrentLine, TAB_VALUE_SPLIT, 1)
+            self._CurrentPcdName = TokenList[0]
+            if len(TokenList) == 2 and TokenList[1].strip().startswith("{CODE"):
+                if ")}" in self._CurrentLine:
+                    self._PcdDataTypeCODE = False
+                    self._PcdCodeValue = ""
+                else:
+                    self._PcdDataTypeCODE = True
+                    self._PcdCodeValue = TokenList[1].strip()
+                    self._ValueList = None
+                    return
+
             self._ValueList[0:1] = GetSplitValueList(TokenList[0], TAB_SPLIT)
             ValueRe = re.compile(r'^[a-zA-Z_][a-zA-Z0-9_]*')
             # check PCD information

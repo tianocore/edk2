@@ -149,7 +149,7 @@ def ByteArrayForamt(Value):
     IsByteArray = False
     SplitNum = 16
     ArrayList = []
-    if Value.startswith('{') and Value.endswith('}'):
+    if Value.startswith('{') and Value.endswith('}') and not Value.startswith("{CODE("):
         Value = Value[1:-1]
         ValueList = Value.split(',')
         if len(ValueList) >= SplitNum:
