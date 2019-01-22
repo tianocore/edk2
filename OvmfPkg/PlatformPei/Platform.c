@@ -190,8 +190,10 @@ MemMapInitialization (
       ASSERT (TopOfLowRam <= PciExBarBase);
       ASSERT (PciExBarBase <= MAX_UINT32 - SIZE_256MB);
       PciBase = (UINT32)(PciExBarBase + SIZE_256MB);
+      PciSize = 0xFC000000 - PciBase;
     } else {
       PciBase = (TopOfLowRam < BASE_2GB) ? BASE_2GB : TopOfLowRam;
+      PciSize = 0xFC000000 - PciBase;
     }
 
     //
@@ -207,7 +209,6 @@ MemMapInitialization (
     // 0xFED20000    gap                          896 KB
     // 0xFEE00000    LAPIC                          1 MB
     //
-    PciSize = 0xFC000000 - PciBase;
     AddIoMemoryBaseSizeHob (PciBase, PciSize);
     PcdStatus = PcdSet64S (PcdPciMmio32Base, PciBase);
     ASSERT_RETURN_ERROR (PcdStatus);
