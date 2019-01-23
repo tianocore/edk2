@@ -1,6 +1,6 @@
 // /**
 //
-// Copyright (c) 2016 - 2017, ARM Limited. All rights reserved.<BR>
+// Copyright (c) 2016 - 2019, ARM Limited. All rights reserved.<BR>
 // This program and the accompanying materials
 // are licensed and made available under the terms and conditions of the BSD License
 // which accompanies this distribution. The full text of the license may be found at
@@ -82,6 +82,7 @@
 "       GTDT  - Generic Timer Description Table\r\n"
 "       IORT  - IO Remapping Table\r\n"
 "       MCFG  - Memory Mapped Config Space Base Address Description Table\r\n"
+"       PPTT  - Processor Properties Topology Table\r\n"
 "       RSDP  - Root System Description Pointer\r\n"
 "       SLIT  - System Locality Information Table\r\n"
 "       SPCR  - Serial Port Console Redirection Table\r\n"
