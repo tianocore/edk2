@@ -181,7 +181,7 @@ class Capsule (CapsuleClassObject):
         #
         # The real capsule header structure is 28 bytes
         #
-        Header.write('\x00'*(HdrSize-28))
+        Header.write(b'\x00'*(HdrSize-28))
         Header.write(FwMgrHdr.getvalue())
         Header.write(Content.getvalue())
         #
@@ -206,18 +206,17 @@ class Capsule (CapsuleClassObject):
             return self.GenFmpCapsule()
 
         CapInfFile = self.GenCapInf()
-        CapInfFile.writelines("[files]" + TAB_LINE_BREAK)
+        CapInfFile.append("[files]" + TAB_LINE_BREAK)
         CapFileList = []
         for CapsuleDataObj in self.CapsuleDataList:
             CapsuleDataObj.CapsuleName = self.CapsuleName
             FileName = CapsuleDataObj.GenCapsuleSubItem()
             CapsuleDataObj.CapsuleName = None
             CapFileList.append(FileName)
-            CapInfFile.writelines("EFI_FILE_NAME = " + \
+            CapInfFile.append("EFI_FILE_NAME = " + \
                                    FileName      + \
                                    TAB_LINE_BREAK)
-        SaveFileOnChange(self.CapInfFileName, CapInfFile.getvalue(), False)
-        CapInfFile.close()
+        SaveFileOnChange(self.CapInfFileName, ''.join(CapInfFile), False)
         #
         # Call GenFv tool to generate capsule
         #
@@ -243,12 +242,12 @@ class Capsule (CapsuleClassObject):
     def GenCapInf(self):
         self.CapInfFileName = os.path.join(GenFdsGlobalVariable.FvDir,
                                    self.UiCapsuleName +  "_Cap" + '.inf')
-        CapInfFile = BytesIO() #open (self.CapInfFileName , 'w+')
+        CapInfFile = []
 
-        CapInfFile.writelines("[options]" + TAB_LINE_BREAK)
+        CapInfFile.append("[options]" + TAB_LINE_BREAK)
 
         for Item in self.TokensDict:
-            CapInfFile.writelines("EFI_"                    + \
+            CapInfFile.append("EFI_"                    + \
                                   Item                      + \
                                   ' = '                     + \
                                   self.TokensDict[Item]     + \

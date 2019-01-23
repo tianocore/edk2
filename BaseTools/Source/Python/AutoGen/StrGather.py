@@ -123,7 +123,10 @@ def DecToHexList(Dec, Digit = 8):
 # @retval:       A list for formatted hex string
 #
 def AscToHexList(Ascii):
-    return ['0x{0:02X}'.format(ord(Item)) for Item in Ascii]
+    try:
+        return ['0x{0:02X}'.format(Item) for Item in Ascii]
+    except:
+        return ['0x{0:02X}'.format(ord(Item)) for Item in Ascii]
 
 ## Create content of .h file
 #

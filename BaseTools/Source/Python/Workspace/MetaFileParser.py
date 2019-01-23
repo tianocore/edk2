@@ -1999,10 +1999,10 @@ class DecParser(MetaFileParser):
                     return
 
                 if self._include_flag:
-                    self._ValueList[1] = "<HeaderFiles>_" + md5(self._CurrentLine).hexdigest()
+                    self._ValueList[1] = "<HeaderFiles>_" + md5(self._CurrentLine.encode('utf-8')).hexdigest()
                     self._ValueList[2] = self._CurrentLine
                 if self._package_flag and "}" != self._CurrentLine:
-                    self._ValueList[1] = "<Packages>_" + md5(self._CurrentLine).hexdigest()
+                    self._ValueList[1] = "<Packages>_" + md5(self._CurrentLine.encode('utf-8')).hexdigest()
                     self._ValueList[2] = self._CurrentLine
                 if self._CurrentLine == "}":
                     self._package_flag = False

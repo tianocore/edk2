@@ -49,15 +49,3 @@ def CopyLongFilePath(src, dst):
     with open(LongFilePath(src), 'rb') as fsrc:
         with open(LongFilePath(dst), 'wb') as fdst:
             shutil.copyfileobj(fsrc, fdst)
-
-## Convert a python unicode string to a normal string
-#
-# Convert a python unicode string to a normal string
-# UniToStr(u'I am a string') is 'I am a string'
-#
-# @param Uni:  The python unicode string
-#
-# @retval:     The formatted normal string
-#
-def UniToStr(Uni):
-    return repr(Uni)[2:-1]

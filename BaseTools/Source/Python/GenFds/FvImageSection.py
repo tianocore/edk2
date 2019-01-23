@@ -102,7 +102,7 @@ class FvImageSection(FvImageSectionClassObject):
         # Generate Fv
         #
         if self.FvName is not None:
-            Buffer = BytesIO('')
+            Buffer = BytesIO()
             Fv = GenFdsGlobalVariable.FdfParser.Profile.FvDict.get(self.FvName)
             if Fv is not None:
                 self.Fv = Fv

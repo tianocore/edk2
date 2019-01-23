@@ -24,7 +24,7 @@ from io import BytesIO
 from Common.BuildToolError import *
 from Common.StringUtils import GetLineNo
 from Common.Misc import PathClass
-from Common.LongFilePathSupport import LongFilePath, UniToStr
+from Common.LongFilePathSupport import LongFilePath
 from Common.GlobalData import *
 ##
 # Static definitions
@@ -427,7 +427,7 @@ class UniFileClassObject(object):
                 if EndPos != -1 and EndPos - StartPos == 6 :
                     if g4HexChar.match(Line[StartPos + 2 : EndPos], re.UNICODE):
                         EndStr = Line[EndPos: ]
-                        UniStr = ('\u' + (Line[StartPos + 2 : EndPos])).decode('unicode_escape')
+                        UniStr = Line[StartPos + 2: EndPos]
                         if EndStr.startswith(u'\\x') and len(EndStr) >= 7:
                             if EndStr[6] == u'\\' and g4HexChar.match(EndStr[2 : 6], re.UNICODE):
                                 Line = Line[0 : StartPos] + UniStr + EndStr

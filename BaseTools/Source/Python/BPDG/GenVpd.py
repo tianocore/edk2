@@ -186,7 +186,7 @@ class PcdEntry:
             EdkLogger.error("BPDG", BuildToolError.RESOURCE_OVERFLOW,
                             "PCD value string %s is exceed to size %d(File: %s Line: %s)" % (ValueString, Size, self.FileName, self.Lineno))
         try:
-            self.PcdValue = pack('%ds' % Size, ValueString)
+            self.PcdValue = pack('%ds' % Size, ValueString.encode('utf-8'))
         except:
             EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID,
                             "Invalid size or value for PCD %s to pack(File: %s Line: %s)." % (self.PcdCName, self.FileName, self.Lineno))
@@ -306,7 +306,7 @@ class GenVPD :
         self.PcdFixedOffsetSizeList  = []
         self.PcdUnknownOffsetList    = []
         try:
-            fInputfile = open(InputFileName, "r", 0)
+            fInputfile = open(InputFileName, "r")
             try:
                 self.FileLinesList = fInputfile.readlines()
             except:
@@ -645,7 +645,7 @@ class GenVPD :
         #Open an VPD file to process
 
         try:
-            fVpdFile = open(BinFileName, "wb", 0)
+            fVpdFile = open(BinFileName, "wb")
         except:
             # Open failed
             EdkLogger.error("BPDG", BuildToolError.FILE_OPEN_FAILURE, "File open failed for %s" % self.VpdFileName, None)
@@ -657,7 +657,7 @@ class GenVPD :
             EdkLogger.error("BPDG", BuildToolError.FILE_OPEN_FAILURE, "File open failed for %s" % self.MapFileName, None)
 
         # Use a instance of BytesIO to cache data
-        fStringIO = BytesIO('')
+        fStringIO = BytesIO()
 
         # Write the header of map file.
         try :

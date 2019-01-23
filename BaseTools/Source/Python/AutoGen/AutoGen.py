@@ -726,11 +726,11 @@ class WorkspaceAutoGen(AutoGen):
             for files in AllWorkSpaceMetaFiles:
                 if files.endswith('.dec'):
                     continue
-                f = open(files, 'r')
+                f = open(files, 'rb')
                 Content = f.read()
                 f.close()
                 m.update(Content)
-            SaveFileOnChange(os.path.join(self.BuildDir, 'AutoGen.hash'), m.hexdigest(), True)
+            SaveFileOnChange(os.path.join(self.BuildDir, 'AutoGen.hash'), m.hexdigest(), False)
             GlobalData.gPlatformHash = m.hexdigest()
 
         #
@@ -755,7 +755,7 @@ class WorkspaceAutoGen(AutoGen):
         HashFile = os.path.join(PkgDir, Pkg.PackageName + '.hash')
         m = hashlib.md5()
         # Get .dec file's hash value
-        f = open(Pkg.MetaFile.Path, 'r')
+        f = open(Pkg.MetaFile.Path, 'rb')
         Content = f.read()
         f.close()
         m.update(Content)
@@ -765,11 +765,11 @@ class WorkspaceAutoGen(AutoGen):
                 for Root, Dirs, Files in os.walk(str(inc)):
                     for File in sorted(Files):
                         File_Path = os.path.join(Root, File)
-                        f = open(File_Path, 'r')
+                        f = open(File_Path, 'rb')
                         Content = f.read()
                         f.close()
                         m.update(Content)
-        SaveFileOnChange(HashFile, m.hexdigest(), True)
+        SaveFileOnChange(HashFile, m.hexdigest(), False)
         GlobalData.gPackageHash[Pkg.Arch][Pkg.PackageName] = m.hexdigest()
 
     def _GetMetaFiles(self, Target, Toolchain, Arch):
@@ -1736,7 +1736,7 @@ class PlatformAutoGen(AutoGen):
         for pcd in self._DynamicPcdList:
             if len(pcd.SkuInfoList) == 1:
                 for (SkuName, SkuId) in allskuset:
-                    if type(SkuId) in (str, unicode) and eval(SkuId) == 0 or SkuId == 0:
+                    if isinstance(SkuId, str) and eval(SkuId) == 0 or SkuId == 0:
                         continue
                     pcd.SkuInfoList[SkuName] = copy.deepcopy(pcd.SkuInfoList[TAB_DEFAULT])
                     pcd.SkuInfoList[SkuName].SkuId = SkuId
@@ -1906,7 +1906,7 @@ class PlatformAutoGen(AutoGen):
                         ToolsDef += "%s_%s = %s\n" % (Tool, Attr, Value)
             ToolsDef += "\n"
 
-        SaveFileOnChange(self.ToolDefinitionFile, ToolsDef)
+        SaveFileOnChange(self.ToolDefinitionFile, ToolsDef, False)
         for DllPath in DllPathList:
             os.environ["PATH"] = DllPath + os.pathsep + os.environ["PATH"]
         os.environ["MAKE_FLAGS"] = MakeFlags
@@ -3303,7 +3303,7 @@ class ModuleAutoGen(AutoGen):
             AutoFile = PathClass(gAutoGenStringFileName % {"module_name":self.Name}, self.DebugDir)
             RetVal[AutoFile] = str(StringH)
             self._ApplyBuildRule(AutoFile, TAB_UNKNOWN_FILE)
-        if UniStringBinBuffer is not None and UniStringBinBuffer.getvalue() != "":
+        if UniStringBinBuffer is not None and UniStringBinBuffer.getvalue() != b"":
             AutoFile = PathClass(gAutoGenStringFormFileName % {"module_name":self.Name}, self.OutputDir)
             RetVal[AutoFile] = UniStringBinBuffer.getvalue()
             AutoFile.IsBinary = True
@@ -3314,7 +3314,7 @@ class ModuleAutoGen(AutoGen):
             AutoFile = PathClass(gAutoGenImageDefFileName % {"module_name":self.Name}, self.DebugDir)
             RetVal[AutoFile] = str(StringIdf)
             self._ApplyBuildRule(AutoFile, TAB_UNKNOWN_FILE)
-        if IdfGenBinBuffer is not None and IdfGenBinBuffer.getvalue() != "":
+        if IdfGenBinBuffer is not None and IdfGenBinBuffer.getvalue() != b"":
             AutoFile = PathClass(gAutoGenIdfFileName % {"module_name":self.Name}, self.OutputDir)
             RetVal[AutoFile] = IdfGenBinBuffer.getvalue()
             AutoFile.IsBinary = True
@@ -3532,7 +3532,7 @@ class ModuleAutoGen(AutoGen):
             EdkLogger.error("build", FILE_OPEN_FAILURE, "File open failed for %s" % UniVfrOffsetFileName, None)
 
         # Use a instance of BytesIO to cache data
-        fStringIO = BytesIO('')
+        fStringIO = BytesIO()
 
         for Item in VfrUniOffsetList:
             if (Item[0].find("Strings") != -1):
@@ -3541,9 +3541,8 @@ class ModuleAutoGen(AutoGen):
                 # GUID + Offset
                 # { 0x8913c5e0, 0x33f6, 0x4d86, { 0x9b, 0xf1, 0x43, 0xef, 0x89, 0xfc, 0x6, 0x66 } }
                 #
-                UniGuid = [0xe0, 0xc5, 0x13, 0x89, 0xf6, 0x33, 0x86, 0x4d, 0x9b, 0xf1, 0x43, 0xef, 0x89, 0xfc, 0x6, 0x66]
-                UniGuid = [chr(ItemGuid) for ItemGuid in UniGuid]
-                fStringIO.write(''.join(UniGuid))
+                UniGuid = b'\xe0\xc5\x13\x89\xf63\x86M\x9b\xf1C\xef\x89\xfc\x06f'
+                fStringIO.write(UniGuid)
                 UniValue = pack ('Q', int (Item[1], 16))
                 fStringIO.write (UniValue)
             else:
@@ -3552,9 +3551,8 @@ class ModuleAutoGen(AutoGen):
                 # GUID + Offset
                 # { 0xd0bc7cb4, 0x6a47, 0x495f, { 0xaa, 0x11, 0x71, 0x7, 0x46, 0xda, 0x6, 0xa2 } };
                 #
-                VfrGuid = [0xb4, 0x7c, 0xbc, 0xd0, 0x47, 0x6a, 0x5f, 0x49, 0xaa, 0x11, 0x71, 0x7, 0x46, 0xda, 0x6, 0xa2]
-                VfrGuid = [chr(ItemGuid) for ItemGuid in VfrGuid]
-                fStringIO.write(''.join(VfrGuid))
+                VfrGuid = b'\xb4|\xbc\xd0Gj_I\xaa\x11q\x07F\xda\x06\xa2'
+                fStringIO.write(VfrGuid)
                 VfrValue = pack ('Q', int (Item[1], 16))
                 fStringIO.write (VfrValue)
         #
@@ -4095,29 +4093,29 @@ class ModuleAutoGen(AutoGen):
             GlobalData.gModuleHash[self.Arch] = {}
         m = hashlib.md5()
         # Add Platform level hash
-        m.update(GlobalData.gPlatformHash)
+        m.update(GlobalData.gPlatformHash.encode('utf-8'))
         # Add Package level hash
         if self.DependentPackageList:
             for Pkg in sorted(self.DependentPackageList, key=lambda x: x.PackageName):
                 if Pkg.PackageName in GlobalData.gPackageHash[self.Arch]:
-                    m.update(GlobalData.gPackageHash[self.Arch][Pkg.PackageName])
+                    m.update(GlobalData.gPackageHash[self.Arch][Pkg.PackageName].encode('utf-8'))
 
         # Add Library hash
         if self.LibraryAutoGenList:
             for Lib in sorted(self.LibraryAutoGenList, key=lambda x: x.Name):
                 if Lib.Name not in GlobalData.gModuleHash[self.Arch]:
                     Lib.GenModuleHash()
-                m.update(GlobalData.gModuleHash[self.Arch][Lib.Name])
+                m.update(GlobalData.gModuleHash[self.Arch][Lib.Name].encode('utf-8'))
 
         # Add Module self
-        f = open(str(self.MetaFile), 'r')
+        f = open(str(self.MetaFile), 'rb')
         Content = f.read()
         f.close()
         m.update(Content)
         # Add Module's source files
         if self.SourceFileList:
             for File in sorted(self.SourceFileList, key=lambda x: str(x)):
-                f = open(str(File), 'r')
+                f = open(str(File), 'rb')
                 Content = f.read()
                 f.close()
                 m.update(Content)
@@ -4128,7 +4126,7 @@ class ModuleAutoGen(AutoGen):
         if GlobalData.gBinCacheSource:
             if self.AttemptModuleCacheCopy():
                 return False
-        return SaveFileOnChange(ModuleHashFile, m.hexdigest(), True)
+        return SaveFileOnChange(ModuleHashFile, m.hexdigest(), False)
 
     ## Decide whether we can skip the ModuleAutoGen process
     def CanSkipbyHash(self):

@@ -20,7 +20,6 @@
 from __future__ import print_function
 import Common.LongFilePathOs as os
 import re
-from io import BytesIO
 import sys
 import glob
 import time
@@ -182,8 +181,8 @@ def ReadMessage(From, To, ExitFlag):
         # read one line a time
         Line = From.readline()
         # empty string means "end"
-        if Line is not None and Line != "":
-            To(Line.rstrip())
+        if Line is not None and Line != b"":
+            To(Line.rstrip().decode(encoding='utf-8', errors='ignore'))
         else:
             break
         if ExitFlag.isSet():
@@ -1410,11 +1409,11 @@ class Build():
             # Add general information.
             #
             if ModeIsSmm:
-                MapBuffer.write('\n\n%s (Fixed SMRAM Offset,   BaseAddress=0x%010X,  EntryPoint=0x%010X)\n' % (ModuleName, BaseAddress, BaseAddress + ModuleInfo.Image.EntryPoint))
+                MapBuffer.append('\n\n%s (Fixed SMRAM Offset,   BaseAddress=0x%010X,  EntryPoint=0x%010X)\n' % (ModuleName, BaseAddress, BaseAddress + ModuleInfo.Image.EntryPoint))
             elif AddrIsOffset:
-                MapBuffer.write('\n\n%s (Fixed Memory Offset,  BaseAddress=-0x%010X, EntryPoint=-0x%010X)\n' % (ModuleName, 0 - BaseAddress, 0 - (BaseAddress + ModuleInfo.Image.EntryPoint)))
+                MapBuffer.append('\n\n%s (Fixed Memory Offset,  BaseAddress=-0x%010X, EntryPoint=-0x%010X)\n' % (ModuleName, 0 - BaseAddress, 0 - (BaseAddress + ModuleInfo.Image.EntryPoint)))
             else:
-                MapBuffer.write('\n\n%s (Fixed Memory Address, BaseAddress=0x%010X,  EntryPoint=0x%010X)\n' % (ModuleName, BaseAddress, BaseAddress + ModuleInfo.Image.EntryPoint))
+                MapBuffer.append('\n\n%s (Fixed Memory Address, BaseAddress=0x%010X,  EntryPoint=0x%010X)\n' % (ModuleName, BaseAddress, BaseAddress + ModuleInfo.Image.EntryPoint))
             #
             # Add guid and general seciton section.
             #
@@ -1426,21 +1425,21 @@ class Build():
                 elif SectionHeader[0] in ['.data', '.sdata']:
                     DataSectionAddress = SectionHeader[1]
             if AddrIsOffset:
-                MapBuffer.write('(GUID=%s, .textbaseaddress=-0x%010X, .databaseaddress=-0x%010X)\n' % (ModuleInfo.Guid, 0 - (BaseAddress + TextSectionAddress), 0 - (BaseAddress + DataSectionAddress)))
+                MapBuffer.append('(GUID=%s, .textbaseaddress=-0x%010X, .databaseaddress=-0x%010X)\n' % (ModuleInfo.Guid, 0 - (BaseAddress + TextSectionAddress), 0 - (BaseAddress + DataSectionAddress)))
             else:
-                MapBuffer.write('(GUID=%s, .textbaseaddress=0x%010X, .databaseaddress=0x%010X)\n' % (ModuleInfo.Guid, BaseAddress + TextSectionAddress, BaseAddress + DataSectionAddress))
+                MapBuffer.append('(GUID=%s, .textbaseaddress=0x%010X, .databaseaddress=0x%010X)\n' % (ModuleInfo.Guid, BaseAddress + TextSectionAddress, BaseAddress + DataSectionAddress))
             #
             # Add debug image full path.
             #
-            MapBuffer.write('(IMAGE=%s)\n\n' % (ModuleDebugImage))
+            MapBuffer.append('(IMAGE=%s)\n\n' % (ModuleDebugImage))
             #
             # Add funtion address
             #
             for Function in FunctionList:
                 if AddrIsOffset:
-                    MapBuffer.write('  -0x%010X    %s\n' % (0 - (BaseAddress + Function[1]), Function[0]))
+                    MapBuffer.append('  -0x%010X    %s\n' % (0 - (BaseAddress + Function[1]), Function[0]))
                 else:
-                    MapBuffer.write('  0x%010X    %s\n' % (BaseAddress + Function[1], Function[0]))
+                    MapBuffer.append('  0x%010X    %s\n' % (BaseAddress + Function[1], Function[0]))
             ImageMap.close()
 
             #
@@ -1475,7 +1474,7 @@ class Build():
                         GuidString = MatchGuid.group()
                         if GuidString.upper() in ModuleList:
                             Line = Line.replace(GuidString, ModuleList[GuidString.upper()].Name)
-                    MapBuffer.write(Line)
+                    MapBuffer.append(Line)
                     #
                     # Add the debug image full path.
                     #
@@ -1483,7 +1482,7 @@ class Build():
                     if MatchGuid is not None:
                         GuidString = MatchGuid.group().split("=")[1]
                         if GuidString.upper() in ModuleList:
-                            MapBuffer.write('(IMAGE=%s)\n' % (os.path.join(ModuleList[GuidString.upper()].DebugDir, ModuleList[GuidString.upper()].Name + '.efi')))
+                            MapBuffer.append('(IMAGE=%s)\n' % (os.path.join(ModuleList[GuidString.upper()].DebugDir, ModuleList[GuidString.upper()].Name + '.efi')))
 
                 FvMap.close()
 
@@ -1599,11 +1598,11 @@ class Build():
                 if ReturnValue != 0:
                     EdkLogger.error("build", PARAMETER_INVALID, "Patch PCD value failed", ExtraData=ErrorInfo)
 
-        MapBuffer.write('PEI_CODE_PAGE_NUMBER      = 0x%x\n' % (PeiSize // 0x1000))
-        MapBuffer.write('BOOT_CODE_PAGE_NUMBER     = 0x%x\n' % (BtSize // 0x1000))
-        MapBuffer.write('RUNTIME_CODE_PAGE_NUMBER  = 0x%x\n' % (RtSize // 0x1000))
+        MapBuffer.append('PEI_CODE_PAGE_NUMBER      = 0x%x\n' % (PeiSize // 0x1000))
+        MapBuffer.append('BOOT_CODE_PAGE_NUMBER     = 0x%x\n' % (BtSize // 0x1000))
+        MapBuffer.append('RUNTIME_CODE_PAGE_NUMBER  = 0x%x\n' % (RtSize // 0x1000))
         if len (SmmModuleList) > 0:
-            MapBuffer.write('SMM_CODE_PAGE_NUMBER      = 0x%x\n' % (SmmSize // 0x1000))
+            MapBuffer.append('SMM_CODE_PAGE_NUMBER      = 0x%x\n' % (SmmSize // 0x1000))
 
         PeiBaseAddr = TopMemoryAddress - RtSize - BtSize
         BtBaseAddr  = TopMemoryAddress - RtSize
@@ -1613,7 +1612,7 @@ class Build():
         self._RebaseModule (MapBuffer, BtBaseAddr, BtModuleList, TopMemoryAddress == 0)
         self._RebaseModule (MapBuffer, RtBaseAddr, RtModuleList, TopMemoryAddress == 0)
         self._RebaseModule (MapBuffer, 0x1000, SmmModuleList, AddrIsOffset=False, ModeIsSmm=True)
-        MapBuffer.write('\n\n')
+        MapBuffer.append('\n\n')
         sys.stdout.write ("\n")
         sys.stdout.flush()
 
@@ -1627,8 +1626,7 @@ class Build():
         #
         # Save address map into MAP file.
         #
-        SaveFileOnChange(MapFilePath, MapBuffer.getvalue(), False)
-        MapBuffer.close()
+        SaveFileOnChange(MapFilePath, ''.join(MapBuffer), False)
         if self.LoadFixAddress != 0:
             sys.stdout.write ("\nLoad Module At Fix Address Map file can be found at %s\n" % (MapFilePath))
         sys.stdout.flush()
@@ -1703,7 +1701,7 @@ class Build():
                             if not Ma.IsLibrary:
                                 ModuleList[Ma.Guid.upper()] = Ma
 
-                    MapBuffer = BytesIO('')
+                    MapBuffer = []
                     if self.LoadFixAddress != 0:
                         #
                         # Rebase module to the preferred memory address before GenFds
@@ -1861,7 +1859,7 @@ class Build():
                             if not Ma.IsLibrary:
                                 ModuleList[Ma.Guid.upper()] = Ma
 
-                    MapBuffer = BytesIO('')
+                    MapBuffer = []
                     if self.LoadFixAddress != 0:
                         #
                         # Rebase module to the preferred memory address before GenFds
@@ -2042,7 +2040,7 @@ class Build():
                     #
                     # Rebase module to the preferred memory address before GenFds
                     #
-                    MapBuffer = BytesIO('')
+                    MapBuffer = []
                     if self.LoadFixAddress != 0:
                         self._CollectModuleMapBuffer(MapBuffer, ModuleList)
 

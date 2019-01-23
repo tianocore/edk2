@@ -53,7 +53,7 @@ class AprioriSection (object):
     #   @retval string      Generated file name
     #
     def GenFfs (self, FvName, Dict = {}, IsMakefile = False):
-        Buffer = BytesIO('')
+        Buffer = BytesIO()
         if self.AprioriType == "PEI":
             AprioriFileGuid = PEI_APRIORI_GUID
         else:

@@ -92,18 +92,18 @@ class VpdInfoFile:
         if (Vpd is None):
             EdkLogger.error("VpdInfoFile", BuildToolError.ATTRIBUTE_UNKNOWN_ERROR, "Invalid VPD PCD entry.")
 
-        if not (Offset >= 0 or Offset == TAB_STAR):
+        if not (Offset >= "0" or Offset == TAB_STAR):
             EdkLogger.error("VpdInfoFile", BuildToolError.PARAMETER_INVALID, "Invalid offset parameter: %s." % Offset)
 
         if Vpd.DatumType == TAB_VOID:
-            if Vpd.MaxDatumSize <= 0:
+            if Vpd.MaxDatumSize <= "0":
                 EdkLogger.error("VpdInfoFile", BuildToolError.PARAMETER_INVALID,
                                 "Invalid max datum size for VPD PCD %s.%s" % (Vpd.TokenSpaceGuidCName, Vpd.TokenCName))
         elif Vpd.DatumType in TAB_PCD_NUMERIC_TYPES:
             if not Vpd.MaxDatumSize:
                 Vpd.MaxDatumSize = MAX_SIZE_TYPE[Vpd.DatumType]
         else:
-            if Vpd.MaxDatumSize <= 0:
+            if Vpd.MaxDatumSize <= "0":
                 EdkLogger.error("VpdInfoFile", BuildToolError.PARAMETER_INVALID,
                                 "Invalid max datum size for VPD PCD %s.%s" % (Vpd.TokenSpaceGuidCName, Vpd.TokenCName))
 
@@ -127,7 +127,7 @@ class VpdInfoFile:
                             "Invalid parameter FilePath: %s." % FilePath)
 
         Content = FILE_COMMENT_TEMPLATE
-        Pcds = sorted(self._VpdArray.keys())
+        Pcds = sorted(self._VpdArray.keys(), key=lambda x: x.TokenCName)
         for Pcd in Pcds:
             i = 0
             PcdTokenCName = Pcd.TokenCName
@@ -249,7 +249,7 @@ def CallExtenalBPDGTool(ToolPath, VpdFileName):
     except Exception as X:
         EdkLogger.error("BPDG", BuildToolError.COMMAND_FAILURE, ExtraData=str(X))
     (out, error) = PopenObject.communicate()
-    print(out)
+    print(out.decode(encoding='utf-8', errors='ignore'))
     while PopenObject.returncode is None :
         PopenObject.wait()
 

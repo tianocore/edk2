@@ -295,7 +295,7 @@ class DbItemList:
 
         PackStr = PACK_CODE_BY_SIZE[self.ItemSize]
 
-        Buffer = ''
+        Buffer = bytearray()
         for Datas in self.RawDataList:
             if type(Datas) in (list, tuple):
                 for Data in Datas:
@@ -320,7 +320,7 @@ class DbExMapTblItemList (DbItemList):
         DbItemList.__init__(self, ItemSize, DataList, RawDataList)
 
     def PackData(self):
-        Buffer = ''
+        Buffer = bytearray()
         PackStr = "=LHH"
         for Datas in self.RawDataList:
             Buffer += pack(PackStr,
@@ -369,7 +369,7 @@ class DbComItemList (DbItemList):
     def PackData(self):
         PackStr = PACK_CODE_BY_SIZE[self.ItemSize]
 
-        Buffer = ''
+        Buffer = bytearray()
         for DataList in self.RawDataList:
             for Data in DataList:
                 if type(Data) in (list, tuple):
@@ -390,7 +390,7 @@ class DbVariableTableItemList (DbComItemList):
 
     def PackData(self):
         PackStr = "=LLHHLHH"
-        Buffer = ''
+        Buffer = bytearray()
         for DataList in self.RawDataList:
             for Data in DataList:
                 Buffer += pack(PackStr,
@@ -451,7 +451,7 @@ class DbSkuHeadTableItemList (DbItemList):
 
     def PackData(self):
         PackStr = "=LL"
-        Buffer = ''
+        Buffer = bytearray()
         for Data in self.RawDataList:
             Buffer += pack(PackStr,
                            GetIntegerValue(Data[0]),
@@ -473,7 +473,7 @@ class DbSizeTableItemList (DbItemList):
         return length * self.ItemSize
     def PackData(self):
         PackStr = "=H"
-        Buffer = ''
+        Buffer = bytearray()
         for Data in self.RawDataList:
             Buffer += pack(PackStr,
                            GetIntegerValue(Data[0]))
@@ -853,8 +853,9 @@ def BuildExDataBase(Dict):
     Index = 0
     for Item in DbItemTotal:
         Index +=1
-        b = Item.PackData()
-        Buffer += b
+        packdata = Item.PackData()
+        for i in range(len(packdata)):
+            Buffer += packdata[i:i + 1]
         if Index == InitTableNum:
             if len(Buffer) % 8:
                 for num in range(8 - len(Buffer) % 8):
@@ -921,9 +922,9 @@ def CreatePcdDataBase(PcdDBData):
     totallenbuff = pack("=L", totallen)
     newbuffer = databasebuff[:32]
     for i in range(4):
-        newbuffer += totallenbuff[i]
+        newbuffer += totallenbuff[i:i+1]
     for i in range(36, totallen):
-        newbuffer += databasebuff[i]
+        newbuffer += databasebuff[i:i+1]
 
     return newbuffer
 
@@ -965,8 +966,8 @@ def NewCreatePcdDatabasePhaseSpecificAutoGen(Platform, Phase):
         for skuname, skuid in DynamicPcdSet_Sku:
             AdditionalAutoGenH, AdditionalAutoGenC, PcdDbBuffer, VarCheckTab = CreatePcdDatabasePhaseSpecificAutoGen (Platform, DynamicPcdSet_Sku[(skuname, skuid)], Phase)
             final_data = ()
-            for item in PcdDbBuffer:
-                final_data += unpack("B", item)
+            for item in range(len(PcdDbBuffer)):
+                final_data += unpack("B", PcdDbBuffer[item:item+1])
             PcdDBData[(skuname, skuid)] = (PcdDbBuffer, final_data)
             PcdDriverAutoGenData[(skuname, skuid)] = (AdditionalAutoGenH, AdditionalAutoGenC)
             VarCheckTableData[(skuname, skuid)] = VarCheckTab
@@ -978,8 +979,8 @@ def NewCreatePcdDatabasePhaseSpecificAutoGen(Platform, Phase):
     else:
         AdditionalAutoGenH, AdditionalAutoGenC, PcdDbBuffer, VarCheckTab = CreatePcdDatabasePhaseSpecificAutoGen (Platform, {}, Phase)
         final_data = ()
-        for item in PcdDbBuffer:
-            final_data += unpack("B", item)
+        for item in range(len(PcdDbBuffer)):
+            final_data += unpack("B", PcdDbBuffer[item:item + 1])
         PcdDBData[(TAB_DEFAULT, "0")] = (PcdDbBuffer, final_data)
 
     return AdditionalAutoGenH, AdditionalAutoGenC, CreatePcdDataBase(PcdDBData)

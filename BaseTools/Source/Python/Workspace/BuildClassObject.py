@@ -94,13 +94,13 @@ class PcdClassObject(object):
                         deme = ArrayIndex.findall(demesionattr)
                         for i in range(len(deme)-1):
                             if int(deme[i].lstrip("[").rstrip("]").strip()) > int(self._Capacity[i]):
-                                print "error"
+                                print ("error")
         if hasattr(self,"DefaultValues"):
             for demesionattr in self.DefaultValues:
                 deme = ArrayIndex.findall(demesionattr)
                 for i in range(len(deme)-1):
                     if int(deme[i].lstrip("[").rstrip("]").strip()) > int(self._Capacity[i]):
-                        print "error"
+                        print ("error")
         return self._Capacity
     @property
     def DatumType(self):

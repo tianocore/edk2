@@ -143,7 +143,7 @@ VPDPcdList = []
 def FileWrite(File, String, Wrapper=False):
     if Wrapper:
         String = textwrap.fill(String, 120)
-    File.write(String + gEndOfLine)
+    File.append(String + gEndOfLine)
 
 def ByteArrayForamt(Value):
     IsByteArray = False
@@ -636,7 +636,7 @@ class ModuleReport(object):
 
                 Match = gTimeStampPattern.search(FileContents)
                 if Match:
-                    self.BuildTimeStamp = datetime.fromtimestamp(int(Match.group(1)))
+                    self.BuildTimeStamp = datetime.utcfromtimestamp(int(Match.group(1)))
             except IOError:
                 EdkLogger.warn(None, "Fail to read report file", FwReportFileName)
 
@@ -721,8 +721,8 @@ def ReadMessage(From, To, ExitFlag):
         # read one line a time
         Line = From.readline()
         # empty string means "end"
-        if Line is not None and Line != "":
-            To(Line.rstrip())
+        if Line is not None and Line != b"":
+            To(Line.rstrip().decode(encoding='utf-8', errors='ignore'))
         else:
             break
         if ExitFlag.isSet():
@@ -2269,18 +2269,17 @@ class BuildReport(object):
     def GenerateReport(self, BuildDuration, AutoGenTime, MakeTime, GenFdsTime):
         if self.ReportFile:
             try:
-                File = BytesIO('')
+                File = []
                 for (Wa, MaList) in self.ReportList:
                     PlatformReport(Wa, MaList, self.ReportType).GenerateReport(File, BuildDuration, AutoGenTime, MakeTime, GenFdsTime, self.ReportType)
-                Content = FileLinesSplit(File.getvalue(), gLineMaxLength)
-                SaveFileOnChange(self.ReportFile, Content, True)
+                Content = FileLinesSplit(''.join(File), gLineMaxLength)
+                SaveFileOnChange(self.ReportFile, Content, False)
                 EdkLogger.quiet("Build report can be found at %s" % os.path.abspath(self.ReportFile))
             except IOError:
                 EdkLogger.error(None, FILE_WRITE_FAILURE, ExtraData=self.ReportFile)
             except:
                 EdkLogger.error("BuildReport", CODE_ERROR, "Unknown fatal error when generating build report", ExtraData=self.ReportFile, RaiseError=False)
                 EdkLogger.quiet("(Python %s on %s\n%s)" % (platform.python_version(), sys.platform, traceback.format_exc()))
-            File.close()
 
 # This acts like the main() function for the script, unless it is 'import'ed into another script.
 if __name__ == '__main__':

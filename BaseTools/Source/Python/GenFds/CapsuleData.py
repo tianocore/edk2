@@ -82,7 +82,7 @@ class CapsuleFv (CapsuleData):
         if self.FvName.find('.fv') == -1:
             if self.FvName.upper() in GenFdsGlobalVariable.FdfParser.Profile.FvDict:
                 FvObj = GenFdsGlobalVariable.FdfParser.Profile.FvDict[self.FvName.upper()]
-                FdBuffer = BytesIO('')
+                FdBuffer = BytesIO()
                 FvObj.CapsuleName = self.CapsuleName
                 FvFile = FvObj.AddToBuffer(FdBuffer)
                 FvObj.CapsuleName = None

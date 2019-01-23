@@ -522,7 +522,7 @@ class GenFds(object):
                 return
         elif GenFds.OnlyGenerateThisFv is None:
             for FvObj in GenFdsGlobalVariable.FdfParser.Profile.FvDict.values():
-                Buffer = BytesIO('')
+                Buffer = BytesIO()
                 FvObj.AddToBuffer(Buffer)
                 Buffer.close()
 
@@ -673,7 +673,7 @@ class GenFds(object):
     @staticmethod
     def GenerateGuidXRefFile(BuildDb, ArchList, FdfParserObj):
         GuidXRefFileName = os.path.join(GenFdsGlobalVariable.FvDir, "Guid.xref")
-        GuidXRefFile = BytesIO('')
+        GuidXRefFile = []
         PkgGuidDict = {}
         GuidDict = {}
         ModuleList = []
@@ -700,9 +700,9 @@ class GenFds(object):
                 else:
                     ModuleList.append(Module)
                 if GlobalData.gGuidPattern.match(ModuleFile.BaseName):
-                    GuidXRefFile.write("%s %s\n" % (ModuleFile.BaseName, Module.BaseName))
+                    GuidXRefFile.append("%s %s\n" % (ModuleFile.BaseName, Module.BaseName))
                 else:
-                    GuidXRefFile.write("%s %s\n" % (Module.Guid, Module.BaseName))
+                    GuidXRefFile.append("%s %s\n" % (Module.Guid, Module.BaseName))
                 GuidDict.update(Module.Protocols)
                 GuidDict.update(Module.Guids)
                 GuidDict.update(Module.Ppis)
@@ -715,7 +715,7 @@ class GenFds(object):
                             continue
                         else:
                             ModuleList.append(FdfModule)
-                        GuidXRefFile.write("%s %s\n" % (FdfModule.Guid, FdfModule.BaseName))
+                        GuidXRefFile.append("%s %s\n" % (FdfModule.Guid, FdfModule.BaseName))
                         GuidDict.update(FdfModule.Protocols)
                         GuidDict.update(FdfModule.Guids)
                         GuidDict.update(FdfModule.Ppis)
@@ -776,19 +776,19 @@ class GenFds(object):
                             continue
 
                         Name = ' '.join(Name) if isinstance(Name, type([])) else Name
-                        GuidXRefFile.write("%s %s\n" %(FileStatementGuid, Name))
+                        GuidXRefFile.append("%s %s\n" %(FileStatementGuid, Name))
 
        # Append GUIDs, Protocols, and PPIs to the Xref file
-        GuidXRefFile.write("\n")
+        GuidXRefFile.append("\n")
         for key, item in GuidDict.items():
-            GuidXRefFile.write("%s %s\n" % (GuidStructureStringToGuidString(item).upper(), key))
+            GuidXRefFile.append("%s %s\n" % (GuidStructureStringToGuidString(item).upper(), key))
 
-        if GuidXRefFile.getvalue():
-            SaveFileOnChange(GuidXRefFileName, GuidXRefFile.getvalue(), False)
+        if GuidXRefFile:
+            GuidXRefFile = ''.join(GuidXRefFile)
+            SaveFileOnChange(GuidXRefFileName, GuidXRefFile, False)
             GenFdsGlobalVariable.InfLogger("\nGUID cross reference file can be found at %s" % GuidXRefFileName)
         elif os.path.exists(GuidXRefFileName):
             os.remove(GuidXRefFileName)
-        GuidXRefFile.close()
 
 
 if __name__ == '__main__':

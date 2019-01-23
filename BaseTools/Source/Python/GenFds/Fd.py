@@ -72,7 +72,7 @@ class FD(FDClassObject):
                 HasCapsuleRegion = True
                 break
         if HasCapsuleRegion:
-            TempFdBuffer = BytesIO('')
+            TempFdBuffer = BytesIO()
             PreviousRegionStart = -1
             PreviousRegionSize = 1
 
@@ -101,7 +101,7 @@ class FD(FDClassObject):
                 GenFdsGlobalVariable.VerboseLogger('Call each region\'s AddToBuffer function')
                 RegionObj.AddToBuffer (TempFdBuffer, self.BaseAddress, self.BlockSizeList, self.ErasePolarity, GenFdsGlobalVariable.ImageBinDict, self.DefineVarDict)
 
-        FdBuffer = BytesIO('')
+        FdBuffer = BytesIO()
         PreviousRegionStart = -1
         PreviousRegionSize = 1
         for RegionObj in self.RegionList :

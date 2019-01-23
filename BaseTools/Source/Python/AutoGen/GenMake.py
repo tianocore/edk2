@@ -1038,17 +1038,21 @@ cleanlib:
                 CurrentFileDependencyList = DepDb[F]
             else:
                 try:
-                    Fd = open(F.Path, 'r')
+                    Fd = open(F.Path, 'rb')
+                    FileContent = Fd.read()
+                    Fd.close()
                 except BaseException as X:
                     EdkLogger.error("build", FILE_OPEN_FAILURE, ExtraData=F.Path + "\n\t" + str(X))
-
-                FileContent = Fd.read()
-                Fd.close()
                 if len(FileContent) == 0:
                     continue
 
                 if FileContent[0] == 0xff or FileContent[0] == 0xfe:
-                    FileContent = unicode(FileContent, "utf-16")
+                    FileContent = FileContent.decode('utf-16')
+                else:
+                    try:
+                        FileContent = str(FileContent)
+                    except:
+                        pass
                 IncludedFileList = gIncludePattern.findall(FileContent)
 
                 for Inc in IncludedFileList:

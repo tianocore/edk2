@@ -62,8 +62,8 @@ class Region(object):
                 PadByte = pack('B', 0xFF)
             else:
                 PadByte = pack('B', 0)
-            PadData = ''.join(PadByte for i in range(0, Size))
-            Buffer.write(PadData)
+            for i in range(0, Size):
+                Buffer.write(PadByte)
 
     ## AddToBuffer()
     #
@@ -131,7 +131,7 @@ class Region(object):
                         if self.FvAddress % FvAlignValue != 0:
                             EdkLogger.error("GenFds", GENFDS_ERROR,
                                             "FV (%s) is NOT %s Aligned!" % (FvObj.UiFvName, FvObj.FvAlignment))
-                        FvBuffer = BytesIO('')
+                        FvBuffer = BytesIO()
                         FvBaseAddress = '0x%X' % self.FvAddress
                         BlockSize = None
                         BlockNum = None
