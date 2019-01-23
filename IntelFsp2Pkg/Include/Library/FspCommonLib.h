@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2019, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -40,9 +40,9 @@ GetFspGlobalDataPointer (
   );
 
 /**
-  This function gets back the FSP API first parameter passed by the bootlaoder.
+  This function gets back the FSP API first parameter passed by the bootloader.
 
-  @retval ApiParameter FSP API first parameter passed by the bootlaoder.
+  @retval ApiParameter FSP API first parameter passed by the bootloader.
 **/
 UINT32
 EFIAPI
@@ -51,13 +51,24 @@ GetFspApiParameter (
   );
 
 /**
-  This function gets back the FSP API second parameter passed by the bootlaoder.
+  This function gets back the FSP API second parameter passed by the bootloader.
 
-  @retval ApiParameter FSP API second parameter passed by the bootlaoder.
+  @retval ApiParameter FSP API second parameter passed by the bootloader.
 **/
 UINT32
 EFIAPI
 GetFspApiParameter2 (
+  VOID
+  );
+
+/**
+  This function returns the FSP entry stack pointer from address of the first API parameter.
+
+  @retval FSP entry stack pointer.
+**/
+VOID*
+EFIAPI
+GetFspEntryStack (
   VOID
   );
 
