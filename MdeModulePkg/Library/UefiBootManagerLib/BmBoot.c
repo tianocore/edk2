@@ -1979,37 +1979,33 @@ BmMatchPartitionDevicePathNode (
   }
 
   //
-  // find the partition device path node
+  // Match all the partition device path nodes including the nested partition nodes
   //
   while (!IsDevicePathEnd (BlockIoDevicePath)) {
     if ((DevicePathType (BlockIoDevicePath) == MEDIA_DEVICE_PATH) &&
         (DevicePathSubType (BlockIoDevicePath) == MEDIA_HARDDRIVE_DP)
         ) {
-      break;
+      //
+      // See if the harddrive device path in blockio matches the orig Hard Drive Node
+      //
+      Node = (HARDDRIVE_DEVICE_PATH *) BlockIoDevicePath;
+
+      //
+      // Match Signature and PartitionNumber.
+      // Unused bytes in Signature are initiaized with zeros.
+      //
+      if ((Node->PartitionNumber == HardDriveDevicePath->PartitionNumber) &&
+          (Node->MBRType == HardDriveDevicePath->MBRType) &&
+          (Node->SignatureType == HardDriveDevicePath->SignatureType) &&
+          (CompareMem (Node->Signature, HardDriveDevicePath->Signature, sizeof (Node->Signature)) == 0)) {
+        return TRUE;
+      }
     }
 
     BlockIoDevicePath = NextDevicePathNode (BlockIoDevicePath);
   }
 
-  if (IsDevicePathEnd (BlockIoDevicePath)) {
-    return FALSE;
-  }
-
-  //
-  // See if the harddrive device path in blockio matches the orig Hard Drive Node
-  //
-  Node = (HARDDRIVE_DEVICE_PATH *) BlockIoDevicePath;
-
-  //
-  // Match Signature and PartitionNumber.
-  // Unused bytes in Signature are initiaized with zeros.
-  //
-  return (BOOLEAN) (
-    (Node->PartitionNumber == HardDriveDevicePath->PartitionNumber) &&
-    (Node->MBRType == HardDriveDevicePath->MBRType) &&
-    (Node->SignatureType == HardDriveDevicePath->SignatureType) &&
-    (CompareMem (Node->Signature, HardDriveDevicePath->Signature, sizeof (Node->Signature)) == 0)
-    );
+  return FALSE;
 }
 
 /**
