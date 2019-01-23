@@ -135,4 +135,17 @@ ProcessLibraryConstructorList (
   VOID
   );
 
+/**
+
+  Return value of esp.
+
+  @return  value of esp.
+
+**/
+UINT32
+EFIAPI
+AsmReadEsp (
+  VOID
+  );
+
 #endif

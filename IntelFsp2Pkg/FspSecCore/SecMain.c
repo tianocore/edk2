@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2019, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -83,7 +83,29 @@ SecStartup (
   //
   InitializeFloatingPointUnits ();
 
+  //
+  // Scenario 1 memory map when running on bootloader stack
+  //
+  // |-------------------|---->
+  // |Idt Table          |
+  // |-------------------|
+  // |PeiService Pointer |
+  // |-------------------|
+  // |                   |
+  // |                   |
+  // |      Heap         |
+  // |                   |
+  // |                   |
+  // |-------------------|---->  TempRamBase
+  //
+  //
+  // |-------------------|
+  // |Bootloader stack   |----> somewhere in memory, FSP will share this stack.
+  // |-------------------|
 
+  //
+  // Scenario 2 memory map when running FSP on a separate stack
+  //
   // |-------------------|---->
   // |Idt Table          |
   // |-------------------|
@@ -135,11 +157,19 @@ SecStartup (
   SecCoreData.BootFirmwareVolumeSize = (UINT32)((EFI_FIRMWARE_VOLUME_HEADER *)BootFirmwareVolume)->FvLength;
 
   SecCoreData.TemporaryRamBase       = (VOID*)(UINTN) TempRamBase;
-  SecCoreData.TemporaryRamSize       = SizeOfRam;
-  SecCoreData.PeiTemporaryRamBase    = SecCoreData.TemporaryRamBase;
-  SecCoreData.PeiTemporaryRamSize    = SecCoreData.TemporaryRamSize * PcdGet8 (PcdFspHeapSizePercentage) / 100;
-  SecCoreData.StackBase              = (VOID*)(UINTN)((UINTN)SecCoreData.TemporaryRamBase + SecCoreData.PeiTemporaryRamSize);
-  SecCoreData.StackSize              = SecCoreData.TemporaryRamSize - SecCoreData.PeiTemporaryRamSize;
+  if (PcdGet8 (PcdFspHeapSizePercentage) == 0) {
+    SecCoreData.TemporaryRamSize       = SizeOfRam; // stack size that is going to be copied to the permanent memory
+    SecCoreData.PeiTemporaryRamBase    = SecCoreData.TemporaryRamBase;
+    SecCoreData.PeiTemporaryRamSize    = SecCoreData.TemporaryRamSize;
+    SecCoreData.StackBase              = (VOID *)GetFspEntryStack(); // Share the same boot loader stack
+    SecCoreData.StackSize              = 0;
+  } else {
+    SecCoreData.TemporaryRamSize       = SizeOfRam;
+    SecCoreData.PeiTemporaryRamBase    = SecCoreData.TemporaryRamBase;
+    SecCoreData.PeiTemporaryRamSize    = SecCoreData.TemporaryRamSize * PcdGet8 (PcdFspHeapSizePercentage) / 100;
+    SecCoreData.StackBase              = (VOID*)(UINTN)((UINTN)SecCoreData.TemporaryRamBase + SecCoreData.PeiTemporaryRamSize);
+    SecCoreData.StackSize              = SecCoreData.TemporaryRamSize - SecCoreData.PeiTemporaryRamSize;
+  }
 
   DEBUG ((DEBUG_INFO, "Fsp BootFirmwareVolumeBase - 0x%x\n", SecCoreData.BootFirmwareVolumeBase));
   DEBUG ((DEBUG_INFO, "Fsp BootFirmwareVolumeSize - 0x%x\n", SecCoreData.BootFirmwareVolumeSize));
@@ -194,15 +224,37 @@ SecTemporaryRamSupport (
   UINTN             HeapSize;
   UINTN             StackSize;
 
-  HeapSize   = CopySize * PcdGet8 (PcdFspHeapSizePercentage) / 100 ;
-  StackSize  = CopySize - HeapSize;
+  UINTN             CurrentStack;
+  UINTN             FspStackBase;
 
-  OldHeap = (VOID*)(UINTN)TemporaryMemoryBase;
-  NewHeap = (VOID*)((UINTN)PermanentMemoryBase + StackSize);
+  if (PcdGet8 (PcdFspHeapSizePercentage) == 0) {
 
-  OldStack = (VOID*)((UINTN)TemporaryMemoryBase + HeapSize);
-  NewStack = (VOID*)(UINTN)PermanentMemoryBase;
+    CurrentStack = AsmReadEsp();
+    FspStackBase = (UINTN)GetFspEntryStack();
 
+    StackSize = FspStackBase - CurrentStack;
+    HeapSize  = CopySize;
+
+    OldHeap = (VOID*)(UINTN)TemporaryMemoryBase;
+    NewHeap = (VOID*)((UINTN)PermanentMemoryBase);
+
+    OldStack = (VOID*)CurrentStack;
+    //
+    //The old stack is copied at the end of the stack region because stack grows down.
+    //
+    NewStack = (VOID*)((UINTN)PermanentMemoryBase - StackSize);
+
+  } else {
+    HeapSize   = CopySize * PcdGet8 (PcdFspHeapSizePercentage) / 100 ;
+    StackSize  = CopySize - HeapSize;
+
+    OldHeap = (VOID*)(UINTN)TemporaryMemoryBase;
+    NewHeap = (VOID*)((UINTN)PermanentMemoryBase + StackSize);
+
+    OldStack = (VOID*)((UINTN)TemporaryMemoryBase + HeapSize);
+    NewStack = (VOID*)(UINTN)PermanentMemoryBase;
+
+  }
   //
   // Migrate Heap
   //

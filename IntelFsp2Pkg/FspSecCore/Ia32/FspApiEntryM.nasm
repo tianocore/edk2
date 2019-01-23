@@ -1,7 +1,7 @@
 ;; @file
 ;  Provide FSP API entry points.
 ;
-; Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2016 - 2019, Intel Corporation. All rights reserved.<BR>
 ; This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -19,6 +19,7 @@
 extern   ASM_PFX(PcdGet32(PcdTemporaryRamBase))
 extern   ASM_PFX(PcdGet32(PcdTemporaryRamSize))
 extern   ASM_PFX(PcdGet32(PcdFspTemporaryRamSize))
+extern   ASM_PFX(PcdGet8 (PcdFspHeapSizePercentage))
 
 struc FSPM_UPD_COMMON
     ; FSP_UPD_HEADER {
@@ -128,15 +129,55 @@ ASM_PFX(FspApiCommonContinue):
   add    edx, [eax + FSP_HEADER_CFGREG_OFFSET]
   pop    eax
 
-  FspStackSetup:
+FspStackSetup:
+  ;
+  ; StackBase = temp memory base, StackSize = temp memory size
+  ;
   mov    edi, [edx + FSPM_UPD_COMMON.StackBase]
   mov    ecx, [edx + FSPM_UPD_COMMON.StackSize]
+
+  ;
+  ; Keep using bootloader stack if heap size % is 0
+  ;
+  mov    bl, BYTE [ASM_PFX(PcdGet8 (PcdFspHeapSizePercentage))]
+  cmp    bl, 0
+  jz     SkipStackSwitch
+
+  ;
+  ; Set up a dedicated temp ram stack for FSP if FSP heap size % doesn't equal 0
+  ;
   add    edi, ecx
   ;
-  ; Setup new FSP stack
+  ; Switch to new FSP stack
   ;
-  xchg    edi, esp                                ; Exchange edi and esp, edi will be assigned to the current esp pointer and esp will be Stack base + Stack size
-  mov     ebx, esp                                ; Put Stack base + Stack size in ebx
+  xchg   edi, esp                                ; Exchange edi and esp, edi will be assigned to the current esp pointer and esp will be Stack base + Stack size
+
+SkipStackSwitch:
+  ;
+  ; If heap size % is 0:
+  ;   EDI is FSPM_UPD_COMMON.StackBase and will hold ESP later (boot loader stack pointer)
+  ;   ECX is FSPM_UPD_COMMON.StackSize
+  ;   ESP is boot loader stack pointer (no stack switch)
+  ;   BL  is 0 to indicate no stack switch (EBX will hold FSPM_UPD_COMMON.StackBase later)
+  ;
+  ; If heap size % is not 0
+  ;   EDI is boot loader stack pointer
+  ;   ECX is FSPM_UPD_COMMON.StackSize
+  ;   ESP is new stack (FSPM_UPD_COMMON.StackBase + FSPM_UPD_COMMON.StackSize)
+  ;   BL  is NOT 0 to indicate stack has switched
+  ;
+  cmp    bl, 0
+  jnz    StackHasBeenSwitched
+
+  mov    ebx, edi                                ; Put FSPM_UPD_COMMON.StackBase to ebx as temp memory base
+  mov    edi, esp                                ; Put boot loader stack pointer to edi
+  jmp    StackSetupDone
+
+StackHasBeenSwitched:
+  mov    ebx, esp                                ; Put Stack base + Stack size in ebx
+  sub    ebx, ecx                                ; Stack base + Stack size - Stack size as temp memory base
+
+StackSetupDone:
 
   ;
   ; Pass the API Idx to SecStartup
@@ -170,7 +211,6 @@ ASM_PFX(FspApiCommonContinue):
   ;
   ; Pass stack base and size into the PEI Core
   ;
-  sub     ebx, ecx            ; Stack base + Stack size - Stack size
   push    ebx
   push    ecx
 

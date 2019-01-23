@@ -86,8 +86,12 @@
   gIntelFsp2PkgTokenSpaceGuid.PcdFspBootFirmwareVolumeBase|0xFFF80000|UINT32|0x10000003
   gIntelFsp2PkgTokenSpaceGuid.PcdFspHeaderSpecVersion     |      0x20| UINT8|0x00000002
 
+  #
   # x % of FSP temporary memory will be used for heap
   # (100 - x) % of FSP temporary memory will be used for stack
+  # 0 means FSP will share the stack with boot loader and FSP temporary memory is heap
+  #   Note: This mode assumes boot loader stack is large enough for FSP to use.
+  #
   gIntelFsp2PkgTokenSpaceGuid.PcdFspHeapSizePercentage    |        50| UINT8|0x10000004
   #
   # Maximal Interrupt supported in IDT table.
