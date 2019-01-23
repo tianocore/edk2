@@ -548,6 +548,8 @@ RunTftp (
       goto NextHandle;
     }
 
+    ShellStatus = SHELL_SUCCESS;
+
     NextHandle:
 
     CloseProtocolAndDestroyServiceChild (
@@ -573,6 +575,10 @@ RunTftp (
   }
   if (Handles != NULL) {
     FreePool (Handles);
+  }
+
+  if ((ShellStatus != SHELL_SUCCESS) && (EFI_ERROR(Status))) {
+    ShellStatus = Status & ~MAX_BIT;
   }
 
   return ShellStatus;
