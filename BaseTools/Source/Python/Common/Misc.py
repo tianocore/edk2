@@ -54,9 +54,6 @@ secReGeneral = re.compile('^([\da-fA-F]+):([\da-fA-F]+) +([\da-fA-F]+)[Hh]? +([.
 
 StructPattern = re.compile(r'[_a-zA-Z][0-9A-Za-z_]*$')
 
-## Dictionary used to store file time stamp for quick re-access
-gFileTimeStampCache = {}    # {file path : file time stamp}
-
 ## Dictionary used to store dependencies of files
 gDependencyDatabase = {}    # arch : {file path : [dependent files list]}
 
