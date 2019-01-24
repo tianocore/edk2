@@ -15,7 +15,7 @@
 # Import Modules
 #
 from __future__ import absolute_import
-import Common.LongFilePathOs as os
+
 import sys
 import string
 import threading
@@ -26,22 +26,22 @@ import array
 import shutil
 from random import sample
 from struct import pack
-from UserDict import IterableUserDict
-from UserList import UserList
-
-from Common import EdkLogger as EdkLogger
-from Common import GlobalData as GlobalData
-from .DataType import *
-from .BuildToolError import *
-from CommonDataClass.DataClass import *
-from .Parsing import GetSplitValueList
-from Common.LongFilePathSupport import OpenLongFilePath as open
-from Common.MultipleWorkspace import MultipleWorkspace as mws
 import uuid
-from CommonDataClass.Exceptions import BadExpression
-from Common.caching import cached_property
 import subprocess
 from collections import OrderedDict
+
+import Common.LongFilePathOs as os
+from Common import EdkLogger as EdkLogger
+from Common import GlobalData as GlobalData
+from Common.DataType import *
+from Common.BuildToolError import *
+from CommonDataClass.DataClass import *
+from Common.Parsing import GetSplitValueList
+from Common.LongFilePathSupport import OpenLongFilePath as open
+from Common.MultipleWorkspace import MultipleWorkspace as mws
+from CommonDataClass.Exceptions import BadExpression
+from Common.caching import cached_property
+
 ## Regular expression used to find out place holders in string template
 gPlaceholderPattern = re.compile("\$\{([^$()\s]+)\}", re.MULTILINE | re.UNICODE)
 
@@ -831,22 +831,22 @@ class Progressor:
 #  accessed in the order they are added into the dict. It guarantees the order
 #  by making use of an internal list to keep a copy of keys.
 #
-class sdict(IterableUserDict):
+class sdict(dict):
     ## Constructor
     def __init__(self):
-        IterableUserDict.__init__(self)
+        dict.__init__(self)
         self._key_list = []
 
     ## [] operator
     def __setitem__(self, key, value):
         if key not in self._key_list:
             self._key_list.append(key)
-        IterableUserDict.__setitem__(self, key, value)
+        dict.__setitem__(self, key, value)
 
     ## del operator
     def __delitem__(self, key):
         self._key_list.remove(key)
-        IterableUserDict.__delitem__(self, key)
+        dict.__delitem__(self, key)
 
     ## used in "for k in dict" loop to ensure the correct order
     def __iter__(self):
@@ -869,17 +869,17 @@ class sdict(IterableUserDict):
         index = self._key_list.index(key)
         if order == 'BEFORE':
             self._key_list.insert(index, newkey)
-            IterableUserDict.__setitem__(self, newkey, newvalue)
+            dict.__setitem__(self, newkey, newvalue)
         elif order == 'AFTER':
             self._key_list.insert(index + 1, newkey)
-            IterableUserDict.__setitem__(self, newkey, newvalue)
+            dict.__setitem__(self, newkey, newvalue)
 
     ## append support
     def append(self, sdict):
         for key in sdict:
             if key not in self._key_list:
                 self._key_list.append(key)
-            IterableUserDict.__setitem__(self, key, sdict[key])
+            dict.__setitem__(self, key, sdict[key])
 
     def has_key(self, key):
         return key in self._key_list
@@ -887,7 +887,7 @@ class sdict(IterableUserDict):
     ## Empty the dict
     def clear(self):
         self._key_list = []
-        IterableUserDict.clear(self)
+        dict.clear(self)
 
     ## Return a copy of keys
     def keys(self):
