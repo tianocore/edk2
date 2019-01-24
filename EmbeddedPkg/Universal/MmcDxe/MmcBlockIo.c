@@ -148,12 +148,23 @@ MmcTransferBlock (
   MmcHostInstance = MMC_HOST_INSTANCE_FROM_BLOCK_IO_THIS (This);
   MmcHost = MmcHostInstance->MmcHost;
 
-  //Set command argument based on the card access mode (Byte mode or Block mode)
-  if ((MmcHostInstance->CardInfo.OCRData.AccessMode & MMC_OCR_ACCESS_MASK) ==
-      MMC_OCR_ACCESS_SECTOR) {
-    CmdArg = Lba;
+  if (MmcHostInstance->CardInfo.CardType != EMMC_CARD) {
+    //Set command argument based on the card capacity
+    //if 0 : SDSC card
+    //if 1 : SDXC/SDHC
+    if (MmcHostInstance->CardInfo.OCRData.AccessMode & SD_CARD_CAPACITY) {
+      CmdArg = Lba;
+    } else {
+      CmdArg = Lba * This->Media->BlockSize;
+    }
   } else {
-    CmdArg = Lba * This->Media->BlockSize;
+    //Set command argument based on the card access mode (Byte mode or Block mode)
+    if ((MmcHostInstance->CardInfo.OCRData.AccessMode & MMC_OCR_ACCESS_MASK) ==
+        MMC_OCR_ACCESS_SECTOR) {
+      CmdArg = Lba;
+    } else {
+      CmdArg = Lba * This->Media->BlockSize;
+    }
   }
 
   Status = MmcHost->SendCommand (MmcHost, Cmd, CmdArg);

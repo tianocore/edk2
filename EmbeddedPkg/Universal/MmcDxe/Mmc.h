@@ -70,6 +70,8 @@
 #define SD_HIGH_SPEED                       50000000
 #define SWITCH_CMD_SUCCESS_MASK             0x0f000000
 
+#define SD_CARD_CAPACITY                    0x00000002
+
 #define BUSWIDTH_4                          4
 
 typedef enum {
