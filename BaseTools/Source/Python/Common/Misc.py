@@ -947,44 +947,6 @@ class sdict(IterableUserDict):
             for k, v in kwargs.items():
                 self[k] = v
 
-## Dictionary with restricted keys
-#
-class rdict(dict):
-    ## Constructor
-    def __init__(self, KeyList):
-        for Key in KeyList:
-            dict.__setitem__(self, Key, "")
-
-    ## []= operator
-    def __setitem__(self, key, value):
-        if key not in self:
-            EdkLogger.error("RestrictedDict", ATTRIBUTE_SET_FAILURE, "Key [%s] is not allowed" % key,
-                            ExtraData=", ".join(dict.keys(self)))
-        dict.__setitem__(self, key, value)
-
-    ## =[] operator
-    def __getitem__(self, key):
-        if key not in self:
-            return ""
-        return dict.__getitem__(self, key)
-
-    ## del operator
-    def __delitem__(self, key):
-        EdkLogger.error("RestrictedDict", ATTRIBUTE_ACCESS_DENIED, ExtraData="del")
-
-    ## Empty the dict
-    def clear(self):
-        for Key in self:
-            self.__setitem__(Key, "")
-
-    ## Return value related to a key, and remove the (key, value) from the dict
-    def pop(self, key, *dv):
-        EdkLogger.error("RestrictedDict", ATTRIBUTE_ACCESS_DENIED, ExtraData="pop")
-
-    ## Return (key, value) pair, and remove the (key, value) from the dict
-    def popitem(self):
-        EdkLogger.error("RestrictedDict", ATTRIBUTE_ACCESS_DENIED, ExtraData="popitem")
-
 ## Dictionary using prioritized list as key
 #
 class tdict:
@@ -1987,11 +1949,3 @@ def CopyDict(ori_dict):
 #
 def RemoveCComments(ctext):
     return re.sub('//.*?\n|/\*.*?\*/', '\n', ctext, flags=re.S)
-##
-#
-# This acts like the main() function for the script, unless it is 'import'ed into another
-# script.
-#
-if __name__ == '__main__':
-    pass
-
