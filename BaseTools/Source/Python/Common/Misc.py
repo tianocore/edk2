@@ -566,32 +566,6 @@ def RealPath(File, Dir='', OverrideDir=''):
         NewFile = GlobalData.gAllFiles[NewFile]
     return NewFile
 
-def RealPath2(File, Dir='', OverrideDir=''):
-    NewFile = None
-    if OverrideDir:
-        NewFile = GlobalData.gAllFiles[os.path.normpath(os.path.join(OverrideDir, File))]
-        if NewFile:
-            if OverrideDir[-1] == os.path.sep:
-                return NewFile[len(OverrideDir):], NewFile[0:len(OverrideDir)]
-            else:
-                return NewFile[len(OverrideDir) + 1:], NewFile[0:len(OverrideDir)]
-    if GlobalData.gAllFiles:
-        NewFile = GlobalData.gAllFiles[os.path.normpath(os.path.join(Dir, File))]
-    if not NewFile:
-        NewFile = os.path.normpath(os.path.join(Dir, File))
-        if not os.path.exists(NewFile):
-            return None, None
-    if NewFile:
-        if Dir:
-            if Dir[-1] == os.path.sep:
-                return NewFile[len(Dir):], NewFile[0:len(Dir)]
-            else:
-                return NewFile[len(Dir) + 1:], NewFile[0:len(Dir)]
-        else:
-            return NewFile, ''
-
-    return None, None
-
 ## Get GUID value from given packages
 #
 #   @param      CName           The CName of the GUID
@@ -1189,27 +1163,27 @@ def AnalyzePcdExpression(Setting):
             FieldList[i] = ch.replace(RanStr,'\\\\')
     return FieldList
 
-def ParseDevPathValue (Value):
-    if '\\' in Value:
-        Value.replace('\\', '/').replace(' ', '')
-
-    Cmd = 'DevicePath ' + '"' + Value + '"'
-    try:
-        p = subprocess.Popen(Cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-        out, err = p.communicate()
-    except Exception as X:
-        raise BadExpression("DevicePath: %s" % (str(X)) )
-    finally:
-        subprocess._cleanup()
-        p.stdout.close()
-        p.stderr.close()
-    if err:
-        raise BadExpression("DevicePath: %s" % str(err))
-    Size = len(out.split())
-    out = ','.join(out.split())
-    return '{' + out + '}', Size
-
 def ParseFieldValue (Value):
+    def ParseDevPathValue (Value):
+        if '\\' in Value:
+            Value.replace('\\', '/').replace(' ', '')
+
+        Cmd = 'DevicePath ' + '"' + Value + '"'
+        try:
+            p = subprocess.Popen(Cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+            out, err = p.communicate()
+        except Exception as X:
+            raise BadExpression("DevicePath: %s" % (str(X)) )
+        finally:
+            subprocess._cleanup()
+            p.stdout.close()
+            p.stderr.close()
+        if err:
+            raise BadExpression("DevicePath: %s" % str(err))
+        Size = len(out.split())
+        out = ','.join(out.split())
+        return '{' + out + '}', Size
+
     if "{CODE(" in Value:
         return Value, len(Value.split(","))
     if isinstance(Value, type(0)):
@@ -1625,6 +1599,32 @@ class PathClass(object):
         return os.stat(self.Path)[8]
 
     def Validate(self, Type='', CaseSensitive=True):
+        def RealPath2(File, Dir='', OverrideDir=''):
+            NewFile = None
+            if OverrideDir:
+                NewFile = GlobalData.gAllFiles[os.path.normpath(os.path.join(OverrideDir, File))]
+                if NewFile:
+                    if OverrideDir[-1] == os.path.sep:
+                        return NewFile[len(OverrideDir):], NewFile[0:len(OverrideDir)]
+                    else:
+                        return NewFile[len(OverrideDir) + 1:], NewFile[0:len(OverrideDir)]
+            if GlobalData.gAllFiles:
+                NewFile = GlobalData.gAllFiles[os.path.normpath(os.path.join(Dir, File))]
+            if not NewFile:
+                NewFile = os.path.normpath(os.path.join(Dir, File))
+                if not os.path.exists(NewFile):
+                    return None, None
+            if NewFile:
+                if Dir:
+                    if Dir[-1] == os.path.sep:
+                        return NewFile[len(Dir):], NewFile[0:len(Dir)]
+                    else:
+                        return NewFile[len(Dir) + 1:], NewFile[0:len(Dir)]
+                else:
+                    return NewFile, ''
+
+            return None, None
+
         if GlobalData.gCaseInsensitive:
             CaseSensitive = False
         if Type and Type.lower() != self.Type:
