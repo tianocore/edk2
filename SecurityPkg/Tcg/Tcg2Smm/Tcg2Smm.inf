@@ -2,8 +2,10 @@
 #  Provides ACPI methods for TPM 2.0 support
 #
 #  Spec Compliance Info:
-#     "TCG ACPI Specification Level 00 Revision 00.37"
+#     "TCG ACPI Specification Version 1.2 Revision 8"
 #     "Physical Presence Interface Specification Version 1.30 Revision 00.52"
+#       along with
+#     "Errata Version 0.4 for TCG PC Client Platform Physical Presence Interface Specification"
 #     "Platform Reset Attack Mitigation Specification Version 1.00"
 #    TPM2.0 ACPI device object
 #     "TCG PC Client Platform Firmware Profile Specification for TPM Family 2.0 Level 00 Revision 1.03 v51"
@@ -18,7 +20,7 @@
 #  This driver will have external input - variable and ACPINvs data in SMM mode.
 #  This external input must be validated carefully to avoid security issue.
 #
-# Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2015 - 2019, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution. The full text of the license may be found at

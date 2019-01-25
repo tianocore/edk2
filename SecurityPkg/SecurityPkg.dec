@@ -405,7 +405,7 @@
   # @Prompt A physical presence user status
   gEfiSecurityPkgTokenSpaceGuid.PcdUserPhysicalPresence|FALSE|BOOLEAN|0x00010019
 
-  ## Indicate the TPM2 ACPI table revision. Rev 4 is defined in TCG ACPI Specification Rev 00.37.<BR><BR>
+  ## Indicate the TPM2 ACPI table revision. Rev 4 has been defined since TCG ACPI Specification Rev 00.37.<BR><BR>
   # To support configuring from setup page, this PCD can be DynamicHii type and map to a setup option.<BR>
   # For example, map to TCG2_VERSION.Tpm2AcpiTableRev to be configured by Tcg2ConfigDxe driver.<BR>
   # gEfiSecurityPkgTokenSpaceGuid.PcdTpm2AcpiTableRev|L"TCG2_VERSION"|gTcg2ConfigFormSetGuid|0x8|3|NV,BS<BR>
