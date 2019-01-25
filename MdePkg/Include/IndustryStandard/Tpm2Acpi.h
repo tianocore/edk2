@@ -1,7 +1,7 @@
 /** @file
   TPM2 ACPI table definition.
 
-Copyright (c) 2013 - 2017, Intel Corporation. All rights reserved. <BR>
+Copyright (c) 2013 - 2019, Intel Corporation. All rights reserved. <BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -31,13 +31,16 @@ typedef struct {
   UINT32                      Flags;
   UINT64                      AddressOfControlArea;
   UINT32                      StartMethod;
-//UINT8                       PlatformSpecificParameters[];
+//UINT8                       PlatformSpecificParameters[];  // size up to 12
+//UINT32                      Laml;                          // Optional
+//UINT32                      Lasa;                          // Optional
 } EFI_TPM2_ACPI_TABLE;
 
 #define EFI_TPM2_ACPI_TABLE_START_METHOD_ACPI                                          2
 #define EFI_TPM2_ACPI_TABLE_START_METHOD_TIS                                           6
 #define EFI_TPM2_ACPI_TABLE_START_METHOD_COMMAND_RESPONSE_BUFFER_INTERFACE             7
 #define EFI_TPM2_ACPI_TABLE_START_METHOD_COMMAND_RESPONSE_BUFFER_INTERFACE_WITH_ACPI   8
+#define EFI_TPM2_ACPI_TABLE_START_METHOD_COMMAND_RESPONSE_BUFFER_INTERFACE_WITH_SMC    11
 
 typedef struct {
   UINT32   Reserved;
