@@ -2201,6 +2201,11 @@ typedef struct {
   #error Unknown Processor Type
 #endif
 
+//
+// The directory within the active EFI System Partition defined for delivery of capsule to firmware
+//
+#define EFI_CAPSULE_FILE_DIRECTORY            L"\\EFI\\UpdateCapsule\\"
+
 #include <Uefi/UefiPxe.h>
 #include <Uefi/UefiGpt.h>
 #include <Uefi/UefiInternalFormRepresentation.h>
