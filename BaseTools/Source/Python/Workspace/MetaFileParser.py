@@ -757,9 +757,13 @@ class InfParser(MetaFileParser):
         if self._ValueList[2] != '':
             InfPcdValueList = GetSplitValueList(TokenList[1], TAB_VALUE_SPLIT, 1)
             if InfPcdValueList[0] in ['True', 'true', 'TRUE']:
-                self._ValueList[2] = TokenList[1].replace(InfPcdValueList[0], '1', 1);
+                self._ValueList[2] = TokenList[1].replace(InfPcdValueList[0], '1', 1)
             elif InfPcdValueList[0] in ['False', 'false', 'FALSE']:
-                self._ValueList[2] = TokenList[1].replace(InfPcdValueList[0], '0', 1);
+                self._ValueList[2] = TokenList[1].replace(InfPcdValueList[0], '0', 1)
+            elif isinstance(InfPcdValueList[0], str) and InfPcdValueList[0].find('$(') >= 0:
+                Value = ReplaceExprMacro(InfPcdValueList[0],self._Macros)
+                if Value != '0':
+                    self._ValueList[2] = Value
         if (self._ValueList[0], self._ValueList[1]) not in self.PcdsDict:
             self.PcdsDict[self._ValueList[0], self._ValueList[1]] = self._SectionType
         elif self.PcdsDict[self._ValueList[0], self._ValueList[1]] != self._SectionType:
