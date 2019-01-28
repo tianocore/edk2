@@ -101,9 +101,7 @@ DEFINE MS_VS_BIN   = DEF(VS2008_BIN)
 DEFINE MS_VS_DLL   = DEF(VS2008_DLL)
 
 DEFINE WINDDK_BIN16     = ENV(WINDDK3790_PREFIX)bin16
-DEFINE WINDDK_BIN32     = ENV(WINDDK3790_PREFIX)x86
 DEFINE WINDDK_BINX64    = ENV(WINDDK3790_PREFIX)win64\x86\amd64
-DEFINE WINDDK_BIN64     = ENV(WINDDK3790_PREFIX)win64\x86
 
 # NOTE: The Intel C++ Compiler for Windows requires one of the Microsoft C compiler
 #        tool chains for the linker and nmake commands.
@@ -273,14 +271,6 @@ DEFINE DTC_BIN                 = ENV(DTC_PREFIX)dtc
 #                        Note:
 #                             Building of XIP firmware images for ARM/ARM64 is not currently supported (only applications).
 #                             /FILEALIGN:4096 and other changes are needed for ARM firmware builds.
-#   DDK3790     -win32-  Requires:
-#                             Microsoft Windows Server 2003 Driver Development Kit (Microsoft WINDDK) version 3790.1830
-#                        Optional:
-#                             Required to build EBC drivers:
-#                               Intel(r) Compiler for Efi Byte Code (Intel(r) EBC Compiler)
-#                             Required to build platforms or ACPI tables:
-#                               Intel(r) ACPI Compiler (iasl.exe) from
-#                               https://acpica.org/downloads
 #   GCC48       -Linux,Windows-  Requires:
 #                             GCC 4.8 targeting x86_64-linux-gnu, aarch64-linux-gnu, or arm-linux-gnueabi
 #                        Optional:
@@ -374,14 +364,6 @@ DEFINE DTC_BIN                 = ENV(DTC_PREFIX)dtc
 #                               http://download.microsoft.com/download/2/c/1/2c16c7e0-96c1-40f5-81fc-3e4bf7b65496/microsoft_asl_compiler-v4-0-0.msi
 #   VS2015xASL  -win32-  Requires:
 #                             Microsoft Visual Studio 2015 Professional Edition
-#                             Microsoft Windows Server 2003 Driver Development Kit (Microsoft WINDDK) version 3790.1830
-#                        Optional:
-#                             Required to build EBC drivers:
-#                               Intel(r) Compiler for Efi Byte Code (Intel(r) EBC Compiler)
-#                             Required to build platforms or ACPI tables:
-#                               Microsoft ASL ACPI Compiler (asl.exe) v4.0.0 from
-#                               http://download.microsoft.com/download/2/c/1/2c16c7e0-96c1-40f5-81fc-3e4bf7b65496/microsoft_asl_compiler-v4-0-0.msi
-#   DDK3790xASL -win32-  Requires:
 #                             Microsoft Windows Server 2003 Driver Development Kit (Microsoft WINDDK) version 3790.1830
 #                        Optional:
 #                             Required to build EBC drivers:
@@ -3111,221 +3093,6 @@ NOOPT_VS2017_AARCH64_DLINK_FLAGS   = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF
 *_VS2017_EBC_VFRPP_FLAGS         = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
 *_VS2017_EBC_SLINK_FLAGS         = /lib /NOLOGO /MACHINE:EBC
 *_VS2017_EBC_DLINK_FLAGS         = "C:\Program Files (x86)\Intel\EBC\Lib\EbcLib.lib" /NOLOGO /NODEFAULTLIB /MACHINE:EBC /OPT:REF /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /MAP /ALIGN:32 /DRIVER
-
-####################################################################################
-#
-# Microsoft Device Driver Kit 3790.1830 (IA-32, X64, Itanium, with Link Time Code Generation)
-# And Intel ACPI Compiler
-#
-####################################################################################
-#   DDK3790  - Microsoft Windows DDK 3790.1830
-#   ASL  - Intel ACPI Source Language Compiler (iasl.exe)
-*_DDK3790_*_*_FAMILY        = MSFT
-
-*_DDK3790_*_*_DLL           = DEF(WINDDK_BIN32)
-*_DDK3790_*_MAKE_PATH       = DEF(WINDDK_BIN32)\nmake.exe
-*_DDK3790_*_MAKE_FLAGS           = /nologo
-*_DDK3790_*_RC_PATH         = DEF(WINDDK_BIN32)\rc.exe
-
-*_DDK3790_*_PP_FLAGS             = /nologo /E /TC /FIAutoGen.h
-*_DDK3790_*_APP_FLAGS            = /nologo /E /TC
-*_DDK3790_*_SLINK_FLAGS          = /nologo /LTCG
-*_DDK3790_*_VFRPP_FLAGS          = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
-
-*_DDK3790_*_ASM16_PATH      = DEF(WINDDK_BIN32)\ml.exe
-
-##################
-# ASL definitions
-##################
-*_DDK3790_*_ASL_PATH        = DEF(DEFAULT_WIN_ASL_BIN)
-*_DDK3790_*_ASL_FLAGS       = DEF(DEFAULT_WIN_ASL_FLAGS)
-*_DDK3790_*_ASL_OUTFLAGS    = DEF(DEFAULT_WIN_ASL_OUTFLAGS)
-*_DDK3790_*_ASLCC_FLAGS     = DEF(MSFT_ASLCC_FLAGS)
-*_DDK3790_*_ASLPP_FLAGS     = DEF(MSFT_ASLPP_FLAGS)
-*_DDK3790_*_ASLDLINK_FLAGS  = DEF(MSFT_ASLDLINK_FLAGS)
-
-##################
-# IA32 definitions
-##################
-*_DDK3790_IA32_CC_PATH      = DEF(WINDDK_BIN32)\cl.exe
-*_DDK3790_IA32_SLINK_PATH   = DEF(WINDDK_BIN32)\lib.exe
-*_DDK3790_IA32_DLINK_PATH   = DEF(WINDDK_BIN32)\link.exe
-*_DDK3790_IA32_PP_PATH      = DEF(WINDDK_BIN32)\cl.exe
-*_DDK3790_IA32_VFRPP_PATH   = DEF(WINDDK_BIN32)\cl.exe
-*_DDK3790_IA32_APP_PATH     = DEF(WINDDK_BIN32)\cl.exe
-*_DDK3790_IA32_ASM_PATH     = DEF(WINDDK_BIN32)\ml.exe
-*_DDK3790_IA32_ASLCC_PATH     = DEF(WINDDK_BIN32)\cl.exe
-*_DDK3790_IA32_ASLPP_PATH     = DEF(WINDDK_BIN32)\cl.exe
-*_DDK3790_IA32_ASLDLINK_PATH  = DEF(WINDDK_BIN32)\link.exe
-
-  DEBUG_DDK3790_IA32_CC_FLAGS    = /nologo /c /WX /W4 /Gy /Gs32768 /D UNICODE /O1b2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm
-RELEASE_DDK3790_IA32_CC_FLAGS    = /nologo /c /WX /W4 /Gy /Gs32768 /D UNICODE /O1b2 /GL /FIAutoGen.h /EHs-c- /GR- /GF
-NOOPT_DDK3790_IA32_CC_FLAGS      = /nologo /c /WX /W4 /Gy /Gs32768 /D UNICODE /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm /Od
-
-  DEBUG_DDK3790_IA32_ASM_FLAGS   = /nologo /c /WX /W3 /coff /Cx /Zd /Zi
-RELEASE_DDK3790_IA32_ASM_FLAGS   = /nologo /c /WX /W3 /coff /Cx /Zd
-NOOPT_DDK3790_IA32_ASM_FLAGS     = /nologo /c /WX /W3 /coff /Cx /Zd /Zi
-
-  DEBUG_DDK3790_IA32_NASM_FLAGS  = -Ox -f win32 -g
-RELEASE_DDK3790_IA32_NASM_FLAGS  = -Ox -f win32
-NOOPT_DDK3790_IA32_NASM_FLAGS    = -O0 -f win32 -g
-
-  DEBUG_DDK3790_IA32_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:X86 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
-RELEASE_DDK3790_IA32_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /IGNORE:4078 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:X86 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MERGE:.rdata=.data
-NOOPT_DDK3790_IA32_DLINK_FLAGS   = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:X86 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
-
-##################
-# x64 definitions
-##################
-*_DDK3790_X64_CC_PATH      = DEF(WINDDK_BINX64)\cl.exe
-*_DDK3790_X64_SLINK_PATH   = DEF(WINDDK_BINX64)\lib.exe
-*_DDK3790_X64_DLINK_PATH   = DEF(WINDDK_BINX64)\link.exe
-*_DDK3790_X64_PP_PATH      = DEF(WINDDK_BINX64)\cl.exe
-*_DDK3790_X64_VFRPP_PATH   = DEF(WINDDK_BINX64)\cl.exe
-*_DDK3790_X64_APP_PATH     = DEF(WINDDK_BINX64)\cl.exe
-*_DDK3790_X64_ASM_PATH     = DEF(WINDDK_BINX64)\ml64.exe
-*_DDK3790_X64_ASLCC_PATH     = DEF(WINDDK_BINX64)\cl.exe
-*_DDK3790_X64_ASLPP_PATH     = DEF(WINDDK_BINX64)\cl.exe
-*_DDK3790_X64_ASLDLINK_PATH  = DEF(WINDDK_BINX64)\link.exe
-
-  DEBUG_DDK3790_X64_CC_FLAGS     = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm
-RELEASE_DDK3790_X64_CC_FLAGS     = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF
-NOOPT_DDK3790_X64_CC_FLAGS       = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm /Od
-
-  DEBUG_DDK3790_X64_ASM_FLAGS    = /nologo /c /WX /W3 /Cx /Zd /Zi
-RELEASE_DDK3790_X64_ASM_FLAGS    = /nologo /c /WX /W3 /Cx /Zd
-NOOPT_DDK3790_X64_ASM_FLAGS      = /nologo /c /WX /W3 /Cx /Zd /Zi
-
-  DEBUG_DDK3790_X64_NASM_FLAGS   = -Ox -f win64 -g
-RELEASE_DDK3790_X64_NASM_FLAGS   = -Ox -f win64
-NOOPT_DDK3790_X64_NASM_FLAGS     = -O0 -f win64 -g
-
-  DEBUG_DDK3790_X64_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:AMD64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
-RELEASE_DDK3790_X64_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /IGNORE:4078 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:AMD64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MERGE:.rdata=.data
-NOOPT_DDK3790_X64_DLINK_FLAGS    = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:AMD64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
-
-##################
-# EBC definitions
-##################
-*_DDK3790_EBC_*_FAMILY      = INTEL
-
-*_DDK3790_EBC_PP_PATH       = DEF(EBC_BIN)\iec.exe
-*_DDK3790_EBC_CC_PATH       = DEF(EBC_BIN)\iec.exe
-*_DDK3790_EBC_DLINK_PATH    = DEF(EBC_BIN)\link.exe
-*_DDK3790_EBC_SLINK_PATH    = DEF(EBC_BIN)\link.exe
-*_DDK3790_EBC_VFRPP_PATH    = DEF(EBC_BIN)\iec.exe
-
-*_DDK3790_EBC_CC_FLAGS           = /nologo /c /WX /W3 /FIAutoGen.h /D$(MODULE_ENTRY_POINT)=$(ARCH_ENTRY_POINT)
-*_DDK3790_EBC_SLINK_FLAGS        = /lib /NOLOGO /MACHINE:EBC
-*_DDK3790_EBC_DLINK_FLAGS        = "C:\Program Files\Intel\EBC\Lib\EbcLib.lib" /NOLOGO /NODEFAULTLIB /MACHINE:EBC /OPT:REF /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /ALIGN:32 /DRIVER
-
-####################################################################################
-#
-# Microsoft Device Driver Kit 3790.1830 (IA-32, X64, Itanium, with Link Time Code Generation)
-# And Microsoft ACPI Compiler
-#
-####################################################################################
-#   DDK3790xASL  - Microsoft Windows DDK 3790.1830
-#   ASL          - Microsoft ACPI Source Language Compiler (asl.exe)
-*_DDK3790xASL_*_*_FAMILY        = MSFT
-
-*_DDK3790xASL_*_*_DLL           = DEF(WINDDK_BIN32)
-*_DDK3790xASL_*_MAKE_PATH       = DEF(WINDDK_BIN32)\nmake.exe
-*_DDK3790xASL_*_MAKE_FLAGS           = /nologo
-*_DDK3790xASL_*_RC_PATH         = DEF(WINDDK_BIN32)\rc.exe
-
-*_DDK3790xASL_*_PP_FLAGS             = /nologo /E /TC /FIAutoGen.h
-*_DDK3790xASL_*_APP_FLAGS            = /nologo /E /TC
-*_DDK3790xASL_*_SLINK_FLAGS          = /nologo /LTCG
-*_DDK3790xASL_*_VFRPP_FLAGS          = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
-
-*_DDK3790xASL_*_ASM16_PATH      = DEF(WINDDK_BIN32)\ml.exe
-
-##################
-# ASL definitions
-##################
-*_DDK3790xASL_*_ASL_PATH        = DEF(WIN_ASL_BIN)
-*_DDK3790xASL_*_ASL_FLAGS       =
-*_DDK3790xASL_*_ASL_OUTFLAGS    = DEF(MS_ASL_OUTFLAGS)
-*_DDK3790xASL_*_ASLCC_FLAGS     = DEF(MSFT_ASLCC_FLAGS)
-*_DDK3790xASL_*_ASLPP_FLAGS     = DEF(MSFT_ASLPP_FLAGS)
-*_DDK3790xASL_*_ASLDLINK_FLAGS  = DEF(MSFT_ASLDLINK_FLAGS)
-
-##################
-# IA32 definitions
-##################
-*_DDK3790xASL_IA32_CC_PATH      = DEF(WINDDK_BIN32)\cl.exe
-*_DDK3790xASL_IA32_SLINK_PATH   = DEF(WINDDK_BIN32)\lib.exe
-*_DDK3790xASL_IA32_DLINK_PATH   = DEF(WINDDK_BIN32)\link.exe
-*_DDK3790xASL_IA32_PP_PATH      = DEF(WINDDK_BIN32)\cl.exe
-*_DDK3790xASL_IA32_VFRPP_PATH   = DEF(WINDDK_BIN32)\cl.exe
-*_DDK3790xASL_IA32_APP_PATH     = DEF(WINDDK_BIN32)\cl.exe
-*_DDK3790xASL_IA32_ASM_PATH     = DEF(WINDDK_BIN32)\ml.exe
-*_DDK3790xASL_IA32_ASLCC_PATH     = DEF(WINDDK_BIN32)\cl.exe
-*_DDK3790xASL_IA32_ASLPP_PATH     = DEF(WINDDK_BIN32)\cl.exe
-*_DDK3790xASL_IA32_ASLDLINK_PATH  = DEF(WINDDK_BIN32)\link.exe
-
-  DEBUG_DDK3790xASL_IA32_CC_FLAGS    = /nologo /c /WX /W4 /Gy /Gs32768 /D UNICODE /O1b2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm
-RELEASE_DDK3790xASL_IA32_CC_FLAGS    = /nologo /c /WX /W4 /Gy /Gs32768 /D UNICODE /O1b2 /GL /FIAutoGen.h /EHs-c- /GR- /GF
-NOOPT_DDK3790xASL_IA32_CC_FLAGS      = /nologo /c /WX /W4 /Gy /Gs32768 /D UNICODE /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm /Od
-
-  DEBUG_DDK3790xASL_IA32_ASM_FLAGS   = /nologo /c /WX /W3 /coff /Cx /Zd /Zi
-RELEASE_DDK3790xASL_IA32_ASM_FLAGS   = /nologo /c /WX /W3 /coff /Cx /Zd
-NOOPT_DDK3790xASL_IA32_ASM_FLAGS     = /nologo /c /WX /W3 /coff /Cx /Zd /Zi
-
-  DEBUG_DDK3790xASL_IA32_NASM_FLAGS  = -Ox -f win32 -g
-RELEASE_DDK3790xASL_IA32_NASM_FLAGS  = -Ox -f win32
-NOOPT_DDK3790xASL_IA32_NASM_FLAGS    = -O0 -f win32 -g
-
-  DEBUG_DDK3790xASL_IA32_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:X86 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
-RELEASE_DDK3790xASL_IA32_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /IGNORE:4078 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:X86 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MERGE:.rdata=.data
-NOOPT_DDK3790xASL_IA32_DLINK_FLAGS   = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:X86 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
-
-##################
-# x64 definitions
-##################
-*_DDK3790xASL_X64_CC_PATH      = DEF(WINDDK_BINX64)\cl.exe
-*_DDK3790xASL_X64_SLINK_PATH   = DEF(WINDDK_BINX64)\lib.exe
-*_DDK3790xASL_X64_DLINK_PATH   = DEF(WINDDK_BINX64)\link.exe
-*_DDK3790xASL_X64_PP_PATH      = DEF(WINDDK_BINX64)\cl.exe
-*_DDK3790xASL_X64_VFRPP_PATH   = DEF(WINDDK_BINX64)\cl.exe
-*_DDK3790xASL_X64_APP_PATH     = DEF(WINDDK_BINX64)\cl.exe
-*_DDK3790xASL_X64_ASM_PATH     = DEF(WINDDK_BINX64)\ml64.exe
-*_DDK3790xASL_X64_ASLCC_PATH     = DEF(WINDDK_BINX64)\cl.exe
-*_DDK3790xASL_X64_ASLPP_PATH     = DEF(WINDDK_BINX64)\cl.exe
-*_DDK3790xASL_X64_ASLDLINK_PATH  = DEF(WINDDK_BINX64)\link.exe
-
-  DEBUG_DDK3790xASL_X64_CC_FLAGS     = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm
-RELEASE_DDK3790xASL_X64_CC_FLAGS     = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF
-NOOPT_DDK3790xASL_X64_CC_FLAGS       = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm /Od
-
-  DEBUG_DDK3790xASL_X64_ASM_FLAGS    = /nologo /c /WX /W3 /Cx /Zd /Zi
-RELEASE_DDK3790xASL_X64_ASM_FLAGS    = /nologo /c /WX /W3 /Cx /Zd
-NOOPT_DDK3790xASL_X64_ASM_FLAGS      = /nologo /c /WX /W3 /Cx /Zd /Zi
-
-  DEBUG_DDK3790xASL_X64_NASM_FLAGS   = -Ox -f win64 -g
-RELEASE_DDK3790xASL_X64_NASM_FLAGS   = -Ox -f win64
-NOOPT_DDK3790xASL_X64_NASM_FLAGS     = -O0 -f win64 -g
-
-  DEBUG_DDK3790xASL_X64_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:AMD64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
-RELEASE_DDK3790xASL_X64_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /IGNORE:4078 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:AMD64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MERGE:.rdata=.data
-NOOPT_DDK3790xASL_X64_DLINK_FLAGS    = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:AMD64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
-
-##################
-# EBC definitions
-##################
-*_DDK3790xASL_EBC_*_FAMILY      = INTEL
-
-*_DDK3790xASL_EBC_PP_PATH       = DEF(EBC_BIN)\iec.exe
-*_DDK3790xASL_EBC_CC_PATH       = DEF(EBC_BIN)\iec.exe
-*_DDK3790xASL_EBC_DLINK_PATH    = DEF(EBC_BIN)\link.exe
-*_DDK3790xASL_EBC_SLINK_PATH    = DEF(EBC_BIN)\link.exe
-*_DDK3790xASL_EBC_VFRPP_PATH    = DEF(EBC_BIN)\iec.exe
-
-*_DDK3790xASL_EBC_CC_FLAGS           = /nologo /c /WX /W3 /FIAutoGen.h /D$(MODULE_ENTRY_POINT)=$(ARCH_ENTRY_POINT)
-*_DDK3790xASL_EBC_SLINK_FLAGS        = /lib /NOLOGO /MACHINE:EBC
-*_DDK3790xASL_EBC_DLINK_FLAGS        = "C:\Program Files\Intel\EBC\Lib\EbcLib.lib" /NOLOGO /NODEFAULTLIB /MACHINE:EBC /OPT:REF /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /ALIGN:32 /DRIVER
-
 
 ####################################################################################
 # GCC Common
