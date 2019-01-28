@@ -822,127 +822,6 @@ class Progressor:
             Progressor._ProgressThread.join()
             Progressor._ProgressThread = None
 
-## A dict which can access its keys and/or values orderly
-#
-#  The class implements a new kind of dict which its keys or values can be
-#  accessed in the order they are added into the dict. It guarantees the order
-#  by making use of an internal list to keep a copy of keys.
-#
-class sdict(dict):
-    ## Constructor
-    def __init__(self):
-        dict.__init__(self)
-        self._key_list = []
-
-    ## [] operator
-    def __setitem__(self, key, value):
-        if key not in self._key_list:
-            self._key_list.append(key)
-        dict.__setitem__(self, key, value)
-
-    ## del operator
-    def __delitem__(self, key):
-        self._key_list.remove(key)
-        dict.__delitem__(self, key)
-
-    ## used in "for k in dict" loop to ensure the correct order
-    def __iter__(self):
-        return self.iterkeys()
-
-    ## len() support
-    def __len__(self):
-        return len(self._key_list)
-
-    ## "in" test support
-    def __contains__(self, key):
-        return key in self._key_list
-
-    ## indexof support
-    def index(self, key):
-        return self._key_list.index(key)
-
-    ## insert support
-    def insert(self, key, newkey, newvalue, order):
-        index = self._key_list.index(key)
-        if order == 'BEFORE':
-            self._key_list.insert(index, newkey)
-            dict.__setitem__(self, newkey, newvalue)
-        elif order == 'AFTER':
-            self._key_list.insert(index + 1, newkey)
-            dict.__setitem__(self, newkey, newvalue)
-
-    ## append support
-    def append(self, sdict):
-        for key in sdict:
-            if key not in self._key_list:
-                self._key_list.append(key)
-            dict.__setitem__(self, key, sdict[key])
-
-    def has_key(self, key):
-        return key in self._key_list
-
-    ## Empty the dict
-    def clear(self):
-        self._key_list = []
-        dict.clear(self)
-
-    ## Return a copy of keys
-    def keys(self):
-        keys = []
-        for key in self._key_list:
-            keys.append(key)
-        return keys
-
-    ## Return a copy of values
-    def values(self):
-        values = []
-        for key in self._key_list:
-            values.append(self[key])
-        return values
-
-    ## Return a copy of (key, value) list
-    def items(self):
-        items = []
-        for key in self._key_list:
-            items.append((key, self[key]))
-        return items
-
-    ## Iteration support
-    def iteritems(self):
-        return iter(self.items())
-
-    ## Keys interation support
-    def iterkeys(self):
-        return iter(self.keys())
-
-    ## Values interation support
-    def itervalues(self):
-        return iter(self.values())
-
-    ## Return value related to a key, and remove the (key, value) from the dict
-    def pop(self, key, *dv):
-        value = None
-        if key in self._key_list:
-            value = self[key]
-            self.__delitem__(key)
-        elif len(dv) != 0 :
-            value = kv[0]
-        return value
-
-    ## Return (key, value) pair, and remove the (key, value) from the dict
-    def popitem(self):
-        key = self._key_list[-1]
-        value = self[key]
-        self.__delitem__(key)
-        return key, value
-
-    def update(self, dict=None, **kwargs):
-        if dict is not None:
-            for k, v in dict.items():
-                self[k] = v
-        if len(kwargs):
-            for k, v in kwargs.items():
-                self[k] = v
 
 ## Dictionary using prioritized list as key
 #
@@ -1746,7 +1625,7 @@ class SkuClass():
                             ExtraData = "SKU-ID [%s] value %s exceeds the max value of UINT64"
                                       % (SkuName, SkuId))
 
-        self.AvailableSkuIds = sdict()
+        self.AvailableSkuIds = OrderedDict()
         self.SkuIdSet = []
         self.SkuIdNumberSet = []
         self.SkuData = SkuIds
