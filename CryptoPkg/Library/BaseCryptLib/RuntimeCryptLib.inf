@@ -11,7 +11,7 @@
 #  functions, PKCS#7 SignedData sign functions, Diffie-Hellman functions, and
 #  authenticode signature verification functions are not supported in this instance.
 #
-#  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2009 - 2019, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -54,7 +54,8 @@
   Pk/CryptRsaExtNull.c
   Pk/CryptPkcs5Pbkdf2Null.c
   Pk/CryptPkcs7SignNull.c
-  Pk/CryptPkcs7Verify.c
+  Pk/CryptPkcs7VerifyCommon.c
+  Pk/CryptPkcs7VerifyRuntime.c
   Pk/CryptDhNull.c
   Pk/CryptX509.c
   Pk/CryptAuthenticodeNull.c
@@ -84,7 +85,6 @@
 [LibraryClasses]
   BaseLib
   BaseMemoryLib
-  MemoryAllocationLib
   UefiBootServicesTableLib
   UefiRuntimeServicesTableLib
   DebugLib

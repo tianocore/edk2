@@ -6,7 +6,7 @@
 #  This external input must be validated carefully to avoid security issues such as
 #  buffer overflow or integer overflow.
 #
-#  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2009 - 2019, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -49,7 +49,8 @@
   Pk/CryptRsaExt.c
   Pk/CryptPkcs5Pbkdf2.c
   Pk/CryptPkcs7Sign.c
-  Pk/CryptPkcs7Verify.c
+  Pk/CryptPkcs7VerifyCommon.c
+  Pk/CryptPkcs7VerifyBase.c
   Pk/CryptDh.c
   Pk/CryptX509.c
   Pk/CryptAuthenticode.c
