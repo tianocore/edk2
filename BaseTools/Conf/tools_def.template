@@ -145,7 +145,6 @@ DEFINE ICC11_BIN64x86     = C:\Program Files (x86)\Intel\Compiler\DEF(ICC11_VERS
 DEFINE EBC_BIN          = C:\Program Files\Intel\EBC\Bin
 DEFINE EBC_BINx86       = C:\Program Files (x86)\Intel\EBC\Bin
 
-DEFINE ELFGCC_BIN       = /usr/bin
 
 DEFINE CYGWIN_BIN              = c:/cygwin/bin
 DEFINE CYGWIN_BINIA32          = c:/cygwin/opt/tiano/i386-tiano-pe/i386-tiano-pe/bin/
@@ -309,12 +308,6 @@ DEFINE DTC_BIN                 = ENV(DTC_PREFIX)dtc
 #   CLANG38  -Linux-  Requires:
 #                             Clang v3.8, LLVMgold plugin and GNU binutils 2.26 targeting x86_64-linux-gnu, aarch64-linux-gnu or arm-linux-gnueabi
 #                             Clang v3.9 or later, LLVMgold plugin and GNU binutils 2.28 targeting x86_64-linux-gnu, aarch64-linux-gnu or arm-linux-gnueabi
-#                        Optional:
-#                             Required to build platforms or ACPI tables:
-#                               Intel(r) ACPI Compiler from
-#                               https://acpica.org/downloads
-#   ELFGCC      -Linux-  Requires:
-#                             GCC(this tool chain uses whatever version of gcc and binutils that is installed in /usr/bin)
 #                        Optional:
 #                             Required to build platforms or ACPI tables:
 #                               Intel(r) ACPI Compiler from
@@ -4159,79 +4152,6 @@ DEFINE CLANG38_AARCH64_DLINK_FLAGS  = DEF(CLANG38_AARCH64_TARGET) DEF(GCC_AARCH6
 RELEASE_CLANG38_AARCH64_CC_FLAGS    = DEF(CLANG38_AARCH64_CC_FLAGS) $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -flto -O3
 RELEASE_CLANG38_AARCH64_DLINK_FLAGS = DEF(CLANG38_AARCH64_DLINK_FLAGS) -flto -Wl,-O3 -L$(WORKSPACE)/ArmPkg/Library/GccLto -llto-aarch64 -Wl,-plugin-opt=-pass-through=-llto-aarch64
 
-
-####################################################################################
-#
-# Elf GCC - This configuration is used to compile on Linux boxes to produce elf
-#           binaries.
-#
-####################################################################################
-#   ELFGCC           - Linux ELF GCC
-*_ELFGCC_*_*_FAMILY                 = GCC
-*_ELFGCC_*_*_BUILDRULEFAMILY        = GCCLD
-*_ELFGCC_*_MAKE_PATH                = make
-
-*_ELFGCC_*_PP_FLAGS                     = -E -x assembler-with-cpp -include AutoGen.h
-*_ELFGCC_*_VFRPP_FLAGS                  = -x c -E -P -DVFRCOMPILE --include $(MODULE_NAME)StrDefs.h
-
-##################
-# ASL definitions
-##################
-*_ELFGCC_*_ASL_PATH                     = DEF(UNIX_IASL_BIN)
-*_ELFGCC_*_ASL_FLAGS                    = DEF(IASL_FLAGS)
-*_ELFGCC_*_ASL_OUTFLAGS                 = DEF(IASL_OUTFLAGS)
-*_ELFGCC_*_ASLPP_FLAGS                  = -x c -E -include AutoGen.h
-*_ELFGCC_*_ASLCC_FLAGS                  = -x c
-*_ELFGCC_*_ASLDLINK_FLAGS               = DEF(GCC_DLINK_FLAGS_COMMON) --entry _ReferenceAcpiTable
-
-##################
-# IA32 definitions
-##################
-*_ELFGCC_IA32_OBJCOPY_PATH          = DEF(ELFGCC_BIN)/objcopy
-*_ELFGCC_IA32_CC_PATH               = DEF(ELFGCC_BIN)/gcc
-*_ELFGCC_IA32_SLINK_PATH            = DEF(ELFGCC_BIN)/ar
-*_ELFGCC_IA32_DLINK_PATH            = DEF(ELFGCC_BIN)/ld
-*_ELFGCC_IA32_ASM_PATH              = DEF(ELFGCC_BIN)/gcc
-*_ELFGCC_IA32_PP_PATH               = DEF(ELFGCC_BIN)/gcc
-*_ELFGCC_IA32_VFRPP_PATH            = DEF(ELFGCC_BIN)/gcc
-*_ELFGCC_IA32_ASLCC_PATH            = DEF(ELFGCC_BIN)/gcc
-*_ELFGCC_IA32_ASLPP_PATH            = DEF(ELFGCC_BIN)/gcc
-*_ELFGCC_IA32_ASLDLINK_PATH         = DEF(ELFGCC_BIN)/ld
-*_ELFGCC_IA32_RC_PATH               = DEF(ELFGCC_BIN)/objcopy
-
-*_ELFGCC_IA32_CC_FLAGS              = -m32 -g -fshort-wchar -fno-strict-aliasing -Wall -malign-double -include $(DEST_DIR_DEBUG)/AutoGen.h -DSTRING_ARRAY_NAME=$(BASE_NAME)Strings
-*_ELFGCC_IA32_SLINK_FLAGS           =
-*_ELFGCC_IA32_DLINK_FLAGS           = -melf_i386 -nostdlib --shared --entry $(IMAGE_ENTRY_POINT) -u $(IMAGE_ENTRY_POINT) -Map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
-#*_ELFGCC_IA32_DLINK_FLAGS          = -melf_i386 -nostdlib -n -q -Ttext 0x220 --entry $(IMAGE_ENTRY_POINT) -u $(IMAGE_ENTRY_POINT)
-*_ELFGCC_IA32_ASM_FLAGS             = -m32 -c -x assembler -imacros $(DEST_DIR_DEBUG)/AutoGen.h
-*_ELFGCC_IA32_PP_FLAGS              = -m32 -E -x assembler-with-cpp -include $(DEST_DIR_DEBUG)/AutoGen.h
-*_ELFGCC_IA32_VFRPP_FLAGS           = -x c -E -P -DVFRCOMPILE --include $(DEST_DIR_DEBUG)/$(MODULE_NAME)StrDefs.h
-*_ELFGCC_IA32_RC_FLAGS              = DEF(GCC_IA32_RC_FLAGS)
-*_ELFGCC_IA32_OBJCOPY_FLAGS         =
-*_ELFGCC_IA32_NASM_FLAGS            = -f elf32
-
-##################
-# X64 definitions
-##################
-*_ELFGCC_X64_CC_PATH               = DEF(ELFGCC_BIN)/gcc
-*_ELFGCC_X64_ASLCC_PATH            = DEF(ELFGCC_BIN)/gcc
-*_ELFGCC_X64_SLINK_PATH            = DEF(ELFGCC_BIN)/ar
-*_ELFGCC_X64_DLINK_PATH            = DEF(ELFGCC_BIN)/ld
-*_ELFGCC_X64_ASLDLINK_PATH         = DEF(ELFGCC_BIN)/ld
-*_ELFGCC_X64_ASM_PATH              = DEF(ELFGCC_BIN)/gcc
-*_ELFGCC_X64_PP_PATH               = DEF(ELFGCC_BIN)/gcc
-*_ELFGCC_X64_ASLPP_PATH            = DEF(ELFGCC_BIN)/gcc
-*_ELFGCC_X64_VFRPP_PATH            = DEF(ELFGCC_BIN)/gcc
-*_ELFGCC_X64_RC_PATH               = DEF(ELFGCC_BIN)/objcopy
-
-*_ELFGCC_X64_CC_FLAGS              = -Os -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-address -Wno-array-bounds -include AutoGen.h -D_EFI_P64
-*_ELFGCC_X64_DLINK_FLAGS           = -nostdlib --shared --entry $(IMAGE_ENTRY_POINT) -u $(IMAGE_ENTRY_POINT) -Map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
-*_ELFGCC_X64_SLINK_FLAGS           =
-*_ELFGCC_X64_ASM_FLAGS             = -c -x assembler -imacros $(DEST_DIR_DEBUG)/AutoGen.h
-*_ELFGCC_X64_PP_FLAGS              = -E -x assembler-with-cpp -include $(DEST_DIR_DEBUG)/AutoGen.h
-*_ELFGCC_X64_VFRPP_FLAGS           = -x c -E -P -DVFRCOMPILE --include $(DEST_DIR_DEBUG)/$(MODULE_NAME)StrDefs.h
-*_ELFGCC_X64_RC_FLAGS              = DEF(GCC_X64_RC_FLAGS)
-*_ELFGCC_X64_NASM_FLAGS            = -f elf64
 
 ####################################################################################
 #
