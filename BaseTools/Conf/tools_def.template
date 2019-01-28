@@ -147,29 +147,6 @@ DEFINE EBC_BINx86       = C:\Program Files (x86)\Intel\EBC\Bin
 
 DEFINE ELFGCC_BIN       = /usr/bin
 
-#
-# Option 1: Hard coded full path to compiler suite
-DEFINE UNIXGCC_IA32_PETOOLS_PREFIX = /opt/tiano/i386-tiano-pe/i386-tiano-pe/bin/
-DEFINE UNIXGCC_X64_PETOOLS_PREFIX  = /opt/tiano/x86_64-pc-mingw64/x86_64-pc-mingw64/bin/
-#
-# Option 2: Use an environment variable
-#DEFINE UNIXGCC_IA32_PETOOLS_PREFIX = ENV(IA32_PETOOLS_PREFIX)
-#DEFINE UNIXGCC_X64_PETOOLS_PREFIX  = ENV(X64_PETOOLS_PREFIX)
-#
-# Option 3: Install the compiler suite into your default paths
-#DEFINE UNIXGCC_IA32_PETOOLS_PREFIX = i386-pc-mingw32-
-#DEFINE UNIXGCC_X64_PETOOLS_PREFIX  = x86_64-pc-mingw32-
-#
-# Option 4: Create links under the BaseTools/Bin/gcc/ARCH directory
-# Links needed: gcc, ar & ld
-#DEFINE UNIXGCC_IA32_PETOOLS_PREFIX = ENV(WORKSPACE)/BaseTools/Bin/gcc/Ia32/
-#DEFINE UNIXGCC_X64_PETOOLS_PREFIX  = ENV(WORKSPACE)/BaseTools/Bin/gcc/X64/
-#
-# Option 5: Install programs under user's home directory
-#DEFINE UNIXGCC_IA32_PETOOLS_PREFIX = ENV(HOME)/programs/gcc/ia32/bin/i686-pc-mingw32-
-#DEFINE UNIXGCC_X64_PETOOLS_PREFIX  = ENV(HOME)/programs/gcc/x64/bin/x86_64-pc-mingw32-
-#
-
 DEFINE CYGWIN_BIN              = c:/cygwin/bin
 DEFINE CYGWIN_BINIA32          = c:/cygwin/opt/tiano/i386-tiano-pe/i386-tiano-pe/bin/
 DEFINE CYGWIN_BINX64           = c:/cygwin/opt/tiano/x86_64-pc-mingw64/x86_64-pc-mingw64/bin/
@@ -304,13 +281,6 @@ DEFINE DTC_BIN                 = ENV(DTC_PREFIX)dtc
 #                               Intel(r) Compiler for Efi Byte Code (Intel(r) EBC Compiler)
 #                             Required to build platforms or ACPI tables:
 #                               Intel(r) ACPI Compiler (iasl.exe) from
-#                               https://acpica.org/downloads
-#   UNIXGCC     -UNIX-   Requires:
-#                             GCC 4.3.0
-#                             binutils 2.20.51.0.5
-#                        Optional:
-#                             Required to build platforms or ACPI tables:
-#                               Intel(r) ACPI Compiler from
 #                               https://acpica.org/downloads
 #   GCC48       -Linux,Windows-  Requires:
 #                             GCC 4.8 targeting x86_64-linux-gnu, aarch64-linux-gnu, or arm-linux-gnueabi
@@ -3478,72 +3448,6 @@ DEFINE GCC5_AARCH64_DLINK2_FLAGS     = DEF(GCC49_AARCH64_DLINK2_FLAGS) -Wno-erro
 DEFINE GCC5_ARM_ASLDLINK_FLAGS       = DEF(GCC49_ARM_ASLDLINK_FLAGS)
 DEFINE GCC5_AARCH64_ASLDLINK_FLAGS   = DEF(GCC49_AARCH64_ASLDLINK_FLAGS)
 DEFINE GCC5_ASLCC_FLAGS              = DEF(GCC49_ASLCC_FLAGS) -fno-lto
-
-####################################################################################
-#
-# Unix GCC And Intel Linux ACPI Compiler
-#
-####################################################################################
-#   UNIXGCC         - UNIX GCC
-#   ASL             - Intel Linux ACPI Source Language Compiler (iasl)
-*_UNIXGCC_*_*_FAMILY               = GCC
-*_UNIXGCC_*_*_BUILDRULEFAMILY      = GCCLD
-
-*_UNIXGCC_*_MAKE_PATH                    = make
-*_UNIXGCC_*_ASL_PATH                     = DEF(UNIX_IASL_BIN)
-
-*_UNIXGCC_IA32_DLINK_FLAGS               = DEF(GCC_IA32_X64_DLINK_FLAGS) --image-base=0
-*_UNIXGCC_X64_DLINK_FLAGS                = DEF(GCC_IA32_X64_DLINK_FLAGS) --image-base=0
-*_UNIXGCC_IA32_ASLDLINK_FLAGS            = DEF(GCC_IA32_X64_ASLDLINK_FLAGS)
-*_UNIXGCC_X64_ASLDLINK_FLAGS             = DEF(GCC_IA32_X64_ASLDLINK_FLAGS)
-*_UNIXGCC_*_ASM_FLAGS                    = DEF(GCC_ASM_FLAGS)
-*_UNIXGCC_*_PP_FLAGS                     = DEF(GCC_PP_FLAGS)
-*_UNIXGCC_*_ASLPP_FLAGS                  = DEF(GCC_ASLPP_FLAGS)
-*_UNIXGCC_*_ASLCC_FLAGS                  = DEF(GCC_ASLCC_FLAGS)
-*_UNIXGCC_*_VFRPP_FLAGS                  = DEF(GCC_VFRPP_FLAGS)
-*_UNIXGCC_*_APP_FLAGS                    =
-*_UNIXGCC_*_ASL_FLAGS                    = DEF(IASL_FLAGS)
-*_UNIXGCC_*_ASL_OUTFLAGS                 = DEF(IASL_OUTFLAGS)
-
-##################
-# IA32 definitions
-##################
-*_UNIXGCC_IA32_OBJCOPY_PATH         = DEF(UNIXGCC_IA32_PETOOLS_PREFIX)objcopy
-*_UNIXGCC_IA32_PP_PATH              = DEF(UNIXGCC_IA32_PETOOLS_PREFIX)gcc
-*_UNIXGCC_IA32_CC_PATH              = DEF(UNIXGCC_IA32_PETOOLS_PREFIX)gcc
-*_UNIXGCC_IA32_SLINK_PATH           = DEF(UNIXGCC_IA32_PETOOLS_PREFIX)ar
-*_UNIXGCC_IA32_DLINK_PATH           = DEF(UNIXGCC_IA32_PETOOLS_PREFIX)ld
-*_UNIXGCC_IA32_ASLPP_PATH           = DEF(UNIXGCC_IA32_PETOOLS_PREFIX)gcc
-*_UNIXGCC_IA32_ASLCC_PATH           = DEF(UNIXGCC_IA32_PETOOLS_PREFIX)gcc
-*_UNIXGCC_IA32_ASLDLINK_PATH        = DEF(UNIXGCC_IA32_PETOOLS_PREFIX)ld
-*_UNIXGCC_IA32_ASM_PATH             = DEF(UNIXGCC_IA32_PETOOLS_PREFIX)gcc
-*_UNIXGCC_IA32_VFRPP_PATH           = DEF(UNIXGCC_IA32_PETOOLS_PREFIX)gcc
-*_UNIXGCC_IA32_RC_PATH              = DEF(UNIXGCC_IA32_PETOOLS_PREFIX)objcopy
-
-*_UNIXGCC_IA32_CC_FLAGS             = DEF(GCC_IA32_CC_FLAGS)
-*_UNIXGCC_IA32_RC_FLAGS             = DEF(GCC_IA32_RC_FLAGS)
-*_UNIXGCC_IA32_OBJCOPY_FLAGS        =
-*_UNIXGCC_IA32_NASM_FLAGS           = -f win32
-
-##################
-# X64 definitions
-##################
-*_UNIXGCC_X64_CC_PATH               = DEF(UNIXGCC_X64_PETOOLS_PREFIX)gcc
-*_UNIXGCC_X64_ASLCC_PATH            = DEF(UNIXGCC_X64_PETOOLS_PREFIX)gcc
-*_UNIXGCC_X64_SLINK_PATH            = DEF(UNIXGCC_X64_PETOOLS_PREFIX)ar
-*_UNIXGCC_X64_DLINK_PATH            = DEF(UNIXGCC_X64_PETOOLS_PREFIX)ld
-*_UNIXGCC_X64_ASLDLINK_PATH         = DEF(UNIXGCC_X64_PETOOLS_PREFIX)ld
-*_UNIXGCC_X64_ASM_PATH              = DEF(UNIXGCC_X64_PETOOLS_PREFIX)gcc
-*_UNIXGCC_X64_PP_PATH               = DEF(UNIXGCC_X64_PETOOLS_PREFIX)gcc
-*_UNIXGCC_X64_ASLPP_PATH            = DEF(UNIXGCC_X64_PETOOLS_PREFIX)gcc
-*_UNIXGCC_X64_VFRPP_PATH            = DEF(UNIXGCC_X64_PETOOLS_PREFIX)gcc
-*_UNIXGCC_X64_RC_PATH               = DEF(UNIXGCC_X64_PETOOLS_PREFIX)objcopy
-*_UNIXGCC_X64_OBJCOPY_PATH          = DEF(UNIXGCC_X64_PETOOLS_PREFIX)objcopy
-
-*_UNIXGCC_X64_CC_FLAGS              = DEF(GCC_X64_CC_FLAGS)
-*_UNIXGCC_X64_RC_FLAGS              = DEF(GCC_X64_RC_FLAGS)
-*_UNIXGCC_X64_OBJCOPY_FLAGS         =
-*_UNIXGCC_X64_NASM_FLAGS            = -f win64
 
 ####################################################################################
 #
