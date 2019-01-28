@@ -574,12 +574,13 @@ def RealPath(File, Dir='', OverrideDir=''):
 #
 def GuidValue(CName, PackageList, Inffile = None):
     for P in PackageList:
-        GuidKeys = P.Guids.keys()
+        GuidKeys = list(P.Guids.keys())
         if Inffile and P._PrivateGuids:
             if not Inffile.startswith(P.MetaFile.Dir):
                 GuidKeys = [x for x in P.Guids if x not in P._PrivateGuids]
         if CName in GuidKeys:
             return P.Guids[CName]
+    return None
     return None
 
 ## A string template class
@@ -1637,7 +1638,7 @@ class SkuClass():
             self.SkuIdSet = ['DEFAULT']
             self.SkuIdNumberSet = ['0U']
         elif SkuIdentifier == 'ALL':
-            self.SkuIdSet = SkuIds.keys()
+            self.SkuIdSet = list(SkuIds.keys())
             self.SkuIdNumberSet = [num[0].strip() + 'U' for num in SkuIds.values()]
         else:
             r = SkuIdentifier.split('|')

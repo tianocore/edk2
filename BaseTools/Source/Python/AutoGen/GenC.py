@@ -2050,7 +2050,7 @@ def CreateCode(Info, AutoGenC, AutoGenH, StringH, UniGenCFlag, UniGenBinBuffer, 
             if Guid in Info.Module.GetGuidsUsedByPcd():
                 continue
             GuidMacros.append('#define %s %s' % (Guid, Info.Module.Guids[Guid]))
-        for Guid, Value in Info.Module.Protocols.items() + Info.Module.Ppis.items():
+        for Guid, Value in list(Info.Module.Protocols.items()) + list(Info.Module.Ppis.items()):
             GuidMacros.append('#define %s %s' % (Guid, Value))
         # supports FixedAtBuild and FeaturePcd usage in VFR file
         if Info.VfrFileList and Info.ModulePcdList:

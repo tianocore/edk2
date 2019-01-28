@@ -551,9 +551,9 @@ def GetStringFiles(UniFilList, SourceFileList, IncludeList, IncludePathList, Ski
             #
             # support ISO 639-2 codes in .UNI files of EDK Shell
             #
-            Uni = UniFileClassObject(sorted (UniFilList), True, IncludePathList)
+            Uni = UniFileClassObject(sorted(UniFilList, key=lambda x: x.File), True, IncludePathList)
         else:
-            Uni = UniFileClassObject(sorted (UniFilList), IsCompatibleMode, IncludePathList)
+            Uni = UniFileClassObject(sorted(UniFilList, key=lambda x: x.File), IsCompatibleMode, IncludePathList)
     else:
         EdkLogger.error("UnicodeStringGather", AUTOGEN_ERROR, 'No unicode files given')
 

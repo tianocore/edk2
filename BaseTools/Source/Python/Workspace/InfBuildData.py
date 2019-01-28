@@ -32,7 +32,7 @@ from Workspace.BuildClassObject import ModuleBuildClassObject, LibraryClassObjec
 #
 def _ProtocolValue(CName, PackageList, Inffile = None):
     for P in PackageList:
-        ProtocolKeys = P.Protocols.keys()
+        ProtocolKeys = list(P.Protocols.keys())
         if Inffile and P._PrivateProtocols:
             if not Inffile.startswith(P.MetaFile.Dir):
                 ProtocolKeys = [x for x in P.Protocols if x not in P._PrivateProtocols]
@@ -51,7 +51,7 @@ def _ProtocolValue(CName, PackageList, Inffile = None):
 #
 def _PpiValue(CName, PackageList, Inffile = None):
     for P in PackageList:
-        PpiKeys = P.Ppis.keys()
+        PpiKeys = list(P.Ppis.keys())
         if Inffile and P._PrivatePpis:
             if not Inffile.startswith(P.MetaFile.Dir):
                 PpiKeys = [x for x in P.Ppis if x not in P._PrivatePpis]

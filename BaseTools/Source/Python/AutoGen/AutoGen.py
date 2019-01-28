@@ -929,7 +929,7 @@ class WorkspaceAutoGen(AutoGen):
     def _CheckAllPcdsTokenValueConflict(self):
         for Pa in self.AutoGenObjectList:
             for Package in Pa.PackageList:
-                PcdList = Package.Pcds.values()
+                PcdList = list(Package.Pcds.values())
                 PcdList.sort(key=lambda x: int(x.TokenValue, 0))
                 Count = 0
                 while (Count < len(PcdList) - 1) :
@@ -975,7 +975,7 @@ class WorkspaceAutoGen(AutoGen):
                         Count += SameTokenValuePcdListCount
                     Count += 1
 
-                PcdList = Package.Pcds.values()
+                PcdList = list(Package.Pcds.values())
                 PcdList.sort(key=lambda x: "%s.%s" % (x.TokenSpaceGuidCName, x.TokenCName))
                 Count = 0
                 while (Count < len(PcdList) - 1) :
@@ -1300,7 +1300,7 @@ class PlatformAutoGen(AutoGen):
                 if os.path.exists(VpdMapFilePath):
                     OrgVpdFile.Read(VpdMapFilePath)
                     PcdItems = OrgVpdFile.GetOffset(PcdNvStoreDfBuffer[0])
-                    NvStoreOffset = PcdItems.values()[0].strip() if PcdItems else '0'
+                    NvStoreOffset = list(PcdItems.values())[0].strip() if PcdItems else '0'
                 else:
                     EdkLogger.error("build", FILE_READ_FAILURE, "Can not find VPD map file %s to fix up VPD offset." % VpdMapFilePath)
 
@@ -1499,7 +1499,7 @@ class PlatformAutoGen(AutoGen):
         if (self.Workspace.ArchList[-1] == self.Arch):
             for Pcd in self._DynamicPcdList:
                 # just pick the a value to determine whether is unicode string type
-                Sku = Pcd.SkuInfoList.values()[0]
+                Sku = Pcd.SkuInfoList.get(TAB_DEFAULT)
                 Sku.VpdOffset = Sku.VpdOffset.strip()
 
                 if Pcd.DatumType not in [TAB_UINT8, TAB_UINT16, TAB_UINT32, TAB_UINT64, TAB_VOID, "BOOLEAN"]:
@@ -1605,7 +1605,7 @@ class PlatformAutoGen(AutoGen):
                         if not FoundFlag :
                             # just pick the a value to determine whether is unicode string type
                             SkuValueMap = {}
-                            SkuObjList = DscPcdEntry.SkuInfoList.items()
+                            SkuObjList = list(DscPcdEntry.SkuInfoList.items())
                             DefaultSku = DscPcdEntry.SkuInfoList.get(TAB_DEFAULT)
                             if DefaultSku:
                                 defaultindex = SkuObjList.index((TAB_DEFAULT, DefaultSku))
@@ -1631,7 +1631,7 @@ class PlatformAutoGen(AutoGen):
                                             DscPcdEntry.TokenSpaceGuidValue = eachDec.Guids[DecPcdEntry.TokenSpaceGuidCName]
                                             # Only fix the value while no value provided in DSC file.
                                             if not Sku.DefaultValue:
-                                                DscPcdEntry.SkuInfoList[DscPcdEntry.SkuInfoList.keys()[0]].DefaultValue = DecPcdEntry.DefaultValue
+                                                DscPcdEntry.SkuInfoList[list(DscPcdEntry.SkuInfoList.keys())[0]].DefaultValue = DecPcdEntry.DefaultValue
 
                                 if DscPcdEntry not in self._DynamicPcdList:
                                     self._DynamicPcdList.append(DscPcdEntry)
@@ -1713,7 +1713,7 @@ class PlatformAutoGen(AutoGen):
             # Delete the DynamicPcdList At the last time enter into this function
             for Pcd in self._DynamicPcdList:
                 # just pick the a value to determine whether is unicode string type
-                Sku = Pcd.SkuInfoList.values()[0]
+                Sku = Pcd.SkuInfoList.get(TAB_DEFAULT)
                 Sku.VpdOffset = Sku.VpdOffset.strip()
 
                 if Pcd.DatumType not in [TAB_UINT8, TAB_UINT16, TAB_UINT32, TAB_UINT64, TAB_VOID, "BOOLEAN"]:
@@ -2286,7 +2286,7 @@ class PlatformAutoGen(AutoGen):
                     Pcd.MaxDatumSize = str(len(Value.split(',')))
                 else:
                     Pcd.MaxDatumSize = str(len(Value) - 1)
-        return Pcds.values()
+        return list(Pcds.values())
 
 
 
@@ -2355,7 +2355,7 @@ class PlatformAutoGen(AutoGen):
         # Use the highest priority value.
         #
         if (len(OverrideList) >= 2):
-            KeyList = OverrideList.keys()
+            KeyList = list(OverrideList.keys())
             for Index in range(len(KeyList)):
                 NowKey = KeyList[Index]
                 Target1, ToolChain1, Arch1, CommandType1, Attr1 = NowKey.split("_")
@@ -2473,9 +2473,9 @@ class PlatformAutoGen(AutoGen):
                     if Attr == TAB_TOD_DEFINES_BUILDRULEORDER:
                         BuildRuleOrder = Options[Tool][Attr]
 
-        AllTools = set(ModuleOptions.keys() + PlatformOptions.keys() +
-                       PlatformModuleOptions.keys() + ModuleTypeOptions.keys() +
-                       self.ToolDefinition.keys())
+        AllTools = set(list(ModuleOptions.keys()) + list(PlatformOptions.keys()) +
+                       list(PlatformModuleOptions.keys()) + list(ModuleTypeOptions.keys()) +
+                       list(self.ToolDefinition.keys()))
         BuildOptions = defaultdict(lambda: defaultdict(str))
         for Tool in AllTools:
             for Options in [self.ToolDefinition, ModuleOptions, PlatformOptions, ModuleTypeOptions, PlatformModuleOptions]:
@@ -3519,7 +3519,7 @@ class ModuleAutoGen(AutoGen):
             return None
         MapFileName = os.path.join(self.OutputDir, self.Name + ".map")
         EfiFileName = os.path.join(self.OutputDir, self.Name + ".efi")
-        VfrUniOffsetList = GetVariableOffset(MapFileName, EfiFileName, VfrUniBaseName.values())
+        VfrUniOffsetList = GetVariableOffset(MapFileName, EfiFileName, list(VfrUniBaseName.values()))
         if not VfrUniOffsetList:
             return None
 

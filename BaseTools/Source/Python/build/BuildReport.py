@@ -1209,7 +1209,7 @@ class PcdReport(object):
     def ParseStruct(self, struct):
         HasDscOverride = False
         if struct:
-            for _, Values in struct.items():
+            for _, Values in list(struct.items()):
                 for Key, value in Values.items():
                     if value[1] and value[1].endswith('.dsc'):
                         HasDscOverride = True
@@ -1425,7 +1425,7 @@ class PcdReport(object):
                         FiledOverrideFlag = False
                         OverrideValues = Pcd.SkuOverrideValues[Sku]
                         if OverrideValues:
-                            Keys = OverrideValues.keys()
+                            Keys = list(OverrideValues.keys())
                             OverrideFieldStruct = self.OverrideFieldValue(Pcd, OverrideValues[Keys[0]])
                             self.PrintStructureInfo(File, OverrideFieldStruct)
                             FiledOverrideFlag = True

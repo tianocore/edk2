@@ -99,7 +99,7 @@ def GetSplitValueList(String, SplitTag=DataType.TAB_VALUE_SPLIT, MaxSplit= -1):
 # @retval list() A list for splitted string
 #
 def GetSplitList(String, SplitStr=DataType.TAB_VALUE_SPLIT, MaxSplit= -1):
-    return map(lambda l: l.strip(), String.split(SplitStr, MaxSplit))
+    return list(map(lambda l: l.strip(), String.split(SplitStr, MaxSplit)))
 
 ## MergeArches
 #
@@ -545,7 +545,7 @@ def GetSingleValueOfKeyFromLines(Lines, Dictionary, CommentCharacter, KeySplitCh
                 #
                 LineList[1] = CleanString(LineList[1], CommentCharacter)
                 if ValueSplitFlag:
-                    Value = map(string.strip, LineList[1].split(ValueSplitCharacter))
+                    Value = list(map(string.strip, LineList[1].split(ValueSplitCharacter)))
                 else:
                     Value = CleanString(LineList[1], CommentCharacter).splitlines()
 
@@ -751,7 +751,7 @@ def SplitString(String):
 # @param StringList:  A list for strings to be converted
 #
 def ConvertToSqlString(StringList):
-    return map(lambda s: s.replace("'", "''"), StringList)
+    return list(map(lambda s: s.replace("'", "''"), StringList))
 
 ## Convert To Sql String
 #

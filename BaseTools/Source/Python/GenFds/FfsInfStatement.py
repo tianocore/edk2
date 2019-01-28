@@ -1075,7 +1075,7 @@ class FfsInfStatement(FfsInfStatementClassObject):
     def __GetBuildOutputMapFileVfrUniInfo(self, VfrUniBaseName):
         MapFileName = os.path.join(self.EfiOutputPath, self.BaseName + ".map")
         EfiFileName = os.path.join(self.EfiOutputPath, self.BaseName + ".efi")
-        return GetVariableOffset(MapFileName, EfiFileName, VfrUniBaseName.values())
+        return GetVariableOffset(MapFileName, EfiFileName, list(VfrUniBaseName.values()))
 
     ## __GenUniVfrOffsetFile() method
     #
