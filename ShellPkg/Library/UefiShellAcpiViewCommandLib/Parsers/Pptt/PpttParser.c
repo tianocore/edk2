@@ -178,7 +178,7 @@ DumpProcessorHierarchyNodeStructure (
   IN UINT8  Length
   )
 {
-  UINT8  Offset;
+  UINT32 Offset;
   UINT8* PrivateResourcePtr;
   UINT32 Index;
   CHAR16 Buffer[OUTPUT_FIELD_COLUMN_WIDTH];
