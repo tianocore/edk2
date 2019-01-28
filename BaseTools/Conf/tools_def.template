@@ -108,10 +108,10 @@ DEFINE WINSDK10_BIN       = ENV(WINSDK10_PREFIX)DEF(VS2017_HOST)
 # are used by other toolchains.  An example is that ICC on Windows normally
 # uses Microsoft's nmake.exe.
 
-# Some MS_VS_BIN options: DEF(VS2003_BIN), DEF(VS2005_BIN), DEF(VS2005x86_BIN), DEF(VS2008_BIN), DEF(VS2008x86_BIN)
-DEFINE MS_VS_BIN   = DEF(VS2005_BIN)
-# Some MS_VS_DLL options: DEF(VS2003_DLL), DEF(VS2005_DLL), DEF(VS2005x86_DLL), DEF(VS2008_DLL), DEF(VS2008x86_DLL)
-DEFINE MS_VS_DLL   = DEF(VS2005_DLL)
+# Some MS_VS_BIN options: DEF(VS2008_BIN), DEF(VS2008x86_BIN)
+DEFINE MS_VS_BIN   = DEF(VS2008_BIN)
+# Some MS_VS_DLL options: DEF(VS2008_DLL), DEF(VS2008x86_DLL)
+DEFINE MS_VS_DLL   = DEF(VS2008_DLL)
 
 DEFINE WINDDK_BIN16     = ENV(WINDDK3790_PREFIX)bin16
 DEFINE WINDDK_BIN32     = ENV(WINDDK3790_PREFIX)x86
@@ -398,14 +398,6 @@ DEFINE DTC_BIN                 = ENV(DTC_PREFIX)dtc
 #                             Microsoft Visual Studio 2005 or 2008
 #                             Microsoft Windows Server 2003 Driver Development Kit (Microsoft WINDDK)
 #                             version 3790.1830 for X64 target architectures
-#                        Optional:
-#                             Required to build EBC drivers:
-#                               Intel(r) Compiler for Efi Byte Code (Intel(r) EBC Compiler)
-#                             Required to build platforms or ACPI tables:
-#                               Intel(r) ACPI Compiler (iasl.exe) from
-#                               https://acpica.org/downloads
-#   MYTOOLS     -win32-  Requires:
-#                             Microsoft Visual Studio 2008 for IA32/X64
 #                        Optional:
 #                             Required to build EBC drivers:
 #                               Intel(r) Compiler for Efi Byte Code (Intel(r) EBC Compiler)
@@ -5981,119 +5973,6 @@ NOOPT_ICC11x86xASL_X64_DLINK_FLAGS                = /NOLOGO /NODEFAULTLIB /IGNOR
 *_ICC11x86xASL_EBC_VFRPP_FLAGS                = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
 *_ICC11x86xASL_EBC_SLINK_FLAGS                = /lib /NOLOGO /MACHINE:EBC
 *_ICC11x86xASL_EBC_DLINK_FLAGS                = "C:\Program Files (x86)\Intel\EBC\Lib\EbcLib.lib" /NOLOGO /NODEFAULTLIB /MACHINE:EBC /OPT:REF /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /MAP /ALIGN:32 /DRIVER
-
-
-####################################################################################
-#
-# MYTOOLS
-#   IA32 - Microsoft Visual Studio 2008 Team Suite
-#   X64  - Microsoft Visual Studio 2008 Team Suite
-#   EBC  - Intel EFI Byte Code Compiler
-#
-####################################################################################
-#   MYTOOLS          - Settings compatible with previous versions of tools_def.template
-*_MYTOOLS_*_*_FAMILY                = MSFT
-
-##################
-# ASL definitions
-##################
-*_MYTOOLS_*_ASL_PATH        = DEF(DEFAULT_WIN_ASL_BIN)
-*_MYTOOLS_*_ASL_FLAGS       = DEF(DEFAULT_WIN_ASL_FLAGS)
-*_MYTOOLS_*_ASL_OUTFLAGS    = DEF(DEFAULT_WIN_ASL_OUTFLAGS)
-*_MYTOOLS_*_ASLCC_FLAGS     = DEF(MSFT_ASLCC_FLAGS)
-*_MYTOOLS_*_ASLPP_FLAGS     = DEF(MSFT_ASLPP_FLAGS)
-*_MYTOOLS_*_ASLDLINK_FLAGS  = DEF(MSFT_ASLDLINK_FLAGS)
-
-
-*_MYTOOLS_*_MAKE_FLAGS                   = /nologo
-*_MYTOOLS_*_VFRPP_FLAGS                  = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
-*_MYTOOLS_*_APP_FLAGS                    = /nologo /E /TC
-*_MYTOOLS_*_PP_FLAGS                     = /nologo /E /TC /FIAutoGen.h
-*_MYTOOLS_*_SLINK_FLAGS                  = /nologo /LTCG
-
-*_MYTOOLS_*_ASM16_PATH      = DEF(VS2008_BIN)\ml.exe
-
-##################
-# IA32 definitions
-##################
-*_MYTOOLS_IA32_*_DLL                = DEF(VS2008_DLL)
-
-*_MYTOOLS_IA32_MAKE_PATH            = DEF(VS2008_BIN)\nmake.exe
-*_MYTOOLS_IA32_CC_PATH              = DEF(VS2008_BIN)\cl.exe
-*_MYTOOLS_IA32_SLINK_PATH           = DEF(VS2008_BIN)\lib.exe
-*_MYTOOLS_IA32_DLINK_PATH           = DEF(VS2008_BIN)\link.exe
-*_MYTOOLS_IA32_PP_PATH              = DEF(VS2008_BIN)\cl.exe
-*_MYTOOLS_IA32_VFRPP_PATH           = DEF(VS2008_BIN)\cl.exe
-*_MYTOOLS_IA32_APP_PATH             = DEF(VS2008_BIN)\cl.exe
-*_MYTOOLS_IA32_ASM_PATH             = DEF(VS2008_BIN)\ml.exe
-*_MYTOOLS_IA32_ASLCC_PATH           = DEF(VS2008_BIN)\cl.exe
-*_MYTOOLS_IA32_ASLPP_PATH           = DEF(VS2008_BIN)\cl.exe
-*_MYTOOLS_IA32_ASLDLINK_PATH        = DEF(VS2008_BIN)\link.exe
-*_MYTOOLS_IA32_RC_PATH              = DEF(WINSDK_BIN)\rc.exe
-
-  DEBUG_MYTOOLS_IA32_CC_FLAGS            = /nologo /c /WX /GS- /W4 /Gs32768 /Gy /D UNICODE /O1b2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm
-RELEASE_MYTOOLS_IA32_CC_FLAGS            = /nologo /c /WX /GS- /W4 /Gs32768 /Gy /D UNICODE /O1b2 /GL /FIAutoGen.h /EHs-c- /GR- /GF
-NOOPT_MYTOOLS_IA32_CC_FLAGS              = /nologo /c /WX /GS- /W4 /Gs32768 /Gy /D UNICODE /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm /Od
-  DEBUG_MYTOOLS_IA32_ASM_FLAGS           = /nologo /c /WX /W3 /coff /Cx /Zd /Zi
-RELEASE_MYTOOLS_IA32_ASM_FLAGS           = /nologo /c /WX /W3 /coff /Cx /Zd
-NOOPT_MYTOOLS_IA32_ASM_FLAGS             = /nologo /c /WX /W3 /coff /Cx /Zd /Zi
-  DEBUG_MYTOOLS_IA32_NASM_FLAGS          = -Ox -f win32 -g
-RELEASE_MYTOOLS_IA32_NASM_FLAGS          = -Ox -f win32
-NOOPT_MYTOOLS_IA32_NASM_FLAGS            = -O0 -f win32 -g
-  DEBUG_MYTOOLS_IA32_DLINK_FLAGS         = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:X86 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG /PDB:$(DEBUG_DIR)/$(BASE_NAME).pdb
-RELEASE_MYTOOLS_IA32_DLINK_FLAGS         = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /IGNORE:4254 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:X86 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MERGE:.rdata=.data /PDB:$(DEBUG_DIR)/$(BASE_NAME).pdb
-NOOPT_MYTOOLS_IA32_DLINK_FLAGS           = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:X86 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG /PDB:$(DEBUG_DIR)/$(BASE_NAME).pdb
-
-##################
-# x64 definitions
-##################
-*_MYTOOLS_X64_*_DLL                 = DEF(VS2008_DLL)
-
-*_MYTOOLS_X64_MAKE_PATH             = DEF(VS2008_BIN)\nmake.exe
-*_MYTOOLS_X64_CC_PATH               = DEF(VS2008_BINX64)\cl.exe
-*_MYTOOLS_X64_SLINK_PATH            = DEF(VS2008_BINX64)\lib.exe
-*_MYTOOLS_X64_DLINK_PATH            = DEF(VS2008_BINX64)\link.exe
-*_MYTOOLS_X64_PP_PATH               = DEF(VS2008_BINX64)\cl.exe
-*_MYTOOLS_X64_VFRPP_PATH            = DEF(VS2008_BINX64)\cl.exe
-*_MYTOOLS_X64_APP_PATH              = DEF(VS2008_BINX64)\cl.exe
-*_MYTOOLS_X64_ASM_PATH              = DEF(VS2008_BINX64)\ml64.exe
-*_MYTOOLS_X64_ASLCC_PATH            = DEF(VS2008_BINX64)\cl.exe
-*_MYTOOLS_X64_ASLPP_PATH            = DEF(VS2008_BINX64)\cl.exe
-*_MYTOOLS_X64_ASLDLINK_PATH         = DEF(VS2008_BINX64)\link.exe
-*_MYTOOLS_X64_RC_PATH               = DEF(WINSDK_BIN)\rc.exe
-
-  DEBUG_MYTOOLS_X64_CC_FLAGS             = /nologo /c /WX /GS- /W4 /Gs32768 /Gy /D UNICODE /O1b2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm
-RELEASE_MYTOOLS_X64_CC_FLAGS             = /nologo /c /WX /GS- /W4 /Gs32768 /Gy /D UNICODE /O1b2 /GL /FIAutoGen.h /EHs-c- /GR- /GF
-NOOPT_MYTOOLS_X64_CC_FLAGS               = /nologo /c /WX /GS- /W4 /Gs32768 /Gy /D UNICODE /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm /Od
-  DEBUG_MYTOOLS_X64_ASM_FLAGS            = /nologo /c /WX /W3 /Cx /Zd /Zi
-RELEASE_MYTOOLS_X64_ASM_FLAGS            = /nologo /c /WX /W3 /Cx /Zd
-NOOPT_MYTOOLS_X64_ASM_FLAGS              = /nologo /c /WX /W3 /Cx /Zd /Zi
-  DEBUG_MYTOOLS_X64_NASM_FLAGS           = -Ox -f win64 -g
-RELEASE_MYTOOLS_X64_NASM_FLAGS           = -Ox -f win64
-NOOPT_MYTOOLS_X64_NASM_FLAGS             = -O0 -f win64 -g
-  DEBUG_MYTOOLS_X64_DLINK_FLAGS          = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:X64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
-RELEASE_MYTOOLS_X64_DLINK_FLAGS          = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /IGNORE:4254 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:X64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MERGE:.rdata=.data
-NOOPT_MYTOOLS_X64_DLINK_FLAGS            = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:X64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
-
-##################
-# EBC definitions
-##################
-*_MYTOOLS_EBC_*_FAMILY              = INTEL
-
-*_MYTOOLS_EBC_MAKE_PATH             = DEF(VS2005_BIN)\nmake.exe
-*_MYTOOLS_EBC_PP_PATH               = DEF(EBC_BIN)\iec.exe
-*_MYTOOLS_EBC_VFRPP_PATH            = DEF(EBC_BIN)\iec.exe
-*_MYTOOLS_EBC_CC_PATH               = DEF(EBC_BIN)\iec.exe
-*_MYTOOLS_EBC_SLINK_PATH            = DEF(EBC_BIN)\link.exe
-*_MYTOOLS_EBC_DLINK_PATH            = DEF(EBC_BIN)\link.exe
-*_MYTOOLS_EBC_RC_PATH               = DEF(VS2005_BIN)\rc.exe
-
-*_MYTOOLS_EBC_MAKE_FLAGS                 = /nologo
-*_MYTOOLS_EBC_PP_FLAGS                   = /nologo /E /TC /FIAutoGen.h
-*_MYTOOLS_EBC_CC_FLAGS                   = /nologo /c /WX /W3 /FIAutoGen.h /D$(MODULE_ENTRY_POINT)=$(ARCH_ENTRY_POINT)
-*_MYTOOLS_EBC_VFRPP_FLAGS                = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
-*_MYTOOLS_EBC_SLINK_FLAGS                = /lib /NOLOGO /MACHINE:EBC
-*_MYTOOLS_EBC_DLINK_FLAGS                = "C:\Program Files\Intel\EBC\Lib\EbcLib.lib" /NOLOGO /NODEFAULTLIB /MACHINE:EBC /OPT:REF /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /MAP /ALIGN:32 /DRIVER
 
 
 #
