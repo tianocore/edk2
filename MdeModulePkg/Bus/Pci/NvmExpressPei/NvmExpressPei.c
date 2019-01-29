@@ -24,8 +24,14 @@ EFI_PEI_PPI_DESCRIPTOR  mNvmeBlkIoPpiListTemplate = {
 };
 
 EFI_PEI_PPI_DESCRIPTOR  mNvmeBlkIo2PpiListTemplate = {
-  EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST,
+  (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
   &gEfiPeiVirtualBlockIo2PpiGuid,
+  NULL
+};
+
+EFI_PEI_PPI_DESCRIPTOR  mNvmeStorageSecurityPpiListTemplate = {
+  (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
+  &gEdkiiPeiStorageSecurityCommandPpiGuid,
   NULL
 };
 
@@ -185,8 +191,7 @@ NvmePeimEndOfPei (
   PEI_NVME_CONTROLLER_PRIVATE_DATA    *Private;
 
   Private = GET_NVME_PEIM_HC_PRIVATE_DATA_FROM_THIS_NOTIFY (NotifyDescriptor);
-  NvmeDisableController (Private);
-  NvmeFreeControllerResource (Private);
+  NvmeFreeDmaResource (Private);
 
   return EFI_SUCCESS;
 }
@@ -211,8 +216,12 @@ NvmExpressPeimEntry (
   EDKII_NVM_EXPRESS_HOST_CONTROLLER_PPI    *NvmeHcPpi;
   UINT8                                    Controller;
   UINTN                                    MmioBase;
+  UINTN                                    DevicePathLength;
+  EFI_DEVICE_PATH_PROTOCOL                 *DevicePath;
   PEI_NVME_CONTROLLER_PRIVATE_DATA         *Private;
   EFI_PHYSICAL_ADDRESS                     DeviceAddress;
+
+  DEBUG ((DEBUG_INFO, "%a: Enters.\n", __FUNCTION__));
 
   //
   // Locate the NVME host controller PPI
@@ -243,16 +252,41 @@ NvmExpressPeimEntry (
       break;
     }
 
+    Status = NvmeHcPpi->GetNvmeHcDevicePath (
+                          NvmeHcPpi,
+                          Controller,
+                          &DevicePathLength,
+                          &DevicePath
+                          );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_ERROR, "%a: Fail to allocate get the device path for Controller %d.\n",
+        __FUNCTION__, Controller
+        ));
+      return Status;
+    }
+
+    //
+    // Check validity of the device path of the NVM Express controller.
+    //
+    Status = NvmeIsHcDevicePathValid (DevicePath, DevicePathLength);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_ERROR, "%a: The device path is invalid for Controller %d.\n",
+        __FUNCTION__, Controller
+        ));
+      Controller++;
+      continue;
+    }
+
     //
     // Memory allocation for controller private data
     //
     Private = AllocateZeroPool (sizeof (PEI_NVME_CONTROLLER_PRIVATE_DATA));
     if (Private == NULL) {
       DEBUG ((
-        DEBUG_ERROR,
-        "%a: Fail to allocate private data for Controller %d.\n",
-        __FUNCTION__,
-        Controller
+        DEBUG_ERROR, "%a: Fail to allocate private data for Controller %d.\n",
+        __FUNCTION__, Controller
         ));
       return EFI_OUT_OF_RESOURCES;
     }
@@ -268,12 +302,9 @@ NvmExpressPeimEntry (
                );
     if (EFI_ERROR (Status)) {
       DEBUG ((
-        DEBUG_ERROR,
-        "%a: Fail to allocate DMA buffers for Controller %d.\n",
-        __FUNCTION__,
-        Controller
+        DEBUG_ERROR, "%a: Fail to allocate DMA buffers for Controller %d.\n",
+        __FUNCTION__, Controller
         ));
-      NvmeFreeControllerResource (Private);
       return Status;
     }
     ASSERT (DeviceAddress == ((EFI_PHYSICAL_ADDRESS) (UINTN) Private->Buffer));
@@ -282,20 +313,10 @@ NvmExpressPeimEntry (
     //
     // Initialize controller private data
     //
-    Private->Signature = NVME_PEI_CONTROLLER_PRIVATE_DATA_SIGNATURE;
-    Private->MmioBase  = MmioBase;
-    Private->BlkIoPpi.GetNumberOfBlockDevices  = NvmeBlockIoPeimGetDeviceNo;
-    Private->BlkIoPpi.GetBlockDeviceMediaInfo  = NvmeBlockIoPeimGetMediaInfo;
-    Private->BlkIoPpi.ReadBlocks               = NvmeBlockIoPeimReadBlocks;
-    Private->BlkIo2Ppi.Revision                = EFI_PEI_RECOVERY_BLOCK_IO2_PPI_REVISION;
-    Private->BlkIo2Ppi.GetNumberOfBlockDevices = NvmeBlockIoPeimGetDeviceNo2;
-    Private->BlkIo2Ppi.GetBlockDeviceMediaInfo = NvmeBlockIoPeimGetMediaInfo2;
-    Private->BlkIo2Ppi.ReadBlocks              = NvmeBlockIoPeimReadBlocks2;
-    CopyMem (&Private->BlkIoPpiList, &mNvmeBlkIoPpiListTemplate, sizeof (EFI_PEI_PPI_DESCRIPTOR));
-    CopyMem (&Private->BlkIo2PpiList, &mNvmeBlkIo2PpiListTemplate, sizeof (EFI_PEI_PPI_DESCRIPTOR));
-    CopyMem (&Private->EndOfPeiNotifyList, &mNvmeEndOfPeiNotifyListTemplate, sizeof (EFI_PEI_NOTIFY_DESCRIPTOR));
-    Private->BlkIoPpiList.Ppi   = &Private->BlkIoPpi;
-    Private->BlkIo2PpiList.Ppi  = &Private->BlkIo2Ppi;
+    Private->Signature        = NVME_PEI_CONTROLLER_PRIVATE_DATA_SIGNATURE;
+    Private->MmioBase         = MmioBase;
+    Private->DevicePathLength = DevicePathLength;
+    Private->DevicePath       = DevicePath;
 
     //
     // Initialize the NVME controller
@@ -305,11 +326,9 @@ NvmExpressPeimEntry (
       DEBUG ((
         DEBUG_ERROR,
         "%a: Controller initialization fail for Controller %d with Status - %r.\n",
-        __FUNCTION__,
-        Controller,
-        Status
+        __FUNCTION__, Controller, Status
         ));
-      NvmeFreeControllerResource (Private);
+      NvmeFreeDmaResource (Private);
       Controller++;
       continue;
     }
@@ -325,22 +344,68 @@ NvmExpressPeimEntry (
       DEBUG ((
         DEBUG_ERROR,
         "%a: Namespaces discovery fail for Controller %d with Status - %r.\n",
-        __FUNCTION__,
-        Controller,
-        Status
+        __FUNCTION__, Controller, Status
         ));
-      NvmeFreeControllerResource (Private);
+      NvmeFreeDmaResource (Private);
       Controller++;
       continue;
     }
 
+    Private->BlkIoPpi.GetNumberOfBlockDevices  = NvmeBlockIoPeimGetDeviceNo;
+    Private->BlkIoPpi.GetBlockDeviceMediaInfo  = NvmeBlockIoPeimGetMediaInfo;
+    Private->BlkIoPpi.ReadBlocks               = NvmeBlockIoPeimReadBlocks;
+    CopyMem (
+      &Private->BlkIoPpiList,
+      &mNvmeBlkIoPpiListTemplate,
+      sizeof (EFI_PEI_PPI_DESCRIPTOR)
+      );
+    Private->BlkIoPpiList.Ppi                  = &Private->BlkIoPpi;
+
+    Private->BlkIo2Ppi.Revision                = EFI_PEI_RECOVERY_BLOCK_IO2_PPI_REVISION;
+    Private->BlkIo2Ppi.GetNumberOfBlockDevices = NvmeBlockIoPeimGetDeviceNo2;
+    Private->BlkIo2Ppi.GetBlockDeviceMediaInfo = NvmeBlockIoPeimGetMediaInfo2;
+    Private->BlkIo2Ppi.ReadBlocks              = NvmeBlockIoPeimReadBlocks2;
+    CopyMem (
+      &Private->BlkIo2PpiList,
+      &mNvmeBlkIo2PpiListTemplate,
+      sizeof (EFI_PEI_PPI_DESCRIPTOR)
+      );
+    Private->BlkIo2PpiList.Ppi                 = &Private->BlkIo2Ppi;
     PeiServicesInstallPpi (&Private->BlkIoPpiList);
-    PeiServicesNotifyPpi (&Private->EndOfPeiNotifyList);
+
+    //
+    // Check if the NVME controller supports the Security Receive/Send commands
+    //
+    if ((Private->ControllerData->Oacs & SECURITY_SEND_RECEIVE_SUPPORTED) != 0) {
+      DEBUG ((
+        DEBUG_INFO,
+        "%a: Security Security Command PPI will be produced for Controller %d.\n",
+        __FUNCTION__, Controller
+        ));
+      Private->StorageSecurityPpi.Revision           = EDKII_STORAGE_SECURITY_PPI_REVISION;
+      Private->StorageSecurityPpi.GetNumberofDevices = NvmeStorageSecurityGetDeviceNo;
+      Private->StorageSecurityPpi.GetDevicePath      = NvmeStorageSecurityGetDevicePath;
+      Private->StorageSecurityPpi.ReceiveData        = NvmeStorageSecurityReceiveData;
+      Private->StorageSecurityPpi.SendData           = NvmeStorageSecuritySendData;
+      CopyMem (
+        &Private->StorageSecurityPpiList,
+        &mNvmeStorageSecurityPpiListTemplate,
+        sizeof (EFI_PEI_PPI_DESCRIPTOR)
+        );
+      Private->StorageSecurityPpiList.Ppi            = &Private->StorageSecurityPpi;
+      PeiServicesInstallPpi (&Private->StorageSecurityPpiList);
+    }
+
+    CopyMem (
+      &Private->EndOfPeiNotifyList,
+      &mNvmeEndOfPeiNotifyListTemplate,
+      sizeof (EFI_PEI_NOTIFY_DESCRIPTOR)
+      );
+    PeiServicesNotifyPpi  (&Private->EndOfPeiNotifyList);
+
     DEBUG ((
-      DEBUG_INFO,
-      "%a: BlockIO PPI has been installed on Controller %d.\n",
-      __FUNCTION__,
-      Controller
+      DEBUG_INFO, "%a: Controller %d has been successfully initialized.\n",
+      __FUNCTION__, Controller
       ));
     Controller++;
   }

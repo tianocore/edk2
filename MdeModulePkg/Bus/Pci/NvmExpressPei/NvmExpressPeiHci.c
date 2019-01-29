@@ -2,7 +2,7 @@
   The NvmExpressPei driver is used to manage non-volatile memory subsystem
   which follows NVM Express specification at PEI phase.
 
-  Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2018 - 2019, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions
@@ -702,47 +702,25 @@ NvmeControllerInit (
 }
 
 /**
-  Free the resources allocated by an NVME controller.
+  Free the DMA resources allocated by an NVME controller.
 
   @param[in] Private     The pointer to the PEI_NVME_CONTROLLER_PRIVATE_DATA data structure.
 
 **/
 VOID
-NvmeFreeControllerResource (
+NvmeFreeDmaResource (
   IN PEI_NVME_CONTROLLER_PRIVATE_DATA    *Private
   )
 {
-  //
-  // Free the controller data buffer
-  //
-  if (Private->ControllerData != NULL) {
-    FreePool (Private->ControllerData);
-    Private->ControllerData = NULL;
-  }
+  ASSERT (Private != NULL);
 
-  //
-  // Free the DMA buffers
-  //
-  if (Private->Buffer != NULL) {
+  if (Private->BufferMapping != NULL) {
     IoMmuFreeBuffer (
        NVME_MEM_MAX_PAGES,
        Private->Buffer,
        Private->BufferMapping
        );
-    Private->Buffer = NULL;
   }
 
-  //
-  // Free the namespaces information buffer
-  //
-  if (Private->NamespaceInfo != NULL) {
-    FreePool (Private->NamespaceInfo);
-    Private->NamespaceInfo = NULL;
-  }
-
-  //
-  // Free the controller private data structure
-  //
-  FreePool (Private);
   return;
 }
