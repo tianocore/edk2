@@ -402,25 +402,6 @@ main firmware (MAINFV) into RAM memory at address 0x800000. The
 remaining OVMF firmware then uses this decompressed firmware
 volume image.
 
-=== UNIXGCC Debug ===
-
-If you build with the UNIXGCC toolchain, then debugging will be disabled
-due to larger image sizes being produced by the UNIXGCC toolchain. The
-first choice recommendation is to use GCC48 or newer instead.
-
-If you must use UNIXGCC, then you can override the build options for
-particular libraries and modules in the .dsc to re-enable debugging
-selectively. For example:
-  [Components]
-  OvmfPkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf {
-    <BuildOptions>
-      GCC:*_*_*_CC_FLAGS             = -UMDEPKG_NDEBUG
-  }
-  MdeModulePkg/Universal/BdsDxe/BdsDxe.inf {
-    <BuildOptions>
-      GCC:*_*_*_CC_FLAGS             = -UMDEPKG_NDEBUG
-  }
-
 === UEFI Windows 7 & Windows 2008 Server ===
 
 * One of the '-vga std' and '-vga qxl' QEMU options should be used.
