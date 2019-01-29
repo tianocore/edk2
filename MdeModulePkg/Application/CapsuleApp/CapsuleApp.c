@@ -1,7 +1,7 @@
 /** @file
   A shell application that triggers capsule update process.
 
-  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2019, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -23,6 +23,7 @@
 #include <Library/PrintLib.h>
 #include <Library/BmpSupportLib.h>
 #include <Protocol/GraphicsOutput.h>
+#include <Guid/GlobalVariable.h>
 #include <Guid/CapsuleReport.h>
 #include <Guid/SystemResourceTable.h>
 #include <Guid/FmpCapsule.h>
@@ -103,6 +104,46 @@ DumpFmpImage (
 VOID
 DumpEsrtData (
   VOID
+  );
+
+/**
+  Dump Provisioned Capsule.
+
+  @param[in]  DumpCapsuleInfo  The flag to indicate whether to dump the capsule inforomation.
+**/
+VOID
+DumpProvisionedCapsule (
+  IN BOOLEAN                      DumpCapsuleInfo
+  );
+
+/**
+  Dump all EFI System Partition.
+**/
+VOID
+DumpAllEfiSysPartition (
+  VOID
+  );
+
+/**
+  Process Capsule On Disk.
+
+  @param[in]  CapsuleBuffer       An array of pointer to capsule images
+  @param[in]  CapsuleBufferSize   An array of UINTN to capsule images size
+  @param[in]  FilePath            An array of capsule images file path
+  @param[in]  Map                 File system mapping string
+  @param[in]  CapsuleNum          The count of capsule images
+
+  @retval EFI_SUCCESS       Capsule on disk success.
+  @retval others            Capsule on disk fail.
+
+**/
+EFI_STATUS
+ProcessCapsuleOnDisk (
+  IN VOID                          **CapsuleBuffer,
+  IN UINTN                         *CapsuleBufferSize,
+  IN CHAR16                        **FilePath,
+  IN CHAR16                        *Map,
+  IN UINTN                         CapsuleNum
   );
 
 /**
@@ -799,19 +840,22 @@ PrintUsage (
   )
 {
   Print(L"CapsuleApp:  usage\n");
-  Print(L"  CapsuleApp <Capsule...> [-NR]\n");
+  Print(L"  CapsuleApp <Capsule...> [-NR] [-OD [FSx]]\n");
   Print(L"  CapsuleApp -S\n");
   Print(L"  CapsuleApp -C\n");
   Print(L"  CapsuleApp -P\n");
   Print(L"  CapsuleApp -E\n");
+  Print(L"  CapsuleApp -L\n");
+  Print(L"  CapsuleApp -L INFO\n");
+  Print(L"  CapsuleApp -F\n");
   Print(L"  CapsuleApp -G <BMP> -O <Capsule>\n");
   Print(L"  CapsuleApp -N <Capsule> -O <NestedCapsule>\n");
   Print(L"  CapsuleApp -D <Capsule>\n");
   Print(L"  CapsuleApp -P GET <ImageTypeId> <Index> -O <FileName>\n");
   Print(L"Parameter:\n");
-  Print(L"  -NR: No reset will be triggered for the capsule with\n");
-  Print(L"       CAPSULE_FLAGS_PERSIST_ACROSS_RESET and without\n");
-  Print(L"       CAPSULE_FLAGS_INITIATE_RESET.\n");
+  Print(L"  -NR: No reset will be triggered for the capsule\n");
+  Print(L"       with CAPSULE_FLAGS_PERSIST_ACROSS_RESET and without CAPSULE_FLAGS_INITIATE_RESET.\n");
+  Print(L"  -OD: Delivery of Capsules via file on Mass Storage device.");
   Print(L"  -S:  Dump capsule report variable (EFI_CAPSULE_REPORT_GUID),\n");
   Print(L"       which is defined in UEFI specification.\n");
   Print(L"  -C:  Clear capsule report variable (EFI_CAPSULE_REPORT_GUID),\n");
@@ -820,6 +864,8 @@ PrintUsage (
   Print(L"       ImageTypeId and Index (decimal format) to a file if 'GET'\n");
   Print(L"       option is used.\n");
   Print(L"  -E:  Dump UEFI ESRT table info.\n");
+  Print(L"  -L:  Dump provisioned capsule image information.\n");
+  Print(L"  -F:  Dump all EFI System Partition.\n");
   Print(L"  -G:  Convert a BMP file to be an UX capsule,\n");
   Print(L"       according to Windows Firmware Update document\n");
   Print(L"  -N:  Append a Capsule Header to an existing FMP capsule image\n");
@@ -851,7 +897,7 @@ UefiMain (
 {
   EFI_STATUS                    Status;
   RETURN_STATUS                 RStatus;
-  UINTN                         FileSize[MAX_CAPSULE_NUM];
+  UINTN                         CapsuleBufferSize[MAX_CAPSULE_NUM];
   VOID                          *CapsuleBuffer[MAX_CAPSULE_NUM];
   EFI_CAPSULE_BLOCK_DESCRIPTOR  *BlockDescriptors;
   EFI_CAPSULE_HEADER            *CapsuleHeaderArray[MAX_CAPSULE_NUM + 1];
@@ -859,11 +905,19 @@ UefiMain (
   EFI_RESET_TYPE                ResetType;
   BOOLEAN                       NeedReset;
   BOOLEAN                       NoReset;
+  BOOLEAN                       CapsuleOnDisk;
   CHAR16                        *CapsuleName;
+  CHAR16                        *CapsuleNames[MAX_CAPSULE_NUM];
+  CHAR16                        *MapFsStr;
   UINTN                         CapsuleNum;
   UINTN                         Index;
+  UINTN                         ParaOdIndex;
+  UINTN                         ParaNrIndex;
   EFI_GUID                      ImageTypeId;
   UINTN                         ImageIndex;
+
+  MapFsStr = NULL;
+  CapsuleNum = 0;
 
   Status = GetArg();
   if (EFI_ERROR(Status)) {
@@ -936,6 +990,20 @@ UefiMain (
     return EFI_SUCCESS;
   }
 
+  if (StrCmp(Argv[1], L"-L") == 0) {
+    if (Argc >= 3 && StrCmp(Argv[2], L"INFO") == 0) {
+      DumpProvisionedCapsule(TRUE);
+    } else {
+      DumpProvisionedCapsule(FALSE);
+    }
+    return EFI_SUCCESS;
+  }
+
+  if (StrCmp(Argv[1], L"-F") == 0) {
+    DumpAllEfiSysPartition();
+    return EFI_SUCCESS;
+  }
+
   if (Argv[1][0] == L'-') {
     Print(L"CapsuleApp: Unrecognized option(%s).\n", Argv[1]);
     return EFI_UNSUPPORTED;
@@ -943,12 +1011,56 @@ UefiMain (
 
   CapsuleFirstIndex = 1;
   NoReset = FALSE;
-  if ((Argc > 1) && (StrCmp(Argv[Argc - 1], L"-NR") == 0)) {
-    NoReset = TRUE;
-    CapsuleLastIndex = Argc - 2;
-  } else {
-    CapsuleLastIndex = Argc - 1;
+  CapsuleOnDisk = FALSE;
+  ParaOdIndex = 0;
+  ParaNrIndex = 0;
+
+  for (Index = 1; Index < Argc; Index++) {
+    if (StrCmp(Argv[Index], L"-OD") == 0) {
+      ParaOdIndex = Index;
+      CapsuleOnDisk = TRUE;
+    } else if (StrCmp(Argv[Index], L"-NR") == 0) {
+      ParaNrIndex = Index;
+      NoReset = TRUE;
+    }
   }
+
+  if (ParaOdIndex != 0) {
+    if (ParaOdIndex == Argc - 1) {
+      MapFsStr = NULL;
+    } else if (ParaOdIndex == Argc - 2) {
+      MapFsStr = Argv[Argc-1];
+    } else {
+      Print (L"CapsuleApp: Invalid Position for -OD Options\n");
+      Status = EFI_INVALID_PARAMETER;
+      goto Done;
+    }
+
+    if (ParaNrIndex != 0) {
+      if (ParaNrIndex + 1 == ParaOdIndex) {
+        CapsuleLastIndex = ParaNrIndex - 1;
+      } else {
+        Print (L"CapsuleApp: Invalid Position for -NR Options\n");
+        Status = EFI_INVALID_PARAMETER;
+        goto Done;
+      }
+    } else {
+      CapsuleLastIndex = ParaOdIndex - 1;
+    }
+  } else {
+    if (ParaNrIndex != 0) {
+      if (ParaNrIndex == Argc -1) {
+        CapsuleLastIndex = ParaNrIndex - 1;
+      } else {
+        Print (L"CapsuleApp: Invalid Position for -NR Options\n");
+        Status = EFI_INVALID_PARAMETER;
+        goto Done;
+      }
+    } else {
+      CapsuleLastIndex = Argc - 1;
+    }
+  }
+
   CapsuleNum = CapsuleLastIndex - CapsuleFirstIndex + 1;
 
   if (CapsuleFirstIndex > CapsuleLastIndex) {
@@ -961,26 +1073,27 @@ UefiMain (
   }
 
   ZeroMem(&CapsuleBuffer, sizeof(CapsuleBuffer));
-  ZeroMem(&FileSize, sizeof(FileSize));
+  ZeroMem(&CapsuleBufferSize, sizeof(CapsuleBufferSize));
   BlockDescriptors = NULL;
 
   for (Index = 0; Index < CapsuleNum; Index++) {
     CapsuleName = Argv[CapsuleFirstIndex + Index];
-    Status = ReadFileToBuffer(CapsuleName, &FileSize[Index], &CapsuleBuffer[Index]);
+    Status = ReadFileToBuffer(CapsuleName, &CapsuleBufferSize[Index], &CapsuleBuffer[Index]);
     if (EFI_ERROR(Status)) {
       Print(L"CapsuleApp: capsule image (%s) is not found.\n", CapsuleName);
       goto Done;
     }
-    if (!IsValidCapsuleHeader (CapsuleBuffer[Index], FileSize[Index])) {
+    if (!IsValidCapsuleHeader (CapsuleBuffer[Index], CapsuleBufferSize[Index])) {
       Print(L"CapsuleApp: Capsule image (%s) is not a valid capsule.\n", CapsuleName);
       return EFI_INVALID_PARAMETER;
     }
+    CapsuleNames[Index] = CapsuleName;
   }
 
   //
   // Every capsule use 2 descriptor 1 for data 1 for end
   //
-  Status = BuildGatherList(CapsuleBuffer, FileSize, CapsuleNum, &BlockDescriptors);
+  Status = BuildGatherList(CapsuleBuffer, CapsuleBufferSize, CapsuleNum, &BlockDescriptors);
   if (EFI_ERROR(Status)) {
     goto Done;
   }
@@ -1007,10 +1120,27 @@ UefiMain (
   }
 
   for (Index = 0; Index < CapsuleNum; Index++) {
-    if (FileSize[Index] > MaxCapsuleSize) {
+    if (CapsuleBufferSize[Index] > MaxCapsuleSize) {
       Print (L"CapsuleApp: capsule is too large to update, %ld is allowed\n", MaxCapsuleSize);
       Status = EFI_UNSUPPORTED;
       goto Done;
+    }
+  }
+
+  //
+  // Check whether is capsule on disk.
+  //
+  if (CapsuleOnDisk) {
+    Status = ProcessCapsuleOnDisk (CapsuleBuffer, CapsuleBufferSize, CapsuleNames, MapFsStr, CapsuleNum);
+    if (Status != EFI_SUCCESS) {
+      Print (L"CapsuleApp: failed to update capsule - %r\n", Status);
+      goto Done;
+    } else {
+      if (!NoReset) {
+        gRT->ResetSystem (ResetType, EFI_SUCCESS, 0, NULL);
+      } else {
+        goto Done;
+      }
     }
   }
 

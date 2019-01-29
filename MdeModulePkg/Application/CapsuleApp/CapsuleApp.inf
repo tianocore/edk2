@@ -33,6 +33,7 @@
 [Sources]
   CapsuleApp.c
   CapsuleDump.c
+  CapsuleOnDisk.c
   AppSupport.c
 
 [Packages]
@@ -40,16 +41,20 @@
   MdeModulePkg/MdeModulePkg.dec
 
 [Guids]
+  gEfiGlobalVariableGuid                 ## CONSUMES   ## GUID
   gEfiCapsuleReportGuid                  ## CONSUMES   ## GUID
   gEfiFmpCapsuleGuid                     ## CONSUMES   ## GUID
   gWindowsUxCapsuleGuid                  ## CONSUMES   ## GUID
   gEfiSystemResourceTableGuid            ## CONSUMES   ## GUID
+  gEfiCapsuleVendorGuid                  ## SOMETIMES_CONSUMES ## Variable:L"CapsuleUpdateData"
+  gEfiPartTypeSystemPartGuid             ## SOMETIMES_CONSUMES ## GUID
 
 [Protocols]
   gEfiGraphicsOutputProtocolGuid         ## CONSUMES
   gEfiFirmwareManagementProtocolGuid     ## CONSUMES
   gEfiShellParametersProtocolGuid        ## CONSUMES
   gEfiShellProtocolGuid                  ## CONSUMES
+  gEfiSimpleFileSystemProtocolGuid       ## SOMETIMES_CONSUMES
 
 [LibraryClasses]
   BaseLib
@@ -61,6 +66,9 @@
   UefiLib
   PrintLib
   BmpSupportLib
+  FileHandleLib
+  UefiBootManagerLib
+  SortLib
 
 [UserExtensions.TianoCore."ExtraFiles"]
   CapsuleAppExtra.uni
