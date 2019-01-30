@@ -1810,9 +1810,9 @@ NOOPT_VS2012xASL_X64_DLINK_FLAGS    = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:RE
 *_VS2012x86_IA32_ASM_PATH     = DEF(VS2012x86_BIN)\ml.exe
 
       *_VS2012x86_IA32_MAKE_FLAGS  = /nologo
-  DEBUG_VS2012x86_IA32_CC_FLAGS    = /nologo /arch:IA32 /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm
+  DEBUG_VS2012x86_IA32_CC_FLAGS    = /nologo /arch:IA32 /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Z7
 RELEASE_VS2012x86_IA32_CC_FLAGS    = /nologo /arch:IA32 /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2 /GL /FIAutoGen.h /EHs-c- /GR- /GF
-NOOPT_VS2012x86_IA32_CC_FLAGS      = /nologo /arch:IA32 /c /WX /GS- /W4 /Gs32768 /D UNICODE /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm /Od
+NOOPT_VS2012x86_IA32_CC_FLAGS      = /nologo /arch:IA32 /c /WX /GS- /W4 /Gs32768 /D UNICODE /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Z7 /Od
 
   DEBUG_VS2012x86_IA32_ASM_FLAGS   = /nologo /c /WX /W3 /Cx /coff /Zd /Zi
 RELEASE_VS2012x86_IA32_ASM_FLAGS   = /nologo /c /WX /W3 /Cx /coff /Zd
@@ -1842,9 +1842,9 @@ NOOPT_VS2012x86_IA32_DLINK_FLAGS   = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF
 *_VS2012x86_X64_DLINK_PATH    = DEF(VS2012x86_BINX64)\link.exe
 *_VS2012x86_X64_ASLDLINK_PATH = DEF(VS2012x86_BINX64)\link.exe
 
-  DEBUG_VS2012x86_X64_CC_FLAGS     = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm
+  DEBUG_VS2012x86_X64_CC_FLAGS     = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Z7
 RELEASE_VS2012x86_X64_CC_FLAGS     = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF
-NOOPT_VS2012x86_X64_CC_FLAGS       = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm /Od
+NOOPT_VS2012x86_X64_CC_FLAGS       = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Z7 /Od
 
   DEBUG_VS2012x86_X64_ASM_FLAGS    = /nologo /c /WX /W3 /Cx /Zd /Zi
 RELEASE_VS2012x86_X64_ASM_FLAGS    = /nologo /c /WX /W3 /Cx /Zd
@@ -2276,9 +2276,9 @@ NOOPT_VS2013xASL_X64_DLINK_FLAGS    = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:RE
 *_VS2013x86_IA32_ASM_PATH     = DEF(VS2013x86_BIN)\ml.exe
 
       *_VS2013x86_IA32_MAKE_FLAGS  = /nologo
-  DEBUG_VS2013x86_IA32_CC_FLAGS    = /nologo /arch:IA32 /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm /Gw
+  DEBUG_VS2013x86_IA32_CC_FLAGS    = /nologo /arch:IA32 /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Z7 /Gw
 RELEASE_VS2013x86_IA32_CC_FLAGS    = /nologo /arch:IA32 /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gw
-NOOPT_VS2013x86_IA32_CC_FLAGS      = /nologo /arch:IA32 /c /WX /GS- /W4 /Gs32768 /D UNICODE /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm /Od
+NOOPT_VS2013x86_IA32_CC_FLAGS      = /nologo /arch:IA32 /c /WX /GS- /W4 /Gs32768 /D UNICODE /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Z7 /Od
 
   DEBUG_VS2013x86_IA32_ASM_FLAGS   = /nologo /c /WX /W3 /Cx /coff /Zd /Zi
 RELEASE_VS2013x86_IA32_ASM_FLAGS   = /nologo /c /WX /W3 /Cx /coff /Zd
@@ -2308,9 +2308,9 @@ NOOPT_VS2013x86_IA32_DLINK_FLAGS   = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF
 *_VS2013x86_X64_DLINK_PATH    = DEF(VS2013x86_BINX64)\link.exe
 *_VS2013x86_X64_ASLDLINK_PATH = DEF(VS2013x86_BINX64)\link.exe
 
-  DEBUG_VS2013x86_X64_CC_FLAGS     = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm /Gw
+  DEBUG_VS2013x86_X64_CC_FLAGS     = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Z7 /Gw
 RELEASE_VS2013x86_X64_CC_FLAGS     = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Gw
-NOOPT_VS2013x86_X64_CC_FLAGS       = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm /Od
+NOOPT_VS2013x86_X64_CC_FLAGS       = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Z7 /Od
 
   DEBUG_VS2013x86_X64_ASM_FLAGS    = /nologo /c /WX /W3 /Cx /Zd /Zi
 RELEASE_VS2013x86_X64_ASM_FLAGS    = /nologo /c /WX /W3 /Cx /Zd
@@ -2746,9 +2746,9 @@ NOOPT_VS2015xASL_X64_DLINK_FLAGS    = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:RE
 *_VS2015x86_IA32_ASM_PATH     = DEF(VS2015x86_BIN)\ml.exe
 
       *_VS2015x86_IA32_MAKE_FLAGS  = /nologo
-  DEBUG_VS2015x86_IA32_CC_FLAGS    = /nologo /arch:IA32 /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm /Gw
+  DEBUG_VS2015x86_IA32_CC_FLAGS    = /nologo /arch:IA32 /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Z7 /Gw
 RELEASE_VS2015x86_IA32_CC_FLAGS    = /nologo /arch:IA32 /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gw
-NOOPT_VS2015x86_IA32_CC_FLAGS      = /nologo /arch:IA32 /c /WX /GS- /W4 /Gs32768 /D UNICODE /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm /Od
+NOOPT_VS2015x86_IA32_CC_FLAGS      = /nologo /arch:IA32 /c /WX /GS- /W4 /Gs32768 /D UNICODE /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Z7 /Od
 
   DEBUG_VS2015x86_IA32_ASM_FLAGS   = /nologo /c /WX /W3 /Cx /coff /Zd /Zi
 RELEASE_VS2015x86_IA32_ASM_FLAGS   = /nologo /c /WX /W3 /Cx /coff /Zd
@@ -2778,9 +2778,9 @@ NOOPT_VS2015x86_IA32_DLINK_FLAGS   = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF
 *_VS2015x86_X64_DLINK_PATH    = DEF(VS2015x86_BINX64)\link.exe
 *_VS2015x86_X64_ASLDLINK_PATH = DEF(VS2015x86_BINX64)\link.exe
 
-  DEBUG_VS2015x86_X64_CC_FLAGS     = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm /Gw
+  DEBUG_VS2015x86_X64_CC_FLAGS     = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Z7 /Gw
 RELEASE_VS2015x86_X64_CC_FLAGS     = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Gw
-NOOPT_VS2015x86_X64_CC_FLAGS       = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm /Od
+NOOPT_VS2015x86_X64_CC_FLAGS       = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Z7 /Od
 
   DEBUG_VS2015x86_X64_ASM_FLAGS    = /nologo /c /WX /W3 /Cx /Zd /Zi
 RELEASE_VS2015x86_X64_ASM_FLAGS    = /nologo /c /WX /W3 /Cx /Zd
@@ -2976,9 +2976,9 @@ NOOPT_VS2015x86xASL_X64_DLINK_FLAGS    = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT
 *_VS2017_IA32_ASM_PATH     = DEF(VS2017_BIN_IA32)\ml.exe
 
       *_VS2017_IA32_MAKE_FLAGS  = /nologo
-  DEBUG_VS2017_IA32_CC_FLAGS    = /nologo /arch:IA32 /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm /Gw
+  DEBUG_VS2017_IA32_CC_FLAGS    = /nologo /arch:IA32 /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Z7 /Gw
 RELEASE_VS2017_IA32_CC_FLAGS    = /nologo /arch:IA32 /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gw
-NOOPT_VS2017_IA32_CC_FLAGS      = /nologo /arch:IA32 /c /WX /GS- /W4 /Gs32768 /D UNICODE /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm /Od
+NOOPT_VS2017_IA32_CC_FLAGS      = /nologo /arch:IA32 /c /WX /GS- /W4 /Gs32768 /D UNICODE /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Z7 /Od
 
   DEBUG_VS2017_IA32_ASM_FLAGS   = /nologo /c /WX /W3 /Cx /coff /Zd /Zi
 RELEASE_VS2017_IA32_ASM_FLAGS   = /nologo /c /WX /W3 /Cx /coff /Zd
@@ -3006,9 +3006,9 @@ NOOPT_VS2017_IA32_DLINK_FLAGS   = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /O
 *_VS2017_X64_DLINK_PATH    = DEF(VS2017_BIN_X64)\link.exe
 *_VS2017_X64_ASLDLINK_PATH = DEF(VS2017_BIN_X64)\link.exe
 
-  DEBUG_VS2017_X64_CC_FLAGS     = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm /Gw
+  DEBUG_VS2017_X64_CC_FLAGS     = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Z7 /Gw
 RELEASE_VS2017_X64_CC_FLAGS     = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Gw
-NOOPT_VS2017_X64_CC_FLAGS       = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm /Od
+NOOPT_VS2017_X64_CC_FLAGS       = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Z7 /Od
 
   DEBUG_VS2017_X64_ASM_FLAGS    = /nologo /c /WX /W3 /Cx /Zd /Zi
 RELEASE_VS2017_X64_ASM_FLAGS    = /nologo /c /WX /W3 /Cx /Zd
