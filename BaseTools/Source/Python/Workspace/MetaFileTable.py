@@ -393,7 +393,7 @@ class PlatformTable(MetaFileTable):
         if FromItem is not None:
             result = [item for item in result if item[9] == FromItem]
 
-        result = [ [r[2],r[3],r[4],r[5],r[6],r[7],r[0],r[9]] for r in result ]
+        result = [ [r[2],r[3],r[4],r[5],r[6],r[7],r[0],r[10]] for r in result ]
         return result
 
     def DisableComponent(self,comp_id):
