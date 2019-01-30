@@ -3,7 +3,7 @@
 
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
   Copyright 2016-2018 Dell Technologies.<BR>
-  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -3741,33 +3741,6 @@ ShellFileExists(
 }
 
 /**
-  Convert a Unicode character to upper case only if
-  it maps to a valid small-case ASCII character.
-
-  This internal function only deal with Unicode character
-  which maps to a valid small-case ASCII character, i.e.
-  L'a' to L'z'. For other Unicode character, the input character
-  is returned directly.
-
-  @param  Char  The character to convert.
-
-  @retval LowerCharacter   If the Char is with range L'a' to L'z'.
-  @retval Unchanged        Otherwise.
-
-**/
-CHAR16
-InternalShellCharToUpper (
-  IN      CHAR16                    Char
-  )
-{
-  if (Char >= L'a' && Char <= L'z') {
-    return (CHAR16) (Char - (L'a' - L'A'));
-  }
-
-  return Char;
-}
-
-/**
   Convert a Unicode character to numerical value.
 
   This internal function only deal with Unicode character
@@ -3789,7 +3762,7 @@ InternalShellHexCharToUintn (
     return Char - L'0';
   }
 
-  return (10 + InternalShellCharToUpper (Char) - L'A');
+  return (10 + CharToUpper (Char) - L'A');
 }
 
 /**
@@ -3849,7 +3822,7 @@ InternalShellStrHexToUint64 (
     String++;
   }
 
-  if (InternalShellCharToUpper (*String) == L'X') {
+  if (CharToUpper (*String) == L'X') {
     if (*(String - 1) != L'0') {
       return 0;
     }
