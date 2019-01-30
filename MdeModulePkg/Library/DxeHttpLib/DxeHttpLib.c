@@ -2,7 +2,7 @@
   This library is used to share code between UEFI network stack modules.
   It provides the helper routines to parse the HTTP message byte stream.
 
-Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2019, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -899,27 +899,6 @@ typedef struct {
 } HTTP_BODY_PARSER;
 
 /**
-
-  Convert an Ascii char to its uppercase.
-
-  @param[in]       Char           Ascii character.
-
-  @return          Uppercase value of the input Char.
-
-**/
-CHAR8
-HttpIoCharToUpper (
-  IN      CHAR8                    Char
-  )
-{
-  if (Char >= 'a' && Char <= 'z') {
-    return  Char - ('a' - 'A');
-  }
-
-  return Char;
-}
-
-/**
   Convert an hexadecimal char to a value of type UINTN.
 
   @param[in]       Char           Ascii character.
@@ -936,7 +915,7 @@ HttpIoHexCharToUintn (
     return Char - '0';
   }
 
-  return (10 + HttpIoCharToUpper (Char) - 'A');
+  return (10 + AsciiCharToUpper (Char) - 'A');
 }
 
 /**
