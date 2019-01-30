@@ -988,6 +988,10 @@ OpalDriverRequestPassword (
 
     IsLocked = OpalDeviceLocked (&Dev->OpalDisk.SupportedAttributes, &Dev->OpalDisk.LockingFeature);
 
+    if (IsLocked && PcdGetBool (PcdSkipOpalDxeUnlock)) {
+      return;
+    }
+
     while (Count < MAX_PASSWORD_TRY_COUNT) {
       Password = OpalDriverPopUpPasswordInput (Dev, PopUpString, NULL, &PressEsc);
       if (PressEsc) {

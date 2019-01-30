@@ -428,6 +428,12 @@
   # @Prompt Possible TPM2 Interrupt Number buffer
   gEfiSecurityPkgTokenSpaceGuid.PcdTpm2PossibleIrqNumBuf|{0x00, 0x00, 0x00, 0x00}|VOID*|0x0001001D
 
+  ## Indicates if Opal DXE driver skip unlock device flow.<BR><BR>
+  #   TRUE  - Skip unlock device flow.<BR>
+  #   FALSE - Does not skip unlock device flow.<BR>
+  # @Prompt Skip Opal DXE driver unlock device flow.
+  gEfiSecurityPkgTokenSpaceGuid.PcdSkipOpalDxeUnlock|FALSE|BOOLEAN|0x00010020
+
 [PcdsDynamic, PcdsDynamicEx]
 
   ## This PCD indicates Hash mask for TPM 2.0. Bit definition strictly follows TCG Algorithm Registry.<BR><BR>
