@@ -1,7 +1,7 @@
 /** @file
   Provides interface to shell MAN file parser.
 
-  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2019, Intel Corporation. All rights reserved.<BR>
   Copyright 2015 Dell Inc.
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -45,27 +45,6 @@ SHELL_MAN_HII_VENDOR_DEVICE_PATH  mShellManHiiDevicePath = {
     }
   }
 };
-
-
-/**
-  Convert a Unicode character to upper case only if
-  it maps to a valid small-case ASCII character.
-
-  This internal function only deal with Unicode character
-  which maps to a valid small-case ASCII character, i.e.
-  L'a' to L'z'. For other Unicode character, the input character
-  is returned directly.
-
-  @param  Char  The character to convert.
-
-  @retval LowerCharacter   If the Char is with range L'a' to L'z'.
-  @retval Unchanged        Otherwise.
-
-**/
-CHAR16
-InternalShellCharToUpper (
-  IN CHAR16  Char
-  );
 
 /**
   Verifies that the filename has .EFI on the end.
@@ -416,7 +395,7 @@ IsTitleHeader(
           ReturnFound = TRUE;  // This is the desired command's title header line.
           State = (BriefDesc == NULL) ? Final : GetBriefDescription;
         }
-        else if (InternalShellCharToUpper (*Line) != InternalShellCharToUpper (*(Command + CommandIndex++))) {
+        else if (CharToUpper (*Line) != CharToUpper (*(Command + CommandIndex++))) {
           State = Final;
         }
         Line++;
