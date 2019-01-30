@@ -587,8 +587,17 @@ Ip6DriverBindingStart (
                        DataItem->DataSize,
                        DataItem->Data.Ptr
                        );
-    if (EFI_ERROR(Status) && Status != EFI_NOT_READY) {
-      goto UNINSTALL_PROTOCOL;
+    if (Status == EFI_INVALID_PARAMETER || Status == EFI_BAD_BUFFER_SIZE) {
+      //
+      // Clean the invalid ManualAddress configuration.
+      //
+      Status = Ip6Cfg->SetData (
+                         Ip6Cfg,
+                         Ip6ConfigDataTypeManualAddress,
+                         0,
+                         NULL
+                         );
+      DEBUG ((EFI_D_WARN, "Ip6DriverBindingStart: Clean the invalid ManualAddress configuration.\n"));
     }
   }
 
@@ -603,8 +612,17 @@ Ip6DriverBindingStart (
                        DataItem->DataSize,
                        DataItem->Data.Ptr
                        );
-    if (EFI_ERROR(Status)) {
-      goto UNINSTALL_PROTOCOL;
+    if (Status == EFI_INVALID_PARAMETER || Status == EFI_BAD_BUFFER_SIZE) {
+      //
+      // Clean the invalid Gateway configuration.
+      //
+      Status = Ip6Cfg->SetData (
+                         Ip6Cfg,
+                         Ip6ConfigDataTypeGateway,
+                         0,
+                         NULL
+                         );
+      DEBUG ((EFI_D_WARN, "Ip6DriverBindingStart: Clean the invalid Gateway configuration.\n"));
     }
   }
 
