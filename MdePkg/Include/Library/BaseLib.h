@@ -2,7 +2,7 @@
   Provides string functions, linked list functions, math functions, synchronization
   functions, file path functions, and CPU architecture-specific functions.
 
-Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -2718,6 +2718,46 @@ AsciiStrnToUnicodeStrS (
   OUT     CHAR16                    *Destination,
   IN      UINTN                     DestMax,
   OUT     UINTN                     *DestinationLength
+  );
+
+/**
+  Convert a Unicode character to upper case only if
+  it maps to a valid small-case ASCII character.
+
+  This internal function only deal with Unicode character
+  which maps to a valid small-case ASCII character, i.e.
+  L'a' to L'z'. For other Unicode character, the input character
+  is returned directly.
+
+  @param  Char  The character to convert.
+
+  @retval LowerCharacter   If the Char is with range L'a' to L'z'.
+  @retval Unchanged        Otherwise.
+
+**/
+CHAR16
+EFIAPI
+CharToUpper (
+  IN      CHAR16                    Char
+  );
+
+/**
+  Converts a lowercase Ascii character to upper one.
+
+  If Chr is lowercase Ascii character, then converts it to upper one.
+
+  If Value >= 0xA0, then ASSERT().
+  If (Value & 0x0F) >= 0x0A, then ASSERT().
+
+  @param  Chr   one Ascii character
+
+  @return The uppercase value of Ascii character
+
+**/
+CHAR8
+EFIAPI
+AsciiCharToUpper (
+  IN      CHAR8                     Chr
   );
 
 /**

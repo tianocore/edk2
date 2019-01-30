@@ -1,7 +1,7 @@
 /** @file
   Safe String functions.
 
-  Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2019, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -905,7 +905,7 @@ StrHexToUintnS (
     String++;
   }
 
-  if (InternalCharToUpper (*String) == L'X') {
+  if (CharToUpper (*String) == L'X') {
     if (*(String - 1) != L'0') {
       *Data = 0;
       return RETURN_SUCCESS;
@@ -1036,7 +1036,7 @@ StrHexToUint64S (
     String++;
   }
 
-  if (InternalCharToUpper (*String) == L'X') {
+  if (CharToUpper (*String) == L'X') {
     if (*(String - 1) != L'0') {
       *Data = 0;
       return RETURN_SUCCESS;
@@ -2459,7 +2459,7 @@ AsciiStrHexToUintnS (
     String++;
   }
 
-  if (InternalBaseLibAsciiToUpper (*String) == 'X') {
+  if (AsciiCharToUpper (*String) == 'X') {
     if (*(String - 1) != '0') {
       *Data = 0;
       return RETURN_SUCCESS;
@@ -2586,7 +2586,7 @@ AsciiStrHexToUint64S (
     String++;
   }
 
-  if (InternalBaseLibAsciiToUpper (*String) == 'X') {
+  if (AsciiCharToUpper (*String) == 'X') {
     if (*(String - 1) != '0') {
       *Data = 0;
       return RETURN_SUCCESS;

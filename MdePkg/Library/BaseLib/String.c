@@ -1,7 +1,7 @@
 /** @file
   Unicode and ASCII string primitives.
 
-  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -552,7 +552,7 @@ InternalIsDecimalDigitCharacter (
 **/
 CHAR16
 EFIAPI
-InternalCharToUpper (
+CharToUpper (
   IN      CHAR16                    Char
   )
 {
@@ -586,7 +586,7 @@ InternalHexCharToUintn (
     return Char - L'0';
   }
 
-  return (10 + InternalCharToUpper (Char) - L'A');
+  return (10 + CharToUpper (Char) - L'A');
 }
 
 /**
@@ -1181,7 +1181,7 @@ AsciiStrCmp (
 **/
 CHAR8
 EFIAPI
-InternalBaseLibAsciiToUpper (
+AsciiCharToUpper (
   IN      CHAR8                     Chr
   )
 {
@@ -1211,7 +1211,7 @@ InternalAsciiHexCharToUintn (
     return Char - '0';
   }
 
-  return (10 + InternalBaseLibAsciiToUpper (Char) - 'A');
+  return (10 + AsciiCharToUpper (Char) - 'A');
 }
 
 
@@ -1260,13 +1260,13 @@ AsciiStriCmp (
   ASSERT (AsciiStrSize (FirstString));
   ASSERT (AsciiStrSize (SecondString));
 
-  UpperFirstString  = InternalBaseLibAsciiToUpper (*FirstString);
-  UpperSecondString = InternalBaseLibAsciiToUpper (*SecondString);
+  UpperFirstString  = AsciiCharToUpper (*FirstString);
+  UpperSecondString = AsciiCharToUpper (*SecondString);
   while ((*FirstString != '\0') && (*SecondString != '\0') && (UpperFirstString == UpperSecondString)) {
     FirstString++;
     SecondString++;
-    UpperFirstString  = InternalBaseLibAsciiToUpper (*FirstString);
-    UpperSecondString = InternalBaseLibAsciiToUpper (*SecondString);
+    UpperFirstString  = AsciiCharToUpper (*FirstString);
+    UpperSecondString = AsciiCharToUpper (*SecondString);
   }
 
   return UpperFirstString - UpperSecondString;
