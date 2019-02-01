@@ -65,7 +65,7 @@ FtwCalculateCrc32 (
 }
 
 /**
-  Notify the system that the SMM FTW driver is ready
+  Notify the system that the SMM FTW driver is ready.
 **/
 VOID
 FtwNotifySmmReady (

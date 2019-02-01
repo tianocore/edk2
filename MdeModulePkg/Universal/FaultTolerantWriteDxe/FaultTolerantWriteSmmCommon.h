@@ -78,7 +78,7 @@ typedef struct {
 } SMM_FTW_GET_LAST_WRITE_HEADER;
 
 /**
-  Shared entry point of the module
+  Shared entry point of the module.
 
   @retval EFI_SUCCESS           The initialization finished successfully.
   @retval EFI_OUT_OF_RESOURCES  Allocate memory error
@@ -109,7 +109,7 @@ FtwSmmIsBufferOutsideSmmValid (
   );
 
 /**
-  Notify the system that the SMM FTW driver is ready
+  Notify the system that the SMM FTW driver is ready.
 **/
 VOID
 FtwNotifySmmReady (

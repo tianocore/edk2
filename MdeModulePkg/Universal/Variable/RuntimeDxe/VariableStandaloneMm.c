@@ -38,7 +38,7 @@ VariableSmmIsBufferOutsideSmmValid (
 }
 
 /**
-  Notify the system that the SMM variable driver is ready
+  Notify the system that the SMM variable driver is ready.
 **/
 VOID
 VariableNotifySmmReady (
@@ -48,7 +48,7 @@ VariableNotifySmmReady (
 }
 
 /**
-  Notify the system that the SMM variable write driver is ready
+  Notify the system that the SMM variable write driver is ready.
 **/
 VOID
 VariableNotifySmmWriteReady (
@@ -58,7 +58,7 @@ VariableNotifySmmWriteReady (
 }
 
 /**
-  Variable service MM driver entry point
+  Variable service MM driver entry point.
 
   @param[in] ImageHandle    A handle for the image that is initializing this
                             driver

@@ -98,7 +98,7 @@ VariableSpeculationBarrier (
   );
 
 /**
-  Notify the system that the SMM variable driver is ready
+  Notify the system that the SMM variable driver is ready.
 **/
 VOID
 VariableNotifySmmReady (
@@ -106,7 +106,7 @@ VariableNotifySmmReady (
   );
 
 /**
-  Notify the system that the SMM variable write driver is ready
+  Notify the system that the SMM variable write driver is ready.
 **/
 VOID
 VariableNotifySmmWriteReady (
