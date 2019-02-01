@@ -36,8 +36,8 @@ extern CONST UINT32                   _gMmRevision;
   If _gMmRevision is not zero and MmSystemTable->Hdr.Revision is
   less than _gMmRevision, then return EFI_INCOMPATIBLE_VERSION.
 
-  @param  ImageHandle  The image handle of the Standalone MM Driver.
-  @param  SystemTable  A pointer to the EFI System Table.
+  @param  ImageHandle    The image handle of the Standalone MM Driver.
+  @param  MmSystemTable  A pointer to the MM System Table.
 
   @retval  EFI_SUCCESS               The Standalone MM Driver exited normally.
   @retval  EFI_INCOMPATIBLE_VERSION  _gMmRevision is greater than
@@ -68,8 +68,8 @@ _ModuleEntryPoint (
   constructors in the proper order based upon each of the library instances own
   dependencies.
 
-  @param  ImageHandle  The image handle of the Standalone MM Driver.
-  @param  SystemTable  A pointer to the MM System Table.
+  @param  ImageHandle    The image handle of the Standalone MM Driver.
+  @param  MmSystemTable  A pointer to the MM System Table.
 
 **/
 VOID
@@ -94,8 +94,8 @@ ProcessLibraryConstructorList (
   have destructors, and calling the library destructors in the proper order
   based upon each of the library instances own dependencies.
 
-  @param  ImageHandle  The image handle of the Standalone MM Driver.
-  @param  SystemTable  A pointer to the MM System Table.
+  @param  ImageHandle    The image handle of the Standalone MM Driver.
+  @param  MmSystemTable  A pointer to the MM System Table.
 
 **/
 VOID
@@ -115,8 +115,8 @@ ProcessLibraryDestructorList (
   responsible for collecting the module entry points and calling them in a
   specified order.
 
-  @param  ImageHandle  The image handle of the Standalone MM Driver.
-  @param  SystemTable  A pointer to the EFI System Table.
+  @param  ImageHandle    The image handle of the Standalone MM Driver.
+  @param  MmSystemTable  A pointer to the MM System Table.
 
   @retval  EFI_SUCCESS   The Standalone MM Driver executed normally.
   @retval  !EFI_SUCCESS  The Standalone MM Driver failed to execute normally.

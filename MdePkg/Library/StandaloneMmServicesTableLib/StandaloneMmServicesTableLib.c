@@ -22,8 +22,8 @@ EFI_MM_SYSTEM_TABLE   *gMmst             = NULL;
 /**
   The constructor function caches the pointer of the MM Services Table.
 
-  @param  ImageHandle   The firmware allocated handle for the EFI image.
-  @param  SystemTable   A pointer to the EFI System Table.
+  @param  ImageHandle     The firmware allocated handle for the EFI image.
+  @param  MmSystemTable   A pointer to the MM System Table.
 
   @retval EFI_SUCCESS   The constructor always returns EFI_SUCCESS.
 

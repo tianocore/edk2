@@ -34,8 +34,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   If _gMmRevision is not zero and SystemTable->Hdr.Revision is
   less than _gMmRevision, then return EFI_INCOMPATIBLE_VERSION.
 
-  @param  ImageHandle  The image handle of the Standalone MM Driver.
-  @param  SystemTable  A pointer to the EFI System Table.
+  @param  ImageHandle    The image handle of the Standalone MM Driver.
+  @param  MmSystemTable  A pointer to the MM System Table.
 
   @retval  EFI_SUCCESS               The Standalone MM Driver exited normally.
   @retval  EFI_INCOMPATIBLE_VERSION  _gMmRevision is greater than
