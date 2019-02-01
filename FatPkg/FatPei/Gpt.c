@@ -244,6 +244,9 @@ PartitionCheckGptEntryArray (
   UINTN                           Index2;
   EFI_PARTITION_ENTRY             *Entry;
 
+  PartitionEntryBuffer = NULL;
+  PartitionEntryStatus = NULL;
+
   ParentBlockDev  = &(PrivateData->BlockDevice[ParentBlockDevNo]);
   Found           = FALSE;
 
