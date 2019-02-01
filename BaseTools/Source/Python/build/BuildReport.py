@@ -1118,20 +1118,13 @@ class PcdReport(object):
                                     SkuList = sorted(Pcd.SkuInfoList.keys())
                                     for Sku in SkuList:
                                         SkuInfo = Pcd.SkuInfoList[Sku]
-                                        if TypeName in ('DYNHII', 'DEXHII'):
-                                            if SkuInfo.DefaultStoreDict:
-                                                DefaultStoreList = sorted(SkuInfo.DefaultStoreDict.keys())
-                                                for DefaultStore in DefaultStoreList:
-                                                    OverrideValues = Pcd.SkuOverrideValues[Sku]
-                                                    DscOverride = self.ParseStruct(OverrideValues[DefaultStore])
-                                                    if DscOverride:
-                                                        break
-                                        else:
-                                            OverrideValues = Pcd.SkuOverrideValues[Sku]
-                                            if OverrideValues:
-                                                Keys = list(OverrideValues.keys())
-                                                OverrideFieldStruct = self.OverrideFieldValue(Pcd, OverrideValues[Keys[0]])
-                                                DscOverride = self.ParseStruct(OverrideFieldStruct)
+                                        if SkuInfo.DefaultStoreDict:
+                                            DefaultStoreList = sorted(SkuInfo.DefaultStoreDict.keys())
+                                            for DefaultStore in DefaultStoreList:
+                                                OverrideValues = Pcd.SkuOverrideValues[Sku]
+                                                DscOverride = self.ParseStruct(OverrideValues[DefaultStore])
+                                                if DscOverride:
+                                                    break
                                         if DscOverride:
                                             break
                         if DscOverride:
