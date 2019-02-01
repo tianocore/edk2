@@ -916,8 +916,9 @@ UefiMain (
   EFI_GUID                      ImageTypeId;
   UINTN                         ImageIndex;
 
-  MapFsStr = NULL;
-  CapsuleNum = 0;
+  BlockDescriptors  = NULL;
+  MapFsStr          = NULL;
+  CapsuleNum        = 0;
 
   Status = GetArg();
   if (EFI_ERROR(Status)) {

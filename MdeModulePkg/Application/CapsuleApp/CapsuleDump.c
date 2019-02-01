@@ -795,11 +795,13 @@ DumpCapsuleFromDisk (
   UINTN                                         FileCount;
   BOOLEAN                                       NoFile;
 
-  DirHandle  = NULL;
-  FileHandle = NULL;
-  Index      = 0;
-  FileCount  = 0;
-  NoFile     = FALSE;
+  DirHandle       = NULL;
+  FileHandle      = NULL;
+  Index           = 0;
+  FileInfoBuffer  = NULL;
+  FileInfo        = NULL;
+  FileCount       = 0;
+  NoFile          = FALSE;
 
   Status = Fs->OpenVolume (Fs, &Root);
   if (EFI_ERROR (Status)) {
@@ -970,7 +972,10 @@ DumpProvisionedCapsule (
 
   ShellProtocol = GetShellProtocol ();
 
-  Index = 0;
+  Index             = 0;
+  CapsuleDataPtr64  = NULL;
+  BootNext          = NULL;
+  ShellProtocol     = NULL;
 
   //
   // Dump capsule provisioned on Memory
