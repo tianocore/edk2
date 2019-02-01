@@ -101,7 +101,7 @@ FfsFindSectionData (
 **/
 EFI_STATUS
 EFIAPI
-FfsFindByName (
+FfsFindFileByName (
   IN CONST  EFI_GUID            *FileName,
   IN CONST  EFI_PEI_FV_HANDLE   VolumeHandle,
   OUT       EFI_PEI_FILE_HANDLE *FileHandle
