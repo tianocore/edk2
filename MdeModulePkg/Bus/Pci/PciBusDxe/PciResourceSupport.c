@@ -1661,57 +1661,52 @@ ProgramUpstreamBridgeForRom (
   IN BOOLEAN         Enable
   )
 {
-  PCI_IO_DEVICE     *Parent;
-  PCI_RESOURCE_NODE Node;
-  UINT64            Base;
-  UINT64            Length;
+  PCI_IO_DEVICE       *Parent;
+  EFI_PCI_IO_PROTOCOL *PciIo;
+  UINT16              Base;
+  UINT16              Limit;
   //
   // For root bridge, just return.
   //
   Parent = PciDevice->Parent;
-  ZeroMem (&Node, sizeof (Node));
   while (Parent != NULL) {
     if (!IS_PCI_BRIDGE (&Parent->Pci)) {
       break;
     }
 
-    Node.PciDev     = Parent;
-    Node.Alignment  = 0;
-    Node.Bar        = PPB_MEM32_RANGE;
-    Node.ResType    = PciBarTypeMem32;
-    Node.Offset     = 0;
+    PciIo = &Parent->PciIo;
 
     //
     // Program PPB to only open a single <= 16MB aperture
     //
     if (Enable) {
       //
-      // Save the original PPB_MEM32_RANGE BAR.
-      // The values will be changed by ProgramPpbApperture().
-      //
-      Base   = Parent->PciBar[Node.Bar].BaseAddress;
-      Length = Parent->PciBar[Node.Bar].Length;
-
-      //
       // Only cover MMIO for Option ROM.
       //
-      Node.Length     = PciDevice->RomSize;
-      ProgramPpbApperture (OptionRomBase, &Node);
-
-      //
-      // Restore the original PPB_MEM32_RANGE BAR.
-      // So the MEM32 RANGE BAR register can be restored when disable the decoding.
-      //
-      Parent->PciBar[Node.Bar].BaseAddress = Base;
-      Parent->PciBar[Node.Bar].Length      = Length;
+      Base  = (UINT16) (OptionRomBase >> 16);
+      Limit = (UINT16) ((OptionRomBase + PciDevice->RomSize - 1) >> 16);
+      PciIo->Pci.Write (PciIo, EfiPciIoWidthUint16, OFFSET_OF (PCI_TYPE01, Bridge.MemoryBase),  1, &Base);
+      PciIo->Pci.Write (PciIo, EfiPciIoWidthUint16, OFFSET_OF (PCI_TYPE01, Bridge.MemoryLimit), 1, &Limit);
 
       PCI_ENABLE_COMMAND_REGISTER (Parent, EFI_PCI_COMMAND_MEMORY_SPACE);
     } else {
       //
       // Cover 32bit MMIO for devices below the bridge.
       //
-      Node.Length     = Parent->PciBar[Node.Bar].Length;
-      ProgramPpbApperture (Parent->PciBar[Node.Bar].BaseAddress, &Node);
+      if (Parent->PciBar[PPB_MEM32_RANGE].Length == 0) {
+        //
+        // When devices under the bridge contains Option ROM and doesn't require 32bit MMIO.
+        //
+        Base  = (UINT16) gAllOne;
+        Limit = (UINT16) gAllZero;
+      } else {
+        Base  = (UINT16) ((UINT32) Parent->PciBar[PPB_MEM32_RANGE].BaseAddress >> 16);
+        Limit = (UINT16) ((UINT32) (Parent->PciBar[PPB_MEM32_RANGE].BaseAddress
+                                    + Parent->PciBar[PPB_MEM32_RANGE].Length - 1) >> 16);
+      }
+      PciIo->Pci.Write (PciIo, EfiPciIoWidthUint16, OFFSET_OF (PCI_TYPE01, Bridge.MemoryBase),  1, &Base);
+      PciIo->Pci.Write (PciIo, EfiPciIoWidthUint16, OFFSET_OF (PCI_TYPE01, Bridge.MemoryLimit), 1, &Limit);
+
       PCI_DISABLE_COMMAND_REGISTER (Parent, EFI_PCI_COMMAND_MEMORY_SPACE);
     }
 
