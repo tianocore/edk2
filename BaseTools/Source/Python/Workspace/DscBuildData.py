@@ -1519,9 +1519,9 @@ class DscBuildData(PlatformBuildClassObject):
                         else:
                             str_pcd_obj_str.DefaultFromDSC = {skuname:{defaultstore: str_pcd_obj.SkuInfoList[skuname].DefaultStoreDict.get(defaultstore, str_pcd_obj.SkuInfoList[skuname].DefaultValue) for defaultstore in DefaultStores} for skuname in str_pcd_obj.SkuInfoList}
                     S_pcd_set[Pcd] = str_pcd_obj_str
-        self.FilterStrcturePcd(S_pcd_set)
         if S_pcd_set:
-            GlobalData.gStructurePcd[self.Arch] = S_pcd_set
+            GlobalData.gStructurePcd[self.Arch] = S_pcd_set.copy()
+        self.FilterStrcturePcd(S_pcd_set)
         for stru_pcd in S_pcd_set.values():
             for skuid in SkuIds:
                 if skuid in stru_pcd.SkuOverrideValues:
