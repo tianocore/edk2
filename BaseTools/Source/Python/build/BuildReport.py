@@ -1652,14 +1652,14 @@ class PredictionReport(object):
         GuidList = os.path.join(self._EotDir, "GuidList.txt")
         DispatchList = os.path.join(self._EotDir, "Dispatch.txt")
 
-        TempFile = open(SourceList, "w+")
+        TempFile = []
         for Item in self._SourceList:
             FileWrite(TempFile, Item)
-        TempFile.close()
-        TempFile = open(GuidList, "w+")
+        SaveFileOnChange(SourceList, "".join(TempFile), False)
+        TempFile = []
         for Key in self._GuidMap:
             FileWrite(TempFile, "%s %s" % (Key, self._GuidMap[Key]))
-        TempFile.close()
+        SaveFileOnChange(GuidList, "".join(TempFile), False)
 
         try:
             from Eot.EotMain import Eot

@@ -21,7 +21,8 @@ import Eot.EotGlobalData as EotGlobalData
 from optparse import OptionParser
 from Common.StringUtils import NormPath
 from Common import BuildToolError
-from Common.Misc import GuidStructureStringToGuidString, sdict
+from Common.Misc import GuidStructureStringToGuidString
+from collections import OrderedDict as sdict
 from Eot.Parser import *
 from Eot.InfParserLite import EdkInfParser
 from Common.StringUtils import GetSplitValueList
