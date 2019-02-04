@@ -1,7 +1,7 @@
 /** @file
   HII Config Access protocol implementation of TCG configuration module.
 
-Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2019, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -176,7 +176,7 @@ TcgExtractConfig (
   //
   // Convert buffer data to <ConfigResp> by helper function BlockToConfig()
   //
-  PrivateData->Configuration->TpmOperation = PHYSICAL_PRESENCE_ENABLE;
+  PrivateData->Configuration->TpmOperation = PHYSICAL_PRESENCE_NO_ACTION;
 
   //
   // Get current TPM state.
