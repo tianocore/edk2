@@ -780,7 +780,7 @@ class PcdReport(object):
             # Collect the PCD defined in DSC/FDF file, but not used in module
             #
             UnusedPcdFullList = []
-            StructPcdDict = GlobalData.gStructurePcd[self.Arch]
+            StructPcdDict = GlobalData.gStructurePcd.get(self.Arch, collections.OrderedDict())
             for Name, Guid in StructPcdDict:
                 if (Name, Guid) not in Pa.Platform.Pcds:
                     Pcd = StructPcdDict[(Name, Guid)]
