@@ -100,9 +100,6 @@
   # Size of the region used by UEFI in permanent memory (Reserved 64MB)
   gArmPlatformTokenSpaceGuid.PcdSystemMemoryUefiRegionSize|0x04000000
 
-  ## Trustzone enable (to make the transition from EL3 to EL2 in ArmPlatformPkg/Sec)
-  gArmTokenSpaceGuid.PcdTrustzoneSupport|FALSE
-
   #
   # ARM PrimeCell
   #
