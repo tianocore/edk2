@@ -272,8 +272,6 @@
 
   gEmbeddedTokenSpaceGuid.PcdPrePiProduceMemoryTypeInformationHob|TRUE
 
-  gEfiMdeModulePkgTokenSpaceGuid.PcdTurnOffUsbLegacySupport|TRUE
-
 [PcdsFeatureFlag.AARCH64]
   #
   # Activate AcpiSdtProtocol
