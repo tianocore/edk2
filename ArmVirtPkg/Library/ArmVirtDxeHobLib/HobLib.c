@@ -1,5 +1,5 @@
 /** @file
-  HOB Library implemenation for Dxe Phase with DebugLib dependency removed
+  HOB Library implementation for Dxe Phase with DebugLib dependency removed
 
 Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2014, Linaro Ltd. All rights reserved.<BR>
