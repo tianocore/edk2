@@ -1,5 +1,5 @@
 ## @file
-# Standardized Error Hanlding infrastructures.
+# Standardized Error Handling infrastructures.
 #
 # Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #

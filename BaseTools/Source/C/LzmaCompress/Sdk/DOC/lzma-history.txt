@@ -142,7 +142,7 @@ HISTORY of the LZMA SDK
 9.35 beta      2014-12-07
 -------------------------	
 - 7zr.exe now support AES encryption.
-- SFX mudules were added to LZMA SDK
+- SFX modules were added to LZMA SDK
 - Some bugs were fixed.
 
 

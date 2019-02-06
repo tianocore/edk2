@@ -22,7 +22,7 @@
     If the context guard g is not a subset of the lookahead context for r1
     (in other words g is neither A nor B) then the code may execute r1 
     even when the lookahead context is not satisfied.  This is an error
-    by the person coding the grammer, and the error should be reported to
+    by the person coding the grammar, and the error should be reported to
     the user, but it isn't. expect.  Some examples I've run seem to
     indicate that such an error actually results in the rule becoming
     unreachable.
@@ -184,7 +184,7 @@
 
     THM:  In MR20 have fixed the most common cases.
 
-    The following token defintion will cause DLG to crash.
+    The following token definition will cause DLG to crash.
 
         #token "()"
 

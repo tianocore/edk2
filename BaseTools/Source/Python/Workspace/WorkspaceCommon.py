@@ -247,7 +247,7 @@ def GetModuleLibInstances(Module, Platform, BuildDatabase, Arch, Target, Toolcha
             SortedLibraryList.append(Item)
 
     #
-    # Build the list of constructor and destructir names
+    # Build the list of constructor and destructor names
     # The DAG Topo sort produces the destructor order, so the list of constructors must generated in the reverse order
     #
     SortedLibraryList.reverse()

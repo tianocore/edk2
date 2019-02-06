@@ -155,10 +155,10 @@ def GenModuleHeaderUserExt(DefineObj, ArchString):
 ## Generate the define statement that will be put into userextension
 #  Not support comments.
 #
-# @param HeaderComment: the original header comment (# not remvoed)
+# @param HeaderComment: the original header comment (# not removed)
 # @param Name: the definition keyword, should not be empty or none
 # @param Value: the definition keyword value
-# @param TailComment: the original Tail comment (# not remvoed)
+# @param TailComment: the original Tail comment (# not removed)
 #
 # @return: the regenerated define statement
 #

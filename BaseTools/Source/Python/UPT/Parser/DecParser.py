@@ -705,7 +705,7 @@ class _DecGuid(_DecBase):
 
 ## _DecUserExtension
 #
-# Parse user extention section
+# Parse user extension section
 #
 class _DecUserExtension(_DecBase):
     def __init__(self, RawData):
@@ -1033,7 +1033,7 @@ class Dec(_DecBase, _DecComments):
                 SectionNames.append(SectionName)
             #
             # In DEC specification, all section headers have at most two part:
-            # SectionName.Arch except UserExtention
+            # SectionName.Arch except UserExtension
             #
             if len(ItemList) > 2:
                 self._LoggerError(ST.ERR_DECPARSE_SECTION_SUBTOOMANY % Item)

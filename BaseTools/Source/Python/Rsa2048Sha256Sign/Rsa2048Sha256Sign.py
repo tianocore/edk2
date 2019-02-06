@@ -42,7 +42,7 @@ __usage__     = '%s -e|-d [options] <input_file>' % (__prog__)
 EFI_HASH_ALGORITHM_SHA256_GUID = uuid.UUID('{51aa59de-fdf2-4ea3-bc63-875fb7842ee9}')
 
 #
-# Structure defintion to unpack EFI_CERT_BLOCK_RSA_2048_SHA256 from UEFI 2.4 Specification
+# Structure definition to unpack EFI_CERT_BLOCK_RSA_2048_SHA256 from UEFI 2.4 Specification
 #
 #   typedef struct _EFI_CERT_BLOCK_RSA_2048_SHA256 {
 #     EFI_GUID HashType;

@@ -328,7 +328,7 @@ Returns:
       if (strlen(argv[0]) > 2) {
         Status = CountVerboseLevel (&argv[0][2], strlen(argv[0]) - 2, &VerboseLevel);
         if (EFI_ERROR (Status)) {
-          Error (NULL, 0, 0x1003, NULL, "%s is invaild parameter!", argv[0]);
+          Error (NULL, 0, 0x1003, NULL, "%s is invalid parameter!", argv[0]);
           return STATUS_ERROR;
         }
       }
@@ -351,7 +351,7 @@ Returns:
     //
     // Don't recognize the parameter.
     //
-    Error (NULL, 0, 0x1003, NULL, "%s is invaild parameter!", argv[0]);
+    Error (NULL, 0, 0x1003, NULL, "%s is invalid parameter!", argv[0]);
     return STATUS_ERROR;
   }
 

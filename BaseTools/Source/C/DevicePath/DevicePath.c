@@ -178,7 +178,7 @@ int main(int argc, CHAR8 *argv[])
   }
   Str16 = (CHAR16 *)malloc(1024);
   if (Str16 == NULL) {
-    fprintf(stderr, "Resource, memory cannot be allcoated");
+    fprintf(stderr, "Resource, memory cannot be allocated");
     return STATUS_ERROR;
   }
   Ascii2UnicodeString(Str, Str16);

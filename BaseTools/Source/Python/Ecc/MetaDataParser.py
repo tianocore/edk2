@@ -18,7 +18,7 @@ from Ecc.EccToolError import *
 from Common.MultipleWorkspace import MultipleWorkspace as mws
 from Ecc import EccGlobalData
 import re
-## Get the inlcude path list for a source file
+## Get the include path list for a source file
 #
 # 1. Find the source file belongs to which inf file
 # 2. Find the inf's package

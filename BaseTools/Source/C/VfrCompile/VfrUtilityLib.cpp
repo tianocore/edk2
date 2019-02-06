@@ -1177,7 +1177,7 @@ CVfrVarDataTypeDB::DataTypeAddBitField (
     }
   } else {
     //
-    // Check whether the bit fileds can be contained within one FieldType.
+    // Check whether the bit fields can be contained within one FieldType.
     //
     if (pTmp != NULL && pTmp->mIsBitField && strcmp (pTmp->mFieldType->mTypeName, pNewField->mFieldType->mTypeName) == 0 &&
        (pTmp->mBitOffset - pTmp->mOffset * 8) + pTmp->mBitWidth + pNewField->mBitWidth <= pNewField->mFieldType->mTotalSize * 8) {
@@ -2058,7 +2058,7 @@ CVfrDataStorage::GetVarStoreId (
   *VarStoreId         = EFI_VARSTORE_ID_INVALID;
 
   //
-  // Assume that Data strucutre name is used as StoreName, and check again.
+  // Assume that Data structure name is used as StoreName, and check again.
   //
   ReturnCode = GetVarStoreByDataType (StoreName, &pNode, StoreGuid);
   if (pNode != NULL) {
@@ -2843,7 +2843,7 @@ CVfrQuestionDB::PrintAllQuestion (
   SVfrQuestionNode *pNode = NULL;
 
   for (pNode = mQuestionList; pNode != NULL; pNode = pNode->mNext) {
-    printf ("Question VarId is %s and QuesitonId is 0x%x\n", pNode->mVarIdStr, pNode->mQuestionId);
+    printf ("Question VarId is %s and QuestionId is 0x%x\n", pNode->mVarIdStr, pNode->mQuestionId);
   }
 }
 

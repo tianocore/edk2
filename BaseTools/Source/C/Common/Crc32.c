@@ -1,5 +1,5 @@
 /** @file
-CalcuateCrc32 routine.
+CalculateCrc32 routine.
 
 Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
@@ -288,7 +288,7 @@ Routine Description:
 
 Arguments:
 
-  Data        - The buffer contaning the data to be processed
+  Data        - The buffer containing the data to be processed
   DataSize    - The size of data to be processed
   CrcOut      - A pointer to the caller allocated UINT32 that on
                 contains the CRC32 checksum of Data

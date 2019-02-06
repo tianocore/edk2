@@ -18,7 +18,7 @@
 #
 # armcc_wrapper.py ToolToExec [command line to convert]
 #
-# anthing with the / will be converted via cygpath cygwin call or manually.
+# anything with the / will be converted via cygpath cygwin call or manually.
 # -I/cygpath/c/example is a special case as you can not pass -I to cygpath
 #
 # ExceptionList if a tool takes an argument with a / add it to the exception list

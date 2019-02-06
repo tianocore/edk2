@@ -959,7 +959,7 @@ def MacroParser(Line, FileName, SectionType, FileLocalMacros):
 #                       INF, DEC specs
 # @param  SectionDict:  section statement dict, key is SectionAttrs(arch,
 #                       moduletype or platform may exist as needed) list
-#                       seperated by space,
+#                       separated by space,
 #                       value is statement
 #
 def GenSection(SectionName, SectionDict, SplitArch=True, NeedBlankLine=False):

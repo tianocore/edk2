@@ -61,9 +61,9 @@ class MacroParserTestCase(unittest.TestCase):
         self.dec = _DecBase(FileContent('dummy', []))
 
     def testCorrectMacro(self):
-        self.dec._MacroParser('DEFINE MARCRO1 = test1')
-        self.failIf('MARCRO1' not in self.dec._LocalMacro)
-        self.assertEqual(self.dec._LocalMacro['MARCRO1'], 'test1')
+        self.dec._MacroParser('DEFINE MACRO1 = test1')
+        self.failIf('MACRO1' not in self.dec._LocalMacro)
+        self.assertEqual(self.dec._LocalMacro['MACRO1'], 'test1')
 
     def testErrorMacro1(self):
         # Raise fatal error, macro name must be upper case letter

@@ -194,7 +194,7 @@ MODEL_LIST = [('MODEL_UNKNOWN', MODEL_UNKNOWN),
 # @param Header:           Header of a Function
 # @param Modifier:         Modifier of a Function
 # @param Name:             Name of a Function
-# @param ReturnStatement:  ReturnStatement of a Funciont
+# @param ReturnStatement:  ReturnStatement of a Function
 # @param StartLine:        StartLine of a Function
 # @param StartColumn:      StartColumn of a Function
 # @param EndLine:          EndLine of a Function
@@ -209,7 +209,7 @@ MODEL_LIST = [('MODEL_UNKNOWN', MODEL_UNKNOWN),
 # @var Header:             Header of a Function
 # @var Modifier:           Modifier of a Function
 # @var Name:               Name of a Function
-# @var ReturnStatement:    ReturnStatement of a Funciont
+# @var ReturnStatement:    ReturnStatement of a Function
 # @var StartLine:          StartLine of a Function
 # @var StartColumn:        StartColumn of a Function
 # @var EndLine:            EndLine of a Function

@@ -1590,7 +1590,7 @@ int *lastAltEmpty; /* MR23 */
 		   with input "C"
 
    Before MR21 the error message would be "expecting B - found C".  After MR21
-   the error message would be "expcect A, B - found C".  This was good, but it
+   the error message would be "expect A, B - found C".  This was good, but it
    caused problems for those using parser exceptions because the reference to
    B was generated inside the {...} where B really wasn't part of the block.
 
@@ -1781,7 +1781,7 @@ Junction *q;
 		followed by a loopBlock whereas the start of a (...)+ block is
 		represented as a single node: a plusBlock.  So if first_item_is_guess_block
 		is called when the current node is a loopBegin it starts with the
-		loop block rather than the the sub block which follows the loop block.
+		loop block rather than the sub block which follows the loop block.
 		However, we can't just skip past the loop block because some routines
 		depend on the old implementation.  So, we provide a new implementation
 		which does skip the loopBlock.  However, which should be called when ?
@@ -3496,7 +3496,7 @@ do {    /* MR10     Change recursion into iteration         */
 			/* MR23
 			   If there were only one return value operand and
 			   it had an initializer then it would have been
-			   initiailized in the declaration.
+			   initialized in the declaration.
 			*/
 
 			returnValueInitializer = getInitializer(q->ret);         /* MR23 */
@@ -3740,7 +3740,7 @@ RuleEntry *r;
         /* NOTICE: this is done only here, for the method definition, but  */
         /*         not for the method declaration inside the class         */
         /*         definition. This is exactly the behaviour defined in    */
-        /*         C++ standard for default paramters.                     */
+        /*         C++ standard for default parameters.                    */
 
 	DumpANSIFunctionArgDef(output,q, 0 /* emit initializers ? */);
 	_gen("\n");
@@ -4726,7 +4726,7 @@ int bInitializer;
 		blocks to look like (...|...| epsilon) since there were
 		intervening generics.  This fixes the problem for this
 		particular case.  Things like actions or empty blocks of
-		various kinds will still cause problems, but I wasnt't
+		various kinds will still cause problems, but I wasn't
 		prepared to handle pathological cases like (A|()*). It
 		does handle (A | ()), which is a recommended idiom for
 		epsilon.

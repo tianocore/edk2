@@ -168,7 +168,7 @@ def TrimPreprocessedFile(Source, Target, ConvertHex, TrimLong):
                 InjectedFile = MatchList[1]
                 InjectedFile = os.path.normpath(InjectedFile)
                 InjectedFile = os.path.normcase(InjectedFile)
-                # The first injetcted file must be the preprocessed file itself
+                # The first injected file must be the preprocessed file itself
                 if PreprocessedFile == "":
                     PreprocessedFile = InjectedFile
             LineControlDirectiveFound = True

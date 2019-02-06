@@ -25,7 +25,7 @@
 #define __EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL_H__
 
 //
-// Forward reference for pure ANSI compatability
+// Forward reference for pure ANSI compatibility
 
 typedef struct _EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL;
 

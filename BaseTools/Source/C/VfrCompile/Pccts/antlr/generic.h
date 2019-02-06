@@ -215,7 +215,7 @@ typedef Graph Attrib;
 
 						/* M a x i m u m s */
 
-/* MR20 Note G. Hobbelt These values are superceded by values in hash.h */
+/* MR20 Note G. Hobbelt These values are superseded by values in hash.h */
 
 #ifndef HashTableSize
 #define HashTableSize	253

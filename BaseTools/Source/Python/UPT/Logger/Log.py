@@ -190,7 +190,7 @@ def Warn(ToolName, Message, File=None, Line=None, ExtraData=None):
 
     _INFO_LOGGER.log(WARN, LogText)
     #
-    # Raise an execption if indicated
+    # Raise an exception if indicated
     #
     if GlobalData.gWARNING_AS_ERROR == True:
         raise FatalError(WARNING_AS_ERROR)
@@ -198,7 +198,7 @@ def Warn(ToolName, Message, File=None, Line=None, ExtraData=None):
 ## Log ERROR message
 #
 # Once an error messages is logged, the tool's execution will be broken by
-# raising an execption. If you don't want to break the execution later, you
+# raising an exception. If you don't want to break the execution later, you
 # can give "RaiseError" with "False" value.
 #
 #   @param  ToolName    The name of the tool. If not given, the name of caller
@@ -208,7 +208,7 @@ def Warn(ToolName, Message, File=None, Line=None, ExtraData=None):
 #   @param  File        The name of file which caused the error.
 #   @param  Line        The line number in the "File" which caused the warning.
 #   @param  ExtraData   More information associated with "Message"
-#   @param  RaiseError  Raise an exception to break the tool's executuion if
+#   @param  RaiseError  Raise an exception to break the tool's execution if
 #                       it's True. This is the default behavior.
 #
 def Error(ToolName, ErrorCode, Message=None, File=None, Line=None, \

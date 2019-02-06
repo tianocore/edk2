@@ -390,10 +390,10 @@ class CodeFragmentCollector:
         print('################# ' + self.FileName + '#####################')
 
         print('/****************************************/')
-        print('/*************** ASSIGNMENTS ***************/')
+        print('/************** ASSIGNMENTS *************/')
         print('/****************************************/')
-        for asign in FileProfile.AssignmentExpressionList:
-            print(str(asign.StartPos) + asign.Name + asign.Operator + asign.Value)
+        for assign in FileProfile.AssignmentExpressionList:
+            print(str(assign.StartPos) + assign.Name + assign.Operator + assign.Value)
 
         print('/****************************************/')
         print('/********* PREPROCESS DIRECTIVES ********/')

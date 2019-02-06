@@ -148,7 +148,7 @@ typedef struct {
   EFI_GUID                          FormatType;
 
   //
-  // An arry of bytes of length Length.
+  // An array of bytes of length Length.
   //
   // UINT8                             Data[1];
   //

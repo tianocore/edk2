@@ -290,7 +290,7 @@ class RangeExpression(BaseExpression):
         return rangeid
 
 
-    def NegtiveRange(self, Oprand1):
+    def NegativeRange(self, Oprand1):
         rangeContainer1 = self.operanddict[Oprand1]
 
 
@@ -332,7 +332,7 @@ class RangeExpression(BaseExpression):
         if Operator in ["!", "NOT", "not"]:
             if not gGuidPattern.match(Oprand1.strip()):
                 raise BadExpression(ERR_STRING_EXPR % Operator)
-            return self.NegtiveRange(Oprand1)
+            return self.NegativeRange(Oprand1)
         else:
             if Operator in ["==", ">=", "<=", ">", "<", '^']:
                 return self.EvalRange(Operator, Oprand1)

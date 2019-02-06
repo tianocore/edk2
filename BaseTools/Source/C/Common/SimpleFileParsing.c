@@ -356,7 +356,7 @@ Returns:
   FALSE - otherwise
 
 Notes:
-  Preceeding white space is ignored.
+  Preceding white space is ignored.
   The parser's buffer pointer is advanced past the end of the
   token.
 
@@ -636,7 +636,7 @@ Returns:
   // Make sure we didn't exceed our maximum nesting depth
   //
   if (NestDepth > MAX_NEST_DEPTH) {
-    Error (NULL, 0, 3001, "Not Supported", "%s exceeeds max nesting depth (%u)", SourceFile->FileName, (unsigned) NestDepth);
+    Error (NULL, 0, 3001, "Not Supported", "%s exceeds max nesting depth (%u)", SourceFile->FileName, (unsigned) NestDepth);
     Status = STATUS_ERROR;
     goto Finish;
   }

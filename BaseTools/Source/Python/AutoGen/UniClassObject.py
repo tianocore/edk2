@@ -99,12 +99,12 @@ LangConvTable = {'eng':'en', 'fra':'fr', \
 ## GetLanguageCode
 #
 # Check the language code read from .UNI file and convert ISO 639-2 codes to RFC 4646 codes if appropriate
-# ISO 639-2 language codes supported in compatiblity mode
+# ISO 639-2 language codes supported in compatibility mode
 # RFC 4646 language codes supported in native mode
 #
 # @param LangName:   Language codes read from .UNI file
 #
-# @retval LangName:  Valid lanugage code in RFC 4646 format or None
+# @retval LangName:  Valid language code in RFC 4646 format or None
 #
 def GetLanguageCode(LangName, IsCompatibleMode, File):
     length = len(LangName)

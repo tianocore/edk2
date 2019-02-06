@@ -70,7 +70,7 @@ Routine Description:
 
 Arguments:
 
-  Strin          The string to 'strip'
+  String          The string to 'strip'
 
 Returns:
 

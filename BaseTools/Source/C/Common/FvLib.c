@@ -318,7 +318,7 @@ Routine Description:
 Arguments:
 
   FileType    Type of file to search for.
-  Instance    Instace of the file type to return.
+  Instance    Instance of the file type to return.
   File        Return pointer.  In the case of an error, contents are undefined.
 
 Returns:
@@ -505,7 +505,7 @@ Arguments:
 
   File        The file to search.
   SectionType Type of file to search for.
-  Instance    Instace of the section to return.
+  Instance    Instance of the section to return.
   Section     Return pointer.  In the case of an error, contents are undefined.
 
 Returns:

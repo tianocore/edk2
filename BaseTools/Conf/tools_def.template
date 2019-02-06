@@ -138,7 +138,7 @@ DEFINE ICC_BIN64x86     = C:\Program Files (x86)\Intel\Compiler\C++\DEF(ICC_VERS
 
 
 # Note: The Intel C++ Compiler 11.1 uses different installation path from previous versions
-#       We use "ICC11" tag for ICC 11.1 while "ICC" tag is dedicated for eariler versions
+#       We use "ICC11" tag for ICC 11.1 while "ICC" tag is dedicated for earlier versions
 #
 DEFINE ICC11_VERSION      = 11.1
 DEFINE ICC11_BUILD        = 072
@@ -6507,7 +6507,7 @@ RELEASE_RVCTCYGWIN_ARM_CC_FLAGS  = "$(CCPATH_FLAG)" $(ARCHCC_FLAGS) $(PLATFORM_F
 *_RVCTCYGWIN_ARM_FROMELF_PATH    = ENV(WORKSPACE)/BaseTools/Bin/CYGWIN_NT-5.1-i686/armcc_wrapper.py
 
 #################
-# ASM 16 linker defintions
+# ASM 16 linker definitions
 #################
 *_*_*_ASMLINK_PATH                 = DEF(WINDDK_BIN16)\link16.exe
 *_*_*_ASMLINK_FLAGS                = /nologo /tiny
@@ -6547,11 +6547,11 @@ RELEASE_RVCTCYGWIN_ARM_CC_FLAGS  = "$(CCPATH_FLAG)" $(ARCHCC_FLAGS) $(PLATFORM_F
 ##################
 # Rsa2048Sha256Sign tool definitions
 #
-# Notes: This tool defintion uses a test signing key for development purposes only.
+# Notes: This tool definition uses a test signing key for development purposes only.
 #        The tool Rsa2048Sha256GenerateKeys can be used to generate a new private/public key
 #        and the gEfiSecurityPkgTokenSpaceGuid.PcdRsa2048Sha256PublicKeyBuffer PCD value.
 #        A custom tool/script can be implemented using the new private/public key with
-#        the Rsa2048Sha256Sign tool and this tool defintiion can be updated to use a
+#        the Rsa2048Sha256Sign tool and this tool definition can be updated to use a
 #        custom tool/script.
 #
 #   Generate new private/public key and gEfiSecurityPkgTokenSpaceGuid.PcdRsa2048Sha256PublicKeyBuffer PCD value

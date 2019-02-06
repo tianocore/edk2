@@ -739,7 +739,7 @@ set *rk_out;
 		t = tlink(t, u, k2);	/* any alts missing k2 toks, add u onto end */
         Tfree(u);               /* MR10 */
 	}
-	set_free(rk);				/* rk is empty, but free it's memory */
+	set_free(rk);				/* rk is empty, but free its memory */
 	set_orin(rk_out, rk2);		/* remember what we couldn't do */
 	set_free(rk2);
 	return t;

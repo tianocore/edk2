@@ -92,7 +92,7 @@ gConsumedProtocolLibrary['EfiLocateProtocolHandleBuffers'] = 0
 gConsumedProtocolLibrary['EfiLocateProtocolInterface'] = 0
 gConsumedProtocolLibrary['EfiHandleProtocol'] = 1
 
-# Dict for callback PROTOCOL function callling
+# Dict for callback PROTOCOL function calling
 gCallbackProtocolLibrary = OrderedDict()
 gCallbackProtocolLibrary['EfiRegisterProtocolCallback'] = 2
 

@@ -1,5 +1,5 @@
 ## @file
-# Standardized Error Hanlding infrastructures.
+# Standardized Error Handling infrastructures.
 #
 # Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
@@ -152,7 +152,7 @@ gEccErrorMessage = {
     ERROR_INCLUDE_FILE_CHECK_IFNDEF_STATEMENT_2 : "The #ifndef must be the first line of code following the file header comment",
     ERROR_INCLUDE_FILE_CHECK_IFNDEF_STATEMENT_3 : "The #endif must appear on the last line in the file",
     ERROR_INCLUDE_FILE_CHECK_DATA : "Include files should contain only public or only private data and cannot contain code or define data variables",
-    ERROR_INCLUDE_FILE_CHECK_NAME : "No permission for the inlcude file with same names",
+    ERROR_INCLUDE_FILE_CHECK_NAME : "No permission for the include file with same names",
 
     ERROR_DECLARATION_DATA_TYPE_CHECK_ALL : "",
     ERROR_DECLARATION_DATA_TYPE_CHECK_NO_USE_C_TYPE : "There should be no use of int, unsigned, char, void, static, long in any .c, .h or .asl files",

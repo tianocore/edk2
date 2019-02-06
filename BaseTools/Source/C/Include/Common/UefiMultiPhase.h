@@ -201,7 +201,7 @@ typedef struct _WIN_CERTIFICATE_EFI_PKCS1_15 {
   EFI_CERT_TYPE_RSA2048_SHA256. If the attribute specifies
   authenticated access, then the Data buffer should begin with an
   authentication descriptor prior to the data payload and DataSize
-  should reflect the the data.and descriptor size. The caller
+  should reflect the data.and descriptor size. The caller
   shall digest the Monotonic Count value and the associated data
   for the variable update using the SHA-256 1-way hash algorithm.
   The ensuing the 32-byte digest will be signed using the private

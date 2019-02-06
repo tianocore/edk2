@@ -1,6 +1,6 @@
 /** @file
 
-  VfrCompiler internal defintions.
+  VfrCompiler internal definitions.
 
 Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials

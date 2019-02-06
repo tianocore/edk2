@@ -130,12 +130,12 @@ def ConvertSpecialUnicodes(Uni):
 ## GetLanguageCode1766
 #
 # Check the language code read from .UNI file and convert RFC 4646 codes to RFC 1766 codes
-# RFC 1766 language codes supported in compatiblity mode
+# RFC 1766 language codes supported in compatibility mode
 # RFC 4646 language codes supported in native mode
 #
 # @param LangName:   Language codes read from .UNI file
 #
-# @retval LangName:  Valid lanugage code in RFC 1766 format or None
+# @retval LangName:  Valid language code in RFC 1766 format or None
 #
 def GetLanguageCode1766(LangName, File=None):
     return LangName
@@ -177,7 +177,7 @@ def GetLanguageCode1766(LangName, File=None):
 ## GetLanguageCode
 #
 # Check the language code read from .UNI file and convert RFC 1766 codes to RFC 4646 codes if appropriate
-# RFC 1766 language codes supported in compatiblity mode
+# RFC 1766 language codes supported in compatibility mode
 # RFC 4646 language codes supported in native mode
 #
 # @param LangName:   Language codes read from .UNI file
@@ -221,13 +221,13 @@ def GetLanguageCode(LangName, IsCompatibleMode, File):
 
 ## FormatUniEntry
 #
-# Formated the entry in Uni file.
+# Formatted the entry in Uni file.
 #
 # @param StrTokenName    StrTokenName.
 # @param TokenValueList  A list need to be processed.
 # @param ContainerFile   ContainerFile.
 #
-# @return formated entry
+# @return formatted entry
 def FormatUniEntry(StrTokenName, TokenValueList, ContainerFile):
     SubContent = ''
     PreFormatLength = 40
@@ -478,8 +478,8 @@ class UniFileClassObject(object):
         MultiLineFeedExits = False
         #
         # 0: initial value
-        # 1: signle String entry exist
-        # 2: line feed exist under the some signle String entry
+        # 1: single String entry exist
+        # 2: line feed exist under the some single String entry
         #
         StringEntryExistsFlag = 0
         for Line in FileIn:
@@ -497,7 +497,7 @@ class UniFileClassObject(object):
                     StringEntryExistsFlag = 2
                 #
                 # If the '#string' line and the '#language' line are not in the same line,
-                # there should be only one line feed character betwwen them
+                # there should be only one line feed character between them
                 #
                 if MultiLineFeedExits:
                     EdkLogger.Error("Unicode File Parser", ToolError.FORMAT_INVALID, ExtraData=File.Path)
@@ -505,7 +505,7 @@ class UniFileClassObject(object):
 
             MultiLineFeedExits = False
             #
-            # Process comment embeded in string define lines
+            # Process comment embedded in string define lines
             #
             FindFlag = Line.find(u'//')
             if FindFlag != -1 and Line.find(u'//') < Line.find(u'"'):
@@ -771,7 +771,7 @@ class UniFileClassObject(object):
 
         #
         # Check Abstract, Description, BinaryAbstract and BinaryDescription order,
-        # should be Abstract, Description, BinaryAbstract, BinaryDesctiption
+        # should be Abstract, Description, BinaryAbstract, BinaryDescription
         AbstractPosition = -1
         DescriptionPosition = -1
         BinaryAbstractPosition = -1

@@ -959,7 +959,7 @@ cleanlib:
                     NewFile = self.PlaceMacro(str(F), self.Macros)
                     # In order to use file list macro as dependency
                     if T.GenListFile:
-                        # gnu tools need forward slash path separater, even on Windows
+                        # gnu tools need forward slash path separator, even on Windows
                         self.ListFileMacros[T.ListFileMacro].append(str(F).replace ('\\', '/'))
                         self.FileListMacros[T.FileListMacro].append(NewFile)
                     elif T.GenFileListMacro:
@@ -1003,7 +1003,7 @@ cleanlib:
     ## Find dependencies for one source file
     #
     #  By searching recursively "#include" directive in file, find out all the
-    #  files needed by given source file. The dependecies will be only searched
+    #  files needed by given source file. The dependencies will be only searched
     #  in given search path list.
     #
     #   @param      File            The source file

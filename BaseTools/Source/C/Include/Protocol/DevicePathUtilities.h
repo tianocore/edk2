@@ -125,7 +125,7 @@ EFI_DEVICE_PATH_PROTOCOL*
                                  If NULL, then the instance size is not output.
 
   @retval Pointer                A pointer to the copy of the current device path instance.
-  @retval NULL                   DevicePathInstace was NULL on entry or there was insufficient memory.
+  @retval NULL                   DevicePathInstance was NULL on entry or there was insufficient memory.
 
 **/
 typedef

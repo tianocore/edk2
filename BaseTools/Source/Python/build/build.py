@@ -488,7 +488,7 @@ class BuildTask:
                 time.sleep(0.1)
         except BaseException as X:
             #
-            # TRICK: hide the output of threads left runing, so that the user can
+            # TRICK: hide the output of threads left running, so that the user can
             #        catch the error message easily
             #
             EdkLogger.SetLevel(EdkLogger.ERROR)
@@ -613,7 +613,7 @@ class BuildTask:
             self.CompleteFlag = True
         except:
             #
-            # TRICK: hide the output of threads left runing, so that the user can
+            # TRICK: hide the output of threads left running, so that the user can
             #        catch the error message easily
             #
             if not BuildTask._ErrorFlag.isSet():
@@ -1380,7 +1380,7 @@ class Build():
                 LaunchCommand(["GenFw", "--address", str(BaseAddress), "-r", ModuleOutputImage], ModuleInfo.OutputDir)
                 LaunchCommand(["GenFw", "--address", str(BaseAddress), "-r", ModuleDebugImage], ModuleInfo.DebugDir)
             #
-            # Collect funtion address from Map file
+            # Collect function address from Map file
             #
             ImageMapTable = ModuleOutputImage.replace('.efi', '.map')
             FunctionList = []
@@ -1433,7 +1433,7 @@ class Build():
             #
             MapBuffer.append('(IMAGE=%s)\n\n' % (ModuleDebugImage))
             #
-            # Add funtion address
+            # Add function address
             #
             for Function in FunctionList:
                 if AddrIsOffset:

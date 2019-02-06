@@ -413,7 +413,7 @@ class DecPomAlignment(PackageObject):
 
         #
         # get a non-overlap set of include path, IncludePathList should be
-        # sorted, and path should be end with path seperator '\'
+        # sorted, and path should be end with path separator '\'
         #
         NonOverLapList = []
         for Path1 in IncludePathList:
@@ -424,7 +424,7 @@ class DecPomAlignment(PackageObject):
                 NonOverLapList.append(Path1)
         #
         # revert the list so the longest path shown first in list, also need
-        # to remove the extra path seperator '\'
+        # to remove the extra path separator '\'
         # as this list is used to search the supported Arch info
         #
         for IndexN in range (0, len(IncludePathList)):

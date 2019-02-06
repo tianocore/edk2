@@ -190,7 +190,7 @@ class FfsInfStatement(FfsInfStatementClassObject):
 
             Inf = GenFdsGlobalVariable.WorkSpace.BuildObject[PathClassObj, self.CurrentArch, GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag]
             #
-            # Set Ffs BaseName, MdouleGuid, ModuleType, Version, OutputPath
+            # Set Ffs BaseName, ModuleGuid, ModuleType, Version, OutputPath
             #
             self.BaseName = Inf.BaseName
             self.ModuleGuid = Inf.Guid
@@ -352,7 +352,7 @@ class FfsInfStatement(FfsInfStatementClassObject):
         GenFdsGlobalVariable.VerboseLogger("InfFileName :%s" % self.InfFileName)
 
         #
-        # Set OutputPath = ${WorkSpace}\Build\Fv\Ffs\${ModuleGuid}+ ${MdouleName}\
+        # Set OutputPath = ${WorkSpace}\Build\Fv\Ffs\${ModuleGuid}+ ${ModuleName}\
         #
 
         self.OutputPath = os.path.join(GenFdsGlobalVariable.FfsDir, \

@@ -715,7 +715,7 @@ Returns:
   }
 
   //
-  // Check Input paramters
+  // Check Input parameters
   //
   if (*InputFileName == NULL) {
     fprintf (stderr, "Missing option.  Input files is not specified\n");

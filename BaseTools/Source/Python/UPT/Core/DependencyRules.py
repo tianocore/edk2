@@ -159,7 +159,7 @@ class DependencyRules(object):
     #
     # @param PkgObj: A package object
     # @param DpObj: A distribution object
-    # @return: True if package depex satisified
+    # @return: True if package depex satisfied
     #          False else
     #
     def CheckPackageDepexSatisfied(self, PkgObj, DpObj=None):

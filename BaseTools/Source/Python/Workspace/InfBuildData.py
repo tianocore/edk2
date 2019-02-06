@@ -205,7 +205,7 @@ class InfBuildData(ModuleBuildClassObject):
 
     ## Retrieve all information in [Defines] section
     #
-    #   (Retriving all [Defines] information in one-shot is just to save time.)
+    #   (Retrieving all [Defines] information in one-shot is just to save time.)
     #
     @cached_class_function
     def _GetHeaderInfo(self):
@@ -816,7 +816,7 @@ class InfBuildData(ModuleBuildClassObject):
             RetVal[Arch, ModuleType] = TemporaryDictionary[Arch, ModuleType]
         return RetVal
 
-    ## Retrieve depedency expression
+    ## Retrieve dependency expression
     @cached_property
     def DepexExpression(self):
         RetVal = tdict(False, 2)

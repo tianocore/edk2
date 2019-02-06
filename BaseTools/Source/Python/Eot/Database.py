@@ -38,7 +38,7 @@ DATABASE_PATH = "Eot.db"
 
 ## Database class
 #
-# This class defined the EOT databse
+# This class defined the EOT database
 # During the phase of initialization, the database will create all tables and
 # insert all records of table DataModel
 #
@@ -83,7 +83,7 @@ class Database(object):
         self.Conn = sqlite3.connect(self.DbPath, isolation_level = 'DEFERRED')
         self.Conn.execute("PRAGMA page_size=8192")
         self.Conn.execute("PRAGMA synchronous=OFF")
-        # to avoid non-ascii charater conversion error
+        # to avoid non-ascii character conversion error
         self.Conn.text_factory = str
         self.Cur = self.Conn.cursor()
 
@@ -198,7 +198,7 @@ class Database(object):
 
     ## UpdateIdentifierBelongsToFunction() method
     #
-    #  Update the field "BelongsToFunction" for each Indentifier
+    #  Update the field "BelongsToFunction" for each Identifier
     #
     #  @param self: The object pointer
     #

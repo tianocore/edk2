@@ -32,7 +32,7 @@ gHumanReadableVerPatt = re.compile(r'([1-9][0-9]*|0)\.[0-9]{1,2}$')
 
 ## GetSplitValueList
 #
-# Get a value list from a string with multiple values splited with SplitTag
+# Get a value list from a string with multiple values split with SplitTag
 # The default SplitTag is DataType.TAB_VALUE_SPLIT
 # 'AAA|BBB|CCC' -> ['AAA', 'BBB', 'CCC']
 #
@@ -88,7 +88,7 @@ def GetSplitValueList(String, SplitTag=DataType.TAB_VALUE_SPLIT, MaxSplit= -1):
 
 ## GetSplitList
 #
-# Get a value list from a string with multiple values splited with SplitString
+# Get a value list from a string with multiple values split with SplitString
 # The default SplitTag is DataType.TAB_VALUE_SPLIT
 # 'AAA|BBB|CCC' -> ['AAA', 'BBB', 'CCC']
 #
@@ -123,7 +123,7 @@ def MergeArches(Dict, Key, Arch):
 # Return False if invalid format
 #
 # @param String:   String with DEFINE statement
-# @param Arch:     Supportted Arch
+# @param Arch:     Supported Arch
 # @param Defines:  DEFINE statement to be parsed
 #
 # @retval 0   DEFINE statement found, and valid
@@ -149,7 +149,7 @@ def GenDefines(String, Arch, Defines):
 #
 # @param String:        String with INCLUDE statement
 # @param IncludeFiles:  INCLUDE statement to be parsed
-# @param Arch:          Supportted Arch
+# @param Arch:          Supported Arch
 #
 # @retval True
 # @retval False
@@ -297,7 +297,7 @@ def ReplaceMacro(String, MacroDefinitions={}, SelfReplacement=False, RaiseError=
 ## NormPath
 #
 # Create a normal path
-# And replace DFEINE in the path
+# And replace DEFINE in the path
 #
 # @param Path:     The input value for Path to be converted
 # @param Defines:  A set for DEFINE statement
@@ -730,9 +730,9 @@ def WorkspaceFile(WorkspaceDir, Filename):
 
 ## Split string
 #
-# Revmove '"' which startswith and endswith string
+# Remove '"' which startswith and endswith string
 #
-# @param String:  The string need to be splited
+# @param String:  The string need to be split
 #
 # @retval String: The string after removed '""'
 #

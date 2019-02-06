@@ -36,7 +36,7 @@ typedef struct _GUID_SEC_TOOL_ENTRY {
 } GUID_SEC_TOOL_ENTRY;
 
 //
-// Functin Implementation
+// Function Implementation
 //
 
 EFI_HANDLE

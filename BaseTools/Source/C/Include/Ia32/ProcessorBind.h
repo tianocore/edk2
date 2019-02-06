@@ -68,7 +68,7 @@
   #if _MSC_EXTENSIONS
 
     //
-    // use Microsoft* C complier dependent integer width types
+    // use Microsoft* C compiler dependent integer width types
     //
     typedef unsigned __int64    UINT64;
     typedef __int64             INT64;
@@ -138,7 +138,7 @@ typedef INT32   INTN;
 //
 #if _MSC_EXTENSIONS
   //
-  // Microsoft* compiler requires _EFIAPI useage, __cdecl is Microsoft* specific C.
+  // Microsoft* compiler requires _EFIAPI usage, __cdecl is Microsoft* specific C.
   //
   #define EFIAPI __cdecl
 #endif

@@ -33,7 +33,7 @@ gMACRO_PATTERN = re.compile("\$\(([_A-Z][_A-Z0-9]*)\)", re.UNICODE)
 
 ## GetSplitValueList
 #
-# Get a value list from a string with multiple values splited with SplitTag
+# Get a value list from a string with multiple values split with SplitTag
 # The default SplitTag is DataType.TAB_VALUE_SPLIT
 # 'AAA|BBB|CCC' -> ['AAA', 'BBB', 'CCC']
 #
@@ -67,7 +67,7 @@ def MergeArches(Dict, Key, Arch):
 # Return False if invalid format
 #
 # @param String:   String with DEFINE statement
-# @param Arch:     Supportted Arch
+# @param Arch:     Supported Arch
 # @param Defines:  DEFINE statement to be parsed
 #
 def GenDefines(String, Arch, Defines):
@@ -236,7 +236,7 @@ def ReplaceMacro(String, MacroDefinitions=None, SelfReplacement=False, Line=None
 ## NormPath
 #
 # Create a normal path
-# And replace DFEINE in the path
+# And replace DEFINE in the path
 #
 # @param Path:     The input value for Path to be converted
 # @param Defines:  A set for DEFINE statement
@@ -613,9 +613,9 @@ def WorkspaceFile(WorkspaceDir, Filename):
 
 ## Split string
 #
-# Revmove '"' which startswith and endswith string
+# Remove '"' which startswith and endswith string
 #
-# @param String:  The string need to be splited
+# @param String:  The string need to be split
 #
 def SplitString(String):
     if String.startswith('\"'):
@@ -734,7 +734,7 @@ def IsHexDigit(Str):
                 return False
     return False
 
-## Check if the string is HexDgit and its interger value within limit of UINT32
+## Check if the string is HexDgit and its integer value within limit of UINT32
 #
 # Return true if all characters in the string are digits and there is at
 # least one character

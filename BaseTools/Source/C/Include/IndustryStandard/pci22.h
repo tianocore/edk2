@@ -98,7 +98,7 @@ typedef union {
 } PCI_TYPE_GENERIC;
 
 typedef struct {
-  UINT32  CardBusSocketReg; // Cardus Socket/ExCA Base
+  UINT32  CardBusSocketReg; // Cardbus Socket/ExCA Base
   // Address Register
   //
   UINT16  Reserved;
@@ -197,7 +197,7 @@ typedef struct {
 #define PCI_IF_8259_PIC               0x00
 #define PCI_IF_ISA_PIC                0x01
 #define PCI_IF_EISA_PIC               0x02
-#define PCI_IF_APIC_CONTROLLER        0x10 // I/O APIC interrupt controller , 32 bye none-prefectable memory.
+#define PCI_IF_APIC_CONTROLLER        0x10 // I/O APIC interrupt controller , 32 byte none-prefetchable memory.
 #define PCI_IF_APIC_CONTROLLER2       0x20
 #define PCI_SUBCLASS_TIMER            0x02
 #define PCI_IF_8254_TIMER             0x00

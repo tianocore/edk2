@@ -34,7 +34,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "EfiUtilityMsgs.h"
 
 //
-// Different file separater for Linux and Windows
+// Different file separator for Linux and Windows
 //
 #define FILE_SEP_CHAR '/'
 

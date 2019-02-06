@@ -1187,7 +1187,7 @@ class PlatformAutoGen(AutoGen):
     #
     @cached_class_function
     def CreateCodeFile(self, CreateModuleCodeFile=False):
-        # only module has code to be greated, so do nothing if CreateModuleCodeFile is False
+        # only module has code to be created, so do nothing if CreateModuleCodeFile is False
         if not CreateModuleCodeFile:
             return
 
@@ -1849,7 +1849,7 @@ class PlatformAutoGen(AutoGen):
 
     ## Get tool chain definition
     #
-    #  Get each tool defition for given tool chain from tools_def.txt and platform
+    #  Get each tool definition for given tool chain from tools_def.txt and platform
     #
     @cached_property
     def ToolDefinition(self):
@@ -2130,8 +2130,8 @@ class PlatformAutoGen(AutoGen):
 
     ## Override PCD setting (type, value, ...)
     #
-    #   @param  ToPcd       The PCD to be overrided
-    #   @param  FromPcd     The PCD overrideing from
+    #   @param  ToPcd       The PCD to be overridden
+    #   @param  FromPcd     The PCD overriding from
     #
     def _OverridePcd(self, ToPcd, FromPcd, Module="", Msg="", Library=""):
         #
@@ -2218,7 +2218,7 @@ class PlatformAutoGen(AutoGen):
 
     ## Apply PCD setting defined platform to a module
     #
-    #   @param  Module  The module from which the PCD setting will be overrided
+    #   @param  Module  The module from which the PCD setting will be overridden
     #
     #   @retval PCD_list    The list PCDs with settings from platform
     #
@@ -2450,7 +2450,7 @@ class PlatformAutoGen(AutoGen):
 
     ## Append build options in platform to a module
     #
-    #   @param  Module  The module to which the build options will be appened
+    #   @param  Module  The module to which the build options will be appended
     #
     #   @retval options     The options appended with build options in platform
     #
@@ -2560,7 +2560,7 @@ class ModuleAutoGen(AutoGen):
         self.SourceDir = mws.relpath(self.SourceDir, self.WorkspaceDir)
 
         self.SourceOverrideDir = None
-        # use overrided path defined in DSC file
+        # use overridden path defined in DSC file
         if self.MetaFile.Key in GlobalData.gOverrideDir:
             self.SourceOverrideDir = GlobalData.gOverrideDir[self.MetaFile.Key]
 
@@ -2685,7 +2685,7 @@ class ModuleAutoGen(AutoGen):
     def Guid(self):
         #
         # To build same module more than once, the module path with FILE_GUID overridden has
-        # the file name FILE_GUIDmodule.inf, but the relative path (self.MetaFile.File) is the realy path
+        # the file name FILE_GUIDmodule.inf, but the relative path (self.MetaFile.File) is the real path
         # in DSC. The overridden GUID can be retrieved from file name
         #
         if os.path.basename(self.MetaFile.File) != os.path.basename(self.MetaFile.Path):
@@ -2745,7 +2745,7 @@ class ModuleAutoGen(AutoGen):
                                     self.MetaFile.BaseName
             ))
 
-    ## Return the directory to store the intermediate object files of the mdoule
+    ## Return the directory to store the intermediate object files of the module
     @cached_property
     def OutputDir(self):
         return _MakeDir((self.BuildDir, "OUTPUT"))
@@ -2757,7 +2757,7 @@ class ModuleAutoGen(AutoGen):
             return path.join(self.PlatformInfo.BuildDir, TAB_FV_DIRECTORY, "Ffs", self.Guid + self.Name)
         return ''
 
-    ## Return the directory to store auto-gened source files of the mdoule
+    ## Return the directory to store auto-gened source files of the module
     @cached_property
     def DebugDir(self):
         return _MakeDir((self.BuildDir, "DEBUG"))
@@ -2809,7 +2809,7 @@ class ModuleAutoGen(AutoGen):
 
     ## Get the depex string
     #
-    # @return : a string contain all depex expresion.
+    # @return : a string contain all depex expression.
     def _GetDepexExpresionString(self):
         DepexStr = ''
         DepexList = []
@@ -2819,11 +2819,11 @@ class ModuleAutoGen(AutoGen):
         for M in [self.Module] + self.DependentLibraryList:
             Filename = M.MetaFile.Path
             InfObj = InfSectionParser.InfSectionParser(Filename)
-            DepexExpresionList = InfObj.GetDepexExpresionList()
-            for DepexExpresion in DepexExpresionList:
-                for key in DepexExpresion:
+            DepexExpressionList = InfObj.GetDepexExpresionList()
+            for DepexExpression in DepexExpressionList:
+                for key in DepexExpression:
                     Arch, ModuleType = key
-                    DepexExpr = [x for x in DepexExpresion[key] if not str(x).startswith('#')]
+                    DepexExpr = [x for x in DepexExpression[key] if not str(x).startswith('#')]
                     # the type of build module is USER_DEFINED.
                     # All different DEPEX section tags would be copied into the As Built INF file
                     # and there would be separate DEPEX section tags
@@ -2878,7 +2878,7 @@ class ModuleAutoGen(AutoGen):
 
         DepexList = []
         #
-        # Append depex from dependent libraries, if not "BEFORE", "AFTER" expresion
+        # Append depex from dependent libraries, if not "BEFORE", "AFTER" expression
         #
         for M in [self.Module] + self.DependentLibraryList:
             Inherited = False
@@ -3323,7 +3323,7 @@ class ModuleAutoGen(AutoGen):
             IdfGenBinBuffer.close()
         return RetVal
 
-    ## Return the list of library modules explicitly or implicityly used by this module
+    ## Return the list of library modules explicitly or implicitly used by this module
     @cached_property
     def DependentLibraryList(self):
         # only merge library classes and PCD for non-library module
@@ -3894,8 +3894,8 @@ class ModuleAutoGen(AutoGen):
         AsBuiltInfDict['userextension_tianocore_item'] = UserExtStr
 
         # Generated depex expression section in comments.
-        DepexExpresion = self._GetDepexExpresionString()
-        AsBuiltInfDict['depexsection_item'] = DepexExpresion if DepexExpresion else ''
+        DepexExpression = self._GetDepexExpresionString()
+        AsBuiltInfDict['depexsection_item'] = DepexExpression if DepexExpression else ''
 
         AsBuiltInf = TemplateString()
         AsBuiltInf.Append(gAsBuiltInfHeaderString.Replace(AsBuiltInfDict))

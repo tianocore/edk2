@@ -2057,13 +2057,13 @@ IsHexStr (
   )
 {
   //
-  // skip preceeding white space
+  // skip preceding white space
   //
   while ((*Str != 0) && *Str == L' ') {
     Str ++;
   }
   //
-  // skip preceeding zeros
+  // skip preceding zeros
   //
   while ((*Str != 0) && *Str == L'0') {
     Str ++;

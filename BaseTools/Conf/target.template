@@ -37,7 +37,7 @@ TARGET                = DEBUG
 #                                               One, or more, of the following, IA32, IPF, X64, EBC, ARM
 #                                               or AArch64.
 #                                               Multiple values can be specified on a single line, using
-#                                               space charaters to separate the values.  These are used
+#                                               space characters to separate the values.  These are used
 #                                               during the parsing of a platform description file, 
 #                                               restricting the build output target(s.)
 #                                               The Build Target ARCH is determined by (precedence high to low):

@@ -293,7 +293,7 @@ class InfPomAlignment(ModuleObject):
             self.SetUserExtensionList(self.GetUserExtensionList() + [UserExtension])
         #
         # Get all meta-file header information
-        # the record is list of items formated:
+        # the record is list of items formatted:
         # [LineValue, Arch, StartLine, ID, Third]
         #
         InfHeaderObj = self.Parser.InfHeader

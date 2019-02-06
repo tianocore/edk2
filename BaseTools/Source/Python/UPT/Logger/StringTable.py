@@ -135,7 +135,7 @@ ERR_INF_PARSER_LIBRARY_SECTION_CONTENT_ERROR = \
 ERR_INF_PARSER_LIBRARY_SECTION_LIBNAME_MISSING = \
     _("Format invalid. Please specify a library name.")
 ERR_INF_PARSER_SOURCES_SECTION_CONTENT_ERROR = \
-    _("The format is incorrect. It should be formated as follows: "
+    _("The format is incorrect. It should be formatted as follows: "
       "FileName, Family | TagName | ToolCode | FeatureFlagExpr.")
 ERR_INF_PARSER_PCD_SECTION_TYPE_ERROR = \
     _("The PCD section type is incorrect. The value should be this list: %s")
@@ -147,10 +147,10 @@ ERR_INF_PARSER_PCD_NAME_FORMAT_ERROR = \
       "Should like following: <TokenSpaceGuidCName>.<PcdCName> ")
 ERR_INF_PARSER_GUID_PPI_PROTOCOL_SECTION_CONTENT_ERROR = \
     _("The format is incorrect. "
-      "It should be formated as follows: CName | FeatureFlag.")
+      "It should be formatted as follows: CName | FeatureFlag.")
 ERR_INF_PARSER_PACKAGE_SECTION_CONTENT_ERROR = \
     _("The format is incorrect. "
-      "It should be formated as follows:  <TokenSpaceGuidCName>.<PcdCName>")
+      "It should be formatted as follows:  <TokenSpaceGuidCName>.<PcdCName>")
 ERR_INF_PARSER_PCD_TAIL_COMMENTS_INVALID = \
     _("The format is incorrect. "
       "Multiple usage descriptions must be described on subsequent lines.")
@@ -197,7 +197,7 @@ ERR_INF_PARSER_FILE_MISS_DEFINE = \
     _("The following file listed in the module "
       "directory is not listed in the INF: %s")
 ERR_INF_PARSER_VERSION_NUMBER_DEPRICATED = \
-    _("VERSION_NUMBER depricated.  "
+    _("VERSION_NUMBER deprecated.  "
       "The INF file %s should be modified to use the VERSION_STRING instead.")
 ERR_INF_PARSER_VER_EXIST_BOTH_NUM_STR = \
     _("The INF file %s defines both VERSION_NUMBER and VERSION_STRING, "
@@ -585,7 +585,7 @@ _("Only a distribution file name without a path is allowed for "
   "the distribution to be replaced during replace. Current given: '%s'.")
 ERR_UNIPARSE_DBLQUOTE_UNMATCHED = \
 _("Only Language entry can contain a couple of matched quote in one line")
-ERR_UNIPARSE_NO_SECTION_EXIST = _("No PakcageDef or ModuleDef section exists in the UNI file.")
+ERR_UNIPARSE_NO_SECTION_EXIST = _("No PackageDef or ModuleDef section exists in the UNI file.")
 ERR_UNIPARSE_STRNAME_FORMAT_ERROR = _("The String Token Name %s must start with \"STR_\"")
 ERR_UNIPARSE_SEP_LANGENTRY_LINE = _("Each <LangEntry> should be in a separate line :%s.")
 ERR_UNIPARSE_MULTI_ENTRY_EXIST = \
@@ -724,7 +724,7 @@ _("Incorrect GUID value format, must be <GuidValueInCFormat:"
 ERR_DECPARSE_CGUID_NOT_FOUND = _("Unable to find the GUID value of this GUID CName : '%s'.")
 ERR_DECPARSE_FILEOPEN               = _("Unable to open: [%s].")
 ERR_DECPARSE_SECTION_EMPTY          = _("Empty sections are not allowed.")
-ERR_DECPARSE_SECTION_UE             = _("Incorrect UserExtentions format. "
+ERR_DECPARSE_SECTION_UE             = _("Incorrect UserExtensions format. "
                             "Must be UserExtenxions.UserId.IdString[.Arch]+.")
 ERR_DECPARSE_SECTION_UE_USERID      = _("Invalid UserId, must be underscore"
                                         "or alphanumeric characters.")

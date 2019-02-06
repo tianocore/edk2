@@ -270,7 +270,7 @@ goto check_build_environment
 
 :check_c_tools
   echo.
-  echo !!! ERROR !!! Binary C tools are missing. They are requried to be built from BaseTools Source.
+  echo !!! ERROR !!! Binary C tools are missing. They are required to be built from BaseTools Source.
   echo.
 
 :check_build_environment

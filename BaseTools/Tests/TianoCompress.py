@@ -57,7 +57,7 @@ class Tests(TestTools.BaseToolsTest):
             print('Original data did not match decompress(compress(data))')
             self.DisplayBinaryData('original data', start)
             self.DisplayBinaryData('after compression', self.ReadTmpFile('output1'))
-            self.DisplayBinaryData('after decomression', finish)
+            self.DisplayBinaryData('after decompression', finish)
         self.assertTrue(startEqualsFinish)
 
     def testRandomDataCycles(self):

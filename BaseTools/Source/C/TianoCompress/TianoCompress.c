@@ -229,7 +229,7 @@ Routine Description:
 
   Allocate memory spaces for data structures used in compression process
 
-Argements:
+Arguments:
   VOID
 
 Returns:
@@ -507,7 +507,7 @@ Returns: (VOID)
   if (mMatchLen >= 4) {
     //
     // We have just got a long match, the target tree
-    // can be located by MatchPos + 1. Travese the tree
+    // can be located by MatchPos + 1. Traverse the tree
     // from bottom up to get to a proper starting point.
     // The usage of PERC_FLAG ensures proper node deletion
     // in DeleteNode() later.
@@ -1708,7 +1708,7 @@ Returns:
   fprintf (stdout, "  --uefi\n\
             Enable UefiCompress, use TianoCompress when without this option\n");
   fprintf (stdout, "  -o FileName, --output FileName\n\
-            File will be created to store the ouput content.\n");
+            File will be created to store the output content.\n");
   fprintf (stdout, "  -v, --verbose\n\
            Turn on verbose output with informational messages.\n");
   fprintf (stdout, "  -q, --quiet\n\
@@ -2714,11 +2714,11 @@ Arguments:
   Source          - The source buffer containing the compressed data.
   Destination     - The destination buffer to store the decompressed data
   Scratch         - The buffer used internally by the decompress routine. This  buffer is needed to store intermediate data.
-  Version         - 1 for EFI1.1 Decompress algoruthm, 2 for Tiano Decompress algorithm
+  Version         - 1 for EFI1.1 Decompress algorithm, 2 for Tiano Decompress algorithm
 
 Returns:
 
-  RETURN_SUCCESS           - Decompression is successfull
+  RETURN_SUCCESS           - Decompression is successful
   RETURN_INVALID_PARAMETER - The source data is corrupted
 
 --*/

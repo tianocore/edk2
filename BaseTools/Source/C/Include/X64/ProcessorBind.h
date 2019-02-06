@@ -71,7 +71,7 @@
 
 
     //
-    // use Microsoft C complier dependent integer width types
+    // use Microsoft C compiler dependent integer width types
     //
     typedef unsigned __int64    UINT64;
     typedef __int64             INT64;
@@ -153,17 +153,17 @@ typedef INT64   INTN;
 //
 // Modifier to ensure that all protocol member functions and EFI intrinsics
 // use the correct C calling convention. All protocol member functions and
-// EFI intrinsics are required to modify thier member functions with EFIAPI.
+// EFI intrinsics are required to modify their member functions with EFIAPI.
 //
 #if _MSC_EXTENSIONS
   ///
-  /// Define the standard calling convention reguardless of optimization level.
+  /// Define the standard calling convention regardless of optimization level.
   /// __cdecl is Microsoft* specific C extension.
   ///
   #define EFIAPI __cdecl
 #elif __GNUC__
   ///
-  /// Define the standard calling convention reguardless of optimization level.
+  /// Define the standard calling convention regardless of optimization level.
   /// efidecl is an extension to GCC that supports the differnece between x64
   /// GCC ABI and x64 Microsoft* ABI. EFI is closer to the Microsoft* ABI and
   /// EFIAPI makes sure the right ABI is used for public interfaces.

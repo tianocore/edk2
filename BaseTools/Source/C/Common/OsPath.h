@@ -104,7 +104,7 @@ Routine Description:
 Arguments:
 
   OldPath     Path name of replace the final segment
-  Peer        The new path name to concatinate to become the peer path
+  Peer        The new path name to concatenate to become the peer path
 
 Returns:
 

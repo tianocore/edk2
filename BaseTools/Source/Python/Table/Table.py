@@ -52,7 +52,7 @@ class Table(object):
     # Query all records of the table
     #
     def Query(self):
-        EdkLogger.verbose("\nQuery tabel %s started ..." % self.Table)
+        EdkLogger.verbose("\nQuery table %s started ..." % self.Table)
         SqlCommand = """select * from %s""" % self.Table
         self.Cur.execute(SqlCommand)
         for Rs in self.Cur:

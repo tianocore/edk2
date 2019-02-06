@@ -463,7 +463,7 @@ new_nfa_node()
 	if (nfa_size<=nfa_allocated){
 		/* need to redo array */
 		if (!nfa_array){
-			/* need some to do inital allocation */
+			/* need some to do initial allocation */
 			nfa_size=nfa_allocated+NFA_MIN;
 			nfa_array=(nfa_node **) malloc(sizeof(nfa_node*)*
 				nfa_size);

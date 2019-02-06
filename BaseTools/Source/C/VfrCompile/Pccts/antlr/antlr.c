@@ -1394,7 +1394,7 @@ tclass()
   /* MR23 */         if (p!= NULL && akaString != NULL) {
     /* MR23 */           if (p->akaString != NULL) {
       /* MR23 */             if (strcmp(p->akaString,akaString) != 0) {
-        /* MR23 */                warnFL(eMsg2("this #tokclass statment conflicts with a previous #tokclass %s(\"%s\") statement",
+        /* MR23 */                warnFL(eMsg2("this #tokclass statement conflicts with a previous #tokclass %s(\"%s\") statement",
         /* MR23 */                              t,p->akaString),
         /* MR23 */			                    FileStr[save_file],save_line);
         /* MR23 */             };
@@ -1635,7 +1635,7 @@ token()
     if (te != NULL && akaString != NULL) {
       if (te->akaString != NULL) {
         if (strcmp(te->akaString,akaString) != 0) {
-          warnFL(eMsg2("this #token statment conflicts with a previous #token %s(\"%s\") statement",
+          warnFL(eMsg2("this #token statement conflicts with a previous #token %s(\"%s\") statement",
           t,te->akaString),
           FileStr[save_file],save_line);
         };

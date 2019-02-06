@@ -1432,7 +1432,7 @@ Returns:
   ImageCount = 0;
   for (;;) {
     //
-    // Save our postition in the file, since offsets in the headers
+    // Save our position in the file, since offsets in the headers
     // are relative to the particular image.
     //
     ImageStart = ftell (InFptr);

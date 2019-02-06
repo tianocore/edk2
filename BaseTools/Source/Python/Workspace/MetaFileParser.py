@@ -438,7 +438,7 @@ class MetaFileParser(object):
         ScopeKey = tuple(ScopeKey)
         #
         # DecParser SectionType is a list, will contain more than one item only in Pcd Section
-        # As Pcd section macro usage is not alllowed, so here it is safe
+        # As Pcd section macro usage is not allowed, so here it is safe
         #
         if isinstance(self, DecParser):
             SectionDictKey = self._SectionType[0], ScopeKey

@@ -262,7 +262,7 @@ class FV (object):
 
     ## _InitializeInf()
     #
-    #   Initilize the inf file to create FV
+    #   Initialize the inf file to create FV
     #
     #   @param  self        The object pointer
     #   @param  BaseAddress base address of FV

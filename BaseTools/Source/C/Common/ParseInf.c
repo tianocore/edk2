@@ -233,7 +233,7 @@ Returns:
   CHAR8   *Delimiter;
   BOOLEAN ParseError;
   BOOLEAN ReadError;
-  UINTN   Occurrance;
+  UINTN   Occurrence;
 
   //
   // Check input parameters
@@ -258,7 +258,7 @@ Returns:
   //
   // Initialize our instance counter for the search token
   //
-  Occurrance = 0;
+  Occurrence = 0;
 
   if (FindSection (InputFile, Section)) {
     //
@@ -307,7 +307,7 @@ Returns:
         //
         // Check if it is the correct instance
         //
-        if (Instance == Occurrance) {
+        if (Instance == Occurrence) {
           //
           // Copy the contents following the =
           //
@@ -338,9 +338,9 @@ Returns:
           }
         } else {
           //
-          // Increment the occurrance found
+          // Increment the occurrence found
           //
-          Occurrance++;
+          Occurrence++;
         }
       }
     } while (
@@ -348,7 +348,7 @@ Returns:
       !ReadError &&
       InputFile->CurrentFilePointer < InputFile->Eof &&
       CurrentToken[0] != '[' &&
-      Occurrance <= Instance
+      Occurrence <= Instance
     );
   }
   //
@@ -478,7 +478,7 @@ AsciiStringToUint64 (
 Routine Description:
 
   Converts a null terminated ascii string that represents a number into a
-  UINT64 value.  A hex number may be preceeded by a 0x, but may not be
+  UINT64 value.  A hex number may be preceded by a 0x, but may not be
   succeeded by an h.  A number without 0x or 0X is considered to be base 10
   unless the IsHex input is true.
 

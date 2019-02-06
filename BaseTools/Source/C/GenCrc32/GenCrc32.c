@@ -288,7 +288,7 @@ Returns:
 
   FileBuffer = (UINT8 *) malloc (FileSize);
   if (FileBuffer == NULL) {
-    Error (NULL, 0, 4001, "Resource", "memory cannot be allcoated!");
+    Error (NULL, 0, 4001, "Resource", "memory cannot be allocated!");
     fclose (InFile);
     goto Finish;
   }

@@ -38,7 +38,7 @@ class TableFunction(Table):
     # @param Header:              Header of a Function
     # @param Modifier:            Modifier of a Function
     # @param Name:                Name of a Function
-    # @param ReturnStatement:     ReturnStatement of a Funciont
+    # @param ReturnStatement:     ReturnStatement of a Function
     # @param StartLine:           StartLine of a Function
     # @param StartColumn:         StartColumn of a Function
     # @param EndLine:             EndLine of a Function
@@ -75,7 +75,7 @@ class TableFunction(Table):
     # @param Header:              Header of a Function
     # @param Modifier:            Modifier of a Function
     # @param Name:                Name of a Function
-    # @param ReturnStatement:     ReturnStatement of a Funciont
+    # @param ReturnStatement:     ReturnStatement of a Function
     # @param StartLine:           StartLine of a Function
     # @param StartColumn:         StartColumn of a Function
     # @param EndLine:             EndLine of a Function

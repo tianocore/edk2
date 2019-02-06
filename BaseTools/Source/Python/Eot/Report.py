@@ -332,7 +332,7 @@ class Report(object):
                 Content = """            </table></td>
           </tr>"""
                 self.WriteLn(Content)
-            #End of Consumed Ppi/Portocol
+            #End of Consumed Ppi/Protocol
 
             # Find Produced Ppi/Protocol
             SqlCommand = """select ModuleName, ItemType, GuidName, GuidValue, GuidMacro from Report

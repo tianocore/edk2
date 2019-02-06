@@ -255,8 +255,8 @@ def GenModuleUNIEncodeFile(ModuleObject, UniFileHeader='', Encoding=DT.TAB_ENCOD
         File = codecs.open(ContainerFile, 'wb', Encoding)
         File.write(u'\uFEFF' + Content)
         File.stream.close()
-    Md5Sigature = md5(__FileHookOpen__(str(ContainerFile), 'rb').read())
-    Md5Sum = Md5Sigature.hexdigest()
+    Md5Signature = md5(__FileHookOpen__(str(ContainerFile), 'rb').read())
+    Md5Sum = Md5Signature.hexdigest()
     if (ContainerFile, Md5Sum) not in ModuleObject.FileList:
         ModuleObject.FileList.append((ContainerFile, Md5Sum))
 

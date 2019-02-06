@@ -775,10 +775,10 @@ class Progressor:
 
     ## Constructor
     #
-    #   @param      OpenMessage     The string printed before progress charaters
-    #   @param      CloseMessage    The string printed after progress charaters
-    #   @param      ProgressChar    The charater used to indicate the progress
-    #   @param      Interval        The interval in seconds between two progress charaters
+    #   @param      OpenMessage     The string printed before progress characters
+    #   @param      CloseMessage    The string printed after progress characters
+    #   @param      ProgressChar    The character used to indicate the progress
+    #   @param      Interval        The interval in seconds between two progress characters
     #
     def __init__(self, OpenMessage="", CloseMessage="", ProgressChar='.', Interval=1.0):
         self.PromptMessage = OpenMessage
@@ -788,9 +788,9 @@ class Progressor:
         if Progressor._StopFlag is None:
             Progressor._StopFlag = threading.Event()
 
-    ## Start to print progress charater
+    ## Start to print progress character
     #
-    #   @param      OpenMessage     The string printed before progress charaters
+    #   @param      OpenMessage     The string printed before progress characters
     #
     def Start(self, OpenMessage=None):
         if OpenMessage is not None:
@@ -801,9 +801,9 @@ class Progressor:
             Progressor._ProgressThread.setDaemon(False)
             Progressor._ProgressThread.start()
 
-    ## Stop printing progress charater
+    ## Stop printing progress character
     #
-    #   @param      CloseMessage    The string printed after progress charaters
+    #   @param      CloseMessage    The string printed after progress characters
     #
     def Stop(self, CloseMessage=None):
         OriginalCodaMessage = self.CodaMessage
@@ -1422,7 +1422,7 @@ class PathClass(object):
 
     ## Override __cmp__ function
     #
-    # Customize the comparsion operation of two PathClass
+    # Customize the comparison operation of two PathClass
     #
     # @retval 0     The two PathClass are different
     # @retval -1    The first PathClass is less than the second PathClass
@@ -1517,7 +1517,7 @@ class PathClass(object):
             self.Path = os.path.join(RealRoot, RealFile)
         return ErrorCode, ErrorInfo
 
-## Parse PE image to get the required PE informaion.
+## Parse PE image to get the required PE information.
 #
 class PeImageClass():
     ## Constructor

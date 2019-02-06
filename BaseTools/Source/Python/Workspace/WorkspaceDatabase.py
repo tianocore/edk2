@@ -37,7 +37,7 @@ from Workspace.InfBuildData import InfBuildData
 #
 # @param DbPath             Path of database file
 # @param GlobalMacros       Global macros used for replacement during file parsing
-# @prarm RenewDb=False      Create new database file if it's already there
+# @param RenewDb=False      Create new database file if it's already there
 #
 class WorkspaceDatabase(object):
 
@@ -82,7 +82,7 @@ class WorkspaceDatabase(object):
                 Arch = None
             return (FilePath, Arch) in self._CACHE_
 
-        # key = (FilePath, Arch=None, Target=None, Toochain=None)
+        # key = (FilePath, Arch=None, Target=None, Toolchain=None)
         def __getitem__(self, Key):
             FilePath = Key[0]
             KeyLength = len(Key)
@@ -123,7 +123,7 @@ class WorkspaceDatabase(object):
                                 Arch,
                                 MetaFileStorage(self.WorkspaceDb, FilePath, FileType)
                                 )
-            # alwasy do post-process, in case of macros change
+            # always do post-process, in case of macros change
             MetaFile.DoPostProcess()
             # object the build is based on
             BuildObject = self._GENERATOR_[FileType](
@@ -149,7 +149,7 @@ class WorkspaceDatabase(object):
     #
     # @param DbPath             Path of database file
     # @param GlobalMacros       Global macros used for replacement during file parsing
-    # @prarm RenewDb=False      Create new database file if it's already there
+    # @param RenewDb=False      Create new database file if it's already there
     #
     def __init__(self):
         self.DB = dict()

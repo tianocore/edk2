@@ -209,7 +209,7 @@ class Ecc(object):
                         Op.write("%s\r" % Filename)
                         #Dsc(Filename, True, True, EccGlobalData.gWorkspace, EccGlobalData.gDb)
                         self.MetaFile = DscParser(PathClass(Filename, Root), MODEL_FILE_DSC, MetaFileStorage(EccGlobalData.gDb.TblDsc.Cur, Filename, MODEL_FILE_DSC, True))
-                        # alwasy do post-process, in case of macros change
+                        # always do post-process, in case of macros change
                         self.MetaFile.DoPostProcess()
                         self.MetaFile.Start()
                         self.MetaFile._PostProcess()
@@ -307,7 +307,7 @@ class Ecc(object):
         if Options.Workspace:
             os.environ["WORKSPACE"] = Options.Workspace
 
-        # Check workspace envirnoment
+        # Check workspace environment
         if "WORKSPACE" not in os.environ:
             EdkLogger.error("ECC", BuildToolError.ATTRIBUTE_NOT_AVAILABLE, "Environment variable not found",
                             ExtraData="WORKSPACE")

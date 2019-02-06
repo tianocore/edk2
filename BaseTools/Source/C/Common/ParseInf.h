@@ -153,7 +153,7 @@ AsciiStringToUint64 (
 Routine Description:
 
   Converts a null terminated ascii string that represents a number into a
-  UINT64 value.  A hex number may be preceeded by a 0x, but may not be
+  UINT64 value.  A hex number may be preceded by a 0x, but may not be
   succeeded by an h.  A number without 0x or 0X is considered to be base 10
   unless the IsHex input is true.
 

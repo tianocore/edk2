@@ -37,7 +37,7 @@ class TableQuery(Table):
     #
     # @param ID:                 ID of a Query
     # @param Name:               Name of a Query
-    # @param Modifer:            Modifier of a Query
+    # @param Modifier:           Modifier of a Query
     # @param Value:              Type of a Query
     # @param Model:              Model of a Query
     #

@@ -45,7 +45,7 @@ static SVFR_ERROR_HANDLE VFR_ERROR_HANDLE_TABLE [] = {
   { VFR_RETURN_DATA_STRING_ERROR, ": data field string error or not support"},
   { VFR_RETURN_DEFAULT_VALUE_REDEFINED, ": default value re-defined with different value"},
   { VFR_RETURN_CONSTANT_ONLY, ": only constant is allowed in the expression"},
-  { VFR_RETURN_VARSTORE_NAME_REDEFINED_ERROR, ": Varstore name is defined by more than one varstores, it can't be referred as varstore, only varstore strucure name could be used."},
+  { VFR_RETURN_VARSTORE_NAME_REDEFINED_ERROR, ": Varstore name is defined by more than one varstores, it can't be referred as varstore, only varstore structure name could be used."},
   { VFR_RETURN_BIT_WIDTH_ERROR, ": bit width must be <= sizeof (type) * 8 and the max width can not > 32" },
   { VFR_RETURN_STRING_TO_UINT_OVERFLOW, ": String to UINT* Overflow"},
   { VFR_RETURN_CODEUNDEFINED, ": undefined Error Code" }

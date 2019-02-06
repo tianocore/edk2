@@ -194,7 +194,7 @@ def Main(Options = None):
         ContentFileClosed = True
 
         #
-        # Add Md5Sigature
+        # Add Md5Signature
         #
         DistPkg.Header.Signature = md5(open(str(ContentFile), 'rb').read()).hexdigest()
         #

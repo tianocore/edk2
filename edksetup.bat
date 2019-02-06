@@ -89,7 +89,7 @@ if exist %EDK_BASETOOLS% (
 :checkNt32Flag
 if exist %EDK_TOOLS_PATH%\Source set BASE_TOOLS_PATH=%EDK_TOOLS_PATH%
 
-@REM The Nt32 Emluation Platform requires Microsoft Libraries
+@REM The Nt32 Emulation Platform requires Microsoft Libraries
 @REM and headers to interface with Windows.
 if /I "%1"=="--nt32" (
   if /I "%2"=="X64" (

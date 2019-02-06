@@ -24,7 +24,7 @@ from Common.DataType import TAB_WORKSPACE
 # @param class:
 #
 # @var WORKSPACE:      defined the current WORKSPACE
-# @var PACKAGES_PATH:  defined the other WORKSAPCE, if current WORKSPACE is invalid, search valid WORKSPACE from PACKAGES_PATH
+# @var PACKAGES_PATH:  defined the other WORKSPACE, if current WORKSPACE is invalid, search valid WORKSPACE from PACKAGES_PATH
 #
 class MultipleWorkspace(object):
     WORKSPACE = ''
@@ -146,7 +146,7 @@ class MultipleWorkspace(object):
 
     ## getPkgPath()
     #
-    #   get all package pathes.
+    #   get all package paths.
     #
     #   @param  cls       The class pointer
     #

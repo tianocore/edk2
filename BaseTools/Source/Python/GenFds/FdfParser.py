@@ -716,13 +716,13 @@ class FdfParser:
                     EndPos = CurLine.find(')', StartPos+2)
                     while StartPos != -1 and EndPos != -1 and self._Token not in {TAB_IF_DEF, TAB_IF_N_DEF, TAB_IF, TAB_ELSE_IF}:
                         MacroName = CurLine[StartPos+2: EndPos]
-                        MacorValue = self._GetMacroValue(MacroName)
-                        if MacorValue is not None:
-                            CurLine = CurLine.replace('$(' + MacroName + ')', MacorValue, 1)
-                            if MacorValue.find('$(') != -1:
+                        MacroValue = self._GetMacroValue(MacroName)
+                        if MacroValue is not None:
+                            CurLine = CurLine.replace('$(' + MacroName + ')', MacroValue, 1)
+                            if MacroValue.find('$(') != -1:
                                 PreIndex = StartPos
                             else:
-                                PreIndex = StartPos + len(MacorValue)
+                                PreIndex = StartPos + len(MacroValue)
                         else:
                             PreIndex = EndPos + 1
                         StartPos = CurLine.find('$(', PreIndex)
@@ -1037,7 +1037,7 @@ class FdfParser:
 
     ## _GetNextToken() method
     #
-    #   Get next token unit before a seperator
+    #   Get next token unit before a separator
     #   If found, the string value is put into self._Token
     #
     #   @param  self        The object pointer
@@ -1054,12 +1054,12 @@ class FdfParser:
         StartLine = self.CurrentLineNumber
         while StartLine == self.CurrentLineNumber:
             TempChar = self._CurrentChar()
-            # Try to find the end char that is not a space and not in seperator tuple.
+            # Try to find the end char that is not a space and not in separator tuple.
             # That is, when we got a space or any char in the tuple, we got the end of token.
             if not str(TempChar).isspace() and TempChar not in SEPARATORS:
                 self._GetOneChar()
-            # if we happen to meet a seperator as the first char, we must proceed to get it.
-            # That is, we get a token that is a seperator char. nomally it is the boundary of other tokens.
+            # if we happen to meet a separator as the first char, we must proceed to get it.
+            # That is, we get a token that is a separator char. normally it is the boundary of other tokens.
             elif StartPos == self.CurrentOffsetWithinLine and TempChar in SEPARATORS:
                 self._GetOneChar()
                 break
@@ -1081,7 +1081,7 @@ class FdfParser:
 
     ## _GetNextGuid() method
     #
-    #   Get next token unit before a seperator
+    #   Get next token unit before a separator
     #   If found, the GUID string is put into self._Token
     #
     #   @param  self        The object pointer
@@ -1133,13 +1133,13 @@ class FdfParser:
         while CurrentLine == self.CurrentLineNumber:
 
             TempChar = self._CurrentChar()
-            # Try to find the end char that is not a space and not in seperator tuple.
+            # Try to find the end char that is not a space and not in separator tuple.
             # That is, when we got a space or any char in the tuple, we got the end of token.
             if not str(TempChar).isspace() and not TempChar in SEPARATORS:
                 if not self._UndoOneChar():
                     return
-            # if we happen to meet a seperator as the first char, we must proceed to get it.
-            # That is, we get a token that is a seperator char. nomally it is the boundary of other tokens.
+            # if we happen to meet a separator as the first char, we must proceed to get it.
+            # That is, we get a token that is a separator char. normally it is the boundary of other tokens.
             elif StartPos == self.CurrentOffsetWithinLine and TempChar in SEPARATORS:
                 return
             else:
@@ -1149,7 +1149,7 @@ class FdfParser:
 
     ## _GetNextHexNumber() method
     #
-    #   Get next HEX data before a seperator
+    #   Get next HEX data before a separator
     #   If found, the HEX data is put into self._Token
     #
     #   @param  self        The object pointer
@@ -1167,7 +1167,7 @@ class FdfParser:
 
     ## _GetNextDecimalNumber() method
     #
-    #   Get next decimal data before a seperator
+    #   Get next decimal data before a separator
     #   If found, the decimal data is put into self._Token
     #
     #   @param  self        The object pointer

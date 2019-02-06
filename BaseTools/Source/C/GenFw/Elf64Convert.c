@@ -74,7 +74,7 @@ CleanUp64 (
   );
 
 //
-// Rename ELF32 strucutres to common names to help when porting to ELF64.
+// Rename ELF32 structures to common names to help when porting to ELF64.
 //
 typedef Elf64_Shdr Elf_Shdr;
 typedef Elf64_Ehdr Elf_Ehdr;
@@ -580,7 +580,7 @@ ScanSections64 (
   mCoffOffset = CoffAlign(mCoffOffset);
 
   if (SectionCount > 1 && mOutImageType == FW_EFI_IMAGE) {
-    Warning (NULL, 0, 0, NULL, "Mulitple sections in %s are merged into 1 text section. Source level debug might not work correctly.", mInImageName);
+    Warning (NULL, 0, 0, NULL, "Multiple sections in %s are merged into 1 text section. Source level debug might not work correctly.", mInImageName);
   }
 
   //
@@ -634,7 +634,7 @@ ScanSections64 (
   }
 
   if (SectionCount > 1 && mOutImageType == FW_EFI_IMAGE) {
-    Warning (NULL, 0, 0, NULL, "Mulitple sections in %s are merged into 1 data section. Source level debug might not work correctly.", mInImageName);
+    Warning (NULL, 0, 0, NULL, "Multiple sections in %s are merged into 1 data section. Source level debug might not work correctly.", mInImageName);
   }
 
   //
@@ -817,7 +817,7 @@ WriteSections64 (
 
       default:
         //
-        //  Ignore for unkown section type.
+        //  Ignore for unknown section type.
         //
         VerboseMsg ("%s unknown section type %x. We ignore this unknown section type.", mInImageName, (unsigned)Shdr->sh_type);
         break;

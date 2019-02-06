@@ -426,7 +426,7 @@ def _CheckListExpression(Expression):
 
     return IsValidListExpr(ListExpr)
 
-## _CheckExpreesion
+## _CheckExpression
 #
 # @param Expression: Pcd value expression
 #
@@ -476,11 +476,11 @@ def _ValidateCopyright(Line):
 
 def GenerateTokenList (Comment):
     #
-    # Tokenize Comment using '#' and ' ' as token seperators
+    # Tokenize Comment using '#' and ' ' as token separators
     #
-    RelplacedComment = None
-    while Comment != RelplacedComment:
-        RelplacedComment = Comment
+    ReplacedComment = None
+    while Comment != ReplacedComment:
+        ReplacedComment = Comment
         Comment = Comment.replace('##', '#').replace('  ', ' ').replace(' ', '#').strip('# ')
     return Comment.split('#')
 
@@ -538,13 +538,13 @@ def ParseComment (Comment, UsageTokens, TypeTokens, RemoveTokens, ParseVariable)
                 NumTokens = 1
 
     #
-    # Initialze HelpText to Comment.
+    # Initialize HelpText to Comment.
     # Content will be remove from HelpText as matching tokens are found
     #
     HelpText = Comment
 
     #
-    # Tokenize Comment using '#' and ' ' as token seperators
+    # Tokenize Comment using '#' and ' ' as token separators
     #
     List = GenerateTokenList (Comment)
 

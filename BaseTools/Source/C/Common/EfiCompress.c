@@ -396,7 +396,7 @@ Routine Description:
 
   Allocate memory spaces for data structures used in compression process
 
-Argements: (VOID)
+Arguments: (VOID)
 
 Returns:
 
@@ -652,7 +652,7 @@ Returns: (VOID)
 
     //
     // We have just got a long match, the target tree
-    // can be located by MatchPos + 1. Travese the tree
+    // can be located by MatchPos + 1. Traverse the tree
     // from bottom up to get to a proper starting point.
     // The usage of PERC_FLAG ensures proper node deletion
     // in DeleteNode() later.
@@ -1281,7 +1281,7 @@ Routine Description:
 
   Outputs rightmost n bits of x
 
-Argments:
+Arguments:
 
   n   - the rightmost n bits of the data is used
   x   - the data

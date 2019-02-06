@@ -159,7 +159,7 @@ ool will generate a FV directory which includes a FFS directory, Fv file, Fv INf
 \af41\afs18 \ltrch\fcs0 \fs18\cf1\insrsid13252123 \hich\af41\dbch\af13\loch\f41 described }{\rtlch\fcs1 \af41\afs18 \ltrch\fcs0 \fs18\cf1\insrsid5513321 \hich\af41\dbch\af13\loch\f41 in the FDF file }{\rtlch\fcs1 \af41\afs18 \ltrch\fcs0 
 \fs18\cf1\insrsid13252123 \hich\af41\dbch\af13\loch\f41 such as }{\rtlch\fcs1 \af41\afs18 \ltrch\fcs0 \fs18\cf1\insrsid5513321 \hich\af41\dbch\af13\loch\f41 the \hich\f41 \lquote \loch\f41 InfFIle\hich\f41 \rquote \loch\f41 
  statement format  the GenFds tool }{\rtlch\fcs1 \af41\afs18 \ltrch\fcs0 \fs18\cf1\insrsid13252123 \hich\af41\dbch\af13\loch\f41 will determing the }{\rtlch\fcs1 \af41\afs18 \ltrch\fcs0 \fs18\cf1\insrsid5513321 \hich\af41\dbch\af13\loch\f41 \hich\f41 
- input files from the path of  \'93\loch\f41  $(outputDir)\\ $(Arch) \\ $(ActivePlatfromName) \\$(ModuleName) \\$(ModuleName) \\DEBUG
+ input files from the path of  \'93\loch\f41  $(outputDir)\\ $(Arch) \\ $(ActivePlatformName) \\$(ModuleName) \\$(ModuleName) \\DEBUG
 \par }\pard \ltrpar\ql \fi-360\li420\ri0\sb200\nowidctlpar\tx420\wrapdefault\faauto\rin0\lin420\itap0 {\rtlch\fcs1 \af41\afs18 \ltrch\fcs0 \fs18\cf1\insrsid5513321 \hich\af41\dbch\af13\loch\f41 1.\tab If Arch list was }{\rtlch\fcs1 \af41\afs18 \ltrch\fcs0 
 \fs18\cf1\insrsid13252123 \hich\af41\dbch\af13\loch\f41 specified}{\rtlch\fcs1 \af41\afs18 \ltrch\fcs0 \fs18\cf1\insrsid5513321 \hich\af41\dbch\af13\loch\f41 , }{\rtlch\fcs1 \af41\afs18 \ltrch\fcs0 \fs18\cf1\insrsid13252123 \hich\af41\dbch\af13\loch\f41 
 the }{\rtlch\fcs1 \af41\afs18 \ltrch\fcs0 \fs18\cf1\insrsid5513321 \hich\af41\dbch\af13\loch\f41 GenFds tool will use this Arch instead of Arch List in Target.txt file
@@ -258,11 +258,11 @@ ARCHS is a comma separated (no space) list containing one or more of: IA32, X64,
 \fs24\lang1033\langfe1033\loch\af41\hich\af41\dbch\af13\cgrid\langnp1033\langfenp1033 {\rtlch\fcs1 \ab\af41\afs28 \ltrch\fcs0 \b\fs28\cf17\insrsid5513321 {\*\bkmkend OLE_LINK3}{\*\bkmkend OLE_LINK4}{\*\bkmkend OLE_LINK5}\hich\af41\dbch\af13\loch\f41 
 Example
 \par }\pard\plain \ltrpar\ql \li60\ri0\sb200\nowidctlpar\wrapdefault\faauto\rin0\lin60\itap0 \rtlch\fcs1 \af0\afs24\alang1025 \ltrch\fcs0 \fs24\lang1033\langfe1033\loch\af41\hich\af41\dbch\af13\cgrid\langnp1033\langfenp1033 {\rtlch\fcs1 \af41\afs18 
-\ltrch\fcs0 \fs18\cf1\insrsid5513321 \hich\af41\dbch\af13\loch\f41 1. WORKSAPCE has already set. $(WORKSPACE) = c:\\work\\\hich\af41\dbch\af13\loch\f41 EdkII. The Fdf file is in c:\\work\\EdkII\\Nt32pkg\\Nt32pkg.fdf. Output directory is c:\\work\\EdkII\\
+\ltrch\fcs0 \fs18\cf1\insrsid5513321 \hich\af41\dbch\af13\loch\f41 1. WORKSPACE has already set. $(WORKSPACE) = c:\\work\\\hich\af41\dbch\af13\loch\f41 EdkII. The Fdf file is in c:\\work\\EdkII\\Nt32pkg\\Nt32pkg.fdf. Output directory is c:\\work\\EdkII\\
 Build\\Nt32\\Debug_MyTools.  ActivePlatform is C:\\work\\EdkII\\Nt32Pkg\\Nt32Pkg.dsc
 \par \hich\af41\dbch\af13\loch\f41 GenFds \hich\f41 \endash \loch\f41 f c:\\work\\EdkII\\Nt32pkg\\Nt32pkg.fdf \hich\f41 \endash \loch\f41 o c:\\work\\EdkII\\Build\\Nt32\\Debug_MyTo\hich\af41\dbch\af13\loch\f41 ols \hich\f41 \endash \loch\f41 p c:\\work\\EdkII
 \\Nt32pkg\\Nt32Pkg.dsc
-\par \hich\af41\dbch\af13\loch\f41 GenFds \hich\f41 \endash \loch\f41 f $(WORKSPACE)\\Nt32Pkg\\Nt32Pkg.fdf \hich\f41 \endash \loch\f41 o $(WORSPACE)\\Build\\Nt32\\Debug_MyTools \hich\f41 \endash \loch\f41 p $(WORKSAPCE)\\Nt32Pkg\\Nt32Pkg.dsc
+\par \hich\af41\dbch\af13\loch\f41 GenFds \hich\f41 \endash \loch\f41 f $(WORKSPACE)\\Nt32Pkg\\Nt32Pkg.fdf \hich\f41 \endash \loch\f41 o $(WORSPACE)\\Build\\Nt32\\Debug_MyTools \hich\f41 \endash \loch\f41 p $(WORKSPACE)\\Nt32Pkg\\Nt32Pkg.dsc
 \par 
 \par \hich\af41\dbch\af13\loch\f41 GenFds \hich\f41 \endash \loch\f41 f Nt32Pkg\\Nt32Pkg.fdf \hich\f41 \endash \loch\f41 o Build\\Nt32\\Debug_MyTools \hich\f41 \endash \loch\f41 p Nt32Pkg\\Nt32Pkg.dsc
 \par \hich\af41\dbch\af13\loch\f41 2. Generate on\hich\af41\dbch\af13\loch\f41 e FD which is defined in FDF file. Use \hich\f41 \lquote \loch\f41 -r\hich\f41 \rquote \loch\f41 

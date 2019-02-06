@@ -735,8 +735,8 @@ class IpiDatabase(object):
 
     ## Get a list of module information that comes from DP.
     #
-    # @param DpGuid: A Distrabution Guid
-    # @param DpVersion: A Distrabution version
+    # @param DpGuid: A Distribution Guid
+    # @param DpVersion: A Distribution version
     #
     def GetSModInsPathListFromDp(self, DpGuid, DpVersion):
 
@@ -754,8 +754,8 @@ class IpiDatabase(object):
 
     ## Get a list of package information.
     #
-    # @param DpGuid: A Distrabution Guid
-    # @param DpVersion: A Distrabution version
+    # @param DpGuid: A Distribution Guid
+    # @param DpVersion: A Distribution version
     #
     def GetPackageListFromDp(self, DpGuid, DpVersion):
 
@@ -774,8 +774,8 @@ class IpiDatabase(object):
 
     ## Get a list of modules that depends on package information from a DP.
     #
-    # @param DpGuid: A Distrabution Guid
-    # @param DpVersion: A Distrabution version
+    # @param DpGuid: A Distribution Guid
+    # @param DpVersion: A Distribution version
     #
     def GetDpDependentModuleList(self, DpGuid, DpVersion):
 
@@ -831,8 +831,8 @@ class IpiDatabase(object):
 
     ## Get Dp's list of modules.
     #
-    # @param DpGuid: A Distrabution Guid
-    # @param DpVersion: A Distrabution version
+    # @param DpGuid: A Distribution Guid
+    # @param DpVersion: A Distribution version
     #
     def GetDpModuleList(self, DpGuid, DpVersion):
         ModList = []

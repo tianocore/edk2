@@ -63,7 +63,7 @@
 #   $(FV_DIR)           Directory to store flash image files
 #   $(INC)              Search path of current module
 #   $(NASM_INC)         Search nasm file path of current module
-#   $(INC_LIST)         A file containing search pathes of current module
+#   $(INC_LIST)         A file containing search paths of current module
 #   $(LIBS)             Static library files of current module
 #   $(<tool>_FLAGS)     Tools flags of current module
 #   $(MODULE_NAME)      Current module name
@@ -379,7 +379,7 @@
         $(OBJCOPY) --strip-unneeded -R .eh_frame ${src}
 
         #
-        #The below 2 lines are only needed for UNIXGCC tool chain, which genereates PE image directly
+        #The below 2 lines are only needed for UNIXGCC tool chain, which generates PE image directly
         #
         -$(OBJCOPY) $(OBJCOPY_ADDDEBUGFLAG) ${src}
         -$(CP) $(DEBUG_DIR)(+)$(MODULE_NAME).debug $(BIN_DIR)(+)$(MODULE_NAME_GUID).debug

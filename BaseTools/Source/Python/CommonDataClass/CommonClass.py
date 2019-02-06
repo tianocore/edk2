@@ -66,7 +66,7 @@ class SkuInfoClass(object):
     ## Convert the class to a string
     #
     #  Convert each member of the class to string
-    #  Organize to a signle line format string
+    #  Organize to a single line format string
     #
     #  @retval Rtn Formatted String
     #

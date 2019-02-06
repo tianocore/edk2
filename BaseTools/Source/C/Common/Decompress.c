@@ -747,7 +747,7 @@ Arguments:
 
 Returns:
 
-  EFI_SUCCESS           - Decompression is successfull
+  EFI_SUCCESS           - Decompression is successful
   EFI_INVALID_PARAMETER - The source data is corrupted
 
 --*/
@@ -902,7 +902,7 @@ Arguments:
 
 Returns:
 
-  EFI_SUCCESS           - Decompression is successfull
+  EFI_SUCCESS           - Decompression is successful
   EFI_INVALID_PARAMETER - The source data is corrupted
 
 --*/
@@ -937,7 +937,7 @@ Arguments:
 
 Returns:
 
-  EFI_SUCCESS           - Decompression is successfull
+  EFI_SUCCESS           - Decompression is successful
   EFI_INVALID_PARAMETER - The source data is corrupted
 
 --*/

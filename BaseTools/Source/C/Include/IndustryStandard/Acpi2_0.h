@@ -497,7 +497,7 @@ typedef struct {
 #define EFI_ACPI_2_0_SYSTEM_LOCALITY_INFORMATION_TABLE_SIGNATURE  0x54494C53
 
 //
-// "SPCR" Serial Port Concole Redirection Table
+// "SPCR" Serial Port Console Redirection Table
 //
 #define EFI_ACPI_2_0_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_SIGNATURE  0x52435053
 

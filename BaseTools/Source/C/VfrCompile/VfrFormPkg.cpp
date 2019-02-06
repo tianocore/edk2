@@ -945,7 +945,7 @@ CFormPkg::DeclarePendingQuestion (
         }
         CNObj.SetFlags (0, Info.mVarType);
         //
-        // Use maximum value not to limit the vaild value for the undefined question.
+        // Use maximum value not to limit the valid value for the undefined question.
         //
         switch (Info.mVarType) {
         case EFI_IFR_TYPE_NUM_SIZE_64:
@@ -1515,7 +1515,7 @@ CIfrRecordInfoDB::IfrRecordAdjust (
       }
       //
       // extract inconsistent opcode list
-      // pNode is Incosistent opcode, tNode is End Opcode
+      // pNode is Inconsistent opcode, tNode is End Opcode
       //
 
       //

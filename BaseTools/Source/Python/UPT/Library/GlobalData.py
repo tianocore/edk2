@@ -43,7 +43,7 @@ gINVALID_MODULE_FILE = gUPT_DIR + r"Invalid_Modules.log"
 gCONTENT_FILE = "dist.content"
 
 #
-# File name for XML file in the distibution
+# File name for XML file in the distribution
 #
 gDESC_FILE = 'dist.pkg'
 

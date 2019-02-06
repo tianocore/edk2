@@ -554,7 +554,7 @@ class App:
         if result:
             print('All files have been downloaded & verified')
         else:
-            print('An error occured while downloading a file')
+            print('An error occurred while downloading a file')
             return
 
         Extracter(sources, config).ExtractAll()

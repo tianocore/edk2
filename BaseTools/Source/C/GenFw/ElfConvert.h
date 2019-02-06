@@ -49,7 +49,7 @@ typedef enum {
 } SECTION_FILTER_TYPES;
 
 //
-// FunctionTalbe
+// FunctionTable
 //
 typedef struct {
   VOID    (*ScanSections) ();

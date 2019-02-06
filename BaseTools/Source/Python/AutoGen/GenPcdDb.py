@@ -342,7 +342,7 @@ class DbComItemList (DbItemList):
         Offset = 0
         if self.ItemSize == 0:
             #
-            # Variable length, need to calculte one by one
+            # Variable length, need to calculate one by one
             # The only variable table is stringtable, it is not Composite item, should not reach here
             #
             assert(False)
@@ -631,7 +631,7 @@ def BuildExDataBase(Dict):
     Dict['STRING_TABLE_DB_VALUE'] = [StringArrayToList(x) for x in Dict['STRING_TABLE_VALUE']]
 
     StringTableValue = Dict['STRING_TABLE_DB_VALUE']
-    # when calcute the offset, should use StringTableLen instead of StringTableValue, as string maxium len may be different with actual len
+    # when calcute the offset, should use StringTableLen instead of StringTableValue, as string maximum len may be different with actual len
     StringTableLen = Dict['STRING_TABLE_LENGTH']
     DbStringTableLen = DbStringItemList(0, RawDataList = StringTableValue, LenList = StringTableLen)
 
@@ -1011,7 +1011,7 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, DynamicPcdList, Phase):
         'SKUID_TABLE_EMPTY'             : 'TRUE',
         'DATABASE_EMPTY'                : 'TRUE',
         'EXMAP_TABLE_EMPTY'             : 'TRUE',
-        'PCD_DATABASE_UNINIT_EMPTY'     : '  UINT8  dummy; /* PCD_DATABASE_UNINIT is emptry */',
+        'PCD_DATABASE_UNINIT_EMPTY'     : '  UINT8  dummy; /* PCD_DATABASE_UNINIT is empty */',
         'SYSTEM_SKU_ID'                 : '  SKU_ID             SystemSkuId;',
         'SYSTEM_SKU_ID_VALUE'           : '0U'
     }

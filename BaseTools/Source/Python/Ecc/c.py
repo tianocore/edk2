@@ -733,7 +733,7 @@ def SplitPredicateByOp(Str, Op, IsFuncCalling=False):
 
             while not LBFound and (Str[Index].isalnum() or Str[Index] == '_'):
                 Index += 1
-            # maybe type-cast at the begining, skip it.
+            # maybe type-cast at the beginning, skip it.
             RemainingStr = Str[Index:].lstrip()
             if RemainingStr.startswith(')') and not LBFound:
                 Index += 1
@@ -834,7 +834,7 @@ def GetDataTypeFromModifier(ModifierStr):
     for M in MList:
         if M in EccGlobalData.gConfig.ModifierSet:
             continue
-        # remove array sufix
+        # remove array suffix
         if M.startswith('[') or M.endswith(']'):
             continue
         ReturnType += M + ' '
@@ -1019,7 +1019,7 @@ def GetFinalTypeValue(Type, FieldName, TypedefDict, SUDict):
                 Type = GetDataTypeFromModifier(Field[0:Index])
                 return Type.strip()
             else:
-            # For the condition that the field in struct is an array with [] sufixes...
+            # For the condition that the field in struct is an array with [] suffixes...
                 if not Field[Index + len(FieldName)].isalnum():
                     Type = GetDataTypeFromModifier(Field[0:Index])
                     return Type.strip()
@@ -1629,7 +1629,7 @@ def CheckMemberVariableFormat(Name, Value, FileTable, TdId, ModelId):
         Field = Field.strip()
         if Field == '':
             continue
-        # For the condition that the field in struct is an array with [] sufixes...
+        # For the condition that the field in struct is an array with [] suffixes...
         if Field[-1] == ']':
             LBPos = Field.find('[')
             Field = Field[0:LBPos]

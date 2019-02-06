@@ -242,8 +242,8 @@ def RemoveDist(Guid, Version, StoredDistFile, DataBase, WorkspaceDir, ForceRemov
                 #
                 # check whether modified by users
                 #
-                Md5Sigature = md5(open(str(Path), 'rb').read())
-                if Md5Sum != Md5Sigature.hexdigest():
+                Md5Signature = md5(open(str(Path), 'rb').read())
+                if Md5Sum != Md5Signature.hexdigest():
                     Logger.Info(ST.MSG_CONFIRM_REMOVE2 % Path)
                     Input = stdin.readline()
                     Input = Input.replace('\r', '').replace('\n', '')

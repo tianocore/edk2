@@ -4,7 +4,7 @@
 # This script will modife the C/Include/Common/BuildVersion.h file and the two
 # Python scripts, Python/Common/BuildVersion.py and Python/UPT/BuildVersion.py.
 # If SVN is available, the tool will obtain the current checked out version of
-# the source tree for including the the --version commands.
+# the source tree for including the --version commands.
 
 #  Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
 #
@@ -73,7 +73,7 @@ def ParseOptions():
 
 
 def ShellCommandResults(CmdLine, Opt):
-    """ Execute the comand, returning the output content """
+    """ Execute the command, returning the output content """
     file_list = NamedTemporaryFile(delete=False)
     filename = file_list.name
     Results = []

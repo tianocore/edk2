@@ -121,7 +121,7 @@ class DecBuildData(PackageBuildClassObject):
 
     ## Retrieve all information in [Defines] section
     #
-    #   (Retriving all [Defines] information in one-shot is just to save time.)
+    #   (Retrieving all [Defines] information in one-shot is just to save time.)
     #
     def _GetHeaderInfo(self):
         RecordList = self._RawData[MODEL_META_DATA_HEADER, self._Arch]
@@ -167,7 +167,7 @@ class DecBuildData(PackageBuildClassObject):
         if self._Protocols is None:
             #
             # tdict is a special kind of dict, used for selecting correct
-            # protocol defition for given ARCH
+            # protocol definition for given ARCH
             #
             ProtocolDict = tdict(True)
             PrivateProtocolDict = tdict(True)
@@ -210,7 +210,7 @@ class DecBuildData(PackageBuildClassObject):
         if self._Ppis is None:
             #
             # tdict is a special kind of dict, used for selecting correct
-            # PPI defition for given ARCH
+            # PPI definition for given ARCH
             #
             PpiDict = tdict(True)
             PrivatePpiDict = tdict(True)
@@ -253,7 +253,7 @@ class DecBuildData(PackageBuildClassObject):
         if self._Guids is None:
             #
             # tdict is a special kind of dict, used for selecting correct
-            # GUID defition for given ARCH
+            # GUID definition for given ARCH
             #
             GuidDict = tdict(True)
             PrivateGuidDict = tdict(True)

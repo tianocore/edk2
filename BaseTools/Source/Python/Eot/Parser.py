@@ -62,7 +62,7 @@ def DeCompress(Method, Input):
 #  @param  MergeMultipleLines: Switch for if merge multiple lines
 #  @param  LineNo: Default line no
 #
-#  @return Lines: The file contents after remvoing comments
+#  @return Lines: The file contents after removing comments
 #
 def PreProcess(Filename, MergeMultipleLines = True, LineNo = -1):
     Lines = []
@@ -770,7 +770,7 @@ def GetParameterName(Parameter):
 #  @param Table: Table to be searched
 #  @param Key: The keyword
 #
-#  @return Value: The value of the the keyword
+#  @return Value: The value of the keyword
 #
 def FindKeyValue(Db, Table, Key):
     SqlCommand = """select Value from %s where Name = '%s' and (Model = %s or Model = %s)""" % (Table, Key, MODEL_IDENTIFIER_VARIABLE, MODEL_IDENTIFIER_ASSIGNMENT_EXPRESSION)

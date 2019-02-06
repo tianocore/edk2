@@ -143,14 +143,14 @@ def GetConfigureKeyValue(self, Key):
         if os.path.exists(dscFullPath):
             Line = "%-30s = %s\n" % (Key, self.Opt.DSCFILE)
         else:
-            EdkLogger.error("TagetTool", BuildToolError.FILE_NOT_FOUND,
+            EdkLogger.error("TargetTool", BuildToolError.FILE_NOT_FOUND,
                             "DSC file %s does not exist!" % self.Opt.DSCFILE, RaiseError=False)
     elif Key == TAB_TAT_DEFINES_TOOL_CHAIN_CONF and self.Opt.TOOL_DEFINITION_FILE is not None:
         tooldefFullPath = os.path.join(self.WorkSpace, self.Opt.TOOL_DEFINITION_FILE)
         if os.path.exists(tooldefFullPath):
             Line = "%-30s = %s\n" % (Key, self.Opt.TOOL_DEFINITION_FILE)
         else:
-            EdkLogger.error("TagetTool", BuildToolError.FILE_NOT_FOUND,
+            EdkLogger.error("TargetTool", BuildToolError.FILE_NOT_FOUND,
                             "Tooldef file %s does not exist!" % self.Opt.TOOL_DEFINITION_FILE, RaiseError=False)
 
     elif self.Opt.NUM >= 2:

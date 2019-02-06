@@ -21,7 +21,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "EfiUtilityMsgs.h"
 
 //
-// Declare module globals for keeping track of the the utility's
+// Declare module globals for keeping track of the utility's
 // name and other settings.
 //
 STATIC STATUS mStatus                 = STATUS_SUCCESS;
@@ -61,7 +61,7 @@ Arguments:
   at least something valid is not specified.
 
   FileName - name of the file or application. If not specified, then the
-             utilty name (as set by the utility calling SetUtilityName()
+             utility name (as set by the utility calling SetUtilityName()
              earlier) is used. Otherwise "Unknown utility" is used.
 
   LineNumber - the line number of error, typically used by parsers. If the
@@ -384,7 +384,7 @@ Routine Description:
 Arguments:
   Type        - "warning" or "error" string to insert into the message to be
                 printed. The first character of this string (converted to uppercase)
-                is used to preceed the MessageCode value in the output string.
+                is used to precede the MessageCode value in the output string.
 
   FileName    - name of the file where the warning was detected, or the name
                 of the application that detected the warning
@@ -597,7 +597,7 @@ Routine Description:
 
 Arguments:
   UtilityName  -  name of the utility, which will be printed with all
-                  error/warning/debug messags.
+                  error/warning/debug messages.
 
 Returns:
   NA

@@ -343,7 +343,7 @@ class DscBuildData(PlatformBuildClassObject):
 
     ## Retrieve all information in [Defines] section
     #
-    #   (Retriving all [Defines] information in one-shot is just to save time.)
+    #   (Retrieving all [Defines] information in one-shot is just to save time.)
     #
     def _GetHeaderInfo(self):
         RecordList = self._RawData[MODEL_META_DATA_HEADER, self._Arch]

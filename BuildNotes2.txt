@@ -138,7 +138,7 @@ Tools in Python
        "<python_source_dir>/build/build.py" directly.
 
 * Convert Python source to exe file
-  The tools written in Python can be coverted into executable program which can
+  The tools written in Python can be converted into executable program which can
   be executed without Python interpreter. One of the conversion tools is called
   cx_Freeze, available at: 
 

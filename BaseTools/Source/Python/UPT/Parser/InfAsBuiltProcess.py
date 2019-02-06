@@ -46,7 +46,7 @@ def GetLibInstanceInfo(String, WorkSpace, LineNo, CurrentInfFileName):
     FileGuidString = ""
     VerString = ""
 
-    OrignalString = String
+    OriginalString = String
     String = String.strip()
     if not String:
         return None, None
@@ -78,7 +78,7 @@ def GetLibInstanceInfo(String, WorkSpace, LineNo, CurrentInfFileName):
     #
     # To deal with library instance specified by file name
     #
-    FileLinesList = GetFileLineContent(String, WorkSpace, LineNo, OrignalString)
+    FileLinesList = GetFileLineContent(String, WorkSpace, LineNo, OriginalString)
 
 
     ReFindFileGuidPattern = re.compile("^\s*FILE_GUID\s*=.*$")

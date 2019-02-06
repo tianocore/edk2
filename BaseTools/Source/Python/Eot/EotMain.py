@@ -1514,7 +1514,7 @@ class Eot(object):
                             % (Identifier, '.NotifyPpi', '->NotifyPpi', MODEL_IDENTIFIER_FUNCTION_CALLING)
             SearchPpi(SqlCommand, Identifier, SourceFileID, SourceFileFullPath, ItemMode)
 
-            # Find Procotols
+            # Find Protocols
             ItemMode = 'Produced'
             SqlCommand = """select Value, Name, BelongsToFile, StartLine, EndLine from %s
                             where (Name like '%%%s%%' or Name like '%%%s%%' or Name like '%%%s%%' or Name like '%%%s%%') and Model = %s""" \

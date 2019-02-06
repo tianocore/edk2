@@ -144,7 +144,7 @@ title, and interest in and to Your Contributions.
   of such entity.
 * "Contribution" shall mean any original work of authorship,
   including any modifications or additions to an existing work,
-  that is intentionally submitted by You to the TinaoCore site for
+  that is intentionally submitted by You to the TianoCore site for
   inclusion in, or documentation of, any of the Content. For the
   purposes of this definition, "submitted" means any form of
   electronic, verbal, or written communication sent to the

@@ -797,7 +797,7 @@ extern int zzguessing;
 extern zzjmp_buf zzguess_start;
 #endif
 
-/* Define global veriables that refer to values exported by the scanner.
+/* Define global variables that refer to values exported by the scanner.
  * These declarations duplicate those in dlgdef.h, but are needed
  * if ANTLR is not to generate a .dlg file (-gx); PS, this is a hack.
  */

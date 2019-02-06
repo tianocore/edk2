@@ -93,7 +93,7 @@ TAB_STR_TOKENHELP = 'HELP'
 TAB_STR_TOKENERR = 'ERR'
 
 #
-# Dictionary of usage tokens and their synonmys
+# Dictionary of usage tokens and their synonyms
 #
 ALL_USAGE_TOKENS = {
   "PRODUCES"           : "PRODUCES",

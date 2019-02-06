@@ -145,7 +145,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <xs:documentation xml:lang="en-us">
               The UserExtensions section is used to disseminate processing
               instructions that may be custom to the content provided by the distribution. This section
-              contains information that is common to all aspects of this disribution.
+              contains information that is common to all aspects of this distribution.
             </xs:documentation>
           </xs:annotation>
         </xs:element>
@@ -328,7 +328,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
               important to reflect the present state of the matter
             </xs:documentation>
             <xs:documentation xml:lang="en-us">
-              #2 Added definition/enumeration of UNDEFIND type 2 is
+              #2 Added definition/enumeration of UNDEFINED type 2 is
               important since there is a large body of legacy code for which the GUID’s and other
               code/data objects were not decorated with their usage. This document will allow for
               importing today’s source artifacts and producing decorations using the ‘Undefined’ versus
@@ -696,7 +696,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             </xs:sequence>
           </xs:complexType>
         </xs:element>
-        <!-- End of PackageSurfaceArea PackageIncluces element.  -->
+        <!-- End of PackageSurfaceArea PackageIncludes element.  -->
 
         <xs:element minOccurs="0" maxOccurs="1" name="Modules">
           <xs:complexType>
@@ -962,8 +962,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
                               <xs:annotation>
                                 <xs:documentation xml:lang="en-us">
                                   The PCD must be within a
-                                  specifed range of numeric values. Restricted to C style
-                                  Relational, Equality and Logicial Operators and parenthesis
+                                  specified range of numeric values. Restricted to C style
+                                  Relational, Equality and Logical Operators and parenthesis
                                   are valid. Only the CName for this PCD is permitted in the
                                   ValidValueRange expression. All other values must be
                                   numeric.
@@ -1006,7 +1006,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
                               <xs:documentation xml:lang="en-us">
                                 This string should be
                                 defined by specifications. There are pre-defined error
-                                number ranges in the UEFI/PI specificaiton.
+                                number ranges in the UEFI/PI specification.
                               </xs:documentation>
                             </xs:annotation>
                             <xs:complexType>
@@ -1452,7 +1452,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
                           <xs:annotation>
                             <xs:documentation xml:lang="en-us">
                               The module will change the
-                              boot mode on some exection paths.
+                              boot mode on some execution paths.
                             </xs:documentation>
                           </xs:annotation>
                         </xs:enumeration>
@@ -2835,7 +2835,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <xs:anyAttribute processContents="lax"/>
     </xs:complexType>
   </xs:element>
-  <!-- The following elsements are common definitions used with the ref attribute for elements. -->
+  <!-- The following elements are common definitions used with the ref attribute for elements. -->
 
   <xs:element name="HelpText">
     <xs:complexType>
