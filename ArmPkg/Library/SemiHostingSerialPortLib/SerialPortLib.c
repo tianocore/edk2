@@ -103,7 +103,7 @@ SerialPortWrite (
   @param  NumberOfBytes    Number of output bytes which are cached in Buffer.
 
   @retval 0                Read data failed.
-  @retval !0               Aactual number of bytes read from serial device.
+  @retval !0               Actual number of bytes read from serial device.
 
 **/
 UINTN
@@ -120,10 +120,10 @@ SerialPortRead (
 
 
 /**
-  Check to see if any data is avaiable to be read from the debug device.
+  Check to see if any data is available to be read from the debug device.
 
-  @retval TRUE       At least one byte of data is avaiable to be read
-  @retval FALSE      No data is avaiable to be read
+  @retval TRUE       At least one byte of data is available to be read
+  @retval FALSE      No data is available to be read
 
 **/
 BOOLEAN

@@ -281,7 +281,7 @@ GetMemoryRegionRec (
     BlockEntry++;
   } else if (EntryType == BlockEntryType) {
     // We have found the BlockEntry attached to the address. We save its start address (the start
-    // address might be before the 'BaseAdress') and attributes
+    // address might be before the 'BaseAddress') and attributes
     *BaseAddress      = *BaseAddress & ~(TT_ADDRESS_AT_LEVEL(TableLevel) - 1);
     *RegionLength     = 0;
     *RegionAttributes = *BlockEntry & TT_ATTRIBUTES_MASK;

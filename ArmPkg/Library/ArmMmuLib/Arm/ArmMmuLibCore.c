@@ -691,7 +691,7 @@ UpdateSectionEntries (
   for(i=0; i<NumSections; i++) {
     CurrentDescriptor = FirstLevelTable[FirstLevelIdx + i];
 
-    // has this descriptor already been coverted to pages?
+    // has this descriptor already been converted to pages?
     if (TT_DESCRIPTOR_SECTION_TYPE_IS_PAGE_TABLE(CurrentDescriptor)) {
       // forward this 1MB range to page table function instead
       Status = UpdatePageEntries (

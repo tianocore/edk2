@@ -13,7 +13,7 @@
 #include <Library/ArmDisassemblerLib.h>
 
 /**
-  Place a disassembly of of **OpCodePtr into buffer, and update OpCodePtr to
+  Place a disassembly of **OpCodePtr into buffer, and update OpCodePtr to
   point to next instruction.
 
   @param  OpCodePtrPtr  Pointer to pointer of instruction to disassemble.

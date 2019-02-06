@@ -365,7 +365,7 @@ TimerInitialize (
   UINT32      TimerHypIntrNum;
 
   if (ArmIsArchTimerImplemented () == 0) {
-    DEBUG ((EFI_D_ERROR, "ARM Architectural Timer is not available in the CPU, hence cann't use this Driver \n"));
+    DEBUG ((DEBUG_ERROR, "ARM Architectural Timer is not available in the CPU, hence can't use this Driver \n"));
     ASSERT (0);
   }
 

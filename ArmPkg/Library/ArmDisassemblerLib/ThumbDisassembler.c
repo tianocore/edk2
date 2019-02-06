@@ -1,5 +1,5 @@
 /** @file
-  Thumb Dissassembler. Still a work in progress.
+  Thumb Disassembler. Still a work in progress.
 
   Wrong output is a bug, so please fix it.
   Hex output means there is not yet an entry or a decode bug.
@@ -103,7 +103,7 @@ typedef struct {
 } THUMB_INSTRUCTIONS;
 
 THUMB_INSTRUCTIONS gOpThumb[] = {
-// Thumb 16-bit instrucitons
+// Thumb 16-bit instructions
 //          Op       Mask   Format
   { "ADC" , 0x4140, 0xffc0, DATA_FORMAT5 },  // ADC <Rndn>, <Rm>
   { "ADR",  0xa000, 0xf800, ADR_FORMAT   },  // ADR <Rd>, <label>
@@ -447,7 +447,7 @@ SignExtend32 (
 
 //
 // Some instructions specify the PC is always considered aligned
-// The PC is after the instruction that is excuting. So you pass
+// The PC is after the instruction that is executing. So you pass
 // in the instruction address and you get back the aligned answer
 //
 UINT32
@@ -459,8 +459,8 @@ PCAlign4 (
 }
 
 /**
-  Place a dissasembly of of **OpCodePtr into buffer, and update OpCodePtr to
-  point to next instructin.
+  Place a disassembly of **OpCodePtr into buffer, and update OpCodePtr to
+  point to next instruction.
 
   We cheat and only decode instructions that access
   memory. If the instruction is not found we dump the instruction in hex.
@@ -1023,8 +1023,8 @@ DisassembleArmInstruction (
 
 
 /**
-  Place a dissasembly of of **OpCodePtr into buffer, and update OpCodePtr to
-  point to next instructin.
+  Place a disassembly of **OpCodePtr into buffer, and update OpCodePtr to
+  point to next instruction.
 
   We cheat and only decode instructions that access
   memory. If the instruction is not found we dump the instruction in hex.
