@@ -286,7 +286,6 @@
   gEfiMdePkgTokenSpaceGuid.PcdMaximumAsciiStringLength|1000000
   gEfiMdePkgTokenSpaceGuid.PcdMaximumLinkedListLength|1000000
   gEfiMdePkgTokenSpaceGuid.PcdSpinLockTimeout|10000000
-  gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue|0xAF
   gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize|320
 
   # DEBUG_ASSERT_ENABLED       0x01
