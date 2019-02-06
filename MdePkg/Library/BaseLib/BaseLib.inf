@@ -552,7 +552,6 @@
 [Sources.ARM]
   Arm/InternalSwitchStack.c
   Arm/Unaligned.c
-  Arm/SpeculationBarrier.c
   Math64.c                   | RVCT
   Math64.c                   | MSFT
 
@@ -564,6 +563,7 @@
   Arm/CpuPause.asm           | RVCT
   Arm/CpuBreakpoint.asm      | RVCT
   Arm/MemoryFence.asm        | RVCT
+  Arm/SpeculationBarrier.S   | RVCT
 
   Arm/SwitchStack.asm        | MSFT
   Arm/SetJumpLongJump.asm    | MSFT
@@ -573,6 +573,7 @@
   Arm/CpuPause.asm           | MSFT
   Arm/CpuBreakpoint.asm      | MSFT
   Arm/MemoryFence.asm        | MSFT
+  Arm/SpeculationBarrier.asm | MSFT
 
   Arm/Math64.S                  | GCC
   Arm/SwitchStack.S             | GCC
@@ -582,11 +583,11 @@
   Arm/SetJumpLongJump.S         | GCC
   Arm/CpuBreakpoint.S           | GCC
   Arm/MemoryFence.S             | GCC
+  Arm/SpeculationBarrier.S      | GCC
 
 [Sources.AARCH64]
   Arm/InternalSwitchStack.c
   Arm/Unaligned.c
-  Arm/SpeculationBarrier.c
   Math64.c
 
   AArch64/MemoryFence.S             | GCC
@@ -596,6 +597,7 @@
   AArch64/GetInterruptsState.S      | GCC
   AArch64/SetJumpLongJump.S         | GCC
   AArch64/CpuBreakpoint.S           | GCC
+  AArch64/SpeculationBarrier.S      | GCC
 
   AArch64/MemoryFence.asm           | MSFT
   AArch64/SwitchStack.asm           | MSFT
@@ -604,6 +606,7 @@
   AArch64/GetInterruptsState.asm    | MSFT
   AArch64/SetJumpLongJump.asm       | MSFT
   AArch64/CpuBreakpoint.asm         | MSFT
+  AArch64/SpeculationBarrier.asm    | MSFT
 
 [Packages]
   MdePkg/MdePkg.dec
