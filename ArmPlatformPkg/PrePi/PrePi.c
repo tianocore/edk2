@@ -193,7 +193,7 @@ CEntryPoint (
         ArmCallSEV ();
       }
     } else {
-      // Wait the Primay core has defined the address of the Global Variable region (event: ARM_CPU_EVENT_DEFAULT)
+      // Wait the Primary core has defined the address of the Global Variable region (event: ARM_CPU_EVENT_DEFAULT)
       ArmCallWFE ();
     }
   }
