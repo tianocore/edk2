@@ -64,7 +64,7 @@ ASM_PFX(SecSwitchStack):
     mov   esp,  eax                 ; From now, esp is pointed to permanent memory
 
     ;
-    ; Fixup the ebp point to permenent memory
+    ; Fixup the ebp point to permanent memory
     ;
     mov   eax,  ebp
     sub   eax,  ebx

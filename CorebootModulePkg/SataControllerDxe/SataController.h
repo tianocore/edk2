@@ -91,7 +91,7 @@ typedef struct _EFI_SATA_CONTROLLER_PRIVATE_DATA {
   UINT8                             DeviceCount;
 
   //
-  // The highest disqulified mode for each attached device,
+  // The highest disqualified mode for each attached device,
   // From ATA/ATAPI spec, if a mode is not supported,
   // the modes higher than it is also not supported
   //

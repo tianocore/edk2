@@ -91,7 +91,7 @@ SecTemporaryRamSupport (
   the control is transferred to this function.
 
   @param SizeOfRam           Size of the temporary memory available for use.
-  @param TempRamBase         Base address of tempory ram
+  @param TempRamBase         Base address of temporary ram
   @param BootFirmwareVolume  Base address of the Boot Firmware Volume.
 **/
 VOID
@@ -105,7 +105,7 @@ SecStartup (
 /**
   Find and return Pei Core entry point.
 
-  It also find SEC and PEI Core file debug inforamtion. It will report them if
+  It also find SEC and PEI Core file debug information. It will report them if
   remote debug is enabled.
 
   @param  BootFirmwareVolumePtr  Point to the boot firmware volume.
