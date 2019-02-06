@@ -474,7 +474,7 @@ class WorkspaceAutoGen(AutoGen):
 
             # generate the SourcePcdDict and BinaryPcdDict
             PGen = PlatformAutoGen(self, self.MetaFile, Target, Toolchain, Arch)
-            for BuildData in PGen.BuildDatabase._CACHE_.values():
+            for BuildData in list(PGen.BuildDatabase._CACHE_.values()):
                 if BuildData.Arch != Arch:
                     continue
                 if BuildData.MetaFile.Ext == '.inf':
