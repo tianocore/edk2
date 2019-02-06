@@ -112,7 +112,7 @@ PL011UartSetControl (
                          . EFI_SERIAL_OUTPUT_BUFFER_EMPTY : equal to one if the
                            transmit buffer is empty, 0 otherwise.
                          . EFI_SERIAL_HARDWARE_LOOPBACK_ENABLE : equal to one if
-                           the hardware loopback is enabled (the ouput feeds the
+                           the hardware loopback is enabled (the output feeds the
                            receive buffer), 0 otherwise.
                          . EFI_SERIAL_SOFTWARE_LOOPBACK_ENABLE : equal to one if
                            a loopback is accomplished by software, 0 otherwise.
