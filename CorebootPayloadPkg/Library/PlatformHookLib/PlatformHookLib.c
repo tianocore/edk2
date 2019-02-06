@@ -34,7 +34,7 @@ typedef struct {
 /**
   Performs platform specific initialization required for the CPU to access
   the hardware associated with a SerialPortLib instance.  This function does
-  not intiailzie the serial port hardware itself.  Instead, it initializes
+  not initialize the serial port hardware itself.  Instead, it initializes
   hardware devices that are required for the CPU to access the serial port
   hardware.  This function may be called more than once.
 

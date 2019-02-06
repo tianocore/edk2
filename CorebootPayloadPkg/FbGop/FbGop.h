@@ -205,7 +205,7 @@ FbGopCheckForVbe (
 
 
 /**
-  Release resource for biso video instance.
+  Release resource for bios video instance.
 
   @param  FbGopPrivate       Video child device private data structure
 
@@ -311,9 +311,9 @@ FbGopGraphicsOutputVbeBlt (
 
 
 /**
-  Grahpics Output protocol instance to block transfer for VGA device.
+  Graphics Output protocol instance to block transfer for VGA device.
 
-  @param  This                   Pointer to Grahpics Output protocol instance
+  @param  This                   Pointer to Graphics Output protocol instance
   @param  BltBuffer              The data to transfer to screen
   @param  BltOperation           The operation to perform
   @param  SourceX                The X coordinate of the source for BltOperation
@@ -394,7 +394,7 @@ FbGopChildHandleUninstall (
   );
 
 /**
-  Release resource for biso video instance.
+  Release resource for bios video instance.
 
   @param  FbGopPrivate       Video child device private data structure
 

@@ -70,7 +70,7 @@ CB_PCI_ROOT_BRIDGE_DEVICE_PATH mRootBridgeDevicePathTemplate = {
                                assigned to any subordinate bus found behind any
                                PCI bridge hanging off this root bus.
 
-                               The caller is repsonsible for ensuring that
+                               The caller is responsible for ensuring that
                                RootBusNumber <= MaxSubBusNumber. If
                                RootBusNumber equals MaxSubBusNumber, then the
                                root bus has no room for subordinate buses.

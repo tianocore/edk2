@@ -262,7 +262,7 @@ FbGopDriverBindingStart (
     if (IsDevicePathEnd (RemainingDevicePath)) {
       //
       // If RemainingDevicePath is the End of Device Path Node,
-      // don't create any child device and return EFI_SUCESS
+      // don't create any child device and return EFI_SUCCESS
       Status = EFI_SUCCESS;
       goto Done;
     }
@@ -688,7 +688,7 @@ FbGopChildHandleUninstall (
 
 
 /**
-  Release resource for biso video instance.
+  Release resource for bios video instance.
 
   @param  FbGopPrivate       Video child device private data structure
 
@@ -703,7 +703,7 @@ FbGopDeviceReleaseResource (
   }
 
   //
-  // Release all the resourses occupied by the FB_VIDEO_DEV
+  // Release all the resources occupied by the FB_VIDEO_DEV
   //
   
   //
@@ -1222,7 +1222,7 @@ FbGopVbeBltWorker (
   }
   //
   // We need to fill the Virtual Screen buffer with the blt data.
-  // The virtual screen is upside down, as the first row is the bootom row of
+  // The virtual screen is upside down, as the first row is the bottom row of
   // the image.
   //
   if (BltOperation == EfiBltVideoToBltBuffer) {
