@@ -61,7 +61,7 @@ PublishArmProcessorTable (
         // Allocate Runtime memory for ARM processor table
         ArmProcessorTable = (ARM_PROCESSOR_TABLE*)AllocateRuntimePool(sizeof(ARM_PROCESSOR_TABLE));
 
-        // Check if the memory allocation is succesful or not
+        // Check if the memory allocation is successful or not
         ASSERT(NULL != ArmProcessorTable);
 
         // Set ARM processor table to default values
@@ -81,7 +81,7 @@ PublishArmProcessorTable (
         ArmProcessorTable->ArmCpus = (ARM_CORE_INFO*)AllocateRuntimePool (
            ArmProcessorTable->NumberOfEntries * sizeof(ARM_CORE_INFO));
 
-        // Check if the memory allocation is succesful or not
+        // Check if the memory allocation is successful or not
         ASSERT(NULL != ArmProcessorTable->ArmCpus);
 
         // Copy ARM Processor Table data from HOB list to newly allocated memory

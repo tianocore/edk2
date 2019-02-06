@@ -21,7 +21,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 /**
   Append string to debugger script file, create file if needed.
 
-  This library can show up in mulitple places so we need to append the file every time we write to it.
+  This library can show up in multiple places so we need to append the file every time we write to it.
   For example Sec can use this to load the DXE core, and the DXE core would use this to load all the
   other modules. So we have two instances of the library in the system.
 

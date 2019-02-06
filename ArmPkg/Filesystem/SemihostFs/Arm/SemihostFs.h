@@ -157,7 +157,7 @@ FileGetPosition (
   @param[in]  Position  The byte position from the start of the file to set.
 
   @retval  EFI_SUCCESS       The position was set.
-  @retval  EFI_DEVICE_ERROR  The semi-hosting positionning operation failed.
+  @retval  EFI_DEVICE_ERROR  The semi-hosting positioning operation failed.
   @retval  EFI_UNSUPPORTED   The seek request for nonzero is not valid on open
                              directories.
 

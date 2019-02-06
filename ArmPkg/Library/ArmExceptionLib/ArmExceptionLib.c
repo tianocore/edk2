@@ -94,7 +94,7 @@ InitializeCpuExceptionHandlers(
 
   Status = EFI_SUCCESS;
 
-  // if we are requested to copy exceptin handlers to another location
+  // if we are requested to copy exception handlers to another location
   if (gArmRelocateVectorTable) {
 
     VectorBase = PcdGet64(PcdCpuVectorBaseAddress);
@@ -131,7 +131,7 @@ InitializeCpuExceptionHandlers(
 }
 
 /**
-Copies exception handlers to the speciifed address.
+Copies exception handlers to the specified address.
 
 Caller should try to get an array of interrupt and/or exception vectors that are in use and need to
 persist by EFI_VECTOR_HANDOFF_INFO defined in PI 1.3 specification.

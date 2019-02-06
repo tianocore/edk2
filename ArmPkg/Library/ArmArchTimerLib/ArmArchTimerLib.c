@@ -152,7 +152,7 @@ MicroSecondDelay (
 
   @param  NanoSeconds The minimum number of nanoseconds to delay.
 
-  @return The value of NanoSeconds inputed.
+  @return The value of NanoSeconds inputted.
 
 **/
 UINTN

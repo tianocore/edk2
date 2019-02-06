@@ -234,7 +234,7 @@ SyncCacheConfig (
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR     *MemorySpaceMap;
 
 
-  DEBUG ((EFI_D_PAGE, "SyncCacheConfig()\n"));
+  DEBUG ((DEBUG_PAGE, "SyncCacheConfig()\n"));
 
   // This code assumes MMU is enabled and filed with section translations
   ASSERT (ArmMmuEnabled ());

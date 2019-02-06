@@ -23,7 +23,7 @@
 
 
 ASM_FUNC(ArmIsMpCore)
-  mrs   x0, mpidr_el1         // Read EL1 Mutliprocessor Affinty Reg (MPIDR)
+  mrs   x0, mpidr_el1         // Read EL1 Multiprocessor Affinty Reg (MPIDR)
   and   x0, x0, #MPIDR_U_MASK // U Bit clear, the processor is part of a multiprocessor system
   lsr   x0, x0, #MPIDR_U_BIT
   eor   x0, x0, #1

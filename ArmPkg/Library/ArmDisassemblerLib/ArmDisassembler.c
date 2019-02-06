@@ -137,8 +137,8 @@ RotateRight (
 
 
 /**
-  Place a dissasembly of of **OpCodePtr into buffer, and update OpCodePtr to
-  point to next instructin.
+  Place a disassembly of **OpCodePtr into buffer, and update OpCodePtr to
+  point to next instruction.
 
   We cheat and only decode instructions that access
   memory. If the instruction is not found we dump the instruction in hex.

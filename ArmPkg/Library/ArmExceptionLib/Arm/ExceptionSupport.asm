@@ -221,7 +221,7 @@ AsmCommonExceptionEntry
   ldr       R5, [SP, #0x58]         ; PC is the LR pushed by srsfd
                                     ; Check to see if we have to adjust for Thumb entry
   sub       r4, r0, #1              ; if (ExceptionType == 1 || ExceptionType == 2)) {
-  cmp       r4, #1                  ;   // UND & SVC have differnt LR adjust for Thumb
+  cmp       r4, #1                  ;   // UND & SVC have different LR adjust for Thumb
   bhi       NoAdjustNeeded
 
   tst       r1, #0x20               ;   if ((CPSR & T)) == T) {  // Thumb Mode on entry

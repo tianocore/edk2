@@ -352,7 +352,7 @@ UpdateRegionMapping (
 
   do {
     // Get the first Block Entry that matches the Virtual Address and also the information on the Table Descriptor
-    // such as the the size of the Block Entry and the address of the last BlockEntry of the Table Descriptor
+    // such as the size of the Block Entry and the address of the last BlockEntry of the Table Descriptor
     BlockEntrySize = RegionLength;
     BlockEntry = GetBlockEntryListFromAddress (RootTable, RegionStart, &TableLevel, &BlockEntrySize, &LastBlockEntry);
     if (BlockEntry == NULL) {

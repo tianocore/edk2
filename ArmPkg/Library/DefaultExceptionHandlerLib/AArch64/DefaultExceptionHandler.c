@@ -137,7 +137,7 @@ BaseName (
 /**
   This is the default action to take on an unexpected exception
 
-  Since this is exception context don't do anything crazy like try to allcoate memory.
+  Since this is exception context don't do anything crazy like try to allocate memory.
 
   @param  ExceptionType    Type of the exception
   @param  SystemContext    Register state at the time of the Exception
