@@ -1,7 +1,7 @@
 /** @file
   Internal library implementation for PCI Bus module.
 
-Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -415,7 +415,7 @@ PciHostBridgeResourceAllocator (
   UINT64                                         PMem32ResStatus;
   UINT64                                         Mem64ResStatus;
   UINT64                                         PMem64ResStatus;
-  UINT64                                         MaxOptionRomSize;
+  UINT32                                         MaxOptionRomSize;
   PCI_RESOURCE_NODE                              *IoBridge;
   PCI_RESOURCE_NODE                              *Mem32Bridge;
   PCI_RESOURCE_NODE                              *PMem32Bridge;

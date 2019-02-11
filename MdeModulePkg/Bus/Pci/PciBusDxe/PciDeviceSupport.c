@@ -1,7 +1,7 @@
 /** @file
   Supporting functions implementaion for PCI devices management.
 
-Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2018 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -259,7 +259,7 @@ RegisterPciDevice (
                                        );
       if (!EFI_ERROR (Status)) {
         PciIoDevice->EmbeddedRom    = FALSE;
-        PciIoDevice->RomSize        = PlatformOpRomSize;
+        PciIoDevice->RomSize        = (UINT32) PlatformOpRomSize;
         PciIoDevice->PciIo.RomSize  = PlatformOpRomSize;
         PciIoDevice->PciIo.RomImage = PlatformOpRomBuffer;
         //
@@ -285,7 +285,7 @@ RegisterPciDevice (
                                        );
       if (!EFI_ERROR (Status)) {
         PciIoDevice->EmbeddedRom    = FALSE;
-        PciIoDevice->RomSize        = PlatformOpRomSize;
+        PciIoDevice->RomSize        = (UINT32) PlatformOpRomSize;
         PciIoDevice->PciIo.RomSize  = PlatformOpRomSize;
         PciIoDevice->PciIo.RomImage = PlatformOpRomBuffer;
         //
