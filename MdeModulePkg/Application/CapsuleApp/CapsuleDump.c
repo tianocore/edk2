@@ -806,48 +806,69 @@ DumpCapsuleFromDisk (
   Status = Fs->OpenVolume (Fs, &Root);
   if (EFI_ERROR (Status)) {
     Print (L"Cannot open volume. Status = %r\n", Status);
-    return EFI_NOT_FOUND;
+    goto Done;
   }
 
   Status = Root->Open (Root, &DirHandle, EFI_CAPSULE_FILE_DIRECTORY, EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE , 0);
   if (EFI_ERROR (Status)) {
     Print (L"Cannot open %s. Status = %r\n", EFI_CAPSULE_FILE_DIRECTORY, Status);
-    return EFI_NOT_FOUND;
+    goto Done;
   }
 
   //
   // Get file count first
   //
-  for ( Status = FileHandleFindFirstFile (DirHandle, &FileInfo)
-      ; !EFI_ERROR(Status) && !NoFile
-      ; Status = FileHandleFindNextFile (DirHandle, FileInfo, &NoFile)
-     ){
-    if ((FileInfo->Attribute & (EFI_FILE_SYSTEM | EFI_FILE_ARCHIVE)) == 0) {
-      continue;
+  do {
+    Status = FileHandleFindFirstFile (DirHandle, &FileInfo);
+    if (EFI_ERROR (Status) || FileInfo == NULL) {
+      Print (L"Get File Info Fail. Status = %r\n", Status);
+      goto Done;
     }
-    FileCount++;
-  }
+
+    if ((FileInfo->Attribute & (EFI_FILE_SYSTEM | EFI_FILE_ARCHIVE)) != 0) {
+      FileCount++;
+    }
+
+    Status = FileHandleFindNextFile (DirHandle, FileInfo, &NoFile);
+    if (EFI_ERROR (Status)) {
+      Print (L"Get Next File Fail. Status = %r\n", Status);
+      goto Done;
+    }
+  } while (!NoFile);
 
   if (FileCount == 0) {
     Print (L"Error: No capsule file found!\n");
-    return EFI_NOT_FOUND;
+    Status = EFI_NOT_FOUND;
+    goto Done;
   }
 
-  FileInfoBuffer = AllocatePool (sizeof(FileInfo) * FileCount);
+  FileInfoBuffer = AllocateZeroPool (sizeof (FileInfo) * FileCount);
+  if (FileInfoBuffer == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Done;
+  }
   NoFile = FALSE;
 
   //
   // Get all file info
   //
-  for ( Status = FileHandleFindFirstFile (DirHandle, &FileInfo)
-      ; !EFI_ERROR (Status) && !NoFile
-      ; Status = FileHandleFindNextFile (DirHandle, FileInfo, &NoFile)
-     ){
-    if ((FileInfo->Attribute & (EFI_FILE_SYSTEM | EFI_FILE_ARCHIVE)) == 0) {
-      continue;
+  do {
+    Status = FileHandleFindFirstFile (DirHandle, &FileInfo);
+    if (EFI_ERROR (Status) || FileInfo == NULL) {
+      Print (L"Get File Info Fail. Status = %r\n", Status);
+      goto Done;
     }
-    FileInfoBuffer[Index++] = AllocateCopyPool ((UINTN)FileInfo->Size, FileInfo);
-  }
+
+    if ((FileInfo->Attribute & (EFI_FILE_SYSTEM | EFI_FILE_ARCHIVE)) != 0) {
+      FileInfoBuffer[Index++] = AllocateCopyPool ((UINTN)FileInfo->Size, FileInfo);
+    }
+
+    Status = FileHandleFindNextFile (DirHandle, FileInfo, &NoFile);
+    if (EFI_ERROR (Status)) {
+      Print (L"Get Next File Fail. Status = %r\n", Status);
+      goto Done;
+    }
+  } while (!NoFile);
 
   //
   // Sort FileInfoBuffer by alphabet order
@@ -866,7 +887,8 @@ DumpCapsuleFromDisk (
   }
 
   if (!DumpCapsuleInfo) {
-    return EFI_SUCCESS;
+    Status = EFI_SUCCESS;
+    goto Done;
   }
 
   Print(L"The infomation of the capsules:\n");
@@ -875,27 +897,28 @@ DumpCapsuleFromDisk (
     FileHandle = NULL;
     Status = DirHandle->Open (DirHandle, &FileHandle, FileInfoBuffer[Index]->FileName, EFI_FILE_MODE_READ, 0);
     if (EFI_ERROR (Status)) {
-      break;
+      goto Done;
     }
 
     Status = FileHandleGetSize (FileHandle, (UINT64 *) &FileSize);
     if (EFI_ERROR (Status)) {
       Print (L"Cannot read file %s. Status = %r\n", FileInfoBuffer[Index]->FileName, Status);
       FileHandleClose (FileHandle);
-      return Status;
+      goto Done;
     }
 
     FileBuffer = AllocatePool (FileSize);
     if (FileBuffer == NULL) {
-      return RETURN_OUT_OF_RESOURCES;
+      Status = EFI_OUT_OF_RESOURCES;
+      goto Done;
     }
 
     Status = FileHandleRead (FileHandle, &FileSize, FileBuffer);
     if (EFI_ERROR (Status)) {
       Print (L"Cannot read file %s. Status = %r\n", FileInfoBuffer[Index]->FileName, Status);
-      FreePool (FileBuffer);
       FileHandleClose (FileHandle);
-      return Status;
+      FreePool (FileBuffer);
+      goto Done;
     }
 
     Print (L"**************************\n");
@@ -906,7 +929,17 @@ DumpCapsuleFromDisk (
     FreePool (FileBuffer);
   }
 
-  return EFI_SUCCESS;
+Done:
+  if (FileInfoBuffer != NULL) {
+    for (Index = 0; Index < FileCount; Index++) {
+      if (FileInfoBuffer[Index] != NULL) {
+        FreePool (FileInfoBuffer[Index]);
+      }
+    }
+    FreePool (FileInfoBuffer);
+  }
+
+  return Status;
 }
 
 /**
