@@ -84,14 +84,14 @@ QuickSortWorker (
     }
   }
   //
-  // Swap pivot to it's final position (NextSwapLocaiton)
+  // Swap pivot to its final position (NextSwapLocation)
   //
   CopyMem (Buffer, Pivot, ElementSize);
   CopyMem (Pivot, (UINT8 *)BufferToSort + (NextSwapLocation * ElementSize), ElementSize);
   CopyMem ((UINT8 *)BufferToSort + (NextSwapLocation * ElementSize), Buffer, ElementSize);
 
   //
-  // Now recurse on 2 paritial lists.  Neither of these will have the 'pivot' element.
+  // Now recurse on 2 partial lists.  Neither of these will have the 'pivot' element.
   // IE list is sorted left half, pivot element, sorted right half...
   //
   QuickSortWorker (

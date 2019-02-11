@@ -142,7 +142,7 @@ IMPLEMENT_ASN1_FUNCTIONS (TS_TST_INFO)
   @param[in]  Asn1Time         Pointer to the ASN.1 GeneralizedTime to be converted.
   @param[out] SigningTime      Return the corresponding EFI Time.
 
-  @retval  TRUE   The time convertion succeeds.
+  @retval  TRUE   The time conversion succeeds.
   @retval  FALSE  Invalid parameters.
 
 **/
