@@ -218,6 +218,10 @@ M: Laszlo Ersek <lersek@redhat.com>
 M: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 R: Anthony Perard <anthony.perard@citrix.com>
 R: Julien Grall <julien.grall@arm.com>
+R: Marc-André Lureau <marcandre.lureau@redhat.com>
+   (TPM2 modules)
+R: Stefan Berger <stefanb@linux.ibm.com>
+   (TPM2 modules)
 S: Maintained
 
 PcAtChipsetPkg
