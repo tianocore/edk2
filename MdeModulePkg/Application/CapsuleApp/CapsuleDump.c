@@ -970,12 +970,15 @@ DumpProvisionedCapsule (
   EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *Fs;
   EFI_SHELL_PROTOCOL              *ShellProtocol;
 
-  ShellProtocol = GetShellProtocol ();
-
   Index             = 0;
   CapsuleDataPtr64  = NULL;
   BootNext          = NULL;
-  ShellProtocol     = NULL;
+
+  ShellProtocol = GetShellProtocol ();
+  if (ShellProtocol == NULL) {
+    Print (L"Get Shell Protocol Fail\n");
+    return ;
+  }
 
   //
   // Dump capsule provisioned on Memory
@@ -1002,16 +1005,16 @@ DumpProvisionedCapsule (
               (VOID **) &CapsuleDataPtr64,
               NULL
               );
-    if (EFI_ERROR (Status)) {
+    if (EFI_ERROR (Status) || CapsuleDataPtr64 == NULL) {
       if (Index == 0) {
         Print (L"No data.\n");
       }
       break;
-    } else {
-      Index++;
-      Print (L"Capsule Description at 0x%08x\n", *CapsuleDataPtr64);
-      DumpBlockDescriptors ((EFI_CAPSULE_BLOCK_DESCRIPTOR*) (UINTN) *CapsuleDataPtr64, DumpCapsuleInfo);
     }
+
+    Index++;
+    Print (L"Capsule Description at 0x%08x\n", *CapsuleDataPtr64);
+    DumpBlockDescriptors ((EFI_CAPSULE_BLOCK_DESCRIPTOR*) (UINTN) *CapsuleDataPtr64, DumpCapsuleInfo);
   }
 
   //
@@ -1026,7 +1029,9 @@ DumpProvisionedCapsule (
              (VOID **) &BootNext,
              NULL
             );
-  if (!EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) || BootNext == NULL) {
+    Print (L"Get BootNext Variable Fail. Status = %r\n", Status);
+  } else {
     UnicodeSPrint (BootOptionName, sizeof (BootOptionName), L"Boot%04x", *BootNext);
     Status = EfiBootManagerVariableToLoadOption (BootOptionName, &BootNextOptionEntry);
     if (!EFI_ERROR (Status)) {

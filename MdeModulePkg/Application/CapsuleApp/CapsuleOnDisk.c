@@ -445,7 +445,10 @@ GetUpdateFileSystem (
                (VOID **)&BootNextData,
                NULL
                );
-    if (!EFI_ERROR (Status)) {
+    if (EFI_ERROR (Status) || BootNextData == NULL) {
+      Print (L"Get Boot Next Data Fail. Status = %r\n", Status);
+      return EFI_NOT_FOUND;
+    } else {
       UnicodeSPrint (BootOptionName, sizeof (BootOptionName), L"Boot%04x", *BootNextData);
       Status = EfiBootManagerVariableToLoadOption (BootOptionName, &BootNextOption);
       if (!EFI_ERROR (Status)) {
