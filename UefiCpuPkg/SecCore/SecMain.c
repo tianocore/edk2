@@ -1,7 +1,7 @@
 /** @file
   C functions in SEC
 
-  Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2008 - 2019, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -232,22 +232,45 @@ SecStartupPhase2(
   EFI_PEI_PPI_DESCRIPTOR      *AllSecPpiList;
   EFI_PEI_CORE_ENTRY_POINT    PeiCoreEntryPoint;
 
+  PeiCoreEntryPoint = NULL;
   SecCoreData   = (EFI_SEC_PEI_HAND_OFF *) Context;
   AllSecPpiList = (EFI_PEI_PPI_DESCRIPTOR *) SecCoreData->PeiTemporaryRamBase;
+
   //
   // Find Pei Core entry point. It will report SEC and Pei Core debug information if remote debug
   // is enabled.
   //
-  FindAndReportEntryPoints ((EFI_FIRMWARE_VOLUME_HEADER *) SecCoreData->BootFirmwareVolumeBase, &PeiCoreEntryPoint);
-  if (PeiCoreEntryPoint == NULL)
-  {
-    CpuDeadLoop ();
+  PpiList = SecPlatformMain (SecCoreData);
+  if (PpiList != NULL) {
+    for (Index = 0;
+      (PpiList[Index].Flags & EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST) != EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST;
+      Index++) {
+      if (CompareGuid (PpiList[Index].Guid, &gEfiPeiCoreFvLocationPpiGuid) && (((EFI_PEI_CORE_FV_LOCATION_PPI *) PpiList[Index].Ppi)->PeiCoreFvLocation != 0)) {
+        FindAndReportEntryPoints ((EFI_FIRMWARE_VOLUME_HEADER *) ((EFI_PEI_CORE_FV_LOCATION_PPI *) PpiList[Index].Ppi)->PeiCoreFvLocation, &PeiCoreEntryPoint);
+        if (PeiCoreEntryPoint != NULL) {
+          break;
+        } else {
+          //
+          // PeiCore not found
+          //
+          CpuDeadLoop ();
+        }
+      }
+    }
+  }
+  //
+  // If EFI_PEI_CORE_FV_LOCATION_PPI not found, try to locate PeiCore from BFV.
+  //
+  if (PeiCoreEntryPoint == NULL) {
+    FindAndReportEntryPoints ((EFI_FIRMWARE_VOLUME_HEADER *) SecCoreData->BootFirmwareVolumeBase, &PeiCoreEntryPoint);
+    if (PeiCoreEntryPoint == NULL) {
+      CpuDeadLoop ();
+    }
   }
 
   //
   // Perform platform specific initialization before entering PeiCore.
   //
-  PpiList = SecPlatformMain (SecCoreData);
   if (PpiList != NULL) {
     //
     // Remove the terminal flag from the terminal PPI

@@ -1,7 +1,7 @@
 /** @file
   Master header file for SecCore.
 
-  Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2008 - 2019, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -20,6 +20,7 @@
 #include <Ppi/SecPlatformInformation2.h>
 #include <Ppi/TemporaryRamDone.h>
 #include <Ppi/SecPerformance.h>
+#include <Ppi/PeiCoreFvLocation.h>
 
 #include <Guid/FirmwarePerformance.h>
 
