@@ -262,10 +262,6 @@
   # @Prompt SMM CPU Synchronization Method.
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmSyncMode|0x00|UINT8|0x60000014
 
-  ## Specifies user's desired settings for enabling/disabling processor features.
-  # @Prompt User settings for enabling/disabling processor features.
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuFeaturesUserConfiguration|{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}|VOID*|0x00000017
-
   ## Specifies the On-demand clock modulation duty cycle when ACPI feature is enabled.
   # @Prompt The encoded values for target duty cycle modulation.
   # @ValidRange  0x80000001 | 0 - 15
@@ -293,8 +289,9 @@
   # @ValidList   0x80000001 | 0
   gUefiCpuPkgTokenSpaceGuid.PcdCpuFeaturesCapability|{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}|VOID*|0x00000018
 
-  ## Specifies actual settings for processor features, each bit corresponding to a specific feature.
-  # @Prompt Actual processor feature settings.
+  ## As input, specifies user's desired settings for enabling/disabling processor features.
+  ## As output, specifies actual settings for processor features, each bit corresponding to a specific feature.
+  # @Prompt As input, specifies user's desired processor feature settings. As output, specifies actual processor feature settings.
   # @ValidList   0x80000001 | 0
   gUefiCpuPkgTokenSpaceGuid.PcdCpuFeaturesSetting|{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}|VOID*|0x00000019
 
