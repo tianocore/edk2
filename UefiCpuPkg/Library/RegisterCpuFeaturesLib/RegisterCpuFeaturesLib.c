@@ -1,7 +1,7 @@
 /** @file
   CPU Register Table Library functions.
 
-  Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2017 - 2019, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -1240,56 +1240,6 @@ IsCpuFeatureInSetting (
            PcdGetSize (PcdCpuFeaturesSetting),
            Feature
            );
-}
-
-/**
-  Determines if a CPU feature is set in PcdCpuFeaturesCapability bit mask.
-
-  @param[in]  Feature  The bit number of the CPU feature to check in the PCD
-                       PcdCpuFeaturesCapability
-
-  @retval  TRUE   The CPU feature is set in PcdCpuFeaturesCapability.
-  @retval  FALSE  The CPU feature is not set in PcdCpuFeaturesCapability.
-
-  @note This service could be called by BSP only.
-**/
-BOOLEAN
-EFIAPI
-IsCpuFeatureCapability (
-  IN UINT32              Feature
-  )
-{
-  return IsCpuFeatureSetInCpuPcd (
-           (UINT8 *)PcdGetPtr (PcdCpuFeaturesCapability),
-           PcdGetSize (PcdCpuFeaturesCapability),
-           Feature
-           );
-
-}
-
-/**
-  Determines if a CPU feature is set in PcdCpuFeaturesUserConfiguration bit mask.
-
-  @param[in]  Feature  The bit number of the CPU feature to check in the PCD
-                       PcdCpuFeaturesUserConfiguration
-
-  @retval  TRUE   The CPU feature is set in PcdCpuFeaturesUserConfiguration.
-  @retval  FALSE  The CPU feature is not set in PcdCpuFeaturesUserConfiguration.
-
-  @note This service could be called by BSP only.
-**/
-BOOLEAN
-EFIAPI
-IsCpuFeatureUserConfiguration (
-  IN UINT32              Feature
-  )
-{
-  return IsCpuFeatureSetInCpuPcd (
-           (UINT8 *)PcdGetPtr (PcdCpuFeaturesUserConfiguration),
-           PcdGetSize (PcdCpuFeaturesUserConfiguration),
-           Feature
-           );
-
 }
 
 /**
