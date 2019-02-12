@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2019, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -587,15 +587,17 @@ UfsBlockIoPeimGetMediaInfo (
   EFI_SCSI_DISK_CAPACITY_DATA16      Capacity16;
   UINTN                              DataLength;
   BOOLEAN                            NeedRetry;
+  UINTN                              Lun;
 
   Private   = GET_UFS_PEIM_HC_PRIVATE_DATA_FROM_THIS (This);
   NeedRetry = TRUE;
 
-  if (DeviceIndex >= UFS_PEIM_MAX_LUNS) {
+  if ((DeviceIndex == 0) || (DeviceIndex > UFS_PEIM_MAX_LUNS)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  if ((Private->Luns.BitMask & (BIT0 << DeviceIndex)) == 0) {
+  Lun = DeviceIndex - 1;
+  if ((Private->Luns.BitMask & (BIT0 << Lun)) == 0) {
     return EFI_ACCESS_DENIED;
   }
 
@@ -609,7 +611,7 @@ UfsBlockIoPeimGetMediaInfo (
   do {
     Status = UfsPeimTestUnitReady (
                Private,
-               DeviceIndex,
+               Lun,
                &SenseData,
                &SenseDataLength
                );
@@ -621,7 +623,7 @@ UfsBlockIoPeimGetMediaInfo (
       continue;
     }
 
-    Status = UfsPeimParsingSenseKeys (&(Private->Media[DeviceIndex]), &SenseData, &NeedRetry);
+    Status = UfsPeimParsingSenseKeys (&(Private->Media[Lun]), &SenseData, &NeedRetry);
     if (EFI_ERROR (Status)) {
       return EFI_DEVICE_ERROR;
     }
@@ -630,7 +632,7 @@ UfsBlockIoPeimGetMediaInfo (
 
   DataLength      = sizeof (EFI_SCSI_DISK_CAPACITY_DATA);
   SenseDataLength = 0;
-  Status = UfsPeimReadCapacity (Private, DeviceIndex, &Capacity, (UINT32 *)&DataLength, NULL, &SenseDataLength);
+  Status = UfsPeimReadCapacity (Private, Lun, &Capacity, (UINT32 *)&DataLength, NULL, &SenseDataLength);
   if (EFI_ERROR (Status)) {
     return EFI_DEVICE_ERROR;
   }
@@ -639,22 +641,22 @@ UfsBlockIoPeimGetMediaInfo (
       (Capacity.LastLba1 == 0xff) && (Capacity.LastLba0 == 0xff)) {
     DataLength      = sizeof (EFI_SCSI_DISK_CAPACITY_DATA16);
     SenseDataLength = 0;
-    Status = UfsPeimReadCapacity16 (Private, DeviceIndex, &Capacity16, (UINT32 *)&DataLength, NULL, &SenseDataLength);
+    Status = UfsPeimReadCapacity16 (Private, Lun, &Capacity16, (UINT32 *)&DataLength, NULL, &SenseDataLength);
     if (EFI_ERROR (Status)) {
       return EFI_DEVICE_ERROR;
     }
-    Private->Media[DeviceIndex].LastBlock  = ((UINT32)Capacity16.LastLba3 << 24) | (Capacity16.LastLba2 << 16) | (Capacity16.LastLba1 << 8) | Capacity16.LastLba0;
-    Private->Media[DeviceIndex].LastBlock |= LShiftU64 ((UINT64)Capacity16.LastLba7, 56) | LShiftU64((UINT64)Capacity16.LastLba6, 48) | LShiftU64 ((UINT64)Capacity16.LastLba5, 40) | LShiftU64 ((UINT64)Capacity16.LastLba4, 32);
-    Private->Media[DeviceIndex].BlockSize  = (Capacity16.BlockSize3 << 24) | (Capacity16.BlockSize2 << 16) | (Capacity16.BlockSize1 << 8) | Capacity16.BlockSize0;
+    Private->Media[Lun].LastBlock  = ((UINT32)Capacity16.LastLba3 << 24) | (Capacity16.LastLba2 << 16) | (Capacity16.LastLba1 << 8) | Capacity16.LastLba0;
+    Private->Media[Lun].LastBlock |= LShiftU64 ((UINT64)Capacity16.LastLba7, 56) | LShiftU64((UINT64)Capacity16.LastLba6, 48) | LShiftU64 ((UINT64)Capacity16.LastLba5, 40) | LShiftU64 ((UINT64)Capacity16.LastLba4, 32);
+    Private->Media[Lun].BlockSize  = (Capacity16.BlockSize3 << 24) | (Capacity16.BlockSize2 << 16) | (Capacity16.BlockSize1 << 8) | Capacity16.BlockSize0;
   } else {
-    Private->Media[DeviceIndex].LastBlock  = ((UINT32)Capacity.LastLba3 << 24) | (Capacity.LastLba2 << 16) | (Capacity.LastLba1 << 8) | Capacity.LastLba0;
-    Private->Media[DeviceIndex].BlockSize  = (Capacity.BlockSize3 << 24) | (Capacity.BlockSize2 << 16) | (Capacity.BlockSize1 << 8) | Capacity.BlockSize0;
+    Private->Media[Lun].LastBlock  = ((UINT32)Capacity.LastLba3 << 24) | (Capacity.LastLba2 << 16) | (Capacity.LastLba1 << 8) | Capacity.LastLba0;
+    Private->Media[Lun].BlockSize  = (Capacity.BlockSize3 << 24) | (Capacity.BlockSize2 << 16) | (Capacity.BlockSize1 << 8) | Capacity.BlockSize0;
   }
 
   MediaInfo->DeviceType   = UfsDevice;
-  MediaInfo->MediaPresent = Private->Media[DeviceIndex].MediaPresent;
-  MediaInfo->LastBlock    = (UINTN)Private->Media[DeviceIndex].LastBlock;
-  MediaInfo->BlockSize    = Private->Media[DeviceIndex].BlockSize;
+  MediaInfo->MediaPresent = Private->Media[Lun].MediaPresent;
+  MediaInfo->LastBlock    = (UINTN)Private->Media[Lun].LastBlock;
+  MediaInfo->BlockSize    = Private->Media[Lun].BlockSize;
 
   return EFI_SUCCESS;
 }
@@ -711,6 +713,7 @@ UfsBlockIoPeimReadBlocks (
   EFI_SCSI_SENSE_DATA                SenseData;
   UINT8                              SenseDataLength;
   BOOLEAN                            NeedRetry;
+  UINTN                              Lun;
 
   Status    = EFI_SUCCESS;
   NeedRetry = TRUE;
@@ -730,21 +733,22 @@ UfsBlockIoPeimReadBlocks (
     return EFI_SUCCESS;
   }
 
-  if (DeviceIndex >= UFS_PEIM_MAX_LUNS) {
+  if ((DeviceIndex == 0) || (DeviceIndex > UFS_PEIM_MAX_LUNS)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  if ((Private->Luns.BitMask & (BIT0 << DeviceIndex)) == 0) {
+  Lun = DeviceIndex - 1;
+  if ((Private->Luns.BitMask & (BIT0 << Lun)) == 0) {
     return EFI_ACCESS_DENIED;
   }
 
-  BlockSize = Private->Media[DeviceIndex].BlockSize;
+  BlockSize = Private->Media[Lun].BlockSize;
 
   if (BufferSize % BlockSize != 0) {
     Status = EFI_BAD_BUFFER_SIZE;
   }
 
-  if (StartLBA > Private->Media[DeviceIndex].LastBlock) {
+  if (StartLBA > Private->Media[Lun].LastBlock) {
     Status = EFI_INVALID_PARAMETER;
   }
 
@@ -753,7 +757,7 @@ UfsBlockIoPeimReadBlocks (
   do {
     Status = UfsPeimTestUnitReady (
                Private,
-               DeviceIndex,
+               Lun,
                &SenseData,
                &SenseDataLength
                );
@@ -765,7 +769,7 @@ UfsBlockIoPeimReadBlocks (
       continue;
     }
 
-    Status = UfsPeimParsingSenseKeys (&(Private->Media[DeviceIndex]), &SenseData, &NeedRetry);
+    Status = UfsPeimParsingSenseKeys (&(Private->Media[Lun]), &SenseData, &NeedRetry);
     if (EFI_ERROR (Status)) {
       return EFI_DEVICE_ERROR;
     }
@@ -773,10 +777,10 @@ UfsBlockIoPeimReadBlocks (
   } while (NeedRetry);
 
   SenseDataLength = 0;
-  if (Private->Media[DeviceIndex].LastBlock < 0xfffffffful) {
+  if (Private->Media[Lun].LastBlock < 0xfffffffful) {
     Status = UfsPeimRead10 (
                Private,
-               DeviceIndex,
+               Lun,
                (UINT32)StartLBA,
                (UINT32)NumberOfBlocks,
                Buffer,
@@ -787,7 +791,7 @@ UfsBlockIoPeimReadBlocks (
   } else {
     Status = UfsPeimRead16 (
                Private,
-               DeviceIndex,
+               Lun,
                (UINT32)StartLBA,
                (UINT32)NumberOfBlocks,
                Buffer,
@@ -888,6 +892,7 @@ UfsBlockIoPeimGetMediaInfo2 (
   EFI_STATUS                         Status;
   UFS_PEIM_HC_PRIVATE_DATA           *Private;
   EFI_PEI_BLOCK_IO_MEDIA             Media;
+  UINTN                              Lun;
 
   Private   = GET_UFS_PEIM_HC_PRIVATE_DATA_FROM_THIS2 (This);
 
@@ -901,7 +906,8 @@ UfsBlockIoPeimGetMediaInfo2 (
     return Status;
   }
 
-  CopyMem (MediaInfo, &(Private->Media[DeviceIndex]), sizeof (EFI_PEI_BLOCK_IO2_MEDIA));
+  Lun = DeviceIndex - 1;
+  CopyMem (MediaInfo, &(Private->Media[Lun]), sizeof (EFI_PEI_BLOCK_IO2_MEDIA));
   return EFI_SUCCESS;
 }
 
