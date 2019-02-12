@@ -1,7 +1,7 @@
 /** @file
   Set up ROM Table for PCI Bus module.
 
-Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -23,9 +23,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @param Bus            Bus NO of PCI space.
   @param Dev            Dev NO of PCI space.
   @param Func           Func NO of PCI space.
-  @param RomImage       Option ROM buffer.
-  @param RomSize        Size of Option ROM buffer.
-
+  @param RomImage       Option Rom buffer.
+  @param RomSize        Size of Option Rom buffer.
 **/
 VOID
 PciRomAddImageMapping (

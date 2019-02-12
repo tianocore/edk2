@@ -1,7 +1,7 @@
 /** @file
   PCI Rom supporting funtions implementation for PCI Bus module.
 
-Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -604,7 +604,7 @@ RomDecode (
     //
     // Programe all upstream bridge
     //
-    ProgrameUpstreamBridgeForRom(PciDevice, RomBar, TRUE);
+    ProgramUpstreamBridgeForRom (PciDevice, RomBar, TRUE);
 
     //
     // Setting the memory space bit in the function's command register
@@ -621,7 +621,7 @@ RomDecode (
     //
     // Destroy the programmed bar in all the upstream bridge.
     //
-    ProgrameUpstreamBridgeForRom(PciDevice, RomBar, FALSE);
+    ProgramUpstreamBridgeForRom (PciDevice, RomBar, FALSE);
 
     //
     // disable rom decode

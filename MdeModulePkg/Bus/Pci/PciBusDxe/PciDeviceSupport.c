@@ -1,5 +1,5 @@
 /** @file
-  Supporting functions implementaion for PCI devices management.
+  Supporting functions implementation for PCI devices management.
 
 Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2018 Hewlett Packard Enterprise Development LP<BR>
@@ -66,7 +66,7 @@ InsertPciDevice (
 }
 
 /**
-  Destroy root bridge and remove it from deivce tree.
+  Destroy root bridge and remove it from device tree.
 
   @param RootBridge     The bridge want to be removed.
 
@@ -86,7 +86,7 @@ DestroyRootBridge (
 
   All direct or indirect allocated resource for this node will be freed.
 
-  @param PciIoDevice  A pointer to the PCI_IO_DEVICE to be destoried.
+  @param PciIoDevice  A pointer to the PCI_IO_DEVICE to be destroyed.
 
 **/
 VOID
@@ -155,7 +155,7 @@ DestroyPciDeviceTree (
 
   @param  Controller    Root bridge handle.
 
-  @retval EFI_SUCCESS   Destory all devcie nodes successfully.
+  @retval EFI_SUCCESS   Destroy all device nodes successfully.
   @retval EFI_NOT_FOUND Cannot find any PCI device under specified
                         root bridge.
 
@@ -824,7 +824,7 @@ StartPciDevices (
 /**
   Create root bridge device.
 
-  @param RootBridgeHandle    Specified root bridge hanle.
+  @param RootBridgeHandle    Specified root bridge handle.
 
   @return The crated root bridge device instance, NULL means no
           root bridge device instance created.
@@ -937,9 +937,9 @@ GetRootBridgeByHandle (
 }
 
 /**
-  Judege whether Pci device existed.
+  Judge whether Pci device existed.
 
-  @param Bridge       Parent bridege instance.
+  @param Bridge       Parent bridge instance.
   @param PciIoDevice  Device instance.
 
   @retval TRUE        Pci device existed.

@@ -442,8 +442,8 @@ NotifyPhase (
   @retval EFI_INVALID_PARAMETER    Phase is not a valid phase that is defined in
                                    EFI_PCI_CONTROLLER_RESOURCE_ALLOCATION_PHASE.
   @retval EFI_DEVICE_ERROR         Programming failed due to a hardware error. The PCI enumerator should
-                                    not enumerate this device, including its child devices if it is a PCI-to-PCI
-                                    bridge.
+                                   not enumerate this device, including its child devices if it is a PCI-to-PCI
+                                   bridge.
 
 **/
 EFI_STATUS
