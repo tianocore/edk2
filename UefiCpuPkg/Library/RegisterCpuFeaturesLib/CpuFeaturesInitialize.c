@@ -245,11 +245,6 @@ CpuInitDataInitialize (
   ASSERT (CpuFeaturesData->CpuFlags.CoreSemaphoreCount != NULL);
   CpuFeaturesData->CpuFlags.PackageSemaphoreCount = AllocateZeroPool (sizeof (UINT32) * CpuStatus->PackageCount * CpuStatus->MaxCoreCount * CpuStatus->MaxThreadCount);
   ASSERT (CpuFeaturesData->CpuFlags.PackageSemaphoreCount != NULL);
-
-  //
-  // Get support and configuration PCDs
-  //
-  CpuFeaturesData->SupportPcd       = GetSupportPcd ();
 }
 
 /**
@@ -269,7 +264,7 @@ SupportedMaskOr (
   UINT8                  *Data1;
   UINT8                  *Data2;
 
-  BitMaskSize = PcdGetSize (PcdCpuFeaturesSupport);
+  BitMaskSize = PcdGetSize (PcdCpuFeaturesSetting);
   Data1 = SupportedFeatureMask;
   Data2 = OrFeatureBitMask;
   for (Index = 0; Index < BitMaskSize; Index++) {
@@ -294,7 +289,7 @@ SupportedMaskAnd (
   UINT8                  *Data1;
   CONST UINT8            *Data2;
 
-  BitMaskSize = PcdGetSize (PcdCpuFeaturesSupport);
+  BitMaskSize = PcdGetSize (PcdCpuFeaturesSetting);
   Data1 = SupportedFeatureMask;
   Data2 = AndFeatureBitMask;
   for (Index = 0; Index < BitMaskSize; Index++) {
@@ -319,7 +314,7 @@ SupportedMaskCleanBit (
   UINT8                  *Data1;
   UINT8                  *Data2;
 
-  BitMaskSize = PcdGetSize (PcdCpuFeaturesSupport);
+  BitMaskSize = PcdGetSize (PcdCpuFeaturesSetting);
   Data1 = SupportedFeatureMask;
   Data2 = AndFeatureBitMask;
   for (Index = 0; Index < BitMaskSize; Index++) {
@@ -350,7 +345,7 @@ IsBitMaskMatch (
   UINT8                  *Data1;
   UINT8                  *Data2;
 
-  BitMaskSize = PcdGetSize (PcdCpuFeaturesSupport);
+  BitMaskSize = PcdGetSize (PcdCpuFeaturesSetting);
 
   Data1 = SupportedFeatureMask;
   Data2 = ComparedFeatureBitMask;
@@ -389,21 +384,19 @@ CollectProcessorData (
   Entry = GetFirstNode (&CpuFeaturesData->FeatureList);
   while (!IsNull (&CpuFeaturesData->FeatureList, Entry)) {
     CpuFeature = CPU_FEATURE_ENTRY_FROM_LINK (Entry);
-    if (IsBitMaskMatch (CpuFeaturesData->SupportPcd, CpuFeature->FeatureMask)) {
-      if (CpuFeature->SupportFunc == NULL) {
-        //
-        // If SupportFunc is NULL, then the feature is supported.
-        //
-        SupportedMaskOr (
-          CpuFeaturesData->InitOrder[ProcessorNumber].FeaturesSupportedMask,
-          CpuFeature->FeatureMask
-          );
-      } else if (CpuFeature->SupportFunc (ProcessorNumber, CpuInfo, CpuFeature->ConfigData)) {
-        SupportedMaskOr (
-          CpuFeaturesData->InitOrder[ProcessorNumber].FeaturesSupportedMask,
-          CpuFeature->FeatureMask
-          );
-      }
+    if (CpuFeature->SupportFunc == NULL) {
+      //
+      // If SupportFunc is NULL, then the feature is supported.
+      //
+      SupportedMaskOr (
+        CpuFeaturesData->InitOrder[ProcessorNumber].FeaturesSupportedMask,
+        CpuFeature->FeatureMask
+        );
+    } else if (CpuFeature->SupportFunc (ProcessorNumber, CpuInfo, CpuFeature->ConfigData)) {
+      SupportedMaskOr (
+        CpuFeaturesData->InitOrder[ProcessorNumber].FeaturesSupportedMask,
+        CpuFeature->FeatureMask
+        );
     }
     Entry = Entry->ForwardLink;
   }
@@ -596,8 +589,6 @@ AnalysisProcessorFeatures (
       DumpCpuFeature (CpuFeature);
       Entry = Entry->ForwardLink;
     }
-    DEBUG ((DEBUG_INFO, "PcdCpuFeaturesSupport:\n"));
-    DumpCpuFeatureMask (CpuFeaturesData->SupportPcd);
     DEBUG ((DEBUG_INFO, "PcdCpuFeaturesCapability:\n"));
     DumpCpuFeatureMask (CpuFeaturesData->CapabilityPcd);
     DEBUG ((DEBUG_INFO, "Origin PcdCpuFeaturesSetting:\n"));

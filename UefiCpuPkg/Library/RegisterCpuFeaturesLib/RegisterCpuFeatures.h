@@ -81,7 +81,6 @@ typedef struct {
   LIST_ENTRY               FeatureList;
 
   CPU_FEATURES_INIT_ORDER  *InitOrder;
-  UINT8                    *SupportPcd;
   UINT8                    *CapabilityPcd;
   UINT8                    *SettingPcd;
 

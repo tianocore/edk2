@@ -31,7 +31,7 @@ IsCpuFeatureMatch (
 {
   UINTN                 BitMaskSize;
 
-  BitMaskSize = PcdGetSize (PcdCpuFeaturesSupport);
+  BitMaskSize = PcdGetSize (PcdCpuFeaturesSetting);
   if (CompareMem (FirstFeatureMask, SecondFeatureMask, BitMaskSize) == 0) {
     return TRUE;
   } else {
@@ -53,7 +53,7 @@ DumpCpuFeatureMask (
   UINT8                  *Data8;
   UINTN                  BitMaskSize;
 
-  BitMaskSize = PcdGetSize (PcdCpuFeaturesSupport);
+  BitMaskSize = PcdGetSize (PcdCpuFeaturesSetting);
   Data8       = (UINT8 *) FeatureMask;
   for (Index = 0; Index < BitMaskSize; Index++) {
     DEBUG ((DEBUG_INFO, " %02x ", *Data8++));
@@ -100,7 +100,7 @@ IsBitMaskMatchCheck (
   UINT8      *Data1;
   UINT8      *Data2;
 
-  BitMaskSize = PcdGetSize (PcdCpuFeaturesSupport);
+  BitMaskSize = PcdGetSize (PcdCpuFeaturesSetting);
 
   Data1 = FeatureMask;
   Data2 = DependentBitMask;
@@ -656,7 +656,7 @@ RegisterCpuFeatureWorker (
   UINTN                      BitMaskSize;
   BOOLEAN                    FeatureExist;
 
-  BitMaskSize     = PcdGetSize (PcdCpuFeaturesSupport);
+  BitMaskSize     = PcdGetSize (PcdCpuFeaturesSetting);
   CpuFeaturesData = GetCpuFeaturesData ();
   if (CpuFeaturesData->FeaturesCount == 0) {
     InitializeListHead (&CpuFeaturesData->FeatureList);
@@ -870,7 +870,7 @@ RegisterCpuFeature (
   BeforeAll            = FALSE;
   AfterAll             = FALSE;
 
-  BitMaskSize = PcdGetSize (PcdCpuFeaturesSupport);
+  BitMaskSize = PcdGetSize (PcdCpuFeaturesSetting);
 
   VA_START (Marker, InitializeFunc);
   Feature = VA_ARG (Marker, UINT32);
