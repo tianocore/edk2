@@ -58,7 +58,7 @@ EFI_STATUS
 EFIAPI
 BootScriptWrite (
   IN CONST EFI_S3_SAVE_STATE_PROTOCOL      *This,
-  IN       UINT16                           OpCode,
+  IN       UINTN                            OpCode,
   ...
   );
 /**
@@ -95,7 +95,7 @@ BootScriptInsert (
   IN CONST EFI_S3_SAVE_STATE_PROTOCOL      *This,
   IN       BOOLEAN                          BeforeOrAfter,
   IN OUT   EFI_S3_BOOT_SCRIPT_POSITION     *Position OPTIONAL,
-  IN       UINT16                           OpCode,
+  IN       UINTN                            OpCode,
   ...
   );
 /**
