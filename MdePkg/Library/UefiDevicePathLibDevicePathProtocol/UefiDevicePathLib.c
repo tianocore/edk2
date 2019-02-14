@@ -138,6 +138,15 @@ IsDevicePathValid (
         return FALSE;
       }
     }
+
+    //
+    // FilePath must be a NULL-terminated string.
+    //
+    if (DevicePathType (DevicePath) == MEDIA_DEVICE_PATH &&
+        DevicePathSubType (DevicePath) == MEDIA_FILEPATH_DP &&
+        *(CHAR16 *)((UINT8 *)DevicePath + NodeLength - 2) != 0) {
+      return FALSE;
+    }
   }
 
   //
