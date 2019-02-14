@@ -1,7 +1,7 @@
 /** @file
   GUID used to identify id for the caller who is initiating the Status Code.
 
-  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -118,6 +118,7 @@ extern EFI_GUID gEfiStatusCodeDataTypeStringGuid;
 ///   - EFI_STATUS_CODE_EXCEP_EXTENDED_DATA
 ///   - EFI_STATUS_CODE_START_EXTENDED_DATA
 ///   - EFI_LEGACY_OPROM_EXTENDED_DATA
+///   - EFI_RETURN_STATUS_EXTENDED_DATA
 ///
 #define EFI_STATUS_CODE_SPECIFIC_DATA_GUID \
   { 0x335984bd, 0xe805, 0x409a, { 0xb8, 0xf8, 0xd2, 0x7e, 0xce, 0x5f, 0xf7, 0xa6 } }
@@ -783,6 +784,25 @@ typedef struct {
   ///
   EFI_PHYSICAL_ADDRESS  RomImageBase;
 } EFI_LEGACY_OPROM_EXTENDED_DATA;
+
+///
+/// This structure defines extended data describing an EFI_STATUS return value that stands for a
+/// failed function call (such as a UEFI boot service).
+///
+typedef struct {
+  ///
+  /// The data header identifying the data:
+  /// DataHeader.HeaderSize should be sizeof(EFI_STATUS_CODE_DATA),
+  /// DataHeader.Size should be sizeof(EFI_RETURN_STATUS_EXTENDED_DATA) - HeaderSize,
+  /// DataHeader.Type should be EFI_STATUS_CODE_SPECIFIC_DATA_GUID.
+  ///
+  EFI_STATUS_CODE_DATA DataHeader;
+  ///
+  /// The EFI_STATUS return value of the service or function whose failure triggered the
+  /// reporting of the status code (generally an error code or a debug code).
+  ///
+  EFI_STATUS           ReturnStatus;
+} EFI_RETURN_STATUS_EXTENDED_DATA;
 
 extern EFI_GUID gEfiStatusCodeSpecificDataGuid;
 
