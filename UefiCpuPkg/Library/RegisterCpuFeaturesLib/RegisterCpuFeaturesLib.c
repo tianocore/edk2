@@ -1174,8 +1174,8 @@ PreSmmCpuRegisterTableWrite (
   @param[in]  CpuBitMaskSize  The size of CPU feature bit mask buffer
   @param[in]  Feature         The bit number of the CPU feature
 
-  @retval  TRUE   The CPU feature is set in PcdCpuFeaturesSupport.
-  @retval  FALSE  The CPU feature is not set in PcdCpuFeaturesSupport.
+  @retval  TRUE   The CPU feature is set in CpuBitMask.
+  @retval  FALSE  The CPU feature is not set in CpuBitMask.
 
 **/
 BOOLEAN
