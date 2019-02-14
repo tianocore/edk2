@@ -1,7 +1,7 @@
 /** @file
   Implementation of the HII for the Opal UEFI Driver.
 
-Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2016 - 2019, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -393,7 +393,6 @@ OpalHiiAddPackages(
   )
 {
   EFI_HANDLE                   DriverHandle;
-  CHAR16                       *NewString;
 
   DriverHandle = HiiGetDriverImageHandleCB();
 
@@ -413,15 +412,6 @@ OpalHiiAddPackages(
   //
   if (gHiiPackageListHandle == NULL) {
     DEBUG ((DEBUG_INFO, "OpalHiiAddPackages failed\n"));
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  //
-  // Update Version String in main window
-  //
-  NewString = HiiGetDriverNameCB ();
-  if (HiiSetString(gHiiPackageListHandle, STRING_TOKEN(STR_MAIN_OPAL_VERSION), NewString, NULL) == 0) {
-    DEBUG ((DEBUG_INFO,  "OpalHiiAddPackages: HiiSetString( ) failed\n"));
     return EFI_OUT_OF_RESOURCES;
   }
 

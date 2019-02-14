@@ -2,7 +2,7 @@
 //
 //   String definitions for Setup formset.
 //
-// Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2016 - 2019, Intel Corporation. All rights reserved.<BR>
 //
 // This program and the accompanying materials
 // are licensed and made available under the terms and conditions of the BSD License
@@ -20,14 +20,14 @@
 #string STR_NULL                                #language en-US " "
 
 /////////////////////////////////   FORM SET   /////////////////////////////////
-#string STR_FORM_SET_HELP                        #language en-US "Manage Opal disks"
+#string STR_FORM_SET_HELP                        #language en-US "Select to manage"
 
 /////////////////////////////////   MULTIPLE FORMS   /////////////////////////////////
-#string STR_OPAL                                 #language en-US "Opal"
-#string STR_MAIN_OPAL_VERSION                    #language en-US "Version 00.0.0.0000"
+#string STR_OPAL                                 #language en-US "TCG Drive Management"
 
 /////////////////////////////////   MAIN MENU FORM   /////////////////////////////////
 #string STR_MAIN_PHY_DISKS_LBL                   #language en-US "Physical Disks:"
+#string STR_MAIN_OPAL_TITLE_LBL                  #language en-US "Allows user to choose drive to configure drive security. User can also set storage action policy for use of the TCG Block SID authentication feature."
 
 #string STR_MAIN_GOTO_DISK_INFO_0                #language en-US " "
 #string STR_MAIN_GOTO_DISK_INFO_1                #language en-US " "
@@ -36,13 +36,14 @@
 #string STR_MAIN_GOTO_DISK_INFO_4                #language en-US " "
 #string STR_MAIN_GOTO_DISK_INFO_5                #language en-US " "
 
-#string STR_MAIN_GOTO_DISK_INFO_HELP             #language en-US "Select to see Opal disk actions"
+#string STR_MAIN_GOTO_DISK_INFO_HELP             #language en-US "Select disk to see actions"
 
 #string STR_MAIN_NO_DISKS_PRESENT_LBL            #language en-US "No disks connected to system"
 #string STR_MAIN_NO_DISKS_PRESENT_LBL_HELP       #language en-US "The storage needs to be connected before EndOfDxe"
 
 /////////////////////////////////   DISK INFO MENU FORM   /////////////////////////////////
 #string STR_DISK_INFO_SELECTED_DISK_NAME         #language en-US " "
+#string STR_DISK_INFO_TITLE_LBL                  #language en-US "Allows user to set and modify password; perform secure erase; and perform revert functions on drive."
 
 #string STR_DISK_INFO_LOCK                       #language en-US "Lock"
 #string STR_DISK_INFO_UNLOCK                     #language en-US "Unlock"
@@ -69,7 +70,7 @@
 #string STR_BLOCKSID_STATUS2                     #language en-US ""
 #string STR_BLOCKSID_STATUS3                     #language en-US ""
 
-#string STR_OPAL_REQUESTS_LBL                    #language en-US "Opal Password Requests:"
+#string STR_OPAL_REQUESTS_LBL                    #language en-US "Options:"
 #string STR_DISK_INFO_LOCK_HELP                  #language en-US "Lock the disk"
 #string STR_DISK_INFO_UNLOCK_HELP                #language en-US "Unlock the disk"
 #string STR_DISK_INFO_SET_ADMIN_PSWD_HELP        #language en-US "Set password for the administrator, reset is required for the request to be processed in next boot"
