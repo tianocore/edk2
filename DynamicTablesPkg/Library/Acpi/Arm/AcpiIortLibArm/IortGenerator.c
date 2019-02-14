@@ -1798,7 +1798,7 @@ BuildIortTable (
              CfgMgrProtocol,
              This,
              &Iort->Header,
-             AcpiTableInfo->AcpiTableRevision,
+             AcpiTableInfo,
              TableSize
              );
   if (EFI_ERROR (Status)) {
