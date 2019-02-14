@@ -2070,7 +2070,7 @@ Base64Decode (
       Chr = DecodingTable[(UINT8) Source[SourceIndex++]];
       } while (Chr == BAD_V);
       Value <<= 6;
-      Value |= Chr;
+      Value |= (UINT32)Chr;
     }
 
     //
