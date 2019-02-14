@@ -220,7 +220,7 @@ BuildMcfgTable (
              CfgMgrProtocol,
              This,
              &Mcfg->Header,
-             AcpiTableInfo->AcpiTableRevision,
+             AcpiTableInfo,
              TableSize
              );
   if (EFI_ERROR (Status)) {

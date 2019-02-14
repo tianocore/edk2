@@ -100,7 +100,7 @@ GetCgfMgrInfo (
   @param [in]     Generator      Pointer to the ACPI table Generator.
   @param [in,out] AcpiHeader     Pointer to the ACPI table header to be
                                  updated.
-  @param [in]     Revision       Revision of the ACPI table.
+  @param [in]     AcpiTableInfo  Pointer to the ACPI table info structure.
   @param [in]     Length         Length of the ACPI table.
 
   @retval EFI_SUCCESS           The ACPI table is updated successfully.
@@ -116,7 +116,7 @@ AddAcpiHeader (
   IN      CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  * CONST CfgMgrProtocol,
   IN      CONST ACPI_TABLE_GENERATOR                  * CONST Generator,
   IN OUT  EFI_ACPI_DESCRIPTION_HEADER                 * CONST AcpiHeader,
-  IN      CONST UINT32                                        Revision,
+  IN      CONST CM_STD_OBJ_ACPI_TABLE_INFO            * CONST AcpiTableInfo,
   IN      CONST UINT32                                        Length
   )
 {
@@ -151,7 +151,7 @@ AddAcpiHeader (
   // UINT32  Length
   AcpiHeader->Length = Length;
   // UINT8   Revision
-  AcpiHeader->Revision = Revision;
+  AcpiHeader->Revision = AcpiTableInfo->AcpiTableRevision;
   // UINT8   Checksum
   AcpiHeader->Checksum = 0;
 
@@ -159,12 +159,24 @@ AddAcpiHeader (
   CopyMem (AcpiHeader->OemId, CfgMfrInfo->OemId, sizeof (AcpiHeader->OemId));
 
   // UINT64  OemTableId
-  AcpiHeader->OemTableId = Generator->CreatorId;
-  AcpiHeader->OemTableId <<= 32;
-  AcpiHeader->OemTableId |= Generator->AcpiTableSignature;
+  if (AcpiTableInfo->OemTableId != 0) {
+    AcpiHeader->OemTableId = AcpiTableInfo->OemTableId;
+  } else {
+    AcpiHeader->OemTableId = SIGNATURE_32 (
+                               CfgMfrInfo->OemId[0],
+                               CfgMfrInfo->OemId[1],
+                               CfgMfrInfo->OemId[2],
+                               CfgMfrInfo->OemId[3]
+                               ) |
+                             ((UINT64)Generator->AcpiTableSignature << 32);
+  }
 
   // UINT32  OemRevision
-  AcpiHeader->OemRevision = CfgMfrInfo->Revision;
+  if (AcpiTableInfo->OemRevision != 0) {
+    AcpiHeader->OemRevision = AcpiTableInfo->OemRevision;
+  } else {
+    AcpiHeader->OemRevision = CfgMfrInfo->Revision;
+  }
 
   // UINT32  CreatorId
   AcpiHeader->CreatorId = Generator->CreatorId;

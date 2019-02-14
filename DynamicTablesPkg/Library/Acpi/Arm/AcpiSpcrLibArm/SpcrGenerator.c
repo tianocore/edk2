@@ -211,7 +211,7 @@ BuildSpcrTable (
              CfgMgrProtocol,
              This,
              (EFI_ACPI_DESCRIPTION_HEADER*)&AcpiSpcr,
-             AcpiTableInfo->AcpiTableRevision,
+             AcpiTableInfo,
              sizeof (EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE)
              );
   if (EFI_ERROR (Status)) {
