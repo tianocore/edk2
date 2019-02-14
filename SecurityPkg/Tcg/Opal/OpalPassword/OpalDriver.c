@@ -2,7 +2,7 @@
   Entrypoint of Opal UEFI Driver and contains all the logic to
   register for new Opal device instances.
 
-Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2016 - 2019, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -436,6 +436,9 @@ BuildOpalDeviceInfoAta (
 
   DevInfoAta = AllocateZeroPool (DevInfoLengthAta);
   ASSERT (DevInfoAta != NULL);
+  if (DevInfoAta == NULL) {
+    return;
+  }
 
   TempDevInfoAta = DevInfoAta;
   TmpDev = mOpalDriver.DeviceList;
@@ -527,6 +530,9 @@ BuildOpalDeviceInfoNvme (
 
   DevInfoNvme = AllocateZeroPool (DevInfoLengthNvme);
   ASSERT (DevInfoNvme != NULL);
+  if (DevInfoNvme == NULL) {
+    return;
+  }
 
   TempDevInfoNvme = DevInfoNvme;
   TmpDev = mOpalDriver.DeviceList;
