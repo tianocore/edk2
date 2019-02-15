@@ -35,6 +35,42 @@ GetCurrentMicrocodeSignature (
 /**
   Detect whether specified processor can find matching microcode patch and load it.
 
+  Microcode Payload as the following format:
+  +----------------------------------------+------------------+
+  |          CPU_MICROCODE_HEADER          |                  |
+  +----------------------------------------+  CheckSum Part1  |
+  |            Microcode Binary            |                  |
+  +----------------------------------------+------------------+
+  |  CPU_MICROCODE_EXTENDED_TABLE_HEADER   |                  |
+  +----------------------------------------+  CheckSum Part2  |
+  |      CPU_MICROCODE_EXTENDED_TABLE      |                  |
+  |                   ...                  |                  |
+  +----------------------------------------+------------------+
+
+  There may by multiple CPU_MICROCODE_EXTENDED_TABLE in this format.
+  The count of CPU_MICROCODE_EXTENDED_TABLE is indicated by ExtendedSignatureCount
+  of CPU_MICROCODE_EXTENDED_TABLE_HEADER structure.
+
+  When we are trying to verify the CheckSum32 with extended table.
+  We should use the fields of exnteded table to replace the corresponding
+  fields in CPU_MICROCODE_HEADER structure, and recalculate the
+  CheckSum32 with CPU_MICROCODE_HEADER + Microcode Binary. We named
+  it as CheckSum Part3.
+
+  The CheckSum Part2 is used to verify the CPU_MICROCODE_EXTENDED_TABLE_HEADER
+  and CPU_MICROCODE_EXTENDED_TABLE parts. We should make sure CheckSum Part2
+  is correct before we are going to verify each CPU_MICROCODE_EXTENDED_TABLE.
+
+  Only ProcessorSignature, ProcessorFlag and CheckSum are different between
+  CheckSum Part1 and CheckSum Part3. To avoid multiple computing CheckSum Part3.
+  Save an in-complete CheckSum32 from CheckSum Part1 for common parts.
+  When we are going to calculate CheckSum32, just should use the corresponding part
+  of the ProcessorSignature, ProcessorFlag and CheckSum with in-complete CheckSum32.
+
+  Notes: CheckSum32 is not a strong verification.
+         It does not guarantee that the data has not been modified.
+         CPU has its own mechanism to verify Microcode Binary part.
+
   @param[in]  CpuMpData    The pointer to CPU MP Data structure.
   @param[in]  IsBspCallIn  Indicate whether the caller is BSP or not.
 **/
@@ -57,6 +93,7 @@ MicrocodeDetect (
   UINT32                                  LatestRevision;
   UINTN                                   TotalSize;
   UINT32                                  CheckSum32;
+  UINT32                                  InCompleteCheckSum32;
   BOOLEAN                                 CorrectMicrocode;
   VOID                                    *MicrocodeData;
   MSR_IA32_PLATFORM_ID_REGISTER           PlatformIdMsr;
@@ -121,6 +158,25 @@ MicrocodeDetect (
   MicrocodeData  = NULL;
   MicrocodeEnd = (UINTN) (CpuMpData->MicrocodePatchAddress + CpuMpData->MicrocodePatchRegionSize);
   MicrocodeEntryPoint = (CPU_MICROCODE_HEADER *) (UINTN) CpuMpData->MicrocodePatchAddress;
+
+  //
+  // Save an in-complete CheckSum32 from CheckSum Part1 for common parts.
+  //
+  if (MicrocodeEntryPoint->DataSize == 0) {
+    InCompleteCheckSum32 = CalculateSum32 (
+                             (UINT32 *) MicrocodeEntryPoint,
+                             sizeof (CPU_MICROCODE_HEADER) + 2000
+                             );
+  } else {
+    InCompleteCheckSum32 = CalculateSum32 (
+                             (UINT32 *) MicrocodeEntryPoint,
+                             sizeof (CPU_MICROCODE_HEADER) + MicrocodeEntryPoint->DataSize
+                             );
+  }
+  InCompleteCheckSum32 -= MicrocodeEntryPoint->ProcessorSignature.Uint32;
+  InCompleteCheckSum32 -= MicrocodeEntryPoint->ProcessorFlags;
+  InCompleteCheckSum32 -= MicrocodeEntryPoint->Checksum;
+
   do {
     //
     // Check if the microcode is for the Cpu and the version is newer
@@ -137,14 +193,13 @@ MicrocodeDetect (
           MicrocodeEntryPoint->UpdateRevision > LatestRevision &&
           (MicrocodeEntryPoint->ProcessorFlags & (1 << PlatformId))
           ) {
-        if (MicrocodeEntryPoint->DataSize == 0) {
-          CheckSum32 = CalculateSum32 ((UINT32 *) MicrocodeEntryPoint, 2048);
-        } else {
-          CheckSum32 = CalculateSum32 (
-                         (UINT32 *) MicrocodeEntryPoint,
-                         MicrocodeEntryPoint->DataSize + sizeof (CPU_MICROCODE_HEADER)
-                         );
-        }
+        //
+        // Calculate CheckSum Part1.
+        //
+        CheckSum32 = InCompleteCheckSum32;
+        CheckSum32 += MicrocodeEntryPoint->ProcessorSignature.Uint32;
+        CheckSum32 += MicrocodeEntryPoint->ProcessorFlags;
+        CheckSum32 += MicrocodeEntryPoint->Checksum;
         if (CheckSum32 == 0) {
           CorrectMicrocode = TRUE;
           ProcessorFlags = MicrocodeEntryPoint->ProcessorFlags;
@@ -163,6 +218,9 @@ MicrocodeDetect (
           // Calculate Extended Checksum
           //
           if ((ExtendedTableLength % 4) == 0) {
+            //
+            // Calculate CheckSum Part2.
+            //
             CheckSum32 = CalculateSum32 ((UINT32 *) ExtendedTableHeader, ExtendedTableLength);
             if (CheckSum32 == 0) {
               //
@@ -171,7 +229,13 @@ MicrocodeDetect (
               ExtendedTableCount = ExtendedTableHeader->ExtendedSignatureCount;
               ExtendedTable      = (CPU_MICROCODE_EXTENDED_TABLE *) (ExtendedTableHeader + 1);
               for (Index = 0; Index < ExtendedTableCount; Index ++) {
-                CheckSum32 = CalculateSum32 ((UINT32 *) ExtendedTable, sizeof(CPU_MICROCODE_EXTENDED_TABLE));
+                //
+                // Calculate CheckSum Part3.
+                //
+                CheckSum32 = InCompleteCheckSum32;
+                CheckSum32 += ExtendedTable->ProcessorSignature.Uint32;
+                CheckSum32 += ExtendedTable->ProcessorFlag;
+                CheckSum32 += ExtendedTable->Checksum;
                 if (CheckSum32 == 0) {
                   //
                   // Verify Header
