@@ -237,10 +237,13 @@ SecStartupPhase2(
   AllSecPpiList = (EFI_PEI_PPI_DESCRIPTOR *) SecCoreData->PeiTemporaryRamBase;
 
   //
+  // Perform platform specific initialization before entering PeiCore.
+  //
+  PpiList = SecPlatformMain (SecCoreData);
+  //
   // Find Pei Core entry point. It will report SEC and Pei Core debug information if remote debug
   // is enabled.
   //
-  PpiList = SecPlatformMain (SecCoreData);
   if (PpiList != NULL) {
     for (Index = 0;
       (PpiList[Index].Flags & EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST) != EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST;
@@ -268,9 +271,6 @@ SecStartupPhase2(
     }
   }
 
-  //
-  // Perform platform specific initialization before entering PeiCore.
-  //
   if (PpiList != NULL) {
     //
     // Remove the terminal flag from the terminal PPI
