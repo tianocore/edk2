@@ -1820,11 +1820,16 @@ EfiBootManagerBoot (
 
     if (EFI_ERROR (Status)) {
       //
-      // Report Status Code to indicate that the failure to load boot option
+      // Report Status Code with the failure status to indicate that the failure to load boot option
       //
-      REPORT_STATUS_CODE (
+      REPORT_STATUS_CODE_EX (
         EFI_ERROR_CODE | EFI_ERROR_MINOR,
-        (EFI_SOFTWARE_DXE_BS_DRIVER | EFI_SW_DXE_BS_EC_BOOT_OPTION_LOAD_ERROR)
+        (EFI_SOFTWARE_DXE_BS_DRIVER | EFI_SW_DXE_BS_EC_BOOT_OPTION_LOAD_ERROR),
+        0,
+        NULL,
+        NULL,
+        &Status,
+        sizeof (EFI_STATUS)
         );
       BootOption->Status = Status;
       //
@@ -1904,11 +1909,16 @@ EfiBootManagerBoot (
   BootOption->Status = Status;
   if (EFI_ERROR (Status)) {
     //
-    // Report Status Code to indicate that boot failure
+    // Report Status Code with the failure status to indicate that boot failure
     //
-    REPORT_STATUS_CODE (
+    REPORT_STATUS_CODE_EX (
       EFI_ERROR_CODE | EFI_ERROR_MINOR,
-      (EFI_SOFTWARE_DXE_BS_DRIVER | EFI_SW_DXE_BS_EC_BOOT_OPTION_FAILED)
+      (EFI_SOFTWARE_DXE_BS_DRIVER | EFI_SW_DXE_BS_EC_BOOT_OPTION_FAILED),
+      0,
+      NULL,
+      NULL,
+      &Status,
+      sizeof (EFI_STATUS)
       );
   }
   PERF_END_EX (gImageHandle, "BdsAttempt", NULL, 0, (UINT32) OptionNumber);
