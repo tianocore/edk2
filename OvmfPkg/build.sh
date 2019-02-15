@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-# Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2010 - 2019, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -215,7 +215,7 @@ if [[ "$RUN_QEMU" == "yes" ]]; then
                    grep -o -E 'version [0-9]+\.[0-9]+\.[0-9]+' | \
                      awk '{print $2}')
   case $qemu_version in
-    1.[6-9].*|1.[1-9][0-9].*|2.*.*)
+    1.[6-9].*|[2-9].*.*|[1-9][0-9]*.*.*)
       ENABLE_FLASH=yes
       ;;
   esac
