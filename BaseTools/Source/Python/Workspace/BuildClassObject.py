@@ -222,6 +222,7 @@ class PcdClassObject(object):
         new_pcd.DefaultValue = self.DefaultValue
         new_pcd.TokenValue = self.TokenValue
         new_pcd.MaxDatumSize = self.MaxDatumSize
+        new_pcd.MaxSizeUserSet = self.MaxSizeUserSet
 
         new_pcd.Phase = self.Phase
         new_pcd.Pending = self.Pending
