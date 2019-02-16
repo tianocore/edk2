@@ -97,14 +97,12 @@ typedef struct {
 /** A helper macro used for initializing the debug port device
     information structure.
 
-  @param [in]  NumReg       The number of generic address registers.
   @param [in]  SubType      The DBG Port SubType.
   @param [in]  UartBase     The UART port base address.
   @param [in]  UartAddrLen  The UART port address range length.
   @param [in]  UartNameStr  The UART port name string.
 **/
 #define DBG2_DEBUG_PORT_DDI(                                          \
-          NumReg,                                                     \
           SubType,                                                    \
           UartBase,                                                   \
           UartAddrLen,                                                \
@@ -116,7 +114,7 @@ typedef struct {
       /* UINT16    Length */                                          \
       sizeof (DBG2_DEBUG_DEVICE_INFORMATION),                         \
       /* UINT8     NumberofGenericAddressRegisters */                 \
-      NumReg,                                                         \
+      DBG2_NUMBER_OF_GENERIC_ADDRESS_REGISTERS,                       \
       /* UINT16    NameSpaceStringLength */                           \
       DBG2_NAMESPACESTRING_FIELD_SIZE,                                \
       /* UINT16    NameSpaceStringOffset */                           \
@@ -164,7 +162,6 @@ DBG2_TABLE AcpiDbg2 = {
      * Debug port 1
      */
     DBG2_DEBUG_PORT_DDI (
-      DBG2_NUMBER_OF_GENERIC_ADDRESS_REGISTERS,
       0,                    // {Template}: Serial Port Subtype
       0,                    // {Template}: Serial Port Base Address
       PL011_UART_LENGTH,
