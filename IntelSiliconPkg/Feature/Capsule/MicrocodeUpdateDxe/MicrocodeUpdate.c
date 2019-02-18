@@ -518,7 +518,7 @@ VerifyMicrocode (
           //
           ExtendedTableCount = ExtendedTableHeader->ExtendedSignatureCount;
           if (ExtendedTableCount > (ExtendedTableLength - sizeof(CPU_MICROCODE_EXTENDED_TABLE_HEADER)) / sizeof(CPU_MICROCODE_EXTENDED_TABLE)) {
-            DEBUG((DEBUG_ERROR, "VerifyMicrocode - ExtendedTableCount too big\n"));
+            DEBUG((DEBUG_ERROR, "VerifyMicrocode - ExtendedTableCount %d is too big\n", ExtendedTableCount));
           } else {
             ExtendedTable = (CPU_MICROCODE_EXTENDED_TABLE *)(ExtendedTableHeader + 1);
             for (Index = 0; Index < ExtendedTableCount; Index++) {
