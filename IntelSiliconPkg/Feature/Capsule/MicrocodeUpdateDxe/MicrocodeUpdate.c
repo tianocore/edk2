@@ -390,6 +390,7 @@ VerifyMicrocode (
   UINTN                                   DataSize;
   UINT32                                  CurrentRevision;
   PROCESSOR_INFO                          *ProcessorInfo;
+  UINT32                                  InCompleteCheckSum32;
   UINT32                                  CheckSum32;
   UINTN                                   ExtendedTableLength;
   UINT32                                  ExtendedTableCount;
@@ -488,6 +489,10 @@ VerifyMicrocode (
     }
     return EFI_VOLUME_CORRUPTED;
   }
+  InCompleteCheckSum32 = CheckSum32;
+  InCompleteCheckSum32 -= MicrocodeEntryPoint->ProcessorSignature.Uint32;
+  InCompleteCheckSum32 -= MicrocodeEntryPoint->ProcessorFlags;
+  InCompleteCheckSum32 -= MicrocodeEntryPoint->Checksum;
 
   //
   // Check ProcessorSignature/ProcessorFlags
@@ -522,7 +527,10 @@ VerifyMicrocode (
           } else {
             ExtendedTable = (CPU_MICROCODE_EXTENDED_TABLE *)(ExtendedTableHeader + 1);
             for (Index = 0; Index < ExtendedTableCount; Index++) {
-              CheckSum32 = CalculateSum32((UINT32 *)ExtendedTable, sizeof(CPU_MICROCODE_EXTENDED_TABLE));
+              CheckSum32 = InCompleteCheckSum32;
+              CheckSum32 += ExtendedTable->ProcessorSignature.Uint32;
+              CheckSum32 += ExtendedTable->ProcessorFlag;
+              CheckSum32 += ExtendedTable->Checksum;
               if (CheckSum32 != 0) {
                 DEBUG((DEBUG_ERROR, "VerifyMicrocode - The checksum for ExtendedTable entry with index 0x%x is incorrect\n", Index));
               } else {
