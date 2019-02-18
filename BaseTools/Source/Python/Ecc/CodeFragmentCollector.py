@@ -27,7 +27,7 @@ if sys.version_info.major == 3:
     from Ecc.CParser4.CParser import CParser
 else:
     import antlr3 as antlr
-    antlr.InputString = antlr.StringStream
+    antlr.InputStream = antlr.StringStream
     from Ecc.CParser3.CLexer import CLexer
     from Ecc.CParser3.CParser import CParser
 

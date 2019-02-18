@@ -193,6 +193,8 @@ class Configuration(object):
         # Check if there is no trailing white space in one line.
         self.GeneralCheckTrailingWhiteSpaceLine = 1
 
+        self.CFunctionLayoutCheckNoDeprecated = 1
+
         ## Space Checking
         self.SpaceCheckAll = 1
 
