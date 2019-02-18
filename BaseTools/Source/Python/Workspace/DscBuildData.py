@@ -1537,6 +1537,9 @@ class DscBuildData(PlatformBuildClassObject):
                     stru_pcd.SkuOverrideValues[skuid] = copy.deepcopy(stru_pcd.SkuOverrideValues[nextskuid]) if not NoDefault else copy.deepcopy({defaultstorename: stru_pcd.DefaultValues for defaultstorename in DefaultStores} if DefaultStores else {}) #{TAB_DEFAULT_STORES_DEFAULT:stru_pcd.DefaultValues})
                     if not NoDefault:
                         stru_pcd.ValueChain.add((skuid, ''))
+                if 'DEFAULT' in stru_pcd.SkuOverrideValues and not GlobalData.gPcdSkuOverrides.get((stru_pcd.TokenCName, stru_pcd.TokenSpaceGuidCName)):
+                    GlobalData.gPcdSkuOverrides.update(
+                        {(stru_pcd.TokenCName, stru_pcd.TokenSpaceGuidCName): {'DEFAULT':stru_pcd.SkuOverrideValues['DEFAULT']}})
             if stru_pcd.Type in [self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_HII], self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_EX_HII]]:
                 for skuid in SkuIds:
                     nextskuid = skuid

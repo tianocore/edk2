@@ -103,7 +103,7 @@ MixedPcd = {}
 
 # Structure Pcd dict
 gStructurePcd = {}
-
+gPcdSkuOverrides={}
 # Pcd name for the Pcd which used in the Conditional directives
 gConditionalPcds = []
 

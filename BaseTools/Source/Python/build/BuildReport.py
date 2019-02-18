@@ -1288,7 +1288,10 @@ class PcdReport(object):
                 FileWrite(File, ' %-*s   : %6s %10s = %s' % (self.MaxLen, Flag + ' ' + PcdTokenCName, TypeName, '(' + Pcd.DatumType + ')', Value))
             if IsStructure:
                 FiledOverrideFlag = False
-                OverrideValues = Pcd.SkuOverrideValues
+                if (Pcd.TokenCName,Pcd.TokenSpaceGuidCName) in GlobalData.gPcdSkuOverrides:
+                    OverrideValues = GlobalData.gPcdSkuOverrides[(Pcd.TokenCName,Pcd.TokenSpaceGuidCName)]
+                else:
+                    OverrideValues = Pcd.SkuOverrideValues
                 if OverrideValues:
                     for Data in OverrideValues.values():
                         Struct = list(Data.values())
