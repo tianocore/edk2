@@ -1,7 +1,7 @@
 /** @file
   This is THE shell (application)
 
-  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2019, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2013-2014 Hewlett-Packard Development Company, L.P.<BR>
   Copyright 2015-2018 Dell Technologies.<BR>
   This program and the accompanying materials
@@ -1002,7 +1002,11 @@ ProcessCommandLine(
                                  ) == 0) {
       ShellInfoObject.ShellInitSettings.BitUnion.Bits.Delay        = TRUE;
       // Check for optional delay value following "-delay"
-      DelayValueStr = gEfiShellParametersProtocol->Argv[LoopVar + 1];
+      if ((LoopVar + 1) >= gEfiShellParametersProtocol->Argc) {
+        DelayValueStr = NULL;
+      } else {
+        DelayValueStr = gEfiShellParametersProtocol->Argv[LoopVar + 1];
+      }
       if (DelayValueStr != NULL){
         if (*DelayValueStr == L':') {
           DelayValueStr++;
