@@ -413,7 +413,6 @@
   MdeModulePkg/Universal/EsrtDxe/EsrtDxe.inf
   MdeModulePkg/Universal/EsrtFmpDxe/EsrtFmpDxe.inf
 
-  MdeModulePkg/Universal/PropertiesTableAttributesDxe/PropertiesTableAttributesDxe.inf
   MdeModulePkg/Universal/FileExplorerDxe/FileExplorerDxe.inf  {
     <LibraryClasses>
       FileExplorerLib|MdeModulePkg/Library/FileExplorerLib/FileExplorerLib.inf
