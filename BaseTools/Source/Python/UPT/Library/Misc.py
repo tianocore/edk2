@@ -1,7 +1,7 @@
 ## @file
 # Common routines used by all tools
 #
-# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2019, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available
 # under the terms and conditions of the BSD License which accompanies this
@@ -32,7 +32,7 @@ from os import linesep
 from os import walk
 from os import environ
 import re
-from collections import OrderedDict
+from collections import OrderedDict as Sdict
 
 import Logger.Log as Logger
 from Logger import StringTable as ST
