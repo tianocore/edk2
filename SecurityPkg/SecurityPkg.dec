@@ -187,6 +187,9 @@
 
   ## Include/Ppi/FirmwareVolumeInfoPrehashedFV.h
   gEdkiiPeiFirmwareVolumeInfoPrehashedFvPpiGuid = { 0x3ce1e631, 0x7008, 0x477c, { 0xad, 0xa7, 0x5d, 0xcf, 0xc7, 0xc1, 0x49, 0x4b } }
+ 
+  ## Include/Ppi/FirmwareVolumeInfoStoredHashFv.h
+  gEdkiiPeiFirmwareVolumeInfoStoredHashFvPpiGuid = {0x7f5e4e31, 0x81b1, 0x47e5, { 0x9e, 0x21, 0x1e, 0x4b, 0x5b, 0xc2, 0xf6, 0x1d } }
 
 #
 # [Error.gEfiSecurityPkgTokenSpaceGuid]
@@ -256,6 +259,12 @@
   # @Prompt Status Code for TPM device definitions
   # @ValidList  0x80000003 | 0x010D0000
   gEfiSecurityPkgTokenSpaceGuid.PcdStatusCodeSubClassTpmDevice|0x010D0000|UINT32|0x00000007
+
+  ## Progress Code for FV verification result.<BR><BR>
+  #  (EFI_SOFTWARE_PEI_MODULE | EFI_SUBCLASS_SPECIFIC | XXX)
+  # @Prompt Status Code for FV verification result
+  gEfiSecurityPkgTokenSpaceGuid.PcdStatusCodeFvVerificationPass|0x0303100A|UINT32|0x00010030
+  gEfiSecurityPkgTokenSpaceGuid.PcdStatusCodeFvVerificationFail|0x0303100B|UINT32|0x00010031
 
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## Image verification policy for OptionRom. Only following values are valid:<BR><BR>
