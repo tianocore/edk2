@@ -1455,10 +1455,25 @@ def CreateLibraryDestructorCode(Info, AutoGenC, AutoGenH):
 def CreateModuleEntryPointCode(Info, AutoGenC, AutoGenH):
     if Info.IsLibrary or Info.ModuleType in [SUP_MODULE_USER_DEFINED, SUP_MODULE_SEC]:
         return
+    ModuleEntryPointList = []
+    for Lib in Info.DependentLibraryList:
+        if len(Lib.ModuleEntryPointList) > 0:
+            if Lib.ModuleType == Info.ModuleType:
+                ModuleEntryPointList = ModuleEntryPointList + Lib.ModuleEntryPointList
+            else:
+                EdkLogger.error(
+                    "build",
+                    PREBUILD_ERROR,
+                    "Driver's ModuleType must be consistent [%s]"%(str(Lib)),
+                    File=str(Info.PlatformInfo),
+                    ExtraData="consumed by [%s]" % str(Info.MetaFile)
+                )
+    ModuleEntryPointList = ModuleEntryPointList + Info.Module.ModuleEntryPointList
+
     #
     # Module Entry Points
     #
-    NumEntryPoints = len(Info.Module.ModuleEntryPointList)
+    NumEntryPoints = len(ModuleEntryPointList)
     if 'PI_SPECIFICATION_VERSION' in Info.Module.Specification:
         PiSpecVersion = Info.Module.Specification['PI_SPECIFICATION_VERSION']
     else:
@@ -1468,7 +1483,7 @@ def CreateModuleEntryPointCode(Info, AutoGenC, AutoGenH):
     else:
         UefiSpecVersion = '0x00000000'
     Dict = {
-        'Function'       :   Info.Module.ModuleEntryPointList,
+        'Function'       :   ModuleEntryPointList,
         'PiSpecVersion'  :   PiSpecVersion + 'U',
         'UefiSpecVersion':   UefiSpecVersion + 'U'
     }
@@ -1481,7 +1496,7 @@ def CreateModuleEntryPointCode(Info, AutoGenC, AutoGenH):
                   AUTOGEN_ERROR,
                   '%s must have exactly one entry point' % Info.ModuleType,
                   File=str(Info),
-                  ExtraData= ", ".join(Info.Module.ModuleEntryPointList)
+                  ExtraData= ", ".join(ModuleEntryPointList)
                   )
     if Info.ModuleType == SUP_MODULE_PEI_CORE:
         AutoGenC.Append(gPeiCoreEntryPointString.Replace(Dict))
@@ -1535,11 +1550,18 @@ def CreateModuleEntryPointCode(Info, AutoGenC, AutoGenH):
 def CreateModuleUnloadImageCode(Info, AutoGenC, AutoGenH):
     if Info.IsLibrary or Info.ModuleType in [SUP_MODULE_USER_DEFINED, SUP_MODULE_SEC]:
         return
+
+    ModuleUnloadImageList = []
+    for Lib in Info.DependentLibraryList:
+        if len(Lib.ModuleUnloadImageList) > 0:
+            ModuleUnloadImageList = ModuleUnloadImageList + Lib.ModuleUnloadImageList
+    ModuleUnloadImageList = ModuleUnloadImageList + Info.Module.ModuleUnloadImageList
+
     #
     # Unload Image Handlers
     #
-    NumUnloadImage = len(Info.Module.ModuleUnloadImageList)
-    Dict = {'Count':str(NumUnloadImage) + 'U', 'Function':Info.Module.ModuleUnloadImageList}
+    NumUnloadImage = len(ModuleUnloadImageList)
+    Dict = {'Count':str(NumUnloadImage) + 'U', 'Function':ModuleUnloadImageList}
     if NumUnloadImage < 2:
         AutoGenC.Append(gUefiUnloadImageString[NumUnloadImage].Replace(Dict))
     else:
