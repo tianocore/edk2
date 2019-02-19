@@ -154,19 +154,36 @@ SdMmcHcRwMmio (
   )
 {
   EFI_STATUS                   Status;
+  EFI_PCI_IO_PROTOCOL_WIDTH    Width;
 
   if ((PciIo == NULL) || (Data == NULL))  {
     return EFI_INVALID_PARAMETER;
   }
 
-  if ((Count != 1) && (Count != 2) && (Count != 4) && (Count != 8)) {
-    return EFI_INVALID_PARAMETER;
+  switch (Count) {
+    case 1:
+      Width = EfiPciIoWidthUint8;
+      break;
+    case 2:
+      Width = EfiPciIoWidthUint16;
+      Count = 1;
+      break;
+    case 4:
+      Width = EfiPciIoWidthUint32;
+      Count = 1;
+      break;
+    case 8:
+      Width = EfiPciIoWidthUint32;
+      Count = 2;
+      break;
+    default:
+      return EFI_INVALID_PARAMETER;
   }
 
   if (Read) {
     Status = PciIo->Mem.Read (
                           PciIo,
-                          EfiPciIoWidthUint8,
+                          Width,
                           BarIndex,
                           (UINT64) Offset,
                           Count,
@@ -175,7 +192,7 @@ SdMmcHcRwMmio (
   } else {
     Status = PciIo->Mem.Write (
                           PciIo,
-                          EfiPciIoWidthUint8,
+                          Width,
                           BarIndex,
                           (UINT64) Offset,
                           Count,
