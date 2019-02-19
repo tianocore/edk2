@@ -248,8 +248,17 @@ SecStartupPhase2(
     for (Index = 0;
       (PpiList[Index].Flags & EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST) != EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST;
       Index++) {
-      if (CompareGuid (PpiList[Index].Guid, &gEfiPeiCoreFvLocationPpiGuid) && (((EFI_PEI_CORE_FV_LOCATION_PPI *) PpiList[Index].Ppi)->PeiCoreFvLocation != 0)) {
-        FindAndReportEntryPoints ((EFI_FIRMWARE_VOLUME_HEADER *) ((EFI_PEI_CORE_FV_LOCATION_PPI *) PpiList[Index].Ppi)->PeiCoreFvLocation, &PeiCoreEntryPoint);
+      if (CompareGuid (PpiList[Index].Guid, &gEfiPeiCoreFvLocationPpiGuid) &&
+          (((EFI_PEI_CORE_FV_LOCATION_PPI *) PpiList[Index].Ppi)->PeiCoreFvLocation != 0)
+         ) {
+        //
+        // In this case, SecCore is in BFV but PeiCore is in another FV reported by PPI.
+        //
+        FindAndReportEntryPoints (
+          (EFI_FIRMWARE_VOLUME_HEADER *) SecCoreData->BootFirmwareVolumeBase,
+          (EFI_FIRMWARE_VOLUME_HEADER *) ((EFI_PEI_CORE_FV_LOCATION_PPI *) PpiList[Index].Ppi)->PeiCoreFvLocation,
+          &PeiCoreEntryPoint
+          );
         if (PeiCoreEntryPoint != NULL) {
           break;
         } else {
@@ -265,7 +274,14 @@ SecStartupPhase2(
   // If EFI_PEI_CORE_FV_LOCATION_PPI not found, try to locate PeiCore from BFV.
   //
   if (PeiCoreEntryPoint == NULL) {
-    FindAndReportEntryPoints ((EFI_FIRMWARE_VOLUME_HEADER *) SecCoreData->BootFirmwareVolumeBase, &PeiCoreEntryPoint);
+    //
+    // Both SecCore and PeiCore are in BFV.
+    //
+    FindAndReportEntryPoints (
+      (EFI_FIRMWARE_VOLUME_HEADER *) SecCoreData->BootFirmwareVolumeBase,
+      (EFI_FIRMWARE_VOLUME_HEADER *) SecCoreData->BootFirmwareVolumeBase,
+      &PeiCoreEntryPoint
+      );
     if (PeiCoreEntryPoint == NULL) {
       CpuDeadLoop ();
     }
