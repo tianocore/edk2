@@ -192,7 +192,9 @@ AddGICD (
   // UINT16 Reserved
   Gicd->Reserved1 = EFI_ACPI_RESERVED_WORD;
   // UINT32 Identifier
-  Gicd->GicId = GicDInfo->GicId;
+  // One, and only one, GIC distributor structure must be present
+  // in the MADT for an ARM based system
+  Gicd->GicId = 0;
   // UINT64 PhysicalBaseAddress
   Gicd->PhysicalBaseAddress = GicDInfo->PhysicalBaseAddress;
   // UINT32 VectorBase
