@@ -51,6 +51,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/MemoryTypeInformation.h>
 #include <Guid/FileInfo.h>
 #include <Guid/GlobalVariable.h>
+#include <Guid/StatusCodeDataTypeId.h>
 #include <Guid/StatusCodeDataTypeVariable.h>
 
 #include <Library/PrintLib.h>
