@@ -92,6 +92,11 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/Disk/UdfDxe/UdfDxe.inf
 
   #
+  # Status Code Routing
+  #
+  INF MdeModulePkg/Universal/ReportStatusCodeRouter/RuntimeDxe/ReportStatusCodeRouterRuntimeDxe.inf
+
+  #
   # Platform Driver
   #
   INF OvmfPkg/VirtioBlkDxe/VirtioBlk.inf
