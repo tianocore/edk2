@@ -155,15 +155,14 @@ def GetDependencyList(FileStack, SearchPathList):
             if len(FileContent) == 0:
                 continue
 
-            if FileContent[0] == 0xff or FileContent[0] == 0xfe:
-                FileContent = FileContent.decode('utf-16')
-                IncludedFileList = gIncludePattern.findall(FileContent)
-            else:
-                try:
-                    FileContent = str(FileContent)
-                    IncludedFileList = gIncludePattern.findall(FileContent)
-                except:
-                    pass
+            try:
+                if FileContent[0] == 0xff or FileContent[0] == 0xfe:
+                    FileContent = FileContent.decode('utf-16')
+                else:
+                    FileContent = FileContent.decode()
+            except:
+                # The file is not txt file. for example .mcb file
+                continue
             IncludedFileList = gIncludePattern.findall(FileContent)
 
             for Inc in IncludedFileList:
