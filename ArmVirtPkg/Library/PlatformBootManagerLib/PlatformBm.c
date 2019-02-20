@@ -20,6 +20,7 @@
 #include <Library/BootLogoLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/PcdLib.h>
+#include <Library/PlatformBmPrintScLib.h>
 #include <Library/QemuBootOrderLib.h>
 #include <Library/UefiBootManagerLib.h>
 #include <Protocol/DevicePath.h>
@@ -833,6 +834,8 @@ PlatformBootManagerAfterConsole (
 
   RemoveStaleFvFileOptions ();
   SetBootOrderFromQemu ();
+
+  PlatformBmPrintScRegisterHandler ();
 }
 
 /**

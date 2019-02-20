@@ -50,6 +50,7 @@
   DevicePathLib
   MemoryAllocationLib
   PcdLib
+  PlatformBmPrintScLib
   PrintLib
   QemuBootOrderLib
   QemuFwCfgLib
