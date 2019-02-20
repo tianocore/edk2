@@ -58,6 +58,7 @@
   QemuBootOrderLib
   ReportStatusCodeLib
   UefiLib
+  PlatformBmPrintScLib
   Tcg2PhysicalPresenceLib
 
 [Pcd]

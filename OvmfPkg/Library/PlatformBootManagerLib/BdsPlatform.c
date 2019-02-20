@@ -16,6 +16,7 @@
 #include <Guid/XenInfo.h>
 #include <Guid/RootBridgesConnectedEventGroup.h>
 #include <Protocol/FirmwareVolume2.h>
+#include <Library/PlatformBmPrintScLib.h>
 #include <Library/Tcg2PhysicalPresenceLib.h>
 
 
@@ -1542,6 +1543,8 @@ PlatformBootManagerAfterConsole (
 
   RemoveStaleFvFileOptions ();
   SetBootOrderFromQemu ();
+
+  PlatformBmPrintScRegisterHandler ();
 }
 
 /**
