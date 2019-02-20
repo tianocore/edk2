@@ -161,7 +161,7 @@ ShellOpenFileByDevicePath(
   otherwise, the Filehandle is NULL. Attributes is valid only for
   EFI_FILE_MODE_CREATE.
 
-  @param[in] FilePath           The pointer to file name.
+  @param[in] FileName           The pointer to file name.
   @param[out] FileHandle        The pointer to the file handle.
   @param[in] OpenMode           The mode to open the file with.
   @param[in] Attributes         The file's file attributes.
@@ -186,7 +186,7 @@ ShellOpenFileByDevicePath(
 EFI_STATUS
 EFIAPI
 ShellOpenFileByName(
-  IN CONST CHAR16               *FilePath,
+  IN CONST CHAR16               *FileName,
   OUT SHELL_FILE_HANDLE         *FileHandle,
   IN UINT64                     OpenMode,
   IN UINT64                     Attributes
