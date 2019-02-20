@@ -2482,7 +2482,8 @@ EfiBootManagerGetBootManagerMenu (
           Caller is responsible to free the memory.
 **/
 EFI_DEVICE_PATH_PROTOCOL *
-EfiBootManagerGetNextFullDevicePath (
+EFIAPI
+EfiBootManagerGetNextLoadOptionDevicePath (
   IN  EFI_DEVICE_PATH_PROTOCOL          *FilePath,
   IN  EFI_DEVICE_PATH_PROTOCOL          *FullPath
   )

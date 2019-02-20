@@ -355,7 +355,7 @@ GetEfiSysPartitionFromBootOptionFilePath (
   //
   do {
     PreFullPath = CurFullPath;
-    CurFullPath = EfiBootManagerGetNextFullDevicePath (DevicePath, CurFullPath);
+    CurFullPath = EfiBootManagerGetNextLoadOptionDevicePath (DevicePath, CurFullPath);
 
     if (PreFullPath != NULL) {
       FreePool (PreFullPath);
