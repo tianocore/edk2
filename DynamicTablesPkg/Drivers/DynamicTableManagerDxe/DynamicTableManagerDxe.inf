@@ -46,5 +46,7 @@
   gEdkiiDynamicTableFactoryProtocolGuid
 
 [Depex]
-  gEdkiiConfigurationManagerProtocolGuid
+  gEfiAcpiTableProtocolGuid AND
+  gEdkiiConfigurationManagerProtocolGuid AND
+  gEdkiiDynamicTableFactoryProtocolGuid
 
