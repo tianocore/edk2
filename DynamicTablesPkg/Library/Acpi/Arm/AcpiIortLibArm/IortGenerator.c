@@ -44,7 +44,7 @@ Requirements:
   - EArmObjSmmuV3
   - EArmObjPmcg
   - EArmObjGicItsIdentifierArray
-  - EArmObjIdMapping
+  - EArmObjIdMappingArray
   - EArmObjGicItsIdentifierArray
 */
 
@@ -116,7 +116,7 @@ GET_OBJECT_LIST (
 */
 GET_OBJECT_LIST (
   EObjNameSpaceArm,
-  EArmObjIdMapping,
+  EArmObjIdMappingArray,
   CM_ARM_ID_MAPPING
   );
 
@@ -653,7 +653,7 @@ AddIdMappingArray (
   Generator = (ACPI_IORT_GENERATOR*)This;
 
   // Get the Id Mapping Array
-  Status = GetEArmObjIdMapping (
+  Status = GetEArmObjIdMappingArray (
              CfgMgrProtocol,
              IdMappingToken,
              &IdMappings,
