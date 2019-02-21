@@ -2079,6 +2079,8 @@ MpInitLibInitialize (
   BufferSize += MonitorFilterSize * MaxLogicalProcessorNumber;
   BufferSize += ApResetVectorSizeBelow1Mb;
   BufferSize  = ALIGN_VALUE (BufferSize, 8);
+  BufferSize += 8;  // allow PeiServicesTablePointerLibIdt to be at Idtr.Base - sizeof (UINTN) and
+                    // maintain 8 byte alignment.
   BufferSize += VolatileRegisters.Idtr.Limit + 1;
   BufferSize += sizeof (CPU_MP_DATA);
   BufferSize += (sizeof (CPU_AP_DATA) + sizeof (CPU_INFO_IN_HOB))* MaxLogicalProcessorNumber;
@@ -2098,6 +2100,8 @@ MpInitLibInitialize (
   //         Backup Buffer
   //    +--------------------+
   //           Padding
+  //    +--------------------+
+  //    PeiServicesTablePointer sizeof (UINTN), 8 byte aligned
   //    +--------------------+ <-- ApIdtBase (8-byte boundary)
   //           AP IDT          All APs share one separate IDT.
   //    +--------------------+ <-- CpuMpData
@@ -2110,7 +2114,7 @@ MpInitLibInitialize (
   //
   MonitorBuffer               = (UINT8 *)(Buffer + ApStackSize * MaxLogicalProcessorNumber);
   BackupBufferAddr            = (UINTN)MonitorBuffer + MonitorFilterSize * MaxLogicalProcessorNumber;
-  ApIdtBase                   = ALIGN_VALUE (BackupBufferAddr + ApResetVectorSizeBelow1Mb, 8);
+  ApIdtBase                   = ALIGN_VALUE (BackupBufferAddr + ApResetVectorSizeBelow1Mb, 8) + 8;
   CpuMpData                   = (CPU_MP_DATA *)(ApIdtBase + VolatileRegisters.Idtr.Limit + 1);
   CpuMpData->Buffer           = Buffer;
   CpuMpData->CpuApStackSize   = ApStackSize;
@@ -2152,7 +2156,14 @@ MpInitLibInitialize (
   // Duplicate BSP's IDT to APs.
   // All APs share one separate IDT. So AP can get the address of CpuMpData by using IDTR.BASE + IDTR.LIMIT + 1
   //
-  CopyMem ((VOID *)ApIdtBase, (VOID *)VolatileRegisters.Idtr.Base, VolatileRegisters.Idtr.Limit + 1);
+  // Maintain compatibility with PeiServicesTablePointerLibIdt which stores the *PeiServices at
+  // Idt.Base - sizeof(UINTN);
+  CopyMem (
+    (VOID *)(ApIdtBase - sizeof (UINTN)),
+    (VOID *)(VolatileRegisters.Idtr.Base - sizeof (UINTN)),
+    VolatileRegisters.Idtr.Limit + 1 + sizeof (UINTN)
+    );
+
   VolatileRegisters.Idtr.Base = ApIdtBase;
   //
   // Don't pass BSP's TR to APs to avoid AP init failure.
