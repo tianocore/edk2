@@ -1,7 +1,7 @@
 /** @file
   Reset Architectural and Reset Notification protocols implementation.
 
-  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -187,7 +187,7 @@ InitializeResetSystem (
   //
   // Hook the runtime service table
   //
-  gRT->ResetSystem = ResetSystem;
+  gRT->ResetSystem = RuntimeServiceResetSystem;
 
   //
   // Now install the Reset RT AP on a new handle
@@ -242,7 +242,7 @@ DoS3 (
 **/
 VOID
 EFIAPI
-ResetSystem (
+RuntimeServiceResetSystem (
   IN EFI_RESET_TYPE   ResetType,
   IN EFI_STATUS       ResetStatus,
   IN UINTN            DataSize,
@@ -256,7 +256,7 @@ ResetSystem (
   RESET_NOTIFY_ENTRY  *Entry;
 
   //
-  // Only do REPORT_STATUS_CODE() on first call to ResetSystem()
+  // Only do REPORT_STATUS_CODE() on first call to RuntimeServiceResetSystem()
   //
   if (mResetNotifyDepth == 0) {
     //
