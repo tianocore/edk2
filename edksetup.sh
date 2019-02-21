@@ -49,6 +49,7 @@ function SetWorkspace()
   #
   # If WORKSPACE is already set, then we can return right now
   #
+  export PYTHONHASHSEED=1
   if [ -n "$WORKSPACE" ]
   then
     return 0
@@ -77,7 +78,6 @@ function SetWorkspace()
   # Set $WORKSPACE
   #
   export WORKSPACE=`pwd`
-  export PYTHONHASHSEED=1
   return 0
 }
 
