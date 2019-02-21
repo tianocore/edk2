@@ -52,7 +52,7 @@ typedef enum ArmObjectID {
   EArmObjSmmuV3,                      ///< 22 - SMMUv3
   EArmObjPmcg,                        ///< 23 - PMCG
   EArmObjGicItsIdentifierArray,       ///< 24 - GIC ITS Identifier Array
-  EArmObjIdMapping,                   ///< 25 - ID Mapping
+  EArmObjIdMappingArray,              ///< 25 - ID Mapping Array
   EArmObjSmmuInterruptArray,          ///< 26 - SMMU Interrupt Array
   EArmObjMax
 } EARM_OBJECT_ID;
