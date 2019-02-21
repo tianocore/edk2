@@ -1,7 +1,7 @@
 /** @file
   PEI Reset System Library instance that calls the ResetSystem2() PEI Service.
 
-  Copyright (c) 2017 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2017 - 2019, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -95,4 +95,30 @@ ResetPlatformSpecific (
   )
 {
   PeiServicesResetSystem2 (EfiResetPlatformSpecific, EFI_SUCCESS, DataSize, ResetData);
+}
+
+/**
+  The ResetSystem function resets the entire platform.
+
+  @param[in] ResetType      The type of reset to perform.
+  @param[in] ResetStatus    The status code for the reset.
+  @param[in] DataSize       The size, in bytes, of ResetData.
+  @param[in] ResetData      For a ResetType of EfiResetCold, EfiResetWarm, or EfiResetShutdown
+                            the data buffer starts with a Null-terminated string, optionally
+                            followed by additional binary data. The string is a description
+                            that the caller may use to further indicate the reason for the
+                            system reset. ResetData is only valid if ResetStatus is something
+                            other than EFI_SUCCESS unless the ResetType is EfiResetPlatformSpecific
+                            where a minimum amount of ResetData is always required.
+**/
+VOID
+EFIAPI
+ResetSystem (
+  IN EFI_RESET_TYPE               ResetType,
+  IN EFI_STATUS                   ResetStatus,
+  IN UINTN                        DataSize,
+  IN VOID                         *ResetData OPTIONAL
+  )
+{
+  PeiServicesResetSystem2 (ResetType, ResetStatus, DataSize, ResetData);
 }
