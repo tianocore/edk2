@@ -189,6 +189,8 @@ BuildSpcrTable (
       (SerialPortInfo->PortSubtype !=
       EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_ARM_SBSA_GENERIC_UART) &&
       (SerialPortInfo->PortSubtype !=
+      EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_FULL_16550) &&
+      (SerialPortInfo->PortSubtype !=
       EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_DCC)) {
     Status = EFI_INVALID_PARAMETER;
     DEBUG ((
