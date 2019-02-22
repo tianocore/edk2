@@ -1,7 +1,7 @@
 /** @file
   This contains the business logic for the module-specific Reset Helper functions.
 
-  Copyright (c) 2017 - 2018 Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2017 - 2019 Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2016 Microsoft Corporation. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -23,9 +23,44 @@ typedef struct {
 VERIFY_SIZE_OF (RESET_UTILITY_GUID_SPECIFIC_RESET_DATA, 18);
 
 /**
-  This is a shorthand helper function to reset with a subtype so that
-  the caller doesn't have to bother with a function that has half a dozen
-  parameters.
+  This is a shorthand helper function to reset with reset type and a subtype
+  so that the caller doesn't have to bother with a function that has half
+  a dozen parameters.
+
+  This will generate a reset with status EFI_SUCCESS, a NULL string, and
+  no custom data. The subtype will be formatted in such a way that it can be
+  picked up by notification registrations and custom handlers.
+
+  NOTE: This call will fail if the architectural ResetSystem underpinnings
+        are not initialized. For DXE, you can add gEfiResetArchProtocolGuid
+        to your DEPEX.
+
+  @param[in]  ResetType     The default EFI_RESET_TYPE of the reset.
+  @param[in]  ResetSubtype  GUID pointer for the reset subtype to be used.
+
+**/
+VOID
+EFIAPI
+ResetSystemWithSubtype (
+  IN EFI_RESET_TYPE     ResetType,
+  IN CONST  GUID        *ResetSubtype
+  )
+{
+  RESET_UTILITY_GUID_SPECIFIC_RESET_DATA  ResetData;
+
+  ResetData.NullTerminator = CHAR_NULL;
+  CopyGuid (
+    (GUID *)((UINT8 *)&ResetData + OFFSET_OF (RESET_UTILITY_GUID_SPECIFIC_RESET_DATA, ResetSubtype)),
+    ResetSubtype
+    );
+
+  ResetSystem (ResetType, EFI_SUCCESS, sizeof (ResetData), &ResetData);
+}
+
+/**
+  This is a shorthand helper function to reset with the reset type
+  'EfiResetPlatformSpecific' and a subtype so that the caller doesn't
+  have to bother with a function that has half a dozen parameters.
 
   This will generate a reset with status EFI_SUCCESS, a NULL string, and
   no custom data. The subtype will be formatted in such a way that it can be
@@ -44,14 +79,7 @@ ResetPlatformSpecificGuid (
   IN CONST  GUID        *ResetSubtype
   )
 {
-  RESET_UTILITY_GUID_SPECIFIC_RESET_DATA  ResetData;
-
-  ResetData.NullTerminator = CHAR_NULL;
-  CopyGuid (
-    (GUID *)((UINT8 *)&ResetData + OFFSET_OF (RESET_UTILITY_GUID_SPECIFIC_RESET_DATA, ResetSubtype)),
-    ResetSubtype
-    );
-  ResetPlatformSpecific (sizeof (ResetData), &ResetData);
+  ResetSystemWithSubtype (EfiResetPlatformSpecific, ResetSubtype);
 }
 
 /**
