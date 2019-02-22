@@ -116,6 +116,7 @@
   NetworkPkg/HttpDxe/HttpDxe.inf
   NetworkPkg/HttpUtilitiesDxe/HttpUtilitiesDxe.inf
   NetworkPkg/HttpBootDxe/HttpBootDxe.inf
+  NetworkPkg/WifiConnectionManagerDxe/WifiConnectionManagerDxe.inf
 
   NetworkPkg/Application/IpsecConfig/IpSecConfig.inf
   NetworkPkg/Application/VConfig/VConfig.inf

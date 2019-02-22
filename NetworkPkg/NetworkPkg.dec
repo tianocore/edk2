@@ -49,6 +49,9 @@
   # Include/Guid/HttpTlsCipherList.h
   gEdkiiHttpTlsCipherListGuid   = { 0x46ddb415, 0x5244, 0x49c7, { 0x93, 0x74, 0xf0, 0xe2, 0x98, 0xe7, 0xd3, 0x86 }}
 
+  # Include/Guid/WifiConnectionManagerConfigHii.h
+  gWifiConfigGuid               = { 0x9f94d327, 0x0b18, 0x4245, { 0x8f, 0xf2, 0x83, 0x2e, 0x30, 0xd, 0x2c, 0xef }}
+
 [PcdsFixedAtBuild]
   ## The max attempt number will be created by iSCSI driver.
   # @Prompt Max attempt number.
