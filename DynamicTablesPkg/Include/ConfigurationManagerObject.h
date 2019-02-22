@@ -63,10 +63,24 @@ Object ID's in the ARM Namespace:
   10 - Serial Debug Port Info
   11 - Generic Timer Info
   12 - Platform GT Block Info
-  13 - Platform Generic Watchdog
-  14 - PCI Configuration Space Info
-  15 - Hypervisor Vendor Id
-  16 - Fixed feature flags for FADT
+  13 - Generic Timer Block Frame Info
+  14 - Platform Generic Watchdog
+  15 - PCI Configuration Space Info
+  16 - Hypervisor Vendor Id
+  17 - Fixed feature flags for FADT
+  18 - ITS Group
+  19 - Named Component
+  20 - Root Complex
+  21 - SMMUv1 or SMMUv2
+  22 - SMMUv3
+  23 - PMCG
+  24 - GIC ITS Identifier Array
+  25 - ID Mapping Array
+  26 - SMMU Interrupt Array
+  27 - Processor Hierarchy Info
+  28 - Cache Info
+  29 - Processor Hierarchy Node ID Info
+  30 - CM Object Reference
 */
 typedef UINT32  CM_OBJECT_ID;
 

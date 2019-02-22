@@ -48,6 +48,10 @@ typedef enum ArmObjectID {
   EArmObjGicItsIdentifierArray,       ///< 24 - GIC ITS Identifier Array
   EArmObjIdMappingArray,              ///< 25 - ID Mapping Array
   EArmObjSmmuInterruptArray,          ///< 26 - SMMU Interrupt Array
+  EArmObjProcHierarchyInfo,           ///< 27 - Processor Hierarchy Info
+  EArmObjCacheInfo,                   ///< 28 - Cache Info
+  EArmObjProcNodeIdInfo,              ///< 29 - Processor Hierarchy Node ID Info
+  EArmObjCmRef,                       ///< 30 - CM Object Reference
   EArmObjMax
 } EARM_OBJECT_ID;
 
@@ -627,6 +631,97 @@ typedef struct CmArmSmmuInterrupt {
   /// Flags
   UINT32    Flags;
 } CM_ARM_SMMU_INTERRUPT;
+
+/** A structure that describes the Processor Hierarchy Node (Type 0) in PPTT
+
+    ID: EArmObjProcHierarchyInfo
+*/
+typedef struct CmArmProcHierarchyInfo {
+  /// A unique token used to identify this object
+  CM_OBJECT_TOKEN   Token;
+  /// Processor structure flags (ACPI 6.3 - January 2019, PPTT, Table 5-155)
+  UINT32            Flags;
+  /// Token for the parent CM_ARM_PROC_HIERARCHY_INFO object in the processor
+  /// topology. A value of CM_NULL_TOKEN means this node has no parent.
+  CM_OBJECT_TOKEN   ParentToken;
+  /// Token of the associated CM_ARM_GICC_INFO object which has the
+  /// corresponding ACPI Processor ID. A value of CM_NULL_TOKEN means this
+  /// node represents a group of associated processors and it does not have an
+  /// associated GIC CPU interface.
+  CM_OBJECT_TOKEN   GicCToken;
+  /// Number of resources private to this Node
+  UINT32            NoOfPrivateResources;
+  /// Token of the array which contains references to the resources private to
+  /// this CM_ARM_PROC_HIERARCHY_INFO instance. This field is ignored if
+  /// the NoOfPrivateResources is 0, in which case it is recomended to set
+  /// this field to CM_NULL_TOKEN.
+  CM_OBJECT_TOKEN   PrivateResourcesArrayToken;
+} CM_ARM_PROC_HIERARCHY_INFO;
+
+/** A structure that describes the Cache Type Structure (Type 1) in PPTT
+
+    ID: EArmObjCacheInfo
+*/
+typedef struct CmArmCacheInfo {
+  /// A unique token used to identify this object
+  CM_OBJECT_TOKEN   Token;
+  /// Reference token for the next level of cache that is private to the same
+  /// CM_ARM_PROC_HIERARCHY_INFO instance. A value of CM_NULL_TOKEN means this
+  /// entry represents the last cache level appropriate to the processor
+  /// hierarchy node structures using this entry.
+  CM_OBJECT_TOKEN   NextLevelOfCacheToken;
+  /// Size of the cache in bytes
+  UINT32            Size;
+  /// Number of sets in the cache
+  UINT32            NumberOfSets;
+  /// Integer number of ways. The maximum associativity supported by
+  /// ACPI Cache type structure is limited to MAX_UINT8. However,
+  /// the maximum number of ways supported by the architecture is
+  /// PPTT_ARM_CCIDX_CACHE_ASSOCIATIVITY_MAX. Therfore this field
+  /// is 32-bit wide.
+  UINT32            Associativity;
+  /// Cache attributes (ACPI 6.3 - January 2019, PPTT, Table 5-156)
+  UINT8             Attributes;
+  /// Line size in bytes
+  UINT16            LineSize;
+} CM_ARM_CACHE_INFO;
+
+/** A structure that describes the ID Structure (Type 2) in PPTT
+
+    ID: EArmObjProcNodeIdInfo
+*/
+typedef struct CmArmProcNodeIdInfo {
+  /// A unique token used to identify this object
+  CM_OBJECT_TOKEN   Token;
+  // Vendor ID (as described in ACPI ID registry)
+  UINT32            VendorId;
+  /// First level unique node ID
+  UINT64            Level1Id;
+  /// Second level unique node ID
+  UINT64            Level2Id;
+  /// Major revision of the node
+  UINT16            MajorRev;
+  /// Minor revision of the node
+  UINT16            MinorRev;
+  /// Spin revision of the node
+  UINT16            SpinRev;
+} CM_ARM_PROC_NODE_ID_INFO;
+
+/** A structure that describes a reference to another Configuration Manager
+    object.
+
+    This is useful for creating an array of reference tokens. The framework
+    can then query the configuration manager for these arrays using the
+    object ID EArmObjCmRef.
+
+    This can be used is to represent one-to-many relationships between objects.
+
+    ID: EArmObjCmRef
+*/
+typedef struct CmArmObjRef {
+  /// Token of the CM object being referenced
+  CM_OBJECT_TOKEN   ReferenceToken;
+} CM_ARM_OBJ_REF;
 
 #pragma pack()
 
