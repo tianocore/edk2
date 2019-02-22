@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011-2017, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2018, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -467,7 +467,7 @@ GicV3DxeInitialize (
 
     // Route the SPIs to the primary CPU. SPIs start at the INTID 32
     for (Index = 0; Index < (mGicNumInterrupts - 32); Index++) {
-      MmioWrite32 (
+      MmioWrite64 (
         mGicDistributorBase + ARM_GICD_IROUTER + (Index * 8),
         CpuTarget
         );
