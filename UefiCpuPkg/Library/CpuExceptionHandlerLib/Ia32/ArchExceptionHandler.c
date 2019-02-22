@@ -1,7 +1,7 @@
 /** @file
   IA32 CPU Exception Handler functons.
 
-  Copyright (c) 2012 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2012 - 2019, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -326,13 +326,14 @@ DumpCpuContext (
       );
     if (ExceptionType == EXCEPT_IA32_PAGE_FAULT) {
       InternalPrintMessage (
-        "  I:%x R:%x U:%x W:%x P:%x PK:%x S:%x",
+        "  I:%x R:%x U:%x W:%x P:%x PK:%x SS:%x SGX:%x",
         (SystemContext.SystemContextIa32->ExceptionData & IA32_PF_EC_ID)   != 0,
         (SystemContext.SystemContextIa32->ExceptionData & IA32_PF_EC_RSVD) != 0,
         (SystemContext.SystemContextIa32->ExceptionData & IA32_PF_EC_US)   != 0,
         (SystemContext.SystemContextIa32->ExceptionData & IA32_PF_EC_WR)   != 0,
         (SystemContext.SystemContextIa32->ExceptionData & IA32_PF_EC_P)    != 0,
         (SystemContext.SystemContextIa32->ExceptionData & IA32_PF_EC_PK)   != 0,
+        (SystemContext.SystemContextIa32->ExceptionData & IA32_PF_EC_SS)   != 0,
         (SystemContext.SystemContextIa32->ExceptionData & IA32_PF_EC_SGX)  != 0
         );
     }
