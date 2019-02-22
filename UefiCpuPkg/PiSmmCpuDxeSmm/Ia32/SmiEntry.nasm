@@ -1,5 +1,5 @@
 ;------------------------------------------------------------------------------ ;
-; Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2016 - 2019, Intel Corporation. All rights reserved.<BR>
 ; This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -19,6 +19,20 @@
 ;-------------------------------------------------------------------------------
 
 %include "StuffRsbNasm.inc"
+%include "Nasm.inc"
+
+%define MSR_IA32_S_CET                     0x6A2
+%define   MSR_IA32_CET_SH_STK_EN             0x1
+%define   MSR_IA32_CET_WR_SHSTK_EN           0x2
+%define   MSR_IA32_CET_ENDBR_EN              0x4
+%define   MSR_IA32_CET_LEG_IW_EN             0x8
+%define   MSR_IA32_CET_NO_TRACK_EN           0x10
+%define   MSR_IA32_CET_SUPPRESS_DIS          0x20
+%define   MSR_IA32_CET_SUPPRESS              0x400
+%define   MSR_IA32_CET_TRACKER               0x800
+%define MSR_IA32_PL0_SSP                   0x6A4
+
+%define CR4_CET                            0x800000
 
 %define MSR_IA32_MISC_ENABLE 0x1A0
 %define MSR_EFER      0xc0000080
@@ -52,6 +66,11 @@ global ASM_PFX(gPatchSmbase)
 extern ASM_PFX(mXdSupported)
 global ASM_PFX(gPatchXdSupported)
 extern ASM_PFX(gSmiHandlerIdtr)
+
+extern ASM_PFX(mCetSupported)
+global ASM_PFX(mPatchCetSupported)
+global ASM_PFX(mPatchCetPl0Ssp)
+global ASM_PFX(mPatchCetInterruptSsp)
 
     SECTION .text
 
@@ -173,11 +192,61 @@ ASM_PFX(gPatchXdSupported):
     mov     ax, [ebx + DSC_SS]
     mov     ss, eax
 
-;   jmp     _SmiHandler                 ; instruction is not needed
+    mov     ebx, [esp + 4]                  ; ebx <- CpuIndex
 
-global ASM_PFX(SmiHandler)
-ASM_PFX(SmiHandler):
-    mov     ebx, [esp + 4]                  ; CPU Index
+; enable CET if supported
+    mov     al, strict byte 1           ; source operand may be patched
+ASM_PFX(mPatchCetSupported):
+    cmp     al, 0
+    jz      CetDone
+
+    mov     ecx, MSR_IA32_S_CET
+    rdmsr
+    push    edx
+    push    eax
+
+    mov     ecx, MSR_IA32_PL0_SSP
+    rdmsr
+    push    edx
+    push    eax
+
+    mov     ecx, MSR_IA32_S_CET
+    mov     eax, MSR_IA32_CET_SH_STK_EN
+    xor     edx, edx
+    wrmsr
+
+    mov     ecx, MSR_IA32_PL0_SSP
+    mov     eax, strict dword 0         ; source operand will be patched
+ASM_PFX(mPatchCetPl0Ssp):
+    xor     edx, edx
+    wrmsr
+    mov     ecx, cr0
+    btr     ecx, 16                     ; clear WP
+    mov     cr0, ecx
+    mov     [eax], eax                  ; reload SSP, and clear busyflag.
+    xor     ecx, ecx
+    mov     [eax + 4], ecx
+
+    mov     eax, strict dword 0         ; source operand will be patched
+ASM_PFX(mPatchCetInterruptSsp):
+    cmp     eax, 0
+    jz      CetInterruptDone
+    mov     [eax], eax                  ; reload SSP, and clear busyflag.
+    xor     ecx, ecx
+    mov     [eax + 4], ecx
+CetInterruptDone:
+
+    mov     ecx, cr0
+    bts     ecx, 16                     ; set WP
+    mov     cr0, ecx
+
+    mov     eax, 0x668 | CR4_CET
+    mov     cr4, eax
+
+    SETSSBSY
+
+CetDone:
+
     push    ebx
     mov     eax, ASM_PFX(CpuSmmDebugEntry)
     call    eax
@@ -193,6 +262,25 @@ ASM_PFX(SmiHandler):
     call    eax
     add     esp, 4
 
+    mov     eax, ASM_PFX(mCetSupported)
+    mov     al, [eax]
+    cmp     al, 0
+    jz      CetDone2
+
+    mov     eax, 0x668
+    mov     cr4, eax       ; disable CET
+
+    mov     ecx, MSR_IA32_PL0_SSP
+    pop     eax
+    pop     edx
+    wrmsr
+
+    mov     ecx, MSR_IA32_S_CET
+    pop     eax
+    pop     edx
+    wrmsr
+CetDone2:
+
     mov     eax, ASM_PFX(mXdSupported)
     mov     al, [eax]
     cmp     al, 0
@@ -206,6 +294,7 @@ ASM_PFX(SmiHandler):
     wrmsr
 
 .7:
+
     StuffRsb32
     rsm
 

@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2016 - 2019, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -38,6 +38,23 @@ PAGE_ATTRIBUTE_TABLE mPageAttributeTable[] = {
   {Page1G,  SIZE_1GB, PAGING_1G_ADDRESS_MASK_64},
 };
 
+UINTN  mInternalGr3;
+
+/**
+  Set the internal page table base address.
+  If it is non zero, further MemoryAttribute modification will be on this page table.
+  If it is zero, further MemoryAttribute modification will be on real page table.
+
+  @param Cr3 page table base.
+**/
+VOID
+SetPageTableBase (
+  IN UINTN   Cr3
+  )
+{
+  mInternalGr3 = Cr3;
+}
+
 /**
   Return page table base.
 
@@ -48,6 +65,9 @@ GetPageTableBase (
   VOID
   )
 {
+  if (mInternalGr3 != 0) {
+    return mInternalGr3;
+  }
   return (AsmReadCr3 () & PAGING_4K_ADDRESS_MASK_64);
 }
 
@@ -220,6 +240,17 @@ ConvertPageEntryAttribute (
   if ((Attributes & EFI_MEMORY_RO) != 0) {
     if (IsSet) {
       NewPageEntry &= ~(UINT64)IA32_PG_RW;
+      if (mInternalGr3 != 0) {
+        // Environment setup
+        // ReadOnly page need set Dirty bit for shadow stack
+        NewPageEntry |= IA32_PG_D;
+        // Clear user bit for supervisor shadow stack
+        NewPageEntry &= ~(UINT64)IA32_PG_U;
+      } else {
+        // Runtime update
+        // Clear dirty bit for non shadow stack, to protect RO page.
+        NewPageEntry &= ~(UINT64)IA32_PG_D;
+      }
     } else {
       NewPageEntry |= IA32_PG_RW;
     }
@@ -661,7 +692,59 @@ SmmClearMemoryAttributes (
   return SmmClearMemoryAttributesEx (BaseAddress, Length, Attributes, NULL);
 }
 
+/**
+  Set ShadowStack memory.
 
+  @param[in]  Cr3              The page table base address.
+  @param[in]  BaseAddress      The physical address that is the start address of a memory region.
+  @param[in]  Length           The size in bytes of the memory region.
+
+  @retval EFI_SUCCESS           The shadow stack memory is set.
+**/
+EFI_STATUS
+SetShadowStack (
+  IN  UINTN                                      Cr3,
+  IN  EFI_PHYSICAL_ADDRESS                       BaseAddress,
+  IN  UINT64                                     Length
+  )
+{
+  EFI_STATUS  Status;
+
+  SetPageTableBase (Cr3);
+
+  Status = SmmSetMemoryAttributes (BaseAddress, Length, EFI_MEMORY_RO);
+
+  SetPageTableBase (0);
+
+  return Status;
+}
+
+/**
+  Set not present memory.
+
+  @param[in]  Cr3              The page table base address.
+  @param[in]  BaseAddress      The physical address that is the start address of a memory region.
+  @param[in]  Length           The size in bytes of the memory region.
+
+  @retval EFI_SUCCESS           The not present memory is set.
+**/
+EFI_STATUS
+SetNotPresentPage (
+  IN  UINTN                                      Cr3,
+  IN  EFI_PHYSICAL_ADDRESS                       BaseAddress,
+  IN  UINT64                                     Length
+  )
+{
+  EFI_STATUS  Status;
+
+  SetPageTableBase (Cr3);
+
+  Status = SmmSetMemoryAttributes (BaseAddress, Length, EFI_MEMORY_RP);
+
+  SetPageTableBase (0);
+
+  return Status;
+}
 
 /**
   Retrieves a pointer to the system configuration table from the SMM System Table

@@ -1,7 +1,7 @@
 ## @file  UefiCpuPkg.dec
 # This Package provides UEFI compatible CPU modules and libraries.
 #
-# Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2019, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available under
 # the terms and conditions of the BSD License which accompanies this distribution.
@@ -176,6 +176,10 @@
   ## Specifies stack size in bytes for each processor in SMM.
   # @Prompt Processor stack size in SMM.
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmStackSize|0x2000|UINT32|0x32132105
+
+  ## Specifies shadow stack size in bytes for each processor in SMM.
+  # @Prompt Processor shadow stack size in SMM.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmShadowStackSize|0x2000|UINT32|0x3213210E
 
   ## Indicates if SMM Code Access Check is enabled.
   #  If enabled, the SMM handler cannot execute the code outside SMM regions.

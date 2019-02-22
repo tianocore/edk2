@@ -1,7 +1,7 @@
 /** @file
   SMM CPU misc functions for Ia32 arch specific.
 
-Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2019, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -18,6 +18,14 @@ extern UINT64 gTaskGateDescriptor;
 
 EFI_PHYSICAL_ADDRESS                mGdtBuffer;
 UINTN                               mGdtBufferSize;
+
+extern BOOLEAN mCetSupported;
+extern UINTN mSmmShadowStackSize;
+
+X86_ASSEMBLY_PATCH_LABEL mPatchCetPl0Ssp;
+X86_ASSEMBLY_PATCH_LABEL mPatchCetInterruptSsp;
+UINT32 mCetPl0Ssp;
+UINT32 mCetInterruptSsp;
 
 /**
   Initialize IDT for SMM Stack Guard.
@@ -62,6 +70,7 @@ InitGdt (
   UINTN                     GdtTssTableSize;
   UINT8                     *GdtTssTables;
   UINTN                     GdtTableStepSize;
+  UINTN                     InterruptShadowStack;
 
   if (FeaturePcdGet (PcdCpuSmmStackGuard)) {
     //
@@ -75,7 +84,7 @@ InitGdt (
     //
     gcSmiGdtr.Limit += (UINT16)(2 * sizeof (IA32_SEGMENT_DESCRIPTOR));
 
-    GdtTssTableSize = (gcSmiGdtr.Limit + 1 + TSS_SIZE * 2 + 7) & ~7; // 8 bytes aligned
+    GdtTssTableSize = (gcSmiGdtr.Limit + 1 + TSS_SIZE + EXCEPTION_TSS_SIZE + 7) & ~7; // 8 bytes aligned
     mGdtBufferSize = GdtTssTableSize * gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus;
     //
     // IA32 Stack Guard need use task switch to switch stack that need
@@ -88,7 +97,7 @@ InitGdt (
     GdtTableStepSize = GdtTssTableSize;
 
     for (Index = 0; Index < gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus; Index++) {
-      CopyMem (GdtTssTables + GdtTableStepSize * Index, (VOID*)(UINTN)gcSmiGdtr.Base, gcSmiGdtr.Limit + 1 + TSS_SIZE * 2);
+      CopyMem (GdtTssTables + GdtTableStepSize * Index, (VOID*)(UINTN)gcSmiGdtr.Base, gcSmiGdtr.Limit + 1 + TSS_SIZE + EXCEPTION_TSS_SIZE);
       //
       // Fixup TSS descriptors
       //
@@ -110,6 +119,14 @@ InitGdt (
       //
       *(UINTN *)(TssBase + TSS_IA32_ESP_OFFSET) =  mSmmStackArrayBase + EFI_PAGE_SIZE + Index * mSmmStackSize;
       *(UINT32 *)(TssBase + TSS_IA32_CR3_OFFSET) = Cr3;
+
+      //
+      // Setup ShadowStack for stack switch
+      //
+      if ((PcdGet32 (PcdControlFlowEnforcementPropertyMask) != 0) && mCetSupported) {
+        InterruptShadowStack = (UINTN)(mSmmStackArrayBase + mSmmStackSize + EFI_PAGES_TO_SIZE (1) - sizeof(UINT64) + (mSmmStackSize + mSmmShadowStackSize) * Index);
+        *(UINT32 *)(TssBase + TSS_IA32_SSP_OFFSET) = (UINT32)InterruptShadowStack;
+      }
     }
   } else {
     //
@@ -157,3 +174,37 @@ TransferApToSafeState (
   //
   ASSERT (FALSE);
 }
+
+/**
+  Initialize the shadow stack related data structure.
+
+  @param CpuIndex     The index of CPU.
+  @param ShadowStack  The bottom of the shadow stack for this CPU.
+**/
+VOID
+InitShadowStack (
+  IN UINTN  CpuIndex,
+  IN VOID   *ShadowStack
+  )
+{
+  UINTN       SmmShadowStackSize;
+
+  if ((PcdGet32 (PcdControlFlowEnforcementPropertyMask) != 0) && mCetSupported) {
+    SmmShadowStackSize = EFI_PAGES_TO_SIZE (EFI_SIZE_TO_PAGES (PcdGet32 (PcdCpuSmmShadowStackSize)));
+    if (FeaturePcdGet (PcdCpuSmmStackGuard)) {
+      SmmShadowStackSize += EFI_PAGES_TO_SIZE (2);
+    }
+    mCetPl0Ssp = (UINT32)((UINTN)ShadowStack + SmmShadowStackSize - sizeof(UINT64));
+    PatchInstructionX86 (mPatchCetPl0Ssp, mCetPl0Ssp, 4);
+    DEBUG ((DEBUG_INFO, "mCetPl0Ssp - 0x%x\n", mCetPl0Ssp));
+    DEBUG ((DEBUG_INFO, "ShadowStack - 0x%x\n", ShadowStack));
+    DEBUG ((DEBUG_INFO, "  SmmShadowStackSize - 0x%x\n", SmmShadowStackSize));
+
+    if (FeaturePcdGet (PcdCpuSmmStackGuard)) {
+      mCetInterruptSsp = (UINT32)((UINTN)ShadowStack + EFI_PAGES_TO_SIZE(1) - sizeof(UINT64));
+      PatchInstructionX86 (mPatchCetInterruptSsp, mCetInterruptSsp, 4);
+      DEBUG ((DEBUG_INFO, "mCetInterruptSsp - 0x%x\n", mCetInterruptSsp));
+    }
+  }
+}
+

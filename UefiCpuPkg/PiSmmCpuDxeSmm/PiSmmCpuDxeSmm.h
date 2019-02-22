@@ -1,7 +1,7 @@
 /** @file
 Agent Module to load other modules to deploy SMM Entry Vector for X86 CPU.
 
-Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2019, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
 This program and the accompanying materials
@@ -63,6 +63,51 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "CpuService.h"
 #include "SmmProfile.h"
+
+//
+// CET definition
+//
+#define CPUID_CET_SS   BIT7
+#define CPUID_CET_IBT  BIT20
+
+#define CR4_CET_ENABLE  BIT23
+
+#define MSR_IA32_S_CET                     0x6A2
+#define MSR_IA32_PL0_SSP                   0x6A4
+#define MSR_IA32_INTERRUPT_SSP_TABLE_ADDR  0x6A8
+
+typedef union {
+  struct {
+    // enable shadow stacks
+    UINT32  SH_STK_ENP:1;
+    // enable the WRSS{D,Q}W instructions.
+    UINT32  WR_SHSTK_EN:1;
+    // enable tracking of indirect call/jmp targets to be ENDBRANCH instruction.
+    UINT32  ENDBR_EN:1;
+    // enable legacy compatibility treatment for indirect call/jmp tracking.
+    UINT32  LEG_IW_EN:1;
+    // enable use of no-track prefix on indirect call/jmp.
+    UINT32  NO_TRACK_EN:1;
+    // disable suppression of CET indirect branch tracking on legacy compatibility.
+    UINT32  SUPPRESS_DIS:1;
+    UINT32  RSVD:4;
+    // indirect branch tracking is suppressed.
+    // This bit can be written to 1 only if TRACKER is written as IDLE.
+    UINT32  SUPPRESS:1;
+    // Value of the endbranch state machine
+    // Values: IDLE (0), WAIT_FOR_ENDBRANCH(1).
+    UINT32  TRACKER:1;
+    // linear address of a bitmap in memory indicating valid
+    // pages as target of CALL/JMP_indirect that do not land on ENDBRANCH when CET is enabled
+    // and not suppressed. Valid when ENDBR_EN is 1. Must be machine canonical when written on
+    // parts that support 64 bit mode. On parts that do not support 64 bit mode, the bits 63:32 are
+    // reserved and must be 0. This value is extended by 12 bits at the low end to form the base address
+    // (this automatically aligns the address on a 4-Kbyte boundary).
+    UINT32  EB_LEG_BITMAP_BASE_low:12;
+    UINT32  EB_LEG_BITMAP_BASE_high:32;
+  } Bits;
+  UINT64   Uint64;
+} MSR_IA32_CET;
 
 //
 // MSRs required for configuration of SMM Code Access Check
@@ -127,9 +172,11 @@ typedef struct {
 // Size of Task-State Segment defined in IA32 Manual
 //
 #define TSS_SIZE              104
+#define EXCEPTION_TSS_SIZE    (TSS_SIZE + 4) // Add 4 bytes SSP
 #define TSS_X64_IST1_OFFSET   36
 #define TSS_IA32_CR3_OFFSET   28
 #define TSS_IA32_ESP_OFFSET   56
+#define TSS_IA32_SSP_OFFSET   104
 
 #define CR0_WP                BIT16
 
@@ -305,6 +352,8 @@ X86_ASSEMBLY_PATCH_LABEL            gPatchSmmCr3;
 extern UINT32                       mSmmCr4;
 X86_ASSEMBLY_PATCH_LABEL            gPatchSmmCr4;
 X86_ASSEMBLY_PATCH_LABEL            gPatchSmmInitStack;
+X86_ASSEMBLY_PATCH_LABEL            mPatchCetSupported;
+extern BOOLEAN                      mCetSupported;
 
 /**
   Semaphore operation for all processor relocate SMMBase.
@@ -418,14 +467,16 @@ Gen4GPageTable (
 /**
   Initialize global data for MP synchronization.
 
-  @param Stacks       Base address of SMI stack buffer for all processors.
-  @param StackSize    Stack size for each processor in SMM.
+  @param Stacks             Base address of SMI stack buffer for all processors.
+  @param StackSize          Stack size for each processor in SMM.
+  @param ShadowStackSize    Shadow Stack size for each processor in SMM.
 
 **/
 UINT32
 InitializeMpServiceData (
   IN VOID        *Stacks,
-  IN UINTN       StackSize
+  IN UINTN       StackSize,
+  IN UINTN       ShadowStackSize
   );
 
 /**
@@ -1034,6 +1085,50 @@ TransferApToSafeState (
   IN UINTN  ApHltLoopCode,
   IN UINTN  TopOfStack,
   IN UINTN  NumberToFinishAddress
+  );
+
+/**
+  Set ShadowStack memory.
+
+  @param[in]  Cr3              The page table base address.
+  @param[in]  BaseAddress      The physical address that is the start address of a memory region.
+  @param[in]  Length           The size in bytes of the memory region.
+
+  @retval EFI_SUCCESS           The shadow stack memory is set.
+**/
+EFI_STATUS
+SetShadowStack (
+  IN  UINTN                                      Cr3,
+  IN  EFI_PHYSICAL_ADDRESS                       BaseAddress,
+  IN  UINT64                                     Length
+  );
+
+/**
+  Set not present memory.
+
+  @param[in]  Cr3              The page table base address.
+  @param[in]  BaseAddress      The physical address that is the start address of a memory region.
+  @param[in]  Length           The size in bytes of the memory region.
+
+  @retval EFI_SUCCESS           The not present memory is set.
+**/
+EFI_STATUS
+SetNotPresentPage (
+  IN  UINTN                                      Cr3,
+  IN  EFI_PHYSICAL_ADDRESS                       BaseAddress,
+  IN  UINT64                                     Length
+  );
+
+/**
+  Initialize the shadow stack related data structure.
+
+  @param CpuIndex     The index of CPU.
+  @param ShadowStack  The bottom of the shadow stack for this CPU.
+**/
+VOID
+InitShadowStack (
+  IN UINTN  CpuIndex,
+  IN VOID   *ShadowStack
   );
 
 /**

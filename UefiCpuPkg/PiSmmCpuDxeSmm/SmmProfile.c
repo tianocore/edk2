@@ -1,7 +1,7 @@
 /** @file
 Enable SMM profile.
 
-Copyright (c) 2012 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2012 - 2019, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
 This program and the accompanying materials
@@ -927,7 +927,7 @@ InitSmmProfileInternal (
 }
 
 /**
-  Check if XD feature is supported by a processor.
+  Check if feature is supported by a processor.
 
 **/
 VOID
@@ -936,8 +936,22 @@ CheckFeatureSupported (
   )
 {
   UINT32                         RegEax;
+  UINT32                         RegEcx;
   UINT32                         RegEdx;
   MSR_IA32_MISC_ENABLE_REGISTER  MiscEnableMsr;
+
+  if ((PcdGet32 (PcdControlFlowEnforcementPropertyMask) != 0) && mCetSupported) {
+    AsmCpuid (CPUID_EXTENDED_FUNCTION, &RegEax, NULL, NULL, NULL);
+    if (RegEax <= CPUID_EXTENDED_FUNCTION) {
+      mCetSupported = FALSE;
+      PatchInstructionX86 (mPatchCetSupported, mCetSupported, 1);
+    }
+    AsmCpuidEx (CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS, CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS_SUB_LEAF_INFO, NULL, NULL, &RegEcx, NULL);
+    if ((RegEcx & CPUID_CET_SS) == 0) {
+      mCetSupported = FALSE;
+      PatchInstructionX86 (mPatchCetSupported, mCetSupported, 1);
+    }
+  }
 
   if (mXdSupported) {
     AsmCpuid (CPUID_EXTENDED_FUNCTION, &RegEax, NULL, NULL, NULL);

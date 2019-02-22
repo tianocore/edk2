@@ -1,7 +1,7 @@
 /** @file
 Page table manipulation functions for IA-32 processors
 
-Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2019, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
 This program and the accompanying materials
@@ -15,6 +15,24 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 #include "PiSmmCpuDxeSmm.h"
+
+/**
+  Disable CET.
+**/
+VOID
+EFIAPI
+DisableCet (
+  VOID
+  );
+
+/**
+  Enable CET.
+**/
+VOID
+EFIAPI
+EnableCet (
+  VOID
+  );
 
 /**
   Create PageTable for SMM use.
@@ -138,6 +156,7 @@ SmiPFHandler (
       }
     }
     CpuDeadLoop ();
+    goto Exit;
   }
 
   //
@@ -152,6 +171,7 @@ SmiPFHandler (
         DumpModuleInfoByIp (*(UINTN *)(UINTN)SystemContext.SystemContextIa32->Esp);
       );
       CpuDeadLoop ();
+      goto Exit;
     }
 
     //
@@ -171,6 +191,7 @@ SmiPFHandler (
       }
 
       CpuDeadLoop ();
+      goto Exit;
     }
 
     if (IsSmmCommBufferForbiddenAddress (PFAddress)) {
@@ -180,6 +201,7 @@ SmiPFHandler (
         DumpModuleInfoByIp ((UINTN)SystemContext.SystemContextIa32->Eip);
       );
       CpuDeadLoop ();
+      goto Exit;
     }
   }
 
@@ -212,6 +234,7 @@ SetPageTableAttributes (
   UINT64                *L3PageTable;
   BOOLEAN               IsSplitted;
   BOOLEAN               PageTableSplitted;
+  BOOLEAN               CetEnabled;
 
   //
   // Don't mark page table to read-only if heap guard is enabled.
@@ -238,6 +261,13 @@ SetPageTableAttributes (
   // Disable write protection, because we need mark page table to be write protected.
   // We need *write* page table memory, to mark itself to be *read only*.
   //
+  CetEnabled = ((AsmReadCr4() & CR4_CET_ENABLE) != 0) ? TRUE : FALSE;
+  if (CetEnabled) {
+    //
+    // CET must be disabled if WP is disabled.
+    //
+    DisableCet();
+  }
   AsmWriteCr0 (AsmReadCr0() & ~CR0_WP);
 
   do {
@@ -277,6 +307,12 @@ SetPageTableAttributes (
   // Enable write protection, after page table updated.
   //
   AsmWriteCr0 (AsmReadCr0() | CR0_WP);
+  if (CetEnabled) {
+    //
+    // re-enable CET.
+    //
+    EnableCet();
+  }
 
   return ;
 }

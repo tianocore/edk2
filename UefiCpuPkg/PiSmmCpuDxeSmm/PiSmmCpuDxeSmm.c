@@ -1,7 +1,7 @@
 /** @file
 Agent Module to load other modules to deploy SMM Entry Vector for X86 CPU.
 
-Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2019, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
 This program and the accompanying materials
@@ -93,6 +93,9 @@ EFI_CPU_INTERRUPT_HANDLER   mExternalVectorTable[EXCEPTION_VECTOR_NUMBER];
 UINTN mSmmStackArrayBase;
 UINTN mSmmStackArrayEnd;
 UINTN mSmmStackSize;
+
+UINTN mSmmShadowStackSize;
+BOOLEAN mCetSupported = TRUE;
 
 UINTN mMaxNumberOfCpus = 1;
 UINTN mNumberOfCpus = 1;
@@ -420,7 +423,7 @@ SmmRelocateBases (
   PatchInstructionX86 (gPatchSmmCr0, mSmmCr0, 4);
   PatchInstructionX86 (gPatchSmmCr3, AsmReadCr3 (), 4);
   mSmmCr4 = (UINT32)AsmReadCr4 ();
-  PatchInstructionX86 (gPatchSmmCr4, mSmmCr4, 4);
+  PatchInstructionX86 (gPatchSmmCr4, mSmmCr4 & (~CR4_CET_ENABLE), 4);
 
   //
   // Patch GDTR for SMM base relocation
@@ -550,6 +553,8 @@ PiCpuSmmEntry (
   UINT8                      *Stacks;
   VOID                       *Registration;
   UINT32                     RegEax;
+  UINT32                     RegEbx;
+  UINT32                     RegEcx;
   UINT32                     RegEdx;
   UINTN                      FamilyId;
   UINTN                      ModelId;
@@ -726,6 +731,32 @@ PiCpuSmmEntry (
     }
   }
 
+  DEBUG ((DEBUG_INFO, "PcdControlFlowEnforcementPropertyMask = %d\n", PcdGet32 (PcdControlFlowEnforcementPropertyMask)));
+  if (PcdGet32 (PcdControlFlowEnforcementPropertyMask) != 0) {
+    AsmCpuid (CPUID_EXTENDED_FUNCTION, &RegEax, NULL, NULL, NULL);
+    if (RegEax > CPUID_EXTENDED_FUNCTION) {
+      AsmCpuidEx (CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS, CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS_SUB_LEAF_INFO, NULL, NULL, &RegEcx, &RegEdx);
+      DEBUG ((DEBUG_INFO, "CPUID[7/0] ECX - 0x%08x\n", RegEcx));
+      DEBUG ((DEBUG_INFO, "  CET_SS  - 0x%08x\n", RegEcx & CPUID_CET_SS));
+      DEBUG ((DEBUG_INFO, "  CET_IBT - 0x%08x\n", RegEdx & CPUID_CET_IBT));
+      if ((RegEcx & CPUID_CET_SS) == 0) {
+        mCetSupported = FALSE;
+        PatchInstructionX86 (mPatchCetSupported, mCetSupported, 1);
+      }
+      if (mCetSupported) {
+        AsmCpuidEx (CPUID_EXTENDED_STATE, CPUID_EXTENDED_STATE_SUB_LEAF, NULL, &RegEbx, &RegEcx, NULL);
+        DEBUG ((DEBUG_INFO, "CPUID[D/1] EBX - 0x%08x, ECX - 0x%08x\n", RegEbx, RegEcx));
+        AsmCpuidEx (CPUID_EXTENDED_STATE, 11, &RegEax, NULL, &RegEcx, NULL);
+        DEBUG ((DEBUG_INFO, "CPUID[D/11] EAX - 0x%08x, ECX - 0x%08x\n", RegEax, RegEcx));
+        AsmCpuidEx(CPUID_EXTENDED_STATE, 12, &RegEax, NULL, &RegEcx, NULL);
+        DEBUG ((DEBUG_INFO, "CPUID[D/12] EAX - 0x%08x, ECX - 0x%08x\n", RegEax, RegEcx));
+      }
+    }
+  } else {
+    mCetSupported = FALSE;
+    PatchInstructionX86 (mPatchCetSupported, mCetSupported, 1);
+  }
+
   //
   // Compute tile size of buffer required to hold the CPU SMRAM Save State Map, extra CPU
   // specific context start starts at SMBASE + SMM_PSD_OFFSET, and the SMI entry point.
@@ -828,6 +859,7 @@ PiCpuSmmEntry (
   //
   // Allocate SMI stacks for all processors.
   //
+  mSmmStackSize = EFI_PAGES_TO_SIZE (EFI_SIZE_TO_PAGES (PcdGet32 (PcdCpuSmmStackSize)));
   if (FeaturePcdGet (PcdCpuSmmStackGuard)) {
     //
     // 2 more pages is allocated for each processor.
@@ -839,15 +871,39 @@ PiCpuSmmEntry (
     // |                                           |     |                                           |
     // |<-------------- Processor 0 -------------->|     |<-------------- Processor n -------------->|
     //
-    mSmmStackSize = EFI_PAGES_TO_SIZE (EFI_SIZE_TO_PAGES (PcdGet32 (PcdCpuSmmStackSize)) + 2);
-    Stacks = (UINT8 *) AllocatePages (gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus * (EFI_SIZE_TO_PAGES (PcdGet32 (PcdCpuSmmStackSize)) + 2));
-    ASSERT (Stacks != NULL);
-    mSmmStackArrayBase = (UINTN)Stacks;
-    mSmmStackArrayEnd = mSmmStackArrayBase + gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus * mSmmStackSize - 1;
-  } else {
-    mSmmStackSize = PcdGet32 (PcdCpuSmmStackSize);
-    Stacks = (UINT8 *) AllocatePages (EFI_SIZE_TO_PAGES (gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus * mSmmStackSize));
-    ASSERT (Stacks != NULL);
+    mSmmStackSize += EFI_PAGES_TO_SIZE (2);
+  }
+
+  mSmmShadowStackSize = 0;
+  if ((PcdGet32 (PcdControlFlowEnforcementPropertyMask) != 0) && mCetSupported) {
+    //
+    // Append Shadow Stack after normal stack
+    //
+    // |= Stacks
+    // +--------------------------------------------------+---------------------------------------------------------------+
+    // | Known Good Stack | Guard Page |    SMM Stack     | Known Good Shadow Stack | Guard Page |    SMM Shadow Stack    |
+    // +--------------------------------------------------+---------------------------------------------------------------+
+    // |                               |PcdCpuSmmStackSize|                                      |PcdCpuSmmShadowStackSize|
+    // |<---------------- mSmmStackSize ----------------->|<--------------------- mSmmShadowStackSize ------------------->|
+    // |                                                                                                                  |
+    // |<-------------------------------------------- Processor N ------------------------------------------------------->|
+    //
+    mSmmShadowStackSize = EFI_PAGES_TO_SIZE (EFI_SIZE_TO_PAGES (PcdGet32 (PcdCpuSmmShadowStackSize)));
+    if (FeaturePcdGet (PcdCpuSmmStackGuard)) {
+      mSmmShadowStackSize += EFI_PAGES_TO_SIZE (2);
+    }
+  }
+
+  Stacks = (UINT8 *) AllocatePages (gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus * (EFI_SIZE_TO_PAGES (mSmmStackSize + mSmmShadowStackSize)));
+  ASSERT (Stacks != NULL);
+  mSmmStackArrayBase = (UINTN)Stacks;
+  mSmmStackArrayEnd = mSmmStackArrayBase + gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus * (mSmmStackSize + mSmmShadowStackSize) - 1;
+
+  DEBUG ((DEBUG_INFO, "Stacks                   - 0x%x\n", Stacks));
+  DEBUG ((DEBUG_INFO, "mSmmStackSize            - 0x%x\n", mSmmStackSize));
+  DEBUG ((DEBUG_INFO, "PcdCpuSmmStackGuard      - 0x%x\n", FeaturePcdGet (PcdCpuSmmStackGuard)));
+  if ((PcdGet32 (PcdControlFlowEnforcementPropertyMask) != 0) && mCetSupported) {
+    DEBUG ((DEBUG_INFO, "mSmmShadowStackSize      - 0x%x\n", mSmmShadowStackSize));
   }
 
   //
@@ -887,7 +943,24 @@ PiCpuSmmEntry (
   //
   // Initialize MP globals
   //
-  Cr3 = InitializeMpServiceData (Stacks, mSmmStackSize);
+  Cr3 = InitializeMpServiceData (Stacks, mSmmStackSize, mSmmShadowStackSize);
+
+  if ((PcdGet32 (PcdControlFlowEnforcementPropertyMask) != 0) && mCetSupported) {
+    for (Index = 0; Index < gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus; Index++) {
+      SetShadowStack (
+        Cr3,
+        (EFI_PHYSICAL_ADDRESS)(UINTN)Stacks + mSmmStackSize + (mSmmStackSize + mSmmShadowStackSize) * Index,
+        mSmmShadowStackSize
+        );
+      if (FeaturePcdGet (PcdCpuSmmStackGuard)) {
+        SetNotPresentPage (
+          Cr3,
+          (EFI_PHYSICAL_ADDRESS)(UINTN)Stacks + mSmmStackSize + EFI_PAGES_TO_SIZE(1) + (mSmmStackSize + mSmmShadowStackSize) * Index,
+          EFI_PAGES_TO_SIZE(1)
+          );
+      }
+    }
+  }
 
   //
   // Fill in SMM Reserved Regions

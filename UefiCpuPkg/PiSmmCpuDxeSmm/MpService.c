@@ -1,7 +1,7 @@
 /** @file
 SMM MP service implementation
 
-Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2019, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
 This program and the accompanying materials
@@ -1369,14 +1369,16 @@ InitializeMpSyncData (
 /**
   Initialize global data for MP synchronization.
 
-  @param Stacks       Base address of SMI stack buffer for all processors.
-  @param StackSize    Stack size for each processor in SMM.
+  @param Stacks             Base address of SMI stack buffer for all processors.
+  @param StackSize          Stack size for each processor in SMM.
+  @param ShadowStackSize    Shadow Stack size for each processor in SMM.
 
 **/
 UINT32
 InitializeMpServiceData (
   IN VOID        *Stacks,
-  IN UINTN       StackSize
+  IN UINTN       StackSize,
+  IN UINTN       ShadowStackSize
   )
 {
   UINT32                    Cr3;
@@ -1428,7 +1430,7 @@ InitializeMpServiceData (
     InstallSmiHandler (
       Index,
       (UINT32)mCpuHotPlugData.SmBase[Index],
-      (VOID*)((UINTN)Stacks + (StackSize * Index)),
+      (VOID*)((UINTN)Stacks + (StackSize + ShadowStackSize) * Index),
       StackSize,
       (UINTN)(GdtTssTables + GdtTableStepSize * Index),
       gcSmiGdtr.Limit + 1,

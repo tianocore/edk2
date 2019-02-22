@@ -1,5 +1,5 @@
 ;------------------------------------------------------------------------------ ;
-; Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2009 - 2019, Intel Corporation. All rights reserved.<BR>
 ; This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -89,7 +89,7 @@ TssSeg:
             DB      0x80                ; LimitHigh
             DB      0                   ; BaseHigh
 ExceptionTssSeg:
-            DW      TSS_DESC_SIZE       ; LimitLow
+            DW      EXCEPTION_TSS_DESC_SIZE       ; LimitLow
             DW      0                   ; BaseLow
             DB      0                   ; BaseMid
             DB      0x89
@@ -223,6 +223,8 @@ ExceptionTssDescriptor:
             DW      0                   ; Reserved
             DW      0                   ; T
             DW      0                   ; I/O Map Base
+            DD      0                   ; SSP
+EXCEPTION_TSS_DESC_SIZE equ $ - ExceptionTssDescriptor
 
 ASM_PFX(gcPsd):
             DB      'PSDSIG  '
