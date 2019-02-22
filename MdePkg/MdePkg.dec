@@ -2087,6 +2087,13 @@
   # @Prompt Fixed Debug Message Print Level.
   gEfiMdePkgTokenSpaceGuid.PcdFixedDebugPrintErrorLevel|0xFFFFFFFF|UINT32|0x30001016
 
+  ## Indicates the control flow enforcement enabling state.
+  #  If enabled, it uses control flow enforcement technology to prevent ROP or JOP.<BR><BR>
+  #   BIT0 - SMM CET Shadow Stack is enabled.<BR>
+  #   Other - reserved
+  # @Prompt Enable control flow enforcement.
+  gEfiMdePkgTokenSpaceGuid.PcdControlFlowEnforcementPropertyMask|0x0|UINT32|0x30001017
+
 [PcdsFixedAtBuild,PcdsPatchableInModule]
   ## Indicates the maximum length of unicode string used in the following
   #  BaseLib functions: StrLen(), StrSize(), StrCmp(), StrnCmp(), StrCpy(), StrnCpy()<BR><BR>

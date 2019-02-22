@@ -1,6 +1,6 @@
 ;------------------------------------------------------------------------------
 ;
-; Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 ; This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -19,7 +19,11 @@
 ;
 ;------------------------------------------------------------------------------
 
+%include "Nasm.inc"
+
     SECTION .text
+
+extern ASM_PFX(PcdGet32 (PcdControlFlowEnforcementPropertyMask))
 
 ;------------------------------------------------------------------------------
 ; VOID
@@ -31,6 +35,25 @@
 ;------------------------------------------------------------------------------
 global ASM_PFX(InternalLongJump)
 ASM_PFX(InternalLongJump):
+
+    mov     eax, [ASM_PFX(PcdGet32 (PcdControlFlowEnforcementPropertyMask))]
+    test    eax, eax
+    jz      CetDone
+    mov     eax, cr4
+    bt      eax, 23                ; check if CET is enabled
+    jnc     CetDone
+
+    mov     edx, [esp + 4]         ; edx = JumpBuffer
+    mov     edx, [edx + 24]        ; edx = target SSP
+    READSSP_EAX
+    sub     edx, eax               ; edx = delta
+    mov     eax, edx               ; eax = delta
+
+    shr     eax, 2                 ; eax = delta/sizeof(UINT32)
+    INCSSP_EAX
+
+CetDone:
+
     pop     eax                         ; skip return address
     pop     edx                         ; edx <- JumpBuffer
     pop     eax                         ; eax <- Value

@@ -1,6 +1,6 @@
 ;------------------------------------------------------------------------------
 ;
-; Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 ; This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -19,8 +19,12 @@
 ;
 ;------------------------------------------------------------------------------
 
+%include "Nasm.inc"
+
     DEFAULT REL
     SECTION .text
+
+extern ASM_PFX(PcdGet32 (PcdControlFlowEnforcementPropertyMask))
 
 ;------------------------------------------------------------------------------
 ; VOID
@@ -32,6 +36,27 @@
 ;------------------------------------------------------------------------------
 global ASM_PFX(InternalLongJump)
 ASM_PFX(InternalLongJump):
+
+    mov     eax, [ASM_PFX(PcdGet32 (PcdControlFlowEnforcementPropertyMask))]
+    test    eax, eax
+    jz      CetDone
+    mov     rax, cr4
+    bt      eax, 23                      ; check if CET is enabled
+    jnc     CetDone
+
+    push    rdx                          ; save rdx
+
+    mov     rdx, [rcx + 0xF8]            ; rdx = target SSP
+    READSSP_RAX
+    sub     rdx, rax                     ; rdx = delta
+    mov     rax, rdx                     ; rax = delta
+
+    shr     rax, 3                       ; rax = delta/sizeof(UINT64)
+    INCSSP_RAX
+
+    pop     rdx                          ; restore rdx
+CetDone:
+
     mov     rbx, [rcx]
     mov     rsp, [rcx + 8]
     mov     rbp, [rcx + 0x10]

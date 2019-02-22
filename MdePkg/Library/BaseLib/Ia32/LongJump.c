@@ -1,7 +1,7 @@
 /** @file
   Implementation of _LongJump() on IA-32.
 
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -36,6 +36,32 @@ InternalLongJump (
   )
 {
   _asm {
+    mov     eax, [PcdGet32 (PcdControlFlowEnforcementPropertyMask)]
+    test    eax, eax
+    jz      CetDone
+    _emit      0x0F
+    _emit      0x20
+    _emit      0xE0                ; mov     eax, cr4
+    bt      eax, 23                ; check if CET is enabled
+    jnc     CetDone
+
+    mov     edx, [esp + 4]         ; edx = JumpBuffer
+    mov     edx, [edx + 24]        ; edx = target SSP
+    _emit      0xF3
+    _emit      0x0F
+    _emit      0x1E
+    _emit      0xC8                ; READSSP EAX
+    sub     edx, eax               ; edx = delta
+    mov     eax, edx               ; eax = delta
+
+    shr     eax, 2                 ; eax = delta/sizeof(UINT32)
+    _emit      0xF3
+    _emit      0x0F
+    _emit      0xAE
+    _emit      0xE8                ; INCSSP EAX
+
+CetDone:
+
     pop     eax                         ; skip return address
     pop     edx                         ; edx <- JumpBuffer
     pop     eax                         ; eax <- Value

@@ -1,7 +1,7 @@
 ## @file
 #  Base Library implementation.
 #
-#  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2019, Intel Corporation. All rights reserved.<BR>
 #  Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 #  Portions copyright (c) 2011 - 2013, ARM Ltd. All rights reserved.<BR>
 #
@@ -620,6 +620,7 @@
   gEfiMdePkgTokenSpaceGuid.PcdMaximumLinkedListLength      ## SOMETIMES_CONSUMES
   gEfiMdePkgTokenSpaceGuid.PcdMaximumAsciiStringLength     ## SOMETIMES_CONSUMES
   gEfiMdePkgTokenSpaceGuid.PcdMaximumUnicodeStringLength   ## SOMETIMES_CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdControlFlowEnforcementPropertyMask   ## SOMETIMES_CONSUMES
 
 [FeaturePcd]
   gEfiMdePkgTokenSpaceGuid.PcdVerifyNodeInList  ## CONSUMES
