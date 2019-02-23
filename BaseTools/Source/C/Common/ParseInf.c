@@ -508,7 +508,7 @@ Returns:
   //
   // Check input parameter
   //
-  if (AsciiString == NULL || ReturnValue == NULL) {
+  if (AsciiString == NULL || ReturnValue == NULL || strlen(AsciiString) > 0xFF) {
     return EFI_INVALID_PARAMETER;
   }
   while (AsciiString[Index] == ' ') {
