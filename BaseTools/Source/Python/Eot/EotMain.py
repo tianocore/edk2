@@ -1105,7 +1105,7 @@ class MultipleFv(FirmwareVolume):
             Fv.frombuffer(Buf, 0, len(Buf))
 
             self.BasicInfo.append([Fv.Name, Fv.FileSystemGuid, Fv.Size])
-            self.FfsDict.append(Fv.FfsDict)
+            self.FfsDict.update(Fv.FfsDict)
 
 ## Class Eot
 #
