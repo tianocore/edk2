@@ -20,8 +20,6 @@ from Workspace.BuildClassObject import StructurePcd
 from Common.BuildToolError import RESOURCE_NOT_AVAILABLE
 from Common.BuildToolError import OPTION_MISSING
 from Common.BuildToolError import BUILD_ERROR
-from Common.BuildToolError import PREBUILD_ERROR
-import Common.EdkLogger as EdkLogError
 
 class OrderedListDict(OrderedDict):
     def __init__(self, *args, **kwargs):
@@ -140,12 +138,6 @@ def GetModuleLibInstances(Module, Platform, BuildDatabase, Arch, Target, Toolcha
                             return []
 
                 LibraryModule = BuildDatabase[LibraryPath, Arch, Target, Toolchain]
-                if LibraryModule.ModuleEntryPointList and LibraryModule.ModuleType != Module.ModuleType:
-                    EdkLogError.error(
-                        "build", PREBUILD_ERROR,
-                        "Driver's ModuleType must be consistent [%s]" % (str(Module)),
-                        File=str(FileName),
-                        ExtraData="consumed by [%s]" % str(LibraryModule))
                 # for those forced library instance (NULL library), add a fake library class
                 if LibraryClassName.startswith("NULL"):
                     LibraryModule.LibraryClass.append(LibraryClassObject(LibraryClassName, [ModuleType]))
