@@ -222,10 +222,11 @@ MakeTable (
 
     if (Len <= TableBits) {
 
+      if (Start[Len] >= NextCode || NextCode > MaxTableLength){
+        return (UINT16) BAD_TABLE;
+      }
+
       for (Index = Start[Len]; Index < NextCode; Index++) {
-        if (Index >= MaxTableLength) {
-          return (UINT16) BAD_TABLE;
-        }
         Table[Index] = Char;
       }
 
