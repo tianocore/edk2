@@ -59,8 +59,6 @@ typedef enum ArmObjectID {
 
 /** A structure that describes the
     ARM Boot Architecture flags.
-
-    ID: EArmObjBootArchInfo
 */
 typedef struct CmArmBootArchInfo {
   /** This is the ARM_BOOT_ARCH flags field of the FADT Table
@@ -73,10 +71,13 @@ typedef struct CmArmCpuInfo {
   // Reserved for use when SMBIOS tables are implemented
 } CM_ARM_CPU_INFO;
 
+typedef struct CmArmCpuInfoList {
+  UINT32             CpuCount;
+  CM_ARM_CPU_INFO  * CpuInfo;
+} CM_ARM_CPU_INFO_LIST;
+
 /** A structure that describes the
     Power Management Profile Information for the Platform.
-
-    ID: EArmObjPowerManagementProfileInfo
 */
 typedef struct CmArmPowerManagementProfileInfo {
   /** This is the Preferred_PM_Profile field of the FADT Table
@@ -87,8 +88,6 @@ typedef struct CmArmPowerManagementProfileInfo {
 
 /** A structure that describes the
     GIC CPU Interface for the Platform.
-
-    ID: EArmObjGicCInfo
 */
 typedef struct CmArmGicCInfo {
   /// The GIC CPU Interface number.
@@ -165,8 +164,6 @@ typedef struct CmArmGicCInfo {
 
 /** A structure that describes the
     GIC Distributor information for the Platform.
-
-    ID: EArmObjGicDInfo
 */
 typedef struct CmArmGicDInfo {
   /// The Physical Base address for the GIC Distributor.
@@ -187,8 +184,6 @@ typedef struct CmArmGicDInfo {
 
 /** A structure that describes the
     GIC MSI Frame information for the Platform.
-
-    ID: EArmObjGicMsiFrameInfo
 */
 typedef struct CmArmGicMsiFrameInfo {
   /// The GIC MSI Frame ID
@@ -212,8 +207,6 @@ typedef struct CmArmGicMsiFrameInfo {
 
 /** A structure that describes the
     GIC Redistributor information for the Platform.
-
-    ID: EArmObjGicRedistributorInfo
 */
 typedef struct CmArmGicRedistInfo {
   /** The physical address of a page range
@@ -227,8 +220,6 @@ typedef struct CmArmGicRedistInfo {
 
 /** A structure that describes the
     GIC Interrupt Translation Service information for the Platform.
-
-    ID: EArmObjGicItsInfo
 */
 typedef struct CmArmGicItsInfo {
   /// The GIC ITS ID
@@ -240,9 +231,6 @@ typedef struct CmArmGicItsInfo {
 
 /** A structure that describes the
     Serial Port information for the Platform.
-
-    ID: EArmObjSerialConsolePortInfo or
-        EArmObjSerialDebugPortInfo
 */
 typedef struct CmArmSerialPortInfo {
   /// The physical base address for the serial port
@@ -263,8 +251,6 @@ typedef struct CmArmSerialPortInfo {
 
 /** A structure that describes the
     Generic Timer information for the Platform.
-
-    ID: EArmObjGenericTimerInfo
 */
 typedef struct CmArmGenericTimerInfo {
   /// The physical base address for the counter control frame
@@ -300,8 +286,6 @@ typedef struct CmArmGenericTimerInfo {
 
 /** A structure that describes the
     Platform Generic Block Timer Frame information for the Platform.
-
-    ID: EArmObjGTBlockTimerFrameInfo
 */
 typedef struct CmArmGTBlockTimerFrameInfo {
   /// The Generic Timer frame number
@@ -337,8 +321,6 @@ typedef struct CmArmGTBlockTimerFrameInfo {
 
 /** A structure that describes the
     Platform Generic Block Timer information for the Platform.
-
-    ID: EArmObjPlatformGTBlockInfo
 */
 typedef struct CmArmGTBlockInfo {
   /// The physical base address for the GT Block Timer structure
@@ -353,8 +335,6 @@ typedef struct CmArmGTBlockInfo {
 
 /** A structure that describes the
     SBSA Generic Watchdog information for the Platform.
-
-    ID: EArmObjPlatformGenericWatchdogInfo
 */
 typedef struct CmArmGenericWatchdogInfo {
   /// The physical base address of the SBSA Watchdog control frame
@@ -374,8 +354,6 @@ typedef struct CmArmGenericWatchdogInfo {
 
 /** A structure that describes the
     PCI Configuration Space information for the Platform.
-
-    ID: EArmObjPciConfigSpaceInfo
 */
 typedef struct CmArmPciConfigSpaceInfo {
   /// The physical base address for the PCI segment
@@ -393,8 +371,6 @@ typedef struct CmArmPciConfigSpaceInfo {
 
 /** A structure that describes the
     Hypervisor Vendor ID information for the Platform.
-
-    ID: EArmObjHypervisorVendorIdentity
 */
 typedef struct CmArmHypervisorVendorId {
   /// The hypervisor Vendor ID
@@ -403,8 +379,6 @@ typedef struct CmArmHypervisorVendorId {
 
 /** A structure that describes the
     Fixed feature flags for the Platform.
-
-    ID: EArmObjFixedFeatureFlags
 */
 typedef struct CmArmFixedFeatureFlags {
   /// The Fixed feature flags
@@ -413,11 +387,9 @@ typedef struct CmArmFixedFeatureFlags {
 
 /** A structure that describes the
     ITS Group node for the Platform.
-
-    ID: EArmObjItsGroup
 */
 typedef struct CmArmItsGroupNode {
-  /// An unique token used to identify this object
+  /// An unique token used to ideintify this object
   CM_OBJECT_TOKEN   Token;
   /// The number of ITS identifiers in the ITS node
   UINT32            ItsIdCount;
@@ -427,8 +399,6 @@ typedef struct CmArmItsGroupNode {
 
 /** A structure that describes the
     GIC ITS Identifiers for an ITS Group node.
-
-    ID: EArmObjGicItsIdentifierArray
 */
 typedef struct CmArmGicItsIdentifier {
   /// The ITS Identifier
@@ -437,11 +407,9 @@ typedef struct CmArmGicItsIdentifier {
 
 /** A structure that describes the
     Named component node for the Platform.
-
-    ID: EArmObjNamedComponent
 */
 typedef struct CmArmNamedComponentNode {
-  /// An unique token used to identify this object
+  /// An unique token used to ideintify this object
   CM_OBJECT_TOKEN   Token;
   /// Number of ID mappings
   UINT32            IdMappingCount;
@@ -468,11 +436,9 @@ typedef struct CmArmNamedComponentNode {
 
 /** A structure that describes the
     Root complex node for the Platform.
-
-    ID: EArmObjRootComplex
 */
 typedef struct CmArmRootComplexNode {
-  /// An unique token used to identify this object
+  /// An unique token used to ideintify this object
   CM_OBJECT_TOKEN   Token;
   /// Number of ID mappings
   UINT32            IdMappingCount;
@@ -496,11 +462,9 @@ typedef struct CmArmRootComplexNode {
 
 /** A structure that describes the
     SMMUv1 or SMMUv2 node for the Platform.
-
-    ID: EArmObjSmmuV1SmmuV2
 */
 typedef struct CmArmSmmuV1SmmuV2Node {
-  /// An unique token used to identify this object
+  /// An unique token used to ideintify this object
   CM_OBJECT_TOKEN   Token;
   /// Number of ID mappings
   UINT32            IdMappingCount;
@@ -538,11 +502,9 @@ typedef struct CmArmSmmuV1SmmuV2Node {
 
 /** A structure that describes the
     SMMUv3 node for the Platform.
-
-    ID: EArmObjSmmuV3
 */
 typedef struct CmArmSmmuV3Node {
-  /// An unique token used to identify this object
+  /// An unique token used to ideintify this object
   CM_OBJECT_TOKEN   Token;
   /// Number of ID mappings
   UINT32            IdMappingCount;
@@ -574,11 +536,9 @@ typedef struct CmArmSmmuV3Node {
 
 /** A structure that describes the
     PMCG node for the Platform.
-
-    ID: EArmObjPmcg
 */
 typedef struct CmArmPmcgNode {
-  /// An unique token used to identify this object
+  /// An unique token used to ideintify this object
   CM_OBJECT_TOKEN   Token;
   /// Number of ID mappings
   UINT32            IdMappingCount;
@@ -598,8 +558,6 @@ typedef struct CmArmPmcgNode {
 
 /** A structure that describes the
     ID Mappings for the Platform.
-
-    ID: EArmObjIdMappingArray
 */
 typedef struct CmArmIdMapping {
   /// Input base
@@ -616,8 +574,6 @@ typedef struct CmArmIdMapping {
 
 /** A structure that describes the
     SMMU interrupts for the Platform.
-
-    ID: EArmObjSmmuInterruptArray
 */
 typedef struct CmArmSmmuInterrupt {
   /// Interrupt number
