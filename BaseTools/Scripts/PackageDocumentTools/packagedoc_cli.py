@@ -16,8 +16,8 @@ from __future__ import print_function
 import os, sys, logging, traceback, subprocess
 from optparse import OptionParser
 
-from .plugins.EdkPlugins.edk2.model import baseobject
-from .plugins.EdkPlugins.edk2.model import doxygengen
+from plugins.EdkPlugins.edk2.model import baseobject
+from plugins.EdkPlugins.edk2.model import doxygengen
 
 gArchMarcoDict = {'ALL'      : 'MDE_CPU_IA32 MDE_CPU_X64 MDE_CPU_EBC MDE_CPU_IPF _MSC_EXTENSIONS __GNUC__ __INTEL_COMPILER',
                   'IA32_MSFT': 'MDE_CPU_IA32 _MSC_EXTENSIONS',

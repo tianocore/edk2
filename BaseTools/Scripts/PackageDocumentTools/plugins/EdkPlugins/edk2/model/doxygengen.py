@@ -16,7 +16,7 @@
 """This file produce action class to generate doxygen document for edk2 codebase.
    The action classes are shared by GUI and command line tools.
 """
-from ...basemodel import doxygen
+from plugins.EdkPlugins.basemodel import doxygen
 import os
 try:
     import wx
@@ -24,9 +24,9 @@ try:
 except:
     gInGui = False
 import re
-from ...edk2.model import inf
-from ...edk2.model import dec
-from ...basemodel.message import *
+from plugins.EdkPlugins.edk2.model import inf
+from plugins.EdkPlugins.edk2.model import dec
+from plugins.EdkPlugins.basemodel.message import *
 
 _ignore_dir = ['.svn', '_svn', 'cvs']
 _inf_key_description_mapping_table = {

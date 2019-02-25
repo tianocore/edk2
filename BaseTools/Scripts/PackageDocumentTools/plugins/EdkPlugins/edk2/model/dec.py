@@ -11,9 +11,9 @@
 # WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 
-from ...basemodel import ini
+from plugins.EdkPlugins.basemodel import ini
 import re, os
-from ...basemodel.message import *
+from plugins.EdkPlugins.basemodel.message import *
 
 class DECFile(ini.BaseINIFile):
 

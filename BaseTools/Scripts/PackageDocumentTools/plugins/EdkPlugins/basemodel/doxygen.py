@@ -92,7 +92,7 @@ class Page(BaseDoxygeItem):
             self.mText.insert(endIndex, '<ul>')
             endIndex += 1
             if self.mIsSort:
-                self.mSubPages.sort(cmp=lambda x, y: cmp(x.mName.lower(), y.mName.lower()))
+                self.mSubPages.sort(key=lambda x: x.mName.lower())
             for page in self.mSubPages:
                 self.mText.insert(endIndex, '<li>\subpage %s \"%s\" </li>' % (page.mTag, page.mName))
                 endIndex += 1
