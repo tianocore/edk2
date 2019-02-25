@@ -54,13 +54,12 @@ LibGetTime (
   )
 {
   EFI_STATUS  Status;
-  UINT32      EpochSeconds;
   INT16       TimeZone;
   UINT8       Daylight;
   UINT64      Freq;
   UINT64      Counter;
   UINT64      Remainder;
-  UINTN       ElapsedSeconds;
+  UINTN       EpochSeconds;
   UINTN       Size;
 
   if (Time == NULL) {
@@ -75,13 +74,13 @@ LibGetTime (
 
   // Get the epoch time from non-volatile storage
   Size = sizeof (UINTN);
-  ElapsedSeconds = 0;
+  EpochSeconds = 0;
   Status = EfiGetVariable (
              (CHAR16 *)mEpochVariableName,
              &gEfiCallerIdGuid,
              NULL,
              &Size,
-             (VOID *)&ElapsedSeconds
+             (VOID *)&EpochSeconds
              );
   // Fall back to compilation-time epoch if not set
   if (EFI_ERROR (Status)) {
@@ -93,7 +92,7 @@ LibGetTime (
     // If you are attempting to use this library on such an environment, please
     // contact the edk2 mailing list, so we can try to add support for it.
     //
-    ElapsedSeconds = BUILD_EPOCH;
+    EpochSeconds = BUILD_EPOCH;
     DEBUG ((
       DEBUG_INFO,
       "LibGetTime: %s non volatile variable was not found - Using compilation time epoch.\n",
@@ -101,7 +100,7 @@ LibGetTime (
       ));
   }
   Counter = GetPerformanceCounter ();
-  ElapsedSeconds += DivU64x64Remainder (Counter, Freq, &Remainder);
+  EpochSeconds += DivU64x64Remainder (Counter, Freq, &Remainder);
 
   // Get the current time zone information from non-volatile storage
   Size = sizeof (TimeZone);
@@ -204,7 +203,7 @@ LibGetTime (
     }
   }
 
-  EpochToEfiTime (ElapsedSeconds, Time);
+  EpochToEfiTime (EpochSeconds, Time);
 
   // Because we use the performance counter, we can fill the Nanosecond attribute
   // provided that the remainder doesn't overflow 64-bit during multiplication.
@@ -240,6 +239,9 @@ LibSetTime (
   )
 {
   EFI_STATUS  Status;
+  UINT64      Freq;
+  UINT64      Counter;
+  UINT64      Remainder;
   UINTN       EpochSeconds;
 
   if (!IsTimeValid (Time)) {
@@ -249,14 +251,28 @@ LibSetTime (
   EpochSeconds = EfiTimeToEpoch (Time);
 
   // Adjust for the correct time zone, i.e. convert to UTC time zone
-  if (Time->TimeZone != EFI_UNSPECIFIED_TIMEZONE) {
+  if ((Time->TimeZone != EFI_UNSPECIFIED_TIMEZONE)
+      && (EpochSeconds > Time->TimeZone * SEC_PER_MIN)) {
     EpochSeconds -= Time->TimeZone * SEC_PER_MIN;
   }
 
   // Adjust for the correct period
-  if ((Time->Daylight & EFI_TIME_IN_DAYLIGHT) == EFI_TIME_IN_DAYLIGHT) {
+  if (((Time->Daylight & EFI_TIME_IN_DAYLIGHT) == EFI_TIME_IN_DAYLIGHT)
+      && (EpochSeconds > SEC_PER_HOUR)) {
     // Convert to un-adjusted time, i.e. fall back one hour
     EpochSeconds -= SEC_PER_HOUR;
+  }
+
+  // Use the performance counter to subtract the number of seconds
+  // since platform reset. Without this, setting time from the shell
+  // and immediately reading it back would result in a forward time
+  // offset, of the duration during which the platform has been up.
+  Freq = GetPerformanceCounterProperties (NULL, NULL);
+  if (Freq != 0) {
+    Counter = GetPerformanceCounter ();
+    if (EpochSeconds > DivU64x64Remainder (Counter, Freq, &Remainder)) {
+      EpochSeconds -= DivU64x64Remainder (Counter, Freq, &Remainder);
+    }
   }
 
   // Save the current time zone information into non-volatile storage
