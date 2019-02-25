@@ -518,7 +518,7 @@ BuildGtdtTable (
              CfgMgrProtocol,
              This,
              &Gtdt->Header,
-             AcpiTableInfo,
+             AcpiTableInfo->AcpiTableRevision,
              TableSize
              );
   if (EFI_ERROR (Status)) {

@@ -537,7 +537,7 @@ BuildFadtTable (
              CfgMgrProtocol,
              This,
              (EFI_ACPI_DESCRIPTION_HEADER*)&AcpiFadt,
-             AcpiTableInfo,
+             AcpiTableInfo->AcpiTableRevision,
              sizeof (EFI_ACPI_6_2_FIXED_ACPI_DESCRIPTION_TABLE)
              );
   if (EFI_ERROR (Status)) {

@@ -569,7 +569,7 @@ BuildMadtTable (
              CfgMgrProtocol,
              This,
              &Madt->Header,
-             AcpiTableInfo,
+             AcpiTableInfo->AcpiTableRevision,
              TableSize
              );
   if (EFI_ERROR (Status)) {

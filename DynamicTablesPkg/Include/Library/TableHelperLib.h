@@ -45,7 +45,7 @@ GetCgfMgrInfo (
   @param [in]     Generator      Pointer to the ACPI table Generator.
   @param [in,out] AcpiHeader     Pointer to the ACPI table header to be
                                  updated.
-  @param [in]     AcpiTableInfo  Pointer to the ACPI table info structure.
+  @param [in]     Revision       Revision of the ACPI table.
   @param [in]     Length         Length of the ACPI table.
 
   @retval EFI_SUCCESS           The ACPI table is updated successfully.
@@ -61,7 +61,7 @@ AddAcpiHeader (
   IN      CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  * CONST CfgMgrProtocol,
   IN      CONST ACPI_TABLE_GENERATOR                  * CONST Generator,
   IN OUT  EFI_ACPI_DESCRIPTION_HEADER                 * CONST AcpiHeader,
-  IN      CONST CM_STD_OBJ_ACPI_TABLE_INFO            * CONST AcpiTableInfo,
+  IN      CONST UINT32                                        Revision,
   IN      CONST UINT32                                        Length
   );
 

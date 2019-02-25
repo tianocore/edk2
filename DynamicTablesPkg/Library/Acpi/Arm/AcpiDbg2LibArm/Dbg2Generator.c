@@ -342,7 +342,7 @@ BuildDbg2Table (
              CfgMgrProtocol,
              This,
              (EFI_ACPI_DESCRIPTION_HEADER*)&AcpiDbg2,
-             AcpiTableInfo,
+             AcpiTableInfo->AcpiTableRevision,
              sizeof (DBG2_TABLE)
              );
   if (EFI_ERROR (Status)) {
