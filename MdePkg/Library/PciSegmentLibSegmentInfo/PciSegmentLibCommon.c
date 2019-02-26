@@ -17,13 +17,13 @@
 #include "PciSegmentLibCommon.h"
 
 typedef struct {
-  UINT64  Register : 12;
-  UINT64  Function : 3;
-  UINT64  Device : 5;
-  UINT64  Bus : 8;
-  UINT64  Reserved1 : 4;
-  UINT64  Segment : 16;
-  UINT64  Reserved2 : 16;
+  UINT32  Register : 12;
+  UINT32  Function : 3;
+  UINT32  Device : 5;
+  UINT32  Bus : 8;
+  UINT32  Reserved1 : 4;
+  UINT32  Segment : 16;
+  UINT32  Reserved2 : 16;
 } PCI_SEGMENT_LIB_ADDRESS_STRUCTURE;
 
 /**
