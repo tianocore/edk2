@@ -17,6 +17,7 @@
 #
 from __future__ import print_function
 import xml.dom.minidom
+import codecs
 from Common.LongFilePathSupport import OpenLongFilePath as open
 
 ## Create a element of XML
@@ -211,7 +212,7 @@ def XmlNodeName(Dom):
 #
 def XmlParseFile(FileName):
     try:
-        XmlFile = open(FileName)
+        XmlFile = codecs.open(FileName,encoding='utf_8_sig')
         Dom = xml.dom.minidom.parse(XmlFile)
         XmlFile.close()
         return Dom
