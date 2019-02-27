@@ -1,7 +1,7 @@
 /** @file
   This module implements Tcg2 Protocol.
 
-Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2019, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -2419,10 +2419,7 @@ OnExitBootServicesFailed (
                                 EfiResetShutdown the data buffer starts with a Null-terminated
                                 string, optionally followed by additional binary data.
                                 The string is a description that the caller may use to further
-                                indicate the reason for the system reset. ResetData is only
-                                valid if ResetStatus is something other than EFI_SUCCESS
-                                unless the ResetType is EfiResetPlatformSpecific
-                                where a minimum amount of ResetData is always required.
+                                indicate the reason for the system reset.
                                 For a ResetType of EfiResetPlatformSpecific the data buffer
                                 also starts with a Null-terminated string that is followed
                                 by an EFI_GUID that describes the specific type of reset to perform.
