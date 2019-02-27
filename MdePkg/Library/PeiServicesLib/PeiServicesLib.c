@@ -1,7 +1,7 @@
 /** @file
   Implementation for PEI Services Library.
 
-  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -793,9 +793,7 @@ PeiServicesInstallFvInfo2Ppi (
                             the data buffer starts with a Null-terminated string, optionally
                             followed by additional binary data. The string is a description
                             that the caller may use to further indicate the reason for the
-                            system reset. ResetData is only valid if ResetStatus is something
-                            other than EFI_SUCCESS unless the ResetType is EfiResetPlatformSpecific
-                            where a minimum amount of ResetData is always required.
+                            system reset.
 
 **/
 VOID
