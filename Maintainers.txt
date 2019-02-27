@@ -20,7 +20,10 @@ Descriptions of section entries:
   M: Package Maintainer: Cc address for patches and questions. Responsible
      for reviewing and pushing package changes to source control.
   R: Package Reviewer: Cc address for patches and questions. Reviewers help
-     maintainers review code, but don't have push access.
+     maintainers review code, but don't have push access. A designated Package
+     Reviewer is reasonably familiar with the Package (or some modules
+     thereof), and/or provides testing or regression testing for the Package
+     (or some modules thereof), in certain platforms and environments.
   W: Web-page with status/info
   T: SCM tree type and location.  Type is one of: git, svn.
   S: Status, one of the following:
