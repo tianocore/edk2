@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2004  - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2004  - 2018, Intel Corporation. All rights reserved.<BR>
                                                                                    
   This program and the accompanying materials are licensed and made available under
   the terms and conditions of the BSD License that accompanies this distribution.  
@@ -28,8 +28,6 @@ Abstract:
 #include "PchAccess.h"
 #include "PlatformBootMode.h"
 #include <Guid/SetupVariable.h>
-
-#include <Guid/BootState.h>
 
 //
 // Priority of our boot modes, highest priority first
@@ -100,56 +98,6 @@ CapsulePpiNotifyCallback (
   return Status;
 }
 
-/**
-  Check CMOS register bit to determine if previous boot was successful
-
-  @param PeiServices    pointer to the PEI Service Table
-
-  @retval TRUE          - Previous Boot was success
-  @retval FALSE         - Previous Boot wasn't success
-
-**/
-BOOLEAN
-IsPreviousBootSuccessful(
-  IN CONST EFI_PEI_SERVICES   **PeiServices
-
-  )
-{
-  EFI_STATUS                      Status;
-  BOOLEAN                         BootState;
-  UINTN                           DataSize;
-  CHAR16                          VarName[] = BOOT_STATE_VARIABLE_NAME;
-  EFI_PEI_READ_ONLY_VARIABLE2_PPI *PeiVar;
-
-  Status = (**PeiServices).LocatePpi (
-                             PeiServices,
-                             &gEfiPeiReadOnlyVariable2PpiGuid,
-                             0,
-                             NULL,
-                                (void **)&PeiVar
-                             );
-  ASSERT_EFI_ERROR (Status);
-
-  //
-  // Get last Boot State Variable to confirm that it is not a first boot .
-  //
-
-  DataSize = sizeof (BOOLEAN);
-  Status = PeiVar->GetVariable (
-                     PeiVar,
-                     VarName,
-                     &gEfiBootStateGuid,
-                     NULL,
-                     &DataSize,
-                     &BootState
-                     );
-  if (EFI_ERROR (Status) || (BootState == TRUE)) {
-    return FALSE;
-  }
-
-  DEBUG ((EFI_D_INFO, "Previous boot cycle successfully completed handover to OS\n"));
-  return TRUE;
-}
 #ifdef NOCS_S3_SUPPORT
 EFI_STATUS
 UpdateBootMode (
@@ -190,7 +138,7 @@ UpdateBootMode (
     } // switch (SleepType)
   }
 
-  if (IsFastBootEnabled (PeiServices) && IsPreviousBootSuccessful (PeiServices)) {
+  if (IsFastBootEnabled (PeiServices)) {
     DEBUG ((EFI_D_INFO, "Prioritizing Boot mode to BOOT_WITH_MINIMAL_CONFIGURATION\n"));
     PrioritizeBootMode (&BootMode, BOOT_WITH_MINIMAL_CONFIGURATION);
   }

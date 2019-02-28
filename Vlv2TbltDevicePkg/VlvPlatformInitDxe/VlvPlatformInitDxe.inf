@@ -2,7 +2,7 @@
 #
 #/*++
 #
-#  Copyright (c)  1999  - 2014, Intel Corporation. All rights reserved
+#  Copyright (c)  1999  - 2018, Intel Corporation. All rights reserved
 #                                                                                  
 # This program and the accompanying materials are licensed and made available under
 # the terms and conditions of the BSD License that accompanies this distribution.  
@@ -65,7 +65,7 @@
   gIgdOpRegionProtocolGuid
   gEfiGlobalNvsAreaProtocolGuid
   gEfiPciIoProtocolGuid
-  gEfiFirmwareVolumeProtocolGuid
+  gEfiFirmwareVolume2ProtocolGuid
   gEfiCpuIoProtocolGuid
 
 [Depex]
@@ -74,6 +74,6 @@
   gEfiCpuIoProtocolGuid                      AND
   gEfiDataHubProtocolGuid                 AND
   gEfiGlobalNvsAreaProtocolGuid       AND
-  gEfiFirmwareVolumeProtocolGuid   AND
+  gEfiFirmwareVolume2ProtocolGuid   AND
   gEfiHiiDatabaseProtocolGuid
 

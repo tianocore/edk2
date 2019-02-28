@@ -36,7 +36,7 @@ Abstract:
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/DebugLib.h>
-#include <Protocol/FirmwareVolume.h>
+#include <Protocol/FirmwareVolume2.h>
 #include <Library/HobLib.h>
 #include <IndustryStandard/Pci22.h>
 
@@ -66,12 +66,12 @@ GetRawImage (
   EFI_HANDLE                    *HandleBuffer;
   UINTN                         HandleCount;
   UINTN                         Index;
-  EFI_FIRMWARE_VOLUME_PROTOCOL  *Fv;
+  EFI_FIRMWARE_VOLUME2_PROTOCOL  *Fv;
   UINT32                        AuthenticationStatus;
 
   Status = gBS->LocateHandleBuffer (
                   ByProtocol,
-                  &gEfiFirmwareVolumeProtocolGuid,
+                  &gEfiFirmwareVolume2ProtocolGuid,
                   NULL,
                   &HandleCount,
                   &HandleBuffer
@@ -86,7 +86,7 @@ GetRawImage (
   for (Index = 0; Index < HandleCount; Index++) {
     Status = gBS->HandleProtocol(
                     HandleBuffer[Index],
-                    &gEfiFirmwareVolumeProtocolGuid,
+                    &gEfiFirmwareVolume2ProtocolGuid,
                     (VOID **) &Fv
                     );
 

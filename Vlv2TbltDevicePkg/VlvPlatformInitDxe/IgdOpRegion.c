@@ -1,7 +1,7 @@
 
 /*++
 
-Copyright (c)  2011  - 2014, Intel Corporation. All rights reserved
+Copyright (c)  2011  - 2018, Intel Corporation. All rights reserved
                                                                                    
   This program and the accompanying materials are licensed and made available under
   the terms and conditions of the BSD License that accompanies this distribution.  
@@ -48,7 +48,7 @@ Abstract:
 
 #include <Protocol/IgdOpRegion.h>
 #include <Protocol/FrameworkHii.h>
-#include <Protocol/FirmwareVolume.h>
+#include <Protocol/FirmwareVolume2.h>
 #include <Protocol/PlatformGopPolicy.h>
 #include <Protocol/PciIo.h>
 #include <Protocol/CpuIo.h>
@@ -135,7 +135,7 @@ GetIntegratedIntelVbtPtr (
   EFI_PHYSICAL_ADDRESS          VbtAddress = 0;
   UINTN                         FvProtocolCount;
   EFI_HANDLE                    *FvHandles;
-  EFI_FIRMWARE_VOLUME_PROTOCOL  *Fv;
+  EFI_FIRMWARE_VOLUME2_PROTOCOL  *Fv;
   UINTN                         Index;
   UINT32                        AuthenticationStatus;
 
@@ -147,7 +147,7 @@ GetIntegratedIntelVbtPtr (
   *VbtFileBuffer = NULL;
   Status = gBS->LocateHandleBuffer (
                   ByProtocol,
-                  &gEfiFirmwareVolumeProtocolGuid,
+                  &gEfiFirmwareVolume2ProtocolGuid,
                   NULL,
                   &FvProtocolCount,
                   &FvHandles
@@ -157,7 +157,7 @@ GetIntegratedIntelVbtPtr (
     for (Index = 0; Index < FvProtocolCount; Index++) {
       Status = gBS->HandleProtocol (
                       FvHandles[Index],
-                      &gEfiFirmwareVolumeProtocolGuid,
+                      &gEfiFirmwareVolume2ProtocolGuid,
                       (VOID **) &Fv
                       );
       VbtBufferSize = 0;
