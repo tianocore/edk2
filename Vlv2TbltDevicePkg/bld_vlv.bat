@@ -30,7 +30,7 @@ set Arch=X64
 set Source=0
 set CORE_PATH=%WORKSPACE%\edk2
 set PLATFORM_PATH=%WORKSPACE%\edk2
-set PACKAGES_PATH=%WORKSPACE%\edk2-non-osi\Silicon\Intel;%WORKSPACE%\edk2
+set PACKAGES_PATH=%WORKSPACE%\silicon;%WORKSPACE%\edk2
 cd ./edk2
 
 :: Clean up previous build files.
@@ -124,7 +124,7 @@ if "%Arch%"=="IA32" (
 :: -- Build flags settings for each Platform --
 echo Setting  %1  platform configuration and BIOS ID...
 if /i "%~1" == "MNW2" (
-    echo BOARD_ID = MNW2MAX >> %Conf\BiosId.env
+    echo BOARD_ID = MNW2MAX >> Conf\BiosId.env
     echo DEFINE ENBDT_PF_BUILD = TRUE   >> %auto_config_inc%
     
 ) else (

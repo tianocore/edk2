@@ -467,7 +467,11 @@ INF MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
 INF RuleOverride = BINARY $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/$(DXE_ARCHITECTURE)/MpCpu.inf
 INF $(PLATFORM_PACKAGE)/Metronome/Metronome.inf
 INF IntelFrameworkModulePkg/Universal/BdsDxe/BdsDxe.inf
+!if $(ARCH) == IA32
+INF USE=IA32 MdeModulePkg/Logo/Logo.inf
+!else
 INF USE=X64 MdeModulePkg/Logo/Logo.inf
+!endif
 INF MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
 INF MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
 INF MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf

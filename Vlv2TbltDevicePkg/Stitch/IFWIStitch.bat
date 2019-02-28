@@ -191,7 +191,7 @@ for %%i in (%BIOS_Names%) do (
     echo Generating IFWI... %BIOS_ID%.bin
     echo.
 
-    copy /b/y !IFWI_HEADER_FILE! + ..\..\..\edk2-non-osi\Silicon\Intel\Vlv2SocBinPkg\SEC\!SEC_VERSION!\VLV_SEC_REGION.bin + ..\..\..\edk2-non-osi\Silicon\Intel\Vlv2SocBinPkg\SEC\!SEC_VERSION!\Vacant.bin + !BIOS_Rom! %BIOS_ID%.bin
+    copy /b/y !IFWI_HEADER_FILE! + ..\..\..\silicon\Vlv2SocBinPkg\SEC\!SEC_VERSION!\VLV_SEC_REGION.bin + ..\..\..\silicon\Vlv2SocBinPkg\SEC\!SEC_VERSION!\Vacant.bin + !BIOS_Rom! %BIOS_ID%.bin
     echo.
     echo ===========================================================================
 )
