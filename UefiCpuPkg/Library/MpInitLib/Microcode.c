@@ -159,30 +159,31 @@ MicrocodeDetect (
   MicrocodeEnd = (UINTN) (CpuMpData->MicrocodePatchAddress + CpuMpData->MicrocodePatchRegionSize);
   MicrocodeEntryPoint = (CPU_MICROCODE_HEADER *) (UINTN) CpuMpData->MicrocodePatchAddress;
 
-  //
-  // Save an in-complete CheckSum32 from CheckSum Part1 for common parts.
-  //
-  if (MicrocodeEntryPoint->DataSize == 0) {
-    InCompleteCheckSum32 = CalculateSum32 (
-                             (UINT32 *) MicrocodeEntryPoint,
-                             sizeof (CPU_MICROCODE_HEADER) + 2000
-                             );
-  } else {
-    InCompleteCheckSum32 = CalculateSum32 (
-                             (UINT32 *) MicrocodeEntryPoint,
-                             sizeof (CPU_MICROCODE_HEADER) + MicrocodeEntryPoint->DataSize
-                             );
-  }
-  InCompleteCheckSum32 -= MicrocodeEntryPoint->ProcessorSignature.Uint32;
-  InCompleteCheckSum32 -= MicrocodeEntryPoint->ProcessorFlags;
-  InCompleteCheckSum32 -= MicrocodeEntryPoint->Checksum;
-
   do {
     //
     // Check if the microcode is for the Cpu and the version is newer
     // and the update can be processed on the platform
     //
     CorrectMicrocode = FALSE;
+
+    //
+    // Save an in-complete CheckSum32 from CheckSum Part1 for common parts.
+    //
+    if (MicrocodeEntryPoint->DataSize == 0) {
+      InCompleteCheckSum32 = CalculateSum32 (
+                               (UINT32 *) MicrocodeEntryPoint,
+                               sizeof (CPU_MICROCODE_HEADER) + 2000
+                               );
+    } else {
+      InCompleteCheckSum32 = CalculateSum32 (
+                               (UINT32 *) MicrocodeEntryPoint,
+                               sizeof (CPU_MICROCODE_HEADER) + MicrocodeEntryPoint->DataSize
+                               );
+    }
+    InCompleteCheckSum32 -= MicrocodeEntryPoint->ProcessorSignature.Uint32;
+    InCompleteCheckSum32 -= MicrocodeEntryPoint->ProcessorFlags;
+    InCompleteCheckSum32 -= MicrocodeEntryPoint->Checksum;
+
     if (MicrocodeEntryPoint->HeaderVersion == 0x1) {
       //
       // It is the microcode header. It is not the padding data between microcode patches
