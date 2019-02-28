@@ -32,7 +32,7 @@
   #
   DEFINE      PLATFORM_PACKAGE                = Vlv2TbltDevicePkg
   DEFINE      PLATFORM_RC_PACKAGE             = Vlv2DeviceRefCodePkg
-  DEFINE      PLATFORM_BINARY_PACKAGE         = Vlv2BinaryPkg
+  DEFINE      PLATFORM_BINARY_PACKAGE         = Vlv2SocBinPkg
   OUTPUT_DIRECTORY                    = Build/$(PLATFORM_PACKAGE)
   SUPPORTED_ARCHITECTURES             = IA32
   BUILD_TARGETS                       = DEBUG|RELEASE
@@ -1420,7 +1420,7 @@ $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/IA32/fTPMInitPeim.inf
   #
   # CPU/FW Microde
   #
-  Vlv2MiscBinariesPkg/Microcode/MicrocodeUpdates.inf {
+  Vlv2SocBinPkg/Microcode/MicrocodeUpdates.inf {
     <BuildOptions>
       *_*_*_GENFW_FLAGS = -a 0x800 -p 0xFF
   }

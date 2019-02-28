@@ -183,7 +183,7 @@ gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase|gEfiMdeModulePkgTok
 
   $(FLASH_REGION_FSPBIN_OFFSET)|$(FLASH_REGION_FSPBIN_SIZE)
   gFspWrapperTokenSpaceGuid.PcdFlashFvFspBase|gFspWrapperTokenSpaceGuid.PcdFlashFvFspSize
-  FILE = Vlv2MiscBinariesPkg/FspBinary/FvFsp.bin
+  FILE = Vlv2SocBinPkg/FspBinary/FvFsp.bin
 
 
   $(FLASH_REGION_AZALIABIN_OFFSET)|$(FLASH_REGION_AZALIABIN_SIZE)
@@ -571,7 +571,7 @@ INF $(PLATFORM_PACKAGE)/SmramSaveInfoHandlerSmm/SmramSaveInfoHandlerSmm.inf
  INF $(PLATFORM_PACKAGE)/PlatformGopPolicy/PlatformGopPolicy.inf
  FILE DRIVER = FF0C8745-3270-4439-B74F-3E45F8C77064 {
   SECTION DXE_DEPEX_EXP = {gPlatformGOPPolicyGuid}
-  SECTION PE32 = Vlv2MiscBinariesPkg/GOP/7.2.1011/RELEASE_VS2008x86/$(DXE_ARCHITECTURE)/IntelGopDriver.efi
+  SECTION PE32 = Vlv2SocBinPkg/GOP/7.2.1011/RELEASE_VS2008x86/$(DXE_ARCHITECTURE)/IntelGopDriver.efi
   SECTION UI = "IntelGopDriver"
 }
 !endif
@@ -711,7 +711,7 @@ INF ShellPkg/DynamicCommand/DpDynamicCommand/DpDynamicCommand.inf
 
 !if $(GOP_DRIVER_ENABLE) == TRUE
 FILE FREEFORM = 878AC2CC-5343-46F2-B563-51F89DAF56BA {
-  SECTION RAW = Vlv2MiscBinariesPkg/GOP/7.2.1011/VBT/MNW2/Vbt.bin
+  SECTION RAW = Vlv2SocBinPkg/GOP/7.2.1011/VBT/MNW2/Vbt.bin
   SECTION UI = "IntelGopVbt"
 }
 !endif
@@ -721,7 +721,7 @@ FILE FREEFORM = 878AC2CC-5343-46F2-B563-51F89DAF56BA {
 #
 !if $(NETWORK_ENABLE) == TRUE
   FILE DRIVER = 22DE1691-D65D-456a-993E-A253DD1F308C {
-    SECTION PE32 = Vlv2MiscBinariesPkg/UNDI/RtkUndiDxe/$(DXE_ARCHITECTURE)/RtkUndiDxe.efi
+    SECTION PE32 = Vlv2SocBinPkg/UNDI/RtkUndiDxe/$(DXE_ARCHITECTURE)/RtkUndiDxe.efi
     SECTION UI = "UNDI"
   }
   INF  MdeModulePkg/Universal/Network/SnpDxe/SnpDxe.inf

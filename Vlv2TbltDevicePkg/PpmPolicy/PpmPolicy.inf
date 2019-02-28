@@ -35,7 +35,7 @@
 [Packages]
   MdePkg/MdePkg.dec
   Vlv2TbltDevicePkg/PlatformPkg.dec
-  IA32FamilyCpuPkg/IA32FamilyCpuPkg.dec #CpuConfigLib.h
+  Vlv2SocBinPkg/Vlv2SocBinPkg.dec
   Vlv2DeviceRefCodePkg/Vlv2DeviceRefCodePkg.dec
 
 [LibraryClasses]

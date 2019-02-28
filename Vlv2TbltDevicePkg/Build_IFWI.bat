@@ -15,7 +15,8 @@
 
 SetLocal EnableDelayedExpansion EnableExtensions
 
-@REM Go to root directory of the codebase.
+@REM Go to work space directory.
+cd ..
 cd ..
 
 :: Assign initial values
@@ -23,8 +24,10 @@ set exitCode=0
 set "Build_Flags= "
 set "Stitch_Flags= "
 set Arch=X64
+set WORKSPACE=%CD%
+set CORE_PATH=%WORKSPACE%\edk2
+set PLATFORM_PATH=%WORKSPACE%\edk2
 set PLATFORM_PACKAGE=Vlv2TbltDevicePkg
-set ROOT_DIR=%CD%
 
 :: Parse Optional arguments
 :OptLoop
@@ -117,12 +120,9 @@ if "%~3"=="" (
 :: Build BIOS
 echo ======================================================================
 echo Build_IFWI:  Calling BIOS build Script...
-if "%Platform_Type%" == "BYTC" (
-    call %PLATFORM_PACKAGE%\bld_vlv_cr.bat %Build_Flags%  %Platform_Type% %Build_Target%
- 
-) else (
-    call %PLATFORM_PACKAGE%\bld_vlv.bat %Build_Flags%  %Platform_Type% %Build_Target%
-)
+
+call %PLATFORM_PATH%\%PLATFORM_PACKAGE%\bld_vlv.bat %Build_Flags%  %Platform_Type% %Build_Target%
+
 if %ERRORLEVEL% NEQ 0 (
     echo echo  -- Error Building BIOS  & echo.
     set exitCode=1
@@ -131,11 +131,11 @@ if %ERRORLEVEL% NEQ 0 (
 echo.
 echo Finished Building BIOS.
 @REM Set BIOS_ID environment variable here.
-call %WORKSPACE%\Conf\BiosId.bat
+call %CORE_PATH%\Conf\BiosId.bat
 echo BIOS_ID=%BIOS_ID%
 
 :: Set the Board_Id, Build_Type, Version_Major, and Version_Minor environment variables
-find /v "#" %WORKSPACE%\Conf\BiosId.env > ver_strings
+find /v "#" %CORE_PATH%\Conf\BiosId.env > ver_strings
 for /f "tokens=1,3" %%i in (ver_strings) do set %%i=%%j
 del /f/q ver_strings >nul
 set BIOS_Name=%BOARD_ID%_%Arch%_%BUILD_TYPE%_%VERSION_MAJOR%_%VERSION_MINOR%.ROM
@@ -143,15 +143,12 @@ set BIOS_Name=%BOARD_ID%_%Arch%_%BUILD_TYPE%_%VERSION_MAJOR%_%VERSION_MINOR%.ROM
 :: Start Integration process
 echo ======================================================================
 echo Build_IFWI:  Calling IFWI Stitching Script...
-if "%Platform_Type%" == "BYTC" (
-    pushd %PLATFORM_PACKAGE%\Stitch_CR
-) else (
-    pushd %PLATFORM_PACKAGE%\Stitch
-)
-   :: IFWIStitch.bat [/nG] [/nM] [/nB] [/B BIOS.rom] [/C StitchConfig] [/S IFWISuffix]
-   call IFWIStitch.bat %Stitch_Flags% /B %WORKSPACE%\%BIOS_Name% %IFWI_Suffix%
+pushd %CORE_PATH%\%PLATFORM_PACKAGE%\Stitch
+
+  :: IFWIStitch.bat [/nG] [/nM] [/nB] [/B BIOS.rom] [/C StitchConfig] [/S IFWISuffix]
+  call IFWIStitch.bat %Stitch_Flags% /B ..\..\%BIOS_Name% %IFWI_Suffix%
    
-   @echo off
+ @echo off
 popd
 if %ERRORLEVEL% NEQ 0 (
     echo echo  -- Error Stitching %BIOS_Nam% & echo.
@@ -188,7 +185,7 @@ set exitCode=1
 
 :Exit
 @REM  CD to platform package.
-cd %ROOT_DIR%\Vlv2TbltDevicePkg
+cd %PLATFORM_PATH%
 exit /b %exitCode%
 
 EndLocal
