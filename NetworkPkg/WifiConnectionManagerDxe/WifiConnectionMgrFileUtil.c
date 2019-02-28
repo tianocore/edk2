@@ -253,6 +253,7 @@ UpdatePage(
 
     if (Private->FileContext->FileName != NULL) {
       FreePool (Private->FileContext->FileName);
+      Private->FileContext->FileName = NULL;
     }
     Private->FileContext->FileName = FileName;
 

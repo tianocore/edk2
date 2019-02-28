@@ -212,7 +212,6 @@ WifiMgrOnScanFinished (
     }
   }
 
-  FreePool (Result);
   gBS->SignalEvent (Nic->Private->NetworkListRefreshEvent);
 
   //

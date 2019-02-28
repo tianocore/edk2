@@ -447,6 +447,8 @@ WifiMgrRefreshNetworkList (
       }
       FreePool (AKMListDisplay);
       FreePool (CipherListDisplay);
+      AKMListDisplay    = NULL;
+      CipherListDisplay = NULL;
 
       HiiCreateGotoOpCode (
         StartOpCodeHandle,
@@ -532,6 +534,8 @@ WifiMgrRefreshNetworkList (
       }
       FreePool (AKMListDisplay);
       FreePool (CipherListDisplay);
+      AKMListDisplay    = NULL;
+      CipherListDisplay = NULL;
 
       HiiCreateGotoOpCode (
         StartOpCodeHandle,
@@ -612,6 +616,8 @@ WifiMgrRefreshNetworkList (
       }
       FreePool (AKMListDisplay);
       FreePool (CipherListDisplay);
+      AKMListDisplay    = NULL;
+      CipherListDisplay = NULL;
 
       PortHelpToken = HiiSetString (Private->RegisteredHandle, 0, PortString, NULL);
 
@@ -1657,6 +1663,7 @@ WifiMgrDxeHiiConfigAccessCallback (
 
           ZeroMem (Profile->PrivateKeyData, Profile->PrivateKeyDataSize);
           FreePool (Profile->PrivateKeyData);
+          Profile->PrivateKeyData = NULL;
         }
 
         Status = WifiMgrReadFileToBuffer (
@@ -1700,12 +1707,14 @@ WifiMgrDxeHiiConfigAccessCallback (
 
             ZeroMem (Profile->CACertData, Profile->CACertSize);
             FreePool (Profile->CACertData);
+            Profile->CACertData = NULL;
           }
         } else if (Private->FileType == FileTypeClientCert) {
           if (Profile->ClientCertData != NULL) {
 
             ZeroMem (Profile->ClientCertData, Profile->ClientCertSize);
             FreePool (Profile->ClientCertData);
+            Profile->ClientCertData = NULL;
           }
         } else {
           break;

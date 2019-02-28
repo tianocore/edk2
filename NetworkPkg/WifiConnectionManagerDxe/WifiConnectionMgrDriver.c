@@ -411,6 +411,7 @@ WifiMgrDxeDriverBindingStop (
   //
   // Close Event
   //
+  gBS->SetTimer (Nic->TickTimer, TimerCancel, 0);
   gBS->CloseEvent (Nic->TickTimer);
 
   //
