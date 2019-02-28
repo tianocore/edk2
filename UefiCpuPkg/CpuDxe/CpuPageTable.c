@@ -1300,7 +1300,16 @@ PageFaultExceptionHandler (
   // Display ExceptionType, CPU information and Image information
   //
   DumpCpuContext (ExceptionType, SystemContext);
-  if (!NonStopMode) {
+  if (NonStopMode) {
+    //
+    // Set TF in EFLAGS
+    //
+    if (mPagingContext.MachineType == IMAGE_FILE_MACHINE_I386) {
+      SystemContext.SystemContextIa32->Eflags |= (UINT32)BIT8;
+    } else {
+      SystemContext.SystemContextX64->Rflags |= (UINT64)BIT8;
+    }
+  } else {
     CpuDeadLoop ();
   }
 }

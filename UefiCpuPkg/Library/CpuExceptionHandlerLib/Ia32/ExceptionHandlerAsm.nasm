@@ -383,13 +383,6 @@ ErrorCodeAndVectorOnStack:
     pop     dword [ebp - 4]
     mov     esp, ebp
     pop     ebp
-
-; Enable TF bit after page fault handler runs
-    cmp     dword [esp], 14       ; #PF?
-    jne     .5
-    bts     dword [esp + 16], 8   ; EFLAGS
-
-.5:
     add     esp, 8
     cmp     dword [esp - 16], 0   ; check EXCEPTION_HANDLER_CONTEXT.OldIdtHandler
     jz      DoReturn
