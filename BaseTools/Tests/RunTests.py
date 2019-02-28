@@ -19,6 +19,13 @@ import os
 import sys
 import unittest
 
+try:
+    import distutils.util
+except ModuleNotFoundError:
+    sys.exit('''
+Python reported: "No module named 'distutils.util"
+''')
+
 import TestTools
 
 def GetCTestSuite():
