@@ -376,9 +376,10 @@ class PackageDocumentAction(DoxygenAction):
             return
 
         try:
-            f = open(path, 'r')
-            lines = f.readlines()
-            f.close()
+            with open(path, 'r') as f:
+                lines = f.readlines()
+        except UnicodeDecodeError:
+            return
         except IOError:
             ErrorMsg('Fail to open file %s' % path)
             return
