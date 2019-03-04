@@ -99,7 +99,6 @@ BOOLEAN  mInLegacyBoot = FALSE;
 // Table of MMI Handlers that are registered by the MM Core when it is initialized
 //
 MM_CORE_MMI_HANDLERS  mMmCoreMmiHandlers[] = {
-  { MmFvDispatchHandler,     &gMmFvDispatchGuid,                 NULL, TRUE  },
   { MmReadyToLockHandler,    &gEfiDxeMmReadyToLockProtocolGuid,  NULL, TRUE  },
   { MmEndOfDxeHandler,       &gEfiEndOfDxeEventGroupGuid,        NULL, FALSE },
   { MmLegacyBootHandler,     &gEfiEventLegacyBootGuid,           NULL, FALSE },
