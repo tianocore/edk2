@@ -100,7 +100,6 @@ BOOLEAN  mInLegacyBoot = FALSE;
 //
 MM_CORE_MMI_HANDLERS  mMmCoreMmiHandlers[] = {
   { MmFvDispatchHandler,     &gMmFvDispatchGuid,                 NULL, TRUE  },
-  { MmDriverDispatchHandler, &gEfiEventDxeDispatchGuid,          NULL, TRUE  },
   { MmReadyToLockHandler,    &gEfiDxeMmReadyToLockProtocolGuid,  NULL, TRUE  },
   { MmEndOfDxeHandler,       &gEfiEndOfDxeEventGroupGuid,        NULL, FALSE },
   { MmLegacyBootHandler,     &gEfiEventLegacyBootGuid,           NULL, FALSE },
