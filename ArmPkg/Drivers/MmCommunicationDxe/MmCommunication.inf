@@ -42,6 +42,11 @@
 [Protocols]
   gEfiMmCommunicationProtocolGuid              ## PRODUCES
 
+[Guids]
+  gEfiEndOfDxeEventGroupGuid
+  gEfiEventExitBootServicesGuid
+  gEfiEventReadyToBootGuid
+
 [Pcd.common]
   gArmTokenSpaceGuid.PcdMmBufferBase
   gArmTokenSpaceGuid.PcdMmBufferSize
