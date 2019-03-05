@@ -88,20 +88,11 @@ EFI_MM_SYSTEM_TABLE  gMmCoreMmst = {
 };
 
 //
-// Flag to determine if the platform has performed a legacy boot.
-// If this flag is TRUE, then the runtime code and runtime data associated with the
-// MM IPL are converted to free memory, so the MM Core must guarantee that is
-// does not touch of the code/data associated with the MM IPL if this flag is TRUE.
-//
-BOOLEAN  mInLegacyBoot = FALSE;
-
-//
 // Table of MMI Handlers that are registered by the MM Core when it is initialized
 //
 MM_CORE_MMI_HANDLERS  mMmCoreMmiHandlers[] = {
   { MmReadyToLockHandler,    &gEfiDxeMmReadyToLockProtocolGuid,  NULL, TRUE  },
   { MmEndOfDxeHandler,       &gEfiEndOfDxeEventGroupGuid,        NULL, FALSE },
-  { MmLegacyBootHandler,     &gEfiEventLegacyBootGuid,           NULL, FALSE },
   { MmExitBootServiceHandler,&gEfiEventExitBootServicesGuid,     NULL, FALSE },
   { MmReadyToBootHandler,    &gEfiEventReadyToBootGuid,          NULL, FALSE },
   { NULL,                    NULL,                               NULL, FALSE },
@@ -140,47 +131,6 @@ MmEfiNotAvailableYetArg5 (
   // have not been designed correctly.
   //
   return EFI_NOT_AVAILABLE_YET;
-}
-
-/**
-  Software MMI handler that is called when a Legacy Boot event is signaled.  The MM
-  Core uses this signal to know that a Legacy Boot has been performed and that
-  gMmCorePrivate that is shared between the UEFI and MM execution environments can
-  not be accessed from MM anymore since that structure is considered free memory by
-  a legacy OS.
-
-  @param  DispatchHandle  The unique handle assigned to this handler by MmiHandlerRegister().
-  @param  Context         Points to an optional handler context which was specified when the handler was registered.
-  @param  CommBuffer      A pointer to a collection of data in memory that will
-                          be conveyed from a non-MM environment into an MM environment.
-  @param  CommBufferSize  The size of the CommBuffer.
-
-  @return Status Code
-
-**/
-EFI_STATUS
-EFIAPI
-MmLegacyBootHandler (
-  IN     EFI_HANDLE  DispatchHandle,
-  IN     CONST VOID  *Context,        OPTIONAL
-  IN OUT VOID        *CommBuffer,     OPTIONAL
-  IN OUT UINTN       *CommBufferSize  OPTIONAL
-  )
-{
-  EFI_HANDLE  MmHandle;
-  EFI_STATUS  Status = EFI_SUCCESS;
-
-  if (!mInLegacyBoot) {
-    MmHandle = NULL;
-    Status = MmInstallProtocolInterface (
-               &MmHandle,
-               &gEfiEventLegacyBootGuid,
-               EFI_NATIVE_INTERFACE,
-               NULL
-               );
-  }
-  mInLegacyBoot = TRUE;
-  return Status;
 }
 
 /**
@@ -396,7 +346,6 @@ MmEntryPoint (
 {
   EFI_STATUS                  Status;
   EFI_MM_COMMUNICATE_HEADER  *CommunicateHeader;
-  BOOLEAN                     InLegacyBoot;
 
   DEBUG ((DEBUG_INFO, "MmEntryPoint ...\n"));
 
@@ -413,44 +362,42 @@ MmEntryPoint (
   //
   // If a legacy boot has occured, then make sure gMmCorePrivate is not accessed
   //
-  InLegacyBoot = mInLegacyBoot;
-  if (!InLegacyBoot) {
-    //
-    // TBD: Mark the InMm flag as TRUE
-    //
-    gMmCorePrivate->InMm = TRUE;
 
+  //
+  // TBD: Mark the InMm flag as TRUE
+  //
+  gMmCorePrivate->InMm = TRUE;
+
+  //
+  // Check to see if this is a Synchronous MMI sent through the MM Communication
+  // Protocol or an Asynchronous MMI
+  //
+  if (gMmCorePrivate->CommunicationBuffer != 0) {
     //
-    // Check to see if this is a Synchronous MMI sent through the MM Communication
-    // Protocol or an Asynchronous MMI
+    // Synchronous MMI for MM Core or request from Communicate protocol
     //
-    if (gMmCorePrivate->CommunicationBuffer != 0) {
+    if (!MmIsBufferOutsideMmValid ((UINTN)gMmCorePrivate->CommunicationBuffer, gMmCorePrivate->BufferSize)) {
       //
-      // Synchronous MMI for MM Core or request from Communicate protocol
+      // If CommunicationBuffer is not in valid address scope, return EFI_INVALID_PARAMETER
       //
-      if (!MmIsBufferOutsideMmValid ((UINTN)gMmCorePrivate->CommunicationBuffer, gMmCorePrivate->BufferSize)) {
-        //
-        // If CommunicationBuffer is not in valid address scope, return EFI_INVALID_PARAMETER
-        //
-        gMmCorePrivate->CommunicationBuffer = 0;
-        gMmCorePrivate->ReturnStatus = EFI_INVALID_PARAMETER;
-      } else {
-        CommunicateHeader = (EFI_MM_COMMUNICATE_HEADER *)(UINTN)gMmCorePrivate->CommunicationBuffer;
-        gMmCorePrivate->BufferSize -= OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data);
-        Status = MmiManage (
-                   &CommunicateHeader->HeaderGuid,
-                   NULL,
-                   CommunicateHeader->Data,
-                   (UINTN *)&gMmCorePrivate->BufferSize
-                   );
-        //
-        // Update CommunicationBuffer, BufferSize and ReturnStatus
-        // Communicate service finished, reset the pointer to CommBuffer to NULL
-        //
-        gMmCorePrivate->BufferSize += OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data);
-        gMmCorePrivate->CommunicationBuffer = 0;
-        gMmCorePrivate->ReturnStatus = (Status == EFI_SUCCESS) ? EFI_SUCCESS : EFI_NOT_FOUND;
-      }
+      gMmCorePrivate->CommunicationBuffer = 0;
+      gMmCorePrivate->ReturnStatus = EFI_INVALID_PARAMETER;
+    } else {
+      CommunicateHeader = (EFI_MM_COMMUNICATE_HEADER *)(UINTN)gMmCorePrivate->CommunicationBuffer;
+      gMmCorePrivate->BufferSize -= OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data);
+      Status = MmiManage (
+                 &CommunicateHeader->HeaderGuid,
+                 NULL,
+                 CommunicateHeader->Data,
+                 (UINTN *)&gMmCorePrivate->BufferSize
+                 );
+      //
+      // Update CommunicationBuffer, BufferSize and ReturnStatus
+      // Communicate service finished, reset the pointer to CommBuffer to NULL
+      //
+      gMmCorePrivate->BufferSize += OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data);
+      gMmCorePrivate->CommunicationBuffer = 0;
+      gMmCorePrivate->ReturnStatus = (Status == EFI_SUCCESS) ? EFI_SUCCESS : EFI_NOT_FOUND;
     }
   }
 
@@ -464,14 +411,9 @@ MmEntryPoint (
   //
 
   //
-  // If a legacy boot has occured, then make sure gMmCorePrivate is not accessed
+  // Clear the InMm flag as we are going to leave MM
   //
-  if (!InLegacyBoot) {
-    //
-    // Clear the InMm flag as we are going to leave MM
-    //
-    gMmCorePrivate->InMm = FALSE;
-  }
+  gMmCorePrivate->InMm = FALSE;
 
   DEBUG ((DEBUG_INFO, "MmEntryPoint Done\n"));
 }
