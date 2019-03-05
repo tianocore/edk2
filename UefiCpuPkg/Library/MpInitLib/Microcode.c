@@ -166,20 +166,29 @@ MicrocodeDetect (
     //
     CorrectMicrocode = FALSE;
 
+    if (MicrocodeEntryPoint->DataSize == 0) {
+      TotalSize = sizeof (CPU_MICROCODE_HEADER) + 2000;
+    } else {
+      TotalSize = sizeof (CPU_MICROCODE_HEADER) + MicrocodeEntryPoint->DataSize;
+    }
+
+    ///
+    /// Check overflow and whether TotalSize is aligned with 4 bytes.
+    ///
+    if ( ((UINTN)MicrocodeEntryPoint + TotalSize) > MicrocodeEnd ||
+         (TotalSize & 0x3) != 0
+       ) {
+      MicrocodeEntryPoint = (CPU_MICROCODE_HEADER *) (((UINTN) MicrocodeEntryPoint) + SIZE_1KB);
+      continue;
+    }
+
     //
     // Save an in-complete CheckSum32 from CheckSum Part1 for common parts.
     //
-    if (MicrocodeEntryPoint->DataSize == 0) {
-      InCompleteCheckSum32 = CalculateSum32 (
-                               (UINT32 *) MicrocodeEntryPoint,
-                               sizeof (CPU_MICROCODE_HEADER) + 2000
-                               );
-    } else {
-      InCompleteCheckSum32 = CalculateSum32 (
-                               (UINT32 *) MicrocodeEntryPoint,
-                               sizeof (CPU_MICROCODE_HEADER) + MicrocodeEntryPoint->DataSize
-                               );
-    }
+    InCompleteCheckSum32 = CalculateSum32 (
+                             (UINT32 *) MicrocodeEntryPoint,
+                             TotalSize
+                             );
     InCompleteCheckSum32 -= MicrocodeEntryPoint->ProcessorSignature.Uint32;
     InCompleteCheckSum32 -= MicrocodeEntryPoint->ProcessorFlags;
     InCompleteCheckSum32 -= MicrocodeEntryPoint->Checksum;
