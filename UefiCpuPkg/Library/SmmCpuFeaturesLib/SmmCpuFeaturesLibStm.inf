@@ -35,18 +35,12 @@
   Ia32/SmiEntry.nasm
   Ia32/SmiException.nasm
 
-  Ia32/SmiEntry.S
-  Ia32/SmiException.S
-
 [Sources.X64]
   X64/SmmStmSupport.c
 
 
   X64/SmiEntry.nasm
   X64/SmiException.nasm
-
-  X64/SmiEntry.S
-  X64/SmiException.S
 
 [Packages]
   MdePkg/MdePkg.dec
