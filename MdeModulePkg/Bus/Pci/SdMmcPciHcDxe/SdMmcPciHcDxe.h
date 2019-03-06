@@ -2,7 +2,7 @@
 
   Provides some data structure definitions used by the SD/MMC host controller driver.
 
-Copyright (c) 2018, NVIDIA CORPORATION. All rights reserved.
+Copyright (c) 2018-2019, NVIDIA CORPORATION. All rights reserved.
 Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -145,13 +145,15 @@ typedef struct {
   EFI_PHYSICAL_ADDRESS                DataPhy;
   VOID                                *DataMap;
   SD_MMC_HC_TRANSFER_MODE             Mode;
+  SD_MMC_HC_ADMA_LENGTH_MODE          AdmaLengthMode;
 
   EFI_EVENT                           Event;
   BOOLEAN                             Started;
   UINT64                              Timeout;
 
   SD_MMC_HC_ADMA_32_DESC_LINE         *Adma32Desc;
-  SD_MMC_HC_ADMA_64_DESC_LINE         *Adma64Desc;
+  SD_MMC_HC_ADMA_64_V3_DESC_LINE      *Adma64V3Desc;
+  SD_MMC_HC_ADMA_64_V4_DESC_LINE      *Adma64V4Desc;
   EFI_PHYSICAL_ADDRESS                AdmaDescPhy;
   VOID                                *AdmaMap;
   UINT32                              AdmaPages;
