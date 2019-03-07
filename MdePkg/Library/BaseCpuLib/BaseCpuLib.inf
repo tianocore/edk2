@@ -46,10 +46,6 @@
   X64/CpuFlushTlb.nasm
   X64/CpuSleep.nasm
 
-  X64/CpuSleep.nasm| GCC
-  X64/CpuSleep.S | GCC
-  X64/CpuFlushTlb.nasm| GCC
-  X64/CpuFlushTlb.S | GCC
 
 [Sources.EBC]
   Ebc/CpuSleepFlushTlb.c
