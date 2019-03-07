@@ -148,6 +148,13 @@
                                                                                          "0  - No length check for unicode string.<BR>\n"
                                                                                          ">0 - Maximum length of unicode string.<BR>"
 
+#string STR_gEfiMdePkgTokenSpaceGuid_PcdControlFlowEnforcementPropertyMask_PROMPT  #language en-US "Enable control flow enforcement."
+
+#string STR_gEfiMdePkgTokenSpaceGuid_PcdControlFlowEnforcementPropertyMask_HELP  #language en-US  "Indicates the control flow enforcement enabling state.\n"
+                                                                                                  "If enabled, it uses control flow enforcement technology to prevent ROP or JOP.<BR><BR>\n"
+                                                                                                  " BIT0 - SMM CET Shadow Stack is enabled.<BR>\n"
+                                                                                                  " Other - reserved"
+
 #string STR_gEfiMdePkgTokenSpaceGuid_PcdMaximumAsciiStringLength_PROMPT  #language en-US "Maximum Length of Ascii String"
 
 #string STR_gEfiMdePkgTokenSpaceGuid_PcdMaximumAsciiStringLength_HELP  #language en-US "Sets the maximum number of ASCII characters used for string functions.  This affects the following BaseLib functions: AsciiStrLen(), AsciiStrSize(), AsciiStrCmp(), AsciiStrnCmp(), AsciiStrCpy(), AsciiStrnCpy(). <BR><BR>\n"
