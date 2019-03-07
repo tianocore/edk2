@@ -260,62 +260,35 @@
 
   Ia32/GccInline.c | GCC
   Ia32/Thunk16.nasm | GCC
-  Ia32/Thunk16.S | XCODE
   Ia32/EnableDisableInterrupts.nasm| GCC
-  Ia32/EnableDisableInterrupts.S | GCC
   Ia32/EnablePaging64.nasm| GCC
-  Ia32/EnablePaging64.S | GCC
   Ia32/DisablePaging32.nasm| GCC
-  Ia32/DisablePaging32.S | GCC
   Ia32/EnablePaging32.nasm| GCC
-  Ia32/EnablePaging32.S | GCC
   Ia32/Mwait.nasm| GCC
-  Ia32/Mwait.S | GCC
   Ia32/Monitor.nasm| GCC
-  Ia32/Monitor.S | GCC
   Ia32/CpuIdEx.nasm| GCC
-  Ia32/CpuIdEx.S | GCC
   Ia32/CpuId.nasm| GCC
-  Ia32/CpuId.S | GCC
   Ia32/LongJump.nasm| GCC
-  Ia32/LongJump.S | GCC
   Ia32/SetJump.nasm| GCC
-  Ia32/SetJump.S | GCC
   Ia32/SwapBytes64.nasm| GCC
-  Ia32/SwapBytes64.S | GCC
   Ia32/DivU64x64Remainder.nasm| GCC
-  Ia32/DivU64x64Remainder.S | GCC
   Ia32/DivU64x32Remainder.nasm| GCC
-  Ia32/DivU64x32Remainder.S | GCC
   Ia32/ModU64x32.nasm| GCC
-  Ia32/ModU64x32.S | GCC
   Ia32/DivU64x32.nasm| GCC
-  Ia32/DivU64x32.S | GCC
   Ia32/MultU64x64.nasm| GCC
-  Ia32/MultU64x64.S | GCC
   Ia32/MultU64x32.nasm| GCC
-  Ia32/MultU64x32.S | GCC
   Ia32/RRotU64.nasm| GCC
-  Ia32/RRotU64.S | GCC
   Ia32/LRotU64.nasm| GCC
-  Ia32/LRotU64.S | GCC
   Ia32/ARShiftU64.nasm| GCC
-  Ia32/ARShiftU64.S | GCC
   Ia32/RShiftU64.nasm| GCC
-  Ia32/RShiftU64.S | GCC
   Ia32/LShiftU64.nasm| GCC
-  Ia32/LShiftU64.S | GCC
   Ia32/EnableCache.nasm| GCC
-  Ia32/EnableCache.S | GCC
   Ia32/DisableCache.nasm| GCC
-  Ia32/DisableCache.S | GCC
   Ia32/RdRand.nasm| GCC
-  Ia32/RdRand.S | GCC
 
   Ia32/DivS64x64Remainder.c
   Ia32/InternalSwitchStack.c | MSFT
   Ia32/InternalSwitchStack.c | INTEL
-  Ia32/InternalSwitchStack.S | GCC
   Ia32/InternalSwitchStack.nasm | GCC
   Ia32/Non-existing.c
   Unaligned.c
@@ -518,27 +491,16 @@
   X86PatchInstruction.c
   X86SpeculationBarrier.c
   X64/GccInline.c | GCC
-  X64/Thunk16.S | XCODE
   X64/SwitchStack.nasm| GCC
-  X64/SwitchStack.S | GCC
   X64/SetJump.nasm| GCC
-  X64/SetJump.S | GCC
   X64/LongJump.nasm| GCC
-  X64/LongJump.S | GCC
   X64/EnableDisableInterrupts.nasm| GCC
-  X64/EnableDisableInterrupts.S | GCC
   X64/DisablePaging64.nasm| GCC
-  X64/DisablePaging64.S | GCC
   X64/CpuId.nasm| GCC
-  X64/CpuId.S | GCC
   X64/CpuIdEx.nasm| GCC
-  X64/CpuIdEx.S | GCC
   X64/EnableCache.nasm| GCC
-  X64/EnableCache.S | GCC
   X64/DisableCache.nasm| GCC
-  X64/DisableCache.S | GCC
   X64/RdRand.nasm| GCC
-  X64/RdRand.S | GCC
   ChkStkGcc.c  | GCC
 
 [Sources.EBC]
