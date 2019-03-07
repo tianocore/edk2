@@ -248,6 +248,12 @@
 #string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTpm2PossibleIrqNumBuf_HELP  #language en-US "This PCD defines possible TPM2 interrupt number in a platform reported by _PRS control method.\n"
                                                                                          "If PcdTpm2CurrentIrqNum set to 0, _PRS will not report any possible TPM2 interrupt numbers."
 
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdSkipOpalDxeUnlock_PROMPT  #language en-US "Skip Opal DXE driver unlock device flow."
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdSkipOpalDxeUnlock_HELP  #language en-US "Indicates if Opal DXE driver skip unlock device flow.<BR><BR>\n"
+                                                                                     "TRUE  - Skip unlock device flow.<BR>\n"
+                                                                                     "FALSE - Does not skip unlock device flow.<BR>"
+
 #string STR_gEfiSecurityPkgTokenSpaceGuid_PcdActiveTpmInterfaceType_PROMPT  #language en-US "Current active TPM interface type"
 
 #string STR_gEfiSecurityPkgTokenSpaceGuid_PcdActiveTpmInterfaceType_HELP  #language en-US "This PCD indicates current active TPM interface type.\n"
