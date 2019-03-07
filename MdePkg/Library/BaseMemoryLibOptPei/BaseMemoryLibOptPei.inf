@@ -35,27 +35,16 @@
 
 [Sources.Ia32]
   Ia32/ScanMem64.nasm
-  Ia32/ScanMem64.S
   Ia32/ScanMem32.nasm
-  Ia32/ScanMem32.S
   Ia32/ScanMem16.nasm
-  Ia32/ScanMem16.S
   Ia32/ScanMem8.nasm
-  Ia32/ScanMem8.S
   Ia32/CompareMem.nasm
-  Ia32/CompareMem.S
   Ia32/ZeroMem.nasm
-  Ia32/ZeroMem.S
   Ia32/SetMem64.nasm
-  Ia32/SetMem64.S
   Ia32/SetMem32.nasm
-  Ia32/SetMem32.S
   Ia32/SetMem16.nasm
-  Ia32/SetMem16.S
   Ia32/SetMem.nasm
-  Ia32/SetMem.S
   Ia32/CopyMem.nasm
-  Ia32/CopyMem.S
   Ia32/ScanMem64.nasm
   Ia32/ScanMem32.nasm
   Ia32/ScanMem16.nasm
@@ -84,27 +73,16 @@
 
 [Sources.X64]
   X64/ScanMem64.nasm
-  X64/ScanMem64.S
   X64/ScanMem32.nasm
-  X64/ScanMem32.S
   X64/ScanMem16.nasm
-  X64/ScanMem16.S
   X64/ScanMem8.nasm
-  X64/ScanMem8.S
   X64/CompareMem.nasm
-  X64/CompareMem.S
   X64/ZeroMem.nasm
-  X64/ZeroMem.S
   X64/SetMem64.nasm
-  X64/SetMem64.S
   X64/SetMem32.nasm
-  X64/SetMem32.S
   X64/SetMem16.nasm
-  X64/SetMem16.S
   X64/SetMem.nasm
-  X64/SetMem.S
   X64/CopyMem.nasm
-  X64/CopyMem.S
   X64/IsZeroBuffer.nasm
   ScanMem64Wrapper.c
   ScanMem32Wrapper.c
