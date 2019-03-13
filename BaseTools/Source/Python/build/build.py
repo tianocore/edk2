@@ -719,6 +719,7 @@ class Build():
         GlobalData.gBinCacheDest   = BuildOptions.BinCacheDest
         GlobalData.gBinCacheSource = BuildOptions.BinCacheSource
         GlobalData.gEnableGenfdsMultiThread = BuildOptions.GenfdsMultiThread
+        GlobalData.gDisableIncludePathCheck = BuildOptions.DisableIncludePathCheck
 
         if GlobalData.gBinCacheDest and not GlobalData.gUseHashCache:
             EdkLogger.error("build", OPTION_NOT_SUPPORTED, ExtraData="--binary-destination must be used together with --hash.")
@@ -2268,6 +2269,7 @@ def MyOptionParser():
     Parser.add_option("--binary-destination", action="store", type="string", dest="BinCacheDest", help="Generate a cache of binary files in the specified directory.")
     Parser.add_option("--binary-source", action="store", type="string", dest="BinCacheSource", help="Consume a cache of binary files from the specified directory.")
     Parser.add_option("--genfds-multi-thread", action="store_true", dest="GenfdsMultiThread", default=False, help="Enable GenFds multi thread to generate ffs file.")
+    Parser.add_option("--disable-include-path-check", action="store_true", dest="DisableIncludePathCheck", default=False, help="Disable the include path check for outside of package.")
     (Opt, Args) = Parser.parse_args()
     return (Opt, Args)
 

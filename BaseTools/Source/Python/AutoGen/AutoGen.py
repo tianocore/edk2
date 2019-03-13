@@ -3037,13 +3037,14 @@ class ModuleAutoGen(AutoGen):
             # EDK II modules must not reference header files outside of the packages they depend on or
             # within the module's directory tree. Report error if violation.
             #
-            for Path in IncPathList:
-                if (Path not in self.IncludePathList) and (CommonPath([Path, self.MetaFile.Dir]) != self.MetaFile.Dir):
-                    ErrMsg = "The include directory for the EDK II module in this line is invalid %s specified in %s FLAGS '%s'" % (Path, Tool, FlagOption)
-                    EdkLogger.error("build",
-                                    PARAMETER_INVALID,
-                                    ExtraData=ErrMsg,
-                                    File=str(self.MetaFile))
+            if GlobalData.gDisableIncludePathCheck == False:
+                for Path in IncPathList:
+                    if (Path not in self.IncludePathList) and (CommonPath([Path, self.MetaFile.Dir]) != self.MetaFile.Dir):
+                        ErrMsg = "The include directory for the EDK II module in this line is invalid %s specified in %s FLAGS '%s'" % (Path, Tool, FlagOption)
+                        EdkLogger.error("build",
+                                        PARAMETER_INVALID,
+                                        ExtraData=ErrMsg,
+                                        File=str(self.MetaFile))
             RetVal += IncPathList
         return RetVal
 
