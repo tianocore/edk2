@@ -67,8 +67,8 @@ clean:
 
 .PHONY: cleanall
 cleanall:
-  @if defined PYTHON_COMMAND $(PYTHON_COMMAND) $(PYTHON_COMMAND) Makefiles\NmakeSubdirs.py cleanall $(LIBRARIES) $(APPLICATIONS)
-  @if not defined PYTHON_COMMAND $(PYTHON_HOME)\python.exe $(PYTHON_COMMAND) Makefiles\NmakeSubdirs.py cleanall $(LIBRARIES) $(APPLICATIONS)
+  @if defined PYTHON_COMMAND $(PYTHON_COMMAND) Makefiles\NmakeSubdirs.py cleanall $(LIBRARIES) $(APPLICATIONS)
+  @if not defined PYTHON_COMMAND $(PYTHON_HOME)\python.exe Makefiles\NmakeSubdirs.py cleanall $(LIBRARIES) $(APPLICATIONS)
 
 !INCLUDE Makefiles\ms.rule
 
