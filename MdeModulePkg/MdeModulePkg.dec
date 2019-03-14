@@ -492,6 +492,9 @@
   ## Include/Ppi/AtaPassThru.h
   gEdkiiPeiAtaPassThruPpiGuid               = { 0xa16473fd, 0xd474, 0x4c89, { 0xae, 0xc7, 0x90, 0xb8, 0x3c, 0x73, 0x86, 0x9  } }
 
+  ## Include/Ppi/Debug.h
+  gEdkiiDebugPpiGuid                        = { 0x999e699c, 0xb013, 0x475e, { 0xb1, 0x7b, 0xf3, 0xa8, 0xae, 0x5c, 0x48, 0x75 } }
+
 [Protocols]
   ## Load File protocol provides capability to load and unload EFI image into memory and execute it.
   #  Include/Protocol/LoadPe32Image.h
