@@ -4,7 +4,7 @@
   Note that if the debug message length is larger than the maximum allowable
   record length, then the debug message will be ignored directly.
 
-  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -26,6 +26,12 @@
 #include <Library/ReportStatusCodeLib.h>
 #include <Library/PcdLib.h>
 #include <Library/DebugPrintErrorLevelLib.h>
+
+//
+// VA_LIST can not initialize to NULL for all compiler, so we use this to
+// indicate a null VA_LIST
+//
+VA_LIST     mVaListNull;
 
 /**
   Prints a debug message to the debug output device if the specified error level is enabled.
@@ -53,11 +59,47 @@ DebugPrint (
   ...
   )
 {
+  VA_LIST         Marker;
+
+  VA_START (Marker, Format);
+  DebugVPrint (ErrorLevel, Format, Marker);
+  VA_END (Marker);
+}
+
+/**
+  Prints a debug message to the debug output device if the specified
+  error level is enabled base on Null-terminated format string and a
+  VA_LIST argument list or a BASE_LIST argument list.
+
+  If any bit in ErrorLevel is also set in DebugPrintErrorLevelLib function
+  GetDebugPrintErrorLevel (), then print the message specified by Format and
+  the associated variable argument list to the debug output device.
+
+  Only one list type is used.
+  If BaseListMarker == NULL, then use VaListMarker.
+  Otherwise use BaseListMarker and the VaListMarker should be initilized as
+  mVaListNull.
+
+  If Format is NULL, then ASSERT().
+
+  @param  ErrorLevel      The error level of the debug message.
+  @param  Format          Format string for the debug message to print.
+  @param  VaListMarker    VA_LIST marker for the variable argument list.
+  @param  BaseListMarker  BASE_LIST marker for the variable argument list.
+
+**/
+VOID
+DebugPrintMarker (
+  IN  UINTN         ErrorLevel,
+  IN  CONST CHAR8   *Format,
+  IN  VA_LIST       VaListMarker,
+  IN  BASE_LIST     BaseListMarker
+  )
+{
   UINT64          Buffer[(EFI_STATUS_CODE_DATA_MAX_SIZE / sizeof (UINT64)) + 1];
   EFI_DEBUG_INFO  *DebugInfo;
   UINTN           TotalSize;
-  VA_LIST         VaListMarker;
-  BASE_LIST       BaseListMarker;
+  BASE_LIST       BaseListMarkerPointer;
   CHAR8           *FormatString;
   BOOLEAN         Long;
 
@@ -78,22 +120,22 @@ DebugPrint (
   // Note that the passing-in format string and variable parameters will be constructed to
   // the following layout:
   //
-  //         Buffer->|------------------------|
-  //                 |         Padding        | 4 bytes
-  //      DebugInfo->|------------------------|
-  //                 |      EFI_DEBUG_INFO    | sizeof(EFI_DEBUG_INFO)
-  // BaseListMarker->|------------------------|
-  //                 |           ...          |
-  //                 |   variable arguments   | 12 * sizeof (UINT64)
-  //                 |           ...          |
-  //                 |------------------------|
-  //                 |       Format String    |
-  //                 |------------------------|<- (UINT8 *)Buffer + sizeof(Buffer)
+  //                Buffer->|------------------------|
+  //                        |         Padding        | 4 bytes
+  //             DebugInfo->|------------------------|
+  //                        |      EFI_DEBUG_INFO    | sizeof(EFI_DEBUG_INFO)
+  // BaseListMarkerPointer->|------------------------|
+  //                        |           ...          |
+  //                        |   variable arguments   | 12 * sizeof (UINT64)
+  //                        |           ...          |
+  //                        |------------------------|
+  //                        |       Format String    |
+  //                        |------------------------|<- (UINT8 *)Buffer + sizeof(Buffer)
   //
   TotalSize = 4 + sizeof (EFI_DEBUG_INFO) + 12 * sizeof (UINT64) + AsciiStrSize (Format);
 
   //
-  // If the TotalSize is larger than the maximum record size, then return
+  // If the TotalSize is larger than the maximum record size, then truncate it.
   //
   if (TotalSize > sizeof (Buffer)) {
     TotalSize = sizeof (Buffer);
@@ -102,14 +144,14 @@ DebugPrint (
   //
   // Fill in EFI_DEBUG_INFO
   //
-  // Here we skip the first 4 bytes of Buffer, because we must ensure BaseListMarker is
-  // 64-bit aligned, otherwise retrieving 64-bit parameter from BaseListMarker will cause
+  // Here we skip the first 4 bytes of Buffer, because we must ensure BaseListMarkerPointer is
+  // 64-bit aligned, otherwise retrieving 64-bit parameter from BaseListMarkerPointer will cause
   // exception on IPF. Buffer starts at 64-bit aligned address, so skipping 4 types (sizeof(EFI_DEBUG_INFO))
-  // just makes address of BaseListMarker, which follows DebugInfo, 64-bit aligned.
+  // just makes address of BaseListMarkerPointer, which follows DebugInfo, 64-bit aligned.
   //
   DebugInfo             = (EFI_DEBUG_INFO *)(Buffer) + 1;
   DebugInfo->ErrorLevel = (UINT32)ErrorLevel;
-  BaseListMarker        = (BASE_LIST)(DebugInfo + 1);
+  BaseListMarkerPointer = (BASE_LIST)(DebugInfo + 1);
   FormatString          = (CHAR8 *)((UINT64 *)(DebugInfo + 1) + 12);
 
   //
@@ -125,7 +167,6 @@ DebugPrint (
   // of format in DEBUG string, which is followed by the DEBUG format string.
   // Here we will process the variable arguments and pack them in this area.
   //
-  VA_START (VaListMarker, Format);
 
   //
   // Use the actual format string.
@@ -167,7 +208,11 @@ DebugPrint (
         // '*' in format field means the precision of the field is specified by
         // a UINTN argument in the argument list.
         //
-        BASE_ARG (BaseListMarker, UINTN) = VA_ARG (VaListMarker, UINTN);
+        if (BaseListMarker == NULL) {
+          BASE_ARG (BaseListMarkerPointer, UINTN) = VA_ARG (VaListMarker, UINTN);
+        } else {
+          BASE_ARG (BaseListMarkerPointer, UINTN) = BASE_ARG (BaseListMarker, UINTN);
+        }
         continue;
       }
       if (*Format == '\0') {
@@ -192,16 +237,36 @@ DebugPrint (
     }
     if (*Format == 'p' || *Format == 'X' || *Format == 'x' || *Format == 'd' || *Format == 'u') {
       if (Long) {
-        BASE_ARG (BaseListMarker, INT64) = VA_ARG (VaListMarker, INT64);
+        if (BaseListMarker == NULL) {
+          BASE_ARG (BaseListMarkerPointer, INT64) = VA_ARG (VaListMarker, INT64);
+        } else {
+          BASE_ARG (BaseListMarkerPointer, INT64) = BASE_ARG (BaseListMarker, INT64);
+        }
       } else {
-        BASE_ARG (BaseListMarker, int) = VA_ARG (VaListMarker, int);
+        if (BaseListMarker == NULL) {
+          BASE_ARG (BaseListMarkerPointer, int) = VA_ARG (VaListMarker, int);
+        } else {
+          BASE_ARG (BaseListMarkerPointer, int) = BASE_ARG (BaseListMarker, int);
+        }
       }
     } else if (*Format == 's' || *Format == 'S' || *Format == 'a' || *Format == 'g' || *Format == 't') {
-      BASE_ARG (BaseListMarker, VOID *) = VA_ARG (VaListMarker, VOID *);
+      if (BaseListMarker == NULL) {
+        BASE_ARG (BaseListMarkerPointer, VOID *) = VA_ARG (VaListMarker, VOID *);
+      } else {
+        BASE_ARG (BaseListMarkerPointer, VOID *) = BASE_ARG (BaseListMarker, VOID *);
+      }
     } else if (*Format == 'c') {
-      BASE_ARG (BaseListMarker, UINTN) = VA_ARG (VaListMarker, UINTN);
+      if (BaseListMarker == NULL) {
+        BASE_ARG (BaseListMarkerPointer, UINTN) = VA_ARG (VaListMarker, UINTN);
+      } else {
+        BASE_ARG (BaseListMarkerPointer, UINTN) = BASE_ARG (BaseListMarker, UINTN);
+      }
     } else if (*Format == 'r') {
-      BASE_ARG (BaseListMarker, RETURN_STATUS) = VA_ARG (VaListMarker, RETURN_STATUS);
+      if (BaseListMarker == NULL) {
+        BASE_ARG (BaseListMarkerPointer, RETURN_STATUS) = VA_ARG (VaListMarker, RETURN_STATUS);
+      } else {
+        BASE_ARG (BaseListMarkerPointer, RETURN_STATUS) = BASE_ARG (BaseListMarker, RETURN_STATUS);
+      }
     }
 
     //
@@ -209,17 +274,15 @@ DebugPrint (
     // This indicates that the DEBUG() macro is passing in more argument than can be handled by
     // the EFI_DEBUG_INFO record
     //
-    ASSERT ((CHAR8 *)BaseListMarker <= FormatString);
+    ASSERT ((CHAR8 *)BaseListMarkerPointer <= FormatString);
 
     //
     // If the converted BASE_LIST is larger than the 12 * sizeof (UINT64) allocated bytes, then return
     //
-    if ((CHAR8 *)BaseListMarker > FormatString) {
-      VA_END (VaListMarker);
+    if ((CHAR8 *)BaseListMarkerPointer > FormatString) {
       return;
     }
   }
-  VA_END (VaListMarker);
 
   //
   // Send the DebugInfo record
@@ -233,6 +296,60 @@ DebugPrint (
     DebugInfo,
     TotalSize
     );
+}
+
+/**
+  Prints a debug message to the debug output device if the specified
+  error level is enabled.
+
+  If any bit in ErrorLevel is also set in DebugPrintErrorLevelLib function
+  GetDebugPrintErrorLevel (), then print the message specified by Format and
+  the associated variable argument list to the debug output device.
+
+  If Format is NULL, then ASSERT().
+
+  @param  ErrorLevel    The error level of the debug message.
+  @param  Format        Format string for the debug message to print.
+  @param  VaListMarker  VA_LIST marker for the variable argument list.
+
+**/
+VOID
+EFIAPI
+DebugVPrint (
+  IN  UINTN         ErrorLevel,
+  IN  CONST CHAR8   *Format,
+  IN  VA_LIST       VaListMarker
+  )
+{
+  DebugPrintMarker (ErrorLevel, Format, VaListMarker, NULL);
+}
+
+/**
+  Prints a debug message to the debug output device if the specified
+  error level is enabled.
+  This function use BASE_LIST which would provide a more compatible
+  service than VA_LIST.
+
+  If any bit in ErrorLevel is also set in DebugPrintErrorLevelLib function
+  GetDebugPrintErrorLevel (), then print the message specified by Format and
+  the associated variable argument list to the debug output device.
+
+  If Format is NULL, then ASSERT().
+
+  @param  ErrorLevel      The error level of the debug message.
+  @param  Format          Format string for the debug message to print.
+  @param  BaseListMarker  BASE_LIST marker for the variable argument list.
+
+**/
+VOID
+EFIAPI
+DebugBPrint (
+  IN  UINTN         ErrorLevel,
+  IN  CONST CHAR8   *Format,
+  IN  BASE_LIST     BaseListMarker
+  )
+{
+  DebugPrintMarker (ErrorLevel, Format, mVaListNull, BaseListMarker);
 }
 
 /**
