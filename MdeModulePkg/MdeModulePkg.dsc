@@ -298,6 +298,7 @@
   MdeModulePkg/Library/PlatformHookLibSerialPortPpi/PlatformHookLibSerialPortPpi.inf
   MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
   MdeModulePkg/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
+  MdeModulePkg/Library/PeiDebugLibDebugPpi/PeiDebugLibDebugPpi.inf
   MdeModulePkg/Library/UefiBootManagerLib/UefiBootManagerLib.inf
   MdeModulePkg/Library/PlatformBootManagerLibNull/PlatformBootManagerLibNull.inf
   MdeModulePkg/Library/BootLogoLib/BootLogoLib.inf
@@ -423,6 +424,8 @@
 
   MdeModulePkg/Universal/SerialDxe/SerialDxe.inf
   MdeModulePkg/Universal/LoadFileOnFv2/LoadFileOnFv2.inf
+
+  MdeModulePkg/Universal/DebugServicePei/DebugServicePei.inf
 
   MdeModulePkg/Application/CapsuleApp/CapsuleApp.inf
   MdeModulePkg/Library/FmpAuthenticationLibNull/FmpAuthenticationLibNull.inf
