@@ -7,7 +7,7 @@
   being blocked.  This may occur if a key(s) are pressed in a terminal emulator
   used to monitor the DEBUG() and ASSERT() messages.
 
-  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -31,6 +31,12 @@
 // Define the maximum debug and assert message length that this library supports
 //
 #define MAX_DEBUG_MESSAGE_LENGTH  0x100
+
+//
+// VA_LIST can not initialize to NULL for all compiler, so we use this to
+// indicate a null VA_LIST
+//
+VA_LIST     mVaListNull;
 
 /**
   The constructor function initialize the Serial Port Library
@@ -70,8 +76,40 @@ DebugPrint (
   ...
   )
 {
-  CHAR8    Buffer[MAX_DEBUG_MESSAGE_LENGTH];
   VA_LIST  Marker;
+
+  VA_START (Marker, Format);
+  DebugVPrint (ErrorLevel, Format, Marker);
+  VA_END (Marker);
+}
+
+
+/**
+  Prints a debug message to the debug output device if the specified
+  error level is enabled base on Null-terminated format string and a
+  VA_LIST argument list or a BASE_LIST argument list.
+
+  If any bit in ErrorLevel is also set in DebugPrintErrorLevelLib function
+  GetDebugPrintErrorLevel (), then print the message specified by Format and
+  the associated variable argument list to the debug output device.
+
+  If Format is NULL, then ASSERT().
+
+  @param  ErrorLevel      The error level of the debug message.
+  @param  Format          Format string for the debug message to print.
+  @param  VaListMarker    VA_LIST marker for the variable argument list.
+  @param  BaseListMarker  BASE_LIST marker for the variable argument list.
+
+**/
+VOID
+DebugPrintMarker (
+  IN  UINTN         ErrorLevel,
+  IN  CONST CHAR8   *Format,
+  IN  VA_LIST       VaListMarker,
+  IN  BASE_LIST     BaseListMarker
+  )
+{
+  CHAR8    Buffer[MAX_DEBUG_MESSAGE_LENGTH];
 
   //
   // If Format is NULL, then ASSERT().
@@ -88,14 +126,72 @@ DebugPrint (
   //
   // Convert the DEBUG() message to an ASCII String
   //
-  VA_START (Marker, Format);
-  AsciiVSPrint (Buffer, sizeof (Buffer), Format, Marker);
-  VA_END (Marker);
+  if (BaseListMarker == NULL) {
+    AsciiVSPrint (Buffer, sizeof (Buffer), Format, VaListMarker);
+  } else {
+    AsciiBSPrint (Buffer, sizeof (Buffer), Format, BaseListMarker);
+  }
 
   //
   // Send the print string to a Serial Port
   //
   SerialPortWrite ((UINT8 *)Buffer, AsciiStrLen (Buffer));
+}
+
+
+/**
+  Prints a debug message to the debug output device if the specified
+  error level is enabled.
+
+  If any bit in ErrorLevel is also set in DebugPrintErrorLevelLib function
+  GetDebugPrintErrorLevel (), then print the message specified by Format and
+  the associated variable argument list to the debug output device.
+
+  If Format is NULL, then ASSERT().
+
+  @param  ErrorLevel    The error level of the debug message.
+  @param  Format        Format string for the debug message to print.
+  @param  VaListMarker  VA_LIST marker for the variable argument list.
+
+**/
+VOID
+EFIAPI
+DebugVPrint (
+  IN  UINTN         ErrorLevel,
+  IN  CONST CHAR8   *Format,
+  IN  VA_LIST       VaListMarker
+  )
+{
+  DebugPrintMarker (ErrorLevel, Format, VaListMarker, NULL);
+}
+
+
+/**
+  Prints a debug message to the debug output device if the specified
+  error level is enabled.
+  This function use BASE_LIST which would provide a more compatible
+  service than VA_LIST.
+
+  If any bit in ErrorLevel is also set in DebugPrintErrorLevelLib function
+  GetDebugPrintErrorLevel (), then print the message specified by Format and
+  the associated variable argument list to the debug output device.
+
+  If Format is NULL, then ASSERT().
+
+  @param  ErrorLevel      The error level of the debug message.
+  @param  Format          Format string for the debug message to print.
+  @param  BaseListMarker  BASE_LIST marker for the variable argument list.
+
+**/
+VOID
+EFIAPI
+DebugBPrint (
+  IN  UINTN         ErrorLevel,
+  IN  CONST CHAR8   *Format,
+  IN  BASE_LIST     BaseListMarker
+  )
+{
+  DebugPrintMarker (ErrorLevel, Format, mVaListNull, BaseListMarker);
 }
 
 
