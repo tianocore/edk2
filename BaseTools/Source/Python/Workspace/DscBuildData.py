@@ -248,7 +248,6 @@ class DscBuildData(PlatformBuildClassObject):
         self._Toolchain = Toolchain
         self._ToolChainFamily = None
         self._Clear()
-        self._HandleOverridePath()
         self.WorkspaceDir = os.getenv("WORKSPACE") if os.getenv("WORKSPACE") else ""
         self.DefaultStores = None
         self.SkuIdMgr = SkuClass(self.SkuName, self.SkuIds)
@@ -306,24 +305,6 @@ class DscBuildData(PlatformBuildClassObject):
         self._VpdToolGuid       = None
         self._MacroDict         = None
         self.DefaultStores      = None
-
-    ## handle Override Path of Module
-    def _HandleOverridePath(self):
-        RecordList = self._RawData[MODEL_META_DATA_COMPONENT, self._Arch]
-        for Record in RecordList:
-            ModuleId = Record[6]
-            LineNo = Record[7]
-            ModuleFile = PathClass(NormPath(Record[0]), GlobalData.gWorkspace, Arch=self._Arch)
-            RecordList = self._RawData[MODEL_META_DATA_COMPONENT_SOURCE_OVERRIDE_PATH, self._Arch, None, ModuleId]
-            if RecordList != []:
-                SourceOverridePath = mws.join(GlobalData.gWorkspace, NormPath(RecordList[0][0]))
-
-                # Check if the source override path exists
-                if not os.path.isdir(SourceOverridePath):
-                    EdkLogger.error('build', FILE_NOT_FOUND, Message='Source override path does not exist:', File=self.MetaFile, ExtraData=SourceOverridePath, Line=LineNo)
-
-                # Add to GlobalData Variables
-                GlobalData.gOverrideDir[ModuleFile.Key] = SourceOverridePath
 
     ## Get current effective macros
     @property

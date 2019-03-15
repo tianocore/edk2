@@ -1141,7 +1141,6 @@ class PlatformAutoGen(AutoGen):
         self.BuildTarget = Target
         self.Arch = Arch
         self.SourceDir = PlatformFile.SubDir
-        self.SourceOverrideDir = None
         self.FdTargetList = self.Workspace.FdTargetList
         self.FvTargetList = self.Workspace.FvTargetList
         # get the original module/package/platform objects
@@ -2559,11 +2558,6 @@ class ModuleAutoGen(AutoGen):
         self.SourceDir = self.MetaFile.SubDir
         self.SourceDir = mws.relpath(self.SourceDir, self.WorkspaceDir)
 
-        self.SourceOverrideDir = None
-        # use overridden path defined in DSC file
-        if self.MetaFile.Key in GlobalData.gOverrideDir:
-            self.SourceOverrideDir = GlobalData.gOverrideDir[self.MetaFile.Key]
-
         self.ToolChain = Toolchain
         self.BuildTarget = Target
         self.Arch = Arch
@@ -2768,12 +2762,7 @@ class ModuleAutoGen(AutoGen):
         RetVal = {}
         for Type in self.Module.CustomMakefile:
             MakeType = gMakeTypeMap[Type] if Type in gMakeTypeMap else 'nmake'
-            if self.SourceOverrideDir is not None:
-                File = os.path.join(self.SourceOverrideDir, self.Module.CustomMakefile[Type])
-                if not os.path.exists(File):
-                    File = os.path.join(self.SourceDir, self.Module.CustomMakefile[Type])
-            else:
-                File = os.path.join(self.SourceDir, self.Module.CustomMakefile[Type])
+            File = os.path.join(self.SourceDir, self.Module.CustomMakefile[Type])
             RetVal[MakeType] = File
         return RetVal
 

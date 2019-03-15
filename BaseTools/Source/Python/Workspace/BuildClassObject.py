@@ -413,7 +413,6 @@ class ModuleBuildClassObject(object):
         self.PcdIsDriver             = ''
         self.BinaryModule            = ''
         self.Shadow                  = ''
-        self.SourceOverridePath      = ''
         self.CustomMakefile          = {}
         self.Specification           = {}
         self.LibraryClass            = []

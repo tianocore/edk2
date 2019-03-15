@@ -1597,7 +1597,7 @@ class Eot(object):
             if not InfFile:
                 continue
             EdkLogger.quiet("Parsing %s ..."  % str(InfFile))
-            EdkInfParser(InfFile, EotGlobalData.gDb, Inf_Files[InfFile], '')
+            EdkInfParser(InfFile, EotGlobalData.gDb, Inf_Files[InfFile])
 
         EotGlobalData.gDb.Conn.commit()
         EdkLogger.quiet("Building database for meta data files done!")

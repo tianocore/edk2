@@ -40,11 +40,8 @@ class EdkInfParser(object):
     #  @param  Filename: INF file name
     #  @param  Database: Eot database
     #  @param  SourceFileList: A list for all source file belonging this INF file
-    #  @param  SourceOverridePath: Override path for source file
-    #  @param  Edk_Source: Environment variable EDK_SOURCE
-    #  @param  Efi_Source: Environment variable EFI_SOURCE
     #
-    def __init__(self, Filename = None, Database = None, SourceFileList = None, SourceOverridePath = None, Edk_Source = None, Efi_Source = None):
+    def __init__(self, Filename = None, Database = None, SourceFileList = None):
         self.Identification = Identification()
         self.Sources = []
         self.Macros = {}
@@ -53,7 +50,6 @@ class EdkInfParser(object):
         self.TblFile = Database.TblFile
         self.TblInf = Database.TblInf
         self.FileID = -1
-        self.SourceOverridePath = SourceOverridePath
 
         # Load Inf file if filename is not None
         if Filename is not None:
