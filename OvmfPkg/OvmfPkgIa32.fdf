@@ -1,7 +1,7 @@
 ## @file
 #  Open Virtual Machine Firmware: FDF
 #
-#  Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 #  (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 #
 #  This program and the accompanying materials
@@ -273,7 +273,6 @@ INF  IntelFrameworkModulePkg/Bus/Isa/IsaSerialDxe/IsaSerialDxe.inf
 !endif
 
 INF  IntelFrameworkModulePkg/Bus/Isa/Ps2KeyboardDxe/Ps2keyboardDxe.inf
-INF  IntelFrameworkModulePkg/Bus/Isa/IsaFloppyDxe/IsaFloppyDxe.inf
 
 INF  MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
 INF  OvmfPkg/SmbiosPlatformDxe/SmbiosPlatformDxe.inf

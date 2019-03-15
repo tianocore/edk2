@@ -1,7 +1,7 @@
 ## @file
 #  EFI/Framework Open Virtual Machine Firmware (OVMF) platform
 #
-#  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 #  (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 #
 #  This program and the accompanying materials
@@ -756,7 +756,6 @@
   IntelFrameworkModulePkg/Bus/Isa/IsaBusDxe/IsaBusDxe.inf
   IntelFrameworkModulePkg/Bus/Isa/IsaSerialDxe/IsaSerialDxe.inf
   IntelFrameworkModulePkg/Bus/Isa/Ps2KeyboardDxe/Ps2keyboardDxe.inf
-  IntelFrameworkModulePkg/Bus/Isa/IsaFloppyDxe/IsaFloppyDxe.inf
 
   #
   # SMBIOS Support
