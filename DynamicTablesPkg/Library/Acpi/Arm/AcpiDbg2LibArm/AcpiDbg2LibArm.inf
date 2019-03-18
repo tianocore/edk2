@@ -34,7 +34,7 @@
 
 [LibraryClasses]
   BaseLib
-  SerialPortLib
+  PL011UartLib
 
 [FixedPcd]
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate
