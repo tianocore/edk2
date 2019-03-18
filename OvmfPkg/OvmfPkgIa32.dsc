@@ -752,6 +752,7 @@
   #
   # ISA Support
   #
+  OvmfPkg/SioBusDxe/SioBusDxe.inf
   PcAtChipsetPkg/IsaAcpiDxe/IsaAcpi.inf
   IntelFrameworkModulePkg/Bus/Isa/IsaBusDxe/IsaBusDxe.inf
   IntelFrameworkModulePkg/Bus/Isa/IsaSerialDxe/IsaSerialDxe.inf
