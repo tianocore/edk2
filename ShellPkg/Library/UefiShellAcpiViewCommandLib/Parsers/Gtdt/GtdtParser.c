@@ -5,7 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
-    - ACPI 6.2 Specification - Errata A, September 2017
+    - ACPI 6.3 Specification - January 2019
   **/
 
 #include <IndustryStandard/Acpi.h>
@@ -77,7 +77,9 @@ STATIC CONST ACPI_PARSER GtdtParser[] = {
   {L"Platform Timer Count", 4, 88, L"%d", NULL,
    (VOID**)&GtdtPlatformTimerCount, NULL, NULL},
   {L"Platform Timer Offset", 4, 92, L"0x%x", NULL,
-   (VOID**)&GtdtPlatformTimerOffset, NULL, NULL}
+   (VOID**)&GtdtPlatformTimerOffset, NULL, NULL},
+  {L"Virtual EL2 Timer GSIV", 4, 96, L"0x%x", NULL, NULL, NULL, NULL},
+  {L"Virtual EL2 Timer Flags", 4, 100, L"0x%x", NULL, NULL, NULL, NULL}
 };
 
 /**
