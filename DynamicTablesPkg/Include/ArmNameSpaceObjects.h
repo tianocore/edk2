@@ -301,6 +301,12 @@ typedef struct CmArmGenericTimerInfo {
 
   /// The non-secure PL2 timer flags
   UINT32  NonSecurePL2TimerFlags;
+
+  /// GSIV for the virtual EL2 timer
+  UINT32  VirtualPL2TimerGSIV;
+
+  /// Flags for the virtual EL2 timer
+  UINT32  VirtualPL2TimerFlags;
 } CM_ARM_GENERIC_TIMER_INFO;
 
 /** A structure that describes the
