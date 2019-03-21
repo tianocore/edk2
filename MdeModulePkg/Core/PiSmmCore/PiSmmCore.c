@@ -1,7 +1,7 @@
 /** @file
   SMM Core Main Entry Point
 
-  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2019, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
   distribution.  The full text of the license may be found at
@@ -78,6 +78,12 @@ BOOLEAN  mInLegacyBoot = FALSE;
 BOOLEAN  mDuringS3Resume = FALSE;
 
 //
+// Flag to determine if platform enabled S3.
+// Get the value from PcdAcpiS3Enable.
+//
+BOOLEAN  mAcpiS3Enable = FALSE;
+
+//
 // Table of SMI Handlers that are registered by the SMM Core when it is initialized
 //
 SMM_CORE_SMI_HANDLERS  mSmmCoreSmiHandlers[] = {
@@ -87,6 +93,13 @@ SMM_CORE_SMI_HANDLERS  mSmmCoreSmiHandlers[] = {
   { SmmExitBootServicesHandler, &gEfiEventExitBootServicesGuid,      NULL, FALSE },
   { SmmReadyToBootHandler,      &gEfiEventReadyToBootGuid,           NULL, FALSE },
   { SmmEndOfDxeHandler,         &gEfiEndOfDxeEventGroupGuid,         NULL, TRUE },
+  { NULL,                       NULL,                                NULL, FALSE }
+};
+
+//
+// Table of SMI Handlers that are registered by the SMM Core when it is initialized
+//
+SMM_CORE_SMI_HANDLERS  mSmmCoreS3SmiHandlers[] = {
   { SmmS3SmmInitDoneHandler,    &gEdkiiS3SmmInitDoneGuid,            NULL, FALSE },
   { SmmEndOfS3ResumeHandler,    &gEdkiiEndOfS3ResumeGuid,            NULL, FALSE },
   { NULL,                       NULL,                                NULL, FALSE }
@@ -445,28 +458,30 @@ SmmEndOfDxeHandler (
              NULL
              );
 
-  //
-  // Locate SmmSxDispatch2 protocol.
-  //
-  Status = SmmLocateProtocol (
-             &gEfiSmmSxDispatch2ProtocolGuid,
-             NULL,
-             (VOID **)&SxDispatch
-             );
-  if (!EFI_ERROR (Status) && (SxDispatch != NULL)) {
+  if (mAcpiS3Enable) {
     //
-    // Register a S3 entry callback function to
-    // determine if it will be during S3 resume.
+    // Locate SmmSxDispatch2 protocol.
     //
-    EntryRegisterContext.Type  = SxS3;
-    EntryRegisterContext.Phase = SxEntry;
-    Status = SxDispatch->Register (
-                           SxDispatch,
-                           SmmS3EntryCallBack,
-                           &EntryRegisterContext,
-                           &S3EntryHandle
-                           );
-    ASSERT_EFI_ERROR (Status);
+    Status = SmmLocateProtocol (
+               &gEfiSmmSxDispatch2ProtocolGuid,
+               NULL,
+               (VOID **)&SxDispatch
+               );
+    if (!EFI_ERROR (Status) && (SxDispatch != NULL)) {
+      //
+      // Register a S3 entry callback function to
+      // determine if it will be during S3 resume.
+      //
+      EntryRegisterContext.Type  = SxS3;
+      EntryRegisterContext.Phase = SxEntry;
+      Status = SxDispatch->Register (
+                             SxDispatch,
+                             SmmS3EntryCallBack,
+                             &EntryRegisterContext,
+                             &S3EntryHandle
+                             );
+      ASSERT_EFI_ERROR (Status);
+    }
   }
 
   return EFI_SUCCESS;
@@ -881,6 +896,21 @@ SmmMain (
                &mSmmCoreSmiHandlers[Index].DispatchHandle
                );
     ASSERT_EFI_ERROR (Status);
+  }
+
+  mAcpiS3Enable = PcdGetBool (PcdAcpiS3Enable);
+  if (mAcpiS3Enable) {
+    //
+    // Register all S3 related SMI Handlers required by the SMM Core
+    //
+    for (Index = 0; mSmmCoreS3SmiHandlers[Index].HandlerType != NULL; Index++) {
+      Status = SmiHandlerRegister (
+                 mSmmCoreS3SmiHandlers[Index].Handler,
+                 mSmmCoreS3SmiHandlers[Index].HandlerType,
+                 &mSmmCoreS3SmiHandlers[Index].DispatchHandle
+                 );
+      ASSERT_EFI_ERROR (Status);
+    }
   }
 
   RegisterSmramProfileHandler ();
