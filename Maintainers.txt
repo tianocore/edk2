@@ -114,10 +114,6 @@ W: https://github.com/tianocore/tianocore.github.io/wiki/DynamicTablesPkg
 M: Sami Mujawar <Sami.Mujawar@arm.com>
 M: Alexei Fedorov <Alexei.Fedorov@arm.com>
 
-EdkCompatibilityPkg
-W: https://github.com/tianocore/tianocore.github.io/wiki/EdkCompatibilityPkg
-M: Liming Gao <liming.gao@intel.com>
-
 EmbeddedPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/EmbeddedPkg
 M: Leif Lindholm <leif.lindholm@linaro.org>
