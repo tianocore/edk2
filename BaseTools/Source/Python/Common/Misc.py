@@ -281,6 +281,7 @@ def ProcessDuplicatedInf(Path, BaseName, Workspace):
     #
     RtPath.Path = TempFullPath
     RtPath.BaseName = BaseName
+    RtPath.OriginalPath = Path
     #
     # If file exists, compare contents
     #
@@ -1405,6 +1406,7 @@ class PathClass(object):
         self.TagName = TagName
         self.ToolCode = ToolCode
         self.ToolChainFamily = ToolChainFamily
+        self.OriginalPath = self
 
     ## Convert the object of this class to a string
     #

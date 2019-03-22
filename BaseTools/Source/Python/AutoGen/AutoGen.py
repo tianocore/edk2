@@ -3416,7 +3416,7 @@ class ModuleAutoGen(AutoGen):
                 RetVal.append(PackageDir)
             IncludesList = Package.Includes
             if Package._PrivateIncludes:
-                if not self.MetaFile.Path.startswith(PackageDir):
+                if not self.MetaFile.OriginalPath.Path.startswith(PackageDir):
                     IncludesList = list(set(Package.Includes).difference(set(Package._PrivateIncludes)))
             for Inc in IncludesList:
                 if Inc not in RetVal:
