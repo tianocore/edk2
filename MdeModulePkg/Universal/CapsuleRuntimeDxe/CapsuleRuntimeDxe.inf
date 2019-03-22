@@ -4,7 +4,7 @@
 #  It installs the Capsule Architectural Protocol defined in PI1.0a to signify
 #  the capsule runtime services are ready.
 #
-#  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -36,15 +36,21 @@
 
 [Sources.Ia32, Sources.EBC, Sources.ARM, Sources.AARCH64]
   SaveLongModeContext.c
-  CapsuleReset.c
 
-[Sources.X64]
-  X64/SaveLongModeContext.c
+[Sources.Ia32, Sources.X64, Sources.ARM, Sources.AARCH64]
+  CapsuleCache.c
+
+[Sources.Ia32, Sources.X64, Sources.EBC]
   CapsuleReset.c
 
 [Sources.ARM, Sources.AARCH64]
-  SaveLongModeContext.c
   Arm/CapsuleReset.c
+
+[Sources.EBC]
+  CapsuleCacheNull.c
+
+[Sources.X64]
+  X64/SaveLongModeContext.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -61,13 +67,11 @@
   BaseLib
   PrintLib
   BaseMemoryLib
+  CacheMaintenanceLib
 
 [LibraryClasses.X64]
   UefiLib
   BaseMemoryLib
-
-[LibraryClasses.ARM, LibraryClasses.AARCH64]
-  CacheMaintenanceLib
 
 [Guids]
   ## SOMETIMES_PRODUCES   ## Variable:L"CapsuleUpdateData" # (Process across reset capsule image) for capsule updated data

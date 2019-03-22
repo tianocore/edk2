@@ -3,6 +3,7 @@
   PersistAcrossReset capsules
 
   Copyright (c) 2018, Linaro, Ltd. All rights reserved.<BR>
+  Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
@@ -15,8 +16,6 @@
 **/
 
 #include "CapsuleService.h"
-
-#include <Library/CacheMaintenanceLib.h>
 
 /**
   Whether the platform supports capsules that persist across reset. Note that
@@ -41,35 +40,3 @@ IsPersistAcrossResetCapsuleSupported (
   return FeaturePcdGet (PcdSupportUpdateCapsuleReset) && !EfiAtRuntime ();
 }
 
-/**
-  Writes Back a range of data cache lines covering a set of capsules in memory.
-
-  Writes Back the data cache lines specified by ScatterGatherList.
-
-  @param  ScatterGatherList Physical address of the data structure that
-                            describes a set of capsules in memory
-
-**/
-VOID
-CapsuleCacheWriteBack (
-  IN  EFI_PHYSICAL_ADDRESS    ScatterGatherList
-  )
-{
-  EFI_CAPSULE_BLOCK_DESCRIPTOR    *Desc;
-
-  Desc = (EFI_CAPSULE_BLOCK_DESCRIPTOR *)(UINTN)ScatterGatherList;
-  do {
-    WriteBackDataCacheRange (Desc, sizeof *Desc);
-
-    if (Desc->Length > 0) {
-      WriteBackDataCacheRange ((VOID *)(UINTN)Desc->Union.DataBlock,
-                               Desc->Length
-                               );
-      Desc++;
-    } else if (Desc->Union.ContinuationPointer > 0) {
-      Desc = (EFI_CAPSULE_BLOCK_DESCRIPTOR *)(UINTN)Desc->Union.ContinuationPointer;
-    }
-  } while (Desc->Length > 0 || Desc->Union.ContinuationPointer > 0);
-
-  WriteBackDataCacheRange (Desc, sizeof *Desc);
-}
