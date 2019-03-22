@@ -207,22 +207,6 @@ InitializeResetSystem (
 }
 
 /**
-  Put the system into S3 power state.
-**/
-VOID
-DoS3 (
-  VOID
-  )
-{
-  EnterS3WithImmediateWake ();
-
-  //
-  // Should not return
-  //
-  CpuDeadLoop ();
-}
-
-/**
   Resets the entire platform.
 
   @param[in] ResetType          The type of reset to perform.
@@ -249,9 +233,6 @@ RuntimeServiceResetSystem (
   IN VOID             *ResetData OPTIONAL
   )
 {
-  EFI_STATUS          Status;
-  UINTN               Size;
-  UINTN               CapsuleDataPtr;
   LIST_ENTRY          *Link;
   RESET_NOTIFY_ENTRY  *Entry;
 
@@ -314,25 +295,6 @@ RuntimeServiceResetSystem (
 
   switch (ResetType) {
   case EfiResetWarm:
-
-    //
-    //Check if there are pending capsules to process
-    //
-    Size = sizeof (CapsuleDataPtr);
-    Status =  EfiGetVariable (
-                 EFI_CAPSULE_VARIABLE_NAME,
-                 &gEfiCapsuleVendorGuid,
-                 NULL,
-                 &Size,
-                 (VOID *) &CapsuleDataPtr
-                 );
-
-    if (Status == EFI_SUCCESS) {
-      //
-      //Process capsules across a system reset.
-      //
-      DoS3();
-    }
 
     ResetWarm ();
     break;
