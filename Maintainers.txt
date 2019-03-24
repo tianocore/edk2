@@ -40,10 +40,9 @@ Descriptions of section entries:
 EDK II
 ------
 W: http://www.tianocore.org/edk2/
-L: https://lists.sourceforge.net/lists/listinfo/edk2-devel
+L: https://lists.01.org/mailman/listinfo/edk2-devel
 T: git - https://github.com/tianocore/edk2.git
 T: git (mirror) - https://bitbucket.org/tianocore/edk2.git
-T: git (mirror) - http://git.code.sf.net/p/tianocore/edk2
 T: svn (read-only, deprecated) - https://svn.code.sf.net/p/edk2/code/trunk/edk2
 
 Tianocore Stewards
