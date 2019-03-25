@@ -4,7 +4,7 @@
   This local APIC library instance supports x2APIC capable processors
   which have xAPIC and x2APIC modes.
 
-  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2019, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2017, AMD Inc. All rights reserved.<BR>
 
   This program and the accompanying materials
@@ -1249,5 +1249,128 @@ GetProcessorLocationByApicId (
   }
   if (Package != NULL) {
     *Package = (InitialApicId >> (ThreadBits + CoreBits));
+  }
+}
+
+/**
+  Get Package ID/Die ID/Tile ID/Module ID/Core ID/Thread ID of a processor.
+
+  The algorithm assumes the target system has symmetry across physical
+  package boundaries with respect to the number of threads per core, number of
+  cores per module, number of modules per tile, number of tiles per die, number
+  of dies per package.
+
+  @param[in]   InitialApicId Initial APIC ID of the target logical processor.
+  @param[out]  Package       Returns the processor package ID.
+  @param[out]  Die           Returns the processor die ID.
+  @param[out]  Tile          Returns the processor tile ID.
+  @param[out]  Module        Returns the processor module ID.
+  @param[out]  Core          Returns the processor core ID.
+  @param[out]  Thread        Returns the processor thread ID.
+**/
+VOID
+EFIAPI
+GetProcessorLocation2ByApicId (
+  IN  UINT32  InitialApicId,
+  OUT UINT32  *Package  OPTIONAL,
+  OUT UINT32  *Die      OPTIONAL,
+  OUT UINT32  *Tile     OPTIONAL,
+  OUT UINT32  *Module   OPTIONAL,
+  OUT UINT32  *Core     OPTIONAL,
+  OUT UINT32  *Thread   OPTIONAL
+  )
+{
+  CPUID_EXTENDED_TOPOLOGY_EAX         ExtendedTopologyEax;
+  CPUID_EXTENDED_TOPOLOGY_ECX         ExtendedTopologyEcx;
+  UINT32                              MaxStandardCpuIdIndex;
+  UINT32                              Index;
+  UINTN                               LevelType;
+  UINT32                              Bits[CPUID_V2_EXTENDED_TOPOLOGY_LEVEL_TYPE_DIE + 2];
+  UINT32                              *Location[CPUID_V2_EXTENDED_TOPOLOGY_LEVEL_TYPE_DIE + 2];
+
+  for (LevelType = 0; LevelType < ARRAY_SIZE (Bits); LevelType++) {
+    Bits[LevelType] = 0;
+  }
+
+  //
+  // Get max index of CPUID
+  //
+  AsmCpuid (CPUID_SIGNATURE, &MaxStandardCpuIdIndex, NULL, NULL, NULL);
+  if (MaxStandardCpuIdIndex < CPUID_V2_EXTENDED_TOPOLOGY) {
+    if (Die != NULL) {
+      *Die = 0;
+    }
+    if (Tile != NULL) {
+      *Tile = 0;
+    }
+    if (Module != NULL) {
+      *Module = 0;
+    }
+    GetProcessorLocationByApicId (InitialApicId, Package, Core, Thread);
+    return;
+  }
+
+  //
+  // If the V2 extended topology enumeration leaf is available, it
+  // is the preferred mechanism for enumerating topology.
+  //
+  for (Index = 0; ; Index++) {
+    AsmCpuidEx(
+      CPUID_V2_EXTENDED_TOPOLOGY,
+      Index,
+      &ExtendedTopologyEax.Uint32,
+      NULL,
+      &ExtendedTopologyEcx.Uint32,
+      NULL
+      );
+
+    LevelType = ExtendedTopologyEcx.Bits.LevelType;
+
+    //
+    // first level reported should be SMT.
+    //
+    ASSERT ((Index != 0) || (LevelType == CPUID_EXTENDED_TOPOLOGY_LEVEL_TYPE_SMT));
+    if (LevelType == CPUID_EXTENDED_TOPOLOGY_LEVEL_TYPE_INVALID) {
+      break;
+    }
+    ASSERT (LevelType < ARRAY_SIZE (Bits));
+    Bits[LevelType] = ExtendedTopologyEax.Bits.ApicIdShift;
+  }
+
+  for (LevelType = CPUID_EXTENDED_TOPOLOGY_LEVEL_TYPE_CORE; LevelType < ARRAY_SIZE (Bits); LevelType++) {
+    //
+    // If there are more levels between level-1 (low-level) and level-2 (high-level), the unknown levels will be ignored
+    // and treated as an extension of the last known level (i.e., level-1 in this case).
+    //
+    if (Bits[LevelType] == 0) {
+      Bits[LevelType] = Bits[LevelType - 1];
+    }
+  }
+
+  Location[CPUID_V2_EXTENDED_TOPOLOGY_LEVEL_TYPE_DIE + 1] = Package;
+  Location[CPUID_V2_EXTENDED_TOPOLOGY_LEVEL_TYPE_DIE    ] = Die;
+  Location[CPUID_V2_EXTENDED_TOPOLOGY_LEVEL_TYPE_TILE   ] = Tile;
+  Location[CPUID_V2_EXTENDED_TOPOLOGY_LEVEL_TYPE_MODULE ] = Module;
+  Location[CPUID_EXTENDED_TOPOLOGY_LEVEL_TYPE_CORE   ]    = Core;
+  Location[CPUID_EXTENDED_TOPOLOGY_LEVEL_TYPE_SMT    ]    = Thread;
+
+  Bits[CPUID_V2_EXTENDED_TOPOLOGY_LEVEL_TYPE_DIE + 1] = 32;
+
+  for ( LevelType = CPUID_EXTENDED_TOPOLOGY_LEVEL_TYPE_SMT
+      ; LevelType <= CPUID_V2_EXTENDED_TOPOLOGY_LEVEL_TYPE_DIE + 1
+      ; LevelType ++
+      ) {
+    if (Location[LevelType] != NULL) {
+      //
+      // Bits[i] holds the number of bits to shift right on x2APIC ID to get a unique
+      // topology ID of the next level type.
+      //
+      *Location[LevelType] = InitialApicId >> Bits[LevelType - 1];
+
+      //
+      // Bits[i] - Bits[i-1] holds the number of bits for the next ONE level type.
+      //
+      *Location[LevelType] &= (1 << (Bits[LevelType] - Bits[LevelType - 1])) - 1;
+    }
   }
 }
