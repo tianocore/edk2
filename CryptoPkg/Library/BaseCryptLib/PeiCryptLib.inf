@@ -13,8 +13,9 @@
 #  PEM handler functions, and pseudorandom number generator functions are not
 #  supported in this instance.
 #
-#  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2010 - 2019, Intel Corporation. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
+
 #
 ##
 
@@ -52,6 +53,7 @@
   Pk/CryptPkcs7SignNull.c
   Pk/CryptPkcs7VerifyCommon.c
   Pk/CryptPkcs7VerifyBase.c
+  Pk/CryptPkcs7VerifyEku.c
 
   Pk/CryptDhNull.c
   Pk/CryptX509Null.c
