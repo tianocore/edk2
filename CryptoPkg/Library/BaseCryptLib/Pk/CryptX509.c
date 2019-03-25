@@ -292,10 +292,11 @@ _Exit:
 }
 
 /**
-  Retrieve the common name (CN) string from one X.509 certificate.
+  Retrieve a string from one X.509 certificate base on the Request_NID.
 
   @param[in]      Cert             Pointer to the DER-encoded X509 certificate.
   @param[in]      CertSize         Size of the X509 certificate in bytes.
+  @param[in]      Request_NID      NID of string to obtain
   @param[out]     CommonName       Buffer to contain the retrieved certificate common
                                    name string (UTF8). At most CommonNameSize bytes will be
                                    written and the string will be null terminated. May be
@@ -310,20 +311,21 @@ _Exit:
                                    If CommonNameSize is NULL.
                                    If CommonName is not NULL and *CommonNameSize is 0.
                                    If Certificate is invalid.
-  @retval RETURN_NOT_FOUND         If no CommonName entry exists.
+  @retval RETURN_NOT_FOUND         If no NID Name entry exists.
   @retval RETURN_BUFFER_TOO_SMALL  If the CommonName is NULL. The required buffer size
                                    (including the final null) is returned in the
                                    CommonNameSize parameter.
   @retval RETURN_UNSUPPORTED       The operation is not supported.
 
 **/
+STATIC
 RETURN_STATUS
-EFIAPI
-X509GetCommonName (
-  IN      CONST UINT8  *Cert,
-  IN      UINTN        CertSize,
-  OUT     CHAR8        *CommonName,  OPTIONAL
-  IN OUT  UINTN        *CommonNameSize
+InternalX509GetNIDName (
+  IN      CONST UINT8   *Cert,
+  IN      UINTN         CertSize,
+  IN      INT32         Request_NID,
+  OUT     CHAR8         *CommonName,  OPTIONAL
+  IN OUT  UINTN         *CommonNameSize
   )
 {
   RETURN_STATUS    ReturnStatus;
@@ -375,12 +377,12 @@ X509GetCommonName (
   }
 
   //
-  // Retrieve the CommonName information from X.509 Subject
+  // Retrive the string from X.509 Subject base on the Request_NID
   //
-  Index = X509_NAME_get_index_by_NID (X509Name, NID_commonName, -1);
+  Index = X509_NAME_get_index_by_NID (X509Name, Request_NID, -1);
   if (Index < 0) {
     //
-    // No CommonName entry exists in X509_NAME object
+    // No Request_NID name entry exists in X509_NAME object
     //
     *CommonNameSize = 0;
     ReturnStatus    = RETURN_NOT_FOUND;
@@ -402,7 +404,7 @@ X509GetCommonName (
   Length = ASN1_STRING_to_UTF8 (&UTF8Name, EntryData);
   if (Length < 0) {
     //
-    // Fail to convert the commonName string
+    // Fail to convert the Name string
     //
     *CommonNameSize = 0;
     ReturnStatus    = RETURN_INVALID_PARAMETER;
@@ -431,6 +433,82 @@ _Exit:
   }
 
   return ReturnStatus;
+}
+
+/**
+  Retrieve the common name (CN) string from one X.509 certificate.
+
+  @param[in]      Cert             Pointer to the DER-encoded X509 certificate.
+  @param[in]      CertSize         Size of the X509 certificate in bytes.
+  @param[out]     CommonName       Buffer to contain the retrieved certificate common
+                                   name string. At most CommonNameSize bytes will be
+                                   written and the string will be null terminated. May be
+                                   NULL in order to determine the size buffer needed.
+  @param[in,out]  CommonNameSize   The size in bytes of the CommonName buffer on input,
+                                   and the size of buffer returned CommonName on output.
+                                   If CommonName is NULL then the amount of space needed
+                                   in buffer (including the final null) is returned.
+
+  @retval RETURN_SUCCESS           The certificate CommonName retrieved successfully.
+  @retval RETURN_INVALID_PARAMETER If Cert is NULL.
+                                   If CommonNameSize is NULL.
+                                   If CommonName is not NULL and *CommonNameSize is 0.
+                                   If Certificate is invalid.
+  @retval RETURN_NOT_FOUND         If no CommonName entry exists.
+  @retval RETURN_BUFFER_TOO_SMALL  If the CommonName is NULL. The required buffer size
+                                   (including the final null) is returned in the
+                                   CommonNameSize parameter.
+  @retval RETURN_UNSUPPORTED       The operation is not supported.
+
+**/
+RETURN_STATUS
+EFIAPI
+X509GetCommonName (
+  IN      CONST UINT8  *Cert,
+  IN      UINTN        CertSize,
+  OUT     CHAR8        *CommonName,  OPTIONAL
+  IN OUT  UINTN        *CommonNameSize
+  )
+{
+  return InternalX509GetNIDName (Cert, CertSize, NID_commonName, CommonName, CommonNameSize);
+}
+
+/**
+  Retrieve the organization name (O) string from one X.509 certificate.
+
+  @param[in]      Cert             Pointer to the DER-encoded X509 certificate.
+  @param[in]      CertSize         Size of the X509 certificate in bytes.
+  @param[out]     NameBuffer       Buffer to contain the retrieved certificate organization
+                                   name string. At most NameBufferSize bytes will be
+                                   written and the string will be null terminated. May be
+                                   NULL in order to determine the size buffer needed.
+  @param[in,out]  NameBufferSize   The size in bytes of the Name buffer on input,
+                                   and the size of buffer returned Name on output.
+                                   If NameBuffer is NULL then the amount of space needed
+                                   in buffer (including the final null) is returned.
+
+  @retval RETURN_SUCCESS           The certificate Organization Name retrieved successfully.
+  @retval RETURN_INVALID_PARAMETER If Cert is NULL.
+                                   If NameBufferSize is NULL.
+                                   If NameBuffer is not NULL and *CommonNameSize is 0.
+                                   If Certificate is invalid.
+  @retval RETURN_NOT_FOUND         If no Organization Name entry exists.
+  @retval RETURN_BUFFER_TOO_SMALL  If the NameBuffer is NULL. The required buffer size
+                                   (including the final null) is returned in the
+                                   CommonNameSize parameter.
+  @retval RETURN_UNSUPPORTED       The operation is not supported.
+
+**/
+RETURN_STATUS
+EFIAPI
+X509GetOrganizationName (
+  IN      CONST UINT8   *Cert,
+  IN      UINTN         CertSize,
+  OUT     CHAR8         *NameBuffer,  OPTIONAL
+  IN OUT  UINTN         *NameBufferSize
+  )
+{
+  return InternalX509GetNIDName (Cert, CertSize, NID_organizationName, NameBuffer, NameBufferSize);
 }
 
 /**
