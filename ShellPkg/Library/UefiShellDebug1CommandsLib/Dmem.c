@@ -13,7 +13,6 @@
 #include <Guid/Acpi.h>
 #include <Guid/Mps.h>
 #include <Guid/SmBios.h>
-#include <Guid/SalSystemTable.h>
 
 /**
   Make a printable character.
@@ -178,10 +177,6 @@ ShellCommandRunDmem (
             }
             if (CompareGuid(&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiAcpi10TableGuid)) {
               AcpiTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
-              continue;
-            }
-            if (CompareGuid(&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiSalSystemTableGuid)) {
-              SalTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
               continue;
             }
             if (CompareGuid(&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiSmbiosTableGuid)) {

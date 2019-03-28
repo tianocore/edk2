@@ -126,7 +126,6 @@
   gEfiSmbiosTableGuid             ## SOMETIMES_CONSUMES ## SystemTable
   gEfiSmbios3TableGuid            ## SOMETIMES_CONSUMES ## SystemTable
   gEfiMpsTableGuid                ## SOMETIMES_CONSUMES ## SystemTable
-  gEfiSalSystemTableGuid          ## SOMETIMES_CONSUMES ## SystemTable
   gEfiAcpi10TableGuid             ## SOMETIMES_CONSUMES ## SystemTable
   gEfiAcpi20TableGuid             ## SOMETIMES_CONSUMES ## SystemTable
   gShellDebug1HiiGuid             ## SOMETIMES_CONSUMES ## HII
