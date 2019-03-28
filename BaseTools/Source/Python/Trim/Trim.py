@@ -18,7 +18,7 @@ import Common.LongFilePathOs as os
 import sys
 import re
 from io import BytesIO
-
+import codecs
 from optparse import OptionParser
 from optparse import make_option
 from Common.BuildToolError import *
@@ -77,13 +77,10 @@ gIncludedAslFile = []
 def TrimPreprocessedFile(Source, Target, ConvertHex, TrimLong):
     CreateDirectory(os.path.dirname(Target))
     try:
-        f = open (Source, 'r')
+        with open(Source, "r") as File:
+            Lines = File.readlines()
     except:
         EdkLogger.error("Trim", FILE_OPEN_FAILURE, ExtraData=Source)
-
-    # read whole file
-    Lines = f.readlines()
-    f.close()
 
     PreprocessedFile = ""
     InjectedFile = ""
@@ -181,11 +178,10 @@ def TrimPreprocessedFile(Source, Target, ConvertHex, TrimLong):
 
     # save to file
     try:
-        f = open (Target, 'w')
+        with open(Target, 'w') as File:
+            File.writelines(NewLines)
     except:
         EdkLogger.error("Trim", FILE_OPEN_FAILURE, ExtraData=Target)
-    f.writelines(NewLines)
-    f.close()
 
 ## Trim preprocessed VFR file
 #
@@ -199,12 +195,11 @@ def TrimPreprocessedVfr(Source, Target):
     CreateDirectory(os.path.dirname(Target))
 
     try:
-        f = open (Source, 'r')
+        with open(Source, "r") as File:
+            Lines = File.readlines()
     except:
         EdkLogger.error("Trim", FILE_OPEN_FAILURE, ExtraData=Source)
     # read whole file
-    Lines = f.readlines()
-    f.close()
 
     FoundTypedef = False
     Brace = 0
@@ -248,11 +243,10 @@ def TrimPreprocessedVfr(Source, Target):
 
     # save all lines trimmed
     try:
-        f = open (Target, 'w')
+        with open(Target, 'w') as File:
+            File.writelines(Lines)
     except:
         EdkLogger.error("Trim", FILE_OPEN_FAILURE, ExtraData=Target)
-    f.writelines(Lines)
-    f.close()
 
 ## Read the content  ASL file, including ASL included, recursively
 #
@@ -278,7 +272,12 @@ def DoInclude(Source, Indent='', IncludePathList=[], LocalSearchPath=None):
         for IncludePath in SearchPathList:
             IncludeFile = os.path.join(IncludePath, Source)
             if os.path.isfile(IncludeFile):
-                F = open(IncludeFile, "r")
+                try:
+                    with open(IncludeFile, "r") as File:
+                        F = File.readlines()
+                except:
+                    with codecs.open(IncludeFile, "r", encoding='utf-8') as File:
+                        F = File.readlines()
                 break
         else:
             EdkLogger.error("Trim", "Failed to find include file %s" % Source)
@@ -313,7 +312,6 @@ def DoInclude(Source, Indent='', IncludePathList=[], LocalSearchPath=None):
         NewFileContent.append("\n")
 
     gIncludedAslFile.pop()
-    F.close()
 
     return NewFileContent
 
@@ -345,7 +343,9 @@ def TrimAslFile(Source, Target, IncludePathFile):
     if IncludePathFile:
         try:
             LineNum = 0
-            for Line in open(IncludePathFile, 'r'):
+            with open(IncludePathFile, 'r') as File:
+                FileLines = File.readlines()
+            for Line in FileLines:
                 LineNum += 1
                 if Line.startswith("/I") or Line.startswith ("-I"):
                     IncludePathList.append(Line[2:].strip())
@@ -363,12 +363,10 @@ def TrimAslFile(Source, Target, IncludePathFile):
 
     # save all lines trimmed
     try:
-        f = open (Target, 'w')
+        with open(Target, 'w') as File:
+            File.writelines(Lines)
     except:
         EdkLogger.error("Trim", FILE_OPEN_FAILURE, ExtraData=Target)
-
-    f.writelines(Lines)
-    f.close()
 
 def GenerateVfrBinSec(ModuleName, DebugDir, OutputFile):
     VfrNameList = []
@@ -389,7 +387,7 @@ def GenerateVfrBinSec(ModuleName, DebugDir, OutputFile):
         return
 
     try:
-        fInputfile = open(OutputFile, "wb+", 0)
+        fInputfile = open(OutputFile, "wb+")
     except:
         EdkLogger.error("Trim", FILE_OPEN_FAILURE, "File open failed for %s" %OutputFile, None)
 
