@@ -229,23 +229,6 @@
   gEfiFirmwareVolumeBlock2ProtocolGuid                    ## UNDEFINED
   gEfiCpuIo2ProtocolGuid                                  ## UNDEFINED
   gEfiLegacyRegion2ProtocolGuid                           ## UNDEFINED
-  gEfiSalMcaInitPmiProtocolGuid                           ## UNDEFINED
-  gEfiExtendedSalBootServiceProtocolGuid                  ## UNDEFINED
-  gEfiExtendedSalBaseIoServicesProtocolGuid               ## UNDEFINED
-  gEfiExtendedSalStallServicesProtocolGuid                ## UNDEFINED
-  gEfiExtendedSalRtcServicesProtocolGuid                  ## UNDEFINED
-  gEfiExtendedSalVariableServicesProtocolGuid             ## UNDEFINED
-  gEfiExtendedSalMtcServicesProtocolGuid                  ## UNDEFINED
-  gEfiExtendedSalResetServicesProtocolGuid                ## UNDEFINED
-  gEfiExtendedSalStatusCodeServicesProtocolGuid           ## UNDEFINED
-  gEfiExtendedSalFvBlockServicesProtocolGuid              ## UNDEFINED
-  gEfiExtendedSalMpServicesProtocolGuid                   ## UNDEFINED
-  gEfiExtendedSalPalServicesProtocolGuid                  ## UNDEFINED
-  gEfiExtendedSalBaseServicesProtocolGuid                 ## UNDEFINED
-  gEfiExtendedSalMcaServicesProtocolGuid                  ## UNDEFINED
-  gEfiExtendedSalPciServicesProtocolGuid                  ## UNDEFINED
-  gEfiExtendedSalCacheServicesProtocolGuid                ## UNDEFINED
-  gEfiExtendedSalMcaLogServicesProtocolGuid               ## UNDEFINED
   gEfiSecurity2ArchProtocolGuid                           ## UNDEFINED
   gEfiSmmEndOfDxeProtocolGuid                             ## UNDEFINED
   gEfiIsaHcProtocolGuid                                   ## UNDEFINED
