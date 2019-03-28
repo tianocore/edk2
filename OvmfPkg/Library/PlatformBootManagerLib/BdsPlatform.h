@@ -57,7 +57,6 @@ Abstract:
 
 #include <Guid/Acpi.h>
 #include <Guid/SmBios.h>
-#include <Guid/Mps.h>
 #include <Guid/HobList.h>
 #include <Guid/GlobalVariable.h>
 #include <Guid/EventGroup.h>
