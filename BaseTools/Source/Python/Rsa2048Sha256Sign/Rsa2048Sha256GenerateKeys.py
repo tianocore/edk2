@@ -84,7 +84,7 @@ if __name__ == '__main__':
   if Process.returncode != 0:
     print('ERROR: Open SSL command not available.  Please verify PATH or set OPENSSL_PATH')
     sys.exit(Process.returncode)
-  print(Version[0].decode())
+  print(Version[0].decode(encoding='utf-8', errors='ignore'))
 
   args.PemFileName = []
 
@@ -125,7 +125,7 @@ if __name__ == '__main__':
     # Extract public key from private key into STDOUT
     #
     Process = subprocess.Popen('%s rsa -in %s -modulus -noout' % (OpenSslCommand, Item), stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-    PublicKeyHexString = Process.communicate()[0].split(b'=')[1].strip()
+    PublicKeyHexString = Process.communicate()[0].decode(encoding='utf-8', errors='ignore').split(b'=')[1].strip()
     if Process.returncode != 0:
       print('ERROR: Unable to extract public key from private key')
       sys.exit(Process.returncode)
@@ -138,7 +138,7 @@ if __name__ == '__main__':
     #
     Process = subprocess.Popen('%s dgst -sha256 -binary' % (OpenSslCommand), stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     Process.stdin.write (PublicKey)
-    PublicKeyHash = PublicKeyHash + Process.communicate()[0]
+    PublicKeyHash = PublicKeyHash + Process.communicate()[0].decode(encoding='utf-8', errors='ignore')
     if Process.returncode != 0:
       print('ERROR: Unable to extract SHA 256 hash of public key')
       sys.exit(Process.returncode)

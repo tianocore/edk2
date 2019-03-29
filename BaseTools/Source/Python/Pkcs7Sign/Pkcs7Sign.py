@@ -122,7 +122,7 @@ if __name__ == '__main__':
   if Process.returncode != 0:
     print('ERROR: Open SSL command not available.  Please verify PATH or set OPENSSL_PATH')
     sys.exit(Process.returncode)
-  print(Version[0].decode())
+  print(Version[0].decode(encoding='utf-8', errors='ignore'))
 
   #
   # Read input file into a buffer and save input filename

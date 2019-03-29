@@ -94,7 +94,7 @@ def SignPayloadSignTool (Payload, ToolPath, PfxFile):
 
     if Process.returncode != 0:
         shutil.rmtree (TempDirectoryName)
-        print (Result[1].decode())
+        print (Result[1].decode(encoding='utf-8', errors='ignore'))
         raise ValueError ('GenerateCapsule: error: signtool failed.')
 
     #
@@ -132,12 +132,12 @@ def SignPayloadOpenSsl (Payload, ToolPath, SignerPrivateCertFile, OtherPublicCer
     try:
         Process = subprocess.Popen (Command, stdin = subprocess.PIPE, stdout = subprocess.PIPE, stderr = subprocess.PIPE, shell = True)
         Result = Process.communicate(input = Payload)
-        Signature = Result[0]
+        Signature = Result[0].decode(encoding='utf-8', errors='ignore')
     except:
         raise ValueError ('GenerateCapsule: error: can not run openssl.')
 
     if Process.returncode != 0:
-        print (Result[1].decode())
+        print (Result[1].decode(encoding='utf-8', errors='ignore'))
         raise ValueError ('GenerateCapsule: error: openssl failed.')
 
     return Signature
@@ -186,7 +186,7 @@ def VerifyPayloadOpenSsl (Payload, CertData, ToolPath, SignerPrivateCertFile, Ot
 
     if Process.returncode != 0:
         shutil.rmtree (TempDirectoryName)
-        print (Result[1].decode())
+        print (Result[1].decode(encoding='utf-8', errors='ignore'))
         raise ValueError ('GenerateCapsule: error: openssl failed.')
 
     shutil.rmtree (TempDirectoryName)
