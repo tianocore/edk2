@@ -1666,6 +1666,12 @@
   # @Prompt Reset on memory type information change.
   gEfiMdeModulePkgTokenSpaceGuid.PcdResetOnMemoryTypeInformationChange|TRUE|BOOLEAN|0x00010056
 
+  ## Indicates if the BDS supports Platform Recovery.<BR><BR>
+  #   TRUE  - BDS supports Platform Recovery.<BR>
+  #   FALSE - BDS does not support Platform Recovery.<BR>
+  # @Prompt Support Platform Recovery.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPlatformRecoverySupport|TRUE|BOOLEAN|0x00010078
+
   ## Specify the foreground color for Subtile text in HII Form Browser. The default value is EFI_BLUE.
   #  Only following values defined in UEFI specification are valid:<BR><BR>
   #  0x00 (EFI_BLACK)<BR>

@@ -445,6 +445,12 @@
                                                                                                        "TRUE  - Resets system when memory type information changes.<BR>\n"
                                                                                                        "FALSE - Does not reset system when memory type information changes.<BR>"
 
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdPlatformRecoverySupport_PROMPT  #language en-US "Support Platform Recovery"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdPlatformRecoverySupport_HELP  #language en-US "Indicates if the BDS supports Platform Recovery.<BR><BR>\n"
+                                                                                            "TRUE  - BDS supports Platform Recovery.<BR>\n"
+                                                                                            "FALSE - BDS does not support Platform Recovery.<BR>"
+
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdBrowserSubtitleTextColor_PROMPT  #language en-US "Foreground color for browser subtitle"
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdBrowserSubtitleTextColor_HELP  #language en-US "Specify the foreground color for Subtitle text in HII Form Browser. The default value is EFI_BLUE. Only following values defined in UEFI specification are valid:<BR><BR>\n"
