@@ -39,8 +39,6 @@
   Ia32/MathLShiftS64.c      | INTEL
   Ia32/MathRShiftU64.c      | INTEL
 
-  Ia32/MathLShiftS64.S      | GCC
-  Ia32/MathRShiftU64.S      | GCC
   Ia32/MathLShiftS64.nasm   | GCC
   Ia32/MathRShiftU64.nasm   | GCC
 
