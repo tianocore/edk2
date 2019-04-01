@@ -316,3 +316,29 @@ SetPageTableAttributes (
 
   return ;
 }
+
+/**
+  This function returns with no action for 32 bit.
+
+  @param[out]  *Cr2  Pointer to variable to hold CR2 register value.
+**/
+VOID
+SaveCr2 (
+  OUT UINTN  *Cr2
+  )
+{
+  return ;
+}
+
+/**
+  This function returns with no action for 32 bit.
+
+  @param[in]  Cr2  Value to write into CR2 register.
+**/
+VOID
+RestoreCr2 (
+  IN UINTN  Cr2
+  )
+{
+  return ;
+}
