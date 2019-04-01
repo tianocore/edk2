@@ -36,14 +36,12 @@
 [Sources.IA32]
   IoLibGcc.c    | GCC
   IoLibMsc.c    | MSFT
-  IoLibIcc.c    | INTEL
   IoLib.c
   Ia32/IoFifo.nasm
 
 [Sources.X64]
   IoLibGcc.c    | GCC
   IoLibMsc.c    | MSFT
-  IoLibIcc.c    | INTEL
   IoLib.c
   X64/IoFifo.nasm
 
