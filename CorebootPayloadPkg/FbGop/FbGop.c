@@ -16,7 +16,7 @@ EFI_PIXEL_BITMASK  mPixelBitMask = {0x0000FF, 0x00FF00, 0xFF0000, 0x000000};
 //
 UINT64                         mOriginalPciAttributes;
 BOOLEAN                        mPciAttributesSaved = FALSE;
-
+FRAME_BUFFER_INFO             *mFrameBufferInfo;
 
 //
 // EFI Driver Binding Protocol Instance
@@ -57,10 +57,12 @@ FbGopDriverBindingSupported (
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
 {
-  EFI_STATUS                Status;
+  EFI_STATUS                 Status;
   EFI_PCI_IO_PROTOCOL       *PciIo;
-  PCI_TYPE00                Pci;
+  PCI_TYPE00                 Pci;
   EFI_DEV_PATH              *Node;
+  UINT8                      Index;
+  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *Resources;
 
   //
   // Open the IO Abstraction(s) needed to perform the supported test
@@ -94,28 +96,45 @@ FbGopDriverBindingSupported (
   }
 
   Status = EFI_UNSUPPORTED;
-  if (Pci.Hdr.ClassCode[2] == 0x03 || (Pci.Hdr.ClassCode[2] == 0x00 && Pci.Hdr.ClassCode[1] == 0x01)) {
+  if (IS_PCI_DISPLAY (&Pci) || IS_PCI_OLD_VGA (&Pci)) {
+    //
+    // Check if PCI BAR matches the framebuffer base
+    //
+    Status = EFI_UNSUPPORTED;
+    for (Index = 0; Index < PCI_MAX_BAR; Index++) {
+      Status = PciIo->GetBarAttributes (PciIo, Index, NULL, (VOID**) &Resources);
+      if (!EFI_ERROR (Status)) {
+        if ((Resources->Desc == ACPI_ADDRESS_SPACE_DESCRIPTOR) &&
+            (Resources->Len == (UINT16) (sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) - 3)) &&
+            (Resources->ResType == ACPI_ADDRESS_SPACE_TYPE_MEM) &&
+            (Resources->AddrRangeMin == mFrameBufferInfo->LinearFrameBuffer)) {
+          DEBUG ((DEBUG_INFO, "Found matched framebuffer PCI BAR !\n"));
+          Status = EFI_SUCCESS;
+          break;
+        }
+      }
+    }
 
-    Status = EFI_SUCCESS;
-    //
-    // If this is a graphics controller,
-    // go further check RemainingDevicePath validation
-    //
-    if (RemainingDevicePath != NULL) {
-      Node = (EFI_DEV_PATH *) RemainingDevicePath;
+    if (!EFI_ERROR (Status)) {
       //
-      // Check if RemainingDevicePath is the End of Device Path Node, 
-      // if yes, return EFI_SUCCESS
+      // If this is a graphics controller,
+      // go further check RemainingDevicePath
       //
-      if (!IsDevicePathEnd (Node)) {
+      if (RemainingDevicePath != NULL) {
+        Node = (EFI_DEV_PATH *) RemainingDevicePath;
         //
-        // If RemainingDevicePath isn't the End of Device Path Node,
-        // check its validation
+        // Check if RemainingDevicePath is the End of Device Path Node,
+        // if yes, return EFI_SUCCESS
         //
-        if (Node->DevPath.Type != ACPI_DEVICE_PATH ||
-            Node->DevPath.SubType != ACPI_ADR_DP ||
-            DevicePathNodeLength(&Node->DevPath) < sizeof(ACPI_ADR_DEVICE_PATH)) {
-          Status = EFI_UNSUPPORTED;
+        if (!IsDevicePathEnd (Node)) {
+          //
+          // Verify RemainingDevicePath
+          //
+          if (Node->DevPath.Type != ACPI_DEVICE_PATH ||
+              Node->DevPath.SubType != ACPI_ADR_DP ||
+              DevicePathNodeLength(&Node->DevPath) < sizeof(ACPI_ADR_DEVICE_PATH)) {
+            Status = EFI_UNSUPPORTED;
+          }
         }
       }
     }
@@ -154,11 +173,11 @@ FbGopDriverBindingStart (
 {
   EFI_STATUS                Status;
   EFI_DEVICE_PATH_PROTOCOL  *ParentDevicePath;
-  EFI_PCI_IO_PROTOCOL       *PciIo;  
+  EFI_PCI_IO_PROTOCOL       *PciIo;
   UINT64                    Supports;
 
-  DEBUG ((EFI_D_INFO, "GOP START\n"));
-  
+  DEBUG ((DEBUG_INFO, "GOP START\n"));
+
   //
   // Initialize local variables
   //
@@ -202,7 +221,7 @@ FbGopDriverBindingStart (
                       0,
                       &mOriginalPciAttributes
                       );
-    
+
     if (EFI_ERROR (Status)) {
       goto Done;
     }
@@ -226,8 +245,8 @@ FbGopDriverBindingStart (
   if (Supports == 0 || Supports == (EFI_PCI_IO_ATTRIBUTE_VGA_IO | EFI_PCI_IO_ATTRIBUTE_VGA_IO_16)) {
     Status = EFI_UNSUPPORTED;
     goto Done;
-  }  
-  
+  }
+
   REPORT_STATUS_CODE_WITH_DEVICE_PATH (
     EFI_PROGRESS_CODE,
     EFI_PERIPHERAL_LOCAL_CONSOLE | EFI_P_PC_ENABLE,
@@ -260,7 +279,7 @@ FbGopDriverBindingStart (
       goto Done;
     }
   }
-  
+
   //
   // Create child handle and install GraphicsOutputProtocol on it
   //
@@ -272,10 +291,10 @@ FbGopDriverBindingStart (
              ParentDevicePath,
              RemainingDevicePath
              );
-  
+
 Done:
   if ((EFI_ERROR (Status)) && (Status != EFI_ALREADY_STARTED)) {
-          
+
     REPORT_STATUS_CODE_WITH_DEVICE_PATH (
       EFI_PROGRESS_CODE,
       EFI_PERIPHERAL_LOCAL_CONSOLE | EFI_P_PC_DISABLE,
@@ -358,7 +377,7 @@ FbGopDriverBindingStop (
   }
 
   for (Index = 0; Index < NumberOfChildren; Index++) {
-        
+
     Status = EFI_SUCCESS;
 
     FbGopChildHandleUninstall (This, Controller, ChildHandleBuffer[Index]);
@@ -380,7 +399,7 @@ FbGopDriverBindingStop (
                       (VOID **) &PciIo
                       );
       ASSERT_EFI_ERROR (Status);
-      
+
       //
       // Restore original PCI attributes
       //
@@ -457,7 +476,7 @@ FbGopChildHandleInstall (
       );
     goto Done;
   }
-  
+
   //
   // Initialize the child private structure
   //
@@ -465,16 +484,16 @@ FbGopChildHandleInstall (
 
   //
   // Fill in Graphics Output specific mode structures
-  //  
+  //
   FbGopPrivate->ModeData              = NULL;
-    
+
   FbGopPrivate->VbeFrameBuffer        = NULL;
 
   FbGopPrivate->EdidDiscovered.SizeOfEdid  = 0;
   FbGopPrivate->EdidDiscovered.Edid        = NULL;
   FbGopPrivate->EdidActive.SizeOfEdid      = 0;
   FbGopPrivate->EdidActive.Edid            = NULL;
-  
+
   //
   // Fill in the Graphics Output Protocol
   //
@@ -511,7 +530,7 @@ FbGopChildHandleInstall (
       AcpiDeviceNode.Header.SubType = ACPI_ADR_DP;
       AcpiDeviceNode.ADR = ACPI_DISPLAY_ADR (1, 0, 0, 1, 0, ACPI_ADR_DISPLAY_TYPE_VGA, 0, 0);
       SetDevicePathNodeLength (&AcpiDeviceNode.Header, sizeof (ACPI_ADR_DEVICE_PATH));
-    
+
       FbGopPrivate->GopDevicePath = AppendDevicePathNode (
                                           ParentDevicePath,
                                           (EFI_DEVICE_PATH_PROTOCOL *) &AcpiDeviceNode
@@ -519,7 +538,7 @@ FbGopChildHandleInstall (
     } else {
       FbGopPrivate->GopDevicePath = AppendDevicePathNode (ParentDevicePath, RemainingDevicePath);
     }
-    
+
     //
     // Creat child handle and device path protocol firstly
     //
@@ -534,7 +553,7 @@ FbGopChildHandleInstall (
       goto Done;
     }
   }
-  
+
   //
   // When check for VBE, PCI I/O protocol is needed, so use parent's protocol interface temporally
   //
@@ -544,11 +563,11 @@ FbGopChildHandleInstall (
   // Check for VESA BIOS Extensions for modes that are compatible with Graphics Output
   //
   Status = FbGopCheckForVbe (FbGopPrivate);
-  DEBUG ((EFI_D_INFO, "FbGopCheckForVbe - %r\n", Status));
-  
+  DEBUG ((DEBUG_INFO, "FbGopCheckForVbe - %r\n", Status));
+
   if (EFI_ERROR (Status)) {
     Status = EFI_UNSUPPORTED;
-    //goto Done;    
+    //goto Done;
   }
 
   //
@@ -557,11 +576,11 @@ FbGopChildHandleInstall (
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &FbGopPrivate->Handle,
                   &gEfiGraphicsOutputProtocolGuid,
-                  &FbGopPrivate->GraphicsOutput,  
+                  &FbGopPrivate->GraphicsOutput,
                   &gEfiEdidDiscoveredProtocolGuid,
-                  &FbGopPrivate->EdidDiscovered,                                                    
+                  &FbGopPrivate->EdidDiscovered,
                   &gEfiEdidActiveProtocolGuid,
-                  &FbGopPrivate->EdidActive,                  
+                  &FbGopPrivate->EdidActive,
                   NULL
                   );
 
@@ -581,7 +600,7 @@ FbGopChildHandleInstall (
       goto Done;
     }
   }
-  
+
 Done:
   if (EFI_ERROR (Status)) {
     //
@@ -612,7 +631,7 @@ FbGopChildHandleUninstall (
   )
 {
   EFI_STATUS                    Status;
-  EFI_GRAPHICS_OUTPUT_PROTOCOL *GraphicsOutput;  
+  EFI_GRAPHICS_OUTPUT_PROTOCOL *GraphicsOutput;
   FB_VIDEO_DEV                 *FbGopPrivate;
   EFI_PCI_IO_PROTOCOL          *PciIo;
 
@@ -632,7 +651,7 @@ FbGopChildHandleUninstall (
   if (!EFI_ERROR (Status)) {
       FbGopPrivate = FB_VIDEO_DEV_FROM_GRAPHICS_OUTPUT_THIS (GraphicsOutput);
   }
-  
+
   if (FbGopPrivate == NULL) {
     return EFI_UNSUPPORTED;
   }
@@ -658,7 +677,7 @@ FbGopChildHandleUninstall (
                     &FbGopPrivate->GraphicsOutput,
                     NULL
                     );
- 
+
   if (EFI_ERROR (Status)) {
     gBS->OpenProtocol (
            Controller,
@@ -670,7 +689,7 @@ FbGopChildHandleUninstall (
            );
     return Status;
   }
-  
+
   //
   // Release all allocated resources
   //
@@ -698,20 +717,20 @@ FbGopDeviceReleaseResource (
   //
   // Release all the resources occupied by the FB_VIDEO_DEV
   //
-  
+
   //
   // Free VBE Frame Buffer
   //
   if (FbGopPrivate->VbeFrameBuffer != NULL) {
     FreePool (FbGopPrivate->VbeFrameBuffer);
   }
-  
+
   //
   // Free mode data
   //
   if (FbGopPrivate->ModeData != NULL) {
     FreePool (FbGopPrivate->ModeData);
-  }  
+  }
 
   //
   // Free graphics output protocol occupied resource
@@ -723,7 +742,7 @@ FbGopDeviceReleaseResource (
     }
     FreePool (FbGopPrivate->GraphicsOutput.Mode);
     FbGopPrivate->GraphicsOutput.Mode = NULL;
-  }  
+  }
 
   if (FbGopPrivate->GopDevicePath!= NULL) {
     FreePool (FbGopPrivate->GopDevicePath);
@@ -768,7 +787,7 @@ HasChildHandle (
       HasChild = TRUE;
     }
   }
-  
+
   return HasChild;
 }
 
@@ -785,38 +804,33 @@ FbGopCheckForVbe (
   IN OUT FB_VIDEO_DEV  *FbGopPrivate
   )
 {
-  EFI_STATUS                             Status;  
+  EFI_STATUS                             Status;
   FB_VIDEO_MODE_DATA                     *ModeBuffer;
-  FB_VIDEO_MODE_DATA                     *CurrentModeData;  
-  UINTN                                  ModeNumber;  
-  UINTN                                  BitsPerPixel; 
+  FB_VIDEO_MODE_DATA                     *CurrentModeData;
+  UINTN                                  ModeNumber;
+  UINTN                                  BitsPerPixel;
   UINTN                                  BytesPerScanLine;
   UINT32                                 HorizontalResolution;
   UINT32                                 VerticalResolution;
-  EFI_GRAPHICS_OUTPUT_BLT_PIXEL          *VbeFrameBuffer;  
-  EFI_HOB_GUID_TYPE                      *GuidHob;
-  FRAME_BUFFER_INFO                      *pFbInfo;
-  
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL          *VbeFrameBuffer;
+  FRAME_BUFFER_INFO                      *FbInfo;
+
   Status = EFI_SUCCESS;
-  //
-  // Find the frame buffer information guid hob
-  //
-  GuidHob = GetFirstGuidHob (&gUefiFrameBufferInfoGuid);
-  ASSERT (GuidHob != NULL);
-  pFbInfo = (FRAME_BUFFER_INFO *)GET_GUID_HOB_DATA (GuidHob);
-  
+
+  FbInfo = mFrameBufferInfo;
+
   //
   // Add mode to the list of available modes
   //
   VbeFrameBuffer = NULL;
   ModeBuffer     = NULL;
-  
-  ModeNumber           = 1;  
-  BitsPerPixel         = pFbInfo->BitsPerPixel;
-  HorizontalResolution = pFbInfo->HorizontalResolution;
-  VerticalResolution   = pFbInfo->VerticalResolution;
-  BytesPerScanLine     = pFbInfo->BytesPerScanLine;
-  
+
+  ModeNumber           = 1;
+  BitsPerPixel         = FbInfo->BitsPerPixel;
+  HorizontalResolution = FbInfo->HorizontalResolution;
+  VerticalResolution   = FbInfo->VerticalResolution;
+  BytesPerScanLine     = FbInfo->BytesPerScanLine;
+
   ModeBuffer = (FB_VIDEO_MODE_DATA *) AllocatePool (
 																						ModeNumber * sizeof (FB_VIDEO_MODE_DATA)
 																			);
@@ -833,32 +847,32 @@ FbGopCheckForVbe (
 	  Status = EFI_OUT_OF_RESOURCES;
     goto Done;
   }
-       
+
   if (FbGopPrivate->ModeData != NULL) {
     FreePool (FbGopPrivate->ModeData);
   }
-    
+
   if (FbGopPrivate->VbeFrameBuffer != NULL) {
     FreePool (FbGopPrivate->VbeFrameBuffer);
-  }  
-  
+  }
+
   CurrentModeData = &ModeBuffer[ModeNumber - 1];
   CurrentModeData->BytesPerScanLine = (UINT16)BytesPerScanLine;
-  
-  CurrentModeData->Red      = *(FB_VIDEO_COLOR_PLACEMENT *)&(pFbInfo->Red);  
-  CurrentModeData->Blue     = *(FB_VIDEO_COLOR_PLACEMENT *)&(pFbInfo->Blue);    
-  CurrentModeData->Green    = *(FB_VIDEO_COLOR_PLACEMENT *)&(pFbInfo->Green);    
-  CurrentModeData->Reserved = *(FB_VIDEO_COLOR_PLACEMENT *)&(pFbInfo->Reserved);  
-  
+
+  CurrentModeData->Red      = *(FB_VIDEO_COLOR_PLACEMENT *)&(FbInfo->Red);
+  CurrentModeData->Blue     = *(FB_VIDEO_COLOR_PLACEMENT *)&(FbInfo->Blue);
+  CurrentModeData->Green    = *(FB_VIDEO_COLOR_PLACEMENT *)&(FbInfo->Green);
+  CurrentModeData->Reserved = *(FB_VIDEO_COLOR_PLACEMENT *)&(FbInfo->Reserved);
+
   CurrentModeData->BitsPerPixel    = (UINT32)BitsPerPixel;
   CurrentModeData->HorizontalResolution = HorizontalResolution;
-  CurrentModeData->VerticalResolution   = VerticalResolution;  
-  CurrentModeData->FrameBufferSize = CurrentModeData->BytesPerScanLine * CurrentModeData->VerticalResolution;    
-  CurrentModeData->LinearFrameBuffer = (VOID *) (UINTN) pFbInfo->LinearFrameBuffer;
+  CurrentModeData->VerticalResolution   = VerticalResolution;
+  CurrentModeData->FrameBufferSize = CurrentModeData->BytesPerScanLine * CurrentModeData->VerticalResolution;
+  CurrentModeData->LinearFrameBuffer = (VOID *) (UINTN) FbInfo->LinearFrameBuffer;
   CurrentModeData->VbeModeNumber        = 0;
   CurrentModeData->ColorDepth           = 32;
   CurrentModeData->RefreshRate          = 60;
-  
+
   CurrentModeData->PixelFormat = PixelBitMask;
   if ((CurrentModeData->BitsPerPixel == 32) &&
       (CurrentModeData->Red.Mask == 0xff) && (CurrentModeData->Green.Mask == 0xff) && (CurrentModeData->Blue.Mask == 0xff)) {
@@ -867,47 +881,47 @@ FbGopCheckForVbe (
     } else if ((CurrentModeData->Blue.Position == 0) && (CurrentModeData->Green.Position == 8) && (CurrentModeData->Red.Position == 16)) {
       CurrentModeData->PixelFormat = PixelBlueGreenRedReserved8BitPerColor;
     }
-  }  
-  
-  CopyMem (&(CurrentModeData->PixelBitMask), &mPixelBitMask, sizeof (EFI_PIXEL_BITMASK));    
-          
+  }
+
+  CopyMem (&(CurrentModeData->PixelBitMask), &mPixelBitMask, sizeof (EFI_PIXEL_BITMASK));
+
   FbGopPrivate->ModeData       = ModeBuffer;
   FbGopPrivate->VbeFrameBuffer = VbeFrameBuffer;
-  
+
   //
   // Assign Gop's Blt function
   //
   FbGopPrivate->GraphicsOutput.Blt     = FbGopGraphicsOutputVbeBlt;
-  
+
   FbGopPrivate->GraphicsOutput.Mode->MaxMode = 1;
-  FbGopPrivate->GraphicsOutput.Mode->Mode    = 0;      
+  FbGopPrivate->GraphicsOutput.Mode->Mode    = 0;
   FbGopPrivate->GraphicsOutput.Mode->Info->Version = 0;
   FbGopPrivate->GraphicsOutput.Mode->Info->HorizontalResolution = HorizontalResolution;
-  FbGopPrivate->GraphicsOutput.Mode->Info->VerticalResolution   = VerticalResolution;   
+  FbGopPrivate->GraphicsOutput.Mode->Info->VerticalResolution   = VerticalResolution;
   FbGopPrivate->GraphicsOutput.Mode->Info->PixelFormat = CurrentModeData->PixelFormat;
-  CopyMem (&(FbGopPrivate->GraphicsOutput.Mode->Info->PixelInformation), &mPixelBitMask, sizeof (EFI_PIXEL_BITMASK));  
+  CopyMem (&(FbGopPrivate->GraphicsOutput.Mode->Info->PixelInformation), &mPixelBitMask, sizeof (EFI_PIXEL_BITMASK));
   FbGopPrivate->GraphicsOutput.Mode->Info->PixelsPerScanLine = (UINT32)(BytesPerScanLine * 8 / BitsPerPixel);
   FbGopPrivate->GraphicsOutput.Mode->SizeOfInfo = sizeof(EFI_GRAPHICS_OUTPUT_MODE_INFORMATION);
   FbGopPrivate->GraphicsOutput.Mode->FrameBufferBase = (EFI_PHYSICAL_ADDRESS) (UINTN) CurrentModeData->LinearFrameBuffer;
   FbGopPrivate->GraphicsOutput.Mode->FrameBufferSize =  CurrentModeData->FrameBufferSize;
-  
+
   //
   // Find the best mode to initialize
-  //  
+  //
 
 Done:
   //
   // If there was an error, then free the mode structure
   //
   if (EFI_ERROR (Status)) {
-      
+
     if (VbeFrameBuffer != NULL) {
       FreePool (VbeFrameBuffer);
-    }    
-    
+    }
+
     if (ModeBuffer != NULL) {
       FreePool (ModeBuffer);
-    }    
+    }
   }
 
   return Status;
@@ -992,7 +1006,7 @@ FbGopGraphicsOutputSetMode (
   IN  EFI_GRAPHICS_OUTPUT_PROTOCOL * This,
   IN  UINT32                       ModeNumber
   )
-{  
+{
   FB_VIDEO_DEV          *FbGopPrivate;
   FB_VIDEO_MODE_DATA    *ModeData;
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL Background;
@@ -1008,11 +1022,11 @@ FbGopGraphicsOutputSetMode (
   if (ModeNumber >= This->Mode->MaxMode) {
     return EFI_UNSUPPORTED;
   }
-  
+
   if (ModeNumber == This->Mode->Mode) {
     //
     // Clear screen to black
-    //    
+    //
     ZeroMem (&Background, sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
     FbGopGraphicsOutputVbeBlt (
                         This,
@@ -1030,7 +1044,7 @@ FbGopGraphicsOutputSetMode (
   } else {
     return EFI_UNSUPPORTED;
   }
-  
+
 }
 
 /**
@@ -1493,12 +1507,14 @@ FbGopEntryPoint(
 {
   EFI_STATUS  Status;
   EFI_HOB_GUID_TYPE  *GuidHob;
-  
+
   //
   // Find the frame buffer information guid hob
   //
   GuidHob = GetFirstGuidHob (&gUefiFrameBufferInfoGuid);
-  if (GuidHob != NULL) {   
+  if (GuidHob != NULL) {
+    mFrameBufferInfo = (FRAME_BUFFER_INFO *)GET_GUID_HOB_DATA (GuidHob);
+
     //
     // Install driver model protocol(s).
     //
@@ -1512,9 +1528,9 @@ FbGopEntryPoint(
                );
     ASSERT_EFI_ERROR (Status);
   } else {
-    DEBUG ((EFI_D_ERROR, "No FrameBuffer information from coreboot.  NO GOP driver !!!\n"));
+    DEBUG ((DEBUG_ERROR, "No FrameBuffer information from coreboot.  NO GOP driver !!!\n"));
     Status = EFI_ABORTED;
   }
-  return Status;  
+  return Status;
 }
 
