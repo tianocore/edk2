@@ -35,12 +35,10 @@
 [Sources.IA32]
   Ia32/IntHandlerFuncs.c
   Ia32/IntHandler.nasm
-  Ia32/IntHandler.S
 
 [Sources.X64]
   X64/IntHandlerFuncs.c
   X64/IntHandler.nasm
-  X64/IntHandler.S
 
 [Packages]
   MdePkg/MdePkg.dec
