@@ -1,15 +1,13 @@
 /** @file
   Driver implementing the Tiano Legacy 8259 Protocol
 
-Copyright (c) 2005 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2019, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #ifndef _8259_H__
 #define _8259_H__
-
-#include <FrameworkDxe.h>
 
 #include <Protocol/Legacy8259.h>
 #include <Protocol/PciIo.h>
