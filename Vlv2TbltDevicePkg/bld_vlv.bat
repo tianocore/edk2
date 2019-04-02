@@ -30,7 +30,6 @@ set Arch=X64
 set Source=0
 set CORE_PATH=%WORKSPACE%\edk2
 set PLATFORM_PATH=%WORKSPACE%\edk2
-set PACKAGES_PATH=%WORKSPACE%\silicon;%WORKSPACE%\edk2
 cd ./edk2
 
 :: Clean up previous build files.
