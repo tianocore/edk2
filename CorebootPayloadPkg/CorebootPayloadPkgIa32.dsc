@@ -76,11 +76,6 @@
   #
   DEFINE USE_HPET_TIMER                   = FALSE
 
-  #
-  # Shell options: [BUILD_SHELL, MIN_BIN, NONE, UEFI]
-  #
-  DEFINE SHELL_TYPE              = UEFI_BIN
-
 [BuildOptions]
   *_*_*_CC_FLAGS                 = -D DISABLE_NEW_DEPRECATED_INTERFACES
   GCC:*_UNIXGCC_*_CC_FLAGS       = -DMDEPKG_NDEBUG
@@ -516,8 +511,6 @@
   #  Build the shell
   #------------------------------
 
-!if $(SHELL_TYPE) == BUILD_SHELL
-
   #
   # Shell Lib
   #
@@ -579,5 +572,3 @@
       ShellCommandLib|ShellPkg/Library/UefiShellCommandLib/UefiShellCommandLib.inf
       SortLib|MdeModulePkg/Library/UefiSortLib/UefiSortLib.inf
   }
-
-!endif
