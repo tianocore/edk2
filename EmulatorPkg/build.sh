@@ -227,7 +227,7 @@ if [[ "$RUN_EMULATOR" == "yes" ]]; then
       ;;
   esac
 
-  /usr/bin/gdb $BUILD_ROOT_ARCH/Host -q -cd=$BUILD_ROOT_ARCH -x $WORKSPACE/EmulatorPkg/Unix/GdbRun
+  /usr/bin/gdb $BUILD_ROOT_ARCH/Host -q -cd=$BUILD_ROOT_ARCH -x $WORKSPACE/EmulatorPkg/Unix/GdbRun.sh
   exit
 fi
 

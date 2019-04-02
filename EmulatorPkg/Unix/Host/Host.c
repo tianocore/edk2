@@ -113,7 +113,7 @@ main (
 
   //
   // Xcode does not support sourcing gdb scripts directly, so the Xcode XML
-  // has a break point script to source the GdbRun script.
+  // has a break point script to source the GdbRun.sh script.
   //
   SecGdbConfigBreak ();
 
