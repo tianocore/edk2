@@ -6,14 +6,7 @@
 @REM Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 @REM (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 @REM
-@REM This program and the accompanying materials are licensed and made available
-@REM under the terms and conditions of the BSD License which accompanies this
-@REM distribution.  The full text of the license may be found at:
-@REM   http://opensource.org/licenses/bsd-license.php
-@REM
-@REM THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-@REM WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR
-@REM IMPLIED.
+@REM SPDX-License-Identifier: BSD-2-Clause-Patent
 @REM
 
 @echo off
