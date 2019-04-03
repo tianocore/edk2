@@ -314,6 +314,9 @@ class DscBuildData(PlatformBuildClassObject):
     @property
     def Arch(self):
         return self._Arch
+    @property
+    def Dir(self):
+        return self.MetaFile.Dir
 
     ## Retrieve all information in [Defines] section
     #

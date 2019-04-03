@@ -710,7 +710,7 @@ cleanlib:
             for index, Str in enumerate(FfsCmdList):
                 if '-o' == Str:
                     OutputFile = FfsCmdList[index + 1]
-                if '-i' == Str:
+                if '-i' == Str or "-oi" == Str:
                     if DepsFileList == []:
                         DepsFileList = [FfsCmdList[index + 1]]
                     else:

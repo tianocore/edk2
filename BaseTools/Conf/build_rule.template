@@ -353,11 +353,11 @@
         ?.dll
 
     <OutputFile>
-        $(DEBUG_DIR)(+)$(MODULE_NAME).efi
+        $(OUTPUT_DIR)(+)$(MODULE_NAME).efi
 
     <Command.MSFT, Command.INTEL, Command.RVCT>
         "$(GENFW)" -e $(MODULE_TYPE) -o ${dst} ${src} $(GENFW_FLAGS)
-        $(CP) ${dst} $(OUTPUT_DIR)
+        $(CP) ${dst} $(DEBUG_DIR)
         $(CP) ${dst} $(BIN_DIR)(+)$(MODULE_NAME_GUID).efi
         -$(CP) $(DEBUG_DIR)(+)*.map $(OUTPUT_DIR)
         -$(CP) $(DEBUG_DIR)(+)*.pdb $(OUTPUT_DIR) 
@@ -372,7 +372,7 @@
         -$(CP) $(DEBUG_DIR)(+)$(MODULE_NAME).debug $(BIN_DIR)(+)$(MODULE_NAME_GUID).debug
 
         "$(GENFW)" -e $(MODULE_TYPE) -o ${dst} ${src} $(GENFW_FLAGS)
-        $(CP) ${dst} $(OUTPUT_DIR)
+        $(CP) ${dst} $(DEBUG_DIR)
         $(CP) ${dst} $(BIN_DIR)(+)$(MODULE_NAME_GUID).efi
         -$(CP) $(DEBUG_DIR)(+)*.map $(OUTPUT_DIR)
         
@@ -382,7 +382,7 @@
         # create symbol file for GDB debug
         -$(DSYMUTIL) ${src}
         "$(GENFW)" -e $(MODULE_TYPE) -o ${dst} $(DEBUG_DIR)(+)$(MODULE_NAME).pecoff $(GENFW_FLAGS)
-        $(CP) ${dst} $(OUTPUT_DIR)
+        $(CP) ${dst} $(DEBUG_DIR)
         $(CP) ${dst} $(BIN_DIR)(+)$(MODULE_NAME_GUID).efi
         -$(CP) $(DEBUG_DIR)(+)*.map $(OUTPUT_DIR)
 

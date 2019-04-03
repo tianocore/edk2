@@ -1663,7 +1663,7 @@ class Build():
                 # Add ffs build to makefile
                 CmdListDict = {}
                 if GlobalData.gEnableGenfdsMultiThread and self.Fdf:
-                    CmdListDict = self._GenFfsCmd()
+                    CmdListDict = self._GenFfsCmd(Wa.ArchList)
 
                 for Arch in Wa.ArchList:
                     GlobalData.gGlobalDefines['ARCH'] = Arch
@@ -1756,7 +1756,7 @@ class Build():
                 # Add ffs build to makefile
                 CmdListDict = None
                 if GlobalData.gEnableGenfdsMultiThread and self.Fdf:
-                    CmdListDict = self._GenFfsCmd()
+                    CmdListDict = self._GenFfsCmd(Wa.ArchList)
                 self.Progress.Stop("done!")
                 MaList = []
                 ExitFlag = threading.Event()
@@ -1875,11 +1875,11 @@ class Build():
                     #
                     self._SaveMapFile (MapBuffer, Wa)
 
-    def _GenFfsCmd(self):
+    def _GenFfsCmd(self,ArchList):
         # convert dictionary of Cmd:(Inf,Arch)
         # to a new dictionary of (Inf,Arch):Cmd,Cmd,Cmd...
         CmdSetDict = defaultdict(set)
-        GenFfsDict = GenFds.GenFfsMakefile('', GlobalData.gFdfParser, self, self.ArchList, GlobalData)
+        GenFfsDict = GenFds.GenFfsMakefile('', GlobalData.gFdfParser, self, ArchList, GlobalData)
         for Cmd in GenFfsDict:
             tmpInf, tmpArch = GenFfsDict[Cmd]
             CmdSetDict[tmpInf, tmpArch].add(Cmd)
@@ -1923,7 +1923,7 @@ class Build():
                 # Add ffs build to makefile
                 CmdListDict = None
                 if GlobalData.gEnableGenfdsMultiThread and self.Fdf:
-                    CmdListDict = self._GenFfsCmd()
+                    CmdListDict = self._GenFfsCmd(Wa.ArchList)
 
                 # multi-thread exit flag
                 ExitFlag = threading.Event()

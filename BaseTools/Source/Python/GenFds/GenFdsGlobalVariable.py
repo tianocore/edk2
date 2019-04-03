@@ -29,6 +29,7 @@ import Common.DataType as DataType
 from Common.Misc import PathClass
 from Common.LongFilePathSupport import OpenLongFilePath as open
 from Common.MultipleWorkspace import MultipleWorkspace as mws
+import Common.GlobalData as GlobalData
 
 ## Global variables
 #
@@ -495,6 +496,10 @@ class GenFdsGlobalVariable:
 
             SaveFileOnChange(CommandFile, ' '.join(Cmd), False)
             if IsMakefile:
+                if GlobalData.gGlobalDefines.get("FAMILY") == "MSFT":
+                    Cmd = ['if', 'exist', Input[0]] + Cmd
+                else:
+                    Cmd = ['test', '-e', Input[0], "&&"] + Cmd
                 if ' '.join(Cmd).strip() not in GenFdsGlobalVariable.SecCmdList:
                     GenFdsGlobalVariable.SecCmdList.append(' '.join(Cmd).strip())
             elif GenFdsGlobalVariable.NeedsUpdate(Output, list(Input) + [CommandFile]):
@@ -536,7 +541,10 @@ class GenFdsGlobalVariable:
 
         Cmd += ("-o", Output)
         for I in range(0, len(Input)):
-            Cmd += ("-i", Input[I])
+            if MakefilePath:
+                Cmd += ("-oi", Input[I])
+            else:
+                Cmd += ("-i", Input[I])
             if SectionAlign and SectionAlign[I]:
                 Cmd += ("-n", SectionAlign[I])
 

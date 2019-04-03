@@ -13,6 +13,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <sys/stat.h>
 #endif
 
+#ifdef __GNUC__
+#include <unistd.h>
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -154,6 +158,8 @@ Returns:
                         128K,256K,512K,1M,2M,4M,8M,16M\n");
   fprintf (stdout, "  -i SectionFile, --sectionfile SectionFile\n\
                         Section file will be contained in this FFS file.\n");
+  fprintf (stdout, "  -oi SectionFile, --optionalsectionfile SectionFile\n\
+                        If the Section file exists, it will be contained in this FFS file, otherwise, it will be ignored.\n");
   fprintf (stdout, "  -n SectionAlign, --sectionalign SectionAlign\n\
                         SectionAlign points to section alignment, which support\n\
                         the alignment scope 0~16M. If SectionAlign is specified\n\
@@ -730,7 +736,7 @@ Returns:
       continue;
     }
 
-    if ((stricmp (argv[0], "-i") == 0) || (stricmp (argv[0], "--sectionfile") == 0)) {
+    if ((stricmp (argv[0], "-oi") == 0) || (stricmp (argv[0], "--optionalsectionfile") == 0) || (stricmp (argv[0], "-i") == 0) || (stricmp (argv[0], "--sectionfile") == 0)) {
       //
       // Get Input file name and its alignment
       //
@@ -738,7 +744,14 @@ Returns:
         Error (NULL, 0, 1003, "Invalid option value", "input section file is missing for -i option");
         goto Finish;
       }
-
+      if ((stricmp (argv[0], "-oi") == 0) || (stricmp (argv[0], "--optionalsectionfile") == 0) ){
+        if (-1 == access(argv[1] , 0)){
+          Warning(NULL, 0, 0001, "File is not found.", argv[1]);
+          argc -= 2;
+          argv += 2;
+          continue;
+        }
+      }
       //
       // Allocate Input file name buffer and its alignment buffer.
       //
