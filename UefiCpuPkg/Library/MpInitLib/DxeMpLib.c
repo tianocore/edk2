@@ -76,7 +76,7 @@ SaveCpuMpData (
 }
 
 /**
-  Get available system memory below 1MB by specified size.
+  Get available system memory below 0x88000 by specified size.
 
   @param[in] WakeupBufferSize   Wakeup buffer size required
 
@@ -91,7 +91,15 @@ GetWakeupBuffer (
   EFI_STATUS              Status;
   EFI_PHYSICAL_ADDRESS    StartAddress;
 
-  StartAddress = BASE_1MB;
+  //
+  // Try to allocate buffer below 1M for waking vector.
+  // LegacyBios driver only reports warning when page allocation in range
+  // [0x60000, 0x88000) fails.
+  // This library is consumed by CpuDxe driver to produce CPU Arch protocol.
+  // LagacyBios driver depends on CPU Arch protocol which guarantees below
+  // allocation runs earlier than LegacyBios driver.
+  //
+  StartAddress = 0x88000;
   Status = gBS->AllocatePages (
                   AllocateMaxAddress,
                   EfiBootServicesData,
@@ -99,17 +107,13 @@ GetWakeupBuffer (
                   &StartAddress
                   );
   ASSERT_EFI_ERROR (Status);
-  if (!EFI_ERROR (Status)) {
-    Status = gBS->FreePages(
-               StartAddress,
-               EFI_SIZE_TO_PAGES (WakeupBufferSize)
-               );
-    ASSERT_EFI_ERROR (Status);
-    DEBUG ((DEBUG_INFO, "WakeupBufferStart = %x, WakeupBufferSize = %x\n",
-                        (UINTN) StartAddress, WakeupBufferSize));
-  } else {
+  if (EFI_ERROR (Status)) {
     StartAddress = (EFI_PHYSICAL_ADDRESS) -1;
   }
+
+  DEBUG ((DEBUG_INFO, "WakeupBufferStart = %x, WakeupBufferSize = %x\n",
+                      (UINTN) StartAddress, WakeupBufferSize));
+
   return (UINTN) StartAddress;
 }
 
