@@ -1769,7 +1769,8 @@ class Build():
                     for Module in Pa.Platform.Modules:
                         if self.ModuleFile.Dir == Module.Dir and self.ModuleFile.Name == Module.Name:
                             Ma = ModuleAutoGen(Wa, Module, BuildTarget, ToolChain, Arch, self.PlatformFile)
-                            if Ma is None: continue
+                            if Ma is None:
+                                continue
                             MaList.append(Ma)
                             if Ma.CanSkipbyHash():
                                 self.HashSkipModules.append(Ma)
@@ -2143,10 +2144,21 @@ class Build():
             RemoveDirectory(os.path.dirname(GlobalData.gDatabasePath), True)
 
     def CreateAsBuiltInf(self):
+        all_lib_set = set()
+        all_mod_set = set()
         for Module in self.BuildModules:
             Module.CreateAsBuiltInf()
+            all_mod_set.add(Module)
         for Module in self.HashSkipModules:
             Module.CreateAsBuiltInf(True)
+            all_mod_set.add(Module)
+        for Module in all_mod_set:
+            for lib in Module.LibraryAutoGenList:
+                all_lib_set.add(lib)
+        for lib in all_lib_set:
+            lib.CreateAsBuiltInf(True)
+        all_lib_set.clear()
+        all_mod_set.clear()
         self.BuildModules = []
         self.HashSkipModules = []
     ## Do some clean-up works when error occurred
