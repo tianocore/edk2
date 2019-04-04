@@ -3900,9 +3900,11 @@ class ModuleAutoGen(AutoGen):
         FileDir = path.join(GlobalData.gBinCacheDest, self.Arch, self.SourceDir, self.MetaFile.BaseName)
         CreateDirectory (FileDir)
         HashFile = path.join(self.BuildDir, self.Name + '.hash')
-        ModuleFile = path.join(self.OutputDir, self.Name + '.inf')
         if os.path.exists(HashFile):
             shutil.copy2(HashFile, FileDir)
+        if self.IsLibrary:
+            return
+        ModuleFile = path.join(self.OutputDir, self.Name + '.inf')
         if os.path.exists(ModuleFile):
             shutil.copy2(ModuleFile, FileDir)
         if not self.OutputFile:
@@ -3914,7 +3916,11 @@ class ModuleAutoGen(AutoGen):
                 if not os.path.isabs(File):
                     File = os.path.join(self.OutputDir, File)
                 if os.path.exists(File):
-                    shutil.copy2(File, FileDir)
+                    sub_dir = os.path.relpath(File, self.OutputDir)
+                    destination_file = os.path.join(FileDir, sub_dir)
+                    destination_dir = os.path.dirname(destination_file)
+                    CreateDirectory(destination_dir)
+                    shutil.copy2(File, destination_dir)
 
     def AttemptModuleCacheCopy(self):
         # If library or Module is binary do not skip by hash
@@ -3938,7 +3944,11 @@ class ModuleAutoGen(AutoGen):
                                 shutil.copy2(HashFile, self.BuildDir)
                             else:
                                 File = path.join(root, f)
-                                shutil.copy2(File, self.OutputDir)
+                                sub_dir = os.path.relpath(File, FileDir)
+                                destination_file = os.path.join(self.OutputDir, sub_dir)
+                                destination_dir = os.path.dirname(destination_file)
+                                CreateDirectory(destination_dir)
+                                shutil.copy2(File, destination_dir)
                     if self.Name == "PcdPeim" or self.Name == "PcdDxe":
                         CreatePcdDatabaseCode(self, TemplateString(), TemplateString())
                     return True
