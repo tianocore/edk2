@@ -1704,9 +1704,9 @@ LegacyBiosBuildE820 (
 
   do {
     //
-    // Use size returned back plus 1 descriptor for the AllocatePool.
+    // Use size returned for the AllocatePool.
     // We don't just multiply by 2 since the "for" loop below terminates on
-    // EfiMemoryMapEnd which is dependent upon EfiMemoryMapSize. Otherwize
+    // EfiMemoryMapEnd which is dependent upon EfiMemoryMapSize. Otherwise
     // we process bogus entries and create bogus E820 entries.
     //
     EfiMemoryMap = (EFI_MEMORY_DESCRIPTOR *) AllocatePool (EfiMemoryMapSize);
@@ -1794,7 +1794,7 @@ LegacyBiosBuildE820 (
     MemoryBlockLength = (UINT64) (LShiftU64 (EfiEntry->NumberOfPages, 12));
     if ((EfiEntry->PhysicalStart + MemoryBlockLength) < 0x100000) {
       //
-      // Skip the memory block is under 1MB
+      // Skip the memory block if under 1MB
       //
     } else {
       if (EfiEntry->PhysicalStart < 0x100000) {
@@ -1919,7 +1919,7 @@ LegacyBiosBuildE820 (
   *Size = (UINTN) (Index * sizeof (EFI_E820_ENTRY64));
 
   //
-  // Determine OS usable memory above 1Mb
+  // Determine OS usable memory above 1MB
   //
   Private->IntThunk->EfiToLegacy16BootTable.OsMemoryAbove1Mb = 0x0000;
   for (TempIndex = Above1MIndex; TempIndex < Index; TempIndex++) {
@@ -1941,7 +1941,7 @@ LegacyBiosBuildE820 (
   // Print DEBUG information
   //
   for (TempIndex = 0; TempIndex < Index; TempIndex++) {
-    DEBUG((EFI_D_INFO, "E820[%2d]: 0x%16lx ---- 0x%16lx, Type = 0x%x \n",
+    DEBUG((EFI_D_INFO, "E820[%2d]: 0x%016lx - 0x%016lx, Type = %d\n",
       TempIndex,
       E820Table[TempIndex].BaseAddr,
       (E820Table[TempIndex].BaseAddr + E820Table[TempIndex].Length),
