@@ -655,7 +655,7 @@ class WorkspaceAutoGen(AutoGen):
             #
             # Generate Package level hash value
             #
-            GlobalData.gPackageHash[Arch] = {}
+            GlobalData.gPackageHash = {}
             if GlobalData.gUseHashCache:
                 for Pkg in Pkgs:
                     self._GenPkgLevelHash(Pkg)
@@ -741,7 +741,7 @@ class WorkspaceAutoGen(AutoGen):
         return True
 
     def _GenPkgLevelHash(self, Pkg):
-        if Pkg.PackageName in GlobalData.gPackageHash[Pkg.Arch]:
+        if Pkg.PackageName in GlobalData.gPackageHash:
             return
 
         PkgDir = os.path.join(self.BuildDir, Pkg.Arch, Pkg.PackageName)
@@ -764,7 +764,7 @@ class WorkspaceAutoGen(AutoGen):
                         f.close()
                         m.update(Content)
         SaveFileOnChange(HashFile, m.hexdigest(), False)
-        GlobalData.gPackageHash[Pkg.Arch][Pkg.PackageName] = m.hexdigest()
+        GlobalData.gPackageHash[Pkg.PackageName] = m.hexdigest()
 
     def _GetMetaFiles(self, Target, Toolchain, Arch):
         AllWorkSpaceMetaFiles = set()
@@ -4086,14 +4086,16 @@ class ModuleAutoGen(AutoGen):
     def GenModuleHash(self):
         if self.Arch not in GlobalData.gModuleHash:
             GlobalData.gModuleHash[self.Arch] = {}
+        if self.Name in GlobalData.gModuleHash[self.Arch] and GlobalData.gBinCacheSource and self.AttemptModuleCacheCopy():
+            return False
         m = hashlib.md5()
         # Add Platform level hash
         m.update(GlobalData.gPlatformHash.encode('utf-8'))
         # Add Package level hash
         if self.DependentPackageList:
             for Pkg in sorted(self.DependentPackageList, key=lambda x: x.PackageName):
-                if Pkg.PackageName in GlobalData.gPackageHash[self.Arch]:
-                    m.update(GlobalData.gPackageHash[self.Arch][Pkg.PackageName].encode('utf-8'))
+                if Pkg.PackageName in GlobalData.gPackageHash:
+                    m.update(GlobalData.gPackageHash[Pkg.PackageName].encode('utf-8'))
 
         # Add Library hash
         if self.LibraryAutoGenList:
@@ -4118,9 +4120,8 @@ class ModuleAutoGen(AutoGen):
         ModuleHashFile = path.join(self.BuildDir, self.Name + ".hash")
         if self.Name not in GlobalData.gModuleHash[self.Arch]:
             GlobalData.gModuleHash[self.Arch][self.Name] = m.hexdigest()
-        if GlobalData.gBinCacheSource:
-            if self.AttemptModuleCacheCopy():
-                return False
+        if GlobalData.gBinCacheSource and self.AttemptModuleCacheCopy():
+            return False
         return SaveFileOnChange(ModuleHashFile, m.hexdigest(), False)
 
     ## Decide whether we can skip the ModuleAutoGen process
