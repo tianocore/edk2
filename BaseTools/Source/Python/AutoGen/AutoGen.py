@@ -3917,8 +3917,13 @@ class ModuleAutoGen(AutoGen):
                     shutil.copy2(File, FileDir)
 
     def AttemptModuleCacheCopy(self):
+        # If library or Module is binary do not skip by hash
         if self.IsBinaryModule:
             return False
+        # .inc is contains binary information so do not skip by hash as well
+        for f_ext in self.SourceFileList:
+            if '.inc' in str(f_ext):
+                return False
         FileDir = path.join(GlobalData.gBinCacheSource, self.Arch, self.SourceDir, self.MetaFile.BaseName)
         HashFile = path.join(FileDir, self.Name + '.hash')
         if os.path.exists(HashFile):
@@ -4120,7 +4125,16 @@ class ModuleAutoGen(AutoGen):
 
     ## Decide whether we can skip the ModuleAutoGen process
     def CanSkipbyHash(self):
+        # If library or Module is binary do not skip by hash
+        if self.IsBinaryModule:
+            return False
+        # .inc is contains binary information so do not skip by hash as well
+        for f_ext in self.SourceFileList:
+            if '.inc' in str(f_ext):
+                return False
         if GlobalData.gUseHashCache:
+            # If there is a valid hash or function generated a valid hash; function will return False
+            # and the statement below will return True
             return not self.GenModuleHash()
         return False
 
