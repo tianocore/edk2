@@ -1,7 +1,7 @@
 /** @file
   UEFI Application to display CPUID leaf information.
 
-  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2019, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -1394,26 +1394,26 @@ CpuidV2ExtendedTopologyEnumeration (
   VOID
   )
 {
-  CPUID_V2_EXTENDED_TOPOLOGY_ENUMERATION_EAX  Eax;
-  CPUID_V2_EXTENDED_TOPOLOGY_ENUMERATION_EBX  Ebx;
-  CPUID_V2_EXTENDED_TOPOLOGY_ENUMERATION_ECX  Ecx;
-  UINT32                                      Edx;
+  CPUID_EXTENDED_TOPOLOGY_EAX  Eax;
+  CPUID_EXTENDED_TOPOLOGY_EBX  Ebx;
+  CPUID_EXTENDED_TOPOLOGY_ECX  Ecx;
+  UINT32                       Edx;
 
-  if (CPUID_V2_EXTENDED_TOPOLOGY_ENUMERATION > gMaximumBasicFunction) {
+  if (CPUID_V2_EXTENDED_TOPOLOGY > gMaximumBasicFunction) {
     return;
   }
 
   AsmCpuidEx (
-    CPUID_V2_EXTENDED_TOPOLOGY_ENUMERATION,
-    CPUID_V2_EXTENDED_TOPOLOGY_ENUMERATION_MAIN_LEAF,
+    CPUID_V2_EXTENDED_TOPOLOGY,
+    0,
     &Eax.Uint32, &Ebx.Uint32, &Ecx.Uint32, &Edx
     );
-  Print (L"CPUID_V2_EXTENDED_TOPOLOGY_ENUMERATION (Leaf %08x, Sub-Leaf %08x)\n", CPUID_V2_EXTENDED_TOPOLOGY_ENUMERATION, CPUID_V2_EXTENDED_TOPOLOGY_ENUMERATION_MAIN_LEAF);
+  Print (L"CPUID_V2_EXTENDED_TOPOLOGY (Leaf %08x, Sub-Leaf %08x)\n", CPUID_V2_EXTENDED_TOPOLOGY, 0);
   Print (L"  EAX:%08x  EBX:%08x  ECX:%08x  EDX:%08x\n", Eax.Uint32, Ebx.Uint32, Ecx.Uint32, Edx);
 
-  PRINT_BIT_FIELD (Eax, BitsNum);
-  PRINT_BIT_FIELD (Ebx, ProcessorsNum);
-  PRINT_BIT_FIELD (Ecx, LevelNum);
+  PRINT_BIT_FIELD (Eax, ApicIdShift);
+  PRINT_BIT_FIELD (Ebx, LogicalProcessors);
+  PRINT_BIT_FIELD (Ecx, LevelNumber);
   PRINT_BIT_FIELD (Ecx, LevelType);
   PRINT_VALUE     (Edx, x2APICID);
 }
