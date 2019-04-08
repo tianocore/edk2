@@ -3,7 +3,9 @@
 #
 #  Debug Lib that sends messages to EFI_DEBUGPORT_PROTOCOL.Write.
 #
-#  Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2018, Microsoft Corporation
+#
+#  Copyright (c) 2015 - 2019, Intel Corporation. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -17,8 +19,9 @@
   FILE_GUID                      = 102287b4-6b12-4D41-91e1-ebee1f3aa614
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = DebugLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
+  LIBRARY_CLASS                  = DebugLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_APPLICATION UEFI_DRIVER
 
+  CONSTRUCTOR                    = DxeDebugLibConstructor
 
 #
 #  VALID_ARCHITECTURES           = IA32 X64 EBC
@@ -27,6 +30,7 @@
 
 [Sources]
   DebugLib.c
+  DebugLibConstructor.c
 
 
 
@@ -39,8 +43,10 @@
   BaseLib
   PcdLib
   PrintLib
-  UefiBootServicesTableLib
   DebugPrintErrorLevelLib
+
+[Guids]
+  gEfiEventExitBootServicesGuid                 ## CONSUMES
 
 [Protocols]
   gEfiDebugPortProtocolGuid                     ## CONSUMES
