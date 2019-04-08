@@ -1506,8 +1506,11 @@ typedef union {
     /// [Bits 14] AVX512_VPOPCNTDQ. (Intel Xeon Phi only.).
     ///
     UINT32  AVX512_VPOPCNTDQ:1;
-    UINT32  Reserved6:2;
-
+    UINT32  Reserved7:1;
+    ///
+    /// [Bits 16] Supports 5-level paging if 1.
+    ///
+    UINT32  FiveLevelPage:1;
     ///
     /// [Bits 21:17] The value of MAWAU used by the BNDLDX and BNDSTX instructions
     /// in 64-bit mode.
