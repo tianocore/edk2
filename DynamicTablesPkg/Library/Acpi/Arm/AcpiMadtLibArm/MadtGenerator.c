@@ -140,28 +140,96 @@ AddGICC (
   Gicc->Reserved2[2] = EFI_ACPI_RESERVED_BYTE;
 }
 
+/**
+  Function to test if two GIC CPU Interface information structures have the
+  same ACPI Processor UID.
+
+  @param [in]  GicCInfo1          Pointer to the first GICC info structure.
+  @param [in]  GicCInfo2          Pointer to the second GICC info structure.
+  @param [in]  Index1             Index of GicCInfo1 in the shared list of GIC
+                                  CPU Interface Info structures.
+  @param [in]  Index2             Index of GicCInfo2 in the shared list of GIC
+                                  CPU Interface Info structures.
+
+  @retval TRUE                    GicCInfo1 and GicCInfo2 have the same UID.
+  @retval FALSE                   GicCInfo1 and GicCInfo2 have different UIDs.
+**/
+BOOLEAN
+EFIAPI
+IsAcpiUidEqual (
+  IN  CONST VOID          * GicCInfo1,
+  IN  CONST VOID          * GicCInfo2,
+  IN        UINTN           Index1,
+  IN        UINTN           Index2
+  )
+{
+  UINT32      Uid1;
+  UINT32      Uid2;
+
+  ASSERT ((GicCInfo1 != NULL) && (GicCInfo2 != NULL));
+
+  Uid1 = ((CM_ARM_GICC_INFO*)GicCInfo1)->AcpiProcessorUid;
+  Uid2 = ((CM_ARM_GICC_INFO*)GicCInfo2)->AcpiProcessorUid;
+
+  if (Uid1 == Uid2) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "ERROR: MADT: GICC Info Structures %d and %d have the same ACPI " \
+      "Processor UID: 0x%x.\n",
+      Index1,
+      Index2,
+      Uid1
+      ));
+    return TRUE;
+  }
+
+  return FALSE;
+}
+
 /** Add the GIC CPU Interface Information to the MADT Table.
 
-  @param [in]  Gicc      Pointer to GIC CPU Interface
-                         structure list.
-  @param [in]  GicCInfo  Pointer to the GIC CPU
-                         Information list.
-  @param [in]  GicCCount Count of GIC CPU Interfaces.
+  This function also checks for duplicate ACPI Processor UIDs.
+
+  @param [in]  Gicc                 Pointer to GIC CPU Interface structure list.
+  @param [in]  GicCInfo             Pointer to the GIC CPU Information list.
+  @param [in]  GicCCount            Count of GIC CPU Interfaces.
+
+  @retval EFI_SUCCESS               GIC CPU Interface Information was added
+                                    successfully.
+  @retval EFI_INVALID_PARAMETER     One or more invalid GIC CPU Info values were
+                                    provided and the generator failed to add the
+                                    information to the table.
 **/
 STATIC
-VOID
+EFI_STATUS
 AddGICCList (
   IN  EFI_ACPI_6_2_GIC_STRUCTURE  * Gicc,
   IN  CONST CM_ARM_GICC_INFO      * GicCInfo,
   IN        UINT32                  GicCCount
   )
 {
+  BOOLEAN   IsAcpiProcUidDuplicated;
+
   ASSERT (Gicc != NULL);
   ASSERT (GicCInfo != NULL);
+
+  IsAcpiProcUidDuplicated = FindDuplicateValue (
+                              GicCInfo,
+                              GicCCount,
+                              sizeof (CM_ARM_GICC_INFO),
+                              IsAcpiUidEqual
+                              );
+  // Duplicate ACPI Processor UID was found so the GICC info provided
+  // is invalid
+  if (IsAcpiProcUidDuplicated) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   while (GicCCount-- != 0) {
     AddGICC (Gicc++, GicCInfo++);
   }
+
+  return EFI_SUCCESS;
 }
 
 /** Update the GIC Distributor Information in the MADT Table.
@@ -577,11 +645,19 @@ BuildMadtTable (
     goto error_handler;
   }
 
-  AddGICCList (
+  Status = AddGICCList (
     (EFI_ACPI_6_2_GIC_STRUCTURE*)((UINT8*)Madt + GicCOffset),
     GicCInfo,
     GicCCount
     );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "ERROR: MADT: Failed to add GICC structures. Status = %r\n",
+      Status
+      ));
+    goto error_handler;
+  }
 
   AddGICD (
     (EFI_ACPI_6_2_GIC_DISTRIBUTOR_STRUCTURE*)((UINT8*)Madt + GicDOffset),
