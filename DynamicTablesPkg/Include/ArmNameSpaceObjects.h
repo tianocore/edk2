@@ -155,6 +155,13 @@ typedef struct CmArmGicCInfo {
       ACPI Specification.
   */
   UINT8   ProcessorPowerEfficiencyClass;
+
+  /** Statistical Profiling Extension buffer overflow GSIV. Zero if
+      unsupported by this processor. This field was introduced in
+      ACPI 6.3 (MADT revision 5) and is therefore ignored when
+      generating MADT revision 4 or lower.
+  */
+  UINT16  SpeOverflowInterrupt;
 } CM_ARM_GICC_INFO;
 
 /** A structure that describes the
