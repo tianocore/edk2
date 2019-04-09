@@ -13,6 +13,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // Module specific include files.
 #include <AcpiTableGenerator.h>
 #include <ConfigurationManagerObject.h>
+#include <Library/TableHelperLib.h>
 #include <Protocol/ConfigurationManagerProtocol.h>
 
 /** The GetCgfMgrInfo function gets the CM_STD_OBJ_CONFIGURATION_MANAGER_INFO
@@ -179,4 +180,67 @@ AddAcpiHeader (
 
 error_handler:
   return Status;
+}
+
+/**
+  Test and report if a duplicate entry exists in the given array of comparable
+  elements.
+
+  @param [in] Array                 Array of elements to test for duplicates.
+  @param [in] Count                 Number of elements in Array.
+  @param [in] ElementSize           Size of an element in bytes
+  @param [in] EqualTestFunction     The function to call to check if any two
+                                    elements are equal.
+
+  @retval TRUE                      A duplicate element was found or one of
+                                    the input arguments is invalid.
+  @retval FALSE                     Every element in Array is unique.
+**/
+BOOLEAN
+EFIAPI
+FindDuplicateValue (
+  IN  CONST VOID          * Array,
+  IN  CONST UINTN           Count,
+  IN  CONST UINTN           ElementSize,
+  IN        PFN_IS_EQUAL    EqualTestFunction
+  )
+{
+  UINTN         Index1;
+  UINTN         Index2;
+  UINT8       * Element1;
+  UINT8       * Element2;
+
+  if (Array == NULL) {
+    DEBUG ((DEBUG_ERROR, "ERROR: FindDuplicateValues: Array is NULL.\n"));
+    return TRUE;
+  }
+
+  if (ElementSize == 0) {
+    DEBUG ((DEBUG_ERROR, "ERROR: FindDuplicateValues: ElementSize is 0.\n"));
+    return TRUE;
+  }
+
+  if (EqualTestFunction == NULL) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "ERROR: FindDuplicateValues: EqualTestFunction is NULL.\n"
+      ));
+    return TRUE;
+  }
+
+  if (Count < 2) {
+    return FALSE;
+  }
+
+  for (Index1 = 0; Index1 < Count - 1; Index1++) {
+    for (Index2 = Index1 + 1; Index2 < Count; Index2++) {
+      Element1 = (UINT8*)Array + (Index1 * ElementSize);
+      Element2 = (UINT8*)Array + (Index2 * ElementSize);
+
+      if (EqualTestFunction (Element1, Element2, Index1, Index2)) {
+        return TRUE;
+      }
+    }
+  }
+  return FALSE;
 }

@@ -4,6 +4,9 @@
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
+  @par Glossary:
+    - PFN   - Pointer to a Function
+
 **/
 
 #ifndef TABLE_HELPER_LIB_H_
@@ -57,6 +60,51 @@ AddAcpiHeader (
   IN OUT  EFI_ACPI_DESCRIPTION_HEADER                 * CONST AcpiHeader,
   IN      CONST CM_STD_OBJ_ACPI_TABLE_INFO            * CONST AcpiTableInfo,
   IN      CONST UINT32                                        Length
+  );
+
+/**
+  Function prototype for testing if two arbitrary objects are equal.
+
+  @param [in] Object1           Pointer to the first object to compare.
+  @param [in] Object2           Pointer to the second object to compare.
+  @param [in] Index1            Index of Object1. This value is optional and
+                                can be ignored by the specified implementation.
+  @param [in] Index2            Index of Object2. This value is optional and
+                                can be ignored by the specified implementation.
+
+  @retval TRUE                  Object1 and Object2 are equal.
+  @retval FALSE                 Object1 and Object2 are NOT equal.
+**/
+typedef
+BOOLEAN
+(EFIAPI *PFN_IS_EQUAL)(
+  IN CONST  VOID            * Object1,
+  IN CONST  VOID            * Object2,
+  IN        UINTN             Index1 OPTIONAL,
+  IN        UINTN             Index2 OPTIONAL
+  );
+
+/**
+  Test and report if a duplicate entry exists in the given array of comparable
+  elements.
+
+  @param [in] Array                 Array of elements to test for duplicates.
+  @param [in] Count                 Number of elements in Array.
+  @param [in] ElementSize           Size of an element in bytes
+  @param [in] EqualTestFunction     The function to call to check if any two
+                                    elements are equal.
+
+  @retval TRUE                      A duplicate element was found or one of
+                                    the input arguments is invalid.
+  @retval FALSE                     Every element in Array is unique.
+**/
+BOOLEAN
+EFIAPI
+FindDuplicateValue (
+  IN  CONST VOID          * Array,
+  IN  CONST UINTN           Count,
+  IN  CONST UINTN           ElementSize,
+  IN        PFN_IS_EQUAL    EqualTestFunction
   );
 
 #endif // TABLE_HELPER_LIB_H_
