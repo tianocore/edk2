@@ -179,6 +179,55 @@ AddGenericWatchdogList (
   } // for
 }
 
+/**
+  Function to test if two Generic Timer Block Frame Info structures have the
+  same frame number.
+
+  @param [in]  Frame1           Pointer to the first GT Block Frame Info
+                                structure.
+  @param [in]  Frame2           Pointer to the second GT Block Frame Info
+                                structure.
+  @param [in]  Index1           Index of Frame1 in the shared GT Block Frame
+                                Information List.
+  @param [in]  Index2           Index of Frame2 in the shared GT Block Frame
+                                Information List.
+
+  @retval TRUE                  Frame1 and Frame2 have the same frame number.
+  @return FALSE                 Frame1 and Frame2 have different frame numbers.
+
+**/
+BOOLEAN
+EFIAPI
+IsGtFrameNumberEqual (
+  IN  CONST VOID          * Frame1,
+  IN  CONST VOID          * Frame2,
+  IN        UINTN           Index1,
+  IN        UINTN           Index2
+  )
+{
+  UINT8     FrameNumber1;
+  UINT8     FrameNumber2;
+
+  ASSERT ((Frame1 != NULL) && (Frame2 != NULL));
+
+  FrameNumber1 = ((CM_ARM_GTBLOCK_TIMER_FRAME_INFO*)Frame1)->FrameNumber;
+  FrameNumber2 = ((CM_ARM_GTBLOCK_TIMER_FRAME_INFO*)Frame2)->FrameNumber;
+
+  if (FrameNumber1 == FrameNumber2) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "ERROR: GTDT: GT Block Frame Info Structures %d and %d have the same " \
+      "frame number: 0x%x.\n",
+      Index1,
+      Index2,
+      FrameNumber1
+      ));
+    return TRUE;
+  }
+
+  return FALSE;
+}
+
 /** Update the GT Block Timer Frame lists in the GTDT Table.
 
   @param [in]  GtBlockFrame           Pointer to the GT Block Frames
@@ -187,8 +236,8 @@ AddGenericWatchdogList (
                                       Information List.
   @param [in]  GTBlockFrameCount      Number of GT Block Frames.
 
-  @retval EFI_SUCCESS           Table generated successfully.
-  @retval EFI_INVALID_PARAMETER A parameter is invalid.
+  @retval EFI_SUCCESS                 Table generated successfully.
+  @retval EFI_INVALID_PARAMETER       A parameter is invalid.
 **/
 STATIC
 EFI_STATUS
@@ -198,6 +247,8 @@ AddGTBlockTimerFrames (
   IN       UINT32                                             GTBlockFrameCount
 )
 {
+  BOOLEAN    IsFrameNumberDuplicated;
+
   ASSERT (GtBlockFrame != NULL);
   ASSERT (GTBlockTimerFrameList != NULL);
 
@@ -208,6 +259,17 @@ AddGTBlockTimerFrames (
       GTBlockFrameCount
       ));
     ASSERT (GTBlockFrameCount <= 8);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  IsFrameNumberDuplicated = FindDuplicateValue (
+                              GTBlockTimerFrameList,
+                              GTBlockFrameCount,
+                              sizeof (CM_ARM_GTBLOCK_TIMER_FRAME_INFO),
+                              IsGtFrameNumberEqual
+                              );
+  // Duplicate entry was found so timer frame numbers provided are invalid
+  if (IsFrameNumberDuplicated) {
     return EFI_INVALID_PARAMETER;
   }
 
