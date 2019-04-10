@@ -218,6 +218,15 @@ AddGTBlockTimerFrames (
       GtBlockFrame
       ));
 
+    if (GTBlockTimerFrameList->FrameNumber >= 8) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "ERROR: GTDT: Frame number %d is not in the range 0-7\n",
+        GTBlockTimerFrameList->FrameNumber
+      ));
+      return EFI_INVALID_PARAMETER;
+    }
+
     GtBlockFrame->GTFrameNumber = GTBlockTimerFrameList->FrameNumber;
     GtBlockFrame->Reserved[0] = EFI_ACPI_RESERVED_BYTE;
     GtBlockFrame->Reserved[1] = EFI_ACPI_RESERVED_BYTE;
