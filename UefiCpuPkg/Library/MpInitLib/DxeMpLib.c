@@ -1,7 +1,7 @@
 /** @file
   MP initialize support functions for DXE phase.
 
-  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2019, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -568,9 +568,10 @@ MpInitLibStartupAllAPs (
   //
   mStopCheckAllApsStatus = TRUE;
 
-  Status = StartupAllAPsWorker (
+  Status = StartupAllCPUsWorker (
              Procedure,
              SingleThread,
+             TRUE,
              WaitEvent,
              TimeoutInMicroseconds,
              ProcedureArgument,
