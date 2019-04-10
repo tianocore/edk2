@@ -126,7 +126,7 @@ def SignPayloadOpenSsl (Payload, ToolPath, SignerPrivateCertFile, OtherPublicCer
     try:
         Process = subprocess.Popen (Command, stdin = subprocess.PIPE, stdout = subprocess.PIPE, stderr = subprocess.PIPE, shell = True)
         Result = Process.communicate(input = Payload)
-        Signature = Result[0].decode(encoding='utf-8', errors='ignore')
+        Signature = Result[0]
     except:
         raise ValueError ('GenerateCapsule: error: can not run openssl.')
 
