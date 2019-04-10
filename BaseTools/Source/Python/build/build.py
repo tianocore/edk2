@@ -620,6 +620,8 @@ class BuildTask:
             BuildTask._ErrorFlag.set()
             BuildTask._ErrorMessage = "%s broken\n    %s [%s]" % \
                                       (threading.currentThread().getName(), Command, WorkingDir)
+        if self.BuildItem.BuildObject in GlobalData.gModuleBuildTracking and not BuildTask._ErrorFlag.isSet():
+            GlobalData.gModuleBuildTracking[self.BuildItem.BuildObject] = True
         # indicate there's a thread is available for another build task
         BuildTask._RunningQueueLock.acquire()
         BuildTask._RunningQueue.pop(self.BuildItem)
@@ -1138,6 +1140,37 @@ class Build():
             if Process.returncode != 0 :
                 EdkLogger.error("Postbuild", POSTBUILD_ERROR, 'Postbuild process is not success!')
             EdkLogger.info("\n- Postbuild Done -\n")
+
+    ## Error handling for hash feature
+    #
+    # On BuildTask error, iterate through the Module Build tracking
+    # dictionary to determine wheather a module failed to build. Invalidate
+    # the hash associated with that module by removing it from storage.
+    #
+    #
+    def invalidateHash(self):
+        # GlobalData.gModuleBuildTracking contains only modules that cannot be skipped by hash
+        for moduleAutoGenObj in GlobalData.gModuleBuildTracking.keys():
+            # False == FAIL : True == Success
+            # Skip invalidating for Successful module builds
+            if GlobalData.gModuleBuildTracking[moduleAutoGenObj] == True:
+                continue
+
+            # The module failed to build or failed to start building, from this point on
+
+            # Remove .hash from build
+            if GlobalData.gUseHashCache:
+                ModuleHashFile = path.join(moduleAutoGenObj.BuildDir, moduleAutoGenObj.Name + ".hash")
+                if os.path.exists(ModuleHashFile):
+                    os.remove(ModuleHashFile)
+
+            # Remove .hash file from cache
+            if GlobalData.gBinCacheSource:
+                FileDir = path.join(GlobalData.gBinCacheSource, moduleAutoGenObj.Arch, moduleAutoGenObj.SourceDir, moduleAutoGenObj.MetaFile.BaseName)
+                HashFile = path.join(FileDir, moduleAutoGenObj.Name + '.hash')
+                if os.path.exists(HashFile):
+                    os.remove(HashFile)
+
     ## Build a module or platform
     #
     # Create autogen code and makefile for a module or platform, and the launch
@@ -1795,6 +1828,9 @@ class Build():
                                 if self.Target == "genmake":
                                     return True
                             self.BuildModules.append(Ma)
+                            # Initialize all modules in tracking to False (FAIL)
+                            if Ma not in GlobalData.gModuleBuildTracking:
+                                GlobalData.gModuleBuildTracking[Ma] = False
                     self.AutoGenTime += int(round((time.time() - AutoGenStart)))
                     MakeStart = time.time()
                     for Ma in self.BuildModules:
@@ -1805,6 +1841,7 @@ class Build():
                             # we need a full version of makefile for platform
                             ExitFlag.set()
                             BuildTask.WaitForComplete()
+                            self.invalidateHash()
                             Pa.CreateMakeFile(False)
                             EdkLogger.error("build", BUILD_ERROR, "Failed to build module", ExtraData=GlobalData.gBuildingModule)
                         # Start task scheduler
@@ -1814,6 +1851,7 @@ class Build():
                     # in case there's an interruption. we need a full version of makefile for platform
                     Pa.CreateMakeFile(False)
                     if BuildTask.HasError():
+                        self.invalidateHash()
                         EdkLogger.error("build", BUILD_ERROR, "Failed to build module", ExtraData=GlobalData.gBuildingModule)
                     self.MakeTime += int(round((time.time() - MakeStart)))
 
@@ -1823,6 +1861,7 @@ class Build():
                 self.CreateAsBuiltInf()
                 self.MakeTime += int(round((time.time() - MakeContiue)))
                 if BuildTask.HasError():
+                    self.invalidateHash()
                     EdkLogger.error("build", BUILD_ERROR, "Failed to build module", ExtraData=GlobalData.gBuildingModule)
 
                 self.BuildReport.AddPlatformReport(Wa, MaList)
@@ -1973,6 +2012,9 @@ class Build():
                             if self.Target == "genmake":
                                 continue
                         self.BuildModules.append(Ma)
+                        # Initialize all modules in tracking to False (FAIL)
+                        if Ma not in GlobalData.gModuleBuildTracking:
+                            GlobalData.gModuleBuildTracking[Ma] = False
                     self.Progress.Stop("done!")
                     self.AutoGenTime += int(round((time.time() - AutoGenStart)))
                     MakeStart = time.time()
@@ -1985,6 +2027,7 @@ class Build():
                             # we need a full version of makefile for platform
                             ExitFlag.set()
                             BuildTask.WaitForComplete()
+                            self.invalidateHash()
                             Pa.CreateMakeFile(False)
                             EdkLogger.error("build", BUILD_ERROR, "Failed to build module", ExtraData=GlobalData.gBuildingModule)
                         # Start task scheduler
@@ -1994,6 +2037,7 @@ class Build():
                     # in case there's an interruption. we need a full version of makefile for platform
                     Pa.CreateMakeFile(False)
                     if BuildTask.HasError():
+                        self.invalidateHash()
                         EdkLogger.error("build", BUILD_ERROR, "Failed to build module", ExtraData=GlobalData.gBuildingModule)
                     self.MakeTime += int(round((time.time() - MakeStart)))
 
@@ -2013,6 +2057,7 @@ class Build():
                 # has been signaled.
                 #
                 if BuildTask.HasError():
+                    self.invalidateHash()
                     EdkLogger.error("build", BUILD_ERROR, "Failed to build module", ExtraData=GlobalData.gBuildingModule)
 
                 # Create MAP file when Load Fix Address is enabled.

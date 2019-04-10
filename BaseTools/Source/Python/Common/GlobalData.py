@@ -108,3 +108,7 @@ gPackageHash = {}
 gModuleHash = {}
 gEnableGenfdsMultiThread = False
 gSikpAutoGenCache = set()
+
+# Dictionary for tracking Module build status as success or failure
+# False -> Fail : True -> Success
+gModuleBuildTracking = dict()
