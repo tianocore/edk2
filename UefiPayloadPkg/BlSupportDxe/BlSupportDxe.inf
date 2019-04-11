@@ -1,0 +1,58 @@
+## @file
+# Bootloader Support DXE Module
+#
+# Report some MMIO/IO resources to dxe core, extract smbios and acpi tables
+#
+#  Copyright (c) 2014 - 2019, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BlSupportDxe
+  FILE_GUID                      = C68DAA4E-7AB5-41e8-A91D-5954421053F3
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = BlDxeEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  BlSupportDxe.c
+  BlSupportDxe.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiPayloadPkg/UefiPayloadPkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  DxeServicesTableLib
+  DebugLib
+  BaseMemoryLib
+  UefiLib
+  HobLib
+
+[Guids]
+  gEfiAcpiTableGuid
+  gEfiSmbiosTableGuid
+  gUefiSystemTableInfoGuid
+  gUefiAcpiBoardInfoGuid
+  gEfiGraphicsInfoHobGuid
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoHorizontalResolution
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoVerticalResolution
+
+[Depex]
+  TRUE
