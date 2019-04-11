@@ -328,8 +328,11 @@ LoadAndRelocatePeCoffImage (
   //
   // When Image has no reloc section, it can't be relocated into memory.
   //
-  if (ImageContext.RelocationsStripped && (Private->PeiMemoryInstalled) && ((!IsPeiModule) ||
-      (!IsS3Boot && (PcdGetBool (PcdShadowPeimOnBoot) || IsRegisterForShadow)) || (IsS3Boot && PcdGetBool (PcdShadowPeimOnS3Boot)))) {
+  if (ImageContext.RelocationsStripped && (Private->PeiMemoryInstalled) &&
+      ((!IsPeiModule) || PcdGetBool (PcdMigrateTemporaryRamFirmwareVolumes) ||
+       (!IsS3Boot && (PcdGetBool (PcdShadowPeimOnBoot) || IsRegisterForShadow)) ||
+       (IsS3Boot && PcdGetBool (PcdShadowPeimOnS3Boot)))
+     ) {
     DEBUG ((EFI_D_INFO|EFI_D_LOAD, "The image at 0x%08x without reloc section can't be loaded into memory\n", (UINTN) Pe32Data));
   }
 
@@ -343,8 +346,11 @@ LoadAndRelocatePeCoffImage (
   // On normal boot, PcdShadowPeimOnBoot decides whether load PEIM or PeiCore into memory.
   // On S3 boot, PcdShadowPeimOnS3Boot decides whether load PEIM or PeiCore into memory.
   //
-  if ((!ImageContext.RelocationsStripped) && (Private->PeiMemoryInstalled) && ((!IsPeiModule) ||
-      (!IsS3Boot && (PcdGetBool (PcdShadowPeimOnBoot) || IsRegisterForShadow)) || (IsS3Boot && PcdGetBool (PcdShadowPeimOnS3Boot)))) {
+  if ((!ImageContext.RelocationsStripped) && (Private->PeiMemoryInstalled) &&
+      ((!IsPeiModule) || PcdGetBool (PcdMigrateTemporaryRamFirmwareVolumes) ||
+       (!IsS3Boot && (PcdGetBool (PcdShadowPeimOnBoot) || IsRegisterForShadow)) ||
+       (IsS3Boot && PcdGetBool (PcdShadowPeimOnS3Boot)))
+     ) {
     //
     // Allocate more buffer to avoid buffer overflow.
     //
@@ -442,6 +448,122 @@ LoadAndRelocatePeCoffImage (
   *EntryPoint   = ImageContext.EntryPoint;
 
   return ReturnStatus;
+}
+
+/**
+  Loads and relocates a PE/COFF image in place.
+
+  @param Pe32Data         The base address of the PE/COFF file that is to be loaded and relocated
+  @param ImageAddress     The base address of the relocated PE/COFF image
+
+  @retval EFI_SUCCESS     The file was loaded and relocated.
+  @retval Others          The file not be loaded and error occurred.
+
+**/
+EFI_STATUS
+LoadAndRelocatePeCoffImageInPlace (
+  IN  VOID    *Pe32Data,
+  IN  VOID    *ImageAddress
+  )
+{
+  EFI_STATUS                      Status;
+  PE_COFF_LOADER_IMAGE_CONTEXT    ImageContext;
+
+  ZeroMem (&ImageContext, sizeof (ImageContext));
+  ImageContext.Handle = Pe32Data;
+  ImageContext.ImageRead = PeiImageRead;
+
+  Status = PeCoffLoaderGetImageInfo (&ImageContext);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  ImageContext.ImageAddress   = (PHYSICAL_ADDRESS)(UINTN) ImageAddress;
+
+  //
+  // Load the image in place
+  //
+  Status = PeCoffLoaderLoadImage (&ImageContext);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  //
+  // Relocate the image in place
+  //
+  Status = PeCoffLoaderRelocateImage (&ImageContext);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  //
+  // Flush the instruction cache so the image data is written before we execute it
+  //
+  if (ImageContext.ImageAddress != (EFI_PHYSICAL_ADDRESS)(UINTN) Pe32Data) {
+    InvalidateInstructionCacheRange ((VOID *)(UINTN)ImageContext.ImageAddress, (UINTN)ImageContext.ImageSize);
+  }
+
+  return Status;
+}
+
+/**
+  Find the PE32 Data for an FFS file.
+
+  @param FileHandle       Pointer to the FFS file header of the image.
+  @param Pe32Data         Pointer to a (VOID *) PE32 Data pointer.
+
+  @retval EFI_SUCCESS      Image is successfully loaded.
+  @retval EFI_NOT_FOUND    Fail to locate PE32 Data.
+
+**/
+EFI_STATUS
+PeiGetPe32Data (
+  IN     EFI_PEI_FILE_HANDLE  FileHandle,
+  OUT    VOID                 **Pe32Data
+  )
+{
+  EFI_STATUS                  Status;
+  EFI_SECTION_TYPE            SearchType1;
+  EFI_SECTION_TYPE            SearchType2;
+  UINT32                      AuthenticationState;
+
+  *Pe32Data = NULL;
+
+  if (FeaturePcdGet (PcdPeiCoreImageLoaderSearchTeSectionFirst)) {
+    SearchType1 = EFI_SECTION_TE;
+    SearchType2 = EFI_SECTION_PE32;
+  } else {
+    SearchType1 = EFI_SECTION_PE32;
+    SearchType2 = EFI_SECTION_TE;
+  }
+
+  //
+  // Try to find a first exe section (if PcdPeiCoreImageLoaderSearchTeSectionFirst
+  // is true, TE will be searched first).
+  //
+  Status = PeiServicesFfsFindSectionData3 (
+             SearchType1,
+             0,
+             FileHandle,
+             Pe32Data,
+             &AuthenticationState
+             );
+  //
+  // If we didn't find a first exe section, try to find the second exe section.
+  //
+  if (EFI_ERROR (Status)) {
+    Status = PeiServicesFfsFindSectionData3 (
+               SearchType2,
+               0,
+               FileHandle,
+               Pe32Data,
+               &AuthenticationState
+               );
+  }
+  return Status;
 }
 
 /**
