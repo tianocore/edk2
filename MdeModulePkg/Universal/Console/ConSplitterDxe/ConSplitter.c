@@ -16,7 +16,7 @@
   never removed. Such design ensures sytem function well during none console
   device situation.
 
-Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -180,7 +180,8 @@ GLOBAL_REMOVE_IF_UNREFERENCED TEXT_OUT_SPLITTER_PRIVATE_DATA mConOut = {
   0,
   (TEXT_OUT_SPLITTER_QUERY_DATA *) NULL,
   0,
-  (INT32 *) NULL
+  (INT32 *) NULL,
+  FALSE
 };
 
 //
@@ -235,7 +236,8 @@ GLOBAL_REMOVE_IF_UNREFERENCED TEXT_OUT_SPLITTER_PRIVATE_DATA mStdErr = {
   0,
   (TEXT_OUT_SPLITTER_QUERY_DATA *) NULL,
   0,
-  (INT32 *) NULL
+  (INT32 *) NULL,
+  FALSE
 };
 
 //
@@ -3132,8 +3134,9 @@ ConSplitterTextOutAddDevice (
   EFI_GRAPHICS_OUTPUT_MODE_INFORMATION *Info;
   EFI_STATUS                           DeviceStatus;
 
-  Status                = EFI_SUCCESS;
-  CurrentNumOfConsoles  = Private->CurrentNumberOfConsoles;
+  Status                      = EFI_SUCCESS;
+  CurrentNumOfConsoles        = Private->CurrentNumberOfConsoles;
+  Private->AddingConOutDevice = TRUE;
 
   //
   // If the Text Out List is full, enlarge it by calling ConSplitterGrowBuffer().
@@ -3289,6 +3292,8 @@ ConSplitterTextOutAddDevice (
   // synced to the current shared mode.
   //
   ConsplitterSetConsoleOutMode (Private);
+
+  Private->AddingConOutDevice = FALSE;
 
   return Status;
 }
@@ -4849,12 +4854,18 @@ ConSplitterTextOutSetMode (
   //
   TextOutModeMap = Private->TextOutModeMap + Private->TextOutListCount * ModeNumber;
   for (Index = 0, ReturnStatus = EFI_SUCCESS; Index < Private->CurrentNumberOfConsoles; Index++) {
-    Status = Private->TextOutList[Index].TextOut->SetMode (
-                                                    Private->TextOutList[Index].TextOut,
-                                                    TextOutModeMap[Index]
-                                                    );
-    if (EFI_ERROR (Status)) {
-      ReturnStatus = Status;
+    //
+    // While adding a console out device do not set same mode again for the same device.
+    //
+    if ((!Private->AddingConOutDevice) ||
+        (TextOutModeMap[Index] != Private->TextOutList[Index].TextOut->Mode->Mode)) {
+      Status = Private->TextOutList[Index].TextOut->SetMode (
+                                                      Private->TextOutList[Index].TextOut,
+                                                      TextOutModeMap[Index]
+                                                      );
+      if (EFI_ERROR (Status)) {
+        ReturnStatus = Status;
+      }
     }
   }
 
