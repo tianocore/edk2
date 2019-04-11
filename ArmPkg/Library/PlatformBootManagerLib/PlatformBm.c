@@ -2,7 +2,7 @@
   Implementation for PlatformBootManagerLib library class interfaces.
 
   Copyright (C) 2015-2016, Red Hat, Inc.
-  Copyright (c) 2014, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2014 - 2019, ARM Ltd. All rights reserved.<BR>
   Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
 
@@ -548,6 +548,11 @@ PlatformBootManagerBeforeConsole (
   // Signal EndOfDxe PI Event
   //
   EfiEventGroupSignal (&gEfiEndOfDxeEventGroupGuid);
+
+  //
+  // Dispatch deferred images after EndOfDxe event.
+  //
+  EfiBootManagerDispatchDeferredImages ();
 
   //
   // Locate the PCI root bridges and make the PCI bus driver connect each,
