@@ -22,6 +22,7 @@ from random import sample
 from struct import pack
 import uuid
 import subprocess
+import tempfile
 from collections import OrderedDict
 
 import Common.LongFilePathOs as os
@@ -476,15 +477,23 @@ def SaveFileOnChange(File, Content, IsBinaryFile=True):
         if not os.access(DirName, os.W_OK):
             EdkLogger.error(None, PERMISSION_FAILURE, "Do not have write permission on directory %s" % DirName)
 
+    OpenMode = "w"
     if IsBinaryFile:
+        OpenMode = "wb"
+
+    if GlobalData.gIsWindows and not os.path.exists(File):
+        # write temp file, then rename the temp file to the real file
+        # to make sure the file be immediate saved to disk
+        with tempfile.NamedTemporaryFile(OpenMode, dir=os.path.dirname(File), delete=False) as tf:
+            tf.write(Content)
+            tempname = tf.name
         try:
-            with open(File, "wb") as Fd:
-                Fd.write(Content)
-        except IOError as X:
+            os.rename(tempname, File)
+        except:
             EdkLogger.error(None, FILE_CREATE_FAILURE, ExtraData='IOError %s' % X)
     else:
         try:
-            with open(File, 'w') as Fd:
+            with open(File, OpenMode) as Fd:
                 Fd.write(Content)
         except IOError as X:
             EdkLogger.error(None, FILE_CREATE_FAILURE, ExtraData='IOError %s' % X)
