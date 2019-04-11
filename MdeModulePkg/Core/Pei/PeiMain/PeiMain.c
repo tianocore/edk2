@@ -319,8 +319,9 @@ PeiCore (
       // PEI Core and PEIMs to get high performance.
       //
       OldCoreData->ShadowedPeiCore = (PEICORE_FUNCTION_POINTER) (UINTN) PeiCore;
-      if ((HandoffInformationTable->BootMode == BOOT_ON_S3_RESUME && PcdGetBool (PcdShadowPeimOnS3Boot))
-          || (HandoffInformationTable->BootMode != BOOT_ON_S3_RESUME && PcdGetBool (PcdShadowPeimOnBoot))) {
+      if (PcdGetBool (PcdMigrateTemporaryRamFirmwareVolumes) ||
+          (HandoffInformationTable->BootMode == BOOT_ON_S3_RESUME && PcdGetBool (PcdShadowPeimOnS3Boot)) ||
+          (HandoffInformationTable->BootMode != BOOT_ON_S3_RESUME && PcdGetBool (PcdShadowPeimOnBoot))) {
         OldCoreData->ShadowedPeiCore = ShadowPeiCore (OldCoreData);
       }
 
@@ -418,6 +419,23 @@ PeiCore (
       ProcessPpiListFromSec ((CONST EFI_PEI_SERVICES **) &PrivateData.Ps, PpiList);
     }
   } else {
+    if (PcdGetBool (PcdMigrateTemporaryRamFirmwareVolumes)) {
+      //
+      // When PcdMigrateTemporaryRamFirmwareVolumes is TRUE, alway shadow all
+      // PEIMs no matter the condition of PcdShadowPeimOnBoot and PcdShadowPeimOnS3Boot
+      //
+      DEBUG ((DEBUG_VERBOSE, "PPI lists before temporary RAM evacuation:\n"));
+      DumpPpiList (&PrivateData);
+
+      //
+      // Migrate installed content from Temporary RAM to Permanent RAM
+      //
+      EvacuateTempRam (&PrivateData, SecCoreData);
+
+      DEBUG ((DEBUG_VERBOSE, "PPI lists after temporary RAM evacuation:\n"));
+      DumpPpiList (&PrivateData);
+    }
+
     //
     // Try to locate Temporary RAM Done Ppi.
     //
