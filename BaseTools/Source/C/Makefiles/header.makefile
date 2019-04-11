@@ -23,8 +23,9 @@ ifndef HOST_ARCH
   endif
   ifneq (,$(findstring aarch64,$(uname_m)))
     HOST_ARCH=AARCH64
-  endif
-  ifneq (,$(findstring arm,$(uname_m)))
+  else ifneq (,$(findstring arm64,$(uname_m)))
+    HOST_ARCH=AARCH64
+  else ifneq (,$(findstring arm,$(uname_m)))
     HOST_ARCH=ARM
   endif
   ifndef HOST_ARCH
