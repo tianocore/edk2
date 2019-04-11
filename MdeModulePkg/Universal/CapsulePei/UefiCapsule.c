@@ -420,7 +420,7 @@ ModeSwitch (
     if (ReservedRangeEnd < MemoryEnd64) {
       MemoryBase64 = ReservedRangeEnd;
     } else {
-      DEBUG ((EFI_D_ERROR, "Memory is not enough to process capsule!\n"));
+      DEBUG ((DEBUG_ERROR, "Memory is not enough to process capsule!\n"));
       return EFI_OUT_OF_RESOURCES;
     }
   } else if (ReservedRangeBase < MemoryEnd64) {
@@ -518,7 +518,7 @@ FindCapsuleCoalesceImage (
                            &AuthenticationState
                            );
       if (EFI_ERROR (Status)) {
-        DEBUG ((EFI_D_ERROR, "Unable to find PE32 section in CapsuleX64 image ffs %r!\n", Status));
+        DEBUG ((DEBUG_ERROR, "Unable to find PE32 section in CapsuleX64 image ffs %r!\n", Status));
         return Status;
       }
       *CoalesceImageMachineType = PeCoffLoaderGetMachineType ((VOID *) (UINTN) CoalesceImageAddress);
@@ -567,7 +567,7 @@ GetLongModeContext (
                                   LongModeBuffer
                                   );
   if (EFI_ERROR (Status)) {
-    DEBUG (( EFI_D_ERROR, "Error Get LongModeBuffer variable %r!\n", Status));
+    DEBUG (( DEBUG_ERROR, "Error Get LongModeBuffer variable %r!\n", Status));
   }
   return Status;
 }
@@ -727,7 +727,7 @@ BuildMemoryResourceDescriptor (
   }
 
   if (Index == 0) {
-    DEBUG ((EFI_D_INFO | EFI_D_WARN, "No memory resource descriptor reported in HOB list before capsule Coalesce\n"));
+    DEBUG ((DEBUG_INFO | DEBUG_WARN, "No memory resource descriptor reported in HOB list before capsule Coalesce\n"));
 #if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
     //
     // Allocate memory to hold memory resource descriptor,
@@ -739,7 +739,7 @@ BuildMemoryResourceDescriptor (
 
     MemoryResource[0].PhysicalStart = 0;
     MemoryResource[0].ResourceLength = LShiftU64 (1, GetPhysicalAddressBits ());
-    DEBUG ((EFI_D_INFO, "MemoryResource[0x0] - Start(0x%0lx) Length(0x%0lx)\n",
+    DEBUG ((DEBUG_INFO, "MemoryResource[0x0] - Start(0x%0lx) Length(0x%0lx)\n",
                         MemoryResource[0x0].PhysicalStart, MemoryResource[0x0].ResourceLength));
     return MemoryResource;
 #else
@@ -763,7 +763,7 @@ BuildMemoryResourceDescriptor (
   while (Hob.Raw != NULL) {
     ResourceDescriptor = (EFI_HOB_RESOURCE_DESCRIPTOR *) Hob.Raw;
     if (ResourceDescriptor->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) {
-      DEBUG ((EFI_D_INFO, "MemoryResource[0x%x] - Start(0x%0lx) Length(0x%0lx)\n",
+      DEBUG ((DEBUG_INFO, "MemoryResource[0x%x] - Start(0x%0lx) Length(0x%0lx)\n",
                           Index, ResourceDescriptor->PhysicalStart, ResourceDescriptor->ResourceLength));
       MemoryResource[Index].PhysicalStart = ResourceDescriptor->PhysicalStart;
       MemoryResource[Index].ResourceLength = ResourceDescriptor->ResourceLength;
@@ -966,7 +966,7 @@ CapsuleCoalesce (
   //
   Status = PeiServicesGetBootMode (&BootMode);
   if (EFI_ERROR (Status) || (BootMode != BOOT_ON_FLASH_UPDATE)) {
-    DEBUG ((EFI_D_ERROR, "Boot mode is not correct for capsule update path.\n"));
+    DEBUG ((DEBUG_ERROR, "Boot mode is not correct for capsule update path.\n"));
     Status = EFI_NOT_FOUND;
     goto Done;
   }
@@ -1009,14 +1009,14 @@ CapsuleCoalesce (
       //
       // There is no capsule variables, quit
       //
-      DEBUG ((EFI_D_INFO,"Capsule variable Index = %d\n", Index));
+      DEBUG ((DEBUG_INFO,"Capsule variable Index = %d\n", Index));
       break;
     }
     VariableCount++;
     Index++;
   }
 
-  DEBUG ((EFI_D_INFO,"Capsule variable count = %d\n", VariableCount));
+  DEBUG ((DEBUG_INFO,"Capsule variable count = %d\n", VariableCount));
 
   //
   // The last entry is the end flag.
@@ -1027,7 +1027,7 @@ CapsuleCoalesce (
              );
 
   if (Status != EFI_SUCCESS) {
-    DEBUG ((EFI_D_ERROR, "AllocatePages Failed!, Status = %x\n", Status));
+    DEBUG ((DEBUG_ERROR, "AllocatePages Failed!, Status = %x\n", Status));
     goto Done;
   }
 
@@ -1039,7 +1039,7 @@ CapsuleCoalesce (
   //
   Status = GetCapsuleDescriptors (VariableArrayAddress);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Fail to find capsule variables.\n"));
+    DEBUG ((DEBUG_ERROR, "Fail to find capsule variables.\n"));
     goto Done;
   }
 
@@ -1057,14 +1057,14 @@ CapsuleCoalesce (
     CoalesceImageEntryPoint = 0;
     Status = GetLongModeContext (&LongModeBuffer);
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "Fail to find the variable for long mode context!\n"));
+      DEBUG ((DEBUG_ERROR, "Fail to find the variable for long mode context!\n"));
       Status = EFI_NOT_FOUND;
       goto Done;
     }
 
     Status = FindCapsuleCoalesceImage (&CoalesceImageEntryPoint, &CoalesceImageMachineType);
     if ((EFI_ERROR (Status)) || (CoalesceImageMachineType != EFI_IMAGE_MACHINE_X64)) {
-      DEBUG ((EFI_D_ERROR, "Fail to find CapsuleX64 module in FV!\n"));
+      DEBUG ((DEBUG_ERROR, "Fail to find CapsuleX64 module in FV!\n"));
       Status = EFI_NOT_FOUND;
       goto Done;
     }
@@ -1084,14 +1084,14 @@ CapsuleCoalesce (
   Status = CapsuleDataCoalesce (PeiServices, (EFI_PHYSICAL_ADDRESS *)(UINTN)VariableArrayAddress, MemoryResource, MemoryBase, MemorySize);
 #endif
 
-  DEBUG ((EFI_D_INFO, "Capsule Coalesce Status = %r!\n", Status));
+  DEBUG ((DEBUG_INFO, "Capsule Coalesce Status = %r!\n", Status));
 
   if (Status == EFI_BUFFER_TOO_SMALL) {
-    DEBUG ((EFI_D_ERROR, "There is not enough memory to process capsule!\n"));
+    DEBUG ((DEBUG_ERROR, "There is not enough memory to process capsule!\n"));
   }
 
   if (Status == EFI_NOT_FOUND) {
-    DEBUG ((EFI_D_ERROR, "Fail to parse capsule descriptor in memory!\n"));
+    DEBUG ((DEBUG_ERROR, "Fail to parse capsule descriptor in memory!\n"));
     REPORT_STATUS_CODE (
       EFI_ERROR_CODE | EFI_ERROR_MAJOR,
       (EFI_SOFTWARE_PEI_MODULE | EFI_SW_PEI_EC_INVALID_CAPSULE_DESCRIPTOR)
@@ -1156,7 +1156,7 @@ CapsuleTestPattern (
   //
   if (*TestPtr == 0x54534554) {
     RetValue = TRUE;
-    DEBUG ((EFI_D_INFO, "Capsule test pattern mode activated...\n"));
+    DEBUG ((DEBUG_INFO, "Capsule test pattern mode activated...\n"));
     TestSize = TestPtr[1] / sizeof (UINT32);
     //
     // Skip over the signature and the size fields in the pattern data header
@@ -1165,7 +1165,7 @@ CapsuleTestPattern (
     TestCounter = 0;
     while (TestSize > 0) {
       if (*TestPtr != TestCounter) {
-        DEBUG ((EFI_D_INFO, "Capsule test pattern mode FAILED: BaseAddr/FailAddr 0x%X 0x%X\n", (UINT32)(UINTN)(EFI_CAPSULE_PEIM_PRIVATE_DATA *)CapsuleBase, (UINT32)(UINTN)TestPtr));
+        DEBUG ((DEBUG_INFO, "Capsule test pattern mode FAILED: BaseAddr/FailAddr 0x%X 0x%X\n", (UINT32)(UINTN)(EFI_CAPSULE_PEIM_PRIVATE_DATA *)CapsuleBase, (UINT32)(UINTN)TestPtr));
         return TRUE;
       }
 
@@ -1174,7 +1174,7 @@ CapsuleTestPattern (
       TestSize--;
     }
 
-    DEBUG ((EFI_D_INFO, "Capsule test pattern mode SUCCESS\n"));
+    DEBUG ((DEBUG_INFO, "Capsule test pattern mode SUCCESS\n"));
   }
 
   return RetValue;
@@ -1219,11 +1219,11 @@ CreateState (
     return EFI_VOLUME_CORRUPTED;
   }
   if (PrivateData->CapsuleAllImageSize >= MAX_ADDRESS) {
-    DEBUG ((EFI_D_ERROR, "CapsuleAllImageSize too big - 0x%lx\n", PrivateData->CapsuleAllImageSize));
+    DEBUG ((DEBUG_ERROR, "CapsuleAllImageSize too big - 0x%lx\n", PrivateData->CapsuleAllImageSize));
     return EFI_OUT_OF_RESOURCES;
   }
   if (PrivateData->CapsuleNumber >= MAX_ADDRESS) {
-    DEBUG ((EFI_D_ERROR, "CapsuleNumber too big - 0x%lx\n", PrivateData->CapsuleNumber));
+    DEBUG ((DEBUG_ERROR, "CapsuleNumber too big - 0x%lx\n", PrivateData->CapsuleNumber));
     return EFI_OUT_OF_RESOURCES;
   }
   //
@@ -1241,13 +1241,13 @@ CreateState (
              );
 
   if (Status != EFI_SUCCESS) {
-    DEBUG ((EFI_D_ERROR, "AllocatePages Failed!\n"));
+    DEBUG ((DEBUG_ERROR, "AllocatePages Failed!\n"));
     return Status;
   }
   //
   // Copy to our new buffer for DXE
   //
-  DEBUG ((EFI_D_INFO, "Capsule copy from 0x%8X to 0x%8X with size 0x%8X\n", (UINTN)((UINT8 *)PrivateData + sizeof(EFI_CAPSULE_PEIM_PRIVATE_DATA) + (CapsuleNumber - 1) * sizeof(UINT64)), (UINTN) NewBuffer, Size));
+  DEBUG ((DEBUG_INFO, "Capsule copy from 0x%8X to 0x%8X with size 0x%8X\n", (UINTN)((UINT8 *)PrivateData + sizeof(EFI_CAPSULE_PEIM_PRIVATE_DATA) + (CapsuleNumber - 1) * sizeof(UINT64)), (UINTN) NewBuffer, Size));
   CopyMem ((VOID *) (UINTN) NewBuffer, (VOID *) (UINTN) ((UINT8 *)PrivateData + sizeof(EFI_CAPSULE_PEIM_PRIVATE_DATA) + (CapsuleNumber - 1) * sizeof(UINT64)), Size);
   //
   // Check for test data pattern. If it is the test pattern, then we'll
