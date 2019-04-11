@@ -327,9 +327,9 @@ ValidateCapsuleIntegrity (
     return NULL;
   }
 
-  DEBUG ((DEBUG_INFO, "Ptr - 0x%x\n", Ptr));
-  DEBUG ((DEBUG_INFO, "Ptr->Length - 0x%x\n", Ptr->Length));
-  DEBUG ((DEBUG_INFO, "Ptr->Union - 0x%x\n", Ptr->Union.ContinuationPointer));
+  DEBUG ((DEBUG_INFO, "Ptr - 0x%p\n", Ptr));
+  DEBUG ((DEBUG_INFO, "Ptr->Length - 0x%lx\n", Ptr->Length));
+  DEBUG ((DEBUG_INFO, "Ptr->Union - 0x%lx\n", Ptr->Union.ContinuationPointer));
   while ((Ptr->Length != 0) || (Ptr->Union.ContinuationPointer != (EFI_PHYSICAL_ADDRESS) (UINTN) NULL)) {
     //
     // Make sure the descriptor is aligned at UINT64 in memory
@@ -348,9 +348,9 @@ ValidateCapsuleIntegrity (
       if (!ValidateCapsuleByMemoryResource (MemoryResource, (EFI_PHYSICAL_ADDRESS) (UINTN) Ptr, sizeof (EFI_CAPSULE_BLOCK_DESCRIPTOR))) {
         return NULL;
       }
-      DEBUG ((DEBUG_INFO, "Ptr(C) - 0x%x\n", Ptr));
-      DEBUG ((DEBUG_INFO, "Ptr->Length - 0x%x\n", Ptr->Length));
-      DEBUG ((DEBUG_INFO, "Ptr->Union - 0x%x\n", Ptr->Union.ContinuationPointer));
+      DEBUG ((DEBUG_INFO, "Ptr(C) - 0x%p\n", Ptr));
+      DEBUG ((DEBUG_INFO, "Ptr->Length - 0x%lx\n", Ptr->Length));
+      DEBUG ((DEBUG_INFO, "Ptr->Union - 0x%lx\n", Ptr->Union.ContinuationPointer));
     } else {
       if (!ValidateCapsuleByMemoryResource (MemoryResource, Ptr->Union.DataBlock, Ptr->Length)) {
         return NULL;
@@ -403,9 +403,9 @@ ValidateCapsuleIntegrity (
       if (!ValidateCapsuleByMemoryResource (MemoryResource, (EFI_PHYSICAL_ADDRESS) (UINTN) Ptr, sizeof (EFI_CAPSULE_BLOCK_DESCRIPTOR))) {
         return NULL;
       }
-      DEBUG ((DEBUG_INFO, "Ptr(B) - 0x%x\n", Ptr));
-      DEBUG ((DEBUG_INFO, "Ptr->Length - 0x%x\n", Ptr->Length));
-      DEBUG ((DEBUG_INFO, "Ptr->Union - 0x%x\n", Ptr->Union.ContinuationPointer));
+      DEBUG ((DEBUG_INFO, "Ptr(B) - 0x%p\n", Ptr));
+      DEBUG ((DEBUG_INFO, "Ptr->Length - 0x%lx\n", Ptr->Length));
+      DEBUG ((DEBUG_INFO, "Ptr->Union - 0x%lx\n", Ptr->Union.ContinuationPointer));
     }
   }
 
