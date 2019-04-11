@@ -200,6 +200,227 @@ ConvertPpiPointers (
 
 /**
 
+  Migrate Notify Pointers inside an FV from temporary memory to permanent memory.
+
+  @param PrivateData      Pointer to PeiCore's private data structure.
+  @param OrgFvHandle      Address of FV Handle in temporary memory.
+  @param FvHandle         Address of FV Handle in permanent memory.
+  @param FvSize           Size of the FV.
+
+**/
+VOID
+ConvertPpiPointersFv (
+  IN  PEI_CORE_INSTANCE       *PrivateData,
+  IN  UINTN                   OrgFvHandle,
+  IN  UINTN                   FvHandle,
+  IN  UINTN                   FvSize
+  )
+{
+  UINT8                             Index;
+  UINTN                             Offset;
+  BOOLEAN                           OffsetPositive;
+  EFI_PEI_FIRMWARE_VOLUME_INFO_PPI  *FvInfoPpi;
+  UINT8                             GuidIndex;
+  EFI_GUID                          *Guid;
+  EFI_GUID                          *GuidCheckList[2];
+
+  GuidCheckList[0] = &gEfiPeiFirmwareVolumeInfoPpiGuid;
+  GuidCheckList[1] = &gEfiPeiFirmwareVolumeInfo2PpiGuid;
+
+  if (FvHandle > OrgFvHandle) {
+    OffsetPositive = TRUE;
+    Offset = FvHandle - OrgFvHandle;
+  } else {
+    OffsetPositive = FALSE;
+    Offset = OrgFvHandle - FvHandle;
+  }
+
+  DEBUG ((DEBUG_VERBOSE, "Converting PPI pointers in FV.\n"));
+  DEBUG ((
+    DEBUG_VERBOSE,
+    "  OrgFvHandle at 0x%08x. FvHandle at 0x%08x. FvSize = 0x%x\n",
+    (UINTN) OrgFvHandle,
+    (UINTN) FvHandle,
+    FvSize
+    ));
+  DEBUG ((
+    DEBUG_VERBOSE,
+    "    OrgFvHandle range: 0x%08x - 0x%08x\n",
+    OrgFvHandle,
+    OrgFvHandle + FvSize
+    ));
+
+  for (Index = 0; Index < PrivateData->PpiData.CallbackNotifyList.CurrentCount; Index++) {
+      ConvertPointer (
+        (VOID **) &PrivateData->PpiData.CallbackNotifyList.NotifyPtrs[Index].Raw,
+        OrgFvHandle,
+        OrgFvHandle + FvSize,
+        Offset,
+        OffsetPositive
+        );
+      ConvertPointer (
+        (VOID **) &PrivateData->PpiData.CallbackNotifyList.NotifyPtrs[Index].Notify->Guid,
+        OrgFvHandle,
+        OrgFvHandle + FvSize,
+        Offset,
+        OffsetPositive
+        );
+      ConvertPointer (
+        (VOID **) &PrivateData->PpiData.CallbackNotifyList.NotifyPtrs[Index].Notify->Notify,
+        OrgFvHandle,
+        OrgFvHandle + FvSize,
+        Offset,
+        OffsetPositive
+        );
+  }
+
+  for (Index = 0; Index < PrivateData->PpiData.DispatchNotifyList.CurrentCount; Index++) {
+    ConvertPointer (
+      (VOID **) &PrivateData->PpiData.DispatchNotifyList.NotifyPtrs[Index].Raw,
+      OrgFvHandle,
+      OrgFvHandle + FvSize,
+      Offset,
+      OffsetPositive
+      );
+    ConvertPointer (
+      (VOID **) &PrivateData->PpiData.DispatchNotifyList.NotifyPtrs[Index].Notify->Guid,
+      OrgFvHandle,
+      OrgFvHandle + FvSize,
+      Offset,
+      OffsetPositive
+      );
+    ConvertPointer (
+      (VOID **) &PrivateData->PpiData.DispatchNotifyList.NotifyPtrs[Index].Notify->Notify,
+      OrgFvHandle,
+      OrgFvHandle + FvSize,
+      Offset,
+      OffsetPositive
+      );
+  }
+
+  for (Index = 0; Index < PrivateData->PpiData.PpiList.CurrentCount; Index++) {
+    ConvertPointer (
+      (VOID **) &PrivateData->PpiData.PpiList.PpiPtrs[Index].Raw,
+      OrgFvHandle,
+      OrgFvHandle + FvSize,
+      Offset,
+      OffsetPositive
+      );
+    ConvertPointer (
+      (VOID **) &PrivateData->PpiData.PpiList.PpiPtrs[Index].Ppi->Guid,
+      OrgFvHandle,
+      OrgFvHandle + FvSize,
+      Offset,
+      OffsetPositive
+      );
+    ConvertPointer (
+      (VOID **) &PrivateData->PpiData.PpiList.PpiPtrs[Index].Ppi->Ppi,
+      OrgFvHandle,
+      OrgFvHandle + FvSize,
+      Offset,
+      OffsetPositive
+      );
+
+    Guid = PrivateData->PpiData.PpiList.PpiPtrs[Index].Ppi->Guid;
+    for (GuidIndex = 0; GuidIndex < ARRAY_SIZE (GuidCheckList); ++GuidIndex) {
+      //
+      // Don't use CompareGuid function here for performance reasons.
+      // Instead we compare the GUID as INT32 at a time and branch
+      // on the first failed comparison.
+      //
+      if ((((INT32 *)Guid)[0] == ((INT32 *)GuidCheckList[GuidIndex])[0]) &&
+          (((INT32 *)Guid)[1] == ((INT32 *)GuidCheckList[GuidIndex])[1]) &&
+          (((INT32 *)Guid)[2] == ((INT32 *)GuidCheckList[GuidIndex])[2]) &&
+          (((INT32 *)Guid)[3] == ((INT32 *)GuidCheckList[GuidIndex])[3])) {
+        FvInfoPpi = PrivateData->PpiData.PpiList.PpiPtrs[Index].Ppi->Ppi;
+        DEBUG ((DEBUG_VERBOSE, "      FvInfo: %p -> ", FvInfoPpi->FvInfo));
+        if ((UINTN)FvInfoPpi->FvInfo == OrgFvHandle) {
+          ConvertPointer (
+            (VOID **)&FvInfoPpi->FvInfo,
+            OrgFvHandle,
+            OrgFvHandle + FvSize,
+            Offset,
+            OffsetPositive
+            );
+          DEBUG ((DEBUG_VERBOSE, "%p", FvInfoPpi->FvInfo));
+        }
+        DEBUG ((DEBUG_VERBOSE, "\n"));
+        break;
+      }
+    }
+  }
+}
+
+/**
+
+  Dumps the PPI lists to debug output.
+
+  @param PrivateData     Points to PeiCore's private instance data.
+
+**/
+VOID
+DumpPpiList (
+  IN PEI_CORE_INSTANCE    *PrivateData
+  )
+{
+  DEBUG_CODE_BEGIN ();
+  UINTN   Index;
+
+  if (PrivateData == NULL) {
+    return;
+  }
+
+  for (Index = 0; Index < PrivateData->PpiData.CallbackNotifyList.CurrentCount; Index++) {
+    DEBUG ((
+      DEBUG_VERBOSE,
+      "CallbackNotify[%2d] {%g} at 0x%x (%a)\n",
+      Index,
+      PrivateData->PpiData.CallbackNotifyList.NotifyPtrs[Index].Notify->Guid,
+      (UINTN) PrivateData->PpiData.CallbackNotifyList.NotifyPtrs[Index].Raw,
+      (
+        !(
+          ((EFI_PHYSICAL_ADDRESS) (UINTN) PrivateData->PpiData.CallbackNotifyList.NotifyPtrs[Index].Raw >= PrivateData->PhysicalMemoryBegin) &&
+          (((EFI_PHYSICAL_ADDRESS) ((UINTN) PrivateData->PpiData.CallbackNotifyList.NotifyPtrs[Index].Raw) + sizeof (EFI_PEI_NOTIFY_DESCRIPTOR)) < PrivateData->FreePhysicalMemoryTop)
+          )
+        ? "CAR" : "Post-Memory"
+        )
+      ));
+  }
+  for (Index = 0; Index < PrivateData->PpiData.DispatchNotifyList.CurrentCount; Index++) {
+    DEBUG ((DEBUG_VERBOSE,
+    "DispatchNotify[%2d] {%g} at 0x%x (%a)\n",
+    Index,
+    PrivateData->PpiData.DispatchNotifyList.NotifyPtrs[Index].Notify->Guid,
+    (UINTN) PrivateData->PpiData.DispatchNotifyList.NotifyPtrs[Index].Raw,
+    (
+      !(
+        ((EFI_PHYSICAL_ADDRESS) (UINTN) PrivateData->PpiData.DispatchNotifyList.NotifyPtrs[Index].Raw >=PrivateData->PhysicalMemoryBegin) &&
+        (((EFI_PHYSICAL_ADDRESS) ((UINTN) PrivateData->PpiData.DispatchNotifyList.NotifyPtrs[Index].Raw) + sizeof (EFI_PEI_NOTIFY_DESCRIPTOR)) < PrivateData->FreePhysicalMemoryTop)
+        )
+      ? "CAR" : "Post-Memory"
+      )
+    ));
+  }
+  for (Index = 0; Index < PrivateData->PpiData.PpiList.CurrentCount; Index++) {
+    DEBUG ((DEBUG_VERBOSE,
+    "PPI[%2d] {%g} at 0x%x (%a)\n",
+    Index,
+    PrivateData->PpiData.PpiList.PpiPtrs[Index].Ppi->Guid,
+    (UINTN) PrivateData->PpiData.PpiList.PpiPtrs[Index].Raw,
+    (
+      !(
+        ((EFI_PHYSICAL_ADDRESS) (UINTN) PrivateData->PpiData.PpiList.PpiPtrs[Index].Raw >= PrivateData->PhysicalMemoryBegin) &&
+        (((EFI_PHYSICAL_ADDRESS) ((UINTN) PrivateData->PpiData.PpiList.PpiPtrs[Index].Raw) + sizeof (EFI_PEI_PPI_DESCRIPTOR)) < PrivateData->FreePhysicalMemoryTop)
+        )
+      ? "CAR" : "Post-Memory"
+      )
+    ));
+  }
+  DEBUG_CODE_END ();
+}
+
+/**
+
   This function installs an interface in the PEI PPI database by GUID.
   The purpose of the service is to publish an interface that other parties
   can use to call additional PEIMs.
@@ -827,6 +1048,72 @@ ProcessPpiListFromSec (
       Status = PeiInstallSecHobData (PeiServices, SecHobList);
       ASSERT_EFI_ERROR (Status);
     }
+  }
+}
+
+/**
+
+  Migrate PPI Pointers of PEI_CORE from temporary memory to permanent memory.
+
+  @param PrivateData      Pointer to PeiCore's private data structure.
+  @param CoreFvHandle     Address of PEI_CORE FV Handle in temporary memory.
+
+**/
+
+VOID
+ConvertPeiCorePpiPointers (
+  IN  PEI_CORE_INSTANCE        *PrivateData,
+  PEI_CORE_FV_HANDLE           CoreFvHandle
+  )
+{
+  EFI_FV_FILE_INFO      FileInfo;
+  EFI_PHYSICAL_ADDRESS  OrgImageBase;
+  EFI_PHYSICAL_ADDRESS  MigratedImageBase;
+  UINTN                 PeiCoreModuleSize;
+  EFI_PEI_FILE_HANDLE   PeiCoreFileHandle;
+  VOID                  *PeiCoreImageBase;
+  VOID                  *PeiCoreEntryPoint;
+  EFI_STATUS            Status;
+
+  PeiCoreFileHandle = NULL;
+
+  //
+  // Find the PEI Core in the BFV in temporary memory.
+  //
+  Status =  CoreFvHandle.FvPpi->FindFileByType (
+                                  CoreFvHandle.FvPpi,
+                                  EFI_FV_FILETYPE_PEI_CORE,
+                                  CoreFvHandle.FvHandle,
+                                  &PeiCoreFileHandle
+                                  );
+  ASSERT_EFI_ERROR (Status);
+
+  if (!EFI_ERROR (Status)) {
+    Status = CoreFvHandle.FvPpi->GetFileInfo (CoreFvHandle.FvPpi, PeiCoreFileHandle, &FileInfo);
+    ASSERT_EFI_ERROR (Status);
+
+    Status = PeiGetPe32Data (PeiCoreFileHandle, &PeiCoreImageBase);
+    ASSERT_EFI_ERROR (Status);
+
+    //
+    // Find PEI Core EntryPoint in the BFV in temporary memory.
+    //
+    Status = PeCoffLoaderGetEntryPoint ((VOID *) (UINTN) PeiCoreImageBase,  &PeiCoreEntryPoint);
+    ASSERT_EFI_ERROR (Status);
+
+    OrgImageBase = (UINTN) PeiCoreImageBase;
+    MigratedImageBase = (UINTN) _ModuleEntryPoint - ((UINTN) PeiCoreEntryPoint - (UINTN) PeiCoreImageBase);
+
+    //
+    // Size of loaded PEI_CORE in permanent memory.
+    //
+    PeiCoreModuleSize = (UINTN)FileInfo.BufferSize - ((UINTN) OrgImageBase - (UINTN) FileInfo.Buffer);
+
+    //
+    // Migrate PEI_CORE PPI pointers from temporary memory to newly
+    // installed PEI_CORE in permanent memory.
+    //
+    ConvertPpiPointersFv (PrivateData, (UINTN) OrgImageBase, (UINTN) MigratedImageBase, PeiCoreModuleSize);
   }
 }
 
