@@ -167,6 +167,88 @@ MigrateMemoryPages (
 }
 
 /**
+  Removes any FV HOBs whose base address is not in PEI installed memory.
+
+  @param[in] Private          Pointer to PeiCore's private data structure.
+
+**/
+VOID
+RemoveFvHobsInTemporaryMemory (
+  IN PEI_CORE_INSTANCE        *Private
+  )
+{
+  EFI_PEI_HOB_POINTERS        Hob;
+  EFI_HOB_FIRMWARE_VOLUME     *FirmwareVolumeHob;
+
+  DEBUG ((DEBUG_INFO, "Removing FVs in FV HOB not already migrated to permanent memory.\n"));
+
+  for (Hob.Raw = GetHobList (); !END_OF_HOB_LIST (Hob); Hob.Raw = GET_NEXT_HOB (Hob)) {
+    if (GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_FV || GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_FV2 || GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_FV3) {
+      FirmwareVolumeHob = Hob.FirmwareVolume;
+      DEBUG ((DEBUG_INFO, "  Found FV HOB.\n"));
+      DEBUG ((
+          DEBUG_INFO,
+          "    BA=%016lx  L=%016lx\n",
+          FirmwareVolumeHob->BaseAddress,
+          FirmwareVolumeHob->Length
+          ));
+      if (
+        !(
+          ((EFI_PHYSICAL_ADDRESS) (UINTN) FirmwareVolumeHob->BaseAddress >= Private->PhysicalMemoryBegin) &&
+          (((EFI_PHYSICAL_ADDRESS) (UINTN) FirmwareVolumeHob->BaseAddress + (FirmwareVolumeHob->Length - 1)) < Private->FreePhysicalMemoryTop)
+          )
+        ) {
+        DEBUG ((DEBUG_INFO, "      Removing FV HOB to an FV in T-RAM (was not migrated).\n"));
+        Hob.Header->HobType = EFI_HOB_TYPE_UNUSED;
+      }
+    }
+  }
+}
+
+/**
+  Migrate the base address in firmware volume allocation HOBs
+  from temporary memory to PEI installed memory.
+
+  @param[in] PrivateData      Pointer to PeiCore's private data structure.
+  @param[in] OrgFvHandle      Address of FV Handle in temporary memory.
+  @param[in] FvHandle         Address of FV Handle in permanent memory.
+
+**/
+VOID
+ConvertFvHob (
+  IN PEI_CORE_INSTANCE          *PrivateData,
+  IN UINTN                      OrgFvHandle,
+  IN UINTN                      FvHandle
+  )
+{
+  EFI_PEI_HOB_POINTERS        Hob;
+  EFI_HOB_FIRMWARE_VOLUME     *FirmwareVolumeHob;
+  EFI_HOB_FIRMWARE_VOLUME2    *FirmwareVolume2Hob;
+  EFI_HOB_FIRMWARE_VOLUME3    *FirmwareVolume3Hob;
+
+  DEBUG ((DEBUG_INFO, "Converting FVs in FV HOB.\n"));
+
+  for (Hob.Raw = GetHobList (); !END_OF_HOB_LIST (Hob); Hob.Raw = GET_NEXT_HOB (Hob)) {
+    if (GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_FV) {
+      FirmwareVolumeHob = Hob.FirmwareVolume;
+      if (FirmwareVolumeHob->BaseAddress == OrgFvHandle) {
+        FirmwareVolumeHob->BaseAddress = FvHandle;
+      }
+    } else if (GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_FV2) {
+      FirmwareVolume2Hob = Hob.FirmwareVolume2;
+      if (FirmwareVolume2Hob->BaseAddress == OrgFvHandle) {
+        FirmwareVolume2Hob->BaseAddress = FvHandle;
+      }
+    } else if (GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_FV3) {
+      FirmwareVolume3Hob = Hob.FirmwareVolume3;
+      if (FirmwareVolume3Hob->BaseAddress == OrgFvHandle) {
+        FirmwareVolume3Hob->BaseAddress = FvHandle;
+      }
+    }
+  }
+}
+
+/**
   Migrate MemoryBaseAddress in memory allocation HOBs
   from the temporary memory to PEI installed memory.
 
