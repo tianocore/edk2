@@ -303,6 +303,13 @@ InsertPciCap (
   // not the first instance of (Domain, CapId).
   //
   if (PciCap->Key.Instance > 0) {
+    //
+    // Suppress invalid "nullptr dereference" compiler/analyzer warnings: the
+    // only way for "PciCap->Key.Instance" to be positive here is for it to
+    // have been assigned *from* dereferencing "InstanceZero" above.
+    //
+    ASSERT (InstanceZero != NULL);
+
     InstanceZero->NumInstancesUnion.NumInstances++;
   }
   return RETURN_SUCCESS;
