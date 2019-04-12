@@ -162,12 +162,19 @@ InstallOvmfFvTables (
   }
 
   //
+  // set FwVol (and use an ASSERT() below) to suppress incorrect
+  // compiler/analyzer warnings
+  //
+  FwVol = NULL;
+  //
   // Locate the firmware volume protocol
   //
   Status = LocateFvInstanceWithTables (&FwVol);
   if (EFI_ERROR (Status)) {
     return EFI_ABORTED;
   }
+  ASSERT (FwVol != NULL);
+
   //
   // Read tables from the storage file.
   //
