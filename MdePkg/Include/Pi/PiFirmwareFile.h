@@ -480,8 +480,15 @@ typedef struct {
   CHAR16                        VersionString[1];
 } EFI_VERSION_SECTION2;
 
-#define SECTION_SIZE(SectionHeaderPtr) \
-    ((UINT32) (*((UINT32 *) ((EFI_COMMON_SECTION_HEADER *) (UINTN) SectionHeaderPtr)->Size) & 0x00ffffff))
+///
+/// The argument passed as the SectionHeaderPtr parameter to the SECTION_SIZE()
+/// and IS_SECTION2() function-like macros below must not have side effects:
+/// SectionHeaderPtr is evaluated multiple times.
+///
+#define SECTION_SIZE(SectionHeaderPtr) ((UINT32) ( \
+    (((EFI_COMMON_SECTION_HEADER *) (UINTN) (SectionHeaderPtr))->Size[0]      ) | \
+    (((EFI_COMMON_SECTION_HEADER *) (UINTN) (SectionHeaderPtr))->Size[1] <<  8) | \
+    (((EFI_COMMON_SECTION_HEADER *) (UINTN) (SectionHeaderPtr))->Size[2] << 16)))
 
 #define IS_SECTION2(SectionHeaderPtr) \
     (SECTION_SIZE (SectionHeaderPtr) == 0x00ffffff)
