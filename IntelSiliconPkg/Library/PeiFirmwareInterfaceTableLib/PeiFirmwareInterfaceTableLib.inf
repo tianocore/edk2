@@ -1,0 +1,54 @@
+## @file
+#  PEI Firmware Interface Table (FIT) Library instance.
+#
+#  Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeiFitMigrationLib
+  MODULE_UNI_FILE                = PeiFitMigrationlib.uni
+  FILE_GUID                      = 6E4ECA8C-DB60-47A7-8D59-4D6D8BBC941D
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = FitLib
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  PeiFirmwareInterfaceTableLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  IntelSiliconPkg/IntelSiliconPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  HobLib
+  IoLib
+  MemoryAllocationLib
+  PcdLib
+  PeiServicesLib
+
+[Pcd]
+  gIntelSiliconPkgTokenSpaceGuid.PcdFitPointerAddress     ## CONSUMES
+  gIntelSiliconPkgTokenSpaceGuid.PcdNemBaseAddress        ## CONSUMES
+
+[Guids]
+  gFitStructureHobGuid
+  gStartupAcmPeiFileGuid
