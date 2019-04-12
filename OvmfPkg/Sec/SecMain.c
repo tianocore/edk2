@@ -274,7 +274,7 @@ FindFfsFileAndSection (
     }
 
     File = (EFI_FFS_FILE_HEADER*)(UINTN) CurrentAddress;
-    Size = *(UINT32*) File->Size & 0xffffff;
+    Size = FFS_FILE_SIZE (File);
     if (Size < (sizeof (*File) + sizeof (EFI_COMMON_SECTION_HEADER))) {
       return EFI_VOLUME_CORRUPTED;
     }
@@ -605,7 +605,7 @@ FindImageBase (
     }
 
     File = (EFI_FFS_FILE_HEADER*)(UINTN) CurrentAddress;
-    Size = *(UINT32*) File->Size & 0xffffff;
+    Size = FFS_FILE_SIZE (File);
     if (Size < sizeof (*File)) {
       return EFI_NOT_FOUND;
     }
@@ -630,7 +630,7 @@ FindImageBase (
       CurrentAddress = (EndOfSection + 3) & 0xfffffffffffffffcULL;
       Section = (EFI_COMMON_SECTION_HEADER*)(UINTN) CurrentAddress;
 
-      Size = *(UINT32*) Section->Size & 0xffffff;
+      Size = SECTION_SIZE (Section);
       if (Size < sizeof (*Section)) {
         return EFI_NOT_FOUND;
       }
