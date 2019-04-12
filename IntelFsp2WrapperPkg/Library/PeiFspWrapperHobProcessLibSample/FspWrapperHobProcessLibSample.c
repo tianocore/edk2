@@ -1,7 +1,7 @@
 /** @file
   Sample to provide FSP wrapper hob process related function.
 
-  Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2019, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -378,7 +378,19 @@ PostFspsHobProcess (
   IN VOID                 *FspHobList
   )
 {
-  ProcessFspHobList (FspHobList);
-
+  //
+  // PostFspsHobProcess () will be called in both FSP API and Dispatch modes to
+  // align the same behavior and support a variety of boot loader implementations.
+  // Boot loader provided library function is recommended to support both API and
+  // Dispatch modes by checking PcdFspModeSelection.
+  //
+  if (PcdGet8 (PcdFspModeSelection) == 1) {
+    //
+    // Only in FSP API mode the wrapper has to build hobs basing on FSP output data.
+    // In this case FspHobList cannot be NULL.
+    //
+    ASSERT (FspHobList != NULL);
+    ProcessFspHobList (FspHobList);
+  }
   return EFI_SUCCESS;
 }

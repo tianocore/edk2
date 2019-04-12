@@ -1,7 +1,7 @@
 ## @file
 #  Sample to provide FSP wrapper hob process related function.
 #
-#  Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2014 - 2019, Intel Corporation. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -61,6 +61,7 @@
 [Pcd]
   gIntelFsp2WrapperTokenSpaceGuid.PcdPeiMinMemSize          ## CONSUMES
   gIntelFsp2WrapperTokenSpaceGuid.PcdPeiRecoveryMinMemSize  ## CONSUMES
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspModeSelection       ## CONSUMES
 
 [Guids]
   gFspReservedMemoryResourceHobGuid                       ## CONSUMES ## HOB

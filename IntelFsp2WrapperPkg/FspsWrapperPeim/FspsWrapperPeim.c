@@ -3,7 +3,7 @@
   register TemporaryRamDonePpi to call TempRamExit API, and register MemoryDiscoveredPpi
   notify to call FspSiliconInit API.
 
-  Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2019, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -130,7 +130,7 @@ S3EndOfPeiNotify(
   @param[in]  This         The pointer to this instance of this PPI.
   @param[out] FspHobList   The pointer to Hob list produced by FSP.
 
-  @return EFI_SUCCESS FReturn Hob list produced by FSP successfully.
+  @return EFI_SUCCESS      Return Hob list produced by FSP successfully.
 **/
 EFI_STATUS
 EFIAPI
@@ -157,7 +157,7 @@ EFI_PEI_PPI_DESCRIPTOR            mPeiFspSiliconInitDonePpi = {
   @param[in]  This         The pointer to this instance of this PPI.
   @param[out] FspHobList   The pointer to Hob list produced by FSP.
 
-  @return EFI_SUCCESS FReturn Hob list produced by FSP successfully.
+  @return EFI_SUCCESS      Return Hob list produced by FSP successfully.
 **/
 EFI_STATUS
 EFIAPI
@@ -177,6 +177,49 @@ FspSiliconInitDoneGetFspHobList (
     return EFI_NOT_FOUND;
   }
 }
+
+/**
+  This function is for FSP dispatch mode to perform post FSP-S process.
+
+  @param[in] PeiServices    Pointer to PEI Services Table.
+  @param[in] NotifyDesc     Pointer to the descriptor for the Notification event that
+                            caused this function to execute.
+  @param[in] Ppi            Pointer to the PPI data associated with this function.
+
+  @retval EFI_STATUS        Status returned by PeiServicesInstallPpi ()
+**/
+EFI_STATUS
+EFIAPI
+FspsWrapperEndOfPeiNotify (
+  IN EFI_PEI_SERVICES          **PeiServices,
+  IN EFI_PEI_NOTIFY_DESCRIPTOR *NotifyDesc,
+  IN VOID                      *Ppi
+  )
+{
+  EFI_STATUS  Status;
+
+  //
+  // This step may include platform specific process in some boot loaders so
+  // aligning the same behavior between API and Dispatch modes.
+  // Note: In Dispatch mode no FspHobList so passing NULL to function and
+  //       expecting function will handle it.
+  //
+  PostFspsHobProcess (NULL);
+
+  //
+  // Install FspSiliconInitDonePpi so that any other driver can consume this info.
+  //
+  Status = PeiServicesInstallPpi (&mPeiFspSiliconInitDonePpi);
+  ASSERT_EFI_ERROR(Status);
+
+  return Status;
+}
+
+EFI_PEI_NOTIFY_DESCRIPTOR mFspsWrapperEndOfPeiNotifyDesc = {
+  (EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
+  &gEfiEndOfPeiSignalPpiGuid,
+  FspsWrapperEndOfPeiNotify
+};
 
 /**
   This function is called after PEI core discover memory and finish migration.
@@ -296,12 +339,12 @@ PeiMemoryDiscoveredNotify (
 }
 
 /**
-  Do FSP initialization.
+  Do FSP initialization in API mode
 
-  @return FSP initialization status.
+  @retval EFI_STATUS        Always return EFI_SUCCESS
 **/
 EFI_STATUS
-FspsWrapperInit (
+FspsWrapperInitApiMode (
   VOID
   )
 {
@@ -327,6 +370,35 @@ FspsWrapperInit (
 }
 
 /**
+  Do FSP initialization in Dispatch mode
+
+  @retval FSP initialization status.
+**/
+EFI_STATUS
+FspsWrapperInitDispatchMode (
+  VOID
+  )
+{
+  EFI_STATUS           Status;
+  //
+  // FSP-S Wrapper running in Dispatch mode and reports FSP-S FV to PEI dispatcher.
+  //
+  PeiServicesInstallFvInfoPpi (
+    NULL,
+    (VOID *)(UINTN) PcdGet32 (PcdFspsBaseAddress),
+    (UINT32)((EFI_FIRMWARE_VOLUME_HEADER *) (UINTN) PcdGet32 (PcdFspsBaseAddress))->FvLength,
+    NULL,
+    NULL
+    );
+  //
+  // Register EndOfPei Nofity to run post FSP-S process.
+  //
+  Status = PeiServicesNotifyPpi (&mFspsWrapperEndOfPeiNotifyDesc);
+  ASSERT_EFI_ERROR (Status);
+  return Status;
+}
+
+/**
   This is the entrypoint of PEIM
 
   @param[in] FileHandle  Handle of the file being invoked.
@@ -344,15 +416,9 @@ FspsWrapperPeimEntryPoint (
   DEBUG ((DEBUG_INFO, "FspsWrapperPeimEntryPoint\n"));
 
   if (PcdGet8 (PcdFspModeSelection) == 1) {
-    FspsWrapperInit ();
+    FspsWrapperInitApiMode ();
   } else {
-    PeiServicesInstallFvInfoPpi (
-      NULL,
-      (VOID *)(UINTN) PcdGet32 (PcdFspsBaseAddress),
-      (UINT32)((EFI_FIRMWARE_VOLUME_HEADER *) (UINTN) PcdGet32 (PcdFspsBaseAddress))->FvLength,
-      NULL,
-      NULL
-      );
+    FspsWrapperInitDispatchMode ();
   }
 
   return EFI_SUCCESS;
