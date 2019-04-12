@@ -96,7 +96,7 @@ InstallVbeShim (
   // The allocation request may fail, eg. if LegacyBiosDxe has already run.
   //
   Segment0Pages = 1;
-  Int0x10       = (IVT_ENTRY *)(UINTN)Segment0 + 0x10;
+  Int0x10       = (IVT_ENTRY *)(UINTN)(Segment0 + 0x10 * sizeof (IVT_ENTRY));
   Segment0AllocationStatus = gBS->AllocatePages (
                                     AllocateAddress,
                                     EfiBootServicesCode,
