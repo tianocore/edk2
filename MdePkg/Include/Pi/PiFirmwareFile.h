@@ -480,11 +480,11 @@ typedef struct {
   CHAR16                        VersionString[1];
 } EFI_VERSION_SECTION2;
 
-#define IS_SECTION2(SectionHeaderPtr) \
-    ((UINT32) (*((UINT32 *) ((EFI_COMMON_SECTION_HEADER *) (UINTN) SectionHeaderPtr)->Size) & 0x00ffffff) == 0x00ffffff)
-
 #define SECTION_SIZE(SectionHeaderPtr) \
     ((UINT32) (*((UINT32 *) ((EFI_COMMON_SECTION_HEADER *) (UINTN) SectionHeaderPtr)->Size) & 0x00ffffff))
+
+#define IS_SECTION2(SectionHeaderPtr) \
+    (SECTION_SIZE (SectionHeaderPtr) == 0x00ffffff)
 
 #define SECTION2_SIZE(SectionHeaderPtr) \
     (((EFI_COMMON_SECTION_HEADER2 *) (UINTN) SectionHeaderPtr)->ExtendedSize)
