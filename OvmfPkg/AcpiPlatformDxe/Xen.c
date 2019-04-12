@@ -295,8 +295,15 @@ InstallXenTables (
   }
 
   //
-  // Install DSDT table.
+  // Install DSDT table. If we reached this point without finding the DSDT,
+  // then we're out of sync with the hypervisor, and cannot continue.
   //
+  if (DsdtTable == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a: no DSDT found\n", __FUNCTION__));
+    ASSERT (FALSE);
+    CpuDeadLoop ();
+  }
+
   Status = InstallAcpiTable (
              AcpiProtocol,
              DsdtTable,
