@@ -146,6 +146,8 @@ def TargetTxtDict(ConfDir):
     Target.LoadTargetTxtFile(os.path.normpath(os.path.join(ConfDir, gDefaultTargetTxtFile)))
     return Target
 
+TargetTxt = TargetTxtDict(os.path.join(os.getenv("WORKSPACE"),"Conf"))
+
 ##
 #
 # This acts like the main() function for the script, unless it is 'import'ed into another

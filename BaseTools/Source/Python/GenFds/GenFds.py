@@ -20,7 +20,7 @@ from linecache import getlines
 from io import BytesIO
 
 import Common.LongFilePathOs as os
-from Common.TargetTxtClassObject import TargetTxtClassObject
+from Common.TargetTxtClassObject import TargetTxt
 from Common.DataType import *
 import Common.GlobalData as GlobalData
 from Common import EdkLogger
@@ -207,8 +207,6 @@ def GenFdsApi(FdsCommandDict, WorkSpaceDataBase=None):
             GlobalData.gConfDirectory = GenFdsGlobalVariable.ConfDir
         BuildConfigurationFile = os.path.normpath(os.path.join(ConfDirectoryPath, "target.txt"))
         if os.path.isfile(BuildConfigurationFile) == True:
-            TargetTxt = TargetTxtClassObject()
-            TargetTxt.LoadTargetTxtFile(BuildConfigurationFile)
             # if no build target given in command line, get it from target.txt
             if not GenFdsGlobalVariable.TargetName:
                 BuildTargetList = TargetTxt.TargetTxtDictionary[TAB_TAT_DEFINES_TARGET]

@@ -20,6 +20,9 @@ from Common.BuildToolError import *
 from Common.Misc import tdict, PathClass
 from Common.StringUtils import NormPath
 from Common.DataType import *
+from Common.TargetTxtClassObject import TargetTxt
+gDefaultBuildRuleFile = 'build_rule.txt'
+AutoGenReqBuildRuleVerNum = '0.1'
 
 import Common.EdkLogger as EdkLogger
 
@@ -582,6 +585,25 @@ class BuildRule:
         _Command           : ParseCommonSubSection,
         _UnknownSection    : SkipSection,
     }
+
+def GetBuildRule():
+    BuildRuleFile = None
+    if TAB_TAT_DEFINES_BUILD_RULE_CONF in TargetTxt.TargetTxtDictionary:
+        BuildRuleFile = TargetTxt.TargetTxtDictionary[TAB_TAT_DEFINES_BUILD_RULE_CONF]
+    if not BuildRuleFile:
+        BuildRuleFile = gDefaultBuildRuleFile
+    RetVal = BuildRule(BuildRuleFile)
+    if RetVal._FileVersion == "":
+        RetVal._FileVersion = AutoGenReqBuildRuleVerNum
+    else:
+        if RetVal._FileVersion < AutoGenReqBuildRuleVerNum :
+            # If Build Rule's version is less than the version number required by the tools, halting the build.
+            EdkLogger.error("build", AUTOGEN_ERROR,
+                            ExtraData="The version number [%s] of build_rule.txt is less than the version number required by the AutoGen.(the minimum required version number is [%s])"\
+                             % (RetVal._FileVersion, AutoGenReqBuildRuleVerNum))
+    return RetVal
+
+BuildRuleObj = GetBuildRule()
 
 # This acts like the main() function for the script, unless it is 'import'ed into another
 # script.

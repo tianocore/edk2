@@ -30,8 +30,8 @@ from subprocess import *
 from Common import Misc as Utils
 
 from Common.LongFilePathSupport import OpenLongFilePath as open
-from Common.TargetTxtClassObject import TargetTxtClassObject
-from Common.ToolDefClassObject import ToolDefClassObject
+from Common.TargetTxtClassObject import TargetTxt
+from Common.ToolDefClassObject import ToolDef
 from Common.DataType import *
 from Common.BuildVersion import gBUILD_VERSION
 from AutoGen.AutoGen import *
@@ -716,8 +716,8 @@ class Build():
         self.ConfDirectory = BuildOptions.ConfDirectory
         self.SpawnMode      = True
         self.BuildReport    = BuildReport(BuildOptions.ReportFile, BuildOptions.ReportType)
-        self.TargetTxt      = TargetTxtClassObject()
-        self.ToolDef        = ToolDefClassObject()
+        self.TargetTxt      = TargetTxt
+        self.ToolDef        = ToolDef
         self.AutoGenTime    = 0
         self.MakeTime       = 0
         self.GenFdsTime     = 0
@@ -816,8 +816,8 @@ class Build():
             EdkLogger.quiet("%-16s = %s" % ("POSTBUILD", self.Postbuild))
         if self.Prebuild:
             self.LaunchPrebuild()
-            self.TargetTxt = TargetTxtClassObject()
-            self.ToolDef   = ToolDefClassObject()
+            self.TargetTxt = TargetTxt
+            self.ToolDef   = ToolDef
         if not (self.LaunchPrebuildFlag and os.path.exists(self.PlatformBuildPath)):
             self.InitBuild()
 
@@ -829,23 +829,6 @@ class Build():
     #   This method will parse target.txt and get the build configurations.
     #
     def LoadConfiguration(self):
-        #
-        # Check target.txt and tools_def.txt and Init them
-        #
-        BuildConfigurationFile = os.path.normpath(os.path.join(GlobalData.gConfDirectory, gBuildConfiguration))
-        if os.path.isfile(BuildConfigurationFile) == True:
-            StatusCode = self.TargetTxt.LoadTargetTxtFile(BuildConfigurationFile)
-
-            ToolDefinitionFile = self.TargetTxt.TargetTxtDictionary[TAB_TAT_DEFINES_TOOL_CHAIN_CONF]
-            if ToolDefinitionFile == '':
-                ToolDefinitionFile = gToolsDefinition
-                ToolDefinitionFile = os.path.normpath(mws.join(self.WorkspaceDir, 'Conf', ToolDefinitionFile))
-            if os.path.isfile(ToolDefinitionFile) == True:
-                StatusCode = self.ToolDef.LoadToolDefFile(ToolDefinitionFile)
-            else:
-                EdkLogger.error("build", FILE_NOT_FOUND, ExtraData=ToolDefinitionFile)
-        else:
-            EdkLogger.error("build", FILE_NOT_FOUND, ExtraData=BuildConfigurationFile)
 
         # if no ARCH given in command line, get it from target.txt
         if not self.ArchList:
