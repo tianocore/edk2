@@ -152,7 +152,7 @@ GetPhysicalAddressWidth (
   Get the type of top level page table.
 
   @retval Page512G  PML4 paging.
-  @retval Page1G    PAE paing.
+  @retval Page1G    PAE paging.
 
 **/
 PAGE_ATTRIBUTE
@@ -582,7 +582,7 @@ SetupStackGuardPage (
 }
 
 /**
-  Enabl/setup stack guard for each processor if PcdCpuStackGuard is set to TRUE.
+  Enable/setup stack guard for each processor if PcdCpuStackGuard is set to TRUE.
 
   Doing this in the memory-discovered callback is to make sure the Stack Guard
   feature to cover as most PEI code as possible.
@@ -602,8 +602,14 @@ MemoryDiscoveredPpiNotifyCallback (
   IN VOID                       *Ppi
   )
 {
-  EFI_STATUS      Status;
-  BOOLEAN         InitStackGuard;
+  EFI_STATUS  Status;
+  BOOLEAN     InitStackGuard;
+  BOOLEAN     InterruptState;
+
+  InterruptState = SaveAndDisableInterrupts ();
+  Status = MigrateGdt ();
+  ASSERT_EFI_ERROR (Status);
+  SetInterruptState (InterruptState);
 
   //
   // Paging must be setup first. Otherwise the exception TSS setup during MP
