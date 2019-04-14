@@ -430,6 +430,44 @@ GetGdtr (
 }
 
 /**
+  Migrates the Global Descriptor Table (GDT) to permanent memory.
+
+  @retval   EFI_SUCCESS           The GDT was migrated successfully.
+  @retval   EFI_OUT_OF_RESOURCES  The GDT could not be migrated due to lack of available memory.
+
+**/
+EFI_STATUS
+EFIAPI
+MigrateGdt (
+  VOID
+  )
+{
+  EFI_STATUS          Status;
+  UINTN               GdtBufferSize;
+  IA32_DESCRIPTOR     Gdtr;
+  UINT8               *GdtBuffer;
+
+  AsmReadGdtr ((IA32_DESCRIPTOR *) &Gdtr);
+  GdtBufferSize = sizeof (IA32_TSS_DESCRIPTOR) + Gdtr.Limit + 1;
+
+  Status =  PeiServicesAllocatePool (
+              GdtBufferSize,
+              (VOID **) &GdtBuffer
+              );
+  ASSERT (GdtBuffer != NULL);
+  if (EFI_ERROR (Status)) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  GdtBuffer = ALIGN_POINTER (GdtBuffer, sizeof (IA32_TSS_DESCRIPTOR));
+  CopyMem ((VOID *) (UINTN) GdtBuffer, (VOID *) Gdtr.Base, Gdtr.Limit + 1);
+  Gdtr.Base = (UINT32) GdtBuffer;
+  AsmWriteGdtr (&Gdtr);
+
+  return EFI_SUCCESS;
+}
+
+/**
   Initializes CPU exceptions handlers for the sake of stack switch requirement.
 
   This function is a wrapper of InitializeCpuExceptionHandlersEx. It's mainly
@@ -644,7 +682,7 @@ InitializeCpuMpWorker (
              &gEfiVectorHandoffInfoPpiGuid,
              0,
              NULL,
-             (VOID **)&VectorHandoffInfoPpi
+             (VOID **) &VectorHandoffInfoPpi
              );
   if (Status == EFI_SUCCESS) {
     VectorInfo = VectorHandoffInfoPpi->Info;
