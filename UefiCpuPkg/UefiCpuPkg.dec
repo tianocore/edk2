@@ -28,6 +28,11 @@
   ##
   RegisterCpuFeaturesLib|Include/Library/RegisterCpuFeaturesLib.h
 
+  ##  @libraryclass  Defines routines to dump CPU structure information to debug
+  ##                 output.
+  ##
+  CpuDebugDumpLib|Include/Library/CpuDebugDumpLib.h
+
 [LibraryClasses.IA32, LibraryClasses.X64]
   ##  @libraryclass  Provides functions to manage MTRR settings on IA32 and X64 CPUs.
   ##
