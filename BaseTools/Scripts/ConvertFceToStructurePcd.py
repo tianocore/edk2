@@ -506,6 +506,8 @@ class mainprocess(object):
     for i in range(len(info_list)-1,-1,-1):
       if len(info_list[i]) == 0:
         info_list.remove(info_list[i])
+    for i in (inf_list, title_all, header_list):
+      i.sort()
     return keys,title_all,info_list,header_list,inf_list
 
   def remove_bracket(self,List):
@@ -517,6 +519,9 @@ class mainprocess(object):
           List[List.index(i)][i.index(j)] = "|".join(tmp)
         else:
           List[List.index(i)][i.index(j)] = j
+    for i in List:
+      if type(i) == type([0,0]):
+        i.sort()
     return List
 
   def write_all(self):
