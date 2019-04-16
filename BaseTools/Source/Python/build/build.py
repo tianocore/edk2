@@ -1165,8 +1165,8 @@ class Build():
                     os.remove(ModuleHashFile)
 
             # Remove .hash file from cache
-            if GlobalData.gBinCacheSource:
-                FileDir = path.join(GlobalData.gBinCacheSource, moduleAutoGenObj.Arch, moduleAutoGenObj.SourceDir, moduleAutoGenObj.MetaFile.BaseName)
+            if GlobalData.gBinCacheDest:
+                FileDir = path.join(GlobalData.gBinCacheDest, moduleAutoGenObj.Arch, moduleAutoGenObj.SourceDir, moduleAutoGenObj.MetaFile.BaseName)
                 HashFile = path.join(FileDir, moduleAutoGenObj.Name + '.hash')
                 if os.path.exists(HashFile):
                     os.remove(HashFile)
