@@ -1,7 +1,7 @@
 /*++ @file
 Vfr Syntax
 
-Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2019, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 --*/
@@ -49,7 +49,6 @@ VfrParserStart (
   )
 {
   ParserBlackBox<CVfrDLGLexer, EfiVfrParser, ANTLRToken> VfrParser(File);
-  VfrParser.parser()->SetCompatibleMode (InputInfo->CompatibleMode);
   VfrParser.parser()->SetOverrideClassGuid (InputInfo->OverrideClassGuid);
   return VfrParser.parser()->vfrProgram();
 }
@@ -675,13 +674,6 @@ vfrFormSetDefinition :
                                                     >>
   vfrFormSetList
   E:EndFormSet                                      <<
-                                                      if (mCompatibleMode) {
-                                                        //
-                                                        // declare all undefined varstore and efivarstore
-                                                        //
-                                                        _DeclareDefaultFrameworkVarStore (GET_LINENO(E));
-                                                      }
-                                                      
                                                       //
                                                       // Declare undefined Question so that they can be used in expression.
                                                       //
@@ -5049,7 +5041,6 @@ public:
 
   VOID                _DeclareDefaultLinearVarStore (IN UINT32);
   VOID                _DeclareStandardDefaultStorage (IN UINT32);
-  VOID                _DeclareDefaultFrameworkVarStore (IN UINT32);
 
   VOID                AssignQuestionKey (IN CIfrQuestionHeader &, IN ANTLRTokenPtr);
 
@@ -5058,10 +5049,6 @@ public:
   VOID                IdEqIdDoSpecial       (IN UINT32 &, IN UINT32, IN EFI_QUESTION_ID, IN CHAR8 *, IN UINT32, IN EFI_QUESTION_ID, IN CHAR8 *, IN UINT32, IN EFI_COMPARE_TYPE);
   VOID                IdEqListDoSpecial     (IN UINT32 &, IN UINT32, IN EFI_QUESTION_ID, IN CHAR8 *, IN UINT32, IN UINT16, IN UINT16 *);
   VOID                SetOverrideClassGuid  (IN EFI_GUID *);
-//
-// For framework vfr compatibility
-//
-  VOID                SetCompatibleMode (IN BOOLEAN);
 >>
 }
 
@@ -5542,84 +5529,6 @@ EfiVfrParser::_STOR (
   return Ref;
 }
 
-//
-// framework vfr to default declare varstore for each structure
-//
-VOID
-EfiVfrParser::_DeclareDefaultFrameworkVarStore (
-  IN UINT32 LineNo
-  )
-{
-  SVfrVarStorageNode    *pNode;
-  UINT32                TypeSize;
-  BOOLEAN               FirstNode;
-  CONST CHAR8           VarName[] = "Setup";
-
-  FirstNode = TRUE;
-  pNode = gCVfrDataStorage.GetBufferVarStoreList();
-  if (pNode == NULL && gCVfrVarDataTypeDB.mFirstNewDataTypeName != NULL) {
-    //
-    // Create the default Buffer Var Store when no VarStore is defined.
-    // its name should be "Setup"
-    //
-    gCVfrVarDataTypeDB.GetDataTypeSize (gCVfrVarDataTypeDB.mFirstNewDataTypeName, &TypeSize);
-    CIfrVarStore      VSObj;
-    VSObj.SetLineNo (LineNo);
-    VSObj.SetVarStoreId (0x1); //the first and only one Buffer Var Store
-    VSObj.SetSize ((UINT16) TypeSize);
-    //VSObj.SetName (gCVfrVarDataTypeDB.mFirstNewDataTypeName);
-    VSObj.SetName ((CHAR8 *) VarName);
-    VSObj.SetGuid (&mFormsetGuid);
-#ifdef VFREXP_DEBUG
-    printf ("Create the default VarStoreName is %s\n", gCVfrVarDataTypeDB.mFirstNewDataTypeName);
-#endif
-  } else {
-    for (; pNode != NULL; pNode = pNode->mNext) {
-      //
-      // create the default varstore opcode for not declared varstore
-      // the first varstore name should be "Setup"
-      //
-      if (!pNode->mAssignedFlag) {
-        CIfrVarStore      VSObj;
-        VSObj.SetLineNo (LineNo);
-        VSObj.SetVarStoreId (pNode->mVarStoreId);
-        VSObj.SetSize ((UINT16) pNode->mStorageInfo.mDataType->mTotalSize);
-        if (FirstNode) {
-          VSObj.SetName ((CHAR8 *) VarName);
-          FirstNode = FALSE;
-        } else {
-          VSObj.SetName (pNode->mVarStoreName);
-        }
-        VSObj.SetGuid (&pNode->mGuid);
-#ifdef VFREXP_DEBUG
-        printf ("undefined VarStoreName is %s and Id is 0x%x\n", pNode->mVarStoreName, pNode->mVarStoreId);
-#endif
-      }
-    }
-  }
-
-  pNode = gCVfrDataStorage.GetEfiVarStoreList();
-  for (; pNode != NULL; pNode = pNode->mNext) {
-    //
-    // create the default efi varstore opcode for not exist varstore
-    //
-    if (!pNode->mAssignedFlag) {
-      CIfrVarStoreEfi VSEObj;
-      VSEObj.SetLineNo (LineNo);
-      VSEObj.SetAttributes (0x00000002); //hardcode EFI_VARIABLE_BOOTSERVICE_ACCESS attribute
-      VSEObj.SetGuid (&pNode->mGuid);
-      VSEObj.SetVarStoreId (pNode->mVarStoreId);
-      // Generate old efi varstore storage structure for compatible with old "VarEqVal" opcode,
-      // which is 3 bytes less than new structure define in UEFI Spec 2.3.1.
-      VSEObj.SetBinaryLength (sizeof (EFI_IFR_VARSTORE_EFI) - 3);
-#ifdef VFREXP_DEBUG
-      printf ("undefined Efi VarStoreName is %s and Id is 0x%x\n", pNode->mVarStoreName, pNode->mVarStoreId);
-#endif
-    }
-  }
-
-}
-
 VOID
 EfiVfrParser::_DeclareDefaultLinearVarStore (
   IN UINT32 LineNo
@@ -5917,16 +5826,6 @@ VOID
 EfiVfrParser::SetOverrideClassGuid (IN EFI_GUID *OverrideClassGuid)
 {
   mOverrideClassGuid = OverrideClassGuid;
-}
-
-//
-// For framework vfr compatibility
-//
-VOID
-EfiVfrParser::SetCompatibleMode (IN BOOLEAN Mode)
-{
-  mCompatibleMode = Mode;
-  mCVfrQuestionDB.SetCompatibleMode (Mode);
 }
 
 VOID

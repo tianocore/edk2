@@ -2,7 +2,7 @@
 
   The definition of CFormPkg's member function
 
-Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2019, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -444,21 +444,10 @@ CFormPkg::GenCFile (
     return Ret;
   }
 
-  //
-  // For framework vfr file, the extension framework header will be added.
-  //
-  if (VfrCompatibleMode) {
-    fprintf (pFile, "  // FRAMEWORK PACKAGE HEADER Length\n");
-    PkgLength = PkgHdr->Length + sizeof (UINT32) + 2;
-    _WRITE_PKG_LINE(pFile, BYTES_PRE_LINE, "  ", (CHAR8 *)&PkgLength, sizeof (UINT32));
-    fprintf (pFile, "\n\n  // FRAMEWORK PACKAGE HEADER Type\n");
-    PkgLength = 3;
-    _WRITE_PKG_LINE(pFile, BYTES_PRE_LINE, "  ", (CHAR8 *)&PkgLength, sizeof (UINT16));
-  } else {
-    fprintf (pFile, "  // ARRAY LENGTH\n");
-    PkgLength = PkgHdr->Length + sizeof (UINT32);
-    _WRITE_PKG_LINE(pFile, BYTES_PRE_LINE, "  ", (CHAR8 *)&PkgLength, sizeof (UINT32));
-  }
+
+  fprintf (pFile, "  // ARRAY LENGTH\n");
+  PkgLength = PkgHdr->Length + sizeof (UINT32);
+  _WRITE_PKG_LINE(pFile, BYTES_PRE_LINE, "  ", (CHAR8 *)&PkgLength, sizeof (UINT32));
 
   fprintf (pFile, "\n\n  // PACKAGE HEADER\n");
   _WRITE_PKG_LINE(pFile, BYTES_PRE_LINE, "  ", (CHAR8 *)PkgHdr, sizeof (EFI_HII_PACKAGE_HEADER));
@@ -968,7 +957,7 @@ CFormPkg::DeclarePendingQuestion (
       // For undefined Efi VarStore type question
       // Append the extended guided opcode to contain VarName
       //
-      if (VarStoreType == EFI_VFR_VARSTORE_EFI || VfrCompatibleMode) {
+      if (VarStoreType == EFI_VFR_VARSTORE_EFI) {
         CIfrVarEqName CVNObj (QId, Info.mInfo.mVarName);
         CVNObj.SetLineNo (LineNo);
       }

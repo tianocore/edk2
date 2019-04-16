@@ -2,7 +2,7 @@
 
   The definition of CFormPkg's member function
 
-Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2019, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -95,7 +95,6 @@ struct SBufferNode {
 };
 
 typedef struct {
-  BOOLEAN  CompatibleMode;
   EFI_GUID *OverrideClassGuid;
 } INPUT_INFO_TO_SYNTAX;
 

@@ -2,7 +2,7 @@
 
   Vfr common library functions.
 
-Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2019, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -15,7 +15,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "EfiVfr.h"
 #include "VfrError.h"
 
-extern BOOLEAN  VfrCompatibleMode;
 static EFI_GUID gEdkiiIfrBitVarGuid = EDKII_IFR_BIT_VARSTORE_GUID;
 
 #define MAX_BIT_WIDTH                      32
@@ -423,10 +422,6 @@ public:
   EFI_VFR_RETURN_CODE FindQuestion (IN CHAR8 *);
   VOID                PrintAllQuestion (IN VOID);
   VOID                ResetInit (IN VOID);
-
-  VOID SetCompatibleMode (IN BOOLEAN Mode) {
-    VfrCompatibleMode = Mode;
-  }
 
 private:
   CVfrQuestionDB (IN CONST CVfrQuestionDB&);             // Prevent copy-construction
