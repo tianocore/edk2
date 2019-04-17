@@ -238,17 +238,17 @@ M: Chao Zhang <chao.b.zhang@intel.com>
 M: Jiewen Yao <jiewen.yao@intel.com>
 M: Jian Wang <jian.j.wang@intel.com>
 
-ShellBinPkg
-W: https://github.com/tianocore/tianocore.github.io/wiki/ShellPkg
-M: Jaben Carsey <jaben.carsey@intel.com>      (Ia32/X64)
-M: Ray Ni <ray.ni@intel.com>          (Ia32/X64)
-M: Leif Lindholm <leif.lindholm@linaro.org>   (ARM/AArch64)
-M: Ard Biesheuvel <ard.biesheuvel@linaro.org> (ARM/AArch64)
-
 ShellPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/ShellPkg
 M: Jaben Carsey <jaben.carsey@intel.com>
 M: Ray Ni <ray.ni@intel.com>
+
+Maintainers for stable Shell binaries generation
+when need to publish Shell binaries with edk2 release:
+M: Jaben Carsey <jaben.carsey@intel.com>      (Ia32/X64)
+M: Ray Ni <ray.ni@intel.com>                  (Ia32/X64)
+M: Leif Lindholm <leif.lindholm@linaro.org>   (ARM/AArch64)
+M: Ard Biesheuvel <ard.biesheuvel@linaro.org> (ARM/AArch64)
 
 SignedCapsulePkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/SignedCapsulePkg
