@@ -47,16 +47,18 @@ UpdateBootMode (
 /**
   This function reset the entire platform, including all processor and devices, and
   reboots the system.
+  
+  Declaration of this function goes to MdeModulePkg/Include/Library/ResetSystemLib.h
 
   @param  PeiServices General purpose services available to every PEIM.
 
   @retval EFI_SUCCESS if it completed successfully.
 **/
-EFI_STATUS
-EFIAPI
-ResetSystem (
-  IN CONST EFI_PEI_SERVICES          **PeiServices
-  );
+// EFI_STATUS
+// EFIAPI
+// ResetSystem (
+  // IN CONST EFI_PEI_SERVICES          **PeiServices
+  // );
 
 /**
   This function will be called when MRC is done.

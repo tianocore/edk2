@@ -18,7 +18,6 @@ Module Name:
 #include "PlatformBaseAddresses.h"
 #include "PchAccess.h"
 #include <Guid/PlatformInfo.h>
-#include "Platform.h"
 #include "PchCommonDefinitions.h"
 #include <Ppi/MfgMemoryTest.h>
 #include <Guid/SetupVariable.h>
