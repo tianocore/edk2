@@ -685,10 +685,6 @@ INF $(PLATFORM_PACKAGE)/SmBiosMiscDxe/SmBiosMiscDxe.inf
 
 INF RuleOverride = BINARY $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/$(DXE_ARCHITECTURE)/SmbiosMemory.inf
 
-  #
-  # Legacy Modules
-  #
-INF PcAtChipsetPkg/8259InterruptControllerDxe/8259.inf
 
 #
 # FAT file system

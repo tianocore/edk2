@@ -1420,8 +1420,6 @@ $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/IA32/fTPMInitPeim.inf
   }
 
 
-  PcAtChipsetPkg/8259InterruptControllerDxe/8259.inf
-
 
 !if $(NETWORK_ENABLE) == TRUE
   !if $(NETWORK_ISCSI_ENABLE) == TRUE
