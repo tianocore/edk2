@@ -5,7 +5,7 @@
 #  PXE-compatible device for network access or booting. This driver supports
 #  both IPv4 and IPv6 network stack.
 #
-#  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2019, Intel Corporation. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -102,6 +102,8 @@
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdTftpBlockSize      ## SOMETIMES_CONSUMES
   gEfiNetworkPkgTokenSpaceGuid.PcdPxeTftpWindowSize    ## SOMETIMES_CONSUMES
+  gEfiNetworkPkgTokenSpaceGuid.PcdIPv4PXESupport       ## CONSUMES
+  gEfiNetworkPkgTokenSpaceGuid.PcdIPv6PXESupport       ## CONSUMES
 
 [UserExtensions.TianoCore."ExtraFiles"]
   UefiPxeBcDxeExtra.uni

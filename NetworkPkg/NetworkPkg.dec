@@ -3,7 +3,7 @@
 #
 # This package provides network modules that conform to UEFI 2.4 specification.
 #
-# Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2019, Intel Corporation. All rights reserved.<BR>
 # (C) Copyright 2015-2017 Hewlett Packard Enterprise Development LP<BR>
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -116,6 +116,16 @@
   # 0xFF = Always use iSCSI HBA and ignore UEFI iSCSI.
   # @Prompt Type Value of network boot policy used in iSCSI.
   gEfiNetworkPkgTokenSpaceGuid.PcdIScsiAIPNetworkBootPolicy|0x08|UINT8|0x10000007
+
+  ## IPv4 PXE support
+  # 0x01 = PXE Enabled
+  # 0x00 = PXE Disabled
+  gEfiNetworkPkgTokenSpaceGuid.PcdIPv4PXESupport|0x01|UINT8|0x10000009
+
+  ## IPv6 PXE support
+  # 0x01 = PXE Enabled
+  # 0x00 = PXE Disabled
+  gEfiNetworkPkgTokenSpaceGuid.PcdIPv6PXESupport|0x01|UINT8|0x1000000a
 
 [UserExtensions.TianoCore."ExtraFiles"]
   NetworkPkgExtra.uni
