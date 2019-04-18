@@ -429,7 +429,7 @@ cleanlib:
         self.CommonFileDependency = []
         self.FileListMacros = {}
         self.ListFileMacros = {}
-        self.ObjTargetDict = {}
+        self.ObjTargetDict = OrderedDict()
         self.FileCache = {}
         self.LibraryBuildCommandList = []
         self.LibraryFileList = []
@@ -943,6 +943,12 @@ cleanlib:
             DependencyDict[File] = list(NewDepSet)
 
         # Convert target description object to target string in makefile
+        if self._AutoGenObject.BuildRuleFamily == TAB_COMPILER_MSFT and TAB_C_CODE_FILE in self._AutoGenObject.Targets:
+            for T in self._AutoGenObject.Targets[TAB_C_CODE_FILE]:
+                NewFile = self.PlaceMacro(str(T), self.Macros)
+                if not self.ObjTargetDict.get(T.Target.SubDir):
+                    self.ObjTargetDict[T.Target.SubDir] = set()
+                self.ObjTargetDict[T.Target.SubDir].add(NewFile)
         for Type in self._AutoGenObject.Targets:
             for T in self._AutoGenObject.Targets[Type]:
                 # Generate related macros if needed
@@ -952,13 +958,6 @@ cleanlib:
                     self.ListFileMacros[T.ListFileMacro] = []
                 if T.GenIncListFile and T.IncListFileMacro not in self.ListFileMacros:
                     self.ListFileMacros[T.IncListFileMacro] = []
-                if self._AutoGenObject.BuildRuleFamily == TAB_COMPILER_MSFT and Type == TAB_C_CODE_FILE:
-                    NewFile = self.PlaceMacro(str(T), self.Macros)
-                    if self.ObjTargetDict.get(T.Target.SubDir):
-                        self.ObjTargetDict[T.Target.SubDir].add(NewFile)
-                    else:
-                        self.ObjTargetDict[T.Target.SubDir] = set()
-                        self.ObjTargetDict[T.Target.SubDir].add(NewFile)
 
                 Deps = []
                 CCodeDeps = []
