@@ -63,11 +63,6 @@ M: Liming Gao <liming.gao@intel.com>
 
 EDK II Packages:
 ----------------
-AppPkg
-W: https://github.com/tianocore/tianocore.github.io/wiki/AppPkg
-M: Daryl McDaniel <edk2-lists@mc2research.org>
-M: Jaben Carsey <jaben.carsey@intel.com>
-
 ArmPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/ArmPkg
 M: Leif Lindholm <leif.lindholm@linaro.org>
@@ -258,11 +253,6 @@ M: Chao Zhang <chao.b.zhang@intel.com>
 SourceLevelDebugPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/SourceLevelDebugPkg
 M: Hao Wu <hao.a.wu@intel.com>
-
-StdLib, StdLibPrivateInternalFiles
-W: https://github.com/tianocore/tianocore.github.io/wiki/StdLib
-M: Daryl McDaniel <edk2-lists@mc2research.org>
-M: Jaben Carsey <jaben.carsey@intel.com>
 
 UefiCpuPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/UefiCpuPkg
