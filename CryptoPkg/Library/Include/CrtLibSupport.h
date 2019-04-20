@@ -155,6 +155,7 @@ uid_t          getuid      (void);
 uid_t          geteuid     (void);
 gid_t          getgid      (void);
 gid_t          getegid     (void);
+int            issetugid   (void);
 void           qsort       (void *, size_t, size_t, int (*)(const void *, const void *));
 char           *getenv     (const char *);
 char           *secure_getenv (const char *);
