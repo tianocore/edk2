@@ -1045,16 +1045,18 @@ ON_EXIT:
   @param[in]  VariableName        Name of database variable that is searched in.
   @param[in]  Signature           Pointer to signature that is searched for.
   @param[in]  SignatureSize       Size of Signature.
+  @param[in]  IsFound             Search result.
 
-  @return TRUE                    Found the signature in the variable database.
-  @return FALSE                   Not found the signature in the variable database.
+  @return EFI_SUCCESS             Finished the search without any error.
+  @return Others                  Error occurred in the search in database.
 
 **/
-BOOLEAN
+EFI_STATUS
 IsSignatureFoundInDatabase (
-  IN CHAR16             *VariableName,
-  IN UINT8              *Signature,
-  IN UINTN              SignatureSize
+  IN  CHAR16            *VariableName,
+  IN  UINT8             *Signature,
+  IN  UINTN             SignatureSize,
+  OUT BOOLEAN           *IsFound
   )
 {
   EFI_STATUS          Status;
@@ -1064,22 +1066,29 @@ IsSignatureFoundInDatabase (
   UINT8               *Data;
   UINTN               Index;
   UINTN               CertCount;
-  BOOLEAN             IsFound;
 
   //
   // Read signature database variable.
   //
-  IsFound   = FALSE;
+  *IsFound  = FALSE;
   Data      = NULL;
   DataSize  = 0;
   Status    = gRT->GetVariable (VariableName, &gEfiImageSecurityDatabaseGuid, NULL, &DataSize, NULL);
   if (Status != EFI_BUFFER_TOO_SMALL) {
-    return FALSE;
+    if (Status == EFI_NOT_FOUND) {
+      //
+      // No database, no need to search, or the search has been done already.
+      //
+      Status = EFI_SUCCESS;
+    } else {
+      Status = EFI_ABORTED;
+    }
+    goto Done;
   }
 
   Data = (UINT8 *) AllocateZeroPool (DataSize);
   if (Data == NULL) {
-    return FALSE;
+    goto Done;
   }
 
   Status = gRT->GetVariable (VariableName, &gEfiImageSecurityDatabaseGuid, NULL, &DataSize, Data);
@@ -1100,14 +1109,10 @@ IsSignatureFoundInDatabase (
           //
           // Find the signature in database.
           //
-          IsFound = TRUE;
-          break;
+          *IsFound = TRUE;
+          goto Done;
         }
         Cert = (EFI_SIGNATURE_DATA *) ((UINT8 *) Cert + CertList->SignatureSize);
-      }
-
-      if (IsFound) {
-        break;
       }
     }
 
@@ -1120,7 +1125,7 @@ Done:
     FreePool (Data);
   }
 
-  return IsFound;
+  return Status;
 }
 
 /**
@@ -1205,18 +1210,19 @@ Done:
 
   @param[in]  Certificate       Pointer to X.509 Certificate that is searched for.
   @param[in]  CertSize          Size of X.509 Certificate.
+  @param[in]  IsFound           Search result.
 
-  @return TRUE               Found the certificate hash in the forbidden database.
-  @return FALSE              Certificate hash is Not found in the forbidden database.
+  @return EFI_SUCCESS           Finished the search without any error.
+  @return Others                Error occurred in the search in database.
 
 **/
-BOOLEAN
+EFI_STATUS
 IsCertHashFoundInDbx (
   IN  UINT8               *Certificate,
-  IN  UINTN               CertSize
+  IN  UINTN               CertSize,
+  OUT BOOLEAN             *IsFound
   )
 {
-  BOOLEAN                 IsFound;
   EFI_STATUS              Status;
   EFI_SIGNATURE_LIST      *DbxList;
   EFI_SIGNATURE_DATA      *CertHash;
@@ -1229,7 +1235,7 @@ IsCertHashFoundInDbx (
   UINT8                   *Data;
   UINTN                   DataSize;
 
-  IsFound  = FALSE;
+  *IsFound = FALSE;
   HashAlg  = HASHALG_MAX;
   Data     = NULL;
 
@@ -1239,12 +1245,20 @@ IsCertHashFoundInDbx (
   DataSize  = 0;
   Status    = gRT->GetVariable (EFI_IMAGE_SECURITY_DATABASE1, &gEfiImageSecurityDatabaseGuid, NULL, &DataSize, NULL);
   if (Status != EFI_BUFFER_TOO_SMALL) {
-    return FALSE;
+    if (Status == EFI_NOT_FOUND) {
+      //
+      // No database, no need to search, or the search has been done already.
+      //
+      Status = EFI_SUCCESS;
+    } else {
+      Status = EFI_ABORTED;
+    }
+    goto Done;
   }
 
   Data = (UINT8 *) AllocateZeroPool (DataSize);
   if (Data == NULL) {
-    return FALSE;
+    goto Done;
   }
 
   Status = gRT->GetVariable (EFI_IMAGE_SECURITY_DATABASE1, &gEfiImageSecurityDatabaseGuid, NULL, &DataSize, Data);
@@ -1276,6 +1290,7 @@ IsCertHashFoundInDbx (
     // Calculate the hash value of current db certificate for comparision.
     //
     if (!CalculateCertHash (Certificate, CertSize, HashAlg, CertDigest)) {
+      Status = EFI_ABORTED;
       goto Done;
     }
 
@@ -1291,7 +1306,7 @@ IsCertHashFoundInDbx (
         //
         // Hash of Certificate is found in forbidden database.
         //
-        IsFound = TRUE;
+        *IsFound = TRUE;
         goto Done;
       }
       CertHash = (EFI_SIGNATURE_DATA *) ((UINT8 *) CertHash + DbxList->SignatureSize);
@@ -1306,7 +1321,7 @@ Done:
     FreePool (Data);
   }
 
-  return IsFound;
+  return Status;
 }
 
 /**
@@ -1641,17 +1656,23 @@ IsX509CertInDbx (
   //
   // Check the raw certificate.
   //
-  IsFound = FALSE;
-  if (IsSignatureFoundInDatabase (EFI_IMAGE_SECURITY_DATABASE1, X509Data, X509DataSize)) {
-    IsFound = TRUE;
+  Status = IsSignatureFoundInDatabase (
+             EFI_IMAGE_SECURITY_DATABASE1,
+             X509Data,
+             X509DataSize,
+             &IsFound
+             );
+  if (EFI_ERROR (Status) || IsFound) {
+    IsFound = TRUE; // in case of false negative
     goto ON_EXIT;
   }
 
   //
   // Check the hash of certificate.
   //
-  if (IsCertHashFoundInDbx (X509Data, X509DataSize)) {
-    IsFound = TRUE;
+  Status = IsCertHashFoundInDbx (X509Data, X509DataSize, &IsFound);
+  if (EFI_ERROR (Status)) {
+    IsFound = TRUE; // in case of false negative
     goto ON_EXIT;
   }
 
