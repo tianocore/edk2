@@ -66,6 +66,7 @@
   gEfiCapsuleReportGuid
   gEfiCapsuleVendorGuid                   ## SOMETIMES_CONSUMES ## Variable:L"CapsuleUpdateData"
   gEfiEndOfDxeEventGroupGuid              ## CONSUMES ## Event
+  gEfiEventReadyToBootGuid                ## CONSUMES ## Event
   gEfiEventVirtualAddressChangeGuid       ## CONSUMES ## Event
 
 [Depex]
