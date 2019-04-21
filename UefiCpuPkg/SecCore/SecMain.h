@@ -15,6 +15,7 @@
 #include <Ppi/TemporaryRamDone.h>
 #include <Ppi/SecPerformance.h>
 #include <Ppi/PeiCoreFvLocation.h>
+#include <Ppi/RepublishSecPpi.h>
 
 #include <Guid/FirmwarePerformance.h>
 
