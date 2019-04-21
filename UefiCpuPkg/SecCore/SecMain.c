@@ -370,12 +370,34 @@ SecTemporaryRamDone (
   VOID
   )
 {
-  BOOLEAN  State;
+  EFI_STATUS                    Status;
+  EFI_STATUS                    Status2;
+  UINTN                         Index;
+  BOOLEAN                       State;
+  EFI_PEI_PPI_DESCRIPTOR        *PeiPpiDescriptor;
+  REPUBLISH_SEC_PPI_PPI         *RepublishSecPpiPpi;
 
   //
   // Republish Sec Platform Information(2) PPI
   //
   RepublishSecPlatformInformationPpi ();
+
+  //
+  // Re-install SEC PPIs using a PEIM produced service if published
+  //
+  for (Index = 0, Status = EFI_SUCCESS; Status == EFI_SUCCESS; Index++) {
+    Status = PeiServicesLocatePpi (
+               &gRepublishSecPpiPpiGuid,
+               Index,
+               &PeiPpiDescriptor,
+               (VOID **) &RepublishSecPpiPpi
+               );
+    if (!EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_INFO, "Calling RepublishSecPpi instance %d.\n", Index));
+      Status2 = RepublishSecPpiPpi->RepublishSecPpis ();
+      ASSERT_EFI_ERROR (Status2);
+    }
+  }
 
   //
   // Migrate DebugAgentContext.
@@ -385,7 +407,7 @@ SecTemporaryRamDone (
   //
   // Disable interrupts and save current interrupt state
   //
-  State = SaveAndDisableInterrupts();
+  State = SaveAndDisableInterrupts ();
 
   //
   // Disable Temporary RAM after Stack and Heap have been migrated at this point.
