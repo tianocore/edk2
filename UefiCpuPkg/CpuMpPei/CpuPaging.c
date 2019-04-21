@@ -622,15 +622,26 @@ MemoryDiscoveredPpiNotifyCallback (
   // the task switch (for the sake of stack switch).
   //
   InitStackGuard = FALSE;
-  if (IsIa32PaeSupported () && PcdGetBool (PcdCpuStackGuard)) {
+  if (IsIa32PaeSupported ()) {
+    InitStackGuard = PcdGetBool (PcdCpuStackGuard);
     EnablePaging ();
-    InitStackGuard = TRUE;
   }
 
   DumpIdt ();
   Status = InitializeCpuMpWorker ((CONST EFI_PEI_SERVICES **) PeiServices);
   ASSERT_EFI_ERROR (Status);
   DumpIdt ();
+
+  //
+  // @todo: move to a separate function and enable with parameter
+  // @todo: set page attributes to make IBB code area as not present wihout hardocding here
+  //
+  ConvertMemoryPageAttributes (0xFFDC0000, 0x240000, 0);
+
+  //
+  // Publish the changes of page table.
+  //
+  CpuFlushTlb ();
 
   if (InitStackGuard) {
     SetupStackGuardPage ();
