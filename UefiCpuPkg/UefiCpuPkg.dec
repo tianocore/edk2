@@ -84,6 +84,9 @@
   ## Include/Ppi/ShadowMicrocode.h
   gEdkiiPeiShadowMicrocodePpiGuid = { 0x430f6965, 0x9a69, 0x41c5, { 0x93, 0xed, 0x8b, 0xf0, 0x64, 0x35, 0xc1, 0xc6 }}
 
+  ## Include/Ppi/RepublishSecPpi.h
+  gRepublishSecPpiPpiGuid   = { 0x27a71b1e, 0x73ee, 0x43d6, { 0xac, 0xe3, 0x52, 0x1a, 0x2d, 0xc5, 0xd0, 0x92 }}
+
 [PcdsFeatureFlag]
   ## Indicates if SMM Profile will be enabled.
   #  If enabled, instruction executions in and data accesses to memory outside of SMRAM will be logged.
