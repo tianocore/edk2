@@ -57,6 +57,7 @@
   PeiServicesLib|MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
   MemoryAllocationLib|MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
   HobLib|MdePkg/Library/PeiHobLib/PeiHobLib.inf
+  NULL|IntelFsp2WrapperPkg/Library/PeiFspWrapperSecMigrationLib/PeiFspWrapperSecMigrationLib.inf
 
 [LibraryClasses.common.DXE_DRIVER]
   UefiDriverEntryPoint|MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
