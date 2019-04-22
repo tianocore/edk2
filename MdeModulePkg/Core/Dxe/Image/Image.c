@@ -134,12 +134,14 @@ PeCoffEmuProtocolNotify (
   IN  VOID            *Context
   )
 {
-  EFI_STATUS          Status;
-  UINTN               BufferSize;
-  EFI_HANDLE          EmuHandle;
-  EMULATOR_ENTRY      *Entry;
+  EFI_STATUS                            Status;
+  UINTN                                 BufferSize;
+  EFI_HANDLE                            EmuHandle;
+  EDKII_PECOFF_IMAGE_EMULATOR_PROTOCOL  *Emulator;
+  EMULATOR_ENTRY                        *Entry;
 
   EmuHandle = NULL;
+  Emulator  = NULL;
 
   while (TRUE) {
     BufferSize = sizeof (EmuHandle);
@@ -157,16 +159,19 @@ PeCoffEmuProtocolNotify (
       return;
     }
 
-    Entry = AllocateZeroPool (sizeof (*Entry));
-    ASSERT (Entry != NULL);
-
     Status = CoreHandleProtocol (
                EmuHandle,
                &gEdkiiPeCoffImageEmulatorProtocolGuid,
-               (VOID **)&Entry->Emulator
+               (VOID **)&Emulator
                );
-    ASSERT_EFI_ERROR (Status);
+    if (EFI_ERROR (Status) || Emulator == NULL) {
+      continue;
+    }
 
+    Entry = AllocateZeroPool (sizeof (*Entry));
+    ASSERT (Entry != NULL);
+
+    Entry->Emulator    = Emulator;
     Entry->MachineType = Entry->Emulator->MachineType;
 
     InsertTailList (&mAvailableEmulators, &Entry->Link);
