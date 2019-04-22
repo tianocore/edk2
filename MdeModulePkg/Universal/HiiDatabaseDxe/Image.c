@@ -2,7 +2,7 @@
 Implementation for EFI_HII_IMAGE_PROTOCOL.
 
 
-Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2019, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -653,6 +653,7 @@ HiiNewImage (
   //
   NewBlockSize = (UINT32)Image->Width * Image->Height;
   if (NewBlockSize > (MAX_UINT32 - (sizeof (EFI_HII_IIBT_IMAGE_24BIT_BLOCK) - sizeof (EFI_HII_RGB_PIXEL))) / 3) {
+    EfiReleaseLock (&mHiiDatabaseLock);
     return EFI_OUT_OF_RESOURCES;
   }
   NewBlockSize = NewBlockSize * 3 + (sizeof (EFI_HII_IIBT_IMAGE_24BIT_BLOCK) - sizeof (EFI_HII_RGB_PIXEL));
@@ -680,6 +681,7 @@ HiiNewImage (
     // Length of the package header is represented using 24 bits. So MAX length is MAX_UINT24.
     //
     if (NewBlockSize > MAX_UINT24 - ImagePackage->ImagePkgHdr.Header.Length) {
+      EfiReleaseLock (&mHiiDatabaseLock);
       return EFI_OUT_OF_RESOURCES;
     }
     //
@@ -721,6 +723,7 @@ HiiNewImage (
     // Length of the package header is represented using 24 bits. So MAX length is MAX_UINT24.
     //
     if (NewBlockSize > MAX_UINT24 - (sizeof (EFI_HII_IMAGE_PACKAGE_HDR) + sizeof (EFI_HII_IIBT_END_BLOCK))) {
+      EfiReleaseLock (&mHiiDatabaseLock);
       return EFI_OUT_OF_RESOURCES;
     }
     //
@@ -1161,12 +1164,14 @@ HiiSetImage (
   //
   NewBlockSize = (UINT32)Image->Width * Image->Height;
   if (NewBlockSize > (MAX_UINT32 - (sizeof (EFI_HII_IIBT_IMAGE_24BIT_BLOCK) - sizeof (EFI_HII_RGB_PIXEL))) / 3) {
+    EfiReleaseLock (&mHiiDatabaseLock);
     return EFI_OUT_OF_RESOURCES;
   }
   NewBlockSize = NewBlockSize * 3 + (sizeof (EFI_HII_IIBT_IMAGE_24BIT_BLOCK) - sizeof (EFI_HII_RGB_PIXEL));
   if ((NewBlockSize > OldBlockSize) &&
       (NewBlockSize - OldBlockSize > MAX_UINT24 - ImagePackage->ImagePkgHdr.Header.Length)
       ) {
+    EfiReleaseLock (&mHiiDatabaseLock);
     return EFI_OUT_OF_RESOURCES;
   }
 
