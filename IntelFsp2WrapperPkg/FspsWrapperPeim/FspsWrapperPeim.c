@@ -38,7 +38,7 @@ extern EFI_PEI_NOTIFY_DESCRIPTOR mS3EndOfPeiNotifyDesc;
 extern EFI_GUID                  gFspHobGuid;
 
 /**
-  This function handles S3 resume task at the end of PEI
+  This function handles S3 resume task at the end of PEI.
 
   @param[in] PeiServices    Pointer to PEI Services Table.
   @param[in] NotifyDesc     Pointer to the descriptor for the Notification event that
@@ -62,7 +62,7 @@ EFI_PEI_NOTIFY_DESCRIPTOR mS3EndOfPeiNotifyDesc = {
 };
 
 /**
-  This function handles S3 resume task at the end of PEI
+  This function handles S3 resume task at the end of PEI.
 
   @param[in] PeiServices    Pointer to PEI Services Table.
   @param[in] NotifyDesc     Pointer to the descriptor for the Notification event that
@@ -339,7 +339,7 @@ PeiMemoryDiscoveredNotify (
 }
 
 /**
-  Do FSP initialization in API mode
+  Do FSP initialization in API mode.
 
   @retval EFI_STATUS        Always return EFI_SUCCESS
 **/
@@ -370,7 +370,7 @@ FspsWrapperInitApiMode (
 }
 
 /**
-  Do FSP initialization in Dispatch mode
+  Do FSP initialization in Dispatch mode.
 
   @retval FSP initialization status.
 **/
@@ -399,7 +399,7 @@ FspsWrapperInitDispatchMode (
 }
 
 /**
-  This is the entrypoint of PEIM
+  This is the entrypoint of PEIM.
 
   @param[in] FileHandle  Handle of the file being invoked.
   @param[in] PeiServices Describes the list of possible PEI Services.
