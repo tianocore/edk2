@@ -112,11 +112,9 @@
   NetworkPkg/HttpBootDxe/HttpBootDxe.inf
   NetworkPkg/WifiConnectionManagerDxe/WifiConnectionManagerDxe.inf
 
-  NetworkPkg/Application/IpsecConfig/IpSecConfig.inf
   NetworkPkg/Application/VConfig/VConfig.inf
 
 [Components.IA32, Components.X64]
-  NetworkPkg/IpSecDxe/IpSecDxe.inf
   NetworkPkg/IScsiDxe/IScsiDxe.inf
   NetworkPkg/UefiPxeBcDxe/UefiPxeBcDxe.inf
   NetworkPkg/TlsDxe/TlsDxe.inf
