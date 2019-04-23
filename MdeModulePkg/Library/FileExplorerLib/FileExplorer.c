@@ -1,7 +1,7 @@
 /** @file
 File explorer related functions.
 
-Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2019, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -1643,6 +1643,7 @@ FileExplorerLibDestructor (
     ASSERT_EFI_ERROR (Status);
 
     HiiRemovePackages (gFileExplorerPrivate.FeHiiHandle);
+    gFileExplorerPrivate.FeDriverHandle = NULL;
   }
 
   FreePool (gHiiVendorDevicePath);
