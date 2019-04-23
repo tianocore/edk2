@@ -1023,7 +1023,7 @@ cleanlib:
             CommandList = T.Commands[:]
             for Item in CommandList[:]:
                 SingleCommandList = Item.split()
-                if len(SingleCommandList) > 0 and '$(CC)' in SingleCommandList[0]:
+                if len(SingleCommandList) > 0 and self.CheckCCCmd(SingleCommandList):
                     for Temp in SingleCommandList:
                         if Temp.startswith('/Fo'):
                             CmdSign = '%s%s' % (Temp.rsplit(TAB_SLASH, 1)[0], TAB_SLASH)
@@ -1043,6 +1043,11 @@ cleanlib:
                         T.Commands.pop(Index)
         return T, CmdSumDict, CmdTargetDict, CmdCppDict
 
+    def CheckCCCmd(self, CommandList):
+        for cmd in CommandList:
+            if '$(CC)' in cmd:
+                return True
+        return False
     ## For creating makefile targets for dependent libraries
     def ProcessDependentLibrary(self):
         for LibraryAutoGen in self._AutoGenObject.LibraryAutoGenList:
