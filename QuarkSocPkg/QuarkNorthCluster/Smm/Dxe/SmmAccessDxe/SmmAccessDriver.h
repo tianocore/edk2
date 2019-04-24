@@ -3,7 +3,7 @@ Header file for SMM Access Driver.
 
 This file includes package header files, library classes and protocol, PPI & GUID definitions.
 
-Copyright (c) 2013-2015 Intel Corporation.
+Copyright (c) 2013-2019 Intel Corporation.
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -21,6 +21,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/BaseMemoryLib.h>
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/DxeServicesTableLib.h>
 #include <Library/PcdLib.h>
 
 //

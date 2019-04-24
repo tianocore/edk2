@@ -1,7 +1,7 @@
 ## @file
 # Component description file for SmmAccess module
 #
-# Copyright (c) 2013-2015 Intel Corporation.
+# Copyright (c) 2013-2019 Intel Corporation.
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -34,6 +34,7 @@
   S3BootScriptLib
   UefiDriverEntryPoint
   UefiBootServicesTableLib
+  DxeServicesTableLib
   PcdLib
   SmmLib
 

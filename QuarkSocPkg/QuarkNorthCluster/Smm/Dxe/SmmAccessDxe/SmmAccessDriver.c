@@ -2,7 +2,7 @@
 This is the driver that publishes the SMM Access Protocol
 instance for the Tylersburg chipset.
 
-Copyright (c) 2013-2015 Intel Corporation.
+Copyright (c) 2013-2019 Intel Corporation.
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -221,6 +221,7 @@ Returns:
 
 --*/
 {
+  EFI_STATUS              Status;
   SMM_ACCESS_PRIVATE_DATA *SmmAccess;
   BOOLEAN                 OpenState;
   UINTN                   Index;
@@ -237,6 +238,21 @@ Returns:
 
   if (mSmmAccess.SMMRegionState & EFI_SMRAM_CLOSED) {
     return EFI_DEVICE_ERROR;
+  }
+
+  //
+  // Reset SMRAM cacheability to UC
+  //
+  for (Index = 0; Index < mSmmAccess.NumberRegions; Index++) {
+    DEBUG ((DEBUG_INFO, "SmmAccess->Close: Set to UC Base=%016lx  Size=%016lx\n", SmmAccess->SmramDesc[Index].CpuStart, SmmAccess->SmramDesc[Index].PhysicalSize));
+    Status = gDS->SetMemorySpaceAttributes(
+                    SmmAccess->SmramDesc[Index].CpuStart,
+                    SmmAccess->SmramDesc[Index].PhysicalSize,
+                    EFI_MEMORY_UC
+                    );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_WARN, "SmmAccess: Failed to reset SMRAM window to EFI_MEMORY_UC\n"));
+    }
   }
 
   //
