@@ -5,7 +5,7 @@
   for Firmware Basic Boot Performance Record and other boot performance records,
   and install FPDT to ACPI table.
 
-  Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011 - 2019, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -40,7 +40,7 @@ EFI_RSC_HANDLER_PROTOCOL    *mRscHandlerProtocol = NULL;
 BOOLEAN                     mLockBoxReady = FALSE;
 EFI_EVENT                   mReadyToBootEvent;
 EFI_EVENT                   mLegacyBootEvent;
-EFI_EVENT                   mExitBootServicesEvent;
+static EFI_EVENT            mExitBootServicesEvent;
 UINTN                       mFirmwarePerformanceTableTemplateKey  = 0;
 BOOLEAN                     mDxeCoreReportStatusCodeEnable = FALSE;
 
