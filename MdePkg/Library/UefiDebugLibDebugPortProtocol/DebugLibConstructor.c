@@ -17,7 +17,7 @@
 //
 BOOLEAN     mPostEBS = FALSE;
 
-EFI_EVENT   mExitBootServicesEvent;
+static EFI_EVENT   mExitBootServicesEvent;
 
 //
 // Pointer to SystemTable
