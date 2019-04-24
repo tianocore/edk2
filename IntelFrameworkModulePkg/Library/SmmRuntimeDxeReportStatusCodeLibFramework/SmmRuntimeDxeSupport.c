@@ -1,7 +1,7 @@
 /** @file
   Library constructor & destructor, event handlers, and other internal worker functions.
 
-  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -9,7 +9,7 @@
 #include "ReportStatusCodeLibInternal.h"
 
 EFI_EVENT                     mVirtualAddressChangeEvent;
-EFI_EVENT                     mExitBootServicesEvent;
+static EFI_EVENT              mExitBootServicesEvent;
 EFI_STATUS_CODE_DATA          *mStatusCodeData;
 BOOLEAN                       mInSmm;
 EFI_SMM_BASE_PROTOCOL         *mSmmBase;
