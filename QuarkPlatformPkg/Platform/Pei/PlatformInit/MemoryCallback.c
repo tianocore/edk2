@@ -7,7 +7,7 @@ following action is performed in this file,
   4. Set MTRR for PEI
   5. Create FV HOB and Flash HOB
 
-Copyright (c) 2013 - 2016, Intel Corporation.
+Copyright (c) 2013 - 2019, Intel Corporation.
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -20,7 +20,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 extern EFI_PEI_PPI_DESCRIPTOR mPpiStall[];
 
-EFI_PEI_RESET_PPI mResetPpi = { ResetSystem };
+EFI_PEI_RESET_PPI mResetPpi = { PlatformResetSystem };
 
 EFI_PEI_PPI_DESCRIPTOR mPpiList[1] = {
   {
@@ -40,7 +40,7 @@ EFI_PEI_PPI_DESCRIPTOR mPpiList[1] = {
 **/
 EFI_STATUS
 EFIAPI
-ResetSystem (
+PlatformResetSystem (
   IN CONST EFI_PEI_SERVICES          **PeiServices
   )
 {

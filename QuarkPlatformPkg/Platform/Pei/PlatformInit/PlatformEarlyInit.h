@@ -1,7 +1,7 @@
 /** @file
 The header file of Platform PEIM.
 
-Copyright (c) 2013 Intel Corporation.
+Copyright (c) 2013 - 2019 Intel Corporation.
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -59,7 +59,7 @@ UpdateBootMode (
 **/
 EFI_STATUS
 EFIAPI
-ResetSystem (
+PlatformResetSystem (
   IN CONST EFI_PEI_SERVICES          **PeiServices
   );
 
