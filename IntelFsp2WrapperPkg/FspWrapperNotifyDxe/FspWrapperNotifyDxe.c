@@ -1,7 +1,7 @@
 /** @file
   This driver will register two callbacks to call fsp's notifies.
 
-  Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2019, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -39,7 +39,7 @@ extern EFI_GUID gAddPerfRecordProtocolGuid;
 extern EFI_GUID gFspHobGuid;
 extern EFI_GUID gFspApiPerformanceGuid;
 
-EFI_EVENT mExitBootServicesEvent     = NULL;
+static EFI_EVENT mExitBootServicesEvent     = NULL;
 
 /**
   Relocate this image under 4G memory.
