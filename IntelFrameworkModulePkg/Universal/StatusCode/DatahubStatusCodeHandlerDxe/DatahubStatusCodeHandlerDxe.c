@@ -2,14 +2,14 @@
   Status Code Handler Driver which produces datahub handler and hook it
   onto the DXE status code router.
 
-  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2019, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include "DatahubStatusCodeHandlerDxe.h"
 
-EFI_EVENT                 mExitBootServicesEvent     = NULL;
+static EFI_EVENT          mExitBootServicesEvent     = NULL;
 EFI_RSC_HANDLER_PROTOCOL  *mRscHandlerProtocol       = NULL;
 
 /**
