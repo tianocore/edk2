@@ -394,6 +394,7 @@
   gEfiMdePkgTokenSpaceGuid.PcdMaximumAsciiStringLength     ## SOMETIMES_CONSUMES
   gEfiMdePkgTokenSpaceGuid.PcdMaximumUnicodeStringLength   ## SOMETIMES_CONSUMES
   gEfiMdePkgTokenSpaceGuid.PcdControlFlowEnforcementPropertyMask   ## SOMETIMES_CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdSpeculationBarrierType       ## SOMETIMES_CONSUMES
 
 [FeaturePcd]
   gEfiMdePkgTokenSpaceGuid.PcdVerifyNodeInList  ## CONSUMES

@@ -1,7 +1,7 @@
 /** @file
   SpeculationBarrier() function for IA32 and x64.
 
-  Copyright (C) 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (C) 2018 - 2019, Intel Corporation. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -22,5 +22,9 @@ SpeculationBarrier (
   VOID
   )
 {
-  AsmLfence ();
+  if (PcdGet8 (PcdSpeculationBarrierType) == 0x01) {
+    AsmLfence ();
+  } else if (PcdGet8 (PcdSpeculationBarrierType) == 0x02) {
+    AsmCpuid (0x01, NULL, NULL, NULL, NULL);
+  }
 }
