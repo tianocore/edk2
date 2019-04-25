@@ -22,6 +22,7 @@
 [Packages]
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
   SecurityPkg/SecurityPkg.dec
   ShellPkg/ShellPkg.dec
 
@@ -33,6 +34,7 @@
   gEfiGlobalVariableGuid
   gEfiImageSecurityDatabaseGuid
   gEfiSecureBootEnableDisableGuid
+  gMicrosoftVendorGuid
 
 [LibraryClasses]
   BaseMemoryLib

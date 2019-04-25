@@ -138,6 +138,4 @@ extern CONST UINTN mSizeOfMicrosoftUefiCa;
 extern CONST UINT8 mSha256OfDevNull[];
 extern CONST UINTN mSizeOfSha256OfDevNull;
 
-extern CONST EFI_GUID mMicrosoftOwnerGuid;
-
 #endif /* ENROLL_DEFAULT_KEYS_H_ */

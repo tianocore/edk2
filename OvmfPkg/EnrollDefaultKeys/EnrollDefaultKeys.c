@@ -8,6 +8,7 @@
 #include <Guid/AuthenticatedVariableFormat.h>    // gEfiCustomModeEnableGuid
 #include <Guid/GlobalVariable.h>                 // EFI_SETUP_MODE_NAME
 #include <Guid/ImageAuthentication.h>            // EFI_IMAGE_SECURITY_DATABASE
+#include <Guid/MicrosoftVendor.h>                // gMicrosoftVendorGuid
 #include <Library/BaseMemoryLib.h>               // CopyGuid()
 #include <Library/DebugLib.h>                    // ASSERT()
 #include <Library/MemoryAllocationLib.h>         // FreePool()
@@ -315,8 +316,8 @@ ShellAppMain (
              EFI_IMAGE_SECURITY_DATABASE,
              &gEfiImageSecurityDatabaseGuid,
              &gEfiCertX509Guid,
-             mMicrosoftPca,    mSizeOfMicrosoftPca,    &mMicrosoftOwnerGuid,
-             mMicrosoftUefiCa, mSizeOfMicrosoftUefiCa, &mMicrosoftOwnerGuid,
+             mMicrosoftPca,    mSizeOfMicrosoftPca,    &gMicrosoftVendorGuid,
+             mMicrosoftUefiCa, mSizeOfMicrosoftUefiCa, &gMicrosoftVendorGuid,
              NULL);
   if (EFI_ERROR (Status)) {
     return 1;
@@ -337,7 +338,7 @@ ShellAppMain (
              &gEfiGlobalVariableGuid,
              &gEfiCertX509Guid,
              mRedHatPkKek1, mSizeOfRedHatPkKek1, &gEfiCallerIdGuid,
-             mMicrosoftKek, mSizeOfMicrosoftKek, &mMicrosoftOwnerGuid,
+             mMicrosoftKek, mSizeOfMicrosoftKek, &gMicrosoftVendorGuid,
              NULL);
   if (EFI_ERROR (Status)) {
     return 1;

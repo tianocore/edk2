@@ -523,31 +523,3 @@ CONST UINT8 mSha256OfDevNull[] = {
 };
 
 CONST UINTN mSizeOfSha256OfDevNull = sizeof mSha256OfDevNull;
-
-
-//
-// The following test cases of the Secure Boot Logo Test in the Microsoft
-// Hardware Certification Kit:
-//
-// - Microsoft.UefiSecureBootLogo.Tests.OutOfBoxVerifyMicrosoftKEKpresent
-// - Microsoft.UefiSecureBootLogo.Tests.OutOfBoxConfirmMicrosoftSignatureInDB
-//
-// expect the EFI_SIGNATURE_DATA.SignatureOwner GUID to be
-// 77FA9ABD-0359-4D32-BD60-28F4E78F784B, when the
-// EFI_SIGNATURE_DATA.SignatureData field carries any of the following X509
-// certificates:
-//
-// - "Microsoft Corporation KEK CA 2011" (in KEK)
-// - "Microsoft Windows Production PCA 2011" (in db)
-// - "Microsoft Corporation UEFI CA 2011" (in db)
-//
-// This is despite the fact that the UEFI specification requires
-// EFI_SIGNATURE_DATA.SignatureOwner to reflect the agent (i.e., OS,
-// application or driver) that enrolled and therefore owns
-// EFI_SIGNATURE_DATA.SignatureData, and not the organization that issued
-// EFI_SIGNATURE_DATA.SignatureData.
-//
-CONST EFI_GUID mMicrosoftOwnerGuid = {
-  0x77fa9abd, 0x0359, 0x4d32,
-  { 0xbd, 0x60, 0x28, 0xf4, 0xe7, 0x8f, 0x78, 0x4b },
-};
