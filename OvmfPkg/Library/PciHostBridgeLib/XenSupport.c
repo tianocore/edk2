@@ -60,9 +60,7 @@ PcatPciRootBridgeParseBars (
   IN UINTN                          BarOffsetEnd,
   IN PCI_ROOT_BRIDGE_APERTURE       *Io,
   IN PCI_ROOT_BRIDGE_APERTURE       *Mem,
-  IN PCI_ROOT_BRIDGE_APERTURE       *MemAbove4G,
-  IN PCI_ROOT_BRIDGE_APERTURE       *PMem,
-  IN PCI_ROOT_BRIDGE_APERTURE       *PMemAbove4G
+  IN PCI_ROOT_BRIDGE_APERTURE       *MemAbove4G
 
 )
 {
@@ -123,11 +121,7 @@ PcatPciRootBridgeParseBars (
           //
           Length = ((~Length) + 1) & 0xffffffff;
 
-          if ((Value & BIT3) == BIT3) {
-            MemAperture = PMem;
-          } else {
-            MemAperture = Mem;
-          }
+          MemAperture = Mem;
         } else {
           //
           // 64bit
@@ -143,11 +137,7 @@ PcatPciRootBridgeParseBars (
           Length = Length | LShiftU64 ((UINT64) UpperValue, 32);
           Length = (~Length) + 1;
 
-          if ((Value & BIT3) == BIT3) {
-            MemAperture = PMemAbove4G;
-          } else {
-            MemAperture = MemAbove4G;
-          }
+          MemAperture = MemAbove4G;
         }
 
         Limit = Base + Length - 1;
@@ -163,6 +153,8 @@ PcatPciRootBridgeParseBars (
     }
   }
 }
+
+STATIC PCI_ROOT_BRIDGE_APERTURE mNonExistAperture = { MAX_UINT64, 0 };
 
 PCI_ROOT_BRIDGE *
 ScanForRootBridges (
@@ -180,7 +172,7 @@ ScanForRootBridges (
   UINT64     Base;
   UINT64     Limit;
   UINT64     Value;
-  PCI_ROOT_BRIDGE_APERTURE Io, Mem, MemAbove4G, PMem, PMemAbove4G, *MemAperture;
+  PCI_ROOT_BRIDGE_APERTURE Io, Mem, MemAbove4G, *MemAperture;
   PCI_ROOT_BRIDGE *RootBridges;
   UINTN      BarOffsetEnd;
 
@@ -200,9 +192,7 @@ ScanForRootBridges (
     ZeroMem (&Io, sizeof (Io));
     ZeroMem (&Mem, sizeof (Mem));
     ZeroMem (&MemAbove4G, sizeof (MemAbove4G));
-    ZeroMem (&PMem, sizeof (PMem));
-    ZeroMem (&PMemAbove4G, sizeof (PMemAbove4G));
-    Io.Base = Mem.Base = MemAbove4G.Base = PMem.Base = PMemAbove4G.Base = MAX_UINT64;
+    Io.Base = Mem.Base = MemAbove4G.Base = MAX_UINT64;
     //
     // Scan all the PCI devices on the primary bus of the PCI root bridge
     //
@@ -307,16 +297,17 @@ ScanForRootBridges (
 
           //
           // Get the Prefetchable Memory range that the PPB is decoding
+          // and merge it into Memory range
           //
           Value = Pci.Bridge.PrefetchableMemoryBase & 0x0f;
           Base = ((UINT32) Pci.Bridge.PrefetchableMemoryBase & 0xfff0) << 16;
           Limit = (((UINT32) Pci.Bridge.PrefetchableMemoryLimit & 0xfff0)
                    << 16) | 0xfffff;
-          MemAperture = &PMem;
+          MemAperture = &Mem;
           if (Value == BIT0) {
             Base |= LShiftU64 (Pci.Bridge.PrefetchableBaseUpper32, 32);
             Limit |= LShiftU64 (Pci.Bridge.PrefetchableLimitUpper32, 32);
-            MemAperture = &PMemAbove4G;
+            MemAperture = &MemAbove4G;
           }
           if (Base < Limit) {
             if (MemAperture->Base > Base) {
@@ -367,8 +358,7 @@ ScanForRootBridges (
           OFFSET_OF (PCI_TYPE00, Device.Bar),
           BarOffsetEnd,
           &Io,
-          &Mem, &MemAbove4G,
-          &PMem, &PMemAbove4G
+          &Mem, &MemAbove4G
         );
 
         //
@@ -440,7 +430,7 @@ ScanForRootBridges (
       InitRootBridge (
         Attributes, Attributes, 0,
         (UINT8) PrimaryBus, (UINT8) SubBus,
-        &Io, &Mem, &MemAbove4G, &PMem, &PMemAbove4G,
+        &Io, &Mem, &MemAbove4G, &mNonExistAperture, &mNonExistAperture,
         &RootBridges[*NumberOfRootBridges]
       );
       RootBridges[*NumberOfRootBridges].ResourceAssigned = TRUE;
