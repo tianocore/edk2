@@ -9,7 +9,7 @@
   AuthenticodeVerify() will get PE/COFF Authenticode and will do basic check for
   data structure.
 
-Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2020, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -100,7 +100,7 @@ AuthenticodeVerify (
   //
   // Check if it's PKCS#7 Signed Data (for Authenticode Scenario)
   //
-  if (!PKCS7_type_is_signed (Pkcs7)) {
+  if (!PKCS7_type_is_signed (Pkcs7) || PKCS7_get_detached (Pkcs7)) {
     goto _Exit;
   }
 
