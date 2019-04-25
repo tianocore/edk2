@@ -41,12 +41,6 @@
   DxeServicesTableLib|MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
   SafeIntLib|MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
 
-  DpcLib|MdeModulePkg/Library/DxeDpcLib/DxeDpcLib.inf
-  NetLib|MdeModulePkg/Library/DxeNetLib/DxeNetLib.inf
-  IpIoLib|MdeModulePkg/Library/DxeIpIoLib/DxeIpIoLib.inf
-  UdpIoLib|MdeModulePkg/Library/DxeUdpIoLib/DxeUdpIoLib.inf
-  TcpIoLib|MdeModulePkg/Library/DxeTcpIoLib/DxeTcpIoLib.inf
-  HttpLib|MdeModulePkg/Library/DxeHttpLib/DxeHttpLib.inf
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
   OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
   IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
@@ -103,24 +97,10 @@
 ###################################################################################################
 
 [Components]
-  NetworkPkg/Ip6Dxe/Ip6Dxe.inf
-  NetworkPkg/TcpDxe/TcpDxe.inf
-  NetworkPkg/Udp6Dxe/Udp6Dxe.inf
-  NetworkPkg/Dhcp6Dxe/Dhcp6Dxe.inf
-  NetworkPkg/Mtftp6Dxe/Mtftp6Dxe.inf
-  NetworkPkg/DnsDxe/DnsDxe.inf
-  NetworkPkg/HttpDxe/HttpDxe.inf
-  NetworkPkg/HttpUtilitiesDxe/HttpUtilitiesDxe.inf
-  NetworkPkg/HttpBootDxe/HttpBootDxe.inf
   NetworkPkg/WifiConnectionManagerDxe/WifiConnectionManagerDxe.inf
-
   NetworkPkg/Application/VConfig/VConfig.inf
 
-[Components.IA32, Components.X64, Components.ARM, Components.AARCH64]
-  NetworkPkg/IScsiDxe/IScsiDxe.inf
-  NetworkPkg/UefiPxeBcDxe/UefiPxeBcDxe.inf
-  NetworkPkg/TlsDxe/TlsDxe.inf
-  NetworkPkg/TlsAuthConfigDxe/TlsAuthConfigDxe.inf
+  !include NetworkPkg/Network.dsc.inc
 
 [BuildOptions]
   *_*_*_CC_FLAGS = -D DISABLE_NEW_DEPRECATED_INTERFACES
