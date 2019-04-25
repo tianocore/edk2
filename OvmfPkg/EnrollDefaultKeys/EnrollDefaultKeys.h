@@ -123,9 +123,6 @@ typedef struct {
 //
 // Refer to "AuthData.c" for details on the following objects.
 //
-extern CONST UINT8 mRedHatPkKek1[];
-extern CONST UINTN mSizeOfRedHatPkKek1;
-
 extern CONST UINT8 mMicrosoftKek[];
 extern CONST UINTN mSizeOfMicrosoftKek;
 
