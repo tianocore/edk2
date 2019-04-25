@@ -361,6 +361,9 @@ ShellAppMain (
   EFI_STATUS Status;
   SETTINGS   Settings;
 
+  //
+  // If we're not in Setup Mode, we can't do anything.
+  //
   Status = GetSettings (&Settings);
   if (EFI_ERROR (Status)) {
     return 1;
@@ -372,6 +375,10 @@ ShellAppMain (
     return 1;
   }
 
+  //
+  // Enter Custom Mode so we can enroll PK, KEK, db, and dbx without signature
+  // checks on those variable writes.
+  //
   if (Settings.CustomMode != CUSTOM_SECURE_BOOT_MODE) {
     Settings.CustomMode = CUSTOM_SECURE_BOOT_MODE;
     Status = gRT->SetVariable (EFI_CUSTOM_MODE_NAME, &gEfiCustomModeEnableGuid,
@@ -385,6 +392,9 @@ ShellAppMain (
     }
   }
 
+  //
+  // Enroll db.
+  //
   Status = EnrollListOfCerts (
              EFI_IMAGE_SECURITY_DATABASE,
              &gEfiImageSecurityDatabaseGuid,
@@ -396,6 +406,9 @@ ShellAppMain (
     return 1;
   }
 
+  //
+  // Enroll dbx.
+  //
   Status = EnrollListOfCerts (
              EFI_IMAGE_SECURITY_DATABASE1,
              &gEfiImageSecurityDatabaseGuid,
@@ -406,6 +419,9 @@ ShellAppMain (
     return 1;
   }
 
+  //
+  // Enroll KEK.
+  //
   Status = EnrollListOfCerts (
              EFI_KEY_EXCHANGE_KEY_NAME,
              &gEfiGlobalVariableGuid,
@@ -417,6 +433,9 @@ ShellAppMain (
     return 1;
   }
 
+  //
+  // Enroll PK, leaving Setup Mode (entering User Mode) at once.
+  //
   Status = EnrollListOfCerts (
              EFI_PLATFORM_KEY_NAME,
              &gEfiGlobalVariableGuid,
@@ -427,6 +446,10 @@ ShellAppMain (
     return 1;
   }
 
+  //
+  // Leave Custom Mode, so that updates to PK, KEK, db, and dbx require valid
+  // signatures.
+  //
   Settings.CustomMode = STANDARD_SECURE_BOOT_MODE;
   Status = gRT->SetVariable (EFI_CUSTOM_MODE_NAME, &gEfiCustomModeEnableGuid,
                   EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
@@ -437,6 +460,37 @@ ShellAppMain (
     return 1;
   }
 
+  //
+  // Final sanity check:
+  //
+  //                                 [SetupMode]
+  //                        (read-only, standardized by UEFI)
+  //                                /                \_
+  //                               0               1, default
+  //                              /                    \_
+  //                      PK enrolled                   no PK enrolled yet,
+  //              (this is called "User Mode")          PK enrollment possible
+  //                             |
+  //                             |
+  //                     [SecureBootEnable]
+  //         (read-write, edk2-specific, boot service only)
+  //                /                           \_
+  //               0                         1, default
+  //              /                               \_
+  //       [SecureBoot]=0                     [SecureBoot]=1
+  // (read-only, standardized by UEFI)  (read-only, standardized by UEFI)
+  //     images are not verified         images are verified, platform is
+  //                                      operating in Secure Boot mode
+  //                                                 |
+  //                                                 |
+  //                                           [CustomMode]
+  //                          (read-write, edk2-specific, boot service only)
+  //                                /                           \_
+  //                          0, default                         1
+  //                              /                               \_
+  //                      PK, KEK, db, dbx                PK, KEK, db, dbx
+  //                    updates are verified          updates are not verified
+  //
   Status = GetSettings (&Settings);
   if (EFI_ERROR (Status)) {
     return 1;
