@@ -7,23 +7,19 @@
 ##
 
 [Defines]
-  INF_VERSION                    = 0x00010006
+  INF_VERSION                    = 1.28
   BASE_NAME                      = EnrollDefaultKeys
-  FILE_GUID                      = D5C1DF0B-1BAC-4EDF-BA48-08834009CA5A
+  FILE_GUID                      = A0BAA8A3-041D-48A8-BC87-C36D121B5E3D
   MODULE_TYPE                    = UEFI_APPLICATION
   VERSION_STRING                 = 0.1
   ENTRY_POINT                    = ShellCEntryLib
-
-#
-#  VALID_ARCHITECTURES           = IA32 X64
-#
 
 [Sources]
   EnrollDefaultKeys.c
 
 [Packages]
-  MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
   SecurityPkg/SecurityPkg.dec
   ShellPkg/ShellPkg.dec
 
