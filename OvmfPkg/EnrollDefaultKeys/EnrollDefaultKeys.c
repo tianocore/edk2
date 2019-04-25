@@ -18,6 +18,7 @@
 
 #include "EnrollDefaultKeys.h"
 
+
 /**
   Enroll a set of certificates in a global variable, overwriting it.
 
@@ -193,6 +194,44 @@ Out:
 }
 
 
+/**
+  Read a UEFI variable into a caller-allocated buffer, enforcing an exact size.
+
+  @param[in] VariableName  The name of the variable to read; passed to
+                           gRT->GetVariable().
+
+  @param[in] VendorGuid    The vendor (namespace) GUID of the variable to read;
+                           passed to gRT->GetVariable().
+
+  @param[out] Data         The caller-allocated buffer that is supposed to
+                           receive the variable's contents. On error, the
+                           contents of Data are indeterminate.
+
+  @param[in] DataSize      The size in bytes that the caller requires the UEFI
+                           variable to have. The caller is responsible for
+                           providing room for DataSize bytes in Data.
+
+  @param[in] AllowMissing  If FALSE, the variable is required to exist. If
+                           TRUE, the variable is permitted to be missing.
+
+  @retval EFI_SUCCESS           The UEFI variable exists, has the required size
+                                (DataSize), and has been read into Data.
+
+  @retval EFI_SUCCESS           The UEFI variable doesn't exist, and
+                                AllowMissing is TRUE. DataSize bytes in Data
+                                have been zeroed out.
+
+  @retval EFI_NOT_FOUND         The UEFI variable doesn't exist, and
+                                AllowMissing is FALSE.
+
+  @retval EFI_BUFFER_TOO_SMALL  The UEFI variable exists, but its size is
+                                greater than DataSize.
+
+  @retval EFI_PROTOCOL_ERROR    The UEFI variable exists, but its size is
+                                smaller than DataSize.
+
+  @return                       Error codes propagated from gRT->GetVariable().
+**/
 STATIC
 EFI_STATUS
 GetExact (
@@ -228,6 +267,31 @@ GetExact (
   return EFI_SUCCESS;
 }
 
+
+/**
+  Populate a SETTINGS structure from the underlying UEFI variables.
+
+  The following UEFI variables are standard variables:
+  - L"SetupMode"  (EFI_SETUP_MODE_NAME)
+  - L"SecureBoot" (EFI_SECURE_BOOT_MODE_NAME)
+  - L"VendorKeys" (EFI_VENDOR_KEYS_VARIABLE_NAME)
+
+  The following UEFI variables are edk2 extensions:
+  - L"SecureBootEnable" (EFI_SECURE_BOOT_ENABLE_NAME)
+  - L"CustomMode"       (EFI_CUSTOM_MODE_NAME)
+
+  The L"SecureBootEnable" UEFI variable is permitted to be missing, in which
+  case the corresponding field in the SETTINGS object will be zeroed out. The
+  rest of the covered UEFI variables are required to exist; otherwise, the
+  function will fail.
+
+  @param[out] Settings  The SETTINGS object to fill.
+
+  @retval EFI_SUCCESS  Settings has been populated.
+
+  @return              Error codes propagated from the GetExact() function. The
+                       contents of Settings are indeterminate.
+**/
 STATIC
 EFI_STATUS
 GetSettings (
@@ -266,6 +330,12 @@ GetSettings (
   return Status;
 }
 
+
+/**
+  Print the contents of a SETTINGS structure to the UEFI console.
+
+  @param[in] Settings  The SETTINGS object to print the contents of.
+**/
 STATIC
 VOID
 PrintSettings (
@@ -278,6 +348,9 @@ PrintSettings (
 }
 
 
+/**
+  Entry point function of this shell application.
+**/
 INTN
 EFIAPI
 ShellAppMain (
