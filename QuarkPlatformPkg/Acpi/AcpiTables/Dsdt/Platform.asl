@@ -1,7 +1,7 @@
 /** @file
 Contains root level name space objects for the platform
 
-Copyright (c) 2013-2015 Intel Corporation.
+Copyright (c) 2013-2019 Intel Corporation.
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -50,7 +50,7 @@ DefinitionBlock (
   "DSDT",
   1,
   "INTEL ",
-  "QuarkNcSocId",
+  "QuarkNcS",
   3)
 {
     //
@@ -275,7 +275,7 @@ DefinitionBlock (
             Method (_INI)
             {
                 Store(LINUX, OSTP)                 // Set the default os is Linux
-                If (CondRefOf (_OSI, local0))
+                If (CondRefOf (_OSI))
                 {
                     //
                     //_OSI is supported, so it is WinXp or Win2003Server

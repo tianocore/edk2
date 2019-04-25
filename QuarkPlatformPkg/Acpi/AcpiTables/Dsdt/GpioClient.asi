@@ -1,7 +1,7 @@
 /** @file
 Expose GPIO resources to usermode through client driver.
 
-Copyright (c) 2013-2015 Intel Corporation.
+Copyright (c) 2013-2019 Intel Corporation.
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -11,7 +11,7 @@ Device(GPOT)
 {
     Name(_HID, "INT349A")
     Name(_CID, "INT349A")
-    Method(_CRS, 0x0, NotSerialized)
+    Method(_CRS, 0x0, Serialized)
     {
         Name(RBUF, ResourceTemplate()
         {
