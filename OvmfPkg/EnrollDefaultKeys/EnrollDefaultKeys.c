@@ -811,7 +811,6 @@ Out:
 
 STATIC
 EFI_STATUS
-EFIAPI
 GetExact (
   IN CHAR16   *VariableName,
   IN EFI_GUID *VendorGuid,
@@ -855,7 +854,6 @@ typedef struct {
 
 STATIC
 EFI_STATUS
-EFIAPI
 GetSettings (
   OUT SETTINGS *Settings
   )
@@ -894,7 +892,6 @@ GetSettings (
 
 STATIC
 VOID
-EFIAPI
 PrintSettings (
   IN CONST SETTINGS *Settings
   )
