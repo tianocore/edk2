@@ -16,6 +16,7 @@
 
 [Sources]
   EnrollDefaultKeys.c
+  EnrollDefaultKeys.h
 
 [Packages]
   MdeModulePkg/MdeModulePkg.dec
