@@ -39,8 +39,8 @@
 #
 # The matching DEPEX section below will generate the EFI_SECTION_PEI_DEPEX,
 # EFI_SECTION_DXE_DEPEX or EFI_SECTION_MM_DEPEX leaf section for the PEIM
-# (EFI_FV_FILETYPE_PEIM), DXE_RUNTIME_DRIVER (EFI_FV_FILETYPE_DRIVER), or
+# (EFI_FV_FILETYPE_PEIM), DXE_RUNTIME_DRIVER/DXE_DRIVER (EFI_FV_FILETYPE_DRIVER), or
 # DXE_SMM_DRIVER (EFI_FV_FILETYPE_MM) module, respectively.
 #
-[Depex.common.PEIM, Depex.common.DXE_RUNTIME_DRIVER, Depex.common.DXE_SMM_DRIVER]
+[Depex.common.PEIM, Depex.common.DXE_RUNTIME_DRIVER, Depex.common.DXE_DRIVER, Depex.common.DXE_SMM_DRIVER]
   gEdkiiNvVarStoreFormattedGuid
