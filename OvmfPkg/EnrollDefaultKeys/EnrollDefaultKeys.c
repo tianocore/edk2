@@ -103,7 +103,7 @@ STATIC CONST UINT8 mRedHatPkKek1[] = {
 //
 // "dbx" updates in "dbxtool" are signed with a key derived from this KEK.
 //
-STATIC CONST UINT8 mMicrosoftKEK[] = {
+STATIC CONST UINT8 mMicrosoftKek[] = {
   0x30, 0x82, 0x05, 0xe8, 0x30, 0x82, 0x03, 0xd0, 0xa0, 0x03, 0x02, 0x01, 0x02,
   0x02, 0x0a, 0x61, 0x0a, 0xd1, 0x88, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03, 0x30,
   0x0d, 0x06, 0x09, 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01, 0x0b, 0x05,
@@ -230,7 +230,7 @@ STATIC CONST UINT8 mMicrosoftKEK[] = {
 // Windows 8 and Windows Server 2012 R2 boot loaders are signed with a chain
 // rooted in this certificate.
 //
-STATIC CONST UINT8 mMicrosoftPCA[] = {
+STATIC CONST UINT8 mMicrosoftPca[] = {
   0x30, 0x82, 0x05, 0xd7, 0x30, 0x82, 0x03, 0xbf, 0xa0, 0x03, 0x02, 0x01, 0x02,
   0x02, 0x0a, 0x61, 0x07, 0x76, 0x56, 0x00, 0x00, 0x00, 0x00, 0x00, 0x08, 0x30,
   0x0d, 0x06, 0x09, 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01, 0x0b, 0x05,
@@ -355,7 +355,7 @@ STATIC CONST UINT8 mMicrosoftPCA[] = {
 //
 // To verify the "shim" binary and PCI expansion ROMs with.
 //
-STATIC CONST UINT8 mMicrosoftUefiCA[] = {
+STATIC CONST UINT8 mMicrosoftUefiCa[] = {
   0x30, 0x82, 0x06, 0x10, 0x30, 0x82, 0x03, 0xf8, 0xa0, 0x03, 0x02, 0x01, 0x02,
   0x02, 0x0a, 0x61, 0x08, 0xd3, 0xc4, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x30,
   0x0d, 0x06, 0x09, 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01, 0x0b, 0x05,
@@ -943,8 +943,8 @@ ShellAppMain (
              EFI_IMAGE_SECURITY_DATABASE,
              &gEfiImageSecurityDatabaseGuid,
              &gEfiCertX509Guid,
-             mMicrosoftPCA,    sizeof mMicrosoftPCA,    &mMicrosoftOwnerGuid,
-             mMicrosoftUefiCA, sizeof mMicrosoftUefiCA, &mMicrosoftOwnerGuid,
+             mMicrosoftPca,    sizeof mMicrosoftPca,    &mMicrosoftOwnerGuid,
+             mMicrosoftUefiCa, sizeof mMicrosoftUefiCa, &mMicrosoftOwnerGuid,
              NULL);
   if (EFI_ERROR (Status)) {
     return 1;
@@ -965,7 +965,7 @@ ShellAppMain (
              &gEfiGlobalVariableGuid,
              &gEfiCertX509Guid,
              mRedHatPkKek1, sizeof mRedHatPkKek1, &gEfiCallerIdGuid,
-             mMicrosoftKEK, sizeof mMicrosoftKEK, &mMicrosoftOwnerGuid,
+             mMicrosoftKek, sizeof mMicrosoftKek, &mMicrosoftOwnerGuid,
              NULL);
   if (EFI_ERROR (Status)) {
     return 1;
