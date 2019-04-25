@@ -601,7 +601,7 @@ STATIC CONST EFI_GUID mMicrosoftOwnerGuid = {
 // UEFI specification, we'll introduce two matching convenience structures that
 // are customized for our X.509 purposes.
 //
-#pragma pack(1)
+#pragma pack (1)
 typedef struct {
   EFI_TIME TimeStamp;
 
@@ -632,7 +632,7 @@ typedef struct {
   // X.509 certificate follows
   //
 } REPEATING_HEADER;
-#pragma pack()
+#pragma pack ()
 
 /**
   Enroll a set of certificates in a global variable, overwriting it.
