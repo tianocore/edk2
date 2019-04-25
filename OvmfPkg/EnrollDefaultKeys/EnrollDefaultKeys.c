@@ -9,14 +9,189 @@
 #include <Guid/GlobalVariable.h>                 // EFI_SETUP_MODE_NAME
 #include <Guid/ImageAuthentication.h>            // EFI_IMAGE_SECURITY_DATABASE
 #include <Guid/MicrosoftVendor.h>                // gMicrosoftVendorGuid
+#include <Guid/OvmfPkKek1AppPrefix.h>            // gOvmfPkKek1AppPrefixGuid
+#include <IndustryStandard/SmBios.h>             // SMBIOS_HANDLE_PI_RESERVED
+#include <Library/BaseLib.h>                     // GUID_STRING_LENGTH
 #include <Library/BaseMemoryLib.h>               // CopyGuid()
 #include <Library/DebugLib.h>                    // ASSERT()
 #include <Library/MemoryAllocationLib.h>         // FreePool()
+#include <Library/PrintLib.h>                    // AsciiSPrint()
 #include <Library/ShellCEntryLib.h>              // ShellAppMain()
+#include <Library/UefiBootServicesTableLib.h>    // gBS
 #include <Library/UefiLib.h>                     // AsciiPrint()
 #include <Library/UefiRuntimeServicesTableLib.h> // gRT
+#include <Protocol/Smbios.h>                     // EFI_SMBIOS_PROTOCOL
 
 #include "EnrollDefaultKeys.h"
+
+
+/**
+  Fetch the X509 certificate (to be used as Platform Key and first Key Exchange
+  Key) from SMBIOS.
+
+  @param[out] PkKek1        The X509 certificate in DER encoding from the
+                            hypervisor, to be enrolled as PK and first KEK
+                            entry. On success, the caller is responsible for
+                            releasing PkKek1 with FreePool().
+
+  @param[out] SizeOfPkKek1  The size of PkKek1 in bytes.
+
+  @retval EFI_SUCCESS           PkKek1 and SizeOfPkKek1 have been set
+                                successfully.
+
+  @retval EFI_NOT_FOUND         An OEM String matching
+                                OVMF_PK_KEK1_APP_PREFIX_GUID has not been
+                                found.
+
+  @retval EFI_PROTOCOL_ERROR    In the OEM String matching
+                                OVMF_PK_KEK1_APP_PREFIX_GUID, the certificate
+                                is empty, or it has invalid base64 encoding.
+
+  @retval EFI_OUT_OF_RESOURCES  Memory allocation failed.
+
+  @return                       Error codes from gBS->LocateProtocol().
+**/
+STATIC
+EFI_STATUS
+GetPkKek1 (
+  OUT UINT8 **PkKek1,
+  OUT UINTN *SizeOfPkKek1
+  )
+{
+  CONST CHAR8             *Base64Cert;
+  CHAR8                   OvmfPkKek1AppPrefix[GUID_STRING_LENGTH + 1 + 1];
+  EFI_STATUS              Status;
+  EFI_SMBIOS_PROTOCOL     *Smbios;
+  EFI_SMBIOS_HANDLE       Handle;
+  EFI_SMBIOS_TYPE         Type;
+  EFI_SMBIOS_TABLE_HEADER *Header;
+  SMBIOS_TABLE_TYPE11     *OemStringsTable;
+  UINTN                   Base64CertLen;
+  UINTN                   DecodedCertSize;
+  UINT8                   *DecodedCert;
+
+  Base64Cert = NULL;
+
+  //
+  // Format the application prefix, for OEM String matching.
+  //
+  AsciiSPrint (OvmfPkKek1AppPrefix, sizeof OvmfPkKek1AppPrefix, "%g:",
+    &gOvmfPkKek1AppPrefixGuid);
+
+  //
+  // Scan all "OEM Strings" tables.
+  //
+  Status = gBS->LocateProtocol (&gEfiSmbiosProtocolGuid, NULL,
+                  (VOID **)&Smbios);
+  if (EFI_ERROR (Status)) {
+    AsciiPrint ("error: failed to locate EFI_SMBIOS_PROTOCOL: %r\n", Status);
+    return Status;
+  }
+
+  Handle = SMBIOS_HANDLE_PI_RESERVED;
+  Type = SMBIOS_TYPE_OEM_STRINGS;
+  for (Status = Smbios->GetNext (Smbios, &Handle, &Type, &Header, NULL);
+       !EFI_ERROR (Status);
+       Status = Smbios->GetNext (Smbios, &Handle, &Type, &Header, NULL)) {
+    CONST CHAR8 *OemString;
+    UINTN       Idx;
+
+    if (Header->Length < sizeof *OemStringsTable) {
+      //
+      // Malformed table header, skip to next.
+      //
+      continue;
+    }
+    OemStringsTable = (SMBIOS_TABLE_TYPE11 *)Header;
+
+    //
+    // Scan all strings in the unformatted area of the current "OEM Strings"
+    // table.
+    //
+    OemString = (CONST CHAR8 *)(OemStringsTable + 1);
+    for (Idx = 0; Idx < OemStringsTable->StringCount; ++Idx) {
+      CHAR8 CandidatePrefix[sizeof OvmfPkKek1AppPrefix];
+
+      //
+      // NUL-terminate the candidate prefix for case-insensitive comparison.
+      //
+      AsciiStrnCpyS (CandidatePrefix, sizeof CandidatePrefix, OemString,
+        GUID_STRING_LENGTH + 1);
+      if (AsciiStriCmp (OvmfPkKek1AppPrefix, CandidatePrefix) == 0) {
+        //
+        // The current string matches the prefix.
+        //
+        Base64Cert = OemString + GUID_STRING_LENGTH + 1;
+        break;
+      }
+      OemString += AsciiStrSize (OemString);
+    }
+
+    if (Idx < OemStringsTable->StringCount) {
+      //
+      // The current table has a matching string.
+      //
+      break;
+    }
+  }
+
+  if (EFI_ERROR (Status)) {
+    //
+    // No table with a matching string has been found.
+    //
+    AsciiPrint ("error: OEM String with app prefix %g not found: %r\n",
+      &gOvmfPkKek1AppPrefixGuid, Status);
+    return EFI_NOT_FOUND;
+  }
+
+  ASSERT (Base64Cert != NULL);
+  Base64CertLen = AsciiStrLen (Base64Cert);
+
+  //
+  // Verify the base64 encoding, and determine the decoded size.
+  //
+  DecodedCertSize = 0;
+  Status = Base64Decode (Base64Cert, Base64CertLen, NULL, &DecodedCertSize);
+  switch (Status) {
+  case EFI_BUFFER_TOO_SMALL:
+    if (DecodedCertSize > 0) {
+      break;
+    }
+    //
+    // Fall through: the above Base64Decode() call is ill-specified in BaseLib
+    // if Source decodes to zero bytes (for example if it consists of ignored
+    // whitespace only).
+    //
+  case EFI_SUCCESS:
+    AsciiPrint ("error: empty certificate after app prefix %g\n",
+      &gOvmfPkKek1AppPrefixGuid);
+    return EFI_PROTOCOL_ERROR;
+  default:
+    AsciiPrint ("error: invalid base64 string after app prefix %g\n",
+      &gOvmfPkKek1AppPrefixGuid);
+    return EFI_PROTOCOL_ERROR;
+  }
+
+  //
+  // Allocate the output buffer.
+  //
+  DecodedCert = AllocatePool (DecodedCertSize);
+  if (DecodedCert == NULL) {
+    AsciiPrint ("error: failed to allocate memory\n");
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  //
+  // Decoding will succeed at this point.
+  //
+  Status = Base64Decode (Base64Cert, Base64CertLen, DecodedCert,
+             &DecodedCertSize);
+  ASSERT_EFI_ERROR (Status);
+
+  *PkKek1 = DecodedCert;
+  *SizeOfPkKek1 = DecodedCertSize;
+  return EFI_SUCCESS;
+}
 
 
 /**
@@ -358,21 +533,38 @@ ShellAppMain (
   IN CHAR16 **Argv
   )
 {
+  INTN       RetVal;
   EFI_STATUS Status;
   SETTINGS   Settings;
+  UINT8      *PkKek1;
+  UINTN      SizeOfPkKek1;
+
+  //
+  // Prepare for failure.
+  //
+  RetVal = 1;
 
   //
   // If we're not in Setup Mode, we can't do anything.
   //
   Status = GetSettings (&Settings);
   if (EFI_ERROR (Status)) {
-    return 1;
+    return RetVal;
   }
   PrintSettings (&Settings);
 
   if (Settings.SetupMode != 1) {
     AsciiPrint ("error: already in User Mode\n");
-    return 1;
+    return RetVal;
+  }
+
+  //
+  // Fetch the X509 certificate (to be used as Platform Key and first Key
+  // Exchange Key) from SMBIOS.
+  //
+  Status = GetPkKek1 (&PkKek1, &SizeOfPkKek1);
+  if (EFI_ERROR (Status)) {
+    return RetVal;
   }
 
   //
@@ -388,7 +580,7 @@ ShellAppMain (
     if (EFI_ERROR (Status)) {
       AsciiPrint ("error: SetVariable(\"%s\", %g): %r\n", EFI_CUSTOM_MODE_NAME,
         &gEfiCustomModeEnableGuid, Status);
-      return 1;
+      goto FreePkKek1;
     }
   }
 
@@ -403,7 +595,7 @@ ShellAppMain (
              mMicrosoftUefiCa, mSizeOfMicrosoftUefiCa, &gMicrosoftVendorGuid,
              NULL);
   if (EFI_ERROR (Status)) {
-    return 1;
+    goto FreePkKek1;
   }
 
   //
@@ -416,7 +608,7 @@ ShellAppMain (
              mSha256OfDevNull, mSizeOfSha256OfDevNull, &gEfiCallerIdGuid,
              NULL);
   if (EFI_ERROR (Status)) {
-    return 1;
+    goto FreePkKek1;
   }
 
   //
@@ -426,11 +618,11 @@ ShellAppMain (
              EFI_KEY_EXCHANGE_KEY_NAME,
              &gEfiGlobalVariableGuid,
              &gEfiCertX509Guid,
-             mRedHatPkKek1, mSizeOfRedHatPkKek1, &gEfiCallerIdGuid,
+             PkKek1,        SizeOfPkKek1,        &gEfiCallerIdGuid,
              mMicrosoftKek, mSizeOfMicrosoftKek, &gMicrosoftVendorGuid,
              NULL);
   if (EFI_ERROR (Status)) {
-    return 1;
+    goto FreePkKek1;
   }
 
   //
@@ -440,10 +632,10 @@ ShellAppMain (
              EFI_PLATFORM_KEY_NAME,
              &gEfiGlobalVariableGuid,
              &gEfiCertX509Guid,
-             mRedHatPkKek1, mSizeOfRedHatPkKek1, &gEfiGlobalVariableGuid,
+             PkKek1, SizeOfPkKek1, &gEfiGlobalVariableGuid,
              NULL);
   if (EFI_ERROR (Status)) {
-    return 1;
+    goto FreePkKek1;
   }
 
   //
@@ -457,7 +649,7 @@ ShellAppMain (
   if (EFI_ERROR (Status)) {
     AsciiPrint ("error: SetVariable(\"%s\", %g): %r\n", EFI_CUSTOM_MODE_NAME,
       &gEfiCustomModeEnableGuid, Status);
-    return 1;
+    goto FreePkKek1;
   }
 
   //
@@ -493,7 +685,7 @@ ShellAppMain (
   //
   Status = GetSettings (&Settings);
   if (EFI_ERROR (Status)) {
-    return 1;
+    goto FreePkKek1;
   }
   PrintSettings (&Settings);
 
@@ -501,9 +693,14 @@ ShellAppMain (
       Settings.SecureBootEnable != 1 || Settings.CustomMode != 0 ||
       Settings.VendorKeys != 0) {
     AsciiPrint ("error: unexpected\n");
-    return 1;
+    goto FreePkKek1;
   }
 
   AsciiPrint ("info: success\n");
-  return 0;
+  RetVal = 0;
+
+FreePkKek1:
+  FreePool (PkKek1);
+
+  return RetVal;
 }

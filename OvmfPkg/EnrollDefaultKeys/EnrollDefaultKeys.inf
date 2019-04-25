@@ -35,11 +35,18 @@
   gEfiImageSecurityDatabaseGuid
   gEfiSecureBootEnableDisableGuid
   gMicrosoftVendorGuid
+  gOvmfPkKek1AppPrefixGuid
+
+[Protocols]
+  gEfiSmbiosProtocolGuid ## CONSUMES
 
 [LibraryClasses]
+  BaseLib
   BaseMemoryLib
   DebugLib
   MemoryAllocationLib
+  PrintLib
   ShellCEntryLib
+  UefiBootServicesTableLib
   UefiLib
   UefiRuntimeServicesTableLib
