@@ -15,6 +15,7 @@
   ENTRY_POINT                    = ShellCEntryLib
 
 [Sources]
+  AuthData.c
   EnrollDefaultKeys.c
   EnrollDefaultKeys.h
 

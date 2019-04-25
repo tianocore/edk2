@@ -1,5 +1,6 @@
 /** @file
-  Type definitions for the EnrollDefaultKeys application.
+  Type definitions and object declarations for the EnrollDefaultKeys
+  application.
 
   Copyright (C) 2014-2019, Red Hat, Inc.
 
@@ -117,5 +118,26 @@ typedef struct {
   UINT8 CustomMode;
   UINT8 VendorKeys;
 } SETTINGS;
+
+
+//
+// Refer to "AuthData.c" for details on the following objects.
+//
+extern CONST UINT8 mRedHatPkKek1[];
+extern CONST UINTN mSizeOfRedHatPkKek1;
+
+extern CONST UINT8 mMicrosoftKek[];
+extern CONST UINTN mSizeOfMicrosoftKek;
+
+extern CONST UINT8 mMicrosoftPca[];
+extern CONST UINTN mSizeOfMicrosoftPca;
+
+extern CONST UINT8 mMicrosoftUefiCa[];
+extern CONST UINTN mSizeOfMicrosoftUefiCa;
+
+extern CONST UINT8 mSha256OfDevNull[];
+extern CONST UINTN mSizeOfSha256OfDevNull;
+
+extern CONST EFI_GUID mMicrosoftOwnerGuid;
 
 #endif /* ENROLL_DEFAULT_KEYS_H_ */
