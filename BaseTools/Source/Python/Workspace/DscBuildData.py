@@ -1632,7 +1632,7 @@ class DscBuildData(PlatformBuildClassObject):
         AvailableSkuIdSet = copy.copy(self.SkuIds)
 
         PcdDict = tdict(True, 4)
-        PcdSet = set()
+        PcdList = []
         # Find out all possible PCD candidates for self._Arch
         RecordList = self._RawData[Type, self._Arch]
         PcdValueDict = OrderedDict()
@@ -1643,11 +1643,11 @@ class DscBuildData(PlatformBuildClassObject):
                 EdkLogger.error('build ', PARAMETER_INVALID, 'Sku %s is not defined in [SkuIds] section' % SkuName,
                                             File=self.MetaFile, Line=Dummy5)
             if SkuName in (self.SkuIdMgr.SystemSkuId, TAB_DEFAULT, TAB_COMMON):
-                if "." not in TokenSpaceGuid and "[" not in PcdCName:
-                    PcdSet.add((PcdCName, TokenSpaceGuid, SkuName, Dummy5))
+                if "." not in TokenSpaceGuid and "[" not in PcdCName and (PcdCName, TokenSpaceGuid, SkuName, Dummy5) not in PcdList:
+                    PcdList.append((PcdCName, TokenSpaceGuid, SkuName, Dummy5))
                 PcdDict[Arch, PcdCName, TokenSpaceGuid, SkuName] = Setting
 
-        for PcdCName, TokenSpaceGuid, SkuName, Dummy4 in PcdSet:
+        for PcdCName, TokenSpaceGuid, SkuName, Dummy4 in PcdList:
             Setting = PcdDict[self._Arch, PcdCName, TokenSpaceGuid, SkuName]
             if Setting is None:
                 continue
@@ -2700,7 +2700,7 @@ class DscBuildData(PlatformBuildClassObject):
             if SkuName not in AvailableSkuIdSet:
                 EdkLogger.error('build', PARAMETER_INVALID, 'Sku %s is not defined in [SkuIds] section' % SkuName,
                                             File=self.MetaFile, Line=Dummy5)
-            if "." not in TokenSpaceGuid and "[" not in PcdCName:
+            if "." not in TokenSpaceGuid and "[" not in PcdCName and (PcdCName, TokenSpaceGuid, SkuName, Dummy5) not in PcdList:
                 PcdList.append((PcdCName, TokenSpaceGuid, SkuName, Dummy5))
             PcdDict[Arch, SkuName, PcdCName, TokenSpaceGuid] = Setting
 
@@ -2852,7 +2852,7 @@ class DscBuildData(PlatformBuildClassObject):
         # PCD settings for certain ARCH and SKU
         #
         PcdDict = tdict(True, 5)
-        PcdSet = set()
+        PcdList = []
         RecordList = self._RawData[Type, self._Arch]
         # Find out all possible PCD candidates for self._Arch
         AvailableSkuIdSet = copy.copy(self.SkuIds)
@@ -2873,13 +2873,13 @@ class DscBuildData(PlatformBuildClassObject):
             if DefaultStore not in DefaultStoresDefine:
                 EdkLogger.error('build', PARAMETER_INVALID, 'DefaultStores %s is not defined in [DefaultStores] section' % DefaultStore,
                                             File=self.MetaFile, Line=Dummy5)
-            if "." not in TokenSpaceGuid and "[" not in PcdCName:
-                PcdSet.add((PcdCName, TokenSpaceGuid, SkuName, DefaultStore, Dummy5))
+            if "." not in TokenSpaceGuid and "[" not in PcdCName and (PcdCName, TokenSpaceGuid, SkuName, DefaultStore, Dummy5) not in PcdList:
+                PcdList.append((PcdCName, TokenSpaceGuid, SkuName, DefaultStore, Dummy5))
             PcdDict[Arch, SkuName, PcdCName, TokenSpaceGuid, DefaultStore] = Setting
 
 
         # Remove redundant PCD candidates, per the ARCH and SKU
-        for PcdCName, TokenSpaceGuid, SkuName, DefaultStore, Dummy4 in PcdSet:
+        for PcdCName, TokenSpaceGuid, SkuName, DefaultStore, Dummy4 in PcdList:
 
             Setting = PcdDict[self._Arch, SkuName, PcdCName, TokenSpaceGuid, DefaultStore]
             if Setting is None:
@@ -3036,7 +3036,7 @@ class DscBuildData(PlatformBuildClassObject):
             if SkuName not in AvailableSkuIdSet:
                 EdkLogger.error('build', PARAMETER_INVALID, 'Sku %s is not defined in [SkuIds] section' % SkuName,
                                             File=self.MetaFile, Line=Dummy5)
-            if "." not in TokenSpaceGuid and "[" not in PcdCName:
+            if "." not in TokenSpaceGuid and "[" not in PcdCName and (PcdCName, TokenSpaceGuid, SkuName, Dummy5) not in PcdList:
                 PcdList.append((PcdCName, TokenSpaceGuid, SkuName, Dummy5))
             PcdDict[Arch, SkuName, PcdCName, TokenSpaceGuid] = Setting
 
