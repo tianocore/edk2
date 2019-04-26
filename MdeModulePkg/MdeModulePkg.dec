@@ -1170,6 +1170,13 @@
   # @Prompt Serial port registers use MMIO.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialUseMmio|FALSE|BOOLEAN|0x00020000
 
+  ## Indicates the access width for 16550 serial port registers.
+  # Default is 8-bit access mode.<BR><BR>
+  #    8  - 16550 serial port registers are accessed in 8-bit width.<BR>
+  #   32 - 16550 serial port registers are accessed in 32-bit width.<BR>
+  # @Prompt Serial port register access width.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterAccessWidth|8|UINT8|0x00020007
+
   ## Indicates if the 16550 serial port hardware flow control will be enabled. Default is FALSE.<BR><BR>
   #   TRUE  - 16550 serial port hardware flow control will be enabled.<BR>
   #   FALSE - 16550 serial port hardware flow control will be disabled.<BR>
