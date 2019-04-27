@@ -25,7 +25,7 @@
   FILE_GUID                      = 78f76ae8-ae62-4455-8148-c3a7ebaaa3f3
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = NvVarStoreFormattedLib|PEIM DXE_RUNTIME_DRIVER DXE_SMM_DRIVER
+  LIBRARY_CLASS                  = NvVarStoreFormattedLib|PEIM DXE_RUNTIME_DRIVER DXE_DRIVER DXE_SMM_DRIVER
   CONSTRUCTOR                    = NvVarStoreFormattedInitialize
 
 [Sources]
