@@ -743,8 +743,6 @@ S3ResumeExecuteBootScript (
   PEI_SMM_ACCESS_PPI         *SmmAccess;
   UINTN                      Index;
   VOID                       *GuidHob;
-  IA32_DESCRIPTOR            *IdtDescriptor;
-  VOID                       *IdtBuffer;
   PEI_S3_RESUME_STATE        *PeiS3ResumeState;
   BOOLEAN                    InterruptStatus;
 
@@ -802,34 +800,6 @@ S3ResumeExecuteBootScript (
 
   if (FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
     AsmWriteCr3 ((UINTN)AcpiS3Context->S3NvsPageTableAddress);
-  }
-
-  if (FeaturePcdGet (PcdFrameworkCompatibilitySupport)) {
-    //
-    // On some platform, such as ECP, a dispatch node in boot script table may execute a 32-bit PEIM which may need PeiServices
-    // pointer. So PeiServices need preserve in (IDTBase- sizeof (UINTN)).
-    //
-    IdtDescriptor = (IA32_DESCRIPTOR *) (UINTN) (AcpiS3Context->IdtrProfile);
-    //
-    // Make sure the newly allocated IDT align with 16-bytes
-    //
-    IdtBuffer = AllocatePages (EFI_SIZE_TO_PAGES((IdtDescriptor->Limit + 1) + 16));
-    if (IdtBuffer == NULL) {
-      REPORT_STATUS_CODE (
-        EFI_ERROR_CODE | EFI_ERROR_MAJOR,
-        (EFI_SOFTWARE_PEI_MODULE | EFI_SW_PEI_EC_S3_RESUME_FAILED)
-        );
-      ASSERT (FALSE);
-    }
-    //
-    // Additional 16 bytes allocated to save IA32 IDT descriptor and Pei Service Table Pointer
-    // IA32 IDT descriptor will be used to setup IA32 IDT table for 32-bit Framework Boot Script code
-    //
-    ZeroMem (IdtBuffer, 16);
-    AsmReadIdtr ((IA32_DESCRIPTOR *)IdtBuffer);
-    CopyMem ((VOID*)((UINT8*)IdtBuffer + 16),(VOID*)(IdtDescriptor->Base), (IdtDescriptor->Limit + 1));
-    IdtDescriptor->Base = (UINTN)((UINT8*)IdtBuffer + 16);
-    *(UINTN*)(IdtDescriptor->Base - sizeof(UINTN)) = (UINTN)GetPeiServicesTablePointer ();
   }
 
   InterruptStatus = SaveAndDisableInterrupts ();
