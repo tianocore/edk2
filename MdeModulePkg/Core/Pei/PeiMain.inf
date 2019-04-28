@@ -102,7 +102,6 @@
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPeiStackSize                  ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreImageLoaderSearchTeSectionFirst  ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFrameworkCompatibilitySupport           ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdLoadFixAddressPeiCodePageNumber         ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdLoadFixAddressBootTimeCodePageNumber    ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdLoadFixAddressRuntimeCodePageNumber     ## SOMETIMES_CONSUMES

@@ -1,7 +1,7 @@
 /** @file
   Core image handling services to load and unload PeImage.
 
-Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -13,15 +13,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // Module Globals
 //
 LOADED_IMAGE_PRIVATE_DATA  *mCurrentImage = NULL;
-
-LOAD_PE32_IMAGE_PRIVATE_DATA  mLoadPe32PrivateData = {
-  LOAD_PE32_IMAGE_PRIVATE_DATA_SIGNATURE,
-  NULL,
-  {
-    CoreLoadImageEx,
-    CoreUnloadImageEx
-  }
-};
 
 typedef struct {
   LIST_ENTRY                            Link;
@@ -275,18 +266,6 @@ CoreInitializeImageServices (
   ASSERT_EFI_ERROR(Status);
 
   InitializeListHead (&mAvailableEmulators);
-
-  if (FeaturePcdGet (PcdFrameworkCompatibilitySupport)) {
-    //
-    // Export DXE Core PE Loader functionality for backward compatibility.
-    //
-    Status = CoreInstallProtocolInterface (
-               &mLoadPe32PrivateData.Handle,
-               &gEfiLoadPeImageProtocolGuid,
-               EFI_NATIVE_INTERFACE,
-               &mLoadPe32PrivateData.Pe32Image
-               );
-  }
 
   ProtectUefiImage (&Image->Info, Image->LoadedImageDevicePath);
 
@@ -1566,92 +1545,6 @@ CoreLoadImage (
   return Status;
 }
 
-
-
-/**
-  Loads an EFI image into memory and returns a handle to the image with extended parameters.
-
-  @param  This                    Calling context
-  @param  ParentImageHandle       The caller's image handle.
-  @param  FilePath                The specific file path from which the image is
-                                  loaded.
-  @param  SourceBuffer            If not NULL, a pointer to the memory location
-                                  containing a copy of the image to be loaded.
-  @param  SourceSize              The size in bytes of SourceBuffer.
-  @param  DstBuffer               The buffer to store the image.
-  @param  NumberOfPages           For input, specifies the space size of the
-                                  image by caller if not NULL. For output,
-                                  specifies the actual space size needed.
-  @param  ImageHandle             Image handle for output.
-  @param  EntryPoint              Image entry point for output.
-  @param  Attribute               The bit mask of attributes to set for the load
-                                  PE image.
-
-  @retval EFI_SUCCESS             The image was loaded into memory.
-  @retval EFI_NOT_FOUND           The FilePath was not found.
-  @retval EFI_INVALID_PARAMETER   One of the parameters has an invalid value.
-  @retval EFI_UNSUPPORTED         The image type is not supported, or the device
-                                  path cannot be parsed to locate the proper
-                                  protocol for loading the file.
-  @retval EFI_OUT_OF_RESOURCES    Image was not loaded due to insufficient
-                                  resources.
-  @retval EFI_LOAD_ERROR          Image was not loaded because the image format was corrupt or not
-                                  understood.
-  @retval EFI_DEVICE_ERROR        Image was not loaded because the device returned a read error.
-  @retval EFI_ACCESS_DENIED       Image was not loaded because the platform policy prohibits the
-                                  image from being loaded. NULL is returned in *ImageHandle.
-  @retval EFI_SECURITY_VIOLATION  Image was loaded and an ImageHandle was created with a
-                                  valid EFI_LOADED_IMAGE_PROTOCOL. However, the current
-                                  platform policy specifies that the image should not be started.
-
-**/
-EFI_STATUS
-EFIAPI
-CoreLoadImageEx (
-  IN  EFI_PE32_IMAGE_PROTOCOL          *This,
-  IN  EFI_HANDLE                       ParentImageHandle,
-  IN  EFI_DEVICE_PATH_PROTOCOL         *FilePath,
-  IN  VOID                             *SourceBuffer       OPTIONAL,
-  IN  UINTN                            SourceSize,
-  IN  EFI_PHYSICAL_ADDRESS             DstBuffer           OPTIONAL,
-  OUT UINTN                            *NumberOfPages      OPTIONAL,
-  OUT EFI_HANDLE                       *ImageHandle,
-  OUT EFI_PHYSICAL_ADDRESS             *EntryPoint         OPTIONAL,
-  IN  UINT32                           Attribute
-  )
-{
-  EFI_STATUS    Status;
-  EFI_HANDLE    Handle;
-
-  PERF_LOAD_IMAGE_BEGIN (NULL);
-
-  Status = CoreLoadImageCommon (
-           TRUE,
-           ParentImageHandle,
-           FilePath,
-           SourceBuffer,
-           SourceSize,
-           DstBuffer,
-           NumberOfPages,
-           ImageHandle,
-           EntryPoint,
-           Attribute
-           );
-
-  Handle = NULL;
-  if (!EFI_ERROR (Status)) {
-    //
-    // ImageHandle will be valid only Status is success.
-    //
-    Handle = *ImageHandle;
-  }
-
-  PERF_LOAD_IMAGE_END (Handle);
-
-  return Status;
-}
-
-
 /**
   Transfer control to a loaded image's entry point.
 
@@ -2011,27 +1904,4 @@ CoreUnloadImage (
 
 Done:
   return Status;
-}
-
-
-
-/**
-  Unload the specified image.
-
-  @param  This                    Indicates the calling context.
-  @param  ImageHandle             The specified image handle.
-
-  @retval EFI_INVALID_PARAMETER   Image handle is NULL.
-  @retval EFI_UNSUPPORTED         Attempt to unload an unsupported image.
-  @retval EFI_SUCCESS             Image successfully unloaded.
-
-**/
-EFI_STATUS
-EFIAPI
-CoreUnloadImageEx (
-  IN EFI_PE32_IMAGE_PROTOCOL  *This,
-  IN EFI_HANDLE                         ImageHandle
-  )
-{
-  return CoreUnloadImage (ImageHandle);
 }

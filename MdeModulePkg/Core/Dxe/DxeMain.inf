@@ -3,7 +3,7 @@
 #
 #  It provides an implementation of DXE Core that is compliant with DXE CIS.
 #
-#  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -132,7 +132,6 @@
   ## PRODUCES
   ## SOMETIMES_CONSUMES
   gEfiDecompressProtocolGuid
-  gEfiLoadPeImageProtocolGuid                   ## SOMETIMES_PRODUCES   # Produces when PcdFrameworkCompatibilitySupport is set
   gEfiSimpleFileSystemProtocolGuid              ## SOMETIMES_CONSUMES
   gEfiLoadFileProtocolGuid                      ## SOMETIMES_CONSUMES
   gEfiLoadFile2ProtocolGuid                     ## SOMETIMES_CONSUMES
@@ -172,9 +171,6 @@
   gEfiVariableArchProtocolGuid                  ## CONSUMES
   gEfiCapsuleArchProtocolGuid                   ## CONSUMES
   gEfiWatchdogTimerArchProtocolGuid             ## CONSUMES
-
-[FeaturePcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFrameworkCompatibilitySupport     ## CONSUMES
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdLoadFixAddressBootTimeCodePageNumber    ## SOMETIMES_CONSUMES

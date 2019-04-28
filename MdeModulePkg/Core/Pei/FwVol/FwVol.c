@@ -1094,15 +1094,6 @@ PeiFfsFindNextFile (
 
   CoreFvHandle = FvHandleToCoreHandle (FvHandle);
 
-  //
-  // To make backward compatiblity, if can not find corresponding the handle of FV
-  // then treat FV as build-in FFS2/FFS3 format and memory mapped FV that FV handle is pointed
-  // to the address of first byte of FV.
-  //
-  if ((CoreFvHandle == NULL) && FeaturePcdGet (PcdFrameworkCompatibilitySupport)) {
-    return FindFileEx (FvHandle, NULL, SearchType, FileHandle, NULL);
-  }
-
   if ((CoreFvHandle == NULL) || CoreFvHandle->FvPpi == NULL) {
     return EFI_NOT_FOUND;
   }
@@ -2111,62 +2102,6 @@ FindNextCoreFvHandle (
   IN UINTN              Instance
   )
 {
-  UINTN                    Index;
-  BOOLEAN                  Match;
-  EFI_HOB_FIRMWARE_VOLUME  *FvHob;
-
-  //
-  // Handle Framework FvHob and Install FvInfo Ppi for it.
-  //
-  if (FeaturePcdGet (PcdFrameworkCompatibilitySupport)) {
-    //
-    // Loop to search the wanted FirmwareVolume which supports FFS
-    //
-    FvHob = (EFI_HOB_FIRMWARE_VOLUME *)GetFirstHob (EFI_HOB_TYPE_FV);
-    while (FvHob != NULL) {
-      //
-      // Search whether FvHob has been installed into PeiCore's FV database.
-      // If found, no need install new FvInfoPpi for it.
-      //
-      for (Index = 0, Match = FALSE; Index < Private->FvCount; Index++) {
-        if ((EFI_PEI_FV_HANDLE)(UINTN)FvHob->BaseAddress == Private->Fv[Index].FvHeader) {
-          Match = TRUE;
-          break;
-        }
-      }
-
-      //
-      // Search whether FvHob has been cached into PeiCore's Unknown FV database.
-      // If found, no need install new FvInfoPpi for it.
-      //
-      if (!Match) {
-        for (Index = 0; Index < Private->UnknownFvInfoCount; Index ++) {
-          if ((UINTN)FvHob->BaseAddress == (UINTN)Private->UnknownFvInfo[Index].FvInfo) {
-            Match = TRUE;
-            break;
-          }
-        }
-      }
-
-      //
-      // If the Fv in FvHob has not been installed into PeiCore's FV database and has
-      // not been cached into PeiCore's Unknown FV database, install a new FvInfoPpi
-      // for it then PeiCore will dispatch it in callback of FvInfoPpi.
-      //
-      if (!Match) {
-        PeiServicesInstallFvInfoPpi (
-          &(((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)FvHob->BaseAddress)->FileSystemGuid),
-          (VOID *)(UINTN)FvHob->BaseAddress,
-          (UINT32)FvHob->Length,
-          NULL,
-          NULL
-          );
-      }
-
-      FvHob = (EFI_HOB_FIRMWARE_VOLUME *)GetNextHob (EFI_HOB_TYPE_FV, (VOID *)((UINTN)FvHob + FvHob->Header.HobLength));
-    }
-  }
-
   if (Instance >= Private->FvCount) {
     return NULL;
   }
