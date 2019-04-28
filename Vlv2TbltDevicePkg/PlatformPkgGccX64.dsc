@@ -491,7 +491,6 @@
 !else
   gEfiMdeModulePkgTokenSpaceGuid.PcdSupportUpdateCapsuleReset|FALSE
 !endif
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFrameworkCompatibilitySupport|TRUE
   gEfiCpuTokenSpaceGuid.PcdCpuSmmEnableBspElection|FALSE
 !if $(DATAHUB_STATUS_CODE_ENABLE) == TRUE
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdStatusCodeUseDataHub|TRUE
