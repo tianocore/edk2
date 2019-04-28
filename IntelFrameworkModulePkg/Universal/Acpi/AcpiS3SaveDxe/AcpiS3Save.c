@@ -2,7 +2,7 @@
   This is an implementation of the ACPI S3 Save protocol.  This is defined in
   S3 boot path specification 0.9.
 
-Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -140,10 +140,6 @@ S3Ready (
   }
   AlreadyEntered = TRUE;
 
-  if (FeaturePcdGet(PcdFrameworkCompatibilitySupport)) {
-    S3ReadyThunkPlatform ();
-  }
-
   return EFI_SUCCESS;
 }
 
@@ -180,10 +176,6 @@ InstallAcpiS3Save (
     mLegacyRegionSize = 0x250;
   } else {
     mLegacyRegionSize = 0x100;
-  }
-
-  if (FeaturePcdGet(PcdFrameworkCompatibilitySupport)) {
-    InstallAcpiS3SaveThunk ();
   }
 
   Status = gBS->InstallProtocolInterface (
