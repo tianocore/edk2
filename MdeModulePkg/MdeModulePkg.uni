@@ -711,12 +711,6 @@
                                                                                                               "TRUE  - disable<BR>\n"
                                                                                                               "FALSE - enable<BR>"
 
-#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdFrameworkCompatibilitySupport_PROMPT  #language en-US "Enable framework backward compatibility support"
-
-#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdFrameworkCompatibilitySupport_HELP  #language en-US "Indicates if backward compatibility to Framework HII and Framework FvHob is supported.<BR><BR>\n"
-                                                                                                  "TRUE  - Setup Browser supports GUID opcodes generated from Framework HII VFR file by VFR compiler. the PeiCore will handle the framework FvHob and install FvInfo PPI for it.<BR>\n"
-                                                                                                  "FALSE - Setup Browser doesn't support GUID opcodes generated from Framework HII VFR file by VFR compiler. the PeiCore will not handle the framework FvHob and install FvInfo PPI for it.<BR>"
-
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdHelloWorldPrintEnable_PROMPT  #language en-US "Enable HelloWorld print"
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdHelloWorldPrintEnable_HELP  #language en-US "Indicates if HelloWorld Application will print the verbose information. This PCD is a sample to explain FeatureFlag PCD usage.<BR><BR>\n"

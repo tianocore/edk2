@@ -737,14 +737,6 @@
   # @Prompt Disable default keyboard layout in USB KeyBoard Driver.
   gEfiMdeModulePkgTokenSpaceGuid.PcdDisableDefaultKeyboardLayoutInUsbKbDriver|FALSE|BOOLEAN|0x00010200
 
-  ## Indicates if backward compatibility to Framework HII and Framework FvHob is supported.<BR><BR>
-  #   TRUE  - Setup Browser supports GUID opcodes generated from Framework HII VFR file by VFR compiler.
-  #           the PeiCore will handle the framework FvHob and install FvInfo PPI for it.<BR>
-  #   FALSE - Setup Browser doesn't support GUID opcodes generated from Framework HII VFR file by VFR compiler.
-  #           the PeiCore will not handle the framework FvHob and install FvInfo PPI for it.<BR>
-  # @Prompt Enable framework backward compatibility support.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFrameworkCompatibilitySupport|FALSE|BOOLEAN|0x00012009
-
   ## Indicates if HelloWorld Application will print the verbose information.
   #  This PCD is a sample to explain FeatureFlag PCD usage.<BR><BR>
   #   TRUE  - HelloWorld Application will print the verbose information.<BR>
