@@ -36,7 +36,7 @@
 #     memory specific stuff like build memory map, build
 #     resource description hob for DXE phase,etc.
 #  Bootmode.c - Detect boot mode.
-# Copyright (c) 2013 - 2016 Intel Corporation.
+# Copyright (c) 2013 - 2019 Intel Corporation.
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -140,7 +140,6 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdRecoveryOnDataCD
   gEfiMdeModulePkgTokenSpaceGuid.PcdRecoveryOnFatFloppyDisk
   gEfiMdeModulePkgTokenSpaceGuid.PcdRecoveryOnIdeDisk
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFrameworkCompatibilitySupport
   gQuarkPlatformTokenSpaceGuid.WaitIfResetDueToError
 
 [Pcd]

@@ -2,7 +2,7 @@
 Install Platform EFI_PEI_RECOVERY_MODULE_PPI and Implementation of
 EFI_PEI_LOAD_RECOVERY_CAPSULE service.
 
-Copyright (c) 2013-2016 Intel Corporation.
+Copyright (c) 2013-2019 Intel Corporation.
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -197,25 +197,13 @@ Returns:
   //
   if (ProviderAvailable) {
     RecoveryCapsuleSize = 0;
-    if (FeaturePcdGet (PcdFrameworkCompatibilitySupport)) {
-      Status = DeviceRecoveryModule->GetRecoveryCapsuleInfo (
-                                      PeiServices,
-                                      DeviceRecoveryModule,
-                                      0,
-                                      &RecoveryCapsuleSize,
-                                      &DeviceId
-                                      );
-    } else {
-      Status = DeviceRecoveryModule->GetRecoveryCapsuleInfo (
-                  PeiServices,
-                  DeviceRecoveryModule,
-                  1,
-                  &RecoveryCapsuleSize,
-                  &DeviceId
-                  );
-
-
-  }
+    Status = DeviceRecoveryModule->GetRecoveryCapsuleInfo (
+                PeiServices,
+                DeviceRecoveryModule,
+                1,
+                &RecoveryCapsuleSize,
+                &DeviceId
+                );
 
     if (EFI_ERROR (Status)) {
       return Status;
@@ -239,22 +227,12 @@ Returns:
     ASSERT (Address);
 
     Buffer = (UINT8 *) (UINTN) Address;
-    if (FeaturePcdGet (PcdFrameworkCompatibilitySupport)) {
-      Status = DeviceRecoveryModule->LoadRecoveryCapsule (
-                                      PeiServices,
-                                      DeviceRecoveryModule,
-                                      0,
-                                      Buffer
-                                      );
-     } else {
-       Status = DeviceRecoveryModule->LoadRecoveryCapsule (
-                                        PeiServices,
-                                        DeviceRecoveryModule,
-                                        1,
-                                        Buffer
-                                        );
-
-     }
+    Status = DeviceRecoveryModule->LoadRecoveryCapsule (
+                                     PeiServices,
+                                     DeviceRecoveryModule,
+                                     1,
+                                     Buffer
+                                     );
 
     DEBUG ((EFI_D_INFO | EFI_D_LOAD, "LoadRecoveryCapsule Returns: %r\n", Status));
 
