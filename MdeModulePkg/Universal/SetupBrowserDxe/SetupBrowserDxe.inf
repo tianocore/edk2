@@ -3,7 +3,7 @@
 #
 # It also produces FormBrowserEx(2) protocol to let user register the different Hot key service.
 #
-# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2019, Intel Corporation. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -52,7 +52,6 @@
   UefiLib
 
 [Guids]
-  gEfiIfrFrameworkGuid                          ## SOMETIMES_CONSUMES  ## GUID
   gEfiHiiPlatformSetupFormsetGuid               ## SOMETIMES_CONSUMES  ## GUID
   gEfiHiiStandardFormGuid                       ## SOMETIMES_CONSUMES  ## GUID
   gZeroGuid                                     ## SOMETIMES_CONSUMES  ## GUID
@@ -72,9 +71,6 @@
   gEdkiiFormDisplayEngineProtocolGuid
   gEdkiiFormBrowserExProtocolGuid               ## PRODUCES
   gEfiRegularExpressionProtocolGuid             ## SOMETIMES_CONSUMES
-
-[FeaturePcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFrameworkCompatibilitySupport          ## CONSUMES
 
 [Depex]
   gEfiHiiDatabaseProtocolGuid AND gEfiHiiConfigRoutingProtocolGuid

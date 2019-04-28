@@ -1,7 +1,7 @@
 /** @file
 Parser for IFR binary encoding.
 
-Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2019, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -85,76 +85,6 @@ CreateStatement (
 }
 
 /**
-  Convert a numeric value to a Unicode String and insert it to String Package.
-  This string is used as the Unicode Name for the EFI Variable. This is to support
-  the deprecated vareqval opcode.
-
-  @param FormSet        The FormSet.
-  @param Statement      The numeric question whose VarStoreInfo.VarName is the
-                        numeric value which is used to produce the Unicode Name
-                        for the EFI Variable.
-
-  If the Statement is NULL, the ASSERT.
-  If the opcode is not Numeric, then ASSERT.
-
-  @retval EFI_SUCCESS The funtion always succeeds.
-**/
-EFI_STATUS
-UpdateCheckBoxStringToken (
-  IN CONST FORM_BROWSER_FORMSET *FormSet,
-  IN       FORM_BROWSER_STATEMENT *Statement
-  )
-{
-  CHAR16                  Str[MAXIMUM_VALUE_CHARACTERS];
-  EFI_STRING_ID           Id;
-
-  ASSERT (Statement != NULL);
-  ASSERT (Statement->Operand == EFI_IFR_NUMERIC_OP);
-
-  UnicodeValueToStringS (Str, sizeof (Str), 0, Statement->VarStoreInfo.VarName, MAXIMUM_VALUE_CHARACTERS - 1);
-
-  Id = HiiSetString (FormSet->HiiHandle, 0, Str, NULL);
-  if (Id == 0) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  Statement->VarStoreInfo.VarName = Id;
-
-  return EFI_SUCCESS;
-}
-
-/**
-  Check if the next opcode is the EFI_IFR_EXTEND_OP_VAREQNAME.
-
-  @param OpCodeData     The current opcode.
-
-  @retval TRUE Yes.
-  @retval FALSE No.
-**/
-BOOLEAN
-IsNextOpCodeGuidedVarEqName (
-  IN UINT8 *OpCodeData
-  )
-{
-  //
-  // Get next opcode
-  //
-  OpCodeData += ((EFI_IFR_OP_HEADER *) OpCodeData)->Length;
-  if (*OpCodeData == EFI_IFR_GUID_OP) {
-    if (CompareGuid (&gEfiIfrFrameworkGuid, (EFI_GUID *)(OpCodeData + sizeof (EFI_IFR_OP_HEADER)))) {
-      //
-      // Specific GUIDed opcodes to support IFR generated from Framework HII VFR
-      //
-      if ((((EFI_IFR_GUID_VAREQNAME *) OpCodeData)->ExtendOpCode) == EFI_IFR_EXTEND_OP_VAREQNAME) {
-        return TRUE;
-      }
-    }
-  }
-
-  return FALSE;
-}
-
-/**
   Initialize Question's members.
 
   @param  OpCodeData             Pointer of the raw OpCode data.
@@ -176,7 +106,6 @@ CreateQuestion (
   LIST_ENTRY               *Link;
   FORMSET_STORAGE          *Storage;
   NAME_VALUE_NODE          *NameValueNode;
-  EFI_STATUS               Status;
   BOOLEAN                  Find;
 
   Statement = CreateStatement (OpCodeData, FormSet, Form);
@@ -196,19 +125,6 @@ CreateQuestion (
     // VarStoreId of zero indicates no variable storage
     //
     return Statement;
-  }
-
-  //
-  // Take a look at next OpCode to see whether it is a GUIDed opcode to support
-  // Framework Compatibility
-  //
-  if (FeaturePcdGet (PcdFrameworkCompatibilitySupport)) {
-    if ((*OpCodeData == EFI_IFR_NUMERIC_OP) && IsNextOpCodeGuidedVarEqName (OpCodeData)) {
-      Status = UpdateCheckBoxStringToken (FormSet, Statement);
-      if (EFI_ERROR (Status)) {
-        return NULL;
-      }
-    }
   }
 
   //
