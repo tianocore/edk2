@@ -9,7 +9,7 @@
   ProcessRecoveryCapsule(), ProcessFmpCapsuleImage(), ProcessRecoveryImage(),
   ValidateFmpCapsule() will receive untrusted input and do basic validation.
 
-Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2016 - 2019, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -766,7 +766,7 @@ LoadRecoveryCapsule (
       Status = DeviceRecoveryPpi->GetRecoveryCapsuleInfo (
                                     (EFI_PEI_SERVICES **)PeiServices,
                                     DeviceRecoveryPpi,
-                                    FeaturePcdGet(PcdFrameworkCompatibilitySupport) ? CapsuleInstance - 1 : CapsuleInstance,
+                                    CapsuleInstance,
                                     &CapsuleSize,
                                     &CapsuleType
                                     );
@@ -783,7 +783,7 @@ LoadRecoveryCapsule (
       Status = DeviceRecoveryPpi->LoadRecoveryCapsule (
                                     (EFI_PEI_SERVICES **)PeiServices,
                                     DeviceRecoveryPpi,
-                                    FeaturePcdGet(PcdFrameworkCompatibilitySupport) ? CapsuleInstance - 1 : CapsuleInstance,
+                                    CapsuleInstance,
                                     CapsuleBuffer
                                     );
       DEBUG ((DEBUG_ERROR, "LoadRecoveryCapsule - LoadRecoveryCapsule (%d) - %r\n", CapsuleInstance, Status));
