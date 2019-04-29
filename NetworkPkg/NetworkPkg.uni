@@ -3,7 +3,7 @@
 //
 // This package provides network modules that conform to UEFI 2.4 specification.
 //
-// Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2009 - 2019, Intel Corporation. All rights reserved.<BR>
 //
 // SPDX-License-Identifier: BSD-2-Clause-Patent
 //
@@ -80,3 +80,15 @@
                                                                                             "0x10 = Stop UEFI iSCSI if iSCSI HBA adapter supports multipath I/O for iSCSI boot.\n"
                                                                                             "0x20 = Stop UEFI iSCSI if iSCSI HBA adapter is currently configured to boot from iSCSI IPv4 targets.\n"
                                                                                             "0x40 = Stop UEFI iSCSI if iSCSI HBA adapter is currently configured to boot from iSCSI IPv6 targets."
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdIPv4PXESupport_PROMPT  #language en-US "Enable IPV4 PXE Function."
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdIPv4PXESupport_HELP  #language en-US "Indicates IPV4 PXE Function is enabled or not.\n"
+                                                                                 "A value of 0 indicates the IPV4 PXE Function is disabled.\n"
+                                                                                 "A value of 1 indicates the IPV4 PXE Function is enabled."
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdIPv6PXESupport_PROMPT  #language en-US "Enable IPV6 PXE Function."
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdIPv6PXESupport_HELP  #language en-US "Indicates IPV6 PXE Function is enabled or not.\n"
+                                                                                 "A value of 0 indicates the IPV6 PXE Function is disabled.\n"
+                                                                                 "A value of 1 indicates the IPV6 PXE Function is enabled."
