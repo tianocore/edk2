@@ -2,7 +2,7 @@
 # Clanton Peak CRB platform with 32-bit DXE for 4MB/8MB flash devices.
 #
 # This package provides Clanton Peak CRB platform specific modules.
-# Copyright (c) 2013 - 2018 Intel Corporation.
+# Copyright (c) 2013 - 2019 Intel Corporation.
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -447,6 +447,11 @@
 !if $(RECOVERY_ENABLE)
   gEfiMdeModulePkgTokenSpaceGuid.PcdRecoveryFileName|L"QUARKREC.Cap"
 !endif
+
+  #
+  # Quark does not support LFENCE.  Use CPUID as speculation barrier
+  #
+  gEfiMdePkgTokenSpaceGuid.PcdSpeculationBarrierType|0x02
 
 [PcdsPatchableInModule]
   gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x803000C7

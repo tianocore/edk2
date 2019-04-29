@@ -406,6 +406,11 @@
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdConInConnectOnDemand|FALSE
 
+  #
+  # Quark does not support LFENCE.  Use CPUID as speculation barrier
+  #
+  gEfiMdePkgTokenSpaceGuid.PcdSpeculationBarrierType|0x02
+
 [PcdsPatchableInModule]
   gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x803000C7
   gEfiMdeModulePkgTokenSpaceGuid.PcdVpdBaseAddress|0x0
