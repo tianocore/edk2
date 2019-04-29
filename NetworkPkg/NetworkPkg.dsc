@@ -72,6 +72,8 @@
   # [LibraryClasses.ARM] and NULL mean link this library into all ARM images.
   #
   NULL|ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
+  NULL|MdePkg/Library/BaseStackCheckLib/BaseStackCheckLib.inf
+  ArmSoftFloatLib|ArmPkg/Library/ArmSoftFloatLib/ArmSoftFloatLib.inf
 
 [PcdsFeatureFlag]
   gEfiMdePkgTokenSpaceGuid.PcdComponentName2Disable|TRUE
@@ -114,7 +116,7 @@
 
   NetworkPkg/Application/VConfig/VConfig.inf
 
-[Components.IA32, Components.X64]
+[Components.IA32, Components.X64, Components.ARM, Components.AARCH64]
   NetworkPkg/IScsiDxe/IScsiDxe.inf
   NetworkPkg/UefiPxeBcDxe/UefiPxeBcDxe.inf
   NetworkPkg/TlsDxe/TlsDxe.inf
