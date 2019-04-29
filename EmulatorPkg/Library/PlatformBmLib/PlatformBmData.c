@@ -42,12 +42,48 @@ EMU_PLATFORM_UGA_DEVICE_PATH gGopDevicePath = {
   gEndEntire
 };
 
+EMU_PLATFORM_UGA_DEVICE_PATH gGopDevicePath2 = {
+  {
+    {
+      {
+        HARDWARE_DEVICE_PATH,
+        HW_VENDOR_DP,
+        {
+          (UINT8) (sizeof (EMU_VENDOR_DEVICE_PATH_NODE)),
+          (UINT8) ((sizeof (EMU_VENDOR_DEVICE_PATH_NODE)) >> 8)
+        }
+      },
+      EMU_THUNK_PROTOCOL_GUID
+    },
+    0
+  },
+  {
+    {
+      {
+        HARDWARE_DEVICE_PATH,
+        HW_VENDOR_DP,
+        {
+          (UINT8) (sizeof (EMU_VENDOR_DEVICE_PATH_NODE)),
+          (UINT8) ((sizeof (EMU_VENDOR_DEVICE_PATH_NODE)) >> 8)
+        },
+      },
+      EMU_GRAPHICS_WINDOW_PROTOCOL_GUID,
+    },
+    1
+  },
+  gEndEntire
+};
+
 //
 // Predefined platform default console device path
 //
 BDS_CONSOLE_CONNECT_ENTRY   gPlatformConsole[] = {
   {
     (EFI_DEVICE_PATH_PROTOCOL *) &gGopDevicePath,
+    (CONSOLE_OUT | CONSOLE_IN)
+  },
+  {
+    (EFI_DEVICE_PATH_PROTOCOL *) &gGopDevicePath2,
     (CONSOLE_OUT | CONSOLE_IN)
   },
   {
