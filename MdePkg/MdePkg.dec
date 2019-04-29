@@ -2062,6 +2062,15 @@
   # @Prompt Enable control flow enforcement.
   gEfiMdePkgTokenSpaceGuid.PcdControlFlowEnforcementPropertyMask|0x0|UINT32|0x30001017
 
+  ## Indicates the type of instruction sequence to use for a speculation
+  #  barrier.  The default instruction sequence is LFENCE.<BR><BR>
+  #   0x00 - No operation.<BR>
+  #   0x01 - LFENCE (IA32/X64).<BR>
+  #   0x02 - CPUID  (IA32/X64).<BR>
+  #   Other - reserved
+  # @Prompt Speculation Barrier Type.
+  gEfiMdePkgTokenSpaceGuid.PcdSpeculationBarrierType|0x01|UINT8|0x30001018
+
 [PcdsFixedAtBuild,PcdsPatchableInModule]
   ## Indicates the maximum length of unicode string used in the following
   #  BaseLib functions: StrLen(), StrSize(), StrCmp(), StrnCmp(), StrCpy(), StrnCpy()<BR><BR>

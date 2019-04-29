@@ -149,6 +149,14 @@
                                                                                                   " BIT0 - SMM CET Shadow Stack is enabled.<BR>\n"
                                                                                                   " Other - reserved"
 
+#string STR_gEfiMdePkgTokenSpaceGuid_PcdSpeculationBarrierType_PROMPT  #language en-US "Speculation Barrier Type."
+
+#string STR_gEfiMdePkgTokenSpaceGuid_PcdSpeculationBarrierType_HELP  #language en-US  "Indicates the type of instruction sequence to use for a speculation.barrier.  The default instruction sequence is LFENCE.<BR><BR>\n"
+                                                                                      "0x00 - No operation.<BR>\n"
+                                                                                      "0x01 - LFENCE (IA32/X64).<BR>\n"
+                                                                                      "0x02 - CPUID  (IA32/X64).<BR>\n"
+                                                                                      "Other - reserved"
+
 #string STR_gEfiMdePkgTokenSpaceGuid_PcdMaximumAsciiStringLength_PROMPT  #language en-US "Maximum Length of Ascii String"
 
 #string STR_gEfiMdePkgTokenSpaceGuid_PcdMaximumAsciiStringLength_HELP  #language en-US "Sets the maximum number of ASCII characters used for string functions.  This affects the following BaseLib functions: AsciiStrLen(), AsciiStrSize(), AsciiStrCmp(), AsciiStrnCmp(), AsciiStrCpy(), AsciiStrnCpy(). <BR><BR>\n"
