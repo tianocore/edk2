@@ -1,7 +1,7 @@
 /** @file
   IP4 input process.
 
-Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2020, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -711,10 +711,6 @@ Ip4PreProcessPacket (
   //
   // Check if the IP4 header is correctly formatted.
   //
-  if ((*Packet)->TotalSize < IP4_MIN_HEADLEN) {
-    return EFI_INVALID_PARAMETER;
-  }
-
   HeadLen  = (Head->HeadLen << 2);
   TotalLen = NTOHS (Head->TotalLen);
 
@@ -809,6 +805,30 @@ Ip4PreProcessPacket (
 }
 
 /**
+  This function checks the IPv4 packet length.
+
+  @param[in]       Packet          Pointer to the IPv4 Packet to be checked.
+
+  @retval TRUE                   The input IPv4 packet length is valid.
+  @retval FALSE                  The input IPv4 packet length is invalid.
+
+**/
+BOOLEAN
+Ip4IsValidPacketLength (
+  IN NET_BUF        *Packet
+  )
+{
+  //
+  // Check the IP4 packet length.
+  //
+  if (Packet->TotalSize < IP4_MIN_HEADLEN) {
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+/**
   The IP4 input routine. It is called by the IP4_INTERFACE when a
   IP4 fragment is received from MNP.
 
@@ -842,6 +862,10 @@ Ip4AccpetFrame (
 
   if (EFI_ERROR (IoStatus) || (IpSb->State == IP4_SERVICE_DESTROY)) {
     goto DROP;
+  }
+
+  if (!Ip4IsValidPacketLength (Packet)) {
+    goto RESTART;
   }
 
   Head      = (IP4_HEAD *) NetbufGetByte (Packet, 0, NULL);
@@ -890,10 +914,14 @@ Ip4AccpetFrame (
   //
   ZeroMem (&ZeroHead, sizeof (IP4_HEAD));
   if (0 == CompareMem (Head, &ZeroHead, sizeof (IP4_HEAD))) {
-  // Packet may have been changed. Head, HeadLen, TotalLen, and
-  // info must be reloaded before use. The ownership of the packet
-  // is transferred to the packet process logic.
-  //
+    // Packet may have been changed. Head, HeadLen, TotalLen, and
+    // info must be reloaded before use. The ownership of the packet
+    // is transferred to the packet process logic.
+    //
+    if (!Ip4IsValidPacketLength (Packet)) {
+      goto RESTART;
+    }
+
     Head = (IP4_HEAD *) NetbufGetByte (Packet, 0, NULL);
     ASSERT (Head != NULL);
     Status = Ip4PreProcessPacket (
