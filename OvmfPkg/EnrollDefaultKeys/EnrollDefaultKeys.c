@@ -559,6 +559,13 @@ ShellAppMain (
   }
 
   //
+  // Set PkKek1 and SizeOfPkKek1 to suppress incorrect compiler/analyzer
+  // warnings.
+  //
+  PkKek1 = NULL;
+  SizeOfPkKek1 = 0;
+
+  //
   // Fetch the X509 certificate (to be used as Platform Key and first Key
   // Exchange Key) from SMBIOS.
   //
