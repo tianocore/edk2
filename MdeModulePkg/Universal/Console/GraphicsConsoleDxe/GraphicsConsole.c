@@ -1,7 +1,7 @@
 /** @file
   This is the main routine for initializing the Graphics Console support routines.
 
-Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -384,6 +384,12 @@ GraphicsConsoleControllerDriverStart (
   EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE    *Mode;
   UINTN                                SizeOfInfo;
   EFI_GRAPHICS_OUTPUT_MODE_INFORMATION *Info;
+  INT32                                PreferMode;
+  INT32                                Index;
+  UINTN                                Column;
+  UINTN                                Row;
+  UINTN                                DefaultColumn;
+  UINTN                                DefaultRow;
 
   ModeNumber = 0;
 
@@ -567,16 +573,32 @@ GraphicsConsoleControllerDriverStart (
   //
   Private->SimpleTextOutputMode.MaxMode = (INT32) MaxMode;
 
-  DEBUG_CODE_BEGIN ();
-    Status = GraphicsConsoleConOutSetMode (&Private->SimpleTextOutput, 0);
-    if (EFI_ERROR (Status)) {
-      goto Error;
+  //
+  // Initialize the Mode of graphics console devices
+  //
+  PreferMode = -1;
+  DefaultColumn = PcdGet32 (PcdConOutColumn);
+  DefaultRow = PcdGet32 (PcdConOutRow);
+  Column = 0;
+  Row = 0;
+  for (Index = 0; Index < (INT32)MaxMode; Index++) {
+    if (DefaultColumn != 0 && DefaultRow != 0) {
+      if ((Private->ModeData[Index].Columns == DefaultColumn) &&
+          (Private->ModeData[Index].Rows == DefaultRow)) {
+        PreferMode = Index;
+        break;
+      }
+    } else {
+      if ((Private->ModeData[Index].Columns > Column) &&
+          (Private->ModeData[Index].Rows > Row)) {
+        Column = Private->ModeData[Index].Columns;
+        Row = Private->ModeData[Index].Rows;
+        PreferMode = Index;
+      }
     }
-    Status = GraphicsConsoleConOutOutputString (&Private->SimpleTextOutput, (CHAR16 *)L"Graphics Console Started\n\r");
-    if (EFI_ERROR (Status)) {
-      goto Error;
-    }
-  DEBUG_CODE_END ();
+  }
+  Private->SimpleTextOutput.Mode->Mode = (INT32)PreferMode;
+  DEBUG ((DEBUG_INFO, "Graphics Console Started, Mode: %d\n", PreferMode));
 
   //
   // Install protocol interfaces for the Graphics Console device.
