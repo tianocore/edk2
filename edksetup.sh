@@ -177,11 +177,22 @@ function SetupPython()
   SetupPython3
 }
 
+function TestUtilModule()
+{
+  if ( $PYTHON_COMMAND -c "import distutils.util" >/dev/null 2>&1 );then
+    return 1
+  else
+    echo Error: "No module named 'distutils.util"
+    return 0
+  fi
+}
+
 function SourceEnv()
 {
   SetWorkspace &&
-  SetupEnv
-  SetupPython
+  SetupEnv &&
+  SetupPython &&
+  TestUtilModule
 }
 
 I=$#
