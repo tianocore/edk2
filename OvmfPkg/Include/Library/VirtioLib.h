@@ -292,7 +292,7 @@ Virtio10WriteFeatures (
                                   VIRTIO_UNMAP_SHARED.
 
 
-  @retval EFI_SUCCESS             The NumberOfBytes is succesfully mapped.
+  @retval EFI_SUCCESS             The NumberOfBytes is successfully mapped.
   @retval EFI_UNSUPPORTED         The HostAddress cannot be mapped as a
                                   common buffer.
   @retval EFI_INVALID_PARAMETER   One or more parameters are invalid.
