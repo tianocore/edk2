@@ -1,7 +1,7 @@
 #/** @file
 # FDF file of Platform.
 #
-# Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2019, Intel Corporation. All rights reserved.<BR>
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -686,7 +686,6 @@ FILE FREEFORM = 878AC2CC-5343-46F2-B563-51F89DAF56BA {
   !if $(NETWORK_IP6_ENABLE) == TRUE
   INF  NetworkPkg/Ip6Dxe/Ip6Dxe.inf
   INF  NetworkPkg/Dhcp6Dxe/Dhcp6Dxe.inf
-  INF  NetworkPkg/IpSecDxe/IpSecDxe.inf
   INF  NetworkPkg/Udp6Dxe/Udp6Dxe.inf
   INF  NetworkPkg/Mtftp6Dxe/Mtftp6Dxe.inf
   !endif

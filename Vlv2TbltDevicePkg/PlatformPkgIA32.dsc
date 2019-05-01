@@ -1,7 +1,7 @@
 #/** @file
 # Platform description.
 #
-# Copyright (c) 2012  - 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2012  - 2019, Intel Corporation. All rights reserved.<BR>
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -1451,7 +1451,6 @@ $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/IA32/fTPMInitPeim.inf
     !if $(NETWORK_IP6_ENABLE) == TRUE
       NetworkPkg/Ip6Dxe/Ip6Dxe.inf
       NetworkPkg/Dhcp6Dxe/Dhcp6Dxe.inf
-      NetworkPkg/IpSecDxe/IpSecDxe.inf
       NetworkPkg/Udp6Dxe/Udp6Dxe.inf
       NetworkPkg/Mtftp6Dxe/Mtftp6Dxe.inf
     !endif
