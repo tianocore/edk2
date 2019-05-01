@@ -195,7 +195,7 @@ typedef struct {
   @retval RETURN_SUCCESS              The attributes were cleared for the
                                       memory region.
   @retval RETURN_INVALID_PARAMETER    Number of pages is zero.
-  @retval RETURN_UNSUPPORTED          Clearing the memory encyrption attribute
+  @retval RETURN_UNSUPPORTED          Clearing the memory encryption attribute
                                       is not supported
 **/
 RETURN_STATUS
@@ -222,7 +222,7 @@ InternalMemEncryptSevSetMemoryDecrypted (
   @retval RETURN_SUCCESS              The attributes were set for the memory
                                       region.
   @retval RETURN_INVALID_PARAMETER    Number of pages is zero.
-  @retval RETURN_UNSUPPORTED          Setting the memory encyrption attribute
+  @retval RETURN_UNSUPPORTED          Setting the memory encryption attribute
                                       is not supported
 **/
 RETURN_STATUS
