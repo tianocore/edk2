@@ -174,14 +174,12 @@ MemMapInitialization (
   AddIoMemoryRangeHob (0x0A0000, BASE_1MB);
 
   if (!mXen) {
-    UINT32  TopOfLowRam;
     UINT64  PciExBarBase;
     UINT32  PciBase;
     UINT32  PciSize;
 
-    TopOfLowRam = GetSystemMemorySizeBelow4gb ();
     PciExBarBase = 0;
-    PciBase = (TopOfLowRam < BASE_2GB) ? BASE_2GB : TopOfLowRam;
+    PciBase = (mQemuUc32Base < BASE_2GB) ? BASE_2GB : mQemuUc32Base;
     if (mHostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID) {
       //
       // The 32-bit PCI host aperture is expected to fall between the top of

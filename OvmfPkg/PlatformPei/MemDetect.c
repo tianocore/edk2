@@ -42,6 +42,8 @@ STATIC UINT32 mS3AcpiReservedMemorySize;
 
 STATIC UINT16 mQ35TsegMbytes;
 
+UINT32 mQemuUc32Base;
+
 VOID
 Q35TsegMbytesInitialization (
   VOID
@@ -663,6 +665,8 @@ QemuInitializeRam (
   // cover it exactly.
   //
   if (IsMtrrSupported ()) {
+    UINT32 Uc32Size;
+
     MtrrGetAllMtrrs (&MtrrSettings);
 
     //
@@ -689,11 +693,24 @@ QemuInitializeRam (
 
     //
     // Set memory range from the "top of lower RAM" (RAM below 4GB) to 4GB as
-    // uncacheable
+    // uncacheable. Make sure one variable MTRR suffices by truncating the size
+    // to a whole power of two. This will round the base *up*, and a gap (not
+    // used for either RAM or MMIO) may stay in the middle, marked as
+    // cacheable-by-default.
     //
-    Status = MtrrSetMemoryAttribute (LowerMemorySize,
-               SIZE_4GB - LowerMemorySize, CacheUncacheable);
+    Uc32Size = GetPowerOfTwo32 ((UINT32)(SIZE_4GB - LowerMemorySize));
+    mQemuUc32Base = (UINT32)(SIZE_4GB - Uc32Size);
+    if (mQemuUc32Base != LowerMemorySize) {
+      DEBUG ((DEBUG_VERBOSE, "%a: rounded UC32 base from 0x%x up to 0x%x, for "
+        "an UC32 size of 0x%x\n", __FUNCTION__, (UINT32)LowerMemorySize,
+        mQemuUc32Base, Uc32Size));
+    }
+
+    Status = MtrrSetMemoryAttribute (mQemuUc32Base, Uc32Size,
+               CacheUncacheable);
     ASSERT_EFI_ERROR (Status);
+  } else {
+    mQemuUc32Base = (UINT32)LowerMemorySize;
   }
 }
 
