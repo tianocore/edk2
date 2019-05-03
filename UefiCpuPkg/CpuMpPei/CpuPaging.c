@@ -12,6 +12,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/MemoryAllocationLib.h>
 #include <Library/CpuLib.h>
 #include <Library/BaseLib.h>
+#include <Library/DebugLib.h>
+#include <Library/CpuDebugDumpLib.h>
+
 
 #include "CpuMpPei.h"
 
@@ -607,8 +610,10 @@ MemoryDiscoveredPpiNotifyCallback (
   BOOLEAN     InterruptState;
 
   InterruptState = SaveAndDisableInterrupts ();
+  DumpGdt ();
   Status = MigrateGdt ();
   ASSERT_EFI_ERROR (Status);
+  DumpGdt ();
   SetInterruptState (InterruptState);
 
   //
@@ -622,8 +627,10 @@ MemoryDiscoveredPpiNotifyCallback (
     InitStackGuard = TRUE;
   }
 
-  Status = InitializeCpuMpWorker ((CONST EFI_PEI_SERVICES **)PeiServices);
+  DumpIdt ();
+  Status = InitializeCpuMpWorker ((CONST EFI_PEI_SERVICES **) PeiServices);
   ASSERT_EFI_ERROR (Status);
+  DumpIdt ();
 
   if (InitStackGuard) {
     SetupStackGuardPage ();
