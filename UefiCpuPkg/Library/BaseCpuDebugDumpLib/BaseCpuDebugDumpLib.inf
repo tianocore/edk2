@@ -1,0 +1,39 @@
+## @file
+#  This library defines routines to dump CPU structure information to debug output.
+#
+#  Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BaseCpuDebugDumplib
+  MODULE_UNI_FILE                = BaseCpuDebugDumpLib.uni
+  FILE_GUID                      = B9B1F934-2EB6-40FD-9881-0527987B45A4
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = CpuDebugDumpLib
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  BaseCpuDebugDumpLib.c
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
