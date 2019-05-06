@@ -80,6 +80,7 @@ DATA = {
 gEmulatorPkgTokenSpaceGuid.PcdEmuFlashNvStorageFtwSpareBase|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
 
 [FV.FvRecovery]
+FvNameGuid         = 6D99E806-3D38-42c2-A095-5F4300BFD7DC
 FvAlignment        = 16         #FV alignment and FV attributes setting.
 ERASE_POLARITY     = 1
 MEMORY_MAPPED      = TRUE
