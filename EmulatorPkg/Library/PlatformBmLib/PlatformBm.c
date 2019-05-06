@@ -333,6 +333,35 @@ PlatformBdsRegisterStaticBootOptions (
 }
 
 /**
+  Returns the priority number.
+
+  @param BootOption
+**/
+UINTN
+BootOptionPriority (
+  CONST EFI_BOOT_MANAGER_LOAD_OPTION *BootOption
+  )
+{
+  //
+  // Make sure Shell is first
+  //
+  if (StrCmp (BootOption->Description, L"UEFI Shell") == 0) {
+    return 0;
+  }
+  return 100;
+}
+
+INTN
+EFIAPI
+CompareBootOption (
+  CONST EFI_BOOT_MANAGER_LOAD_OPTION  *Left,
+  CONST EFI_BOOT_MANAGER_LOAD_OPTION  *Right
+  )
+{
+  return BootOptionPriority (Left) - BootOptionPriority (Right);
+}
+
+/**
   Do the platform specific action after the console is connected.
 
   Such as:
@@ -377,6 +406,7 @@ PlatformBootManagerAfterConsole (
     PlatformBdsRegisterStaticBootOptions ();
     PlatformBdsConnectSequence ();
     EfiBootManagerRefreshAllBootOption ();
+    EfiBootManagerSortLoadOptionVariable (LoadOptionTypeBoot, (SORT_COMPARE)CompareBootOption);
     break;
   }
 }
