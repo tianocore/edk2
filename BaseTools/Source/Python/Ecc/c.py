@@ -495,6 +495,8 @@ def CollectSourceCodeDataIntoDB(RootDir):
     tuple = os.walk(RootDir)
     IgnoredPattern = GetIgnoredDirListPattern()
     ParseErrorFileList = []
+    TokenReleaceList = EccGlobalData.gConfig.TokenReleaceList
+    TokenReleaceList.extend(['L",\\\""'])
 
     for dirpath, dirnames, filenames in tuple:
         if IgnoredPattern.match(dirpath.upper()):
@@ -519,6 +521,7 @@ def CollectSourceCodeDataIntoDB(RootDir):
                 EdkLogger.info("Parsing " + FullName)
                 model = f.endswith('c') and DataClass.MODEL_FILE_C or DataClass.MODEL_FILE_H
                 collector = CodeFragmentCollector.CodeFragmentCollector(FullName)
+                collector.TokenReleaceList = TokenReleaceList
                 try:
                     collector.ParseFile()
                 except UnicodeError:

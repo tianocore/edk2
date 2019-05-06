@@ -114,6 +114,7 @@ _ConfigFileToInternalTranslation = {
     "SmmCommParaCheckBufferType":"SmmCommParaCheckBufferType",
     "SpaceCheckAll":"SpaceCheckAll",
     "SpellingCheckAll":"SpellingCheckAll",
+    "TokenReleaceList":"TokenReleaceList",
     "UniCheckAll":"UniCheckAll",
     "UniCheckHelpInfo":"UniCheckHelpInfo",
     "UniCheckPCDInfo":"UniCheckPCDInfo",
@@ -389,6 +390,8 @@ class Configuration(object):
         # A list for Copyright format
         self.Copyright = []
 
+        self.TokenReleaceList = []
+
         self.ParseConfig()
 
     def ParseConfig(self):
@@ -418,6 +421,8 @@ class Configuration(object):
                 if List[0] == 'BinaryExtList':
                     List[1] = GetSplitValueList(List[1], TAB_COMMA_SPLIT)
                 if List[0] == 'Copyright':
+                    List[1] = GetSplitValueList(List[1], TAB_COMMA_SPLIT)
+                if List[0] == 'TokenReleaceList':
                     List[1] = GetSplitValueList(List[1], TAB_COMMA_SPLIT)
                 self.__dict__[_ConfigFileToInternalTranslation[List[0]]] = List[1]
 

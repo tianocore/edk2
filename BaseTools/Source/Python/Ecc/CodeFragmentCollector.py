@@ -73,7 +73,7 @@ class CodeFragmentCollector:
         self.FileName = FileName
         self.CurrentLineNumber = 1
         self.CurrentOffsetWithinLine = 0
-
+        self.TokenReleaceList = []
         self.__Token = ""
         self.__SkippedChars = ""
 
@@ -503,6 +503,9 @@ class CodeFragmentCollector:
         FileStringContents = ''
         for fileLine in self.Profile.FileLinesList:
             FileStringContents += fileLine
+        for Token in self.TokenReleaceList:
+            if Token in FileStringContents:
+                FileStringContents = FileStringContents.replace(Token, 'TOKENSTRING')
         cStream = antlr.InputStream(FileStringContents)
         lexer = CLexer(cStream)
         tStream = antlr.CommonTokenStream(lexer)
