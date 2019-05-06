@@ -12,7 +12,6 @@
 @if exist %WORKSPACE%\edk2.log del %WORKSPACE%\edk2.log
 @if exist %WORKSPACE%\unitool.log del %WORKSPACE%\unitool.log
 @if exist %WORKSPACE%\Conf\build_rule.txt del %WORKSPACE%\Conf\build_rule.txt
-@if exist %WORKSPACE%\Conf\FrameworkDatabase.db del %WORKSPACE%\Conf\FrameworkDatabase.db
 @if exist %WORKSPACE%\Conf\target.txt del %WORKSPACE%\Conf\target.txt
 @if exist %WORKSPACE%\Conf\tools_def.txt del %WORKSPACE%\Conf\tools_def.txt
 @if exist conf\.cache rmdir /q /s conf\.cache

@@ -32,7 +32,6 @@ if exist %CORE_PATH%\unitool.log del %CORE_PATH%\unitool.log
 if exist %CORE_PATH%\Conf\target.txt del %CORE_PATH%\Conf\target.txt
 if exist %CORE_PATH%\Conf\tools_def.txt del %CORE_PATH%\Conf\tools_def.txt
 if exist %CORE_PATH%\Conf\build_rule.txt del %CORE_PATH%\Conf\build_rule.txt
-if exist %CORE_PATH%\Conf\FrameworkDatabase.db del %CORE_PATH%\Conf\FrameworkDatabase.db
 if exist conf\.cache rmdir /q/s conf\.cache
 
 :: Setup EDK environment. Edksetup puts new copies of target.txt, tools_def.txt, build_rule.txt in WorkSpace\Conf
