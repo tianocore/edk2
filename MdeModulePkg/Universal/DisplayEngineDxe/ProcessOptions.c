@@ -2,7 +2,7 @@
 Implementation for handling the User Interface option processing.
 
 
-Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2020, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -823,6 +823,7 @@ PasswordProcess (
     //
     Status = ReadString (MenuOption, gPromptForPassword, StringPtr);
     if (EFI_ERROR (Status)) {
+      ZeroMem (StringPtr, (Maximum + 1) * sizeof (CHAR16));
       FreePool (StringPtr);
       return Status;
     }
@@ -840,7 +841,7 @@ PasswordProcess (
       } else {
         Status = EFI_SUCCESS;
       }
-
+      ZeroMem (StringPtr, (Maximum + 1) * sizeof (CHAR16));
       FreePool (StringPtr);
       return Status;
     }
@@ -856,6 +857,7 @@ PasswordProcess (
     // Reset state machine for password
     //
     Question->PasswordCheck (gFormData, Question, NULL);
+    ZeroMem (StringPtr, (Maximum + 1) * sizeof (CHAR16));
     FreePool (StringPtr);
     return Status;
   }
@@ -871,6 +873,8 @@ PasswordProcess (
     // Reset state machine for password
     //
     Question->PasswordCheck (gFormData, Question, NULL);
+    ZeroMem (StringPtr, (Maximum + 1) * sizeof (CHAR16));
+    ZeroMem (TempString, (Maximum + 1) * sizeof (CHAR16));
     FreePool (StringPtr);
     FreePool (TempString);
     return Status;
