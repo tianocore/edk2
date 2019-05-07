@@ -1019,7 +1019,7 @@ BcfgAddOpt(
   //
   // Get the index of the variable we are changing.
   //
-  Status = ShellConvertStringToUint64(Walker, &Intermediate, FALSE, TRUE);
+  Status = ShellConvertStringToUint64(Walker, &Intermediate, TRUE, TRUE);
   if (EFI_ERROR(Status) || (((UINT16)Intermediate) != Intermediate) || StrStr(Walker, L" ") == NULL || ((UINT16)Intermediate) > ((UINT16)OrderCount)) {
     ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellBcfgHiiHandle, L"bcfg", L"Option Index");
     ShellStatus = SHELL_INVALID_PARAMETER;
