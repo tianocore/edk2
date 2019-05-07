@@ -487,6 +487,7 @@ OpalEndOfDxeEventNotify (
                             OPAL request.
   @param[in]  PopUpString   Pop up string.
   @param[in]  PopUpString2  Pop up string in line 2.
+  @param[in]  PopUpString3  Pop up string in line 3.
 
   @param[out] PressEsc      Whether user escape function through Press ESC.
 
@@ -498,6 +499,7 @@ OpalDriverPopUpPsidInput (
   IN OPAL_DRIVER_DEVICE     *Dev,
   IN CHAR16                 *PopUpString,
   IN CHAR16                 *PopUpString2,
+  IN CHAR16                 *PopUpString3,
   OUT BOOLEAN               *PressEsc
   )
 {
@@ -527,15 +529,28 @@ OpalDriverPopUpPsidInput (
         NULL
       );
     } else {
-      CreatePopUp (
-        EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
-        &InputKey,
-        PopUpString,
-        PopUpString2,
-        L"---------------------",
-        Mask,
-        NULL
-      );
+      if (PopUpString3 == NULL) {
+        CreatePopUp (
+          EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+          &InputKey,
+          PopUpString,
+          PopUpString2,
+          L"---------------------",
+          Mask,
+          NULL
+        );
+      } else {
+        CreatePopUp (
+          EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+          &InputKey,
+          PopUpString,
+          PopUpString2,
+          PopUpString3,
+          L"---------------------",
+          Mask,
+          NULL
+        );
+      }
     }
 
     //
@@ -625,6 +640,7 @@ OpalDriverPopUpPsidInput (
                             process OPAL request.
   @param[in]  PopUpString1  Pop up string 1.
   @param[in]  PopUpString2  Pop up string 2.
+  @param[in]  PopUpString3  Pop up string 3.
   @param[out] PressEsc      Whether user escape function through Press ESC.
 
   @retval Password string if success. NULL if failed.
@@ -635,6 +651,7 @@ OpalDriverPopUpPasswordInput (
   IN OPAL_DRIVER_DEVICE     *Dev,
   IN CHAR16                 *PopUpString1,
   IN CHAR16                 *PopUpString2,
+  IN CHAR16                 *PopUpString3,
   OUT BOOLEAN               *PressEsc
   )
 {
@@ -664,15 +681,28 @@ OpalDriverPopUpPasswordInput (
         NULL
       );
     } else {
-      CreatePopUp (
-        EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
-        &InputKey,
-        PopUpString1,
-        PopUpString2,
-        L"---------------------",
-        Mask,
-        NULL
-      );
+      if (PopUpString3 == NULL) {
+        CreatePopUp (
+          EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+          &InputKey,
+          PopUpString1,
+          PopUpString2,
+          L"---------------------",
+          Mask,
+          NULL
+        );
+      } else {
+        CreatePopUp (
+          EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+          &InputKey,
+          PopUpString1,
+          PopUpString2,
+          PopUpString3,
+          L"---------------------",
+          Mask,
+          NULL
+        );
+      }
     }
 
     //
@@ -823,7 +853,7 @@ OpalDriverRequestPassword (
     }
 
     while (Count < MAX_PASSWORD_TRY_COUNT) {
-      Password = OpalDriverPopUpPasswordInput (Dev, PopUpString, NULL, &PressEsc);
+      Password = OpalDriverPopUpPasswordInput (Dev, PopUpString, NULL, NULL, &PressEsc);
       if (PressEsc) {
         if (IsLocked) {
           //
@@ -988,7 +1018,7 @@ ProcessOpalRequestEnableFeature (
   Session.OpalBaseComId = Dev->OpalDisk.OpalBaseComId;
 
   while (Count < MAX_PASSWORD_TRY_COUNT) {
-    Password = OpalDriverPopUpPasswordInput (Dev, PopUpString, L"Please type in your new password", &PressEsc);
+    Password = OpalDriverPopUpPasswordInput (Dev, PopUpString, L"Please type in your new password", NULL, &PressEsc);
     if (PressEsc) {
         do {
           CreatePopUp (
@@ -1017,7 +1047,7 @@ ProcessOpalRequestEnableFeature (
     }
     PasswordLen = (UINT32) AsciiStrLen(Password);
 
-    PasswordConfirm = OpalDriverPopUpPasswordInput (Dev, PopUpString, L"Please confirm your new password", &PressEsc);
+    PasswordConfirm = OpalDriverPopUpPasswordInput (Dev, PopUpString, L"Please confirm your new password", NULL, &PressEsc);
     if (PasswordConfirm == NULL) {
       ZeroMem (Password, PasswordLen);
       FreePool (Password);
@@ -1132,7 +1162,7 @@ ProcessOpalRequestDisableUser (
   Session.OpalBaseComId = Dev->OpalDisk.OpalBaseComId;
 
   while (Count < MAX_PASSWORD_TRY_COUNT) {
-    Password = OpalDriverPopUpPasswordInput (Dev, PopUpString, NULL, &PressEsc);
+    Password = OpalDriverPopUpPasswordInput (Dev, PopUpString, NULL, NULL, &PressEsc);
     if (PressEsc) {
         do {
           CreatePopUp (
@@ -1227,6 +1257,7 @@ ProcessOpalRequestPsidRevert (
   TCG_RESULT            Ret;
   CHAR16                *PopUpString;
   CHAR16                *PopUpString2;
+  CHAR16                *PopUpString3;
   UINTN                 BufferSize;
 
   if (Dev == NULL) {
@@ -1238,17 +1269,19 @@ ProcessOpalRequestPsidRevert (
   PopUpString = OpalGetPopUpString (Dev, RequestString);
 
   if (Dev->OpalDisk.EstimateTimeCost > MAX_ACCEPTABLE_REVERTING_TIME) {
-    BufferSize = StrSize (L"Warning: Revert action will take about ####### seconds, DO NOT power off system during the revert action!");
+    BufferSize = StrSize (L"Warning: Revert action will take about ####### seconds");
     PopUpString2 = AllocateZeroPool (BufferSize);
     ASSERT (PopUpString2 != NULL);
     UnicodeSPrint (
         PopUpString2,
         BufferSize,
-        L"WARNING: Revert action will take about %d seconds, DO NOT power off system during the revert action!",
+        L"WARNING: Revert action will take about %d seconds",
         Dev->OpalDisk.EstimateTimeCost
       );
+    PopUpString3 = L"DO NOT power off system during the revert action!";
   } else {
     PopUpString2 = NULL;
+    PopUpString3 = NULL;
   }
 
   Count = 0;
@@ -1259,7 +1292,7 @@ ProcessOpalRequestPsidRevert (
   Session.OpalBaseComId = Dev->OpalDisk.OpalBaseComId;
 
   while (Count < MAX_PSID_TRY_COUNT) {
-    Psid = OpalDriverPopUpPsidInput (Dev, PopUpString, PopUpString2, &PressEsc);
+    Psid = OpalDriverPopUpPsidInput (Dev, PopUpString, PopUpString2, PopUpString3, &PressEsc);
     if (PressEsc) {
         do {
           CreatePopUp (
@@ -1361,6 +1394,7 @@ ProcessOpalRequestRevert (
   BOOLEAN               PasswordFailed;
   CHAR16                *PopUpString;
   CHAR16                *PopUpString2;
+  CHAR16                *PopUpString3;
   UINTN                 BufferSize;
 
   if (Dev == NULL) {
@@ -1373,17 +1407,19 @@ ProcessOpalRequestRevert (
 
   if ((!KeepUserData) &&
       (Dev->OpalDisk.EstimateTimeCost > MAX_ACCEPTABLE_REVERTING_TIME)) {
-    BufferSize = StrSize (L"Warning: Revert action will take about ####### seconds, DO NOT power off system during the revert action!");
+    BufferSize = StrSize (L"Warning: Revert action will take about ####### seconds");
     PopUpString2 = AllocateZeroPool (BufferSize);
     ASSERT (PopUpString2 != NULL);
     UnicodeSPrint (
         PopUpString2,
         BufferSize,
-        L"WARNING: Revert action will take about %d seconds, DO NOT power off system during the revert action!",
+        L"WARNING: Revert action will take about %d seconds",
         Dev->OpalDisk.EstimateTimeCost
       );
+    PopUpString3 = L"DO NOT power off system during the revert action!";
   } else {
     PopUpString2 = NULL;
+    PopUpString3 = NULL;
   }
 
   Count = 0;
@@ -1394,7 +1430,7 @@ ProcessOpalRequestRevert (
   Session.OpalBaseComId = Dev->OpalDisk.OpalBaseComId;
 
   while (Count < MAX_PASSWORD_TRY_COUNT) {
-    Password = OpalDriverPopUpPasswordInput (Dev, PopUpString, PopUpString2, &PressEsc);
+    Password = OpalDriverPopUpPasswordInput (Dev, PopUpString, PopUpString2, PopUpString3, &PressEsc);
     if (PressEsc) {
         do {
           CreatePopUp (
@@ -1520,6 +1556,9 @@ ProcessOpalRequestSecureErase (
   TCG_RESULT            Ret;
   BOOLEAN               PasswordFailed;
   CHAR16                *PopUpString;
+  CHAR16                *PopUpString2;
+  CHAR16                *PopUpString3;
+  UINTN                 BufferSize;
 
   if (Dev == NULL) {
     return;
@@ -1529,6 +1568,21 @@ ProcessOpalRequestSecureErase (
 
   PopUpString = OpalGetPopUpString (Dev, RequestString);
 
+  if (Dev->OpalDisk.EstimateTimeCost > MAX_ACCEPTABLE_REVERTING_TIME) {
+    BufferSize = StrSize (L"Warning: Secure erase action will take about ####### seconds");
+    PopUpString2 = AllocateZeroPool (BufferSize);
+    ASSERT (PopUpString2 != NULL);
+    UnicodeSPrint (
+        PopUpString2,
+        BufferSize,
+        L"WARNING: Secure erase action will take about %d seconds",
+        Dev->OpalDisk.EstimateTimeCost
+      );
+    PopUpString3 = L"DO NOT power off system during the action!";
+  } else {
+    PopUpString2 = NULL;
+    PopUpString3 = NULL;
+  }
   Count = 0;
 
   ZeroMem(&Session, sizeof(Session));
@@ -1537,7 +1591,7 @@ ProcessOpalRequestSecureErase (
   Session.OpalBaseComId = Dev->OpalDisk.OpalBaseComId;
 
   while (Count < MAX_PASSWORD_TRY_COUNT) {
-    Password = OpalDriverPopUpPasswordInput (Dev, PopUpString, NULL, &PressEsc);
+    Password = OpalDriverPopUpPasswordInput (Dev, PopUpString, PopUpString2, PopUpString3, &PressEsc);
     if (PressEsc) {
         do {
           CreatePopUp (
@@ -1551,7 +1605,7 @@ ProcessOpalRequestSecureErase (
 
         if (Key.UnicodeChar == CHAR_CARRIAGE_RETURN) {
           gST->ConOut->ClearScreen(gST->ConOut);
-          return;
+          goto Done;
         } else {
           //
           // Let user input password again.
@@ -1608,6 +1662,11 @@ ProcessOpalRequestSecureErase (
     } while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
     gST->ConOut->ClearScreen(gST->ConOut);
   }
+
+Done:
+  if (PopUpString2 != NULL) {
+    FreePool (PopUpString2);
+  }
 }
 
 /**
@@ -1647,7 +1706,7 @@ ProcessOpalRequestSetUserPwd (
   Count = 0;
 
   while (Count < MAX_PASSWORD_TRY_COUNT) {
-    OldPassword = OpalDriverPopUpPasswordInput (Dev, PopUpString, L"Please type in your password", &PressEsc);
+    OldPassword = OpalDriverPopUpPasswordInput (Dev, PopUpString, L"Please type in your password", NULL, &PressEsc);
     if (PressEsc) {
         do {
           CreatePopUp (
@@ -1705,7 +1764,7 @@ ProcessOpalRequestSetUserPwd (
       }
     }
 
-    Password = OpalDriverPopUpPasswordInput (Dev, PopUpString, L"Please type in your new password", &PressEsc);
+    Password = OpalDriverPopUpPasswordInput (Dev, PopUpString, L"Please type in your new password", NULL, &PressEsc);
     if (Password == NULL) {
       ZeroMem (OldPassword, OldPasswordLen);
       FreePool (OldPassword);
@@ -1714,7 +1773,7 @@ ProcessOpalRequestSetUserPwd (
     }
     PasswordLen = (UINT32) AsciiStrLen(Password);
 
-    PasswordConfirm = OpalDriverPopUpPasswordInput (Dev, PopUpString, L"Please confirm your new password", &PressEsc);
+    PasswordConfirm = OpalDriverPopUpPasswordInput (Dev, PopUpString, L"Please confirm your new password", NULL, &PressEsc);
     if (PasswordConfirm == NULL) {
       ZeroMem (OldPassword, OldPasswordLen);
       FreePool (OldPassword);
@@ -1846,7 +1905,7 @@ ProcessOpalRequestSetAdminPwd (
   Count = 0;
 
   while (Count < MAX_PASSWORD_TRY_COUNT) {
-    OldPassword = OpalDriverPopUpPasswordInput (Dev, PopUpString, L"Please type in your password", &PressEsc);
+    OldPassword = OpalDriverPopUpPasswordInput (Dev, PopUpString, L"Please type in your password", NULL, &PressEsc);
     if (PressEsc) {
         do {
           CreatePopUp (
@@ -1899,7 +1958,7 @@ ProcessOpalRequestSetAdminPwd (
       continue;
     }
 
-    Password = OpalDriverPopUpPasswordInput (Dev, PopUpString, L"Please type in your new password", &PressEsc);
+    Password = OpalDriverPopUpPasswordInput (Dev, PopUpString, L"Please type in your new password", NULL, &PressEsc);
     if (Password == NULL) {
       ZeroMem (OldPassword, OldPasswordLen);
       FreePool (OldPassword);
@@ -1908,7 +1967,7 @@ ProcessOpalRequestSetAdminPwd (
     }
     PasswordLen = (UINT32) AsciiStrLen(Password);
 
-    PasswordConfirm = OpalDriverPopUpPasswordInput (Dev, PopUpString, L"Please confirm your new password", &PressEsc);
+    PasswordConfirm = OpalDriverPopUpPasswordInput (Dev, PopUpString, L"Please confirm your new password", NULL, &PressEsc);
     if (PasswordConfirm == NULL) {
       ZeroMem (OldPassword, OldPasswordLen);
       FreePool (OldPassword);
