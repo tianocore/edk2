@@ -120,6 +120,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack               ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeNxMemoryProtectionPolicy ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdImageProtectionPolicy       ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdShadowPeimOnS3Boot          ## CONSUMES
 
 [Depex]
   gEfiPeiLoadFilePpiGuid AND gEfiPeiMasterBootModePpiGuid
