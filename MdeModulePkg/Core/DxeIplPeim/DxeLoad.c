@@ -77,7 +77,7 @@ PeimInitializeDxeIpl (
 
   BootMode = GetBootModeHob ();
 
-  if (BootMode != BOOT_ON_S3_RESUME) {
+  if (BootMode != BOOT_ON_S3_RESUME || PcdGetBool (PcdShadowPeimOnS3Boot)) {
     Status = PeiServicesRegisterForShadow (FileHandle);
     if (Status == EFI_SUCCESS) {
       //
