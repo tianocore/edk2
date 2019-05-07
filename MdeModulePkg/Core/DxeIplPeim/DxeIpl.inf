@@ -121,6 +121,9 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeNxMemoryProtectionPolicy ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdImageProtectionPolicy       ## SOMETIMES_CONSUMES
 
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdShadowPeimOnS3Boot          ## CONSUMES
+
 [Depex]
   gEfiPeiLoadFilePpiGuid AND gEfiPeiMasterBootModePpiGuid
 
