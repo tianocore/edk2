@@ -56,7 +56,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdSataSpinUpDelayInSecForRecoveryPath   ## CONSUMES
 
 [Depex]
-  gEfiPeiMemoryDiscoveredPpiGuid AND gEfiPeiBootInRecoveryModePpiGuid AND gPeiAtaControllerPpiGuid
+  gEfiPeiMemoryDiscoveredPpiGuid AND gPeiAtaControllerPpiGuid
 
 [UserExtensions.TianoCore."ExtraFiles"]
   IdeBusPeiExtra.uni

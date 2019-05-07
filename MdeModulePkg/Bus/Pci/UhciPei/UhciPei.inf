@@ -54,7 +54,7 @@
 
 
 [Depex]
-  gEfiPeiMemoryDiscoveredPpiGuid AND gPeiUsbControllerPpiGuid AND gEfiPeiBootInRecoveryModePpiGuid
+  gEfiPeiMemoryDiscoveredPpiGuid AND gPeiUsbControllerPpiGuid
 
 [UserExtensions.TianoCore."ExtraFiles"]
   UhciPeiExtra.uni

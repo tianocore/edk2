@@ -59,7 +59,7 @@
   gEfiEndOfPeiSignalPpiGuid                     ## CONSUMES
 
 [Depex]
-  gEfiPeiMemoryDiscoveredPpiGuid AND gPeiUsbControllerPpiGuid AND gEfiPeiBootInRecoveryModePpiGuid
+  gEfiPeiMemoryDiscoveredPpiGuid AND gPeiUsbControllerPpiGuid
 
 [UserExtensions.TianoCore."ExtraFiles"]
   EhciPeiExtra.uni

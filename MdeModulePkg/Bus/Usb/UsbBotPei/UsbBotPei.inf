@@ -56,7 +56,7 @@
   gPeiUsbIoPpiGuid
 
 [Depex]
-  gEfiPeiMemoryDiscoveredPpiGuid AND gPeiUsbIoPpiGuid AND gEfiPeiBootInRecoveryModePpiGuid
+  gEfiPeiMemoryDiscoveredPpiGuid AND gPeiUsbIoPpiGuid
 
 [UserExtensions.TianoCore."ExtraFiles"]
   UsbBotPeiExtra.uni

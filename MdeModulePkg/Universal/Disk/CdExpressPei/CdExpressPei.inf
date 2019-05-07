@@ -62,7 +62,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdRecoveryFileName         ## CONSUMES
 
 [Depex]
-  gEfiPeiMemoryDiscoveredPpiGuid AND gEfiPeiBootInRecoveryModePpiGuid
+  gEfiPeiMemoryDiscoveredPpiGuid
 
 [UserExtensions.TianoCore."ExtraFiles"]
   CdExpressPeiExtra.uni
