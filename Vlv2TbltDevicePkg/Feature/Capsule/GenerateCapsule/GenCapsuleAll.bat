@@ -24,6 +24,12 @@ copy %WORKSPACE%\Build\Vlv2TbltDevicePkg\RELEASE_VS2015x86\X64\CapsuleApp.efi %W
 
 call GenCapsuleMinnowMax.bat
 call GenCapsuleMinnowMaxRelease.bat
-call GenCapsuleSampleColor.bat Blue  149DA854-7D19-4FAA-A91E-862EA1324BE6
-call GenCapsuleSampleColor.bat Green 79179BFD-704D-4C90-9E02-0AB8D968C18A
-call GenCapsuleSampleColor.bat Red   72E2945A-00DA-448E-9AA7-075AD840F9D4
+call GenCapsuleSampleColor.bat Blue  149da854-7d19-4faa-a91e-862ea1324be6
+call GenCapsuleSampleColor.bat Green 79179bfd-704d-4c90-9e02-0ab8d968c18a
+call GenCapsuleSampleColor.bat Red   72e2945a-00da-448e-9aa7-075ad840f9d4
+
+call LvfsGenCapsuleMinnowMax.bat
+call LvfsGenCapsuleMinnowMaxRelease.bat
+call LvfsGenCapsuleSampleColor.bat Blue  149da854-7d19-4faa-a91e-862ea1324be6
+call LvfsGenCapsuleSampleColor.bat Green 79179bfd-704d-4c90-9e02-0ab8d968c18a
+call LvfsGenCapsuleSampleColor.bat Red   72e2945a-00da-448e-9aa7-075ad840f9d4

@@ -1,0 +1,14 @@
+.OPTION EXPLICIT ; Generate errors on variable typos
+
+.Set CabinetNameTemplate=firmware.cab ; The name of the file
+.set DiskDirectoryTemplate=CDROM ; All cabinets go in a single directory
+.Set Cabinet=on ;
+.Set Compress=on ;
+.Set DiskDirectory1=.
+.Set MaxDiskSize=99999744               ; multiple of 512
+
+;*** Files to zip ;
+;
+firmware.bin
+firmware.metainfo.xml
+;***
