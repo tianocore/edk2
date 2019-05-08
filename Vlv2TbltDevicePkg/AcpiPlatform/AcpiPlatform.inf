@@ -1,10 +1,12 @@
 #
 #
-# Copyright (c)  1999  - 2018, Intel Corporation. All rights reserved
-#                                                                                  
+# Copyright (c)  1999  - 2019, Intel Corporation. All rights reserved
+#
+
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 
-#                                                                                  
+#
+
 #
 #
 #  Module Name:
@@ -79,6 +81,8 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiTableStorageFile
 
 [Depex]
+  gEfiVariableArchProtocolGuid        AND
+  gEfiVariableWriteArchProtocolGuid   AND
   gEfiAcpiSupportProtocolGuid AND
   gEfiMpServiceProtocolGuid AND
   gEfiCpuIoProtocolGuid
