@@ -69,7 +69,6 @@ if exist "NewCert.pem" (
     --lsv %FMP_CAPSULE_LSV% ^
     --capflag PersistAcrossReset ^
     --capflag InitiateReset ^
-    --signing-tool-path=c:\OpenSSL-Win32\bin ^
     --signer-private-cert=NewCert.pem ^
     --other-public-cert=NewSub.pub.pem ^
     --trusted-public-cert=NewRoot.pub.pem ^
@@ -106,7 +105,6 @@ call GenerateCapsule ^
   --lsv %FMP_CAPSULE_LSV% ^
   --capflag PersistAcrossReset ^
   --capflag InitiateReset ^
-  --signing-tool-path=c:\OpenSSL-Win32\bin ^
   --signer-private-cert=%WORKSPACE%\edk2\BaseTools\Source\Python\Pkcs7Sign\TestCert.pem ^
   --other-public-cert=%WORKSPACE%\edk2\BaseTools\Source\Python\Pkcs7Sign\TestSub.pub.pem ^
   --trusted-public-cert=%WORKSPACE%\edk2\BaseTools\Source\Python\Pkcs7Sign\TestRoot.pub.pem ^
