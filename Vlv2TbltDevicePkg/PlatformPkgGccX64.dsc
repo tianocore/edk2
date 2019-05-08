@@ -1193,6 +1193,8 @@ $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/IA32/fTPMInitPeim.inf
     <PcdsPatchableInModule>
         gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0xF0000043
   }
+  $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/$(DXE_ARCHITECTURE)/PchInitSmm.inf
+
   $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/$(DXE_ARCHITECTURE)/PchSmiDispatcher.inf
 
 !if $(PCIESC_ENABLE) == TRUE
@@ -1447,6 +1449,7 @@ $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/IA32/fTPMInitPeim.inf
     <BuildOptions>
       *_*_*_GENFW_FLAGS = -a 0x800 -p 0xFF
   }
+
 
 
 !if $(NETWORK_ENABLE) == TRUE
