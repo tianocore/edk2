@@ -458,7 +458,7 @@ INF MdeModulePkg/Universal/ReportStatusCodeRouter/RuntimeDxe/ReportStatusCodeRou
 INF MdeModulePkg/Universal/StatusCodeHandler/RuntimeDxe/StatusCodeHandlerRuntimeDxe.inf
 INF MdeModulePkg/Universal/ReportStatusCodeRouter/Smm/ReportStatusCodeRouterSmm.inf
 INF MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
-INF RuleOverride = BINARY $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/$(DXE_ARCHITECTURE)/MpCpu.inf
+INF UefiCpuPkg/CpuDxe/CpuDxe.inf
 INF $(PLATFORM_PACKAGE)/Metronome/Metronome.inf
 INF IntelFrameworkModulePkg/Universal/BdsDxe/BdsDxe.inf
 !if $(ARCH) == IA32
