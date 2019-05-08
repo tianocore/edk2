@@ -147,7 +147,7 @@ STATIC CONST ACPI_PARSER IdStructureParser[] = {
   {L"Length", 1, 1, L"%d", NULL, NULL, NULL, NULL},
   {L"Reserved", 2, 2, L"0x%x", NULL, NULL, NULL, NULL},
 
-  {L"VENDOR_ID", 4, 4, L"0x%x", NULL, NULL, NULL, NULL},
+  {L"VENDOR_ID", 4, 4, NULL, Dump4Chars, NULL, NULL, NULL},
   {L"LEVEL_1_ID", 8, 8, L"0x%x", NULL, NULL, NULL, NULL},
   {L"LEVEL_2_ID", 8, 16, L"0x%x", NULL, NULL, NULL, NULL},
   {L"MAJOR_REV", 2, 24, L"0x%x", NULL, NULL, NULL, NULL},
