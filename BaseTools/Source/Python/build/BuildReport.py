@@ -620,7 +620,7 @@ class ModuleReport(object):
     def GenerateReport(self, File, GlobalPcdReport, GlobalPredictionReport, GlobalDepexParser, ReportType):
         FileWrite(File, gSectionStart)
 
-        FwReportFileName = os.path.join(self._BuildDir, "DEBUG", self.ModuleName + ".txt")
+        FwReportFileName = os.path.join(self._BuildDir, "OUTPUT", self.ModuleName + ".txt")
         if os.path.isfile(FwReportFileName):
             try:
                 FileContents = open(FwReportFileName).read()
