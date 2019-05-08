@@ -1,13 +1,32 @@
 @REM @file
 @REM   Windows batch file to build BIOS ROM
 @REM
-@REM Copyright (c) 2006   - 2014, Intel Corporation. All rights reserved.<BR>
+@REM Copyright (c) 2006   - 2019, Intel Corporation. All rights reserved.<BR>
 @REM 
 @REM   SPDX-License-Identifier: BSD-2-Clause-Patent
 @REM
 
 @echo off
 SetLocal EnableDelayedExpansion EnableExtensions
+
+set PLATFORM_BIN_PACKAGE=%WORKSPACE%\Vlv2SocBinPkg
+if not exist %PLATFORM_BIN_PACKAGE% (
+  if defined PACKAGES_PATH (
+    for %%i IN (%PACKAGES_PATH%) DO (
+      if exist %%~fi\Vlv2SocBinPkg (
+        set PLATFORM_BIN_PACKAGE=%%~fi\Vlv2SocBinPkg
+        goto PlatformBinPackageFound
+      )
+    )
+  ) else (
+    echo.
+    echo !!! ERROR !!! Cannot find %PLATFORM_NAME% !!!
+    echo.
+    goto BldFail
+  )
+)
+:PlatformBinPackageFound
+
 
 :: Set script defaults
 set exitCode=0
@@ -185,7 +204,7 @@ for %%i in (%BIOS_Names%) do (
     echo Generating IFWI... %BIOS_ID%.bin
     echo.
 
-    copy /b/y !IFWI_HEADER_FILE! + ..\..\..\silicon\Vlv2SocBinPkg\SEC\!SEC_VERSION!\VLV_SEC_REGION.bin + ..\..\..\silicon\Vlv2SocBinPkg\SEC\!SEC_VERSION!\Vacant.bin + !BIOS_Rom! %BIOS_ID%.bin
+    copy /b/y !IFWI_HEADER_FILE! + %PLATFORM_BIN_PACKAGE%\SEC\!SEC_VERSION!\VLV_SEC_REGION.bin + %PLATFORM_BIN_PACKAGE%\SEC\!SEC_VERSION!\Vacant.bin + !BIOS_Rom! %BIOS_ID%.bin
     echo.
     echo ===========================================================================
 )

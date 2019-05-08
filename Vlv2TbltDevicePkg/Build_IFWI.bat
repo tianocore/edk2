@@ -1,7 +1,7 @@
 @REM @file
 @REM   Windows batch file to build BIOS ROM
 @REM
-@REM Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+@REM Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 @REM SPDX-License-Identifier: BSD-2-Clause-Patent
 @REM
 
@@ -18,10 +18,25 @@ set exitCode=0
 set "Build_Flags= "
 set "Stitch_Flags= "
 set Arch=X64
-set WORKSPACE=%CD%
-set CORE_PATH=%WORKSPACE%\edk2
-set PLATFORM_PATH=%WORKSPACE%\edk2
 set PLATFORM_PACKAGE=Vlv2TbltDevicePkg
+
+set PLATFORM_PATH=%WORKSPACE%
+if not exist %PLATFORM_PATH%\%PLATFORM_PACKAGE% (
+  if defined PACKAGES_PATH (
+    for %%i IN (%PACKAGES_PATH%) DO (
+      if exist %%~fi\%PLATFORM_PACKAGE% (
+        set PLATFORM_PATH=%%~fi
+        goto PlatformPackageFound
+      )
+    )
+  ) else (
+    echo.
+    echo !!! ERROR !!! Cannot find %PLATFORM_PACKAGE% !!!
+    echo.
+    goto Exit
+  )
+)
+:PlatformPackageFound
 
 :: Parse Optional arguments
 :OptLoop
@@ -125,11 +140,11 @@ if %ERRORLEVEL% NEQ 0 (
 echo.
 echo Finished Building BIOS.
 @REM Set BIOS_ID environment variable here.
-call %CORE_PATH%\Conf\BiosId.bat
+call %WORKSPACE%\Conf\BiosId.bat
 echo BIOS_ID=%BIOS_ID%
 
 :: Set the Board_Id, Build_Type, Version_Major, and Version_Minor environment variables
-find /v "#" %CORE_PATH%\Conf\BiosId.env > ver_strings
+find /v "#" %WORKSPACE%\Conf\BiosId.env > ver_strings
 for /f "tokens=1,3" %%i in (ver_strings) do set %%i=%%j
 del /f/q ver_strings >nul
 set BIOS_Name=%BOARD_ID%_%Arch%_%BUILD_TYPE%_%VERSION_MAJOR%_%VERSION_MINOR%.ROM
@@ -137,10 +152,10 @@ set BIOS_Name=%BOARD_ID%_%Arch%_%BUILD_TYPE%_%VERSION_MAJOR%_%VERSION_MINOR%.ROM
 :: Start Integration process
 echo ======================================================================
 echo Build_IFWI:  Calling IFWI Stitching Script...
-pushd %CORE_PATH%\%PLATFORM_PACKAGE%\Stitch
+pushd %PLATFORM_PATH%\%PLATFORM_PACKAGE%\Stitch
 
   :: IFWIStitch.bat [/nG] [/nM] [/nB] [/B BIOS.rom] [/C StitchConfig] [/S IFWISuffix]
-  call IFWIStitch.bat %Stitch_Flags% /B ..\..\%BIOS_Name% %IFWI_Suffix%
+  call IFWIStitch.bat %Stitch_Flags% /B %BIOS_Name% %IFWI_Suffix%
    
  @echo off
 popd

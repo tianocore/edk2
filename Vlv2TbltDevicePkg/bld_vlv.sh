@@ -242,9 +242,8 @@ VERSION_MINOR=$(grep '^VERSION_MINOR' Conf/BiosId.env | cut -d ' ' -f 3 | cut -c
 BOARD_ID=$(grep '^BOARD_ID' Conf/BiosId.env | cut -d ' ' -f 3 | cut -c 1-7)
 BIOS_Name="$BOARD_ID"_"$Arch"_"$BUILD_TYPE"_"$VERSION_MAJOR"_"$VERSION_MINOR".ROM
 BIOS_ID="$BOARD_ID"_"$Arch"_"$BUILD_TYPE"_"$VERSION_MAJOR"_"$VERSION_MINOR"_GCC.bin
-cp -f $BUILD_PATH/FV/VLV.fd  $WORKSPACE/$BIOS_Name
 SEC_VERSION=1.0.2.1060v5
-cat $IFWI_HEADER_FILE ./Vlv2MiscBinariesPkg/SEC/$SEC_VERSION/VLV_SEC_REGION.bin ./Vlv2MiscBinariesPkg/SEC/$SEC_VERSION/Vacant.bin $BIOS_Name > ./$PLATFORM_PACKAGE/Stitch/$BIOS_ID
+cat $IFWI_HEADER_FILE ../Vlv2Binaries/Vlv2SocBinPkg/SEC/$SEC_VERSION/VLV_SEC_REGION.bin ../Vlv2Binaries/Vlv2SocBinPkg/SEC/$SEC_VERSION/Vacant.bin $BUILD_PATH/FV/VLV.fd > ./$PLATFORM_PACKAGE/Stitch/$BIOS_ID
 
 
 echo Skip "Running BIOS_Signing ..."
