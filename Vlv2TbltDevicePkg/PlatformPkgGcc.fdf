@@ -119,15 +119,15 @@ gPlatformModuleTokenSpaceGuid.PcdFlashMicroCodeAddress|gPlatformModuleTokenSpace
 FV = MICROCODE_FV
 $(FLASH_REGION_VPD_OFFSET)|$(FLASH_REGION_VPD_SIZE)
 gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
-FILE = $(WORKSPACE)/Vlv2TbltDevicePkg/Stitch/Gcc/NvStorageVariable.bin
+FILE = Vlv2TbltDevicePkg/Stitch/Gcc/NvStorageVariable.bin
 
 $(FLASH_REGION_NVSTORAGE_SUBREGION_NV_FTW_WORKING_OFFSET)|$(FLASH_REGION_NVSTORAGE_SUBREGION_NV_FTW_WORKING_SIZE)
 gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
-FILE = $(WORKSPACE)/Vlv2TbltDevicePkg/Stitch/Gcc/NvStorageFtwWorking.bin
+FILE = Vlv2TbltDevicePkg/Stitch/Gcc/NvStorageFtwWorking.bin
 
 $(FLASH_REGION_NVSTORAGE_SUBREGION_NV_FTW_SPARE_OFFSET)|$(FLASH_REGION_NVSTORAGE_SUBREGION_NV_FTW_SPARE_SIZE)
 gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
-FILE = $(WORKSPACE)/Vlv2TbltDevicePkg/Stitch/Gcc/NvStorageFtwSpare.bin
+FILE = Vlv2TbltDevicePkg/Stitch/Gcc/NvStorageFtwSpare.bin
 
 !if $(MINNOW2_FSP_BUILD) == TRUE
 
@@ -632,6 +632,7 @@ INF MdeModulePkg/Bus/Usb/UsbMouseDxe/UsbMouseDxe.inf
 INF MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
 INF MdeModulePkg/Bus/Pci/XhciDxe/XhciDxe.inf
 !endif
+
 
   #
   # SMBIOS
