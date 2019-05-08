@@ -1,11 +1,13 @@
 #/** @file
 # Component name for module PlatformBootManagerLib
 #
-# Copyright (c) 2008  - 2016, Intel Corporation. All rights reserved.<BR>
-#                                                                                  
+# Copyright (c) 2008  - 2019, Intel Corporation. All rights reserved.<BR>
+#
+
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 
-#                                                                                  
+#
+
 #
 #
 #
@@ -97,6 +99,7 @@
   gEfiNormalSetupGuid
   gEfiPartTypeSystemPartGuid
   gEfiEndOfDxeEventGroupGuid
+  gUefiShellFileGuid
 
 [Pcd]
   gEfiSignedCapsulePkgTokenSpaceGuid.PcdEdkiiRsa2048Sha256TestPublicKeyFileGuid
@@ -111,7 +114,6 @@
   gPlatformModuleTokenSpaceGuid.PcdFlashFvShellSize
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLogoFile
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdShellFile
   gPlatformModuleTokenSpaceGuid.PcdIFWISigBaseAddress
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn

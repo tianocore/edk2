@@ -1,7 +1,7 @@
 /** @file
   BDS Lib functions which relate with create or process the boot option.
 
-Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2019, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -2342,7 +2342,7 @@ BdsLibBootViaBootOption (
     //
     // If the boot option point to Internal FV shell, make sure it is valid
     //
-    Status = BdsLibUpdateFvFileDevicePath (&DevicePath, PcdGetPtr(PcdShellFile));
+    Status = BdsLibUpdateFvFileDevicePath (&DevicePath, &gUefiShellFileGuid);
     if (!EFI_ERROR(Status)) {
       if (Option->DevicePath != NULL) {
         FreePool(Option->DevicePath);
@@ -3544,7 +3544,7 @@ BdsLibEnumerateAllBootOption (
 
     Status = Fv->ReadFile (
                   Fv,
-                  PcdGetPtr(PcdShellFile),
+                  &gUefiShellFileGuid,
                   NULL,
                   &Size,
                   &Type,
@@ -3629,7 +3629,7 @@ BdsLibBuildOptionFromShell (
   //
   // Build the shell device path
   //
-  EfiInitializeFwVolDevicepathNode (&ShellNode, PcdGetPtr(PcdShellFile));
+  EfiInitializeFwVolDevicepathNode (&ShellNode, &gUefiShellFileGuid);
 
   DevicePath = AppendDevicePathNode (DevicePath, (EFI_DEVICE_PATH_PROTOCOL *) &ShellNode);
 

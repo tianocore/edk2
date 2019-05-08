@@ -1356,7 +1356,7 @@ PlatformBdsLibEnumerateAllBootOption (
 
     Status = Fv->ReadFile (
                   Fv,
-                  PcdGetPtr(PcdShellFile),
+                  &gUefiShellFileGuid,
                   NULL,
                   &Size,
                   &Type,
@@ -1528,7 +1528,7 @@ PlatformBdsLibEnumerateAllBootOption (
 
     Status = Fv->ReadFile (
                   Fv,
-                  PcdGetPtr(PcdShellFile),
+                  &gUefiShellFileGuid,
                   NULL,
                   &Size,
                   &Type,

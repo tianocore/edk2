@@ -6,7 +6,7 @@
 #  2) BDS boot device connect interface;
 #  3) BDS Misc interfaces for mainting boot variable, ouput string, etc.
 #  
-#  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2019, Intel Corporation. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #  
 ##
@@ -43,6 +43,7 @@
   MdeModulePkg/MdeModulePkg.dec
   IntelFrameworkPkg/IntelFrameworkPkg.dec
   IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
+  ShellPkg/ShellPkg.dec
 
 [LibraryClasses]
   DevicePathLib
@@ -98,6 +99,7 @@
   ## SOMETIMES_CONSUMES ## Variable:L"LegacyDevOrder"
   gEfiLegacyDevOrderVariableGuid
   gEdkiiStatusCodeDataTypeVariableGuid          ## SOMETIMES_CONSUMES ## GUID
+  gUefiShellFileGuid
 
 [Protocols]
   gEfiSimpleFileSystemProtocolGuid              ## SOMETIMES_CONSUMES
@@ -131,7 +133,6 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdProgressCodeOsLoaderLoad  ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdProgressCodeOsLoaderStart ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdErrorCodeSetVariable      ## CONSUMES
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdShellFile      ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdTestKeyUsed                       ## CONSUMES
 
 #
