@@ -1,5 +1,5 @@
 /** 
-  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2019, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 
@@ -40,6 +40,7 @@ PpmPolicyEntry(
   EFI_HANDLE                Handle;
   EFI_STATUS                Status;
   UINTN                     CpuCount;
+  UINTN                     CpuEnabledCount;
   UINT8                     CPUMobileFeature;
 
   PCH_STEPPING              Stepping;
@@ -63,7 +64,7 @@ PpmPolicyEntry(
   //
   // Get processor count from MP service.
   //
-  Status = MpService->GetNumberOfProcessors (MpService, &CpuCount, NULL);
+  Status = MpService->GetNumberOfProcessors (MpService, &CpuCount, &CpuEnabledCount);
   ASSERT_EFI_ERROR (Status);
 
   //
