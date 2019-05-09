@@ -1,18 +1,11 @@
 /** @file
   UEFI Decompress Library implementation refer to UEFI specification.
 
-  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
   Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
-
-
-#include <Base.h>
-#include <Library/BaseLib.h>
-#include <Library/DebugLib.h>
-#include <Library/BaseMemoryLib.h>
-#include <Library/UefiDecompressLib.h>
 
 #include "BaseUefiDecompressLibInternals.h"
 
@@ -734,12 +727,14 @@ UefiDecompressGetInfo (
   If Source is NULL, then ASSERT().
   If Destination is NULL, then ASSERT().
   If the required scratch buffer size > 0 and Scratch is NULL, then ASSERT().
+  If the Version is not 1 or 2, then ASSERT().
 
   @param  Source      The source buffer containing the compressed data.
   @param  Destination The destination buffer to store the decompressed data.
   @param  Scratch     A temporary scratch buffer that is used to perform the decompression.
                       This is an optional parameter that may be NULL if the
                       required scratch buffer size is 0.
+  @param  Version     1 for UEFI Decompress algoruthm, 2 for Tiano Decompess algorithm.
 
   @retval  RETURN_SUCCESS Decompression completed successfully, and
                           the uncompressed buffer is returned in Destination.
@@ -748,11 +743,11 @@ UefiDecompressGetInfo (
                           (not in a valid compressed format).
 **/
 RETURN_STATUS
-EFIAPI
-UefiDecompress (
+UefiTianoDecompress (
   IN CONST VOID  *Source,
   IN OUT VOID    *Destination,
-  IN OUT VOID    *Scratch  OPTIONAL
+  IN OUT VOID    *Scratch,
+  IN UINT32      Version
   )
 {
   UINT32           CompSize;
@@ -764,6 +759,7 @@ UefiDecompress (
   ASSERT (Source != NULL);
   ASSERT (Destination != NULL);
   ASSERT (Scratch != NULL);
+  ASSERT (Version == 1 || Version == 2);
 
   Src     = Source;
   Dst     = Destination;
@@ -786,8 +782,18 @@ UefiDecompress (
   //
   // The length of the field 'Position Set Code Length Array Size' in Block Header.
   // For UEFI 2.0 de/compression algorithm(Version 1), mPBit = 4
+  // For Tiano de/compression algorithm(Version 2), mPBit = 5
   //
-  Sd->mPBit     = 4;
+  switch (Version) {
+    case 1 :
+      Sd->mPBit = 4;
+      break;
+    case 2 :
+      Sd->mPBit = 5;
+      break;
+    default:
+      ASSERT (FALSE);
+  }
   Sd->mSrcBase  = (UINT8 *)Src;
   Sd->mDstBase  = Dst;
   //
@@ -814,4 +820,44 @@ UefiDecompress (
   }
 
   return RETURN_SUCCESS;
+}
+
+/**
+  Decompresses a UEFI compressed source buffer.
+
+  Extracts decompressed data to its original form.
+  This function is designed so that the decompression algorithm can be implemented
+  without using any memory services.  As a result, this function is not allowed to
+  call any memory allocation services in its implementation.  It is the caller's
+  responsibility to allocate and free the Destination and Scratch buffers.
+  If the compressed source data specified by Source is successfully decompressed
+  into Destination, then RETURN_SUCCESS is returned.  If the compressed source data
+  specified by Source is not in a valid compressed data format,
+  then RETURN_INVALID_PARAMETER is returned.
+
+  If Source is NULL, then ASSERT().
+  If Destination is NULL, then ASSERT().
+  If the required scratch buffer size > 0 and Scratch is NULL, then ASSERT().
+
+  @param  Source      The source buffer containing the compressed data.
+  @param  Destination The destination buffer to store the decompressed data
+  @param  Scratch     A temporary scratch buffer that is used to perform the decompression.
+                      This is an optional parameter that may be NULL if the
+                      required scratch buffer size is 0.
+
+  @retval  RETURN_SUCCESS Decompression completed successfully, and
+                          the uncompressed buffer is returned in Destination.
+  @retval  RETURN_INVALID_PARAMETER
+                          The source buffer specified by Source is corrupted
+                          (not in a valid compressed format).
+**/
+RETURN_STATUS
+EFIAPI
+UefiDecompress (
+  IN CONST VOID  *Source,
+  IN OUT VOID    *Destination,
+  IN OUT VOID    *Scratch  OPTIONAL
+  )
+{
+  return UefiTianoDecompress (Source, Destination, Scratch, 1);
 }

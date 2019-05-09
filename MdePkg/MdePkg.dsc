@@ -57,6 +57,7 @@
   MdePkg/Library/BaseSynchronizationLib/BaseSynchronizationLib.inf
   MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
   MdePkg/Library/BaseUefiDecompressLib/BaseUefiDecompressLib.inf
+  MdePkg/Library/BaseUefiDecompressLib/BaseUefiTianoCustomDecompressLib.inf
   MdePkg/Library/BaseSmbusLibNull/BaseSmbusLibNull.inf
   MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
 
