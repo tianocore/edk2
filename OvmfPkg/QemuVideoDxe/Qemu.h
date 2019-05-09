@@ -1,7 +1,7 @@
 /** @file
   QEMU Video Controller Driver
 
-  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -156,7 +156,6 @@ extern QEMU_VIDEO_BOCHS_MODES                     QemuVideoBochsModes[];
 extern EFI_DRIVER_BINDING_PROTOCOL                gQemuVideoDriverBinding;
 extern EFI_COMPONENT_NAME_PROTOCOL                gQemuVideoComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL               gQemuVideoComponentName2;
-extern EFI_DRIVER_SUPPORTED_EFI_VERSION_PROTOCOL  gQemuVideoDriverSupportedEfiVersion;
 
 //
 // Io Registers defined by VGA

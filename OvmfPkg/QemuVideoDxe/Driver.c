@@ -2,7 +2,7 @@
   This driver is a sample implementation of the Graphics Output Protocol for
   the QEMU (Cirrus Logic 5446) video controller.
 
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -980,19 +980,6 @@ InitializeQemuVideo (
              &gQemuVideoComponentName,
              &gQemuVideoComponentName2
              );
-  ASSERT_EFI_ERROR (Status);
-
-  //
-  // Install EFI Driver Supported EFI Version Protocol required for
-  // EFI drivers that are on PCI and other plug in cards.
-  //
-  gQemuVideoDriverSupportedEfiVersion.FirmwareVersion = PcdGet32 (PcdDriverSupportedEfiVersion);
-  Status = gBS->InstallMultipleProtocolInterfaces (
-                  &ImageHandle,
-                  &gEfiDriverSupportedEfiVersionProtocolGuid,
-                  &gQemuVideoDriverSupportedEfiVersion,
-                  NULL
-                  );
   ASSERT_EFI_ERROR (Status);
 
   return Status;

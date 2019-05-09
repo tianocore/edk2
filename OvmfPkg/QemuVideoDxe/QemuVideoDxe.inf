@@ -2,7 +2,7 @@
 #  This driver is a sample implementation of the Graphics Output Protocol for
 #  the QEMU (Cirrus Logic 5446) video controller.
 #
-#  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -29,7 +29,6 @@
 [Sources.common]
   ComponentName.c
   Driver.c
-  DriverSupportedEfiVersion.c
   Gop.c
   Initialize.c
   Qemu.h
@@ -41,7 +40,6 @@
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
-  OptionRomPkg/OptionRomPkg.dec
   OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
@@ -59,12 +57,10 @@
   UefiLib
 
 [Protocols]
-  gEfiDriverSupportedEfiVersionProtocolGuid     # PROTOCOL ALWAYS_PRODUCED
   gEfiGraphicsOutputProtocolGuid                # PROTOCOL BY_START
   gEfiDevicePathProtocolGuid                    # PROTOCOL BY_START
   gEfiPciIoProtocolGuid                         # PROTOCOL TO_START
 
 [Pcd]
-  gOptionRomPkgTokenSpaceGuid.PcdDriverSupportedEfiVersion
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
   gEfiMdeModulePkgTokenSpaceGuid.PcdNullPointerDetectionPropertyMask
