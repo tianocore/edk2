@@ -1,10 +1,12 @@
 /*++
 
-Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
-                                                                                   
+Copyright (c) 2009 - 2019, Intel Corporation. All rights reserved.<BR>
+
+
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
-                                                                                   
+
+
 
 
 Module Name:
@@ -68,7 +70,7 @@ CurrentLanguageMatch (
     // Find the best matching RFC 4646 language, compute the offset.
     //
     CompareLength = AsciiStrLen (BestLanguage);
-    for (MatchLang = Languages, (*Offset) = 0; MatchLang != '\0'; (*Offset)++) {
+    for (MatchLang = Languages, (*Offset) = 0; *MatchLang != '\0'; (*Offset)++) {
       //
       // Seek to the end of current match language.
       //
