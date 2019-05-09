@@ -3605,7 +3605,12 @@ class FdfParser:
 
         if not self._IsKeyword("$(NAMED_GUID)"):
             if not self._GetNextWord():
-                raise Warning.Expected("$(NAMED_GUID)", self.FileName, self.CurrentLineNumber)
+                NamedGuid = self._CurrentLine()[self.CurrentOffsetWithinLine:].split()[0].strip()
+                if GlobalData.gGuidPatternEnd.match(NamedGuid):
+                    self.CurrentOffsetWithinLine += len(NamedGuid)
+                    self._Token = NamedGuid
+                else:
+                    raise Warning.Expected("$(NAMED_GUID)", self.FileName, self.CurrentLineNumber)
             if self._Token == 'PCD':
                 if not self._IsToken("("):
                     raise Warning.Expected("'('", self.FileName, self.CurrentLineNumber)
