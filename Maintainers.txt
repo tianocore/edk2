@@ -86,11 +86,6 @@ M: Bob Feng <bob.c.feng@intel.com>
 M: Liming Gao <liming.gao@intel.com>
 R: Yonghong Zhu <yonghong.zhu@intel.com>
 
-BeagleBoardPkg
-W: https://github.com/tianocore/tianocore.github.io/wiki/BeagleBoardPkg
-M: Leif Lindholm <leif.lindholm@linaro.org>
-M: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-
 CorebootModulePkg, CorebootPayloadPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/Coreboot_UEFI_payload
 M: Maurice Ma <maurice.ma@intel.com>
@@ -195,15 +190,6 @@ W: https://github.com/tianocore/tianocore.github.io/wiki/Nt32Pkg
 M: Ray Ni <ray.ni@intel.com>
 M: Hao A Wu <hao.a.wu@intel.com>
 
-Omap35xxPkg
-W: https://github.com/tianocore/tianocore.github.io/wiki/Omap35xxPkg
-M: Leif Lindholm <leif.lindholm@linaro.org>
-M: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-
-OptionRomPkg
-W: https://github.com/tianocore/tianocore.github.io/wiki/OptionRomPkg
-M: Ray Ni <ray.ni@intel.com>
-
 OvmfPkg
 W: http://www.tianocore.org/ovmf/
 M: Jordan Justen <jordan.l.justen@intel.com>
@@ -222,10 +208,6 @@ S: Maintained
 PcAtChipsetPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/PcAtChipsetPkg
 M: Ray Ni <ray.ni@intel.com>
-
-QuarkPlatformPkg, QuarkSocPkg
-M: Michael D Kinney <michael.d.kinney@intel.com>
-M: Kelly Steele <kelly.steele@intel.com>
 
 SecurityPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/SecurityPkg
@@ -259,14 +241,6 @@ W: https://github.com/tianocore/tianocore.github.io/wiki/UefiCpuPkg
 M: Eric Dong <eric.dong@intel.com>
 M: Ray Ni <ray.ni@intel.com>
 R: Laszlo Ersek <lersek@redhat.com>
-
-Vlv2DeviceRefCodePkg
-M: Zailiang Sun <zailiang.sun@intel.com>
-M: Yi Qian <yi.qian@intel.com>
-
-Vlv2TbltDevicePkg
-M: Zailiang Sun <zailiang.sun@intel.com>
-M: Yi Qian <yi.qian@intel.com>
 
 StandaloneMmPkg
 M: Achin Gupta <achin.gupta@arm.com>
