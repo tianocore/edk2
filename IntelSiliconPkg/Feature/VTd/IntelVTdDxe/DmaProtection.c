@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2017 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2017 - 2019, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -581,8 +581,19 @@ OnExitBootServices (
   IN VOID                                    *Context
   )
 {
+  UINTN   VtdIndex;
+
   DEBUG ((DEBUG_INFO, "Vtd OnExitBootServices\n"));
   DumpVtdRegsAll ();
+
+  DEBUG ((DEBUG_INFO, "Invalidate all\n"));
+  for (VtdIndex = 0; VtdIndex < mVtdUnitNumber; VtdIndex++) {
+    FlushWriteBuffer (VtdIndex);
+
+    InvalidateContextCache (VtdIndex);
+
+    InvalidateIOTLB (VtdIndex);
+  }
 
   if ((PcdGet8(PcdVTdPolicyPropertyMask) & BIT1) == 0) {
     DisableDmar ();
