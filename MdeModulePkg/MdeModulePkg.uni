@@ -160,6 +160,12 @@
                                                                                   "TRUE  - 16550 serial port registers are in MMIO space.<BR>\n"
                                                                                   "FALSE - 16550 serial port registers are in I/O space.<BR>"
 
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdSerialRegisterAccessWidth_PROMPT  #language en-US "Serial port registers access width"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdSerialRegisterAccessWidth_HELP  #language en-US "Sets the 16550 serial port registers access width in MMIO space. Default is 8 bits access.<BR><BR>\n"
+                                                                                  "8  - 16550 serial port MMIO register access are in 8 bits mode.<BR>\n"
+                                                                                  "32 - 16550 serial port MMIO registers acess are in 32 bits mode.<BR>"
+
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdSerialUseHardwareFlowControl_PROMPT  #language en-US "Enable serial port hardware flow control"
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdSerialUseHardwareFlowControl_HELP  #language en-US "Indicates if the 16550 serial port hardware flow control will be enabled. Default is FALSE.<BR><BR>\n"
