@@ -37,6 +37,7 @@ from Common.MultipleWorkspace import MultipleWorkspace as mws
 from CommonDataClass.Exceptions import BadExpression
 from Common.caching import cached_property
 
+ArrayIndex = re.compile("\[\s*[0-9a-fA-FxX]*\s*\]")
 ## Regular expression used to find out place holders in string template
 gPlaceholderPattern = re.compile("\$\{([^$()\s]+)\}", re.MULTILINE | re.UNICODE)
 

@@ -395,7 +395,7 @@ class DecBuildData(PackageBuildClassObject):
                     struct_pcd.TokenSpaceGuidCName, struct_pcd.TokenCName = pcdname.split(".")
                     struct_pcd.PcdDefineLineNo = LineNo
                     struct_pcd.PkgPath = self.MetaFile.File
-                    struct_pcd.SetDecDefaultValue(item.DefaultValue)
+                    struct_pcd.SetDecDefaultValue(item.DefaultValue,self.MetaFile.File,LineNo)
                 else:
                     DemesionAttr, Fields = self.ParsePcdName(item.TokenCName)
                     struct_pcd.AddDefaultValue(Fields, item.DefaultValue, self.MetaFile.File, LineNo,DemesionAttr)

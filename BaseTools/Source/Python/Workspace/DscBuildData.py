@@ -27,7 +27,7 @@ from .MetaFileParser import *
 
 from .WorkspaceCommon import GetDeclaredPcd
 from Common.Misc import AnalyzeDscPcd
-from Common.Misc import ProcessDuplicatedInf,RemoveCComments
+from Common.Misc import ProcessDuplicatedInf,RemoveCComments,ArrayIndex
 import re
 from Common.Parsing import IsValidWord
 from Common.VariableAttributes import VariableAttributes
@@ -37,7 +37,6 @@ from functools import reduce
 from Common.Misc import SaveFileOnChange
 from Workspace.BuildClassObject import PlatformBuildClassObject, StructurePcd, PcdClassObject, ModuleBuildClassObject
 from collections import OrderedDict, defaultdict
-from .BuildClassObject import ArrayIndex
 
 def _IsFieldValueAnArray (Value):
     Value = Value.strip()
@@ -943,7 +942,7 @@ class DscBuildData(PlatformBuildClassObject):
                 EdkLogger.error('build', FORMAT_INVALID, ErrStr, File=self.MetaFile, Line=LineNo,
                                 ExtraData="%s.%s" % (TokenSpaceGuid, PcdCName))
             if PcdType in (MODEL_PCD_DYNAMIC_DEFAULT, MODEL_PCD_DYNAMIC_EX_DEFAULT, MODEL_PCD_FIXED_AT_BUILD, MODEL_PCD_PATCHABLE_IN_MODULE):
-                if self._DecPcds[PcdCName, TokenSpaceGuid].BaseDatumType.strip() != ValueList[1].strip():
+                if self._DecPcds[PcdCName, TokenSpaceGuid].DatumType.strip() != ValueList[1].strip():
                     DecPcd = self._DecPcds[PcdCName, TokenSpaceGuid]
                     EdkLogger.error('build', FORMAT_INVALID,
                                     "Pcd datumtype used in DSC file is not the same as its declaration. DatumType:%s"%DecPcd.DatumType,
@@ -1664,17 +1663,17 @@ class DscBuildData(PlatformBuildClassObject):
                     EdkLogger.error('build', FORMAT_INVALID, "The size value can't be set to negative value for %s." % ".".join((TokenSpaceGuid, PcdCName)),
                                     File=self.MetaFile, Line=Dummy4)
             if (PcdCName, TokenSpaceGuid) in PcdValueDict:
-                PcdValueDict[PcdCName, TokenSpaceGuid][SkuName] = (PcdValue, DatumType, MaxDatumSize)
+                PcdValueDict[PcdCName, TokenSpaceGuid][SkuName] = (PcdValue, DatumType, MaxDatumSize,Dummy4)
             else:
-                PcdValueDict[PcdCName, TokenSpaceGuid] = {SkuName:(PcdValue, DatumType, MaxDatumSize)}
+                PcdValueDict[PcdCName, TokenSpaceGuid] = {SkuName:(PcdValue, DatumType, MaxDatumSize,Dummy4)}
 
         for ((PcdCName, TokenSpaceGuid), PcdSetting) in PcdValueDict.items():
             if self.SkuIdMgr.SystemSkuId in PcdSetting:
-                PcdValue, DatumType, MaxDatumSize = PcdSetting[self.SkuIdMgr.SystemSkuId]
+                PcdValue, DatumType, MaxDatumSize,_ = PcdSetting[self.SkuIdMgr.SystemSkuId]
             elif TAB_DEFAULT in PcdSetting:
-                PcdValue, DatumType, MaxDatumSize = PcdSetting[TAB_DEFAULT]
+                PcdValue, DatumType, MaxDatumSize,_  = PcdSetting[TAB_DEFAULT]
             elif TAB_COMMON in PcdSetting:
-                PcdValue, DatumType, MaxDatumSize = PcdSetting[TAB_COMMON]
+                PcdValue, DatumType, MaxDatumSize,_  = PcdSetting[TAB_COMMON]
             else:
                 PcdValue = None
                 DatumType = None
@@ -1696,7 +1695,9 @@ class DscBuildData(PlatformBuildClassObject):
                 Settings = PcdValueDict[PcdCName, TokenSpaceGuid][SkuName]
                 if SkuName not in Pcds[PcdCName, TokenSpaceGuid].DscRawValue:
                     Pcds[PcdCName, TokenSpaceGuid].DscRawValue[SkuName] = {}
+                    Pcds[PcdCName, TokenSpaceGuid].DscRawValueInfo[SkuName] = {}
                 Pcds[PcdCName, TokenSpaceGuid].DscRawValue[SkuName][TAB_DEFAULT_STORES_DEFAULT] = Settings[0]
+                Pcds[PcdCName, TokenSpaceGuid].DscRawValueInfo[SkuName][TAB_DEFAULT_STORES_DEFAULT] = (self.MetaFile.File,Settings[3])
         return Pcds
 
     @staticmethod
@@ -1749,24 +1750,41 @@ class DscBuildData(PlatformBuildClassObject):
     def GenerateSizeFunction(self, Pcd):
         CApp = "// Default Value in Dec \n"
         CApp = CApp + "void Cal_%s_%s_Size(UINT32 *Size){\n" % (Pcd.TokenSpaceGuidCName, Pcd.TokenCName)
-        if Pcd.IsArray():
+
+        if Pcd.IsArray() and Pcd.Capacity[-1] != "-1":
+            CApp += "  *Size = (sizeof (%s) > *Size ? sizeof (%s) : *Size);\n" % (Pcd.DatumType,Pcd.DatumType)
+        else:
+            if "{CODE(" in Pcd.DefaultValueFromDec:
+                CApp += "  *Size = (sizeof (%s_%s_INIT_Value) > *Size ? sizeof (%s_%s_INIT_Value) : *Size);\n" % (Pcd.TokenSpaceGuidCName,Pcd.TokenCName,Pcd.TokenSpaceGuidCName,Pcd.TokenCName)
             if Pcd.Type in PCD_DYNAMIC_TYPE_SET | PCD_DYNAMIC_EX_TYPE_SET:
                 for skuname in Pcd.SkuInfoList:
                     skuobj = Pcd.SkuInfoList[skuname]
                     if skuobj.VariableName:
                         for defaultstore in skuobj.DefaultStoreDict:
                             pcddef = self.GetPcdDscRawDefaultValue(Pcd,skuname,defaultstore)
-                            if pcddef and "{CODE(" in pcddef:
-                                CApp += "  *Size = (sizeof (%s_%s_%s_%s_Value) > *Size ? sizeof (%s_%s_%s_%s_Value) : *Size);\n" % (Pcd.TokenSpaceGuidCName,Pcd.TokenCName,skuname,defaultstore,Pcd.TokenSpaceGuidCName,Pcd.TokenCName,skuname,defaultstore)
+                            if pcddef:
+                                if "{CODE(" in pcddef:
+                                    CApp += "  *Size = (sizeof (%s_%s_%s_%s_Value) > *Size ? sizeof (%s_%s_%s_%s_Value) : *Size);\n" % (Pcd.TokenSpaceGuidCName,Pcd.TokenCName,skuname,defaultstore,Pcd.TokenSpaceGuidCName,Pcd.TokenCName,skuname,defaultstore)
+                                else:
+                                    CApp += "  *Size = %s > *Size ? %s : *Size;\n" % (self.GetStructurePcdMaxSize(Pcd),self.GetStructurePcdMaxSize(Pcd))
                     else:
                         pcddef = self.GetPcdDscRawDefaultValue(Pcd,skuname,TAB_DEFAULT_STORES_DEFAULT)
-                        if pcddef and "{CODE(" in pcddef:
-                            CApp += "  *Size = (sizeof (%s_%s_%s_%s_Value) > *Size ? sizeof (%s_%s_%s_%s_Value) : *Size);\n" % (Pcd.TokenSpaceGuidCName,Pcd.TokenCName,skuname,TAB_DEFAULT_STORES_DEFAULT,Pcd.TokenSpaceGuidCName,Pcd.TokenCName,skuname,TAB_DEFAULT_STORES_DEFAULT)
+                        if pcddef:
+                            if  "{CODE(" in pcddef:
+                                CApp += "  *Size = (sizeof (%s_%s_%s_%s_Value) > *Size ? sizeof (%s_%s_%s_%s_Value) : *Size);\n" % (Pcd.TokenSpaceGuidCName,Pcd.TokenCName,skuname,TAB_DEFAULT_STORES_DEFAULT,Pcd.TokenSpaceGuidCName,Pcd.TokenCName,skuname,TAB_DEFAULT_STORES_DEFAULT)
+                            else:
+                                CApp += "  *Size = %s > *Size ? %s : *Size;\n" % (self.GetStructurePcdMaxSize(Pcd),self.GetStructurePcdMaxSize(Pcd))
             else:
                 pcddef = self.GetPcdDscRawDefaultValue(Pcd,TAB_DEFAULT,TAB_DEFAULT_STORES_DEFAULT)
-                if pcddef and "{CODE(" in pcddef:
-                    CApp += "  *Size = (sizeof (%s_%s_%s_%s_Value) > *Size ? sizeof (%s_%s_%s_%s_Value) : *Size);\n" % (Pcd.TokenSpaceGuidCName,Pcd.TokenCName,TAB_DEFAULT,TAB_DEFAULT_STORES_DEFAULT,Pcd.TokenSpaceGuidCName,Pcd.TokenCName,TAB_DEFAULT,TAB_DEFAULT_STORES_DEFAULT)
+                if pcddef:
+                    if "{CODE(" in pcddef:
+                        CApp += "  *Size = (sizeof (%s_%s_%s_%s_Value) > *Size ? sizeof (%s_%s_%s_%s_Value) : *Size);\n" % (Pcd.TokenSpaceGuidCName,Pcd.TokenCName,TAB_DEFAULT,TAB_DEFAULT_STORES_DEFAULT,Pcd.TokenSpaceGuidCName,Pcd.TokenCName,TAB_DEFAULT,TAB_DEFAULT_STORES_DEFAULT)
+                    else:
+                        CApp += "  *Size = %s > *Size ? %s : *Size;\n" % (self.GetStructurePcdMaxSize(Pcd),self.GetStructurePcdMaxSize(Pcd))
+        ActualCap = []
         for index in Pcd.DefaultValues:
+            if index:
+                ActualCap.append(index)
             FieldList = Pcd.DefaultValues[index]
             if not FieldList:
                 continue
@@ -1787,18 +1805,20 @@ class DscBuildData(PlatformBuildClassObject):
                     FieldName_ori = FieldName.strip('.')
                     while '[' in  FieldName:
                         NewFieldName = NewFieldName + FieldName.split('[', 1)[0] + '[0]'
-                        ArrayIndex = int(FieldName.split('[', 1)[1].split(']', 1)[0])
+                        Array_Index = int(FieldName.split('[', 1)[1].split(']', 1)[0])
                         FieldName = FieldName.split(']', 1)[1]
                     FieldName = NewFieldName + FieldName
                     while '[' in FieldName and not Pcd.IsArray():
                         FieldName = FieldName.rsplit('[', 1)[0]
-                        CApp = CApp + '  __FLEXIBLE_SIZE(*Size, %s, %s, %d); // From %s Line %d Value %s\n' % (Pcd.DatumType, FieldName.strip("."), ArrayIndex + 1, FieldList[FieldName_ori][1], FieldList[FieldName_ori][2], FieldList[FieldName_ori][0])
+                        CApp = CApp + '  __FLEXIBLE_SIZE(*Size, %s, %s, %d); // From %s Line %d Value %s\n' % (Pcd.DatumType, FieldName.strip("."), Array_Index + 1, FieldList[FieldName_ori][1], FieldList[FieldName_ori][2], FieldList[FieldName_ori][0])
         for skuname in Pcd.SkuOverrideValues:
             if skuname == TAB_COMMON:
                 continue
             for defaultstorenameitem in Pcd.SkuOverrideValues[skuname]:
                 CApp = CApp + "// SkuName: %s,  DefaultStoreName: %s \n" % (skuname, defaultstorenameitem)
                 for index in Pcd.SkuOverrideValues[skuname][defaultstorenameitem]:
+                    if index:
+                        ActualCap.append(index)
                     for FieldList in [Pcd.SkuOverrideValues[skuname][defaultstorenameitem][index]]:
                         if not FieldList:
                             continue
@@ -1819,12 +1839,12 @@ class DscBuildData(PlatformBuildClassObject):
                                 FieldName_ori = FieldName.strip('.')
                                 while '[' in  FieldName:
                                     NewFieldName = NewFieldName + FieldName.split('[', 1)[0] + '[0]'
-                                    ArrayIndex = int(FieldName.split('[', 1)[1].split(']', 1)[0])
+                                    Array_Index = int(FieldName.split('[', 1)[1].split(']', 1)[0])
                                     FieldName = FieldName.split(']', 1)[1]
                                 FieldName = NewFieldName + FieldName
                                 while '[' in FieldName and not Pcd.IsArray():
                                     FieldName = FieldName.rsplit('[', 1)[0]
-                                    CApp = CApp + '  __FLEXIBLE_SIZE(*Size, %s, %s, %d); // From %s Line %d Value %s \n' % (Pcd.DatumType, FieldName.strip("."), ArrayIndex + 1, FieldList[FieldName_ori][1], FieldList[FieldName_ori][2], FieldList[FieldName_ori][0])
+                                    CApp = CApp + '  __FLEXIBLE_SIZE(*Size, %s, %s, %d); // From %s Line %d Value %s \n' % (Pcd.DatumType, FieldName.strip("."), Array_Index + 1, FieldList[FieldName_ori][1], FieldList[FieldName_ori][2], FieldList[FieldName_ori][0])
         if Pcd.PcdFieldValueFromFdf:
             CApp = CApp + "// From fdf \n"
         for FieldName in Pcd.PcdFieldValueFromFdf:
@@ -1844,12 +1864,12 @@ class DscBuildData(PlatformBuildClassObject):
                 FieldName_ori = FieldName.strip('.')
                 while '[' in  FieldName:
                     NewFieldName = NewFieldName + FieldName.split('[', 1)[0] + '[0]'
-                    ArrayIndex = int(FieldName.split('[', 1)[1].split(']', 1)[0])
+                    Array_Index = int(FieldName.split('[', 1)[1].split(']', 1)[0])
                     FieldName = FieldName.split(']', 1)[1]
                 FieldName = NewFieldName + FieldName
                 while '[' in FieldName:
                     FieldName = FieldName.rsplit('[', 1)[0]
-                    CApp = CApp + '  __FLEXIBLE_SIZE(*Size, %s, %s, %d); // From %s Line %s Value %s \n' % (Pcd.DatumType, FieldName.strip("."), ArrayIndex + 1, Pcd.PcdFieldValueFromFdf[FieldName_ori][1], Pcd.PcdFieldValueFromFdf[FieldName_ori][2], Pcd.PcdFieldValueFromFdf[FieldName_ori][0])
+                    CApp = CApp + '  __FLEXIBLE_SIZE(*Size, %s, %s, %d); // From %s Line %s Value %s \n' % (Pcd.DatumType, FieldName.strip("."), Array_Index + 1, Pcd.PcdFieldValueFromFdf[FieldName_ori][1], Pcd.PcdFieldValueFromFdf[FieldName_ori][2], Pcd.PcdFieldValueFromFdf[FieldName_ori][0])
         if Pcd.PcdFieldValueFromComm:
             CApp = CApp + "// From Command Line \n"
         for FieldName in Pcd.PcdFieldValueFromComm:
@@ -1869,16 +1889,37 @@ class DscBuildData(PlatformBuildClassObject):
                 FieldName_ori = FieldName.strip('.')
                 while '[' in  FieldName:
                     NewFieldName = NewFieldName + FieldName.split('[', 1)[0] + '[0]'
-                    ArrayIndex = int(FieldName.split('[', 1)[1].split(']', 1)[0])
+                    Array_Index = int(FieldName.split('[', 1)[1].split(']', 1)[0])
                     FieldName = FieldName.split(']', 1)[1]
                 FieldName = NewFieldName + FieldName
                 while '[' in FieldName and not Pcd.IsArray():
                     FieldName = FieldName.rsplit('[', 1)[0]
-                    CApp = CApp + '  __FLEXIBLE_SIZE(*Size, %s, %s, %d); // From %s Line %d Value %s \n' % (Pcd.DatumType, FieldName.strip("."), ArrayIndex + 1, Pcd.PcdFieldValueFromComm[FieldName_ori][1], Pcd.PcdFieldValueFromComm[FieldName_ori][2], Pcd.PcdFieldValueFromComm[FieldName_ori][0])
+                    CApp = CApp + '  __FLEXIBLE_SIZE(*Size, %s, %s, %d); // From %s Line %d Value %s \n' % (Pcd.DatumType, FieldName.strip("."), Array_Index + 1, Pcd.PcdFieldValueFromComm[FieldName_ori][1], Pcd.PcdFieldValueFromComm[FieldName_ori][2], Pcd.PcdFieldValueFromComm[FieldName_ori][0])
         if Pcd.GetPcdMaxSize():
             CApp = CApp + "  *Size = (%d > *Size ? %d : *Size); // The Pcd maxsize is %d \n" % (Pcd.GetPcdMaxSize(), Pcd.GetPcdMaxSize(), Pcd.GetPcdMaxSize())
+        ArraySizeByAssign = self.CalculateActualCap(ActualCap)
+        if ArraySizeByAssign > 1:
+            CApp = CApp + "  *Size = (%d > *Size ? %d : *Size); \n" % (ArraySizeByAssign, ArraySizeByAssign)
         CApp = CApp + "}\n"
         return CApp
+    def CalculateActualCap(self,ActualCap):
+        if not ActualCap:
+            return 1
+        maxsize = 1
+        for item in ActualCap:
+            index_elements = ArrayIndex.findall(item)
+            rt = 1
+            for index_e in index_elements:
+                index_num = index_e.lstrip("[").rstrip("]").strip()
+                if not index_num:
+                    # Not support flexiable pcd array assignment
+                    return 1
+                index_num = int(index_num,16) if index_num.startswith(("0x","0X")) else int(index_num)
+                rt = rt * (index_num+1)
+            if rt  >maxsize:
+                maxsize = rt
+
+        return maxsize
 
     @staticmethod
     def GenerateSizeStatments(Pcd,skuname,defaultstorename):
@@ -1957,6 +1998,7 @@ class DscBuildData(PlatformBuildClassObject):
         CApp = CApp + "void Assign_%s_%s_Default_Value(%s *Pcd){\n" % (Pcd.TokenSpaceGuidCName, Pcd.TokenCName, Pcd.BaseDatumType)
         CApp = CApp + '  UINT32  FieldSize;\n'
         CApp = CApp + '  CHAR8   *Value;\n'
+        CApp = CApp + ' UINT32 PcdArraySize;\n'
         DefaultValueFromDec = Pcd.DefaultValueFromDec
         IsArray = _IsFieldValueAnArray(Pcd.DefaultValueFromDec)
         if IsArray:
@@ -1968,14 +2010,29 @@ class DscBuildData(PlatformBuildClassObject):
         DefaultValueFromDec = StringToArray(DefaultValueFromDec)
         Value, ValueSize = ParseFieldValue (DefaultValueFromDec)
         if IsArray:
-        #
-        # Use memcpy() to copy value into field
-        #
-            if "{CODE(" in Pcd.DefaultValueFromDec:
-                CApp = CApp + '  memcpy (Pcd, %s_%s_INIT_Value, sizeof(%s_%s_INIT_Value));\n' % (Pcd.TokenSpaceGuidCName, Pcd.TokenCName,Pcd.TokenSpaceGuidCName, Pcd.TokenCName)
+            #
+            # Use memcpy() to copy value into field
+            #
+            if Pcd.IsArray():
+                pcdarraysize = Pcd.PcdArraySize()
+                if "{CODE(" in Pcd.DefaultValueFromDec:
+                    if Pcd.Capacity[-1] != "-1":
+                        CApp = CApp + '__STATIC_ASSERT(sizeof(%s_%s_INIT_Value) < %d * sizeof(%s), "Pcd %s.%s Value in Dec exceed the array capability %s"); // From  %s Line %s \n ' % (Pcd.TokenSpaceGuidCName, Pcd.TokenCName,pcdarraysize,Pcd.BaseDatumType,Pcd.TokenSpaceGuidCName, Pcd.TokenCName,Pcd.DatumType,Pcd.DefaultValueFromDecInfo[0],Pcd.DefaultValueFromDecInfo[1])
+                    CApp = CApp + ' PcdArraySize = sizeof(%s_%s_INIT_Value);\n ' % (Pcd.TokenSpaceGuidCName, Pcd.TokenCName)
+                    CApp = CApp + '  memcpy (Pcd, %s_%s_INIT_Value,PcdArraySize);\n ' % (Pcd.TokenSpaceGuidCName, Pcd.TokenCName)
+                else:
+                    if Pcd.Capacity[-1] != "-1":
+                        CApp = CApp + '__STATIC_ASSERT(%d < %d * sizeof(%s), "Pcd %s.%s Value in Dec exceed the array capability %s"); // From %s Line %s \n' % (ValueSize,pcdarraysize,Pcd.BaseDatumType,Pcd.TokenSpaceGuidCName, Pcd.TokenCName,Pcd.DatumType,Pcd.DefaultValueFromDecInfo[0],Pcd.DefaultValueFromDecInfo[1])
+                    CApp = CApp + ' PcdArraySize = %d;\n' % ValueSize
+                    CApp = CApp + '  Value     = %s; // From DEC Default Value %s\n' % (DscBuildData.IntToCString(Value, ValueSize), Pcd.DefaultValueFromDec)
+                    CApp = CApp + '  memcpy (Pcd, Value, PcdArraySize);\n'
             else:
-                CApp = CApp + '  Value     = %s; // From DEC Default Value %s\n' % (DscBuildData.IntToCString(Value, ValueSize), Pcd.DefaultValueFromDec)
-                CApp = CApp + '  memcpy (Pcd, Value, %d);\n' % (ValueSize)
+                if "{CODE(" in Pcd.DefaultValueFromDec:
+                    CApp = CApp + '  PcdArraySize = sizeof(%s_%s_INIT_Value);\n ' % (Pcd.TokenSpaceGuidCName, Pcd.TokenCName)
+                    CApp = CApp + '  memcpy (Pcd, &%s_%s_INIT_Value,PcdArraySize);\n ' % (Pcd.TokenSpaceGuidCName, Pcd.TokenCName)
+                else:
+                    CApp = CApp + '  Value     = %s; // From DEC Default Value %s\n' % (DscBuildData.IntToCString(Value, ValueSize), Pcd.DefaultValueFromDec)
+                    CApp = CApp + '  memcpy (Pcd, Value, %d);\n' % (ValueSize)
         elif isinstance(Value, str):
             CApp = CApp + '  Pcd = %s; // From DEC Default Value %s\n' % (Value, Pcd.DefaultValueFromDec)
         for index in Pcd.DefaultValues:
@@ -2033,14 +2090,29 @@ class DscBuildData(PlatformBuildClassObject):
             pcddefaultvalue = Pcd.DscRawValue.get(SkuName, {}).get(TAB_DEFAULT_STORES_DEFAULT)
 
         return pcddefaultvalue
+    def GetPcdDscRawValueInfo(self,Pcd, SkuName,DefaultStoreName):
+        DscValueInfo = Pcd.DscRawValueInfo.get(SkuName, {}).get(DefaultStoreName)
+        if DscValueInfo:
+            dscfilepath,lineno = DscValueInfo
+        else:
+            dscfilepath = self.MetaFile.File
+            lineno = ""
+        return dscfilepath,lineno
+
     def GenerateInitValueFunction(self, Pcd, SkuName, DefaultStoreName):
         CApp = "// Value in Dsc for Sku: %s, DefaultStore %s\n" % (SkuName, DefaultStoreName)
         CApp = CApp + "void Assign_%s_%s_%s_%s_Value(%s *Pcd){\n" % (Pcd.TokenSpaceGuidCName, Pcd.TokenCName, SkuName, DefaultStoreName, Pcd.BaseDatumType)
         CApp = CApp + '  UINT32  FieldSize;\n'
         CApp = CApp + '  CHAR8   *Value;\n'
+        CApp = CApp + ' UINT32 PcdArraySize;\n'
 
         CApp = CApp + "// SkuName: %s,  DefaultStoreName: %s \n" % (TAB_DEFAULT, TAB_DEFAULT_STORES_DEFAULT)
         inherit_OverrideValues = Pcd.SkuOverrideValues[SkuName]
+        dscfilepath,lineno = self.GetPcdDscRawValueInfo(Pcd, SkuName, DefaultStoreName)
+        if lineno:
+            valuefrom = "%s Line %s" % (dscfilepath,str(lineno))
+        else:
+            valuefrom = dscfilepath
 
         pcddefaultvalue = self.GetPcdDscRawDefaultValue(Pcd, SkuName, DefaultStoreName)
         if pcddefaultvalue:
@@ -2058,33 +2130,71 @@ class DscBuildData(PlatformBuildClassObject):
             if (SkuName, DefaultStoreName) == (TAB_DEFAULT, TAB_DEFAULT_STORES_DEFAULT):
                 if isinstance(Value, str):
                     if "{CODE(" in Value:
-                        CApp = CApp + '  memcpy (Pcd, %s_%s_%s_%s_Value, sizeof(%s_%s_%s_%s_Value));\n' % (Pcd.TokenSpaceGuidCName, Pcd.TokenCName,SkuName, DefaultStoreName,Pcd.TokenSpaceGuidCName, Pcd.TokenCName,SkuName, DefaultStoreName)
+                        if Pcd.IsArray() and Pcd.Capacity[-1] != "-1":
+                            pcdarraysize = Pcd.PcdArraySize()
+                            CApp = CApp + '__STATIC_ASSERT(sizeof(%s_%s_%s_%s_Value) < %d * sizeof(%s), "Pcd %s.%s Value in Dsc exceed the array capability %s"); // From %s \n' % (Pcd.TokenSpaceGuidCName, Pcd.TokenCName,SkuName, DefaultStoreName,pcdarraysize,Pcd.BaseDatumType,Pcd.TokenSpaceGuidCName, Pcd.TokenCName,Pcd.DatumType, valuefrom)
+                        CApp = CApp+ ' PcdArraySize = sizeof(%s_%s_%s_%s_Value);\n ' % (Pcd.TokenSpaceGuidCName, Pcd.TokenCName,SkuName, DefaultStoreName)
+                        CApp = CApp + '  memcpy (Pcd, &%s_%s_%s_%s_Value,PcdArraySize);\n ' % (Pcd.TokenSpaceGuidCName, Pcd.TokenCName,SkuName, DefaultStoreName)
                     else:
                         CApp = CApp + '  Pcd = %s; // From DSC Default Value %s\n' % (Value, Pcd.DefaultFromDSC.get(TAB_DEFAULT, {}).get(TAB_DEFAULT_STORES_DEFAULT, Pcd.DefaultValue) if Pcd.DefaultFromDSC else Pcd.DefaultValue)
                 elif IsArray:
-                #
-                # Use memcpy() to copy value into field
-                #
-                    if Pcd.IsArray() and "{CODE(" in pcddefaultvalue:
-                        CApp = CApp + '  memcpy (Pcd, %s_%s_%s_%s_Value, sizeof(%s_%s_%s_%s_Value));\n' % (Pcd.TokenSpaceGuidCName, Pcd.TokenCName,SkuName, DefaultStoreName,Pcd.TokenSpaceGuidCName, Pcd.TokenCName,SkuName, DefaultStoreName)
+                    #
+                    # Use memcpy() to copy value into field
+                    #
+                    if Pcd.IsArray():
+                        pcdarraysize = Pcd.PcdArraySize()
+                        if "{CODE(" in pcddefaultvalue:
+                            if Pcd.Capacity[-1] != "-1":
+                                CApp = CApp + '__STATIC_ASSERT(sizeof(%s_%s_%s_%s_Value) < %d * sizeof(%s), "Pcd %s.%s Value in Dsc exceed the array capability %s"); // From  %s \n' % (Pcd.TokenSpaceGuidCName, Pcd.TokenCName,SkuName, DefaultStoreName,pcdarraysize,Pcd.BaseDatumType,Pcd.TokenSpaceGuidCName, Pcd.TokenCName,Pcd.DatumType,valuefrom)
+                            CApp = CApp + ' PcdArraySize = sizeof(%s_%s_%s_%s_Value);\n ' % (Pcd.TokenSpaceGuidCName, Pcd.TokenCName,SkuName, DefaultStoreName)
+                            CApp = CApp + '  memcpy (Pcd, %s_%s_%s_%s_Value, PcdArraySize);\n' % (Pcd.TokenSpaceGuidCName, Pcd.TokenCName,SkuName, DefaultStoreName)
+                        else:
+                            if Pcd.Capacity[-1] != "-1":
+                                CApp = CApp + '__STATIC_ASSERT(%d < %d * sizeof(%s), "Pcd %s.%s Value in Dsc exceed the array capability %s"); // From  %s \n' % (ValueSize,pcdarraysize,Pcd.BaseDatumType,Pcd.TokenSpaceGuidCName, Pcd.TokenCName,Pcd.DatumType,valuefrom)
+                            CApp = CApp + ' PcdArraySize = %d;\n' % ValueSize
+                            CApp = CApp + '  Value     = %s; // From DSC Default Value %s\n' % (DscBuildData.IntToCString(Value, ValueSize), Pcd.DefaultFromDSC.get(TAB_DEFAULT, {}).get(TAB_DEFAULT_STORES_DEFAULT, Pcd.DefaultValue) if Pcd.DefaultFromDSC else Pcd.DefaultValue)
+                            CApp = CApp + '  memcpy (Pcd, Value, PcdArraySize);\n'
                     else:
-                        CApp = CApp + '  Value     = %s; // From DSC Default Value %s\n' % (DscBuildData.IntToCString(Value, ValueSize), Pcd.DefaultFromDSC.get(TAB_DEFAULT, {}).get(TAB_DEFAULT_STORES_DEFAULT, Pcd.DefaultValue) if Pcd.DefaultFromDSC else Pcd.DefaultValue)
-                        CApp = CApp + '  memcpy (Pcd, Value, %d);\n' % (ValueSize)
+                        if "{CODE(" in pcddefaultvalue:
+                            CApp = CApp + '  PcdArraySize = %d < sizeof(%s) * %d ? %d: sizeof(%s) * %d;\n ' % (ValueSize,Pcd.BaseDatumType,pcdarraysize,ValueSize,Pcd.BaseDatumType,pcdarraysize)
+                            CApp = CApp + '  memcpy (Pcd, &%s_%s_%s_%s_Value, PcdArraySize);\n' % (Pcd.TokenSpaceGuidCName, Pcd.TokenCName,SkuName, DefaultStoreName)
+                        else:
+                            CApp = CApp + '  Value     = %s; // From DSC Default Value %s\n' % (DscBuildData.IntToCString(Value, ValueSize), Pcd.DefaultFromDSC.get(TAB_DEFAULT, {}).get(TAB_DEFAULT_STORES_DEFAULT, Pcd.DefaultValue) if Pcd.DefaultFromDSC else Pcd.DefaultValue)
+                            CApp = CApp + '  memcpy (Pcd, Value, %d);\n' % (ValueSize)
             else:
                 if isinstance(Value, str):
                     if "{CODE(" in Value:
-                        CApp = CApp + '  memcpy (Pcd, %s_%s_%s_%s_Value, sizeof(%s_%s_%s_%s_Value));\n' % (Pcd.TokenSpaceGuidCName, Pcd.TokenCName,SkuName, DefaultStoreName,Pcd.TokenSpaceGuidCName, Pcd.TokenCName,SkuName, DefaultStoreName)
+                        if Pcd.IsArray() and Pcd.Capacity[-1] != "-1":
+                            pcdarraysize = Pcd.PcdArraySize()
+                            CApp = CApp + '__STATIC_ASSERT(sizeof(%s_%s_%s_%s_Value) < %d * sizeof(%s), "Pcd %s.%s Value in Dsc exceed the array capability %s"); // From %s \n' % (Pcd.TokenSpaceGuidCName, Pcd.TokenCName,SkuName, DefaultStoreName,pcdarraysize,Pcd.BaseDatumType,Pcd.TokenSpaceGuidCName, Pcd.TokenCName,Pcd.DatumType,valuefrom)
+                        CApp = CApp + ' PcdArraySize = sizeof(%s_%s_%s_%s_Value);\n '% (Pcd.TokenSpaceGuidCName, Pcd.TokenCName,SkuName, DefaultStoreName)
+                        CApp = CApp + '  memcpy (Pcd, &%s_%s_%s_%s_Value, PcdArraySize);\n' % (Pcd.TokenSpaceGuidCName, Pcd.TokenCName,SkuName, DefaultStoreName)
                     else:
                         CApp = CApp + '  Pcd = %s; // From DSC Default Value %s\n' % (Value, Pcd.DscRawValue.get(SkuName, {}).get(DefaultStoreName))
                 elif IsArray:
-                #
-                # Use memcpy() to copy value into field
-                #
-                    if Pcd.IsArray() and "{CODE(" in pcddefaultvalue:
-                        CApp = CApp + '  memcpy (Pcd, %s_%s_%s_%s_Value, sizeof(%s_%s_%s_%s_Value));\n' % (Pcd.TokenSpaceGuidCName, Pcd.TokenCName,SkuName, DefaultStoreName,Pcd.TokenSpaceGuidCName, Pcd.TokenCName,SkuName, DefaultStoreName)
+                    #
+                    # Use memcpy() to copy value into field
+                    #
+                    if Pcd.IsArray():
+                        pcdarraysize = Pcd.PcdArraySize()
+                        if "{CODE(" in pcddefaultvalue:
+                            if Pcd.Capacity[-1] != "-1":
+                                CApp = CApp + '__STATIC_ASSERT(sizeof(%s_%s_%s_%s_Value) < %d * sizeof(%s), "Pcd %s.%s Value in Dsc exceed the array capability %s"); // From  %s \n' % (Pcd.TokenSpaceGuidCName, Pcd.TokenCName,SkuName, DefaultStoreName,pcdarraysize,Pcd.BaseDatumType,Pcd.TokenSpaceGuidCName, Pcd.TokenCName,Pcd.DatumType,valuefrom)
+                            CApp + ' PcdArraySize = sizeof(%s_%s_%s_%s_Value);\n ' % (Pcd.TokenSpaceGuidCName, Pcd.TokenCName,SkuName, DefaultStoreName)
+                            CApp = CApp + '  memcpy (Pcd, %s_%s_%s_%s_Value, PcdArraySize);\n' % (Pcd.TokenSpaceGuidCName, Pcd.TokenCName,SkuName, DefaultStoreName)
+                        else:
+                            if Pcd.Capacity[-1] != "-1":
+                                CApp = CApp + '__STATIC_ASSERT(%d < %d * sizeof(%s), "Pcd %s.%s Value in Dsc exceed the array capability %s"); // From  %s \n' % (ValueSize,pcdarraysize,Pcd.BaseDatumType,Pcd.TokenSpaceGuidCName, Pcd.TokenCName,Pcd.DatumType,valuefrom)
+                            CApp = CApp + ' PcdArraySize = %d;\n' % ValueSize
+                            CApp = CApp + '  Value     = %s; // From DSC Default Value %s\n' % (DscBuildData.IntToCString(Value, ValueSize), Pcd.DscRawValue.get(TAB_DEFAULT, {}).get(TAB_DEFAULT_STORES_DEFAULT, Pcd.DefaultValue) if Pcd.DefaultFromDSC else Pcd.DefaultValue)
+                            CApp = CApp + '  memcpy (Pcd, Value, PcdArraySize);\n'
                     else:
-                        CApp = CApp + '  Value     = %s; // From DSC Default Value %s\n' % (DscBuildData.IntToCString(Value, ValueSize), Pcd.DscRawValue.get(SkuName, {}).get(DefaultStoreName))
-                        CApp = CApp + '  memcpy (Pcd, Value, %d);\n' % (ValueSize)
+                        if "{CODE(" in pcddefaultvalue:
+                            CApp = CApp + '  PcdArraySize = %d < sizeof(%s) * %d ? %d: sizeof(%s) * %d;\n ' % (ValueSize,Pcd.BaseDatumType,pcdarraysize,ValueSize,Pcd.BaseDatumType,pcdarraysize)
+                            CApp = CApp + '  memcpy (Pcd, &%s_%s_%s_%s_Value, PcdArraySize);\n' % (Pcd.TokenSpaceGuidCName, Pcd.TokenCName,SkuName, DefaultStoreName)
+                        else:
+                            CApp = CApp + '  Value     = %s; // From DSC Default Value %s\n' % (DscBuildData.IntToCString(Value, ValueSize), Pcd.DscRawValue.get(SkuName, {}).get(DefaultStoreName))
+                            CApp = CApp + '  memcpy (Pcd, Value, %d);\n' % (ValueSize)
 
         inheritvalue = inherit_OverrideValues.get(DefaultStoreName)
         if not inheritvalue:
@@ -2310,6 +2420,9 @@ class DscBuildData(PlatformBuildClassObject):
             # OFFSET_OF(FlexbleArrayField) + sizeof(FlexibleArray[0]) * (HighestIndex + 1)
             #
             CApp = CApp + DscBuildData.GenerateSizeStatments(Pcd,SkuName,DefaultStoreName)
+            if Pcd.IsArray() and Pcd.Capacity[-1] != "-1":
+                CApp = CApp + '  OriginalSize = OriginalSize < sizeof(%s) * %d? OriginalSize:sizeof(%s) * %d; \n' % (Pcd.BaseDatumType,Pcd.PcdArraySize(),Pcd.BaseDatumType,Pcd.PcdArraySize())
+                CApp = CApp + '  Size = sizeof(%s) * %d; \n' % (Pcd.BaseDatumType,Pcd.PcdArraySize())
 
             #
             # Allocate and zero buffer for the PCD
@@ -2359,8 +2472,6 @@ class DscBuildData(PlatformBuildClassObject):
     def GenerateArrayAssignment(self, Pcd):
         CApp = ""
         if not Pcd:
-            return CApp
-        if not Pcd.IsArray():
             return CApp
         Demesion = ""
         for d in Pcd.Capacity:
@@ -2753,7 +2864,9 @@ class DscBuildData(PlatformBuildClassObject):
 
             if SkuName not in Pcds[PcdCName, TokenSpaceGuid].DscRawValue:
                 Pcds[PcdCName, TokenSpaceGuid].DscRawValue[SkuName] = {}
+                Pcds[PcdCName, TokenSpaceGuid].DscRawValueInfo[SkuName] = {}
             Pcds[PcdCName, TokenSpaceGuid].DscRawValue[SkuName][TAB_DEFAULT_STORES_DEFAULT] = PcdValue
+            Pcds[PcdCName, TokenSpaceGuid].DscRawValueInfo[SkuName][TAB_DEFAULT_STORES_DEFAULT] = (self.MetaFile.File,Dummy4)
 
         for pcd in Pcds.values():
             pcdDecObject = self._DecPcds[pcd.TokenCName, pcd.TokenSpaceGuidCName]
@@ -2955,7 +3068,9 @@ class DscBuildData(PlatformBuildClassObject):
                 Pcds[PcdCName, TokenSpaceGuid].CustomAttribute['DscPosition'] = int(Dummy4)
             if SkuName not in Pcds[PcdCName, TokenSpaceGuid].DscRawValue:
                 Pcds[PcdCName, TokenSpaceGuid].DscRawValue[SkuName] = {}
+                Pcds[PcdCName, TokenSpaceGuid].DscRawValueInfo[SkuName] = {}
             Pcds[PcdCName, TokenSpaceGuid].DscRawValue[SkuName][DefaultStore] = DefaultValue
+            Pcds[PcdCName, TokenSpaceGuid].DscRawValueInfo[SkuName][DefaultStore] = (self.MetaFile.File,Dummy4)
         for pcd in Pcds.values():
             pcdDecObject = self._DecPcds[pcd.TokenCName, pcd.TokenSpaceGuidCName]
             pcd.DatumType = pcdDecObject.DatumType
@@ -3093,7 +3208,9 @@ class DscBuildData(PlatformBuildClassObject):
 
             if SkuName not in Pcds[PcdCName, TokenSpaceGuid].DscRawValue:
                 Pcds[PcdCName, TokenSpaceGuid].DscRawValue[SkuName] = {}
+                Pcds[PcdCName, TokenSpaceGuid].DscRawValueInfo[SkuName] = {}
             Pcds[PcdCName, TokenSpaceGuid].DscRawValue[SkuName][TAB_DEFAULT_STORES_DEFAULT] = InitialValue
+            Pcds[PcdCName, TokenSpaceGuid].DscRawValueInfo[SkuName][TAB_DEFAULT_STORES_DEFAULT] = (self.MetaFile.File,Dummy4)
         for pcd in Pcds.values():
             pcdDecObject = self._DecPcds[pcd.TokenCName, pcd.TokenSpaceGuidCName]
             pcd.DatumType = pcdDecObject.DatumType
