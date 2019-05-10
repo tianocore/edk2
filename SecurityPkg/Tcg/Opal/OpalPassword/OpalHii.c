@@ -1229,7 +1229,7 @@ EFI_STATUS
 OpalDiskUpdateOwnerShip (
   OPAL_DISK        *OpalDisk
   )
-{
+{
   OPAL_SESSION  Session;
 
   if (OpalDisk->MsidLength == 0) {
@@ -1245,7 +1245,7 @@ OpalDiskUpdateOwnerShip (
   Session.MediaId = OpalDisk->MediaId;
   Session.OpalBaseComId = OpalDisk->OpalBaseComId;
 
-  OpalDisk->Owner = OpalUtilDetermineOwnership(&Session, OpalDisk->Msid, OpalDisk->MsidLength);
+  OpalDisk->Owner = OpalUtilDetermineOwnership(&Session, OpalDisk->Msid, OpalDisk->MsidLength);
   return EFI_SUCCESS;
 }
 
