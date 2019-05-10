@@ -68,7 +68,7 @@ LimitCpuidMaxvalInitialize (
   // The scope of LimitCpuidMaxval bit in the MSR_IA32_MISC_ENABLE is core for below
   // processor type, only program MSR_IA32_MISC_ENABLE for thread 0 in each core.
   //
-  if (IS_PENTIUM_4_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel) ||
+  if (IS_PENTIUM_4_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel) ||
       IS_SILVERMONT_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel) ||
       IS_GOLDMONT_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel) ||
       IS_CORE_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel) ||
