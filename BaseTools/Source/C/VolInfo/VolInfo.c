@@ -751,6 +751,7 @@ Returns:
   UINTN                       Signature[2];
   UINTN                       BytesRead;
   UINT32                      Size;
+  size_t                      ReadSize;
 
   BytesRead = 0;
   Size      = 0;
@@ -764,7 +765,10 @@ Returns:
   //
   // Read the header
   //
-  fread (&VolumeHeader, sizeof (EFI_FIRMWARE_VOLUME_HEADER) - sizeof (EFI_FV_BLOCK_MAP_ENTRY), 1, InputFile);
+  ReadSize = fread (&VolumeHeader, sizeof (EFI_FIRMWARE_VOLUME_HEADER) - sizeof (EFI_FV_BLOCK_MAP_ENTRY), 1, InputFile);
+  if (ReadSize != 1) {
+    return EFI_ABORTED;
+  }
   BytesRead     = sizeof (EFI_FIRMWARE_VOLUME_HEADER) - sizeof (EFI_FV_BLOCK_MAP_ENTRY);
   Signature[0]  = VolumeHeader.Signature;
   Signature[1]  = 0;
@@ -1053,7 +1057,10 @@ Returns:
   printf ("Revision:              0x%04X\n", VolumeHeader.Revision);
 
   do {
-    fread (&BlockMap, sizeof (EFI_FV_BLOCK_MAP_ENTRY), 1, InputFile);
+    ReadSize = fread (&BlockMap, sizeof (EFI_FV_BLOCK_MAP_ENTRY), 1, InputFile);
+    if (ReadSize != 1) {
+      return EFI_ABORTED;
+    }
     BytesRead += sizeof (EFI_FV_BLOCK_MAP_ENTRY);
 
     if (BlockMap.NumBlocks != 0) {
