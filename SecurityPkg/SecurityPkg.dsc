@@ -293,6 +293,11 @@
   SecurityPkg/HddPassword/HddPasswordDxe.inf
   SecurityPkg/HddPassword/HddPasswordPei.inf
 
+  #
+  # Common FV checker/verifier/reporter
+  #
+  SecurityPkg/FvReportPei/FvReportPei.inf
+
 [BuildOptions]
    MSFT:*_*_IA32_DLINK_FLAGS = /ALIGN:256
   INTEL:*_*_IA32_DLINK_FLAGS = /ALIGN:256
