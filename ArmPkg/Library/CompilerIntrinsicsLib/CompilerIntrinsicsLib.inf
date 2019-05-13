@@ -68,6 +68,7 @@
   Arm/sourcery.S       | GCC
   Arm/uldiv.S          | GCC
   Arm/ldivmod.S        | GCC
+  Arm/lasr.S           | GCC
   Arm/llsr.S           | GCC
   Arm/llsl.S           | GCC
 
