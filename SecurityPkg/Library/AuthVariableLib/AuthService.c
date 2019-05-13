@@ -18,7 +18,7 @@
   They will do basic validation for authentication data structure, then call crypto library
   to verify the signature.
 
-Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2019, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -1735,10 +1735,13 @@ CleanCertsFromDb (
                                        );
 
       if (EFI_ERROR(Status) || (AuthVariableInfo.Attributes & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) == 0) {
+        //
+        // While cleaning certdb, always delete the variable in certdb regardless of it attributes.
+        //
         Status      = DeleteCertsFromDb(
                         VariableName,
                         &AuthVarGuid,
-                        AuthVariableInfo.Attributes
+                        AuthVariableInfo.Attributes | EFI_VARIABLE_NON_VOLATILE
                         );
         CertCleaned = TRUE;
         DEBUG((EFI_D_INFO, "Recovery!! Cert for Auth Variable %s Guid %g is removed for consistency\n", VariableName, &AuthVarGuid));
