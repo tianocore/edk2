@@ -71,6 +71,8 @@
   Arm/lasr.S           | GCC
   Arm/llsr.S           | GCC
   Arm/llsl.S           | GCC
+  Arm/uread.S          | GCC
+  Arm/uwrite.S         | GCC
 
   Arm/div.asm          | MSFT
   Arm/uldiv.asm        | MSFT
