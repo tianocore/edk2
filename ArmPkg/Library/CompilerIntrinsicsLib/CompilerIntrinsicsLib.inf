@@ -26,6 +26,8 @@
 
   memcpy_ms.c          | MSFT
   memset_ms.c          | MSFT
+  memcmp_ms.c          | MSFT
+  memmove_ms.c         | MSFT
 
 [Sources.ARM]
   Arm/mullu.asm        | RVCT
