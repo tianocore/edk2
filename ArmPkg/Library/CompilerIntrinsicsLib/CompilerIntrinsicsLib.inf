@@ -19,10 +19,12 @@
 
 [Sources]
   memcpy.c             | RVCT
-  memcpy.c             | GCC
-  memcpy_ms.c          | MSFT
   memset.c             | RVCT
+
+  memcpy.c             | GCC
   memset.c             | GCC
+
+  memcpy_ms.c          | MSFT
   memset_ms.c          | MSFT
 
 [Sources.ARM]
@@ -38,73 +40,44 @@
   Arm/uldiv.asm        | RVCT
   Arm/ldivmod.asm      | RVCT
 
+  Arm/ashrdi3.S        | GCC
+  Arm/ashldi3.S        | GCC
+  Arm/div.S            | GCC
+  Arm/divdi3.S         | GCC
+  Arm/divsi3.S         | GCC
+  Arm/lshrdi3.S        | GCC
+  Arm/memmove.S        | GCC
+  Arm/modsi3.S         | GCC
+  Arm/moddi3.S         | GCC
+  Arm/muldi3.S         | GCC
+  Arm/mullu.S          | GCC
+  Arm/udivsi3.S        | GCC
+  Arm/umodsi3.S        | GCC
+  Arm/udivdi3.S        | GCC
+  Arm/umoddi3.S        | GCC
+  Arm/udivmoddi4.S     | GCC
+  Arm/clzsi2.S         | GCC
+  Arm/ctzsi2.S         | GCC
+  Arm/ucmpdi2.S        | GCC
+  Arm/switch8.S        | GCC
+  Arm/switchu8.S       | GCC
+  Arm/switch16.S       | GCC
+  Arm/switch32.S       | GCC
+  Arm/sourcery.S       | GCC
+  Arm/uldiv.S          | GCC
+  Arm/ldivmod.S        | GCC
+  Arm/llsr.S           | GCC
+  Arm/llsl.S           | GCC
 
-#
-# Move .c to .s to work around LLVM issues
-#
-#  Arm/ashrdi3.c    | GCC
-#  Arm/ashldi3.c    | GCC
-#  Arm/divdi3.c     | GCC
-#  Arm/divsi3.c     | GCC
-#  Arm/lshrdi3.c    | GCC
-  Arm/ashrdi3.S    | GCC
-  Arm/ashldi3.S    | GCC
-  Arm/div.S        | GCC
-  Arm/divdi3.S     | GCC
-  Arm/divsi3.S     | GCC
-  Arm/lshrdi3.S    | GCC
-
-  Arm/memmove.S    | GCC
-
-#  Arm/modsi3.c     | GCC
-#  Arm/moddi3.c     | GCC
-#  Arm/muldi3.c     | GCC
-  Arm/modsi3.S     | GCC
-  Arm/moddi3.S     | GCC
-  Arm/muldi3.S     | GCC
-  Arm/mullu.S      | GCC
-
-#  Arm/udivsi3.c    | GCC
-#  Arm/umodsi3.c    | GCC
-#  Arm/udivdi3.c    | GCC
-#  Arm/umoddi3.c    | GCC
-#  Arm/udivmoddi4.c | GCC
-  Arm/udivsi3.S    | GCC
-  Arm/umodsi3.S    | GCC
-  Arm/udivdi3.S    | GCC
-  Arm/umoddi3.S    | GCC
-  Arm/udivmoddi4.S | GCC
-
-#  Arm/clzsi2.c     | GCC
-#  Arm/ctzsi2.c     | GCC
-#  Arm/ucmpdi2.c    | GCC
-  Arm/clzsi2.S     | GCC
-  Arm/ctzsi2.S     | GCC
-  Arm/ucmpdi2.S    | GCC
-  Arm/switch8.S    | GCC
-  Arm/switchu8.S   | GCC
-  Arm/switch16.S   | GCC
-  Arm/switch32.S   | GCC
-
-  Arm/sourcery.S   | GCC
-  Arm/uldiv.S      | GCC
-  Arm/ldivmod.S    | GCC
-
-  Arm/llsr.S       | GCC
-  Arm/llsl.S       | GCC
-
-  Arm/div.asm      | MSFT
-  Arm/uldiv.asm    | MSFT
-  Arm/ldivmod.asm  | MSFT
-  Arm/llsr.asm     | MSFT
+  Arm/div.asm          | MSFT
+  Arm/uldiv.asm        | MSFT
+  Arm/ldivmod.asm      | MSFT
+  Arm/llsr.asm         | MSFT
 
 [Packages]
   MdePkg/MdePkg.dec
   ArmPkg/ArmPkg.dec
 
-[LibraryClasses]
-
 [BuildOptions]
-  MSFT:*_*_ARM_CC_FLAGS = /GL-
+  MSFT:*_*_*_CC_FLAGS = /GL-
   MSFT:*_*_ARM_ASM_FLAGS = /oldit
-  MSFT:*_*_AARCH64_CC_FLAGS = /GL-
