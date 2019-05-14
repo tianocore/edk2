@@ -15,7 +15,6 @@
 #include <Protocol/StatusCode.h>
 #include <Guid/StatusCodeDataTypeId.h>
 #include <Guid/StatusCodeDataTypeDebug.h>
-#include <FrameworkPei.h>
 
 EFI_STATUS
 EFIAPI

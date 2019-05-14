@@ -35,9 +35,6 @@
   MdePkg/MdePkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
   MdeModulePkg/MdeModulePkg.dec
-  IntelFrameworkPkg/IntelFrameworkPkg.dec              # needed to support StatusCodes
-  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec  # needed to support StatusCodes
-
 
 [LibraryClasses]
   BaseLib
