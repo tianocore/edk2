@@ -3,7 +3,7 @@
 #
 # This driver installs Legacy Bios Protocol to support CSM module work in EFI system.
 #
-# Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -13,7 +13,7 @@
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = LegacyBiosDxe
   MODULE_UNI_FILE                = LegacyBiosDxe.uni
-  FILE_GUID                      = F122A15C-C10B-4d54-8F48-60F4F06DD1AD
+  FILE_GUID                      = 46482D14-7CA1-4977-9DDB-64D747E13DE6
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
 
@@ -50,9 +50,7 @@
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
-  IntelFrameworkPkg/IntelFrameworkPkg.dec
-  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
-
+  OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
   DevicePathLib
@@ -116,13 +114,13 @@
   gEdkiiIoMmuProtocolGuid                       ## CONSUMES
 
 [Pcd]
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLegacyBiosCacheLegacyRegion  ## CONSUMES
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdEbdaReservedMemorySize       ## CONSUMES
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdEndOpromShadowAddress        ## SOMETIMES_CONSUMES
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLowPmmMemorySize             ## CONSUMES
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdHighPmmMemorySize            ## CONSUMES
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdOpromReservedMemoryBase      ## CONSUMES
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdOpromReservedMemorySize      ## CONSUMES
+  gUefiOvmfPkgTokenSpaceGuid.PcdLegacyBiosCacheLegacyRegion  ## CONSUMES
+  gUefiOvmfPkgTokenSpaceGuid.PcdEbdaReservedMemorySize       ## CONSUMES
+  gUefiOvmfPkgTokenSpaceGuid.PcdEndOpromShadowAddress        ## SOMETIMES_CONSUMES
+  gUefiOvmfPkgTokenSpaceGuid.PcdLowPmmMemorySize             ## CONSUMES
+  gUefiOvmfPkgTokenSpaceGuid.PcdHighPmmMemorySize            ## CONSUMES
+  gUefiOvmfPkgTokenSpaceGuid.PcdOpromReservedMemoryBase      ## CONSUMES
+  gUefiOvmfPkgTokenSpaceGuid.PcdOpromReservedMemorySize      ## CONSUMES
 
 [Depex]
   gEfiLegacyRegion2ProtocolGuid AND gEfiLegacyInterruptProtocolGuid AND gEfiLegacyBiosPlatformProtocolGuid AND gEfiLegacy8259ProtocolGuid AND gEfiGenericMemTestProtocolGuid AND gEfiCpuArchProtocolGuid AND gEfiTimerArchProtocolGuid AND gEfiVariableWriteArchProtocolGuid
