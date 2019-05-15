@@ -1,7 +1,7 @@
 ## @file
 #  Legacy Boot Maintainence UI module is library for BDS phase.
 #
-#  Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2015 - 2019, Intel Corporation. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -10,7 +10,7 @@
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = LegacyBootMaintUiLib
   MODULE_UNI_FILE                = LegacyBootMaintUiLib.uni
-  FILE_GUID                      = e6f7f038-3ed9-401a-af1f-5ea7bf644d34
+  FILE_GUID                      = 259A90B1-C151-43E5-8A71-82B4E3201F4E
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = NULL|DXE_DRIVER UEFI_APPLICATION
@@ -32,8 +32,7 @@
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
-  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
-  IntelFrameworkPkg/IntelFrameworkPkg.dec
+  OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
   DevicePathLib
