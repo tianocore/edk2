@@ -20,6 +20,30 @@
 [Includes]
   Include
 
+[LibraryClasses]
+  ##  @libraryclass  IpIo layer upon EFI IP4 Protocol.
+  #   This library is only intended to be used by UEFI network stack modules.
+  IpIoLib|Include/Library/IpIoLib.h
+
+  ##  @libraryclass  Basic function for UEFI network stack.
+  #   This library is only intended to be used by UEFI network stack modules.
+  NetLib|Include/Library/NetLib.h
+
+  ##  @libraryclass  The helper routines to access UDP service.
+  #   This library is only intended to be used by UEFI network stack modules.
+  UdpIoLib|Include/Library/UdpIoLib.h
+
+  ##  @libraryclass  The helper routines to access TCP service.
+  #   This library is only intended to be used by UEFI network stack modules.
+  TcpIoLib|Include/Library/TcpIoLib.h
+
+  ##  @libraryclass  The helper routines to access HTTP service.
+  #   This library is only intended to be used by UEFI network stack modules.
+  HttpLib|Include/Library/HttpLib.h
+
+  ##  @libraryclass  Library for Deferred Procedure Calls.
+  DpcLib|Include/Library/DpcLib.h
+
 [Guids]
   ## Network package token space guid.
   # Include/Guid/NetworkPkgTokenSpace.h

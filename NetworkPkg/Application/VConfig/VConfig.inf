@@ -35,6 +35,7 @@
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
+  NetworkPkg/NetworkPkg.dec
   ShellPkg/ShellPkg.dec
 
 [LibraryClasses]
