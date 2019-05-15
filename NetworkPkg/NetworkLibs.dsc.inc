@@ -11,10 +11,10 @@
 #
 ##
 
-  DpcLib|MdeModulePkg/Library/DxeDpcLib/DxeDpcLib.inf
-  NetLib|MdeModulePkg/Library/DxeNetLib/DxeNetLib.inf
-  IpIoLib|MdeModulePkg/Library/DxeIpIoLib/DxeIpIoLib.inf
-  UdpIoLib|MdeModulePkg/Library/DxeUdpIoLib/DxeUdpIoLib.inf
-  TcpIoLib|MdeModulePkg/Library/DxeTcpIoLib/DxeTcpIoLib.inf
+  DpcLib|NetworkPkg/Library/DxeDpcLib/DxeDpcLib.inf
+  NetLib|NetworkPkg/Library/DxeNetLib/DxeNetLib.inf
+  IpIoLib|NetworkPkg/Library/DxeIpIoLib/DxeIpIoLib.inf
+  UdpIoLib|NetworkPkg/Library/DxeUdpIoLib/DxeUdpIoLib.inf
+  TcpIoLib|NetworkPkg/Library/DxeTcpIoLib/DxeTcpIoLib.inf
   # HttpLib is used for Http Boot
-  HttpLib|MdeModulePkg/Library/DxeHttpLib/DxeHttpLib.inf
+  HttpLib|NetworkPkg/Library/DxeHttpLib/DxeHttpLib.inf

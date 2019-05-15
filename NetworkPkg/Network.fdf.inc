@@ -11,24 +11,24 @@
 #
 
 !if $(NETWORK_ENABLE) == TRUE
-  INF  MdeModulePkg/Universal/Network/DpcDxe/DpcDxe.inf
+  INF  NetworkPkg/DpcDxe/DpcDxe.inf
 
   !if $(NETWORK_SNP_ENABLE) == TRUE
-    INF  MdeModulePkg/Universal/Network/SnpDxe/SnpDxe.inf
+    INF  NetworkPkg/SnpDxe/SnpDxe.inf
   !endif
 
   !if $(NETWORK_VLAN_ENABLE) == TRUE
-    INF  MdeModulePkg/Universal/Network/VlanConfigDxe/VlanConfigDxe.inf
+    INF  NetworkPkg/VlanConfigDxe/VlanConfigDxe.inf
   !endif
 
-  INF  MdeModulePkg/Universal/Network/MnpDxe/MnpDxe.inf
+  INF  NetworkPkg/MnpDxe/MnpDxe.inf
 
   !if $(NETWORK_IP4_ENABLE) == TRUE
-    INF  MdeModulePkg/Universal/Network/ArpDxe/ArpDxe.inf
-    INF  MdeModulePkg/Universal/Network/Dhcp4Dxe/Dhcp4Dxe.inf
-    INF  MdeModulePkg/Universal/Network/Ip4Dxe/Ip4Dxe.inf
-    INF  MdeModulePkg/Universal/Network/Udp4Dxe/Udp4Dxe.inf
-    INF  MdeModulePkg/Universal/Network/Mtftp4Dxe/Mtftp4Dxe.inf
+    INF  NetworkPkg/ArpDxe/ArpDxe.inf
+    INF  NetworkPkg/Dhcp4Dxe/Dhcp4Dxe.inf
+    INF  NetworkPkg/Ip4Dxe/Ip4Dxe.inf
+    INF  NetworkPkg/Udp4Dxe/Udp4Dxe.inf
+    INF  NetworkPkg/Mtftp4Dxe/Mtftp4Dxe.inf
   !endif
 
   !if $(NETWORK_IP6_ENABLE) == TRUE
