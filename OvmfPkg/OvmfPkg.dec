@@ -15,6 +15,7 @@
 
 [Includes]
   Include
+  Csm/Include
 
 [LibraryClasses]
   ##  @libraryclass  Loads and boots a Linux kernel image
