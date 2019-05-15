@@ -4,7 +4,7 @@
 # This driver by using Legacy Bios protocol service to support csm Video
 # and produce Graphics Output Protocol.
 #
-# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2019, Intel Corporation. All rights reserved.<BR>
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -14,7 +14,7 @@
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = BiosVideoDxe
   MODULE_UNI_FILE                = BiosVideoDxe.uni
-  FILE_GUID                      = 0B04B2ED-861C-42cd-A22F-C3AAFACCB896
+  FILE_GUID                      = 8669E6C9-842B-4B49-BCC3-32C96D244750
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
 
@@ -38,9 +38,7 @@
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
-  IntelFrameworkPkg/IntelFrameworkPkg.dec
-  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
-
+  OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
   MemoryAllocationLib
@@ -70,9 +68,9 @@
   gEfiEdidOverrideProtocolGuid                  ## SOMETIMES_CONSUMES
 
 [Pcd]
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdBiosVideoSetTextVgaModeEnable  ## CONSUMES
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdBiosVideoCheckVbeEnable        ## CONSUMES
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdBiosVideoCheckVgaEnable        ## SOMETIMES_CONSUMES
+  gUefiOvmfPkgTokenSpaceGuid.PcdBiosVideoSetTextVgaModeEnable                 ## CONSUMES
+  gUefiOvmfPkgTokenSpaceGuid.PcdBiosVideoCheckVbeEnable                       ## CONSUMES
+  gUefiOvmfPkgTokenSpaceGuid.PcdBiosVideoCheckVgaEnable                       ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution                 ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution                   ## SOMETIMES_CONSUMES
 
