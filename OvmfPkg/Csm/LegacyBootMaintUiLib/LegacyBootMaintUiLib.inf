@@ -1,0 +1,63 @@
+## @file
+#  Legacy Boot Maintainence UI module is library for BDS phase.
+#
+#  Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = LegacyBootMaintUiLib
+  MODULE_UNI_FILE                = LegacyBootMaintUiLib.uni
+  FILE_GUID                      = e6f7f038-3ed9-401a-af1f-5ea7bf644d34
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL|DXE_DRIVER UEFI_APPLICATION
+  CONSTRUCTOR                    = LegacyBootMaintUiLibConstructor
+  DESTRUCTOR                     = LegacyBootMaintUiLibDestructor
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  LegacyBootMaintUiVfr.h
+  LegacyBootMaintUi.h
+  LegacyBootMaintUiVfr.Vfr
+  LegacyBootMaintUiStrings.uni
+  LegacyBootMaintUi.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
+
+[LibraryClasses]
+  DevicePathLib
+  BaseLib
+  UefiRuntimeServicesTableLib
+  UefiBootServicesTableLib
+  DebugLib
+  HiiLib
+  MemoryAllocationLib
+  UefiBootManagerLib
+  UefiLib
+  PrintLib
+  BaseMemoryLib
+
+[Guids]
+  gEfiIfrTianoGuid                  ## SOMETIMES_PRODUCES ## UNDEFINED # Extended IFR Guid Opcode
+  gEfiIfrBootMaintenanceGuid        ## CONSUMES ## HII # BootMaint HII Package
+  gEfiLegacyDevOrderVariableGuid    ## PRODUCES ## Variable:L"LegacyDevOrder"
+
+[Protocols]
+  gEfiHiiConfigAccessProtocolGuid             ## PRODUCES
+  gEfiLegacyBiosProtocolGuid                  ## CONSUMES
+  gEfiHiiConfigRoutingProtocolGuid            ## CONSUMES
+
+[Depex]
+  gEfiHiiDatabaseProtocolGuid
+

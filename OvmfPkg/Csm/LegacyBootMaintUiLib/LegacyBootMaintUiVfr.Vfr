@@ -1,0 +1,67 @@
+///** @file
+//  
+//    Browser formset.
+//  
+//  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+//  SPDX-License-Identifier: BSD-2-Clause-Patent
+//  
+//**/
+
+#include "LegacyBootMaintUiVfr.h"
+
+
+formset
+  guid      = LEGACY_BOOT_OPTION_FORMSET_GUID,
+  title     = STRING_TOKEN(STR_LEGACY_BOOT_PROMPT),
+  help      = STRING_TOKEN(STR_LEGACY_BOOT_HELP),
+  classguid = EFI_IFR_BOOT_MAINTENANCE_GUID,
+  
+  varstore LEGACY_BOOT_NV_DATA,
+    varid = VARSTORE_ID_LEGACY_BOOT,
+    name = LegacyBootData,
+    guid = LEGACY_BOOT_OPTION_FORMSET_GUID;
+    
+  form formid = LEGACY_BOOT_FORM_ID,
+       title  = STRING_TOKEN(STR_LEGACY_BOOT_PROMPT);
+       
+    goto LEGACY_ORDER_CHANGE_FORM_ID,
+         prompt = STRING_TOKEN(STR_FORM_FLOPPY_BOOT_TITLE),
+         help = STRING_TOKEN(STR_FORM_FLOPPY_BOOT_HELP),
+         flags = INTERACTIVE,
+         key = FORM_FLOPPY_BOOT_ID;
+
+    goto LEGACY_ORDER_CHANGE_FORM_ID,
+         prompt = STRING_TOKEN(STR_FORM_HARDDISK_BOOT_TITLE),
+         help = STRING_TOKEN(STR_FORM_HARDDISK_BOOT_HELP),
+         flags = INTERACTIVE,
+         key = FORM_HARDDISK_BOOT_ID;
+
+    goto LEGACY_ORDER_CHANGE_FORM_ID,
+         prompt = STRING_TOKEN(STR_FORM_CDROM_BOOT_TITLE),
+         help = STRING_TOKEN(STR_FORM_CDROM_BOOT_HELP),
+         flags = INTERACTIVE,
+         key = FORM_CDROM_BOOT_ID;
+
+    goto LEGACY_ORDER_CHANGE_FORM_ID,
+         prompt = STRING_TOKEN(STR_FORM_NET_BOOT_TITLE),
+         help = STRING_TOKEN(STR_FORM_NET_BOOT_HELP),
+         flags = INTERACTIVE,
+         key = FORM_NET_BOOT_ID;
+
+    goto LEGACY_ORDER_CHANGE_FORM_ID,
+         prompt = STRING_TOKEN(STR_FORM_BEV_BOOT_TITLE),
+         help = STRING_TOKEN(STR_FORM_BEV_BOOT_HELP),
+         flags = INTERACTIVE,
+         key = FORM_BEV_BOOT_ID;
+         
+  endform;
+
+  form formid = LEGACY_ORDER_CHANGE_FORM_ID,
+       title  = STRING_TOKEN(STR_ORDER_CHANGE_PROMPT);
+       
+       label FORM_BOOT_LEGACY_DEVICE_ID;
+       label FORM_BOOT_LEGACY_LABEL_END;
+         
+  endform;
+
+endformset;
