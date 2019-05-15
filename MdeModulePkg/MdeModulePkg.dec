@@ -25,26 +25,6 @@
 
 
 [LibraryClasses]
-  ##  @libraryclass  IpIo layer upon EFI IP4 Protocol.
-  #   This library is only intended to be used by UEFI network stack modules.
-  IpIoLib|Include/Library/IpIoLib.h
-
-  ##  @libraryclass  Basic function for UEFI network stack.
-  #   This library is only intended to be used by UEFI network stack modules.
-  NetLib|Include/Library/NetLib.h
-
-  ##  @libraryclass  The helper routines to access UDP service.
-  #   This library is only intended to be used by UEFI network stack modules.
-  UdpIoLib|Include/Library/UdpIoLib.h
-
-  ##  @libraryclass  The helper routines to access TCP service.
-  #   This library is only intended to be used by UEFI network stack modules.
-  TcpIoLib|Include/Library/TcpIoLib.h
-
-  ##  @libraryclass  The helper routines to access HTTP service.
-  #   This library is only intended to be used by UEFI network stack modules.
-  HttpLib|Include/Library/HttpLib.h
-
   ##  @libraryclass  Defines a set of methods to reset whole system.
   ResetSystemLib|Include/Library/ResetSystemLib.h
 
@@ -66,9 +46,6 @@
 
   ##  @libraryclass  Defines a set of interfaces on how to process capusle image update.
   CapsuleLib|Include/Library/CapsuleLib.h
-
-  ##  @libraryclass  Library for Deferred Procedure Calls.
-  DpcLib|Include/Library/DpcLib.h
 
   ##  @libraryclass    Provides global variables that are pointers
   #   to the UEFI HII related protocols.
