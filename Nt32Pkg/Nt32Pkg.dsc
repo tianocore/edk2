@@ -43,34 +43,15 @@
   #       located in CryptoPkg\Library\OpensslLib to enable the OpenSSL building first.
   #
   DEFINE SECURE_BOOT_ENABLE      = FALSE
-  
-  #
-  # This flag is to enable or disable TLS feature.  
-  # These can be changed on the command line.
-  # -D FLAG=VALUE
-  #
-  # Note: TLS feature highly depends on the OpenSSL building. To enable this 
-  #       feature, please follow the instructions found in the file "Patch-HOWTO.txt" 
-  #       located in CryptoPkg\Library\OpensslLib to enable the OpenSSL building first.
-  #
-  DEFINE TLS_ENABLE = FALSE
-  
-  #
-  # Indicates whether HTTP connections (i.e., unsecured) are permitted or not.
-  # -D FLAG=VALUE
-  #
-  # Note: If ALLOW_HTTP_CONNECTIONS is TRUE, HTTP connections are allowed. Both 
-  #       the "https://" and "http://" URI schemes are permitted. Otherwise, HTTP 
-  #       connections are denied. Only the "https://" URI scheme is permitted.
-  #
-  DEFINE ALLOW_HTTP_CONNECTIONS = TRUE
 
   #
-  # This flag is to enable or disable IPv6 network stack.
-  # These can be changed on the command line.
-  # -D FLAG=VALUE
+  # Network definition
+  # SnpNt32Dxe.inf will be used.
   #
-  DEFINE NETWORK_IP6_ENABLE = FALSE
+  DEFINE NETWORK_TLS_ENABLE             = FALSE
+  DEFINE NETWORK_IP6_ENABLE             = FALSE
+  DEFINE NETWORK_SNP_ENABLE             = FALSE
+  DEFINE NETWORK_ALLOW_HTTP_CONNECTIONS = TRUE
 
 ################################################################################
 #
@@ -133,12 +114,6 @@
   #
   UefiUsbLib|MdePkg/Library/UefiUsbLib/UefiUsbLib.inf
   UefiScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
-  NetLib|MdeModulePkg/Library/DxeNetLib/DxeNetLib.inf
-  IpIoLib|MdeModulePkg/Library/DxeIpIoLib/DxeIpIoLib.inf
-  UdpIoLib|MdeModulePkg/Library/DxeUdpIoLib/DxeUdpIoLib.inf
-  TcpIoLib|MdeModulePkg/Library/DxeTcpIoLib/DxeTcpIoLib.inf
-  HttpLib|MdeModulePkg/Library/DxeHttpLib/DxeHttpLib.inf
-  DpcLib|MdeModulePkg/Library/DxeDpcLib/DxeDpcLib.inf
   OemHookStatusCodeLib|MdeModulePkg/Library/OemHookStatusCodeLibNull/OemHookStatusCodeLibNull.inf
   GenericBdsLib|IntelFrameworkModulePkg/Library/GenericBdsLib/GenericBdsLib.inf
   CustomizedDisplayLib|MdeModulePkg/Library/CustomizedDisplayLib/CustomizedDisplayLib.inf
@@ -162,7 +137,7 @@
   LockBoxLib|MdeModulePkg/Library/LockBoxNullLib/LockBoxNullLib.inf
   IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
   ResetSystemLib|Nt32Pkg/Library/ResetSystemLib/ResetSystemLib.inf
-!if $(TLS_ENABLE) == TRUE
+!if $(NETWORK_TLS_ENABLE) == TRUE
   OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
 !else
   OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibCrypto.inf
@@ -269,11 +244,6 @@
   gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0x0f
   gEfiMdeModulePkgTokenSpaceGuid.PcdResetOnMemoryTypeInformationChange|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize|0x2000
-
-!if $(ALLOW_HTTP_CONNECTIONS) == TRUE
-  gEfiNetworkPkgTokenSpaceGuid.PcdAllowHttpConnections|TRUE
-!endif
-
 
 !if $(SECURE_BOOT_ENABLE) == TRUE
   # override the default values from SecurityPkg to ensure images from all sources are verified in secure boot
@@ -448,39 +418,11 @@
   MdeModulePkg/Application/HelloWorld/HelloWorld.inf
 
   #
-  # Network stack drivers
+  # Network SNP drivers
   # To test network drivers, need network Io driver(SnpNt32Io.dll), please refer to NETWORK-IO Subproject.
   #
-  MdeModulePkg/Universal/Network/DpcDxe/DpcDxe.inf
-  MdeModulePkg/Universal/Network/ArpDxe/ArpDxe.inf
-  MdeModulePkg/Universal/Network/Dhcp4Dxe/Dhcp4Dxe.inf
-  MdeModulePkg/Universal/Network/Ip4Dxe/Ip4Dxe.inf
-  MdeModulePkg/Universal/Network/MnpDxe/MnpDxe.inf
-  MdeModulePkg/Universal/Network/VlanConfigDxe/VlanConfigDxe.inf
-  MdeModulePkg/Universal/Network/Mtftp4Dxe/Mtftp4Dxe.inf
-  MdeModulePkg/Universal/Network/Udp4Dxe/Udp4Dxe.inf
-  NetworkPkg/UefiPxeBcDxe/UefiPxeBcDxe.inf
-  NetworkPkg/TcpDxe/TcpDxe.inf
-  NetworkPkg/IScsiDxe/IScsiDxe.inf
+!include NetworkPkg/Network.dsc.inc
   Nt32Pkg/SnpNt32Dxe/SnpNt32Dxe.inf
-
-!if $(NETWORK_IP6_ENABLE) == TRUE
-  NetworkPkg/Ip6Dxe/Ip6Dxe.inf
-  NetworkPkg/Dhcp6Dxe/Dhcp6Dxe.inf
-  NetworkPkg/Udp6Dxe/Udp6Dxe.inf
-  NetworkPkg/Mtftp6Dxe/Mtftp6Dxe.inf
-!endif
-
-  NetworkPkg/HttpBootDxe/HttpBootDxe.inf
-  NetworkPkg/DnsDxe/DnsDxe.inf
-  NetworkPkg/HttpDxe/HttpDxe.inf
-  NetworkPkg/HttpUtilitiesDxe/HttpUtilitiesDxe.inf
-   
-!if $(TLS_ENABLE) == TRUE
-  NetworkPkg/TlsDxe/TlsDxe.inf
-  NetworkPkg/TlsAuthConfigDxe/TlsAuthConfigDxe.inf
-!endif
-
   MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
   MdeModulePkg/Application/UiApp/UiApp.inf{
     <LibraryClasses>

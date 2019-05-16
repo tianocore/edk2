@@ -243,32 +243,9 @@ INF  Nt32Pkg/WinNtSimpleFileSystemDxe/WinNtSimpleFileSystemDxe.inf
 INF  MdeModulePkg/Universal/PlatformDriOverrideDxe/PlatformDriOverrideDxe.inf
 INF  MdeModulePkg/Universal/DriverSampleDxe/DriverSampleDxe.inf
 
-INF  MdeModulePkg/Universal/Network/DpcDxe/DpcDxe.inf
-INF  MdeModulePkg/Universal/Network/ArpDxe/ArpDxe.inf
-INF  MdeModulePkg/Universal/Network/Dhcp4Dxe/Dhcp4Dxe.inf
-INF  MdeModulePkg/Universal/Network/Ip4Dxe/Ip4Dxe.inf
-INF  MdeModulePkg/Universal/Network/MnpDxe/MnpDxe.inf
-INF  MdeModulePkg/Universal/Network/VlanConfigDxe/VlanConfigDxe.inf
-INF  MdeModulePkg/Universal/Network/Mtftp4Dxe/Mtftp4Dxe.inf
-INF  MdeModulePkg/Universal/Network/Udp4Dxe/Udp4Dxe.inf
-INF  NetworkPkg/UefiPxeBcDxe/UefiPxeBcDxe.inf
-INF  NetworkPkg/TcpDxe/TcpDxe.inf
-INF  NetworkPkg/IScsiDxe/IScsiDxe.inf
 INF  Nt32Pkg/SnpNt32Dxe/SnpNt32Dxe.inf
-!if $(NETWORK_IP6_ENABLE) == TRUE
-INF  NetworkPkg/Ip6Dxe/Ip6Dxe.inf
-INF  NetworkPkg/Dhcp6Dxe/Dhcp6Dxe.inf
-INF  NetworkPkg/Udp6Dxe/Udp6Dxe.inf
-INF  NetworkPkg/Mtftp6Dxe/Mtftp6Dxe.inf
-!endif
-INF  NetworkPkg/HttpBootDxe/HttpBootDxe.inf
-INF  NetworkPkg/DnsDxe/DnsDxe.inf
-INF  NetworkPkg/HttpDxe/HttpDxe.inf
-INF  NetworkPkg/HttpUtilitiesDxe/HttpUtilitiesDxe.inf
-!if $(TLS_ENABLE) == TRUE
-INF  NetworkPkg/TlsDxe/TlsDxe.inf
-INF  NetworkPkg/TlsAuthConfigDxe/TlsAuthConfigDxe.inf
-!endif
+!include NetworkPkg/Network.fdf.inc
+
 INF  MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp.inf
 ################################################################################
 #
