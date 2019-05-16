@@ -70,14 +70,8 @@
   BaseMemoryLib|MdePkg/Library/BaseMemoryLibOptDxe/BaseMemoryLibOptDxe.inf
 
   # Networking Requirements
-  NetLib|MdeModulePkg/Library/DxeNetLib/DxeNetLib.inf
-  DpcLib|MdeModulePkg/Library/DxeDpcLib/DxeDpcLib.inf
-  UdpIoLib|MdeModulePkg/Library/DxeUdpIoLib/DxeUdpIoLib.inf
-  IpIoLib|MdeModulePkg/Library/DxeIpIoLib/DxeIpIoLib.inf
-  TcpIoLib|MdeModulePkg/Library/DxeTcpIoLib/DxeTcpIoLib.inf
-!if $(HTTP_BOOT_ENABLE) == TRUE
-  HttpLib|MdeModulePkg/Library/DxeHttpLib/DxeHttpLib.inf
-!endif
+!include NetworkPkg/NetworkLibs.dsc.inc
+
 
   #
   # It is not possible to prevent the ARM compiler from inserting calls to intrinsic functions.

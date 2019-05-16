@@ -29,8 +29,25 @@
   #
   DEFINE TTY_TERMINAL            = FALSE
   DEFINE SECURE_BOOT_ENABLE      = FALSE
-  DEFINE NETWORK_IP6_ENABLE      = FALSE
-  DEFINE HTTP_BOOT_ENABLE        = FALSE
+
+  #
+  # Network definition
+  #
+  DEFINE NETWORK_IP6_ENABLE              = FALSE
+  DEFINE NETWORK_HTTP_BOOT_ENABLE        = FALSE
+  DEFINE NETWORK_SNP_ENABLE              = FALSE
+  DEFINE NETWORK_TLS_ENABLE              = FALSE
+  DEFINE NETWORK_ALLOW_HTTP_CONNECTIONS  = TRUE
+
+!if $(NETWORK_SNP_ENABLE) == TRUE
+  !error "NETWORK_SNP_ENABLE is IA32/X64/EBC only"
+!endif
+
+!if $(NETWORK_TLS_ENABLE) == TRUE
+  !error "NETWORK_TLS_ENABLE is tracked at <https://bugzilla.tianocore.org/show_bug.cgi?id=1009>"
+!endif
+
+!include NetworkPkg/NetworkDefines.dsc.inc
 
 !include ArmVirtPkg/ArmVirt.dsc.inc
 
@@ -122,9 +139,10 @@
   #
   gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|0
 
-!if $(HTTP_BOOT_ENABLE) == TRUE
-  gEfiNetworkPkgTokenSpaceGuid.PcdAllowHttpConnections|TRUE
-!endif
+  #
+  # Network Pcds
+  #
+!include NetworkPkg/NetworkPcds.dsc.inc
 
   # System Memory Base -- fixed at 0x4000_0000
   gArmTokenSpaceGuid.PcdSystemMemoryBase|0x40000000
@@ -353,29 +371,7 @@
   #
   # Networking stack
   #
-  MdeModulePkg/Universal/Network/DpcDxe/DpcDxe.inf
-  MdeModulePkg/Universal/Network/ArpDxe/ArpDxe.inf
-  MdeModulePkg/Universal/Network/Dhcp4Dxe/Dhcp4Dxe.inf
-  MdeModulePkg/Universal/Network/Ip4Dxe/Ip4Dxe.inf
-  MdeModulePkg/Universal/Network/MnpDxe/MnpDxe.inf
-  MdeModulePkg/Universal/Network/VlanConfigDxe/VlanConfigDxe.inf
-  MdeModulePkg/Universal/Network/Mtftp4Dxe/Mtftp4Dxe.inf
-  MdeModulePkg/Universal/Network/Udp4Dxe/Udp4Dxe.inf
-  NetworkPkg/TcpDxe/TcpDxe.inf
-  NetworkPkg/UefiPxeBcDxe/UefiPxeBcDxe.inf
-  NetworkPkg/IScsiDxe/IScsiDxe.inf
-!if $(NETWORK_IP6_ENABLE) == TRUE
-  NetworkPkg/Ip6Dxe/Ip6Dxe.inf
-  NetworkPkg/Udp6Dxe/Udp6Dxe.inf
-  NetworkPkg/Dhcp6Dxe/Dhcp6Dxe.inf
-  NetworkPkg/Mtftp6Dxe/Mtftp6Dxe.inf
-!endif
-!if $(HTTP_BOOT_ENABLE) == TRUE
-  NetworkPkg/DnsDxe/DnsDxe.inf
-  NetworkPkg/HttpUtilitiesDxe/HttpUtilitiesDxe.inf
-  NetworkPkg/HttpDxe/HttpDxe.inf
-  NetworkPkg/HttpBootDxe/HttpBootDxe.inf
-!endif
+!include NetworkPkg/NetworkComponents.dsc.inc
 
   #
   # SCSI Bus and Disk Driver
