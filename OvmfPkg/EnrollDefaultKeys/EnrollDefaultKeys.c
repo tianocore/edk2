@@ -538,6 +538,13 @@ ShellAppMain (
   SETTINGS   Settings;
   UINT8      *PkKek1;
   UINTN      SizeOfPkKek1;
+  BOOLEAN    NoDefault;
+
+  if (Argc == 2 && StrCmp (Argv[1], L"--no-default") == 0) {
+    NoDefault = TRUE;
+  } else {
+    NoDefault = FALSE;
+  }
 
   //
   // Prepare for failure.
@@ -594,13 +601,22 @@ ShellAppMain (
   //
   // Enroll db.
   //
-  Status = EnrollListOfCerts (
-             EFI_IMAGE_SECURITY_DATABASE,
-             &gEfiImageSecurityDatabaseGuid,
-             &gEfiCertX509Guid,
-             mMicrosoftPca,    mSizeOfMicrosoftPca,    &gMicrosoftVendorGuid,
-             mMicrosoftUefiCa, mSizeOfMicrosoftUefiCa, &gMicrosoftVendorGuid,
-             NULL);
+  if (NoDefault) {
+    Status = EnrollListOfCerts (
+               EFI_IMAGE_SECURITY_DATABASE,
+               &gEfiImageSecurityDatabaseGuid,
+               &gEfiCertX509Guid,
+               PkKek1, SizeOfPkKek1, &gEfiCallerIdGuid,
+               NULL);
+  } else {
+    Status = EnrollListOfCerts (
+               EFI_IMAGE_SECURITY_DATABASE,
+               &gEfiImageSecurityDatabaseGuid,
+               &gEfiCertX509Guid,
+               mMicrosoftPca,    mSizeOfMicrosoftPca,    &gMicrosoftVendorGuid,
+               mMicrosoftUefiCa, mSizeOfMicrosoftUefiCa, &gMicrosoftVendorGuid,
+               NULL);
+  }
   if (EFI_ERROR (Status)) {
     goto FreePkKek1;
   }
@@ -621,13 +637,22 @@ ShellAppMain (
   //
   // Enroll KEK.
   //
-  Status = EnrollListOfCerts (
-             EFI_KEY_EXCHANGE_KEY_NAME,
-             &gEfiGlobalVariableGuid,
-             &gEfiCertX509Guid,
-             PkKek1,        SizeOfPkKek1,        &gEfiCallerIdGuid,
-             mMicrosoftKek, mSizeOfMicrosoftKek, &gMicrosoftVendorGuid,
-             NULL);
+  if (NoDefault) {
+    Status = EnrollListOfCerts (
+               EFI_KEY_EXCHANGE_KEY_NAME,
+               &gEfiGlobalVariableGuid,
+               &gEfiCertX509Guid,
+               PkKek1, SizeOfPkKek1, &gEfiCallerIdGuid,
+               NULL);
+  } else {
+    Status = EnrollListOfCerts (
+               EFI_KEY_EXCHANGE_KEY_NAME,
+               &gEfiGlobalVariableGuid,
+               &gEfiCertX509Guid,
+               PkKek1,        SizeOfPkKek1,        &gEfiCallerIdGuid,
+               mMicrosoftKek, mSizeOfMicrosoftKek, &gMicrosoftVendorGuid,
+               NULL);
+  }
   if (EFI_ERROR (Status)) {
     goto FreePkKek1;
   }
