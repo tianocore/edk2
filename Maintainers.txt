@@ -1,4 +1,4 @@
-EDK II Maintainers
+﻿EDK II Maintainers
 ==================
 
 This file provides information about the primary maintainers for
@@ -184,11 +184,6 @@ NetworkPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/NetworkPkg
 M: Siyuan Fu <siyuan.fu@intel.com>
 M: Jiaxin Wu <jiaxin.wu@intel.com>
-
-Nt32Pkg
-W: https://github.com/tianocore/tianocore.github.io/wiki/Nt32Pkg
-M: Ray Ni <ray.ni@intel.com>
-M: Hao A Wu <hao.a.wu@intel.com>
 
 OvmfPkg
 W: http://www.tianocore.org/ovmf/
