@@ -755,11 +755,4 @@ DecompressFirstFv (
   VOID
   );
 
-VOID
-EFIAPI
-AddDxeCoreReportStatusCodeCallback (
-  VOID
-  );
-
-
 #endif
