@@ -214,6 +214,7 @@ ShellPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/ShellPkg
 M: Jaben Carsey <jaben.carsey@intel.com>
 M: Ray Ni <ray.ni@intel.com>
+R: Zhichao Gao <zhichao.gao@intel.com>
 
 Maintainers for stable Shell binaries generation
 when need to publish Shell binaries with edk2 release:
