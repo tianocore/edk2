@@ -80,11 +80,9 @@ ValidateCacheAttributes (
   IN VOID*  Context
   )
 {
-#if defined(MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
   // Reference: Advanced Configuration and Power Interface (ACPI) Specification
   //            Version 6.2 Errata A, September 2017
   // Table 5-153: Cache Type Structure
-
   UINT8 Attributes;
   Attributes = *(UINT8*)Ptr;
 
@@ -96,7 +94,6 @@ ValidateCacheAttributes (
       );
     return;
   }
-#endif
 }
 
 /**
