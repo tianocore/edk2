@@ -1,4 +1,4 @@
-﻿EDK II Maintainers
+EDK II Maintainers
 ==================
 
 This file provides information about the primary maintainers for
