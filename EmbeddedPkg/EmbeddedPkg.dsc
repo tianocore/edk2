@@ -96,7 +96,7 @@
   SortLib|MdeModulePkg/Library/UefiSortLib/UefiSortLib.inf
 
   # Networking Requirements
-  NetLib|MdeModulePkg/Library/DxeNetLib/DxeNetLib.inf
+  !include NetworkPkg/NetworkLibs.dsc.inc
   HiiLib|MdeModulePkg/Library/UefiHiiLib/UefiHiiLib.inf
   UefiHiiServicesLib|MdeModulePkg/Library/UefiHiiServicesLib/UefiHiiServicesLib.inf
 
