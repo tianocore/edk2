@@ -47,7 +47,7 @@ CpuCommonFeaturesLibConstructor (
   if (IsCpuFeatureSupported (CPU_FEATURE_ACPI)) {
     Status = RegisterCpuFeature (
                "ACPI",
-               NULL,
+               ClockModulationGetConfigData,
                ClockModulationSupport,
                ClockModulationInitialize,
                CPU_FEATURE_ACPI,

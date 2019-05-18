@@ -1,12 +1,39 @@
 /** @file
   Clock Modulation feature.
 
-  Copyright (c) 2017 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2017 - 2019, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include "CpuCommonFeatures.h"
+
+typedef struct  {
+  CPUID_THERMAL_POWER_MANAGEMENT_EAX  ThermalPowerManagementEax;
+  MSR_IA32_CLOCK_MODULATION_REGISTER  ClockModulation;
+} CLOCK_MODULATION_CONFIG_DATA;
+
+/**
+  Prepares for the data used by CPU feature detection and initialization.
+
+  @param[in]  NumberOfProcessors  The number of CPUs in the platform.
+
+  @return  Pointer to a buffer of CPU related configuration data.
+
+  @note This service could be called by BSP only.
+**/
+VOID *
+EFIAPI
+ClockModulationGetConfigData (
+  IN UINTN  NumberOfProcessors
+  )
+{
+  UINT32    *ConfigData;
+
+  ConfigData = AllocateZeroPool (sizeof (CLOCK_MODULATION_CONFIG_DATA) * NumberOfProcessors);
+  ASSERT (ConfigData != NULL);
+  return ConfigData;
+}
 
 /**
   Detects if Clock Modulation feature supported on current processor.
@@ -32,7 +59,22 @@ ClockModulationSupport (
   IN VOID                              *ConfigData  OPTIONAL
   )
 {
-  return (CpuInfo->CpuIdVersionInfoEdx.Bits.ACPI == 1);
+  CLOCK_MODULATION_CONFIG_DATA         *CmConfigData;
+
+  if (CpuInfo->CpuIdVersionInfoEdx.Bits.ACPI == 1) {
+    CmConfigData = (CLOCK_MODULATION_CONFIG_DATA *) ConfigData;
+    ASSERT (CmConfigData != NULL);
+    AsmCpuid (
+      CPUID_THERMAL_POWER_MANAGEMENT,
+      &CmConfigData[ProcessorNumber].ThermalPowerManagementEax.Uint32,
+      NULL,
+      NULL,
+      NULL
+      );
+    CmConfigData[ProcessorNumber].ClockModulation.Uint64 = AsmReadMsr64 (MSR_IA32_CLOCK_MODULATION);
+    return TRUE;
+  }
+  return FALSE;
 }
 
 /**
@@ -61,34 +103,29 @@ ClockModulationInitialize (
   IN BOOLEAN                           State
   )
 {
-  CPUID_THERMAL_POWER_MANAGEMENT_EAX   ThermalPowerManagementEax;
-  AsmCpuid (CPUID_THERMAL_POWER_MANAGEMENT, &ThermalPowerManagementEax.Uint32, NULL, NULL, NULL);
+  CLOCK_MODULATION_CONFIG_DATA         *CmConfigData;
+  MSR_IA32_CLOCK_MODULATION_REGISTER   *ClockModulation;
 
-  CPU_REGISTER_TABLE_WRITE_FIELD (
-    ProcessorNumber,
-    Msr,
-    MSR_IA32_CLOCK_MODULATION,
-    MSR_IA32_CLOCK_MODULATION_REGISTER,
-    Bits.OnDemandClockModulationDutyCycle,
-    PcdGet8 (PcdCpuClockModulationDutyCycle) >> 1
-    );
-  if (ThermalPowerManagementEax.Bits.ECMD == 1) {
-    CPU_REGISTER_TABLE_WRITE_FIELD (
-      ProcessorNumber,
-      Msr,
-      MSR_IA32_CLOCK_MODULATION,
-      MSR_IA32_CLOCK_MODULATION_REGISTER,
-      Bits.ExtendedOnDemandClockModulationDutyCycle,
-      PcdGet8 (PcdCpuClockModulationDutyCycle) & BIT0
-      );
+  CmConfigData = (CLOCK_MODULATION_CONFIG_DATA *) ConfigData;
+  ASSERT (CmConfigData != NULL);
+  ClockModulation = &CmConfigData[ProcessorNumber].ClockModulation;
+
+  if (State) {
+    ClockModulation->Bits.OnDemandClockModulationEnable = 1;
+    ClockModulation->Bits.OnDemandClockModulationDutyCycle = PcdGet8 (PcdCpuClockModulationDutyCycle) >> 1;
+    if (CmConfigData[ProcessorNumber].ThermalPowerManagementEax.Bits.ECMD == 1) {
+      ClockModulation->Bits.ExtendedOnDemandClockModulationDutyCycle = PcdGet8 (PcdCpuClockModulationDutyCycle) & BIT0;
+    }
+  } else {
+    ClockModulation->Bits.OnDemandClockModulationEnable = 0;
   }
-  CPU_REGISTER_TABLE_WRITE_FIELD (
+
+  CPU_REGISTER_TABLE_WRITE64 (
     ProcessorNumber,
     Msr,
     MSR_IA32_CLOCK_MODULATION,
-    MSR_IA32_CLOCK_MODULATION_REGISTER,
-    Bits.OnDemandClockModulationEnable,
-    (State) ? 1 : 0
+    ClockModulation->Uint64
     );
+
   return RETURN_SUCCESS;
 }
