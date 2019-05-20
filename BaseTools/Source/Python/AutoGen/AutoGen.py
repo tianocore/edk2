@@ -3935,6 +3935,7 @@ class ModuleAutoGen(AutoGen):
             f = open(HashFile, 'r')
             CacheHash = f.read()
             f.close()
+            self.GenModuleHash()
             if GlobalData.gModuleHash[self.Arch][self.Name]:
                 if CacheHash == GlobalData.gModuleHash[self.Arch][self.Name]:
                     for root, dir, files in os.walk(FileDir):
@@ -4093,13 +4094,20 @@ class ModuleAutoGen(AutoGen):
         return RetVal
 
     def GenModuleHash(self):
+        # Initialize a dictionary for each arch type
         if self.Arch not in GlobalData.gModuleHash:
             GlobalData.gModuleHash[self.Arch] = {}
-        if self.Name in GlobalData.gModuleHash[self.Arch] and GlobalData.gBinCacheSource and self.AttemptModuleCacheCopy():
-            return False
+
+        # Early exit if module or library has been hashed and is in memory
+        if self.Name in GlobalData.gModuleHash[self.Arch]:
+            return GlobalData.gModuleHash[self.Arch][self.Name].encode('utf-8')
+
+        # Initialze hash object
         m = hashlib.md5()
+
         # Add Platform level hash
         m.update(GlobalData.gPlatformHash.encode('utf-8'))
+
         # Add Package level hash
         if self.DependentPackageList:
             for Pkg in sorted(self.DependentPackageList, key=lambda x: x.PackageName):
@@ -4118,6 +4126,7 @@ class ModuleAutoGen(AutoGen):
         Content = f.read()
         f.close()
         m.update(Content)
+
         # Add Module's source files
         if self.SourceFileList:
             for File in sorted(self.SourceFileList, key=lambda x: str(x)):
@@ -4126,27 +4135,45 @@ class ModuleAutoGen(AutoGen):
                 f.close()
                 m.update(Content)
 
-        ModuleHashFile = path.join(self.BuildDir, self.Name + ".hash")
-        if self.Name not in GlobalData.gModuleHash[self.Arch]:
-            GlobalData.gModuleHash[self.Arch][self.Name] = m.hexdigest()
-        if GlobalData.gBinCacheSource and self.AttemptModuleCacheCopy():
-            return False
-        return SaveFileOnChange(ModuleHashFile, m.hexdigest(), False)
+        GlobalData.gModuleHash[self.Arch][self.Name] = m.hexdigest()
+
+        return GlobalData.gModuleHash[self.Arch][self.Name].encode('utf-8')
 
     ## Decide whether we can skip the ModuleAutoGen process
     def CanSkipbyHash(self):
+        # Hashing feature is off
+        if not GlobalData.gUseHashCache:
+            return False
+
+        # Initialize a dictionary for each arch type
+        if self.Arch not in GlobalData.gBuildHashSkipTracking:
+            GlobalData.gBuildHashSkipTracking[self.Arch] = dict()
+
         # If library or Module is binary do not skip by hash
         if self.IsBinaryModule:
             return False
+
         # .inc is contains binary information so do not skip by hash as well
         for f_ext in self.SourceFileList:
             if '.inc' in str(f_ext):
                 return False
-        if GlobalData.gUseHashCache:
-            # If there is a valid hash or function generated a valid hash; function will return False
-            # and the statement below will return True
-            return not self.GenModuleHash()
-        return False
+
+        # Use Cache, if exists and if Module has a copy in cache
+        if GlobalData.gBinCacheSource and self.AttemptModuleCacheCopy():
+            return True
+
+        # Early exit for libraries that haven't yet finished building
+        HashFile = path.join(self.BuildDir, self.Name + ".hash")
+        if self.IsLibrary and not os.path.exists(HashFile):
+            return False
+
+        # Return a Boolean based on if can skip by hash, either from memory or from IO.
+        if self.Name not in GlobalData.gBuildHashSkipTracking[self.Arch]:
+            # If hashes are the same, SaveFileOnChange() will return False.
+            GlobalData.gBuildHashSkipTracking[self.Arch][self.Name] = not SaveFileOnChange(HashFile, self.GenModuleHash(), True)
+            return GlobalData.gBuildHashSkipTracking[self.Arch][self.Name]
+        else:
+            return GlobalData.gBuildHashSkipTracking[self.Arch][self.Name]
 
     ## Decide whether we can skip the ModuleAutoGen process
     #  If any source file is newer than the module than we cannot skip

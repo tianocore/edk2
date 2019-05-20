@@ -593,7 +593,7 @@ class BuildTask:
     #
     def AddDependency(self, Dependency):
         for Dep in Dependency:
-            if not Dep.BuildObject.IsBinaryModule:
+            if not Dep.BuildObject.IsBinaryModule and not Dep.BuildObject.CanSkipbyHash():
                 self.DependencyList.append(BuildTask.New(Dep))    # BuildTask list
 
     ## The thread wrapper of LaunchCommand function
@@ -605,6 +605,11 @@ class BuildTask:
         try:
             self.BuildItem.BuildObject.BuildTime = LaunchCommand(Command, WorkingDir)
             self.CompleteFlag = True
+
+            # Run hash operation post dependency, to account for libs
+            if GlobalData.gUseHashCache and self.BuildItem.BuildObject.IsLibrary:
+                HashFile = path.join(self.BuildItem.BuildObject.BuildDir, self.BuildItem.BuildObject.Name + ".hash")
+                SaveFileOnChange(HashFile, self.BuildItem.BuildObject.GenModuleHash(), True)
         except:
             #
             # TRICK: hide the output of threads left running, so that the user can

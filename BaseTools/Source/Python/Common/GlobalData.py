@@ -112,3 +112,9 @@ gSikpAutoGenCache = set()
 # Dictionary for tracking Module build status as success or failure
 # False -> Fail : True -> Success
 gModuleBuildTracking = dict()
+
+# Dictionary of booleans that dictate whether a module or
+# library can be skiped
+# Top Dict:     Key: Arch Type              Value: Dictionary
+# Second Dict:  Key: Module\Library Name    Value: True\False
+gBuildHashSkipTracking = dict()
