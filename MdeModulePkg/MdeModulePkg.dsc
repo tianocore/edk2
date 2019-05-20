@@ -204,6 +204,22 @@
   MdeModulePkg/Application/DumpDynPcd/DumpDynPcd.inf
   MdeModulePkg/Application/MemoryProfileInfo/MemoryProfileInfo.inf
 
+  MdeModulePkg/Library/UefiSortLib/UefiSortLib.inf
+  MdeModulePkg/Logo/Logo.inf
+  MdeModulePkg/Logo/LogoDxe.inf
+  MdeModulePkg/Library/BaseSortLib/BaseSortLib.inf
+  MdeModulePkg/Library/BootMaintenanceManagerUiLib/BootMaintenanceManagerUiLib.inf
+  MdeModulePkg/Library/BootManagerUiLib/BootManagerUiLib.inf
+  MdeModulePkg/Library/CustomizedDisplayLib/CustomizedDisplayLib.inf
+  MdeModulePkg/Library/DebugAgentLibNull/DebugAgentLibNull.inf
+  MdeModulePkg/Library/DeviceManagerUiLib/DeviceManagerUiLib.inf
+  MdeModulePkg/Library/LockBoxNullLib/LockBoxNullLib.inf
+  MdeModulePkg/Library/PciHostBridgeLibNull/PciHostBridgeLibNull.inf
+  MdeModulePkg/Library/PiSmmCoreSmmServicesTableLib/PiSmmCoreSmmServicesTableLib.inf
+  MdeModulePkg/Library/UefiHiiServicesLib/UefiHiiServicesLib.inf
+  MdeModulePkg/Library/BaseHobLibNull/BaseHobLibNull.inf
+  MdeModulePkg/Library/BaseMemoryAllocationLibNull/BaseMemoryAllocationLibNull.inf
+
   MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf
   MdeModulePkg/Bus/Pci/PciSioSerialDxe/PciSioSerialDxe.inf
   MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
