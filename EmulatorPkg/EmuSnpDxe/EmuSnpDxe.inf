@@ -1,7 +1,7 @@
 #/** @file
 # Component name for module EmuSnpDxe
 #
-#  Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2018 - 2019, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) 2010, Apple, Inc. All rights reserved.<BR>
 #
 #    SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -33,6 +33,7 @@
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   EmulatorPkg/EmulatorPkg.dec
+  NetworkPkg/NetworkPkg.dec
 
 [LibraryClasses]
   DevicePathLib
