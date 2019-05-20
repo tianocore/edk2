@@ -1,7 +1,7 @@
 ##  @file
 # Provides Shell 'tftp' standalone application.
 #
-# Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved. <BR>
+# Copyright (c) 2010 - 2019, Intel Corporation. All rights reserved. <BR>
 # Copyright (c) 2015, ARM Ltd. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -31,6 +31,7 @@
   MdePkg/MdePkg.dec
   ShellPkg/ShellPkg.dec
   MdeModulePkg/MdeModulePkg.dec
+  NetworkPkg/NetworkPkg.dec
 
 [LibraryClasses]
   MemoryAllocationLib
