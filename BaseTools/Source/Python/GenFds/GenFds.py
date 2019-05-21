@@ -388,7 +388,7 @@ def GenFdsApi(FdsCommandDict, WorkSpaceDataBase=None):
                     "\nPython",
                     CODE_ERROR,
                     "Tools code failure",
-                    ExtraData="Please send email to edk2-devel@lists.01.org for help, attaching following call stack trace!\n",
+                    ExtraData="Please send email to %s for help, attaching following call stack trace!\n" % MSG_EDKII_MAIL_ADDR,
                     RaiseError=False
                     )
         EdkLogger.quiet(traceback.format_exc())

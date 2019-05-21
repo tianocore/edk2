@@ -81,7 +81,7 @@ def Main(Options = None):
                     "\nReplacePkg",
                     CODE_ERROR,
                     ST.ERR_UNKNOWN_FATAL_REPLACE_ERR % (Options.PackFileToReplace, Options.PackFileToBeReplaced),
-                    ExtraData=ST.MSG_SEARCH_FOR_HELP,
+                    ExtraData=ST.MSG_SEARCH_FOR_HELP % ST.MSG_EDKII_MAIL_ADDR,
                     RaiseError=False
                     )
         Logger.Quiet(ST.MSG_PYTHON_ON % (python_version(),

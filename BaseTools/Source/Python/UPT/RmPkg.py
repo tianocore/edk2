@@ -166,7 +166,7 @@ def Main(Options = None):
                     "\nRmPkg",
                     CODE_ERROR,
                     ST.ERR_UNKNOWN_FATAL_REMOVING_ERR,
-                    ExtraData=ST.MSG_SEARCH_FOR_HELP,
+                    ExtraData=ST.MSG_SEARCH_FOR_HELP % ST.MSG_EDKII_MAIL_ADDR,
                     RaiseError=False
                     )
         Logger.Quiet(ST.MSG_PYTHON_ON % (python_version(), platform) + \
