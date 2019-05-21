@@ -150,7 +150,7 @@ DebugPrintMarker (
   FormatString          = (CHAR8 *)((UINT64 *)(DebugInfo + 1) + 12);
 
   //
-  // Copy the Format string into the record
+  // Copy the Format string into the record. It will be truncated if it's too long.
   //
   // According to the content structure of Buffer shown above, the size of
   // the FormatString buffer is the size of Buffer minus the Padding
@@ -158,7 +158,7 @@ DebugPrintMarker (
   // variable arguments (12 * sizeof (UINT64)).
   //
   DestBufferSize = sizeof (Buffer) - 4 - sizeof (EFI_DEBUG_INFO) - 12 * sizeof (UINT64);
-  AsciiStrCpyS (FormatString, DestBufferSize / sizeof (CHAR8), Format);
+  AsciiStrnCpyS (FormatString, DestBufferSize / sizeof (CHAR8), Format, DestBufferSize / sizeof (CHAR8) - 1);
 
   //
   // The first 12 * sizeof (UINT64) bytes following EFI_DEBUG_INFO are for variable arguments
