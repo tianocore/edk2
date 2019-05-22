@@ -899,8 +899,20 @@ OpalDriverRequestPassword (
 
     IsLocked = OpalDeviceLocked (&Dev->OpalDisk.SupportedAttributes, &Dev->OpalDisk.LockingFeature);
 
-    if (IsLocked && PcdGetBool (PcdSkipOpalDxeUnlock)) {
-      return;
+    //
+    // Add PcdSkipOpalPasswordPrompt to determin whether to skip password prompt.
+    // Due to board design, device may not power off during system warm boot, which result in
+    // security status remain unlocked status, hence we add device security status check here.
+    //
+    // If device is in the locked status, device keeps locked and system continues booting.
+    // If device is in the unlocked status, system is forced shutdown to support security requirement.
+    //
+    if (PcdGetBool (PcdSkipOpalPasswordPrompt)) {
+      if (IsLocked) {
+        return;
+      } else {
+        gRT->ResetSystem (EfiResetShutdown, EFI_SUCCESS, 0, NULL);
+      }
     }
 
     while (Count < MAX_PASSWORD_TRY_COUNT) {
