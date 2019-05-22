@@ -546,10 +546,14 @@ BdsFormalizeOSIndicationVariable (
   //
   Status = EfiBootManagerGetBootManagerMenu (&BootManagerMenu);
   if (Status != EFI_NOT_FOUND) {
-    OsIndicationSupport = EFI_OS_INDICATIONS_BOOT_TO_FW_UI | EFI_OS_INDICATIONS_START_PLATFORM_RECOVERY;
+    OsIndicationSupport = EFI_OS_INDICATIONS_BOOT_TO_FW_UI;
     EfiBootManagerFreeLoadOption (&BootManagerMenu);
   } else {
-    OsIndicationSupport = EFI_OS_INDICATIONS_START_PLATFORM_RECOVERY;
+    OsIndicationSupport = 0;
+  }
+
+  if (PcdGetBool (PcdPlatformRecoverySupport)) {
+    OsIndicationSupport |= EFI_OS_INDICATIONS_START_PLATFORM_RECOVERY;
   }
 
   if (PcdGetBool(PcdCapsuleOnDiskSupport)) {
@@ -666,6 +670,7 @@ BdsEntry (
   BOOLEAN                         BootSuccess;
   EFI_DEVICE_PATH_PROTOCOL        *FilePath;
   EFI_STATUS                      BootManagerMenuStatus;
+  EFI_BOOT_MANAGER_LOAD_OPTION    PlatformDefaultBootOption;
 
   HotkeyTriggered = NULL;
   Status          = EFI_SUCCESS;
@@ -767,14 +772,13 @@ BdsEntry (
   //
   InitializeLanguage (TRUE);
 
-  //
-  // System firmware must include a PlatformRecovery#### variable specifying
-  // a short-form File Path Media Device Path containing the platform default
-  // file path for removable media
-  //
   FilePath = FileDevicePath (NULL, EFI_REMOVABLE_MEDIA_FILE_NAME);
+  if (FilePath == NULL) {
+    DEBUG ((DEBUG_ERROR, "Fail to allocate memory for defualt boot file path. Unable to boot.\n"));
+    CpuDeadLoop ();
+  }
   Status = EfiBootManagerInitializeLoadOption (
-             &LoadOption,
+             &PlatformDefaultBootOption,
              LoadOptionNumberUnassigned,
              LoadOptionTypePlatformRecovery,
              LOAD_OPTION_ACTIVE,
@@ -784,24 +788,31 @@ BdsEntry (
              0
              );
   ASSERT_EFI_ERROR (Status);
-  LoadOptions = EfiBootManagerGetLoadOptions (&LoadOptionCount, LoadOptionTypePlatformRecovery);
-  if (EfiBootManagerFindLoadOption (&LoadOption, LoadOptions, LoadOptionCount) == -1) {
-    for (Index = 0; Index < LoadOptionCount; Index++) {
-      //
-      // The PlatformRecovery#### options are sorted by OptionNumber.
-      // Find the the smallest unused number as the new OptionNumber.
-      //
-      if (LoadOptions[Index].OptionNumber != Index) {
-        break;
+
+  //
+  // System firmware must include a PlatformRecovery#### variable specifying
+  // a short-form File Path Media Device Path containing the platform default
+  // file path for removable media if the platform supports Platform Recovery.
+  //
+  if (PcdGetBool (PcdPlatformRecoverySupport)) {
+    LoadOptions = EfiBootManagerGetLoadOptions (&LoadOptionCount, LoadOptionTypePlatformRecovery);
+    if (EfiBootManagerFindLoadOption (&PlatformDefaultBootOption, LoadOptions, LoadOptionCount) == -1) {
+      for (Index = 0; Index < LoadOptionCount; Index++) {
+        //
+        // The PlatformRecovery#### options are sorted by OptionNumber.
+        // Find the the smallest unused number as the new OptionNumber.
+        //
+        if (LoadOptions[Index].OptionNumber != Index) {
+          break;
+        }
       }
+      PlatformDefaultBootOption.OptionNumber = Index;
+      Status = EfiBootManagerLoadOptionToVariable (&PlatformDefaultBootOption);
+      ASSERT_EFI_ERROR (Status);
     }
-    LoadOption.OptionNumber = Index;
-    Status = EfiBootManagerLoadOptionToVariable (&LoadOption);
-    ASSERT_EFI_ERROR (Status);
+    EfiBootManagerFreeLoadOptions (LoadOptions, LoadOptionCount);
   }
-  EfiBootManagerFreeLoadOption (&LoadOption);
   FreePool (FilePath);
-  EfiBootManagerFreeLoadOptions (LoadOptions, LoadOptionCount);
 
   //
   // Report Status Code to indicate connecting drivers will happen
@@ -1047,10 +1058,18 @@ BdsEntry (
   }
 
   if (!BootSuccess) {
-    LoadOptions = EfiBootManagerGetLoadOptions (&LoadOptionCount, LoadOptionTypePlatformRecovery);
-    ProcessLoadOptions (LoadOptions, LoadOptionCount);
-    EfiBootManagerFreeLoadOptions (LoadOptions, LoadOptionCount);
+    if (PlatformRecovery) {
+      LoadOptions = EfiBootManagerGetLoadOptions (&LoadOptionCount, LoadOptionTypePlatformRecovery);
+      ProcessLoadOptions (LoadOptions, LoadOptionCount);
+      EfiBootManagerFreeLoadOptions (LoadOptions, LoadOptionCount);
+    } else {
+      //
+      // When platform recovery is not enabled, still boot to platform default file path.
+      //
+      EfiBootManagerProcessLoadOption (&PlatformDefaultBootOption);
+    }
   }
+  EfiBootManagerFreeLoadOption (&PlatformDefaultBootOption);
 
   DEBUG ((EFI_D_ERROR, "[Bds] Unable to boot!\n"));
   PlatformBootManagerUnableToBoot ();
