@@ -214,7 +214,7 @@ CpuCommonFeaturesLibConstructor (
   if (IsCpuFeatureSupported (CPU_FEATURE_LMCE)) {
     Status = RegisterCpuFeature (
                "LMCE",
-               NULL,
+               FeatureControlGetConfigData,
                LmceSupport,
                LmceInitialize,
                CPU_FEATURE_LMCE,
