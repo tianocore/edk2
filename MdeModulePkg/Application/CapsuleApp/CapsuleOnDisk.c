@@ -23,6 +23,8 @@
 #include <Guid/GlobalVariable.h>
 #include <Guid/Gpt.h>
 
+#define MAX_CAPSULE_NUM 10
+
 EFI_GUID mCapsuleOnDiskBootOptionGuid = { 0x4CC29BB7, 0x2413, 0x40A2, { 0xB0, 0x6D, 0x25, 0x3E, 0x37, 0x10, 0xF5, 0x32 } };
 
 /**
@@ -745,6 +747,41 @@ SetCapsuleStatusVariable (
 }
 
 /**
+  Check if Capsule On Disk is supported.
+
+  @retval TRUE              Capsule On Disk is supported.
+  @retval FALSE             Capsule On Disk is not supported.
+
+**/
+BOOLEAN
+IsCapsuleOnDiskSupported (
+  VOID
+  )
+{
+  EFI_STATUS                    Status;
+  UINT64                        OsIndicationsSupported;
+  UINTN                         DataSize;
+
+  DataSize = sizeof(UINT64);
+  Status = gRT->GetVariable (
+                  L"OsIndicationsSupported",
+                  &gEfiGlobalVariableGuid,
+                  NULL,
+                  &DataSize,
+                  &OsIndicationsSupported
+                  );
+  if (EFI_ERROR (Status)) {
+    return FALSE;
+  }
+
+  if (OsIndicationsSupported & EFI_OS_INDICATIONS_FILE_CAPSULE_DELIVERY_SUPPORTED) {
+    return TRUE;
+  }
+
+  return FALSE;
+}
+
+/**
   Process Capsule On Disk.
 
   @param[in]  CapsuleBuffer       An array of pointer to capsule images
@@ -770,6 +807,16 @@ ProcessCapsuleOnDisk (
   UINT16                          BootNext;
   EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *Fs;
   BOOLEAN                         UpdateBootNext;
+  CHAR16                          *FileName[MAX_CAPSULE_NUM];
+  UINTN                           Index;
+
+  //
+  // Check if Capsule On Disk is supported
+  //
+  if (!IsCapsuleOnDiskSupported ()) {
+    Print (L"CapsuleApp: Capsule On Disk is not supported.\n");
+    return EFI_UNSUPPORTED;
+  }
 
   //
   // Get a valid file system from boot path
@@ -783,9 +830,16 @@ ProcessCapsuleOnDisk (
   }
 
   //
+  // Get file name from file path
+  //
+  for (Index = 0; Index < CapsuleNum; Index ++) {
+    FileName[Index] = GetFileNameFromPath (FilePath[Index]);
+  }
+
+  //
   // Copy capsule image to '\efi\UpdateCapsule\'
   //
-  Status = WriteUpdateFile (CapsuleBuffer, CapsuleBufferSize, FilePath, CapsuleNum, Fs);
+  Status = WriteUpdateFile (CapsuleBuffer, CapsuleBufferSize, FileName, CapsuleNum, Fs);
   if (EFI_ERROR (Status)) {
     Print (L"CapsuleApp: capsule image could not be copied for update.\n");
     return Status;

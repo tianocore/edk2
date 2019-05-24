@@ -812,8 +812,8 @@ DumpCapsuleFromDisk (
   //
   // Get file count first
   //
+  Status = FileHandleFindFirstFile (DirHandle, &FileInfo);
   do {
-    Status = FileHandleFindFirstFile (DirHandle, &FileInfo);
     if (EFI_ERROR (Status) || FileInfo == NULL) {
       Print (L"Get File Info Fail. Status = %r\n", Status);
       goto Done;
@@ -846,8 +846,8 @@ DumpCapsuleFromDisk (
   //
   // Get all file info
   //
+  Status = FileHandleFindFirstFile (DirHandle, &FileInfo);
   do {
-    Status = FileHandleFindFirstFile (DirHandle, &FileInfo);
     if (EFI_ERROR (Status) || FileInfo == NULL) {
       Print (L"Get File Info Fail. Status = %r\n", Status);
       goto Done;
