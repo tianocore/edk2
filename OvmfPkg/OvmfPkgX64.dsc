@@ -32,7 +32,6 @@
   DEFINE SMM_REQUIRE             = FALSE
   DEFINE TPM2_ENABLE             = FALSE
   DEFINE TPM2_CONFIG_ENABLE      = FALSE
-  DEFINE USE_LEGACY_ISA_STACK    = FALSE
 
   #
   # Network definition
@@ -755,16 +754,9 @@
   #
   # ISA Support
   #
-!if $(USE_LEGACY_ISA_STACK) == FALSE
   OvmfPkg/SioBusDxe/SioBusDxe.inf
   MdeModulePkg/Bus/Pci/PciSioSerialDxe/PciSioSerialDxe.inf
   MdeModulePkg/Bus/Isa/Ps2KeyboardDxe/Ps2KeyboardDxe.inf
-!else
-  PcAtChipsetPkg/IsaAcpiDxe/IsaAcpi.inf
-  IntelFrameworkModulePkg/Bus/Isa/IsaBusDxe/IsaBusDxe.inf
-  IntelFrameworkModulePkg/Bus/Isa/IsaSerialDxe/IsaSerialDxe.inf
-  IntelFrameworkModulePkg/Bus/Isa/Ps2KeyboardDxe/Ps2keyboardDxe.inf
-!endif
 
   #
   # SMBIOS Support
