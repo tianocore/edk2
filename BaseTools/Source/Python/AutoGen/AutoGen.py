@@ -3897,7 +3897,7 @@ class ModuleAutoGen(AutoGen):
             self.CopyModuleToCache()
 
     def CopyModuleToCache(self):
-        FileDir = path.join(GlobalData.gBinCacheDest, self.PlatformInfo.Name, self.BuildTarget + "_" + self.ToolChain, self.Arch, self.SourceDir, self.MetaFile.BaseName)
+        FileDir = path.join(GlobalData.gBinCacheDest, self.PlatformInfo.OutputDir, self.BuildTarget + "_" + self.ToolChain, self.Arch, self.SourceDir, self.MetaFile.BaseName)
         CreateDirectory (FileDir)
         HashFile = path.join(self.BuildDir, self.Name + '.hash')
         if os.path.exists(HashFile):
@@ -3929,7 +3929,7 @@ class ModuleAutoGen(AutoGen):
         for f_ext in self.SourceFileList:
             if '.inc' in str(f_ext):
                 return False
-        FileDir = path.join(GlobalData.gBinCacheSource, self.PlatformInfo.Name, self.BuildTarget + "_" + self.ToolChain, self.Arch, self.SourceDir, self.MetaFile.BaseName)
+        FileDir = path.join(GlobalData.gBinCacheSource, self.PlatformInfo.OutputDir, self.BuildTarget + "_" + self.ToolChain, self.Arch, self.SourceDir, self.MetaFile.BaseName)
         HashFile = path.join(FileDir, self.Name + '.hash')
         if os.path.exists(HashFile):
             f = open(HashFile, 'r')
