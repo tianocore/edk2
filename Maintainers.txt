@@ -188,6 +188,8 @@ R: Marc-André Lureau <marcandre.lureau@redhat.com>
    (TPM2 modules)
 R: Stefan Berger <stefanb@linux.ibm.com>
    (TPM2 modules)
+R: David Woodhouse <dwmw2@infradead.org>
+   (CSM modules)
 S: Maintained
 
 PcAtChipsetPkg
