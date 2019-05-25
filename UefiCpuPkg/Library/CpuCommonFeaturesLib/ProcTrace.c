@@ -199,22 +199,6 @@ ProcTraceInitialize (
   ProcTraceData = (PROC_TRACE_DATA *) ConfigData;
   ASSERT (ProcTraceData != NULL);
 
-  MemRegionBaseAddr = 0;
-  FirstIn = FALSE;
-
-  if (ProcTraceData->ThreadMemRegionTable == NULL) {
-    FirstIn = TRUE;
-    DEBUG ((DEBUG_INFO, "Initialize Processor Trace\n"));
-  }
-
-  ///
-  /// Refer to PROC_TRACE_MEM_SIZE Table for Size Encoding
-  ///
-  MemRegionSize = (UINT32) (1 << (ProcTraceData->ProcTraceMemSize + 12));
-  if (FirstIn) {
-    DEBUG ((DEBUG_INFO, "ProcTrace: MemSize requested: 0x%X \n", MemRegionSize));
-  }
-
   //
   // Clear MSR_IA32_RTIT_CTL[0] and IA32_RTIT_STS only if MSR_IA32_RTIT_CTL[0]==1b
   //
@@ -241,6 +225,26 @@ ProcTraceInitialize (
       MSR_IA32_RTIT_STATUS,
       StatusReg.Uint64
       );
+  }
+
+  if (!State) {
+    return RETURN_SUCCESS;
+  }
+
+  MemRegionBaseAddr = 0;
+  FirstIn = FALSE;
+
+  if (ProcTraceData->ThreadMemRegionTable == NULL) {
+    FirstIn = TRUE;
+    DEBUG ((DEBUG_INFO, "Initialize Processor Trace\n"));
+  }
+
+  ///
+  /// Refer to PROC_TRACE_MEM_SIZE Table for Size Encoding
+  ///
+  MemRegionSize = (UINT32) (1 << (ProcTraceData->ProcTraceMemSize + 12));
+  if (FirstIn) {
+    DEBUG ((DEBUG_INFO, "ProcTrace: MemSize requested: 0x%X \n", MemRegionSize));
   }
 
   if (FirstIn) {
@@ -459,11 +463,7 @@ ProcTraceInitialize (
   CtrlReg.Bits.OS = 1;
   CtrlReg.Bits.User = 1;
   CtrlReg.Bits.BranchEn = 1;
-  if (!State) {
-    CtrlReg.Bits.TraceEn = 0;
-  } else {
-    CtrlReg.Bits.TraceEn = 1;
-  }
+  CtrlReg.Bits.TraceEn = 1;
   CPU_REGISTER_TABLE_WRITE64 (
     ProcessorNumber,
     Msr,
