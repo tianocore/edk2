@@ -1224,7 +1224,27 @@ class DscBuildData(PlatformBuildClassObject):
                         if ' ' + Option not in self._BuildOptions[CurKey]:
                             self._BuildOptions[CurKey] += ' ' + Option
         return self._BuildOptions
+    def GetBuildOptionsByPkg(self, Module, ModuleType):
 
+        local_pkg = os.path.split(Module.LocalPkg())[0]
+        if self._ModuleTypeOptions is None:
+            self._ModuleTypeOptions = OrderedDict()
+        if ModuleType not in self._ModuleTypeOptions:
+            options = OrderedDict()
+            self._ModuleTypeOptions[ ModuleType] = options
+            RecordList = self._RawData[MODEL_META_DATA_BUILD_OPTION, self._Arch]
+            for ToolChainFamily, ToolChain, Option, Dummy1, Dummy2, Dummy3, Dummy4, Dummy5 in RecordList:
+                if Dummy2 not in (TAB_COMMON,local_pkg.upper(),"EDKII"):
+                    continue
+                Type = Dummy3
+                if Type.upper() == ModuleType.upper():
+                    Key = (ToolChainFamily, ToolChain)
+                    if Key not in options or not ToolChain.endswith('_FLAGS') or Option.startswith('='):
+                        options[Key] = Option
+                    else:
+                        if ' ' + Option not in options[Key]:
+                            options[Key] += ' ' + Option
+        return self._ModuleTypeOptions[ModuleType]
     def GetBuildOptionsByModuleType(self, Edk, ModuleType):
         if self._ModuleTypeOptions is None:
             self._ModuleTypeOptions = OrderedDict()

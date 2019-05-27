@@ -819,7 +819,17 @@ class InfBuildData(ModuleBuildClassObject):
         for Arch, ModuleType in TemporaryDictionary:
             RetVal[Arch, ModuleType] = TemporaryDictionary[Arch, ModuleType]
         return RetVal
+    def LocalPkg(self):
+        module_path = self.MetaFile.File
+        subdir = os.path.split(module_path)[0]
+        TopDir = ""
+        while subdir:
+            subdir,TopDir = os.path.split(subdir)
 
+        for file_name in os.listdir(os.path.join(self.MetaFile.Root,TopDir)):
+            if file_name.upper().endswith("DEC"):
+                pkg = os.path.join(TopDir,file_name)
+        return pkg
     @cached_class_function
     def GetGuidsUsedByPcd(self):
         self.Pcds

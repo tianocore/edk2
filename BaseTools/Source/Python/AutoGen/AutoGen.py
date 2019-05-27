@@ -2486,7 +2486,15 @@ class PlatformAutoGen(AutoGen):
                             else:
                                 BuildOptions[Tool][Attr] = Options[Key]
         return BuildOptions
-
+    def GetGlobalBuildOptions(self,Module):
+        ModuleTypeOptions = self.Platform.GetBuildOptionsByPkg(Module, Module.ModuleType)
+        ModuleTypeOptions = self._ExpandBuildOption(ModuleTypeOptions)
+        if Module in self.Platform.Modules:
+            PlatformModule = self.Platform.Modules[str(Module)]
+            PlatformModuleOptions = self._ExpandBuildOption(PlatformModule.BuildOptions)
+        else:
+            PlatformModuleOptions = {}
+        return ModuleTypeOptions, PlatformModuleOptions
     ## Append build options in platform to a module
     #
     #   @param  Module  The module to which the build options will be appended
