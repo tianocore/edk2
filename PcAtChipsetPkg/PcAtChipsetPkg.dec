@@ -42,64 +42,6 @@
   gPcAtChipsetPkgTokenSpaceGuid.PcdHpetMsiEnable|TRUE|BOOLEAN|0x00001000
 
 [PcdsFixedAtBuild, PcdsDynamic, PcdsDynamicEx, PcdsPatchableInModule]
-  ## Pcd8259LegacyModeMask defines the default mask value for platform. This value is determined<BR><BR>
-  #  1) If platform only support pure UEFI, value should be set to 0xFFFF or 0xFFFE;
-  #     Because only clock interrupt is allowed in legacy mode in pure UEFI platform.<BR>
-  #  2) If platform install CSM and use thunk module:<BR>
-  #     a) If thunk call provided by CSM binary requires some legacy interrupt support, the corresponding bit
-  #        should be opened as 0.<BR>
-  #        For example, if keyboard interfaces provided CSM binary use legacy keyboard interrupt in 8259 bit 1, then
-  #        the value should be set to 0xFFFC.<BR>
-  #     b) If all thunk call provied by CSM binary do not require legacy interrupt support, value should be set
-  #        to 0xFFFF or 0xFFFE.<BR>
-  #
-  #  The default value of legacy mode mask could be changed by EFI_LEGACY_8259_PROTOCOL->SetMask(). But it is rarely
-  #  need change it except some special cases such as when initializing the CSM binary, it should be set to 0xFFFF to
-  #  mask all legacy interrupt. Please restore the original legacy mask value if changing is made for these special case.<BR>
-  # @Prompt 8259 Legacy Mode mask.
-  gPcAtChipsetPkgTokenSpaceGuid.Pcd8259LegacyModeMask|0xFFFF|UINT16|0x00000001
-
-  ## Pcd8259LegacyModeEdgeLevel defines the default edge level for legacy mode's interrrupt controller.
-  #  For the corresponding bits, 0 = Edge triggered and 1 = Level triggered.
-  # @Prompt 8259 Legacy Mode edge level.
-  gPcAtChipsetPkgTokenSpaceGuid.Pcd8259LegacyModeEdgeLevel|0x0000|UINT16|0x00000002
-
-  ## Indicates if we need enable IsaAcpiCom1 device.<BR><BR>
-  #   TRUE  - Enables IsaAcpiCom1 device.<BR>
-  #   FALSE - Doesn't enable IsaAcpiCom1 device.<BR>
-  # @Prompt Enable IsaAcpiCom1 device.
-  gPcAtChipsetPkgTokenSpaceGuid.PcdIsaAcpiCom1Enable|TRUE|BOOLEAN|0x00000003
-
-  ## Indicates if we need enable IsaAcpiCom2 device.<BR><BR>
-  #   TRUE  - Enables IsaAcpiCom2 device.<BR>
-  #   FALSE - Doesn't enable IsaAcpiCom2 device.<BR>
-  # @Prompt Enable IsaAcpiCom12 device.
-  gPcAtChipsetPkgTokenSpaceGuid.PcdIsaAcpiCom2Enable|TRUE|BOOLEAN|0x00000004
-
-  ## Indicates if we need enable IsaAcpiPs2Keyboard device.<BR><BR>
-  #   TRUE  - Enables IsaAcpiPs2Keyboard device.<BR>
-  #   FALSE - Doesn't enable IsaAcpiPs2Keyboard device.<BR>
-  # @Prompt Enable IsaAcpiPs2Keyboard device.
-  gPcAtChipsetPkgTokenSpaceGuid.PcdIsaAcpiPs2KeyboardEnable|TRUE|BOOLEAN|0x00000005
-
-  ## Indicates if we need enable IsaAcpiPs2Mouse device.<BR><BR>
-  #   TRUE  - Enables IsaAcpiPs2Mouse device.<BR>
-  #   FALSE - Doesn't enable IsaAcpiPs2Mouse device.<BR>
-  # @Prompt Enable IsaAcpiPs2Mouse device.
-  gPcAtChipsetPkgTokenSpaceGuid.PcdIsaAcpiPs2MouseEnable|TRUE|BOOLEAN|0x00000006
-
-  ## Indicates if we need enable IsaAcpiFloppyA device.<BR><BR>
-  #   TRUE  - Enables IsaAcpiFloppyA device.<BR>
-  #   FALSE - Doesn't enable IsaAcpiFloppyA device.<BR>
-  # @Prompt Enable IsaAcpiFloppyA device.
-  gPcAtChipsetPkgTokenSpaceGuid.PcdIsaAcpiFloppyAEnable|TRUE|BOOLEAN|0x00000007
-
-  ## Indicates if we need enable IsaAcpiFloppyB device.<BR><BR>
-  #   TRUE  - Enables IsaAcpiFloppyB device.<BR>
-  #   FALSE - Doesn't enable IsaAcpiFloppyB device.<BR>
-  # @Prompt Enable IsaAcpiFloppyB device.
-  gPcAtChipsetPkgTokenSpaceGuid.PcdIsaAcpiFloppyBEnable|TRUE|BOOLEAN|0x00000008
-
   ## This PCD specifies the base address of the HPET timer.
   # @Prompt HPET base address.
   gPcAtChipsetPkgTokenSpaceGuid.PcdHpetBaseAddress|0xFED00000|UINT32|0x00000009

@@ -4,7 +4,7 @@
 // This package is designed to public interfaces and implementation which follows
 // PcAt defacto standard.
 //
-// Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2009 - 2019, Intel Corporation. All rights reserved.<BR>
 //
 // SPDX-License-Identifier: BSD-2-Clause-Patent
 //
@@ -16,56 +16,6 @@
 #string STR_PACKAGE_DESCRIPTION         #language en-US "This package is designed to public interfaces and implementation which follows PcAt de facto standard."
 
 
-
-#string STR_gPcAtChipsetPkgTokenSpaceGuid_Pcd8259LegacyModeMask_PROMPT  #language en-US "8259 Legacy Mode mask"
-
-#string STR_gPcAtChipsetPkgTokenSpaceGuid_Pcd8259LegacyModeMask_HELP  #language en-US "Pcd8259LegacyModeMask defines the default mask value for platform. This value is determined<BR><BR>\n"
-                                                                                      "1) If platform only support pure UEFI, value should be set to 0xFFFF or 0xFFFE; Because only clock interrupt is allowed in legacy mode in pure UEFI platform.<BR>\n"
-                                                                                      "2) If platform install CSM and use thunk module:<BR>\n"
-                                                                                      "a) If thunk call provided by CSM binary requires some legacy interrupt support, the corresponding bit should be opened as 0.<BR>\n"
-                                                                                      "For example, if keyboard interfaces provided CSM binary use legacy keyboard interrupt in 8259 bit 1, then the value should be set to 0xFFFC.<BR>\n"
-                                                                                      "b) If all thunk call provided by CSM binary do not require legacy interrupt support, value should be set to 0xFFFF or 0xFFFE.<BR>\n"
-                                                                                      "The default value of legacy mode mask could be changed by EFI_LEGACY_8259_PROTOCOL->SetMask(). But it is rarely need change it except some special cases such as when initializing the CSM binary, it should be set to 0xFFFF to mask all legacy interrupt. Please restore the original legacy mask value if changing is made for these special case.<BR>"
-
-#string STR_gPcAtChipsetPkgTokenSpaceGuid_Pcd8259LegacyModeEdgeLevel_PROMPT  #language en-US "8259 Legacy Mode edge level"
-
-#string STR_gPcAtChipsetPkgTokenSpaceGuid_Pcd8259LegacyModeEdgeLevel_HELP  #language en-US "Pcd8259LegacyModeEdgeLevel defines the default edge level for legacy mode's interrupt controller.\"                                                                                           \"For the corresponding bits, 0 = Edge triggered and 1 = Level triggered."
-
-#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdIsaAcpiCom1Enable_PROMPT  #language en-US "Enable IsaAcpiCom1 device"
-
-#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdIsaAcpiCom1Enable_HELP  #language en-US "Indicates if we need enable IsaAcpiCom1 device.<BR><BR>\n"
-                                                                                     "TRUE  - Enables IsaAcpiCom1 device.<BR>\n"
-                                                                                     "FALSE - Doesn't enable IsaAcpiCom1 device.<BR>"
-
-#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdIsaAcpiCom2Enable_PROMPT  #language en-US "Enable IsaAcpiCom12 device"
-
-#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdIsaAcpiCom2Enable_HELP  #language en-US "Indicates if we need enable IsaAcpiCom2 device.<BR><BR>\n"
-                                                                                     "TRUE  - Enables IsaAcpiCom2 device.<BR>\n"
-                                                                                     "FALSE - Doesn't enable IsaAcpiCom2 device.<BR>"
-
-#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdIsaAcpiPs2KeyboardEnable_PROMPT  #language en-US "Enable IsaAcpiPs2Keyboard device"
-
-#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdIsaAcpiPs2KeyboardEnable_HELP  #language en-US "Indicates if we need enable IsaAcpiPs2Keyboard device.<BR><BR>\n"
-                                                                                            "TRUE  - Enables IsaAcpiPs2Keyboard device.<BR>\n"
-                                                                                            "FALSE - Doesn't enable IsaAcpiPs2Keyboard device.<BR>"
-
-#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdIsaAcpiPs2MouseEnable_PROMPT  #language en-US "Enable IsaAcpiPs2Mouse device"
-
-#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdIsaAcpiPs2MouseEnable_HELP  #language en-US "Indicates if we need enable IsaAcpiPs2Mouse device.<BR><BR>\n"
-                                                                                         "TRUE  - Enables IsaAcpiPs2Mouse device.<BR>\n"
-                                                                                         "FALSE - Doesn't enable IsaAcpiPs2Mouse device.<BR>"
-
-#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdIsaAcpiFloppyAEnable_PROMPT  #language en-US "Enable IsaAcpiFloppyA device"
-
-#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdIsaAcpiFloppyAEnable_HELP  #language en-US "Indicates if we need enable IsaAcpiFloppyA device.<BR><BR>\n"
-                                                                                        "TRUE  - Enables IsaAcpiFloppyA device.<BR>\n"
-                                                                                        "FALSE - Doesn't enable IsaAcpiFloppyA device.<BR>"
-
-#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdIsaAcpiFloppyBEnable_PROMPT  #language en-US "Enable IsaAcpiFloppyB device"
-
-#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdIsaAcpiFloppyBEnable_HELP  #language en-US "Indicates if we need enable IsaAcpiFloppyB device.<BR><BR>\n"
-                                                                                        "TRUE  - Enables IsaAcpiFloppyB device.<BR>\n"
-                                                                                        "FALSE - Doesn't enable IsaAcpiFloppyB device.<BR>"
 
 #string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdHpetBaseAddress_PROMPT  #language en-US "HPET base address"
 
