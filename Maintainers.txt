@@ -118,15 +118,6 @@ W: https://github.com/tianocore/tianocore.github.io/wiki/FmpDevicePkg
 M: Liming Gao <liming.gao@intel.com>
 M: Michael D Kinney <michael.d.kinney@intel.com>
 
-IntelFrameworkModulePkg
-W: https://github.com/tianocore/tianocore.github.io/wiki/IntelFrameworkModulePkg
-M: Liming Gao <liming.gao@intel.com>
-
-IntelFrameworkPkg
-W: https://github.com/tianocore/tianocore.github.io/wiki/IntelFrameworkPkg
-M: Michael D Kinney <michael.d.kinney@intel.com>
-M: Liming Gao <liming.gao@intel.com>
-
 IntelFsp2Pkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/IntelFsp2Pkg
 M: Chasel Chiu <chasel.chiu@intel.com>
