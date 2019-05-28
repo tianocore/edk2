@@ -215,9 +215,10 @@ ExitConditionsForDeviceNotAriCapable (
           Status = DetermineDevicePortType(PciIoDevice, &DevicePortType);
           if (!EFI_ERROR (Status)) {
             //
-            // If the PCIe Device is an End-Point or a PCIe-to-PCI bridge
+            // If the PCIe Device is an End-Point, a PCIe-to-PCI Bridge or a Upstream Port.
             //
-            if ((DevicePortType == PCIE_DEVICE_PORT_TYPE_PCIE_TO_PCI_BRIDGE) ||
+            if ((DevicePortType == PCIE_DEVICE_PORT_TYPE_UPSTREAM_PORT) ||
+                (DevicePortType == PCIE_DEVICE_PORT_TYPE_PCIE_TO_PCI_BRIDGE) ||
                 (DevicePortType == PCIE_DEVICE_PORT_TYPE_PCIE_ENDPOINT) ||
                 (DevicePortType == PCIE_DEVICE_PORT_TYPE_LEGACY_PCIE_ENDPOINT)) {
               DEBUG((EFI_D_INFO, "Invalid configuration: PCIe device in BDF[%02x:%02x:%02x] is Not ARI capable\n",
