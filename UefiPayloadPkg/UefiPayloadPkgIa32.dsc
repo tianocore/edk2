@@ -516,7 +516,7 @@
   DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
   FileHandleLib|MdePkg/Library/UefiFileHandleLib/UefiFileHandleLib.inf
   ShellLib|ShellPkg/Library/UefiShellLib/UefiShellLib.inf
-  NetLib|MdeModulePkg/Library/DxeNetLib/DxeNetLib.inf
+  !include NetworkPkg/NetworkLibs.dsc.inc
 
 [Components.IA32]
   ShellPkg/DynamicCommand/TftpDynamicCommand/TftpDynamicCommand.inf {
