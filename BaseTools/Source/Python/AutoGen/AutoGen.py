@@ -3947,14 +3947,14 @@ class ModuleAutoGen(AutoGen):
                     for root, dir, files in os.walk(FileDir):
                         for f in files:
                             if self.Name + '.hash' in f:
-                                shutil.copy2(HashFile, self.BuildDir)
+                                shutil.copy(HashFile, self.BuildDir)
                             else:
                                 File = path.join(root, f)
                                 sub_dir = os.path.relpath(File, FileDir)
                                 destination_file = os.path.join(self.OutputDir, sub_dir)
                                 destination_dir = os.path.dirname(destination_file)
                                 CreateDirectory(destination_dir)
-                                shutil.copy2(File, destination_dir)
+                                shutil.copy(File, destination_dir)
                     if self.Name == "PcdPeim" or self.Name == "PcdDxe":
                         CreatePcdDatabaseCode(self, TemplateString(), TemplateString())
                     return True
