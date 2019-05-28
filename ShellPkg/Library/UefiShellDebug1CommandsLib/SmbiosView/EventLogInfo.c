@@ -1,7 +1,7 @@
 /** @file
   Module for clarifying the content of the smbios structure element info.
 
-  Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2005 - 2019, Intel Corporation. All rights reserved. <BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -347,16 +347,12 @@ DisplaySysEventLogData (
   Offset  = 0;
   Log     = (LOG_RECORD_FORMAT *) LogData;
   while (Log != NULL && Log->Type != END_OF_LOG && Offset < LogAreaLength) {
-    //
-    // Get a Event Log Record
-    //
-    Log = (LOG_RECORD_FORMAT *) (LogData + Offset);
 
     if (Log != NULL) {
       //
       // Display Event Log Record Information
       //
-      DisplaySELVarDataFormatType (Log->Type, SHOW_DETAIL);
+      DisplaySELTypes (Log->Type, SHOW_DETAIL);
       DisplaySELLogHeaderLen (Log->Length, SHOW_DETAIL);
 
       Offset += Log->Length;
@@ -373,6 +369,10 @@ DisplaySysEventLogData (
         Print (L"20");
       } else {
         ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_ERROR), gShellDebug1HiiHandle);
+        //
+        // Get a Event Log Record
+        //
+        Log = (LOG_RECORD_FORMAT *) (LogData + Offset);
         continue;
       }
 
@@ -391,11 +391,19 @@ DisplaySysEventLogData (
       // Display Variable Data Format
       //
       if (Log->Length <= (sizeof (LOG_RECORD_FORMAT) - 1)) {
+        //
+        // Get a Event Log Record
+        //
+        Log = (LOG_RECORD_FORMAT *) (LogData + Offset);
         continue;
       }
 
       ElVdfType = Log->LogVariableData[0];
       DisplayElVdfInfo (ElVdfType, Log->LogVariableData);
+      //
+      // Get a Event Log Record
+      //
+      Log = (LOG_RECORD_FORMAT *) (LogData + Offset);
     }
   }
 }
