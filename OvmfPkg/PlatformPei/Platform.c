@@ -181,7 +181,6 @@ MemMapInitialization (
 
     TopOfLowRam = GetSystemMemorySizeBelow4gb ();
     PciExBarBase = 0;
-    PciBase = (TopOfLowRam < BASE_2GB) ? BASE_2GB : TopOfLowRam;
     if (mHostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID) {
       //
       // The MMCONFIG area is expected to fall between the top of low RAM and
@@ -193,6 +192,7 @@ MemMapInitialization (
       PciBase = (UINT32)(PciExBarBase + SIZE_256MB);
       PciSize = 0xFC000000 - PciBase;
     } else {
+      PciBase = (TopOfLowRam < BASE_2GB) ? BASE_2GB : TopOfLowRam;
       PciSize = 0xFC000000 - PciBase;
     }
 
