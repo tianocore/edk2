@@ -63,6 +63,11 @@ GetSystemMemorySizeBelow4gb (
   );
 
 VOID
+QemuUc32BaseInitialization (
+  VOID
+  );
+
+VOID
 InitializeRamRegions (
   VOID
   );
@@ -113,5 +118,7 @@ extern UINT8 mPhysMemAddressWidth;
 extern UINT32 mMaxCpuCount;
 
 extern UINT16 mHostBridgeDevId;
+
+extern UINT32 mQemuUc32Base;
 
 #endif // _PLATFORM_PEI_H_INCLUDED_
