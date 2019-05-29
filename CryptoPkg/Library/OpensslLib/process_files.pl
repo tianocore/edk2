@@ -127,6 +127,12 @@ foreach my $product ((@{$unified_info{libraries}},
         foreach my $s (@{$unified_info{sources}->{$o}}) {
             next if ($unified_info{generate}->{$s});
             next if $s =~ "crypto/bio/b_print.c";
+
+            # No need to add unused files in UEFI.
+            # So it can reduce porting time, compile time, library size.
+            next if $s =~ "crypto/rand/randfile.c";
+            next if $s =~ "crypto/store/";
+
             if ($product =~ "libssl") {
                 push @sslfilelist, '  $(OPENSSL_PATH)/' . $s . "\r\n";
                 next;
