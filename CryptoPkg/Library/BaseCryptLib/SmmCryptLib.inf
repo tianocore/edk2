@@ -98,3 +98,5 @@
   MSFT:*_*_*_CC_FLAGS = /wd4090
 
   XCODE:*_*_*_CC_FLAGS = -mmmx -msse
+
+  GCC:*_CLANG38_*_CC_FLAGS = -std=c99
