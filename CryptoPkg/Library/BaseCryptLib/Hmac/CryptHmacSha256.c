@@ -9,8 +9,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "InternalCryptLib.h"
 #include <openssl/hmac.h>
 
-#define HMAC_SHA256_CTX_SIZE   sizeof(void *) * 4 + sizeof(unsigned int) + \
-                               sizeof(unsigned char) * HMAC_MAX_MD_CBLOCK
+//
+// NOTE: OpenSSL redefines the size of HMAC_CTX at crypto/hmac/hmac_lcl.h
+//       #define HMAC_MAX_MD_CBLOCK_SIZE     144
+//
+#define HMAC_SHA256_CTX_SIZE    (sizeof(void *) * 4 + sizeof(unsigned int) + \
+                             sizeof(unsigned char) * 144)
 
 /**
   Retrieves the size, in bytes, of the context buffer required for HMAC-SHA256 operations.
