@@ -3995,7 +3995,8 @@ class ModuleAutoGen(AutoGen):
             for LibraryAutoGen in self.LibraryAutoGenList:
                 LibraryAutoGen.CreateMakeFile()
 
-        if self.CanSkip():
+        # Don't enable if hash feature enabled, CanSkip uses timestamps to determine build skipping
+        if not GlobalData.gUseHashCache and self.CanSkip():
             return
 
         if len(self.CustomMakefile) == 0:
@@ -4038,7 +4039,8 @@ class ModuleAutoGen(AutoGen):
             for LibraryAutoGen in self.LibraryAutoGenList:
                 LibraryAutoGen.CreateCodeFile()
 
-        if self.CanSkip():
+        # Don't enable if hash feature enabled, CanSkip uses timestamps to determine build skipping
+        if not GlobalData.gUseHashCache and self.CanSkip():
             return
 
         AutoGenList = []

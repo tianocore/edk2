@@ -625,8 +625,16 @@ class BuildTask:
             BuildTask._ErrorFlag.set()
             BuildTask._ErrorMessage = "%s broken\n    %s [%s]" % \
                                       (threading.currentThread().getName(), Command, WorkingDir)
-        if self.BuildItem.BuildObject in GlobalData.gModuleBuildTracking and not BuildTask._ErrorFlag.isSet():
-            GlobalData.gModuleBuildTracking[self.BuildItem.BuildObject] = True
+
+        # Set the value used by hash invalidation flow in GlobalData.gModuleBuildTracking to 'SUCCESS'
+        # If Module or Lib is being tracked, it did not fail header check test, and built successfully
+        if (self.BuildItem.BuildObject.Arch in GlobalData.gModuleBuildTracking and
+           self.BuildItem.BuildObject in GlobalData.gModuleBuildTracking[self.BuildItem.BuildObject.Arch] and
+           GlobalData.gModuleBuildTracking[self.BuildItem.BuildObject.Arch][self.BuildItem.BuildObject] != 'FAIL_METAFILE' and
+           not BuildTask._ErrorFlag.isSet()
+           ):
+            GlobalData.gModuleBuildTracking[self.BuildItem.BuildObject.Arch][self.BuildItem.BuildObject] = 'SUCCESS'
+
         # indicate there's a thread is available for another build task
         BuildTask._RunningQueueLock.acquire()
         BuildTask._RunningQueue.pop(self.BuildItem)
@@ -1154,27 +1162,30 @@ class Build():
     #
     #
     def invalidateHash(self):
-        # GlobalData.gModuleBuildTracking contains only modules that cannot be skipped by hash
-        for moduleAutoGenObj in GlobalData.gModuleBuildTracking.keys():
-            # False == FAIL : True == Success
-            # Skip invalidating for Successful module builds
-            if GlobalData.gModuleBuildTracking[moduleAutoGenObj] == True:
-                continue
+        # Only for hashing feature
+        if not GlobalData.gUseHashCache:
+            return
 
-            # The module failed to build or failed to start building, from this point on
+        # GlobalData.gModuleBuildTracking contains only modules or libs that cannot be skipped by hash
+        for moduleAutoGenObjArch in GlobalData.gModuleBuildTracking.keys():
+            for moduleAutoGenObj in GlobalData.gModuleBuildTracking[moduleAutoGenObjArch].keys():
+                # Skip invalidating for Successful Module/Lib builds
+                if GlobalData.gModuleBuildTracking[moduleAutoGenObjArch][moduleAutoGenObj] == 'SUCCESS':
+                    continue
 
-            # Remove .hash from build
-            if GlobalData.gUseHashCache:
-                ModuleHashFile = path.join(moduleAutoGenObj.BuildDir, moduleAutoGenObj.Name + ".hash")
+                # The module failed to build, failed to start building, or failed the header check test from this point on
+
+                # Remove .hash from build
+                ModuleHashFile = os.path.join(moduleAutoGenObj.BuildDir, moduleAutoGenObj.Name + ".hash")
                 if os.path.exists(ModuleHashFile):
                     os.remove(ModuleHashFile)
 
-            # Remove .hash file from cache
-            if GlobalData.gBinCacheDest:
-                FileDir = path.join(GlobalData.gBinCacheDest, moduleAutoGenObj.Arch, moduleAutoGenObj.SourceDir, moduleAutoGenObj.MetaFile.BaseName)
-                HashFile = path.join(FileDir, moduleAutoGenObj.Name + '.hash')
-                if os.path.exists(HashFile):
-                    os.remove(HashFile)
+                # Remove .hash file from cache
+                if GlobalData.gBinCacheDest:
+                    FileDir = os.path.join(GlobalData.gBinCacheDest, moduleAutoGenObj.Arch, moduleAutoGenObj.SourceDir, moduleAutoGenObj.MetaFile.BaseName)
+                    HashFile = os.path.join(FileDir, moduleAutoGenObj.Name + '.hash')
+                    if os.path.exists(HashFile):
+                        os.remove(HashFile)
 
     ## Build a module or platform
     #
@@ -1825,9 +1836,11 @@ class Build():
                                 if self.Target == "genmake":
                                     return True
                             self.BuildModules.append(Ma)
-                            # Initialize all modules in tracking to False (FAIL)
-                            if Ma not in GlobalData.gModuleBuildTracking:
-                                GlobalData.gModuleBuildTracking[Ma] = False
+                            # Initialize all modules in tracking to 'FAIL'
+                            if Ma.Arch not in GlobalData.gModuleBuildTracking:
+                                GlobalData.gModuleBuildTracking[Ma.Arch] = dict()
+                            if Ma not in GlobalData.gModuleBuildTracking[Ma.Arch]:
+                                GlobalData.gModuleBuildTracking[Ma.Arch][Ma] = 'FAIL'
                     self.AutoGenTime += int(round((time.time() - AutoGenStart)))
                     MakeStart = time.time()
                     for Ma in self.BuildModules:
@@ -1911,6 +1924,7 @@ class Build():
                     # Save MAP buffer into MAP file.
                     #
                     self._SaveMapFile (MapBuffer, Wa)
+        self.invalidateHash()
 
     def _GenFfsCmd(self,ArchList):
         # convert dictionary of Cmd:(Inf,Arch)
@@ -2009,9 +2023,11 @@ class Build():
                             if self.Target == "genmake":
                                 continue
                         self.BuildModules.append(Ma)
-                        # Initialize all modules in tracking to False (FAIL)
-                        if Ma not in GlobalData.gModuleBuildTracking:
-                            GlobalData.gModuleBuildTracking[Ma] = False
+                        # Initialize all modules in tracking to 'FAIL'
+                        if Ma.Arch not in GlobalData.gModuleBuildTracking:
+                            GlobalData.gModuleBuildTracking[Ma.Arch] = dict()
+                        if Ma not in GlobalData.gModuleBuildTracking[Ma.Arch]:
+                            GlobalData.gModuleBuildTracking[Ma.Arch][Ma] = 'FAIL'
                     self.Progress.Stop("done!")
                     self.AutoGenTime += int(round((time.time() - AutoGenStart)))
                     MakeStart = time.time()
@@ -2099,6 +2115,7 @@ class Build():
                     # Save MAP buffer into MAP file.
                     #
                     self._SaveMapFile(MapBuffer, Wa)
+        self.invalidateHash()
 
     ## Generate GuidedSectionTools.txt in the FV directories.
     #
