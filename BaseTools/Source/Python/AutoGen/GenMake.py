@@ -905,6 +905,44 @@ cleanlib:
                                     ForceIncludedFile,
                                     self._AutoGenObject.IncludePathList + self._AutoGenObject.BuildOptionIncPathList
                                     )
+
+        # Check if header files are listed in metafile
+        # Get a list of unique module header source files from MetaFile
+        headerFilesInMetaFileSet = set()
+        for aFile in self._AutoGenObject.SourceFileList:
+            aFileName = str(aFile)
+            if not aFileName.endswith('.h'):
+                continue
+            headerFilesInMetaFileSet.add(aFileName.lower())
+
+        # Get a list of unique module autogen files
+        localAutoGenFileSet = set()
+        for aFile in self._AutoGenObject.AutoGenFileList:
+            localAutoGenFileSet.add(str(aFile).lower())
+
+        # Get a list of unique module dependency header files
+        # Exclude autogen files and files not in the source directory
+        headerFileDependencySet = set()
+        localSourceDir = str(self._AutoGenObject.SourceDir).lower()
+        for Dependency in FileDependencyDict.values():
+            for aFile in Dependency:
+                aFileName = str(aFile).lower()
+                if not aFileName.endswith('.h'):
+                    continue
+                if aFileName in localAutoGenFileSet:
+                    continue
+                if localSourceDir not in aFileName:
+                    continue
+                headerFileDependencySet.add(aFileName)
+
+        # Check if a module dependency header file is missing from the module's MetaFile
+        for aFile in headerFileDependencySet:
+            if aFile in headerFilesInMetaFileSet:
+                continue
+            EdkLogger.warn("build","Module MetaFile [Sources] is missing local header!",
+                        ExtraData = "Local Header: " + aFile + " not found in " + self._AutoGenObject.MetaFile.Path
+                        )
+
         DepSet = None
         for File,Dependency in FileDependencyDict.items():
             if not Dependency:
