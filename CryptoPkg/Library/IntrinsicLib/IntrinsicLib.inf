@@ -1,7 +1,7 @@
 ## @file
 #  Intrinsic Routines Wrapper Library Instance.
 #
-#  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2010 - 2019, Intel Corporation. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -29,9 +29,11 @@
 
   Ia32/MathLShiftS64.c      | MSFT
   Ia32/MathRShiftU64.c      | MSFT
+  Ia32/MathFtol.c           | MSFT
 
   Ia32/MathLShiftS64.c      | INTEL
   Ia32/MathRShiftU64.c      | INTEL
+  Ia32/MathFtol.c           | INTEL
 
   Ia32/MathLShiftS64.nasm   | GCC
   Ia32/MathRShiftU64.nasm   | GCC
