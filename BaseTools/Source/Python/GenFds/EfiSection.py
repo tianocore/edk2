@@ -93,7 +93,7 @@ class EfiSection (EfiSectionClassObject):
                 if '.depex' in SuffixMap:
                     FileList.append(Filename)
         else:
-            FileList, IsSect = Section.Section.GetFileList(FfsInf, self.FileType, self.FileExtension, Dict, IsMakefile=IsMakefile)
+            FileList, IsSect = Section.Section.GetFileList(FfsInf, self.FileType, self.FileExtension, Dict, IsMakefile=IsMakefile, SectionType=SectionType)
             if IsSect :
                 return FileList, self.Alignment
 
@@ -217,6 +217,26 @@ class EfiSection (EfiSectionClassObject):
                                                      Ui=StringData, IsMakefile=IsMakefile)
                 OutputFileList.append(OutputFile)
 
+        #
+        # If Section Type is BINARY_FILE_TYPE_RAW
+        #
+        elif SectionType == BINARY_FILE_TYPE_RAW:
+            """If File List is empty"""
+            if FileList == []:
+                if self.Optional == True:
+                    GenFdsGlobalVariable.VerboseLogger("Optional Section don't exist!")
+                    return [], None
+                else:
+                    EdkLogger.error("GenFds", GENFDS_ERROR, "Output file for %s section could not be found for %s" % (SectionType, InfFileName))
+
+            elif len(FileList) > 1:
+                EdkLogger.error("GenFds", GENFDS_ERROR,
+                                "Files suffixed with %s are not allowed to have more than one file in %s[Binaries] section" % (
+                                self.FileExtension, InfFileName))
+            else:
+                for File in FileList:
+                    File = GenFdsGlobalVariable.MacroExtend(File, Dict)
+                    OutputFileList.append(File)
 
         else:
             """If File List is empty"""

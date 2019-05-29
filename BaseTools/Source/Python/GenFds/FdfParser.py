@@ -3749,8 +3749,19 @@ class FdfParser:
     #
     def _GetEfiSection(self, Obj):
         OldPos = self.GetFileBufferPos()
+        EfiSectionObj = EfiSection()
         if not self._GetNextWord():
-            return False
+            CurrentLine = self._CurrentLine()[self.CurrentOffsetWithinLine:].split()[0].strip()
+            if self._Token == '{' and Obj.FvFileType == "RAW" and TAB_SPLIT in CurrentLine:
+                if self._IsToken(TAB_VALUE_SPLIT):
+                    EfiSectionObj.FileExtension = self._GetFileExtension()
+                elif self._GetNextToken():
+                    EfiSectionObj.FileName = self._Token
+                EfiSectionObj.SectionType = BINARY_FILE_TYPE_RAW
+                Obj.SectionList.append(EfiSectionObj)
+                return True
+            else:
+                return False
         SectionName = self._Token
 
         if SectionName not in {
@@ -3816,7 +3827,6 @@ class FdfParser:
             Obj.SectionList.append(FvImageSectionObj)
             return True
 
-        EfiSectionObj = EfiSection()
         EfiSectionObj.SectionType = SectionName
 
         if not self._GetNextToken():
