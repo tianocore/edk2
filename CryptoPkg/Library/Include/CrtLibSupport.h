@@ -2,7 +2,7 @@
   Root include file of C runtime library to support building the third-party
   cryptographic library.
 
-Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2019, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -19,6 +19,17 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define ENGINESDIR ""
 
 #define MAX_STRING_SIZE  0x1000
+
+//
+// We already have "no-ui" in out Configure invocation.
+// but the code still fails to compile.
+// Ref:  https://github.com/openssl/openssl/issues/8904
+//
+// This is defined in CRT library(stdio.h).
+//
+#ifndef BUFSIZ
+#define BUFSIZ  8192
+#endif
 
 //
 // OpenSSL relies on explicit configuration for word size in crypto/bn,

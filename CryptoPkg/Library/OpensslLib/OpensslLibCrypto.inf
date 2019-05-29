@@ -1,7 +1,7 @@
 ## @file
 #  This module provides OpenSSL Library implementation.
 #
-#  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2010 - 2019, Intel Corporation. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -15,7 +15,7 @@
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = OpensslLib
   DEFINE OPENSSL_PATH            = openssl
-  DEFINE OPENSSL_FLAGS           = -DL_ENDIAN -DOPENSSL_SMALL_FOOTPRINT -D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE -DNO_SYSLOG
+  DEFINE OPENSSL_FLAGS           = -DL_ENDIAN -DOPENSSL_SMALL_FOOTPRINT -D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE
 
 #
 #  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64
@@ -32,6 +32,7 @@
   $(OPENSSL_PATH)/crypto/aes/aes_misc.c
   $(OPENSSL_PATH)/crypto/aes/aes_ofb.c
   $(OPENSSL_PATH)/crypto/aes/aes_wrap.c
+  $(OPENSSL_PATH)/crypto/aria/aria.c
   $(OPENSSL_PATH)/crypto/asn1/a_bitstr.c
   $(OPENSSL_PATH)/crypto/asn1/a_d2i_fp.c
   $(OPENSSL_PATH)/crypto/asn1/a_digest.c
@@ -54,6 +55,7 @@
   $(OPENSSL_PATH)/crypto/asn1/ameth_lib.c
   $(OPENSSL_PATH)/crypto/asn1/asn1_err.c
   $(OPENSSL_PATH)/crypto/asn1/asn1_gen.c
+  $(OPENSSL_PATH)/crypto/asn1/asn1_item_list.c
   $(OPENSSL_PATH)/crypto/asn1/asn1_lib.c
   $(OPENSSL_PATH)/crypto/asn1/asn1_par.c
   $(OPENSSL_PATH)/crypto/asn1/asn_mime.c
@@ -172,6 +174,7 @@
   $(OPENSSL_PATH)/crypto/conf/conf_ssl.c
   $(OPENSSL_PATH)/crypto/cpt_err.c
   $(OPENSSL_PATH)/crypto/cryptlib.c
+  $(OPENSSL_PATH)/crypto/ctype.c
   $(OPENSSL_PATH)/crypto/cversion.c
   $(OPENSSL_PATH)/crypto/des/cbc_cksm.c
   $(OPENSSL_PATH)/crypto/des/cbc_enc.c
@@ -189,7 +192,6 @@
   $(OPENSSL_PATH)/crypto/des/pcbc_enc.c
   $(OPENSSL_PATH)/crypto/des/qud_cksm.c
   $(OPENSSL_PATH)/crypto/des/rand_key.c
-  $(OPENSSL_PATH)/crypto/des/rpc_enc.c
   $(OPENSSL_PATH)/crypto/des/set_key.c
   $(OPENSSL_PATH)/crypto/des/str2key.c
   $(OPENSSL_PATH)/crypto/des/xcbc_enc.c
@@ -206,6 +208,7 @@
   $(OPENSSL_PATH)/crypto/dh/dh_pmeth.c
   $(OPENSSL_PATH)/crypto/dh/dh_prn.c
   $(OPENSSL_PATH)/crypto/dh/dh_rfc5114.c
+  $(OPENSSL_PATH)/crypto/dh/dh_rfc7919.c
   $(OPENSSL_PATH)/crypto/dso/dso_dl.c
   $(OPENSSL_PATH)/crypto/dso/dso_dlfcn.c
   $(OPENSSL_PATH)/crypto/dso/dso_err.c
@@ -228,6 +231,7 @@
   $(OPENSSL_PATH)/crypto/evp/e_aes.c
   $(OPENSSL_PATH)/crypto/evp/e_aes_cbc_hmac_sha1.c
   $(OPENSSL_PATH)/crypto/evp/e_aes_cbc_hmac_sha256.c
+  $(OPENSSL_PATH)/crypto/evp/e_aria.c
   $(OPENSSL_PATH)/crypto/evp/e_bf.c
   $(OPENSSL_PATH)/crypto/evp/e_camellia.c
   $(OPENSSL_PATH)/crypto/evp/e_cast.c
@@ -242,6 +246,7 @@
   $(OPENSSL_PATH)/crypto/evp/e_rc4_hmac_md5.c
   $(OPENSSL_PATH)/crypto/evp/e_rc5.c
   $(OPENSSL_PATH)/crypto/evp/e_seed.c
+  $(OPENSSL_PATH)/crypto/evp/e_sm4.c
   $(OPENSSL_PATH)/crypto/evp/e_xcbc_d.c
   $(OPENSSL_PATH)/crypto/evp/encode.c
   $(OPENSSL_PATH)/crypto/evp/evp_cnf.c
@@ -259,6 +264,7 @@
   $(OPENSSL_PATH)/crypto/evp/m_null.c
   $(OPENSSL_PATH)/crypto/evp/m_ripemd.c
   $(OPENSSL_PATH)/crypto/evp/m_sha1.c
+  $(OPENSSL_PATH)/crypto/evp/m_sha3.c
   $(OPENSSL_PATH)/crypto/evp/m_sigver.c
   $(OPENSSL_PATH)/crypto/evp/m_wp.c
   $(OPENSSL_PATH)/crypto/evp/names.c
@@ -271,10 +277,10 @@
   $(OPENSSL_PATH)/crypto/evp/p_seal.c
   $(OPENSSL_PATH)/crypto/evp/p_sign.c
   $(OPENSSL_PATH)/crypto/evp/p_verify.c
+  $(OPENSSL_PATH)/crypto/evp/pbe_scrypt.c
   $(OPENSSL_PATH)/crypto/evp/pmeth_fn.c
   $(OPENSSL_PATH)/crypto/evp/pmeth_gn.c
   $(OPENSSL_PATH)/crypto/evp/pmeth_lib.c
-  $(OPENSSL_PATH)/crypto/evp/scrypt.c
   $(OPENSSL_PATH)/crypto/ex_data.c
   $(OPENSSL_PATH)/crypto/getenv.c
   $(OPENSSL_PATH)/crypto/hmac/hm_ameth.c
@@ -283,6 +289,7 @@
   $(OPENSSL_PATH)/crypto/init.c
   $(OPENSSL_PATH)/crypto/kdf/hkdf.c
   $(OPENSSL_PATH)/crypto/kdf/kdf_err.c
+  $(OPENSSL_PATH)/crypto/kdf/scrypt.c
   $(OPENSSL_PATH)/crypto/kdf/tls1_prf.c
   $(OPENSSL_PATH)/crypto/lhash/lh_stats.c
   $(OPENSSL_PATH)/crypto/lhash/lhash.c
@@ -360,14 +367,14 @@
   $(OPENSSL_PATH)/crypto/pkcs7/pk7_mime.c
   $(OPENSSL_PATH)/crypto/pkcs7/pk7_smime.c
   $(OPENSSL_PATH)/crypto/pkcs7/pkcs7err.c
-  $(OPENSSL_PATH)/crypto/rand/md_rand.c
+  $(OPENSSL_PATH)/crypto/rand/drbg_ctr.c
+  $(OPENSSL_PATH)/crypto/rand/drbg_lib.c
   $(OPENSSL_PATH)/crypto/rand/rand_egd.c
   $(OPENSSL_PATH)/crypto/rand/rand_err.c
   $(OPENSSL_PATH)/crypto/rand/rand_lib.c
   $(OPENSSL_PATH)/crypto/rand/rand_unix.c
   $(OPENSSL_PATH)/crypto/rand/rand_vms.c
   $(OPENSSL_PATH)/crypto/rand/rand_win.c
-  $(OPENSSL_PATH)/crypto/rand/randfile.c
   $(OPENSSL_PATH)/crypto/rc4/rc4_enc.c
   $(OPENSSL_PATH)/crypto/rc4/rc4_skey.c
   $(OPENSSL_PATH)/crypto/rsa/rsa_ameth.c
@@ -379,8 +386,8 @@
   $(OPENSSL_PATH)/crypto/rsa/rsa_gen.c
   $(OPENSSL_PATH)/crypto/rsa/rsa_lib.c
   $(OPENSSL_PATH)/crypto/rsa/rsa_meth.c
+  $(OPENSSL_PATH)/crypto/rsa/rsa_mp.c
   $(OPENSSL_PATH)/crypto/rsa/rsa_none.c
-  $(OPENSSL_PATH)/crypto/rsa/rsa_null.c
   $(OPENSSL_PATH)/crypto/rsa/rsa_oaep.c
   $(OPENSSL_PATH)/crypto/rsa/rsa_ossl.c
   $(OPENSSL_PATH)/crypto/rsa/rsa_pk1.c
@@ -392,15 +399,27 @@
   $(OPENSSL_PATH)/crypto/rsa/rsa_ssl.c
   $(OPENSSL_PATH)/crypto/rsa/rsa_x931.c
   $(OPENSSL_PATH)/crypto/rsa/rsa_x931g.c
+  $(OPENSSL_PATH)/crypto/sha/keccak1600.c
   $(OPENSSL_PATH)/crypto/sha/sha1_one.c
   $(OPENSSL_PATH)/crypto/sha/sha1dgst.c
   $(OPENSSL_PATH)/crypto/sha/sha256.c
   $(OPENSSL_PATH)/crypto/sha/sha512.c
+  $(OPENSSL_PATH)/crypto/siphash/siphash.c
+  $(OPENSSL_PATH)/crypto/siphash/siphash_ameth.c
+  $(OPENSSL_PATH)/crypto/siphash/siphash_pmeth.c
+  $(OPENSSL_PATH)/crypto/sm3/m_sm3.c
+  $(OPENSSL_PATH)/crypto/sm3/sm3.c
+  $(OPENSSL_PATH)/crypto/sm4/sm4.c
   $(OPENSSL_PATH)/crypto/stack/stack.c
   $(OPENSSL_PATH)/crypto/threads_none.c
   $(OPENSSL_PATH)/crypto/threads_pthread.c
   $(OPENSSL_PATH)/crypto/threads_win.c
   $(OPENSSL_PATH)/crypto/txt_db/txt_db.c
+  $(OPENSSL_PATH)/crypto/ui/ui_err.c
+  $(OPENSSL_PATH)/crypto/ui/ui_lib.c
+  $(OPENSSL_PATH)/crypto/ui/ui_null.c
+  $(OPENSSL_PATH)/crypto/ui/ui_openssl.c
+  $(OPENSSL_PATH)/crypto/ui/ui_util.c
   $(OPENSSL_PATH)/crypto/uid.c
   $(OPENSSL_PATH)/crypto/x509/by_dir.c
   $(OPENSSL_PATH)/crypto/x509/by_file.c
@@ -445,6 +464,7 @@
   $(OPENSSL_PATH)/crypto/x509v3/pcy_node.c
   $(OPENSSL_PATH)/crypto/x509v3/pcy_tree.c
   $(OPENSSL_PATH)/crypto/x509v3/v3_addr.c
+  $(OPENSSL_PATH)/crypto/x509v3/v3_admis.c
   $(OPENSSL_PATH)/crypto/x509v3/v3_akey.c
   $(OPENSSL_PATH)/crypto/x509v3/v3_akeya.c
   $(OPENSSL_PATH)/crypto/x509v3/v3_alt.c
@@ -476,12 +496,29 @@
   $(OPENSSL_PATH)/crypto/x509v3/v3err.c
 # Autogenerated files list ends here
 
+  ossl_store.c
+  rand_pool.c
+
+[Sources.Ia32]
+  rand_pool_noise_tsc.c
+
+[Sources.X64]
+  rand_pool_noise_tsc.c
+
+[Sources.ARM]
+  rand_pool_noise.c
+
+[Sources.AARCH64]
+  rand_pool_noise.c
+
 [Packages]
   MdePkg/MdePkg.dec
   CryptoPkg/CryptoPkg.dec
 
 [LibraryClasses]
+  BaseLib
   DebugLib
+  TimerLib
 
 [LibraryClasses.ARM]
   ArmSoftFloatLib
