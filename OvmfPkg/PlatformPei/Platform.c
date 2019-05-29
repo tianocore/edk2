@@ -184,13 +184,14 @@ MemMapInitialization (
     PciBase = (TopOfLowRam < BASE_2GB) ? BASE_2GB : TopOfLowRam;
     if (mHostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID) {
       //
-      // The 32-bit PCI host aperture is expected to fall between the top of
-      // low RAM and the base of the MMCONFIG area.
+      // The MMCONFIG area is expected to fall between the top of low RAM and
+      // the base of the 32-bit PCI host aperture.
       //
       PciExBarBase = FixedPcdGet64 (PcdPciExpressBaseAddress);
-      ASSERT (PciBase < PciExBarBase);
+      ASSERT (TopOfLowRam <= PciExBarBase);
       ASSERT (PciExBarBase <= MAX_UINT32 - SIZE_256MB);
-      PciSize = (UINT32)(PciExBarBase - PciBase);
+      PciBase = (UINT32)(PciExBarBase + SIZE_256MB);
+      PciSize = 0xFC000000 - PciBase;
     } else {
       PciSize = 0xFC000000 - PciBase;
     }
