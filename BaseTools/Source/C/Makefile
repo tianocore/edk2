@@ -12,6 +12,7 @@ LIBRARIES = Common
 APPLICATIONS = \
   VfrCompile \
   BrotliCompress \
+  BfmLib \
   EfiRom \
   GenCrc32 \
   GenFfs \
