@@ -1521,7 +1521,7 @@ Returns:
   //
   FitStartPtr = (FIT_TABLE *) RelativeAddress;
 
-  strncpy ((CHAR8 *) &FitStartPtr->CompAddress, FIT_SIGNATURE, 8);  // "_FIT_   "
+  memcpy(&FitStartPtr->CompAddress, FIT_SIGNATURE, 8); // "_FIT_   "
   assert (((VtfInfo->CompSize & 0x00FFFFFF) % 16) == 0);
   FitStartPtr->CompSize     = (VtfInfo->CompSize & 0x00FFFFFF) / 16;
   FitStartPtr->CompVersion  = MAKE_VERSION (VtfInfo->MajorVer, VtfInfo->MinorVer);
