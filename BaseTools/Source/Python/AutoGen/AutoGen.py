@@ -3906,6 +3906,12 @@ class ModuleAutoGen(AutoGen):
             ModuleFile = path.join(self.OutputDir, self.Name + '.inf')
             if os.path.exists(ModuleFile):
                 shutil.copy2(ModuleFile, FileDir)
+        else:
+            OutputDir = self.OutputDir.replace('\\', '/').strip('/')
+            DebugDir = self.DebugDir.replace('\\', '/').strip('/')
+            for Item in self.CodaTargetList:
+                File = Item.Target.Path.replace('\\', '/').strip('/').replace(DebugDir, '').replace(OutputDir, '').strip('/')
+                self.OutputFile.add(File)
         if not self.OutputFile:
             Ma = self.BuildDatabase[self.MetaFile, self.Arch, self.BuildTarget, self.ToolChain]
             self.OutputFile = Ma.Binaries
