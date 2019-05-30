@@ -1713,7 +1713,7 @@ AhciModeInitialization (
   MaxPortNumber = MIN (MaxPortNumber, (UINT8)(UINTN)(HighBitSet32(PortImplementBitMap) + 1));
   MaxPortNumber = MIN (MaxPortNumber, AhciGetNumberOfPortsFromMap (Private->PortBitMap));
 
-  PortInitializeBitMap = Private->PortBitMap;
+  PortInitializeBitMap = Private->PortBitMap & PortImplementBitMap;
   AhciRegisters        = &Private->AhciRegisters;
   DeviceIndex          = 0;
   //
@@ -1721,6 +1721,13 @@ AhciModeInitialization (
   //
   for (PortIndex = 1; PortIndex <= MaxPortNumber; PortIndex ++) {
     Status = AhciGetPortFromMap (PortInitializeBitMap, PortIndex, &Port);
+    if (EFI_ERROR (Status)) {
+      //
+      // No more available port, just break out of the loop.
+      //
+      break;
+    }
+
     if ((PortImplementBitMap & (BIT0 << Port)) != 0) {
       //
       // Initialize FIS Base Address Register and Command List Base Address
