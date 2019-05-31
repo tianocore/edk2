@@ -1,7 +1,7 @@
 /** @file
   CPU MP Initialize Library common functions.
 
-  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2019, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -619,6 +619,8 @@ ApWakeupFunction (
       RestoreVolatileRegisters (&CpuMpData->CpuData[0].VolatileRegisters, FALSE);
       InitializeApData (CpuMpData, ProcessorNumber, BistData, ApTopOfStack);
       ApStartupSignalBuffer = CpuMpData->CpuData[ProcessorNumber].StartupApSignal;
+
+      InterlockedDecrement ((UINT32 *) &CpuMpData->MpCpuExchangeInfo->NumApsExecuting);
     } else {
       //
       // Execute AP function if AP is ready
@@ -698,7 +700,6 @@ ApWakeupFunction (
     // AP finished executing C code
     //
     InterlockedIncrement ((UINT32 *) &CpuMpData->FinishedCount);
-    InterlockedDecrement ((UINT32 *) &CpuMpData->MpCpuExchangeInfo->NumApsExecuting);
 
     //
     // Place AP is specified loop mode
