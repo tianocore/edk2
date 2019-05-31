@@ -33,6 +33,7 @@
   Hash/CryptSha1.c
   Hash/CryptSha256.c
   Hash/CryptSha512.c
+  Hash/CryptSm3.c
   Hmac/CryptHmacMd5.c
   Hmac/CryptHmacSha1.c
   Hmac/CryptHmacSha256.c
