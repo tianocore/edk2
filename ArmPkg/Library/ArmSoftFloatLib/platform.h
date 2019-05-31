@@ -5,7 +5,7 @@
  */
 
 #define LITTLEENDIAN 1
-#define INLINE inline __attribute__((always_inline))
+#define INLINE static inline
 #define SOFTFLOAT_BUILTIN_CLZ 1
 #define SOFTFLOAT_FAST_INT64
 #include "opts-GCC.h"
