@@ -1,5 +1,5 @@
 ;------------------------------------------------------------------------------ ;
-; Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2015 - 2019, Intel Corporation. All rights reserved.<BR>
 ; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;
 ; Module Name:
@@ -81,12 +81,6 @@ Flat32Start:                                   ; protected mode entry point
 
     mov        esi, ebx
 
-    ; Increment the number of APs executing here as early as possible
-    ; This is decremented in C code when AP is finished executing
-    mov        edi, esi
-    add        edi, NumApsExecutingLocation
-    lock inc   dword [edi]
-
     mov         edi, esi
     add         edi, EnableExecuteDisableLocation
     cmp         byte [edi], 0
@@ -119,6 +113,12 @@ SkipEnableExecuteDisable:
     add        edi, InitFlagLocation
     cmp        dword [edi], 1       ; 1 == ApInitConfig
     jnz        GetApicId
+
+    ; Increment the number of APs executing here as early as possible
+    ; This is decremented in C code when AP is finished executing
+    mov        edi, esi
+    add        edi, NumApsExecutingLocation
+    lock inc   dword [edi]
 
     ; AP init
     mov        edi, esi
