@@ -791,18 +791,84 @@ BuildMemoryResourceDescriptor (
 }
 
 /**
-  Checks for the presence of capsule descriptors.
-  Get capsule descriptors from variable CapsuleUpdateData, CapsuleUpdateData1, CapsuleUpdateData2...
-  and save to DescriptorBuffer.
+  Check if the capsules are staged.
 
-  @param DescriptorBuffer        Pointer to the capsule descriptors
+  @param UpdateCapsules   A pointer to return the check result.
 
-  @retval EFI_SUCCESS     a valid capsule is present
-  @retval EFI_NOT_FOUND   if a valid capsule is not present
+  @retval EFI_INVALID_PARAMETER   The parameter is null.
+  @retval EFI_SUCCESS             The Capsules are staged.
+
 **/
 EFI_STATUS
-GetCapsuleDescriptors (
-  IN EFI_PHYSICAL_ADDRESS     *DescriptorBuffer
+EFIAPI
+AreCapsulesStaged(
+  OUT BOOLEAN     *UpdateCapsules
+  )
+{
+  EFI_STATUS                        Status;
+  UINTN                             Size;
+  EFI_PEI_READ_ONLY_VARIABLE2_PPI   *PPIVariableServices;
+  EFI_PHYSICAL_ADDRESS              CapsuleDataPtr64 = 0;
+
+  if (UpdateCapsules == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a Invalid parameters.  Inputs can't be NULL\n", __FUNCTION__));
+    ASSERT (UpdateCapsules != NULL);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  *UpdateCapsules = FALSE;
+
+  Status = PeiServicesLocatePpi(
+              &gEfiPeiReadOnlyVariable2PpiGuid,
+              0,
+              NULL,
+              (VOID **)&PPIVariableServices
+              );
+
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Failed to find ReadOnlyVariable2PPI\n"));
+    return Status;
+  }
+
+  //
+  // Check for Update capsule
+  //
+  Size = sizeof (CapsuleDataPtr64);
+  Status = PPIVariableServices->GetVariable (
+                                  PPIVariableServices,
+                                  EFI_CAPSULE_VARIABLE_NAME,
+                                  &gEfiCapsuleVendorGuid,
+                                  NULL,
+                                  &Size,
+                                  (VOID *)&CapsuleDataPtr64
+                                  );
+
+  if (!EFI_ERROR (Status)) {
+    *UpdateCapsules = TRUE;
+  }
+
+  return EFI_SUCCESS;
+}
+
+#define MAX_SG_LIST_HEADS (20)
+
+/**
+  Check all the variables for SG list heads and get the count and addresses.
+
+  @param ListLength               A pointer would return the SG list length.
+  @param HeadList                 A ponter to the capsule SG list.
+
+  @retval EFI_SUCCESS             a valid capsule is present
+  @retval EFI_NOT_FOUND           if a valid capsule is not present
+  @retval EFI_INVALID_PARAMETER   the input parameter is invalid
+  @retval EFI_OUT_OF_RESOURCES    fail to allocate memory
+
+**/
+EFI_STATUS
+EFIAPI
+GetScatterGatherHeadEntries(
+  OUT UINTN *ListLength,
+  OUT EFI_PHYSICAL_ADDRESS **HeadList
   )
 {
   EFI_STATUS                       Status;
@@ -815,6 +881,7 @@ GetCapsuleDescriptors (
   CHAR16                           *TempVarName;
   EFI_PHYSICAL_ADDRESS             CapsuleDataPtr64;
   EFI_PEI_READ_ONLY_VARIABLE2_PPI  *PPIVariableServices;
+  EFI_PHYSICAL_ADDRESS             TempList[MAX_SG_LIST_HEADS];
 
   Index             = 0;
   TempVarName       = NULL;
@@ -822,86 +889,95 @@ GetCapsuleDescriptors (
   ValidIndex        = 0;
   CapsuleDataPtr64  = 0;
 
+  if ((ListLength == NULL) || (HeadList == NULL)) {
+    DEBUG ((DEBUG_ERROR, "%a Invalid parameters.  Inputs can't be NULL\n", __FUNCTION__));
+    ASSERT (ListLength != NULL);
+    ASSERT (HeadList != NULL);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  *ListLength = 0;
+  *HeadList = NULL;
+
   Status = PeiServicesLocatePpi (
               &gEfiPeiReadOnlyVariable2PpiGuid,
               0,
               NULL,
-              (VOID **) &PPIVariableServices
+              (VOID **)&PPIVariableServices
               );
-  if (Status == EFI_SUCCESS) {
-    StrCpyS (CapsuleVarName, sizeof(CapsuleVarName)/sizeof(CHAR16), EFI_CAPSULE_VARIABLE_NAME);
-    TempVarName = CapsuleVarName + StrLen (CapsuleVarName);
-    Size = sizeof (CapsuleDataPtr64);
-    while (1) {
-      if (Index == 0) {
-        //
-        // For the first Capsule Image
-        //
-        Status = PPIVariableServices->GetVariable (
-                                        PPIVariableServices,
-                                        CapsuleVarName,
-                                        &gEfiCapsuleVendorGuid,
-                                        NULL,
-                                        &Size,
-                                        (VOID *) &CapsuleDataPtr64
-                                        );
-        if (EFI_ERROR (Status)) {
-          DEBUG ((DEBUG_INFO, "Capsule -- capsule variable not set\n"));
-          return EFI_NOT_FOUND;
-        }
-        //
-        // We have a chicken/egg situation where the memory init code needs to
-        // know the boot mode prior to initializing memory. For this case, our
-        // validate function will fail. We can detect if this is the case if blocklist
-        // pointer is null. In that case, return success since we know that the
-        // variable is set.
-        //
-        if (DescriptorBuffer == NULL) {
-          return EFI_SUCCESS;
-        }
-      } else {
-        UnicodeValueToStringS (
-          TempVarName,
-          sizeof (CapsuleVarName) - ((UINTN)TempVarName - (UINTN)CapsuleVarName),
-          0,
-          Index,
-          0
-          );
-        Status = PPIVariableServices->GetVariable (
-                                        PPIVariableServices,
-                                        CapsuleVarName,
-                                        &gEfiCapsuleVendorGuid,
-                                        NULL,
-                                        &Size,
-                                        (VOID *) &CapsuleDataPtr64
-                                        );
-        if (EFI_ERROR (Status)) {
-          break;
-        }
 
-        //
-        // If this BlockList has been linked before, skip this variable
-        //
-        Flag = FALSE;
-        for (TempIndex = 0; TempIndex < ValidIndex; TempIndex++) {
-          if (DescriptorBuffer[TempIndex] == CapsuleDataPtr64)  {
-            Flag = TRUE;
-            break;
-          }
-        }
-        if (Flag) {
-          Index ++;
-          continue;
-        }
-      }
-
-      //
-      // Cache BlockList which has been processed
-      //
-      DescriptorBuffer[ValidIndex++] = CapsuleDataPtr64;
-      Index ++;
-    }
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Failed to find ReadOnlyVariable2PPI\n"));
+    return Status;
   }
+
+  //
+  // setup var name buffer for update capsules
+  //
+  StrCpyS (CapsuleVarName, sizeof (CapsuleVarName) / sizeof (CHAR16), EFI_CAPSULE_VARIABLE_NAME);
+  TempVarName = CapsuleVarName + StrLen (CapsuleVarName);
+  while (ValidIndex < MAX_SG_LIST_HEADS) {
+    if (Index != 0) {
+      UnicodeValueToStringS (
+        TempVarName,
+        (sizeof (CapsuleVarName) - ((StrLen (CapsuleVarName) + 1) * sizeof (CHAR16))),
+        0,
+        Index,
+        0
+        );
+    }
+    Size = sizeof (CapsuleDataPtr64);
+    Status = PPIVariableServices->GetVariable (
+                                    PPIVariableServices,
+                                    CapsuleVarName,
+                                    &gEfiCapsuleVendorGuid,
+                                    NULL,
+                                    &Size,
+                                    (VOID *)&CapsuleDataPtr64
+                                    );
+
+    if (EFI_ERROR (Status)) {
+      if (Status != EFI_NOT_FOUND) {
+        DEBUG ((DEBUG_ERROR, "Unexpected error getting Capsule Update variable.  Status = %r\n"));
+      }
+      break;
+    }
+
+    //
+    // If this BlockList has been linked before, skip this variable
+    //
+    Flag = FALSE;
+    for (TempIndex = 0; TempIndex < ValidIndex; TempIndex++) {
+      if (TempList[TempIndex] == CapsuleDataPtr64) {
+        Flag = TRUE;
+        break;
+      }
+    }
+    if (Flag) {
+      Index++;
+      continue;
+    }
+
+    //
+    // add it to the cached list
+    //
+    TempList[ValidIndex++] = CapsuleDataPtr64;
+    Index++;
+  }
+
+  if (ValidIndex == 0) {
+    DEBUG ((DEBUG_ERROR, "%a didn't find any SG lists in variables\n", __FUNCTION__));
+    return EFI_NOT_FOUND;
+  }
+
+  *HeadList = AllocateZeroPool ((ValidIndex + 1) * sizeof (EFI_PHYSICAL_ADDRESS));
+  if (*HeadList == NULL) {
+    DEBUG ((DEBUG_ERROR, "Failed to allocate memory\n"));
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  CopyMem (*HeadList, TempList, (ValidIndex) * sizeof (EFI_PHYSICAL_ADDRESS));
+  *ListLength = ValidIndex;
 
   return EFI_SUCCESS;
 }
@@ -937,15 +1013,9 @@ CapsuleCoalesce (
   IN OUT UINTN                       *MemorySize
   )
 {
-  UINTN                                Index;
-  UINTN                                Size;
-  UINTN                                VariableCount;
-  CHAR16                               CapsuleVarName[30];
-  CHAR16                               *TempVarName;
-  EFI_PHYSICAL_ADDRESS                 CapsuleDataPtr64;
   EFI_STATUS                           Status;
   EFI_BOOT_MODE                        BootMode;
-  EFI_PEI_READ_ONLY_VARIABLE2_PPI      *PPIVariableServices;
+  UINTN                                ListLength;
   EFI_PHYSICAL_ADDRESS                 *VariableArrayAddress;
   MEMORY_RESOURCE_DESCRIPTOR           *MemoryResource;
 #ifdef MDE_CPU_IA32
@@ -955,10 +1025,8 @@ CapsuleCoalesce (
   EFI_CAPSULE_LONG_MODE_BUFFER         LongModeBuffer;
 #endif
 
-  Index                   = 0;
-  VariableCount           = 0;
-  CapsuleVarName[0]       = 0;
-  CapsuleDataPtr64        = 0;
+  ListLength = 0;
+  VariableArrayAddress = NULL;
 
   //
   // Someone should have already ascertained the boot mode. If it's not
@@ -972,74 +1040,11 @@ CapsuleCoalesce (
   }
 
   //
-  // User may set the same ScatterGatherList with several different variables,
-  // so cache all ScatterGatherList for check later.
+  // Get SG list entries
   //
-  Status = PeiServicesLocatePpi (
-              &gEfiPeiReadOnlyVariable2PpiGuid,
-              0,
-              NULL,
-              (VOID **) &PPIVariableServices
-              );
+  Status = GetScatterGatherHeadEntries (&ListLength, &VariableArrayAddress);
   if (EFI_ERROR (Status)) {
-    goto Done;
-  }
-  Size = sizeof (CapsuleDataPtr64);
-  StrCpyS (CapsuleVarName, sizeof(CapsuleVarName)/sizeof(CHAR16), EFI_CAPSULE_VARIABLE_NAME);
-  TempVarName = CapsuleVarName + StrLen (CapsuleVarName);
-  while (TRUE) {
-    if (Index > 0) {
-      UnicodeValueToStringS (
-        TempVarName,
-        sizeof (CapsuleVarName) - ((UINTN)TempVarName - (UINTN)CapsuleVarName),
-        0,
-        Index,
-        0
-        );
-    }
-    Status = PPIVariableServices->GetVariable (
-                                    PPIVariableServices,
-                                    CapsuleVarName,
-                                    &gEfiCapsuleVendorGuid,
-                                    NULL,
-                                    &Size,
-                                    (VOID *) &CapsuleDataPtr64
-                                    );
-    if (EFI_ERROR (Status)) {
-      //
-      // There is no capsule variables, quit
-      //
-      DEBUG ((DEBUG_INFO,"Capsule variable Index = %d\n", Index));
-      break;
-    }
-    VariableCount++;
-    Index++;
-  }
-
-  DEBUG ((DEBUG_INFO,"Capsule variable count = %d\n", VariableCount));
-
-  //
-  // The last entry is the end flag.
-  //
-  Status = PeiServicesAllocatePool (
-             (VariableCount + 1) * sizeof (EFI_PHYSICAL_ADDRESS),
-             (VOID **)&VariableArrayAddress
-             );
-
-  if (Status != EFI_SUCCESS) {
-    DEBUG ((DEBUG_ERROR, "AllocatePages Failed!, Status = %x\n", Status));
-    goto Done;
-  }
-
-  ZeroMem (VariableArrayAddress, (VariableCount + 1) * sizeof (EFI_PHYSICAL_ADDRESS));
-
-  //
-  // Find out if we actually have a capsule.
-  // GetCapsuleDescriptors depends on variable PPI, so it should run in 32-bit environment.
-  //
-  Status = GetCapsuleDescriptors (VariableArrayAddress);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "Fail to find capsule variables.\n"));
+    DEBUG ((DEBUG_ERROR, "%a failed to get Scatter Gather List Head Entries.  Status = %r\n", __FUNCTION__, Status));
     goto Done;
   }
 
@@ -1118,7 +1123,17 @@ CheckCapsuleUpdate (
   )
 {
   EFI_STATUS  Status;
-  Status = GetCapsuleDescriptors (NULL);
+  BOOLEAN     Update;
+
+  Status = AreCapsulesStaged (&Update);
+
+  if (!EFI_ERROR (Status)) {
+    if (Update) {
+      Status = EFI_SUCCESS;
+    } else {
+      Status = EFI_NOT_FOUND;
+    }
+  }
   return Status;
 }
 /**

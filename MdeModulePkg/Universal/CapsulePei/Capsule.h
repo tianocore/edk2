@@ -30,6 +30,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/PcdLib.h>
 #include <Library/ReportStatusCodeLib.h>
 #include <Library/DebugAgentLib.h>
+#include <Library/MemoryAllocationLib.h>
 #include <IndustryStandard/PeImage.h>
 #include "Common/CommonHeader.h"
 

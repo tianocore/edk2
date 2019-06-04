@@ -43,6 +43,7 @@
   BaseLib
   HobLib
   BaseMemoryLib
+  MemoryAllocationLib
   PeiServicesLib
   PeimEntryPoint
   DebugLib
