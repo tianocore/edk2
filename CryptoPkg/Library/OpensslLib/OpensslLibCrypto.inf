@@ -218,7 +218,6 @@
   $(OPENSSL_PATH)/crypto/dso/dso_win32.c
   $(OPENSSL_PATH)/crypto/ebcdic.c
   $(OPENSSL_PATH)/crypto/err/err.c
-  $(OPENSSL_PATH)/crypto/err/err_all.c
   $(OPENSSL_PATH)/crypto/err/err_prn.c
   $(OPENSSL_PATH)/crypto/evp/bio_b64.c
   $(OPENSSL_PATH)/crypto/evp/bio_enc.c
