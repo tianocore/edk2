@@ -621,6 +621,11 @@ UpdateFrontPageBannerStrings (
         HiiSetString (gFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_FRONT_PAGE_CPU_MODEL), NewString, NULL);
         FreePool (NewString);
 
+        ConvertProcessorToString(Type4Record->CurrentSpeed, 6, &NewString);
+        UiCustomizeFrontPageBanner (2, FALSE, &NewString);
+        HiiSetString (gFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_FRONT_PAGE_CPU_SPEED), NewString, NULL);
+        FreePool (NewString);
+
         FoundCpu = TRUE;
       }
     }
