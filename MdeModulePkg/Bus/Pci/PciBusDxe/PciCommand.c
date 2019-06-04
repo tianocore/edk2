@@ -236,6 +236,19 @@ LocatePciExpressCapabilityRegBlock (
       break;
     }
 
+    if (CapabilityEntry == MAX_UINT32) {
+      DEBUG ((
+        DEBUG_WARN,
+        "%a: [%02x|%02x|%02x] failed to access config space at offset 0x%x\n",
+        __FUNCTION__,
+        PciIoDevice->BusNumber,
+        PciIoDevice->DeviceNumber,
+        PciIoDevice->FunctionNumber,
+        CapabilityPtr
+        ));
+      break;
+    }
+
     CapabilityID = (UINT16) CapabilityEntry;
 
     if (CapabilityID == CapId) {
