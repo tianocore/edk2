@@ -16,6 +16,7 @@
 
 #include <Protocol/SerialIo.h>
 #include <Protocol/DevicePath.h>
+#include <Guid/SerialPortLibVendor.h>
 
 typedef struct {
   VENDOR_DEVICE_PATH        Guid;
@@ -159,7 +160,7 @@ EFI_HANDLE mSerialHandle = NULL;
 SERIAL_DEVICE_PATH mSerialDevicePath = {
   {
     { HARDWARE_DEVICE_PATH, HW_VENDOR_DP, { sizeof (VENDOR_DEVICE_PATH), 0} },
-    EFI_CALLER_ID_GUID  // Use the driver's GUID
+    EDKII_SERIAL_PORT_LIB_VENDOR_GUID
   },
   {
     { MESSAGING_DEVICE_PATH, MSG_UART_DP, { sizeof (UART_DEVICE_PATH), 0} },
