@@ -518,6 +518,7 @@
   BaseLib
   DebugLib
   TimerLib
+  PrintLib
 
 [LibraryClasses.ARM]
   ArmSoftFloatLib
