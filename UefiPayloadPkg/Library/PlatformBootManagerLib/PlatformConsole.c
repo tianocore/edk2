@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "PlatformBootManager.h"
 #include "PlatformConsole.h"
+#include <Guid/SerialPortLibVendor.h>
 
 #define PCI_DEVICE_PATH_NODE(Func, Dev) \
   { \
@@ -53,7 +54,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
         (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8) \
       } \
     }, \
-    {0xD3987D4B, 0x971A, 0x435F, {0x8C, 0xAF, 0x49, 0x67, 0xEB, 0x62, 0x72, 0x41}} \
+    EDKII_SERIAL_PORT_LIB_VENDOR_GUID \
   }
 
 #define gUart \
