@@ -201,6 +201,7 @@ QemuVideoControllerDriverStart (
   PCI_TYPE00                        Pci;
   QEMU_VIDEO_CARD                   *Card;
   EFI_PCI_IO_PROTOCOL               *ChildPciIo;
+  UINT64                            SupportedVgaIo;
 
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
@@ -278,12 +279,31 @@ QemuVideoControllerDriverStart (
   }
 
   //
+  // Get supported PCI attributes
+  //
+  Status = Private->PciIo->Attributes (
+                             Private->PciIo,
+                             EfiPciIoAttributeOperationSupported,
+                             0,
+                             &SupportedVgaIo
+                             );
+  if (EFI_ERROR (Status)) {
+    goto ClosePciIo;
+  }
+
+  SupportedVgaIo &= (UINT64)(EFI_PCI_IO_ATTRIBUTE_VGA_IO | EFI_PCI_IO_ATTRIBUTE_VGA_IO_16);
+  if (SupportedVgaIo == 0) {
+    Status = EFI_UNSUPPORTED;
+    goto ClosePciIo;
+  }
+
+  //
   // Set new PCI attributes
   //
   Status = Private->PciIo->Attributes (
                             Private->PciIo,
                             EfiPciIoAttributeOperationEnable,
-                            EFI_PCI_DEVICE_ENABLE | EFI_PCI_IO_ATTRIBUTE_VGA_MEMORY | EFI_PCI_IO_ATTRIBUTE_VGA_IO,
+                            EFI_PCI_DEVICE_ENABLE | EFI_PCI_IO_ATTRIBUTE_VGA_MEMORY | SupportedVgaIo,
                             NULL
                             );
   if (EFI_ERROR (Status)) {
