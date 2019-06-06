@@ -83,18 +83,6 @@ if exist %EDK_BASETOOLS% (
 :checkNt32Flag
 if exist %EDK_TOOLS_PATH%\Source set BASE_TOOLS_PATH=%EDK_TOOLS_PATH%
 
-@REM The Nt32 Emulation Platform requires Microsoft Libraries
-@REM and headers to interface with Windows.
-if /I "%1"=="--nt32" (
-  if /I "%2"=="X64" (
-    shift
-    call "%BASE_TOOLS_PATH%\Scripts\SetVisualStudio.bat"
-  ) else (
-    call "%BASE_TOOLS_PATH%\get_vsvars.bat"
-  )
-  shift
-)
-
 :checkBaseTools
 IF NOT EXIST "%EDK_TOOLS_PATH%\toolsetup.bat" goto BadBaseTools
 call %EDK_TOOLS_PATH%\toolsetup.bat %*
@@ -149,16 +137,7 @@ if "%1"=="" goto end
 
 :Usage
   @echo.
-  @echo  Usage: "%0 [-h | -help | --help | /h | /help | /?] [--nt32 [X64]] [Reconfig] [Rebuild] [ForceRebuild]"
-  @echo         --nt32 [X64]   If a compiler tool chain is not available in the
-  @echo                        environment, call a script to attempt to set one up.
-  @echo                        This flag is only required if building the
-  @echo                        Nt32Pkg/Nt32Pkg.dsc system emulator.
-  @echo                        If the X64 argument is set, and a compiler tool chain is
-  @echo                        not available, attempt to set up a tool chain that will
-  @echo                        create X64 binaries. Setting these two options have the
-  @echo                        potential side effect of changing tool chains used for a
-  @echo                        rebuild.
+  @echo  Usage: "%0 [-h | -help | --help | /h | /help | /?] [Reconfig] [Rebuild] [ForceRebuild]"
   @echo.
   @echo         Reconfig       Reinstall target.txt, tools_def.txt and build_rule.txt.
   @echo         Rebuild        Perform incremental rebuild of BaseTools binaries.

@@ -26,14 +26,6 @@ if /I "%1"=="/?" goto Usage
 
 :loop
   if "%1"=="" goto setup_workspace
-  if /I "%1"=="--nt32" (
-    if /I "%2" == "X64" (
-      shift
-    )
-    @REM Ignore --nt32 flag
-    shift
-    goto loop
-  )
   if /I "%1"=="Reconfig" (
     shift
     set RECONFIG=TRUE
