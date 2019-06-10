@@ -922,7 +922,7 @@ GetScatterGatherHeadEntries (
     if (Index != 0) {
       UnicodeValueToStringS (
         TempVarName,
-        (sizeof (CapsuleVarName) - ((StrLen (CapsuleVarName) + 1) * sizeof (CHAR16))),
+        (sizeof (CapsuleVarName) - ((UINTN)TempVarName - (UINTN)CapsuleVarName)),
         0,
         Index,
         0
