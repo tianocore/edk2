@@ -10,6 +10,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "Capsule.h"
 
+#define DEFAULT_SG_LIST_HEADS       (20)
+
 #ifdef MDE_CPU_IA32
 //
 // Global Descriptor Table (GDT)
@@ -841,8 +843,6 @@ AreCapsulesStaged (
   return FALSE;
 }
 
-#define MAX_SG_LIST_HEADS (20)
-
 /**
   Check all the variables for SG list heads and get the count and addresses.
 
@@ -861,17 +861,19 @@ GetScatterGatherHeadEntries (
   OUT EFI_PHYSICAL_ADDRESS **HeadList
   )
 {
-  EFI_STATUS                       Status;
-  UINTN                            Size;
-  UINTN                            Index;
-  UINTN                            TempIndex;
-  UINTN                            ValidIndex;
-  BOOLEAN                          Flag;
-  CHAR16                           CapsuleVarName[30];
-  CHAR16                           *TempVarName;
-  EFI_PHYSICAL_ADDRESS             CapsuleDataPtr64;
-  EFI_PEI_READ_ONLY_VARIABLE2_PPI  *PPIVariableServices;
-  EFI_PHYSICAL_ADDRESS             TempList[MAX_SG_LIST_HEADS];
+  EFI_STATUS                        Status;
+  UINTN                             Size;
+  UINTN                             Index;
+  UINTN                             TempIndex;
+  UINTN                             ValidIndex;
+  BOOLEAN                           Flag;
+  CHAR16                            CapsuleVarName[30];
+  CHAR16                            *TempVarName;
+  EFI_PHYSICAL_ADDRESS              CapsuleDataPtr64;
+  EFI_PEI_READ_ONLY_VARIABLE2_PPI   *PPIVariableServices;
+  EFI_PHYSICAL_ADDRESS              *TempList;
+  EFI_PHYSICAL_ADDRESS              *EnlargedTempList;
+  UINTN                             TempListLength;
 
   Index             = 0;
   TempVarName       = NULL;
@@ -902,11 +904,21 @@ GetScatterGatherHeadEntries (
   }
 
   //
+  // Allocate memory for sg list head
+  //
+  TempListLength = DEFAULT_SG_LIST_HEADS * sizeof (EFI_PHYSICAL_ADDRESS);
+  TempList = AllocateZeroPool (TempListLength);
+  if (TempList == NULL) {
+    DEBUG((DEBUG_ERROR, "Failed to allocate memory\n"));
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  //
   // setup var name buffer for update capsules
   //
   StrCpyS (CapsuleVarName, sizeof (CapsuleVarName) / sizeof (CHAR16), EFI_CAPSULE_VARIABLE_NAME);
   TempVarName = CapsuleVarName + StrLen (CapsuleVarName);
-  while (ValidIndex < MAX_SG_LIST_HEADS) {
+  while (TRUE) {
     if (Index != 0) {
       UnicodeValueToStringS (
         TempVarName,
@@ -946,6 +958,17 @@ GetScatterGatherHeadEntries (
     if (Flag) {
       Index++;
       continue;
+    }
+
+    //
+    // The TempList is full, enlarge it
+    //
+    if ((ValidIndex + 1) >= TempListLength) {
+      EnlargedTempList = AllocateZeroPool (TempListLength * 2);
+      CopyMem (EnlargedTempList, TempList, TempListLength);
+      FreePool (TempList);
+      TempList = EnlargedTempList;
+      TempListLength *= 2;
     }
 
     //
