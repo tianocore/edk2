@@ -260,9 +260,14 @@ HTTPS Boot is an alternative solution to PXE. It replaces the tftp server
 with a HTTPS server so the firmware can download the images through a trusted
 and encrypted connection.
 
-* To enable HTTPS Boot, you have to build OVMF with -D HTTP_BOOT_ENABLE and
-  -D TLS_ENABLE. The former brings in the HTTP stack from NetworkPkg while
-  the latter enables TLS support in both NetworkPkg and CryptoPkg.
+* To enable HTTPS Boot, you have to build OVMF with -D NETWORK_HTTP_BOOT_ENABLE
+  and -D NETWORK_TLS_ENABLE. The former brings in the HTTP stack from
+  NetworkPkg while the latter enables TLS support in both NetworkPkg and
+  CryptoPkg.
+
+  If you want to exclude the unsecured HTTP connection completely, OVMF has to
+  be built with -D NETWORK_ALLOW_HTTP_CONNECTIONS=FALSE so that only the HTTPS
+  connections will be accepted.
 
 * By default, there is no trusted certificate. The user has to import the
   certificates either manually with "Tls Auth Configuration" utility in the
