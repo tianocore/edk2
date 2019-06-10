@@ -1,0 +1,19 @@
+#
+# Copyright (c) 2019, Linaro Ltd. All rights reserved.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+*.efi     -diff
+*.EFI     -diff
+*.bin     -diff
+*.BIN     -diff
+*.raw     -diff
+*.RAW     -diff
+*.bmp     -diff
+*.BMP     -diff
+*.dec     diff=ini
+*.dsc     diff=ini
+*.dsc.inc diff=ini
+*.fdf     diff=ini
+*.fdf.inc diff=ini
+*.inf     diff=ini
