@@ -793,29 +793,21 @@ BuildMemoryResourceDescriptor (
 /**
   Check if the capsules are staged.
 
-  @param UpdateCapsules   A pointer to return the check result.
-
-  @retval EFI_INVALID_PARAMETER   The parameter is null.
-  @retval EFI_SUCCESS             The Capsules are staged.
+  @retval TRUE              The capsules are staged.
+  @retval FALSE             The capsules are not staged.
 
 **/
-EFI_STATUS
+BOOLEAN
 AreCapsulesStaged (
-  OUT BOOLEAN     *UpdateCapsules
+  VOID
   )
 {
   EFI_STATUS                        Status;
   UINTN                             Size;
   EFI_PEI_READ_ONLY_VARIABLE2_PPI   *PPIVariableServices;
-  EFI_PHYSICAL_ADDRESS              CapsuleDataPtr64 = 0;
+  EFI_PHYSICAL_ADDRESS              CapsuleDataPtr64;
 
-  if (UpdateCapsules == NULL) {
-    DEBUG ((DEBUG_ERROR, "%a Invalid parameters.  Inputs can't be NULL\n", __FUNCTION__));
-    ASSERT (UpdateCapsules != NULL);
-    return EFI_INVALID_PARAMETER;
-  }
-
-  *UpdateCapsules = FALSE;
+  CapsuleDataPtr64 = 0;
 
   Status = PeiServicesLocatePpi(
               &gEfiPeiReadOnlyVariable2PpiGuid,
@@ -826,7 +818,7 @@ AreCapsulesStaged (
 
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Failed to find ReadOnlyVariable2PPI\n"));
-    return Status;
+    return FALSE;
   }
 
   //
@@ -843,10 +835,10 @@ AreCapsulesStaged (
                                   );
 
   if (!EFI_ERROR (Status)) {
-    *UpdateCapsules = TRUE;
+    return TRUE;
   }
 
-  return EFI_SUCCESS;
+  return FALSE;
 }
 
 #define MAX_SG_LIST_HEADS (20)
@@ -1120,19 +1112,11 @@ CheckCapsuleUpdate (
   IN EFI_PEI_SERVICES           **PeiServices
   )
 {
-  EFI_STATUS  Status;
-  BOOLEAN     Update;
-
-  Status = AreCapsulesStaged (&Update);
-
-  if (!EFI_ERROR (Status)) {
-    if (Update) {
-      Status = EFI_SUCCESS;
-    } else {
-      Status = EFI_NOT_FOUND;
-    }
+  if (AreCapsulesStaged ()) {
+    return EFI_SUCCESS;
+  } else {
+    return EFI_NOT_FOUND;
   }
-  return Status;
 }
 /**
   This function will look at a capsule and determine if it's a test pattern.
