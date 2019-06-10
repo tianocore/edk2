@@ -151,11 +151,6 @@ M: Chasel Chiu <chasel.chiu@intel.com>
 R: Nate DeSimone <nathaniel.l.desimone@intel.com>
 R: Star Zeng <star.zeng@intel.com>
 
-IntelSiliconPkg
-W: https://github.com/tianocore/tianocore.github.io/wiki/IntelSiliconPkg
-M: Ray Ni <ray.ni@intel.com>
-M: Rangasai V Chaganty <rangasai.v.chaganty@intel.com>
-
 MdeModulePkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/MdeModulePkg
 M: Jian J Wang <jian.j.wang@intel.com>
