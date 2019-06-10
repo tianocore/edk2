@@ -1345,6 +1345,22 @@ HddPasswordRequestPassword (
   //
   if ((ConfigFormEntry->IfrData.SecurityStatus.Supported) &&
       (ConfigFormEntry->IfrData.SecurityStatus.Enabled)) {
+
+     //
+     // Add PcdSkipHddPasswordPrompt to determin whether to skip password prompt.
+     // Due to board design, device may not power off during system warm boot, which result in
+     // security status remain unlocked status, hence we add device security status check here.
+     //
+     // If device is in the locked status, device keeps locked and system continues booting.
+     // If device is in the unlocked status, system is forced shutdown for security concern.
+     //
+     if (PcdGetBool (PcdSkipHddPasswordPrompt)) {
+       if (ConfigFormEntry->IfrData.SecurityStatus.Locked) {
+         return;
+       } else {
+         gRT->ResetSystem (EfiResetShutdown, EFI_SUCCESS, 0, NULL);
+       }
+    }
     //
     // As soon as the HDD password is in enabled state, we pop up a window to unlock hdd
     // no matter it's really in locked or unlocked state.

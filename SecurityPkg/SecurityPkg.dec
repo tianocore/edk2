@@ -428,6 +428,12 @@
   # @Prompt Skip Opal DXE driver password prompt.
   gEfiSecurityPkgTokenSpaceGuid.PcdSkipOpalPasswordPrompt|FALSE|BOOLEAN|0x00010020
 
+  ## Indicates if Hdd Password driver skip password prompt.<BR><BR>
+  #   TRUE  - Skip password prompt.<BR>
+  #   FALSE - Does not skip password prompt.<BR>
+  # @Prompt Skip Hdd Password prompt.
+  gEfiSecurityPkgTokenSpaceGuid.PcdSkipHddPasswordPrompt|FALSE|BOOLEAN|0x00010021
+
 [PcdsDynamic, PcdsDynamicEx]
 
   ## This PCD indicates Hash mask for TPM 2.0. Bit definition strictly follows TCG Algorithm Registry.<BR><BR>
