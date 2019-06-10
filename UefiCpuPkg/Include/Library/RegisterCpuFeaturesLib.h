@@ -61,7 +61,7 @@
 #define CPU_FEATURE_IP_PREFETCHER                   (32+5)
 #define CPU_FEATURE_MLC_STREAMER_PREFETCHER         (32+6)
 #define CPU_FEATURE_MLC_SPATIAL_PREFETCHER          (32+7)
-#define CPU_FEATURE_THREE_STRICK_COUNTER            (32+8)
+#define CPU_FEATURE_THREE_STRIKE_COUNTER            (32+8)
 #define CPU_FEATURE_APIC_TPR_UPDATE_MESSAGE         (32+9)
 #define CPU_FEATURE_ENERGY_PERFORMANCE_BIAS         (32+10)
 #define CPU_FEATURE_PPIN                            (32+11)
