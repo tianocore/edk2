@@ -3569,8 +3569,11 @@ class ModuleAutoGen(AutoGen):
         if self.IsAsBuiltInfCreated:
             return
 
-        # Skip the following code for libraries
+        # Skip INF file generation for libraries
         if self.IsLibrary:
+            # Only store the library cache if needed
+            if GlobalData.gBinCacheDest:
+                self.CopyModuleToCache()
             return
 
         # Skip the following code for modules with no source files
