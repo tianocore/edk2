@@ -639,7 +639,7 @@ typedef struct {
 
 //
 // SRAT structure types.
-// All other values between 0x05 an 0xFF are reserved and
+// All other values between 0x06 an 0xFF are reserved and
 // will be ignored by OSPM.
 //
 #define EFI_ACPI_6_3_PROCESSOR_LOCAL_APIC_SAPIC_AFFINITY  0x00
@@ -647,6 +647,7 @@ typedef struct {
 #define EFI_ACPI_6_3_PROCESSOR_LOCAL_X2APIC_AFFINITY      0x02
 #define EFI_ACPI_6_3_GICC_AFFINITY                        0x03
 #define EFI_ACPI_6_3_GIC_ITS_AFFINITY                     0x04
+#define EFI_ACPI_6_3_GENERIC_INITIATOR_AFFINITY           0x05
 
 ///
 /// Processor Local APIC/SAPIC Affinity Structure Definition
@@ -732,6 +733,14 @@ typedef struct {
   UINT8   Reserved[2];
   UINT32  ItsId;
 } EFI_ACPI_6_3_GIC_ITS_AFFINITY_STRUCTURE;
+
+//
+// Generic Initiator Affinity Structure Device Handle Types
+// All other values between 0x02 an 0xFF are reserved and
+// will be ignored by OSPM.
+//
+#define EFI_ACPI_6_3_ACPI_DEVICE_HANDLE     0x00
+#define EFI_ACPI_6_3_PCI_DEVICE_HANDLE      0x01
 
 ///
 /// Device Handle - ACPI
