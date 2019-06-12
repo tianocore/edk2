@@ -1239,8 +1239,16 @@ InternalSmmStartupThisAp (
     AcquireSpinLock (mSmmMpSyncData->CpuData[CpuIndex].Busy);
   } else {
     if (!AcquireSpinLockOrFail (mSmmMpSyncData->CpuData[CpuIndex].Busy)) {
-      DEBUG((DEBUG_ERROR, "Can't acquire mSmmMpSyncData->CpuData[%d].Busy\n", CpuIndex));
-      return EFI_NOT_READY;
+      DEBUG ((DEBUG_INFO, "BSP[%d] finds AP[%d] busy at proc 0x%llX (param 0x%llX), ",
+        mSmmMpSyncData->BspIndex,
+        CpuIndex,
+        *mSmmMpSyncData->CpuData[CpuIndex].Procedure,
+        (VOID*)mSmmMpSyncData->CpuData[CpuIndex].Parameter));
+      DEBUG ((DEBUG_INFO, "new proc 0x%llX (param 0x%llX). Waiting for the previous AP procedure to complete...\n",
+        Procedure,
+        ProcArguments));
+
+      AcquireSpinLock (mSmmMpSyncData->CpuData[CpuIndex].Busy);
     }
 
     *Token = (MM_COMPLETION) CreateToken ();
