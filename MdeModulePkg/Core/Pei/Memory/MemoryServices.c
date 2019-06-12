@@ -802,7 +802,12 @@ PeiAllocatePool (
              (VOID **)&Hob
              );
   ASSERT_EFI_ERROR (Status);
-  *Buffer = Hob+1;
+
+  if (EFI_ERROR (Status)) {
+    *Buffer = NULL;
+  } else {
+    *Buffer = Hob + 1;
+  }
 
   return Status;
 }
