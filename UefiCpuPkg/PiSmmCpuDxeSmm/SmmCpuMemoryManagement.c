@@ -125,18 +125,36 @@ GetPageTableEntry (
   UINTN                 Index2;
   UINTN                 Index3;
   UINTN                 Index4;
+  UINTN                 Index5;
   UINT64                *L1PageTable;
   UINT64                *L2PageTable;
   UINT64                *L3PageTable;
   UINT64                *L4PageTable;
+  UINT64                *L5PageTable;
+  IA32_CR4              Cr4;
+  BOOLEAN               Enable5LevelPaging;
 
+  Index5 = ((UINTN)RShiftU64 (Address, 48)) & PAGING_PAE_INDEX_MASK;
   Index4 = ((UINTN)RShiftU64 (Address, 39)) & PAGING_PAE_INDEX_MASK;
   Index3 = ((UINTN)Address >> 30) & PAGING_PAE_INDEX_MASK;
   Index2 = ((UINTN)Address >> 21) & PAGING_PAE_INDEX_MASK;
   Index1 = ((UINTN)Address >> 12) & PAGING_PAE_INDEX_MASK;
 
+  Cr4.UintN = AsmReadCr4 ();
+  Enable5LevelPaging = (BOOLEAN) (Cr4.Bits.LA57 == 1);
+
   if (sizeof(UINTN) == sizeof(UINT64)) {
-    L4PageTable = (UINT64 *)GetPageTableBase ();
+    if (Enable5LevelPaging) {
+      L5PageTable = (UINT64 *)GetPageTableBase ();
+      if (L5PageTable[Index5] == 0) {
+        *PageAttribute = PageNone;
+        return NULL;
+      }
+
+      L4PageTable = (UINT64 *)(UINTN)(L5PageTable[Index5] & ~mAddressEncMask & PAGING_4K_ADDRESS_MASK_64);
+    } else {
+      L4PageTable = (UINT64 *)GetPageTableBase ();
+    }
     if (L4PageTable[Index4] == 0) {
       *PageAttribute = PageNone;
       return NULL;
