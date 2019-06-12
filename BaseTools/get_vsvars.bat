@@ -8,7 +8,12 @@
 
 
 @echo off
-goto  :main
+set SCRIPT_ERROR=0
+if "%1"=="" goto main
+if /I "%1"=="VS2017" goto VS2017Vars
+if /I "%1"=="VS2015" goto VS2015Vars
+if /I "%1"=="VS2013" goto VS2013Vars
+if /I "%1"=="VS2012" goto VS2012Vars
 
 :set_vsvars
 for /f "usebackq tokens=1* delims=: " %%i in (`%*`) do (
@@ -26,6 +31,10 @@ if defined VCINSTALLDIR goto :EOF
 goto :EOF
 
 
+:ToolNotInstall
+set SCRIPT_ERROR=1
+goto :EOF
+
 REM NOTE: This file will find the most recent Visual Studio installation
 REM       apparent from the environment.
 REM       To use an older version, modify your environment set up.
@@ -33,11 +42,32 @@ REM       (Or invoke the relevant vsvars32 file beforehand).
 
 :main
 if defined VCINSTALLDIR goto :done
-  if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe"  call :set_vsvars "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe"
-  if exist "%ProgramFiles%\Microsoft Visual Studio\Installer\vswhere.exe"       call :set_vsvars "%ProgramFiles%\Microsoft Visual Studio\Installer\vswhere.exe"
-  if defined VS140COMNTOOLS  call :read_vsvars  "%VS140COMNTOOLS%"
-  if defined VS120COMNTOOLS  call :read_vsvars  "%VS120COMNTOOLS%"
-  if defined VS110COMNTOOLS  call :read_vsvars  "%VS110COMNTOOLS%"
+  :VS2017Vars
+  if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" (
+    if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\BuildTools" (
+      call :set_vsvars "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" -products Microsoft.VisualStudio.Product.BuildTools
+    ) else (
+      call :set_vsvars "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe"
+    )
+  )
+  if exist "%ProgramFiles%\Microsoft Visual Studio\Installer\vswhere.exe" (
+    if exist "%ProgramFiles%\Microsoft Visual Studio\2017\BuildTools" (
+      call :set_vsvars "%ProgramFiles%\Microsoft Visual Studio\Installer\vswhere.exe" -products Microsoft.VisualStudio.Product.BuildTools
+    ) else (
+      call :set_vsvars "%ProgramFiles%\Microsoft Visual Studio\Installer\vswhere.exe"
+    )
+  )
+  if /I "%1"=="VS2017" goto ToolNotInstall
+
+  :VS2015Vars
+  if defined VS140COMNTOOLS (call :read_vsvars  "%VS140COMNTOOLS%") else (if /I "%1"=="VS2015" goto ToolNotInstall)
+
+  :VS2013Vars
+  if defined VS120COMNTOOLS ( call :read_vsvars  "%VS120COMNTOOLS%") else (if /I "%1"=="VS2013" goto ToolNotInstall)
+
+  :VS2012Vars
+  if defined VS110COMNTOOLS (call :read_vsvars  "%VS110COMNTOOLS%") else (if /I "%1"=="VS2012" goto ToolNotInstall)
+
   if defined VS100COMNTOOLS  call :read_vsvars  "%VS100COMNTOOLS%"
   if defined VS90COMNTOOLS   call :read_vsvars  "%VS90COMNTOOLS%"
   if defined VS80COMNTOOLS   call :read_vsvars  "%VS80COMNTOOLS%"
