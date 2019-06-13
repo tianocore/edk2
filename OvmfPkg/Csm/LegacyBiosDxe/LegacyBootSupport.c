@@ -928,7 +928,9 @@ GenericLegacyBoot (
   if (CopySize > Private->Legacy16Table->E820Length) {
     ZeroMem (&Regs, sizeof (EFI_IA32_REGISTER_SET));
     Regs.X.AX = Legacy16GetTableAddress;
+    Regs.X.BX = (UINT16) 0x0; // Any region
     Regs.X.CX = (UINT16) CopySize;
+    Regs.X.DX = (UINT16) 0x4; // Alignment
     Private->LegacyBios.FarCall86 (
       &Private->LegacyBios,
       Private->Legacy16Table->Compatibility16CallSegment,
@@ -942,6 +944,7 @@ GenericLegacyBoot (
     Private->Legacy16Table->E820Length  = (UINT32) CopySize;
     if (Regs.X.AX != 0) {
       DEBUG ((EFI_D_ERROR, "Legacy16 E820 length insufficient\n"));
+      return EFI_OUT_OF_RESOURCES;
     } else {
       CopyMem (
         (VOID *)(UINTN) Private->Legacy16Table->E820Pointer,
