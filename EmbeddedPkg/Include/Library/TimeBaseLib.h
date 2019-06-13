@@ -1,7 +1,7 @@
 /** @file
 *
 *  Copyright (c) 2016, Hisilicon Limited. All rights reserved.
-*  Copyright (c) 2016, Linaro Limited. All rights reserved.
+*  Copyright (c) 2016-2019, Linaro Limited. All rights reserved.
 *
 *  SPDX-License-Identifier: BSD-2-Clause-Patent
 *
@@ -53,7 +53,7 @@ EpochToEfiTime (
 /**
   Converts EFI_TIME to Epoch seconds (elapsed since 1970 JANUARY 01, 00:00:00 UTC)
  **/
-UINTN
+UINT32
 EFIAPI
 EfiTimeToEpoch (
   IN  EFI_TIME  *Time

@@ -1,7 +1,7 @@
 /** @file
 *
 *  Copyright (c) 2016, Hisilicon Limited. All rights reserved.
-*  Copyright (c) 2016, Linaro Limited. All rights reserved.
+*  Copyright (c) 2016-2019, Linaro Limited. All rights reserved.
 *
 *  SPDX-License-Identifier: BSD-2-Clause-Patent
 *
@@ -53,9 +53,9 @@ EpochToEfiTime (
   m  = (((da * 5) + 308) / 153) - 2;
   d  = da - (((m + 4) * 153) / 5) + 122;
 
-  Time->Year  = y - 4800 + ((m + 2) / 12);
+  Time->Year  = (UINT16)(y - 4800 + ((m + 2) / 12));
   Time->Month = ((m + 2) % 12) + 1;
-  Time->Day   = d + 1;
+  Time->Day   = (UINT8)(d + 1);
 
   ss = EpochSeconds % 60;
   a  = (EpochSeconds - ss) / 60;
@@ -63,9 +63,9 @@ EpochToEfiTime (
   b = (a - mm) / 60;
   hh = b % 24;
 
-  Time->Hour        = hh;
-  Time->Minute      = mm;
-  Time->Second      = ss;
+  Time->Hour        = (UINT8)hh;
+  Time->Minute      = (UINT8)mm;
+  Time->Second      = (UINT8)ss;
   Time->Nanosecond  = 0;
 
 }
@@ -99,14 +99,14 @@ EfiGetEpochDays (
 /**
   Converts EFI_TIME to Epoch seconds (elapsed since 1970 JANUARY 01, 00:00:00 UTC)
  **/
-UINTN
+UINT32
 EFIAPI
 EfiTimeToEpoch (
   IN  EFI_TIME  *Time
   )
 {
-  UINTN EpochDays;   // Number of days elapsed since EPOCH_JULIAN_DAY
-  UINTN EpochSeconds;
+  UINT32 EpochDays;   // Number of days elapsed since EPOCH_JULIAN_DAY
+  UINT32 EpochSeconds;
 
   EpochDays = EfiGetEpochDays (Time);
 
