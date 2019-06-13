@@ -3,6 +3,7 @@
 
   Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
   Copyright (c) 2011 - 2014, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2019, Linaro Ltd. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -181,7 +182,7 @@ LibSetTime (
   )
 {
   EFI_STATUS  Status;
-  UINTN       EpochSeconds;
+  UINT32      EpochSeconds;
 
   // Because the PL031 is a 32-bit counter counting seconds,
   // the maximum time span is just over 136 years.
