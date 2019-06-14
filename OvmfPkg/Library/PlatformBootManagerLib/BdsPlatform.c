@@ -1,7 +1,7 @@
 /** @file
   Platform BDS customizations.
 
-  Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2004 - 2019, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -1532,7 +1532,7 @@ PlatformBootManagerAfterConsole (
   // Register UEFI Shell
   //
   PlatformRegisterFvBootOption (
-    PcdGetPtr (PcdShellFile), L"EFI Internal Shell", LOAD_OPTION_ACTIVE
+    &gUefiShellFileGuid, L"EFI Internal Shell", LOAD_OPTION_ACTIVE
     );
 
   RemoveStaleFvFileOptions ();
