@@ -36,6 +36,22 @@ Descriptions of section entries:
      Obsolete:   Old code. Something tagged obsolete generally means
                  it has been replaced by a better system and you
                  should be using that.
+  F: Files and directories with wildcard patterns.
+     A trailing slash includes all files and subdirectory files.
+     F:   MdeModulePkg/   all files in and below MdeModulePkg
+     F:   MdeModulePkg/*  all files in MdeModulePkg, but not below
+     F:   */Pci/*         all files in a directory called Pci, at any depth in
+                          the hierarchy, but not below
+     One pattern per line.  Multiple F: lines per section acceptable.
+  X: Files and directories that are NOT maintained, same rules as F:
+     Files exclusions are tested after file matches.
+     Can be useful for excluding a specific subdirectory, for instance:
+     F:   NetworkPkg/
+     X:   NetworkPkg/Ip6Dxe/
+     matches all files in and below NetworkPkg excluding NetworkPkg/Ip6Dxe/
+  Filenames not caught by any F: rule get matched as being located in the top-
+  level directory. (Internally, the script looks for a match called '<default>',
+  so please don't add a file called that in the top-level directory.)
 
 EDK II
 ------
@@ -44,8 +60,14 @@ L: https://edk2.groups.io/g/devel/
 T: git - https://github.com/tianocore/edk2.git
 T: git (mirror) - https://bitbucket.org/tianocore/edk2.git
 
+All patches CC:d here
+L: devel@edk2.groups.io
+F: *
+F: */
+
 Tianocore Stewards
 ------------------
+F: *
 M: Andrew Fish <afish@apple.com>
 M: Laszlo Ersek <lersek@redhat.com>
 M: Leif Lindholm <leif.lindholm@linaro.org>
@@ -63,16 +85,19 @@ M: Liming Gao <liming.gao@intel.com>
 EDK II Packages:
 ----------------
 ArmPkg
+F: ArmPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/ArmPkg
 M: Leif Lindholm <leif.lindholm@linaro.org>
 M: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
 ArmPlatformPkg
+F: ArmPlatformPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/ArmPlatformPkg
 M: Leif Lindholm <leif.lindholm@linaro.org>
 M: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
 ArmVirtPkg
+F: ArmVirtPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/ArmVirtPkg
 M: Laszlo Ersek <lersek@redhat.com>
 M: Ard Biesheuvel <ard.biesheuvel@linaro.org>
@@ -81,26 +106,31 @@ R: Julien Grall <julien.grall@arm.com>
 R: Leif Lindholm <leif.lindholm@linaro.org>
 
 BaseTools
+F: BaseTools/
 W: https://github.com/tianocore/tianocore.github.io/wiki/BaseTools
 M: Bob Feng <bob.c.feng@intel.com>
 M: Liming Gao <liming.gao@intel.com>
 
 CryptoPkg
+F: CryptoPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/CryptoPkg
 M: Jian Wang <jian.j.wang@intel.com>
 R: Ting Ye <ting.ye@intel.com>
 
 DynamicTablesPkg
+F: DynamicTablesPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/DynamicTablesPkg
 M: Sami Mujawar <Sami.Mujawar@arm.com>
 M: Alexei Fedorov <Alexei.Fedorov@arm.com>
 
 EmbeddedPkg
+F: EmbeddedPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/EmbeddedPkg
 M: Leif Lindholm <leif.lindholm@linaro.org>
 M: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
 EmulatorPkg
+F: EmulatorPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/EmulatorPkg
 M: Jordan Justen <jordan.l.justen@intel.com>
 M: Andrew Fish <afish@apple.com>
@@ -108,29 +138,34 @@ M: Ray Ni <ray.ni@intel.com>
 S: Maintained
 
 FatPkg
+F: FatPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/Edk2-fat-driver
 M: Ray Ni <ray.ni@intel.com>
 T: svn - https://svn.code.sf.net/p/edk2-fatdriver2/code/trunk/EnhancedFat
 T: git - https://github.com/tianocore/edk2-FatPkg.git
 
 FmpDevicePkg
+F: FmpDevicePkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/FmpDevicePkg
 M: Liming Gao <liming.gao@intel.com>
 M: Michael D Kinney <michael.d.kinney@intel.com>
 
 IntelFsp2Pkg
+F: IntelFsp2Pkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/IntelFsp2Pkg
 M: Chasel Chiu <chasel.chiu@intel.com>
 R: Nate DeSimone <nathaniel.l.desimone@intel.com>
 R: Star Zeng <star.zeng@intel.com>
 
 IntelFsp2WrapperPkg
+F: IntelFsp2WrapperPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/IntelFsp2WrapperPkg
 M: Chasel Chiu <chasel.chiu@intel.com>
 R: Nate DeSimone <nathaniel.l.desimone@intel.com>
 R: Star Zeng <star.zeng@intel.com>
 
 MdeModulePkg
+F: MdeModulePkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/MdeModulePkg
 M: Jian J Wang <jian.j.wang@intel.com>
 M: Hao A Wu <hao.a.wu@intel.com>
@@ -140,16 +175,19 @@ R: Ray Ni <ray.ni@intel.com>
 R: Star Zeng <star.zeng@intel.com>
 
 MdePkg
+F: MdePkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/MdePkg
 M: Michael D Kinney <michael.d.kinney@intel.com>
 M: Liming Gao <liming.gao@intel.com>
 
 NetworkPkg
+F: NetworkPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/NetworkPkg
 M: Siyuan Fu <siyuan.fu@intel.com>
 M: Jiaxin Wu <jiaxin.wu@intel.com>
 
 OvmfPkg
+F: OvmfPkg/
 W: http://www.tianocore.org/ovmf/
 M: Jordan Justen <jordan.l.justen@intel.com>
 M: Laszlo Ersek <lersek@redhat.com>
@@ -167,16 +205,19 @@ R: David Woodhouse <dwmw2@infradead.org>
 S: Maintained
 
 PcAtChipsetPkg
+F: PcAtChipsetPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/PcAtChipsetPkg
 M: Ray Ni <ray.ni@intel.com>
 
 SecurityPkg
+F: SecurityPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/SecurityPkg
 M: Jiewen Yao <jiewen.yao@intel.com>
 M: Jian Wang <jian.j.wang@intel.com>
 R: Chao Zhang <chao.b.zhang@intel.com>
 
 ShellPkg
+F: ShellPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/ShellPkg
 M: Jaben Carsey <jaben.carsey@intel.com>
 M: Ray Ni <ray.ni@intel.com>
@@ -190,21 +231,25 @@ M: Leif Lindholm <leif.lindholm@linaro.org>   (ARM/AArch64)
 M: Ard Biesheuvel <ard.biesheuvel@linaro.org> (ARM/AArch64)
 
 SignedCapsulePkg
+F: SignedCapsulePkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/SignedCapsulePkg
 M: Jiewen Yao <jiewen.yao@intel.com>
 M: Chao Zhang <chao.b.zhang@intel.com>
 
 SourceLevelDebugPkg
+F: SourceLevelDebugPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/SourceLevelDebugPkg
 M: Hao A Wu <hao.a.wu@intel.com>
 
 UefiCpuPkg
+F: UefiCpuPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/UefiCpuPkg
 M: Eric Dong <eric.dong@intel.com>
 M: Ray Ni <ray.ni@intel.com>
 R: Laszlo Ersek <lersek@redhat.com>
 
 UefiPayloadPkg
+F: UefiPayloadPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/UefiPayloadPkg
 M: Maurice Ma <maurice.ma@intel.com>
 M: Guo Dong <guo.dong@intel.com>
@@ -212,6 +257,7 @@ M: Benjamin You <benjamin.you@intel.com>
 S: Maintained
 
 StandaloneMmPkg
+F: StandaloneMmPkg/
 M: Achin Gupta <achin.gupta@arm.com>
 M: Jiewen Yao <jiewen.yao@intel.com>
 R: Supreeth Venkatesh <supreeth.venkatesh@arm.com>
