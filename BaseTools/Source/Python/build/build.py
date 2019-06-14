@@ -1815,7 +1815,12 @@ class Build():
                             MaList.append(Ma)
                             if Ma.CanSkipbyHash():
                                 self.HashSkipModules.append(Ma)
+                                if GlobalData.gBinCacheSource:
+                                    EdkLogger.quiet("cache hit: %s[%s]" % (Ma.MetaFile.Path, Ma.Arch))
                                 continue
+                            else:
+                                if GlobalData.gBinCacheSource:
+                                    EdkLogger.quiet("cache miss: %s[%s]" % (Ma.MetaFile.Path, Ma.Arch))
                             # Not to auto-gen for targets 'clean', 'cleanlib', 'cleanall', 'run', 'fds'
                             if self.Target not in ['clean', 'cleanlib', 'cleanall', 'run', 'fds']:
                                 # for target which must generate AutoGen code and makefile
@@ -2004,7 +2009,12 @@ class Build():
                             continue
                         if Ma.CanSkipbyHash():
                             self.HashSkipModules.append(Ma)
+                            if GlobalData.gBinCacheSource:
+                                EdkLogger.quiet("cache hit: %s[%s]" % (Ma.MetaFile.Path, Ma.Arch))
                             continue
+                        else:
+                            if GlobalData.gBinCacheSource:
+                                EdkLogger.quiet("cache miss: %s[%s]" % (Ma.MetaFile.Path, Ma.Arch))
 
                         # Not to auto-gen for targets 'clean', 'cleanlib', 'cleanall', 'run', 'fds'
                         if self.Target not in ['clean', 'cleanlib', 'cleanall', 'run', 'fds']:
