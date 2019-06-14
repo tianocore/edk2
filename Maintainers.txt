@@ -82,6 +82,14 @@ EDK II Releases:
 W: https://github.com/tianocore/tianocore.github.io/wiki/EDK-II-Release-Planning
 M: Liming Gao <liming.gao@intel.com>
 
+EDK II Architectures:
+---------------------
+ARM, AARCH64
+F: */AArch64/
+F: */Arm/
+M: Leif Lindholm <leif.lindholm@linaro.org>
+M: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+
 EDK II Packages:
 ----------------
 ArmPkg
