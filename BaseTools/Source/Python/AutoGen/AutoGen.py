@@ -1166,6 +1166,17 @@ class PlatformAutoGen(AutoGen):
 
         return True
 
+    ## hash() operator of PlatformAutoGen
+    #
+    #  The platform file path and arch string will be used to represent
+    #  hash value of this object
+    #
+    #   @retval   int Hash value of the platform file path and arch
+    #
+    @cached_class_function
+    def __hash__(self):
+        return hash((self.MetaFile, self.Arch))
+
     @cached_class_function
     def __repr__(self):
         return "%s [%s]" % (self.MetaFile, self.Arch)
@@ -2579,6 +2590,16 @@ class ModuleAutoGen(AutoGen):
         self.ReferenceModules = []
         self.ConstPcd                  = {}
 
+    ## hash() operator of ModuleAutoGen
+    #
+    #  The module file path and arch string will be used to represent
+    #  hash value of this object
+    #
+    #   @retval   int Hash value of the module file path and arch
+    #
+    @cached_class_function
+    def __hash__(self):
+        return hash((self.MetaFile, self.Arch))
 
     def __repr__(self):
         return "%s [%s]" % (self.MetaFile, self.Arch)
