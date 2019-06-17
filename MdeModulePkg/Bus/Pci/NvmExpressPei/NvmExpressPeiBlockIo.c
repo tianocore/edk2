@@ -2,7 +2,7 @@
   The NvmExpressPei driver is used to manage non-volatile memory subsystem
   which follows NVM Express specification at PEI phase.
 
-  Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2018 - 2019, Intel Corporation. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -34,17 +34,19 @@ ReadSectors (
   UINT32                                            BlockSize;
   PEI_NVME_CONTROLLER_PRIVATE_DATA                  *Private;
   UINT32                                            Bytes;
-  EDKII_PEI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET    CommandPacket;
-  EDKII_PEI_NVM_EXPRESS_COMMAND                     Command;
-  EDKII_PEI_NVM_EXPRESS_COMPLETION                  Completion;
+  EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET          CommandPacket;
+  EFI_NVM_EXPRESS_COMMAND                           Command;
+  EFI_NVM_EXPRESS_COMPLETION                        Completion;
+  EDKII_PEI_NVM_EXPRESS_PASS_THRU_PPI               *NvmePassThru;
 
   Private   = NamespaceInfo->Controller;
+  NvmePassThru = &Private->NvmePassThruPpi;
   BlockSize = NamespaceInfo->Media.BlockSize;
   Bytes     = Blocks * BlockSize;
 
-  ZeroMem (&CommandPacket, sizeof(EDKII_PEI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET));
-  ZeroMem (&Command, sizeof(EDKII_PEI_NVM_EXPRESS_COMMAND));
-  ZeroMem (&Completion, sizeof(EDKII_PEI_NVM_EXPRESS_COMPLETION));
+  ZeroMem (&CommandPacket, sizeof(EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET));
+  ZeroMem (&Command, sizeof(EFI_NVM_EXPRESS_COMMAND));
+  ZeroMem (&Completion, sizeof(EFI_NVM_EXPRESS_COMPLETION));
 
   CommandPacket.NvmeCmd        = &Command;
   CommandPacket.NvmeCompletion = &Completion;
@@ -63,11 +65,12 @@ ReadSectors (
 
   CommandPacket.NvmeCmd->Flags = CDW10_VALID | CDW11_VALID | CDW12_VALID;
 
-  Status = NvmePassThru (
-             Private,
-             NamespaceInfo->NamespaceId,
-             &CommandPacket
-             );
+  Status = NvmePassThru->PassThru (
+                           NvmePassThru,
+                           NamespaceInfo->NamespaceId,
+                           &CommandPacket
+                           );
+
   return Status;
 }
 

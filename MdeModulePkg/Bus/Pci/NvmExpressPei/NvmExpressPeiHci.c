@@ -320,14 +320,14 @@ NvmeIdentifyController (
   IN VOID                                *Buffer
   )
 {
-  EDKII_PEI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET    CommandPacket;
-  EDKII_PEI_NVM_EXPRESS_COMMAND                     Command;
-  EDKII_PEI_NVM_EXPRESS_COMPLETION                  Completion;
-  EFI_STATUS                                        Status;
+  EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET    CommandPacket;
+  EFI_NVM_EXPRESS_COMMAND                     Command;
+  EFI_NVM_EXPRESS_COMPLETION                  Completion;
+  EFI_STATUS                                  Status;
 
-  ZeroMem (&CommandPacket, sizeof(EDKII_PEI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET));
-  ZeroMem (&Command, sizeof(EDKII_PEI_NVM_EXPRESS_COMMAND));
-  ZeroMem (&Completion, sizeof(EDKII_PEI_NVM_EXPRESS_COMPLETION));
+  ZeroMem (&CommandPacket, sizeof(EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET));
+  ZeroMem (&Command, sizeof(EFI_NVM_EXPRESS_COMMAND));
+  ZeroMem (&Completion, sizeof(EFI_NVM_EXPRESS_COMPLETION));
 
   Command.Cdw0.Opcode = NVME_ADMIN_IDENTIFY_CMD;
   //
@@ -348,7 +348,7 @@ NvmeIdentifyController (
   CommandPacket.NvmeCmd->Cdw10 = 1;
   CommandPacket.NvmeCmd->Flags = CDW10_VALID;
 
-  Status = NvmePassThru (
+  Status = NvmePassThruExecute (
              Private,
              NVME_CONTROLLER_NSID,
              &CommandPacket
@@ -374,14 +374,14 @@ NvmeIdentifyNamespace (
   IN VOID                                *Buffer
   )
 {
-  EDKII_PEI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET    CommandPacket;
-  EDKII_PEI_NVM_EXPRESS_COMMAND                     Command;
-  EDKII_PEI_NVM_EXPRESS_COMPLETION                  Completion;
-  EFI_STATUS                                        Status;
+  EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET    CommandPacket;
+  EFI_NVM_EXPRESS_COMMAND                     Command;
+  EFI_NVM_EXPRESS_COMPLETION                  Completion;
+  EFI_STATUS                                  Status;
 
-  ZeroMem (&CommandPacket, sizeof(EDKII_PEI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET));
-  ZeroMem (&Command, sizeof(EDKII_PEI_NVM_EXPRESS_COMMAND));
-  ZeroMem (&Completion, sizeof(EDKII_PEI_NVM_EXPRESS_COMPLETION));
+  ZeroMem (&CommandPacket, sizeof(EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET));
+  ZeroMem (&Command, sizeof(EFI_NVM_EXPRESS_COMMAND));
+  ZeroMem (&Completion, sizeof(EFI_NVM_EXPRESS_COMPLETION));
 
   Command.Cdw0.Opcode = NVME_ADMIN_IDENTIFY_CMD;
   Command.Nsid        = NamespaceId;
@@ -398,7 +398,7 @@ NvmeIdentifyNamespace (
   CommandPacket.NvmeCmd->Cdw10 = 0;
   CommandPacket.NvmeCmd->Flags = CDW10_VALID;
 
-  Status = NvmePassThru (
+  Status = NvmePassThruExecute (
              Private,
              NamespaceId,
              &CommandPacket
@@ -454,22 +454,21 @@ NvmeCreateIoCompletionQueue (
   IN PEI_NVME_CONTROLLER_PRIVATE_DATA    *Private
   )
 {
-  EDKII_PEI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET    CommandPacket;
-  EDKII_PEI_NVM_EXPRESS_COMMAND                     Command;
-  EDKII_PEI_NVM_EXPRESS_COMPLETION                  Completion;
-  EFI_STATUS                                        Status;
-  NVME_ADMIN_CRIOCQ                                 CrIoCq;
+  EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET    CommandPacket;
+  EFI_NVM_EXPRESS_COMMAND                     Command;
+  EFI_NVM_EXPRESS_COMPLETION                  Completion;
+  EFI_STATUS                                  Status;
+  NVME_ADMIN_CRIOCQ                           CrIoCq;
 
-  ZeroMem (&CommandPacket, sizeof(EDKII_PEI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET));
-  ZeroMem (&Command, sizeof(EDKII_PEI_NVM_EXPRESS_COMMAND));
-  ZeroMem (&Completion, sizeof(EDKII_PEI_NVM_EXPRESS_COMPLETION));
+  ZeroMem (&CommandPacket, sizeof(EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET));
+  ZeroMem (&Command, sizeof(EFI_NVM_EXPRESS_COMMAND));
+  ZeroMem (&Completion, sizeof(EFI_NVM_EXPRESS_COMPLETION));
   ZeroMem (&CrIoCq, sizeof(NVME_ADMIN_CRIOCQ));
 
   CommandPacket.NvmeCmd        = &Command;
   CommandPacket.NvmeCompletion = &Completion;
 
   Command.Cdw0.Opcode = NVME_ADMIN_CRIOCQ_CMD;
-  Command.Cdw0.Cid    = Private->Cid[NVME_ADMIN_QUEUE]++;
   CommandPacket.TransferBuffer = Private->CqBuffer[NVME_IO_QUEUE];
   CommandPacket.TransferLength = EFI_PAGE_SIZE;
   CommandPacket.CommandTimeout = NVME_GENERIC_TIMEOUT;
@@ -481,7 +480,7 @@ NvmeCreateIoCompletionQueue (
   CopyMem (&CommandPacket.NvmeCmd->Cdw10, &CrIoCq, sizeof (NVME_ADMIN_CRIOCQ));
   CommandPacket.NvmeCmd->Flags = CDW10_VALID | CDW11_VALID;
 
-  Status = NvmePassThru (
+  Status = NvmePassThruExecute (
              Private,
              NVME_CONTROLLER_NSID,
              &CommandPacket
@@ -503,22 +502,21 @@ NvmeCreateIoSubmissionQueue (
   IN PEI_NVME_CONTROLLER_PRIVATE_DATA    *Private
   )
 {
-  EDKII_PEI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET    CommandPacket;
-  EDKII_PEI_NVM_EXPRESS_COMMAND                     Command;
-  EDKII_PEI_NVM_EXPRESS_COMPLETION                  Completion;
-  EFI_STATUS                                        Status;
-  NVME_ADMIN_CRIOSQ                                 CrIoSq;
+  EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET    CommandPacket;
+  EFI_NVM_EXPRESS_COMMAND                     Command;
+  EFI_NVM_EXPRESS_COMPLETION                  Completion;
+  EFI_STATUS                                  Status;
+  NVME_ADMIN_CRIOSQ                           CrIoSq;
 
-  ZeroMem (&CommandPacket, sizeof(EDKII_PEI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET));
-  ZeroMem (&Command, sizeof(EDKII_PEI_NVM_EXPRESS_COMMAND));
-  ZeroMem (&Completion, sizeof(EDKII_PEI_NVM_EXPRESS_COMPLETION));
+  ZeroMem (&CommandPacket, sizeof(EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET));
+  ZeroMem (&Command, sizeof(EFI_NVM_EXPRESS_COMMAND));
+  ZeroMem (&Completion, sizeof(EFI_NVM_EXPRESS_COMPLETION));
   ZeroMem (&CrIoSq, sizeof(NVME_ADMIN_CRIOSQ));
 
   CommandPacket.NvmeCmd        = &Command;
   CommandPacket.NvmeCompletion = &Completion;
 
   Command.Cdw0.Opcode = NVME_ADMIN_CRIOSQ_CMD;
-  Command.Cdw0.Cid    = Private->Cid[NVME_ADMIN_QUEUE]++;
   CommandPacket.TransferBuffer = Private->SqBuffer[NVME_IO_QUEUE];
   CommandPacket.TransferLength = EFI_PAGE_SIZE;
   CommandPacket.CommandTimeout = NVME_GENERIC_TIMEOUT;
@@ -532,7 +530,7 @@ NvmeCreateIoSubmissionQueue (
   CopyMem (&CommandPacket.NvmeCmd->Cdw10, &CrIoSq, sizeof (NVME_ADMIN_CRIOSQ));
   CommandPacket.NvmeCmd->Flags = CDW10_VALID | CDW11_VALID;
 
-  Status = NvmePassThru (
+  Status = NvmePassThruExecute (
              Private,
              NVME_CONTROLLER_NSID,
              &CommandPacket

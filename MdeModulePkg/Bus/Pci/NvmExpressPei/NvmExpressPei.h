@@ -19,6 +19,7 @@
 #include <Ppi/BlockIo.h>
 #include <Ppi/BlockIo2.h>
 #include <Ppi/StorageSecurityCommand.h>
+#include <Ppi/NvmExpressPassThru.h>
 #include <Ppi/IoMmu.h>
 #include <Ppi/EndOfPeiPhase.h>
 
@@ -74,6 +75,8 @@ struct _PEI_NVME_NAMESPACE_INFO {
   PEI_NVME_CONTROLLER_PRIVATE_DATA          *Controller;
 };
 
+#define NVME_CONTROLLER_NSID        0
+
 //
 // Unique signature for private data structure.
 //
@@ -85,15 +88,18 @@ struct _PEI_NVME_NAMESPACE_INFO {
 struct _PEI_NVME_CONTROLLER_PRIVATE_DATA {
   UINT32                                    Signature;
   UINTN                                     MmioBase;
+  EFI_NVM_EXPRESS_PASS_THRU_MODE            PassThruMode;
   UINTN                                     DevicePathLength;
   EFI_DEVICE_PATH_PROTOCOL                  *DevicePath;
 
   EFI_PEI_RECOVERY_BLOCK_IO_PPI             BlkIoPpi;
   EFI_PEI_RECOVERY_BLOCK_IO2_PPI            BlkIo2Ppi;
   EDKII_PEI_STORAGE_SECURITY_CMD_PPI        StorageSecurityPpi;
+  EDKII_PEI_NVM_EXPRESS_PASS_THRU_PPI       NvmePassThruPpi;
   EFI_PEI_PPI_DESCRIPTOR                    BlkIoPpiList;
   EFI_PEI_PPI_DESCRIPTOR                    BlkIo2PpiList;
   EFI_PEI_PPI_DESCRIPTOR                    StorageSecurityPpiList;
+  EFI_PEI_PPI_DESCRIPTOR                    NvmePassThruPpiList;
   EFI_PEI_NOTIFY_DESCRIPTOR                 EndOfPeiNotifyList;
 
   //
@@ -145,6 +151,8 @@ struct _PEI_NVME_CONTROLLER_PRIVATE_DATA {
   CR (a, PEI_NVME_CONTROLLER_PRIVATE_DATA, BlkIo2Ppi, NVME_PEI_CONTROLLER_PRIVATE_DATA_SIGNATURE)
 #define GET_NVME_PEIM_HC_PRIVATE_DATA_FROM_THIS_STROAGE_SECURITY(a)    \
   CR (a, PEI_NVME_CONTROLLER_PRIVATE_DATA, StorageSecurityPpi, NVME_PEI_CONTROLLER_PRIVATE_DATA_SIGNATURE)
+#define GET_NVME_PEIM_HC_PRIVATE_DATA_FROM_THIS_NVME_PASSTHRU(a)       \
+  CR (a, PEI_NVME_CONTROLLER_PRIVATE_DATA, NvmePassThruPpi, NVME_PEI_CONTROLLER_PRIVATE_DATA_SIGNATURE)
 #define GET_NVME_PEIM_HC_PRIVATE_DATA_FROM_THIS_NOTIFY(a)              \
   CR (a, PEI_NVME_CONTROLLER_PRIVATE_DATA, EndOfPeiNotifyList, NVME_PEI_CONTROLLER_PRIVATE_DATA_SIGNATURE)
 

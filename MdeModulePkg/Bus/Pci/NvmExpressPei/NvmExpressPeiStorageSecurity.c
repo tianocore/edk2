@@ -57,15 +57,17 @@ TrustTransferNvmeDevice (
      OUT UINTN                               *TransferLengthOut
   )
 {
-  EDKII_PEI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET    CommandPacket;
-  EDKII_PEI_NVM_EXPRESS_COMMAND                     Command;
-  EDKII_PEI_NVM_EXPRESS_COMPLETION                  Completion;
+  EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET          CommandPacket;
+  EFI_NVM_EXPRESS_COMMAND                           Command;
+  EFI_NVM_EXPRESS_COMPLETION                        Completion;
   EFI_STATUS                                        Status;
   UINT16                                            SpecificData;
+  EDKII_PEI_NVM_EXPRESS_PASS_THRU_PPI               *NvmePassThru;
 
-  ZeroMem (&CommandPacket, sizeof(EDKII_PEI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET));
-  ZeroMem (&Command, sizeof(EDKII_PEI_NVM_EXPRESS_COMMAND));
-  ZeroMem (&Completion, sizeof(EDKII_PEI_NVM_EXPRESS_COMPLETION));
+  NvmePassThru = &Private->NvmePassThruPpi;
+  ZeroMem (&CommandPacket, sizeof(EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET));
+  ZeroMem (&Command, sizeof(EFI_NVM_EXPRESS_COMMAND));
+  ZeroMem (&Completion, sizeof(EFI_NVM_EXPRESS_COMPLETION));
 
   CommandPacket.NvmeCmd        = &Command;
   CommandPacket.NvmeCompletion = &Completion;
@@ -94,11 +96,11 @@ TrustTransferNvmeDevice (
   CommandPacket.CommandTimeout = Timeout;
   CommandPacket.QueueType      = NVME_ADMIN_QUEUE;
 
-  Status = NvmePassThru (
-             Private,
-             NVME_CONTROLLER_NSID,
-             &CommandPacket
-             );
+  Status = NvmePassThru->PassThru (
+                           NvmePassThru,
+                           NVME_CONTROLLER_NSID,
+                           &CommandPacket
+                           );
 
   if (!IsTrustSend) {
     if (EFI_ERROR (Status))  {
