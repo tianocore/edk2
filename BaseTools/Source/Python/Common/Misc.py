@@ -18,6 +18,7 @@ import re
 import pickle
 import array
 import shutil
+import filecmp
 from random import sample
 from struct import pack
 import uuid
@@ -499,6 +500,60 @@ def SaveFileOnChange(File, Content, IsBinaryFile=True):
                 Fd.write(Content)
         except IOError as X:
             EdkLogger.error(None, FILE_CREATE_FAILURE, ExtraData='IOError %s' % X)
+
+    return True
+
+## Copy source file only if it is different from the destination file
+#
+#  This method is used to copy file only if the source file and destination
+#  file content are different. This is quite useful to avoid duplicated
+#  file writing.
+#
+#   @param      SrcFile   The path of source file
+#   @param      Dst       The path of destination file or folder
+#
+#   @retval     True      The two files content are different and the file is copied
+#   @retval     False     No copy really happen
+#
+def CopyFileOnChange(SrcFile, Dst):
+    if not os.path.exists(SrcFile):
+        return False
+
+    if os.path.isdir(Dst):
+        DstFile = os.path.join(Dst, os.path.basename(SrcFile))
+    else:
+        DstFile = Dst
+
+    if os.path.exists(DstFile) and filecmp.cmp(SrcFile, DstFile, shallow=False):
+        return False
+
+    DirName = os.path.dirname(DstFile)
+    if not CreateDirectory(DirName):
+        EdkLogger.error(None, FILE_CREATE_FAILURE, "Could not create directory %s" % DirName)
+    else:
+        if DirName == '':
+            DirName = os.getcwd()
+        if not os.access(DirName, os.W_OK):
+            EdkLogger.error(None, PERMISSION_FAILURE, "Do not have write permission on directory %s" % DirName)
+
+    # os.replace and os.rename are the atomic operations in python 3 and 2.
+    # we use these two atomic operations to ensure the file copy is atomic:
+    # copy the src to a temp file in the dst same folder firstly, then
+    # replace or rename the temp file to the destination file.
+    with tempfile.NamedTemporaryFile(dir=DirName, delete=False) as tf:
+        shutil.copy(SrcFile, tf.name)
+        tempname = tf.name
+    try:
+        if hasattr(os, 'replace'):
+            os.replace(tempname, DstFile)
+        else:
+            # os.rename reqire to remove the dst on Windows, otherwise OSError will be raised.
+            if GlobalData.gIsWindows and os.path.exists(DstFile):
+                os.remove(DstFile)
+            os.rename(tempname, DstFile)
+
+    except IOError as X:
+        EdkLogger.error(None, FILE_COPY_FAILURE, ExtraData='IOError %s' % X)
 
     return True
 

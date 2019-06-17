@@ -3925,11 +3925,11 @@ class ModuleAutoGen(AutoGen):
         CreateDirectory (FileDir)
         HashFile = path.join(self.BuildDir, self.Name + '.hash')
         if os.path.exists(HashFile):
-            shutil.copy2(HashFile, FileDir)
+            CopyFileOnChange(HashFile, FileDir)
         if not self.IsLibrary:
             ModuleFile = path.join(self.OutputDir, self.Name + '.inf')
             if os.path.exists(ModuleFile):
-                shutil.copy2(ModuleFile, FileDir)
+                CopyFileOnChange(ModuleFile, FileDir)
         else:
             OutputDir = self.OutputDir.replace('\\', '/').strip('/')
             DebugDir = self.DebugDir.replace('\\', '/').strip('/')
@@ -3949,7 +3949,7 @@ class ModuleAutoGen(AutoGen):
                     destination_file = os.path.join(FileDir, sub_dir)
                     destination_dir = os.path.dirname(destination_file)
                     CreateDirectory(destination_dir)
-                    shutil.copy2(File, destination_dir)
+                    CopyFileOnChange(File, destination_dir)
 
     def AttemptModuleCacheCopy(self):
         # If library or Module is binary do not skip by hash
@@ -3971,14 +3971,14 @@ class ModuleAutoGen(AutoGen):
                     for root, dir, files in os.walk(FileDir):
                         for f in files:
                             if self.Name + '.hash' in f:
-                                shutil.copy(HashFile, self.BuildDir)
+                                CopyFileOnChange(HashFile, self.BuildDir)
                             else:
                                 File = path.join(root, f)
                                 sub_dir = os.path.relpath(File, FileDir)
                                 destination_file = os.path.join(self.OutputDir, sub_dir)
                                 destination_dir = os.path.dirname(destination_file)
                                 CreateDirectory(destination_dir)
-                                shutil.copy(File, destination_dir)
+                                CopyFileOnChange(File, destination_dir)
                     if self.Name == "PcdPeim" or self.Name == "PcdDxe":
                         CreatePcdDatabaseCode(self, TemplateString(), TemplateString())
                     return True

@@ -60,6 +60,10 @@ def listdir(path):
         List.append(Item)
     return List
 
+if hasattr(os, 'replace'):
+    def replace(src, dst):
+        return os.replace(LongFilePath(src), LongFilePath(dst))
+
 environ = os.environ
 getcwd = os.getcwd
 chdir = os.chdir
