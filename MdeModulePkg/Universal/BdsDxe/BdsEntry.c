@@ -5,7 +5,7 @@
   After DxeCore finish DXE phase, gEfiBdsArchProtocolGuid->BdsEntry will be invoked
   to enter BDS phase.
 
-Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2019, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -550,6 +550,10 @@ BdsFormalizeOSIndicationVariable (
     EfiBootManagerFreeLoadOption (&BootManagerMenu);
   } else {
     OsIndicationSupport = EFI_OS_INDICATIONS_START_PLATFORM_RECOVERY;
+  }
+
+  if (PcdGetBool(PcdCapsuleOnDiskSupport)) {
+    OsIndicationSupport |= EFI_OS_INDICATIONS_FILE_CAPSULE_DELIVERY_SUPPORTED;
   }
 
   Status = gRT->SetVariable (
