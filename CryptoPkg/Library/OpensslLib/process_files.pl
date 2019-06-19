@@ -133,6 +133,7 @@ foreach my $product ((@{$unified_info{libraries}},
             # So it can reduce porting time, compile time, library size.
             next if $s =~ "crypto/rand/randfile.c";
             next if $s =~ "crypto/store/";
+            next if $s =~ "crypto/err/err_all.c";
 
             if ($product =~ "libssl") {
                 push @sslfilelist, '  $(OPENSSL_PATH)/' . $s . "\r\n";
