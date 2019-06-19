@@ -149,7 +149,6 @@
 
 [Components]
   SecurityPkg/Library/DxeImageVerificationLib/DxeImageVerificationLib.inf
-  #SecurityPkg/Library/DxeDeferImageLoadLib/DxeDeferImageLoadLib.inf
   SecurityPkg/Library/DxeImageAuthenticationStatusLib/DxeImageAuthenticationStatusLib.inf
 
   #
