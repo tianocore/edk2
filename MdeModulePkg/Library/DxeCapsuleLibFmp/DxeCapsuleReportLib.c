@@ -1,7 +1,7 @@
 /** @file
   DXE capsule report related function.
 
-  Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2019, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -28,6 +28,18 @@
 #include <Library/CapsuleLib.h>
 
 #include <IndustryStandard/WindowsUxCapsule.h>
+
+/**
+  This routine is called to clear CapsuleOnDisk Relocation Info variable.
+  Total Capsule On Disk length is recorded in this variable
+
+  @retval EFI_SUCCESS   Capsule On Disk flags are cleared
+
+**/
+EFI_STATUS
+CoDClearCapsuleRelocationInfo(
+  VOID
+  );
 
 /**
   Get current capsule last variable index.
@@ -174,6 +186,7 @@ RecordCapsuleStatusVariable (
   @param[in] PayloadIndex   FMP payload index
   @param[in] ImageHeader    FMP image header
   @param[in] FmpDevicePath  DevicePath associated with the FMP producer
+  @param[in] CapFileName    Capsule file name
 
   @retval EFI_SUCCESS          The capsule status variable is recorded.
   @retval EFI_OUT_OF_RESOURCES No resource to record the capsule status variable.
@@ -184,7 +197,8 @@ RecordFmpCapsuleStatusVariable (
   IN EFI_STATUS                                    CapsuleStatus,
   IN UINTN                                         PayloadIndex,
   IN EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER  *ImageHeader,
-  IN EFI_DEVICE_PATH_PROTOCOL                      *FmpDevicePath OPTIONAL
+  IN EFI_DEVICE_PATH_PROTOCOL                      *FmpDevicePath, OPTIONAL
+  IN CHAR16                                        *CapFileName    OPTIONAL
   )
 {
   EFI_CAPSULE_RESULT_VARIABLE_HEADER  *CapsuleResultVariableHeader;
@@ -194,8 +208,11 @@ RecordFmpCapsuleStatusVariable (
   UINTN                               CapsuleResultVariableSize;
   CHAR16                              *DevicePathStr;
   UINTN                               DevicePathStrSize;
+  UINTN                               CapFileNameSize;
 
-  DevicePathStr = NULL;
+  DevicePathStr   = NULL;
+  CapFileNameSize = sizeof(CHAR16);
+
   if (FmpDevicePath != NULL) {
     DevicePathStr = ConvertDevicePathToText (FmpDevicePath, FALSE, FALSE);
   }
@@ -204,10 +221,16 @@ RecordFmpCapsuleStatusVariable (
   } else {
     DevicePathStrSize = sizeof(CHAR16);
   }
+
+  if (CapFileName != NULL) {
+    CapFileNameSize = StrSize(CapFileName);
+  }
+
   //
-  // Allocate zero CHAR16 for CapsuleFileName.
+  // Allocate room for CapsuleFileName.
   //
-  CapsuleResultVariableSize = sizeof(EFI_CAPSULE_RESULT_VARIABLE_HEADER) + sizeof(EFI_CAPSULE_RESULT_VARIABLE_FMP) + sizeof(CHAR16) + DevicePathStrSize;
+  CapsuleResultVariableSize = sizeof(EFI_CAPSULE_RESULT_VARIABLE_HEADER) + sizeof(EFI_CAPSULE_RESULT_VARIABLE_FMP) + CapFileNameSize + DevicePathStrSize;
+
   CapsuleResultVariable     = AllocateZeroPool (CapsuleResultVariableSize);
   if (CapsuleResultVariable == NULL) {
     return EFI_OUT_OF_RESOURCES;
@@ -225,8 +248,13 @@ RecordFmpCapsuleStatusVariable (
   CapsuleResultVariableFmp->PayloadIndex = (UINT8)PayloadIndex;
   CapsuleResultVariableFmp->UpdateImageIndex = ImageHeader->UpdateImageIndex;
   CopyGuid (&CapsuleResultVariableFmp->UpdateImageTypeId, &ImageHeader->UpdateImageTypeId);
+
+  if (CapFileName != NULL) {
+    CopyMem((UINT8 *)CapsuleResultVariableFmp + sizeof(EFI_CAPSULE_RESULT_VARIABLE_FMP), CapFileName, CapFileNameSize);
+  }
+
   if (DevicePathStr != NULL) {
-    CopyMem ((UINT8 *)CapsuleResultVariableFmp + sizeof(EFI_CAPSULE_RESULT_VARIABLE_FMP) + sizeof(CHAR16), DevicePathStr, DevicePathStrSize);
+    CopyMem ((UINT8 *)CapsuleResultVariableFmp + sizeof(EFI_CAPSULE_RESULT_VARIABLE_FMP) + CapFileNameSize, DevicePathStr, DevicePathStrSize);
     FreePool (DevicePathStr);
     DevicePathStr = NULL;
   }
@@ -401,6 +429,31 @@ InitCapsuleUpdateVariable (
 }
 
 /**
+  Initialize capsule relocation info variable.
+**/
+VOID
+InitCapsuleRelocationInfo (
+  VOID
+  )
+{
+  EFI_STATUS                   Status;
+  EDKII_VARIABLE_LOCK_PROTOCOL *VariableLock;
+
+  CoDClearCapsuleRelocationInfo();
+
+  //
+  // Unlock Capsule On Disk relocation Info variable only when Capsule On Disk flag is enabled
+  //
+  if (!CoDCheckCapsuleOnDiskFlag()) {
+    Status = gBS->LocateProtocol (&gEdkiiVariableLockProtocolGuid, NULL, (VOID **) &VariableLock);
+    if (!EFI_ERROR (Status)) {
+      Status = VariableLock->RequestToLock (VariableLock, COD_RELOCATION_INFO_VAR_NAME, &gEfiCapsuleVendorGuid);
+      ASSERT_EFI_ERROR (Status);
+    }
+  }
+}
+
+/**
   Initialize capsule related variables.
 **/
 VOID
@@ -411,6 +464,8 @@ InitCapsuleVariable (
   InitCapsuleUpdateVariable();
   InitCapsuleMaxVariable();
   InitCapsuleLastVariable();
+  InitCapsuleRelocationInfo();
+
   //
   // No need to clear L"Capsule####", because OS/APP should refer L"CapsuleLast"
   // to check status and delete them.
