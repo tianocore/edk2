@@ -60,9 +60,9 @@ case `uname` in
         CLANG_VER=$(clang -ccc-host-triple x86_64-pc-win32-macho 2>&1 >/dev/null) || true
         if [[ "$CLANG_VER" == *-ccc-host-triple* ]]
         then
-        # only older versions of Xcode support -ccc-host-tripe, for newer versions
+        # only older versions of Xcode support -ccc-host-triple, for newer versions
         # it is -target
-          HOST_TOOLS=XCODE32
+          HOST_TOOLS=XCODE5
           TARGET_TOOLS=XCODE5
         else
           HOST_TOOLS=XCODE32
