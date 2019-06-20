@@ -17,6 +17,7 @@ import subprocess
 from .GenFdsGlobalVariable import GenFdsGlobalVariable
 import Common.LongFilePathOs as os
 from CommonDataClass.FdfClass import FvImageSectionClassObject
+from Common.MultipleWorkspace import MultipleWorkspace as mws
 from Common import EdkLogger
 from Common.BuildToolError import *
 from Common.DataType import *
