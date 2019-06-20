@@ -27,7 +27,7 @@
   APs to help test system memory in parallel with other device initialization.
   Diagnostics applications may also use this protocol for multi-processor.
 
-Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Revision Reference:
@@ -79,7 +79,7 @@ typedef struct _EFI_MP_SERVICES_PROTOCOL EFI_MP_SERVICES_PROTOCOL;
 #define PROCESSOR_HEALTH_STATUS_BIT  0x00000004
 
 ///
-/// Structure that describes the pyhiscal location of a logical CPU.
+/// Structure that describes the physical location of a logical CPU.
 ///
 typedef struct {
   ///
@@ -96,6 +96,45 @@ typedef struct {
   UINT32  Thread;
 } EFI_CPU_PHYSICAL_LOCATION;
 
+#define CPU_V2_EXTENDED_TOPOLOGY     BIT24
+
+///
+/// Structure that describes the v2 physical location of a logical CPU.
+///
+typedef struct {
+  ///
+  /// Zero-based physical package number that identifies the cartridge of the processor.
+  ///
+  UINT32  Package;
+  ///
+  /// Zero-based physical module number within package of the processor.
+  ///
+  UINT32  Module;
+  ///
+  /// Zero-based physical tile number within module of the processor.
+  ///
+  UINT32  Tile;
+  ///
+  /// Zero-based physical die number within tile of the processor.
+  ///
+  UINT32  Die;
+  ///
+  /// Zero-based physical core number within die of the processor.
+  ///
+  UINT32  Core;
+  ///
+  /// Zero-based logical thread number within core of the processor.
+  ///
+  UINT32  Thread;
+} EFI_CPU_PHYSICAL_LOCATION2;
+
+///
+/// Structure that describes extended processor information.
+///
+typedef union {
+  EFI_CPU_PHYSICAL_LOCATION2  Location2;
+} EXTENDED_PROCESSOR_INFORMATION;
+
 ///
 /// Structure that describes information about a logical CPU.
 ///
@@ -106,7 +145,7 @@ typedef struct {
   /// are used, and higher bits are reserved.  For IPF, the lower 16 bits contains
   /// id/eid, and higher bits are reserved.
   ///
-  UINT64                     ProcessorId;
+  UINT64                         ProcessorId;
   ///
   /// Flags indicating if the processor is BSP or AP, if the processor is enabled
   /// or disabled, and if the processor is healthy. Bits 3..31 are reserved and
@@ -125,13 +164,14 @@ typedef struct {
   ///  1      1       1     Healthy Enabled BSP.
   /// </pre>
   ///
-  UINT32                     StatusFlag;
+  UINT32                         StatusFlag;
   ///
   /// The physical location of the processor, including the physical package number
   /// that identifies the cartridge, the physical core number within package, and
   /// logical thread number within core.
   ///
-  EFI_CPU_PHYSICAL_LOCATION  Location;
+  EFI_CPU_PHYSICAL_LOCATION      Location;
+  EXTENDED_PROCESSOR_INFORMATION ExtendedInformation;
 } EFI_PROCESSOR_INFORMATION;
 
 /**
