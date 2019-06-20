@@ -53,6 +53,7 @@ BEGIN {
                 "no-async",
                 "no-autoalginit",
                 "no-autoerrinit",
+                "no-autoload-config",
                 "no-bf",
                 "no-blake2",
                 "no-camellia",
