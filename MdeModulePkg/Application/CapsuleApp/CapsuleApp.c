@@ -849,7 +849,7 @@ PrintUsage (
   Print(L"Parameter:\n");
   Print(L"  -NR: No reset will be triggered for the capsule\n");
   Print(L"       with CAPSULE_FLAGS_PERSIST_ACROSS_RESET and without CAPSULE_FLAGS_INITIATE_RESET.\n");
-  Print(L"  -OD: Delivery of Capsules via file on Mass Storage device.\n");
+  Print(L"  -OD: Delivery of Capsules via file on Mass Storage device.");
   Print(L"  -S:  Dump capsule report variable (EFI_CAPSULE_REPORT_GUID),\n");
   Print(L"       which is defined in UEFI specification.\n");
   Print(L"  -C:  Clear capsule report variable (EFI_CAPSULE_REPORT_GUID),\n");
@@ -1020,39 +1020,40 @@ UefiMain (
     }
   }
 
-  if (ParaOdIndex > ParaNrIndex) {
-    if (ParaNrIndex != 0) {
-      CapsuleLastIndex = ParaNrIndex - 1;
-    } else {
-      CapsuleLastIndex = ParaOdIndex - 1;
-    }
-
-    if (ParaOdIndex == Argc -1) {
+  if (ParaOdIndex != 0) {
+    if (ParaOdIndex == Argc - 1) {
       MapFsStr = NULL;
     } else if (ParaOdIndex == Argc - 2) {
       MapFsStr = Argv[Argc-1];
     } else {
-      Print (L"CapsuleApp: Cannot specify more than one FS mapping!\n");
+      Print (L"CapsuleApp: Invalid Position for -OD Options\n");
       Status = EFI_INVALID_PARAMETER;
       goto Done;
     }
-  } else if (ParaOdIndex < ParaNrIndex) {
-    if (ParaOdIndex != 0) {
-      CapsuleLastIndex = ParaOdIndex - 1;
-      if (ParaOdIndex == ParaNrIndex - 1) {
-        MapFsStr = NULL;
-      } else if (ParaOdIndex == ParaNrIndex - 2) {
-        MapFsStr = Argv[ParaOdIndex + 1];
+
+    if (ParaNrIndex != 0) {
+      if (ParaNrIndex + 1 == ParaOdIndex) {
+        CapsuleLastIndex = ParaNrIndex - 1;
       } else {
-        Print (L"CapsuleApp: Cannot specify more than one FS mapping!\n");
+        Print (L"CapsuleApp: Invalid Position for -NR Options\n");
         Status = EFI_INVALID_PARAMETER;
         goto Done;
       }
     } else {
-      CapsuleLastIndex = ParaNrIndex - 1;
+      CapsuleLastIndex = ParaOdIndex - 1;
     }
   } else {
-    CapsuleLastIndex = Argc - 1;
+    if (ParaNrIndex != 0) {
+      if (ParaNrIndex == Argc -1) {
+        CapsuleLastIndex = ParaNrIndex - 1;
+      } else {
+        Print (L"CapsuleApp: Invalid Position for -NR Options\n");
+        Status = EFI_INVALID_PARAMETER;
+        goto Done;
+      }
+    } else {
+      CapsuleLastIndex = Argc - 1;
+    }
   }
 
   CapsuleNum = CapsuleLastIndex - CapsuleFirstIndex + 1;

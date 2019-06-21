@@ -3,7 +3,7 @@
 #
 #  Capsule library instance for DXE_RUNTIME_DRIVER module types.
 #
-#  Copyright (c) 2016 - 2019, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -68,7 +68,6 @@
   gEfiEndOfDxeEventGroupGuid              ## CONSUMES ## Event
   gEfiEventReadyToBootGuid                ## CONSUMES ## Event
   gEfiEventVirtualAddressChangeGuid       ## CONSUMES ## Event
-  gEdkiiCapsuleOnDiskNameGuid             ## SOMETIMES_CONSUMES ## GUID
 
 [Depex]
   gEfiVariableWriteArchProtocolGuid

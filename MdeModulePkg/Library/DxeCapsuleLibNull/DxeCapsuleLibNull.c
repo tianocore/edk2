@@ -1,7 +1,7 @@
 /** @file
   Null Dxe Capsule Library instance does nothing and returns unsupport status.
 
-Copyright (c) 2007 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -85,86 +85,3 @@ ProcessCapsules (
   return EFI_UNSUPPORTED;
 }
 
-
-/**
-  This routine is called to check if CapsuleOnDisk flag in OsIndications Variable
-  is enabled.
-
-  @retval TRUE     Flag is enabled
-  @retval FALSE    Flag is not enabled
-
-**/
-BOOLEAN
-EFIAPI
-CoDCheckCapsuleOnDiskFlag(
-  VOID
-  )
-{
-  return FALSE;
-}
-
-/**
-  This routine is called to clear CapsuleOnDisk flags including OsIndications and BootNext variable.
-
-  @retval EFI_SUCCESS   All Capsule On Disk flags are cleared
-
-**/
-EFI_STATUS
-EFIAPI
-CoDClearCapsuleOnDiskFlag(
-  VOID
-  )
-{
-  return EFI_UNSUPPORTED;
-}
-
-/**
-  Relocate Capsule on Disk from EFI system partition.
-
-  Two solution to deliver Capsule On Disk:
-  Solution A: If PcdCapsuleInRamSupport is enabled, relocate Capsule On Disk to memory and call UpdateCapsule().
-  Solution B: If PcdCapsuleInRamSupport is disabled, relocate Capsule On Disk to a platform-specific NV storage
-  device with BlockIo protocol.
-
-  Device enumeration like USB costs time, user can input MaxRetry to tell function to retry.
-  Function will stall 100ms between each retry.
-
-  Side Effects:
-    Capsule Delivery Supported Flag in OsIndication variable and BootNext variable will be cleared.
-    Solution B: Content corruption. Block IO write directly touches low level write. Orignal partitions, file
-  systems of the relocation device will be corrupted.
-
-  @param[in]    MaxRetry             Max Connection Retry. Stall 100ms between each connection try to ensure
-                                     devices like USB can get enumerated. Input 0 means no retry.
-
-  @retval EFI_SUCCESS   Capsule on Disk images are successfully relocated.
-
-**/
-EFI_STATUS
-EFIAPI
-CoDRelocateCapsule(
-  UINTN     MaxRetry
-  )
-{
-  return EFI_UNSUPPORTED;
-}
-
-/**
-  Remove the temp file from the root of EFI System Partition.
-  Device enumeration like USB costs time, user can input MaxRetry to tell function to retry.
-  Function will stall 100ms between each retry.
-
-  @param[in]    MaxRetry             Max Connection Retry. Stall 100ms between each connection try to ensure
-                                     devices like USB can get enumerated. Input 0 means no retry.
-
-  @retval EFI_SUCCESS   Remove the temp file successfully.
-
-**/
-EFI_STATUS
-EFIAPI
-CoDRemoveTempFile (
-  UINTN    MaxRetry
-  )
-{
-  return EFI_UNSUPPORTED;
-}

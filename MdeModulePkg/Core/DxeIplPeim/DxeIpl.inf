@@ -5,7 +5,7 @@
 #  PPI to discover and dispatch the DXE Foundation and components that are
 #  needed to run the DXE Foundation.
 #
-#  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 #  Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -76,19 +76,17 @@
   ArmMmuLib
 
 [Ppis]
-  gEfiDxeIplPpiGuid                      ## PRODUCES
-  gEfiPeiDecompressPpiGuid               ## PRODUCES
-  gEfiEndOfPeiSignalPpiGuid              ## SOMETIMES_PRODUCES # Not produced on S3 boot path
-  gEfiPeiReadOnlyVariable2PpiGuid        ## SOMETIMES_CONSUMES
-  gEfiPeiLoadFilePpiGuid                 ## SOMETIMES_CONSUMES
-  gEfiPeiS3Resume2PpiGuid                ## SOMETIMES_CONSUMES # Consumed on S3 boot path
-  gEfiPeiRecoveryModulePpiGuid           ## SOMETIMES_CONSUMES # Consumed on recovery boot path
+  gEfiDxeIplPpiGuid                 ## PRODUCES
+  gEfiPeiDecompressPpiGuid          ## PRODUCES
+  gEfiEndOfPeiSignalPpiGuid         ## SOMETIMES_PRODUCES # Not produced on S3 boot path
+  gEfiPeiReadOnlyVariable2PpiGuid   ## SOMETIMES_CONSUMES
+  gEfiPeiLoadFilePpiGuid            ## SOMETIMES_CONSUMES
+  gEfiPeiS3Resume2PpiGuid           ## SOMETIMES_CONSUMES # Consumed on S3 boot path
+  gEfiPeiRecoveryModulePpiGuid      ## SOMETIMES_CONSUMES # Consumed on recovery boot path
   ## SOMETIMES_CONSUMES
   ## UNDEFINED # HOB
   gEfiVectorHandoffInfoPpiGuid
-  gEfiPeiMemoryDiscoveredPpiGuid         ## SOMETIMES_CONSUMES
-  gEdkiiPeiBootInCapsuleOnDiskModePpiGuid  ## SOMETIMES_CONSUMES
-  gEdkiiPeiCapsuleOnDiskPpiGuid            ## SOMETIMES_CONSUMES # Consumed on firmware update boot path
+  gEfiPeiMemoryDiscoveredPpiGuid    ## SOMETIMES_CONSUMES
 
 [Guids]
   ## SOMETIMES_CONSUMES ## Variable:L"MemoryTypeInformation"
