@@ -12,6 +12,7 @@ import copy
 import struct
 import argparse
 from   ctypes import *
+from functools import reduce
 
 """
 This utility supports some operations for Intel FSP 1.x/2.x image.
@@ -340,6 +341,31 @@ def Bytes2Val (bytes):
 def Val2Bytes (value, blen):
     return [(value>>(i*8) & 0xff) for i in range(blen)]
 
+def IsIntegerType (val):
+    if sys.version_info[0] < 3:
+        if type(val) in (int, long):
+            return True
+    else:
+        if type(val) is int:
+            return True
+    return False
+
+def IsStrType (val):
+    if sys.version_info[0] < 3:
+        if type(val) is str:
+            return True
+    else:
+        if type(val) is bytes:
+            return True
+    return False
+
+def HandleNameStr (val):
+    if sys.version_info[0] < 3:
+        rep = "0x%X ('%s')" % (Bytes2Val (bytearray (val)), val)
+    else:
+        rep = "0x%X ('%s')" % (Bytes2Val (bytearray (val)), str (val, 'utf-8'))
+    return rep
+
 def OutputStruct (obj, indent = 0, plen = 0):
     if indent:
         body = ''
@@ -361,15 +387,19 @@ def OutputStruct (obj, indent = 0, plen = 0):
             body += OutputStruct (val, indent + 1)
             plen -= sizeof(val)
         else:
-            if type(val) is str:
-                rep = "0x%X ('%s')" % (Bytes2Val(bytearray(val)), val)
-            elif type(val) in (int, long):
+            if IsStrType (val):
+                rep = HandleNameStr (val)
+            elif IsIntegerType (val):
                 rep = '0x%X' % val
             elif isinstance(val, c_uint24):
                 rep = '0x%X' % val.get_value()
             elif 'c_ubyte_Array' in str(type(val)):
                 if sizeof(val) == 16:
-                    rep = str(uuid.UUID(bytes = str(bytearray(val)))).upper()
+                    if sys.version_info[0] < 3:
+                        rep = str(bytearray(val))
+                    else:
+                        rep = bytes(val)
+                    rep = str(uuid.UUID(bytes_le = rep)).upper()
                 else:
                     res = ['0x%02X'%i for i in bytearray(val)]
                     rep = '[%s]' % (','.join(res))
@@ -487,7 +517,7 @@ class FirmwareDevice:
         self.FvList  = []
         while offset < fdsize:
             fvh = EFI_FIRMWARE_VOLUME_HEADER.from_buffer (self.FdData, offset)
-            if '_FVH' != fvh.Signature:
+            if b'_FVH' != fvh.Signature:
                 raise Exception("ERROR: Invalid FV header !")
             fv = FirmwareVolume (offset, self.FdData[offset:offset + fvh.FvLength])
             fv.ParseFv ()
@@ -524,7 +554,7 @@ class FirmwareDevice:
                 fspoffset = fv.Offset
                 offset    = fspoffset + fihoffset
                 fih = FSP_INFORMATION_HEADER.from_buffer (self.FdData, offset)
-                if 'FSPH' != fih.Signature:
+                if b'FSPH' != fih.Signature:
                     continue
 
                 offset += fih.HeaderLength
@@ -532,7 +562,7 @@ class FirmwareDevice:
                 plist  = []
                 while True:
                     fch = FSP_COMMON_HEADER.from_buffer (self.FdData, offset)
-                    if 'FSPP' != fch.Signature:
+                    if b'FSPP' != fch.Signature:
                         offset += fch.HeaderLength
                         offset = AlignPtr(offset, 4)
                     else:
@@ -557,9 +587,9 @@ class PeTeImage:
     def __init__(self, offset, data):
         self.Offset    = offset
         tehdr          = EFI_TE_IMAGE_HEADER.from_buffer (data, 0)
-        if   tehdr.Signature == 'VZ': # TE image
+        if   tehdr.Signature == b'VZ': # TE image
             self.TeHdr   = tehdr
-        elif tehdr.Signature == 'MZ': # PE image
+        elif tehdr.Signature == b'MZ': # PE image
             self.TeHdr   = None
             self.DosHdr  = EFI_IMAGE_DOS_HEADER.from_buffer (data, 0)
             self.PeHdr   = EFI_IMAGE_NT_HEADERS32.from_buffer (data, self.DosHdr.e_lfanew)
@@ -604,7 +634,7 @@ class PeTeImage:
             offset += sizeof(blkhdr)
             # Read relocation type,offset pairs
             rlen  = blkhdr.BlockSize - sizeof(PE_RELOC_BLOCK_HEADER)
-            rnum  = rlen/sizeof(c_uint16)
+            rnum  = int (rlen/sizeof(c_uint16))
             rdata = (c_uint16 * rnum).from_buffer(self.Data, offset)
             for each in rdata:
                 roff  = each & 0xfff
@@ -666,8 +696,11 @@ def ShowFspInfo (fspfile):
         if not name:
             name = '\xff' * 16
         else:
-            name = str(bytearray(name))
-        guid = uuid.UUID(bytes = name)
+            if sys.version_info[0] < 3:
+                name = str(bytearray(name))
+            else:
+                name = bytes(name)
+        guid = uuid.UUID(bytes_le = name)
         print ("FV%d:" % idx)
         print ("  GUID   : %s" % str(guid).upper())
         print ("  Offset : 0x%08X" %  fv.Offset)
@@ -695,7 +728,10 @@ def GenFspHdr (fspfile, outdir, hfile):
     for fsp in fd.FspList:
         fih = fsp.Fih
         if firstfv:
-            hfsp.write("#define  FSP_IMAGE_ID    0x%016X    /* '%s' */\n" % (Bytes2Val(bytearray(fih.ImageId)), fih.ImageId))
+            if sys.version_info[0] < 3:
+                hfsp.write("#define  FSP_IMAGE_ID    0x%016X    /* '%s' */\n" % (Bytes2Val(bytearray(fih.ImageId)), fih.ImageId))
+            else:
+                hfsp.write("#define  FSP_IMAGE_ID    0x%016X    /* '%s' */\n" % (Bytes2Val(bytearray(fih.ImageId)), str (fih.ImageId, 'utf-8')))
             hfsp.write("#define  FSP_IMAGE_REV   0x%08X \n\n" % fih.ImageRevision)
             firstfv = False
         fv = fd.FvList[fsp.FvIdxList[0]]
@@ -733,7 +769,7 @@ def RebaseFspBin (FspBinary, FspComponent, FspBase, OutputDir, OutputFile):
     numcomp  = len(FspComponent)
     baselist = FspBase
     if numcomp != len(baselist):
-        print "ERROR: Required number of base does not match number of FSP component !"
+        print ("ERROR: Required number of base does not match number of FSP component !")
         return
 
     newfspbin = fd.FdData[:]
@@ -753,7 +789,7 @@ def RebaseFspBin (FspBinary, FspComponent, FspBase, OutputDir, OutputFile):
                 break
 
         if not found:
-            print "ERROR: Could not find FSP_%c component to rebase !" % fspcomp.upper()
+            print ("ERROR: Could not find FSP_%c component to rebase !" % fspcomp.upper())
             return
 
         fspbase = baselist[idx]
@@ -763,7 +799,7 @@ def RebaseFspBin (FspBinary, FspComponent, FspBase, OutputDir, OutputFile):
             newbase = int(fspbase)
         oldbase = fsp.Fih.ImageBase
         delta = newbase - oldbase
-        print "Rebase FSP-%c from 0x%08X to 0x%08X:" % (ftype.upper(),oldbase,newbase)
+        print ("Rebase FSP-%c from 0x%08X to 0x%08X:" % (ftype.upper(),oldbase,newbase))
 
         imglist = []
         for fvidx in fsp.FvIdxList:
@@ -782,12 +818,12 @@ def RebaseFspBin (FspBinary, FspComponent, FspBase, OutputDir, OutputFile):
             pcount += img.Rebase(delta, newfspbin)
             fcount += 1
 
-        print "  Patched %d entries in %d TE/PE32 images." % (pcount, fcount)
+        print ("  Patched %d entries in %d TE/PE32 images." % (pcount, fcount))
 
         (count, applied) = fsp.Patch(delta, newfspbin)
-        print "  Patched %d entries using FSP patch table." % applied
+        print ("  Patched %d entries using FSP patch table." % applied)
         if count != applied:
-            print "  %d invalid entries are ignored !" % (count - applied)
+            print ("  %d invalid entries are ignored !" % (count - applied))
 
     if OutputFile == '':
         filename = os.path.basename(FspBinary)

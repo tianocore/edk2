@@ -1,6 +1,6 @@
 ## @ GenCfgOpt.py
 #
-# Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2014 - 2019, Intel Corporation. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -10,6 +10,7 @@ import re
 import sys
 import struct
 from   datetime import date
+from functools import reduce
 
 # Generated file copyright header
 
@@ -90,11 +91,11 @@ class CLogicalExpression:
         self.string   = ''
 
     def errExit(self, err = ''):
-        print "ERROR: Express parsing for:"
-        print "       %s" % self.string
-        print "       %s^" % (' ' * self.index)
+        print ("ERROR: Express parsing for:")
+        print ("       %s" % self.string)
+        print ("       %s^" % (' ' * self.index))
         if err:
-            print "INFO : %s" % err
+            print ("INFO : %s" % err)
         raise SystemExit
 
     def getNonNumber (self, n1, n2):
@@ -338,15 +339,15 @@ EndList
         else:
             Error = 0
             if self.Debug:
-                print "INFO : Macro dictionary:"
+                print ("INFO : Macro dictionary:")
                 for Each in self._MacroDict:
-                    print "       $(%s) = [ %s ]" % (Each , self._MacroDict[Each])
+                    print ("       $(%s) = [ %s ]" % (Each , self._MacroDict[Each]))
         return Error
 
     def EvaulateIfdef   (self, Macro):
         Result = Macro in self._MacroDict
         if self.Debug:
-            print "INFO : Eval Ifdef [%s] : %s" % (Macro, Result)
+            print ("INFO : Eval Ifdef [%s] : %s" % (Macro, Result))
         return  Result
 
     def ExpandMacros (self, Input):
@@ -359,7 +360,7 @@ EndList
                   Line = Line.replace(Each, self._MacroDict[Variable])
               else:
                   if self.Debug:
-                      print "WARN : %s is not defined" % Each
+                      print ("WARN : %s is not defined" % Each)
                   Line = Line.replace(Each, Each[2:-1])
         return Line
 
@@ -372,7 +373,7 @@ EndList
                   Line = Line.replace(PcdName, self._PcdsDict[PcdName])
               else:
                   if self.Debug:
-                      print "WARN : %s is not defined" % PcdName
+                      print ("WARN : %s is not defined" % PcdName)
         return Line
 
     def EvaluateExpress (self, Expr):
@@ -381,7 +382,7 @@ EndList
         LogExpr = CLogicalExpression()
         Result  = LogExpr.evaluateExpress (ExpExpr)
         if self.Debug:
-            print "INFO : Eval Express [%s] : %s" % (Expr, Result)
+            print ("INFO : Eval Express [%s] : %s" % (Expr, Result))
         return Result
 
     def FormatListValue(self, ConfigDict):
@@ -406,7 +407,7 @@ EndList
         bytearray = []
         for each in dataarray:
             value = each
-            for loop in xrange(unit):
+            for loop in range(int(unit)):
                 bytearray.append("0x%02X" % (value & 0xFF))
                 value = value >> 8
         newvalue  = '{'  + ','.join(bytearray) + '}'
@@ -548,7 +549,7 @@ EndList
                 if Match:
                     self._MacroDict[Match.group(1)] = Match.group(2)
                     if self.Debug:
-                        print "INFO : DEFINE %s = [ %s ]" % (Match.group(1), Match.group(2))
+                        print ("INFO : DEFINE %s = [ %s ]" % (Match.group(1), Match.group(2)))
             elif IsPcdSect:
                 #gSiPkgTokenSpaceGuid.PcdTxtEnable|FALSE
                 #gSiPkgTokenSpaceGuid.PcdOverclockEnable|TRUE
@@ -556,7 +557,7 @@ EndList
                 if Match:
                     self._PcdsDict[Match.group(1)] = Match.group(2)
                     if self.Debug:
-                        print "INFO : PCD %s = [ %s ]" % (Match.group(1), Match.group(2))
+                        print ("INFO : PCD %s = [ %s ]" % (Match.group(1), Match.group(2)))
                     i = 0
                     while i < len(BuildOptionPcd):
                         Match = re.match("\s*([\w\.]+)\s*\=\s*(\w+)", BuildOptionPcd[i])
@@ -774,7 +775,7 @@ EndList
         bitsvalue = bitsvalue[::-1]
         bitslen   = len(bitsvalue)
         if start > bitslen or end > bitslen:
-            print "Invalid bits offset [%d,%d] for %s" % (start, end, subitem['name'])
+            print ("Invalid bits offset [%d,%d] for %s" % (start, end, subitem['name']))
             raise SystemExit
         return hex(int(bitsvalue[start:end][::-1], 2))
 
@@ -1031,7 +1032,7 @@ EndList
 
            if Match and Match.group(3) == 'END':
                if (StructName != Match.group(1)) or (VariableName != Match.group(2)):
-                   print "Unmatched struct name '%s' and '%s' !"  % (StructName, Match.group(1))
+                   print ("Unmatched struct name '%s' and '%s' !"  % (StructName, Match.group(1)))
                else:
                    if IsUpdHdrDefined != True or IsUpdHeader != True:
                       NewTextBody.append ('} %s;\n\n' %  StructName)
@@ -1464,11 +1465,11 @@ EndList
 
 
 def Usage():
-    print "GenCfgOpt Version 0.53"
-    print "Usage:"
-    print "    GenCfgOpt  UPDTXT  PlatformDscFile BuildFvDir                 [-D Macros]"
-    print "    GenCfgOpt  HEADER  PlatformDscFile BuildFvDir  InputHFile     [-D Macros]"
-    print "    GenCfgOpt  GENBSF  PlatformDscFile BuildFvDir  BsfOutFile     [-D Macros]"
+    print ("GenCfgOpt Version 0.54")
+    print ("Usage:")
+    print ("    GenCfgOpt  UPDTXT  PlatformDscFile BuildFvDir                 [-D Macros]")
+    print ("    GenCfgOpt  HEADER  PlatformDscFile BuildFvDir  InputHFile     [-D Macros]")
+    print ("    GenCfgOpt  GENBSF  PlatformDscFile BuildFvDir  BsfOutFile     [-D Macros]")
 
 def Main():
     #
@@ -1489,7 +1490,7 @@ def Main():
     else:
         DscFile = sys.argv[2]
         if not os.path.exists(DscFile):
-            print "ERROR: Cannot open DSC file '%s' !" % DscFile
+            print ("ERROR: Cannot open DSC file '%s' !" % DscFile)
             return 2
 
         OutFile = ''
@@ -1501,7 +1502,7 @@ def Main():
                 Start = 5
             if argc > Start:
                 if GenCfgOpt.ParseMacros(sys.argv[Start:]) != 0:
-                    print "ERROR: Macro parsing failed !"
+                    print ("ERROR: Macro parsing failed !")
                     return 3
 
         FvDir = sys.argv[3]
@@ -1509,11 +1510,11 @@ def Main():
             os.makedirs(FvDir)
 
         if GenCfgOpt.ParseDscFile(DscFile, FvDir) != 0:
-            print "ERROR: %s !" % GenCfgOpt.Error
+            print ("ERROR: %s !" % GenCfgOpt.Error)
             return 5
 
         if GenCfgOpt.UpdateSubRegionDefaultValue() != 0:
-            print "ERROR: %s !" % GenCfgOpt.Error
+            print ("ERROR: %s !" % GenCfgOpt.Error)
             return 7
 
         if sys.argv[1] == "UPDTXT":
@@ -1521,23 +1522,23 @@ def Main():
             if Ret != 0:
                 # No change is detected
                 if Ret == 256:
-                    print "INFO: %s !" % (GenCfgOpt.Error)
+                    print ("INFO: %s !" % (GenCfgOpt.Error))
                 else :
-                    print "ERROR: %s !" % (GenCfgOpt.Error)
+                    print ("ERROR: %s !" % (GenCfgOpt.Error))
             return Ret
         elif sys.argv[1] == "HEADER":
             if GenCfgOpt.CreateHeaderFile(OutFile) != 0:
-                print "ERROR: %s !" % GenCfgOpt.Error
+                print ("ERROR: %s !" % GenCfgOpt.Error)
                 return 8
         elif sys.argv[1] == "GENBSF":
             if GenCfgOpt.GenerateBsfFile(OutFile) != 0:
-                print "ERROR: %s !" % GenCfgOpt.Error
+                print ("ERROR: %s !" % GenCfgOpt.Error)
                 return 9
         else:
             if argc < 5:
                 Usage()
                 return 1
-            print "ERROR: Unknown command '%s' !" % sys.argv[1]
+            print ("ERROR: Unknown command '%s' !" % sys.argv[1])
             Usage()
             return 1
         return 0

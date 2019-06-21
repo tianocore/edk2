@@ -1,6 +1,6 @@
 ## @ PatchFv.py
 #
-# Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2014 - 2019, Intel Corporation. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -25,7 +25,10 @@ def readDataFromFile (binfile, offset, len=1):
     if (offval & 0x80000000):
         offval = fsize - (0xFFFFFFFF - offval + 1)
     fd.seek(offval)
-    bytearray = [ord(b) for b in fd.read(len)]
+    if sys.version_info[0] < 3:
+        bytearray = [ord(b) for b in fd.read(len)]
+    else:
+        bytearray = [b for b in fd.read(len)]
     value = 0
     idx   = len - 1
     while  idx >= 0:
@@ -45,7 +48,7 @@ def IsFspHeaderValid (binfile):
     fd     = open (binfile, "rb")
     bindat = fd.read(0x200) # only read first 0x200 bytes
     fd.close()
-    HeaderList = ['FSPH' , 'FSPP' , 'FSPE']       # Check 'FSPH', 'FSPP', and 'FSPE' in the FSP header
+    HeaderList = [b'FSPH' , b'FSPP' , b'FSPE']       # Check 'FSPH', 'FSPP', and 'FSPE' in the FSP header
     OffsetList = []
     for each in HeaderList:
         if each in bindat:
@@ -55,7 +58,10 @@ def IsFspHeaderValid (binfile):
         OffsetList.append(idx)
     if not OffsetList[0] or not OffsetList[1]:    # If 'FSPH' or 'FSPP' is missing, it will return false
         return False
-    Revision = ord(bindat[OffsetList[0] + 0x0B])
+    if sys.version_info[0] < 3:
+        Revision = ord(bindat[OffsetList[0] + 0x0B])
+    else:
+        Revision = bindat[OffsetList[0] + 0x0B]
     #
     # if revision is bigger than 1, it means it is FSP v1.1 or greater revision, which must contain 'FSPE'.
     #
@@ -86,7 +92,10 @@ def patchDataInFile (binfile, offset, value, len=1):
         value          = value >> 8
         idx            = idx + 1
     fd.seek(offval)
-    fd.write("".join(chr(b) for b in bytearray))
+    if sys.version_info[0] < 3:
+        fd.write("".join(chr(b) for b in bytearray))
+    else:
+        fd.write(bytes(bytearray))
     fd.close()
     return len
 
@@ -791,7 +800,7 @@ class Symbols:
     #  retval      ret
     #
     def getSymbols(self, value):
-        if self.dictSymbolAddress.has_key(value):
+        if value in self.dictSymbolAddress:
             # Module:Function
             ret = int (self.dictSymbolAddress[value], 16)
         else:
@@ -827,8 +836,9 @@ class Symbols:
 #
 #  Print out the usage
 #
-def usage():
-    print "Usage: \n\tPatchFv FvBuildDir [FvFileBaseNames:]FdFileBaseNameToPatch \"Offset, Value\""
+def Usage():
+    print ("PatchFv Version 0.50")
+    print ("Usage: \n\tPatchFv FvBuildDir [FvFileBaseNames:]FdFileBaseNameToPatch \"Offset, Value\"")
 
 def main():
     #
@@ -847,7 +857,7 @@ def main():
     # If it fails to create dictionaries, then return an error.
     #
     if symTables.createDicts(sys.argv[1], sys.argv[2]) != 0:
-        print "ERROR: Failed to create symbol dictionary!!"
+        print ("ERROR: Failed to create symbol dictionary!!")
         return 2
 
     #
@@ -907,7 +917,7 @@ def main():
                 if ret:
                     raise Exception ("Patch failed for offset 0x%08X" % offset)
                 else:
-                    print  "Patched offset 0x%08X:[%08X] with value 0x%08X  # %s" % (offset, oldvalue, value, comment)
+                    print ("Patched offset 0x%08X:[%08X] with value 0x%08X  # %s" % (offset, oldvalue, value, comment))
 
             elif command == "COPY":
                 #
@@ -928,13 +938,13 @@ def main():
                 if ret:
                     raise Exception ("Copy failed from offset 0x%08X to offset 0x%08X!" % (src, dest))
                 else :
-                    print  "Copied %d bytes from offset 0x%08X ~ offset 0x%08X  # %s" % (clen, src, dest, comment)
+                    print ("Copied %d bytes from offset 0x%08X ~ offset 0x%08X  # %s" % (clen, src, dest, comment))
             else:
                 raise Exception ("Unknown command %s!" % command)
         return 0
 
-    except Exception as (ex):
-        print "ERROR: %s" % ex
+    except Exception as ex:
+        print ("ERROR: %s" % ex)
         return 1
 
 if __name__ == '__main__':
