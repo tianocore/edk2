@@ -1534,7 +1534,7 @@ Exit1:
 
 
 /**
-  Sent UIC DME_LINKSTARTUP command to start the link startup procedure.
+  Send UIC command.
 
   @param[in] Private          The pointer to the UFS_PASS_THRU_PRIVATE_DATA data structure.
   @param[in] UicOpcode        The opcode of the UIC command.
@@ -1544,7 +1544,6 @@ Exit1:
 
   @return EFI_SUCCESS      Successfully execute this UIC command and detect attached UFS device.
   @return EFI_DEVICE_ERROR Fail to execute this UIC command and detect attached UFS device.
-  @return EFI_NOT_FOUND    The presence of the UFS device isn't detected.
 
 **/
 EFI_STATUS
@@ -1628,24 +1627,6 @@ UfsExecUicCommands (
       return EFI_DEVICE_ERROR;
     }
   }
-
-  //
-  // Check value of HCS.DP and make sure that there is a device attached to the Link.
-  //
-  Status = UfsMmioRead32 (Private, UFS_HC_STATUS_OFFSET, &Data);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  if ((Data & UFS_HC_HCS_DP) == 0) {
-    Status  = UfsWaitMemSet (Private, UFS_HC_IS_OFFSET, UFS_HC_IS_ULSS, UFS_HC_IS_ULSS, UFS_TIMEOUT);
-    if (EFI_ERROR (Status)) {
-      return EFI_DEVICE_ERROR;
-    }
-    return EFI_NOT_FOUND;
-  }
-
-  DEBUG ((DEBUG_INFO, "UfsPassThruDxe: found a attached UFS device\n"));
 
   return EFI_SUCCESS;
 }
@@ -1820,8 +1801,9 @@ UfsDeviceDetection (
   IN  UFS_PASS_THRU_PRIVATE_DATA     *Private
   )
 {
-  UINTN                  Retry;
-  EFI_STATUS             Status;
+  UINTN       Retry;
+  EFI_STATUS  Status;
+  UINT32      Data;
 
   //
   // Start UFS device detection.
@@ -1829,22 +1811,26 @@ UfsDeviceDetection (
   //
   for (Retry = 0; Retry < 3; Retry++) {
     Status = UfsExecUicCommands (Private, UfsUicDmeLinkStartup, 0, 0, 0);
-    if (!EFI_ERROR (Status)) {
-      break;
+    if (EFI_ERROR (Status)) {
+      return EFI_DEVICE_ERROR;
     }
 
-    if (Status == EFI_NOT_FOUND) {
-      continue;
+    Status = UfsMmioRead32 (Private, UFS_HC_STATUS_OFFSET, &Data);
+    if (EFI_ERROR (Status)) {
+      return EFI_DEVICE_ERROR;
     }
 
-    return EFI_DEVICE_ERROR;
+    if ((Data & UFS_HC_HCS_DP) == 0) {
+      Status = UfsWaitMemSet (Private, UFS_HC_IS_OFFSET, UFS_HC_IS_ULSS, UFS_HC_IS_ULSS, UFS_TIMEOUT);
+      if (EFI_ERROR (Status)) {
+        return EFI_DEVICE_ERROR;
+      }
+    } else {
+      return EFI_SUCCESS;
+    }
   }
 
-  if (Retry == 3) {
-    return EFI_NOT_FOUND;
-  }
-
-  return EFI_SUCCESS;
+  return EFI_NOT_FOUND;
 }
 
 /**
