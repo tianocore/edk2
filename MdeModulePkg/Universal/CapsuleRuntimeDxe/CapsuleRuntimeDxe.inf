@@ -90,6 +90,7 @@
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxSizeNonPopulateCapsule   ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxSizePopulateCapsule      ## SOMETIMES_CONSUMES # Populate Image requires reset support.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleInRamSupport         ## CONSUMES
 
 [Pcd.X64]
   gEfiMdeModulePkgTokenSpaceGuid.PcdCapsulePeiLongModeStackSize   ## SOMETIMES_CONSUMES
