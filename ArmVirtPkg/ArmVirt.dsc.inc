@@ -71,6 +71,9 @@
 
   # Networking Requirements
 !include NetworkPkg/NetworkLibs.dsc.inc
+!if $(NETWORK_TLS_ENABLE) == TRUE
+  TlsLib|CryptoPkg/Library/TlsLib/TlsLib.inf
+!endif
 
 
   #
@@ -136,7 +139,11 @@
   # CryptoPkg libraries needed by multiple firmware features
   #
   IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
+!if $(NETWORK_TLS_ENABLE) == TRUE
+  OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
+!else
   OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibCrypto.inf
+!endif
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
 
   #

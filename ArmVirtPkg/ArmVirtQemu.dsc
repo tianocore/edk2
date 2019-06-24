@@ -43,10 +43,6 @@
   !error "NETWORK_SNP_ENABLE is IA32/X64/EBC only"
 !endif
 
-!if $(NETWORK_TLS_ENABLE) == TRUE
-  !error "NETWORK_TLS_ENABLE is tracked at <https://bugzilla.tianocore.org/show_bug.cgi?id=1009>"
-!endif
-
 !include NetworkPkg/NetworkDefines.dsc.inc
 
 !include ArmVirtPkg/ArmVirt.dsc.inc
@@ -113,6 +109,14 @@
   gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize|0x4000
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize|0x2000
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxAuthVariableSize|0x2800
+!if $(NETWORK_TLS_ENABLE) == TRUE
+  #
+  # The cumulative and individual VOLATILE variable size limits should be set
+  # high enough for accommodating several and/or large CA certificates.
+  #
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize|0x80000
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVolatileVariableSize|0x40000
+!endif
 
   # Size of the region used by UEFI in permanent memory (Reserved 64MB)
   gArmPlatformTokenSpaceGuid.PcdSystemMemoryUefiRegionSize|0x04000000
@@ -372,6 +376,12 @@
   # Networking stack
   #
 !include NetworkPkg/NetworkComponents.dsc.inc
+!if $(NETWORK_TLS_ENABLE) == TRUE
+  NetworkPkg/TlsAuthConfigDxe/TlsAuthConfigDxe.inf {
+    <LibraryClasses>
+      NULL|OvmfPkg/Library/TlsAuthConfigLib/TlsAuthConfigLib.inf
+  }
+!endif
 
   #
   # SCSI Bus and Disk Driver
