@@ -2219,13 +2219,15 @@ class Build():
             Module.CreateAsBuiltInf()
             all_mod_set.add(Module)
         for Module in self.HashSkipModules:
-            Module.CreateAsBuiltInf(True)
+            if  GlobalData.gBinCacheDest:
+                Module.CopyModuleToCache()
             all_mod_set.add(Module)
         for Module in all_mod_set:
             for lib in Module.LibraryAutoGenList:
                 all_lib_set.add(lib)
         for lib in all_lib_set:
-            lib.CreateAsBuiltInf(True)
+            if  GlobalData.gBinCacheDest:
+                lib.CopyModuleToCache()
         all_lib_set.clear()
         all_mod_set.clear()
         self.BuildModules = []

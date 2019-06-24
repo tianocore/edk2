@@ -3581,11 +3581,8 @@ class ModuleAutoGen(AutoGen):
 
     ## Create AsBuilt INF file the module
     #
-    def CreateAsBuiltInf(self, IsOnlyCopy = False):
+    def CreateAsBuiltInf(self):
         self.OutputFile = set()
-        if IsOnlyCopy and GlobalData.gBinCacheDest:
-            self.CopyModuleToCache()
-            return
 
         if self.IsAsBuiltInfCreated:
             return
