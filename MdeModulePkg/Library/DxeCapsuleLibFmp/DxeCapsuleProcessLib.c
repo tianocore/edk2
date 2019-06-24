@@ -9,7 +9,7 @@
   ProcessCapsules(), ProcessTheseCapsules() will receive untrusted
   input and do basic validation.
 
-  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2019, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -92,10 +92,41 @@ IsValidCapsuleHeader (
   IN UINT64              CapsuleSize
   );
 
+/**
+  Return if this capsule is a capsule name capsule, based upon CapsuleHeader.
+
+  @param[in] CapsuleHeader A pointer to EFI_CAPSULE_HEADER
+
+  @retval TRUE  It is a capsule name capsule.
+  @retval FALSE It is not a capsule name capsule.
+**/
+BOOLEAN
+IsCapsuleNameCapsule (
+  IN EFI_CAPSULE_HEADER         *CapsuleHeader
+  );
+
+/**
+  Check the integrity of the capsule name capsule.
+  If the capsule is vaild, return the physical address of each capsule name string.
+
+  @param[in]  CapsuleHeader   Pointer to the capsule header of a capsule name capsule.
+  @param[out] CapsuleNameNum  Number of capsule name.
+
+  @retval NULL                Capsule name capsule is not valid.
+  @retval CapsuleNameBuf      Array of capsule name physical address.
+
+**/
+EFI_PHYSICAL_ADDRESS *
+ValidateCapsuleNameCapsuleIntegrity (
+  IN  EFI_CAPSULE_HEADER            *CapsuleHeader,
+  OUT UINTN                         *CapsuleNameNum
+  );
+
 extern BOOLEAN                   mDxeCapsuleLibEndOfDxe;
 BOOLEAN                          mNeedReset = FALSE;
 
 VOID                        **mCapsulePtr;
+CHAR16                      **mCapsuleNamePtr;
 EFI_STATUS                  *mCapsuleStatusArray;
 UINT32                      mCapsuleTotalNumber;
 
@@ -116,6 +147,7 @@ EFI_STATUS
 EFIAPI
 ProcessThisCapsuleImage (
   IN EFI_CAPSULE_HEADER  *CapsuleHeader,
+  IN CHAR16              *CapFileName,  OPTIONAL
   OUT BOOLEAN            *ResetRequired OPTIONAL
   );
 
@@ -185,6 +217,18 @@ InitCapsulePtr (
 {
   EFI_PEI_HOB_POINTERS        HobPointer;
   UINTN                       Index;
+  UINTN                       Index2;
+  UINTN                       Index3;
+  UINTN                       CapsuleNameNumber;
+  UINTN                       CapsuleNameTotalNumber;
+  UINTN                       CapsuleNameCapsuleTotalNumber;
+  VOID                        **CapsuleNameCapsulePtr;
+  EFI_PHYSICAL_ADDRESS        *CapsuleNameAddress;
+
+  CapsuleNameNumber             = 0;
+  CapsuleNameTotalNumber        = 0;
+  CapsuleNameCapsuleTotalNumber = 0;
+  CapsuleNameCapsulePtr         = NULL;
 
   //
   // Find all capsule images from hob
@@ -194,7 +238,11 @@ InitCapsulePtr (
     if (!IsValidCapsuleHeader((VOID *)(UINTN)HobPointer.Capsule->BaseAddress, HobPointer.Capsule->Length)) {
       HobPointer.Header->HobType = EFI_HOB_TYPE_UNUSED; // Mark this hob as invalid
     } else {
-      mCapsuleTotalNumber++;
+      if (IsCapsuleNameCapsule((VOID *)(UINTN)HobPointer.Capsule->BaseAddress)) {
+        CapsuleNameCapsuleTotalNumber++;
+      } else {
+        mCapsuleTotalNumber++;
+      }
     }
     HobPointer.Raw = GET_NEXT_HOB (HobPointer);
   }
@@ -224,15 +272,68 @@ InitCapsulePtr (
   }
   SetMemN (mCapsuleStatusArray, sizeof (EFI_STATUS) * mCapsuleTotalNumber, EFI_NOT_READY);
 
+  CapsuleNameCapsulePtr =  (VOID **) AllocateZeroPool (sizeof (VOID *) * CapsuleNameCapsuleTotalNumber);
+  if (CapsuleNameCapsulePtr == NULL) {
+    DEBUG ((DEBUG_ERROR, "Allocate CapsuleNameCapsulePtr fail!\n"));
+    FreePool (mCapsulePtr);
+    FreePool (mCapsuleStatusArray);
+    mCapsulePtr         = NULL;
+    mCapsuleStatusArray = NULL;
+    mCapsuleTotalNumber = 0;
+    return ;
+  }
+
   //
   // Find all capsule images from hob
   //
   HobPointer.Raw = GetHobList ();
-  Index = 0;
+  Index  = 0;
+  Index2 = 0;
   while ((HobPointer.Raw = GetNextHob (EFI_HOB_TYPE_UEFI_CAPSULE, HobPointer.Raw)) != NULL) {
-    mCapsulePtr [Index++] = (VOID *) (UINTN) HobPointer.Capsule->BaseAddress;
+    if (IsCapsuleNameCapsule ((VOID *) (UINTN) HobPointer.Capsule->BaseAddress)) {
+      CapsuleNameCapsulePtr [Index2++] = (VOID *) (UINTN) HobPointer.Capsule->BaseAddress;
+    } else {
+      mCapsulePtr [Index++] = (VOID *) (UINTN) HobPointer.Capsule->BaseAddress;
+    }
     HobPointer.Raw = GET_NEXT_HOB (HobPointer);
   }
+
+  //
+  // Find Capsule On Disk Names
+  //
+  for (Index = 0; Index < CapsuleNameCapsuleTotalNumber; Index ++) {
+    CapsuleNameAddress = ValidateCapsuleNameCapsuleIntegrity (CapsuleNameCapsulePtr[Index], &CapsuleNameNumber);
+    if (CapsuleNameAddress != NULL ) {
+      CapsuleNameTotalNumber += CapsuleNameNumber;
+    }
+  }
+
+  if (CapsuleNameTotalNumber == mCapsuleTotalNumber) {
+    mCapsuleNamePtr = (CHAR16 **) AllocateZeroPool (sizeof (CHAR16 *) * mCapsuleTotalNumber);
+    if (mCapsuleNamePtr == NULL) {
+      DEBUG ((DEBUG_ERROR, "Allocate mCapsuleNamePtr fail!\n"));
+      FreePool (mCapsulePtr);
+      FreePool (mCapsuleStatusArray);
+      FreePool (CapsuleNameCapsulePtr);
+      mCapsulePtr         = NULL;
+      mCapsuleStatusArray = NULL;
+      mCapsuleTotalNumber = 0;
+      return ;
+    }
+
+    for (Index = 0, Index3 = 0; Index < CapsuleNameCapsuleTotalNumber; Index ++) {
+      CapsuleNameAddress = ValidateCapsuleNameCapsuleIntegrity (CapsuleNameCapsulePtr[Index], &CapsuleNameNumber);
+      if (CapsuleNameAddress != NULL ) {
+        for (Index2 = 0; Index2 < CapsuleNameNumber; Index2 ++) {
+          mCapsuleNamePtr[Index3 ++] = (CHAR16 *)(UINTN) CapsuleNameAddress[Index2];
+        }
+      }
+    }
+  } else {
+    mCapsuleNamePtr = NULL;
+  }
+
+  FreePool (CapsuleNameCapsulePtr);
 }
 
 /**
@@ -396,6 +497,7 @@ ProcessTheseCapsules (
   ESRT_MANAGEMENT_PROTOCOL    *EsrtManagement;
   UINT16                      EmbeddedDriverCount;
   BOOLEAN                     ResetRequired;
+  CHAR16                      *CapsuleName;
 
   REPORT_STATUS_CODE(EFI_PROGRESS_CODE, (EFI_SOFTWARE | PcdGet32(PcdStatusCodeSubClassCapsule) | PcdGet32(PcdCapsuleStatusCodeProcessCapsulesBegin)));
 
@@ -408,6 +510,7 @@ ProcessTheseCapsules (
     // We didn't find a hob, so had no errors.
     //
     DEBUG ((DEBUG_ERROR, "We can not find capsule data in capsule update boot mode.\n"));
+    mNeedReset = TRUE;
     return EFI_SUCCESS;
   }
 
@@ -430,10 +533,11 @@ ProcessTheseCapsules (
   //
   for (Index = 0; Index < mCapsuleTotalNumber; Index++) {
     CapsuleHeader = (EFI_CAPSULE_HEADER*) mCapsulePtr [Index];
+    CapsuleName = (mCapsuleNamePtr == NULL) ? NULL : mCapsuleNamePtr[Index];
     if (CompareGuid (&CapsuleHeader->CapsuleGuid, &gWindowsUxCapsuleGuid)) {
       DEBUG ((DEBUG_INFO, "ProcessThisCapsuleImage (Ux) - 0x%x\n", CapsuleHeader));
       DEBUG ((DEBUG_INFO, "Display logo capsule is found.\n"));
-      Status = ProcessThisCapsuleImage (CapsuleHeader, NULL);
+      Status = ProcessThisCapsuleImage (CapsuleHeader, CapsuleName, NULL);
       mCapsuleStatusArray [Index] = EFI_SUCCESS;
       DEBUG((DEBUG_INFO, "ProcessThisCapsuleImage (Ux) - %r\n", Status));
       break;
@@ -451,6 +555,7 @@ ProcessTheseCapsules (
       continue;
     }
     CapsuleHeader = (EFI_CAPSULE_HEADER*) mCapsulePtr [Index];
+    CapsuleName = (mCapsuleNamePtr == NULL) ? NULL : mCapsuleNamePtr[Index];
     if (!CompareGuid (&CapsuleHeader->CapsuleGuid, &gWindowsUxCapsuleGuid)) {
       //
       // Call capsule library to process capsule image.
@@ -471,7 +576,7 @@ ProcessTheseCapsules (
       if ((!FirstRound) || (EmbeddedDriverCount == 0)) {
         DEBUG((DEBUG_INFO, "ProcessThisCapsuleImage - 0x%x\n", CapsuleHeader));
         ResetRequired = FALSE;
-        Status = ProcessThisCapsuleImage (CapsuleHeader, &ResetRequired);
+        Status = ProcessThisCapsuleImage (CapsuleHeader, CapsuleName, &ResetRequired);
         mCapsuleStatusArray [Index] = Status;
         DEBUG((DEBUG_INFO, "ProcessThisCapsuleImage - %r\n", Status));
 
@@ -530,7 +635,8 @@ DoResetSystem (
   Caution: This function may receive untrusted input.
 
   The capsules reported in EFI_HOB_UEFI_CAPSULE are processed.
-  If there is no EFI_HOB_UEFI_CAPSULE, this routine does nothing.
+  If there is no EFI_HOB_UEFI_CAPSULE, it means error occurs, force reset to
+  normal boot path.
 
   This routine should be called twice in BDS.
   1) The first call must be before EndOfDxe. The system capsules is processed.
