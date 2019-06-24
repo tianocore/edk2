@@ -1066,6 +1066,15 @@
                                                                                      "The file name must be the 8.3 format.\n"
                                                                                      "The PCD data must be in UNICODE format."
 
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdCoDRelocationFileName_PROMPT  #language en-US "Capsule On Disk Temp Relocation file name in PEI phase"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdCoDRelocationFileName_HELP  #language en-US "This is Capsule Temp Relocation file name in PEI phase.<BR>"
+                                                                                          "The file must be in the root directory.<BR>"
+                                                                                          "The file name must be the 8.3 format.<BR>"
+                                                                                          "The PCD data must be in UNICODE format.<BR>"
+                                                                                          "CapsuleOnDiskLoadPei PEI module will set value of this PCD to PcdRecoveryFileName, then leverage recovery to get Capsule On Disk Temp Relocation file.<BR>"
+                                                                                          "Note: The file name must be shorter than PcdRecoveryFileName, otherwise CapsuleOnDiskLoadPei PEI module will fail to get Capsule On Disk Temp Relocation file.<BR>"
+
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdSystemFmpCapsuleImageTypeIdGuid_PROMPT  #language en-US "A list of system FMP ImageTypeId GUIDs"
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdSystemFmpCapsuleImageTypeIdGuid_HELP  #language en-US "This PCD hold a list GUIDs for the ImageTypeId to indicate the\n"
@@ -1130,6 +1139,31 @@
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdPteMemoryEncryptionAddressOrMask_HELP  #language en-US "This PCD holds the address mask for page table entries when memory encryption is\n"
                                                                                                      "enabled on AMD processors supporting the Secure Encrypted Virtualization (SEV) feature.\n"
                                                                                                      "This mask should be applied when creating 1:1 virtual to physical mapping tables."
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdCapsuleOnDiskSupport_PROMPT  #language en-US "Enable Capsule On Disk support"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdCapsuleOnDiskSupport_HELP  #language en-US   "Capsule On Disk is to deliver capsules via files on Mass Storage device.<BR><BR>"
+                                                                                           "This PCD indicates if the Capsule On Disk is supported.<BR>"
+                                                                                           " TRUE  - Capsule On Disk is supported.<BR>"
+                                                                                           " FALSE - Capsule On Disk is not supported.<BR>"
+                                                                                           "If platform does not use this feature, this PCD should be set to FALSE.<BR><BR>"
+                                                                                           "Two sulotions to deliver Capsule On Disk:<BR>"
+                                                                                           " a) If PcdCapsuleInRamSupport = TRUE, Load Capsule On Disk image out of TCB, and reuse Capsule In Ram to deliver capsule.<BR>"
+                                                                                           " b) If PcdCapsuleInRamSupport = FALSE, Relocate Capsule On Disk image to RootDir out of TCB, and reuse FatPei to load capsules from external storage.<BR>"
+                                                                                           "Note:<BR>"
+                                                                                           "If Both Capsule In Ram and Capsule On Disk are provisioned at the same time, the Capsule On Disk will be bypassed."
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdCapsuleInRamSupport_PROMPT  #language en-US "Enable Capsule In Ram support"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdCapsuleInRamSupport_HELP  #language en-US   "Capsule In Ram is to use memory to deliver the capsules that will be processed after system reset.<BR><BR>"
+                                                                                          "This PCD indicates if the Capsule In Ram is supported.<BR>"
+                                                                                          " TRUE  - Capsule In Ram is supported.<BR>"
+                                                                                          " FALSE - Capsule In Ram is not supported."
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdCodRelocationDevPath_PROMPT  #language en-US "Capsule On Disk relacation device path."
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdCodRelocationDevPath_HELP  #language en-US   "Full device path of plaform specific device to store Capsule On Disk temp relocation file.<BR>"
+                                                                                           "If this PCD is set, Capsule On Disk temp relocation file will be stored in the device specified by this PCD, instead of the EFI System Partition that stores capsule image file."
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdNullPointerDetectionPropertyMask_PROMPT  #language en-US "Enable NULL pointer detection"
 

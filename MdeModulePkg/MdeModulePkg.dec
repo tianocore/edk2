@@ -399,6 +399,9 @@
   ## Include/Guid/SerialPortLibVendor.h
   gEdkiiSerialPortLibVendorGuid = { 0xD3987D4B, 0x971A, 0x435F, { 0x8C, 0xAF, 0x49, 0x67, 0xEB, 0x62, 0x72, 0x41 } }
 
+  ## GUID indicates the capsule is to store Capsule On Disk file names.
+  gEdkiiCapsuleOnDiskNameGuid = { 0x98c80a4f, 0xe16b, 0x4d11, { 0x93, 0x9a, 0xab, 0xe5, 0x61, 0x26, 0x3, 0x30 } }
+
 [Ppis]
   ## Include/Ppi/AtaController.h
   gPeiAtaControllerPpiGuid       = { 0xa45e60d1, 0xc719, 0x44aa, { 0xb0, 0x7a, 0xaa, 0x77, 0x7f, 0x85, 0x90, 0x6d }}
@@ -471,6 +474,10 @@
 
   ## Include/Ppi/NvmExpressPassThru.h
   gEdkiiPeiNvmExpressPassThruPpiGuid    = { 0x6af31b2c, 0x3be, 0x46c1, { 0xb1, 0x2d, 0xea, 0x4a, 0x36, 0xdf, 0xa7, 0x4c } }
+
+  ## Include/Ppi/CapsuleOnDisk.h
+  gEdkiiPeiCapsuleOnDiskPpiGuid             = { 0x71a9ea61, 0x5a35, 0x4a5d, { 0xac, 0xef, 0x9c, 0xf8, 0x6d, 0x6d, 0x67, 0xe0 } }
+  gEdkiiPeiBootInCapsuleOnDiskModePpiGuid   = { 0xb08a11e4, 0xe2b7, 0x4b75, { 0xb5, 0x15, 0xaf, 0x61, 0x6, 0x68, 0xbf, 0xd1  } }
 
 [Protocols]
   ## Load File protocol provides capability to load and unload EFI image into memory and execute it.
@@ -1481,6 +1488,22 @@
   # @Prompt Maximum Number of PEI Reset Filters, Reset Notifications or Reset Handlers.
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaximumPeiResetNotifies|0x10|UINT32|0x0000010A
 
+  ## Capsule On Disk is to deliver capsules via files on Mass Storage device.<BR><BR>
+  #  This PCD indicates if the Capsule On Disk is supported.<BR>
+  #   TRUE  - Capsule On Disk is supported.<BR>
+  #   FALSE - Capsule On Disk is not supported.<BR>
+  #  If platform does not use this feature, this PCD should be set to FALSE.<BR><BR>
+  #  Two sulotions to deliver Capsule On Disk:<BR>
+  #    a) If PcdCapsuleInRamSupport = TRUE, Load Capsule On Disk image out of TCB, and reuse
+  #       Capsule In Ram to deliver capsule.<BR>
+  #    b) If PcdCapsuleInRamSupport = FALSE, Relocate Capsule On Disk image to RootDir out
+  #       of TCB, and reuse FatPei to load capsules from external storage.<BR>
+  #  Note:<BR>
+  #    If Both Capsule In Ram and Capsule On Disk are provisioned at the same time, the Capsule
+  #  On Disk will be bypassed.
+  # @Prompt Enable Capsule On Disk support.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleOnDiskSupport|FALSE|BOOLEAN|0x0000002d
+
 [PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## This PCD defines the Console output row. The default value is 25 according to UEFI spec.
   #  This PCD could be set to 0 then console output would be at max column and max row.
@@ -1940,6 +1963,17 @@
   # @Prompt Recover file name in PEI phase
   gEfiMdeModulePkgTokenSpaceGuid.PcdRecoveryFileName|L"FVMAIN.FV"|VOID*|0x30001045
 
+  ## This is Capsule Temp Relocation file name in PEI phase.
+  #  The file must be in the root directory.
+  #  The file name must be the 8.3 format.
+  #  The PCD data must be in UNICODE format.
+  #  CapsuleOnDiskLoadPei PEI module will set value of this PCD to PcdRecoveryFileName, then
+  #  leverage recovery to get Capsule On Disk Temp Relocation file.
+  #  Note: The file name must be shorter than PcdRecoveryFileName, otherwise CapsuleOnDiskLoadPei
+  #  PEI module will fail to get Capsule On Disk Temp Relocation file.
+  # @Prompt Capsule On Disk Temp Relocation file name in PEI phase
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCoDRelocationFileName|L"Cod.tmp"|VOID*|0x30001048
+
   ## This PCD hold a list GUIDs for the ImageTypeId to indicate the
   #  FMP capsule is a system FMP.
   # @Prompt A list of system FMP ImageTypeId GUIDs
@@ -1950,6 +1984,20 @@
   #  This mask should be applied when creating 1:1 virtual to physical mapping tables.
   # @Prompt The address mask when memory encryption is enabled.
   gEfiMdeModulePkgTokenSpaceGuid.PcdPteMemoryEncryptionAddressOrMask|0x0|UINT64|0x30001047
+
+  ## Capsule In Ram is to use memory to deliver the capsules that will be processed after system
+  #  reset.<BR><BR>
+  #  This PCD indicates if the Capsule In Ram is supported.<BR>
+  #   TRUE  - Capsule In Ram is supported.<BR>
+  #   FALSE - Capsule In Ram is not supported.
+  # @Prompt Enable Capsule In Ram support.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleInRamSupport|TRUE|BOOLEAN|0x0000002e
+
+  ## Full device path of plaform specific device to store Capsule On Disk temp relocation file.<BR>
+  #  If this PCD is set, Capsule On Disk temp relocation file will be stored in the device specified
+  #  by this PCD, instead of the EFI System Partition that stores capsule image file.
+  # @Prompt Capsule On Disk relocation device path.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCodRelocationDevPath|{0xFF}|VOID*|0x0000002f
 
 [PcdsPatchableInModule]
   ## Specify memory size with page number for PEI code when
