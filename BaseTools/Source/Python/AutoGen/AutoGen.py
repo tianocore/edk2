@@ -3579,19 +3579,37 @@ class ModuleAutoGen(AutoGen):
         fInputfile.close ()
         return OutputName
 
+    @cached_property
+    def OutputFile(self):
+        retVal = set()
+        OutputDir = self.OutputDir.replace('\\', '/').strip('/')
+        DebugDir = self.DebugDir.replace('\\', '/').strip('/')
+        for Item in self.CodaTargetList:
+            File = Item.Target.Path.replace('\\', '/').strip('/').replace(DebugDir, '').replace(OutputDir, '').strip('/')
+            retVal.add(File)
+        if self.DepexGenerated:
+            retVal.add(self.Name + '.depex')
+
+        Bin = self._GenOffsetBin()
+        if Bin:
+            retVal.add(Bin)
+
+        for Root, Dirs, Files in os.walk(OutputDir):
+            for File in Files:
+                if File.lower().endswith('.pdb'):
+                    retVal.add(File)
+
+        return retVal
+
     ## Create AsBuilt INF file the module
     #
     def CreateAsBuiltInf(self):
-        self.OutputFile = set()
 
         if self.IsAsBuiltInfCreated:
             return
 
         # Skip INF file generation for libraries
         if self.IsLibrary:
-            # Only store the library cache if needed
-            if GlobalData.gBinCacheDest:
-                self.CopyModuleToCache()
             return
 
         # Skip the following code for modules with no source files
@@ -3712,7 +3730,6 @@ class ModuleAutoGen(AutoGen):
         DebugDir = self.DebugDir.replace('\\', '/').strip('/')
         for Item in self.CodaTargetList:
             File = Item.Target.Path.replace('\\', '/').strip('/').replace(DebugDir, '').replace(OutputDir, '').strip('/')
-            self.OutputFile.add(File)
             if os.path.isabs(File):
                 File = File.replace('\\', '/').strip('/').replace(OutputDir, '').strip('/')
             if Item.Target.Ext.lower() == '.aml':
@@ -3728,7 +3745,6 @@ class ModuleAutoGen(AutoGen):
             if os.path.exists(DepexFile):
                 self.DepexGenerated = True
         if self.DepexGenerated:
-            self.OutputFile.add(self.Name + '.depex')
             if self.ModuleType in [SUP_MODULE_PEIM]:
                 AsBuiltInfDict['binary_item'].append('PEI_DEPEX|' + self.Name + '.depex')
             elif self.ModuleType in [SUP_MODULE_DXE_DRIVER, SUP_MODULE_DXE_RUNTIME_DRIVER, SUP_MODULE_DXE_SAL_DRIVER, SUP_MODULE_UEFI_DRIVER]:
@@ -3739,13 +3755,11 @@ class ModuleAutoGen(AutoGen):
         Bin = self._GenOffsetBin()
         if Bin:
             AsBuiltInfDict['binary_item'].append('BIN|%s' % Bin)
-            self.OutputFile.add(Bin)
 
         for Root, Dirs, Files in os.walk(OutputDir):
             for File in Files:
                 if File.lower().endswith('.pdb'):
                     AsBuiltInfDict['binary_item'].append('DISPOSABLE|' + File)
-                    self.OutputFile.add(File)
         HeaderComments = self.Module.HeaderComments
         StartPos = 0
         for Index in range(len(HeaderComments)):
@@ -3914,8 +3928,6 @@ class ModuleAutoGen(AutoGen):
         SaveFileOnChange(os.path.join(self.OutputDir, self.Name + '.inf'), str(AsBuiltInf), False)
 
         self.IsAsBuiltInfCreated = True
-        if GlobalData.gBinCacheDest:
-            self.CopyModuleToCache()
 
     def CopyModuleToCache(self):
         FileDir = path.join(GlobalData.gBinCacheDest, self.PlatformInfo.OutputDir, self.BuildTarget + "_" + self.ToolChain, self.Arch, self.SourceDir, self.MetaFile.BaseName)
@@ -3923,30 +3935,24 @@ class ModuleAutoGen(AutoGen):
         HashFile = path.join(self.BuildDir, self.Name + '.hash')
         if os.path.exists(HashFile):
             CopyFileOnChange(HashFile, FileDir)
-        if not self.IsLibrary:
-            ModuleFile = path.join(self.OutputDir, self.Name + '.inf')
-            if os.path.exists(ModuleFile):
-                CopyFileOnChange(ModuleFile, FileDir)
-        else:
-            OutputDir = self.OutputDir.replace('\\', '/').strip('/')
-            DebugDir = self.DebugDir.replace('\\', '/').strip('/')
-            for Item in self.CodaTargetList:
-                File = Item.Target.Path.replace('\\', '/').strip('/').replace(DebugDir, '').replace(OutputDir, '').strip('/')
-                self.OutputFile.add(File)
+        ModuleFile = path.join(self.OutputDir, self.Name + '.inf')
+        if os.path.exists(ModuleFile):
+            CopyFileOnChange(ModuleFile, FileDir)
+
         if not self.OutputFile:
             Ma = self.BuildDatabase[self.MetaFile, self.Arch, self.BuildTarget, self.ToolChain]
             self.OutputFile = Ma.Binaries
-        if self.OutputFile:
-            for File in self.OutputFile:
-                File = str(File)
-                if not os.path.isabs(File):
-                    File = os.path.join(self.OutputDir, File)
-                if os.path.exists(File):
-                    sub_dir = os.path.relpath(File, self.OutputDir)
-                    destination_file = os.path.join(FileDir, sub_dir)
-                    destination_dir = os.path.dirname(destination_file)
-                    CreateDirectory(destination_dir)
-                    CopyFileOnChange(File, destination_dir)
+
+        for File in self.OutputFile:
+            File = str(File)
+            if not os.path.isabs(File):
+                File = os.path.join(self.OutputDir, File)
+            if os.path.exists(File):
+                sub_dir = os.path.relpath(File, self.OutputDir)
+                destination_file = os.path.join(FileDir, sub_dir)
+                destination_dir = os.path.dirname(destination_file)
+                CreateDirectory(destination_dir)
+                CopyFileOnChange(File, destination_dir)
 
     def AttemptModuleCacheCopy(self):
         # If library or Module is binary do not skip by hash

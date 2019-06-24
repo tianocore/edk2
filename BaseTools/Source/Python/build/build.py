@@ -1250,6 +1250,9 @@ class Build():
             BuildCommand = BuildCommand + [Target]
             LaunchCommand(BuildCommand, AutoGenObject.MakeFileDir)
             self.CreateAsBuiltInf()
+            if GlobalData.gBinCacheDest:
+                self.UpdateBuildCache()
+            self.BuildModules = []
             return True
 
         # build library
@@ -1268,6 +1271,9 @@ class Build():
                 NewBuildCommand = BuildCommand + ['-f', os.path.normpath(os.path.join(Mod, makefile)), 'pbuild']
                 LaunchCommand(NewBuildCommand, AutoGenObject.MakeFileDir)
             self.CreateAsBuiltInf()
+            if GlobalData.gBinCacheDest:
+                self.UpdateBuildCache()
+            self.BuildModules = []
             return True
 
         # cleanlib
@@ -1361,6 +1367,9 @@ class Build():
                 BuildCommand = BuildCommand + [Target]
             AutoGenObject.BuildTime = LaunchCommand(BuildCommand, AutoGenObject.MakeFileDir)
             self.CreateAsBuiltInf()
+            if GlobalData.gBinCacheDest:
+                self.UpdateBuildCache()
+            self.BuildModules = []
             return True
 
         # genfds
@@ -1874,6 +1883,9 @@ class Build():
                 ExitFlag.set()
                 BuildTask.WaitForComplete()
                 self.CreateAsBuiltInf()
+                if GlobalData.gBinCacheDest:
+                    self.UpdateBuildCache()
+                self.BuildModules = []
                 self.MakeTime += int(round((time.time() - MakeContiue)))
                 if BuildTask.HasError():
                     self.invalidateHash()
@@ -2074,6 +2086,9 @@ class Build():
                 ExitFlag.set()
                 BuildTask.WaitForComplete()
                 self.CreateAsBuiltInf()
+                if GlobalData.gBinCacheDest:
+                    self.UpdateBuildCache()
+                self.BuildModules = []
                 self.MakeTime += int(round((time.time() - MakeContiue)))
                 #
                 # Check for build error, and raise exception if one
@@ -2213,24 +2228,25 @@ class Build():
             RemoveDirectory(os.path.dirname(GlobalData.gDatabasePath), True)
 
     def CreateAsBuiltInf(self):
+        for Module in self.BuildModules:
+            Module.CreateAsBuiltInf()
+
+    def UpdateBuildCache(self):
         all_lib_set = set()
         all_mod_set = set()
         for Module in self.BuildModules:
-            Module.CreateAsBuiltInf()
+            Module.CopyModuleToCache()
             all_mod_set.add(Module)
         for Module in self.HashSkipModules:
-            if  GlobalData.gBinCacheDest:
-                Module.CopyModuleToCache()
+            Module.CopyModuleToCache()
             all_mod_set.add(Module)
         for Module in all_mod_set:
             for lib in Module.LibraryAutoGenList:
                 all_lib_set.add(lib)
         for lib in all_lib_set:
-            if  GlobalData.gBinCacheDest:
-                lib.CopyModuleToCache()
+            lib.CopyModuleToCache()
         all_lib_set.clear()
         all_mod_set.clear()
-        self.BuildModules = []
         self.HashSkipModules = []
     ## Do some clean-up works when error occurred
     def Relinquish(self):
