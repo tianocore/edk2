@@ -4,7 +4,7 @@
 # This application can trigger capsule update process. It can also
 # generate capsule image, or dump capsule variable information.
 #
-#  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2016 - 2019, Intel Corporation. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -26,6 +26,7 @@
 
 [Sources]
   CapsuleApp.c
+  CapsuleApp.h
   CapsuleDump.c
   CapsuleOnDisk.c
   AppSupport.c

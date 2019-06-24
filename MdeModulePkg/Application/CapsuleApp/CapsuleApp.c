@@ -6,36 +6,7 @@
 
 **/
 
-#include <Uefi.h>
-#include <Library/BaseLib.h>
-#include <Library/DebugLib.h>
-#include <Library/BaseMemoryLib.h>
-#include <Library/MemoryAllocationLib.h>
-#include <Library/UefiBootServicesTableLib.h>
-#include <Library/UefiRuntimeServicesTableLib.h>
-#include <Library/UefiLib.h>
-#include <Library/PrintLib.h>
-#include <Library/BmpSupportLib.h>
-#include <Protocol/GraphicsOutput.h>
-#include <Guid/GlobalVariable.h>
-#include <Guid/CapsuleReport.h>
-#include <Guid/SystemResourceTable.h>
-#include <Guid/FmpCapsule.h>
-#include <IndustryStandard/WindowsUxCapsule.h>
-
-#define CAPSULE_HEADER_SIZE  0x20
-
-#define NESTED_CAPSULE_HEADER_SIZE  SIZE_4KB
-#define SYSTEM_FIRMWARE_FLAG 0x50000
-#define DEVICE_FIRMWARE_FLAG 0x78010
-
-#define MAJOR_VERSION   1
-#define MINOR_VERSION   0
-
-#define MAX_CAPSULE_NUM 10
-
-extern UINTN  Argc;
-extern CHAR16 **Argv;
+#include "CapsuleApp.h"
 
 //
 // Define how many block descriptors we want to test with.
@@ -43,149 +14,6 @@ extern CHAR16 **Argv;
 UINTN  NumberOfDescriptors = 1;
 UINTN  CapsuleFirstIndex;
 UINTN  CapsuleLastIndex;
-
-/**
-  Dump capsule information
-
-  @param[in] CapsuleName  The name of the capsule image.
-
-  @retval EFI_SUCCESS            The capsule information is dumped.
-  @retval EFI_UNSUPPORTED        Input parameter is not valid.
-**/
-EFI_STATUS
-DumpCapsule (
-  IN CHAR16                                        *CapsuleName
-  );
-
-/**
-  Dump capsule status variable.
-
-  @retval EFI_SUCCESS            The capsule status variable is dumped.
-  @retval EFI_UNSUPPORTED        Input parameter is not valid.
-**/
-EFI_STATUS
-DumpCapsuleStatusVariable (
-  VOID
-  );
-
-/**
-  Dump FMP protocol info.
-**/
-VOID
-DumpFmpData (
-  VOID
-  );
-
-/**
-  Dump FMP image data.
-
-  @param[in]  ImageTypeId   The ImageTypeId of the FMP image.
-                            It is used to identify the FMP protocol.
-  @param[in]  ImageIndex    The ImageIndex of the FMP image.
-                            It is the input parameter for FMP->GetImage().
-  @param[in]  ImageName     The file name to hold the output FMP image.
-**/
-VOID
-DumpFmpImage (
-  IN EFI_GUID  *ImageTypeId,
-  IN UINTN     ImageIndex,
-  IN CHAR16    *ImageName
-  );
-
-/**
-  Dump ESRT info.
-**/
-VOID
-DumpEsrtData (
-  VOID
-  );
-
-/**
-  Dump Provisioned Capsule.
-
-  @param[in]  DumpCapsuleInfo  The flag to indicate whether to dump the capsule inforomation.
-**/
-VOID
-DumpProvisionedCapsule (
-  IN BOOLEAN                      DumpCapsuleInfo
-  );
-
-/**
-  Dump all EFI System Partition.
-**/
-VOID
-DumpAllEfiSysPartition (
-  VOID
-  );
-
-/**
-  Process Capsule On Disk.
-
-  @param[in]  CapsuleBuffer       An array of pointer to capsule images
-  @param[in]  CapsuleBufferSize   An array of UINTN to capsule images size
-  @param[in]  FilePath            An array of capsule images file path
-  @param[in]  Map                 File system mapping string
-  @param[in]  CapsuleNum          The count of capsule images
-
-  @retval EFI_SUCCESS       Capsule on disk success.
-  @retval others            Capsule on disk fail.
-
-**/
-EFI_STATUS
-ProcessCapsuleOnDisk (
-  IN VOID                          **CapsuleBuffer,
-  IN UINTN                         *CapsuleBufferSize,
-  IN CHAR16                        **FilePath,
-  IN CHAR16                        *Map,
-  IN UINTN                         CapsuleNum
-  );
-
-/**
-  Read a file.
-
-  @param[in]  FileName        The file to be read.
-  @param[out] BufferSize      The file buffer size
-  @param[out] Buffer          The file buffer
-
-  @retval EFI_SUCCESS    Read file successfully
-  @retval EFI_NOT_FOUND  Shell protocol or file not found
-  @retval others         Read file failed
-**/
-EFI_STATUS
-ReadFileToBuffer (
-  IN  CHAR16                               *FileName,
-  OUT UINTN                                *BufferSize,
-  OUT VOID                                 **Buffer
-  );
-
-/**
-  Write a file.
-
-  @param[in] FileName        The file to be written.
-  @param[in] BufferSize      The file buffer size
-  @param[in] Buffer          The file buffer
-
-  @retval EFI_SUCCESS    Write file successfully
-  @retval EFI_NOT_FOUND  Shell protocol not found
-  @retval others         Write file failed
-**/
-EFI_STATUS
-WriteFileFromBuffer (
-  IN  CHAR16                               *FileName,
-  IN  UINTN                                BufferSize,
-  IN  VOID                                 *Buffer
-  );
-
-/**
-
-  This function parse application ARG.
-
-  @return Status
-**/
-EFI_STATUS
-GetArg (
-  VOID
-  );
 
 /**
   Create UX capsule.
@@ -849,7 +677,7 @@ PrintUsage (
   Print(L"Parameter:\n");
   Print(L"  -NR: No reset will be triggered for the capsule\n");
   Print(L"       with CAPSULE_FLAGS_PERSIST_ACROSS_RESET and without CAPSULE_FLAGS_INITIATE_RESET.\n");
-  Print(L"  -OD: Delivery of Capsules via file on Mass Storage device.");
+  Print(L"  -OD: Delivery of Capsules via file on Mass Storage device.\n");
   Print(L"  -S:  Dump capsule report variable (EFI_CAPSULE_REPORT_GUID),\n");
   Print(L"       which is defined in UEFI specification.\n");
   Print(L"  -C:  Clear capsule report variable (EFI_CAPSULE_REPORT_GUID),\n");
@@ -1020,40 +848,39 @@ UefiMain (
     }
   }
 
-  if (ParaOdIndex != 0) {
-    if (ParaOdIndex == Argc - 1) {
+  if (ParaOdIndex > ParaNrIndex) {
+    if (ParaNrIndex != 0) {
+      CapsuleLastIndex = ParaNrIndex - 1;
+    } else {
+      CapsuleLastIndex = ParaOdIndex - 1;
+    }
+
+    if (ParaOdIndex == Argc -1) {
       MapFsStr = NULL;
     } else if (ParaOdIndex == Argc - 2) {
       MapFsStr = Argv[Argc-1];
     } else {
-      Print (L"CapsuleApp: Invalid Position for -OD Options\n");
+      Print (L"CapsuleApp: Cannot specify more than one FS mapping!\n");
       Status = EFI_INVALID_PARAMETER;
       goto Done;
     }
-
-    if (ParaNrIndex != 0) {
-      if (ParaNrIndex + 1 == ParaOdIndex) {
-        CapsuleLastIndex = ParaNrIndex - 1;
+  } else if (ParaOdIndex < ParaNrIndex) {
+    if (ParaOdIndex != 0) {
+      CapsuleLastIndex = ParaOdIndex - 1;
+      if (ParaOdIndex == ParaNrIndex - 1) {
+        MapFsStr = NULL;
+      } else if (ParaOdIndex == ParaNrIndex - 2) {
+        MapFsStr = Argv[ParaOdIndex + 1];
       } else {
-        Print (L"CapsuleApp: Invalid Position for -NR Options\n");
+        Print (L"CapsuleApp: Cannot specify more than one FS mapping!\n");
         Status = EFI_INVALID_PARAMETER;
         goto Done;
       }
     } else {
-      CapsuleLastIndex = ParaOdIndex - 1;
+      CapsuleLastIndex = ParaNrIndex - 1;
     }
   } else {
-    if (ParaNrIndex != 0) {
-      if (ParaNrIndex == Argc -1) {
-        CapsuleLastIndex = ParaNrIndex - 1;
-      } else {
-        Print (L"CapsuleApp: Invalid Position for -NR Options\n");
-        Status = EFI_INVALID_PARAMETER;
-        goto Done;
-      }
-    } else {
-      CapsuleLastIndex = Argc - 1;
-    }
+    CapsuleLastIndex = Argc - 1;
   }
 
   CapsuleNum = CapsuleLastIndex - CapsuleFirstIndex + 1;

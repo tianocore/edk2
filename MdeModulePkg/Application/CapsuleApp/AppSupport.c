@@ -1,21 +1,12 @@
 /** @file
   A shell application that triggers capsule update process.
 
-  Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2019, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include <Uefi.h>
-#include <Library/BaseLib.h>
-#include <Library/DebugLib.h>
-#include <Library/BaseMemoryLib.h>
-#include <Library/MemoryAllocationLib.h>
-#include <Library/UefiBootServicesTableLib.h>
-#include <Protocol/SimpleFileSystem.h>
-#include <Protocol/ShellParameters.h>
-#include <Protocol/Shell.h>
-#include <Guid/FileInfo.h>
+#include "CapsuleApp.h"
 
 UINTN  Argc;
 CHAR16 **Argv;

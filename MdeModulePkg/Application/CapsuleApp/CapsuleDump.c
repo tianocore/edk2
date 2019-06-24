@@ -6,98 +6,7 @@
 
 **/
 
-#include <PiDxe.h>
-#include <Library/BaseLib.h>
-#include <Library/DebugLib.h>
-#include <Library/BaseMemoryLib.h>
-#include <Library/MemoryAllocationLib.h>
-#include <Library/UefiBootServicesTableLib.h>
-#include <Library/UefiRuntimeServicesTableLib.h>
-#include <Library/UefiLib.h>
-#include <Library/PrintLib.h>
-#include <Library/FileHandleLib.h>
-#include <Library/SortLib.h>
-#include <Library/UefiBootManagerLib.h>
-#include <Library/DevicePathLib.h>
-#include <Protocol/FirmwareManagement.h>
-#include <Protocol/SimpleFileSystem.h>
-#include <Protocol/Shell.h>
-#include <Guid/ImageAuthentication.h>
-#include <Guid/CapsuleReport.h>
-#include <Guid/SystemResourceTable.h>
-#include <Guid/FmpCapsule.h>
-#include <Guid/CapsuleVendor.h>
-#include <IndustryStandard/WindowsUxCapsule.h>
-
-//
-// (20 * (6+5+2))+1) unicode characters from EFI FAT spec (doubled for bytes)
-//
-#define MAX_FILE_NAME_SIZE   522
-#define MAX_FILE_NAME_LEN    (MAX_FILE_NAME_SIZE / sizeof(CHAR16))
-
-/**
-  Read a file.
-
-  @param[in]  FileName        The file to be read.
-  @param[out] BufferSize      The file buffer size
-  @param[out] Buffer          The file buffer
-
-  @retval EFI_SUCCESS    Read file successfully
-  @retval EFI_NOT_FOUND  File not found
-**/
-EFI_STATUS
-ReadFileToBuffer (
-  IN  CHAR16                               *FileName,
-  OUT UINTN                                *BufferSize,
-  OUT VOID                                 **Buffer
-  );
-
-/**
-  Write a file.
-
-  @param[in] FileName        The file to be written.
-  @param[in] BufferSize      The file buffer size
-  @param[in] Buffer          The file buffer
-
-  @retval EFI_SUCCESS    Write file successfully
-**/
-EFI_STATUS
-WriteFileFromBuffer (
-  IN  CHAR16                               *FileName,
-  IN  UINTN                                BufferSize,
-  IN  VOID                                 *Buffer
-  );
-
-/**
-  Get shell protocol.
-
-  @return Pointer to shell protocol.
-
-**/
-EFI_SHELL_PROTOCOL *
-GetShellProtocol (
-  VOID
-  );
-
-/**
-  Get SimpleFileSystem from boot option file path.
-
-  @param[in]  DevicePath     The file path of boot option
-  @param[out] FullPath       The full device path of boot device
-  @param[out] Fs             The file system within EfiSysPartition
-
-  @retval EFI_SUCCESS    Get file system successfully
-  @retval EFI_NOT_FOUND  No valid file system found
-  @retval others         Get file system failed
-
-**/
-EFI_STATUS
-EFIAPI
-GetEfiSysPartitionFromBootOptionFilePath (
-  IN  EFI_DEVICE_PATH_PROTOCOL         *DevicePath,
-  OUT EFI_DEVICE_PATH_PROTOCOL         **FullPath,
-  OUT EFI_SIMPLE_FILE_SYSTEM_PROTOCOL  **Fs
-  );
+#include "CapsuleApp.h"
 
 /**
   Validate if it is valid capsule header
@@ -709,7 +618,6 @@ SplitFileNameExtension (
 
 **/
 INTN
-EFIAPI
 CompareFileNameInAlphabet (
   IN VOID                         *Left,
   IN VOID                         *Right
@@ -812,8 +720,8 @@ DumpCapsuleFromDisk (
   //
   // Get file count first
   //
+  Status = FileHandleFindFirstFile (DirHandle, &FileInfo);
   do {
-    Status = FileHandleFindFirstFile (DirHandle, &FileInfo);
     if (EFI_ERROR (Status) || FileInfo == NULL) {
       Print (L"Get File Info Fail. Status = %r\n", Status);
       goto Done;
@@ -846,8 +754,8 @@ DumpCapsuleFromDisk (
   //
   // Get all file info
   //
+  Status = FileHandleFindFirstFile (DirHandle, &FileInfo);
   do {
-    Status = FileHandleFindFirstFile (DirHandle, &FileInfo);
     if (EFI_ERROR (Status) || FileInfo == NULL) {
       Print (L"Get File Info Fail. Status = %r\n", Status);
       goto Done;
