@@ -965,6 +965,10 @@ GetScatterGatherHeadEntries (
     //
     if ((ValidIndex + 1) >= TempListLength) {
       EnlargedTempList = AllocateZeroPool (TempListLength * 2);
+      if (EnlargedTempList == NULL) {
+        DEBUG ((DEBUG_ERROR, "Fail to allocate memory!\n"));
+        return EFI_OUT_OF_RESOURCES;
+      }
       CopyMem (EnlargedTempList, TempList, TempListLength);
       FreePool (TempList);
       TempList = EnlargedTempList;
@@ -1056,7 +1060,7 @@ CapsuleCoalesce (
   // Get SG list entries
   //
   Status = GetScatterGatherHeadEntries (&ListLength, &VariableArrayAddress);
-  if (EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) || VariableArrayAddress == NULL) {
     DEBUG ((DEBUG_ERROR, "%a failed to get Scatter Gather List Head Entries.  Status = %r\n", __FUNCTION__, Status));
     goto Done;
   }
