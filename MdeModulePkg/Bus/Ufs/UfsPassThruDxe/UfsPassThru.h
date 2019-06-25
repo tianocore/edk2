@@ -92,6 +92,8 @@ typedef struct {
   UINT32                                        CmdDescSize;
   VOID                                          *CmdDescHost;
   VOID                                          *CmdDescMapping;
+  VOID                                          *AlignedDataBuf;
+  UINTN                                         AlignedDataBufSize;
   VOID                                          *DataBufMapping;
 
   EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET    *Packet;

@@ -394,16 +394,12 @@ UfsInitUtpPrdt (
   UINT8      *Remaining;
   UINTN      PrdtNumber;
 
-  if ((BufferSize & (BIT0 | BIT1)) != 0) {
-    BufferSize &= ~(BIT0 | BIT1);
-    DEBUG ((DEBUG_WARN, "UfsInitUtpPrdt: The BufferSize [%d] is not dword-aligned!\n", BufferSize));
-  }
+  ASSERT (((UINTN)Buffer & (BIT0 | BIT1)) == 0);
+  ASSERT ((BufferSize & (BIT1 | BIT0)) == 0);
 
   if (BufferSize == 0) {
     return EFI_SUCCESS;
   }
-
-  ASSERT (((UINTN)Buffer & (BIT0 | BIT1)) == 0);
 
   RemainingLen = BufferSize;
   Remaining    = Buffer;
@@ -1318,6 +1314,143 @@ Exit:
 }
 
 /**
+  Cleanup data buffers after data transfer. This function
+  also takes care to copy all data to user memory pool for
+  unaligned data transfers.
+
+  @param[in] Private   Pointer to the UFS_PASS_THRU_PRIVATE_DATA
+  @param[in] TransReq  Pointer to the transfer request
+**/
+VOID
+UfsReconcileDataTransferBuffer (
+  IN UFS_PASS_THRU_PRIVATE_DATA  *Private,
+  IN UFS_PASS_THRU_TRANS_REQ     *TransReq
+  )
+{
+  if (TransReq->DataBufMapping != NULL) {
+    Private->UfsHostController->Unmap (
+                                  Private->UfsHostController,
+                                  TransReq->DataBufMapping
+                                  );
+  }
+
+  //
+  // Check if unaligned transfer was performed. If it was and we read
+  // data from device copy memory to user data buffers before cleanup.
+  // The assumption is if auxiliary aligned data buffer is not NULL then
+  // unaligned transfer has been performed.
+  //
+  if (TransReq->AlignedDataBuf != NULL) {
+    if (TransReq->Packet->DataDirection == EFI_EXT_SCSI_DATA_DIRECTION_READ) {
+      CopyMem (TransReq->Packet->InDataBuffer, TransReq->AlignedDataBuf, TransReq->Packet->InTransferLength);
+    }
+    //
+    // Wipe out the transfer buffer in case it contains sensitive data.
+    //
+    ZeroMem (TransReq->AlignedDataBuf, TransReq->AlignedDataBufSize);
+    FreeAlignedPages (TransReq->AlignedDataBuf, EFI_SIZE_TO_PAGES (TransReq->AlignedDataBufSize));
+    TransReq->AlignedDataBuf = NULL;
+  }
+}
+
+/**
+  Prepare data buffer for transfer.
+
+  @param[in]      Private   Pointer to the UFS_PASS_THRU_PRIVATE_DATA
+  @param[in, out] TransReq  Pointer to the transfer request
+
+  @retval EFI_DEVICE_ERROR  Failed to prepare buffer for transfer
+  @retval EFI_SUCCESS       Buffer ready for transfer
+**/
+EFI_STATUS
+UfsPrepareDataTransferBuffer (
+  IN     UFS_PASS_THRU_PRIVATE_DATA  *Private,
+  IN OUT UFS_PASS_THRU_TRANS_REQ     *TransReq
+  )
+{
+  EFI_STATUS                           Status;
+  VOID                                 *DataBuf;
+  UINT32                               DataLen;
+  UINTN                                MapLength;
+  EFI_PHYSICAL_ADDRESS                 DataBufPhyAddr;
+  EDKII_UFS_HOST_CONTROLLER_OPERATION  Flag;
+  UTP_TR_PRD                           *PrdtBase;
+
+  DataBufPhyAddr = 0;
+  DataBuf        = NULL;
+
+  //
+  // For unaligned data transfers we allocate auxiliary DWORD aligned memory pool.
+  // When command is finished auxiliary memory pool is copied into actual user memory.
+  // This is requiered to assure data transfer safety(DWORD alignment required by UFS spec.)
+  //
+  if (TransReq->Packet->DataDirection == EFI_EXT_SCSI_DATA_DIRECTION_READ) {
+    if (((UINTN)TransReq->Packet->InDataBuffer % 4 != 0) || (TransReq->Packet->InTransferLength % 4 != 0)) {
+      DataLen = TransReq->Packet->InTransferLength + (4 - (TransReq->Packet->InTransferLength % 4));
+      DataBuf = AllocateAlignedPages (EFI_SIZE_TO_PAGES (DataLen), 4);
+      if (DataBuf == NULL) {
+        return EFI_DEVICE_ERROR;
+      }
+      ZeroMem (DataBuf, DataLen);
+      TransReq->AlignedDataBuf = DataBuf;
+      TransReq->AlignedDataBufSize = DataLen;
+    } else {
+      DataLen       = TransReq->Packet->InTransferLength;
+      DataBuf       = TransReq->Packet->InDataBuffer;
+    }
+    Flag          = EdkiiUfsHcOperationBusMasterWrite;
+  } else {
+    if (((UINTN)TransReq->Packet->OutDataBuffer % 4 != 0) || (TransReq->Packet->OutTransferLength % 4 != 0)) {
+      DataLen = TransReq->Packet->OutTransferLength + (4 - (TransReq->Packet->OutTransferLength % 4));
+      DataBuf = AllocateAlignedPages (EFI_SIZE_TO_PAGES (DataLen), 4);
+      if (DataBuf == NULL) {
+        return EFI_DEVICE_ERROR;
+      }
+      CopyMem (DataBuf, TransReq->Packet->OutDataBuffer, TransReq->Packet->OutTransferLength);
+      TransReq->AlignedDataBuf = DataBuf;
+      TransReq->AlignedDataBufSize = DataLen;
+    } else {
+      DataLen       = TransReq->Packet->OutTransferLength;
+      DataBuf       = TransReq->Packet->OutDataBuffer;
+    }
+    Flag          = EdkiiUfsHcOperationBusMasterRead;
+  }
+
+  if (DataLen != 0) {
+    MapLength = DataLen;
+    Status    = Private->UfsHostController->Map (
+                                              Private->UfsHostController,
+                                              Flag,
+                                              DataBuf,
+                                              &MapLength,
+                                              &DataBufPhyAddr,
+                                              &TransReq->DataBufMapping
+                                              );
+
+    if (EFI_ERROR (Status) || (DataLen != MapLength)) {
+      if (TransReq->AlignedDataBuf != NULL) {
+        //
+        // Wipe out the transfer buffer in case it contains sensitive data.
+        //
+        ZeroMem (TransReq->AlignedDataBuf, TransReq->AlignedDataBufSize);
+        FreeAlignedPages (TransReq->AlignedDataBuf, EFI_SIZE_TO_PAGES (TransReq->AlignedDataBufSize));
+        TransReq->AlignedDataBuf = NULL;
+      }
+      return EFI_DEVICE_ERROR;
+    }
+  }
+
+  //
+  // Fill PRDT table of Command UPIU for executed SCSI cmd.
+  //
+  PrdtBase = (UTP_TR_PRD*)((UINT8*)TransReq->CmdDescHost + ROUNDUP8 (sizeof (UTP_COMMAND_UPIU)) + ROUNDUP8 (sizeof (UTP_RESPONSE_UPIU)));
+  ASSERT (PrdtBase != NULL);
+  UfsInitUtpPrdt (PrdtBase, (VOID*)(UINTN)DataBufPhyAddr, DataLen);
+
+  return EFI_SUCCESS;
+}
+
+/**
   Sends a UFS-supported SCSI Request Packet to a UFS device that is attached to the UFS host controller.
 
   @param[in]      Private       The pointer to the UFS_PASS_THRU_PRIVATE_DATA data structure.
@@ -1353,24 +1486,19 @@ UfsExecScsiCmds (
   UTP_RESPONSE_UPIU                    *Response;
   UINT16                               SenseDataLen;
   UINT32                               ResTranCount;
-  VOID                                 *DataBuf;
-  EFI_PHYSICAL_ADDRESS                 DataBufPhyAddr;
-  UINT32                               DataLen;
-  UINTN                                MapLength;
-  EDKII_UFS_HOST_CONTROLLER_PROTOCOL   *UfsHc;
-  EDKII_UFS_HOST_CONTROLLER_OPERATION  Flag;
-  UTP_TR_PRD                           *PrdtBase;
   EFI_TPL                              OldTpl;
   UFS_PASS_THRU_TRANS_REQ              *TransReq;
+  EDKII_UFS_HOST_CONTROLLER_PROTOCOL   *UfsHc;
 
-  TransReq       = AllocateZeroPool (sizeof (UFS_PASS_THRU_TRANS_REQ));
+  TransReq = AllocateZeroPool (sizeof (UFS_PASS_THRU_TRANS_REQ));
   if (TransReq == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
   TransReq->Signature     = UFS_PASS_THRU_TRANS_REQ_SIG;
   TransReq->TimeoutRemain = Packet->Timeout;
-  DataBufPhyAddr = 0;
+  TransReq->Packet        = Packet;
+
   UfsHc          = Private->UfsHostController;
   //
   // Find out which slot of transfer request list is available.
@@ -1399,44 +1527,16 @@ UfsExecScsiCmds (
 
   TransReq->CmdDescSize = TransReq->Trd->PrdtO * sizeof (UINT32) + TransReq->Trd->PrdtL * sizeof (UTP_TR_PRD);
 
-  if (Packet->DataDirection == EFI_EXT_SCSI_DATA_DIRECTION_READ) {
-    DataBuf       = Packet->InDataBuffer;
-    DataLen       = Packet->InTransferLength;
-    Flag          = EdkiiUfsHcOperationBusMasterWrite;
-  } else {
-    DataBuf       = Packet->OutDataBuffer;
-    DataLen       = Packet->OutTransferLength;
-    Flag          = EdkiiUfsHcOperationBusMasterRead;
+  Status = UfsPrepareDataTransferBuffer (Private, TransReq);
+  if (EFI_ERROR (Status)) {
+    goto Exit1;
   }
-
-  if (DataLen != 0) {
-    MapLength = DataLen;
-    Status    = UfsHc->Map (
-                         UfsHc,
-                         Flag,
-                         DataBuf,
-                         &MapLength,
-                         &DataBufPhyAddr,
-                         &TransReq->DataBufMapping
-                         );
-
-    if (EFI_ERROR (Status) || (DataLen != MapLength)) {
-      goto Exit1;
-    }
-  }
-  //
-  // Fill PRDT table of Command UPIU for executed SCSI cmd.
-  //
-  PrdtBase = (UTP_TR_PRD*)((UINT8*)TransReq->CmdDescHost + ROUNDUP8 (sizeof (UTP_COMMAND_UPIU)) + ROUNDUP8 (sizeof (UTP_RESPONSE_UPIU)));
-  ASSERT (PrdtBase != NULL);
-  UfsInitUtpPrdt (PrdtBase, (VOID*)(UINTN)DataBufPhyAddr, DataLen);
 
   //
   // Insert the async SCSI cmd to the Async I/O list
   //
   if (Event != NULL) {
     OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
-    TransReq->Packet      = Packet;
     TransReq->CallerEvent = Event;
     InsertTailList (&Private->Queue, &TransReq->TransferList);
     gBS->RestoreTPL (OldTpl);
@@ -1515,9 +1615,7 @@ Exit:
 
   UfsStopExecCmd (Private, TransReq->Slot);
 
-  if (TransReq->DataBufMapping != NULL) {
-    UfsHc->Unmap (UfsHc, TransReq->DataBufMapping);
-  }
+  UfsReconcileDataTransferBuffer (Private, TransReq);
 
 Exit1:
   if (TransReq->CmdDescMapping != NULL) {
@@ -1531,7 +1629,6 @@ Exit1:
   }
   return Status;
 }
-
 
 /**
   Send UIC command.
@@ -2086,7 +2183,6 @@ UfsControllerStop (
   return EFI_SUCCESS;
 }
 
-
 /**
   Internal helper function which will signal the caller event and clean up
   resources.
@@ -2118,9 +2214,7 @@ SignalCallerEvent (
 
   UfsStopExecCmd (Private, TransReq->Slot);
 
-  if (TransReq->DataBufMapping != NULL) {
-    UfsHc->Unmap (UfsHc, TransReq->DataBufMapping);
-  }
+  UfsReconcileDataTransferBuffer (Private, TransReq);
 
   if (TransReq->CmdDescMapping != NULL) {
     UfsHc->Unmap (UfsHc, TransReq->CmdDescMapping);
