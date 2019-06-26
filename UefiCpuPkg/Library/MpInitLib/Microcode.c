@@ -1,7 +1,7 @@
 /** @file
   Implementation of loading microcode on processors.
 
-  Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2019, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -167,9 +167,15 @@ MicrocodeDetect (
     }
 
     ///
-    /// Check overflow and whether TotalSize is aligned with 4 bytes.
+    /// 0x0       MicrocodeBegin  MicrocodeEntry  MicrocodeEnd      0xffffffff
+    /// |--------------|---------------|---------------|---------------|
+    ///                                 valid TotalSize
+    /// TotalSize is only valid between 0 and (MicrocodeEnd - MicrocodeEntry).
+    /// And it should be aligned with 4 bytes.
+    /// If the TotalSize is invalid, skip 1KB to check next entry.
     ///
-    if ( ((UINTN)MicrocodeEntryPoint + TotalSize) > MicrocodeEnd ||
+    if ( (UINTN)MicrocodeEntryPoint > (MAX_ADDRESS - TotalSize) ||
+         ((UINTN)MicrocodeEntryPoint + TotalSize) > MicrocodeEnd ||
          (TotalSize & 0x3) != 0
        ) {
       MicrocodeEntryPoint = (CPU_MICROCODE_HEADER *) (((UINTN) MicrocodeEntryPoint) + SIZE_1KB);
