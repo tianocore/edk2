@@ -140,10 +140,14 @@ LegacyBiosBuildBbs (
   IN  BBS_TABLE                 *BbsTable
   )
 {
-  UINTN     BbsIndex;
-  HDD_INFO  *HddInfo;
-  UINTN     HddIndex;
-  UINTN     Index;
+  UINTN       BbsIndex;
+  HDD_INFO    *HddInfo;
+  UINTN       HddIndex;
+  UINTN       Index;
+  EFI_HANDLE  *BlockIoHandles;
+  UINTN       NumberBlockIoHandles;
+  UINTN       BlockIndex;
+  EFI_STATUS  Status;
 
   //
   // First entry is floppy.
@@ -252,8 +256,151 @@ LegacyBiosBuildBbs (
     }
   }
 
-  return EFI_SUCCESS;
+  //
+  // Add non-IDE block devices
+  //
+  BbsIndex = HddIndex * 2 + 1;
 
+  Status = gBS->LocateHandleBuffer (
+                  ByProtocol,
+                  &gEfiBlockIoProtocolGuid,
+                  NULL,
+                  &NumberBlockIoHandles,
+                  &BlockIoHandles
+                  );
+
+  if (!EFI_ERROR (Status)) {
+    UINTN                     Removable;
+    EFI_BLOCK_IO_PROTOCOL     *BlkIo;
+    EFI_PCI_IO_PROTOCOL       *PciIo;
+    EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
+    EFI_DEVICE_PATH_PROTOCOL  *DevicePathNode;
+    EFI_HANDLE                PciHandle;
+    UINTN                     SegNum;
+    UINTN                     BusNum;
+    UINTN                     DevNum;
+    UINTN                     FuncNum;
+
+    for (Removable = 0; Removable < 2; Removable++) {
+      for (BlockIndex = 0; BlockIndex < NumberBlockIoHandles; BlockIndex++) {
+        Status = gBS->HandleProtocol (
+                        BlockIoHandles[BlockIndex],
+                        &gEfiBlockIoProtocolGuid,
+                        (VOID **) &BlkIo
+                        );
+
+        if (EFI_ERROR (Status)) {
+          continue;
+        }
+
+        //
+        // Skip the logical partitions
+        //
+        if (BlkIo->Media->LogicalPartition) {
+          continue;
+        }
+
+        //
+        // Skip the fixed block io then the removable block io
+        //
+        if (BlkIo->Media->RemovableMedia == ((Removable == 0) ? FALSE : TRUE)) {
+          continue;
+        }
+
+        //
+        // Get Device Path
+        //
+        Status = gBS->HandleProtocol (
+                        BlockIoHandles[BlockIndex],
+                        &gEfiDevicePathProtocolGuid,
+                        (VOID **) &DevicePath
+                        );
+        if (EFI_ERROR (Status)) {
+          continue;
+        }
+
+        //
+        // Skip ATA devices as they have already been handled
+        //
+        DevicePathNode = DevicePath;
+        while (!IsDevicePathEnd (DevicePathNode)) {
+          if (DevicePathType (DevicePathNode) == MESSAGING_DEVICE_PATH &&
+              DevicePathSubType (DevicePathNode) == MSG_ATAPI_DP) {
+            break;
+          }
+          DevicePathNode = NextDevicePathNode (DevicePathNode);
+        }
+        if (!IsDevicePathEnd (DevicePathNode)) {
+            continue;
+        }
+
+        //
+        //  Locate which PCI device
+        //
+        Status = gBS->LocateDevicePath (
+                        &gEfiPciIoProtocolGuid,
+                        &DevicePath,
+                        &PciHandle
+                        );
+        if (EFI_ERROR (Status)) {
+          continue;
+        }
+
+        Status = gBS->HandleProtocol (
+                        PciHandle,
+                        &gEfiPciIoProtocolGuid,
+                        (VOID **) &PciIo
+                        );
+        if (EFI_ERROR (Status)) {
+          continue;
+        }
+
+        Status = PciIo->GetLocation (
+                          PciIo,
+                          &SegNum,
+                          &BusNum,
+                          &DevNum,
+                          &FuncNum
+                          );
+        if (EFI_ERROR (Status)) {
+          continue;
+        }
+
+        if (SegNum != 0) {
+          DEBUG ((DEBUG_WARN, "CSM cannot use PCI devices in segment %Lu\n",
+            (UINT64) SegNum));
+          continue;
+        }
+
+        DEBUG ((DEBUG_INFO, "Add Legacy Bbs entry for PCI %d/%d/%d\n",
+          BusNum, DevNum, FuncNum));
+
+        BbsTable[BbsIndex].Bus                      = BusNum;
+        BbsTable[BbsIndex].Device                   = DevNum;
+        BbsTable[BbsIndex].Function                 = FuncNum;
+        BbsTable[BbsIndex].Class                    = 1;
+        BbsTable[BbsIndex].SubClass                 = 0x80;
+        BbsTable[BbsIndex].StatusFlags.OldPosition  = 0;
+        BbsTable[BbsIndex].StatusFlags.Reserved1    = 0;
+        BbsTable[BbsIndex].StatusFlags.Enabled      = 0;
+        BbsTable[BbsIndex].StatusFlags.Failed       = 0;
+        BbsTable[BbsIndex].StatusFlags.MediaPresent = 0;
+        BbsTable[BbsIndex].StatusFlags.Reserved2    = 0;
+        BbsTable[BbsIndex].DeviceType               = BBS_HARDDISK;
+        BbsTable[BbsIndex].BootPriority             = BBS_UNPRIORITIZED_ENTRY;
+        BbsIndex++;
+
+        if (BbsIndex == MAX_BBS_ENTRIES) {
+          Removable = 2;
+          break;
+        }
+      }
+    }
+
+    FreePool (BlockIoHandles);
+  }
+
+  return EFI_SUCCESS;
 }
 
 
