@@ -2,7 +2,7 @@
 # Module that encodes and decodes a EFI_FIRMWARE_MANAGEMENT_CAPSULE_HEADER with
 # a payload.
 #
-# Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2018 - 2019, Intel Corporation. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
@@ -172,8 +172,8 @@ class FmpCapsuleHeaderClass (object):
             raise ValueError
         return self._EmbeddedDriverList[Index]
 
-    def AddPayload (self, UpdateImageTypeId, Payload = b'', VendorCodeBytes = b'', HardwareInstance = 0):
-        self._PayloadList.append ((UpdateImageTypeId, Payload, VendorCodeBytes, HardwareInstance))
+    def AddPayload (self, UpdateImageTypeId, Payload = b'', VendorCodeBytes = b'', HardwareInstance = 0, UpdateImageIndex = 1):
+        self._PayloadList.append ((UpdateImageTypeId, Payload, VendorCodeBytes, HardwareInstance, UpdateImageIndex))
 
     def GetFmpCapsuleImageHeader (self, Index):
         if Index >= len (self._FmpCapsuleImageHeaderList):
@@ -198,10 +198,10 @@ class FmpCapsuleHeaderClass (object):
             self._ItemOffsetList.append (Offset)
             Offset = Offset + len (EmbeddedDriver)
         Index = 1
-        for (UpdateImageTypeId, Payload, VendorCodeBytes, HardwareInstance) in self._PayloadList:
+        for (UpdateImageTypeId, Payload, VendorCodeBytes, HardwareInstance, UpdateImageIndex) in self._PayloadList:
             FmpCapsuleImageHeader = FmpCapsuleImageHeaderClass ()
             FmpCapsuleImageHeader.UpdateImageTypeId      = UpdateImageTypeId
-            FmpCapsuleImageHeader.UpdateImageIndex       = Index
+            FmpCapsuleImageHeader.UpdateImageIndex       = UpdateImageIndex
             FmpCapsuleImageHeader.Payload                = Payload
             FmpCapsuleImageHeader.VendorCodeBytes        = VendorCodeBytes
             FmpCapsuleImageHeader.UpdateHardwareInstance = HardwareInstance
@@ -288,6 +288,8 @@ class FmpCapsuleHeaderClass (object):
             raise ValueError
         print ('EFI_FIRMWARE_MANAGEMENT_CAPSULE_HEADER.Version             = {Version:08X}'.format (Version = self.Version))
         print ('EFI_FIRMWARE_MANAGEMENT_CAPSULE_HEADER.EmbeddedDriverCount = {EmbeddedDriverCount:08X}'.format (EmbeddedDriverCount = self.EmbeddedDriverCount))
+        for EmbeddedDriver in self._EmbeddedDriverList:
+            print ('  sizeof (EmbeddedDriver)                                  = {Size:08X}'.format (Size = len (EmbeddedDriver)))
         print ('EFI_FIRMWARE_MANAGEMENT_CAPSULE_HEADER.PayloadItemCount    = {PayloadItemCount:08X}'.format (PayloadItemCount = self.PayloadItemCount))
         print ('EFI_FIRMWARE_MANAGEMENT_CAPSULE_HEADER.ItemOffsetList      = ')
         for Offset in self._ItemOffsetList:
