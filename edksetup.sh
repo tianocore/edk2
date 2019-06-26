@@ -108,27 +108,27 @@ function SetupEnv()
 function SetupPython3()
 {
   if [ $origin_version ];then
-      origin_version=
+    origin_version=
+  fi
+  for python in $(whereis python3)
+  do
+    python=$(echo $python | grep "[[:digit:]]$" || true)
+    python_version=${python##*python}
+    if [ -z "${python_version}" ] || (! command -v $python >/dev/null 2>&1);then
+      continue
     fi
-    for python in $(whereis python3)
-    do
-      python=$(echo $python | grep "[[:digit:]]$" || true)
-      python_version=${python##*python}
-      if [ -z "${python_version}" ] || (! command -v $python >/dev/null 2>&1);then
-        continue
-      fi
-      if [ -z $origin_version ];then
-        origin_version=$python_version
-        export PYTHON_COMMAND=$python
-        continue
-      fi
-      ret=`echo "$origin_version < $python_version" |bc`
-      if [ "$ret" -eq 1 ]; then
-        origin_version=$python_version
-        export PYTHON_COMMAND=$python
-      fi
-    done
-    return 0
+    if [ -z $origin_version ];then
+      origin_version=$python_version
+      export PYTHON_COMMAND=$python
+      continue
+    fi
+    ret=`echo "$origin_version < $python_version" |bc`
+    if [ "$ret" -eq 1 ]; then
+      origin_version=$python_version
+      export PYTHON_COMMAND=$python
+    fi
+  done
+  return 0
 }
 
 function SetupPython()
