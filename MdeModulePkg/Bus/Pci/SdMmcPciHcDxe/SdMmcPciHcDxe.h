@@ -78,11 +78,12 @@ typedef enum {
 } EFI_SD_MMC_SLOT_TYPE;
 
 typedef struct {
-  BOOLEAN                           Enable;
-  EFI_SD_MMC_SLOT_TYPE              SlotType;
-  BOOLEAN                           MediaPresent;
-  BOOLEAN                           Initialized;
-  SD_MMC_CARD_TYPE                  CardType;
+  BOOLEAN                            Enable;
+  EFI_SD_MMC_SLOT_TYPE               SlotType;
+  BOOLEAN                            MediaPresent;
+  BOOLEAN                            Initialized;
+  SD_MMC_CARD_TYPE                   CardType;
+  EDKII_SD_MMC_OPERATING_PARAMETERS  OperatingParameters;
 } SD_MMC_HC_SLOT;
 
 typedef struct {
@@ -119,6 +120,13 @@ typedef struct {
   //
   UINT32                              BaseClkFreq[SD_MMC_HC_MAX_SLOT];
 } SD_MMC_HC_PRIVATE_DATA;
+
+typedef struct {
+  SD_MMC_BUS_MODE               BusTiming;
+  UINT8                         BusWidth;
+  UINT32                        ClockFreq;
+  EDKII_SD_MMC_DRIVER_STRENGTH  DriverStrength;
+} SD_MMC_BUS_SETTINGS;
 
 #define SD_MMC_HC_TRB_SIG             SIGNATURE_32 ('T', 'R', 'B', 'T')
 

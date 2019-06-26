@@ -28,6 +28,11 @@ EFI_DRIVER_BINDING_PROTOCOL gSdMmcPciHcDriverBinding = {
   NULL
 };
 
+#define SLOT_INIT_TEMPLATE {0, UnknownSlot, 0, 0, 0, \
+                               {EDKII_SD_MMC_BUS_WIDTH_IGNORE,\
+                               EDKII_SD_MMC_CLOCK_FREQ_IGNORE,\
+                               {EDKII_SD_MMC_DRIVER_STRENGTH_IGNORE}}}
+
 //
 // Template for SD/MMC host controller private data.
 //
@@ -50,8 +55,12 @@ SD_MMC_HC_PRIVATE_DATA gSdMmcPciHcTemplate = {
                                     // Queue
   INITIALIZE_LIST_HEAD_VARIABLE (gSdMmcPciHcTemplate.Queue),
   {                                 // Slot
-    {0, UnknownSlot, 0, 0, 0}, {0, UnknownSlot, 0, 0, 0}, {0, UnknownSlot, 0, 0, 0},
-    {0, UnknownSlot, 0, 0, 0}, {0, UnknownSlot, 0, 0, 0}, {0, UnknownSlot, 0, 0, 0}
+    SLOT_INIT_TEMPLATE,
+    SLOT_INIT_TEMPLATE,
+    SLOT_INIT_TEMPLATE,
+    SLOT_INIT_TEMPLATE,
+    SLOT_INIT_TEMPLATE,
+    SLOT_INIT_TEMPLATE
   },
   {                                 // Capability
     {0},
@@ -328,6 +337,7 @@ SdMmcPciHcEnumerateDevice (
 
   return;
 }
+
 /**
   Tests to see if this driver supports a given controller. If a child device is provided,
   it further tests to see if this driver supports creating a handle for the specified child device.
@@ -619,7 +629,6 @@ SdMmcPciHcDriverBindingStart (
   Support64BitDma = TRUE;
   for (Slot = FirstBar; Slot < (FirstBar + SlotNum); Slot++) {
     Private->Slot[Slot].Enable = TRUE;
-
     //
     // Get SD/MMC Pci Host Controller Version
     //
@@ -635,19 +644,34 @@ SdMmcPciHcDriverBindingStart (
 
     Private->BaseClkFreq[Slot] = Private->Capability[Slot].BaseClkFreq;
 
-    if (mOverride != NULL && mOverride->Capability != NULL) {
-      Status = mOverride->Capability (
-                            Controller,
-                            Slot,
-                            &Private->Capability[Slot],
-                            &Private->BaseClkFreq[Slot]
-                            );
-      if (EFI_ERROR (Status)) {
-        DEBUG ((DEBUG_WARN, "%a: Failed to override capability - %r\n",
-          __FUNCTION__, Status));
-        continue;
+    if (mOverride != NULL) {
+      if (mOverride->Capability != NULL) {
+        Status = mOverride->Capability (
+                              Controller,
+                              Slot,
+                              &Private->Capability[Slot],
+                              &Private->BaseClkFreq[Slot]
+                              );
+        if (EFI_ERROR (Status)) {
+          DEBUG ((DEBUG_WARN, "%a: Failed to override capability - %r\n",
+            __FUNCTION__, Status));
+          continue;
+        }
+      }
+
+      if (mOverride->NotifyPhase != NULL) {
+        Status = mOverride->NotifyPhase (
+                              Controller,
+                              Slot,
+                              EdkiiSdMmcGetOperatingParam,
+                              (VOID*)&Private->Slot[Slot].OperatingParameters
+                              );
+        if (EFI_ERROR (Status)) {
+          DEBUG ((DEBUG_WARN, "%a: Failed to get operating parameters, using defaults\n", __FUNCTION__));
+        }
       }
     }
+
     DumpCapabilityReg (Slot, &Private->Capability[Slot]);
     DEBUG ((
       DEBUG_INFO,
