@@ -565,12 +565,13 @@ ShadowAndStartLegacy16 (
 
   EfiToLegacy16BootTable->BbsTable  = (UINT32)(UINTN)BbsTable;
   Private->BbsTablePtr              = (VOID *) BbsTable;
-  //
-  // Skip Floppy and possible onboard IDE drives
-  //
-  EfiToLegacy16BootTable->NumberBbsEntries = 1 + 2 * MAX_IDE_CONTROLLER;
 
-  for (Index = 0; Index < (sizeof (Private->IntThunk->BbsTable) / sizeof (BBS_TABLE)); Index++) {
+  //
+  // Populate entire table with BBS_IGNORE_ENTRY
+  //
+  EfiToLegacy16BootTable->NumberBbsEntries = MAX_BBS_ENTRIES;
+
+  for (Index = 0; Index < MAX_BBS_ENTRIES; Index++) {
     BbsTable[Index].BootPriority = BBS_IGNORE_ENTRY;
   }
   //
