@@ -64,6 +64,7 @@ SMBIOS_FILTER_TABLE  mSmbiosFilterType4BlackList[] = {
   {0x04, OFFSET_OF(SMBIOS_TABLE_TYPE4, CoreCount2),           FIELD_SIZE_OF(SMBIOS_TABLE_TYPE4, CoreCount2),           0},
   {0x04, OFFSET_OF(SMBIOS_TABLE_TYPE4, EnabledCoreCount2),    FIELD_SIZE_OF(SMBIOS_TABLE_TYPE4, EnabledCoreCount2),    0},
   {0x04, OFFSET_OF(SMBIOS_TABLE_TYPE4, ThreadCount2),         FIELD_SIZE_OF(SMBIOS_TABLE_TYPE4, ThreadCount2),         0},
+  {0x04, OFFSET_OF(SMBIOS_TABLE_TYPE4, Voltage),              FIELD_SIZE_OF(SMBIOS_TABLE_TYPE4, Voltage),              0},
 };
 SMBIOS_FILTER_TABLE  mSmbiosFilterType17BlackList[] = {
   {0x11, OFFSET_OF(SMBIOS_TABLE_TYPE17, SerialNumber),        FIELD_SIZE_OF(SMBIOS_TABLE_TYPE17, SerialNumber),        SMBIOS_FILTER_TABLE_FLAG_IS_STRING},
