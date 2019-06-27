@@ -25,6 +25,9 @@ IsCapsuleNameCapsule (
   Check the integrity of the capsule name capsule.
   If the capsule is vaild, return the physical address of each capsule name string.
 
+  This routine assumes the capsule has been validated by IsValidCapsuleHeader(), so
+  capsule memory overflow is not going to happen in this routine.
+
   @param[in]  CapsuleHeader   Pointer to the capsule header of a capsule name capsule.
   @param[out] CapsuleNameNum  Number of capsule name.
 
@@ -65,6 +68,9 @@ ValidateCapsuleNameCapsuleIntegrity (
   //
   if (((UINTN) CapsuleNameBufStart & BIT0) != 0) {
     CapsuleNameBufStart = AllocateCopyPool (CapsuleHeader->CapsuleImageSize - CapsuleHeader->HeaderSize, CapsuleNameBufStart);
+    if (CapsuleNameBufStart == NULL) {
+      return NULL;
+    }
   }
 
   CapsuleNameBufEnd = CapsuleNameBufStart + CapsuleHeader->CapsuleImageSize - CapsuleHeader->HeaderSize;
