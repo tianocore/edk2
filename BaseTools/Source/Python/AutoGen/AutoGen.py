@@ -794,6 +794,9 @@ class WorkspaceAutoGen(AutoGen):
         #
         AllWorkSpaceMetaFiles.add(os.path.join(self.BuildDir, 'PcdTokenNumber'))
 
+        for Pa in self.AutoGenObjectList:
+            AllWorkSpaceMetaFiles.add(Pa.ToolDefinitionFile)
+
         for Arch in self.ArchList:
             #
             # add dec
@@ -1861,7 +1864,7 @@ class PlatformAutoGen(AutoGen):
         if TAB_TOD_DEFINES_COMMAND_TYPE not in self.Workspace.ToolDef.ToolsDefTxtDatabase:
             EdkLogger.error('build', RESOURCE_NOT_AVAILABLE, "No tools found in configuration",
                             ExtraData="[%s]" % self.MetaFile)
-        RetVal = {}
+        RetVal = OrderedDict()
         DllPathList = set()
         for Def in ToolDefinition:
             Target, Tag, Arch, Tool, Attr = Def.split("_")
@@ -1875,7 +1878,7 @@ class PlatformAutoGen(AutoGen):
                 continue
 
             if Tool not in RetVal:
-                RetVal[Tool] = {}
+                RetVal[Tool] = OrderedDict()
             RetVal[Tool][Attr] = Value
 
         ToolsDef = ''
