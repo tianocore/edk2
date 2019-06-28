@@ -131,19 +131,19 @@ STATIC CONST ACPI_PARSER IortNodeSmmuV1V2Parser[] = {
   An ACPI_PARSER array describing the SMMUv1/2 Node Interrupt Array.
 **/
 STATIC CONST ACPI_PARSER InterruptArrayParser[] = {
-  {L"  Interrupt GSIV", 4, 0, L"0x%x", NULL, NULL, NULL, NULL},
-  {L"  Flags", 4, 4, L"0x%x", NULL, NULL, NULL, NULL}
+  {L"Interrupt GSIV", 4, 0, L"0x%x", NULL, NULL, NULL, NULL},
+  {L"Flags", 4, 4, L"0x%x", NULL, NULL, NULL, NULL}
 };
 
 /**
   An ACPI_PARSER array describing the IORT ID Mapping.
 **/
 STATIC CONST ACPI_PARSER IortNodeIdMappingParser[] = {
-  {L"  Input base", 4, 0, L"0x%x", NULL, NULL, NULL, NULL},
-  {L"  Number of IDs", 4, 4, L"0x%x", NULL, NULL, NULL, NULL},
-  {L"  Output base", 4, 8, L"0x%x", NULL, NULL, NULL, NULL},
-  {L"  Output reference", 4, 12, L"0x%x", NULL, NULL, NULL, NULL},
-  {L"  Flags", 4, 16, L"0x%x", NULL, NULL, NULL, NULL}
+  {L"Input base", 4, 0, L"0x%x", NULL, NULL, NULL, NULL},
+  {L"Number of IDs", 4, 4, L"0x%x", NULL, NULL, NULL, NULL},
+  {L"Output base", 4, 8, L"0x%x", NULL, NULL, NULL, NULL},
+  {L"Output reference", 4, 12, L"0x%x", NULL, NULL, NULL, NULL},
+  {L"Flags", 4, 16, L"0x%x", NULL, NULL, NULL, NULL}
 };
 
 /**
@@ -170,14 +170,14 @@ STATIC CONST ACPI_PARSER IortNodeItsParser[] = {
     ValidateItsIdMappingCount,
     ValidateItsIdArrayReference
     ),
-  {L"  Number of ITSs", 4, 16, L"%d", NULL, (VOID**)&ItsCount, NULL}
+  {L"Number of ITSs", 4, 16, L"%d", NULL, (VOID**)&ItsCount, NULL}
 };
 
 /**
   An ACPI_PARSER array describing the ITS ID.
 **/
 STATIC CONST ACPI_PARSER ItsIdParser[] = {
-  { L"  GIC ITS Identifier", 4, 0, L"%d", NULL, NULL, NULL }
+  { L"GIC ITS Identifier", 4, 0, L"%d", NULL, NULL, NULL }
 };
 
 /**
