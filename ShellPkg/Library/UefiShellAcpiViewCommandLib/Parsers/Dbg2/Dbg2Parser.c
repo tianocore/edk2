@@ -1,7 +1,7 @@
 /** @file
   DBG2 table parser
 
-  Copyright (c) 2016 - 2018, ARM Limited. All rights reserved.
+  Copyright (c) 2016 - 2019, ARM Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -190,6 +190,7 @@ DumpDbgDeviceInfo (
       Print (L"\n%-*s   ", OUTPUT_FIELD_COLUMN_WIDTH, L"");
     }
   }
+  Print (L"\n");
 
   *Length = *DbgDevInfoLen;
 }
