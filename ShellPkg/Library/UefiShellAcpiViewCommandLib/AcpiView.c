@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2016 - 2018, ARM Limited. All rights reserved.
+  Copyright (c) 2016 - 2019, ARM Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
@@ -33,7 +33,6 @@ STATIC BOOLEAN            mColourHighlighting;
   An array of acpiview command line parameters.
 **/
 STATIC CONST SHELL_PARAM_ITEM ParamList[] = {
-  {L"/?", TypeFlag},
   {L"-c", TypeFlag},
   {L"-d", TypeFlag},
   {L"-h", TypeValue},
