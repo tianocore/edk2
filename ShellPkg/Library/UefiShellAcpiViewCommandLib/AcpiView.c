@@ -34,7 +34,7 @@ STATIC BOOLEAN            mColourHighlighting;
 STATIC CONST SHELL_PARAM_ITEM ParamList[] = {
   {L"-q", TypeFlag},
   {L"-d", TypeFlag},
-  {L"-h", TypeValue},
+  {L"-h", TypeFlag},
   {L"-l", TypeFlag},
   {L"-s", TypeValue},
   {NULL, TypeMax}
@@ -459,8 +459,6 @@ ShellCommandRunAcpiView (
   SHELL_STATUS       ShellStatus;
   LIST_ENTRY*        Package;
   CHAR16*            ProblemParam;
-  CONST CHAR16*      Temp;
-  CHAR8              ColourOption[8];
   SHELL_FILE_HANDLE  TmpDumpFileHandle;
 
   // Set Defaults
@@ -540,18 +538,6 @@ ShellCommandRunAcpiView (
         L"acpiview"
         );
       ShellStatus = SHELL_INVALID_PARAMETER;
-    } else if (ShellCommandLineGetFlag (Package, L"-h") &&
-               ShellCommandLineGetValue (Package, L"-h") == NULL) {
-        ShellPrintHiiEx (
-          -1,
-          -1,
-          NULL,
-          STRING_TOKEN (STR_GEN_NO_VALUE),
-          gShellAcpiViewHiiHandle,
-          L"acpiview",
-          L"-h"
-          );
-        ShellStatus = SHELL_INVALID_PARAMETER;
     } else if (ShellCommandLineGetFlag (Package, L"-d") &&
                !ShellCommandLineGetFlag (Package, L"-s")) {
         ShellPrintHiiEx (
@@ -566,18 +552,8 @@ ShellCommandRunAcpiView (
           );
         ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
-      // Check if the colour option is set
-      Temp = ShellCommandLineGetValue (Package, L"-h");
-      if (Temp != NULL) {
-        UnicodeStrToAsciiStrS (Temp, ColourOption, sizeof (ColourOption));
-        if ((AsciiStriCmp (ColourOption, "ON") == 0) ||
-            (AsciiStriCmp (ColourOption, "TRUE") == 0)) {
-          SetColourHighlighting (TRUE);
-        } else if ((AsciiStriCmp (ColourOption, "OFF") == 0) ||
-                   (AsciiStriCmp (ColourOption, "FALSE") == 0)) {
-          SetColourHighlighting (FALSE);
-        }
-      }
+      // Turn on colour highlighting if requested
+      SetColourHighlighting (ShellCommandLineGetFlag (Package, L"-h"));
 
       // Surpress consistency checking if requested
       SetConsistencyChecking (!ShellCommandLineGetFlag (Package, L"-q"));
