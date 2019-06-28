@@ -1,7 +1,7 @@
 /** @file
   IORT table parser
 
-  Copyright (c) 2016 - 2018, ARM Limited. All rights reserved.
+  Copyright (c) 2016 - 2019, ARM Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -17,24 +17,10 @@
 // Local variables
 STATIC ACPI_DESCRIPTION_HEADER_INFO AcpiHdrInfo;
 
-/**
-  The EIORT_NODE enum describes the IORT Node types.
-**/
-typedef enum IortNode {
-  Iort_Node_ITS_Group,        ///< ITS Group node
-  Iort_Node_Named_Component,  ///< Named Component node
-  Iort_Node_Root_Complex,     ///< Root Complex node
-  Iort_Node_SMMUV1_V2,        ///< SMMU v1/v2 node
-  Iort_Node_SMMUV3,           ///< SMMU v3 node
-  Iort_Node_PMCG,             ///< PMC group node
-  Iort_Node_Max
-} EIORT_NODE;
-
-// Local Variables
 STATIC CONST UINT32* IortNodeCount;
 STATIC CONST UINT32* IortNodeOffset;
 
-STATIC CONST UINT8* IortNodeType;
+STATIC CONST UINT8*  IortNodeType;
 STATIC CONST UINT16* IortNodeLength;
 STATIC CONST UINT32* IortIdMappingCount;
 STATIC CONST UINT32* IortIdMappingOffset;
@@ -659,13 +645,13 @@ ParseAcpiIort (
     Print (L"0x%x\n", Offset);
 
     switch (*IortNodeType) {
-      case Iort_Node_ITS_Group:
+      case EFI_ACPI_IORT_TYPE_ITS_GROUP:
         DumpIortNodeIts (
           NodePtr,
           *IortNodeLength
           );
         break;
-      case Iort_Node_Named_Component:
+      case EFI_ACPI_IORT_TYPE_NAMED_COMP:
         DumpIortNodeNamedComponent (
           NodePtr,
           *IortNodeLength,
@@ -673,7 +659,7 @@ ParseAcpiIort (
           *IortIdMappingOffset
           );
         break;
-      case Iort_Node_Root_Complex:
+      case EFI_ACPI_IORT_TYPE_ROOT_COMPLEX:
         DumpIortNodeRootComplex (
           NodePtr,
           *IortNodeLength,
@@ -681,7 +667,7 @@ ParseAcpiIort (
           *IortIdMappingOffset
           );
         break;
-      case Iort_Node_SMMUV1_V2:
+      case EFI_ACPI_IORT_TYPE_SMMUv1v2:
         DumpIortNodeSmmuV1V2 (
           NodePtr,
           *IortNodeLength,
@@ -689,7 +675,7 @@ ParseAcpiIort (
           *IortIdMappingOffset
           );
         break;
-      case Iort_Node_SMMUV3:
+      case EFI_ACPI_IORT_TYPE_SMMUv3:
         DumpIortNodeSmmuV3 (
           NodePtr,
           *IortNodeLength,
@@ -697,7 +683,7 @@ ParseAcpiIort (
           *IortIdMappingOffset
           );
         break;
-      case Iort_Node_PMCG:
+      case EFI_ACPI_IORT_TYPE_PMCG:
         DumpIortNodePmcg (
           NodePtr,
           *IortNodeLength,
