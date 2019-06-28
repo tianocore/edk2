@@ -33,7 +33,7 @@ STATIC BOOLEAN            mColourHighlighting;
   An array of acpiview command line parameters.
 **/
 STATIC CONST SHELL_PARAM_ITEM ParamList[] = {
-  {L"-c", TypeFlag},
+  {L"-q", TypeFlag},
   {L"-d", TypeFlag},
   {L"-h", TypeValue},
   {L"-l", TypeFlag},
@@ -67,6 +67,33 @@ SetColourHighlighting (
   )
 {
   mColourHighlighting = Highlight;
+}
+
+/**
+  This function returns the consistency checking status.
+
+  @retval TRUE if consistency checking is enabled.
+**/
+BOOLEAN
+GetConsistencyChecking (
+  VOID
+  )
+{
+  return mConsistencyCheck;
+}
+
+/**
+  This function sets the consistency checking status.
+
+  @param  ConsistencyChecking   The consistency checking status.
+
+**/
+VOID
+SetConsistencyChecking (
+  BOOLEAN ConsistencyChecking
+  )
+{
+  mConsistencyCheck = ConsistencyChecking;
 }
 
 /**
@@ -380,7 +407,8 @@ AcpiView (
          (ReportDumpBinFile == ReportOption)) &&
         (!mSelectedAcpiTableFound)) {
       Print (L"\nRequested ACPI Table not found.\n");
-    } else if (ReportDumpBinFile != ReportOption) {
+    } else if (GetConsistencyChecking () &&
+               (ReportDumpBinFile != ReportOption)) {
       OriginalAttribute = gST->ConOut->Mode->Attribute;
 
       Print (L"\nTable Statistics:\n");
@@ -553,6 +581,9 @@ ShellCommandRunAcpiView (
           SetColourHighlighting (FALSE);
         }
       }
+
+      // Surpress consistency checking if requested
+      SetConsistencyChecking (!ShellCommandLineGetFlag (Package, L"-q"));
 
       if (ShellCommandLineGetFlag (Package, L"-l")) {
         mReportType = ReportTableList;

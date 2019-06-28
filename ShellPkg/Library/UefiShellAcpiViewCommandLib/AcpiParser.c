@@ -506,7 +506,8 @@ ParseAcpi (
       break;
     }
 
-    if (Offset != Parser[Index].Offset) {
+    if (GetConsistencyChecking () &&
+        (Offset != Parser[Index].Offset)) {
       IncrementErrorCount ();
       Print (
         L"\nERROR: %a: Offset Mismatch for %s\n"
@@ -549,7 +550,8 @@ ParseAcpi (
 
         // Validating only makes sense if we are tracing
         // the parsed table entries, to report by table name.
-        if (Parser[Index].FieldValidator != NULL) {
+        if (GetConsistencyChecking () &&
+            (Parser[Index].FieldValidator != NULL)) {
           Parser[Index].FieldValidator (Ptr, Parser[Index].Context);
         }
       }

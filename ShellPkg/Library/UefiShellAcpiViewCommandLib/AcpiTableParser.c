@@ -1,7 +1,7 @@
 /** @file
   ACPI table parser
 
-  Copyright (c) 2016 - 2018, ARM Limited. All rights reserved.
+  Copyright (c) 2016 - 2019, ARM Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
@@ -193,7 +193,9 @@ ProcessAcpiTable (
 
   if (Trace) {
     DumpRaw (Ptr, *AcpiTableLength);
-    VerifyChecksum (TRUE, Ptr, *AcpiTableLength);
+    if (GetConsistencyChecking ()) {
+      VerifyChecksum (TRUE, Ptr, *AcpiTableLength);
+    }
   }
 
   Status = GetParser (*AcpiTableSignature, &ParserProc);

@@ -1,7 +1,7 @@
 /** @file
   Header file for AcpiView
 
-  Copyright (c) 2016 - 2018, ARM Limited. All rights reserved.
+  Copyright (c) 2016 - 2019, ARM Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
@@ -89,6 +89,27 @@ GetColourHighlighting (
 VOID
 SetColourHighlighting (
   BOOLEAN Highlight
+  );
+
+/**
+  This function returns the consistency checking status.
+
+  @retval TRUE if consistency checking is enabled.
+**/
+BOOLEAN
+GetConsistencyChecking (
+  VOID
+  );
+
+/**
+  This function sets the consistency checking status.
+
+  @param  ConsistencyChecking   The consistency checking status.
+
+**/
+VOID
+SetConsistencyChecking (
+  BOOLEAN ConsistencyChecking
   );
 
 /**
