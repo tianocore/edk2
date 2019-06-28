@@ -1,7 +1,7 @@
 /** @file
   ACPI parser
 
-  Copyright (c) 2016 - 2018, ARM Limited. All rights reserved.
+  Copyright (c) 2016 - 2019, ARM Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
@@ -139,7 +139,7 @@ VerifyChecksum (
                          ((OriginalAttribute&(BIT4|BIT5|BIT6))>>4))
                        );
       }
-      Print (L"\n\nTable Checksum : OK\n\n");
+      Print (L"Table Checksum : OK\n\n");
     } else {
       IncrementErrorCount ();
       if (GetColourHighlighting ()) {
@@ -149,7 +149,7 @@ VerifyChecksum (
                          ((OriginalAttribute&(BIT4|BIT5|BIT6))>>4))
                        );
       }
-      Print (L"\n\nTable Checksum : FAILED (0x%X)\n\n", Checksum);
+      Print (L"Table Checksum : FAILED (0x%X)\n\n", Checksum);
     }
     if (GetColourHighlighting ()) {
       gST->ConOut->SetAttribute (gST->ConOut, OriginalAttribute);
@@ -219,7 +219,7 @@ DumpRaw (
 
   // Print ASCII data for the final line.
   AsciiBuffer[AsciiBufferIndex] = '\0';
-  Print (L"  %a", AsciiBuffer);
+  Print (L"  %a\n\n", AsciiBuffer);
 }
 
 /**
