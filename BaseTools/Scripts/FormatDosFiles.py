@@ -20,7 +20,7 @@ import copy
 
 __prog__        = 'FormatDosFiles'
 __version__     = '%s Version %s' % (__prog__, '0.10 ')
-__copyright__   = 'Copyright (c) 2018, Intel Corporation. All rights reserved.'
+__copyright__   = 'Copyright (c) 2018-2019, Intel Corporation. All rights reserved.'
 __description__ = 'Convert source files to meet the EDKII C Coding Standards Specification.\n'
 DEFAULT_EXT_LIST = ['.h', '.c', '.nasm', '.nasmb', '.asm', '.S', '.inf', '.dec', '.dsc', '.fdf', '.uni', '.asl', '.aslc', '.vfr', '.idf', '.txt', '.bat', '.py']
 
@@ -46,10 +46,26 @@ def FormatFile(FilePath, Args):
 def FormatFilesInDir(DirPath, ExtList, Args):
 
     FileList = []
+    ExcludeDir = DirPath
     for DirPath, DirNames, FileNames in os.walk(DirPath):
         if Args.Exclude:
             DirNames[:] = [d for d in DirNames if d not in Args.Exclude]
             FileNames[:] = [f for f in FileNames if f not in Args.Exclude]
+            Continue = False
+            for Path in Args.Exclude:
+                if not os.path.isdir(Path) and not os.path.isfile(Path):
+                    Path = os.path.join(ExcludeDir, Path)
+                if os.path.isdir(Path) and Path.endswith(DirPath):
+                    DirNames[:] = []
+                    Continue = True
+                elif os.path.isfile(Path):
+                    FilePaths = FileNames
+                    for ItemPath in FilePaths:
+                        FilePath = os.path.join(DirPath, ItemPath)
+                        if Path.endswith(FilePath):
+                            FileNames.remove(ItemPath)
+            if Continue:
+                continue
         for FileName in [f for f in FileNames if any(f.endswith(ext) for ext in ExtList)]:
                 FileList.append(os.path.join(DirPath, FileName))
     for File in FileList:
