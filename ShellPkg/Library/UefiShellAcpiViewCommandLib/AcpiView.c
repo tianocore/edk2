@@ -25,7 +25,6 @@ STATIC BOOLEAN            mSelectedAcpiTableFound;
 STATIC EREPORT_OPTION     mReportType;
 STATIC UINT32             mTableCount;
 STATIC UINT32             mBinTableCount;
-STATIC BOOLEAN            mVerbose;
 STATIC BOOLEAN            mConsistencyCheck;
 STATIC BOOLEAN            mColourHighlighting;
 
@@ -38,7 +37,6 @@ STATIC CONST SHELL_PARAM_ITEM ParamList[] = {
   {L"-h", TypeValue},
   {L"-l", TypeFlag},
   {L"-s", TypeValue},
-  {L"-v", TypeFlag},
   {NULL, TypeMax}
 };
 
@@ -472,7 +470,6 @@ ShellCommandRunAcpiView (
   mSelectedAcpiTable = 0;
   mSelectedAcpiTableName = NULL;
   mSelectedAcpiTableFound = FALSE;
-  mVerbose = TRUE;
   mConsistencyCheck = TRUE;
 
   ShellStatus = SHELL_SUCCESS;
