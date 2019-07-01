@@ -198,7 +198,6 @@
   SecurityPkg/Library/FmpAuthenticationLibPkcs7/FmpAuthenticationLibPkcs7.inf
   SecurityPkg/Library/FmpAuthenticationLibRsa2048Sha256/FmpAuthenticationLibRsa2048Sha256.inf
 
-  SecurityPkg/Library/DxeDeferImageLoadLib/DxeDeferImageLoadLib.inf
   SecurityPkg/Library/DxeTpmMeasurementLib/DxeTpmMeasurementLib.inf
   SecurityPkg/Library/PlatformSecureLibNull/PlatformSecureLibNull.inf
   SecurityPkg/Library/Tcg2PpVendorLibNull/Tcg2PpVendorLibNull.inf
