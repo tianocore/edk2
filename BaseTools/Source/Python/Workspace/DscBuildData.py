@@ -2668,7 +2668,8 @@ class DscBuildData(PlatformBuildClassObject):
             elif len(ArchBuildOptions.keys()) > 1:
                 CommonBuildOptions = reduce(lambda x,y: x&y, ArchBuildOptions.values())
                 BuildOptions['COMMON'] |= CommonBuildOptions
-            ValueList = list(BuildOptions['COMMON'])
+            ValueList = [item for item in BuildOptions['COMMON'] if item.startswith((r"/U","-U"))]
+            ValueList.extend([item for item in BuildOptions['COMMON'] if item.startswith((r"/D", "-D"))])
             CC_FLAGS += " ".join(ValueList)
         MakeApp += CC_FLAGS
 
