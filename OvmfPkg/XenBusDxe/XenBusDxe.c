@@ -453,6 +453,10 @@ XenBusDxeDriverBindingStop (
       continue;
     }
 
+    Status = gBS->CloseProtocol (Dev->ControllerHandle, &gXenIoProtocolGuid,
+                    Dev->This->DriverBindingHandle, ChildData->Handle);
+    ASSERT_EFI_ERROR (Status);
+
     Status = gBS->UninstallMultipleProtocolInterfaces (
                ChildData->Handle,
                &gEfiDevicePathProtocolGuid, ChildData->DevicePath,
