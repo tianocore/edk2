@@ -748,7 +748,7 @@ class InfBuildData(ModuleBuildClassObject):
                 EdkLogger.error('build', RESOURCE_NOT_AVAILABLE, "No [Depex] section or no valid expression in [Depex] section for [%s] module" \
                                 % self.ModuleType, File=self.MetaFile)
 
-        if len(RecordList) != 0 and self.ModuleType == SUP_MODULE_USER_DEFINED:
+        if len(RecordList) != 0 and (self.ModuleType == SUP_MODULE_USER_DEFINED or self.ModuleType == SUP_MODULE_HOST_APPLICATION):
             for Record in RecordList:
                 if Record[4] not in [SUP_MODULE_PEIM, SUP_MODULE_DXE_DRIVER, SUP_MODULE_DXE_SMM_DRIVER]:
                     EdkLogger.error('build', FORMAT_INVALID,

@@ -321,7 +321,7 @@
         "$(OBJCOPY)" $(OBJCOPY_FLAGS) ${dst}
 
 
-[Static-Library-File.USER_DEFINED]
+[Static-Library-File.USER_DEFINED, Static-Library-File.HOST_APPLICATION]
     <InputFile>
         *.lib
 

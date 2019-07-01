@@ -776,7 +776,8 @@ gModuleTypeHeaderFile = {
     SUP_MODULE_SMM_CORE          :   ["PiDxe.h", "Library/BaseLib.h", "Library/DebugLib.h", "Library/UefiDriverEntryPoint.h"],
     SUP_MODULE_MM_STANDALONE     :   ["PiMm.h", "Library/BaseLib.h", "Library/DebugLib.h", "Library/StandaloneMmDriverEntryPoint.h"],
     SUP_MODULE_MM_CORE_STANDALONE :  ["PiMm.h", "Library/BaseLib.h", "Library/DebugLib.h", "Library/StandaloneMmCoreEntryPoint.h"],
-    SUP_MODULE_USER_DEFINED      :   [gBasicHeaderFile, "Library/DebugLib.h"]
+    SUP_MODULE_USER_DEFINED      :   [gBasicHeaderFile, "Library/DebugLib.h"],
+    SUP_MODULE_HOST_APPLICATION  :   [gBasicHeaderFile, "Library/DebugLib.h"]
 }
 
 ## Autogen internal worker macro to define DynamicEx PCD name includes both the TokenSpaceGuidName
@@ -1339,7 +1340,7 @@ def CreateLibraryConstructorCode(Info, AutoGenC, AutoGenH):
         if Lib.ModuleType in [SUP_MODULE_BASE, SUP_MODULE_SEC]:
             ConstructorPrototypeString.Append(gLibraryStructorPrototype[SUP_MODULE_BASE].Replace(Dict))
             ConstructorCallingString.Append(gLibraryStructorCall[SUP_MODULE_BASE].Replace(Dict))
-        if Info.ModuleType not in [SUP_MODULE_BASE, SUP_MODULE_USER_DEFINED]:
+        if Info.ModuleType not in [SUP_MODULE_BASE, SUP_MODULE_USER_DEFINED, SUP_MODULE_HOST_APPLICATION]:
             if Lib.ModuleType in SUP_MODULE_SET_PEI:
                 ConstructorPrototypeString.Append(gLibraryStructorPrototype['PEI'].Replace(Dict))
                 ConstructorCallingString.Append(gLibraryStructorCall['PEI'].Replace(Dict))
@@ -1368,7 +1369,7 @@ def CreateLibraryConstructorCode(Info, AutoGenC, AutoGenH):
     if Info.IsLibrary:
         AutoGenH.Append("${BEGIN}${FunctionPrototype}${END}", Dict)
     else:
-        if Info.ModuleType in [SUP_MODULE_BASE, SUP_MODULE_SEC, SUP_MODULE_USER_DEFINED]:
+        if Info.ModuleType in [SUP_MODULE_BASE, SUP_MODULE_SEC, SUP_MODULE_USER_DEFINED, SUP_MODULE_HOST_APPLICATION]:
             AutoGenC.Append(gLibraryString[SUP_MODULE_BASE].Replace(Dict))
         elif Info.ModuleType in SUP_MODULE_SET_PEI:
             AutoGenC.Append(gLibraryString['PEI'].Replace(Dict))
@@ -1402,7 +1403,7 @@ def CreateLibraryDestructorCode(Info, AutoGenC, AutoGenH):
         if Lib.ModuleType in [SUP_MODULE_BASE, SUP_MODULE_SEC]:
             DestructorPrototypeString.Append(gLibraryStructorPrototype[SUP_MODULE_BASE].Replace(Dict))
             DestructorCallingString.Append(gLibraryStructorCall[SUP_MODULE_BASE].Replace(Dict))
-        if Info.ModuleType not in [SUP_MODULE_BASE, SUP_MODULE_USER_DEFINED]:
+        if Info.ModuleType not in [SUP_MODULE_BASE, SUP_MODULE_USER_DEFINED, SUP_MODULE_HOST_APPLICATION]:
             if Lib.ModuleType in SUP_MODULE_SET_PEI:
                 DestructorPrototypeString.Append(gLibraryStructorPrototype['PEI'].Replace(Dict))
                 DestructorCallingString.Append(gLibraryStructorCall['PEI'].Replace(Dict))
@@ -1431,7 +1432,7 @@ def CreateLibraryDestructorCode(Info, AutoGenC, AutoGenH):
     if Info.IsLibrary:
         AutoGenH.Append("${BEGIN}${FunctionPrototype}${END}", Dict)
     else:
-        if Info.ModuleType in [SUP_MODULE_BASE, SUP_MODULE_SEC, SUP_MODULE_USER_DEFINED]:
+        if Info.ModuleType in [SUP_MODULE_BASE, SUP_MODULE_SEC, SUP_MODULE_USER_DEFINED, SUP_MODULE_HOST_APPLICATION]:
             AutoGenC.Append(gLibraryString[SUP_MODULE_BASE].Replace(Dict))
         elif Info.ModuleType in SUP_MODULE_SET_PEI:
             AutoGenC.Append(gLibraryString['PEI'].Replace(Dict))
@@ -1449,7 +1450,7 @@ def CreateLibraryDestructorCode(Info, AutoGenC, AutoGenH):
 #   @param      AutoGenH    The TemplateString object for header file
 #
 def CreateModuleEntryPointCode(Info, AutoGenC, AutoGenH):
-    if Info.IsLibrary or Info.ModuleType in [SUP_MODULE_USER_DEFINED, SUP_MODULE_SEC]:
+    if Info.IsLibrary or Info.ModuleType in [SUP_MODULE_USER_DEFINED, SUP_MODULE_HOST_APPLICATION, SUP_MODULE_SEC]:
         return
     #
     # Module Entry Points
@@ -1529,7 +1530,7 @@ def CreateModuleEntryPointCode(Info, AutoGenC, AutoGenH):
 #   @param      AutoGenH    The TemplateString object for header file
 #
 def CreateModuleUnloadImageCode(Info, AutoGenC, AutoGenH):
-    if Info.IsLibrary or Info.ModuleType in [SUP_MODULE_USER_DEFINED, SUP_MODULE_BASE, SUP_MODULE_SEC]:
+    if Info.IsLibrary or Info.ModuleType in [SUP_MODULE_USER_DEFINED, SUP_MODULE_HOST_APPLICATION, SUP_MODULE_BASE, SUP_MODULE_SEC]:
         return
     #
     # Unload Image Handlers
@@ -1549,7 +1550,7 @@ def CreateModuleUnloadImageCode(Info, AutoGenC, AutoGenH):
 #   @param      AutoGenH    The TemplateString object for header file
 #
 def CreateGuidDefinitionCode(Info, AutoGenC, AutoGenH):
-    if Info.ModuleType in [SUP_MODULE_USER_DEFINED, SUP_MODULE_BASE]:
+    if Info.ModuleType in [SUP_MODULE_USER_DEFINED, SUP_MODULE_HOST_APPLICATION, SUP_MODULE_BASE]:
         GuidType = TAB_GUID
     else:
         GuidType = "EFI_GUID"
@@ -1573,7 +1574,7 @@ def CreateGuidDefinitionCode(Info, AutoGenC, AutoGenH):
 #   @param      AutoGenH    The TemplateString object for header file
 #
 def CreateProtocolDefinitionCode(Info, AutoGenC, AutoGenH):
-    if Info.ModuleType in [SUP_MODULE_USER_DEFINED, SUP_MODULE_BASE]:
+    if Info.ModuleType in [SUP_MODULE_USER_DEFINED, SUP_MODULE_HOST_APPLICATION, SUP_MODULE_BASE]:
         GuidType = TAB_GUID
     else:
         GuidType = "EFI_GUID"
@@ -1597,7 +1598,7 @@ def CreateProtocolDefinitionCode(Info, AutoGenC, AutoGenH):
 #   @param      AutoGenH    The TemplateString object for header file
 #
 def CreatePpiDefinitionCode(Info, AutoGenC, AutoGenH):
-    if Info.ModuleType in [SUP_MODULE_USER_DEFINED, SUP_MODULE_BASE]:
+    if Info.ModuleType in [SUP_MODULE_USER_DEFINED, SUP_MODULE_HOST_APPLICATION, SUP_MODULE_BASE]:
         GuidType = TAB_GUID
     else:
         GuidType = "EFI_GUID"
@@ -1634,7 +1635,7 @@ def CreatePcdCode(Info, AutoGenC, AutoGenH):
     # Add extern declarations to AutoGen.h if one or more Token Space GUIDs were found
     if TokenSpaceList:
         AutoGenH.Append("\n// Definition of PCD Token Space GUIDs used in this module\n\n")
-        if Info.ModuleType in [SUP_MODULE_USER_DEFINED, SUP_MODULE_BASE]:
+        if Info.ModuleType in [SUP_MODULE_USER_DEFINED, SUP_MODULE_HOST_APPLICATION, SUP_MODULE_BASE]:
             GuidType = TAB_GUID
         else:
             GuidType = "EFI_GUID"

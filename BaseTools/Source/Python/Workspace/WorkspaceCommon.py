@@ -8,6 +8,7 @@
 from __future__ import absolute_import
 from collections import OrderedDict, defaultdict
 from Common.DataType import SUP_MODULE_USER_DEFINED
+from Common.DataType import SUP_MODULE_HOST_APPLICATION
 from .BuildClassObject import LibraryClassObject
 import Common.GlobalData as GlobalData
 from Workspace.BuildClassObject import StructurePcd
@@ -94,7 +95,7 @@ def GetModuleLibInstances(Module, Platform, BuildDatabase, Arch, Target, Toolcha
     # If a module has a MODULE_TYPE of USER_DEFINED,
     # do not link in NULL library class instances from the global [LibraryClasses.*] sections.
     #
-    if Module.ModuleType != SUP_MODULE_USER_DEFINED:
+    if Module.ModuleType != SUP_MODULE_USER_DEFINED and Module.ModuleType != SUP_MODULE_HOST_APPLICATION:
         for LibraryClass in Platform.LibraryClasses.GetKeys():
             if LibraryClass.startswith("NULL") and Platform.LibraryClasses[LibraryClass, Module.ModuleType]:
                 Module.LibraryClasses[LibraryClass] = Platform.LibraryClasses[LibraryClass, Module.ModuleType]
@@ -137,7 +138,7 @@ def GetModuleLibInstances(Module, Platform, BuildDatabase, Arch, Target, Toolcha
                     LibraryModule.LibraryClass.append(LibraryClassObject(LibraryClassName, [ModuleType]))
                 elif LibraryModule.LibraryClass is None \
                      or len(LibraryModule.LibraryClass) == 0 \
-                     or (ModuleType != SUP_MODULE_USER_DEFINED
+                     or (ModuleType != SUP_MODULE_USER_DEFINED and ModuleType != SUP_MODULE_HOST_APPLICATION
                          and ModuleType not in LibraryModule.LibraryClass[0].SupModList):
                     # only USER_DEFINED can link against any library instance despite of its SupModList
                     if FileName:

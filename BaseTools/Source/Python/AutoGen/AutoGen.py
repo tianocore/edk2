@@ -2837,7 +2837,7 @@ class ModuleAutoGen(AutoGen):
                     # the type of build module is USER_DEFINED.
                     # All different DEPEX section tags would be copied into the As Built INF file
                     # and there would be separate DEPEX section tags
-                    if self.ModuleType.upper() == SUP_MODULE_USER_DEFINED:
+                    if self.ModuleType.upper() == SUP_MODULE_USER_DEFINED or self.ModuleType.upper() == SUP_MODULE_HOST_APPLICATION:
                         if (Arch.upper() == self.Arch.upper()) and (ModuleType.upper() != TAB_ARCH_COMMON):
                             DepexList.append({(Arch, ModuleType): DepexExpr})
                     else:
@@ -2847,7 +2847,7 @@ class ModuleAutoGen(AutoGen):
                             DepexList.append({(Arch, ModuleType): DepexExpr})
 
         #the type of build module is USER_DEFINED.
-        if self.ModuleType.upper() == SUP_MODULE_USER_DEFINED:
+        if self.ModuleType.upper() == SUP_MODULE_USER_DEFINED or self.ModuleType.upper() == SUP_MODULE_HOST_APPLICATION:
             for Depex in DepexList:
                 for key in Depex:
                     DepexStr += '[Depex.%s.%s]\n' % key
@@ -4088,7 +4088,7 @@ class ModuleAutoGen(AutoGen):
 
         for ModuleType in self.DepexList:
             # Ignore empty [depex] section or [depex] section for SUP_MODULE_USER_DEFINED module
-            if len(self.DepexList[ModuleType]) == 0 or ModuleType == SUP_MODULE_USER_DEFINED:
+            if len(self.DepexList[ModuleType]) == 0 or ModuleType == SUP_MODULE_USER_DEFINED or ModuleType == SUP_MODULE_HOST_APPLICATION:
                 continue
 
             Dpx = GenDepex.DependencyExpression(self.DepexList[ModuleType], ModuleType, True)
