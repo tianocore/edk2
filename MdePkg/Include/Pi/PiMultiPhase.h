@@ -176,4 +176,20 @@ VOID
   IN OUT VOID  *Buffer
   );
 
+/**
+  The function prototype for invoking a function on an Application Processor.
+
+  This definition is used by the UEFI MM MP Serices Protocol.
+
+  @param[in] ProcedureArgument    The pointer to private data buffer.
+
+  @retval EFI_SUCCESS             Excutive the procedure successfully
+
+**/
+typedef
+EFI_STATUS
+(EFIAPI *EFI_AP_PROCEDURE2)(
+  IN VOID  *ProcedureArgument
+);
+
 #endif
