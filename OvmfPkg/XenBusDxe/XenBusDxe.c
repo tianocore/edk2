@@ -446,12 +446,6 @@ XenBusDxeDriverBindingStop (
       continue;
     }
     ChildData = XENBUS_PRIVATE_DATA_FROM_THIS (XenBusIo);
-    Status = gBS->DisconnectController (ChildData->Handle, NULL, NULL);
-    if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "XenBusDxe: error disconnecting child: %r\n",
-              Status));
-      continue;
-    }
 
     Status = gBS->CloseProtocol (Dev->ControllerHandle, &gXenIoProtocolGuid,
                     Dev->This->DriverBindingHandle, ChildData->Handle);
