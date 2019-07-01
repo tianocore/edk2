@@ -2785,31 +2785,94 @@ Base64Encode (
   );
 
 /**
-  Convert Base64 ascii string to binary data based on RFC4648.
+  Decode Base64 ASCII encoded data to 8-bit binary representation, based on
+  RFC4648.
 
-  Produce Null-terminated binary data in the output buffer specified by Destination and DestinationSize.
-  The binary data is produced by converting the Base64 ascii string specified by Source and SourceLength.
+  Decoding occurs according to "Table 1: The Base 64 Alphabet" in RFC4648.
 
-  @param Source          Input ASCII characters
-  @param SourceLength    Number of ASCII characters
-  @param Destination     Pointer to output buffer
-  @param DestinationSize Caller is responsible for passing in buffer of at least DestinationSize.
-                         Set 0 to get the size needed. Set to bytes stored on return.
+  Whitespace is ignored at all positions:
+  - 0x09 ('\t') horizontal tab
+  - 0x0A ('\n') new line
+  - 0x0B ('\v') vertical tab
+  - 0x0C ('\f') form feed
+  - 0x0D ('\r') carriage return
+  - 0x20 (' ')  space
 
-  @retval RETURN_SUCCESS             When binary buffer is filled in.
-  @retval RETURN_INVALID_PARAMETER   If Source is NULL or DestinationSize is NULL.
-  @retval RETURN_INVALID_PARAMETER   If SourceLength or DestinationSize is bigger than (MAX_ADDRESS -(UINTN)Destination ).
-  @retval RETURN_INVALID_PARAMETER   If there is any invalid character in input stream.
-  @retval RETURN_BUFFER_TOO_SMALL    If buffer length is smaller than required buffer size.
+  The minimum amount of required padding (with ASCII 0x3D, '=') is tolerated
+  and enforced at the end of the Base64 ASCII encoded data, and only there.
 
- **/
+  Other characters outside of the encoding alphabet cause the function to
+  reject the Base64 ASCII encoded data.
+
+  @param[in] Source               Array of CHAR8 elements containing the Base64
+                                  ASCII encoding. May be NULL if SourceSize is
+                                  zero.
+
+  @param[in] SourceSize           Number of CHAR8 elements in Source.
+
+  @param[out] Destination         Array of UINT8 elements receiving the decoded
+                                  8-bit binary representation. Allocated by the
+                                  caller. May be NULL if DestinationSize is
+                                  zero on input. If NULL, decoding is
+                                  performed, but the 8-bit binary
+                                  representation is not stored. If non-NULL and
+                                  the function returns an error, the contents
+                                  of Destination are indeterminate.
+
+  @param[in,out] DestinationSize  On input, the number of UINT8 elements that
+                                  the caller allocated for Destination. On
+                                  output, if the function returns
+                                  RETURN_SUCCESS or RETURN_BUFFER_TOO_SMALL,
+                                  the number of UINT8 elements that are
+                                  required for decoding the Base64 ASCII
+                                  representation. If the function returns a
+                                  value different from both RETURN_SUCCESS and
+                                  RETURN_BUFFER_TOO_SMALL, then DestinationSize
+                                  is indeterminate on output.
+
+  @retval RETURN_SUCCESS            SourceSize CHAR8 elements at Source have
+                                    been decoded to on-output DestinationSize
+                                    UINT8 elements at Destination. Note that
+                                    RETURN_SUCCESS covers the case when
+                                    DestinationSize is zero on input, and
+                                    Source decodes to zero bytes (due to
+                                    containing at most ignored whitespace).
+
+  @retval RETURN_BUFFER_TOO_SMALL   The input value of DestinationSize is not
+                                    large enough for decoding SourceSize CHAR8
+                                    elements at Source. The required number of
+                                    UINT8 elements has been stored to
+                                    DestinationSize.
+
+  @retval RETURN_INVALID_PARAMETER  DestinationSize is NULL.
+
+  @retval RETURN_INVALID_PARAMETER  Source is NULL, but SourceSize is not zero.
+
+  @retval RETURN_INVALID_PARAMETER  Destination is NULL, but DestinationSize is
+                                    not zero on input.
+
+  @retval RETURN_INVALID_PARAMETER  Source is non-NULL, and (Source +
+                                    SourceSize) would wrap around MAX_ADDRESS.
+
+  @retval RETURN_INVALID_PARAMETER  Destination is non-NULL, and (Destination +
+                                    DestinationSize) would wrap around
+                                    MAX_ADDRESS, as specified on input.
+
+  @retval RETURN_INVALID_PARAMETER  None of Source and Destination are NULL,
+                                    and CHAR8[SourceSize] at Source overlaps
+                                    UINT8[DestinationSize] at Destination, as
+                                    specified on input.
+
+  @retval RETURN_INVALID_PARAMETER  Invalid CHAR8 element encountered in
+                                    Source.
+**/
 RETURN_STATUS
 EFIAPI
 Base64Decode (
-  IN  CONST CHAR8  *Source,
-  IN        UINTN   SourceLength,
-  OUT       UINT8  *Destination  OPTIONAL,
-  IN OUT    UINTN  *DestinationSize
+  IN     CONST CHAR8 *Source          OPTIONAL,
+  IN     UINTN       SourceSize,
+  OUT    UINT8       *Destination     OPTIONAL,
+  IN OUT UINTN       *DestinationSize
   );
 
 /**
