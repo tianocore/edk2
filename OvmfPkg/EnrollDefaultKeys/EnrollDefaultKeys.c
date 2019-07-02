@@ -154,14 +154,8 @@ GetPkKek1 (
   Status = Base64Decode (Base64Cert, Base64CertLen, NULL, &DecodedCertSize);
   switch (Status) {
   case EFI_BUFFER_TOO_SMALL:
-    if (DecodedCertSize > 0) {
-      break;
-    }
-    //
-    // Fall through: the above Base64Decode() call is ill-specified in BaseLib
-    // if Source decodes to zero bytes (for example if it consists of ignored
-    // whitespace only).
-    //
+    ASSERT (DecodedCertSize > 0);
+    break;
   case EFI_SUCCESS:
     AsciiPrint ("error: empty certificate after app prefix %g\n",
       &gOvmfPkKek1AppPrefixGuid);
