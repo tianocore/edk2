@@ -1,7 +1,7 @@
 /** @file
   CPU Register Table Library functions.
 
-  Copyright (c) 2017 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2017 - 2020, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -858,16 +858,16 @@ RegisterCpuFeature (
                     != (CPU_FEATURE_CORE_BEFORE | CPU_FEATURE_CORE_AFTER));
     ASSERT ((Feature & (CPU_FEATURE_PACKAGE_BEFORE | CPU_FEATURE_PACKAGE_AFTER))
                     != (CPU_FEATURE_PACKAGE_BEFORE | CPU_FEATURE_PACKAGE_AFTER));
-    if (Feature < CPU_FEATURE_BEFORE) {
+    if (Feature < CPU_FEATURE_THREAD_BEFORE) {
       BeforeAll = ((Feature & CPU_FEATURE_BEFORE_ALL) != 0) ? TRUE : FALSE;
       AfterAll  = ((Feature & CPU_FEATURE_AFTER_ALL) != 0) ? TRUE : FALSE;
       Feature  &= ~(CPU_FEATURE_BEFORE_ALL | CPU_FEATURE_AFTER_ALL);
       ASSERT (FeatureMask == NULL);
       SetCpuFeaturesBitMask (&FeatureMask, Feature, CpuFeaturesData->BitMaskSize);
-    } else if ((Feature & CPU_FEATURE_BEFORE) != 0) {
-      SetCpuFeaturesBitMask (&BeforeFeatureBitMask, Feature & ~CPU_FEATURE_BEFORE, CpuFeaturesData->BitMaskSize);
-    } else if ((Feature & CPU_FEATURE_AFTER) != 0) {
-      SetCpuFeaturesBitMask (&AfterFeatureBitMask, Feature & ~CPU_FEATURE_AFTER, CpuFeaturesData->BitMaskSize);
+    } else if ((Feature & CPU_FEATURE_THREAD_BEFORE) != 0) {
+      SetCpuFeaturesBitMask (&BeforeFeatureBitMask, Feature & ~CPU_FEATURE_THREAD_BEFORE, CpuFeaturesData->BitMaskSize);
+    } else if ((Feature & CPU_FEATURE_THREAD_AFTER) != 0) {
+      SetCpuFeaturesBitMask (&AfterFeatureBitMask, Feature & ~CPU_FEATURE_THREAD_AFTER, CpuFeaturesData->BitMaskSize);
     } else if ((Feature & CPU_FEATURE_CORE_BEFORE) != 0) {
       SetCpuFeaturesBitMask (&CoreBeforeFeatureBitMask, Feature & ~CPU_FEATURE_CORE_BEFORE, CpuFeaturesData->BitMaskSize);
     } else if ((Feature & CPU_FEATURE_CORE_AFTER) != 0) {
