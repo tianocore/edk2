@@ -1,7 +1,7 @@
 /** @file
   CPU Register Table Library definitions.
 
-  Copyright (c) 2017 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2017 - 2020, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -43,8 +43,8 @@ typedef struct {
   CPU_FEATURE_GET_CONFIG_DATA  GetConfigDataFunc;
   CPU_FEATURE_SUPPORT          SupportFunc;
   CPU_FEATURE_INITIALIZE       InitializeFunc;
-  UINT8                        *BeforeFeatureBitMask;
-  UINT8                        *AfterFeatureBitMask;
+  UINT8                        *ThreadBeforeFeatureBitMask;
+  UINT8                        *ThreadAfterFeatureBitMask;
   UINT8                        *CoreBeforeFeatureBitMask;
   UINT8                        *CoreAfterFeatureBitMask;
   UINT8                        *PackageBeforeFeatureBitMask;
