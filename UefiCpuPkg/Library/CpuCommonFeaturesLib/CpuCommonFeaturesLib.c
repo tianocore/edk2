@@ -95,7 +95,7 @@ CpuCommonFeaturesLibConstructor (
                SmxSupport,
                SmxInitialize,
                CPU_FEATURE_SMX,
-               CPU_FEATURE_LOCK_FEATURE_CONTROL_REGISTER | CPU_FEATURE_BEFORE,
+               CPU_FEATURE_LOCK_FEATURE_CONTROL_REGISTER | CPU_FEATURE_THREAD_BEFORE,
                CPU_FEATURE_END
                );
     ASSERT_EFI_ERROR (Status);
@@ -107,7 +107,7 @@ CpuCommonFeaturesLibConstructor (
                VmxSupport,
                VmxInitialize,
                CPU_FEATURE_VMX,
-               CPU_FEATURE_LOCK_FEATURE_CONTROL_REGISTER | CPU_FEATURE_BEFORE,
+               CPU_FEATURE_LOCK_FEATURE_CONTROL_REGISTER | CPU_FEATURE_THREAD_BEFORE,
                CPU_FEATURE_END
                );
     ASSERT_EFI_ERROR (Status);
@@ -207,7 +207,7 @@ CpuCommonFeaturesLibConstructor (
                LmceSupport,
                LmceInitialize,
                CPU_FEATURE_LMCE,
-               CPU_FEATURE_LOCK_FEATURE_CONTROL_REGISTER | CPU_FEATURE_BEFORE,
+               CPU_FEATURE_LOCK_FEATURE_CONTROL_REGISTER | CPU_FEATURE_THREAD_BEFORE,
                CPU_FEATURE_END
                );
     ASSERT_EFI_ERROR (Status);

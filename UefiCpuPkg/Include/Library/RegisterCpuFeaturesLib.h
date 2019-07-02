@@ -69,17 +69,8 @@
 
 #define CPU_FEATURE_BEFORE_ALL                      BIT23
 #define CPU_FEATURE_AFTER_ALL                       BIT24
-//
-// CPU_FEATURE_BEFORE and CPU_FEATURE_AFTER only mean Thread scope
-// before and Thread scope after.
-// It will be replace with CPU_FEATURE_THREAD_BEFORE and
-// CPU_FEATURE_THREAD_AFTER, and should not be used anymore.
-//
-#define CPU_FEATURE_BEFORE                          BIT25
-#define CPU_FEATURE_AFTER                           BIT26
-
-#define CPU_FEATURE_THREAD_BEFORE                   CPU_FEATURE_BEFORE
-#define CPU_FEATURE_THREAD_AFTER                    CPU_FEATURE_AFTER
+#define CPU_FEATURE_THREAD_BEFORE                   BIT25
+#define CPU_FEATURE_THREAD_AFTER                    BIT26
 #define CPU_FEATURE_CORE_BEFORE                     BIT27
 #define CPU_FEATURE_CORE_AFTER                      BIT28
 #define CPU_FEATURE_PACKAGE_BEFORE                  BIT29
