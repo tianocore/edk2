@@ -79,6 +79,7 @@ M: Laszlo Ersek <lersek@redhat.com>
 M: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 R: Julien Grall <julien.grall@arm.com>
    (Xen modules)
+R: Leif Lindholm <leif.lindholm@linaro.org>
 
 BaseTools
 W: https://github.com/tianocore/tianocore.github.io/wiki/BaseTools
