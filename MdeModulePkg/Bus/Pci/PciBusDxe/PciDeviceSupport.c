@@ -16,6 +16,79 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 LIST_ENTRY  mPciDevicePool;
 
 /**
+ * Disable the bus pointed to by Head.
+ *
+ * @param Head     A pointer to the list entry you want to disable.
+ *
+ * @return VOID
+ */
+VOID
+DisableBmeOnTree (
+  IN LIST_ENTRY  *Head
+  )
+{
+  LIST_ENTRY     *CurrentLink;
+  PCI_IO_DEVICE  *PciIoDevice;
+  UINT16         Command;
+
+  // DisableBME on ExitBootServices should be synchonized with IoMmu/Smmu disable - with
+  // DisableBME running before IoMmu/Smmu disable.  If the IoMmu/Smmu disable code runs at TPL_CALLBACK,
+  // then DisableBME will run before IoMmu/Smmu disable.
+  if (!PcdGetBool (PcdDisableBmeOnEbs)) {
+    DEBUG ((DEBUG_WARN, "%a PCI Bus Master enabled due to PCD setting\n", __func__));
+    return;
+  }
+
+  CurrentLink = Head->ForwardLink;
+  while (CurrentLink != NULL && CurrentLink != Head) {
+    PciIoDevice = PCI_IO_DEVICE_FROM_LINK (CurrentLink);
+    //
+    // Turn off all children's Bus Master, if any
+    //
+    DisableBmeOnTree (&PciIoDevice->ChildList);
+
+    // If this is a P2P Bridge, disable the Bridge's Bus Master.
+    if (IS_PCI_BRIDGE (&PciIoDevice->Pci)) {
+      PCI_READ_COMMAND_REGISTER (PciIoDevice, &Command);
+      if (EFI_PCI_COMMAND_BUS_MASTER == (Command & EFI_PCI_COMMAND_BUS_MASTER)) {
+        Command &= ~EFI_PCI_COMMAND_BUS_MASTER;
+        PCI_SET_COMMAND_REGISTER (PciIoDevice, Command);
+        DEBUG ((
+          EFI_D_INFO,
+          "P2P BME-DISABLED PciIo=%p, Command=%x, Bus=%d,Dev=%d,Fun=%d\n",
+          &PciIoDevice->PciIo,
+          Command,
+          PciIoDevice->BusNumber,
+          PciIoDevice->DeviceNumber,
+          PciIoDevice->FunctionNumber
+          ));
+      }
+    }
+
+    CurrentLink = CurrentLink->ForwardLink;
+  }
+}
+
+/**
+ * On ExitBootServices handler.  Inspect all P2P bridges, and
+ * disable Bus Master on any that were enabled during BDS.
+ *
+ * @param Event
+ * @param Context
+ *
+ * @return VOID EFIAPI
+ */
+VOID
+EFIAPI
+OnExitBootServices (
+  IN      EFI_EVENT  Event,
+  IN      VOID       *Context
+  )
+{
+  DisableBmeOnTree (&mPciDevicePool);
+}
+
+/**
   Initialize the PCI devices pool.
 
 **/
@@ -24,7 +97,22 @@ InitializePciDevicePool (
   VOID
   )
 {
+  EFI_EVENT   ExitBootServicesEvent;
+  EFI_STATUS  Status;
+
   InitializeListHead (&mPciDevicePool);
+
+  Status = gBS->CreateEventEx (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_NOTIFY,
+                  OnExitBootServices,
+                  NULL,
+                  &gEfiEventExitBootServicesGuid,
+                  &ExitBootServicesEvent
+                  );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Unable to create ExitBootServices event. Code=%r\n", Status));
+  }
 }
 
 /**
@@ -684,7 +772,13 @@ StartPciDevicesOnBridge (
                              0,
                              &Supports
                              );
-        Supports &= (UINT64)EFI_PCI_DEVICE_ENABLE;
+
+        if (FeaturePcdGet (PcdDeferBme)) {
+          Supports &= (UINT64)(EFI_PCI_IO_ATTRIBUTE_IO | EFI_PCI_IO_ATTRIBUTE_MEMORY);
+        } else {
+          Supports &= (UINT64)EFI_PCI_DEVICE_ENABLE;
+        }
+
         PciIoDevice->PciIo.Attributes (
                              &(PciIoDevice->PciIo),
                              EfiPciIoAttributeOperationEnable,
@@ -732,7 +826,16 @@ StartPciDevicesOnBridge (
                              0,
                              &Supports
                              );
-        Supports &= (UINT64)EFI_PCI_DEVICE_ENABLE;
+
+        // Defer BME enablement until PCI SetAttributes
+        if (FeaturePcdGet (PcdDeferBme)) {
+          Supports &= (UINT64)(EFI_PCI_IO_ATTRIBUTE_IO | EFI_PCI_IO_ATTRIBUTE_MEMORY);
+        } else {
+          Supports &= (UINT64)EFI_PCI_DEVICE_ENABLE;
+        }
+
+        // Supports &= (UINT64)EFI_PCI_DEVICE_ENABLE;
+
         PciIoDevice->PciIo.Attributes (
                              &(PciIoDevice->PciIo),
                              EfiPciIoAttributeOperationEnable,

@@ -997,6 +997,15 @@
   # @Prompt Enable process non-reset capsule image at runtime.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSupportProcessCapsuleAtRuntime|FALSE|BOOLEAN|0x00010079
 
+  ## Indicates that the system should not automatically enable BME on P2P bridges until a subordinate
+  #  device has its Bus Master Enable bit set by a call to PciIo->SetAttributes.
+  #  Note: Some UEFI drivers are not compliant and do not correctly call SetAttributes before attempting
+  #  DMA operations. For these drivers, this setting will cause a functionality break.
+  #   TRUE  - Defer BME enablement on P2P bridges.
+  #   FALSE - Initialize P2P bridges with BME enabled.
+  # @Prompt Defer BME enablement
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDeferBme|TRUE|BOOLEAN|0x30002050
+
 [PcdsFeatureFlag.IA32, PcdsFeatureFlag.ARM, PcdsFeatureFlag.AARCH64, PcdsFeatureFlag.LOONGARCH64]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciDegradeResourceForOptionRom|FALSE|BOOLEAN|0x0001003a
 
@@ -1916,6 +1925,14 @@
   #   FALSE - BDS does not support Platform Recovery.<BR>
   # @Prompt Support Platform Recovery.
   gEfiMdeModulePkgTokenSpaceGuid.PcdPlatformRecoverySupport|TRUE|BOOLEAN|0x00010078
+
+  ## Indicates that the system should disable BME on all Pci2Pci bridges on Exit Boot Services
+  #  Note: Some operating systems and drivers may not expect devices to be in this state, and it
+  #  may cause unexpected behaviors.
+  #   TRUE  - Disable BME on P2P at Exit Boot Services.
+  #   FALSE - Do not disable BME on P2P at Exit Boot Services.
+  # @Prompt Disable BME on Exit Boot Services
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDisableBmeOnEbs|TRUE|BOOLEAN|0x30002051
 
   ## Specify the foreground color for Subtile text in HII Form Browser. The default value is EFI_BLUE.
   #  Only following values defined in UEFI specification are valid:<BR><BR>
