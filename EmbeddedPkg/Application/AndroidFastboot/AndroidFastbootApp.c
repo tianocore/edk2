@@ -300,7 +300,7 @@ AcceptCmd (
   } else if (IS_LOWERCASE_ASCII (Command[0])) {
     // Commands starting with lowercase ASCII characters are reserved for the
     // Fastboot protocol. If we don't recognise it, it's probably the future
-    // and there are new commmands in the protocol.
+    // and there are new commands in the protocol.
     // (By the way, the "oem" command mentioned above makes this reservation
     //  redundant, but we handle it here to be spec-compliant)
     SEND_LITERAL ("FAILCommand not recognised. Check Fastboot version.");

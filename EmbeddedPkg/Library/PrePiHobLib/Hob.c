@@ -812,7 +812,7 @@ BuildPeCoffLoaderHob (
   BuildGuidDataHob (&gPeCoffLoaderProtocolGuid, &Ptr, sizeof (VOID *));
 }
 
-// May want to put this into a library so you only need the PCD setings if you are using the feature?
+// May want to put this into a library so you only need the PCD settings if you are using the feature?
 VOID
 BuildMemoryTypeInformationHob (
   VOID

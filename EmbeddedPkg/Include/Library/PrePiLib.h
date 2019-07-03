@@ -171,7 +171,7 @@ FfsProcessFvFile (
   Search through every FV until you find a file of type FileType
 
   @param FileType        File handle of a Fv type file.
-  @param Volumehandle    On succes Volume Handle of the match
+  @param Volumehandle    On success Volume Handle of the match
   @param FileHandle      On success File Handle of the match
 
   @retval EFI_NOT_FOUND  FV image can't be found.
@@ -492,7 +492,7 @@ BuildFvHob (
   );
 
 /**
-  Builds a Firmware Volume HOB and a resrouce descriptor hob
+  Builds a Firmware Volume HOB and a resource descriptor hob
 
   This function builds a Firmware Volume HOB.
   It can only be invoked during PEI phase;

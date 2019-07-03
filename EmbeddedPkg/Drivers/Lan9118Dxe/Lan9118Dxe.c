@@ -1439,7 +1439,7 @@ SnpReceive (
     return EFI_BUFFER_TOO_SMALL;
   }
 
-  // Set the amount of data to be transfered out of FIFO for THIS packet
+  // Set the amount of data to be transferred out of FIFO for THIS packet
   // This can be used to trigger an interrupt, and status can be checked
   RxCfgValue = Lan9118MmioRead32 (LAN9118_RX_CFG);
   RxCfgValue &= ~(RXCFG_RX_DMA_CNT_MASK);

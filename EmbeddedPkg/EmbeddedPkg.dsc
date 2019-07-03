@@ -172,7 +172,7 @@
 # Values are in EFI Pages (4K). DXE Core will make sure that
 # at least this much of each type of memory can be allocated
 # from a single memory range. This way you only end up with
-# maximum of two fragements for each type in the memory map
+# maximum of two fragments for each type in the memory map
 # (the memory used, and the free memory that was prereserved
 # but not used).
 #

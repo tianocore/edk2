@@ -1,6 +1,6 @@
 /** @file
   Library functions that perform file IO. Memory buffer, file system, and
-  fimrware volume operations are supproted.
+  firmware volume operations are supported.
 
   Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
   Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
@@ -12,7 +12,7 @@
   current mounted device concept of current working directory concept implement
   by this library.
 
-  Device names are case insensative and only check the leading characters for
+  Device names are case insensitive and only check the leading characters for
   unique matches. Thus the following are all the same:
     LoadFile0:
     l0:
@@ -24,7 +24,7 @@
   l1:          - EFI LoadFile device one.
   B0:          - EFI BlockIo zero.
   fs3:         - EFI Simple File System device 3
-  Fv2:         - EFI Firmware VOlume device 2
+  Fv2:         - EFI Firmware Volume device 2
   1.2.3.4:name - TFTP IP and file name
 
 **/

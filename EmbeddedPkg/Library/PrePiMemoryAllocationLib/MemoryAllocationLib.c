@@ -180,7 +180,7 @@ AllocatePool (
   // Verify that there is sufficient memory to satisfy the allocation
   //
   if (AllocationSize > 0x10000) {
-    // Please call AllcoatePages for big allocations
+    // Please call AllocatePages for big allocations
     return 0;
   } else {
 

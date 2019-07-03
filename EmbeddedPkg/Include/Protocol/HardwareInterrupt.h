@@ -131,7 +131,7 @@ EFI_STATUS
   );
 
 /**
-  Signal to the hardware that the End Of Intrrupt state
+  Signal to the hardware that the End Of Interrupt state
   has been reached.
 
   @param This     Instance pointer for this protocol

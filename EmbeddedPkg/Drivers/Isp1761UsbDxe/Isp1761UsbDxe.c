@@ -33,7 +33,7 @@
 */
 
 // TODO Make sure the controller isn't sending empty packets when it shouldn't
-// (check behaviour in cases when Buffer Length isn't explcitly set)
+// (check behaviour in cases when Buffer Length isn't explicitly set)
 
 // ISP1582 Datasheet:
 // "Data transfers preceding the status stage must first be fully
@@ -570,7 +570,7 @@ Isp1761PeriphStart (
   mDataReceivedCallback = RxCallback;
   mDataSentCallback = TxCallback;
 
-  // Register a timer event so CheckInterupts gets called periodically
+  // Register a timer event so CheckInterrupts gets called periodically
   Status = gBS->CreateEvent (
                   EVT_TIMER | EVT_NOTIFY_SIGNAL,
                   TPL_CALLBACK,

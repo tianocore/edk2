@@ -634,7 +634,7 @@ SiI3132GetDevice (
     return EFI_UNSUPPORTED;
   } else {
     *Port = ((SATA_DEVICE_PATH*)DevicePath)->Lun;
-    // Return the first Sata Sevice as there should be only one directly connected
+    // Return the first Sata Device as there should be only one directly connected
     *PortMultiplierPort = ((SATA_SI3132_DEVICE*)SataSiI3132Instance->Ports[*Port].Devices.ForwardLink)->Index;
     return EFI_SUCCESS;
   }

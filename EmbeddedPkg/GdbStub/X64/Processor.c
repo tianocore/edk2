@@ -254,7 +254,7 @@ BasicWriteRegister (
  Writes the new value of n-th register received into the input buffer to the n-th register
 
  @param   SystemContext   Register content at time of the exception
- @param   InBuffer      Ponter to the input buffer received from gdb server
+ @param   InBuffer      Pointer to the input buffer received from gdb server
  **/
 VOID
 EFIAPI
@@ -638,7 +638,7 @@ EnableDebugRegister (
 
 
 /**
-  Returns register number 0 - 3 for the maching debug register.
+  Returns register number 0 - 3 for the matching debug register.
   This function compares incoming Address, Type, Length and
   if there is a match then it returns the appropriate register number.
   In case of mismatch, function returns EFI_NOT_FOUND message.

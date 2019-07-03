@@ -135,7 +135,7 @@ LibRtcInitialize (
   )
 {
   //
-  // Do some initialization if reqruied to turn on the RTC
+  // Do some initialization if required to turn on the RTC
   //
   return EFI_SUCCESS;
 }
@@ -159,7 +159,7 @@ LibRtcVirtualNotifyEvent (
   //
   // Only needed if you are going to support the OS calling RTC functions in virtual mode.
   // You will need to call EfiConvertPointer (). To convert any stored physical addresses
-  // to virtual address. After the OS transistions to calling in virtual mode, all future
+  // to virtual address. After the OS transitions to calling in virtual mode, all future
   // runtime calls will be made in virtual mode.
   //
   return;

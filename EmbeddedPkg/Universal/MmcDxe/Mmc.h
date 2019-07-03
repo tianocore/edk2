@@ -255,7 +255,7 @@ typedef struct {
   UINT8   MIN_PERF_W_8_52;                    // Minimum write performance for 8bit at 52MHz [210:210]
   UINT8   RESERVED_18;                        // Reserved [211:211]
   UINT32  SECTOR_COUNT;                       // Sector count [215:212]
-  UINT8   SLEEP_NOTIFICATION_TIME;            // Sleep notification timout [216:216]
+  UINT8   SLEEP_NOTIFICATION_TIME;            // Sleep notification timeout [216:216]
   UINT8   S_A_TIMEOUT;                        // Sleep/awake timeout [217:217]
   UINT8   PRODUCTION_STATE_AWARENESS_TIMEOUT; // Production state awareness timeout [218:218]
   UINT8   S_C_VCCQ;                           // Sleep current (VCCQ) [219:219]

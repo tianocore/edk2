@@ -441,7 +441,7 @@ PrintIoRegisters (
 
   DEBUG ((DEBUG_ERROR, "\nLAN91x I/O Register Dump:\n"));
 
-  // Print currrent bank select register
+  // Print current bank select register
   Value = MmioRead16 (LanDriver->IoBase + LAN91X_BANK_OFFSET);
   DEBUG ((DEBUG_ERROR, "  BankSel: %d  Bank Register %04x (%d)\n",
       LanDriver->BankSel, Value, Value & 0x0007));

@@ -732,7 +732,7 @@ FfsGetVolumeInfo (
   Search through every FV until you find a file of type FileType
 
   @param FileType        File handle of a Fv type file.
-  @param Volumehandle    On succes Volume Handle of the match
+  @param Volumehandle    On success Volume Handle of the match
   @param FileHandle      On success File Handle of the match
 
   @retval EFI_NOT_FOUND  FV image can't be found.
@@ -857,7 +857,7 @@ FfsProcessFvFile (
 
 
   //
-  // Inform HOB consumer phase, i.e. DXE core, the existance of this FV
+  // Inform HOB consumer phase, i.e. DXE core, the existence of this FV
   //
   BuildFvHob ((EFI_PHYSICAL_ADDRESS) (UINTN) FvImageInfo.FvStart, FvImageInfo.FvSize);
 

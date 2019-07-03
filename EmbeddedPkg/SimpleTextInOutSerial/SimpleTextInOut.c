@@ -297,7 +297,7 @@ ReadKeyStroke (
   SerialPortRead ((UINT8 *)&Char, 1);
 
   //
-  // Check for ESC sequence. This code is not techincally correct VT100 code.
+  // Check for ESC sequence. This code is not technically correct VT100 code.
   // An illegal ESC sequence represents an ESC and the characters that follow.
   // This code will eat one or two chars after an escape. This is done to
   // prevent some complex FIFOing of the data. It is good enough to get

@@ -224,7 +224,7 @@ OnReadyToBoot (
   @retval EFI_ALREADY_STARTED     The driver already exists in system.
   @retval EFI_OUT_OF_RESOURCES    Fail to execute entry point due to lack of
                                   resources.
-  @retval EFI_SUCCES              All the related protocols are installed on
+  @retval EFI_SUCCESS             All the related protocols are installed on
                                   the driver.
 
 **/

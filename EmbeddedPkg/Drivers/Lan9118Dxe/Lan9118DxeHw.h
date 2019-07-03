@@ -127,7 +127,7 @@
 #define RXSTATUS_CRC_ERROR                    BIT1                      // Cyclic Redundancy Check Error
 #define RXSTATUS_DB                           BIT2                      // Dribbling bit: Frame had non-integer multiple of 8bits
 #define RXSTATUS_MII_ERROR                    BIT3                      // Receive error during interception
-#define RXSTATUS_RXW_TO                       BIT4                      // Incomming frame larger than 2kb
+#define RXSTATUS_RXW_TO                       BIT4                      // Incoming frame larger than 2kb
 #define RXSTATUS_FT                           BIT5                      // 1: Ether type / 0: 802.3 type frame
 #define RXSTATUS_LCOLL                        BIT6                      // Late collision detected
 #define RXSTATUS_FTL                          BIT7                      // Frame longer than Ether type

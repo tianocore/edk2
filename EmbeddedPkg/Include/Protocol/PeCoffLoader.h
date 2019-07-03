@@ -162,13 +162,13 @@ RETURN_STATUS
 
 
 /**
-  Reapply fixups on a fixed up PE32/PE32+ image to allow virutal calling at EFI
+  Reapply fixups on a fixed up PE32/PE32+ image to allow virtual calling at EFI
   runtime.
 
   This function reapplies relocation fixups to the PE/COFF image specified by ImageBase
   and ImageSize so the image will execute correctly when the PE/COFF image is mapped
   to the address specified by VirtualImageBase. RelocationData must be identical
-  to the FiuxupData buffer from the PE_COFF_LOADER_IMAGE_CONTEXT structure
+  to the FixupData buffer from the PE_COFF_LOADER_IMAGE_CONTEXT structure
   after this PE/COFF image was relocated with PeCoffLoaderRelocateImage().
 
   Note that if the platform does not maintain coherency between the instruction cache(s) and the data

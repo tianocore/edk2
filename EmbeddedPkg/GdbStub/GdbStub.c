@@ -2,7 +2,7 @@
   UEFI driver that implements a GDB stub
 
   Note: Any code in the path of the Serial IO output can not call DEBUG as will
-  will blow out the stack. Serial IO calls DEBUG, debug calls Serail IO, ...
+  will blow out the stack. Serial IO calls DEBUG, debug calls Serial IO, ...
 
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
@@ -260,10 +260,10 @@ TransferFromMemToOutBufAndSend (
   Send a GDB Remote Serial Protocol Packet
 
   $PacketData#checksum PacketData is passed in and this function adds the packet prefix '$',
-  the packet teminating character '#' and the two digit checksum.
+  the packet terminating character '#' and the two digit checksum.
 
   If an ack '+' is not sent resend the packet, but timeout eventually so we don't end up
-  in an infinit loop. This is so if you unplug the debugger code just keeps running
+  in an infinite loop. This is so if you unplug the debugger code just keeps running
 
   @param PacketData   Payload data for the packet
 
@@ -317,7 +317,7 @@ SendPacket (
   Receive a GDB Remote Serial Protocol Packet
 
   $PacketData#checksum PacketData is passed in and this function adds the packet prefix '$',
-  the packet teminating character '#' and the two digit checksum.
+  the packet terminating character '#' and the two digit checksum.
 
   If host re-starts sending a packet without ending the previous packet, only the last valid packet is processed.
   (In other words, if received packet is '$12345$12345$123456#checksum', only '$123456#checksum' will be processed.)
@@ -407,7 +407,7 @@ EmptyBuffer (
  Converts an 8-bit Hex Char into a INTN.
 
  @param   Char the hex character to be converted into UINTN
- @retval  a INTN, from 0 to 15, that corressponds to Char
+ @retval  a INTN, from 0 to 15, that corresponds to Char
  -1 if Char is not a hex character
  **/
 INTN
@@ -596,7 +596,7 @@ ConvertEFItoGDBtype (
 
 
 /** "m addr,length"
- Find the Length of the area to read and the start addres. Finally, pass them to
+ Find the Length of the area to read and the start address. Finally, pass them to
  another function, TransferFromMemToOutBufAndSend, that will read from that memory space and
  send it as a packet.
  **/
@@ -644,7 +644,7 @@ ReadFromMemory (
 
 
 /** "M addr,length :XX..."
- Find the Length of the area in bytes to write and the start addres. Finally, pass them to
+ Find the Length of the area in bytes to write and the start address. Finally, pass them to
  another function, TransferFromInBufToMem, that will write to that memory space the info in
  the input buffer.
  **/
@@ -918,7 +918,7 @@ PeCoffLoaderGetDebuggerInfo (
       break;
     default:
       //
-      // For unknow Machine field, use Magic in optional Header
+      // For unknown Machine field, use Magic in optional Header
       //
       Magic = Hdr.Pe32->OptionalHeader.Magic;
     }
@@ -1088,7 +1088,7 @@ QxferLibrary (
 
 
 /**
- Exception Hanldler for GDB. It will be called for all exceptions
+ Exception Handler for GDB. It will be called for all exceptions
  registered via the gExceptionType[] array.
 
  @param ExceptionType     Exception that is being processed
@@ -1157,7 +1157,7 @@ GdbExceptionHandler (
       case 'q':
         // General Query Packets
         if (AsciiStrnCmp (gInBuffer, "qSupported", 10) == 0) {
-          // return what we currently support, we don't parse what gdb suports
+          // return what we currently support, we don't parse what gdb supports
           AsciiSPrint (gOutBuffer, MAX_BUF_SIZE, "qXfer:libraries:read+;PacketSize=%d", MAX_BUF_SIZE);
           SendPacket (gOutBuffer);
         } else if (AsciiStrnCmp (gInBuffer, "qXfer:libraries:read::", 22) == 0) {

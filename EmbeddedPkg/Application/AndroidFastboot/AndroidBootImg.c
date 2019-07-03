@@ -9,7 +9,7 @@
 #include "AndroidFastbootApp.h"
 
 // Find the kernel and ramdisk in an Android boot.img.
-// return EFI_INVALID_PARAMTER if the boot.img is invalid (i.e. doesn't have the
+// return EFI_INVALID_PARAMETER if the boot.img is invalid (i.e. doesn't have the
 //  right magic value),
 // return EFI_NOT_FOUND if there was no kernel in the boot.img.
 // Note that the Ramdisk is optional - *Ramdisk won't be touched if it isn't

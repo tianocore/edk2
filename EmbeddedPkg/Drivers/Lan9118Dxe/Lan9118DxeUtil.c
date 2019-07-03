@@ -427,7 +427,7 @@ Lan9118Initialize (
   if ((Lan9118MmioRead32 (LAN9118_E2P_CMD) & E2P_EPC_MAC_ADDRESS_LOADED) == 0) {
     DEBUG ((EFI_D_ERROR, "Warning: There was an error detecting EEPROM or loading the MAC Address.\n"));
 
-    // If we had an address before (set by StationAddess), continue to use it
+    // If we had an address before (set by StationAddress), continue to use it
     if (CompareMem (&Snp->Mode->CurrentAddress, &mZeroMac, NET_ETHER_ADDR_LEN)) {
       Lan9118SetMacAddress (&Snp->Mode->CurrentAddress, Snp);
     } else {

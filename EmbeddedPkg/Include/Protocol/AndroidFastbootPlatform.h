@@ -36,7 +36,7 @@ EFI_STATUS
 
 /*
   To be called when Fastboot is finished and we aren't rebooting or booting an
-  image. Undo initialisation, free resrouces.
+  image. Undo initialisation, free resources.
 */
 typedef
 VOID
@@ -49,7 +49,7 @@ VOID
   PartitionName, with the image pointed to by Buffer, whose size is BufferSize.
 
   @param[in] PartitionName  Null-terminated name of partition to write.
-  @param[in] BufferSize     Size of Buffer in byets.
+  @param[in] BufferSize     Size of Buffer in bytes.
   @param[in] Buffer         Data to write to partition.
 
   @retval EFI_NOT_FOUND     No such partition.

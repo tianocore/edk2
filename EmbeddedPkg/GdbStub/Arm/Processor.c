@@ -298,7 +298,7 @@ CHAR8
 /** ‘P n...=r...’
  Writes the new value of n-th register received into the input buffer to the n-th register
  @param   SystemContext   Register content at time of the exception
- @param   InBuffer      Ponter to the input buffer received from gdb server
+ @param   InBuffer      Pointer to the input buffer received from gdb server
  **/
 VOID
 WriteNthRegister (

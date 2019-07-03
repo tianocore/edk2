@@ -173,7 +173,7 @@
 #define PTR_AUTO_INCR   BIT14
 #define PTR_RCV         BIT15
 
-// Interupt Status and Mask Register Bits
+// Interrupt Status and Mask Register Bits
 #define IST_RCV         BIT0
 #define IST_TX          BIT1
 #define IST_TX_EMPTY    BIT2

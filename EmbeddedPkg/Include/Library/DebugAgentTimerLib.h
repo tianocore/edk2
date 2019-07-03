@@ -17,7 +17,7 @@
 /**
   Setup all the hardware needed for the debug agents timer.
 
-  This function is used to set up debug enviroment. It may enable interrupts.
+  This function is used to set up debug environment. It may enable interrupts.
 
 **/
 VOID
