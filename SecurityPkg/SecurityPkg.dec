@@ -453,10 +453,9 @@
   #    BIT1  -  SHA256.<BR>
   #    BIT2  -  SHA384.<BR>
   #    BIT3  -  SHA512.<BR>
-  #    BIT4  -  SM3_256.<BR>
   # @Prompt Hash mask for TPM 2.0
-  # @ValidRange 0x80000001 | 0x00000000 - 0x0000001F
-  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2HashMask|0x0000001F|UINT32|0x00010010
+  # @ValidRange 0x80000001 | 0x00000000 - 0x0000000F
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2HashMask|0x0000000F|UINT32|0x00010010
 
   ## This PCD indicated final BIOS supported Hash mask.
   #    Bios may choose to register a subset of PcdTpm2HashMask.
