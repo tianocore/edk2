@@ -210,7 +210,7 @@ ARCH_LIST = ["IA32",
 ##
 # PCD driver type list items
 #
-PCD_DIRVER_TYPE_LIST = ["PEI_PCD_DRIVER", "DXE_PCD_DRIVER"]
+PCD_DRIVER_TYPE_LIST = ["PEI_PCD_DRIVER", "DXE_PCD_DRIVER"]
 
 ##
 # Boot Mode List Items

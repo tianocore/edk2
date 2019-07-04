@@ -3030,7 +3030,7 @@ class ModuleAutoGen(AutoGen):
                 IncPathList = [NormPath(Path, self.Macros) for Path in BuildOptIncludeRegEx.findall(FlagOption)]
             else:
                 #
-                # RVCT may specify a list of directory seperated by commas
+                # RVCT may specify a list of directory separated by commas
                 #
                 IncPathList = []
                 for Path in BuildOptIncludeRegEx.findall(FlagOption):
@@ -3994,7 +3994,7 @@ class ModuleAutoGen(AutoGen):
     #
     @cached_class_function
     def CreateMakeFile(self, CreateLibraryMakeFile=True, GenFfsList = []):
-        # nest this function inside it's only caller.
+        # nest this function inside its only caller.
         def CreateTimeStamp():
             FileSet = {self.MetaFile.Path}
 

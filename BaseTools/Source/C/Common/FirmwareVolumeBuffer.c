@@ -937,7 +937,7 @@ Arguments:
 
   Fv - Address of the Fv in memory
   Key - Should be 0 to get the first file.  After that, it should be
-        passed back in without modifying it's contents to retrieve
+        passed back in without modifying its contents to retrieve
         subsequent files.
   File - Output file pointer
     File == NULL - invalid parameter
@@ -1323,7 +1323,7 @@ Arguments:
   SectionsStart - Address of the start of the FFS sections array
   TotalSectionsSize - Total size of all the sections
   Key - Should be 0 to get the first section.  After that, it should be
-        passed back in without modifying it's contents to retrieve
+        passed back in without modifying its contents to retrieve
         subsequent files.
   Section - Output section pointer
     (Section == NULL) -> invalid parameter

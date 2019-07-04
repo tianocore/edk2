@@ -863,7 +863,7 @@ def ConvertNOTEQToNE(Expr):
 ## SplitPcdEntry
 #
 # Split an PCD entry string to Token.CName and PCD value and FFE.
-# NOTE: PCD Value and FFE can contain "|" in it's expression. And in INF specification, have below rule.
+# NOTE: PCD Value and FFE can contain "|" in its expression. And in INF specification, have below rule.
 # When using the characters "|" or "||" in an expression, the expression must be encapsulated in
 # open "(" and close ")" parenthesis.
 #

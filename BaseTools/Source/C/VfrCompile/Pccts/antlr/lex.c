@@ -298,7 +298,7 @@ genDefFile( )
 					/* look in all lexclasses for the reg expr */
 
 /* MR10  Derek Pappas                                                */
-/* MR10     A #tokclass doesn't have associated regular expressiones */
+/* MR10     A #tokclass doesn't have associated regular expressions */
 /* MR10        so don't warn user about it's omission                */
 
                     p = (TermEntry *) hash_get(Tname, TokenString(i));

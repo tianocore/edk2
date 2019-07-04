@@ -151,7 +151,7 @@ typedef struct {
 
 ///
 ///  _CR - returns a pointer to the structure
-///      from one of it's elements.
+///      from one of its elements.
 ///
 #define _CR(Record, TYPE, Field)  ((TYPE *) ((CHAR8 *) (Record) - (CHAR8 *) &(((TYPE *) 0)->Field)))
 

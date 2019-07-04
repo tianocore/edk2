@@ -251,7 +251,7 @@ ERR_ASBUILD_PCD_SECTION_TYPE = _("The AsBuilt INF file contains a PCD section ty
 ERR_ASBUILD_PATCHPCD_FORMAT_INVALID = _("The AsBuilt PatchPcd entry must contain 3 elements: PcdName|Value|Offset")
 ERR_ASBUILD_PCDEX_FORMAT_INVALID = _("The AsBuilt PcdEx entry must contain one element: PcdName")
 ERR_ASBUILD_PCD_VALUE_INVALID = \
-    _("The AsBuilt PCD value %s is incorrect or not align with it's datum type %s. "
+    _("The AsBuilt PCD value %s is incorrect or not align with its datum type %s. "
       "It must be corrected before continuing.")
 ERR_ASBUILD_PCD_TOKENSPACE_GUID_VALUE_MISS = _("Package file value could not be retrieved for %s.")
 ERR_ASBUILD_PCD_DECLARITION_MISS = _("PCD Declaration in DEC files could not be found for: %s.")

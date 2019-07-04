@@ -49,7 +49,7 @@ class InfBuildOptionsObject(InfSectionCommonDef):
         InfSectionCommonDef.__init__(self)
     ## SetBuildOptions function
     #
-    # For BuildOptionName, need to validate it's format
+    # For BuildOptionName, need to validate its format
     # For BuildOptionValue, just ignore it.
     #
     # @param  Arch          Indicated which arch of build options belong to.

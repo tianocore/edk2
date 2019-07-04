@@ -104,7 +104,7 @@ class ThreadControl(object):
         while len(self.running) > 0:
             time.sleep(0.1)
         if self.error:
-            print("subprocess not exit sucessfully")
+            print("subprocess not exit successfully")
             print(self.errorMsg)
 
     def startTask(self):

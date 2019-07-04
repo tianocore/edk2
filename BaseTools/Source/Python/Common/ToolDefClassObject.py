@@ -105,7 +105,7 @@ class ToolDefClassObject(object):
 
     ## IncludeToolDefFile
     #
-    # Load target.txt file and parse it as if it's contents were inside the main file
+    # Load target.txt file and parse it as if its contents were inside the main file
     #
     # @param Filename:  Input value for full path of tools_def.txt
     #

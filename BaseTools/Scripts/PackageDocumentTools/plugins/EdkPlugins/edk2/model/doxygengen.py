@@ -792,7 +792,7 @@ class PackageDocumentAction(DoxygenAction):
         Generate page for a module/library.
         @param infObj     INF file object for module/library
         @param configFile doxygen config file object
-        @param isLib      Whether this module is libary
+        @param isLib      Whether this module is library
 
         @param module doxygen page object
         """
