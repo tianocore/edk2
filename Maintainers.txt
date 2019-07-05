@@ -184,9 +184,9 @@ M: Ray Ni <ray.ni@intel.com>
 
 SecurityPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/SecurityPkg
-M: Chao Zhang <chao.b.zhang@intel.com>
 M: Jiewen Yao <jiewen.yao@intel.com>
 M: Jian Wang <jian.j.wang@intel.com>
+R: Chao Zhang <chao.b.zhang@intel.com>
 
 ShellPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/ShellPkg
