@@ -203,7 +203,7 @@ CpuCommonFeaturesLibConstructor (
   if (IsCpuFeatureSupported (CPU_FEATURE_PPIN)) {
     Status = RegisterCpuFeature (
                "PPIN",
-               NULL,
+               PpinGetConfigData,
                PpinSupport,
                PpinInitialize,
                CPU_FEATURE_PPIN,
