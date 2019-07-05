@@ -1,7 +1,7 @@
 /** @file
   CPU Features Initialize functions.
 
-  Copyright (c) 2017 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2017 - 2020, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -105,6 +105,9 @@ CpuInitDataInitialize (
   EFI_CPU_PHYSICAL_LOCATION            *Location;
   BOOLEAN                              *CoresVisited;
   UINTN                                Index;
+  UINT32                               PackageIndex;
+  UINT32                               CoreIndex;
+  UINT32                               First;
   ACPI_CPU_DATA                        *AcpiCpuData;
   CPU_STATUS_INFORMATION               *CpuStatus;
   UINT32                               *ValidCoreCountPerPackage;
@@ -234,6 +237,77 @@ CpuInitDataInitialize (
   ASSERT (CpuFeaturesData->CpuFlags.CoreSemaphoreCount != NULL);
   CpuFeaturesData->CpuFlags.PackageSemaphoreCount = AllocateZeroPool (sizeof (UINT32) * CpuStatus->PackageCount * CpuStatus->MaxCoreCount * CpuStatus->MaxThreadCount);
   ASSERT (CpuFeaturesData->CpuFlags.PackageSemaphoreCount != NULL);
+
+  //
+  // Initialize CpuFeaturesData->InitOrder[].CpuInfo.First
+  //
+
+  //
+  // Set First.Package for each thread belonging to the first package.
+  //
+  First = MAX_UINT32;
+  for (ProcessorNumber = 0; ProcessorNumber < NumberOfCpus; ProcessorNumber++) {
+    Location = &CpuFeaturesData->InitOrder[ProcessorNumber].CpuInfo.ProcessorInfo.Location;
+    First = MIN (Location->Package, First);
+  }
+  for (ProcessorNumber = 0; ProcessorNumber < NumberOfCpus; ProcessorNumber++) {
+    Location = &CpuFeaturesData->InitOrder[ProcessorNumber].CpuInfo.ProcessorInfo.Location;
+    if (Location->Package == First) {
+      CpuFeaturesData->InitOrder[ProcessorNumber].CpuInfo.First.Package = 1;
+    }
+  }
+
+  //
+  // Set First.Die/Tile/Module for each thread assuming:
+  //  single Die under each package, single Tile under each Die, single Module under each Tile
+  //
+  for (ProcessorNumber = 0; ProcessorNumber < NumberOfCpus; ProcessorNumber++) {
+    CpuFeaturesData->InitOrder[ProcessorNumber].CpuInfo.First.Die = 1;
+    CpuFeaturesData->InitOrder[ProcessorNumber].CpuInfo.First.Tile = 1;
+    CpuFeaturesData->InitOrder[ProcessorNumber].CpuInfo.First.Module = 1;
+  }
+
+  for (PackageIndex = 0; PackageIndex < CpuStatus->PackageCount; PackageIndex++) {
+    //
+    // Set First.Core for each thread in the first core of each package.
+    //
+    First = MAX_UINT32;
+    for (ProcessorNumber = 0; ProcessorNumber < NumberOfCpus; ProcessorNumber++) {
+      Location = &CpuFeaturesData->InitOrder[ProcessorNumber].CpuInfo.ProcessorInfo.Location;
+      if (Location->Package == PackageIndex) {
+        First = MIN (Location->Core, First);
+      }
+    }
+
+    for (ProcessorNumber = 0; ProcessorNumber < NumberOfCpus; ProcessorNumber++) {
+      Location = &CpuFeaturesData->InitOrder[ProcessorNumber].CpuInfo.ProcessorInfo.Location;
+      if (Location->Package == PackageIndex && Location->Core == First) {
+        CpuFeaturesData->InitOrder[ProcessorNumber].CpuInfo.First.Core = 1;
+      }
+    }
+  }
+
+  for (PackageIndex = 0; PackageIndex < CpuStatus->PackageCount; PackageIndex++) {
+    for (CoreIndex = 0; CoreIndex < CpuStatus->MaxCoreCount; CoreIndex++) {
+      //
+      // Set First.Thread for the first thread of each core.
+      //
+      First = MAX_UINT32;
+      for (ProcessorNumber = 0; ProcessorNumber < NumberOfCpus; ProcessorNumber++) {
+        Location = &CpuFeaturesData->InitOrder[ProcessorNumber].CpuInfo.ProcessorInfo.Location;
+        if (Location->Package == PackageIndex && Location->Core == CoreIndex) {
+          First = MIN (Location->Thread, First);
+        }
+      }
+
+      for (ProcessorNumber = 0; ProcessorNumber < NumberOfCpus; ProcessorNumber++) {
+        Location = &CpuFeaturesData->InitOrder[ProcessorNumber].CpuInfo.ProcessorInfo.Location;
+        if (Location->Package == PackageIndex && Location->Core == CoreIndex && Location->Thread == First) {
+          CpuFeaturesData->InitOrder[ProcessorNumber].CpuInfo.First.Thread = 1;
+        }
+      }
+    }
+  }
 }
 
 /**
