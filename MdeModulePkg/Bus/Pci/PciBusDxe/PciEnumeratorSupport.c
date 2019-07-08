@@ -116,10 +116,10 @@ DetermineDevicePortType (
   OUT UINT8                            *DevicePortTypePtr
   )
 {
-  EFI_STATUS            Status;
-  UINT8                 Data8 = 0;
-  UINT8                 PcieCapRegOffset;
-  UINT8                 CapRegPtr;
+  EFI_STATUS                   Status;
+  UINT32                       PcieCapRegOffset;
+  UINT32                       CapRegPtr;
+  PCI_REG_PCIE_CAPABILITY      Capability;
 
   if (PciIoDevice == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -142,29 +142,29 @@ DetermineDevicePortType (
     //
     return Status;
   }
+
   if (!EFI_ERROR (Status)) {
     //
     // There is a valid value for PciIoDevice->PciExpressCapabilityOffset
     //
     PcieCapRegOffset = OFFSET_OF(PCI_CAPABILITY_PCIEXP, Capability);
     CapRegPtr = PciIoDevice->PciExpressCapabilityOffset + PcieCapRegOffset;
-    Status = PciIoDevice->PciIo.Pci.Read(
-      &PciIoDevice->PciIo,
-      EfiPciIoWidthUint8,
-      CapRegPtr,
-      1,
-      &Data8
-    );
+    Status = PciIoDevice->PciIo.Pci.Read (
+                                      &PciIoDevice->PciIo,
+                                      EfiPciIoWidthUint16,
+                                      CapRegPtr,
+                                      1,
+                                      &Capability
+                                      );
     if (EFI_ERROR (Status)) {
+      DEBUG((EFI_D_ERROR, "Unable to read Capability register, Status = 0x%x\n", Status));
       return Status;
     }
     if (!EFI_ERROR (Status)) {
       //
-      // Interested in the Device Port Type information, Bits [7:4]
+      // Save the interesting information: Device Port Type, Bits [7:4]
       //
-      Data8 &= EFI_PCIE_CAPABILITY_DEVICE_PORT_TYPE;
-      Data8 >>= EFI_PCIE_CAPABILITY_DEVICE_PORT_TYPE_BIT_OFFSET;
-      (*DevicePortTypePtr) = Data8;
+      (*DevicePortTypePtr) = (UINT8) Capability.Bits.DevicePortType;
     }
   }
   return EFI_SUCCESS;
@@ -209,7 +209,7 @@ ExitConditionsForDeviceNotAriCapable (
       Status = DetermineDevicePortType(Bridge, &ParentDevicePortType);
       if (!EFI_ERROR (Status)) {
         //
-        // If the Parent Device is device type Root Port
+        // If the Parent Device is Root Port device port type
         //
         if (ParentDevicePortType == PCIE_DEVICE_PORT_TYPE_ROOT_PORT) {
           Status = DetermineDevicePortType(PciIoDevice, &DevicePortType);
@@ -221,7 +221,7 @@ ExitConditionsForDeviceNotAriCapable (
                 (DevicePortType == PCIE_DEVICE_PORT_TYPE_PCIE_TO_PCI_BRIDGE) ||
                 (DevicePortType == PCIE_DEVICE_PORT_TYPE_PCIE_ENDPOINT) ||
                 (DevicePortType == PCIE_DEVICE_PORT_TYPE_LEGACY_PCIE_ENDPOINT)) {
-              DEBUG((EFI_D_INFO, "Invalid configuration: PCIe device in BDF[%02x:%02x:%02x] is Not ARI capable\n",
+              DEBUG((EFI_D_INFO, "Invalid config: PCIe device in BDF[%02x:%02x:%02x] is Not ARI capable\n",
                   PciIoDevice->BusNumber, PciIoDevice->DeviceNumber, PciIoDevice->FunctionNumber));
               (*ExitConditions) = TRUE;
             }
@@ -304,6 +304,15 @@ PciPciDeviceInfoCollector (
                    Func,
                    &PciIoDevice
                    );
+
+        if (!PcdGetBool (PcdRootPortAbortsNonZeroNonAriDevices)) {
+          //
+          // Skipping current device if error status
+          //
+          if (EFI_ERROR (Status)) {
+            break;
+          }
+        }
 
         //
         // Recursively scan PCI busses on the other side of PCI-PCI bridges
