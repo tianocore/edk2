@@ -140,3 +140,42 @@ Signed-off-by: Contributor Name <contributor@example.com>
   the change.  Each line should be less than ~70 characters.
 * `Signed-off-by` is the contributor's signature identifying them
   by their real/legal name and their email address.
+
+# Submodules
+
+Submodule in EDK II is allowed but submodule chain should be avoided
+as possible as we can. Currently EDK II contains two submodules
+
+- CryptoPkg/Library/OpensslLib/openssl
+- ArmPkg/Library/ArmSoftFloatLib/berkeley-softfloat-3
+
+The latter one is actually required by previous one. It's inevitable
+in openssl-1.1.1 (since stable201905) for floating point parameter
+conversion, but should be dropped once there's no such need in future
+release of openssl.
+
+To get a full, buildable EDK II repository, use following steps of git
+command
+
+```
+$ git clone https://github.com/tianocore/edk2.git
+$ cd edk2
+$ git submodule update --init
+$ cd ..
+```
+
+If there's update for submodules, use following git commands to get the
+latest submodules code.
+
+```
+$ cd edk2
+$ git pull
+$ git submodule update
+```
+
+Note: When cloning submodule repos, '--recursive' option is not
+recommended. EDK II itself will not use any code/feature from
+submodules in above submodules. So using '--recursive' adds a
+dependency on being able to reach servers we do not actually want
+any code from, as well as needlessly downloading code we will not
+use.
