@@ -18,6 +18,7 @@
 
 [Sources]
   PpttGenerator.c
+  PpttGenerator.h
 
 [Packages]
   EmbeddedPkg/EmbeddedPkg.dec
