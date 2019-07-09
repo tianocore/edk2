@@ -287,10 +287,10 @@ typedef struct AcpiTableGenerator {
   UINT32                                 AcpiTableSignature;
 
   /// The ACPI table revision.
-  UINT32                                 AcpiTableRevision;
+  UINT8                                  AcpiTableRevision;
 
   /// The minimum supported ACPI table revision.
-  UINT32                                 MinAcpiTableRevision;
+  UINT8                                  MinAcpiTableRevision;
 
   /// The ACPI table creator ID.
   UINT32                                 CreatorId;
