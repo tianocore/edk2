@@ -175,7 +175,7 @@ GET_OBJECT_LIST (
   CM_ARM_SERIAL_PORT_INFO
   );
 
-/** Initialize the PL011 UART with the parameters obtained from
+/** Initialize the PL011/SBSA UART with the parameters obtained from
     the Configuration Manager.
 
   @param [in]  SerialPortInfo Pointer to the Serial Port Information.
@@ -353,15 +353,22 @@ BuildDbg2Table (
   AcpiDbg2.Dbg2DeviceInfo[DBG_PORT_INDEX_PORT1].Dbg2Device.PortSubtype =
     SerialPortInfo->PortSubtype;
 
-  // Initialize the serial port
-  Status = SetupDebugUart (SerialPortInfo);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "ERROR: DBG2: Failed to configure debug serial port. Status = %r\n",
-      Status
-      ));
-    goto error_handler;
+  if ((SerialPortInfo->PortSubtype ==
+      EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_ARM_PL011_UART)           ||
+      (SerialPortInfo->PortSubtype ==
+      EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_ARM_SBSA_GENERIC_UART_2X) ||
+      (SerialPortInfo->PortSubtype ==
+      EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_ARM_SBSA_GENERIC_UART)) {
+    // Initialize the serial port
+    Status = SetupDebugUart (SerialPortInfo);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "ERROR: DBG2: Failed to configure debug serial port. Status = %r\n",
+        Status
+        ));
+      goto error_handler;
+    }
   }
 
   *Table = (EFI_ACPI_DESCRIPTION_HEADER*)&AcpiDbg2;
