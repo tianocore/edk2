@@ -109,8 +109,8 @@ ACPI_TABLE_GENERATOR RawGenerator = {
 EFI_STATUS
 EFIAPI
 AcpiRawLibConstructor (
-  IN CONST EFI_HANDLE                ImageHandle,
-  IN       EFI_SYSTEM_TABLE  * CONST SystemTable
+  IN  EFI_HANDLE           ImageHandle,
+  IN  EFI_SYSTEM_TABLE  *  SystemTable
   )
 {
   EFI_STATUS  Status;
@@ -132,8 +132,8 @@ AcpiRawLibConstructor (
 EFI_STATUS
 EFIAPI
 AcpiRawLibDestructor (
-  IN CONST EFI_HANDLE                ImageHandle,
-  IN       EFI_SYSTEM_TABLE  * CONST SystemTable
+  IN  EFI_HANDLE           ImageHandle,
+  IN  EFI_SYSTEM_TABLE  *  SystemTable
   )
 {
   EFI_STATUS  Status;

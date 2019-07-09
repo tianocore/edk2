@@ -1,7 +1,7 @@
 /** @file
   Dynamic Table Factory Dxe
 
-  Copyright (c) 2017 - 2018, ARM Limited. All rights reserved.
+  Copyright (c) 2017 - 2019, ARM Limited. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -60,8 +60,8 @@ EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL DynamicTableFactoryProtocol = {
 EFI_STATUS
 EFIAPI
 DynamicTableFactoryDxeInitialize (
-  IN  EFI_HANDLE                 ImageHandle,
-  IN  EFI_SYSTEM_TABLE   * CONST SystemTable
+  IN  EFI_HANDLE            ImageHandle,
+  IN  EFI_SYSTEM_TABLE   *  SystemTable
   )
 {
   EFI_STATUS  Status;

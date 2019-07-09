@@ -2040,8 +2040,8 @@ ACPI_IORT_GENERATOR IortGenerator = {
 EFI_STATUS
 EFIAPI
 AcpiIortLibConstructor (
-  IN CONST EFI_HANDLE                ImageHandle,
-  IN       EFI_SYSTEM_TABLE  * CONST SystemTable
+  IN  EFI_HANDLE           ImageHandle,
+  IN  EFI_SYSTEM_TABLE  *  SystemTable
   )
 {
   EFI_STATUS  Status;
@@ -2063,8 +2063,8 @@ AcpiIortLibConstructor (
 EFI_STATUS
 EFIAPI
 AcpiIortLibDestructor (
-  IN CONST EFI_HANDLE                ImageHandle,
-  IN       EFI_SYSTEM_TABLE  * CONST SystemTable
+  IN  EFI_HANDLE           ImageHandle,
+  IN  EFI_SYSTEM_TABLE  *  SystemTable
   )
 {
   EFI_STATUS  Status;

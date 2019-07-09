@@ -655,8 +655,8 @@ ProcessAcpiTables (
 EFI_STATUS
 EFIAPI
 DynamicTableManagerDxeInitialize (
-  IN CONST EFI_HANDLE                 ImageHandle,
-  IN       EFI_SYSTEM_TABLE   * CONST SystemTable
+  IN  EFI_HANDLE            ImageHandle,
+  IN  EFI_SYSTEM_TABLE   *  SystemTable
   )
 {
   EFI_STATUS                                 Status;
