@@ -68,7 +68,7 @@ typedef struct CmArmBootArchInfo {
   /** This is the ARM_BOOT_ARCH flags field of the FADT Table
       described in the ACPI Table Specification.
   */
-  UINT32  BootArchFlags;
+  UINT16  BootArchFlags;
 } CM_ARM_BOOT_ARCH_INFO;
 
 /** A structure that describes the
