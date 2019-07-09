@@ -308,8 +308,8 @@ ACPI_TABLE_GENERATOR SpcrGenerator = {
 EFI_STATUS
 EFIAPI
 AcpiSpcrLibConstructor (
-  IN CONST EFI_HANDLE                ImageHandle,
-  IN       EFI_SYSTEM_TABLE  * CONST SystemTable
+  IN  EFI_HANDLE           ImageHandle,
+  IN  EFI_SYSTEM_TABLE  *  SystemTable
   )
 {
   EFI_STATUS  Status;
@@ -331,8 +331,8 @@ AcpiSpcrLibConstructor (
 EFI_STATUS
 EFIAPI
 AcpiSpcrLibDestructor (
-  IN CONST EFI_HANDLE                ImageHandle,
-  IN       EFI_SYSTEM_TABLE  * CONST SystemTable
+  IN  EFI_HANDLE           ImageHandle,
+  IN  EFI_SYSTEM_TABLE  *  SystemTable
   )
 {
   EFI_STATUS  Status;

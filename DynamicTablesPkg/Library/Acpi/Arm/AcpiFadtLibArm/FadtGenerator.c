@@ -648,8 +648,8 @@ ACPI_TABLE_GENERATOR FadtGenerator = {
 EFI_STATUS
 EFIAPI
 AcpiFadtLibConstructor (
-  IN CONST EFI_HANDLE                ImageHandle,
-  IN       EFI_SYSTEM_TABLE  * CONST SystemTable
+  IN  EFI_HANDLE           ImageHandle,
+  IN  EFI_SYSTEM_TABLE  *  SystemTable
   )
 {
   EFI_STATUS  Status;
@@ -671,8 +671,8 @@ AcpiFadtLibConstructor (
 EFI_STATUS
 EFIAPI
 AcpiFadtLibDestructor (
-  IN CONST EFI_HANDLE                ImageHandle,
-  IN       EFI_SYSTEM_TABLE  * CONST SystemTable
+  IN  EFI_HANDLE           ImageHandle,
+  IN  EFI_SYSTEM_TABLE  *  SystemTable
   )
 {
   EFI_STATUS  Status;

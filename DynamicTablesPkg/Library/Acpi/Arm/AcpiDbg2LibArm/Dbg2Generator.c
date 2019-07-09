@@ -418,8 +418,8 @@ ACPI_TABLE_GENERATOR Dbg2Generator = {
 EFI_STATUS
 EFIAPI
 AcpiDbg2LibConstructor (
-  IN CONST EFI_HANDLE                ImageHandle,
-  IN       EFI_SYSTEM_TABLE  * CONST SystemTable
+  IN  EFI_HANDLE           ImageHandle,
+  IN  EFI_SYSTEM_TABLE  *  SystemTable
   )
 {
   EFI_STATUS  Status;
@@ -442,8 +442,8 @@ AcpiDbg2LibConstructor (
 EFI_STATUS
 EFIAPI
 AcpiDbg2LibDestructor (
-  IN CONST EFI_HANDLE                ImageHandle,
-  IN       EFI_SYSTEM_TABLE  * CONST SystemTable
+  IN  EFI_HANDLE           ImageHandle,
+  IN  EFI_SYSTEM_TABLE  *  SystemTable
   )
 {
   EFI_STATUS  Status;
