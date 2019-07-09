@@ -140,8 +140,8 @@ GetItsGroupNodeSize (
   /* Size of ITS Group Node +
      Size of ITS Identifier array
   */
-  return sizeof (EFI_ACPI_6_0_IO_REMAPPING_ITS_NODE) +
-           (Node->ItsIdCount * sizeof (UINT32));
+  return (UINT32)(sizeof (EFI_ACPI_6_0_IO_REMAPPING_ITS_NODE) +
+                    (Node->ItsIdCount * sizeof (UINT32)));
 }
 
 /** Returns the total size required for the ITS Group nodes and
@@ -160,7 +160,7 @@ GetItsGroupNodeSize (
     @retval Total size of the ITS Group Nodes.
 **/
 STATIC
-UINT32
+UINT64
 GetSizeofItsGroupNodes (
   IN      CONST UINT32                         NodeStartOffset,
   IN      CONST CM_ARM_ITS_GROUP_NODE  *       NodeList,
@@ -168,7 +168,7 @@ GetSizeofItsGroupNodes (
   IN OUT        IORT_NODE_INDEXER     ** CONST NodeIndexer
   )
 {
-  UINT32  Size;
+  UINT64  Size;
 
   ASSERT (NodeList != NULL);
 
@@ -176,7 +176,7 @@ GetSizeofItsGroupNodes (
   while (NodeCount-- != 0) {
     (*NodeIndexer)->Token = NodeList->Token;
     (*NodeIndexer)->Object = (VOID*)NodeList;
-    (*NodeIndexer)->Offset = Size + NodeStartOffset;
+    (*NodeIndexer)->Offset = (UINT32)(Size + NodeStartOffset);
     DEBUG ((
       DEBUG_INFO,
       "IORT: Node Indexer = %p, Token = %p, Object = %p, Offset = 0x%x\n",
@@ -211,10 +211,10 @@ GetNamedComponentNodeSize (
      Size of ID mapping array +
      Size of ASCII string + 'padding to 32-bit word aligned'.
   */
-  return sizeof (EFI_ACPI_6_0_IO_REMAPPING_NAMED_COMP_NODE) +
-            (Node->IdMappingCount *
-             sizeof (EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE)) +
-            ALIGN_VALUE (AsciiStrSize (Node->ObjectName), 4);
+  return (UINT32)(sizeof (EFI_ACPI_6_0_IO_REMAPPING_NAMED_COMP_NODE) +
+                    (Node->IdMappingCount *
+                     sizeof (EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE)) +
+                    ALIGN_VALUE (AsciiStrSize (Node->ObjectName), 4));
 }
 
 /** Returns the total size required for the Named Component nodes and
@@ -233,7 +233,7 @@ GetNamedComponentNodeSize (
     @retval Total size of the Named Component nodes.
 **/
 STATIC
-UINT32
+UINT64
 GetSizeofNamedComponentNodes (
   IN      CONST UINT32                              NodeStartOffset,
   IN      CONST CM_ARM_NAMED_COMPONENT_NODE *       NodeList,
@@ -241,7 +241,7 @@ GetSizeofNamedComponentNodes (
   IN OUT        IORT_NODE_INDEXER          ** CONST NodeIndexer
   )
 {
-  UINT32  Size;
+  UINT64  Size;
 
   ASSERT (NodeList != NULL);
 
@@ -249,7 +249,7 @@ GetSizeofNamedComponentNodes (
   while (NodeCount-- != 0) {
     (*NodeIndexer)->Token = NodeList->Token;
     (*NodeIndexer)->Object = (VOID*)NodeList;
-    (*NodeIndexer)->Offset = Size + NodeStartOffset;
+    (*NodeIndexer)->Offset = (UINT32)(Size + NodeStartOffset);
     DEBUG ((
       DEBUG_INFO,
       "IORT: Node Indexer = %p, Token = %p, Object = %p, Offset = 0x%x\n",
@@ -284,9 +284,9 @@ GetRootComplexNodeSize (
   /* Size of Root Complex node +
      Size of ID mapping array
   */
-  return sizeof (EFI_ACPI_6_0_IO_REMAPPING_RC_NODE) +
-           (Node->IdMappingCount *
-            sizeof (EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE));
+  return (UINT32)(sizeof (EFI_ACPI_6_0_IO_REMAPPING_RC_NODE) +
+                    (Node->IdMappingCount *
+                     sizeof (EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE)));
 }
 
 /** Returns the total size required for the Root Complex nodes and
@@ -305,7 +305,7 @@ GetRootComplexNodeSize (
     @retval Total size of the Root Complex nodes.
 **/
 STATIC
-UINT32
+UINT64
 GetSizeofRootComplexNodes (
   IN      CONST UINT32                              NodeStartOffset,
   IN      CONST CM_ARM_ROOT_COMPLEX_NODE    *       NodeList,
@@ -313,7 +313,7 @@ GetSizeofRootComplexNodes (
   IN OUT        IORT_NODE_INDEXER          ** CONST NodeIndexer
   )
 {
-  UINT32  Size;
+  UINT64  Size;
 
   ASSERT (NodeList != NULL);
 
@@ -321,7 +321,7 @@ GetSizeofRootComplexNodes (
   while (NodeCount-- != 0) {
     (*NodeIndexer)->Token = NodeList->Token;
     (*NodeIndexer)->Object = (VOID*)NodeList;
-    (*NodeIndexer)->Offset = Size + NodeStartOffset;
+    (*NodeIndexer)->Offset = (UINT32)(Size + NodeStartOffset);
     DEBUG ((
       DEBUG_INFO,
       "IORT: Node Indexer = %p, Token = %p, Object = %p, Offset = 0x%x\n",
@@ -358,13 +358,13 @@ GetSmmuV1V2NodeSize (
      Size of context interrupt array +
      Size of PMU interrupt array
   */
-  return sizeof (EFI_ACPI_6_0_IO_REMAPPING_SMMU_NODE) +
-           (Node->IdMappingCount *
-            sizeof (EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE)) +
-           (Node->ContextInterruptCount *
-            sizeof (EFI_ACPI_6_0_IO_REMAPPING_SMMU_INT)) +
-           (Node->PmuInterruptCount *
-            sizeof (EFI_ACPI_6_0_IO_REMAPPING_SMMU_INT));
+  return (UINT32)(sizeof (EFI_ACPI_6_0_IO_REMAPPING_SMMU_NODE) +
+                    (Node->IdMappingCount *
+                     sizeof (EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE)) +
+                    (Node->ContextInterruptCount *
+                     sizeof (EFI_ACPI_6_0_IO_REMAPPING_SMMU_INT)) +
+                    (Node->PmuInterruptCount *
+                     sizeof (EFI_ACPI_6_0_IO_REMAPPING_SMMU_INT)));
 }
 
 /** Returns the total size required for the SMMUv1/SMMUv2 nodes and
@@ -383,7 +383,7 @@ GetSmmuV1V2NodeSize (
     @retval Total size of the SMMUv1/SMMUv2 nodes.
 **/
 STATIC
-UINT32
+UINT64
 GetSizeofSmmuV1V2Nodes (
   IN      CONST UINT32                              NodeStartOffset,
   IN      CONST CM_ARM_SMMUV1_SMMUV2_NODE   *       NodeList,
@@ -391,7 +391,7 @@ GetSizeofSmmuV1V2Nodes (
   IN OUT        IORT_NODE_INDEXER          ** CONST NodeIndexer
   )
 {
-  UINT32  Size;
+  UINT64  Size;
 
   ASSERT (NodeList != NULL);
 
@@ -399,7 +399,7 @@ GetSizeofSmmuV1V2Nodes (
   while (NodeCount-- != 0) {
     (*NodeIndexer)->Token = NodeList->Token;
     (*NodeIndexer)->Object = (VOID*)NodeList;
-    (*NodeIndexer)->Offset = Size + NodeStartOffset;
+    (*NodeIndexer)->Offset = (UINT32)(Size + NodeStartOffset);
     DEBUG ((
       DEBUG_INFO,
       "IORT: Node Indexer = %p, Token = %p, Object = %p, Offset = 0x%x\n",
@@ -433,9 +433,9 @@ GetSmmuV3NodeSize (
   /* Size of SMMU v1/SMMU v2 node +
      Size of ID mapping array
   */
-  return sizeof (EFI_ACPI_6_0_IO_REMAPPING_SMMU3_NODE) +
-           (Node->IdMappingCount *
-            sizeof (EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE));
+  return (UINT32)(sizeof (EFI_ACPI_6_0_IO_REMAPPING_SMMU3_NODE) +
+                    (Node->IdMappingCount *
+                     sizeof (EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE)));
 }
 
 /** Returns the total size required for the SMMUv3 nodes and
@@ -454,7 +454,7 @@ GetSmmuV3NodeSize (
     @retval Total size of the SMMUv3 nodes.
 **/
 STATIC
-UINT32
+UINT64
 GetSizeofSmmuV3Nodes (
   IN      CONST UINT32                       NodeStartOffset,
   IN      CONST CM_ARM_SMMUV3_NODE   *       NodeList,
@@ -462,7 +462,7 @@ GetSizeofSmmuV3Nodes (
   IN OUT        IORT_NODE_INDEXER   ** CONST NodeIndexer
   )
 {
-  UINT32  Size;
+  UINT64  Size;
 
   ASSERT (NodeList != NULL);
 
@@ -470,7 +470,7 @@ GetSizeofSmmuV3Nodes (
   while (NodeCount-- != 0) {
     (*NodeIndexer)->Token = NodeList->Token;
     (*NodeIndexer)->Object = (VOID*)NodeList;
-    (*NodeIndexer)->Offset = Size + NodeStartOffset;
+    (*NodeIndexer)->Offset = (UINT32)(Size + NodeStartOffset);
     DEBUG ((
       DEBUG_INFO,
       "IORT: Node Indexer = %p, Token = %p, Object = %p, Offset = 0x%x\n",
@@ -504,9 +504,9 @@ GetPmcgNodeSize (
   /* Size of PMCG node +
      Size of ID mapping array
   */
-  return sizeof (EFI_ACPI_6_0_IO_REMAPPING_PMCG_NODE) +
-           (Node->IdMappingCount *
-            sizeof (EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE));
+  return (UINT32)(sizeof (EFI_ACPI_6_0_IO_REMAPPING_PMCG_NODE) +
+                    (Node->IdMappingCount *
+                     sizeof (EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE)));
 }
 
 /** Returns the total size required for the PMCG nodes and
@@ -525,7 +525,7 @@ GetPmcgNodeSize (
     @retval Total size of the PMCG nodes.
 **/
 STATIC
-UINT32
+UINT64
 GetSizeofPmcgNodes (
   IN      CONST UINT32                     NodeStartOffset,
   IN      CONST CM_ARM_PMCG_NODE   *       NodeList,
@@ -533,7 +533,7 @@ GetSizeofPmcgNodes (
   IN OUT        IORT_NODE_INDEXER ** CONST NodeIndexer
   )
 {
-  UINT32  Size;
+  UINT64  Size;
 
   ASSERT (NodeList != NULL);
 
@@ -541,7 +541,7 @@ GetSizeofPmcgNodes (
   while (NodeCount-- != 0) {
     (*NodeIndexer)->Token = NodeList->Token;
     (*NodeIndexer)->Object = (VOID*)NodeList;
-    (*NodeIndexer)->Offset = Size + NodeStartOffset;
+    (*NodeIndexer)->Offset = (UINT32)(Size + NodeStartOffset);
     DEBUG ((
       DEBUG_INFO,
       "IORT: Node Indexer = %p, Token = %p, Object = %p, Offset = 0x%x\n",
@@ -735,6 +735,7 @@ AddItsGroupNodes (
   CM_ARM_ITS_IDENTIFIER               * ItsIdentifier;
   UINT32                                ItsIdentifierCount;
   UINT32                                IdIndex;
+  UINT64                                NodeLength;
 
   ASSERT (Iort != NULL);
 
@@ -742,9 +743,22 @@ AddItsGroupNodes (
                   NodesStartOffset);
 
   while (NodeCount-- != 0) {
+    NodeLength = GetItsGroupNodeSize (NodeList);
+    if (NodeLength > MAX_UINT16) {
+      Status = EFI_INVALID_PARAMETER;
+      DEBUG ((
+        DEBUG_ERROR,
+        "ERROR: IORT: ITS Id Array Node length 0x%lx > MAX_UINT16."
+        " Status = %r\n",
+        NodeLength,
+        Status
+        ));
+      return Status;
+    }
+
     // Populate the node header
     ItsGroupNode->Node.Type = EFI_ACPI_IORT_TYPE_ITS_GROUP;
-    ItsGroupNode->Node.Length = GetItsGroupNodeSize (NodeList);
+    ItsGroupNode->Node.Length = (UINT16)NodeLength;
     ItsGroupNode->Node.Revision = 0;
     ItsGroupNode->Node.Reserved = EFI_ACPI_RESERVED_DWORD;
     ItsGroupNode->Node.NumIdMappings = 0;
@@ -825,8 +839,9 @@ AddNamedComponentNodes (
   EFI_STATUS                                   Status;
   EFI_ACPI_6_0_IO_REMAPPING_NAMED_COMP_NODE  * NcNode;
   EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE         * IdMapArray;
-  UINT32                                       ObjectNameLenght;
   CHAR8                                      * ObjectName;
+  UINTN                                        ObjectNameLength;
+  UINT64                                       NodeLength;
 
   ASSERT (Iort != NULL);
 
@@ -834,18 +849,30 @@ AddNamedComponentNodes (
             NodesStartOffset);
 
   while (NodeCount-- != 0) {
+    NodeLength = GetNamedComponentNodeSize (NodeList);
+    if (NodeLength > MAX_UINT16) {
+      Status = EFI_INVALID_PARAMETER;
+      DEBUG ((
+        DEBUG_ERROR,
+        "ERROR: IORT: Named Component Node length 0x%lx > MAX_UINT16."
+        " Status = %r\n",
+        NodeLength,
+        Status
+        ));
+      return Status;
+    }
+
     // Populate the node header
     NcNode->Node.Type = EFI_ACPI_IORT_TYPE_NAMED_COMP;
-    NcNode->Node.Length =
-      GetNamedComponentNodeSize (NodeList);
+    NcNode->Node.Length = (UINT16)NodeLength;
     NcNode->Node.Revision = 2;
     NcNode->Node.Reserved = EFI_ACPI_RESERVED_DWORD;
     NcNode->Node.NumIdMappings = NodeList->IdMappingCount;
 
-    ObjectNameLenght = AsciiStrLen (NodeList->ObjectName) + 1;
+    ObjectNameLength = AsciiStrLen (NodeList->ObjectName) + 1;
     NcNode->Node.IdReference =
-      sizeof (EFI_ACPI_6_0_IO_REMAPPING_NAMED_COMP_NODE) +
-      (ALIGN_VALUE (ObjectNameLenght, 4));
+      (UINT32)(sizeof (EFI_ACPI_6_0_IO_REMAPPING_NAMED_COMP_NODE) +
+        (ALIGN_VALUE (ObjectNameLength, 4)));
 
     // Named Component specific data
     NcNode->Flags = NodeList->Flags;
@@ -860,7 +887,7 @@ AddNamedComponentNodes (
       sizeof (EFI_ACPI_6_0_IO_REMAPPING_NAMED_COMP_NODE));
     Status = AsciiStrCpyS (
                ObjectName,
-               ObjectNameLenght,
+               ObjectNameLength,
                NodeList->ObjectName
                );
     if (EFI_ERROR (Status)) {
@@ -936,6 +963,7 @@ AddRootComplexNodes (
   EFI_STATUS                           Status;
   EFI_ACPI_6_0_IO_REMAPPING_RC_NODE  * RcNode;
   EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE * IdMapArray;
+  UINT64                               NodeLength;
 
   ASSERT (Iort != NULL);
 
@@ -943,9 +971,22 @@ AddRootComplexNodes (
             NodesStartOffset);
 
   while (NodeCount-- != 0) {
+    NodeLength = GetRootComplexNodeSize (NodeList);
+    if (NodeLength > MAX_UINT16) {
+      Status = EFI_INVALID_PARAMETER;
+      DEBUG ((
+        DEBUG_ERROR,
+        "ERROR: IORT: Root Complex Node length 0x%lx > MAX_UINT16."
+        " Status = %r\n",
+        NodeLength,
+        Status
+        ));
+      return Status;
+    }
+
     // Populate the node header
     RcNode->Node.Type = EFI_ACPI_IORT_TYPE_ROOT_COMPLEX;
-    RcNode->Node.Length = GetRootComplexNodeSize (NodeList);
+    RcNode->Node.Length = (UINT16)NodeLength;
     RcNode->Node.Revision = 1;
     RcNode->Node.Reserved = EFI_ACPI_RESERVED_DWORD;
     RcNode->Node.NumIdMappings = NodeList->IdMappingCount;
@@ -1093,6 +1134,7 @@ AddSmmuV1V2Nodes (
 
   EFI_ACPI_6_0_IO_REMAPPING_SMMU_INT  * ContextInterruptArray;
   EFI_ACPI_6_0_IO_REMAPPING_SMMU_INT  * PmuInterruptArray;
+  UINT64                                NodeLength;
 
   ASSERT (Iort != NULL);
 
@@ -1100,9 +1142,21 @@ AddSmmuV1V2Nodes (
               NodesStartOffset);
 
   while (NodeCount-- != 0) {
+    NodeLength = GetSmmuV1V2NodeSize (NodeList);
+    if (NodeLength > MAX_UINT16) {
+      Status = EFI_INVALID_PARAMETER;
+      DEBUG ((
+        DEBUG_ERROR,
+        "ERROR: IORT: SMMU V1/V2 Node length 0x%lx > MAX_UINT16. Status = %r\n",
+        NodeLength,
+        Status
+        ));
+      return Status;
+    }
+
     // Populate the node header
     SmmuNode->Node.Type = EFI_ACPI_IORT_TYPE_SMMUv1v2;
-    SmmuNode->Node.Length = GetSmmuV1V2NodeSize (NodeList);
+    SmmuNode->Node.Length = (UINT16)NodeLength;
     SmmuNode->Node.Revision = 0;
     SmmuNode->Node.Reserved = EFI_ACPI_RESERVED_DWORD;
     SmmuNode->Node.NumIdMappings = NodeList->IdMappingCount;
@@ -1239,6 +1293,7 @@ AddSmmuV3Nodes (
   EFI_STATUS                             Status;
   EFI_ACPI_6_0_IO_REMAPPING_SMMU3_NODE * SmmuV3Node;
   EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE   * IdMapArray;
+  UINT64                                 NodeLength;
 
   ASSERT (Iort != NULL);
 
@@ -1246,9 +1301,21 @@ AddSmmuV3Nodes (
                 NodesStartOffset);
 
   while (NodeCount-- != 0) {
+    NodeLength = GetSmmuV3NodeSize (NodeList);
+    if (NodeLength > MAX_UINT16) {
+      Status = EFI_INVALID_PARAMETER;
+      DEBUG ((
+        DEBUG_ERROR,
+        "ERROR: IORT: SMMU V3 Node length 0x%lx > MAX_UINT16. Status = %r\n",
+        NodeLength,
+        Status
+        ));
+      return Status;
+    }
+
     // Populate the node header
     SmmuV3Node->Node.Type = EFI_ACPI_IORT_TYPE_SMMUv3;
-    SmmuV3Node->Node.Length = GetSmmuV3NodeSize (NodeList);
+    SmmuV3Node->Node.Length = (UINT16)NodeLength;
     SmmuV3Node->Node.Revision = 2;
     SmmuV3Node->Node.Reserved = EFI_ACPI_RESERVED_DWORD;
     SmmuV3Node->Node.NumIdMappings = NodeList->IdMappingCount;
@@ -1344,6 +1411,7 @@ AddPmcgNodes (
   EFI_ACPI_6_0_IO_REMAPPING_PMCG_NODE  * PmcgNode;
   EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE   * IdMapArray;
   ACPI_IORT_GENERATOR                  * Generator;
+  UINT64                                 NodeLength;
 
   ASSERT (Iort != NULL);
 
@@ -1352,9 +1420,21 @@ AddPmcgNodes (
               NodesStartOffset);
 
   while (NodeCount-- != 0) {
+    NodeLength = GetPmcgNodeSize (NodeList);
+    if (NodeLength > MAX_UINT16) {
+      Status = EFI_INVALID_PARAMETER;
+      DEBUG ((
+        DEBUG_ERROR,
+        "ERROR: IORT: PMCG Node length 0x%lx > MAX_UINT16. Status = %r\n",
+        NodeLength,
+        Status
+        ));
+      return Status;
+    }
+
     // Populate the node header
     PmcgNode->Node.Type = EFI_ACPI_IORT_TYPE_PMCG;
-    PmcgNode->Node.Length = GetPmcgNodeSize (NodeList);
+    PmcgNode->Node.Length = (UINT16)NodeLength;
     PmcgNode->Node.Revision = 1;
     PmcgNode->Node.Reserved = EFI_ACPI_RESERVED_DWORD;
     PmcgNode->Node.NumIdMappings = NodeList->IdMappingCount;
@@ -1448,9 +1528,11 @@ BuildIortTable (
   )
 {
   EFI_STATUS                             Status;
-  UINT32                                 TableSize;
-  UINT32                                 IortNodeCount;
 
+  UINT64                                 TableSize;
+  UINT64                                 NodeSize;
+
+  UINT32                                 IortNodeCount;
   UINT32                                 ItsGroupNodeCount;
   UINT32                                 NamedComponentNodeCount;
   UINT32                                 RootComplexNodeCount;
@@ -1638,81 +1720,141 @@ BuildIortTable (
 
   // ITS Group Nodes
   if (ItsGroupNodeCount > 0) {
-    ItsGroupOffset = TableSize;
+    ItsGroupOffset = (UINT32)TableSize;
     // Size of ITS Group node list.
-    TableSize += GetSizeofItsGroupNodes (
-                   ItsGroupOffset,
-                   ItsGroupNodeList,
-                   ItsGroupNodeCount,
-                   &NodeIndexer
-                   );
+    NodeSize = GetSizeofItsGroupNodes (
+                 ItsGroupOffset,
+                 ItsGroupNodeList,
+                 ItsGroupNodeCount,
+                 &NodeIndexer
+                 );
+    if (NodeSize > MAX_UINT32) {
+      Status = EFI_INVALID_PARAMETER;
+      DEBUG ((
+        DEBUG_ERROR,
+        "ERROR: IORT: Invalid Size of Group Nodes. Status = %r\n",
+        Status
+        ));
+      goto error_handler;
+    }
+    TableSize += NodeSize;
   }
 
   // Named Component Nodes
   if (NamedComponentNodeCount > 0) {
-    NamedComponentOffset = TableSize;
+    NamedComponentOffset = (UINT32)TableSize;
     // Size of Named Component node list.
-    TableSize += GetSizeofNamedComponentNodes (
-                   NamedComponentOffset,
-                   NamedComponentNodeList,
-                   NamedComponentNodeCount,
-                   &NodeIndexer
-                   );
+    NodeSize = GetSizeofNamedComponentNodes (
+                 NamedComponentOffset,
+                 NamedComponentNodeList,
+                 NamedComponentNodeCount,
+                 &NodeIndexer
+                 );
+    if (NodeSize > MAX_UINT32) {
+      Status = EFI_INVALID_PARAMETER;
+      DEBUG ((
+        DEBUG_ERROR,
+        "ERROR: IORT: Invalid Size of Named Component Nodes. Status = %r\n",
+        Status
+        ));
+      goto error_handler;
+    }
+    TableSize += NodeSize;
   }
 
   // Root Complex Nodes
   if (RootComplexNodeCount > 0) {
-    RootComplexOffset = TableSize;
+    RootComplexOffset = (UINT32)TableSize;
     // Size of Root Complex node list.
-    TableSize += GetSizeofRootComplexNodes (
-                   RootComplexOffset,
-                   RootComplexNodeList,
-                   RootComplexNodeCount,
-                   &NodeIndexer
-                   );
+    NodeSize = GetSizeofRootComplexNodes (
+                 RootComplexOffset,
+                 RootComplexNodeList,
+                 RootComplexNodeCount,
+                 &NodeIndexer
+                 );
+    if (NodeSize > MAX_UINT32) {
+      Status = EFI_INVALID_PARAMETER;
+      DEBUG ((
+        DEBUG_ERROR,
+        "ERROR: IORT: Invalid Size of Root Complex Nodes. Status = %r\n",
+        Status
+        ));
+      goto error_handler;
+    }
+    TableSize += NodeSize;
   }
 
   // SMMUv1/SMMUv2 Nodes
   if (SmmuV1V2NodeCount > 0) {
-    SmmuV1V2Offset = TableSize;
+    SmmuV1V2Offset = (UINT32)TableSize;
     // Size of SMMUv1/SMMUv2 node list.
-    TableSize += GetSizeofSmmuV1V2Nodes (
-                   SmmuV1V2Offset,
-                   SmmuV1V2NodeList,
-                   SmmuV1V2NodeCount,
-                   &NodeIndexer
-                   );
+    NodeSize = GetSizeofSmmuV1V2Nodes (
+                 SmmuV1V2Offset,
+                 SmmuV1V2NodeList,
+                 SmmuV1V2NodeCount,
+                 &NodeIndexer
+                 );
+    if (NodeSize > MAX_UINT32) {
+      Status = EFI_INVALID_PARAMETER;
+      DEBUG ((
+        DEBUG_ERROR,
+        "ERROR: IORT: Invalid Size of SMMUv1/v2 Nodes. Status = %r\n",
+        Status
+        ));
+      goto error_handler;
+    }
+    TableSize += NodeSize;
   }
 
   // SMMUv3 Nodes
   if (SmmuV3NodeCount > 0) {
-    SmmuV3Offset = TableSize;
+    SmmuV3Offset = (UINT32)TableSize;
     // Size of SMMUv3 node list.
-    TableSize += GetSizeofSmmuV3Nodes (
-                   SmmuV3Offset,
-                   SmmuV3NodeList,
-                   SmmuV3NodeCount,
-                   &NodeIndexer
-                   );
+    NodeSize = GetSizeofSmmuV3Nodes (
+                 SmmuV3Offset,
+                 SmmuV3NodeList,
+                 SmmuV3NodeCount,
+                 &NodeIndexer
+                 );
+    if (NodeSize > MAX_UINT32) {
+      Status = EFI_INVALID_PARAMETER;
+      DEBUG ((
+        DEBUG_ERROR,
+        "ERROR: IORT: Invalid Size of SMMUv3 Nodes. Status = %r\n",
+        Status
+        ));
+      goto error_handler;
+    }
+    TableSize += NodeSize;
   }
 
   // PMCG Nodes
   if (PmcgNodeCount > 0) {
-    PmcgOffset = TableSize;
+    PmcgOffset = (UINT32)TableSize;
     // Size of PMCG node list.
-    TableSize += GetSizeofPmcgNodes (
-                   PmcgOffset,
-                   PmcgNodeList,
-                   PmcgNodeCount,
-                   &NodeIndexer
-                   );
+    NodeSize = GetSizeofPmcgNodes (
+                 PmcgOffset,
+                 PmcgNodeList,
+                 PmcgNodeCount,
+                 &NodeIndexer
+                 );
+    if (NodeSize > MAX_UINT32) {
+      Status = EFI_INVALID_PARAMETER;
+      DEBUG ((
+        DEBUG_ERROR,
+        "ERROR: IORT: Invalid Size of PMCG Nodes. Status = %r\n",
+        Status
+        ));
+      goto error_handler;
+    }
+    TableSize += NodeSize;
   }
 
   DEBUG ((
     DEBUG_INFO,
     "INFO: IORT:\n" \
     " IortNodeCount = %d\n" \
-    " TableSize = %d\n",
+    " TableSize = 0x%lx\n",
     IortNodeCount,
     TableSize
     ));
@@ -1765,6 +1907,18 @@ BuildIortTable (
     PmcgOffset
     ));
 
+  if (TableSize > MAX_UINT32) {
+    Status = EFI_INVALID_PARAMETER;
+    DEBUG ((
+      DEBUG_ERROR,
+      "ERROR: IORT: IORT Table Size 0x%lx > MAX_UINT32," \
+      " Status = %r\n",
+      TableSize,
+      Status
+      ));
+    goto error_handler;
+  }
+
   // Allocate the Buffer for IORT table
   *Table = (EFI_ACPI_DESCRIPTION_HEADER*)AllocateZeroPool (TableSize);
   if (*Table == NULL) {
@@ -1783,7 +1937,7 @@ BuildIortTable (
 
   DEBUG ((
     DEBUG_INFO,
-    "IORT: Iort = 0x%p TableSize = 0x%x\n",
+    "IORT: Iort = 0x%p TableSize = 0x%lx\n",
     Iort,
     TableSize
     ));
@@ -1793,7 +1947,7 @@ BuildIortTable (
              This,
              &Iort->Header,
              AcpiTableInfo,
-             TableSize
+             (UINT32)TableSize
              );
   if (EFI_ERROR (Status)) {
     DEBUG ((
