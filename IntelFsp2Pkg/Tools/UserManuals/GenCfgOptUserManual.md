@@ -213,7 +213,7 @@ in the third.
 ```@Bsf NAME:{Variable 1} TYPE:{Combo}```
 
 There is a special **None** type that puts the variable in the **StructDef**
-region of the BSF, but doesn?t put it in any **Page** section. This makes the
+region of the BSF, but doesn't put it in any **Page** section. This makes the
 variable visible to BCT, but not to the end user.
 
 ###HELP

@@ -535,7 +535,7 @@ EndList
                                         Offset = 0
                                     else:
                                         if DscLine.startswith('!'):
-                                            print("ERROR: Unrecoginized directive for line '%s'" % DscLine)
+                                            print("ERROR: Unrecognized directive for line '%s'" % DscLine)
                                             raise SystemExit
             if not Handle:
                 continue
