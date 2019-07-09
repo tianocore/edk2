@@ -15,8 +15,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 LIST_ENTRY  mPciDevicePool;
 
-// MU_CHANGE Begin - Disable BME at Exit Boot Services
-
 /**
  * Disable the bus pointed to by Head.
  *
@@ -36,7 +34,7 @@ DisableBmeOnTree (
   // DisableBME on ExitBootServices should be synchonized with VTd disable - with
   // DisableBME running before VTd disable.  If the VTd disable code runs at TPL_CALLBACK,
   // then DisableBME will run before VTd disable.
-  if (!PcdGetBool (PcdDisableBMEonEBS)) {
+  if (!PcdGetBool (PcdDisableBmeOnEbs)) {
     DEBUG ((DEBUG_WARN, "%a PCI Bus Master enabled due to PCD setting\n", __func__));
     return;
   }
@@ -90,8 +88,6 @@ OnExitBootServices (
   DisableBmeOnTree (&mPciDevicePool);
 }
 
-// MU_CHANGE End
-
 /**
   Initialize the PCI devices pool.
 
@@ -101,12 +97,11 @@ InitializePciDevicePool (
   VOID
   )
 {
-  EFI_EVENT   ExitBootServicesEvent;    // MU_CHANGE
-  EFI_STATUS  Status;                   // MU_CHANGE
+  EFI_EVENT   ExitBootServicesEvent;
+  EFI_STATUS  Status;
 
   InitializeListHead (&mPciDevicePool);
 
-  // MU_CHANGE [Begin] - Disable BME on EBS
   Status = gBS->CreateEventEx (
                   EVT_NOTIFY_SIGNAL,
                   TPL_NOTIFY,
@@ -118,8 +113,6 @@ InitializePciDevicePool (
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Unable to create ExitBootServices event. Code=%r\n", Status));
   }
-
-  // MU_CHANGE [End]
 }
 
 /**
@@ -780,14 +773,11 @@ StartPciDevicesOnBridge (
                              &Supports
                              );
 
-        // MU_CHANGE [Begin] - Defer BME enablement until PCI SetAttributes
-        if (FeaturePcdGet (PcdDeferBME)) {
+        if (FeaturePcdGet (PcdDeferBme)) {
           Supports &= (UINT64)(EFI_PCI_IO_ATTRIBUTE_IO | EFI_PCI_IO_ATTRIBUTE_MEMORY);
         } else {
           Supports &= (UINT64)EFI_PCI_DEVICE_ENABLE;
         }
-
-        // MU_CHANGE [End]
 
         PciIoDevice->PciIo.Attributes (
                              &(PciIoDevice->PciIo),
@@ -837,15 +827,13 @@ StartPciDevicesOnBridge (
                              &Supports
                              );
 
-        // MU_CHANGE Start - Defer BME enablement until PCI SetAttributes
-        if (FeaturePcdGet (PcdDeferBME)) {
+        if (FeaturePcdGet (PcdDeferBme)) {
           Supports &= (UINT64)(EFI_PCI_IO_ATTRIBUTE_IO | EFI_PCI_IO_ATTRIBUTE_MEMORY);
         } else {
           Supports &= (UINT64)EFI_PCI_DEVICE_ENABLE;
         }
 
         // Supports &= (UINT64)EFI_PCI_DEVICE_ENABLE;
-        // MU_CHANGE End
 
         PciIoDevice->PciIo.Attributes (
                              &(PciIoDevice->PciIo),

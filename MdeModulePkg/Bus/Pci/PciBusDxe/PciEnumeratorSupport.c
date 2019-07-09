@@ -1188,7 +1188,7 @@ DetermineDeviceAttribute (
   PCI_IO_DEVICE  *Temp;
   LIST_ENTRY     *CurrentLink;
   EFI_STATUS     Status;
-  UINT16         BridgeSupportsMaster = 0;  // MU_CHANGE
+  UINT16         BridgeSupportsMaster = 0;
 
   //
   // For Root Bridge, just copy it by RootBridgeIo protocol
@@ -1211,12 +1211,9 @@ DetermineDeviceAttribute (
                                       EFI_PCI_IO_ATTRIBUTE_EMBEDDED_ROM |
                                       EFI_PCI_IO_ATTRIBUTE_DUAL_ADDRESS_CYCLE);
 
-    // MU_CHANGE [Start] - Defer BME enablement until Pci SetAttributes
-    if (FeaturePcdGet (PcdDeferBME)) {
+    if (FeaturePcdGet (PcdDeferBme)) {
       PciIoDevice->Supports |= EFI_PCI_IO_ATTRIBUTE_BUS_MASTER;
     }
-
-    // MU_CHANGE [End]
   } else {
     //
     // Set the attributes to be checked for common PCI devices and PPB or P2C
@@ -1228,9 +1225,8 @@ DetermineDeviceAttribute (
               EFI_PCI_COMMAND_BUS_MASTER   |
               EFI_PCI_COMMAND_VGA_PALETTE_SNOOP;
 
-    // MU_CHANGE Start - Defer BME enablement until Pci SetAttributes
     // This ASSUMES all P2P bridges are Bus Master capable
-    if (FeaturePcdGet (PcdDeferBME)) {
+    if (FeaturePcdGet (PcdDeferBme)) {
       if (IS_PCI_BRIDGE (&PciIoDevice->Pci)) {
         Command              &= ~EFI_PCI_COMMAND_BUS_MASTER;
         BridgeSupportsMaster |= EFI_PCI_COMMAND_BUS_MASTER;
@@ -1247,8 +1243,6 @@ DetermineDeviceAttribute (
       }
     }
 
-    // MU_CHANGE End
-
     BridgeControl = EFI_PCI_BRIDGE_CONTROL_ISA | EFI_PCI_BRIDGE_CONTROL_VGA | EFI_PCI_BRIDGE_CONTROL_VGA_16;
 
     //
@@ -1259,7 +1253,7 @@ DetermineDeviceAttribute (
     //
     // Set the supported attributes for specified PCI device
     //
-    PciSetDeviceAttribute (PciIoDevice, Command|BridgeSupportsMaster, BridgeControl, EFI_SET_SUPPORTS); // MU_CHANGE
+    PciSetDeviceAttribute (PciIoDevice, Command|BridgeSupportsMaster, BridgeControl, EFI_SET_SUPPORTS);
 
     //
     // Set the current attributes for specified PCI device

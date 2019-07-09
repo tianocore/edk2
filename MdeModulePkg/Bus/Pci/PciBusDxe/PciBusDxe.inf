@@ -95,14 +95,14 @@
   gEfiLoadedImageDevicePathProtocolGuid           ## CONSUMES
 
 [Guids]
-  gEfiEventExitBootServicesGuid                   ## SOMETIMES_CONSUMES     ## MU_CHANGE
+  gEfiEventExitBootServicesGuid                   ## SOMETIMES_CONSUMES
 
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciBusHotplugDeviceSupport      ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciBridgeIoAlignmentProbe       ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdUnalignedPciIoEnable            ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciDegradeResourceForOptionRom  ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdDeferBME                        ## MU_CHANGE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDeferBme
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdSrIovSystemPageSize         ## SOMETIMES_CONSUMES
@@ -111,7 +111,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdMrIovSupport                ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration    ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPcieResizableBarSupport     ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdDisableBMEonEBS             ## MU_CHANGE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDisableBmeOnEbs
 
 [UserExtensions.TianoCore."ExtraFiles"]
   PciBusDxeExtra.uni

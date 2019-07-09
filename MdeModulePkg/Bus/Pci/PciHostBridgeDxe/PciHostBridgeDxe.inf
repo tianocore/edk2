@@ -39,6 +39,11 @@
   UefiLib
   PciHostBridgeLib
   TimerLib
+  PcdLib
+  ReportStatusCodeLib
+
+[FeaturePcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdRequireIommu
 
 [Protocols]
   gEfiCpuIo2ProtocolGuid                          ## CONSUMES
