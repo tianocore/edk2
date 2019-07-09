@@ -1066,6 +1066,9 @@ BuildPpttTable (
   EFI_STATUS                      Status;
   UINT32                          TableSize;
   UINT32                          ProcTopologyStructCount;
+  UINT32                          ProcHierarchyNodeCount;
+  UINT32                          CacheStructCount;
+  UINT32                          IdStructCount;
 
   UINT32                          ProcHierarchyNodeOffset;
   UINT32                          CacheStructOffset;
@@ -1113,7 +1116,7 @@ BuildPpttTable (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
              &ProcHierarchyNodeList,
-             &Generator->ProcHierarchyNodeCount
+             &ProcHierarchyNodeCount
              );
   if (EFI_ERROR (Status)) {
     DEBUG ((
@@ -1124,7 +1127,8 @@ BuildPpttTable (
     goto error_handler;
   }
 
-  ProcTopologyStructCount = Generator->ProcHierarchyNodeCount;
+  ProcTopologyStructCount = ProcHierarchyNodeCount;
+  Generator->ProcHierarchyNodeCount = ProcHierarchyNodeCount;
 
   // Get the cache info and update the processor topology structure count with
   // Cache Type Structures (Type 1)
@@ -1132,7 +1136,7 @@ BuildPpttTable (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
              &CacheStructList,
-             &Generator->CacheStructCount
+             &CacheStructCount
              );
   if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
     DEBUG ((
@@ -1143,7 +1147,8 @@ BuildPpttTable (
     goto error_handler;
   }
 
-  ProcTopologyStructCount += Generator->CacheStructCount;
+  ProcTopologyStructCount += CacheStructCount;
+  Generator->CacheStructCount = CacheStructCount;
 
   // Get the processor hierarchy node ID info and update the processor topology
   // structure count with ID Structures (Type 2)
@@ -1151,7 +1156,7 @@ BuildPpttTable (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
              &IdStructList,
-             &Generator->IdStructCount
+             &IdStructCount
              );
   if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
     DEBUG ((
@@ -1163,7 +1168,8 @@ BuildPpttTable (
     goto error_handler;
   }
 
-  ProcTopologyStructCount += Generator->IdStructCount;
+  ProcTopologyStructCount += IdStructCount;
+  Generator->IdStructCount = IdStructCount;
 
   // Allocate Node Indexer array
   NodeIndexer = (PPTT_NODE_INDEXER*)AllocateZeroPool (
@@ -1474,6 +1480,12 @@ ACPI_PPTT_GENERATOR PpttGenerator = {
   // PPTT Generator private data
 
   // Processor topology node count
+  0,
+  // Count of Processor Hierarchy Nodes
+  0,
+  // Count of Cache Structures
+  0,
+  // Count of Id Structures
   0,
   // Pointer to PPTT Node Indexer
   NULL
