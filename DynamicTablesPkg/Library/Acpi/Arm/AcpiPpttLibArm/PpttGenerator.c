@@ -1492,8 +1492,8 @@ ACPI_PPTT_GENERATOR PpttGenerator = {
 EFI_STATUS
 EFIAPI
 AcpiPpttLibConstructor (
-  IN CONST EFI_HANDLE                ImageHandle,
-  IN       EFI_SYSTEM_TABLE  * CONST SystemTable
+  IN  EFI_HANDLE           ImageHandle,
+  IN  EFI_SYSTEM_TABLE  *  SystemTable
   )
 {
   EFI_STATUS  Status;
@@ -1516,8 +1516,8 @@ AcpiPpttLibConstructor (
 EFI_STATUS
 EFIAPI
 AcpiPpttLibDestructor (
-  IN CONST EFI_HANDLE                ImageHandle,
-  IN       EFI_SYSTEM_TABLE  * CONST SystemTable
+  IN  EFI_HANDLE           ImageHandle,
+  IN  EFI_SYSTEM_TABLE  *  SystemTable
   )
 {
   EFI_STATUS  Status;

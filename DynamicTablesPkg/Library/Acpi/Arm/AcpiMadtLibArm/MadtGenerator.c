@@ -795,8 +795,8 @@ ACPI_TABLE_GENERATOR MadtGenerator = {
 EFI_STATUS
 EFIAPI
 AcpiMadtLibConstructor (
-  IN CONST EFI_HANDLE                ImageHandle,
-  IN       EFI_SYSTEM_TABLE  * CONST SystemTable
+  IN  EFI_HANDLE           ImageHandle,
+  IN  EFI_SYSTEM_TABLE  *  SystemTable
   )
 {
   EFI_STATUS  Status;
@@ -818,8 +818,8 @@ AcpiMadtLibConstructor (
 EFI_STATUS
 EFIAPI
 AcpiMadtLibDestructor (
-  IN CONST EFI_HANDLE                ImageHandle,
-  IN       EFI_SYSTEM_TABLE  * CONST SystemTable
+  IN  EFI_HANDLE           ImageHandle,
+  IN  EFI_SYSTEM_TABLE  *  SystemTable
   )
 {
   EFI_STATUS  Status;

@@ -329,8 +329,8 @@ ACPI_TABLE_GENERATOR McfgGenerator = {
 EFI_STATUS
 EFIAPI
 AcpiMcfgLibConstructor (
-  IN CONST EFI_HANDLE                ImageHandle,
-  IN       EFI_SYSTEM_TABLE  * CONST SystemTable
+  IN  EFI_HANDLE           ImageHandle,
+  IN  EFI_SYSTEM_TABLE  *  SystemTable
   )
 {
   EFI_STATUS  Status;
@@ -352,8 +352,8 @@ AcpiMcfgLibConstructor (
 EFI_STATUS
 EFIAPI
 AcpiMcfgLibDestructor (
-  IN CONST EFI_HANDLE                ImageHandle,
-  IN       EFI_SYSTEM_TABLE  * CONST SystemTable
+  IN  EFI_HANDLE           ImageHandle,
+  IN  EFI_SYSTEM_TABLE  *  SystemTable
   )
 {
   EFI_STATUS  Status;

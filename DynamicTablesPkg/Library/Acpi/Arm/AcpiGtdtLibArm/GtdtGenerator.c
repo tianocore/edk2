@@ -738,8 +738,8 @@ ACPI_TABLE_GENERATOR GtdtGenerator = {
 EFI_STATUS
 EFIAPI
 AcpiGtdtLibConstructor (
-  IN CONST EFI_HANDLE                ImageHandle,
-  IN       EFI_SYSTEM_TABLE  * CONST SystemTable
+  IN  EFI_HANDLE           ImageHandle,
+  IN  EFI_SYSTEM_TABLE  *  SystemTable
   )
 {
   EFI_STATUS  Status;
@@ -761,8 +761,8 @@ AcpiGtdtLibConstructor (
 EFI_STATUS
 EFIAPI
 AcpiGtdtLibDestructor (
-  IN CONST EFI_HANDLE                ImageHandle,
-  IN       EFI_SYSTEM_TABLE  * CONST SystemTable
+  IN  EFI_HANDLE           ImageHandle,
+  IN  EFI_SYSTEM_TABLE  *  SystemTable
   )
 {
   EFI_STATUS  Status;
