@@ -25,6 +25,7 @@
   DeviceTreeTableFactory/DeviceTreeTableFactory.c
   DynamicTableFactoryDxe.c
   SmbiosTableFactory/SmbiosTableFactory.c
+  DynamicTableFactory.h
 
 [Packages]
   MdePkg/MdePkg.dec
