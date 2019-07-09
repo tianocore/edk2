@@ -259,16 +259,6 @@ AddGTBlockTimerFrames (
   ASSERT (GtBlockFrame != NULL);
   ASSERT (GTBlockTimerFrameList != NULL);
 
-  if (GTBlockFrameCount > 8) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "ERROR: GTDT: GT Block Frame Count %d is greater than 8\n",
-      GTBlockFrameCount
-      ));
-    ASSERT (GTBlockFrameCount <= 8);
-    return EFI_INVALID_PARAMETER;
-  }
-
   IsFrameNumberDuplicated = FindDuplicateValue (
                               GTBlockTimerFrameList,
                               GTBlockFrameCount,
