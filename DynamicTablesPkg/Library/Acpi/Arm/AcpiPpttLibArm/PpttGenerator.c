@@ -504,6 +504,7 @@ AddProcHierarchyNodes (
 
   PPTT_NODE_INDEXER                     * ProcNodeIterator;
   UINT32                                  NodeCount;
+  UINT32                                  Length;
 
   ASSERT (
     (Generator != NULL) &&
@@ -539,8 +540,8 @@ AddProcHierarchyNodes (
     // imposed on the Processor Hierarchy node by the specification.
     // Note: The length field is 8 bit wide while the number of private
     // resource field is 32 bit wide.
-    if ((sizeof (EFI_ACPI_6_3_PPTT_STRUCTURE_PROCESSOR) +
-        (ProcInfoNode->NoOfPrivateResources * sizeof (UINT32))) > MAX_UINT8) {
+    Length = GetProcHierarchyNodeSize (ProcInfoNode);
+    if (Length > MAX_UINT8) {
       Status = EFI_INVALID_PARAMETER;
       DEBUG ((
         DEBUG_ERROR,
@@ -556,7 +557,7 @@ AddProcHierarchyNodes (
 
     // Populate the node header
     ProcStruct->Type = EFI_ACPI_6_3_PPTT_TYPE_PROCESSOR;
-    ProcStruct->Length = GetProcHierarchyNodeSize (ProcInfoNode);
+    ProcStruct->Length = (UINT8)Length;
     ProcStruct->Reserved[0] = EFI_ACPI_RESERVED_BYTE;
     ProcStruct->Reserved[1] = EFI_ACPI_RESERVED_BYTE;
 
