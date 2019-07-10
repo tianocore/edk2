@@ -42,7 +42,7 @@ endif
 export ARCH
 export HOST_ARCH=$(ARCH)
 
-MAKEROOT ?= ..
+MAKEROOT ?= $(EDK_TOOLS_PATH)/Source/C
 
 APPNAME = FCE
 
