@@ -80,8 +80,8 @@ InitializePL031 (
   }
 
   // Ensure interrupts are masked. We do not want RTC interrupts in UEFI
-  if ((MmioRead32 (mPL031RtcBase + PL031_RTC_IMSC_IRQ_MASK_SET_CLEAR_REGISTER) & PL031_SET_IRQ_MASK) != PL031_SET_IRQ_MASK) {
-    MmioOr32 (mPL031RtcBase + PL031_RTC_IMSC_IRQ_MASK_SET_CLEAR_REGISTER, PL031_SET_IRQ_MASK);
+  if ((MmioRead32 (mPL031RtcBase + PL031_RTC_IMSC_IRQ_MASK_SET_CLEAR_REGISTER) & PL031_SET_IRQ_MASK) != 0) {
+    MmioWrite32 (mPL031RtcBase + PL031_RTC_IMSC_IRQ_MASK_SET_CLEAR_REGISTER, 0);
   }
 
   // Clear any existing interrupts
