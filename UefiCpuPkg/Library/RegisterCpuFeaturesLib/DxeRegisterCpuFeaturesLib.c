@@ -229,31 +229,36 @@ CpuFeaturesInitialize (
   OldBspNumber = GetProcessorIndex (CpuFeaturesData);
   CpuFeaturesData->BspNumber = OldBspNumber;
 
-  Status = gBS->CreateEvent (
-                  EVT_NOTIFY_WAIT,
-                  TPL_CALLBACK,
-                  EfiEventEmptyFunction,
-                  NULL,
-                  &MpEvent
-                  );
-  ASSERT_EFI_ERROR (Status);
+  if (CpuFeaturesData->NumberOfCpus > 1) {
+    Status = gBS->CreateEvent (
+                    EVT_NOTIFY_WAIT,
+                    TPL_CALLBACK,
+                    EfiEventEmptyFunction,
+                    NULL,
+                    &MpEvent
+                    );
+    ASSERT_EFI_ERROR (Status);
 
-  //
-  // Wakeup all APs for programming.
-  //
-  StartupAPsWorker (SetProcessorRegister, MpEvent);
+    //
+    // Wakeup all APs for programming.
+    //
+    StartupAPsWorker (SetProcessorRegister, MpEvent);
+  }
+
   //
   // Programming BSP
   //
   SetProcessorRegister (CpuFeaturesData);
 
-  //
-  // Wait all processors to finish the task.
-  //
-  do {
-    Status = gBS->CheckEvent (MpEvent);
-  } while (Status == EFI_NOT_READY);
-  ASSERT_EFI_ERROR (Status);
+  if (CpuFeaturesData->NumberOfCpus > 1) {
+    //
+    // Wait all processors to finish the task.
+    //
+    do {
+      Status = gBS->CheckEvent (MpEvent);
+    } while (Status == EFI_NOT_READY);
+    ASSERT_EFI_ERROR (Status);
+  }
 
   //
   // Switch to new BSP if required

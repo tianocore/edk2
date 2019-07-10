@@ -1071,10 +1071,12 @@ CpuFeaturesDetect (
 
   CpuInitDataInitialize ();
 
-  //
-  // Wakeup all APs for data collection.
-  //
-  StartupAPsWorker (CollectProcessorData, NULL);
+  if (CpuFeaturesData->NumberOfCpus > 1) {
+    //
+    // Wakeup all APs for data collection.
+    //
+    StartupAPsWorker (CollectProcessorData, NULL);
+  }
 
   //
   // Collect data on BSP

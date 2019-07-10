@@ -273,10 +273,13 @@ CpuFeaturesInitialize (
   // DXE type instance.
   //
 
-  //
-  // Wakeup all APs for programming.
-  //
-  StartupAPsWorker (SetProcessorRegister, NULL);
+  if (CpuFeaturesData->NumberOfCpus > 1) {
+    //
+    // Wakeup all APs for programming.
+    //
+    StartupAPsWorker (SetProcessorRegister, NULL);
+  }
+
   //
   // Programming BSP
   //
