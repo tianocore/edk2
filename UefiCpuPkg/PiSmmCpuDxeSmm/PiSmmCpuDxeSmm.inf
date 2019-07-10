@@ -40,6 +40,8 @@
   SmmProfileInternal.h
   SmramSaveState.c
   SmmCpuMemoryManagement.c
+  SmmMp.h
+  SmmMp.c
 
 [Sources.Ia32]
   Ia32/Semaphore.c
@@ -105,6 +107,7 @@
   gEfiSmmReadyToLockProtocolGuid           ## NOTIFY
   gEfiSmmCpuServiceProtocolGuid            ## PRODUCES
   gEdkiiSmmMemoryAttributeProtocolGuid     ## PRODUCES
+  gEfiMmMpProtocolGuid                    ## PRODUCES
 
 [Guids]
   gEfiAcpiVariableGuid                     ## SOMETIMES_CONSUMES ## HOB # it is used for S3 boot.

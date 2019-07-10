@@ -136,11 +136,9 @@ ReleaseAllAPs (
   )
 {
   UINTN                             Index;
-  UINTN                             BspIndex;
 
-  BspIndex = mSmmMpSyncData->BspIndex;
   for (Index = mMaxNumberOfCpus; Index-- > 0;) {
-    if (Index != BspIndex && *(mSmmMpSyncData->CpuData[Index].Present)) {
+    if (IsPresentAp (Index)) {
       ReleaseSemaphore (mSmmMpSyncData->CpuData[Index].Run);
     }
   }
@@ -348,6 +346,165 @@ ReplaceOSMtrrs (
 }
 
 /**
+  Wheck whether task has been finished by all APs.
+
+  @param       BlockMode   Whether did it in block mode or non-block mode.
+
+  @retval      TRUE        Task has been finished by all APs.
+  @retval      FALSE       Task not has been finished by all APs.
+
+**/
+BOOLEAN
+WaitForAllAPsNotBusy (
+  IN BOOLEAN                        BlockMode
+  )
+{
+  UINTN                             Index;
+
+  for (Index = mMaxNumberOfCpus; Index-- > 0;) {
+    //
+    // Ignore BSP and APs which not call in SMM.
+    //
+    if (!IsPresentAp(Index)) {
+      continue;
+    }
+
+    if (BlockMode) {
+      AcquireSpinLock(mSmmMpSyncData->CpuData[Index].Busy);
+      ReleaseSpinLock(mSmmMpSyncData->CpuData[Index].Busy);
+    } else {
+      if (AcquireSpinLockOrFail (mSmmMpSyncData->CpuData[Index].Busy)) {
+        ReleaseSpinLock(mSmmMpSyncData->CpuData[Index].Busy);
+      } else {
+        return FALSE;
+      }
+    }
+  }
+
+  return TRUE;
+}
+
+/**
+  Check whether it is an present AP.
+
+  @param   CpuIndex      The AP index which calls this function.
+
+  @retval  TRUE           It's a present AP.
+  @retval  TRUE           This is not an AP or it is not present.
+
+**/
+BOOLEAN
+IsPresentAp (
+  IN UINTN        CpuIndex
+  )
+{
+  return ((CpuIndex != gSmmCpuPrivate->SmmCoreEntryContext.CurrentlyExecutingCpu) &&
+    *(mSmmMpSyncData->CpuData[CpuIndex].Present));
+}
+
+/**
+  Check whether execute in single AP or all APs.
+
+  Compare two Tokens used by different APs to know whether in StartAllAps call.
+
+  Whether is an valid AP base on AP's Present flag.
+
+  @retval  TRUE      IN StartAllAps call.
+  @retval  FALSE     Not in StartAllAps call.
+
+**/
+BOOLEAN
+InStartAllApsCall (
+  VOID
+  )
+{
+  UINTN      ApIndex;
+  UINTN      ApIndex2;
+
+  for (ApIndex = mMaxNumberOfCpus; ApIndex-- > 0;) {
+    if (IsPresentAp (ApIndex) && (mSmmMpSyncData->CpuData[ApIndex].Token != NULL)) {
+      for (ApIndex2 = ApIndex; ApIndex2-- > 0;) {
+        if (IsPresentAp (ApIndex2) && (mSmmMpSyncData->CpuData[ApIndex2].Token != NULL)) {
+          return mSmmMpSyncData->CpuData[ApIndex2].Token == mSmmMpSyncData->CpuData[ApIndex].Token;
+        }
+      }
+    }
+  }
+
+  return FALSE;
+}
+
+/**
+  Clean up the status flags used during executing the procedure.
+
+  @param   CpuIndex      The AP index which calls this function.
+
+**/
+VOID
+ReleaseToken (
+  IN UINTN                  CpuIndex
+  )
+{
+  UINTN                             Index;
+  BOOLEAN                           Released;
+
+  if (InStartAllApsCall ()) {
+    //
+    // In Start All APs mode, make sure all APs have finished task.
+    //
+    if (WaitForAllAPsNotBusy (FALSE)) {
+      //
+      // Clean the flags update in the function call.
+      //
+      Released = FALSE;
+      for (Index = mMaxNumberOfCpus; Index-- > 0;) {
+        //
+        // Only In SMM APs need to be clean up.
+        //
+        if (mSmmMpSyncData->CpuData[Index].Present && mSmmMpSyncData->CpuData[Index].Token != NULL) {
+          if (!Released) {
+            ReleaseSpinLock (mSmmMpSyncData->CpuData[Index].Token);
+            Released = TRUE;
+          }
+          mSmmMpSyncData->CpuData[Index].Token = NULL;
+        }
+      }
+    }
+  } else {
+    //
+    // In single AP mode.
+    //
+    if (mSmmMpSyncData->CpuData[CpuIndex].Token != NULL) {
+      ReleaseSpinLock (mSmmMpSyncData->CpuData[CpuIndex].Token);
+      mSmmMpSyncData->CpuData[CpuIndex].Token = NULL;
+    }
+  }
+}
+
+/**
+  Free the tokens in the maintained list.
+
+**/
+VOID
+FreeTokens (
+  VOID
+  )
+{
+  LIST_ENTRY            *Link;
+  PROCEDURE_TOKEN       *ProcToken;
+
+  while (!IsListEmpty (&gSmmCpuPrivate->TokenList)) {
+    Link = GetFirstNode (&gSmmCpuPrivate->TokenList);
+    ProcToken = PROCEDURE_TOKEN_FROM_LINK (Link);
+
+    RemoveEntryList (&ProcToken->Link);
+
+    FreePool ((VOID *)ProcToken->ProcedureToken);
+    FreePool (ProcToken);
+  }
+}
+
+/**
   SMI handler for BSP.
 
   @param     CpuIndex         BSP processor Index
@@ -476,12 +633,7 @@ BSPHandler (
   //
   // Make sure all APs have completed their pending none-block tasks
   //
-  for (Index = mMaxNumberOfCpus; Index-- > 0;) {
-    if (Index != CpuIndex && *(mSmmMpSyncData->CpuData[Index].Present)) {
-      AcquireSpinLock (mSmmMpSyncData->CpuData[Index].Busy);
-      ReleaseSpinLock (mSmmMpSyncData->CpuData[Index].Busy);
-    }
-  }
+  WaitForAllAPsNotBusy (TRUE);
 
   //
   // Perform the remaining tasks
@@ -573,6 +725,11 @@ BSPHandler (
   WaitForAllAPs (ApCount);
 
   //
+  // Clean the tokens buffer.
+  //
+  FreeTokens ();
+
+  //
   // Reset BspIndex to -1, meaning BSP has not been elected.
   //
   if (FeaturePcdGet (PcdCpuSmmEnableBspElection)) {
@@ -604,6 +761,7 @@ APHandler (
   UINT64                            Timer;
   UINTN                             BspIndex;
   MTRR_SETTINGS                     Mtrrs;
+  EFI_STATUS                        ProcedureStatus;
 
   //
   // Timeout BSP
@@ -730,14 +888,19 @@ APHandler (
     //
     // Invoke the scheduled procedure
     //
-    (*mSmmMpSyncData->CpuData[CpuIndex].Procedure) (
-      (VOID*)mSmmMpSyncData->CpuData[CpuIndex].Parameter
-      );
+    ProcedureStatus = (*mSmmMpSyncData->CpuData[CpuIndex].Procedure) (
+                          (VOID*)mSmmMpSyncData->CpuData[CpuIndex].Parameter
+                          );
+    if (mSmmMpSyncData->CpuData[CpuIndex].Status != NULL) {
+      *mSmmMpSyncData->CpuData[CpuIndex].Status = ProcedureStatus;
+    }
 
     //
     // Release BUSY
     //
     ReleaseSpinLock (mSmmMpSyncData->CpuData[CpuIndex].Busy);
+
+    ReleaseToken (CpuIndex);
   }
 
   if (SmmCpuFeaturesNeedConfigureMtrrs()) {
@@ -907,12 +1070,123 @@ Gen4GPageTable (
 }
 
 /**
+  Checks whether the input token is the current used token.
+
+  @param[in]  Token      This parameter describes the token that was passed into DispatchProcedure or
+                         BroadcastProcedure.
+
+  @retval TRUE           The input token is the current used token.
+  @retval FALSE          The input token is not the current used token.
+**/
+BOOLEAN
+IsTokenInUse (
+  IN SPIN_LOCK           *Token
+  )
+{
+  LIST_ENTRY        *Link;
+  PROCEDURE_TOKEN   *ProcToken;
+
+  if (Token == NULL) {
+    return FALSE;
+  }
+
+  Link = GetFirstNode (&gSmmCpuPrivate->TokenList);
+  while (!IsNull (&gSmmCpuPrivate->TokenList, Link)) {
+    ProcToken = PROCEDURE_TOKEN_FROM_LINK (Link);
+
+    if (ProcToken->ProcedureToken == Token) {
+      return TRUE;
+    }
+
+    Link = GetNextNode (&gSmmCpuPrivate->TokenList, Link);
+  }
+
+  return FALSE;
+}
+
+/**
+  create token and save it to the maintain list.
+
+  @retval    return the spin lock used as token.
+
+**/
+SPIN_LOCK *
+CreateToken (
+  VOID
+  )
+{
+  PROCEDURE_TOKEN    *ProcToken;
+  SPIN_LOCK           *CpuToken;
+  UINTN               SpinLockSize;
+
+  SpinLockSize = GetSpinLockProperties ();
+  CpuToken = AllocatePool (SpinLockSize);
+  ASSERT (CpuToken != NULL);
+  InitializeSpinLock (CpuToken);
+  AcquireSpinLock (CpuToken);
+
+  ProcToken = AllocatePool (sizeof (PROCEDURE_TOKEN));
+  ASSERT (ProcToken != NULL);
+  ProcToken->Signature = PROCEDURE_TOKEN_SIGNATURE;
+  ProcToken->ProcedureToken = CpuToken;
+
+  InsertTailList (&gSmmCpuPrivate->TokenList, &ProcToken->Link);
+
+  return CpuToken;
+}
+
+/**
+  Checks status of specified AP.
+
+  This function checks whether the specified AP has finished the task assigned
+  by StartupThisAP(), and whether timeout expires.
+
+  @param[in]  Token             This parameter describes the token that was passed into DispatchProcedure or
+                                BroadcastProcedure.
+
+  @retval EFI_SUCCESS           Specified AP has finished task assigned by StartupThisAPs().
+  @retval EFI_NOT_READY         Specified AP has not finished task and timeout has not expired.
+**/
+EFI_STATUS
+IsApReady (
+  IN SPIN_LOCK          *Token
+  )
+{
+  if (AcquireSpinLockOrFail (Token)) {
+    ReleaseSpinLock (Token);
+    return EFI_SUCCESS;
+  }
+
+  return EFI_NOT_READY;
+}
+
+/**
   Schedule a procedure to run on the specified CPU.
 
   @param[in]       Procedure                The address of the procedure to run
   @param[in]       CpuIndex                 Target CPU Index
-  @param[in, out]  ProcArguments            The parameter to pass to the procedure
-  @param[in]       BlockingMode             Startup AP in blocking mode or not
+  @param[in,out]   ProcArguments            The parameter to pass to the procedure
+  @param[in]       Token                    This is an optional parameter that allows the caller to execute the
+                                            procedure in a blocking or non-blocking fashion. If it is NULL the
+                                            call is blocking, and the call will not return until the AP has
+                                            completed the procedure. If the token is not NULL, the call will
+                                            return immediately. The caller can check whether the procedure has
+                                            completed with CheckOnProcedure or WaitForProcedure.
+  @param[in]       TimeoutInMicroseconds    Indicates the time limit in microseconds for the APs to finish
+                                            execution of Procedure, either for blocking or non-blocking mode.
+                                            Zero means infinity. If the timeout expires before all APs return
+                                            from Procedure, then Procedure on the failed APs is terminated. If
+                                            the timeout expires in blocking mode, the call returns EFI_TIMEOUT.
+                                            If the timeout expires in non-blocking mode, the timeout determined
+                                            can be through CheckOnProcedure or WaitForProcedure.
+                                            Note that timeout support is optional. Whether an implementation
+                                            supports this feature can be determined via the Attributes data
+                                            member.
+  @param[in,out]   CpuStatus                This optional pointer may be used to get the status code returned
+                                            by Procedure when it completes execution on the target AP, or with
+                                            EFI_TIMEOUT if the Procedure fails to complete within the optional
+                                            timeout. The implementation will update this variable with
+                                            EFI_NOT_READY prior to starting Procedure on the target AP.
 
   @retval EFI_INVALID_PARAMETER    CpuNumber not valid
   @retval EFI_INVALID_PARAMETER    CpuNumber specifying BSP
@@ -923,10 +1197,12 @@ Gen4GPageTable (
 **/
 EFI_STATUS
 InternalSmmStartupThisAp (
-  IN      EFI_AP_PROCEDURE          Procedure,
-  IN      UINTN                     CpuIndex,
-  IN OUT  VOID                      *ProcArguments OPTIONAL,
-  IN      BOOLEAN                   BlockingMode
+  IN      EFI_AP_PROCEDURE2              Procedure,
+  IN      UINTN                          CpuIndex,
+  IN OUT  VOID                           *ProcArguments OPTIONAL,
+  IN      MM_COMPLETION                  *Token,
+  IN      UINTN                          TimeoutInMicroseconds,
+  IN OUT  EFI_STATUS                     *CpuStatus
   )
 {
   if (CpuIndex >= gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus) {
@@ -952,24 +1228,190 @@ InternalSmmStartupThisAp (
     }
     return EFI_INVALID_PARAMETER;
   }
+  if ((TimeoutInMicroseconds != 0) && ((mSmmMp.Attributes & EFI_MM_MP_TIMEOUT_SUPPORTED) == 0)) {
+    return EFI_INVALID_PARAMETER;
+  }
+  if (Procedure == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
-  if (BlockingMode) {
+  if (Token == NULL) {
     AcquireSpinLock (mSmmMpSyncData->CpuData[CpuIndex].Busy);
   } else {
     if (!AcquireSpinLockOrFail (mSmmMpSyncData->CpuData[CpuIndex].Busy)) {
-      DEBUG((DEBUG_ERROR, "mSmmMpSyncData->CpuData[%d].Busy\n", CpuIndex));
-      return EFI_INVALID_PARAMETER;
+      DEBUG((DEBUG_ERROR, "Can't acquire mSmmMpSyncData->CpuData[%d].Busy\n", CpuIndex));
+      return EFI_NOT_READY;
     }
+
+    *Token = (MM_COMPLETION) CreateToken ();
   }
 
   mSmmMpSyncData->CpuData[CpuIndex].Procedure = Procedure;
   mSmmMpSyncData->CpuData[CpuIndex].Parameter = ProcArguments;
+  if (Token != NULL) {
+    mSmmMpSyncData->CpuData[CpuIndex].Token   = (SPIN_LOCK *)(*Token);
+  }
+  mSmmMpSyncData->CpuData[CpuIndex].Status    = CpuStatus;
+  if (mSmmMpSyncData->CpuData[CpuIndex].Status != NULL) {
+    *mSmmMpSyncData->CpuData[CpuIndex].Status = EFI_NOT_READY;
+  }
+
   ReleaseSemaphore (mSmmMpSyncData->CpuData[CpuIndex].Run);
 
-  if (BlockingMode) {
+  if (Token == NULL) {
     AcquireSpinLock (mSmmMpSyncData->CpuData[CpuIndex].Busy);
     ReleaseSpinLock (mSmmMpSyncData->CpuData[CpuIndex].Busy);
   }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Worker function to execute a caller provided function on all enabled APs.
+
+  @param[in]     Procedure               A pointer to the function to be run on
+                                         enabled APs of the system.
+  @param[in]     TimeoutInMicroseconds   Indicates the time limit in microseconds for
+                                         APs to return from Procedure, either for
+                                         blocking or non-blocking mode.
+  @param[in,out] ProcedureArguments      The parameter passed into Procedure for
+                                         all APs.
+  @param[in,out] Token                   This is an optional parameter that allows the caller to execute the
+                                         procedure in a blocking or non-blocking fashion. If it is NULL the
+                                         call is blocking, and the call will not return until the AP has
+                                         completed the procedure. If the token is not NULL, the call will
+                                         return immediately. The caller can check whether the procedure has
+                                         completed with CheckOnProcedure or WaitForProcedure.
+  @param[in,out] CPUStatus               This optional pointer may be used to get the status code returned
+                                         by Procedure when it completes execution on the target AP, or with
+                                         EFI_TIMEOUT if the Procedure fails to complete within the optional
+                                         timeout. The implementation will update this variable with
+                                         EFI_NOT_READY prior to starting Procedure on the target AP.
+
+
+  @retval EFI_SUCCESS             In blocking mode, all APs have finished before
+                                  the timeout expired.
+  @retval EFI_SUCCESS             In non-blocking mode, function has been dispatched
+                                  to all enabled APs.
+  @retval others                  Failed to Startup all APs.
+
+**/
+EFI_STATUS
+InternalSmmStartupAllAPs (
+  IN       EFI_AP_PROCEDURE2             Procedure,
+  IN       UINTN                         TimeoutInMicroseconds,
+  IN OUT   VOID                          *ProcedureArguments OPTIONAL,
+  IN OUT   MM_COMPLETION                 *Token,
+  IN OUT   EFI_STATUS                    *CPUStatus
+  )
+{
+  UINTN               Index;
+  UINTN               CpuCount;
+
+  if ((TimeoutInMicroseconds != 0) && ((mSmmMp.Attributes & EFI_MM_MP_TIMEOUT_SUPPORTED) == 0)) {
+    return EFI_INVALID_PARAMETER;
+  }
+  if (Procedure == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  CpuCount = 0;
+  for (Index = mMaxNumberOfCpus; Index-- > 0;) {
+    if (IsPresentAp (Index)) {
+      CpuCount ++;
+
+      if (gSmmCpuPrivate->Operation[Index] == SmmCpuRemove) {
+        return EFI_INVALID_PARAMETER;
+      }
+
+      if (!AcquireSpinLockOrFail(mSmmMpSyncData->CpuData[Index].Busy)) {
+        return EFI_NOT_READY;
+      }
+      ReleaseSpinLock (mSmmMpSyncData->CpuData[Index].Busy);
+    }
+  }
+  if (CpuCount == 0) {
+    return EFI_NOT_STARTED;
+  }
+
+  if (Token != NULL) {
+    *Token = (MM_COMPLETION) CreateToken ();
+  }
+
+  //
+  // Make sure all BUSY should be acquired.
+  //
+  // Because former code already check mSmmMpSyncData->CpuData[***].Busy for each AP.
+  // Here code always use AcquireSpinLock instead of AcquireSpinLockOrFail for not
+  // block mode.
+  //
+  for (Index = mMaxNumberOfCpus; Index-- > 0;) {
+    if (IsPresentAp (Index)) {
+      AcquireSpinLock (mSmmMpSyncData->CpuData[Index].Busy);
+    }
+  }
+
+  for (Index = mMaxNumberOfCpus; Index-- > 0;) {
+    if (IsPresentAp (Index)) {
+      mSmmMpSyncData->CpuData[Index].Procedure = (EFI_AP_PROCEDURE2) Procedure;
+      mSmmMpSyncData->CpuData[Index].Parameter = ProcedureArguments;
+      if (Token != NULL) {
+        mSmmMpSyncData->CpuData[Index].Token   = (SPIN_LOCK *)(*Token);
+      }
+      if (CPUStatus != NULL) {
+        mSmmMpSyncData->CpuData[Index].Status    = &CPUStatus[Index];
+        if (mSmmMpSyncData->CpuData[Index].Status != NULL) {
+          *mSmmMpSyncData->CpuData[Index].Status = EFI_NOT_READY;
+        }
+      }
+    } else {
+      //
+      // PI spec requirement:
+      // For every excluded processor, the array entry must contain a value of EFI_NOT_STARTED.
+      //
+      if (CPUStatus != NULL) {
+        CPUStatus[Index] = EFI_NOT_STARTED;
+      }
+    }
+  }
+
+  ReleaseAllAPs ();
+
+  if (Token == NULL) {
+    //
+    // Make sure all APs have completed their tasks.
+    //
+    WaitForAllAPsNotBusy (TRUE);
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  ISO C99 6.5.2.2 "Function calls", paragraph 9:
+  If the function is defined with a type that is not compatible with
+  the type (of the expression) pointed to by the expression that
+  denotes the called function, the behavior is undefined.
+
+  So add below wrapper function to convert between EFI_AP_PROCEDURE
+  and EFI_AP_PROCEDURE2.
+
+  Wrapper for Procedures.
+
+  @param[in]  Buffer              Pointer to PROCEDURE_WRAPPER buffer.
+
+**/
+EFI_STATUS
+EFIAPI
+ProcedureWrapper (
+  IN OUT VOID *Buffer
+  )
+{
+  PROCEDURE_WRAPPER *Wrapper;
+
+  Wrapper = Buffer;
+  Wrapper->Procedure (Wrapper->ProcedureArgument);
+
   return EFI_SUCCESS;
 }
 
@@ -995,7 +1437,15 @@ SmmBlockingStartupThisAp (
   IN OUT  VOID                      *ProcArguments OPTIONAL
   )
 {
-  return InternalSmmStartupThisAp(Procedure, CpuIndex, ProcArguments, TRUE);
+  PROCEDURE_WRAPPER  Wrapper;
+
+  Wrapper.Procedure = Procedure;
+  Wrapper.ProcedureArgument = ProcArguments;
+
+  //
+  // Use wrapper function to convert EFI_AP_PROCEDURE to EFI_AP_PROCEDURE2.
+  //
+  return InternalSmmStartupThisAp (ProcedureWrapper, CpuIndex, &Wrapper, NULL, 0, NULL);
 }
 
 /**
@@ -1020,7 +1470,22 @@ SmmStartupThisAp (
   IN OUT  VOID                      *ProcArguments OPTIONAL
   )
 {
-  return InternalSmmStartupThisAp(Procedure, CpuIndex, ProcArguments, FeaturePcdGet (PcdCpuSmmBlockStartupThisAp));
+  MM_COMPLETION               Token;
+
+  gSmmCpuPrivate->ApWrapperFunc[CpuIndex].Procedure = Procedure;
+  gSmmCpuPrivate->ApWrapperFunc[CpuIndex].ProcedureArgument = ProcArguments;
+
+  //
+  // Use wrapper function to convert EFI_AP_PROCEDURE to EFI_AP_PROCEDURE2.
+  //
+  return InternalSmmStartupThisAp (
+    ProcedureWrapper,
+    CpuIndex,
+    &gSmmCpuPrivate->ApWrapperFunc[CpuIndex],
+    FeaturePcdGet (PcdCpuSmmBlockStartupThisAp) ? NULL : &Token,
+    0,
+    NULL
+    );
 }
 
 /**
@@ -1111,6 +1576,13 @@ SmiRendezvous (
   //
   Cr2 = 0;
   SaveCr2 (&Cr2);
+
+  //
+  // Call the user register Startup function first.
+  //
+  if (mSmmMpSyncData->StartupProcedure != NULL) {
+    mSmmMpSyncData->StartupProcedure (mSmmMpSyncData->StartupProcArgs);
+  }
 
   //
   // Perform CPU specific entry hooks
@@ -1254,6 +1726,21 @@ Exit:
   // Restore Cr2
   //
   RestoreCr2 (Cr2);
+}
+
+/**
+  Allocate buffer for SpinLock and Wrapper function buffer.
+
+**/
+VOID
+InitializeDataForMmMp (
+  VOID
+  )
+{
+  gSmmCpuPrivate->ApWrapperFunc = AllocatePool (sizeof (PROCEDURE_WRAPPER) * gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus);
+  ASSERT (gSmmCpuPrivate->ApWrapperFunc != NULL);
+
+  InitializeListHead (&gSmmCpuPrivate->TokenList);
 }
 
 /**
@@ -1467,5 +1954,42 @@ RegisterSmmEntry (
   // Record SMM Foundation EntryPoint, later invoke it on SMI entry vector.
   //
   gSmmCpuPrivate->SmmCoreEntry = SmmEntryPoint;
+  return EFI_SUCCESS;
+}
+
+/**
+
+  Register the SMM Foundation entry point.
+
+  @param[in]      Procedure            A pointer to the code stream to be run on the designated target AP
+                                       of the system. Type EFI_AP_PROCEDURE is defined below in Volume 2
+                                       with the related definitions of
+                                       EFI_MP_SERVICES_PROTOCOL.StartupAllAPs.
+                                       If caller may pass a value of NULL to deregister any existing
+                                       startup procedure.
+  @param[in]      ProcedureArguments   Allows the caller to pass a list of parameters to the code that is
+                                       run by the AP. It is an optional common mailbox between APs and
+                                       the caller to share information
+
+  @retval EFI_SUCCESS                  The Procedure has been set successfully.
+  @retval EFI_INVALID_PARAMETER        The Procedure is NULL but ProcedureArguments not NULL.
+
+**/
+EFI_STATUS
+RegisterStartupProcedure (
+  IN EFI_AP_PROCEDURE    Procedure,
+  IN VOID                *ProcedureArguments OPTIONAL
+  )
+{
+  if (Procedure == NULL && ProcedureArguments != NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+  if (mSmmMpSyncData == NULL) {
+    return EFI_NOT_READY;
+  }
+
+  mSmmMpSyncData->StartupProcedure = Procedure;
+  mSmmMpSyncData->StartupProcArgs  = ProcedureArguments;
+
   return EFI_SUCCESS;
 }

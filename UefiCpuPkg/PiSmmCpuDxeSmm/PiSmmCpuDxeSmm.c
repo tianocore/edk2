@@ -34,6 +34,8 @@ SMM_CPU_PRIVATE_DATA  mSmmCpuPrivateData = {
     mSmmCpuPrivateData.SmmReservedSmramRegion,  // SmmConfiguration.SmramReservedRegions
     RegisterSmmEntry                            // SmmConfiguration.RegisterSmmEntry
   },
+  NULL,                                         // pointer to Ap Wrapper Func array
+  {NULL, NULL},                                 // List_Entry for Tokens.
 };
 
 CPU_HOT_PLUG_DATA mCpuHotPlugData = {
@@ -993,6 +995,22 @@ PiCpuSmmEntry (
                     &gEdkiiSmmMemoryAttributeProtocolGuid,
                     EFI_NATIVE_INTERFACE,
                     &mSmmMemoryAttribute
+                    );
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Initialize global buffer for MM MP.
+  //
+  InitializeDataForMmMp ();
+
+  //
+  // Install the SMM Mp Protocol into SMM protocol database
+  //
+  Status = gSmst->SmmInstallProtocolInterface (
+                    &mSmmCpuHandle,
+                    &gEfiMmMpProtocolGuid,
+                    EFI_NATIVE_INTERFACE,
+                    &mSmmMp
                     );
   ASSERT_EFI_ERROR (Status);
 
