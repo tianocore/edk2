@@ -12,7 +12,6 @@ LIBRARIES = Common
 APPLICATIONS = \
   VfrCompile \
   BrotliCompress \
-  FMMT \
   BfmLib \
   EfiRom \
   FCE \

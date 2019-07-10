@@ -47,7 +47,6 @@ VFRAUTOGEN = VfrCompile/VfrLexer.h
 APPLICATIONS = \
   BrotliCompress \
   VfrCompile \
-  FMMT \
   BfmLib \
   EfiRom \
   FCE \
