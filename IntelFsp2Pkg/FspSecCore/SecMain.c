@@ -110,7 +110,7 @@ SecStartup (
   // |-------------------|---->
   // |                   |
   // |                   |
-  // |      Heap         |    PeiTemporayRamSize
+  // |      Heap         |    PeiTemporaryRamSize
   // |                   |
   // |                   |
   // |-------------------|---->  TempRamBase

@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2019, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -52,8 +52,8 @@ IsDefaultType (
   @param[in]  BaseAddress     Base address.
   @param[in]  Size            Size.
 
-  @retval Zero      Alligned.
-  @retval Non-Zero  Not alligned.
+  @retval Zero      Aligned.
+  @retval Non-Zero  Not aligned.
 
 **/
 UINT32
@@ -217,7 +217,7 @@ Power2MaxMemory (
   }
 
   //
-  // Compute inital power of 2 size to return
+  // Compute initial power of 2 size to return
   //
   Result = GetPowerOfTwo64(MemoryLength);
 
@@ -247,8 +247,8 @@ Power2MaxMemory (
   @param[in]  BaseAddress     Base address.
   @param[in]  Size            Size.
 
-  @retval Zero      Alligned.
-  @retval Non-Zero  Not alligned.
+  @retval Zero      Aligned.
+  @retval Non-Zero  Not aligned.
 
 **/
 UINT32

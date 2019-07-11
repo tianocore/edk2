@@ -160,7 +160,7 @@ class Symbols:
     #
     def createDicts (self, fvDir, fvNames):
         #
-        # If the fvDir is not a dirctory, then raise an exception
+        # If the fvDir is not a directory, then raise an exception
         #
         if not os.path.isdir(fvDir):
             raise Exception ("'%s' is not a valid directory!" % FvDir)
