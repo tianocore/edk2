@@ -1912,8 +1912,8 @@ class PlatformAutoGen(AutoGen):
                     else:
                         ToolsDef += "%s_%s = %s\n" % (Tool, Attr, Value)
             ToolsDef += "\n"
-
-        SaveFileOnChange(self.ToolDefinitionFile, ToolsDef, False)
+        tool_def_file = os.path.join(self.MakeFileDir, "TOOLS_DEF." + self.Arch)
+        SaveFileOnChange(tool_def_file, ToolsDef, False)
         for DllPath in DllPathList:
             os.environ["PATH"] = DllPath + os.pathsep + os.environ["PATH"]
         os.environ["MAKE_FLAGS"] = MakeFlags
@@ -1923,7 +1923,10 @@ class PlatformAutoGen(AutoGen):
     ## Return the paths of tools
     @cached_property
     def ToolDefinitionFile(self):
-        return os.path.join(self.MakeFileDir, "TOOLS_DEF." + self.Arch)
+        tool_def_file = os.path.join(self.MakeFileDir, "TOOLS_DEF." + self.Arch)
+        if not os.path.exists(tool_def_file):
+            self.ToolDefinition
+        return tool_def_file
 
     ## Retrieve the toolchain family of given toolchain tag. Default to 'MSFT'.
     @cached_property
