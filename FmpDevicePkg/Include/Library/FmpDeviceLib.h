@@ -73,7 +73,7 @@ RegisterFmpInstaller (
   @retval EFI_INVALID_PARAMETER  Size is NULL.
   @retval EFI_UNSUPPORTED        The firmware device does not support reporting
                                  the size of the currently stored firmware image.
-  @retval EFI_DEVICE_ERROR       An error occured attempting to determine the
+  @retval EFI_DEVICE_ERROR       An error occurred attempting to determine the
                                  size of the firmware image currently stored in
                                  in the firmware device.
 

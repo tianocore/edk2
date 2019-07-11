@@ -139,7 +139,7 @@ DetectTestKey (
   }
 
   //
-  // If test key detected or an error occured checking for the test key, then
+  // If test key detected or an error occurred checking for the test key, then
   // set PcdTestKeyUsed to TRUE.
   //
   if (TestKeyUsed) {
