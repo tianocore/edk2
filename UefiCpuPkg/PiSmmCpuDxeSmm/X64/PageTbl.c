@@ -571,7 +571,7 @@ ReclaimPages (
   //
   // First, find the leaf entry has the smallest access record value
   //
-  for (Pml5Index = 0; Pml5Index < Enable5LevelPaging ? (EFI_PAGE_SIZE / sizeof (*Pml4)) : 1; Pml5Index++) {
+  for (Pml5Index = 0; Pml5Index < (Enable5LevelPaging ? (EFI_PAGE_SIZE / sizeof (*Pml4)) : 1); Pml5Index++) {
     if ((Pml5[Pml5Index] & IA32_PG_P) == 0 || (Pml5[Pml5Index] & IA32_PG_PMNT) != 0) {
       //
       // If the PML5 entry is not present or is masked, skip it
