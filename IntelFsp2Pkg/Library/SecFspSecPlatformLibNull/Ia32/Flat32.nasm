@@ -2,7 +2,7 @@
 ;  This is the code that goes from real-mode to protected mode.
 ;  It consumes the reset vector, configures the stack.
 ;
-; Copyright (c) 2015 - 2019, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
 ; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;;
 
@@ -54,7 +54,7 @@ ASM_PFX(SecPlatformInit):
 ;               esp
 ;
 ; Description:
-;               Perform any essential early platform initialisation
+;               Perform any essential early platform initilaisation
 ;               Setup a stack
 ;
 ;----------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 ;------------------------------------------------------------------------------
 ;
-; Copyright (c) 2015 - 2019, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
 ; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;
 ; Abstract:
@@ -58,7 +58,7 @@ ASM_PFX(SecSwitchStack):
     mov   esp, eax                     ; From now, esp is pointed to permanent memory
 
     ;
-    ; Fixup the ebp point to permanent memory
+    ; Fixup the ebp point to permenent memory
     ;
     mov   eax, ebp
     sub   eax, ebx

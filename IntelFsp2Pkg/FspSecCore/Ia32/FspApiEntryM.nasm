@@ -194,9 +194,9 @@ StackSetupDone:
 
   ;
   ; Pass BFV into the PEI Core
-  ; It uses relative address to calculate the actual boot FV base
+  ; It uses relative address to calucate the actual boot FV base
   ; For FSP implementation with single FV, PcdFspBootFirmwareVolumeBase and
-  ; PcdFspAreaBaseAddress are the same. For FSP with multiple FVs,
+  ; PcdFspAreaBaseAddress are the same. For FSP with mulitple FVs,
   ; they are different. The code below can handle both cases.
   ;
   call    ASM_PFX(AsmGetFspBaseAddress)

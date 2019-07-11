@@ -1,11 +1,11 @@
 ;------------------------------------------------------------------------------
 ;
-; Copyright (c) 2016 - 2019, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
 ; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;
 ; Abstract:
 ;
-;   Switch the stack from temporary memory to permanent memory.
+;   Switch the stack from temporary memory to permenent memory.
 ;
 ;------------------------------------------------------------------------------
 
