@@ -246,19 +246,20 @@ CpuInitDataInitialize (
 
   @param[in]  SupportedFeatureMask  The pointer to CPU feature bits mask buffer
   @param[in]  OrFeatureBitMask      The feature bit mask to do OR operation
+  @param[in]  BitMaskSize           The CPU feature bits mask buffer size.
+
 **/
 VOID
 SupportedMaskOr (
   IN UINT8               *SupportedFeatureMask,
-  IN UINT8               *OrFeatureBitMask
+  IN UINT8               *OrFeatureBitMask,
+  IN UINT32              BitMaskSize
   )
 {
   UINTN                  Index;
-  UINTN                  BitMaskSize;
   UINT8                  *Data1;
   UINT8                  *Data2;
 
-  BitMaskSize = PcdGetSize (PcdCpuFeaturesSetting);
   Data1 = SupportedFeatureMask;
   Data2 = OrFeatureBitMask;
   for (Index = 0; Index < BitMaskSize; Index++) {
@@ -384,12 +385,14 @@ CollectProcessorData (
       //
       SupportedMaskOr (
         CpuFeaturesData->InitOrder[ProcessorNumber].FeaturesSupportedMask,
-        CpuFeature->FeatureMask
+        CpuFeature->FeatureMask,
+        CpuFeaturesData->BitMaskSize
         );
     } else if (CpuFeature->SupportFunc (ProcessorNumber, CpuInfo, CpuFeature->ConfigData)) {
       SupportedMaskOr (
         CpuFeaturesData->InitOrder[ProcessorNumber].FeaturesSupportedMask,
-        CpuFeature->FeatureMask
+        CpuFeature->FeatureMask,
+        CpuFeaturesData->BitMaskSize
         );
     }
     Entry = Entry->ForwardLink;

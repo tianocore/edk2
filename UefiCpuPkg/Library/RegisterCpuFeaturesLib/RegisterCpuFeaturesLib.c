@@ -658,6 +658,11 @@ RegisterCpuFeatureWorker (
     InitializeListHead (&CpuFeaturesData->FeatureList);
     InitializeSpinLock (&CpuFeaturesData->CpuFlags.MemoryMappedLock);
     InitializeSpinLock (&CpuFeaturesData->CpuFlags.ConsoleLogLock);
+    //
+    // Driver has assumption that these three PCD should has same buffer size.
+    //
+    ASSERT (PcdGetSize (PcdCpuFeaturesSetting) == PcdGetSize (PcdCpuFeaturesCapability));
+    ASSERT (PcdGetSize (PcdCpuFeaturesSetting) == PcdGetSize (PcdCpuFeaturesSupport));
     CpuFeaturesData->BitMaskSize = (UINT32) BitMaskSize;
   }
   ASSERT (CpuFeaturesData->BitMaskSize == BitMaskSize);
