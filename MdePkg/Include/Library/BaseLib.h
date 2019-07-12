@@ -5324,8 +5324,7 @@ typedef union {
     UINT32  OSXMMEXCPT:1;   ///< Operating System Support for
                             ///< Unmasked SIMD Floating Point
                             ///< Exceptions.
-    UINT32  Reserved_2:1;   ///< Reserved.
-    UINT32  LA57:1;         ///< Linear Address 57bit.
+    UINT32  Reserved_0:2;   ///< Reserved.
     UINT32  VMXE:1;         ///< VMX Enable
     UINT32  Reserved_1:18;  ///< Reserved.
   } Bits;
