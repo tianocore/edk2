@@ -69,7 +69,6 @@ extern ASM_PFX(mXdSupported)
 global ASM_PFX(gPatchXdSupported)
 global ASM_PFX(gPatchSmiStack)
 global ASM_PFX(gPatchSmiCr3)
-global ASM_PFX(gPatch5LevelPagingSupport)
 global ASM_PFX(gcSmiHandlerTemplate)
 global ASM_PFX(gcSmiHandlerSize)
 
@@ -125,17 +124,6 @@ ProtFlatMode:
 ASM_PFX(gPatchSmiCr3):
     mov     cr3, rax
     mov     eax, 0x668                   ; as cr4.PGE is not set here, refresh cr3
-
-    mov     cl, strict byte 0            ; source operand will be patched
-ASM_PFX(gPatch5LevelPagingSupport):
-    cmp     cl, 0
-    je      SkipEnable5LevelPaging
-    ;
-    ; Enable 5-Level Paging bit
-    ;
-    bts     eax, 12                     ; Set LA57 bit (bit #12)
-SkipEnable5LevelPaging:
-
     mov     cr4, rax                    ; in PreModifyMtrrs() to flush TLB.
 ; Load TSS
     sub     esp, 8                      ; reserve room in stack

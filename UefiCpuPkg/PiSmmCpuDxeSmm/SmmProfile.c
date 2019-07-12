@@ -534,78 +534,43 @@ InitPaging (
   VOID
   )
 {
-  UINT64                            Pml5Entry;
-  UINT64                            Pml4Entry;
-  UINT64                            *Pml5;
   UINT64                            *Pml4;
   UINT64                            *Pdpt;
   UINT64                            *Pd;
   UINT64                            *Pt;
   UINTN                             Address;
-  UINTN                             Pml5Index;
   UINTN                             Pml4Index;
   UINTN                             PdptIndex;
   UINTN                             PdIndex;
   UINTN                             PtIndex;
   UINTN                             NumberOfPdptEntries;
   UINTN                             NumberOfPml4Entries;
-  UINTN                             NumberOfPml5Entries;
   UINTN                             SizeOfMemorySpace;
   BOOLEAN                           Nx;
-  IA32_CR4                          Cr4;
-  BOOLEAN                           Enable5LevelPaging;
-
-  Cr4.UintN = AsmReadCr4 ();
-  Enable5LevelPaging = (BOOLEAN) (Cr4.Bits.LA57 == 1);
 
   if (sizeof (UINTN) == sizeof (UINT64)) {
-    if (!Enable5LevelPaging) {
-      Pml5Entry = (UINTN) mSmmProfileCr3 | IA32_PG_P;
-      Pml5 = &Pml5Entry;
-    } else {
-      Pml5 = (UINT64*) (UINTN) mSmmProfileCr3;
-    }
+    Pml4 = (UINT64*)(UINTN)mSmmProfileCr3;
     SizeOfMemorySpace = HighBitSet64 (gPhyMask) + 1;
     //
     // Calculate the table entries of PML4E and PDPTE.
     //
-    NumberOfPml5Entries = 1;
-    if (SizeOfMemorySpace > 48) {
-      NumberOfPml5Entries = (UINTN) LShiftU64 (1, SizeOfMemorySpace - 48);
-      SizeOfMemorySpace = 48;
+    if (SizeOfMemorySpace <= 39 ) {
+      NumberOfPml4Entries = 1;
+      NumberOfPdptEntries = (UINT32)LShiftU64 (1, (SizeOfMemorySpace - 30));
+    } else {
+      NumberOfPml4Entries = (UINT32)LShiftU64 (1, (SizeOfMemorySpace - 39));
+      NumberOfPdptEntries = 512;
     }
-
-    NumberOfPml4Entries = 1;
-    if (SizeOfMemorySpace > 39) {
-      NumberOfPml4Entries = (UINTN) LShiftU64 (1, SizeOfMemorySpace - 39);
-      SizeOfMemorySpace = 39;
-    }
-
-    NumberOfPdptEntries = 1;
-    ASSERT (SizeOfMemorySpace > 30);
-    NumberOfPdptEntries = (UINTN) LShiftU64 (1, SizeOfMemorySpace - 30);
   } else {
-    Pml4Entry = (UINTN) mSmmProfileCr3 | IA32_PG_P;
-    Pml4 = &Pml4Entry;
-    Pml5Entry = (UINTN) Pml4 | IA32_PG_P;
-    Pml5 = &Pml5Entry;
-    NumberOfPml5Entries  = 1;
-    NumberOfPml4Entries  = 1;
+    NumberOfPml4Entries = 1;
     NumberOfPdptEntries  = 4;
   }
 
   //
   // Go through page table and change 2MB-page into 4KB-page.
   //
-  for (Pml5Index = 0; Pml5Index < NumberOfPml5Entries; Pml5Index++) {
-    if ((Pml5[Pml5Index] & IA32_PG_P) == 0) {
-      //
-      // If PML5 entry does not exist, skip it
-      //
-      continue;
-    }
-    Pml4 = (UINT64 *) (UINTN) (Pml5[Pml5Index] & PHYSICAL_ADDRESS_MASK);
-    for (Pml4Index = 0; Pml4Index < NumberOfPml4Entries; Pml4Index++) {
+  for (Pml4Index = 0; Pml4Index < NumberOfPml4Entries; Pml4Index++) {
+    if (sizeof (UINTN) == sizeof (UINT64)) {
       if ((Pml4[Pml4Index] & IA32_PG_P) == 0) {
         //
         // If PML4 entry does not exist, skip it
@@ -613,76 +578,63 @@ InitPaging (
         continue;
       }
       Pdpt = (UINT64 *)(UINTN)(Pml4[Pml4Index] & ~mAddressEncMask & PHYSICAL_ADDRESS_MASK);
-      for (PdptIndex = 0; PdptIndex < NumberOfPdptEntries; PdptIndex++, Pdpt++) {
-        if ((*Pdpt & IA32_PG_P) == 0) {
+    } else {
+      Pdpt = (UINT64*)(UINTN)mSmmProfileCr3;
+    }
+    for (PdptIndex = 0; PdptIndex < NumberOfPdptEntries; PdptIndex++, Pdpt++) {
+      if ((*Pdpt & IA32_PG_P) == 0) {
+        //
+        // If PDPT entry does not exist, skip it
+        //
+        continue;
+      }
+      if ((*Pdpt & IA32_PG_PS) != 0) {
+        //
+        // This is 1G entry, skip it
+        //
+        continue;
+      }
+      Pd = (UINT64 *)(UINTN)(*Pdpt & ~mAddressEncMask & PHYSICAL_ADDRESS_MASK);
+      if (Pd == 0) {
+        continue;
+      }
+      for (PdIndex = 0; PdIndex < SIZE_4KB / sizeof (*Pd); PdIndex++, Pd++) {
+        if ((*Pd & IA32_PG_P) == 0) {
           //
-          // If PDPT entry does not exist, skip it
+          // If PD entry does not exist, skip it
           //
           continue;
         }
-        if ((*Pdpt & IA32_PG_PS) != 0) {
-          //
-          // This is 1G entry, skip it
-          //
-          continue;
-        }
-        Pd = (UINT64 *)(UINTN)(*Pdpt & ~mAddressEncMask & PHYSICAL_ADDRESS_MASK);
-        if (Pd == 0) {
-          continue;
-        }
-        for (PdIndex = 0; PdIndex < SIZE_4KB / sizeof (*Pd); PdIndex++, Pd++) {
-          if ((*Pd & IA32_PG_P) == 0) {
-            //
-            // If PD entry does not exist, skip it
-            //
-            continue;
-          }
-          Address = (UINTN) LShiftU64 (
-                              LShiftU64 (
-                                LShiftU64 ((Pml5Index << 9) + Pml4Index, 9) + PdptIndex,
-                                9
-                                ) + PdIndex,
-                                21
-                              );
+        Address = (((PdptIndex << 9) + PdIndex) << 21);
 
+        //
+        // If it is 2M page, check IsAddressSplit()
+        //
+        if (((*Pd & IA32_PG_PS) != 0) && IsAddressSplit (Address)) {
           //
-          // If it is 2M page, check IsAddressSplit()
+          // Based on current page table, create 4KB page table for split area.
           //
-          if (((*Pd & IA32_PG_PS) != 0) && IsAddressSplit (Address)) {
-            //
-            // Based on current page table, create 4KB page table for split area.
-            //
-            ASSERT (Address == (*Pd & PHYSICAL_ADDRESS_MASK));
+          ASSERT (Address == (*Pd & PHYSICAL_ADDRESS_MASK));
 
-            Pt = AllocatePageTableMemory (1);
-            ASSERT (Pt != NULL);
+          Pt = AllocatePageTableMemory (1);
+          ASSERT (Pt != NULL);
 
-            *Pd = (UINTN) Pt | IA32_PG_RW | IA32_PG_P;
-
-            // Split it
-            for (PtIndex = 0; PtIndex < SIZE_4KB / sizeof(*Pt); PtIndex++, Pt++) {
-              *Pt = Address + ((PtIndex << 12) | mAddressEncMask | PAGE_ATTRIBUTE_BITS);
-            } // end for PT
-            *Pd = (UINT64)(UINTN)Pt | mAddressEncMask | PAGE_ATTRIBUTE_BITS;
-          } // end if IsAddressSplit
-        } // end for PD
-      } // end for PDPT
-    } // end for PML4
-  } // end for PML5
+          // Split it
+          for (PtIndex = 0; PtIndex < SIZE_4KB / sizeof(*Pt); PtIndex++) {
+            Pt[PtIndex] = Address + ((PtIndex << 12) | mAddressEncMask | PAGE_ATTRIBUTE_BITS);
+          } // end for PT
+          *Pd = (UINT64)(UINTN)Pt | mAddressEncMask | PAGE_ATTRIBUTE_BITS;
+        } // end if IsAddressSplit
+      } // end for PD
+    } // end for PDPT
+  } // end for PML4
 
   //
   // Go through page table and set several page table entries to absent or execute-disable.
   //
   DEBUG ((EFI_D_INFO, "Patch page table start ...\n"));
-  for (Pml5Index = 0; Pml5Index < NumberOfPml5Entries; Pml5Index++) {
-    if ((Pml5[Pml5Index] & IA32_PG_P) == 0) {
-      //
-      // If PML5 entry does not exist, skip it
-      //
-      continue;
-    }
-    Pml4 = (UINT64 *) (UINTN) (Pml5[Pml5Index] & PHYSICAL_ADDRESS_MASK);
-    for (Pml4Index = 0; Pml4Index < NumberOfPml4Entries; Pml4Index++) {
+  for (Pml4Index = 0; Pml4Index < NumberOfPml4Entries; Pml4Index++) {
+    if (sizeof (UINTN) == sizeof (UINT64)) {
       if ((Pml4[Pml4Index] & IA32_PG_P) == 0) {
         //
         // If PML4 entry does not exist, skip it
@@ -690,73 +642,69 @@ InitPaging (
         continue;
       }
       Pdpt = (UINT64 *)(UINTN)(Pml4[Pml4Index] & ~mAddressEncMask & PHYSICAL_ADDRESS_MASK);
-      for (PdptIndex = 0; PdptIndex < NumberOfPdptEntries; PdptIndex++, Pdpt++) {
-        if ((*Pdpt & IA32_PG_P) == 0) {
+    } else {
+      Pdpt = (UINT64*)(UINTN)mSmmProfileCr3;
+    }
+    for (PdptIndex = 0; PdptIndex < NumberOfPdptEntries; PdptIndex++, Pdpt++) {
+      if ((*Pdpt & IA32_PG_P) == 0) {
+        //
+        // If PDPT entry does not exist, skip it
+        //
+        continue;
+      }
+      if ((*Pdpt & IA32_PG_PS) != 0) {
+        //
+        // This is 1G entry, set NX bit and skip it
+        //
+        if (mXdSupported) {
+          *Pdpt = *Pdpt | IA32_PG_NX;
+        }
+        continue;
+      }
+      Pd = (UINT64 *)(UINTN)(*Pdpt & ~mAddressEncMask & PHYSICAL_ADDRESS_MASK);
+      if (Pd == 0) {
+        continue;
+      }
+      for (PdIndex = 0; PdIndex < SIZE_4KB / sizeof (*Pd); PdIndex++, Pd++) {
+        if ((*Pd & IA32_PG_P) == 0) {
           //
-          // If PDPT entry does not exist, skip it
+          // If PD entry does not exist, skip it
           //
           continue;
         }
-        if ((*Pdpt & IA32_PG_PS) != 0) {
-          //
-          // This is 1G entry, set NX bit and skip it
-          //
-          if (mXdSupported) {
-            *Pdpt = *Pdpt | IA32_PG_NX;
+        Address = (((PdptIndex << 9) + PdIndex) << 21);
+
+        if ((*Pd & IA32_PG_PS) != 0) {
+          // 2MB page
+
+          if (!IsAddressValid (Address, &Nx)) {
+            //
+            // Patch to remove Present flag and RW flag
+            //
+            *Pd = *Pd & (INTN)(INT32)(~PAGE_ATTRIBUTE_BITS);
           }
-          continue;
-        }
-        Pd = (UINT64 *)(UINTN)(*Pdpt & ~mAddressEncMask & PHYSICAL_ADDRESS_MASK);
-        if (Pd == 0) {
-          continue;
-        }
-        for (PdIndex = 0; PdIndex < SIZE_4KB / sizeof (*Pd); PdIndex++, Pd++) {
-          if ((*Pd & IA32_PG_P) == 0) {
-            //
-            // If PD entry does not exist, skip it
-            //
+          if (Nx && mXdSupported) {
+            *Pd = *Pd | IA32_PG_NX;
+          }
+        } else {
+          // 4KB page
+          Pt = (UINT64 *)(UINTN)(*Pd & ~mAddressEncMask & PHYSICAL_ADDRESS_MASK);
+          if (Pt == 0) {
             continue;
           }
-          Address = (UINTN) LShiftU64 (
-                              LShiftU64 (
-                                LShiftU64 ((Pml5Index << 9) + Pml4Index, 9) + PdptIndex,
-                                9
-                                ) + PdIndex,
-                                21
-                              );
-
-          if ((*Pd & IA32_PG_PS) != 0) {
-            // 2MB page
-
+          for (PtIndex = 0; PtIndex < SIZE_4KB / sizeof(*Pt); PtIndex++, Pt++) {
             if (!IsAddressValid (Address, &Nx)) {
-              //
-              // Patch to remove Present flag and RW flag
-              //
-              *Pd = *Pd & (INTN)(INT32)(~PAGE_ATTRIBUTE_BITS);
+              *Pt = *Pt & (INTN)(INT32)(~PAGE_ATTRIBUTE_BITS);
             }
             if (Nx && mXdSupported) {
-              *Pd = *Pd | IA32_PG_NX;
+              *Pt = *Pt | IA32_PG_NX;
             }
-          } else {
-            // 4KB page
-            Pt = (UINT64 *)(UINTN)(*Pd & ~mAddressEncMask & PHYSICAL_ADDRESS_MASK);
-            if (Pt == 0) {
-              continue;
-            }
-            for (PtIndex = 0; PtIndex < SIZE_4KB / sizeof(*Pt); PtIndex++, Pt++) {
-              if (!IsAddressValid (Address, &Nx)) {
-                *Pt = *Pt & (INTN)(INT32)(~PAGE_ATTRIBUTE_BITS);
-              }
-              if (Nx && mXdSupported) {
-                *Pt = *Pt | IA32_PG_NX;
-              }
-              Address += SIZE_4KB;
-            } // end for PT
-          } // end if PS
-        } // end for PD
-      } // end for PDPT
-    } // end for PML4
-  } // end for PML5
+            Address += SIZE_4KB;
+          } // end for PT
+        } // end if PS
+      } // end for PD
+    } // end for PDPT
+  } // end for PML4
 
   //
   // Flush TLB
@@ -1208,20 +1156,6 @@ RestorePageTableBelow4G (
 {
   UINTN         PTIndex;
   UINTN         PFIndex;
-  IA32_CR4      Cr4;
-  BOOLEAN       Enable5LevelPaging;
-
-  Cr4.UintN = AsmReadCr4 ();
-  Enable5LevelPaging = (BOOLEAN) (Cr4.Bits.LA57 == 1);
-
-  //
-  // PML5
-  //
-  if (Enable5LevelPaging) {
-    PTIndex = (UINTN)BitFieldRead64 (PFAddress, 48, 56);
-    ASSERT (PageTable[PTIndex] != 0);
-    PageTable = (UINT64*)(UINTN)(PageTable[PTIndex] & PHYSICAL_ADDRESS_MASK);
-  }
 
   //
   // PML4
