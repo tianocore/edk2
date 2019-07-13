@@ -9,7 +9,7 @@
   it may cause the table to be initaliized with the members at the end being
   set to zero. This is bad as jumping to zero will crash.
 
-Copyright (c) 2004 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2019, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2008 - 2011, Apple Inc. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -363,7 +363,7 @@ SecGetTime (
   Time->Minute = tm->tm_min;
   Time->Second = tm->tm_sec;
   Time->Nanosecond = 0;
-  Time->TimeZone = timezone;
+  Time->TimeZone = timezone / 60;
   Time->Daylight = (daylight ? EFI_TIME_ADJUST_DAYLIGHT : 0)
     | (tm->tm_isdst > 0 ? EFI_TIME_IN_DAYLIGHT : 0);
 

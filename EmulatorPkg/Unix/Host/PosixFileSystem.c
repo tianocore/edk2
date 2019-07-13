@@ -2,6 +2,7 @@
  POSIX Pthreads to emulate APs and implement threads
 
 Copyright (c) 2011, Apple Inc. All rights reserved.
+Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 
@@ -220,7 +221,7 @@ PosixSystemTimeToEfiTime (
   Time->Second = tm->tm_sec;
   Time->Nanosecond = 0;
 
-  Time->TimeZone = timezone;
+  Time->TimeZone = timezone / 60;
   Time->Daylight = (daylight ? EFI_TIME_ADJUST_DAYLIGHT : 0) | (tm->tm_isdst > 0 ? EFI_TIME_IN_DAYLIGHT : 0);
 }
 
