@@ -109,9 +109,18 @@ F: ArmVirtPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/ArmVirtPkg
 M: Laszlo Ersek <lersek@redhat.com>
 M: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-R: Julien Grall <julien.grall@arm.com>
-   (Xen modules)
 R: Leif Lindholm <leif.lindholm@linaro.org>
+
+ArmVirtPkg: modules used on Xen
+F: ArmVirtPkg/ArmVirtXen.*
+F: ArmVirtPkg/Library/XenArmGenericTimerVirtCounterLib/
+F: ArmVirtPkg/Library/XenRealTimeClockLib/
+F: ArmVirtPkg/Library/XenVirtMemInfoLib/
+F: ArmVirtPkg/PrePi/
+F: ArmVirtPkg/XenAcpiPlatformDxe/
+F: ArmVirtPkg/XenPlatformHasAcpiDtDxe/
+F: ArmVirtPkg/XenioFdtDxe/
+R: Julien Grall <julien.grall@arm.com>
 
 BaseTools
 F: BaseTools/
