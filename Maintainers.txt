@@ -209,10 +209,6 @@ W: http://www.tianocore.org/ovmf/
 M: Jordan Justen <jordan.l.justen@intel.com>
 M: Laszlo Ersek <lersek@redhat.com>
 M: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-R: Anthony Perard <anthony.perard@citrix.com>
-   (Xen modules)
-R: Julien Grall <julien.grall@arm.com>
-   (Xen modules)
 R: Marc-André Lureau <marcandre.lureau@redhat.com>
    (TPM2 modules)
 R: Stefan Berger <stefanb@linux.ibm.com>
@@ -220,6 +216,30 @@ R: Stefan Berger <stefanb@linux.ibm.com>
 R: David Woodhouse <dwmw2@infradead.org>
    (CSM modules)
 S: Maintained
+
+OvmfPkg: Xen-related modules
+F: OvmfPkg/AcpiPlatformDxe/Xen.c
+F: OvmfPkg/Include/Guid/XenBusRootDevice.h
+F: OvmfPkg/Include/Guid/XenInfo.h
+F: OvmfPkg/Include/IndustryStandard/Xen/
+F: OvmfPkg/Include/Library/XenHypercallLib.h
+F: OvmfPkg/Include/Library/XenIoMmioLib.h
+F: OvmfPkg/Include/Protocol/XenBus.h
+F: OvmfPkg/Include/Protocol/XenIo.h
+F: OvmfPkg/Library/PciHostBridgeLib/XenSupport.c
+F: OvmfPkg/Library/PlatformBootManagerLib/BdsPlatform.c
+F: OvmfPkg/Library/XenConsoleSerialPortLib/
+F: OvmfPkg/Library/XenHypercallLib/
+F: OvmfPkg/Library/XenIoMmioLib/
+F: OvmfPkg/PlatformPei/MemDetect.c
+F: OvmfPkg/PlatformPei/Platform.*
+F: OvmfPkg/PlatformPei/Xen.*
+F: OvmfPkg/SmbiosPlatformDxe/*Xen.c
+F: OvmfPkg/XenBusDxe/
+F: OvmfPkg/XenIoPciDxe/
+F: OvmfPkg/XenPvBlkDxe/
+R: Anthony Perard <anthony.perard@citrix.com>
+R: Julien Grall <julien.grall@arm.com>
 
 PcAtChipsetPkg
 F: PcAtChipsetPkg/
