@@ -2,7 +2,7 @@
   Main file for Type shell level 3 function.
 
   (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2009 - 2019, Intel Corporation. All rights reserved. <BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -78,12 +78,13 @@ TypeFileByHandle (
           // Allow Line Feed (LF) (0xA) & Carriage Return (CR) (0xD)
           // characters to be displayed as is.
           //
-          if (AsciiChar == '\n' && ((CHAR8*)Buffer)[LoopVar-1] != '\r') {
+          if ((AsciiChar == '\n' && LoopVar == 0) ||
+              (AsciiChar == '\n' && ((CHAR8*)Buffer)[LoopVar-1] != '\r')) {
             //
-            // In case Line Feed (0xA) is encountered & Carriage Return (0xD)
-            // was not the previous character, print CR and LF. This is because
-            // Shell 2.0 requires carriage return with line feed for displaying
-            // each new line from left.
+            // In case file begin with single line Feed or Line Feed (0xA) is
+            // encountered & Carriage Return (0xD) was not previous character,
+            // print CR and LF. This is because Shell 2.0 requires carriage
+            // return with line feed for displaying each new line from left.
             //
             ShellPrintEx (-1, -1, L"\r\n");
             continue;
@@ -121,12 +122,13 @@ TypeFileByHandle (
           // Allow Line Feed (LF) (0xA) & Carriage Return (CR) (0xD)
           // characters to be displayed as is.
           //
-          if (Ucs2Char == '\n' && ((CHAR16*)Buffer)[LoopVar-1] != '\r') {
+          if ((Ucs2Char == '\n' && LoopVar == 0) ||
+              (Ucs2Char == '\n' && ((CHAR16*)Buffer)[LoopVar-1] != '\r')) {
             //
-            // In case Line Feed (0xA) is encountered & Carriage Return (0xD)
-            // was not the previous character, print CR and LF. This is because
-            // Shell 2.0 requires carriage return with line feed for displaying
-            // each new line from left.
+            // In case file begin with single line Feed or Line Feed (0xA) is
+            // encountered & Carriage Return (0xD) was not previous character,
+            // print CR and LF. This is because Shell 2.0 requires carriage
+            // return with line feed for displaying each new line from left.
             //
             ShellPrintEx (-1, -1, L"\r\n");
             continue;
