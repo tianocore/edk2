@@ -209,10 +209,6 @@ W: http://www.tianocore.org/ovmf/
 M: Jordan Justen <jordan.l.justen@intel.com>
 M: Laszlo Ersek <lersek@redhat.com>
 M: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-R: Marc-André Lureau <marcandre.lureau@redhat.com>
-   (TPM2 modules)
-R: Stefan Berger <stefanb@linux.ibm.com>
-   (TPM2 modules)
 R: David Woodhouse <dwmw2@infradead.org>
    (CSM modules)
 S: Maintained
@@ -240,6 +236,15 @@ F: OvmfPkg/XenIoPciDxe/
 F: OvmfPkg/XenPvBlkDxe/
 R: Anthony Perard <anthony.perard@citrix.com>
 R: Julien Grall <julien.grall@arm.com>
+
+OvmfPkg: TCG- and TPM2-related modules
+F: OvmfPkg/Include/IndustryStandard/QemuTpm.h
+F: OvmfPkg/Library/PlatformBootManagerLib/BdsPlatform.c
+F: OvmfPkg/Library/Tcg2PhysicalPresenceLib*/
+F: OvmfPkg/PlatformPei/ClearCache.c
+F: OvmfPkg/Tcg/
+R: Marc-André Lureau <marcandre.lureau@redhat.com>
+R: Stefan Berger <stefanb@linux.ibm.com>
 
 PcAtChipsetPkg
 F: PcAtChipsetPkg/
