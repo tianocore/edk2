@@ -1026,7 +1026,8 @@ cleanlib:
                         self.FileListMacros[T.FileListMacro].append(NewFile)
                     else:
                         Deps.append(NewFile)
-
+                for key in self.FileListMacros:
+                    self.FileListMacros[key].sort()
                 # Use file list macro as dependency
                 if T.GenFileListMacro:
                     Deps.append("$(%s)" % T.FileListMacro)
