@@ -2462,17 +2462,21 @@ InsertNewGuidNameMapping(
   IN CONST DUMP_PROTOCOL_INFO DumpFunc OPTIONAL
   )
 {
-  ASSERT(Guid   != NULL);
-  ASSERT(NameID != 0);
+  ASSERT (Guid   != NULL);
+  ASSERT (NameID != 0);
 
-  mGuidList = ReallocatePool(mGuidListCount * sizeof(GUID_INFO_BLOCK), mGuidListCount+1 * sizeof(GUID_INFO_BLOCK), mGuidList);
+  mGuidList = ReallocatePool (
+                mGuidListCount * sizeof (GUID_INFO_BLOCK),
+                (mGuidListCount + 1) * sizeof (GUID_INFO_BLOCK),
+                mGuidList
+                );
   if (mGuidList == NULL) {
     mGuidListCount = 0;
     return (EFI_OUT_OF_RESOURCES);
   }
   mGuidListCount++;
 
-  mGuidList[mGuidListCount - 1].GuidId   = AllocateCopyPool(sizeof(EFI_GUID), Guid);
+  mGuidList[mGuidListCount - 1].GuidId   = AllocateCopyPool (sizeof (EFI_GUID), Guid);
   mGuidList[mGuidListCount - 1].StringId = NameID;
   mGuidList[mGuidListCount - 1].DumpInfo = DumpFunc;
 
