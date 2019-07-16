@@ -199,7 +199,7 @@ do
       break
     ;;
   esac
-  I=$(($I - 1))
+  I=$((I - 1))
 done
 
 if [ $I -gt 0 ]
