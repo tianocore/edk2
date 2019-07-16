@@ -10,7 +10,7 @@ NOTE: Below steps are required for Windows. Linux may already have the OPENSSL e
     set OPENSSL_HOME=c:\home\openssl\openssl-[version]
     set OPENSSL_CONF=%OPENSSL_HOME%\apps\openssl.cnf
 
-When a user uses OpenSSL (req or ca command) to generate the certificates, OpenSSL will use the openssl.cnf file as the configuration data (can use “-config path/to/openssl.cnf” to describe the specific config file).
+When a user uses OpenSSL (req or ca command) to generate the certificates, OpenSSL will use the openssl.cnf file as the configuration data (can use "-config path/to/openssl.cnf" to describe the specific config file).
 
 The user need check the openssl.cnf file, to find your CA path setting, e.g. check if the path exists in [ CA_default ] section.
 
