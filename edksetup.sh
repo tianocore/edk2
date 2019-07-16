@@ -71,7 +71,7 @@ function SetWorkspace()
   #
   # Set $WORKSPACE
   #
-  export WORKSPACE=`pwd`
+  export WORKSPACE=$PWD
   return 0
 }
 
