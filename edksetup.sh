@@ -194,7 +194,7 @@ do
       RECONFIG=TRUE
       shift
     ;;
-    -?|-h|--help|*)
+    *)
       HelpMsg
       break
     ;;
