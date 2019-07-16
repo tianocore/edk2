@@ -1087,7 +1087,7 @@ def ParseFieldValue (Value):
             p.stderr.close()
         if err:
             raise BadExpression("DevicePath: %s" % str(err))
-        out = out.decode(encoding='utf-8', errors='ignore')
+        out = out.decode()
         Size = len(out.split())
         out = ','.join(out.split())
         return '{' + out + '}', Size

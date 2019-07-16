@@ -243,7 +243,7 @@ def CallExtenalBPDGTool(ToolPath, VpdFileName):
     except Exception as X:
         EdkLogger.error("BPDG", BuildToolError.COMMAND_FAILURE, ExtraData=str(X))
     (out, error) = PopenObject.communicate()
-    print(out.decode(encoding='utf-8', errors='ignore'))
+    print(out.decode())
     while PopenObject.returncode is None :
         PopenObject.wait()
 

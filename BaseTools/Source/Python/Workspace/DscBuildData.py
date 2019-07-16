@@ -1735,7 +1735,7 @@ class DscBuildData(PlatformBuildClassObject):
         except:
             EdkLogger.error('Build', COMMAND_FAILURE, 'Can not execute command: %s' % Command)
         Result = Process.communicate()
-        return Process.returncode, Result[0].decode(encoding='utf-8', errors='ignore'), Result[1].decode(encoding='utf-8', errors='ignore')
+        return Process.returncode, Result[0].decode(), Result[1].decode()
 
     @staticmethod
     def IntToCString(Value, ValueSize):
