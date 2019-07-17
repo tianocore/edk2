@@ -186,10 +186,157 @@ F: MdeModulePkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/MdeModulePkg
 M: Jian J Wang <jian.j.wang@intel.com>
 M: Hao A Wu <hao.a.wu@intel.com>
+
+MdeModulePkg: ACPI modules
+F: MdeModulePkg/Include/*Acpi*.h
+F: MdeModulePkg/Universal/Acpi/
+R: Dandan Bi <dandan.bi@intel.com>
+R: Liming Gao <liming.gao@intel.com>
+
+MdeModulePkg: ACPI S3 modules
+F: MdeModulePkg/*LockBox*/
+F: MdeModulePkg/Include/*BootScript*.h
+F: MdeModulePkg/Include/*LockBox*.h
+F: MdeModulePkg/Include/*S3*.h
+F: MdeModulePkg/Library/*S3*/
+R: Hao A Wu <hao.a.wu@intel.com>
+R: Eric Dong <eric.dong@intel.com>
+
+MdeModulePkg: BDS modules
+F: MdeModulePkg/*BootManager*/
+F: MdeModulePkg/Include/Library/UefiBootManagerLib.h
+F: MdeModulePkg/Universal/BdsDxe/
+F: MdeModulePkg/Universal/DevicePathDxe/
+F: MdeModulePkg/Universal/DriverHealthManagerDxe/
+F: MdeModulePkg/Universal/LoadFileOnFv2/
+F: MdeModulePkg/Universal/SecurityStubDxe/Defer3rdPartyImageLoad.*
+R: Zhichao Gao <zhichao.gao@intel.com>
 R: Ray Ni <ray.ni@intel.com>
-  (especially for Bus, Universal/Console, Universal/Disk,
-   Universal/BdsDxe and related libraries, header files)
+
+MdeModulePkg: Console and Graphics modules
+F: MdeModulePkg/*Logo*/
+F: MdeModulePkg/Include/*Logo*.h
+F: MdeModulePkg/Include/Guid/ConnectConInEvent.h
+F: MdeModulePkg/Include/Guid/Console*.h
+F: MdeModulePkg/Include/Guid/StandardErrorDevice.h
+F: MdeModulePkg/Include/Guid/TtyTerm.h
+F: MdeModulePkg/Include/Library/BmpSupportLib.h
+F: MdeModulePkg/Include/Library/FrameBufferBltLib.h
+F: MdeModulePkg/Library/BaseBmpSupportLib/
+F: MdeModulePkg/Library/FrameBufferBltLib/
+F: MdeModulePkg/Universal/Console/
+R: Zhichao Gao <zhichao.gao@intel.com>
+R: Ray Ni <ray.ni@intel.com>
+
+MdeModulePkg: Core services (PEI, DXE and Runtime) modules
+F: MdeModulePkg/*Mem*/
+F: MdeModulePkg/*SectionExtract*/
+F: MdeModulePkg/*StatusCode*/
+F: MdeModulePkg/Application/DumpDynPcd/
+F: MdeModulePkg/Core/Dxe/
+F: MdeModulePkg/Core/DxeIplPeim/
+F: MdeModulePkg/Core/Pei/
+F: MdeModulePkg/Core/RuntimeDxe/
+F: MdeModulePkg/Include/*Mem*.h
+F: MdeModulePkg/Include/*Pcd*.h
+F: MdeModulePkg/Include/*Perf*.h
+F: MdeModulePkg/Include/*StatusCode*.h
+F: MdeModulePkg/Include/Guid/Crc32GuidedSectionExtraction.h
+F: MdeModulePkg/Include/Guid/EventExitBootServiceFailed.h
+F: MdeModulePkg/Include/Guid/IdleLoopEvent.h
+F: MdeModulePkg/Include/Guid/LoadModuleAtFixedAddress.h
+F: MdeModulePkg/Include/Guid/LzmaDecompress.h
+F: MdeModulePkg/Include/Library/SecurityManagementLib.h
+F: MdeModulePkg/Library/*Decompress*/
+F: MdeModulePkg/Library/*Perf*/
+F: MdeModulePkg/Library/DxeSecurityManagementLib/
+F: MdeModulePkg/Universal/PCD/
+F: MdeModulePkg/Universal/PlatformDriOverrideDxe/
+F: MdeModulePkg/Universal/SecurityStubDxe/SecurityStub.c
+R: Dandan Bi <dandan.bi@intel.com>
+R: Liming Gao <liming.gao@intel.com>
+
+MdeModulePkg: Device and Peripheral modules
+F: MdeModulePkg/*PciHostBridge*/
+F: MdeModulePkg/*Serial*/
+F: MdeModulePkg/Bus/
+F: MdeModulePkg/Include/*Ata*.h
+F: MdeModulePkg/Include/*IoMmu*.h
+F: MdeModulePkg/Include/*NonDiscoverableDevice*.h
+F: MdeModulePkg/Include/*NvmExpress*.h
+F: MdeModulePkg/Include/*SdMmc*.h
+F: MdeModulePkg/Include/*SerialPort*.h
+F: MdeModulePkg/Include/*Ufs*.h
+F: MdeModulePkg/Include/*Usb*.h
+F: MdeModulePkg/Include/Guid/RecoveryDevice.h
+F: MdeModulePkg/Include/Guid/S3StorageDeviceInitList.h
+F: MdeModulePkg/Include/Library/PciHostBridgeLib.h
+F: MdeModulePkg/Include/Ppi/StorageSecurityCommand.h
+F: MdeModulePkg/Include/Protocol/Ps2Policy.h
+F: MdeModulePkg/Library/NonDiscoverableDeviceRegistrationLib/
+F: MdeModulePkg/Universal/Disk/
+F: MdeModulePkg/Universal/PcatSingleSegmentPciCfg2Pei/
+R: Hao A Wu <hao.a.wu@intel.com>
+R: Ray Ni <ray.ni@intel.com>
+
+MdeModulePkg: Firmware Update modules
+F: MdeModulePkg/*Capsule*/
+F: MdeModulePkg/Include/*Capsule*.h
+F: MdeModulePkg/Include/Library/DisplayUpdateProgressLib.h
+F: MdeModulePkg/Include/Library/FmpAuthenticationLib.h
+F: MdeModulePkg/Include/Protocol/EsrtManagement.h
+F: MdeModulePkg/Include/Protocol/FirmwareManagementProgress.h
+F: MdeModulePkg/Library/DisplayUpdateProgressLib*/
+F: MdeModulePkg/Library/FmpAuthenticationLibNull/
+F: MdeModulePkg/Universal/Esrt*/
+R: Hao A Wu <hao.a.wu@intel.com>
+R: Liming Gao <liming.gao@intel.com>
+
+MdeModulePkg: HII and UI modules
+F: MdeModulePkg/*FileExplorer*/
+F: MdeModulePkg/*Hii*/
+F: MdeModulePkg/*Ui*/
+F: MdeModulePkg/Application/BootManagerMenuApp/
+F: MdeModulePkg/Include/*FileExplorer*.h
+F: MdeModulePkg/Include/*FormBrowser*.h
+F: MdeModulePkg/Include/*Hii*.h
+F: MdeModulePkg/Include/Library/CustomizedDisplayLib.h
+F: MdeModulePkg/Include/Protocol/DisplayProtocol.h
+F: MdeModulePkg/Library/CustomizedDisplayLib/
+F: MdeModulePkg/Universal/DisplayEngineDxe/
+F: MdeModulePkg/Universal/DriverSampleDxe/
+F: MdeModulePkg/Universal/SetupBrowserDxe/
+R: Dandan Bi <dandan.bi@intel.com>
+R: Eric Dong <eric.dong@intel.com>
+
+MdeModulePkg: Management Mode (MM, SMM) modules
+F: MdeModulePkg/*Smi*/
+F: MdeModulePkg/*Smm*/
+F: MdeModulePkg/Include/*Smi*.h
+F: MdeModulePkg/Include/*Smm*.h
+R: Eric Dong <eric.dong@intel.com>
+R: Ray Ni <ray.ni@intel.com>
+
+MdeModulePkg: Reset modules
+F: MdeModulePkg/*Reset*/
+F: MdeModulePkg/Include/*Reset*.h
+R: Zhichao Gao <zhichao.gao@intel.com>
+R: Ray Ni <ray.ni@intel.com>
+
+MdeModulePkg: SMBIOS modules
+F: MdeModulePkg/Universal/Smbios*/
+R: Dandan Bi <dandan.bi@intel.com>
 R: Star Zeng <star.zeng@intel.com>
+
+MdeModulePkg: UEFI Variable modules
+F: MdeModulePkg/*Var*/
+F: MdeModulePkg/Include/*/*FaultTolerantWrite*.h
+F: MdeModulePkg/Include/*/*Var*.h
+F: MdeModulePkg/Include/Guid/SystemNvDataGuid.h
+F: MdeModulePkg/Include/Protocol/SwapAddressRange.h
+F: MdeModulePkg/Universal/FaultTolerantWrite*/
+R: Hao A Wu <hao.a.wu@intel.com>
+R: Liming Gao <liming.gao@intel.com>
 
 MdePkg
 F: MdePkg/
