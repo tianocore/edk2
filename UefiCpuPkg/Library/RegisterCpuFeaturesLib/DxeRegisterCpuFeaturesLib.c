@@ -229,6 +229,12 @@ CpuFeaturesInitialize (
   OldBspNumber = GetProcessorIndex (CpuFeaturesData);
   CpuFeaturesData->BspNumber = OldBspNumber;
 
+  //
+  //
+  // Initialize MpEvent to suppress incorrect compiler/analyzer warnings.
+  //
+  MpEvent = NULL;
+
   if (CpuFeaturesData->NumberOfCpus > 1) {
     Status = gBS->CreateEvent (
                     EVT_NOTIFY_WAIT,
