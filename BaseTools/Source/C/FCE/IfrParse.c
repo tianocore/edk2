@@ -18,8 +18,8 @@
 #define EDKII_IFR_NUMERIC_SIZE_BIT  0x3F
 #endif
 
-UINT16           mStatementIndex;
-UINT16           mExpressionOpCodeIndex;
+UINTN            mStatementIndex;
+UINTN            mExpressionOpCodeIndex;
 
 BOOLEAN          mInScopeSubtitle;
 BOOLEAN          mInScopeSuppress;
@@ -1774,12 +1774,12 @@ IsExpressionOpCode (
 VOID
 CountOpCodes (
   IN  FORM_BROWSER_FORMSET  *FormSet,
-  IN OUT  UINT16            *NumberOfStatement,
-  IN OUT  UINT16            *NumberOfExpression
+  IN OUT  UINTN             *NumberOfStatement,
+  IN OUT  UINTN             *NumberOfExpression
   )
 {
-  UINT16  StatementCount;
-  UINT16  ExpressionCount;
+  UINTN   StatementCount;
+  UINTN   ExpressionCount;
   UINT8   *OpCodeData;
   UINTN   Offset;
   UINTN   OpCodeLen;
@@ -1839,8 +1839,8 @@ ParseOpCodes (
   QUESTION_OPTION         *CurrentOption;
   UINT8                   Width;
   CHAR8                   *AsciiString;
-  UINT16                  NumberOfStatement;
-  UINT16                  NumberOfExpression;
+  UINTN                   NumberOfStatement;
+  UINTN                   NumberOfExpression;
   BOOLEAN                 SuppressForQuestion;
   BOOLEAN                 SuppressForOption;
   BOOLEAN                 InScopeOptionSuppress;
