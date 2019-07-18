@@ -1,0 +1,41 @@
+## @file
+#  Provides BaseCrypto SM3 hash service
+#
+#  This library can be registered to BaseCrypto router, to serve as hash engine.
+#
+#  Copyright (c) 2013 - 2019, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = HashInstanceLibSm3
+  MODULE_UNI_FILE                = HashInstanceLibSm3.uni
+  FILE_GUID                      = C5865D5D-9ACE-39FB-DC7C-0511891D40F9
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL
+  CONSTRUCTOR                    = HashInstanceLibSm3Constructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  HashInstanceLibSm3.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  SecurityPkg/SecurityPkg.dec
+  CryptoPkg/CryptoPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  Tpm2CommandLib
+  MemoryAllocationLib
+  BaseCryptLib
