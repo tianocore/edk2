@@ -16,6 +16,7 @@
 
 [Sources.common]
   MainMPCore.c
+  PrePeiCore.h
   PrePeiCore.c
 
 [Sources.ARM]

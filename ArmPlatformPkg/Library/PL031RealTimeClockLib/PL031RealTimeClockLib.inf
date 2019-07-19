@@ -17,6 +17,7 @@
   LIBRARY_CLASS                  = RealTimeClockLib|DXE_RUNTIME_DRIVER
 
 [Sources.common]
+  PL031RealTimeClock.h
   PL031RealTimeClockLib.c
 
 [Packages]

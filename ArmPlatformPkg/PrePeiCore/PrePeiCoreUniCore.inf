@@ -15,6 +15,7 @@
   VERSION_STRING                 = 1.0
 
 [Sources.common]
+  PrePeiCore.h
   PrePeiCore.c
   MainUniCore.c
 
