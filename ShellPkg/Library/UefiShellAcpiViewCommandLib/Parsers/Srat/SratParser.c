@@ -1,7 +1,7 @@
 /** @file
   SRAT table parser
 
-  Copyright (c) 2016 - 2018, ARM Limited. All rights reserved.
+  Copyright (c) 2016 - 2019, ARM Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -32,7 +32,13 @@ EFIAPI
 ValidateSratReserved (
   IN UINT8* Ptr,
   IN VOID*  Context
-  );
+  )
+{
+  if (*(UINT32*)Ptr != 1) {
+    IncrementErrorCount ();
+    Print (L"\nERROR: Reserved should be 1 for backward compatibility.\n");
+  }
+}
 
 /**
   This function traces the APIC Proximity Domain field.
@@ -44,9 +50,16 @@ STATIC
 VOID
 EFIAPI
 DumpSratApicProximity (
-  IN  CONST CHAR16*  Format,
-  IN  UINT8*         Ptr
-  );
+ IN CONST CHAR16* Format,
+ IN UINT8*        Ptr
+ )
+{
+  UINT32 ProximityDomain;
+
+  ProximityDomain = Ptr[0] | (Ptr[1] << 8) | (Ptr[2] << 16);
+
+  Print (Format, ProximityDomain);
+}
 
 /**
   An ACPI_PARSER array describing the SRAT Table.
@@ -138,47 +151,6 @@ STATIC CONST ACPI_PARSER SratX2ApciAffinityParser[] = {
   {L"Clock Domain", 4, 16, L"0x%x", NULL, NULL, NULL, NULL},
   {L"Reserved", 4, 20, L"0x%x", NULL, NULL, NULL, NULL}
 };
-
-/** This function validates the Reserved field in the SRAT table header.
-
-  @param [in] Ptr     Pointer to the start of the field data.
-  @param [in] Context Pointer to context specific information e.g. this
-                      could be a pointer to the ACPI table header.
-**/
-STATIC
-VOID
-EFIAPI
-ValidateSratReserved (
-  IN UINT8* Ptr,
-  IN VOID*  Context
-  )
-{
-  if (*(UINT32*)Ptr != 1) {
-    IncrementErrorCount ();
-    Print (L"\nERROR: Reserved should be 1 for backward compatibility.\n");
-  }
-}
-
-/**
-  This function traces the APIC Proximity Domain field.
-
-  @param [in] Format  Format string for tracing the data.
-  @param [in] Ptr     Pointer to the start of the buffer.
-**/
-STATIC
-VOID
-EFIAPI
-DumpSratApicProximity (
- IN CONST CHAR16* Format,
- IN UINT8*        Ptr
- )
-{
-  UINT32 ProximityDomain;
-
-  ProximityDomain = Ptr[0] | (Ptr[1] << 8) | (Ptr[2] << 16);
-
-  Print (Format, ProximityDomain);
-}
 
 /**
   This function parses the ACPI SRAT table.
