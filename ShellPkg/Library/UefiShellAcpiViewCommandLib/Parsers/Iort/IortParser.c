@@ -45,7 +45,13 @@ EFIAPI
 ValidateItsIdMappingCount (
   IN UINT8* Ptr,
   IN VOID*  Context
-  );
+  )
+{
+  if (*(UINT32*)Ptr != 0) {
+    IncrementErrorCount ();
+    Print (L"\nERROR: IORT ID Mapping count must be zero.");
+  }
+}
 
 /**
   This function validates the ID Mapping array offset for the ITS node.
@@ -60,7 +66,13 @@ EFIAPI
 ValidateItsIdArrayReference (
   IN UINT8* Ptr,
   IN VOID*  Context
-  );
+  )
+{
+  if (*(UINT32*)Ptr != 0) {
+    IncrementErrorCount ();
+    Print (L"\nERROR: IORT ID Mapping offset must be zero.");
+  }
+}
 
 /**
   Helper Macro for populating the IORT Node header in the ACPI_PARSER array.
@@ -209,48 +221,6 @@ STATIC CONST ACPI_PARSER IortNodePmcgParser[] = {
   {L"Overflow interrupt GSIV", 4, 24, L"0x%x", NULL, NULL, NULL, NULL},
   {L"Node reference", 4, 28, L"0x%x", NULL, NULL, NULL, NULL},
 };
-
-/**
-  This function validates the ID Mapping array count for the ITS node.
-
-  @param [in] Ptr     Pointer to the start of the field data.
-  @param [in] Context Pointer to context specific information e.g. this
-                      could be a pointer to the ACPI table header.
-**/
-STATIC
-VOID
-EFIAPI
-ValidateItsIdMappingCount (
-  IN UINT8* Ptr,
-  IN VOID*     Context
-  )
-{
-  if (*(UINT32*)Ptr != 0) {
-    IncrementErrorCount ();
-    Print (L"\nERROR: IORT ID Mapping count must be zero.");
-  }
-}
-
-/**
-  This function validates the ID Mapping array offset for the ITS node.
-
-  @param [in] Ptr     Pointer to the start of the field data.
-  @param [in] Context Pointer to context specific information e.g. this
-                      could be a pointer to the ACPI table header.
-**/
-STATIC
-VOID
-EFIAPI
-ValidateItsIdArrayReference (
-  IN UINT8* Ptr,
-  IN VOID*  Context
-  )
-{
-  if (*(UINT32*)Ptr != 0) {
-    IncrementErrorCount ();
-    Print (L"\nERROR: IORT ID Mapping offset must be zero.");
-  }
-}
 
 /**
   This function parses the IORT Node Id Mapping array.
