@@ -27,6 +27,7 @@
 #
 
 [Sources.common]
+  PrePi.h
   FwVol.c
   PrePiLib.c
 

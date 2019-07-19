@@ -20,6 +20,7 @@
 #
 
 [Sources]
+  libfdt_internal.h
   fdt_empty_tree.c
   fdt_overlay.c
   fdt_ro.c
