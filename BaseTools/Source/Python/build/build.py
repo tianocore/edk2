@@ -773,7 +773,8 @@ class Build():
                 ConfDirectoryPath = mws.join(self.WorkspaceDir, 'Conf')
         GlobalData.gConfDirectory = ConfDirectoryPath
         GlobalData.gDatabasePath = os.path.normpath(os.path.join(ConfDirectoryPath, GlobalData.gDatabasePath))
-
+        if not os.path.exists(os.path.join(GlobalData.gConfDirectory, '.cache')):
+            os.makedirs(os.path.join(GlobalData.gConfDirectory, '.cache'))
         self.Db = WorkspaceDatabase()
         self.BuildDatabase = self.Db.BuildObject
         self.Platform = None

@@ -246,13 +246,8 @@ def ProcessDuplicatedInf(Path, BaseName, Workspace):
     else:
         Filename = BaseName + Path.BaseName
 
-    #
-    # If -N is specified on command line, cache is disabled
-    # The directory has to be created
-    #
     DbDir = os.path.split(GlobalData.gDatabasePath)[0]
-    if not os.path.exists(DbDir):
-        os.makedirs(DbDir)
+
     #
     # A temporary INF is copied to database path which must have write permission
     # The temporary will be removed at the end of build
