@@ -34,6 +34,7 @@
 #
 
 [Sources]
+  InternalCryptLib.h
   Hash/CryptMd4Null.c
   Hash/CryptMd5.c
   Hash/CryptSha1.c
