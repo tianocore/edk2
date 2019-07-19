@@ -18,9 +18,11 @@
   LIBRARY_CLASS                  = ArmLib
 
 [Sources]
+  ArmLibPrivate.h
   ArmLib.c
 
 [Sources.ARM]
+  Arm/ArmV7Lib.h
   Arm/ArmV7Lib.c
 
   Arm/ArmLibSupport.S           | GCC
@@ -34,6 +36,7 @@
   Arm/ArmV7ArchTimerSupport.asm | RVCT
 
 [Sources.AARCH64]
+  AArch64/AArch64Lib.h
   AArch64/AArch64Lib.c
 
   AArch64/ArmLibSupport.S
