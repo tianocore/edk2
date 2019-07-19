@@ -13,6 +13,9 @@
 #include "AcpiParser.h"
 #include "AcpiTableParser.h"
 
+// "The number of GT Block Timers must be less than or equal to 8"
+#define GT_BLOCK_TIMER_COUNT_MAX 8
+
 // Local variables
 STATIC CONST UINT32* GtdtPlatformTimerCount;
 STATIC CONST UINT32* GtdtPlatformTimerOffset;
@@ -36,7 +39,21 @@ EFIAPI
 ValidateGtBlockTimerCount (
   IN UINT8* Ptr,
   IN VOID*  Context
-  );
+  )
+{
+  UINT32 BlockTimerCount;
+
+  BlockTimerCount = *(UINT32*)Ptr;
+
+  if (BlockTimerCount > GT_BLOCK_TIMER_COUNT_MAX) {
+    IncrementErrorCount ();
+    Print (
+      L"\nERROR: Timer Count = %d. Max Timer Count is %d.",
+      BlockTimerCount,
+      GT_BLOCK_TIMER_COUNT_MAX
+      );
+  }
+}
 
 /**
   This function validates the GT Frame Number.
@@ -51,7 +68,21 @@ EFIAPI
 ValidateGtFrameNumber (
   IN UINT8* Ptr,
   IN VOID*  Context
-  );
+  )
+{
+  UINT8 FrameNumber;
+
+  FrameNumber = *(UINT8*)Ptr;
+
+  if (FrameNumber >= GT_BLOCK_TIMER_COUNT_MAX) {
+    IncrementErrorCount ();
+    Print (
+      L"\nERROR: GT Frame Number = %d. GT Frame Number must be in range 0-%d.",
+      FrameNumber,
+      GT_BLOCK_TIMER_COUNT_MAX - 1
+      );
+  }
+}
 
 /**
   An ACPI_PARSER array describing the ACPI GTDT Table.
@@ -133,62 +164,6 @@ STATIC CONST ACPI_PARSER SBSAGenericWatchdogParser[] = {
   {L"Watchdog Timer GSIV", 4, 20, L"0x%x", NULL, NULL, NULL, NULL},
   {L"Watchdog Timer Flags", 4, 24, L"0x%x", NULL, NULL, NULL, NULL}
 };
-
-/**
-  This function validates the GT Block timer count.
-
-  @param [in] Ptr     Pointer to the start of the field data.
-  @param [in] Context Pointer to context specific information e.g. this
-                      could be a pointer to the ACPI table header.
-**/
-STATIC
-VOID
-EFIAPI
-ValidateGtBlockTimerCount (
-  IN UINT8* Ptr,
-  IN VOID*  Context
-  )
-{
-  UINT32 BlockTimerCount;
-
-  BlockTimerCount = *(UINT32*)Ptr;
-
-  if (BlockTimerCount > 8) {
-    IncrementErrorCount ();
-    Print (
-      L"\nERROR: Timer Count = %d. Max Timer Count is 8.",
-      BlockTimerCount
-      );
-  }
-}
-
-/**
-  This function validates the GT Frame Number.
-
-  @param [in] Ptr     Pointer to the start of the field data.
-  @param [in] Context Pointer to context specific information e.g. this
-                      could be a pointer to the ACPI table header.
-**/
-STATIC
-VOID
-EFIAPI
-ValidateGtFrameNumber (
-  IN UINT8* Ptr,
-  IN VOID*  Context
-  )
-{
-  UINT8 FrameNumber;
-
-  FrameNumber = *(UINT8*)Ptr;
-
-  if (FrameNumber > 7) {
-    IncrementErrorCount ();
-    Print (
-      L"\nERROR: GT Frame Number = %d. GT Frame Number must be in range 0-7.",
-      FrameNumber
-      );
-  }
-}
 
 /**
   This function parses the Platform GT Block.
