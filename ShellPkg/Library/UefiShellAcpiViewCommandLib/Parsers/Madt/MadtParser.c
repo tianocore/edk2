@@ -35,7 +35,15 @@ EFIAPI
 ValidateGICDSystemVectorBase (
   IN UINT8* Ptr,
   IN VOID*  Context
-  );
+)
+{
+  if (*(UINT32*)Ptr != 0) {
+    IncrementErrorCount ();
+    Print (
+      L"\nERROR: System Vector Base must be zero."
+    );
+  }
+}
 
 /**
   This function validates the SPE Overflow Interrupt in the GICC.
@@ -50,7 +58,41 @@ EFIAPI
 ValidateSpeOverflowInterrupt (
   IN UINT8* Ptr,
   IN VOID*  Context
-  );
+  )
+{
+  UINT16 SpeOverflowInterrupt;
+
+  SpeOverflowInterrupt = *(UINT16*)Ptr;
+
+  // SPE not supported by this processor
+  if (SpeOverflowInterrupt == 0) {
+    return;
+  }
+
+  if ((SpeOverflowInterrupt < ARM_PPI_ID_MIN) ||
+      ((SpeOverflowInterrupt > ARM_PPI_ID_MAX) &&
+       (SpeOverflowInterrupt < ARM_PPI_ID_EXTENDED_MIN)) ||
+      (SpeOverflowInterrupt > ARM_PPI_ID_EXTENDED_MAX)) {
+    IncrementErrorCount ();
+    Print (
+      L"\nERROR: SPE Overflow Interrupt ID of %d is not in the allowed PPI ID "
+        L"ranges of %d-%d or %d-%d (for GICv3.1 or later).",
+      SpeOverflowInterrupt,
+      ARM_PPI_ID_MIN,
+      ARM_PPI_ID_MAX,
+      ARM_PPI_ID_EXTENDED_MIN,
+      ARM_PPI_ID_EXTENDED_MAX
+    );
+  } else if (SpeOverflowInterrupt != ARM_PPI_ID_PMBIRQ) {
+    IncrementWarningCount();
+    Print (
+      L"\nWARNING: SPE Overflow Interrupt ID of %d is not compliant with SBSA "
+        L"Level 3 PPI ID assignment: %d.",
+      SpeOverflowInterrupt,
+      ARM_PPI_ID_PMBIRQ
+    );
+  }
+}
 
 /**
   An ACPI_PARSER array describing the GICC Interrupt Controller Structure.
@@ -157,78 +199,6 @@ STATIC CONST ACPI_PARSER MadtInterruptControllerHeaderParser[] = {
    NULL},
   {L"Reserved", 2, 2, NULL, NULL, NULL, NULL, NULL}
 };
-
-/**
-  This function validates the System Vector Base in the GICD.
-
-  @param [in] Ptr     Pointer to the start of the field data.
-  @param [in] Context Pointer to context specific information e.g. this
-                      could be a pointer to the ACPI table header.
-**/
-STATIC
-VOID
-EFIAPI
-ValidateGICDSystemVectorBase (
-  IN UINT8* Ptr,
-  IN VOID*  Context
-)
-{
-  if (*(UINT32*)Ptr != 0) {
-    IncrementErrorCount ();
-    Print (
-      L"\nERROR: System Vector Base must be zero."
-    );
-  }
-}
-
-/**
-  This function validates the SPE Overflow Interrupt in the GICC.
-
-  @param [in] Ptr     Pointer to the start of the field data.
-  @param [in] Context Pointer to context specific information e.g. this
-                      could be a pointer to the ACPI table header.
-**/
-STATIC
-VOID
-EFIAPI
-ValidateSpeOverflowInterrupt (
-  IN UINT8* Ptr,
-  IN VOID*  Context
-  )
-{
-  UINT16 SpeOverflowInterrupt;
-
-  SpeOverflowInterrupt = *(UINT16*)Ptr;
-
-  // SPE not supported by this processor
-  if (SpeOverflowInterrupt == 0) {
-    return;
-  }
-
-  if ((SpeOverflowInterrupt < ARM_PPI_ID_MIN) ||
-      ((SpeOverflowInterrupt > ARM_PPI_ID_MAX) &&
-       (SpeOverflowInterrupt < ARM_PPI_ID_EXTENDED_MIN)) ||
-      (SpeOverflowInterrupt > ARM_PPI_ID_EXTENDED_MAX)) {
-    IncrementErrorCount ();
-    Print (
-      L"\nERROR: SPE Overflow Interrupt ID of %d is not in the allowed PPI ID "
-        L"ranges of %d-%d or %d-%d (for GICv3.1 or later).",
-      SpeOverflowInterrupt,
-      ARM_PPI_ID_MIN,
-      ARM_PPI_ID_MAX,
-      ARM_PPI_ID_EXTENDED_MIN,
-      ARM_PPI_ID_EXTENDED_MAX
-    );
-  } else if (SpeOverflowInterrupt != ARM_PPI_ID_PMBIRQ) {
-    IncrementWarningCount();
-    Print (
-      L"\nWARNING: SPE Overflow Interrupt ID of %d is not compliant with SBSA "
-        L"Level 3 PPI ID assignment: %d.",
-      SpeOverflowInterrupt,
-      ARM_PPI_ID_PMBIRQ
-    );
-  }
-}
 
 /**
   This function parses the ACPI MADT table.
