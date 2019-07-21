@@ -1079,7 +1079,7 @@ cleanlib:
                         CmdTargetDict[CmdSign] = "%s %s" % (CmdTargetDict[CmdSign], SingleCommandList[-1])
                     Index = CommandList.index(Item)
                     CommandList.pop(Index)
-                    if SingleCommandList[-1].endswith("%s%s.c" % (TAB_SLASH, CmdSumDict[CmdSign.lstrip('/Fo').rsplit(TAB_SLASH, 1)[0]])):
+                    if SingleCommandList[-1].endswith("%s%s.c" % (TAB_SLASH, CmdSumDict[CmdSign[3:].rsplit(TAB_SLASH, 1)[0]])):
                         Cpplist = CmdCppDict[T.Target.SubDir]
                         Cpplist.insert(0, '$(OBJLIST_%d): $(COMMON_DEPS)' % list(self.ObjTargetDict.keys()).index(T.Target.SubDir))
                         T.Commands[Index] = '%s\n\t%s' % (' \\\n\t'.join(Cpplist), CmdTargetDict[CmdSign])

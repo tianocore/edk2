@@ -793,7 +793,10 @@ class GenFdsGlobalVariable:
     def GetPcdValue (PcdPattern):
         if PcdPattern is None:
             return None
-        PcdPair = PcdPattern.lstrip('PCD(').rstrip(')').strip().split('.')
+        if PcdPattern.startswith('PCD('):
+            PcdPair = PcdPattern[4:].rstrip(')').strip().split('.')
+        else:
+            PcdPair = PcdPattern.strip().split('.')
         TokenSpace = PcdPair[0]
         TokenCName = PcdPair[1]
 
