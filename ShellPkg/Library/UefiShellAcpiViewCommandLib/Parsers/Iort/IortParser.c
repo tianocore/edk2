@@ -54,6 +54,28 @@ ValidateItsIdMappingCount (
 }
 
 /**
+  This function validates the ID Mapping array count for the Performance
+  Monitoring Counter Group (PMCG) node.
+
+  @param [in] Ptr     Pointer to the start of the field data.
+  @param [in] Context Pointer to context specific information e.g. this
+                      could be a pointer to the ACPI table header.
+**/
+STATIC
+VOID
+EFIAPI
+ValidatePmcgIdMappingCount (
+  IN UINT8* Ptr,
+  IN VOID*  Context
+  )
+{
+  if (*(UINT32*)Ptr > 1) {
+    IncrementErrorCount ();
+    Print (L"\nERROR: IORT ID Mapping count must not be greater than 1.");
+  }
+}
+
+/**
   This function validates the ID Mapping array offset for the ITS node.
 
   @param [in] Ptr     Pointer to the start of the field data.
@@ -216,7 +238,7 @@ STATIC CONST ACPI_PARSER IortNodeRootComplexParser[] = {
   An ACPI_PARSER array describing the IORT PMCG node.
 **/
 STATIC CONST ACPI_PARSER IortNodePmcgParser[] = {
-  PARSE_IORT_NODE_HEADER (NULL, NULL),
+  PARSE_IORT_NODE_HEADER (ValidatePmcgIdMappingCount, NULL),
   {L"Base Address", 8, 16, L"0x%lx", NULL, NULL, NULL, NULL},
   {L"Overflow interrupt GSIV", 4, 24, L"0x%x", NULL, NULL, NULL, NULL},
   {L"Node reference", 4, 28, L"0x%x", NULL, NULL, NULL, NULL},
@@ -536,14 +558,6 @@ DumpIortNodePmcg (
 
   if (*IortIdMappingCount != 0) {
     DumpIortNodeIdMappings (Ptr, MappingCount, MappingOffset);
-  }
-
-  if (*IortIdMappingCount > 1) {
-    IncrementErrorCount ();
-    Print (
-      L"ERROR: ID mapping must not be greater than 1. Id Mapping Count =%d\n",
-      *IortIdMappingCount
-      );
   }
 }
 
