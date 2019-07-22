@@ -206,6 +206,7 @@ ParseAcpiSrat (
              AcpiTableLength,
              PARSER_PARAMS (SratParser)
              );
+
   ResourcePtr = Ptr + Offset;
 
   while (Offset < AcpiTableLength) {
@@ -250,7 +251,7 @@ ParseAcpiSrat (
           ResourcePtr,
           *SratRALength,
           PARSER_PARAMS (SratGicITSAffinityParser)
-        );
+          );
         break;
 
       case EFI_ACPI_6_2_MEMORY_AFFINITY:
