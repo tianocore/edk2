@@ -405,12 +405,16 @@ ParseAcpi (
 
   @param [in] Ptr     Pointer to the start of the buffer.
   @param [in] Indent  Number of spaces to indent the output.
+  @param [in] Length  Length of the GAS structure buffer.
+
+  @retval Number of bytes parsed.
 **/
-VOID
+UINT32
 EFIAPI
 DumpGasStruct (
   IN UINT8*        Ptr,
-  IN UINT32        Indent
+  IN UINT32        Indent,
+  IN UINT32        Length
   );
 
 /**

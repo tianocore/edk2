@@ -134,7 +134,7 @@ DumpDbgDeviceInfo (
   AddrSize = (UINT32*)(Ptr + (*AddrSizeOffset));
   while (Index < (*GasCount)) {
     PrintFieldName (4, L"BaseAddressRegister");
-    DumpGasStruct (DataPtr, 4);
+    DumpGasStruct (DataPtr, 4, GAS_LENGTH);
     PrintFieldName (4, L"Address Size");
     Print (L"0x%x\n", AddrSize[Index]);
     DataPtr += GAS_LENGTH;

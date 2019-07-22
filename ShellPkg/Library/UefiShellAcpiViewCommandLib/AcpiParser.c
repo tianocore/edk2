@@ -589,23 +589,27 @@ STATIC CONST ACPI_PARSER GasParser[] = {
 
   @param [in] Ptr     Pointer to the start of the buffer.
   @param [in] Indent  Number of spaces to indent the output.
+  @param [in] Length  Length of the GAS structure buffer.
+
+  @retval Number of bytes parsed.
 **/
-VOID
+UINT32
 EFIAPI
 DumpGasStruct (
   IN UINT8*        Ptr,
-  IN UINT32        Indent
+  IN UINT32        Indent,
+  IN UINT32        Length
   )
 {
   Print (L"\n");
-  ParseAcpi (
-    TRUE,
-    Indent,
-    NULL,
-    Ptr,
-    GAS_LENGTH,
-    PARSER_PARAMS (GasParser)
-    );
+  return ParseAcpi (
+           TRUE,
+           Indent,
+           NULL,
+           Ptr,
+           Length,
+           PARSER_PARAMS (GasParser)
+           );
 }
 
 /**
@@ -621,7 +625,7 @@ DumpGas (
   IN UINT8*        Ptr
   )
 {
-  DumpGasStruct (Ptr, 2);
+  DumpGasStruct (Ptr, 2, GAS_LENGTH);
 }
 
 /**
