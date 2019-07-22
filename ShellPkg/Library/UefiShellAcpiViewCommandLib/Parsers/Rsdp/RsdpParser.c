@@ -129,7 +129,14 @@ ParseAcpiRsdp (
     VerifyChecksum (TRUE, Ptr, AcpiTableLength);
   }
 
-  ParseAcpi (Trace, 0, "RSDP", Ptr, AcpiTableLength, PARSER_PARAMS (RsdpParser));
+  ParseAcpi (
+    Trace,
+    0,
+    "RSDP",
+    Ptr,
+    AcpiTableLength,
+    PARSER_PARAMS (RsdpParser)
+    );
 
   // This code currently supports parsing of XSDT table only
   // and does not parse the RSDT table. Platforms provide the
@@ -137,7 +144,7 @@ ParseAcpiRsdp (
   // Therefore the RSDT should not be used on ARM platforms.
   if ((*XsdtAddress) == 0) {
     IncrementErrorCount ();
-    Print (L"ERROR: XSDT Pointer is not set.\n");
+    Print (L"ERROR: XSDT Pointer is not set. RSDP parsing aborted.\n");
     return;
   }
 
