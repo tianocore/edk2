@@ -260,16 +260,30 @@ ParseAcpiMadt (
       PARSER_PARAMS (MadtInterruptControllerHeaderParser)
       );
 
-    if (((Offset + (*MadtInterruptControllerLength)) > AcpiTableLength) ||
-        (*MadtInterruptControllerLength < 4)) {
+    // Make sure forward progress is made.
+    if (*MadtInterruptControllerLength < 2) {
       IncrementErrorCount ();
       Print (
-         L"ERROR: Invalid Interrupt Controller Length,"
-          L" Type = %d, Length = %d\n",
-         *MadtInterruptControllerType,
-         *MadtInterruptControllerLength
-         );
-      break;
+        L"ERROR: Structure length is too small: " \
+          L"MadtInterruptControllerLength = %d. " \
+          L"MadtInterruptControllerType = %d. MADT parsing aborted.\n",
+        *MadtInterruptControllerLength,
+        *MadtInterruptControllerType
+        );
+      return;
+    }
+
+    // Make sure the MADT structure lies inside the table
+    if ((Offset + *MadtInterruptControllerLength) > AcpiTableLength) {
+      IncrementErrorCount ();
+      Print (
+        L"ERROR: Invalid MADT structure length. " \
+          L"MadtInterruptControllerLength = %d. " \
+          L"RemainingTableBufferLength = %d. MADT parsing aborted.\n",
+        *MadtInterruptControllerLength,
+        AcpiTableLength - Offset
+        );
+      return;
     }
 
     switch (*MadtInterruptControllerType) {
