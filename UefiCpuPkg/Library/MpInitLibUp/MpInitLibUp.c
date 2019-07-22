@@ -405,3 +405,38 @@ MpInitLibWhoAmI (
   *ProcessorNumber = 0;
   return EFI_SUCCESS;
 }
+
+/**
+  This service executes a caller provided function on all enabled CPUs.
+
+  @param[in]  Procedure               A pointer to the function to be run on
+                                      enabled APs of the system. See type
+                                      EFI_AP_PROCEDURE.
+  @param[in]  TimeoutInMicroseconds   Indicates the time limit in microseconds for
+                                      APs to return from Procedure, either for
+                                      blocking or non-blocking mode. Zero means
+                                      infinity. TimeoutInMicroseconds is ignored
+                                      for BSP.
+  @param[in]  ProcedureArgument       The parameter passed into Procedure for
+                                      all APs.
+
+  @retval EFI_SUCCESS             CPU have finished the procedure.
+  @retval EFI_INVALID_PARAMETER   Procedure is NULL.
+
+**/
+EFI_STATUS
+EFIAPI
+MpInitLibStartupAllCPUs (
+  IN  EFI_AP_PROCEDURE          Procedure,
+  IN  UINTN                     TimeoutInMicroseconds,
+  IN  VOID                      *ProcedureArgument      OPTIONAL
+  )
+{
+  if (Procedure == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Procedure (ProcedureArgument);
+
+  return EFI_SUCCESS;
+}
