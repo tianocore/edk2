@@ -154,6 +154,13 @@ class InfBuildData(ModuleBuildClassObject):
         self._PcdComments = None
         self._BuildOptions = None
         self._DependencyFileList = None
+        self.LibInstances = []
+        self.ReferenceModules = set()
+        self.Guids
+        self.Pcds
+    def SetReferenceModule(self,Module):
+        self.ReferenceModules.add(Module)
+        return self
 
     ## XXX[key] = value
     def __setitem__(self, key, value):
@@ -705,6 +712,25 @@ class InfBuildData(ModuleBuildClassObject):
         return RetVal
 
     @cached_property
+    def ModulePcdList(self):
+        RetVal = self.Pcds
+        return RetVal
+    @cached_property
+    def LibraryPcdList(self):
+        if bool(self.LibraryClass):
+            return []
+        RetVal = {}
+        Pcds = set()
+        for Library in self.LibInstances:
+            PcdsInLibrary = OrderedDict()
+            for Key in Library.Pcds:
+                if Key in self.Pcds or Key in Pcds:
+                    continue
+                Pcds.add(Key)
+                PcdsInLibrary[Key] = copy.copy(Library.Pcds[Key])
+            RetVal[Library] = PcdsInLibrary
+        return RetVal
+    @cached_property
     def PcdsName(self):
         PcdsName = set()
         for Type in (MODEL_PCD_FIXED_AT_BUILD,MODEL_PCD_PATCHABLE_IN_MODULE,MODEL_PCD_FEATURE_FLAG,MODEL_PCD_DYNAMIC,MODEL_PCD_DYNAMIC_EX):
@@ -1030,3 +1056,6 @@ class InfBuildData(ModuleBuildClassObject):
         if (self.Binaries and not self.Sources) or GlobalData.gIgnoreSource:
             return True
         return False
+def ExtendCopyDictionaryLists(CopyToDict, CopyFromDict):
+    for Key in CopyFromDict:
+        CopyToDict[Key].extend(CopyFromDict[Key])

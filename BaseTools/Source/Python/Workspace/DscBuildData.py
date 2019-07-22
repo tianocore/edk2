@@ -1373,11 +1373,11 @@ class DscBuildData(PlatformBuildClassObject):
                                         self._PCD_TYPE_STRING_[MODEL_PCD_FEATURE_FLAG],
                                         self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC],
                                         self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_EX]]:
-                        self.Pcds[Name, Guid] = copy.deepcopy(PcdInDec)
-                        self.Pcds[Name, Guid].DefaultValue = NoFiledValues[( Guid, Name)][0]
+                        self._Pcds[Name, Guid] = copy.deepcopy(PcdInDec)
+                        self._Pcds[Name, Guid].DefaultValue = NoFiledValues[( Guid, Name)][0]
                     if PcdInDec.Type in [self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC],
                                         self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_EX]]:
-                        self.Pcds[Name, Guid].SkuInfoList = {TAB_DEFAULT:SkuInfoClass(TAB_DEFAULT, self.SkuIds[TAB_DEFAULT][0], '', '', '', '', '', NoFiledValues[( Guid, Name)][0])}
+                        self._Pcds[Name, Guid].SkuInfoList = {TAB_DEFAULT:SkuInfoClass(TAB_DEFAULT, self.SkuIds[TAB_DEFAULT][0], '', '', '', '', '', NoFiledValues[( Guid, Name)][0])}
         return AllPcds
 
     def OverrideByFdfOverAll(self,AllPcds):
@@ -1419,8 +1419,8 @@ class DscBuildData(PlatformBuildClassObject):
                     if PcdInDec.Type in [self._PCD_TYPE_STRING_[MODEL_PCD_FIXED_AT_BUILD],
                                         self._PCD_TYPE_STRING_[MODEL_PCD_PATCHABLE_IN_MODULE],
                                         self._PCD_TYPE_STRING_[MODEL_PCD_FEATURE_FLAG]]:
-                        self.Pcds[Name, Guid] = copy.deepcopy(PcdInDec)
-                        self.Pcds[Name, Guid].DefaultValue = Value
+                        self._Pcds[Name, Guid] = copy.deepcopy(PcdInDec)
+                        self._Pcds[Name, Guid].DefaultValue = Value
         return AllPcds
 
     def ParsePcdNameStruct(self,NamePart1,NamePart2):

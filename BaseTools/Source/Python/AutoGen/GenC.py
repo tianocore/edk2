@@ -1629,7 +1629,7 @@ def CreatePcdCode(Info, AutoGenC, AutoGenH):
         if Pcd.Type in PCD_DYNAMIC_EX_TYPE_SET and Pcd.TokenSpaceGuidCName not in TokenSpaceList:
             TokenSpaceList.append(Pcd.TokenSpaceGuidCName)
 
-    SkuMgr = Info.Workspace.Platform.SkuIdMgr
+    SkuMgr = Info.PlatformInfo.Platform.SkuIdMgr
     AutoGenH.Append("\n// Definition of SkuId Array\n")
     AutoGenH.Append("extern UINT64 _gPcd_SkuId_Array[];\n")
     # Add extern declarations to AutoGen.h if one or more Token Space GUIDs were found

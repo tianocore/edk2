@@ -12,42 +12,45 @@
 # Import Modules
 #
 from __future__ import print_function
-import Common.LongFilePathOs as os
-import re
+from __future__ import absolute_import
+import os.path as path
 import sys
+import os
+import re
 import glob
 import time
 import platform
 import traceback
-import encodings.ascii
 import multiprocessing
-
-from struct import *
-from threading import *
+from threading import Thread,Event,BoundedSemaphore
 import threading
+from subprocess import Popen,PIPE
+from collections import OrderedDict, defaultdict
 from optparse import OptionParser
-from subprocess import *
+from AutoGen.PlatformAutoGen import PlatformAutoGen
+from AutoGen.ModuleAutoGen import ModuleAutoGen
+from AutoGen.WorkspaceAutoGen import WorkspaceAutoGen
+from AutoGen import GenMake
 from Common import Misc as Utils
 
-from Common.LongFilePathSupport import OpenLongFilePath as open
 from Common.TargetTxtClassObject import TargetTxt
 from Common.ToolDefClassObject import ToolDef
-from Common.DataType import *
-from Common.BuildVersion import gBUILD_VERSION
-from AutoGen.AutoGen import *
-from Common.BuildToolError import *
-from Workspace.WorkspaceDatabase import WorkspaceDatabase
+from Common.Misc import PathClass,SaveFileOnChange,RemoveDirectory
+from Common.StringUtils import NormPath
 from Common.MultipleWorkspace import MultipleWorkspace as mws
+from Common.BuildToolError import *
+from Common.DataType import *
+import Common.EdkLogger as EdkLogger
+from Common.BuildVersion import gBUILD_VERSION
+from Workspace.WorkspaceDatabase import BuildDB
 
 from BuildReport import BuildReport
-from GenPatchPcdTable.GenPatchPcdTable import *
-from PatchPcdValue.PatchPcdValue import *
+from GenPatchPcdTable.GenPatchPcdTable import PeImageClass,parsePcdInfoFromMapFile
+from PatchPcdValue.PatchPcdValue import PatchBinaryFile
 
-import Common.EdkLogger
 import Common.GlobalData as GlobalData
 from GenFds.GenFds import GenFds, GenFdsApi
 
-from collections import OrderedDict, defaultdict
 
 # Version and Copyright
 VersionNumber = "0.60" + ' ' + gBUILD_VERSION
@@ -775,7 +778,7 @@ class Build():
         GlobalData.gDatabasePath = os.path.normpath(os.path.join(ConfDirectoryPath, GlobalData.gDatabasePath))
         if not os.path.exists(os.path.join(GlobalData.gConfDirectory, '.cache')):
             os.makedirs(os.path.join(GlobalData.gConfDirectory, '.cache'))
-        self.Db = WorkspaceDatabase()
+        self.Db = BuildDB
         self.BuildDatabase = self.Db.BuildObject
         self.Platform = None
         self.ToolChainFamily = None
@@ -1700,13 +1703,17 @@ class Build():
                     CmdListDict = self._GenFfsCmd(Wa.ArchList)
 
                 for Arch in Wa.ArchList:
+                    PcdMaList    = []
                     GlobalData.gGlobalDefines['ARCH'] = Arch
                     Pa = PlatformAutoGen(Wa, self.PlatformFile, BuildTarget, ToolChain, Arch)
                     for Module in Pa.Platform.Modules:
                         # Get ModuleAutoGen object to generate C code file and makefile
-                        Ma = ModuleAutoGen(Wa, Module, BuildTarget, ToolChain, Arch, self.PlatformFile)
+                        Ma = ModuleAutoGen(Wa, Module, BuildTarget, ToolChain, Arch, self.PlatformFile,Pa.DataPipe)
                         if Ma is None:
                             continue
+                        if Ma.PcdIsDriver:
+                            Ma.PlatformInfo = Pa
+                            PcdMaList.append(Ma)
                         self.BuildModules.append(Ma)
                     self._BuildPa(self.Target, Pa, FfsCommand=CmdListDict)
 
@@ -1802,7 +1809,7 @@ class Build():
                     Pa = PlatformAutoGen(Wa, self.PlatformFile, BuildTarget, ToolChain, Arch)
                     for Module in Pa.Platform.Modules:
                         if self.ModuleFile.Dir == Module.Dir and self.ModuleFile.Name == Module.Name:
-                            Ma = ModuleAutoGen(Wa, Module, BuildTarget, ToolChain, Arch, self.PlatformFile)
+                            Ma = ModuleAutoGen(Wa, Module, BuildTarget, ToolChain, Arch, self.PlatformFile,Pa.DataPipe)
                             if Ma is None:
                                 continue
                             MaList.append(Ma)
@@ -1982,6 +1989,7 @@ class Build():
                 ExitFlag.clear()
                 self.AutoGenTime += int(round((time.time() - WorkspaceAutoGenTime)))
                 for Arch in Wa.ArchList:
+                    PcdMaList    = []
                     AutoGenStart = time.time()
                     GlobalData.gGlobalDefines['ARCH'] = Arch
                     Pa = PlatformAutoGen(Wa, self.PlatformFile, BuildTarget, ToolChain, Arch)
@@ -1999,10 +2007,13 @@ class Build():
                             ModuleList.append(Inf)
                     for Module in ModuleList:
                         # Get ModuleAutoGen object to generate C code file and makefile
-                        Ma = ModuleAutoGen(Wa, Module, BuildTarget, ToolChain, Arch, self.PlatformFile)
+                        Ma = ModuleAutoGen(Wa, Module, BuildTarget, ToolChain, Arch, self.PlatformFile,Pa.DataPipe)
 
                         if Ma is None:
                             continue
+                        if Ma.PcdIsDriver:
+                            Ma.PlatformInfo = Pa
+                            PcdMaList.append(Ma)
                         if Ma.CanSkipbyHash():
                             self.HashSkipModules.append(Ma)
                             if GlobalData.gBinCacheSource:
