@@ -1336,7 +1336,7 @@ IsForbiddenByDbx (
   //       UINT8  Certn[];
   //
   Pkcs7GetSigners (AuthData, AuthDataSize, &CertBuffer, &BufferLength, &TrustedCert, &TrustedCertLength);
-  if ((BufferLength == 0) || (CertBuffer == NULL)) {
+  if ((BufferLength == 0) || (CertBuffer == NULL) || (*CertBuffer) == 0) {
     IsForbidden = TRUE;
     goto Done;
   }
@@ -1370,21 +1370,17 @@ IsForbiddenByDbx (
       DEBUG ((DEBUG_INFO, "DxeImageVerificationLib: Image is signed but signature failed the timestamp check.\n"));
       goto Done;
     }
-
   }
+
+  IsForbidden = FALSE;
 
 Done:
   if (Data != NULL) {
     FreePool (Data);
   }
 
-  if (CertBuffer != NULL) {
-    Pkcs7FreeSigners (CertBuffer);
-  }
-
-  if (TrustedCert != NULL) {
-    Pkcs7FreeSigners (TrustedCert);
-  }
+  Pkcs7FreeSigners (CertBuffer);
+  Pkcs7FreeSigners (TrustedCert);
 
   return IsForbidden;
 }
@@ -1475,6 +1471,7 @@ IsAllowedByDb (
             //
             // Here We still need to check if this RootCert's Hash is revoked
             //
+            DbxDataSize = 0;
             Status   = gRT->GetVariable (EFI_IMAGE_SECURITY_DATABASE1, &gEfiImageSecurityDatabaseGuid, NULL, &DbxDataSize, NULL);
             if (Status != EFI_BUFFER_TOO_SMALL) {
               if (Status == EFI_NOT_FOUND) {
@@ -1504,6 +1501,8 @@ IsAllowedByDb (
               if (!VerifyStatus) {
                 DEBUG ((DEBUG_INFO, "DxeImageVerificationLib: Image is signed and signature is accepted by DB, but its root cert failed the timestamp check.\n"));
               }
+            } else if (!EFI_ERROR (Status) && !IsFound) {
+              VerifyStatus = TRUE;
             }
 
             goto Done;
