@@ -213,17 +213,6 @@ if [[ "$RUN_QEMU" == "yes" ]]; then
       ENABLE_FLASH=yes
       ;;
   esac
-
-  ADD_QEMU_HDA=yes
-  for arg in "$@"
-  do
-    case $arg in
-      -hd[a-d]|-fd[ab]|-cdrom)
-        ADD_QEMU_HDA=no
-        break
-        ;;
-    esac
-  done
 fi
 
 #
@@ -266,9 +255,6 @@ if [[ "$RUN_QEMU" == "yes" ]]; then
     QEMU_COMMAND="$QEMU_COMMAND -pflash $QEMU_FIRMWARE_DIR/bios.bin"
   else
     QEMU_COMMAND="$QEMU_COMMAND -L $QEMU_FIRMWARE_DIR"
-  fi
-  if [[ "$ADD_QEMU_HDA" == "yes" ]]; then
-    QEMU_COMMAND="$QEMU_COMMAND -hda fat:$BUILD_ROOT_ARCH"
   fi
   echo Running: $QEMU_COMMAND "$@"
   $QEMU_COMMAND "$@"
