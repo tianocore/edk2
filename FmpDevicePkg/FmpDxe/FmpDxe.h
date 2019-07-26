@@ -23,6 +23,7 @@
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiLib.h>
+#include <Library/PrintLib.h>
 #include <Library/FmpAuthenticationLib.h>
 #include <Library/FmpDeviceLib.h>
 #include <Library/FmpPayloadHeaderLib.h>
