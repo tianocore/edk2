@@ -96,6 +96,11 @@
   # @Prompt Firmware Device Watchdog Time in Seconds.
   gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceProgressWatchdogTimeInSeconds|0x0|UINT8|0x4000000D
 
+  ## The Image Type ID to use if one is not provided by FmpDeviceLib. If this
+  #  PCD is not a valid GUID value, then gEfiCallerIdGuid is used.
+  # @Prompt Firmware Device Image Type ID
+  gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceImageTypeIdGuid|{0}|VOID*|0x40000010
+
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## One or more PKCS7 certificates used to verify a firmware device capsule
   #  update image.  Encoded using the Variable-Length Opaque Data format of RFC

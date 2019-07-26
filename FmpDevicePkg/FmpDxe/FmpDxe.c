@@ -147,7 +147,9 @@ FmpDxeProgress (
 /**
   Returns a pointer to the ImageTypeId GUID value.  An attempt is made to get
   the GUID value from the FmpDeviceLib. If the FmpDeviceLib does not provide
-  a GUID value, then gEfiCallerIdGuid is returned.
+  a GUID value, then PcdFmpDeviceImageTypeIdGuid is used.  If the size of
+  PcdFmpDeviceImageTypeIdGuid is not the size of EFI_GUID, then gEfiCallerIdGuid
+  is returned.
 
   @retval  The ImageTypeId GUID
 
@@ -159,6 +161,7 @@ GetImageTypeIdGuid (
 {
   EFI_STATUS  Status;
   EFI_GUID    *FmpDeviceLibGuid;
+  UINTN       ImageTypeIdGuidSize;
 
   FmpDeviceLibGuid = NULL;
   Status = FmpDeviceGetImageTypeIdGuidPtr (&FmpDeviceLibGuid);
@@ -166,11 +169,18 @@ GetImageTypeIdGuid (
     if (Status != EFI_UNSUPPORTED) {
       DEBUG ((DEBUG_ERROR, "FmpDxe(%s): FmpDeviceLib GetImageTypeIdGuidPtr() returned invalid error %r\n", mImageIdName, Status));
     }
-    return &gEfiCallerIdGuid;
-  }
-  if (FmpDeviceLibGuid == NULL) {
+  } else if (FmpDeviceLibGuid == NULL) {
     DEBUG ((DEBUG_ERROR, "FmpDxe(%s): FmpDeviceLib GetImageTypeIdGuidPtr() returned invalid GUID\n", mImageIdName));
-    return &gEfiCallerIdGuid;
+    Status = EFI_NOT_FOUND;
+  }
+  if (EFI_ERROR (Status)) {
+    ImageTypeIdGuidSize = PcdGetSize (PcdFmpDeviceImageTypeIdGuid);
+    if (ImageTypeIdGuidSize == sizeof (EFI_GUID)) {
+      FmpDeviceLibGuid = (EFI_GUID *)PcdGetPtr (PcdFmpDeviceImageTypeIdGuid);
+    } else {
+      DEBUG ((DEBUG_INFO, "FmpDxe(%s): Fall back to ImageTypeIdGuid of gEfiCallerIdGuid\n", mImageIdName));
+      FmpDeviceLibGuid = &gEfiCallerIdGuid;
+    }
   }
   return FmpDeviceLibGuid;
 }
