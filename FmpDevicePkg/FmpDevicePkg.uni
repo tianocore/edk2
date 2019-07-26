@@ -6,7 +6,7 @@
 // Capsules.  The behavior of the Firmware Management Protocol instance is
 // customized using libraries and PCDs.
 //
-// Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2018 - 2019, Intel Corporation. All rights reserved.<BR>
 //
 // SPDX-License-Identifier: BSD-2-Clause-Patent
 //
@@ -52,6 +52,10 @@
                                                                                                           "firmware update.  If the watchdog timer expires, the system reboots.  A"
                                                                                                           "value of 0 disables the watchdog timer.  The default value is 0 (watchdog"
                                                                                                           "disabled)."
+
+#string STR_gFmpDevicePkgTokenSpaceGuid_PcdFmpDeviceImageTypeIdGuid_PROMPT  #language en-US "Firmware Device Image Type ID."
+#string STR_gFmpDevicePkgTokenSpaceGuid_PcdFmpDeviceImageTypeIdGuid_HELP    #language en-US "The Image Type ID to use if one is not provided by FmpDeviceLib. If this"
+                                                                                            "PCD is not a valid GUID value, then gEfiCallerIdGuid is used."
 
 #string STR_gFmpDevicePkgTokenSpaceGuid_PcdFmpDevicePkcs7CertBufferXdr_PROMPT  #language en-US "One or more XDR encoded PKCS7 certificates used to verify firmware device capsule update images"
 #string STR_gFmpDevicePkgTokenSpaceGuid_PcdFmpDevicePkcs7CertBufferXdr_HELP    #language en-US "Provides one or more PKCS7 certificates used to verify a firmware device"

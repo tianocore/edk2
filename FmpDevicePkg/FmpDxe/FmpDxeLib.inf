@@ -68,6 +68,7 @@
   gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceProgressColor                    ## CONSUMES
   gFmpDevicePkgTokenSpaceGuid.PcdFmpDevicePkcs7CertBufferXdr               ## CONSUMES
   gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceTestKeySha256Digest              ## CONSUMES
+  gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceImageTypeIdGuid                  ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdTestKeyUsed                            ## SOMETIMES_PRODUCES
 
 [Depex]

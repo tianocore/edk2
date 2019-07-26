@@ -66,6 +66,9 @@
 [LibraryClasses.ARM]
   ArmSoftFloatLib|ArmPkg/Library/ArmSoftFloatLib/ArmSoftFloatLib.inf
 
+[PcdsPatchableInModule]
+  gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceImageTypeIdGuid|{0}
+
 [Components]
   #
   # Libraries
@@ -89,6 +92,17 @@
       # FILE_GUID is used as ESRT GUID
       #
       FILE_GUID = $(SYSTEM_FMP_ESRT_GUID)
+    <PcdsFixedAtBuild>
+      #
+      # Unicode name string that is used to populate FMP Image Descriptor for this capsule update module
+      #
+      gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceImageIdName|L"Sample Firmware Device"
+      #
+      # Certificates used to authenticate capsule update image
+      #
+      !include BaseTools/Source/Python/Pkcs7Sign/TestRoot.cer.gFmpDevicePkgTokenSpaceGuid.PcdFmpDevicePkcs7CertBufferXdr.inc
+    <PcdsPatchableInModule>
+      gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceImageTypeIdGuid|{GUID("$(SYSTEM_FMP_ESRT_GUID)")}
     <LibraryClasses>
       #
       # Use CapsuleUpdatePolicyLib that calls the Capsule Update Policy Protocol.
@@ -104,6 +118,17 @@
       # FILE_GUID is used as ESRT GUID
       #
       FILE_GUID = $(DEVICE_FMP_ESRT_GUID)
+    <PcdsFixedAtBuild>
+      #
+      # Unicode name string that is used to populate FMP Image Descriptor for this capsule update module
+      #
+      gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceImageIdName|L"Sample Firmware Device"
+      #
+      # Certificates used to authenticate capsule update image
+      #
+      !include BaseTools/Source/Python/Pkcs7Sign/TestRoot.cer.gFmpDevicePkgTokenSpaceGuid.PcdFmpDevicePkcs7CertBufferXdr.inc
+    <PcdsPatchableInModule>
+      gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceImageTypeIdGuid|{GUID("$(DEVICE_FMP_ESRT_GUID)")}
     <LibraryClasses>
       #
       # Directly use a platform specific CapsuleUpdatePolicyLib instance.
