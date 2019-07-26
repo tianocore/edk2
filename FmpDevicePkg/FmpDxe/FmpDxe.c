@@ -541,6 +541,10 @@ GetTheImage (
   FIRMWARE_MANAGEMENT_PRIVATE_DATA  *Private;
   UINTN                             Size;
 
+  if (!FeaturePcdGet (PcdFmpDeviceStorageAccessEnable)) {
+    return EFI_UNSUPPORTED;
+  }
+
   Status = EFI_SUCCESS;
 
   //
@@ -714,6 +718,10 @@ CheckTheImage (
   Version          = 0;
   FmpHeaderSize    = 0;
   AllHeaderSize    = 0;
+
+  if (!FeaturePcdGet (PcdFmpDeviceStorageAccessEnable)) {
+    return EFI_UNSUPPORTED;
+  }
 
   //
   // Retrieve the private context structure
@@ -969,6 +977,10 @@ SetTheImage (
   AllHeaderSize      = 0;
   IncommingFwVersion = 0;
   LastAttemptStatus  = LAST_ATTEMPT_STATUS_ERROR_UNSUCCESSFUL;
+
+  if (!FeaturePcdGet (PcdFmpDeviceStorageAccessEnable)) {
+    return EFI_UNSUPPORTED;
+  }
 
   //
   // Retrieve the private context structure

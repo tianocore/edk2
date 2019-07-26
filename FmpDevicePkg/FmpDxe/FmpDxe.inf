@@ -61,6 +61,7 @@
   gEdkiiFirmwareManagementProgressProtocolGuid  ## PRODUCES
 
 [Pcd]
+  gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceStorageAccessEnable              ## CONSUMES
   gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceImageIdName                      ## CONSUMES
   gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceBuildTimeLowestSupportedVersion  ## CONSUMES
   gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceLockEventGuid                    ## CONSUMES
