@@ -17,6 +17,8 @@
 #include <Library/DebugLib.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/BaseCryptLib.h>
+#include <Library/PcdLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/MemoryAllocationLib.h>
@@ -70,6 +72,11 @@ typedef struct {
 ///
 #define FIRMWARE_MANAGEMENT_PRIVATE_DATA_FROM_THIS(a) \
   CR (a, FIRMWARE_MANAGEMENT_PRIVATE_DATA, Fmp, FIRMWARE_MANAGEMENT_PRIVATE_DATA_SIGNATURE)
+
+///
+/// Null-terminated Unicode string retrieved from PcdFmpDeviceImageIdName.
+///
+extern CHAR16  *mImageIdName;
 
 /**
   Check to see if any of the keys in PcdFmpDevicePkcs7CertBufferXdr matches
