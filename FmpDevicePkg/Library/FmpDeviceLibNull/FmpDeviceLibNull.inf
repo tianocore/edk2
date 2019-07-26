@@ -3,7 +3,7 @@
 #  image stored in a firmware device.
 #
 #  Copyright (c) 2016, Microsoft Corporation. All rights reserved.<BR>
-#  Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2018 - 2019, Intel Corporation. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
@@ -15,7 +15,7 @@
   FILE_GUID       = 8507642B-AE92-4664-B713-807F7774A96D
   MODULE_TYPE     = DXE_DRIVER
   VERSION_STRING  = 1.0
-  LIBRARY_CLASS   = FmpDeviceLib|DXE_DRIVER
+  LIBRARY_CLASS   = FmpDeviceLib|DXE_DRIVER UEFI_DRIVER
 
 #
 # The following information is for reference only and not required by the build tools.
