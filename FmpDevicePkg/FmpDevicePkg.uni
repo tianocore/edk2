@@ -16,6 +16,16 @@
 
 #string STR_PACKAGE_DESCRIPTION  #language en-US  "This package provides libraries that support the implementation of a module that produces the Firmware Management Protocol to support the update of a system firmware component."
 
+#string STR_gFmpDevicePkgTokenSpaceGuid_PcdFmpDeviceStorageAccessEnable_PROMPT  #language en-US "Firmware Device Storage Access Enabled."
+#string STR_gFmpDevicePkgTokenSpaceGuid_PcdFmpDeviceStorageAccessEnable_HELP    #language en-US "Indicates if the Firmware Management Protocol supports access to"
+                                                                                                "to a firmware storage device.  If set to FALSE, then only GetImageInfo()"
+                                                                                                "is supported.  This is used by FMP drivers that require the samllest"
+                                                                                                "possible Firmware Management Protocol implementation that supports"
+                                                                                                "advertising the updatable firmware device in the ESRT.<BR>"
+                                                                                                "  TRUE  - All Firmware Management Protocol services supported.<BR>"
+                                                                                                "  FALSE - Firmware Management Protocol returns EFI_UNSUPPORTED for"
+                                                                                                "          all services except GetImageInfo().<BR>"
+
 #string STR_gFmpDevicePkgTokenSpaceGuid_PcdFmpDeviceTestKeySha256Digest_PROMPT  #language en-US "SHA-256 hash of PKCS7 test key."
 #string STR_gFmpDevicePkgTokenSpaceGuid_PcdFmpDeviceTestKeySha256Digest_HELP    #language en-US "The SHA-256 hash of a PKCS7 test key that is used to detect if a test key"
                                                                                                 "is being used to authenticate capsules.  Test key detection can be disabled"

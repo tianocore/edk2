@@ -29,6 +29,12 @@
   DEFINE SYSTEM_FMP_ESRT_GUID   = B461B3BD-E62A-4A71-841C-50BA4E500267
   DEFINE DEVICE_FMP_ESRT_GUID   = 226034C4-8B67-4536-8653-D6EE7CE5A316
 
+  #
+  # TRUE  - Build FmpDxe module for with storage access enabled
+  # FALSE - Build FmpDxe module for with storage access disabled
+  #
+  DEFINE DEVICE_FMP_STORAGE_ACCESS_ENABLE = TRUE
+
 [LibraryClasses]
   UefiDriverEntryPoint|MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
   UefiBootServicesTableLib|MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
@@ -118,11 +124,23 @@
       # FILE_GUID is used as ESRT GUID
       #
       FILE_GUID = $(DEVICE_FMP_ESRT_GUID)
+    <PcdsFeatureFlag>
+      gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceStorageAccessEnable|$(DEVICE_FMP_STORAGE_ACCESS_ENABLE)
     <PcdsFixedAtBuild>
+!if $(DEVICE_FMP_STORAGE_ACCESS_ENABLE) == FALSE
+      #
+      # Disable test key detection
+      #
+      gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceTestKeySha256Digest|{0}
+!endif
       #
       # Unicode name string that is used to populate FMP Image Descriptor for this capsule update module
       #
+!if $(DEVICE_FMP_STORAGE_ACCESS_ENABLE) == TRUE
       gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceImageIdName|L"Sample Firmware Device"
+!else
+      gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceImageIdName|L"Sample Firmware Device No Storage Access"
+!endif
       #
       # Certificates used to authenticate capsule update image
       #
