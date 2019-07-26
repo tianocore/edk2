@@ -45,6 +45,7 @@
   BaseMemoryLib
   UefiBootServicesTableLib
   MemoryAllocationLib
+  PrintLib
   UefiLib
   BaseCryptLib
   FmpAuthenticationLib

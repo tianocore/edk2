@@ -147,9 +147,15 @@ GenerateFmpVariableName (
   IN  CHAR16  *BaseVariableName
   )
 {
+  UINTN   Size;
   CHAR16  *VariableName;
 
-  VariableName = CatSPrint (NULL, BaseVariableName);
+  //
+  // Allocate Unicode string with room for BaseVariableName and a 16 digit
+  // hexadecimal value for the HardwareInstance value.
+  //
+  Size = StrSize (BaseVariableName) + 16 * sizeof (CHAR16);
+  VariableName = AllocateCopyPool (Size, BaseVariableName);
   if (VariableName == NULL) {
     DEBUG ((DEBUG_ERROR, "FmpDxe(%s): Failed to generate variable name %s.\n", mImageIdName, BaseVariableName));
     return VariableName;
@@ -157,10 +163,13 @@ GenerateFmpVariableName (
   if (HardwareInstance == 0) {
     return VariableName;
   }
-  VariableName = CatSPrint (VariableName, L"%016lx", HardwareInstance);
-  if (VariableName == NULL) {
-    DEBUG ((DEBUG_ERROR, "FmpDxe(%s): Failed to generate variable name %s.\n", mImageIdName, BaseVariableName));
-  }
+  UnicodeValueToStringS (
+    &VariableName[StrLen(BaseVariableName)],
+    Size,
+    PREFIX_ZERO | RADIX_HEX,
+    HardwareInstance,
+    16
+    );
   return VariableName;
 }
 
