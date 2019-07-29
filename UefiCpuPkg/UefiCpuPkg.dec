@@ -75,6 +75,9 @@
 #   0x80000001 | Invalid value provided.
 #
 
+[Ppis]
+  gEdkiiPeiMpServices2PpiGuid =    { 0x5cb9cb3d, 0x31a4, 0x480c, { 0x94, 0x98, 0x29, 0xd2, 0x69, 0xba, 0xcf, 0xba}}
+
 [PcdsFeatureFlag]
   ## Indicates if SMM Profile will be enabled.
   #  If enabled, instruction executions in and data accesses to memory outside of SMRAM will be logged.
