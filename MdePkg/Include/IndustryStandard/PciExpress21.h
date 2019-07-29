@@ -91,6 +91,24 @@ typedef union {
   UINT16   Uint16;
 } PCI_REG_PCIE_DEVICE_CONTROL;
 
+#define PCIE_MAX_PAYLOAD_SIZE_128B   0
+#define PCIE_MAX_PAYLOAD_SIZE_256B   1
+#define PCIE_MAX_PAYLOAD_SIZE_512B   2
+#define PCIE_MAX_PAYLOAD_SIZE_1024B  3
+#define PCIE_MAX_PAYLOAD_SIZE_2048B  4
+#define PCIE_MAX_PAYLOAD_SIZE_4096B  5
+#define PCIE_MAX_PAYLOAD_SIZE_RVSD1  6
+#define PCIE_MAX_PAYLOAD_SIZE_RVSD2  7
+
+#define PCIE_MAX_READ_REQ_SIZE_128B    0
+#define PCIE_MAX_READ_REQ_SIZE_256B    1
+#define PCIE_MAX_READ_REQ_SIZE_512B    2
+#define PCIE_MAX_READ_REQ_SIZE_1024B   3
+#define PCIE_MAX_READ_REQ_SIZE_2048B   4
+#define PCIE_MAX_READ_REQ_SIZE_4096B   5
+#define PCIE_MAX_READ_REQ_SIZE_RVSD1   6
+#define PCIE_MAX_READ_REQ_SIZE_RVSD2   7
+
 typedef union {
   struct {
     UINT16 CorrectableError : 1;
@@ -250,15 +268,29 @@ typedef union {
     UINT32 NoRoEnabledPrPrPassing : 1;
     UINT32 LtrMechanism : 1;
     UINT32 TphCompleter : 2;
-    UINT32 Reserved : 4;
+    UINT32 LnSystemCLS : 2;
+    UINT32 TenBitTagCompleterSupported : 1;
+    UINT32 TenBitTagRequesterSupported : 1;
     UINT32 Obff : 2;
     UINT32 ExtendedFmtField : 1;
     UINT32 EndEndTlpPrefix : 1;
     UINT32 MaxEndEndTlpPrefixes : 2;
-    UINT32 Reserved2 : 8;
+    UINT32 EmergencyPowerReductionSupported : 2;
+    UINT32 EmergencyPowerReductionInitializationRequired : 1;
+    UINT32 Reserved3 : 4;
+    UINT32 FrsSupported : 1;
   } Bits;
   UINT32   Uint32;
 } PCI_REG_PCIE_DEVICE_CAPABILITY2;
+
+#define PCIE_COMPLETION_TIMEOUT_NOT_SUPPORTED           0
+#define PCIE_COMPLETION_TIMEOUT_RANGE_A_SUPPORTED       1
+#define PCIE_COMPLETION_TIMEOUT_RANGE_B_SUPPORTED       2
+#define PCIE_COMPLETION_TIMEOUT_RANGE_A_B_SUPPORTED     3
+#define PCIE_COMPLETION_TIMEOUT_RANGE_B_C_SUPPORTED     6
+#define PCIE_COMPLETION_TIMEOUT_RANGE_A_B_C_SUPPORTED   7
+#define PCIE_COMPLETION_TIMEOUT_RANGE_B_C_D_SUPPORTED   14
+#define PCIE_COMPLETION_TIMEOUT_RANGE_A_B_C_D_SUPPORTED 15
 
 #define PCIE_DEVICE_CAPABILITY_OBFF_MESSAGE BIT0
 #define PCIE_DEVICE_CAPABILITY_OBFF_WAKE    BIT1
@@ -273,7 +305,8 @@ typedef union {
     UINT16 IdoRequest : 1;
     UINT16 IdoCompletion : 1;
     UINT16 LtrMechanism : 2;
-    UINT16 Reserved : 2;
+    UINT16 EmergencyPowerReductionRequest : 1;
+    UINT16 TenBitTagRequesterEnable : 1;
     UINT16 Obff : 2;
     UINT16 EndEndTlpPrefixBlocking : 1;
   } Bits;
