@@ -122,14 +122,14 @@ PeCoffLoaderUnloadImageExtraAction (
   if (ImageContext->PdbPointer) {
 #ifdef __CC_ARM
     // Print out the command for the RVD debugger to load symbols for this image
-    DEBUG ((EFI_D_ERROR, "unload symbols_only %a\n", DeCygwinPathIfNeeded (ImageContext->PdbPointer, Temp, sizeof (Temp))));
+    DEBUG ((DEBUG_LOAD | DEBUG_INFO, "unload symbols_only %a\n", DeCygwinPathIfNeeded (ImageContext->PdbPointer, Temp, sizeof (Temp))));
 #elif __GNUC__
     // This may not work correctly if you generate PE/COFF directlyas then the Offset would not be required
-    DEBUG ((EFI_D_ERROR, "remove-symbol-file %a 0x%08x\n", DeCygwinPathIfNeeded (ImageContext->PdbPointer, Temp, sizeof (Temp)), (UINTN)(ImageContext->ImageAddress + ImageContext->SizeOfHeaders)));
+    DEBUG ((DEBUG_LOAD | DEBUG_INFO, "remove-symbol-file %a 0x%08x\n", DeCygwinPathIfNeeded (ImageContext->PdbPointer, Temp, sizeof (Temp)), (UINTN)(ImageContext->ImageAddress + ImageContext->SizeOfHeaders)));
 #else
-    DEBUG ((EFI_D_ERROR, "Unloading %a\n", ImageContext->PdbPointer));
+    DEBUG ((DEBUG_LOAD | DEBUG_INFO, "Unloading %a\n", ImageContext->PdbPointer));
 #endif
   } else {
-    DEBUG ((EFI_D_ERROR, "Unloading driver at 0x%11p\n", (VOID *)(UINTN) ImageContext->ImageAddress));
+    DEBUG ((DEBUG_LOAD | DEBUG_INFO, "Unloading driver at 0x%11p\n", (VOID *)(UINTN) ImageContext->ImageAddress));
   }
 }
