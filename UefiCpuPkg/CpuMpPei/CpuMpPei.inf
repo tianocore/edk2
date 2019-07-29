@@ -26,6 +26,7 @@
   CpuMpPei.c
   CpuBist.c
   CpuPaging.c
+  CpuMp2Pei.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -54,6 +55,7 @@
   gEfiSecPlatformInformation2PpiGuid
   gEfiVectorHandoffInfoPpiGuid                  ## SOMETIMES_CONSUMES
   gEfiPeiMemoryDiscoveredPpiGuid                ## CONSUMES
+  gEdkiiPeiMpServices2PpiGuid                   ## PRODUCES
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPteMemoryEncryptionAddressOrMask    ## CONSUMES

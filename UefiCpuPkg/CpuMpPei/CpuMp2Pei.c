@@ -1,40 +1,12 @@
 /** @file
-  CPU PEI Module installs CPU Multiple Processor PPI.
+  EDKII_PEI_MP_SERVICES2_PPI Implementation code.
 
-  Copyright (c) 2015 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include "CpuMpPei.h"
-
-extern EDKII_PEI_MP_SERVICES2_PPI            mMpServices2Ppi;
-
-//
-// CPU MP PPI to be installed
-//
-EFI_PEI_MP_SERVICES_PPI                mMpServicesPpi = {
-  PeiGetNumberOfProcessors,
-  PeiGetProcessorInfo,
-  PeiStartupAllAPs,
-  PeiStartupThisAP,
-  PeiSwitchBSP,
-  PeiEnableDisableAP,
-  PeiWhoAmI,
-};
-
-EFI_PEI_PPI_DESCRIPTOR           mPeiCpuMpPpiList[] = {
-  {
-    EFI_PEI_PPI_DESCRIPTOR_PPI,
-    &gEdkiiPeiMpServices2PpiGuid,
-    &mMpServices2Ppi
-  },
-  {
-    (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
-    &gEfiPeiMpServicesPpiGuid,
-    &mMpServicesPpi
-  }
-};
 
 /**
   This service retrieves the number of logical processor in the platform
@@ -56,8 +28,6 @@ EFI_PEI_PPI_DESCRIPTOR           mPeiCpuMpPpiList[] = {
   is returned in NumberOfProcessors, the number of currently enabled processor
   is returned in NumberOfEnabledProcessors, and EFI_SUCCESS is returned.
 
-  @param[in]  PeiServices         An indirect pointer to the PEI Services Table
-                                  published by the PEI Foundation.
   @param[in]  This                Pointer to this instance of the PPI.
   @param[out] NumberOfProcessors  Pointer to the total number of logical processors in
                                   the system, including the BSP and disabled APs.
@@ -72,9 +42,8 @@ EFI_PEI_PPI_DESCRIPTOR           mPeiCpuMpPpiList[] = {
 **/
 EFI_STATUS
 EFIAPI
-PeiGetNumberOfProcessors (
-  IN  CONST EFI_PEI_SERVICES    **PeiServices,
-  IN  EFI_PEI_MP_SERVICES_PPI   *This,
+EdkiiPeiGetNumberOfProcessors (
+  IN  EDKII_PEI_MP_SERVICES2_PPI   *This,
   OUT UINTN                     *NumberOfProcessors,
   OUT UINTN                     *NumberOfEnabledProcessors
   )
@@ -102,8 +71,6 @@ PeiGetNumberOfProcessors (
   slot numbers is all considered platform-related information and is not provided
   by this service.
 
-  @param[in]  PeiServices         An indirect pointer to the PEI Services Table
-                                  published by the PEI Foundation.
   @param[in]  This                Pointer to this instance of the PPI.
   @param[in]  ProcessorNumber     Pointer to the total number of logical processors in
                                   the system, including the BSP and disabled APs.
@@ -117,11 +84,10 @@ PeiGetNumberOfProcessors (
 **/
 EFI_STATUS
 EFIAPI
-PeiGetProcessorInfo (
-  IN  CONST EFI_PEI_SERVICES     **PeiServices,
-  IN  EFI_PEI_MP_SERVICES_PPI    *This,
-  IN  UINTN                      ProcessorNumber,
-  OUT EFI_PROCESSOR_INFORMATION  *ProcessorInfoBuffer
+EdkiiPeiGetProcessorInfo (
+  IN  EDKII_PEI_MP_SERVICES2_PPI    *This,
+  IN  UINTN                         ProcessorNumber,
+  OUT EFI_PROCESSOR_INFORMATION     *ProcessorInfoBuffer
   )
 {
   return MpInitLibGetProcessorInfo (ProcessorNumber, ProcessorInfoBuffer, NULL);
@@ -143,12 +109,12 @@ PeiGetProcessorInfo (
 
   If the timeout specified by TimeoutInMicroSeconds expires before all APs return
   from Procedure, then Procedure on the failed APs is terminated. All enabled APs
-  are always available for further calls to EFI_PEI_MP_SERVICES_PPI.StartupAllAPs()
-  and EFI_PEI_MP_SERVICES_PPI.StartupThisAP(). If FailedCpuList is not NULL, its
+  are always available for further calls to EDKII_PEI_MP_SERVICES2_PPI.StartupAllAPs()
+  and EDKII_PEI_MP_SERVICES2_PPI.StartupThisAP(). If FailedCpuList is not NULL, its
   content points to the list of processor handle numbers in which Procedure was
   terminated.
 
-  Note: It is the responsibility of the consumer of the EFI_PEI_MP_SERVICES_PPI.StartupAllAPs()
+  Note: It is the responsibility of the consumer of the EDKII_PEI_MP_SERVICES2_PPI.StartupAllAPs()
   to make sure that the nature of the code that is executed on the BSP and the
   dispatched APs is well controlled. The MP Services Ppi does not guarantee
   that the Procedure function is MP-safe. Hence, the tasks that can be run in
@@ -159,9 +125,7 @@ PeiGetProcessorInfo (
   In blocking execution mode, BSP waits until all APs finish or
   TimeoutInMicroSeconds expires.
 
-  @param[in] PeiServices          An indirect pointer to the PEI Services Table
-                                  published by the PEI Foundation.
-  @param[in] This                 A pointer to the EFI_PEI_MP_SERVICES_PPI instance.
+  @param[in] This                 A pointer to the EDKII_PEI_MP_SERVICES2_PPI instance.
   @param[in] Procedure            A pointer to the function to be run on enabled APs of
                                   the system.
   @param[in] SingleThread         If TRUE, then all the enabled APs execute the function
@@ -175,8 +139,8 @@ PeiGetProcessorInfo (
                                   means infinity. If the timeout expires before all APs
                                   return from Procedure, then Procedure on the failed APs
                                   is terminated. All enabled APs are available for next
-                                  function assigned by EFI_PEI_MP_SERVICES_PPI.StartupAllAPs()
-                                  or EFI_PEI_MP_SERVICES_PPI.StartupThisAP(). If the
+                                  function assigned by EDKII_PEI_MP_SERVICES2_PPI.StartupAllAPs()
+                                  or EDKII_PEI_MP_SERVICES2_PPI.StartupThisAP(). If the
                                   timeout expires in blocking mode, BSP returns
                                   EFI_TIMEOUT.
   @param[in] ProcedureArgument    The parameter passed into Procedure for all APs.
@@ -192,13 +156,12 @@ PeiGetProcessorInfo (
 **/
 EFI_STATUS
 EFIAPI
-PeiStartupAllAPs (
-  IN  CONST EFI_PEI_SERVICES    **PeiServices,
-  IN  EFI_PEI_MP_SERVICES_PPI   *This,
-  IN  EFI_AP_PROCEDURE          Procedure,
-  IN  BOOLEAN                   SingleThread,
-  IN  UINTN                     TimeoutInMicroSeconds,
-  IN  VOID                      *ProcedureArgument      OPTIONAL
+EdkiiPeiStartupAllAPs (
+  IN  EDKII_PEI_MP_SERVICES2_PPI   *This,
+  IN  EFI_AP_PROCEDURE             Procedure,
+  IN  BOOLEAN                      SingleThread,
+  IN  UINTN                        TimeoutInMicroSeconds,
+  IN  VOID                         *ProcedureArgument      OPTIONAL
   )
 {
   return MpInitLibStartupAllAPs (
@@ -223,26 +186,24 @@ PeiStartupAllAPs (
 
   If the timeout specified by TimeoutInMicroseconds expires before the AP returns
   from Procedure, then execution of Procedure by the AP is terminated. The AP is
-  available for subsequent calls to EFI_PEI_MP_SERVICES_PPI.StartupAllAPs() and
-  EFI_PEI_MP_SERVICES_PPI.StartupThisAP().
+  available for subsequent calls to EDKII_PEI_MP_SERVICES2_PPI.StartupAllAPs() and
+  EDKII_PEI_MP_SERVICES2_PPI.StartupThisAP().
 
-  @param[in] PeiServices          An indirect pointer to the PEI Services Table
-                                  published by the PEI Foundation.
-  @param[in] This                 A pointer to the EFI_PEI_MP_SERVICES_PPI instance.
+  @param[in] This                 A pointer to the EDKII_PEI_MP_SERVICES2_PPI instance.
   @param[in] Procedure            A pointer to the function to be run on enabled APs of
                                   the system.
   @param[in] ProcessorNumber      The handle number of the AP. The range is from 0 to the
                                   total number of logical processors minus 1. The total
                                   number of logical processors can be retrieved by
-                                  EFI_PEI_MP_SERVICES_PPI.GetNumberOfProcessors().
+                                  EDKII_PEI_MP_SERVICES2_PPI.GetNumberOfProcessors().
   @param[in] TimeoutInMicroseconds
                                   Indicates the time limit in microseconds for APs to
                                   return from Procedure, for blocking mode only. Zero
                                   means infinity. If the timeout expires before all APs
                                   return from Procedure, then Procedure on the failed APs
                                   is terminated. All enabled APs are available for next
-                                  function assigned by EFI_PEI_MP_SERVICES_PPI.StartupAllAPs()
-                                  or EFI_PEI_MP_SERVICES_PPI.StartupThisAP(). If the
+                                  function assigned by EDKII_PEI_MP_SERVICES2_PPI.StartupAllAPs()
+                                  or EDKII_PEI_MP_SERVICES2_PPI.StartupThisAP(). If the
                                   timeout expires in blocking mode, BSP returns
                                   EFI_TIMEOUT.
   @param[in] ProcedureArgument    The parameter passed into Procedure for all APs.
@@ -259,13 +220,12 @@ PeiStartupAllAPs (
 **/
 EFI_STATUS
 EFIAPI
-PeiStartupThisAP (
-  IN  CONST EFI_PEI_SERVICES    **PeiServices,
-  IN  EFI_PEI_MP_SERVICES_PPI   *This,
-  IN  EFI_AP_PROCEDURE          Procedure,
-  IN  UINTN                     ProcessorNumber,
-  IN  UINTN                     TimeoutInMicroseconds,
-  IN  VOID                      *ProcedureArgument      OPTIONAL
+EdkiiPeiStartupThisAP (
+  IN  EDKII_PEI_MP_SERVICES2_PPI   *This,
+  IN  EFI_AP_PROCEDURE             Procedure,
+  IN  UINTN                        ProcessorNumber,
+  IN  UINTN                        TimeoutInMicroseconds,
+  IN  VOID                         *ProcedureArgument      OPTIONAL
   )
 {
   return MpInitLibStartupThisAP (
@@ -291,13 +251,11 @@ PeiStartupThisAP (
   If the BSP cannot be switched prior to the return from this service, then
   EFI_UNSUPPORTED must be returned.
 
-  @param[in] PeiServices          An indirect pointer to the PEI Services Table
-                                  published by the PEI Foundation.
-  @param[in] This                 A pointer to the EFI_PEI_MP_SERVICES_PPI instance.
+  @param[in] This                 A pointer to the EDKII_PEI_MP_SERVICES2_PPI instance.
   @param[in] ProcessorNumber      The handle number of the AP. The range is from 0 to the
                                   total number of logical processors minus 1. The total
                                   number of logical processors can be retrieved by
-                                  EFI_PEI_MP_SERVICES_PPI.GetNumberOfProcessors().
+                                  EDKII_PEI_MP_SERVICES2_PPI.GetNumberOfProcessors().
   @param[in] EnableOldBSP         If TRUE, then the old BSP will be listed as an enabled
                                   AP. Otherwise, it will be disabled.
 
@@ -314,11 +272,10 @@ PeiStartupThisAP (
 **/
 EFI_STATUS
 EFIAPI
-PeiSwitchBSP (
-  IN  CONST EFI_PEI_SERVICES   **PeiServices,
-  IN  EFI_PEI_MP_SERVICES_PPI  *This,
-  IN  UINTN                    ProcessorNumber,
-  IN  BOOLEAN                  EnableOldBSP
+EdkiiPeiSwitchBSP (
+  IN  EDKII_PEI_MP_SERVICES2_PPI  *This,
+  IN  UINTN                       ProcessorNumber,
+  IN  BOOLEAN                     EnableOldBSP
   )
 {
   return MpInitLibSwitchBSP (ProcessorNumber, EnableOldBSP);
@@ -338,18 +295,16 @@ PeiSwitchBSP (
   If the enable or disable AP operation cannot be completed prior to the return
   from this service, then EFI_UNSUPPORTED must be returned.
 
-  @param[in] PeiServices          An indirect pointer to the PEI Services Table
-                                  published by the PEI Foundation.
-  @param[in] This                 A pointer to the EFI_PEI_MP_SERVICES_PPI instance.
+  @param[in] This                 A pointer to the EDKII_PEI_MP_SERVICES2_PPI instance.
   @param[in] ProcessorNumber      The handle number of the AP. The range is from 0 to the
                                   total number of logical processors minus 1. The total
                                   number of logical processors can be retrieved by
-                                  EFI_PEI_MP_SERVICES_PPI.GetNumberOfProcessors().
+                                  EDKII_PEI_MP_SERVICES2_PPI.GetNumberOfProcessors().
   @param[in] EnableAP             Specifies the new state for the processor for enabled,
                                   FALSE for disabled.
   @param[in] HealthFlag           If not NULL, a pointer to a value that specifies the
                                   new health status of the AP. This flag corresponds to
-                                  StatusFlag defined in EFI_PEI_MP_SERVICES_PPI.GetProcessorInfo().
+                                  StatusFlag defined in EDKII_PEI_MP_SERVICES2_PPI.GetProcessorInfo().
                                   Only the PROCESSOR_HEALTH_STATUS_BIT is used. All other
                                   bits are ignored. If it is NULL, this parameter is
                                   ignored.
@@ -365,12 +320,11 @@ PeiSwitchBSP (
 **/
 EFI_STATUS
 EFIAPI
-PeiEnableDisableAP (
-  IN  CONST EFI_PEI_SERVICES    **PeiServices,
-  IN  EFI_PEI_MP_SERVICES_PPI   *This,
-  IN  UINTN                     ProcessorNumber,
-  IN  BOOLEAN                   EnableAP,
-  IN  UINT32                    *HealthFlag OPTIONAL
+EdkiiPeiEnableDisableAP (
+  IN  EDKII_PEI_MP_SERVICES2_PPI   *This,
+  IN  UINTN                        ProcessorNumber,
+  IN  BOOLEAN                      EnableAP,
+  IN  UINT32                       *HealthFlag OPTIONAL
   )
 {
   return MpInitLibEnableDisableAP (ProcessorNumber, EnableAP, HealthFlag);
@@ -383,18 +337,16 @@ PeiEnableDisableAP (
   This service returns the processor handle number for the calling processor.
   The returned value is in the range from 0 to the total number of logical
   processors minus 1. The total number of logical processors can be retrieved
-  with EFI_PEI_MP_SERVICES_PPI.GetNumberOfProcessors(). This service may be
+  with EDKII_PEI_MP_SERVICES2_PPI.GetNumberOfProcessors(). This service may be
   called from the BSP and APs. If ProcessorNumber is NULL, then EFI_INVALID_PARAMETER
   is returned. Otherwise, the current processors handle number is returned in
   ProcessorNumber, and EFI_SUCCESS is returned.
 
-  @param[in]  PeiServices         An indirect pointer to the PEI Services Table
-                                  published by the PEI Foundation.
-  @param[in]  This                A pointer to the EFI_PEI_MP_SERVICES_PPI instance.
+  @param[in]  This                A pointer to the EDKII_PEI_MP_SERVICES2_PPI instance.
   @param[out] ProcessorNumber     The handle number of the AP. The range is from 0 to the
                                   total number of logical processors minus 1. The total
                                   number of logical processors can be retrieved by
-                                  EFI_PEI_MP_SERVICES_PPI.GetNumberOfProcessors().
+                                  EDKII_PEI_MP_SERVICES2_PPI.GetNumberOfProcessors().
 
   @retval EFI_SUCCESS             The current processor handle number was returned in
                                   ProcessorNumber.
@@ -402,313 +354,64 @@ PeiEnableDisableAP (
 **/
 EFI_STATUS
 EFIAPI
-PeiWhoAmI (
-  IN  CONST EFI_PEI_SERVICES   **PeiServices,
-  IN  EFI_PEI_MP_SERVICES_PPI  *This,
-  OUT UINTN                    *ProcessorNumber
+EdkiiPeiWhoAmI (
+  IN  EDKII_PEI_MP_SERVICES2_PPI  *This,
+  OUT UINTN                       *ProcessorNumber
   )
 {
   return MpInitLibWhoAmI (ProcessorNumber);
 }
 
 /**
-  Get GDT register value.
+  This service executes a caller provided function on all enabled CPUs. CPUs can
+  run either simultaneously or one at a time in sequence. This service may only
+  be called from the BSP.
 
-  This function is mainly for AP purpose because AP may have different GDT
-  table than BSP.
+  @param[in] This                 A pointer to the EDKII_PEI_MP_SERVICES2_PPI instance.
+  @param[in] Procedure            A pointer to the function to be run on enabled APs of
+                                  the system.
+  @param[in] TimeoutInMicroSeconds
+                                  Indicates the time limit in microseconds for APs to
+                                  return from Procedure, for blocking mode only. Zero
+                                  means infinity.  If the timeout expires in blocking
+                                  mode, BSP returns EFI_TIMEOUT.
+  @param[in] ProcedureArgument    The parameter passed into Procedure for all CPUs.
 
-  @param[in,out] Buffer  The pointer to private data buffer.
-
-**/
-VOID
-EFIAPI
-GetGdtr (
-  IN OUT VOID *Buffer
-  )
-{
-  AsmReadGdtr ((IA32_DESCRIPTOR *)Buffer);
-}
-
-/**
-  Initializes CPU exceptions handlers for the sake of stack switch requirement.
-
-  This function is a wrapper of InitializeCpuExceptionHandlersEx. It's mainly
-  for the sake of AP's init because of EFI_AP_PROCEDURE API requirement.
-
-  @param[in,out] Buffer  The pointer to private data buffer.
-
-**/
-VOID
-EFIAPI
-InitializeExceptionStackSwitchHandlers (
-  IN OUT VOID *Buffer
-  )
-{
-  CPU_EXCEPTION_INIT_DATA           *EssData;
-  IA32_DESCRIPTOR                   Idtr;
-  EFI_STATUS                        Status;
-
-  EssData = Buffer;
-  //
-  // We don't plan to replace IDT table with a new one, but we should not assume
-  // the AP's IDT is the same as BSP's IDT either.
-  //
-  AsmReadIdtr (&Idtr);
-  EssData->Ia32.IdtTable = (VOID *)Idtr.Base;
-  EssData->Ia32.IdtTableSize = Idtr.Limit + 1;
-  Status = InitializeCpuExceptionHandlersEx (NULL, EssData);
-  ASSERT_EFI_ERROR (Status);
-}
-
-/**
-  Initializes MP exceptions handlers for the sake of stack switch requirement.
-
-  This function will allocate required resources required to setup stack switch
-  and pass them through CPU_EXCEPTION_INIT_DATA to each logic processor.
-
-**/
-VOID
-InitializeMpExceptionStackSwitchHandlers (
-  VOID
-  )
-{
-  EFI_STATUS                      Status;
-  UINTN                           Index;
-  UINTN                           Bsp;
-  UINTN                           ExceptionNumber;
-  UINTN                           OldGdtSize;
-  UINTN                           NewGdtSize;
-  UINTN                           NewStackSize;
-  IA32_DESCRIPTOR                 Gdtr;
-  CPU_EXCEPTION_INIT_DATA         EssData;
-  UINT8                           *GdtBuffer;
-  UINT8                           *StackTop;
-  UINTN                           NumberOfProcessors;
-
-  if (!PcdGetBool (PcdCpuStackGuard)) {
-    return;
-  }
-
-  MpInitLibGetNumberOfProcessors(&NumberOfProcessors, NULL);
-  MpInitLibWhoAmI (&Bsp);
-
-  ExceptionNumber = FixedPcdGetSize (PcdCpuStackSwitchExceptionList);
-  NewStackSize = FixedPcdGet32 (PcdCpuKnownGoodStackSize) * ExceptionNumber;
-
-  Status = PeiServicesAllocatePool (
-             NewStackSize * NumberOfProcessors,
-             (VOID **)&StackTop
-             );
-  ASSERT(StackTop != NULL);
-  if (EFI_ERROR (Status)) {
-    ASSERT_EFI_ERROR (Status);
-    return;
-  }
-  StackTop += NewStackSize  * NumberOfProcessors;
-
-  //
-  // The default exception handlers must have been initialized. Let's just skip
-  // it in this method.
-  //
-  EssData.Ia32.Revision = CPU_EXCEPTION_INIT_DATA_REV;
-  EssData.Ia32.InitDefaultHandlers = FALSE;
-
-  EssData.Ia32.StackSwitchExceptions = FixedPcdGetPtr(PcdCpuStackSwitchExceptionList);
-  EssData.Ia32.StackSwitchExceptionNumber = ExceptionNumber;
-  EssData.Ia32.KnownGoodStackSize = FixedPcdGet32(PcdCpuKnownGoodStackSize);
-
-  //
-  // Initialize Gdtr to suppress incorrect compiler/analyzer warnings.
-  //
-  Gdtr.Base = 0;
-  Gdtr.Limit = 0;
-  for (Index = 0; Index < NumberOfProcessors; ++Index) {
-    //
-    // To support stack switch, we need to re-construct GDT but not IDT.
-    //
-    if (Index == Bsp) {
-      GetGdtr(&Gdtr);
-    } else {
-      //
-      // AP might have different size of GDT from BSP.
-      //
-      MpInitLibStartupThisAP (GetGdtr, Index, NULL, 0, (VOID *)&Gdtr, NULL);
-    }
-
-    //
-    // X64 needs only one TSS of current task working for all exceptions
-    // because of its IST feature. IA32 needs one TSS for each exception
-    // in addition to current task. Since AP is not supposed to allocate
-    // memory, we have to do it in BSP. To simplify the code, we allocate
-    // memory for IA32 case to cover both IA32 and X64 exception stack
-    // switch.
-    //
-    // Layout of memory to allocate for each processor:
-    //    --------------------------------
-    //    |            Alignment         |  (just in case)
-    //    --------------------------------
-    //    |                              |
-    //    |        Original GDT          |
-    //    |                              |
-    //    --------------------------------
-    //    |    Current task descriptor   |
-    //    --------------------------------
-    //    |                              |
-    //    |  Exception task descriptors  |  X ExceptionNumber
-    //    |                              |
-    //    --------------------------------
-    //    |  Current task-state segment  |
-    //    --------------------------------
-    //    |                              |
-    //    | Exception task-state segment |  X ExceptionNumber
-    //    |                              |
-    //    --------------------------------
-    //
-    OldGdtSize = Gdtr.Limit + 1;
-    EssData.Ia32.ExceptionTssDescSize = sizeof (IA32_TSS_DESCRIPTOR) *
-                                        (ExceptionNumber + 1);
-    EssData.Ia32.ExceptionTssSize = sizeof (IA32_TASK_STATE_SEGMENT) *
-                                    (ExceptionNumber + 1);
-    NewGdtSize = sizeof (IA32_TSS_DESCRIPTOR) +
-                 OldGdtSize +
-                 EssData.Ia32.ExceptionTssDescSize +
-                 EssData.Ia32.ExceptionTssSize;
-
-    Status = PeiServicesAllocatePool (
-               NewGdtSize,
-               (VOID **)&GdtBuffer
-               );
-    ASSERT (GdtBuffer != NULL);
-    if (EFI_ERROR (Status)) {
-      ASSERT_EFI_ERROR (Status);
-      return;
-    }
-
-    //
-    // Make sure GDT table alignment
-    //
-    EssData.Ia32.GdtTable = ALIGN_POINTER(GdtBuffer, sizeof (IA32_TSS_DESCRIPTOR));
-    NewGdtSize -= ((UINT8 *)EssData.Ia32.GdtTable - GdtBuffer);
-    EssData.Ia32.GdtTableSize = NewGdtSize;
-
-    EssData.Ia32.ExceptionTssDesc = ((UINT8 *)EssData.Ia32.GdtTable + OldGdtSize);
-    EssData.Ia32.ExceptionTss = ((UINT8 *)EssData.Ia32.GdtTable + OldGdtSize +
-                                 EssData.Ia32.ExceptionTssDescSize);
-
-    EssData.Ia32.KnownGoodStackTop = (UINTN)StackTop;
-    DEBUG ((DEBUG_INFO,
-            "Exception stack top[cpu%lu]: 0x%lX\n",
-            (UINT64)(UINTN)Index,
-            (UINT64)(UINTN)StackTop));
-
-    if (Index == Bsp) {
-      InitializeExceptionStackSwitchHandlers (&EssData);
-    } else {
-      MpInitLibStartupThisAP (
-        InitializeExceptionStackSwitchHandlers,
-        Index,
-        NULL,
-        0,
-        (VOID *)&EssData,
-        NULL
-        );
-    }
-
-    StackTop  -= NewStackSize;
-  }
-}
-
-/**
-  Initializes MP and exceptions handlers.
-
-  @param  PeiServices                The pointer to the PEI Services Table.
-
-  @retval EFI_SUCCESS     MP was successfully initialized.
-  @retval others          Error occurred in MP initialization.
-
-**/
-EFI_STATUS
-InitializeCpuMpWorker (
-  IN CONST EFI_PEI_SERVICES     **PeiServices
-  )
-{
-  EFI_STATUS                      Status;
-  EFI_VECTOR_HANDOFF_INFO         *VectorInfo;
-  EFI_PEI_VECTOR_HANDOFF_INFO_PPI *VectorHandoffInfoPpi;
-
-  //
-  // Get Vector Hand-off Info PPI
-  //
-  VectorInfo = NULL;
-  Status = PeiServicesLocatePpi (
-             &gEfiVectorHandoffInfoPpiGuid,
-             0,
-             NULL,
-             (VOID **)&VectorHandoffInfoPpi
-             );
-  if (Status == EFI_SUCCESS) {
-    VectorInfo = VectorHandoffInfoPpi->Info;
-  }
-
-  //
-  // Initialize default handlers
-  //
-  Status = InitializeCpuExceptionHandlers (VectorInfo);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  Status = MpInitLibInitialize ();
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  //
-  // Special initialization for the sake of Stack Guard
-  //
-  InitializeMpExceptionStackSwitchHandlers ();
-
-  //
-  // Update and publish CPU BIST information
-  //
-  CollectBistDataFromPpi (PeiServices);
-
-  //
-  // Install CPU MP PPI
-  //
-  Status = PeiServicesInstallPpi(mPeiCpuMpPpiList);
-  ASSERT_EFI_ERROR (Status);
-
-  return Status;
-}
-
-/**
-  The Entry point of the MP CPU PEIM.
-
-  This function will wakeup APs and collect CPU AP count and install the
-  Mp Service Ppi.
-
-  @param  FileHandle    Handle of the file being invoked.
-  @param  PeiServices   Describes the list of possible PEI Services.
-
-  @retval EFI_SUCCESS   MpServicePpi is installed successfully.
-
+  @retval EFI_SUCCESS             In blocking mode, all APs have finished before the
+                                  timeout expired.
+  @retval EFI_DEVICE_ERROR        Caller processor is AP.
+  @retval EFI_NOT_READY           Any enabled APs are busy.
+  @retval EFI_TIMEOUT             In blocking mode, the timeout expired before all
+                                  enabled APs have finished.
+  @retval EFI_INVALID_PARAMETER   Procedure is NULL.
 **/
 EFI_STATUS
 EFIAPI
-CpuMpPeimInit (
-  IN       EFI_PEI_FILE_HANDLE  FileHandle,
-  IN CONST EFI_PEI_SERVICES     **PeiServices
+EdkiiPeiStartupAllCPUs (
+  IN  EDKII_PEI_MP_SERVICES2_PPI   *This,
+  IN  EFI_AP_PROCEDURE             Procedure,
+  IN  UINTN                        TimeoutInMicroSeconds,
+  IN  VOID                         *ProcedureArgument      OPTIONAL
   )
 {
-  EFI_STATUS           Status;
-
-  //
-  // For the sake of special initialization needing to be done right after
-  // memory discovery.
-  //
-  Status = PeiServicesNotifyPpi (&mPostMemNotifyList[0]);
-  ASSERT_EFI_ERROR (Status);
-
-  return Status;
+  return MpInitLibStartupAllCPUs (
+           Procedure,
+           TimeoutInMicroSeconds,
+           ProcedureArgument
+           );
 }
+
+//
+// CPU MP2 PPI to be installed
+//
+EDKII_PEI_MP_SERVICES2_PPI            mMpServices2Ppi = {
+  EdkiiPeiGetNumberOfProcessors,
+  EdkiiPeiGetProcessorInfo,
+  EdkiiPeiStartupAllAPs,
+  EdkiiPeiStartupThisAP,
+  EdkiiPeiSwitchBSP,
+  EdkiiPeiEnableDisableAP,
+  EdkiiPeiWhoAmI,
+  EdkiiPeiStartupAllCPUs
+};
+
