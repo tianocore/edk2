@@ -24,7 +24,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   @retval EFI_SUCCESS             The number of processors was retrieved successfully
   @retval EFI_INVALID_PARAMETER   NumberOfProcessors is NULL
 **/
-
 EFI_STATUS
 EFIAPI
 SmmMpGetNumberOfProcessors (
