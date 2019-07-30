@@ -21,9 +21,9 @@ FORM_DISPLAY_ENGINE_FORM gDisplayFormData;
 BOOLEAN            mFinishRetrieveCall = FALSE;
 
 /**
-  Check whether the ConfigAccess protocol is available
+  Check whether the ConfigAccess protocol is available.
 
-  @parm FormSet           FormSet of which the ConfigAcces protocol need to be checked.
+  @param FormSet           FormSet of which the ConfigAcces protocol need to be checked.
 
   @retval EFI_SUCCESS     The function executed successfully.
 

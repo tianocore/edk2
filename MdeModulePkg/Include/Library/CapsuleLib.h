@@ -101,7 +101,7 @@ CoDCheckCapsuleOnDiskFlag(
   );
 
 /**
-  This routine is called to clear CapsuleOnDisk flags including OsIndications and BootNext variable
+  This routine is called to clear CapsuleOnDisk flags including OsIndications and BootNext variable.
 
   @retval EFI_SUCCESS   All Capsule On Disk flags are cleared
 
