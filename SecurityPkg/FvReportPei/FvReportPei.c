@@ -17,7 +17,7 @@ STATIC CONST HASH_ALG_INFO mHashAlgInfo[] = {
 /**
   Find hash algorithm information from mHashAlgInfo according to given ID.
 
-  @param[in]  HashAlgoId          Hash algorithm type id.
+  @param[in]  HashAlgId          Hash algorithm type id.
 
   @retval Pointer to HASH_ALG_INFO if given hash algorithm is supported.
   @retval NULL if given algorithm is not supported.
