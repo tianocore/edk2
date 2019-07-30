@@ -52,6 +52,7 @@ from PatchPcdValue.PatchPcdValue import PatchBinaryFile
 import Common.GlobalData as GlobalData
 from GenFds.GenFds import GenFds, GenFdsApi
 import multiprocessing as mp
+from multiprocessing import Manager
 
 # Version and Copyright
 VersionNumber = "0.60" + ' ' + gBUILD_VERSION
@@ -828,14 +829,15 @@ class Build():
         self.AutoGenMgr = None
         EdkLogger.info("")
         os.chdir(self.WorkspaceDir)
-    def StartAutoGen(self,mqueue, DataPipe,SkipAutoGen,PcdMaList):
+        self.share_data = Manager().dict()
+    def StartAutoGen(self,mqueue, DataPipe,SkipAutoGen,PcdMaList,share_data):
         try:
             if SkipAutoGen:
                 return True,0
             feedback_q = mp.Queue()
             file_lock = mp.Lock()
             error_event = mp.Event()
-            auto_workers = [AutoGenWorkerInProcess(mqueue,DataPipe.dump_file,feedback_q,file_lock,error_event) for _ in range(self.ThreadNumber)]
+            auto_workers = [AutoGenWorkerInProcess(mqueue,DataPipe.dump_file,feedback_q,file_lock,share_data,error_event) for _ in range(self.ThreadNumber)]
             self.AutoGenMgr = AutoGenManager(auto_workers,feedback_q,error_event)
             self.AutoGenMgr.start()
             for w in auto_workers:
@@ -1230,7 +1232,7 @@ class Build():
             self.Progress.Start("Generating makefile and code")
             data_pipe_file = os.path.join(AutoGenObject.BuildDir, "GlobalVar_%s_%s.bin" % (str(AutoGenObject.Guid),AutoGenObject.Arch))
             AutoGenObject.DataPipe.dump(data_pipe_file)
-            autogen_rt,errorcode = self.StartAutoGen(mqueue, AutoGenObject.DataPipe, self.SkipAutoGen, PcdMaList)
+            autogen_rt, errorcode = self.StartAutoGen(mqueue, AutoGenObject.DataPipe, self.SkipAutoGen, PcdMaList,self.share_data)
             self.Progress.Stop("done!")
             if not autogen_rt:
                 self.AutoGenMgr.TerminateWorkers()
@@ -2070,7 +2072,7 @@ class Build():
                         mqueue.put(m)
                     data_pipe_file = os.path.join(Pa.BuildDir, "GlobalVar_%s_%s.bin" % (str(Pa.Guid),Pa.Arch))
                     Pa.DataPipe.dump(data_pipe_file)
-                    autogen_rt, errorcode = self.StartAutoGen(mqueue, Pa.DataPipe, self.SkipAutoGen, PcdMaList)
+                    autogen_rt, errorcode = self.StartAutoGen(mqueue, Pa.DataPipe, self.SkipAutoGen, PcdMaList,self.share_data)
                     self.Progress.Stop("done!")
                     self.AutoGenTime += int(round((time.time() - AutoGenStart)))
                     if not autogen_rt:

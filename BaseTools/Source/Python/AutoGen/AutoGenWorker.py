@@ -64,7 +64,7 @@ class AutoGenManager(threading.Thread):
     def kill(self):
         self.feedback_q.put(None)
 class AutoGenWorkerInProcess(mp.Process):
-    def __init__(self,module_queue,data_pipe_file_path,feedback_q,file_lock,error_event):
+    def __init__(self,module_queue,data_pipe_file_path,feedback_q,file_lock, share_data,error_event):
         mp.Process.__init__(self)
         self.module_queue = module_queue
         self.data_pipe_file_path =data_pipe_file_path
@@ -72,6 +72,7 @@ class AutoGenWorkerInProcess(mp.Process):
         self.feedback_q = feedback_q
         self.PlatformMetaFileSet = {}
         self.file_lock = file_lock
+        self.share_data = share_data
         self.error_event = error_event
     def GetPlatformMetaFile(self,filepath,root):
         try:
