@@ -16,7 +16,10 @@ import os
 from Common.MultipleWorkspace import MultipleWorkspace as mws
 from AutoGen.AutoGen import AutoGen
 from Workspace.WorkspaceDatabase import BuildDB
-from queue import Empty
+try:
+    from queue import Empty
+except:
+    from Queue import Empty
 import traceback
 import sys
 from AutoGen.DataPipe import MemoryDataPipe
