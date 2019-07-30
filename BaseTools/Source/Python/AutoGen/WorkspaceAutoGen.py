@@ -113,6 +113,8 @@ class WorkspaceAutoGen(AutoGen):
         self.ProcessMixedPcd()
         self.VerifyPcdsFromFDF()
         self.CollectAllPcds()
+        for Pa in self.AutoGenObjectList:
+            Pa.FillData_LibConstPcd()
         self.GeneratePkgLevelHash()
         #
         # Check PCDs token value conflict in each DEC file.
@@ -881,7 +883,7 @@ class WorkspaceAutoGen(AutoGen):
         if not CreateDepsMakeFile:
             return
         for Pa in self.AutoGenObjectList:
-            Pa.CreateMakeFile(True)
+            Pa.CreateMakeFile(CreateDepsMakeFile)
 
     ## Create autogen code for platform and modules
     #
@@ -895,7 +897,7 @@ class WorkspaceAutoGen(AutoGen):
         if not CreateDepsCodeFile:
             return
         for Pa in self.AutoGenObjectList:
-            Pa.CreateCodeFile(True)
+            Pa.CreateCodeFile(CreateDepsCodeFile)
 
     ## Create AsBuilt INF file the platform
     #

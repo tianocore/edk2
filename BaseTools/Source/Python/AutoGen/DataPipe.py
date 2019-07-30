@@ -11,6 +11,7 @@ import Common.GlobalData as GlobalData
 import os
 import pickle
 from pickle import HIGHEST_PROTOCOL
+from Common import EdkLogger
 
 class PCD_DATA():
     def __init__(self,TokenCName,TokenSpaceGuidCName,Type,DatumType,SkuInfoList,DefaultValue,
@@ -34,6 +35,7 @@ class DataPipe(object):
     def __init__(self, BuildDir=None):
         self.data_container = {}
         self.BuildDir = BuildDir
+        self.dump_file = ""
 
 class MemoryDataPipe(DataPipe):
 
@@ -41,6 +43,7 @@ class MemoryDataPipe(DataPipe):
         return self.data_container.get(key)
 
     def dump(self,file_path):
+        self.dump_file = file_path
         with open(file_path,'wb') as fd:
             pickle.dump(self.data_container,fd,pickle.HIGHEST_PROTOCOL)
 
@@ -71,7 +74,7 @@ class MemoryDataPipe(DataPipe):
         for m in PlatformInfo.Platform.Modules:
             m_pcds =  PlatformInfo.Platform.Modules[m].Pcds
             if m_pcds:
-                ModulePcds[(m.File,m.Root)] = [PCD_DATA(
+                ModulePcds[(m.File,m.Root,m.Arch)] = [PCD_DATA(
             pcd.TokenCName,pcd.TokenSpaceGuidCName,pcd.Type,
             pcd.DatumType,pcd.SkuInfoList,pcd.DefaultValue,
             pcd.MaxDatumSize,pcd.UserDefinedDefaultStoresFlag,pcd.validateranges,
@@ -83,11 +86,18 @@ class MemoryDataPipe(DataPipe):
 
         #Module's Library Instance
         ModuleLibs = {}
+        libModules = {}
         for m in PlatformInfo.Platform.Modules:
             module_obj = BuildDB.BuildObject[m,PlatformInfo.Arch,PlatformInfo.BuildTarget,PlatformInfo.ToolChain]
             Libs = GetModuleLibInstances(module_obj, PlatformInfo.Platform, BuildDB.BuildObject, PlatformInfo.Arch,PlatformInfo.BuildTarget,PlatformInfo.ToolChain)
-            ModuleLibs[(m.File,m.Root,module_obj.Arch)] = [(l.MetaFile.File,l.MetaFile.Root,l.Arch) for l in Libs]
+            for lib in Libs:
+                try:
+                    libModules[(lib.MetaFile.File,lib.MetaFile.Root,lib.Arch,lib.MetaFile.Path)].append((m.File,m.Root,module_obj.Arch,m.Path))
+                except:
+                    libModules[(lib.MetaFile.File,lib.MetaFile.Root,lib.Arch,lib.MetaFile.Path)] = [(m.File,m.Root,module_obj.Arch,m.Path)]
+            ModuleLibs[(m.File,m.Root,module_obj.Arch,m.Path)] = [(l.MetaFile.File,l.MetaFile.Root,l.Arch,l.MetaFile.Path) for l in Libs]
         self.DataContainer = {"DEPS":ModuleLibs}
+        self.DataContainer = {"REFS":libModules}
 
         #Platform BuildOptions
 
@@ -143,5 +153,8 @@ class MemoryDataPipe(DataPipe):
 
         self.DataContainer = {"GuidDict": PlatformInfo.Platform._GuidDict}
 
+        self.DataContainer = {"DatabasePath":GlobalData.gDatabasePath}
         self.DataContainer = {"FdfParser": True if GlobalData.gFdfParser else False}
 
+        self.DataContainer = {"LogLevel": EdkLogger.GetLevel()}
+        self.DataContainer = {"LogFile": GlobalData.gOptions.LogFile if GlobalData.gOptions.LogFile is not None else ""}

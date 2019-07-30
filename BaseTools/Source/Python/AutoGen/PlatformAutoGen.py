@@ -133,6 +133,12 @@ class PlatformAutoGen(AutoGen):
         self.DataPipe.FillData(self)
 
         return True
+    def FillData_LibConstPcd(self):
+        libConstPcd = {}
+        for LibAuto in self.LibraryAutoGenList:
+            if LibAuto.ConstPcd:
+                libConstPcd[(LibAuto.MetaFile.File,LibAuto.MetaFile.Root,LibAuto.Arch,LibAuto.MetaFile.Path)] = LibAuto.ConstPcd
+        self.DataPipe.DataContainer = {"LibConstPcd":libConstPcd}
     ## hash() operator of PlatformAutoGen
     #
     #  The platform file path and arch string will be used to represent
@@ -162,7 +168,7 @@ class PlatformAutoGen(AutoGen):
             return
 
         for Ma in self.ModuleAutoGenList:
-            Ma.CreateCodeFile(True)
+            Ma.CreateCodeFile(CreateModuleCodeFile)
 
     ## Generate Fds Command
     @cached_property
@@ -179,9 +185,9 @@ class PlatformAutoGen(AutoGen):
             for Ma in self._MaList:
                 key = (Ma.MetaFile.File, self.Arch)
                 if key in FfsCommand:
-                    Ma.CreateMakeFile(True, FfsCommand[key])
+                    Ma.CreateMakeFile(CreateModuleMakeFile, FfsCommand[key])
                 else:
-                    Ma.CreateMakeFile(True)
+                    Ma.CreateMakeFile(CreateModuleMakeFile)
 
         # no need to create makefile for the platform more than once
         if self.IsMakeFileCreated:
@@ -1086,10 +1092,10 @@ class PlatformAutoGen(AutoGen):
                 Libs = GetModuleLibInstances(module_obj, self.Platform, self.BuildDatabase, self.Arch,self.BuildTarget,self.ToolChain)
             else:
                 Libs = []
-            ModuleLibs.update( set([(l.MetaFile.File,l.MetaFile.Root,l.Arch,True) for l in Libs]))
+            ModuleLibs.update( set([(l.MetaFile.File,l.MetaFile.Root,l.MetaFile.Path,l.MetaFile.BaseName,l.MetaFile.OriginalPath,l.Arch,True) for l in Libs]))
             if WithoutPcd and module_obj.PcdIsDriver:
                 continue
-            ModuleLibs.add((m.File,m.Root,module_obj.Arch,False))
+            ModuleLibs.add((m.File,m.Root,m.Path,m.BaseName,m.OriginalPath,module_obj.Arch,bool(module_obj.LibraryClass)))
 
         return ModuleLibs
 

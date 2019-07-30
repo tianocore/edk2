@@ -1472,8 +1472,8 @@ def CreateModuleEntryPointCode(Info, AutoGenC, AutoGenH):
 
     if Info.ModuleType in [SUP_MODULE_PEI_CORE, SUP_MODULE_DXE_CORE, SUP_MODULE_SMM_CORE, SUP_MODULE_MM_CORE_STANDALONE]:
         if Info.SourceFileList:
-          if NumEntryPoints != 1:
-              EdkLogger.error(
+            if NumEntryPoints != 1:
+                EdkLogger.error(
                   "build",
                   AUTOGEN_ERROR,
                   '%s must have exactly one entry point' % Info.ModuleType,
