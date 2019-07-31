@@ -30,7 +30,8 @@ from optparse import OptionParser
 from AutoGen.PlatformAutoGen import PlatformAutoGen
 from AutoGen.ModuleAutoGen import ModuleAutoGen
 from AutoGen.WorkspaceAutoGen import WorkspaceAutoGen
-from AutoGen.AutoGenWorker import AutoGenWorkerInProcess,AutoGenManager
+from AutoGen.AutoGenWorker import AutoGenWorkerInProcess,AutoGenManager,\
+    LogAgent
 from AutoGen import GenMake
 from Common import Misc as Utils
 
@@ -699,7 +700,7 @@ class Build():
     #   @param  WorkspaceDir        The directory of workspace
     #   @param  BuildOptions        Build options passed from command line
     #
-    def __init__(self, Target, WorkspaceDir, BuildOptions):
+    def __init__(self, Target, WorkspaceDir, BuildOptions,log_q):
         self.WorkspaceDir   = WorkspaceDir
         self.Target         = Target
         self.PlatformFile   = BuildOptions.PlatformFile
@@ -830,6 +831,7 @@ class Build():
         EdkLogger.info("")
         os.chdir(self.WorkspaceDir)
         self.share_data = Manager().dict()
+        self.log_q = log_q
     def StartAutoGen(self,mqueue, DataPipe,SkipAutoGen,PcdMaList,share_data):
         try:
             if SkipAutoGen:
@@ -837,7 +839,7 @@ class Build():
             feedback_q = mp.Queue()
             file_lock = mp.Lock()
             error_event = mp.Event()
-            auto_workers = [AutoGenWorkerInProcess(mqueue,DataPipe.dump_file,feedback_q,file_lock,share_data,error_event) for _ in range(self.ThreadNumber)]
+            auto_workers = [AutoGenWorkerInProcess(mqueue,DataPipe.dump_file,feedback_q,file_lock,share_data,self.log_q,error_event) for _ in range(self.ThreadNumber)]
             self.AutoGenMgr = AutoGenManager(auto_workers,feedback_q,error_event)
             self.AutoGenMgr.start()
             for w in auto_workers:
@@ -2406,8 +2408,12 @@ def MyOptionParser():
 def Main():
     StartTime = time.time()
 
+    #
+    # Create a log Queue
+    #
+    LogQ = mp.Queue()
     # Initialize log system
-    EdkLogger.Initialize()
+    EdkLogger.LogClientInitialize(LogQ)
     GlobalData.gCommand = sys.argv[1:]
     #
     # Parse the options and args
@@ -2417,20 +2423,23 @@ def Main():
     GlobalData.gCaseInsensitive = Option.CaseInsensitive
 
     # Set log level
+    LogLevel = EdkLogger.INFO
     if Option.verbose is not None:
         EdkLogger.SetLevel(EdkLogger.VERBOSE)
+        LogLevel = EdkLogger.VERBOSE
     elif Option.quiet is not None:
         EdkLogger.SetLevel(EdkLogger.QUIET)
+        LogLevel = EdkLogger.QUIET
     elif Option.debug is not None:
         EdkLogger.SetLevel(Option.debug + 1)
+        LogLevel = Option.debug + 1
     else:
         EdkLogger.SetLevel(EdkLogger.INFO)
 
-    if Option.LogFile is not None:
-        EdkLogger.SetLogFile(Option.LogFile)
-
     if Option.WarningAsError == True:
         EdkLogger.SetWarningAsError()
+    Log_Agent = LogAgent(LogQ,LogLevel,Option.LogFile)
+    Log_Agent.start()
 
     if platform.platform().find("Windows") >= 0:
         GlobalData.gIsWindows = True
@@ -2504,7 +2513,7 @@ def Main():
         if Option.Flag is not None and Option.Flag not in ['-c', '-s']:
             EdkLogger.error("build", OPTION_VALUE_INVALID, "UNI flag must be one of -c or -s")
 
-        MyBuild = Build(Target, Workspace, Option)
+        MyBuild = Build(Target, Workspace, Option,LogQ)
         GlobalData.gCommandLineDefines['ARCH'] = ' '.join(MyBuild.ArchList)
         if not (MyBuild.LaunchPrebuildFlag and os.path.exists(MyBuild.PlatformBuildPath)):
             MyBuild.Launch()
@@ -2588,6 +2597,8 @@ def Main():
     EdkLogger.quiet("\n- %s -" % Conclusion)
     EdkLogger.quiet(time.strftime("Build end time: %H:%M:%S, %b.%d %Y", time.localtime()))
     EdkLogger.quiet("Build total time: %s\n" % BuildDurationStr)
+    Log_Agent.kill()
+    Log_Agent.join()
     return ReturnCode
 
 if __name__ == '__main__':

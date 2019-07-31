@@ -10,6 +10,7 @@ from __future__ import absolute_import
 import Common.LongFilePathOs as os, sys, logging
 import traceback
 from  .BuildToolError import *
+import logging.handlers
 
 ## Log level constants
 DEBUG_0 = 1
@@ -200,6 +201,41 @@ def error(ToolName, ErrorCode, Message=None, File=None, Line=None, ExtraData=Non
 quiet   = _ErrorLogger.error
 
 ## Initialize log system
+def LogClientInitialize(log_q):
+    #
+    # Since we use different format to log different levels of message into different
+    # place (stdout or stderr), we have to use different "Logger" objects to do this.
+    #
+    # For DEBUG level (All DEBUG_0~9 are applicable)
+    _DebugLogger.setLevel(INFO)
+    _DebugChannel = logging.handlers.QueueHandler(log_q)
+    _DebugChannel.setFormatter(_DebugFormatter)
+    _DebugLogger.addHandler(_DebugChannel)
+
+    # For VERBOSE, INFO, WARN level
+    _InfoLogger.setLevel(INFO)
+    _InfoChannel = logging.handlers.QueueHandler(log_q)
+    _InfoChannel.setFormatter(_InfoFormatter)
+    _InfoLogger.addHandler(_InfoChannel)
+
+    # For ERROR level
+    _ErrorLogger.setLevel(INFO)
+    _ErrorCh = logging.handlers.QueueHandler(log_q)
+    _ErrorCh.setFormatter(_ErrorFormatter)
+    _ErrorLogger.addHandler(_ErrorCh)
+
+## Set log level
+#
+#   @param  Level   One of log level in _LogLevel
+def SetLevel(Level):
+    if Level not in _LogLevels:
+        info("Not supported log level (%d). Use default level instead." % Level)
+        Level = INFO
+    _DebugLogger.setLevel(Level)
+    _InfoLogger.setLevel(Level)
+    _ErrorLogger.setLevel(Level)
+
+## Initialize log system
 def Initialize():
     #
     # Since we use different format to log different levels of message into different
@@ -222,17 +258,6 @@ def Initialize():
     _ErrorCh = logging.StreamHandler(sys.stderr)
     _ErrorCh.setFormatter(_ErrorFormatter)
     _ErrorLogger.addHandler(_ErrorCh)
-
-## Set log level
-#
-#   @param  Level   One of log level in _LogLevel
-def SetLevel(Level):
-    if Level not in _LogLevels:
-        info("Not supported log level (%d). Use default level instead." % Level)
-        Level = INFO
-    _DebugLogger.setLevel(Level)
-    _InfoLogger.setLevel(Level)
-    _ErrorLogger.setLevel(Level)
 
 def InitializeForUnitTest():
     Initialize()

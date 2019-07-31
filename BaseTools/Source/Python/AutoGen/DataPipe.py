@@ -154,7 +154,7 @@ class MemoryDataPipe(DataPipe):
         self.DataContainer = {"GuidDict": PlatformInfo.Platform._GuidDict}
 
         self.DataContainer = {"DatabasePath":GlobalData.gDatabasePath}
+
         self.DataContainer = {"FdfParser": True if GlobalData.gFdfParser else False}
 
         self.DataContainer = {"LogLevel": EdkLogger.GetLevel()}
-        self.DataContainer = {"LogFile": GlobalData.gOptions.LogFile if GlobalData.gOptions.LogFile is not None else ""}
