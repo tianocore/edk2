@@ -130,6 +130,8 @@ UINT8                    mPhysicalAddressBits;
 UINT32                   mSmmCr0;
 UINT32                   mSmmCr4;
 
+extern BOOLEAN           mCpuSmmStaticPageTable;
+
 /**
   Initialize IDT to setup exception handlers for SMM.
 
@@ -1121,6 +1123,9 @@ FindSmramInfo (
   *SmrrBase = (UINT32)CurrentSmramRange->CpuStart;
   *SmrrSize = (UINT32)CurrentSmramRange->PhysicalSize;
 
+  //
+  // Extend *SmrrBase/*SmrrSize to include adjacent SMRAM ranges
+  //
   do {
     Found = FALSE;
     for (Index = 0; Index < mSmmCpuSmramRangeCount; Index++) {
@@ -1432,14 +1437,20 @@ PerformRemainingTasks (
     SetMemMapAttributes ();
 
     //
-    // For outside SMRAM, we only map SMM communication buffer or MMIO.
+    // Do not protect memory outside SMRAM when SMM static page table is not enabled.
     //
-    SetUefiMemMapAttributes ();
+    if (mCpuSmmStaticPageTable) {
 
-    //
-    // Set page table itself to be read-only
-    //
-    SetPageTableAttributes ();
+      //
+      // For outside SMRAM, we only map SMM communication buffer or MMIO.
+      //
+      SetUefiMemMapAttributes ();
+
+      //
+      // Set page table itself to be read-only
+      //
+      SetPageTableAttributes ();
+    }
 
     //
     // Configure SMM Code Access Check feature if available.
