@@ -375,6 +375,7 @@ SmmInitPageTable (
     // Fill PML5 entry
     //
     Pml5Entry = (UINT64*)AllocatePageTableMemory (1);
+    ASSERT (Pml5Entry != NULL);
     *Pml5Entry = (UINTN) Pml4Entry | mAddressEncMask | PAGE_ATTRIBUTE_BITS;
     ZeroMem (Pml5Entry + 1, EFI_PAGE_SIZE - sizeof (*Pml5Entry));
     //
