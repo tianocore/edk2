@@ -719,6 +719,7 @@ UsbEnumerateNewDev (
 
   if (!USB_BIT_IS_SET (PortState.PortStatus, USB_PORT_STAT_CONNECTION)) {
     DEBUG ((EFI_D_ERROR, "UsbEnumerateNewDev: No device present at port %d\n", Port));
+    Status = EFI_NOT_FOUND;
     goto ON_ERROR;
   } else if (USB_BIT_IS_SET (PortState.PortStatus, USB_PORT_STAT_SUPER_SPEED)){
     Child->Speed      = EFI_USB_SPEED_SUPER;
