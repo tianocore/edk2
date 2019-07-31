@@ -23,13 +23,14 @@ except:
 import traceback
 import sys
 from AutoGen.DataPipe import MemoryDataPipe
+import logging
+
 def clearQ(q):
     try:
         while True:
             q.get_nowait()
     except Empty:
         pass
-import logging
 
 class LogAgent(threading.Thread):
     def __init__(self,log_q,log_level,log_file=None):
@@ -123,9 +124,10 @@ class AutoGenManager(threading.Thread):
 
     def clearQueue(self):
         taskq = self.autogen_workers[0].module_queue
+        logq = self.autogen_workers[0].log_q
         clearQ(taskq)
         clearQ(self.feedback_q)
-
+        clearQ(logq)
     def TerminateWorkers(self):
         self.error_event.set()
     def kill(self):

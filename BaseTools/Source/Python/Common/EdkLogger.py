@@ -95,7 +95,9 @@ except:
                 self.enqueue(self.prepare(record))
             except Exception:
                 self.handleError(record)
-
+class BlockQueueHandler(QueueHandler):
+    def enqueue(self, record):
+        self.queue.put(record,True)
 ## Log level constants
 DEBUG_0 = 1
 DEBUG_1 = 2
@@ -292,19 +294,19 @@ def LogClientInitialize(log_q):
     #
     # For DEBUG level (All DEBUG_0~9 are applicable)
     _DebugLogger.setLevel(INFO)
-    _DebugChannel = QueueHandler(log_q)
+    _DebugChannel = BlockQueueHandler(log_q)
     _DebugChannel.setFormatter(_DebugFormatter)
     _DebugLogger.addHandler(_DebugChannel)
 
     # For VERBOSE, INFO, WARN level
     _InfoLogger.setLevel(INFO)
-    _InfoChannel = QueueHandler(log_q)
+    _InfoChannel = BlockQueueHandler(log_q)
     _InfoChannel.setFormatter(_InfoFormatter)
     _InfoLogger.addHandler(_InfoChannel)
 
     # For ERROR level
     _ErrorLogger.setLevel(INFO)
-    _ErrorCh = QueueHandler(log_q)
+    _ErrorCh = BlockQueueHandler(log_q)
     _ErrorCh.setFormatter(_ErrorFormatter)
     _ErrorLogger.addHandler(_ErrorCh)
 

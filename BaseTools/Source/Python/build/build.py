@@ -709,7 +709,7 @@ class Build():
         self.FvList         = BuildOptions.FvImage
         self.CapList        = BuildOptions.CapName
         self.SilentMode     = BuildOptions.SilentMode
-        self.ThreadNumber   = BuildOptions.ThreadNumber
+        self.ThreadNumber   = 1
         self.SkipAutoGen    = BuildOptions.SkipAutoGen
         self.Reparse        = BuildOptions.Reparse
         self.SkuId          = BuildOptions.SkuId
@@ -882,19 +882,6 @@ class Build():
                 ToolChainFamily.append(ToolDefinition[TAB_TOD_DEFINES_FAMILY][Tool])
         self.ToolChainFamily = ToolChainFamily
 
-        if self.ThreadNumber is None:
-            self.ThreadNumber = self.TargetTxt.TargetTxtDictionary[TAB_TAT_DEFINES_MAX_CONCURRENT_THREAD_NUMBER]
-            if self.ThreadNumber == '':
-                self.ThreadNumber = 0
-            else:
-                self.ThreadNumber = int(self.ThreadNumber, 0)
-
-        if self.ThreadNumber == 0:
-            try:
-                self.ThreadNumber = multiprocessing.cpu_count()
-            except (ImportError, NotImplementedError):
-                self.ThreadNumber = 1
-
         if not self.PlatformFile:
             PlatformFile = self.TargetTxt.TargetTxtDictionary[TAB_TAT_DEFINES_ACTIVE_PLATFORM]
             if not PlatformFile:
@@ -912,7 +899,7 @@ class Build():
                                     ExtraData="No active platform specified in target.txt or command line! Nothing can be built.\n")
 
             self.PlatformFile = PathClass(NormFile(PlatformFile, self.WorkspaceDir), self.WorkspaceDir)
-
+        self.ThreadNumber   = ThreadNum()
     ## Initialize build configuration
     #
     #   This method will parse DSC file and merge the configurations from
@@ -2056,12 +2043,13 @@ class Build():
                     data_pipe_file = os.path.join(Pa.BuildDir, "GlobalVar_%s_%s.bin" % (str(Pa.Guid),Pa.Arch))
                     Pa.DataPipe.dump(data_pipe_file)
                     autogen_rt, errorcode = self.StartAutoGen(mqueue, Pa.DataPipe, self.SkipAutoGen, PcdMaList,self.share_data)
-                    self.Progress.Stop("done!")
-                    self.AutoGenTime += int(round((time.time() - AutoGenStart)))
+
                     if not autogen_rt:
                         self.AutoGenMgr.TerminateWorkers()
                         self.AutoGenMgr.join(0.1)
                         raise FatalError(errorcode)
+                self.AutoGenTime += int(round((time.time() - AutoGenStart)))
+                self.Progress.Stop("done!")
                 for Arch in Wa.ArchList:
                     MakeStart = time.time()
                     for Ma in self.BuildModules:
@@ -2297,7 +2285,21 @@ def LogBuildTime(Time):
         return TimeDurStr
     else:
         return None
+def ThreadNum():
+    ThreadNumber = BuildOption.ThreadNumber
+    if ThreadNumber is None:
+        ThreadNumber = TargetTxt.TargetTxtDictionary[TAB_TAT_DEFINES_MAX_CONCURRENT_THREAD_NUMBER]
+        if ThreadNumber == '':
+            ThreadNumber = 0
+        else:
+            ThreadNumber = int(ThreadNumber, 0)
 
+    if ThreadNumber == 0:
+        try:
+            ThreadNumber = multiprocessing.cpu_count()
+        except (ImportError, NotImplementedError):
+            ThreadNumber = 1
+    return ThreadNumber
 ## Tool entrance method
 #
 # This method mainly dispatch specific methods per the command line options.
@@ -2307,13 +2309,14 @@ def LogBuildTime(Time):
 #   @retval 0     Tool was successful
 #   @retval 1     Tool failed
 #
+LogQMaxSize = ThreadNum() * 10
 def Main():
     StartTime = time.time()
 
     #
     # Create a log Queue
     #
-    LogQ = mp.Queue()
+    LogQ = mp.Queue(LogQMaxSize)
     # Initialize log system
     EdkLogger.LogClientInitialize(LogQ)
     GlobalData.gCommand = sys.argv[1:]
