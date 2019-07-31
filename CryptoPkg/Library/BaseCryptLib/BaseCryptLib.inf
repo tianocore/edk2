@@ -37,6 +37,7 @@
   Hmac/CryptHmacMd5.c
   Hmac/CryptHmacSha1.c
   Hmac/CryptHmacSha256.c
+  Kdf/CryptHkdf.c
   Cipher/CryptAes.c
   Cipher/CryptTdes.c
   Cipher/CryptArc4.c
