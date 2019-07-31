@@ -1404,7 +1404,7 @@ InternalSmmStartupAllAPs (
 EFI_STATUS
 EFIAPI
 ProcedureWrapper (
-  IN OUT VOID *Buffer
+  IN     VOID *Buffer
   )
 {
   PROCEDURE_WRAPPER *Wrapper;

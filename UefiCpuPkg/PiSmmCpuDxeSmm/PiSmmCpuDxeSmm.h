@@ -1329,7 +1329,7 @@ InternalSmmStartupThisAp (
   IN      EFI_AP_PROCEDURE2              Procedure,
   IN      UINTN                          CpuIndex,
   IN OUT  VOID                           *ProcArguments OPTIONAL,
-  IN      MM_COMPLETION                  *Token,
+  IN OUT  MM_COMPLETION                  *Token,
   IN      UINTN                          TimeoutInMicroseconds,
   IN OUT  EFI_STATUS                     *CpuStatus
   );
@@ -1387,7 +1387,7 @@ IsPresentAp (
   @param[in]     TimeoutInMicroseconds   Indicates the time limit in microseconds for
                                          APs to return from Procedure, either for
                                          blocking or non-blocking mode.
-  @param[in,out] ProcedureArgument       The parameter passed into Procedure for
+  @param[in,out] ProcedureArguments      The parameter passed into Procedure for
                                          all APs.
   @param[in,out] Token                   This is an optional parameter that allows the caller to execute the
                                          procedure in a blocking or non-blocking fashion. If it is NULL the
