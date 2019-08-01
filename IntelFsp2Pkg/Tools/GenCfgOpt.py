@@ -715,7 +715,7 @@ EndList
                         if (ConfigDict['embed'].find(':END') != -1):
                             Remainder = Offset % (MaxAlign/8)   # MaxAlign is either 32 or 64
                             if Remainder:
-                                Diff = (MaxAlign/8) - Remainder
+                                Diff = int((MaxAlign/8) - Remainder)
                                 Offset = Offset + Diff
                                 ItemOffset = ItemOffset + Diff
                             MaxAlign = 32                       # Reset to default 32 align when struct end
@@ -727,7 +727,7 @@ EndList
                             Remainder = Offset % max(ItemLength/8, 4, SizeAlign)
                             Offset = Offset + ItemLength
                             if Remainder:
-                                Diff = max(ItemLength/8, 4, SizeAlign) - Remainder
+                                Diff = int(max(ItemLength/8, 4, SizeAlign) - Remainder)
                                 ItemOffset = ItemOffset + Diff
                         ConfigDict['offset'] = ItemOffset
 
@@ -1416,7 +1416,7 @@ EndList
                         if BitsRemain:
                             BsfFd.write("        Skip %d bits\n" % BitsRemain)
                             BitsGap -= BitsRemain
-                        BytesRemain = BitsGap / 8
+                        BytesRemain = int(BitsGap / 8)
                         if BytesRemain:
                             BsfFd.write("        Skip %d bytes\n" % BytesRemain)
                     NextOffset = Item['offset'] + Item['length']
