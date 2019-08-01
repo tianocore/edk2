@@ -1298,3 +1298,10 @@
                                                                                    "It is used to set VPD region base address. So, it can't be DynamicExVpd PCD. Its value is"
                                                                                    "required to be accessed in PcdDxe driver entry point. So, its value must be set in PEI phase."
                                                                                    "It can't depend on EFI variable service, and can't be DynamicExHii PCD."
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdUse5LevelPageTable_PROMPT  #language en-US "Enable 5-Level Paging support in long mode"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdUse5LevelPageTable_HELP  #language en-US "Indicates if 5-Level Paging will be enabled in long mode. 5-Level Paging will not be enabled"
+                                                                                    "when the PCD is TRUE but CPU doesn't support 5-Level Paging."
+                                                                                    " TRUE  - 5-Level Paging will be enabled."
+                                                                                    " FALSE - 5-Level Paging will not be enabled."

@@ -1981,6 +1981,13 @@
   # @Prompt The address mask when memory encryption is enabled.
   gEfiMdeModulePkgTokenSpaceGuid.PcdPteMemoryEncryptionAddressOrMask|0x0|UINT64|0x30001047
 
+  ## Indicates if 5-Level Paging will be enabled in long mode. 5-Level Paging will not be enabled
+  #  when the PCD is TRUE but CPU doesn't support 5-Level Paging.
+  #   TRUE  - 5-Level Paging will be enabled.<BR>
+  #   FALSE - 5-Level Paging will not be enabled.<BR>
+  # @Prompt Enable 5-Level Paging support in long mode.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUse5LevelPageTable|FALSE|BOOLEAN|0x0001105F
+
   ## Capsule In Ram is to use memory to deliver the capsules that will be processed after system
   #  reset.<BR><BR>
   #  This PCD indicates if the Capsule In Ram is supported.<BR>
