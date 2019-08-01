@@ -184,6 +184,9 @@ GetCurrentPagingContext (
     if (Cr4.Bits.PAE != 0) {
       mPagingContext.ContextData.Ia32.Attributes |= PAGE_TABLE_LIB_PAGING_CONTEXT_IA32_X64_ATTRIBUTES_PAE;
     }
+    if (Cr4.Bits.LA57 != 0) {
+      mPagingContext.ContextData.Ia32.Attributes |= PAGE_TABLE_LIB_PAGING_CONTEXT_IA32_X64_ATTRIBUTES_5_LEVEL;
+    }
 
     AsmCpuid (CPUID_EXTENDED_FUNCTION, &RegEax, NULL, NULL, NULL);
     if (RegEax >= CPUID_EXTENDED_CPU_SIG) {
@@ -273,14 +276,17 @@ GetPageTableEntry (
   UINTN                 Index2;
   UINTN                 Index3;
   UINTN                 Index4;
+  UINTN                 Index5;
   UINT64                *L1PageTable;
   UINT64                *L2PageTable;
   UINT64                *L3PageTable;
   UINT64                *L4PageTable;
+  UINT64                *L5PageTable;
   UINT64                AddressEncMask;
 
   ASSERT (PagingContext != NULL);
 
+  Index5 = ((UINTN)RShiftU64 (Address, 48)) & PAGING_PAE_INDEX_MASK;
   Index4 = ((UINTN)RShiftU64 (Address, 39)) & PAGING_PAE_INDEX_MASK;
   Index3 = ((UINTN)Address >> 30) & PAGING_PAE_INDEX_MASK;
   Index2 = ((UINTN)Address >> 21) & PAGING_PAE_INDEX_MASK;
@@ -291,7 +297,17 @@ GetPageTableEntry (
   AddressEncMask = PcdGet64 (PcdPteMemoryEncryptionAddressOrMask) & PAGING_1G_ADDRESS_MASK_64;
 
   if (PagingContext->MachineType == IMAGE_FILE_MACHINE_X64) {
-    L4PageTable = (UINT64 *)(UINTN)PagingContext->ContextData.X64.PageTableBase;
+    if ((PagingContext->ContextData.X64.Attributes & PAGE_TABLE_LIB_PAGING_CONTEXT_IA32_X64_ATTRIBUTES_5_LEVEL) != 0) {
+      L5PageTable = (UINT64 *)(UINTN)PagingContext->ContextData.X64.PageTableBase;
+      if (L5PageTable[Index5] == 0) {
+        *PageAttribute = PageNone;
+        return NULL;
+      }
+
+      L4PageTable = (UINT64 *)(UINTN)(L5PageTable[Index5] & ~AddressEncMask & PAGING_4K_ADDRESS_MASK_64);
+    } else {
+      L4PageTable = (UINT64 *)(UINTN)PagingContext->ContextData.X64.PageTableBase;
+    }
     if (L4PageTable[Index4] == 0) {
       *PageAttribute = PageNone;
       return NULL;
