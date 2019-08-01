@@ -256,7 +256,7 @@ ParseAcpiMadt (
       0,
       NULL,
       InterruptContollerPtr,
-      2,  //  Length is 1 byte at offset 1
+      AcpiTableLength - Offset,
       PARSER_PARAMS (MadtInterruptControllerHeaderParser)
       );
 
