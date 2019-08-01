@@ -30,7 +30,7 @@ STATIC CONST ACPI_PARSER SlitParser[] = {
 /**
   Macro to get the value of a System Locality
 **/
-#define SLIT_ELEMENT(Ptr, i, j) *(Ptr + (i * LocalityCount) + j)
+#define SLIT_ELEMENT(Ptr, i, j) *(Ptr + (MultU64x64 (i, LocalityCount)) + j)
 
 /**
   This function parses the ACPI SLIT table.
