@@ -270,6 +270,7 @@ class GitDiffCheck:
             if line.startswith('@@ '):
                 self.state = PRE_PATCH
             elif len(line) >= 1 and line[0] not in ' -+' and \
+                 not line.startswith('\r\n') and  \
                  not line.startswith(r'\ No newline ') and not self.binary:
                 for line in self.lines[self.line_num + 1:]:
                     if line.startswith('diff --git'):
@@ -313,6 +314,8 @@ class GitDiffCheck:
                 pass
             elif line.startswith('+'):
                 self.check_added_line(line[1:])
+            elif line.startswith('\r\n'):
+                pass
             elif line.startswith(r'\ No newline '):
                 pass
             elif not line.startswith(' '):
