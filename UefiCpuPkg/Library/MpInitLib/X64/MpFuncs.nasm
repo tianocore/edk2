@@ -1,5 +1,5 @@
 ;------------------------------------------------------------------------------ ;
-; Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2015 - 2019, Intel Corporation. All rights reserved.<BR>
 ; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;
 ; Module Name:
@@ -100,6 +100,18 @@ SkipEnableExecuteDisableBit:
     ;
     mov        eax, cr4
     bts        eax, 5
+
+    mov        esi, Enable5LevelPagingLocation
+    cmp        byte [ebx + esi], 0
+    jz         SkipEnable5LevelPaging
+
+    ;
+    ; Enable 5 Level Paging
+    ;
+    bts        eax, 12                     ; Set LA57=1.
+
+SkipEnable5LevelPaging:
+
     mov        cr4, eax
 
     ;

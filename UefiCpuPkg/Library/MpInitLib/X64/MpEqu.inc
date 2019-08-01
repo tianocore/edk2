@@ -1,5 +1,5 @@
 ;------------------------------------------------------------------------------ ;
-; Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2015 - 2019, Intel Corporation. All rights reserved.<BR>
 ; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;
 ; Module Name:
@@ -40,3 +40,4 @@ ModeTransitionMemoryLocation        equ  LockLocation + 94h
 ModeTransitionSegmentLocation       equ  LockLocation + 98h
 ModeHighMemoryLocation              equ  LockLocation + 9Ah
 ModeHighSegmentLocation             equ  LockLocation + 9Eh
+Enable5LevelPagingLocation          equ  LockLocation + 0A0h
