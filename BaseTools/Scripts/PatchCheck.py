@@ -331,6 +331,8 @@ class GitDiffCheck:
         'old mode ',
         'new mode ',
         'similarity index ',
+        'copy from ',
+        'copy to ',
         'rename ',
         )
 
