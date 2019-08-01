@@ -23,7 +23,6 @@ STATIC CONST UINT8*  PlatformTimerType;
 STATIC CONST UINT16* PlatformTimerLength;
 STATIC CONST UINT32* GtBlockTimerCount;
 STATIC CONST UINT32* GtBlockTimerOffset;
-STATIC CONST UINT16* GtBlockLength;
 STATIC ACPI_DESCRIPTION_HEADER_INFO AcpiHdrInfo;
 
 /**
@@ -127,7 +126,7 @@ STATIC CONST ACPI_PARSER GtPlatformTimerHeaderParser[] = {
 **/
 STATIC CONST ACPI_PARSER GtBlockParser[] = {
   {L"Type", 1, 0, L"%d", NULL, NULL, NULL, NULL},
-  {L"Length", 2, 1, L"%d", NULL, (VOID**)&GtBlockLength, NULL, NULL},
+  {L"Length", 2, 1, L"%d", NULL, NULL, NULL, NULL},
   {L"Reserved", 1, 3, L"%x", NULL, NULL, NULL, NULL},
   {L"Physical address (CntCtlBase)", 8, 4, L"0x%lx", NULL, NULL, NULL, NULL},
   {L"Timer Count", 4, 12, L"%d", NULL, (VOID**)&GtBlockTimerCount,
@@ -168,56 +167,43 @@ STATIC CONST ACPI_PARSER SBSAGenericWatchdogParser[] = {
 /**
   This function parses the Platform GT Block.
 
-  @param [in] Ptr     Pointer to the start of the GT Block data.
-  @param [in] Length  Length of the GT Block structure.
+  @param [in] Ptr       Pointer to the start of the GT Block data.
+  @param [in] Length    Length of the GT Block structure.
 **/
 STATIC
 VOID
 DumpGTBlock (
   IN UINT8* Ptr,
-  IN UINT32 Length
+  IN UINT16 Length
   )
 {
   UINT32 Index;
   UINT32 Offset;
-  UINT32 GTBlockTimerLength;
 
-  Offset = ParseAcpi (
-             TRUE,
-             2,
-             "GT Block",
-             Ptr,
-             Length,
-             PARSER_PARAMS (GtBlockParser)
-             );
-  GTBlockTimerLength = (*GtBlockLength - Offset) / (*GtBlockTimerCount);
-  Length -= Offset;
+  ParseAcpi (
+    TRUE,
+    2,
+    "GT Block",
+    Ptr,
+    Length,
+    PARSER_PARAMS (GtBlockParser)
+    );
 
-  if (*GtBlockTimerCount != 0) {
-    Ptr += (*GtBlockTimerOffset);
-    Index = 0;
-    while ((Index < (*GtBlockTimerCount)) && (Length >= GTBlockTimerLength)) {
-      Offset = ParseAcpi (
-                 TRUE,
-                 2,
-                 "GT Block Timer",
-                 Ptr,
-                 GTBlockTimerLength,
-                 PARSER_PARAMS (GtBlockTimerParser)
-                 );
-      // Increment by GT Block Timer structure size
-      Ptr += Offset;
-      Length -= Offset;
-      Index++;
-    }
+  Offset = *GtBlockTimerOffset;
+  Index = 0;
 
-    if (Length != 0) {
-      IncrementErrorCount ();
-      Print (
-        L"ERROR:GT Block Timer length mismatch. Unparsed %d bytes.\n",
-        Length
-        );
-    }
+  // Parse the specified number of GT Block Timer Structures or the GT Block
+  // Structure buffer length. Whichever is minimum.
+  while ((Index++ < *GtBlockTimerCount) &&
+         (Offset < Length)) {
+    Offset += ParseAcpi (
+                TRUE,
+                2,
+                "GT Block Timer",
+                Ptr + Offset,
+                Length - Offset,
+                PARSER_PARAMS (GtBlockTimerParser)
+                );
   }
 }
 
@@ -270,6 +256,7 @@ ParseAcpiGtdt (
   )
 {
   UINT32 Index;
+  UINT32 Offset;
   UINT8* TimerPtr;
 
   if (!Trace) {
@@ -285,36 +272,54 @@ ParseAcpiGtdt (
     PARSER_PARAMS (GtdtParser)
     );
 
-  if (*GtdtPlatformTimerCount != 0) {
-    TimerPtr = Ptr + (*GtdtPlatformTimerOffset);
-    Index = 0;
-    do {
-      // Parse the Platform Timer Header
-      ParseAcpi (
-        FALSE,
-        0,
-        NULL,
-        TimerPtr,
-        4,  // GT Platform Timer structure header length.
-        PARSER_PARAMS (GtPlatformTimerHeaderParser)
+  TimerPtr = Ptr + *GtdtPlatformTimerOffset;
+  Offset = *GtdtPlatformTimerOffset;
+  Index = 0;
+
+  // Parse the specified number of Platform Timer Structures or the GTDT
+  // buffer length. Whichever is minimum.
+  while ((Index++ < *GtdtPlatformTimerCount) &&
+         (Offset < AcpiTableLength)) {
+    // Parse the Platform Timer Header to obtain Length and Type
+    ParseAcpi (
+      FALSE,
+      0,
+      NULL,
+      TimerPtr,
+      AcpiTableLength - Offset,
+      PARSER_PARAMS (GtPlatformTimerHeaderParser)
+      );
+
+    // Make sure the Platform Timer is inside the table.
+    if ((Offset + *PlatformTimerLength) > AcpiTableLength) {
+      IncrementErrorCount ();
+      Print (
+        L"ERROR: Invalid Platform Timer Structure length. " \
+          L"PlatformTimerLength = %d. RemainingTableBufferLength = %d. " \
+          L"GTDT parsing aborted.\n",
+        *PlatformTimerLength,
+        AcpiTableLength - Offset
         );
-      switch (*PlatformTimerType) {
-        case EFI_ACPI_6_2_GTDT_GT_BLOCK:
-          DumpGTBlock (TimerPtr, *PlatformTimerLength);
-          break;
-        case EFI_ACPI_6_2_GTDT_SBSA_GENERIC_WATCHDOG:
-          DumpWatchdogTimer (TimerPtr, *PlatformTimerLength);
-          break;
-        default:
-          IncrementErrorCount ();
-          Print (
-            L"ERROR: INVALID Platform Timer Type = %d\n",
-            *PlatformTimerType
-            );
-          break;
-      } // switch
-      TimerPtr += (*PlatformTimerLength);
-      Index++;
-    } while (Index < *GtdtPlatformTimerCount);
-  }
+      return;
+    }
+
+    switch (*PlatformTimerType) {
+      case EFI_ACPI_6_3_GTDT_GT_BLOCK:
+        DumpGTBlock (TimerPtr, *PlatformTimerLength);
+        break;
+      case EFI_ACPI_6_3_GTDT_SBSA_GENERIC_WATCHDOG:
+        DumpWatchdogTimer (TimerPtr, *PlatformTimerLength);
+        break;
+      default:
+        IncrementErrorCount ();
+        Print (
+          L"ERROR: Invalid Platform Timer Type = %d\n",
+          *PlatformTimerType
+          );
+        break;
+    } // switch
+
+    TimerPtr += *PlatformTimerLength;
+    Offset += *PlatformTimerLength;
+  } // while
 }
