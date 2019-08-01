@@ -6,7 +6,7 @@
   returned is a single 32-bit or 64-bit value, then a data structure is not
   provided for that MSR.
 
-  Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2018 - 2019, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Specification Reference:
@@ -18,7 +18,7 @@
 #ifndef __GOLDMONT_PLUS_MSR_H__
 #define __GOLDMONT_PLUS_MSR_H__
 
-#include <Register/ArchitecturalMsr.h>
+#include <Register/Intel/ArchitecturalMsr.h>
 
 /**
   Is Intel Atom processors based on the Goldmont plus microarchitecture?

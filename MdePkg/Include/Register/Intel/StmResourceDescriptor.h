@@ -1,7 +1,7 @@
 /** @file
   STM Resource Descriptor
 
-  Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2019, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Specification Reference:
@@ -9,8 +9,8 @@
 
 **/
 
-#ifndef _STM_RESOURCE_DESCRIPTOR_H_
-#define _STM_RESOURCE_DESCRIPTOR_H_
+#ifndef _INTEL_STM_RESOURCE_DESCRIPTOR_H_
+#define _INTEL_STM_RESOURCE_DESCRIPTOR_H_
 
 #pragma pack (1)
 

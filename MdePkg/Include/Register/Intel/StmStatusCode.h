@@ -1,7 +1,7 @@
 /** @file
   STM Status Codes
 
-  Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2019, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Specification Reference:
@@ -9,8 +9,8 @@
 
 **/
 
-#ifndef _STM_STATUS_CODE_H_
-#define _STM_STATUS_CODE_H_
+#ifndef _INTEL_STM_STATUS_CODE_H_
+#define _INTEL_STM_STATUS_CODE_H_
 
 /**
   STM Status Codes
