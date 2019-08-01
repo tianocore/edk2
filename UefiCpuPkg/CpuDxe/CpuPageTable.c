@@ -1,7 +1,7 @@
 /** @file
   Page table management support.
 
-  Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2017 - 2019, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -20,14 +20,6 @@
 
 #include "CpuDxe.h"
 #include "CpuPageTable.h"
-
-///
-/// Paging registers
-///
-#define CR0_WP                      BIT16
-#define CR0_PG                      BIT31
-#define CR4_PSE                     BIT4
-#define CR4_PAE                     BIT5
 
 ///
 /// Page Table Entry
@@ -161,6 +153,8 @@ GetCurrentPagingContext (
   UINT32                          RegEax;
   CPUID_EXTENDED_CPU_SIG_EDX      RegEdx;
   MSR_IA32_EFER_REGISTER          MsrEfer;
+  IA32_CR4                        Cr4;
+  IA32_CR0                        Cr0;
 
   //
   // Don't retrieve current paging context from processor if in SMM mode.
@@ -172,20 +166,23 @@ GetCurrentPagingContext (
     } else {
       mPagingContext.MachineType = IMAGE_FILE_MACHINE_I386;
     }
-    if ((AsmReadCr0 () & CR0_PG) != 0) {
+
+    Cr0.UintN = AsmReadCr0 ();
+    Cr4.UintN = AsmReadCr4 ();
+
+    if (Cr0.Bits.PG != 0) {
       mPagingContext.ContextData.X64.PageTableBase = (AsmReadCr3 () & PAGING_4K_ADDRESS_MASK_64);
     } else {
       mPagingContext.ContextData.X64.PageTableBase = 0;
     }
-
-    if ((AsmReadCr4 () & CR4_PSE) != 0) {
+    if (Cr0.Bits.WP  != 0) {
+      mPagingContext.ContextData.Ia32.Attributes |= PAGE_TABLE_LIB_PAGING_CONTEXT_IA32_X64_ATTRIBUTES_WP_ENABLE;
+    }
+    if (Cr4.Bits.PSE != 0) {
       mPagingContext.ContextData.Ia32.Attributes |= PAGE_TABLE_LIB_PAGING_CONTEXT_IA32_X64_ATTRIBUTES_PSE;
     }
-    if ((AsmReadCr4 () & CR4_PAE) != 0) {
+    if (Cr4.Bits.PAE != 0) {
       mPagingContext.ContextData.Ia32.Attributes |= PAGE_TABLE_LIB_PAGING_CONTEXT_IA32_X64_ATTRIBUTES_PAE;
-    }
-    if ((AsmReadCr0 () & CR0_WP) != 0) {
-      mPagingContext.ContextData.Ia32.Attributes |= PAGE_TABLE_LIB_PAGING_CONTEXT_IA32_X64_ATTRIBUTES_WP_ENABLE;
     }
 
     AsmCpuid (CPUID_EXTENDED_FUNCTION, &RegEax, NULL, NULL, NULL);
@@ -581,12 +578,14 @@ IsReadOnlyPageWriteProtected (
   VOID
   )
 {
+  IA32_CR0  Cr0;
   //
   // To avoid unforseen consequences, don't touch paging settings in SMM mode
   // in this driver.
   //
   if (!IsInSmm ()) {
-    return ((AsmReadCr0 () & CR0_WP) != 0);
+    Cr0.UintN = AsmReadCr0 ();
+    return (BOOLEAN) (Cr0.Bits.WP != 0);
   }
   return FALSE;
 }
@@ -599,12 +598,15 @@ DisableReadOnlyPageWriteProtect (
   VOID
   )
 {
+  IA32_CR0  Cr0;
   //
   // To avoid unforseen consequences, don't touch paging settings in SMM mode
   // in this driver.
   //
   if (!IsInSmm ()) {
-    AsmWriteCr0 (AsmReadCr0 () & ~CR0_WP);
+    Cr0.UintN = AsmReadCr0 ();
+    Cr0.Bits.WP = 0;
+    AsmWriteCr0 (Cr0.UintN);
   }
 }
 
@@ -616,12 +618,15 @@ EnableReadOnlyPageWriteProtect (
   VOID
   )
 {
+  IA32_CR0  Cr0;
   //
   // To avoid unforseen consequences, don't touch paging settings in SMM mode
   // in this driver.
   //
   if (!IsInSmm ()) {
-    AsmWriteCr0 (AsmReadCr0 () | CR0_WP);
+    Cr0.UintN = AsmReadCr0 ();
+    Cr0.Bits.WP = 1;
+    AsmWriteCr0 (Cr0.UintN);
   }
 }
 
