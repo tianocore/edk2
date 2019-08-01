@@ -53,8 +53,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <AcpiCpuData.h>
 #include <CpuHotPlugData.h>
 
-#include <Register/Cpuid.h>
-#include <Register/Msr.h>
+#include <Register/Intel/Cpuid.h>
+#include <Register/Intel/Msr.h>
 
 #include "CpuService.h"
 #include "SmmProfile.h"

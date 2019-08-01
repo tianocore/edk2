@@ -11,8 +11,8 @@
 **/
 
 #include <Uefi.h>
-#include <Register/Cpuid.h>
-#include <Register/Msr.h>
+#include <Register/Intel/Cpuid.h>
+#include <Register/Intel/Msr.h>
 
 #include <Library/MtrrLib.h>
 #include <Library/BaseLib.h>

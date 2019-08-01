@@ -15,8 +15,8 @@
 #include <Library/SynchronizationLib.h>
 #include <Library/PrintLib.h>
 #include <Protocol/SmmBase2.h>
-#include <Register/Cpuid.h>
-#include <Register/Msr.h>
+#include <Register/Intel/Cpuid.h>
+#include <Register/Intel/Msr.h>
 
 #include "CpuDxe.h"
 #include "CpuPageTable.h"

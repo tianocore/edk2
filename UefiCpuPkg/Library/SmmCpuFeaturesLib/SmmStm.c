@@ -15,9 +15,9 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/SmmServicesTableLib.h>
 #include <Library/TpmMeasurementLib.h>
-#include <Register/Cpuid.h>
-#include <Register/ArchitecturalMsr.h>
-#include <Register/SmramSaveStateMap.h>
+#include <Register/Intel/Cpuid.h>
+#include <Register/Intel/ArchitecturalMsr.h>
+#include <Register/Intel/SmramSaveStateMap.h>
 
 #include <Protocol/MpService.h>
 

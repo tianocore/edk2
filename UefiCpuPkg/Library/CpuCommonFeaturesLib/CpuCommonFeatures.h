@@ -1,7 +1,7 @@
 /** @file
   CPU Common features library header file.
 
-  Copyright (c) 2017 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2017 - 2019, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -19,8 +19,8 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/LocalApicLib.h>
 
-#include <Register/Cpuid.h>
-#include <Register/Msr.h>
+#include <Register/Intel/Cpuid.h>
+#include <Register/Intel/Msr.h>
 
 /**
   Prepares for the data used by CPU feature detection and initialization.

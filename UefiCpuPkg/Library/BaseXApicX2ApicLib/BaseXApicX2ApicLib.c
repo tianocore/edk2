@@ -11,10 +11,10 @@
 
 **/
 
-#include <Register/Cpuid.h>
+#include <Register/Intel/Cpuid.h>
 #include <Register/Amd/Cpuid.h>
-#include <Register/Msr.h>
-#include <Register/LocalApic.h>
+#include <Register/Intel/Msr.h>
+#include <Register/Intel/LocalApic.h>
 
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>

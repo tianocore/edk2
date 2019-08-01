@@ -14,8 +14,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/BaseMemoryLib.h>
 #include <Library/SmmServicesTableLib.h>
 #include <Library/DebugLib.h>
-#include <Register/Cpuid.h>
-#include <Register/SmramSaveStateMap.h>
 
 #include "PiSmmCpuDxeSmm.h"
 

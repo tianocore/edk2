@@ -10,7 +10,7 @@
 #define __REGISTER_CPU_FEATURES_LIB_H__
 
 #include <AcpiCpuData.h>
-#include <Register/Cpuid.h>
+#include <Register/Intel/Cpuid.h>
 #include <Protocol/MpService.h>
 
 ///

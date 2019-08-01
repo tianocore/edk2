@@ -1,7 +1,7 @@
 /** @file
 The CPU specific programming for PiSmmCpuDxeSmm module.
 
-Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2019, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -13,8 +13,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/PcdLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DebugLib.h>
-#include <Register/Cpuid.h>
-#include <Register/SmramSaveStateMap.h>
+#include <Register/Intel/Cpuid.h>
+#include <Register/Intel/SmramSaveStateMap.h>
 
 //
 // Machine Specific Registers (MSRs)

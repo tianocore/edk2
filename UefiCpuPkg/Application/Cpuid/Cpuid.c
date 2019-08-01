@@ -9,7 +9,7 @@
 #include <Uefi.h>
 #include <Library/BaseLib.h>
 #include <Library/UefiLib.h>
-#include <Register/Cpuid.h>
+#include <Register/Intel/Cpuid.h>
 
 ///
 /// Macro used to display the value of a bit field in a register returned by CPUID.

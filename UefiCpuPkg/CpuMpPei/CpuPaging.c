@@ -1,14 +1,14 @@
 /** @file
   Basic paging support for the CPU to enable Stack Guard.
 
-Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2018 - 2019, Intel Corporation. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include <Register/Cpuid.h>
-#include <Register/Msr.h>
+#include <Register/Intel/Cpuid.h>
+#include <Register/Intel/Msr.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/CpuLib.h>
 #include <Library/BaseLib.h>

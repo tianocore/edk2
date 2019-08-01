@@ -11,7 +11,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <Protocol/MpService.h>
 #include <Protocol/SmmCpu.h>
-#include <Register/SmramSaveStateMap.h>
+#include <Register/Intel/SmramSaveStateMap.h>
 #include <CpuHotPlugData.h>
 
 ///
