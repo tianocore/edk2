@@ -543,7 +543,7 @@ class CheckGitCommits:
 
     def read_patch_from_git(self, commit):
         # Run git to get the commit patch
-        return self.run_git('show', '--pretty=email', commit)
+        return self.run_git('show', '--pretty=email', '--no-textconv', commit)
 
     def run_git(self, *args):
         cmd = [ 'git' ]
