@@ -252,7 +252,6 @@ DumpProcessorHierarchyNodeStructure (
   )
 {
   UINT32 Offset;
-  UINT8* PrivateResourcePtr;
   UINT32 Index;
   CHAR16 Buffer[OUTPUT_FIELD_COLUMN_WIDTH];
 
@@ -265,8 +264,23 @@ DumpProcessorHierarchyNodeStructure (
              PARSER_PARAMS (ProcessorHierarchyNodeStructureParser)
              );
 
-  PrivateResourcePtr = Ptr + Offset;
+  // Make sure the Private Resource array lies inside this structure
+  if (Offset + (*NumberOfPrivateResources * sizeof (UINT32)) > Length) {
+    IncrementErrorCount ();
+    Print (
+      L"ERROR: Invalid Number of Private Resources. " \
+        L"PrivateResourceCount = %d. RemainingBufferLength = %d. " \
+        L"Parsing of this structure aborted.\n",
+      *NumberOfPrivateResources,
+      Length - Offset
+      );
+    return;
+  }
+
   Index = 0;
+
+  // Parse the specified number of private resource references or the Processor
+  // Hierarchy Node length. Whichever is minimum.
   while (Index < *NumberOfPrivateResources) {
     UnicodeSPrint (
       Buffer,
@@ -278,10 +292,10 @@ DumpProcessorHierarchyNodeStructure (
     PrintFieldName (4, Buffer);
     Print (
       L"0x%x\n",
-      *((UINT32*) PrivateResourcePtr)
+      *((UINT32*)(Ptr + Offset))
       );
 
-    PrivateResourcePtr += sizeof(UINT32);
+    Offset += sizeof (UINT32);
     Index++;
   }
 }
@@ -382,19 +396,21 @@ ParseAcpiPptt (
       0,
       NULL,
       ProcessorTopologyStructurePtr,
-      4,  // Length of the processor topology structure header is 4 bytes
+      AcpiTableLength - Offset,
       PARSER_PARAMS (ProcessorTopologyStructureHeaderParser)
       );
 
-    if ((Offset + (*ProcessorTopologyStructureLength)) > AcpiTableLength) {
+    // Make sure the PPTT structure lies inside the table
+    if ((Offset + *ProcessorTopologyStructureLength) > AcpiTableLength) {
       IncrementErrorCount ();
       Print (
-        L"ERROR: Invalid processor topology structure length:"
-          L" Type = %d, Length = %d\n",
-        *ProcessorTopologyStructureType,
-        *ProcessorTopologyStructureLength
+        L"ERROR: Invalid PPTT structure length. " \
+          L"ProcessorTopologyStructureLength = %d. " \
+          L"RemainingTableBufferLength = %d. PPTT parsing aborted.\n",
+        *ProcessorTopologyStructureLength,
+        AcpiTableLength - Offset
         );
-      break;
+      return;
     }
 
     PrintFieldName (2, L"* Structure Offset *");
