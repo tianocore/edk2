@@ -215,9 +215,21 @@ ParseAcpiSrat (
       0,
       NULL,
       ResourcePtr,
-      2,  // The length is 1 byte at offset 1
+      AcpiTableLength - Offset,
       PARSER_PARAMS (SratResourceAllocationParser)
       );
+
+    // Make sure the SRAT structure lies inside the table
+    if ((Offset + *SratRALength) > AcpiTableLength) {
+      IncrementErrorCount ();
+      Print (
+        L"ERROR: Invalid SRAT structure length. SratRALength = %d. " \
+          L"RemainingTableBufferLength = %d. SRAT parsing aborted.\n",
+        *SratRALength,
+        AcpiTableLength - Offset
+        );
+      return;
+    }
 
     switch (*SratRAType) {
       case EFI_ACPI_6_2_GICC_AFFINITY:
