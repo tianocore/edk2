@@ -1075,13 +1075,10 @@ class DscBuildData(PlatformBuildClassObject):
                 GlobalData.BuildOptionPcd[i] = (TokenSpaceGuidCName, TokenCName, FieldName, pcdvalue, ("build command options", 1))
 
         if GlobalData.BuildOptionPcd:
+            inf_objs = [item for item in self._Bdb._CACHE_.values() if item.Arch == self.Arch and item.MetaFile.Ext.lower() == '.inf']
             for pcd in GlobalData.BuildOptionPcd:
                 (TokenSpaceGuidCName, TokenCName, FieldName, pcdvalue, _) = pcd
-                for BuildData in self._Bdb._CACHE_.values():
-                    if BuildData.Arch != self.Arch:
-                        continue
-                    if BuildData.MetaFile.Ext == '.dec' or BuildData.MetaFile.Ext == '.dsc':
-                        continue
+                for BuildData in inf_objs:
                     for key in BuildData.Pcds:
                         PcdItem = BuildData.Pcds[key]
                         if (TokenSpaceGuidCName, TokenCName) == (PcdItem.TokenSpaceGuidCName, PcdItem.TokenCName) and FieldName =="":
