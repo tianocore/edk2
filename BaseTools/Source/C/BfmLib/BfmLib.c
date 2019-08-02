@@ -582,6 +582,7 @@ LibGenFfsFile (
   TempDir       = NULL;
 
   TempDir = getcwd (NULL, _MAX_PATH);
+  TempDir = realloc (TempDir, _MAX_PATH);
 
    if (strlen (TempDir) + strlen (OS_SEP_STR) + strlen (TEMP_DIR_NAME) > _MAX_PATH - 1) {
     printf ("The directory is too long \n");
@@ -1399,6 +1400,7 @@ LibParseSection (
       } else if (ExtractionTool != NULL) {
 
         TempDir = getcwd (NULL, _MAX_PATH);
+        TempDir = realloc (TempDir, _MAX_PATH);
         if (strlen (TempDir) + strlen (OS_SEP_STR) + strlen (TEMP_DIR_NAME) > _MAX_PATH - 1) {
           printf ("The directory is too long \n");
           free (ExtractionTool);
@@ -2196,6 +2198,7 @@ LibGenExtFile(
   TempDir = NULL;
 
   TempDir = getcwd(NULL, _MAX_PATH);
+  TempDir = realloc (TempDir, _MAX_PATH);
 
   if (strlen (TempDir) + strlen (OS_SEP_STR) + strlen (TEMP_DIR_NAME) > _MAX_PATH - 1) {
     printf ("The directory is too long \n");
@@ -3510,6 +3513,7 @@ LibGenCompressedSection (
     }
 
     TemDir = getcwd (NULL, _MAX_PATH);
+  TemDir = realloc (TemDir, _MAX_PATH);
     if (strlen (TemDir) + strlen (OS_SEP_STR) + strlen (TEMP_DIR_NAME) > _MAX_PATH - 1) {
       printf ("The directory is too long \n");
       fclose (UnCompressFile);
