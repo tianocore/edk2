@@ -31,11 +31,6 @@
   ##  @libraryclass  Defines a set of helper functions for resetting the system.
   ResetUtilityLib|Include/Library/ResetUtilityLib.h
 
-  ##  @libraryclass  Defines a set of methods related recovery mode.
-  #   This library class is no longer used and modules using this library should
-  #   directly locate EFI_PEI_RECOVERY_MODULE_PPI defined in PI 1.2 specification.
-  RecoveryLib|Include/Library/RecoveryLib.h
-
   ##  @libraryclass  Provides HII related functions.
   HiiLib|Include/Library/HiiLib.h
 
