@@ -2,7 +2,7 @@
  POSIX Pthreads to emulate APs and implement threads
 
 Copyright (c) 2011, Apple Inc. All rights reserved.
-Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2019, Intel Corporation. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -109,7 +109,7 @@ SecFakePthreadStart (
   // This is a great example of how all problems in computer
   // science can be solved by adding another level of indirection
   //
- return  (VOID *)ReverseGasketUint64 ((CALL_BACK)Start, (UINTN)Context);
+ return  (VOID *)ReverseGasketUint64 ((UINTN)Start, (UINTN)Context);
 }
 
 UINTN

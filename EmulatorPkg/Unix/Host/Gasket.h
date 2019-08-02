@@ -1,7 +1,7 @@
 /** @file
 
   Copyright (c) 2008 - 2011, Apple Inc. All rights reserved.<BR>
-  Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011 - 2019, Intel Corporation. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -195,7 +195,7 @@ void
 
 UINTN
 ReverseGasketUint64 (
-  CALL_BACK CallBack,
+  UINTN  CallBack,
   UINT64 a
   );
 

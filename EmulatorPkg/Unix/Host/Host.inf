@@ -2,7 +2,7 @@
 # Entry Point of Emu Emulator
 #
 # Main executable file of Unix Emulator that loads PEI core after initialization finished.
-# Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2019, Intel Corporation. All rights reserved.<BR>
 # Portions copyright (c) 2008 - 2011, Apple Inc. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -132,11 +132,11 @@
 # Need to do this link via gcc and not ld as the pathing to libraries changes from OS version to OS version
 #
    XCODE:*_*_IA32_DLINK_PATH == gcc
-   XCODE:*_*_IA32_CC_FLAGS == -arch i386 -O0 -g -include $(DEST_DIR_DEBUG)/AutoGen.h -c -fshort-wchar -fno-strict-aliasing
+   XCODE:*_*_IA32_CC_FLAGS = -I$(WORKSPACE)/EmulatorPkg/Unix/Host/X11IncludeHack
    XCODE:*_*_IA32_DLINK_FLAGS == -arch i386 -o $(BIN_DIR)/Host -L/usr/X11R6/lib -lXext -lX11 -framework Carbon
    XCODE:*_*_IA32_ASM_FLAGS == -arch i386 -g
 
    XCODE:*_*_X64_DLINK_PATH == gcc
-   XCODE:*_*_X64_DLINK_FLAGS == -o $(BIN_DIR)/Host -L/usr/X11R6/lib -lXext -lX11 -framework Carbon
+   XCODE:*_*_X64_DLINK_FLAGS == -L/usr/X11R6/lib -lXext -lX11 -framework Carbon -Wl,-no_pie
    XCODE:*_*_X64_ASM_FLAGS == -g
-   XCODE:*_*_X64_CC_FLAGS = -I$(WORKSPACE)/EmulatorPkg/Unix/Host/X11IncludeHack
+   XCODE:*_*_X64_CC_FLAGS = -target x86_64-apple-darwin -I$(WORKSPACE)/EmulatorPkg/Unix/Host/X11IncludeHack "-DEFIAPI=__attribute__((ms_abi))"

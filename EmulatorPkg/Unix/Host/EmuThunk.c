@@ -30,7 +30,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 int settimer_initialized;
 struct timeval settimer_timeval;
-void (*settimer_callback)(UINT64 delta);
+UINTN  settimer_callback = 0;
 
 BOOLEAN gEmulatorInterruptEnabled = FALSE;
 
@@ -194,7 +194,7 @@ SecSetTimer (
   if (setitimer (ITIMER_REAL, &timerval, NULL) != 0) {
     printf ("SetTimer: setitimer error %s\n", strerror (errno));
   }
-  settimer_callback = CallBack;
+  settimer_callback = (UINTN)CallBack;
 }
 
 
