@@ -639,6 +639,7 @@ LibGenFfsFile (
   TempDir       = NULL;
 
   TempDir = getcwd (NULL, _MAX_PATH);
+  TempDir = realloc (TempDir, _MAX_PATH);
   if (strlen (TempDir) + strlen(OS_SEP_STR) + strlen (TEMP_DIR_NAME) > _MAX_PATH - 1) {
     Error("FMMT", 0, 1001,  "The directory is too long.", "");
     return EFI_ABORTED;
@@ -1293,6 +1294,7 @@ LibParseSection (
       if (ExtractionTool != NULL && ((GuidAttr & EFI_GUIDED_SECTION_PROCESSING_REQUIRED) != 0)) {
 
         TempDir = getcwd (NULL, _MAX_PATH);
+        TempDir = realloc (TempDir, _MAX_PATH);
         if (strlen (TempDir) + strlen(OS_SEP_STR) + strlen (TEMP_DIR_NAME) > _MAX_PATH - 1) {
           Error("FMMT", 0, 1001, "The directory is too long.", "");
           free (ExtractionTool);
@@ -2364,6 +2366,7 @@ LibDeleteAndRenameFfs(
   free(SystemCommand);
 
   TemDir = getcwd (NULL, _MAX_PATH);
+  TemDir = realloc (TemDir, _MAX_PATH);
   if (strlen (TemDir) + strlen(OS_SEP_STR) + strlen (TEMP_DIR_NAME) > _MAX_PATH - 1) {
     Error("FMMT", 0, 1001, "The directory is too long.", "");
      return EFI_ABORTED;
@@ -3342,6 +3345,7 @@ LibCreateNewFdCopy(
 
 
   NewFdDir = getcwd (NULL, _MAX_PATH);
+  NewFdDir = realloc (NewFdDir, _MAX_PATH);
 
   Count = strlen(NewFdDir);
 
@@ -3386,6 +3390,7 @@ LibCreateNewFdCopy(
   UseNewDirFlag = FALSE;
 
   OldFdDir = getcwd (NULL, _MAX_PATH);
+  OldFdDir = realloc (OldFdDir, _MAX_PATH);
 
   Count = strlen(OldFdDir);
 
@@ -3630,6 +3635,7 @@ FILE *InfFile
   TempDir = NULL;
 
   TempDir = getcwd(NULL, _MAX_PATH);
+  TempDir = realloc (TempDir, _MAX_PATH);
   if (strlen (TempDir) + strlen(OS_SEP_STR) + strlen (TEMP_DIR_NAME) > _MAX_PATH - 1) {
     Error("FMMT", 0, 1001,  "The directory is too long.", "");
     return EFI_ABORTED;
@@ -3718,6 +3724,7 @@ LibFmmtDeleteFile(
 
   // if the FileName is not in TemDir, we don't need to delete.
   TemDir = getcwd (NULL, _MAX_PATH);
+  TemDir = realloc (TemDir, _MAX_PATH);
   if (*(TemDir + strlen(TemDir) - 1) == OS_SEP) {
     *(TemDir + strlen(TemDir) - 1) = '\0';
   }
