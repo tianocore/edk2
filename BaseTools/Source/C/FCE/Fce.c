@@ -4391,6 +4391,7 @@ PickUpFfsFromFd (
   //Pick up the FFS which is interrelated with the IFR binary.
   //
   TemDir = getcwd (NULL, _MAX_PATH);
+  TemDir = realloc (TemDir, _MAX_PATH);
   if (strlen (TemDir) + strlen (OS_SEP_STR) + strlen (TEMP_DIR_NAME)> _MAX_PATH - 1) {
     printf ("The directory is too long \n");
     return EFI_ABORTED;
@@ -4980,6 +4981,7 @@ ReadStorageFromBfv (
   SectionName               = NULL;
 
   SectionName = getcwd(NULL, _MAX_PATH);
+  SectionName = realloc (SectionName, _MAX_PATH);
   if (strlen (SectionName) + 2 * strlen (OS_SEP_STR) + strlen ("Temp") + strlen ("TempSection.sec") >
       _MAX_PATH - 1) {
     printf ("Error. The current path is too long.\n");
@@ -5133,6 +5135,7 @@ InsertBinaryToBfv (
   FileName                  = NULL;
 
   TemDir = getcwd (NULL, _MAX_PATH);
+  TemDir = realloc (TemDir, _MAX_PATH);
   SectionNameFormatString = "%s%cTemp%c%s.sec";
 
   memset (SectionName, 0, _MAXIMUM_SECTION_FILE_NUM * sizeof(CHAR8 *));
@@ -6109,6 +6112,7 @@ main (
   UqiIsSet           = FALSE;
 
   TemDir = getcwd (NULL, _MAX_PATH);
+  TemDir = realloc (TemDir, _MAX_PATH);
   if (strlen (TemDir) + strlen (OS_SEP_STR) + strlen (TEMP_DIR_NAME) > _MAX_PATH - 1) {
     printf ("The directory is too long \n");
     return FAIL;
