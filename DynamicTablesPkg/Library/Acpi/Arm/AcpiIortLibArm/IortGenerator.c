@@ -1738,6 +1738,14 @@ BuildIortTable (
       goto error_handler;
     }
     TableSize += NodeSize;
+
+    DEBUG ((
+      DEBUG_INFO,
+      " ItsGroupNodeCount = %d\n" \
+      " ItsGroupOffset = %d\n",
+      ItsGroupNodeCount,
+      ItsGroupOffset
+      ));
   }
 
   // Named Component Nodes
@@ -1760,6 +1768,14 @@ BuildIortTable (
       goto error_handler;
     }
     TableSize += NodeSize;
+
+    DEBUG ((
+      DEBUG_INFO,
+      " NamedComponentNodeCount = %d\n" \
+      " NamedComponentOffset = %d\n",
+      NamedComponentNodeCount,
+      NamedComponentOffset
+      ));
   }
 
   // Root Complex Nodes
@@ -1782,6 +1798,14 @@ BuildIortTable (
       goto error_handler;
     }
     TableSize += NodeSize;
+
+    DEBUG ((
+      DEBUG_INFO,
+      " RootComplexNodeCount = %d\n" \
+      " RootComplexOffset = %d\n",
+      RootComplexNodeCount,
+      RootComplexOffset
+      ));
   }
 
   // SMMUv1/SMMUv2 Nodes
@@ -1804,6 +1828,14 @@ BuildIortTable (
       goto error_handler;
     }
     TableSize += NodeSize;
+
+    DEBUG ((
+      DEBUG_INFO,
+      " SmmuV1V2NodeCount = %d\n" \
+      " SmmuV1V2Offset = %d\n",
+      SmmuV1V2NodeCount,
+      SmmuV1V2Offset
+      ));
   }
 
   // SMMUv3 Nodes
@@ -1826,6 +1858,14 @@ BuildIortTable (
       goto error_handler;
     }
     TableSize += NodeSize;
+
+    DEBUG ((
+      DEBUG_INFO,
+      " SmmuV3NodeCount = %d\n" \
+      " SmmuV3Offset = %d\n",
+      SmmuV3NodeCount,
+      SmmuV3Offset
+      ));
   }
 
   // PMCG Nodes
@@ -1848,6 +1888,14 @@ BuildIortTable (
       goto error_handler;
     }
     TableSize += NodeSize;
+
+    DEBUG ((
+      DEBUG_INFO,
+      " PmcgNodeCount = %d\n" \
+      " PmcgOffset = %d\n",
+      PmcgNodeCount,
+      PmcgOffset
+      ));
   }
 
   DEBUG ((
@@ -1857,54 +1905,6 @@ BuildIortTable (
     " TableSize = 0x%lx\n",
     IortNodeCount,
     TableSize
-    ));
-
-  DEBUG ((
-    DEBUG_INFO,
-    " ItsGroupNodeCount = %d\n" \
-    " ItsGroupOffset = %d\n",
-    ItsGroupNodeCount,
-    ItsGroupOffset
-    ));
-
-  DEBUG ((
-    DEBUG_INFO,
-    " NamedComponentNodeCount = %d\n" \
-    " NamedComponentOffset = %d\n",
-    NamedComponentNodeCount,
-    NamedComponentOffset
-    ));
-
-  DEBUG ((
-    DEBUG_INFO,
-    " RootComplexNodeCount = %d\n" \
-    " RootComplexOffset = %d\n",
-    RootComplexNodeCount,
-    RootComplexOffset
-    ));
-
-  DEBUG ((
-    DEBUG_INFO,
-    " SmmuV1V2NodeCount = %d\n" \
-    " SmmuV1V2Offset = %d\n",
-    SmmuV1V2NodeCount,
-    SmmuV1V2Offset
-    ));
-
-  DEBUG ((
-    DEBUG_INFO,
-    " SmmuV3NodeCount = %d\n" \
-    " SmmuV3Offset = %d\n",
-    SmmuV3NodeCount,
-    SmmuV3Offset
-    ));
-
-  DEBUG ((
-    DEBUG_INFO,
-    " PmcgNodeCount = %d\n" \
-    " PmcgOffset = %d\n",
-    PmcgNodeCount,
-    PmcgOffset
     ));
 
   if (TableSize > MAX_UINT32) {
