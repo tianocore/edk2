@@ -1203,6 +1203,17 @@ BuildPpttTable (
                    Generator->ProcHierarchyNodeCount,
                    &NodeIndexer
                    );
+
+    DEBUG ((
+      DEBUG_INFO,
+      " ProcHierarchyNodeCount = %d\n" \
+      " ProcHierarchyNodeOffset = 0x%x\n" \
+      " ProcHierarchyNodeIndexedList = 0x%p\n",
+      Generator->ProcHierarchyNodeCount,
+      ProcHierarchyNodeOffset,
+      Generator->ProcHierarchyNodeIndexedList
+      ));
+
   }
 
   // Include the size of Cache Type Structures and index them
@@ -1215,6 +1226,15 @@ BuildPpttTable (
                    Generator->CacheStructCount,
                    &NodeIndexer
                    );
+    DEBUG ((
+      DEBUG_INFO,
+      " CacheStructCount = %d\n" \
+      " CacheStructOffset = 0x%x\n" \
+      " CacheStructIndexedList = 0x%p\n",
+      Generator->CacheStructCount,
+      CacheStructOffset,
+      Generator->CacheStructIndexedList
+      ));
   }
 
   // Include the size of ID Type Structures and index them
@@ -1227,6 +1247,15 @@ BuildPpttTable (
                    Generator->IdStructCount,
                    &NodeIndexer
                    );
+    DEBUG ((
+      DEBUG_INFO,
+      " IdStructCount = %d\n" \
+      " IdStructOffset = 0x%x\n" \
+      " IdStructIndexedList = 0x%p\n",
+      Generator->IdStructCount,
+      IdStructOffset,
+      Generator->IdStructIndexedList
+      ));
   }
 
   DEBUG ((
@@ -1236,36 +1265,6 @@ BuildPpttTable (
     " TableSize = %d\n",
     ProcTopologyStructCount,
     TableSize
-    ));
-
-  DEBUG ((
-    DEBUG_INFO,
-    " ProcHierarchyNodeCount = %d\n" \
-    " ProcHierarchyNodeOffset = 0x%x\n" \
-    " ProcHierarchyNodeIndexedList = 0x%p\n",
-    Generator->ProcHierarchyNodeCount,
-    ProcHierarchyNodeOffset,
-    Generator->ProcHierarchyNodeIndexedList
-    ));
-
-  DEBUG ((
-    DEBUG_INFO,
-    " CacheStructCount = %d\n" \
-    " CacheStructOffset = 0x%x\n" \
-    " CacheStructIndexedList = 0x%p\n",
-    Generator->CacheStructCount,
-    CacheStructOffset,
-    Generator->CacheStructIndexedList
-    ));
-
-  DEBUG ((
-    DEBUG_INFO,
-    " IdStructCount = %d\n" \
-    " IdStructOffset = 0x%x\n" \
-    " IdStructIndexedList = 0x%p\n",
-    Generator->IdStructCount,
-    IdStructOffset,
-    Generator->IdStructIndexedList
     ));
 
   // Allocate the Buffer for the PPTT table
