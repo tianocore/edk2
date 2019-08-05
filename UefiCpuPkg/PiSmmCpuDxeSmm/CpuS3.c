@@ -1,7 +1,7 @@
 /** @file
 Code for Processor S3 restoration
 
-Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -89,8 +89,6 @@ UINT8                        mApHltLoopCodeTemplate[] = {
                                0xF4,                    // hlt
                                0xEB, 0xFC               // jmp $-2
                                };
-
-CHAR16 *mRegisterTypeStr[] = {L"MSR", L"CR", L"MMIO", L"CACHE", L"SEMAP", L"INVALID" };
 
 /**
   Sync up the MTRR values for all processors.
@@ -189,7 +187,6 @@ ProgramProcessorRegister (
   UINT32                    PackageThreadsCount;
   UINT32                    CurrentThread;
   UINTN                     ProcessorIndex;
-  UINTN                     ThreadIndex;
   UINTN                     ValidThreadCount;
   UINT32                    *ValidCoreCountPerPackage;
 
@@ -201,23 +198,6 @@ ProgramProcessorRegister (
   for (Index = 0; Index < RegisterTable->TableLength; Index++) {
 
     RegisterTableEntry = &RegisterTableEntryHead[Index];
-
-    DEBUG_CODE_BEGIN ();
-      if (ApLocation != NULL) {
-        AcquireSpinLock (&CpuFlags->ConsoleLogLock);
-        ThreadIndex = ApLocation->Package * CpuStatus->MaxCoreCount * CpuStatus->MaxThreadCount +
-              ApLocation->Core * CpuStatus->MaxThreadCount +
-              ApLocation->Thread;
-        DEBUG ((
-          DEBUG_INFO,
-          "Processor = %lu, Entry Index %lu, Type = %s!\n",
-          (UINT64)ThreadIndex,
-          (UINT64)Index,
-          mRegisterTypeStr[MIN ((REGISTER_TYPE)RegisterTableEntry->RegisterType, InvalidReg)]
-          ));
-        ReleaseSpinLock (&CpuFlags->ConsoleLogLock);
-      }
-    DEBUG_CODE_END ();
 
     //
     // Check the type of specified register
