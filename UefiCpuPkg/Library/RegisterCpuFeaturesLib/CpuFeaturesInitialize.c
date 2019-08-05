@@ -9,7 +9,6 @@
 #include "RegisterCpuFeatures.h"
 
 CHAR16 *mDependTypeStr[]   = {L"None", L"Thread", L"Core", L"Package", L"Invalid" };
-CHAR16 *mRegisterTypeStr[] = {L"MSR", L"CR", L"MMIO", L"CACHE", L"SEMAP", L"INVALID" };
 
 /**
   Worker function to save PcdCpuFeaturesCapability.
@@ -772,7 +771,6 @@ ProgramProcessorRegister (
   UINT32                    PackageThreadsCount;
   UINT32                    CurrentThread;
   UINTN                     ProcessorIndex;
-  UINTN                     ThreadIndex;
   UINTN                     ValidThreadCount;
   UINT32                    *ValidCoreCountPerPackage;
 
@@ -784,26 +782,6 @@ ProgramProcessorRegister (
   for (Index = 0; Index < RegisterTable->TableLength; Index++) {
 
     RegisterTableEntry = &RegisterTableEntryHead[Index];
-
-    DEBUG_CODE_BEGIN ();
-      //
-      // Wait for the AP to release the MSR spin lock.
-      //
-      while (!AcquireSpinLockOrFail (&CpuFlags->ConsoleLogLock)) {
-        CpuPause ();
-      }
-      ThreadIndex = ApLocation->Package * CpuStatus->MaxCoreCount * CpuStatus->MaxThreadCount +
-              ApLocation->Core * CpuStatus->MaxThreadCount +
-              ApLocation->Thread;
-      DEBUG ((
-        DEBUG_INFO,
-        "Processor = %08lu, Index %08lu, Type = %s!\n",
-        (UINT64)ThreadIndex,
-        (UINT64)Index,
-        mRegisterTypeStr[MIN ((REGISTER_TYPE)RegisterTableEntry->RegisterType, InvalidReg)]
-        ));
-      ReleaseSpinLock (&CpuFlags->ConsoleLogLock);
-    DEBUG_CODE_END ();
 
     //
     // Check the type of specified register
