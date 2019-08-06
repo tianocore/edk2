@@ -136,6 +136,7 @@ UINT32                      mCapsuleTotalNumber;
   Caution: This function may receive untrusted input.
 
   @param[in]  CapsuleHeader         Points to a capsule header.
+  @param[in]  CapFileName           Capsule file name.
   @param[out] ResetRequired         Indicates whether reset is required or not.
 
   @retval EFI_SUCESS            Process Capsule Image successfully.
