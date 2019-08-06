@@ -43,6 +43,8 @@
   Parsers/Srat/SratParser.c
   Parsers/Ssdt/SsdtParser.c
   Parsers/Xsdt/XsdtParser.c
+  Parsers/Madt/MadtParser.h
+  Parsers/Pptt/PpttParser.h
 
 [Packages]
   MdePkg/MdePkg.dec
