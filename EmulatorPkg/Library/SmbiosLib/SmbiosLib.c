@@ -4,7 +4,7 @@
 
 
 Copyright (c) 2012, Apple Inc. All rights reserved.
-Portitions Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Portitions Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -223,7 +223,7 @@ SmbiosLibUpdateUnicodeString (
   if (Ascii == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
-  UnicodeStrToAsciiStr (String, Ascii);
+  UnicodeStrToAsciiStrS (String, Ascii, StrSize (String));
 
   StringIndex = StringNumber;
   Status = gSmbios->UpdateString (gSmbios, &SmbiosHandle, &StringIndex, Ascii);
