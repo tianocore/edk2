@@ -1,7 +1,7 @@
 /*++ @file
   PEIM to build GUIDed HOBs for platform specific flash map
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2011, Apple Inc. All rights reserved.
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -69,9 +69,9 @@ Returns:
     return Status;
   }
 
-  PcdSet64 (PcdFlashNvStorageVariableBase64, PcdGet64 (PcdEmuFlashNvStorageVariableBase) + FdFixUp);
-  PcdSet64 (PcdFlashNvStorageFtwWorkingBase64, PcdGet64 (PcdEmuFlashNvStorageFtwWorkingBase) + FdFixUp);
-  PcdSet64 (PcdFlashNvStorageFtwSpareBase64, PcdGet64 (PcdEmuFlashNvStorageFtwSpareBase) + FdFixUp);
+  PcdSet64S (PcdFlashNvStorageVariableBase64, PcdGet64 (PcdEmuFlashNvStorageVariableBase) + FdFixUp);
+  PcdSet64S (PcdFlashNvStorageFtwWorkingBase64, PcdGet64 (PcdEmuFlashNvStorageFtwWorkingBase) + FdFixUp);
+  PcdSet64S (PcdFlashNvStorageFtwSpareBase64, PcdGet64 (PcdEmuFlashNvStorageFtwSpareBase) + FdFixUp);
 
   return EFI_SUCCESS;
 }

@@ -1,7 +1,7 @@
 /** @file
  Emu Bus driver
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2011, Apple Inc. All rights reserved.
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -256,7 +256,12 @@ EmuBusDriverBindingStart (
 
       EmuDevice->ControllerNameTable = NULL;
 
-      StrnCpy (ComponentName, EmuIoThunk->ConfigString, sizeof (ComponentName)/sizeof (CHAR16));
+      StrnCpyS (
+        ComponentName,
+        sizeof (ComponentName) / sizeof (CHAR16),
+        EmuIoThunk->ConfigString,
+        sizeof (ComponentName) / sizeof (CHAR16)
+        );
 
       EmuDevice->DevicePath = EmuBusCreateDevicePath (
                                   ParentDevicePath,

@@ -2,7 +2,7 @@
   Emulator Thunk to abstract OS services from pure EFI code
 
   Copyright (c) 2008 - 2011, Apple Inc. All rights reserved.<BR>
-  Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011 - 2019, Intel Corporation. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -37,6 +37,7 @@ AddThunkProtocol (
   IN  BOOLEAN                 EmuBusDriver
   )
 {
+  UINTN                       Size;
   CHAR16                      *StartString;
   CHAR16                      *SubString;
   UINTN                       Instance;
@@ -47,8 +48,12 @@ AddThunkProtocol (
   }
 
   Instance = 0;
-  StartString = AllocatePool (StrSize (ConfigString));
-  StrCpy (StartString, ConfigString);
+  Size = StrSize (ConfigString);
+  StartString = AllocatePool (Size);
+  if (StartString == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+  StrCpyS (StartString, Size / sizeof (CHAR16), ConfigString);
   while (*StartString != '\0') {
 
     //
