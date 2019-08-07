@@ -1311,7 +1311,7 @@ RestoreCr2 (
                                             Note that timeout support is optional. Whether an implementation
                                             supports this feature can be determined via the Attributes data
                                             member.
-  @param[in,out]   CPUStatus                This optional pointer may be used to get the status code returned
+  @param[in,out]   CpuStatus                This optional pointer may be used to get the status code returned
                                             by Procedure when it completes execution on the target AP, or with
                                             EFI_TIMEOUT if the Procedure fails to complete within the optional
                                             timeout. The implementation will update this variable with
@@ -1437,8 +1437,8 @@ InternalSmmStartupAllAPs (
 **/
 EFI_STATUS
 RegisterStartupProcedure (
-  IN EFI_AP_PROCEDURE    Procedure,
-  IN VOID                *ProcedureArguments OPTIONAL
+  IN     EFI_AP_PROCEDURE    Procedure,
+  IN OUT VOID                *ProcedureArguments OPTIONAL
   );
 
 /**
