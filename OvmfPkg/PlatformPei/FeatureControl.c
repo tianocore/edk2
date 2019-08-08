@@ -11,7 +11,7 @@
 #include <Library/PeiServicesLib.h>
 #include <Library/QemuFwCfgLib.h>
 #include <Ppi/MpServices.h>
-#include <Register/Msr/Core2Msr.h>
+#include <Register/ArchitecturalMsr.h>
 
 #include "Platform.h"
 
@@ -37,7 +37,7 @@ WriteFeatureControl (
   IN OUT VOID *WorkSpace
   )
 {
-  AsmWriteMsr64 (MSR_CORE2_FEATURE_CONTROL, mFeatureControlValue);
+  AsmWriteMsr64 (MSR_IA32_FEATURE_CONTROL, mFeatureControlValue);
 }
 
 /**
