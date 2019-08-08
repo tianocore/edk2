@@ -4,7 +4,7 @@
   regenc.h -  Oniguruma (regular expression library)
 **********************************************************************/
 /*-
- * Copyright (c) 2002-2018  K.Kosako  <sndgk393 AT ybb DOT ne DOT jp>
+ * Copyright (c) 2002-2019  K.Kosako  <sndgk393 AT ybb DOT ne DOT jp>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -114,6 +114,7 @@ struct PropertyNameCtype {
 /* #define USE_CRNL_AS_LINE_TERMINATOR */
 #define USE_UNICODE_PROPERTIES
 #define USE_UNICODE_EXTENDED_GRAPHEME_CLUSTER
+#define USE_UNICODE_WORD_BREAK
 /* #define USE_UNICODE_CASE_FOLD_TURKISH_AZERI */
 /* #define USE_UNICODE_ALL_LINE_TERMINATORS */  /* see Unicode.org UTS #18 */
 
@@ -121,8 +122,20 @@ struct PropertyNameCtype {
 #define ONIG_ENCODING_INIT_DEFAULT           ONIG_ENCODING_ASCII
 
 
+#define ENC_SKIP_OFFSET_1_OR_0             7
+
 #define ENC_FLAG_ASCII_COMPATIBLE      (1<<0)
 #define ENC_FLAG_UNICODE               (1<<1)
+#define ENC_FLAG_SKIP_OFFSET_MASK      (7<<2)
+#define ENC_FLAG_SKIP_OFFSET_0             0
+#define ENC_FLAG_SKIP_OFFSET_1         (1<<2)
+#define ENC_FLAG_SKIP_OFFSET_2         (2<<2)
+#define ENC_FLAG_SKIP_OFFSET_3         (3<<2)
+#define ENC_FLAG_SKIP_OFFSET_4         (4<<2)
+#define ENC_FLAG_SKIP_OFFSET_1_OR_0    (ENC_SKIP_OFFSET_1_OR_0<<2)
+
+#define ENC_GET_SKIP_OFFSET(enc) \
+  (((enc)->flag & ENC_FLAG_SKIP_OFFSET_MASK)>>2)
 
 
 /* for encoding system implementation (internal) */
@@ -162,15 +175,19 @@ extern int onigenc_mb4_is_code_ctype P_((OnigEncoding enc, OnigCodePoint code, u
 extern struct PropertyNameCtype* onigenc_euc_jp_lookup_property_name P_((register const char *str, register size_t len));
 extern struct PropertyNameCtype* onigenc_sjis_lookup_property_name P_((register const char *str, register size_t len));
 
-/* in enc/unicode.c */
+/* in unicode.c */
 extern int onigenc_unicode_is_code_ctype P_((OnigCodePoint code, unsigned int ctype));
 extern int onigenc_utf16_32_get_ctype_code_range P_((OnigCtype ctype, OnigCodePoint *sb_out, const OnigCodePoint* ranges[]));
 extern int onigenc_unicode_ctype_code_range P_((OnigCtype ctype, const OnigCodePoint* ranges[]));
 extern int onigenc_unicode_get_case_fold_codes_by_str P_((OnigEncoding enc, OnigCaseFoldType flag, const OnigUChar* p, const OnigUChar* end, OnigCaseFoldCodeItem items[]));
 extern int onigenc_unicode_mbc_case_fold P_((OnigEncoding enc, OnigCaseFoldType flag, const UChar** pp, const UChar* end, UChar* fold));
 extern int onigenc_unicode_apply_all_case_fold P_((OnigCaseFoldType flag, OnigApplyAllCaseFoldFunc f, void* arg));
+
 extern int onigenc_egcb_is_break_position P_((OnigEncoding enc, UChar* p, UChar* prev, const UChar* start, const UChar* end));
 
+#ifdef USE_UNICODE_WORD_BREAK
+extern int onigenc_wb_is_break_position P_((OnigEncoding enc, UChar* p, UChar* prev, const UChar* start, const UChar* end));
+#endif
 
 #define UTF16_IS_SURROGATE_FIRST(c)    (((c) & 0xfc) == 0xd8)
 #define UTF16_IS_SURROGATE_SECOND(c)   (((c) & 0xfc) == 0xdc)
@@ -252,7 +269,7 @@ extern const unsigned short OnigEncAsciiCtypeTable[];
 #define ONIGENC_IS_ASCII_CODE_CASE_AMBIG(code) \
  (ONIGENC_IS_ASCII_CODE_CTYPE(code, ONIGENC_CTYPE_UPPER) ||\
   ONIGENC_IS_ASCII_CODE_CTYPE(code, ONIGENC_CTYPE_LOWER))
-   
+
 #define ONIGENC_IS_UNICODE_ENCODING(enc) \
   (((enc)->flag & ENC_FLAG_UNICODE) != 0)
 
