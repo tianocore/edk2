@@ -33,6 +33,7 @@
   X64/X64Entry.c
   X64/PageFaultHandler.nasm
   Common/CapsuleCoalesce.c
+  Common/CommonHeader.h
 
 [Packages]
   MdePkg/MdePkg.dec
