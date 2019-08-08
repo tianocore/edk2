@@ -1,7 +1,7 @@
 ## @file
 #  EBC Debugger configuration application.
 #
-#  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2019, Intel Corporation. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -28,6 +28,13 @@
   EbcDebugger/EdbCommon.h
   EbcDebugger/EdbSupportString.c
   EbcDebugger/EdbSupport.h
+  EbcDebugger/EdbCommand.h
+  EbcDebugger/EdbHook.h
+  EbcDebugger/Edb.h
+  EbcDebugger/EdbDisasmSupport.h
+  EbcDebugger/EdbDisasm.h
+  EbcDebugger/EdbSymbol.h
+  EbcDebuggerHook.h
 
 [Packages]
   MdePkg/MdePkg.dec
