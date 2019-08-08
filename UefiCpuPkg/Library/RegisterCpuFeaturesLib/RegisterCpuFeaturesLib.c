@@ -839,7 +839,6 @@ RegisterCpuFeature (
   if (CpuFeaturesData->FeaturesCount == 0) {
     InitializeListHead (&CpuFeaturesData->FeatureList);
     InitializeSpinLock (&CpuFeaturesData->CpuFlags.MemoryMappedLock);
-    InitializeSpinLock (&CpuFeaturesData->CpuFlags.ConsoleLogLock);
     //
     // Code assumes below three PCDs have PCD same buffer size.
     //

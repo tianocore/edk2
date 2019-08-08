@@ -58,7 +58,6 @@ typedef struct {
 // Flags used when program the register.
 //
 typedef struct {
-  volatile UINTN           ConsoleLogLock;          // Spinlock used to control console.
   volatile UINTN           MemoryMappedLock;        // Spinlock used to program mmio
   volatile UINT32          *CoreSemaphoreCount;     // Semaphore containers used to program Core semaphore.
   volatile UINT32          *PackageSemaphoreCount;  // Semaphore containers used to program Package semaphore.
