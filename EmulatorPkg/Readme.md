@@ -21,19 +21,19 @@ https://github.com/tianocore/tianocore.github.io/wiki/EmulatorPkg
 **You can use the following command to build.**
   * 32bit emulator in Windows:
 
-    `build -p EmulatorPkg\EmulatorPkg.dsc -t VS2017 -D WIN_SEC_BUILD -a IA32`
+    `build -p EmulatorPkg\EmulatorPkg.dsc -t VS2017 -a IA32`
 
   * 64bit emulator in Windows:
 
-    `build -p EmulatorPkg\EmulatorPkg.dsc -t VS2017 -D WIN_SEC_BUILD -a X64`
+    `build -p EmulatorPkg\EmulatorPkg.dsc -t VS2017 -a X64`
 
   * 32bit emulator in Linux:
 
-    `build -p EmulatorPkg\EmulatorPkg.dsc -t GCC5 -D UNIX_SEC_BUILD -a IA32`
+    `build -p EmulatorPkg\EmulatorPkg.dsc -t GCC5 -a IA32`
 
   * 64bit emulator in Linux:
 
-    `build -p EmulatorPkg\EmulatorPkg.dsc -t GCC5 -D UNIX_SEC_BUILD -a X64`
+    `build -p EmulatorPkg\EmulatorPkg.dsc -t GCC5 -a X64`
 
 **You can start/run the emulator using the following command:**
   * 32bit emulator in Windows:
