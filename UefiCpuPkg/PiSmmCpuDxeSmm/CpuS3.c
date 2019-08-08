@@ -35,7 +35,6 @@ typedef struct {
 // Flags used when program the register.
 //
 typedef struct {
-  volatile UINTN           ConsoleLogLock;          // Spinlock used to control console.
   volatile UINTN           MemoryMappedLock;        // Spinlock used to program mmio
   volatile UINT32          *CoreSemaphoreCount;     // Semaphore container used to program
                                                     // core level semaphore.
@@ -1028,7 +1027,6 @@ GetAcpiCpuData (
     ASSERT (mCpuFlags.PackageSemaphoreCount != NULL);
   }
   InitializeSpinLock((SPIN_LOCK*) &mCpuFlags.MemoryMappedLock);
-  InitializeSpinLock((SPIN_LOCK*) &mCpuFlags.ConsoleLogLock);
 }
 
 /**
