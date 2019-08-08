@@ -2,7 +2,7 @@
   regerror.c -  Oniguruma (regular expression library)
 **********************************************************************/
 /*-
- * Copyright (c) 2002-2018  K.Kosako  <sndgk393 AT ybb DOT ne DOT jp>
+ * Copyright (c) 2002-2019  K.Kosako  <sndgk393 AT ybb DOT ne DOT jp>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,13 +31,7 @@
 #if 0
 #include <stdio.h> /* for vsnprintf() */
 
-#ifdef HAVE_STDARG_PROTOTYPES
 #include <stdarg.h>
-#define va_init_list(a,b) va_start(a,b)
-#else
-#include <varargs.h>
-#define va_init_list(a,b) va_start(a)
-#endif
 #endif
 
 extern UChar*
@@ -213,13 +207,17 @@ static void sprint_byte_with_x(char* s, unsigned int v)
 }
 
 static int to_ascii(OnigEncoding enc, UChar *s, UChar *end,
-		    UChar buf[], int buf_size, int *is_over)
+                    UChar buf[], int buf_size, int *is_over)
 {
   int len;
   UChar *p;
   OnigCodePoint code;
 
-  if (ONIGENC_MBC_MINLEN(enc) > 1) {
+  if (!s) {
+    len = 0;
+    *is_over = 0;
+  }
+  else if (ONIGENC_MBC_MINLEN(enc) > 1) {
     p = s;
     len = 0;
     while (p < end) {
@@ -249,7 +247,7 @@ static int to_ascii(OnigEncoding enc, UChar *s, UChar *end,
       if (len >= buf_size) break;
     }
 
-    *is_over = ((p < end) ? 1 : 0);
+    *is_over = p < end;
   }
   else {
     len = MIN((int )(end - s), buf_size);
@@ -261,19 +259,27 @@ static int to_ascii(OnigEncoding enc, UChar *s, UChar *end,
 }
 
 
+extern int
+onig_is_error_code_needs_param(int code)
+{
+  switch (code) {
+  case ONIGERR_UNDEFINED_NAME_REFERENCE:
+  case ONIGERR_UNDEFINED_GROUP_REFERENCE:
+  case ONIGERR_MULTIPLEX_DEFINED_NAME:
+  case ONIGERR_MULTIPLEX_DEFINITION_NAME_CALL:
+  case ONIGERR_INVALID_GROUP_NAME:
+  case ONIGERR_INVALID_CHAR_IN_GROUP_NAME:
+  case ONIGERR_INVALID_CHAR_PROPERTY_NAME:
+    return 1;
+  default:
+    return 0;
+  }
+}
+
 /* for ONIG_MAX_ERROR_MESSAGE_LEN */
 #define MAX_ERROR_PAR_LEN   30
 
-extern int
-EFIAPI
-#ifdef HAVE_STDARG_PROTOTYPES
-onig_error_code_to_str(UChar* s, int code, ...)
-#else
-onig_error_code_to_str(s, code, va_alist)
-  UChar* s;
-  int code;
-  va_dcl 
-#endif
+extern int EFIAPI onig_error_code_to_str(UChar* s, int code, ...)
 {
   UChar *p, *q;
   OnigErrorInfo* einfo;
@@ -333,21 +339,8 @@ onig_error_code_to_str(s, code, va_alist)
 }
 
 
-void
-EFIAPI
-#ifdef HAVE_STDARG_PROTOTYPES
-onig_snprintf_with_pattern(UChar buf[], int bufsize, OnigEncoding enc,
-                           UChar* pat, UChar* pat_end, const UChar *fmt, ...)
-#else
-onig_snprintf_with_pattern(buf, bufsize, enc, pat, pat_end, fmt, va_alist)
-    UChar buf[];
-    int bufsize;
-    OnigEncoding enc;
-    UChar* pat;
-    UChar* pat_end;
-    const UChar *fmt;
-    va_dcl
-#endif
+void EFIAPI onig_snprintf_with_pattern(UChar buf[], int bufsize, OnigEncoding enc,
+                                UChar* pat, UChar* pat_end, const UChar *fmt, ...)
 {
   int n, need, len;
   UChar *p, *s, *bp;
