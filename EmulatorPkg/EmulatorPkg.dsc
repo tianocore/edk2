@@ -4,7 +4,7 @@
 # The Emulation Platform can be used to debug individual modules, prior to creating
 # a real platform. This also provides an example for how an DSC is created.
 #
-# Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 # Portions copyright (c) 2010 - 2011, Apple Inc. All rights reserved.<BR>
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -236,18 +236,18 @@
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|L"Timeout"|gEfiGlobalVariableGuid|0x0|10
 
 [Components]
-!ifdef $(UNIX_SEC_BUILD)
-  ##
-  #  Emulator, OS POSIX application
-  ##
-  EmulatorPkg/Unix/Host/Host.inf
-!endif
-
-!ifdef $(WIN_SEC_BUILD)
-  ##
-  #  Emulator, OS WIN application
-  ##
-  EmulatorPkg/Win/Host/WinHost.inf
+!if "IA32" in $(ARCH) || "X64" in $(ARCH)
+  !if "MSFT" in $(FAMILY)
+    ##
+    #  Emulator, OS WIN application
+    ##
+    EmulatorPkg/Win/Host/WinHost.inf
+  !else
+    ##
+    #  Emulator, OS POSIX application
+    ##
+    EmulatorPkg/Unix/Host/Host.inf
+  !endif
 !endif
 
 !ifndef $(SKIP_MAIN_BUILD)
