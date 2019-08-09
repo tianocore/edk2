@@ -63,6 +63,7 @@ typedef struct _UFS_PASS_THRU_PRIVATE_DATA {
   EDKII_UFS_HOST_CONTROLLER_PROTOCOL  *UfsHostController;
   UINTN                               UfsHcBase;
   EDKII_UFS_HC_INFO                   UfsHcInfo;
+  EDKII_UFS_HC_DRIVER_INTERFACE       UfsHcDriverInterface;
 
   UINT8                               TaskTag;
 
@@ -123,6 +124,13 @@ typedef struct {
   CR (a, \
       UFS_PASS_THRU_PRIVATE_DATA, \
       UfsDevConfig, \
+      UFS_PASS_THRU_SIG \
+      )
+
+#define UFS_PASS_THRU_PRIVATE_DATA_FROM_DRIVER_INTF(a) \
+  CR (a, \
+      UFS_PASS_THRU_PRIVATE_DATA, \
+      UfsHcDriverInterface, \
       UFS_PASS_THRU_SIG \
       )
 
@@ -960,6 +968,23 @@ UfsRwUfsAttribute (
   );
 
 /**
+  Execute UIC command.
+
+  @param[in]      This        Pointer to driver interface produced by the UFS controller.
+  @param[in, out] UicCommand  Descriptor of the command that will be executed.
+
+  @retval EFI_SUCCESS            Command executed successfully.
+  @retval EFI_INVALID_PARAMETER  This or UicCommand is NULL.
+  @retval Others                 Command failed to execute.
+**/
+EFI_STATUS
+EFIAPI
+UfsHcDriverInterfaceExecUicCommand (
+  IN     EDKII_UFS_HC_DRIVER_INTERFACE  *This,
+  IN OUT EDKII_UIC_COMMAND              *UicCommand
+  );
+
+/**
   Initializes UfsHcInfo field in private data.
 
   @param[in] Private  Pointer to host controller private data.
@@ -975,5 +1000,6 @@ GetUfsHcInfo (
 extern EFI_COMPONENT_NAME_PROTOCOL  gUfsPassThruComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL gUfsPassThruComponentName2;
 extern EFI_DRIVER_BINDING_PROTOCOL  gUfsPassThruDriverBinding;
+extern EDKII_UFS_HC_PLATFORM_PROTOCOL  *mUfsHcPlatform;
 
 #endif
