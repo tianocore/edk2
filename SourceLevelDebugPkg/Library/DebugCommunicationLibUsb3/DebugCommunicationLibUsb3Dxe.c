@@ -447,7 +447,7 @@ DebugCommunicationUsb3DxeConstructor (
   EFI_EVENT                     Event;
 
   Status = EfiGetSystemConfigurationTable (&gUsb3DbgGuid, (VOID **) &AddrPtr);
-  if (EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) || (AddrPtr == NULL)) {
     //
     // Instead of using local variables, install system configuration table for
     // the local instance and the buffer to save instance address pointer.
