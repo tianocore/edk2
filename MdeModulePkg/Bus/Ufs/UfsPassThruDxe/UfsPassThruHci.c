@@ -731,7 +731,7 @@ UfsFindAvailableSlotInTrl (
     return Status;
   }
 
-  Nutrs   = (UINT8)((Private->Capabilities & UFS_HC_CAP_NUTRS) + 1);
+  Nutrs   = (UINT8)((Private->UfsHcInfo.Capabilities & UFS_HC_CAP_NUTRS) + 1);
 
   for (Index = 0; Index < Nutrs; Index++) {
     if ((Data & (BIT0 << Index)) == 0) {
@@ -1754,7 +1754,7 @@ UfsAllocateAlignCommonBuffer (
   BOOLEAN                              Is32BitAddr;
   EDKII_UFS_HOST_CONTROLLER_PROTOCOL   *UfsHc;
 
-  if ((Private->Capabilities & UFS_HC_CAP_64ADDR) == UFS_HC_CAP_64ADDR) {
+  if ((Private->UfsHcInfo.Capabilities & UFS_HC_CAP_64ADDR) == UFS_HC_CAP_64ADDR) {
     Is32BitAddr = FALSE;
   } else {
     Is32BitAddr = TRUE;
@@ -1947,7 +1947,6 @@ UfsInitTaskManagementRequestList (
   IN  UFS_PASS_THRU_PRIVATE_DATA     *Private
   )
 {
-  UINT32                 Data;
   UINT8                  Nutmrs;
   VOID                   *CmdDescHost;
   EFI_PHYSICAL_ADDRESS   CmdDescPhyAddr;
@@ -1961,17 +1960,10 @@ UfsInitTaskManagementRequestList (
   CmdDescMapping = NULL;
   CmdDescPhyAddr = 0;
 
-  Status = UfsMmioRead32 (Private, UFS_HC_CAP_OFFSET, &Data);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  Private->Capabilities = Data;
-
   //
   // Allocate and initialize UTP Task Management Request List.
   //
-  Nutmrs = (UINT8) (RShiftU64 ((Private->Capabilities & UFS_HC_CAP_NUTMRS), 16) + 1);
+  Nutmrs = (UINT8) (RShiftU64 ((Private->UfsHcInfo.Capabilities & UFS_HC_CAP_NUTMRS), 16) + 1);
   Status = UfsAllocateAlignCommonBuffer (Private, Nutmrs * sizeof (UTP_TMRD), &CmdDescHost, &CmdDescPhyAddr, &CmdDescMapping);
   if (EFI_ERROR (Status)) {
     return Status;
@@ -2020,7 +2012,6 @@ UfsInitTransferRequestList (
   IN  UFS_PASS_THRU_PRIVATE_DATA     *Private
   )
 {
-  UINT32                 Data;
   UINT8                  Nutrs;
   VOID                   *CmdDescHost;
   EFI_PHYSICAL_ADDRESS   CmdDescPhyAddr;
@@ -2034,17 +2025,10 @@ UfsInitTransferRequestList (
   CmdDescMapping = NULL;
   CmdDescPhyAddr = 0;
 
-  Status = UfsMmioRead32 (Private, UFS_HC_CAP_OFFSET, &Data);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  Private->Capabilities = Data;
-
   //
   // Allocate and initialize UTP Transfer Request List.
   //
-  Nutrs  = (UINT8)((Private->Capabilities & UFS_HC_CAP_NUTRS) + 1);
+  Nutrs  = (UINT8)((Private->UfsHcInfo.Capabilities & UFS_HC_CAP_NUTRS) + 1);
   Status = UfsAllocateAlignCommonBuffer (Private, Nutrs * sizeof (UTP_TRD), &CmdDescHost, &CmdDescPhyAddr, &CmdDescMapping);
   if (EFI_ERROR (Status)) {
     return Status;
@@ -2364,5 +2348,38 @@ ProcessAsyncTaskList (
       }
     }
   }
+}
+
+/**
+  Initializes UfsHcInfo field in private data.
+
+  @param[in] Private  Pointer to host controller private data.
+
+  @retval EFI_SUCCESS  UfsHcInfo initialized successfully.
+  @retval Others       Failed to initalize UfsHcInfo.
+**/
+EFI_STATUS
+GetUfsHcInfo (
+  IN UFS_PASS_THRU_PRIVATE_DATA  *Private
+  )
+{
+  UINT32      Data;
+  EFI_STATUS  Status;
+
+  Status = UfsMmioRead32 (Private, UFS_HC_VER_OFFSET, &Data);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Private->UfsHcInfo.Version = Data;
+
+  Status = UfsMmioRead32 (Private, UFS_HC_CAP_OFFSET, &Data);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Private->UfsHcInfo.Capabilities = Data;
+
+  return EFI_SUCCESS;
 }
 

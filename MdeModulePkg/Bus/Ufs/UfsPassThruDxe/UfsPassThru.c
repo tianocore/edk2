@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2019, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -35,7 +35,7 @@ UFS_PASS_THRU_PRIVATE_DATA gUfsPassThruTemplate = {
   },
   0,                              // UfsHostController
   0,                              // UfsHcBase
-  0,                              // Capabilities
+  {0, 0},                         // UfsHcInfo
   0,                              // TaskTag
   0,                              // UtpTrlBase
   0,                              // Nutrs
@@ -865,6 +865,11 @@ UfsPassThruDriverBindingStart (
   Private->UfsHostController    = UfsHc;
   Private->UfsHcBase            = UfsHcBase;
   InitializeListHead (&Private->Queue);
+  Status = GetUfsHcInfo (Private);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Failed to initialize UfsHcInfo\n"));
+    goto Error;
+  }
 
   //
   // Initialize UFS Host Controller H/W.
