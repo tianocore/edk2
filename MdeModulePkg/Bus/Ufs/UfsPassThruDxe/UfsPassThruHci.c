@@ -1202,8 +1202,6 @@ UfsSetFlag (
   return Status;
 }
 
-
-
 /**
   Read specified flag from a UFS device.
 
@@ -1835,6 +1833,14 @@ UfsEnableHostController (
   EFI_STATUS             Status;
   UINT32                 Data;
 
+  if (mUfsHcPlatform != NULL && mUfsHcPlatform->Callback != NULL) {
+    Status = mUfsHcPlatform->Callback (Private->Handle, EdkiiUfsHcPreHce, &Private->UfsHcDriverInterface);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "Failure from platform driver during EdkiiUfsHcPreHce, Status = %r\n", Status));
+      return Status;
+    }
+  }
+
   //
   // UFS 2.0 spec section 7.1.1 - Host Controller Initialization
   //
@@ -1878,6 +1884,14 @@ UfsEnableHostController (
     return EFI_DEVICE_ERROR;
   }
 
+  if (mUfsHcPlatform != NULL && mUfsHcPlatform->Callback != NULL) {
+    Status = mUfsHcPlatform->Callback (Private->Handle, EdkiiUfsHcPostHce, &Private->UfsHcDriverInterface);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "Failure from platform driver during EdkiiUfsHcPostHce, Status = %r\n", Status));
+      return Status;
+    }
+  }
+
   return EFI_SUCCESS;
 }
 
@@ -1900,6 +1914,14 @@ UfsDeviceDetection (
   EFI_STATUS         Status;
   UINT32             Data;
   EDKII_UIC_COMMAND  LinkStartupCommand;
+
+  if (mUfsHcPlatform != NULL && mUfsHcPlatform->Callback != NULL) {
+    Status = mUfsHcPlatform->Callback (Private->Handle, EdkiiUfsHcPreLinkStartup, &Private->UfsHcDriverInterface);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "Failure from platform driver during EdkiiUfsHcPreLinkStartup, Status = %r\n", Status));
+      return Status;
+    }
+  }
 
   //
   // Start UFS device detection.
@@ -1926,6 +1948,13 @@ UfsDeviceDetection (
         return EFI_DEVICE_ERROR;
       }
     } else {
+      if (mUfsHcPlatform != NULL && mUfsHcPlatform->Callback != NULL) {
+        Status = mUfsHcPlatform->Callback (Private->Handle, EdkiiUfsHcPostLinkStartup, &Private->UfsHcDriverInterface);
+        if (EFI_ERROR (Status)) {
+          DEBUG ((DEBUG_ERROR, "Failure from platform driver during EdkiiUfsHcPostLinkStartup, Status = %r\n", Status));
+          return Status;
+        }
+      }
       return EFI_SUCCESS;
     }
   }
@@ -2351,6 +2380,34 @@ ProcessAsyncTaskList (
 }
 
 /**
+  Execute UIC command.
+
+  @param[in]      This        Pointer to driver interface produced by the UFS controller.
+  @param[in, out] UicCommand  Descriptor of the command that will be executed.
+
+  @retval EFI_SUCCESS            Command executed successfully.
+  @retval EFI_INVALID_PARAMETER  This or UicCommand is NULL.
+  @retval Others                 Command failed to execute.
+**/
+EFI_STATUS
+EFIAPI
+UfsHcDriverInterfaceExecUicCommand (
+  IN     EDKII_UFS_HC_DRIVER_INTERFACE  *This,
+  IN OUT EDKII_UIC_COMMAND              *UicCommand
+  )
+{
+  UFS_PASS_THRU_PRIVATE_DATA    *Private;
+
+  if (This == NULL || UicCommand == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Private = UFS_PASS_THRU_PRIVATE_DATA_FROM_DRIVER_INTF (This);
+
+  return UfsExecUicCommands (Private, UicCommand);
+}
+
+/**
   Initializes UfsHcInfo field in private data.
 
   @param[in] Private  Pointer to host controller private data.
@@ -2379,6 +2436,14 @@ GetUfsHcInfo (
   }
 
   Private->UfsHcInfo.Capabilities = Data;
+
+  if (mUfsHcPlatform != NULL && mUfsHcPlatform->OverrideHcInfo != NULL) {
+    Status = mUfsHcPlatform->OverrideHcInfo (Private->Handle, &Private->UfsHcInfo);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "Failure from platform on OverrideHcInfo, Status = %r\n", Status));
+      return Status;
+    }
+  }
 
   return EFI_SUCCESS;
 }

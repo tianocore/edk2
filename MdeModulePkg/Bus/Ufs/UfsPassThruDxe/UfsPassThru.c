@@ -36,6 +36,7 @@ UFS_PASS_THRU_PRIVATE_DATA gUfsPassThruTemplate = {
   0,                              // UfsHostController
   0,                              // UfsHcBase
   {0, 0},                         // UfsHcInfo
+  {NULL, NULL},                   // UfsHcDriverInterface
   0,                              // TaskTag
   0,                              // UtpTrlBase
   0,                              // Nutrs
@@ -91,6 +92,8 @@ UFS_DEVICE_PATH    mUfsDevicePathTemplate = {
 };
 
 UINT8 mUfsTargetId[TARGET_MAX_BYTES];
+
+GLOBAL_REMOVE_IF_UNREFERENCED EDKII_UFS_HC_PLATFORM_PROTOCOL  *mUfsHcPlatform;
 
 /**
   Sends a SCSI Request Packet to a SCSI device that is attached to the SCSI channel. This function
@@ -864,7 +867,21 @@ UfsPassThruDriverBindingStart (
   Private->ExtScsiPassThru.Mode = &Private->ExtScsiPassThruMode;
   Private->UfsHostController    = UfsHc;
   Private->UfsHcBase            = UfsHcBase;
+  Private->Handle               = Controller;
+  Private->UfsHcDriverInterface.UfsHcProtocol = UfsHc;
+  Private->UfsHcDriverInterface.UfsExecUicCommand = UfsHcDriverInterfaceExecUicCommand;
   InitializeListHead (&Private->Queue);
+
+  //
+  // This has to be done before initializing UfsHcInfo or calling the UfsControllerInit
+  //
+  if (mUfsHcPlatform == NULL) {
+    Status = gBS->LocateProtocol (&gEdkiiUfsHcPlatformProtocolGuid, NULL, (VOID**)&mUfsHcPlatform);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_INFO, "No UfsHcPlatformProtocol present\n"));
+    }
+  }
+
   Status = GetUfsHcInfo (Private);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Failed to initialize UfsHcInfo\n"));
