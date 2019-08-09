@@ -62,7 +62,7 @@ typedef struct _UFS_PASS_THRU_PRIVATE_DATA {
   EFI_UFS_DEVICE_CONFIG_PROTOCOL      UfsDevConfig;
   EDKII_UFS_HOST_CONTROLLER_PROTOCOL  *UfsHostController;
   UINTN                               UfsHcBase;
-  UINT32                              Capabilities;
+  EDKII_UFS_HC_INFO                   UfsHcInfo;
 
   UINT8                               TaskTag;
 
@@ -957,6 +957,19 @@ UfsRwUfsAttribute (
   IN UINT8                             Selector,
   IN OUT UINT8                         *Attribute,
   IN OUT UINT32                        *AttrSize
+  );
+
+/**
+  Initializes UfsHcInfo field in private data.
+
+  @param[in] Private  Pointer to host controller private data.
+
+  @retval EFI_SUCCESS  UfsHcInfo initialized successfully.
+  @retval Others       Failed to initalize UfsHcInfo.
+**/
+EFI_STATUS
+GetUfsHcInfo (
+  IN UFS_PASS_THRU_PRIVATE_DATA  *Private
   );
 
 extern EFI_COMPONENT_NAME_PROTOCOL  gUfsPassThruComponentName;
