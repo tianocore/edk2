@@ -2,7 +2,7 @@
   UfsPassThruDxe driver is used to produce EFI_EXT_SCSI_PASS_THRU protocol interface
   for upper layer application to execute UFS-supported SCSI cmds.
 
-  Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2019, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -1633,11 +1633,8 @@ Exit1:
 /**
   Send UIC command.
 
-  @param[in] Private          The pointer to the UFS_PASS_THRU_PRIVATE_DATA data structure.
-  @param[in] UicOpcode        The opcode of the UIC command.
-  @param[in] Arg1             The value for 1st argument of the UIC command.
-  @param[in] Arg2             The value for 2nd argument of the UIC command.
-  @param[in] Arg3             The value for 3rd argument of the UIC command.
+  @param[in]      Private     The pointer to the UFS_PASS_THRU_PRIVATE_DATA data structure.
+  @param[in, out] UicCommand  UIC command descriptor. On exit contains UIC command results.
 
   @return EFI_SUCCESS      Successfully execute this UIC command and detect attached UFS device.
   @return EFI_DEVICE_ERROR Fail to execute this UIC command and detect attached UFS device.
@@ -1646,10 +1643,7 @@ Exit1:
 EFI_STATUS
 UfsExecUicCommands (
   IN  UFS_PASS_THRU_PRIVATE_DATA    *Private,
-  IN  UINT8                         UicOpcode,
-  IN  UINT32                        Arg1,
-  IN  UINT32                        Arg2,
-  IN  UINT32                        Arg3
+  IN OUT EDKII_UIC_COMMAND          *UicCommand
   )
 {
   EFI_STATUS  Status;
@@ -1675,17 +1669,17 @@ UfsExecUicCommands (
   // only after all the UIC command argument registers (UICCMDARG1, UICCMDARG2 and UICCMDARG3)
   // are set.
   //
-  Status = UfsMmioWrite32 (Private, UFS_HC_UCMD_ARG1_OFFSET, Arg1);
+  Status = UfsMmioWrite32 (Private, UFS_HC_UCMD_ARG1_OFFSET, UicCommand->Arg1);
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  Status = UfsMmioWrite32 (Private, UFS_HC_UCMD_ARG2_OFFSET, Arg2);
+  Status = UfsMmioWrite32 (Private, UFS_HC_UCMD_ARG2_OFFSET, UicCommand->Arg2);
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  Status = UfsMmioWrite32 (Private, UFS_HC_UCMD_ARG3_OFFSET, Arg3);
+  Status = UfsMmioWrite32 (Private, UFS_HC_UCMD_ARG3_OFFSET, UicCommand->Arg3);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -1698,7 +1692,7 @@ UfsExecUicCommands (
     return Status;
   }
 
-  Status = UfsMmioWrite32 (Private, UFS_HC_UIC_CMD_OFFSET, (UINT32)UicOpcode);
+  Status = UfsMmioWrite32 (Private, UFS_HC_UIC_CMD_OFFSET, UicCommand->Opcode);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -1712,14 +1706,18 @@ UfsExecUicCommands (
     return Status;
   }
 
-  if (UicOpcode != UfsUicDmeReset) {
-    Status = UfsMmioRead32 (Private, UFS_HC_UCMD_ARG2_OFFSET, &Data);
+  if (UicCommand->Opcode != UfsUicDmeReset) {
+    Status = UfsMmioRead32 (Private, UFS_HC_UCMD_ARG2_OFFSET, &UicCommand->Arg2);
     if (EFI_ERROR (Status)) {
       return Status;
     }
-    if ((Data & 0xFF) != 0) {
+    Status = UfsMmioRead32 (Private, UFS_HC_UCMD_ARG3_OFFSET, &UicCommand->Arg3);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+    if ((UicCommand->Arg2 & 0xFF) != 0) {
       DEBUG_CODE_BEGIN();
-        DumpUicCmdExecResult (UicOpcode, (UINT8)(Data & 0xFF));
+        DumpUicCmdExecResult ((UINT8)UicCommand->Opcode, (UINT8)(UicCommand->Arg2 & 0xFF));
       DEBUG_CODE_END();
       return EFI_DEVICE_ERROR;
     }
@@ -1898,16 +1896,21 @@ UfsDeviceDetection (
   IN  UFS_PASS_THRU_PRIVATE_DATA     *Private
   )
 {
-  UINTN       Retry;
-  EFI_STATUS  Status;
-  UINT32      Data;
+  UINTN              Retry;
+  EFI_STATUS         Status;
+  UINT32             Data;
+  EDKII_UIC_COMMAND  LinkStartupCommand;
 
   //
   // Start UFS device detection.
   // Try up to 3 times for establishing data link with device.
   //
   for (Retry = 0; Retry < 3; Retry++) {
-    Status = UfsExecUicCommands (Private, UfsUicDmeLinkStartup, 0, 0, 0);
+    LinkStartupCommand.Opcode = UfsUicDmeLinkStartup;
+    LinkStartupCommand.Arg1 = 0;
+    LinkStartupCommand.Arg2 = 0;
+    LinkStartupCommand.Arg3 = 0;
+    Status = UfsExecUicCommands (Private, &LinkStartupCommand);
     if (EFI_ERROR (Status)) {
       return EFI_DEVICE_ERROR;
     }
