@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2019, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -13,6 +13,7 @@
 #include <Protocol/ScsiPassThruExt.h>
 #include <Protocol/UfsDeviceConfig.h>
 #include <Protocol/UfsHostController.h>
+#include <Protocol/UfsHostControllerPlatform.h>
 
 #include <Library/DebugLib.h>
 #include <Library/UefiDriverEntryPoint.h>
