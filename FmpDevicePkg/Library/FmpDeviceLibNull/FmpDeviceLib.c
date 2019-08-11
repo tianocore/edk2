@@ -3,7 +3,7 @@
   image stored in a firmware device.
 
   Copyright (c) 2016, Microsoft Corporation. All rights reserved.<BR>
-  Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2018 - 2019, Intel Corporation. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -35,6 +35,68 @@ EFI_STATUS
 EFIAPI
 RegisterFmpInstaller (
   IN FMP_DEVICE_LIB_REGISTER_FMP_INSTALLER  Function
+  )
+{
+  return EFI_UNSUPPORTED;
+}
+
+/**
+  Provide a function to uninstall the Firmware Management Protocol instance from a
+  device handle when the device is managed by a driver that follows the UEFI
+  Driver Model.  If the device is not managed by a driver that follows the UEFI
+  Driver Model, then EFI_UNSUPPORTED is returned.
+
+  @param[in] FmpUninstaller  Function that installs the Firmware Management
+                             Protocol.
+
+  @retval EFI_SUCCESS      The device is managed by a driver that follows the
+                           UEFI Driver Model.  FmpUinstaller must be called on
+                           each Driver Binding Stop().
+  @retval EFI_UNSUPPORTED  The device is not managed by a driver that follows
+                           the UEFI Driver Model.
+  @retval other            The Firmware Management Protocol for this firmware
+                           device is not installed.  The firmware device is
+                           still locked using FmpDeviceLock().
+
+**/
+EFI_STATUS
+EFIAPI
+RegisterFmpUninstaller (
+  IN FMP_DEVICE_LIB_REGISTER_FMP_UNINSTALLER  Function
+  )
+{
+  return EFI_UNSUPPORTED;
+}
+
+/**
+  Set the device context for the FmpDeviceLib services when the device is
+  managed by a driver that follows the UEFI Driver Model.  If the device is not
+  managed by a driver that follows the UEFI Driver Model, then EFI_UNSUPPORTED
+  is returned.  Once a device context is set, the FmpDeviceLib services
+  operate on the currently set device context.
+
+  @param[in]      Handle   Device handle for the FmpDeviceLib services.
+                           If Handle is NULL, then Context is freed.
+  @param[in, out] Context  Device context for the FmpDeviceLib services.
+                           If Context is NULL, then a new context is allocated
+                           for Handle and the current device context is set and
+                           returned in Context.  If Context is not NULL, then
+                           the current device context is set.
+
+  @retval EFI_SUCCESS      The device is managed by a driver that follows the
+                           UEFI Driver Model.
+  @retval EFI_UNSUPPORTED  The device is not managed by a driver that follows
+                           the UEFI Driver Model.
+  @retval other            The Firmware Management Protocol for this firmware
+                           device is not installed.  The firmware device is
+                           still locked using FmpDeviceLock().
+
+**/
+EFI_STATUS
+EFIAPI
+FmpDeviceSetContext (
+  IN EFI_HANDLE  Handle,
+  IN OUT VOID    **Context
   )
 {
   return EFI_UNSUPPORTED;
@@ -239,6 +301,35 @@ EFI_STATUS
 EFIAPI
 FmpDeviceGetVersion (
   OUT UINT32  *Version
+  )
+{
+  return EFI_UNSUPPORTED;
+}
+
+/**
+  Returns the value used to fill in the HardwareInstance field of the
+  EFI_FIRMWARE_IMAGE_DESCRIPTOR structure that is returned by the GetImageInfo()
+  service of the Firmware Management Protocol.  If EFI_SUCCESS is returned, then
+  the firmware device supports a method to report the HardwareInstance value.
+  If the value can not be reported for the firmware device, then EFI_UNSUPPORTED
+  must be returned.  EFI_DEVICE_ERROR is returned if an error occurs attempting
+  to retrieve the HardwareInstance value for the firmware device.
+
+  @param[out] HardwareInstance  The hardware instance value for the firmware
+                                device.
+
+  @retval EFI_SUCCESS       The hardware instance for the current firmware
+                            devide is returned in HardwareInstance.
+  @retval EFI_UNSUPPORTED   The firmware device does not support a method to
+                            report the hardware instance value.
+  @retval EFI_DEVICE_ERROR  An error occurred attempting to retrieve the hardware
+                            instance value.
+
+**/
+EFI_STATUS
+EFIAPI
+FmpDeviceGetHardwareInstance (
+  OUT UINT64  *HardwareInstance
   )
 {
   return EFI_UNSUPPORTED;
