@@ -7,7 +7,7 @@
 # customized using libraries and PCDs.
 #
 # Copyright (c) 2016, Microsoft Corporation. All rights reserved.<BR>
-# Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2018 - 2019, Intel Corporation. All rights reserved.<BR>
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -23,15 +23,10 @@
 [Includes]
   Include
 
-[LibraryClasses]
-  ##  @libraryclass  Provides services to retrieve values from a capsule's FMP
-  #                  Payload Header.  The structure is not included in the
-  #                  library class.  Instead, services are provided to retrieve
-  #                  information from the FMP Payload Header.  If information is
-  #                  added to the FMP Payload Header, then new services may be
-  #                  added to this library class to retrieve the new information.
-  FmpPayloadHeaderLib|Include/Library/FmpPayloadHeaderLib.h
+[Includes.Common.Private]
+  PrivateInclude
 
+[LibraryClasses]
   ##  @libraryclass  Provides platform policy services used during a capsule
   #                  update.
   CapsuleUpdatePolicyLib|Include/Library/CapsuleUpdatePolicyLib.h
@@ -40,9 +35,22 @@
   #                  updates of a firmware image stored in a firmware device.
   FmpDeviceLib|Include/Library/FmpDeviceLib.h
 
+[LibraryClasses.Common.Private]
+  ##  @libraryclass  Provides services to retrieve values from a capsule's FMP
+  #                  Payload Header.  The structure is not included in the
+  #                  library class.  Instead, services are provided to retrieve
+  #                  information from the FMP Payload Header.  If information is
+  #                  added to the FMP Payload Header, then new services may be
+  #                  added to this library class to retrieve the new information.
+  FmpPayloadHeaderLib|PrivateInclude/Library/FmpPayloadHeaderLib.h
+
 [Guids]
   ## Firmware Management Protocol Device Package Token Space GUID
   gFmpDevicePkgTokenSpaceGuid = { 0x40b2d964, 0xfe11, 0x40dc, { 0x82, 0x83, 0x2e, 0xfb, 0xda, 0x29, 0x53, 0x56 } }
+
+[Protocols.Common.Private]
+  ## Capsule Update Policy Protocol
+  gEdkiiCapuleUpdatePolicyProtocolGuid = { 0x487784c5, 0x6299, 0x4ba6, { 0xb0, 0x96, 0x5c, 0xc5, 0x27, 0x7c, 0xf7, 0x57 } }
 
 [PcdsFixedAtBuild]
   ## The SHA-256 hash of a PKCS7 test key that is used to detect if a test key
