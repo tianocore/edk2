@@ -7,7 +7,7 @@
 # customized using libraries and PCDs.
 #
 # Copyright (c) 2016, Microsoft Corporation. All rights reserved.<BR>
-# Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2018 - 2019, Intel Corporation. All rights reserved.<BR>
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -71,6 +71,7 @@
   # Libraries
   #
   FmpDevicePkg/Library/CapsuleUpdatePolicyLibNull/CapsuleUpdatePolicyLibNull.inf
+  FmpDevicePkg/Library/CapsuleUpdatePolicyLibOnProtocol/CapsuleUpdatePolicyLibOnProtocol.inf
   FmpDevicePkg/Library/FmpPayloadHeaderLibV1/FmpPayloadHeaderLibV1.inf
   FmpDevicePkg/Library/FmpDeviceLibNull/FmpDeviceLibNull.inf
   FmpDevicePkg/FmpDxe/FmpDxeLib.inf
@@ -78,12 +79,23 @@
   #
   # Modules
   #
+  FmpDevicePkg/CapsuleUpdatePolicyDxe/CapsuleUpdatePolicyDxe.inf {
+    <LibraryClasses>
+      CapsuleUpdatePolicyLib|FmpDevicePkg/Library/CapsuleUpdatePolicyLibNull/CapsuleUpdatePolicyLibNull.inf
+  }
   FmpDevicePkg/FmpDxe/FmpDxe.inf {
     <Defines>
       #
       # FILE_GUID is used as ESRT GUID
       #
       FILE_GUID = $(SYSTEM_FMP_ESRT_GUID)
+    <LibraryClasses>
+      #
+      # Use CapsuleUpdatePolicyLib that calls the Capsule Update Policy Protocol.
+      # Depends on the CapsuleUpdatePolicyDxe module to produce the protocol.
+      # Required for FmpDxe modules that are intended to be platform independent.
+      #
+      CapsuleUpdatePolicyLib|FmpDevicePkg/Library/CapsuleUpdatePolicyLibOnProtocol/CapsuleUpdatePolicyLibOnProtocol.inf
   }
 
   FmpDevicePkg/FmpDxe/FmpDxe.inf {
@@ -92,6 +104,13 @@
       # FILE_GUID is used as ESRT GUID
       #
       FILE_GUID = $(DEVICE_FMP_ESRT_GUID)
+    <LibraryClasses>
+      #
+      # Directly use a platform specific CapsuleUpdatePolicyLib instance.
+      # Only works for FmpDxe modules that are build from sources and included
+      # in a system firmware image.
+      #
+      CapsuleUpdatePolicyLib|FmpDevicePkg/Library/CapsuleUpdatePolicyLibNull/CapsuleUpdatePolicyLibNull.inf
   }
 
 [BuildOptions]
