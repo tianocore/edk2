@@ -120,7 +120,7 @@ FindDxeCore (
     if (*FileHandle) {
       // Assume the FV that contains multiple compressed FVs.
       // So decompress the compressed FVs
-      Status = FfsProcessFvFile (*FileHandle);
+      Status = FfsProcessFvFile (*FileHandle, VolumeHandle);
       ASSERT_EFI_ERROR (Status);
       Status = FfsAnyFvFindFirstFile (EFI_FV_FILETYPE_DXE_CORE, &VolumeHandle, FileHandle);
     }
