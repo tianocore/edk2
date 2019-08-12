@@ -1,0 +1,35 @@
+## @file
+#  Base CPU Timer Library
+#
+#  Provides basic timer support using CPUID Leaf 0x15 XTAL frequency. The performance
+#  counter features are provided by the processors time stamp counter.
+#
+#  Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BaseCpuTimerLib
+  FILE_GUID                      = F10B5B91-D15A-496C-B044-B5235721AA08
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = TimerLib|SEC PEI_CORE PEIM
+  MODULE_UNI_FILE                = BaseCpuTimerLib.uni
+
+[Sources]
+  CpuTimerLib.c
+  BaseCpuTimerLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  PcdLib
+  DebugLib
+
+[Pcd]
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuCoreCrystalClockFrequency  ## CONSUMES

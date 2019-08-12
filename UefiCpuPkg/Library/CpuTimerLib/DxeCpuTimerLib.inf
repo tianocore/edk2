@@ -1,0 +1,37 @@
+## @file
+#  DXE CPU Timer Library
+#
+#  Provides basic timer support using CPUID Leaf 0x15 XTAL frequency. The performance
+#  counter features are provided by the processors time stamp counter.
+#
+#  Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxeCpuTimerLib
+  FILE_GUID                      = F22CC0DA-E7DB-4E4D-ABE2-A608188233A2
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = TimerLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER SMM_CORE
+  CONSTRUCTOR                    = DxeCpuTimerLibConstructor
+  MODULE_UNI_FILE                = DxeCpuTimerLib.uni
+
+[Sources]
+  CpuTimerLib.c
+  DxeCpuTimerLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  PcdLib
+  DebugLib
+  HobLib
+
+[Pcd]
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuCoreCrystalClockFrequency  ## CONSUMES
