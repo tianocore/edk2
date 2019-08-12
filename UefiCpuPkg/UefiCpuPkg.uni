@@ -242,3 +242,13 @@
 #string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuKnownGoodStackSize_HELP  #language en-US "Size of good stack for an exception.\n"
                                                                                      "This PCD will only take into effect if PcdCpuStackGuard is enabled.\n"
 
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuCoreCrystalClockFrequency_PROMPT  #language en-US "Specifies CPUID Leaf 0x15 Time Stamp Counter and Nominal Core Crystal Clock Frequency."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuCoreCrystalClockFrequency_HELP  #language en-US "Specifies CPUID Leaf 0x15 Time Stamp Counter and Nominal Core Crystal Clock Frequency.<BR><BR>\n"
+                                                                                            "TSC Frequency = ECX (core crystal clock frequency) * EBX/EAX.<BR><BR>\n"
+                                                                                            "This PCD is the nominal frequency of the core crystal clock in Hz as is CPUID Leaf 0x15:ECX.<BR><BR>\n"
+                                                                                            "Default value is 24000000 for 6th and 7th generation Intel Core processors and Intel Xeon W Processor Family.<BR>\n"
+                                                                                            "25000000  -  Intel Xeon Processor Scalable Family with CPUID signature 06_55H(25MHz).<BR>\n"
+                                                                                            "24000000  -  6th and 7th generation Intel Core processors and Intel Xeon W Processor Family(24MHz).<BR>\n"
+                                                                                            "19200000  -  Intel Atom processors based on Goldmont Microarchitecture with CPUID signature 06_5CH(19.2MHz).<BR>\n"
+
