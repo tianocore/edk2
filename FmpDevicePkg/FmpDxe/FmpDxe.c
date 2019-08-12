@@ -11,6 +11,7 @@
 **/
 
 #include "FmpDxe.h"
+#include "VariableSupport.h"
 
 ///
 /// FILE_GUID from FmpDxe.inf.  When FmpDxe.inf is used in a platform, the
@@ -73,7 +74,13 @@ const FIRMWARE_MANAGEMENT_PRIVATE_DATA  mFirmwareManagementPrivateDataTemplate =
   NULL,                                        // VersionName
   TRUE,                                        // RuntimeVersionSupported
   NULL,                                        // FmpDeviceLockEvent
-  FALSE                                        // FmpDeviceLocked
+  FALSE,                                       // FmpDeviceLocked
+  NULL,                                        // FmpDeviceContext
+  NULL,                                        // VersionVariableName
+  NULL,                                        // LsvVariableName
+  NULL,                                        // LastAttemptStatusVariableName
+  NULL,                                        // LastAttemptVersionVariableName
+  NULL                                         // FmpStateVariableName
 };
 
 ///
@@ -142,7 +149,7 @@ FmpDxeProgress (
   the GUID value from the FmpDeviceLib. If the FmpDeviceLib does not provide
   a GUID value, then gEfiCallerIdGuid is returned.
 
-  @return  The ImageTypeId GUID
+  @retval  The ImageTypeId GUID
 
 **/
 EFI_GUID *
@@ -171,7 +178,7 @@ GetImageTypeIdGuid (
 /**
   Returns a pointer to the Null-terminated Unicode ImageIdName string.
 
-  @return  Null-terminated Unicode ImageIdName string.
+  @retval  Null-terminated Unicode ImageIdName string.
 
 **/
 CHAR16 *
@@ -188,12 +195,15 @@ GetImageTypeNameString (
   2. Check if we have a variable for lowest supported version (this will be updated with each capsule applied)
   3. Check Fixed at build PCD
 
-  @return  The largest value
+  @param[in] Private  Pointer to the private context structure for the
+                      Firmware Management Protocol instance.
+
+  @retval  The largest value
 
 **/
 UINT32
 GetLowestSupportedVersion (
-  VOID
+  FIRMWARE_MANAGEMENT_PRIVATE_DATA  *Private
   )
 {
   EFI_STATUS  Status;
@@ -230,7 +240,7 @@ GetLowestSupportedVersion (
   //
   // Check the lowest supported version UEFI variable for this device
   //
-  VariableLowestSupportedVersion = GetLowestSupportedVersionFromVariable();
+  VariableLowestSupportedVersion = GetLowestSupportedVersionFromVariable (Private);
   if (VariableLowestSupportedVersion > ReturnLsv) {
     ReturnLsv = VariableLowestSupportedVersion;
   }
@@ -266,6 +276,20 @@ PopulateDescriptor (
   Private->Descriptor.ImageIdName = GetImageTypeNameString();
 
   //
+  // Get the hardware instance from FmpDeviceLib
+  //
+  Status = FmpDeviceGetHardwareInstance (&Private->Descriptor.HardwareInstance);
+  if (Status == EFI_UNSUPPORTED) {
+    Private->Descriptor.HardwareInstance = 0;
+  }
+
+  //
+  // Generate UEFI Variable names used to store status information for this
+  // FMP instance.
+  //
+  GenerateFmpVariableNames (Private);
+
+  //
   // Get the version.  Some devices don't support getting the firmware version
   // at runtime.  If FmpDeviceLib does not support returning a version, then
   // it is stored in a UEFI variable.
@@ -273,7 +297,7 @@ PopulateDescriptor (
   Status = FmpDeviceGetVersion (&Private->Descriptor.Version);
   if (Status == EFI_UNSUPPORTED) {
     Private->RuntimeVersionSupported = FALSE;
-    Private->Descriptor.Version = GetVersionFromVariable();
+    Private->Descriptor.Version = GetVersionFromVariable (Private);
   } else if (EFI_ERROR (Status)) {
     //
     // Unexpected error.   Use default version.
@@ -309,7 +333,7 @@ PopulateDescriptor (
                                         );
   }
 
-  Private->Descriptor.LowestSupportedImageVersion = GetLowestSupportedVersion();
+  Private->Descriptor.LowestSupportedImageVersion = GetLowestSupportedVersion (Private);
 
   //
   // Get attributes from the FmpDeviceLib
@@ -341,16 +365,8 @@ PopulateDescriptor (
     Private->Descriptor.Size = 0;
   }
 
-  Private->Descriptor.LastAttemptVersion = GetLastAttemptVersionFromVariable ();
-  Private->Descriptor.LastAttemptStatus  = GetLastAttemptStatusFromVariable ();
-
-  //
-  // Get the hardware instance from FmpDeviceLib
-  //
-  Status = FmpDeviceGetHardwareInstance (&Private->Descriptor.HardwareInstance);
-  if (Status == EFI_UNSUPPORTED) {
-    Private->Descriptor.HardwareInstance = 0;
-  }
+  Private->Descriptor.LastAttemptVersion = GetLastAttemptVersionFromVariable (Private);
+  Private->Descriptor.LastAttemptStatus  = GetLastAttemptStatusFromVariable (Private);
 
   Private->DescriptorPopulated = TRUE;
 }
@@ -453,7 +469,7 @@ GetTheImageInfo (
   *ImageInfoSize = sizeof (EFI_FIRMWARE_IMAGE_DESCRIPTOR);
 
   //
-  // make sure the descriptor has already been loaded
+  // Make sure the descriptor has already been loaded or refreshed
   //
   PopulateDescriptor (Private);
 
@@ -696,7 +712,7 @@ CheckTheImage (
   FmpDeviceSetContext (Private->Handle, &Private->FmpDeviceContext);
 
   //
-  // make sure the descriptor has already been loaded
+  // Make sure the descriptor has already been loaded or refreshed
   //
   PopulateDescriptor (Private);
 
@@ -949,7 +965,15 @@ SetTheImage (
   Private = FIRMWARE_MANAGEMENT_PRIVATE_DATA_FROM_THIS (This);
   FmpDeviceSetContext (Private->Handle, &Private->FmpDeviceContext);
 
-  SetLastAttemptVersionInVariable (IncommingFwVersion); //set to 0 to clear any previous results.
+  //
+  // Make sure the descriptor has already been loaded or refreshed
+  //
+  PopulateDescriptor (Private);
+
+  //
+  // Set to 0 to clear any previous results.
+  //
+  SetLastAttemptVersionInVariable (Private, IncommingFwVersion);
 
   //
   // if we have locked the device, then skip the set operation.
@@ -988,7 +1012,7 @@ SetTheImage (
     //
     // Set to actual value
     //
-    SetLastAttemptVersionInVariable (IncommingFwVersion);
+    SetLastAttemptVersionInVariable (Private, IncommingFwVersion);
   }
 
 
@@ -1080,7 +1104,7 @@ SetTheImage (
   // Save LastAttemptStatus as error so that if SetImage never returns the error
   // state is recorded.
   //
-  SetLastAttemptStatusInVariable (LastAttemptStatus);
+  SetLastAttemptStatusInVariable (Private, LastAttemptStatus);
 
   //
   // Strip off all the headers so the device can process its firmware
@@ -1132,23 +1156,21 @@ SetTheImage (
   if (!Private->RuntimeVersionSupported) {
     Version = DEFAULT_VERSION;
     GetFmpPayloadHeaderVersion (FmpHeader, FmpPayloadSize, &Version);
-    SetVersionInVariable (Version);
+    SetVersionInVariable (Private, Version);
   }
 
   //
   // Update lowest supported variable
   //
-  {
-    LowestSupportedVersion = DEFAULT_LOWESTSUPPORTEDVERSION;
-    GetFmpPayloadHeaderLowestSupportedVersion (FmpHeader, FmpPayloadSize, &LowestSupportedVersion);
-    SetLowestSupportedVersionInVariable (LowestSupportedVersion);
-  }
+  LowestSupportedVersion = DEFAULT_LOWESTSUPPORTEDVERSION;
+  GetFmpPayloadHeaderLowestSupportedVersion (FmpHeader, FmpPayloadSize, &LowestSupportedVersion);
+  SetLowestSupportedVersionInVariable (Private, LowestSupportedVersion);
 
   LastAttemptStatus = LAST_ATTEMPT_STATUS_SUCCESS;
 
 cleanup:
   mProgressFunc = NULL;
-  SetLastAttemptStatusInVariable (LastAttemptStatus);
+  SetLastAttemptStatusInVariable (Private, LastAttemptStatus);
 
   if (Progress != NULL) {
     //
@@ -1359,13 +1381,18 @@ InstallFmpInstance (
     goto cleanup;
   }
 
+  //
+  // Make sure the descriptor has already been loaded or refreshed
+  //
+  PopulateDescriptor (Private);
+
   DEBUG ((DEBUG_ERROR, "InstallFmpInstance: Lock events\n"));
 
   if (IsLockFmpDeviceAtLockEventGuidRequired ()) {
     //
     // Lock all UEFI Variables used by this module.
     //
-    Status = LockAllFmpVariables ();
+    Status = LockAllFmpVariables (Private);
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "FmpDxe: Failed to lock variables.  Status = %r.\n", Status));
     } else {
@@ -1416,6 +1443,27 @@ cleanup:
     if (Private != NULL) {
       if (Private->FmpDeviceLockEvent != NULL) {
         gBS->CloseEvent (Private->FmpDeviceLockEvent);
+      }
+      if (Private->Descriptor.VersionName != NULL) {
+        FreePool (Private->Descriptor.VersionName);
+      }
+      if (Private->FmpDeviceContext != NULL) {
+        FmpDeviceSetContext (NULL, &Private->FmpDeviceContext);
+      }
+      if (Private->VersionVariableName != NULL) {
+        FreePool (Private->VersionVariableName);
+      }
+      if (Private->LsvVariableName != NULL) {
+        FreePool (Private->LsvVariableName);
+      }
+      if (Private->LastAttemptStatusVariableName != NULL) {
+        FreePool (Private->LastAttemptStatusVariableName);
+      }
+      if (Private->LastAttemptVersionVariableName != NULL) {
+        FreePool (Private->LastAttemptVersionVariableName);
+      }
+      if (Private->FmpStateVariableName != NULL) {
+        FreePool (Private->FmpStateVariableName);
       }
       FreePool (Private);
     }
@@ -1473,8 +1521,27 @@ UninstallFmpInstance (
     return Status;
   }
 
-  FmpDeviceSetContext (NULL, &Private->FmpDeviceContext);
-
+  if (Private->Descriptor.VersionName != NULL) {
+    FreePool (Private->Descriptor.VersionName);
+  }
+  if (Private->FmpDeviceContext != NULL) {
+    FmpDeviceSetContext (NULL, &Private->FmpDeviceContext);
+  }
+  if (Private->VersionVariableName != NULL) {
+    FreePool (Private->VersionVariableName);
+  }
+  if (Private->LsvVariableName != NULL) {
+    FreePool (Private->LsvVariableName);
+  }
+  if (Private->LastAttemptStatusVariableName != NULL) {
+    FreePool (Private->LastAttemptStatusVariableName);
+  }
+  if (Private->LastAttemptVersionVariableName != NULL) {
+    FreePool (Private->LastAttemptVersionVariableName);
+  }
+  if (Private->FmpStateVariableName != NULL) {
+    FreePool (Private->FmpStateVariableName);
+  }
   FreePool (Private);
 
   return EFI_SUCCESS;
