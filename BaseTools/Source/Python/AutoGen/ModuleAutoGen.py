@@ -1113,6 +1113,21 @@ class ModuleAutoGen(AutoGen):
     def IncludePathLength(self):
         return sum(len(inc)+1 for inc in self.IncludePathList)
 
+    ## Get the list of include paths from the packages
+    #
+    #   @IncludesList     list             The list path
+    #
+    @cached_property
+    def PackageIncludePathList(self):
+        IncludesList = []
+        for Package in self.Module.Packages:
+            PackageDir = mws.join(self.WorkspaceDir, Package.MetaFile.Dir)
+            IncludesList = Package.Includes
+            if Package._PrivateIncludes:
+                if not self.MetaFile.Path.startswith(PackageDir):
+                    IncludesList = list(set(Package.Includes).difference(set(Package._PrivateIncludes)))
+        return IncludesList
+
     ## Get HII EX PCDs which maybe used by VFR
     #
     #  efivarstore used by VFR may relate with HII EX PCDs
