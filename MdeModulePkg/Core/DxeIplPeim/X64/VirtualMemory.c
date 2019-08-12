@@ -764,7 +764,7 @@ CreateIdentityMappingPageTables (
 
   for ( IndexOfPml5Entries = 0
       ; IndexOfPml5Entries < NumberOfPml5EntriesNeeded
-      ; IndexOfPml5Entries++, PageMapLevel5Entry++) {
+      ; IndexOfPml5Entries++) {
     //
     // Each PML5 entry points to a page of PML4 entires.
     // So lets allocate space for them and fill them in in the IndexOfPml4Entries loop.
@@ -780,6 +780,7 @@ CreateIdentityMappingPageTables (
       PageMapLevel5Entry->Uint64 = (UINT64) (UINTN) PageMapLevel4Entry | AddressEncMask;
       PageMapLevel5Entry->Bits.ReadWrite = 1;
       PageMapLevel5Entry->Bits.Present   = 1;
+      PageMapLevel5Entry++;
     }
 
     for ( IndexOfPml4Entries = 0
