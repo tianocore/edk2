@@ -18,6 +18,7 @@
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiLib.h>
 #include <Library/FmpAuthenticationLib.h>
@@ -26,9 +27,9 @@
 #include <Library/CapsuleUpdatePolicyLib.h>
 #include <Protocol/FirmwareManagement.h>
 #include <Protocol/FirmwareManagementProgress.h>
+#include <Protocol/VariableLock.h>
 #include <Guid/SystemResourceTable.h>
 #include <Guid/EventGroup.h>
-#include "VariableSupport.h"
 
 #define VERSION_STRING_NOT_SUPPORTED  L"VERSION STRING NOT SUPPORTED"
 #define VERSION_STRING_NOT_AVAILABLE  L"VERSION STRING NOT AVAILABLE"
@@ -57,6 +58,11 @@ typedef struct {
   //
   BOOLEAN                                      FmpDeviceLocked;
   VOID                                         *FmpDeviceContext;
+  CHAR16                                       *VersionVariableName;
+  CHAR16                                       *LsvVariableName;
+  CHAR16                                       *LastAttemptStatusVariableName;
+  CHAR16                                       *LastAttemptVersionVariableName;
+  CHAR16                                       *FmpStateVariableName;
 } FIRMWARE_MANAGEMENT_PRIVATE_DATA;
 
 ///
