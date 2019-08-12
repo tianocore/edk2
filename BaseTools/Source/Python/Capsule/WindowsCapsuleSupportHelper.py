@@ -3,7 +3,11 @@
 # Windows Firmware Update Platform spec.
 # Creates INF, Cat, and then signs it
 #
+# To install run pip install --upgrade edk2-pytool-library
+# edk2-pytool-library-0.9.1 is required.
+#
 # Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 
@@ -12,14 +16,12 @@ import re
 import datetime
 import os
 import logging
-from MuEnvironment import PluginManager
-from MuPythonLibrary.Uefi.Capsule.CatGenerator import *
-from MuPythonLibrary.Uefi.Capsule.InfGenerator import *
-from MuPythonLibrary.UtilityFunctions import CatalogSignWithSignTool
-from MuPythonLibrary.Windows.VsWhereUtilities import FindToolInWinSdk
+from edk2toollib.windows.capsule.cat_generator import CatGenerator
+from edk2toollib.windows.capsule.inf_generator import InfGenerator
+from edk2toollib.utility_functions import CatalogSignWithSignTool
+from edk2toollib.windows.locate_tools import FindToolInWinSdk
 
-
-class WindowsCapsuleSupportHelper(PluginManager.IUefiHelperPlugin):
+class WindowsCapsuleSupportHelper(object):
 
   def RegisterHelpers(self, obj):
       fp = os.path.abspath(__file__)
