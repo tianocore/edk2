@@ -906,8 +906,14 @@ cleanlib:
                                     self._AutoGenObject.IncludePathList + self._AutoGenObject.BuildOptionIncPathList
                                     )
 
+        # Get a set of unique package includes from MetaFile
+        parentMetaFileIncludes = set()
+        for aInclude in self._AutoGenObject.PackageIncludePathList:
+            aIncludeName = str(aInclude)
+            parentMetaFileIncludes.add(aIncludeName.lower())
+
         # Check if header files are listed in metafile
-        # Get a list of unique module header source files from MetaFile
+        # Get a set of unique module header source files from MetaFile
         headerFilesInMetaFileSet = set()
         for aFile in self._AutoGenObject.SourceFileList:
             aFileName = str(aFile)
@@ -915,24 +921,37 @@ cleanlib:
                 continue
             headerFilesInMetaFileSet.add(aFileName.lower())
 
-        # Get a list of unique module autogen files
+        # Get a set of unique module autogen files
         localAutoGenFileSet = set()
         for aFile in self._AutoGenObject.AutoGenFileList:
             localAutoGenFileSet.add(str(aFile).lower())
 
-        # Get a list of unique module dependency header files
+        # Get a set of unique module dependency header files
         # Exclude autogen files and files not in the source directory
+        # and files that are under the package include list
         headerFileDependencySet = set()
         localSourceDir = str(self._AutoGenObject.SourceDir).lower()
         for Dependency in FileDependencyDict.values():
             for aFile in Dependency:
                 aFileName = str(aFile).lower()
+                # Exclude non-header files
                 if not aFileName.endswith('.h'):
                     continue
+                # Exclude autogen files
                 if aFileName in localAutoGenFileSet:
                     continue
+                # Exclude include out of local scope
                 if localSourceDir not in aFileName:
                     continue
+                # Exclude files covered by package includes
+                pathNeeded = True
+                for aIncludePath in parentMetaFileIncludes:
+                    if aIncludePath in aFileName:
+                        pathNeeded = False
+                        break
+                if not pathNeeded:
+                    continue
+                # Keep the file to be checked
                 headerFileDependencySet.add(aFileName)
 
         # Ensure that gModuleBuildTracking has been initialized per architecture
