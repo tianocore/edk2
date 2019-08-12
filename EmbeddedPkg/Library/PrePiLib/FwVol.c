@@ -858,8 +858,8 @@ FfsAnyFvFindFirstFile (
 /**
   Get Fv image from the FV type file, then add FV & FV2 Hob.
 
-  @param FileHandle  File handle of a Fv type file.
-
+  @param FvFileHandle        File handle of a Fv type file.
+  @param ParentVolumeHandle  Parent volume handle, for filling out FvName field in FV2 Hob
 
   @retval EFI_NOT_FOUND  FV image can't be found.
   @retval EFI_SUCCESS    Successfully to process it.
@@ -868,12 +868,14 @@ FfsAnyFvFindFirstFile (
 EFI_STATUS
 EFIAPI
 FfsProcessFvFile (
-  IN  EFI_PEI_FILE_HANDLE  FvFileHandle
+  IN  EFI_PEI_FILE_HANDLE  FvFileHandle,
+  IN EFI_PEI_FV_HANDLE     ParentVolumeHandle
   )
 {
   EFI_STATUS            Status;
   EFI_PEI_FV_HANDLE     FvImageHandle;
   EFI_FV_INFO           FvImageInfo;
+  EFI_FV_INFO           ParentVolumeInfo;
   UINT32                FvAlignment;
   VOID                  *FvBuffer;
   EFI_PEI_HOB_POINTERS  Hob;
@@ -945,6 +947,9 @@ FfsProcessFvFile (
   //
   BuildFvHob ((EFI_PHYSICAL_ADDRESS)(UINTN)FvImageInfo.FvStart, FvImageInfo.FvSize);
 
+  Status = FfsGetVolumeInfo (ParentVolumeHandle, &ParentVolumeInfo);
+  ASSERT_EFI_ERROR (Status);
+
   //
   // Makes the encapsulated volume show up in DXE phase to skip processing of
   // encapsulated file again.
@@ -952,7 +957,7 @@ FfsProcessFvFile (
   BuildFv2Hob (
     (EFI_PHYSICAL_ADDRESS)(UINTN)FvImageInfo.FvStart,
     FvImageInfo.FvSize,
-    &FvImageInfo.FvName,
+    &ParentVolumeInfo.FvName,
     &(((EFI_FFS_FILE_HEADER *)FvFileHandle)->Name)
     );
 

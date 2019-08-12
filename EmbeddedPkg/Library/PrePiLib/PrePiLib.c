@@ -231,7 +231,7 @@ DecompressFirstFv (
 
   Status = FfsAnyFvFindFirstFile (EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE, &VolumeHandle, &FileHandle);
   if (!EFI_ERROR (Status)) {
-    Status = FfsProcessFvFile (FileHandle);
+    Status = FfsProcessFvFile (FileHandle, VolumeHandle);
   }
 
   return Status;

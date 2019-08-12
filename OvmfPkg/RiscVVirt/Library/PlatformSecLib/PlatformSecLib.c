@@ -155,7 +155,7 @@ SecPEIlessStartup (
              );
   ASSERT_EFI_ERROR (Status);
 
-  Status = FfsProcessFvFile (FileHandle);
+  Status = FfsProcessFvFile (FileHandle, BootFirmwareVolume);
   ASSERT_EFI_ERROR (Status);
 
   //
