@@ -1955,6 +1955,7 @@ callout_tag_entry(ScanEnv* env, regex_t* reg, UChar* name, UChar* name_end,
 
   ext = onig_get_regex_ext(reg);
   CHECK_NULL_RETURN_MEMERR(ext);
+  CHECK_NULL_RETURN_MEMERR(ext->tag_table);
   r = callout_tag_entry_raw(env, ext->tag_table, name, name_end, entry_val);
 
   e = onig_reg_callout_list_at(reg, (int )entry_val);
@@ -3277,6 +3278,7 @@ node_new_str_raw_char(UChar c)
 
   p[0] = c;
   node = node_new_str_raw(p, p + 1);
+  CHECK_NULL_RETURN(node);
 
   /* clear buf tail */
   for (i = 1; i < NODE_STRING_BUF_SIZE; i++)
