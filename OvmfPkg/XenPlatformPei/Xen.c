@@ -199,6 +199,13 @@ XenDetect (
   return FALSE;
 }
 
+BOOLEAN
+XenHvmloaderDetected (
+  VOID
+  )
+{
+  return (mXenHvmloaderInfo != NULL);
+}
 
 VOID
 XenPublishRamRegions (
