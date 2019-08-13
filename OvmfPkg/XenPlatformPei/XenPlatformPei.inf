@@ -84,6 +84,9 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdOptionRomImageVerificationPolicy
   gUefiCpuPkgTokenSpaceGuid.PcdCpuLocalApicBaseAddress
 
+  gUefiOvmfPkgTokenSpaceGuid.PcdXenPvhStartOfDayStructPtr
+  gUefiOvmfPkgTokenSpaceGuid.PcdXenPvhStartOfDayStructPtrSize
+
 [FixedPcd]
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
 

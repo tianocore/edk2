@@ -25,6 +25,10 @@ typedef struct {
   /// Hypervisor minor version.
   ///
   UINT16 VersionMinor;
+  ///
+  /// Pointer to the RSDP found in the hvm_start_info provided to a PVH guest
+  ///
+  VOID *RsdpPvh;
 } EFI_XEN_INFO;
 
 extern EFI_GUID gEfiXenInfoGuid;
