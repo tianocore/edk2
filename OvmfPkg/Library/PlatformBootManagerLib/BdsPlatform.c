@@ -398,7 +398,8 @@ PlatformBootManagerBeforeConsole (
   //
   EfiBootManagerDispatchDeferredImages ();
 
-  PlatformInitializeConsole (gPlatformConsole);
+  PlatformInitializeConsole (
+    XenDetected() ? gXenPlatformConsole : gPlatformConsole);
   PcdStatus = PcdSet16S (PcdPlatformBootTimeOut,
                 GetFrontPageTimeoutFromQemu ());
   ASSERT_RETURN_ERROR (PcdStatus);

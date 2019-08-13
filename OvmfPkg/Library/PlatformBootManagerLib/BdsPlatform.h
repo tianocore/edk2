@@ -165,6 +165,7 @@ typedef struct {
 #define CONSOLE_IN  BIT1
 #define STD_ERROR   BIT2
 extern PLATFORM_CONSOLE_CONNECT_ENTRY  gPlatformConsole[];
+extern PLATFORM_CONSOLE_CONNECT_ENTRY  gXenPlatformConsole[];
 
 //
 // Platform BDS Functions
