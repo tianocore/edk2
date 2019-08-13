@@ -19,6 +19,7 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
+#include <Library/XenPlatformLib.h>
 
 #include <IndustryStandard/Acpi.h>
 
@@ -50,11 +51,6 @@ QemuInstallAcpiTable (
   IN   VOID                          *AcpiTableBuffer,
   IN   UINTN                         AcpiTableBufferSize,
   OUT  UINTN                         *TableKey
-  );
-
-BOOLEAN
-XenDetected (
-  VOID
   );
 
 EFI_STATUS

@@ -44,13 +44,13 @@
   DebugLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
-  HobLib
   QemuFwCfgLib
   QemuFwCfgS3Lib
   MemoryAllocationLib
   BaseLib
   DxeServicesTableLib
   OrderedCollectionLib
+  XenPlatformLib
 
 [Protocols]
   gEfiAcpiTableProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
@@ -58,7 +58,6 @@
   gEfiPciIoProtocolGuid                         # PROTOCOL SOMETIMES_CONSUMED
 
 [Guids]
-  gEfiXenInfoGuid
   gRootBridgesConnectedEventGroupGuid
 
 [Pcd]
