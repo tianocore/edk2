@@ -72,14 +72,11 @@ XenGetE820Map (
 /**
   Connects to the Hypervisor.
 
-  @param  XenLeaf     CPUID index used to connect.
-
   @return EFI_STATUS
 
 **/
 EFI_STATUS
 XenConnect (
-  UINT32 XenLeaf
   )
 {
   UINT32 Index;
@@ -91,7 +88,13 @@ XenConnect (
   UINT32 *PVHResetVectorData;
   RETURN_STATUS Status;
 
-  AsmCpuid (XenLeaf + 2, &TransferPages, &TransferReg, NULL, NULL);
+  ASSERT (mXenLeaf != 0);
+
+  //
+  // Prepare HyperPages to be able to make hypercalls
+  //
+
+  AsmCpuid (mXenLeaf + 2, &TransferPages, &TransferReg, NULL, NULL);
   mXenInfo.HyperPages = AllocatePages (TransferPages);
   if (!mXenInfo.HyperPages) {
     return EFI_OUT_OF_RESOURCES;
@@ -103,7 +106,11 @@ XenConnect (
                    (Index << EFI_PAGE_SHIFT) + Index);
   }
 
-  AsmCpuid (XenLeaf + 1, &XenVersion, NULL, NULL, NULL);
+  //
+  // Find out the Xen version
+  //
+
+  AsmCpuid (mXenLeaf + 1, &XenVersion, NULL, NULL, NULL);
   DEBUG ((DEBUG_ERROR, "Detected Xen version %d.%d\n",
           XenVersion >> 16, XenVersion & 0xFFFF));
   mXenInfo.VersionMajor = (UINT16)(XenVersion >> 16);
@@ -261,12 +268,6 @@ InitializeXen (
   )
 {
   RETURN_STATUS PcdStatus;
-
-  if (mXenLeaf == 0) {
-    return EFI_NOT_FOUND;
-  }
-
-  XenConnect (mXenLeaf);
 
   //
   // Reserve away HVMLOADER reserved memory [0xFC000000,0xFD000000).

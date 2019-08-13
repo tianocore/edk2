@@ -416,6 +416,8 @@ InitializeXenPlatform (
     CpuDeadLoop ();
   }
 
+  XenConnect ();
+
   BootModeInitialization ();
   AddressWidthInitialization ();
 
