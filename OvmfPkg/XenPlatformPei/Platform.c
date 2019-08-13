@@ -283,6 +283,12 @@ MiscInitialization (
       AcpiEnBit  = ICH9_ACPI_CNTL_ACPI_EN;
       break;
     default:
+      if (XenPvhDetected ()) {
+        //
+        // There is no PCI bus in this case
+        //
+        return;
+      }
       DEBUG ((DEBUG_ERROR, "%a: Unknown Host Bridge Device ID: 0x%04x\n",
         __FUNCTION__, mHostBridgeDevId));
       ASSERT (FALSE);
