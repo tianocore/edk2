@@ -96,6 +96,45 @@ Q35TsegMbytesInitialization (
   mQ35TsegMbytes = ExtendedTsegMbytes;
 }
 
+STATIC
+UINT64
+GetHighestSystemMemoryAddress (
+  BOOLEAN       Below4gb
+  )
+{
+  EFI_E820_ENTRY64    *E820Map;
+  UINT32              E820EntriesCount;
+  EFI_E820_ENTRY64    *Entry;
+  EFI_STATUS          Status;
+  UINT32              Loop;
+  UINT64              HighestAddress;
+  UINT64              EntryEnd;
+
+  HighestAddress = 0;
+
+  Status = XenGetE820Map (&E820Map, &E820EntriesCount);
+  ASSERT_EFI_ERROR (Status);
+
+  for (Loop = 0; Loop < E820EntriesCount; Loop++) {
+    Entry = E820Map + Loop;
+    EntryEnd = Entry->BaseAddr + Entry->Length;
+
+    if (Entry->Type == EfiAcpiAddressRangeMemory &&
+        EntryEnd > HighestAddress) {
+
+      if (Below4gb && (EntryEnd <= BASE_4GB)) {
+        HighestAddress = EntryEnd;
+      } else if (!Below4gb && (EntryEnd >= BASE_4GB)) {
+        HighestAddress = EntryEnd;
+      }
+    }
+  }
+
+  //
+  // Round down the end address.
+  //
+  return HighestAddress & ~(UINT64)EFI_PAGE_MASK;
+}
 
 UINT32
 GetSystemMemorySizeBelow4gb (
@@ -104,6 +143,19 @@ GetSystemMemorySizeBelow4gb (
 {
   UINT8 Cmos0x34;
   UINT8 Cmos0x35;
+
+  //
+  // In PVH case, there is no CMOS, we have to calculate the memory size
+  // from parsing the E820
+  //
+  if (XenPvhDetected ()) {
+    UINT64  HighestAddress;
+
+    HighestAddress = GetHighestSystemMemoryAddress (TRUE);
+    ASSERT (HighestAddress > 0 && HighestAddress <= BASE_4GB);
+
+    return HighestAddress;
+  }
 
   //
   // CMOS 0x34/0x35 specifies the system memory above 16 MB.
@@ -128,6 +180,23 @@ GetSystemMemorySizeAbove4gb (
 {
   UINT32 Size;
   UINTN  CmosIndex;
+
+  //
+  // In PVH case, there is no CMOS, we have to calculate the memory size
+  // from parsing the E820
+  //
+  if (XenPvhDetected ()) {
+    UINT64  HighestAddress;
+
+    HighestAddress = GetHighestSystemMemoryAddress (FALSE);
+    ASSERT (HighestAddress == 0 || HighestAddress >= BASE_4GB);
+
+    if (HighestAddress >= BASE_4GB) {
+      HighestAddress -= BASE_4GB;
+    }
+
+    return HighestAddress;
+  }
 
   //
   // CMOS 0x5b-0x5d specifies the system memory above 4GB MB.
