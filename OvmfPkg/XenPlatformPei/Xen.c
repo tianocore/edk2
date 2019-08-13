@@ -26,6 +26,7 @@
 #include <Library/ResourcePublicationLib.h>
 #include <Library/MtrrLib.h>
 #include <IndustryStandard/Xen/arch-x86/hvm/start_info.h>
+#include <Library/XenHypercallLib.h>
 
 #include "Platform.h"
 #include "Xen.h"
@@ -88,6 +89,7 @@ XenConnect (
   EFI_XEN_OVMF_INFO *Info;
   CHAR8 Sig[sizeof (Info->Signature) + 1];
   UINT32 *PVHResetVectorData;
+  RETURN_STATUS Status;
 
   AsmCpuid (XenLeaf + 2, &TransferPages, &TransferReg, NULL, NULL);
   mXenInfo.HyperPages = AllocatePages (TransferPages);
@@ -151,6 +153,13 @@ XenConnect (
     &mXenInfo,
     sizeof(mXenInfo)
     );
+
+  //
+  // Initialize the XenHypercall library, now that the XenInfo HOB is
+  // available
+  //
+  Status = XenHypercallLibInit ();
+  ASSERT_RETURN_ERROR (Status);
 
   return EFI_SUCCESS;
 }

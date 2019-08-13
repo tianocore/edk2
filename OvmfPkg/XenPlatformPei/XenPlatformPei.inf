@@ -59,6 +59,7 @@
   MtrrLib
   MemEncryptSevLib
   PcdLib
+  XenHypercallLib
 
 [Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfPeiMemFvBase
