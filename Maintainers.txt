@@ -385,6 +385,7 @@ F: OvmfPkg/XenIoPciDxe/
 F: OvmfPkg/XenPlatformPei/
 F: OvmfPkg/XenPvBlkDxe/
 F: OvmfPkg/XenResetVector/
+F: OvmfPkg/XenTimerDxe/
 R: Anthony Perard <anthony.perard@citrix.com>
 R: Julien Grall <julien.grall@arm.com>
 
