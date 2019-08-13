@@ -25,14 +25,26 @@ XenGetInfoHOB (
   VOID
   )
 {
-  EFI_HOB_GUID_TYPE  *GuidHob;
+  EFI_HOB_GUID_TYPE   *GuidHob;
+  STATIC BOOLEAN      Cached = FALSE;
+  STATIC EFI_XEN_INFO *XenInfo;
+
+  //
+  // Return the cached result for the benefit of XenDetected that can be
+  // called many times.
+  //
+  if (Cached) {
+    return XenInfo;
+  }
 
   GuidHob = GetFirstGuidHob (&gEfiXenInfoGuid);
   if (GuidHob == NULL) {
-    return NULL;
+    XenInfo = NULL;
+  } else {
+    XenInfo = (EFI_XEN_INFO *) GET_GUID_HOB_DATA (GuidHob);
   }
-
-  return (EFI_XEN_INFO *) GET_GUID_HOB_DATA (GuidHob);
+  Cached = TRUE;
+  return XenInfo;
 }
 
 /**
