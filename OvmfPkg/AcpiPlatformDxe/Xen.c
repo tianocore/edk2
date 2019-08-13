@@ -36,9 +36,26 @@ GetXenAcpiRsdp (
   EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER   *RsdpStructurePtr;
   UINT8                                          *XenAcpiPtr;
   UINT8                                          Sum;
+  EFI_XEN_INFO                                   *XenInfo;
 
   //
   // Detect the RSDP structure
+  //
+
+  //
+  // First look for PVH one
+  //
+  XenInfo = XenGetInfoHOB ();
+  ASSERT (XenInfo != NULL);
+  if (XenInfo->RsdpPvh != NULL) {
+    DEBUG ((DEBUG_INFO, "%a: Use ACPI RSDP table at 0x%p\n",
+      gEfiCallerBaseName, XenInfo->RsdpPvh));
+    *RsdpPtr = XenInfo->RsdpPvh;
+    return EFI_SUCCESS;
+  }
+
+  //
+  // Otherwise, look for the HVM one
   //
   for (XenAcpiPtr = (UINT8*)(UINTN) XEN_ACPI_PHYSICAL_ADDRESS;
        XenAcpiPtr < (UINT8*)(UINTN) XEN_BIOS_PHYSICAL_END;
