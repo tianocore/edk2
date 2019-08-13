@@ -372,6 +372,7 @@ F: OvmfPkg/Library/PlatformBootManagerLib/BdsPlatform.c
 F: OvmfPkg/Library/XenConsoleSerialPortLib/
 F: OvmfPkg/Library/XenHypercallLib/
 F: OvmfPkg/Library/XenIoMmioLib/
+F: OvmfPkg/OvmfXen.*
 F: OvmfPkg/PlatformPei/MemDetect.c
 F: OvmfPkg/PlatformPei/Platform.*
 F: OvmfPkg/PlatformPei/Xen.*
