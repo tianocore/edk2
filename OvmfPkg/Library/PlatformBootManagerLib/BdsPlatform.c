@@ -7,11 +7,11 @@
 **/
 
 #include "BdsPlatform.h"
-#include <Guid/XenInfo.h>
 #include <Guid/RootBridgesConnectedEventGroup.h>
 #include <Protocol/FirmwareVolume2.h>
 #include <Library/PlatformBmPrintScLib.h>
 #include <Library/Tcg2PhysicalPresenceLib.h>
+#include <Library/XenPlatformLib.h>
 
 
 //
@@ -1223,38 +1223,6 @@ PciAcpiInitialization (
   // Set ACPI SCI_EN bit in PMCNTRL
   //
   IoOr16 ((PciRead32 (Pmba) & ~BIT0) + 4, BIT0);
-}
-
-/**
-  This function detects if OVMF is running on Xen.
-
-**/
-STATIC
-BOOLEAN
-XenDetected (
-  VOID
-  )
-{
-  EFI_HOB_GUID_TYPE         *GuidHob;
-  STATIC INTN               FoundHob = -1;
-
-  if (FoundHob == 0) {
-    return FALSE;
-  } else if (FoundHob == 1) {
-    return TRUE;
-  }
-
-  //
-  // See if a XenInfo HOB is available
-  //
-  GuidHob = GetFirstGuidHob (&gEfiXenInfoGuid);
-  if (GuidHob == NULL) {
-    FoundHob = 0;
-    return FALSE;
-  }
-
-  FoundHob = 1;
-  return TRUE;
 }
 
 EFI_STATUS
