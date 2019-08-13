@@ -18,10 +18,6 @@ typedef struct {
   ///
   VOID *HyperPages;
   ///
-  /// Location of the hvm_info page.
-  ///
-  VOID *HvmInfo;
-  ///
   /// Hypervisor major version.
   ///
   UINT16 VersionMajor;
