@@ -307,7 +307,7 @@ INF  MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf
 INF  MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
 INF  MdeModulePkg/Universal/ResetSystemRuntimeDxe/ResetSystemRuntimeDxe.inf
 INF  MdeModulePkg/Universal/Metronome/Metronome.inf
-INF  PcAtChipsetPkg/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf
+INF  EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
 
 INF  OvmfPkg/XenIoPvhDxe/XenIoPvhDxe.inf
 INF  OvmfPkg/XenIoPciDxe/XenIoPciDxe.inf
