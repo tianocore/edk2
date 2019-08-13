@@ -27,6 +27,7 @@
 #include <Library/MtrrLib.h>
 #include <IndustryStandard/Xen/arch-x86/hvm/start_info.h>
 #include <Library/XenHypercallLib.h>
+#include <IndustryStandard/Xen/memory.h>
 
 #include "Platform.h"
 #include "Xen.h"
@@ -40,6 +41,8 @@ EFI_XEN_INFO mXenInfo;
 // Only the E820 table is used by OVMF.
 //
 EFI_XEN_OVMF_INFO *mXenHvmloaderInfo;
+STATIC EFI_E820_ENTRY64 mE820Entries[128];
+STATIC UINT32 mE820EntriesCount;
 
 /**
   Returns E820 map provided by Xen
@@ -55,6 +58,12 @@ XenGetE820Map (
   UINT32 *Count
   )
 {
+  INTN ReturnCode;
+  xen_memory_map_t Parameters;
+  UINTN LoopIndex;
+  UINTN Index;
+  EFI_E820_ENTRY64 TmpEntry;
+
   //
   // Get E820 produced by hvmloader
   //
@@ -66,7 +75,42 @@ XenGetE820Map (
     return EFI_SUCCESS;
   }
 
-  return EFI_NOT_FOUND;
+  //
+  // Otherwise, get the E820 table from the Xen hypervisor
+  //
+
+  if (mE820EntriesCount > 0) {
+    *Entries = mE820Entries;
+    *Count = mE820EntriesCount;
+    return EFI_SUCCESS;
+  }
+
+  Parameters.nr_entries = 128;
+  set_xen_guest_handle (Parameters.buffer, mE820Entries);
+
+  // Returns a errno
+  ReturnCode = XenHypercallMemoryOp (XENMEM_memory_map, &Parameters);
+  ASSERT (ReturnCode == 0);
+
+  mE820EntriesCount = Parameters.nr_entries;
+
+  //
+  // Sort E820 entries
+  //
+  for (LoopIndex = 1; LoopIndex < mE820EntriesCount; LoopIndex++) {
+    for (Index = LoopIndex; Index < mE820EntriesCount; Index++) {
+      if (mE820Entries[Index - 1].BaseAddr > mE820Entries[Index].BaseAddr) {
+        TmpEntry = mE820Entries[Index];
+        mE820Entries[Index] = mE820Entries[Index - 1];
+        mE820Entries[Index - 1] = TmpEntry;
+      }
+    }
+  }
+
+  *Count = mE820EntriesCount;
+  *Entries = mE820Entries;
+
+  return EFI_SUCCESS;
 }
 
 /**
