@@ -53,18 +53,18 @@ XenGetE820Map (
   UINT32 *Count
   )
 {
-  EFI_XEN_OVMF_INFO *Info =
-    (EFI_XEN_OVMF_INFO *)(UINTN) OVMF_INFO_PHYSICAL_ADDRESS;
+  //
+  // Get E820 produced by hvmloader
+  //
+  if (mXenHvmloaderInfo != NULL) {
+    ASSERT (mXenHvmloaderInfo->E820 < MAX_ADDRESS);
+    *Entries = (EFI_E820_ENTRY64 *)(UINTN) mXenHvmloaderInfo->E820;
+    *Count = mXenHvmloaderInfo->E820EntriesCount;
 
-  if (AsciiStrCmp ((CHAR8 *) Info->Signature, "XenHVMOVMF")) {
-    return EFI_NOT_FOUND;
+    return EFI_SUCCESS;
   }
 
-  ASSERT (Info->E820 < MAX_ADDRESS);
-  *Entries = (EFI_E820_ENTRY64 *)(UINTN) Info->E820;
-  *Count = Info->E820EntriesCount;
-
-  return EFI_SUCCESS;
+  return EFI_NOT_FOUND;
 }
 
 /**
