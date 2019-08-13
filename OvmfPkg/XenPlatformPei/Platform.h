@@ -45,6 +45,13 @@ AddReservedMemoryBaseSizeHob (
   );
 
 VOID
+AddReservedMemoryRangeHob (
+  EFI_PHYSICAL_ADDRESS        MemoryBase,
+  EFI_PHYSICAL_ADDRESS        MemoryLimit,
+  BOOLEAN                     Cacheable
+  );
+
+VOID
 AddressWidthInitialization (
   VOID
   );
@@ -112,6 +119,12 @@ AmdSevInitialize (
 VOID
 XenPublishRamRegions (
   VOID
+  );
+
+EFI_STATUS
+XenGetE820Map (
+  EFI_E820_ENTRY64 **Entries,
+  UINT32 *Count
   );
 
 extern EFI_BOOT_MODE mBootMode;

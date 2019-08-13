@@ -103,6 +103,17 @@ AddReservedMemoryBaseSizeHob (
 }
 
 VOID
+AddReservedMemoryRangeHob (
+  EFI_PHYSICAL_ADDRESS        MemoryBase,
+  EFI_PHYSICAL_ADDRESS        MemoryLimit,
+  BOOLEAN                     Cacheable
+  )
+{
+  AddReservedMemoryBaseSizeHob (MemoryBase,
+    (UINT64)(MemoryLimit - MemoryBase), Cacheable);
+}
+
+VOID
 AddIoMemoryRangeHob (
   EFI_PHYSICAL_ADDRESS        MemoryBase,
   EFI_PHYSICAL_ADDRESS        MemoryLimit

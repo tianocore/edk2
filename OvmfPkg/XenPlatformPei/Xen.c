@@ -276,9 +276,14 @@ XenPublishRamRegions (
   VOID
   )
 {
-  EFI_E820_ENTRY64  *E820Map;
-  UINT32            E820EntriesCount;
-  EFI_STATUS        Status;
+  EFI_E820_ENTRY64      *E820Map;
+  UINT32                E820EntriesCount;
+  EFI_STATUS            Status;
+  EFI_E820_ENTRY64      *Entry;
+  UINTN                 Index;
+  UINT64                LapicBase;
+  UINT64                LapicEnd;
+
 
   DEBUG ((DEBUG_INFO, "Using memory map provided by Xen\n"));
 
@@ -287,26 +292,60 @@ XenPublishRamRegions (
   //
   E820EntriesCount = 0;
   Status = XenGetE820Map (&E820Map, &E820EntriesCount);
-
   ASSERT_EFI_ERROR (Status);
 
-  if (E820EntriesCount > 0) {
-    EFI_E820_ENTRY64 *Entry;
-    UINT32 Loop;
+  LapicBase = PcdGet32 (PcdCpuLocalApicBaseAddress);
+  LapicEnd = LapicBase + SIZE_1MB;
+  AddIoMemoryRangeHob (LapicBase, LapicEnd);
 
-    for (Loop = 0; Loop < E820EntriesCount; Loop++) {
-      Entry = E820Map + Loop;
+  for (Index = 0; Index < E820EntriesCount; Index++) {
+    UINT64 Base;
+    UINT64 End;
+    UINT64 ReservedBase;
+    UINT64 ReservedEnd;
+
+    Entry = &E820Map[Index];
+
+    //
+    // Round up the start address, and round down the end address.
+    //
+    Base = ALIGN_VALUE (Entry->BaseAddr, (UINT64)EFI_PAGE_SIZE);
+    End = (Entry->BaseAddr + Entry->Length) & ~(UINT64)EFI_PAGE_MASK;
+
+    switch (Entry->Type) {
+    case EfiAcpiAddressRangeMemory:
+      AddMemoryRangeHob (Base, End);
+      break;
+    case EfiAcpiAddressRangeACPI:
+      AddReservedMemoryRangeHob (Base, End, FALSE);
+      break;
+    case EfiAcpiAddressRangeReserved:
+      //
+      // hvmloader marks a range that overlaps with the local APIC memory
+      // mapped region as reserved, but CpuDxe wants it as mapped IO. We
+      // have already added it as mapped IO, so skip it here.
+      //
 
       //
-      // Only care about RAM
+      // add LAPIC predecessor range, if any
       //
-      if (Entry->Type != EfiAcpiAddressRangeMemory) {
-        continue;
+      ReservedBase = Base;
+      ReservedEnd = MIN (End, LapicBase);
+      if (ReservedBase < ReservedEnd) {
+        AddReservedMemoryRangeHob (ReservedBase, ReservedEnd, FALSE);
       }
 
-      AddMemoryBaseSizeHob (Entry->BaseAddr, Entry->Length);
-
-      MtrrSetMemoryAttribute (Entry->BaseAddr, Entry->Length, CacheWriteBack);
+      //
+      // add LAPIC successor range, if any
+      //
+      ReservedBase = MAX (Base, LapicEnd);
+      ReservedEnd = End;
+      if (ReservedBase < ReservedEnd) {
+        AddReservedMemoryRangeHob (ReservedBase, ReservedEnd, FALSE);
+      }
+      break;
+    default:
+      break;
     }
   }
 }
@@ -325,12 +364,6 @@ InitializeXen (
   )
 {
   RETURN_STATUS PcdStatus;
-
-  //
-  // Reserve away HVMLOADER reserved memory [0xFC000000,0xFD000000).
-  // This needs to match HVMLOADER RESERVED_MEMBASE/RESERVED_MEMSIZE.
-  //
-  AddReservedMemoryBaseSizeHob (0xFC000000, 0x1000000, FALSE);
 
   PcdStatus = PcdSetBoolS (PcdPciDisableBusEnumeration, TRUE);
   ASSERT_RETURN_ERROR (PcdStatus);
