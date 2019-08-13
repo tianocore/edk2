@@ -1,0 +1,36 @@
+## @file
+#  Driver for the XenIo protocol
+#
+#  Copyright (c) 2019, Citrix Systems, Inc.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION               = 0x00010005
+  BASE_NAME                 = XenIoPvhDxe
+  FILE_GUID                 = 7a567cc4-0e75-4d7a-a305-c3db109b53ad
+  MODULE_TYPE               = DXE_DRIVER
+  VERSION_STRING            = 1.0
+  ENTRY_POINT               = InitializeXenIoPvhDxe
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[Sources]
+  XenIoPvhDxe.c
+
+[LibraryClasses]
+  MemoryAllocationLib
+  PcdLib
+  UefiDriverEntryPoint
+  XenIoMmioLib
+  XenPlatformLib
+
+[FixedPcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdXenGrantFrames
+
+[Depex]
+  TRUE

@@ -382,6 +382,7 @@ F: OvmfPkg/PlatformPei/Xen.*
 F: OvmfPkg/SmbiosPlatformDxe/*Xen.c
 F: OvmfPkg/XenBusDxe/
 F: OvmfPkg/XenIoPciDxe/
+F: OvmfPkg/XenIoPvhDxe/
 F: OvmfPkg/XenPlatformPei/
 F: OvmfPkg/XenPvBlkDxe/
 F: OvmfPkg/XenResetVector/
