@@ -54,6 +54,9 @@ jumpTo32BitAndLandHere:
     mov     gs, ax
     mov     ss, ax
 
+    ; parameter for Flat32SearchForBfvBase
+    xor     eax, eax ; Start searching from top of 4GB for BfvBase
+
     OneTimeCallRet TransitionFromReal16To32BitFlat
 
 ALIGN   2
