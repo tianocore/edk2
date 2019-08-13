@@ -744,7 +744,7 @@ IsCapsuleOnDiskSupported (
     return FALSE;
   }
 
-  if (OsIndicationsSupported & EFI_OS_INDICATIONS_FILE_CAPSULE_DELIVERY_SUPPORTED) {
+  if ((OsIndicationsSupported & EFI_OS_INDICATIONS_FILE_CAPSULE_DELIVERY_SUPPORTED) != 0) {
     return TRUE;
   }
 
