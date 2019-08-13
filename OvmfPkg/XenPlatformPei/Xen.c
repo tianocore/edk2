@@ -214,6 +214,19 @@ XenHvmloaderDetected (
   return (mXenHvmloaderInfo != NULL);
 }
 
+BOOLEAN
+XenPvhDetected (
+  VOID
+  )
+{
+  //
+  // This function should only be used after XenConnect
+  //
+  ASSERT (mXenInfo.HyperPages != NULL);
+
+  return mXenHvmloaderInfo == NULL;
+}
+
 VOID
 XenPublishRamRegions (
   VOID
