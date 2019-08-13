@@ -164,7 +164,7 @@ def _parseGeneral(lines, efifilepath, varnames):
     status = 0    #0 - beginning of file; 1 - PE section definition; 2 - symbol table
     secs  = []    # key = section name
     varoffset = []
-    symRe = re.compile('^([\da-fA-F]+):([\da-fA-F]+) +([\.:\\\\\w\?@\$]+) +([\da-fA-F]+)', re.UNICODE)
+    symRe = re.compile('^([\da-fA-F]+):([\da-fA-F]+) +([\.:\\\\\w\?@\$-]+) +([\da-fA-F]+)', re.UNICODE)
 
     for line in lines:
         line = line.strip()
