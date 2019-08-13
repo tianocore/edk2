@@ -114,7 +114,6 @@ R: Leif Lindholm <leif.lindholm@linaro.org>
 ArmVirtPkg: modules used on Xen
 F: ArmVirtPkg/ArmVirtXen.*
 F: ArmVirtPkg/Library/XenArmGenericTimerVirtCounterLib/
-F: ArmVirtPkg/Library/XenRealTimeClockLib/
 F: ArmVirtPkg/Library/XenVirtMemInfoLib/
 F: ArmVirtPkg/PrePi/
 F: ArmVirtPkg/XenAcpiPlatformDxe/
@@ -374,6 +373,7 @@ F: OvmfPkg/Library/XenConsoleSerialPortLib/
 F: OvmfPkg/Library/XenHypercallLib/
 F: OvmfPkg/Library/XenIoMmioLib/
 F: OvmfPkg/Library/XenPlatformLib/
+F: OvmfPkg/Library/XenRealTimeClockLib/
 F: OvmfPkg/OvmfXen.*
 F: OvmfPkg/OvmfXenElfHeaderGenerator.c
 F: OvmfPkg/PlatformPei/MemDetect.c
