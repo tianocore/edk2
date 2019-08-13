@@ -80,6 +80,11 @@ InstallClearCacheCallback (
   );
 
 EFI_STATUS
+XenConnect (
+  VOID
+  );
+
+EFI_STATUS
 InitializeXen (
   VOID
   );
