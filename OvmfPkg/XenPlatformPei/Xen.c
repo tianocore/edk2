@@ -294,6 +294,12 @@ XenPublishRamRegions (
   Status = XenGetE820Map (&E820Map, &E820EntriesCount);
   ASSERT_EFI_ERROR (Status);
 
+  AddMemoryBaseSizeHob (0, 0xA0000);
+  //
+  // Video memory + Legacy BIOS region, to allow Linux to boot.
+  //
+  AddReservedMemoryBaseSizeHob (0xA0000, BASE_1MB - 0xA0000, TRUE);
+
   LapicBase = PcdGet32 (PcdCpuLocalApicBaseAddress);
   LapicEnd = LapicBase + SIZE_1MB;
   AddIoMemoryRangeHob (LapicBase, LapicEnd);
@@ -311,6 +317,16 @@ XenPublishRamRegions (
     //
     Base = ALIGN_VALUE (Entry->BaseAddr, (UINT64)EFI_PAGE_SIZE);
     End = (Entry->BaseAddr + Entry->Length) & ~(UINT64)EFI_PAGE_MASK;
+
+    //
+    // Ignore the first 1MB, this is handled before the loop.
+    //
+    if (Base < BASE_1MB) {
+      Base = BASE_1MB;
+    }
+    if (Base >= End) {
+      continue;
+    }
 
     switch (Entry->Type) {
     case EfiAcpiAddressRangeMemory:
