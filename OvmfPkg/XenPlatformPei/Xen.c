@@ -25,6 +25,7 @@
 #include <IndustryStandard/E820.h>
 #include <Library/ResourcePublicationLib.h>
 #include <Library/MtrrLib.h>
+#include <IndustryStandard/Xen/arch-x86/hvm/start_info.h>
 
 #include "Platform.h"
 #include "Xen.h"
@@ -86,6 +87,7 @@ XenConnect (
   UINT32 XenVersion;
   EFI_XEN_OVMF_INFO *Info;
   CHAR8 Sig[sizeof (Info->Signature) + 1];
+  UINT32 *PVHResetVectorData;
 
   AsmCpuid (XenLeaf + 2, &TransferPages, &TransferReg, NULL, NULL);
   mXenInfo.HyperPages = AllocatePages (TransferPages);
@@ -119,6 +121,29 @@ XenConnect (
     mXenHvmloaderInfo = Info;
   } else {
     mXenHvmloaderInfo = NULL;
+  }
+
+  mXenInfo.RsdpPvh = NULL;
+
+  //
+  // Locate and use information from the start of day structure if we have
+  // booted via the PVH entry point.
+  //
+
+  PVHResetVectorData = (VOID *)(UINTN) PcdGet32 (PcdXenPvhStartOfDayStructPtr);
+  //
+  // That magic value is written in XenResetVector/Ia32/XenPVHMain.asm
+  //
+  if (PVHResetVectorData[1] == SIGNATURE_32 ('X', 'P', 'V', 'H')) {
+    struct hvm_start_info *HVMStartInfo;
+
+    HVMStartInfo = (VOID *)(UINTN) PVHResetVectorData[0];
+    if (HVMStartInfo->magic == XEN_HVM_START_MAGIC_VALUE) {
+      ASSERT (HVMStartInfo->rsdp_paddr != 0);
+      if (HVMStartInfo->rsdp_paddr != 0) {
+        mXenInfo.RsdpPvh = (VOID *)(UINTN)HVMStartInfo->rsdp_paddr;
+      }
+    }
   }
 
   BuildGuidDataHob (
