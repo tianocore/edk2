@@ -11,6 +11,18 @@
 #define __XEN_HYPERCALL_LIB_H__
 
 /**
+  To call when the gEfiXenInfoGuid HOB became available after the library init
+  function has already been executed.
+
+  This allow to make hypercall in the PEIM stage.
+**/
+RETURN_STATUS
+EFIAPI
+XenHypercallLibInit (
+  VOID
+  );
+
+/**
   Check if the Xen Hypercall library is able to make calls to the Xen
   hypervisor.
 

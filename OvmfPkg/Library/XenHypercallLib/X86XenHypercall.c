@@ -59,13 +59,7 @@ XenHypercallLibInit (
 
   GuidHob = GetFirstGuidHob (&gEfiXenInfoGuid);
   if (GuidHob == NULL) {
-    //
-    // We don't fail library construction, since that has catastrophic
-    // consequences for client modules (whereas those modules may easily be
-    // running on a non-Xen platform). Instead, XenHypercallIsAvailable() above
-    // will return FALSE.
-    //
-    return RETURN_SUCCESS;
+    return RETURN_NOT_FOUND;
   }
   XenInfo = (EFI_XEN_INFO *) GET_GUID_HOB_DATA (GuidHob);
   HyperPage = XenInfo->HyperPages;

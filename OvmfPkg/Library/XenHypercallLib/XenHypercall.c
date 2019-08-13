@@ -15,6 +15,22 @@
 #include <Library/DebugLib.h>
 #include <Library/XenHypercallLib.h>
 
+RETURN_STATUS
+EFIAPI
+XenHypercallLibConstruct (
+  VOID
+  )
+{
+  XenHypercallLibInit ();
+  //
+  // We don't fail library construction, since that has catastrophic
+  // consequences for client modules (whereas those modules may easily be
+  // running on a non-Xen platform). Instead, XenHypercallIsAvailable()
+  // will return FALSE.
+  //
+  return RETURN_SUCCESS;
+}
+
 UINT64
 EFIAPI
 XenHypercallHvmGetParam (
