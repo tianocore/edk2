@@ -10,7 +10,7 @@
 #
 from __future__ import print_function
 from __future__ import absolute_import
-from buildoptions import BuildOption,BuildTarget
+from Common.buildoptions import BuildOption,BuildTarget
 import Common.GlobalData as GlobalData
 import Common.LongFilePathOs as os
 from . import EdkLogger

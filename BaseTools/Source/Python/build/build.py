@@ -26,7 +26,7 @@ from threading import Thread,Event,BoundedSemaphore
 import threading
 from subprocess import Popen,PIPE
 from collections import OrderedDict, defaultdict
-from buildoptions import BuildOption,BuildTarget
+from Common.buildoptions import BuildOption,BuildTarget
 from AutoGen.PlatformAutoGen import PlatformAutoGen
 from AutoGen.ModuleAutoGen import ModuleAutoGen
 from AutoGen.WorkspaceAutoGen import WorkspaceAutoGen
