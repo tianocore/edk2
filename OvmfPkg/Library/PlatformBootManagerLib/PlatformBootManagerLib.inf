@@ -54,6 +54,7 @@
   UefiLib
   PlatformBmPrintScLib
   Tcg2PhysicalPresenceLib
+  XenPlatformLib
 
 [Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdEmuVariableEvent
@@ -73,7 +74,6 @@
   gEfiFirmwareVolume2ProtocolGuid               # PROTOCOL SOMETIMES_CONSUMED
 
 [Guids]
-  gEfiXenInfoGuid
   gEfiEndOfDxeEventGroupGuid
   gRootBridgesConnectedEventGroupGuid
   gUefiShellFileGuid
