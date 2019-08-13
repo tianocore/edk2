@@ -218,6 +218,9 @@
   #  The value should be a multiple of 4KB.
   gUefiOvmfPkgTokenSpaceGuid.PcdHighPmmMemorySize|0x400000|UINT32|0x31
 
+  gUefiOvmfPkgTokenSpaceGuid.PcdXenPvhStartOfDayStructPtr|0x0|UINT32|0x17
+  gUefiOvmfPkgTokenSpaceGuid.PcdXenPvhStartOfDayStructPtrSize|0x0|UINT32|0x32
+
 [PcdsDynamic, PcdsDynamicEx]
   gUefiOvmfPkgTokenSpaceGuid.PcdEmuVariableEvent|0|UINT64|2
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashVariablesEnable|FALSE|BOOLEAN|0x10

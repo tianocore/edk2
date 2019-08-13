@@ -34,6 +34,8 @@
 
 %include "CommonMacros.inc"
 
+%define PVH_SPACE(Offset) (FixedPcdGet32 (PcdXenPvhStartOfDayStructPtr) + (Offset))
+
 %include "PostCodes.inc"
 
 %ifdef DEBUG_PORT80
