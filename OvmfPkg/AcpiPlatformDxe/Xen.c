@@ -9,36 +9,12 @@
 **/ 
 
 #include "AcpiPlatform.h"
-#include <Library/HobLib.h>
-#include <Guid/XenInfo.h>
 #include <Library/BaseLib.h>
 
 #define XEN_ACPI_PHYSICAL_ADDRESS         0x000EA020
 #define XEN_BIOS_PHYSICAL_END             0x000FFFFF
 
 EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER  *XenAcpiRsdpStructurePtr = NULL;
-
-/**
-  This function detects if OVMF is running on Xen.
-
-**/
-BOOLEAN
-XenDetected (
-  VOID
-  )
-{
-  EFI_HOB_GUID_TYPE         *GuidHob;
-
-  //
-  // See if a XenInfo HOB is available
-  //
-  GuidHob = GetFirstGuidHob (&gEfiXenInfoGuid);
-  if (GuidHob == NULL) {
-    return FALSE;
-  }
-
-  return TRUE;
-}
 
 /**
   Get the address of Xen ACPI Root System Description Pointer (RSDP)

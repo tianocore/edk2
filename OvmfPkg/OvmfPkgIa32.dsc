@@ -200,6 +200,7 @@
   SmbusLib|MdePkg/Library/BaseSmbusLibNull/BaseSmbusLibNull.inf
   OrderedCollectionLib|MdePkg/Library/BaseOrderedCollectionRedBlackTreeLib/BaseOrderedCollectionRedBlackTreeLib.inf
   XenHypercallLib|OvmfPkg/Library/XenHypercallLib/XenHypercallLib.inf
+  XenPlatformLib|OvmfPkg/Library/XenPlatformLib/XenPlatformLib.inf
 
 !if $(TPM2_ENABLE) == TRUE
   Tpm2CommandLib|SecurityPkg/Library/Tpm2CommandLib/Tpm2CommandLib.inf
