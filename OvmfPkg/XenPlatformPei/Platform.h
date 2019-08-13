@@ -89,6 +89,11 @@ XenDetect (
   VOID
   );
 
+BOOLEAN
+XenHvmloaderDetected (
+  VOID
+  );
+
 VOID
 AmdSevInitialize (
   VOID
