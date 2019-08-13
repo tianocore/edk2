@@ -22,6 +22,7 @@
 #include <Library/UefiLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/DebugLib.h>
+#include <Library/PcdLib.h>
 
 
 //
