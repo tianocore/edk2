@@ -22,6 +22,12 @@ xenPVHMain:
     ;
     xor     esp, esp
 
+    ;
+    ; Store "Start of day" struct pointer for later use
+    ;
+    mov     dword[PVH_SPACE (0)], ebx
+    mov     dword[PVH_SPACE (4)], 'XPVH'
+
     mov     ebx, ADDR_OF(gdtr)
     lgdt    [ebx]
 
