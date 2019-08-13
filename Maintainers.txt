@@ -365,6 +365,7 @@ F: OvmfPkg/Include/Guid/XenInfo.h
 F: OvmfPkg/Include/IndustryStandard/Xen/
 F: OvmfPkg/Include/Library/XenHypercallLib.h
 F: OvmfPkg/Include/Library/XenIoMmioLib.h
+F: OvmfPkg/Include/Library/XenPlatformLib.h
 F: OvmfPkg/Include/Protocol/XenBus.h
 F: OvmfPkg/Include/Protocol/XenIo.h
 F: OvmfPkg/Library/PciHostBridgeLib/XenSupport.c
@@ -372,6 +373,7 @@ F: OvmfPkg/Library/PlatformBootManagerLib/BdsPlatform.c
 F: OvmfPkg/Library/XenConsoleSerialPortLib/
 F: OvmfPkg/Library/XenHypercallLib/
 F: OvmfPkg/Library/XenIoMmioLib/
+F: OvmfPkg/Library/XenPlatformLib/
 F: OvmfPkg/OvmfXen.*
 F: OvmfPkg/OvmfXenElfHeaderGenerator.c
 F: OvmfPkg/PlatformPei/MemDetect.c
