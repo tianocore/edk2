@@ -127,7 +127,7 @@ UpperCaseString (
 {
   CHAR16  *Cptr;
 
-  for (Cptr = Str; *Cptr; Cptr++) {
+  for (Cptr = Str; *Cptr != L'\0'; Cptr++) {
     if (L'a' <= *Cptr && *Cptr <= L'z') {
       *Cptr = *Cptr - L'a' + L'A';
     }
