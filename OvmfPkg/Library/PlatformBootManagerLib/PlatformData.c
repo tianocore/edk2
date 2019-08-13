@@ -9,18 +9,19 @@
 
 #include "BdsPlatform.h"
 #include <Guid/QemuRamfb.h>
+#include <Guid/SerialPortLibVendor.h>
 
 //
-// Debug Agent UART Device Path structure
+// Vendor UART Device Path structure
 //
-#pragma pack(1)
+#pragma pack (1)
 typedef struct {
   VENDOR_DEVICE_PATH        VendorHardware;
   UART_DEVICE_PATH          Uart;
   VENDOR_DEVICE_PATH        TerminalType;
   EFI_DEVICE_PATH_PROTOCOL  End;
 } VENDOR_UART_DEVICE_PATH;
-#pragma pack()
+#pragma pack ()
 
 //
 // USB Keyboard Device Path structure
@@ -141,6 +142,37 @@ STATIC VENDOR_RAMFB_DEVICE_PATH gQemuRamfbDevicePath = {
   gEndEntire
 };
 
+STATIC VENDOR_UART_DEVICE_PATH gXenConsoleDevicePath = {
+  {
+    {
+      HARDWARE_DEVICE_PATH,
+      HW_VENDOR_DP,
+      {
+        (UINT8) (sizeof (VENDOR_DEVICE_PATH)),
+        (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8)
+      }
+    },
+    EDKII_SERIAL_PORT_LIB_VENDOR_GUID
+  },
+  {
+    {
+      MESSAGING_DEVICE_PATH,
+      MSG_UART_DP,
+      {
+        (UINT8) (sizeof (UART_DEVICE_PATH)),
+        (UINT8) ((sizeof (UART_DEVICE_PATH)) >> 8)
+      }
+    },
+    0,
+    FixedPcdGet64 (PcdUartDefaultBaudRate),
+    FixedPcdGet8 (PcdUartDefaultDataBits),
+    FixedPcdGet8 (PcdUartDefaultParity),
+    FixedPcdGet8 (PcdUartDefaultStopBits),
+  },
+  gPcAnsiTerminal,
+  gEndEntire
+};
+
 //
 // Predefined platform default console device path
 //
@@ -156,6 +188,17 @@ PLATFORM_CONSOLE_CONNECT_ENTRY   gPlatformConsole[] = {
   {
     (EFI_DEVICE_PATH_PROTOCOL *)&gQemuRamfbDevicePath,
     CONSOLE_OUT
+  },
+  {
+    NULL,
+    0
+  }
+};
+
+PLATFORM_CONSOLE_CONNECT_ENTRY   gXenPlatformConsole[] = {
+  {
+    (EFI_DEVICE_PATH_PROTOCOL *)&gXenConsoleDevicePath,
+    (CONSOLE_OUT | CONSOLE_IN | STD_ERROR)
   },
   {
     NULL,
