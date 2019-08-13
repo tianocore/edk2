@@ -63,6 +63,7 @@
 %include "Ia16/Init16.asm"
 
 %include "Main.asm"
+%include "Ia32/XenPVHMain.asm"
 
 %include "Ia16/ResetVectorVtf0.asm"
 
