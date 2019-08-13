@@ -30,4 +30,5 @@
 [LibraryClasses]
   DebugLib
   IoLib
+  PciLib
   TimerLib

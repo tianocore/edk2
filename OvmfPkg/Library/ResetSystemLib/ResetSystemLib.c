@@ -11,9 +11,8 @@
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/IoLib.h>
+#include <Library/PciLib.h>
 #include <Library/TimerLib.h>
-#include <OvmfPlatforms.h>
-
 #include <OvmfPlatforms.h>
 
 VOID
