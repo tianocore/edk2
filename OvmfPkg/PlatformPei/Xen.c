@@ -98,9 +98,6 @@ XenConnect (
   mXenInfo.VersionMajor = (UINT16)(XenVersion >> 16);
   mXenInfo.VersionMinor = (UINT16)(XenVersion & 0xFFFF);
 
-  /* TBD: Locate hvm_info and reserve it away. */
-  mXenInfo.HvmInfo = NULL;
-
   BuildGuidDataHob (
     &gEfiXenInfoGuid,
     &mXenInfo,

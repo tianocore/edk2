@@ -33,6 +33,12 @@ STATIC UINT32 mXenLeaf = 0;
 
 EFI_XEN_INFO mXenInfo;
 
+//
+// Location of the firmware info struct setup by hvmloader.
+// Only the E820 table is used by OVMF.
+//
+EFI_XEN_OVMF_INFO *mXenHvmloaderInfo;
+
 /**
   Returns E820 map provided by Xen
 
@@ -78,6 +84,8 @@ XenConnect (
   UINT32 TransferReg;
   UINT32 TransferPages;
   UINT32 XenVersion;
+  EFI_XEN_OVMF_INFO *Info;
+  CHAR8 Sig[sizeof (Info->Signature) + 1];
 
   AsmCpuid (XenLeaf + 2, &TransferPages, &TransferReg, NULL, NULL);
   mXenInfo.HyperPages = AllocatePages (TransferPages);
@@ -97,8 +105,21 @@ XenConnect (
   mXenInfo.VersionMajor = (UINT16)(XenVersion >> 16);
   mXenInfo.VersionMinor = (UINT16)(XenVersion & 0xFFFF);
 
-  /* TBD: Locate hvm_info and reserve it away. */
-  mXenInfo.HvmInfo = NULL;
+  //
+  // Check if there are information left by hvmloader
+  //
+
+  Info = (EFI_XEN_OVMF_INFO *)(UINTN) OVMF_INFO_PHYSICAL_ADDRESS;
+  //
+  // Copy the signature, and make it null-terminated.
+  //
+  AsciiStrnCpyS (Sig, sizeof (Sig), (CHAR8 *) &Info->Signature,
+    sizeof (Info->Signature));
+  if (AsciiStrCmp (Sig, "XenHVMOVMF") == 0) {
+    mXenHvmloaderInfo = Info;
+  } else {
+    mXenHvmloaderInfo = NULL;
+  }
 
   BuildGuidDataHob (
     &gEfiXenInfoGuid,
