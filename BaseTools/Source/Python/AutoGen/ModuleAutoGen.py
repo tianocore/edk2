@@ -218,7 +218,7 @@ class ModuleAutoGen(AutoGen):
         EdkLogger.debug(EdkLogger.DEBUG_9, "AutoGen module [%s] [%s]" % (ModuleFile, Arch))
         GlobalData.gProcessingFile = "%s [%s, %s, %s]" % (ModuleFile, Arch, Toolchain, Target)
 
-        self.Workspace = None
+        self.Workspace = Workspace
         self.WorkspaceDir = ""
         self.PlatformInfo = None
         self.DataPipe = DataPipe
@@ -255,7 +255,6 @@ class ModuleAutoGen(AutoGen):
 
     def __init_platform_info__(self):
         pinfo = self.DataPipe.Get("P_Info")
-        self.Workspace = WorkSpaceInfo(pinfo.get("WorkspaceDir"),pinfo.get("ActivePlatform"),pinfo.get("Target"),pinfo.get("ToolChain"),pinfo.get("ArchList"))
         self.WorkspaceDir = pinfo.get("WorkspaceDir")
         self.PlatformInfo = PlatformInfo(self.Workspace,pinfo.get("ActivePlatform"),pinfo.get("Target"),pinfo.get("ToolChain"),pinfo.get("Arch"),self.DataPipe)
     ## hash() operator of ModuleAutoGen
