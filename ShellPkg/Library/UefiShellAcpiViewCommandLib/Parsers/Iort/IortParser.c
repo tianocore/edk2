@@ -472,7 +472,6 @@ DumpIortNodeNamedComponent (
   )
 {
   UINT32 Offset;
-  UINT32 Index;
 
   Offset = ParseAcpi (
              TRUE,
@@ -485,7 +484,6 @@ DumpIortNodeNamedComponent (
 
   // Estimate the Device Name length
   PrintFieldName (2, L"Device Object Name");
-  Index = 0;
 
   while ((*(Ptr + Offset) != 0) &&
          (Offset < Length)) {
