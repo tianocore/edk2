@@ -1,7 +1,7 @@
 /** @file
 Utility functions for UI presentation.
 
-Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2019, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -11,7 +11,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifdef PC_HOOK
 #include <ItkSupport.h>
 
-BOOLEAN gLoadDefault = FALSE;
 #endif //PC_HOOK
 BOOLEAN            mHiiPackageListUpdated;
 UI_MENU_SELECTION  *gCurrentSelection;
@@ -1002,9 +1001,6 @@ ProcessAction (
   IN UINT16        DefaultId
   )
 {
-#ifdef PC_HOOK
-  BOOLEAN ApplyItkBOSettings = FALSE;
-#endif //PC_HOOK
   //
   // This is caused by use press ESC, and it should not combine with other action type.
   //
@@ -1026,18 +1022,6 @@ ProcessAction (
   }
 
   if ((Action & BROWSER_ACTION_SUBMIT) == BROWSER_ACTION_SUBMIT) {
-#ifdef PC_HOOK
-    if (gLoadDefault) {
-      ApplyItkBOSettings = TRUE;
-      gRT->SetVariable (
-            L"ApplyItkBootorderCustomizedSettings",
-            &gEfiGenericVariableGuid,
-            EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
-            sizeof (ApplyItkBOSettings),
-            &ApplyItkBOSettings
-            );
-    }
-#endif //PC_HOOK
     SubmitForm (gCurrentSelection->FormSet, gCurrentSelection->Form, gBrowserSettingScope);
   }
 
