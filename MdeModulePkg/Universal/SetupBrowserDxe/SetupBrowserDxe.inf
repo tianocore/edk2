@@ -71,14 +71,6 @@
   gEfiHiiStandardFormGuid                       ## SOMETIMES_CONSUMES  ## GUID
   gZeroGuid                                     ## SOMETIMES_CONSUMES  ## GUID
   gEdkiiIfrBitVarstoreGuid                      ## SOMETIMES_CONSUMES  ## GUID
-#
-# PC:RestrictedBegin
-#
-  gPcPasswordGuid                               ## PC_HOOK
-  gEfiGenericVariableGuid                       ## PC_HOOK
-#
-# PC:RestrictedEnd
-#
 
 [Protocols]
   gEfiHiiConfigAccessProtocolGuid               ## SOMETIMES_CONSUMES
