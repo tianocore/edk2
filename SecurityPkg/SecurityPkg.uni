@@ -263,3 +263,26 @@
                                                                                           "0x01 - Do not support IdleByPass.<BR>\n"
                                                                                           "0x02 - Support IdleByPass.<BR>\n"
                                                                                           "0xFF - IdleByPass State is not synced with TPM hardware.<BR>"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdStatusCodeFvVerificationPass_PROMPT  #language en-US "Status Code for FV verification pass."
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdStatusCodeFvVerificationPass_HELP  #language en-US "Progress Code for FV verification result.\n"
+                                                                                                "  (EFI_SOFTWARE_PEI_MODULE | EFI_SUBCLASS_SPECIFIC | 00A).\n"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdStatusCodeFvVerificationFail_PROMPT  #language en-US "Status Code for FV verification failure."
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdStatusCodeFvVerificationFail_HELP  #language en-US "Progress Code for FV verification result.\n"
+                                                                                                "  (EFI_SOFTWARE_PEI_MODULE | EFI_SUBCLASS_SPECIFIC | 00B).\n"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdSkipOpalPasswordPrompt_PROMPT  #language en-US "Skip Opal DXE driver password prompt."
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdSkipOpalPasswordPrompt_HELP  #language en-US "Indicates if Opal DXE driver skip password prompt.\n\n"
+                                                                                          "  TRUE  - Skip password prompt.\n"
+                                                                                          "  FALSE - Does not skip password prompt.\n"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdSkipHddPasswordPrompt_PROMPT  #language en-US "Skip Hdd Password prompt."
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdSkipHddPasswordPrompt_HELP  #language en-US "Indicates if Hdd Password driver skip password prompt.\n\n"
+                                                                                          "  TRUE  - Skip password prompt.\n"
+                                                                                          "  FALSE - Does not skip password prompt.\n"
+
