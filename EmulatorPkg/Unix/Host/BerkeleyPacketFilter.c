@@ -216,6 +216,7 @@ EmuSnpStart (
   }
 
   Status = EFI_SUCCESS;
+  Private->ReadBuffer = NULL;
   if (Private->BpfFd == 0) {
     Status = OpenBpfFileDescriptor (Private, &Private->BpfFd);
     if (EFI_ERROR (Status)) {
