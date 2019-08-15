@@ -133,7 +133,7 @@ class AutoGenManager(threading.Thread):
     def kill(self):
         self.feedback_q.put(None)
 class AutoGenWorkerInProcess(mp.Process):
-    def __init__(self,module_queue,data_pipe_file_path,feedback_q,file_lock, share_data,log_q,error_event):
+    def __init__(self,module_queue,data_pipe_file_path,feedback_q,file_lock,cache_lock,share_data,log_q,error_event):
         mp.Process.__init__(self)
         self.module_queue = module_queue
         self.data_pipe_file_path =data_pipe_file_path
@@ -141,6 +141,7 @@ class AutoGenWorkerInProcess(mp.Process):
         self.feedback_q = feedback_q
         self.PlatformMetaFileSet = {}
         self.file_lock = file_lock
+        self.cache_lock = cache_lock
         self.share_data = share_data
         self.log_q = log_q
         self.error_event = error_event
@@ -184,9 +185,10 @@ class AutoGenWorkerInProcess(mp.Process):
             GlobalData.gDatabasePath = self.data_pipe.Get("DatabasePath")
             GlobalData.gBinCacheSource = self.data_pipe.Get("BinCacheSource")
             GlobalData.gBinCacheDest = self.data_pipe.Get("BinCacheDest")
-            GlobalData.gCacheIR = self.data_pipe.Get("CacheIR")
+            GlobalData.gCacheIR = self.share_data
             GlobalData.gEnableGenfdsMultiThread = self.data_pipe.Get("EnableGenfdsMultiThread")
             GlobalData.file_lock = self.file_lock
+            GlobalData.cache_lock = self.cache_lock
             CommandTarget = self.data_pipe.Get("CommandTarget")
             pcd_from_build_option = []
             for pcd_tuple in self.data_pipe.Get("BuildOptPcd"):

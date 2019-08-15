@@ -122,6 +122,8 @@ gBuildHashSkipTracking = dict()
 
 # Common dictionary to share module cache intermediate result and state
 gCacheIR = None
+# Common lock for the module cache intermediate data
+cache_lock = None
 # Common lock for the file access in multiple process AutoGens
 file_lock = None
 # Common dictionary to share platform libraries' constant Pcd

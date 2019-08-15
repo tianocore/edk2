@@ -28,6 +28,7 @@ from Common.caching import cached_class_function
 from AutoGen.ModuleAutoGenHelper import PlatformInfo,WorkSpaceInfo
 from AutoGen.CacheIR import ModuleBuildCacheIR
 import json
+import tempfile
 
 ## Mapping Makefile type
 gMakeTypeMap = {TAB_COMPILER_MSFT:"nmake", "GCC":"gmake"}
@@ -1702,9 +1703,8 @@ class ModuleAutoGen(AutoGen):
         try:
             ModuleHashPairList = [] # tuple list: [tuple(PreMakefileHash, MakeHash)]
             if os.path.exists(ModuleHashPair):
-                f = open(ModuleHashPair, 'r')
-                ModuleHashPairList = json.load(f)
-                f.close()
+                with open(ModuleHashPair, 'r') as f:
+                    ModuleHashPairList = json.load(f)
             PreMakeHash = gDict[(self.MetaFile.Path, self.Arch)].PreMakefileHashHexDigest
             MakeHash = gDict[(self.MetaFile.Path, self.Arch)].MakeHashHexDigest
             ModuleHashPairList.append((PreMakeHash, MakeHash))
@@ -1766,10 +1766,12 @@ class ModuleAutoGen(AutoGen):
 
             if os.path.exists (self.TimeStampPath):
                 os.remove (self.TimeStampPath)
-            with open(self.TimeStampPath, 'w+') as fd:
+            with tempfile.NamedTemporaryFile('w+', dir=os.path.dirname(self.TimeStampPath), delete=False) as tf:
                 for f in FileSet:
-                    fd.write(f)
-                    fd.write("\n")
+                    tf.write(f)
+                    tf.write("\n")
+                tempname = tf.name
+            SaveFileOnChange(self.TimeStampPath, tempname, False)
 
         # Ignore generating makefile when it is a binary module
         if self.IsBinaryModule:
@@ -1806,7 +1808,7 @@ class ModuleAutoGen(AutoGen):
         MewIR.MakefilePath = MakefilePath
         MewIR.DependencyHeaderFileSet = Makefile.DependencyHeaderFileSet
         MewIR.CreateMakeFileDone = True
-        with GlobalData.file_lock:
+        with GlobalData.cache_lock:
             try:
                 IR = gDict[(self.MetaFile.Path, self.Arch)]
                 IR.MakefilePath = MakefilePath
@@ -1891,7 +1893,7 @@ class ModuleAutoGen(AutoGen):
         self.IsCodeFileCreated = True
         MewIR = ModuleBuildCacheIR(self.MetaFile.Path, self.Arch)
         MewIR.CreateCodeFileDone = True
-        with GlobalData.file_lock:
+        with GlobalData.cache_lock:
             try:
                 IR = gDict[(self.MetaFile.Path, self.Arch)]
                 IR.CreateCodeFileDone = True
@@ -1951,9 +1953,8 @@ class ModuleAutoGen(AutoGen):
                 m.update(GlobalData.gModuleHash[self.Arch][Lib.Name].encode('utf-8'))
 
         # Add Module self
-        f = open(str(self.MetaFile), 'rb')
-        Content = f.read()
-        f.close()
+        with open(str(self.MetaFile), 'rb') as f:
+            Content = f.read()
         m.update(Content)
 
         # Add Module's source files
@@ -1973,6 +1974,11 @@ class ModuleAutoGen(AutoGen):
         if (self.MetaFile.Path, self.Arch) in gDict:
             if gDict[(self.MetaFile.Path, self.Arch)].ModuleFilesChain:
                 return gDict[(self.MetaFile.Path, self.Arch)]
+
+        # skip if the module cache already crashed
+        if (self.MetaFile.Path, self.Arch) in gDict and \
+          gDict[(self.MetaFile.Path, self.Arch)].CacheCrash:
+            return
 
         DependencyFileSet = set()
         # Add Module Meta file
@@ -2021,9 +2027,8 @@ class ModuleAutoGen(AutoGen):
             if not os.path.exists(str(File)):
                 EdkLogger.quiet("[cache warning]: header file %s is missing for module: %s[%s]" % (File, self.MetaFile.Path, self.Arch))
                 continue
-            f = open(str(File), 'rb')
-            Content = f.read()
-            f.close()
+            with open(str(File), 'rb') as f:
+                Content = f.read()
             m.update(Content)
             FileList.append((str(File), hashlib.md5(Content).hexdigest()))
 
@@ -2032,7 +2037,7 @@ class ModuleAutoGen(AutoGen):
         MewIR.ModuleFilesHashDigest = m.digest()
         MewIR.ModuleFilesHashHexDigest = m.hexdigest()
         MewIR.ModuleFilesChain = FileList
-        with GlobalData.file_lock:
+        with GlobalData.cache_lock:
             try:
                 IR = gDict[(self.MetaFile.Path, self.Arch)]
                 IR.ModuleFilesHashDigest = m.digest()
@@ -2049,6 +2054,11 @@ class ModuleAutoGen(AutoGen):
         if (self.MetaFile.Path, self.Arch) in gDict and \
           gDict[(self.MetaFile.Path, self.Arch)].PreMakefileHashHexDigest:
             return gDict[(self.MetaFile.Path, self.Arch)]
+
+        # skip if the module cache already crashed
+        if (self.MetaFile.Path, self.Arch) in gDict and \
+          gDict[(self.MetaFile.Path, self.Arch)].CacheCrash:
+            return
 
         # skip binary module
         if self.IsBinaryModule:
@@ -2091,7 +2101,7 @@ class ModuleAutoGen(AutoGen):
         # Add Module self
         m.update(gDict[(self.MetaFile.Path, self.Arch)].ModuleFilesHashDigest)
 
-        with GlobalData.file_lock:
+        with GlobalData.cache_lock:
             IR = gDict[(self.MetaFile.Path, self.Arch)]
             IR.PreMakefileHashHexDigest = m.hexdigest()
             gDict[(self.MetaFile.Path, self.Arch)] = IR
@@ -2103,6 +2113,11 @@ class ModuleAutoGen(AutoGen):
         if (self.MetaFile.Path, self.Arch) in gDict and \
           gDict[(self.MetaFile.Path, self.Arch)].MakeHeaderFilesHashDigest:
             return gDict[(self.MetaFile.Path, self.Arch)]
+
+        # skip if the module cache already crashed
+        if (self.MetaFile.Path, self.Arch) in gDict and \
+          gDict[(self.MetaFile.Path, self.Arch)].CacheCrash:
+            return
 
         # skip binary module
         if self.IsBinaryModule:
@@ -2159,7 +2174,7 @@ class ModuleAutoGen(AutoGen):
             m.update(Content)
             FileList.append((str(File), hashlib.md5(Content).hexdigest()))
 
-        with GlobalData.file_lock:
+        with GlobalData.cache_lock:
             IR = gDict[(self.MetaFile.Path, self.Arch)]
             IR.AutoGenFileList = self.AutoGenFileList.keys()
             IR.MakeHeaderFilesHashChain = FileList
@@ -2173,6 +2188,11 @@ class ModuleAutoGen(AutoGen):
         if (self.MetaFile.Path, self.Arch) in gDict and \
           gDict[(self.MetaFile.Path, self.Arch)].MakeHashChain:
             return gDict[(self.MetaFile.Path, self.Arch)]
+
+        # skip if the module cache already crashed
+        if (self.MetaFile.Path, self.Arch) in gDict and \
+          gDict[(self.MetaFile.Path, self.Arch)].CacheCrash:
+            return
 
         # skip binary module
         if self.IsBinaryModule:
@@ -2222,7 +2242,7 @@ class ModuleAutoGen(AutoGen):
         New.sort(key=lambda x: str(x))
         MakeHashChain += New
 
-        with GlobalData.file_lock:
+        with GlobalData.cache_lock:
             IR = gDict[(self.MetaFile.Path, self.Arch)]
             IR.MakeHashDigest = m.digest()
             IR.MakeHashHexDigest = m.hexdigest()
@@ -2234,6 +2254,12 @@ class ModuleAutoGen(AutoGen):
     ## Decide whether we can skip the left autogen and make process
     def CanSkipbyPreMakefileCache(self, gDict):
         if not GlobalData.gBinCacheSource:
+            return False
+
+        if gDict[(self.MetaFile.Path, self.Arch)].PreMakeCacheHit:
+            return True
+
+        if gDict[(self.MetaFile.Path, self.Arch)].CacheCrash:
             return False
 
         # If Module is binary, do not skip by cache
@@ -2255,12 +2281,15 @@ class ModuleAutoGen(AutoGen):
         ModuleHashPair = path.join(FileDir, self.Name + ".ModuleHashPair")
         if not os.path.exists(ModuleHashPair):
             EdkLogger.quiet("[cache warning]: Cannot find ModuleHashPair file: %s" % ModuleHashPair)
+            with GlobalData.cache_lock:
+                IR = gDict[(self.MetaFile.Path, self.Arch)]
+                IR.CacheCrash = True
+                gDict[(self.MetaFile.Path, self.Arch)] = IR
             return False
 
         try:
-            f = open(ModuleHashPair, 'r')
-            ModuleHashPairList = json.load(f)
-            f.close()
+            with open(ModuleHashPair, 'r') as f:
+                ModuleHashPairList = json.load(f)
         except:
             EdkLogger.quiet("[cache warning]: fail to load ModuleHashPair file: %s" % ModuleHashPair)
             return False
@@ -2300,7 +2329,7 @@ class ModuleAutoGen(AutoGen):
         if self.Name == "PcdPeim" or self.Name == "PcdDxe":
             CreatePcdDatabaseCode(self, TemplateString(), TemplateString())
 
-        with GlobalData.file_lock:
+        with GlobalData.cache_lock:
             IR = gDict[(self.MetaFile.Path, self.Arch)]
             IR.PreMakeCacheHit = True
             gDict[(self.MetaFile.Path, self.Arch)] = IR
@@ -2313,6 +2342,12 @@ class ModuleAutoGen(AutoGen):
         if not GlobalData.gBinCacheSource:
             return False
 
+        if gDict[(self.MetaFile.Path, self.Arch)].MakeCacheHit:
+            return True
+
+        if gDict[(self.MetaFile.Path, self.Arch)].CacheCrash:
+            return False
+
         # If Module is binary, do not skip by cache
         if self.IsBinaryModule:
             print("[cache miss]: checkpoint_Makefile: binary module:", self.MetaFile.Path, self.Arch)
@@ -2321,7 +2356,7 @@ class ModuleAutoGen(AutoGen):
         # .inc is contains binary information so do not skip by hash as well
         for f_ext in self.SourceFileList:
             if '.inc' in str(f_ext):
-                with GlobalData.file_lock:
+                with GlobalData.cache_lock:
                     IR = gDict[(self.MetaFile.Path, self.Arch)]
                     IR.MakeCacheHit = False
                     gDict[(self.MetaFile.Path, self.Arch)] = IR
@@ -2338,12 +2373,15 @@ class ModuleAutoGen(AutoGen):
         ModuleHashPair = path.join(FileDir, self.Name + ".ModuleHashPair")
         if not os.path.exists(ModuleHashPair):
             EdkLogger.quiet("[cache warning]: Cannot find ModuleHashPair file: %s" % ModuleHashPair)
+            with GlobalData.cache_lock:
+                IR = gDict[(self.MetaFile.Path, self.Arch)]
+                IR.CacheCrash = True
+                gDict[(self.MetaFile.Path, self.Arch)] = IR
             return False
 
         try:
-            f = open(ModuleHashPair, 'r')
-            ModuleHashPairList = json.load(f)
-            f.close()
+            with open(ModuleHashPair, 'r') as f:
+                ModuleHashPairList = json.load(f)
         except:
             EdkLogger.quiet("[cache warning]: fail to load ModuleHashPair file: %s" % ModuleHashPair)
             return False
@@ -2383,7 +2421,7 @@ class ModuleAutoGen(AutoGen):
 
         if self.Name == "PcdPeim" or self.Name == "PcdDxe":
             CreatePcdDatabaseCode(self, TemplateString(), TemplateString())
-        with GlobalData.file_lock:
+        with GlobalData.cache_lock:
             IR = gDict[(self.MetaFile.Path, self.Arch)]
             IR.MakeCacheHit = True
             gDict[(self.MetaFile.Path, self.Arch)] = IR
@@ -2393,6 +2431,10 @@ class ModuleAutoGen(AutoGen):
     ## Show the first file name which causes cache miss
     def PrintFirstMakeCacheMissFile(self, gDict):
         if not GlobalData.gBinCacheSource:
+            return
+
+        # skip if the module cache already crashed
+        if gDict[(self.MetaFile.Path, self.Arch)].CacheCrash:
             return
 
         # skip binary module
@@ -2420,9 +2462,8 @@ class ModuleAutoGen(AutoGen):
             return
 
         try:
-            f = open(ModuleHashPair, 'r')
-            ModuleHashPairList = json.load(f)
-            f.close()
+            with open(ModuleHashPair, 'r') as f:
+                ModuleHashPairList = json.load(f)
         except:
             EdkLogger.quiet("[cache insight]: Cannot load ModuleHashPair file for module: %s[%s]" % (self.MetaFile.Path, self.Arch))
             return

@@ -820,13 +820,15 @@ class Build():
             file_lock = mp.Lock()
             error_event = mp.Event()
             GlobalData.file_lock = file_lock
+            cache_lock = mp.Lock()
+            GlobalData.cache_lock = cache_lock
             FfsCmd = DataPipe.Get("FfsCommand")
             if FfsCmd is None:
                 FfsCmd = {}
             GlobalData.FfsCmd = FfsCmd
             GlobalData.libConstPcd = DataPipe.Get("LibConstPcd")
             GlobalData.Refes = DataPipe.Get("REFS")
-            auto_workers = [AutoGenWorkerInProcess(mqueue,DataPipe.dump_file,feedback_q,file_lock,share_data,self.log_q,error_event) for _ in range(self.ThreadNumber)]
+            auto_workers = [AutoGenWorkerInProcess(mqueue,DataPipe.dump_file,feedback_q,file_lock,cache_lock,share_data,self.log_q,error_event) for _ in range(self.ThreadNumber)]
             self.AutoGenMgr = AutoGenManager(auto_workers,feedback_q,error_event)
             self.AutoGenMgr.start()
             for w in auto_workers:
@@ -1826,6 +1828,7 @@ class Build():
                     for PkgName in GlobalData.gPackageHash.keys():
                         GlobalData.gCacheIR[(PkgName, 'PackageHash')] = GlobalData.gPackageHash[PkgName]
                 GlobalData.file_lock = mp.Lock()
+                GlobalData.cache_lock = mp.Lock()
                 GlobalData.FfsCmd = CmdListDict
 
                 self.Progress.Stop("done!")

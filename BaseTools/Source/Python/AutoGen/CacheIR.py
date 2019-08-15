@@ -24,5 +24,6 @@ class ModuleBuildCacheIR():
         self.MakeHashDigest = None
         self.MakeHashHexDigest = None
         self.MakeHashChain = []
+        self.CacheCrash = False
         self.PreMakeCacheHit = False
         self.MakeCacheHit = False
