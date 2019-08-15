@@ -43,56 +43,6 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_PCI_HOTPLUG_REQUEST_PROTOCOL mPciHotPlugReques
   PciHotPlugRequestNotify
 };
 
-VOID
-EFIAPI
-PciBusInstallPendingOproms (
-  IN EFI_EVENT                Event,
-  IN VOID                     *Context
-  )
-{
-  UINTN                         HandleCount;
-  EFI_HANDLE                    *HandleBuffer;
-  EFI_STATUS                    Status;
-  UINTN                         Index;
-  EFI_PCI_IO_PROTOCOL           *PciIoProtocol;
-  PCI_IO_DEVICE                 *PciIoDevice;
-  BOOLEAN                       AllOpRomProcessed;
-  BOOLEAN                       PciContainEfiImage;
-
-  DEBUG((EFI_D_INFO, "Installing all pending UEFI Option ROMs...\n"));
-  HandleBuffer = NULL;
-  Status = gBS->LocateHandleBuffer (
-                  ByProtocol,
-                  &gEfiPciIoProtocolGuid,
-                  NULL,
-                  &HandleCount,
-                  &HandleBuffer
-                  );
-  ASSERT_EFI_ERROR(Status);
-
-  for (Index = 0; Index < HandleCount; Index++) {
-    Status = gBS->HandleProtocol (HandleBuffer[Index], &gEfiPciIoProtocolGuid, (VOID **)&PciIoProtocol);
-    ASSERT_EFI_ERROR(Status);
-    PciIoDevice = PCI_IO_DEVICE_FROM_PCI_IO_THIS(PciIoProtocol);
-    AllOpRomProcessed = PciIoDevice->AllOpRomProcessed;
-    PciContainEfiImage = ContainEfiImage(PciIoDevice->PciIo.RomImage, PciIoDevice->PciIo.RomSize);
-    if (!AllOpRomProcessed && PciContainEfiImage) {
-      PciIoDevice->AllOpRomProcessed = TRUE;
-      //
-      // Start the OpRom image
-      //
-      DEBUG((EFI_D_INFO, "Installing Option ROM for B0x%x D0x%x F0x%x\n", PciIoDevice->BusNumber, PciIoDevice->DeviceNumber, PciIoDevice->FunctionNumber));
-      ProcessOpRomImage(PciIoDevice);
-    }
-  }
-
-  if (HandleBuffer != NULL) {
-    gBS->FreePool(HandleBuffer);
-  }
-  DEBUG((EFI_D_INFO, "All pending Option ROMs installed!\n")); 
-  return; 
-}
-
 /**
   The Entry Point for PCI Bus module. The user code starts with this function.
 
@@ -117,7 +67,6 @@ PciBusEntryPoint (
 {
   EFI_STATUS  Status;
   EFI_HANDLE  Handle;
-  EFI_EVENT             Registration;
 
   //
   // Initializes PCI devices pool
@@ -150,15 +99,6 @@ PciBusEntryPoint (
                     );
   }
 
-  Status = gBS->CreateEventEx (
-      EVT_NOTIFY_SIGNAL,
-      TPL_CALLBACK,
-      PciBusInstallPendingOproms,
-      NULL,
-      &gEfiAfterPlatformLocksEventGuid,
-      &Registration
-      );
-
   return Status;
 }
 
@@ -188,44 +128,6 @@ PciBusDriverBindingSupported (
   EFI_DEVICE_PATH_PROTOCOL        *ParentDevicePath;
   EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL *PciRootBridgeIo;
   EFI_DEV_PATH_PTR                Node;
-  EFI_PCI_IO_PROTOCOL             *PciIoProtocol;
-  PCI_IO_DEVICE                   *PciIoDevice;
-  BOOLEAN                         AllOpRomProcessed;
-  BOOLEAN                         PciContainEfiImage;
-
-
-  //
-  // Check if Pci IO protocol is installed by this driver
-  //
-  Status = gBS->OpenProtocol (
-                  Controller,
-                  &gEfiPciIoProtocolGuid,
-                  (VOID **) &PciIoProtocol,
-                  This->DriverBindingHandle,
-                  Controller,
-                  EFI_OPEN_PROTOCOL_BY_DRIVER
-                  );
-  if (!EFI_ERROR(Status)) {
-    //
-    // If PciIo exists, and isn't already open, check to see if device contains OpRom
-    // Return success if OpRom hasn't been launched yet.  OpRom will be launched in Start()
-    //
-    PciIoDevice = PCI_IO_DEVICE_FROM_PCI_IO_THIS(PciIoProtocol);
-    AllOpRomProcessed = PciIoDevice->AllOpRomProcessed;
-    PciContainEfiImage = ContainEfiImage(PciIoDevice->PciIo.RomImage, PciIoDevice->PciIo.RomSize);
-    //
-    // Close the I/O Abstraction(s) used to perform the supported test
-    //
-    gBS->CloseProtocol(
-        Controller,
-        &gEfiPciIoProtocolGuid,
-        This->DriverBindingHandle,
-        Controller
-        );
-    if (!AllOpRomProcessed && PciContainEfiImage) {
-      return EFI_SUCCESS;
-    }
-  }
 
   //
   // Check RemainingDevicePath validation
@@ -336,56 +238,10 @@ PciBusDriverBindingStart (
   EFI_DEVICE_PATH_PROTOCOL        *ParentDevicePath;
   EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL *PciRootBridgeIo;
 
-  EFI_PCI_IO_PROTOCOL       *PciIoProtocol;
-  PCI_IO_DEVICE             *PciIoDevice;
-  BOOLEAN                   AllOpRomProcessed;
-  BOOLEAN                   PciContainEfiImage;
-
   //
   // Initialize PciRootBridgeIo to suppress incorrect compiler warning.
   //
   PciRootBridgeIo = NULL;
-
-  //
-  // Check if Pci IO protocol is installed by this driver
-  //
-  Status = gBS->OpenProtocol (
-                  Controller,
-                  &gEfiPciIoProtocolGuid,
-                  (VOID **) &PciIoProtocol,
-                  This->DriverBindingHandle,
-                  Controller,
-                  EFI_OPEN_PROTOCOL_BY_DRIVER
-                  );
-  if (!EFI_ERROR(Status)) {
-    //
-    // If PciIo exists, and isn't already open, check to see if device contains OpRom
-    // Return success if OpRom hasn't been launched yet.  OpRom will be launched in Start()
-    //
-    PciIoDevice = PCI_IO_DEVICE_FROM_PCI_IO_THIS(PciIoProtocol);
-    AllOpRomProcessed = PciIoDevice->AllOpRomProcessed;
-    PciContainEfiImage = ContainEfiImage(PciIoDevice->PciIo.RomImage, PciIoDevice->PciIo.RomSize);
-    //
-    // Close the I/O Abstraction(s) used to perform the supported test
-    //
-    gBS->CloseProtocol(
-        Controller,
-        &gEfiPciIoProtocolGuid,
-        This->DriverBindingHandle,
-        Controller
-        );
-    if (!AllOpRomProcessed && PciContainEfiImage) {
-      PciIoDevice->AllOpRomProcessed = TRUE;
-      //
-      // Start the OpRom image
-      //
-      ProcessOpRomImage(PciIoDevice);
-      //
-      // Call ConnectController to now have OpRom driver start on this handle
-      //
-      return gBS->ConnectController(Controller, NULL, RemainingDevicePath, FALSE);
-    }
-  }
 
   //
   // Check RemainingDevicePath validation

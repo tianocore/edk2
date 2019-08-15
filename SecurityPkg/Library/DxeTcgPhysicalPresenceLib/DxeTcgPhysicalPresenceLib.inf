@@ -38,7 +38,6 @@
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   SecurityPkg/SecurityPkg.dec
-  ServerPlatformPkg/PlatformPkg.dec
 
 [LibraryClasses]
   MemoryAllocationLib
@@ -51,9 +50,6 @@
   PrintLib
   HiiLib
   TcgPpVendorLib
-  HobLib
-  TimerLib
-  BeepLib
 
 [Protocols]
   gEfiTcgProtocolGuid                   ## SOMETIMES_CONSUMES

@@ -823,7 +823,6 @@ PasswordProcess (
     //
     Status = ReadString (MenuOption, gPromptForPassword, StringPtr);
     if (EFI_ERROR (Status)) {
-      ZeroMem (StringPtr, (Maximum + 1) * sizeof (CHAR16));
       FreePool (StringPtr);
       return Status;
     }
@@ -841,7 +840,7 @@ PasswordProcess (
       } else {
         Status = EFI_SUCCESS;
       }
-      ZeroMem (StringPtr, (Maximum + 1) * sizeof (CHAR16));
+
       FreePool (StringPtr);
       return Status;
     }
@@ -857,7 +856,6 @@ PasswordProcess (
     // Reset state machine for password
     //
     Question->PasswordCheck (gFormData, Question, NULL);
-    ZeroMem (StringPtr, (Maximum + 1) * sizeof (CHAR16));
     FreePool (StringPtr);
     return Status;
   }
@@ -873,8 +871,6 @@ PasswordProcess (
     // Reset state machine for password
     //
     Question->PasswordCheck (gFormData, Question, NULL);
-    ZeroMem (StringPtr, (Maximum + 1) * sizeof (CHAR16));
-    ZeroMem (TempString, (Maximum + 1) * sizeof (CHAR16));
     FreePool (StringPtr);
     FreePool (TempString);
     return Status;
