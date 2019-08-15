@@ -332,7 +332,9 @@
 
   MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
   MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
+!if "XCODE5" not in $(TOOL_CHAIN_TAG)
   MdeModulePkg/Logo/LogoDxe.inf
+!endif
   MdeModulePkg/Universal/LoadFileOnFv2/LoadFileOnFv2.inf
   MdeModulePkg/Application/UiApp/UiApp.inf {
    <LibraryClasses>
@@ -375,10 +377,12 @@
 
   FatPkg/EnhancedFatDxe/Fat.inf
 
+!if "XCODE5" not in $(TOOL_CHAIN_TAG)
   ShellPkg/DynamicCommand/TftpDynamicCommand/TftpDynamicCommand.inf {
     <PcdsFixedAtBuild>
       gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize|FALSE
   }
+!endif
   ShellPkg/Application/Shell/Shell.inf {
     <LibraryClasses>
       ShellCommandLib|ShellPkg/Library/UefiShellCommandLib/UefiShellCommandLib.inf
