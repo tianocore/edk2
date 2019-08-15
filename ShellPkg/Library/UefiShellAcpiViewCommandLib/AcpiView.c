@@ -211,6 +211,10 @@ ProcessTableReportOptions (
   BOOLEAN Log;
   BOOLEAN HighLight;
 
+  //
+  // set local variables to suppress incorrect compiler/analyzer warnings
+  //
+  OriginalAttribute = 0;
   SignaturePtr = (UINT8*)(UINTN)&Signature;
   Log = FALSE;
   HighLight = GetColourHighlighting ();
@@ -346,6 +350,12 @@ AcpiView (
   UINT8                    RsdpRevision;
   PARSE_ACPI_TABLE_PROC    RsdpParserProc;
   BOOLEAN                  Trace;
+
+  //
+  // set local variables to suppress incorrect compiler/analyzer warnings
+  //
+  EfiConfigurationTable = NULL;
+  OriginalAttribute = 0;
 
   // Search the table for an entry that matches the ACPI Table Guid
   FoundAcpiTable = FALSE;
