@@ -158,3 +158,11 @@ class MemoryDataPipe(DataPipe):
         self.DataContainer = {"FdfParser": True if GlobalData.gFdfParser else False}
 
         self.DataContainer = {"LogLevel": EdkLogger.GetLevel()}
+
+        self.DataContainer = {"BinCacheSource":GlobalData.gBinCacheSource}
+
+        self.DataContainer = {"BinCacheDest":GlobalData.gBinCacheDest}
+
+        self.DataContainer = {"CacheIR":GlobalData.gCacheIR}
+
+        self.DataContainer = {"EnableGenfdsMultiThread":GlobalData.gEnableGenfdsMultiThread}
