@@ -121,6 +121,10 @@ VerifyChecksum (
   UINT8 Checksum;
   UINTN OriginalAttribute;
 
+  //
+  // set local variables to suppress incorrect compiler/analyzer warnings
+  //
+  OriginalAttribute = 0;
   ByteCount = 0;
   Checksum = 0;
 
@@ -472,6 +476,10 @@ ParseAcpi (
   BOOLEAN HighLight;
   UINTN   OriginalAttribute;
 
+  //
+  // set local variables to suppress incorrect compiler/analyzer warnings
+  //
+  OriginalAttribute = 0;
   Offset = 0;
 
   // Increment the Indent
