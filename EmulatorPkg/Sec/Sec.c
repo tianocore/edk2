@@ -75,6 +75,7 @@ _ModuleEntryPoint (
   EFI_PEI_PPI_DESCRIPTOR    *SecPpiList;
   UINTN                     SecReseveredMemorySize;
   UINTN                     Index;
+  EFI_PEI_PPI_DESCRIPTOR    PpiArray[10];
 
   EMU_MAGIC_PAGE()->PpiList = PpiList;
   ProcessLibraryConstructorList ();
@@ -104,16 +105,13 @@ _ModuleEntryPoint (
   SecCoreData->PeiTemporaryRamBase = (VOID *)((UINTN)SecCoreData->PeiTemporaryRamBase + SecReseveredMemorySize);
   SecCoreData->PeiTemporaryRamSize -= SecReseveredMemorySize;
 #else
-  {
-    //
-    // When I subtrack from SecCoreData->PeiTemporaryRamBase PEI Core crashes? Either there is a bug
-    // or I don't understand temp RAM correctly?
-    //
-    EFI_PEI_PPI_DESCRIPTOR    PpiArray[10];
+  //
+  // When I subtrack from SecCoreData->PeiTemporaryRamBase PEI Core crashes? Either there is a bug
+  // or I don't understand temp RAM correctly?
+  //
 
-    SecPpiList = &PpiArray[0];
-    ASSERT (sizeof (PpiArray) >= SecReseveredMemorySize);
-  }
+  SecPpiList = &PpiArray[0];
+  ASSERT (sizeof (PpiArray) >= SecReseveredMemorySize);
 #endif
   // Copy existing list, and append our entries.
   CopyMem (SecPpiList, PpiList, sizeof (EFI_PEI_PPI_DESCRIPTOR) * Index);
