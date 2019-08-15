@@ -178,7 +178,9 @@ INF  MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
 INF  MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
 INF  MdeModulePkg/Universal/PrintDxe/PrintDxe.inf
 INF  MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
+!if "XCODE5" not in $(TOOL_CHAIN_TAG)
 INF  MdeModulePkg/Logo/LogoDxe.inf
+!endif
 INF  MdeModulePkg/Universal/LoadFileOnFv2/LoadFileOnFv2.inf
 INF  RuleOverride = UI MdeModulePkg/Application/UiApp/UiApp.inf
 INF  MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp.inf
@@ -194,7 +196,9 @@ INF  EmulatorPkg/EmuSnpDxe/EmuSnpDxe.inf
 
 INF FatPkg/EnhancedFatDxe/Fat.inf
 
+!if "XCODE5" not in $(TOOL_CHAIN_TAG)
 INF  ShellPkg/DynamicCommand/TftpDynamicCommand/TftpDynamicCommand.inf
+!endif
 INF  ShellPkg/Application/Shell/Shell.inf
 
 [Rule.Common.SEC]
