@@ -246,6 +246,8 @@ class AutoGenWorkerInProcess(mp.Process):
                     Ma.GenMakeHash(GlobalData.gCacheIR)
                     if Ma.CanSkipbyMakeCache(GlobalData.gCacheIR):
                         continue
+                    else:
+                        Ma.PrintFirstMakeCacheMissFile(GlobalData.gCacheIR)
         except Empty:
             pass
         except:

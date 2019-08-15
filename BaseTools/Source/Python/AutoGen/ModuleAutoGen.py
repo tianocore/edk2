@@ -2379,6 +2379,82 @@ class ModuleAutoGen(AutoGen):
         print("[cache hit]: checkpoint_Makefile:", self.MetaFile.Path, self.Arch)
         return True
 
+    ## Show the first file name which causes cache miss
+    def PrintFirstMakeCacheMissFile(self, gDict):
+        if not GlobalData.gBinCacheSource:
+            return
+
+        # skip binary module
+        if self.IsBinaryModule:
+            return
+
+        if not (self.MetaFile.Path, self.Arch) in gDict:
+            return
+
+        # Only print cache miss file for the MakeCache not hit module
+        if gDict[(self.MetaFile.Path, self.Arch)].MakeCacheHit:
+            return
+
+        if not gDict[(self.MetaFile.Path, self.Arch)].MakeHashChain:
+            EdkLogger.quiet("[cache insight]: MakeHashChain is missing for: %s[%s]" % (self.MetaFile.Path, self.Arch))
+            return
+
+        # Find the cache dir name through the .ModuleHashPair file info
+        FileDir = path.join(GlobalData.gBinCacheSource, self.PlatformInfo.OutputDir, self.BuildTarget + "_" + self.ToolChain, self.Arch, self.SourceDir, self.MetaFile.BaseName)
+
+        ModuleHashPairList = [] # tuple list: [tuple(PreMakefileHash, MakeHash)]
+        ModuleHashPair = path.join(FileDir, self.Name + ".ModuleHashPair")
+        if not os.path.exists(ModuleHashPair):
+            EdkLogger.quiet("[cache insight]: Cannot find ModuleHashPair file for module: %s[%s]" % (self.MetaFile.Path, self.Arch))
+            return
+
+        try:
+            f = open(ModuleHashPair, 'r')
+            ModuleHashPairList = json.load(f)
+            f.close()
+        except:
+            EdkLogger.quiet("[cache insight]: Cannot load ModuleHashPair file for module: %s[%s]" % (self.MetaFile.Path, self.Arch))
+            return
+
+        MakeHashSet = set()
+        for idx, (PreMakefileHash, MakeHash) in enumerate (ModuleHashPairList):
+            TargetHashDir = path.join(FileDir, str(MakeHash))
+            if os.path.exists(TargetHashDir):
+                MakeHashSet.add(MakeHash)
+        if not MakeHashSet:
+            EdkLogger.quiet("[cache insight]: Cannot find valid cache dir for module: %s[%s]" % (self.MetaFile.Path, self.Arch))
+            return
+
+        TargetHash = list(MakeHashSet)[0]
+        TargetHashDir = path.join(FileDir, str(TargetHash))
+        if len(MakeHashSet) > 1 :
+            EdkLogger.quiet("[cache insight]: found multiple cache dirs for this module, random select dir '%s' to search the first cache miss file: %s[%s]" % (TargetHash, self.MetaFile.Path, self.Arch))
+
+        ListFile = path.join(TargetHashDir, self.Name + '.MakeHashChain')
+        if os.path.exists(ListFile):
+            try:
+                f = open(ListFile, 'r')
+                CachedList = json.load(f)
+                f.close()
+            except:
+                EdkLogger.quiet("[cache insight]: Cannot load MakeHashChain file: %s" % ListFile)
+                return
+        else:
+            EdkLogger.quiet("[cache insight]: Cannot find MakeHashChain file: %s" % ListFile)
+            return
+
+        CurrentList = gDict[(self.MetaFile.Path, self.Arch)].MakeHashChain
+        for idx, (file, hash) in enumerate (CurrentList):
+            (filecached, hashcached) = CachedList[idx]
+            if file != filecached:
+                EdkLogger.quiet("[cache insight]: first different file in %s[%s] is %s, the cached one is %s" % (self.MetaFile.Path, self.Arch, file, filecached))
+                break
+            if hash != hashcached:
+                EdkLogger.quiet("[cache insight]: first cache miss file in %s[%s] is %s" % (self.MetaFile.Path, self.Arch, file))
+                break
+
+        return True
+
     ## Decide whether we can skip the ModuleAutoGen process
     def CanSkipbyCache(self, gDict):
         # Hashing feature is off
