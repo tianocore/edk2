@@ -163,6 +163,4 @@ class MemoryDataPipe(DataPipe):
 
         self.DataContainer = {"BinCacheDest":GlobalData.gBinCacheDest}
 
-        self.DataContainer = {"CacheIR":GlobalData.gCacheIR}
-
         self.DataContainer = {"EnableGenfdsMultiThread":GlobalData.gEnableGenfdsMultiThread}
