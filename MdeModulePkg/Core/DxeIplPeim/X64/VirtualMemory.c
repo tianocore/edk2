@@ -653,6 +653,11 @@ CreateIdentityMappingPageTables (
   IA32_CR4                                      Cr4;
 
   //
+  // Set PageMapLevel5Entry to suppress incorrect compiler/analyzer warnings
+  //
+  PageMapLevel5Entry = NULL;
+
+  //
   // Make sure AddressEncMask is contained to smallest supported address field
   //
   AddressEncMask = PcdGet64 (PcdPteMemoryEncryptionAddressOrMask) & PAGING_1G_ADDRESS_MASK_64;
