@@ -1113,6 +1113,9 @@ DlLoadImage (
 }
 
 
+#ifdef __APPLE__
+__attribute__((noinline))
+#endif
 VOID
 SecGdbScriptBreak (
   char                *FileName,
