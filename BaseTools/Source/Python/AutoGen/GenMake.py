@@ -959,16 +959,12 @@ cleanlib:
                 # Keep the file to be checked
                 headerFileDependencySet.add(aFileName)
 
-        # Ensure that gModuleBuildTracking has been initialized per architecture
-        if self._AutoGenObject.Arch not in GlobalData.gModuleBuildTracking:
-            GlobalData.gModuleBuildTracking[self._AutoGenObject.Arch] = dict()
-
         # Check if a module dependency header file is missing from the module's MetaFile
         for aFile in headerFileDependencySet:
             if aFile in headerFilesInMetaFileSet:
                 continue
             if GlobalData.gUseHashCache:
-                GlobalData.gModuleBuildTracking[self._AutoGenObject.Arch][self._AutoGenObject] = 'FAIL_METAFILE'
+                GlobalData.gModuleBuildTracking[self._AutoGenObject] = 'FAIL_METAFILE'
             EdkLogger.warn("build","Module MetaFile [Sources] is missing local header!",
                         ExtraData = "Local Header: " + aFile + " not found in " + self._AutoGenObject.MetaFile.Path
                         )
