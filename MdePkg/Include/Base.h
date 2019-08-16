@@ -844,6 +844,20 @@ typedef UINTN  *BASE_LIST;
 #endif
 
 /**
+  Portable definition for compile time assertions.
+  Equivalent to C11 static_assert macro from assert.h.
+
+  @param  Expression  Boolean expression.
+  @param  Message     Raised compiler diagnostic message when expression is false.
+
+**/
+#ifdef _MSC_EXTENSIONS
+  #define STATIC_ASSERT static_assert
+#else
+  #define STATIC_ASSERT _Static_assert
+#endif
+
+/**
   Macro that returns a pointer to the data structure that contains a specified field of
   that data structure.  This is a lightweight method to hide information by placing a
   public data structure inside a larger private data structure and using a pointer to
