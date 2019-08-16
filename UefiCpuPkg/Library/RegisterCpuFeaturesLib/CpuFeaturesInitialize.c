@@ -826,6 +826,7 @@ ProgramProcessorRegister (
   UINTN                     ValidThreadCount;
   UINT32                    *ValidCoreCountPerPackage;
   EFI_STATUS                Status;
+  UINT64                    CurrentValue;
 
   //
   // Traverse Register Table of this logical processor
@@ -848,7 +849,16 @@ ProgramProcessorRegister (
       if (EFI_ERROR (Status)) {
         break;
       }
-
+      if (RegisterTableEntry->TestThenWrite) {
+        CurrentValue = BitFieldRead64 (
+                         Value,
+                         RegisterTableEntry->ValidBitStart,
+                         RegisterTableEntry->ValidBitStart + RegisterTableEntry->ValidBitLength - 1
+                         );
+        if (CurrentValue == RegisterTableEntry->Value) {
+          break;
+        }
+      }
       Value = (UINTN) BitFieldWrite64 (
                         Value,
                         RegisterTableEntry->ValidBitStart,
@@ -857,10 +867,29 @@ ProgramProcessorRegister (
                         );
       ReadWriteCr (RegisterTableEntry->Index, FALSE, &Value);
       break;
+
     //
     // The specified register is Model Specific Register
     //
     case Msr:
+      if (RegisterTableEntry->TestThenWrite) {
+        Value = (UINTN)AsmReadMsr64 (RegisterTableEntry->Index);
+        if (RegisterTableEntry->ValidBitLength >= 64) {
+          if (Value == RegisterTableEntry->Value) {
+            break;
+          }
+        } else {
+          CurrentValue = BitFieldRead64 (
+                           Value,
+                           RegisterTableEntry->ValidBitStart,
+                           RegisterTableEntry->ValidBitStart + RegisterTableEntry->ValidBitLength - 1
+                           );
+          if (CurrentValue == RegisterTableEntry->Value) {
+            break;
+          }
+        }
+      }
+
       if (RegisterTableEntry->ValidBitLength >= 64) {
         //
         // If length is not less than 64 bits, then directly write without reading
