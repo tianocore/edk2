@@ -2,7 +2,7 @@
   This library registers CPU features defined in Intel(R) 64 and IA-32
   Architectures Software Developer's Manual.
 
-  Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2017 - 2019, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -91,7 +91,7 @@ CpuCommonFeaturesLibConstructor (
   if (IsCpuFeatureSupported (CPU_FEATURE_LOCK_FEATURE_CONTROL_REGISTER)) {
     Status = RegisterCpuFeature (
                "Lock Feature Control Register",
-               FeatureControlGetConfigData,
+               NULL,
                LockFeatureControlRegisterSupport,
                LockFeatureControlRegisterInitialize,
                CPU_FEATURE_LOCK_FEATURE_CONTROL_REGISTER,
@@ -102,7 +102,7 @@ CpuCommonFeaturesLibConstructor (
   if (IsCpuFeatureSupported (CPU_FEATURE_SMX)) {
     Status = RegisterCpuFeature (
                "SMX",
-               FeatureControlGetConfigData,
+               NULL,
                SmxSupport,
                SmxInitialize,
                CPU_FEATURE_SMX,
@@ -114,7 +114,7 @@ CpuCommonFeaturesLibConstructor (
   if (IsCpuFeatureSupported (CPU_FEATURE_VMX)) {
     Status = RegisterCpuFeature (
                "VMX",
-               FeatureControlGetConfigData,
+               NULL,
                VmxSupport,
                VmxInitialize,
                CPU_FEATURE_VMX,
@@ -214,7 +214,7 @@ CpuCommonFeaturesLibConstructor (
   if (IsCpuFeatureSupported (CPU_FEATURE_LMCE)) {
     Status = RegisterCpuFeature (
                "LMCE",
-               FeatureControlGetConfigData,
+               NULL,
                LmceSupport,
                LmceInitialize,
                CPU_FEATURE_LMCE,
