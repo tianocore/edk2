@@ -1025,6 +1025,8 @@ EnlargeRegisterTable (
   @param[in]  ValidBitStart    Start of the bit section
   @param[in]  ValidBitLength   Length of the bit section
   @param[in]  Value            Value to write
+  @param[in]  TestThenWrite    Whether need to test current Value before writing.
+
 **/
 VOID
 CpuRegisterTableWriteWorker (
@@ -1034,7 +1036,8 @@ CpuRegisterTableWriteWorker (
   IN UINT64                  Index,
   IN UINT8                   ValidBitStart,
   IN UINT8                   ValidBitLength,
-  IN UINT64                  Value
+  IN UINT64                  Value,
+  IN BOOLEAN                 TestThenWrite
   )
 {
   CPU_FEATURES_DATA        *CpuFeaturesData;
@@ -1070,6 +1073,7 @@ CpuRegisterTableWriteWorker (
   RegisterTableEntry[RegisterTable->TableLength].ValidBitStart  = ValidBitStart;
   RegisterTableEntry[RegisterTable->TableLength].ValidBitLength = ValidBitLength;
   RegisterTableEntry[RegisterTable->TableLength].Value          = Value;
+  RegisterTableEntry[RegisterTable->TableLength].TestThenWrite  = TestThenWrite;
 
   RegisterTable->TableLength++;
 }
@@ -1105,7 +1109,41 @@ CpuRegisterTableWrite (
   Start  = (UINT8)LowBitSet64  (ValueMask);
   End    = (UINT8)HighBitSet64 (ValueMask);
   Length = End - Start + 1;
-  CpuRegisterTableWriteWorker (FALSE, ProcessorNumber, RegisterType, Index, Start, Length, Value);
+  CpuRegisterTableWriteWorker (FALSE, ProcessorNumber, RegisterType, Index, Start, Length, Value, FALSE);
+}
+
+/**
+  Adds an entry in specified register table.
+
+  This function adds an entry in specified register table, with given register type,
+  register index, bit section and value.
+
+  @param[in]  ProcessorNumber  The index of the CPU to add a register table entry
+  @param[in]  RegisterType     Type of the register to program
+  @param[in]  Index            Index of the register to program
+  @param[in]  ValueMask        Mask of bits in register to write
+  @param[in]  Value            Value to write
+
+  @note This service could be called by BSP only.
+**/
+VOID
+EFIAPI
+CpuRegisterTableTestThenWrite (
+  IN UINTN               ProcessorNumber,
+  IN REGISTER_TYPE       RegisterType,
+  IN UINT64              Index,
+  IN UINT64              ValueMask,
+  IN UINT64              Value
+  )
+{
+  UINT8                   Start;
+  UINT8                   End;
+  UINT8                   Length;
+
+  Start  = (UINT8)LowBitSet64  (ValueMask);
+  End    = (UINT8)HighBitSet64 (ValueMask);
+  Length = End - Start + 1;
+  CpuRegisterTableWriteWorker (FALSE, ProcessorNumber, RegisterType, Index, Start, Length, Value, TRUE);
 }
 
 /**
@@ -1139,7 +1177,7 @@ PreSmmCpuRegisterTableWrite (
   Start  = (UINT8)LowBitSet64  (ValueMask);
   End    = (UINT8)HighBitSet64 (ValueMask);
   Length = End - Start + 1;
-  CpuRegisterTableWriteWorker (TRUE, ProcessorNumber, RegisterType, Index, Start, Length, Value);
+  CpuRegisterTableWriteWorker (TRUE, ProcessorNumber, RegisterType, Index, Start, Length, Value, FALSE);
 }
 
 /**
