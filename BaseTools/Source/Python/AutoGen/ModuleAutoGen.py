@@ -295,7 +295,7 @@ class ModuleAutoGen(AutoGen):
         ModuleNames = self.DataPipe.Get("M_Name")
         if not ModuleNames:
             return self.Name
-        return ModuleNames.get(self.Name,self.Name)
+        return ModuleNames.get((self.Name,self.MetaFile),self.Name)
 
     # Macros could be used in build_rule.txt (also Makefile)
     @cached_property

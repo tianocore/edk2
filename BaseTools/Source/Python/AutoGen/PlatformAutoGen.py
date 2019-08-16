@@ -1366,14 +1366,15 @@ class PlatformAutoGen(AutoGen):
                 UniqueName[Module.BaseName] = set()
             UniqueName[Module.BaseName].add((self.ModuleGuid(Module),Module.MetaFile))
         for module_paths in ModuleNameDict.values():
-            if len(module_paths) > 1 and len(set(module_paths))>1:
+            if len(set(module_paths))>1:
                 samemodules = list(set(module_paths))
                 EdkLogger.error("build", FILE_DUPLICATED, 'Modules have same BaseName and FILE_GUID:\n'
                                     '  %s\n  %s' % (samemodules[0], samemodules[1]))
         for name in UniqueName:
             Guid_Path = UniqueName[name]
             if len(Guid_Path) > 1:
-                retVal[name] = '%s_%s' % (name,Guid_Path.pop()[0])
+                for guid,mpath in Guid_Path:
+                    retVal[(name,mpath)] = '%s_%s' % (name,guid)
         return retVal
     ## Expand * in build option key
     #
