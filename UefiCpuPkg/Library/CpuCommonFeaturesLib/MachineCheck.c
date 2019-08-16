@@ -1,7 +1,7 @@
 /** @file
   Machine Check features.
 
-  Copyright (c) 2017 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2017 - 2019, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -319,8 +319,6 @@ LmceInitialize (
   IN BOOLEAN                           State
   )
 {
-  MSR_IA32_FEATURE_CONTROL_REGISTER    *MsrRegister;
-
   //
   // The scope of LcmeOn bit in the MSR_IA32_MISC_ENABLE is core for below processor type, only program
   // MSR_IA32_MISC_ENABLE for thread 0 in each core.
@@ -333,17 +331,14 @@ LmceInitialize (
     }
   }
 
-  ASSERT (ConfigData != NULL);
-  MsrRegister = (MSR_IA32_FEATURE_CONTROL_REGISTER *) ConfigData;
-  if (MsrRegister[ProcessorNumber].Bits.Lock == 0) {
-    CPU_REGISTER_TABLE_WRITE_FIELD (
-      ProcessorNumber,
-      Msr,
-      MSR_IA32_FEATURE_CONTROL,
-      MSR_IA32_FEATURE_CONTROL_REGISTER,
-      Bits.LmceOn,
-      (State) ? 1 : 0
-      );
-  }
+  CPU_REGISTER_TABLE_TEST_THEN_WRITE_FIELD (
+    ProcessorNumber,
+    Msr,
+    MSR_IA32_FEATURE_CONTROL,
+    MSR_IA32_FEATURE_CONTROL_REGISTER,
+    Bits.LmceOn,
+    (State) ? 1 : 0
+    );
+
   return RETURN_SUCCESS;
 }
