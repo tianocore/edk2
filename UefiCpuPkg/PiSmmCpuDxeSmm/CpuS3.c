@@ -160,6 +160,58 @@ S3WaitForSemaphore (
 }
 
 /**
+  Read / write CR value.
+
+  @param[in]      CrIndex         The CR index which need to read/write.
+  @param[in]      Read            Read or write. TRUE is read.
+  @param[in,out]  CrValue         CR value.
+
+  @retval    EFI_SUCCESS means read/write success, else return EFI_UNSUPPORTED.
+**/
+UINTN
+ReadWriteCr (
+  IN     UINT32       CrIndex,
+  IN     BOOLEAN      Read,
+  IN OUT UINTN        *CrValue
+  )
+{
+  switch (CrIndex) {
+  case 0:
+    if (Read) {
+      *CrValue = AsmReadCr0 ();
+    } else {
+      AsmWriteCr0 (*CrValue);
+    }
+    break;
+  case 2:
+    if (Read) {
+      *CrValue = AsmReadCr2 ();
+    } else {
+      AsmWriteCr2 (*CrValue);
+    }
+    break;
+  case 3:
+    if (Read) {
+      *CrValue = AsmReadCr3 ();
+    } else {
+      AsmWriteCr3 (*CrValue);
+    }
+    break;
+  case 4:
+    if (Read) {
+      *CrValue = AsmReadCr4 ();
+    } else {
+      AsmWriteCr4 (*CrValue);
+    }
+    break;
+  default:
+    return EFI_UNSUPPORTED;;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
   Initialize the CPU registers from a register table.
 
   @param[in]  RegisterTable         The register table for this AP.
@@ -188,6 +240,7 @@ ProgramProcessorRegister (
   UINTN                     ProcessorIndex;
   UINTN                     ValidThreadCount;
   UINT32                    *ValidCoreCountPerPackage;
+  EFI_STATUS                Status;
 
   //
   // Traverse Register Table of this logical processor
@@ -206,50 +259,17 @@ ProgramProcessorRegister (
     // The specified register is Control Register
     //
     case ControlRegister:
-      switch (RegisterTableEntry->Index) {
-      case 0:
-        Value = AsmReadCr0 ();
-        Value = (UINTN) BitFieldWrite64 (
-                          Value,
-                          RegisterTableEntry->ValidBitStart,
-                          RegisterTableEntry->ValidBitStart + RegisterTableEntry->ValidBitLength - 1,
-                          (UINTN) RegisterTableEntry->Value
-                          );
-        AsmWriteCr0 (Value);
-        break;
-      case 2:
-        Value = AsmReadCr2 ();
-        Value = (UINTN) BitFieldWrite64 (
-                          Value,
-                          RegisterTableEntry->ValidBitStart,
-                          RegisterTableEntry->ValidBitStart + RegisterTableEntry->ValidBitLength - 1,
-                          (UINTN) RegisterTableEntry->Value
-                          );
-        AsmWriteCr2 (Value);
-        break;
-      case 3:
-        Value = AsmReadCr3 ();
-        Value = (UINTN) BitFieldWrite64 (
-                          Value,
-                          RegisterTableEntry->ValidBitStart,
-                          RegisterTableEntry->ValidBitStart + RegisterTableEntry->ValidBitLength - 1,
-                          (UINTN) RegisterTableEntry->Value
-                          );
-        AsmWriteCr3 (Value);
-        break;
-      case 4:
-        Value = AsmReadCr4 ();
-        Value = (UINTN) BitFieldWrite64 (
-                          Value,
-                          RegisterTableEntry->ValidBitStart,
-                          RegisterTableEntry->ValidBitStart + RegisterTableEntry->ValidBitLength - 1,
-                          (UINTN) RegisterTableEntry->Value
-                          );
-        AsmWriteCr4 (Value);
-        break;
-      default:
+      Status = ReadWriteCr (RegisterTableEntry->Index, TRUE, &Value);
+      if (EFI_ERROR (Status)) {
         break;
       }
+      Value = (UINTN) BitFieldWrite64 (
+                        Value,
+                        RegisterTableEntry->ValidBitStart,
+                        RegisterTableEntry->ValidBitStart + RegisterTableEntry->ValidBitLength - 1,
+                        RegisterTableEntry->Value
+                        );
+      ReadWriteCr (RegisterTableEntry->Index, FALSE, &Value);
       break;
     //
     // The specified register is Model Specific Register
