@@ -20,7 +20,10 @@ typedef struct {
 } RESET_UTILITY_GUID_SPECIFIC_RESET_DATA;
 #pragma pack()
 
-VERIFY_SIZE_OF (RESET_UTILITY_GUID_SPECIFIC_RESET_DATA, 18);
+STATIC_ASSERT (
+  sizeof (RESET_UTILITY_GUID_SPECIFIC_RESET_DATA) == 18,
+  "sizeof (RESET_UTILITY_GUID_SPECIFIC_RESET_DATA) is expected to be 18 bytes"
+  );
 
 /**
   This is a shorthand helper function to reset with reset type and a subtype
