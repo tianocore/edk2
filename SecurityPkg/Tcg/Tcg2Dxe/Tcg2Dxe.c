@@ -1363,9 +1363,9 @@ Tcg2SetActivePCRBanks (
     //
     // Need clear previous SET_PCR_BANKS setting
     //
-    ReturnCode = Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunction (TCG_ACPI_FUNCTION_SUBMIT_REQUEST_TO_BIOS_2, TCG2_PHYSICAL_PRESENCE_NO_ACTION, 0);
+    ReturnCode = Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunction (TCG2_PHYSICAL_PRESENCE_NO_ACTION, 0);
   } else {
-    ReturnCode = Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunction (TCG_ACPI_FUNCTION_SUBMIT_REQUEST_TO_BIOS_2, TCG2_PHYSICAL_PRESENCE_SET_PCR_BANKS, ActivePcrBanks);
+    ReturnCode = Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunction (TCG2_PHYSICAL_PRESENCE_SET_PCR_BANKS, ActivePcrBanks);
   }
 
   if (ReturnCode == TCG_PP_SUBMIT_REQUEST_TO_PREOS_SUCCESS) {
@@ -2351,7 +2351,6 @@ OnExitBootServices (
   IN      VOID                      *Context
   )
 {
-#ifndef PC_HOOK
   EFI_STATUS    Status;
 
   //
@@ -2375,7 +2374,6 @@ OnExitBootServices (
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "%a not Measured. Error!\n", EFI_EXIT_BOOT_SERVICES_SUCCEEDED));
   }
-#endif
 }
 
 /**
