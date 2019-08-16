@@ -28,19 +28,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #pragma warning ( disable : 4200 )
 #endif
 
-/**
-  Verifies the storage size of a given data type.
-
-  This macro generates a divide by zero error or a zero size array declaration in
-  the preprocessor if the size is incorrect.  These are declared as "extern" so
-  the space for these arrays will not be in the modules.
-
-  @param  TYPE  The date type to determine the size of.
-  @param  Size  The expected size for the TYPE.
-
-**/
-#define VERIFY_SIZE_OF(TYPE, Size) extern UINT8 _VerifySizeof##TYPE[(sizeof(TYPE) == (Size)) / (sizeof(TYPE) == (Size))]
-
 //
 // The Microsoft* C compiler can removed references to unreferenced data items
 //  if the /OPT:REF linker option is used. We defined a macro as this is a
