@@ -3135,7 +3135,7 @@ RandomBytes (
   @param[in]   SaltSize         Salt size in bytes.
   @param[in]   Info             Pointer to the application specific info.
   @param[in]   InfoSize         Info size in bytes.
-  @param[Out]  Out              Pointer to buffer to receive hkdf value.
+  @param[out]  Out              Pointer to buffer to receive hkdf value.
   @param[in]   OutSize          Size of hkdf bytes to generate.
 
   @retval TRUE   Hkdf generated successfully.
