@@ -544,6 +544,11 @@ ReclaimPages (
   UINT64                       *ReleasePageAddress;
   IA32_CR4                     Cr4;
   BOOLEAN                      Enable5LevelPaging;
+  UINT64                       PFAddress;
+  UINT64                       PFAddressPml5Index;
+  UINT64                       PFAddressPml4Index;
+  UINT64                       PFAddressPdptIndex;
+  UINT64                       PFAddressPdtIndex;
 
   Pml4 = NULL;
   Pdpt = NULL;
@@ -555,6 +560,11 @@ ReclaimPages (
   MinPdt  = (UINTN)-1;
   Acc     = 0;
   ReleasePageAddress = 0;
+  PFAddress = AsmReadCr2 ();
+  PFAddressPml5Index = BitFieldRead64 (PFAddress, 48, 48 + 8);
+  PFAddressPml4Index = BitFieldRead64 (PFAddress, 39, 39 + 8);
+  PFAddressPdptIndex = BitFieldRead64 (PFAddress, 30, 30 + 8);
+  PFAddressPdtIndex = BitFieldRead64 (PFAddress, 21, 21 + 8);
 
   Cr4.UintN = AsmReadCr4 ();
   Enable5LevelPaging = (BOOLEAN) (Cr4.Bits.LA57 == 1);
@@ -629,18 +639,21 @@ ReclaimPages (
               // we will find the entry has the smallest access record value
               //
               PDPTEIgnore = TRUE;
-              Acc = GetAndUpdateAccNum (Pdt + PdtIndex);
-              if (Acc < MinAcc) {
-                //
-                // If the PD entry has the smallest access record value,
-                // save the Page address to be released
-                //
-                MinAcc  = Acc;
-                MinPml5 = Pml5Index;
-                MinPml4 = Pml4Index;
-                MinPdpt = PdptIndex;
-                MinPdt  = PdtIndex;
-                ReleasePageAddress = Pdt + PdtIndex;
+              if (PdtIndex != PFAddressPdtIndex || PdptIndex != PFAddressPdptIndex ||
+                  Pml4Index != PFAddressPml4Index || Pml5Index != PFAddressPml5Index) {
+                Acc = GetAndUpdateAccNum (Pdt + PdtIndex);
+                if (Acc < MinAcc) {
+                  //
+                  // If the PD entry has the smallest access record value,
+                  // save the Page address to be released
+                  //
+                  MinAcc  = Acc;
+                  MinPml5 = Pml5Index;
+                  MinPml4 = Pml4Index;
+                  MinPdpt = PdptIndex;
+                  MinPdt  = PdtIndex;
+                  ReleasePageAddress = Pdt + PdtIndex;
+                }
               }
             }
           }
@@ -649,18 +662,21 @@ ReclaimPages (
             // If this PDPT entry has no PDT entries pointer to 4 KByte pages,
             // it should only has the entries point to 2 MByte Pages
             //
-            Acc = GetAndUpdateAccNum (Pdpt + PdptIndex);
-            if (Acc < MinAcc) {
-              //
-              // If the PDPT entry has the smallest access record value,
-              // save the Page address to be released
-              //
-              MinAcc  = Acc;
-              MinPml5 = Pml5Index;
-              MinPml4 = Pml4Index;
-              MinPdpt = PdptIndex;
-              MinPdt  = (UINTN)-1;
-              ReleasePageAddress = Pdpt + PdptIndex;
+            if (PdptIndex != PFAddressPdptIndex || Pml4Index != PFAddressPml4Index ||
+                Pml5Index != PFAddressPml5Index) {
+              Acc = GetAndUpdateAccNum (Pdpt + PdptIndex);
+              if (Acc < MinAcc) {
+                //
+                // If the PDPT entry has the smallest access record value,
+                // save the Page address to be released
+                //
+                MinAcc  = Acc;
+                MinPml5 = Pml5Index;
+                MinPml4 = Pml4Index;
+                MinPdpt = PdptIndex;
+                MinPdt  = (UINTN)-1;
+                ReleasePageAddress = Pdpt + PdptIndex;
+              }
             }
           }
         }
@@ -670,18 +686,20 @@ ReclaimPages (
         // If PML4 entry has no the PDPT entry pointer to 2 MByte pages,
         // it should only has the entries point to 1 GByte Pages
         //
-        Acc = GetAndUpdateAccNum (Pml4 + Pml4Index);
-        if (Acc < MinAcc) {
-          //
-          // If the PML4 entry has the smallest access record value,
-          // save the Page address to be released
-          //
-          MinAcc  = Acc;
-          MinPml5 = Pml5Index;
-          MinPml4 = Pml4Index;
-          MinPdpt = (UINTN)-1;
-          MinPdt  = (UINTN)-1;
-          ReleasePageAddress = Pml4 + Pml4Index;
+        if (Pml4Index != PFAddressPml4Index || Pml5Index != PFAddressPml5Index) {
+          Acc = GetAndUpdateAccNum (Pml4 + Pml4Index);
+          if (Acc < MinAcc) {
+            //
+            // If the PML4 entry has the smallest access record value,
+            // save the Page address to be released
+            //
+            MinAcc  = Acc;
+            MinPml5 = Pml5Index;
+            MinPml4 = Pml4Index;
+            MinPdpt = (UINTN)-1;
+            MinPdt  = (UINTN)-1;
+            ReleasePageAddress = Pml4 + Pml4Index;
+          }
         }
       }
     }
@@ -709,7 +727,8 @@ ReclaimPages (
       Pml4 = (UINT64 *) (UINTN) (Pml5[MinPml5] & gPhyMask);
       Pdpt = (UINT64*)(UINTN)(Pml4[MinPml4] & ~mAddressEncMask & gPhyMask);
       SubEntriesNum = GetSubEntriesNum(Pdpt + MinPdpt);
-      if (SubEntriesNum == 0) {
+      if (SubEntriesNum == 0 &&
+          (MinPdpt != PFAddressPdptIndex || MinPml4 != PFAddressPml4Index || MinPml5 != PFAddressPml5Index)) {
         //
         // Release the empty Page Directory table if there was no more 4 KByte Page Table entry
         // clear the Page directory entry
@@ -725,7 +744,7 @@ ReclaimPages (
       //
       // Update the sub-entries filed in PDPT entry and exit
       //
-      SetSubEntriesNum (Pdpt + MinPdpt, SubEntriesNum - 1);
+      SetSubEntriesNum (Pdpt + MinPdpt, (SubEntriesNum - 1) & 0x1FF);
       break;
     }
     if (MinPdpt != (UINTN)-1) {
@@ -733,7 +752,7 @@ ReclaimPages (
       // One 2MB Page Table is released or Page Directory table is released, check the PML4 entry
       //
       SubEntriesNum = GetSubEntriesNum (Pml4 + MinPml4);
-      if (SubEntriesNum == 0) {
+      if (SubEntriesNum == 0 && (MinPml4 != PFAddressPml4Index || MinPml5 != PFAddressPml5Index)) {
         //
         // Release the empty PML4 table if there was no more 1G KByte Page Table entry
         // clear the Page directory entry
@@ -746,7 +765,7 @@ ReclaimPages (
       //
       // Update the sub-entries filed in PML4 entry and exit
       //
-      SetSubEntriesNum (Pml4 + MinPml4, SubEntriesNum - 1);
+      SetSubEntriesNum (Pml4 + MinPml4, (SubEntriesNum - 1) & 0x1FF);
       break;
     }
     //
@@ -919,7 +938,7 @@ SmiDefaultPFHandler (
     PageTable[PTIndex] = ((PFAddress | mAddressEncMask) & gPhyMask & ~((1ull << EndBit) - 1)) |
                          PageAttribute | IA32_PG_A | PAGE_ATTRIBUTE_BITS;
     if (UpperEntry != NULL) {
-      SetSubEntriesNum (UpperEntry, GetSubEntriesNum (UpperEntry) + 1);
+      SetSubEntriesNum (UpperEntry, (GetSubEntriesNum (UpperEntry) + 1) & 0x1FF);
     }
     //
     // Get the next page address if we need to create more page tables
