@@ -32,25 +32,10 @@
   Expression.c
   Presentation.c
   Expression.h
-#
-# PC:RestrictedBegin
-#
-  ItkSupport.c                              ## PC_HOOK
-  ItkSupport.h                              ## PC_HOOK
-#
-# PC:RestrictedEnd
-#
 
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
-#
-# PC:RestrictedBegin
-#
-  CpPcPlatPkg/CpPcPlatPkg.dec              ## PC_HOOK
-#
-# PC:RestrictedEnd
-#
 
 [LibraryClasses]
   MemoryAllocationLib
@@ -86,13 +71,6 @@
   gEdkiiFormDisplayEngineProtocolGuid
   gEdkiiFormBrowserExProtocolGuid               ## PRODUCES
   gEfiRegularExpressionProtocolGuid             ## SOMETIMES_CONSUMES
-#
-# PC:RestrictedBegin
-#
-  gItk50PostProtocolGuid                        ## PC_HOOK
-#
-# PC:RestrictedEnd
-#
 
 [Depex]
   gEfiHiiDatabaseProtocolGuid AND gEfiHiiConfigRoutingProtocolGuid

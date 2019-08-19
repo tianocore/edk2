@@ -40,8 +40,6 @@ PciDevicePresent (
 {
   UINT64      Address;
   EFI_STATUS  Status;
-  UINT32      Dummy;
-  Dummy = 0xFFFFFFFF;
 
   //
   // Create PCI address map in terms of Bus, Device and Func
@@ -59,28 +57,6 @@ PciDevicePresent (
                                   Pci
                                   );
 
-  if ((Pci->Hdr).VendorId == 0xffff) {
-	  /// PCIe card could have been assigned a temporary bus number.
-	  /// An write cycle can be used to try to rewrite the Bus number in the card
-	  /// Try to write the Vendor Id register, and recheck if the card is present.
-	  Status = PciRootBridgeIo->Pci.Write(
-		  PciRootBridgeIo,
-		  EfiPciWidthUint32,
-		  Address,
-		  1,
-		  &Dummy
-		  );
-
-	  // Retry the previous read after the PCI cycle has been tried.
-	  Status = PciRootBridgeIo->Pci.Read(
-		  PciRootBridgeIo,
-		  EfiPciWidthUint32,
-		  Address,
-		  1,
-		  Pci
-		  );
-  }
-
   if (!EFI_ERROR (Status) && (Pci->Hdr).VendorId != 0xffff) {
     //
     // Read the entire config header for the device
@@ -97,141 +73,6 @@ PciDevicePresent (
   }
 
   return EFI_NOT_FOUND;
-}
-
-/**
-  Determine the device port type reading the bits [7:4] of the PCI Express
-  Capabilitites register (offset 02h) of the PCI Express capability structure.
-
-  @param PciIoDevice                    Pointer to instance of EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL
-  @param DevicePortTypePtr              Pointer to integer (eight bits) to store the device port type.
-
-  @retval EFI_INVALID_PARAMETER         Returned when arguments of function are not valid.
-  @retval EFI_SUCCESS                   Returned when there are no errors reading capability register and
-                                        device port type is returned correctly in corresponding variable.
-**/
-EFI_STATUS
-DetermineDevicePortType (
-  IN  PCI_IO_DEVICE                    *PciIoDevice,
-  OUT UINT8                            *DevicePortTypePtr
-  )
-{
-  EFI_STATUS                   Status;
-  UINT32                       PcieCapRegOffset;
-  UINT32                       CapRegPtr;
-  PCI_REG_PCIE_CAPABILITY      Capability;
-
-  if (PciIoDevice == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  //
-  // Detect if PCI Express Device
-  //
-  PciIoDevice->PciExpressCapabilityOffset = 0;
-  Status = LocateCapabilityRegBlock (
-             PciIoDevice,
-             EFI_PCI_CAPABILITY_ID_PCIEXP,
-             &PciIoDevice->PciExpressCapabilityOffset,
-             NULL
-             );
-  if (EFI_ERROR (Status)) {
-    //
-    // It is expected behavior that most devices does not have defined this capability,
-    // then avoid printing any debug message.
-    //
-    return Status;
-  }
-
-  if (!EFI_ERROR (Status)) {
-    //
-    // There is a valid value for PciIoDevice->PciExpressCapabilityOffset
-    //
-    PcieCapRegOffset = OFFSET_OF(PCI_CAPABILITY_PCIEXP, Capability);
-    CapRegPtr = PciIoDevice->PciExpressCapabilityOffset + PcieCapRegOffset;
-    Status = PciIoDevice->PciIo.Pci.Read (
-                                      &PciIoDevice->PciIo,
-                                      EfiPciIoWidthUint16,
-                                      CapRegPtr,
-                                      1,
-                                      &Capability
-                                      );
-    if (EFI_ERROR (Status)) {
-      DEBUG((EFI_D_ERROR, "Unable to read Capability register, Status = 0x%x\n", Status));
-      return Status;
-    }
-    if (!EFI_ERROR (Status)) {
-      //
-      // Save the interesting information: Device Port Type, Bits [7:4]
-      //
-      (*DevicePortTypePtr) = (UINT8) Capability.Bits.DevicePortType;
-    }
-  }
-  return EFI_SUCCESS;
-}
-
-/**
-  This function returns a TRUE condition only when a End-Point PCIe device does not support ARI capability and
-  is different than zero (device number 1-31).
-
-  @param Bridge                         Pointer to instance of EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL, containing information of the bridge.
-  @param PciIoDevice                    Pointer to instance of EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL, containing information of the device.
-  @param ExitConditions                 Store the TRUE value only when conditions are satisfied, otherwise value is FALSE.
-
-  @retval EFI_INVALID_PARAMETER         When arguments of function are invalid
-  @retval EFI_SUCCESS                   When there are no errors calling auxiliary functions.
-**/
-EFI_STATUS
-ExitConditionsForDeviceNotAriCapable (
-  IN PCI_IO_DEVICE                    *Bridge,
-  IN PCI_IO_DEVICE                    *PciIoDevice,
-  OUT BOOLEAN                         *ExitConditions
-  )
-{
-  EFI_STATUS            Status;
-  UINT8                 DevicePortType;
-  UINT8                 ParentDevicePortType;
-
-  //
-  // Initialize to FALSE, this value will be returned by default if some of the below conditions are not satisfied.
-  //
-  (*ExitConditions) = FALSE;
-
-  //
-  // Downstream Ports that do not have ARI Forwarding enabled must associate only Device 0 with the device attached to the
-  // Logical Bus representing the Link from the Port.
-  //
-  if (PciIoDevice->DeviceNumber != 0) {
-    //
-    // If it is NOT ARI capable PciIoDevice->AriCapabilityOffset has zero value
-    //
-    if (PciIoDevice->AriCapabilityOffset == 0) {
-      Status = DetermineDevicePortType(Bridge, &ParentDevicePortType);
-      if (!EFI_ERROR (Status)) {
-        //
-        // If the Parent Device is Root Port device port type
-        //
-        if (ParentDevicePortType == PCIE_DEVICE_PORT_TYPE_ROOT_PORT) {
-          Status = DetermineDevicePortType(PciIoDevice, &DevicePortType);
-          if (!EFI_ERROR (Status)) {
-            //
-            // If the PCIe Device is an End-Point, a PCIe-to-PCI Bridge or a Upstream Port.
-            //
-            if ((DevicePortType == PCIE_DEVICE_PORT_TYPE_UPSTREAM_PORT) ||
-                (DevicePortType == PCIE_DEVICE_PORT_TYPE_PCIE_TO_PCI_BRIDGE) ||
-                (DevicePortType == PCIE_DEVICE_PORT_TYPE_PCIE_ENDPOINT) ||
-                (DevicePortType == PCIE_DEVICE_PORT_TYPE_LEGACY_PCIE_ENDPOINT)) {
-              DEBUG((EFI_D_INFO, "Invalid config: PCIe device in BDF[%02x:%02x:%02x] is Not ARI capable\n",
-                  PciIoDevice->BusNumber, PciIoDevice->DeviceNumber, PciIoDevice->FunctionNumber));
-              (*ExitConditions) = TRUE;
-            }
-          }
-        }
-      }
-    }
-  }
-
-  return EFI_SUCCESS;
 }
 
 /**
@@ -304,15 +145,6 @@ PciPciDeviceInfoCollector (
                    Func,
                    &PciIoDevice
                    );
-
-        if (!PcdGetBool (PcdRootPortAbortsNonZeroNonAriDevices)) {
-          //
-          // Skipping current device if error status
-          //
-          if (EFI_ERROR (Status)) {
-            break;
-          }
-        }
 
         //
         // Recursively scan PCI busses on the other side of PCI-PCI bridges
@@ -2260,10 +2092,9 @@ CreatePciIoDevice (
   IN UINT8                            Func
   )
 {
-  PCI_IO_DEVICE         *PciIoDevice;
-  EFI_PCI_IO_PROTOCOL   *PciIo;
-  EFI_STATUS            Status;
-  BOOLEAN               ExitConditionsAriDevice = FALSE;
+  PCI_IO_DEVICE        *PciIoDevice;
+  EFI_PCI_IO_PROTOCOL  *PciIo;
+  EFI_STATUS           Status;
 
   PciIoDevice = AllocateZeroPool (sizeof (PCI_IO_DEVICE));
   if (PciIoDevice == NULL) {
@@ -2385,25 +2216,6 @@ CreatePciIoDevice (
       }
 
       DEBUG ((EFI_D_INFO, " ARI: CapOffset = 0x%x\n", PciIoDevice->AriCapabilityOffset));
-    }
-  }
-
-  if (!PcdGetBool (PcdRootPortAbortsNonZeroNonAriDevices)) {
-    //
-    // For Silicons that allows transactions to non zero Pcie End-Point devices even they are
-    // not ARI capable (a Silicon bug).
-    // If conditions are satisfied, return NULL and as result the current device will not be enumerated.
-    //
-    Status = ExitConditionsForDeviceNotAriCapable (Bridge,PciIoDevice,&ExitConditionsAriDevice);
-    if (!EFI_ERROR (Status)) {
-      if (ExitConditionsAriDevice) {
-        DEBUG ((EFI_D_INFO, "Skipping enumeration of current invalid device\n"));
-        //
-        // Free the space associated to current invalid Pcie End-Point device
-        //
-        FreePool(PciIoDevice);
-        return NULL;
-      }
     }
   }
 
