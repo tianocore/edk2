@@ -102,7 +102,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <Ppi/EmuThunk.h>
 #include <Ppi/StatusCode.h>
-#include <Ppi/SimCmdLineArgs.h>
 
 #include <Protocol/SimplePointer.h>
 #include <Protocol/SimpleTextIn.h>
@@ -116,7 +115,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Protocol/EmuThread.h>
 #include <Protocol/EmuBlockIo.h>
 #include <Protocol/EmuSnp.h>
-#include <Protocol/EmuDynamicLoad.h>
 
 #include <Guid/FileInfo.h>
 #include <Guid/FileSystemInfo.h>
@@ -126,7 +124,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "Gasket.h"
 
 
-#define STACK_SIZE                0x2000000
+#define STACK_SIZE                0x20000
 
 typedef struct {
   EFI_PHYSICAL_ADDRESS  Address;
@@ -346,12 +344,11 @@ VOID SecDisableInterrupt (VOID);
 BOOLEAN SecInterruptEanbled (VOID);
 
 
-extern EMU_THUNK_PROTOCOL         gEmuThunkProtocol;
-extern EMU_IO_THUNK_PROTOCOL      gX11ThunkIo;
-extern EMU_IO_THUNK_PROTOCOL      gPosixFileSystemThunkIo;
-extern EMU_IO_THUNK_PROTOCOL      gPthreadThunkIo;
-extern EMU_IO_THUNK_PROTOCOL      gBlockIoThunkIo;
-extern EMU_IO_THUNK_PROTOCOL      gSnpThunkIo;
-extern EMU_DYNAMIC_LOAD_PROTOCOL  gDynamicLoad;
+extern EMU_THUNK_PROTOCOL    gEmuThunkProtocol;
+extern EMU_IO_THUNK_PROTOCOL gX11ThunkIo;
+extern EMU_IO_THUNK_PROTOCOL gPosixFileSystemThunkIo;
+extern EMU_IO_THUNK_PROTOCOL gPthreadThunkIo;
+extern EMU_IO_THUNK_PROTOCOL gBlockIoThunkIo;
+extern EMU_IO_THUNK_PROTOCOL gSnpThunkIo;
 
 #endif

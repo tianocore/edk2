@@ -36,9 +36,6 @@
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   SecurityPkg/SecurityPkg.dec
-  ServerPlatformPkg/PlatformPkg.dec
-  ServerSiliconPkg/SiliconPkg.dec
-  CpRcPkg/CpRcPkg.dec
 
 [LibraryClasses]
   MemoryAllocationLib
@@ -46,7 +43,6 @@
   UefiBootServicesTableLib
   UefiDriverEntryPoint
   UefiRuntimeServicesTableLib
-  BaseLib
   BaseMemoryLib
   DebugLib
   PrintLib
@@ -54,13 +50,9 @@
   HobLib
   Tpm2CommandLib
   Tcg2PpVendorLib
-  PasswordEncodeLib
-  TimerLib
-  BeepLib
 
 [Protocols]
   gEfiTcg2ProtocolGuid                 ## SOMETIMES_CONSUMES
-  gEfiTcgProtocolGuid                  ## SOMETIMES_CONSUMES
   gEdkiiVariableLockProtocolGuid       ## SOMETIMES_CONSUMES
 
 [Pcd]
@@ -73,8 +65,3 @@
   ## SOMETIMES_PRODUCES ## Variable:L"Tcg2PhysicalPresenceFlags"
   ## SOMETIMES_CONSUMES ## Variable:L"Tcg2PhysicalPresenceFlags"
   gEfiTcg2PhysicalPresenceGuid
-
-[FixedPcd]
-  gEfiCpRcPkgTokenSpaceGuid.PcdMaxCpuSocketCount
-  gEfiCpRcPkgTokenSpaceGuid.PcdMaxCpuCoreCount
-

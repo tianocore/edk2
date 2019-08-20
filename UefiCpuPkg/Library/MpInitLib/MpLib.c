@@ -1791,16 +1791,9 @@ MpInitLibGetProcessorInfo (
   CPU_MP_DATA            *CpuMpData;
   UINTN                  CallerNumber;
   CPU_INFO_IN_HOB        *CpuInfoInHob;
-  UINTN                  OriginalProcessorNumber;
 
   CpuMpData = GetCpuMpData ();
   CpuInfoInHob = (CPU_INFO_IN_HOB *) (UINTN) CpuMpData->CpuInfoInHob;
-
-  //
-  // Lower 24 bits contains the actual processor number.
-  //
-  OriginalProcessorNumber = ProcessorNumber;
-  ProcessorNumber &= BIT24 - 1;
 
   //
   // Check whether caller processor is BSP
@@ -1841,18 +1834,6 @@ MpInitLibGetProcessorInfo (
     &ProcessorInfoBuffer->Location.Core,
     &ProcessorInfoBuffer->Location.Thread
     );
-
-  if ((OriginalProcessorNumber & CPU_V2_EXTENDED_TOPOLOGY) != 0) {
-    GetProcessorLocation2ByApicId (
-      CpuInfoInHob[ProcessorNumber].ApicId,
-      &ProcessorInfoBuffer->ExtendedInformation.Location2.Package,
-      &ProcessorInfoBuffer->ExtendedInformation.Location2.Die,
-      &ProcessorInfoBuffer->ExtendedInformation.Location2.Tile,
-      &ProcessorInfoBuffer->ExtendedInformation.Location2.Module,
-      &ProcessorInfoBuffer->ExtendedInformation.Location2.Core,
-      &ProcessorInfoBuffer->ExtendedInformation.Location2.Thread
-      );
-  }
 
   if (HealthData != NULL) {
     HealthData->Uint32 = CpuInfoInHob[ProcessorNumber].Health;
