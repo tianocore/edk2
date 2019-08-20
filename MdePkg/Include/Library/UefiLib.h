@@ -462,6 +462,23 @@ EfiTestChildHandle (
   );
 
 /**
+ * This function checks the supported languages list for a target language,
+ * This only supports RFC 4646 Languages.
+ *
+ * @param      SupportedLanguages  The supported languages
+ * @param      TargetLanguage      The target language
+ *
+ * @return     Returns EFI_SUCCESS if the language is supported,
+ *             EFI_UNSUPPORTED otherwise
+ */
+EFI_STATUS
+EFIAPI
+IsLanguageSupported (
+  IN CONST CHAR8 *SupportedLanguages,
+  IN CONST CHAR8 *TargetLanguage
+  );
+
+/**
   This function looks up a Unicode string in UnicodeStringTable.
 
   If Language is a member of SupportedLanguages and a Unicode string is found in
