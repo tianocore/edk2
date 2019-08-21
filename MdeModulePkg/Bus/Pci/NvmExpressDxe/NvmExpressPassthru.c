@@ -561,7 +561,7 @@ NvmExpressPassThru (
   Sq  = Private->SqBuffer[QueueId] + Private->SqTdbl[QueueId].Sqt;
   Cq  = Private->CqBuffer[QueueId] + Private->CqHdbl[QueueId].Cqh;
 
-  if (Packet->NvmeCmd->Nsid != NamespaceId) {
+  if (Packet->QueueType != NVME_ADMIN_QUEUE && Packet->NvmeCmd->Nsid != NamespaceId) {
     return EFI_INVALID_PARAMETER;
   }
 
