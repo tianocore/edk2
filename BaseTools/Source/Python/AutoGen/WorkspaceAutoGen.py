@@ -248,7 +248,9 @@ class WorkspaceAutoGen(AutoGen):
                                      self.BuildDatabase,
                                      Arch,
                                      self.BuildTarget,
-                                     self.ToolChain
+                                     self.ToolChain,
+                                     self.Platform.MetaFile,
+                                     EdkLogger
                                      ))
             for BuildData in list(self.BuildDatabase._CACHE_.values()):
                 if BuildData.Arch != Arch:

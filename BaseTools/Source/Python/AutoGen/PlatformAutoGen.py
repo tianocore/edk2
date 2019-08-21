@@ -1089,7 +1089,7 @@ class PlatformAutoGen(AutoGen):
         for m in self.Platform.Modules:
             module_obj = self.BuildDatabase[m,self.Arch,self.BuildTarget,self.ToolChain]
             if not bool(module_obj.LibraryClass):
-                Libs = GetModuleLibInstances(module_obj, self.Platform, self.BuildDatabase, self.Arch,self.BuildTarget,self.ToolChain)
+                Libs = GetModuleLibInstances(module_obj, self.Platform, self.BuildDatabase, self.Arch,self.BuildTarget,self.ToolChain,self.MetaFile,EdkLogger)
             else:
                 Libs = []
             ModuleLibs.update( set([(l.MetaFile.File,l.MetaFile.Root,l.MetaFile.Path,l.MetaFile.BaseName,l.MetaFile.OriginalPath,l.Arch,True) for l in Libs]))
