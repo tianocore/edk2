@@ -1219,7 +1219,6 @@ class Build():
             for m in AutoGenObject.GetAllModuleInfo:
                 mqueue.put(m)
 
-            AutoGenObject.DataPipe.DataContainer = {"FfsCommand":FfsCommand}
             AutoGenObject.DataPipe.DataContainer = {"CommandTarget": self.Target}
             self.Progress.Start("Generating makefile and code")
             data_pipe_file = os.path.join(AutoGenObject.BuildDir, "GlobalVar_%s_%s.bin" % (str(AutoGenObject.Guid),AutoGenObject.Arch))
@@ -1738,6 +1737,8 @@ class Build():
                             Ma.Workspace = Wa
                             PcdMaList.append(Ma)
                         self.BuildModules.append(Ma)
+                    Pa.DataPipe.DataContainer = {"FfsCommand":CmdListDict}
+                    Pa.DataPipe.DataContainer = {"Workspace_timestamp": Wa._SrcTimeStamp}
                     self._BuildPa(self.Target, Pa, FfsCommand=CmdListDict,PcdMaList=PcdMaList)
 
                 # Create MAP file when Load Fix Address is enabled.
