@@ -1777,14 +1777,6 @@
   # @Prompt Enable ARI support.
   gEfiMdeModulePkgTokenSpaceGuid.PcdAriSupport|TRUE|BOOLEAN|0x10000045
 
-  ## This PCD is used to introduce a temporary W/A for a silicon issue which is expected to fixed in Q2-Q3'19.
-  #  Indicates if Root port disallows transactions to Device Numbers (1-31) when ARI forwarding is disable (expected behavior).
-  #  When ARI forwarding is enabled, is expected behavior that the root port allows transactions to all devices numbers.<BR><BR>
-  #   TRUE  - Root port disallows transactions to Device Numbers (1-31) when ARI forwarding is disable (expected behavior).<BR>
-  #   FALSE - Root port allows transactions to Device Numbers (1-31) when ARI forwarding is disable (Silicon bug).<BR>
-  # @Prompt Root port disallows transactions to Device Numbers (1-31)  when ARI forwarding is disable.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdRootPortAbortsNonZeroNonAriDevices|TRUE|BOOLEAN|0x10000049
-
   ## Indicates if the Multi Root I/O virtualization is supported.<BR><BR>
   #   TRUE  - Multi Root I/O virtualization is supported.<BR>
   #   FALSE - Multi Root I/O virtualization is not supported.<BR>

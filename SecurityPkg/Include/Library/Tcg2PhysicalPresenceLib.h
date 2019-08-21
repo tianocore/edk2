@@ -90,16 +90,6 @@ Tcg2PhysicalPresenceLibNeedUserConfirm (
   );
 
 /**
-  Check if a PPI request is pending.
-
-  @retval   Result  BOOLEAN: TRUE/FALSE, PPI request yes/not pending
-
-**/
-BOOLEAN
-Tcg2PhysicalPresenceLibIfRequestPending (
-  );
-
-/**
   Return TPM2 ManagementFlags set by PP interface.
 
   @retval    ManagementFlags    TPM2 Management Flags.
@@ -137,7 +127,6 @@ Tcg2PhysicalPresenceLibReturnOperationResponseToOsFunction (
 
   Caution: This function may receive untrusted input.
 
-  @param[in, out]  Pointer to FunctionIndex TPM physical presence Function Index.
   @param[in, out]  Pointer to OperationRequest TPM physical presence operation request.
   @param[in, out]  Pointer to RequestParameter TPM physical presence operation request parameter.
 
@@ -146,7 +135,6 @@ Tcg2PhysicalPresenceLibReturnOperationResponseToOsFunction (
   **/
 UINT32
 Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunctionEx (
-  IN OUT UINT32               *FunctionIndex,
   IN OUT UINT32               *OperationRequest,
   IN OUT UINT32               *RequestParameter
   );
@@ -160,7 +148,6 @@ Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunctionEx (
 
   Caution: This function may receive untrusted input.
 
-  @param[in]      FunctionIndex TPM physical presence Function Index.
   @param[in]      OperationRequest TPM physical presence operation request.
   @param[in]      RequestParameter TPM physical presence operation request parameter.
 
@@ -170,7 +157,6 @@ Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunctionEx (
 UINT32
 EFIAPI
 Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunction (
-  IN UINT32                 FunctionIndex,
   IN UINT32                 OperationRequest,
   IN UINT32                 RequestParameter
   );

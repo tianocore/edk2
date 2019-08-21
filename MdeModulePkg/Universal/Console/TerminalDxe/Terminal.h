@@ -128,12 +128,6 @@ typedef struct {
 #define INPUT_STATE_2                     0x10
 #define INPUT_STATE_LEFTOPENBRACKET_2     0x20
 
-#ifdef PC_HOOK
-#define INPUT_STATE_4                     0x40
-#define INPUT_STATE_8                     0x80
-#define INPUT_STATE_16                    0x100
-#endif
-
 #define RESET_STATE_DEFAULT               0x00
 #define RESET_STATE_ESC_R                 0x01
 #define RESET_STATE_ESC_R_ESC_R           0x02
