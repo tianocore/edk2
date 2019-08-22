@@ -408,7 +408,7 @@ Returns:
   MemorySizeStr      = (CHAR16 *) PcdGetPtr (PcdEmuMemorySize);
   FirmwareVolumesStr = (CHAR16 *) PcdGetPtr (PcdEmuFirmwareVolume);
 
-  SecPrint ("\nEDK II WIN Host Emulation Environment from http://www.tianocore.org/edk2/\n");
+  SecPrint ("\n\rEDK II WIN Host Emulation Environment from http://www.tianocore.org/edk2/\n\r");
 
   //
   // Determine the first thread available to this process.
@@ -450,7 +450,7 @@ Returns:
   gSystemMemoryCount  = CountSeparatorsInString (MemorySizeStr, '!') + 1;
   gSystemMemory       = calloc (gSystemMemoryCount, sizeof (NT_SYSTEM_MEMORY));
   if (gSystemMemory == NULL) {
-    SecPrint ("ERROR : Can not allocate memory for %S.  Exiting.\n", MemorySizeStr);
+    SecPrint ("ERROR : Can not allocate memory for %S.  Exiting.\n\r", MemorySizeStr);
     exit (1);
   }
 
@@ -460,13 +460,13 @@ Returns:
   gFdInfoCount  = CountSeparatorsInString (FirmwareVolumesStr, '!') + 1;
   gFdInfo       = calloc (gFdInfoCount, sizeof (NT_FD_INFO));
   if (gFdInfo == NULL) {
-    SecPrint ("ERROR : Can not allocate memory for %S.  Exiting.\n", FirmwareVolumesStr);
+    SecPrint ("ERROR : Can not allocate memory for %S.  Exiting.\n\r", FirmwareVolumesStr);
     exit (1);
   }
   //
   // Setup Boot Mode.
   //
-  SecPrint ("  BootMode 0x%02x\n", PcdGet32 (PcdEmuBootMode));
+  SecPrint ("  BootMode 0x%02x\n\r", PcdGet32 (PcdEmuBootMode));
 
   //
   //  Allocate 128K memory to emulate temp memory for PEI.
@@ -476,12 +476,12 @@ Returns:
   TemporaryRamSize = TEMPORARY_RAM_SIZE;
   TemporaryRam     = VirtualAlloc (NULL, (SIZE_T) (TemporaryRamSize), MEM_COMMIT, PAGE_EXECUTE_READWRITE);
   if (TemporaryRam == NULL) {
-    SecPrint ("ERROR : Can not allocate enough space for SecStack\n");
+    SecPrint ("ERROR : Can not allocate enough space for SecStack\n\r");
     exit (1);
   }
   SetMem32 (TemporaryRam, TemporaryRamSize, PcdGet32 (PcdInitValueInTempStack));
 
-  SecPrint ("  OS Emulator passing in %u KB of temp RAM at 0x%08lx to SEC\n",
+  SecPrint ("  OS Emulator passing in %u KB of temp RAM at 0x%08lx to SEC\n\r",
     TemporaryRamSize / SIZE_1KB,
     TemporaryRam
     );
@@ -503,7 +503,7 @@ Returns:
               &Size
               );
     if (EFI_ERROR (Status)) {
-      SecPrint ("ERROR : Could not allocate PeiServicesTablePage @ %p\n", EmuMagicPage);
+      SecPrint ("ERROR : Could not allocate PeiServicesTablePage @ %p\n\r", EmuMagicPage);
       return EFI_DEVICE_ERROR;
     }
   }
@@ -514,7 +514,7 @@ Returns:
   //
   FileNamePtr = AllocateCopyPool (StrSize (FirmwareVolumesStr), FirmwareVolumesStr);
   if (FileNamePtr == NULL) {
-    SecPrint ("ERROR : Can not allocate memory for firmware volume string\n");
+    SecPrint ("ERROR : Can not allocate memory for firmware volume string\n\r");
     exit (1);
   }
 
@@ -540,11 +540,11 @@ Returns:
               &gFdInfo[Index].Size
               );
     if (EFI_ERROR (Status)) {
-      SecPrint ("ERROR : Can not open Firmware Device File %S (0x%X).  Exiting.\n", FileName, Status);
+      SecPrint ("ERROR : Can not open Firmware Device File %S (0x%X).  Exiting.\n\r", FileName, Status);
       exit (1);
     }
 
-    SecPrint ("  FD loaded from %S\n", FileName);
+    SecPrint ("  FD loaded from %S", FileName);
 
     if (SecFile == NULL) {
       //
@@ -565,7 +565,7 @@ Returns:
       }
     }
 
-    SecPrint ("\n");
+    SecPrint ("\n\r");
   }
   //
   // Calculate memory regions and store the information in the gSystemMemory
@@ -590,7 +590,7 @@ Returns:
     MemorySizeStr = MemorySizeStr + Index1 + 1;
   }
 
-  SecPrint ("\n");
+  SecPrint ("\n\r");
 
   //
   // Hand off to SEC Core
@@ -601,7 +601,7 @@ Returns:
   // If we get here, then the SEC Core returned. This is an error as SEC should
   //  always hand off to PEI Core and then on to DXE Core.
   //
-  SecPrint ("ERROR : SEC returned\n");
+  SecPrint ("ERROR : SEC returned\n\r");
   exit (1);
 }
 
