@@ -34,6 +34,8 @@ from Common.BuildToolError import *
 from CommonDataClass.DataClass import *
 from Common.Parsing import GetSplitValueList
 from Common.LongFilePathSupport import OpenLongFilePath as open
+from Common.LongFilePathSupport import CopyLongFilePath as CopyLong
+from Common.LongFilePathSupport import LongFilePath as LongFilePath
 from Common.MultipleWorkspace import MultipleWorkspace as mws
 from CommonDataClass.Exceptions import BadExpression
 from Common.caching import cached_property
@@ -450,6 +452,9 @@ def RemoveDirectory(Directory, Recursively=False):
 #
 def SaveFileOnChange(File, Content, IsBinaryFile=True, FileLock=None):
 
+    # Convert to long file path format
+    File = LongFilePath(File)
+
     if os.path.exists(File):
         if IsBinaryFile:
             try:
@@ -530,6 +535,11 @@ def SaveFileOnChange(File, Content, IsBinaryFile=True, FileLock=None):
 #   @retval     False     No copy really happen
 #
 def CopyFileOnChange(SrcFile, Dst, FileLock=None):
+
+    # Convert to long file path format
+    SrcFile = LongFilePath(SrcFile)
+    Dst = LongFilePath(Dst)
+
     if not os.path.exists(SrcFile):
         return False
 
@@ -561,7 +571,7 @@ def CopyFileOnChange(SrcFile, Dst, FileLock=None):
     # copy the src to a temp file in the dst same folder firstly, then
     # replace or rename the temp file to the destination file.
     with tempfile.NamedTemporaryFile(dir=DirName, delete=False) as tf:
-        shutil.copy(SrcFile, tf.name)
+        CopyLong(SrcFile, tf.name)
         tempname = tf.name
     try:
         if hasattr(os, 'replace'):
