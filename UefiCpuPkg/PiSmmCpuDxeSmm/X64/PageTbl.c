@@ -15,7 +15,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 LIST_ENTRY                          mPagePool = INITIALIZE_LIST_HEAD_VARIABLE (mPagePool);
 BOOLEAN                             m1GPageTableSupport = FALSE;
-BOOLEAN                             mCpuSmmStaticPageTable;
+BOOLEAN                             mCpuSmmRestrictedMemoryAccess;
 BOOLEAN                             m5LevelPagingSupport;
 X86_ASSEMBLY_PATCH_LABEL            gPatch5LevelPagingSupport;
 
@@ -334,15 +334,15 @@ SmmInitPageTable (
   //
   InitializeSpinLock (mPFLock);
 
-  mCpuSmmStaticPageTable = PcdGetBool (PcdCpuSmmStaticPageTable);
-  m1GPageTableSupport    = Is1GPageSupport ();
-  m5LevelPagingSupport   = Is5LevelPagingSupport ();
-  mPhysicalAddressBits   = CalculateMaximumSupportAddress ();
+  mCpuSmmRestrictedMemoryAccess = PcdGetBool (PcdCpuSmmRestrictedMemoryAccess);
+  m1GPageTableSupport           = Is1GPageSupport ();
+  m5LevelPagingSupport          = Is5LevelPagingSupport ();
+  mPhysicalAddressBits          = CalculateMaximumSupportAddress ();
   PatchInstructionX86 (gPatch5LevelPagingSupport, m5LevelPagingSupport, 1);
-  DEBUG ((DEBUG_INFO, "5LevelPaging Support     - %d\n", m5LevelPagingSupport));
-  DEBUG ((DEBUG_INFO, "1GPageTable Support      - %d\n", m1GPageTableSupport));
-  DEBUG ((DEBUG_INFO, "PcdCpuSmmStaticPageTable - %d\n", mCpuSmmStaticPageTable));
-  DEBUG ((DEBUG_INFO, "PhysicalAddressBits      - %d\n", mPhysicalAddressBits));
+  DEBUG ((DEBUG_INFO, "5LevelPaging Support            - %d\n", m5LevelPagingSupport));
+  DEBUG ((DEBUG_INFO, "1GPageTable Support             - %d\n", m1GPageTableSupport));
+  DEBUG ((DEBUG_INFO, "PcdCpuSmmRestrictedMemoryAccess - %d\n", mCpuSmmRestrictedMemoryAccess));
+  DEBUG ((DEBUG_INFO, "PhysicalAddressBits             - %d\n", mPhysicalAddressBits));
   //
   // Generate PAE page table for the first 4GB memory space
   //
@@ -385,7 +385,11 @@ SmmInitPageTable (
     PTEntry = Pml5Entry;
   }
 
-  if (mCpuSmmStaticPageTable) {
+  if (mCpuSmmRestrictedMemoryAccess) {
+    //
+    // When access to non-SMRAM memory is restricted, create page table
+    // that covers all memory space.
+    //
     SetStaticPageTable ((UINTN)PTEntry);
   } else {
     //
@@ -972,7 +976,7 @@ SmiPFHandler (
 
   PFAddress = AsmReadCr2 ();
 
-  if (mCpuSmmStaticPageTable && (PFAddress >= LShiftU64 (1, (mPhysicalAddressBits - 1)))) {
+  if (mCpuSmmRestrictedMemoryAccess && (PFAddress >= LShiftU64 (1, (mPhysicalAddressBits - 1)))) {
     DumpCpuContext (InterruptType, SystemContext);
     DEBUG ((DEBUG_ERROR, "Do not support address 0x%lx by processor!\n", PFAddress));
     CpuDeadLoop ();
@@ -1049,7 +1053,7 @@ SmiPFHandler (
       goto Exit;
     }
 
-    if (mCpuSmmStaticPageTable && IsSmmCommBufferForbiddenAddress (PFAddress)) {
+    if (mCpuSmmRestrictedMemoryAccess && IsSmmCommBufferForbiddenAddress (PFAddress)) {
       DumpCpuContext (InterruptType, SystemContext);
       DEBUG ((DEBUG_ERROR, "Access SMM communication forbidden address (0x%lx)!\n", PFAddress));
       DEBUG_CODE (
@@ -1100,26 +1104,26 @@ SetPageTableAttributes (
   Enable5LevelPaging = (BOOLEAN) (Cr4.Bits.LA57 == 1);
 
   //
-  // Don't do this if
-  //  - no static page table; or
+  // Don't mark page table memory as read-only if
+  //  - no restriction on access to non-SMRAM memory; or
   //  - SMM heap guard feature enabled; or
   //      BIT2: SMM page guard enabled
   //      BIT3: SMM pool guard enabled
   //  - SMM profile feature enabled
   //
-  if (!mCpuSmmStaticPageTable ||
+  if (!mCpuSmmRestrictedMemoryAccess ||
       ((PcdGet8 (PcdHeapGuardPropertyMask) & (BIT3 | BIT2)) != 0) ||
       FeaturePcdGet (PcdCpuSmmProfileEnable)) {
     //
-    // Static paging and heap guard could not be enabled at the same time.
+    // Restriction on access to non-SMRAM memory and heap guard could not be enabled at the same time.
     //
-    ASSERT (!(mCpuSmmStaticPageTable &&
+    ASSERT (!(mCpuSmmRestrictedMemoryAccess &&
               (PcdGet8 (PcdHeapGuardPropertyMask) & (BIT3 | BIT2)) != 0));
 
     //
-    // Static paging and SMM profile could not be enabled at the same time.
+    // Restriction on access to non-SMRAM memory and SMM profile could not be enabled at the same time.
     //
-    ASSERT (!(mCpuSmmStaticPageTable && FeaturePcdGet (PcdCpuSmmProfileEnable)));
+    ASSERT (!(mCpuSmmRestrictedMemoryAccess && FeaturePcdGet (PcdCpuSmmProfileEnable)));
     return ;
   }
 
@@ -1223,7 +1227,10 @@ SaveCr2 (
   OUT UINTN  *Cr2
   )
 {
-  if (!mCpuSmmStaticPageTable) {
+  if (!mCpuSmmRestrictedMemoryAccess) {
+    //
+    // On-demand paging is enabled when access to non-SMRAM is not restricted.
+    //
     *Cr2 = AsmReadCr2 ();
   }
 }
@@ -1238,7 +1245,10 @@ RestoreCr2 (
   IN UINTN  Cr2
   )
 {
-  if (!mCpuSmmStaticPageTable) {
+  if (!mCpuSmmRestrictedMemoryAccess) {
+    //
+    // On-demand paging is enabled when access to non-SMRAM is not restricted.
+    //
     AsmWriteCr2 (Cr2);
   }
 }
