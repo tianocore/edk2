@@ -247,17 +247,6 @@
   # @Prompt The specified AP target C-state for Mwait.
   gUefiCpuPkgTokenSpaceGuid.PcdCpuApTargetCstate|0|UINT8|0x00000007
 
-  ## Indicates if SMM uses static page table.
-  #  If enabled, SMM will not use on-demand paging. SMM will build static page table for all memory.
-  #  This flag only impacts X64 build, because SMM always builds static page table for IA32.
-  #  It could not be enabled at the same time with SMM profile feature (PcdCpuSmmProfileEnable).
-  #  It could not be enabled also at the same time with heap guard feature for SMM
-  #  (PcdHeapGuardPropertyMask in MdeModulePkg).<BR><BR>
-  #   TRUE  - SMM uses static page table for all memory.<BR>
-  #   FALSE - SMM uses static page table for below 4G memory and use on-demand paging for above 4G memory.<BR>
-  # @Prompt Use static page table for all memory in SMM.
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmStaticPageTable|TRUE|BOOLEAN|0x3213210D
-
   ## Specifies timeout value in microseconds for the BSP in SMM to wait for all APs to come into SMM.
   # @Prompt AP synchronization timeout value in SMM.
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmApSyncTimeout|1000000|UINT64|0x32132104
