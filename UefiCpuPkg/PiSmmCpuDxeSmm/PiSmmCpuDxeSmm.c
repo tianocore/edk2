@@ -1431,15 +1431,17 @@ PerformRemainingTasks (
     //
     SetMemMapAttributes ();
 
-    //
-    // For outside SMRAM, we only map SMM communication buffer or MMIO.
-    //
-    SetUefiMemMapAttributes ();
+    if (IsRestrictedMemoryAccess ()) {
+      //
+      // For outside SMRAM, we only map SMM communication buffer or MMIO.
+      //
+      SetUefiMemMapAttributes ();
 
-    //
-    // Set page table itself to be read-only
-    //
-    SetPageTableAttributes ();
+      //
+      // Set page table itself to be read-only
+      //
+      SetPageTableAttributes ();
+    }
 
     //
     // Configure SMM Code Access Check feature if available.
