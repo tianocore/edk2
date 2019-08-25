@@ -81,7 +81,8 @@
 [PcdsFeatureFlag]
   ## Indicates if SMM Profile will be enabled.
   #  If enabled, instruction executions in and data accesses to memory outside of SMRAM will be logged.
-  #  It could not be enabled at the same time with SMM static page table feature (PcdCpuSmmStaticPageTable).
+  #  In X64 build, it could not be enabled when PcdCpuSmmRestrictedMemoryAccess is TRUE.
+  #  In IA32 build, the page table memory is not marked as read-only when it is enabled.
   #  This PCD is only for validation purpose. It should be set to false in production.<BR><BR>
   #   TRUE  - SMM Profile will be enabled.<BR>
   #   FALSE - SMM Profile will be disabled.<BR>
@@ -285,6 +286,11 @@
   #  The PCD value is considered as constantly TRUE in IA32 platforms.
   #  When the PCD value is TRUE, page table is initialized to cover all memory spaces
   #  and the memory occupied by page table is protected by page table itself as read-only.
+  #  In X64 build, it cannot be enabled at the same time with SMM profile feature (PcdCpuSmmProfileEnable).
+  #  In X64 build, it could not be enabled also at the same time with heap guard feature for SMM
+  #  (PcdHeapGuardPropertyMask in MdeModulePkg).
+  #  In IA32 build, page table memory is not marked as read-only when either SMM profile feature (PcdCpuSmmProfileEnable)
+  #  or heap guard feature for SMM (PcdHeapGuardPropertyMask in MdeModulePkg) is enabled.
   #   TRUE  - Access to non-SMRAM memory is restricted to reserved, runtime and ACPI NVS type after SmmReadyToLock.<BR>
   #   FALSE - Access to any type of non-SMRAM memory after SmmReadyToLock is allowed.<BR>
   # @Prompt Access to non-SMRAM memory is restricted to reserved, runtime and ACPI NVS type after SmmReadyToLock.
