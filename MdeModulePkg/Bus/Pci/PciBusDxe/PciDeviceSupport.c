@@ -324,7 +324,10 @@ RegisterPciDevice (
     }
   }
 
+
   if (!PciIoDevice->AllOpRomProcessed) {
+
+    PciIoDevice->AllOpRomProcessed = TRUE;
 
     //
     // Dispatch the EFI OpRom for the PCI device.
@@ -332,16 +335,7 @@ RegisterPciDevice (
     // or loaded from device in the previous round of bus enumeration
     //
     if (HasEfiImage) {
-      //
-      // Do not launch UEFI OpRom here.
-      // This will be done at ConnectController
-      //
-      //ProcessOpRomImage (PciIoDevice);
-    } else {
-      //
-      // Mark this as true for non-UEFI OpRom image
-      //
-      PciIoDevice->AllOpRomProcessed = TRUE;
+      ProcessOpRomImage (PciIoDevice);
     }
   }
 

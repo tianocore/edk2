@@ -40,4 +40,4 @@ ModeTransitionMemoryLocation        equ  LockLocation + 4Ch
 ModeTransitionSegmentLocation       equ  LockLocation + 50h
 ModeHighMemoryLocation              equ  LockLocation + 52h
 ModeHighSegmentLocation             equ  LockLocation + 56h
-Enable5LevelPagingLocation          equ  LockLocation + 58h
+
