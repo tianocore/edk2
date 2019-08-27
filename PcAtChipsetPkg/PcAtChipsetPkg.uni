@@ -115,3 +115,6 @@
 
 #string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdRtcTargetRegister_PROMPT         #language en-US "RTC Target Register address"
 #string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdRtcTargetRegister_HELP           #language en-US "Specifies RTC Target Register address in I/O space."
+
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdRealTimeClockUpdateTimeout_PROMPT #language en-US "RTC Update Timeout Value"
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdRealTimeClockUpdateTimeout_HELP   #language en-US "RTC Update Timeout Value(microsecond)."
