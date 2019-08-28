@@ -1766,12 +1766,8 @@ class ModuleAutoGen(AutoGen):
 
             if os.path.exists (self.TimeStampPath):
                 os.remove (self.TimeStampPath)
-            with tempfile.NamedTemporaryFile('w+', dir=os.path.dirname(self.TimeStampPath), delete=False) as tf:
-                for f in FileSet:
-                    tf.write(f)
-                    tf.write("\n")
-                tempname = tf.name
-            SaveFileOnChange(self.TimeStampPath, tempname, False)
+
+            SaveFileOnChange(self.TimeStampPath, "\n".join(FileSet), False)
 
         # Ignore generating makefile when it is a binary module
         if self.IsBinaryModule:
