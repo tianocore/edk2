@@ -1694,22 +1694,25 @@ def GetDependencyList(AutoGenObject, FileCache, File, ForceList, SearchPathList)
             CurrentFileDependencyList = DepDb[F]
         else:
             try:
-                Fd = open(F.Path, 'rb')
-                FileContent = Fd.read()
-                Fd.close()
+                with open(F.Path, 'rb') as Fd:
+                    FileContent = Fd.read(1)
+                    Fd.seek(0)
+                    if not FileContent:
+                        continue
+                    if FileContent[0] == 0xff or FileContent[0] == 0xfe:
+                        FileContent2 = Fd.read()
+                        FileContent2 = FileContent2.decode('utf-16')
+                        IncludedFileList = gIncludePattern.findall(FileContent2)
+                    else:
+                        FileLines = Fd.readlines()
+                        FileContent2 = [line for line in FileLines if str(line).lstrip("#\t ")[:8] == "include "]
+                        simpleFileContent="".join(FileContent2)
+
+                        IncludedFileList = gIncludePattern.findall(simpleFileContent)
             except BaseException as X:
                 EdkLogger.error("build", FILE_OPEN_FAILURE, ExtraData=F.Path + "\n\t" + str(X))
-            if len(FileContent) == 0:
+            if not FileContent:
                 continue
-            try:
-                if FileContent[0] == 0xff or FileContent[0] == 0xfe:
-                    FileContent = FileContent.decode('utf-16')
-                else:
-                    FileContent = FileContent.decode()
-            except:
-                # The file is not txt file. for example .mcb file
-                continue
-            IncludedFileList = gIncludePattern.findall(FileContent)
 
             for Inc in IncludedFileList:
                 Inc = Inc.strip()
