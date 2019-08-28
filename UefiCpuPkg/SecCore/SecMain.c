@@ -228,7 +228,6 @@ SecStartupPhase2(
 
   PeiCoreEntryPoint = NULL;
   SecCoreData   = (EFI_SEC_PEI_HAND_OFF *) Context;
-  AllSecPpiList = (EFI_PEI_PPI_DESCRIPTOR *) SecCoreData->PeiTemporaryRamBase;
 
   //
   // Perform platform specific initialization before entering PeiCore.
@@ -282,6 +281,8 @@ SecStartupPhase2(
   }
 
   if (PpiList != NULL) {
+    AllSecPpiList = (EFI_PEI_PPI_DESCRIPTOR *) SecCoreData->PeiTemporaryRamBase;
+
     //
     // Remove the terminal flag from the terminal PPI
     //
