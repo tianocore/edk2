@@ -61,7 +61,6 @@
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
-  ServerPlatformPkg/PlatformPkg.dec
 
 [LibraryClasses]
   PcdLib
@@ -92,9 +91,6 @@
   gEfiLoadFile2ProtocolGuid                       ## SOMETIMES_PRODUCES
   gEdkiiIoMmuProtocolGuid                         ## SOMETIMES_CONSUMES
   gEfiLoadedImageDevicePathProtocolGuid           ## CONSUMES
-
-[Guids]
-  gEfiAfterPlatformLocksEventGuid
 
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciBusHotplugDeviceSupport      ## CONSUMES
