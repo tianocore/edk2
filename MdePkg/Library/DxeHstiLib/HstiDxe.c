@@ -51,7 +51,7 @@ InternalHstiFindAip (
                   &NoHandles,
                   &Handles
                   );
-  if (EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) || (Handles == NULL) || (NoHandles == 0)) {
     return NULL;
   }
 
@@ -77,7 +77,7 @@ InternalHstiFindAip (
                     &InfoTypesBuffer,
                     &InfoTypesBufferCount
                     );
-    if (EFI_ERROR (Status)) {
+    if (EFI_ERROR (Status) || (InfoTypesBuffer == NULL) || (InfoTypesBufferCount == 0)) {
       continue;
     }
 
