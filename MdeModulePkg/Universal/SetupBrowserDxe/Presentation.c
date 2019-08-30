@@ -1,17 +1,14 @@
 /** @file
 Utility functions for UI presentation.
 
-Copyright (c) 2004 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include "Setup.h"
-#ifdef PC_HOOK
-#include <ItkSupport.h>
 
-#endif //PC_HOOK
 BOOLEAN            mHiiPackageListUpdated;
 UI_MENU_SELECTION  *gCurrentSelection;
 EFI_HII_HANDLE     mCurrentHiiHandle = NULL;
