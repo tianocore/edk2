@@ -16,6 +16,7 @@
   LIBRARY_CLASS                  = LcdHwLib
 
 [Sources.common]
+  ArmMaliDp.h
   ArmMaliDp.c
 
 [Packages]
