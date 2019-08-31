@@ -15,6 +15,7 @@
   VERSION_STRING                 = 1.0
 
 [Sources]
+  PrePi.h
   PrePi.c
   MainMPCore.c
 
