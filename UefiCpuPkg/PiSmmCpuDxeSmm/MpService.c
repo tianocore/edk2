@@ -1239,16 +1239,8 @@ InternalSmmStartupThisAp (
     AcquireSpinLock (mSmmMpSyncData->CpuData[CpuIndex].Busy);
   } else {
     if (!AcquireSpinLockOrFail (mSmmMpSyncData->CpuData[CpuIndex].Busy)) {
-      DEBUG ((DEBUG_INFO, "BSP[%d] finds AP[%d] busy at proc 0x%llX (param 0x%llX), ",
-        mSmmMpSyncData->BspIndex,
-        CpuIndex,
-        *mSmmMpSyncData->CpuData[CpuIndex].Procedure,
-        (VOID*)mSmmMpSyncData->CpuData[CpuIndex].Parameter));
-      DEBUG ((DEBUG_INFO, "new proc 0x%llX (param 0x%llX). Waiting for the previous AP procedure to complete...\n",
-        Procedure,
-        ProcArguments));
-
-      AcquireSpinLock (mSmmMpSyncData->CpuData[CpuIndex].Busy);
+      DEBUG((DEBUG_ERROR, "Can't acquire mSmmMpSyncData->CpuData[%d].Busy\n", CpuIndex));
+      return EFI_NOT_READY;
     }
 
     *Token = (MM_COMPLETION) CreateToken ();
@@ -1579,9 +1571,11 @@ SmiRendezvous (
   ASSERT(CpuIndex < mMaxNumberOfCpus);
 
   //
-  // Save Cr2 because Page Fault exception in SMM may override its value
+  // Save Cr2 because Page Fault exception in SMM may override its value,
+  // when using on-demand paging for above 4G memory.
   //
-  Cr2 = AsmReadCr2 ();
+  Cr2 = 0;
+  SaveCr2 (&Cr2);
 
   //
   // Call the user register Startup function first.
@@ -1727,10 +1721,11 @@ SmiRendezvous (
 
 Exit:
   SmmCpuFeaturesRendezvousExit (CpuIndex);
+
   //
   // Restore Cr2
   //
-  AsmWriteCr2 (Cr2);
+  RestoreCr2 (Cr2);
 }
 
 /**

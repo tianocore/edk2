@@ -61,7 +61,6 @@
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
-  ServerPlatformPkg/PlatformPkg.dec
 
 [LibraryClasses]
   PcdLib
@@ -93,9 +92,6 @@
   gEdkiiIoMmuProtocolGuid                         ## SOMETIMES_CONSUMES
   gEfiLoadedImageDevicePathProtocolGuid           ## CONSUMES
 
-[Guids]
-  gEfiAfterPlatformLocksEventGuid
-
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciBusHotplugDeviceSupport      ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciBridgeIoAlignmentProbe       ## CONSUMES
@@ -103,12 +99,11 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciDegradeResourceForOptionRom  ## CONSUMES
 
 [Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSrIovSystemPageSize                 ## SOMETIMES_CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSrIovSupport                        ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdAriSupport                          ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdRootPortAbortsNonZeroNonAriDevices  ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdMrIovSupport                        ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration            ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSrIovSystemPageSize         ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSrIovSupport                ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAriSupport                  ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMrIovSupport                ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration    ## SOMETIMES_CONSUMES
 
 [UserExtensions.TianoCore."ExtraFiles"]
   PciBusDxeExtra.uni
