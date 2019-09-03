@@ -921,12 +921,7 @@ FmmtImageView (
 
     mkdir(TemDir, S_IRWXU | S_IRWXG | S_IRWXO);
 
-    Status = LibRmDir (TemDir);
-
-    if (EFI_ERROR (Status)) {
-      Error ("FMMT", 0, 0004, "error while encapsulate FD Image", "remove directory failed!");
-      ErrorStatus = Status;
-    }
+    LibRmDir (TemDir);
   }
 Done:
   if (!ViewFlag) {
@@ -1233,11 +1228,7 @@ FmmtImageAdd(
         }
     }
 
-    Status = LibRmDir(TemDir);
-    if (EFI_ERROR(Status)) {
-        Error("FMMT", 0, 0004, "error while encapsulate FD Image", "remove directory failed!");
-        goto FAILED;
-    }
+    LibRmDir(TemDir);
 
     NewFdFile = fopen(FdOutName, "wb");
     if (NewFdFile == NULL) {
@@ -1353,12 +1344,7 @@ FmmtImageDeleteFv(
   fwrite(FdBuffer, 1, FdSize, NewFdFile);
   fclose(NewFdFile);
 
-  Status = LibRmDir(TemDir);
-
-  if (EFI_ERROR(Status)) {
-    Error("FMMT", 0, 0004, "error while deleting root FV", "remove directory failed!");
-    goto END;
-  }
+  LibRmDir(TemDir);
 
   printf("Create New FD file successfully. \n\nDone! \n");
 END:
@@ -1644,11 +1630,7 @@ FmmtImageDelete (
         }
     }
 
-    Status = LibRmDir(TemDir);
-    if (EFI_ERROR(Status)) {
-        Error("FMMT", 0, 0004, "error while encapsulate FD Image", "remove directory failed!");
-        goto FAILED;
-    }
+    LibRmDir(TemDir);
 
     NewFdFile = fopen(FdOutName, "wb");
     if (NewFdFile == NULL) {
@@ -1980,10 +1962,7 @@ FmmtImageReplace (
         }
     }
 
-    Status = LibRmDir(TemDir);
-    if (EFI_ERROR(Status)) {
-      Error("FMMT", 0, 0004, "error while encapsulate FD Image", "remove directory failed!");
-    }
+    LibRmDir(TemDir);
 
     NewFdFile = fopen(FdOutName, "wb");
     if (NewFdFile == NULL) {
