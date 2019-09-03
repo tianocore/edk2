@@ -1128,10 +1128,6 @@
   # @Prompt Maximum number of PEI performance log entries.
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxPeiPerformanceLogEntries16|0|UINT16|0x00010035
 
-  ## RTC Update Timeout Value(microsecond).
-  # @Prompt RTC Update Timeout Value.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdRealTimeClockUpdateTimeout|100000|UINT32|0x00010034
-
   ## Indicates the 16550 serial port registers are in MMIO space, or in I/O space. Default is I/O space.<BR><BR>
   #   TRUE  - 16550 serial port registers are in MMIO space.<BR>
   #   FALSE - 16550 serial port registers are in I/O space.<BR>
