@@ -18,6 +18,7 @@
 #else
 #include <io.h>
 #include <direct.h>
+#include <windows.h>
 #endif
 #include <FvLib.h>
 #include <Common/UefiBaseTypes.h>
