@@ -3549,6 +3549,8 @@ LibRmDir (
 )
 {
   CHAR8*                 SystemCommand;
+  UINT8                  Index;
+  INT32                  RetValue;
 
   SystemCommand             = NULL;
 
@@ -3581,11 +3583,34 @@ LibRmDir (
     DirName
     );
 
-  if (system (SystemCommand) != EFI_SUCCESS) {
-    free(SystemCommand);
+  //
+  // Try 3 times to remove the directory
+  //
+  RetValue = 0;
+  for (Index = 0; Index < 3; Index ++) {
+    RetValue = system (SystemCommand);
+    if (RetValue == EFI_SUCCESS) {
+      break;
+    }
+
+    //
+    // Wait for 1 second, and try again
+    //
+#ifdef __GNUC__
+    sleep (1);
+#else
+    Sleep (1 * 1000);
+#endif
+  }
+
+  free(SystemCommand);
+  if (Index == 3) {
+    //
+    // Command doesn't successfully exit
+    //
+    printf ("Warning: remove temp directory %s failed with return value %d!\n", DirName, RetValue);
     return EFI_ABORTED;
   }
-  free(SystemCommand);
 
   return EFI_SUCCESS;
 }
