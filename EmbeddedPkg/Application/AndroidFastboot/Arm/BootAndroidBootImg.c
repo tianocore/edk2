@@ -73,6 +73,15 @@ StartEfiApplication (
   Status = gBS->LoadImage (TRUE, ParentImageHandle, DevicePath, NULL, 0,
                   &ImageHandle);
   if (EFI_ERROR (Status)) {
+    //
+    // With EFI_SECURITY_VIOLATION retval, the Image was loaded and an ImageHandle was created
+    // with a valid EFI_LOADED_IMAGE_PROTOCOL, but the image can not be started right now.
+    // If the caller doesn't have the option to defer the execution of an image, we should
+    // unload image for the EFI_SECURITY_VIOLATION to avoid resource leak.
+    //
+    if (Status == EFI_SECURITY_VIOLATION) {
+      gBS->UnloadImage (ImageHandle);
+    }
     return Status;
   }
 
