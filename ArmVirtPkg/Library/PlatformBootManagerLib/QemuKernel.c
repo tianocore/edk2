@@ -991,7 +991,14 @@ TryRunningQemuKernel (
                   );
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "%a: LoadImage(): %r\n", __FUNCTION__, Status));
-    goto FreeKernelDevicePath;
+    if (Status != EFI_SECURITY_VIOLATION) {
+      goto FreeKernelDevicePath;
+    }
+    //
+    // From the resource allocation perspective, EFI_SECURITY_VIOLATION means
+    // "success", so we must roll back the image loading.
+    //
+    goto UnloadKernelImage;
   }
 
   //
