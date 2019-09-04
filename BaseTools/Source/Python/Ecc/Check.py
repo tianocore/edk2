@@ -441,7 +441,7 @@ class Check(object):
         self.DeclCheckUnionType()
 
 
-    # Check whether no use of int, unsigned, char, void, static, long in any .c, .h or .asl files.
+    # Check whether no use of int, unsigned, char, void, long in any .c, .h or .asl files.
     def DeclCheckNoUseCType(self):
         if EccGlobalData.gConfig.DeclarationDataTypeCheckNoUseCType == '1' or EccGlobalData.gConfig.DeclarationDataTypeCheckAll == '1' or EccGlobalData.gConfig.CheckAll == '1':
             EdkLogger.quiet("Checking Declaration No use C type ...")
