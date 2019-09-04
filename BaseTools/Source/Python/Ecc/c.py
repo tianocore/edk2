@@ -1859,7 +1859,7 @@ def CheckDeclNoUseCType(FullFileName):
                        where Model = %d
                    """ % (FileTable, DataClass.MODEL_IDENTIFIER_VARIABLE)
     ResultSet = Db.TblFile.Exec(SqlStatement)
-    CTypeTuple = ('int', 'unsigned', 'char', 'void', 'static', 'long')
+    CTypeTuple = ('int', 'unsigned', 'char', 'void', 'long')
     for Result in ResultSet:
         for Type in CTypeTuple:
             if PatternInModifier(Result[0], Type):

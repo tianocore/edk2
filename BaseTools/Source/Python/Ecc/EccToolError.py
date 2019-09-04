@@ -149,7 +149,7 @@ gEccErrorMessage = {
     ERROR_INCLUDE_FILE_CHECK_NAME : "No permission for the include file with same names",
 
     ERROR_DECLARATION_DATA_TYPE_CHECK_ALL : "",
-    ERROR_DECLARATION_DATA_TYPE_CHECK_NO_USE_C_TYPE : "There should be no use of int, unsigned, char, void, static, long in any .c, .h or .asl files",
+    ERROR_DECLARATION_DATA_TYPE_CHECK_NO_USE_C_TYPE : "There should be no use of int, unsigned, char, void, long in any .c, .h or .asl files",
     ERROR_DECLARATION_DATA_TYPE_CHECK_IN_OUT_MODIFIER : """The modifiers IN, OUT, OPTIONAL, and UNALIGNED should be used only to qualify arguments to a function and should not appear in a data type declaration""",
     ERROR_DECLARATION_DATA_TYPE_CHECK_EFI_API_MODIFIER : "The EFIAPI modifier should be used at the entry of drivers, events, and member functions of protocols",
     ERROR_DECLARATION_DATA_TYPE_CHECK_ENUMERATED_TYPE : "Enumerated Type should have a 'typedef' and the name must be in capital letters",
