@@ -441,7 +441,7 @@ class PlatformAutoGen(AutoGen):
                             File=self.MetaFile,
                             ExtraData="\n\tPCD(s) without MaxDatumSize:\n\t\t%s\n"
                                       % NoDatumTypePcdListString)
-        self._NonDynamicPcdList = self._NonDynaPcdList_
+        self._NonDynamicPcdList = sorted(self._NonDynaPcdList_)
         self._DynamicPcdList = self._DynaPcdList_
 
     def SortDynamicPcd(self):
@@ -704,6 +704,7 @@ class PlatformAutoGen(AutoGen):
         self._DynamicPcdList.extend(list(UnicodePcdArray))
         self._DynamicPcdList.extend(list(HiiPcdArray))
         self._DynamicPcdList.extend(list(OtherPcdArray))
+        self._DynamicPcdList.sort()
         allskuset = [(SkuName, Sku.SkuId) for pcd in self._DynamicPcdList for (SkuName, Sku) in pcd.SkuInfoList.items()]
         for pcd in self._DynamicPcdList:
             if len(pcd.SkuInfoList) == 1:
