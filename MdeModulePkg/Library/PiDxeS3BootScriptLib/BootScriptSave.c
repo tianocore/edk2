@@ -1,7 +1,7 @@
 /** @file
   Save the S3 data to S3 boot script.
 
-  Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -124,6 +124,7 @@ VOID                             *mRegistrationSmmReadyToLock = NULL;
 BOOLEAN                          mS3BootScriptTableAllocated = FALSE;
 BOOLEAN                          mS3BootScriptTableSmmAllocated = FALSE;
 EFI_SMM_SYSTEM_TABLE2            *mBootScriptSmst = NULL;
+BOOLEAN                          mAcpiS3Enable = TRUE;
 
 /**
   This is an internal function to add a terminate node the entry, recalculate the table
@@ -436,6 +437,12 @@ S3BootScriptLibInitialize (
   BOOLEAN                        InSmm;
   EFI_PHYSICAL_ADDRESS           Buffer;
 
+  if (!PcdGetBool (PcdAcpiS3Enable)) {
+    mAcpiS3Enable = FALSE;
+    DEBUG ((DEBUG_INFO, "%a: Skip S3BootScript because ACPI S3 disabled.\n", gEfiCallerBaseName));
+    return RETURN_SUCCESS;
+  }
+
   S3TablePtr = (SCRIPT_TABLE_PRIVATE_DATA*)(UINTN)PcdGet64(PcdS3BootScriptTablePrivateDataPtr);
   //
   // The Boot script private data is not be initialized. create it
@@ -561,6 +568,10 @@ S3BootScriptLibDeinitialize (
   )
 {
   EFI_STATUS                Status;
+
+  if (!mAcpiS3Enable) {
+    return RETURN_SUCCESS;
+  }
 
   DEBUG ((EFI_D_INFO, "%a() in %a module\n", __FUNCTION__, gEfiCallerBaseName));
 
@@ -809,6 +820,10 @@ S3BootScriptGetEntryAddAddress (
   )
 {
   UINT8*                         NewEntryPtr;
+
+  if (!mAcpiS3Enable) {
+    return NULL;
+  }
 
   if (mS3BootScriptTablePtr->SmmLocked) {
     //
