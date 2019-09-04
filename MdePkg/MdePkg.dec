@@ -131,7 +131,7 @@
   ##  @libraryclass  The multiple segments PCI configuration Library Services that carry out
   ##                 PCI configuration and enable the PCI operations to be replayed during an
   ##                 S3 resume. This library class maps directly on top of the PciSegmentLib class.
-  S3PciSegmentLib|Include/Library/PciSegmentLib.h
+  S3PciSegmentLib|Include/Library/S3PciSegmentLib.h
 
   ##  @libraryclass  Provides services to access PCI Configuration Space.
   PciLib|Include/Library/PciLib.h
