@@ -238,9 +238,8 @@ SecStartupPhase2(
   // is enabled.
   //
   if (PpiList != NULL) {
-    for (Index = 0;
-      (PpiList[Index].Flags & EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST) != EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST;
-      Index++) {
+    Index = 0;
+    do {
       if (CompareGuid (PpiList[Index].Guid, &gEfiPeiCoreFvLocationPpiGuid) &&
           (((EFI_PEI_CORE_FV_LOCATION_PPI *) PpiList[Index].Ppi)->PeiCoreFvLocation != 0)
          ) {
@@ -256,12 +255,12 @@ SecStartupPhase2(
           break;
         } else {
           //
-          // PeiCore not found
+          // Invalid PeiCore FV provided by platform
           //
           CpuDeadLoop ();
         }
       }
-    }
+    } while ((PpiList[Index++].Flags & EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST) != EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST);
   }
   //
   // If EFI_PEI_CORE_FV_LOCATION_PPI not found, try to locate PeiCore from BFV.
