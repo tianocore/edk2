@@ -2,7 +2,7 @@
   Main file for LoadPciRom shell Debug1 function.
 
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2005 - 2019, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -334,6 +334,15 @@ LoadEfiDriversFromRomImage (
                         &ImageHandle
                        );
           if (EFI_ERROR (Status)) {
+            //
+            // With EFI_SECURITY_VIOLATION retval, the Image was loaded and an ImageHandle was created
+            // with a valid EFI_LOADED_IMAGE_PROTOCOL, but the image can not be started right now.
+            // If the caller doesn't have the option to defer the execution of an image, we should
+            // unload image for the EFI_SECURITY_VIOLATION to avoid resource leak.
+            //
+            if (Status == EFI_SECURITY_VIOLATION) {
+              gBS->UnloadImage (ImageHandle);
+            }
             ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_LOADPCIROM_LOAD_FAIL), gShellDebug1HiiHandle, L"loadpcirom", FileName, ImageIndex);
 //            PrintToken (STRING_TOKEN (STR_LOADPCIROM_LOAD_IMAGE_ERROR), HiiHandle, ImageIndex, Status);
           } else {
