@@ -14,6 +14,7 @@ from Common.Misc import CopyDict,ArrayIndex
 import copy
 import Common.EdkLogger as EdkLogger
 from Common.BuildToolError import OPTION_VALUE_INVALID
+from Common.caching import cached_property
 StructPattern = re.compile(r'[_a-zA-Z][0-9A-Za-z_\[\]]*$')
 
 ## PcdClassObject
@@ -226,6 +227,15 @@ class PcdClassObject(object):
     #
     def __hash__(self):
         return hash((self.TokenCName, self.TokenSpaceGuidCName))
+
+    @cached_property
+    def _fullname(self):
+        return ".".join((self.TokenSpaceGuidCName,self.TokenCName))
+
+    def __lt__(self,pcd):
+        return self._fullname < pcd._fullname
+    def __gt__(self,pcd):
+        return self._fullname > pcd._fullname
 
     def sharedcopy(self,new_pcd):
         new_pcd.TokenCName = self.TokenCName
