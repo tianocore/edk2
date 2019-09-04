@@ -62,7 +62,7 @@
   ##  @libraryclass  Provides support for TCG Physical Presence Interface (PPI) specification
   #   >= 128 Vendor Specific PPI Operation.
   #
-  Tcg2PpVendorLib|Include/Library/TcgPpVendorLib.h
+  Tcg2PpVendorLib|Include/Library/Tcg2PpVendorLib.h
 
   ##  @libraryclass  Handle TPM 2.0 physical presence request from OS.
   #
