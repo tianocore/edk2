@@ -3014,7 +3014,7 @@ class DscBuildData(PlatformBuildClassObject):
 
 
         # Remove redundant PCD candidates, per the ARCH and SKU
-        for PcdCName, TokenSpaceGuid, SkuName, DefaultStore, Dummy4 in PcdList:
+        for index,(PcdCName, TokenSpaceGuid, SkuName, DefaultStore, Dummy4) in enumerate(PcdList):
 
             Setting = PcdDict[self._Arch, SkuName, PcdCName, TokenSpaceGuid, DefaultStore]
             if Setting is None:
@@ -3083,7 +3083,7 @@ class DscBuildData(PlatformBuildClassObject):
                     PcdClassObj.UserDefinedDefaultStoresFlag = True
                 Pcds[PcdCName, TokenSpaceGuid] = PcdClassObj
 
-                Pcds[PcdCName, TokenSpaceGuid].CustomAttribute['DscPosition'] = int(Dummy4)
+                Pcds[PcdCName, TokenSpaceGuid].CustomAttribute['DscPosition'] = index
             if SkuName not in Pcds[PcdCName, TokenSpaceGuid].DscRawValue:
                 Pcds[PcdCName, TokenSpaceGuid].DscRawValue[SkuName] = {}
                 Pcds[PcdCName, TokenSpaceGuid].DscRawValueInfo[SkuName] = {}
