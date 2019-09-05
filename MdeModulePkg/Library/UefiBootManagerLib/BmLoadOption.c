@@ -1,7 +1,7 @@
 /** @file
   Load option library functions which relate with creating and processing load options.
 
-Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2019, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015-2018 Hewlett Packard Enterprise Development LP<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -1411,7 +1411,17 @@ EfiBootManagerProcessLoadOption (
                     );
     FreePool (FileBuffer);
 
-    if (!EFI_ERROR (Status)) {
+    if (EFI_ERROR (Status)) {
+      //
+      // With EFI_SECURITY_VIOLATION retval, the Image was loaded and an ImageHandle was created
+      // with a valid EFI_LOADED_IMAGE_PROTOCOL, but the image can not be started right now.
+      // If the caller doesn't have the option to defer the execution of an image, we should
+      // unload image for the EFI_SECURITY_VIOLATION to avoid resource leak.
+      //
+      if (Status == EFI_SECURITY_VIOLATION) {
+        gBS->UnloadImage (ImageHandle);
+      }
+    } else {
       Status = gBS->HandleProtocol (ImageHandle, &gEfiLoadedImageProtocolGuid, (VOID **)&ImageInfo);
       ASSERT_EFI_ERROR (Status);
 
