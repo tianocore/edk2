@@ -69,7 +69,7 @@ extern ASM_PFX(mXdSupported)
 global ASM_PFX(gPatchXdSupported)
 global ASM_PFX(gPatchSmiStack)
 global ASM_PFX(gPatchSmiCr3)
-global ASM_PFX(gPatch5LevelPagingSupport)
+global ASM_PFX(gPatch5LevelPagingNeeded)
 global ASM_PFX(gcSmiHandlerTemplate)
 global ASM_PFX(gcSmiHandlerSize)
 
@@ -127,7 +127,7 @@ ASM_PFX(gPatchSmiCr3):
     mov     eax, 0x668                   ; as cr4.PGE is not set here, refresh cr3
 
     mov     cl, strict byte 0            ; source operand will be patched
-ASM_PFX(gPatch5LevelPagingSupport):
+ASM_PFX(gPatch5LevelPagingNeeded):
     cmp     cl, 0
     je      SkipEnable5LevelPaging
     ;
