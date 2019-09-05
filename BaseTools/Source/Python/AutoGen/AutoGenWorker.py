@@ -238,7 +238,7 @@ class AutoGenWorkerInProcess(mp.Process):
                     Ma.GenModuleFilesHash(GlobalData.gCacheIR)
                     Ma.GenPreMakefileHash(GlobalData.gCacheIR)
                     if Ma.CanSkipbyPreMakefileCache(GlobalData.gCacheIR):
-                       continue
+                        continue
 
                 Ma.CreateCodeFile(False)
                 Ma.CreateMakeFile(False,GenFfsList=FfsCmd.get((Ma.MetaFile.File, Ma.Arch),[]))

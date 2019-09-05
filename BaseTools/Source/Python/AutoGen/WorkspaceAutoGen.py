@@ -128,7 +128,6 @@ class WorkspaceAutoGen(AutoGen):
         self.CreateBuildOptionsFile()
         self.CreatePcdTokenNumberFile()
         self.CreateModuleHashInfo()
-        GlobalData.gAutoGenPhase = False
 
     #
     # Merge Arch
