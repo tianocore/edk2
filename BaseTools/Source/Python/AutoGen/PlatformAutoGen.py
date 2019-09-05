@@ -188,7 +188,9 @@ class PlatformAutoGen(AutoGen):
                     Ma.CreateMakeFile(CreateModuleMakeFile, FfsCommand[key])
                 else:
                     Ma.CreateMakeFile(CreateModuleMakeFile)
+        self.CreateLibModuelDirs()
 
+    def CreateLibModuelDirs(self):
         # no need to create makefile for the platform more than once
         if self.IsMakeFileCreated:
             return

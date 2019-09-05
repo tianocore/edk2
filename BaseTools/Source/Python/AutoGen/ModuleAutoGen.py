@@ -2060,8 +2060,8 @@ class ModuleAutoGen(AutoGen):
 
         if not (self.MetaFile.Path, self.Arch) in gDict or \
            not gDict[(self.MetaFile.Path, self.Arch)].ModuleFilesHashDigest:
-           EdkLogger.quiet("[cache warning]: Cannot generate ModuleFilesHashDigest for module %s[%s]" %(self.MetaFile.Path, self.Arch))
-           return
+            EdkLogger.quiet("[cache warning]: Cannot generate ModuleFilesHashDigest for module %s[%s]" %(self.MetaFile.Path, self.Arch))
+            return
 
         # Initialze hash object
         m = hashlib.md5()
