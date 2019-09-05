@@ -30,6 +30,7 @@
   Tcg2Config.vfr
   Tcg2ConfigStrings.uni
   Tcg2ConfigNvData.h
+  Tcg2Internal.h
 
 [Packages]
   MdePkg/MdePkg.dec

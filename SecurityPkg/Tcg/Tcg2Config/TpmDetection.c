@@ -20,6 +20,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <IndustryStandard/Tpm12.h>
 
 #include "Tcg2ConfigNvData.h"
+#include "Tcg2Internal.h"
 
 /**
   This routine check both SetupVariable and real TPM device, and return final TpmDevice configuration.

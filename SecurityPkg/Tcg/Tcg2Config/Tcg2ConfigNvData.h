@@ -13,15 +13,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Guid/Tcg2ConfigHii.h>
 #include <IndustryStandard/TcgPhysicalPresence.h>
 
-//
-// BUGBUG: In order to pass VfrCompiler, we have to redefine below MACRO, which already in <Protocol/Tcg2Protocol.h>.
-//
-#ifndef __TCG2_H__
-#define EFI_TCG2_EVENT_LOG_FORMAT_TCG_1_2       0x00000001
-#define EFI_TCG2_EVENT_LOG_FORMAT_TCG_2         0x00000002
-#endif
-#define EFI_TCG2_EVENT_LOG_FORMAT_ALL           (EFI_TCG2_EVENT_LOG_FORMAT_TCG_1_2 | EFI_TCG2_EVENT_LOG_FORMAT_TCG_2)
-
 #define TCG2_CONFIGURATION_VARSTORE_ID  0x0001
 #define TCG2_CONFIGURATION_INFO_VARSTORE_ID     0x0002
 #define TCG2_VERSION_VARSTORE_ID        0x0003
@@ -54,9 +45,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define TPM_DEVICE_INTERFACE_PTP_CRB   2
 #define TPM_DEVICE_INTERFACE_MAX       TPM_DEVICE_INTERFACE_PTP_FIFO
 #define TPM_DEVICE_INTERFACE_DEFAULT   TPM_DEVICE_INTERFACE_PTP_CRB
-
-#define TCG2_PROTOCOL_VERSION_DEFAULT        0x0001
-#define EFI_TCG2_EVENT_LOG_FORMAT_DEFAULT    EFI_TCG2_EVENT_LOG_FORMAT_TCG_1_2
 
 #define TCG2_PPI_VERSION_1_2                    0x322E31  // "1.2"
 #define TCG2_PPI_VERSION_1_3                    0x332E31  // "1.3"
@@ -96,28 +84,5 @@ typedef struct {
 #define TCG2_STORAGE_INFO_NAME      L"TCG2_CONFIGURATION_INFO"
 #define TCG2_DEVICE_DETECTION_NAME  L"TCG2_DEVICE_DETECTION"
 #define TCG2_VERSION_NAME           L"TCG2_VERSION"
-
-#define TPM_INSTANCE_ID_LIST  { \
-  {TPM_DEVICE_INTERFACE_NONE,           TPM_DEVICE_NULL},      \
-  {TPM_DEVICE_INTERFACE_TPM12,          TPM_DEVICE_1_2},       \
-  {TPM_DEVICE_INTERFACE_TPM20_DTPM,     TPM_DEVICE_2_0_DTPM},  \
-}
-
-//
-// BUGBUG: In order to pass VfrCompiler, we have to redefine GUID here.
-//
-#ifndef __BASE_H__
-typedef struct {
-  UINT32  Data1;
-  UINT16  Data2;
-  UINT16  Data3;
-  UINT8   Data4[8];
-} GUID;
-#endif
-
-typedef struct {
-  GUID       TpmInstanceGuid;
-  UINT8      TpmDevice;
-} TPM_INSTANCE_ID;
 
 #endif
