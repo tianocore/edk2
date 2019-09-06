@@ -1580,8 +1580,8 @@ class TopLevelMakefile(BuildFile):
 
         if GlobalData.gCaseInsensitive:
             ExtraOption += " -c"
-        if GlobalData.gEnableGenfdsMultiThread:
-            ExtraOption += " --genfds-multi-thread"
+        if not GlobalData.gEnableGenfdsMultiThread:
+            ExtraOption += " --no-genfds-multi-thread"
         if GlobalData.gIgnoreSource:
             ExtraOption += " --ignore-sources"
 

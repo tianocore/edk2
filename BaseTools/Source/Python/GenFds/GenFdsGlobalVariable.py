@@ -69,7 +69,7 @@ class GenFdsGlobalVariable:
     SecCmdList = []
     CopyList   = []
     ModuleFile = ''
-    EnableGenfdsMultiThread = False
+    EnableGenfdsMultiThread = True
 
     #
     # The list whose element are flags to indicate if large FFS or SECTION files exist in FV.

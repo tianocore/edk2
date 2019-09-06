@@ -731,7 +731,7 @@ class Build():
         GlobalData.gUseHashCache = BuildOptions.UseHashCache
         GlobalData.gBinCacheDest   = BuildOptions.BinCacheDest
         GlobalData.gBinCacheSource = BuildOptions.BinCacheSource
-        GlobalData.gEnableGenfdsMultiThread = BuildOptions.GenfdsMultiThread
+        GlobalData.gEnableGenfdsMultiThread = not BuildOptions.NoGenfdsMultiThread
         GlobalData.gDisableIncludePathCheck = BuildOptions.DisableIncludePathCheck
 
         if GlobalData.gBinCacheDest and not GlobalData.gUseHashCache:
