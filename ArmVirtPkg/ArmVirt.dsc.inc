@@ -10,6 +10,21 @@
 [Defines]
   DEFINE DEBUG_PRINT_ERROR_LEVEL = 0x8000004F
 
+!if $(TARGET) != NOOPT
+  DEFINE FD_SIZE_IN_MB    = 2
+!else
+  DEFINE FD_SIZE_IN_MB    = 3
+!endif
+
+!if $(FD_SIZE_IN_MB) == 2
+  DEFINE FD_SIZE          = 0x200000
+  DEFINE FD_NUM_BLOCKS    = 0x200
+!endif
+!if $(FD_SIZE_IN_MB) == 3
+  DEFINE FD_SIZE          = 0x300000
+  DEFINE FD_NUM_BLOCKS    = 0x300
+!endif
+
 [BuildOptions.common.EDKII.DXE_CORE,BuildOptions.common.EDKII.DXE_DRIVER,BuildOptions.common.EDKII.UEFI_DRIVER,BuildOptions.common.EDKII.UEFI_APPLICATION]
   GCC:*_*_*_DLINK_FLAGS = -z common-page-size=0x1000
 
