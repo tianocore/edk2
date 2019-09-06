@@ -329,8 +329,9 @@ MmcDriverBindingStop (
     // Close gEfiMmcHostProtocolGuid
     Status = gBS->CloseProtocol (
                 Controller,
-                &gEfiMmcHostProtocolGuid,(VOID **) &MmcHostInstance->MmcHost,
-                This->DriverBindingHandle
+                &gEfiMmcHostProtocolGuid,
+                This->DriverBindingHandle,
+                Controller
                 );
 
     // Remove MMC Host Instance from the pool
