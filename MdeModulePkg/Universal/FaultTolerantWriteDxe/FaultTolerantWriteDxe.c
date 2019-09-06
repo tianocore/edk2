@@ -47,7 +47,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <Library/UefiBootServicesTableLib.h>
 #include "FaultTolerantWrite.h"
-EFI_EVENT                                 mFvbRegistration = NULL;
+VOID                                      *mFvbRegistration = NULL;
 
 
 /**

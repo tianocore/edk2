@@ -13,7 +13,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 EFI_HANDLE                          mHandle                    = NULL;
 EFI_EVENT                           mVirtualAddressChangeEvent = NULL;
-EFI_EVENT                           mFtwRegistration           = NULL;
+VOID                                *mFtwRegistration          = NULL;
 VOID                                ***mVarCheckAddressPointer = NULL;
 UINTN                               mVarCheckAddressPointerCount = 0;
 EDKII_VARIABLE_LOCK_PROTOCOL        mVariableLock              = { VariableLockRequestToLock };
