@@ -56,7 +56,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "FaultTolerantWriteSmmCommon.h"
 #include <Protocol/MmEndOfDxe.h>
 
-EFI_EVENT                                 mFvbRegistration = NULL;
+VOID                                      *mFvbRegistration = NULL;
 EFI_FTW_DEVICE                            *mFtwDevice      = NULL;
 
 ///
