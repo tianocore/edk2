@@ -2997,7 +2997,7 @@ ShellPrintHiiEx(
   IN INT32                Row OPTIONAL,
   IN CONST CHAR8          *Language OPTIONAL,
   IN CONST EFI_STRING_ID  HiiFormatStringId,
-  IN CONST EFI_HANDLE     HiiFormatHandle,
+  IN CONST EFI_HII_HANDLE HiiFormatHandle,
   ...
   )
 {
@@ -3609,7 +3609,7 @@ EFIAPI
 ShellPromptForResponseHii (
   IN SHELL_PROMPT_REQUEST_TYPE         Type,
   IN CONST EFI_STRING_ID  HiiFormatStringId,
-  IN CONST EFI_HANDLE     HiiFormatHandle,
+  IN CONST EFI_HII_HANDLE HiiFormatHandle,
   IN OUT VOID             **Response
   )
 {

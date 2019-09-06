@@ -9,7 +9,7 @@
 #include "UefiShellDriver1CommandsLib.h"
 
 STATIC CONST CHAR16 mFileName[] = L"Driver1Commands";
-EFI_HANDLE gShellDriver1HiiHandle = NULL;
+EFI_HII_HANDLE gShellDriver1HiiHandle = NULL;
 BOOLEAN    gInReconnect = FALSE;
 
 /**

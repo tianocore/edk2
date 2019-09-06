@@ -58,7 +58,7 @@
 #include <Library/HandleParsingLib.h>
 
 
-extern        EFI_HANDLE                        gShellDriver1HiiHandle;
+extern        EFI_HII_HANDLE                    gShellDriver1HiiHandle;
 extern        BOOLEAN                           gInReconnect;
 
 /**

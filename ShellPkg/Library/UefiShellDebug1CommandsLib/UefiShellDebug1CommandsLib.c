@@ -10,7 +10,7 @@
 #include <Library/BcfgCommandLib.h>
 
 STATIC CONST CHAR16 mFileName[] = L"Debug1Commands";
-EFI_HANDLE gShellDebug1HiiHandle = NULL;
+EFI_HII_HANDLE gShellDebug1HiiHandle = NULL;
 
 /**
   Gets the debug file name.  This will be used if HII is not working.

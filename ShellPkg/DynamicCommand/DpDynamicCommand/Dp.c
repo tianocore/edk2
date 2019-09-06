@@ -36,7 +36,7 @@ typedef struct {
 
 #pragma pack()
 
-EFI_HANDLE   mDpHiiHandle;
+EFI_HII_HANDLE   mDpHiiHandle;
 
 typedef struct {
   EFI_HANDLE    Handle;
@@ -924,14 +924,14 @@ Done:
 
   @return HII handle.
 **/
-EFI_HANDLE
+EFI_HII_HANDLE
 InitializeHiiPackage (
   EFI_HANDLE                  ImageHandle
   )
 {
   EFI_STATUS                  Status;
   EFI_HII_PACKAGE_LIST_HEADER *PackageList;
-  EFI_HANDLE                  HiiHandle;
+  EFI_HII_HANDLE              HiiHandle;
 
   //
   // Retrieve HII package list from ImageHandle

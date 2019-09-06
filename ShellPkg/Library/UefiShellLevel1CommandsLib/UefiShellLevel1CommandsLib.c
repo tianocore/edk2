@@ -10,7 +10,7 @@
 #include "UefiShellLevel1CommandsLib.h"
 
 STATIC CONST CHAR16 mFileName[] = L"ShellCommands";
-EFI_HANDLE gShellLevel1HiiHandle = NULL;
+EFI_HII_HANDLE gShellLevel1HiiHandle = NULL;
 
 /**
   Return the help text filename.  Only used if no HII information found.

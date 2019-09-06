@@ -27,7 +27,7 @@
 #include <Library/HiiLib.h>
 #include <Library/NetLib.h>
 
-extern EFI_HANDLE gShellNetwork2HiiHandle;
+extern EFI_HII_HANDLE gShellNetwork2HiiHandle;
 
 /**
   Function for 'ping6' command.

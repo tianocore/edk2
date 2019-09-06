@@ -33,7 +33,7 @@
 #include <Library/HiiLib.h>
 #include <Library/FileHandleLib.h>
 
-extern        EFI_HANDLE                        gShellLevel1HiiHandle;
+extern        EFI_HII_HANDLE                    gShellLevel1HiiHandle;
 
 /**
   Function for 'stall' command.

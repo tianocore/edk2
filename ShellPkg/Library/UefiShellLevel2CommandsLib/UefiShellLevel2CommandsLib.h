@@ -43,7 +43,7 @@
 #include <Library/FileHandleLib.h>
 
 extern CONST  CHAR16                            mFileName[];
-extern        EFI_HANDLE                        gShellLevel2HiiHandle;
+extern        EFI_HII_HANDLE                    gShellLevel2HiiHandle;
 
 /**
   Function for 'attrib' command.

@@ -9,7 +9,7 @@
 #include "UefiShellLevel3CommandsLib.h"
 
 CONST CHAR16 gShellLevel3FileName[] = L"ShellCommands";
-EFI_HANDLE gShellLevel3HiiHandle = NULL;
+EFI_HII_HANDLE gShellLevel3HiiHandle = NULL;
 
 /**
   return the filename to get help from is not using HII.

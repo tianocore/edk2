@@ -38,7 +38,7 @@
 #include <Library/UefiBootManagerLib.h>
 
 STATIC CONST CHAR16 mFileName[] = L"ShellCommands";
-STATIC EFI_HANDLE gShellBcfgHiiHandle  = NULL;
+STATIC EFI_HII_HANDLE gShellBcfgHiiHandle  = NULL;
 
 typedef enum {
   BcfgTargetBootOrder    = 0,
