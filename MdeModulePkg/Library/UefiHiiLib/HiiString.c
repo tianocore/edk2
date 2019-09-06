@@ -173,8 +173,8 @@ HiiGetPackageString (
   IN CONST CHAR8     *Language  OPTIONAL
   )
 {
-  EFI_HANDLE  *HiiHandleBuffer;
-  EFI_HANDLE  HiiHandle;
+  EFI_HII_HANDLE  *HiiHandleBuffer;
+  EFI_HII_HANDLE  HiiHandle;
 
   ASSERT (PackageListGuid != NULL);
 
