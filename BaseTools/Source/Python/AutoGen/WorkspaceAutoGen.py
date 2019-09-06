@@ -833,8 +833,7 @@ class WorkspaceAutoGen(AutoGen):
         elif LogLevel == EdkLogger.QUIET:
             FdsCommandDict["quiet"] = True
 
-        if GlobalData.gEnableGenfdsMultiThread:
-            FdsCommandDict["GenfdsMultiThread"] = True
+        FdsCommandDict["GenfdsMultiThread"] = GlobalData.gEnableGenfdsMultiThread
         if GlobalData.gIgnoreSource:
             FdsCommandDict["IgnoreSources"] = True
 

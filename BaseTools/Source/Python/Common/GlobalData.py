@@ -106,7 +106,7 @@ gBinCacheSource = None
 gPlatformHash = None
 gPackageHash = {}
 gModuleHash = {}
-gEnableGenfdsMultiThread = False
+gEnableGenfdsMultiThread = True
 gSikpAutoGenCache = set()
 
 # Dictionary for tracking Module build status as success or failure
