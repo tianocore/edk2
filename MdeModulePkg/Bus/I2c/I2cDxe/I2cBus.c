@@ -720,7 +720,7 @@ Error:
 
     if (I2cBusContext != NULL) {
       Status = gBS->UninstallMultipleProtocolInterfaces (
-                      &Controller,
+                      Controller,
                       gEfiCallerIdGuid,
                       I2cBusContext,
                       NULL

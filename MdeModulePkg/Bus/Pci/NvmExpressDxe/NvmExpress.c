@@ -244,7 +244,7 @@ EnumerateNvmeDevNamespace (
                       );
       if(EFI_ERROR(Status)) {
         gBS->UninstallMultipleProtocolInterfaces (
-               &Device->DeviceHandle,
+               Device->DeviceHandle,
                &gEfiDevicePathProtocolGuid,
                Device->DevicePath,
                &gEfiBlockIoProtocolGuid,

@@ -313,7 +313,7 @@ RegisterPciDevice (
                     );
     if (EFI_ERROR (Status)) {
       gBS->UninstallMultipleProtocolInterfaces (
-             &PciIoDevice->Handle,
+             PciIoDevice->Handle,
              &gEfiDevicePathProtocolGuid,
              PciIoDevice->DevicePath,
              &gEfiPciIoProtocolGuid,
@@ -351,7 +351,7 @@ RegisterPciDevice (
                     );
     if (EFI_ERROR (Status)) {
       gBS->UninstallMultipleProtocolInterfaces (
-             &PciIoDevice->Handle,
+             PciIoDevice->Handle,
              &gEfiDevicePathProtocolGuid,
              PciIoDevice->DevicePath,
              &gEfiPciIoProtocolGuid,
@@ -360,7 +360,7 @@ RegisterPciDevice (
              );
       if (HasEfiImage) {
         gBS->UninstallMultipleProtocolInterfaces (
-               &PciIoDevice->Handle,
+               PciIoDevice->Handle,
                &gEfiLoadFile2ProtocolGuid,
                &PciIoDevice->LoadFile2,
                NULL
