@@ -21,7 +21,7 @@
 **/
 EFI_STATUS
 TouchFileByHandle (
-  IN EFI_HANDLE Handle
+  IN SHELL_FILE_HANDLE Handle
   )
 {
   EFI_STATUS    Status;
