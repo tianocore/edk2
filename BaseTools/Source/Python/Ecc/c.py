@@ -2388,7 +2388,7 @@ def CheckFileHeaderDoxygenComments(FullFileName):
                     PrintErrorMsg(ERROR_HEADER_CHECK_FILE, 'File header comment content should start with two spaces at each line', FileTable, ID)
 
             CommentLine = CommentLine.strip()
-            if CommentLine.startswith('Copyright'):
+            if CommentLine.startswith('Copyright') or ('Copyright' in CommentLine and CommentLine.lower().startswith('(c)')):
                 NoCopyrightFlag = False
                 if CommentLine.find('All rights reserved') == -1:
                     for Copyright in EccGlobalData.gConfig.Copyright:
