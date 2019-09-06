@@ -1,7 +1,7 @@
 /** @file
   Header file for Terminal driver.
 
-Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 Copyright (C) 2016 Silicon Graphics, Inc. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -81,7 +81,11 @@ typedef enum {
   TerminalTypeVt100,
   TerminalTypeVt100Plus,
   TerminalTypeVtUtf8,
-  TerminalTypeTtyTerm
+  TerminalTypeTtyTerm,
+  TerminalTypeLinux,
+  TerminalTypeXtermR6,
+  TerminalTypeVt400,
+  TerminalTypeSCO
 } TERMINAL_TYPE;
 
 typedef struct {
@@ -126,7 +130,9 @@ typedef struct {
 #define INPUT_STATE_LEFTOPENBRACKET       0x04
 #define INPUT_STATE_O                     0x08
 #define INPUT_STATE_2                     0x10
-#define INPUT_STATE_LEFTOPENBRACKET_2     0x20
+#define INPUT_STATE_LEFTOPENBRACKET_TTY   0x20
+#define INPUT_STATE_1                     0x40
+#define INPUT_STATE_LEFTOPENBRACKET_2ND   0x80
 
 #define RESET_STATE_DEFAULT               0x00
 #define RESET_STATE_ESC_R                 0x01
@@ -848,7 +854,8 @@ TerminalRemoveConsoleDevVariable (
 /**
   Build termial device path according to terminal type.
 
-  @param  TerminalType           The terminal type is PC ANSI, VT100, VT100+ or VT-UTF8.
+  @param  TerminalType           The terminal type is PC ANSI, VT100, VT100+, VT-UTF8, TTY-Term,
+                                 Linux, XtermR6, VT400 and SCO.
   @param  ParentDevicePath       Parent device path.
   @param  TerminalDevicePath     Returned terminal device path, if building successfully.
 
@@ -1208,6 +1215,28 @@ AnsiRawDataToUnicode (
   | F11     | 0x15 |           | ESC !    |          |
   | F12     | 0x16 |           | ESC @    |          |
   +=========+======+===========+==========+==========+
+
+Putty function key map:
+  +=========+======+===========+=============+=============+=============+=========+
+  |         | EFI  |           |             |             |             |         |
+  |         | Scan |           |             |  Normal     |             |         |
+  |   KEY   | Code |  VT100+   | Xterm R6    |  VT400      | Linux       | SCO     |
+  +=========+======+===========+=============+=============+=============+=========+
+  | F1      | 0x0B | ESC O P   | ESC O P     | ESC [ 1 1 ~ | ESC [ [ A   | ESC [ M |
+  | F2      | 0x0C | ESC O Q   | ESC O Q     | ESC [ 1 2 ~ | ESC [ [ B   | ESC [ N |
+  | F3      | 0x0D | ESC O R   | ESC O R     | ESC [ 1 3 ~ | ESC [ [ C   | ESC [ O |
+  | F4      | 0x0E | ESC O S   | ESC O S     | ESC [ 1 4 ~ | ESC [ [ D   | ESC [ P |
+  | F5      | 0x0F | ESC O T   | ESC [ 1 5 ~ | ESC [ 1 5 ~ | ESC [ [ E   | ESC [ Q |
+  | F6      | 0x10 | ESC O U   | ESC [ 1 7 ~ | ESC [ 1 7 ~ | ESC [ 1 7 ~ | ESC [ R |
+  | F7      | 0x11 | ESC O V   | ESC [ 1 8 ~ | ESC [ 1 8 ~ | ESC [ 1 8 ~ | ESC [ S |
+  | F8      | 0x12 | ESC O W   | ESC [ 1 9 ~ | ESC [ 1 9 ~ | ESC [ 1 9 ~ | ESC [ T |
+  | F9      | 0x13 | ESC O X   | ESC [ 2 0 ~ | ESC [ 2 0 ~ | ESC [ 2 0 ~ | ESC [ U |
+  | F10     | 0x14 | ESC O Y   | ESC [ 2 1 ~ | ESC [ 2 1 ~ | ESC [ 2 1 ~ | ESC [ V |
+  | Escape  | 0x17 | ESC       | ESC         | ESC         | ESC         | ESC     |
+  | F11     | 0x15 | ESC O Z   | ESC [ 2 3 ~ | ESC [ 2 3 ~ | ESC [ 2 3 ~ | ESC [ W |
+  | F12     | 0x16 | ESC O [   | ESC [ 2 4 ~ | ESC [ 2 4 ~ | ESC [ 2 4 ~ | ESC [ X |
+  +=========+======+===========+=============+=============+=============+=========+
+
 
   Special Mappings
   ================
