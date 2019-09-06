@@ -346,8 +346,8 @@ ShellConnectFromDevPaths (
 **/
 EFI_STATUS
 ConvertAndConnectControllers (
-  IN EFI_HANDLE     *Handle1 OPTIONAL,
-  IN EFI_HANDLE     *Handle2 OPTIONAL,
+  IN EFI_HANDLE     Handle1 OPTIONAL,
+  IN EFI_HANDLE     Handle2 OPTIONAL,
   IN CONST BOOLEAN  Recursive,
   IN CONST BOOLEAN  Output
   )
