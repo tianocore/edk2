@@ -24,7 +24,7 @@ STATIC CONST SHELL_PARAM_ITEM ParamList[] = {
 **/
 BOOLEAN
 IsDirectoryEmpty (
-  IN EFI_HANDLE   FileHandle
+  IN SHELL_FILE_HANDLE   FileHandle
   )
 {
   EFI_STATUS      Status;
