@@ -503,7 +503,7 @@ TcpFastbootTransportStop (
   Status = mTcpListener->Configure (mTcpListener, NULL);
   ASSERT_EFI_ERROR (Status);
 
-  Status = mTcpServiceBinding->DestroyChild (mTcpServiceBinding, &mTcpHandle);
+  Status = mTcpServiceBinding->DestroyChild (mTcpServiceBinding, mTcpHandle);
 
   // Free any data the user didn't pick up
   Entry = (FASTBOOT_TCP_PACKET_LIST *) GetFirstNode (&mPacketListHead);
