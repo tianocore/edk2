@@ -2770,7 +2770,7 @@ HddPasswordDxeInit (
 {
   EFI_STATUS                     Status;
   HDD_PASSWORD_DXE_PRIVATE_DATA  *Private;
-  EFI_EVENT                      Registration;
+  VOID                           *Registration;
   EFI_EVENT                      EndOfDxeEvent;
   EDKII_VARIABLE_LOCK_PROTOCOL   *VariableLock;
 
