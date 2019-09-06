@@ -575,7 +575,7 @@ UsbMassInitMultiLun (
     if (EFI_ERROR (Status)) {
       DEBUG ((EFI_D_ERROR, "UsbMassInitMultiLun: OpenUsbIoProtocol By Child (%r)\n", Status));
       gBS->UninstallMultipleProtocolInterfaces (
-             &UsbMass->Controller,
+             UsbMass->Controller,
              &gEfiDevicePathProtocolGuid,
              UsbMass->DevicePath,
              &gEfiBlockIoProtocolGuid,
