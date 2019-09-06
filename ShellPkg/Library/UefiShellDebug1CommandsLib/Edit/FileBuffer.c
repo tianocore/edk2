@@ -1462,7 +1462,7 @@ FileBufferSave (
 
     if (Info != NULL && Info->Attribute & EFI_FILE_DIRECTORY) {
       StatusBarSetStatusString (L"Directory Can Not Be Saved");
-      ShellCloseFile(FileHandle);
+      ShellCloseFile (&FileHandle);
       FreePool(Info);
       return EFI_LOAD_ERROR;
     }
