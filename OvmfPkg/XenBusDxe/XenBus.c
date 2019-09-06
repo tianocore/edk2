@@ -210,7 +210,7 @@ XenBusAddDevice (
 
 ErrorOpenProtocolByChild:
   gBS->UninstallMultipleProtocolInterfaces (
-    &Private->Handle,
+    Private->Handle,
     &gEfiDevicePathProtocolGuid, Private->DevicePath,
     &gXenBusProtocolGuid, &Private->XenBusIo,
     NULL);
