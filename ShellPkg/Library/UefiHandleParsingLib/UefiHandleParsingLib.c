@@ -14,7 +14,7 @@
 #include <PiDxe.h>
 #include <Protocol/FirmwareVolume2.h>
 
-EFI_HANDLE        mHandleParsingHiiHandle = NULL;
+EFI_HII_HANDLE    mHandleParsingHiiHandle = NULL;
 HANDLE_INDEX_LIST mHandleList = {{{NULL,NULL},0,0},0};
 GUID_INFO_BLOCK   *mGuidList;
 UINTN             mGuidListCount;

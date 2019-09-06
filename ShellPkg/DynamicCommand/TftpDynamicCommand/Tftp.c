@@ -11,7 +11,7 @@
 #include "Tftp.h"
 
 #define IP4_CONFIG2_INTERFACE_INFO_NAME_LENGTH 32
-EFI_HANDLE   mTftpHiiHandle;
+EFI_HII_HANDLE   mTftpHiiHandle;
 
 /*
    Constant strings and definitions related to the message indicating the amount of
@@ -1087,14 +1087,14 @@ CheckPacket (
 
   @return HII handle.
 **/
-EFI_HANDLE
+EFI_HII_HANDLE
 InitializeHiiPackage (
   EFI_HANDLE                  ImageHandle
   )
 {
   EFI_STATUS                  Status;
   EFI_HII_PACKAGE_LIST_HEADER *PackageList;
-  EFI_HANDLE                  HiiHandle;
+  EFI_HII_HANDLE              HiiHandle;
 
   //
   // Retrieve HII package list from ImageHandle

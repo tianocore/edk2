@@ -136,7 +136,7 @@ ShellCommandRegisterCommandName (
   IN        UINT32                      ShellMinSupportLevel,
   IN CONST  CHAR16                      *ProfileName,
   IN CONST  BOOLEAN                     CanAffectLE,
-  IN CONST  EFI_HANDLE                  HiiHandle,
+  IN CONST  EFI_HII_HANDLE              HiiHandle,
   IN CONST  EFI_STRING_ID               ManFormatHelp
   );
 

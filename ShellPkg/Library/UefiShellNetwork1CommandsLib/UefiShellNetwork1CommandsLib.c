@@ -8,7 +8,7 @@
 #include "UefiShellNetwork1CommandsLib.h"
 
 CONST CHAR16 gShellNetwork1FileName[] = L"ShellCommands";
-EFI_HANDLE gShellNetwork1HiiHandle = NULL;
+EFI_HII_HANDLE gShellNetwork1HiiHandle = NULL;
 
 /**
   return the file name of the help text file if not using HII.

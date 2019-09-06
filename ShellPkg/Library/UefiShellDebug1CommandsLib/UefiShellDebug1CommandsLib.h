@@ -52,7 +52,7 @@
 #include <Library/HandleParsingLib.h>
 
 
-extern        EFI_HANDLE                        gShellDebug1HiiHandle;
+extern        EFI_HII_HANDLE                    gShellDebug1HiiHandle;
 
 /**
   Function returns a system configuration table that is stored in the

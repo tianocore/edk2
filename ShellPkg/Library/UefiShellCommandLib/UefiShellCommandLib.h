@@ -46,7 +46,7 @@ typedef struct{
   SHELL_GET_MAN_FILENAME      GetManFileName;
   SHELL_RUN_COMMAND           CommandHandler;
   BOOLEAN                     LastError;
-  EFI_HANDLE                  HiiHandle;
+  EFI_HII_HANDLE              HiiHandle;
   EFI_STRING_ID               ManFormatHelp;
 } SHELL_COMMAND_INTERNAL_LIST_ENTRY;
 

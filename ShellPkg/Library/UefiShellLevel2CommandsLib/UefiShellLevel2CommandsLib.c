@@ -29,7 +29,7 @@
 #include "UefiShellLevel2CommandsLib.h"
 
 CONST CHAR16 mFileName[] = L"ShellCommands";
-EFI_HANDLE gShellLevel2HiiHandle = NULL;
+EFI_HII_HANDLE gShellLevel2HiiHandle = NULL;
 
 /**
   Get the filename to get help text from if not using HII.
