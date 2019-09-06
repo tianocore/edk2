@@ -49,7 +49,7 @@ InternalImageHandleToFvHandle (
   ASSERT (ImageHandle != NULL);
 
   Status = gBS->HandleProtocol (
-             (EFI_HANDLE *) ImageHandle,
+             ImageHandle,
              &gEfiLoadedImageProtocolGuid,
              (VOID **) &LoadedImage
              );
