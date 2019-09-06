@@ -587,7 +587,7 @@ InsertFpdtRecord (
   switch (PerfId) {
   case MODULE_START_ID:
   case MODULE_END_ID:
-    GetModuleInfoFromHandle ((EFI_HANDLE *)CallerIdentifier, ModuleName, sizeof (ModuleName), &ModuleGuid);
+    GetModuleInfoFromHandle ((EFI_HANDLE)CallerIdentifier, ModuleName, sizeof (ModuleName), &ModuleGuid);
     StringPtr = ModuleName;
     //
     // Cache the offset of start image start record and use to update the start image end record if needed.
@@ -612,7 +612,7 @@ InsertFpdtRecord (
 
   case MODULE_LOADIMAGE_START_ID:
   case MODULE_LOADIMAGE_END_ID:
-    GetModuleInfoFromHandle ((EFI_HANDLE *)CallerIdentifier, ModuleName, sizeof (ModuleName), &ModuleGuid);
+    GetModuleInfoFromHandle ((EFI_HANDLE)CallerIdentifier, ModuleName, sizeof (ModuleName), &ModuleGuid);
     StringPtr = ModuleName;
     if (PerfId == MODULE_LOADIMAGE_START_ID) {
       mLoadImageCount++;
@@ -669,7 +669,7 @@ InsertFpdtRecord (
   case PERF_INMODULE_END_ID:
   case PERF_CROSSMODULE_START_ID:
   case PERF_CROSSMODULE_END_ID:
-    GetModuleInfoFromHandle ((EFI_HANDLE *)CallerIdentifier, ModuleName, sizeof (ModuleName), &ModuleGuid);
+    GetModuleInfoFromHandle ((EFI_HANDLE)CallerIdentifier, ModuleName, sizeof (ModuleName), &ModuleGuid);
     if (String != NULL) {
       StringPtr = String;
     } else {
@@ -691,7 +691,7 @@ InsertFpdtRecord (
 
   default:
     if (Attribute != PerfEntry) {
-      GetModuleInfoFromHandle ((EFI_HANDLE *)CallerIdentifier, ModuleName, sizeof (ModuleName), &ModuleGuid);
+      GetModuleInfoFromHandle ((EFI_HANDLE)CallerIdentifier, ModuleName, sizeof (ModuleName), &ModuleGuid);
       if (String != NULL) {
         StringPtr = String;
       } else {
