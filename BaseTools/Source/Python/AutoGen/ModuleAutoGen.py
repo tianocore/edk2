@@ -2123,7 +2123,7 @@ class ModuleAutoGen(AutoGen):
             self.CreateCodeFile()
         if not (self.MetaFile.Path, self.Arch) in gDict or \
            not gDict[(self.MetaFile.Path, self.Arch)].CreateMakeFileDone:
-            self.CreateMakeFile(GenFfsList=GlobalData.FfsCmd.get((self.MetaFile.File, self.Arch),[]))
+            self.CreateMakeFile(GenFfsList=GlobalData.FfsCmd.get((self.MetaFile.Path, self.Arch),[]))
 
         if not (self.MetaFile.Path, self.Arch) in gDict or \
            not gDict[(self.MetaFile.Path, self.Arch)].CreateCodeFileDone or \

@@ -502,7 +502,10 @@ class FfsInfStatement(FfsInfStatementClassObject):
         if self.IsBinaryModule:
             IsMakefile = False
         if IsMakefile:
-            MakefilePath = self.InfFileName, Arch
+            PathClassObj = PathClass(self.InfFileName, GenFdsGlobalVariable.WorkSpaceDir)
+            if self.OverrideGuid:
+                PathClassObj = ProcessDuplicatedInf(PathClassObj, self.OverrideGuid, GenFdsGlobalVariable.WorkSpaceDir)
+            MakefilePath = PathClassObj.Path, Arch
         if isinstance (Rule, RuleSimpleFile.RuleSimpleFile):
             SectionOutputList = self.__GenSimpleFileSection__(Rule, IsMakefile=IsMakefile)
             FfsOutput = self.__GenSimpleFileFfs__(Rule, SectionOutputList, MakefilePath=MakefilePath)

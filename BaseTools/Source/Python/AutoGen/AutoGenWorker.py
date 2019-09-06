@@ -241,7 +241,7 @@ class AutoGenWorkerInProcess(mp.Process):
                         continue
 
                 Ma.CreateCodeFile(False)
-                Ma.CreateMakeFile(False,GenFfsList=FfsCmd.get((Ma.MetaFile.File, Ma.Arch),[]))
+                Ma.CreateMakeFile(False,GenFfsList=FfsCmd.get((Ma.MetaFile.Path, Ma.Arch),[]))
 
                 if GlobalData.gBinCacheSource and CommandTarget in [None, "", "all"]:
                     Ma.GenMakeHeaderFilesHash(GlobalData.gCacheIR)

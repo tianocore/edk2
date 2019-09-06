@@ -843,7 +843,7 @@ class Build():
                             continue
 
                     PcdMa.CreateCodeFile(False)
-                    PcdMa.CreateMakeFile(False,GenFfsList = DataPipe.Get("FfsCommand").get((PcdMa.MetaFile.File, PcdMa.Arch),[]))
+                    PcdMa.CreateMakeFile(False,GenFfsList = DataPipe.Get("FfsCommand").get((PcdMa.MetaFile.Path, PcdMa.Arch),[]))
 
                     if GlobalData.gBinCacheSource and self.Target in [None, "", "all"]:
                         PcdMa.GenMakeHeaderFilesHash(share_data)
@@ -1881,9 +1881,9 @@ class Build():
                                     return True
                                 if not self.SkipAutoGen or self.Target == 'genmake':
                                     self.Progress.Start("Generating makefile")
-                                    if CmdListDict and self.Fdf and (Module.File, Arch) in CmdListDict:
-                                        Ma.CreateMakeFile(True, CmdListDict[Module.File, Arch])
-                                        del CmdListDict[Module.File, Arch]
+                                    if CmdListDict and self.Fdf and (Module.Path, Arch) in CmdListDict:
+                                        Ma.CreateMakeFile(True, CmdListDict[Module.Path, Arch])
+                                        del CmdListDict[Module.Path, Arch]
                                     else:
                                         Ma.CreateMakeFile(True)
                                     self.Progress.Stop("done!")
