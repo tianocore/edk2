@@ -489,7 +489,7 @@ class GenFdsGlobalVariable:
                 if GlobalData.gGlobalDefines.get("FAMILY") == "MSFT":
                     Cmd = ['if', 'exist', Input[0]] + Cmd
                 else:
-                    Cmd = ['test', '-e', Input[0], "&&"] + Cmd
+                    Cmd = ['-test', '-e', Input[0], "&&"] + Cmd
                 if ' '.join(Cmd).strip() not in GenFdsGlobalVariable.SecCmdList:
                     GenFdsGlobalVariable.SecCmdList.append(' '.join(Cmd).strip())
             elif GenFdsGlobalVariable.NeedsUpdate(Output, list(Input) + [CommandFile]):
