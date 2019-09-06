@@ -443,7 +443,7 @@ Tcg2ConfigDriverUnload (
   ASSERT (PrivateData->Signature == TCG2_CONFIG_PRIVATE_DATA_SIGNATURE);
 
   gBS->UninstallMultipleProtocolInterfaces (
-         &ImageHandle,
+         ImageHandle,
          &gEfiCallerIdGuid,
          PrivateData,
          NULL
