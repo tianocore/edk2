@@ -2182,7 +2182,7 @@ NetLibGetMacAddress (
   EFI_SIMPLE_NETWORK_MODE      SnpModeData;
   EFI_MANAGED_NETWORK_PROTOCOL *Mnp;
   EFI_SERVICE_BINDING_PROTOCOL *MnpSb;
-  EFI_HANDLE                   *SnpHandle;
+  EFI_HANDLE                   SnpHandle;
   EFI_HANDLE                   MnpChildHandle;
 
   ASSERT (MacAddress != NULL);
