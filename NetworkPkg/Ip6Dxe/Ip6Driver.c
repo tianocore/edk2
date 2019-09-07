@@ -888,7 +888,7 @@ Ip6ServiceBindingCreateChild (
                   );
   if (EFI_ERROR (Status)) {
     gBS->UninstallMultipleProtocolInterfaces (
-           ChildHandle,
+           *ChildHandle,
            &gEfiIp6ProtocolGuid,
            &IpInstance->Ip6Proto,
            NULL

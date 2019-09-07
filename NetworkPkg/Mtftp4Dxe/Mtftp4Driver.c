@@ -592,7 +592,7 @@ Mtftp4ServiceBindingCreateChild (
            MtftpSb->ConnectUdp->UdpHandle,
            &gEfiUdp4ProtocolGuid,
            gMtftp4DriverBinding.DriverBindingHandle,
-           ChildHandle
+           *ChildHandle
            );
     goto ON_ERROR;
   }
