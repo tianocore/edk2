@@ -407,7 +407,7 @@ FindFileEx (
         } else if (AprioriFile != NULL) {
           if (FfsFileHeader->Type == EFI_FV_FILETYPE_FREEFORM) {
             if (CompareGuid (&FfsFileHeader->Name, &gPeiAprioriFileNameGuid)) {
-              *AprioriFile = FfsFileHeader;
+              *AprioriFile = (EFI_PEI_FILE_HANDLE)FfsFileHeader;
             }
           }
         }
