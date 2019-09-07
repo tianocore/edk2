@@ -63,6 +63,8 @@ clean:
 cleanall:
   @if defined PYTHON_COMMAND $(PYTHON_COMMAND) Makefiles\NmakeSubdirs.py cleanall $(LIBRARIES) $(APPLICATIONS)
   @if not defined PYTHON_COMMAND $(PYTHON_HOME)\python.exe Makefiles\NmakeSubdirs.py cleanall $(LIBRARIES) $(APPLICATIONS)
+# Next line protects the libs pseudo target from inadvertent GNU make activity
+  if exist libs RMDIR /S /Q libs
 
 !INCLUDE Makefiles\ms.rule
 
