@@ -285,8 +285,16 @@ RuntimeDriverSetVirtualAddressMap (
   for (Link = mRuntime.EventHead.ForwardLink; Link != &mRuntime.EventHead; Link = Link->ForwardLink) {
     RuntimeEvent = BASE_CR (Link, EFI_RUNTIME_EVENT_ENTRY, Link);
     if ((RuntimeEvent->Type & EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE) == EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE) {
+      //
+      // Work around the bug in the Platform Init specification (v1.7),
+      // reported as Mantis#2017: "EFI_RUNTIME_EVENT_ENTRY.Event" should have
+      // type EFI_EVENT, not (EFI_EVENT*). The PI spec documents the field
+      // correctly as "The EFI_EVENT returned by CreateEvent()", but the type
+      // of the field doesn't match the natural language description. Therefore
+      // we need an explicit cast here.
+      //
       RuntimeEvent->NotifyFunction (
-                      RuntimeEvent->Event,
+                      (EFI_EVENT) RuntimeEvent->Event,
                       RuntimeEvent->NotifyContext
                       );
     }
