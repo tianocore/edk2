@@ -609,7 +609,11 @@ VariableCleanupHiiExtractConfig (
     // Allocate and fill a buffer large enough to hold the <ConfigHdr> template
     // followed by "&OFFSET=0&WIDTH=WWWWWWWWWWWWWWWW" followed by a Null-terminator.
     //
-    ConfigRequestHdr = HiiConstructConfigHdr (&mVariableCleanupHiiGuid, mVarStoreName, Private->HiiHandle);
+    ConfigRequestHdr = HiiConstructConfigHdr (
+                         &mVariableCleanupHiiGuid,
+                         mVarStoreName,
+                         Private->DriverHandle
+                         );
     Size = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
     ConfigRequest = AllocateZeroPool (Size);
     ASSERT (ConfigRequest != NULL);
