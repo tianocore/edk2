@@ -40,7 +40,7 @@ RegisterTimerArchProtocol (
     gTimerPeriod = MultU64x32 (gTimerPeriod, 100);
 
     if (gTimerEvent == NULL) {
-      Status = gBS->CreateEvent (EVT_TIMER, 0, NULL, NULL, (VOID **)&gTimerEvent);
+      Status = gBS->CreateEvent (EVT_TIMER, 0, NULL, NULL, &gTimerEvent);
       ASSERT_EFI_ERROR (Status);
     }
   }
