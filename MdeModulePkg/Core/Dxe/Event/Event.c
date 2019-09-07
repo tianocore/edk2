@@ -485,6 +485,14 @@ CoreCreateEventInternal (
     IEvent->RuntimeData.NotifyTpl      = NotifyTpl;
     IEvent->RuntimeData.NotifyFunction = NotifyFunction;
     IEvent->RuntimeData.NotifyContext  = (VOID *) NotifyContext;
+    //
+    // Work around the bug in the Platform Init specification (v1.7), reported
+    // as Mantis#2017: "EFI_RUNTIME_EVENT_ENTRY.Event" should have type
+    // EFI_EVENT, not (EFI_EVENT*). The PI spec documents the field correctly
+    // as "The EFI_EVENT returned by CreateEvent()", but the type of the field
+    // doesn't match the natural language description. Therefore we need an
+    // explicit cast here.
+    //
     IEvent->RuntimeData.Event          = (EFI_EVENT *) IEvent;
     InsertTailList (&gRuntime->EventHead, &IEvent->RuntimeData.Link);
   }
