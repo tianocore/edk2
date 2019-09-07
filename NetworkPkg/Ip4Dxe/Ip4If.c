@@ -592,7 +592,7 @@ Ip4SetAddress (
       Interface->Controller,
       Interface->Image,
       &gEfiArpServiceBindingProtocolGuid,
-      &Interface->ArpHandle
+      Interface->ArpHandle
       );
 
     Interface->ArpHandle = NULL;
@@ -657,7 +657,7 @@ ON_ERROR:
     Interface->Controller,
     Interface->Image,
     &gEfiArpServiceBindingProtocolGuid,
-    &Interface->ArpHandle
+    Interface->ArpHandle
     );
 
   return Status;
