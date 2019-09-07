@@ -299,7 +299,7 @@ FindFileEx (
   IN  CONST EFI_GUID                 *FileName,   OPTIONAL
   IN        EFI_FV_FILETYPE          SearchType,
   IN OUT    EFI_PEI_FILE_HANDLE      *FileHandle,
-  IN OUT    EFI_PEI_FV_HANDLE        *AprioriFile  OPTIONAL
+  IN OUT    EFI_PEI_FILE_HANDLE      *AprioriFile  OPTIONAL
   );
 
 /**
