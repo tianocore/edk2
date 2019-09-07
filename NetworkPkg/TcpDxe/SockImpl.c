@@ -67,13 +67,13 @@ SockBufNext (
 /**
   User provided callback function for NetbufFromExt.
 
-  @param[in] Event    The Event this notify function registered to, ignored.
+  @param[in] Arg      The Arg parameter forwarded by NetbufFromExt(). Ignored.
 
 **/
 VOID
 EFIAPI
 SockFreeFoo (
-  IN EFI_EVENT Event
+  IN VOID      *Arg
   )
 {
   return;
