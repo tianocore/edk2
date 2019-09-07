@@ -1145,7 +1145,7 @@ Dns4ServiceBindingCreateChild (
            DnsSb->ConnectUdp->UdpHandle,
            &gEfiUdp4ProtocolGuid,
            gDns4DriverBinding.DriverBindingHandle,
-           ChildHandle
+           *ChildHandle
            );
 
      gBS->UninstallMultipleProtocolInterfaces (
@@ -1388,7 +1388,7 @@ Dns6ServiceBindingCreateChild (
            DnsSb->ConnectUdp->UdpHandle,
            &gEfiUdp6ProtocolGuid,
            gDns6DriverBinding.DriverBindingHandle,
-           ChildHandle
+           *ChildHandle
            );
 
      gBS->UninstallMultipleProtocolInterfaces (

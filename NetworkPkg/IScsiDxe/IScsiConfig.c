@@ -3852,7 +3852,7 @@ IScsiConfigFormInit (
                                      );
   if (CallbackInfo->RegisteredHandle == NULL) {
     gBS->UninstallMultipleProtocolInterfaces (
-           &CallbackInfo->DriverHandle,
+           CallbackInfo->DriverHandle,
            &gEfiDevicePathProtocolGuid,
            &mIScsiHiiVendorDevicePath,
            &gEfiHiiConfigAccessProtocolGuid,

@@ -891,7 +891,7 @@ Ip4ServiceBindingCreateChild (
                   );
   if (EFI_ERROR (Status)) {
     gBS->UninstallMultipleProtocolInterfaces (
-           ChildHandle,
+           *ChildHandle,
            &gEfiIp4ProtocolGuid,
            &IpInstance->Ip4Proto,
            NULL
