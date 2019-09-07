@@ -143,7 +143,7 @@ InternalStartMonitor(
   EFI_HANDLE                        *Handles;
   UINTN                             HandleCount;
   UINTN                             HandleIndex;
-  EFI_HANDLE                        NotifyHandle;
+  VOID                              *NotifyHandle;
 
   Status = gBS->LocateHandleBuffer (
               ByProtocol,
@@ -202,7 +202,7 @@ InternalStopMonitor(
   EFI_KEY_DATA                      KeyData;
   UINTN                             HandleCount;
   UINTN                             HandleIndex;
-  EFI_HANDLE                        NotifyHandle;
+  VOID                              *NotifyHandle;
 
   Status = gBS->LocateHandleBuffer (
                 ByProtocol,

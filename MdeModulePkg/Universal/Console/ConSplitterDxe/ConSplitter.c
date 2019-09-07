@@ -4026,7 +4026,7 @@ ConSplitterTextInRegisterKeyNotify (
   if (NewNotify == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
-  NewNotify->NotifyHandleList = (EFI_HANDLE *) AllocateZeroPool (sizeof (EFI_HANDLE) *  Private->TextInExListCount);
+  NewNotify->NotifyHandleList = (VOID **) AllocateZeroPool (sizeof (VOID *) *  Private->TextInExListCount);
   if (NewNotify->NotifyHandleList == NULL) {
     gBS->FreePool (NewNotify);
     return EFI_OUT_OF_RESOURCES;
