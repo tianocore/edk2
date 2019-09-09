@@ -812,23 +812,21 @@ class Build():
         os.chdir(self.WorkspaceDir)
         GlobalData.gCacheIR = Manager().dict()
         self.log_q = log_q
+        GlobalData.file_lock =  mp.Lock()
+        GlobalData.cache_lock = mp.Lock()
     def StartAutoGen(self,mqueue, DataPipe,SkipAutoGen,PcdMaList,share_data):
         try:
             if SkipAutoGen:
                 return True,0
             feedback_q = mp.Queue()
-            file_lock = mp.Lock()
             error_event = mp.Event()
-            GlobalData.file_lock = file_lock
-            cache_lock = mp.Lock()
-            GlobalData.cache_lock = cache_lock
             FfsCmd = DataPipe.Get("FfsCommand")
             if FfsCmd is None:
                 FfsCmd = {}
             GlobalData.FfsCmd = FfsCmd
             GlobalData.libConstPcd = DataPipe.Get("LibConstPcd")
             GlobalData.Refes = DataPipe.Get("REFS")
-            auto_workers = [AutoGenWorkerInProcess(mqueue,DataPipe.dump_file,feedback_q,file_lock,cache_lock,share_data,self.log_q,error_event) for _ in range(self.ThreadNumber)]
+            auto_workers = [AutoGenWorkerInProcess(mqueue,DataPipe.dump_file,feedback_q,GlobalData.file_lock,GlobalData.cache_lock,share_data,self.log_q,error_event) for _ in range(self.ThreadNumber)]
             self.AutoGenMgr = AutoGenManager(auto_workers,feedback_q,error_event)
             self.AutoGenMgr.start()
             for w in auto_workers:
