@@ -1235,14 +1235,9 @@ InternalSmmStartupThisAp (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (Token == NULL) {
-    AcquireSpinLock (mSmmMpSyncData->CpuData[CpuIndex].Busy);
-  } else {
-    if (!AcquireSpinLockOrFail (mSmmMpSyncData->CpuData[CpuIndex].Busy)) {
-      DEBUG((DEBUG_ERROR, "Can't acquire mSmmMpSyncData->CpuData[%d].Busy\n", CpuIndex));
-      return EFI_NOT_READY;
-    }
+  AcquireSpinLock (mSmmMpSyncData->CpuData[CpuIndex].Busy);
 
+  if (Token != NULL) {
     *Token = (MM_COMPLETION) CreateToken ();
   }
 
