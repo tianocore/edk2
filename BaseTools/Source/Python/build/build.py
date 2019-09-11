@@ -2204,6 +2204,7 @@ class Build():
                 if self.SkipAutoGen:
                     Wa = self.VerifyAutoGenFiles()
                     if Wa is None:
+                        self.SkipAutoGen = False
                         Wa, self.BuildModules = self.PerformAutoGen(BuildTarget,ToolChain)
                     else:
                         GlobalData.gAutoGenPhase = True
