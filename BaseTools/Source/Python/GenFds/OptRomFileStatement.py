@@ -34,7 +34,10 @@ class OptRomFileStatement:
     #   @param  Dict        dictionary contains macro and value pair
     #   @retval string      Generated FFS file name
     #
-    def GenFfs(self, Dict = {}, IsMakefile=False):
+    def GenFfs(self, Dict = None, IsMakefile=False):
+
+        if Dict is None:
+            Dict = {}
 
         if self.FileName is not None:
             self.FileName = GenFdsGlobalVariable.ReplaceWorkspaceMacro(self.FileName)

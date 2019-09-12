@@ -176,7 +176,9 @@ class FileBuildRule:
         CommandString = "\n\t".join(self.CommandList)
         return "%s : %s\n\t%s" % (DestString, SourceString, CommandString)
 
-    def Instantiate(self, Macros={}):
+    def Instantiate(self, Macros = None):
+        if Macros is None:
+            Macros = {}
         NewRuleObject = copy.copy(self)
         NewRuleObject.BuildTargets = {}
         NewRuleObject.DestFileList = []

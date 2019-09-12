@@ -46,7 +46,9 @@ class AprioriSection (object):
     #   @param  Dict        dictionary contains macro and its value
     #   @retval string      Generated file name
     #
-    def GenFfs (self, FvName, Dict = {}, IsMakefile = False):
+    def GenFfs (self, FvName, Dict = None, IsMakefile = False):
+        if Dict is None:
+            Dict = {}
         Buffer = BytesIO()
         if self.AprioriType == "PEI":
             AprioriFileGuid = PEI_APRIORI_GUID
