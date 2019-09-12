@@ -44,7 +44,7 @@ class UiSection (UiSectionClassObject):
     #   @param  Dict        dictionary contains macro and its value
     #   @retval tuple       (Generated file name, section alignment)
     #
-    def GenSection(self, OutputPath, ModuleName, SecNum, KeyStringList, FfsInf=None, Dict={}, IsMakefile = False):
+    def GenSection(self, OutputPath, ModuleName, SecNum, KeyStringList, FfsInf=None, Dict=None, IsMakefile = False):
         #
         # Prepare the parameter of GenSection
         #
@@ -58,6 +58,8 @@ class UiSection (UiSectionClassObject):
         if self.StringData is not None :
             NameString = self.StringData
         elif self.FileName is not None:
+            if Dict is None:
+                Dict = {}
             FileNameStr = GenFdsGlobalVariable.ReplaceWorkspaceMacro(self.FileName)
             FileNameStr = GenFdsGlobalVariable.MacroExtend(FileNameStr, Dict)
             FileObj = open(FileNameStr, 'r')

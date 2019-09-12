@@ -49,7 +49,7 @@ class EfiSection (EfiSectionClassObject):
     #   @param  Dict        dictionary contains macro and its value
     #   @retval tuple       (Generated file name list, section alignment)
     #
-    def GenSection(self, OutputPath, ModuleName, SecNum, KeyStringList, FfsInf = None, Dict = {}, IsMakefile = False) :
+    def GenSection(self, OutputPath, ModuleName, SecNum, KeyStringList, FfsInf = None, Dict = None, IsMakefile = False) :
 
         if self.FileName is not None and self.FileName.startswith('PCD('):
             self.FileName = GenFdsGlobalVariable.GetPcdValue(self.FileName)
@@ -76,6 +76,8 @@ class EfiSection (EfiSectionClassObject):
 
         """If the file name was pointed out, add it in FileList"""
         FileList = []
+        if Dict is None:
+            Dict = {}
         if Filename is not None:
             Filename = GenFdsGlobalVariable.MacroExtend(Filename, Dict)
             # check if the path is absolute or relative

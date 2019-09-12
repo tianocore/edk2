@@ -742,7 +742,7 @@ class GenFdsGlobalVariable:
     #   @param  MacroDict     Dictionary that contains macro value pair
     #
     @staticmethod
-    def MacroExtend (Str, MacroDict={}, Arch=DataType.TAB_COMMON):
+    def MacroExtend (Str, MacroDict=None, Arch=DataType.TAB_COMMON):
         if Str is None:
             return None
 

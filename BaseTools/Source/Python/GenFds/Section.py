@@ -92,7 +92,7 @@ class Section (SectionClassObject):
     #   @param  FfsInf      FfsInfStatement object that contains this section data
     #   @param  Dict        dictionary contains macro and its value
     #
-    def GenSection(self, OutputPath, GuidName, SecNum, keyStringList, FfsInf = None, Dict = {}):
+    def GenSection(self, OutputPath, GuidName, SecNum, keyStringList, FfsInf = None, Dict = None):
         pass
 
     ## GetFileList() method

@@ -437,11 +437,12 @@ class FfsInfStatement(FfsInfStatementClassObject):
     #   @param  FvParentAddr Parent Fv base address
     #   @retval string       Generated FFS file name
     #
-    def GenFfs(self, Dict = {}, FvChildAddr = [], FvParentAddr=None, IsMakefile=False, FvName=None):
+    def GenFfs(self, Dict = None, FvChildAddr = [], FvParentAddr=None, IsMakefile=False, FvName=None):
         #
         # Parse Inf file get Module related information
         #
-
+        if Dict is None:
+            Dict = {}
         self.__InfParse__(Dict, IsGenFfs=True)
         Arch = self.GetCurrentArch()
         SrcFile = mws.join( GenFdsGlobalVariable.WorkSpaceDir, self.InfFileName);
