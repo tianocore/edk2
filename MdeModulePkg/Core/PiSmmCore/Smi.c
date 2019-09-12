@@ -282,7 +282,7 @@ SmiHandlerUnRegister (
   //
   SmiHandler = NULL;
   for ( HandlerLink = GetFirstNode (&mRootSmiEntry.SmiHandlers)
-      ; !IsNull (&mRootSmiEntry.SmiHandlers, HandlerLink) && (SmiHandler != DispatchHandle)
+      ; !IsNull (&mRootSmiEntry.SmiHandlers, HandlerLink) && ((EFI_HANDLE) SmiHandler != DispatchHandle)
       ; HandlerLink = GetNextNode (&mRootSmiEntry.SmiHandlers, HandlerLink)
       ) {
     SmiHandler = CR (HandlerLink, SMI_HANDLER, Link, SMI_HANDLER_SIGNATURE);
@@ -292,19 +292,19 @@ SmiHandlerUnRegister (
   // Look for it in non-root SMI handlers
   //
   for ( EntryLink = GetFirstNode (&mSmiEntryList)
-      ; !IsNull (&mSmiEntryList, EntryLink) && (SmiHandler != DispatchHandle)
+      ; !IsNull (&mSmiEntryList, EntryLink) && ((EFI_HANDLE) SmiHandler != DispatchHandle)
       ; EntryLink = GetNextNode (&mSmiEntryList, EntryLink)
       ) {
     SmiEntry = CR (EntryLink, SMI_ENTRY, AllEntries, SMI_ENTRY_SIGNATURE);
     for ( HandlerLink = GetFirstNode (&SmiEntry->SmiHandlers)
-        ; !IsNull (&SmiEntry->SmiHandlers, HandlerLink) && (SmiHandler != DispatchHandle)
+        ; !IsNull (&SmiEntry->SmiHandlers, HandlerLink) && ((EFI_HANDLE) SmiHandler != DispatchHandle)
         ; HandlerLink = GetNextNode (&SmiEntry->SmiHandlers, HandlerLink)
         ) {
       SmiHandler = CR (HandlerLink, SMI_HANDLER, Link, SMI_HANDLER_SIGNATURE);
     }
   }
 
-  if (SmiHandler != DispatchHandle) {
+  if ((EFI_HANDLE) SmiHandler != DispatchHandle) {
     return EFI_INVALID_PARAMETER;
   }
 
