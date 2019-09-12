@@ -1860,6 +1860,9 @@ class Build():
                             Ma = ModuleAutoGen(Wa, Module, BuildTarget, ToolChain, Arch, self.PlatformFile,Pa.DataPipe)
                             if Ma is None:
                                 continue
+                            if Ma.PcdIsDriver:
+                                Ma.PlatformInfo = Pa
+                                Ma.Workspace = Wa
                             MaList.append(Ma)
 
                             if GlobalData.gBinCacheSource and self.Target in [None, "", "all"]:
