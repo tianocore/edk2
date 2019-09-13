@@ -106,10 +106,10 @@ BlDxeEntryPoint (
   //
   // Report MMIO/IO Resources
   //
-  Status = ReserveResourceInGcd (TRUE, EfiGcdMemoryTypeMemoryMappedIo, 0xFEC00000, SIZE_4KB, 0, SystemTable); // IOAPIC
+  Status = ReserveResourceInGcd (TRUE, EfiGcdMemoryTypeMemoryMappedIo, 0xFEC00000, SIZE_4KB, 0, ImageHandle); // IOAPIC
   ASSERT_EFI_ERROR (Status);
 
-  Status = ReserveResourceInGcd (TRUE, EfiGcdMemoryTypeMemoryMappedIo, 0xFED00000, SIZE_1KB, 0, SystemTable); // HPET
+  Status = ReserveResourceInGcd (TRUE, EfiGcdMemoryTypeMemoryMappedIo, 0xFED00000, SIZE_1KB, 0, ImageHandle); // HPET
   ASSERT_EFI_ERROR (Status);
 
   //
