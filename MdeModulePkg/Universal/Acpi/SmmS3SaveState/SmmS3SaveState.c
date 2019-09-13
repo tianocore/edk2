@@ -808,7 +808,7 @@ BootScriptInsert (
   }
 
   if (!EFI_ERROR (Status)) {
-   Status = S3BootScriptMoveLastOpcode (BeforeOrAfter, Position);
+   Status = S3BootScriptMoveLastOpcode (BeforeOrAfter, (VOID **)Position);
   }
   return Status;
 }
@@ -849,7 +849,7 @@ BootScriptLabel (
   IN CONST CHAR8                                *Label
   )
 {
-  return S3BootScriptLabel (BeforeOrAfter, CreateIfNotFound, Position, Label);
+  return S3BootScriptLabel (BeforeOrAfter, CreateIfNotFound, (VOID **)Position, Label);
 }
 /**
   Compare two positions in the boot script table and return their relative position.
