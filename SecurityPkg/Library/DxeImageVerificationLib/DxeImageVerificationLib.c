@@ -822,22 +822,23 @@ AddImageExeInfo (
   @param[in]  SignatureList     Pointer to the Signature List in forbidden database.
   @param[in]  SignatureListSize Size of Signature List.
   @param[out] RevocationTime    Return the time that the certificate was revoked.
+  @param[out] IsFound           Search result. Only valid if EFI_SUCCESS returned.
 
-  @return TRUE   The certificate hash is found in the forbidden database.
-  @return FALSE  The certificate hash is not found in the forbidden database.
+  @retval EFI_SUCCESS           Finished the search without any error.
+  @retval Others                Error occurred in the search of database.
 
 **/
-BOOLEAN
+EFI_STATUS
 IsCertHashFoundInDatabase (
   IN  UINT8               *Certificate,
   IN  UINTN               CertSize,
   IN  EFI_SIGNATURE_LIST  *SignatureList,
   IN  UINTN               SignatureListSize,
-  OUT EFI_TIME            *RevocationTime
+  OUT EFI_TIME            *RevocationTime,
+  OUT BOOLEAN             *IsFound
   )
 {
-  BOOLEAN             IsFound;
-  BOOLEAN             Status;
+  EFI_STATUS          Status;
   EFI_SIGNATURE_LIST  *DbxList;
   UINTN               DbxSize;
   EFI_SIGNATURE_DATA  *CertHash;
@@ -851,21 +852,22 @@ IsCertHashFoundInDatabase (
   UINT8               *TBSCert;
   UINTN               TBSCertSize;
 
-  IsFound  = FALSE;
+  Status   = EFI_ABORTED;
+  *IsFound = FALSE;
   DbxList  = SignatureList;
   DbxSize  = SignatureListSize;
   HashCtx  = NULL;
   HashAlg  = HASHALG_MAX;
 
   if ((RevocationTime == NULL) || (DbxList == NULL)) {
-    return FALSE;
+    return EFI_INVALID_PARAMETER;
   }
 
   //
   // Retrieve the TBSCertificate from the X.509 Certificate.
   //
   if (!X509GetTBSCert (Certificate, CertSize, &TBSCert, &TBSCertSize)) {
-    return FALSE;
+    return Status;
   }
 
   while ((DbxSize > 0) && (SignatureListSize >= DbxList->SignatureListSize)) {
@@ -895,16 +897,13 @@ IsCertHashFoundInDatabase (
     if (HashCtx == NULL) {
       goto Done;
     }
-    Status = mHash[HashAlg].HashInit (HashCtx);
-    if (!Status) {
+    if (!mHash[HashAlg].HashInit (HashCtx)) {
       goto Done;
     }
-    Status = mHash[HashAlg].HashUpdate (HashCtx, TBSCert, TBSCertSize);
-    if (!Status) {
+    if (!mHash[HashAlg].HashUpdate (HashCtx, TBSCert, TBSCertSize)) {
       goto Done;
     }
-    Status = mHash[HashAlg].HashFinal (HashCtx, CertDigest);
-    if (!Status) {
+    if (!mHash[HashAlg].HashFinal (HashCtx, CertDigest)) {
       goto Done;
     }
 
@@ -923,7 +922,8 @@ IsCertHashFoundInDatabase (
         //
         // Hash of Certificate is found in forbidden database.
         //
-        IsFound = TRUE;
+        Status   = EFI_SUCCESS;
+        *IsFound = TRUE;
 
         //
         // Return the revocation time.
@@ -938,12 +938,14 @@ IsCertHashFoundInDatabase (
     DbxList  = (EFI_SIGNATURE_LIST *) ((UINT8 *) DbxList + DbxList->SignatureListSize);
   }
 
+  Status = EFI_SUCCESS;
+
 Done:
   if (HashCtx != NULL) {
     FreePool (HashCtx);
   }
 
-  return IsFound;
+  return Status;
 }
 
 /**
@@ -1216,6 +1218,7 @@ IsForbiddenByDbx (
 {
   EFI_STATUS                Status;
   BOOLEAN                   IsForbidden;
+  BOOLEAN                   IsFound;
   UINT8                     *Data;
   UINTN                     DataSize;
   EFI_SIGNATURE_LIST        *CertList;
@@ -1344,12 +1347,13 @@ IsForbiddenByDbx (
     //
     CertPtr = CertPtr + sizeof (UINT32) + CertSize;
 
-    if (IsCertHashFoundInDatabase (Cert, CertSize, (EFI_SIGNATURE_LIST *)Data, DataSize, &RevocationTime)) {
+    Status = IsCertHashFoundInDatabase (Cert, CertSize, (EFI_SIGNATURE_LIST *)Data, DataSize, &RevocationTime, &IsFound);
+    if (EFI_ERROR (Status) || IsFound) {
       //
       // Check the timestamp signature and signing time to determine if the image can be trusted.
       //
       IsForbidden = TRUE;
-      if (PassTimestampCheck (AuthData, AuthDataSize, &RevocationTime)) {
+      if (!EFI_ERROR (Status) && PassTimestampCheck (AuthData, AuthDataSize, &RevocationTime)) {
         IsForbidden = FALSE;
         //
         // Pass DBT check. Continue to check other certs in image signer's cert list against DBX, DBT
@@ -1392,6 +1396,7 @@ IsAllowedByDb (
 {
   EFI_STATUS                Status;
   BOOLEAN                   VerifyStatus;
+  BOOLEAN                   IsFound;
   EFI_SIGNATURE_LIST        *CertList;
   EFI_SIGNATURE_DATA        *CertData;
   UINTN                     DataSize;
@@ -1495,17 +1500,26 @@ IsAllowedByDb (
           // The image is signed and its signature is found in 'db'.
           //
           if (DbxData != NULL) {
+            VerifyStatus = FALSE;
             //
             // Here We still need to check if this RootCert's Hash is revoked
             //
-            if (IsCertHashFoundInDatabase (RootCert, RootCertSize, (EFI_SIGNATURE_LIST *)DbxData, DbxDataSize, &RevocationTime)) {
-              //
-              // Check the timestamp signature and signing time to determine if the RootCert can be trusted.
-              //
-              VerifyStatus = PassTimestampCheck (AuthData, AuthDataSize, &RevocationTime);
-              if (!VerifyStatus) {
-                DEBUG ((DEBUG_INFO, "DxeImageVerificationLib: Image is signed and signature is accepted by DB, but its root cert failed the timestamp check.\n"));
-              }
+            Status = IsCertHashFoundInDatabase (RootCert, RootCertSize, (EFI_SIGNATURE_LIST *)DbxData, DbxDataSize, &RevocationTime, &IsFound);
+            if (EFI_ERROR (Status)) {
+              goto Done;
+            }
+
+            if (!IsFound) {
+              VerifyStatus = TRUE;
+              goto Done;
+            }
+
+            //
+            // Check the timestamp signature and signing time to determine if the RootCert can be trusted.
+            //
+            VerifyStatus = PassTimestampCheck (AuthData, AuthDataSize, &RevocationTime);
+            if (!VerifyStatus) {
+              DEBUG ((DEBUG_INFO, "DxeImageVerificationLib: Image is signed and signature is accepted by DB, but its root cert failed the timestamp check.\n"));
             }
           }
 
