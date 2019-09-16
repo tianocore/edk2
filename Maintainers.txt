@@ -131,7 +131,7 @@ CryptoPkg
 F: CryptoPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/CryptoPkg
 M: Jian Wang <jian.j.wang@intel.com>
-R: Ting Ye <ting.ye@intel.com>
+R: Xiaoyu Lu <xiaoyux.lu@intel.com>
 
 DynamicTablesPkg
 F: DynamicTablesPkg/
