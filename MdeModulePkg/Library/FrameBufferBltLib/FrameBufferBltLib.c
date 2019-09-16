@@ -504,7 +504,7 @@ FrameBufferBltLibBufferToVideo (
     Destination = Configure->FrameBuffer + Offset;
 
     if (Configure->PixelFormat == PixelBlueGreenRedReserved8BitPerColor) {
-      Source = (UINT8 *) BltBuffer + (SrcY * Delta);
+      Source = (UINT8 *) BltBuffer + (SrcY * Delta) + SourceX;
     } else {
       for (IndexX = 0; IndexX < Width; IndexX++) {
         Blt =
