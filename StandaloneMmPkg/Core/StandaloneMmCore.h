@@ -67,7 +67,7 @@ typedef struct {
 
   LIST_ENTRY                      ScheduledLink;    // mScheduledQueue
 
-  EFI_HANDLE                      FvHandle;
+  EFI_FIRMWARE_VOLUME_HEADER      *FwVolHeader;
   EFI_GUID                        FileName;
   VOID                            *Pe32Data;
   UINTN                           Pe32DataSize;
