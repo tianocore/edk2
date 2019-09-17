@@ -205,7 +205,9 @@ SataSiI3132DriverBindingStop (
   IN EFI_HANDLE                  *ChildHandleBuffer
   );
 
-EFI_STATUS SiI3132AtaPassThruCommand (
+EFI_STATUS
+EFIAPI
+SiI3132AtaPassThruCommand (
   IN     SATA_SI3132_INSTANCE             *pSataSiI3132Instance,
   IN     SATA_SI3132_PORT                 *pSataPort,
   IN     UINT16                           PortMultiplierPort,
@@ -216,7 +218,9 @@ EFI_STATUS SiI3132AtaPassThruCommand (
 /**
  * EFI ATA Pass Thru Protocol
  */
-EFI_STATUS SiI3132AtaPassThru (
+EFI_STATUS
+EFIAPI
+SiI3132AtaPassThru (
   IN     EFI_ATA_PASS_THRU_PROTOCOL       *This,
   IN     UINT16                           Port,
   IN     UINT16                           PortMultiplierPort,
@@ -224,37 +228,49 @@ EFI_STATUS SiI3132AtaPassThru (
   IN     EFI_EVENT                        Event OPTIONAL
   );
 
-EFI_STATUS SiI3132GetNextPort (
+EFI_STATUS
+EFIAPI
+SiI3132GetNextPort (
   IN EFI_ATA_PASS_THRU_PROTOCOL *This,
   IN OUT UINT16                 *Port
   );
 
-EFI_STATUS SiI3132GetNextDevice (
+EFI_STATUS
+EFIAPI
+SiI3132GetNextDevice (
   IN EFI_ATA_PASS_THRU_PROTOCOL *This,
   IN UINT16                     Port,
   IN OUT UINT16                 *PortMultiplierPort
   );
 
-EFI_STATUS SiI3132BuildDevicePath (
+EFI_STATUS
+EFIAPI
+SiI3132BuildDevicePath (
   IN     EFI_ATA_PASS_THRU_PROTOCOL *This,
   IN     UINT16                     Port,
   IN     UINT16                     PortMultiplierPort,
   IN OUT EFI_DEVICE_PATH_PROTOCOL   **DevicePath
   );
 
-EFI_STATUS SiI3132GetDevice (
+EFI_STATUS
+EFIAPI
+SiI3132GetDevice (
   IN  EFI_ATA_PASS_THRU_PROTOCOL *This,
   IN  EFI_DEVICE_PATH_PROTOCOL   *DevicePath,
   OUT UINT16                     *Port,
   OUT UINT16                     *PortMultiplierPort
   );
 
-EFI_STATUS SiI3132ResetPort (
+EFI_STATUS
+EFIAPI
+SiI3132ResetPort (
   IN EFI_ATA_PASS_THRU_PROTOCOL *This,
   IN UINT16                     Port
   );
 
-EFI_STATUS SiI3132ResetDevice (
+EFI_STATUS
+EFIAPI
+SiI3132ResetDevice (
   IN EFI_ATA_PASS_THRU_PROTOCOL *This,
   IN UINT16                     Port,
   IN UINT16                     PortMultiplierPort

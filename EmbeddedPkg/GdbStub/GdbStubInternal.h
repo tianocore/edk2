@@ -323,6 +323,7 @@ SendError (
  Send 'OK' when the function is done executing successfully.
  **/
 VOID
+EFIAPI
 SendSuccess (
   VOID
   );
@@ -332,6 +333,7 @@ SendSuccess (
  Send empty packet to specify that particular command/functionality is not supported.
  **/
 VOID
+EFIAPI
 SendNotSupported (
   VOID
   );
@@ -353,6 +355,7 @@ ReadNthRegister (
  @param     SystemContext           Register content at time of the exception
  **/
 VOID
+EFIAPI
 ReadGeneralRegisters (
   IN    EFI_SYSTEM_CONTEXT  SystemContext
   );
@@ -364,6 +367,7 @@ ReadGeneralRegisters (
  @param     InBuffer            This is the input buffer received from gdb server
  **/
 VOID
+EFIAPI
 WriteNthRegister (
   IN    EFI_SYSTEM_CONTEXT  SystemContext,
   IN    CHAR8               *InBuffer
@@ -377,6 +381,7 @@ WriteNthRegister (
  **/
 
 VOID
+EFIAPI
 WriteGeneralRegisters (
   IN    EFI_SYSTEM_CONTEXT  SystemContext,
   IN    CHAR8               *InBuffer
@@ -391,6 +396,7 @@ WriteGeneralRegisters (
  @param  *PacketData  Pointer to Payload data for the packet
  **/
 VOID
+EFIAPI
 ReadFromMemory (
   IN  CHAR8  *PacketData
   );
@@ -404,6 +410,7 @@ ReadFromMemory (
  @param   PacketData     Pointer to Payload data for the packet
  **/
 VOID
+EFIAPI
 WriteToMemory (
   IN CHAR8 *PacketData
   );
@@ -418,6 +425,7 @@ WriteToMemory (
  **/
 
 VOID
+EFIAPI
 ContinueAtAddress (
   IN  EFI_SYSTEM_CONTEXT   SystemContext,
   IN  CHAR8                *PacketData
@@ -432,6 +440,7 @@ ContinueAtAddress (
  @param PacketData      Pointer to Payload data for the packet
  **/
 VOID
+EFIAPI
 SingleStep (
   IN  EFI_SYSTEM_CONTEXT  SystemContext,
   IN  CHAR8               *PacketData
