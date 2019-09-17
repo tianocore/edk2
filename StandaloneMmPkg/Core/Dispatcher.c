@@ -5,7 +5,7 @@
             is added to the mDiscoveredList. The Before, and After Depex are
             pre-processed as drivers are added to the mDiscoveredList. If an Apriori
             file exists in the FV those drivers are addeded to the
-            mScheduledQueue. The mFvHandleList is used to make sure a
+            mScheduledQueue. The mFwVolList is used to make sure a
             FV is only processed once.
 
   Step #2 - Dispatch. Remove driver from the mScheduledQueue and load and
@@ -40,13 +40,13 @@
 //
 // MM Dispatcher Data structures
 //
-#define KNOWN_HANDLE_SIGNATURE  SIGNATURE_32('k','n','o','w')
+#define KNOWN_FWVOL_SIGNATURE  SIGNATURE_32('k','n','o','w')
 
 typedef struct {
-  UINTN           Signature;
-  LIST_ENTRY      Link;         // mFvHandleList
-  EFI_HANDLE      Handle;
-} KNOWN_HANDLE;
+  UINTN                      Signature;
+  LIST_ENTRY                 Link;         // mFwVolList
+  EFI_FIRMWARE_VOLUME_HEADER *FwVolHeader;
+} KNOWN_FWVOL;
 
 //
 // Function Prototypes
@@ -86,9 +86,10 @@ LIST_ENTRY  mDiscoveredList = INITIALIZE_LIST_HEAD_VARIABLE (mDiscoveredList);
 LIST_ENTRY  mScheduledQueue = INITIALIZE_LIST_HEAD_VARIABLE (mScheduledQueue);
 
 //
-// List of handles who's Fv's have been parsed and added to the mFwDriverList.
+// List of firmware volume headers whose containing firmware volumes have been
+// parsed and added to the mFwDriverList.
 //
-LIST_ENTRY  mFvHandleList = INITIALIZE_LIST_HEAD_VARIABLE (mFvHandleList);
+LIST_ENTRY  mFwVolList = INITIALIZE_LIST_HEAD_VARIABLE (mFwVolList);
 
 //
 // Flag for the MM Dispacher.  TRUE if dispatcher is execuing.
@@ -769,26 +770,30 @@ MmInsertOnScheduledQueueWhileProcessingBeforeAndAfter (
 }
 
 /**
-  Return TRUE if the Fv has been processed, FALSE if not.
+  Return TRUE if the firmware volume has been processed, FALSE if not.
 
-  @param  FvHandle              The handle of a FV that's being tested
+  @param  FwVolHeader           The header of the firmware volume that's being
+                                tested.
 
-  @retval TRUE                  Fv protocol on FvHandle has been processed
-  @retval FALSE                 Fv protocol on FvHandle has not yet been
-                                processed
+  @retval TRUE                  The firmware volume denoted by FwVolHeader has
+                                been processed
+  @retval FALSE                 The firmware volume denoted by FwVolHeader has
+                                not yet been processed
 
 **/
 BOOLEAN
 FvHasBeenProcessed (
-  IN EFI_HANDLE  FvHandle
+  IN EFI_FIRMWARE_VOLUME_HEADER *FwVolHeader
   )
 {
   LIST_ENTRY    *Link;
-  KNOWN_HANDLE  *KnownHandle;
+  KNOWN_FWVOL   *KnownFwVol;
 
-  for (Link = mFvHandleList.ForwardLink; Link != &mFvHandleList; Link = Link->ForwardLink) {
-    KnownHandle = CR (Link, KNOWN_HANDLE, Link, KNOWN_HANDLE_SIGNATURE);
-    if (KnownHandle->Handle == FvHandle) {
+  for (Link = mFwVolList.ForwardLink;
+       Link != &mFwVolList;
+       Link = Link->ForwardLink) {
+    KnownFwVol = CR (Link, KNOWN_FWVOL, Link, KNOWN_FWVOL_SIGNATURE);
+    if (KnownFwVol->FwVolHeader == FwVolHeader) {
       return TRUE;
     }
   }
@@ -796,28 +801,29 @@ FvHasBeenProcessed (
 }
 
 /**
-  Remember that Fv protocol on FvHandle has had it's drivers placed on the
-  mDiscoveredList. This fucntion adds entries on the mFvHandleList. Items are
-  never removed/freed from the mFvHandleList.
+  Remember that the firmware volume denoted by FwVolHeader has had its drivers
+  placed on mDiscoveredList. This function adds entries to mFwVolList. Items
+  are never removed/freed from mFwVolList.
 
-  @param  FvHandle              The handle of a FV that has been processed
+  @param  FwVolHeader           The header of the firmware volume that's being
+                                processed.
 
 **/
 VOID
 FvIsBeingProcesssed (
-  IN EFI_HANDLE  FvHandle
+  IN EFI_FIRMWARE_VOLUME_HEADER *FwVolHeader
   )
 {
-  KNOWN_HANDLE  *KnownHandle;
+  KNOWN_FWVOL   *KnownFwVol;
 
-  DEBUG ((DEBUG_INFO, "FvIsBeingProcesssed - 0x%08x\n", FvHandle));
+  DEBUG ((DEBUG_INFO, "FvIsBeingProcesssed - 0x%08x\n", KnownFwVol));
 
-  KnownHandle = AllocatePool (sizeof (KNOWN_HANDLE));
-  ASSERT (KnownHandle != NULL);
+  KnownFwVol = AllocatePool (sizeof (KNOWN_FWVOL));
+  ASSERT (KnownFwVol != NULL);
 
-  KnownHandle->Signature = KNOWN_HANDLE_SIGNATURE;
-  KnownHandle->Handle = FvHandle;
-  InsertTailList (&mFvHandleList, &KnownHandle->Link);
+  KnownFwVol->Signature = KNOWN_FWVOL_SIGNATURE;
+  KnownFwVol->FwVolHeader = FwVolHeader;
+  InsertTailList (&mFwVolList, &KnownFwVol->Link);
 }
 
 /**
@@ -842,12 +848,12 @@ FvIsBeingProcesssed (
 **/
 EFI_STATUS
 MmAddToDriverList (
-  IN EFI_HANDLE   FvHandle,
-  IN VOID         *Pe32Data,
-  IN UINTN        Pe32DataSize,
-  IN VOID         *Depex,
-  IN UINTN        DepexSize,
-  IN EFI_GUID     *DriverName
+  IN EFI_FIRMWARE_VOLUME_HEADER *FwVolHeader,
+  IN VOID                       *Pe32Data,
+  IN UINTN                      Pe32DataSize,
+  IN VOID                       *Depex,
+  IN UINTN                      DepexSize,
+  IN EFI_GUID                   *DriverName
   )
 {
   EFI_MM_DRIVER_ENTRY  *DriverEntry;
@@ -863,7 +869,7 @@ MmAddToDriverList (
 
   DriverEntry->Signature        = EFI_MM_DRIVER_ENTRY_SIGNATURE;
   CopyGuid (&DriverEntry->FileName, DriverName);
-  DriverEntry->FvHandle         = FvHandle;
+  DriverEntry->FwVolHeader      = FwVolHeader;
   DriverEntry->Pe32Data         = Pe32Data;
   DriverEntry->Pe32DataSize     = Pe32DataSize;
   DriverEntry->Depex            = Depex;
