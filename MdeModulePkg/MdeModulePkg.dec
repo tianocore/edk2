@@ -1181,12 +1181,6 @@
   # @Expression 0x80000002 | (gEfiMdeModulePkgTokenSpaceGuid.PcdSerialFifoControl & 0xD8) == 0
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialFifoControl|0x07|UINT8|0x00020005
 
-  ## This setting can override the default TFTP block size. A value of 0 computes
-  # the default from MTU information. A non-zero value will be used as block size
-  # in bytes.
-  # @Prompt TFTP block size.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdTftpBlockSize|0x0|UINT64|0x30001026
-
   ## Maximum address that the DXE Core will allocate the EFI_SYSTEM_TABLE_POINTER
   #  structure. The default value for this PCD is 0, which means that the DXE Core
   #  will allocate the buffer from the EFI_SYSTEM_TABLE_POINTER structure on a 4MB
