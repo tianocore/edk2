@@ -102,6 +102,13 @@
   # @Prompt PXE TFTP windowsize.
   gEfiNetworkPkgTokenSpaceGuid.PcdPxeTftpWindowSize|0x4|UINT64|0x10000008
 
+
+  ## This setting can override the default TFTP block size. A value of 0 computes
+  # the default from MTU information. A non-zero value will be used as block size
+  # in bytes.
+  # @Prompt TFTP block size.
+  gEfiNetworkPkgTokenSpaceGuid.PcdTftpBlockSize|0x0|UINT64|0x1000000B
+
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## IPv6 DHCP Unique Identifier (DUID) Type configuration (From RFCs 3315 and 6355).
   # 01 = DUID Based on Link-layer Address Plus Time [DUID-LLT]
