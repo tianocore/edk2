@@ -1240,7 +1240,7 @@ IsForbiddenByDbx (
   //
   // Variable Initialization
   //
-  IsForbidden       = FALSE;
+  IsForbidden       = TRUE;
   Data              = NULL;
   CertList          = NULL;
   CertData          = NULL;
@@ -1257,7 +1257,14 @@ IsForbiddenByDbx (
   //
   DataSize = 0;
   Status   = gRT->GetVariable (EFI_IMAGE_SECURITY_DATABASE1, &gEfiImageSecurityDatabaseGuid, NULL, &DataSize, NULL);
+  ASSERT (EFI_ERROR (Status));
   if (Status != EFI_BUFFER_TOO_SMALL) {
+    if (Status == EFI_NOT_FOUND) {
+      //
+      // Evidently not in dbx if the database doesn't exist.
+      //
+      IsForbidden = FALSE;
+    }
     return IsForbidden;
   }
   Data = (UINT8 *) AllocateZeroPool (DataSize);
@@ -1373,6 +1380,8 @@ IsForbiddenByDbx (
     }
 
   }
+
+  IsForbidden = FALSE;
 
 Done:
   if (Data != NULL) {
