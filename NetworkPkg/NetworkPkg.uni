@@ -92,3 +92,9 @@
 #string STR_gEfiNetworkPkgTokenSpaceGuid_PcdIPv6PXESupport_HELP  #language en-US "Indicates IPV6 PXE Function is enabled or not.\n"
                                                                                  "A value of 0 indicates the IPV6 PXE Function is disabled.\n"
                                                                                  "A value of 1 indicates the IPV6 PXE Function is enabled."
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdTftpBlockSize_PROMPT  #language en-US "TFTP block size"
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdTftpBlockSize_HELP  #language en-US "This setting can override the default TFTP block size. A value of 0 computes "
+                                                                                  "the default from MTU information. A non-zero value will be used as block size "
+                                                                                  "in bytes."
