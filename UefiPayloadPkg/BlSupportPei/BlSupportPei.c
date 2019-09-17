@@ -164,6 +164,7 @@ ParseAcpiInfo (
   UINT64                                        *Entry64;
   UINTN                                         Entry64Num;
   UINTN                                         Idx;
+  UINT32                                        *Signature;
   EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_BASE_ADDRESS_TABLE_HEADER *MmCfgHdr;
   EFI_ACPI_MEMORY_MAPPED_ENHANCED_CONFIGURATION_SPACE_BASE_ADDRESS_ALLOCATION_STRUCTURE *MmCfgBase;
 
@@ -181,13 +182,14 @@ ParseAcpiInfo (
     Entry32  = (UINT32 *)(Rsdt + 1);
     Entry32Num = (Rsdt->Length - sizeof(EFI_ACPI_DESCRIPTION_HEADER)) >> 2;
     for (Idx = 0; Idx < Entry32Num; Idx++) {
-      if (*(UINT32 *)(UINTN)(Entry32[Idx]) == EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE) {
-        Fadt = (EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE *)(UINTN)(Entry32[Idx]);
+      Signature = (UINT32 *)(UINTN)Entry32[Idx];
+      if (*Signature == EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE) {
+        Fadt = (EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE *)Signature;
         DEBUG ((DEBUG_INFO, "Found Fadt in Rsdt\n"));
       }
 
-      if (*(UINT32 *)(UINTN)(Entry32[Idx]) == EFI_ACPI_5_0_PCI_EXPRESS_MEMORY_MAPPED_CONFIGURATION_SPACE_BASE_ADDRESS_DESCRIPTION_TABLE_SIGNATURE) {
-        MmCfgHdr = (EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_BASE_ADDRESS_TABLE_HEADER *)(UINTN)(Entry32[Idx]);
+      if (*Signature == EFI_ACPI_5_0_PCI_EXPRESS_MEMORY_MAPPED_CONFIGURATION_SPACE_BASE_ADDRESS_DESCRIPTION_TABLE_SIGNATURE) {
+        MmCfgHdr = (EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_BASE_ADDRESS_TABLE_HEADER *)Signature;
         DEBUG ((DEBUG_INFO, "Found MM config address in Rsdt\n"));
       }
 
@@ -205,13 +207,14 @@ ParseAcpiInfo (
     Entry64  = (UINT64 *)(Xsdt + 1);
     Entry64Num = (Xsdt->Length - sizeof(EFI_ACPI_DESCRIPTION_HEADER)) >> 3;
     for (Idx = 0; Idx < Entry64Num; Idx++) {
-      if (*(UINT32 *)(UINTN)(Entry64[Idx]) == EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE) {
-        Fadt = (EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE *)(UINTN)(Entry64[Idx]);
+      Signature = (UINT32 *)(UINTN)Entry64[Idx];
+      if (*Signature == EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE) {
+        Fadt = (EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE *)Signature;
         DEBUG ((DEBUG_INFO, "Found Fadt in Xsdt\n"));
       }
 
-      if (*(UINT32 *)(UINTN)(Entry64[Idx]) == EFI_ACPI_5_0_PCI_EXPRESS_MEMORY_MAPPED_CONFIGURATION_SPACE_BASE_ADDRESS_DESCRIPTION_TABLE_SIGNATURE) {
-        MmCfgHdr = (EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_BASE_ADDRESS_TABLE_HEADER *)(UINTN)(Entry32[Idx]);
+      if (*Signature == EFI_ACPI_5_0_PCI_EXPRESS_MEMORY_MAPPED_CONFIGURATION_SPACE_BASE_ADDRESS_DESCRIPTION_TABLE_SIGNATURE) {
+        MmCfgHdr = (EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_BASE_ADDRESS_TABLE_HEADER *)Signature;
         DEBUG ((DEBUG_INFO, "Found MM config address in Xsdt\n"));
       }
 
