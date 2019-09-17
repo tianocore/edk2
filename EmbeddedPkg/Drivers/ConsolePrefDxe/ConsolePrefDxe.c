@@ -174,6 +174,7 @@ RemoveSpcrTable (
 
 STATIC
 VOID
+EFIAPI
 OnReadyToBoot (
   IN EFI_EVENT  Event,
   IN VOID       *Context

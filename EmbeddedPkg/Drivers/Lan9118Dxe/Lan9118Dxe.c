@@ -34,6 +34,7 @@ LAN9118_DEVICE_PATH Lan9118PathTemplate =  {
 **
 */
 EFI_STATUS
+EFIAPI
 Lan9118DxeEntry (
   IN EFI_HANDLE Handle,
   IN EFI_SYSTEM_TABLE *SystemTable

@@ -39,6 +39,7 @@ GetSataDevice (
 }
 
 EFI_STATUS
+EFIAPI
 SiI3132AtaPassThruCommand (
   IN     SATA_SI3132_INSTANCE             *SataSiI3132Instance,
   IN     SATA_SI3132_PORT                 *SataPort,
@@ -310,6 +311,7 @@ SiI3132AtaPassThruCommand (
 
 **/
 EFI_STATUS
+EFIAPI
 SiI3132AtaPassThru (
   IN     EFI_ATA_PASS_THRU_PROTOCOL       *This,
   IN     UINT16                           Port,
@@ -371,6 +373,7 @@ SiI3132AtaPassThru (
 
 **/
 EFI_STATUS
+EFIAPI
 SiI3132GetNextPort (
   IN EFI_ATA_PASS_THRU_PROTOCOL *This,
   IN OUT UINT16                 *Port
@@ -442,6 +445,7 @@ SiI3132GetNextPort (
 
 **/
 EFI_STATUS
+EFIAPI
 SiI3132GetNextDevice (
   IN EFI_ATA_PASS_THRU_PROTOCOL *This,
   IN UINT16                     Port,
@@ -523,6 +527,7 @@ SiI3132GetNextDevice (
 
 **/
 EFI_STATUS
+EFIAPI
 SiI3132BuildDevicePath (
   IN     EFI_ATA_PASS_THRU_PROTOCOL *This,
   IN     UINT16                     Port,
@@ -601,6 +606,7 @@ SiI3132BuildDevicePath (
                                   port number does not exist.
 **/
 EFI_STATUS
+EFIAPI
 SiI3132GetDevice (
   IN  EFI_ATA_PASS_THRU_PROTOCOL *This,
   IN  EFI_DEVICE_PATH_PROTOCOL   *DevicePath,
@@ -717,6 +723,7 @@ SiI3132HwResetPort (
 
 **/
 EFI_STATUS
+EFIAPI
 SiI3132ResetPort (
   IN EFI_ATA_PASS_THRU_PROTOCOL *This,
   IN UINT16                     Port
@@ -772,6 +779,7 @@ SiI3132ResetPort (
 
 **/
 EFI_STATUS
+EFIAPI
 SiI3132ResetDevice (
   IN EFI_ATA_PASS_THRU_PROTOCOL *This,
   IN UINT16                     Port,

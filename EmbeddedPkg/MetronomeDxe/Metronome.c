@@ -110,6 +110,7 @@ EFI_HANDLE  gMetronomeHandle = NULL;
 
 **/
 EFI_STATUS
+EFIAPI
 MetronomeInitialize (
   IN EFI_HANDLE         ImageHandle,
   IN EFI_SYSTEM_TABLE   *SystemTable
