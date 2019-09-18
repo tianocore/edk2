@@ -536,7 +536,8 @@ def CopyFileOnChange(SrcFile, Dst, FileLock=None):
     SrcFile = LongFilePath(SrcFile)
     Dst = LongFilePath(Dst)
 
-    if not os.path.exists(SrcFile):
+    if os.path.isdir(SrcFile):
+        EdkLogger.error(None, FILE_COPY_FAILURE, ExtraData='CopyFileOnChange SrcFile is a dir, not a file: %s' % SrcFile)
         return False
 
     if os.path.isdir(Dst):
