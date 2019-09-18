@@ -184,17 +184,19 @@ HasErrorCode:
     push    rax
     push    rax
     sidt    [rsp]
-    xchg    rax, [rsp + 2]
-    xchg    rax, [rsp]
-    xchg    rax, [rsp + 8]
+    mov     bx, word [rsp]
+    mov     rax, qword [rsp + 2]
+    mov     qword [rsp], rax
+    mov     word [rsp + 8], bx
 
     xor     rax, rax
     push    rax
     push    rax
     sgdt    [rsp]
-    xchg    rax, [rsp + 2]
-    xchg    rax, [rsp]
-    xchg    rax, [rsp + 8]
+    mov     bx, word [rsp]
+    mov     rax, qword [rsp + 2]
+    mov     qword [rsp], rax
+    mov     word [rsp + 8], bx
 
 ;; UINT64  Ldtr, Tr;
     xor     rax, rax
