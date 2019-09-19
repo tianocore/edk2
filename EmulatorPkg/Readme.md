@@ -57,12 +57,12 @@ emulator.**
 
 For example, to build + run:
 
-`$ EmulatorPkg/build.sh`  
+`$ EmulatorPkg/build.sh`
 `$ EmulatorPkg/build.sh run`
 
 The build architecture will match your host machine's architecture.
 
 On X64 host machines, you can build + run IA32 mode as well:
 
-`$ EmulatorPkg/build.sh -a IA32`  
+`$ EmulatorPkg/build.sh -a IA32`
 `$ EmulatorPkg/build.sh -a IA32 run`
