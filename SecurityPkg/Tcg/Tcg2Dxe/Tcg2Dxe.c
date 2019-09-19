@@ -2351,7 +2351,6 @@ OnExitBootServices (
   IN      VOID                      *Context
   )
 {
-#ifndef PC_HOOK
   EFI_STATUS    Status;
 
   //
@@ -2375,7 +2374,6 @@ OnExitBootServices (
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "%a not Measured. Error!\n", EFI_EXIT_BOOT_SERVICES_SUCCEEDED));
   }
-#endif
 }
 
 /**
