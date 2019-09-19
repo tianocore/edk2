@@ -709,7 +709,7 @@ CpuidArchitecturalPerformanceMonitoring (
   Display CPUID_EXTENDED_TOPOLOGY leafs for all supported levels.
 
   @param[in] LeafFunction  Leaf function index for CPUID_EXTENDED_TOPOLOGY.
-  
+
 **/
 VOID
 CpuidExtendedTopology (
