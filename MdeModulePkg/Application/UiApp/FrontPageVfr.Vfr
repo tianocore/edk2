@@ -1,10 +1,10 @@
 ///** @file
-//  
+//
 //  Front page formset.
-//  
+//
 //  Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
 //  SPDX-License-Identifier: BSD-2-Clause-Patent
-//  
+//
 //**/
 
 #define FORMSET_GUID  { 0x9e0c30bc, 0x3f06, 0x4ba6, 0x82, 0x88, 0x9, 0x17, 0x9b, 0x85, 0x5d, 0xbe }
@@ -70,7 +70,7 @@ formset
 
     label LABEL_FRANTPAGE_INFORMATION;
     //
-    // This is where we will dynamically add a Action type op-code to show 
+    // This is where we will dynamically add a Action type op-code to show
     // the platform information.
     //
     label LABEL_END;

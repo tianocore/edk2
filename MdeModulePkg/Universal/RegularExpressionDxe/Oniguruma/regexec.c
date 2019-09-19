@@ -375,7 +375,7 @@ print_compiled_byte_code(FILE* f, regex_t* reg, int index,
   case OP_CCLASS_MB_NOT:
     {
       OnigCodePoint ncode;
-      OnigCodePoint* codes;      
+      OnigCodePoint* codes;
 
       codes = (OnigCodePoint* )p->cclass_mb.mb;
       GET_CODE_POINT(ncode, codes);

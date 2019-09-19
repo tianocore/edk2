@@ -1,8 +1,8 @@
 ///** @file
-//  
+//
 //    VFR to produce the formset used by BDS. This form only lists
 //    the Configure Required driver health instances.
-//  
+//
 //  Copyright (c) 2013 - 2015, Intel Corporation. All rights reserved.<BR>
 //  SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -20,7 +20,7 @@ formset
 
       label LABEL_BEGIN;
       label LABEL_END;
-            
+
       suppressif TRUE;
           text
               help  = STRING_TOKEN(STR_NULL),
