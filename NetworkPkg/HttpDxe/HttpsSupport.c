@@ -623,16 +623,13 @@ TlsConfigureSession (
   //
   // TlsConfigData initialization
   //
-  HttpInstance->TlsConfigData.ConnectionEnd       = EfiTlsClient;
-  HttpInstance->TlsConfigData.VerifyMethod        = EFI_TLS_VERIFY_PEER;
-  HttpInstance->TlsConfigData.VerifyHost.Flags    = EFI_TLS_VERIFY_FLAG_NO_WILDCARDS;
-  HttpInstance->TlsConfigData.VerifyHost.HostName = HttpInstance->RemoteHost;
-  HttpInstance->TlsConfigData.SessionState        = EfiTlsSessionNotStarted;
+  HttpInstance->TlsConfigData.ConnectionEnd = EfiTlsClient;
+  HttpInstance->TlsConfigData.VerifyMethod = EFI_TLS_VERIFY_PEER;
+  HttpInstance->TlsConfigData.SessionState = EfiTlsSessionNotStarted;
 
   //
   // EfiTlsConnectionEnd,
-  // EfiTlsVerifyMethod,
-  // EfiTlsVerifyHost,
+  // EfiTlsVerifyMethod
   // EfiTlsSessionState
   //
   Status = HttpInstance->Tls->SetSessionData (
@@ -650,16 +647,6 @@ TlsConfigureSession (
                                 EfiTlsVerifyMethod,
                                 &HttpInstance->TlsConfigData.VerifyMethod,
                                 sizeof (EFI_TLS_VERIFY)
-                                );
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  Status = HttpInstance->Tls->SetSessionData (
-                                HttpInstance->Tls,
-                                EfiTlsVerifyHost,
-                                &HttpInstance->TlsConfigData.VerifyHost,
-                                sizeof (EFI_TLS_VERIFY_HOST)
                                 );
   if (EFI_ERROR (Status)) {
     return Status;
