@@ -6,7 +6,7 @@
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
-**/ 
+**/
 
 #include "AcpiPlatform.h"
 #include <Library/BaseLib.h>
@@ -151,12 +151,12 @@ InstallXenTables (
   }
 
   //
-  // If XSDT table is find, just install its tables. 
+  // If XSDT table is find, just install its tables.
   // Otherwise, try to find and install the RSDT tables.
   //
   if (XenAcpiRsdpStructurePtr->XsdtAddress) {
     //
-    // Retrieve the addresses of XSDT and 
+    // Retrieve the addresses of XSDT and
     // calculate the number of its table entries.
     //
     Xsdt = (EFI_ACPI_DESCRIPTION_HEADER *) (UINTN)
@@ -212,7 +212,7 @@ InstallXenTables (
     Rsdt = (EFI_ACPI_DESCRIPTION_HEADER *) (UINTN)
              XenAcpiRsdpStructurePtr->RsdtAddress;
     NumberOfTableEntries = (Rsdt->Length -
-                             sizeof (EFI_ACPI_DESCRIPTION_HEADER)) / 
+                             sizeof (EFI_ACPI_DESCRIPTION_HEADER)) /
                              sizeof (UINT32);
 
     //

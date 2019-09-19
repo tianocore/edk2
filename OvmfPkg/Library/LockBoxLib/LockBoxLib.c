@@ -48,7 +48,7 @@ LockBoxLibInitialize (
   StartOfEntries = ((LOCK_BOX_ENTRY *) (mLockBoxGlobal + 1));
   NumEntries = ((PcdGet32 (PcdOvmfLockBoxStorageSize) - sizeof (LOCK_BOX_GLOBAL)) /
                 sizeof (LOCK_BOX_ENTRY));
-  EndOfEntries = StartOfEntries + NumEntries;    
+  EndOfEntries = StartOfEntries + NumEntries;
   if (mLockBoxGlobal->Signature != LOCK_BOX_GLOBAL_SIGNATURE) {
     //
     // Note: This code depends on the lock box being cleared in early

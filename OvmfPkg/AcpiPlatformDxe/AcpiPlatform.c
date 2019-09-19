@@ -124,7 +124,7 @@ LocateFvInstanceWithTables (
 
 
 /**
-  Find ACPI tables in an FV and install them. 
+  Find ACPI tables in an FV and install them.
 
   This is now a fall-back path. Normally, we will search for tables provided
   by the VMM first.
@@ -132,7 +132,7 @@ LocateFvInstanceWithTables (
   If that fails, we use this function to load the ACPI tables from an FV. The
   sources for the FV based tables is located under OvmfPkg/AcpiTables.
 
-  @param  AcpiTable     Protocol instance pointer    
+  @param  AcpiTable     Protocol instance pointer
 
 **/
 EFI_STATUS

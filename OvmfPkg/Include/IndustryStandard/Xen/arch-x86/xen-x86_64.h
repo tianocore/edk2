@@ -1,8 +1,8 @@
 /******************************************************************************
  * xen-x86_64.h
- * 
+ *
  * Guest OS interface to x86 64-bit Xen.
- * 
+ *
  * SPDX-License-Identifier: MIT
  *
  * Copyright (c) 2004-2006, K A Fraser

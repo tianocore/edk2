@@ -64,7 +64,7 @@ XenGetE820Map (
 
 /**
   Connects to the Hypervisor.
- 
+
   @param  XenLeaf     CPUID index used to connect.
 
   @return EFI_STATUS

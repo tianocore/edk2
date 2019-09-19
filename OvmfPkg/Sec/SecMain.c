@@ -51,7 +51,7 @@ TemporaryRamMigration (
 
 //
 //
-//  
+//
 EFI_PEI_TEMPORARY_RAM_SUPPORT_PPI mTemporaryRamSupportPpi = {
   TemporaryRamMigration
 };
@@ -74,7 +74,7 @@ IA32_IDT_GATE_DESCRIPTOR  mIdtEntryTemplate = {
     0x0,                                 // Reserved_0
     IA32_IDT_GATE_TYPE_INTERRUPT_32,     // GateType
     0xffff                               // OffsetHigh
-  }    
+  }
 };
 
 /**
@@ -685,7 +685,7 @@ FindAndReportEntryPoints (
   ASSERT_EFI_ERROR (Status);
 
   FindPeiCoreImageBase (BootFirmwareVolumePtr, &PeiCoreImageBase);
-  
+
   ZeroMem ((VOID *) &ImageContext, sizeof (PE_COFF_LOADER_IMAGE_CONTEXT));
   //
   // Report SEC Core debug information when remote debug is enabled
@@ -753,7 +753,7 @@ SecCoreStartupWithStack (
 
   //
   // Initialize IDT
-  //  
+  //
   IdtTableInStack.PeiService = NULL;
   for (Index = 0; Index < SEC_IDT_ENTRY_COUNT; Index ++) {
     CopyMem (&IdtTableInStack.IdtTable[Index], &mIdtEntryTemplate, sizeof (mIdtEntryTemplate));
@@ -814,13 +814,13 @@ SecCoreStartupWithStack (
   //
   InitializeApicTimer (0, MAX_UINT32, TRUE, 5);
   DisableApicTimerInterrupt ();
-  
+
   //
   // Initialize Debug Agent to support source level debug in SEC/PEI phases before memory ready.
   //
   InitializeDebugAgent (DEBUG_AGENT_INIT_PREMEM_SEC, &SecCoreData, SecStartupPhase2);
 }
-  
+
 /**
   Caller provided function to be invoked at the end of InitializeDebugAgent().
 
@@ -840,9 +840,9 @@ SecStartupPhase2(
   EFI_SEC_PEI_HAND_OFF        *SecCoreData;
   EFI_FIRMWARE_VOLUME_HEADER  *BootFv;
   EFI_PEI_CORE_ENTRY_POINT    PeiCoreEntryPoint;
-  
+
   SecCoreData = (EFI_SEC_PEI_HAND_OFF *) Context;
-  
+
   //
   // Find PEI Core entry point. It will report SEC and Pei Core debug information if remote debug
   // is enabled.
@@ -856,7 +856,7 @@ SecStartupPhase2(
   // Transfer the control to the PEI core
   //
   (*PeiCoreEntryPoint) (SecCoreData, (EFI_PEI_PPI_DESCRIPTOR *)&mPrivateDispatchTable);
-  
+
   //
   // If we get here then the PEI Core returned, which is not recoverable.
   //
@@ -881,23 +881,23 @@ TemporaryRamMigration (
   DEBUG_AGENT_CONTEXT_POSTMEM_SEC  DebugAgentContext;
   BOOLEAN                          OldStatus;
   BASE_LIBRARY_JUMP_BUFFER         JumpBuffer;
-  
+
   DEBUG ((EFI_D_INFO,
     "TemporaryRamMigration(0x%Lx, 0x%Lx, 0x%Lx)\n",
     TemporaryMemoryBase,
     PermanentMemoryBase,
     (UINT64)CopySize
     ));
-  
+
   OldHeap = (VOID*)(UINTN)TemporaryMemoryBase;
   NewHeap = (VOID*)((UINTN)PermanentMemoryBase + (CopySize >> 1));
-  
+
   OldStack = (VOID*)((UINTN)TemporaryMemoryBase + (CopySize >> 1));
   NewStack = (VOID*)(UINTN)PermanentMemoryBase;
 
   DebugAgentContext.HeapMigrateOffset = (UINTN)NewHeap - (UINTN)OldHeap;
   DebugAgentContext.StackMigrateOffset = (UINTN)NewStack - (UINTN)OldStack;
-  
+
   OldStatus = SaveAndSetDebugTimerInterrupt (FALSE);
   InitializeDebugAgent (DEBUG_AGENT_INIT_POSTMEM_SEC, (VOID *) &DebugAgentContext, NULL);
 
@@ -910,7 +910,7 @@ TemporaryRamMigration (
   // Migrate Stack
   //
   CopyMem (NewStack, OldStack, CopySize >> 1);
-  
+
   //
   // Rebase IDT table in permanent memory
   //
@@ -921,16 +921,16 @@ TemporaryRamMigration (
 
   //
   // Use SetJump()/LongJump() to switch to a new stack.
-  // 
+  //
   if (SetJump (&JumpBuffer) == 0) {
 #if defined (MDE_CPU_IA32)
     JumpBuffer.Esp = JumpBuffer.Esp + DebugAgentContext.StackMigrateOffset;
     JumpBuffer.Ebp = JumpBuffer.Ebp + DebugAgentContext.StackMigrateOffset;
-#endif    
+#endif
 #if defined (MDE_CPU_X64)
     JumpBuffer.Rsp = JumpBuffer.Rsp + DebugAgentContext.StackMigrateOffset;
     JumpBuffer.Rbp = JumpBuffer.Rbp + DebugAgentContext.StackMigrateOffset;
-#endif    
+#endif
     LongJump (&JumpBuffer, (UINTN)-1);
   }
 

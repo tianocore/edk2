@@ -1,8 +1,8 @@
 /******************************************************************************
  * xen-compat.h
- * 
+ *
  * Guest OS interface to Xen.  Compatibility layer.
- * 
+ *
  * SPDX-License-Identifier: MIT
  *
  * Copyright (c) 2006, Christian Limpach

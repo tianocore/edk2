@@ -1,10 +1,10 @@
 ## @file
-#  
+#
 #    Component description file for the Sata Controller driver.
 #
 #  Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
-#  
+#
 ##
 
 [Defines]
@@ -39,5 +39,5 @@
   UefiBootServicesTableLib
 
 [Protocols]
-  gEfiPciIoProtocolGuid  
+  gEfiPciIoProtocolGuid
   gEfiIdeControllerInitProtocolGuid

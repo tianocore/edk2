@@ -1,8 +1,8 @@
 /******************************************************************************
  * memory.h
- * 
+ *
  * Memory reservation and information.
- * 
+ *
  * SPDX-License-Identifier: MIT
  *
  * Copyright (c) 2005, Keir Fraser <keir@xensource.com>

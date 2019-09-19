@@ -1,8 +1,8 @@
 /******************************************************************************
  * xen-x86_32.h
- * 
+ *
  * Guest OS interface to x86 32-bit Xen.
- * 
+ *
  * SPDX-License-Identifier: MIT
  *
  * Copyright (c) 2004-2007, K A Fraser
