@@ -1,7 +1,7 @@
 /** @file
 SMRAM Save State Map Definitions.
 
-SMRAM Save State Map definitions based on contents of the 
+SMRAM Save State Map definitions based on contents of the
 Intel(R) 64 and IA-32 Architectures Software Developer's Manual
   Volume 3C, Section 34.4 SMRAM
   Volume 3C, Section 34.5 SMI Handler Execution Environment

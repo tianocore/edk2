@@ -1,8 +1,8 @@
 /******************************************************************************
  * arch-x86/xen.h
- * 
+ *
  * Guest OS interface to x86 Xen.
- * 
+ *
  * SPDX-License-Identifier: MIT
  *
  * Copyright (c) 2004-2006, K A Fraser

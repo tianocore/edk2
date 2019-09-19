@@ -1,8 +1,8 @@
 /******************************************************************************
  * xen.h
- * 
+ *
  * Guest OS interface to Xen.
- * 
+ *
  * SPDX-License-Identifier: MIT
  *
  * Copyright (c) 2004, K A Fraser
@@ -203,7 +203,7 @@ typedef struct vcpu_time_info vcpu_time_info_t;
 struct vcpu_info {
     /*
      * 'evtchn_upcall_pending' is written non-zero by Xen to indicate
-     * a pending notification for a particular VCPU. It is then cleared 
+     * a pending notification for a particular VCPU. It is then cleared
      * by the guest OS /before/ checking for pending work, thus avoiding
      * a set-and-check race. Note that the mask is only accessed by Xen
      * on the CPU that is currently hosting the VCPU. This means that the
@@ -266,7 +266,7 @@ struct shared_info {
      *  3. Virtual interrupts ('events'). A domain can bind an event-channel
      *     port to a virtual interrupt source, such as the virtual-timer
      *     device or the emergency console.
-     * 
+     *
      * Event channels are addressed by a "port index". Each channel is
      * associated with two bits of information:
      *  1. PENDING -- notifies the domain that there is a pending notification
@@ -277,7 +277,7 @@ struct shared_info {
      *     becomes pending while the channel is masked then the 'edge' is lost
      *     (i.e., when the channel is unmasked, the guest must manually handle
      *     pending notifications as no upcall will be scheduled by Xen).
-     * 
+     *
      * To expedite scanning of pending notifications, any 0->1 pending
      * transition on an unmasked channel causes a corresponding bit in a
      * per-vcpu selector word to be set. Each bit in the selector covers a
