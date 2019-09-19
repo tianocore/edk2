@@ -10,15 +10,21 @@
 @echo off
 set SCRIPT_ERROR=0
 if "%1"=="" goto main
+if /I "%1"=="VS2019" goto VS2019Vars
 if /I "%1"=="VS2017" goto VS2017Vars
 if /I "%1"=="VS2015" goto VS2015Vars
 if /I "%1"=="VS2013" goto VS2013Vars
 if /I "%1"=="VS2012" goto VS2012Vars
 
 :set_vsvars
-for /f "usebackq tokens=1* delims=: " %%i in (`%*`) do (
-  if /i "%%i"=="installationPath" call "%%j\VC\Auxiliary\Build\vcvars32.bat"
-)
+if defined VCINSTALLDIR goto :EOF
+  call %* > vswhereInfo
+  for /f "usebackq tokens=1* delims=: " %%i in (vswhereInfo) do (
+    if /i "%%i"=="installationPath" (
+      call "%%j\VC\Auxiliary\Build\vcvars32.bat"
+    )
+  )
+  del vswhereInfo
 goto :EOF
 
 :read_vsvars
@@ -42,19 +48,36 @@ REM       (Or invoke the relevant vsvars32 file beforehand).
 
 :main
 if defined VCINSTALLDIR goto :done
+  :VS2019Vars
+  if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" (
+    if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\2019\BuildTools" (
+      call :set_vsvars "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" -products Microsoft.VisualStudio.Product.BuildTools -version 16,17
+    ) else (
+      call :set_vsvars "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" -version 16,17
+    )
+  )
+  if exist "%ProgramFiles%\Microsoft Visual Studio\Installer\vswhere.exe" (
+    if exist "%ProgramFiles%\Microsoft Visual Studio\2019\BuildTools" (
+      call :set_vsvars "%ProgramFiles%\Microsoft Visual Studio\Installer\vswhere.exe" -products Microsoft.VisualStudio.Product.BuildTools -version 16,17
+    ) else (
+      call :set_vsvars "%ProgramFiles%\Microsoft Visual Studio\Installer\vswhere.exe" -version 16,17
+    )
+  )
+  if /I "%1"=="VS2019" goto ToolNotInstall
+
   :VS2017Vars
   if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" (
     if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\BuildTools" (
-      call :set_vsvars "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" -products Microsoft.VisualStudio.Product.BuildTools
+      call :set_vsvars "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" -products Microsoft.VisualStudio.Product.BuildTools -version 15,16
     ) else (
-      call :set_vsvars "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe"
+      call :set_vsvars "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" -version 15,16
     )
   )
   if exist "%ProgramFiles%\Microsoft Visual Studio\Installer\vswhere.exe" (
     if exist "%ProgramFiles%\Microsoft Visual Studio\2017\BuildTools" (
-      call :set_vsvars "%ProgramFiles%\Microsoft Visual Studio\Installer\vswhere.exe" -products Microsoft.VisualStudio.Product.BuildTools
+      call :set_vsvars "%ProgramFiles%\Microsoft Visual Studio\Installer\vswhere.exe" -products Microsoft.VisualStudio.Product.BuildTools -version 15,16
     ) else (
-      call :set_vsvars "%ProgramFiles%\Microsoft Visual Studio\Installer\vswhere.exe"
+      call :set_vsvars "%ProgramFiles%\Microsoft Visual Studio\Installer\vswhere.exe" -version 15,16
     )
   )
   if /I "%1"=="VS2017" goto ToolNotInstall
