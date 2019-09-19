@@ -1,7 +1,7 @@
 @REM @file
 @REM   Windows batch file to setup a WORKSPACE environment
 @REM
-@REM Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+@REM Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 @REM (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 @REM SPDX-License-Identifier: BSD-2-Clause-Patent
 @REM
@@ -133,6 +133,7 @@ if defined CYGWIN_HOME (
 :cygwin_done
 if /I "%1"=="Rebuild" shift
 if /I "%1"=="ForceRebuild" shift
+if /I "%1"=="VS2019" shift
 if /I "%1"=="VS2017" shift
 if /I "%1"=="VS2015" shift
 if /I "%1"=="VS2013" shift
@@ -141,7 +142,7 @@ if "%1"=="" goto end
 
 :Usage
   @echo.
-  @echo  Usage: "%0 [-h | -help | --help | /h | /help | /?] [Reconfig] [Rebuild] [ForceRebuild] [VS2017] [VS2015] [VS2013] [VS2012]"
+  @echo  Usage: "%0 [-h | -help | --help | /h | /help | /?] [Reconfig] [Rebuild] [ForceRebuild] [VS2019] [VS2017] [VS2015] [VS2013] [VS2012]"
   @echo.
   @echo         Reconfig       Reinstall target.txt, tools_def.txt and build_rule.txt.
   @echo         Rebuild        Perform incremental rebuild of BaseTools binaries.
@@ -150,6 +151,7 @@ if "%1"=="" goto end
   @echo         VS2013         Set the env for VS2013 build.
   @echo         VS2015         Set the env for VS2015 build.
   @echo         VS2017         Set the env for VS2017 build.
+  @echo         VS2019         Set the env for VS2019 build.
   @echo.
   @echo  Note that target.template, tools_def.template and build_rules.template
   @echo  will only be copied to target.txt, tools_def.txt and build_rule.txt
