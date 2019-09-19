@@ -321,7 +321,7 @@ for (key,value) in sorted_functions_cycles[:20]:
 	else:
 		break;
 print "----"
-for (key,value) in sorted_all_functions_cycles[:20]: 
+for (key,value) in sorted_all_functions_cycles[:20]:
 	if value[0] != 0:
 		print "%s (cycles: %d - %d%%, count: %d)" % (key, value[0], (value[0] * 100) / total_cycles, value[1])
 	else:

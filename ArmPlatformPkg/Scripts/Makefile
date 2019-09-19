@@ -1,6 +1,6 @@
 #/* @file
 #  Copyright (c) 2011-2015, ARM Limited. All rights reserved.
-#  
+#
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 #*/
