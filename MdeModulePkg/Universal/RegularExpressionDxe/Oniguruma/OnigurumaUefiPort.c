@@ -1,5 +1,5 @@
 /** @file
-  
+
   Module to rewrite stdlib references within Oniguruma
 
   (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP<BR>
