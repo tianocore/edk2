@@ -49,6 +49,12 @@
 #define MCH_PAM5                  0x95
 #define MCH_PAM6                  0x96
 
+#define MCH_DEFAULT_SMBASE_CTL    0x9C
+#define MCH_DEFAULT_SMBASE_QUERY    0xFF
+#define MCH_DEFAULT_SMBASE_IN_RAM   0x01
+#define MCH_DEFAULT_SMBASE_LCK      0x02
+#define MCH_DEFAULT_SMBASE_SIZE     SIZE_128KB
+
 #define MCH_SMRAM                 0x9D
 #define MCH_SMRAM_D_LCK             BIT4
 #define MCH_SMRAM_G_SMRAME          BIT3
