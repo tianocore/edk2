@@ -257,6 +257,12 @@
   #  This PCD is only accessed if PcdSmmSmramRequire is TRUE (see below).
   gUefiOvmfPkgTokenSpaceGuid.PcdQ35TsegMbytes|8|UINT16|0x20
 
+  ## Set to TRUE by PlatformPei if the Q35 board supports the "SMRAM at default
+  #  SMBASE" feature.
+  #
+  #  This PCD is only accessed if PcdSmmSmramRequire is TRUE (see below).
+  gUefiOvmfPkgTokenSpaceGuid.PcdQ35SmramAtDefaultSmbase|FALSE|BOOLEAN|0x34
+
 [PcdsFeatureFlag]
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuBootOrderPciTranslation|TRUE|BOOLEAN|0x1c
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuBootOrderMmioTranslation|FALSE|BOOLEAN|0x1d
