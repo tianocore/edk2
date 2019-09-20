@@ -27,56 +27,56 @@
 //
 #define DRAMC_REGISTER_Q35(Offset) PCI_LIB_ADDRESS (0, 0, 0, (Offset))
 
-#define MCH_EXT_TSEG_MB       0x50
-#define MCH_EXT_TSEG_MB_QUERY   0xFFFF
+#define MCH_EXT_TSEG_MB           0x50
+#define MCH_EXT_TSEG_MB_QUERY       0xFFFF
 
-#define MCH_GGC               0x52
-#define MCH_GGC_IVD             BIT1
+#define MCH_GGC                   0x52
+#define MCH_GGC_IVD                 BIT1
 
-#define MCH_PCIEXBAR_LOW      0x60
-#define MCH_PCIEXBAR_LOWMASK    0x0FFFFFFF
-#define MCH_PCIEXBAR_BUS_FF     0
-#define MCH_PCIEXBAR_EN         BIT0
+#define MCH_PCIEXBAR_LOW          0x60
+#define MCH_PCIEXBAR_LOWMASK        0x0FFFFFFF
+#define MCH_PCIEXBAR_BUS_FF         0
+#define MCH_PCIEXBAR_EN             BIT0
 
-#define MCH_PCIEXBAR_HIGH     0x64
-#define MCH_PCIEXBAR_HIGHMASK   0xFFFFFFF0
+#define MCH_PCIEXBAR_HIGH         0x64
+#define MCH_PCIEXBAR_HIGHMASK       0xFFFFFFF0
 
-#define MCH_PAM0              0x90
-#define MCH_PAM1              0x91
-#define MCH_PAM2              0x92
-#define MCH_PAM3              0x93
-#define MCH_PAM4              0x94
-#define MCH_PAM5              0x95
-#define MCH_PAM6              0x96
+#define MCH_PAM0                  0x90
+#define MCH_PAM1                  0x91
+#define MCH_PAM2                  0x92
+#define MCH_PAM3                  0x93
+#define MCH_PAM4                  0x94
+#define MCH_PAM5                  0x95
+#define MCH_PAM6                  0x96
 
-#define MCH_SMRAM             0x9D
-#define MCH_SMRAM_D_LCK         BIT4
-#define MCH_SMRAM_G_SMRAME      BIT3
+#define MCH_SMRAM                 0x9D
+#define MCH_SMRAM_D_LCK             BIT4
+#define MCH_SMRAM_G_SMRAME          BIT3
 
-#define MCH_ESMRAMC           0x9E
-#define MCH_ESMRAMC_H_SMRAME    BIT7
-#define MCH_ESMRAMC_E_SMERR     BIT6
-#define MCH_ESMRAMC_SM_CACHE    BIT5
-#define MCH_ESMRAMC_SM_L1       BIT4
-#define MCH_ESMRAMC_SM_L2       BIT3
-#define MCH_ESMRAMC_TSEG_EXT    (BIT2 | BIT1)
-#define MCH_ESMRAMC_TSEG_8MB    BIT2
-#define MCH_ESMRAMC_TSEG_2MB    BIT1
-#define MCH_ESMRAMC_TSEG_1MB    0
-#define MCH_ESMRAMC_TSEG_MASK   (BIT2 | BIT1)
-#define MCH_ESMRAMC_T_EN        BIT0
+#define MCH_ESMRAMC               0x9E
+#define MCH_ESMRAMC_H_SMRAME        BIT7
+#define MCH_ESMRAMC_E_SMERR         BIT6
+#define MCH_ESMRAMC_SM_CACHE        BIT5
+#define MCH_ESMRAMC_SM_L1           BIT4
+#define MCH_ESMRAMC_SM_L2           BIT3
+#define MCH_ESMRAMC_TSEG_EXT        (BIT2 | BIT1)
+#define MCH_ESMRAMC_TSEG_8MB        BIT2
+#define MCH_ESMRAMC_TSEG_2MB        BIT1
+#define MCH_ESMRAMC_TSEG_1MB        0
+#define MCH_ESMRAMC_TSEG_MASK       (BIT2 | BIT1)
+#define MCH_ESMRAMC_T_EN            BIT0
 
-#define MCH_GBSM              0xA4
-#define MCH_GBSM_MB_SHIFT       20
+#define MCH_GBSM                  0xA4
+#define MCH_GBSM_MB_SHIFT           20
 
-#define MCH_BGSM              0xA8
-#define MCH_BGSM_MB_SHIFT       20
+#define MCH_BGSM                  0xA8
+#define MCH_BGSM_MB_SHIFT           20
 
-#define MCH_TSEGMB            0xAC
-#define MCH_TSEGMB_MB_SHIFT     20
+#define MCH_TSEGMB                0xAC
+#define MCH_TSEGMB_MB_SHIFT         20
 
-#define MCH_TOLUD             0xB0
-#define MCH_TOLUD_MB_SHIFT      4
+#define MCH_TOLUD                 0xB0
+#define MCH_TOLUD_MB_SHIFT          4
 
 //
 // B/D/F/Type: 0/0x1f/0/PCI
