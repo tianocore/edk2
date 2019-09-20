@@ -577,6 +577,7 @@
 
 !if $(SMM_REQUIRE) == TRUE
   gUefiOvmfPkgTokenSpaceGuid.PcdQ35TsegMbytes|8
+  gUefiOvmfPkgTokenSpaceGuid.PcdQ35SmramAtDefaultSmbase|FALSE
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmSyncMode|0x01
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmApSyncTimeout|100000
 !endif
