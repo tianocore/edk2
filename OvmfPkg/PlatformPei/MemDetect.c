@@ -646,6 +646,28 @@ PublishPeiMemory (
 }
 
 
+STATIC
+VOID
+QemuInitializeRamBelow1gb (
+  VOID
+  )
+{
+  if (FeaturePcdGet (PcdSmmSmramRequire) && mQ35SmramAtDefaultSmbase) {
+    AddMemoryRangeHob (0, SMM_DEFAULT_SMBASE);
+    AddReservedMemoryBaseSizeHob (SMM_DEFAULT_SMBASE, MCH_DEFAULT_SMBASE_SIZE,
+      TRUE /* Cacheable */);
+    STATIC_ASSERT (
+      SMM_DEFAULT_SMBASE + MCH_DEFAULT_SMBASE_SIZE < BASE_512KB + BASE_128KB,
+      "end of SMRAM at default SMBASE ends at, or exceeds, 640KB"
+      );
+    AddMemoryRangeHob (SMM_DEFAULT_SMBASE + MCH_DEFAULT_SMBASE_SIZE,
+      BASE_512KB + BASE_128KB);
+  } else {
+    AddMemoryRangeHob (0, BASE_512KB + BASE_128KB);
+  }
+}
+
+
 /**
   Peform Memory Detection for QEMU / KVM
 
@@ -690,12 +712,12 @@ QemuInitializeRam (
     // allocation HOBs, and to honor preexistent memory allocation HOBs when
     // looking for an area to borrow.
     //
-    AddMemoryRangeHob (0, BASE_512KB + BASE_128KB);
+    QemuInitializeRamBelow1gb ();
   } else {
     //
     // Create memory HOBs
     //
-    AddMemoryRangeHob (0, BASE_512KB + BASE_128KB);
+    QemuInitializeRamBelow1gb ();
 
     if (FeaturePcdGet (PcdSmmSmramRequire)) {
       UINT32 TsegSize;
@@ -861,6 +883,17 @@ InitializeRamRegions (
         TsegSize,
         EfiReservedMemoryType
         );
+      //
+      // Similarly, allocate away the (already reserved) SMRAM at the default
+      // SMBASE, if it exists.
+      //
+      if (mQ35SmramAtDefaultSmbase) {
+        BuildMemoryAllocationHob (
+          SMM_DEFAULT_SMBASE,
+          MCH_DEFAULT_SMBASE_SIZE,
+          EfiReservedMemoryType
+          );
+      }
     }
   }
 }
