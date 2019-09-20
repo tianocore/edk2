@@ -53,18 +53,7 @@ Q35TsegMbytesInitialization (
   UINT16        ExtendedTsegMbytes;
   RETURN_STATUS PcdStatus;
 
-  if (mHostBridgeDevId != INTEL_Q35_MCH_DEVICE_ID) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "%a: no TSEG (SMRAM) on host bridge DID=0x%04x; "
-      "only DID=0x%04x (Q35) is supported\n",
-      __FUNCTION__,
-      mHostBridgeDevId,
-      INTEL_Q35_MCH_DEVICE_ID
-      ));
-    ASSERT (FALSE);
-    CpuDeadLoop ();
-  }
+  ASSERT (mHostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID);
 
   //
   // Check if QEMU offers an extended TSEG.

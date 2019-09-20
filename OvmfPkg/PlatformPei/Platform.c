@@ -566,6 +566,28 @@ S3Verification (
 }
 
 
+VOID
+Q35BoardVerification (
+  VOID
+  )
+{
+  if (mHostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID) {
+    return;
+  }
+
+  DEBUG ((
+    DEBUG_ERROR,
+    "%a: no TSEG (SMRAM) on host bridge DID=0x%04x; "
+    "only DID=0x%04x (Q35) is supported\n",
+    __FUNCTION__,
+    mHostBridgeDevId,
+    INTEL_Q35_MCH_DEVICE_ID
+    ));
+  ASSERT (FALSE);
+  CpuDeadLoop ();
+}
+
+
 /**
   Fetch the boot CPU count and the possible CPU count from QEMU, and expose
   them to UefiCpuPkg modules. Set the mMaxCpuCount variable.
@@ -768,6 +790,7 @@ InitializePlatform (
   MaxCpuCountInitialization ();
 
   if (FeaturePcdGet (PcdSmmSmramRequire)) {
+    Q35BoardVerification ();
     Q35TsegMbytesInitialization ();
   }
 
