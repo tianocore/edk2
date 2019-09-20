@@ -792,6 +792,7 @@ InitializePlatform (
   if (FeaturePcdGet (PcdSmmSmramRequire)) {
     Q35BoardVerification ();
     Q35TsegMbytesInitialization ();
+    Q35SmramAtDefaultSmbaseInitialization ();
   }
 
   PublishPeiMemory ();

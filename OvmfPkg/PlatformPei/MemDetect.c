@@ -43,6 +43,8 @@ STATIC UINT32 mS3AcpiReservedMemorySize;
 
 STATIC UINT16 mQ35TsegMbytes;
 
+BOOLEAN mQ35SmramAtDefaultSmbase;
+
 UINT32 mQemuUc32Base;
 
 VOID
@@ -87,6 +89,22 @@ Q35TsegMbytesInitialization (
   PcdStatus = PcdSet16S (PcdQ35TsegMbytes, ExtendedTsegMbytes);
   ASSERT_RETURN_ERROR (PcdStatus);
   mQ35TsegMbytes = ExtendedTsegMbytes;
+}
+
+
+VOID
+Q35SmramAtDefaultSmbaseInitialization (
+  VOID
+  )
+{
+  RETURN_STATUS PcdStatus;
+
+  ASSERT (mHostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID);
+
+  mQ35SmramAtDefaultSmbase = FALSE;
+  PcdStatus = PcdSetBoolS (PcdQ35SmramAtDefaultSmbase,
+                mQ35SmramAtDefaultSmbase);
+  ASSERT_RETURN_ERROR (PcdStatus);
 }
 
 
