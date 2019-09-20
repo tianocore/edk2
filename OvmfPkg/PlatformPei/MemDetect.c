@@ -17,6 +17,7 @@ Module Name:
 #include <IndustryStandard/I440FxPiix4.h>
 #include <IndustryStandard/Q35MchIch9.h>
 #include <PiPei.h>
+#include <Register/Intel/SmramSaveStateMap.h>
 
 //
 // The Library classes this module consumes
@@ -624,6 +625,15 @@ PublishPeiMemory (
       MemoryBase = LowerMemorySize - PeiMemoryCap;
       MemorySize = PeiMemoryCap;
     }
+  }
+
+  //
+  // MEMFD_BASE_ADDRESS separates the SMRAM at the default SMBASE from the
+  // normal boot permanent PEI RAM. Regarding the S3 boot path, the S3
+  // permanent PEI RAM is located even higher.
+  //
+  if (FeaturePcdGet (PcdSmmSmramRequire) && mQ35SmramAtDefaultSmbase) {
+    ASSERT (SMM_DEFAULT_SMBASE + MCH_DEFAULT_SMBASE_SIZE <= MemoryBase);
   }
 
   //
