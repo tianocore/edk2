@@ -52,6 +52,11 @@ Q35TsegMbytesInitialization (
   VOID
   );
 
+VOID
+Q35SmramAtDefaultSmbaseInitialization (
+  VOID
+  );
+
 EFI_STATUS
 PublishPeiMemory (
   VOID
@@ -118,6 +123,8 @@ extern UINT8 mPhysMemAddressWidth;
 extern UINT32 mMaxCpuCount;
 
 extern UINT16 mHostBridgeDevId;
+
+extern BOOLEAN mQ35SmramAtDefaultSmbase;
 
 extern UINT32 mQemuUc32Base;
 
