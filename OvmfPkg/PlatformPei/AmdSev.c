@@ -9,6 +9,7 @@
 //
 // The package level header files this module uses
 //
+#include <IndustryStandard/Q35MchIch9.h>
 #include <Library/DebugLib.h>
 #include <Library/HobLib.h>
 #include <Library/MemEncryptSevLib.h>
@@ -16,6 +17,7 @@
 #include <PiPei.h>
 #include <Register/Amd/Cpuid.h>
 #include <Register/Cpuid.h>
+#include <Register/Intel/SmramSaveStateMap.h>
 
 #include "Platform.h"
 
@@ -83,10 +85,22 @@ AmdSevInitialize (
                         );
     ASSERT_RETURN_ERROR (LocateMapStatus);
 
-    BuildMemoryAllocationHob (
-      MapPagesBase,                      // BaseAddress
-      EFI_PAGES_TO_SIZE (MapPagesCount), // Length
-      EfiBootServicesData                // MemoryType
-      );
+    if (mQ35SmramAtDefaultSmbase) {
+      //
+      // The initial SMRAM Save State Map has been covered as part of a larger
+      // reserved memory allocation in InitializeRamRegions().
+      //
+      ASSERT (SMM_DEFAULT_SMBASE <= MapPagesBase);
+      ASSERT (
+        (MapPagesBase + EFI_PAGES_TO_SIZE (MapPagesCount) <=
+         SMM_DEFAULT_SMBASE + MCH_DEFAULT_SMBASE_SIZE)
+        );
+    } else {
+      BuildMemoryAllocationHob (
+        MapPagesBase,                      // BaseAddress
+        EFI_PAGES_TO_SIZE (MapPagesCount), // Length
+        EfiBootServicesData                // MemoryType
+        );
+    }
   }
 }
