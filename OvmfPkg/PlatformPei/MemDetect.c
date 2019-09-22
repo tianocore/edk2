@@ -103,6 +103,22 @@ Q35SmramAtDefaultSmbaseInitialization (
   ASSERT (mHostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID);
 
   mQ35SmramAtDefaultSmbase = FALSE;
+  if (FeaturePcdGet (PcdCsmEnable)) {
+    DEBUG ((DEBUG_INFO, "%a: SMRAM at default SMBASE not checked due to CSM\n",
+      __FUNCTION__));
+  } else {
+    UINTN CtlReg;
+    UINT8 CtlRegVal;
+
+    CtlReg = DRAMC_REGISTER_Q35 (MCH_DEFAULT_SMBASE_CTL);
+    PciWrite8 (CtlReg, MCH_DEFAULT_SMBASE_QUERY);
+    CtlRegVal = PciRead8 (CtlReg);
+    mQ35SmramAtDefaultSmbase = (BOOLEAN)(CtlRegVal ==
+                                         MCH_DEFAULT_SMBASE_IN_RAM);
+    DEBUG ((DEBUG_INFO, "%a: SMRAM at default SMBASE %a\n", __FUNCTION__,
+      mQ35SmramAtDefaultSmbase ? "found" : "not found"));
+  }
+
   PcdStatus = PcdSetBoolS (PcdQ35SmramAtDefaultSmbase,
                 mQ35SmramAtDefaultSmbase);
   ASSERT_RETURN_ERROR (PcdStatus);
