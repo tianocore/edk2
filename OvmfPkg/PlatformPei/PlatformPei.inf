@@ -106,6 +106,7 @@
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
 
 [FeaturePcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdCsmEnable
   gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire
 
 [Ppis]
