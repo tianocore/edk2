@@ -373,6 +373,12 @@ SmmAccessPeiEntryPoint (
     sizeof SmramMap[DescIdxSmmS3ResumeState]);
 
   //
+  // SmramAccessLock() depends on "mQ35SmramAtDefaultSmbase"; init the latter
+  // just before exposing the former via PEI_SMM_ACCESS_PPI.Lock().
+  //
+  InitQ35SmramAtDefaultSmbase ();
+
+  //
   // We're done. The next step should succeed, but even if it fails, we can't
   // roll back the above BuildGuidHob() allocation, because PEI doesn't support
   // releasing memory.
