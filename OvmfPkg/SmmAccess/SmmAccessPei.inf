@@ -54,6 +54,7 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire
 
 [Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdQ35SmramAtDefaultSmbase
   gUefiOvmfPkgTokenSpaceGuid.PcdQ35TsegMbytes
 
 [Ppis]

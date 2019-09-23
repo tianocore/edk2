@@ -39,6 +39,14 @@ InitQ35TsegMbytes (
   );
 
 /**
+  Save PcdQ35SmramAtDefaultSmbase into mQ35SmramAtDefaultSmbase.
+**/
+VOID
+InitQ35SmramAtDefaultSmbase (
+  VOID
+  );
+
+/**
   Read the MCH_SMRAM and ESMRAMC registers, and update the LockState and
   OpenState fields in the PEI_SMM_ACCESS_PPI / EFI_SMM_ACCESS2_PROTOCOL object,
   from the D_LCK and T_EN bits.
