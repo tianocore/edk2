@@ -145,6 +145,13 @@ SmmAccess2DxeEntryPoint (
 
   InitQ35TsegMbytes ();
   GetStates (&mAccess2.LockState, &mAccess2.OpenState);
+
+  //
+  // SmramAccessLock() depends on "mQ35SmramAtDefaultSmbase"; init the latter
+  // just before exposing the former via EFI_SMM_ACCESS2_PROTOCOL.Lock().
+  //
+  InitQ35SmramAtDefaultSmbase ();
+
   return gBS->InstallMultipleProtocolInterfaces (&ImageHandle,
                 &gEfiSmmAccess2ProtocolGuid, &mAccess2,
                 NULL);
