@@ -13,7 +13,7 @@
 #  may not be modified without authorization. If platform fails to protect these resources,
 #  the authentication service provided in this driver will be broken, and the behavior is undefined.
 #
-# Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2010 - 2019, Intel Corporation. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -39,6 +39,8 @@
   VariableSmmRuntimeDxe.c
   PrivilegePolymorphic.h
   Measurement.c
+  VariableParsing.c
+  VariableParsing.h
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -65,7 +67,21 @@
   gEdkiiVariableLockProtocolGuid                ## PRODUCES
   gEdkiiVarCheckProtocolGuid                    ## PRODUCES
 
+[FeaturePcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEnableVariableRuntimeCache           ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableCollectStatistics            ## CONSUMES
+
 [Guids]
+  ## PRODUCES             ## GUID # Signature of Variable store header
+  ## CONSUMES             ## GUID # Signature of Variable store header
+  ## SOMETIMES_PRODUCES   ## SystemTable
+  gEfiAuthenticatedVariableGuid
+
+  ## PRODUCES             ## GUID # Signature of Variable store header
+  ## CONSUMES             ## GUID # Signature of Variable store header
+  ## SOMETIMES_PRODUCES   ## SystemTable
+  gEfiVariableGuid
+
   gEfiEventVirtualAddressChangeGuid             ## CONSUMES ## Event
   gEfiEventExitBootServicesGuid                 ## CONSUMES ## Event
   ## CONSUMES ## GUID # Locate protocol

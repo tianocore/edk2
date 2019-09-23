@@ -25,6 +25,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "Variable.h"
 #include "VariableNonVolatile.h"
 #include "VariableParsing.h"
+#include "VariableRuntimeCache.h"
 
 VARIABLE_MODULE_GLOBAL  *mVariableModuleGlobal;
 
@@ -332,6 +333,12 @@ RecordVarErrorFlag (
       // Update the data in NV cache.
       //
       *VarErrFlag = TempFlag;
+      Status =  SynchronizeRuntimeVariableCache (
+                  &mVariableModuleGlobal->VariableGlobal.VariableRuntimeCacheContext.VariableRuntimeNvCache,
+                  (UINTN) VarErrFlag - (UINTN) mNvVariableCache + (UINTN) mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase,
+                  sizeof (TempFlag)
+                  );
+      ASSERT_EFI_ERROR (Status);
     }
   }
 }
@@ -766,12 +773,24 @@ Reclaim (
 
 Done:
   if (IsVolatile || mVariableModuleGlobal->VariableGlobal.EmuNvMode) {
+    Status =  SynchronizeRuntimeVariableCache (
+                &mVariableModuleGlobal->VariableGlobal.VariableRuntimeCacheContext.VariableRuntimeVolatileCache,
+                0,
+                VariableStoreHeader->Size
+                );
+    ASSERT_EFI_ERROR (Status);
     FreePool (ValidBuffer);
   } else {
     //
     // For NV variable reclaim, we use mNvVariableCache as the buffer, so copy the data back.
     //
-    CopyMem (mNvVariableCache, (UINT8 *)(UINTN)VariableBase, VariableStoreHeader->Size);
+    CopyMem (mNvVariableCache, (UINT8 *) (UINTN) VariableBase, VariableStoreHeader->Size);
+    Status =  SynchronizeRuntimeVariableCache (
+                &mVariableModuleGlobal->VariableGlobal.VariableRuntimeCacheContext.VariableRuntimeNvCache,
+                0,
+                VariableStoreHeader->Size
+                );
+    ASSERT_EFI_ERROR (Status);
   }
 
   return Status;
@@ -1614,6 +1633,7 @@ UpdateVariable (
   VARIABLE_POINTER_TRACK              *Variable;
   VARIABLE_POINTER_TRACK              NvVariable;
   VARIABLE_STORE_HEADER               *VariableStoreHeader;
+  VARIABLE_RUNTIME_CACHE              *VolatileCacheInstance;
   UINT8                               *BufferForMerge;
   UINTN                               MergedBufSize;
   BOOLEAN                             DataReady;
@@ -2275,6 +2295,23 @@ UpdateVariable (
   }
 
 Done:
+  if (!EFI_ERROR (Status)) {
+    if (Variable->Volatile) {
+      VolatileCacheInstance = &(mVariableModuleGlobal->VariableGlobal.VariableRuntimeCacheContext.VariableRuntimeVolatileCache);
+    } else {
+      VolatileCacheInstance = &(mVariableModuleGlobal->VariableGlobal.VariableRuntimeCacheContext.VariableRuntimeNvCache);
+    }
+
+    if (VolatileCacheInstance->Store != NULL) {
+      Status =  SynchronizeRuntimeVariableCache (
+                  VolatileCacheInstance,
+                  0,
+                  VolatileCacheInstance->Store->Size
+                  );
+      ASSERT_EFI_ERROR (Status);
+    }
+  }
+
   return Status;
 }
 
@@ -3200,6 +3237,14 @@ FlushHobVariableToFlash (
         ErrorFlag = TRUE;
       }
     }
+    if (mVariableModuleGlobal->VariableGlobal.VariableRuntimeCacheContext.VariableRuntimeHobCache.Store != NULL) {
+      Status =  SynchronizeRuntimeVariableCache (
+                  &mVariableModuleGlobal->VariableGlobal.VariableRuntimeCacheContext.VariableRuntimeHobCache,
+                  0,
+                  mVariableModuleGlobal->VariableGlobal.VariableRuntimeCacheContext.VariableRuntimeHobCache.Store->Size
+                  );
+      ASSERT_EFI_ERROR (Status);
+    }
     if (ErrorFlag) {
       //
       // We still have HOB variable(s) not flushed in flash.
@@ -3210,6 +3255,9 @@ FlushHobVariableToFlash (
       // All HOB variables have been flushed in flash.
       //
       DEBUG ((EFI_D_INFO, "Variable driver: all HOB variables have been flushed in flash.\n"));
+      if (mVariableModuleGlobal->VariableGlobal.VariableRuntimeCacheContext.HobFlushComplete != NULL) {
+        *(mVariableModuleGlobal->VariableGlobal.VariableRuntimeCacheContext.HobFlushComplete) = TRUE;
+      }
       if (!AtRuntime ()) {
         FreePool ((VOID *) VariableStoreHeader);
       }

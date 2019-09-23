@@ -65,6 +65,21 @@ typedef enum {
 } VARIABLE_STORE_TYPE;
 
 typedef struct {
+  UINT32                  PendingUpdateOffset;
+  UINT32                  PendingUpdateLength;
+  VARIABLE_STORE_HEADER   *Store;
+} VARIABLE_RUNTIME_CACHE;
+
+typedef struct {
+  BOOLEAN                 *ReadLock;
+  BOOLEAN                 *PendingUpdate;
+  BOOLEAN                 *HobFlushComplete;
+  VARIABLE_RUNTIME_CACHE  VariableRuntimeHobCache;
+  VARIABLE_RUNTIME_CACHE  VariableRuntimeNvCache;
+  VARIABLE_RUNTIME_CACHE  VariableRuntimeVolatileCache;
+} VARIABLE_RUNTIME_CACHE_CONTEXT;
+
+typedef struct {
   VARIABLE_HEADER *CurrPtr;
   //
   // If both ADDED and IN_DELETED_TRANSITION variable are present,
@@ -79,14 +94,15 @@ typedef struct {
 } VARIABLE_POINTER_TRACK;
 
 typedef struct {
-  EFI_PHYSICAL_ADDRESS  HobVariableBase;
-  EFI_PHYSICAL_ADDRESS  VolatileVariableBase;
-  EFI_PHYSICAL_ADDRESS  NonVolatileVariableBase;
-  EFI_LOCK              VariableServicesLock;
-  UINT32                ReentrantState;
-  BOOLEAN               AuthFormat;
-  BOOLEAN               AuthSupport;
-  BOOLEAN               EmuNvMode;
+  EFI_PHYSICAL_ADDRESS            HobVariableBase;
+  EFI_PHYSICAL_ADDRESS            VolatileVariableBase;
+  EFI_PHYSICAL_ADDRESS            NonVolatileVariableBase;
+  VARIABLE_RUNTIME_CACHE_CONTEXT  VariableRuntimeCacheContext;
+  EFI_LOCK                        VariableServicesLock;
+  UINT32                          ReentrantState;
+  BOOLEAN                         AuthFormat;
+  BOOLEAN                         AuthSupport;
+  BOOLEAN                         EmuNvMode;
 } VARIABLE_GLOBAL;
 
 typedef struct {

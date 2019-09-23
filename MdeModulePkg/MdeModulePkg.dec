@@ -641,6 +641,18 @@
   # @Prompt Enable Device Path From Text support.
   gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathFromText|TRUE|BOOLEAN|0x00010038
 
+  ## Indicates if the UEFI variable runtime cache should be enabled.
+  #  This setting only applies if SMM variables are enabled. When enabled, all variable
+  #  data for Runtime Service GetVariable () and GetNextVariableName () calls is retrieved
+  #  from a runtime data buffer referred to as the "runtime cache". An SMI is not triggered
+  #  at all for these requests. Variables writes still trigger an SMI. This can greatly
+  #  reduce overall system SMM usage as most boots tend to issue far more variable reads
+  #  than writes.<BR><BR>
+  #   TRUE  - The UEFI variable runtime cache is enabled.<BR>
+  #   FALSE - The UEFI variable runtime cache is disabled.<BR>
+  # @Prompt Enable the UEFI variable runtime cache.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEnableVariableRuntimeCache|FALSE|BOOLEAN|0x00010039
+
   ## Indicates if the statistics about variable usage will be collected. This information is
   #  stored as a vendor configuration table into the EFI system table.
   #  Set this PCD to TRUE to use VariableInfo application in MdeModulePkg\Application directory to get
