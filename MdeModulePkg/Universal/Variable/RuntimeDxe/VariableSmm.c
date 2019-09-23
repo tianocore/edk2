@@ -31,6 +31,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Guid/SmmVariableCommon.h>
 #include "Variable.h"
 #include "VariableParsing.h"
+#include "VariableRuntimeCache.h"
+
+extern VARIABLE_STORE_HEADER                         *mNvVariableCache;
 
 BOOLEAN                                              mAtRuntime              = FALSE;
 UINT8                                                *mVariableBufferPayload = NULL;
@@ -451,25 +454,29 @@ SmmVariableGetStatistics (
 EFI_STATUS
 EFIAPI
 SmmVariableHandler (
-  IN     EFI_HANDLE                                DispatchHandle,
-  IN     CONST VOID                                *RegisterContext,
-  IN OUT VOID                                      *CommBuffer,
-  IN OUT UINTN                                     *CommBufferSize
+  IN     EFI_HANDLE                                       DispatchHandle,
+  IN     CONST VOID                                       *RegisterContext,
+  IN OUT VOID                                             *CommBuffer,
+  IN OUT UINTN                                            *CommBufferSize
   )
 {
-  EFI_STATUS                                       Status;
-  SMM_VARIABLE_COMMUNICATE_HEADER                  *SmmVariableFunctionHeader;
-  SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE         *SmmVariableHeader;
-  SMM_VARIABLE_COMMUNICATE_GET_NEXT_VARIABLE_NAME  *GetNextVariableName;
-  SMM_VARIABLE_COMMUNICATE_QUERY_VARIABLE_INFO     *QueryVariableInfo;
-  SMM_VARIABLE_COMMUNICATE_GET_PAYLOAD_SIZE        *GetPayloadSize;
-  VARIABLE_INFO_ENTRY                              *VariableInfo;
-  SMM_VARIABLE_COMMUNICATE_LOCK_VARIABLE           *VariableToLock;
-  SMM_VARIABLE_COMMUNICATE_VAR_CHECK_VARIABLE_PROPERTY *CommVariableProperty;
-  UINTN                                            InfoSize;
-  UINTN                                            NameBufferSize;
-  UINTN                                            CommBufferPayloadSize;
-  UINTN                                            TempCommBufferSize;
+  EFI_STATUS                                              Status;
+  SMM_VARIABLE_COMMUNICATE_HEADER                         *SmmVariableFunctionHeader;
+  SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE                *SmmVariableHeader;
+  SMM_VARIABLE_COMMUNICATE_GET_NEXT_VARIABLE_NAME         *GetNextVariableName;
+  SMM_VARIABLE_COMMUNICATE_QUERY_VARIABLE_INFO            *QueryVariableInfo;
+  SMM_VARIABLE_COMMUNICATE_GET_PAYLOAD_SIZE               *GetPayloadSize;
+  SMM_VARIABLE_COMMUNICATE_RUNTIME_VARIABLE_CACHE_CONTEXT *RuntimeVariableCacheContext;
+  SMM_VARIABLE_COMMUNICATE_GET_RUNTIME_CACHE_INFO         *GetRuntimeCacheInfo;
+  SMM_VARIABLE_COMMUNICATE_LOCK_VARIABLE                  *VariableToLock;
+  SMM_VARIABLE_COMMUNICATE_VAR_CHECK_VARIABLE_PROPERTY    *CommVariableProperty;
+  VARIABLE_INFO_ENTRY                                     *VariableInfo;
+  VARIABLE_RUNTIME_CACHE_CONTEXT                          *VariableCacheContext;
+  VARIABLE_STORE_HEADER                                   *VariableCache;
+  UINTN                                                   InfoSize;
+  UINTN                                                   NameBufferSize;
+  UINTN                                                   CommBufferPayloadSize;
+  UINTN                                                   TempCommBufferSize;
 
   //
   // If input is invalid, stop processing this SMI
@@ -788,6 +795,154 @@ SmmVariableHandler (
                  &CommVariableProperty->VariableProperty
                  );
       CopyMem (SmmVariableFunctionHeader->Data, mVariableBufferPayload, CommBufferPayloadSize);
+      break;
+    case SMM_VARIABLE_FUNCTION_INIT_RUNTIME_VARIABLE_CACHE_CONTEXT:
+      if (CommBufferPayloadSize < sizeof (SMM_VARIABLE_COMMUNICATE_RUNTIME_VARIABLE_CACHE_CONTEXT)) {
+        DEBUG ((DEBUG_ERROR, "InitRuntimeVariableCacheContext: SMM communication buffer size invalid!\n"));
+        Status = EFI_ACCESS_DENIED;
+        goto EXIT;
+      }
+      if (mEndOfDxe) {
+        DEBUG ((DEBUG_ERROR, "InitRuntimeVariableCacheContext: Cannot init context after end of DXE!\n"));
+        Status = EFI_ACCESS_DENIED;
+        goto EXIT;
+      }
+
+      //
+      // Copy the input communicate buffer payload to the pre-allocated SMM variable payload buffer.
+      //
+      CopyMem (mVariableBufferPayload, SmmVariableFunctionHeader->Data, CommBufferPayloadSize);
+      RuntimeVariableCacheContext = (SMM_VARIABLE_COMMUNICATE_RUNTIME_VARIABLE_CACHE_CONTEXT *) mVariableBufferPayload;
+
+      //
+      // Verify required runtime cache buffers are provided.
+      //
+      if (RuntimeVariableCacheContext->RuntimeVolatileCache == NULL ||
+          RuntimeVariableCacheContext->RuntimeNvCache == NULL ||
+          RuntimeVariableCacheContext->PendingUpdate == NULL ||
+          RuntimeVariableCacheContext->ReadLock == NULL ||
+          RuntimeVariableCacheContext->HobFlushComplete == NULL) {
+        DEBUG ((DEBUG_ERROR, "InitRuntimeVariableCacheContext: Required runtime cache buffer is NULL!\n"));
+        Status = EFI_ACCESS_DENIED;
+        goto EXIT;
+      }
+
+      //
+      // Verify minimum size requirements for the runtime variable store buffers.
+      //
+      if ((RuntimeVariableCacheContext->RuntimeHobCache != NULL &&
+          RuntimeVariableCacheContext->RuntimeHobCache->Size < sizeof (VARIABLE_STORE_HEADER)) ||
+          RuntimeVariableCacheContext->RuntimeVolatileCache->Size < sizeof (VARIABLE_STORE_HEADER) ||
+          RuntimeVariableCacheContext->RuntimeNvCache->Size < sizeof (VARIABLE_STORE_HEADER)) {
+        DEBUG ((DEBUG_ERROR, "InitRuntimeVariableCacheContext: A runtime cache buffer size is invalid!\n"));
+        Status = EFI_ACCESS_DENIED;
+        goto EXIT;
+      }
+
+      //
+      // Verify runtime buffers do not overlap with SMRAM ranges.
+      //
+      if (RuntimeVariableCacheContext->RuntimeHobCache != NULL &&
+          !VariableSmmIsBufferOutsideSmmValid (
+            (UINTN) RuntimeVariableCacheContext->RuntimeHobCache,
+            (UINTN) RuntimeVariableCacheContext->RuntimeHobCache->Size)) {
+        DEBUG ((DEBUG_ERROR, "InitRuntimeVariableCacheContext: Runtime HOB cache buffer in SMRAM or overflow!\n"));
+        Status = EFI_ACCESS_DENIED;
+        goto EXIT;
+      }
+      if (!VariableSmmIsBufferOutsideSmmValid (
+            (UINTN) RuntimeVariableCacheContext->RuntimeVolatileCache,
+            (UINTN) RuntimeVariableCacheContext->RuntimeVolatileCache->Size)) {
+        DEBUG ((DEBUG_ERROR, "InitRuntimeVariableCacheContext: Runtime volatile cache buffer in SMRAM or overflow!\n"));
+        Status = EFI_ACCESS_DENIED;
+        goto EXIT;
+      }
+      if (!VariableSmmIsBufferOutsideSmmValid (
+            (UINTN) RuntimeVariableCacheContext->RuntimeNvCache,
+            (UINTN) RuntimeVariableCacheContext->RuntimeNvCache->Size)) {
+        DEBUG ((DEBUG_ERROR, "InitRuntimeVariableCacheContext: Runtime non-volatile cache buffer in SMRAM or overflow!\n"));
+        Status = EFI_ACCESS_DENIED;
+        goto EXIT;
+      }
+      if (!VariableSmmIsBufferOutsideSmmValid (
+            (UINTN) RuntimeVariableCacheContext->PendingUpdate,
+            sizeof (*(RuntimeVariableCacheContext->PendingUpdate)))) {
+        DEBUG ((DEBUG_ERROR, "InitRuntimeVariableCacheContext: Runtime cache pending update buffer in SMRAM or overflow!\n"));
+        Status = EFI_ACCESS_DENIED;
+        goto EXIT;
+      }
+      if (!VariableSmmIsBufferOutsideSmmValid (
+            (UINTN) RuntimeVariableCacheContext->ReadLock,
+            sizeof (*(RuntimeVariableCacheContext->ReadLock)))) {
+        DEBUG ((DEBUG_ERROR, "InitRuntimeVariableCacheContext: Runtime cache read lock buffer in SMRAM or overflow!\n"));
+        Status = EFI_ACCESS_DENIED;
+        goto EXIT;
+      }
+      if (!VariableSmmIsBufferOutsideSmmValid (
+            (UINTN) RuntimeVariableCacheContext->HobFlushComplete,
+            sizeof (*(RuntimeVariableCacheContext->HobFlushComplete)))) {
+        DEBUG ((DEBUG_ERROR, "InitRuntimeVariableCacheContext: Runtime cache HOB flush complete buffer in SMRAM or overflow!\n"));
+        Status = EFI_ACCESS_DENIED;
+        goto EXIT;
+      }
+
+      VariableCacheContext = &mVariableModuleGlobal->VariableGlobal.VariableRuntimeCacheContext;
+      VariableCacheContext->VariableRuntimeHobCache.Store      = RuntimeVariableCacheContext->RuntimeHobCache;
+      VariableCacheContext->VariableRuntimeVolatileCache.Store = RuntimeVariableCacheContext->RuntimeVolatileCache;
+      VariableCacheContext->VariableRuntimeNvCache.Store       = RuntimeVariableCacheContext->RuntimeNvCache;
+      VariableCacheContext->PendingUpdate                      = RuntimeVariableCacheContext->PendingUpdate;
+      VariableCacheContext->ReadLock                           = RuntimeVariableCacheContext->ReadLock;
+      VariableCacheContext->HobFlushComplete                   = RuntimeVariableCacheContext->HobFlushComplete;
+
+      // Set up the intial pending request since the RT cache needs to be in sync with SMM cache
+      VariableCacheContext->VariableRuntimeHobCache.PendingUpdateOffset = 0;
+      VariableCacheContext->VariableRuntimeHobCache.PendingUpdateLength = 0;
+      if (mVariableModuleGlobal->VariableGlobal.HobVariableBase > 0 &&
+          VariableCacheContext->VariableRuntimeHobCache.Store != NULL) {
+        VariableCache = (VARIABLE_STORE_HEADER *) (UINTN) mVariableModuleGlobal->VariableGlobal.HobVariableBase;
+        VariableCacheContext->VariableRuntimeHobCache.PendingUpdateLength = (UINT32) ((UINTN) GetEndPointer (VariableCache) - (UINTN) VariableCache);
+        CopyGuid (&(VariableCacheContext->VariableRuntimeHobCache.Store->Signature), &(VariableCache->Signature));
+      }
+      VariableCache = (VARIABLE_STORE_HEADER  *) (UINTN) mVariableModuleGlobal->VariableGlobal.VolatileVariableBase;
+      VariableCacheContext->VariableRuntimeVolatileCache.PendingUpdateOffset   = 0;
+      VariableCacheContext->VariableRuntimeVolatileCache.PendingUpdateLength   = (UINT32) ((UINTN) GetEndPointer (VariableCache) - (UINTN) VariableCache);
+      CopyGuid (&(VariableCacheContext->VariableRuntimeVolatileCache.Store->Signature), &(VariableCache->Signature));
+
+      VariableCache = (VARIABLE_STORE_HEADER  *) (UINTN) mNvVariableCache;
+      VariableCacheContext->VariableRuntimeNvCache.PendingUpdateOffset = 0;
+      VariableCacheContext->VariableRuntimeNvCache.PendingUpdateLength = (UINT32) ((UINTN) GetEndPointer (VariableCache) - (UINTN) VariableCache);
+      CopyGuid (&(VariableCacheContext->VariableRuntimeNvCache.Store->Signature), &(VariableCache->Signature));
+
+      *(VariableCacheContext->PendingUpdate) = TRUE;
+      *(VariableCacheContext->ReadLock) = FALSE;
+      *(VariableCacheContext->HobFlushComplete) = FALSE;
+
+      Status = EFI_SUCCESS;
+      break;
+    case SMM_VARIABLE_FUNCTION_SYNC_RUNTIME_CACHE:
+      Status = FlushPendingRuntimeVariableCacheUpdates ();
+      break;
+    case SMM_VARIABLE_FUNCTION_GET_RUNTIME_CACHE_INFO:
+      if (CommBufferPayloadSize < sizeof (SMM_VARIABLE_COMMUNICATE_GET_RUNTIME_CACHE_INFO)) {
+        DEBUG ((DEBUG_ERROR, "GetRuntimeCacheInfo: SMM communication buffer size invalid!\n"));
+        return EFI_SUCCESS;
+      }
+      GetRuntimeCacheInfo = (SMM_VARIABLE_COMMUNICATE_GET_RUNTIME_CACHE_INFO *) SmmVariableFunctionHeader->Data;
+
+      if (mVariableModuleGlobal->VariableGlobal.HobVariableBase > 0) {
+        VariableCache = (VARIABLE_STORE_HEADER *) (UINTN) mVariableModuleGlobal->VariableGlobal.HobVariableBase;
+        GetRuntimeCacheInfo->TotalHobStorageSize = VariableCache->Size;
+      } else {
+        GetRuntimeCacheInfo->TotalHobStorageSize = 0;
+      }
+
+      VariableCache = (VARIABLE_STORE_HEADER  *) (UINTN) mVariableModuleGlobal->VariableGlobal.VolatileVariableBase;
+      GetRuntimeCacheInfo->TotalVolatileStorageSize = VariableCache->Size;
+      VariableCache = (VARIABLE_STORE_HEADER  *) (UINTN) mNvVariableCache;
+      GetRuntimeCacheInfo->TotalNvStorageSize = (UINTN) VariableCache->Size;
+      GetRuntimeCacheInfo->AuthenticatedVariableUsage = mVariableModuleGlobal->VariableGlobal.AuthFormat;
+
+      Status = EFI_SUCCESS;
       break;
 
     default:
