@@ -863,7 +863,10 @@ UfsGetReturnDataFromQueryResponse (
     case UtpQueryFuncOpcodeSetFlag:
     case UtpQueryFuncOpcodeClrFlag:
     case UtpQueryFuncOpcodeTogFlag:
-      CopyMem (Packet->DataBuffer, &QueryResp->Tsf.Value, sizeof (UINT8));
+      //
+      // The 'FLAG VALUE' field is at byte offset 3 of QueryResp->Tsf.Value
+      //
+      *((UINT8*)(Packet->DataBuffer)) = *((UINT8*)&(QueryResp->Tsf.Value) + 3);
       break;
     case UtpQueryFuncOpcodeRdAttr:
     case UtpQueryFuncOpcodeWrAttr:
