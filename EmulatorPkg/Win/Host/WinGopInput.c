@@ -409,9 +409,12 @@ WinNtWndCheckPointer (
 
   Private = GRAPHICS_PRIVATE_DATA_FROM_THIS (GraphicsIo);
 
-  return EFI_NOT_READY;
-}
+  if (!Private->PointerStateChanged) {
+    return EFI_NOT_READY;
+  }
 
+  return EFI_SUCCESS;
+}
 
 EFI_STATUS
 EFIAPI
@@ -424,5 +427,21 @@ WinNtWndGetPointerState (
 
   Private = GRAPHICS_PRIVATE_DATA_FROM_THIS (GraphicsIo);
 
-  return EFI_NOT_READY;
+  if (!Private->PointerStateChanged) {
+    return EFI_NOT_READY;
+  }
+
+  State->RelativeMovementX = Private->PointerState.RelativeMovementX;
+  State->RelativeMovementY = Private->PointerState.RelativeMovementY;
+  State->RelativeMovementZ = Private->PointerState.RelativeMovementZ;
+  State->LeftButton        = Private->PointerState.LeftButton;
+  State->RightButton       = Private->PointerState.RightButton;
+
+  Private->PointerState.RelativeMovementX = 0;
+  Private->PointerState.RelativeMovementY = 0;
+  Private->PointerState.RelativeMovementZ = 0;
+
+  Private->PointerStateChanged = FALSE;
+
+  return EFI_SUCCESS;
 }

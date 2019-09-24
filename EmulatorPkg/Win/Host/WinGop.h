@@ -22,6 +22,7 @@ Abstract:
 
 #include <Protocol/EmuIoThunk.h>
 #include <Protocol/EmuGraphicsWindow.h>
+#include <Protocol/SimplePointer.h>
 #include <Protocol/SimpleTextIn.h>
 #include <Protocol/SimpleTextInEx.h>
 #include <Protocol/GraphicsOutput.h>
@@ -109,6 +110,10 @@ typedef struct {
   BOOLEAN                           ScrollLock;
   BOOLEAN                           CapsLock;
   BOOLEAN                           IsPartialKeySupport;
+  INT32                             PointerPreviousX;
+  INT32                             PointerPreviousY;
+  BOOLEAN                           PointerStateChanged;
+  EFI_SIMPLE_POINTER_STATE          PointerState;
 } GRAPHICS_PRIVATE_DATA;
 #define GRAPHICS_PRIVATE_DATA_SIGNATURE  SIGNATURE_32 ('g', 'f', 'x', 'd')
 #define GRAPHICS_PRIVATE_DATA_FROM_THIS(a)  \

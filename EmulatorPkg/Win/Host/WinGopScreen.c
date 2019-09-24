@@ -399,6 +399,8 @@ WinNtGopThreadWindowProc (
   LPARAM                Index;
   EFI_INPUT_KEY         Key;
   BOOLEAN               AltIsPress;
+  INT32                 PosX;
+  INT32                 PosY;
 
   //
   // Use mTlsIndex global to get a Thread Local Storage version of Private.
@@ -525,6 +527,45 @@ WinNtGopThreadWindowProc (
 
   case WM_KEYUP:
     WinNtGopConvertParamToEfiKeyShiftState (Private, &wParam, &lParam, FALSE);
+    return 0;
+
+  case WM_MOUSEMOVE:
+    PosX = GET_X_LPARAM (lParam);
+    PosY = GET_Y_LPARAM (lParam);
+
+    if (Private->PointerPreviousX != PosX) {
+      Private->PointerState.RelativeMovementX += (PosX - Private->PointerPreviousX);
+      Private->PointerPreviousX                = PosX;
+      Private->PointerStateChanged             = TRUE;
+    }
+
+    if (Private->PointerPreviousY != PosY) {
+      Private->PointerState.RelativeMovementY += (PosY - Private->PointerPreviousY);
+      Private->PointerPreviousY                = PosY;
+      Private->PointerStateChanged             = TRUE;
+    }
+
+    Private->PointerState.RelativeMovementZ  = 0;
+    return 0;
+
+  case WM_LBUTTONDOWN:
+    Private->PointerState.LeftButton = TRUE;
+    Private->PointerStateChanged     = TRUE;
+    return 0;
+
+  case WM_LBUTTONUP:
+    Private->PointerState.LeftButton = FALSE;
+    Private->PointerStateChanged     = TRUE;
+    return 0;
+
+  case WM_RBUTTONDOWN:
+    Private->PointerState.RightButton = TRUE;
+    Private->PointerStateChanged      = TRUE;
+    return 0;
+
+  case WM_RBUTTONUP:
+    Private->PointerState.RightButton = FALSE;
+    Private->PointerStateChanged      = TRUE;
     return 0;
 
   case WM_CLOSE:
