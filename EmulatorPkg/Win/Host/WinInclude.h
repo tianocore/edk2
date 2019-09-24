@@ -40,6 +40,7 @@ typedef UINT32 size_t ;
 #endif
 
 #include "windows.h"
+#include "windowsx.h"
 
 #undef GUID
 #undef _LIST_ENTRY
