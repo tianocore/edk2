@@ -1,7 +1,7 @@
 /** @file
 Implementation for EFI_HII_DATABASE_PROTOCOL.
 
-Copyright (c) 2007 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2020, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -3376,6 +3376,10 @@ HiiGetConfigRespInfo(
       if (gRTConfigRespBuffer == NULL){
         FreePool(ConfigAltResp);
         DEBUG ((DEBUG_ERROR, "[HiiDatabase]: No enough memory resource to store the ConfigResp string.\n"));
+        //
+        // Remove from the System Table when the configuration runtime buffer is freed.
+        //
+        gBS->InstallConfigurationTable (&gEfiHiiConfigRoutingProtocolGuid, NULL);
         return EFI_OUT_OF_RESOURCES;
       }
     } else {
@@ -3431,6 +3435,10 @@ HiiGetDatabaseInfo(
     gRTDatabaseInfoBuffer = AllocateRuntimeZeroPool (gDatabaseInfoSize);
     if (gRTDatabaseInfoBuffer == NULL){
       DEBUG ((DEBUG_ERROR, "[HiiDatabase]: No enough memory resource to store the HiiDatabase info.\n"));
+      //
+      // Remove from the System Table when the configuration runtime buffer is freed.
+      //
+      gBS->InstallConfigurationTable (&gEfiHiiDatabaseProtocolGuid, NULL);
       return EFI_OUT_OF_RESOURCES;
     }
   } else {
