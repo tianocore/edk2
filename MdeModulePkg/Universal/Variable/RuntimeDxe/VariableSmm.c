@@ -30,6 +30,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <Guid/SmmVariableCommon.h>
 #include "Variable.h"
+#include "VariableParsing.h"
 
 BOOLEAN                                              mAtRuntime              = FALSE;
 UINT8                                                *mVariableBufferPayload = NULL;
