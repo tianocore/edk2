@@ -45,6 +45,8 @@
   Variable.c
   VariableTraditionalMm.c
   VariableSmm.c
+  VariableParsing.c
+  VariableParsing.h
   VarCheck.c
   Variable.h
   PrivilegePolymorphic.h
