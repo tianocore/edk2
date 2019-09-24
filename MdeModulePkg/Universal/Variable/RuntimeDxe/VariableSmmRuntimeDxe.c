@@ -823,7 +823,7 @@ RuntimeServiceGetVariable (
 }
 
 /**
-  This code Finds the Next available variable.
+  Finds the next available variable in a runtime cache variable store.
 
   @param[in, out] VariableNameSize   Size of the variable name.
   @param[in, out] VariableName       Pointer to variable name.
@@ -836,8 +836,81 @@ RuntimeServiceGetVariable (
 
 **/
 EFI_STATUS
-EFIAPI
-RuntimeServiceGetNextVariableName (
+GetNextVariableNameInRuntimeCache (
+  IN OUT  UINTN                             *VariableNameSize,
+  IN OUT  CHAR16                            *VariableName,
+  IN OUT  EFI_GUID                          *VendorGuid
+  )
+{
+  EFI_STATUS              Status;
+  UINTN                   VarNameSize;
+  VARIABLE_HEADER         *VariablePtr;
+  VARIABLE_STORE_HEADER   *VariableStoreHeader[VariableStoreTypeMax];
+
+  Status = EFI_NOT_FOUND;
+
+  //
+  // The UEFI specification restricts Runtime Services callers from invoking the same or certain other Runtime Service
+  // functions prior to completion and return from a previous Runtime Service call. These restrictions prevent
+  // a GetVariable () or GetNextVariable () call from being issued until a prior call has returned. The runtime
+  // cache read lock should always be free when entering this function.
+  //
+  ASSERT (!mVariableRuntimeCacheReadLock);
+
+  CheckForRuntimeCacheSync ();
+
+  mVariableRuntimeCacheReadLock = TRUE;
+  if (!mVariableRuntimeCachePendingUpdate) {
+    //
+    // 0: Volatile, 1: HOB, 2: Non-Volatile.
+    // The index and attributes mapping must be kept in this order as FindVariable
+    // makes use of this mapping to implement search algorithm.
+    //
+    VariableStoreHeader[VariableStoreTypeVolatile] = mVariableRuntimeVolatileCacheBuffer;
+    VariableStoreHeader[VariableStoreTypeHob]      = mVariableRuntimeHobCacheBuffer;
+    VariableStoreHeader[VariableStoreTypeNv]       = mVariableRuntimeNvCacheBuffer;
+
+    Status =  VariableServiceGetNextVariableInternal (
+                VariableName,
+                VendorGuid,
+                VariableStoreHeader,
+                &VariablePtr,
+                mVariableAuthFormat
+                );
+    if (!EFI_ERROR (Status)) {
+      VarNameSize = NameSizeOfVariable (VariablePtr, mVariableAuthFormat);
+      ASSERT (VarNameSize != 0);
+      if (VarNameSize <= *VariableNameSize) {
+        CopyMem (VariableName, GetVariableNamePtr (VariablePtr, mVariableAuthFormat), VarNameSize);
+        CopyMem (VendorGuid, GetVendorGuidPtr (VariablePtr, mVariableAuthFormat), sizeof (EFI_GUID));
+        Status = EFI_SUCCESS;
+      } else {
+        Status = EFI_BUFFER_TOO_SMALL;
+      }
+
+      *VariableNameSize = VarNameSize;
+    }
+  }
+  mVariableRuntimeCacheReadLock = FALSE;
+
+  return Status;
+}
+
+/**
+  Finds the next available variable in a SMM variable store.
+
+  @param[in, out] VariableNameSize   Size of the variable name.
+  @param[in, out] VariableName       Pointer to variable name.
+  @param[in, out] VendorGuid         Variable Vendor Guid.
+
+  @retval EFI_INVALID_PARAMETER      Invalid parameter.
+  @retval EFI_SUCCESS                Find the specified variable.
+  @retval EFI_NOT_FOUND              Not found.
+  @retval EFI_BUFFER_TO_SMALL        DataSize is too small for the result.
+
+**/
+EFI_STATUS
+GetNextVariableNameInSmm (
   IN OUT  UINTN                             *VariableNameSize,
   IN OUT  CHAR16                            *VariableName,
   IN OUT  EFI_GUID                          *VendorGuid
@@ -849,10 +922,6 @@ RuntimeServiceGetNextVariableName (
   UINTN                                           OutVariableNameSize;
   UINTN                                           InVariableNameSize;
 
-  if (VariableNameSize == NULL || VariableName == NULL || VendorGuid == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
   OutVariableNameSize   = *VariableNameSize;
   InVariableNameSize    = StrSize (VariableName);
   SmmGetNextVariableName = NULL;
@@ -863,8 +932,6 @@ RuntimeServiceGetNextVariableName (
   if (InVariableNameSize > mVariableBufferPayloadSize - OFFSET_OF (SMM_VARIABLE_COMMUNICATE_GET_NEXT_VARIABLE_NAME, Name)) {
     return EFI_INVALID_PARAMETER;
   }
-
-  AcquireLockOnlyAtBootTime(&mVariableServicesLock);
 
   //
   // Init the communicate buffer. The buffer data size is:
@@ -924,7 +991,59 @@ RuntimeServiceGetNextVariableName (
   CopyMem (VariableName, SmmGetNextVariableName->Name, SmmGetNextVariableName->NameSize);
 
 Done:
+  return Status;
+}
+
+/**
+  This code Finds the Next available variable.
+
+  @param[in, out] VariableNameSize   Size of the variable name.
+  @param[in, out] VariableName       Pointer to variable name.
+  @param[in, out] VendorGuid         Variable Vendor Guid.
+
+  @retval EFI_INVALID_PARAMETER      Invalid parameter.
+  @retval EFI_SUCCESS                Find the specified variable.
+  @retval EFI_NOT_FOUND              Not found.
+  @retval EFI_BUFFER_TO_SMALL        DataSize is too small for the result.
+
+**/
+EFI_STATUS
+EFIAPI
+RuntimeServiceGetNextVariableName (
+  IN OUT  UINTN                             *VariableNameSize,
+  IN OUT  CHAR16                            *VariableName,
+  IN OUT  EFI_GUID                          *VendorGuid
+  )
+{
+  EFI_STATUS              Status;
+  UINTN                   MaxLen;
+
+  Status = EFI_NOT_FOUND;
+
+  if (VariableNameSize == NULL || VariableName == NULL || VendorGuid == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Calculate the possible maximum length of name string, including the Null terminator.
+  //
+  MaxLen = *VariableNameSize / sizeof (CHAR16);
+  if ((MaxLen == 0) || (StrnLenS (VariableName, MaxLen) == MaxLen)) {
+    //
+    // Null-terminator is not found in the first VariableNameSize bytes of the input VariableName buffer,
+    // follow spec to return EFI_INVALID_PARAMETER.
+    //
+    return EFI_INVALID_PARAMETER;
+  }
+
+  AcquireLockOnlyAtBootTime (&mVariableServicesLock);
+  if (FeaturePcdGet (PcdEnableVariableRuntimeCache)) {
+    Status = GetNextVariableNameInRuntimeCache (VariableNameSize, VariableName, VendorGuid);
+  } else {
+    Status = GetNextVariableNameInSmm (VariableNameSize, VariableName, VendorGuid);
+  }
   ReleaseLockOnlyAtBootTime (&mVariableServicesLock);
+
   return Status;
 }
 
