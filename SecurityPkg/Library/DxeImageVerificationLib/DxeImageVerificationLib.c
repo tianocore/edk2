@@ -1274,7 +1274,7 @@ IsForbiddenByDbx (
 
   Status = gRT->GetVariable (EFI_IMAGE_SECURITY_DATABASE1, &gEfiImageSecurityDatabaseGuid, NULL, &DataSize, (VOID *) Data);
   if (EFI_ERROR (Status)) {
-    return IsForbidden;
+    goto Done;
   }
 
   //
