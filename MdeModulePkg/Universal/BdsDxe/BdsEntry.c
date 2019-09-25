@@ -341,6 +341,7 @@ BdsWait (
       TimeoutRemain--;
     }
   }
+  PlatformBootManagerWaitCallback (0);
   DEBUG ((EFI_D_INFO, "[Bds]Exit the waiting!\n"));
 }
 
