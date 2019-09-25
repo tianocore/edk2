@@ -3,7 +3,7 @@
   this utility will print out the statistics information. You can use console
   redirection to capture the data.
 
-  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -126,7 +126,7 @@ PrintInfoFromSmm (
   ASSERT (CommBuffer != NULL);
   ZeroMem (CommBuffer, RealCommSize);
 
-  Print (L"Non-Volatile SMM Variables:\n");
+  Print (L"SMM Driver Non-Volatile Variables:\n");
   do {
     CommSize = RealCommSize;
     Status = GetVariableStatisticsData (CommBuffer, &CommSize);
@@ -155,7 +155,7 @@ PrintInfoFromSmm (
     }
   } while (TRUE);
 
-  Print (L"Volatile SMM Variables:\n");
+  Print (L"SMM Driver Volatile Variables:\n");
   ZeroMem (CommBuffer, RealCommSize);
   do {
     CommSize = RealCommSize;
@@ -207,24 +207,18 @@ UefiMain (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS            Status;
+  EFI_STATUS            RuntimeDxeStatus;
+  EFI_STATUS            SmmStatus;
   VARIABLE_INFO_ENTRY   *VariableInfo;
   VARIABLE_INFO_ENTRY   *Entry;
 
-  Status = EfiGetSystemConfigurationTable (&gEfiVariableGuid, (VOID **)&Entry);
-  if (EFI_ERROR (Status) || (Entry == NULL)) {
-    Status = EfiGetSystemConfigurationTable (&gEfiAuthenticatedVariableGuid, (VOID **)&Entry);
+  RuntimeDxeStatus = EfiGetSystemConfigurationTable (&gEfiVariableGuid, (VOID **) &Entry);
+  if (EFI_ERROR (RuntimeDxeStatus) || (Entry == NULL)) {
+    RuntimeDxeStatus = EfiGetSystemConfigurationTable (&gEfiAuthenticatedVariableGuid, (VOID **) &Entry);
   }
 
-  if (EFI_ERROR (Status) || (Entry == NULL)) {
-    Status = PrintInfoFromSmm ();
-    if (!EFI_ERROR (Status)) {
-      return Status;
-    }
-  }
-
-  if (!EFI_ERROR (Status) && (Entry != NULL)) {
-    Print (L"Non-Volatile EFI Variables:\n");
+  if (!EFI_ERROR (RuntimeDxeStatus) && (Entry != NULL)) {
+    Print (L"Runtime DXE Driver Non-Volatile EFI Variables:\n");
     VariableInfo = Entry;
     do {
       if (!VariableInfo->Volatile) {
@@ -242,7 +236,7 @@ UefiMain (
       VariableInfo = VariableInfo->Next;
     } while (VariableInfo != NULL);
 
-    Print (L"Volatile EFI Variables:\n");
+    Print (L"Runtime DXE Driver Volatile EFI Variables:\n");
     VariableInfo = Entry;
     do {
       if (VariableInfo->Volatile) {
@@ -258,14 +252,19 @@ UefiMain (
       }
       VariableInfo = VariableInfo->Next;
     } while (VariableInfo != NULL);
+  }
 
-  } else {
+  SmmStatus = PrintInfoFromSmm ();
+
+  if (EFI_ERROR (RuntimeDxeStatus) && EFI_ERROR (SmmStatus)) {
     Print (L"Warning: Variable Dxe/Smm driver doesn't enable the feature of statistical information!\n");
     Print (L"If you want to see this info, please:\n");
     Print (L"  1. Set PcdVariableCollectStatistics as TRUE\n");
     Print (L"  2. Rebuild Variable Dxe/Smm driver\n");
     Print (L"  3. Run \"VariableInfo\" cmd again\n");
+
+    return EFI_NOT_FOUND;
   }
 
-  return Status;
+  return EFI_SUCCESS;
 }
