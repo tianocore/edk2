@@ -1,7 +1,7 @@
 ///** @file
 //  String definitions for Boot Maintenance Utility.
 //
-//  Copyright (c) 2004 - 2019, Intel Corporation. All rights reserved.<BR>
+//  Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 //  SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 //**/
@@ -233,14 +233,6 @@
                                        #language fr-FR  "VT_UTF8"
 #string STR_COM_TYPE_4                 #language en-US  "TTY_TERM"
                                        #language fr-FR  "TTY_TERM"
-#string STR_COM_TYPE_5                 #language en-US  "LINUX"
-                                       #language fr-FR  "LINUX"
-#string STR_COM_TYPE_6                 #language en-US  "XTERM_R6"
-                                       #language fr-FR  "XTERM_R6"
-#string STR_COM_TYPE_7                 #language en-US  "VT_400"
-                                       #language fr-FR  "VT_400"
-#string STR_COM_TYPE_8                 #language en-US  "SCO"
-                                       #language fr-FR  "SCO"
 #string STR_RESET                      #language en-US  "Reset System"
                                        #language fr-FR  "Reset System"
 #string STR_FORM_GOTO_MAIN             #language en-US  "Go Back To Main Page"

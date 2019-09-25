@@ -222,10 +222,6 @@ TerminalConOutOutputString (
     case TerminalTypeVt100:
     case TerminalTypeVt100Plus:
     case TerminalTypeTtyTerm:
-    case TerminalTypeLinux:
-    case TerminalTypeXtermR6:
-    case TerminalTypeVt400:
-    case TerminalTypeSCO:
 
       if (!TerminalIsValidTextGraphics (*WString, &GraphicChar, &AsciiChar)) {
         //

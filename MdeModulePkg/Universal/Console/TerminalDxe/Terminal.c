@@ -2,7 +2,7 @@
   Produces Simple Text Input Protocol, Simple Text Input Extended Protocol and
   Simple Text Output Protocol upon Serial IO Protocol.
 
-Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -28,11 +28,7 @@ EFI_GUID  *mTerminalType[] = {
   &gEfiVT100Guid,
   &gEfiVT100PlusGuid,
   &gEfiVTUTF8Guid,
-  &gEfiTtyTermGuid,
-  &gEdkiiLinuxTermGuid,
-  &gEdkiiXtermR6Guid,
-  &gEdkiiVT400Guid,
-  &gEdkiiSCOTermGuid
+  &gEfiTtyTermGuid
 };
 
 
@@ -41,11 +37,7 @@ CHAR16 *mSerialConsoleNames[] = {
   L"VT-100 Serial Console",
   L"VT-100+ Serial Console",
   L"VT-UTF8 Serial Console",
-  L"Tty Terminal Serial Console",
-  L"Linux Terminal Serial Console",
-  L"Xterm R6 Serial Console",
-  L"VT-400 Serial Console",
-  L"SCO Terminal Serial Console"
+  L"Tty Terminal Serial Console"
 };
 
 TERMINAL_DEV  mTerminalDevTemplate = {
@@ -195,8 +187,7 @@ TerminalDriverBindingSupported (
 
       }
       //
-      // only supports PC ANSI, VT100, VT100+, VT-UTF8, TtyTerm
-      // Linux, XtermR6, VT400 and SCO terminal types
+      // only supports PC ANSI, VT100, VT100+, VT-UTF8, and TtyTerm terminal types
       //
       if (TerminalTypeFromGuid (&Node->Guid) == ARRAY_SIZE (mTerminalType)) {
         return EFI_UNSUPPORTED;
