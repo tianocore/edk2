@@ -794,7 +794,7 @@ EmmcSwitchToHighSpeed (
   EFI_STATUS  Status;
   BOOLEAN     IsDdr;
 
-  if ((BusMode->BusTiming != SdMmcMmcHsSdr && BusMode->BusTiming != SdMmcMmcHsDdr) ||
+  if ((BusMode->BusTiming != SdMmcMmcHsSdr && BusMode->BusTiming != SdMmcMmcHsDdr && BusMode->BusTiming != SdMmcMmcLegacy) ||
       BusMode->ClockFreq > 52) {
     return EFI_INVALID_PARAMETER;
   }
@@ -1244,6 +1244,12 @@ EmmcSetBusMode (
   } else if (BusMode.BusTiming == SdMmcMmcHs200) {
     Status = EmmcSwitchToHS200 (PciIo, PassThru, Slot, Rca, &BusMode);
   } else {
+    //
+    // Note that EmmcSwitchToHighSpeed is also called for SdMmcMmcLegacy
+    // bus timing. This is because even though we might not want to
+    // change the timing itself we still want to allow customization of
+    // bus parameters such as clock frequency and bus width.
+    //
     Status = EmmcSwitchToHighSpeed (PciIo, PassThru, Slot, Rca, &BusMode);
   }
 
