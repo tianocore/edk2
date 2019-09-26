@@ -671,6 +671,7 @@ EmmcSwitchBusTiming (
   UINT8                     CmdSet;
   UINT32                    DevStatus;
   SD_MMC_HC_PRIVATE_DATA    *Private;
+  UINT8                     HostCtrl1;
 
   Private = SD_MMC_HC_PRIVATE_FROM_THIS (PassThru);
   //
@@ -701,6 +702,25 @@ EmmcSwitchBusTiming (
   Status = EmmcSwitch (PassThru, Slot, Access, Index, Value, CmdSet);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "EmmcSwitchBusTiming: Switch to bus timing %d fails with %r\n", BusTiming, Status));
+    return Status;
+  }
+
+  if (BusTiming == SdMmcMmcHsSdr || BusTiming == SdMmcMmcHsDdr) {
+    HostCtrl1 = BIT2;
+    Status = SdMmcHcOrMmio (PciIo, Slot, SD_MMC_HC_HOST_CTRL1, sizeof (HostCtrl1), &HostCtrl1);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  } else {
+    HostCtrl1 = (UINT8)~BIT2;
+    Status = SdMmcHcAndMmio (PciIo, Slot, SD_MMC_HC_HOST_CTRL1, sizeof (HostCtrl1), &HostCtrl1);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
+
+  Status = SdMmcHcUhsSignaling (Private->ControllerHandle, PciIo, Slot, BusTiming);
+  if (EFI_ERROR (Status)) {
     return Status;
   }
 
@@ -771,12 +791,8 @@ EmmcSwitchToHighSpeed (
   IN SD_MMC_BUS_SETTINGS                *BusMode
   )
 {
-  EFI_STATUS              Status;
-  UINT8                   HostCtrl1;
-  SD_MMC_HC_PRIVATE_DATA  *Private;
-  BOOLEAN                 IsDdr;
-
-  Private = SD_MMC_HC_PRIVATE_FROM_THIS (PassThru);
+  EFI_STATUS  Status;
+  BOOLEAN     IsDdr;
 
   if ((BusMode->BusTiming != SdMmcMmcHsSdr && BusMode->BusTiming != SdMmcMmcHsDdr) ||
       BusMode->ClockFreq > 52) {
@@ -790,20 +806,6 @@ EmmcSwitchToHighSpeed (
   }
 
   Status = EmmcSwitchBusWidth (PciIo, PassThru, Slot, Rca, IsDdr, BusMode->BusWidth);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  //
-  // Set to High Speed timing
-  //
-  HostCtrl1 = BIT2;
-  Status = SdMmcHcOrMmio (PciIo, Slot, SD_MMC_HC_HOST_CTRL1, sizeof (HostCtrl1), &HostCtrl1);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  Status = SdMmcHcUhsSignaling (Private->ControllerHandle, PciIo, Slot, BusMode->BusTiming);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -836,10 +838,7 @@ EmmcSwitchToHS200 (
   IN SD_MMC_BUS_SETTINGS                *BusMode
   )
 {
-  EFI_STATUS               Status;
-  SD_MMC_HC_PRIVATE_DATA  *Private;
-
-  Private = SD_MMC_HC_PRIVATE_FROM_THIS (PassThru);
+  EFI_STATUS  Status;
 
   if (BusMode->BusTiming != SdMmcMmcHs200 ||
       (BusMode->BusWidth != 4 && BusMode->BusWidth != 8)) {
@@ -847,11 +846,6 @@ EmmcSwitchToHS200 (
   }
 
   Status = EmmcSwitchBusWidth (PciIo, PassThru, Slot, Rca, FALSE, BusMode->BusWidth);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  Status = SdMmcHcUhsSignaling (Private->ControllerHandle, PciIo, Slot, BusMode->BusTiming);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -891,17 +885,15 @@ EmmcSwitchToHS400 (
   IN SD_MMC_BUS_SETTINGS                *BusMode
   )
 {
-  EFI_STATUS                 Status;
-  SD_MMC_HC_PRIVATE_DATA     *Private;
-  SD_MMC_BUS_SETTINGS        Hs200BusMode;
-  UINT32                     HsFreq;
+  EFI_STATUS           Status;
+  SD_MMC_BUS_SETTINGS  Hs200BusMode;
+  UINT32               HsFreq;
 
   if (BusMode->BusTiming != SdMmcMmcHs400 ||
       BusMode->BusWidth != 8) {
     return EFI_INVALID_PARAMETER;
   }
 
-  Private = SD_MMC_HC_PRIVATE_FROM_THIS (PassThru);
   Hs200BusMode.BusTiming = SdMmcMmcHs200;
   Hs200BusMode.BusWidth = BusMode->BusWidth;
   Hs200BusMode.ClockFreq = BusMode->ClockFreq;
@@ -916,11 +908,6 @@ EmmcSwitchToHS400 (
   // Set to High Speed timing and set the clock frequency to a value less than or equal to 52MHz.
   // This step is necessary to be able to switch Bus into 8 bit DDR mode which is unsupported in HS200.
   //
-  Status = SdMmcHcUhsSignaling (Private->ControllerHandle, PciIo, Slot, SdMmcMmcHsSdr);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
   HsFreq = BusMode->ClockFreq < 52 ? BusMode->ClockFreq : 52;
   Status = EmmcSwitchBusTiming (PciIo, PassThru, Slot, Rca, BusMode->DriverStrength, SdMmcMmcHsSdr, HsFreq);
   if (EFI_ERROR (Status)) {
@@ -928,11 +915,6 @@ EmmcSwitchToHS400 (
   }
 
   Status = EmmcSwitchBusWidth (PciIo, PassThru, Slot, Rca, TRUE, BusMode->BusWidth);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  Status = SdMmcHcUhsSignaling (Private->ControllerHandle, PciIo, Slot, BusMode->BusTiming);
   if (EFI_ERROR (Status)) {
     return Status;
   }
