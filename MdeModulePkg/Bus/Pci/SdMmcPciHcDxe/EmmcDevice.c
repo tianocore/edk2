@@ -837,7 +837,6 @@ EmmcSwitchToHS200 (
   )
 {
   EFI_STATUS               Status;
-  UINT16                   ClockCtrl;
   SD_MMC_HC_PRIVATE_DATA  *Private;
 
   Private = SD_MMC_HC_PRIVATE_FROM_THIS (PassThru);
@@ -851,39 +850,11 @@ EmmcSwitchToHS200 (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  //
-  // Stop bus clock at first
-  //
-  Status = SdMmcHcStopClock (PciIo, Slot);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
 
   Status = SdMmcHcUhsSignaling (Private->ControllerHandle, PciIo, Slot, BusMode->BusTiming);
   if (EFI_ERROR (Status)) {
     return Status;
   }
-
-  //
-  // Wait Internal Clock Stable in the Clock Control register to be 1 before set SD Clock Enable bit
-  //
-  Status = SdMmcHcWaitMmioSet (
-             PciIo,
-             Slot,
-             SD_MMC_HC_CLOCK_CTRL,
-             sizeof (ClockCtrl),
-             BIT1,
-             BIT1,
-             SD_MMC_HC_GENERIC_TIMEOUT
-             );
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-  //
-  // Set SD Clock Enable in the Clock Control register to 1
-  //
-  ClockCtrl = BIT2;
-  Status = SdMmcHcOrMmio (PciIo, Slot, SD_MMC_HC_CLOCK_CTRL, sizeof (ClockCtrl), &ClockCtrl);
 
   Status = EmmcSwitchBusTiming (PciIo, PassThru, Slot, Rca, BusMode->DriverStrength, BusMode->BusTiming, BusMode->ClockFreq);
   if (EFI_ERROR (Status)) {
