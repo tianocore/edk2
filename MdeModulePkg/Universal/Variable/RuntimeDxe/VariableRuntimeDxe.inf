@@ -36,6 +36,8 @@
   Variable.c
   VariableDxe.c
   Variable.h
+  VariableNonVolatile.c
+  VariableNonVolatile.h
   VariableParsing.c
   VariableParsing.h
   PrivilegePolymorphic.h
