@@ -1843,7 +1843,7 @@ class ModuleAutoGen(AutoGen):
         # CanSkip uses timestamps to determine build skipping
         if self.CanSkip():
             return
-
+        self.LibraryAutoGenList
         AutoGenList = []
         IgoredAutoGenList = []
 
