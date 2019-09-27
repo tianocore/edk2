@@ -476,14 +476,16 @@ FindVariableEx (
 }
 
 /**
-  This code Finds the Next available variable.
+  This code finds the next available variable.
 
   Caution: This function may receive untrusted input.
   This function may be invoked in SMM mode. This function will do basic validation, before parse the data.
 
-  @param[in]  VariableName  Pointer to variable name.
-  @param[in]  VendorGuid    Variable Vendor Guid.
-  @param[out] VariablePtr   Pointer to variable header address.
+  @param[in]  VariableName      Pointer to variable name.
+  @param[in]  VendorGuid        Variable Vendor Guid.
+  @param[in]  VariableStoreList A list of variable stores that should be used to get the next variable.
+                                The maximum number of entries is the max value of VARIABLE_STORE_TYPE.
+  @param[out] VariablePtr       Pointer to variable header address.
 
   @retval EFI_SUCCESS           The function completed successfully.
   @retval EFI_NOT_FOUND         The next variable was not found.
@@ -497,26 +499,47 @@ EFIAPI
 VariableServiceGetNextVariableInternal (
   IN  CHAR16                *VariableName,
   IN  EFI_GUID              *VendorGuid,
+  IN  VARIABLE_STORE_HEADER **VariableStoreList,
   OUT VARIABLE_HEADER       **VariablePtr
   )
 {
-  VARIABLE_STORE_TYPE     Type;
+  EFI_STATUS              Status;
+  VARIABLE_STORE_TYPE     StoreType;
   VARIABLE_POINTER_TRACK  Variable;
   VARIABLE_POINTER_TRACK  VariableInHob;
   VARIABLE_POINTER_TRACK  VariablePtrTrack;
-  EFI_STATUS              Status;
-  VARIABLE_STORE_HEADER   *VariableStoreHeader[VariableStoreTypeMax];
 
-  Status = FindVariable (VariableName, VendorGuid, &Variable, &mVariableModuleGlobal->VariableGlobal, FALSE);
+  Status = EFI_NOT_FOUND;
+
+  if (VariableStoreList == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  // Check if the variable exists in the given variable store list
+  for (StoreType = (VARIABLE_STORE_TYPE) 0; StoreType < VariableStoreTypeMax; StoreType++) {
+    if (VariableStoreList[StoreType] == NULL) {
+      continue;
+    }
+
+    Variable.StartPtr = GetStartPointer (VariableStoreList[StoreType]);
+    Variable.EndPtr   = GetEndPointer   (VariableStoreList[StoreType]);
+    Variable.Volatile = (BOOLEAN) (StoreType == VariableStoreTypeVolatile);
+
+    Status = FindVariableEx (VariableName, VendorGuid, FALSE, &Variable);
+    if (!EFI_ERROR (Status)) {
+      break;
+    }
+  }
+
   if (Variable.CurrPtr == NULL || EFI_ERROR (Status)) {
     //
-    // For VariableName is an empty string, FindVariable() will try to find and return
-    // the first qualified variable, and if FindVariable() returns error (EFI_NOT_FOUND)
+    // For VariableName is an empty string, FindVariableEx() will try to find and return
+    // the first qualified variable, and if FindVariableEx() returns error (EFI_NOT_FOUND)
     // as no any variable is found, still go to return the error (EFI_NOT_FOUND).
     //
     if (VariableName[0] != 0) {
       //
-      // For VariableName is not an empty string, and FindVariable() returns error as
+      // For VariableName is not an empty string, and FindVariableEx() returns error as
       // VariableName and VendorGuid are not a name and GUID of an existing variable,
       // there is no way to get next variable, follow spec to return EFI_INVALID_PARAMETER.
       //
@@ -527,39 +550,30 @@ VariableServiceGetNextVariableInternal (
 
   if (VariableName[0] != 0) {
     //
-    // If variable name is not NULL, get next variable.
+    // If variable name is not empty, get next variable.
     //
     Variable.CurrPtr = GetNextVariablePtr (Variable.CurrPtr);
   }
 
-  //
-  // 0: Volatile, 1: HOB, 2: Non-Volatile.
-  // The index and attributes mapping must be kept in this order as FindVariable
-  // makes use of this mapping to implement search algorithm.
-  //
-  VariableStoreHeader[VariableStoreTypeVolatile] = (VARIABLE_STORE_HEADER *) (UINTN) mVariableModuleGlobal->VariableGlobal.VolatileVariableBase;
-  VariableStoreHeader[VariableStoreTypeHob]      = (VARIABLE_STORE_HEADER *) (UINTN) mVariableModuleGlobal->VariableGlobal.HobVariableBase;
-  VariableStoreHeader[VariableStoreTypeNv]       = mNvVariableCache;
-
   while (TRUE) {
     //
-    // Switch from Volatile to HOB, to Non-Volatile.
+    // Switch to the next variable store if needed
     //
     while (!IsValidVariableHeader (Variable.CurrPtr, Variable.EndPtr)) {
       //
       // Find current storage index
       //
-      for (Type = (VARIABLE_STORE_TYPE) 0; Type < VariableStoreTypeMax; Type++) {
-        if ((VariableStoreHeader[Type] != NULL) && (Variable.StartPtr == GetStartPointer (VariableStoreHeader[Type]))) {
+      for (StoreType = (VARIABLE_STORE_TYPE) 0; StoreType < VariableStoreTypeMax; StoreType++) {
+        if ((VariableStoreList[StoreType] != NULL) && (Variable.StartPtr == GetStartPointer (VariableStoreList[StoreType]))) {
           break;
         }
       }
-      ASSERT (Type < VariableStoreTypeMax);
+      ASSERT (StoreType < VariableStoreTypeMax);
       //
       // Switch to next storage
       //
-      for (Type++; Type < VariableStoreTypeMax; Type++) {
-        if (VariableStoreHeader[Type] != NULL) {
+      for (StoreType++; StoreType < VariableStoreTypeMax; StoreType++) {
+        if (VariableStoreList[StoreType] != NULL) {
           break;
         }
       }
@@ -568,12 +582,12 @@ VariableServiceGetNextVariableInternal (
       // 1. current storage is the last one, or
       // 2. no further storage
       //
-      if (Type == VariableStoreTypeMax) {
+      if (StoreType == VariableStoreTypeMax) {
         Status = EFI_NOT_FOUND;
         goto Done;
       }
-      Variable.StartPtr = GetStartPointer (VariableStoreHeader[Type]);
-      Variable.EndPtr   = GetEndPointer   (VariableStoreHeader[Type]);
+      Variable.StartPtr = GetStartPointer (VariableStoreList[StoreType]);
+      Variable.EndPtr   = GetEndPointer   (VariableStoreList[StoreType]);
       Variable.CurrPtr  = Variable.StartPtr;
     }
 
@@ -605,11 +619,11 @@ VariableServiceGetNextVariableInternal (
         //
         // Don't return NV variable when HOB overrides it
         //
-        if ((VariableStoreHeader[VariableStoreTypeHob] != NULL) && (VariableStoreHeader[VariableStoreTypeNv] != NULL) &&
-            (Variable.StartPtr == GetStartPointer (VariableStoreHeader[VariableStoreTypeNv]))
+        if ((VariableStoreList[VariableStoreTypeHob] != NULL) && (VariableStoreList[VariableStoreTypeNv] != NULL) &&
+            (Variable.StartPtr == GetStartPointer (VariableStoreList[VariableStoreTypeNv]))
            ) {
-          VariableInHob.StartPtr = GetStartPointer (VariableStoreHeader[VariableStoreTypeHob]);
-          VariableInHob.EndPtr   = GetEndPointer   (VariableStoreHeader[VariableStoreTypeHob]);
+          VariableInHob.StartPtr = GetStartPointer (VariableStoreList[VariableStoreTypeHob]);
+          VariableInHob.EndPtr   = GetEndPointer   (VariableStoreList[VariableStoreTypeHob]);
           Status = FindVariableEx (
                      GetVariableNamePtr (Variable.CurrPtr),
                      GetVendorGuidPtr (Variable.CurrPtr),

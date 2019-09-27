@@ -98,10 +98,16 @@ VariableExLibFindNextVariable (
   EFI_STATUS                    Status;
   VARIABLE_HEADER               *VariablePtr;
   AUTHENTICATED_VARIABLE_HEADER *AuthVariablePtr;
+  VARIABLE_STORE_HEADER         *VariableStoreHeader[VariableStoreTypeMax];
+
+  VariableStoreHeader[VariableStoreTypeVolatile] = (VARIABLE_STORE_HEADER *) (UINTN) mVariableModuleGlobal->VariableGlobal.VolatileVariableBase;
+  VariableStoreHeader[VariableStoreTypeHob]      = (VARIABLE_STORE_HEADER *) (UINTN) mVariableModuleGlobal->VariableGlobal.HobVariableBase;
+  VariableStoreHeader[VariableStoreTypeNv]       = mNvVariableCache;
 
   Status = VariableServiceGetNextVariableInternal (
              VariableName,
              VendorGuid,
+             VariableStoreHeader,
              &VariablePtr
              );
   if (EFI_ERROR (Status)) {
