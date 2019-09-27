@@ -78,17 +78,20 @@ GetVariableStoreStatus (
 /**
   This code gets the size of variable header.
 
+  @param[in]  AuthFormat    TRUE indicates authenticated variables are used.
+                            FALSE indicates authenticated variables are not used.
+
   @return Size of variable header in bytes in type UINTN.
 
 **/
 UINTN
 GetVariableHeaderSize (
-  VOID
+  IN  BOOLEAN   AuthFormat
   )
 {
   UINTN Value;
 
-  if (mVariableModuleGlobal->VariableGlobal.AuthFormat) {
+  if (AuthFormat) {
     Value = sizeof (AUTHENTICATED_VARIABLE_HEADER);
   } else {
     Value = sizeof (VARIABLE_HEADER);
@@ -101,20 +104,23 @@ GetVariableHeaderSize (
 
   This code gets the size of name of variable.
 
-  @param Variable        Pointer to the Variable Header.
+  @param[in]  Variable      Pointer to the variable header.
+  @param[in]  AuthFormat    TRUE indicates authenticated variables are used.
+                            FALSE indicates authenticated variables are not used.
 
   @return UINTN          Size of variable in bytes.
 
 **/
 UINTN
 NameSizeOfVariable (
-  IN  VARIABLE_HEADER   *Variable
+  IN  VARIABLE_HEADER   *Variable,
+  IN  BOOLEAN           AuthFormat
   )
 {
   AUTHENTICATED_VARIABLE_HEADER *AuthVariable;
 
   AuthVariable = (AUTHENTICATED_VARIABLE_HEADER *) Variable;
-  if (mVariableModuleGlobal->VariableGlobal.AuthFormat) {
+  if (AuthFormat) {
     if (AuthVariable->State == (UINT8) (-1) ||
        AuthVariable->DataSize == (UINT32) (-1) ||
        AuthVariable->NameSize == (UINT32) (-1) ||
@@ -136,20 +142,23 @@ NameSizeOfVariable (
 /**
   This code sets the size of name of variable.
 
-  @param[in] Variable   Pointer to the Variable Header.
-  @param[in] NameSize   Name size to set.
+  @param[in]  Variable      Pointer to the Variable Header.
+  @param[in]  NameSize      Name size to set.
+  @param[in]  AuthFormat    TRUE indicates authenticated variables are used.
+                            FALSE indicates authenticated variables are not used.
 
 **/
 VOID
 SetNameSizeOfVariable (
   IN VARIABLE_HEADER    *Variable,
-  IN UINTN              NameSize
+  IN UINTN              NameSize,
+  IN BOOLEAN            AuthFormat
   )
 {
   AUTHENTICATED_VARIABLE_HEADER *AuthVariable;
 
   AuthVariable = (AUTHENTICATED_VARIABLE_HEADER *) Variable;
-  if (mVariableModuleGlobal->VariableGlobal.AuthFormat) {
+  if (AuthFormat) {
     AuthVariable->NameSize = (UINT32) NameSize;
   } else {
     Variable->NameSize = (UINT32) NameSize;
@@ -160,20 +169,23 @@ SetNameSizeOfVariable (
 
   This code gets the size of variable data.
 
-  @param Variable        Pointer to the Variable Header.
+  @param[in]  Variable      Pointer to the Variable Header.
+  @param[in]  AuthFormat    TRUE indicates authenticated variables are used.
+                            FALSE indicates authenticated variables are not used.
 
   @return Size of variable in bytes.
 
 **/
 UINTN
 DataSizeOfVariable (
-  IN  VARIABLE_HEADER   *Variable
+  IN  VARIABLE_HEADER   *Variable,
+  IN  BOOLEAN           AuthFormat
   )
 {
   AUTHENTICATED_VARIABLE_HEADER *AuthVariable;
 
   AuthVariable = (AUTHENTICATED_VARIABLE_HEADER *) Variable;
-  if (mVariableModuleGlobal->VariableGlobal.AuthFormat) {
+  if (AuthFormat) {
     if (AuthVariable->State == (UINT8) (-1) ||
        AuthVariable->DataSize == (UINT32) (-1) ||
        AuthVariable->NameSize == (UINT32) (-1) ||
@@ -197,18 +209,21 @@ DataSizeOfVariable (
 
   @param[in] Variable   Pointer to the Variable Header.
   @param[in] DataSize   Data size to set.
+  @param[in] AuthFormat TRUE indicates authenticated variables are used.
+                        FALSE indicates authenticated variables are not used.
 
 **/
 VOID
 SetDataSizeOfVariable (
-  IN VARIABLE_HEADER    *Variable,
-  IN UINTN              DataSize
+  IN  VARIABLE_HEADER   *Variable,
+  IN  UINTN             DataSize,
+  IN  BOOLEAN           AuthFormat
   )
 {
   AUTHENTICATED_VARIABLE_HEADER *AuthVariable;
 
   AuthVariable = (AUTHENTICATED_VARIABLE_HEADER *) Variable;
-  if (mVariableModuleGlobal->VariableGlobal.AuthFormat) {
+  if (AuthFormat) {
     AuthVariable->DataSize = (UINT32) DataSize;
   } else {
     Variable->DataSize = (UINT32) DataSize;
@@ -219,36 +234,42 @@ SetDataSizeOfVariable (
 
   This code gets the pointer to the variable name.
 
-  @param Variable        Pointer to the Variable Header.
+  @param[in] Variable     Pointer to the Variable Header.
+  @param[in] AuthFormat   TRUE indicates authenticated variables are used.
+                          FALSE indicates authenticated variables are not used.
 
   @return Pointer to Variable Name which is Unicode encoding.
 
 **/
 CHAR16 *
 GetVariableNamePtr (
-  IN  VARIABLE_HEADER   *Variable
+  IN  VARIABLE_HEADER   *Variable,
+  IN  BOOLEAN           AuthFormat
   )
 {
-  return (CHAR16 *) ((UINTN) Variable + GetVariableHeaderSize ());
+  return (CHAR16 *) ((UINTN) Variable + GetVariableHeaderSize (AuthFormat));
 }
 
 /**
   This code gets the pointer to the variable guid.
 
-  @param Variable   Pointer to the Variable Header.
+  @param[in] Variable     Pointer to the Variable Header.
+  @param[in] AuthFormat   TRUE indicates authenticated variables are used.
+                          FALSE indicates authenticated variables are not used.
 
   @return A EFI_GUID* pointer to Vendor Guid.
 
 **/
 EFI_GUID *
 GetVendorGuidPtr (
-  IN VARIABLE_HEADER    *Variable
+  IN  VARIABLE_HEADER    *Variable,
+  IN  BOOLEAN            AuthFormat
   )
 {
   AUTHENTICATED_VARIABLE_HEADER *AuthVariable;
 
   AuthVariable = (AUTHENTICATED_VARIABLE_HEADER *) Variable;
-  if (mVariableModuleGlobal->VariableGlobal.AuthFormat) {
+  if (AuthFormat) {
     return &AuthVariable->VendorGuid;
   } else {
     return &Variable->VendorGuid;
@@ -259,14 +280,17 @@ GetVendorGuidPtr (
 
   This code gets the pointer to the variable data.
 
-  @param Variable        Pointer to the Variable Header.
+  @param[in] Variable     Pointer to the Variable Header.
+  @param[in] AuthFormat   TRUE indicates authenticated variables are used.
+                          FALSE indicates authenticated variables are not used.
 
   @return Pointer to Variable Data.
 
 **/
 UINT8 *
 GetVariableDataPtr (
-  IN  VARIABLE_HEADER   *Variable
+  IN  VARIABLE_HEADER    *Variable,
+  IN  BOOLEAN            AuthFormat
   )
 {
   UINTN Value;
@@ -274,9 +298,9 @@ GetVariableDataPtr (
   //
   // Be careful about pad size for alignment.
   //
-  Value =  (UINTN) GetVariableNamePtr (Variable);
-  Value += NameSizeOfVariable (Variable);
-  Value += GET_PAD_SIZE (NameSizeOfVariable (Variable));
+  Value =  (UINTN) GetVariableNamePtr (Variable, AuthFormat);
+  Value += NameSizeOfVariable (Variable, AuthFormat);
+  Value += GET_PAD_SIZE (NameSizeOfVariable (Variable, AuthFormat));
 
   return (UINT8 *) Value;
 }
@@ -284,14 +308,17 @@ GetVariableDataPtr (
 /**
   This code gets the variable data offset related to variable header.
 
-  @param Variable        Pointer to the Variable Header.
+  @param[in] Variable     Pointer to the Variable Header.
+  @param[in] AuthFormat   TRUE indicates authenticated variables are used.
+                          FALSE indicates authenticated variables are not used.
 
   @return Variable Data offset.
 
 **/
 UINTN
 GetVariableDataOffset (
-  IN  VARIABLE_HEADER   *Variable
+  IN  VARIABLE_HEADER   *Variable,
+  IN  BOOLEAN           AuthFormat
   )
 {
   UINTN Value;
@@ -299,9 +326,9 @@ GetVariableDataOffset (
   //
   // Be careful about pad size for alignment
   //
-  Value = GetVariableHeaderSize ();
-  Value += NameSizeOfVariable (Variable);
-  Value += GET_PAD_SIZE (NameSizeOfVariable (Variable));
+  Value = GetVariableHeaderSize (AuthFormat);
+  Value += NameSizeOfVariable (Variable, AuthFormat);
+  Value += GET_PAD_SIZE (NameSizeOfVariable (Variable, AuthFormat));
 
   return Value;
 }
@@ -310,21 +337,24 @@ GetVariableDataOffset (
 
   This code gets the pointer to the next variable header.
 
-  @param Variable        Pointer to the Variable Header.
+  @param[in] Variable     Pointer to the Variable Header.
+  @param[in] AuthFormat   TRUE indicates authenticated variables are used.
+                          FALSE indicates authenticated variables are not used.
 
   @return Pointer to next variable header.
 
 **/
 VARIABLE_HEADER *
 GetNextVariablePtr (
-  IN  VARIABLE_HEADER   *Variable
+  IN  VARIABLE_HEADER   *Variable,
+  IN  BOOLEAN           AuthFormat
   )
 {
   UINTN Value;
 
-  Value =  (UINTN) GetVariableDataPtr (Variable);
-  Value += DataSizeOfVariable (Variable);
-  Value += GET_PAD_SIZE (DataSizeOfVariable (Variable));
+  Value =  (UINTN) GetVariableDataPtr (Variable, AuthFormat);
+  Value += DataSizeOfVariable (Variable, AuthFormat);
+  Value += GET_PAD_SIZE (DataSizeOfVariable (Variable, AuthFormat));
 
   //
   // Be careful about pad size for alignment.
@@ -415,6 +445,8 @@ VariableCompareTimeStampInternal (
   @param[in]       IgnoreRtCheck       Ignore EFI_VARIABLE_RUNTIME_ACCESS attribute
                                        check at runtime when searching variable.
   @param[in, out]  PtrTrack            Variable Track Pointer structure that contains Variable Information.
+  @param[in]       AuthFormat          TRUE indicates authenticated variables are used.
+                                       FALSE indicates authenticated variables are not used.
 
   @retval          EFI_SUCCESS         Variable found successfully
   @retval          EFI_NOT_FOUND       Variable not found
@@ -424,7 +456,8 @@ FindVariableEx (
   IN     CHAR16                  *VariableName,
   IN     EFI_GUID                *VendorGuid,
   IN     BOOLEAN                 IgnoreRtCheck,
-  IN OUT VARIABLE_POINTER_TRACK  *PtrTrack
+  IN OUT VARIABLE_POINTER_TRACK  *PtrTrack,
+  IN     BOOLEAN                 AuthFormat
   )
 {
   VARIABLE_HEADER                *InDeletedVariable;
@@ -439,7 +472,7 @@ FindVariableEx (
 
   for ( PtrTrack->CurrPtr = PtrTrack->StartPtr
       ; IsValidVariableHeader (PtrTrack->CurrPtr, PtrTrack->EndPtr)
-      ; PtrTrack->CurrPtr = GetNextVariablePtr (PtrTrack->CurrPtr)
+      ; PtrTrack->CurrPtr = GetNextVariablePtr (PtrTrack->CurrPtr, AuthFormat)
       ) {
     if (PtrTrack->CurrPtr->State == VAR_ADDED ||
         PtrTrack->CurrPtr->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)
@@ -453,11 +486,11 @@ FindVariableEx (
             return EFI_SUCCESS;
           }
         } else {
-          if (CompareGuid (VendorGuid, GetVendorGuidPtr (PtrTrack->CurrPtr))) {
-            Point = (VOID *) GetVariableNamePtr (PtrTrack->CurrPtr);
+          if (CompareGuid (VendorGuid, GetVendorGuidPtr (PtrTrack->CurrPtr, AuthFormat))) {
+            Point = (VOID *) GetVariableNamePtr (PtrTrack->CurrPtr, AuthFormat);
 
-            ASSERT (NameSizeOfVariable (PtrTrack->CurrPtr) != 0);
-            if (CompareMem (VariableName, Point, NameSizeOfVariable (PtrTrack->CurrPtr)) == 0) {
+            ASSERT (NameSizeOfVariable (PtrTrack->CurrPtr, AuthFormat) != 0);
+            if (CompareMem (VariableName, Point, NameSizeOfVariable (PtrTrack->CurrPtr, AuthFormat)) == 0) {
               if (PtrTrack->CurrPtr->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) {
                 InDeletedVariable     = PtrTrack->CurrPtr;
               } else {
@@ -486,6 +519,8 @@ FindVariableEx (
   @param[in]  VariableStoreList A list of variable stores that should be used to get the next variable.
                                 The maximum number of entries is the max value of VARIABLE_STORE_TYPE.
   @param[out] VariablePtr       Pointer to variable header address.
+  @param[in]  AuthFormat        TRUE indicates authenticated variables are used.
+                                FALSE indicates authenticated variables are not used.
 
   @retval EFI_SUCCESS           The function completed successfully.
   @retval EFI_NOT_FOUND         The next variable was not found.
@@ -500,7 +535,8 @@ VariableServiceGetNextVariableInternal (
   IN  CHAR16                *VariableName,
   IN  EFI_GUID              *VendorGuid,
   IN  VARIABLE_STORE_HEADER **VariableStoreList,
-  OUT VARIABLE_HEADER       **VariablePtr
+  OUT VARIABLE_HEADER       **VariablePtr,
+  IN  BOOLEAN               AuthFormat
   )
 {
   EFI_STATUS              Status;
@@ -525,7 +561,7 @@ VariableServiceGetNextVariableInternal (
     Variable.EndPtr   = GetEndPointer   (VariableStoreList[StoreType]);
     Variable.Volatile = (BOOLEAN) (StoreType == VariableStoreTypeVolatile);
 
-    Status = FindVariableEx (VariableName, VendorGuid, FALSE, &Variable);
+    Status = FindVariableEx (VariableName, VendorGuid, FALSE, &Variable, AuthFormat);
     if (!EFI_ERROR (Status)) {
       break;
     }
@@ -552,7 +588,7 @@ VariableServiceGetNextVariableInternal (
     //
     // If variable name is not empty, get next variable.
     //
-    Variable.CurrPtr = GetNextVariablePtr (Variable.CurrPtr);
+    Variable.CurrPtr = GetNextVariablePtr (Variable.CurrPtr, AuthFormat);
   }
 
   while (TRUE) {
@@ -605,13 +641,14 @@ VariableServiceGetNextVariableInternal (
           VariablePtrTrack.StartPtr = Variable.StartPtr;
           VariablePtrTrack.EndPtr = Variable.EndPtr;
           Status = FindVariableEx (
-                     GetVariableNamePtr (Variable.CurrPtr),
-                     GetVendorGuidPtr (Variable.CurrPtr),
+                     GetVariableNamePtr (Variable.CurrPtr, AuthFormat),
+                     GetVendorGuidPtr (Variable.CurrPtr, AuthFormat),
                      FALSE,
-                     &VariablePtrTrack
+                     &VariablePtrTrack,
+                     AuthFormat
                      );
           if (!EFI_ERROR (Status) && VariablePtrTrack.CurrPtr->State == VAR_ADDED) {
-            Variable.CurrPtr = GetNextVariablePtr (Variable.CurrPtr);
+            Variable.CurrPtr = GetNextVariablePtr (Variable.CurrPtr, AuthFormat);
             continue;
           }
         }
@@ -625,13 +662,14 @@ VariableServiceGetNextVariableInternal (
           VariableInHob.StartPtr = GetStartPointer (VariableStoreList[VariableStoreTypeHob]);
           VariableInHob.EndPtr   = GetEndPointer   (VariableStoreList[VariableStoreTypeHob]);
           Status = FindVariableEx (
-                     GetVariableNamePtr (Variable.CurrPtr),
-                     GetVendorGuidPtr (Variable.CurrPtr),
+                     GetVariableNamePtr (Variable.CurrPtr, AuthFormat),
+                     GetVendorGuidPtr (Variable.CurrPtr, AuthFormat),
                      FALSE,
-                     &VariableInHob
+                     &VariableInHob,
+                     AuthFormat
                      );
           if (!EFI_ERROR (Status)) {
-            Variable.CurrPtr = GetNextVariablePtr (Variable.CurrPtr);
+            Variable.CurrPtr = GetNextVariablePtr (Variable.CurrPtr, AuthFormat);
             continue;
           }
         }
@@ -642,7 +680,7 @@ VariableServiceGetNextVariableInternal (
       }
     }
 
-    Variable.CurrPtr = GetNextVariablePtr (Variable.CurrPtr);
+    Variable.CurrPtr = GetNextVariablePtr (Variable.CurrPtr, AuthFormat);
   }
 
 Done:
