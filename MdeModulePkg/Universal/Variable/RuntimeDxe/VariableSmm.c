@@ -975,8 +975,9 @@ MmVariableServiceInitialize (
                     );
   ASSERT_EFI_ERROR (Status);
 
-  mVariableBufferPayloadSize = GetMaxVariableSize () +
-                               OFFSET_OF (SMM_VARIABLE_COMMUNICATE_VAR_CHECK_VARIABLE_PROPERTY, Name) - GetVariableHeaderSize ();
+  mVariableBufferPayloadSize =  GetMaxVariableSize () +
+                                  OFFSET_OF (SMM_VARIABLE_COMMUNICATE_VAR_CHECK_VARIABLE_PROPERTY, Name) -
+                                  GetVariableHeaderSize (mVariableModuleGlobal->VariableGlobal.AuthFormat);
 
   Status = gMmst->MmAllocatePool (
                     EfiRuntimeServicesData,

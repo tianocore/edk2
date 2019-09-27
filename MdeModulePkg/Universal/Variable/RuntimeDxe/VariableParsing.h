@@ -49,53 +49,65 @@ GetVariableStoreStatus (
 /**
   This code gets the size of variable header.
 
+  @param[in]  AuthFormat    TRUE indicates authenticated variables are used.
+                            FALSE indicates authenticated variables are not used.
+
   @return Size of variable header in bytes in type UINTN.
 
 **/
 UINTN
 GetVariableHeaderSize (
-  VOID
+  IN  BOOLEAN   AuthFormat
   );
 
 /**
 
   This code gets the size of name of variable.
 
-  @param Variable        Pointer to the Variable Header.
+  @param[in]  Variable      Pointer to the variable header.
+  @param[in]  AuthFormat    TRUE indicates authenticated variables are used.
+                            FALSE indicates authenticated variables are not used.
 
   @return UINTN          Size of variable in bytes.
 
 **/
 UINTN
 NameSizeOfVariable (
-  IN  VARIABLE_HEADER   *Variable
+  IN  VARIABLE_HEADER   *Variable,
+  IN  BOOLEAN           AuthFormat
   );
 
 /**
   This code sets the size of name of variable.
 
-  @param[in] Variable   Pointer to the Variable Header.
-  @param[in] NameSize   Name size to set.
+  @param[in]  Variable      Pointer to the Variable Header.
+  @param[in]  NameSize      Name size to set.
+  @param[in]  AuthFormat    TRUE indicates authenticated variables are used.
+                            FALSE indicates authenticated variables are not used.
 
 **/
 VOID
 SetNameSizeOfVariable (
   IN VARIABLE_HEADER    *Variable,
-  IN UINTN              NameSize
+  IN UINTN              NameSize,
+  IN BOOLEAN            AuthFormat
   );
 
 /**
 
   This code gets the size of variable data.
 
-  @param Variable        Pointer to the Variable Header.
+  @param[in]  Variable      Pointer to the Variable Header.
+  @param[in]  AuthFormat    TRUE indicates authenticated variables are used.
+                            FALSE indicates authenticated variables are not used.
 
   @return Size of variable in bytes.
 
 **/
 UINTN
 DataSizeOfVariable (
-  IN  VARIABLE_HEADER   *Variable
+  IN  VARIABLE_HEADER   *Variable,
+  IN  BOOLEAN           AuthFormat
   );
 
 /**
@@ -103,80 +115,98 @@ DataSizeOfVariable (
 
   @param[in] Variable   Pointer to the Variable Header.
   @param[in] DataSize   Data size to set.
+  @param[in] AuthFormat TRUE indicates authenticated variables are used.
+                        FALSE indicates authenticated variables are not used.
 
 **/
 VOID
 SetDataSizeOfVariable (
-  IN VARIABLE_HEADER    *Variable,
-  IN UINTN              DataSize
+  IN  VARIABLE_HEADER   *Variable,
+  IN  UINTN             DataSize,
+  IN  BOOLEAN           AuthFormat
   );
 
 /**
 
   This code gets the pointer to the variable name.
 
-  @param Variable        Pointer to the Variable Header.
+  @param[in] Variable     Pointer to the Variable Header.
+  @param[in] AuthFormat   TRUE indicates authenticated variables are used.
+                          FALSE indicates authenticated variables are not used.
 
   @return Pointer to Variable Name which is Unicode encoding.
 
 **/
 CHAR16 *
 GetVariableNamePtr (
-  IN  VARIABLE_HEADER   *Variable
+  IN  VARIABLE_HEADER   *Variable,
+  IN  BOOLEAN           AuthFormat
   );
 
 /**
   This code gets the pointer to the variable guid.
 
-  @param Variable   Pointer to the Variable Header.
+  @param[in] Variable     Pointer to the Variable Header.
+  @param[in] AuthFormat   TRUE indicates authenticated variables are used.
+                          FALSE indicates authenticated variables are not used.
 
   @return A EFI_GUID* pointer to Vendor Guid.
 
 **/
 EFI_GUID *
 GetVendorGuidPtr (
-  IN VARIABLE_HEADER    *Variable
+  IN  VARIABLE_HEADER    *Variable,
+  IN  BOOLEAN            AuthFormat
   );
 
 /**
 
   This code gets the pointer to the variable data.
 
-  @param Variable        Pointer to the Variable Header.
+  @param[in] Variable     Pointer to the Variable Header.
+  @param[in] AuthFormat   TRUE indicates authenticated variables are used.
+                          FALSE indicates authenticated variables are not used.
 
   @return Pointer to Variable Data.
 
 **/
 UINT8 *
 GetVariableDataPtr (
-  IN  VARIABLE_HEADER   *Variable
+  IN  VARIABLE_HEADER    *Variable,
+  IN  BOOLEAN            AuthFormat
   );
 
 /**
   This code gets the variable data offset related to variable header.
 
-  @param Variable        Pointer to the Variable Header.
+  @param[in] Variable     Pointer to the Variable Header.
+  @param[in] AuthFormat   TRUE indicates authenticated variables are used.
+                          FALSE indicates authenticated variables are not used.
 
   @return Variable Data offset.
 
 **/
 UINTN
 GetVariableDataOffset (
-  IN  VARIABLE_HEADER   *Variable
+  IN  VARIABLE_HEADER   *Variable,
+  IN  BOOLEAN           AuthFormat
   );
 
 /**
 
   This code gets the pointer to the next variable header.
 
-  @param Variable        Pointer to the Variable Header.
+  @param[in] Variable     Pointer to the Variable Header.
+  @param[in] AuthFormat   TRUE indicates authenticated variables are used.
+                          FALSE indicates authenticated variables are not used.
 
   @return Pointer to next variable header.
 
 **/
 VARIABLE_HEADER *
 GetNextVariablePtr (
-  IN  VARIABLE_HEADER   *Variable
+  IN  VARIABLE_HEADER   *Variable,
+  IN  BOOLEAN           AuthFormat
   );
 
 /**
@@ -235,6 +265,8 @@ VariableCompareTimeStampInternal (
   @param[in]       IgnoreRtCheck       Ignore EFI_VARIABLE_RUNTIME_ACCESS attribute
                                        check at runtime when searching variable.
   @param[in, out]  PtrTrack            Variable Track Pointer structure that contains Variable Information.
+  @param[in]       AuthFormat          TRUE indicates authenticated variables are used.
+                                       FALSE indicates authenticated variables are not used.
 
   @retval          EFI_SUCCESS         Variable found successfully
   @retval          EFI_NOT_FOUND       Variable not found
@@ -244,7 +276,8 @@ FindVariableEx (
   IN     CHAR16                  *VariableName,
   IN     EFI_GUID                *VendorGuid,
   IN     BOOLEAN                 IgnoreRtCheck,
-  IN OUT VARIABLE_POINTER_TRACK  *PtrTrack
+  IN OUT VARIABLE_POINTER_TRACK  *PtrTrack,
+  IN     BOOLEAN                 AuthFormat
   );
 
 /**
@@ -258,10 +291,12 @@ FindVariableEx (
   @param[in]  VariableStoreList A list of variable stores that should be used to get the next variable.
                                 The maximum number of entries is the max value of VARIABLE_STORE_TYPE.
   @param[out] VariablePtr       Pointer to variable header address.
+  @param[in]  AuthFormat        TRUE indicates authenticated variables are used.
+                                FALSE indicates authenticated variables are not used.
 
   @retval EFI_SUCCESS           The function completed successfully.
   @retval EFI_NOT_FOUND         The next variable was not found.
-  @retval EFI_INVALID_PARAMETER If VariableName is nt an empty string, while VendorGuid is NULL.
+  @retval EFI_INVALID_PARAMETER If VariableName is not an empty string, while VendorGuid is NULL.
   @retval EFI_INVALID_PARAMETER The input values of VariableName and VendorGuid are not a name and
                                 GUID of an existing variable.
 
@@ -272,7 +307,8 @@ VariableServiceGetNextVariableInternal (
   IN  CHAR16                *VariableName,
   IN  EFI_GUID              *VendorGuid,
   IN  VARIABLE_STORE_HEADER **VariableStoreList,
-  OUT VARIABLE_HEADER       **VariablePtr
+  OUT VARIABLE_HEADER       **VariablePtr,
+  IN  BOOLEAN               AuthFormat
   );
 
 /**
