@@ -1,7 +1,7 @@
 /** @file
   Implementation of EFI TLS Protocol Interfaces.
 
-  Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -56,12 +56,16 @@ TlsSetSessionData (
   UINT16                    *CipherId;
   CONST EFI_TLS_CIPHER      *TlsCipherList;
   UINTN                     CipherCount;
+  CONST EFI_TLS_VERIFY_HOST *TlsVerifyHost;
+  EFI_TLS_VERIFY            VerifyMethod;
+  UINTN                     VerifyMethodSize;
   UINTN                     Index;
 
   EFI_TPL                   OldTpl;
 
-  Status = EFI_SUCCESS;
-  CipherId = NULL;
+  Status           = EFI_SUCCESS;
+  CipherId         = NULL;
+  VerifyMethodSize = sizeof (EFI_TLS_VERIFY);
 
   if (This == NULL || Data == NULL || DataSize == 0) {
     return EFI_INVALID_PARAMETER;
@@ -148,6 +152,40 @@ TlsSetSessionData (
     }
 
     TlsSetVerify (Instance->TlsConn, *((UINT32 *) Data));
+    break;
+  case EfiTlsVerifyHost:
+    if (DataSize != sizeof (EFI_TLS_VERIFY_HOST)) {
+      Status = EFI_INVALID_PARAMETER;
+      goto ON_EXIT;
+    }
+
+    TlsVerifyHost = (CONST EFI_TLS_VERIFY_HOST *) Data;
+
+    if ((TlsVerifyHost->Flags & EFI_TLS_VERIFY_FLAG_ALWAYS_CHECK_SUBJECT) != 0 &&
+        (TlsVerifyHost->Flags & EFI_TLS_VERIFY_FLAG_NEVER_CHECK_SUBJECT) != 0) {
+      Status = EFI_INVALID_PARAMETER;
+      goto ON_EXIT;
+    }
+
+    if ((TlsVerifyHost->Flags & EFI_TLS_VERIFY_FLAG_NO_WILDCARDS) != 0 &&
+        ((TlsVerifyHost->Flags & EFI_TLS_VERIFY_FLAG_NO_PARTIAL_WILDCARDS) != 0 ||
+         (TlsVerifyHost->Flags & EFI_TLS_VERIFY_FLAG_MULTI_LABEL_WILDCARDS) != 0)) {
+      Status = EFI_INVALID_PARAMETER;
+      goto ON_EXIT;
+    }
+
+    Status = This->GetSessionData (This, EfiTlsVerifyMethod, &VerifyMethod, &VerifyMethodSize);
+    if (EFI_ERROR (Status)) {
+      goto ON_EXIT;
+    }
+
+    if ((VerifyMethod & EFI_TLS_VERIFY_PEER) == 0) {
+      Status = EFI_INVALID_PARAMETER;
+      goto ON_EXIT;
+    }
+
+    Status = TlsSetVerifyHost (Instance->TlsConn, TlsVerifyHost->Flags, TlsVerifyHost->HostName);
+
     break;
   case EfiTlsSessionID:
     if (DataSize != sizeof (EFI_TLS_SESSION_ID)) {
