@@ -286,13 +286,14 @@ VariableServiceGetNextVariableInternal (
   the transaction. Data is allocated by this routine, but never
   freed.
 
-  @param[in] VariableName   Name of the Variable to track.
-  @param[in] VendorGuid     Guid of the Variable to track.
-  @param[in] Volatile       TRUE if volatile FALSE if non-volatile.
-  @param[in] Read           TRUE if GetVariable() was called.
-  @param[in] Write          TRUE if SetVariable() was called.
-  @param[in] Delete         TRUE if deleted via SetVariable().
-  @param[in] Cache          TRUE for a cache hit.
+  @param[in]      VariableName   Name of the Variable to track.
+  @param[in]      VendorGuid     Guid of the Variable to track.
+  @param[in]      Volatile       TRUE if volatile FALSE if non-volatile.
+  @param[in]      Read           TRUE if GetVariable() was called.
+  @param[in]      Write          TRUE if SetVariable() was called.
+  @param[in]      Delete         TRUE if deleted via SetVariable().
+  @param[in]      Cache          TRUE for a cache hit.
+  @param[in,out]  VariableInfo   Pointer to a pointer of VARIABLE_INFO_ENTRY structures.
 
 **/
 VOID
@@ -303,7 +304,8 @@ UpdateVariableInfo (
   IN  BOOLEAN                 Read,
   IN  BOOLEAN                 Write,
   IN  BOOLEAN                 Delete,
-  IN  BOOLEAN                 Cache
+  IN  BOOLEAN                 Cache,
+  IN OUT VARIABLE_INFO_ENTRY  **VariableInfo
   );
 
 #endif
