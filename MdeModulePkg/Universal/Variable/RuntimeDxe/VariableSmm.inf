@@ -45,6 +45,8 @@
   Variable.c
   VariableTraditionalMm.c
   VariableSmm.c
+  VariableNonVolatile.c
+  VariableNonVolatile.h
   VariableParsing.c
   VariableParsing.h
   VarCheck.c
