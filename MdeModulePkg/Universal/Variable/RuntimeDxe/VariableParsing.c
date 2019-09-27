@@ -660,13 +660,14 @@ Done:
   the transaction. Data is allocated by this routine, but never
   freed.
 
-  @param[in] VariableName   Name of the Variable to track.
-  @param[in] VendorGuid     Guid of the Variable to track.
-  @param[in] Volatile       TRUE if volatile FALSE if non-volatile.
-  @param[in] Read           TRUE if GetVariable() was called.
-  @param[in] Write          TRUE if SetVariable() was called.
-  @param[in] Delete         TRUE if deleted via SetVariable().
-  @param[in] Cache          TRUE for a cache hit.
+  @param[in]      VariableName   Name of the Variable to track.
+  @param[in]      VendorGuid     Guid of the Variable to track.
+  @param[in]      Volatile       TRUE if volatile FALSE if non-volatile.
+  @param[in]      Read           TRUE if GetVariable() was called.
+  @param[in]      Write          TRUE if SetVariable() was called.
+  @param[in]      Delete         TRUE if deleted via SetVariable().
+  @param[in]      Cache          TRUE for a cache hit.
+  @param[in,out]  VariableInfo   Pointer to a pointer of VARIABLE_INFO_ENTRY structures.
 
 **/
 VOID
@@ -677,35 +678,38 @@ UpdateVariableInfo (
   IN  BOOLEAN                 Read,
   IN  BOOLEAN                 Write,
   IN  BOOLEAN                 Delete,
-  IN  BOOLEAN                 Cache
+  IN  BOOLEAN                 Cache,
+  IN OUT VARIABLE_INFO_ENTRY  **VariableInfo
   )
 {
   VARIABLE_INFO_ENTRY   *Entry;
 
   if (FeaturePcdGet (PcdVariableCollectStatistics)) {
-
+    if (VariableName == NULL || VendorGuid == NULL || VariableInfo == NULL) {
+      return;
+    }
     if (AtRuntime ()) {
       // Don't collect statistics at runtime.
       return;
     }
 
-    if (gVariableInfo == NULL) {
+    if (*VariableInfo == NULL) {
       //
       // On the first call allocate a entry and place a pointer to it in
       // the EFI System Table.
       //
-      gVariableInfo = AllocateZeroPool (sizeof (VARIABLE_INFO_ENTRY));
-      ASSERT (gVariableInfo != NULL);
+      *VariableInfo = AllocateZeroPool (sizeof (VARIABLE_INFO_ENTRY));
+      ASSERT (*VariableInfo != NULL);
 
-      CopyGuid (&gVariableInfo->VendorGuid, VendorGuid);
-      gVariableInfo->Name = AllocateZeroPool (StrSize (VariableName));
-      ASSERT (gVariableInfo->Name != NULL);
-      StrCpyS (gVariableInfo->Name, StrSize(VariableName)/sizeof(CHAR16), VariableName);
-      gVariableInfo->Volatile = Volatile;
+      CopyGuid (&(*VariableInfo)->VendorGuid, VendorGuid);
+      (*VariableInfo)->Name = AllocateZeroPool (StrSize (VariableName));
+      ASSERT ((*VariableInfo)->Name != NULL);
+      StrCpyS ((*VariableInfo)->Name, StrSize(VariableName)/sizeof(CHAR16), VariableName);
+      (*VariableInfo)->Volatile = Volatile;
     }
 
 
-    for (Entry = gVariableInfo; Entry != NULL; Entry = Entry->Next) {
+    for (Entry = (*VariableInfo); Entry != NULL; Entry = Entry->Next) {
       if (CompareGuid (VendorGuid, &Entry->VendorGuid)) {
         if (StrCmp (VariableName, Entry->Name) == 0) {
           if (Read) {
@@ -739,7 +743,6 @@ UpdateVariableInfo (
         StrCpyS (Entry->Next->Name, StrSize(VariableName)/sizeof(CHAR16), VariableName);
         Entry->Next->Volatile = Volatile;
       }
-
     }
   }
 }

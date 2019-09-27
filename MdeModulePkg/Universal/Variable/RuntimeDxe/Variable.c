@@ -1641,7 +1641,7 @@ UpdateVariable (
         // go to delete this variable in variable HOB and
         // try to flush other variables from HOB to flash.
         //
-        UpdateVariableInfo (VariableName, VendorGuid, FALSE, FALSE, FALSE, TRUE, FALSE);
+        UpdateVariableInfo (VariableName, VendorGuid, FALSE, FALSE, FALSE, TRUE, FALSE, &gVariableInfo);
         FlushHobVariableToFlash (VariableName, VendorGuid);
         return EFI_SUCCESS;
       }
@@ -1758,7 +1758,7 @@ UpdateVariable (
                  &State
                  );
       if (!EFI_ERROR (Status)) {
-        UpdateVariableInfo (VariableName, VendorGuid, Variable->Volatile, FALSE, FALSE, TRUE, FALSE);
+        UpdateVariableInfo (VariableName, VendorGuid, Variable->Volatile, FALSE, FALSE, TRUE, FALSE, &gVariableInfo);
         if (!Variable->Volatile) {
           CacheVariable->CurrPtr->State = State;
           FlushHobVariableToFlash (VariableName, VendorGuid);
@@ -1777,7 +1777,7 @@ UpdateVariable (
       //
       // Variable content unchanged and no need to update timestamp, just return.
       //
-      UpdateVariableInfo (VariableName, VendorGuid, Variable->Volatile, FALSE, TRUE, FALSE, FALSE);
+      UpdateVariableInfo (VariableName, VendorGuid, Variable->Volatile, FALSE, TRUE, FALSE, FALSE, &gVariableInfo);
       Status = EFI_SUCCESS;
       goto Done;
     } else if ((CacheVariable->CurrPtr->State == VAR_ADDED) ||
@@ -2006,7 +2006,7 @@ UpdateVariable (
           CacheVariable->CurrPtr = (VARIABLE_HEADER *)((UINTN) CacheVariable->StartPtr + ((UINTN) Variable->CurrPtr - (UINTN) Variable->StartPtr));
           CacheVariable->InDeletedTransitionPtr = NULL;
         }
-        UpdateVariableInfo (VariableName, VendorGuid, FALSE, FALSE, TRUE, FALSE, FALSE);
+        UpdateVariableInfo (VariableName, VendorGuid, FALSE, FALSE, TRUE, FALSE, FALSE, &gVariableInfo);
         FlushHobVariableToFlash (VariableName, VendorGuid);
       } else {
         if (IsCommonUserVariable && ((VarSize + mVariableModuleGlobal->CommonUserVariableTotalSize) > mVariableModuleGlobal->CommonMaxUserVariableSpace)) {
@@ -2156,7 +2156,7 @@ UpdateVariable (
           CacheVariable->CurrPtr = (VARIABLE_HEADER *)((UINTN) CacheVariable->StartPtr + ((UINTN) Variable->CurrPtr - (UINTN) Variable->StartPtr));
           CacheVariable->InDeletedTransitionPtr = NULL;
         }
-        UpdateVariableInfo (VariableName, VendorGuid, TRUE, FALSE, TRUE, FALSE, FALSE);
+        UpdateVariableInfo (VariableName, VendorGuid, TRUE, FALSE, TRUE, FALSE, FALSE, &gVariableInfo);
       }
       goto Done;
     }
@@ -2227,7 +2227,7 @@ UpdateVariable (
   }
 
   if (!EFI_ERROR (Status)) {
-    UpdateVariableInfo (VariableName, VendorGuid, Volatile, FALSE, TRUE, FALSE, FALSE);
+    UpdateVariableInfo (VariableName, VendorGuid, Volatile, FALSE, TRUE, FALSE, FALSE, &gVariableInfo);
     if (!Volatile) {
       FlushHobVariableToFlash (VariableName, VendorGuid);
     }
@@ -2306,7 +2306,7 @@ VariableServiceGetVariable (
     }
 
     *DataSize = VarDataSize;
-    UpdateVariableInfo (VariableName, VendorGuid, Variable.Volatile, TRUE, FALSE, FALSE, FALSE);
+    UpdateVariableInfo (VariableName, VendorGuid, Variable.Volatile, TRUE, FALSE, FALSE, FALSE, &gVariableInfo);
 
     Status = EFI_SUCCESS;
     goto Done;
