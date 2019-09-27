@@ -822,7 +822,9 @@ UfsPassThruDriverBindingStart (
   UINTN                                 UfsHcBase;
   UINT32                                Index;
   UFS_UNIT_DESC                         UnitDescriptor;
+  UFS_DEV_DESC                          DeviceDescriptor;
   UINT32                                UnitDescriptorSize;
+  UINT32                                DeviceDescriptorSize;
 
   Status    = EFI_SUCCESS;
   UfsHc     = NULL;
@@ -916,7 +918,6 @@ UfsPassThruDriverBindingStart (
 
   //
   // Check if 8 common luns are active and set corresponding bit mask.
-  // TODO: Parse device descriptor to decide if exposing RPMB LUN to upper layer for authentication access.
   //
   UnitDescriptorSize = sizeof (UFS_UNIT_DESC);
   for (Index = 0; Index < 8; Index++) {
@@ -928,6 +929,20 @@ UfsPassThruDriverBindingStart (
     if (UnitDescriptor.LunEn == 0x1) {
       DEBUG ((DEBUG_INFO, "UFS LUN %X is enabled\n", Index));
       Private->Luns.BitMask |= (BIT0 << Index);
+    }
+  }
+
+  //
+  // Check if RPMB WLUN is supported and set corresponding bit mask.
+  //
+  DeviceDescriptorSize = sizeof (UFS_DEV_DESC);
+  Status = UfsRwDeviceDesc (Private, TRUE, UfsDeviceDesc, 0, 0, &DeviceDescriptor, &DeviceDescriptorSize);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Failed to read device descriptor, status = %r\n", Status));
+  } else {
+    if (DeviceDescriptor.SecurityLun == 0x1) {
+      DEBUG ((DEBUG_INFO, "UFS WLUN RPMB is supported\n"));
+      Private->Luns.BitMask |= BIT11;
     }
   }
 
