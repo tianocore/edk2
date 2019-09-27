@@ -1670,8 +1670,12 @@ UnicodeToEfiKey (
 
       if (TerminalDevice->TerminalType == TerminalTypePcAnsi    ||
           TerminalDevice->TerminalType == TerminalTypeVt100     ||
-          TerminalDevice->TerminalType == TerminalTypeVtUtf8 ||
-          TerminalDevice->TerminalType == TerminalTypeTtyTerm ||
+          TerminalDevice->TerminalType == TerminalTypeVt100Plus ||
+          TerminalDevice->TerminalType == TerminalTypeVtUtf8    ||
+          TerminalDevice->TerminalType == TerminalTypeTtyTerm   ||
+          TerminalDevice->TerminalType == TerminalTypeLinux     ||
+          TerminalDevice->TerminalType == TerminalTypeXtermR6   ||
+          TerminalDevice->TerminalType == TerminalTypeVt400     ||
           TerminalDevice->TerminalType == TerminalTypeSCO) {
         switch (UnicodeChar) {
         case 'A':
