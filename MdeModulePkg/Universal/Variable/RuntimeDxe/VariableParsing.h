@@ -248,18 +248,20 @@ FindVariableEx (
   );
 
 /**
-  This code Finds the Next available variable.
+  This code finds the next available variable.
 
   Caution: This function may receive untrusted input.
   This function may be invoked in SMM mode. This function will do basic validation, before parse the data.
 
-  @param[in]  VariableName  Pointer to variable name.
-  @param[in]  VendorGuid    Variable Vendor Guid.
-  @param[out] VariablePtr   Pointer to variable header address.
+  @param[in]  VariableName      Pointer to variable name.
+  @param[in]  VendorGuid        Variable Vendor Guid.
+  @param[in]  VariableStoreList A list of variable stores that should be used to get the next variable.
+                                The maximum number of entries is the max value of VARIABLE_STORE_TYPE.
+  @param[out] VariablePtr       Pointer to variable header address.
 
   @retval EFI_SUCCESS           The function completed successfully.
   @retval EFI_NOT_FOUND         The next variable was not found.
-  @retval EFI_INVALID_PARAMETER If VariableName is not an empty string, while VendorGuid is NULL.
+  @retval EFI_INVALID_PARAMETER If VariableName is nt an empty string, while VendorGuid is NULL.
   @retval EFI_INVALID_PARAMETER The input values of VariableName and VendorGuid are not a name and
                                 GUID of an existing variable.
 
@@ -269,6 +271,7 @@ EFIAPI
 VariableServiceGetNextVariableInternal (
   IN  CHAR16                *VariableName,
   IN  EFI_GUID              *VendorGuid,
+  IN  VARIABLE_STORE_HEADER **VariableStoreList,
   OUT VARIABLE_HEADER       **VariablePtr
   );
 

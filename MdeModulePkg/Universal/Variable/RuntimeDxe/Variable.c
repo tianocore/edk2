@@ -2358,6 +2358,7 @@ VariableServiceGetNextVariableName (
   UINTN                   MaxLen;
   UINTN                   VarNameSize;
   VARIABLE_HEADER         *VariablePtr;
+  VARIABLE_STORE_HEADER   *VariableStoreHeader[VariableStoreTypeMax];
 
   if (VariableNameSize == NULL || VariableName == NULL || VendorGuid == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -2377,7 +2378,16 @@ VariableServiceGetNextVariableName (
 
   AcquireLockOnlyAtBootTime(&mVariableModuleGlobal->VariableGlobal.VariableServicesLock);
 
-  Status = VariableServiceGetNextVariableInternal (VariableName, VendorGuid, &VariablePtr);
+  //
+  // 0: Volatile, 1: HOB, 2: Non-Volatile.
+  // The index and attributes mapping must be kept in this order as FindVariable
+  // makes use of this mapping to implement search algorithm.
+  //
+  VariableStoreHeader[VariableStoreTypeVolatile] = (VARIABLE_STORE_HEADER *) (UINTN) mVariableModuleGlobal->VariableGlobal.VolatileVariableBase;
+  VariableStoreHeader[VariableStoreTypeHob]      = (VARIABLE_STORE_HEADER *) (UINTN) mVariableModuleGlobal->VariableGlobal.HobVariableBase;
+  VariableStoreHeader[VariableStoreTypeNv]       = mNvVariableCache;
+
+  Status = VariableServiceGetNextVariableInternal (VariableName, VendorGuid, VariableStoreHeader, &VariablePtr);
   if (!EFI_ERROR (Status)) {
     VarNameSize = NameSizeOfVariable (VariablePtr);
     ASSERT (VarNameSize != 0);
