@@ -3,7 +3,7 @@
 #  It detects the SCSI disk media and installs Block I/O and Block I/O2 Protocol on
 #  the device handle.
 #
-#  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -52,6 +52,7 @@
   gEfiBlockIoProtocolGuid                       ## BY_START
   gEfiBlockIo2ProtocolGuid                      ## BY_START
   gEfiEraseBlockProtocolGuid                    ## BY_START
+  gEfiStorageSecurityCommandProtocolGuid        ## BY_START
   gEfiScsiIoProtocolGuid                        ## TO_START
   gEfiScsiPassThruProtocolGuid                  ## TO_START
   gEfiExtScsiPassThruProtocolGuid               ## TO_START
