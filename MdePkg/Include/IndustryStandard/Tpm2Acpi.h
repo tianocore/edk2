@@ -27,7 +27,7 @@ typedef struct {
   UINT32                      StartMethod;
 //UINT8                       PlatformSpecificParameters[];  // size up to 12
 //UINT32                      Laml;                          // Optional
-//UINT32                      Lasa;                          // Optional
+//UINT64                      Lasa;                          // Optional
 } EFI_TPM2_ACPI_TABLE;
 
 #define EFI_TPM2_ACPI_TABLE_START_METHOD_ACPI                                          2
