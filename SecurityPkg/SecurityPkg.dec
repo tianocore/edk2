@@ -488,5 +488,13 @@
   # @Prompt IdleByass status supported by current active TPM interface.
   gEfiSecurityPkgTokenSpaceGuid.PcdCRBIdleByPass|0xFF|UINT8|0x0001001F
 
+  ## This PCD records LAML field in TPM2 ACPI table.
+  # @Prompt Tpm2AcpiTableLaml LAML field in TPM2 ACPI table.
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2AcpiTableLaml|0|UINT32|0x00010022
+
+  ## This PCD records LASA field in TPM2 ACPI table.
+  # @Prompt Tpm2AcpiTableLasa LASA field in TPM2 ACPI table.
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2AcpiTableLasa|0|UINT64|0x00010023
+
 [UserExtensions.TianoCore."ExtraFiles"]
   SecurityPkgExtra.uni
