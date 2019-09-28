@@ -286,3 +286,12 @@
                                                                                           "  TRUE  - Skip password prompt.\n"
                                                                                           "  FALSE - Does not skip password prompt.\n"
 
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTpm2AcpiTableLaml_PROMPT  #language en-US "The LAML of TPM2 ACPI table"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTpm2AcpiTableLaml_HELP  #language en-US "This PCD defines LAML of TPM2 ACPI table\n\n"
+                                                                                     "0 means this field is unsupported\n"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTpm2AcpiTableLasa_PROMPT  #language en-US "The LASA of TPM2 ACPI table"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTpm2AcpiTableLasa_HELP  #language en-US "This PCD defines LASA of TPM2 ACPI table\n\n"
+                                                                                     "0 means this field is unsupported\n"
