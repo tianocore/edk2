@@ -16,8 +16,24 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "Tcg2Smm.h"
 
+#pragma pack(1)
 
-EFI_TPM2_ACPI_TABLE  mTpm2AcpiTemplate = {
+typedef struct {
+  EFI_ACPI_DESCRIPTION_HEADER Header;
+  // Flags field is replaced in version 4 and above
+  //    BIT0~15:  PlatformClass      This field is only valid for version 4 and above
+  //    BIT16~31: Reserved
+  UINT32                      Flags;
+  UINT64                      AddressOfControlArea;
+  UINT32                      StartMethod;
+  UINT8                       PlatformSpecificParameters[12];  // size up to 12
+  UINT32                      Laml;                          // Optional
+  UINT64                      Lasa;                          // Optional
+} EFI_TPM2_ACPI_TABLE_V4;
+
+#pragma pack()
+
+EFI_TPM2_ACPI_TABLE_V4  mTpm2AcpiTemplate = {
   {
     EFI_ACPI_5_0_TRUSTED_COMPUTING_PLATFORM_2_TABLE_SIGNATURE,
     sizeof (mTpm2AcpiTemplate),
@@ -748,6 +764,16 @@ PublishTpm2 (
     DEBUG((DEBUG_INFO, "Tpm2 ACPI table PlatformClass is %d\n", (mTpm2AcpiTemplate.Flags & 0x0000FFFF)));
   }
 
+  mTpm2AcpiTemplate.Laml = PcdGet32(PcdTpm2AcpiTableLaml);
+  mTpm2AcpiTemplate.Lasa = PcdGet64(PcdTpm2AcpiTableLasa);
+  if ((mTpm2AcpiTemplate.Header.Revision < EFI_TPM2_ACPI_TABLE_REVISION_4) ||
+      (mTpm2AcpiTemplate.Laml == 0) || (mTpm2AcpiTemplate.Lasa == 0)) {
+    //
+    // If version is smaller than 4 or Laml/Lasa is not valid, rollback to original Length.
+    //
+    mTpm2AcpiTemplate.Header.Length = sizeof(EFI_TPM2_ACPI_TABLE);
+  }
+
   //
   // Measure to PCR[0] with event EV_POST_CODE ACPI DATA
   //
@@ -757,7 +783,7 @@ PublishTpm2 (
     EV_POSTCODE_INFO_ACPI_DATA,
     ACPI_DATA_LEN,
     &mTpm2AcpiTemplate,
-    sizeof(mTpm2AcpiTemplate)
+    mTpm2AcpiTemplate.Header.Length
     );
 
   InterfaceType = PcdGet8(PcdActiveTpmInterfaceType);
@@ -795,7 +821,7 @@ PublishTpm2 (
   Status = AcpiTable->InstallAcpiTable (
                         AcpiTable,
                         &mTpm2AcpiTemplate,
-                        sizeof(mTpm2AcpiTemplate),
+                        mTpm2AcpiTemplate.Header.Length,
                         &TableKey
                         );
   ASSERT_EFI_ERROR (Status);

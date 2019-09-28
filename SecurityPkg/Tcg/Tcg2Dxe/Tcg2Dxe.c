@@ -1467,17 +1467,37 @@ SetupEventLog (
   for (Index = 0; Index < sizeof(mTcg2EventInfo)/sizeof(mTcg2EventInfo[0]); Index++) {
     if ((mTcgDxeData.BsCap.SupportedEventLogs & mTcg2EventInfo[Index].LogFormat) != 0) {
       mTcgDxeData.EventLogAreaStruct[Index].EventLogFormat = mTcg2EventInfo[Index].LogFormat;
-      Status = gBS->AllocatePages (
-                      AllocateAnyPages,
-                      EfiBootServicesData,
-                      EFI_SIZE_TO_PAGES (PcdGet32 (PcdTcgLogAreaMinLen)),
-                      &Lasa
-                      );
+      if (PcdGet8(PcdTpm2AcpiTableRev) >= 4) {
+        Status = gBS->AllocatePages (
+                        AllocateAnyPages,
+                        EfiACPIMemoryNVS,
+                        EFI_SIZE_TO_PAGES (PcdGet32 (PcdTcgLogAreaMinLen)),
+                        &Lasa
+                        );
+      } else {
+        Status = gBS->AllocatePages (
+                        AllocateAnyPages,
+                        EfiBootServicesData,
+                        EFI_SIZE_TO_PAGES (PcdGet32 (PcdTcgLogAreaMinLen)),
+                        &Lasa
+                        );
+      }
       if (EFI_ERROR (Status)) {
         return Status;
       }
       mTcgDxeData.EventLogAreaStruct[Index].Lasa = Lasa;
       mTcgDxeData.EventLogAreaStruct[Index].Laml = PcdGet32 (PcdTcgLogAreaMinLen);
+
+      if ((PcdGet8(PcdTpm2AcpiTableRev) >= 4) ||
+          (mTcg2EventInfo[Index].LogFormat == EFI_TCG2_EVENT_LOG_FORMAT_TCG_2)) {
+        //
+        // Report TCG2 event log address and length, so that they can be reported in TPM2 ACPI table.
+        // Ignore the return status, because those fields are optional.
+        //
+        PcdSet32S(PcdTpm2AcpiTableLaml, (UINT32)mTcgDxeData.EventLogAreaStruct[Index].Laml);
+        PcdSet64S(PcdTpm2AcpiTableLasa, mTcgDxeData.EventLogAreaStruct[Index].Lasa);
+      }
+
       //
       // To initialize them as 0xFF is recommended
       // because the OS can know the last entry for that.
