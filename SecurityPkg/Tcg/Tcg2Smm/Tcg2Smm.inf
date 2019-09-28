@@ -84,6 +84,8 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdTpm2CurrentIrqNum            ## CONSUMES
   gEfiSecurityPkgTokenSpaceGuid.PcdTpm2PossibleIrqNumBuf        ## CONSUMES
   gEfiSecurityPkgTokenSpaceGuid.PcdActiveTpmInterfaceType       ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2AcpiTableLaml            ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2AcpiTableLasa            ## CONSUMES
 
 [Depex]
   gEfiAcpiTableProtocolGuid AND

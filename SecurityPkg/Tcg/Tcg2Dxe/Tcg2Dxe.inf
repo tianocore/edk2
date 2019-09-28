@@ -102,6 +102,9 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdTcg2NumberOfPCRBanks                     ## CONSUMES
   gEfiSecurityPkgTokenSpaceGuid.PcdTcgLogAreaMinLen                         ## CONSUMES
   gEfiSecurityPkgTokenSpaceGuid.PcdTcg2FinalLogAreaLen                      ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2AcpiTableRev                         ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2AcpiTableLaml                        ## PRODUCES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2AcpiTableLasa                        ## PRODUCES
 
 [Depex]
   TRUE
