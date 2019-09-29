@@ -27,6 +27,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Protocol/PciOverride.h>
 #include <Protocol/PciEnumerationComplete.h>
 #include <Protocol/IoMmu.h>
+#include <Protocol/DeviceSecurity.h>
 
 #include <Library/DebugLib.h>
 #include <Library/UefiDriverEntryPoint.h>
