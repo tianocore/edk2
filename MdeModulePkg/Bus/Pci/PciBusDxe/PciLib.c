@@ -1054,7 +1054,9 @@ PciScanBus (
                 &PciDevice
                 );
 
-      ASSERT (!EFI_ERROR (Status));
+      if (EFI_ERROR (Status)) {
+        continue;
+      }
 
       PciAddress = EFI_PCI_ADDRESS (StartBusNumber, Device, Func, 0);
 
