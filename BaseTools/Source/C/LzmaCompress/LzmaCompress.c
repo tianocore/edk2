@@ -42,7 +42,7 @@ const char *kInvalidParamValMessage = "Invalid parameter value";
 static Bool mQuietMode = False;
 static CONVERTER_TYPE mConType = NoConverter;
 
-UINT64 mDictionarySize = 31;
+UINT64 mDictionarySize = 28;
 UINT64 mCompressionMode = 2;
 
 #define UTILITY_NAME "LzmaCompress"
@@ -64,7 +64,7 @@ void PrintHelp(char *buffer)
              "  -q, --quiet: reduce output messages\n"
              "  --debug [0-9]: set debug level\n"
              "  -a: set compression mode 0 = fast, 1 = normal, default: 1 (normal)\n"
-             "  d: sets Dictionary size - [0, 30], default: 23 (8MB)\n"
+             "  d: sets Dictionary size - [0, 27], default: 24 (16MB)\n"
              "  --version: display the program version and exit\n"
              "  -h, --help: display this help text\n"
              );
@@ -298,8 +298,12 @@ int main2(int numArgs, const char *args[], char *rs)
       }
     } else if (strcmp(args[param], "d") == 0) {
       AsciiStringToUint64(args[param + 1],FALSE,&mDictionarySize);
-      if (mDictionarySize <= 30){
-        props.dictSize = (UINT32)mDictionarySize;
+      if (mDictionarySize <= 27) {
+        if (mDictionarySize == 0) {
+          props.dictSize = 0;
+        } else {
+          props.dictSize = (1 << mDictionarySize);
+        }
         param++;
         continue;
       } else {
