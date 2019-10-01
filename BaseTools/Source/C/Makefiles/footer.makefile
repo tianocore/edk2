@@ -14,10 +14,10 @@ $(MAKEROOT)/libs-$(HOST_ARCH):
 install: $(MAKEROOT)/libs-$(HOST_ARCH) $(LIBRARY)
 	cp $(LIBRARY) $(MAKEROOT)/libs-$(HOST_ARCH)
 
-$(LIBRARY): $(OBJECTS) 
+$(LIBRARY): $(OBJECTS)
 	$(BUILD_AR) crs $@ $^
 
-%.o : %.c 
+%.o : %.c
 	$(BUILD_CC)  -c $(BUILD_CPPFLAGS) $(BUILD_CFLAGS) $< -o $@
 
 %.o : %.cpp

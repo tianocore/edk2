@@ -36,9 +36,9 @@ include $(MAKEROOT)/Makefiles/header.makefile
 APPLICATION = $(MAKEROOT)/bin/$(APPNAME)
 
 .PHONY:all
-all: $(MAKEROOT)/bin $(APPLICATION) 
+all: $(MAKEROOT)/bin $(APPLICATION)
 
-$(APPLICATION): $(OBJECTS) 
+$(APPLICATION): $(OBJECTS)
 	$(LINKER) -o $(APPLICATION) $(VFR_LFLAGS) $(OBJECTS) -L$(MAKEROOT)/libs $(LIBS)
 
 VfrCompiler.o: ../Include/Common/BuildVersion.h
@@ -68,7 +68,7 @@ AParser.o: Pccts/h/AParser.cpp
 
 VfrSyntax.o: VfrSyntax.cpp
 	$(BUILD_CXX) -c $(VFR_CPPFLAGS) $(INC) $(VFR_CXXFLAGS) $? -o $@
-	
+
 clean: localClean
 
 localClean:

@@ -77,7 +77,7 @@ $(SUBDIRS):
 $(patsubst %,%-clean,$(sort $(SUBDIRS))):
 	-$(MAKE) -C $(@:-clean=) clean
 
-$(VFRAUTOGEN): VfrCompile/VfrSyntax.g 
+$(VFRAUTOGEN): VfrCompile/VfrSyntax.g
 	$(MAKE) -C VfrCompile VfrLexer.h
 
 clean:  $(patsubst %,%-clean,$(sort $(SUBDIRS)))

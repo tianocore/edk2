@@ -12,9 +12,9 @@ include $(MAKEROOT)/Makefiles/header.makefile
 APPLICATION = $(MAKEROOT)/bin/$(APPNAME)
 
 .PHONY:all
-all: $(MAKEROOT)/bin $(APPLICATION) 
+all: $(MAKEROOT)/bin $(APPLICATION)
 
-$(APPLICATION): $(OBJECTS) 
+$(APPLICATION): $(OBJECTS)
 	$(LINKER) -o $(APPLICATION) $(BUILD_LFLAGS) $(OBJECTS) -L$(MAKEROOT)/libs $(LIBS)
 
 $(OBJECTS): $(MAKEROOT)/Include/Common/BuildVersion.h

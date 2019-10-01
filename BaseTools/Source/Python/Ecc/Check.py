@@ -265,7 +265,7 @@ class Check(object):
         self.FunctionLayoutCheckBody()
         self.FunctionLayoutCheckLocalVariable()
         self.FunctionLayoutCheckDeprecated()
-    
+
     # To check if the deprecated functions are used
     def FunctionLayoutCheckDeprecated(self):
         if EccGlobalData.gConfig.CFunctionLayoutCheckNoDeprecated == '1' or EccGlobalData.gConfig.CFunctionLayoutCheckAll == '1' or EccGlobalData.gConfig.CheckAll == '1':
