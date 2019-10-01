@@ -8,6 +8,6 @@
 all:
 
 clean:
-cleanall:  
+cleanall:
   @del /f /q $(BASE_TOOLS_PATH)\Source\Python\*.pyc
 

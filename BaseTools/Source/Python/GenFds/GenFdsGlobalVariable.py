@@ -160,7 +160,7 @@ class GenFdsGlobalVariable:
         "OUTPUT_DIR":os.path.join(BuildDir, "OUTPUT"),
         "DEBUG_DIR":os.path.join(BuildDir, "DEBUG")
         }
-        
+
         BuildRules = {}
         for Type in BuildRuleDatabase.FileTypeList:
             #first try getting build rule by BuildRuleFamily
