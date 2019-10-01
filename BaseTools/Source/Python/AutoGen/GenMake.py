@@ -637,13 +637,11 @@ cleanlib:
         while not found and os.sep in package_rel_dir:
             index = package_rel_dir.index(os.sep)
             current_dir = mws.join(current_dir, package_rel_dir[:index])
-            try:
+            if os.path.exists(current_dir):
                 for fl in os.listdir(current_dir):
                     if fl.endswith('.dec'):
                         found = True
                         break
-            except:
-                EdkLogger.error('build', FILE_NOT_FOUND, "WORKSPACE does not exist.")
             package_rel_dir = package_rel_dir[index + 1:]
 
         MakefileTemplateDict = {
