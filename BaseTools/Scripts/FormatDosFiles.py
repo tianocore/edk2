@@ -53,6 +53,7 @@ def FormatFilesInDir(DirPath, ExtList, Args):
             FileNames[:] = [f for f in FileNames if f not in Args.Exclude]
             Continue = False
             for Path in Args.Exclude:
+                Path = Path.strip('\\').strip('/')
                 if not os.path.isdir(Path) and not os.path.isfile(Path):
                     Path = os.path.join(ExcludeDir, Path)
                 if os.path.isdir(Path) and Path.endswith(DirPath):

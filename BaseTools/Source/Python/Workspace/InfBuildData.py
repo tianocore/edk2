@@ -156,8 +156,7 @@ class InfBuildData(ModuleBuildClassObject):
         self._DependencyFileList = None
         self.LibInstances = []
         self.ReferenceModules = set()
-        self.Guids
-        self.Pcds
+
     def SetReferenceModule(self,Module):
         self.ReferenceModules.add(Module)
         return self
@@ -656,6 +655,20 @@ class InfBuildData(ModuleBuildClassObject):
             RetVal[CName] = Value
             CommentRecords = self._RawData[MODEL_META_DATA_COMMENT, self._Arch, self._Platform, Record[5]]
             self._GuidComments[CName] = [a[0] for a in CommentRecords]
+
+        for Type in [MODEL_PCD_FIXED_AT_BUILD,MODEL_PCD_PATCHABLE_IN_MODULE,MODEL_PCD_FEATURE_FLAG,MODEL_PCD_DYNAMIC,MODEL_PCD_DYNAMIC_EX]:
+            RecordList = self._RawData[Type, self._Arch, self._Platform]
+            for TokenSpaceGuid, _, _, _, _, _, LineNo in RecordList:
+                # get the guid value
+                if TokenSpaceGuid not in RetVal:
+                    Value = GuidValue(TokenSpaceGuid, self.Packages, self.MetaFile.Path)
+                    if Value is None:
+                        PackageList = "\n\t".join(str(P) for P in self.Packages)
+                        EdkLogger.error('build', RESOURCE_NOT_AVAILABLE,
+                                        "Value of Guid [%s] is not found under [Guids] section in" % TokenSpaceGuid,
+                                        ExtraData=PackageList, File=self.MetaFile, Line=LineNo)
+                    RetVal[TokenSpaceGuid] = Value
+                    self._GuidsUsedByPcd[TokenSpaceGuid] = Value
         return RetVal
 
     ## Retrieve include paths necessary for this module (for Edk.x style of modules)
@@ -858,7 +871,7 @@ class InfBuildData(ModuleBuildClassObject):
         return pkg
     @cached_class_function
     def GetGuidsUsedByPcd(self):
-        self.Pcds
+        self.Guid
         return self._GuidsUsedByPcd
 
     ## Retrieve PCD for given type
@@ -870,16 +883,6 @@ class InfBuildData(ModuleBuildClassObject):
         for TokenSpaceGuid, PcdCName, Setting, Arch, Platform, Id, LineNo in RecordList:
             PcdDict[Arch, Platform, PcdCName, TokenSpaceGuid] = (Setting, LineNo)
             PcdList.append((PcdCName, TokenSpaceGuid))
-            # get the guid value
-            if TokenSpaceGuid not in self.Guids:
-                Value = GuidValue(TokenSpaceGuid, self.Packages, self.MetaFile.Path)
-                if Value is None:
-                    PackageList = "\n\t".join(str(P) for P in self.Packages)
-                    EdkLogger.error('build', RESOURCE_NOT_AVAILABLE,
-                                    "Value of Guid [%s] is not found under [Guids] section in" % TokenSpaceGuid,
-                                    ExtraData=PackageList, File=self.MetaFile, Line=LineNo)
-                self.Guids[TokenSpaceGuid] = Value
-                self._GuidsUsedByPcd[TokenSpaceGuid] = Value
             CommentRecords = self._RawData[MODEL_META_DATA_COMMENT, self._Arch, self._Platform, Id]
             Comments = []
             for CmtRec in CommentRecords:

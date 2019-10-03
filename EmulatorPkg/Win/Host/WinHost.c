@@ -20,6 +20,25 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #endif
 
 //
+// The growth size for array of module handle entries
+//
+#define MAX_PDB_NAME_TO_MOD_HANDLE_ARRAY_SIZE 0x100
+
+//
+// Module handle entry structure
+//
+typedef struct {
+  CHAR8   *PdbPointer;
+  VOID    *ModHandle;
+} PDB_NAME_TO_MOD_HANDLE;
+
+//
+// An Array to hold the module handles
+//
+PDB_NAME_TO_MOD_HANDLE  *mPdbNameModHandleArray = NULL;
+UINTN                   mPdbNameModHandleArraySize = 0;
+
+//
 // Default information about where the FD is located.
 //  This array gets filled in with information from PcdWinNtFirmwareVolume
 //  The number of array elements is allocated base on parsing
@@ -389,7 +408,7 @@ Returns:
   MemorySizeStr      = (CHAR16 *) PcdGetPtr (PcdEmuMemorySize);
   FirmwareVolumesStr = (CHAR16 *) PcdGetPtr (PcdEmuFirmwareVolume);
 
-  SecPrint ("\nEDK II WIN Host Emulation Environment from http://www.tianocore.org/edk2/\n");
+  SecPrint ("\n\rEDK II WIN Host Emulation Environment from http://www.tianocore.org/edk2/\n\r");
 
   //
   // Determine the first thread available to this process.
@@ -431,7 +450,7 @@ Returns:
   gSystemMemoryCount  = CountSeparatorsInString (MemorySizeStr, '!') + 1;
   gSystemMemory       = calloc (gSystemMemoryCount, sizeof (NT_SYSTEM_MEMORY));
   if (gSystemMemory == NULL) {
-    SecPrint ("ERROR : Can not allocate memory for %S.  Exiting.\n", MemorySizeStr);
+    SecPrint ("ERROR : Can not allocate memory for %S.  Exiting.\n\r", MemorySizeStr);
     exit (1);
   }
 
@@ -441,13 +460,13 @@ Returns:
   gFdInfoCount  = CountSeparatorsInString (FirmwareVolumesStr, '!') + 1;
   gFdInfo       = calloc (gFdInfoCount, sizeof (NT_FD_INFO));
   if (gFdInfo == NULL) {
-    SecPrint ("ERROR : Can not allocate memory for %S.  Exiting.\n", FirmwareVolumesStr);
+    SecPrint ("ERROR : Can not allocate memory for %S.  Exiting.\n\r", FirmwareVolumesStr);
     exit (1);
   }
   //
   // Setup Boot Mode.
   //
-  SecPrint ("  BootMode 0x%02x\n", PcdGet32 (PcdEmuBootMode));
+  SecPrint ("  BootMode 0x%02x\n\r", PcdGet32 (PcdEmuBootMode));
 
   //
   //  Allocate 128K memory to emulate temp memory for PEI.
@@ -457,12 +476,12 @@ Returns:
   TemporaryRamSize = TEMPORARY_RAM_SIZE;
   TemporaryRam     = VirtualAlloc (NULL, (SIZE_T) (TemporaryRamSize), MEM_COMMIT, PAGE_EXECUTE_READWRITE);
   if (TemporaryRam == NULL) {
-    SecPrint ("ERROR : Can not allocate enough space for SecStack\n");
+    SecPrint ("ERROR : Can not allocate enough space for SecStack\n\r");
     exit (1);
   }
   SetMem32 (TemporaryRam, TemporaryRamSize, PcdGet32 (PcdInitValueInTempStack));
 
-  SecPrint ("  OS Emulator passing in %u KB of temp RAM at 0x%08lx to SEC\n",
+  SecPrint ("  OS Emulator passing in %u KB of temp RAM at 0x%08lx to SEC\n\r",
     TemporaryRamSize / SIZE_1KB,
     TemporaryRam
     );
@@ -484,7 +503,7 @@ Returns:
               &Size
               );
     if (EFI_ERROR (Status)) {
-      SecPrint ("ERROR : Could not allocate PeiServicesTablePage @ %p\n", EmuMagicPage);
+      SecPrint ("ERROR : Could not allocate PeiServicesTablePage @ %p\n\r", EmuMagicPage);
       return EFI_DEVICE_ERROR;
     }
   }
@@ -495,7 +514,7 @@ Returns:
   //
   FileNamePtr = AllocateCopyPool (StrSize (FirmwareVolumesStr), FirmwareVolumesStr);
   if (FileNamePtr == NULL) {
-    SecPrint ("ERROR : Can not allocate memory for firmware volume string\n");
+    SecPrint ("ERROR : Can not allocate memory for firmware volume string\n\r");
     exit (1);
   }
 
@@ -521,11 +540,11 @@ Returns:
               &gFdInfo[Index].Size
               );
     if (EFI_ERROR (Status)) {
-      SecPrint ("ERROR : Can not open Firmware Device File %S (0x%X).  Exiting.\n", FileName, Status);
+      SecPrint ("ERROR : Can not open Firmware Device File %S (0x%X).  Exiting.\n\r", FileName, Status);
       exit (1);
     }
 
-    SecPrint ("  FD loaded from %S\n", FileName);
+    SecPrint ("  FD loaded from %S", FileName);
 
     if (SecFile == NULL) {
       //
@@ -546,7 +565,7 @@ Returns:
       }
     }
 
-    SecPrint ("\n");
+    SecPrint ("\n\r");
   }
   //
   // Calculate memory regions and store the information in the gSystemMemory
@@ -571,7 +590,7 @@ Returns:
     MemorySizeStr = MemorySizeStr + Index1 + 1;
   }
 
-  SecPrint ("\n");
+  SecPrint ("\n\r");
 
   //
   // Hand off to SEC Core
@@ -582,7 +601,7 @@ Returns:
   // If we get here, then the SEC Core returned. This is an error as SEC should
   //  always hand off to PEI Core and then on to DXE Core.
   //
-  SecPrint ("ERROR : SEC returned\n");
+  SecPrint ("ERROR : SEC returned\n\r");
   exit (1);
 }
 
@@ -840,6 +859,120 @@ Returns:
   return Count;
 }
 
+/**
+  Store the ModHandle in an array indexed by the Pdb File name.
+  The ModHandle is needed to unload the image.
+  @param ImageContext - Input data returned from PE Laoder Library. Used to find the
+                 .PDB file name of the PE Image.
+  @param ModHandle    - Returned from LoadLibraryEx() and stored for call to
+                 FreeLibrary().
+  @return   return EFI_SUCCESS when ModHandle was stored.
+--*/
+EFI_STATUS
+AddModHandle (
+  IN  PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext,
+  IN  VOID                                 *ModHandle
+  )
+
+{
+  UINTN                   Index;
+  PDB_NAME_TO_MOD_HANDLE  *Array;
+  UINTN                   PreviousSize;
+  PDB_NAME_TO_MOD_HANDLE  *TempArray;
+  HANDLE                  Handle;
+  UINTN                   Size;
+
+  //
+  // Return EFI_ALREADY_STARTED if this DLL has already been loaded
+  //
+  Array = mPdbNameModHandleArray;
+  for (Index = 0; Index < mPdbNameModHandleArraySize; Index++, Array++) {
+    if (Array->PdbPointer != NULL && Array->ModHandle == ModHandle) {
+      return EFI_ALREADY_STARTED;
+    }
+  }
+
+  Array = mPdbNameModHandleArray;
+  for (Index = 0; Index < mPdbNameModHandleArraySize; Index++, Array++) {
+    if (Array->PdbPointer == NULL) {
+      //
+      // Make a copy of the stirng and store the ModHandle
+      //
+      Handle = GetProcessHeap ();
+      Size = AsciiStrLen (ImageContext->PdbPointer) + 1;
+      Array->PdbPointer = HeapAlloc ( Handle, HEAP_ZERO_MEMORY, Size);
+      ASSERT (Array->PdbPointer != NULL);
+
+      AsciiStrCpyS (Array->PdbPointer, Size, ImageContext->PdbPointer);
+      Array->ModHandle = ModHandle;
+      return EFI_SUCCESS;
+    }
+  }
+
+  //
+  // No free space in mPdbNameModHandleArray so grow it by
+  // MAX_PDB_NAME_TO_MOD_HANDLE_ARRAY_SIZE entires.
+  //
+  PreviousSize = mPdbNameModHandleArraySize * sizeof (PDB_NAME_TO_MOD_HANDLE);
+  mPdbNameModHandleArraySize += MAX_PDB_NAME_TO_MOD_HANDLE_ARRAY_SIZE;
+  //
+  // re-allocate a new buffer and copy the old values to the new locaiton.
+  //
+  TempArray = HeapAlloc (GetProcessHeap (),
+                                HEAP_ZERO_MEMORY,
+                                mPdbNameModHandleArraySize * sizeof (PDB_NAME_TO_MOD_HANDLE)
+                               );
+
+  CopyMem ((VOID *) (UINTN) TempArray, (VOID *) (UINTN)mPdbNameModHandleArray, PreviousSize);
+
+  HeapFree (GetProcessHeap (), 0, mPdbNameModHandleArray);
+
+  mPdbNameModHandleArray = TempArray;
+  if (mPdbNameModHandleArray == NULL) {
+    ASSERT (FALSE);
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  return AddModHandle (ImageContext, ModHandle);
+}
+
+/**
+  Return the ModHandle and delete the entry in the array.
+   @param  ImageContext - Input data returned from PE Laoder Library. Used to find the
+                 .PDB file name of the PE Image.
+  @return
+    ModHandle - ModHandle assoicated with ImageContext is returned
+    NULL      - No ModHandle associated with ImageContext
+**/
+VOID *
+RemoveModHandle (
+  IN  PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext
+  )
+{
+  UINTN                   Index;
+  PDB_NAME_TO_MOD_HANDLE  *Array;
+
+  if (ImageContext->PdbPointer == NULL) {
+    //
+    // If no PDB pointer there is no ModHandle so return NULL
+    //
+    return NULL;
+  }
+
+  Array = mPdbNameModHandleArray;
+  for (Index = 0; Index < mPdbNameModHandleArraySize; Index++, Array++) {
+    if ((Array->PdbPointer != NULL) && (AsciiStrCmp(Array->PdbPointer, ImageContext->PdbPointer) == 0)) {
+      //
+      // If you find a match return it and delete the entry
+      //
+      HeapFree (GetProcessHeap (), 0, Array->PdbPointer);
+      Array->PdbPointer = NULL;
+      return Array->ModHandle;
+    }
+  }
+
+  return NULL;
+}
 
 VOID
 EFIAPI
@@ -847,6 +980,7 @@ PeCoffLoaderRelocateImageExtraAction (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext
   )
 {
+  EFI_STATUS        Status;
   VOID              *DllEntryPoint;
   CHAR16            *DllFileName;
   HMODULE           Library;
@@ -855,7 +989,7 @@ PeCoffLoaderRelocateImageExtraAction (
   ASSERT (ImageContext != NULL);
   //
   // If we load our own PE COFF images the Windows debugger can not source
-  //  level debug our code. If a valid PDB pointer exists usw it to load
+  //  level debug our code. If a valid PDB pointer exists use it to load
   //  the *.dll file as a library using Windows* APIs. This allows
   //  source level debug. The image is still loaded and relocated
   //  in the Framework memory space like on a real system (by the code above),
@@ -913,10 +1047,22 @@ PeCoffLoaderRelocateImageExtraAction (
     }
 
     if ((Library != NULL) && (DllEntryPoint != NULL)) {
-      ImageContext->EntryPoint  = (EFI_PHYSICAL_ADDRESS) (UINTN) DllEntryPoint;
-      SecPrint ("LoadLibraryEx (%S,\n               NULL, DONT_RESOLVE_DLL_REFERENCES)\n", DllFileName);
+      Status = AddModHandle (ImageContext, Library);
+      if (Status == EFI_ALREADY_STARTED) {
+        //
+        // If the DLL has already been loaded before, then this instance of the DLL can not be debugged.
+        //
+        ImageContext->PdbPointer = NULL;
+        SecPrint ("WARNING: DLL already loaded.  No source level debug %S.\n\r", DllFileName);
+      } else {
+        //
+        // This DLL is not already loaded, so source level debugging is supported.
+        //
+        ImageContext->EntryPoint  = (EFI_PHYSICAL_ADDRESS) (UINTN) DllEntryPoint;
+        SecPrint ("LoadLibraryEx (\n\r  %S,\n\r  NULL, DONT_RESOLVE_DLL_REFERENCES)\n\r", DllFileName);
+      }
     } else {
-      SecPrint ("WARNING: No source level debug %S. \n", DllFileName);
+      SecPrint ("WARNING: No source level debug %S. \n\r", DllFileName);
     }
 
     free (DllFileName);
@@ -926,12 +1072,21 @@ PeCoffLoaderRelocateImageExtraAction (
 VOID
 EFIAPI
 PeCoffLoaderUnloadImageExtraAction (
-  IN PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext
+  IN PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
 )
 {
-  ASSERT (ImageContext != NULL);
-}
+  VOID  *ModHandle;
 
+  ASSERT (ImageContext != NULL);
+
+  ModHandle = RemoveModHandle (ImageContext);
+  if (ModHandle != NULL) {
+    FreeLibrary (ModHandle);
+    SecPrint ("FreeLibrary (\n\r  %s)\n\r", ImageContext->PdbPointer);
+  } else {
+    SecPrint ("WARNING: Unload image without source level debug\n\r");
+  }
+}
 
 VOID
 _ModuleEntryPoint (

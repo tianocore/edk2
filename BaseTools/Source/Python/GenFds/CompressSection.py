@@ -49,7 +49,7 @@ class CompressSection (CompressSectionClassObject) :
     #   @param  Dict        dictionary contains macro and its value
     #   @retval tuple       (Generated file name, section alignment)
     #
-    def GenSection(self, OutputPath, ModuleName, SecNum, KeyStringList, FfsInf = None, Dict = {}, IsMakefile = False):
+    def GenSection(self, OutputPath, ModuleName, SecNum, KeyStringList, FfsInf = None, Dict = None, IsMakefile = False):
 
         if FfsInf is not None:
             self.CompType = FfsInf.__ExtendMacro__(self.CompType)
@@ -59,6 +59,8 @@ class CompressSection (CompressSectionClassObject) :
         SectAlign = []
         Index = 0
         MaxAlign = None
+        if Dict is None:
+            Dict = {}
         for Sect in self.SectionList:
             Index = Index + 1
             SecIndex = '%s.%d' %(SecNum, Index)

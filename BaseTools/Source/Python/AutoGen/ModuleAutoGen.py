@@ -1267,29 +1267,30 @@ class ModuleAutoGen(AutoGen):
     @cached_property
     def OutputFile(self):
         retVal = set()
+
         OutputDir = self.OutputDir.replace('\\', '/').strip('/')
         DebugDir = self.DebugDir.replace('\\', '/').strip('/')
-        FfsOutputDir = self.FfsOutputDir.replace('\\', '/').rstrip('/')
         for Item in self.CodaTargetList:
             File = Item.Target.Path.replace('\\', '/').strip('/').replace(DebugDir, '').replace(OutputDir, '').strip('/')
-            retVal.add(File)
-        if self.DepexGenerated:
-            retVal.add(self.Name + '.depex')
+            NewFile = path.join(self.OutputDir, File)
+            retVal.add(NewFile)
 
         Bin = self._GenOffsetBin()
         if Bin:
-            retVal.add(Bin)
+            NewFile = path.join(self.OutputDir, Bin)
+            retVal.add(NewFile)
 
-        for Root, Dirs, Files in os.walk(OutputDir):
+        for Root, Dirs, Files in os.walk(self.OutputDir):
             for File in Files:
-                if File.lower().endswith('.pdb'):
-                    retVal.add(File)
+                # lib file is already added through above CodaTargetList, skip it here
+                if not (File.lower().endswith('.obj') or File.lower().endswith('.lib')):
+                    NewFile = path.join(self.OutputDir, File)
+                    retVal.add(NewFile)
 
-        for Root, Dirs, Files in os.walk(FfsOutputDir):
+        for Root, Dirs, Files in os.walk(self.FfsOutputDir):
             for File in Files:
-                if File.lower().endswith('.ffs') or File.lower().endswith('.offset') or File.lower().endswith('.raw') \
-                    or File.lower().endswith('.raw.txt'):
-                    retVal.add(File)
+                NewFile = path.join(self.FfsOutputDir, File)
+                retVal.add(NewFile)
 
         return retVal
 
@@ -1659,15 +1660,8 @@ class ModuleAutoGen(AutoGen):
             Ma = self.BuildDatabase[self.MetaFile, self.Arch, self.BuildTarget, self.ToolChain]
             self.OutputFile = Ma.Binaries
         for File in self.OutputFile:
-            File = str(File)
-            if not os.path.isabs(File):
-                NewFile = os.path.join(self.OutputDir, File)
-                if not os.path.exists(NewFile):
-                    NewFile = os.path.join(self.FfsOutputDir, File)
-                File = NewFile
             if os.path.exists(File):
-                if File.lower().endswith('.ffs') or File.lower().endswith('.offset') or File.lower().endswith('.raw') \
-                    or File.lower().endswith('.raw.txt'):
+                if File.startswith(os.path.abspath(self.FfsOutputDir)+os.sep):
                     self.CacheCopyFile(FfsDir, self.FfsOutputDir, File)
                 else:
                     self.CacheCopyFile(FileDir, self.OutputDir, File)
@@ -1766,12 +1760,8 @@ class ModuleAutoGen(AutoGen):
 
             if os.path.exists (self.TimeStampPath):
                 os.remove (self.TimeStampPath)
-            with tempfile.NamedTemporaryFile('w+', dir=os.path.dirname(self.TimeStampPath), delete=False) as tf:
-                for f in FileSet:
-                    tf.write(f)
-                    tf.write("\n")
-                tempname = tf.name
-            SaveFileOnChange(self.TimeStampPath, tempname, False)
+
+            SaveFileOnChange(self.TimeStampPath, "\n".join(FileSet), False)
 
         # Ignore generating makefile when it is a binary module
         if self.IsBinaryModule:
@@ -1853,7 +1843,7 @@ class ModuleAutoGen(AutoGen):
         # CanSkip uses timestamps to determine build skipping
         if self.CanSkip():
             return
-
+        self.LibraryAutoGenList
         AutoGenList = []
         IgoredAutoGenList = []
 
@@ -2070,8 +2060,8 @@ class ModuleAutoGen(AutoGen):
 
         if not (self.MetaFile.Path, self.Arch) in gDict or \
            not gDict[(self.MetaFile.Path, self.Arch)].ModuleFilesHashDigest:
-           EdkLogger.quiet("[cache warning]: Cannot generate ModuleFilesHashDigest for module %s[%s]" %(self.MetaFile.Path, self.Arch))
-           return
+            EdkLogger.quiet("[cache warning]: Cannot generate ModuleFilesHashDigest for module %s[%s]" %(self.MetaFile.Path, self.Arch))
+            return
 
         # Initialze hash object
         m = hashlib.md5()
@@ -2133,7 +2123,7 @@ class ModuleAutoGen(AutoGen):
             self.CreateCodeFile()
         if not (self.MetaFile.Path, self.Arch) in gDict or \
            not gDict[(self.MetaFile.Path, self.Arch)].CreateMakeFileDone:
-            self.CreateMakeFile(GenFfsList=GlobalData.FfsCmd.get((self.MetaFile.File, self.Arch),[]))
+            self.CreateMakeFile(GenFfsList=GlobalData.FfsCmd.get((self.MetaFile.Path, self.Arch),[]))
 
         if not (self.MetaFile.Path, self.Arch) in gDict or \
            not gDict[(self.MetaFile.Path, self.Arch)].CreateCodeFileDone or \

@@ -2,7 +2,7 @@
   SCSI Bus driver that layers on every SCSI Pass Thru and
   Extended SCSI Pass Thru protocol in the system.
 
-Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -1368,7 +1368,8 @@ DiscoverScsiDevice (
     goto Done;
   }
 
-  if (0x1e >= InquiryData->Peripheral_Type && InquiryData->Peripheral_Type >= 0xa) {
+  if ((InquiryData->Peripheral_Type >= EFI_SCSI_TYPE_RESERVED_LOW) &&
+      (InquiryData->Peripheral_Type <= EFI_SCSI_TYPE_RESERVED_HIGH)) {
     ScsiDeviceFound = FALSE;
     goto Done;
   }

@@ -5,7 +5,7 @@
     LzmaUtil.c -- Test application for LZMA compression
     2018-04-30 : Igor Pavlov : Public domain
 
-  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -23,6 +23,7 @@
 #include "Sdk/C/LzmaEnc.h"
 #include "Sdk/C/Bra.h"
 #include "CommonLib.h"
+#include "ParseInf.h"
 
 #define LZMA_HEADER_SIZE (LZMA_PROPS_SIZE + 8)
 
@@ -36,9 +37,13 @@ const char *kCantReadMessage = "Can not read input file";
 const char *kCantWriteMessage = "Can not write output file";
 const char *kCantAllocateMessage = "Can not allocate memory";
 const char *kDataErrorMessage = "Data error";
+const char *kInvalidParamValMessage = "Invalid parameter value";
 
 static Bool mQuietMode = False;
 static CONVERTER_TYPE mConType = NoConverter;
+
+UINT64 mDictionarySize = 28;
+UINT64 mCompressionMode = 2;
 
 #define UTILITY_NAME "LzmaCompress"
 #define UTILITY_MAJOR_VERSION 0
@@ -58,6 +63,8 @@ void PrintHelp(char *buffer)
              "  -v, --verbose: increase output messages\n"
              "  -q, --quiet: reduce output messages\n"
              "  --debug [0-9]: set debug level\n"
+             "  -a: set compression mode 0 = fast, 1 = normal, default: 1 (normal)\n"
+             "  d: sets Dictionary size - [0, 27], default: 24 (16MB)\n"
              "  --version: display the program version and exit\n"
              "  -h, --help: display this help text\n"
              );
@@ -87,7 +94,7 @@ void PrintVersion(char *buffer)
   sprintf (buffer, "%s Version %d.%d %s ", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION, __BUILD_VERSION);
 }
 
-static SRes Encode(ISeqOutStream *outStream, ISeqInStream *inStream, UInt64 fileSize)
+static SRes Encode(ISeqOutStream *outStream, ISeqInStream *inStream, UInt64 fileSize, CLzmaEncProps *props)
 {
   SRes res;
   size_t inSize = (size_t)fileSize;
@@ -95,10 +102,6 @@ static SRes Encode(ISeqOutStream *outStream, ISeqInStream *inStream, UInt64 file
   Byte *outBuffer = 0;
   Byte *filteredStream = 0;
   size_t outSize;
-  CLzmaEncProps props;
-
-  LzmaEncProps_Init(&props);
-  LzmaEncProps_Normalize(&props);
 
   if (inSize != 0) {
     inBuffer = (Byte *)MyAlloc(inSize);
@@ -151,7 +154,7 @@ static SRes Encode(ISeqOutStream *outStream, ISeqInStream *inStream, UInt64 file
 
     res = LzmaEncode(outBuffer + LZMA_HEADER_SIZE, &outSizeProcessed,
         mConType != NoConverter ? filteredStream : inBuffer, inSize,
-        &props, outBuffer, &outPropsSize, 0,
+        props, outBuffer, &outPropsSize, 0,
         NULL, &g_Alloc, &g_Alloc);
 
     if (res != SZ_OK)
@@ -246,6 +249,10 @@ int main2(int numArgs, const char *args[], char *rs)
   const char *outputFile = "file.tmp";
   int param;
   UInt64 fileSize;
+  CLzmaEncProps props;
+
+  LzmaEncProps_Init(&props);
+  LzmaEncProps_Normalize(&props);
 
   FileSeqInStream_CreateVTable(&inStream);
   File_Construct(&inStream.file);
@@ -280,6 +287,28 @@ int main2(int numArgs, const char *args[], char *rs)
       // parameter compatibility with other build tools.
       //
       param++;
+    } else if (strcmp(args[param], "-a") == 0) {
+      AsciiStringToUint64(args[param + 1],FALSE,&mCompressionMode);
+      if ((mCompressionMode == 0)||(mCompressionMode == 1)){
+        props.algo = (int)mCompressionMode;
+        param++;
+        continue;
+      } else {
+        return PrintError(rs, kInvalidParamValMessage);
+      }
+    } else if (strcmp(args[param], "d") == 0) {
+      AsciiStringToUint64(args[param + 1],FALSE,&mDictionarySize);
+      if (mDictionarySize <= 27) {
+        if (mDictionarySize == 0) {
+          props.dictSize = 0;
+        } else {
+          props.dictSize = (1 << mDictionarySize);
+        }
+        param++;
+        continue;
+      } else {
+        return PrintError(rs, kInvalidParamValMessage);
+      }
     } else if (
                 strcmp(args[param], "-h") == 0 ||
                 strcmp(args[param], "--help") == 0
@@ -335,7 +364,7 @@ int main2(int numArgs, const char *args[], char *rs)
     if (!mQuietMode) {
       printf("Encoding\n");
     }
-    res = Encode(&outStream.vt, &inStream.vt, fileSize);
+    res = Encode(&outStream.vt, &inStream.vt, fileSize, &props);
   }
   else
   {

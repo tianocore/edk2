@@ -41,21 +41,21 @@
   typedef signed char         INT8;
 #else
   //
-  // Assume standard AARCH64 alignment.
+  // Use ANSI C 2000 stdint.h integer width declarations
   //
-  typedef unsigned long long  UINT64;
-  typedef long long           INT64;
-  typedef unsigned int        UINT32;
-  typedef int                 INT32;
-  typedef unsigned short      UINT16;
-  typedef unsigned short      CHAR16;
-  typedef short               INT16;
-  typedef unsigned char       BOOLEAN;
-  typedef unsigned char       UINT8;
-  typedef char                CHAR8;
-  typedef signed char         INT8;
+  #include <stdint.h>
+  typedef uint8_t   BOOLEAN;
+  typedef int8_t    INT8;
+  typedef uint8_t   UINT8;
+  typedef int16_t   INT16;
+  typedef uint16_t  UINT16;
+  typedef int32_t   INT32;
+  typedef uint32_t  UINT32;
+  typedef int64_t   INT64;
+  typedef uint64_t  UINT64;
+  typedef char      CHAR8;
+  typedef uint16_t  CHAR16;
 
-  #define UINT8_MAX 0xff
 #endif
 
 ///

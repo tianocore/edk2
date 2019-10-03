@@ -1111,6 +1111,7 @@ Returns:
   time_t                           InputFileTime;
   time_t                           OutputFileTime;
   struct stat                      Stat_Buf;
+  BOOLEAN                          ZeroDebugFlag;
 
   SetUtilityName (UTILITY_NAME);
 
@@ -1158,6 +1159,7 @@ Returns:
   NegativeAddr           = FALSE;
   InputFileTime          = 0;
   OutputFileTime         = 0;
+  ZeroDebugFlag          = FALSE;
 
   if (argc == 1) {
     Error (NULL, 0, 1001, "Missing options", "No input options.");
@@ -1197,6 +1199,9 @@ Returns:
         goto Finish;
       }
       ModuleType = argv[1];
+      if (mOutImageType == FW_ZERO_DEBUG_IMAGE) {
+        ZeroDebugFlag = TRUE;
+      }
       if (mOutImageType != FW_TE_IMAGE) {
         mOutImageType = FW_EFI_IMAGE;
       }
@@ -1220,6 +1225,9 @@ Returns:
     }
 
     if ((stricmp (argv[0], "-t") == 0) || (stricmp (argv[0], "--terse") == 0)) {
+      if (mOutImageType == FW_ZERO_DEBUG_IMAGE) {
+        ZeroDebugFlag = TRUE;
+      }
       mOutImageType = FW_TE_IMAGE;
       argc --;
       argv ++;
@@ -1241,7 +1249,12 @@ Returns:
     }
 
     if ((stricmp (argv[0], "-z") == 0) || (stricmp (argv[0], "--zero") == 0)) {
-      mOutImageType = FW_ZERO_DEBUG_IMAGE;
+      if (mOutImageType == FW_DUMMY_IMAGE) {
+        mOutImageType = FW_ZERO_DEBUG_IMAGE;
+      }
+      if (mOutImageType == FW_TE_IMAGE || mOutImageType == FW_EFI_IMAGE) {
+        ZeroDebugFlag = TRUE;
+      }
       argc --;
       argv ++;
       continue;
@@ -2588,7 +2601,7 @@ Returns:
   //
   // Zero Time/Data field
   //
-  ZeroDebugData (FileBuffer, FALSE);
+  ZeroDebugData (FileBuffer, ZeroDebugFlag);
 
   if (mOutImageType == FW_TE_IMAGE) {
     if ((PeHdr->Pe32.FileHeader.NumberOfSections &~0xFF) || (Type &~0xFF)) {

@@ -130,8 +130,8 @@ M: Liming Gao <liming.gao@intel.com>
 CryptoPkg
 F: CryptoPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/CryptoPkg
-M: Jian Wang <jian.j.wang@intel.com>
-R: Ting Ye <ting.ye@intel.com>
+M: Jian J Wang <jian.j.wang@intel.com>
+R: Xiaoyu Lu <xiaoyux.lu@intel.com>
 
 DynamicTablesPkg
 F: DynamicTablesPkg/
@@ -412,20 +412,19 @@ SecurityPkg
 F: SecurityPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/SecurityPkg
 M: Jiewen Yao <jiewen.yao@intel.com>
-M: Jian Wang <jian.j.wang@intel.com>
+M: Jian J Wang <jian.j.wang@intel.com>
 R: Chao Zhang <chao.b.zhang@intel.com>
 
 ShellPkg
 F: ShellPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/ShellPkg
-M: Jaben Carsey <jaben.carsey@intel.com>
 M: Ray Ni <ray.ni@intel.com>
-R: Zhichao Gao <zhichao.gao@intel.com>
+M: Zhichao Gao <zhichao.gao@intel.com>
 
 Maintainers for stable Shell binaries generation
 when need to publish Shell binaries with edk2 release:
-M: Jaben Carsey <jaben.carsey@intel.com>      (Ia32/X64)
 M: Ray Ni <ray.ni@intel.com>                  (Ia32/X64)
+M: Zhichao Gao <zhichao.gao@intel.com>        (Ia32/X64)
 M: Leif Lindholm <leif.lindholm@linaro.org>   (ARM/AArch64)
 M: Ard Biesheuvel <ard.biesheuvel@linaro.org> (ARM/AArch64)
 

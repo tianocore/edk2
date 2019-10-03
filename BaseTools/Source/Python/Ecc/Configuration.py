@@ -256,7 +256,7 @@ class Configuration(object):
         ## Declarations and Data Types Checking
         self.DeclarationDataTypeCheckAll = 0
 
-        # Check whether no use of int, unsigned, char, void, static, long in any .c, .h or .asl files.
+        # Check whether no use of int, unsigned, char, void, long in any .c, .h or .asl files.
         self.DeclarationDataTypeCheckNoUseCType = 1
         # Check whether the modifiers IN, OUT, OPTIONAL, and UNALIGNED are used only to qualify arguments to a function and should not appear in a data type declaration
         self.DeclarationDataTypeCheckInOutModifier = 1

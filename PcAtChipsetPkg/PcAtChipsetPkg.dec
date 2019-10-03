@@ -4,7 +4,7 @@
 # This package is designed to public interfaces and implementation which follows
 # PcAt defacto standard.
 #
-# Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2019, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) 2017, AMD Inc. All rights reserved.<BR>
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -137,6 +137,10 @@
   ## Specifies RTC Target Register address in I/O space.
   # @Prompt RTC Target Register address
   gPcAtChipsetPkgTokenSpaceGuid.PcdRtcTargetRegister|0x71|UINT8|0x0000001F
+
+  ## RTC Update Timeout Value(microsecond).
+  # @Prompt RTC Update Timeout Value.
+  gPcAtChipsetPkgTokenSpaceGuid.PcdRealTimeClockUpdateTimeout|100000|UINT32|0x00000020
 
 [UserExtensions.TianoCore."ExtraFiles"]
   PcAtChipsetPkgExtra.uni

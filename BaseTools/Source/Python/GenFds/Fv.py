@@ -71,9 +71,11 @@ class FV (object):
     #   @param  MacroDict   macro value pair
     #   @retval string      Generated FV file path
     #
-    def AddToBuffer (self, Buffer, BaseAddress=None, BlockSize= None, BlockNum=None, ErasePloarity='1',  MacroDict = {}, Flag=False):
+    def AddToBuffer (self, Buffer, BaseAddress=None, BlockSize= None, BlockNum=None, ErasePloarity='1',  MacroDict = None, Flag=False):
         if BaseAddress is None and self.UiFvName.upper() + 'fv' in GenFdsGlobalVariable.ImageBinDict:
             return GenFdsGlobalVariable.ImageBinDict[self.UiFvName.upper() + 'fv']
+        if MacroDict is None:
+            MacroDict = {}
 
         #
         # Check whether FV in Capsule is in FD flash region.

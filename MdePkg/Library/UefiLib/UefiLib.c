@@ -641,6 +641,36 @@ EfiTestChildHandle (
 }
 
 /**
+ * This function checks the supported languages list for a target language,
+ * This only supports RFC 4646 Languages.
+ *
+ * @param      SupportedLanguages  The supported languages
+ * @param      TargetLanguage      The target language
+ *
+ * @return     Returns EFI_SUCCESS if the language is supported,
+ *             EFI_UNSUPPORTED otherwise
+ */
+EFI_STATUS
+EFIAPI
+IsLanguageSupported (
+  IN CONST CHAR8 *SupportedLanguages,
+  IN CONST CHAR8 *TargetLanguage
+  )
+{
+  UINTN Index;
+  while (*SupportedLanguages != 0) {
+    for (Index = 0; SupportedLanguages[Index] != 0 && SupportedLanguages[Index] != ';'; Index++);
+    if ((AsciiStrnCmp(SupportedLanguages, TargetLanguage, Index) == 0) && (TargetLanguage[Index] == 0)) {
+      return EFI_SUCCESS;
+    }
+    SupportedLanguages += Index;
+    for (; *SupportedLanguages != 0 && *SupportedLanguages == ';'; SupportedLanguages++);
+  }
+
+  return EFI_UNSUPPORTED;
+}
+
+/**
   This function looks up a Unicode string in UnicodeStringTable.
 
   If Language is a member of SupportedLanguages and a Unicode string is found in
@@ -800,23 +830,18 @@ LookupUnicodeString2 (
   // Make sure Language is in the set of Supported Languages
   //
   Found = FALSE;
-  while (*SupportedLanguages != 0) {
-    if (Iso639Language) {
+  if (Iso639Language) {
+    while (*SupportedLanguages != 0) {
       if (CompareIso639LanguageCode (Language, SupportedLanguages)) {
         Found = TRUE;
         break;
       }
       SupportedLanguages += 3;
-    } else {
-      for (Index = 0; SupportedLanguages[Index] != 0 && SupportedLanguages[Index] != ';'; Index++);
-      if ((AsciiStrnCmp(SupportedLanguages, Language, Index) == 0) && (Language[Index] == 0)) {
-        Found = TRUE;
-        break;
-      }
-      SupportedLanguages += Index;
-      for (; *SupportedLanguages != 0 && *SupportedLanguages == ';'; SupportedLanguages++);
     }
+  } else {
+    Found = !IsLanguageSupported(Language, SupportedLanguages);
   }
+
 
   //
   // If Language is not a member of SupportedLanguages, then return EFI_UNSUPPORTED
@@ -1099,24 +1124,17 @@ AddUnicodeString2 (
   // Make sure Language is a member of SupportedLanguages
   //
   Found = FALSE;
-  while (*SupportedLanguages != 0) {
-    if (Iso639Language) {
+  if (Iso639Language) {
+    while (*SupportedLanguages != 0) {
       if (CompareIso639LanguageCode (Language, SupportedLanguages)) {
         Found = TRUE;
         break;
       }
       SupportedLanguages += 3;
-    } else {
-      for (Index = 0; SupportedLanguages[Index] != 0 && SupportedLanguages[Index] != ';'; Index++);
-      if (AsciiStrnCmp(SupportedLanguages, Language, Index) == 0) {
-        Found = TRUE;
-        break;
-      }
-      SupportedLanguages += Index;
-      for (; *SupportedLanguages != 0 && *SupportedLanguages == ';'; SupportedLanguages++);
     }
+  } else {
+    Found = !IsLanguageSupported(Language, SupportedLanguages);
   }
-
   //
   // If Language is not a member of SupportedLanguages, then return EFI_UNSUPPORTED
   //

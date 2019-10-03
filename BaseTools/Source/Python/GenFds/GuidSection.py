@@ -50,7 +50,7 @@ class GuidSection(GuidSectionClassObject) :
     #   @param  Dict        dictionary contains macro and its value
     #   @retval tuple       (Generated file name, section alignment)
     #
-    def GenSection(self, OutputPath, ModuleName, SecNum, KeyStringList, FfsInf=None, Dict={}, IsMakefile=False):
+    def GenSection(self, OutputPath, ModuleName, SecNum, KeyStringList, FfsInf=None, Dict=None, IsMakefile=False):
         #
         # Generate all section
         #
@@ -66,6 +66,8 @@ class GuidSection(GuidSectionClassObject) :
         SectAlign = []
         Index = 0
         MaxAlign = None
+        if Dict is None:
+            Dict = {}
         if self.FvAddr != []:
             FvAddrIsSet = True
         else:

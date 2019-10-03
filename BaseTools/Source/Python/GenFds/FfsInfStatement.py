@@ -437,11 +437,12 @@ class FfsInfStatement(FfsInfStatementClassObject):
     #   @param  FvParentAddr Parent Fv base address
     #   @retval string       Generated FFS file name
     #
-    def GenFfs(self, Dict = {}, FvChildAddr = [], FvParentAddr=None, IsMakefile=False, FvName=None):
+    def GenFfs(self, Dict = None, FvChildAddr = [], FvParentAddr=None, IsMakefile=False, FvName=None):
         #
         # Parse Inf file get Module related information
         #
-
+        if Dict is None:
+            Dict = {}
         self.__InfParse__(Dict, IsGenFfs=True)
         Arch = self.GetCurrentArch()
         SrcFile = mws.join( GenFdsGlobalVariable.WorkSpaceDir, self.InfFileName);
@@ -502,7 +503,10 @@ class FfsInfStatement(FfsInfStatementClassObject):
         if self.IsBinaryModule:
             IsMakefile = False
         if IsMakefile:
-            MakefilePath = self.InfFileName, Arch
+            PathClassObj = PathClass(self.InfFileName, GenFdsGlobalVariable.WorkSpaceDir)
+            if self.OverrideGuid:
+                PathClassObj = ProcessDuplicatedInf(PathClassObj, self.OverrideGuid, GenFdsGlobalVariable.WorkSpaceDir)
+            MakefilePath = PathClassObj.Path, Arch
         if isinstance (Rule, RuleSimpleFile.RuleSimpleFile):
             SectionOutputList = self.__GenSimpleFileSection__(Rule, IsMakefile=IsMakefile)
             FfsOutput = self.__GenSimpleFileFfs__(Rule, SectionOutputList, MakefilePath=MakefilePath)

@@ -2,7 +2,7 @@
   Implementation for EFI_SIMPLE_TEXT_INPUT_PROTOCOL protocol.
 
 (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
-Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 Copyright (C) 2016 Silicon Graphics, Inc. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -453,6 +453,10 @@ TranslateRawDataToEfiKey (
   case TerminalTypeVt100:
   case TerminalTypeVt100Plus:
   case TerminalTypeTtyTerm:
+  case TerminalTypeLinux:
+  case TerminalTypeXtermR6:
+  case TerminalTypeVt400:
+  case TerminalTypeSCO:
     AnsiRawDataToUnicode (TerminalDevice);
     UnicodeToEfiKey (TerminalDevice);
     break;
@@ -1319,6 +1323,27 @@ UnicodeToEfiKeyFlushState (
   | F12     | 0x16 |           | ESC @    |          |
   +=========+======+===========+==========+==========+
 
+Putty function key map:
+  +=========+======+===========+=============+=============+=============+=========+
+  |         | EFI  |           |             |             |             |         |
+  |         | Scan |           |             |  Normal     |             |         |
+  |   KEY   | Code |  VT100+   | Xterm R6    |  VT400      | Linux       | SCO     |
+  +=========+======+===========+=============+=============+=============+=========+
+  | F1      | 0x0B | ESC O P   | ESC O P     | ESC [ 1 1 ~ | ESC [ [ A   | ESC [ M |
+  | F2      | 0x0C | ESC O Q   | ESC O Q     | ESC [ 1 2 ~ | ESC [ [ B   | ESC [ N |
+  | F3      | 0x0D | ESC O R   | ESC O R     | ESC [ 1 3 ~ | ESC [ [ C   | ESC [ O |
+  | F4      | 0x0E | ESC O S   | ESC O S     | ESC [ 1 4 ~ | ESC [ [ D   | ESC [ P |
+  | F5      | 0x0F | ESC O T   | ESC [ 1 5 ~ | ESC [ 1 5 ~ | ESC [ [ E   | ESC [ Q |
+  | F6      | 0x10 | ESC O U   | ESC [ 1 7 ~ | ESC [ 1 7 ~ | ESC [ 1 7 ~ | ESC [ R |
+  | F7      | 0x11 | ESC O V   | ESC [ 1 8 ~ | ESC [ 1 8 ~ | ESC [ 1 8 ~ | ESC [ S |
+  | F8      | 0x12 | ESC O W   | ESC [ 1 9 ~ | ESC [ 1 9 ~ | ESC [ 1 9 ~ | ESC [ T |
+  | F9      | 0x13 | ESC O X   | ESC [ 2 0 ~ | ESC [ 2 0 ~ | ESC [ 2 0 ~ | ESC [ U |
+  | F10     | 0x14 | ESC O Y   | ESC [ 2 1 ~ | ESC [ 2 1 ~ | ESC [ 2 1 ~ | ESC [ V |
+  | Escape  | 0x17 | ESC       | ESC         | ESC         | ESC         | ESC     |
+  | F11     | 0x15 | ESC O Z   | ESC [ 2 3 ~ | ESC [ 2 3 ~ | ESC [ 2 3 ~ | ESC [ W |
+  | F12     | 0x16 | ESC O [   | ESC [ 2 4 ~ | ESC [ 2 4 ~ | ESC [ 2 4 ~ | ESC [ X |
+  +=========+======+===========+=============+=============+=============+=========+
+
   Special Mappings
   ================
   ESC R ESC r ESC R = Reset System
@@ -1378,7 +1403,9 @@ UnicodeToEfiKey (
       }
 
       if (UnicodeChar == 'O' && (TerminalDevice->TerminalType == TerminalTypeVt100 ||
-                                 TerminalDevice->TerminalType == TerminalTypeTtyTerm)) {
+                                 TerminalDevice->TerminalType == TerminalTypeTtyTerm ||
+                                 TerminalDevice->TerminalType == TerminalTypeXtermR6 ||
+                                 TerminalDevice->TerminalType == TerminalTypeVt100Plus)) {
         TerminalDevice->InputState |= INPUT_STATE_O;
         TerminalDevice->ResetState = RESET_STATE_DEFAULT;
         continue;
@@ -1548,6 +1575,60 @@ UnicodeToEfiKey (
           Key.ScanCode = SCAN_END;
           break;
         }
+      } else if (TerminalDevice->TerminalType == TerminalTypeVt100Plus) {
+        switch (UnicodeChar) {
+        case 'P':
+          Key.ScanCode = SCAN_F1;
+          break;
+        case 'Q':
+          Key.ScanCode = SCAN_F2;
+          break;
+        case 'R':
+          Key.ScanCode = SCAN_F3;
+          break;
+        case 'S':
+          Key.ScanCode = SCAN_F4;
+          break;
+        case 'T':
+          Key.ScanCode = SCAN_F5;
+          break;
+        case 'U':
+          Key.ScanCode = SCAN_F6;
+          break;
+        case 'V':
+          Key.ScanCode = SCAN_F7;
+          break;
+        case 'W':
+          Key.ScanCode = SCAN_F8;
+          break;
+        case 'X':
+          Key.ScanCode = SCAN_F9;
+          break;
+        case 'Y':
+          Key.ScanCode = SCAN_F10;
+          break;
+        case 'Z':
+          Key.ScanCode = SCAN_F11;
+          break;
+        case '[':
+          Key.ScanCode = SCAN_F12;
+          break;
+        }
+      } else if (TerminalDevice->TerminalType == TerminalTypeXtermR6) {
+        switch (UnicodeChar) {
+        case 'P':
+          Key.ScanCode = SCAN_F1;
+          break;
+        case 'Q':
+          Key.ScanCode = SCAN_F2;
+          break;
+        case 'R':
+          Key.ScanCode = SCAN_F3;
+          break;
+        case 'S':
+          Key.ScanCode = SCAN_F4;
+          break;
+        }
       }
 
       if (Key.ScanCode != SCAN_NULL) {
@@ -1564,6 +1645,25 @@ UnicodeToEfiKey (
 
     case INPUT_STATE_ESC | INPUT_STATE_LEFTOPENBRACKET:
 
+      if (UnicodeChar == '1' && (TerminalDevice->TerminalType == TerminalTypeXtermR6 ||
+                                  TerminalDevice->TerminalType == TerminalTypeVt400 ||
+                                  TerminalDevice->TerminalType == TerminalTypeLinux)) {
+        TerminalDevice->InputState |= INPUT_STATE_1;
+        continue;
+      }
+
+      if (UnicodeChar == '2' && (TerminalDevice->TerminalType == TerminalTypeXtermR6 ||
+                                  TerminalDevice->TerminalType == TerminalTypeVt400 ||
+                                  TerminalDevice->TerminalType == TerminalTypeLinux)) {
+        TerminalDevice->InputState |= INPUT_STATE_2;
+        continue;
+      }
+
+      if (UnicodeChar == LEFTOPENBRACKET && TerminalDevice->TerminalType == TerminalTypeLinux) {
+        TerminalDevice->InputState |= INPUT_STATE_LEFTOPENBRACKET_2ND;
+        continue;
+      }
+
       TerminalDevice->ResetState = RESET_STATE_DEFAULT;
 
       Key.ScanCode = SCAN_NULL;
@@ -1572,7 +1672,11 @@ UnicodeToEfiKey (
           TerminalDevice->TerminalType == TerminalTypeVt100     ||
           TerminalDevice->TerminalType == TerminalTypeVt100Plus ||
           TerminalDevice->TerminalType == TerminalTypeVtUtf8    ||
-          TerminalDevice->TerminalType == TerminalTypeTtyTerm) {
+          TerminalDevice->TerminalType == TerminalTypeTtyTerm   ||
+          TerminalDevice->TerminalType == TerminalTypeLinux     ||
+          TerminalDevice->TerminalType == TerminalTypeXtermR6   ||
+          TerminalDevice->TerminalType == TerminalTypeVt400     ||
+          TerminalDevice->TerminalType == TerminalTypeSCO) {
         switch (UnicodeChar) {
         case 'A':
           Key.ScanCode = SCAN_UP;
@@ -1614,12 +1718,15 @@ UnicodeToEfiKey (
         case 'X':
           if (TerminalDevice->TerminalType == TerminalTypePcAnsi) {
             Key.ScanCode = SCAN_DELETE;
+          } else if (TerminalDevice->TerminalType == TerminalTypeSCO) {
+            Key.ScanCode = SCAN_F12;
           }
           break;
         case 'P':
           if (TerminalDevice->TerminalType == TerminalTypeVt100) {
             Key.ScanCode = SCAN_DELETE;
-          } else if (TerminalDevice->TerminalType == TerminalTypePcAnsi) {
+          } else if (TerminalDevice->TerminalType == TerminalTypePcAnsi ||
+                      TerminalDevice->TerminalType == TerminalTypeSCO) {
             Key.ScanCode = SCAN_F4;
           }
           break;
@@ -1629,7 +1736,8 @@ UnicodeToEfiKey (
           }
           break;
         case 'V':
-          if (TerminalDevice->TerminalType == TerminalTypePcAnsi) {
+          if (TerminalDevice->TerminalType == TerminalTypePcAnsi ||
+              TerminalDevice->TerminalType == TerminalTypeSCO) {
             Key.ScanCode = SCAN_F10;
           }
           break;
@@ -1644,7 +1752,8 @@ UnicodeToEfiKey (
           }
           break;
         case 'U':
-          if (TerminalDevice->TerminalType == TerminalTypePcAnsi) {
+          if (TerminalDevice->TerminalType == TerminalTypePcAnsi ||
+              TerminalDevice->TerminalType == TerminalTypeSCO) {
             Key.ScanCode = SCAN_F9;
           }
           break;
@@ -1654,38 +1763,50 @@ UnicodeToEfiKey (
           }
           break;
         case 'M':
-          if (TerminalDevice->TerminalType == TerminalTypePcAnsi) {
+          if (TerminalDevice->TerminalType == TerminalTypePcAnsi ||
+              TerminalDevice->TerminalType == TerminalTypeSCO) {
             Key.ScanCode = SCAN_F1;
           }
           break;
         case 'N':
-          if (TerminalDevice->TerminalType == TerminalTypePcAnsi) {
+          if (TerminalDevice->TerminalType == TerminalTypePcAnsi ||
+              TerminalDevice->TerminalType == TerminalTypeSCO) {
             Key.ScanCode = SCAN_F2;
           }
           break;
         case 'O':
-          if (TerminalDevice->TerminalType == TerminalTypePcAnsi) {
+          if (TerminalDevice->TerminalType == TerminalTypePcAnsi ||
+              TerminalDevice->TerminalType == TerminalTypeSCO) {
             Key.ScanCode = SCAN_F3;
           }
           break;
         case 'Q':
-          if (TerminalDevice->TerminalType == TerminalTypePcAnsi) {
+          if (TerminalDevice->TerminalType == TerminalTypePcAnsi ||
+              TerminalDevice->TerminalType == TerminalTypeSCO) {
             Key.ScanCode = SCAN_F5;
           }
           break;
         case 'R':
-          if (TerminalDevice->TerminalType == TerminalTypePcAnsi) {
+          if (TerminalDevice->TerminalType == TerminalTypePcAnsi ||
+              TerminalDevice->TerminalType == TerminalTypeSCO) {
             Key.ScanCode = SCAN_F6;
           }
           break;
         case 'S':
-          if (TerminalDevice->TerminalType == TerminalTypePcAnsi) {
+          if (TerminalDevice->TerminalType == TerminalTypePcAnsi ||
+              TerminalDevice->TerminalType == TerminalTypeSCO) {
             Key.ScanCode = SCAN_F7;
           }
           break;
         case 'T':
-          if (TerminalDevice->TerminalType == TerminalTypePcAnsi) {
+          if (TerminalDevice->TerminalType == TerminalTypePcAnsi ||
+              TerminalDevice->TerminalType == TerminalTypeSCO) {
             Key.ScanCode = SCAN_F8;
+          }
+          break;
+        case 'W':
+          if (TerminalDevice->TerminalType == TerminalTypeSCO) {
+            Key.ScanCode = SCAN_F11;
           }
           break;
         default :
@@ -1704,7 +1825,7 @@ UnicodeToEfiKey (
           UnicodeChar <= '9') {
         TerminalDevice->TtyEscapeStr[0] = UnicodeChar;
         TerminalDevice->TtyEscapeIndex = 1;
-        TerminalDevice->InputState |= INPUT_STATE_LEFTOPENBRACKET_2;
+        TerminalDevice->InputState |= INPUT_STATE_LEFTOPENBRACKET_TTY;
         continue;
       }
 
@@ -1720,8 +1841,139 @@ UnicodeToEfiKey (
 
       break;
 
+    case INPUT_STATE_ESC | INPUT_STATE_LEFTOPENBRACKET | INPUT_STATE_1:
 
-    case INPUT_STATE_ESC | INPUT_STATE_LEFTOPENBRACKET | INPUT_STATE_LEFTOPENBRACKET_2:
+      TerminalDevice->ResetState = RESET_STATE_DEFAULT;
+
+      Key.ScanCode = SCAN_NULL;
+
+      if (TerminalDevice->TerminalType == TerminalTypeXtermR6 ||
+          TerminalDevice->TerminalType == TerminalTypeVt400 ||
+          TerminalDevice->TerminalType == TerminalTypeLinux) {
+        switch (UnicodeChar) {
+        case '1':
+          if (TerminalDevice->TerminalType == TerminalTypeVt400) {
+            Key.ScanCode = SCAN_F1;
+          }
+          break;
+        case '2':
+          if (TerminalDevice->TerminalType == TerminalTypeVt400) {
+            Key.ScanCode = SCAN_F2;
+          }
+          break;
+        case '3':
+          if (TerminalDevice->TerminalType == TerminalTypeVt400) {
+            Key.ScanCode = SCAN_F3;
+          }
+          break;
+        case '4':
+          if (TerminalDevice->TerminalType == TerminalTypeVt400) {
+            Key.ScanCode = SCAN_F4;
+          }
+          break;
+        case '5':
+          if (TerminalDevice->TerminalType == TerminalTypeXtermR6 ||
+              TerminalDevice->TerminalType == TerminalTypeVt400) {
+            Key.ScanCode = SCAN_F5;
+          }
+          break;
+        case '7':
+          Key.ScanCode = SCAN_F6;
+          break;
+        case '8':
+          Key.ScanCode = SCAN_F7;
+          break;
+        case '9':
+          Key.ScanCode = SCAN_F8;
+          break;
+        }
+      }
+
+      if (Key.ScanCode != SCAN_NULL) {
+        Key.UnicodeChar = 0;
+        EfiKeyFiFoInsertOneKey (TerminalDevice, &Key);
+        TerminalDevice->InputState = INPUT_STATE_DEFAULT;
+        UnicodeToEfiKeyFlushState (TerminalDevice);
+        continue;
+      }
+
+      UnicodeToEfiKeyFlushState (TerminalDevice);
+
+      break;
+
+    case INPUT_STATE_ESC | INPUT_STATE_LEFTOPENBRACKET | INPUT_STATE_2:
+
+      TerminalDevice->InputState = INPUT_STATE_DEFAULT;
+      Key.ScanCode = SCAN_NULL;
+      if (TerminalDevice->TerminalType == TerminalTypeXtermR6 ||
+          TerminalDevice->TerminalType == TerminalTypeVt400 ||
+          TerminalDevice->TerminalType == TerminalTypeLinux) {
+        switch (UnicodeChar) {
+        case '0':
+          Key.ScanCode = SCAN_F9;
+          break;
+        case '1':
+          Key.ScanCode = SCAN_F10;
+          break;
+        case '3':
+          Key.ScanCode = SCAN_F11;
+          break;
+        case '4':
+          Key.ScanCode = SCAN_F12;
+          break;
+        }
+      }
+
+      if (Key.ScanCode != SCAN_NULL) {
+        Key.UnicodeChar = 0;
+        EfiKeyFiFoInsertOneKey (TerminalDevice, &Key);
+        TerminalDevice->InputState = INPUT_STATE_DEFAULT;
+        UnicodeToEfiKeyFlushState (TerminalDevice);
+        continue;
+      }
+
+      UnicodeToEfiKeyFlushState (TerminalDevice);
+
+      break;
+
+    case INPUT_STATE_ESC | INPUT_STATE_LEFTOPENBRACKET | INPUT_STATE_LEFTOPENBRACKET_2ND:
+
+      TerminalDevice->InputState = INPUT_STATE_DEFAULT;
+      Key.ScanCode = SCAN_NULL;
+
+      if (TerminalDevice->TerminalType == TerminalTypeLinux) {
+        switch (UnicodeChar) {
+        case 'A':
+          Key.ScanCode = SCAN_F1;
+          break;
+        case 'B':
+          Key.ScanCode = SCAN_F2;
+          break;
+        case 'C':
+          Key.ScanCode = SCAN_F3;
+          break;
+        case 'D':
+          Key.ScanCode = SCAN_F4;
+          break;
+        case 'E':
+          Key.ScanCode = SCAN_F5;
+          break;
+        }
+      }
+
+      if (Key.ScanCode != SCAN_NULL) {
+        Key.UnicodeChar = 0;
+        EfiKeyFiFoInsertOneKey (TerminalDevice, &Key);
+        TerminalDevice->InputState = INPUT_STATE_DEFAULT;
+        UnicodeToEfiKeyFlushState (TerminalDevice);
+        continue;
+      }
+
+      UnicodeToEfiKeyFlushState (TerminalDevice);
+
+      break;
+
+    case INPUT_STATE_ESC | INPUT_STATE_LEFTOPENBRACKET | INPUT_STATE_LEFTOPENBRACKET_TTY:
       /*
        * Here we handle the VT220 escape codes that we accept.  This
        * state is only used by the TTY terminal type.

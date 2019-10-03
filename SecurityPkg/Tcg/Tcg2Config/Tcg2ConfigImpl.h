@@ -36,6 +36,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Guid/MdeModuleHii.h>
 
 #include "Tcg2ConfigNvData.h"
+#include "Tcg2Internal.h"
+
+#define TCG2_PROTOCOL_VERSION_DEFAULT        0x0001
 
 //
 // Tool generated IFR binary data and String package data

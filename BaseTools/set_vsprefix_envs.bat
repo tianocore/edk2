@@ -3,7 +3,7 @@
 @REM   however it may be executed directly from the BaseTools project folder
 @REM   if the file is not executed within a WORKSPACE\BaseTools folder.
 @REM
-@REM Copyright (c) 2016-2017, Intel Corporation. All rights reserved.<BR>
+@REM Copyright (c) 2016-2019, Intel Corporation. All rights reserved.<BR>
 @REM
 @REM SPDX-License-Identifier: BSD-2-Clause-Patent
 @REM
@@ -18,6 +18,7 @@ set SCRIPT_ERROR=1
 goto :EOF
 
 :main
+if /I "%1"=="VS2019" goto SetVS2019
 if /I "%1"=="VS2017" goto SetVS2017
 if /I "%1"=="VS2015" goto SetVS2015
 if /I "%1"=="VS2013" goto SetVS2013
@@ -107,27 +108,86 @@ if defined VS140COMNTOOLS (
 )
 if /I "%1"=="VS2015" goto SetWinDDK
 
+:SetVS2019
+if not defined VS160COMNTOOLS (
+  if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" (
+    if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\2019\BuildTools" (
+      call "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" -products Microsoft.VisualStudio.Product.BuildTools -version 16,17 > vswhereInfo
+      for /f "usebackq tokens=1* delims=: " %%i in (vswhereInfo) do (
+        if /i "%%i"=="installationPath" call "%%j\VC\Auxiliary\Build\vcvars32.bat"
+      )
+      del vswhereInfo
+    ) else (
+      call "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" -version 16,17 > vswhereInfo
+      for /f "usebackq tokens=1* delims=: " %%i in (vswhereInfo) do (
+        if /i "%%i"=="installationPath" call "%%j\VC\Auxiliary\Build\vcvars32.bat"
+      )
+      del vswhereInfo
+    )
+  ) else if exist "%ProgramFiles%\Microsoft Visual Studio\Installer\vswhere.exe" (
+    if exist "%ProgramFiles%\Microsoft Visual Studio\2019\BuildTools" (
+      call "%ProgramFiles%\Microsoft Visual Studio\Installer\vswhere.exe" -products Microsoft.VisualStudio.Product.BuildTools -version 16,17 > vswhereInfo
+      for /f "usebackq tokens=1* delims=: " %%i in (vswhereInfo) do (
+        if /i "%%i"=="installationPath" call "%%j\VC\Auxiliary\Build\vcvars32.bat"
+      )
+      del vswhereInfo
+    ) else (
+      call "%ProgramFiles%\Microsoft Visual Studio\Installer\vswhere.exe" -version 16,17 > vswhereInfo
+      for /f "usebackq tokens=1* delims=: " %%i in (vswhereInfo) do (
+        if /i "%%i"=="installationPath" call "%%j\VC\Auxiliary\Build\vcvars32.bat"
+      )
+      del vswhereInfo
+    )
+  ) else (
+    if /I "%1"=="VS2019" goto ToolNotInstall
+    goto SetWinDDK
+  )
+)
+
+if defined VCToolsInstallDir (
+  if not defined VS2019_PREFIX (
+    set "VS2019_PREFIX=%VCToolsInstallDir%"
+  )
+  if not defined WINSDK10_PREFIX (
+    if defined WindowsSdkVerBinPath (
+      set "WINSDK10_PREFIX=%WindowsSdkVerBinPath%"
+    ) else if exist "%ProgramFiles(x86)%\Windows Kits\10\bin" (
+      set "WINSDK10_PREFIX=%ProgramFiles(x86)%\Windows Kits\10\bin\"
+    ) else if exist "%ProgramFiles%\Windows Kits\10\bin" (
+      set "WINSDK10_PREFIX=%ProgramFiles%\Windows Kits\10\bin\"
+    )
+  )
+)
+
 :SetVS2017
 if not defined VS150COMNTOOLS (
   if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" (
     if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\BuildTools" (
-      for /f "usebackq tokens=1* delims=: " %%i in (`"%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" -products Microsoft.VisualStudio.Product.BuildTools`) do (
+      call "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" -products Microsoft.VisualStudio.Product.BuildTools -version 15,16 > vswhereInfo
+      for /f "usebackq tokens=1* delims=: " %%i in (vswhereInfo) do (
         if /i "%%i"=="installationPath" call "%%j\VC\Auxiliary\Build\vcvars32.bat"
       )
+      del vswhereInfo
     ) else (
-      for /f "usebackq tokens=1* delims=: " %%i in (`"%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe"`) do (
+      call "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" -version 15,16 > vswhereInfo
+      for /f "usebackq tokens=1* delims=: " %%i in (vswhereInfo) do (
         if /i "%%i"=="installationPath" call "%%j\VC\Auxiliary\Build\vcvars32.bat"
       )
+      del vswhereInfo
     )
   ) else if exist "%ProgramFiles%\Microsoft Visual Studio\Installer\vswhere.exe" (
     if exist "%ProgramFiles%\Microsoft Visual Studio\2017\BuildTools" (
-      for /f "usebackq tokens=1* delims=: " %%i in (`"%ProgramFiles%\Microsoft Visual Studio\Installer\vswhere.exe" -products Microsoft.VisualStudio.Product.BuildTools`) do (
+      call "%ProgramFiles%\Microsoft Visual Studio\Installer\vswhere.exe" -products Microsoft.VisualStudio.Product.BuildTools -version 15,16 > vswhereInfo
+      for /f "usebackq tokens=1* delims=: " %%i in (vswhereInfo) do (
         if /i "%%i"=="installationPath" call "%%j\VC\Auxiliary\Build\vcvars32.bat"
       )
+      del vswhereInfo
     ) else (
-      for /f "usebackq tokens=1* delims=: " %%i in (`"%ProgramFiles%\Microsoft Visual Studio\Installer\vswhere.exe"`) do (
+      call "%ProgramFiles%\Microsoft Visual Studio\Installer\vswhere.exe" -version 15,16 > vswhereInfo
+      for /f "usebackq tokens=1* delims=: " %%i in (vswhereInfo) do (
         if /i "%%i"=="installationPath" call "%%j\VC\Auxiliary\Build\vcvars32.bat"
       )
+      del vswhereInfo
     )
   ) else (
     if /I "%1"=="VS2017" goto ToolNotInstall
@@ -139,14 +199,14 @@ if defined VCToolsInstallDir (
   if not defined VS2017_PREFIX (
     set "VS2017_PREFIX=%VCToolsInstallDir%"
   )
-)
-if not defined WINSDK10_PREFIX (
-  if defined WindowsSdkVerBinPath (
-    set "WINSDK10_PREFIX=%WindowsSdkVerBinPath%"
-  ) else if exist "%ProgramFiles(x86)%\Windows Kits\10\bin" (
-    set "WINSDK10_PREFIX=%ProgramFiles(x86)%\Windows Kits\10\bin\"
-  ) else if exist "%ProgramFiles%\Windows Kits\10\bin" (
-    set "WINSDK10_PREFIX=%ProgramFiles%\Windows Kits\10\bin\"
+  if not defined WINSDK10_PREFIX (
+    if defined WindowsSdkVerBinPath (
+      set "WINSDK10_PREFIX=%WindowsSdkVerBinPath%"
+    ) else if exist "%ProgramFiles(x86)%\Windows Kits\10\bin" (
+      set "WINSDK10_PREFIX=%ProgramFiles(x86)%\Windows Kits\10\bin\"
+    ) else if exist "%ProgramFiles%\Windows Kits\10\bin" (
+      set "WINSDK10_PREFIX=%ProgramFiles%\Windows Kits\10\bin\"
+    )
   )
 )
 

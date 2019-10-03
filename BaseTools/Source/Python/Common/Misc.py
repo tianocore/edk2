@@ -34,6 +34,8 @@ from Common.BuildToolError import *
 from CommonDataClass.DataClass import *
 from Common.Parsing import GetSplitValueList
 from Common.LongFilePathSupport import OpenLongFilePath as open
+from Common.LongFilePathSupport import CopyLongFilePath as CopyLong
+from Common.LongFilePathSupport import LongFilePath as LongFilePath
 from Common.MultipleWorkspace import MultipleWorkspace as mws
 from CommonDataClass.Exceptions import BadExpression
 from Common.caching import cached_property
@@ -450,6 +452,9 @@ def RemoveDirectory(Directory, Recursively=False):
 #
 def SaveFileOnChange(File, Content, IsBinaryFile=True, FileLock=None):
 
+    # Convert to long file path format
+    File = LongFilePath(File)
+
     if os.path.exists(File):
         if IsBinaryFile:
             try:
@@ -487,13 +492,9 @@ def SaveFileOnChange(File, Content, IsBinaryFile=True, FileLock=None):
 
 
     if GlobalData.gIsWindows and not os.path.exists(File):
-        # write temp file, then rename the temp file to the real file
-        # to make sure the file be immediate saved to disk
-        with tempfile.NamedTemporaryFile(OpenMode, dir=os.path.dirname(File), delete=False) as tf:
-            tf.write(Content)
-            tempname = tf.name
         try:
-            os.rename(tempname, File)
+            with open(File, OpenMode) as tf:
+                tf.write(Content)
         except IOError as X:
             if GlobalData.gBinCacheSource:
                 EdkLogger.quiet("[cache error]:fails to save file with error: %s" % (X))
@@ -530,7 +531,13 @@ def SaveFileOnChange(File, Content, IsBinaryFile=True, FileLock=None):
 #   @retval     False     No copy really happen
 #
 def CopyFileOnChange(SrcFile, Dst, FileLock=None):
-    if not os.path.exists(SrcFile):
+
+    # Convert to long file path format
+    SrcFile = LongFilePath(SrcFile)
+    Dst = LongFilePath(Dst)
+
+    if os.path.isdir(SrcFile):
+        EdkLogger.error(None, FILE_COPY_FAILURE, ExtraData='CopyFileOnChange SrcFile is a dir, not a file: %s' % SrcFile)
         return False
 
     if os.path.isdir(Dst):
@@ -556,21 +563,8 @@ def CopyFileOnChange(SrcFile, Dst, FileLock=None):
     if FileLock:
         FileLock.acquire()
 
-    # os.replace and os.rename are the atomic operations in python 3 and 2.
-    # we use these two atomic operations to ensure the file copy is atomic:
-    # copy the src to a temp file in the dst same folder firstly, then
-    # replace or rename the temp file to the destination file.
-    with tempfile.NamedTemporaryFile(dir=DirName, delete=False) as tf:
-        shutil.copy(SrcFile, tf.name)
-        tempname = tf.name
     try:
-        if hasattr(os, 'replace'):
-            os.replace(tempname, DstFile)
-        else:
-            # os.rename reqire to remove the dst on Windows, otherwise OSError will be raised.
-            if GlobalData.gIsWindows and os.path.exists(DstFile):
-                os.remove(DstFile)
-            os.rename(tempname, DstFile)
+        CopyLong(SrcFile, DstFile)
     except IOError as X:
         if GlobalData.gBinCacheSource:
             EdkLogger.quiet("[cache error]:fails to copy file with error: %s" % (X))

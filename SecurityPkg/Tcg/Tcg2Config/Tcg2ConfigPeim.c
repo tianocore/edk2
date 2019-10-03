@@ -23,6 +23,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Protocol/Tcg2Protocol.h>
 
 #include "Tcg2ConfigNvData.h"
+#include "Tcg2Internal.h"
 
 TPM_INSTANCE_ID  mTpmInstanceId[] = TPM_INSTANCE_ID_LIST;
 

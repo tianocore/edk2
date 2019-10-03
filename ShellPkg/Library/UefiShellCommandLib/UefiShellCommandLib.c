@@ -74,12 +74,10 @@ CommandInit(
   EFI_STATUS                      Status;
   CHAR8                           *PlatformLang;
 
-  GetEfiGlobalVariable2 (EFI_PLATFORM_LANG_VARIABLE_NAME, (VOID**)&PlatformLang, NULL);
-  if (PlatformLang == NULL) {
-    return EFI_UNSUPPORTED;
-  }
-
   if (gUnicodeCollation == NULL) {
+
+    GetEfiGlobalVariable2 (EFI_PLATFORM_LANG_VARIABLE_NAME, (VOID**)&PlatformLang, NULL);
+
     Status = gBS->LocateHandleBuffer (
                     ByProtocol,
                     &gEfiUnicodeCollation2ProtocolGuid,
@@ -108,6 +106,14 @@ CommandInit(
       }
 
       //
+      // Without clue provided use the first Unicode Collation2 protocol.
+      //
+      if (PlatformLang == NULL) {
+        gUnicodeCollation = Uc;
+        break;
+      }
+
+      //
       // Find the best matching matching language from the supported languages
       // of Unicode Collation2 protocol.
       //
@@ -126,7 +132,9 @@ CommandInit(
     if (Handles != NULL) {
       FreePool (Handles);
     }
-    FreePool (PlatformLang);
+    if (PlatformLang != NULL) {
+      FreePool (PlatformLang);
+    }
   }
 
   return (gUnicodeCollation == NULL) ? EFI_UNSUPPORTED : EFI_SUCCESS;

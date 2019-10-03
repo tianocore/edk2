@@ -150,10 +150,6 @@
                                                                                                   "entries. If greater than 0, then this PCD determines the number of entries,\n"
                                                                                                   "and PcdMaxPeiPerformanceLogEntries is ignored."
 
-#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdRealTimeClockUpdateTimeout_PROMPT  #language en-US "RTC Update Timeout Value"
-
-#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdRealTimeClockUpdateTimeout_HELP  #language en-US "RTC Update Timeout Value(microsecond)."
-
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdSerialUseMmio_PROMPT  #language en-US "Serial port registers use MMIO"
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdSerialUseMmio_HELP  #language en-US "Indicates the 16550 serial port registers are in MMIO space, or in I/O space. Default is I/O space.<BR><BR>\n"

@@ -155,10 +155,11 @@ class AutoGenWorkerInProcess(mp.Process):
         try:
             taskname = "Init"
             with self.file_lock:
-                if not os.path.exists(self.data_pipe_file_path):
+                try:
+                    self.data_pipe = MemoryDataPipe()
+                    self.data_pipe.load(self.data_pipe_file_path)
+                except:
                     self.feedback_q.put(taskname + ":" + "load data pipe %s failed." % self.data_pipe_file_path)
-                self.data_pipe = MemoryDataPipe()
-                self.data_pipe.load(self.data_pipe_file_path)
             EdkLogger.LogClientInitialize(self.log_q)
             loglevel = self.data_pipe.Get("LogLevel")
             if not loglevel:
@@ -238,10 +239,10 @@ class AutoGenWorkerInProcess(mp.Process):
                     Ma.GenModuleFilesHash(GlobalData.gCacheIR)
                     Ma.GenPreMakefileHash(GlobalData.gCacheIR)
                     if Ma.CanSkipbyPreMakefileCache(GlobalData.gCacheIR):
-                       continue
+                        continue
 
                 Ma.CreateCodeFile(False)
-                Ma.CreateMakeFile(False,GenFfsList=FfsCmd.get((Ma.MetaFile.File, Ma.Arch),[]))
+                Ma.CreateMakeFile(False,GenFfsList=FfsCmd.get((Ma.MetaFile.Path, Ma.Arch),[]))
 
                 if GlobalData.gBinCacheSource and CommandTarget in [None, "", "all"]:
                     Ma.GenMakeHeaderFilesHash(GlobalData.gCacheIR)

@@ -15,9 +15,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 LIST_ENTRY                          mPagePool = INITIALIZE_LIST_HEAD_VARIABLE (mPagePool);
 BOOLEAN                             m1GPageTableSupport = FALSE;
-BOOLEAN                             mCpuSmmStaticPageTable;
-BOOLEAN                             m5LevelPagingSupport;
-X86_ASSEMBLY_PATCH_LABEL            gPatch5LevelPagingSupport;
+BOOLEAN                             mCpuSmmRestrictedMemoryAccess;
+BOOLEAN                             m5LevelPagingNeeded;
+X86_ASSEMBLY_PATCH_LABEL            gPatch5LevelPagingNeeded;
 
 /**
   Disable CET.
@@ -63,28 +63,45 @@ Is1GPageSupport (
 }
 
 /**
-  Check if 5-level paging is supported by processor or not.
+  The routine returns TRUE when CPU supports it (CPUID[7,0].ECX.BIT[16] is set) and
+  the max physical address bits is bigger than 48. Because 4-level paging can support
+  to address physical address up to 2^48 - 1, there is no need to enable 5-level paging
+  with max physical address bits <= 48.
 
-  @retval TRUE   5-level paging is supported.
-  @retval FALSE  5-level paging is not supported.
-
+  @retval TRUE  5-level paging enabling is needed.
+  @retval FALSE 5-level paging enabling is not needed.
 **/
 BOOLEAN
-Is5LevelPagingSupport (
+Is5LevelPagingNeeded (
   VOID
   )
 {
-  CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS_ECX EcxFlags;
+  CPUID_VIR_PHY_ADDRESS_SIZE_EAX              VirPhyAddressSize;
+  CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS_ECX ExtFeatureEcx;
+  UINT32                                      MaxExtendedFunctionId;
 
+  AsmCpuid (CPUID_EXTENDED_FUNCTION, &MaxExtendedFunctionId, NULL, NULL, NULL);
+  if (MaxExtendedFunctionId >= CPUID_VIR_PHY_ADDRESS_SIZE) {
+    AsmCpuid (CPUID_VIR_PHY_ADDRESS_SIZE, &VirPhyAddressSize.Uint32, NULL, NULL, NULL);
+  } else {
+    VirPhyAddressSize.Bits.PhysicalAddressBits = 36;
+  }
   AsmCpuidEx (
     CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS,
     CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS_SUB_LEAF_INFO,
-    NULL,
-    NULL,
-    &EcxFlags.Uint32,
-    NULL
+    NULL, NULL, &ExtFeatureEcx.Uint32, NULL
     );
-  return (BOOLEAN) (EcxFlags.Bits.FiveLevelPage != 0);
+  DEBUG ((
+    DEBUG_INFO, "PhysicalAddressBits = %d, 5LPageTable = %d.\n",
+    VirPhyAddressSize.Bits.PhysicalAddressBits, ExtFeatureEcx.Bits.FiveLevelPage
+    ));
+
+  if (VirPhyAddressSize.Bits.PhysicalAddressBits > 4 * 9 + 12) {
+    ASSERT (ExtFeatureEcx.Bits.FiveLevelPage == 1);
+    return TRUE;
+  } else {
+    return FALSE;
+  }
 }
 
 /**
@@ -190,7 +207,7 @@ SetStaticPageTable (
   //  when 5-Level Paging is disabled.
   //
   ASSERT (mPhysicalAddressBits <= 52);
-  if (!m5LevelPagingSupport && mPhysicalAddressBits > 48) {
+  if (!m5LevelPagingNeeded && mPhysicalAddressBits > 48) {
     mPhysicalAddressBits = 48;
   }
 
@@ -217,7 +234,7 @@ SetStaticPageTable (
 
   PageMapLevel4Entry = PageMap;
   PageMapLevel5Entry = NULL;
-  if (m5LevelPagingSupport) {
+  if (m5LevelPagingNeeded) {
     //
     // By architecture only one PageMapLevel5 exists - so lets allocate storage for it.
     //
@@ -233,7 +250,7 @@ SetStaticPageTable (
     // So lets allocate space for them and fill them in in the IndexOfPml4Entries loop.
     // When 5-Level Paging is disabled, below allocation happens only once.
     //
-    if (m5LevelPagingSupport) {
+    if (m5LevelPagingNeeded) {
       PageMapLevel4Entry = (UINT64 *) ((*PageMapLevel5Entry) & ~mAddressEncMask & gPhyMask);
       if (PageMapLevel4Entry == NULL) {
         PageMapLevel4Entry = AllocatePageTableMemory (1);
@@ -334,15 +351,15 @@ SmmInitPageTable (
   //
   InitializeSpinLock (mPFLock);
 
-  mCpuSmmStaticPageTable = PcdGetBool (PcdCpuSmmStaticPageTable);
-  m1GPageTableSupport    = Is1GPageSupport ();
-  m5LevelPagingSupport   = Is5LevelPagingSupport ();
-  mPhysicalAddressBits   = CalculateMaximumSupportAddress ();
-  PatchInstructionX86 (gPatch5LevelPagingSupport, m5LevelPagingSupport, 1);
-  DEBUG ((DEBUG_INFO, "5LevelPaging Support     - %d\n", m5LevelPagingSupport));
-  DEBUG ((DEBUG_INFO, "1GPageTable Support      - %d\n", m1GPageTableSupport));
-  DEBUG ((DEBUG_INFO, "PcdCpuSmmStaticPageTable - %d\n", mCpuSmmStaticPageTable));
-  DEBUG ((DEBUG_INFO, "PhysicalAddressBits      - %d\n", mPhysicalAddressBits));
+  mCpuSmmRestrictedMemoryAccess = PcdGetBool (PcdCpuSmmRestrictedMemoryAccess);
+  m1GPageTableSupport           = Is1GPageSupport ();
+  m5LevelPagingNeeded           = Is5LevelPagingNeeded ();
+  mPhysicalAddressBits          = CalculateMaximumSupportAddress ();
+  PatchInstructionX86 (gPatch5LevelPagingNeeded, m5LevelPagingNeeded, 1);
+  DEBUG ((DEBUG_INFO, "5LevelPaging Needed             - %d\n", m5LevelPagingNeeded));
+  DEBUG ((DEBUG_INFO, "1GPageTable Support             - %d\n", m1GPageTableSupport));
+  DEBUG ((DEBUG_INFO, "PcdCpuSmmRestrictedMemoryAccess - %d\n", mCpuSmmRestrictedMemoryAccess));
+  DEBUG ((DEBUG_INFO, "PhysicalAddressBits             - %d\n", mPhysicalAddressBits));
   //
   // Generate PAE page table for the first 4GB memory space
   //
@@ -370,7 +387,7 @@ SmmInitPageTable (
   SetSubEntriesNum (Pml4Entry, 3);
   PTEntry = Pml4Entry;
 
-  if (m5LevelPagingSupport) {
+  if (m5LevelPagingNeeded) {
     //
     // Fill PML5 entry
     //
@@ -385,7 +402,11 @@ SmmInitPageTable (
     PTEntry = Pml5Entry;
   }
 
-  if (mCpuSmmStaticPageTable) {
+  if (mCpuSmmRestrictedMemoryAccess) {
+    //
+    // When access to non-SMRAM memory is restricted, create page table
+    // that covers all memory space.
+    //
     SetStaticPageTable ((UINTN)PTEntry);
   } else {
     //
@@ -972,7 +993,7 @@ SmiPFHandler (
 
   PFAddress = AsmReadCr2 ();
 
-  if (mCpuSmmStaticPageTable && (PFAddress >= LShiftU64 (1, (mPhysicalAddressBits - 1)))) {
+  if (mCpuSmmRestrictedMemoryAccess && (PFAddress >= LShiftU64 (1, (mPhysicalAddressBits - 1)))) {
     DumpCpuContext (InterruptType, SystemContext);
     DEBUG ((DEBUG_ERROR, "Do not support address 0x%lx by processor!\n", PFAddress));
     CpuDeadLoop ();
@@ -1049,7 +1070,7 @@ SmiPFHandler (
       goto Exit;
     }
 
-    if (mCpuSmmStaticPageTable && IsSmmCommBufferForbiddenAddress (PFAddress)) {
+    if (mCpuSmmRestrictedMemoryAccess && IsSmmCommBufferForbiddenAddress (PFAddress)) {
       DumpCpuContext (InterruptType, SystemContext);
       DEBUG ((DEBUG_ERROR, "Access SMM communication forbidden address (0x%lx)!\n", PFAddress));
       DEBUG_CODE (
@@ -1100,26 +1121,26 @@ SetPageTableAttributes (
   Enable5LevelPaging = (BOOLEAN) (Cr4.Bits.LA57 == 1);
 
   //
-  // Don't do this if
-  //  - no static page table; or
+  // Don't mark page table memory as read-only if
+  //  - no restriction on access to non-SMRAM memory; or
   //  - SMM heap guard feature enabled; or
   //      BIT2: SMM page guard enabled
   //      BIT3: SMM pool guard enabled
   //  - SMM profile feature enabled
   //
-  if (!mCpuSmmStaticPageTable ||
+  if (!mCpuSmmRestrictedMemoryAccess ||
       ((PcdGet8 (PcdHeapGuardPropertyMask) & (BIT3 | BIT2)) != 0) ||
       FeaturePcdGet (PcdCpuSmmProfileEnable)) {
     //
-    // Static paging and heap guard could not be enabled at the same time.
+    // Restriction on access to non-SMRAM memory and heap guard could not be enabled at the same time.
     //
-    ASSERT (!(mCpuSmmStaticPageTable &&
+    ASSERT (!(mCpuSmmRestrictedMemoryAccess &&
               (PcdGet8 (PcdHeapGuardPropertyMask) & (BIT3 | BIT2)) != 0));
 
     //
-    // Static paging and SMM profile could not be enabled at the same time.
+    // Restriction on access to non-SMRAM memory and SMM profile could not be enabled at the same time.
     //
-    ASSERT (!(mCpuSmmStaticPageTable && FeaturePcdGet (PcdCpuSmmProfileEnable)));
+    ASSERT (!(mCpuSmmRestrictedMemoryAccess && FeaturePcdGet (PcdCpuSmmProfileEnable)));
     return ;
   }
 
@@ -1223,7 +1244,10 @@ SaveCr2 (
   OUT UINTN  *Cr2
   )
 {
-  if (!mCpuSmmStaticPageTable) {
+  if (!mCpuSmmRestrictedMemoryAccess) {
+    //
+    // On-demand paging is enabled when access to non-SMRAM is not restricted.
+    //
     *Cr2 = AsmReadCr2 ();
   }
 }
@@ -1238,7 +1262,24 @@ RestoreCr2 (
   IN UINTN  Cr2
   )
 {
-  if (!mCpuSmmStaticPageTable) {
+  if (!mCpuSmmRestrictedMemoryAccess) {
+    //
+    // On-demand paging is enabled when access to non-SMRAM is not restricted.
+    //
     AsmWriteCr2 (Cr2);
   }
+}
+
+/**
+  Return whether access to non-SMRAM is restricted.
+
+  @retval TRUE  Access to non-SMRAM is restricted.
+  @retval FALSE Access to non-SMRAM is not restricted.
+*/
+BOOLEAN
+IsRestrictedMemoryAccess (
+  VOID
+  )
+{
+  return mCpuSmmRestrictedMemoryAccess;
 }

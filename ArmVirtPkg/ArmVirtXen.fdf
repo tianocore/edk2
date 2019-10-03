@@ -20,14 +20,22 @@
 #
 ################################################################################
 
+[Defines]
+!if $(FD_SIZE_IN_MB) == 2
+  DEFINE FVMAIN_COMPACT_SIZE  = 0x1fe000
+!endif
+!if $(FD_SIZE_IN_MB) == 3
+  DEFINE FVMAIN_COMPACT_SIZE  = 0x2fe000
+!endif
+
 [FD.XEN_EFI]
 BaseAddress   = 0x00000000|gArmTokenSpaceGuid.PcdFdBaseAddress
-Size          = 0x00200000|gArmTokenSpaceGuid.PcdFdSize
+Size          = $(FD_SIZE)|gArmTokenSpaceGuid.PcdFdSize
 ErasePolarity = 1
 
 # This one is tricky, it must be: BlockSize * NumBlocks = Size
 BlockSize     = 0x00001000
-NumBlocks     = 0x200
+NumBlocks     = $(FD_NUM_BLOCKS)
 
 ################################################################################
 #
@@ -56,7 +64,12 @@ DATA = {
   0x01, 0x00, 0x00, 0x10,                         # code0: adr x1, .
   0xff, 0x07, 0x00, 0x14,                         # code1: b 0x2000
   0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, # text_offset: 512 KB
+!if $(FD_SIZE_IN_MB) == 2
   0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, # image_size: 2 MB
+!endif
+!if $(FD_SIZE_IN_MB) == 3
+  0x00, 0x00, 0x30, 0x00, 0x00, 0x00, 0x00, 0x00, # image_size: 3 MB
+!endif
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, # flags
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, # res2
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, # res3
@@ -76,12 +89,17 @@ DATA = {
   0xf6, 0x07, 0x00, 0xea, # b 0x2000
   0x18, 0x28, 0x6f, 0x01, # magic
   0x00, 0x00, 0x00, 0x00, # start
+!if $(FD_SIZE_IN_MB) == 2
   0x00, 0x00, 0x20, 0x00, # image size: 2 MB
+!endif
+!if $(FD_SIZE_IN_MB) == 3
+  0x00, 0x00, 0x30, 0x00, # image size: 3 MB
+!endif
   0x01, 0x02, 0x03, 0x04  # endiannness flag
 !endif
 }
 
-0x00002000|0x001fe000
+0x00002000|$(FVMAIN_COMPACT_SIZE)
 gArmTokenSpaceGuid.PcdFvBaseAddress|gArmTokenSpaceGuid.PcdFvSize
 FV = FVMAIN_COMPACT
 

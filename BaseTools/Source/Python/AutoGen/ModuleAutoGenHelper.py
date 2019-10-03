@@ -236,6 +236,10 @@ class AutoGenInfo(object):
 #
 class WorkSpaceInfo(AutoGenInfo):
     def __init__(self,Workspace, MetaFile, Target, ToolChain, Arch):
+        if not hasattr(self, "_Init"):
+            self.do_init(Workspace, MetaFile, Target, ToolChain, Arch)
+            self._Init = True
+    def do_init(self,Workspace, MetaFile, Target, ToolChain, Arch):
         self._SrcTimeStamp = 0
         self.Db = BuildDB
         self.BuildDatabase = self.Db.BuildObject
@@ -244,10 +248,35 @@ class WorkSpaceInfo(AutoGenInfo):
         self.WorkspaceDir = Workspace
         self.ActivePlatform = MetaFile
         self.ArchList = Arch
+        self.AutoGenObjectList = []
+    @property
+    def BuildDir(self):
+        return self.AutoGenObjectList[0].BuildDir
 
+    @property
+    def Name(self):
+        return self.AutoGenObjectList[0].Platform.PlatformName
+
+    @property
+    def FlashDefinition(self):
+        return self.AutoGenObjectList[0].Platform.FlashDefinition
+    @property
+    def GenFdsCommandDict(self):
+        FdsCommandDict = self.AutoGenObjectList[0].DataPipe.Get("FdsCommandDict")
+        if FdsCommandDict:
+            return FdsCommandDict
+        return {}
+
+    @cached_property
+    def FvDir(self):
+        return os.path.join(self.BuildDir, TAB_FV_DIRECTORY)
 
 class PlatformInfo(AutoGenInfo):
     def __init__(self, Workspace, MetaFile, Target, ToolChain, Arch,DataPipe):
+        if not hasattr(self, "_Init"):
+            self.do_init(Workspace, MetaFile, Target, ToolChain, Arch,DataPipe)
+            self._Init = True
+    def do_init(self,Workspace, MetaFile, Target, ToolChain, Arch,DataPipe):
         self.Wa = Workspace
         self.WorkspaceDir = self.Wa.WorkspaceDir
         self.MetaFile = MetaFile

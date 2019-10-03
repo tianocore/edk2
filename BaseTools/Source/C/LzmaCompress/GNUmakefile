@@ -1,12 +1,14 @@
 ## @file
 # GNU/Linux makefile for 'LzmaCompress' module build.
 #
-# Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2019, Intel Corporation. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 MAKEROOT ?= ..
 
 APPNAME = LzmaCompress
+
+LIBS = -lCommon
 
 SDK_C = Sdk/C
 

@@ -11,7 +11,7 @@
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = SerialDxe
   MODULE_UNI_FILE                = SerialDxe.uni
-  FILE_GUID                      = D3987D4B-971A-435F-8CAF-4967EB627241
+  FILE_GUID                      = 9A5163E7-5C29-453F-825C-837A46A81E15
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
 

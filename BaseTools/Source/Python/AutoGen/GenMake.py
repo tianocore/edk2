@@ -205,10 +205,12 @@ class BuildFile(object):
     def GetRemoveDirectoryCommand(self, DirList):
         return [self._RD_TEMPLATE_[self._FileType] % {'dir':Dir} for Dir in DirList]
 
-    def PlaceMacro(self, Path, MacroDefinitions={}):
+    def PlaceMacro(self, Path, MacroDefinitions=None):
         if Path.startswith("$("):
             return Path
         else:
+            if MacroDefinitions is None:
+                MacroDefinitions = {}
             PathLength = len(Path)
             for MacroName in MacroDefinitions:
                 MacroValue = MacroDefinitions[MacroName]
@@ -447,6 +449,7 @@ cleanlib:
         self.GenFfsList                 = ModuleAutoGen.GenFfsList
         self.MacroList = ['FFS_OUTPUT_DIR', 'MODULE_GUID', 'OUTPUT_DIR']
         self.FfsOutputFileList = []
+        self.DependencyHeaderFileSet = set()
 
     # Compose a dict object containing information used to do replacement in template
     @property
@@ -634,11 +637,13 @@ cleanlib:
         while not found and os.sep in package_rel_dir:
             index = package_rel_dir.index(os.sep)
             current_dir = mws.join(current_dir, package_rel_dir[:index])
-            if os.path.exists(current_dir):
+            try:
                 for fl in os.listdir(current_dir):
                     if fl.endswith('.dec'):
                         found = True
                         break
+            except:
+                EdkLogger.error('build', FILE_NOT_FOUND, "WORKSPACE does not exist.")
             package_rel_dir = package_rel_dir[index + 1:]
 
         MakefileTemplateDict = {
@@ -906,7 +911,7 @@ cleanlib:
                                     self._AutoGenObject.IncludePathList + self._AutoGenObject.BuildOptionIncPathList
                                     )
 
-        self.DependencyHeaderFileSet = set()
+
         if FileDependencyDict:
             for Dependency in FileDependencyDict.values():
                 self.DependencyHeaderFileSet.update(set(Dependency))
@@ -1240,6 +1245,7 @@ ${BEGIN}\t-@${create_directory_command}\n${END}\
         BuildFile.__init__(self, ModuleAutoGen)
         self.PlatformInfo = self._AutoGenObject.PlatformInfo
         self.IntermediateDirectoryList = ["$(DEBUG_DIR)", "$(OUTPUT_DIR)"]
+        self.DependencyHeaderFileSet = set()
 
     # Compose a dict object containing information used to do replacement in template
     @property
@@ -1430,6 +1436,7 @@ cleanlib:
         self.ModuleBuildDirectoryList = []
         self.LibraryBuildDirectoryList = []
         self.LibraryMakeCommandList = []
+        self.DependencyHeaderFileSet = set()
 
     # Compose a dict object containing information used to do replacement in template
     @property
@@ -1535,6 +1542,7 @@ class TopLevelMakefile(BuildFile):
     def __init__(self, Workspace):
         BuildFile.__init__(self, Workspace)
         self.IntermediateDirectoryList = []
+        self.DependencyHeaderFileSet = set()
 
     # Compose a dict object containing information used to do replacement in template
     @property
@@ -1580,8 +1588,8 @@ class TopLevelMakefile(BuildFile):
 
         if GlobalData.gCaseInsensitive:
             ExtraOption += " -c"
-        if GlobalData.gEnableGenfdsMultiThread:
-            ExtraOption += " --genfds-multi-thread"
+        if not GlobalData.gEnableGenfdsMultiThread:
+            ExtraOption += " --no-genfds-multi-thread"
         if GlobalData.gIgnoreSource:
             ExtraOption += " --ignore-sources"
 
@@ -1762,4 +1770,4 @@ def GetDependencyList(AutoGenObject, FileCache, File, ForceList, SearchPathList)
 
 # This acts like the main() function for the script, unless it is 'import'ed into another script.
 if __name__ == '__main__':
-    pass
+    pass
