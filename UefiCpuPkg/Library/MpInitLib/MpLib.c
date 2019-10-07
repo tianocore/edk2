@@ -1044,46 +1044,67 @@ WakeUpAP (
       SendInitSipiSipiAllExcludingSelf ((UINT32) ExchangeInfo->BufferStart);
     }
     if (CpuMpData->InitFlag == ApInitConfig) {
-      //
-      // The AP enumeration algorithm below is suitable for two use cases.
-      //
-      // (1) The check-in time for an individual AP is bounded, and APs run
-      //     through their initialization routines strongly concurrently. In
-      //     particular, the number of concurrently running APs
-      //     ("NumApsExecuting") is never expected to fall to zero
-      //     *temporarily* -- it is expected to fall to zero only when all
-      //     APs have checked-in.
-      //
-      //     In this case, the platform is supposed to set
-      //     PcdCpuApInitTimeOutInMicroSeconds to a low-ish value (just long
-      //     enough for one AP to start initialization). The timeout will be
-      //     reached soon, and remaining APs are collected by watching
-      //     NumApsExecuting fall to zero. If NumApsExecuting falls to zero
-      //     mid-process, while some APs have not completed initialization,
-      //     the behavior is undefined.
-      //
-      // (2) The check-in time for an individual AP is unbounded, and/or APs
-      //     may complete their initializations widely spread out. In
-      //     particular, some APs may finish initialization before some APs
-      //     even start.
-      //
-      //     In this case, the platform is supposed to set
-      //     PcdCpuApInitTimeOutInMicroSeconds to a high-ish value. The AP
-      //     enumeration will always take that long (except when the boot CPU
-      //     count happens to be maximal, that is,
-      //     PcdCpuMaxLogicalProcessorNumber). All APs are expected to
-      //     check-in before the timeout, and NumApsExecuting is assumed zero
-      //     at timeout. APs that miss the time-out may cause undefined
-      //     behavior.
-      //
-      TimedWaitForApFinish (
-        CpuMpData,
-        PcdGet32 (PcdCpuMaxLogicalProcessorNumber) - 1,
-        PcdGet32 (PcdCpuApInitTimeOutInMicroSeconds)
-        );
+      if (PcdGet32 (PcdCpuBootLogicalProcessorNumber) > 0) {
+        //
+        // The AP enumeration algorithm below is suitable only when the
+        // platform can tell us the *exact* boot CPU count in advance.
+        //
+        // The wait below finishes only when the detected AP count reaches
+        // (PcdCpuBootLogicalProcessorNumber - 1), regardless of how long that
+        // takes. If at least one AP fails to check in (meaning a platform
+        // hardware bug), the detection hangs forever, by design. If the actual
+        // boot CPU count in the system is higher than
+        // PcdCpuBootLogicalProcessorNumber (meaning a platform
+        // misconfiguration), then some APs may complete initialization after
+        // the wait finishes, and cause undefined behavior.
+        //
+        TimedWaitForApFinish (
+          CpuMpData,
+          PcdGet32 (PcdCpuBootLogicalProcessorNumber) - 1,
+          MAX_UINT32 // approx. 71 minutes
+          );
+      } else {
+        //
+        // The AP enumeration algorithm below is suitable for two use cases.
+        //
+        // (1) The check-in time for an individual AP is bounded, and APs run
+        //     through their initialization routines strongly concurrently. In
+        //     particular, the number of concurrently running APs
+        //     ("NumApsExecuting") is never expected to fall to zero
+        //     *temporarily* -- it is expected to fall to zero only when all
+        //     APs have checked-in.
+        //
+        //     In this case, the platform is supposed to set
+        //     PcdCpuApInitTimeOutInMicroSeconds to a low-ish value (just long
+        //     enough for one AP to start initialization). The timeout will be
+        //     reached soon, and remaining APs are collected by watching
+        //     NumApsExecuting fall to zero. If NumApsExecuting falls to zero
+        //     mid-process, while some APs have not completed initialization,
+        //     the behavior is undefined.
+        //
+        // (2) The check-in time for an individual AP is unbounded, and/or APs
+        //     may complete their initializations widely spread out. In
+        //     particular, some APs may finish initialization before some APs
+        //     even start.
+        //
+        //     In this case, the platform is supposed to set
+        //     PcdCpuApInitTimeOutInMicroSeconds to a high-ish value. The AP
+        //     enumeration will always take that long (except when the boot CPU
+        //     count happens to be maximal, that is,
+        //     PcdCpuMaxLogicalProcessorNumber). All APs are expected to
+        //     check-in before the timeout, and NumApsExecuting is assumed zero
+        //     at timeout. APs that miss the time-out may cause undefined
+        //     behavior.
+        //
+        TimedWaitForApFinish (
+          CpuMpData,
+          PcdGet32 (PcdCpuMaxLogicalProcessorNumber) - 1,
+          PcdGet32 (PcdCpuApInitTimeOutInMicroSeconds)
+          );
 
-      while (CpuMpData->MpCpuExchangeInfo->NumApsExecuting != 0) {
-        CpuPause();
+        while (CpuMpData->MpCpuExchangeInfo->NumApsExecuting != 0) {
+          CpuPause();
+        }
       }
     } else {
       //

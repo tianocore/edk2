@@ -227,6 +227,19 @@
   ## Specifies timeout value in microseconds for the BSP to detect all APs for the first time.
   # @Prompt Timeout for the BSP to detect all APs for the first time.
   gUefiCpuPkgTokenSpaceGuid.PcdCpuApInitTimeOutInMicroSeconds|50000|UINT32|0x00000004
+  ## Specifies the number of Logical Processors that are available in the
+  #  preboot environment after platform reset, including BSP and APs. Possible
+  #  values:<BR><BR>
+  #  zero (default) - PcdCpuBootLogicalProcessorNumber is ignored, and
+  #                   PcdCpuApInitTimeOutInMicroSeconds limits the initial AP
+  #                   detection by the BSP.<BR>
+  #  nonzero        - PcdCpuApInitTimeOutInMicroSeconds is ignored. The initial
+  #                   AP detection finishes only when the detected CPU count
+  #                   (BSP plus APs) reaches the value of
+  #                   PcdCpuBootLogicalProcessorNumber, regardless of how long
+  #                   that takes.<BR>
+  # @Prompt Number of Logical Processors available after platform reset.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuBootLogicalProcessorNumber|0|UINT32|0x00000008
   ## Specifies the base address of the first microcode Patch in the microcode Region.
   # @Prompt Microcode Region base address.
   gUefiCpuPkgTokenSpaceGuid.PcdCpuMicrocodePatchAddress|0x0|UINT64|0x00000005
