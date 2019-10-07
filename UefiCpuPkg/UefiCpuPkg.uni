@@ -37,6 +37,10 @@
 
 #string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuApInitTimeOutInMicroSeconds_HELP  #language en-US "Specifies timeout value in microseconds for the BSP to detect all APs for the first time."
 
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuBootLogicalProcessorNumber_PROMPT  #language en-US "Number of Logical Processors available after platform reset."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuBootLogicalProcessorNumber_HELP  #language en-US "Specifies the number of Logical Processors that are available in the preboot environment after platform reset, including BSP and APs."
+
 #string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuMicrocodePatchAddress_PROMPT  #language en-US "Microcode Region base address."
 
 #string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuMicrocodePatchAddress_HELP  #language en-US "Specifies the base address of the first microcode Patch in the microcode Region."
