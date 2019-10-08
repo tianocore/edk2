@@ -158,6 +158,11 @@ if defined VCToolsInstallDir (
     )
   )
 )
+if not defined WINSDK_PATH_FOR_RC_EXE (
+  if defined WINSDK10_PREFIX (
+    set "WINSDK_PATH_FOR_RC_EXE=%WINSDK10_PREFIX%x86"
+  )
+)
 
 :SetVS2017
 if not defined VS150COMNTOOLS (
@@ -207,6 +212,11 @@ if defined VCToolsInstallDir (
     ) else if exist "%ProgramFiles%\Windows Kits\10\bin" (
       set "WINSDK10_PREFIX=%ProgramFiles%\Windows Kits\10\bin\"
     )
+  )
+)
+if not defined WINSDK_PATH_FOR_RC_EXE (
+  if defined WINSDK10_PREFIX (
+    set "WINSDK_PATH_FOR_RC_EXE=%WINSDK10_PREFIX%x86"
   )
 )
 
