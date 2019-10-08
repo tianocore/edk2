@@ -99,6 +99,12 @@
 [Components]
   NetworkPkg/WifiConnectionManagerDxe/WifiConnectionManagerDxe.inf
   NetworkPkg/Application/VConfig/VConfig.inf
+  NetworkPkg/Library/DxeDpcLib/DxeDpcLib.inf
+  NetworkPkg/Library/DxeHttpLib/DxeHttpLib.inf
+  NetworkPkg/Library/DxeIpIoLib/DxeIpIoLib.inf
+  NetworkPkg/Library/DxeNetLib/DxeNetLib.inf
+  NetworkPkg/Library/DxeTcpIoLib/DxeTcpIoLib.inf
+  NetworkPkg/Library/DxeUdpIoLib/DxeUdpIoLib.inf
 
   !include NetworkPkg/Network.dsc.inc
 
