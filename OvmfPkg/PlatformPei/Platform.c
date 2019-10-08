@@ -30,7 +30,10 @@
 #include <Library/ResourcePublicationLib.h>
 #include <Guid/MemoryTypeInformation.h>
 #include <Ppi/MasterBootMode.h>
+#include <IndustryStandard/I440FxPiix4.h>
 #include <IndustryStandard/Pci22.h>
+#include <IndustryStandard/Q35MchIch9.h>
+#include <IndustryStandard/QemuCpuHotplug.h>
 #include <OvmfPlatforms.h>
 
 #include "Platform.h"
@@ -564,43 +567,161 @@ S3Verification (
 
 
 /**
-  Fetch the number of boot CPUs from QEMU and expose it to UefiCpuPkg modules.
-  Set the mMaxCpuCount variable.
+  Fetch the boot CPU count and the possible CPU count from QEMU, and expose
+  them to UefiCpuPkg modules. Set the mMaxCpuCount variable.
 **/
 VOID
 MaxCpuCountInitialization (
   VOID
   )
 {
-  UINT16        ProcessorCount;
+  UINT16        BootCpuCount;
   RETURN_STATUS PcdStatus;
 
+  //
+  // Try to fetch the boot CPU count.
+  //
   QemuFwCfgSelectItem (QemuFwCfgItemSmpCpuCount);
-  ProcessorCount = QemuFwCfgRead16 ();
-  //
-  // If the fw_cfg key or fw_cfg entirely is unavailable, load mMaxCpuCount
-  // from the PCD default. No change to PCDs.
-  //
-  if (ProcessorCount == 0) {
+  BootCpuCount = QemuFwCfgRead16 ();
+  if (BootCpuCount == 0) {
+    //
+    // QEMU doesn't report the boot CPU count. (BootCpuCount == 0) will let
+    // MpInitLib count APs up to (PcdCpuMaxLogicalProcessorNumber - 1), or
+    // until PcdCpuApInitTimeOutInMicroSeconds elapses (whichever is reached
+    // first).
+    //
+    DEBUG ((DEBUG_WARN, "%a: boot CPU count unavailable\n", __FUNCTION__));
     mMaxCpuCount = PcdGet32 (PcdCpuMaxLogicalProcessorNumber);
-    return;
+  } else {
+    //
+    // We will expose BootCpuCount to MpInitLib. MpInitLib will count APs up to
+    // (BootCpuCount - 1) precisely, regardless of timeout.
+    //
+    // Now try to fetch the possible CPU count.
+    //
+    UINTN CpuHpBase;
+    UINT32 CmdData2;
+
+    CpuHpBase = ((mHostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID) ?
+                 ICH9_CPU_HOTPLUG_BASE : PIIX4_CPU_HOTPLUG_BASE);
+
+    //
+    // If only legacy mode is available in the CPU hotplug register block, or
+    // the register block is completely missing, then the writes below are
+    // no-ops.
+    //
+    // 1. Switch the hotplug register block to modern mode.
+    //
+    IoWrite32 (CpuHpBase + QEMU_CPUHP_W_CPU_SEL, 0);
+    //
+    // 2. Select a valid CPU for deterministic reading of
+    //    QEMU_CPUHP_R_CMD_DATA2.
+    //
+    //    CPU#0 is always valid; it is the always present and non-removable
+    //    BSP.
+    //
+    IoWrite32 (CpuHpBase + QEMU_CPUHP_W_CPU_SEL, 0);
+    //
+    // 3. Send a command after which QEMU_CPUHP_R_CMD_DATA2 is specified to
+    //    read as zero, and which does not invalidate the selector. (The
+    //    selector may change, but it must not become invalid.)
+    //
+    //    Send QEMU_CPUHP_CMD_GET_PENDING, as it will prove useful later.
+    //
+    IoWrite8 (CpuHpBase + QEMU_CPUHP_W_CMD, QEMU_CPUHP_CMD_GET_PENDING);
+    //
+    // 4. Read QEMU_CPUHP_R_CMD_DATA2.
+    //
+    //    If the register block is entirely missing, then this is an unassigned
+    //    IO read, returning all-bits-one.
+    //
+    //    If only legacy mode is available, then bit#0 stands for CPU#0 in the
+    //    "CPU present bitmap". CPU#0 is always present.
+    //
+    //    Otherwise, QEMU_CPUHP_R_CMD_DATA2 is either still reserved (returning
+    //    all-bits-zero), or it is specified to read as zero after the above
+    //    steps. Both cases confirm modern mode.
+    //
+    CmdData2 = IoRead32 (CpuHpBase + QEMU_CPUHP_R_CMD_DATA2);
+    DEBUG ((DEBUG_VERBOSE, "%a: CmdData2=0x%x\n", __FUNCTION__, CmdData2));
+    if (CmdData2 != 0) {
+      //
+      // QEMU doesn't support the modern CPU hotplug interface. Assume that the
+      // possible CPU count equals the boot CPU count (precluding hotplug).
+      //
+      DEBUG ((DEBUG_WARN, "%a: modern CPU hotplug interface unavailable\n",
+        __FUNCTION__));
+      mMaxCpuCount = BootCpuCount;
+    } else {
+      //
+      // Grab the possible CPU count from the modern CPU hotplug interface.
+      //
+      UINT32 Present, Possible, Selected;
+
+      Present = 0;
+      Possible = 0;
+
+      //
+      // We've sent QEMU_CPUHP_CMD_GET_PENDING last; this ensures
+      // QEMU_CPUHP_RW_CMD_DATA can now be read usefully. However,
+      // QEMU_CPUHP_CMD_GET_PENDING may have selected a CPU with actual pending
+      // hotplug events; therefore, select CPU#0 forcibly.
+      //
+      IoWrite32 (CpuHpBase + QEMU_CPUHP_W_CPU_SEL, Possible);
+
+      do {
+        UINT8 CpuStatus;
+
+        //
+        // Read the status of the currently selected CPU. This will help with a
+        // sanity check against "BootCpuCount".
+        //
+        CpuStatus = IoRead8 (CpuHpBase + QEMU_CPUHP_R_CPU_STAT);
+        if ((CpuStatus & QEMU_CPUHP_STAT_ENABLED) != 0) {
+          ++Present;
+        }
+        //
+        // Attempt to select the next CPU.
+        //
+        ++Possible;
+        IoWrite32 (CpuHpBase + QEMU_CPUHP_W_CPU_SEL, Possible);
+        //
+        // If the selection is successful, then the following read will return
+        // the selector (which we know is positive at this point). Otherwise,
+        // the read will return 0.
+        //
+        Selected = IoRead32 (CpuHpBase + QEMU_CPUHP_RW_CMD_DATA);
+        ASSERT (Selected == Possible || Selected == 0);
+      } while (Selected > 0);
+
+      //
+      // Sanity check: fw_cfg and the modern CPU hotplug interface should
+      // return the same boot CPU count.
+      //
+      if (BootCpuCount != Present) {
+        DEBUG ((DEBUG_WARN, "%a: QEMU v2.7 reset bug: BootCpuCount=%d "
+          "Present=%u\n", __FUNCTION__, BootCpuCount, Present));
+        //
+        // The handling of QemuFwCfgItemSmpCpuCount, across CPU hotplug plus
+        // platform reset (including S3), was corrected in QEMU commit
+        // e3cadac073a9 ("pc: fix FW_CFG_NB_CPUS to account for -device added
+        // CPUs", 2016-11-16), part of release v2.8.0.
+        //
+        BootCpuCount = (UINT16)Present;
+      }
+
+      mMaxCpuCount = Possible;
+    }
   }
-  //
-  // Otherwise, set mMaxCpuCount to the value reported by QEMU.
-  //
-  mMaxCpuCount = ProcessorCount;
-  //
-  // Additionally, tell UefiCpuPkg modules (a) the exact number of VCPUs, (b)
-  // to wait, in the initial AP bringup, exactly as long as it takes for all of
-  // the APs to report in. For this, we set the longest representable timeout
-  // (approx. 71 minutes).
-  //
-  PcdStatus = PcdSet32S (PcdCpuMaxLogicalProcessorNumber, ProcessorCount);
+
+  DEBUG ((DEBUG_INFO, "%a: BootCpuCount=%d mMaxCpuCount=%u\n", __FUNCTION__,
+    BootCpuCount, mMaxCpuCount));
+  ASSERT (BootCpuCount <= mMaxCpuCount);
+
+  PcdStatus = PcdSet32S (PcdCpuBootLogicalProcessorNumber, BootCpuCount);
   ASSERT_RETURN_ERROR (PcdStatus);
-  PcdStatus = PcdSet32S (PcdCpuApInitTimeOutInMicroSeconds, MAX_UINT32);
+  PcdStatus = PcdSet32S (PcdCpuMaxLogicalProcessorNumber, mMaxCpuCount);
   ASSERT_RETURN_ERROR (PcdStatus);
-  DEBUG ((DEBUG_INFO, "%a: QEMU reports %d processor(s)\n", __FUNCTION__,
-    ProcessorCount));
 }
 
 
@@ -638,12 +759,13 @@ InitializePlatform (
   S3Verification ();
   BootModeInitialization ();
   AddressWidthInitialization ();
-  MaxCpuCountInitialization ();
 
   //
   // Query Host Bridge DID
   //
   mHostBridgeDevId = PciRead16 (OVMF_HOSTBRIDGE_DID);
+
+  MaxCpuCountInitialization ();
 
   if (FeaturePcdGet (PcdSmmSmramRequire)) {
     Q35TsegMbytesInitialization ();
