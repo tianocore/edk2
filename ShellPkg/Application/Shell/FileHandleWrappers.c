@@ -1644,6 +1644,9 @@ FileInterfaceMemWrite(
     //
     if ((UINTN)(MemFile->Position + (*BufferSize)) > (UINTN)(MemFile->BufferSize)) {
       MemFile->Buffer = ReallocatePool((UINTN)(MemFile->BufferSize), (UINTN)(MemFile->BufferSize) + (*BufferSize) + MEM_WRITE_REALLOC_OVERHEAD, MemFile->Buffer);
+      if (MemFile->Buffer == NULL){
+        return EFI_OUT_OF_RESOURCES;
+      }
       MemFile->BufferSize += (*BufferSize) + MEM_WRITE_REALLOC_OVERHEAD;
     }
     CopyMem(((UINT8*)MemFile->Buffer) + MemFile->Position, Buffer, *BufferSize);
@@ -1661,6 +1664,10 @@ FileInterfaceMemWrite(
     AsciiSPrint(AsciiBuffer, *BufferSize, "%S", Buffer);
     if ((UINTN)(MemFile->Position + AsciiStrSize(AsciiBuffer)) > (UINTN)(MemFile->BufferSize)) {
       MemFile->Buffer = ReallocatePool((UINTN)(MemFile->BufferSize), (UINTN)(MemFile->BufferSize) + AsciiStrSize(AsciiBuffer) + MEM_WRITE_REALLOC_OVERHEAD, MemFile->Buffer);
+      if (MemFile->Buffer == NULL){
+        FreePool(AsciiBuffer);
+        return EFI_OUT_OF_RESOURCES;
+      }
       MemFile->BufferSize += AsciiStrSize(AsciiBuffer) + MEM_WRITE_REALLOC_OVERHEAD;
     }
     CopyMem(((UINT8*)MemFile->Buffer) + MemFile->Position, AsciiBuffer, AsciiStrSize(AsciiBuffer));
