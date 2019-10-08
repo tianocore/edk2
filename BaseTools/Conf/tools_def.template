@@ -4,9 +4,18 @@
 #  Portions copyright (c) 2011 - 2014, ARM Ltd. All rights reserved.<BR>
 #  Copyright (c) 2015, Hewlett-Packard Development Company, L.P.<BR>
 #  (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
+#  Copyright (c) Microsoft Corporation
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
+#
+# Increase this version tag any time you want user to get warning about updating this
+# file in the Conf dir.  By default it does not do update existing conf dirs.
+#
+# 2.00 - Initial version with changes for CI
+#      - Change RC path to use plugin
+#
+#!VERSION=2.00
 
 IDENTIFIER = Default TOOL_CHAIN_CONF
 
@@ -70,6 +79,11 @@ DEFINE VS2019_BIN_IA32    = DEF(VS2019_BIN)\HostDEF(VS_HOST)\x86
 DEFINE VS2019_BIN_X64     = DEF(VS2019_BIN)\HostDEF(VS_HOST)\x64
 DEFINE VS2019_BIN_ARM     = DEF(VS2019_BIN)\HostDEF(VS_HOST)\arm
 DEFINE VS2019_BIN_AARCH64 = DEF(VS2019_BIN)\HostDEF(VS_HOST)\arm64
+
+#
+# Resource compiler
+#
+DEFINE RC_PATH    = ENV(WINSDK_PATH_FOR_RC_EXE)\rc.exe
 
 DEFINE WINSDK_BIN           = ENV(WINSDK_PREFIX)
 DEFINE WINSDKx86_BIN        = ENV(WINSDKx86_PREFIX)
@@ -1566,7 +1580,7 @@ NOOPT_VS2015x86_X64_DLINK_FLAGS    = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF
 
 *_VS2017_*_MAKE_PATH       = DEF(VS2017_BIN_HOST)\nmake.exe
 *_VS2017_*_MAKE_FLAG       = /nologo
-*_VS2017_*_RC_PATH         = DEF(WINSDK10_BIN)\rc.exe
+*_VS2017_*_RC_PATH         = DEF(RC_PATH)
 
 *_VS2017_*_MAKE_FLAGS      = /nologo
 *_VS2017_*_SLINK_FLAGS     = /NOLOGO /LTCG
@@ -1729,7 +1743,7 @@ NOOPT_VS2017_AARCH64_DLINK_FLAGS   = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF
 
 *_VS2019_*_MAKE_PATH       = DEF(VS2019_BIN_HOST)\nmake.exe
 *_VS2019_*_MAKE_FLAG       = /nologo
-*_VS2019_*_RC_PATH         = DEF(WINSDK10_BIN)\rc.exe
+*_VS2019_*_RC_PATH         = DEF(RC_PATH)
 
 *_VS2019_*_MAKE_FLAGS      = /nologo
 *_VS2019_*_SLINK_FLAGS     = /NOLOGO /LTCG
