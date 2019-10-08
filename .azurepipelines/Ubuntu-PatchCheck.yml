@@ -1,0 +1,35 @@
+## @file
+# Azure Pipielines YML file that evalues the patch series in a PR using the
+# python script BaseTools/Scripts/PatchCheck.py.
+#
+# NOTE: This example monitors pull requests against the edk2-ci branch.  Most
+# environments would replace 'edk2-ci' with 'master'.
+#
+# Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+# https://github.com/tianocore
+#
+##
+
+trigger: none
+
+pr:
+- master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- checkout: self
+  clean: true
+
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '3.7.x'
+    architecture: 'x64'
+
+- script: |
+    git fetch origin $(System.PullRequest.TargetBranch):$(System.PullRequest.TargetBranch)
+    python BaseTools/Scripts/PatchCheck.py $(System.PullRequest.TargetBranch)..$(System.PullRequest.SourceCommitId)
+  displayName: 'Use PatchCheck.py to verify patch series in pull request'
