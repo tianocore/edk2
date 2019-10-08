@@ -1,8 +1,9 @@
 /** @file
-  Industry Standard Definitions of SMBIOS Table Specification v3.2.0.
+  Industry Standard Definitions of SMBIOS Table Specification v3.3.0.
 
 Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015-2017 Hewlett Packard Enterprise Development LP<BR>
+(C) Copyright 2015 - 2019 Hewlett Packard Enterprise Development LP<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -46,7 +47,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define SMBIOS_3_0_TABLE_MAX_LENGTH 0xFFFFFFFF
 
 //
-// SMBIOS type macros which is according to SMBIOS 2.7 specification.
+// SMBIOS type macros which is according to SMBIOS 3.3.0 specification.
 //
 #define SMBIOS_TYPE_BIOS_INFORMATION                     0
 #define SMBIOS_TYPE_SYSTEM_INFORMATION                   1
@@ -92,6 +93,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define SMBIOS_TYPE_ONBOARD_DEVICES_EXTENDED_INFORMATION 41
 #define SMBIOS_TYPE_MANAGEMENT_CONTROLLER_HOST_INTERFACE 42
 #define SMBIOS_TYPE_TPM_DEVICE                           43
+#define SMBIOS_TYPE_PROCESSOR_ADDITIONAL_INFORMATION     44
 
 ///
 /// Inactive type is added from SMBIOS 2.2. Reference SMBIOS 2.6, chapter 3.3.43.
@@ -727,7 +729,10 @@ typedef enum {
   ProcessorFamilyMII                   = 0x012E,
   ProcessorFamilyWinChip               = 0x0140,
   ProcessorFamilyDSP                   = 0x015E,
-  ProcessorFamilyVideoProcessor        = 0x01F4
+  ProcessorFamilyVideoProcessor        = 0x01F4,
+  ProcessorFamilyRiscvRV32             = 0x0200,
+  ProcessorFamilyRiscVRV64             = 0x0201,
+  ProcessorFamilyRiscVRV128            = 0x0202
 } PROCESSOR_FAMILY2_DATA;
 
 ///
@@ -855,6 +860,19 @@ typedef struct {
   UINT32  ProcessorTm        :1;
   UINT32  ProcessorReserved4 :2;
 } PROCESSOR_FEATURE_FLAGS;
+
+typedef struct {
+  UINT32  ProcessorReserved1             :1;
+  UINT32  ProcessorUnknown               :1;
+  UINT32  Processor64BitCapble           :1;
+  UINT32  ProcessorMultiCore             :1;
+  UINT32  ProcessorHardwareThread        :1;
+  UINT32  ProcessorExecuteProtection     :1;
+  UINT32  ProcessorEnhancedVirtulization :1;
+  UINT32  ProcessorPowerPerformanceCtrl  :1;
+  UINT32  Processor128bitCapble          :1;
+  UINT32  ProcessorReserved2             :7;
+} PROCESSOR_CHARACTERISTIC_FLAGS;
 
 typedef struct {
   PROCESSOR_SIGNATURE     Signature;
@@ -2508,6 +2526,57 @@ typedef struct {
   UINT8                             InterfaceTypeSpecificData[4];   ///< This field has a minimum of four bytes
 } SMBIOS_TABLE_TYPE42;
 
+
+///
+/// Processor Specific Block - Processor Architecture Type
+///
+typedef enum{
+  ProcessorSpecificBlockArchTypeReserved   = 0x00,
+  ProcessorSpecificBlockArchTypeIa32       = 0x01,
+  ProcessorSpecificBlockArchTypeX64        = 0x02,
+  ProcessorSpecificBlockArchTypeItanium    = 0x03,
+  ProcessorSpecificBlockArchTypeAarch32    = 0x04,
+  ProcessorSpecificBlockArchTypeAarch64    = 0x05,
+  ProcessorSpecificBlockArchTypeRiscVRV32  = 0x06,
+  ProcessorSpecificBlockArchTypeRiscVRV64  = 0x07,
+  ProcessorSpecificBlockArchTypeRiscVRV128 = 0x08
+} PROCESSOR_SPECIFIC_BLOCK_ARCH_TYPE;
+
+///
+/// Processor Specific Block is the standard container of processor-specific data.
+///
+typedef struct {
+  UINT8                              Length;
+  UINT8                              ProcessorArchType;
+  ///
+  /// Below followed by Processor-specific data
+  ///
+  ///
+} PROCESSOR_SPECIFIC_BLOCK;
+
+///
+/// Processor Additional Information(Type 44).
+///
+/// The information in this structure defines the processor additional information in case
+/// SMBIOS type 4 is not sufficient to describe processor characteristics.
+/// The SMBIOS type 44 structure has a reference handle field to link back to the related
+/// SMBIOS type 4 structure. There may be multiple SMBIOS type 44 structures linked to the
+/// same SMBIOS type 4 structure. For example, when cores are not identical in a processor,
+/// SMBIOS type 44 structures describe different core-specific information.
+///
+/// SMBIOS type 44 defines the standard header for the processor-specific block, while the
+/// contents of processor-specific data are maintained by processor
+/// architecture workgroups or vendors in separate documents.
+///
+typedef struct {
+  SMBIOS_STRUCTURE                  Hdr;
+  SMBIOS_HANDLE                     RefHandle;                 ///< This field refer to associated SMBIOS type 4
+  ///
+  /// Below followed by Processor-specific block
+  ///
+  PROCESSOR_SPECIFIC_BLOCK          ProcessorSpecificBlock;
+} SMBIOS_TABLE_TYPE44;
+
 ///
 /// TPM Device (Type 43).
 ///
@@ -2586,6 +2655,7 @@ typedef union {
   SMBIOS_TABLE_TYPE41   *Type41;
   SMBIOS_TABLE_TYPE42   *Type42;
   SMBIOS_TABLE_TYPE43   *Type43;
+  SMBIOS_TABLE_TYPE44   *Type44;
   SMBIOS_TABLE_TYPE126  *Type126;
   SMBIOS_TABLE_TYPE127  *Type127;
   UINT8                 *Raw;
