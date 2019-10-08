@@ -1,0 +1,11 @@
+## @file
+# Build Plugin used to set the path to the visual studio tools chain
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+{
+  "scope": "global-win",
+  "name": "Windows Visual Studio Tool Chain Support",
+  "module": "WindowsVsToolChain"
+}
