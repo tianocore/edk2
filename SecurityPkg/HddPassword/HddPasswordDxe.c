@@ -120,7 +120,7 @@ BuildHddPasswordDeviceInfo (
 
     //
     // 1. Handle device which already set password.
-    // 2. When request to send freeze comamnd, driver also needs to handle device
+    // 2. When request to send freeze command, driver also needs to handle device
     //    which support security feature.
     //
     if ((!PasswordIsFullZero (ConfigFormEntry->Password)) ||
@@ -2008,9 +2008,9 @@ SaveHddPasswordRequest (
 }
 
 /**
-  Get the HDD Password configuration form entry by the index of the goto opcode actived.
+  Get the HDD Password configuration form entry by the index of the goto opcode activated.
 
-  @param[in]  Index The 0-based index of the goto opcode actived.
+  @param[in]  Index The 0-based index of the goto opcode activated.
 
   @return The HDD Password configuration form entry found.
 **/
@@ -2758,7 +2758,7 @@ HddPasswordConfigFormInit (
   @param ImageHandle     Image handle this driver.
   @param SystemTable     Pointer to SystemTable.
 
-  @retval EFI_SUCESS     This function always complete successfully.
+  @retval EFI_SUCCESS     This function always complete successfully.
 
 **/
 EFI_STATUS
@@ -2806,7 +2806,7 @@ HddPasswordDxeInit (
   ASSERT_EFI_ERROR (Status);
 
   //
-  // Make HDD_PASSWORD_VARIABLE_NAME varible read-only.
+  // Make HDD_PASSWORD_VARIABLE_NAME variable read-only.
   //
   Status = gBS->LocateProtocol (&gEdkiiVariableLockProtocolGuid, NULL, (VOID **) &VariableLock);
   if (!EFI_ERROR (Status)) {

@@ -64,16 +64,16 @@ DefinitionBlock (
       Field (TNVS, AnyAcc, NoLock, Preserve)
       {
         PPIN,   8,  //   Software SMI for Physical Presence Interface
-        PPIP,   32, //   Used for save physical presence paramter
+        PPIP,   32, //   Used for save physical presence parameter
         PPRP,   32, //   Physical Presence request operation response
         PPRQ,   32, //   Physical Presence request operation
         LPPR,   32, //   Last Physical Presence request operation
         FRET,   32, //   Physical Presence function return code
         MCIN,   8,  //   Software SMI for Memory Clear Interface
-        MCIP,   32, //   Used for save the Mor paramter
+        MCIP,   32, //   Used for save the Mor parameter
         MORD,   32, //   Memory Overwrite Request Data
         MRET,   32, //   Memory Overwrite function return code
-        UCRQ,   32  //   Phyical Presence request operation to Get User Confirmation Status
+        UCRQ,   32  //   Physical Presence request operation to Get User Confirmation Status
       }
 
       Method (PTS, 1, Serialized)

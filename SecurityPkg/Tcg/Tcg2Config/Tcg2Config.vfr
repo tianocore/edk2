@@ -16,19 +16,19 @@ formset
 
   efivarstore TCG2_CONFIGURATION_INFO,
     varid = TCG2_CONFIGURATION_INFO_VARSTORE_ID,
-    attribute = 0x02,  // EFI variable attribures  EFI_VARIABLE_BOOTSERVICE_ACCESS
+    attribute = 0x02,  // EFI variable attributes  EFI_VARIABLE_BOOTSERVICE_ACCESS
     name  = TCG2_CONFIGURATION_INFO,
     guid  = TCG2_CONFIG_FORM_SET_GUID;
 
   efivarstore TCG2_CONFIGURATION,
     varid = TCG2_CONFIGURATION_VARSTORE_ID,
-    attribute = 0x03,  // EFI variable attribures  EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE
+    attribute = 0x03,  // EFI variable attributes  EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE
     name  = TCG2_CONFIGURATION,
     guid  = TCG2_CONFIG_FORM_SET_GUID;
 
   efivarstore TCG2_VERSION,
     varid = TCG2_VERSION_VARSTORE_ID,
-    attribute = 0x03,  // EFI variable attribures  EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE
+    attribute = 0x03,  // EFI variable attributes  EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE
     name  = TCG2_VERSION,
     guid  = TCG2_CONFIG_FORM_SET_GUID;
 

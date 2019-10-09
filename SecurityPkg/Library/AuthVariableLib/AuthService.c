@@ -425,7 +425,7 @@ CheckSignatureListFormat(
   RsaContext = NULL;
 
   //
-  // Walk throuth the input signature list and check the data format.
+  // Walk through the input signature list and check the data format.
   // If any signature is incorrectly formed, the whole check will fail.
   //
   while ((SigDataSize > 0) && (SigDataSize >= SigList->SignatureListSize)) {
@@ -1069,7 +1069,7 @@ AuthServiceInternalCompareTimeStamp (
   @param[out] Sha256Digest       Sha256 digest calculated.
 
   @return EFI_ABORTED          Digest process failed.
-  @return EFI_SUCCESS          SHA256 Digest is succesfully calculated.
+  @return EFI_SUCCESS          SHA256 Digest is successfully calculated.
 
 **/
 EFI_STATUS

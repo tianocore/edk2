@@ -79,7 +79,7 @@ EFI_TCG_CLIENT_ACPI_TABLE           mTcgClientAcpiTemplate = {
 
 //
 // The following EFI_TCG_SERVER_ACPI_TABLE default setting is just one example,
-// the TPM device connectes to LPC, and also defined the ACPI _UID as 0xFF,
+// the TPM device connects to LPC, and also defined the ACPI _UID as 0xFF,
 // this _UID can be changed and should match with the _UID setting of the TPM
 // ACPI device object
 //
@@ -1224,7 +1224,7 @@ InstallAcpiTable (
     mTcgClientAcpiTemplate.Header.CreatorId        = PcdGet32 (PcdAcpiDefaultCreatorId);
     mTcgClientAcpiTemplate.Header.CreatorRevision  = PcdGet32 (PcdAcpiDefaultCreatorRevision);
     //
-    // The ACPI table must be checksumed before calling the InstallAcpiTable()
+    // The ACPI table must be checksummed before calling the InstallAcpiTable()
     // service of the ACPI table protocol to install it.
     //
     Checksum = CalculateCheckSum8 ((UINT8 *)&mTcgClientAcpiTemplate, sizeof (mTcgClientAcpiTemplate));
@@ -1244,7 +1244,7 @@ InstallAcpiTable (
     mTcgServerAcpiTemplate.Header.CreatorId        = PcdGet32 (PcdAcpiDefaultCreatorId);
     mTcgServerAcpiTemplate.Header.CreatorRevision  = PcdGet32 (PcdAcpiDefaultCreatorRevision);
     //
-    // The ACPI table must be checksumed before calling the InstallAcpiTable()
+    // The ACPI table must be checksummed before calling the InstallAcpiTable()
     // service of the ACPI table protocol to install it.
     //
     Checksum = CalculateCheckSum8 ((UINT8 *)&mTcgServerAcpiTemplate, sizeof (mTcgServerAcpiTemplate));

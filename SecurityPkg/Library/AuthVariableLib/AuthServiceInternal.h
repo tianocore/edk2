@@ -159,7 +159,7 @@ DeleteCertsFromDb (
 /**
   Clean up signer's certificates for common authenticated variable
   by corresponding VariableName and VendorGuid from "certdb".
-  Sytem may break down during Timebased Variable update & certdb update,
+  System may break down during Timebased Variable update & certdb update,
   make them inconsistent,  this function is called in AuthVariable Init to ensure
   consistency
 

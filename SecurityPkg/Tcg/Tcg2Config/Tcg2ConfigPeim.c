@@ -57,7 +57,7 @@ DetectTpmDevice (
   @param  FileHandle  Handle of the file being invoked.
   @param  PeiServices Describes the list of possible PEI Services.
 
-  @retval EFI_SUCCES             Convert variable to PCD successfully.
+  @retval EFI_SUCCESS            Convert variable to PCD successfully.
   @retval Others                 Fail to convert variable to PCD.
 **/
 EFI_STATUS
@@ -118,7 +118,7 @@ Tcg2ConfigPeimEntryPoint (
 
   //
   // Convert variable to PCD.
-  // This is work-around because there is no gurantee DynamicHiiPcd can return correct value in DXE phase.
+  // This is work-around because there is no guarantee DynamicHiiPcd can return correct value in DXE phase.
   // Using DynamicPcd instead.
   //
   // NOTE: Tcg2Configuration variable contains the desired TpmDevice type,

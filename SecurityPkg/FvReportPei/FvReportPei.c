@@ -145,7 +145,7 @@ VerifyHashedFv (
   ASSERT (HashValue != NULL);
 
   //
-  // Calcuate hash value for each FV first.
+  // Calculate hash value for each FV first.
   //
   FvHashValue = HashValue;
   for (FvIndex = 0; FvIndex < FvNumber; ++FvIndex) {
@@ -281,7 +281,7 @@ ReportHashedFv (
   @param[in] StoredHashFvPpi  Pointer to PPI containing hash information.
   @param[in] BootMode         Current boot mode.
 
-  @retval Pointer to structure containning valid hash information for current boot mode.
+  @retval Pointer to structure containing valid hash information for current boot mode.
   @retval NULL if there's no hash associated with current boot mode.
 **/
 STATIC

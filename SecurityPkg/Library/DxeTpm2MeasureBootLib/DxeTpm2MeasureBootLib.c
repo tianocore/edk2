@@ -362,7 +362,7 @@ Tcg2MeasurePeImage (
   if (Status == EFI_VOLUME_FULL) {
     //
     // Volume full here means the image is hashed and its result is extended to PCR.
-    // But the event log cann't be saved since log area is full.
+    // But the event log can't be saved since log area is full.
     // Just return EFI_SUCCESS in order not to block the image load.
     //
     Status = EFI_SUCCESS;
@@ -541,7 +541,7 @@ DxeTpm2MeasureBootHandler (
     }
     //
     // The PE image from unmeasured Firmware volume need be measured
-    // The PE image from measured Firmware volume will be mearsured according to policy below.
+    // The PE image from measured Firmware volume will be measured according to policy below.
     //   If it is driver, do not measure
     //   If it is application, still measure.
     //

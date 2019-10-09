@@ -2583,7 +2583,7 @@ OpalDriverGetDriverDeviceName(
   @param ImageHandle     Image Handle this driver.
   @param SystemTable     Pointer to SystemTable.
 
-  @retval EFI_SUCESS     This function always complete successfully.
+  @retval EFI_SUCCESS     This function always complete successfully.
 **/
 EFI_STATUS
 EFIAPI
@@ -2637,7 +2637,7 @@ EfiDriverEntryPoint(
   Tests to see if this driver supports a given controller.
 
   This function checks to see if the controller contains an instance of the
-  EFI_STORAGE_SECURITY_COMMAND_PROTOCOL and the EFI_BLOCK_IO_PROTOCL
+  EFI_STORAGE_SECURITY_COMMAND_PROTOCOL and the EFI_BLOCK_IO_PROTOCOL
   and returns EFI_SUCCESS if it does.
 
   @param[in]  This                  A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
@@ -2741,7 +2741,7 @@ OpalEfiDriverBindingSupported(
   "controller", which is a child Handle, contains the EF_STORAGE_SECURITY_COMMAND protocols.
   This function will complete the other necessary checks, such as verifying the device supports
   the correct version of Opal.  Upon verification, it will add the device to the
-  Opal HII list in order to expose Opal managmeent options.
+  Opal HII list in order to expose Opal management options.
 
   @param[in]  This                  A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
   @param[in]  ControllerHandle      The Handle of the controller to start. This Handle

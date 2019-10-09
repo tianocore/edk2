@@ -80,7 +80,7 @@
 
 #string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTpmPhysicalPresence_PROMPT  #language en-US "Physical presence of the platform operator."
 
-#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTpmPhysicalPresence_HELP  #language en-US "Indicates the presence or absence of the platform operator during firmware booting. If platform operator is not physical presnece during boot. TPM will be locked and the TPM commands that required operator physical presence can not run.<BR><BR>\n"
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTpmPhysicalPresence_HELP  #language en-US "Indicates the presence or absence of the platform operator during firmware booting. If platform operator is not physical presence during boot. TPM will be locked and the TPM commands that required operator physical presence can not run.<BR><BR>\n"
                                                                                        "TRUE  - The platform operator is physically present.<BR>\n"
                                                                                        "FALSE - The platform operator is not physically present.<BR>"
 
@@ -176,9 +176,9 @@
 #string STR_gEfiSecurityPkgTokenSpaceGuid_PcdRsa2048Sha256PublicKeyBuffer_HELP  #language en-US "Provides one or more SHA 256 Hashes of the RSA 2048 public keys used to verify Recovery and Capsule Update images\n"
                                                                                                 "WARNING: The default value is treated as test key. Please do not use default value in the production."
 
-#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTcg2NumberOfPCRBanks_PROMPT  #language en-US "OEM configurated number of PCR banks."
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTcg2NumberOfPCRBanks_PROMPT  #language en-US "OEM configured number of PCR banks."
 
-#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTcg2NumberOfPCRBanks_HELP  #language en-US "This PCR means the OEM configurated number of PCR banks.\n"
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTcg2NumberOfPCRBanks_HELP  #language en-US "This PCR means the OEM configured number of PCR banks.\n"
                                                                                         "0 means dynamic get from supported HASH algorithm"
 
 #string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTcg2HashAlgorithmBitmap_PROMPT  #language en-US "Hash Algorithm bitmap."
@@ -256,10 +256,10 @@
                                                                                           "0x02 - CRB interface is active.<BR>\n"
                                                                                           "0xFF - Contains no current active TPM interface type<BR>"
 
-#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdCRBIdleByPass_PROMPT  #language en-US "IdleByass status supported by current active TPM interface."
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdCRBIdleByPass_PROMPT  #language en-US "IdleBypass status supported by current active TPM interface."
 
-#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdCRBIdleByPass_HELP  #language en-US "This PCD records IdleByass status supported by current active TPM interface.\n"
-                                                                                          "Accodingt to TCG PTP spec 1.3, TPM with CRB interface can skip idle state and diretcly move to CmdReady state. <BR>"
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdCRBIdleByPass_HELP  #language en-US "This PCD records IdleBypass status supported by current active TPM interface.\n"
+                                                                                          "According to TCG PTP spec 1.3, TPM with CRB interface can skip idle state and directly move to CmdReady state. <BR>"
                                                                                           "0x01 - Do not support IdleByPass.<BR>\n"
                                                                                           "0x02 - Support IdleByPass.<BR>\n"
                                                                                           "0xFF - IdleByPass State is not synced with TPM hardware.<BR>"

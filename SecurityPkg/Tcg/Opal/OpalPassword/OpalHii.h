@@ -156,7 +156,7 @@ OpalHiiSetBrowserData (
 
 /**
 
-  Populate the hii_g_Configuraton with the browser Data.
+  Populate the hii_g_Configuration with the browser Data.
 
 **/
 VOID
@@ -247,7 +247,7 @@ GetDiskNameStringId(
 
   @param OpalDisk                The Opal device.
 
-  @retval EFI_SUCESS             Initialize the device success.
+  @retval EFI_SUCCESS             Initialize the device success.
   @retval EFI_DEVICE_ERROR       Get info from device failed.
   @retval EFI_INVALID_PARAMETER  Not get Msid info before get ownership info.
 
@@ -348,7 +348,7 @@ HiiUninstall(
 
   @param Dev                  The Opal device.
 
-  @retval EFI_SUCESS          Initialize the device success.
+  @retval EFI_SUCCESS          Initialize the device success.
   @retval EFI_DEVICE_ERROR    Get info from device failed.
 
 **/
@@ -362,7 +362,7 @@ OpalDiskInitialize (
 
   @param OpalDisk                The Opal device.
 
-  @retval EFI_SUCESS             Get ownership success.
+  @retval EFI_SUCCESS             Get ownership success.
   @retval EFI_ACCESS_DENIED      Has send BlockSID command, can't change ownership.
   @retval EFI_INVALID_PARAMETER  Not get Msid info before get ownership info.
 

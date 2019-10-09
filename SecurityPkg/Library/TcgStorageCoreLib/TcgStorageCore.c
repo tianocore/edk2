@@ -1249,7 +1249,7 @@ TcgGetTokenByteSequence(
   Get next specify value.
 
   @param    ParseStruct   Input parse structure.
-  @param    Value         Return vlaue.
+  @param    Value         Return value.
 
   @retval   return the action result.
 
@@ -1282,7 +1282,7 @@ TcgGetNextUINT8(
   Get next specify value.
 
   @param    ParseStruct   Input parse structure.
-  @param    Value         Return vlaue.
+  @param    Value         Return value.
 
   @retval   return the action result.
 
@@ -1315,7 +1315,7 @@ TcgGetNextUINT16(
   Get next specify value.
 
   @param    ParseStruct   Input parse structure.
-  @param    Value         Return vlaue.
+  @param    Value         Return value.
 
   @retval   return the action result.
 
@@ -1348,7 +1348,7 @@ TcgGetNextUINT32(
   Get next specify value.
 
   @param    ParseStruct   Input parse structure.
-  @param    Value         Return vlaue.
+  @param    Value         Return value.
 
   @retval   return the action result.
 
@@ -1370,7 +1370,7 @@ TcgGetNextUINT64(
   Get next specify value.
 
   @param    ParseStruct   Input parse structure.
-  @param    Value         Return vlaue.
+  @param    Value         Return value.
 
   @retval   return the action result.
 

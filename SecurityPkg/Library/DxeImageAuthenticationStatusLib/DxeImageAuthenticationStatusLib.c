@@ -49,7 +49,7 @@ DxeImageAuthenticationStatusHandler (
 
 
 /**
-  Register image authenticaion status check handler.
+  Register image authentication status check handler.
 
   @param  ImageHandle   ImageHandle of the loaded driver.
   @param  SystemTable   Pointer to the EFI System Table.

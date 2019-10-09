@@ -45,8 +45,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #string STR_DBX_PE_IMAGE_FORMAT_HELP       #language en-US "PE image enrolled. Use SHA256 hash to enroll it into DBX"
 #string STR_DBX_PE_FORMAT_SHA256           #language en-US "PE Image SHA256"
 
-#string STR_DBX_AUTH_2_FORMAT_HELP         #language en-US "VARIABLE_AUTHENICATION_2 binary enrolled. Use raw binary to enroll it into DBX"
-#string STR_DBX_AUTH_2_FORMAT              #language en-US "VARIABLE_AUTHENICATION_2"
+#string STR_DBX_AUTH_2_FORMAT_HELP         #language en-US "VARIABLE_AUTHENTICATION_2 binary enrolled. Use raw binary to enroll it into DBX"
+#string STR_DBX_AUTH_2_FORMAT              #language en-US "VARIABLE_AUTHENTICATION_2"
 
 #string STR_CERTIFICATE_REVOCATION_TIME_PROMPT #language en-US "  Revocation Time"
 #string STR_CERTIFICATE_REVOCATION_TIME_HELP   #language en-US "Input the revocation time of the certificate"

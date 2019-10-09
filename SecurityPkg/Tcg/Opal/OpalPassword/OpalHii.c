@@ -1090,7 +1090,7 @@ OpalHiiSetBrowserData (
 
 /**
 
-  Populate the hii_g_Configuraton with the browser Data.
+  Populate the hii_g_Configuration with the browser Data.
 
 **/
 VOID
@@ -1164,7 +1164,7 @@ HiiSetFormString(
 
   @param Dev                  The Opal device.
 
-  @retval EFI_SUCESS          Initialize the device success.
+  @retval EFI_SUCCESS          Initialize the device success.
   @retval EFI_DEVICE_ERROR    Get info from device failed.
 
 **/
@@ -1193,7 +1193,7 @@ OpalDiskInitialize (
   }
   Session.OpalBaseComId = Dev->OpalDisk.OpalBaseComId;
 
-  TcgResult = OpalUtilGetMsid (&Session, Dev->OpalDisk.Msid, OPAL_MSID_LENGHT, &Dev->OpalDisk.MsidLength);
+  TcgResult = OpalUtilGetMsid (&Session, Dev->OpalDisk.Msid, OPAL_MSID_LENGTH, &Dev->OpalDisk.MsidLength);
   if (TcgResult != TcgResultSuccess) {
     return EFI_DEVICE_ERROR;
   }
@@ -1220,7 +1220,7 @@ OpalDiskInitialize (
 
   @param OpalDisk                The Opal device.
 
-  @retval EFI_SUCESS             Get ownership success.
+  @retval EFI_SUCCESS             Get ownership success.
   @retval EFI_ACCESS_DENIED      Has send BlockSID command, can't change ownership.
   @retval EFI_INVALID_PARAMETER  Not get Msid info before get ownership info.
 
@@ -1254,7 +1254,7 @@ OpalDiskUpdateOwnerShip (
 
   @param OpalDisk                The Opal device.
 
-  @retval EFI_SUCESS             Initialize the device success.
+  @retval EFI_SUCCESS             Initialize the device success.
   @retval EFI_DEVICE_ERROR       Get info from device failed.
   @retval EFI_INVALID_PARAMETER  Not get Msid info before get ownership info.
   @retval EFI_ACCESS_DENIED      Has send BlockSID command, can't change ownership.

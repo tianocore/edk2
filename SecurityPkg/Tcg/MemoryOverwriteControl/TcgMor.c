@@ -1,7 +1,7 @@
 /** @file
   TCG MOR (Memory Overwrite Request) Control Driver.
 
-  This driver initilize MemoryOverwriteRequestControl variable. It
+  This driver initialize MemoryOverwriteRequestControl variable. It
   will clear MOR_CLEAR_MEMORY_BIT bit if it is set. It will also do TPer Reset for
   those encrypted drives through EFI_STORAGE_SECURITY_COMMAND_PROTOCOL at EndOfDxe.
 
@@ -298,7 +298,7 @@ TPerResetAtEndOfDxe (
   @param[in] ImageHandle  Image handle of this driver.
   @param[in] SystemTable  A Pointer to the EFI System Table.
 
-  @retval EFI_SUCEESS
+  @retval EFI_SUCCESS
   @return Others          Some error occurs.
 **/
 EFI_STATUS
@@ -341,7 +341,7 @@ MorDriverEntryPoint (
     //
     // Create a Ready To Boot Event and Clear the MorControl bit in the call back function.
     //
-    DEBUG ((DEBUG_INFO, "TcgMor: Create ReadyToBoot Event for MorControl Bit cleanning!\n"));
+    DEBUG ((DEBUG_INFO, "TcgMor: Create ReadyToBoot Event for MorControl Bit cleaning!\n"));
     Status = EfiCreateEventReadyToBootEx (
                TPL_CALLBACK,
                OnReadyToBoot,
