@@ -1,5 +1,5 @@
 // /** @file
-// Initilizes MemoryOverwriteRequestControlLock variable
+// Initializes MemoryOverwriteRequestControlLock variable
 //
 // This module will add Variable Hook and allow MemoryOverwriteRequestControlLock variable set only once.
 //
@@ -10,7 +10,7 @@
 // **/
 
 
-#string STR_MODULE_ABSTRACT             #language en-US "Initilizes MemoryOverwriteRequestControlLock variable"
+#string STR_MODULE_ABSTRACT             #language en-US "Initializes MemoryOverwriteRequestControlLock variable"
 
 #string STR_MODULE_DESCRIPTION          #language en-US "This module will add Variable Hook and allow MemoryOverwriteRequestControlLock variable set only once."
 

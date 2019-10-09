@@ -1,5 +1,5 @@
 // /** @file
-// Provides the capbility to configure secure boot in a setup browser
+// Provides the capability to configure secure boot in a setup browser
 //
 // By this module, user may change the content of DB, DBX, PK and KEK.
 //

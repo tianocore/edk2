@@ -128,7 +128,7 @@ HASH_INTERFACE  mSha1InternalHashInstance = {
 /**
   The function register SHA1 instance.
 
-  @retval EFI_SUCCESS   SHA1 instance is registered, or system dose not surpport registr SHA1 instance
+  @retval EFI_SUCCESS   SHA1 instance is registered, or system does not support register SHA1 instance
 **/
 EFI_STATUS
 EFIAPI

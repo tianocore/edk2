@@ -56,7 +56,7 @@ Tpm12MeasureAndLogData (
   TcgEvent = NULL;
 
   //
-  // Tpm active/deactive state is checked in HashLogExtendEvent
+  // Tpm activation state is checked in HashLogExtendEvent
   //
   Status = gBS->LocateProtocol (&gEfiTcgProtocolGuid, NULL, (VOID **) &TcgProtocol);
   if (EFI_ERROR(Status)){

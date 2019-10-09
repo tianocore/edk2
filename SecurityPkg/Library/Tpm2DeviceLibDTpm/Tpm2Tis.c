@@ -81,7 +81,7 @@ TisPcWaitRegisterBits (
   in the time of default TIS_TIMEOUT_D.
 
   @param[in]  TisReg                Pointer to TIS register.
-  @param[out] BurstCount            Pointer to a buffer to store the got BurstConut.
+  @param[out] BurstCount            Pointer to a buffer to store the got BurstCount.
 
   @retval     EFI_SUCCESS           Get BurstCount.
   @retval     EFI_INVALID_PARAMETER TisReg is NULL or BurstCount is NULL.
@@ -303,7 +303,7 @@ Tpm2TisTpmCommand (
                TIS_TIMEOUT_B
                );
     //
-    // Do not clear CANCEL bit here bicoz Writes of 0 to this bit are ignored
+    // Do not clear CANCEL bit here because Writes of 0 to this bit are ignored
     //
     if (EFI_ERROR (Status)) {
       //

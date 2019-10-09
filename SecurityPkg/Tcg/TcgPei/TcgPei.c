@@ -85,7 +85,7 @@ PhysicalPresencePpiNotifyCallback (
   );
 
 /**
-  Measure and record the Firmware Volum Information once FvInfoPPI install.
+  Measure and record the Firmware Volume Information once FvInfoPPI install.
 
   @param[in] PeiServices       An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param[in] NotifyDescriptor  Address of the notification descriptor data structure.
@@ -97,14 +97,14 @@ PhysicalPresencePpiNotifyCallback (
 **/
 EFI_STATUS
 EFIAPI
-FirmwareVolmeInfoPpiNotifyCallback (
+FirmwareVolumeInfoPpiNotifyCallback (
   IN EFI_PEI_SERVICES              **PeiServices,
   IN EFI_PEI_NOTIFY_DESCRIPTOR     *NotifyDescriptor,
   IN VOID                          *Ppi
   );
 
 /**
-  Record all measured Firmware Volum Information into a Guid Hob
+  Record all measured Firmware Volume Information into a Guid Hob
 
   @param[in] PeiServices       An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param[in] NotifyDescriptor  Address of the notification descriptor data structure.
@@ -131,12 +131,12 @@ EFI_PEI_NOTIFY_DESCRIPTOR           mNotifyList[] = {
   {
     EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK,
     &gEfiPeiFirmwareVolumeInfoPpiGuid,
-    FirmwareVolmeInfoPpiNotifyCallback
+    FirmwareVolumeInfoPpiNotifyCallback
   },
   {
     EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK,
     &gEfiPeiFirmwareVolumeInfo2PpiGuid,
-    FirmwareVolmeInfoPpiNotifyCallback
+    FirmwareVolumeInfoPpiNotifyCallback
   },
   {
     (EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
@@ -146,7 +146,7 @@ EFI_PEI_NOTIFY_DESCRIPTOR           mNotifyList[] = {
 };
 
 /**
-  Record all measured Firmware Volum Information into a Guid Hob
+  Record all measured Firmware Voluem Information into a Guid Hob
   Guid Hob payload layout is
 
      UINT32 *************************** FIRMWARE_BLOB number
@@ -501,7 +501,7 @@ MeasureMainBios (
 }
 
 /**
-  Measure and record the Firmware Volum Information once FvInfoPPI install.
+  Measure and record the Firmware Voluem Information once FvInfoPPI install.
 
   @param[in] PeiServices       An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param[in] NotifyDescriptor  Address of the notification descriptor data structure.
@@ -513,7 +513,7 @@ MeasureMainBios (
 **/
 EFI_STATUS
 EFIAPI
-FirmwareVolmeInfoPpiNotifyCallback (
+FirmwareVolumeInfoPpiNotifyCallback (
   IN EFI_PEI_SERVICES               **PeiServices,
   IN EFI_PEI_NOTIFY_DESCRIPTOR      *NotifyDescriptor,
   IN VOID                           *Ppi
@@ -672,7 +672,7 @@ PhysicalPresencePpiNotifyCallback (
 }
 
 /**
-  Check if TPM chip is activeated or not.
+  Check if TPM chip is activated or not.
 
   @param[in]      PeiServices   Describes the list of possible PEI Services.
 

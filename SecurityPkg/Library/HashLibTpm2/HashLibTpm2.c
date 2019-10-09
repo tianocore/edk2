@@ -29,7 +29,7 @@ TPM2_HASH_MASK mTpm2HashMask[] = {
 };
 
 /**
-  The function get algorith from hash mask info.
+  The function get algorithm from hash mask info.
 
   @return Hash algorithm
 **/

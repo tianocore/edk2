@@ -11,7 +11,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/TcgStorageOpalLib.h>
 #include "TcgStorageOpalLibInternal.h"
 
-#define OPAL_MSID_LENGHT        128
+#define OPAL_MSID_LENGTH        128
 
 /**
   Creates a session with OPAL_UID_ADMIN_SP as OPAL_ADMIN_SP_PSID_AUTHORITY, then reverts device using Admin SP Revert method.
@@ -1095,7 +1095,7 @@ GetRevertTimeOut (
   OPAL_DISK_SUPPORT_ATTRIBUTE  SupportedAttributes;
   UINT16                       BaseComId;
   UINT32                       MsidLength;
-  UINT8                        Msid[OPAL_MSID_LENGHT];
+  UINT8                        Msid[OPAL_MSID_LENGTH];
   UINT32                       RemovalMechanishLists[ResearvedMechanism];
   UINT8                        ActiveDataRemovalMechanism;
 
@@ -1104,7 +1104,7 @@ GetRevertTimeOut (
     return 0;
   }
 
-  TcgResult = OpalUtilGetMsid (Session, Msid, OPAL_MSID_LENGHT, &MsidLength);
+  TcgResult = OpalUtilGetMsid (Session, Msid, OPAL_MSID_LENGTH, &MsidLength);
   if (TcgResult != TcgResultSuccess) {
     return 0;
   }

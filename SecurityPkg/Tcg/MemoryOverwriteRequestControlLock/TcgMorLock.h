@@ -119,7 +119,7 @@ SetVariableCheckHandlerMor (
   @param[in] ImageHandle  Image handle of this driver.
   @param[in] SystemTable  A Pointer to the EFI System Table.
 
-  @retval EFI_SUCEESS
+  @retval EFI_SUCCESS
   @return Others          Some error occurs.
 **/
 EFI_STATUS

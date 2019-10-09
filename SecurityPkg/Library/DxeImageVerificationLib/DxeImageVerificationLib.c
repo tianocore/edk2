@@ -745,7 +745,7 @@ AddImageExeInfo (
   if (ImageExeInfoTable != NULL) {
     //
     // The table has been found!
-    // We must enlarge the table to accomodate the new exe info entry.
+    // We must enlarge the table to accommodate the new exe info entry.
     //
     ImageExeInfoTableSize = GetImageExeInfoTableSize (ImageExeInfoTable);
   } else {
@@ -947,7 +947,7 @@ Done:
 
   @param[in]  VariableName        Name of database variable that is searched in.
   @param[in]  Signature           Pointer to signature that is searched for.
-  @param[in]  CertType            Pointer to hash algrithom.
+  @param[in]  CertType            Pointer to hash algorithm.
   @param[in]  SignatureSize       Size of Signature.
 
   @return TRUE                    Found the signature in the variable database.
@@ -992,7 +992,7 @@ IsSignatureFoundInDatabase (
     goto Done;
   }
   //
-  // Enumerate all signature data in SigDB to check if executable's signature exists.
+  // Enumerate all signature data in SigDB to check if signature exists for executable.
   //
   CertList = (EFI_SIGNATURE_LIST *) Data;
   while ((DataSize > 0) && (DataSize >= CertList->SignatureListSize)) {
@@ -1844,7 +1844,7 @@ DxeImageVerificationHandler (
 
   if (OffSet != (SecDataDir->VirtualAddress + SecDataDir->Size)) {
     //
-    // The Size in Certificate Table or the attribute certicate table is corrupted.
+    // The Size in Certificate Table or the attribute certificate table is corrupted.
     //
     VerifyStatus = EFI_ACCESS_DENIED;
   }
@@ -1855,7 +1855,7 @@ DxeImageVerificationHandler (
     Status = EFI_ACCESS_DENIED;
     if (Action == EFI_IMAGE_EXECUTION_AUTH_SIG_FAILED || Action == EFI_IMAGE_EXECUTION_AUTH_SIG_FOUND) {
       //
-      // Get image hash value as executable's signature.
+      // Get image hash value as signature of executable.
       //
       SignatureListSize = sizeof (EFI_SIGNATURE_LIST) + sizeof (EFI_SIGNATURE_DATA) - 1 + mImageDigestSize;
       SignatureList     = (EFI_SIGNATURE_LIST *) AllocateZeroPool (SignatureListSize);

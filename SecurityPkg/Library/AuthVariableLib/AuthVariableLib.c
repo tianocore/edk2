@@ -96,7 +96,7 @@ VOID **mAuthVarAddressPointer[9];
 AUTH_VAR_LIB_CONTEXT_IN *mAuthVarLibContextIn = NULL;
 
 /**
-  Initialization for authenticated varibale services.
+  Initialization for authenticated variable services.
   If this initialization returns error status, other APIs will not work
   and expect to be not called then.
 
@@ -382,7 +382,7 @@ AuthVariableLibInitialize (
   @retval EFI_INVALID_PARAMETER     Invalid parameter.
   @retval EFI_WRITE_PROTECTED       Variable is write-protected.
   @retval EFI_OUT_OF_RESOURCES      There is not enough resource.
-  @retval EFI_SECURITY_VIOLATION    The variable is with EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACESS
+  @retval EFI_SECURITY_VIOLATION    The variable is with EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS
                                     set, but the AuthInfo does NOT pass the validation
                                     check carried out by the firmware.
   @retval EFI_UNSUPPORTED           Unsupported to process authenticated variable.

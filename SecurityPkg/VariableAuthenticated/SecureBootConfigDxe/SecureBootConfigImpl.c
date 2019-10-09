@@ -234,7 +234,7 @@ SaveSecureBootVariable (
                                    it's caller's responsibility to free the memory when finish using it.
 
   @retval EFI_SUCCESS              Create time based payload successfully.
-  @retval EFI_OUT_OF_RESOURCES     There are not enough memory resourses to create time based payload.
+  @retval EFI_OUT_OF_RESOURCES     There are not enough memory resources to create time based payload.
   @retval EFI_INVALID_PARAMETER    The parameter is invalid.
   @retval Others                   Unexpected error happens.
 
@@ -390,7 +390,7 @@ SetSecureBootMode (
   @param[out]  PkCert                Point to the data buffer to store the signature list.
 
   @return EFI_UNSUPPORTED            Unsupported Key Length.
-  @return EFI_OUT_OF_RESOURCES       There are not enough memory resourses to form the signature list.
+  @return EFI_OUT_OF_RESOURCES       There are not enough memory resources to form the signature list.
 
 **/
 EFI_STATUS
@@ -507,7 +507,7 @@ EnrollPlatformKey (
   DEBUG ((EFI_D_INFO, "FilePostFix = %s\n", FilePostFix));
 
   //
-  // Prase the selected PK file and generature PK certificate list.
+  // Prase the selected PK file and generate PK certificate list.
   //
   Status = CreatePkX509SignatureList (
             Private->FileContext->FHandle,
@@ -1088,7 +1088,7 @@ IsSignatureFoundInDatabase (
   }
 
   //
-  // Enumerate all signature data in SigDB to check if executable's signature exists.
+  // Enumerate all signature data in SigDB to check if signature exists for executable.
   //
   CertList = (EFI_SIGNATURE_LIST *) Data;
   while ((DataSize > 0) && (DataSize >= CertList->SignatureListSize)) {
@@ -1312,7 +1312,7 @@ Done:
 /**
   Check whether the signature list exists in given variable data.
 
-  It searches the signature list for the ceritificate hash by CertType.
+  It searches the signature list for the certificate hash by CertType.
   If the signature list is found, get the offset of Database for the
   next hash of a certificate.
 
@@ -2107,7 +2107,7 @@ HashPeImageByType (
 }
 
 /**
-  Enroll a new executable's signature into Signature Database.
+  Enroll a new signature of executable into Signature Database.
 
   @param[in] PrivateData     The module's private data.
   @param[in] VariableName    Variable name of signature database, must be
@@ -2177,7 +2177,7 @@ EnrollAuthentication2Descriptor (
   }
 
   //
-  // Diretly set AUTHENTICATION_2 data to SetVariable
+  // Directly set AUTHENTICATION_2 data to SetVariable
   //
   Status = gRT->SetVariable(
                   VariableName,
@@ -2208,7 +2208,7 @@ ON_EXIT:
 
 
 /**
-  Enroll a new executable's signature into Signature Database.
+  Enroll a new signature of executable into Signature Database.
 
   @param[in] PrivateData     The module's private data.
   @param[in] VariableName    Variable name of signature database, must be
@@ -2247,7 +2247,7 @@ EnrollImageSignatureToSigDB (
   // Form the SigDB certificate list.
   // Format the data item into EFI_SIGNATURE_LIST type.
   //
-  // We need to parse executable's signature data from specified signed executable file.
+  // We need to parse signature data of executable from specified signed executable file.
   // In current implementation, we simply trust the pass-in signed executable file.
   // In reality, it's OS's responsibility to verify the signed executable file.
   //
@@ -3269,7 +3269,7 @@ SecureBootExtractConfigFromVariable (
   SecureBootMode   = NULL;
 
   //
-  // Initilize the Date and Time using system time.
+  // Initialize the Date and Time using system time.
   //
   ConfigData->CertificateFormat = HASHALG_RAW;
   ConfigData->AlwaysRevocation = TRUE;
@@ -3306,7 +3306,7 @@ SecureBootExtractConfigFromVariable (
   }
 
   //
-  // Check SecureBootEnable & Pk status, fix the inconsistence.
+  // Check SecureBootEnable & Pk status, fix the inconsistency.
   // If the SecureBootEnable Variable doesn't exist, hide the SecureBoot Enable/Disable
   // Checkbox.
   //
@@ -3314,7 +3314,7 @@ SecureBootExtractConfigFromVariable (
   GetVariable2 (EFI_SECURE_BOOT_ENABLE_NAME, &gEfiSecureBootEnableDisableGuid, (VOID**)&SecureBootEnable, NULL);
 
   //
-  // Fix Pk, SecureBootEnable inconsistence
+  // Fix Pk and SecureBootEnable inconsistency
   //
   if ((SetupMode != NULL) && (*SetupMode) == USER_MODE) {
     ConfigData->HideSecureBoot = FALSE;

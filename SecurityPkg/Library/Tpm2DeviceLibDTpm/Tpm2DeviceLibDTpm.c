@@ -137,7 +137,7 @@ Tpm2RegisterTpm2DeviceLib (
 /**
   The function caches current active TPM interface type.
 
-  @retval EFI_SUCCESS   DTPM2.0 instance is registered, or system dose not surpport registr DTPM2.0 instance
+  @retval EFI_SUCCESS   DTPM2.0 instance is registered, or system does not support register DTPM2.0 instance
 **/
 EFI_STATUS
 EFIAPI

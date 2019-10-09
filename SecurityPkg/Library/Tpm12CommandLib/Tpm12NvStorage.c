@@ -218,7 +218,7 @@ Tpm12NvWriteValue (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  DEBUG ((DEBUG_INFO, "Tpm12NvWritedValue - ReturnCode = %x\n", SwapBytes32 (Response.returnCode)));
+  DEBUG ((DEBUG_INFO, "Tpm12NvWriteValue - ReturnCode = %x\n", SwapBytes32 (Response.returnCode)));
   switch (SwapBytes32 (Response.returnCode)) {
   case TPM_SUCCESS:
     return EFI_SUCCESS;

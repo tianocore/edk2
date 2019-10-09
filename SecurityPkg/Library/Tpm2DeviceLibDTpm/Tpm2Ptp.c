@@ -327,7 +327,7 @@ PtpCrbTpmCommand (
 
 GoReady_Exit:
   //
-  // Goto Ready State if command is completed succesfully and TPM support IdleBypass
+  // Goto Ready State if command is completed successfully and TPM support IdleBypass
   // If not supported. flow down to GoIdle
   //
   if (PcdGet8(PcdCRBIdleByPass) == 1) {
@@ -347,7 +347,7 @@ GoIdle_Exit:
   MmioWrite32((UINTN)&CrbReg->CrbControlRequest, PTP_CRB_CONTROL_AREA_REQUEST_GO_IDLE);
 
   //
-  // Only enforce Idle state transition if execution fails when CRBIndleBypass==1
+  // Only enforce Idle state transition if execution fails when CRBIdleBypass==1
   // Leave regular Idle delay at the beginning of next command execution
   //
   if (PcdGet8(PcdCRBIdleByPass) == 1){

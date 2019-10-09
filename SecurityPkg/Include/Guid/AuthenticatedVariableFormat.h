@@ -54,7 +54,7 @@ extern EFI_GUID gEfiVendorKeysNvGuid;
 
 ///
 ///  "VendorKeysNv" variable to record the out of band secure boot keys modification.
-///  This variable is a read-only NV varaible that indicates whether someone other than
+///  This variable is a read-only NV variable that indicates whether someone other than
 ///  the platform vendor has used a mechanism not defined by the UEFI Specification to
 ///  transition the system to setup mode or to update secure boot keys.
 ///

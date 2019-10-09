@@ -269,7 +269,7 @@ UpdatePPVersion (
 
 /**
   Patch interrupt resources returned by TPM _PRS. ResourceTemplate to patch is determined by input
-  interrupt buffer size. BufferSize, PkgLength and interrupt descirptor in ByteList need to be patched
+  interrupt buffer size. BufferSize, PkgLength and interrupt descriptor in ByteList need to be patched
 
   @param[in, out] Table            The TPM item in ACPI table.
   @param[in]      IrqBuffer        Input new IRQ buffer.
@@ -304,7 +304,7 @@ UpdatePossibleResource (
   // to patch TPM ACPI object _PRS returned ResourceTemplate() containing 2 resource descriptors and an auto appended End Tag
   //
   //  AML data is organized by following rule.
-  //  Code need to patch BufferSize and PkgLength and interrupt descirptor in ByteList
+  //  Code need to patch BufferSize and PkgLength and interrupt descriptor in ByteList
   //
   // =============  Buffer ====================
   //           DefBuffer := BufferOp PkgLength BufferSize ByteList
@@ -321,8 +321,8 @@ UpdatePossibleResource (
   //                               <bit 3-0: Least significant package length nybble>
   //
   //==============BufferSize==================
-  //        BufferSize := Integar
-  //           Integar := ByteConst|WordConst|DwordConst....
+  //        BufferSize := Integer
+  //           Integer := ByteConst|WordConst|DwordConst....
   //
   //           ByteConst := BytePrefix ByteData
   //
@@ -371,7 +371,7 @@ UpdatePossibleResource (
       }
 
       //
-      // Include Memory32Fixed Descritor (12 Bytes) + Interrupt Descriptor header(5 Bytes) + End Tag(2 Bytes)
+      // Include Memory32Fixed Descriptor (12 Bytes) + Interrupt Descriptor header(5 Bytes) + End Tag(2 Bytes)
       //
       NewPkgLength += 19 + IrqBuffserSize;
       if (NewPkgLength > 63) {
@@ -389,7 +389,7 @@ UpdatePossibleResource (
       *DataPtr = (UINT8)NewPkgLength;
 
       //
-      // 1.2 Patch BufferSize = sizeof(Memory32Fixed Descritor + Interrupt Descriptor + End Tag).
+      // 1.2 Patch BufferSize = sizeof(Memory32Fixed Descriptor + Interrupt Descriptor + End Tag).
       //      It is Little endian. So only patch lowest byte of BufferSize due to current interrupt number limit.
       //
       *(DataPtr + 2) = (UINT8)(IrqBuffserSize + 19);
@@ -445,7 +445,7 @@ UpdatePossibleResource (
         }
 
         //
-        // Include Memory32Fixed Descritor (12 Bytes) + Interrupt Descriptor header(5 Bytes) + End Tag(2  Bytes)
+        // Include Memory32Fixed Descriptor (12 Bytes) + Interrupt Descriptor header(5 Bytes) + End Tag(2  Bytes)
         //
         NewPkgLength += 19 + IrqBuffserSize;
 
@@ -461,7 +461,7 @@ UpdatePossibleResource (
         *(DataPtr + 1) = (UINT8)((NewPkgLength & 0xFF0) >> 4);
 
         //
-        // 2.2 Patch BufferSize = sizeof(Memory32Fixed Descritor + Interrupt Descriptor + End Tag).
+        // 2.2 Patch BufferSize = sizeof(Memory32Fixed Descriptor + Interrupt Descriptor + End Tag).
         //     It is Little endian. Only patch lowest byte of BufferSize due to current interrupt number limit.
         //
         *(DataPtr + 2 + ((*DataPtr & (BIT7|BIT6)) >> 6)) = (UINT8)(IrqBuffserSize + 19);
@@ -485,7 +485,7 @@ UpdatePossibleResource (
   //
   DataPtr += NewPkgLength - (5 + IrqBuffserSize + 2);
   //
-  //   3.1 Patch Length bit[7:0] of Interrupt descirptor patch interrupt descriptor
+  //   3.1 Patch Length bit[7:0] of Interrupt descriptor patch interrupt descriptor
   //
   *(DataPtr + 1) = (UINT8)(2 + IrqBuffserSize);
   //
@@ -498,7 +498,7 @@ UpdatePossibleResource (
   CopyMem(DataPtr + 5, IrqBuffer, IrqBuffserSize);
 
   //
-  // 4. Jump over Interrupt descirptor and Patch END Tag, set Checksum field to 0
+  // 4. Jump over Interrupt descriptor and Patch END Tag, set Checksum field to 0
   //
   DataPtr       += 5 + IrqBuffserSize;
   *DataPtr       = ACPI_END_TAG_DESCRIPTOR;
@@ -715,7 +715,7 @@ PublishAcpiTable (
   mTcgNvs->IsShortFormPkgLength = IsShortFormPkgLength;
 
   //
-  // Publish the TPM ACPI table. Table is re-checksumed.
+  // Publish the TPM ACPI table. Table is re-checksummed.
   //
   Status = gBS->LocateProtocol (&gEfiAcpiTableProtocolGuid, NULL, (VOID **) &AcpiTable);
   ASSERT_EFI_ERROR (Status);

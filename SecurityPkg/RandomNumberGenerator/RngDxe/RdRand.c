@@ -79,7 +79,7 @@ RdRandGetSeed128 (
   UINT32      Index2;
 
   //
-  // Chose an arbitary key and zero the feed_forward_value (FFV)
+  // Chose an arbitrary key and zero the feed_forward_value (FFV)
   //
   for (Index = 0; Index < 16; Index++) {
     Key[Index] = (UINT8) Index;

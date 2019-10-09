@@ -494,7 +494,7 @@ IsValidTimestamp (
     TsaCertSize = SigList->SignatureSize - sizeof (EFI_GUID);
 
     //
-    // Each TSA Certificate will normally be in a seperate EFI_SIGNATURE_LIST
+    // Each TSA Certificate will normally be in a separate EFI_SIGNATURE_LIST
     // Leverage ImageTimestampVerify interface for Timestamp counterSignature Verification
     //
     if (ImageTimestampVerify (SignedData, SignedDataSize, TsaCert, TsaCertSize, &SigningTime)) {
@@ -514,7 +514,7 @@ IsValidTimestamp (
 /**
   Check whether the PKCS7 signedData is revoked by verifying with the revoked
   certificates database, and if the signedData is timestamped, the embedded timestamp
-  couterSignature will be checked with the supplied timestamp database.
+  counterSignature will be checked with the supplied timestamp database.
 
   @param[in]  SignedData      Pointer to buffer containing ASN.1 DER-encoded PKCS7
                               signature.
@@ -657,8 +657,8 @@ P7CheckRevocationByHash (
       Status = EFI_SUCCESS;
       if (IsValidTimestamp (SignedData, SignedDataSize, TimeStampDb, &RevocationTime)) {
         //
-        // Use EFI_NOT_READY to identify the P7Data is not reovked, because the timestamping
-        // occured prior to the time of certificate revocation.
+        // Use EFI_NOT_READY to identify the P7Data is not revoked, because the timestamping
+        // occurred prior to the time of certificate revocation.
         //
         Status = EFI_NOT_READY;
       }
@@ -679,7 +679,7 @@ _Exit:
 /**
   Check whether the PKCS7 signedData is revoked by verifying with the revoked
   certificates database, and if the signedData is timestamped, the embedded timestamp
-  couterSignature will be checked with the supplied timestamp database.
+  counterSignature will be checked with the supplied timestamp database.
 
   @param[in]  SignedData      Pointer to buffer containing ASN.1 DER-encoded PKCS7
                               signature.
@@ -822,8 +822,8 @@ P7CheckRevocation (
       Status = EFI_SUCCESS;
       if (IsValidTimestamp (SignedData, SignedDataSize, TimeStampDb, &RevocationTime)) {
         //
-        // Use EFI_NOT_READY to identify the P7Data is not reovked, because the timestamping
-        // occured prior to the time of certificate revocation.
+        // Use EFI_NOT_READY to identify the P7Data is not revoked, because the timestamping
+        // occurred prior to the time of certificate revocation.
         //
         Status = EFI_NOT_READY;
       }
@@ -1261,7 +1261,7 @@ VerifyBuffer (
                );
     if (!EFI_ERROR (Status)) {
       //
-      // The PKCS7 SignedData is reovked
+      // The PKCS7 SignedData is revoked
       //
       Status = EFI_SECURITY_VIOLATION;
       goto _Exit;
@@ -1413,7 +1413,7 @@ VerifySignature (
 
     if (!EFI_ERROR (Status)) {
       //
-      // The PKCS7 SignedData is reovked
+      // The PKCS7 SignedData is revoked
       //
       return EFI_SECURITY_VIOLATION;
     }
