@@ -50,7 +50,7 @@
   # @Prompt HPET local APIC vector.
   gPcAtChipsetPkgTokenSpaceGuid.PcdHpetLocalApicVector|0x40|UINT8|0x0000000A
 
-  ## This PCD specifies the defaut period of the HPET Timer in 100 ns units.
+  ## This PCD specifies the default period of the HPET Timer in 100 ns units.
   #  The default value of 100000 100 ns units is the same as 10 ms.
   # @Prompt Default period of HPET timer.
   gPcAtChipsetPkgTokenSpaceGuid.PcdHpetDefaultTimerPeriod|100000|UINT64|0x0000000B

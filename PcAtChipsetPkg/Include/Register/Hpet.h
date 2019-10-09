@@ -70,14 +70,14 @@ typedef union {
     UINT32  LevelTriggeredInterrupt:1;
     UINT32  InterruptEnable:1;
     UINT32  PeriodicInterruptEnable:1;
-    UINT32  PeriodicInterruptCapablity:1;
-    UINT32  CounterSizeCapablity:1;
+    UINT32  PeriodicInterruptCapability:1;
+    UINT32  CounterSizeCapability:1;
     UINT32  ValueSetEnable:1;
     UINT32  Reserved1:1;
     UINT32  CounterSizeEnable:1;
     UINT32  InterruptRoute:5;
     UINT32  MsiInterruptEnable:1;
-    UINT32  MsiInterruptCapablity:1;
+    UINT32  MsiInterruptCapability:1;
     UINT32  Reserved2:16;
     UINT32  InterruptRouteCapability;
   } Bits;

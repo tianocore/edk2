@@ -63,7 +63,7 @@ IoApicEnableInterrupt (
   Configures an I/O APIC interrupt.
 
   Configure an I/O APIC Redirection Table Entry to deliver an interrupt in physical
-  mode to the Local APIC of the currntly executing CPU.  The default state of the
+  mode to the Local APIC of the currently executing CPU.  The default state of the
   entry is for the interrupt to be disabled (masked).  IoApicEnableInterrupts() must
   be used to enable(unmask) the I/O APIC Interrupt.
 

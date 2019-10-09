@@ -1051,9 +1051,9 @@ IsLeapYear (
 }
 
 /**
-  Converts time from EFI_TIME format defined by UEFI spec to RTC's.
+  Converts time from EFI_TIME format defined by UEFI spec to RTC format.
 
-  This function converts time from EFI_TIME format defined by UEFI spec to RTC's.
+  This function converts time from EFI_TIME format defined by UEFI spec to RTC format.
   If data mode of RTC is BCD, then converts EFI_TIME to it.
   If RTC is in 12-hour format, then converts EFI_TIME to it.
 

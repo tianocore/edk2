@@ -1,5 +1,5 @@
 ## @file
-# Timer Architectural Protocol module using High Precesion Event Timer (HPET).
+# Timer Architectural Protocol module using High Precision Event Timer (HPET).
 #
 # Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
