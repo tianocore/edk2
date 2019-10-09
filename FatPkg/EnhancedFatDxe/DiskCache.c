@@ -16,7 +16,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   are older than the contents in disk, so they are invalid; just mark them invalid.
 
   When this function is called by read command, if any entry in this range
-  is dirty, it means that the relative info directly readed from media is older than
+  is dirty, it means that the relative info directly read from media is older than
   than the info in the cache; So need to update the relative info in the Buffer.
 
   @param  Volume                - FAT file system volume.

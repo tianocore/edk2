@@ -129,7 +129,7 @@ FatGetFatEntry (
   @param  Index                 - The index of the FAT entry of the volume.
   @param  Value                 - The new value of the FAT entry.
 
-  @retval EFI_SUCCESS           - Set the new FAT entry value sucessfully.
+  @retval EFI_SUCCESS           - Set the new FAT entry value successfully.
   @retval EFI_VOLUME_CORRUPTED  - The FAT type of the volume is error.
   @return other                 - An error occurred when operation the FAT entries.
 
@@ -343,7 +343,7 @@ FatSizeToClusters (
 
   @param  OFile                 - The open file.
 
-  @retval EFI_SUCCESS           - Shrinked sucessfully.
+  @retval EFI_SUCCESS           - Shrinked successfully.
   @retval EFI_VOLUME_CORRUPTED  - There are errors in the file's clusters.
 
 **/
@@ -416,7 +416,7 @@ FatShrinkEof (
   @param  OFile                 - The open file.
   @param  NewSizeInBytes        - The new size in bytes of the open file.
 
-  @retval EFI_SUCCESS           - The file is grown sucessfully.
+  @retval EFI_SUCCESS           - The file is grown successfully.
   @retval EFI_UNSUPPORTED       - The file size is larger than 4GB.
   @retval EFI_VOLUME_CORRUPTED  - There are errors in the files' clusters.
   @retval EFI_VOLUME_FULL       - The volume is full and can not grow the file.

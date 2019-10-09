@@ -865,7 +865,7 @@ FatCleanupVolume (
 
   @param  OFile                 - The open file.
 
-  @retval EFI_SUCCESS           - Shrinked sucessfully.
+  @retval EFI_SUCCESS           - Shrinked successfully.
   @retval EFI_VOLUME_CORRUPTED  - There are errors in the file's clusters.
 
 **/
@@ -881,7 +881,7 @@ FatShrinkEof (
   @param  OFile                 - The open file.
   @param  NewSizeInBytes        - The new size in bytes of the open file.
 
-  @retval EFI_SUCCESS           - The file is grown sucessfully.
+  @retval EFI_SUCCESS           - The file is grown successfully.
   @retval EFI_UNSUPPORTED       - The file size is larger than 4GB.
   @retval EFI_VOLUME_CORRUPTED  - There are errors in the files' clusters.
   @retval EFI_VOLUME_FULL       - The volume is full and can not grow the file.
@@ -969,7 +969,7 @@ FatComputeFreeInfo (
   @param  Handle                - The handle of parent device.
   @param  DiskIo                - The DiskIo of parent device.
   @param  DiskIo2               - The DiskIo2 of parent device.
-  @param  BlockIo               - The BlockIo of parent devicel
+  @param  BlockIo               - The BlockIo of parent device.
 
   @retval EFI_SUCCESS           - Allocate a new volume successfully.
   @retval EFI_OUT_OF_RESOURCES  - Can not allocate the memory.
@@ -1079,7 +1079,7 @@ FatDestroySubtask (
   @param  IFile                 - The instance of the open file.
   @param  Task                  - The task to be executed.
 
-  @retval EFI_SUCCESS           - The task was executed sucessfully.
+  @retval EFI_SUCCESS           - The task was executed successfully.
   @return other                 - An error occurred when executing the task.
 
 **/
@@ -1097,7 +1097,7 @@ FatQueueTask (
   @param  IoMode                - The access mode.
   @param  DirtyValue            - Set the volume as dirty or not.
 
-  @retval EFI_SUCCESS           - Set the new FAT entry value sucessfully.
+  @retval EFI_SUCCESS           - Set the new FAT entry value successfully.
   @return other                 - An error occurred when operation the FAT entries.
 
 **/
@@ -1120,7 +1120,7 @@ FatAccessVolumeDirty (
   @param  Task                    point to task instance.
 
   @retval EFI_SUCCESS           - The operation is performed successfully.
-  @retval EFI_VOLUME_CORRUPTED  - The accesss is
+  @retval EFI_VOLUME_CORRUPTED  - The access is
   @return Others                - The status of read/write the disk
 
 **/
@@ -1361,7 +1361,7 @@ FatStriCmp (
   @retval EFI_SUCCESS           - Open the file successfully.
   @retval EFI_INVALID_PARAMETER - The open mode is conflict with the attributes
                           or the file name is not valid.
-  @retval EFI_NOT_FOUND         - Conficts between dir intention and attribute.
+  @retval EFI_NOT_FOUND         - Conflicts between dir intention and attribute.
   @retval EFI_WRITE_PROTECTED   - Can't open for write if the volume is read only.
   @retval EFI_ACCESS_DENIED     - If the file's attribute is read only, and the
                           open is for read-write fail it.
@@ -1710,7 +1710,7 @@ FatCloseDirEnt (
                           not be created either).
   @retval EFI_INVALID_PARAMETER - The parameter is not valid.
   @retval EFI_SUCCESS           - Open the file successfully.
-  @return other                 - An error occured when locating the OFile.
+  @return other                 - An error occurred when locating the OFile.
 
 **/
 EFI_STATUS
@@ -1728,7 +1728,7 @@ FatLocateOFile (
   @param  Volume                - FAT file system volume.
   @param  Name                  - The file name of the volume.
 
-  @retval EFI_SUCCESS           - Update the volume with the directory entry sucessfully.
+  @retval EFI_SUCCESS           - Update the volume with the directory entry successfully.
   @return others                - An error occurred when getting volume label.
 
 **/
@@ -1745,7 +1745,7 @@ FatGetVolumeEntry (
   @param  Volume              - FAT file system volume.
   @param  Name                - The new file name of the volume.
 
-  @retval EFI_SUCCESS         - Update the Volume sucessfully.
+  @retval EFI_SUCCESS         - Update the Volume successfully.
   @retval EFI_UNSUPPORTED     - The input label is not a valid volume label.
   @return other               - An error occurred when setting volume label.
 

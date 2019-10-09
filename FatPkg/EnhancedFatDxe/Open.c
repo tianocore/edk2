@@ -74,7 +74,7 @@ FatAllocateIFile (
   @retval EFI_SUCCESS           - Open the file successfully.
   @retval EFI_INVALID_PARAMETER - The open mode is conflict with the attributes
                           or the file name is not valid.
-  @retval EFI_NOT_FOUND         - Conficts between dir intention and attribute.
+  @retval EFI_NOT_FOUND         - Conflicts between dir intention and attribute.
   @retval EFI_WRITE_PROTECTED   - Can't open for write if the volume is read only.
   @retval EFI_ACCESS_DENIED     - If the file's attribute is read only, and the
                           open is for read-write fail it.

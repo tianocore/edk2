@@ -16,7 +16,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   @param  Handle                - The handle of parent device.
   @param  DiskIo                - The DiskIo of parent device.
   @param  DiskIo2               - The DiskIo2 of parent device.
-  @param  BlockIo               - The BlockIo of parent devicel
+  @param  BlockIo               - The BlockIo of parent device.
 
   @retval EFI_SUCCESS           - Allocate a new volume successfully.
   @retval EFI_OUT_OF_RESOURCES  - Can not allocate the memory.

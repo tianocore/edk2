@@ -114,7 +114,7 @@ FatDestroySubtask (
   @param  IFile                 - The instance of the open file.
   @param  Task                  - The task to be executed.
 
-  @retval EFI_SUCCESS           - The task was executed sucessfully.
+  @retval EFI_SUCCESS           - The task was executed successfully.
   @return other                 - An error occurred when executing the task.
 
 **/
@@ -219,7 +219,7 @@ FatQueueTask (
   @param  IoMode                - The access mode.
   @param  DirtyValue            - Set the volume as dirty or not.
 
-  @retval EFI_SUCCESS           - Set the new FAT entry value sucessfully.
+  @retval EFI_SUCCESS           - Set the new FAT entry value successfully.
   @return other                 - An error occurred when operation the FAT entries.
 
 **/
@@ -304,7 +304,7 @@ FatOnAccessComplete (
   @param  Task                    point to task instance.
 
   @retval EFI_SUCCESS           - The operation is performed successfully.
-  @retval EFI_VOLUME_CORRUPTED  - The accesss is
+  @retval EFI_VOLUME_CORRUPTED  - The access is
   @return Others                - The status of read/write the disk
 
 **/

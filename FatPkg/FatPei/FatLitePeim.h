@@ -40,7 +40,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define PEI_FAT_MAX_BLOCK_IO_PPI                      32
 #define PEI_FAT_MAX_VOLUME                            64
 
-#define PEI_FAT_MEMMORY_PAGE_SIZE                     0x1000
+#define PEI_FAT_MEMORY_PAGE_SIZE                      0x1000
 
 //
 // Data Structures
@@ -194,7 +194,7 @@ typedef struct {
   @param  FileName                The recovery file name to find.
   @param  Handle                  The output file handle.
 
-  @retval EFI_DEVICE_ERROR        Some error occured when operating the FAT
+  @retval EFI_DEVICE_ERROR        Some error occurred when operating the FAT
                                   volume.
   @retval EFI_NOT_FOUND           The recovery file was not found.
   @retval EFI_SUCCESS             The recovery file was successfully found on the
