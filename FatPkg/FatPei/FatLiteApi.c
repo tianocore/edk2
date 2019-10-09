@@ -12,7 +12,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 PEI_FAT_PRIVATE_DATA  *mPrivateData = NULL;
 
 /**
-  BlockIo installation nofication function. Find out all the current BlockIO
+  BlockIo installation notification function. Find out all the current BlockIO
   PPIs in the system and add them into private data. Assume there is
 
   @param  PeiServices             General purpose services available to every
@@ -256,7 +256,7 @@ FatPeimEntry (
 
   Status = PeiServicesAllocatePages (
             EfiBootServicesCode,
-            (sizeof (PEI_FAT_PRIVATE_DATA) - 1) / PEI_FAT_MEMMORY_PAGE_SIZE + 1,
+            (sizeof (PEI_FAT_PRIVATE_DATA) - 1) / PEI_FAT_MEMORY_PAGE_SIZE + 1,
             &Address
             );
   if (EFI_ERROR (Status)) {
@@ -600,7 +600,7 @@ LoadRecoveryCapsule (
   @param  FileName                The recovery file name to find.
   @param  Handle                  The output file handle.
 
-  @retval EFI_DEVICE_ERROR        Some error occured when operating the FAT
+  @retval EFI_DEVICE_ERROR        Some error occurred when operating the FAT
                                   volume.
   @retval EFI_NOT_FOUND           The recovery file was not found.
   @retval EFI_SUCCESS             The recovery file was successfully found on the

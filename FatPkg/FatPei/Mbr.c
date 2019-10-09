@@ -52,7 +52,7 @@ PartitionValidMbr (
     if (EndingLBA > LastLba) {
       //
       // Compatability Errata:
-      //  Some systems try to hide drive space with thier INT 13h driver
+      //  Some systems try to hide drive space with their INT 13h driver
       //  This does not hide space from the OS driver. This means the MBR
       //  that gets created from DOS is smaller than the MBR created from
       //  a real OS (NT & Win98). This leads to BlockIo->LastBlock being

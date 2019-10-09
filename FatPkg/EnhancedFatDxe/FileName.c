@@ -100,7 +100,7 @@ FatCheckIs8Dot3Name (
 
   Trim the trailing blanks of fat name.
 
-  @param  Name                  - The Char8 string needs to be trimed.
+  @param  Name                  - The Char8 string needs to be trimmed.
   @param  Len                   - The length of the fat name.
 
   The real length of the fat name after the trailing blanks are trimmed.
