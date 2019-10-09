@@ -108,7 +108,7 @@ PcRtcEfiSetWakeupTime (
 /**
   The user Entry Point for PcRTC module.
 
-  This is the entrhy point for PcRTC module. It installs the UEFI runtime service
+  This is the entry point for PcRTC module. It installs the UEFI runtime service
   including GetTime(),SetTime(),GetWakeupTime(),and SetWakeupTime().
 
   @param  ImageHandle    The firmware allocated handle for the EFI image.

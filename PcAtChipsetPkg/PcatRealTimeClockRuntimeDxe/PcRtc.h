@@ -110,7 +110,7 @@ typedef struct {
   UINT8 Uf : 1;       // Update End Interrupt Flag
   UINT8 Af : 1;       // Alarm Interrupt Flag
   UINT8 Pf : 1;       // Periodic Interrupt Flag
-  UINT8 Irqf : 1;     // Iterrupt Request Flag = PF & PIE | AF & AIE | UF & UIE
+  UINT8 Irqf : 1;     // Interrupt Request Flag = PF & PIE | AF & AIE | UF & UIE
 } RTC_REGISTER_C_BITS;
 
 typedef union {
@@ -234,7 +234,7 @@ PcRtcGetWakeupTime (
 /**
   The user Entry Point for PcRTC module.
 
-  This is the entrhy point for PcRTC module. It installs the UEFI runtime service
+  This is the entry point for PcRTC module. It installs the UEFI runtime service
   including GetTime(),SetTime(),GetWakeupTime(),and SetWakeupTime().
 
   @param  ImageHandle    The firmware allocated handle for the EFI image.
@@ -266,9 +266,9 @@ RtcTimeFieldsValid (
   );
 
 /**
-  Converts time from EFI_TIME format defined by UEFI spec to RTC's.
+  Converts time from EFI_TIME format defined by UEFI spec to RTC format.
 
-  This function converts time from EFI_TIME format defined by UEFI spec to RTC's.
+  This function converts time from EFI_TIME format defined by UEFI spec to RTC format.
   If data mode of RTC is BCD, then converts EFI_TIME to it.
   If RTC is in 12-hour format, then converts EFI_TIME to it.
 
