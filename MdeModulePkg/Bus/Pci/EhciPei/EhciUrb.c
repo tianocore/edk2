@@ -534,6 +534,8 @@ EhcCreateUrb (
   PEI_URB                       *Urb;
   VOID                          *Map;
 
+  Map = NULL;
+
   Urb = Ehc->Urb;
   Urb->Signature  = EHC_URB_SIG;
   InitializeListHead (&Urb->UrbList);
