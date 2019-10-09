@@ -342,6 +342,10 @@
 
   ## Include/Guid/TtyTerm.h
   gEfiTtyTermGuid                = { 0x7d916d80, 0x5bb1, 0x458c, {0xa4, 0x8f, 0xe2, 0x5f, 0xdd, 0x51, 0xef, 0x94 }}
+  gEdkiiLinuxTermGuid            = { 0xe4364a7f, 0xf825, 0x430e, {0x9d, 0x3a, 0x9c, 0x9b, 0xe6, 0x81, 0x7c, 0xa5 }}
+  gEdkiiXtermR6Guid              = { 0xfbfca56b, 0xbb36, 0x4b78, {0xaa, 0xab, 0xbe, 0x1b, 0x97, 0xec, 0x7c, 0xcb }}
+  gEdkiiVT400Guid                = { 0x8e46dddd, 0x3d49, 0x4a9d, {0xb8, 0x75, 0x3c, 0x08, 0x6f, 0x6a, 0xa2, 0xbd }}
+  gEdkiiSCOTermGuid              = { 0xfc7dd6e0, 0x813c, 0x434d, {0xb4, 0xda, 0x3b, 0xd6, 0x49, 0xe9, 0xe1, 0x5a }}
 
   ## Include/Guid/HiiBootMaintenanceFormset.h
   gEfiIfrBootMaintenanceGuid      = { 0xb2dedc91, 0xd59f, 0x48d2, { 0x89, 0x8a, 0x12, 0x49, 0xc, 0x74, 0xa4, 0xe0 }}
@@ -1772,14 +1776,6 @@
   #   FALSE - Alternative Routing-ID is not supported.<BR>
   # @Prompt Enable ARI support.
   gEfiMdeModulePkgTokenSpaceGuid.PcdAriSupport|TRUE|BOOLEAN|0x10000045
-
-  ## This PCD is used to introduce a temporary W/A for a silicon issue which is expected to fixed in Q2-Q3'19.
-  #  Indicates if Root port disallows transactions to Device Numbers (1-31) when ARI forwarding is disable (expected behavior).
-  #  When ARI forwarding is enabled, is expected behavior that the root port allows transactions to all devices numbers.<BR><BR>
-  #   TRUE  - Root port disallows transactions to Device Numbers (1-31) when ARI forwarding is disable (expected behavior).<BR>
-  #   FALSE - Root port allows transactions to Device Numbers (1-31) when ARI forwarding is disable (Silicon bug).<BR>
-  # @Prompt Root port disallows transactions to Device Numbers (1-31)  when ARI forwarding is disable.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdRootPortAbortsNonZeroNonAriDevices|TRUE|BOOLEAN|0x10000049
 
   ## Indicates if the Multi Root I/O virtualization is supported.<BR><BR>
   #   TRUE  - Multi Root I/O virtualization is supported.<BR>
