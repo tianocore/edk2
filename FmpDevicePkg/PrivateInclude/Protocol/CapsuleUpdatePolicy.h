@@ -127,6 +127,6 @@ struct _EDKII_CAPSULE_UPDATE_POLICY_PROTOCOL {
   EDKII_CAPSULE_UPDATE_POLICY_IS_FMP_DEVICE_AT_LOCK_EVENT_REQUIRED        IsLockFmpDeviceAtLockEventGuidRequired;
 };
 
-extern EFI_GUID gEdkiiCapuleUpdatePolicyProtocolGuid;
+extern EFI_GUID gEdkiiCapsuleUpdatePolicyProtocolGuid;
 
 #endif
