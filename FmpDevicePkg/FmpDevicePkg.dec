@@ -50,12 +50,12 @@
 
 [Protocols.Common.Private]
   ## Capsule Update Policy Protocol
-  gEdkiiCapuleUpdatePolicyProtocolGuid = { 0x487784c5, 0x6299, 0x4ba6, { 0xb0, 0x96, 0x5c, 0xc5, 0x27, 0x7c, 0xf7, 0x57 } }
+  gEdkiiCapsuleUpdatePolicyProtocolGuid = { 0x487784c5, 0x6299, 0x4ba6, { 0xb0, 0x96, 0x5c, 0xc5, 0x27, 0x7c, 0xf7, 0x57 } }
 
 [PcdsFeatureFlag]
   ## Indicates if the Firmware Management Protocol supports access to
   #  to a firmware storage device.  If set to FALSE, then only GetImageInfo()
-  #  is supported.  This is used by FMP drivers that require the samllest
+  #  is supported.  This is used by FMP drivers that require the smallest
   #  possible Firmware Management Protocol implementation that supports
   #  advertising the updatable firmware device in the ESRT.<BR>
   #    TRUE  - All Firmware Management Protocol services supported.<BR>

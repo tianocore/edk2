@@ -39,7 +39,7 @@
   CapsuleUpdatePolicyLib
 
 [Protocols]
-  gEdkiiCapuleUpdatePolicyProtocolGuid  ## PRODUCES
+  gEdkiiCapsuleUpdatePolicyProtocolGuid  ## PRODUCES
 
 [Depex]
   TRUE

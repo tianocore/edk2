@@ -37,4 +37,4 @@
   UefiBootServicesTableLib
 
 [Protocols]
-  gEdkiiCapuleUpdatePolicyProtocolGuid  ## CONSUMES
+  gEdkiiCapsuleUpdatePolicyProtocolGuid  ## CONSUMES

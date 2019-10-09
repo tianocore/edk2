@@ -37,7 +37,7 @@ LookupCapsuleUpdatePolicyProtocol (
     return TRUE;
   }
   Status = gBS->LocateProtocol (
-                  &gEdkiiCapuleUpdatePolicyProtocolGuid,
+                  &gEdkiiCapsuleUpdatePolicyProtocolGuid,
                   NULL,
                   (VOID **)&mCapsuleUpdatePolicy
                   );

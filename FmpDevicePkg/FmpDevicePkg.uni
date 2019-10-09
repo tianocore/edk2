@@ -19,7 +19,7 @@
 #string STR_gFmpDevicePkgTokenSpaceGuid_PcdFmpDeviceStorageAccessEnable_PROMPT  #language en-US "Firmware Device Storage Access Enabled."
 #string STR_gFmpDevicePkgTokenSpaceGuid_PcdFmpDeviceStorageAccessEnable_HELP    #language en-US "Indicates if the Firmware Management Protocol supports access to"
                                                                                                 "to a firmware storage device.  If set to FALSE, then only GetImageInfo()"
-                                                                                                "is supported.  This is used by FMP drivers that require the samllest"
+                                                                                                "is supported.  This is used by FMP drivers that require the smallest"
                                                                                                 "possible Firmware Management Protocol implementation that supports"
                                                                                                 "advertising the updatable firmware device in the ESRT.<BR>"
                                                                                                 "  TRUE  - All Firmware Management Protocol services supported.<BR>"

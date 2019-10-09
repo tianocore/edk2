@@ -50,7 +50,7 @@ RegisterFmpInstaller (
                              Protocol.
 
   @retval EFI_SUCCESS      The device is managed by a driver that follows the
-                           UEFI Driver Model.  FmpUinstaller must be called on
+                           UEFI Driver Model.  FmpUninstaller must be called on
                            each Driver Binding Stop().
   @retval EFI_UNSUPPORTED  The device is not managed by a driver that follows
                            the UEFI Driver Model.
@@ -319,7 +319,7 @@ FmpDeviceGetVersion (
                                 device.
 
   @retval EFI_SUCCESS       The hardware instance for the current firmware
-                            devide is returned in HardwareInstance.
+                            device is returned in HardwareInstance.
   @retval EFI_UNSUPPORTED   The firmware device does not support a method to
                             report the hardware instance value.
   @retval EFI_DEVICE_ERROR  An error occurred attempting to retrieve the hardware

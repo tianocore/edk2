@@ -60,7 +60,7 @@
 [LibraryClasses.ARM, LibraryClasses.AARCH64]
   #
   # It is not possible to prevent the ARM compiler for generic intrinsic functions.
-  # This library provides the instrinsic functions generate by a given compiler.
+  # This library provides the intrinsic functions generate by a given compiler.
   # [LibraryClasses.ARM, LibraryClasses.AARCH64] and NULL mean link this library
   # into all ARM and AARCH64 images.
   #

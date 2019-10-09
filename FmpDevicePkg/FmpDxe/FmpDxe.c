@@ -963,7 +963,7 @@ SetTheImage (
   VOID                              *FmpHeader;
   UINTN                             FmpPayloadSize;
   UINT32                            AllHeaderSize;
-  UINT32                            IncommingFwVersion;
+  UINT32                            IncomingFwVersion;
   UINT32                            LastAttemptStatus;
   UINT32                            Version;
   UINT32                            LowestSupportedVersion;
@@ -975,7 +975,7 @@ SetTheImage (
   FmpHeader          = NULL;
   FmpPayloadSize     = 0;
   AllHeaderSize      = 0;
-  IncommingFwVersion = 0;
+  IncomingFwVersion = 0;
   LastAttemptStatus  = LAST_ATTEMPT_STATUS_ERROR_UNSUCCESSFUL;
 
   if (!FeaturePcdGet (PcdFmpDeviceStorageAccessEnable)) {
@@ -996,7 +996,7 @@ SetTheImage (
   //
   // Set to 0 to clear any previous results.
   //
-  SetLastAttemptVersionInVariable (Private, IncommingFwVersion);
+  SetLastAttemptVersionInVariable (Private, IncomingFwVersion);
 
   //
   // if we have locked the device, then skip the set operation.
@@ -1030,12 +1030,12 @@ SetTheImage (
     Status = EFI_ABORTED;
     goto cleanup;
   }
-  Status = GetFmpPayloadHeaderVersion (FmpHeader, FmpPayloadSize, &IncommingFwVersion);
+  Status = GetFmpPayloadHeaderVersion (FmpHeader, FmpPayloadSize, &IncomingFwVersion);
   if (!EFI_ERROR (Status)) {
     //
     // Set to actual value
     //
-    SetLastAttemptVersionInVariable (Private, IncommingFwVersion);
+    SetLastAttemptVersionInVariable (Private, IncomingFwVersion);
   }
 
 
@@ -1158,7 +1158,7 @@ SetTheImage (
              ImageSize - AllHeaderSize,
              VendorCode,
              FmpDxeProgress,
-             IncommingFwVersion,
+             IncomingFwVersion,
              AbortReason
              );
   if (EFI_ERROR (Status)) {
