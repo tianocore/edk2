@@ -1326,7 +1326,7 @@ IsForbiddenByDbx (
   //       UINT8  Certn[];
   //
   Pkcs7GetSigners (AuthData, AuthDataSize, &CertBuffer, &BufferLength, &TrustedCert, &TrustedCertLength);
-  if ((BufferLength == 0) || (CertBuffer == NULL)) {
+  if ((BufferLength == 0) || (CertBuffer == NULL) || (*CertBuffer) == 0) {
     IsForbidden = TRUE;
     goto Done;
   }
