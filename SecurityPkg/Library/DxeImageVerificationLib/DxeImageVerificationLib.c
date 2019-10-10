@@ -1456,8 +1456,9 @@ IsAllowedByDb (
             //
             // Here We still need to check if this RootCert's Hash is revoked
             //
+            DbxDataSize = 0;
             Status   = gRT->GetVariable (EFI_IMAGE_SECURITY_DATABASE1, &gEfiImageSecurityDatabaseGuid, NULL, &DbxDataSize, NULL);
-            if (Status == EFI_BUFFER_TOO_SMALL) {
+            if (Status != EFI_BUFFER_TOO_SMALL) {
               goto Done;
             }
             DbxData = (UINT8 *) AllocateZeroPool (DbxDataSize);
