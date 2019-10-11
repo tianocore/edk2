@@ -341,7 +341,17 @@ BdsWait (
       TimeoutRemain--;
     }
   }
-  PlatformBootManagerWaitCallback (0);
+
+  //
+  // If the platform configured a nonzero and finite time-out, and we have
+  // actually reached that, report 100% completion to the platform.
+  //
+  // Note that the (TimeoutRemain == 0) condition excludes
+  // PcdPlatformBootTimeOut=0xFFFF, and that's deliberate.
+  //
+  if (PcdGet16 (PcdPlatformBootTimeOut) != 0 && TimeoutRemain == 0) {
+    PlatformBootManagerWaitCallback (0);
+  }
   DEBUG ((EFI_D_INFO, "[Bds]Exit the waiting!\n"));
 }
 
