@@ -1,7 +1,7 @@
 /** @file
   Implementation of driver entry point and driver binding protocol.
 
-Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2019, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -647,19 +647,21 @@ SimpleNetworkDriverStart (
   PxeShutdown (Snp);
   PxeStop (Snp);
 
-  //
-  // Create EXIT_BOOT_SERIVES Event
-  //
-  Status = gBS->CreateEventEx (
-                  EVT_NOTIFY_SIGNAL,
-                  TPL_NOTIFY,
-                  SnpNotifyExitBootServices,
-                  Snp,
-                  &gEfiEventExitBootServicesGuid,
-                  &Snp->ExitBootServicesEvent
-                  );
-  if (EFI_ERROR (Status)) {
-    goto Error_DeleteSNP;
+  if (FixedPcdGetBool (PcdSnpCreateExitBootServicesEvent)) {
+    //
+    // Create EXIT_BOOT_SERIVES Event
+    //
+    Status = gBS->CreateEventEx (
+                    EVT_NOTIFY_SIGNAL,
+                    TPL_NOTIFY,
+                    SnpNotifyExitBootServices,
+                    Snp,
+                    &gEfiEventExitBootServicesGuid,
+                    &Snp->ExitBootServicesEvent
+                    );
+    if (EFI_ERROR (Status)) {
+      goto Error_DeleteSNP;
+    }
   }
 
   //
@@ -778,10 +780,12 @@ SimpleNetworkDriverStop (
     return Status;
   }
 
-  //
-  // Close EXIT_BOOT_SERIVES Event
-  //
-  gBS->CloseEvent (Snp->ExitBootServicesEvent);
+  if (FixedPcdGetBool (PcdSnpCreateExitBootServicesEvent)) {
+    //
+    // Close EXIT_BOOT_SERIVES Event
+    //
+    gBS->CloseEvent (Snp->ExitBootServicesEvent);
+  }
 
   Status = gBS->CloseProtocol (
                   Controller,

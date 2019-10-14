@@ -109,6 +109,13 @@
   # @Prompt TFTP block size.
   gEfiNetworkPkgTokenSpaceGuid.PcdTftpBlockSize|0x0|UINT64|0x1000000B
 
+  ## Indicates whether SnpDxe driver will create an event that will be notified
+  # upon gBS->ExitBootServices() call.
+  # TRUE - Event being triggered upon ExitBootServices call will be created
+  # FALSE - Event being triggered upon ExitBootServices call will NOT be created
+  # @Prompt Indicates whether SnpDxe creates event for ExitBootServices() call.
+  gEfiNetworkPkgTokenSpaceGuid.PcdSnpCreateExitBootServicesEvent|TRUE|BOOLEAN|0x1000000C
+
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## IPv6 DHCP Unique Identifier (DUID) Type configuration (From RFCs 3315 and 6355).
   # 01 = DUID Based on Link-layer Address Plus Time [DUID-LLT]
