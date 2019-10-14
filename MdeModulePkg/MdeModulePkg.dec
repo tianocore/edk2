@@ -651,7 +651,7 @@
   #   TRUE  - The UEFI variable runtime cache is enabled.<BR>
   #   FALSE - The UEFI variable runtime cache is disabled.<BR>
   # @Prompt Enable the UEFI variable runtime cache.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdEnableVariableRuntimeCache|FALSE|BOOLEAN|0x00010039
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEnableVariableRuntimeCache|TRUE|BOOLEAN|0x00010039
 
   ## Indicates if the statistics about variable usage will be collected. This information is
   #  stored as a vendor configuration table into the EFI system table.
