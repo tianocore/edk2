@@ -76,6 +76,7 @@
   ## CONSUMES   ## UNDEFINED # Locate ppi
   ## CONSUMES   ## GUID      # Used to compare with FV's file system guid and get the FV's file system format
   gEfiFirmwareFileSystem3Guid
+  gStatusCodeCallbackGuid
 
 [Ppis]
   gEfiPeiStatusCodePpiGuid                      ## SOMETIMES_CONSUMES # PeiReportStatusService is not ready if this PPI doesn't exist
