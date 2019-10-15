@@ -239,6 +239,11 @@ DeleteEsrtEntry(
     goto EXIT;
   }
 
+  if (EsrtRepository == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto EXIT;
+  }
+
   if ((RepositorySize % sizeof(EFI_SYSTEM_RESOURCE_ENTRY)) != 0) {
     DEBUG((EFI_D_ERROR, "Repository Corrupt. Need to rebuild Repository.\n"));
     //
@@ -331,6 +336,11 @@ UpdateEsrtEntry(
              (VOID **) &EsrtRepository,
              &RepositorySize
              );
+
+  if (EsrtRepository == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto EXIT;
+  }
 
   if (!EFI_ERROR(Status)) {
     //
