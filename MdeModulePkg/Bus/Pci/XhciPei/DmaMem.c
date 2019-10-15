@@ -225,6 +225,134 @@ IoMmuFreeBuffer (
 }
 
 /**
+  Allocates aligned pages that are suitable for an OperationBusMasterCommonBuffer or
+  OperationBusMasterCommonBuffer64 mapping.
+
+  @param  Pages                 The number of pages to allocate.
+  @param  Alignment             The requested alignment of the allocation.  Must be a power of two.
+  @param  HostAddress           A pointer to store the base system memory address of the
+                                allocated range.
+  @param  DeviceAddress         The resulting map address for the bus master PCI controller to use to
+                                access the hosts HostAddress.
+  @param  Mapping               A resulting value to pass to Unmap().
+
+  @retval EFI_SUCCESS           The requested memory pages were allocated.
+  @retval EFI_UNSUPPORTED       Attributes is unsupported. The only legal attribute bits are
+                                MEMORY_WRITE_COMBINE and MEMORY_CACHED.
+  @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
+  @retval EFI_OUT_OF_RESOURCES  The memory pages could not be allocated.
+
+**/
+EFI_STATUS
+IoMmuAllocateAlignedBuffer (
+  IN UINTN                  Pages,
+  IN UINTN                  Alignment,
+  OUT VOID                  **HostAddress,
+  OUT EFI_PHYSICAL_ADDRESS  *DeviceAddress,
+  OUT VOID                  **Mapping
+  )
+{
+  EFI_STATUS            Status;
+  VOID                  *Memory;
+  UINTN                 AlignedMemory;
+  UINTN                 AlignmentMask;
+  UINTN                 UnalignedPages;
+  UINTN                 RealPages;
+  UINTN                 NumberOfBytes;
+  EFI_PHYSICAL_ADDRESS  HostPhyAddress;
+
+  *HostAddress   = NULL;
+  *DeviceAddress = 0;
+  AlignmentMask  = Alignment - 1;
+
+  //
+  // Calculate the total number of pages since alignment is larger than page size.
+  //
+  RealPages = Pages + EFI_SIZE_TO_PAGES (Alignment);
+
+  //
+  // Make sure that Pages plus EFI_SIZE_TO_PAGES (Alignment) does not overflow.
+  //
+  ASSERT (RealPages > Pages);
+
+  if (mIoMmu != NULL) {
+    Status = mIoMmu->AllocateBuffer (
+                       mIoMmu,
+                       EfiBootServicesData,
+                       RealPages,
+                       HostAddress,
+                       0
+                       );
+    if (EFI_ERROR (Status)) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+    Memory         = *HostAddress;
+    AlignedMemory  = ((UINTN) Memory + AlignmentMask) & ~AlignmentMask;
+    UnalignedPages = EFI_SIZE_TO_PAGES (AlignedMemory - (UINTN) Memory);
+    if (UnalignedPages > 0) {
+      //
+      // Free first unaligned page(s).
+      //
+      Status = mIoMmu->FreeBuffer (
+                         mIoMmu,
+                         UnalignedPages,
+                         Memory);
+      if (EFI_ERROR (Status)) {
+        return Status;
+      }
+    }
+    Memory         = (VOID *)(UINTN)(AlignedMemory + EFI_PAGES_TO_SIZE (Pages));
+    UnalignedPages = RealPages - Pages - UnalignedPages;
+    if (UnalignedPages > 0) {
+      //
+      // Free last unaligned page(s).
+      //
+      Status = mIoMmu->FreeBuffer (
+                         mIoMmu,
+                         UnalignedPages,
+                         Memory);
+      if (EFI_ERROR (Status)) {
+        return Status;
+      }
+    }
+    *HostAddress  = (VOID *) AlignedMemory;
+    NumberOfBytes = EFI_PAGES_TO_SIZE(Pages);
+    Status = mIoMmu->Map (
+                       mIoMmu,
+                       EdkiiIoMmuOperationBusMasterCommonBuffer,
+                       *HostAddress,
+                       &NumberOfBytes,
+                       DeviceAddress,
+                       Mapping
+                       );
+    if (EFI_ERROR (Status)) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+    Status = mIoMmu->SetAttribute (
+                       mIoMmu,
+                       *Mapping,
+                       EDKII_IOMMU_ACCESS_READ | EDKII_IOMMU_ACCESS_WRITE
+                       );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  } else {
+    Status = PeiServicesAllocatePages (
+               EfiBootServicesData,
+               RealPages,
+               &HostPhyAddress
+               );
+    if (EFI_ERROR (Status)) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+    *HostAddress = (VOID *)(((UINTN) HostPhyAddress + AlignmentMask) & ~AlignmentMask);
+    *DeviceAddress = ((UINTN) HostPhyAddress + AlignmentMask) & ~AlignmentMask;
+    *Mapping = NULL;
+  }
+  return Status;
+}
+
+/**
   Initialize IOMMU.
 **/
 VOID
