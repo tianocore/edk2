@@ -225,6 +225,8 @@ FindGuardedMemoryMap (
   UINTN                   BitsToUnitEnd;
   EFI_STATUS              Status;
 
+  MapMemory = 0;
+
   //
   // Adjust current map table depth according to the address to access
   //
