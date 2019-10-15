@@ -342,4 +342,32 @@ IoMmuFreeBuffer (
   IN VOID                   *Mapping
   );
 
+/**
+  Allocates aligned pages that are suitable for an OperationBusMasterCommonBuffer or
+  OperationBusMasterCommonBuffer64 mapping.
+
+  @param  Pages                 The number of pages to allocate.
+  @param  Alignment             The requested alignment of the allocation.  Must be a power of two.
+  @param  HostAddress           A pointer to store the base system memory address of the
+                                allocated range.
+  @param  DeviceAddress         The resulting map address for the bus master PCI controller to use to
+                                access the hosts HostAddress.
+  @param  Mapping               A resulting value to pass to Unmap().
+
+  @retval EFI_SUCCESS           The requested memory pages were allocated.
+  @retval EFI_UNSUPPORTED       Attributes is unsupported. The only legal attribute bits are
+                                MEMORY_WRITE_COMBINE and MEMORY_CACHED.
+  @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
+  @retval EFI_OUT_OF_RESOURCES  The memory pages could not be allocated.
+
+**/
+EFI_STATUS
+IoMmuAllocateAlignedBuffer (
+  IN UINTN                  Pages,
+  IN UINTN                  Alignment,
+  OUT VOID                  **HostAddress,
+  OUT EFI_PHYSICAL_ADDRESS  *DeviceAddress,
+  OUT VOID                  **Mapping
+  );
+
 #endif
