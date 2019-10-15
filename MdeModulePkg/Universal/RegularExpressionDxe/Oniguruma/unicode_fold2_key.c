@@ -211,17 +211,12 @@ onigenc_unicode_fold2_key(OnigCodePoint codes[])
       129
     };
 
-  if (0 == 0)
-    {
-      int key = hash(codes);
-
-      if (key <= MAX_HASH_VALUE)
-        {
-          int index = wordlist[key];
-
-          if (index >= 0 && onig_codes_cmp(codes, OnigUnicodeFolds2 + index, 2) == 0)
-            return index;
-        }
+    int key = hash(codes);
+    if (key <= MAX_HASH_VALUE) {
+      int index = wordlist[key];
+      if (index >= 0 && onig_codes_cmp(codes, OnigUnicodeFolds2 + index, 2) == 0)
+        return index;
     }
+
   return -1;
 }
