@@ -143,7 +143,7 @@ DebuggerDisplaySymbolAccrodingToAddress (
   // Find the nearest symbol address
   //
   CandidateAddress = EbdFindSymbolAddress (Address, EdbMatchSymbolTypeNearestAddress, &Object, &Entry);
-  if (CandidateAddress == 0 || CandidateAddress == (UINTN) -1) {
+  if (CandidateAddress == 0 || CandidateAddress == (UINTN) -1 || Entry == NULL) {
     EDBPrint (L"Symbole at Address not found!\n");
     return EFI_DEBUG_CONTINUE;
   } else if (Address != CandidateAddress) {
