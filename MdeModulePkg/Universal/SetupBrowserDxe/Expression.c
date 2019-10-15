@@ -1281,7 +1281,10 @@ IfrToUint (
       Result->Type = EFI_IFR_TYPE_UNDEFINED;
       return EFI_SUCCESS;
     }
+
+    ASSERT (GetBufferForValue (&Value) != NULL);
     Result->Value.u64 = *(UINT64*) GetBufferForValue (&Value);
+
     if (Value.Type == EFI_IFR_TYPE_BUFFER) {
       FreePool (Value.Buffer);
     }
