@@ -3,7 +3,7 @@
   And give a interface of query a string out of a table.
 
   Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
-  (C) Copyright 2016-2017 Hewlett Packard Enterprise Development LP<BR>
+  (C) Copyright 2016-2019 Hewlett Packard Enterprise Development LP<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -620,6 +620,10 @@ TABLE_ITEM  ProcessorCharacteristicsTable[] = {
   {
     7,
     L" Power/Performance Control"
+  },
+  {
+    8,
+    L" 128-bit Capable"
   }
 };
 
@@ -3268,6 +3272,44 @@ TABLE_ITEM  MCHostInterfaceTypeTable[] = {
   },
 };
 
+TABLE_ITEM  ProcessorArchitectureTypesTable[] = {
+  {
+    0,
+    L" Reserved "
+  },
+  {
+    1,
+    L" IA32 (x86) "
+  },
+  {
+    2,
+    L" x64 (x86-64, intel64, AMD64, EM64T) "
+  },
+  {
+    3,
+    L" Intel Itanium architecture "
+  },
+  {
+    4,
+    L" 32-bit ARM (Aarch32) "
+  },
+  {
+    5,
+    L" 64-bit ARM (Aarch64) "
+  },
+  {
+    6,
+    L" 32-bit RISC-V (RV32) "
+  },
+  {
+    7,
+    L" 64-bit RISC-V (RV64) "
+  },
+  {
+    8,
+    L" 128-bit RISC-V (RV128) "
+  }
+};
 
 TABLE_ITEM  StructureTypeInfoTable[] = {
   {
@@ -3445,6 +3487,10 @@ TABLE_ITEM  StructureTypeInfoTable[] = {
   {
     43,
     L" TPM Device"
+  },
+  {
+    44,
+    L" Processor Additional Information"
   },
   {
     0x7E,
@@ -4694,6 +4740,23 @@ DisplayMCHostInterfaceType (
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_MC_HOST_INTERFACE_TYPE), gShellDebug1HiiHandle);
   PRINT_INFO_OPTION (Key, Option);
   PRINT_TABLE_ITEM (MCHostInterfaceTypeTable, Key);
+}
+
+/**
+  Display Processor Architecture Type (Type 44).
+
+  @param[in] Key            The key of the structure.
+  @param[in] Option         The optional information.
+**/
+VOID
+DisplayProcessorArchitectureType (
+  IN UINT8 Key,
+  IN UINT8 Option
+  )
+{
+  ShellPrintHiiEx (-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_PROCESSOR_ARCH_TYPE), gShellDebug1HiiHandle);
+  PRINT_INFO_OPTION (Key, Option);
+  PRINT_TABLE_ITEM (ProcessorArchitectureTypesTable, Key);
 }
 
 /**

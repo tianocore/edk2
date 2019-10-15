@@ -2,7 +2,7 @@
   Module to clarify the element info of the smbios structure.
 
   Copyright (c) 2005 - 2015, Intel Corporation. All rights reserved.<BR>
-  (C) Copyright 2017 Hewlett Packard Enterprise Development LP<BR>
+  (C) Copyright 2017 - 2019 Hewlett Packard Enterprise Development LP<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -427,4 +427,15 @@ DisplayTpmDeviceCharacteristics (
   IN UINT8   Option
   );
 
+/**
+  Display Processor Architecture Type (Type 44).
+
+  @param[in] Key            The key of the structure.
+  @param[in] Option         The optional information.
+**/
+VOID
+DisplayProcessorArchitectureType (
+  IN UINT8 Key,
+  IN UINT8 Option
+  );
 #endif
