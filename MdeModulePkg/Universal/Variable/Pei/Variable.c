@@ -896,7 +896,7 @@ FindVariableEx (
       //
       if ((IndexTable != NULL) && !StopRecord) {
         Offset = (UINTN) Variable - (UINTN) LastVariable;
-        if ((Offset > 0x0FFFF) || (IndexTable->Length == sizeof (IndexTable->Index) / sizeof (IndexTable->Index[0]))) {
+        if ((Offset > 0x0FFFF) || (IndexTable->Length >= sizeof (IndexTable->Index) / sizeof (IndexTable->Index[0]))) {
           //
           // Stop to record if the distance of two neighbouring VAR_ADDED variable is larger than the allowable scope(UINT16),
           // or the record buffer is full.
