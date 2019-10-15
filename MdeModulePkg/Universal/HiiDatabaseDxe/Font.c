@@ -999,6 +999,7 @@ GetSystemFont (
   }
 
   Info->ForegroundColor    = mHiiEfiColors[Private->Attribute & 0x0f];
+  ASSERT ((Private->Attribute >> 4) < 8);
   Info->BackgroundColor    = mHiiEfiColors[Private->Attribute >> 4];
   Info->FontInfoMask       = EFI_FONT_INFO_SYS_FONT | EFI_FONT_INFO_SYS_SIZE | EFI_FONT_INFO_SYS_STYLE;
   Info->FontInfo.FontStyle = 0;
