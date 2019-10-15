@@ -3288,17 +3288,12 @@ onigenc_unicode_unfold_key(OnigCodePoint code)
       {0x1e907, 4005, 1}
     };
 
-  if (0 == 0)
-    {
-      int key = hash(&code);
-
-      if (key <= MAX_HASH_VALUE)
-        {
-          OnigCodePoint gcode = wordlist[key].code;
-
-          if (code == gcode && wordlist[key].index >= 0)
-            return &wordlist[key];
-        }
+    int key = hash(&code);
+    if (key <= MAX_HASH_VALUE) {
+      OnigCodePoint gcode = wordlist[key].code;
+      if (code == gcode && wordlist[key].index >= 0) {
+        return &wordlist[key];
+      }
     }
   return 0;
 }

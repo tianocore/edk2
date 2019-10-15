@@ -121,17 +121,13 @@ onigenc_unicode_fold3_key(OnigCodePoint codes[])
       0
     };
 
-  if (0 == 0)
-    {
-      int key = hash(codes);
-
-      if (key <= MAX_HASH_VALUE)
-        {
-          int index = wordlist[key];
-
-          if (index >= 0 && onig_codes_cmp(codes, OnigUnicodeFolds3 + index, 3) == 0)
-            return index;
-        }
+    int key = hash(codes);
+    if (key <= MAX_HASH_VALUE) {
+      int index = wordlist[key];
+      if (index >= 0 && onig_codes_cmp(codes, OnigUnicodeFolds3 + index, 3) == 0) {
+        return index;
+      }
     }
+
   return -1;
 }
