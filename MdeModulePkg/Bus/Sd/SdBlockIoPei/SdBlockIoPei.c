@@ -174,7 +174,7 @@ SdBlockIoPeimGetMediaInfo (
 
   Private   = GET_SD_PEIM_HC_PRIVATE_DATA_FROM_THIS (This);
 
-  if ((DeviceIndex == 0) || (DeviceIndex > Private->TotalBlkIoDevices)) {
+  if ((DeviceIndex == 0) || (DeviceIndex > Private->TotalBlkIoDevices) || (DeviceIndex > SD_PEIM_MAX_SLOTS)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -252,7 +252,7 @@ SdBlockIoPeimReadBlocks (
     return EFI_SUCCESS;
   }
 
-  if ((DeviceIndex == 0) || (DeviceIndex > Private->TotalBlkIoDevices)) {
+  if ((DeviceIndex == 0) || (DeviceIndex > Private->TotalBlkIoDevices) || (DeviceIndex > SD_PEIM_MAX_SLOTS)) {
     return EFI_INVALID_PARAMETER;
   }
 
