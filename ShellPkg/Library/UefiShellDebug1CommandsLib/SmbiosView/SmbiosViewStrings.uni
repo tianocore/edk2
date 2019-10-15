@@ -2,7 +2,7 @@
 //
 // Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
 // (C) Copyright 2014-2015 Hewlett-Packard Development Company, L.P.<BR>
-// (C) Copyright 2015-2017 Hewlett Packard Enterprise Development LP<BR>
+// (C) Copyright 2015-2019 Hewlett Packard Enterprise Development LP<BR>
 // SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Module Name:
@@ -447,6 +447,7 @@
 #string STR_SMBIOSVIEW_QUERYTABLE_BMC_INTERFACE_TYPE            #language en-US "BMC Interface Type:"
 #string STR_SMBIOSVIEW_QUERYTABLE_MC_HOST_INTERFACE_TYPE        #language en-US "MC Host Interface Type:"
 #string STR_SMBIOSVIEW_QUERYTABLE_STRUCT_TYPE                   #language en-US "Structure Type:"
+#string STR_SMBIOSVIEW_QUERYTABLE_PROCESSOR_ARCH_TYPE           #language en-US "Processor Architecture Type:"
 #string STR_SMBIOSVIEW_SMBIOSVIEW_ONE_VAR_ARGV                  #language en-US "%s "
 #string STR_SMBIOSVIEW_SMBIOSVIEW_QUERY_STRUCT_COND             #language en-US "Query Structure, conditions are:\r\n"
 #string STR_SMBIOSVIEW_SMBIOSVIEW_QUERYTYPE_RANDOM              #language en-US "QueryType   = Random \r\n"
