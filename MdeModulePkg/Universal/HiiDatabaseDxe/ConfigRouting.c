@@ -909,6 +909,7 @@ CompareAndMergeDefaultString (
   // To find the <AltResp> with AltConfigHdr in AltCfgResp, ignore other <AltResp> which follow it.
   //
   StringPtr = StrStr (*AltCfgResp, AltConfigHdr);
+  ASSERT (StringPtr != NULL);
   StringPtrNext = StrStr (StringPtr + 1, L"&GUID");
   if (StringPtrNext != NULL) {
     TempCharA = *StringPtrNext;
