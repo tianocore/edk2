@@ -810,13 +810,13 @@ FvHasBeenProcessed (
 
 **/
 VOID
-FvIsBeingProcesssed (
+FvIsBeingProcessed (
   IN EFI_FIRMWARE_VOLUME_HEADER *FwVolHeader
   )
 {
   KNOWN_FWVOL   *KnownFwVol;
 
-  DEBUG ((DEBUG_INFO, "FvIsBeingProcesssed - 0x%08x\n", KnownFwVol));
+  DEBUG ((DEBUG_INFO, "FvIsBeingProcessed - 0x%08x\n", KnownFwVol));
 
   KnownFwVol = AllocatePool (sizeof (KNOWN_FWVOL));
   ASSERT (KnownFwVol != NULL);

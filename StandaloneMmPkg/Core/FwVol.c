@@ -38,7 +38,7 @@ FvHasBeenProcessed (
   );
 
 VOID
-FvIsBeingProcesssed (
+FvIsBeingProcessed (
   IN EFI_FIRMWARE_VOLUME_HEADER *FwVolHeader
   );
 
@@ -86,7 +86,7 @@ Returns:
     return EFI_SUCCESS;
   }
 
-  FvIsBeingProcesssed (FwVolHeader);
+  FvIsBeingProcessed (FwVolHeader);
 
   //
   // First check for encapsulated compressed firmware volumes
