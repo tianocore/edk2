@@ -107,7 +107,11 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdTpm2AcpiTableLasa                        ## PRODUCES
 
 [Depex]
-  TRUE
+  # According to PcdTpm2AcpiTableRev definition in SecurityPkg.dec
+  # This PCD should be configured at DynamicHii or DynamicHiiEx.
+  # So, this PCD read operation depends on GetVariable service.
+  # Add VariableArch protocol dependency to make sure PCD read works.
+  gEfiVariableArchProtocolGuid
 
 [UserExtensions.TianoCore."ExtraFiles"]
   Tcg2DxeExtra.uni
