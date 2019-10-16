@@ -1080,13 +1080,17 @@ cleanlib:
                     else:
                         CmdCppDict[item.Target.SubDir] = ['$(MAKE_FILE)', Path]
                     if CppPath.Path in DependencyDict:
-                        for Temp in DependencyDict[CppPath.Path]:
-                            try:
-                                Path = self.PlaceMacro(Temp.Path, self.Macros)
-                            except:
-                                continue
-                            if Path not in (self.CommonFileDependency + CmdCppDict[item.Target.SubDir]):
-                                CmdCppDict[item.Target.SubDir].append(Path)
+                        if '$(FORCE_REBUILD)' in DependencyDict[CppPath.Path]:
+                            if '$(FORCE_REBUILD)' not in (self.CommonFileDependency + CmdCppDict[item.Target.SubDir]):
+                                CmdCppDict[item.Target.SubDir].append('$(FORCE_REBUILD)')
+                        else:
+                            for Temp in DependencyDict[CppPath.Path]:
+                                try:
+                                    Path = self.PlaceMacro(Temp.Path, self.Macros)
+                                except:
+                                    continue
+                                if Path not in (self.CommonFileDependency + CmdCppDict[item.Target.SubDir]):
+                                    CmdCppDict[item.Target.SubDir].append(Path)
         if T.Commands:
             CommandList = T.Commands[:]
             for Item in CommandList[:]:
