@@ -696,7 +696,7 @@ FvHasBeenProcessed (
 
 **/
 KNOWN_HANDLE *
-FvIsBeingProcesssed (
+FvIsBeingProcessed (
   IN  EFI_HANDLE    FvHandle
   )
 {
@@ -1253,7 +1253,7 @@ CoreFwVolEventProtocolNotify (
     //
     // Since we are about to process this Fv mark it as processed.
     //
-    KnownHandle = FvIsBeingProcesssed (FvHandle);
+    KnownHandle = FvIsBeingProcessed (FvHandle);
     if (KnownHandle == NULL) {
       //
       // The FV with the same FV name guid has already been processed.
