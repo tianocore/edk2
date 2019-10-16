@@ -158,7 +158,7 @@ Ip6IsNDOptionValid (
       //
       // Check the length of Ip6OptionEtherSource, Ip6OptionEtherTarget, and
       // Ip6OptionRedirected here. For unrecognized options, silently ignore
-      // and continue processsing the message.
+      // and continue processing the message.
       //
       if (Length == 0) {
         return FALSE;
