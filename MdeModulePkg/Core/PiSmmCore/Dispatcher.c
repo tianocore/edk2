@@ -1101,7 +1101,7 @@ FvHasBeenProcessed (
 
 **/
 VOID
-FvIsBeingProcesssed (
+FvIsBeingProcessed (
   IN EFI_HANDLE  FvHandle
   )
 {
@@ -1294,7 +1294,7 @@ SmmDriverDispatchHandler (
     //
     // Since we are about to process this Fv mark it as processed.
     //
-    FvIsBeingProcesssed (FvHandle);
+    FvIsBeingProcessed (FvHandle);
 
     Status = gBS->HandleProtocol (FvHandle, &gEfiFirmwareVolume2ProtocolGuid, (VOID **)&Fv);
     if (EFI_ERROR (Status)) {
