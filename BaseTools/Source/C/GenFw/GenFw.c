@@ -653,7 +653,11 @@ PeCoffConvertImageToXip (
     //
     // Make the size of raw data in section header alignment.
     //
-    SectionHeader->SizeOfRawData = (SectionHeader->Misc.VirtualSize + PeHdr->Pe32.OptionalHeader.FileAlignment - 1) & (~(PeHdr->Pe32.OptionalHeader.FileAlignment - 1));
+    SectionSize = (SectionHeader->Misc.VirtualSize + PeHdr->Pe32.OptionalHeader.FileAlignment - 1) & (~(PeHdr->Pe32.OptionalHeader.FileAlignment - 1));
+    if (SectionSize < SectionHeader->SizeOfRawData) {
+      SectionHeader->SizeOfRawData = SectionSize;
+    }
+
     SectionHeader->PointerToRawData = SectionHeader->VirtualAddress;
   }
 
@@ -999,7 +1003,7 @@ Returns:
     CopyMem (
       FileBuffer + SectionHeader->PointerToRawData,
       (VOID*) (UINTN) (ImageContext.ImageAddress + SectionHeader->VirtualAddress),
-      SectionHeader->SizeOfRawData
+      SectionHeader->SizeOfRawData < SectionHeader->Misc.VirtualSize ? SectionHeader->SizeOfRawData : SectionHeader->Misc.VirtualSize
       );
   }
 
