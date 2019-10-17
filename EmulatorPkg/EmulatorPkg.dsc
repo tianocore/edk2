@@ -237,9 +237,11 @@
 
 [Components]
 !if "IA32" in $(ARCH) || "X64" in $(ARCH)
-  !if "MSFT" in $(FAMILY)
+  !if "MSFT" in $(FAMILY) || $(WIN_HOST_BUILD) == TRUE
     ##
     #  Emulator, OS WIN application
+    #  CLANG9 is cross OS tool chain. It depends on WIN_HOST_BUILD flag
+    #  to build WinHost application.
     ##
     EmulatorPkg/Win/Host/WinHost.inf
   !else
@@ -419,7 +421,17 @@
 
   MSFT:DEBUG_*_*_CC_FLAGS = /Od /Oy-
   MSFT:NOOPT_*_*_CC_FLAGS = /Od /Oy-
+  GCC:DEBUG_CLANG9_*_CC_FLAGS =-O0 -Wno-unused-command-line-argument -Wno-incompatible-pointer-types -Wno-enum-conversion -Wno-incompatible-pointer-types -Wno-sometimes-uninitialized -Wno-constant-conversion -Wno-main-return-type
 
   MSFT:*_*_*_DLINK_FLAGS     = /ALIGN:4096 /FILEALIGN:4096 /SUBSYSTEM:CONSOLE
   MSFT:DEBUG_*_*_DLINK_FLAGS = /EXPORT:InitializeDriver=$(IMAGE_ENTRY_POINT) /BASE:0x10000
   MSFT:NOOPT_*_*_DLINK_FLAGS = /EXPORT:InitializeDriver=$(IMAGE_ENTRY_POINT) /BASE:0x10000
+
+!if $(WIN_HOST_BUILD) == TRUE
+  #
+  # CLANG9 tool chain depends on WIN_HOST_BUILD flag to generate the windows application.
+  #
+  GCC:*_CLANG9_*_DLINK_FLAGS     = /ALIGN:4096 /FILEALIGN:4096 /SUBSYSTEM:CONSOLE
+  GCC:DEBUG_CLANG9_*_DLINK_FLAGS = /EXPORT:InitializeDriver=$(IMAGE_ENTRY_POINT) /BASE:0x10000
+  GCC:NOOPT_CLANG9_*_DLINK_FLAGS = /EXPORT:InitializeDriver=$(IMAGE_ENTRY_POINT) /BASE:0x10000
+!endif
