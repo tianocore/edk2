@@ -356,7 +356,7 @@ Returns:
 INTN
 EFIAPI
 main (
-  IN  INTN  Argc,
+  IN  INT  Argc,
   IN  CHAR8 **Argv,
   IN  CHAR8 **Envp
   )
@@ -391,8 +391,8 @@ Returns:
   VOID                  *SecFile;
   CHAR16                *MemorySizeStr;
   CHAR16                *FirmwareVolumesStr;
-  UINT32                ProcessAffinityMask;
-  UINT32                SystemAffinityMask;
+  UINTN                 ProcessAffinityMask;
+  UINTN                 SystemAffinityMask;
   INT32                 LowBit;
 
   //
@@ -414,7 +414,7 @@ Returns:
   // Determine the first thread available to this process.
   //
   if (GetProcessAffinityMask (GetCurrentProcess (), &ProcessAffinityMask, &SystemAffinityMask)) {
-    LowBit = (INT32)LowBitSet32 (ProcessAffinityMask);
+    LowBit = (INT32)LowBitSet32 ((UINT32)ProcessAffinityMask);
     if (LowBit != -1) {
       //
       // Force the system to bind the process to a single thread to work
