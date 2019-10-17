@@ -621,9 +621,9 @@ typedef char* VA_LIST;
 #define VA_END(Marker)                  (Marker = (VA_LIST) 0)
 #define VA_COPY(Dest, Start)            ((void)((Dest) = (Start)))
 
-#elif defined(__GNUC__)
+#elif defined(__GNUC__) || defined(__clang__)
 
-#if defined(MDE_CPU_X64) && !defined(NO_MSABI_VA_FUNCS)
+#if defined(MDE_CPU_X64) && !defined(NO_MSABI_VA_FUNCS) && !defined(__clang__)
 //
 // X64 only. Use MS ABI version of GCC built-in macros for variable argument lists.
 //
@@ -1274,7 +1274,7 @@ typedef UINTN RETURN_STATUS;
 
   **/
   #define RETURN_ADDRESS(L)     ((L == 0) ? _ReturnAddress() : (VOID *) 0)
-#elif defined(__GNUC__)
+#elif defined (__GNUC__) || defined (__clang__)
   void * __builtin_return_address (unsigned int level);
   /**
     Get the return address of the calling function.
