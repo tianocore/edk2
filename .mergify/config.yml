@@ -1,0 +1,97 @@
+## @file
+# Mergify YML file that automatically merges a GitHub pull request against
+# edk2-ci if all of the GitHub branch protections have passed.  It also
+# contains rules to:
+# * auto close branches that are not from an EDK II Maintainer
+# * post a comment on pull requests that have merge conflicts.
+# * post a comment on pull requests that have PatchCheck.py errors.
+#
+# Configuration Notes:
+# * Update the 'base=edk2-ci' statements with the name of the branch to merge
+#   pull requests.
+#
+# * Update the 'status-failure' statement with the name of the name of the Azure
+#   Pipelines Build that performs the EDK II Maintainer check.
+#
+# * This file must be checked into the 'default' branch of a repo.  Copies
+#   of this file on other branches of a repo are ignored by Mergify.
+#
+# Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+# https://github.com/apps/mergify
+# https://doc.mergify.io/
+#
+##
+
+pull_request_rules:
+
+  - name: Automatically merge a PR when all required checks pass and 'push' label is present
+    conditions:
+      - base=master
+      - label=push
+      - author=@tianocore/edk-ii-maintainers
+      - status-success=tianocore.PatchCheck
+      - status-success=Ubuntu GCC5 PR
+      - status-success=Windows VS2019 PR
+    actions:
+      merge:
+        strict: true
+        method: rebase
+
+  - name: Automatically close a PR when all required checks pass and 'push' label is not present
+    conditions:
+      - base=master
+      - -label=push
+      - -closed
+      - status-success=tianocore.PatchCheck
+      - status-success=Ubuntu GCC5 PR
+      - status-success=Windows VS2019 PR
+      - status-success=Ubuntu GCC5 PR (FINISHED)
+      - status-success=Windows VS2019 PR (FINISHED)
+    actions:
+      close:
+        message: All checks passed. Auto close personal build.
+
+  - name: Post a comment on a PR that can not be merged due to a merge conflict
+    conditions:
+      - base=master
+      - conflict
+    actions:
+      comment:
+        message: PR can not be merged due to conflict.  Please rebase and resubmit
+
+  - name: Automatically close a PR that fails the EDK II Maintainers membership check and 'push' label is present
+    conditions:
+      - base=master
+      - label=push
+      - -author=@tianocore/edk-ii-maintainers
+    actions:
+      close:
+        message: PR submitter is not a member of the Tianocore EDK II Maintainers team
+
+  - name: Post a comment on a PR if PatchCheck fails
+    conditions:
+      - base=master
+      - status-failure=tianocore.PatchCheck
+    actions:
+      comment:
+        message: PR can not be merged due to a PatchCheck failure.  Please resolve and resubmit
+
+  - name: Post a comment on a PR if Ubuntu GCC5 fails
+    conditions:
+      - base=master
+      - status-failure=Ubuntu GCC5 PR
+      - status-success=Ubuntu GCC5 PR (FAILED)
+    actions:
+      comment:
+        message: PR can not be merged due to an Ubuntu GCC5 failure.  Please resolve and resubmit
+
+  - name: Post a comment on a PR if Windows VS2019 fails
+    conditions:
+      - base=master
+      - status-failure=Windows VS2019 PR
+      - status-success=Windows VS2019 PR (FAILED)
+    actions:
+      comment:
+        message: PR can not be merged due to a Windows VS2019 failure.  Please resolve and resubmit
