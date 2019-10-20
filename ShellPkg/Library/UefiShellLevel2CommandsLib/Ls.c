@@ -500,7 +500,7 @@ PrintLsOutput(
       // Change the file time to local time.
       //
       Status = gRT->GetTime(&LocalTime, NULL);
-      if (!EFI_ERROR (Status)) {
+      if (!EFI_ERROR (Status) && (LocalTime.TimeZone != EFI_UNSPECIFIED_TIMEZONE)) {
         if ((Node->Info->CreateTime.TimeZone != EFI_UNSPECIFIED_TIMEZONE) &&
             (Node->Info->CreateTime.Month >= 1 && Node->Info->CreateTime.Month <= 12)) {
           //
