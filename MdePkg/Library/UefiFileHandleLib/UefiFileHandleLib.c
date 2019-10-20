@@ -817,9 +817,24 @@ FileHandleGetFileName (
         break;
       } else {
         //
+        // Prepare to move to the parent directory.
+        // Also determine whether CurrentHandle refers to the Root directory.
+        //
+        Status = CurrentHandle->Open (CurrentHandle, &NextHigherHandle, L"..", EFI_FILE_MODE_READ, 0);
+        //
         // We got info... do we have a name? if yes precede the current path with it...
         //
-        if (StrLen (FileInfo->FileName) == 0) {
+        if ((StrLen (FileInfo->FileName) == 0) || EFI_ERROR (Status)) {
+          //
+          // Both FileInfo->FileName being '\0' and EFI_ERROR() suggest that
+          // CurrentHandle refers to the Root directory.  As this loop ensures
+          // FullFileName is starting with '\\' at all times, signal success
+          // and exit the loop.
+          // While FileInfo->FileName could theoretically be a value other than
+          // '\0' or '\\', '\\' is guaranteed to be supported by the
+          // specification and hence its value can safely be ignored.
+          //
+          Status = EFI_SUCCESS;
           if (*FullFileName == NULL) {
             ASSERT((*FullFileName == NULL && Size == 0) || (*FullFileName != NULL));
             *FullFileName = StrnCatGrowLeft(FullFileName, &Size, L"\\", 0);
@@ -837,15 +852,11 @@ FileHandleGetFileName (
           FreePool(FileInfo);
         }
       }
+
+      FileHandleClose(CurrentHandle);
       //
       // Move to the parent directory
       //
-      Status = CurrentHandle->Open (CurrentHandle, &NextHigherHandle, L"..", EFI_FILE_MODE_READ, 0);
-      if (EFI_ERROR (Status)) {
-        break;
-      }
-
-      FileHandleClose(CurrentHandle);
       CurrentHandle = NextHigherHandle;
     }
   } else if (Status == EFI_NOT_FOUND) {
