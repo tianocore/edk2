@@ -68,19 +68,21 @@ FileHandleGetInfo (
     // error is expected.  getting size to allocate
     //
     FileInfo = AllocateZeroPool(FileInfoSize);
-    //
-    // now get the information
-    //
-    Status = FileHandle->GetInfo(FileHandle,
-                                 &gEfiFileInfoGuid,
-                                 &FileInfoSize,
-                                 FileInfo);
-    //
-    // if we got an error free the memory and return NULL
-    //
-    if (EFI_ERROR(Status) && (FileInfo != NULL)) {
-      FreePool(FileInfo);
-      FileInfo = NULL;
+    if (FileInfo != NULL) {
+      //
+      // now get the information
+      //
+      Status = FileHandle->GetInfo(FileHandle,
+                                   &gEfiFileInfoGuid,
+                                   &FileInfoSize,
+                                   FileInfo);
+      //
+      // if we got an error free the memory and return NULL
+      //
+      if (EFI_ERROR(Status)) {
+        FreePool(FileInfo);
+        FileInfo = NULL;
+      }
     }
   }
   return (FileInfo);
