@@ -1650,9 +1650,9 @@ class ModuleAutoGen(AutoGen):
 
         self.IsAsBuiltInfCreated = True
 
-    def CacheCopyFile(self, OriginDir, CopyDir, File):
-        sub_dir = os.path.relpath(File, CopyDir)
-        destination_file = os.path.join(OriginDir, sub_dir)
+    def CacheCopyFile(self, DestDir, SourceDir, File):
+        sub_dir = os.path.relpath(File, SourceDir)
+        destination_file = os.path.join(DestDir, sub_dir)
         destination_dir = os.path.dirname(destination_file)
         CreateDirectory(destination_dir)
         try:
