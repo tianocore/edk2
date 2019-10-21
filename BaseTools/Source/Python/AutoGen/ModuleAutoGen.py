@@ -1308,28 +1308,16 @@ class ModuleAutoGen(AutoGen):
     def OutputFile(self):
         retVal = set()
 
-        OutputDir = self.OutputDir.replace('\\', '/').strip('/')
-        DebugDir = self.DebugDir.replace('\\', '/').strip('/')
-        for Item in self.CodaTargetList:
-            File = Item.Target.Path.replace('\\', '/').strip('/').replace(DebugDir, '').replace(OutputDir, '').strip('/')
-            NewFile = path.join(self.OutputDir, File)
-            retVal.add(NewFile)
-
-        Bin = self._GenOffsetBin()
-        if Bin:
-            NewFile = path.join(self.OutputDir, Bin)
-            retVal.add(NewFile)
-
-        for Root, Dirs, Files in os.walk(self.OutputDir):
+        for Root, Dirs, Files in os.walk(self.BuildDir):
             for File in Files:
                 # lib file is already added through above CodaTargetList, skip it here
-                if not (File.lower().endswith('.obj') or File.lower().endswith('.lib')):
-                    NewFile = path.join(self.OutputDir, File)
+                if not (File.lower().endswith('.obj') or File.lower().endswith('.debug')):
+                    NewFile = path.join(Root, File)
                     retVal.add(NewFile)
 
         for Root, Dirs, Files in os.walk(self.FfsOutputDir):
             for File in Files:
-                NewFile = path.join(self.FfsOutputDir, File)
+                NewFile = path.join(Root, File)
                 retVal.add(NewFile)
 
         return retVal
