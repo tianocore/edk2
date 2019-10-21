@@ -2,7 +2,7 @@
 #
 # This script runs the OpenSSL Configure script, then processes the
 # resulting file list into our local OpensslLib[Crypto].inf and also
-# takes a copy of opensslconf.h.
+# takes copies of opensslconf.h and dso_conf.h.
 #
 # This only needs to be done once by a developer when updating to a
 # new version of OpenSSL (or changing options, etc.). Normal users
@@ -105,6 +105,14 @@ BEGIN {
                 "> include/openssl/opensslconf.h"
                 ) == 0 ||
                     die "Failed to generate opensslconf.h!\n";
+
+            # Generate dso_conf.h per config data
+            system(
+                "perl -I. -Mconfigdata util/dofile.pl " .
+                "crypto/include/internal/dso_conf.h.in " .
+                "> include/internal/dso_conf.h"
+                ) == 0 ||
+                    die "Failed to generate dso_conf.h!\n";
 
             chdir($basedir) ||
                 die "Cannot change to base directory \"" . $basedir . "\"";
@@ -249,12 +257,17 @@ rename( $new_inf_file, $inf_file ) ||
 print "Done!";
 
 #
-# Copy opensslconf.h generated from OpenSSL Configuration
+# Copy opensslconf.h and dso_conf.h generated from OpenSSL Configuration
 #
 print "\n--> Duplicating opensslconf.h into Include/openssl ... ";
 copy($OPENSSL_PATH . "/include/openssl/opensslconf.h",
      $OPENSSL_PATH . "/../../Include/openssl/") ||
    die "Cannot copy opensslconf.h!";
+print "Done!";
+print "\n--> Duplicating dso_conf.h into Include/internal ... ";
+copy($OPENSSL_PATH . "/include/internal/dso_conf.h",
+     $OPENSSL_PATH . "/../../Include/internal/") ||
+   die "Cannot copy dso_conf.h!";
 print "Done!\n";
 
 print "\nProcessing Files Done!\n";
