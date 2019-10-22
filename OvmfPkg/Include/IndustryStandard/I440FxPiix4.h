@@ -46,4 +46,9 @@
 #define PIIX4_PMREGMISC        0x80
 #define PIIX4_PMREGMISC_PMIOSE   BIT0
 
+//
+// IO ports
+//
+#define PIIX4_CPU_HOTPLUG_BASE 0xAF00
+
 #endif
