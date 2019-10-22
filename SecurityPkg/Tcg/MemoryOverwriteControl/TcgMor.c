@@ -341,7 +341,7 @@ MorDriverEntryPoint (
     //
     // Create a Ready To Boot Event and Clear the MorControl bit in the call back function.
     //
-    DEBUG ((EFI_D_INFO, "TcgMor: Create ReadyToBoot Event for MorControl Bit cleanning!\n"));
+    DEBUG ((DEBUG_INFO, "TcgMor: Create ReadyToBoot Event for MorControl Bit cleanning!\n"));
     Status = EfiCreateEventReadyToBootEx (
                TPL_CALLBACK,
                OnReadyToBoot,
