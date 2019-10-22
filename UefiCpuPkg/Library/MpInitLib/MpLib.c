@@ -546,7 +546,9 @@ InitializeApData (
     // Set x2APIC mode if there are any logical processor reporting
     // an Initial APIC ID of 255 or greater.
     //
+    AcquireSpinLock(&CpuMpData->MpLock);
     CpuMpData->X2ApicEnable = TRUE;
+    ReleaseSpinLock(&CpuMpData->MpLock);
   }
 
   InitializeSpinLock(&CpuMpData->CpuData[ProcessorNumber].ApLock);
