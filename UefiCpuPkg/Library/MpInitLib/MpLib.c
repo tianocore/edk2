@@ -458,6 +458,7 @@ CollectProcessorCount (
   )
 {
   UINTN                  Index;
+  CPU_INFO_IN_HOB        *CpuInfoInHob;
 
   //
   // Send 1st broadcast IPI to APs to wakeup APs
@@ -474,12 +475,27 @@ CollectProcessorCount (
     CpuPause ();
   }
 
+  
+  //
+  // Enable x2APIC mode if
+  //  1. Number of CPU is greater than 255; or
+  //  2. There are any logical processors reporting an Initial APIC ID of 255 or greater.
+  //
   if (CpuMpData->CpuCount > 255) {
     //
     // If there are more than 255 processor found, force to enable X2APIC
     //
     CpuMpData->X2ApicEnable = TRUE;
+  } else {
+    CpuInfoInHob = (CPU_INFO_IN_HOB *) (UINTN) CpuMpData->CpuInfoInHob;
+    for (Index = 0; Index < CpuMpData->CpuCount; Index++) {
+      if (CpuInfoInHob[Index].InitialApicId >= 0xFF) {
+        CpuMpData->X2ApicEnable = TRUE;
+        break;
+      }
+    }
   }
+
   if (CpuMpData->X2ApicEnable) {
     DEBUG ((DEBUG_INFO, "Force x2APIC mode!\n"));
     //
@@ -541,15 +557,6 @@ InitializeApData (
 
   CpuMpData->CpuData[ProcessorNumber].Waiting    = FALSE;
   CpuMpData->CpuData[ProcessorNumber].CpuHealthy = (BistData == 0) ? TRUE : FALSE;
-  if (CpuInfoInHob[ProcessorNumber].InitialApicId >= 0xFF) {
-    //
-    // Set x2APIC mode if there are any logical processor reporting
-    // an Initial APIC ID of 255 or greater.
-    //
-    AcquireSpinLock(&CpuMpData->MpLock);
-    CpuMpData->X2ApicEnable = TRUE;
-    ReleaseSpinLock(&CpuMpData->MpLock);
-  }
 
   InitializeSpinLock(&CpuMpData->CpuData[ProcessorNumber].ApLock);
   SetApState (&CpuMpData->CpuData[ProcessorNumber], CpuStateIdle);
