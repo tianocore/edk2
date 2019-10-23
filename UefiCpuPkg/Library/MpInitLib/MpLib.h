@@ -227,7 +227,6 @@ struct _CPU_MP_DATA {
   UINTN                          **FailedCpuList;
 
   AP_INIT_STATE                  InitFlag;
-  BOOLEAN                        X2ApicEnable;
   BOOLEAN                        SwitchBspFlag;
   UINTN                          NewBspNumber;
   CPU_EXCHANGE_ROLE_INFO         BSPInfo;
