@@ -147,6 +147,7 @@ int            isupper     (int);
 int            tolower     (int);
 int            strcmp      (const char *, const char *);
 int            strncasecmp (const char *, const char *, size_t);
+char           *strchr     (const char *, int);
 char           *strrchr    (const char *, int);
 unsigned long  strtoul     (const char *, char **, int);
 long           strtol      (const char *, char **, int);
@@ -188,7 +189,6 @@ void           abort       (void);
 #define strcpy(strDest,strSource)         AsciiStrCpyS(strDest,MAX_STRING_SIZE,strSource)
 #define strncpy(strDest,strSource,count)  AsciiStrnCpyS(strDest,MAX_STRING_SIZE,strSource,(UINTN)count)
 #define strcat(strDest,strSource)         AsciiStrCatS(strDest,MAX_STRING_SIZE,strSource)
-#define strchr(str,ch)                    ScanMem8((VOID *)(str),AsciiStrSize(str),(UINT8)ch)
 #define strncmp(string1,string2,count)    (int)(AsciiStrnCmp(string1,string2,(UINTN)(count)))
 #define strcasecmp(str1,str2)             (int)AsciiStriCmp(str1,str2)
 #define sprintf(buf,...)                  AsciiSPrint(buf,MAX_STRING_SIZE,__VA_ARGS__)

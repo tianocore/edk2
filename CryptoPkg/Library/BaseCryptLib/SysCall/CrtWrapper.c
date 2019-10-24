@@ -115,6 +115,11 @@ QuickSortWorker (
 // -- String Manipulation Routines --
 //
 
+char *strchr(const char *str, int ch)
+{
+  return ScanMem8 (str, AsciiStrSize (str), (UINT8)ch);
+}
+
 /* Scan a string for the last occurrence of a character */
 char *strrchr (const char *str, int c)
 {
