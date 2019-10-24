@@ -328,6 +328,7 @@ class MetaFileParser(object):
                 S1 = ItemList[1].upper()
             else:
                 S1 = TAB_ARCH_COMMON
+            S1 = ReplaceMacro(S1, self._Macros)
             ArchList.add(S1)
 
             # S2 may be Platform or ModuleType
