@@ -74,6 +74,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // Definitions for global constants used by CRT library routines
 //
 #define EINVAL       22               /* Invalid argument */
+#define EAFNOSUPPORT 47               /* Address family not supported by protocol family */
 #define INT_MAX      0x7FFFFFFF       /* Maximum (signed) int value */
 #define LONG_MAX     0X7FFFFFFFL      /* max value for a long */
 #define LONG_MIN     (-LONG_MAX-1)    /* min value for a long */
@@ -81,13 +82,28 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define CHAR_BIT     8                /* Number of bits in a char */
 
 //
+// Address families.
+//
+#define AF_INET   2     /* internetwork: UDP, TCP, etc. */
+#define AF_INET6  24    /* IP version 6 */
+
+//
+// Define constants based on RFC0883, RFC1034, RFC 1035
+//
+#define NS_INT16SZ    2   /*%< #/bytes of data in a u_int16_t */
+#define NS_INADDRSZ   4   /*%< IPv4 T_A */
+#define NS_IN6ADDRSZ  16  /*%< IPv6 T_AAAA */
+
+//
 // Basic types mapping
 //
 typedef UINTN          size_t;
+typedef UINTN          u_int;
 typedef INTN           ssize_t;
 typedef INT32          time_t;
 typedef UINT8          __uint8_t;
 typedef UINT8          sa_family_t;
+typedef UINT8          u_char;
 typedef UINT32         uid_t;
 typedef UINT32         gid_t;
 
