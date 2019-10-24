@@ -192,6 +192,7 @@ void           abort       (void) __attribute__((__noreturn__));
 #else
 void           abort       (void);
 #endif
+int            inet_pton   (int, const char *, void *);
 
 //
 // Macros that directly map functions to BaseLib, BaseMemoryLib, and DebugLib functions

@@ -58,6 +58,7 @@
   SysCall/CrtWrapper.c
   SysCall/TimerWrapper.c
   SysCall/BaseMemAllocation.c
+  SysCall/inet_pton.c
 
 [Sources.Ia32]
   Rand/CryptRandTsc.c
