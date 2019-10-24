@@ -517,7 +517,11 @@ TlsSetVerifyHost (
   IN     CHAR8                    *HostName
   )
 {
-  TLS_CONNECTION  *TlsConn;
+  TLS_CONNECTION    *TlsConn;
+  X509_VERIFY_PARAM *VerifyParam;
+  UINTN             BinaryAddressSize;
+  UINT8             BinaryAddress[MAX (NS_INADDRSZ, NS_IN6ADDRSZ)];
+  INTN              ParamStatus;
 
   TlsConn = (TLS_CONNECTION *) Tls;
   if (TlsConn == NULL || TlsConn->Ssl == NULL || HostName == NULL) {
@@ -526,11 +530,27 @@ TlsSetVerifyHost (
 
   SSL_set_hostflags(TlsConn->Ssl, Flags);
 
-  if (SSL_set1_host(TlsConn->Ssl, HostName) == 0) {
-    return EFI_ABORTED;
+  VerifyParam = SSL_get0_param (TlsConn->Ssl);
+  ASSERT (VerifyParam != NULL);
+
+  BinaryAddressSize = 0;
+  if (inet_pton (AF_INET6, HostName, BinaryAddress) == 1) {
+    BinaryAddressSize = NS_IN6ADDRSZ;
+  } else if (inet_pton (AF_INET, HostName, BinaryAddress) == 1) {
+    BinaryAddressSize = NS_INADDRSZ;
   }
 
-  return EFI_SUCCESS;
+  if (BinaryAddressSize > 0) {
+    DEBUG ((DEBUG_VERBOSE, "%a:%a: parsed \"%a\" as an IPv%c address "
+      "literal\n", gEfiCallerBaseName, __FUNCTION__, HostName,
+      (UINTN)((BinaryAddressSize == NS_IN6ADDRSZ) ? '6' : '4')));
+    ParamStatus = X509_VERIFY_PARAM_set1_ip (VerifyParam, BinaryAddress,
+                    BinaryAddressSize);
+  } else {
+    ParamStatus = X509_VERIFY_PARAM_set1_host (VerifyParam, HostName, 0);
+  }
+
+  return (ParamStatus == 1) ? EFI_SUCCESS : EFI_ABORTED;
 }
 
 /**
