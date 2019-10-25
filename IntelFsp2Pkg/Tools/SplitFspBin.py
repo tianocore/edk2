@@ -428,7 +428,7 @@ class FirmwareFile:
         ffssize = len(self.FfsData)
         offset  = sizeof(self.FfsHdr)
         if self.FfsHdr.Name != '\xff' * 16:
-            while offset < ffssize:
+            while offset < (ffssize - sizeof (EFI_COMMON_SECTION_HEADER)):
                 sechdr = EFI_COMMON_SECTION_HEADER.from_buffer (self.FfsData, offset)
                 sec = Section (offset, self.FfsData[offset:offset + int(sechdr.Size)])
                 self.SecList.append(sec)
@@ -453,7 +453,7 @@ class FirmwareVolume:
         else:
             offset = self.FvHdr.HeaderLength
         offset = AlignPtr(offset)
-        while offset < fvsize:
+        while offset < (fvsize - sizeof (EFI_FFS_FILE_HEADER)):
             ffshdr = EFI_FFS_FILE_HEADER.from_buffer (self.FvData, offset)
             if (ffshdr.Name == '\xff' * 16) and (int(ffshdr.Size) == 0xFFFFFF):
                 offset = fvsize
@@ -515,7 +515,7 @@ class FirmwareDevice:
         offset = 0
         fdsize = len(self.FdData)
         self.FvList  = []
-        while offset < fdsize:
+        while offset < (fdsize - sizeof (EFI_FIRMWARE_VOLUME_HEADER)):
             fvh = EFI_FIRMWARE_VOLUME_HEADER.from_buffer (self.FdData, offset)
             if b'_FVH' != fvh.Signature:
                 raise Exception("ERROR: Invalid FV header !")
@@ -838,7 +838,7 @@ def RebaseFspBin (FspBinary, FspComponent, FspBase, OutputDir, OutputFile):
 
 def main ():
     parser     = argparse.ArgumentParser()
-    subparsers = parser.add_subparsers(title='commands')
+    subparsers = parser.add_subparsers(title='commands', dest="which")
 
     parser_rebase  = subparsers.add_parser('rebase',  help='rebase a FSP into a new base address')
     parser_rebase.set_defaults(which='rebase')
@@ -880,7 +880,7 @@ def main ():
     elif args.which == 'info':
         ShowFspInfo (args.FspBinary)
     else:
-        pass
+        parser.print_help()
 
     return 0
 
