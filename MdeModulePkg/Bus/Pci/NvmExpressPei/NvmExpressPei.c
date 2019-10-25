@@ -376,6 +376,29 @@ NvmExpressPeimEntry (
       continue;
     }
 
+    //
+    // Nvm Express Pass Thru PPI
+    //
+    Private->PassThruMode.Attributes            = EFI_NVM_EXPRESS_PASS_THRU_ATTRIBUTES_PHYSICAL |
+                                                  EFI_NVM_EXPRESS_PASS_THRU_ATTRIBUTES_LOGICAL |
+                                                  EFI_NVM_EXPRESS_PASS_THRU_ATTRIBUTES_CMD_SET_NVM;
+    Private->PassThruMode.IoAlign               = sizeof (UINTN);
+    Private->PassThruMode.NvmeVersion           = EDKII_PEI_NVM_EXPRESS_PASS_THRU_PPI_REVISION;
+    Private->NvmePassThruPpi.Mode               = &Private->PassThruMode;
+    Private->NvmePassThruPpi.GetDevicePath      = NvmePassThruGetDevicePath;
+    Private->NvmePassThruPpi.GetNextNameSpace   = NvmePassThruGetNextNameSpace;
+    Private->NvmePassThruPpi.PassThru           = NvmePassThru;
+    CopyMem (
+      &Private->NvmePassThruPpiList,
+      &mNvmePassThruPpiListTemplate,
+      sizeof (EFI_PEI_PPI_DESCRIPTOR)
+      );
+    Private->NvmePassThruPpiList.Ppi            = &Private->NvmePassThruPpi;
+    PeiServicesInstallPpi (&Private->NvmePassThruPpiList);
+
+    //
+    // Block Io PPI
+    //
     Private->BlkIoPpi.GetNumberOfBlockDevices  = NvmeBlockIoPeimGetDeviceNo;
     Private->BlkIoPpi.GetBlockDeviceMediaInfo  = NvmeBlockIoPeimGetMediaInfo;
     Private->BlkIoPpi.ReadBlocks               = NvmeBlockIoPeimReadBlocks;
@@ -397,26 +420,6 @@ NvmExpressPeimEntry (
       );
     Private->BlkIo2PpiList.Ppi                 = &Private->BlkIo2Ppi;
     PeiServicesInstallPpi (&Private->BlkIoPpiList);
-
-    //
-    // Nvm Express Pass Thru PPI
-    //
-    Private->PassThruMode.Attributes            = EFI_NVM_EXPRESS_PASS_THRU_ATTRIBUTES_PHYSICAL |
-                                                  EFI_NVM_EXPRESS_PASS_THRU_ATTRIBUTES_LOGICAL |
-                                                  EFI_NVM_EXPRESS_PASS_THRU_ATTRIBUTES_CMD_SET_NVM;
-    Private->PassThruMode.IoAlign               = sizeof (UINTN);
-    Private->PassThruMode.NvmeVersion           = EDKII_PEI_NVM_EXPRESS_PASS_THRU_PPI_REVISION;
-    Private->NvmePassThruPpi.Mode               = &Private->PassThruMode;
-    Private->NvmePassThruPpi.GetDevicePath      = NvmePassThruGetDevicePath;
-    Private->NvmePassThruPpi.GetNextNameSpace   = NvmePassThruGetNextNameSpace;
-    Private->NvmePassThruPpi.PassThru           = NvmePassThru;
-    CopyMem (
-      &Private->NvmePassThruPpiList,
-      &mNvmePassThruPpiListTemplate,
-      sizeof (EFI_PEI_PPI_DESCRIPTOR)
-      );
-    Private->NvmePassThruPpiList.Ppi            = &Private->NvmePassThruPpi;
-    PeiServicesInstallPpi (&Private->NvmePassThruPpiList);
 
     //
     // Check if the NVME controller supports the Security Receive/Send commands
