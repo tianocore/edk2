@@ -98,6 +98,29 @@ F: */Arm/
 M: Leif Lindholm <leif.lindholm@linaro.org>
 M: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
+EDK II Continuous Integration:
+------------------------------
+.azurepipelines/
+F: .azurepipelines/
+M: Sean Brogan <sean.brogan@microsoft.com>
+M: Bret Barkelew <Bret.Barkelew@microsoft.com>
+R: Michael D Kinney <michael.d.kinney@intel.com>
+R: Liming Gao <liming.gao@intel.com>
+
+.mergify/
+F: .mergify/
+M: Michael D Kinney <michael.d.kinney@intel.com>
+M: Liming Gao <liming.gao@intel.com>
+R: Sean Brogan <sean.brogan@microsoft.com>
+R: Bret Barkelew <Bret.Barkelew@microsoft.com>
+
+.pytool/
+F: .pytool/
+M: Sean Brogan <sean.brogan@microsoft.com>
+M: Bret Barkelew <Bret.Barkelew@microsoft.com>
+R: Michael D Kinney <michael.d.kinney@intel.com>
+R: Liming Gao <liming.gao@intel.com>
+
 EDK II Packages:
 ----------------
 ArmPkg
