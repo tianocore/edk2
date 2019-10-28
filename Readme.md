@@ -3,6 +3,57 @@
 A modern, feature-rich, cross-platform firmware development environment
 for the UEFI and PI specifications from www.uefi.org.
 
+# Build Status
+
+<table>
+  <tr>
+    <th>Host Type</th>
+    <th>Toolchain</th>
+    <th>Branch</th>
+    <th>Build Status</th>
+    <th>Test Status</th>
+    <th>Code Coverage</th>
+  </tr>
+  <tr>
+    <td>Windows</td>
+    <td>VS2019</td>
+    <td>edk2-ci</td>
+    <td>
+      <a  href="https://dev.azure.com/tianocore/edk2-ci-play/_build/latest?definitionId=27&branchName=edk2-ci">
+      <img src="https://dev.azure.com/tianocore/edk2-ci-play/_apis/build/status/edk2-staging/Windows%20VS2019%20CI?branchName=edk2-ci"/></a>
+    </td>
+    <td>
+      <a  href="https://dev.azure.com/tianocore/edk2-ci-play/_build/latest?definitionId=27&branchName=edk2-ci">
+      <img src="https://img.shields.io/azure-devops/tests/tianocore/edk2-ci-play/27.svg"/></a>
+    </td>
+    <td>
+      <a  href="https://dev.azure.com/tianocore/edk2-ci-play/_build/latest?definitionId=27&branchName=edk2-ci">
+      <img src="https://img.shields.io/badge/coverage-coming_soon-blue"/></a>
+    </td>
+  </tr>
+  <tr>
+    <td>Ubuntu</td>
+    <td>GCC</td>
+    <td>edk2-ci</td>
+    <td>
+      <a  href="https://dev.azure.com/tianocore/edk2-ci-play/_build/latest?definitionId=26&branchName=edk2-ci">
+      <img src="https://dev.azure.com/tianocore/edk2-ci-play/_apis/build/status/edk2-staging/Ubuntu%20GCC5%20CI?branchName=edk2-ci"/></a>
+    </td>
+    <td>
+      <a  href="https://dev.azure.com/tianocore/edk2-ci-play/_build/latest?definitionId=26&branchName=edk2-ci">
+      <img src="https://img.shields.io/azure-devops/tests/tianocore/edk2-ci-play/26.svg"/></a>
+    </td>
+    <td>
+      <a  href="https://dev.azure.com/tianocore/edk2-ci-play/_build/latest?definitionId=26&branchName=edk2-ci">
+      <img src="https://img.shields.io/badge/coverage-coming_soon-blue"/></a>
+    </td>
+  </tr>
+</table>
+
+[More CI Build information](.pytool/Readme.md)
+
+# License Details
+
 The majority of the content in the EDK II open source project uses a
 [BSD-2-Clause Plus Patent License](License.txt).  The EDK II open source project
 contains the following components that are covered by additional licenses:
