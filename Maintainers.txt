@@ -127,7 +127,7 @@ F: ArmVirtPkg/PrePi/
 F: ArmVirtPkg/XenAcpiPlatformDxe/
 F: ArmVirtPkg/XenPlatformHasAcpiDtDxe/
 F: ArmVirtPkg/XenioFdtDxe/
-R: Julien Grall <julien.grall@arm.com>
+R: Julien Grall <julien@xen.org>
 
 BaseTools
 F: BaseTools/
@@ -396,7 +396,7 @@ F: OvmfPkg/XenPvBlkDxe/
 F: OvmfPkg/XenResetVector/
 F: OvmfPkg/XenTimerDxe/
 R: Anthony Perard <anthony.perard@citrix.com>
-R: Julien Grall <julien.grall@arm.com>
+R: Julien Grall <julien@xen.org>
 
 OvmfPkg: TCG- and TPM2-related modules
 F: OvmfPkg/Include/IndustryStandard/QemuTpm.h
