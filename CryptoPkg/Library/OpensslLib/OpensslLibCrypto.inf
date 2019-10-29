@@ -33,9 +33,7 @@
   $(OPENSSL_PATH)/crypto/aes/aes_misc.c
   $(OPENSSL_PATH)/crypto/aes/aes_ofb.c
   $(OPENSSL_PATH)/crypto/aes/aes_wrap.c
-  $(OPENSSL_PATH)/crypto/aes/aes_locl.h
   $(OPENSSL_PATH)/crypto/aria/aria.c
-  $(OPENSSL_PATH)/crypto/arm_arch.h
   $(OPENSSL_PATH)/crypto/asn1/a_bitstr.c
   $(OPENSSL_PATH)/crypto/asn1/a_d2i_fp.c
   $(OPENSSL_PATH)/crypto/asn1/a_digest.c
@@ -100,21 +98,12 @@
   $(OPENSSL_PATH)/crypto/asn1/x_sig.c
   $(OPENSSL_PATH)/crypto/asn1/x_spki.c
   $(OPENSSL_PATH)/crypto/asn1/x_val.c
-  $(OPENSSL_PATH)/crypto/asn1/standard_methods.h
-  $(OPENSSL_PATH)/crypto/asn1/charmap.h
-  $(OPENSSL_PATH)/crypto/asn1/tbl_standard.h
-  $(OPENSSL_PATH)/crypto/asn1/asn1_item_list.h
-  $(OPENSSL_PATH)/crypto/asn1/asn1_locl.h
   $(OPENSSL_PATH)/crypto/async/arch/async_null.c
   $(OPENSSL_PATH)/crypto/async/arch/async_posix.c
   $(OPENSSL_PATH)/crypto/async/arch/async_win.c
-  $(OPENSSL_PATH)/crypto/async/arch/async_posix.h
-  $(OPENSSL_PATH)/crypto/async/arch/async_null.h
-  $(OPENSSL_PATH)/crypto/async/arch/async_win.h
   $(OPENSSL_PATH)/crypto/async/async.c
   $(OPENSSL_PATH)/crypto/async/async_err.c
   $(OPENSSL_PATH)/crypto/async/async_wait.c
-  $(OPENSSL_PATH)/crypto/async/async_locl.h
   $(OPENSSL_PATH)/crypto/bio/b_addr.c
   $(OPENSSL_PATH)/crypto/bio/b_dump.c
   $(OPENSSL_PATH)/crypto/bio/b_sock.c
@@ -137,7 +126,6 @@
   $(OPENSSL_PATH)/crypto/bio/bss_mem.c
   $(OPENSSL_PATH)/crypto/bio/bss_null.c
   $(OPENSSL_PATH)/crypto/bio/bss_sock.c
-  $(OPENSSL_PATH)/crypto/bio/bio_lcl.h
   $(OPENSSL_PATH)/crypto/bn/bn_add.c
   $(OPENSSL_PATH)/crypto/bn/bn_asm.c
   $(OPENSSL_PATH)/crypto/bn/bn_blind.c
@@ -169,9 +157,6 @@
   $(OPENSSL_PATH)/crypto/bn/bn_srp.c
   $(OPENSSL_PATH)/crypto/bn/bn_word.c
   $(OPENSSL_PATH)/crypto/bn/bn_x931p.c
-  $(OPENSSL_PATH)/crypto/bn/rsaz_exp.h
-  $(OPENSSL_PATH)/crypto/bn/bn_prime.h
-  $(OPENSSL_PATH)/crypto/bn/bn_lcl.h
   $(OPENSSL_PATH)/crypto/buffer/buf_err.c
   $(OPENSSL_PATH)/crypto/buffer/buffer.c
   $(OPENSSL_PATH)/crypto/cmac/cm_ameth.c
@@ -180,7 +165,6 @@
   $(OPENSSL_PATH)/crypto/comp/c_zlib.c
   $(OPENSSL_PATH)/crypto/comp/comp_err.c
   $(OPENSSL_PATH)/crypto/comp/comp_lib.c
-  $(OPENSSL_PATH)/crypto/comp/comp_lcl.h
   $(OPENSSL_PATH)/crypto/conf/conf_api.c
   $(OPENSSL_PATH)/crypto/conf/conf_def.c
   $(OPENSSL_PATH)/crypto/conf/conf_err.c
@@ -189,8 +173,6 @@
   $(OPENSSL_PATH)/crypto/conf/conf_mod.c
   $(OPENSSL_PATH)/crypto/conf/conf_sap.c
   $(OPENSSL_PATH)/crypto/conf/conf_ssl.c
-  $(OPENSSL_PATH)/crypto/conf/conf_lcl.h
-  $(OPENSSL_PATH)/crypto/conf/conf_def.h
   $(OPENSSL_PATH)/crypto/cpt_err.c
   $(OPENSSL_PATH)/crypto/cryptlib.c
   $(OPENSSL_PATH)/crypto/ctype.c
@@ -214,8 +196,6 @@
   $(OPENSSL_PATH)/crypto/des/set_key.c
   $(OPENSSL_PATH)/crypto/des/str2key.c
   $(OPENSSL_PATH)/crypto/des/xcbc_enc.c
-  $(OPENSSL_PATH)/crypto/des/spr.h
-  $(OPENSSL_PATH)/crypto/des/des_locl.h
   $(OPENSSL_PATH)/crypto/dh/dh_ameth.c
   $(OPENSSL_PATH)/crypto/dh/dh_asn1.c
   $(OPENSSL_PATH)/crypto/dh/dh_check.c
@@ -230,7 +210,6 @@
   $(OPENSSL_PATH)/crypto/dh/dh_prn.c
   $(OPENSSL_PATH)/crypto/dh/dh_rfc5114.c
   $(OPENSSL_PATH)/crypto/dh/dh_rfc7919.c
-  $(OPENSSL_PATH)/crypto/dh/dh_locl.h
   $(OPENSSL_PATH)/crypto/dso/dso_dl.c
   $(OPENSSL_PATH)/crypto/dso/dso_dlfcn.c
   $(OPENSSL_PATH)/crypto/dso/dso_err.c
@@ -238,7 +217,6 @@
   $(OPENSSL_PATH)/crypto/dso/dso_openssl.c
   $(OPENSSL_PATH)/crypto/dso/dso_vms.c
   $(OPENSSL_PATH)/crypto/dso/dso_win32.c
-  $(OPENSSL_PATH)/crypto/dso/dso_locl.h
   $(OPENSSL_PATH)/crypto/ebcdic.c
   $(OPENSSL_PATH)/crypto/err/err.c
   $(OPENSSL_PATH)/crypto/err/err_prn.c
@@ -280,7 +258,6 @@
   $(OPENSSL_PATH)/crypto/evp/evp_pkey.c
   $(OPENSSL_PATH)/crypto/evp/m_md2.c
   $(OPENSSL_PATH)/crypto/evp/m_md4.c
-  $(OPENSSL_PATH)/crypto/md4/md4_locl.h
   $(OPENSSL_PATH)/crypto/evp/m_md5.c
   $(OPENSSL_PATH)/crypto/evp/m_md5_sha1.c
   $(OPENSSL_PATH)/crypto/evp/m_mdc2.c
@@ -304,13 +281,11 @@
   $(OPENSSL_PATH)/crypto/evp/pmeth_fn.c
   $(OPENSSL_PATH)/crypto/evp/pmeth_gn.c
   $(OPENSSL_PATH)/crypto/evp/pmeth_lib.c
-  $(OPENSSL_PATH)/crypto/evp/evp_locl.h
   $(OPENSSL_PATH)/crypto/ex_data.c
   $(OPENSSL_PATH)/crypto/getenv.c
   $(OPENSSL_PATH)/crypto/hmac/hm_ameth.c
   $(OPENSSL_PATH)/crypto/hmac/hm_pmeth.c
   $(OPENSSL_PATH)/crypto/hmac/hmac.c
-  $(OPENSSL_PATH)/crypto/hmac/hmac_lcl.h
   $(OPENSSL_PATH)/crypto/init.c
   $(OPENSSL_PATH)/crypto/kdf/hkdf.c
   $(OPENSSL_PATH)/crypto/kdf/kdf_err.c
@@ -318,12 +293,10 @@
   $(OPENSSL_PATH)/crypto/kdf/tls1_prf.c
   $(OPENSSL_PATH)/crypto/lhash/lh_stats.c
   $(OPENSSL_PATH)/crypto/lhash/lhash.c
-  $(OPENSSL_PATH)/crypto/lhash/lhash_lcl.h
   $(OPENSSL_PATH)/crypto/md4/md4_dgst.c
   $(OPENSSL_PATH)/crypto/md4/md4_one.c
   $(OPENSSL_PATH)/crypto/md5/md5_dgst.c
   $(OPENSSL_PATH)/crypto/md5/md5_one.c
-  $(OPENSSL_PATH)/crypto/md5/md5_locl.h
   $(OPENSSL_PATH)/crypto/mem.c
   $(OPENSSL_PATH)/crypto/mem_clr.c
   $(OPENSSL_PATH)/crypto/mem_dbg.c
@@ -338,7 +311,6 @@
   $(OPENSSL_PATH)/crypto/modes/ofb128.c
   $(OPENSSL_PATH)/crypto/modes/wrap128.c
   $(OPENSSL_PATH)/crypto/modes/xts128.c
-  $(OPENSSL_PATH)/crypto/modes/modes_lcl.h
   $(OPENSSL_PATH)/crypto/o_dir.c
   $(OPENSSL_PATH)/crypto/o_fips.c
   $(OPENSSL_PATH)/crypto/o_fopen.c
@@ -350,9 +322,6 @@
   $(OPENSSL_PATH)/crypto/objects/obj_err.c
   $(OPENSSL_PATH)/crypto/objects/obj_lib.c
   $(OPENSSL_PATH)/crypto/objects/obj_xref.c
-  $(OPENSSL_PATH)/crypto/objects/obj_dat.h
-  $(OPENSSL_PATH)/crypto/objects/obj_xref.h
-  $(OPENSSL_PATH)/crypto/objects/obj_lcl.h
   $(OPENSSL_PATH)/crypto/ocsp/ocsp_asn.c
   $(OPENSSL_PATH)/crypto/ocsp/ocsp_cl.c
   $(OPENSSL_PATH)/crypto/ocsp/ocsp_err.c
@@ -363,7 +332,6 @@
   $(OPENSSL_PATH)/crypto/ocsp/ocsp_srv.c
   $(OPENSSL_PATH)/crypto/ocsp/ocsp_vfy.c
   $(OPENSSL_PATH)/crypto/ocsp/v3_ocsp.c
-  $(OPENSSL_PATH)/crypto/ocsp/ocsp_lcl.h
   $(OPENSSL_PATH)/crypto/pem/pem_all.c
   $(OPENSSL_PATH)/crypto/pem/pem_err.c
   $(OPENSSL_PATH)/crypto/pem/pem_info.c
@@ -399,8 +367,6 @@
   $(OPENSSL_PATH)/crypto/pkcs7/pk7_mime.c
   $(OPENSSL_PATH)/crypto/pkcs7/pk7_smime.c
   $(OPENSSL_PATH)/crypto/pkcs7/pkcs7err.c
-  $(OPENSSL_PATH)/crypto/pkcs12/p12_lcl.h
-  $(OPENSSL_PATH)/crypto/ppc_arch.h
   $(OPENSSL_PATH)/crypto/rand/drbg_ctr.c
   $(OPENSSL_PATH)/crypto/rand/drbg_lib.c
   $(OPENSSL_PATH)/crypto/rand/rand_egd.c
@@ -409,10 +375,8 @@
   $(OPENSSL_PATH)/crypto/rand/rand_unix.c
   $(OPENSSL_PATH)/crypto/rand/rand_vms.c
   $(OPENSSL_PATH)/crypto/rand/rand_win.c
-  $(OPENSSL_PATH)/crypto/rand/rand_lcl.h
   $(OPENSSL_PATH)/crypto/rc4/rc4_enc.c
   $(OPENSSL_PATH)/crypto/rc4/rc4_skey.c
-  $(OPENSSL_PATH)/crypto/rc4/rc4_locl.h
   $(OPENSSL_PATH)/crypto/rsa/rsa_ameth.c
   $(OPENSSL_PATH)/crypto/rsa/rsa_asn1.c
   $(OPENSSL_PATH)/crypto/rsa/rsa_chk.c
@@ -435,24 +399,18 @@
   $(OPENSSL_PATH)/crypto/rsa/rsa_ssl.c
   $(OPENSSL_PATH)/crypto/rsa/rsa_x931.c
   $(OPENSSL_PATH)/crypto/rsa/rsa_x931g.c
-  $(OPENSSL_PATH)/crypto/rsa/rsa_locl.h
   $(OPENSSL_PATH)/crypto/sha/keccak1600.c
   $(OPENSSL_PATH)/crypto/sha/sha1_one.c
   $(OPENSSL_PATH)/crypto/sha/sha1dgst.c
   $(OPENSSL_PATH)/crypto/sha/sha256.c
   $(OPENSSL_PATH)/crypto/sha/sha512.c
-  $(OPENSSL_PATH)/crypto/sha/sha_locl.h
   $(OPENSSL_PATH)/crypto/siphash/siphash.c
   $(OPENSSL_PATH)/crypto/siphash/siphash_ameth.c
   $(OPENSSL_PATH)/crypto/siphash/siphash_pmeth.c
-  $(OPENSSL_PATH)/crypto/siphash/siphash_local.h
   $(OPENSSL_PATH)/crypto/sm3/m_sm3.c
   $(OPENSSL_PATH)/crypto/sm3/sm3.c
-  $(OPENSSL_PATH)/crypto/sm3/sm3_locl.h
   $(OPENSSL_PATH)/crypto/sm4/sm4.c
   $(OPENSSL_PATH)/crypto/stack/stack.c
-  $(OPENSSL_PATH)/crypto/s390x_arch.h
-  $(OPENSSL_PATH)/crypto/sparc_arch.h
   $(OPENSSL_PATH)/crypto/threads_none.c
   $(OPENSSL_PATH)/crypto/threads_pthread.c
   $(OPENSSL_PATH)/crypto/threads_win.c
@@ -462,9 +420,7 @@
   $(OPENSSL_PATH)/crypto/ui/ui_null.c
   $(OPENSSL_PATH)/crypto/ui/ui_openssl.c
   $(OPENSSL_PATH)/crypto/ui/ui_util.c
-  $(OPENSSL_PATH)/crypto/ui/ui_locl.h
   $(OPENSSL_PATH)/crypto/uid.c
-  $(OPENSSL_PATH)/crypto/vms_rms.h
   $(OPENSSL_PATH)/crypto/x509/by_dir.c
   $(OPENSSL_PATH)/crypto/x509/by_file.c
   $(OPENSSL_PATH)/crypto/x509/t_crl.c
@@ -501,7 +457,6 @@
   $(OPENSSL_PATH)/crypto/x509/x_req.c
   $(OPENSSL_PATH)/crypto/x509/x_x509.c
   $(OPENSSL_PATH)/crypto/x509/x_x509a.c
-  $(OPENSSL_PATH)/crypto/x509/x509_lcl.h
   $(OPENSSL_PATH)/crypto/x509v3/pcy_cache.c
   $(OPENSSL_PATH)/crypto/x509v3/pcy_data.c
   $(OPENSSL_PATH)/crypto/x509v3/pcy_lib.c
@@ -539,10 +494,57 @@
   $(OPENSSL_PATH)/crypto/x509v3/v3_tlsf.c
   $(OPENSSL_PATH)/crypto/x509v3/v3_utl.c
   $(OPENSSL_PATH)/crypto/x509v3/v3err.c
-  $(OPENSSL_PATH)/crypto/x509v3/pcy_int.h
-  $(OPENSSL_PATH)/crypto/x509v3/v3_admis.h
-  $(OPENSSL_PATH)/crypto/x509v3/standard_exts.h
+  $(OPENSSL_PATH)/crypto/hmac/hmac_lcl.h
+  $(OPENSSL_PATH)/crypto/dh/dh_locl.h
+  $(OPENSSL_PATH)/crypto/bio/bio_lcl.h
+  $(OPENSSL_PATH)/crypto/conf/conf_def.h
+  $(OPENSSL_PATH)/crypto/conf/conf_lcl.h
+  $(OPENSSL_PATH)/crypto/lhash/lhash_lcl.h
+  $(OPENSSL_PATH)/crypto/sha/sha_locl.h
+  $(OPENSSL_PATH)/crypto/md5/md5_locl.h
+  $(OPENSSL_PATH)/crypto/store/store_locl.h
+  $(OPENSSL_PATH)/crypto/dso/dso_locl.h
+  $(OPENSSL_PATH)/crypto/pkcs12/p12_lcl.h
+  $(OPENSSL_PATH)/crypto/arm_arch.h
+  $(OPENSSL_PATH)/crypto/mips_arch.h
+  $(OPENSSL_PATH)/crypto/ppc_arch.h
+  $(OPENSSL_PATH)/crypto/s390x_arch.h
+  $(OPENSSL_PATH)/crypto/sparc_arch.h
+  $(OPENSSL_PATH)/crypto/vms_rms.h
+  $(OPENSSL_PATH)/crypto/bn/bn_lcl.h
+  $(OPENSSL_PATH)/crypto/bn/bn_prime.h
+  $(OPENSSL_PATH)/crypto/bn/rsaz_exp.h
+  $(OPENSSL_PATH)/crypto/ui/ui_locl.h
+  $(OPENSSL_PATH)/crypto/md4/md4_locl.h
+  $(OPENSSL_PATH)/crypto/rc4/rc4_locl.h
+  $(OPENSSL_PATH)/crypto/asn1/asn1_item_list.h
+  $(OPENSSL_PATH)/crypto/asn1/asn1_locl.h
+  $(OPENSSL_PATH)/crypto/asn1/charmap.h
+  $(OPENSSL_PATH)/crypto/asn1/standard_methods.h
+  $(OPENSSL_PATH)/crypto/asn1/tbl_standard.h
+  $(OPENSSL_PATH)/crypto/evp/evp_locl.h
+  $(OPENSSL_PATH)/crypto/rand/rand_lcl.h
+  $(OPENSSL_PATH)/crypto/ocsp/ocsp_lcl.h
+  $(OPENSSL_PATH)/crypto/modes/modes_lcl.h
+  $(OPENSSL_PATH)/crypto/comp/comp_lcl.h
+  $(OPENSSL_PATH)/crypto/rsa/rsa_locl.h
+  $(OPENSSL_PATH)/crypto/x509/x509_lcl.h
+  $(OPENSSL_PATH)/crypto/async/arch/async_null.h
+  $(OPENSSL_PATH)/crypto/async/arch/async_posix.h
+  $(OPENSSL_PATH)/crypto/async/arch/async_win.h
+  $(OPENSSL_PATH)/crypto/sm3/sm3_locl.h
+  $(OPENSSL_PATH)/crypto/des/des_locl.h
+  $(OPENSSL_PATH)/crypto/des/spr.h
+  $(OPENSSL_PATH)/crypto/siphash/siphash_local.h
+  $(OPENSSL_PATH)/crypto/aes/aes_locl.h
+  $(OPENSSL_PATH)/crypto/async/async_locl.h
   $(OPENSSL_PATH)/crypto/x509v3/ext_dat.h
+  $(OPENSSL_PATH)/crypto/x509v3/pcy_int.h
+  $(OPENSSL_PATH)/crypto/x509v3/standard_exts.h
+  $(OPENSSL_PATH)/crypto/x509v3/v3_admis.h
+  $(OPENSSL_PATH)/crypto/objects/obj_dat.h
+  $(OPENSSL_PATH)/crypto/objects/obj_lcl.h
+  $(OPENSSL_PATH)/crypto/objects/obj_xref.h
 # Autogenerated files list ends here
   buildinf.h
   rand_pool_noise.h
