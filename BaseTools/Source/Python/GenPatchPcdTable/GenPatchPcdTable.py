@@ -49,20 +49,23 @@ def parsePcdInfoFromMapFile(mapfilepath, efifilepath):
 
     if len(lines) == 0: return None
     firstline = lines[0].strip()
+    if re.match('^\s*Address\s*Size\s*Align\s*Out\s*In\s*Symbol\s*$', firstline):
+        return _parseForXcodeAndClang9(lines, efifilepath)
     if (firstline.startswith("Archive member included ") and
         firstline.endswith(" file (symbol)")):
         return _parseForGCC(lines, efifilepath)
     if firstline.startswith("# Path:"):
-        return _parseForXcode(lines, efifilepath)
+        return _parseForXcodeAndClang9(lines, efifilepath)
     return _parseGeneral(lines, efifilepath)
 
-def _parseForXcode(lines, efifilepath):
+def _parseForXcodeAndClang9(lines, efifilepath):
     valuePattern = re.compile('^([\da-fA-FxX]+)([\s\S]*)([_]*_gPcd_BinaryPatch_([\w]+))')
     status = 0
     pcds = []
     for line in lines:
         line = line.strip()
-        if status == 0 and line == "# Symbols:":
+        if status == 0 and (re.match('^\s*Address\s*Size\s*Align\s*Out\s*In\s*Symbol\s*$', line) \
+            or line == "# Symbols:"):
             status = 1
             continue
         if status == 1 and len(line) != 0:
