@@ -144,12 +144,12 @@ Signed-off-by: Contributor Name <contributor@example.com>
 # Submodules
 
 Submodule in EDK II is allowed but submodule chain should be avoided
-as possible as we can. Currently EDK II contains two submodules
+as possible as we can. Currently EDK II contains the following submodules
 
 - CryptoPkg/Library/OpensslLib/openssl
 - ArmPkg/Library/ArmSoftFloatLib/berkeley-softfloat-3
 
-The latter one is actually required by previous one. It's inevitable
+ArmSoftFloatLib is actually required by OpensslLib. It's inevitable
 in openssl-1.1.1 (since stable201905) for floating point parameter
 conversion, but should be dropped once there's no such need in future
 release of openssl.
