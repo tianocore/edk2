@@ -647,7 +647,7 @@ SimpleNetworkDriverStart (
   PxeShutdown (Snp);
   PxeStop (Snp);
 
-  if (FixedPcdGetBool (PcdSnpCreateExitBootServicesEvent)) {
+  if (PcdGetBool (PcdSnpCreateExitBootServicesEvent)) {
     //
     // Create EXIT_BOOT_SERIVES Event
     //
@@ -780,7 +780,7 @@ SimpleNetworkDriverStop (
     return Status;
   }
 
-  if (FixedPcdGetBool (PcdSnpCreateExitBootServicesEvent)) {
+  if (PcdGetBool (PcdSnpCreateExitBootServicesEvent)) {
     //
     // Close EXIT_BOOT_SERIVES Event
     //
