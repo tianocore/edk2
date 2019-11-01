@@ -914,6 +914,116 @@ PasswordProcess (
 }
 
 /**
+  Print some debug message about mismatched menu info.
+
+  @param  MenuOption             The MenuOption for this Question.
+
+**/
+VOID
+PrintMismatchMenuInfo (
+  IN  UI_MENU_OPTION              *MenuOption
+)
+{
+  CHAR16                          *FormTitleStr;
+  CHAR16                          *FormSetTitleStr;
+  CHAR16                          *OneOfOptionStr;
+  CHAR16                          *QuestionName;
+  LIST_ENTRY                      *Link;
+  FORM_DISPLAY_ENGINE_STATEMENT   *Question;
+  EFI_IFR_ORDERED_LIST            *OrderList;
+  UINT8                           Index;
+  EFI_HII_VALUE                   HiiValue;
+  EFI_HII_VALUE                   *QuestionValue;
+  DISPLAY_QUESTION_OPTION         *Option;
+  UINT8                           *ValueArray;
+  UINT8                           ValueType;
+  EFI_IFR_FORM_SET                *FormsetBuffer;
+  UINTN                           FormsetBufferSize;
+
+  Question = MenuOption->ThisTag;
+  HiiGetFormSetFromHiiHandle (gFormData->HiiHandle, &FormsetBuffer, &FormsetBufferSize);
+
+  FormSetTitleStr = GetToken (FormsetBuffer->FormSetTitle, gFormData->HiiHandle);
+  FormTitleStr = GetToken (gFormData->FormTitle, gFormData->HiiHandle);
+
+  DEBUG ((DEBUG_ERROR, "\n[%a]: Mismatch Formset    : Formset Guid = %g,  FormSet title = %s\n", gEfiCallerBaseName, &gFormData->FormSetGuid, FormSetTitleStr));
+  DEBUG ((DEBUG_ERROR, "[%a]: Mismatch Form       : FormId = %d,  Form title = %s.\n", gEfiCallerBaseName, gFormData->FormId, FormTitleStr));
+
+  if (Question->OpCode->OpCode == EFI_IFR_ORDERED_LIST_OP) {
+    QuestionName = GetToken (((EFI_IFR_ORDERED_LIST*)MenuOption->ThisTag->OpCode)->Question.Header.Prompt, gFormData->HiiHandle);
+    Link = GetFirstNode (&Question->OptionListHead);
+    Option = DISPLAY_QUESTION_OPTION_FROM_LINK (Link);
+    ValueType = Option->OptionOpCode->Type;
+    DEBUG ((DEBUG_ERROR, "[%a]: Mismatch Error      : OrderedList value in the array doesn't match with option value.\n", gEfiCallerBaseName));
+    DEBUG ((DEBUG_ERROR, "[%a]: Mismatch OrderedList: Name = %s.\n", gEfiCallerBaseName, QuestionName));
+    DEBUG ((DEBUG_ERROR, "[%a]: Mismatch OrderedList: OrderedList array value :\n", gEfiCallerBaseName));
+
+    OrderList = (EFI_IFR_ORDERED_LIST *) Question->OpCode;
+    for (Index = 0; Index < OrderList->MaxContainers; Index++) {
+      ValueArray = Question->CurrentValue.Buffer;
+      HiiValue.Value.u64 = GetArrayData (ValueArray, ValueType, Index);
+      DEBUG ((DEBUG_ERROR, "                                       Value[%d] =%ld.\n", Index, HiiValue.Value.u64));
+    }
+  } else if (Question->OpCode->OpCode == EFI_IFR_ONE_OF_OP) {
+    QuestionName = GetToken (((EFI_IFR_ONE_OF*)MenuOption->ThisTag->OpCode)->Question.Header.Prompt, gFormData->HiiHandle);
+    QuestionValue = &Question->CurrentValue;
+    DEBUG ((DEBUG_ERROR, "[%a]: Mismatch Error      : OneOf value doesn't match with option value.\n", gEfiCallerBaseName));
+    DEBUG ((DEBUG_ERROR, "[%a]: Mismatch OneOf      : Name = %s.\n", gEfiCallerBaseName, QuestionName));
+    switch (QuestionValue->Type) {
+      case EFI_IFR_TYPE_NUM_SIZE_64:
+        DEBUG ((DEBUG_ERROR, "[%a]: Mismatch OneOf      : OneOf value = %ld.\n",gEfiCallerBaseName, QuestionValue->Value.u64));
+        break;
+
+      case EFI_IFR_TYPE_NUM_SIZE_32:
+        DEBUG ((DEBUG_ERROR, "[%a]: Mismatch OneOf      : OneOf value = %d.\n",gEfiCallerBaseName, QuestionValue->Value.u32));
+        break;
+
+      case EFI_IFR_TYPE_NUM_SIZE_16:
+        DEBUG ((DEBUG_ERROR, "[%a]: Mismatch OneOf      : OneOf value = %d.\n",gEfiCallerBaseName, QuestionValue->Value.u16));
+        break;
+
+      case EFI_IFR_TYPE_NUM_SIZE_8:
+        DEBUG ((DEBUG_ERROR, "[%a]: Mismatch OneOf      : OneOf value = %d.\n",gEfiCallerBaseName, QuestionValue->Value.u8));
+        break;
+
+      default:
+        ASSERT (FALSE);
+        break;
+    }
+  }
+
+  Index = 0;
+  Link = GetFirstNode (&Question->OptionListHead);
+  while (!IsNull (&Question->OptionListHead, Link)) {
+    Option = DISPLAY_QUESTION_OPTION_FROM_LINK (Link);
+    OneOfOptionStr = GetToken (Option->OptionOpCode->Option, gFormData->HiiHandle);
+    switch (Option->OptionOpCode->Type) {
+      case EFI_IFR_TYPE_NUM_SIZE_64:
+        DEBUG ((DEBUG_ERROR, "[%a]: Option %d            : Option Value = %ld,  Option Name = %s.\n",gEfiCallerBaseName, Index, Option->OptionOpCode->Value.u64, OneOfOptionStr));
+        break;
+
+      case EFI_IFR_TYPE_NUM_SIZE_32:
+        DEBUG ((DEBUG_ERROR, "[%a]: Option %d            : Option Value = %d,  Option Name = %s.\n",gEfiCallerBaseName, Index, Option->OptionOpCode->Value.u32, OneOfOptionStr));
+        break;
+
+      case EFI_IFR_TYPE_NUM_SIZE_16:
+        DEBUG ((DEBUG_ERROR, "[%a]: Option %d            : Option Value = %d,  Option Name = %s.\n",gEfiCallerBaseName, Index, Option->OptionOpCode->Value.u16, OneOfOptionStr));
+        break;
+
+      case EFI_IFR_TYPE_NUM_SIZE_8:
+        DEBUG ((DEBUG_ERROR, "[%a]: Option %d            : Option Value = %d,  Option Name = %s.\n",gEfiCallerBaseName, Index, Option->OptionOpCode->Value.u8, OneOfOptionStr));
+        break;
+
+      default:
+        ASSERT (FALSE);
+        break;
+    }
+    Link = GetNextNode (&Question->OptionListHead, Link);
+    Index++;
+  }
+}
+
+/**
   Process a Question's Option (whether selected or un-selected).
 
   @param  MenuOption             The MenuOption for this Question.
@@ -1012,6 +1122,11 @@ ProcessOptions (
 
         OneOfOption = ValueToOption (Question, &HiiValue);
         if (OneOfOption == NULL) {
+          //
+          // Print debug msg for the mistach menu.
+          //
+          PrintMismatchMenuInfo (MenuOption);
+
           if (SkipErrorValue) {
             //
             // Just try to get the option string, skip the value which not has option.
@@ -1084,6 +1199,11 @@ ProcessOptions (
           continue;
         }
 
+        //
+        // Print debug msg for the mistach menu.
+        //
+        PrintMismatchMenuInfo (MenuOption);
+
         if (SkipErrorValue) {
           //
           // Not report error, just get the correct option string info.
@@ -1154,6 +1274,11 @@ ProcessOptions (
 
       OneOfOption = ValueToOption (Question, QuestionValue);
       if (OneOfOption == NULL) {
+        //
+        // Print debug msg for the mistach menu.
+        //
+        PrintMismatchMenuInfo (MenuOption);
+
         if (SkipErrorValue) {
           //
           // Not report error, just get the correct option string info.
