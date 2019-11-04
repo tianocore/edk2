@@ -46,6 +46,9 @@
   gEdkiiPlatformHasAcpiGuid
   gFdtTableGuid
 
+[Pcd]
+  gEmbeddedTokenSpaceGuid.PcdDefaultDtPref
+
 [Depex]
   gEfiVariableArchProtocolGuid        AND
   gEfiVariableWriteArchProtocolGuid

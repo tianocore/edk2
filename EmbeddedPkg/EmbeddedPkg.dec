@@ -185,3 +185,8 @@
   # truncation on overflow to specify negative offsets.
   #
   gEmbeddedTokenSpaceGuid.PcdDmaDeviceOffset|0x0|UINT64|0x0000058
+
+  #
+  # Selection between DT and ACPI as a default
+  #
+  gEmbeddedTokenSpaceGuid.PcdDefaultDtPref|TRUE|BOOLEAN|0x0000059
