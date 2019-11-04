@@ -124,18 +124,21 @@ DtPlatformDxeEntryPoint (
     Status = gRT->GetVariable(DT_ACPI_VARIABLE_NAME, &gDtPlatformFormSetGuid,
                     NULL, &BufferSize, &DtAcpiPref);
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_WARN, "%a: no DT/ACPI preference found, defaulting to DT\n",
-        __FUNCTION__));
-      DtAcpiPref.Pref = DT_ACPI_SELECT_DT;
+      DEBUG ((DEBUG_WARN, "%a: no DT/ACPI preference found, defaulting to %a\n",
+        __FUNCTION__, PcdGetBool (PcdDefaultDtPref) ? "DT" : "ACPI"));
+      DtAcpiPref.Pref = PcdGetBool (PcdDefaultDtPref) ? DT_ACPI_SELECT_DT
+                                                      : DT_ACPI_SELECT_ACPI;
     }
   }
 
   if (!EFI_ERROR (Status) &&
       DtAcpiPref.Pref != DT_ACPI_SELECT_ACPI &&
       DtAcpiPref.Pref != DT_ACPI_SELECT_DT) {
-    DEBUG ((DEBUG_WARN, "%a: invalid value for %s, defaulting to DT\n",
-      __FUNCTION__, DT_ACPI_VARIABLE_NAME));
-    DtAcpiPref.Pref = DT_ACPI_SELECT_DT;
+    DEBUG ((DEBUG_WARN, "%a: invalid value for %s, defaulting to %a\n",
+      __FUNCTION__, DT_ACPI_VARIABLE_NAME,
+      PcdGetBool (PcdDefaultDtPref) ? "DT" : "ACPI"));
+    DtAcpiPref.Pref = PcdGetBool (PcdDefaultDtPref) ? DT_ACPI_SELECT_DT
+                                                    : DT_ACPI_SELECT_ACPI;
     Status = EFI_INVALID_PARAMETER; // trigger setvar below
   }
 
