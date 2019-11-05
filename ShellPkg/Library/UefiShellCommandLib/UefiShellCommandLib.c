@@ -107,9 +107,13 @@ CommandInit(
 
       //
       // Without clue provided use the first Unicode Collation2 protocol.
+      // This may happen when PlatformLang is NULL or when no installed Unicode
+      // Collation2 protocol instance supports PlatformLang.
       //
-      if (PlatformLang == NULL) {
+      if (gUnicodeCollation == NULL) {
         gUnicodeCollation = Uc;
+      }
+      if (PlatformLang == NULL) {
         break;
       }
 
