@@ -664,7 +664,22 @@ PublishAcpiTable (
     ));
 
   //
-  // Update TPM2 HID before measuring it to PCR
+  // Measure to PCR[0] with event EV_POST_CODE ACPI DATA.
+  // The measurement has to be done before UpdateHID since TPM2 ACPI HID
+  // imply TPM Firmware Version. Otherwise, the PCR record would be
+  // different after TPM FW update.
+  //
+  TpmMeasureAndLogData(
+    0,
+    EV_POST_CODE,
+    EV_POSTCODE_INFO_ACPI_DATA,
+    ACPI_DATA_LEN,
+    Table,
+    TableSize
+    );
+
+  //
+  // Update TPM2 HID after measuring it to PCR
   //
   Status = UpdateHID(Table);
   if (EFI_ERROR(Status)) {
@@ -693,19 +708,6 @@ PublishAcpiTable (
       ));
     }
   }
-
-  //
-  // Measure to PCR[0] with event EV_POST_CODE ACPI DATA
-  //
-  TpmMeasureAndLogData(
-    0,
-    EV_POST_CODE,
-    EV_POSTCODE_INFO_ACPI_DATA,
-    ACPI_DATA_LEN,
-    Table,
-    TableSize
-    );
-
 
   ASSERT (Table->OemTableId == SIGNATURE_64 ('T', 'p', 'm', '2', 'T', 'a', 'b', 'l'));
   CopyMem (Table->OemId, PcdGetPtr (PcdAcpiDefaultOemId), sizeof (Table->OemId) );
