@@ -246,8 +246,12 @@ HandOffToDxeCore (
   EFI_PEI_VECTOR_HANDOFF_INFO_PPI *VectorHandoffInfoPpi;
   BOOLEAN                   BuildPageTablesIa32Pae;
 
+  //
+  // Clear page 0 and mark it as allocated if NULL pointer detection is enabled.
+  //
   if (IsNullDetectionEnabled ()) {
     ClearFirst4KPage (HobList.Raw);
+    BuildMemoryAllocationHob (0, EFI_PAGES_TO_SIZE (1), EfiBootServicesData);
   }
 
   Status = PeiServicesAllocatePages (EfiBootServicesData, EFI_SIZE_TO_PAGES (STACK_SIZE), &BaseOfStack);
