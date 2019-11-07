@@ -15,8 +15,6 @@
 
 #string STR_PACKAGE_DESCRIPTION         #language en-US "This Package provides cryptographic-related libraries for UEFI security modules."
 
-
-
 #string STR_gEfiCryptoPkgTokenSpaceGuid_PcdHashApiLibPolicy_PROMPT  #language en-US "HASH algorithm to calculate hash"
 
 #string STR_gEfiCryptoPkgTokenSpaceGuid_PcdHashApiLibPolicy_HELP  #language en-US "This PCD indicates the HASH algorithm to calculate hash of data.<BR><BR>\n"
@@ -31,5 +29,6 @@
                                                                                         "0x00000006  -  SHA512.<BR>\n"
                                                                                         "0x00000007  -  SM3.<BR>"
 
+#string STR_gEfiCryptoPkgTokenSpaceGuid_PcdCryptoServiceFamilyEnable_PROMPT  #language en-US "Enable/Disable EDK II Crypto Protocol/PPI services"
 
-
+#string STR_gEfiCryptoPkgTokenSpaceGuid_PcdCryptoServiceFamilyEnable_HELP  #language en-US "Enable/Disable the families and individual services produced by the EDK II Crypto Protocols/PPIs.  The default is all services disabled.  This Structured PCD is associated with PCD_CRYPTO_SERVICE_FAMILY_ENABLE structure that is defined in Include/Pcd/PcdCryptoServiceFamilyEnable.h."
