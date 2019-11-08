@@ -1045,6 +1045,19 @@ WriteSections64 (
 
           case R_AARCH64_ADR_PREL_PG_HI21:
             //
+            // In order to handle Cortex-A53 erratum #843419, the LD linker may
+            // convert ADRP instructions into ADR instructions, but without
+            // updating the static relocation type, and so we may end up here
+            // while the instruction in question is actually ADR. So let's
+            // just disregard it: the section offset check we apply below to
+            // ADR instructions will trigger for its R_AARCH64_xxx_ABS_LO12_NC
+            // companion instruction as well, so it is safe to omit it here.
+            //
+            if ((*(UINT32 *)Targ & BIT31) == 0) {
+              break;
+            }
+
+            //
             // AArch64 PG_H21 relocations are typically paired with ABS_LO12
             // relocations, where a PC-relative reference with +/- 4 GB range is
             // split into a relative high part and an absolute low part. Since
