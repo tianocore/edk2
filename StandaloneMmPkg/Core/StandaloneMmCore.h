@@ -18,7 +18,7 @@
 #include <Protocol/DxeMmReadyToLock.h>
 #include <Protocol/MmReadyToLock.h>
 #include <Protocol/MmEndOfDxe.h>
-#include <Protocol/MmCommunication.h>
+#include <Protocol/MmCommunication2.h>
 #include <Protocol/LoadedImage.h>
 #include <Protocol/MmConfiguration.h>
 
