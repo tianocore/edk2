@@ -13,7 +13,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <PiDxe.h>
 
-#include <Protocol/SmmCommunication.h>
+#include <Protocol/MmCommunication2.h>
 
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiDriverEntryPoint.h>

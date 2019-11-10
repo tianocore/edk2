@@ -45,7 +45,7 @@
 
 [Protocols]
   gEfiFaultTolerantWriteProtocolGuid            ## PRODUCES
-  gEfiSmmCommunicationProtocolGuid              ## CONSUMES
+  gEfiMmCommunication2ProtocolGuid              ## CONSUMES
   ## NOTIFY
   ## UNDEFINED # Used to do smm communication
   ## CONSUMES
@@ -53,7 +53,7 @@
   gEfiFirmwareVolumeBlockProtocolGuid           ## CONSUMES
 
 [Depex]
-  gEfiSmmCommunicationProtocolGuid
+  gEfiMmCommunication2ProtocolGuid
 
 [UserExtensions.TianoCore."ExtraFiles"]
   FaultTolerantWriteSmmDxeExtra.uni
