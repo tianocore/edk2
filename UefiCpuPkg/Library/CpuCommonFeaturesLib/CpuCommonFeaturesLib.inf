@@ -4,7 +4,7 @@
 #  This library registers CPU features defined in Intel(R) 64 and IA-32
 #  Architectures Software Developer's Manual.
 #
-# Copyright (c) 2017 - 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2017 - 2019, Intel Corporation. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -34,7 +34,6 @@
   C1e.c
   ClockModulation.c
   Eist.c
-  ExecuteDisable.c
   FastStrings.c
   FeatureControl.c
   LimitCpuIdMaxval.c
