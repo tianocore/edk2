@@ -19,15 +19,15 @@ for the UEFI and PI specifications from www.uefi.org.
     <td>VS2019</td>
     <td>edk2-ci</td>
     <td>
-      <a  href="https://dev.azure.com/tianocore/edk2-ci-play/_build/latest?definitionId=27&branchName=edk2-ci">
-      <img src="https://dev.azure.com/tianocore/edk2-ci-play/_apis/build/status/edk2-staging/Windows%20VS2019%20CI?branchName=edk2-ci"/></a>
+      <a  href="https://dev.azure.com/tianocore/edk2-ci/_build/latest?definitionId=32&branchName=master">
+      <img src="https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/Windows%20VS2019%20CI?branchName=master"/></a>
     </td>
     <td>
-      <a  href="https://dev.azure.com/tianocore/edk2-ci-play/_build/latest?definitionId=27&branchName=edk2-ci">
-      <img src="https://img.shields.io/azure-devops/tests/tianocore/edk2-ci-play/27.svg"/></a>
+      <a  href="https://dev.azure.com/tianocore/edk2-ci/_build/latest?definitionId=32&branchName=master">
+      <img src="https://img.shields.io/azure-devops/tests/tianocore/edk2-ci/32.svg"/></a>
     </td>
     <td>
-      <a  href="https://dev.azure.com/tianocore/edk2-ci-play/_build/latest?definitionId=27&branchName=edk2-ci">
+      <a  href="https://dev.azure.com/tianocore/edk2-ci/_build/latest?definitionId=32&branchName=master">
       <img src="https://img.shields.io/badge/coverage-coming_soon-blue"/></a>
     </td>
   </tr>
@@ -36,15 +36,15 @@ for the UEFI and PI specifications from www.uefi.org.
     <td>GCC</td>
     <td>edk2-ci</td>
     <td>
-      <a  href="https://dev.azure.com/tianocore/edk2-ci-play/_build/latest?definitionId=26&branchName=edk2-ci">
-      <img src="https://dev.azure.com/tianocore/edk2-ci-play/_apis/build/status/edk2-staging/Ubuntu%20GCC5%20CI?branchName=edk2-ci"/></a>
+      <a  href="https://dev.azure.com/tianocore/edk2-ci/_build/latest?definitionId=31&branchName=master">
+      <img src="https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/Ubuntu%20GCC5%20CI?branchName=master"/></a>
     </td>
     <td>
-      <a  href="https://dev.azure.com/tianocore/edk2-ci-play/_build/latest?definitionId=26&branchName=edk2-ci">
-      <img src="https://img.shields.io/azure-devops/tests/tianocore/edk2-ci-play/26.svg"/></a>
+      <a  href="https://dev.azure.com/tianocore/edk2-ci/_build/latest?definitionId=31&branchName=master">
+      <img src="https://img.shields.io/azure-devops/tests/tianocore/edk2-ci/31.svg"/></a>
     </td>
     <td>
-      <a  href="https://dev.azure.com/tianocore/edk2-ci-play/_build/latest?definitionId=26&branchName=edk2-ci">
+      <a  href="https://dev.azure.com/tianocore/edk2-ci/_build/latest?definitionId=31&branchName=master">
       <img src="https://img.shields.io/badge/coverage-coming_soon-blue"/></a>
     </td>
   </tr>
