@@ -15,7 +15,7 @@
   FILE_GUID                      = 67FA951E-4FA2-9F4E-A658-4DBD954AC22E
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  ENTRY_POINT                    = PlatfomrSmbiosDriverEntryPoint
+  ENTRY_POINT                    = PlatformSmbiosDriverEntryPoint
 
 
 [Sources]
