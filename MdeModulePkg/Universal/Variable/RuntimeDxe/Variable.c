@@ -2296,10 +2296,10 @@ UpdateVariable (
 
 Done:
   if (!EFI_ERROR (Status)) {
-    if (Variable->Volatile) {
-      VolatileCacheInstance = &(mVariableModuleGlobal->VariableGlobal.VariableRuntimeCacheContext.VariableRuntimeVolatileCache);
-    } else {
+    if ((Variable->CurrPtr != NULL && !Variable->Volatile) || (Attributes & EFI_VARIABLE_NON_VOLATILE) != 0) {
       VolatileCacheInstance = &(mVariableModuleGlobal->VariableGlobal.VariableRuntimeCacheContext.VariableRuntimeNvCache);
+    } else {
+      VolatileCacheInstance = &(mVariableModuleGlobal->VariableGlobal.VariableRuntimeCacheContext.VariableRuntimeVolatileCache);
     }
 
     if (VolatileCacheInstance->Store != NULL) {
