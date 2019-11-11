@@ -1,0 +1,42 @@
+# @file
+# Provides implementation of the library class RngLib that uses the RngProtocol
+#
+# @copyright
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION     = 0x00010029
+  BASE_NAME       = DxeRngLibRngProtocol
+  MODULE_UNI_FILE = DxeRngLibRngProtocol.uni
+  FILE_GUID       = FF9F84C5-A33E-44E3-9BB5-0D654B2D4149
+  MODULE_TYPE     = DXE_DRIVER
+  VERSION_STRING  = 1.0
+  LIBRARY_CLASS   = RngLib|DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC ARM AARCH64
+#
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[Sources]
+  DxeRngLibRngProtocol.c
+
+[LibraryClasses]
+  DebugLib
+  UefiBootServicesTableLib
+
+[Protocols]
+  gEfiRngProtocolGuid                 ## CONSUMES
+
+[Depex]
+  gEfiRngProtocolGuid
+
+[Guids]
+  gEfiRngAlgorithmSp80090Ctr256Guid            ## CONSUMES
+  gEfiRngAlgorithmSp80090Hash256Guid           ## CONSUMES
+  gEfiRngAlgorithmSp80090Hmac256Guid           ## CONSUMES
