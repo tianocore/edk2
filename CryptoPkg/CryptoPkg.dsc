@@ -44,6 +44,7 @@
 
   IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
   OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
+  RngLib|MdePkg/Library/BaseRngLibNull/BaseRngLibNull.inf
 
 [LibraryClasses.ARM, LibraryClasses.AARCH64]
   #
