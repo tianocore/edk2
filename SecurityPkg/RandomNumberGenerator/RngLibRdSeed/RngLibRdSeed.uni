@@ -1,0 +1,18 @@
+// /** @file
+// Instance of RNG (Random Number Generator) Library.
+//
+// Rng RdSeed Library that uses CPU RdSeed instruction access to provide
+// non-deterministic random number which can be used as seed for other
+// software deterministic RNGs.
+//
+// Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Instance of RNG Library"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "RngRdSeed Library that uses CPU RdSeed instruction access to provide non-deterministic random numbers."
+
