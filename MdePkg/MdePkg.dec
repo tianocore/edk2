@@ -244,6 +244,10 @@
   ##  @libraryclass  Module entry point library for standalone MM drivers.
   StandaloneMmDriverEntryPoint|Include/Library/StandaloneMmDriverEntryPoint.h
 
+  ## @libraryclass Provides a unit test framework
+  #
+  UnitTestLib|Include/Library/UnitTestLib.h
+
 [LibraryClasses.IA32, LibraryClasses.X64]
   ##  @libraryclass  Abstracts both S/W SMI generation and detection.
   ##
