@@ -25,7 +25,7 @@
 #define CPU_FEATURE_MWAIT                           2
 #define CPU_FEATURE_ACPI                            3
 #define CPU_FEATURE_EIST                            4
-#define CPU_FEATURE_XD                              5
+#define CPU_FEATURE_RESERVED_5                      5
 #define CPU_FEATURE_FASTSTRINGS                     6
 #define CPU_FEATURE_VMX                             7
 #define CPU_FEATURE_SMX                             8
