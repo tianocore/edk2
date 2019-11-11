@@ -156,8 +156,10 @@
   IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
 !if $(NETWORK_TLS_ENABLE) == TRUE
   OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
+  RngLib|SecurityPkg/RandomNumberGenerator/DxeRngLibRngProtocol/DxeRngLibRngProtocol.inf
 !else
   OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibCrypto.inf
+  RngLib|MdePkg/Library/BaseRngLibNull/BaseRngLibNull.inf
 !endif
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
 
