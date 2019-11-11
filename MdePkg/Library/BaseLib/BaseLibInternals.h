@@ -862,6 +862,52 @@ InternalX86RdRand64  (
   OUT     UINT64                    *Rand
   );
 
+/**
+  Generates a 16-bit random seed through RDSEED instruction.
+
+  @param[out]  Seed     Buffer pointer to store the seed data.
+
+  @retval TRUE          RDSEED call was successful.
+  @retval FALSE         Failed attempts to call RDSEED.
+
+ **/
+BOOLEAN
+EFIAPI
+InternalX86RdSeed16 (
+  OUT     UINT16                    *Seed
+  );
+
+/**
+  Generates a 32-bit random seed through RDSEED instruction.
+
+  @param[out]  Seed     Buffer pointer to store the seed data.
+
+  @retval TRUE          RDSEED call was successful.
+  @retval FALSE         Failed attempts to call RDSEED.
+
+**/
+BOOLEAN
+EFIAPI
+InternalX86RdSeed32 (
+  OUT     UINT32                    *Seed
+  );
+
+/**
+  Generates a 64-bit random seed through RDSEED instruction.
+
+
+  @param[out]  Seed     Buffer pointer to store the seed data.
+
+  @retval TRUE          RDSEED call was successful.
+  @retval FALSE         Failed attempts to call RDSEED.
+
+**/
+BOOLEAN
+EFIAPI
+InternalX86RdSeed64  (
+  OUT     UINT64                    *Seed
+  );
+
 #else
 
 #endif

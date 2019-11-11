@@ -7857,6 +7857,57 @@ AsmRdRand64  (
   );
 
 /**
+  Generates a 16-bit random seed through RDSEED instruction.
+
+  if Seed is NULL, then ASSERT().
+
+  @param[out]  Seed     Buffer pointer to store the seed data.
+
+  @retval TRUE          RDSEED call was successful.
+  @retval FALSE         Failed attempts to call RDSEED.
+
+ **/
+BOOLEAN
+EFIAPI
+AsmRdSeed16 (
+  OUT     UINT16                    *Seed
+  );
+
+/**
+  Generates a 32-bit random seed through RDSEED instruction.
+
+  if Seed is NULL, then ASSERT().
+
+  @param[out]  Seed     Buffer pointer to store the seed data.
+
+  @retval TRUE          RDSEED call was successful.
+  @retval FALSE         Failed attempts to call RDSEED.
+
+**/
+BOOLEAN
+EFIAPI
+AsmRdSeed32 (
+  OUT     UINT32                    *Seed
+  );
+
+/**
+  Generates a 64-bit random seed through RDSEED instruction.
+
+  if Seed is NULL, then ASSERT().
+
+  @param[out]  Seed     Buffer pointer to store the seed data.
+
+  @retval TRUE          RDSEED call was successful.
+  @retval FALSE         Failed attempts to call RDSEED.
+
+**/
+BOOLEAN
+EFIAPI
+AsmRdSeed64  (
+  OUT     UINT64                    *Seed
+  );
+
+/**
   Load given selector into TR register.
 
   @param[in] Selector     Task segment selector

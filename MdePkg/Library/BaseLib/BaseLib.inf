@@ -181,6 +181,7 @@
   Ia32/EnableCache.nasm| GCC
   Ia32/DisableCache.nasm| GCC
   Ia32/RdRand.nasm
+  Ia32/RdSeed.nasm
 
   Ia32/DivS64x64Remainder.c
   Ia32/InternalSwitchStack.c | MSFT
@@ -202,6 +203,7 @@
   X86DisablePaging64.c
   X86DisablePaging32.c
   X86RdRand.c
+  X86RdSeed.c
   X86PatchInstruction.c
   X86SpeculationBarrier.c
 
@@ -306,12 +308,14 @@
   X86DisablePaging64.c
   X86DisablePaging32.c
   X86RdRand.c
+  X86RdSeed.c
   X86PatchInstruction.c
   X86SpeculationBarrier.c
   X64/GccInline.c | GCC
   X64/EnableDisableInterrupts.nasm
   X64/DisablePaging64.nasm
   X64/RdRand.nasm
+  X64/RdSeed.nasm
   ChkStkGcc.c  | GCC
 
 [Sources.EBC]
