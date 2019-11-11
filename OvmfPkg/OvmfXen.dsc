@@ -204,6 +204,7 @@
 
 [LibraryClasses.common]
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
+  RngLib|MdePkg/Library/BaseRngLibNull/BaseRngLibNull.inf
 
 [LibraryClasses.common.SEC]
   QemuFwCfgLib|OvmfPkg/Library/QemuFwCfgLib/QemuFwCfgSecLib.inf
@@ -665,6 +666,10 @@
   NetworkPkg/TlsAuthConfigDxe/TlsAuthConfigDxe.inf {
     <LibraryClasses>
       NULL|OvmfPkg/Library/TlsAuthConfigLib/TlsAuthConfigLib.inf
+  }
+  NetworkPkg/TlsDxe/TlsDxe.inf {
+    <LibraryClasses>
+      RngLib|SecurityPkg/RandomNumberGenerator/DxeRngLibRngProtocol/DxeRngLibRngProtocol.inf
   }
 !endif
 
