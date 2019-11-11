@@ -66,17 +66,6 @@ CpuCommonFeaturesLibConstructor (
                );
     ASSERT_EFI_ERROR (Status);
   }
-  if (IsCpuFeatureSupported (CPU_FEATURE_XD)) {
-    Status = RegisterCpuFeature (
-               "Execute Disable",
-               NULL,
-               ExecuteDisableSupport,
-               ExecuteDisableInitialize,
-               CPU_FEATURE_XD,
-               CPU_FEATURE_END
-               );
-    ASSERT_EFI_ERROR (Status);
-  }
   if (IsCpuFeatureSupported (CPU_FEATURE_FASTSTRINGS)) {
     Status = RegisterCpuFeature (
                "FastStrings",
