@@ -47,6 +47,7 @@
 !else
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
   OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
+  RngLib|MdePkg/Library/BaseRngLibNull/BaseRngLibNull.inf
   IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
   TlsLib|CryptoPkg/Library/TlsLib/TlsLib.inf
 !endif
