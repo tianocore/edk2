@@ -1433,6 +1433,10 @@ TABLE_ITEM  SystemSlotTypeTable[] = {
     L"PCI Express Mini 76-pin (CEM spec. 2.0) Corresponds to Display-Mini card"
   },
   {
+    SlotTypeCXLFlexbus10,
+    L"CXL Flexbus 1.0"
+  },
+  {
     0xA0,
     L"PC-98/C20 "
   },
@@ -2290,6 +2294,10 @@ TABLE_ITEM  PMALocationTable[] = {
   {
     0xA3,
     L"  PC-98/Local bus add-on card"
+  },
+  {
+    MemoryArrayLocationCXLFlexbus10AddonCard,
+    L"  CXL Flexbus 1.0 add-on card"
   }
 };
 
