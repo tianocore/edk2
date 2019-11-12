@@ -17,7 +17,7 @@ for the UEFI and PI specifications from www.uefi.org.
   <tr>
     <td>Windows</td>
     <td>VS2019</td>
-    <td>edk2-ci</td>
+    <td>master</td>
     <td>
       <a  href="https://dev.azure.com/tianocore/edk2-ci/_build/latest?definitionId=32&branchName=master">
       <img src="https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/Windows%20VS2019%20CI?branchName=master"/></a>
@@ -34,7 +34,7 @@ for the UEFI and PI specifications from www.uefi.org.
   <tr>
     <td>Ubuntu</td>
     <td>GCC</td>
-    <td>edk2-ci</td>
+    <td>master</td>
     <td>
       <a  href="https://dev.azure.com/tianocore/edk2-ci/_build/latest?definitionId=31&branchName=master">
       <img src="https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/Ubuntu%20GCC5%20CI?branchName=master"/></a>
