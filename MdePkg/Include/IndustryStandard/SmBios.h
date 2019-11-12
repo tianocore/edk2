@@ -1753,6 +1753,10 @@ typedef enum {
   MemoryTechnologyNvdimmN                   = 0x04,
   MemoryTechnologyNvdimmF                   = 0x05,
   MemoryTechnologyNvdimmP                   = 0x06,
+  //
+  // This definition is updated to represent Intel
+  // Optane DC Presistent Memory in SMBIOS spec 3.3.0
+  //
   MemoryTechnologyIntelPersistentMemory     = 0x07
 } MEMORY_DEVICE_TECHNOLOGY;
 
