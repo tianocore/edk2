@@ -1681,7 +1681,8 @@ typedef enum {
   MemoryFormFactorRimm                     = 0x0C,
   MemoryFormFactorSodimm                   = 0x0D,
   MemoryFormFactorSrimm                    = 0x0E,
-  MemoryFormFactorFbDimm                   = 0x0F
+  MemoryFormFactorFbDimm                   = 0x0F,
+  MemoryFormFactorDie                      = 0x10
 } MEMORY_FORM_FACTOR;
 
 ///
@@ -1715,7 +1716,9 @@ typedef enum {
   MemoryTypeLpddr2                         = 0x1C,
   MemoryTypeLpddr3                         = 0x1D,
   MemoryTypeLpddr4                         = 0x1E,
-  MemoryTypeLogicalNonVolatileDevice       = 0x1F
+  MemoryTypeLogicalNonVolatileDevice       = 0x1F,
+  MemoryTypeHBM                            = 0x20,
+  MemoryTypeHBM2                           = 0x21
 } MEMORY_DEVICE_TYPE;
 
 ///
