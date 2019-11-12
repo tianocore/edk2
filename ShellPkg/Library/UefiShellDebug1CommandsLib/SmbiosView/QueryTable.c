@@ -2423,6 +2423,10 @@ TABLE_ITEM  MemoryDeviceFormFactorTable[] = {
   {
     0x0F,
     L"  FB-DIMM"
+  },
+  {
+    MemoryFormFactorDie,
+    L"  Die"
   }
 };
 
@@ -2538,6 +2542,14 @@ TABLE_ITEM  MemoryDeviceTypeTable[] = {
   {
     0x1F,
     L"  Logical non-volatile device"
+  },
+  {
+    MemoryTypeHBM,
+    L"  HBM (High Bandwidth Memory)"
+  },
+  {
+    MemoryTypeHBM2,
+    L"  HBM2 (High Bandwidth Memory Generation 2)"
   }
 };
 
