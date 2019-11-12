@@ -1,7 +1,7 @@
 /** @file
   Industry Standard Definitions of SMBIOS Table Specification v3.3.0.
 
-Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015-2017 Hewlett Packard Enterprise Development LP<BR>
 (C) Copyright 2015 - 2019 Hewlett Packard Enterprise Development LP<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -1307,7 +1307,13 @@ typedef enum {
   SlotTypePciExpressGen3X2             = 0xB3,
   SlotTypePciExpressGen3X4             = 0xB4,
   SlotTypePciExpressGen3X8             = 0xB5,
-  SlotTypePciExpressGen3X16            = 0xB6
+  SlotTypePciExpressGen3X16            = 0xB6,
+  SlotTypePciExpressGen4               = 0xB8,
+  SlotTypePciExpressGen4X1             = 0xB9,
+  SlotTypePciExpressGen4X2             = 0xBA,
+  SlotTypePciExpressGen4X4             = 0xBB,
+  SlotTypePciExpressGen4X8             = 0xBC,
+  SlotTypePciExpressGen4X16            = 0xBD
 } MISC_SLOT_TYPE;
 
 ///
