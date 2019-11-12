@@ -1055,7 +1055,7 @@ PciScanBus (
                 );
 
       if (EFI_ERROR (Status)) {
-        continue;
+        break;
       }
 
       PciAddress = EFI_PCI_ADDRESS (StartBusNumber, Device, Func, 0);
