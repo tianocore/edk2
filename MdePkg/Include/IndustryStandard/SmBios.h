@@ -1285,6 +1285,7 @@ typedef enum {
   SlotTypePciExpressMini52pinWithBSKO  = 0x21,      ///< PCI Express Mini 52-pin (CEM spec. 2.0) with bottom-side keep-outs.
   SlotTypePciExpressMini52pinWithoutBSKO = 0x22,    ///< PCI Express Mini 52-pin (CEM spec. 2.0) without bottom-side keep-outs.
   SlotTypePciExpressMini76pin          = 0x23,      ///< PCI Express Mini 76-pin (CEM spec. 2.0) Corresponds to Display-Mini card.
+  SlotTypeCXLFlexbus10                 = 0x30,
   SlotTypePC98C20                      = 0xA0,
   SlotTypePC98C24                      = 0xA1,
   SlotTypePC98E                        = 0xA2,
@@ -1612,7 +1613,8 @@ typedef enum {
   MemoryArrayLocationPc98C20AddonCard      = 0xA0,
   MemoryArrayLocationPc98C24AddonCard      = 0xA1,
   MemoryArrayLocationPc98EAddonCard        = 0xA2,
-  MemoryArrayLocationPc98LocalBusAddonCard = 0xA3
+  MemoryArrayLocationPc98LocalBusAddonCard = 0xA3,
+  MemoryArrayLocationCXLFlexbus10AddonCard = 0xA4
 } MEMORY_ARRAY_LOCATION;
 
 ///
