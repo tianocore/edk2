@@ -2638,8 +2638,8 @@ TABLE_ITEM  MemoryDeviceMemoryTechnologyTable[] = {
     L" NVDIMM-P"
   },
   {
-    0x07,
-    L" Intel persistent memory"
+    MemoryTechnologyIntelPersistentMemory,
+    L" Intel Optane DC Persistent Memory"
   }
 };
 
