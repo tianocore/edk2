@@ -61,6 +61,7 @@
   MdePkg/Library/BaseUefiDecompressLib/BaseUefiTianoCustomDecompressLib.inf
   MdePkg/Library/BaseSmbusLibNull/BaseSmbusLibNull.inf
   MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
+  MdePkg/Library/BaseRngLibNull/BaseRngLibNull.inf
 
   MdePkg/Library/DxeCoreEntryPoint/DxeCoreEntryPoint.inf
   MdePkg/Library/DxeCoreHobLib/DxeCoreHobLib.inf
