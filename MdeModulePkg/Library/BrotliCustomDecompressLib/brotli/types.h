@@ -13,11 +13,7 @@
 #define BROTLI_COMMON_TYPES_H_
 
 //#include <stddef.h>  /* for size_t */
-#ifndef _SIZE_T_DEFINED
-#if !defined(_WIN64) || defined(__GNUC__)
-typedef unsigned int size_t;
-#endif
-#endif
+typedef UINTN size_t;
 
 #if defined(_MSC_VER) && (_MSC_VER < 1600)
 typedef __int8 int8_t;
