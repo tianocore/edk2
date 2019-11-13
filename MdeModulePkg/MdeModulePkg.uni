@@ -660,6 +660,18 @@
                                                                                                         "TRUE  - Device Path From Text Protocol will be produced.<BR>\n"
                                                                                                         "FALSE - Device Path From Text Protocol will not be produced.<BR>"
 
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdEnableVariableRuntimeCache_PROMPT  #language en-US "Enable the UEFI variable runtime cache."
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdEnableVariableRuntimeCache_HELP  #language en-US "Indicates if the UEFI variable runtime cache should be enabled.<BR><BR>\n"
+                                                                                               "This setting only applies if SMM variables are enabled. When enabled, all variable<BR>\n"
+                                                                                               "data for Runtime Service GetVariable () and GetNextVariableName () calls is retrieved<BR>\n"
+                                                                                               "from a runtime data buffer referred to as the "runtime cache". An SMI is not triggered<BR>\n"
+                                                                                               "at all for these requests. Variables writes still trigger an SMI. This can greatly<BR>\n"
+                                                                                               "reduce overall system SMM usage as most boots tend to issue far more variable reads<BR>\n"
+                                                                                               "than writes.<BR>\n"
+                                                                                               "TRUE  - The UEFI variable runtime cache is enabled.<BR>\n"
+                                                                                               "FALSE - The UEFI variable runtime cache is disabled.<BR>"
+
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdVariableCollectStatistics_PROMPT  #language en-US "Enable variable statistics collection"
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdVariableCollectStatistics_HELP  #language en-US "Indicates if the statistics about variable usage will be collected. This information is stored as a vendor configuration table into the EFI system table. Set this PCD to TRUE to use VariableInfo application in MdeModulePkg\Application directory to get variable usage info. VariableInfo application will not output information if not set to TRUE.<BR><BR>\n"
