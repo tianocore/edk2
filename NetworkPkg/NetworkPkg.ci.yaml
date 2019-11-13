@@ -1,0 +1,62 @@
+## @file
+# CI configuration for NetworkPkg
+#
+# Copyright (c) Microsoft Corporation
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+{
+    "CompilerPlugin": {
+        "DscPath": "NetworkPkg.dsc"
+    },
+    "CharEncodingCheck": {
+        "IgnoreFiles": []
+    },
+    "DependencyCheck": {
+        "AcceptableDependencies": [
+            "MdePkg/MdePkg.dec",
+            "MdeModulePkg/MdeModulePkg.dec",
+            "NetworkPkg/NetworkPkg.dec",
+            "CryptoPkg/CryptoPkg.dec"
+        ],
+        # For host based unit tests
+        "AcceptableDependencies-HOST_APPLICATION":[],
+        # For UEFI shell based apps
+        "AcceptableDependencies-UEFI_APPLICATION":[
+            "ShellPkg/ShellPkg.dec"
+        ],
+        "IgnoreInf": []
+    },
+    "DscCompleteCheck": {
+        "DscPath": "NetworkPkg.dsc",
+        "IgnoreInf": []
+    },
+    "GuidCheck": {
+        "IgnoreGuidName": [],
+        "IgnoreGuidValue": [],
+        "IgnoreFoldersAndFiles": []
+    },
+    "LibraryClassCheck": {
+        "IgnoreHeaderFile": []
+    },
+
+    ## options defined ci/Plugin/SpellCheck
+    "SpellCheck": {
+        "AuditOnly": True,           # Fails test but run in AuditOnly mode to collect log
+        "IgnoreFiles": [],           # use gitignore syntax to ignore errors in matching files
+        "ExtendWords": [],           # words to extend to the dictionary for this package
+        "IgnoreStandardPaths": [],   # Standard Plugin defined paths that should be ignore
+        "AdditionalIncludePaths": [] # Additional paths to spell check (wildcards supported)
+    },
+
+    "Defines": {
+        "BLD_*_CONTINUOUS_INTEGRATION": "TRUE",
+        "BLD_*_NETWORK_ENABLE": "TRUE",
+        "BLD_*_NETWORK_SNP_ENABLE": "TRUE",
+        "BLD_*_NETWORK_VLAN_ENABLE": "TRUE",
+        "BLD_*_NETWORK_IP4_ENABLE": "TRUE",
+        "BLD_*_NETWORK_IP6_ENABLE": "TRUE",
+        "BLD_*_NETWORK_TLS_ENABLE": "TRUE",
+        "BLD_*_NETWORK_HTTP_BOOT_ENABLE": "TRUE",
+        "BLD_*_NETWORK_ISCSI_ENABLE": "TRUE",
+    }
+}

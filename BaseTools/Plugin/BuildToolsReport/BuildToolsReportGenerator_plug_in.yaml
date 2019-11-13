@@ -1,0 +1,12 @@
+## @file
+# Build Plugin used to output html report of all versions collected
+# during the build
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+{
+  "scope": "global",
+  "name": "Build Tools Report Generator",
+  "module": "BuildToolsReportGenerator"
+}

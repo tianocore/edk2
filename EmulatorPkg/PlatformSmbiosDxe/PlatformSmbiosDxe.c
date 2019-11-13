@@ -82,7 +82,7 @@ CreatePlatformSmbiosMemoryRecords (
 **/
 EFI_STATUS
 EFIAPI
-PlatfomrSmbiosDriverEntryPoint (
+PlatformSmbiosDriverEntryPoint (
   IN EFI_HANDLE         ImageHandle,
   IN EFI_SYSTEM_TABLE   *SystemTable
   )
