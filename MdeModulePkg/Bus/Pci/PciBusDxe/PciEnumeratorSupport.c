@@ -10,6 +10,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "PciBus.h"
 
 extern CHAR16  *mBarTypeStr[];
+extern EDKII_DEVICE_SECURITY_PROTOCOL                          *mDeviceSecurityProtocol;
 
 #define OLD_ALIGN   0xFFFFFFFFFFFFFFFFULL
 #define EVEN_ALIGN  0xFFFFFFFFFFFFFFFEULL
@@ -2070,6 +2071,67 @@ InitializeP2C (
   PciIo->Pci.Write (PciIo, EfiPciIoWidthUint8, 0x3C, 1, &gAllZero);
 }
 
+/*
+  Authenticate the PCI device by using DeviceSecurityProtocol.
+
+  @param PciIoDevice  PCI device.
+
+  @retval EFI_SUCCESS     The device passes the authentication.
+  @return not EFI_SUCCESS The device failes the authentication or
+                          unexpected error happen during authentication.
+*/
+EFI_STATUS
+AuthenticatePciDevice (
+  IN PCI_IO_DEVICE            *PciIoDevice
+  )
+{
+  EDKII_DEVICE_IDENTIFIER  DeviceIdentifier;
+  EFI_STATUS               Status;
+
+  if (mDeviceSecurityProtocol != NULL) {
+    //
+    // Prepare the parameter
+    //
+    DeviceIdentifier.Version = EDKII_DEVICE_IDENTIFIER_REVISION;
+    CopyGuid (&DeviceIdentifier.DeviceType, &gEdkiiDeviceIdentifierTypePciGuid);
+    DeviceIdentifier.DeviceHandle = NULL;
+    Status = gBS->InstallMultipleProtocolInterfaces (
+                    &DeviceIdentifier.DeviceHandle,
+                    &gEfiDevicePathProtocolGuid,
+                    PciIoDevice->DevicePath,
+                    &gEdkiiDeviceIdentifierTypePciGuid,
+                    &PciIoDevice->PciIo,
+                    NULL
+                    );
+    if (EFI_ERROR(Status)) {
+      return Status;
+    }
+
+    //
+    // Do DeviceAuthentication
+    //
+    Status = mDeviceSecurityProtocol->DeviceAuthenticate (mDeviceSecurityProtocol, &DeviceIdentifier);
+    //
+    // Always uninstall, because they are only for Authentication.
+    // No need to check return Status.
+    //
+    gBS->UninstallMultipleProtocolInterfaces (
+                    DeviceIdentifier.DeviceHandle,
+                    &gEfiDevicePathProtocolGuid,
+                    PciIoDevice->DevicePath,
+                    &gEdkiiDeviceIdentifierTypePciGuid,
+                    &PciIoDevice->PciIo,
+                    NULL
+                    );
+    return Status;
+  }
+
+  //
+  // Device Security Protocol is not found, just return success
+  //
+  return EFI_SUCCESS;
+}
+
 /**
   Create and initialize general PCI I/O device instance for
   PCI device/bridge device/hotplug bridge device.
@@ -2154,6 +2216,21 @@ CreatePciIoDevice (
              );
   if (!EFI_ERROR (Status)) {
     PciIoDevice->IsPciExp = TRUE;
+  }
+
+  //
+  // Now we can do the authentication check for the device.
+  //
+  Status = AuthenticatePciDevice (PciIoDevice);
+  //
+  // If authentication fails, skip this device.
+  //
+  if (EFI_ERROR(Status)) {
+    if (PciIoDevice->DevicePath != NULL) {
+      FreePool (PciIoDevice->DevicePath);
+    }
+    FreePool (PciIoDevice);
+    return NULL;
   }
 
   if (PcdGetBool (PcdAriSupport)) {

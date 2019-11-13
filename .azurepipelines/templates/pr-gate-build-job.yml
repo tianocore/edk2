@@ -1,0 +1,80 @@
+## @file
+# File templates/pr-gate-build-job.yml
+#
+# template file used to build supported packages.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+parameters:
+  tool_chain_tag: ''
+  vm_image: ''
+  arch_list: ''
+
+# Build step
+jobs:
+
+- job: Build_${{ parameters.tool_chain_tag }}
+
+  #Use matrix to speed up the build process
+  strategy:
+    matrix:
+      TARGET_MDE_CPU:
+        Build.Pkgs: 'MdePkg,UefiCpuPkg'
+        Build.Targets: 'DEBUG,RELEASE,NO-TARGET'
+      TARGET_MDEMODULE_DEBUG:
+        Build.Pkgs: 'MdeModulePkg'
+        Build.Targets: 'DEBUG'
+      TARGET_MDEMODULE_RELEASE:
+        Build.Pkgs: 'MdeModulePkg'
+        Build.Targets: 'RELEASE,NO-TARGET'
+      TARGET_NETWORK:
+        Build.Pkgs: 'NetworkPkg'
+        Build.Targets: 'DEBUG,RELEASE,NO-TARGET'
+      TARGET_OTHER:
+        Build.Pkgs: 'PcAtChipsetPkg,ShellPkg'
+        Build.Targets: 'DEBUG,RELEASE,NO-TARGET'
+      TARGET_FMP:
+        Build.Pkgs: 'FmpDevicePkg,FatPkg'
+        Build.Targets: 'DEBUG,RELEASE,NO-TARGET'
+      TARGET_CRYPTO:
+        Build.Pkgs: 'CryptoPkg'
+        Build.Targets: 'DEBUG,RELEASE,NO-TARGET'
+      TARGET_SECURITY:
+        Build.Pkgs: 'SecurityPkg'
+        Build.Targets: 'DEBUG,RELEASE,NO-TARGET'
+
+  workspace:
+    clean: all
+
+  pool:
+    vmImage: ${{ parameters.vm_image }}
+
+  steps:
+  - template: pr-gate-steps.yml
+    parameters:
+      tool_chain_tag: ${{ parameters.tool_chain_tag }}
+      build_pkgs: $(Build.Pkgs)
+      build_targets: $(Build.Targets)
+      build_archs: ${{ parameters.arch_list }}
+
+- job: FINISHED
+  dependsOn: Build_${{ parameters.tool_chain_tag }}
+  condition: succeeded()
+  steps:
+  - checkout: none
+  - script: |
+      echo FINISHED
+      sleep 10
+    displayName: FINISHED
+
+- job: FAILED
+  dependsOn: Build_${{ parameters.tool_chain_tag }}
+  condition: failed()
+  steps:
+  - checkout: none
+  - script: |
+      echo FAILED
+      sleep 10
+    displayName: FAILED

@@ -1,0 +1,11 @@
+## @file
+# CiBuildPlugin used to check char encoding
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+{
+  "scope": "cibuild",
+  "name": "Char Encoding Check Test",
+  "module": "CharEncodingCheck"
+}
