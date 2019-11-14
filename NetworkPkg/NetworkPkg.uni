@@ -61,6 +61,13 @@
                                                                                           "TRUE  - Certificate Authentication feature is enabled.<BR>\n"
                                                                                           "FALSE - Does not support Certificate Authentication.<BR>"
 
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdSnpCreateExitBootServicesEvent_PROMPT  #language en-US "Indicates whether SnpDxe creates event for ExitBootServices() call."
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdSnpCreateExitBootServicesEvent_HELP  #language en-US "Indicates whether SnpDxe driver will create an event that will be notified<BR><BR>\n"
+                                                                                                 "upon gBS->ExitBootServices() call.<BR>\n"
+                                                                                                 "TRUE - Event being triggered upon ExitBootServices call will be created<BR>\n"
+                                                                                                 "FALSE - Event being triggered upon ExitBootServices call will NOT be created<BR>"
+
 #string STR_gEfiNetworkPkgTokenSpaceGuid_PcdDhcp6UidType_PROMPT  #language en-US "Type Value of Dhcp6 Unique Identifier (DUID)."
 
 #string STR_gEfiNetworkPkgTokenSpaceGuid_PcdDhcp6UidType_HELP  #language en-US "IPv6 DHCP Unique Identifier (DUID) Type configuration (From RFCs 3315 and 6355).\n"
