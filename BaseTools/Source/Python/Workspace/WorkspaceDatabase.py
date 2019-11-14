@@ -186,6 +186,10 @@ class WorkspaceDatabase(object):
             for Package in LibObj.Packages:
                 if Package not in PackageList:
                     PackageList.append(Package)
+        for Package in Pa.Packages:
+            if Package in PackageList:
+                continue
+            PackageList.append(Package)
 
         return PackageList
 

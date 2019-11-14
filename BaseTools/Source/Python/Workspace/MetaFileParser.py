@@ -160,6 +160,7 @@ class MetaFileParser(object):
         self.MetaFile = FilePath
         self._FileDir = self.MetaFile.Dir
         self._Defines = {}
+        self._Packages = []
         self._FileLocalMacros = {}
         self._SectionsMacroDict = defaultdict(dict)
 
@@ -351,6 +352,13 @@ class MetaFileParser(object):
                             File=self.MetaFile, Line=self._LineIndex + 1, ExtraData=self._CurrentLine)
         # If the section information is needed later, it should be stored in database
         self._ValueList[0] = self._SectionName
+
+    ## [packages] section parser
+    @ParseMacro
+    def _PackageParser(self):
+        self._CurrentLine = CleanString(self._CurrentLine)
+        self._Packages.append(self._CurrentLine)
+        self._ValueList[0] = self._CurrentLine
 
     ## [defines] section parser
     @ParseMacro
@@ -849,6 +857,7 @@ class DscParser(MetaFileParser):
         TAB_LIBRARIES.upper()                       :   MODEL_EFI_LIBRARY_INSTANCE,
         TAB_LIBRARY_CLASSES.upper()                 :   MODEL_EFI_LIBRARY_CLASS,
         TAB_BUILD_OPTIONS.upper()                   :   MODEL_META_DATA_BUILD_OPTION,
+        TAB_PACKAGES.upper()                        :   MODEL_META_DATA_PACKAGE,
         TAB_PCDS_FIXED_AT_BUILD_NULL.upper()        :   MODEL_PCD_FIXED_AT_BUILD,
         TAB_PCDS_PATCHABLE_IN_MODULE_NULL.upper()   :   MODEL_PCD_PATCHABLE_IN_MODULE,
         TAB_PCDS_FEATURE_FLAG_NULL.upper()          :   MODEL_PCD_FEATURE_FLAG,
@@ -1340,6 +1349,7 @@ class DscParser(MetaFileParser):
             MODEL_META_DATA_DEFINE                          :   self.__ProcessDefine,
             MODEL_META_DATA_GLOBAL_DEFINE                   :   self.__ProcessDefine,
             MODEL_META_DATA_INCLUDE                         :   self.__ProcessDirective,
+            MODEL_META_DATA_PACKAGE                         :   self.__ProcessPackages,
             MODEL_META_DATA_CONDITIONAL_STATEMENT_IF        :   self.__ProcessDirective,
             MODEL_META_DATA_CONDITIONAL_STATEMENT_ELSE      :   self.__ProcessDirective,
             MODEL_META_DATA_CONDITIONAL_STATEMENT_IFDEF     :   self.__ProcessDirective,
@@ -1643,6 +1653,9 @@ class DscParser(MetaFileParser):
                 self._ValueList = None
                 self._ContentIndex -= 1
 
+    def __ProcessPackages(self):
+        self._ValueList[0] = ReplaceMacro(self._ValueList[0], self._Macros)
+
     def __ProcessSkuId(self):
         self._ValueList = [ReplaceMacro(Value, self._Macros, RaiseError=True)
                            for Value in self._ValueList]
@@ -1721,6 +1734,7 @@ class DscParser(MetaFileParser):
         MODEL_META_DATA_COMPONENT                       :   _ComponentParser,
         MODEL_META_DATA_BUILD_OPTION                    :   _BuildOptionParser,
         MODEL_UNKNOWN                                   :   MetaFileParser._Skip,
+        MODEL_META_DATA_PACKAGE                         :   MetaFileParser._PackageParser,
         MODEL_META_DATA_USER_EXTENSION                  :   MetaFileParser._SkipUserExtension,
         MODEL_META_DATA_SECTION_HEADER                  :   MetaFileParser._SectionHeaderParser,
         MODEL_META_DATA_SUBSECTION_HEADER               :   _SubsectionHeaderParser,
