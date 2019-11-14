@@ -342,7 +342,7 @@ RestoreCr2 (
 
   @retval TRUE  Access to non-SMRAM is restricted.
   @retval FALSE Access to non-SMRAM is not restricted.
-*/
+**/
 BOOLEAN
 IsRestrictedMemoryAccess (
   VOID
