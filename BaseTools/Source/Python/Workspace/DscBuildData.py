@@ -719,6 +719,24 @@ class DscBuildData(PlatformBuildClassObject):
                 self._RawData.DisableOverrideComponent(Components[(file_guid_str,str(ModuleFile))])
             Components[(file_guid_str,str(ModuleFile))] = ModuleId
         self._RawData._PostProcessed = False
+
+    ## Retrieve packages this Platform depends on
+    @cached_property
+    def Packages(self):
+        RetVal = set()
+        RecordList = self._RawData[MODEL_META_DATA_PACKAGE, self._Arch]
+        Macros = self._Macros
+        for Record in RecordList:
+            File = PathClass(NormPath(Record[0], Macros), GlobalData.gWorkspace, Arch=self._Arch)
+            # check the file validation
+            ErrorCode, ErrorInfo = File.Validate('.dec')
+            if ErrorCode != 0:
+                LineNo = Record[-1]
+                EdkLogger.error('build', ErrorCode, ExtraData=ErrorInfo, File=self.MetaFile, Line=LineNo)
+            # parse this package now. we need it to get protocol/ppi/guid value
+            RetVal.add(self._Bdb[File, self._Arch, self._Target, self._Toolchain])
+        return RetVal
+
     ## Retrieve [Components] section information
     @property
     def Modules(self):
@@ -896,7 +914,8 @@ class DscBuildData(PlatformBuildClassObject):
                     continue
                 ModuleData = self._Bdb[ModuleFile, self._Arch, self._Target, self._Toolchain]
                 PkgSet.update(ModuleData.Packages)
-
+            if self.Packages:
+                PkgSet.update(self.Packages)
             self._DecPcds, self._GuidDict = GetDeclaredPcd(self, self._Bdb, self._Arch, self._Target, self._Toolchain, PkgSet)
             self._GuidDict.update(GlobalData.gPlatformPcds)
 
@@ -3320,6 +3339,8 @@ class DscBuildData(PlatformBuildClassObject):
                     continue
                 ModuleData = self._Bdb[ModuleFile, self._Arch, self._Target, self._Toolchain]
                 PkgSet.update(ModuleData.Packages)
+            if self.Packages:
+                PkgSet.update(self.Packages)
             self._DecPcds, self._GuidDict = GetDeclaredPcd(self, self._Bdb, self._Arch, self._Target, self._Toolchain, PkgSet)
             self._GuidDict.update(GlobalData.gPlatformPcds)
         return self._DecPcds

@@ -37,6 +37,8 @@ class OrderedListDict(OrderedDict):
 #
 def GetPackageList(Platform, BuildDatabase, Arch, Target, Toolchain):
     PkgSet = set()
+    if Platform.Packages:
+        PkgSet.update(Platform.Packages)
     for ModuleFile in Platform.Modules:
         Data = BuildDatabase[ModuleFile, Arch, Target, Toolchain]
         PkgSet.update(Data.Packages)
