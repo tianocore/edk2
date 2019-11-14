@@ -641,15 +641,15 @@ EfiTestChildHandle (
 }
 
 /**
- * This function checks the supported languages list for a target language,
- * This only supports RFC 4646 Languages.
- *
- * @param      SupportedLanguages  The supported languages
- * @param      TargetLanguage      The target language
- *
- * @return     Returns EFI_SUCCESS if the language is supported,
- *             EFI_UNSUPPORTED otherwise
- */
+  This function checks the supported languages list for a target language,
+  This only supports RFC 4646 Languages.
+
+  @param  SupportedLanguages  The supported languages
+  @param  TargetLanguage      The target language
+
+  @retval Returns EFI_SUCCESS if the language is supported,
+          EFI_UNSUPPORTED otherwise
+**/
 EFI_STATUS
 EFIAPI
 IsLanguageSupported (
