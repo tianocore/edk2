@@ -475,7 +475,7 @@ CollectProcessorCount (
     CpuPause ();
   }
 
-  
+
   //
   // Enable x2APIC mode if
   //  1. Number of CPU is greater than 255; or
