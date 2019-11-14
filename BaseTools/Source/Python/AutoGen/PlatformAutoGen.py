@@ -975,6 +975,7 @@ class PlatformAutoGen(AutoGen):
                 continue
             ModuleData = self.BuildDatabase[ModuleFile, self.Arch, self.BuildTarget, self.ToolChain]
             RetVal.update(ModuleData.Packages)
+        RetVal.update(self.Platform.Packages)
         return list(RetVal)
 
     @cached_property
