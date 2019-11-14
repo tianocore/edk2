@@ -108,7 +108,7 @@
   GCC:*_*_*_CC_FLAGS = -Wno-error=maybe-uninitialized
 
   # Oniguruma: implicit conversion from 'UINTN' (aka 'unsigned long long') to 'long'
-  GCC:*_CLANG9_*_CC_FLAGS = -Wno-error=constant-conversion
+  GCC:*_CLANGPDB_*_CC_FLAGS = -Wno-error=constant-conversion
 
   # Not add -Wno-error=maybe-uninitialized option for XCODE
   # XCODE doesn't know this option
