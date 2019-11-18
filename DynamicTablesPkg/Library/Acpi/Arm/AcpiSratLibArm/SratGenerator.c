@@ -413,7 +413,7 @@ AddGenericInitiatorAffinity (
     GenInitAff++;
     GenInitAffInfo++;
   }// while
-  return Status;
+  return EFI_SUCCESS;
 }
 
 /** Construct the SRAT ACPI table.
