@@ -649,11 +649,13 @@ typedef struct {
 //
 // .pdata entries for X64
 //
+#if !((defined(_M_AMD64)||defined(_M_ARM64)) && defined(_WINNT_))
 typedef struct {
   UINT32  FunctionStartAddress;
   UINT32  FunctionEndAddress;
   UINT32  UnwindInfoAddress;
 } RUNTIME_FUNCTION;
+#endif
 
 typedef struct {
   UINT8  Version:3;

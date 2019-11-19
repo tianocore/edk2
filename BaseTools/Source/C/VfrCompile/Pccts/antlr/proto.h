@@ -281,7 +281,6 @@ extern Tree *tmake();
 #endif
 
 #ifdef __USE_PROTOS
-extern int STRICMP(const char*, const char*);
 extern void istackreset(void);
 extern int istacksize(void);
 extern void pushint(int);
@@ -562,7 +561,6 @@ extern void DumpInitializers(FILE*, RuleEntry*, char*);              /* MR23 */
 extern int isTermEntryTokClass(TermEntry *);						 /* MR23 */
 extern int isEmptyAlt(Node *, Node *);                               /* MR23 */
 #else
-extern int STRICMP();
 extern void istackreset();
 extern int istacksize();
 extern void pushint();

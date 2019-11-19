@@ -113,7 +113,9 @@
     #endif
   #endif
 
+  #ifndef UINT8_MAX
   #define UINT8_MAX 0xff
+  #endif
 
 #else
   //
