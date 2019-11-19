@@ -1,7 +1,7 @@
 /** @file
   Industry Standard Definitions of SMBIOS Table Specification v3.3.0.
 
-Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015-2017 Hewlett Packard Enterprise Development LP<BR>
 (C) Copyright 2015 - 2019 Hewlett Packard Enterprise Development LP<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -1285,6 +1285,7 @@ typedef enum {
   SlotTypePciExpressMini52pinWithBSKO  = 0x21,      ///< PCI Express Mini 52-pin (CEM spec. 2.0) with bottom-side keep-outs.
   SlotTypePciExpressMini52pinWithoutBSKO = 0x22,    ///< PCI Express Mini 52-pin (CEM spec. 2.0) without bottom-side keep-outs.
   SlotTypePciExpressMini76pin          = 0x23,      ///< PCI Express Mini 76-pin (CEM spec. 2.0) Corresponds to Display-Mini card.
+  SlotTypeCXLFlexbus10                 = 0x30,
   SlotTypePC98C20                      = 0xA0,
   SlotTypePC98C24                      = 0xA1,
   SlotTypePC98E                        = 0xA2,
@@ -1307,7 +1308,13 @@ typedef enum {
   SlotTypePciExpressGen3X2             = 0xB3,
   SlotTypePciExpressGen3X4             = 0xB4,
   SlotTypePciExpressGen3X8             = 0xB5,
-  SlotTypePciExpressGen3X16            = 0xB6
+  SlotTypePciExpressGen3X16            = 0xB6,
+  SlotTypePciExpressGen4               = 0xB8,
+  SlotTypePciExpressGen4X1             = 0xB9,
+  SlotTypePciExpressGen4X2             = 0xBA,
+  SlotTypePciExpressGen4X4             = 0xBB,
+  SlotTypePciExpressGen4X8             = 0xBC,
+  SlotTypePciExpressGen4X16            = 0xBD
 } MISC_SLOT_TYPE;
 
 ///
@@ -1606,7 +1613,8 @@ typedef enum {
   MemoryArrayLocationPc98C20AddonCard      = 0xA0,
   MemoryArrayLocationPc98C24AddonCard      = 0xA1,
   MemoryArrayLocationPc98EAddonCard        = 0xA2,
-  MemoryArrayLocationPc98LocalBusAddonCard = 0xA3
+  MemoryArrayLocationPc98LocalBusAddonCard = 0xA3,
+  MemoryArrayLocationCXLFlexbus10AddonCard = 0xA4
 } MEMORY_ARRAY_LOCATION;
 
 ///
@@ -1673,7 +1681,8 @@ typedef enum {
   MemoryFormFactorRimm                     = 0x0C,
   MemoryFormFactorSodimm                   = 0x0D,
   MemoryFormFactorSrimm                    = 0x0E,
-  MemoryFormFactorFbDimm                   = 0x0F
+  MemoryFormFactorFbDimm                   = 0x0F,
+  MemoryFormFactorDie                      = 0x10
 } MEMORY_FORM_FACTOR;
 
 ///
@@ -1707,7 +1716,9 @@ typedef enum {
   MemoryTypeLpddr2                         = 0x1C,
   MemoryTypeLpddr3                         = 0x1D,
   MemoryTypeLpddr4                         = 0x1E,
-  MemoryTypeLogicalNonVolatileDevice       = 0x1F
+  MemoryTypeLogicalNonVolatileDevice       = 0x1F,
+  MemoryTypeHBM                            = 0x20,
+  MemoryTypeHBM2                           = 0x21
 } MEMORY_DEVICE_TYPE;
 
 ///
@@ -1742,6 +1753,10 @@ typedef enum {
   MemoryTechnologyNvdimmN                   = 0x04,
   MemoryTechnologyNvdimmF                   = 0x05,
   MemoryTechnologyNvdimmP                   = 0x06,
+  //
+  // This definition is updated to represent Intel
+  // Optane DC Presistent Memory in SMBIOS spec 3.3.0
+  //
   MemoryTechnologyIntelPersistentMemory     = 0x07
 } MEMORY_DEVICE_TECHNOLOGY;
 

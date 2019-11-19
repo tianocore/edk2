@@ -1,0 +1,21 @@
+## @file
+# Download GCC ARM compiler from Linaro's release site
+# Set shell variable GCC5_ARM_INSTALL to this folder
+#
+# This is only downloaded when a build activates scope gcc_arm_linux
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+{
+  "scope": "gcc_arm_linux",
+  "type": "web",
+  "name": "gcc_arm_linux",
+  "source": "https://releases.linaro.org/components/toolchain/binaries/7.4-2019.02/arm-linux-gnueabihf/gcc-linaro-7.4.1-2019.02-x86_64_arm-linux-gnueabihf.tar.xz",
+  "version": "7.4.1",
+  "sha256": "3C951CF1941D0FA06D64CC0D5E88612B209D8123B273FA26C16D70BD7BC6B163",
+  "compression_type": "tar",
+  "internal_path": "/gcc-linaro-7.4.1-2019.02-x86_64_arm-linux-gnueabihf/",
+  "flags": ["set_shell_var", ],
+  "var_name": "GCC5_ARM_INSTALL"
+}

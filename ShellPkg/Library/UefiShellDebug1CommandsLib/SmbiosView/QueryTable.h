@@ -2,13 +2,15 @@
   Build a table, each item is (key, info) pair.
   and give a interface of query a string out of a table.
 
-  Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2005 - 2019, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #ifndef _SMBIOS_QUERY_TABLE_H_
 #define _SMBIOS_QUERY_TABLE_H_
+
+#include <IndustryStandard/SmBios.h>
 
 #define QUERY_TABLE_UNFOUND 0xFF
 

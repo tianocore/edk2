@@ -1,0 +1,46 @@
+## @file
+# CI configuration for PcAtChipsetPkg
+#
+# Copyright (c) Microsoft Corporation
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+{
+    "CompilerPlugin": {
+        "DscPath": "PcAtChipsetPkg.dsc"
+    },
+    "CharEncodingCheck": {
+        "IgnoreFiles": []
+    },
+    "DependencyCheck": {
+        "AcceptableDependencies": [
+            "MdePkg/MdePkg.dec",
+            "PcAtChipsetPkg/PcAtChipsetPkg.dec",
+            "UefiCpuPkg/UefiCpuPkg.dec"
+        ],
+        # For host based unit tests
+        "AcceptableDependencies-HOST_APPLICATION":[],
+        # For UEFI shell based apps
+        "AcceptableDependencies-UEFI_APPLICATION":[],
+        "IgnoreInf": []
+    },
+    "DscCompleteCheck": {
+        "DscPath": "PcAtChipsetPkg.dsc",
+        "IgnoreInf": []
+    },
+    "GuidCheck": {
+        "IgnoreGuidName": [],
+        "IgnoreGuidValue": [],
+        "IgnoreFoldersAndFiles": [],
+         "IgnoreDuplicates": []
+    },
+    "LibraryClassCheck": {
+        "IgnoreHeaderFile": []
+    },
+    "SpellCheck": {
+        "ExtendWords": [
+            "ENUMER", # this is part of an IDE enum
+            "PCATCHIPSET",
+            "TXRDY"
+        ]
+    }
+}

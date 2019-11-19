@@ -1,0 +1,223 @@
+# Edk2 Continuous Integration
+
+## Basic Status
+
+| Package             | Windows VS2019 (IA32/X64)| Ubuntu GCC (IA32/X64/ARM/AARCH64) | Known Issues |
+| :----               | :-----                   | :----                             | :---         |
+| ArmPkg              |
+| ArmPlatformPkg      |
+| ArmVirtPkg          |
+| CryptoPkg           | :heavy_check_mark: | :heavy_check_mark: | Spell checking in audit mode
+| DynamicTablesPkg    |
+| EmbeddedPkg         |
+| EmulatorPkg         |
+| FatPkg              | :heavy_check_mark: | :heavy_check_mark: |
+| FmpDevicePkg        | :heavy_check_mark: | :heavy_check_mark: |
+| IntelFsp2Pkg        |
+| IntelFsp2WrapperPkg |
+| MdeModulePkg        | :heavy_check_mark: | :heavy_check_mark: | DxeIpl dependency on ArmPkg, Depends on StandaloneMmPkg, Spell checking in audit mode
+| MdePkg              | :heavy_check_mark: | :heavy_check_mark: | Spell checking in audit mode
+| NetworkPkg          | :heavy_check_mark: | :heavy_check_mark: | Spell checking in audit mode
+| OvmfPkg             |
+| PcAtChipsetPkg      | :heavy_check_mark: | :heavy_check_mark: |
+| SecurityPkg         | :heavy_check_mark: | :heavy_check_mark: | Spell checking in audit mode
+| ShellPkg            | :heavy_check_mark: | :heavy_check_mark: | Spell checking in audit mode, 3 modules are not being built by DSC
+| SignedCapsulePkg    |
+| SourceLevelDebugPkg |
+| StandaloneMmPkg     |
+| UefiCpuPkg          | :heavy_check_mark: | :heavy_check_mark: | Spell checking in audit mode, 2 binary modules not being built by DSC
+| UefiPayloadPkg      |
+
+For more detailed status look at the test results of the latest CI run on the
+repo readme.
+
+## Background
+
+This Continuous integration and testing infrastructure leverages the TianoCore EDKII Tools PIP modules:
+[library](https://pypi.org/project/edk2-pytool-library/) and
+[extensions](https://pypi.org/project/edk2-pytool-extensions/) (with repos
+located [here](https://github.com/tianocore/edk2-pytool-library) and
+[here](https://github.com/tianocore/edk2-pytool-extensions)).
+
+The primary execution flows can be found in the
+`.azurepipelines/Windows-VS2019.yml` and `.azurepipelines/Ubuntu-GCC5.yml`
+files. These YAML files are consumed by the Azure Dev Ops Build Pipeline and
+dictate what server resources should be used, how they should be configured, and
+what processes should be run on them. An overview of this schema can be found
+[here](https://docs.microsoft.com/en-us/azure/devops/pipelines/yaml-schema?view=azure-devops&tabs=schema).
+
+Inspection of these files reveals the EDKII Tools commands that make up the
+primary processes for the CI build: 'stuart_setup', 'stuart_update', and
+'stuart_ci_build'. These commands come from the EDKII Tools PIP modules and are
+configured as described below. More documentation on the tools can be
+found [here](https://github.com/tianocore/edk2-pytool-extensions/blob/master/docs/using.md)
+and [here](https://github.com/tianocore/edk2-pytool-extensions/blob/master/docs/features/feature_invocables.md).
+
+## Configuration
+
+Configuration of the CI process consists of (in order of precedence):
+
+* command-line arguments passed in via the Pipeline YAML
+* a per-package configuration file (e.g. `<package-name>.ci.yaml`) that is
+  detected by the CI system in EDKII Tools.
+* a global configuration Python module (e.g. `CISetting.py`) passed in via the
+  command-line
+
+The global configuration file is described in
+[this readme](https://github.com/tianocore/edk2-pytool-extensions/blob/master/docs/usability/using_settings_manager.md)
+from the EDKII Tools documentation. This configuration is written as a Python
+module so that decisions can be made dynamically based on command line
+parameters and codebase state.
+
+The per-package configuration file can override most settings in the global
+configuration file, but is not dynamic. This file can be used to skip or
+customize tests that may be incompatible with a specific package.  Each test generally requires
+per package configuration which comes from this file.
+
+## Running CI locally
+
+The EDKII Tools environment (and by extension the ci) is designed to support
+easily and consistantly running locally and in a cloud ci environment.  To do
+that a few steps should be followed.  Details of EDKII Tools can be found in the
+[docs folder here](https://github.com/tianocore/edk2-pytool-extensions/tree/master/docs)
+
+### Prerequisets
+
+1. A supported toolchain (others might work but this is what is tested and validated)
+   * Windows 10:
+     * VS 2017 or VS 2019
+     * Windows SDK (for rc)
+     * Windows WDK (for capsules)
+   * Ubuntu 16.04
+     * GCC5
+   * Easy to add more but this is the current state
+2. Python 3.7.x or newer on path
+3. git on path
+4. Recommended to setup and activate a python virtual environment
+5. Install the requirements `pip install --upgrade pip-requirements.txt`
+
+### Running CI
+
+1. clone your edk2 repo
+2. Activate your python virtual environment in cmd window
+3. Get code dependencies (done only when submodules change)
+   * `stuart_setup -c .pytool/CISettings.py TOOL_CHAIN_TAG=<your tag here>`
+4. Update other dependencies (done more often)
+   * `stuart_update -c .pytool/CISettings.py TOOL_CHAIN_TAG=<your tag here>`
+5. Run CI build (--help will give you options)
+   * `stuart_ci_build -c .pytool/CISettings.py TOOL_CHAIN_TAG=<your tag here>`
+   * -p <pkg1,pkg2,pkg3> : To build only certain packages use a CSV list
+   * -a <arch1,arch2,arch3>: To run only certain architectures use a CSV list
+   * -t <target1,target2>: To run only tests related to certain targets use a
+     CSV list
+   * By default all tests are opted in.  Then given a package.ci.yaml file those
+     tests can be configured for a package. Finally setting the check to the
+     value `skip` will skip that plugin.  Examples:
+     * `CompilerPlugin=skip` skip the build test
+     * `GuidCheck=skip` skip the Guid check
+     * `SpellCheck=skip` skip the spell checker
+     * etc
+6. Detailed reports and logs per package are captured in the `Build` directory
+
+## Current PyTool Test Capabilities
+
+All CI tests are instances of EDKII Tools plugins. Documentation on the plugin
+system can be found [here](https://github.com/tianocore/edk2-pytool-extensions/blob/master/docs/usability/using_plugin_manager.md)
+and [here](https://github.com/tianocore/edk2-pytool-extensions/blob/master/docs/features/feature_plugin_manager.md).
+Upon invocation, each plugin will be passed the path to the current package
+under test and a dictionary containing its targeted configuration, as assembled
+from the command line, per-package configuration, and global configuration.
+
+Note: CI plugins are considered unique from build plugins and helper plugins,
+even though some CI plugins may execute steps of a build.
+
+In the example, these plugins live alongside the code under test (in the
+`.pytool/Plugin` directory), but may be moved to the 'edk2-test' repo if that
+location makes more sense for the community.
+
+### Module Inclusion Test - DscCompleteCheck
+
+This test scans all available modules (via INF files) and compares them to the
+package-level DSC file for the package each module is contained within. The test
+considers it an error if any module does not appear in the `Components` section
+of at least one package-level DSC (indicating that it would not be built if the
+package were built).
+
+### Code Compilation Test - CompilerPlugin
+
+Once the Module Inclusion Test has verified that all modules would be built if
+all package-level DSCs were built, the Code Compilation Test simply runs through
+and builds every package-level DSC on every toolchain and for every architecture
+that is supported. Any module that fails to build is considered an error.
+
+### GUID Uniqueness Test - GuidCheck
+
+This test works on the collection of all packages rather than an individual
+package. It looks at all FILE_GUIDs and GUIDs declared in DEC files and ensures
+that they are unique for the codebase. This prevents, for example, accidental
+duplication of GUIDs when using an existing INF as a template for a new module.
+
+### Cross-Package Dependency Test - DependencyCheck
+
+This test compares the list of all packages used in INFs files for a given
+package against a list of "allowed dependencies" in plugin configuration for
+that package. Any module that depends on a disallowed package will cause a test
+failure.
+
+### Library Declaration Test - LibraryClassCheck
+
+This test scans at all library header files found in the `Library` folders in
+all of the package's declared include directories and ensures that all files
+have a matching LibraryClass declaration in the DEC file for the package. Any
+missing declarations will cause a failure.
+
+### Invalid Character Test - CharEncodingCheck
+
+This test scans all files in a package to make sure that there are no invalid
+Unicode characters that may cause build errors in some character
+sets/localizations.
+
+### Spell Checking - cspell
+
+This test runs a spell checker on all files within the package.  This is done
+using the NodeJs cspell tool.  For details check `.pytool/Plugin/SpellCheck`.
+For this plugin to run during ci you must install nodejs and cspell and have
+both available to the command line when running your CI.
+
+Install
+
+* Install nodejs from https://nodejs.org/en/
+* Install cspell
+  1. Open cmd prompt with access to node and npm
+  2. Run `npm install -g cspell`
+
+  More cspell info: https://github.com/streetsidesoftware/cspell
+
+## PyTool Scopes
+
+Scopes are how the PyTool ext_dep, path_env, and plugins are activated.  Meaning
+that if an invocable process has a scope active then those ext_dep and path_env
+will be active. To allow easy integration of PyTools capabilities there are a
+few standard scopes.
+
+| Scope      | Invocable                                            | Description    |
+| :----      | :-----                                               | :----          |
+| global     | edk2_invocable++ - should be base_abstract_invocable | Running an invocables |
+| global-win | edk2_invocable++                                     | Running on Microsoft Windows |
+| global-nix | edk2_invocable++                                     | Running on Linux based OS    |
+| edk2-build |                                                      | This indicates that an invocable is building EDK2 based UEFI code |
+| cibuild    | set in .pytool/CISettings.py                         | Suggested target for edk2 continuous integration builds.  Tools used for CiBuilds can use this scope.  Example: asl compiler |
+
+## Future investments
+
+* PatchCheck tests as plugins
+* MacOS/xcode support
+* Clang/LLVM support
+* Visual Studio AARCH64 and ARM support
+* BaseTools C tools CI/PR and binary release process
+* BaseTools Python tools CI/PR process
+* Host based unit testing
+* Extensible private/closed source platform reporting
+* Platform builds, validation
+* UEFI SCTs
+* Other automation

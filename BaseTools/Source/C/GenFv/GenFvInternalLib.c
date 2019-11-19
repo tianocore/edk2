@@ -791,6 +791,7 @@ Returns:
   FILE                                *PeMapFile;
   CHAR8                               Line [MAX_LINE_LEN];
   CHAR8                               KeyWord [MAX_LINE_LEN];
+  CHAR8                               KeyWord2 [MAX_LINE_LEN];
   CHAR8                               FunctionName [MAX_LINE_LEN];
   EFI_PHYSICAL_ADDRESS                FunctionAddress;
   UINT32                              FunctionType;
@@ -805,6 +806,7 @@ Returns:
   UINT32                              TextVirtualAddress;
   UINT32                              DataVirtualAddress;
   EFI_PHYSICAL_ADDRESS                LinkTimeBaseAddress;
+  BOOLEAN                             IsUseClang;
 
   //
   // Init local variable
@@ -932,6 +934,7 @@ Returns:
   // Output Functions information into Fv Map file
   //
   LinkTimeBaseAddress = 0;
+  IsUseClang = FALSE;
   while (fgets (Line, MAX_LINE_LEN, PeMapFile) != NULL) {
     //
     // Skip blank line
@@ -946,6 +949,12 @@ Returns:
     if (FunctionType == 0) {
       sscanf (Line, "%s", KeyWord);
       if (stricmp (KeyWord, "Address") == 0) {
+        sscanf (Line, "%s %s", KeyWord, KeyWord2);
+        if (stricmp (KeyWord2, "Size") == 0) {
+          IsUseClang = TRUE;
+          FunctionType = 1;
+          continue;
+        }
         //
         // function list
         //
@@ -967,11 +976,20 @@ Returns:
     // Printf Function Information
     //
     if (FunctionType == 1) {
-      sscanf (Line, "%s %s %llx %s", KeyWord, FunctionName, &TempLongAddress, FunctionTypeName);
-      FunctionAddress = (UINT64) TempLongAddress;
-      if (FunctionTypeName [1] == '\0' && (FunctionTypeName [0] == 'f' || FunctionTypeName [0] == 'F')) {
-        fprintf (FvMapFile, "  0x%010llx    ", (unsigned long long) (ImageBaseAddress + FunctionAddress - LinkTimeBaseAddress));
-        fprintf (FvMapFile, "%s\n", FunctionName);
+      if (IsUseClang) {
+        sscanf (Line, "%llx %s %s %s", &TempLongAddress, KeyWord, KeyWord2, FunctionTypeName);
+        FunctionAddress = (UINT64) TempLongAddress;
+        if (FunctionTypeName [0] == '_' ) {
+          fprintf (FvMapFile, "  0x%010llx    ", (unsigned long long) (ImageBaseAddress + FunctionAddress - LinkTimeBaseAddress));
+          fprintf (FvMapFile, "%s\n", FunctionTypeName);
+        }
+      } else {
+        sscanf (Line, "%s %s %llx %s", KeyWord, FunctionName, &TempLongAddress, FunctionTypeName);
+        FunctionAddress = (UINT64) TempLongAddress;
+        if (FunctionTypeName [1] == '\0' && (FunctionTypeName [0] == 'f' || FunctionTypeName [0] == 'F')) {
+          fprintf (FvMapFile, "  0x%010llx    ", (unsigned long long) (ImageBaseAddress + FunctionAddress - LinkTimeBaseAddress));
+          fprintf (FvMapFile, "%s\n", FunctionName);
+        }
       }
     } else if (FunctionType == 2) {
       sscanf (Line, "%s %s %llx %s", KeyWord, FunctionName, &TempLongAddress, FunctionTypeName);

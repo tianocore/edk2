@@ -1094,6 +1094,11 @@ DisableNullDetectionAtTheEndOfDxe (
             );
   ASSERT_EFI_ERROR (Status);
 
+  //
+  // Page 0 might have be allocated to avoid misuses. Free it here anyway.
+  //
+  CoreFreePages (0, 1);
+
   CoreCloseEvent (Event);
   DEBUG ((DEBUG_INFO, "DisableNullDetectionAtTheEndOfDxe(): end\r\n"));
 

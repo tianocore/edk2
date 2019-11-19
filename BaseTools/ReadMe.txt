@@ -44,4 +44,75 @@ Please copy it manually from <PythonHome>\DLLs.
 The Python distributed with most recent Linux will have sqlite3 module
 built in. If not, please install sqlit3 package separately.
 
-26-OCT-2011
+=== CMake Project Generation ===
+Create a build folder, and invoke CMake selecting your prefered project
+type.
+
+Examples:
+
+On Windows:
+cd %WORKSPACE%\BaseTools
+mkdir build && cd build
+
+REM VS Enviromental Variables
+cmake ..
+cmake --build . --target INSTALL --config MinSizeRel
+cmake --build . --target CHECK --config MinSizeRel
+* installs to BaseTools/Bin/Windows-x64/
+
+REM Force Win32
+cmake .. -G"Visual Studio 16 2019" -AWin32
+cmake --build . --target INSTALL --config MinSizeRel
+cmake --build . --target CHECK --config MinSizeRel
+* installs to BaseTools/Bin/Windows-Win32/
+
+REM Force ARM64
+cmake .. -G"Visual Studio 16 2019" -AARM64
+
+
+Supported Visual Studio Generators
+* Visual Studio 16 2019        = Generates Visual Studio 2019 project files.
+                                 Use -A option to specify architecture.
+  Visual Studio 15 2017 [arch] = Generates Visual Studio 2017 project files.
+                                 Optional [arch] can be "Win64" or "ARM".
+  Visual Studio 14 2015 [arch] = Generates Visual Studio 2015 project files.
+                                 Optional [arch] can be "Win64" or "ARM".
+  Visual Studio 12 2013 [arch] = Generates Visual Studio 2013 project files.
+                                 Optional [arch] can be "Win64" or "ARM".
+  Visual Studio 11 2012 [arch] = Generates Visual Studio 2012 project files.
+                                 Optional [arch] can be "Win64" or "ARM".
+  Visual Studio 10 2010 [arch] = Generates Visual Studio 2010 project files.
+                                 Optional [arch] can be "Win64" or "IA64".
+  Visual Studio 9 2008 [arch]  = Generates Visual Studio 2008 project files.
+                                 Optional [arch] can be "Win64" or "IA64".
+
+On Darwin
+cd $WORKSPACE/BaseTools
+mkdir build && cd build
+cmake ..
+make install
+make check
+
+
+On Linux
+
+cd $WORKSPACE/BaseTools
+mkdir build && cd build
+cmake ..
+make install -j32
+make check
+
+cd $WORKSPACE/BaseTools
+mkdir build && cd build
+CXX=/usr/bin/clang++ CC=/usr/bin/clang cmake ..
+make install -j32
+make check
+
+cd $WORKSPACE/BaseTools
+mkdir build && cd build
+cmake .. -GNinja
+autoninja install
+ninja check
+
+
+17-NOV-2019

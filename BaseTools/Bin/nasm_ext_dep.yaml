@@ -1,0 +1,18 @@
+## @file
+# Download nasm x86 assembler executable tool from a nuget.org package
+# - package contains different binaries based on host
+# Put on the tool on the path
+#
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+{
+  "id": "nasm-1",
+  "scope": "edk2-build",
+  "type": "nuget",
+  "name": "mu_nasm",
+  "source": "https://api.nuget.org/v3/index.json",
+  "version": "2.14.02",
+  "flags": ["set_path", "host_specific"]
+}
