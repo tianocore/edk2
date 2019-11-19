@@ -1532,8 +1532,6 @@ BuildAdmaDescTable (
       PciIo,
       Trb->AdmaMap
     );
-    Trb->AdmaMap = NULL;
-
     PciIo->FreeBuffer (
       PciIo,
       EFI_SIZE_TO_PAGES (TableSize),
@@ -1742,6 +1740,7 @@ SdMmcCreateTrb (
       }
       Status = BuildAdmaDescTable (Trb, Private->ControllerVersion[Slot]);
       if (EFI_ERROR (Status)) {
+        PciIo->Unmap (PciIo, Trb->DataMap);
         goto Error;
       }
     } else if (Private->Capability[Slot].Sdma != 0) {
