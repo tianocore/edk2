@@ -240,6 +240,15 @@ SmxInitialize (
     Status = RETURN_UNSUPPORTED;
   }
 
+  CPU_REGISTER_TABLE_WRITE_FIELD (
+    ProcessorNumber,
+    ControlRegister,
+    4,
+    IA32_CR4,
+    Bits.SMXE,
+    (State) ? 1 : 0
+  )
+
   CPU_REGISTER_TABLE_TEST_THEN_WRITE_FIELD (
     ProcessorNumber,
     Msr,
