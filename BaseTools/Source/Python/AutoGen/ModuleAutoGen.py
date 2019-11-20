@@ -1129,7 +1129,30 @@ class ModuleAutoGen(AutoGen):
             for Inc in IncludesList:
                 if Inc not in RetVal:
                     RetVal.append(str(Inc))
+        RetVal.extend(self.IncPathFromBuildOptions)
         return RetVal
+
+    @cached_property
+    def IncPathFromBuildOptions(self):
+        IncPathList = []
+        for tool in self.BuildOption:
+            if 'FLAGS' in self.BuildOption[tool]:
+                flags = self.BuildOption[tool]['FLAGS']
+                whitespace = False
+                for flag in flags.split(" "):
+                    flag = flag.strip()
+                    if flag.startswith(("/I","-I")):
+                        if len(flag)>2:
+                            if os.path.exists(flag[2:]):
+                                IncPathList.append(flag[2:])
+                        else:
+                            whitespace = True
+                            continue
+                    if whitespace and flag:
+                        if os.path.exists(flag):
+                            IncPathList.append(flag)
+                            whitespace = False
+        return IncPathList
 
     @cached_property
     def IncludePathLength(self):
