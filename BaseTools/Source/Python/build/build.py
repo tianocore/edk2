@@ -57,7 +57,7 @@ from multiprocessing import Manager
 from AutoGen.DataPipe import MemoryDataPipe
 from AutoGen.ModuleAutoGenHelper import WorkSpaceInfo, PlatformInfo
 from GenFds.FdfParser import FdfParser
-
+from AutoGen.IncludesAutoGen import IncludesAutoGen
 
 ## standard targets of build command
 gSupportedTarget = ['all', 'genc', 'genmake', 'modules', 'libraries', 'fds', 'clean', 'cleanall', 'cleanlib', 'run']
@@ -175,17 +175,30 @@ def NormFile(FilePath, Workspace):
 # @param  To        The stream message put on
 # @param  ExitFlag  The flag used to indicate stopping reading
 #
-def ReadMessage(From, To, ExitFlag):
+def ReadMessage(From, To, ExitFlag,MemTo=None):
     while True:
         # read one line a time
         Line = From.readline()
         # empty string means "end"
         if Line is not None and Line != b"":
-            To(Line.rstrip().decode(encoding='utf-8', errors='ignore'))
+            LineStr = Line.rstrip().decode(encoding='utf-8', errors='ignore')
+            if MemTo is not None:
+                if "Note: including file:" ==  LineStr.lstrip()[:21]:
+                    MemTo.append(LineStr)
+                else:
+                    To(LineStr)
+                    MemTo.append(LineStr)
+            else:
+                To(LineStr)
         else:
             break
         if ExitFlag.isSet():
             break
+
+class MakeSubProc(Popen):
+    def __init__(self,*args, **argv):
+        super(MakeSubProc,self).__init__(*args, **argv)
+        self.ProcOut = []
 
 ## Launch an external program
 #
@@ -197,7 +210,7 @@ def ReadMessage(From, To, ExitFlag):
 # @param  Command               A list or string containing the call of the program
 # @param  WorkingDir            The directory in which the program will be running
 #
-def LaunchCommand(Command, WorkingDir):
+def LaunchCommand(Command, WorkingDir,ModuleAuto = None):
     BeginTime = time.time()
     # if working directory doesn't exist, Popen() will raise an exception
     if not os.path.isdir(WorkingDir):
@@ -216,19 +229,19 @@ def LaunchCommand(Command, WorkingDir):
     EndOfProcedure = None
     try:
         # launch the command
-        Proc = Popen(Command, stdout=PIPE, stderr=PIPE, env=os.environ, cwd=WorkingDir, bufsize=-1, shell=True)
+        Proc = MakeSubProc(Command, stdout=PIPE, stderr=PIPE, env=os.environ, cwd=WorkingDir, bufsize=-1, shell=True)
 
         # launch two threads to read the STDOUT and STDERR
         EndOfProcedure = Event()
         EndOfProcedure.clear()
         if Proc.stdout:
-            StdOutThread = Thread(target=ReadMessage, args=(Proc.stdout, EdkLogger.info, EndOfProcedure))
+            StdOutThread = Thread(target=ReadMessage, args=(Proc.stdout, EdkLogger.info, EndOfProcedure,Proc.ProcOut))
             StdOutThread.setName("STDOUT-Redirector")
             StdOutThread.setDaemon(False)
             StdOutThread.start()
 
         if Proc.stderr:
-            StdErrThread = Thread(target=ReadMessage, args=(Proc.stderr, EdkLogger.quiet, EndOfProcedure))
+            StdErrThread = Thread(target=ReadMessage, args=(Proc.stderr, EdkLogger.quiet, EndOfProcedure,Proc.ProcOut))
             StdErrThread.setName("STDERR-Redirector")
             StdErrThread.setDaemon(False)
             StdErrThread.start()
@@ -263,6 +276,15 @@ def LaunchCommand(Command, WorkingDir):
             EdkLogger.info(RespContent)
 
         EdkLogger.error("build", COMMAND_FAILURE, ExtraData="%s [%s]" % (Command, WorkingDir))
+    if ModuleAuto:
+        iau = IncludesAutoGen(WorkingDir,ModuleAuto)
+        if ModuleAuto.ToolChainFamily == TAB_COMPILER_MSFT:
+            iau.CreateDepsFileForMsvc(Proc.ProcOut)
+        else:
+            iau.UpdateDepsFileforNonMsvc()
+        iau.UpdateDepsFileforTrim()
+        iau.CreateModuleDeps()
+        iau.CreateDepsInclude()
     return "%dms" % (int(round((time.time() - BeginTime) * 1000)))
 
 ## The smallest unit that can be built in multi-thread build mode
@@ -608,7 +630,7 @@ class BuildTask:
     #
     def _CommandThread(self, Command, WorkingDir):
         try:
-            self.BuildItem.BuildObject.BuildTime = LaunchCommand(Command, WorkingDir)
+            self.BuildItem.BuildObject.BuildTime = LaunchCommand(Command, WorkingDir,self.BuildItem.BuildObject)
             self.CompleteFlag = True
 
             # Run hash operation post dependency, to account for libs
@@ -1276,19 +1298,32 @@ class Build():
 
         # build library
         if Target == 'libraries':
-            for Lib in AutoGenObject.LibraryBuildDirectoryList:
+            DirList = []
+            for Lib in AutoGenObject.LibraryAutoGenList:
+                if not Lib.IsBinaryModule:
+                    DirList.append((os.path.join(AutoGenObject.BuildDir, Lib.BuildDir),Lib))
+            for Lib, LibAutoGen in DirList:
                 NewBuildCommand = BuildCommand + ['-f', os.path.normpath(os.path.join(Lib, makefile)), 'pbuild']
-                LaunchCommand(NewBuildCommand, AutoGenObject.MakeFileDir)
+                LaunchCommand(NewBuildCommand, AutoGenObject.MakeFileDir,LibAutoGen)
             return True
 
         # build module
         if Target == 'modules':
-            for Lib in AutoGenObject.LibraryBuildDirectoryList:
+            DirList = []
+            for Lib in AutoGenObject.LibraryAutoGenList:
+                if not Lib.IsBinaryModule:
+                    DirList.append((os.path.join(AutoGenObject.BuildDir, Lib.BuildDir),Lib))
+            for Lib, LibAutoGen in DirList:
                 NewBuildCommand = BuildCommand + ['-f', os.path.normpath(os.path.join(Lib, makefile)), 'pbuild']
-                LaunchCommand(NewBuildCommand, AutoGenObject.MakeFileDir)
-            for Mod in AutoGenObject.ModuleBuildDirectoryList:
+                LaunchCommand(NewBuildCommand, AutoGenObject.MakeFileDir,LibAutoGen)
+
+            DirList = []
+            for ModuleAutoGen in AutoGenObject.ModuleAutoGenList:
+                if not ModuleAutoGen.IsBinaryModule:
+                    DirList.append((os.path.join(AutoGenObject.BuildDir, ModuleAutoGen.BuildDir),ModuleAutoGen))
+            for Mod,ModAutoGen in DirList:
                 NewBuildCommand = BuildCommand + ['-f', os.path.normpath(os.path.join(Mod, makefile)), 'pbuild']
-                LaunchCommand(NewBuildCommand, AutoGenObject.MakeFileDir)
+                LaunchCommand(NewBuildCommand, AutoGenObject.MakeFileDir,ModAutoGen)
             self.CreateAsBuiltInf()
             if GlobalData.gBinCacheDest:
                 self.UpdateBuildCache()
