@@ -1,7 +1,7 @@
 /** @file
   X.509 Certificate Handler Wrapper Implementation over OpenSSL.
 
-Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2020, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -60,23 +60,26 @@ X509ConstructCertificate (
   Construct a X509 stack object from a list of DER-encoded certificate data.
 
   If X509Stack is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
 
   @param[in, out]  X509Stack  On input, pointer to an existing or NULL X509 stack object.
                               On output, pointer to the X509 stack object with new
                               inserted X509 certificate.
-  @param           ...        A list of DER-encoded single certificate data followed
+  @param[in]       Args       VA_LIST marker for the variable argument list.
+                              A list of DER-encoded single certificate data followed
                               by certificate size. A NULL terminates the list. The
                               pairs are the arguments to X509ConstructCertificate().
 
   @retval     TRUE            The X509 stack construction succeeded.
   @retval     FALSE           The construction operation failed.
+  @retval     FALSE           This interface is not supported.
 
 **/
 BOOLEAN
 EFIAPI
-X509ConstructCertificateStack (
-  IN OUT  UINT8  **X509Stack,
-  ...
+X509ConstructCertificateStackV (
+  IN OUT  UINT8    **X509Stack,
+  IN      VA_LIST  Args
   )
 {
   UINT8           *Cert;
@@ -84,7 +87,6 @@ X509ConstructCertificateStack (
   X509            *X509Cert;
   STACK_OF(X509)  *CertStack;
   BOOLEAN         Status;
-  VA_LIST         Args;
   UINTN           Index;
 
   //
@@ -106,8 +108,6 @@ X509ConstructCertificateStack (
       return Status;
     }
   }
-
-  VA_START (Args, X509Stack);
 
   for (Index = 0; ; Index++) {
     //
@@ -145,8 +145,6 @@ X509ConstructCertificateStack (
     sk_X509_push (CertStack, X509Cert);
   }
 
-  VA_END (Args);
-
   if (!Status) {
     sk_X509_pop_free (CertStack, X509_free);
   } else {
@@ -154,6 +152,38 @@ X509ConstructCertificateStack (
   }
 
   return Status;
+}
+
+/**
+  Construct a X509 stack object from a list of DER-encoded certificate data.
+
+  If X509Stack is NULL, then return FALSE.
+
+  @param[in, out]  X509Stack  On input, pointer to an existing or NULL X509 stack object.
+                              On output, pointer to the X509 stack object with new
+                              inserted X509 certificate.
+  @param           ...        A list of DER-encoded single certificate data followed
+                              by certificate size. A NULL terminates the list. The
+                              pairs are the arguments to X509ConstructCertificate().
+
+  @retval     TRUE            The X509 stack construction succeeded.
+  @retval     FALSE           The construction operation failed.
+
+**/
+BOOLEAN
+EFIAPI
+X509ConstructCertificateStack (
+  IN OUT  UINT8  **X509Stack,
+  ...
+  )
+{
+  VA_LIST  Args;
+  BOOLEAN  Result;
+
+  VA_START (Args, X509Stack);
+  Result = X509ConstructCertificateStackV (X509Stack, Args);
+  VA_END (Args);
+  return Result;
 }
 
 /**

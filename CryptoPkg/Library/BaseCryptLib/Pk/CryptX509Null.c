@@ -2,7 +2,7 @@
   X.509 Certificate Handler Wrapper Implementation which does not provide
   real capabilities.
 
-Copyright (c) 2012 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2012 - 2020, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -27,6 +27,36 @@ X509ConstructCertificate (
   IN   CONST UINT8  *Cert,
   IN   UINTN        CertSize,
   OUT  UINT8        **SingleX509Cert
+  )
+{
+  ASSERT (FALSE);
+  return FALSE;
+}
+
+/**
+  Construct a X509 stack object from a list of DER-encoded certificate data.
+
+  If X509Stack is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[in, out]  X509Stack  On input, pointer to an existing or NULL X509 stack object.
+                              On output, pointer to the X509 stack object with new
+                              inserted X509 certificate.
+  @param[in]       Args       VA_LIST marker for the variable argument list.
+                              A list of DER-encoded single certificate data followed
+                              by certificate size. A NULL terminates the list. The
+                              pairs are the arguments to X509ConstructCertificate().
+
+  @retval     TRUE            The X509 stack construction succeeded.
+  @retval     FALSE           The construction operation failed.
+  @retval     FALSE           This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+X509ConstructCertificateStackV (
+  IN OUT  UINT8    **X509Stack,
+  IN      VA_LIST  Args
   )
 {
   ASSERT (FALSE);
