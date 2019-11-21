@@ -1,0 +1,49 @@
+## @file
+#  Produces the EDK II Crypto Protocol using the library services from
+#  BaseCryptLib and TlsLib.  PcdCryptoServiceFamilyEnable is used to enable the
+#  subset of available services.
+#
+#  Copyright (C) Microsoft Corporation. All rights reserved.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  PI_SPECIFICATION_VERSION       = 0x0001000A
+  BASE_NAME                      = CryptoDxe
+  MODULE_UNI_FILE                = Crypto.uni
+  FILE_GUID                      = FEA01457-E381-4135-9475-C6AFD0076C61
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = CryptoDxeEntry
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64
+#
+
+[Sources]
+  Crypto.c
+  CryptoDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  CryptoPkg/CryptoPkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  DebugLib
+  BaseCryptLib
+  TlsLib
+
+[Protocols]
+  gEdkiiCryptoProtocolGuid  ## PRODUCES
+
+[Pcd]
+  gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable  #CONSUMES
+
+[Depex]
+  TRUE
