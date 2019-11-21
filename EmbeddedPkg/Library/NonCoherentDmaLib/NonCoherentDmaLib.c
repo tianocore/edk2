@@ -40,6 +40,8 @@ typedef struct {
 STATIC EFI_CPU_ARCH_PROTOCOL      *mCpu;
 STATIC LIST_ENTRY                 UncachedAllocationList;
 
+STATIC PHYSICAL_ADDRESS           mDmaHostAddressLimit;
+
 STATIC
 PHYSICAL_ADDRESS
 HostToDeviceAddress (
@@ -47,6 +49,102 @@ HostToDeviceAddress (
   )
 {
   return (PHYSICAL_ADDRESS)(UINTN)Address + PcdGet64 (PcdDmaDeviceOffset);
+}
+
+/**
+  Allocates one or more 4KB pages of a certain memory type at a specified
+  alignment.
+
+  Allocates the number of 4KB pages specified by Pages of a certain memory type
+  with an alignment specified by Alignment. The allocated buffer is returned.
+  If Pages is 0, then NULL is returned. If there is not enough memory at the
+  specified alignment remaining to satisfy the request, then NULL is returned.
+  If Alignment is not a power of two and Alignment is not zero, then ASSERT().
+  If Pages plus EFI_SIZE_TO_PAGES (Alignment) overflows, then ASSERT().
+
+  @param  MemoryType            The type of memory to allocate.
+  @param  Pages                 The number of 4 KB pages to allocate.
+  @param  Alignment             The requested alignment of the allocation.
+                                Must be a power of two.
+                                If Alignment is zero, then byte alignment is
+                                used.
+
+  @return A pointer to the allocated buffer or NULL if allocation fails.
+
+**/
+STATIC
+VOID *
+InternalAllocateAlignedPages (
+  IN EFI_MEMORY_TYPE  MemoryType,
+  IN UINTN            Pages,
+  IN UINTN            Alignment
+  )
+{
+  EFI_STATUS            Status;
+  EFI_PHYSICAL_ADDRESS  Memory;
+  UINTN                 AlignedMemory;
+  UINTN                 AlignmentMask;
+  UINTN                 UnalignedPages;
+  UINTN                 RealPages;
+
+  //
+  // Alignment must be a power of two or zero.
+  //
+  ASSERT ((Alignment & (Alignment - 1)) == 0);
+
+  if (Pages == 0) {
+    return NULL;
+  }
+  if (Alignment > EFI_PAGE_SIZE) {
+    //
+    // Calculate the total number of pages since alignment is larger than page
+    // size.
+    //
+    AlignmentMask  = Alignment - 1;
+    RealPages      = Pages + EFI_SIZE_TO_PAGES (Alignment);
+    //
+    // Make sure that Pages plus EFI_SIZE_TO_PAGES (Alignment) does not
+    // overflow.
+    //
+    ASSERT (RealPages > Pages);
+
+    Memory = mDmaHostAddressLimit;
+    Status = gBS->AllocatePages (AllocateMaxAddress, MemoryType, RealPages,
+                    &Memory);
+    if (EFI_ERROR (Status)) {
+      return NULL;
+    }
+    AlignedMemory  = ((UINTN)Memory + AlignmentMask) & ~AlignmentMask;
+    UnalignedPages = EFI_SIZE_TO_PAGES (AlignedMemory - (UINTN)Memory);
+    if (UnalignedPages > 0) {
+      //
+      // Free first unaligned page(s).
+      //
+      Status = gBS->FreePages (Memory, UnalignedPages);
+      ASSERT_EFI_ERROR (Status);
+    }
+    Memory         = AlignedMemory + EFI_PAGES_TO_SIZE (Pages);
+    UnalignedPages = RealPages - Pages - UnalignedPages;
+    if (UnalignedPages > 0) {
+      //
+      // Free last unaligned page(s).
+      //
+      Status = gBS->FreePages (Memory, UnalignedPages);
+      ASSERT_EFI_ERROR (Status);
+    }
+  } else {
+    //
+    // Do not over-allocate pages in this case.
+    //
+    Memory = mDmaHostAddressLimit;
+    Status = gBS->AllocatePages (AllocateMaxAddress, MemoryType, Pages,
+                    &Memory);
+    if (EFI_ERROR (Status)) {
+      return NULL;
+    }
+    AlignedMemory = (UINTN)Memory;
+  }
+  return (VOID *)AlignedMemory;
 }
 
 /**
@@ -111,7 +209,30 @@ DmaMap (
     return  EFI_OUT_OF_RESOURCES;
   }
 
-  if (Operation != MapOperationBusMasterRead &&
+  if (((UINTN)HostAddress + *NumberOfBytes) > mDmaHostAddressLimit) {
+
+    if (Operation == MapOperationBusMasterCommonBuffer) {
+      goto CommonBufferError;
+    }
+
+    AllocSize = ALIGN_VALUE (*NumberOfBytes, mCpu->DmaBufferAlignment);
+    Map->BufferAddress = InternalAllocateAlignedPages (EfiBootServicesData,
+                           EFI_SIZE_TO_PAGES (AllocSize),
+                           mCpu->DmaBufferAlignment);
+    if (Map->BufferAddress == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto FreeMapInfo;
+    }
+
+    if (Map->Operation == MapOperationBusMasterRead) {
+      CopyMem (Map->BufferAddress, (VOID *)(UINTN)Map->HostAddress,
+        *NumberOfBytes);
+    }
+    mCpu->FlushDataCache (mCpu, (UINTN)Map->BufferAddress, AllocSize,
+            EfiCpuFlushTypeWriteBack);
+
+    *DeviceAddress = HostToDeviceAddress (Map->BufferAddress);
+  } else if (Operation != MapOperationBusMasterRead &&
       ((((UINTN)HostAddress & (mCpu->DmaBufferAlignment - 1)) != 0) ||
        ((*NumberOfBytes & (mCpu->DmaBufferAlignment - 1)) != 0))) {
 
@@ -128,12 +249,7 @@ DmaMap (
       // on uncached buffers.
       //
       if (Operation == MapOperationBusMasterCommonBuffer) {
-        DEBUG ((DEBUG_ERROR,
-          "%a: Operation type 'MapOperationBusMasterCommonBuffer' is only "
-          "supported\non memory regions that were allocated using "
-          "DmaAllocateBuffer ()\n", __FUNCTION__));
-        Status = EFI_UNSUPPORTED;
-        goto FreeMapInfo;
+        goto CommonBufferError;
       }
 
       //
@@ -199,6 +315,12 @@ DmaMap (
 
   return EFI_SUCCESS;
 
+CommonBufferError:
+  DEBUG ((DEBUG_ERROR,
+    "%a: Operation type 'MapOperationBusMasterCommonBuffer' is only "
+    "supported\non memory regions that were allocated using "
+    "DmaAllocateBuffer ()\n", __FUNCTION__));
+  Status = EFI_UNSUPPORTED;
 FreeMapInfo:
   FreePool (Map);
 
@@ -229,6 +351,7 @@ DmaUnmap (
   MAP_INFO_INSTANCE *Map;
   EFI_STATUS        Status;
   VOID              *Buffer;
+  UINTN             AllocSize;
 
   if (Mapping == NULL) {
     ASSERT (FALSE);
@@ -238,7 +361,17 @@ DmaUnmap (
   Map = (MAP_INFO_INSTANCE *)Mapping;
 
   Status = EFI_SUCCESS;
-  if (Map->DoubleBuffer) {
+  if (((UINTN)Map->HostAddress + Map->NumberOfBytes) > mDmaHostAddressLimit) {
+    AllocSize = ALIGN_VALUE (Map->NumberOfBytes, mCpu->DmaBufferAlignment);
+    if (Map->Operation == MapOperationBusMasterWrite) {
+      mCpu->FlushDataCache (mCpu, (UINTN)Map->BufferAddress, AllocSize,
+              EfiCpuFlushTypeInvalidate);
+      CopyMem ((VOID *)(UINTN)Map->HostAddress, Map->BufferAddress,
+        Map->NumberOfBytes);
+    }
+    FreePages (Map->BufferAddress, EFI_SIZE_TO_PAGES (AllocSize));
+  } else if (Map->DoubleBuffer) {
+
     ASSERT (Map->Operation == MapOperationBusMasterWrite);
 
     if (Map->Operation != MapOperationBusMasterWrite) {
@@ -335,10 +468,9 @@ DmaAllocateAlignedBuffer (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (MemoryType == EfiBootServicesData) {
-    Allocation = AllocateAlignedPages (Pages, Alignment);
-  } else if (MemoryType == EfiRuntimeServicesData) {
-    Allocation = AllocateAlignedRuntimePages (Pages, Alignment);
+  if (MemoryType == EfiBootServicesData ||
+      MemoryType == EfiRuntimeServicesData) {
+    Allocation = InternalAllocateAlignedPages (MemoryType, Pages, Alignment);
   } else {
     return EFI_INVALID_PARAMETER;
   }
@@ -478,6 +610,15 @@ NonCoherentDmaLibConstructor (
   )
 {
   InitializeListHead (&UncachedAllocationList);
+
+  //
+  // Ensure that the combination of DMA addressing offset and limit produces
+  // a sane value.
+  //
+  ASSERT (PcdGet64 (PcdDmaDeviceLimit) > PcdGet64 (PcdDmaDeviceOffset));
+
+  mDmaHostAddressLimit = PcdGet64 (PcdDmaDeviceLimit) -
+                         PcdGet64 (PcdDmaDeviceOffset);
 
   // Get the Cpu protocol for later use
   return gBS->LocateProtocol (&gEfiCpuArchProtocolGuid, NULL, (VOID **)&mCpu);
