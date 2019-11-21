@@ -13,12 +13,12 @@ EFI_PEI_NOTIFY_DESCRIPTOR mNotifyOnFvInfoList[] = {
   {
     EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK,
     &gEfiPeiFirmwareVolumeInfoPpiGuid,
-    FirmwareVolmeInfoPpiNotifyCallback
+    FirmwareVolumeInfoPpiNotifyCallback
   },
   {
     (EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
     &gEfiPeiFirmwareVolumeInfo2PpiGuid,
-    FirmwareVolmeInfoPpiNotifyCallback
+    FirmwareVolumeInfoPpiNotifyCallback
   }
 };
 
@@ -447,7 +447,7 @@ FindFileEx (
 }
 
 /**
-  Initialize PeiCore Fv List.
+  Initialize PeiCore FV List.
 
   @param PrivateData     - Pointer to PEI_CORE_INSTANCE.
   @param SecCoreData     - Pointer to EFI_SEC_PEI_HAND_OFF.
@@ -520,7 +520,7 @@ PeiInitializeFv (
 
   //
   // Post a call-back for the FvInfoPPI and FvInfo2PPI services to expose
-  // additional Fvs to PeiCore.
+  // additional FVs to PeiCore.
   //
   Status = PeiServicesNotifyPpi (mNotifyOnFvInfoList);
   ASSERT_EFI_ERROR (Status);
@@ -528,7 +528,7 @@ PeiInitializeFv (
 }
 
 /**
-  Process Firmware Volum Information once FvInfoPPI or FvInfo2PPI install.
+  Process Firmware Volume Information once FvInfoPPI or FvInfo2PPI install.
   The FV Info will be registered into PeiCore private data structure.
   And search the inside FV image, if found, the new FV INFO(2) PPI will be installed.
 
@@ -537,12 +537,12 @@ PeiInitializeFv (
   @param Ppi               Address of the PPI that was installed.
 
   @retval EFI_SUCCESS    The FV Info is registered into PeiCore private data structure.
-  @return if not EFI_SUCESS, fail to verify FV.
+  @return if not EFI_SUCCESS, fail to verify FV.
 
 **/
 EFI_STATUS
 EFIAPI
-FirmwareVolmeInfoPpiNotifyCallback (
+FirmwareVolumeInfoPpiNotifyCallback (
   IN EFI_PEI_SERVICES              **PeiServices,
   IN EFI_PEI_NOTIFY_DESCRIPTOR     *NotifyDescriptor,
   IN VOID                          *Ppi
@@ -593,7 +593,7 @@ FirmwareVolmeInfoPpiNotifyCallback (
   }
 
   //
-  // Locate the corresponding FV_PPI according to founded FV's format guid
+  // Locate the corresponding FV_PPI according to founded FV's format GUID
   //
   Status = PeiServicesLocatePpi (
              &FvInfo2Ppi.FvFormat,
@@ -620,7 +620,7 @@ FirmwareVolmeInfoPpiNotifyCallback (
           PrivateData->Fv[FvIndex].AuthenticationStatus = FvInfo2Ppi.AuthenticationStatus;
           DEBUG ((EFI_D_INFO, "Update AuthenticationStatus of the %dth FV to 0x%x!\n", FvIndex, FvInfo2Ppi.AuthenticationStatus));
         }
-        DEBUG ((EFI_D_INFO, "The Fv %p has already been processed!\n", FvInfo2Ppi.FvInfo));
+        DEBUG ((DEBUG_INFO, "The FV %p has already been processed!\n", FvInfo2Ppi.FvInfo));
         return EFI_SUCCESS;
       }
     }
@@ -661,7 +661,7 @@ FirmwareVolmeInfoPpiNotifyCallback (
     PrivateData->FvCount ++;
 
     //
-    // Scan and process the new discoveried FV for EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE
+    // Scan and process the new discovered FV for EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE
     //
     FileHandle = NULL;
     do {
@@ -1359,11 +1359,11 @@ GetFvUsedSize (
 }
 
 /**
-  Get Fv image(s) from the FV type file, then install FV INFO(2) ppi, Build FV(2, 3) hob.
+  Get FV image(s) from the FV type file, then install FV INFO(2) PPI, Build FV(2, 3) HOB.
 
   @param PrivateData          PeiCore's private data structure
-  @param ParentFvCoreHandle   Pointer of EFI_CORE_FV_HANDLE to parent Fv image that contain this Fv image.
-  @param ParentFvFileHandle   File handle of a Fv type file that contain this Fv image.
+  @param ParentFvCoreHandle   Pointer of EFI_CORE_FV_HANDLE to parent FV image that contain this FV image.
+  @param ParentFvFileHandle   File handle of a FV type file that contain this FV image.
 
   @retval EFI_NOT_FOUND         FV image can't be found.
   @retval EFI_SUCCESS           Successfully to process it.
@@ -1533,7 +1533,7 @@ ProcessFvFile (
       );
 
     //
-    // Inform the extracted FvImage to Fv HOB consumer phase, i.e. DXE phase
+    // Inform the extracted FvImage to FV HOB consumer phase, i.e. DXE phase
     //
     BuildFvHob (
       (EFI_PHYSICAL_ADDRESS) (UINTN) FvHeader,
@@ -1619,7 +1619,7 @@ PeiFfsFvPpiProcessVolume (
 
   //
   // The build-in EFI_PEI_FIRMWARE_VOLUME_PPI for FFS2/FFS3 support memory-mapped
-  // FV image and the handle is pointed to Fv image's buffer.
+  // FV image and the handle is pointed to FV image's buffer.
   //
   *FvHandle = (EFI_PEI_FV_HANDLE) Buffer;
 
@@ -1915,7 +1915,7 @@ PeiFfsFvPpiGetVolumeInfo (
   CopyMem (&FwVolHeader, FvHandle, sizeof (EFI_FIRMWARE_VOLUME_HEADER));
 
   //
-  // Check Fv Image Signature
+  // Check FV Image Signature
   //
   if (FwVolHeader.Signature != EFI_FVH_SIGNATURE) {
     return EFI_INVALID_PARAMETER;
@@ -2089,7 +2089,7 @@ FvHandleToCoreHandle (
 /**
   Get instance of PEI_CORE_FV_HANDLE for next volume according to given index.
 
-  This routine also will install FvInfo ppi for FV hob in PI ways.
+  This routine also will install FvInfo PPI for FV HOB in PI ways.
 
   @param Private    Pointer of PEI_CORE_INSTANCE
   @param Instance   The index of FV want to be searched.
@@ -2185,10 +2185,10 @@ PeiReinitializeFv (
 }
 
 /**
-  Report the information for a new discoveried FV in unknown third-party format.
+  Report the information for a new discovered FV in unknown third-party format.
 
   If the EFI_PEI_FIRMWARE_VOLUME_PPI has not been installed for third-party FV format, but
-  the FV in this format has been discoveried, then this FV's information will be cached into
+  the FV in this format has been discovered, then this FV's information will be cached into
   PEI_CORE_INSTANCE's UnknownFvInfo array.
   Also a notification would be installed for unknown third-party FV format guid, if EFI_PEI_FIRMWARE_VOLUME_PPI
   is installed later by platform's PEIM, the original unknown third-party FV will be processed by
@@ -2242,13 +2242,13 @@ AddUnknownFormatFvInfo (
 }
 
 /**
-  Find the FV information according to third-party FV format guid.
+  Find the FV information according to third-party FV format GUID.
 
-  This routine also will remove the FV information found by given FV format guid from
+  This routine also will remove the FV information found by given FV format GUID from
   PrivateData->UnknownFvInfo[].
 
   @param PrivateData      Point to instance of PEI_CORE_INSTANCE
-  @param Format           Point to given FV format guid
+  @param Format           Point to given FV format GUID
   @param FvInfo           On return, the pointer of FV information buffer
   @param FvInfoSize       On return, the size of FV information buffer.
   @param AuthenticationStatus On return, the authentication status of FV information buffer.
@@ -2298,7 +2298,7 @@ FindUnknownFormatFvInfo (
   Notification callback function for EFI_PEI_FIRMWARE_VOLUME_PPI.
 
   When a EFI_PEI_FIRMWARE_VOLUME_PPI is installed to support new FV format, this
-  routine is called to process all discoveried FVs in this format.
+  routine is called to process all discovered FVs in this format.
 
   @param PeiServices       An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation
   @param NotifyDescriptor  Address of the notification descriptor data structure.
@@ -2352,7 +2352,7 @@ ThirdPartyFvPpiNotifyCallback (
     IsProcessed = FALSE;
     for (FvIndex = 0; FvIndex < PrivateData->FvCount; FvIndex ++) {
       if (PrivateData->Fv[FvIndex].FvHandle == FvHandle) {
-        DEBUG ((EFI_D_INFO, "The Fv %p has already been processed!\n", FvInfo));
+        DEBUG ((DEBUG_INFO, "The FV %p has already been processed!\n", FvInfo));
         IsProcessed = TRUE;
         break;
       }
@@ -2398,7 +2398,7 @@ ThirdPartyFvPpiNotifyCallback (
     PrivateData->FvCount ++;
 
     //
-    // Scan and process the new discoveried FV for EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE
+    // Scan and process the new discovered FV for EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE
     //
     FileHandle = NULL;
     do {

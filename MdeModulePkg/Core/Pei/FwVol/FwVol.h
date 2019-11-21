@@ -1,7 +1,7 @@
 /** @file
   The internal header file for firmware volume related definitions.
 
-Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2019, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -303,12 +303,12 @@ FindFileEx (
   );
 
 /**
-  Report the information for a new discoveried FV in unknown format.
+  Report the information for a new discovered FV in unknown format.
 
-  If the EFI_PEI_FIRMWARE_VOLUME_PPI has not been installed for specifical FV format, but
-  the FV in this FV format has been discoveried, then the information of this FV
+  If the EFI_PEI_FIRMWARE_VOLUME_PPI has not been installed for specific FV format, but
+  the FV in this FV format has been discovered, then the information of this FV
   will be cached into PEI_CORE_INSTANCE's UnknownFvInfo array.
-  Also a notification would be installed for unknown FV format guid, if EFI_PEI_FIRMWARE_VOLUME_PPI
+  Also a notification would be installed for unknown FV format GUID, if EFI_PEI_FIRMWARE_VOLUME_PPI
   is installed later by platform's PEIM, the original unknown FV will be processed by
   using new installed EFI_PEI_FIRMWARE_VOLUME_PPI.
 
@@ -325,14 +325,14 @@ AddUnknownFormatFvInfo (
   );
 
 /**
-  Find the FV information according to FV format guid.
+  Find the FV information according to FV format GUID.
 
-  This routine also will remove the FV information found by given FV format guid from
+  This routine also will remove the FV information found by given FV format GUID from
   PrivateData->UnknownFvInfo[].
 
   @param PrivateData      Point to instance of PEI_CORE_INSTANCE
-  @param Format           Point to given FV format guid
-  @param FvInfo           On return, the pointer of FV information buffer in given FV format guid
+  @param Format           Point to given FV format GUID
+  @param FvInfo           On return, the pointer of FV information buffer in given FV format GUID
   @param FvInfoSize       On return, the size of FV information buffer.
   @param AuthenticationStatus On return, the authentication status of FV information buffer.
 
@@ -352,7 +352,7 @@ FindUnknownFormatFvInfo (
   Notification callback function for EFI_PEI_FIRMWARE_VOLUME_PPI.
 
   When a EFI_PEI_FIRMWARE_VOLUME_PPI is installed to support new FV format, this
-  routine is called to process all discoveried FVs in this format.
+  routine is called to process all discovered FVs in this format.
 
   @param PeiServices       An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation
   @param NotifyDescriptor  Address of the notification descriptor data structure.

@@ -1,7 +1,7 @@
 /** @file
   Pei Core Load Image Support
 
-Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -99,7 +99,7 @@ CheckAndMarkFixLoadingMemoryUsageBitMap (
    }
 
    //
-   // Test if the memory is avalaible or not.
+   // Test if the memory is available or not.
    //
    MemoryUsageBitMap    = Private->PeiCodeMemoryRangeUsageBitMap;
    BaseOffsetPageNumber = EFI_SIZE_TO_PAGES((UINT32)(ImageBase - PeiCodeBase));
@@ -290,7 +290,7 @@ LoadAndRelocatePeCoffImage (
   }
 
   //
-  // Initilize local IsS3Boot and IsRegisterForShadow variable
+  // Initialize local IsS3Boot and IsRegisterForShadow variable
   //
   IsS3Boot = FALSE;
   if (Private->HobList.HandoffInformationTable->BootMode == BOOT_ON_S3_RESUME) {
@@ -363,7 +363,7 @@ LoadAndRelocatePeCoffImage (
       if (EFI_ERROR (Status)){
         DEBUG ((EFI_D_INFO|EFI_D_LOAD, "LOADING MODULE FIXED ERROR: Failed to load module at fixed address. \n"));
         //
-        // The PEIM is not assiged valid address, try to allocate page to load it.
+        // The PEIM is not assigned valid address, try to allocate page to load it.
         //
         Status = PeiServicesAllocatePages (EfiBootServicesCode,
                                            EFI_SIZE_TO_PAGES ((UINT32) AlignImageSize),
@@ -602,7 +602,7 @@ PeiLoadImageLoadImage (
       //
       // Copy the PDB file name to our temporary string, and replace .pdb with .efi
       // The PDB file name is limited in the range of 0~511.
-      // If the length is bigger than 511, trim the redudant characters to avoid overflow in array boundary.
+      // If the length is bigger than 511, trim the redundant characters to avoid overflow in array boundary.
       //
       for (Index = 0; Index < sizeof (EfiFileName) - 4; Index++) {
         EfiFileName[Index] = AsciiString[Index + StartIndex];
