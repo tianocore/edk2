@@ -1,7 +1,7 @@
 /** @file
   EFI PEI Core memory services
 
-Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -17,7 +17,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
                          environment, such as the size and location of temporary RAM, the stack location and
                          the BFV location.
   @param OldCoreData     Pointer to the PEI Core data.
-                         NULL if being run in non-permament memory mode.
+                         NULL if being run in non-permanent memory mode.
 
 **/
 VOID
@@ -32,7 +32,7 @@ InitializeMemoryServices (
 
   //
   // First entering PeiCore, following code will initialized some field
-  // in PeiCore's private data according to hand off data from sec core.
+  // in PeiCore's private data according to hand off data from SEC core.
   //
   if (OldCoreData == NULL) {
 
@@ -61,7 +61,7 @@ InitializeMemoryServices (
   The usage model is that the PEIM that discovers the permanent memory shall invoke this service.
   This routine will hold discoveried memory information into PeiCore's private data,
   and set SwitchStackSignal flag. After PEIM who discovery memory is dispatched,
-  PeiDispatcher will migrate temporary memory to permenement memory.
+  PeiDispatcher will migrate temporary memory to permanent memory.
 
   @param PeiServices        An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param MemoryBegin        Start of memory address.
@@ -86,7 +86,7 @@ PeiInstallPeiMemory (
   //
   // PEI_SERVICE.InstallPeiMemory should only be called one time during whole PEI phase.
   // If it is invoked more than one time, ASSERT information is given for developer debugging in debug tip and
-  // simply return EFI_SUCESS in release tip to ignore it.
+  // simply return EFI_SUCCESS in release tip to ignore it.
   //
   if (PrivateData->PeiMemoryInstalled) {
     DEBUG ((EFI_D_ERROR, "ERROR: PeiInstallPeiMemory is called more than once!\n"));
@@ -758,8 +758,8 @@ PeiFreePages (
 
 /**
 
-  Pool allocation service. Before permanent memory is discoveried, the pool will
-  be allocated the heap in the temporary memory. Genenrally, the size of heap in temporary
+  Pool allocation service. Before permanent memory is discovered, the pool will
+  be allocated the heap in the temporary memory. Generally, the size of heap in temporary
   memory does not exceed to 64K, so the biggest pool size could be allocated is
   64K.
 
@@ -790,7 +790,7 @@ PeiAllocatePool (
 
   //
   // Generally, the size of heap in temporary memory does not exceed to 64K,
-  // HobLength is multiples of 8 bytes, so the maxmium size of pool is 0xFFF8 - sizeof (EFI_HOB_MEMORY_POOL)
+  // HobLength is multiples of 8 bytes, so the maximum size of pool is 0xFFF8 - sizeof (EFI_HOB_MEMORY_POOL)
   //
   if (Size > (0xFFF8 - sizeof (EFI_HOB_MEMORY_POOL))) {
     return EFI_OUT_OF_RESOURCES;

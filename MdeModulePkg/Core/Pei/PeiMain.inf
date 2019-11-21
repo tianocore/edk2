@@ -69,12 +69,12 @@
 
 [Guids]
   gPeiAprioriFileNameGuid       ## SOMETIMES_CONSUMES   ## File
-  ## PRODUCES   ## UNDEFINED # Install ppi
-  ## CONSUMES   ## UNDEFINED # Locate ppi
+  ## PRODUCES   ## UNDEFINED # Install PPI
+  ## CONSUMES   ## UNDEFINED # Locate PPI
   gEfiFirmwareFileSystem2Guid
-  ## PRODUCES   ## UNDEFINED # Install ppi
-  ## CONSUMES   ## UNDEFINED # Locate ppi
-  ## CONSUMES   ## GUID      # Used to compare with FV's file system guid and get the FV's file system format
+  ## PRODUCES   ## UNDEFINED # Install PPI
+  ## CONSUMES   ## UNDEFINED # Locate PPI
+  ## CONSUMES   ## GUID      # Used to compare with FV's file system GUID and get the FV's file system format
   gEfiFirmwareFileSystem3Guid
 
 [Ppis]
