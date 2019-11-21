@@ -590,6 +590,8 @@ FindVariableInRuntimeCache (
     return EFI_INVALID_PARAMETER;
   }
 
+  ZeroMem (&RtPtrTrack, sizeof (RtPtrTrack));
+
   //
   // The UEFI specification restricts Runtime Services callers from invoking the same or certain other Runtime Service
   // functions prior to completion and return from a previous Runtime Service call. These restrictions prevent
