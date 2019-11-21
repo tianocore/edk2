@@ -109,8 +109,6 @@ X509ConstructCertificateStackV (
     }
   }
 
-  VA_START (Args, X509Stack);
-
   for (Index = 0; ; Index++) {
     //
     // If Cert is NULL, then it is the end of the list.
@@ -146,8 +144,6 @@ X509ConstructCertificateStackV (
     //
     sk_X509_push (CertStack, X509Cert);
   }
-
-  VA_END (Args);
 
   if (!Status) {
     sk_X509_pop_free (CertStack, X509_free);
