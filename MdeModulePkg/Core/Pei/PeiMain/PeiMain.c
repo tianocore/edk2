@@ -315,7 +315,7 @@ PeiCore (
       }
 
       //
-      // Shadow PEI Core. When permanent memory is avaiable, shadow
+      // Shadow PEI Core. When permanent memory is available, shadow
       // PEI Core and PEIMs to get high performance.
       //
       OldCoreData->ShadowedPeiCore = (PEICORE_FUNCTION_POINTER) (UINTN) PeiCore;

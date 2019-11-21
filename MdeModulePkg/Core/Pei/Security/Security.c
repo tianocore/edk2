@@ -1,7 +1,7 @@
 /** @file
   EFI PEI Core Security services
 
-Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -20,7 +20,7 @@ EFI_PEI_NOTIFY_DESCRIPTOR mNotifyList = {
 
   @param PeiServices     An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param OldCoreData     Pointer to the old core data.
-                         NULL if being run in non-permament memory mode.
+                         NULL if being run in non-permanent memory mode.
 
 **/
 VOID
@@ -76,7 +76,7 @@ SecurityPpiNotifyCallback (
 
   @param PrivateData     PeiCore's private data structure
   @param VolumeHandle    Handle of FV
-  @param FileHandle      Handle of PEIM's ffs
+  @param FileHandle      Handle of PEIM's FFS
   @param AuthenticationStatus Authentication status
 
   @retval EFI_SUCCESS              Image is OK
@@ -92,7 +92,7 @@ VerifyPeim (
   )
 {
   EFI_STATUS                      Status;
-  BOOLEAN                         DeferExection;
+  BOOLEAN                         DeferExecution;
 
   Status = EFI_NOT_FOUND;
   if (PrivateData->PrivateSecurityPpi == NULL) {
@@ -114,9 +114,9 @@ VerifyPeim (
                                                 AuthenticationStatus,
                                                 VolumeHandle,
                                                 FileHandle,
-                                                &DeferExection
+                                                &DeferExecution
                                                 );
-    if (DeferExection) {
+    if (DeferExecution) {
       Status = EFI_SECURITY_VIOLATION;
     }
   }

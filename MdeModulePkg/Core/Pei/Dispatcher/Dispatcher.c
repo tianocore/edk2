@@ -1,7 +1,7 @@
 /** @file
   EFI PEI Core dispatch services
 
-Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -11,7 +11,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 /**
 
-  Discover all Peims and optional Apriori file in one FV. There is at most one
+  Discover all PEIMs and optional Apriori file in one FV. There is at most one
   Apriori file in one FV.
 
 
@@ -49,7 +49,7 @@ DiscoverPeimsAndOrderWithApriori (
   Guid = NULL;
 
   //
-  // If the current Fv has been scanned, directly get its cached records.
+  // If the current FV has been scanned, directly get its cached records.
   //
   if (CoreFileHandle->ScanFv) {
     Private->CurrentFvFileHandles = CoreFileHandle->FvFileHandles;
@@ -60,7 +60,7 @@ DiscoverPeimsAndOrderWithApriori (
   TempFileGuid    = Private->TempFileGuid;
 
   //
-  // Go ahead to scan this Fv, get PeimCount and cache FileHandles within it to TempFileHandles.
+  // Go ahead to scan this FV, get PeimCount and cache FileHandles within it to TempFileHandles.
   //
   PeimCount = 0;
   FileHandle = NULL;
@@ -147,7 +147,7 @@ DiscoverPeimsAndOrderWithApriori (
 
       for (Index = 0; Index < PeimCount; Index++) {
         //
-        // Make an array of file name guids that matches the FileHandle array so we can convert
+        // Make an array of file name GUIDs that matches the FileHandle array so we can convert
         // quickly from file name to file handle
         //
         Status = FvPpi->GetFileInfo (FvPpi, TempFileHandles[Index], &FileInfo);
@@ -156,7 +156,7 @@ DiscoverPeimsAndOrderWithApriori (
       }
 
       //
-      // Walk through TempFileGuid array to find out who is invalid PEIM guid in Apriori file.
+      // Walk through TempFileGuid array to find out who is invalid PEIM GUID in Apriori file.
       // Add available PEIMs in Apriori file into FvFileHandles array.
       //
       Index = 0;
@@ -194,8 +194,8 @@ DiscoverPeimsAndOrderWithApriori (
   }
 
   //
-  // The current Fv File Handles have been cached. So that we don't have to scan the Fv again.
-  // Instead, we can retrieve the file handles within this Fv from cached records.
+  // The current FV File Handles have been cached. So that we don't have to scan the FV again.
+  // Instead, we can retrieve the file handles within this FV from cached records.
   //
   CoreFileHandle->ScanFv = TRUE;
   Private->CurrentFvFileHandles = CoreFileHandle->FvFileHandles;
@@ -307,7 +307,7 @@ PeiLoadFixAddressHook(
   DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED INFO: PcdLoadFixAddressPeiCodePageNumber= 0x%x.\n", PcdGet32(PcdLoadFixAddressPeiCodePageNumber)));
   DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED INFO: Total Reserved Memory Size = 0x%lx.\n", TotalReservedMemorySize));
   //
-  // Loop through the system memory typed hob to merge the adjacent memory range
+  // Loop through the system memory typed HOB to merge the adjacent memory range
   //
   for (Hob.Raw = PrivateData->HobList.Raw; !END_OF_HOB_LIST(Hob); Hob.Raw = GET_NEXT_HOB(Hob)) {
     //
@@ -317,7 +317,7 @@ PeiLoadFixAddressHook(
 
       ResourceHob = Hob.ResourceDescriptor;
       //
-      // If range described in this hob is not system memory or heigher than MAX_ADDRESS, ignored.
+      // If range described in this HOB is not system memory or higher than MAX_ADDRESS, ignored.
       //
       if (ResourceHob->ResourceType != EFI_RESOURCE_SYSTEM_MEMORY ||
           ResourceHob->PhysicalStart + ResourceHob->ResourceLength > MAX_ADDRESS)   {
@@ -387,18 +387,18 @@ PeiLoadFixAddressHook(
         if (GET_HOB_TYPE (NextHob) == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
           NextResourceHob = NextHob.ResourceDescriptor;
           //
-          // If range described in this hob is not system memory or heigher than MAX_ADDRESS, ignored.
+          // If range described in this HOB is not system memory or higher than MAX_ADDRESS, ignored.
           //
           if (NextResourceHob->ResourceType != EFI_RESOURCE_SYSTEM_MEMORY || NextResourceHob->PhysicalStart + NextResourceHob->ResourceLength > MAX_ADDRESS) {
             continue;
           }
           //
-          // If the range describe in memory allocation HOB  belongs to the memroy range described by the resource hob
+          // If the range describe in memory allocation HOB belongs to the memory range described by the resource HOB
           //
           if (MemoryHob->AllocDescriptor.MemoryBaseAddress >= NextResourceHob->PhysicalStart &&
               MemoryHob->AllocDescriptor.MemoryBaseAddress + MemoryHob->AllocDescriptor.MemoryLength <= NextResourceHob->PhysicalStart + NextResourceHob->ResourceLength) {
              //
-             // Build seperate resource hob for this allocated range
+             // Build separate resource HOB for this allocated range
              //
              if (MemoryHob->AllocDescriptor.MemoryBaseAddress > NextResourceHob->PhysicalStart) {
                BuildResourceDescriptorHob (
@@ -452,7 +452,7 @@ PeiLoadFixAddressHook(
 
         ResourceHob = Hob.ResourceDescriptor;
         //
-        // See if this resource descrior HOB describes tested system memory below MAX_ADDRESS
+        // See if this resource descriptor HOB describes tested system memory below MAX_ADDRESS
         //
         if (ResourceHob->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY &&
             ResourceHob->PhysicalStart + ResourceHob->ResourceLength <= MAX_ADDRESS) {
@@ -476,7 +476,7 @@ PeiLoadFixAddressHook(
       DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED ERROR:Top Address 0x%lx is invalid \n",  TopLoadingAddress));
       DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED ERROR:The recommended Top Address for the platform is: \n"));
       //
-      // Print the recomended Top address range.
+      // Print the recommended Top address range.
       //
       for (Hob.Raw = PrivateData->HobList.Raw; !END_OF_HOB_LIST(Hob); Hob.Raw = GET_NEXT_HOB(Hob)) {
         //
@@ -486,7 +486,7 @@ PeiLoadFixAddressHook(
 
           ResourceHob = Hob.ResourceDescriptor;
           //
-          // See if this resource descrior HOB describes tested system memory below MAX_ADDRESS
+          // See if this resource descriptor HOB describes tested system memory below MAX_ADDRESS
           //
           if (ResourceHob->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY &&
               ResourceHob->PhysicalStart + ResourceHob->ResourceLength <= MAX_ADDRESS) {
@@ -524,7 +524,7 @@ PeiLoadFixAddressHook(
 
         ResourceHob = Hob.ResourceDescriptor;
         //
-        // See if this resource descrior HOB describes tested system memory below MAX_ADDRESS
+        // See if this resource descriptor HOB describes tested system memory below MAX_ADDRESS
         //
         if (ResourceHob->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY &&
             ResourceHob->PhysicalStart + ResourceHob->ResourceLength <= MAX_ADDRESS &&
@@ -554,7 +554,7 @@ PeiLoadFixAddressHook(
 
   if (CurrentResourceHob != NULL) {
     //
-    // rebuild resource HOB for PEI memmory and reserved memory
+    // rebuild resource HOB for PEI memory and reserved memory
     //
     BuildResourceDescriptorHob (
       EFI_RESOURCE_SYSTEM_MEMORY,
@@ -750,7 +750,7 @@ PeiCheckAndSwitchStack (
     ASSERT (NewStackSize >= SecCoreData->StackSize);
 
     //
-    // Calculate stack offset and heap offset between temporary memory and new permement
+    // Calculate stack offset and heap offset between temporary memory and new permanent
     // memory seperately.
     //
     TopOfOldStack = (UINTN)SecCoreData->StackBase + SecCoreData->StackSize;
@@ -1042,10 +1042,10 @@ PeiDispatcher (
   //
   // This is the main dispatch loop.  It will search known FVs for PEIMs and
   // attempt to dispatch them.  If any PEIM gets dispatched through a single
-  // pass of the dispatcher, it will start over from the Bfv again to see
+  // pass of the dispatcher, it will start over from the BFV again to see
   // if any new PEIMs dependencies got satisfied.  With a well ordered
   // FV where PEIMs are found in the order their dependencies are also
-  // satisfied, this dipatcher should run only once.
+  // satisfied, this dispatcher should run only once.
   //
   do {
     //
@@ -1081,7 +1081,7 @@ PeiDispatcher (
       }
 
       //
-      // Start to dispatch all modules within the current Fv.
+      // Start to dispatch all modules within the current FV.
       //
       for (PeimCount = Private->CurrentPeimCount;
            PeimCount < Private->Fv[FvCount].PeimCount;
@@ -1097,7 +1097,7 @@ PeiDispatcher (
             ASSERT_EFI_ERROR (Status);
             if (FvFileInfo.FileType == EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE) {
               //
-              // For Fv type file, Produce new FvInfo PPI and FV hob
+              // For FV type file, Produce new FvInfo PPI and FV HOB
               //
               Status = ProcessFvFile (Private, &Private->Fv[FvCount], PeimFileHandle);
               if (Status == EFI_SUCCESS) {
@@ -1317,7 +1317,7 @@ DepexSatisfied (
 
   if (PeimCount < Private->AprioriCount) {
     //
-    // If it's in the Apriori file then we set Depex to TRUE
+    // If it's in the Apriori file then we set DEPEX to TRUE
     //
     DEBUG ((DEBUG_DISPATCH, "  RESULT = TRUE (Apriori)\n"));
     return TRUE;

@@ -5,7 +5,7 @@
   if a driver can be scheduled for execution.  The criteria for
   schedulability is that the dependency expression is satisfied.
 
-Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -45,7 +45,7 @@ IsPpiInstalled (
   }
 
   //
-  // Copy the Guid into a locale variable so that there are no
+  // Copy the GUID into a local variable so that there are no
   // possibilities of alignment faults for cross-compilation
   // environments such as Intel?Itanium(TM).
   //
@@ -72,7 +72,7 @@ IsPpiInstalled (
 
   This is the POSTFIX version of the dependency evaluator.  When a
   PUSH [PPI GUID] is encountered, a pointer to the GUID is stored on
-  the evaluation stack.  When that entry is poped from the evaluation
+  the evaluation stack.  When that entry is popped from the evaluation
   stack, the PPI is checked if it is installed.  This method allows
   some time savings as not all PPIs must be checked for certain
   operation types (AND, OR).
@@ -123,7 +123,7 @@ PeimDispatchReadiness (
 
         //
         // Push the pointer to the PUSH opcode operator (pointer to PPI GUID)
-        // We will evaluate if the PPI is insalled on the POP operation.
+        // We will evaluate if the PPI is installed on the POP operation.
         //
         StackPtr->Operator = (VOID *) Iterator;
         Iterator = Iterator + sizeof (EFI_GUID);
