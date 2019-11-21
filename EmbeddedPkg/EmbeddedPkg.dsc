@@ -238,6 +238,11 @@
   EmbeddedPkg/Drivers/ConsolePrefDxe/ConsolePrefDxe.inf
   EmbeddedPkg/Drivers/DtPlatformDxe/DtPlatformDxe.inf
 
+  EmbeddedPkg/Drivers/NonCoherentIoMmuDxe/NonCoherentIoMmuDxe.inf {
+    <LibraryClasses>
+      DmaLib|EmbeddedPkg/Library/NonCoherentDmaLib/NonCoherentDmaLib.inf
+  }
+
 [Components.ARM]
   EmbeddedPkg/Drivers/Isp1761UsbDxe/Isp1761UsbDxe.inf
 
