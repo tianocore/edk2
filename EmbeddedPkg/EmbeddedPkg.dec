@@ -187,6 +187,12 @@
   gEmbeddedTokenSpaceGuid.PcdDmaDeviceOffset|0x0|UINT64|0x0000058
 
   #
+  # Highest address value supported by the device for DMA addressing. Note
+  # that this value should be strictly greater than PcdDmaDeviceOffset.
+  #
+  gEmbeddedTokenSpaceGuid.PcdDmaDeviceLimit|0xFFFFFFFFFFFFFFFF|UINT64|0x000005A
+
+  #
   # Selection between DT and ACPI as a default
   #
   gEmbeddedTokenSpaceGuid.PcdDefaultDtPref|TRUE|BOOLEAN|0x0000059
