@@ -41,6 +41,7 @@
   Measurement.c
   VariableParsing.c
   VariableParsing.h
+  Variable.h
 
 [Packages]
   MdePkg/MdePkg.dec
