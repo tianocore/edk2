@@ -1,7 +1,7 @@
 ## @file
 # This file is used to create a database used by build tool
 #
-# Copyright (c) 2008 - 2019, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2020, Intel Corporation. All rights reserved.<BR>
 # (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -2667,6 +2667,22 @@ class DscBuildData(PlatformBuildClassObject):
             for pkg in PcdDependDEC:
                 if pkg in PlatformInc:
                     for inc in PlatformInc[pkg]:
+                        #
+                        # Get list of file in potential -I include path
+                        #
+                        FileList = os.listdir (str(inc))
+                        #
+                        # Skip -I include path if one of the include files required
+                        # by PcdValueInit.c are present in the include paths from
+                        # the DEC file.  PcdValueInit.c must use the standard include
+                        # files from the host compiler.
+                        #
+                        if 'stdio.h' in FileList:
+                          continue
+                        if 'stdlib.h' in FileList:
+                          continue
+                        if 'string.h' in FileList:
+                          continue
                         MakeApp += '-I'  + str(inc) + ' '
                         IncSearchList.append(inc)
         MakeApp = MakeApp + '\n'
