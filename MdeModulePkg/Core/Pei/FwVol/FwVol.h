@@ -303,11 +303,12 @@ FindFileEx (
   );
 
 /**
-  Report the information for a new discovered FV in unknown format.
+  Report the information for a newly discovered FV in an unknown format.
 
-  If the EFI_PEI_FIRMWARE_VOLUME_PPI has not been installed for specific FV format, but
-  the FV in this FV format has been discovered, then the information of this FV
-  will be cached into PEI_CORE_INSTANCE's UnknownFvInfo array.
+  If the EFI_PEI_FIRMWARE_VOLUME_PPI has not been installed for a third-party FV format, but
+  the FV has been discovered, then the information of this FV will be cached into PEI_CORE_INSTANCE's
+  UnknownFvInfo array.
+
   Also a notification would be installed for unknown FV format GUID, if EFI_PEI_FIRMWARE_VOLUME_PPI
   is installed later by platform's PEIM, the original unknown FV will be processed by
   using new installed EFI_PEI_FIRMWARE_VOLUME_PPI.

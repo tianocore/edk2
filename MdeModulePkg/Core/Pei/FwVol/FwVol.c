@@ -593,7 +593,7 @@ FirmwareVolumeInfoPpiNotifyCallback (
   }
 
   //
-  // Locate the corresponding FV_PPI according to founded FV's format GUID
+  // Locate the corresponding FV_PPI according to the format GUID of the FV found
   //
   Status = PeiServicesLocatePpi (
              &FvInfo2Ppi.FvFormat,
@@ -1533,7 +1533,7 @@ ProcessFvFile (
       );
 
     //
-    // Inform the extracted FvImage to FV HOB consumer phase, i.e. DXE phase
+    // Expose the extracted FvImage to the FV HOB consumer phase, i.e. DXE phase
     //
     BuildFvHob (
       (EFI_PHYSICAL_ADDRESS) (UINTN) FvHeader,
@@ -2087,12 +2087,13 @@ FvHandleToCoreHandle (
 }
 
 /**
-  Get instance of PEI_CORE_FV_HANDLE for next volume according to given index.
+  Gets a PEI_CORE_FV_HANDLE instance for the next volume according to the given index.
 
-  This routine also will install FvInfo PPI for FV HOB in PI ways.
+  This routine also will install an instance of the FvInfo PPI for the FV HOB
+  as defined in the PI specification.
 
   @param Private    Pointer of PEI_CORE_INSTANCE
-  @param Instance   The index of FV want to be searched.
+  @param Instance   Index of the FV to search
 
   @return Instance of PEI_CORE_FV_HANDLE.
 **/
@@ -2185,13 +2186,14 @@ PeiReinitializeFv (
 }
 
 /**
-  Report the information for a new discovered FV in unknown third-party format.
+  Report the information for a newly discovered FV in an unknown format.
 
-  If the EFI_PEI_FIRMWARE_VOLUME_PPI has not been installed for third-party FV format, but
-  the FV in this format has been discovered, then this FV's information will be cached into
-  PEI_CORE_INSTANCE's UnknownFvInfo array.
-  Also a notification would be installed for unknown third-party FV format guid, if EFI_PEI_FIRMWARE_VOLUME_PPI
-  is installed later by platform's PEIM, the original unknown third-party FV will be processed by
+  If the EFI_PEI_FIRMWARE_VOLUME_PPI has not been installed for a third-party FV format, but
+  the FV has been discovered, then the information of this FV will be cached into PEI_CORE_INSTANCE's
+  UnknownFvInfo array.
+
+  Also a notification would be installed for unknown FV format GUID, if EFI_PEI_FIRMWARE_VOLUME_PPI
+  is installed later by platform's PEIM, the original unknown FV will be processed by
   using new installed EFI_PEI_FIRMWARE_VOLUME_PPI.
 
   @param PrivateData  Point to instance of PEI_CORE_INSTANCE
