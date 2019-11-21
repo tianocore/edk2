@@ -1217,8 +1217,8 @@ PeiFfsGetVolumeInfo (
   );
 
 /**
-  This routine enable a PEIM to register itself to shadow when PEI Foundation
-  discovery permanent memory.
+  This routine enables a PEIM to register itself for shadow when the PEI Foundation
+  discovers permanent memory.
 
   @param FileHandle             File handle of a PEIM.
 
@@ -1314,12 +1314,13 @@ ProcessFvFile (
   );
 
 /**
-  Get instance of PEI_CORE_FV_HANDLE for next volume according to given index.
+  Gets a PEI_CORE_FV_HANDLE instance for the next volume according to the given index.
 
-  This routine also will install FvInfo PPI for FV HOB in PI ways.
+  This routine also will install an instance of the FvInfo PPI for the FV HOB
+  as defined in the PI specification.
 
   @param Private    Pointer of PEI_CORE_INSTANCE
-  @param Instance   The index of FV want to be searched.
+  @param Instance   Index of the FV to search
 
   @return Instance of PEI_CORE_FV_HANDLE.
 **/

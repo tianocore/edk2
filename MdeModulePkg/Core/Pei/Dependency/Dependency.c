@@ -2,8 +2,8 @@
   PEI Dispatcher Dependency Evaluator
 
   This routine evaluates a dependency expression (DEPENDENCY_EXPRESSION) to determine
-  if a driver can be scheduled for execution.  The criteria for
-  schedulability is that the dependency expression is satisfied.
+  if a driver can be scheduled for execution.  The criteria to be scheduled is
+  that the dependency expression is satisfied.
 
 Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent

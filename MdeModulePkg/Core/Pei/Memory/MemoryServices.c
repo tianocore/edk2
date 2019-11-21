@@ -759,8 +759,8 @@ PeiFreePages (
 /**
 
   Pool allocation service. Before permanent memory is discovered, the pool will
-  be allocated the heap in the temporary memory. Generally, the size of heap in temporary
-  memory does not exceed to 64K, so the biggest pool size could be allocated is
+  be allocated in the heap in temporary memory. Generally, the size of the heap in temporary
+  memory does not exceed 64K, so the biggest pool size could be allocated is
   64K.
 
   @param PeiServices               An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
@@ -789,7 +789,7 @@ PeiAllocatePool (
   //
 
   //
-  // Generally, the size of heap in temporary memory does not exceed to 64K,
+  // Generally, the size of heap in temporary memory does not exceed 64K,
   // HobLength is multiples of 8 bytes, so the maximum size of pool is 0xFFF8 - sizeof (EFI_HOB_MEMORY_POOL)
   //
   if (Size > (0xFFF8 - sizeof (EFI_HOB_MEMORY_POOL))) {
