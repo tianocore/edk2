@@ -551,6 +551,8 @@ VariableServiceGetNextVariableInternal (
     return EFI_INVALID_PARAMETER;
   }
 
+  ZeroMem (&Variable, sizeof (Variable));
+
   // Check if the variable exists in the given variable store list
   for (StoreType = (VARIABLE_STORE_TYPE) 0; StoreType < VariableStoreTypeMax; StoreType++) {
     if (VariableStoreList[StoreType] == NULL) {
