@@ -2267,6 +2267,10 @@ class Build():
                 self.CreateAsBuiltInf()
                 if GlobalData.gBinCacheDest:
                     self.UpdateBuildCache()
+                #
+                # Get Module List
+                #
+                ModuleList = {ma.Guid.upper(): ma for ma in self.BuildModules}
                 self.BuildModules = []
                 self.MakeTime += int(round((time.time() - MakeContiue)))
                 #
@@ -2285,10 +2289,6 @@ class Build():
                         #
                         if (Arch == 'IA32' or Arch == 'ARM') and self.LoadFixAddress != 0xFFFFFFFFFFFFFFFF and self.LoadFixAddress >= 0x100000000:
                             EdkLogger.error("build", PARAMETER_INVALID, "FIX_LOAD_TOP_MEMORY_ADDRESS can't be set to larger than or equal to 4G for the platorm with IA32 or ARM arch modules")
-                    #
-                    # Get Module List
-                    #
-                    ModuleList = {ma.Guid.upper():ma for ma in self.BuildModules}
 
                     #
                     # Rebase module to the preferred memory address before GenFds
