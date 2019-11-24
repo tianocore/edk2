@@ -1602,7 +1602,7 @@ FileBufferSave (
   //
   // set status string
   //
-  Str = CatSPrint (NULL, L"%d Lines Wrote", NumLines);
+  Str = CatSPrint (NULL, L"%d Lines Written", NumLines);
   if (Str == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
