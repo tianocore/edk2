@@ -462,14 +462,31 @@ class ModuleAutoGen(AutoGen):
     def BuildCommand(self):
         return self.PlatformInfo.BuildCommand
 
-    ## Get object list of all packages the module and its dependent libraries belong to
+    ## Get Module package and Platform package
+    #
+    #   @retval list The list of package object
+    #
+    @cached_property
+    def PackageList(self):
+        PkagList = []
+        if self.Module.Packages:
+            PkagList.extend(self.Module.Packages)
+        Platform = self.BuildDatabase[self.PlatformInfo.MetaFile, self.Arch, self.BuildTarget, self.ToolChain]
+        for Package in Platform.Packages:
+            if Package in PkagList:
+                continue
+            PkagList.append(Package)
+        return PkagList
+
+    ## Get object list of all packages the module and its dependent libraries belong to and the Platform depends on
     #
     #   @retval     list    The list of package object
     #
     @cached_property
     def DerivedPackageList(self):
         PackageList = []
-        for M in [self.Module] + self.DependentLibraryList:
+        PackageList.extend(self.PackageList)
+        for M in self.DependentLibraryList:
             for Package in M.Packages:
                 if Package in PackageList:
                     continue
@@ -938,13 +955,13 @@ class ModuleAutoGen(AutoGen):
         self.Targets
         return self._FileTypes
 
-    ## Get the list of package object the module depends on
+    ## Get the list of package object the module depends on and the Platform depends on
     #
     #   @retval     list    The package object list
     #
     @cached_property
     def DependentPackageList(self):
-        return self.Module.Packages
+        return self.PackageList
 
     ## Return the list of auto-generated code file
     #
@@ -1101,7 +1118,7 @@ class ModuleAutoGen(AutoGen):
         RetVal.append(self.MetaFile.Dir)
         RetVal.append(self.DebugDir)
 
-        for Package in self.Module.Packages:
+        for Package in self.PackageList:
             PackageDir = mws.join(self.WorkspaceDir, Package.MetaFile.Dir)
             if PackageDir not in RetVal:
                 RetVal.append(PackageDir)
@@ -1125,7 +1142,7 @@ class ModuleAutoGen(AutoGen):
     @cached_property
     def PackageIncludePathList(self):
         IncludesList = []
-        for Package in self.Module.Packages:
+        for Package in self.PackageList:
             PackageDir = mws.join(self.WorkspaceDir, Package.MetaFile.Dir)
             IncludesList = Package.Includes
             if Package._PrivateIncludes:

@@ -420,6 +420,7 @@ class WorkspaceAutoGen(AutoGen):
                     continue
                 ModuleData = self.BuildDatabase[ModuleFile, Arch, self.BuildTarget, self.ToolChain]
                 PkgSet.update(ModuleData.Packages)
+            PkgSet.update(Platform.Packages)
             Pkgs[Arch] = list(PkgSet)
         return Pkgs
 
