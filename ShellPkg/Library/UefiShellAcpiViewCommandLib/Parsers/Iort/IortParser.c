@@ -5,7 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
-    - IO Remapping Table, Platform Design Document, Revision C, 15 May 2017
+    - IO Remapping Table, Platform Design Document, Revision D, March 2018
 **/
 
 #include <IndustryStandard/IoRemappingTable.h>
@@ -193,7 +193,9 @@ STATIC CONST ACPI_PARSER IortNodeSmmuV3Parser[] = {
   {L"Event", 4, 44, L"0x%x", NULL, NULL, NULL, NULL},
   {L"PRI", 4, 48, L"0x%x", NULL, NULL, NULL, NULL},
   {L"GERR", 4, 52, L"0x%x", NULL, NULL, NULL, NULL},
-  {L"Sync", 4, 56, L"0x%x", NULL, NULL, NULL, NULL}
+  {L"Sync", 4, 56, L"0x%x", NULL, NULL, NULL, NULL},
+  {L"Proximity domain", 4, 60, L"0x%x", NULL, NULL, NULL, NULL},
+  {L"Device ID mapping index", 4, 64, L"%d", NULL, NULL, NULL, NULL}
 };
 
 /**
@@ -231,7 +233,9 @@ STATIC CONST ACPI_PARSER IortNodeRootComplexParser[] = {
   PARSE_IORT_NODE_HEADER (NULL, NULL),
   {L"Memory access properties", 8, 16, L"0x%lx", NULL, NULL, NULL, NULL},
   {L"ATS Attribute", 4, 24, L"0x%x", NULL, NULL, NULL, NULL},
-  {L"PCI Segment number", 4, 28, L"0x%x", NULL, NULL, NULL, NULL}
+  {L"PCI Segment number", 4, 28, L"0x%x", NULL, NULL, NULL, NULL},
+  {L"Memory access size limit", 1, 32, L"0x%x", NULL, NULL, NULL, NULL},
+  {L"Reserved", 3, 33, L"%x %x %x", Dump3Chars, NULL, NULL, NULL}
 };
 
 /**
@@ -239,9 +243,10 @@ STATIC CONST ACPI_PARSER IortNodeRootComplexParser[] = {
 **/
 STATIC CONST ACPI_PARSER IortNodePmcgParser[] = {
   PARSE_IORT_NODE_HEADER (ValidatePmcgIdMappingCount, NULL),
-  {L"Base Address", 8, 16, L"0x%lx", NULL, NULL, NULL, NULL},
+  {L"Page 0 Base Address", 8, 16, L"0x%lx", NULL, NULL, NULL, NULL},
   {L"Overflow interrupt GSIV", 4, 24, L"0x%x", NULL, NULL, NULL, NULL},
   {L"Node reference", 4, 28, L"0x%x", NULL, NULL, NULL, NULL},
+  {L"Page 1 Base Address", 8, 32, L"0x%lx", NULL, NULL, NULL, NULL}
 };
 
 /**
