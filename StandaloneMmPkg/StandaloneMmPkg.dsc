@@ -2,7 +2,7 @@
 # Standalone MM Platform.
 #
 # Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
-# Copyright (c) 2016 - 2018, ARM Limited. All rights reserved.<BR>
+# Copyright (c) 2016 - 2019, ARM Limited. All rights reserved.<BR>
 #
 #    SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -19,7 +19,7 @@
   PLATFORM_VERSION               = 1.0
   DSC_SPECIFICATION              = 0x00010011
   OUTPUT_DIRECTORY               = Build/StandaloneMm
-  SUPPORTED_ARCHITECTURES        = IA32|X64|AARCH64
+  SUPPORTED_ARCHITECTURES        = AARCH64
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
 
