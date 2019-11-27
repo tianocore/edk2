@@ -5,7 +5,7 @@
 #  If the DevicePathFromText/DevicePathToText protocol doesn't exist, the library
 #  uses its internal conversion logic.
 #
-# Copyright (c) 2013 - 2019, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -14,14 +14,14 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = UefiDevicePathLibOptionalDevicePathProtocol
-  MODULE_UNI_FILE                = UefiDevicePathLibOptionalDevicePathProtocol.uni
-  FILE_GUID                      = 3E1C696D-FCF0-45a7-85A7-E86C2A1C1080
+  BASE_NAME                      = UefiDevicePathLibMandatoryDevicePathProtocol
+  MODULE_UNI_FILE                = UefiDevicePathLibMandatoryDevicePathProtocol.uni
+  FILE_GUID                      = 5A8389AF-DAE4-407E-8FD5-D026948BC579
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = DevicePathLib|DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER SMM_CORE
 
-  CONSTRUCTOR                    = UefiDevicePathLibOptionalDevicePathProtocolConstructor
+  CONSTRUCTOR                    = UefiDevicePathLibMandatoryDevicePathProtocolConstructor
 
 #
 #  VALID_ARCHITECTURES           = IA32 X64 EBC
@@ -31,7 +31,7 @@
   DevicePathUtilities.c
   DevicePathToText.c
   DevicePathFromText.c
-  UefiDevicePathLibOptionalDevicePathProtocol.c
+  UefiDevicePathLibMandatoryDevicePathProtocol.c
   UefiDevicePathLib.h
 
 [Packages]
@@ -78,4 +78,9 @@
 
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdMaximumDevicePathNodeCount ## SOMETIMES_CONSUMES
+
+[Depex.common.DXE_DRIVER, Depex.common.DXE_RUNTIME_DRIVER, Depex.common.DXE_SAL_DRIVER, Depex.common.DXE_SMM_DRIVER]
+  gEfiDevicePathUtilitiesProtocolGuid AND
+  gEfiDevicePathToTextProtocolGuid AND
+  gEfiDevicePathFromTextProtocolGuid
 

@@ -8,7 +8,7 @@
   environment varibles. Multi-instance device paths should never be placed
   on a Handle.
 
-  Copyright (c) 2013 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -21,7 +21,8 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_DEVICE_PATH_TO_TEXT_PROTOCOL   *mDevicePathLib
 GLOBAL_REMOVE_IF_UNREFERENCED EFI_DEVICE_PATH_FROM_TEXT_PROTOCOL *mDevicePathLibDevicePathFromText  = NULL;
 
 /**
-  The constructor function caches the pointer to DevicePathUtilites protocol.
+  The constructor function caches the pointer to DevicePathUtilites protocol,
+  DevicePathToText protocol and DevicePathFromText protocol.
 
   The constructor function locates these three protocols from protocol database.
   It will caches the pointer to local protocol instance if that operation fails
@@ -35,17 +36,38 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_DEVICE_PATH_FROM_TEXT_PROTOCOL *mDevicePathLib
 **/
 EFI_STATUS
 EFIAPI
-UefiDevicePathLibOptionalDevicePathProtocolConstructor (
+UefiDevicePathLibMandatoryDevicePathProtocolConstructor (
   IN      EFI_HANDLE                ImageHandle,
   IN      EFI_SYSTEM_TABLE          *SystemTable
   )
 {
-  gBS->LocateProtocol (
-        &gEfiDevicePathUtilitiesProtocolGuid,
-        NULL,
-        (VOID**) &mDevicePathLibDevicePathUtilities
-        );
-  return EFI_SUCCESS;
+  EFI_STATUS                        Status;
+
+  Status = gBS->LocateProtocol (
+                  &gEfiDevicePathUtilitiesProtocolGuid,
+                  NULL,
+                  (VOID**) &mDevicePathLibDevicePathUtilities
+                  );
+  ASSERT_EFI_ERROR (Status);
+  ASSERT (mDevicePathLibDevicePathUtilities != NULL);
+
+  Status = gBS->LocateProtocol (
+                  &gEfiDevicePathToTextProtocolGuid,
+                  NULL,
+                  (VOID**) &mDevicePathLibDevicePathToText
+                  );
+  ASSERT_EFI_ERROR (Status);
+  ASSERT (mDevicePathLibDevicePathToText != NULL);
+
+  Status = gBS->LocateProtocol (
+                  &gEfiDevicePathFromTextProtocolGuid,
+                  NULL,
+                  (VOID**) &mDevicePathLibDevicePathFromText
+                  );
+  ASSERT_EFI_ERROR (Status);
+  ASSERT (mDevicePathLibDevicePathFromText != NULL);
+
+  return Status;
 }
 
 /**
@@ -69,9 +91,10 @@ GetDevicePathSize (
 {
   if (mDevicePathLibDevicePathUtilities != NULL) {
     return mDevicePathLibDevicePathUtilities->GetDevicePathSize (DevicePath);
-  } else {
-    return UefiDevicePathLibGetDevicePathSize (DevicePath);
   }
+
+  ASSERT (FALSE);
+  return 0;
 }
 
 /**
@@ -98,9 +121,10 @@ DuplicateDevicePath (
 {
   if (mDevicePathLibDevicePathUtilities != NULL) {
     return mDevicePathLibDevicePathUtilities->DuplicateDevicePath (DevicePath);
-  } else {
-    return UefiDevicePathLibDuplicateDevicePath (DevicePath);
   }
+
+  ASSERT (FALSE);
+  return NULL;
 }
 
 /**
@@ -136,9 +160,10 @@ AppendDevicePath (
 {
   if (mDevicePathLibDevicePathUtilities != NULL) {
     return mDevicePathLibDevicePathUtilities->AppendDevicePath (FirstDevicePath, SecondDevicePath);
-  } else {
-    return UefiDevicePathLibAppendDevicePath (FirstDevicePath, SecondDevicePath);
   }
+
+  ASSERT (FALSE);
+  return NULL;
 }
 
 /**
@@ -178,9 +203,10 @@ AppendDevicePathNode (
 {
   if (mDevicePathLibDevicePathUtilities != NULL) {
     return mDevicePathLibDevicePathUtilities->AppendDeviceNode (DevicePath, DevicePathNode);
-  } else {
-    return UefiDevicePathLibAppendDevicePathNode (DevicePath, DevicePathNode);
   }
+
+  ASSERT (FALSE);
+  return NULL;
 }
 
 /**
@@ -215,9 +241,10 @@ AppendDevicePathInstance (
 {
   if (mDevicePathLibDevicePathUtilities != NULL) {
     return mDevicePathLibDevicePathUtilities->AppendDevicePathInstance (DevicePath, DevicePathInstance);
-  } else {
-    return UefiDevicePathLibAppendDevicePathInstance (DevicePath, DevicePathInstance);
   }
+
+  ASSERT (FALSE);
+  return NULL;
 }
 
 /**
@@ -257,9 +284,10 @@ GetNextDevicePathInstance (
 {
   if (mDevicePathLibDevicePathUtilities != NULL) {
     return mDevicePathLibDevicePathUtilities->GetNextDevicePathInstance (DevicePath, Size);
-  } else {
-    return UefiDevicePathLibGetNextDevicePathInstance (DevicePath, Size);
   }
+
+  ASSERT (FALSE);
+  return NULL;
 }
 
 /**
@@ -291,9 +319,10 @@ CreateDeviceNode (
 {
   if (mDevicePathLibDevicePathUtilities != NULL) {
     return mDevicePathLibDevicePathUtilities->CreateDeviceNode (NodeType, NodeSubType, NodeLength);
-  } else {
-    return UefiDevicePathLibCreateDeviceNode (NodeType, NodeSubType, NodeLength);
   }
+
+  ASSERT (FALSE);
+  return NULL;
 }
 
 /**
@@ -319,35 +348,10 @@ IsDevicePathMultiInstance (
 {
   if (mDevicePathLibDevicePathUtilities != NULL) {
     return mDevicePathLibDevicePathUtilities->IsDevicePathMultiInstance (DevicePath);
-  } else {
-    return UefiDevicePathLibIsDevicePathMultiInstance (DevicePath);
   }
-}
 
-/**
-  Locate and return the protocol instance identified by the ProtocolGuid.
-
-  @param ProtocolGuid     The GUID of the protocol.
-
-  @return A pointer to the protocol instance or NULL when absent.
-**/
-VOID *
-UefiDevicePathLibLocateProtocol (
-  EFI_GUID                         *ProtocolGuid
-  )
-{
-  EFI_STATUS Status;
-  VOID       *Protocol;
-  Status = gBS->LocateProtocol (
-                  ProtocolGuid,
-                  NULL,
-                  (VOID**) &Protocol
-                  );
-  if (EFI_ERROR (Status)) {
-    return NULL;
-  } else {
-    return Protocol;
-  }
+  ASSERT (FALSE);
+  return FALSE;
 }
 
 /**
@@ -373,14 +377,12 @@ ConvertDeviceNodeToText (
   IN BOOLEAN                         AllowShortcuts
   )
 {
-  if (mDevicePathLibDevicePathToText == NULL) {
-    mDevicePathLibDevicePathToText = UefiDevicePathLibLocateProtocol (&gEfiDevicePathToTextProtocolGuid);
-  }
   if (mDevicePathLibDevicePathToText != NULL) {
     return mDevicePathLibDevicePathToText->ConvertDeviceNodeToText (DeviceNode, DisplayOnly, AllowShortcuts);
   }
 
-  return UefiDevicePathLibConvertDeviceNodeToText (DeviceNode, DisplayOnly, AllowShortcuts);
+  ASSERT (FALSE);
+  return NULL;
 }
 
 /**
@@ -406,14 +408,12 @@ ConvertDevicePathToText (
   IN BOOLEAN                          AllowShortcuts
   )
 {
-  if (mDevicePathLibDevicePathToText == NULL) {
-    mDevicePathLibDevicePathToText = UefiDevicePathLibLocateProtocol (&gEfiDevicePathToTextProtocolGuid);
-  }
   if (mDevicePathLibDevicePathToText != NULL) {
     return mDevicePathLibDevicePathToText->ConvertDevicePathToText (DevicePath, DisplayOnly, AllowShortcuts);
   }
 
-  return UefiDevicePathLibConvertDevicePathToText (DevicePath, DisplayOnly, AllowShortcuts);
+  ASSERT (FALSE);
+  return NULL;
 }
 
 /**
@@ -433,14 +433,12 @@ ConvertTextToDeviceNode (
   IN CONST CHAR16 *TextDeviceNode
   )
 {
-  if (mDevicePathLibDevicePathFromText == NULL) {
-    mDevicePathLibDevicePathFromText = UefiDevicePathLibLocateProtocol (&gEfiDevicePathFromTextProtocolGuid);
-  }
   if (mDevicePathLibDevicePathFromText != NULL) {
     return mDevicePathLibDevicePathFromText->ConvertTextToDeviceNode (TextDeviceNode);
   }
 
-  return UefiDevicePathLibConvertTextToDeviceNode (TextDeviceNode);
+  ASSERT (FALSE);
+  return NULL;
 }
 
 /**
@@ -461,13 +459,11 @@ ConvertTextToDevicePath (
   IN CONST CHAR16 *TextDevicePath
   )
 {
-  if (mDevicePathLibDevicePathFromText == NULL) {
-    mDevicePathLibDevicePathFromText = UefiDevicePathLibLocateProtocol (&gEfiDevicePathFromTextProtocolGuid);
-  }
   if (mDevicePathLibDevicePathFromText != NULL) {
     return mDevicePathLibDevicePathFromText->ConvertTextToDevicePath (TextDevicePath);
   }
 
-  return UefiDevicePathLibConvertTextToDevicePath (TextDevicePath);
+  ASSERT (FALSE);
+  return NULL;
 }
 

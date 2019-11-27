@@ -5,14 +5,14 @@
 // If the DevicePathFromText/DevicePathToText protocol doesn't exist, the library
 // uses its internal conversion logic.
 //
-// Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2013 - 2019, Intel Corporation. All rights reserved.<BR>
 //
 // SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // **/
 
 
-#string STR_MODULE_ABSTRACT             #language en-US "Instance of Device Path Library based on Device Path Protocol."
+#string STR_MODULE_ABSTRACT             #language en-US "Instance of Device Path Library based on Device Path Protocol or Memory Allocation Library."
 
-#string STR_MODULE_DESCRIPTION          #language en-US "Instance of Device Path Library based on Device Path Protocol."
+#string STR_MODULE_DESCRIPTION          #language en-US "Instance of Device Path Library based on Device Path Protocol or Memory Allocation Library."
 
