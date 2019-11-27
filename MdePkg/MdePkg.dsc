@@ -1,7 +1,7 @@
 ## @file
 # EFI/PI MdePkg Package
 #
-# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2019, Intel Corporation. All rights reserved.<BR>
 # Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 #
 #    SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -99,6 +99,7 @@
   MdePkg/Library/UefiDebugLibStdErr/UefiDebugLibStdErr.inf
   MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
   MdePkg/Library/UefiDevicePathLib/UefiDevicePathLibOptionalDevicePathProtocol.inf
+  MdePkg/Library/UefiDevicePathLib/UefiDevicePathLibMandatoryDevicePathProtocol.inf
   MdePkg/Library/UefiDevicePathLibDevicePathProtocol/UefiDevicePathLibDevicePathProtocol.inf
   MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
   MdePkg/Library/UefiLib/UefiLib.inf
