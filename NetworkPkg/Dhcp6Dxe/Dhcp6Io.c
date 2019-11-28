@@ -203,6 +203,7 @@ Dhcp6EnqueueRetry (
     //
     // Unexpected message type.
     //
+    FreePool(TxCb);
     return EFI_DEVICE_ERROR;
   }
 
