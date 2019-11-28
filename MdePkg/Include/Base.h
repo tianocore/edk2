@@ -781,10 +781,8 @@ typedef UINTN  *BASE_LIST;
   @return  Offset, in bytes, of field.
 
 **/
-#ifdef __GNUC__
-#if __GNUC__ >= 4
+#if (defined(__GNUC__) && __GNUC__ >= 4) || defined(__clang__)
 #define OFFSET_OF(TYPE, Field) ((UINTN) __builtin_offsetof(TYPE, Field))
-#endif
 #endif
 
 #ifndef OFFSET_OF
