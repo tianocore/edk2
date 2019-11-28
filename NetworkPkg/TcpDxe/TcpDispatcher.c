@@ -390,6 +390,7 @@ TcpAttachPcb (
                   );
   if (EFI_ERROR (Status)) {
     IpIoRemoveIp (IpIo, Tcb->IpInfo);
+    FreePool (Tcb);
     return Status;
   }
 
