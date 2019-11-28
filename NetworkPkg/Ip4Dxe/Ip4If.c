@@ -491,9 +491,13 @@ Ip4CreateInterface (
   IP4_INTERFACE             *Interface;
   EFI_SIMPLE_NETWORK_MODE   SnpMode;
 
+  if (Mnp == NULL) {
+    return NULL;
+  }
+
   Interface = AllocatePool (sizeof (IP4_INTERFACE));
 
-  if ((Interface == NULL) || (Mnp == NULL)) {
+  if (Interface == NULL) {
     return NULL;
   }
 
