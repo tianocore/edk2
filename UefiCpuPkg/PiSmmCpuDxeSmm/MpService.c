@@ -1566,9 +1566,11 @@ SmiRendezvous (
   ASSERT(CpuIndex < mMaxNumberOfCpus);
 
   //
-  // Save Cr2 because Page Fault exception in SMM may override its value
+  // Save Cr2 because Page Fault exception in SMM may override its value,
+  // when using on-demand paging for above 4G memory.
   //
-  Cr2 = AsmReadCr2 ();
+  Cr2 = 0;
+  SaveCr2 (&Cr2);
 
   //
   // Call the user register Startup function first.
@@ -1714,10 +1716,11 @@ SmiRendezvous (
 
 Exit:
   SmmCpuFeaturesRendezvousExit (CpuIndex);
+
   //
   // Restore Cr2
   //
-  AsmWriteCr2 (Cr2);
+  RestoreCr2 (Cr2);
 }
 
 /**
