@@ -1497,7 +1497,10 @@ InternalShellExecuteDevicePath(
     ShellParamsProtocol.StdOut  = ShellInfoObject.NewShellParametersProtocol->StdOut;
     ShellParamsProtocol.StdErr  = ShellInfoObject.NewShellParametersProtocol->StdErr;
     Status = UpdateArgcArgv(&ShellParamsProtocol, NewCmdLine, Efi_Application, NULL, NULL);
-    ASSERT_EFI_ERROR(Status);
+    if (EFI_ERROR (Status)) {
+      goto UnloadImage;
+    }
+
     //
     // Replace Argv[0] with the full path of the binary we're executing:
     // If the command line was "foo", the binary might be called "foo.efi".
