@@ -185,6 +185,7 @@ DEBUG_CODE_END();
   @param[in, out] Argc            pointer to number of strings in Argv array
 
   @return EFI_SUCCESS           the operation was sucessful
+  @return EFI_INVALID_PARAMETER some parameters are invalid
   @return EFI_OUT_OF_RESOURCES  a memory allocation failed.
 **/
 EFI_STATUS
