@@ -1340,7 +1340,9 @@ RestoreStdInStdOutStdErr (
   @param[out] OldArgv                    Pointer to old list of parameters.
   @param[out] OldArgc                    Pointer to old number of items in Argv list.
 
+
   @retval   EFI_SUCCESS                 Operation was successful, Argv and Argc are valid.
+  @return   EFI_INVALID_PARAMETER       Some parameters are invalid.
   @retval   EFI_OUT_OF_RESOURCES        A memory allocation failed.
 **/
 EFI_STATUS

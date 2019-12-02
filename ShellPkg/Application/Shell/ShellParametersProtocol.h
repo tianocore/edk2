@@ -71,6 +71,7 @@ CleanUpShellParametersProtocol (
   @param[out] OldArgc                   pointer to old number of items in Argv list
 
   @retval   EFI_SUCCESS                 operation was successful, Argv and Argc are valid
+  @return   EFI_INVALID_PARAMETER       some parameters are invalid
   @retval   EFI_OUT_OF_RESOURCES        a memory allocation failed.
 **/
 EFI_STATUS
