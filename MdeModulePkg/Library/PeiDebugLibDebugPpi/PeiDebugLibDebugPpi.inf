@@ -1,0 +1,59 @@
+## @file
+#  Debug Lib instance through DebugServicePei for PEI phase
+#
+#  This module use gEdkiiDebugPpiGuid to implement the PEI DebugLib for reduce
+#  the size of PEIMs which consume DebugLib.
+#
+#  Notes: this library instance can be used only the PEIM
+#  DebugSerivicePei is runed and install the gEdkiiDebugPpiGuid.
+#  And this library contian the depex of gEfiPeiPcdPpiGuid, that
+#  means the PcdPei.inf cannot use this library instance. The
+#  PcdPei.inf should use the same library instance that the
+#  PEIM DebugServicePei consumes.
+#
+#  Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeiDebugLibDebugPpi
+  FILE_GUID                      = 2E08836C-4D1C-42F7-BBBE-EC5D25F1FDD4
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = DebugLib|PEIM
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  DebugLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  PcdLib
+  BaseMemoryLib
+  DebugPrintErrorLevelLib
+  PeiServicesLib
+  PeiServicesTablePointerLib
+  BaseLib
+
+[Ppis]
+  gEdkiiDebugPpiGuid                                        ## CONSUMES
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue         ## SOMETIMES_CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask             ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdFixedDebugPrintErrorLevel     ## CONSUMES
+
+[Depex]
+  gEdkiiDebugPpiGuid
+

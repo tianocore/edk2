@@ -3,13 +3,7 @@
   This file provides the information dump support for EHCI when in debug mode.
 
 Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -228,31 +222,4 @@ EhcDumpBuf (
   DEBUG ((EFI_D_VERBOSE, "\n"));
 }
 
-/**
-  Dump the EHCI status registers.
 
-  @param  Ehc    USB EHCI Host Controller instance
-
-**/
-VOID
-EhcDumpRegs (
-  IN  USB2_HC_DEV         *Ehc
-  )
-{
-  UINT8   Index;
-
-  DEBUG ((EFI_D_VERBOSE, "  EHC_CAPLENGTH_OFFSET   = 0x%08x\n", EhcReadCapRegister (Ehc, EHC_CAPLENGTH_OFFSET)));
-  DEBUG ((EFI_D_VERBOSE, "  EHC_HCSPARAMS_OFFSET   = 0x%08x\n", EhcReadCapRegister (Ehc, EHC_HCSPARAMS_OFFSET)));
-  DEBUG ((EFI_D_VERBOSE, "  EHC_HCCPARAMS_OFFSET   = 0x%08x\n", EhcReadCapRegister (Ehc, EHC_HCCPARAMS_OFFSET)));
-  DEBUG ((EFI_D_VERBOSE, "  EHC_USBCMD_OFFSET      = 0x%08x\n", EhcReadOpReg (Ehc, EHC_USBCMD_OFFSET)));
-  DEBUG ((EFI_D_VERBOSE, "  EHC_USBSTS_OFFSET      = 0x%08x\n", EhcReadOpReg (Ehc, EHC_USBSTS_OFFSET)));
-  DEBUG ((EFI_D_VERBOSE, "  EHC_USBINTR_OFFSET     = 0x%08x\n", EhcReadOpReg (Ehc, EHC_USBINTR_OFFSET)));
-  DEBUG ((EFI_D_VERBOSE, "  EHC_FRINDEX_OFFSET     = 0x%08x\n", EhcReadOpReg (Ehc, EHC_FRINDEX_OFFSET)));
-  DEBUG ((EFI_D_VERBOSE, "  EHC_CTRLDSSEG_OFFSET   = 0x%08x\n", EhcReadOpReg (Ehc,  EHC_CTRLDSSEG_OFFSET)));
-  DEBUG ((EFI_D_VERBOSE, "  EHC_FRAME_BASE_OFFSET  = 0x%08x\n", EhcReadOpReg (Ehc,  EHC_FRAME_BASE_OFFSET)));
-  DEBUG ((EFI_D_VERBOSE, "  EHC_ASYNC_HEAD_OFFSET  = 0x%08x\n", EhcReadOpReg (Ehc, EHC_ASYNC_HEAD_OFFSET)));
-  DEBUG ((EFI_D_VERBOSE, "  EHC_CONFIG_FLAG_OFFSET = 0x%08x\n", EhcReadOpReg (Ehc, EHC_CONFIG_FLAG_OFFSET)));
-  for (Index = 0; Index < (UINT8) (Ehc->HcStructParams & HCSP_NPORTS); Index++) {
-    DEBUG ((EFI_D_VERBOSE, "  EHC_PORT_STAT_OFFSET(%d)  = 0x%08x\n", Index, EhcReadOpReg (Ehc, EHC_PORT_STAT_OFFSET + (4 * Index))));
-  }
-}

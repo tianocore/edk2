@@ -1,25 +1,9 @@
 /******************************************************************************
  * ring.h
- * 
+ *
  * Shared producer-consumer ring macros.
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to
- * deal in the Software without restriction, including without limitation the
- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
- * sell copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
+ * SPDX-License-Identifier: MIT
  *
  * Tim Deegan and Andrew Warfield November 2004.
  */
@@ -47,7 +31,7 @@ typedef UINT32 RING_IDX;
 /*
  * Calculate size of a shared ring, given the total available space for the
  * ring and indexes (_sz), and the name tag of the request/response structure.
- * A ring contains as many entries as will fit, rounded down to the nearest 
+ * A ring contains as many entries as will fit, rounded down to the nearest
  * power of two (so we can mask with (size-1) to loop around).
  */
 #define __CONST_RING_SIZE(_s, _sz) \
@@ -61,7 +45,7 @@ typedef UINT32 RING_IDX;
 
 /*
  * Macros to make the correct C datatypes for a new kind of ring.
- * 
+ *
  * To make a new ring datatype, you need to have two message structures,
  * let's say request_t, and response_t already defined.
  *
@@ -71,7 +55,7 @@ typedef UINT32 RING_IDX;
  *
  * These expand out to give you a set of types, as you can see below.
  * The most important of these are:
- * 
+ *
  *     mytag_sring_t      - The shared ring.
  *     mytag_front_ring_t - The 'front' half of the ring.
  *     mytag_back_ring_t  - The 'back' half of the ring.
@@ -139,15 +123,15 @@ typedef struct __name##_back_ring __name##_back_ring_t
 
 /*
  * Macros for manipulating rings.
- * 
- * FRONT_RING_whatever works on the "front end" of a ring: here 
+ *
+ * FRONT_RING_whatever works on the "front end" of a ring: here
  * requests are pushed on to the ring and responses taken off it.
- * 
- * BACK_RING_whatever works on the "back end" of a ring: here 
+ *
+ * BACK_RING_whatever works on the "back end" of a ring: here
  * requests are taken off the ring and responses put on.
- * 
- * N.B. these macros do NO INTERLOCKS OR FLOW CONTROL. 
- * This is OK in 1-for-1 request-response situations where the 
+ *
+ * N.B. these macros do NO INTERLOCKS OR FLOW CONTROL.
+ * This is OK in 1-for-1 request-response situations where the
  * requestor (front end) never has more than RING_SIZE()-1
  * outstanding requests.
  */
@@ -235,26 +219,26 @@ typedef struct __name##_back_ring __name##_back_ring_t
 
 /*
  * Notification hold-off (req_event and rsp_event):
- * 
+ *
  * When queueing requests or responses on a shared ring, it may not always be
  * necessary to notify the remote end. For example, if requests are in flight
  * in a backend, the front may be able to queue further requests without
  * notifying the back (if the back checks for new requests when it queues
  * responses).
- * 
+ *
  * When enqueuing requests or responses:
- * 
+ *
  *  Use RING_PUSH_{REQUESTS,RESPONSES}_AND_CHECK_NOTIFY(). The second argument
  *  is a boolean return value. True indicates that the receiver requires an
  *  asynchronous notification.
- * 
+ *
  * After dequeuing requests or responses (before sleeping the connection):
- * 
+ *
  *  Use RING_FINAL_CHECK_FOR_REQUESTS() or RING_FINAL_CHECK_FOR_RESPONSES().
  *  The second argument is a boolean return value. True indicates that there
  *  are pending messages on the ring (i.e., the connection should not be put
  *  to sleep).
- * 
+ *
  *  These macros will set the req_event/rsp_event field to trigger a
  *  notification on the very next message that is enqueued. If you want to
  *  create batches of work (i.e., only receive a notification after several

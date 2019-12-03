@@ -1,14 +1,9 @@
 /** @file
 *
 *  Copyright (c) 2013, ARM Limited. All rights reserved.
+*  Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
 *
-*  This program and the accompanying materials
-*  are licensed and made available under the terms and conditions of the BSD License
-*  which accompanies this distribution.  The full text of the license may be found at
-*  http://opensource.org/licenses/bsd-license.php
-*
-*  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-*  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+*  SPDX-License-Identifier: BSD-2-Clause-Patent
 *
 **/
 
@@ -187,9 +182,13 @@ CpuSetMemoryAttributes (
   UINTN       RegionLength;
   UINTN       RegionArmAttributes;
 
+  if (mIsFlushingGCD) {
+    return EFI_SUCCESS;
+  }
+
   if ((BaseAddress & (SIZE_4KB - 1)) != 0) {
     // Minimum granularity is SIZE_4KB (4KB on ARM)
-    DEBUG ((EFI_D_PAGE, "CpuSetMemoryAttributes(%lx, %lx, %lx): Minimum ganularity is SIZE_4KB\n", BaseAddress, Length, EfiAttributes));
+    DEBUG ((DEBUG_PAGE, "CpuSetMemoryAttributes(%lx, %lx, %lx): Minimum granularity is SIZE_4KB\n", BaseAddress, Length, EfiAttributes));
     return EFI_UNSUPPORTED;
   }
 
@@ -205,78 +204,8 @@ CpuSetMemoryAttributes (
   if (EFI_ERROR (Status) || (RegionArmAttributes != ArmAttributes) ||
       ((BaseAddress + Length) > (RegionBaseAddress + RegionLength)))
   {
-    return SetMemoryAttributes (BaseAddress, Length, EfiAttributes, 0);
+    return ArmSetMemoryAttributes (BaseAddress, Length, EfiAttributes);
   } else {
     return EFI_SUCCESS;
   }
 }
-
-EFI_STATUS
-EFIAPI
-CpuConvertPagesToUncachedVirtualAddress (
-  IN  VIRTUAL_UNCACHED_PAGES_PROTOCOL  *This,
-  IN  EFI_PHYSICAL_ADDRESS              Address,
-  IN  UINTN                             Length,
-  IN  EFI_PHYSICAL_ADDRESS              VirtualMask,
-  OUT UINT64                           *Attributes     OPTIONAL
-  )
-{
-  EFI_STATUS                      Status;
-  EFI_GCD_MEMORY_SPACE_DESCRIPTOR GcdDescriptor;
-
-  if (Attributes != NULL) {
-    Status = gDS->GetMemorySpaceDescriptor (Address, &GcdDescriptor);
-    if (!EFI_ERROR (Status)) {
-      *Attributes = GcdDescriptor.Attributes;
-    }
-  }
-
-  //
-  // Make this address range page fault if accessed. If it is a DMA buffer than this would
-  // be the PCI address. Code should always use the CPU address, and we will or in VirtualMask
-  // to that address.
-  //
-  Status = SetMemoryAttributes (Address, Length, EFI_MEMORY_WP, 0);
-  if (!EFI_ERROR (Status)) {
-    Status = SetMemoryAttributes (Address | VirtualMask, Length, EFI_MEMORY_UC, VirtualMask);
-  }
-
-  DEBUG ((DEBUG_INFO | DEBUG_LOAD, "CpuConvertPagesToUncachedVirtualAddress()\n    Unmapped 0x%08lx Mapped 0x%08lx 0x%x bytes\n", Address, Address | VirtualMask, Length));
-
-  return Status;
-}
-
-
-EFI_STATUS
-EFIAPI
-CpuReconvertPages (
-  IN  VIRTUAL_UNCACHED_PAGES_PROTOCOL  *This,
-  IN  EFI_PHYSICAL_ADDRESS              Address,
-  IN  UINTN                             Length,
-  IN  EFI_PHYSICAL_ADDRESS              VirtualMask,
-  IN  UINT64                            Attributes
-  )
-{
-  EFI_STATUS      Status;
-
-  DEBUG ((DEBUG_INFO | DEBUG_LOAD, "CpuReconvertPages(%lx, %x, %lx, %lx)\n", Address, Length, VirtualMask, Attributes));
-
-  //
-  // Unmap the aliased Address
-  //
-  Status = SetMemoryAttributes (Address | VirtualMask, Length, EFI_MEMORY_WP, 0);
-  if (!EFI_ERROR (Status)) {
-    //
-    // Restore atttributes
-    //
-    Status = SetMemoryAttributes (Address, Length, Attributes, 0);
-  }
-
-  return Status;
-}
-
-
-VIRTUAL_UNCACHED_PAGES_PROTOCOL  gVirtualUncachedPages = {
-  CpuConvertPagesToUncachedVirtualAddress,
-  CpuReconvertPages
-};

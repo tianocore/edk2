@@ -2,14 +2,8 @@
   Definitions of functions for Driver Binding Protocol and Block I/O Protocol,
   and other internal definitions.
 
-Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -107,7 +101,7 @@ USBMassDriverBindingStop (
 /**
   Reset the block device.
 
-  This function implements EFI_BLOCK_IO_PROTOCOL.Reset(). 
+  This function implements EFI_BLOCK_IO_PROTOCOL.Reset().
   It resets the block device hardware.
   ExtendedVerification is ignored in this implementation.
 
@@ -129,7 +123,7 @@ UsbMassReset (
 /**
   Reads the requested number of blocks from the device.
 
-  This function implements EFI_BLOCK_IO_PROTOCOL.ReadBlocks(). 
+  This function implements EFI_BLOCK_IO_PROTOCOL.ReadBlocks().
   It reads the requested number of blocks from the device.
   All the blocks are read, or an error is returned.
 
@@ -163,7 +157,7 @@ UsbMassReadBlocks (
 /**
   Writes a specified number of blocks to the device.
 
-  This function implements EFI_BLOCK_IO_PROTOCOL.WriteBlocks(). 
+  This function implements EFI_BLOCK_IO_PROTOCOL.WriteBlocks().
   It writes a specified number of blocks to the device.
   All blocks are written, or an error is returned.
 

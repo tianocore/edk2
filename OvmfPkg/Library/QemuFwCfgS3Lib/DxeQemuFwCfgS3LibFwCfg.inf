@@ -1,0 +1,41 @@
+## @file
+# Full functionality QemuFwCfgS3Lib instance, for DXE phase modules.
+#
+#  Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (C) 2017, Red Hat, Inc.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 1.25
+  BASE_NAME                      = DxeQemuFwCfgS3LibFwCfg
+  FILE_GUID                      = C5DE76EB-E8DE-4057-A487-C5A09AB039AB
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = QemuFwCfgS3Lib|DXE_DRIVER DXE_RUNTIME_DRIVER
+
+#
+# The following information is for reference only and not required by the build
+# tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64 EBC
+#
+
+[Sources]
+  QemuFwCfgS3Dxe.c
+  QemuFwCfgS3PeiDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  MemoryAllocationLib
+  QemuFwCfgLib
+  UefiBootServicesTableLib
+
+[Protocols]
+  gEfiS3SaveStateProtocolGuid ## SOMETIMES_CONSUMES

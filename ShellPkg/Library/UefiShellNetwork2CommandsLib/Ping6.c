@@ -1,15 +1,9 @@
 /** @file
   The implementation for Ping6 application.
 
-  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -50,7 +44,7 @@ typedef struct _PING6_PRIVATE_DATA {
   EFI_EVENT                   Timer;
 
   UINT32                      TimerPeriod;
-  UINT32                      RttTimerTick;   
+  UINT32                      RttTimerTick;
   EFI_EVENT                   RttTimer;
 
   EFI_STATUS                  Status;
@@ -199,7 +193,7 @@ Ping6InitRttTimer (
   if (Private->TimerPeriod == 0) {
     return EFI_ABORTED;
   }
-  
+
   Private->RttTimerTick = 0;
   Status = gBS->CreateEvent (
                   EVT_TIMER | EVT_NOTIFY_SIGNAL,
@@ -245,7 +239,7 @@ Ping6FreeRttTimer (
 
 /**
   Read the current time.
-  
+
   @param[in]    Private    The pointer to PING6_PRIVATE_DATA.
 
   @retval the current tick value.
@@ -474,6 +468,7 @@ ON_EXIT:
     Status = Private->Ip6->Receive (Private->Ip6, RxToken);
 
     if (EFI_ERROR (Status)) {
+      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PING6_IP6_RECEIVE), gShellNetwork2HiiHandle, Status);
       Private->Status = EFI_ABORTED;
     }
   } else {
@@ -658,7 +653,11 @@ Ping6OnReceiveEchoReply (
 
   Private->RxToken.Status = EFI_NOT_READY;
 
-  return Private->Ip6->Receive (Private->Ip6, &Private->RxToken);
+  Status = Private->Ip6->Receive (Private->Ip6, &Private->RxToken);
+  if (EFI_ERROR (Status)) {
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PING6_IP6_RECEIVE), gShellNetwork2HiiHandle, Status);
+  }
+  return Status;
 }
 
 /**
@@ -750,7 +749,7 @@ Ping6CreateIpInstance (
   UINTN                            HandleNum;
   EFI_HANDLE                       *HandleBuffer;
   BOOLEAN                          UnspecifiedSrc;
-  BOOLEAN                          MediaPresent;
+  EFI_STATUS                       MediaStatus;
   EFI_SERVICE_BINDING_PROTOCOL     *Ip6Sb;
   EFI_IP6_CONFIG_PROTOCOL          *Ip6Cfg;
   EFI_IP6_CONFIG_DATA              Ip6Config;
@@ -761,7 +760,7 @@ Ping6CreateIpInstance (
 
   HandleBuffer      = NULL;
   UnspecifiedSrc    = FALSE;
-  MediaPresent      = TRUE;
+  MediaStatus       = EFI_SUCCESS;
   Ip6Sb             = NULL;
   IfInfo            = NULL;
   IfInfoSize        = 0;
@@ -782,11 +781,11 @@ Ping6CreateIpInstance (
 
   if (NetIp6IsUnspecifiedAddr (&Private->SrcAddress)) {
     //
-    // SrcAddress is unspecified. So, both connected and configured interface will be automatic selected. 
+    // SrcAddress is unspecified. So, both connected and configured interface will be automatic selected.
     //
     UnspecifiedSrc = TRUE;
   }
-  
+
   //
   // Source address is required when pinging a link-local address.
   //
@@ -795,7 +794,7 @@ Ping6CreateIpInstance (
     Status = EFI_INVALID_PARAMETER;
     goto ON_ERROR;
   }
-  
+
   //
   // For each ip6 protocol, check interface addresses list.
   //
@@ -809,8 +808,8 @@ Ping6CreateIpInstance (
       //
       // Check media.
       //
-      NetLibDetectMedia (HandleBuffer[HandleIndex], &MediaPresent);
-      if (!MediaPresent) {
+      NetLibDetectMediaWaitTimeout (HandleBuffer[HandleIndex], 0, &MediaStatus);
+      if (MediaStatus != EFI_SUCCESS) {
         //
         // Skip this one.
         //
@@ -894,7 +893,7 @@ Ping6CreateIpInstance (
         // Match a certain interface address.
         //
         break;
-      } 
+      }
     }
 
     if (AddrIndex < IfInfo->AddressInfoCount) {

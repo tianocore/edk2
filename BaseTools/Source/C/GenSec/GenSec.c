@@ -1,16 +1,16 @@
 /** @file
 Creates output file that is a properly formed section per the PI spec.
 
-Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
+#ifndef __GNUC__
+#include <windows.h>
+#include <io.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -27,6 +27,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "Crc32.h"
 #include "EfiUtilityMsgs.h"
 #include "ParseInf.h"
+#include "FvLib.h"
+#include "PeCoffLib.h"
 
 //
 // GenSec Tool Information
@@ -74,7 +76,8 @@ STATIC CHAR8      *mGUIDedSectionAttribue[]  = { "NONE", "PROCESSING_REQUIRED", 
 
 STATIC CHAR8 *mAlignName[] = {
   "1", "2", "4", "8", "16", "32", "64", "128", "256", "512",
-  "1K", "2K", "4K", "8K", "16K", "32K", "64K"
+  "1K", "2K", "4K", "8K", "16K", "32K", "64K", "128K", "256K",
+  "512K", "1M", "2M", "4M", "8M", "16M"
 };
 
 //
@@ -94,7 +97,7 @@ STATIC EFI_GUID  mZeroGuid                 = {0x0, 0x0, 0x0, {0x0, 0x0, 0x0, 0x0
 STATIC EFI_GUID  mEfiCrc32SectionGuid      = EFI_CRC32_GUIDED_SECTION_EXTRACTION_PROTOCOL_GUID;
 
 STATIC
-VOID 
+VOID
 Version (
   VOID
   )
@@ -107,12 +110,12 @@ Routine Description:
 Arguments:
 
   None
-  
+
 Returns:
 
   None
-  
---*/ 
+
+--*/
 {
   fprintf (stdout, "%s Version %d.%d %s \n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION, __BUILD_VERSION);
 }
@@ -142,11 +145,11 @@ Returns:
   // Summary usage
   //
   fprintf (stdout, "\nUsage: %s [options] [input_file]\n\n", UTILITY_NAME);
-  
+
   //
   // Copyright declaration
-  // 
-  fprintf (stdout, "Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.\n\n");
+  //
+  fprintf (stdout, "Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.\n\n");
 
   //
   // Details Option
@@ -167,7 +170,7 @@ Returns:
                         EFI_SECTION_ALL is default section type.\n");
   fprintf (stdout, "  -c [Type], --compress [Type]\n\
                         Compress method type can be PI_NONE or PI_STD.\n\
-                        if -c option is not given, PI_STD is default type.\n"); 
+                        if -c option is not given, PI_STD is default type.\n");
   fprintf (stdout, "  -g GuidValue, --vendor GuidValue\n\
                         GuidValue is one specific vendor guid value.\n\
                         Its format is xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx\n");
@@ -184,8 +187,12 @@ Returns:
                         used in Ver section.\n");
   fprintf (stdout, "  --sectionalign SectionAlign\n\
                         SectionAlign points to section alignment, which support\n\
-                        the alignment scope 1~64K. It is specified in same\n\
-                        order that the section file is input.\n");
+                        the alignment scope 0~16M. If SectionAlign is specified\n\
+                        as 0, tool get alignment value from SectionFile. It is\n\
+                        specified in same order that the section file is input.\n");
+  fprintf (stdout, "  --dummy dummyfile\n\
+                        compare dummpyfile with input_file to decide whether\n\
+                        need to set PROCESSING_REQUIRED attribute.\n");
   fprintf (stdout, "  -v, --verbose         Turn on verbose output with informational messages.\n");
   fprintf (stdout, "  -q, --quiet           Disable all messages except key message and fatal error\n");
   fprintf (stdout, "  -d, --debug level     Enable debug messages, at input debug level.\n");
@@ -202,7 +209,7 @@ Ascii2UnicodeString (
 
 Routine Description:
 
-  Write ascii string as unicode string format to FILE 
+  Write ascii string as unicode string format to FILE
 
 Arguments:
 
@@ -222,7 +229,7 @@ Returns:
   // End the UniString with a NULL.
   //
   *UniString = '\0';
-} 
+}
 
 STATUS
 GenSectionCommonLeafSection (
@@ -232,19 +239,19 @@ GenSectionCommonLeafSection (
   UINT8   **OutFileBuffer
   )
 /*++
-        
+
 Routine Description:
-           
+
   Generate a leaf section of type other than EFI_SECTION_VERSION
   and EFI_SECTION_USER_INTERFACE. Input file must be well formed.
   The function won't validate the input file's contents. For
   common leaf sections, the input file may be a binary file.
   The utility will add section header to the file.
-            
+
 Arguments:
-               
+
   InputFileName  - Name of the input file.
-                
+
   InputFileNum   - Number of input files. Should be 1 for leaf section.
 
   SectionType    - A valid section type string
@@ -252,7 +259,7 @@ Arguments:
   OutFileBuffer  - Buffer pointer to Output file contents
 
 Returns:
-                       
+
   STATUS_ERROR            - can't continue
   STATUS_SUCCESS          - successful return
 
@@ -310,7 +317,7 @@ Returns:
   //
   Buffer = (UINT8 *) malloc ((size_t) TotalLength);
   if (Buffer == NULL) {
-    Error (NULL, 0, 4001, "Resource", "memory cannot be allcoated"); 
+    Error (NULL, 0, 4001, "Resource", "memory cannot be allocated");
     goto Done;
   }
   CommonSect = (EFI_COMMON_SECTION_HEADER *) Buffer;
@@ -323,7 +330,7 @@ Returns:
     memset(CommonSect->Size, 0xff, sizeof(UINT8) * 3);
     ((EFI_COMMON_SECTION_HEADER2 *)CommonSect)->ExtendedSize = TotalLength;
   }
-  
+
   //
   // read data from the input file.
   //
@@ -335,7 +342,7 @@ Returns:
   }
 
   //
-  // Set OutFileBuffer 
+  // Set OutFileBuffer
   //
   *OutFileBuffer = Buffer;
   Status = STATUS_SUCCESS;
@@ -356,7 +363,7 @@ StringtoAlignment (
 
 Routine Description:
 
-  Converts Align String to align value (1~64K). 
+  Converts Align String to align value (1~16M).
 
 Arguments:
 
@@ -395,14 +402,14 @@ GetSectionContents (
   UINT32  *BufferLength
   )
 /*++
-        
+
 Routine Description:
-           
+
   Get the contents of all section files specified in InputFileName
   into FileBuffer.
-            
+
 Arguments:
-               
+
   InputFileName  - Name of the input file.
 
   InputFileAlign - Alignment required by the input file data.
@@ -411,11 +418,11 @@ Arguments:
 
   FileBuffer     - Output buffer to contain data
 
-  BufferLength   - On input, this is size of the FileBuffer. 
+  BufferLength   - On input, this is size of the FileBuffer.
                    On output, this is the actual length of the data.
 
 Returns:
-                       
+
   EFI_SUCCESS on successful return
   EFI_INVALID_PARAMETER if InputFileNum is less than 1 or BufferLength point is NULL.
   EFI_ABORTED if unable to open input file.
@@ -462,8 +469,8 @@ Returns:
       }
       Size++;
     }
-    
-    // 
+
+    //
     // Open file and read contents
     //
     InFile = fopen (LongFilePath (InputFileName[Index]), "rb");
@@ -475,7 +482,7 @@ Returns:
     fseek (InFile, 0, SEEK_END);
     FileSize = ftell (InFile);
     fseek (InFile, 0, SEEK_SET);
-    DebugMsg (NULL, 0, 9, "Input files", "the input file name is %s and the size is %u bytes", InputFileName[Index], (unsigned) FileSize); 
+    DebugMsg (NULL, 0, 9, "Input files", "the input file name is %s and the size is %u bytes", InputFileName[Index], (unsigned) FileSize);
     //
     // Adjust section buffer when section alignment is required.
     //
@@ -512,7 +519,7 @@ Returns:
             HeaderSize = GuidSectHeader.DataOffset;
           }
         }
-      } 
+      }
 
       fseek (InFile, 0, SEEK_SET);
 
@@ -531,7 +538,7 @@ Returns:
       if ((InputFileAlign [Index] != 0) && (((Size + HeaderSize + TeOffset) % InputFileAlign [Index]) != 0)) {
         Offset = (Size + sizeof (EFI_COMMON_SECTION_HEADER) + HeaderSize + TeOffset + InputFileAlign [Index] - 1) & ~(InputFileAlign [Index] - 1);
         Offset = Offset - Size - HeaderSize - TeOffset;
-         
+
         if (FileBuffer != NULL && ((Size + Offset) < *BufferLength)) {
           //
           // The maximal alignment is 64K, the raw section size must be less than 0xffffff
@@ -564,7 +571,7 @@ Returns:
     fclose (InFile);
     Size += FileSize;
   }
-  
+
   //
   // Set the real required buffer size.
   //
@@ -586,28 +593,28 @@ GenSectionCompressionSection (
   UINT8   **OutFileBuffer
   )
 /*++
-        
+
 Routine Description:
-           
+
   Generate an encapsulating section of type EFI_SECTION_COMPRESSION
   Input file must be already sectioned. The function won't validate
-  the input files' contents. Caller should hand in files already 
+  the input files' contents. Caller should hand in files already
   with section header.
-            
+
 Arguments:
-               
+
   InputFileName  - Name of the input file.
 
   InputFileAlign - Alignment required by the input file data.
 
   InputFileNum   - Number of input files. Should be at least 1.
 
-  SectCompSubType - Specify the compression algorithm requested. 
-  
+  SectCompSubType - Specify the compression algorithm requested.
+
   OutFileBuffer   - Buffer pointer to Output file contents
 
 Returns:
-                       
+
   EFI_SUCCESS           on successful return
   EFI_INVALID_PARAMETER if InputFileNum is less than 1
   EFI_ABORTED           if unable to open input file.
@@ -645,7 +652,7 @@ Returns:
   if (Status == EFI_BUFFER_TOO_SMALL) {
     FileBuffer = (UINT8 *) malloc (InputLength);
     if (FileBuffer == NULL) {
-      Error (NULL, 0, 4001, "Resource", "memory cannot be allcoated");
+      Error (NULL, 0, 4001, "Resource", "memory cannot be allocated");
       return EFI_OUT_OF_RESOURCES;
     }
     //
@@ -741,7 +748,7 @@ Returns:
     }
   }
 
-  DebugMsg (NULL, 0, 9, "comprss file size", 
+  DebugMsg (NULL, 0, 9, "comprss file size",
             "the original section size is %d bytes and the compressed section size is %u bytes", (unsigned) InputLength, (unsigned) CompressedLength);
 
   //if (TotalLength >= MAX_SECTION_SIZE) {
@@ -769,7 +776,7 @@ Returns:
     CompressionSect2->UncompressedLength        = InputLength;
   } else {
     CompressionSect = (EFI_COMPRESSION_SECTION *) FileBuffer;
-    
+
     CompressionSect->CommonHeader.Type     = EFI_SECTION_COMPRESSION;
     CompressionSect->CommonHeader.Size[0]  = (UINT8) (TotalLength & 0xff);
     CompressionSect->CommonHeader.Size[1]  = (UINT8) ((TotalLength & 0xff00) >> 8);
@@ -779,7 +786,7 @@ Returns:
   }
 
   //
-  // Set OutFileBuffer 
+  // Set OutFileBuffer
   //
   *OutFileBuffer = FileBuffer;
 
@@ -797,32 +804,32 @@ GenSectionGuidDefinedSection (
   UINT8    **OutFileBuffer
   )
 /*++
-        
+
 Routine Description:
-           
+
   Generate an encapsulating section of type EFI_SECTION_GUID_DEFINED
   Input file must be already sectioned. The function won't validate
-  the input files' contents. Caller should hand in files already 
+  the input files' contents. Caller should hand in files already
   with section header.
-            
+
 Arguments:
-               
+
   InputFileName - Name of the input file.
-                
+
   InputFileAlign - Alignment required by the input file data.
 
   InputFileNum  - Number of input files. Should be at least 1.
 
   VendorGuid    - Specify vendor guid value.
 
-  DataAttribute - Specify attribute for the vendor guid data. 
-  
+  DataAttribute - Specify attribute for the vendor guid data.
+
   DataHeaderSize- Guided Data Header Size
-  
+
   OutFileBuffer   - Buffer pointer to Output file contents
 
 Returns:
-                       
+
   EFI_SUCCESS on successful return
   EFI_INVALID_PARAMETER if InputFileNum is less than 1
   EFI_ABORTED if unable to open input file.
@@ -874,7 +881,7 @@ Returns:
 
     FileBuffer = (UINT8 *) malloc (InputLength + Offset);
     if (FileBuffer == NULL) {
-      Error (NULL, 0, 4001, "Resource", "memory cannot be allcoated");
+      Error (NULL, 0, 4001, "Resource", "memory cannot be allocated");
       return EFI_OUT_OF_RESOURCES;
     }
     //
@@ -909,7 +916,7 @@ Returns:
   // InputLength != 0, but FileBuffer == NULL means out of resources.
   //
   if (FileBuffer == NULL) {
-    Error (NULL, 0, 4001, "Resource", "memory cannot be allcoated");
+    Error (NULL, 0, 4001, "Resource", "memory cannot be allocated");
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -922,7 +929,7 @@ Returns:
     //
     Crc32Checksum = 0;
     CalculateCrc32 (FileBuffer + Offset, InputLength, &Crc32Checksum);
-    
+
     if (TotalLength >= MAX_SECTION_SIZE) {
       Crc32GuidSect2 = (CRC32_SECTION_HEADER2 *) FileBuffer;
       Crc32GuidSect2->GuidSectionHeader.CommonHeader.Type     = EFI_SECTION_GUID_DEFINED;
@@ -972,12 +979,109 @@ Returns:
     }
   }
   VerboseMsg ("the size of the created section file is %u bytes", (unsigned) TotalLength);
-  
+
   //
-  // Set OutFileBuffer 
+  // Set OutFileBuffer
   //
   *OutFileBuffer = FileBuffer;
 
+  return EFI_SUCCESS;
+}
+
+EFI_STATUS
+FfsRebaseImageRead (
+    IN      VOID    *FileHandle,
+    IN      UINTN   FileOffset,
+    IN OUT  UINT32  *ReadSize,
+    OUT     VOID    *Buffer
+    )
+  /*++
+
+    Routine Description:
+
+    Support routine for the PE/COFF Loader that reads a buffer from a PE/COFF file
+
+    Arguments:
+
+   FileHandle - The handle to the PE/COFF file
+
+   FileOffset - The offset, in bytes, into the file to read
+
+   ReadSize   - The number of bytes to read from the file starting at FileOffset
+
+   Buffer     - A pointer to the buffer to read the data into.
+
+   Returns:
+
+   EFI_SUCCESS - ReadSize bytes of data were read into Buffer from the PE/COFF file starting at FileOffset
+
+   --*/
+{
+  CHAR8   *Destination8;
+  CHAR8   *Source8;
+  UINT32  Length;
+
+  Destination8  = Buffer;
+  Source8       = (CHAR8 *) ((UINTN) FileHandle + FileOffset);
+  Length        = *ReadSize;
+  while (Length--) {
+    *(Destination8++) = *(Source8++);
+  }
+
+  return EFI_SUCCESS;
+}
+
+STATIC
+EFI_STATUS
+GetAlignmentFromFile(char *InFile, UINT32 *Alignment)
+  /*
+    InFile is input file for getting alignment
+    return the alignment
+    */
+{
+  FILE                           *InFileHandle;
+  UINT8                          *PeFileBuffer;
+  UINTN                          PeFileSize;
+  UINT32                         CurSecHdrSize;
+  PE_COFF_LOADER_IMAGE_CONTEXT   ImageContext;
+  EFI_COMMON_SECTION_HEADER      *CommonHeader;
+  EFI_STATUS                     Status;
+
+  InFileHandle        = NULL;
+  PeFileBuffer        = NULL;
+  *Alignment          = 0;
+
+  memset (&ImageContext, 0, sizeof (ImageContext));
+
+  InFileHandle = fopen(LongFilePath(InFile), "rb");
+  if (InFileHandle == NULL){
+    Error (NULL, 0, 0001, "Error opening file", InFile);
+    return EFI_ABORTED;
+  }
+  PeFileSize = _filelength (fileno(InFileHandle));
+  PeFileBuffer = (UINT8 *) malloc (PeFileSize);
+  if (PeFileBuffer == NULL) {
+    fclose (InFileHandle);
+    Error(NULL, 0, 4001, "Resource", "memory cannot be allocated  of %s", InFileHandle);
+    return EFI_OUT_OF_RESOURCES;
+  }
+  fread (PeFileBuffer, sizeof (UINT8), PeFileSize, InFileHandle);
+  fclose (InFileHandle);
+  CommonHeader = (EFI_COMMON_SECTION_HEADER *) PeFileBuffer;
+  CurSecHdrSize = GetSectionHeaderLength(CommonHeader);
+  ImageContext.Handle = (VOID *) ((UINTN)PeFileBuffer + CurSecHdrSize);
+  ImageContext.ImageRead = (PE_COFF_LOADER_READ_FILE)FfsRebaseImageRead;
+  Status               = PeCoffLoaderGetImageInfo(&ImageContext);
+  if (EFI_ERROR (Status)) {
+    Error (NULL, 0, 3000, "Invalid PeImage", "The input file is %s and return status is %x", InFile, (int) Status);
+    return Status;
+   }
+  *Alignment = ImageContext.SectionAlignment;
+  // Free the allocated memory resource
+  if (PeFileBuffer != NULL) {
+    free (PeFileBuffer);
+    PeFileBuffer = NULL;
+  }
   return EFI_SUCCESS;
 }
 
@@ -1016,7 +1120,7 @@ Returns:
   int                       VersionNumber;
   UINT8                     SectType;
   UINT8                     SectCompSubType;
-  UINT16                    SectGuidAttribute; 
+  UINT16                    SectGuidAttribute;
   UINT64                    SectGuidHeaderLength;
   EFI_VERSION_SECTION       *VersionSect;
   EFI_USER_INTERFACE_SECTION *UiSect;
@@ -1027,6 +1131,13 @@ Returns:
   UINT32                    *InputFileAlign;
   UINT32                    InputFileAlignNum;
   EFI_COMMON_SECTION_HEADER *SectionHeader;
+  CHAR8                     *DummyFileName;
+  FILE                      *DummyFile;
+  UINTN                     DummyFileSize;
+  UINT8                     *DummyFileBuffer;
+  FILE                      *InFile;
+  UINT8                     *InFileBuffer;
+  UINTN                     InFileSize;
 
   InputFileAlign        = NULL;
   InputFileAlignNum     = 0;
@@ -1048,9 +1159,16 @@ Returns:
   SectGuidHeaderLength  = 0;
   VersionSect           = NULL;
   UiSect                = NULL;
-  
+  DummyFileSize         = 0;
+  DummyFileName         = NULL;
+  DummyFile             = NULL;
+  DummyFileBuffer       = NULL;
+  InFile                = NULL;
+  InFileSize            = 0;
+  InFileBuffer          = NULL;
+
   SetUtilityName (UTILITY_NAME);
-  
+
   if (argc == 1) {
     Error (NULL, 0, 1001, "Missing options", "No options input");
     Usage ();
@@ -1066,12 +1184,12 @@ Returns:
   if ((stricmp (argv[0], "-h") == 0) || (stricmp (argv[0], "--help") == 0)) {
     Version ();
     Usage ();
-    return STATUS_SUCCESS;    
+    return STATUS_SUCCESS;
   }
 
   if (stricmp (argv[0], "--version") == 0) {
     Version ();
-    return STATUS_SUCCESS;    
+    return STATUS_SUCCESS;
   }
 
   while (argc > 0) {
@@ -1083,7 +1201,7 @@ Returns:
       }
       argc -= 2;
       argv += 2;
-      continue; 
+      continue;
     }
 
     if ((stricmp (argv[0], "-o") == 0) || (stricmp (argv[0], "--outputfile") == 0)) {
@@ -1094,7 +1212,7 @@ Returns:
       }
       argc -= 2;
       argv += 2;
-      continue; 
+      continue;
     }
 
     if ((stricmp (argv[0], "-c") == 0) || (stricmp (argv[0], "--compress") == 0)) {
@@ -1118,8 +1236,22 @@ Returns:
       argv += 2;
       continue;
     }
+    if (stricmp (argv[0], "--dummy") == 0) {
+      DummyFileName = argv[1];
+      if (DummyFileName == NULL) {
+        Error (NULL, 0, 1003, "Invalid option value", "Dummy file can't be NULL");
+        goto Finish;
+      }
+      argc -= 2;
+      argv += 2;
+      continue;
+    }
 
     if ((stricmp (argv[0], "-r") == 0) || (stricmp (argv[0], "--attributes") == 0)) {
+      if (argv[1] == NULL) {
+        Error (NULL, 0, 1003, "Invalid option value", "Guid section attributes can't be NULL");
+        goto Finish;
+      }
       if (stricmp (argv[1], mGUIDedSectionAttribue[EFI_GUIDED_SECTION_PROCESSING_REQUIRED]) == 0) {
         SectGuidAttribute |= EFI_GUIDED_SECTION_PROCESSING_REQUIRED;
       } else if (stricmp (argv[1], mGUIDedSectionAttribue[EFI_GUIDED_SECTION_AUTH_STATUS_VALID]) == 0) {
@@ -1204,7 +1336,7 @@ Returns:
         goto Finish;
       }
       if (LogLevel > 9) {
-        Error (NULL, 0, 1003, "Invalid option value", "Debug Level range is 0~9, currnt input level is %d", (int) LogLevel);
+        Error (NULL, 0, 1003, "Invalid option value", "Debug Level range is 0~9, current input level is %d", (int) LogLevel);
         goto Finish;
       }
       SetPrintLevel (LogLevel);
@@ -1237,16 +1369,19 @@ Returns:
         }
         memset (&(InputFileAlign[InputFileNum]), 1, (MAXIMUM_INPUT_FILE_NUM * sizeof (UINT32)));
       }
-      
-      Status = StringtoAlignment (argv[1], &(InputFileAlign[InputFileAlignNum]));
-      if (EFI_ERROR (Status)) {
-        Error (NULL, 0, 1003, "Invalid option value", "%s = %s", argv[0], argv[1]);
-        goto Finish;
+      if (stricmp(argv[1], "0") == 0) {
+        InputFileAlign[InputFileAlignNum] = 0;
+      } else {
+        Status = StringtoAlignment (argv[1], &(InputFileAlign[InputFileAlignNum]));
+        if (EFI_ERROR (Status)) {
+          Error (NULL, 0, 1003, "Invalid option value", "%s = %s", argv[0], argv[1]);
+          goto Finish;
+        }
       }
       argc -= 2;
       argv += 2;
       InputFileAlignNum ++;
-      continue; 
+      continue;
     }
 
     //
@@ -1255,7 +1390,7 @@ Returns:
     if ((InputFileNum == 0) && (InputFileName == NULL)) {
       InputFileName = (CHAR8 **) malloc (MAXIMUM_INPUT_FILE_NUM * sizeof (CHAR8 *));
       if (InputFileName == NULL) {
-        Error (NULL, 0, 4001, "Resource", "memory cannot be allcoated");
+        Error (NULL, 0, 4001, "Resource", "memory cannot be allocated");
         goto Finish;
       }
       memset (InputFileName, 0, (MAXIMUM_INPUT_FILE_NUM * sizeof (CHAR8 *)));
@@ -1269,7 +1404,7 @@ Returns:
                                   );
 
       if (InputFileName == NULL) {
-        Error (NULL, 0, 4001, "Resource", "memory cannot be allcoated");
+        Error (NULL, 0, 4001, "Resource", "memory cannot be allocated");
         goto Finish;
       }
       memset (&(InputFileName[InputFileNum]), 0, (MAXIMUM_INPUT_FILE_NUM * sizeof (CHAR8 *)));
@@ -1284,8 +1419,82 @@ Returns:
     Error (NULL, 0, 1003, "Invalid option", "section alignment must be set for each section");
     goto Finish;
   }
+  for (Index = 0; Index < InputFileAlignNum; Index++)
+  {
+    if (InputFileAlign[Index] == 0) {
+      Status = GetAlignmentFromFile(InputFileName[Index], &(InputFileAlign[Index]));
+      if (EFI_ERROR(Status)) {
+        Error (NULL, 0, 1003, "Fail to get Alignment from %s", InputFileName[InputFileNum]);
+        goto Finish;
+      }
+    }
+  }
 
   VerboseMsg ("%s tool start.", UTILITY_NAME);
+
+  if (DummyFileName != NULL) {
+      //
+      // Open file and read contents
+      //
+      DummyFile = fopen (LongFilePath (DummyFileName), "rb");
+      if (DummyFile == NULL) {
+        Error (NULL, 0, 0001, "Error opening file", DummyFileName);
+        goto Finish;
+      }
+
+      fseek (DummyFile, 0, SEEK_END);
+      DummyFileSize = ftell (DummyFile);
+      fseek (DummyFile, 0, SEEK_SET);
+      DummyFileBuffer = (UINT8 *) malloc (DummyFileSize);
+      if (DummyFileBuffer == NULL) {
+        fclose(DummyFile);
+        Error (NULL, 0, 4001, "Resource", "memory cannot be allocated");
+        goto Finish;
+      }
+
+      fread(DummyFileBuffer, 1, DummyFileSize, DummyFile);
+      fclose(DummyFile);
+      DebugMsg (NULL, 0, 9, "Dummy files", "the dummy file name is %s and the size is %u bytes", DummyFileName, (unsigned) DummyFileSize);
+
+      if (InputFileName == NULL) {
+        Error (NULL, 0, 4001, "Resource", "memory cannot be allocated");
+        goto Finish;
+      }
+      InFile = fopen(LongFilePath(InputFileName[0]), "rb");
+      if (InFile == NULL) {
+        Error (NULL, 0, 0001, "Error opening file", InputFileName[0]);
+        goto Finish;
+      }
+
+      fseek (InFile, 0, SEEK_END);
+      InFileSize = ftell (InFile);
+      fseek (InFile, 0, SEEK_SET);
+      InFileBuffer = (UINT8 *) malloc (InFileSize);
+      if (InFileBuffer == NULL) {
+        fclose(InFile);
+        Error (NULL, 0, 4001, "Resource", "memory cannot be allocated");
+        goto Finish;
+      }
+
+      fread(InFileBuffer, 1, InFileSize, InFile);
+      fclose(InFile);
+      DebugMsg (NULL, 0, 9, "Input files", "the input file name is %s and the size is %u bytes", InputFileName[0], (unsigned) InFileSize);
+      if (InFileSize > DummyFileSize){
+        if (stricmp((CHAR8 *)DummyFileBuffer, (CHAR8 *)(InFileBuffer + (InFileSize - DummyFileSize))) == 0){
+          SectGuidHeaderLength = InFileSize - DummyFileSize;
+        }
+      }
+      if (SectGuidHeaderLength == 0) {
+        SectGuidAttribute |= EFI_GUIDED_SECTION_PROCESSING_REQUIRED;
+      }
+      if (DummyFileBuffer != NULL) {
+        free (DummyFileBuffer);
+        DummyFileBuffer = NULL;
+      }
+      if (InFileBuffer != NULL) {
+        free (InFileBuffer);
+      }
+    }
 
   //
   // Parse all command line parameters to get the corresponding section type.
@@ -1314,14 +1523,14 @@ Returns:
     VerboseMsg ("Compress method is %s", mCompressionTypeName [SectCompSubType]);
   } else if (stricmp (SectionName, mSectionTypeName[EFI_SECTION_GUID_DEFINED]) == 0) {
     SectType     = EFI_SECTION_GUID_DEFINED;
-    
+
     if ((SectGuidAttribute & EFI_GUIDED_SECTION_NONE) != 0) {
       //
       // NONE attribute, clear attribute value.
       //
       SectGuidAttribute = SectGuidAttribute & ~EFI_GUIDED_SECTION_NONE;
     }
-    VerboseMsg ("Vendor Guid is %08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X", 
+    VerboseMsg ("Vendor Guid is %08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X",
                 (unsigned) VendorGuid.Data1,
                 VendorGuid.Data2,
                 VendorGuid.Data3,
@@ -1380,7 +1589,7 @@ Returns:
     Error (NULL, 0, 1003, "Invalid option value", "SectionType = %s", SectionName);
     goto Finish;
   }
-  
+
   //
   // GuidValue is only required by Guided section.
   //
@@ -1389,10 +1598,10 @@ Returns:
     (CompareGuid (&VendorGuid, &mZeroGuid) != 0)) {
     fprintf (stdout, "Warning: the input guid value is not required for this section type %s\n", SectionName);
   }
-  
+
   //
   // Check whether there is input file
-  //  
+  //
   if ((SectType != EFI_SECTION_VERSION) && (SectType != EFI_SECTION_USER_INTERFACE)) {
     //
     // The input file are required for other section type.
@@ -1470,7 +1679,7 @@ Returns:
     Index += (strlen (StringBuffer) * 2) + 2;
     OutFileBuffer = (UINT8 *) malloc (Index);
     if (OutFileBuffer == NULL) {
-      Error (NULL, 0, 4001, "Resource", "memory cannot be allcoated");
+      Error (NULL, 0, 4001, "Resource", "memory cannot be allocated");
       goto Finish;
     }
     VersionSect = (EFI_VERSION_SECTION *) OutFileBuffer;
@@ -1491,7 +1700,7 @@ Returns:
     Index += (strlen (StringBuffer) * 2) + 2;
     OutFileBuffer = (UINT8 *) malloc (Index);
     if (OutFileBuffer == NULL) {
-      Error (NULL, 0, 4001, "Resource", "memory cannot be allcoated");
+      Error (NULL, 0, 4001, "Resource", "memory cannot be allocated");
       goto Finish;
     }
     UiSect = (EFI_USER_INTERFACE_SECTION *) OutFileBuffer;
@@ -1515,11 +1724,11 @@ Returns:
               OutFileBuffer,
               &InputLength
               );
-  
+
     if (Status == EFI_BUFFER_TOO_SMALL) {
       OutFileBuffer = (UINT8 *) malloc (InputLength);
       if (OutFileBuffer == NULL) {
-        Error (NULL, 0, 4001, "Resource", "memory cannot be allcoated");
+        Error (NULL, 0, 4001, "Resource", "memory cannot be allocated");
         goto Finish;
       }
       //
@@ -1547,10 +1756,10 @@ Returns:
               );
     break;
   }
-  
+
   if (Status != EFI_SUCCESS || OutFileBuffer == NULL) {
     Error (NULL, 0, 2000, "Status is not successful", "Status value is 0x%X", (int) Status);
-	  goto Finish;
+    goto Finish;
   }
 
   //
@@ -1563,7 +1772,7 @@ Returns:
       InputLength = ((EFI_COMMON_SECTION_HEADER2 *)SectionHeader)->ExtendedSize;
     }
   }
-  
+
   //
   // Write the output file
   //
@@ -1591,7 +1800,11 @@ Finish:
   if (OutFile != NULL) {
     fclose (OutFile);
   }
-  
+
+  if (DummyFileBuffer != NULL) {
+    free (DummyFileBuffer);
+  }
+
   VerboseMsg ("%s tool done with return code is 0x%x.", UTILITY_NAME, GetUtilityStatus ());
 
   return GetUtilityStatus ();

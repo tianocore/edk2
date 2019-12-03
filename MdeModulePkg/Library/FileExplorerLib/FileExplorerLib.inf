@@ -1,15 +1,9 @@
 ## @file
 #  library defines a set of interfaces for how to do file explorer.
-#  
-#  Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
-#  This program and the accompanying materials are licensed and made available under
-#  the terms and conditions of the BSD License that accompanies this distribution.
-#  The full text of the license may be found at
-#  http://opensource.org/licenses/bsd-license.php.
-#  
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-#  
+#
+#  Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
 ##
 [Defines]
   INF_VERSION                    = 0x00010005
@@ -25,7 +19,7 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
 #
 
 [Sources]
@@ -50,15 +44,14 @@
   UefiHiiServicesLib
 
 [Guids]
-  gEfiFileSystemVolumeLabelInfoIdGuid           ## CONSUMES ## GUID (Indicate the information type is volume)
-  gEfiIfrTianoGuid                              ## CONSUMES ## GUID (Extended IFR Guid Opcode)
- 
+  gEfiFileSystemVolumeLabelInfoIdGuid           ## SOMETIMES_CONSUMES ## GUID (Indicate the information type is volume)
+  gEfiIfrTianoGuid                              ## SOMETIMES_CONSUMES ## GUID (Extended IFR Guid Opcode)
+
 [Protocols]
-  gEfiSimpleFileSystemProtocolGuid              ## CONSUMES
-  gEfiLoadFileProtocolGuid                      ## CONSUMES
-  gEfiHiiConfigAccessProtocolGuid               ## CONSUMES
+  gEfiSimpleFileSystemProtocolGuid              ## SOMETIMES_CONSUMES
+  gEfiHiiConfigAccessProtocolGuid               ## PRODUCES
   gEfiFormBrowser2ProtocolGuid                  ## CONSUMES
-  gEfiDevicePathToTextProtocolGuid              ## CONSUMES
+  gEfiDevicePathToTextProtocolGuid              ## PRODUCES
 
 [Depex.common.DXE_DRIVER]
   gEfiFormBrowser2ProtocolGuid AND gEfiHiiDatabaseProtocolGuid

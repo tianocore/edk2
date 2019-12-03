@@ -1,31 +1,33 @@
 ## @file
 # preprocess source file
 #
-#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 #
-#  This program and the accompanying materials
-#  are licensed and made available under the terms and conditions of the BSD License
-#  which accompanies this distribution.  The full text of the license may be found at
-#  http://opensource.org/licenses/bsd-license.php
-#
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
 ##
 # Import Modules
 #
+from __future__ import print_function
+from __future__ import absolute_import
 import re
 import Common.LongFilePathOs as os
 import sys
 
-import antlr3
-from CLexer import CLexer
-from CParser import CParser
+if sys.version_info.major == 3:
+    import antlr4 as antlr
+    from Eot.CParser4.CLexer import CLexer
+    from Eot.CParser4.CParser import CParser
+else:
+    import antlr3 as antlr
+    antlr.InputStream = antlr.StringStream
+    from Eot.CParser3.CLexer import CLexer
+    from Eot.CParser3.CParser import CParser
 
-import FileProfile
-from CodeFragment import PP_Directive
-from ParserWarning import Warning
+from Eot import FileProfile
+from Eot.CodeFragment import PP_Directive
+from Eot.ParserWarning import Warning
 
 
 ##define T_CHAR_SPACE                ' '
@@ -72,40 +74,6 @@ class CodeFragmentCollector:
 
         self.__Token = ""
         self.__SkippedChars = ""
-
-    ## __IsWhiteSpace() method
-    #
-    #   Whether char at current FileBufferPos is whitespace
-    #
-    #   @param  self        The object pointer
-    #   @param  Char        The char to test
-    #   @retval True        The char is a kind of white space
-    #   @retval False       The char is NOT a kind of white space
-    #
-    def __IsWhiteSpace(self, Char):
-        if Char in (T_CHAR_NULL, T_CHAR_CR, T_CHAR_SPACE, T_CHAR_TAB, T_CHAR_LF):
-            return True
-        else:
-            return False
-
-    ## __SkipWhiteSpace() method
-    #
-    #   Skip white spaces from current char, return number of chars skipped
-    #
-    #   @param  self        The object pointer
-    #   @retval Count       The number of chars skipped
-    #
-    def __SkipWhiteSpace(self):
-        Count = 0
-        while not self.__EndOfFile():
-            Count += 1
-            if self.__CurrentChar() in (T_CHAR_NULL, T_CHAR_CR, T_CHAR_LF, T_CHAR_SPACE, T_CHAR_TAB):
-                self.__SkippedChars += str(self.__CurrentChar())
-                self.__GetOneChar()
-
-            else:
-                Count = Count - 1
-                return Count
 
     ## __EndOfFile() method
     #
@@ -291,7 +259,7 @@ class CodeFragmentCollector:
                 InCharLiteral = not InCharLiteral
             # meet new line, then no longer in a comment for // and '#'
             if self.__CurrentChar() == T_CHAR_LF:
-                if HashComment and PPDirectiveObj != None:
+                if HashComment and PPDirectiveObj is not None:
                     if PPDirectiveObj.Content.rstrip(T_CHAR_CR).endswith(T_CHAR_BACKSLASH):
                         PPDirectiveObj.Content += T_CHAR_LF
                         PPExtend = True
@@ -386,9 +354,9 @@ class CodeFragmentCollector:
         FileStringContents = ''
         for fileLine in self.Profile.FileLinesList:
             FileStringContents += fileLine
-        cStream = antlr3.StringStream(FileStringContents)
+        cStream = antlr.InputStream(FileStringContents)
         lexer = CLexer(cStream)
-        tStream = antlr3.CommonTokenStream(lexer)
+        tStream = antlr.CommonTokenStream(lexer)
         parser = CParser(tStream)
         parser.translation_unit()
 
@@ -413,49 +381,49 @@ class CodeFragmentCollector:
     #
     def PrintFragments(self):
 
-        print '################# ' + self.FileName + '#####################'
+        print('################# ' + self.FileName + '#####################')
 
-        print '/****************************************/'
-        print '/*************** ASSIGNMENTS ***************/'
-        print '/****************************************/'
-        for asign in FileProfile.AssignmentExpressionList:
-            print str(asign.StartPos) + asign.Name + asign.Operator + asign.Value
+        print('/****************************************/')
+        print('/************** ASSIGNMENTS *************/')
+        print('/****************************************/')
+        for assign in FileProfile.AssignmentExpressionList:
+            print(str(assign.StartPos) + assign.Name + assign.Operator + assign.Value)
 
-        print '/****************************************/'
-        print '/********* PREPROCESS DIRECTIVES ********/'
-        print '/****************************************/'
+        print('/****************************************/')
+        print('/********* PREPROCESS DIRECTIVES ********/')
+        print('/****************************************/')
         for pp in FileProfile.PPDirectiveList:
-            print str(pp.StartPos) + pp.Content
+            print(str(pp.StartPos) + pp.Content)
 
-        print '/****************************************/'
-        print '/********* VARIABLE DECLARATIONS ********/'
-        print '/****************************************/'
+        print('/****************************************/')
+        print('/********* VARIABLE DECLARATIONS ********/')
+        print('/****************************************/')
         for var in FileProfile.VariableDeclarationList:
-            print str(var.StartPos) + var.Modifier + ' '+ var.Declarator
+            print(str(var.StartPos) + var.Modifier + ' '+ var.Declarator)
 
-        print '/****************************************/'
-        print '/********* FUNCTION DEFINITIONS *********/'
-        print '/****************************************/'
+        print('/****************************************/')
+        print('/********* FUNCTION DEFINITIONS *********/')
+        print('/****************************************/')
         for func in FileProfile.FunctionDefinitionList:
-            print str(func.StartPos) + func.Modifier + ' '+ func.Declarator + ' ' + str(func.NamePos)
+            print(str(func.StartPos) + func.Modifier + ' '+ func.Declarator + ' ' + str(func.NamePos))
 
-        print '/****************************************/'
-        print '/************ ENUMERATIONS **************/'
-        print '/****************************************/'
+        print('/****************************************/')
+        print('/************ ENUMERATIONS **************/')
+        print('/****************************************/')
         for enum in FileProfile.EnumerationDefinitionList:
-            print str(enum.StartPos) + enum.Content
+            print(str(enum.StartPos) + enum.Content)
 
-        print '/****************************************/'
-        print '/*********** STRUCTS/UNIONS *************/'
-        print '/****************************************/'
+        print('/****************************************/')
+        print('/*********** STRUCTS/UNIONS *************/')
+        print('/****************************************/')
         for su in FileProfile.StructUnionDefinitionList:
-            print str(su.StartPos) + su.Content
+            print(str(su.StartPos) + su.Content)
 
-        print '/****************************************/'
-        print '/************** TYPEDEFS ****************/'
-        print '/****************************************/'
+        print('/****************************************/')
+        print('/************** TYPEDEFS ****************/')
+        print('/****************************************/')
         for typedef in FileProfile.TypedefDefinitionList:
-            print str(typedef.StartPos) + typedef.ToType
+            print(str(typedef.StartPos) + typedef.ToType)
 
 ##
 #
@@ -464,4 +432,4 @@ class CodeFragmentCollector:
 #
 if __name__ == "__main__":
 
-    print "For Test."
+    print("For Test.")

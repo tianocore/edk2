@@ -1,0 +1,22 @@
+#/** @file
+#
+#  Copyright (c) 2017, Linaro, Ltd. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = LcdPlatformNullLib
+  FILE_GUID                      = b78d02bb-d0b5-4389-bc7f-b39ee846c784
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = LcdPlatformLib
+
+[Sources]
+  LcdPlatformNullLib.c
+
+[Packages]
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  MdePkg/MdePkg.dec

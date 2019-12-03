@@ -4,13 +4,7 @@
   Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
   Copyright (c) 2011 - 2014, ARM Ltd. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -22,6 +16,7 @@
 #include <Library/PrintLib.h>
 #include <Library/ArmDisassemblerLib.h>
 #include <Library/SerialPortLib.h>
+#include <Library/UefiBootServicesTableLib.h>
 
 #include <Guid/DebugImageInfoTable.h>
 #include <Protocol/DebugSupport.h>
@@ -142,7 +137,7 @@ BaseName (
 /**
   This is the default action to take on an unexpected exception
 
-  Since this is exception context don't do anything crazy like try to allcoate memory.
+  Since this is exception context don't do anything crazy like try to allocate memory.
 
   @param  ExceptionType    Type of the exception
   @param  SystemContext    Register state at the time of the Exception
@@ -159,14 +154,21 @@ DefaultExceptionHandler (
   INT32  Offset;
 
   if (mRecursiveException) {
-    CharCount = AsciiSPrint (Buffer, sizeof (Buffer),"\nRecursive exception occurred while dumping the CPU state\n");
-    SerialPortWrite ((UINT8 *) Buffer, CharCount);
+    STATIC CHAR8 CONST Message[] = "\nRecursive exception occurred while dumping the CPU state\n";
+
+    SerialPortWrite ((UINT8 *)Message, sizeof Message - 1);
+    if (gST->ConOut != NULL) {
+      AsciiPrint (Message);
+    }
     CpuDeadLoop ();
   }
   mRecursiveException = TRUE;
 
   CharCount = AsciiSPrint (Buffer,sizeof (Buffer),"\n\n%a Exception at 0x%016lx\n", gExceptionTypeString[ExceptionType], SystemContext.SystemContextAArch64->ELR);
   SerialPortWrite ((UINT8 *) Buffer, CharCount);
+  if (gST->ConOut != NULL) {
+    AsciiPrint (Buffer);
+  }
 
   DEBUG_CODE_BEGIN ();
     CHAR8  *Pdb, *PrevPdb;
@@ -181,37 +183,43 @@ DefaultExceptionHandler (
       DEBUG ((EFI_D_ERROR, "PC 0x%012lx (0x%012lx+0x%08x) [ 0] %a\n",
         SystemContext.SystemContextAArch64->ELR, ImageBase,
         SystemContext.SystemContextAArch64->ELR - ImageBase, BaseName (Pdb)));
+    } else {
+      DEBUG ((EFI_D_ERROR, "PC 0x%012lx\n", SystemContext.SystemContextAArch64->ELR));
+    }
 
-      if ((UINT64 *)SystemContext.SystemContextAArch64->FP != 0) {
-        Idx = 0;
+    if ((UINT64 *)SystemContext.SystemContextAArch64->FP != 0) {
+      Idx = 0;
 
-        RootFp[0] = ((UINT64 *)SystemContext.SystemContextAArch64->FP)[0];
-        RootFp[1] = ((UINT64 *)SystemContext.SystemContextAArch64->FP)[1];
-        if (RootFp[1] != SystemContext.SystemContextAArch64->LR) {
-          RootFp[0] = SystemContext.SystemContextAArch64->FP;
-          RootFp[1] = SystemContext.SystemContextAArch64->LR;
-        }
-        for (Fp = RootFp; Fp[0] != 0; Fp = (UINT64 *)Fp[0]) {
-          Pdb = GetImageName (Fp[1], &ImageBase, &PeCoffSizeOfHeader);
-          if (Pdb != NULL) {
-            if (Pdb != PrevPdb) {
-              Idx++;
-              PrevPdb = Pdb;
-            }
-            DEBUG ((EFI_D_ERROR, "PC 0x%012lx (0x%012lx+0x%08x) [% 2d] %a\n",
-              Fp[1], ImageBase, Fp[1] - ImageBase, Idx, BaseName (Pdb)));
-          }
-        }
-        PrevPdb = Pdb = GetImageName (SystemContext.SystemContextAArch64->ELR, &ImageBase, &PeCoffSizeOfHeader);
-        DEBUG ((EFI_D_ERROR, "\n[ 0] %a\n", Pdb));
-
-        Idx = 0;
-        for (Fp = RootFp; Fp[0] != 0; Fp = (UINT64 *)Fp[0]) {
-          Pdb = GetImageName (Fp[1], &ImageBase, &PeCoffSizeOfHeader);
-          if (Pdb != NULL && Pdb != PrevPdb) {
-            DEBUG ((EFI_D_ERROR, "[% 2d] %a\n", ++Idx, Pdb));
+      RootFp[0] = ((UINT64 *)SystemContext.SystemContextAArch64->FP)[0];
+      RootFp[1] = ((UINT64 *)SystemContext.SystemContextAArch64->FP)[1];
+      if (RootFp[1] != SystemContext.SystemContextAArch64->LR) {
+        RootFp[0] = SystemContext.SystemContextAArch64->FP;
+        RootFp[1] = SystemContext.SystemContextAArch64->LR;
+      }
+      for (Fp = RootFp; Fp[0] != 0; Fp = (UINT64 *)Fp[0]) {
+        Pdb = GetImageName (Fp[1], &ImageBase, &PeCoffSizeOfHeader);
+        if (Pdb != NULL) {
+          if (Pdb != PrevPdb) {
+            Idx++;
             PrevPdb = Pdb;
           }
+          DEBUG ((EFI_D_ERROR, "PC 0x%012lx (0x%012lx+0x%08x) [% 2d] %a\n",
+            Fp[1], ImageBase, Fp[1] - ImageBase, Idx, BaseName (Pdb)));
+        } else {
+          DEBUG ((EFI_D_ERROR, "PC 0x%012lx\n", Fp[1]));
+        }
+      }
+      PrevPdb = Pdb = GetImageName (SystemContext.SystemContextAArch64->ELR, &ImageBase, &PeCoffSizeOfHeader);
+      if (Pdb != NULL) {
+        DEBUG ((EFI_D_ERROR, "\n[ 0] %a\n", Pdb));
+      }
+
+      Idx = 0;
+      for (Fp = RootFp; Fp[0] != 0; Fp = (UINT64 *)Fp[0]) {
+        Pdb = GetImageName (Fp[1], &ImageBase, &PeCoffSizeOfHeader);
+        if (Pdb != NULL && Pdb != PrevPdb) {
+          DEBUG ((EFI_D_ERROR, "[% 2d] %a\n", ++Idx, Pdb));
+          PrevPdb = Pdb;
         }
       }
     }

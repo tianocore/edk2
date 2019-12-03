@@ -1,29 +1,26 @@
 ## @file
 # process FV image section generation
 #
-#  Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 #
-#  This program and the accompanying materials
-#  are licensed and made available under the terms and conditions of the BSD License
-#  which accompanies this distribution.  The full text of the license may be found at
-#  http://opensource.org/licenses/bsd-license.php
-#
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
 ##
 # Import Modules
 #
-import Section
-import StringIO
-from Ffs import Ffs
+from __future__ import absolute_import
+from . import Section
+from io import BytesIO
+from .Ffs import SectionSuffix
 import subprocess
-from GenFdsGlobalVariable import GenFdsGlobalVariable
+from .GenFdsGlobalVariable import GenFdsGlobalVariable
 import Common.LongFilePathOs as os
 from CommonDataClass.FdfClass import FvImageSectionClassObject
+from Common.MultipleWorkspace import MultipleWorkspace as mws
 from Common import EdkLogger
 from Common.BuildToolError import *
+from Common.DataType import *
 
 ## generate FV image section
 #
@@ -50,10 +47,12 @@ class FvImageSection(FvImageSectionClassObject):
     #   @param  Dict        dictionary contains macro and its value
     #   @retval tuple       (Generated file name, section alignment)
     #
-    def GenSection(self, OutputPath, ModuleName, SecNum, KeyStringList, FfsInf = None, Dict = {}):
+    def GenSection(self, OutputPath, ModuleName, SecNum, KeyStringList, FfsInf = None, Dict = None, IsMakefile = False):
 
         OutputFileList = []
-        if self.FvFileType != None:
+        if Dict is None:
+            Dict = {}
+        if self.FvFileType is not None:
             FileList, IsSect = Section.Section.GetFileList(FfsInf, self.FvFileType, self.FvFileExtension)
             if IsSect :
                 return FileList, self.Alignment
@@ -64,27 +63,33 @@ class FvImageSection(FvImageSectionClassObject):
             for FvFileName in FileList:
                 FvAlignmentValue = 0
                 if os.path.isfile(FvFileName):
-                    FvFileObj = open (FvFileName,'rb')
+                    FvFileObj = open (FvFileName, 'rb')
                     FvFileObj.seek(0)
                     # PI FvHeader is 0x48 byte
                     FvHeaderBuffer = FvFileObj.read(0x48)
                     # FV alignment position.
-                    FvAlignmentValue = 1 << (ord (FvHeaderBuffer[0x2E]) & 0x1F)
+                    if isinstance(FvHeaderBuffer[0x2E], str):
+                        FvAlignmentValue = 1 << (ord(FvHeaderBuffer[0x2E]) & 0x1F)
+                    else:
+                        FvAlignmentValue = 1 << (FvHeaderBuffer[0x2E] & 0x1F)
                     FvFileObj.close()
                 if FvAlignmentValue > MaxFvAlignment:
                     MaxFvAlignment = FvAlignmentValue
 
-                OutputFile = os.path.join(OutputPath, ModuleName + 'SEC' + Num + Ffs.SectionSuffix.get("FV_IMAGE"))
-                GenFdsGlobalVariable.GenerateSection(OutputFile, [FvFileName], 'EFI_SECTION_FIRMWARE_VOLUME_IMAGE')
+                OutputFile = os.path.join(OutputPath, ModuleName + SUP_MODULE_SEC + Num + SectionSuffix.get("FV_IMAGE"))
+                GenFdsGlobalVariable.GenerateSection(OutputFile, [FvFileName], 'EFI_SECTION_FIRMWARE_VOLUME_IMAGE', IsMakefile=IsMakefile)
                 OutputFileList.append(OutputFile)
 
             # MaxFvAlignment is larger than or equal to 1K
             if MaxFvAlignment >= 0x400:
-                if MaxFvAlignment >= 0x10000:
-                    #The max alignment supported by FFS is 64K.
-                    self.Alignment = "64K"
+                if MaxFvAlignment >= 0x100000:
+                    #The max alignment supported by FFS is 16M.
+                    if MaxFvAlignment >= 0x1000000:
+                        self.Alignment = "16M"
+                    else:
+                        self.Alignment = str(MaxFvAlignment // 0x100000) + "M"
                 else:
-                    self.Alignment = str (MaxFvAlignment / 0x400) + "K"
+                    self.Alignment = str (MaxFvAlignment // 0x400) + "K"
             else:
                 # MaxFvAlignment is less than 1K
                 self.Alignment = str (MaxFvAlignment)
@@ -93,47 +98,61 @@ class FvImageSection(FvImageSectionClassObject):
         #
         # Generate Fv
         #
-        if self.FvName != None:
-            Buffer = StringIO.StringIO('')
+        if self.FvName is not None:
+            Buffer = BytesIO()
             Fv = GenFdsGlobalVariable.FdfParser.Profile.FvDict.get(self.FvName)
-            if Fv != None:
+            if Fv is not None:
                 self.Fv = Fv
-                FvFileName = Fv.AddToBuffer(Buffer, self.FvAddr, MacroDict = Dict)
-                if Fv.FvAlignment != None:
-                    if self.Alignment == None:
+                if not self.FvAddr and self.Fv.BaseAddress:
+                    self.FvAddr = self.Fv.BaseAddress
+                FvFileName = Fv.AddToBuffer(Buffer, self.FvAddr, MacroDict = Dict, Flag=IsMakefile)
+                if Fv.FvAlignment is not None:
+                    if self.Alignment is None:
                         self.Alignment = Fv.FvAlignment
                     else:
                         if GenFdsGlobalVariable.GetAlignment (Fv.FvAlignment) > GenFdsGlobalVariable.GetAlignment (self.Alignment):
                             self.Alignment = Fv.FvAlignment
             else:
-                if self.FvFileName != None:
+                if self.FvFileName is not None:
                     FvFileName = GenFdsGlobalVariable.ReplaceWorkspaceMacro(self.FvFileName)
                     if os.path.isfile(FvFileName):
-                        FvFileObj = open (FvFileName,'rb')
+                        FvFileObj = open (FvFileName, 'rb')
                         FvFileObj.seek(0)
                         # PI FvHeader is 0x48 byte
                         FvHeaderBuffer = FvFileObj.read(0x48)
                         # FV alignment position.
-                        FvAlignmentValue = 1 << (ord (FvHeaderBuffer[0x2E]) & 0x1F)
+                        if isinstance(FvHeaderBuffer[0x2E], str):
+                            FvAlignmentValue = 1 << (ord(FvHeaderBuffer[0x2E]) & 0x1F)
+                        else:
+                            FvAlignmentValue = 1 << (FvHeaderBuffer[0x2E] & 0x1F)
                         # FvAlignmentValue is larger than or equal to 1K
                         if FvAlignmentValue >= 0x400:
-                            if FvAlignmentValue >= 0x10000:
-                                #The max alignment supported by FFS is 64K.
-                                self.Alignment = "64K"
+                            if FvAlignmentValue >= 0x100000:
+                                #The max alignment supported by FFS is 16M.
+                                if FvAlignmentValue >= 0x1000000:
+                                    self.Alignment = "16M"
+                                else:
+                                    self.Alignment = str(FvAlignmentValue // 0x100000) + "M"
                             else:
-                                self.Alignment = str (FvAlignmentValue / 0x400) + "K"
+                                self.Alignment = str (FvAlignmentValue // 0x400) + "K"
                         else:
                             # FvAlignmentValue is less than 1K
                             self.Alignment = str (FvAlignmentValue)
                         FvFileObj.close()
+                    else:
+                        if len (mws.getPkgPath()) == 0:
+                            EdkLogger.error("GenFds", FILE_NOT_FOUND, "%s is not found in WORKSPACE: %s" % self.FvFileName, GenFdsGlobalVariable.WorkSpaceDir)
+                        else:
+                            EdkLogger.error("GenFds", FILE_NOT_FOUND, "%s is not found in packages path:\n\t%s" % (self.FvFileName, '\n\t'.join(mws.getPkgPath())))
+
                 else:
                     EdkLogger.error("GenFds", GENFDS_ERROR, "FvImageSection Failed! %s NOT found in FDF" % self.FvName)
 
             #
             # Prepare the parameter of GenSection
             #
-            OutputFile = os.path.join(OutputPath, ModuleName + 'SEC' + SecNum + Ffs.SectionSuffix.get("FV_IMAGE"))
-            GenFdsGlobalVariable.GenerateSection(OutputFile, [FvFileName], 'EFI_SECTION_FIRMWARE_VOLUME_IMAGE')
+            OutputFile = os.path.join(OutputPath, ModuleName + SUP_MODULE_SEC + SecNum + SectionSuffix.get("FV_IMAGE"))
+            GenFdsGlobalVariable.GenerateSection(OutputFile, [FvFileName], 'EFI_SECTION_FIRMWARE_VOLUME_IMAGE', IsMakefile=IsMakefile)
             OutputFileList.append(OutputFile)
 
             return OutputFileList, self.Alignment

@@ -1,14 +1,8 @@
 /** @file
   VFR file used by the SecureBoot configuration component.
 
-Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -316,11 +310,11 @@ formset
 
     subtitle text = STRING_TOKEN(STR_NULL);
 
-    goto SECUREBOOT_DELETE_SIGNATURE_FROM_DBX,
+    goto SECUREBOOT_DELETE_SIGNATURE_LIST_FORM,
     prompt = STRING_TOKEN (STR_SECURE_BOOT_DELETE_SIGNATURE),
     help   = STRING_TOKEN (STR_SECURE_BOOT_DELETE_SIGNATURE),
     flags  = INTERACTIVE,
-    key    = SECUREBOOT_DELETE_SIGNATURE_FROM_DBX;
+    key    = KEY_VALUE_FROM_DBX_TO_LIST_FORM;
 
   endform;
 
@@ -360,16 +354,57 @@ formset
   endform;
 
   //
-  // Form: 'Delete Signature' for DBX Options.
+  // Form: Display Signature List.
   //
-  form formid = SECUREBOOT_DELETE_SIGNATURE_FROM_DBX,
-    title  = STRING_TOKEN(STR_SECURE_BOOT_DELETE_SIGNATURE);
+  form formid = SECUREBOOT_DELETE_SIGNATURE_LIST_FORM,
+    title  = STRING_TOKEN(STR_SECURE_BOOT_DELETE_LIST_FORM);
 
-    label LABEL_DBX_DELETE;
+    subtitle text = STRING_TOKEN(STR_NULL);
+
+    grayoutif ideqval SECUREBOOT_CONFIGURATION.ListCount == 0;
+      label LABEL_DELETE_ALL_LIST_BUTTON;
+      //
+      // Will create a goto button dynamically here.
+      //
+      label LABEL_END;
+   endif;
+
+   subtitle text = STRING_TOKEN(STR_NULL);
+   label LABEL_SIGNATURE_LIST_START;
+   label LABEL_END;
+   subtitle text = STRING_TOKEN(STR_NULL);
+
+  endform;
+
+  //
+  // Form: Display Signature Data.
+  //
+  form formid = SECUREBOOT_DELETE_SIGNATURE_DATA_FORM,
+    title = STRING_TOKEN(STR_SECURE_BOOT_DELETE_DATA_FORM);
+
+    subtitle text = STRING_TOKEN(STR_NULL);
+
+    goto SECUREBOOT_DELETE_SIGNATURE_LIST_FORM,
+      prompt = STRING_TOKEN(STR_SECURE_BOOT_DELETE_ALL_DATA),
+      help   = STRING_TOKEN(STR_SECURE_BOOT_DELETE_ALL_DATA_HELP),
+      flags  = INTERACTIVE,
+      key    = KEY_SECURE_BOOT_DELETE_ALL_DATA;
+
+    grayoutif ideqval SECUREBOOT_CONFIGURATION.CheckedDataCount == 0;
+      goto SECUREBOOT_DELETE_SIGNATURE_LIST_FORM,
+        prompt = STRING_TOKEN(STR_SECURE_BOOT_DELETE_CHECK_DATA),
+        help   = STRING_TOKEN(STR_SECURE_BOOT_DELETE_CHECK_DATA_HELP),
+        flags  = INTERACTIVE,
+        key    = KEY_SECURE_BOOT_DELETE_CHECK_DATA;
+    endif;
+
+    subtitle text = STRING_TOKEN(STR_NULL);
+    label LABEL_SIGNATURE_DATA_START;
     label LABEL_END;
     subtitle text = STRING_TOKEN(STR_NULL);
 
   endform;
+
 
   //
   // Form: 'Delete Signature' for DBT Options.
@@ -446,26 +481,44 @@ formset
     label LABEL_END;
     subtitle text = STRING_TOKEN(STR_NULL);
 
-    string  varid   = SECUREBOOT_CONFIGURATION.SignatureGuid,
-            prompt  = STRING_TOKEN(STR_SECURE_BOOT_SIGNATURE_GUID),
-            help    = STRING_TOKEN(STR_SECURE_BOOT_SIGNATURE_GUID_HELP),
-            flags   = INTERACTIVE,
-            key     = KEY_SECURE_BOOT_SIGNATURE_GUID_DBX,
-            minsize = SECURE_BOOT_GUID_SIZE,
-            maxsize = SECURE_BOOT_GUID_SIZE,
-    endstring;
+    grayoutif ideqval SECUREBOOT_CONFIGURATION.FileEnrollType == 3;
+      string  varid   = SECUREBOOT_CONFIGURATION.SignatureGuid,
+              prompt  = STRING_TOKEN(STR_SECURE_BOOT_SIGNATURE_GUID),
+              help    = STRING_TOKEN(STR_SECURE_BOOT_SIGNATURE_GUID_HELP),
+              flags   = INTERACTIVE,
+              key     = KEY_SECURE_BOOT_SIGNATURE_GUID_DBX,
+              minsize = SECURE_BOOT_GUID_SIZE,
+              maxsize = SECURE_BOOT_GUID_SIZE,
+      endstring;
+    endif;
 
-    oneof name = SignatureFormatInDbx,
-          varid       = SECUREBOOT_CONFIGURATION.CertificateFormat,
-          prompt      = STRING_TOKEN(STR_DBX_CERTIFICATE_FORMAT_PROMPT),
-          help        = STRING_TOKEN(STR_DBX_CERTIFICATE_FORMAT_HELP),
-          option text = STRING_TOKEN(STR_DBX_CERTIFICATE_FORMAT_SHA256), value = 0x2, flags = DEFAULT;
-          option text = STRING_TOKEN(STR_DBX_CERTIFICATE_FORMAT_SHA384), value = 0x3, flags = 0;
-          option text = STRING_TOKEN(STR_DBX_CERTIFICATE_FORMAT_SHA512), value = 0x4, flags = 0;
-          option text = STRING_TOKEN(STR_DBX_CERTIFICATE_FORMAT_RAW), value = 0x5, flags = 0;
-    endoneof;
+    disableif NOT ideqval SECUREBOOT_CONFIGURATION.FileEnrollType == 1;
+      oneof name = X509SignatureFormatInDbx,
+            varid       = SECUREBOOT_CONFIGURATION.CertificateFormat,
+            prompt      = STRING_TOKEN(STR_DBX_CERTIFICATE_FORMAT_PROMPT),
+            help        = STRING_TOKEN(STR_DBX_CERTIFICATE_FORMAT_HELP),
+            option text = STRING_TOKEN(STR_DBX_CERTIFICATE_FORMAT_SHA256), value = 0x1, flags = DEFAULT;
+            option text = STRING_TOKEN(STR_DBX_CERTIFICATE_FORMAT_SHA384), value = 0x2, flags = 0;
+            option text = STRING_TOKEN(STR_DBX_CERTIFICATE_FORMAT_SHA512), value = 0x3, flags = 0;
+            option text = STRING_TOKEN(STR_DBX_CERTIFICATE_FORMAT_RAW), value = 0x4, flags = 0;
+      endoneof;
+    endif;
 
-    suppressif ideqval SECUREBOOT_CONFIGURATION.CertificateFormat == 5;
+    disableif NOT ideqval SECUREBOOT_CONFIGURATION.FileEnrollType == 2;
+      text
+        help   = STRING_TOKEN(STR_DBX_PE_IMAGE_FORMAT_HELP),          // Help string
+        text   = STRING_TOKEN(STR_DBX_CERTIFICATE_FORMAT_PROMPT),     // Prompt string
+        text   = STRING_TOKEN(STR_DBX_PE_FORMAT_SHA256);              // PE image type
+    endif;
+
+    disableif NOT ideqval SECUREBOOT_CONFIGURATION.FileEnrollType == 3;
+      text
+        help   = STRING_TOKEN(STR_DBX_AUTH_2_FORMAT_HELP),            // Help string
+        text   = STRING_TOKEN(STR_DBX_CERTIFICATE_FORMAT_PROMPT),     // Prompt string
+        text   = STRING_TOKEN(STR_DBX_AUTH_2_FORMAT);                 // AUTH_2 image type
+    endif;
+
+    suppressif ideqval SECUREBOOT_CONFIGURATION.CertificateFormat == 4;
         checkbox varid  = SECUREBOOT_CONFIGURATION.AlwaysRevocation,
                prompt = STRING_TOKEN(STR_ALWAYS_CERTIFICATE_REVOCATION_PROMPT),
                help   = STRING_TOKEN(STR_ALWAYS_CERTIFICATE_REVOCATION_HELP),

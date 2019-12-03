@@ -1,13 +1,7 @@
 /** @file
   Copyright (c) 2016, Linaro, Ltd. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -25,6 +19,14 @@
 #include <Protocol/DevicePath.h>
 #include <Protocol/NonDiscoverableDevice.h>
 
+/**
+  Get Guid form the type of non-discoverable device.
+
+  @param[in]  Type    The type of non-discoverable device.
+
+  @retval   Return the Guid.
+
+**/
 STATIC
 CONST EFI_GUID *
 GetGuidFromType (
@@ -74,9 +76,9 @@ typedef struct {
 #pragma pack ()
 
 /**
-  Register a non-discoverable MMIO device
+  Register a non-discoverable MMIO device.
 
-  @param[in]      DeviceType          The type of non-discoverable device
+  @param[in]      Type                The type of non-discoverable device
   @param[in]      DmaType             Whether the device is DMA coherent
   @param[in]      InitFunc            Initialization routine to be invoked when
                                       the device is enabled
@@ -87,6 +89,8 @@ typedef struct {
   @param[in]      NumMmioResources    The number of UINTN base/size pairs that
                                       follow, each describing an MMIO region
                                       owned by the device
+  @param[in]  ...                     The variable argument list which contains the
+                                      info about MmioResources.
 
   @retval EFI_SUCCESS                 The registration succeeded.
   @retval EFI_INVALID_PARAMETER       An invalid argument was given
@@ -153,7 +157,7 @@ RegisterNonDiscoverableMmioDevice (
     Desc->AddrLen               = Size;
     Desc->AddrRangeMax          = Base + Size - 1;
     Desc->ResType               = ACPI_ADDRESS_SPACE_TYPE_MEM;
-    Desc->AddrSpaceGranularity  = (Base + Size > SIZE_4GB) ? 64 : 32;
+    Desc->AddrSpaceGranularity  = ((EFI_PHYSICAL_ADDRESS)Base + Size > SIZE_4GB) ? 64 : 32;
     Desc->AddrTranslationOffset = 0;
   }
   VA_END (Args);

@@ -1,0 +1,41 @@
+## @file
+#  Runtime DXE part corresponding to StanaloneMM variable module.
+#
+#  This module installs variable arch protocol and variable write arch protocol
+#  to StandaloneMM runtime variable service.
+#
+# Copyright (c) 2019, ARM Ltd. All rights reserved.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = VariableMmDependency
+  FILE_GUID                      = 64BC4129-778E-4867-BA07-13999A4DEC3F
+  MODULE_TYPE                    = DXE_DRIVER
+  LIBRARY_CLASS                  = NULL
+  CONSTRUCTOR                    = VariableMmDependencyLibConstructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = AARCH64
+#
+#
+
+[Sources]
+  VariableMmDependency.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[Protocols]
+  gEfiSmmVariableProtocolGuid        ## PRODUCES
+
+[Guids]
+  gSmmVariableWriteGuid              ## PRODUCES             ## GUID # Install protocol
+
+[Depex]
+  TRUE

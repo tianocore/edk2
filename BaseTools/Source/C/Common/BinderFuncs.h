@@ -1,16 +1,10 @@
 /** @file
-Prototypes for binder functions that allow common code to be written which then 
-links to implementation of these functions which is appropriate for the specific 
+Prototypes for binder functions that allow common code to be written which then
+links to implementation of these functions which is appropriate for the specific
 environment that they are running under.
-  
-Copyright (c) 1999 - 2014, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 1999 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 

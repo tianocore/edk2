@@ -5,13 +5,7 @@
 
   Copyright (C) 2012, Red Hat, Inc.
 
-  This program and the accompanying materials are licensed and made available
-  under the terms and conditions of the BSD License which accompanies this
-  distribution. The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT
-  WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -41,6 +35,7 @@ typedef struct {
   VRING                  Ring;                 // VirtioRingInit      2
   EFI_BLOCK_IO_PROTOCOL  BlockIo;              // VirtioBlkInit       1
   EFI_BLOCK_IO_MEDIA     BlockIoMedia;         // VirtioBlkInit       1
+  VOID                   *RingMap;             // VirtioRingMap       2
 } VBLK_DEV;
 
 #define VIRTIO_BLK_FROM_BLOCK_IO(BlockIoPointer) \

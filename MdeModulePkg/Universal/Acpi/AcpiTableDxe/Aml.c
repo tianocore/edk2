@@ -1,14 +1,8 @@
 /** @file
   ACPI Sdt Protocol Driver
 
-  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved. <BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved. <BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -209,7 +203,7 @@ AmlSearchByOpByte (
       return &mAmlByteEncoding[Index];
     }
   }
-  
+
   return NULL;
 }
 
@@ -250,7 +244,7 @@ AmlGetPkgLength (
   UINT8             ByteCount;
   UINTN             RealLength;
   UINTN             Offset;
-  
+
   //
   // <bit 7-6: ByteData count that follows (0-3)>
   // <bit 5-4: Only used if PkgLength < 63>
@@ -265,8 +259,8 @@ AmlGetPkgLength (
   // package length value. The next ByteData will become the next least significant 8 bits
   // of the resulting value and so on, up to 3 ByteData bytes. Thus, the maximum package
   // length is 2**28.
-  // 
-  
+  //
+
   LeadByte = *Buffer;
   ByteCount = (UINT8)((LeadByte >> 6) & 0x03);
   Offset = ByteCount + 1;
@@ -295,7 +289,7 @@ AmlGetPkgLength (
     ASSERT (0);
     break;
   }
-  
+
   *PkgLength = RealLength;
   return Offset;
 }

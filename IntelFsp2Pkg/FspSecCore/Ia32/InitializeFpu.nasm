@@ -1,13 +1,7 @@
 ;------------------------------------------------------------------------------
 ;
-; Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
-; This program and the accompanying materials
-; are licensed and made available under the terms and conditions of the BSD License
-; which accompanies this distribution.  The full text of the license may be found at
-; http://opensource.org/licenses/bsd-license.php.
-;
-; THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-; WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+; Copyright (c) 2015 - 2019, Intel Corporation. All rights reserved.<BR>
+; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;
 ; Abstract:
 ;
@@ -52,7 +46,7 @@ ASM_PFX(InitializeFloatingPointUnits):
     fldcw    [ASM_PFX(mFpuControlWord)]
 
     ;
-    ; Use CpuId instructuion (CPUID.01H:EDX.SSE[bit 25] = 1) to test
+    ; Use CpuId instruction (CPUID.01H:EDX.SSE[bit 25] = 1) to test
     ; whether the processor supports SSE instruction.
     ;
     mov     eax, 1

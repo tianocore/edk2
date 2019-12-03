@@ -9,14 +9,8 @@
   ProcessRecoveryCapsule(), ProcessFmpCapsuleImage(), ProcessRecoveryImage(),
   ValidateFmpCapsule() will receive untrusted input and do basic validation.
 
-Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2016 - 2019, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -467,7 +461,7 @@ CreateHobForRecoveryCapsule (
   DEBUG((DEBUG_INFO, "BuildFvHob (FV in recovery) - 0x%lx - 0x%lx\n", (UINT64)(UINTN)FvHeader, FvHeader->FvLength));
 
   PeiServicesInstallFvInfoPpi(
-    NULL,
+    &FvHeader->FileSystemGuid,
     (VOID *)FvHeader,
     (UINT32)FvHeader->FvLength,
     NULL,
@@ -703,7 +697,7 @@ ProcessRecoveryCapsule (
     }
 
     //
-    // Press EFI FMP Capsule
+    // Process EFI FMP Capsule
     //
     DEBUG((DEBUG_INFO, "ProcessFmpCapsuleImage ...\n"));
     Status = ProcessFmpCapsuleImage(CapsuleHeader, IsSystemFmp);
@@ -772,7 +766,7 @@ LoadRecoveryCapsule (
       Status = DeviceRecoveryPpi->GetRecoveryCapsuleInfo (
                                     (EFI_PEI_SERVICES **)PeiServices,
                                     DeviceRecoveryPpi,
-                                    FeaturePcdGet(PcdFrameworkCompatibilitySupport) ? CapsuleInstance - 1 : CapsuleInstance,
+                                    CapsuleInstance,
                                     &CapsuleSize,
                                     &CapsuleType
                                     );
@@ -789,7 +783,7 @@ LoadRecoveryCapsule (
       Status = DeviceRecoveryPpi->LoadRecoveryCapsule (
                                     (EFI_PEI_SERVICES **)PeiServices,
                                     DeviceRecoveryPpi,
-                                    FeaturePcdGet(PcdFrameworkCompatibilitySupport) ? CapsuleInstance - 1 : CapsuleInstance,
+                                    CapsuleInstance,
                                     CapsuleBuffer
                                     );
       DEBUG ((DEBUG_ERROR, "LoadRecoveryCapsule - LoadRecoveryCapsule (%d) - %r\n", CapsuleInstance, Status));

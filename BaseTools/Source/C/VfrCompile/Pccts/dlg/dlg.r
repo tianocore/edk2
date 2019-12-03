@@ -23,9 +23,9 @@ resource 'cmdo' (128, "Dlg") {
 				{35, 175, 50, 225},
 				"On",
 				"-CC",
-				"When this control is checked, DLG genera"
-				"tes a scanner using C++ classes rather t"
-				"han C functions."
+				"When this control is checked, DLG generates "
+				"a scanner using C++ classes rather than "
+				"C functions."
 			},
 			/* [2] */
 			Or {
@@ -41,8 +41,7 @@ resource 'cmdo' (128, "Dlg") {
 				"DLGLexer",
 				keepCase,
 				"-cl",
-				"This entry specifies the name DLG uses f"
-				"or the C++ lexer class."
+				"This entry specifies the name DLG uses for the C++ lexer class."
 			},
 			/* [3] */
 			NotDependent {
@@ -90,8 +89,7 @@ resource 'cmdo' (128, "Dlg") {
 					{66, 25, 85, 135},
 					"Output File",
 					"",
-					"Choose the name of the file that will ho"
-					"ld the DLG-produced scanner."
+					"Choose the name of the file that will hold the DLG-produced scanner."
 				},
 				NoMore {
 
@@ -161,8 +159,7 @@ resource 'cmdo' (128, "Dlg") {
 				"mode.h",
 				keepCase,
 				"-m",
-				"This entry specifies the name DLG uses f"
-				"or its lexical mode output file."
+				"This entry specifies the name DLG uses for its lexical mode output file."
 			},
 			/* [11] */
 			NotDependent {
@@ -171,15 +168,14 @@ resource 'cmdo' (128, "Dlg") {
 			RadioButtons {
 				{	/* array radioArray: 3 elements */
 					/* [1] */
-					{134, 175, 149, 255}, "None", "", Set, "When this option is selected, DLG will n"
-					"ot compress its tables.",
+					{134, 175, 149, 255}, "None", "", Set, "When this option is selected, DLG will not "
+					"compress its tables.",
 					/* [2] */
-					{134, 265, 149, 345}, "Level 1", "-C1", NotSet, "When this option is selected, DLG will r"
-					"emove all unused characters from the tra"
-					"nsition-from table.",
+					{134, 265, 149, 345}, "Level 1", "-C1", NotSet, "When this option is selected, DLG will "
+					"remove all unused characters from the transition-from table.",
 					/* [3] */
-					{134, 360, 149, 450}, "Level 2", "-C2", NotSet, "When this option is selected, DLG will p"
-					"erform level 1 compression plus it will "
+					{134, 360, 149, 450}, "Level 2", "-C2", NotSet, "When this option is selected, DLG will "
+					"perform level 1 compression plus it will "
 					"map equivalent characters into the same "
 					"character classes."
 				}
@@ -202,8 +198,8 @@ resource 'cmdo' (128, "Dlg") {
 				{165, 20, 180, 145},
 				"Case Sensitive",
 				"-ci",
-				"When this control is checked, the DLG au"
-				"tomaton will treat upper and lower case "
+				"When this control is checked, the DLG automaton "
+				"will treat upper and lower case "
 				"characters identically."
 			},
 			/* [14] */
@@ -215,9 +211,8 @@ resource 'cmdo' (128, "Dlg") {
 				{165, 150, 180, 300},
 				"Interactive Scanner",
 				"-i",
-				"When this control is checked, DLG will g"
-				"enerate as interactive a scanner as poss"
-				"ible."
+				"When this control is checked, DLG will generate "
+				"as interactive a scanner as possible."
 			},
 			/* [15] */
 			NotDependent {
@@ -229,8 +224,8 @@ resource 'cmdo' (128, "Dlg") {
 				"Ambiguity Warnings",
 				"-Wambiguity",
 				"When this control is checked, DLG warns "
-				"if more than one regular expression coul"
-				"d match the same character sequence."
+				"if more than one regular expression could "
+				"match the same character sequence."
 			},
 			/* [16] */
 			NotDependent {
@@ -240,9 +235,9 @@ resource 'cmdo' (128, "Dlg") {
 				VersionString {
 					"1.33MR"
 				},
-				"PCCTS was written by Terence Parr, Russe"
-				"ll Quong, Will Cohen, and Hank Dietz: 19"
-				"89-1998. MPW port by Scott Haney.",
+				"PCCTS was written by Terence Parr, Russell "
+				"Quong, Will Cohen, and Hank Dietz: 1989-1998. "
+				"MPW port by Scott Haney.",
 				noDialog
 			},
 			/* [17] */
@@ -266,8 +261,8 @@ resource 'cmdo' (128, "Dlg") {
 				{142, 20, 157, 148},
 				"Generate ANSI C",
 				"-ga",
-				"When this control is checked, DLG genera"
-				"tes ANSI C compatible code."
+				"When this control is checked, DLG generates "
+				"ANSI C compatible code."
 			}
 		}
 	}

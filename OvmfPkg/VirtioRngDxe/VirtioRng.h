@@ -4,13 +4,7 @@
 
   Copyright (C) 2016, Linaro Ltd.
 
-  This program and the accompanying materials are licensed and made available
-  under the terms and conditions of the BSD License which accompanies this
-  distribution. The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT
-  WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -38,6 +32,7 @@ typedef struct {
   EFI_EVENT                 ExitBoot;       // DriverBindingStart   0
   VRING                     Ring;           // VirtioRingInit       2
   EFI_RNG_PROTOCOL          Rng;            // VirtioRngInit        1
+  VOID                      *RingMap;       // VirtioRingMap        2
 } VIRTIO_RNG_DEV;
 
 #define VIRTIO_ENTROPY_SOURCE_FROM_RNG(RngPointer) \

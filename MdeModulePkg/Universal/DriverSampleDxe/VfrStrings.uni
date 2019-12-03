@@ -1,24 +1,18 @@
 // *++
-	//
-// Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
-// This program and the accompanying materials                          
-// are licensed and made available under the terms and conditions of the BSD License         
-// which accompanies this distribution.  The full text of the license may be found at        
-// http://opensource.org/licenses/bsd-license.php                                            
-//                                                                                           
-// THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-// WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
-// 
+  //
+// Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
 // Module Name:
 //
 //   VfrStrings.vfr
-// 
+//
 // Abstract:
-// 
+//
 //   String definitions for Sample Setup formset.
-// 
+//
 // Revision History:
-// 
+//
 // --*/
 
 
@@ -52,9 +46,9 @@
 #string STR_CPU_STRING2                #language en-US " "
                                        #language fr-FR " "
 #string STR_NUMERIC_NUM_PROMPT         #language en-US "Please select the number"
-                                       #language fr-FR "Please select the number"                                       
+                                       #language fr-FR "Please select the number"
 #string STR_NUMERIC_NUM_HELP           #language en-US "Check the input number, test the efi buffer varstore"
-                                       #language fr-FR "Check the input number, test the efi buffer varstore"                                        
+                                       #language fr-FR "Check the input number, test the efi buffer varstore"
 #string STR_ONE_OF_PROMPT              #language en-US "My one-of prompt #1"
                                        #language fr-FR "Mi uno- de guía # 1"
 #string STR_ONE_OF_PROMPT_KEYWORD      #language en-US "My Keyword Namespace Test"
@@ -142,7 +136,7 @@
 #string STR_GOTO_DYNAMIC3_HELP         #language en-US "Update the destination through "retrieve" call back type before user select it."
                                        #language fr-FR "Update the destination through "retrieve" call back type before user select it."
 #string STR_GOTO_DYNAMIC4_HELP         #language en-US "Update the destination through "changing" call back type when user select it."
-                                       #language fr-FR "Update the destination through "changing" call back type when user select it."                                                                                
+                                       #language fr-FR "Update the destination through "changing" call back type when user select it."
 #string STR_ERROR_INCONSISTENT         #language en-US "This is my inconsistent error message"
                                        #language fr-FR "Éste es mi mensaje de error contrario."
 #string STR_ERROR_POPUP                #language en-US "You typed in something bad!"
@@ -240,7 +234,7 @@
 #string STR_STRING_CHECK_ERROR_POPUP   #language en-US "String you typed in is not correct!"
                                        #language fr-FR "String you typed in is not correct!"
 #string STR_TEXT_REFRESH_GUID          #language en-US "Add new menu by press "Ctrl + C""
-                                       #language fr-FR "Add new menu by press "Ctrl + C"" 
+                                       #language fr-FR "Add new menu by press "Ctrl + C""
 #string STR_TEXT_REFRESH_GUID_COUNT    #language en-US "Refresh guid event count"
                                        #language fr-FR "Refresh guid event count"
 #string STR_MODAL_FORM_TITLE           #language en-US "First Modal Form"
@@ -262,11 +256,76 @@
 #string STR_GOTO_ANOTHER_FORMSET_HELP                #language en-US "When select this option, browser will go to another formset."
                                                      #language fr-FR "When select this option, browser will go to another formset."
 #string STR_DEVICE_PATH                              #language en-US ""
-                                                     #language fr-FR ""                                                                                                           
+                                                     #language fr-FR ""
 #string STR_SUBMITTED_CALLBACK_TEST_PROMPT           #language en-US "Submitted callback test"
                                                      #language fr-FR "Submitted callback test"
 #string STR_SUBMITTED_CALLBACK_TEST_HELP             #language en-US "Change the value and press F10 to submmit will pop up a dialogue to show SUBMITTED Callback has been triggered"
                                                      #language fr-FR "Change the value and press F10 to submmit will pop up a dialogue to show SUBMITTED Callback has been triggered"
+#string STR_POPUP_TEST_PROMPT                        #language en-US "Select it to invoke Hii Popup Protocol"
+                                                     #language fr-FR "Select it to invoke Hii Popup Protocol"
+#string STR_POPUP_TEST_HELP                          #language en-US "Select this question will pop up a message box, then user can decide whether exit curret form or not"
+                                                     #language fr-FR "Select this question will pop up a message box, then user can decide whether exit curret form or not"
+#string STR_POPUP_STRING                             #language en-US "Are you sure to exit current form?"
+                                                     #language fr-FR "Are you sure to exit current form?"
+//
+// Form 7 to show Questions which refer to Union Bit varstore
+//
+#string STR_FORM7_TITLE                #language en-US "Form to Show Questions with union and bit VarStore"
+                                       #language fr-FR "Form to Show Questions with union and bit VarStore"
+#string STR_GOTO_FORM7                 #language en-US "Enter Page 7"
+                                       #language fr-FR "Enter Page 7"
+#string STR_GOTO_FORM7_HELP            #language en-US "This Form is to Show Questions with union and bit VarStore"
+                                       #language fr-FR "This Form is to Show Questions with union and bit VarStore"
+#string STR_NEST_BIT_EFI_VARSTORE      #language en-US "Nested BIT fields in efivarstore"
+                                       #language fr-FR "Nested BIT fields in efivarstore"
+#string STR_BIT_EFI_VARSTORE           #language en-US "BIT fields in efivarstore"
+                                       #language fr-FR "BIT fields in efivarstore"
+#string STR_NEST_BIT_VARSTORE          #language en-US "Nested BIT fields in bufferstore"
+                                       #language fr-FR "Nested BIT fields in bufferstore"
+#string STR_BIT_VARSTORE               #language en-US "BIT fields in bufferstore"
+                                       #language fr-FR "BIT fields in bufferstore"
+#string STR_UNION_EFI_VARSTORE         #language en-US "Union efivarstore"
+                                       #language fr-FR "Union efivarstore"
+#string STR_BIT_NEST_CHECK_BOX_PROMPT  #language en-US "NEST_BIT check box"
+                                       #language fr-FR "NEST_BIT check box"
+#string STR_BIT_NEST_CHECK_BOX_HELP    #language en-US "The check box refer to nested bit field, the default is checked"
+                                       #language fr-FR "The check box refer to nested bit field, the default is checked"
+#string STR_ONE_OF_BIT_NEST_PROMPT     #language en-US "NEST_BIT one-of"
+                                       #language fr-FR "NEST_BIT one-of"
+#string STR_ONE_OF_BIT_NEST_HELP       #language en-US "The oneof refer to nested bit field"
+                                       #language fr-FR "The oneof refer to nested bit field"
+#string STR_BIT_NEST_NUMERIC_PROMPT    #language en-US "NEST_BIT numeric"
+                                       #language fr-FR "NEST_BIT numeric"
+#string STR_BIT_NEST_NUMERIC_HELP      #language en-US "The numeric refer to nested bit field, the Standard default is 6 Manufacture default is 7"
+                                       #language fr-FR "The numeric refer to nested bit field, the Standard default is 6 Manufacture default is 7"
+#string BYTE_QUESTION_NEST_BIT_PROMPT  #language en-US "Use byte field in NEST_BIT structure"
+                                       #language fr-FR "Use byte field in NEST_BIT structure"
+#string BYTE_QUESTION_NEST_BIT_HELP    #language en-US "The Question refer to byte field in NEST_BIT structure"
+                                       #language fr-FR "The Question refer to byte field in NEST_BIT structure"
+#string STR_BIT_NEST_NUMERIC_DEFAULT_HELP   #language en-US "NEST_BIT numeric, default value form callback function, the Standard default is C Manufacture default is D"
+                                            #language fr-FR "NEST_BIT numeric, default value form callback function, the Standard default is C Manufacture default is D"
+#string STR_BIT_CHECK_BOX_PROMPT       #language en-US "BIT check box"
+                                       #language fr-FR "BIT check box"
+#string STR_BIT_CHECK_BOX_HELP         #language en-US "The check box refer to bit field, the default is checked"
+                                       #language fr-FR "The check box refer to bit field, the default is checked"
+#string STR_ONE_OF_BIT_PROMPT          #language en-US "BIT one-of"
+                                       #language fr-FR "BIT one-of"
+#string STR_ONE_OF_BIT_HELP            #language en-US "The one-of refer to bit field"
+                                       #language fr-FR "The one-of refer to bit field"
+#string STR_BIT_NUMERIC_PROMPT         #language en-US "BIT numeric"
+                                       #language fr-FR "BIT numeric"
+#string STR_BIT_NUMERIC_HELP           #language en-US "The numeric refer to bit field, the Standard default is 4 Manufacture default is 5"
+                                       #language fr-FR "The numeric refer to bit field  the Standard default is 4 Manufacture default is 5"
+#string STR_BUFFER_BIT_NUMERIC_HELP    #language en-US "The numeric refer to bit field, the Standard default is 16 Manufacture default is 17"
+                                       #language fr-FR "The numeric refer to bit field, the Standard default is 16 Manufacture default is 17"
+#string BYTE_QUESTION_BIT_PROMPT       #language en-US "Use byte field in BIT structure"
+                                       #language fr-FR "Use byte field in BIT structure"
+#string BYTE_QUESTION_BIT_HELP         #language en-US "The question refer to byte field in BIT structure"
+                                       #language fr-FR "The question refer to byte field in BIT structure"
+#string STR_UNION_BYTE_NUMERIC_PROMPT  #language en-US "UNION EfiVarStore byte numeric"
+                                       #language fr-FR "UNION EfiVarStore byte numeric"
+#string STR_UNION_BYTE_NUMERIC_HELP    #language en-US "Question refer to byte field in UNION type efivastore, the Standard default is 7 Manufacture default is 8"
+                                       #language fr-FR "Question refer to byte field in UNION type efivastore, the Standard default is 7 Manufacture default is 8"
 // Boot Order
 #string STR_BOOT_TITLE                 #language en-US "Boot"
 #string STR_BOOT_OPTIONS               #language en-US "Boot Order"
@@ -281,7 +340,7 @@
                                        #language fr-FR "Manufacture Default"
 
 #string STR_DEFAULTSTORE_SAFE          #language en-US "Safe Default"
-                                       #language fr-FR "Safe Default"                                       
+                                       #language fr-FR "Safe Default"
 
 #string STR_STANDARD_DEFAULT_PROMPT    #language en-US "Standard Default"
                                        #language fr-FR "Standard Default"
@@ -305,7 +364,7 @@
 #string STR_STANDARD_MAP_METHOD        #language en-US "UEFI Standard Map Form"
                                        #language fr-FR "UEFI Standard Map Form"
 //
-// Serial Port 
+// Serial Port
 //
 #string STR_SERIAL_PORT                #language en-US "Serial port number"
                                        #language fr-FR "Serial port number"

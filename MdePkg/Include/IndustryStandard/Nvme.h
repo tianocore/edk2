@@ -2,13 +2,8 @@
   Definitions based on NVMe spec. version 1.1.
 
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Specification Reference:
   NVMe Specification 1.1
@@ -86,6 +81,8 @@ typedef struct {
   UINT8  Iocqes:4;   // I/O Completion Queue Entry Size
   UINT8  Rsvd2;
 } NVME_CC;
+#define NVME_CC_SHN_NORMAL_SHUTDOWN    1
+#define NVME_CC_SHN_ABRUPT_SHUTDOWN    2
 
 //
 // 3.1.6 Offset 1Ch: CSTS - Controller Status
@@ -97,7 +94,8 @@ typedef struct {
   UINT32 Nssro:1;    // NVM Subsystem Reset Occurred
   UINT32 Rsvd1:27;
 } NVME_CSTS;
-
+#define NVME_CSTS_SHST_SHUTDOWN_OCCURRING 1
+#define NVME_CSTS_SHST_SHUTDOWN_COMPLETED 2
 //
 // 3.1.8 Offset 24h: AQA - Admin Queue Attributes
 //

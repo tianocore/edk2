@@ -1,14 +1,8 @@
 /** @file
   Define NVData structures used by the iSCSI configuration component.
 
-Copyright (c) 2004 - 2013, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -26,12 +20,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define FORMID_ORDER_FORM         4
 #define FORMID_DELETE_FORM        5
 
+#define ISCSI_MAX_ATTEMPTS_NUM    FixedPcdGet8 (PcdMaxIScsiAttemptNumber)
+
 #define ISCSI_NAME_IFR_MIN_SIZE   4
 #define ISCSI_NAME_IFR_MAX_SIZE   223
 #define ISCSI_NAME_MAX_SIZE       224
 
-#define ATTEMPT_NAME_MAX_SIZE     96
-#define ATTEMPT_NAME_SIZE         10
+#define ATTEMPT_NAME_LIST_SIZE    96
+#define ATTEMPT_NAME_SIZE         12
 
 #define CONNECT_MIN_RETRY         0
 #define CONNECT_MAX_RETRY         16
@@ -40,7 +36,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define CONNECT_MAX_TIMEOUT       20000
 #define CONNECT_DEFAULT_TIMEOUT   1000
 
-#define ISCSI_MAX_ATTEMPTS_NUM    255
+#define ISCSI_ACTIVE_DISABLED     0
+#define ISCSI_ACTIVE_ENABLED      1
 
 #define ISCSI_DISABLED            0
 #define ISCSI_ENABLED             1
@@ -67,6 +64,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #define LUN_MIN_SIZE              1
 #define LUN_MAX_SIZE              20
+#define ISCSI_LUN_STR_MAX_LEN     21
 
 #define ISCSI_CHAP_UNI            0
 #define ISCSI_CHAP_MUTUAL         1
@@ -112,17 +110,18 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define MAC_ENTRY_LABEL           0x3000
 #define ORDER_ENTRY_LABEL         0x4000
 #define DELETE_ENTRY_LABEL        0x5000
+#define KEYWORD_ENTRY_LABEL       0x6000
 #define CONFIG_OPTION_OFFSET      0x9000
 
-#define ISCSI_LUN_STR_MAX_LEN     21
 #define ISCSI_CHAP_SECRET_MIN_LEN 12
 #define ISCSI_CHAP_SECRET_MAX_LEN 16
 //
 // ISCSI_CHAP_SECRET_STORAGE = ISCSI_CHAP_SECRET_MAX_LEN + sizeof (NULL-Terminator)
 //
-#define ISCSI_CHAP_SECRET_STORAGE 17
-#define ISCSI_CHAP_NAME_MAX_LEN   126
-#define ISCSI_CHAP_NAME_STORAGE   127
+#define ISCSI_CHAP_SECRET_STORAGE  17
+
+#define ISCSI_CHAP_NAME_MAX_LEN    126
+#define ISCSI_CHAP_NAME_STORAGE    127
 
 #define KERBEROS_SECRET_MIN_LEN   12
 #define KERBEROS_SECRET_MAX_LEN   16
@@ -135,11 +134,39 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define ISID_CONFIGURABLE_MAX_LEN 12
 #define ISID_CONFIGURABLE_STORAGE 13
 
+//
+// sizeof (EFI_MAC_ADDRESS) * 3
+//
+#define ISCSI_MAX_MAC_STRING_LEN            96
+
+///
+/// Macro used for target Url.
+///
+#define ISCSI_TARGET_URI_MIN_SIZE     0
+#define ISCSI_TARGET_URI_MAX_SIZE     255
+
 #pragma pack(1)
+
+//
+// Used by keyword.
+//
+typedef struct {
+  CHAR16  ISCSIIsId[ISID_CONFIGURABLE_STORAGE];
+  CHAR16  ISCSIInitiatorIpAddress[IP4_STR_MAX_SIZE];
+  CHAR16  ISCSIInitiatorNetmask[IP4_STR_MAX_SIZE];
+  CHAR16  ISCSIInitiatorGateway[IP4_STR_MAX_SIZE];
+  CHAR16  ISCSITargetName[ISCSI_NAME_MAX_SIZE];
+  CHAR16  ISCSITargetIpAddress[ISCSI_TARGET_URI_MAX_SIZE];
+  CHAR16  ISCSILun[ISCSI_LUN_STR_MAX_LEN];
+  CHAR16  ISCSIChapUsername[ISCSI_CHAP_NAME_STORAGE];
+  CHAR16  ISCSIChapSecret[ISCSI_CHAP_SECRET_STORAGE];
+  CHAR16  ISCSIReverseChapUsername[ISCSI_CHAP_NAME_STORAGE];
+  CHAR16  ISCSIReverseChapSecret[ISCSI_CHAP_SECRET_STORAGE];
+} KEYWORD_STR;
+
 typedef struct _ISCSI_CONFIG_IFR_NVDATA {
   CHAR16  InitiatorName[ISCSI_NAME_MAX_SIZE];
-  CHAR16  AttemptName[ATTEMPT_NAME_MAX_SIZE];
-
+  CHAR16  AttemptName[ATTEMPT_NAME_SIZE];
   UINT8   Enabled;
   UINT8   IpMode;
 
@@ -154,7 +181,7 @@ typedef struct _ISCSI_CONFIG_IFR_NVDATA {
   CHAR16  Gateway[IP4_STR_MAX_SIZE];
 
   CHAR16  TargetName[ISCSI_NAME_MAX_SIZE];
-  CHAR16  TargetIp[IP_STR_MAX_SIZE];
+  CHAR16  TargetIp[ISCSI_TARGET_URI_MAX_SIZE];
   UINT16  TargetPort;
   CHAR16  BootLun[ISCSI_LUN_STR_MAX_LEN];
 
@@ -177,8 +204,28 @@ typedef struct _ISCSI_CONFIG_IFR_NVDATA {
 
   UINT8   DynamicOrderedList[ISCSI_MAX_ATTEMPTS_NUM];
   UINT8   DeleteAttemptList[ISCSI_MAX_ATTEMPTS_NUM];
-
+  UINT8   AddAttemptList[ISCSI_MAX_ATTEMPTS_NUM];
   CHAR16  IsId[ISID_CONFIGURABLE_STORAGE];
+
+  //
+  // This will be used by keywords.
+  //
+  CHAR16  ISCSIMacAddr[ISCSI_MAX_MAC_STRING_LEN];
+  CHAR16  ISCSIAttemptOrder[ATTEMPT_NAME_LIST_SIZE];
+  CHAR16  ISCSIAddAttemptList[ATTEMPT_NAME_LIST_SIZE];
+  CHAR16  ISCSIDeleteAttemptList[ATTEMPT_NAME_LIST_SIZE];
+  CHAR16  ISCSIDisplayAttemptList[ATTEMPT_NAME_LIST_SIZE];
+  CHAR16  ISCSIAttemptName[ATTEMPT_NAME_LIST_SIZE];
+  UINT8   ISCSIBootEnableList[ISCSI_MAX_ATTEMPTS_NUM];
+  UINT8   ISCSIIpAddressTypeList[ISCSI_MAX_ATTEMPTS_NUM];
+  UINT8   ISCSIConnectRetry[ISCSI_MAX_ATTEMPTS_NUM];
+  UINT16  ISCSIConnectTimeout[ISCSI_MAX_ATTEMPTS_NUM];
+  UINT8   ISCSIInitiatorInfoViaDHCP[ISCSI_MAX_ATTEMPTS_NUM];
+  UINT8   ISCSITargetInfoViaDHCP[ISCSI_MAX_ATTEMPTS_NUM];
+  UINT16  ISCSITargetTcpPort[ISCSI_MAX_ATTEMPTS_NUM];
+  UINT8   ISCSIAuthenticationMethod[ISCSI_MAX_ATTEMPTS_NUM];
+  UINT8   ISCSIChapType[ISCSI_MAX_ATTEMPTS_NUM];
+  KEYWORD_STR Keyword[ISCSI_MAX_ATTEMPTS_NUM];
 } ISCSI_CONFIG_IFR_NVDATA;
 #pragma pack()
 

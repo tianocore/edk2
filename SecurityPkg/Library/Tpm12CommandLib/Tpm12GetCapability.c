@@ -1,14 +1,8 @@
 /** @file
   Implement TPM1.2 Get Capabilities related commands.
 
-Copyright (c) 2016, Intel Corporation. All rights reserved. <BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved. <BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -79,8 +73,13 @@ Tpm12GetCapabilityFlagPermanent (
     return Status;
   }
 
+  if (SwapBytes32 (Response.Hdr.returnCode) != TPM_SUCCESS) {
+    DEBUG ((DEBUG_ERROR, "Tpm12GetCapabilityFlagPermanent: Response Code error! 0x%08x\r\n", SwapBytes32 (Response.Hdr.returnCode)));
+    return EFI_DEVICE_ERROR;
+  }
+
   ZeroMem (TpmPermanentFlags, sizeof (*TpmPermanentFlags));
-  CopyMem (TpmPermanentFlags, &Response.Flags, MIN (sizeof (*TpmPermanentFlags), Response.ResponseSize));
+  CopyMem (TpmPermanentFlags, &Response.Flags, MIN (sizeof (*TpmPermanentFlags), SwapBytes32(Response.ResponseSize)));
 
   return Status;
 }
@@ -120,8 +119,13 @@ Tpm12GetCapabilityFlagVolatile (
     return Status;
   }
 
+  if (SwapBytes32 (Response.Hdr.returnCode) != TPM_SUCCESS) {
+    DEBUG ((DEBUG_ERROR, "Tpm12GetCapabilityFlagVolatile: Response Code error! 0x%08x\r\n", SwapBytes32 (Response.Hdr.returnCode)));
+    return EFI_DEVICE_ERROR;
+  }
+
   ZeroMem (VolatileFlags, sizeof (*VolatileFlags));
-  CopyMem (VolatileFlags, &Response.Flags, MIN (sizeof (*VolatileFlags), Response.ResponseSize));
+  CopyMem (VolatileFlags, &Response.Flags, MIN (sizeof (*VolatileFlags), SwapBytes32(Response.ResponseSize)));
 
   return Status;
 }

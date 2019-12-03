@@ -3,13 +3,7 @@
 
   Copyright (C) 2014, Red Hat, Inc.
 
-  This program and the accompanying materials are licensed and made available
-  under the terms and conditions of the BSD License which accompanies this
-  distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT
-  WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -27,7 +21,8 @@
 typedef enum {
   QemuLoaderCmdAllocate = 1,
   QemuLoaderCmdAddPointer,
-  QemuLoaderCmdAddChecksum
+  QemuLoaderCmdAddChecksum,
+  QemuLoaderCmdWritePointer,
 } QEMU_LOADER_COMMAND_TYPE;
 
 typedef enum {
@@ -72,13 +67,38 @@ typedef struct {
   UINT32 Length;
 } QEMU_LOADER_ADD_CHECKSUM;
 
+//
+// QemuLoaderCmdWritePointer: the bytes at
+// [PointerOffset..PointerOffset+PointerSize) in the writeable fw_cfg file
+// PointerFile are to receive the absolute address of PointeeFile, as allocated
+// and downloaded by the firmware, incremented by the value of PointeeOffset.
+// Store the sum of (a) the base address of where PointeeFile's contents have
+// been placed (when QemuLoaderCmdAllocate has been executed for PointeeFile)
+// and (b) PointeeOffset, to this portion of PointerFile.
+//
+// This command is similar to QemuLoaderCmdAddPointer; the difference is that
+// the "pointer to patch" does not exist in guest-physical address space, only
+// in "fw_cfg file space". In addition, the "pointer to patch" is not
+// initialized by QEMU in-place with a possibly nonzero offset value: the
+// relative offset into PointeeFile comes from the explicit PointeeOffset
+// field.
+//
+typedef struct {
+  UINT8  PointerFile[QEMU_LOADER_FNAME_SIZE]; // NUL-terminated
+  UINT8  PointeeFile[QEMU_LOADER_FNAME_SIZE]; // NUL-terminated
+  UINT32 PointerOffset;
+  UINT32 PointeeOffset;
+  UINT8  PointerSize;                         // one of 1, 2, 4, 8
+} QEMU_LOADER_WRITE_POINTER;
+
 typedef struct {
   UINT32 Type;                             // QEMU_LOADER_COMMAND_TYPE values
   union {
-    QEMU_LOADER_ALLOCATE     Allocate;
-    QEMU_LOADER_ADD_POINTER  AddPointer;
-    QEMU_LOADER_ADD_CHECKSUM AddChecksum;
-    UINT8                    Padding[124];
+    QEMU_LOADER_ALLOCATE      Allocate;
+    QEMU_LOADER_ADD_POINTER   AddPointer;
+    QEMU_LOADER_ADD_CHECKSUM  AddChecksum;
+    QEMU_LOADER_WRITE_POINTER WritePointer;
+    UINT8                     Padding[124];
   } Command;
 } QEMU_LOADER_ENTRY;
 #pragma pack ()

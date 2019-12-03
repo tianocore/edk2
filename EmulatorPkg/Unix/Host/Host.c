@@ -2,13 +2,7 @@
 
 Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2008 - 2011, Apple Inc. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -119,7 +113,7 @@ main (
 
   //
   // Xcode does not support sourcing gdb scripts directly, so the Xcode XML
-  // has a break point script to source the GdbRun script.
+  // has a break point script to source the GdbRun.sh script.
   //
   SecGdbConfigBreak ();
 
@@ -1119,6 +1113,9 @@ DlLoadImage (
 }
 
 
+#ifdef __APPLE__
+__attribute__((noinline))
+#endif
 VOID
 SecGdbScriptBreak (
   char                *FileName,
@@ -1148,7 +1145,7 @@ GdbScriptAddImage (
 
   if (ImageContext->PdbPointer != NULL && !IsPdbFile (ImageContext->PdbPointer)) {
     FILE  *GdbTempFile;
-    if (FeaturePcdGet (PcdEmulatorLazyLoadSymbols)) {    
+    if (FeaturePcdGet (PcdEmulatorLazyLoadSymbols)) {
       GdbTempFile = fopen (gGdbWorkingFileName, "a");
       if (GdbTempFile != NULL) {
         long unsigned int SymbolsAddr = (long unsigned int)(ImageContext->ImageAddress + ImageContext->SizeOfHeaders);
@@ -1170,13 +1167,13 @@ GdbScriptAddImage (
       GdbTempFile = fopen (gGdbWorkingFileName, "w");
       if (GdbTempFile != NULL) {
         fprintf (
-          GdbTempFile, 
-          "add-symbol-file %s 0x%08lx\n", 
-          ImageContext->PdbPointer, 
+          GdbTempFile,
+          "add-symbol-file %s 0x%08lx\n",
+          ImageContext->PdbPointer,
           (long unsigned int)(ImageContext->ImageAddress + ImageContext->SizeOfHeaders)
           );
         fclose (GdbTempFile);
-  
+
         //
         // Target for gdb breakpoint in a script that uses gGdbWorkingFileName to set a breakpoint.
         // Hey what can you say scripting in gdb is not that great....
@@ -1225,7 +1222,7 @@ GdbScriptRemoveImage (
     return;
   }
 
-  if (FeaturePcdGet (PcdEmulatorLazyLoadSymbols)) {    
+  if (FeaturePcdGet (PcdEmulatorLazyLoadSymbols)) {
     //
     // Write the file we need for the gdb script
     //
@@ -1256,7 +1253,7 @@ GdbScriptRemoveImage (
       SecGdbScriptBreak (ImageContext->PdbPointer, strlen (ImageContext->PdbPointer) + 1, 0, 0);
     } else {
       ASSERT (FALSE);
-    }  
+    }
   }
 }
 

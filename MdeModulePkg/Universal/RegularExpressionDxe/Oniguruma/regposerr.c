@@ -2,10 +2,8 @@
   regposerr.c - Oniguruma (regular expression library)
 **********************************************************************/
 /*-
- * Copyright (c) 2002-2007  K.Kosako  <sndgk393 AT ybb DOT ne DOT jp>
+ * Copyright (c) 2002-2019  K.Kosako  <sndgk393 AT ybb DOT ne DOT jp>
  * All rights reserved.
- *
- * (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -29,21 +27,30 @@
  * SUCH DAMAGE.
  */
 
-/*#include "config.h"*/
+/* Can't include regint.h etc.. for conflict of regex_t.
+   Define ONIGURUMA_EXPORT here for onigposix.h.
+ */
+#ifndef ONIGURUMA_EXPORT
+#define ONIGURUMA_EXPORT
+#endif
+
+//#include "config.h"
 #include "onigposix.h"
 
-#if 0
-#ifdef HAVE_STRING_H
-# include <string.h>
-#else
-# include <strings.h>
-#endif
-#endif
+//#include <string.h>
 
 #if defined(__GNUC__)
 #  define ARG_UNUSED  __attribute__ ((unused))
 #else
 #  define ARG_UNUSED
+#endif
+
+#if defined(_WIN32) && !defined(__GNUC__)
+#define xsnprintf   sprintf_s
+#define xstrncpy(dest,src,size)   strncpy_s(dest,size,src,_TRUNCATE)
+#else
+#define xsnprintf   snprintf
+#define xstrncpy    strncpy
 #endif
 
 static char* ESTRING[] = {
@@ -65,8 +72,7 @@ static char* ESTRING[] = {
   /* Extended errors */
   "internal error",                          /* REG_EONIG_INTERNAL */
   "invalid wide char value",                 /* REG_EONIG_BADWC    */
-  "invalid argument",                        /* REG_EONIG_BADARG   */
-  "multi-thread error"                       /* REG_EONIG_THREAD   */
+  "invalid argument"                         /* REG_EONIG_BADARG   */
 };
 
 //#include <stdio.h>
@@ -74,7 +80,7 @@ static char* ESTRING[] = {
 
 extern size_t
 regerror(int posix_ecode, const regex_t* reg ARG_UNUSED, char* buf,
-	 size_t size)
+         size_t size)
 {
   char* s;
   char tbuf[35];

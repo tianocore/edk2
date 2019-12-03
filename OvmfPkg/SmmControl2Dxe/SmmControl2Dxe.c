@@ -15,13 +15,7 @@
   Copyright (C) 2013, 2015, Red Hat, Inc.<BR>
   Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials are licensed and made available
-  under the terms and conditions of the BSD License which accompanies this
-  distribution. The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT
-  WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -32,9 +26,12 @@
 #include <Library/PcdLib.h>
 #include <Library/PciLib.h>
 #include <Library/QemuFwCfgLib.h>
+#include <Library/QemuFwCfgS3Lib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Protocol/S3SaveState.h>
 #include <Protocol/SmmControl2.h>
+
+#include "SmiFeatures.h"
 
 //
 // Forward declaration.
@@ -54,6 +51,13 @@ OnS3SaveStateInstalled (
 // phase.
 //
 STATIC UINTN mSmiEnable;
+
+//
+// Captures whether SMI feature negotiation is supported. The variable is only
+// used to carry this information from the entry point function to the
+// S3SaveState protocol installation callback.
+//
+STATIC BOOLEAN mSmiFeatureNegotiation;
 
 //
 // Event signaled when an S3SaveState protocol interface is installed.
@@ -229,6 +233,11 @@ SmmControl2DxeEntryPoint (
     goto FatalError;
   }
 
+  //
+  // QEMU can inject SMIs in different ways, negotiate our preferences.
+  //
+  mSmiFeatureNegotiation = NegotiateSmiFeatures ();
+
   if (QemuFwCfgS3Enabled ()) {
     VOID *Registration;
 
@@ -311,6 +320,7 @@ OnS3SaveStateInstalled (
   EFI_STATUS                 Status;
   EFI_S3_SAVE_STATE_PROTOCOL *S3SaveState;
   UINT32                     SmiEnOrMask, SmiEnAndMask;
+  UINT64                     GenPmCon1Address;
   UINT16                     GenPmCon1OrMask, GenPmCon1AndMask;
 
   ASSERT (Event == mS3SaveStateInstalled);
@@ -342,13 +352,15 @@ OnS3SaveStateInstalled (
     CpuDeadLoop ();
   }
 
+  GenPmCon1Address = POWER_MGMT_REGISTER_Q35_EFI_PCI_ADDRESS (
+                       ICH9_GEN_PMCON_1);
   GenPmCon1OrMask  = ICH9_GEN_PMCON_1_SMI_LOCK;
   GenPmCon1AndMask = MAX_UINT16;
   Status = S3SaveState->Write (
                           S3SaveState,
                           EFI_BOOT_SCRIPT_PCI_CONFIG_READ_WRITE_OPCODE,
                           EfiBootScriptWidthUint16,
-                          (UINT64)POWER_MGMT_REGISTER_Q35 (ICH9_GEN_PMCON_1),
+                          GenPmCon1Address,
                           &GenPmCon1OrMask,
                           &GenPmCon1AndMask
                           );
@@ -360,7 +372,15 @@ OnS3SaveStateInstalled (
     CpuDeadLoop ();
   }
 
-  DEBUG ((EFI_D_VERBOSE, "%a: boot script fragment saved\n", __FUNCTION__));
+  DEBUG ((DEBUG_VERBOSE, "%a: chipset boot script saved\n", __FUNCTION__));
+
+  //
+  // Append a boot script fragment that re-selects the negotiated SMI features.
+  //
+  if (mSmiFeatureNegotiation) {
+    SaveSmiFeatures ();
+  }
+
   gBS->CloseEvent (Event);
   mS3SaveStateInstalled = NULL;
 }

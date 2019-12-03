@@ -1,28 +1,23 @@
 ## @file
 # This file is used to create/update/query/erase table for data models
 #
-# Copyright (c) 2008, Intel Corporation. All rights reserved.<BR>
-# This program and the accompanying materials
-# are licensed and made available under the terms and conditions of the BSD License
-# which accompanies this distribution.  The full text of the license may be found at
-# http://opensource.org/licenses/bsd-license.php
-#
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
 ##
 # Import Modules
 #
+from __future__ import absolute_import
 import Common.EdkLogger as EdkLogger
 import CommonDataClass.DataClass as DataClass
-from Table import Table
-from Common.String import ConvertToSqlString
+from Table.Table import Table
+from Common.StringUtils import ConvertToSqlString
 
 ## TableDataModel
 #
 # This class defined a table used for data model
-# 
+#
 # @param object:       Inherited from object class
 #
 #
@@ -30,7 +25,7 @@ class TableDataModel(Table):
     def __init__(self, Cursor):
         Table.__init__(self, Cursor)
         self.Table = 'DataModel'
-    
+
     ## Create table
     #
     # Create table DataModel
@@ -62,13 +57,13 @@ class TableDataModel(Table):
         (Name, Description) = ConvertToSqlString((Name, Description))
         SqlCommand = """insert into %s values(%s, %s, '%s', '%s')""" % (self.Table, self.ID, CrossIndex, Name, Description)
         Table.Insert(self, SqlCommand)
-        
+
         return self.ID
-    
+
     ## Init table
     #
     # Create all default records of table DataModel
-    #  
+    #
     def InitTable(self):
         EdkLogger.verbose("\nInitialize table DataModel started ...")
         for Item in DataClass.MODEL_LIST:
@@ -77,7 +72,7 @@ class TableDataModel(Table):
             Description = Item[0]
             self.Insert(CrossIndex, Name, Description)
         EdkLogger.verbose("Initialize table DataModel ... DONE!")
-    
+
     ## Get CrossIndex
     #
     # Get a model's cross index from its name
@@ -91,5 +86,5 @@ class TableDataModel(Table):
         self.Cur.execute(SqlCommand)
         for Item in self.Cur:
             CrossIndex = Item[0]
-        
+
         return CrossIndex

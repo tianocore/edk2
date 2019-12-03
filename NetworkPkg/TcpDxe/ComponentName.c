@@ -2,15 +2,9 @@
   Implementation of protocols EFI_COMPONENT_NAME_PROTOCOL and
   EFI_COMPONENT_NAME2_PROTOCOL.
 
-  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -231,10 +225,10 @@ TcpComponentNameGetDriverName (
 
   @param  Tcp4[in]                   A pointer to the EFI_TCP4_PROTOCOL.
 
-  
+
   @retval EFI_SUCCESS                Update the ControllerNameTable of this instance successfully.
   @retval EFI_INVALID_PARAMETER      The input parameter is invalid.
-  
+
 **/
 EFI_STATUS
 UpdateTcp4Name (
@@ -276,7 +270,7 @@ UpdateTcp4Name (
     FreeUnicodeStringTable (gTcpControllerNameTable);
     gTcpControllerNameTable = NULL;
   }
-  
+
   Status = AddUnicodeString2 (
              "eng",
              gTcpComponentName.SupportedLanguages,
@@ -287,7 +281,7 @@ UpdateTcp4Name (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  
+
   return AddUnicodeString2 (
            "en",
            gTcpComponentName2.SupportedLanguages,
@@ -302,10 +296,10 @@ UpdateTcp4Name (
 
   @param  Tcp6[in]                   A pointer to the EFI_TCP6_PROTOCOL.
 
-  
+
   @retval EFI_SUCCESS                Update the ControllerNameTable of this instance successfully.
   @retval EFI_INVALID_PARAMETER      The input parameter is invalid.
-  
+
 **/
 EFI_STATUS
 UpdateTcp6Name (
@@ -343,7 +337,7 @@ UpdateTcp6Name (
     FreeUnicodeStringTable (gTcpControllerNameTable);
     gTcpControllerNameTable = NULL;
   }
-  
+
   Status = AddUnicodeString2 (
              "eng",
              gTcpComponentName.SupportedLanguages,
@@ -354,7 +348,7 @@ UpdateTcp6Name (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  
+
   return AddUnicodeString2 (
            "en",
            gTcpComponentName2.SupportedLanguages,

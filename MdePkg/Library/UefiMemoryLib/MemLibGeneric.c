@@ -7,13 +7,7 @@
     UefiMemoryLib
 
   Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -37,9 +31,9 @@ InternalMemSetMem16 (
   IN      UINT16                    Value
   )
 {
-  do {
-    ((UINT16*)Buffer)[--Length] = Value;
-  } while (Length != 0);
+  for (; Length != 0; Length--) {
+    ((UINT16*)Buffer)[Length - 1] = Value;
+  }
   return Buffer;
 }
 
@@ -61,9 +55,9 @@ InternalMemSetMem32 (
   IN      UINT32                    Value
   )
 {
-  do {
-    ((UINT32*)Buffer)[--Length] = Value;
-  } while (Length != 0);
+  for (; Length != 0; Length--) {
+    ((UINT32*)Buffer)[Length - 1] = Value;
+  }
   return Buffer;
 }
 
@@ -85,9 +79,9 @@ InternalMemSetMem64 (
   IN      UINT64                    Value
   )
 {
-  do {
-    ((UINT64*)Buffer)[--Length] = Value;
-  } while (Length != 0);
+  for (; Length != 0; Length--) {
+    ((UINT64*)Buffer)[Length - 1] = Value;
+  }
   return Buffer;
 }
 

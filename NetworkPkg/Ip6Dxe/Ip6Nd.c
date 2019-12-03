@@ -1,15 +1,9 @@
 /** @file
   Implementation of Neighbor Discovery support routines.
 
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -822,7 +816,7 @@ Ip6OnDADFinished (
   EFI_DHCP6_PACKET_OPTION   *Oro;
   EFI_DHCP6_RETRANSMISSION  InfoReqReXmit;
   EFI_IPv6_ADDRESS          AllNodes;
-  
+
   IpSb     = IpIf->Service;
   AddrInfo = DadEntry->AddressInfo;
 
@@ -988,7 +982,7 @@ Ip6InitDADProcess (
   if (Ip6FindDADEntry (IpIf->Service, &AddressInfo->Address, NULL) != NULL) {
     return EFI_SUCCESS;
   }
-  
+
   Status   = EFI_SUCCESS;
   IpSb     = IpIf->Service;
   DadXmits = &IpSb->Ip6ConfigInstance.DadXmits;

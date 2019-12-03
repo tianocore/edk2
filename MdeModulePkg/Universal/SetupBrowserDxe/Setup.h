@@ -1,14 +1,8 @@
 /** @file
 Private MACRO, structure and function definitions for Setup Browser module.
 
-Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 
 **/
@@ -271,7 +265,7 @@ typedef struct {
 typedef struct {
   UINTN                Signature;
   LIST_ENTRY           Link;
-  
+
   EFI_IFR_ONE_OF_OPTION  *OpCode;   // OneOfOption Data
 
   EFI_STRING_ID        Text;
@@ -286,14 +280,14 @@ typedef struct {
 
 typedef enum {
   ExpressFalse = 0,
-  ExpressGrayOut,  
+  ExpressGrayOut,
   ExpressSuppress,
   ExpressDisable
 } EXPRESS_RESULT;
 
 typedef enum {
   ExpressNone = 0,
-  ExpressForm,  
+  ExpressForm,
   ExpressStatement,
   ExpressOption
 } EXPRESS_LEVEL;
@@ -329,7 +323,10 @@ struct _FORM_BROWSER_STATEMENT{
   BROWSER_STORAGE       *Storage;
   VAR_STORE_INFO        VarStoreInfo;
   UINT16                StorageWidth;
+  UINT16                BitStorageWidth;
+  UINT16                BitVarOffset;
   UINT8                 QuestionFlags;
+  BOOLEAN               QuestionReferToBitField;// Whether the question is stored in a bit field.
   CHAR16                *VariableName;    // Name/Value or EFI Variable name
   CHAR16                *BlockName;       // Buffer storage block name: "OFFSET=...WIDTH=..."
 
@@ -387,7 +384,7 @@ typedef struct {
 
   CHAR16                *ConfigRequest; // <ConfigRequest> = <ConfigHdr> + <RequestElement>
   CHAR16                *ConfigAltResp; // Alt config response string for this ConfigRequest.
-  UINTN                 ElementCount;   // Number of <RequestElement> in the <ConfigRequest>  
+  UINTN                 ElementCount;   // Number of <RequestElement> in the <ConfigRequest>
   UINTN                 SpareStrLen;
   CHAR16                *RestoreConfigRequest; // When submit form fail, the element need to be restored
   CHAR16                *SyncConfigRequest;    // When submit form fail, the element need to be synced
@@ -580,7 +577,8 @@ extern EDKII_FORM_DISPLAY_ENGINE_PROTOCOL *mFormDisplay;
 
 extern BOOLEAN               gCallbackReconnect;
 extern BOOLEAN               gFlagReconnect;
-extern BOOLEAN               gResetRequired;
+extern BOOLEAN               gResetRequiredFormLevel;
+extern BOOLEAN               gResetRequiredSystemLevel;
 extern BOOLEAN               gExitRequired;
 extern LIST_ENTRY            gBrowserFormSetList;
 extern LIST_ENTRY            gBrowserHotKeyList;
@@ -769,10 +767,10 @@ ValidateFormSet (
   @param  SettingScope           Setting Scope for Default action.
 
 **/
-VOID 
+VOID
 UpdateStatementStatus (
   IN FORM_BROWSER_FORMSET             *FormSet,
-  IN FORM_BROWSER_FORM                *Form, 
+  IN FORM_BROWSER_FORM                *Form,
   IN BROWSER_SETTING_SCOPE            SettingScope
   );
 
@@ -918,13 +916,13 @@ EFI_STATUS
 InitializeFormSet (
   IN  EFI_HII_HANDLE                   Handle,
   IN OUT EFI_GUID                      *FormSetGuid,
-  OUT FORM_BROWSER_FORMSET             *FormSet                   
+  OUT FORM_BROWSER_FORMSET             *FormSet
   );
 
 /**
   Reset Questions to their initial value or default value in a Form, Formset or System.
 
-  GetDefaultValueScope parameter decides which questions will reset 
+  GetDefaultValueScope parameter decides which questions will reset
   to its default value.
 
   @param  FormSet                FormSet data structure.
@@ -957,7 +955,7 @@ ExtractDefault (
 /**
   Initialize Question's Edit copy from Storage.
 
-  @param  Selection              Selection contains the information about 
+  @param  Selection              Selection contains the information about
                                  the Selection, form and formset to be displayed.
                                  Selection action may be updated in retrieve callback.
                                  If Selection is NULL, only initialize Question value.
@@ -977,7 +975,7 @@ LoadFormConfig (
 /**
   Initialize Question's Edit copy from Storage for the whole Formset.
 
-  @param  Selection              Selection contains the information about 
+  @param  Selection              Selection contains the information about
                                  the Selection, form and formset to be displayed.
                                  Selection action may be updated in retrieve callback.
                                  If Selection is NULL, only initialize Question value.
@@ -1067,7 +1065,7 @@ GetIfrBinaryData (
   );
 
 /**
-  Save globals used by previous call to SendForm(). SendForm() may be called from 
+  Save globals used by previous call to SendForm(). SendForm() may be called from
   HiiConfigAccess.Callback(), this will cause SendForm() be reentried.
   So, save globals of previous call to SendForm() and restore them upon exit.
 
@@ -1171,9 +1169,9 @@ BrowserCallback (
                          about the Selection, form and formset to be displayed.
                          On output, Selection return the screen item that is selected
                          by user.
-  @param SettingLevel    Input Settting level, if it is FormLevel, just exit current form. 
+  @param SettingLevel    Input Settting level, if it is FormLevel, just exit current form.
                          else, we need to exit current formset.
-  
+
   @retval TRUE           Exit current form.
   @retval FALSE          User press ESC and keep in current form.
 **/
@@ -1225,7 +1223,7 @@ IsNvUpdateRequiredForFormSet (
   @retval EFI_SUCCESS          The call back function executes successfully.
   @return Other value if the call back function failed to execute.
 **/
-EFI_STATUS 
+EFI_STATUS
 ProcessCallBackFunction (
   IN OUT UI_MENU_SELECTION               *Selection,
   IN     FORM_BROWSER_FORMSET            *FormSet,
@@ -1234,11 +1232,11 @@ ProcessCallBackFunction (
   IN     EFI_BROWSER_ACTION              Action,
   IN     BOOLEAN                         SkipSaveOrDiscard
   );
-  
+
 /**
   Call the retrieve type call back function for one question to get the initialize data.
-  
-  This function only used when in the initialize stage, because in this stage, the 
+
+  This function only used when in the initialize stage, because in this stage, the
   Selection->Form is not ready. For other case, use the ProcessCallBackFunction instead.
 
   @param ConfigAccess          The config access protocol produced by the hii driver.
@@ -1248,7 +1246,7 @@ ProcessCallBackFunction (
   @retval EFI_SUCCESS          The call back function executes successfully.
   @return Other value if the call back function failed to execute.
 **/
-EFI_STATUS 
+EFI_STATUS
 ProcessRetrieveForQuestion (
   IN     EFI_HII_CONFIG_ACCESS_PROTOCOL  *ConfigAccess,
   IN     FORM_BROWSER_STATEMENT          *Statement,
@@ -1257,22 +1255,22 @@ ProcessRetrieveForQuestion (
 
 /**
   Find the matched FormSet context in the backup maintain list based on HiiHandle.
-  
+
   @param Handle  The Hii Handle.
-  
+
   @return the found FormSet context. If no found, NULL will return.
 
 **/
-FORM_BROWSER_FORMSET * 
+FORM_BROWSER_FORMSET *
 GetFormSetFromHiiHandle (
   EFI_HII_HANDLE Handle
   );
 
 /**
   Check whether the input HII handle is the FormSet that is being used.
-  
+
   @param Handle  The Hii Handle.
-  
+
   @retval TRUE   HII handle is being used.
   @retval FALSE  HII handle is not being used.
 
@@ -1287,11 +1285,11 @@ IsHiiHandleInBrowserContext (
   All hot keys have the same scope. The mixed hot keys with the different level are not supported.
   If no scope is set, the default scope will be FormSet level.
   After all registered hot keys are removed, previous Scope can reset to another level.
-  
-  @param[in] Scope               Scope level to be set. 
-  
+
+  @param[in] Scope               Scope level to be set.
+
   @retval EFI_SUCCESS            Scope is set correctly.
-  @retval EFI_INVALID_PARAMETER  Scope is not the valid value specified in BROWSER_SETTING_SCOPE. 
+  @retval EFI_INVALID_PARAMETER  Scope is not the valid value specified in BROWSER_SETTING_SCOPE.
   @retval EFI_UNSPPORTED         Scope level is different from current one that the registered hot keys have.
 
 **/
@@ -1306,15 +1304,15 @@ SetScope (
   Only support hot key that is not printable character (control key, function key, etc.).
   If the action value is zero, the hot key will be unregistered if it has been registered.
   If the same hot key has been registered, the new action and help string will override the previous ones.
-  
+
   @param[in] KeyData     A pointer to a buffer that describes the keystroke
-                         information for the hot key. Its type is EFI_INPUT_KEY to 
+                         information for the hot key. Its type is EFI_INPUT_KEY to
                          be supported by all ConsoleIn devices.
-  @param[in] Action      Action value that describes what action will be trigged when the hot key is pressed. 
+  @param[in] Action      Action value that describes what action will be trigged when the hot key is pressed.
   @param[in] DefaultId   Specifies the type of defaults to retrieve, which is only for DEFAULT action.
   @param[in] HelpString  Help string that describes the hot key information.
                          Its value may be NULL for the unregistered hot key.
-  
+
   @retval EFI_SUCCESS            Hot key is registered or unregistered.
   @retval EFI_INVALID_PARAMETER  KeyData is NULL.
   @retval EFI_NOT_FOUND          KeyData is not found to be unregistered.
@@ -1331,11 +1329,11 @@ RegisterHotKey (
   );
 
 /**
-  Register Exit handler function. 
-  When more than one handler function is registered, the latter one will override the previous one. 
-  When NULL handler is specified, the previous Exit handler will be unregistered. 
-  
-  @param[in] Handler      Pointer to handler function. 
+  Register Exit handler function.
+  When more than one handler function is registered, the latter one will override the previous one.
+  When NULL handler is specified, the previous Exit handler will be unregistered.
+
+  @param[in] Handler      Pointer to handler function.
 
 **/
 VOID
@@ -1345,22 +1343,22 @@ RegiserExitHandler (
   );
 
 /**
-  
-  Check whether the browser data has been modified. 
+
+  Check whether the browser data has been modified.
 
   @retval TRUE        Browser data is changed.
   @retval FALSE       No browser data is changed.
 
 **/
-BOOLEAN 
+BOOLEAN
 EFIAPI
 IsBrowserDataModified (
   VOID
   );
 
 /**
-  
-  Execute the action requested by the Action parameter. 
+
+  Execute the action requested by the Action parameter.
 
   @param[in] Action     Execute the request action.
   @param[in] DefaultId  The default Id info when need to load default value.
@@ -1369,7 +1367,7 @@ IsBrowserDataModified (
   @retval EFI_INVALID_PARAMETER    The input action value is invalid.
 
 **/
-EFI_STATUS 
+EFI_STATUS
 EFIAPI
 ExecuteAction (
   IN UINT32        Action,
@@ -1407,7 +1405,7 @@ IsResetRequired (
 
 /**
   Find the registered HotKey based on KeyData.
-  
+
   @param[in] KeyData     A pointer to a buffer that describes the keystroke
                          information for the hot key.
 
@@ -1431,7 +1429,7 @@ FORM_BROWSER_STATEMENT *
 GetBrowserStatement (
   IN FORM_DISPLAY_ENGINE_STATEMENT *DisplayStatement
   );
-  
+
 /**
   Password may be stored as encrypted by Configuration Driver. When change a
   password, user will be challenged with old password. To validate user input old
@@ -1491,7 +1489,7 @@ EFI_STATUS
 SetupBrowser (
   IN OUT UI_MENU_SELECTION    *Selection
   );
-  
+
 /**
   Free up the resource allocated for all strings required
   by Setup Browser.
@@ -1534,7 +1532,7 @@ UiAddMenuList (
 **/
 FORM_ENTRY_INFO *
 UiFindMenuList (
-  IN EFI_HII_HANDLE       HiiHandle, 
+  IN EFI_HII_HANDLE       HiiHandle,
   IN EFI_GUID             *FormSetGuid,
   IN UINT16               FormId
   );
@@ -1555,7 +1553,7 @@ UiFreeMenuList (
 
   @param  CurrentMenu    Current Menu
   @param  SettingLevel   Whether find parent menu in Form Level or Formset level.
-                         In form level, just find the parent menu; 
+                         In form level, just find the parent menu;
                          In formset level, find the parent menu which has different
                          formset guid value.
 
@@ -1566,7 +1564,7 @@ UiFindParentMenu (
   IN FORM_ENTRY_INFO          *CurrentMenu,
   IN BROWSER_SETTING_SCOPE    SettingLevel
   );
-  
+
 /**
   Validate the HiiHandle.
 
@@ -1583,7 +1581,7 @@ ValidateHiiHandle (
 
 /**
   Copy current Menu list to the new menu list.
-  
+
   @param  NewMenuListHead        New create Menu list.
   @param  CurrentMenuListHead    Current Menu list.
 
@@ -1645,7 +1643,7 @@ SetArrayData (
 
 /**
    Compare two Hii value.
- 
+
    @param  Value1                 Expression value to compare on left-hand.
    @param  Value2                 Expression value to compare on right-hand.
    @param  Result                 Return value after compare.
@@ -1653,10 +1651,10 @@ SetArrayData (
                                   return Positive value if Value1 is greater than Value2.
                                   retval Negative value if Value1 is less than Value2.
    @param  HiiHandle              Only required for string compare.
- 
+
    @retval other                  Could not perform compare on two values.
    @retval EFI_SUCCESS            Compare the value success.
- 
+
 **/
 EFI_STATUS
 CompareHiiValue (
@@ -1667,15 +1665,15 @@ CompareHiiValue (
   );
 
 /**
-  Perform Password check. 
+  Perform Password check.
   Passwork may be encrypted by driver that requires the specific check.
-  
+
   @param  Form             Form where Password Statement is in.
   @param  Statement        Password statement
   @param  PasswordString   Password string to be checked. It may be NULL.
                            NULL means to restore password.
                            "" string can be used to checked whether old password does exist.
-  
+
   @return Status     Status of Password check.
 **/
 EFI_STATUS
@@ -1699,7 +1697,7 @@ FORM_BROWSER_STATEMENT *
 GetBrowserStatement (
   IN FORM_DISPLAY_ENGINE_STATEMENT *DisplayStatement
   );
-  
+
 /**
 
   Initialize the Display form structure data.
@@ -1753,7 +1751,7 @@ DevicePathToHiiHandle (
   @retval FALSE                  All elements covered by current used elements.
 
 **/
-BOOLEAN 
+BOOLEAN
 ConfigRequestAdjust (
   IN  BROWSER_STORAGE         *Storage,
   IN  CHAR16                  *Request,
@@ -1761,8 +1759,8 @@ ConfigRequestAdjust (
   );
 
 /**
-  Perform question check. 
-  
+  Perform question check.
+
   If one question has more than one check, process form high priority to low.
 
   @param  FormSet                FormSet data structure.
@@ -1839,7 +1837,7 @@ GetFstStgFromVarId (
   @param  Storage              browser storage info.
 
   @return Pointer to a FORMSET_STORAGE data structure.
-  
+
 
 **/
 FORMSET_STORAGE *
@@ -1854,7 +1852,7 @@ GetFstStgFromBrsStg (
 
   @retval   TRUE     do the reconnect behavior success.
   @retval   FALSE    do the reconnect behavior failed.
-  
+
 **/
 BOOLEAN
 ReconnectController (

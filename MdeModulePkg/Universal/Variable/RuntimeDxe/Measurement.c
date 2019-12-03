@@ -1,21 +1,14 @@
 /** @file
-  Measure TrEE required variable.
+  Measure TCG required variable.
 
-Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2013 - 2017, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include <PiDxe.h>
 #include <Guid/ImageAuthentication.h>
 #include <IndustryStandard/UefiTcgPlatform.h>
-#include <Protocol/TrEEProtocol.h>
 
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
@@ -24,6 +17,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/DebugLib.h>
 #include <Library/BaseLib.h>
 #include <Library/TpmMeasurementLib.h>
+
+#include "PrivilegePolymorphic.h"
 
 typedef struct {
   CHAR16                                 *VariableName;
@@ -36,7 +31,15 @@ VARIABLE_TYPE  mVariableType[] = {
   {EFI_KEY_EXCHANGE_KEY_NAME,    &gEfiGlobalVariableGuid},
   {EFI_IMAGE_SECURITY_DATABASE,  &gEfiImageSecurityDatabaseGuid},
   {EFI_IMAGE_SECURITY_DATABASE1, &gEfiImageSecurityDatabaseGuid},
+  {EFI_IMAGE_SECURITY_DATABASE2, &gEfiImageSecurityDatabaseGuid},
 };
+
+//
+// "SecureBoot" may update following PK Del/Add
+//  Cache its value to detect value update
+//
+UINT8       *mSecureBootVarData    = NULL;
+UINTN       mSecureBootVarDataSize = 0;
 
 /**
   This function will return if this variable is SecureBootPolicy Variable.
@@ -88,7 +91,7 @@ MeasureVariable (
 {
   EFI_STATUS                        Status;
   UINTN                             VarNameLength;
-  EFI_VARIABLE_DATA_TREE            *VarLog;
+  UEFI_VARIABLE_DATA                *VarLog;
   UINT32                            VarLogSize;
 
   ASSERT ((VarSize == 0 && VarData == NULL) || (VarSize != 0 && VarData != NULL));
@@ -97,7 +100,7 @@ MeasureVariable (
   VarLogSize = (UINT32)(sizeof (*VarLog) + VarNameLength * sizeof (*VarName) + VarSize
                         - sizeof (VarLog->UnicodeName) - sizeof (VarLog->VariableData));
 
-  VarLog = (EFI_VARIABLE_DATA_TREE *) AllocateZeroPool (VarLogSize);
+  VarLog = (UEFI_VARIABLE_DATA *) AllocateZeroPool (VarLogSize);
   if (VarLog == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -118,7 +121,7 @@ MeasureVariable (
        );
   }
 
-  DEBUG ((EFI_D_INFO, "AuthVariableDxe: MeasureVariable (Pcr - %x, EventType - %x, ", (UINTN)7, (UINTN)EV_EFI_VARIABLE_AUTHORITY));
+  DEBUG ((EFI_D_INFO, "VariableDxe: MeasureVariable (Pcr - %x, EventType - %x, ", (UINTN)7, (UINTN)EV_EFI_VARIABLE_DRIVER_CONFIG));
   DEBUG ((EFI_D_INFO, "VariableName - %s, VendorGuid - %g)\n", VarName, VendorGuid));
 
   Status = TpmMeasureAndLogData (
@@ -235,8 +238,17 @@ SecureBootHook (
              &VariableDataSize
              );
   if (EFI_ERROR (Status)) {
-    VariableData     = NULL;
-    VariableDataSize = 0;
+    //
+    // Measure DBT only if present and not empty
+    //
+    if (StrCmp (VariableName, EFI_IMAGE_SECURITY_DATABASE2) == 0 &&
+        CompareGuid (VendorGuid, &gEfiImageSecurityDatabaseGuid)) {
+      DEBUG((DEBUG_INFO, "Skip measuring variable %s since it's deleted\n", EFI_IMAGE_SECURITY_DATABASE2));
+      return;
+    } else {
+      VariableData     = NULL;
+      VariableDataSize = 0;
+    }
   }
 
   Status = MeasureVariable (
@@ -251,5 +263,77 @@ SecureBootHook (
     FreePool (VariableData);
   }
 
+  //
+  // "SecureBoot" is 8bit & read-only. It can only be changed according to PK update
+  //
+  if ((StrCmp (VariableName, EFI_PLATFORM_KEY_NAME) == 0) &&
+       CompareGuid (VendorGuid, &gEfiGlobalVariableGuid)) {
+     Status = InternalGetVariable (
+                EFI_SECURE_BOOT_MODE_NAME,
+                &gEfiGlobalVariableGuid,
+                &VariableData,
+                &VariableDataSize
+                );
+     if (EFI_ERROR (Status)) {
+       return;
+     }
+
+     //
+     // If PK update is successful. "SecureBoot" shall always exist ever since variable write service is ready
+     //
+     ASSERT(mSecureBootVarData != NULL);
+
+     if (CompareMem(mSecureBootVarData, VariableData, VariableDataSize) != 0) {
+       FreePool(mSecureBootVarData);
+       mSecureBootVarData     = VariableData;
+       mSecureBootVarDataSize = VariableDataSize;
+
+       DEBUG((DEBUG_INFO, "%s variable updated according to PK change. Remeasure the value!\n", EFI_SECURE_BOOT_MODE_NAME));
+       Status = MeasureVariable (
+                  EFI_SECURE_BOOT_MODE_NAME,
+                  &gEfiGlobalVariableGuid,
+                  mSecureBootVarData,
+                  mSecureBootVarDataSize
+                  );
+       DEBUG ((DEBUG_INFO, "MeasureBootPolicyVariable - %r\n", Status));
+     } else {
+       //
+       // "SecureBoot" variable is not changed
+       //
+       FreePool(VariableData);
+     }
+  }
+
   return ;
+}
+
+/**
+  Some Secure Boot Policy Variable may update following other variable changes(SecureBoot follows PK change, etc).
+  Record their initial State when variable write service is ready.
+
+**/
+VOID
+EFIAPI
+RecordSecureBootPolicyVarData(
+  VOID
+  )
+{
+  EFI_STATUS Status;
+
+  //
+  // Record initial "SecureBoot" variable value.
+  // It is used to detect SecureBoot variable change in SecureBootHook.
+  //
+  Status = InternalGetVariable (
+             EFI_SECURE_BOOT_MODE_NAME,
+             &gEfiGlobalVariableGuid,
+             (VOID **)&mSecureBootVarData,
+             &mSecureBootVarDataSize
+             );
+  if (EFI_ERROR(Status)) {
+    //
+    // Read could fail when Auth Variable solution is not supported
+    //
+    DEBUG((DEBUG_INFO, "RecordSecureBootPolicyVarData GetVariable %s Status %x\n", EFI_SECURE_BOOT_MODE_NAME, Status));
+  }
 }

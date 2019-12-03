@@ -1,0 +1,28 @@
+## @file
+#  NULL Tcg2PhysicalPresenceLib library instance
+#
+# Under SecurityPkg, the corresponding library instance will check and
+# execute TPM 2.0 request from OS or BIOS; the request may ask for user
+# confirmation before execution. This Null instance implements a no-op
+# Tcg2PhysicalPresenceLibProcessRequest(), without user interaction.
+#
+# Copyright (C) 2018, Red Hat, Inc.
+# Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxeTcg2PhysicalPresenceLibNull
+  FILE_GUID                      = 2A6BA243-DC22-42D8-9C3D-AE3728DC7AFA
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = Tcg2PhysicalPresenceLib|DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_APPLICATION UEFI_DRIVER
+
+[Sources]
+  DxeTcg2PhysicalPresenceLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  SecurityPkg/SecurityPkg.dec

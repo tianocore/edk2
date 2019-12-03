@@ -1,15 +1,9 @@
 /** @file
   Mtftp6 internal data structure and definition declaration.
 
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved. <BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -46,6 +40,7 @@ typedef struct _MTFTP6_INSTANCE MTFTP6_INSTANCE;
 #define MTFTP6_GET_MAPPING_TIMEOUT     3
 #define MTFTP6_DEFAULT_MAX_RETRY       5
 #define MTFTP6_DEFAULT_BLK_SIZE        512
+#define MTFTP6_DEFAULT_WINDOWSIZE      1
 #define MTFTP6_TICK_PER_SECOND         10000000U
 
 #define MTFTP6_SERVICE_FROM_THIS(a)    CR (a, MTFTP6_SERVICE, ServiceBinding, MTFTP6_SERVICE_SIGNATURE)
@@ -76,6 +71,20 @@ struct _MTFTP6_INSTANCE {
   UINT16                        BlkSize;
   UINT16                        LastBlk;
   LIST_ENTRY                    BlkList;
+
+  UINT16                        Operation;
+
+  UINT16                        WindowSize;
+
+  //
+  // Record the total received and saved block number.
+  //
+  UINT64                        TotalBlock;
+
+  //
+  // Record the acked block number.
+  //
+  UINT64                        AckedBlock;
 
   EFI_IPv6_ADDRESS              ServerIp;
   UINT16                        ServerCmdPort;

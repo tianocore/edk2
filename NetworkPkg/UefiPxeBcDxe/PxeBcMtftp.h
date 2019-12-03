@@ -1,15 +1,9 @@
 /** @file
   Functions declaration related with Mtftp for UefiPxeBc Driver.
 
-  Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -20,7 +14,8 @@
 #define PXE_MTFTP_OPTION_TIMEOUT_INDEX     1
 #define PXE_MTFTP_OPTION_TSIZE_INDEX       2
 #define PXE_MTFTP_OPTION_MULTICAST_INDEX   3
-#define PXE_MTFTP_OPTION_MAXIMUM_INDEX     4
+#define PXE_MTFTP_OPTION_WINDOWSIZE_INDEX  4
+#define PXE_MTFTP_OPTION_MAXIMUM_INDEX     5
 #define PXE_MTFTP_OPTBUF_MAXNUM_INDEX      128
 
 #define PXE_MTFTP_ERROR_STRING_LENGTH      127   // refer to definition of struct EFI_PXE_BASE_CODE_TFTP_ERROR.
@@ -34,6 +29,7 @@
   @param[in]      Config         Pointer to configure data.
   @param[in]      Filename       Pointer to boot file name.
   @param[in]      BlockSize      Pointer to required block size.
+  @param[in]      WindowSize     Pointer to required window size.
   @param[in, out] BufferSize     Pointer to buffer size.
 
   @retval EFI_SUCCESS        Successfully obtained the size of file.
@@ -48,6 +44,7 @@ PxeBcTftpGetFileSize (
   IN     VOID                       *Config,
   IN     UINT8                      *Filename,
   IN     UINTN                      *BlockSize,
+  IN     UINTN                      *WindowSize,
   IN OUT UINT64                     *BufferSize
   );
 
@@ -59,6 +56,7 @@ PxeBcTftpGetFileSize (
   @param[in]      Config         Pointer to config data.
   @param[in]      Filename       Pointer to boot file name.
   @param[in]      BlockSize      Pointer to required block size.
+  @param[in]      WindowSize     Pointer to required window size.
   @param[in]      BufferPtr      Pointer to buffer.
   @param[in, out] BufferSize     Pointer to buffer size.
   @param[in]      DontUseBuffer  Indicates whether to use a receive buffer.
@@ -74,6 +72,7 @@ PxeBcTftpReadFile (
   IN     VOID                       *Config,
   IN     UINT8                      *Filename,
   IN     UINTN                      *BlockSize,
+  IN     UINTN                      *WindowSize,
   IN     UINT8                      *BufferPtr,
   IN OUT UINT64                     *BufferSize,
   IN     BOOLEAN                    DontUseBuffer
@@ -115,6 +114,7 @@ PxeBcTftpWriteFile (
   @param[in]       Config         Pointer to config data.
   @param[in]       Filename       Pointer to boot file name.
   @param[in]       BlockSize      Pointer to required block size.
+  @param[in]       WindowSize     Pointer to required window size.
   @param[in]       BufferPtr      Pointer to buffer.
   @param[in, out]  BufferSize     Pointer to buffer size.
   @param[in]       DontUseBuffer  Indicates whether with a receive buffer.
@@ -130,6 +130,7 @@ PxeBcTftpReadDirectory (
   IN     VOID                          *Config,
   IN     UINT8                         *Filename,
   IN     UINTN                         *BlockSize,
+  IN     UINTN                         *WindowSize,
   IN     UINT8                         *BufferPtr,
   IN OUT UINT64                        *BufferSize,
   IN     BOOLEAN                       DontUseBuffer

@@ -3,14 +3,8 @@
   It can be registered to Tpm2 Device router, to be active TPM2 engine,
   based on platform setting.
 
-Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved. <BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved. <BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -18,8 +12,33 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/Tpm2DeviceLib.h>
+#include <Library/PcdLib.h>
 
 #include <Guid/TpmInstance.h>
+
+/**
+  Return PTP interface type.
+
+  @param[in] Register                Pointer to PTP register.
+
+  @return PTP interface type.
+**/
+TPM2_PTP_INTERFACE_TYPE
+Tpm2GetPtpInterface (
+  IN VOID *Register
+  );
+
+/**
+  Return PTP CRB interface IdleByPass state.
+
+  @param[in] Register                Pointer to PTP register.
+
+  @return PTP CRB interface IdleByPass state.
+**/
+UINT8
+Tpm2GetIdleByPass (
+  IN VOID *Register
+  );
 
 /**
   Dump PTP register information.
@@ -41,7 +60,7 @@ DumpPtpInfo (
 
   @retval EFI_SUCCESS            The command byte stream was successfully sent to the device and a response was successfully received.
   @retval EFI_DEVICE_ERROR       The command was not successfully sent to the device or a response was not successfully received from the device.
-  @retval EFI_BUFFER_TOO_SMALL   The output parameter block is too small. 
+  @retval EFI_BUFFER_TOO_SMALL   The output parameter block is too small.
 **/
 EFI_STATUS
 EFIAPI
@@ -72,9 +91,9 @@ TPM2_DEVICE_INTERFACE  mDTpm2InternalTpm2Device = {
 };
 
 /**
-  The function register DTPM2.0 instance.
-  
-  @retval EFI_SUCCESS   DTPM2.0 instance is registered, or system dose not surpport registr DTPM2.0 instance
+  The function register DTPM2.0 instance and caches current active TPM interface type.
+
+  @retval EFI_SUCCESS   DTPM2.0 instance is registered, or system does not support register DTPM2.0 instance
 **/
 EFI_STATUS
 EFIAPI
@@ -82,7 +101,9 @@ Tpm2InstanceLibDTpmConstructor (
   VOID
   )
 {
-  EFI_STATUS  Status;
+  EFI_STATUS               Status;
+  TPM2_PTP_INTERFACE_TYPE  PtpInterface;
+  UINT8                    IdleByPass;
 
   Status = Tpm2RegisterTpm2DeviceLib (&mDTpm2InternalTpm2Device);
   if ((Status == EFI_SUCCESS) || (Status == EFI_UNSUPPORTED)) {
@@ -90,6 +111,19 @@ Tpm2InstanceLibDTpmConstructor (
     // Unsupported means platform policy does not need this instance enabled.
     //
     if (Status == EFI_SUCCESS) {
+      //
+      // Cache current active TpmInterfaceType only when needed
+      //
+      if (PcdGet8(PcdActiveTpmInterfaceType) == 0xFF) {
+        PtpInterface = Tpm2GetPtpInterface ((VOID *) (UINTN) PcdGet64 (PcdTpmBaseAddress));
+        PcdSet8S(PcdActiveTpmInterfaceType, PtpInterface);
+      }
+
+      if (PcdGet8(PcdActiveTpmInterfaceType) == Tpm2PtpInterfaceCrb && PcdGet8(PcdCRBIdleByPass) == 0xFF) {
+        IdleByPass = Tpm2GetIdleByPass((VOID *) (UINTN) PcdGet64 (PcdTpmBaseAddress));
+        PcdSet8S(PcdCRBIdleByPass, IdleByPass);
+      }
+
       DumpPtpInfo ((VOID *) (UINTN) PcdGet64 (PcdTpmBaseAddress));
     }
     return EFI_SUCCESS;

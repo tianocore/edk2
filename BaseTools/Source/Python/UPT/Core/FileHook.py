@@ -1,15 +1,9 @@
 ## @file
 # This file hooks file and directory creation and removal
 #
-# Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
 #
-# This program and the accompanying materials are licensed and made available 
-# under the terms and conditions of the BSD License which accompanies this 
-# distribution. The full text of the license may be found at 
-# http://opensource.org/licenses/bsd-license.php
-#
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
 '''
@@ -166,7 +160,7 @@ def _hookrm(path):
     else:
         __built_in_remove__(path)
 
-def _hookmkdir(path, mode=0777):
+def _hookmkdir(path, mode=0o777):
     if GlobalData.gRECOVERMGR:
         GlobalData.gRECOVERMGR.bkmkdir(path, mode)
     else:

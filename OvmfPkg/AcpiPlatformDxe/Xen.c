@@ -4,47 +4,17 @@
   Copyright (c) 2008 - 2012, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2012, Bei Guan <gbtju85@gmail.com>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-
-**/ 
+**/
 
 #include "AcpiPlatform.h"
-#include <Library/HobLib.h>
-#include <Guid/XenInfo.h>
 #include <Library/BaseLib.h>
 
 #define XEN_ACPI_PHYSICAL_ADDRESS         0x000EA020
 #define XEN_BIOS_PHYSICAL_END             0x000FFFFF
 
 EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER  *XenAcpiRsdpStructurePtr = NULL;
-
-/**
-  This function detects if OVMF is running on Xen.
-
-**/
-BOOLEAN
-XenDetected (
-  VOID
-  )
-{
-  EFI_HOB_GUID_TYPE         *GuidHob;
-
-  //
-  // See if a XenInfo HOB is available
-  //
-  GuidHob = GetFirstGuidHob (&gEfiXenInfoGuid);
-  if (GuidHob == NULL) {
-    return FALSE;
-  }
-
-  return TRUE;
-}
 
 /**
   Get the address of Xen ACPI Root System Description Pointer (RSDP)
@@ -66,9 +36,26 @@ GetXenAcpiRsdp (
   EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER   *RsdpStructurePtr;
   UINT8                                          *XenAcpiPtr;
   UINT8                                          Sum;
+  EFI_XEN_INFO                                   *XenInfo;
 
   //
   // Detect the RSDP structure
+  //
+
+  //
+  // First look for PVH one
+  //
+  XenInfo = XenGetInfoHOB ();
+  ASSERT (XenInfo != NULL);
+  if (XenInfo->RsdpPvh != NULL) {
+    DEBUG ((DEBUG_INFO, "%a: Use ACPI RSDP table at 0x%p\n",
+      gEfiCallerBaseName, XenInfo->RsdpPvh));
+    *RsdpPtr = XenInfo->RsdpPvh;
+    return EFI_SUCCESS;
+  }
+
+  //
+  // Otherwise, look for the HVM one
   //
   for (XenAcpiPtr = (UINT8*)(UINTN) XEN_ACPI_PHYSICAL_ADDRESS;
        XenAcpiPtr < (UINT8*)(UINTN) XEN_BIOS_PHYSICAL_END;
@@ -164,12 +151,12 @@ InstallXenTables (
   }
 
   //
-  // If XSDT table is find, just install its tables. 
+  // If XSDT table is find, just install its tables.
   // Otherwise, try to find and install the RSDT tables.
   //
   if (XenAcpiRsdpStructurePtr->XsdtAddress) {
     //
-    // Retrieve the addresses of XSDT and 
+    // Retrieve the addresses of XSDT and
     // calculate the number of its table entries.
     //
     Xsdt = (EFI_ACPI_DESCRIPTION_HEADER *) (UINTN)
@@ -225,7 +212,7 @@ InstallXenTables (
     Rsdt = (EFI_ACPI_DESCRIPTION_HEADER *) (UINTN)
              XenAcpiRsdpStructurePtr->RsdtAddress;
     NumberOfTableEntries = (Rsdt->Length -
-                             sizeof (EFI_ACPI_DESCRIPTION_HEADER)) / 
+                             sizeof (EFI_ACPI_DESCRIPTION_HEADER)) /
                              sizeof (UINT32);
 
     //
@@ -301,8 +288,15 @@ InstallXenTables (
   }
 
   //
-  // Install DSDT table.
+  // Install DSDT table. If we reached this point without finding the DSDT,
+  // then we're out of sync with the hypervisor, and cannot continue.
   //
+  if (DsdtTable == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a: no DSDT found\n", __FUNCTION__));
+    ASSERT (FALSE);
+    CpuDeadLoop ();
+  }
+
   Status = InstallAcpiTable (
              AcpiProtocol,
              DsdtTable,

@@ -3,13 +3,7 @@
 
   Copyright (c) 2011-2015, ARM Limited. All rights reserved.
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -63,6 +57,16 @@
 #define EMMC_CMD6_ARG_INDEX(x)              (((x) & 0xFF) << 16)
 #define EMMC_CMD6_ARG_VALUE(x)              (((x) & 0xFF) << 8)
 #define EMMC_CMD6_ARG_CMD_SET(x)            (((x) & 0x7) << 0)
+
+#define SWITCH_CMD_DATA_LENGTH              64
+#define SD_HIGH_SPEED_SUPPORTED             0x20000
+#define SD_DEFAULT_SPEED                    25000000
+#define SD_HIGH_SPEED                       50000000
+#define SWITCH_CMD_SUCCESS_MASK             0x0f000000
+
+#define SD_CARD_CAPACITY                    0x00000002
+
+#define BUSWIDTH_4                          4
 
 typedef enum {
   UNKNOWN_CARD,
@@ -251,7 +255,7 @@ typedef struct {
   UINT8   MIN_PERF_W_8_52;                    // Minimum write performance for 8bit at 52MHz [210:210]
   UINT8   RESERVED_18;                        // Reserved [211:211]
   UINT32  SECTOR_COUNT;                       // Sector count [215:212]
-  UINT8   SLEEP_NOTIFICATION_TIME;            // Sleep notification timout [216:216]
+  UINT8   SLEEP_NOTIFICATION_TIME;            // Sleep notification timeout [216:216]
   UINT8   S_A_TIMEOUT;                        // Sleep/awake timeout [217:217]
   UINT8   PRODUCTION_STATE_AWARENESS_TIMEOUT; // Production state awareness timeout [218:218]
   UINT8   S_C_VCCQ;                           // Sleep current (VCCQ) [219:219]
@@ -319,7 +323,7 @@ typedef struct  {
   OCR       OCRData;
   CID       CIDData;
   CSD       CSDData;
-  ECSD      ECSDData;                         // MMC V4 extended card specific
+  ECSD      *ECSDData;                         // MMC V4 extended card specific
 } CARD_INFO;
 
 typedef struct _MMC_HOST_INSTANCE {

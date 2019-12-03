@@ -1,13 +1,7 @@
 //
 //  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
 //
-//  This program and the accompanying materials
-//  are licensed and made available under the terms and conditions of the BSD License
-//  which accompanies this distribution.  The full text of the license may be found at
-//  http://opensource.org/licenses/bsd-license.php
-//
-//  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-//  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+//  SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 //
 
@@ -65,6 +59,14 @@ _PrepareArguments:
 
 _SetupPrimaryCoreStack:
   mov   sp, r1
+  MOV32 (r8, FixedPcdGet64 (PcdCPUCoresStackBase))
+  MOV32 (r9, FixedPcdGet32 (PcdInitValueInTempStack))
+  mov   r10, r9
+  mov   r11, r9
+  mov   r12, r9
+0:stm   r8!, {r9-r12}
+  cmp   r8, r1
+  blt   0b
   b     _PrepareArguments
 
 _NeverReturn:

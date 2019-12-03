@@ -1,15 +1,9 @@
 #
 #  Copyright (c) 2011-2015, ARM Limited. All rights reserved.
 #  Copyright (c) 2014-2016, Linaro Limited. All rights reserved.
-#  Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.
+#  Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.
 #
-#  This program and the accompanying materials
-#  are licensed and made available under the terms and conditions of the BSD License
-#  which accompanies this distribution.  The full text of the license may be found at
-#  http://opensource.org/licenses/bsd-license.php
-#
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
 ################################################################################
@@ -63,7 +57,7 @@ READ_LOCK_STATUS   = TRUE
   INF SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
 !endif
   INF MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
-  INF EmbeddedPkg/ResetRuntimeDxe/ResetRuntimeDxe.inf
+  INF MdeModulePkg/Universal/ResetSystemRuntimeDxe/ResetSystemRuntimeDxe.inf
   INF EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
   INF EmbeddedPkg/MetronomeDxe/MetronomeDxe.inf
   INF MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
@@ -83,12 +77,18 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
 
   #
-  # FAT filesystem + GPT/MBR partitioning
+  # FAT filesystem + GPT/MBR partitioning + UDF filesystem
   #
   INF MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
   INF MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
   INF FatPkg/EnhancedFatDxe/Fat.inf
   INF MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
+  INF MdeModulePkg/Universal/Disk/UdfDxe/UdfDxe.inf
+
+  #
+  # Status Code Routing
+  #
+  INF MdeModulePkg/Universal/ReportStatusCodeRouter/RuntimeDxe/ReportStatusCodeRouterRuntimeDxe.inf
 
   #
   # Platform Driver
@@ -102,6 +102,7 @@ READ_LOCK_STATUS   = TRUE
   # UEFI application (Shell Embedded Boot Loader)
   #
   INF ShellPkg/Application/Shell/Shell.inf
+  INF ShellPkg/DynamicCommand/TftpDynamicCommand/TftpDynamicCommand.inf
 
   #
   # Bds
@@ -116,17 +117,8 @@ READ_LOCK_STATUS   = TRUE
   #
   # Networking stack
   #
-  INF MdeModulePkg/Universal/Network/DpcDxe/DpcDxe.inf
-  INF MdeModulePkg/Universal/Network/ArpDxe/ArpDxe.inf
-  INF MdeModulePkg/Universal/Network/Dhcp4Dxe/Dhcp4Dxe.inf
-  INF MdeModulePkg/Universal/Network/Ip4Dxe/Ip4Dxe.inf
-  INF MdeModulePkg/Universal/Network/MnpDxe/MnpDxe.inf
-  INF MdeModulePkg/Universal/Network/VlanConfigDxe/VlanConfigDxe.inf
-  INF MdeModulePkg/Universal/Network/Mtftp4Dxe/Mtftp4Dxe.inf
-  INF MdeModulePkg/Universal/Network/Tcp4Dxe/Tcp4Dxe.inf
-  INF MdeModulePkg/Universal/Network/Udp4Dxe/Udp4Dxe.inf
-  INF MdeModulePkg/Universal/Network/UefiPxeBcDxe/UefiPxeBcDxe.inf
-  INF MdeModulePkg/Universal/Network/IScsiDxe/IScsiDxe.inf
+!include NetworkPkg/Network.fdf.inc
+
 
   #
   # SCSI Bus and Disk Driver
@@ -140,11 +132,13 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
   INF OvmfPkg/SmbiosPlatformDxe/SmbiosPlatformDxe.inf
 
-!if $(ARCH) == AARCH64
   #
   # ACPI Support
   #
+  INF ArmVirtPkg/PlatformHasAcpiDtDxe/PlatformHasAcpiDtDxe.inf
+!if $(ARCH) == AARCH64
   INF MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
+  INF MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResourceTableDxe.inf
   INF OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpiPlatformDxe.inf
 
   #
@@ -165,7 +159,7 @@ READ_LOCK_STATUS   = TRUE
   #
   # Video support
   #
-  INF OvmfPkg/QemuVideoDxe/QemuVideoDxe.inf
+  INF OvmfPkg/QemuRamfbDxe/QemuRamfbDxe.inf
   INF OvmfPkg/VirtioGpuDxe/VirtioGpu.inf
   INF OvmfPkg/PlatformDxe/Platform.inf
 
@@ -177,6 +171,7 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Bus/Pci/XhciDxe/XhciDxe.inf
   INF MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
   INF MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
+  INF MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
 
   #
   # TianoCore logo (splash screen)

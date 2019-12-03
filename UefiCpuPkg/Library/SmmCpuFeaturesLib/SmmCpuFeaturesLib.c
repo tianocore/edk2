@@ -1,14 +1,8 @@
 /** @file
 The CPU specific programming for PiSmmCpuDxeSmm module.
 
-Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2010 - 2019, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -19,8 +13,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/PcdLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DebugLib.h>
-#include <Register/Cpuid.h>
-#include <Register/SmramSaveStateMap.h>
+#include <Register/Intel/Cpuid.h>
+#include <Register/Intel/SmramSaveStateMap.h>
 
 //
 // Machine Specific Registers (MSRs)
@@ -40,6 +34,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 #define SMM_FEATURES_LIB_IA32_MCA_CAP              0x17D
 #define   SMM_CODE_ACCESS_CHK_BIT                  BIT58
+
+/**
+  Internal worker function that is called to complete CPU initialization at the
+  end of SmmCpuFeaturesInitializeProcessor().
+
+**/
+VOID
+FinishSmmCpuFeaturesInitializeProcessor (
+  VOID
+  );
 
 //
 // Set default value to assume SMRR is not supported
@@ -257,7 +261,7 @@ SmmCpuFeaturesInitializeProcessor (
       // Print message and halt if CPU is Monarch
       //
       if (IsMonarch) {
-        DEBUG ((EFI_D_ERROR, "SMM Base/Size does not meet alignment/size requirement!\n"));
+        DEBUG ((DEBUG_ERROR, "SMM Base/Size does not meet alignment/size requirement!\n"));
         CpuDeadLoop ();
       }
     } else {
@@ -286,7 +290,9 @@ SmmCpuFeaturesInitializeProcessor (
   // Intel(R) Core(TM) Processor Family MSRs.
   //
   if (FamilyId == 0x06) {
-    if (ModelId == 0x3C || ModelId == 0x45 || ModelId == 0x46) {
+    if (ModelId == 0x3C || ModelId == 0x45 || ModelId == 0x46 ||
+        ModelId == 0x3D || ModelId == 0x47 || ModelId == 0x4E || ModelId == 0x4F ||
+        ModelId == 0x3F || ModelId == 0x56 || ModelId == 0x57 || ModelId == 0x5C) {
       //
       // Check to see if the CPU supports the SMM Code Access Check feature
       // Do not access this MSR unless the CPU supports the SmmRegFeatureControl
@@ -296,6 +302,11 @@ SmmCpuFeaturesInitializeProcessor (
       }
     }
   }
+
+  //
+  //  Call internal worker function that completes the CPU initialization
+  //
+  FinishSmmCpuFeaturesInitializeProcessor ();
 }
 
 /**
@@ -352,66 +363,6 @@ VOID
 EFIAPI
 SmmCpuFeaturesSmmRelocationComplete (
   VOID
-  )
-{
-}
-
-/**
-  Return the size, in bytes, of a custom SMI Handler in bytes.  If 0 is
-  returned, then a custom SMI handler is not provided by this library,
-  and the default SMI handler must be used.
-
-  @retval 0    Use the default SMI handler.
-  @retval > 0  Use the SMI handler installed by SmmCpuFeaturesInstallSmiHandler()
-               The caller is required to allocate enough SMRAM for each CPU to
-               support the size of the custom SMI handler.
-**/
-UINTN
-EFIAPI
-SmmCpuFeaturesGetSmiHandlerSize (
-  VOID
-  )
-{
-  return 0;
-}
-
-/**
-  Install a custom SMI handler for the CPU specified by CpuIndex.  This function
-  is only called if SmmCpuFeaturesGetSmiHandlerSize() returns a size is greater
-  than zero and is called by the CPU that was elected as monarch during System
-  Management Mode initialization.
-
-  @param[in] CpuIndex   The index of the CPU to install the custom SMI handler.
-                        The value must be between 0 and the NumberOfCpus field
-                        in the System Management System Table (SMST).
-  @param[in] SmBase     The SMBASE address for the CPU specified by CpuIndex.
-  @param[in] SmiStack   The stack to use when an SMI is processed by the
-                        the CPU specified by CpuIndex.
-  @param[in] StackSize  The size, in bytes, if the stack used when an SMI is
-                        processed by the CPU specified by CpuIndex.
-  @param[in] GdtBase    The base address of the GDT to use when an SMI is
-                        processed by the CPU specified by CpuIndex.
-  @param[in] GdtSize    The size, in bytes, of the GDT used when an SMI is
-                        processed by the CPU specified by CpuIndex.
-  @param[in] IdtBase    The base address of the IDT to use when an SMI is
-                        processed by the CPU specified by CpuIndex.
-  @param[in] IdtSize    The size, in bytes, of the IDT used when an SMI is
-                        processed by the CPU specified by CpuIndex.
-  @param[in] Cr3        The base address of the page tables to use when an SMI
-                        is processed by the CPU specified by CpuIndex.
-**/
-VOID
-EFIAPI
-SmmCpuFeaturesInstallSmiHandler (
-  IN UINTN   CpuIndex,
-  IN UINT32  SmBase,
-  IN VOID    *SmiStack,
-  IN UINTN   StackSize,
-  IN UINTN   GdtBase,
-  IN UINTN   GdtSize,
-  IN UINTN   IdtBase,
-  IN UINTN   IdtSize,
-  IN UINT32  Cr3
   )
 {
 }

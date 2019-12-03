@@ -1,14 +1,8 @@
 /** @file
   Debug Agent library implementition for Dxe Core and Dxr modules.
 
-  Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -237,7 +231,7 @@ GetDebugPortHandle (
 /**
   Worker function to set up Debug Agent environment.
 
-  This function will set up IDT table and initialize the IDT entries and 
+  This function will set up IDT table and initialize the IDT entries and
   initialize CPU LOCAL APIC timer.
   It also tries to connect HOST if Debug Agent was not initialized before.
 
@@ -512,8 +506,8 @@ InitializeDebugAgent (
     if (Context != NULL) {
       Ia32Idtr =  (IA32_DESCRIPTOR *) Context;
       Ia32IdtEntry = (IA32_IDT_ENTRY *)(Ia32Idtr->Base);
-      MailboxLocation = (UINT64 *) (UINTN) (Ia32IdtEntry[DEBUG_MAILBOX_VECTOR].Bits.OffsetLow +
-                                  (UINT32) (Ia32IdtEntry[DEBUG_MAILBOX_VECTOR].Bits.OffsetHigh << 16));
+      MailboxLocation = (UINT64 *) ((UINTN) Ia32IdtEntry[DEBUG_MAILBOX_VECTOR].Bits.OffsetLow +
+                                   ((UINTN) Ia32IdtEntry[DEBUG_MAILBOX_VECTOR].Bits.OffsetHigh << 16));
       Mailbox = (DEBUG_AGENT_MAILBOX *)(UINTN)(*MailboxLocation);
       VerifyMailboxChecksum (Mailbox);
     }

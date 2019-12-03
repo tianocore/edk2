@@ -4,14 +4,8 @@
   primitives (Hash Serials, HMAC, RSA, Diffie-Hellman, etc) for UEFI security
   functionality enabling.
 
-Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2009 - 2019, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -49,6 +43,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 /// SHA-512 digest size in bytes
 ///
 #define SHA512_DIGEST_SIZE  64
+
+///
+/// SM3 digest size in bytes
+///
+#define SM3_256_DIGEST_SIZE 32
 
 ///
 /// TDES block size in bytes
@@ -891,12 +890,145 @@ Sha512HashAll (
   OUT  UINT8       *HashValue
   );
 
+/**
+  Retrieves the size, in bytes, of the context buffer required for SM3 hash operations.
+
+  @return  The size, in bytes, of the context buffer required for SM3 hash operations.
+
+**/
+UINTN
+EFIAPI
+Sm3GetContextSize (
+  VOID
+  );
+
+/**
+  Initializes user-supplied memory pointed by Sm3Context as SM3 hash context for
+  subsequent use.
+
+  If Sm3Context is NULL, then return FALSE.
+
+  @param[out]  Sm3Context  Pointer to SM3 context being initialized.
+
+  @retval TRUE   SM3 context initialization succeeded.
+  @retval FALSE  SM3 context initialization failed.
+
+**/
+BOOLEAN
+EFIAPI
+Sm3Init (
+  OUT  VOID  *Sm3Context
+  );
+
+/**
+  Makes a copy of an existing SM3 context.
+
+  If Sm3Context is NULL, then return FALSE.
+  If NewSm3Context is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[in]  Sm3Context     Pointer to SM3 context being copied.
+  @param[out] NewSm3Context  Pointer to new SM3 context.
+
+  @retval TRUE   SM3 context copy succeeded.
+  @retval FALSE  SM3 context copy failed.
+  @retval FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+Sm3Duplicate (
+  IN   CONST VOID  *Sm3Context,
+  OUT  VOID        *NewSm3Context
+  );
+
+/**
+  Digests the input data and updates SM3 context.
+
+  This function performs SM3 digest on a data buffer of the specified size.
+  It can be called multiple times to compute the digest of long or discontinuous data streams.
+  SM3 context should be already correctly initialized by Sm3Init(), and should not be finalized
+  by Sm3Final(). Behavior with invalid context is undefined.
+
+  If Sm3Context is NULL, then return FALSE.
+
+  @param[in, out]  Sm3Context     Pointer to the SM3 context.
+  @param[in]       Data           Pointer to the buffer containing the data to be hashed.
+  @param[in]       DataSize       Size of Data buffer in bytes.
+
+  @retval TRUE   SM3 data digest succeeded.
+  @retval FALSE  SM3 data digest failed.
+
+**/
+BOOLEAN
+EFIAPI
+Sm3Update (
+  IN OUT  VOID        *Sm3Context,
+  IN      CONST VOID  *Data,
+  IN      UINTN       DataSize
+  );
+
+/**
+  Completes computation of the SM3 digest value.
+
+  This function completes SM3 hash computation and retrieves the digest value into
+  the specified memory. After this function has been called, the SM3 context cannot
+  be used again.
+  SM3 context should be already correctly initialized by Sm3Init(), and should not be
+  finalized by Sm3Final(). Behavior with invalid SM3 context is undefined.
+
+  If Sm3Context is NULL, then return FALSE.
+  If HashValue is NULL, then return FALSE.
+
+  @param[in, out]  Sm3Context     Pointer to the SM3 context.
+  @param[out]      HashValue      Pointer to a buffer that receives the SM3 digest
+                                  value (32 bytes).
+
+  @retval TRUE   SM3 digest computation succeeded.
+  @retval FALSE  SM3 digest computation failed.
+
+**/
+BOOLEAN
+EFIAPI
+Sm3Final (
+  IN OUT  VOID   *Sm3Context,
+  OUT     UINT8  *HashValue
+  );
+
+/**
+  Computes the SM3 message digest of a input data buffer.
+
+  This function performs the SM3 message digest of a given data buffer, and places
+  the digest value into the specified memory.
+
+  If this interface is not supported, then return FALSE.
+
+  @param[in]   Data        Pointer to the buffer containing the data to be hashed.
+  @param[in]   DataSize    Size of Data buffer in bytes.
+  @param[out]  HashValue   Pointer to a buffer that receives the SM3 digest
+                           value (32 bytes).
+
+  @retval TRUE   SM3 digest computation succeeded.
+  @retval FALSE  SM3 digest computation failed.
+  @retval FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+Sm3HashAll (
+  IN   CONST VOID  *Data,
+  IN   UINTN       DataSize,
+  OUT  UINT8       *HashValue
+  );
+
 //=====================================================================================
 //    MAC (Message Authentication Code) Primitive
 //=====================================================================================
 
 /**
   Retrieves the size, in bytes, of the context buffer required for HMAC-MD5 operations.
+  (NOTE: This API is deprecated.
+         Use HmacMd5New() / HmacMd5Free() for HMAC-MD5 Context operations.)
 
   If this interface is not supported, then return zero.
 
@@ -908,6 +1040,36 @@ UINTN
 EFIAPI
 HmacMd5GetContextSize (
   VOID
+  );
+
+/**
+  Allocates and initializes one HMAC_CTX context for subsequent HMAC-MD5 use.
+
+  If this interface is not supported, then return NULL.
+
+  @return  Pointer to the HMAC_CTX context that has been initialized.
+           If the allocations fails, HmacMd5New() returns NULL.
+  @retval  NULL  This interface is not supported.
+
+**/
+VOID *
+EFIAPI
+HmacMd5New (
+  VOID
+  );
+
+/**
+  Release the specified HMAC_CTX context.
+
+  If this interface is not supported, then do nothing.
+
+  @param[in]  HmacMd5Ctx  Pointer to the HMAC_CTX context to be released.
+
+**/
+VOID
+EFIAPI
+HmacMd5Free (
+  IN  VOID  *HmacMd5Ctx
   );
 
 /**
@@ -1015,6 +1177,8 @@ HmacMd5Final (
 
 /**
   Retrieves the size, in bytes, of the context buffer required for HMAC-SHA1 operations.
+  (NOTE: This API is deprecated.
+         Use HmacSha1New() / HmacSha1Free() for HMAC-SHA1 Context operations.)
 
   If this interface is not supported, then return zero.
 
@@ -1026,6 +1190,36 @@ UINTN
 EFIAPI
 HmacSha1GetContextSize (
   VOID
+  );
+
+/**
+  Allocates and initializes one HMAC_CTX context for subsequent HMAC-SHA1 use.
+
+  If this interface is not supported, then return NULL.
+
+  @return  Pointer to the HMAC_CTX context that has been initialized.
+           If the allocations fails, HmacSha1New() returns NULL.
+  @return  NULL   This interface is not supported.
+
+**/
+VOID *
+EFIAPI
+HmacSha1New (
+  VOID
+  );
+
+/**
+  Release the specified HMAC_CTX context.
+
+  If this interface is not supported, then do nothing.
+
+  @param[in]  HmacSha1Ctx  Pointer to the HMAC_CTX context to be released.
+
+**/
+VOID
+EFIAPI
+HmacSha1Free (
+  IN  VOID  *HmacSha1Ctx
   );
 
 /**
@@ -1133,6 +1327,8 @@ HmacSha1Final (
 
 /**
   Retrieves the size, in bytes, of the context buffer required for HMAC-SHA256 operations.
+  (NOTE: This API is deprecated.
+         Use HmacSha256New() / HmacSha256Free() for HMAC-SHA256 Context operations.)
 
   If this interface is not supported, then return zero.
 
@@ -1144,6 +1340,31 @@ UINTN
 EFIAPI
 HmacSha256GetContextSize (
   VOID
+  );
+
+/**
+  Allocates and initializes one HMAC_CTX context for subsequent HMAC-SHA256 use.
+
+  @return  Pointer to the HMAC_CTX context that has been initialized.
+           If the allocations fails, HmacSha256New() returns NULL.
+
+**/
+VOID *
+EFIAPI
+HmacSha256New (
+  VOID
+  );
+
+/**
+  Release the specified HMAC_CTX context.
+
+  @param[in]  HmacSha256Ctx  Pointer to the HMAC_CTX context to be released.
+
+**/
+VOID
+EFIAPI
+HmacSha256Free (
+  IN  VOID  *HmacSha256Ctx
   );
 
 /**
@@ -1699,10 +1920,10 @@ Arc4Init (
   If Output is NULL, then return FALSE.
   If this interface is not supported, then return FALSE.
 
-  @param[in]   Arc4Context  Pointer to the ARC4 context.
-  @param[in]   Input        Pointer to the buffer containing the data to be encrypted.
-  @param[in]   InputSize    Size of the Input buffer in bytes.
-  @param[out]  Output       Pointer to a buffer that receives the ARC4 encryption output.
+  @param[in, out]  Arc4Context  Pointer to the ARC4 context.
+  @param[in]       Input        Pointer to the buffer containing the data to be encrypted.
+  @param[in]       InputSize    Size of the Input buffer in bytes.
+  @param[out]      Output       Pointer to a buffer that receives the ARC4 encryption output.
 
   @retval TRUE   ARC4 encryption succeeded.
   @retval FALSE  ARC4 encryption failed.
@@ -1731,10 +1952,10 @@ Arc4Encrypt (
   If Output is NULL, then return FALSE.
   If this interface is not supported, then return FALSE.
 
-  @param[in]   Arc4Context  Pointer to the ARC4 context.
-  @param[in]   Input        Pointer to the buffer containing the data to be decrypted.
-  @param[in]   InputSize    Size of the Input buffer in bytes.
-  @param[out]  Output       Pointer to a buffer that receives the ARC4 decryption output.
+  @param[in, out]  Arc4Context  Pointer to the ARC4 context.
+  @param[in]       Input        Pointer to the buffer containing the data to be decrypted.
+  @param[in]       InputSize    Size of the Input buffer in bytes.
+  @param[out]      Output       Pointer to a buffer that receives the ARC4 decryption output.
 
   @retval TRUE   ARC4 decryption succeeded.
   @retval FALSE  ARC4 decryption failed.
@@ -2081,6 +2302,76 @@ X509GetSubjectName (
   );
 
 /**
+  Retrieve the common name (CN) string from one X.509 certificate.
+
+  @param[in]      Cert             Pointer to the DER-encoded X509 certificate.
+  @param[in]      CertSize         Size of the X509 certificate in bytes.
+  @param[out]     CommonName       Buffer to contain the retrieved certificate common
+                                   name string (UTF8). At most CommonNameSize bytes will be
+                                   written and the string will be null terminated. May be
+                                   NULL in order to determine the size buffer needed.
+  @param[in,out]  CommonNameSize   The size in bytes of the CommonName buffer on input,
+                                   and the size of buffer returned CommonName on output.
+                                   If CommonName is NULL then the amount of space needed
+                                   in buffer (including the final null) is returned.
+
+  @retval RETURN_SUCCESS           The certificate CommonName retrieved successfully.
+  @retval RETURN_INVALID_PARAMETER If Cert is NULL.
+                                   If CommonNameSize is NULL.
+                                   If CommonName is not NULL and *CommonNameSize is 0.
+                                   If Certificate is invalid.
+  @retval RETURN_NOT_FOUND         If no CommonName entry exists.
+  @retval RETURN_BUFFER_TOO_SMALL  If the CommonName is NULL. The required buffer size
+                                   (including the final null) is returned in the
+                                   CommonNameSize parameter.
+  @retval RETURN_UNSUPPORTED       The operation is not supported.
+
+**/
+RETURN_STATUS
+EFIAPI
+X509GetCommonName (
+  IN      CONST UINT8  *Cert,
+  IN      UINTN        CertSize,
+  OUT     CHAR8        *CommonName,  OPTIONAL
+  IN OUT  UINTN        *CommonNameSize
+  );
+
+/**
+  Retrieve the organization name (O) string from one X.509 certificate.
+
+  @param[in]      Cert             Pointer to the DER-encoded X509 certificate.
+  @param[in]      CertSize         Size of the X509 certificate in bytes.
+  @param[out]     NameBuffer       Buffer to contain the retrieved certificate organization
+                                   name string. At most NameBufferSize bytes will be
+                                   written and the string will be null terminated. May be
+                                   NULL in order to determine the size buffer needed.
+  @param[in,out]  NameBufferSize   The size in bytes of the Name buffer on input,
+                                   and the size of buffer returned Name on output.
+                                   If NameBuffer is NULL then the amount of space needed
+                                   in buffer (including the final null) is returned.
+
+  @retval RETURN_SUCCESS           The certificate Organization Name retrieved successfully.
+  @retval RETURN_INVALID_PARAMETER If Cert is NULL.
+                                   If NameBufferSize is NULL.
+                                   If NameBuffer is not NULL and *CommonNameSize is 0.
+                                   If Certificate is invalid.
+  @retval RETURN_NOT_FOUND         If no Organization Name entry exists.
+  @retval RETURN_BUFFER_TOO_SMALL  If the NameBuffer is NULL. The required buffer size
+                                   (including the final null) is returned in the
+                                   CommonNameSize parameter.
+  @retval RETURN_UNSUPPORTED       The operation is not supported.
+
+**/
+RETURN_STATUS
+EFIAPI
+X509GetOrganizationName (
+  IN      CONST UINT8   *Cert,
+  IN      UINTN         CertSize,
+  OUT     CHAR8         *NameBuffer,  OPTIONAL
+  IN OUT  UINTN         *NameBufferSize
+  );
+
+/**
   Verify one X509 certificate was issued by the trusted CA.
 
   If Cert is NULL, then return FALSE.
@@ -2251,6 +2542,78 @@ Pkcs5HashPassword (
   );
 
 /**
+  Encrypts a blob using PKCS1v2 (RSAES-OAEP) schema. On success, will return the
+  encrypted message in a newly allocated buffer.
+
+  Things that can cause a failure include:
+  - X509 key size does not match any known key size.
+  - Fail to parse X509 certificate.
+  - Fail to allocate an intermediate buffer.
+  - Null pointer provided for a non-optional parameter.
+  - Data size is too large for the provided key size (max size is a function of key size
+    and hash digest size).
+
+  @param[in]  PublicKey           A pointer to the DER-encoded X509 certificate that
+                                  will be used to encrypt the data.
+  @param[in]  PublicKeySize       Size of the X509 cert buffer.
+  @param[in]  InData              Data to be encrypted.
+  @param[in]  InDataSize          Size of the data buffer.
+  @param[in]  PrngSeed            [Optional] If provided, a pointer to a random seed buffer
+                                  to be used when initializing the PRNG. NULL otherwise.
+  @param[in]  PrngSeedSize        [Optional] If provided, size of the random seed buffer.
+                                  0 otherwise.
+  @param[out] EncryptedData       Pointer to an allocated buffer containing the encrypted
+                                  message.
+  @param[out] EncryptedDataSize   Size of the encrypted message buffer.
+
+  @retval     TRUE                Encryption was successful.
+  @retval     FALSE               Encryption failed.
+
+**/
+BOOLEAN
+EFIAPI
+Pkcs1v2Encrypt (
+  IN   CONST UINT8  *PublicKey,
+  IN   UINTN        PublicKeySize,
+  IN   UINT8        *InData,
+  IN   UINTN        InDataSize,
+  IN   CONST UINT8  *PrngSeed,  OPTIONAL
+  IN   UINTN        PrngSeedSize,  OPTIONAL
+  OUT  UINT8        **EncryptedData,
+  OUT  UINTN        *EncryptedDataSize
+  );
+
+/**
+  The 3rd parameter of Pkcs7GetSigners will return all embedded
+  X.509 certificate in one given PKCS7 signature. The format is:
+  //
+  // UINT8  CertNumber;
+  // UINT32 Cert1Length;
+  // UINT8  Cert1[];
+  // UINT32 Cert2Length;
+  // UINT8  Cert2[];
+  // ...
+  // UINT32 CertnLength;
+  // UINT8  Certn[];
+  //
+
+  The two following C-structure are used for parsing CertStack more clearly.
+**/
+#pragma pack(1)
+
+typedef struct {
+  UINT32    CertDataLength;       // The length in bytes of X.509 certificate.
+  UINT8     CertDataBuffer[0];    // The X.509 certificate content (DER).
+} EFI_CERT_DATA;
+
+typedef struct {
+  UINT8             CertNumber;   // Number of X.509 certificate.
+  //EFI_CERT_DATA   CertArray[];  // An array of X.509 certificate.
+} EFI_CERT_STACK;
+
+#pragma pack()
+
+/**
   Get the signer's certificates from PKCS#7 signed data as described in "PKCS #7:
   Cryptographic Message Syntax Standard". The input signed data could be wrapped
   in a ContentInfo structure.
@@ -2262,10 +2625,13 @@ Pkcs5HashPassword (
   @param[in]  P7Data       Pointer to the PKCS#7 message to verify.
   @param[in]  P7Length     Length of the PKCS#7 message in bytes.
   @param[out] CertStack    Pointer to Signer's certificates retrieved from P7Data.
-                           It's caller's responsibility to free the buffer.
+                           It's caller's responsibility to free the buffer with
+                           Pkcs7FreeSigners().
+                           This data structure is EFI_CERT_STACK type.
   @param[out] StackLength  Length of signer's certificates in bytes.
   @param[out] TrustedCert  Pointer to a trusted certificate from Signer's certificates.
-                           It's caller's responsibility to free the buffer.
+                           It's caller's responsibility to free the buffer with
+                           Pkcs7FreeSigners().
   @param[out] CertLength   Length of the trusted certificate in bytes.
 
   @retval  TRUE            The operation is finished successfully.
@@ -2307,10 +2673,13 @@ Pkcs7FreeSigners (
   @param[in]  P7Data            Pointer to the PKCS#7 message.
   @param[in]  P7Length          Length of the PKCS#7 message in bytes.
   @param[out] SignerChainCerts  Pointer to the certificates list chained to signer's
-                                certificate. It's caller's responsibility to free the buffer.
+                                certificate. It's caller's responsibility to free the buffer
+                                with Pkcs7FreeSigners().
+                                This data structure is EFI_CERT_STACK type.
   @param[out] ChainLength       Length of the chained certificates list buffer in bytes.
   @param[out] UnchainCerts      Pointer to the unchained certificates lists. It's caller's
-                                responsibility to free the buffer.
+                                responsibility to free the buffer with Pkcs7FreeSigners().
+                                This data structure is EFI_CERT_STACK type.
   @param[out] UnchainLength     Length of the unchained certificates list buffer in bytes.
 
   @retval  TRUE         The operation is finished successfully.
@@ -2346,7 +2715,8 @@ Pkcs7GetCertificatesList (
   @param[in]  OtherCerts       Pointer to an optional additional set of certificates to
                                include in the PKCS#7 signedData (e.g. any intermediate
                                CAs in the chain).
-  @param[out] SignedData       Pointer to output PKCS#7 signedData.
+  @param[out] SignedData       Pointer to output PKCS#7 signedData. It's caller's
+                               responsibility to free the buffer with FreePool().
   @param[out] SignedDataSize   Size of SignedData in bytes.
 
   @retval     TRUE             PKCS#7 data signing succeeded.
@@ -2402,6 +2772,48 @@ Pkcs7Verify (
   );
 
 /**
+  This function receives a PKCS7 formatted signature, and then verifies that
+  the specified Enhanced or Extended Key Usages (EKU's) are present in the end-entity
+  leaf signing certificate.
+  Note that this function does not validate the certificate chain.
+
+  Applications for custom EKU's are quite flexible. For example, a policy EKU
+  may be present in an Issuing Certificate Authority (CA), and any sub-ordinate
+  certificate issued might also contain this EKU, thus constraining the
+  sub-ordinate certificate.  Other applications might allow a certificate
+  embedded in a device to specify that other Object Identifiers (OIDs) are
+  present which contains binary data specifying custom capabilities that
+  the device is able to do.
+
+  @param[in]  Pkcs7Signature       The PKCS#7 signed information content block. An array
+                                   containing the content block with both the signature,
+                                   the signer's certificate, and any necessary intermediate
+                                   certificates.
+  @param[in]  Pkcs7SignatureSize   Number of bytes in Pkcs7Signature.
+  @param[in]  RequiredEKUs         Array of null-terminated strings listing OIDs of
+                                   required EKUs that must be present in the signature.
+  @param[in]  RequiredEKUsSize     Number of elements in the RequiredEKUs string array.
+  @param[in]  RequireAllPresent    If this is TRUE, then all of the specified EKU's
+                                   must be present in the leaf signer.  If it is
+                                   FALSE, then we will succeed if we find any
+                                   of the specified EKU's.
+
+  @retval EFI_SUCCESS              The required EKUs were found in the signature.
+  @retval EFI_INVALID_PARAMETER    A parameter was invalid.
+  @retval EFI_NOT_FOUND            One or more EKU's were not found in the signature.
+
+**/
+RETURN_STATUS
+EFIAPI
+VerifyEKUsInPkcs7Signature (
+  IN  CONST UINT8   *Pkcs7Signature,
+  IN  CONST UINT32  SignatureSize,
+  IN  CONST CHAR8   *RequiredEKUs[],
+  IN  CONST UINT32  RequiredEKUsSize,
+  IN  BOOLEAN       RequireAllPresent
+  );
+
+/**
   Extracts the attached content from a PKCS#7 signed data if existed. The input signed
   data could be wrapped in a ContentInfo structure.
 
@@ -2414,13 +2826,13 @@ Pkcs7Verify (
   @param[in]   P7Data       Pointer to the PKCS#7 signed data to process.
   @param[in]   P7Length     Length of the PKCS#7 signed data in bytes.
   @param[out]  Content      Pointer to the extracted content from the PKCS#7 signedData.
-                            It's caller's responsibility to free the buffer.
+                            It's caller's responsibility to free the buffer with FreePool().
   @param[out]  ContentSize  The size of the extracted content in bytes.
 
   @retval     TRUE          The P7Data was correctly formatted for processing.
   @retval     FALSE         The P7Data was not correctly formatted for processing.
 
-*/
+**/
 BOOLEAN
 EFIAPI
 Pkcs7GetAttachedContent (
@@ -2708,6 +3120,39 @@ EFIAPI
 RandomBytes (
   OUT  UINT8  *Output,
   IN   UINTN  Size
+  );
+
+//=====================================================================================
+//    Key Derivation Function Primitive
+//=====================================================================================
+
+/**
+  Derive key data using HMAC-SHA256 based KDF.
+
+  @param[in]   Key              Pointer to the user-supplied key.
+  @param[in]   KeySize          Key size in bytes.
+  @param[in]   Salt             Pointer to the salt(non-secret) value.
+  @param[in]   SaltSize         Salt size in bytes.
+  @param[in]   Info             Pointer to the application specific info.
+  @param[in]   InfoSize         Info size in bytes.
+  @param[out]  Out              Pointer to buffer to receive hkdf value.
+  @param[in]   OutSize          Size of hkdf bytes to generate.
+
+  @retval TRUE   Hkdf generated successfully.
+  @retval FALSE  Hkdf generation failed.
+
+**/
+BOOLEAN
+EFIAPI
+HkdfSha256ExtractAndExpand (
+  IN   CONST UINT8  *Key,
+  IN   UINTN        KeySize,
+  IN   CONST UINT8  *Salt,
+  IN   UINTN        SaltSize,
+  IN   CONST UINT8  *Info,
+  IN   UINTN        InfoSize,
+  OUT  UINT8        *Out,
+  IN   UINTN        OutSize
   );
 
 #endif // __BASE_CRYPT_LIB_H__

@@ -1,14 +1,9 @@
 ##  @file
 # Provides shell Debug1 profile functions
 #
-# Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 #
-#  This program and the accompanying materials
-#  are licensed and made available under the terms and conditions of the BSD License
-#  which accompanies this distribution. The full text of the license may be found at
-#  http://opensource.org/licenses/bsd-license.php
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 #
 ##
@@ -64,8 +59,8 @@
   EditStatusBar.c
   EditMenuBar.h
   EditMenuBar.c
-  
-## Files specific to the text editor  
+
+## Files specific to the text editor
   Edit/Edit.c
   Edit/TextEditor.h
   Edit/TextEditorTypes.h
@@ -76,7 +71,7 @@
   Edit/Misc.h
   Edit/Misc.c
   Edit/TextEditStrings.uni
-  
+
 ## Files specific to the HEX editor
   HexEdit/BufferImage.h
   HexEdit/BufferImage.c
@@ -119,8 +114,6 @@
 
 [Pcd]
   gEfiShellPkgTokenSpaceGuid.PcdShellProfileMask              ## CONSUMES
-  gEfiShellPkgTokenSpaceGuid.PcdShellFileOperationSize        ## CONSUMES
-  gEfiMdePkgTokenSpaceGuid.PcdMaximumUnicodeStringLength      ## CONSUMES
 
 [Protocols]
   gEfiPciRootBridgeIoProtocolGuid             ## SOMETIMES_CONSUMES
@@ -133,7 +126,6 @@
   gEfiSmbiosTableGuid             ## SOMETIMES_CONSUMES ## SystemTable
   gEfiSmbios3TableGuid            ## SOMETIMES_CONSUMES ## SystemTable
   gEfiMpsTableGuid                ## SOMETIMES_CONSUMES ## SystemTable
-  gEfiSalSystemTableGuid          ## SOMETIMES_CONSUMES ## SystemTable
   gEfiAcpi10TableGuid             ## SOMETIMES_CONSUMES ## SystemTable
   gEfiAcpi20TableGuid             ## SOMETIMES_CONSUMES ## SystemTable
   gShellDebug1HiiGuid             ## SOMETIMES_CONSUMES ## HII

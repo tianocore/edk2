@@ -1,14 +1,8 @@
 /** @file
 Library that provides CPU specific functions to support the PiSmmCpuDxeSmm module.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2015 - 2019, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -17,7 +11,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Protocol/MpService.h>
 #include <Protocol/SmmCpu.h>
-#include <Register/SmramSaveStateMap.h>
+#include <Register/Intel/SmramSaveStateMap.h>
 #include <CpuHotPlugData.h>
 
 ///
@@ -160,14 +154,33 @@ SmmCpuFeaturesGetSmiHandlerSize (
   than zero and is called by the CPU that was elected as monarch during System
   Management Mode initialization.
 
+    //
+    // Append Shadow Stack after normal stack
+    //
+    // |= SmiStack
+    // +--------------------------------------------------+---------------------------------------------------------------+
+    // | Known Good Stack | Guard Page |    SMM Stack     | Known Good Shadow Stack | Guard Page |    SMM Shadow Stack    |
+    // +--------------------------------------------------+---------------------------------------------------------------+
+    // |                               |PcdCpuSmmStackSize|                                      |PcdCpuSmmShadowStackSize|
+    // |<-------------------- StackSize ----------------->|<------------------------- ShadowStackSize ------------------->|
+    // |                                                                                                                  |
+    // |<-------------------------------------------- Processor N ------------------------------------------------------->|
+    // | low address (bottom)                                                                          high address (top) |
+    //
+
   @param[in] CpuIndex   The index of the CPU to install the custom SMI handler.
                         The value must be between 0 and the NumberOfCpus field
                         in the System Management System Table (SMST).
   @param[in] SmBase     The SMBASE address for the CPU specified by CpuIndex.
-  @param[in] SmiStack   The stack to use when an SMI is processed by the
+  @param[in] SmiStack   The bottom of stack to use when an SMI is processed by the
                         the CPU specified by CpuIndex.
   @param[in] StackSize  The size, in bytes, if the stack used when an SMI is
                         processed by the CPU specified by CpuIndex.
+                        StackSize should be PcdCpuSmmStackSize, with 2 more pages
+                        if PcdCpuSmmStackGuard is true.
+                        If ShadowStack is enabled, the shadow stack is allocated
+                        after the normal Stack. The size is PcdCpuSmmShadowStackSize.
+                        with 2 more pages if PcdCpuSmmStackGuard is true.
   @param[in] GdtBase    The base address of the GDT to use when an SMI is
                         processed by the CPU specified by CpuIndex.
   @param[in] GdtSize    The size, in bytes, of the GDT used when an SMI is

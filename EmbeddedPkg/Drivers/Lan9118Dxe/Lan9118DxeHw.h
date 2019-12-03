@@ -2,13 +2,7 @@
 *
 *  Copyright (c) 2012-2014, ARM Limited. All rights reserved.
 *
-*  This program and the accompanying materials
-*  are licensed and made available under the terms and conditions of the BSD License
-*  which accompanies this distribution.  The full text of the license may be found at
-*  http://opensource.org/licenses/bsd-license.php
-*
-*  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-*  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+*  SPDX-License-Identifier: BSD-2-Clause-Patent
 *
 **/
 
@@ -133,7 +127,7 @@
 #define RXSTATUS_CRC_ERROR                    BIT1                      // Cyclic Redundancy Check Error
 #define RXSTATUS_DB                           BIT2                      // Dribbling bit: Frame had non-integer multiple of 8bits
 #define RXSTATUS_MII_ERROR                    BIT3                      // Receive error during interception
-#define RXSTATUS_RXW_TO                       BIT4                      // Incomming frame larger than 2kb
+#define RXSTATUS_RXW_TO                       BIT4                      // Incoming frame larger than 2kb
 #define RXSTATUS_FT                           BIT5                      // 1: Ether type / 0: 802.3 type frame
 #define RXSTATUS_LCOLL                        BIT6                      // Late collision detected
 #define RXSTATUS_FTL                          BIT7                      // Frame longer than Ether type

@@ -1,22 +1,16 @@
 ## @file
 # This file is used to define common static strings and global data used by UPT
 #
-# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
-# This program and the accompanying materials are licensed and made available 
-# under the terms and conditions of the BSD License which accompanies this 
-# distribution. The full text of the license may be found at 
-# http://opensource.org/licenses/bsd-license.php
-#
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
 
 '''
 GlobalData
 '''
 
 #
-# The workspace directory 
+# The workspace directory
 #
 gWORKSPACE = '.'
 gPACKAGE_PATH = None
@@ -43,7 +37,7 @@ gINVALID_MODULE_FILE = gUPT_DIR + r"Invalid_Modules.log"
 gCONTENT_FILE = "dist.content"
 
 #
-# File name for XML file in the distibution
+# File name for XML file in the distribution
 #
 gDESC_FILE = 'dist.pkg'
 
@@ -87,7 +81,7 @@ gWARNING_AS_ERROR = False
 #
 # Used to specify the temp directory to hold the unpacked distribution files
 #
-gUNPACK_DIR = None
+gUNPACK_DIR = []
 
 #
 # Flag used to mark whether the INF file is Binary INF or not.
@@ -109,3 +103,8 @@ gPackageDict = {}
 # {FilePath: FileObj}
 #
 gLIBINSTANCEDICT = {}
+
+#
+# Store the list of DIST
+#
+gTO_BE_INSTALLED_DIST_LIST = []

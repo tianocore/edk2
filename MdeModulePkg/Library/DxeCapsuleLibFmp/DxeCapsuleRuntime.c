@@ -1,14 +1,8 @@
 /** @file
   Capsule library runtime support.
 
-  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -28,6 +22,8 @@
 
 extern EFI_SYSTEM_RESOURCE_TABLE *mEsrtTable;
 extern BOOLEAN                   mIsVirtualAddrConverted;
+EFI_EVENT                 mDxeRuntimeCapsuleLibVirtualAddressChangeEvent  = NULL;
+EFI_EVENT                 mDxeRuntimeCapsuleLibReadyToBootEvent  = NULL;
 
 /**
   Convert EsrtTable physical address to virtual address.
@@ -43,8 +39,28 @@ DxeCapsuleLibVirtualAddressChangeEvent (
   IN  VOID        *Context
   )
 {
-  UINTN                    Index;
-  EFI_CONFIGURATION_TABLE  *ConfigEntry;
+  gRT->ConvertPointer (EFI_OPTIONAL_PTR, (VOID **)&mEsrtTable);
+  mIsVirtualAddrConverted = TRUE;
+}
+
+/**
+  Notify function for event group EFI_EVENT_GROUP_READY_TO_BOOT.
+
+  @param[in]  Event   The Event that is being processed.
+  @param[in]  Context The Event Context.
+
+**/
+STATIC
+VOID
+EFIAPI
+DxeCapsuleLibReadyToBootEventNotify (
+  IN EFI_EVENT        Event,
+  IN VOID             *Context
+  )
+{
+  UINTN                       Index;
+  EFI_CONFIGURATION_TABLE     *ConfigEntry;
+  EFI_SYSTEM_RESOURCE_TABLE   *EsrtTable;
 
   //
   // Get Esrt table first
@@ -64,16 +80,19 @@ DxeCapsuleLibVirtualAddressChangeEvent (
     //
     // Search Esrt to check given capsule is qualified
     //
-    mEsrtTable = (EFI_SYSTEM_RESOURCE_TABLE *) ConfigEntry->VendorTable;
+    EsrtTable = (EFI_SYSTEM_RESOURCE_TABLE *) ConfigEntry->VendorTable;
+
+    mEsrtTable = AllocateRuntimeCopyPool (
+                   sizeof (EFI_SYSTEM_RESOURCE_TABLE) +
+                   EsrtTable->FwResourceCount * sizeof (EFI_SYSTEM_RESOURCE_ENTRY),
+                   EsrtTable);
+    ASSERT (mEsrtTable != NULL);
 
     //
-    // Update protocol pointer to Esrt Table.
+    // Set FwResourceCountMax to a sane value.
     //
-    gRT->ConvertPointer (0x00, (VOID**) &(mEsrtTable));
+    mEsrtTable->FwResourceCountMax = mEsrtTable->FwResourceCount;
   }
-
-  mIsVirtualAddrConverted = TRUE;
-
 }
 
 /**
@@ -92,20 +111,63 @@ DxeRuntimeCapsuleLibConstructor (
   )
 {
   EFI_STATUS     Status;
-  EFI_EVENT      Event;
 
   //
   // Make sure we can handle virtual address changes.
   //
-  Event = NULL;
   Status = gBS->CreateEventEx (
                   EVT_NOTIFY_SIGNAL,
                   TPL_NOTIFY,
                   DxeCapsuleLibVirtualAddressChangeEvent,
                   NULL,
                   &gEfiEventVirtualAddressChangeGuid,
-                  &Event
+                  &mDxeRuntimeCapsuleLibVirtualAddressChangeEvent
                   );
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Register notify function to cache the FMP capsule GUIDs at ReadyToBoot.
+  //
+  Status = gBS->CreateEventEx (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_CALLBACK,
+                  DxeCapsuleLibReadyToBootEventNotify,
+                  NULL,
+                  &gEfiEventReadyToBootGuid,
+                  &mDxeRuntimeCapsuleLibReadyToBootEvent
+                  );
+  ASSERT_EFI_ERROR (Status);
+
+  return EFI_SUCCESS;
+}
+
+/**
+  The destructor function closes the VirtualAddressChange event.
+
+  @param  ImageHandle   The firmware allocated handle for the EFI image.
+  @param  SystemTable   A pointer to the EFI System Table.
+
+  @retval EFI_SUCCESS   The destructor completed successfully.
+**/
+EFI_STATUS
+EFIAPI
+DxeRuntimeCapsuleLibDestructor (
+  IN EFI_HANDLE         ImageHandle,
+  IN EFI_SYSTEM_TABLE   *SystemTable
+  )
+{
+  EFI_STATUS    Status;
+
+  //
+  // Close the VirtualAddressChange event.
+  //
+  Status = gBS->CloseEvent (mDxeRuntimeCapsuleLibVirtualAddressChangeEvent);
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Close the ReadyToBoot event.
+  //
+  Status = gBS->CloseEvent (mDxeRuntimeCapsuleLibReadyToBootEvent);
   ASSERT_EFI_ERROR (Status);
 
   return EFI_SUCCESS;

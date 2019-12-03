@@ -1,14 +1,8 @@
 // /**
 //
-// Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
 // (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
-// This program and the accompanying materials
-// are licensed and made available under the terms and conditions of the BSD License
-// which accompanies this distribution. The full text of the license may be found at
-// http://opensource.org/licenses/bsd-license.php
-//
-// THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-// WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+// SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Abstract:
 //
@@ -27,7 +21,7 @@
 #string STR_HEXEDIT_DISKNAME              #language en-US  "    %H-d   DiskName FirstBlockNo.   BlockNumber%N     Open Disk Block For Editing\n"
 #string STR_HEXEDIT_OFFSET_SIZE           #language en-US  "    %H-m   Offset   Size%N                            Open Memory Region For Editing\n"
 #string STR_HEXEDIT_FILE_NAME             #language en-US  "%Hhexedit%N: Invalid File Name\n"
-#string STR_HEXEDIT_LIBEDITOR_MAINEDITOR_TITLE      #language en-US  "%EMainEditor init failed on TitleBar init\n%N"			
+#string STR_HEXEDIT_LIBEDITOR_MAINEDITOR_TITLE      #language en-US  "%EMainEditor init failed on TitleBar init\n%N"
 #string STR_HEXEDIT_LIBEDITOR_MAINEDITOR_MAINMENU   #language en-US  "%EMainEditor init failed on MainMenu init\n%N"
 #string STR_HEXEDIT_LIBEDITOR_MAINEDITOR_STATUS     #language en-US  "%EMainEditor init failed on StatusBar init\n%N"
 #string STR_HEXEDIT_LIBEDITOR_MAINEDITOR_INPUTBAR   #language en-US  "%EMainEditor init failed on InputBar init\n%N"

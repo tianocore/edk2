@@ -1,13 +1,7 @@
 /** @file
 
-  Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -15,6 +9,9 @@
 #define _FSP_GLOBAL_DATA_H_
 
 #include <FspEas.h>
+
+#define FSP_IN_API_MODE      0
+#define FSP_IN_DISPATCH_MODE 1
 
 #pragma pack(1)
 
@@ -54,7 +51,8 @@ typedef struct  {
    VOID               *MemoryInitUpdPtr;
    VOID               *SiliconInitUpdPtr;
    UINT8              ApiIdx;
-   UINT8              Reserved3[31];
+   UINT8              FspMode; // 0: FSP in API mode; 1: FSP in DISPATCH mode
+   UINT8              Reserved3[30];
    UINT32             PerfSig;
    UINT16             PerfLen;
    UINT16             Reserved4;

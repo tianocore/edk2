@@ -1,14 +1,10 @@
 /** @file
   Produces the CPU I/O PPI.
 
-Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
+
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -52,7 +48,7 @@ EFI_PEI_PPI_DESCRIPTOR gPpiList = {
   &gEfiPeiCpuIoPpiInstalledGuid,
   NULL
 };
-  
+
 //
 // Lookup table for increment values based on transfer widths
 //
@@ -101,9 +97,9 @@ UINT8 mOutStride[] = {
   @retval EFI_SUCCESS            The parameters for this request pass the checks.
   @retval EFI_INVALID_PARAMETER  Width is invalid for this EFI system.
   @retval EFI_INVALID_PARAMETER  Buffer is NULL.
-  @retval EFI_UNSUPPORTED        The address range specified by Address, Width, 
+  @retval EFI_UNSUPPORTED        The address range specified by Address, Width,
                                  and Count is not valid for this EFI system.
-                                 
+
 **/
 EFI_STATUS
 CpuIoCheckParameter (
@@ -146,20 +142,20 @@ CpuIoCheckParameter (
   if (!MmioOperation && (Width == EfiPeiCpuIoWidthUint64)) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   //
-  // Check to see if any address associated with this transfer exceeds the maximum 
+  // Check to see if any address associated with this transfer exceeds the maximum
   // allowed address.  The maximum address implied by the parameters passed in is
   // Address + Size * Count.  If the following condition is met, then the transfer
   // is not supported.
   //
   //    Address + Size * Count > (MmioOperation ? MAX_ADDRESS : MAX_IO_PORT_ADDRESS) + 1
   //
-  // Since MAX_ADDRESS can be the maximum integer value supported by the CPU and Count 
+  // Since MAX_ADDRESS can be the maximum integer value supported by the CPU and Count
   // can also be the maximum integer value supported by the CPU, this range
   // check must be adjusted to avoid all overflow conditions.
-  //   
-  // The following form of the range check is equivalent but assumes that 
+  //
+  // The following form of the range check is equivalent but assumes that
   // MAX_ADDRESS and MAX_IO_PORT_ADDRESS are of the form (2^n - 1).
   //
   Limit = (MmioOperation ? MAX_ADDRESS : MAX_IO_PORT_ADDRESS);
@@ -167,7 +163,7 @@ CpuIoCheckParameter (
     if (Address > Limit) {
       return EFI_UNSUPPORTED;
     }
-  } else {  
+  } else {
     MaxCount = RShiftU64 (Limit, Width);
     if (MaxCount < (Count - 1)) {
       return EFI_UNSUPPORTED;
@@ -176,7 +172,7 @@ CpuIoCheckParameter (
       return EFI_UNSUPPORTED;
     }
   }
-  
+
   return EFI_SUCCESS;
 }
 
@@ -194,7 +190,7 @@ CpuIoCheckParameter (
   @retval EFI_SUCCESS            The function completed successfully.
   @retval EFI_INVALID_PARAMETER  Width is invalid for this EFI system.
   @retval EFI_INVALID_PARAMETER  Buffer is NULL.
-  @retval EFI_UNSUPPORTED        The address range specified by Address, Width, 
+  @retval EFI_UNSUPPORTED        The address range specified by Address, Width,
                                  and Count is not valid for this EFI system.
 
 **/
@@ -268,7 +264,7 @@ CpuMemoryServiceRead (
   @retval EFI_SUCCESS            The function completed successfully.
   @retval EFI_INVALID_PARAMETER  Width is invalid for this EFI system.
   @retval EFI_INVALID_PARAMETER  Buffer is NULL.
-  @retval EFI_UNSUPPORTED        The address range specified by Address, Width, 
+  @retval EFI_UNSUPPORTED        The address range specified by Address, Width,
                                  and Count is not valid for this EFI system.
 
 **/
@@ -342,7 +338,7 @@ CpuMemoryServiceWrite (
   @retval EFI_SUCCESS            The function completed successfully.
   @retval EFI_INVALID_PARAMETER  Width is invalid for this EFI system.
   @retval EFI_INVALID_PARAMETER  Buffer is NULL.
-  @retval EFI_UNSUPPORTED        The address range specified by Address, Width, 
+  @retval EFI_UNSUPPORTED        The address range specified by Address, Width,
                                  and Count is not valid for this EFI system.
 
 **/
@@ -375,6 +371,31 @@ CpuIoServiceRead (
   InStride = mInStride[Width];
   OutStride = mOutStride[Width];
   OperationWidth = (EFI_PEI_CPU_IO_PPI_WIDTH) (Width & 0x03);
+
+  //
+  // Fifo operations supported for (mInStride[Width] == 0)
+  //
+  if (InStride == 0) {
+    switch (OperationWidth) {
+    case EfiPeiCpuIoWidthUint8:
+      IoReadFifo8 ((UINTN)Address, Count, Buffer);
+      return EFI_SUCCESS;
+    case EfiPeiCpuIoWidthUint16:
+      IoReadFifo16 ((UINTN)Address, Count, Buffer);
+      return EFI_SUCCESS;
+    case EfiPeiCpuIoWidthUint32:
+      IoReadFifo32 ((UINTN)Address, Count, Buffer);
+      return EFI_SUCCESS;
+    default:
+      //
+      // The CpuIoCheckParameter call above will ensure that this
+      // path is not taken.
+      //
+      ASSERT (FALSE);
+      break;
+    }
+  }
+
   Aligned = (BOOLEAN)(((UINTN)Buffer & (mInStride[OperationWidth] - 1)) == 0x00);
   for (Uint8Buffer = Buffer; Count > 0; Address += InStride, Uint8Buffer += OutStride, Count--) {
     if (OperationWidth == EfiPeiCpuIoWidthUint8) {
@@ -411,7 +432,7 @@ CpuIoServiceRead (
   @retval EFI_SUCCESS            The function completed successfully.
   @retval EFI_INVALID_PARAMETER  Width is invalid for this EFI system.
   @retval EFI_INVALID_PARAMETER  Buffer is NULL.
-  @retval EFI_UNSUPPORTED        The address range specified by Address, Width, 
+  @retval EFI_UNSUPPORTED        The address range specified by Address, Width,
                                  and Count is not valid for this EFI system.
 
 **/
@@ -447,6 +468,31 @@ CpuIoServiceWrite (
   InStride = mInStride[Width];
   OutStride = mOutStride[Width];
   OperationWidth = (EFI_PEI_CPU_IO_PPI_WIDTH) (Width & 0x03);
+
+  //
+  // Fifo operations supported for (mInStride[Width] == 0)
+  //
+  if (InStride == 0) {
+    switch (OperationWidth) {
+    case EfiPeiCpuIoWidthUint8:
+      IoWriteFifo8 ((UINTN)Address, Count, Buffer);
+      return EFI_SUCCESS;
+    case EfiPeiCpuIoWidthUint16:
+      IoWriteFifo16 ((UINTN)Address, Count, Buffer);
+      return EFI_SUCCESS;
+    case EfiPeiCpuIoWidthUint32:
+      IoWriteFifo32 ((UINTN)Address, Count, Buffer);
+      return EFI_SUCCESS;
+    default:
+      //
+      // The CpuIoCheckParameter call above will ensure that this
+      // path is not taken.
+      //
+      ASSERT (FALSE);
+      break;
+    }
+  }
+
   Aligned = (BOOLEAN)(((UINTN)Buffer & (mInStride[OperationWidth] - 1)) == 0x00);
   for (Uint8Buffer = (UINT8 *)Buffer; Count > 0; Address += InStride, Uint8Buffer += OutStride, Count--) {
     if (OperationWidth == EfiPeiCpuIoWidthUint8) {
@@ -465,14 +511,14 @@ CpuIoServiceWrite (
       }
     }
   }
-  
+
   return EFI_SUCCESS;
 }
 
 /**
   8-bit I/O read operations.
 
-  @param[in] PeiServices  An indirect pointer to the PEI Services Table published 
+  @param[in] PeiServices  An indirect pointer to the PEI Services Table published
                           by the PEI Foundation.
   @param[in] This         Pointer to local data for the interface.
   @param[in] Address      The physical address of the access.
@@ -493,7 +539,7 @@ CpuIoRead8 (
 /**
   16-bit I/O read operations.
 
-  @param[in] PeiServices  An indirect pointer to the PEI Services Table published 
+  @param[in] PeiServices  An indirect pointer to the PEI Services Table published
                           by the PEI Foundation.
   @param[in] This         Pointer to local data for the interface.
   @param[in] Address      The physical address of the access.
@@ -515,7 +561,7 @@ CpuIoRead16 (
 /**
   32-bit I/O read operations.
 
-  @param[in] PeiServices  An indirect pointer to the PEI Services Table published 
+  @param[in] PeiServices  An indirect pointer to the PEI Services Table published
                           by the PEI Foundation.
   @param[in] This         Pointer to local data for the interface.
   @param[in] Address      The physical address of the access.
@@ -537,7 +583,7 @@ CpuIoRead32 (
 /**
   64-bit I/O read operations.
 
-  @param[in] PeiServices  An indirect pointer to the PEI Services Table published 
+  @param[in] PeiServices  An indirect pointer to the PEI Services Table published
                           by the PEI Foundation.
   @param[in] This         Pointer to local data for the interface.
   @param[in] Address      The physical address of the access.
@@ -559,7 +605,7 @@ CpuIoRead64 (
 /**
   8-bit I/O write operations.
 
-  @param[in] PeiServices  An indirect pointer to the PEI Services Table published 
+  @param[in] PeiServices  An indirect pointer to the PEI Services Table published
                           by the PEI Foundation.
   @param[in] This         Pointer to local data for the interface.
   @param[in] Address      The physical address of the access.
@@ -581,7 +627,7 @@ CpuIoWrite8 (
 /**
   16-bit I/O write operations.
 
-  @param[in] PeiServices  An indirect pointer to the PEI Services Table published 
+  @param[in] PeiServices  An indirect pointer to the PEI Services Table published
                           by the PEI Foundation.
   @param[in] This         Pointer to local data for the interface.
   @param[in] Address      The physical address of the access.
@@ -603,7 +649,7 @@ CpuIoWrite16 (
 /**
   32-bit I/O write operations.
 
-  @param[in] PeiServices  An indirect pointer to the PEI Services Table published 
+  @param[in] PeiServices  An indirect pointer to the PEI Services Table published
                           by the PEI Foundation.
   @param[in] This         Pointer to local data for the interface.
   @param[in] Address      The physical address of the access.
@@ -625,7 +671,7 @@ CpuIoWrite32 (
 /**
   64-bit I/O write operations.
 
-  @param[in] PeiServices  An indirect pointer to the PEI Services Table published 
+  @param[in] PeiServices  An indirect pointer to the PEI Services Table published
                           by the PEI Foundation.
   @param[in] This         Pointer to local data for the interface.
   @param[in] Address      The physical address of the access.
@@ -647,7 +693,7 @@ CpuIoWrite64 (
 /**
   8-bit memory read operations.
 
-  @param[in] PeiServices  An indirect pointer to the PEI Services Table published 
+  @param[in] PeiServices  An indirect pointer to the PEI Services Table published
                           by the PEI Foundation.
   @param[in] This         Pointer to local data for the interface.
   @param[in] Address      The physical address of the access.
@@ -669,7 +715,7 @@ CpuMemRead8 (
 /**
   16-bit memory read operations.
 
-  @param[in] PeiServices  An indirect pointer to the PEI Services Table published 
+  @param[in] PeiServices  An indirect pointer to the PEI Services Table published
                           by the PEI Foundation.
   @param[in] This         Pointer to local data for the interface.
   @param[in] Address      The physical address of the access.
@@ -691,7 +737,7 @@ CpuMemRead16 (
 /**
   32-bit memory read operations.
 
-  @param[in] PeiServices  An indirect pointer to the PEI Services Table published 
+  @param[in] PeiServices  An indirect pointer to the PEI Services Table published
                           by the PEI Foundation.
   @param[in] This         Pointer to local data for the interface.
   @param[in] Address      The physical address of the access.
@@ -713,7 +759,7 @@ CpuMemRead32 (
 /**
   64-bit memory read operations.
 
-  @param[in] PeiServices  An indirect pointer to the PEI Services Table published 
+  @param[in] PeiServices  An indirect pointer to the PEI Services Table published
                           by the PEI Foundation.
   @param[in] This         Pointer to local data for the interface.
   @param[in] Address      The physical address of the access.
@@ -735,7 +781,7 @@ CpuMemRead64 (
 /**
   8-bit memory write operations.
 
-  @param[in] PeiServices  An indirect pointer to the PEI Services Table published 
+  @param[in] PeiServices  An indirect pointer to the PEI Services Table published
                           by the PEI Foundation.
   @param[in] This         Pointer to local data for the interface.
   @param[in] Address      The physical address of the access.
@@ -757,7 +803,7 @@ CpuMemWrite8 (
 /**
   16-bit memory write operations.
 
-  @param[in] PeiServices  An indirect pointer to the PEI Services Table published 
+  @param[in] PeiServices  An indirect pointer to the PEI Services Table published
                           by the PEI Foundation.
   @param[in] This         Pointer to local data for the interface.
   @param[in] Address      The physical address of the access.
@@ -779,7 +825,7 @@ CpuMemWrite16 (
 /**
   32-bit memory write operations.
 
-  @param[in] PeiServices  An indirect pointer to the PEI Services Table published 
+  @param[in] PeiServices  An indirect pointer to the PEI Services Table published
                           by the PEI Foundation.
   @param[in] This         Pointer to local data for the interface.
   @param[in] Address      The physical address of the access.
@@ -801,7 +847,7 @@ CpuMemWrite32 (
 /**
   64-bit memory write operations.
 
-  @param[in] PeiServices  An indirect pointer to the PEI Services Table published 
+  @param[in] PeiServices  An indirect pointer to the PEI Services Table published
                           by the PEI Foundation.
   @param[in] This         Pointer to local data for the interface.
   @param[in] Address      The physical address of the access.
@@ -826,7 +872,7 @@ CpuMemWrite64 (
   This function is the Entry point of the CPU I/O PEIM which installs CpuIoPpi.
 
   @param[in]  FileHandle   Pointer to image file handle.
-  @param[in]  PeiServices  Pointer to PEI Services Table   
+  @param[in]  PeiServices  Pointer to PEI Services Table
 
   @retval EFI_SUCCESS  CPU I/O PPI successfully installed
 
@@ -844,12 +890,12 @@ CpuIoInitialize (
   // Register so it will be automatically shadowed to memory
   //
   Status = PeiServicesRegisterForShadow (FileHandle);
-  
+
   //
   // Make CpuIo pointer in PeiService table point to gCpuIoPpi
   //
   (*((EFI_PEI_SERVICES **)PeiServices))->CpuIo = &gCpuIoPpi;
-  
+
   if (Status == EFI_ALREADY_STARTED) {
     //
     // Shadow completed and running from memory
@@ -859,6 +905,6 @@ CpuIoInitialize (
     Status = PeiServicesInstallPpi (&gPpiList);
     ASSERT_EFI_ERROR (Status);
   }
-  
+
   return EFI_SUCCESS;
 }

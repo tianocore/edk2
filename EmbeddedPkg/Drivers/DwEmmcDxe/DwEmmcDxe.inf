@@ -1,0 +1,49 @@
+#/** @file
+#  INF file for the eMMC Host Protocol implementation for the DesignWare MMC.
+#
+#  Copyright (c) 2014-2017, Linaro Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010019
+  BASE_NAME                      = DwEmmcDxe
+  FILE_GUID                      = b549f005-4bd4-4020-a0cb-06f42bda68c3
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = DwEmmcDxeInitialize
+
+[Sources.common]
+  DwEmmcDxe.c
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  ArmLib
+  BaseLib
+  BaseMemoryLib
+  CacheMaintenanceLib
+  IoLib
+  MemoryAllocationLib
+  TimerLib
+  UefiDriverEntryPoint
+  UefiLib
+
+[Protocols]
+  gEfiCpuArchProtocolGuid
+  gEfiDevicePathProtocolGuid
+  gEfiMmcHostProtocolGuid
+
+[Pcd]
+  gEmbeddedTokenSpaceGuid.PcdDwEmmcDxeBaseAddress
+  gEmbeddedTokenSpaceGuid.PcdDwEmmcDxeClockFrequencyInHz
+  gEmbeddedTokenSpaceGuid.PcdDwEmmcDxeMaxClockFreqInHz
+  gEmbeddedTokenSpaceGuid.PcdDwEmmcDxeFifoDepth
+
+[Depex]
+  TRUE

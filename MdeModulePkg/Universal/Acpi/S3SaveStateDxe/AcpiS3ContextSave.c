@@ -1,16 +1,9 @@
 /** @file
   This is the implementation to save ACPI S3 Context.
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 
-This program and the accompanying materials
-are licensed and made available under the terms and conditions
-of the BSD License which accompanies this distribution.  The
-full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -22,8 +15,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/LockBoxLib.h>
 #include <Library/PcdLib.h>
 #include <Library/DebugLib.h>
+#include <Library/UefiLib.h>
 #include <Guid/AcpiS3Context.h>
-#include <Guid/Acpi.h>
 #include <IndustryStandard/Acpi.h>
 #include <Protocol/LockBox.h>
 
@@ -43,7 +36,7 @@ EFI_GUID              mAcpiS3IdtrProfileGuid = {
 
   @param  MemoryType   Memory type of memory to allocate.
   @param  Size         Size of memory to allocate.
-  
+
   @return Allocated address for output.
 
 **/
@@ -73,208 +66,6 @@ AllocateMemoryBelow4G (
   ZeroMem (Buffer, Size);
 
   return Buffer;
-}
-
-/**
-
-  This function scan ACPI table in RSDT.
-
-  @param Rsdt      ACPI RSDT
-  @param Signature ACPI table signature
-
-  @return ACPI table
-
-**/
-VOID *
-ScanTableInRSDT (
-  IN EFI_ACPI_DESCRIPTION_HEADER    *Rsdt,
-  IN UINT32                         Signature
-  )
-{
-  UINTN                              Index;
-  UINT32                             EntryCount;
-  UINT32                             *EntryPtr;
-  EFI_ACPI_DESCRIPTION_HEADER        *Table;
-
-  if (Rsdt == NULL) {
-    return NULL;
-  }
-
-  EntryCount = (Rsdt->Length - sizeof (EFI_ACPI_DESCRIPTION_HEADER)) / sizeof(UINT32);
-  
-  EntryPtr = (UINT32 *)(Rsdt + 1);
-  for (Index = 0; Index < EntryCount; Index ++, EntryPtr ++) {
-    Table = (EFI_ACPI_DESCRIPTION_HEADER *)((UINTN)(*EntryPtr));
-    if (Table->Signature == Signature) {
-      return Table;
-    }
-  }
-  
-  return NULL;
-}
-
-/**
-
-  This function scan ACPI table in XSDT.
-
-  @param Xsdt      ACPI XSDT
-  @param Signature ACPI table signature
-
-  @return ACPI table
-
-**/
-VOID *
-ScanTableInXSDT (
-  IN EFI_ACPI_DESCRIPTION_HEADER    *Xsdt,
-  IN UINT32                         Signature
-  )
-{
-  UINTN                          Index;
-  UINT32                         EntryCount;
-  UINT64                         EntryPtr;
-  UINTN                          BasePtr;
-  EFI_ACPI_DESCRIPTION_HEADER    *Table;
-
-  if (Xsdt == NULL) {
-    return NULL;
-  }
-
-  EntryCount = (Xsdt->Length - sizeof (EFI_ACPI_DESCRIPTION_HEADER)) / sizeof(UINT64);
-  
-  BasePtr = (UINTN)(Xsdt + 1);
-  for (Index = 0; Index < EntryCount; Index ++) {
-    CopyMem (&EntryPtr, (VOID *)(BasePtr + Index * sizeof(UINT64)), sizeof(UINT64));
-    Table = (EFI_ACPI_DESCRIPTION_HEADER *)((UINTN)(EntryPtr));
-    if (Table->Signature == Signature) {
-      return Table;
-    }
-  }
-  
-  return NULL;
-}
-
-/**
-  To find Facs in FADT.
-
-  @param Fadt   FADT table pointer
-  
-  @return  Facs table pointer.
-**/
-EFI_ACPI_2_0_FIRMWARE_ACPI_CONTROL_STRUCTURE  *
-FindAcpiFacsFromFadt (
-  IN EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE     *Fadt
-  )
-{
-  EFI_ACPI_2_0_FIRMWARE_ACPI_CONTROL_STRUCTURE  *Facs;
-  UINT64                                        Data64;
-
-  if (Fadt == NULL) {
-    return NULL;
-  }
-
-  if (Fadt->Header.Revision < EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE_REVISION) {
-    Facs = (EFI_ACPI_2_0_FIRMWARE_ACPI_CONTROL_STRUCTURE *)(UINTN)Fadt->FirmwareCtrl;
-  } else {
-    if (Fadt->FirmwareCtrl != 0) {
-      Facs = (EFI_ACPI_2_0_FIRMWARE_ACPI_CONTROL_STRUCTURE *)(UINTN)Fadt->FirmwareCtrl;
-    } else {
-      CopyMem (&Data64, &Fadt->XFirmwareCtrl, sizeof(UINT64));
-      Facs = (EFI_ACPI_2_0_FIRMWARE_ACPI_CONTROL_STRUCTURE *)(UINTN)Data64;
-    }
-  }
-  return Facs;
-}
-
-/**
-  To find Facs in Acpi tables.
- 
-  To find Firmware ACPI control strutcure in Acpi Tables since the S3 waking vector is stored 
-  in the table.
-
-  @param AcpiTableGuid   The guid used to find ACPI table in UEFI ConfigurationTable.
-  
-  @return  Facs table pointer.
-**/
-EFI_ACPI_2_0_FIRMWARE_ACPI_CONTROL_STRUCTURE  *
-FindAcpiFacsTableByAcpiGuid (
-  IN EFI_GUID  *AcpiTableGuid
-  )
-{
-  EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER  *Rsdp;
-  EFI_ACPI_DESCRIPTION_HEADER                   *Rsdt;
-  EFI_ACPI_DESCRIPTION_HEADER                   *Xsdt;
-  EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE     *Fadt;
-  EFI_ACPI_2_0_FIRMWARE_ACPI_CONTROL_STRUCTURE  *Facs;
-  UINTN                                         Index;
-
-  Rsdp  = NULL;
-  //
-  // found ACPI table RSD_PTR from system table
-  //
-  for (Index = 0; Index < gST->NumberOfTableEntries; Index++) {
-    if (CompareGuid (&(gST->ConfigurationTable[Index].VendorGuid), AcpiTableGuid)) {
-      //
-      // A match was found.
-      //
-      Rsdp = gST->ConfigurationTable[Index].VendorTable;
-      break;
-    }
-  }
-
-  if (Rsdp == NULL) {
-    return NULL;
-  }
-
-  //
-  // Search XSDT
-  //
-  if (Rsdp->Revision >= EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER_REVISION) {
-    Xsdt = (EFI_ACPI_DESCRIPTION_HEADER *)(UINTN) Rsdp->XsdtAddress;
-    Fadt = ScanTableInXSDT (Xsdt, EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE);
-    if (Fadt != NULL) {
-      Facs = FindAcpiFacsFromFadt (Fadt);
-      if (Facs != NULL) {
-        return Facs;
-      }
-    }
-  }
-
-  //
-  // Search RSDT
-  //
-  Rsdt = (EFI_ACPI_DESCRIPTION_HEADER *)(UINTN) Rsdp->RsdtAddress;
-  Fadt = ScanTableInRSDT (Rsdt, EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE);
-  if (Fadt != NULL) {
-    Facs = FindAcpiFacsFromFadt (Fadt);
-    if (Facs != NULL) {
-      return Facs;
-    }
-  }
-
-  return NULL;
-}
-
-/**
-  To find Facs in Acpi tables.
- 
-  To find Firmware ACPI control strutcure in Acpi Tables since the S3 waking vector is stored 
-  in the table.
-  
-  @return  Facs table pointer.
-**/
-EFI_ACPI_2_0_FIRMWARE_ACPI_CONTROL_STRUCTURE  *
-FindAcpiFacsTable (
-  VOID
-  )
-{
-  EFI_ACPI_2_0_FIRMWARE_ACPI_CONTROL_STRUCTURE *Facs;
-
-  Facs = FindAcpiFacsTableByAcpiGuid (&gEfiAcpi20TableGuid);
-  if (Facs != NULL) {
-    return Facs;
-  }
-
-  return FindAcpiFacsTableByAcpiGuid (&gEfiAcpi10TableGuid);
 }
 
 /**
@@ -315,20 +106,20 @@ IsLongModeWakingVectorSupport (
 
   @param[in] LongModeWakingVectorSupport    Support long mode waking vector or not.
 
-  If BootScriptExector driver will run in 64-bit mode, this function will establish the 1:1 
+  If BootScriptExector driver will run in 64-bit mode, this function will establish the 1:1
   virtual to physical mapping page table when long mode waking vector is supported, otherwise
   create 4G page table when long mode waking vector is not supported and let PF handler to
   handle > 4G request.
-  If BootScriptExector driver will not run in 64-bit mode, this function will do nothing. 
-  
-  @return Page table base address. 
+  If BootScriptExector driver will not run in 64-bit mode, this function will do nothing.
+
+  @return Page table base address.
 
 **/
 EFI_PHYSICAL_ADDRESS
 S3AllocatePageTablesBuffer (
   IN BOOLEAN    LongModeWakingVectorSupport
   )
-{  
+{
   if (FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
     UINTN                                         ExtraPageTablePages;
     UINT32                                        RegEax;
@@ -401,13 +192,13 @@ S3AllocatePageTablesBuffer (
     // We need calculate whole page size then allocate once, because S3 restore page table does not know each page in Nvs.
     //
     if (!Page1GSupport) {
-      TotalPageTableSize = (UINTN)(1 + NumberOfPml4EntriesNeeded + NumberOfPml4EntriesNeeded * NumberOfPdpEntriesNeeded);
+      TotalPageTableSize = 1 + NumberOfPml4EntriesNeeded + NumberOfPml4EntriesNeeded * NumberOfPdpEntriesNeeded;
     } else {
-      TotalPageTableSize = (UINTN)(1 + NumberOfPml4EntriesNeeded);
+      TotalPageTableSize = 1 + NumberOfPml4EntriesNeeded;
     }
 
     TotalPageTableSize += ExtraPageTablePages;
-    DEBUG ((EFI_D_ERROR, "AcpiS3ContextSave TotalPageTableSize - 0x%x pages\n", TotalPageTableSize));
+    DEBUG ((DEBUG_INFO, "AcpiS3ContextSave TotalPageTableSize - 0x%x pages\n", TotalPageTableSize));
 
     //
     // By architecture only one PageMapLevel4 exists - so lets allocate storage for it.
@@ -419,7 +210,7 @@ S3AllocatePageTablesBuffer (
     //
     // If DXE is running 32-bit mode, no need to establish page table.
     //
-    return  (EFI_PHYSICAL_ADDRESS) 0;  
+    return  (EFI_PHYSICAL_ADDRESS) 0;
   }
 }
 
@@ -460,7 +251,9 @@ AcpiS3ContextSaveOnEndOfDxe (
   //
   // Get ACPI Table because we will save its position to variable
   //
-  Facs = (EFI_ACPI_4_0_FIRMWARE_ACPI_CONTROL_STRUCTURE *) FindAcpiFacsTable ();
+  Facs = (EFI_ACPI_4_0_FIRMWARE_ACPI_CONTROL_STRUCTURE *) EfiLocateFirstAcpiTable (
+                                                            EFI_ACPI_4_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_SIGNATURE
+                                                            );
   AcpiS3Context->AcpiFacsTable = (EFI_PHYSICAL_ADDRESS) (UINTN) Facs;
   ASSERT (AcpiS3Context->AcpiFacsTable != 0);
 

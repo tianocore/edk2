@@ -1,18 +1,12 @@
 /*++
 
 Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 Module Name:
 
   FwBlockService.h
-  
+
 Abstract:
 
   Firmware volume block driver for Intel Firmware Hub (FWH) device
@@ -58,8 +52,14 @@ typedef struct {
 //
 // Constants
 //
-#define EMU_FVB_BLOCK_SIZE (FixedPcdGet32 (PcdFlashNvStorageFtwSpareSize))
-#define EMU_FVB_SIZE (2 * FixedPcdGet32 (PcdFlashNvStorageFtwSpareSize))
+#define EMU_FVB_BLOCK_SIZE \
+  EFI_PAGE_SIZE
+#define EMU_FVB_NUM_SPARE_BLOCKS \
+  EFI_SIZE_TO_PAGES ((UINTN)FixedPcdGet32 (PcdFlashNvStorageFtwSpareSize))
+#define EMU_FVB_NUM_TOTAL_BLOCKS \
+  (2 * EMU_FVB_NUM_SPARE_BLOCKS)
+#define EMU_FVB_SIZE \
+  (EMU_FVB_NUM_TOTAL_BLOCKS * EMU_FVB_BLOCK_SIZE)
 #define FTW_WRITE_QUEUE_SIZE \
   (FixedPcdGet32 (PcdFlashNvStorageFtwWorkingSize) - \
    sizeof (EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER))

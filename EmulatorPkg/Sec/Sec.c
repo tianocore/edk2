@@ -4,13 +4,7 @@
   The OS application will call the SEC with the PEI Entry Point API.
 
 Copyright (c) 2011, Apple Inc. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -81,6 +75,7 @@ _ModuleEntryPoint (
   EFI_PEI_PPI_DESCRIPTOR    *SecPpiList;
   UINTN                     SecReseveredMemorySize;
   UINTN                     Index;
+  EFI_PEI_PPI_DESCRIPTOR    PpiArray[10];
 
   EMU_MAGIC_PAGE()->PpiList = PpiList;
   ProcessLibraryConstructorList ();
@@ -110,16 +105,13 @@ _ModuleEntryPoint (
   SecCoreData->PeiTemporaryRamBase = (VOID *)((UINTN)SecCoreData->PeiTemporaryRamBase + SecReseveredMemorySize);
   SecCoreData->PeiTemporaryRamSize -= SecReseveredMemorySize;
 #else
-  {
-    //
-    // When I subtrack from SecCoreData->PeiTemporaryRamBase PEI Core crashes? Either there is a bug
-    // or I don't understand temp RAM correctly?
-    //
-    EFI_PEI_PPI_DESCRIPTOR    PpiArray[10];
+  //
+  // When I subtrack from SecCoreData->PeiTemporaryRamBase PEI Core crashes? Either there is a bug
+  // or I don't understand temp RAM correctly?
+  //
 
-    SecPpiList = &PpiArray[0];
-    ASSERT (sizeof (PpiArray) >= SecReseveredMemorySize);
-  }
+  SecPpiList = &PpiArray[0];
+  ASSERT (sizeof (PpiArray) >= SecReseveredMemorySize);
 #endif
   // Copy existing list, and append our entries.
   CopyMem (SecPpiList, PpiList, sizeof (EFI_PEI_PPI_DESCRIPTOR) * Index);

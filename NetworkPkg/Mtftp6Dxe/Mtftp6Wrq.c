@@ -3,13 +3,7 @@
 
   Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -153,7 +147,7 @@ Mtftp6WrqHandleAck (
 {
   UINT16                    AckNum;
   INTN                      Expected;
-  UINT64                    TotalBlock;
+  UINT64                    BlockCounter;
 
   *IsCompleted = FALSE;
   AckNum       = NTOHS (Packet->Ack.Block[0]);
@@ -172,9 +166,9 @@ Mtftp6WrqHandleAck (
   //
   // Remove the acked block number, if this is the last block number,
   // tell the Mtftp6WrqInput to finish the transfer. This is the last
-  // block number if the block range are empty..
+  // block number if the block range are empty.
   //
-  Mtftp6RemoveBlockNum (&Instance->BlkList, AckNum, *IsCompleted, &TotalBlock);
+  Mtftp6RemoveBlockNum (&Instance->BlkList, AckNum, *IsCompleted, &BlockCounter);
 
   Expected = Mtftp6GetNextBlockNum (&Instance->BlkList);
 
@@ -318,7 +312,7 @@ Mtftp6WrqHandleOack (
   }
   ASSERT (Options != NULL);
 
-  Status = Mtftp6ParseExtensionOption (Options, Count, FALSE, &ExtInfo);
+  Status = Mtftp6ParseExtensionOption (Options, Count, FALSE, Instance->Operation, &ExtInfo);
 
   if (EFI_ERROR(Status) || !Mtftp6WrqOackValid (&ExtInfo, &Instance->ExtInfo)) {
     //

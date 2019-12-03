@@ -1,14 +1,8 @@
 /** @file
   QEMU Video Controller Driver
 
-  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -92,9 +86,11 @@ typedef enum {
   QEMU_VIDEO_CIRRUS_5446,
   QEMU_VIDEO_BOCHS,
   QEMU_VIDEO_BOCHS_MMIO,
+  QEMU_VIDEO_VMWARE_SVGA,
 } QEMU_VIDEO_VARIANT;
 
 typedef struct {
+  UINT8                                 SubClass;
   UINT16                                VendorId;
   UINT16                                DeviceId;
   QEMU_VIDEO_VARIANT                    Variant;
@@ -119,6 +115,7 @@ typedef struct {
   QEMU_VIDEO_VARIANT                    Variant;
   FRAME_BUFFER_CONFIGURE                *FrameBufferBltConfigure;
   UINTN                                 FrameBufferBltConfigureSize;
+  UINT8                                 FrameBufferVramBarIndex;
 } QEMU_VIDEO_PRIVATE_DATA;
 
 ///
@@ -159,7 +156,6 @@ extern QEMU_VIDEO_BOCHS_MODES                     QemuVideoBochsModes[];
 extern EFI_DRIVER_BINDING_PROTOCOL                gQemuVideoDriverBinding;
 extern EFI_COMPONENT_NAME_PROTOCOL                gQemuVideoComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL               gQemuVideoComponentName2;
-extern EFI_DRIVER_SUPPORTED_EFI_VERSION_PROTOCOL  gQemuVideoDriverSupportedEfiVersion;
 
 //
 // Io Registers defined by VGA

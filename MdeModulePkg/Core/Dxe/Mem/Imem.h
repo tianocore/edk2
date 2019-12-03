@@ -1,14 +1,8 @@
 /** @file
   Data structure and functions to allocate and free memory space.
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -61,6 +55,7 @@ typedef struct {
   @param  PoolType               The type of memory for the new pool pages
   @param  NumberOfPages          No of pages to allocate
   @param  Alignment              Bits to align.
+  @param  NeedGuard              Flag to indicate Guard page is needed or not
 
   @return The allocated memory, or NULL
 
@@ -69,7 +64,8 @@ VOID *
 CoreAllocatePoolPages (
   IN EFI_MEMORY_TYPE    PoolType,
   IN UINTN              NumberOfPages,
-  IN UINTN              Alignment
+  IN UINTN              Alignment,
+  IN BOOLEAN            NeedGuard
   );
 
 
@@ -95,6 +91,7 @@ CoreFreePoolPages (
 
   @param  PoolType               Type of pool to allocate
   @param  Size                   The amount of pool to allocate
+  @param  NeedGuard              Flag to indicate Guard page is needed or not
 
   @return The allocate pool, or NULL
 
@@ -102,7 +99,8 @@ CoreFreePoolPages (
 VOID *
 CoreAllocatePoolI (
   IN EFI_MEMORY_TYPE  PoolType,
-  IN UINTN            Size
+  IN UINTN            Size,
+  IN BOOLEAN          NeedGuard
   );
 
 
@@ -145,6 +143,34 @@ CoreReleaseMemoryLock (
   VOID
   );
 
+/**
+  Allocates pages from the memory map.
+
+  @param  Type                   The type of allocation to perform
+  @param  MemoryType             The type of memory to turn the allocated pages
+                                 into
+  @param  NumberOfPages          The number of pages to allocate
+  @param  Memory                 A pointer to receive the base allocated memory
+                                 address
+  @param  NeedGuard              Flag to indicate Guard page is needed or not
+
+  @return Status. On success, Memory is filled in with the base address allocated
+  @retval EFI_INVALID_PARAMETER  Parameters violate checking rules defined in
+                                 spec.
+  @retval EFI_NOT_FOUND          Could not allocate pages match the requirement.
+  @retval EFI_OUT_OF_RESOURCES   No enough pages to allocate.
+  @retval EFI_SUCCESS            Pages successfully allocated.
+
+**/
+EFI_STATUS
+EFIAPI
+CoreInternalAllocatePages (
+  IN EFI_ALLOCATE_TYPE      Type,
+  IN EFI_MEMORY_TYPE        MemoryType,
+  IN UINTN                  NumberOfPages,
+  IN OUT EFI_PHYSICAL_ADDRESS  *Memory,
+  IN BOOLEAN                NeedGuard
+  );
 
 //
 // Internal Global data

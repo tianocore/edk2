@@ -1,19 +1,14 @@
 /** @file
   Produces the CPU I/O 2 Protocol.
 
-Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
+
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include "CpuIo2Dxe.h"
-#include "IoFifo.h"
 
 //
 // Handle for the CPU I/O 2 Protocol
@@ -73,16 +68,16 @@ UINT8 mOutStride[] = {
 /**
   Check parameters to a CPU I/O 2 Protocol service request.
 
-  The I/O operations are carried out exactly as requested. The caller is responsible 
-  for satisfying any alignment and I/O width restrictions that a PI System on a 
-  platform might require. For example on some platforms, width requests of 
-  EfiCpuIoWidthUint64 do not work. Misaligned buffers, on the other hand, will 
+  The I/O operations are carried out exactly as requested. The caller is responsible
+  for satisfying any alignment and I/O width restrictions that a PI System on a
+  platform might require. For example on some platforms, width requests of
+  EfiCpuIoWidthUint64 do not work. Misaligned buffers, on the other hand, will
   be handled by the driver.
-  
+
   @param[in] MmioOperation  TRUE for an MMIO operation, FALSE for I/O Port operation.
   @param[in] Width          Signifies the width of the I/O or Memory operation.
-  @param[in] Address        The base address of the I/O operation. 
-  @param[in] Count          The number of I/O operations to perform. The number of  
+  @param[in] Address        The base address of the I/O operation.
+  @param[in] Count          The number of I/O operations to perform. The number of
                             bytes moved is Width size * Count, starting at Address.
   @param[in] Buffer         For read operations, the destination buffer to store the results.
                             For write operations, the source buffer from which to write data.
@@ -91,7 +86,7 @@ UINT8 mOutStride[] = {
   @retval EFI_INVALID_PARAMETER  Width is invalid for this PI system.
   @retval EFI_INVALID_PARAMETER  Buffer is NULL.
   @retval EFI_UNSUPPORTED        The Buffer is not aligned for the given Width.
-  @retval EFI_UNSUPPORTED        The address range specified by Address, Width, 
+  @retval EFI_UNSUPPORTED        The address range specified by Address, Width,
                                  and Count is not valid for this PI system.
 
 **/
@@ -136,27 +131,27 @@ CpuIoCheckParameter (
   if (!MmioOperation && (Width == EfiCpuIoWidthUint64)) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   //
   // Check to see if Address is aligned
   //
-  if ((Address & (UINT64)(mInStride[Width] - 1)) != 0) {
+  if ((Address & ((UINT64)mInStride[Width] - 1)) != 0) {
     return EFI_UNSUPPORTED;
   }
 
   //
-  // Check to see if any address associated with this transfer exceeds the maximum 
+  // Check to see if any address associated with this transfer exceeds the maximum
   // allowed address.  The maximum address implied by the parameters passed in is
   // Address + Size * Count.  If the following condition is met, then the transfer
   // is not supported.
   //
   //    Address + Size * Count > (MmioOperation ? MAX_ADDRESS : MAX_IO_PORT_ADDRESS) + 1
   //
-  // Since MAX_ADDRESS can be the maximum integer value supported by the CPU and Count 
+  // Since MAX_ADDRESS can be the maximum integer value supported by the CPU and Count
   // can also be the maximum integer value supported by the CPU, this range
   // check must be adjusted to avoid all oveflow conditions.
-  //   
-  // The following form of the range check is equivalent but assumes that 
+  //
+  // The following form of the range check is equivalent but assumes that
   // MAX_ADDRESS and MAX_IO_PORT_ADDRESS are of the form (2^n - 1).
   //
   Limit = (MmioOperation ? MAX_ADDRESS : MAX_IO_PORT_ADDRESS);
@@ -164,7 +159,7 @@ CpuIoCheckParameter (
     if (Address > Limit) {
       return EFI_UNSUPPORTED;
     }
-  } else {  
+  } else {
     MaxCount = RShiftU64 (Limit, Width);
     if (MaxCount < (Count - 1)) {
       return EFI_UNSUPPORTED;
@@ -188,30 +183,30 @@ CpuIoCheckParameter (
 /**
   Reads memory-mapped registers.
 
-  The I/O operations are carried out exactly as requested. The caller is responsible 
-  for satisfying any alignment and I/O width restrictions that a PI System on a 
-  platform might require. For example on some platforms, width requests of 
-  EfiCpuIoWidthUint64 do not work. Misaligned buffers, on the other hand, will 
+  The I/O operations are carried out exactly as requested. The caller is responsible
+  for satisfying any alignment and I/O width restrictions that a PI System on a
+  platform might require. For example on some platforms, width requests of
+  EfiCpuIoWidthUint64 do not work. Misaligned buffers, on the other hand, will
   be handled by the driver.
-  
-  If Width is EfiCpuIoWidthUint8, EfiCpuIoWidthUint16, EfiCpuIoWidthUint32, 
-  or EfiCpuIoWidthUint64, then both Address and Buffer are incremented for 
+
+  If Width is EfiCpuIoWidthUint8, EfiCpuIoWidthUint16, EfiCpuIoWidthUint32,
+  or EfiCpuIoWidthUint64, then both Address and Buffer are incremented for
   each of the Count operations that is performed.
-  
-  If Width is EfiCpuIoWidthFifoUint8, EfiCpuIoWidthFifoUint16, 
-  EfiCpuIoWidthFifoUint32, or EfiCpuIoWidthFifoUint64, then only Buffer is 
-  incremented for each of the Count operations that is performed. The read or 
+
+  If Width is EfiCpuIoWidthFifoUint8, EfiCpuIoWidthFifoUint16,
+  EfiCpuIoWidthFifoUint32, or EfiCpuIoWidthFifoUint64, then only Buffer is
+  incremented for each of the Count operations that is performed. The read or
   write operation is performed Count times on the same Address.
-  
-  If Width is EfiCpuIoWidthFillUint8, EfiCpuIoWidthFillUint16, 
-  EfiCpuIoWidthFillUint32, or EfiCpuIoWidthFillUint64, then only Address is 
-  incremented for each of the Count operations that is performed. The read or 
+
+  If Width is EfiCpuIoWidthFillUint8, EfiCpuIoWidthFillUint16,
+  EfiCpuIoWidthFillUint32, or EfiCpuIoWidthFillUint64, then only Address is
+  incremented for each of the Count operations that is performed. The read or
   write operation is performed Count times from the first element of Buffer.
-  
+
   @param[in]  This     A pointer to the EFI_CPU_IO2_PROTOCOL instance.
   @param[in]  Width    Signifies the width of the I/O or Memory operation.
-  @param[in]  Address  The base address of the I/O operation. 
-  @param[in]  Count    The number of I/O operations to perform. The number of 
+  @param[in]  Address  The base address of the I/O operation.
+  @param[in]  Count    The number of I/O operations to perform. The number of
                        bytes moved is Width size * Count, starting at Address.
   @param[out] Buffer   For read operations, the destination buffer to store the results.
                        For write operations, the source buffer from which to write data.
@@ -220,7 +215,7 @@ CpuIoCheckParameter (
   @retval EFI_INVALID_PARAMETER  Width is invalid for this PI system.
   @retval EFI_INVALID_PARAMETER  Buffer is NULL.
   @retval EFI_UNSUPPORTED        The Buffer is not aligned for the given Width.
-  @retval EFI_UNSUPPORTED        The address range specified by Address, Width, 
+  @retval EFI_UNSUPPORTED        The address range specified by Address, Width,
                                  and Count is not valid for this PI system.
 
 **/
@@ -268,30 +263,30 @@ CpuMemoryServiceRead (
 /**
   Writes memory-mapped registers.
 
-  The I/O operations are carried out exactly as requested. The caller is responsible 
-  for satisfying any alignment and I/O width restrictions that a PI System on a 
-  platform might require. For example on some platforms, width requests of 
-  EfiCpuIoWidthUint64 do not work. Misaligned buffers, on the other hand, will 
+  The I/O operations are carried out exactly as requested. The caller is responsible
+  for satisfying any alignment and I/O width restrictions that a PI System on a
+  platform might require. For example on some platforms, width requests of
+  EfiCpuIoWidthUint64 do not work. Misaligned buffers, on the other hand, will
   be handled by the driver.
-  
-  If Width is EfiCpuIoWidthUint8, EfiCpuIoWidthUint16, EfiCpuIoWidthUint32, 
-  or EfiCpuIoWidthUint64, then both Address and Buffer are incremented for 
+
+  If Width is EfiCpuIoWidthUint8, EfiCpuIoWidthUint16, EfiCpuIoWidthUint32,
+  or EfiCpuIoWidthUint64, then both Address and Buffer are incremented for
   each of the Count operations that is performed.
-  
-  If Width is EfiCpuIoWidthFifoUint8, EfiCpuIoWidthFifoUint16, 
-  EfiCpuIoWidthFifoUint32, or EfiCpuIoWidthFifoUint64, then only Buffer is 
-  incremented for each of the Count operations that is performed. The read or 
+
+  If Width is EfiCpuIoWidthFifoUint8, EfiCpuIoWidthFifoUint16,
+  EfiCpuIoWidthFifoUint32, or EfiCpuIoWidthFifoUint64, then only Buffer is
+  incremented for each of the Count operations that is performed. The read or
   write operation is performed Count times on the same Address.
-  
-  If Width is EfiCpuIoWidthFillUint8, EfiCpuIoWidthFillUint16, 
-  EfiCpuIoWidthFillUint32, or EfiCpuIoWidthFillUint64, then only Address is 
-  incremented for each of the Count operations that is performed. The read or 
+
+  If Width is EfiCpuIoWidthFillUint8, EfiCpuIoWidthFillUint16,
+  EfiCpuIoWidthFillUint32, or EfiCpuIoWidthFillUint64, then only Address is
+  incremented for each of the Count operations that is performed. The read or
   write operation is performed Count times from the first element of Buffer.
-  
+
   @param[in]  This     A pointer to the EFI_CPU_IO2_PROTOCOL instance.
   @param[in]  Width    Signifies the width of the I/O or Memory operation.
-  @param[in]  Address  The base address of the I/O operation. 
-  @param[in]  Count    The number of I/O operations to perform. The number of 
+  @param[in]  Address  The base address of the I/O operation.
+  @param[in]  Count    The number of I/O operations to perform. The number of
                        bytes moved is Width size * Count, starting at Address.
   @param[in]  Buffer   For read operations, the destination buffer to store the results.
                        For write operations, the source buffer from which to write data.
@@ -300,7 +295,7 @@ CpuMemoryServiceRead (
   @retval EFI_INVALID_PARAMETER  Width is invalid for this PI system.
   @retval EFI_INVALID_PARAMETER  Buffer is NULL.
   @retval EFI_UNSUPPORTED        The Buffer is not aligned for the given Width.
-  @retval EFI_UNSUPPORTED        The address range specified by Address, Width, 
+  @retval EFI_UNSUPPORTED        The address range specified by Address, Width,
                                  and Count is not valid for this PI system.
 
 **/
@@ -348,30 +343,30 @@ CpuMemoryServiceWrite (
 /**
   Reads I/O registers.
 
-  The I/O operations are carried out exactly as requested. The caller is responsible 
-  for satisfying any alignment and I/O width restrictions that a PI System on a 
-  platform might require. For example on some platforms, width requests of 
-  EfiCpuIoWidthUint64 do not work. Misaligned buffers, on the other hand, will 
+  The I/O operations are carried out exactly as requested. The caller is responsible
+  for satisfying any alignment and I/O width restrictions that a PI System on a
+  platform might require. For example on some platforms, width requests of
+  EfiCpuIoWidthUint64 do not work. Misaligned buffers, on the other hand, will
   be handled by the driver.
-  
-  If Width is EfiCpuIoWidthUint8, EfiCpuIoWidthUint16, EfiCpuIoWidthUint32, 
-  or EfiCpuIoWidthUint64, then both Address and Buffer are incremented for 
+
+  If Width is EfiCpuIoWidthUint8, EfiCpuIoWidthUint16, EfiCpuIoWidthUint32,
+  or EfiCpuIoWidthUint64, then both Address and Buffer are incremented for
   each of the Count operations that is performed.
-  
-  If Width is EfiCpuIoWidthFifoUint8, EfiCpuIoWidthFifoUint16, 
-  EfiCpuIoWidthFifoUint32, or EfiCpuIoWidthFifoUint64, then only Buffer is 
-  incremented for each of the Count operations that is performed. The read or 
+
+  If Width is EfiCpuIoWidthFifoUint8, EfiCpuIoWidthFifoUint16,
+  EfiCpuIoWidthFifoUint32, or EfiCpuIoWidthFifoUint64, then only Buffer is
+  incremented for each of the Count operations that is performed. The read or
   write operation is performed Count times on the same Address.
-  
-  If Width is EfiCpuIoWidthFillUint8, EfiCpuIoWidthFillUint16, 
-  EfiCpuIoWidthFillUint32, or EfiCpuIoWidthFillUint64, then only Address is 
-  incremented for each of the Count operations that is performed. The read or 
+
+  If Width is EfiCpuIoWidthFillUint8, EfiCpuIoWidthFillUint16,
+  EfiCpuIoWidthFillUint32, or EfiCpuIoWidthFillUint64, then only Address is
+  incremented for each of the Count operations that is performed. The read or
   write operation is performed Count times from the first element of Buffer.
-  
+
   @param[in]  This     A pointer to the EFI_CPU_IO2_PROTOCOL instance.
   @param[in]  Width    Signifies the width of the I/O or Memory operation.
-  @param[in]  Address  The base address of the I/O operation. 
-  @param[in]  Count    The number of I/O operations to perform. The number of 
+  @param[in]  Address  The base address of the I/O operation.
+  @param[in]  Count    The number of I/O operations to perform. The number of
                        bytes moved is Width size * Count, starting at Address.
   @param[out] Buffer   For read operations, the destination buffer to store the results.
                        For write operations, the source buffer from which to write data.
@@ -380,7 +375,7 @@ CpuMemoryServiceWrite (
   @retval EFI_INVALID_PARAMETER  Width is invalid for this PI system.
   @retval EFI_INVALID_PARAMETER  Buffer is NULL.
   @retval EFI_UNSUPPORTED        The Buffer is not aligned for the given Width.
-  @retval EFI_UNSUPPORTED        The address range specified by Address, Width, 
+  @retval EFI_UNSUPPORTED        The address range specified by Address, Width,
                                  and Count is not valid for this PI system.
 
 **/
@@ -412,7 +407,9 @@ CpuIoServiceRead (
   OutStride = mOutStride[Width];
   OperationWidth = (EFI_CPU_IO_PROTOCOL_WIDTH) (Width & 0x03);
 
-#if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
+  //
+  // Fifo operations supported for (mInStride[Width] == 0)
+  //
   if (InStride == 0) {
     switch (OperationWidth) {
     case EfiCpuIoWidthUint8:
@@ -433,7 +430,6 @@ CpuIoServiceRead (
       break;
     }
   }
-#endif
 
   for (Uint8Buffer = Buffer; Count > 0; Address += InStride, Uint8Buffer += OutStride, Count--) {
     if (OperationWidth == EfiCpuIoWidthUint8) {
@@ -451,30 +447,30 @@ CpuIoServiceRead (
 /**
   Write I/O registers.
 
-  The I/O operations are carried out exactly as requested. The caller is responsible 
-  for satisfying any alignment and I/O width restrictions that a PI System on a 
-  platform might require. For example on some platforms, width requests of 
-  EfiCpuIoWidthUint64 do not work. Misaligned buffers, on the other hand, will 
+  The I/O operations are carried out exactly as requested. The caller is responsible
+  for satisfying any alignment and I/O width restrictions that a PI System on a
+  platform might require. For example on some platforms, width requests of
+  EfiCpuIoWidthUint64 do not work. Misaligned buffers, on the other hand, will
   be handled by the driver.
-  
-  If Width is EfiCpuIoWidthUint8, EfiCpuIoWidthUint16, EfiCpuIoWidthUint32, 
-  or EfiCpuIoWidthUint64, then both Address and Buffer are incremented for 
+
+  If Width is EfiCpuIoWidthUint8, EfiCpuIoWidthUint16, EfiCpuIoWidthUint32,
+  or EfiCpuIoWidthUint64, then both Address and Buffer are incremented for
   each of the Count operations that is performed.
-  
-  If Width is EfiCpuIoWidthFifoUint8, EfiCpuIoWidthFifoUint16, 
-  EfiCpuIoWidthFifoUint32, or EfiCpuIoWidthFifoUint64, then only Buffer is 
-  incremented for each of the Count operations that is performed. The read or 
+
+  If Width is EfiCpuIoWidthFifoUint8, EfiCpuIoWidthFifoUint16,
+  EfiCpuIoWidthFifoUint32, or EfiCpuIoWidthFifoUint64, then only Buffer is
+  incremented for each of the Count operations that is performed. The read or
   write operation is performed Count times on the same Address.
-  
-  If Width is EfiCpuIoWidthFillUint8, EfiCpuIoWidthFillUint16, 
-  EfiCpuIoWidthFillUint32, or EfiCpuIoWidthFillUint64, then only Address is 
-  incremented for each of the Count operations that is performed. The read or 
+
+  If Width is EfiCpuIoWidthFillUint8, EfiCpuIoWidthFillUint16,
+  EfiCpuIoWidthFillUint32, or EfiCpuIoWidthFillUint64, then only Address is
+  incremented for each of the Count operations that is performed. The read or
   write operation is performed Count times from the first element of Buffer.
-  
+
   @param[in]  This     A pointer to the EFI_CPU_IO2_PROTOCOL instance.
   @param[in]  Width    Signifies the width of the I/O or Memory operation.
-  @param[in]  Address  The base address of the I/O operation. 
-  @param[in]  Count    The number of I/O operations to perform. The number of 
+  @param[in]  Address  The base address of the I/O operation.
+  @param[in]  Count    The number of I/O operations to perform. The number of
                        bytes moved is Width size * Count, starting at Address.
   @param[in]  Buffer   For read operations, the destination buffer to store the results.
                        For write operations, the source buffer from which to write data.
@@ -483,9 +479,9 @@ CpuIoServiceRead (
   @retval EFI_INVALID_PARAMETER  Width is invalid for this PI system.
   @retval EFI_INVALID_PARAMETER  Buffer is NULL.
   @retval EFI_UNSUPPORTED        The Buffer is not aligned for the given Width.
-  @retval EFI_UNSUPPORTED        The address range specified by Address, Width, 
+  @retval EFI_UNSUPPORTED        The address range specified by Address, Width,
                                  and Count is not valid for this PI system.
-                                 
+
 **/
 EFI_STATUS
 EFIAPI
@@ -518,7 +514,9 @@ CpuIoServiceWrite (
   OutStride = mOutStride[Width];
   OperationWidth = (EFI_CPU_IO_PROTOCOL_WIDTH) (Width & 0x03);
 
-#if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
+  //
+  // Fifo operations supported for (mInStride[Width] == 0)
+  //
   if (InStride == 0) {
     switch (OperationWidth) {
     case EfiCpuIoWidthUint8:
@@ -539,7 +537,6 @@ CpuIoServiceWrite (
       break;
     }
   }
-#endif
 
   for (Uint8Buffer = (UINT8 *)Buffer; Count > 0; Address += InStride, Uint8Buffer += OutStride, Count--) {
     if (OperationWidth == EfiCpuIoWidthUint8) {
@@ -550,16 +547,16 @@ CpuIoServiceWrite (
       IoWrite32 ((UINTN)Address, *((UINT32 *)Uint8Buffer));
     }
   }
-  
+
   return EFI_SUCCESS;
 }
 
 /**
   The user Entry Point for module CpuIo2Dxe. The user code starts with this function.
 
-  @param[in] ImageHandle    The firmware allocated handle for the EFI image.  
+  @param[in] ImageHandle    The firmware allocated handle for the EFI image.
   @param[in] SystemTable    A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS       The entry point is executed successfully.
   @retval other             Some error occurs when executing this entry point.
 

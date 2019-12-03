@@ -2,18 +2,13 @@
   Main file for NULL named library for network2 shell command functions.
 
   Copyright (c) 2016, Intel Corporation. All rights reserved. <BR>
-  This program and the accompanying materials are licensed and made available under
-  the terms and conditions of the BSD License which accompanies this distribution.
-  The full text of the license may be found at http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 #include "UefiShellNetwork2CommandsLib.h"
 
 CONST CHAR16 gShellNetwork2FileName[] = L"ShellCommands";
-EFI_HANDLE gShellNetwork2HiiHandle = NULL;
+EFI_HII_HANDLE gShellNetwork2HiiHandle = NULL;
 
 /**
   return the file name of the help text file if not using HII.

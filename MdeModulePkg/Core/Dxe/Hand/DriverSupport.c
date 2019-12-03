@@ -1,14 +1,8 @@
 /** @file
   Support functions to connect/disconnect UEFI Driver model Protocol
 
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -40,8 +34,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @retval EFI_NOT_FOUND         1) There are no EFI_DRIVER_BINDING_PROTOCOL instances
                                 present in the system.
                                 2) No drivers were connected to ControllerHandle.
-  @retval EFI_SECURITY_VIOLATION 
-                                The user has no permission to start UEFI device drivers on the device path 
+  @retval EFI_SECURITY_VIOLATION
+                                The user has no permission to start UEFI device drivers on the device path
                                 associated with the ControllerHandle or specified by the RemainingDevicePath.
 
 **/
@@ -112,7 +106,7 @@ CoreConnectController (
       }
     }
   }
-  
+
   Handle = ControllerHandle;
 
   //
@@ -627,13 +621,13 @@ CoreConnectSingleController (
     for (Index = 0; (Index < NumberOfSortedDriverBindingProtocols) && !DriverFound; Index++) {
       if (SortedDriverBindingProtocols[Index] != NULL) {
         DriverBinding = SortedDriverBindingProtocols[Index];
-        PERF_START (DriverBinding->DriverBindingHandle, "DB:Support:", NULL, 0);
+        PERF_DRIVER_BINDING_SUPPORT_BEGIN (DriverBinding->DriverBindingHandle, ControllerHandle);
         Status = DriverBinding->Supported(
                                   DriverBinding,
                                   ControllerHandle,
                                   RemainingDevicePath
                                   );
-        PERF_END (DriverBinding->DriverBindingHandle, "DB:Support:", NULL, 0);
+        PERF_DRIVER_BINDING_SUPPORT_END (DriverBinding->DriverBindingHandle, ControllerHandle);
         if (!EFI_ERROR (Status)) {
           SortedDriverBindingProtocols[Index] = NULL;
           DriverFound = TRUE;
@@ -642,13 +636,13 @@ CoreConnectSingleController (
           // A driver was found that supports ControllerHandle, so attempt to start the driver
           // on ControllerHandle.
           //
-          PERF_START (DriverBinding->DriverBindingHandle, "DB:Start:", NULL, 0);
+          PERF_DRIVER_BINDING_START_BEGIN (DriverBinding->DriverBindingHandle, ControllerHandle);
           Status = DriverBinding->Start (
                                     DriverBinding,
                                     ControllerHandle,
                                     RemainingDevicePath
                                     );
-          PERF_END (DriverBinding->DriverBindingHandle, "DB:Start:", NULL, 0);
+          PERF_DRIVER_BINDING_START_END (DriverBinding->DriverBindingHandle, ControllerHandle);
 
           if (!EFI_ERROR (Status)) {
             //

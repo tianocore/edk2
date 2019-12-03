@@ -3,13 +3,7 @@
 // Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 // Copyright (c) 2011 - 2016, ARM Limited. All rights reserved.
 //
-// This program and the accompanying materials
-// are licensed and made available under the terms and conditions of the BSD License
-// which accompanies this distribution.  The full text of the license may be found at
-// http://opensource.org/licenses/bsd-license.php
-//
-// THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-// WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+// SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 //------------------------------------------------------------------------------
 
@@ -155,6 +149,9 @@
   mrc     p15, 0, r0, c1, c0, 0      // Read SCTLR into R0 (Read control register configuration data)
   bx      lr
 
+ RVCT_ASM_EXPORT ArmWriteSctlr
+  mcr     p15, 0, r0, c1, c0, 0
+  bx      lr
 
  RVCT_ASM_EXPORT ArmReadCpuActlr
   mrc     p15, 0, r0, c1, c0, 1
@@ -164,6 +161,14 @@
   mcr     p15, 0, r0, c1, c0, 1
   dsb
   isb
+  bx      lr
+
+ RVCT_ASM_EXPORT ArmGetPhysicalAddressBits
+  mrc     p15, 0, r0, c0, c1, 4   ; MMFR0
+  and     r0, r0, #0xf            ; VMSA [3:0]
+  cmp     r0, #5                  ; >= 5 implies LPAE support
+  movlt   r0, #32                 ; 32 bits if no LPAE
+  movge   r0, #40                 ; 40 bits if LPAE
   bx      lr
 
   END

@@ -1,14 +1,8 @@
 /** @file
   Implement TPM2 Integrity related command.
 
-Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved. <BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved. <BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -120,16 +114,16 @@ Tpm2PcrExtend (
   // Add in Auth session
   //
   Buffer = (UINT8 *)&Cmd.AuthSessionPcr;
-  
+
   // sessionInfoSize
   SessionInfoSize = CopyAuthSessionCommand (NULL, Buffer);
   Buffer += SessionInfoSize;
   Cmd.AuthorizationSize = SwapBytes32(SessionInfoSize);
-  
+
   //Digest Count
   WriteUnaligned32 ((UINT32 *)Buffer, SwapBytes32(Digests->count));
   Buffer += sizeof(UINT32);
-  
+
   //Digest
   for (Index = 0; Index < Digests->count; Index++) {
     WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16(Digests->digests[Index].hashAlg));
@@ -241,7 +235,7 @@ Tpm2PcrEvent (
 
   CopyMem (Buffer, EventData->buffer, EventData->size);
   Buffer += EventData->size;
-  
+
   CmdSize              = (UINT32)((UINTN)Buffer - (UINTN)&Cmd);
   Cmd.Header.paramSize = SwapBytes32(CmdSize);
 
@@ -279,6 +273,11 @@ Tpm2PcrEvent (
   Buffer = (UINT8 *)&Res.Digests;
 
   Digests->count = SwapBytes32 (ReadUnaligned32 ((UINT32 *)Buffer));
+  if (Digests->count > HASH_COUNT) {
+    DEBUG ((DEBUG_ERROR, "Tpm2PcrEvent - Digests->count error %x\n", Digests->count));
+    return EFI_DEVICE_ERROR;
+  }
+
   Buffer += sizeof(UINT32);
   for (Index = 0; Index < Digests->count; Index++) {
     Digests->digests[Index].hashAlg = SwapBytes16 (ReadUnaligned16 ((UINT16 *)Buffer));
@@ -306,7 +305,7 @@ Tpm2PcrEvent (
   @param[out] PcrUpdateCounter   The current value of the PCR update counter.
   @param[out] PcrSelectionOut    The PCR in the returned list.
   @param[out] PcrValues          The contents of the PCR indicated in pcrSelect.
-  
+
   @retval EFI_SUCCESS            Operation completed successfully.
   @retval EFI_DEVICE_ERROR       The command was unsuccessful.
 **/
@@ -333,7 +332,7 @@ Tpm2PcrRead (
   //
   SendBuffer.Header.tag = SwapBytes16(TPM_ST_NO_SESSIONS);
   SendBuffer.Header.commandCode = SwapBytes32(TPM_CC_PCR_Read);
- 
+
   SendBuffer.PcrSelectionIn.count = SwapBytes32(PcrSelectionIn->count);
   for (Index = 0; Index < PcrSelectionIn->count; Index++) {
     SendBuffer.PcrSelectionIn.pcrSelections[Index].hash = SwapBytes16(PcrSelectionIn->pcrSelections[Index].hash);
@@ -383,6 +382,11 @@ Tpm2PcrRead (
     return EFI_DEVICE_ERROR;
   }
   PcrSelectionOut->count = SwapBytes32(RecvBuffer.PcrSelectionOut.count);
+  if (PcrSelectionOut->count > HASH_COUNT) {
+    DEBUG ((DEBUG_ERROR, "Tpm2PcrRead - PcrSelectionOut->count error %x\n", PcrSelectionOut->count));
+    return EFI_DEVICE_ERROR;
+  }
+
   if (RecvBufferSize < sizeof (TPM2_RESPONSE_HEADER) + sizeof(RecvBuffer.PcrUpdateCounter) + sizeof(RecvBuffer.PcrSelectionOut.count) + sizeof(RecvBuffer.PcrSelectionOut.pcrSelections[0]) * PcrSelectionOut->count) {
     DEBUG ((EFI_D_ERROR, "Tpm2PcrRead - RecvBufferSize Error - %x\n", RecvBufferSize));
     return EFI_DEVICE_ERROR;
@@ -390,6 +394,9 @@ Tpm2PcrRead (
   for (Index = 0; Index < PcrSelectionOut->count; Index++) {
     PcrSelectionOut->pcrSelections[Index].hash = SwapBytes16(RecvBuffer.PcrSelectionOut.pcrSelections[Index].hash);
     PcrSelectionOut->pcrSelections[Index].sizeofSelect = RecvBuffer.PcrSelectionOut.pcrSelections[Index].sizeofSelect;
+    if (PcrSelectionOut->pcrSelections[Index].sizeofSelect > PCR_SELECT_MAX) {
+      return EFI_DEVICE_ERROR;
+    }
     CopyMem (&PcrSelectionOut->pcrSelections[Index].pcrSelect, &RecvBuffer.PcrSelectionOut.pcrSelections[Index].pcrSelect, PcrSelectionOut->pcrSelections[Index].sizeofSelect);
   }
 
@@ -398,9 +405,20 @@ Tpm2PcrRead (
   //
   PcrValuesOut = (TPML_DIGEST *)((UINT8 *)&RecvBuffer + sizeof (TPM2_RESPONSE_HEADER) + sizeof(RecvBuffer.PcrUpdateCounter) + sizeof(RecvBuffer.PcrSelectionOut.count) + sizeof(RecvBuffer.PcrSelectionOut.pcrSelections[0]) * PcrSelectionOut->count);
   PcrValues->count = SwapBytes32(PcrValuesOut->count);
+  //
+  // The number of digests in list is not greater than 8 per TPML_DIGEST definition
+  //
+  if (PcrValues->count > 8) {
+    DEBUG ((DEBUG_ERROR, "Tpm2PcrRead - PcrValues->count error %x\n", PcrValues->count));
+    return EFI_DEVICE_ERROR;
+  }
   Digests = PcrValuesOut->digests;
   for (Index = 0; Index < PcrValues->count; Index++) {
     PcrValues->digests[Index].size = SwapBytes16(Digests->size);
+    if (PcrValues->digests[Index].size > sizeof(TPMU_HA)) {
+      DEBUG ((DEBUG_ERROR, "Tpm2PcrRead - Digest.size error %x\n", PcrValues->digests[Index].size));
+      return EFI_DEVICE_ERROR;
+    }
     CopyMem (&PcrValues->digests[Index].buffer, &Digests->buffer, PcrValues->digests[Index].size);
     Digests = (TPM2B_DIGEST *)((UINT8 *)Digests + sizeof(Digests->size) + PcrValues->digests[Index].size);
   }
@@ -418,7 +436,7 @@ Tpm2PcrRead (
   @param[out] MaxPCR             maximum number of PCR that may be in a bank
   @param[out] SizeNeeded         number of octets required to satisfy the request
   @param[out] SizeAvailable      Number of octets available. Computed before the allocation
-  
+
   @retval EFI_SUCCESS            Operation completed successfully.
   @retval EFI_DEVICE_ERROR       The command was unsuccessful.
 **/
@@ -485,8 +503,8 @@ Tpm2PcrAllocate (
   // Call the TPM
   //
   Status = Tpm2SubmitCommand (
-             CmdSize, 
-             (UINT8 *)&Cmd, 
+             CmdSize,
+             (UINT8 *)&Cmd,
              &ResultBufSize,
              ResultBuf
              );
@@ -542,7 +560,7 @@ Done:
   @param[in]  PlatformAuth      platform auth value. NULL means no platform auth change.
   @param[in]  SupportedPCRBanks Supported PCR banks
   @param[in]  PCRBanks          PCR banks
-  
+
   @retval EFI_SUCCESS Operation completed successfully.
 **/
 EFI_STATUS

@@ -286,7 +286,7 @@ resource 'cmdo' (128, "Antlr") {
 				"If this option is checked, ANTLR will ge"
 				"nerate a cross reference for all rules. "
 				"For each rule it will print a list of al"
-				"l other rules that refrence it."
+				"l other rules that reference it."
 			},
 			/* [10] */
 			NotDependent {

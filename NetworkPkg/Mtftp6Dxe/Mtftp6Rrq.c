@@ -1,15 +1,9 @@
 /** @file
   Mtftp6 Rrq process functions implementation.
 
-  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -35,6 +29,9 @@ Mtftp6RrqSendAck (
 {
   EFI_MTFTP6_PACKET         *Ack;
   NET_BUF                   *Packet;
+  EFI_STATUS                Status;
+
+  Status = EFI_SUCCESS;
 
   //
   // Allocate net buffer to create ack packet.
@@ -61,7 +58,12 @@ Mtftp6RrqSendAck (
   Instance->CurRetry = 0;
   Instance->LastPacket = Packet;
 
-  return Mtftp6TransmitPacket (Instance, Packet);
+  Status = Mtftp6TransmitPacket (Instance, Packet);
+  if (!EFI_ERROR (Status)) {
+    Instance->AckedBlock = Instance->TotalBlock;
+  }
+
+  return Status;
 }
 
 
@@ -94,7 +96,7 @@ Mtftp6RrqSaveBlock (
   UINT16                    Block;
   UINT64                    Start;
   UINT32                    DataLen;
-  UINT64                    TotalBlock;
+  UINT64                    BlockCounter;
   BOOLEAN                   Completed;
 
   Completed = FALSE;
@@ -115,10 +117,10 @@ Mtftp6RrqSaveBlock (
   // Remove this block number from the file hole. If Mtftp6RemoveBlockNum
   // returns EFI_NOT_FOUND, the block has been saved, don't save it again.
   // Note that : For bigger files, allowing the block counter to roll over
-  // to accept transfers of unlimited size. So TotalBlock is memorised as
+  // to accept transfers of unlimited size. So BlockCounter is memorised as
   // continuous block counter.
   //
-  Status = Mtftp6RemoveBlockNum (&Instance->BlkList, Block, Completed, &TotalBlock);
+  Status = Mtftp6RemoveBlockNum (&Instance->BlkList, Block, Completed, &BlockCounter);
 
   if (Status == EFI_NOT_FOUND) {
     return EFI_SUCCESS;
@@ -154,7 +156,7 @@ Mtftp6RrqSaveBlock (
 
   if (Token->Buffer != NULL) {
 
-    Start = MultU64x32 (TotalBlock - 1, Instance->BlkSize);
+    Start = MultU64x32 (BlockCounter - 1, Instance->BlkSize);
     if (Start + DataLen <= Token->BufferSize) {
       CopyMem ((UINT8 *) Token->Buffer + Start, Packet->Data.Data, DataLen);
       //
@@ -224,15 +226,16 @@ Mtftp6RrqHandleData (
   INTN                      Expected;
 
   *IsCompleted = FALSE;
+  Status       = EFI_SUCCESS;
   BlockNum     = NTOHS (Packet->Data.Block);
   Expected     = Mtftp6GetNextBlockNum (&Instance->BlkList);
 
   ASSERT (Expected >= 0);
 
   //
-  // If we are active and received an unexpected packet, retransmit
-  // the last ACK then restart receiving. If we are passive, save
-  // the block.
+  // If we are active (Master) and received an unexpected packet, transmit
+  // the ACK for the block we received, then restart receiving the
+  // expected one. If we are passive (Slave), save the block.
   //
   if (Instance->IsMaster && (Expected != BlockNum)) {
     //
@@ -242,8 +245,10 @@ Mtftp6RrqHandleData (
     NetbufFree (*UdpPacket);
     *UdpPacket = NULL;
 
-    Mtftp6TransmitPacket (Instance, Instance->LastPacket);
-    return EFI_SUCCESS;
+    //
+    // If Expected is 0, (UINT16) (Expected - 1) is also the expected Ack number (65535).
+    //
+    return Mtftp6RrqSendAck (Instance,  (UINT16) (Expected - 1));
   }
 
   Status = Mtftp6RrqSaveBlock (Instance, Packet, Len, UdpPacket);
@@ -251,6 +256,11 @@ Mtftp6RrqHandleData (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
+  //
+  // Record the total received and saved block number.
+  //
+  Instance->TotalBlock ++;
 
   //
   // Reset the passive client's timer whenever it received a valid data packet.
@@ -288,10 +298,12 @@ Mtftp6RrqHandleData (
     NetbufFree (*UdpPacket);
     *UdpPacket = NULL;
 
-    Mtftp6RrqSendAck (Instance, BlockNum);
+    if (Instance->WindowSize == (Instance->TotalBlock - Instance->AckedBlock) || Expected < 0) {
+      Status = Mtftp6RrqSendAck (Instance, BlockNum);
+    }
   }
 
-  return EFI_SUCCESS;
+  return Status;
 }
 
 
@@ -326,12 +338,13 @@ Mtftp6RrqOackValid (
   }
 
   //
-  // Server can only specify a smaller block size to be used and
+  // Server can only specify a smaller block size and windowsize to be used and
   // return the timeout matches that requested.
   //
   if ((((ReplyInfo->BitMap & MTFTP6_OPT_BLKSIZE_BIT) != 0) && (ReplyInfo->BlkSize > RequestInfo->BlkSize)) ||
+      (((ReplyInfo->BitMap & MTFTP6_OPT_WINDOWSIZE_BIT) != 0) && (ReplyInfo->BlkSize > RequestInfo->BlkSize)) ||
       (((ReplyInfo->BitMap & MTFTP6_OPT_TIMEOUT_BIT) != 0) && (ReplyInfo->Timeout != RequestInfo->Timeout))
-      ) {
+     ) {
     return FALSE;
   }
 
@@ -485,7 +498,7 @@ Mtftp6RrqHandleOack (
   //
   // Parse the extensive options in the packet.
   //
-  Status = Mtftp6ParseExtensionOption (Options, Count, FALSE, &ExtInfo);
+  Status = Mtftp6ParseExtensionOption (Options, Count, FALSE, Instance->Operation, &ExtInfo);
 
   if (EFI_ERROR (Status) || !Mtftp6RrqOackValid (Instance, &ExtInfo, &Instance->ExtInfo)) {
     //
@@ -515,7 +528,7 @@ Mtftp6RrqHandleOack (
 
     //
     // Save the multicast info. Always update the Master, only update the
-    // multicast IP address, block size, timeoute at the first time. If IP
+    // multicast IP address, block size, window size, timeoute at the first time. If IP
     // address is updated, create a UDP child to receive the multicast.
     //
     Instance->IsMaster = ExtInfo.IsMaster;
@@ -612,6 +625,10 @@ Mtftp6RrqHandleOack (
         Instance->BlkSize = ExtInfo.BlkSize;
       }
 
+      if (ExtInfo.WindowSize != 0) {
+        Instance->WindowSize = ExtInfo.WindowSize;
+      }
+
       if (ExtInfo.Timeout != 0) {
         Instance->Timeout = ExtInfo.Timeout;
       }
@@ -623,6 +640,10 @@ Mtftp6RrqHandleOack (
 
     if (ExtInfo.BlkSize != 0) {
       Instance->BlkSize = ExtInfo.BlkSize;
+    }
+
+    if (ExtInfo.WindowSize != 0) {
+      Instance->WindowSize = ExtInfo.WindowSize;
     }
 
     if (ExtInfo.Timeout != 0) {

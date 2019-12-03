@@ -1,15 +1,9 @@
 /** @file
   Routines to process TCP option.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -341,34 +335,4 @@ TcpParseOption (
   }
 
   return 0;
-}
-
-/**
-  Check the segment against PAWS.
-
-  @param[in]  Tcb     Pointer to the TCP_CB of this TCP instance.
-  @param[in]  TSVal   The timestamp value.
-
-  @retval     1       The segment passed the PAWS check.
-  @retval     0       The segment failed to pass the PAWS check.
-
-**/
-UINT32
-TcpPawsOK (
-  IN TCP_CB *Tcb,
-  IN UINT32 TSVal
-  )
-{
-  //
-  // PAWS as defined in RFC1323, buggy...
-  //
-  if (TCP_TIME_LT (TSVal, Tcb->TsRecent) &&
-      TCP_TIME_LT (Tcb->TsRecentAge + TCP_PAWS_24DAY, mTcpTick)
-      ) {
-
-    return 0;
-
-  }
-
-  return 1;
 }

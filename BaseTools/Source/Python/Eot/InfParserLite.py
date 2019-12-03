@@ -1,27 +1,25 @@
 ## @file
 # This file is used to parse INF file of EDK project
 #
-# Copyright (c) 2008 - 2014, Intel Corporation. All rights reserved.<BR>
-# This program and the accompanying materials
-# are licensed and made available under the terms and conditions of the BSD License
-# which accompanies this distribution.  The full text of the license may be found at
-# http://opensource.org/licenses/bsd-license.php
-#
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
 ##
 # Import Modules
 #
+from __future__ import print_function
+from __future__ import absolute_import
+
 import Common.LongFilePathOs as os
 import Common.EdkLogger as EdkLogger
 from Common.DataType import *
 from CommonDataClass.DataClass import *
-from Common.Identification import *
-from Common.String import *
-from Parser import *
-import Database
+from Eot.Identification import Identification
+from Common.StringUtils import *
+from Eot.Parser import *
+from Eot import Database
+from Eot import EotGlobalData
 
 ## EdkInfParser() class
 #
@@ -36,11 +34,8 @@ class EdkInfParser(object):
     #  @param  Filename: INF file name
     #  @param  Database: Eot database
     #  @param  SourceFileList: A list for all source file belonging this INF file
-    #  @param  SourceOverridePath: Override path for source file
-    #  @param  Edk_Source: Envirnoment variable EDK_SOURCE
-    #  @param  Efi_Source: Envirnoment variable EFI_SOURCE
     #
-    def __init__(self, Filename = None, Database = None, SourceFileList = None, SourceOverridePath = None, Edk_Source = None, Efi_Source = None):
+    def __init__(self, Filename = None, Database = None, SourceFileList = None):
         self.Identification = Identification()
         self.Sources = []
         self.Macros = {}
@@ -49,10 +44,9 @@ class EdkInfParser(object):
         self.TblFile = Database.TblFile
         self.TblInf = Database.TblInf
         self.FileID = -1
-        self.SourceOverridePath = SourceOverridePath
 
         # Load Inf file if filename is not None
-        if Filename != None:
+        if Filename is not None:
             self.LoadInfFile(Filename)
 
         if SourceFileList:
@@ -151,21 +145,4 @@ class EdkInfParser(object):
         self.ParserSource(CurrentSection, SectionItemList, ArchList, ThirdList)
         #End of For
 
-##
-#
-# This acts like the main() function for the script, unless it is 'import'ed into another
-# script.
-#
-if __name__ == '__main__':
-    EdkLogger.Initialize()
-    EdkLogger.SetLevel(EdkLogger.QUIET)
 
-    Db = Database.Database('Inf.db')
-    Db.InitDatabase()
-    P = EdkInfParser(os.path.normpath("C:\Framework\Edk\Sample\Platform\Nt32\Dxe\PlatformBds\PlatformBds.inf"), Db, '', '')
-    for Inf in P.Sources:
-        print Inf
-    for Item in P.Macros:
-        print Item, P.Macros[Item]
-
-    Db.Close()

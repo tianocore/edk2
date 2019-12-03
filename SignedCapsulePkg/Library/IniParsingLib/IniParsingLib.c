@@ -25,16 +25,9 @@
   OpenIniFile(), PreProcessDataFile(), ProfileGetSection(), ProfileGetEntry()
   will receive untrusted input and do basic validation.
 
-  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions
-  of the BSD License which accompanies this distribution.  The
-  full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -50,8 +43,8 @@
 // This is default allocation. Reallocation will happen if it is not enough.
 #define MAX_LINE_LENGTH           512
 
-typedef struct _SECTION_ITEM SECTION_ITEM;
-struct _SECTION_ITEM {
+typedef struct _INI_SECTION_ITEM SECTION_ITEM;
+struct _INI_SECTION_ITEM {
   CHAR8                           *PtrSection;
   UINTN                           SecNameLen;
   CHAR8                           *PtrEntry;
@@ -59,8 +52,8 @@ struct _SECTION_ITEM {
   SECTION_ITEM                    *PtrNext;
 };
 
-typedef struct _COMMENT_LINE COMMENT_LINE;
-struct _COMMENT_LINE {
+typedef struct _INI_COMMENT_LINE COMMENT_LINE;
+struct _INI_COMMENT_LINE {
   CHAR8                           *PtrComment;
   COMMENT_LINE                    *PtrNext;
 };
@@ -862,144 +855,6 @@ UpdateGetProfileString (
 }
 
 /**
-  Converts a list of string to a specified buffer.
-
-  @param[out] Buf             The output buffer that contains the string.
-  @param[in]  BufferLength    The length of the buffer
-  @param[in]  Str             The input string that contains the hex number
-
-  @retval EFI_SUCCESS    The string was successfully converted to the buffer.
-
-**/
-EFI_STATUS
-AsciiStrToBuf (
-  OUT UINT8    *Buf,
-  IN  UINTN    BufferLength,
-  IN  CHAR8    *Str
-  )
-{
-  UINTN       Index;
-  UINTN       StrLength;
-  UINT8       Digit;
-  UINT8       Byte;
-
-  Digit = 0;
-
-  //
-  // Two hex char make up one byte
-  //
-  StrLength = BufferLength * 2;
-
-  for(Index = 0; Index < StrLength; Index++, Str++) {
-
-    if ((*Str >= 'a') && (*Str <= 'f')) {
-      Digit = (UINT8) (*Str - 'a' + 0x0A);
-    } else if ((*Str >= 'A') && (*Str <= 'F')) {
-      Digit = (UINT8) (*Str - 'A' + 0x0A);
-    } else if ((*Str >= '0') && (*Str <= '9')) {
-      Digit = (UINT8) (*Str - '0');
-    } else {
-      return EFI_INVALID_PARAMETER;
-    }
-
-    //
-    // For odd characters, write the upper nibble for each buffer byte,
-    // and for even characters, the lower nibble.
-    //
-    if ((Index & 1) == 0) {
-      Byte = (UINT8) (Digit << 4);
-    } else {
-      Byte = Buf[Index / 2];
-      Byte &= 0xF0;
-      Byte = (UINT8) (Byte | Digit);
-    }
-
-    Buf[Index / 2] = Byte;
-  }
-
-  return EFI_SUCCESS;
-}
-
-/**
-  Converts a string to GUID value.
-  Guid Format is xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-
-  @param[in]  Str              The registry format GUID string that contains the GUID value.
-  @param[out] Guid             A pointer to the converted GUID value.
-
-  @retval EFI_SUCCESS     The GUID string was successfully converted to the GUID value.
-  @retval EFI_UNSUPPORTED The input string is not in registry format.
-  @return others          Some error occurred when converting part of GUID value.
-
-**/
-EFI_STATUS
-AsciiStrToGuid (
-  IN  CHAR8    *Str,
-  OUT EFI_GUID *Guid
-  )
-{
-  //
-  // Get the first UINT32 data
-  //
-  Guid->Data1 = (UINT32) AsciiStrHexToUint64  (Str);
-  while (!IS_HYPHEN (*Str) && !IS_NULL (*Str)) {
-    Str ++;
-  }
-
-  if (IS_HYPHEN (*Str)) {
-    Str++;
-  } else {
-    return EFI_UNSUPPORTED;
-  }
-
-  //
-  // Get the second UINT16 data
-  //
-  Guid->Data2 = (UINT16) AsciiStrHexToUint64  (Str);
-  while (!IS_HYPHEN (*Str) && !IS_NULL (*Str)) {
-    Str ++;
-  }
-
-  if (IS_HYPHEN (*Str)) {
-    Str++;
-  } else {
-    return EFI_UNSUPPORTED;
-  }
-
-  //
-  // Get the third UINT16 data
-  //
-  Guid->Data3 = (UINT16) AsciiStrHexToUint64  (Str);
-  while (!IS_HYPHEN (*Str) && !IS_NULL (*Str)) {
-    Str ++;
-  }
-
-  if (IS_HYPHEN (*Str)) {
-    Str++;
-  } else {
-    return EFI_UNSUPPORTED;
-  }
-
-  //
-  // Get the following 8 bytes data
-  //
-  AsciiStrToBuf (&Guid->Data4[0], 2, Str);
-  //
-  // Skip 2 byte hex chars
-  //
-  Str += 2 * 2;
-
-  if (IS_HYPHEN (*Str)) {
-    Str++;
-  } else {
-    return EFI_UNSUPPORTED;
-  }
-  AsciiStrToBuf (&Guid->Data4[2], 6, Str);
-
-  return EFI_SUCCESS;
-}
-
-/**
   Pre process config data buffer into Section entry list and Comment entry list.
 
   @param[in]      DataBuffer      Config raw file buffer.
@@ -1243,6 +1098,7 @@ GetGuidFromDataFile (
 {
   CHAR8                                 *Value;
   EFI_STATUS                            Status;
+  RETURN_STATUS                         RStatus;
 
   if (Context == NULL || SectionName == NULL || EntryName == NULL || Guid == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -1258,11 +1114,8 @@ GetGuidFromDataFile (
     return EFI_NOT_FOUND;
   }
   ASSERT (Value != NULL);
-  if (!IsValidGuid(Value, AsciiStrLen(Value))) {
-    return EFI_NOT_FOUND;
-  }
-  Status = AsciiStrToGuid(Value, Guid);
-  if (EFI_ERROR (Status)) {
+  RStatus = AsciiStrToGuid (Value, Guid);
+  if (RETURN_ERROR (RStatus) || (Value[GUID_STRING_LENGTH] != '\0')) {
     return EFI_NOT_FOUND;
   }
   return EFI_SUCCESS;

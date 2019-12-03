@@ -2,21 +2,18 @@
   HII Config Access protocol implementation of TCG2 configuration module.
   NOTE: This module is only for reference only, each platform should have its own setup page.
 
-Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials 
-are licensed and made available under the terms and conditions of the BSD License 
-which accompanies this distribution.  The full text of the license may be found at 
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, 
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+(C) Copyright 2018 Hewlett Packard Enterprise Development LP<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include "Tcg2ConfigImpl.h"
 #include <Library/PcdLib.h>
 #include <Library/Tpm2CommandLib.h>
+#include <Library/Tpm2DeviceLib.h>
 #include <Library/IoLib.h>
+
 #include <Guid/TpmInstance.h>
 
 #include <IndustryStandard/TpmPtp.h>
@@ -50,7 +47,7 @@ HII_VENDOR_DEVICE_PATH          mTcg2HiiVendorDevicePath = {
   {
     END_DEVICE_PATH_TYPE,
     END_ENTIRE_DEVICE_PATH_SUBTYPE,
-    { 
+    {
       (UINT8) (END_DEVICE_PATH_LENGTH),
       (UINT8) ((END_DEVICE_PATH_LENGTH) >> 8)
     }
@@ -60,45 +57,10 @@ HII_VENDOR_DEVICE_PATH          mTcg2HiiVendorDevicePath = {
 UINT8  mCurrentPpRequest;
 
 /**
-  Return PTP interface type.
-
-  @param[in] Register                Pointer to PTP register.
-
-  @return PTP interface type.
-**/
-UINT8
-GetPtpInterface (
-  IN VOID *Register
-  )
-{
-  PTP_CRB_INTERFACE_IDENTIFIER  InterfaceId;
-  PTP_FIFO_INTERFACE_CAPABILITY InterfaceCapability;
-
-  //
-  // Check interface id
-  //
-  InterfaceId.Uint32 = MmioRead32 ((UINTN)&((PTP_CRB_REGISTERS *)Register)->InterfaceId);
-  InterfaceCapability.Uint32 = MmioRead32 ((UINTN)&((PTP_FIFO_REGISTERS *)Register)->InterfaceCapability);
-
-  if ((InterfaceId.Bits.InterfaceType == PTP_INTERFACE_IDENTIFIER_INTERFACE_TYPE_CRB) &&
-      (InterfaceId.Bits.InterfaceVersion == PTP_INTERFACE_IDENTIFIER_INTERFACE_VERSION_CRB) &&
-      (InterfaceId.Bits.CapCRB != 0)) {
-    return TPM_DEVICE_INTERFACE_PTP_CRB;
-  }
-  if ((InterfaceId.Bits.InterfaceType == PTP_INTERFACE_IDENTIFIER_INTERFACE_TYPE_FIFO) &&
-      (InterfaceId.Bits.InterfaceVersion == PTP_INTERFACE_IDENTIFIER_INTERFACE_VERSION_FIFO) &&
-      (InterfaceId.Bits.CapFIFO != 0) &&
-      (InterfaceCapability.Bits.InterfaceVersion == INTERFACE_CAPABILITY_INTERFACE_VERSION_PTP)) {
-    return TPM_DEVICE_INTERFACE_PTP_FIFO;
-  }
-  return TPM_DEVICE_INTERFACE_TIS;
-}
-
-/**
   Return if PTP CRB is supported.
 
   @param[in] Register                Pointer to PTP register.
-  
+
   @retval TRUE  PTP CRB is supported.
   @retval FALSE PTP CRB is unsupported.
 **/
@@ -126,7 +88,7 @@ IsPtpCrbSupported (
   Return if PTP FIFO is supported.
 
   @param[in] Register                Pointer to PTP register.
-  
+
   @retval TRUE  PTP FIFO is supported.
   @retval FALSE PTP FIFO is unsupported.
 **/
@@ -152,10 +114,11 @@ IsPtpFifoSupported (
 
 /**
   Set PTP interface type.
+  Do not update PcdActiveTpmInterfaceType here because interface change only happens on next _TPM_INIT
 
   @param[in] Register                Pointer to PTP register.
   @param[in] PtpInterface            PTP interface type.
-  
+
   @retval EFI_SUCCESS                PTP interface type is set.
   @retval EFI_INVALID_PARAMETER      PTP interface type is invalid.
   @retval EFI_UNSUPPORTED            PTP interface type is unsupported.
@@ -167,12 +130,12 @@ SetPtpInterface (
   IN UINT8                PtpInterface
   )
 {
-  UINT8                         PtpInterfaceCurrent;
+  TPM2_PTP_INTERFACE_TYPE       PtpInterfaceCurrent;
   PTP_CRB_INTERFACE_IDENTIFIER  InterfaceId;
 
-  PtpInterfaceCurrent = GetPtpInterface (Register);
-  if ((PtpInterfaceCurrent != TPM_DEVICE_INTERFACE_PTP_FIFO) && 
-      (PtpInterfaceCurrent != TPM_DEVICE_INTERFACE_PTP_CRB)) {
+  PtpInterfaceCurrent = PcdGet8(PcdActiveTpmInterfaceType);
+  if ((PtpInterfaceCurrent != Tpm2PtpInterfaceFifo) &&
+      (PtpInterfaceCurrent != Tpm2PtpInterfaceCrb)) {
     return EFI_UNSUPPORTED;
   }
   InterfaceId.Uint32 = MmioRead32 ((UINTN)&((PTP_CRB_REGISTERS *)Register)->InterfaceId);
@@ -181,14 +144,14 @@ SetPtpInterface (
   }
 
   switch (PtpInterface) {
-  case TPM_DEVICE_INTERFACE_PTP_FIFO:
+  case Tpm2PtpInterfaceFifo:
     if (InterfaceId.Bits.CapFIFO == 0) {
       return EFI_UNSUPPORTED;
     }
     InterfaceId.Bits.InterfaceSelector = PTP_INTERFACE_IDENTIFIER_INTERFACE_SELECTOR_FIFO;
     MmioWrite32 ((UINTN)&((PTP_CRB_REGISTERS *)Register)->InterfaceId, InterfaceId.Uint32);
     return EFI_SUCCESS;
-  case TPM_DEVICE_INTERFACE_PTP_CRB:
+  case Tpm2PtpInterfaceCrb:
     if (InterfaceId.Bits.CapCRB == 0) {
       return EFI_UNSUPPORTED;
     }
@@ -330,7 +293,7 @@ SaveTcg2PCRBanksRequest (
   } else {
     mTcg2ConfigPrivateDate->PCRBanksDesired &= ~(0x1 << PCRBankIndex);
   }
-  
+
   ReturnCode = Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunction (TCG2_PHYSICAL_PRESENCE_SET_PCR_BANKS, mTcg2ConfigPrivateDate->PCRBanksDesired);
   if (ReturnCode == TCG_PP_SUBMIT_REQUEST_TO_PREOS_SUCCESS) {
     Status = EFI_SUCCESS;
@@ -375,7 +338,161 @@ Tcg2RouteConfig (
     return EFI_INVALID_PARAMETER;
   }
 
+  *Progress = Configuration;
+
   return EFI_NOT_FOUND;
+}
+
+/**
+  Get HID string of TPM2 ACPI device object
+
+  @param[in]  Hid               Points to HID String Buffer.
+  @param[in]  Size              HID String size in bytes. Must >= TPM_HID_ACPI_SIZE
+
+  @return                       HID String get status.
+
+**/
+EFI_STATUS
+GetTpm2HID(
+   CHAR8 *Hid,
+   UINTN  Size
+  )
+{
+  EFI_STATUS  Status;
+  UINT32      ManufacturerID;
+  UINT32      FirmwareVersion1;
+  UINT32      FirmwareVersion2;
+  BOOLEAN     PnpHID;
+
+  PnpHID = TRUE;
+
+  ZeroMem(Hid, Size);
+
+  //
+  // Get Manufacturer ID
+  //
+  Status = Tpm2GetCapabilityManufactureID(&ManufacturerID);
+  if (!EFI_ERROR(Status)) {
+    DEBUG((DEBUG_INFO, "TPM_PT_MANUFACTURER 0x%08x\n", ManufacturerID));
+    //
+    // ManufacturerID defined in TCG Vendor ID Registry
+    // may tailed with 0x00 or 0x20
+    //
+    if ((ManufacturerID >> 24) == 0x00 || ((ManufacturerID >> 24) == 0x20)) {
+      //
+      //  HID containing PNP ID "NNN####"
+      //   NNN is uppercase letter for Vendor ID specified by manufacturer
+      //
+      CopyMem(Hid, &ManufacturerID, 3);
+    } else {
+      //
+      //  HID containing ACP ID "NNNN####"
+      //   NNNN is uppercase letter for Vendor ID specified by manufacturer
+      //
+      CopyMem(Hid, &ManufacturerID, 4);
+      PnpHID = FALSE;
+    }
+  } else {
+    DEBUG ((DEBUG_ERROR, "Get TPM_PT_MANUFACTURER failed %x!\n", Status));
+    ASSERT(FALSE);
+    return Status;
+  }
+
+  Status = Tpm2GetCapabilityFirmwareVersion(&FirmwareVersion1, &FirmwareVersion2);
+  if (!EFI_ERROR(Status)) {
+    DEBUG((DEBUG_INFO, "TPM_PT_FIRMWARE_VERSION_1 0x%x\n", FirmwareVersion1));
+    DEBUG((DEBUG_INFO, "TPM_PT_FIRMWARE_VERSION_2 0x%x\n", FirmwareVersion2));
+    //
+    //   #### is Firmware Version 1
+    //
+    if (PnpHID) {
+      AsciiSPrint(Hid + 3, TPM_HID_PNP_SIZE - 3, "%02d%02d", ((FirmwareVersion1 & 0xFFFF0000) >> 16), (FirmwareVersion1 & 0x0000FFFF));
+    } else {
+      AsciiSPrint(Hid + 4, TPM_HID_ACPI_SIZE - 4, "%02d%02d", ((FirmwareVersion1 & 0xFFFF0000) >> 16), (FirmwareVersion1 & 0x0000FFFF));
+    }
+
+  } else {
+    DEBUG ((DEBUG_ERROR, "Get TPM_PT_FIRMWARE_VERSION_X failed %x!\n", Status));
+    ASSERT(FALSE);
+    return Status;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  This function processes the results of changes in configuration
+  for TCG2 version information.
+
+  @param[in] Action             Specifies the type of action taken by the browser.
+                                ASSERT if the Action is not EFI_BROWSER_ACTION_SUBMITTED.
+  @param[in] QuestionId         A unique value which is sent to the original
+                                exporting driver so that it can identify the type
+                                of data to expect.
+  @param[in] Type               The type of value for the question.
+  @param[in] Value              A pointer to the data being sent to the original
+                                exporting driver.
+
+  @retval EFI_SUCCESS           The callback successfully handled the action.
+
+**/
+EFI_STATUS
+Tcg2VersionInfoCallback (
+  IN EFI_BROWSER_ACTION         Action,
+  IN EFI_QUESTION_ID            QuestionId,
+  IN UINT8                      Type,
+  IN EFI_IFR_TYPE_VALUE         *Value
+  )
+{
+  EFI_INPUT_KEY                 Key;
+  UINT64                        PcdTcg2PpiVersion;
+  UINT8                         PcdTpm2AcpiTableRev;
+
+  ASSERT (Action == EFI_BROWSER_ACTION_SUBMITTED);
+
+  if (QuestionId == KEY_TCG2_PPI_VERSION) {
+    //
+    // Get the PCD value after EFI_BROWSER_ACTION_SUBMITTED,
+    // the SetVariable to TCG2_VERSION_NAME should have been done.
+    // If the PCD value is not equal to the value set to variable,
+    // the PCD is not DynamicHii type and does not map to the setup option.
+    //
+    PcdTcg2PpiVersion = 0;
+    CopyMem (
+      &PcdTcg2PpiVersion,
+      PcdGetPtr (PcdTcgPhysicalPresenceInterfaceVer),
+      AsciiStrSize ((CHAR8 *) PcdGetPtr (PcdTcgPhysicalPresenceInterfaceVer))
+      );
+    if (PcdTcg2PpiVersion != Value->u64) {
+      CreatePopUp (
+        EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+        &Key,
+        L"WARNING: PcdTcgPhysicalPresenceInterfaceVer is not DynamicHii type and does not map to this option!",
+        L"The version configuring by this setup option will not work!",
+        NULL
+        );
+    }
+  } else if (QuestionId == KEY_TPM2_ACPI_REVISION){
+    //
+    // Get the PCD value after EFI_BROWSER_ACTION_SUBMITTED,
+    // the SetVariable to TCG2_VERSION_NAME should have been done.
+    // If the PCD value is not equal to the value set to variable,
+    // the PCD is not DynamicHii type and does not map to the setup option.
+    //
+    PcdTpm2AcpiTableRev = PcdGet8 (PcdTpm2AcpiTableRev);
+
+    if (PcdTpm2AcpiTableRev != Value->u8) {
+      CreatePopUp (
+        EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+        &Key,
+        L"WARNING: PcdTpm2AcpiTableRev is not DynamicHii type and does not map to this option!",
+        L"The Revision configuring by this setup option will not work!",
+        NULL
+        );
+    }
+  }
+
+  return EFI_SUCCESS;
 }
 
 /**
@@ -411,15 +528,40 @@ Tcg2Callback (
      OUT EFI_BROWSER_ACTION_REQUEST            *ActionRequest
   )
 {
-  EFI_INPUT_KEY               Key;
+  EFI_STATUS                 Status;
+  EFI_INPUT_KEY              Key;
+  CHAR8                      HidStr[16];
+  CHAR16                     UnHidStr[16];
+  TCG2_CONFIG_PRIVATE_DATA   *Private;
 
   if ((This == NULL) || (Value == NULL) || (ActionRequest == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
+  Private = TCG2_CONFIG_PRIVATE_DATA_FROM_THIS (This);
+
+  if (Action == EFI_BROWSER_ACTION_FORM_OPEN) {
+    //
+    // Update TPM2 HID info
+    //
+    if (QuestionId == KEY_TPM_DEVICE) {
+      Status = GetTpm2HID(HidStr, 16);
+
+      if (EFI_ERROR(Status)) {
+        //
+        //  Fail to get TPM2 HID
+        //
+        HiiSetString (Private->HiiHandle, STRING_TOKEN (STR_TPM2_ACPI_HID_CONTENT), L"Unknown", NULL);
+      } else {
+        AsciiStrToUnicodeStrS(HidStr, UnHidStr, 16);
+        HiiSetString (Private->HiiHandle, STRING_TOKEN (STR_TPM2_ACPI_HID_CONTENT), UnHidStr, NULL);
+      }
+    }
+    return EFI_SUCCESS;
+  }
+
   if (Action == EFI_BROWSER_ACTION_CHANGING) {
     if (QuestionId == KEY_TPM_DEVICE_INTERFACE) {
-      EFI_STATUS  Status;
       Status = SetPtpInterface ((VOID *) (UINTN) PcdGet64 (PcdTpmBaseAddress), Value->u8);
       if (EFI_ERROR (Status)) {
         CreatePopUp (
@@ -432,7 +574,7 @@ Tcg2Callback (
       }
     }
   }
-  
+
   if (Action == EFI_BROWSER_ACTION_CHANGED) {
     if (QuestionId == KEY_TPM_DEVICE) {
       return EFI_SUCCESS;
@@ -444,7 +586,13 @@ Tcg2Callback (
       return SaveTcg2PpRequestParameter (Value->u32);
     }
     if ((QuestionId >= KEY_TPM2_PCR_BANKS_REQUEST_0) && (QuestionId <= KEY_TPM2_PCR_BANKS_REQUEST_4)) {
-      SaveTcg2PCRBanksRequest (QuestionId - KEY_TPM2_PCR_BANKS_REQUEST_0, Value->b);
+      return SaveTcg2PCRBanksRequest (QuestionId - KEY_TPM2_PCR_BANKS_REQUEST_0, Value->b);
+    }
+  }
+
+  if (Action == EFI_BROWSER_ACTION_SUBMITTED) {
+    if (QuestionId == KEY_TCG2_PPI_VERSION || QuestionId == KEY_TPM2_ACPI_REVISION) {
+      return Tcg2VersionInfoCallback (Action, QuestionId, Type, Value);
     }
   }
 
@@ -639,7 +787,7 @@ InstallTcg2ConfigForm (
   TPML_PCR_SELECTION              Pcrs;
   CHAR16                          TempBuffer[1024];
   TCG2_CONFIGURATION_INFO         Tcg2ConfigInfo;
-  UINT8                           TpmDeviceInterfaceDetected;
+  TPM2_PTP_INTERFACE_TYPE         TpmDeviceInterfaceDetected;
 
   DriverHandle = NULL;
   ConfigAccess = &PrivateData->ConfigAccess;
@@ -675,11 +823,11 @@ InstallTcg2ConfigForm (
            &gEfiHiiConfigAccessProtocolGuid,
            ConfigAccess,
            NULL
-           );  
+           );
 
     return EFI_OUT_OF_RESOURCES;
   }
-  
+
   PrivateData->HiiHandle = HiiHandle;
 
   //
@@ -744,15 +892,15 @@ InstallTcg2ConfigForm (
   // Update TPM device interface type
   //
   if (PrivateData->TpmDeviceDetected == TPM_DEVICE_2_0_DTPM) {
-    TpmDeviceInterfaceDetected = GetPtpInterface ((VOID *) (UINTN) PcdGet64 (PcdTpmBaseAddress));
+    TpmDeviceInterfaceDetected = PcdGet8(PcdActiveTpmInterfaceType);
     switch (TpmDeviceInterfaceDetected) {
-    case TPM_DEVICE_INTERFACE_TIS:
+    case Tpm2PtpInterfaceTis:
       HiiSetString (PrivateData->HiiHandle, STRING_TOKEN (STR_TCG2_DEVICE_INTERFACE_STATE_CONTENT), L"TIS", NULL);
       break;
-    case TPM_DEVICE_INTERFACE_PTP_FIFO:
+    case Tpm2PtpInterfaceFifo:
       HiiSetString (PrivateData->HiiHandle, STRING_TOKEN (STR_TCG2_DEVICE_INTERFACE_STATE_CONTENT), L"PTP FIFO", NULL);
       break;
-    case TPM_DEVICE_INTERFACE_PTP_CRB:
+    case Tpm2PtpInterfaceCrb:
       HiiSetString (PrivateData->HiiHandle, STRING_TOKEN (STR_TCG2_DEVICE_INTERFACE_STATE_CONTENT), L"PTP CRB", NULL);
       break;
      default:
@@ -762,13 +910,13 @@ InstallTcg2ConfigForm (
 
     Tcg2ConfigInfo.TpmDeviceInterfaceAttempt = TpmDeviceInterfaceDetected;
     switch (TpmDeviceInterfaceDetected) {
-    case TPM_DEVICE_INTERFACE_TIS:
+    case Tpm2PtpInterfaceTis:
       Tcg2ConfigInfo.TpmDeviceInterfacePtpFifoSupported = FALSE;
       Tcg2ConfigInfo.TpmDeviceInterfacePtpCrbSupported  = FALSE;
       HiiSetString (PrivateData->HiiHandle, STRING_TOKEN (STR_TCG2_DEVICE_INTERFACE_CAPABILITY_CONTENT), L"TIS", NULL);
       break;
-    case TPM_DEVICE_INTERFACE_PTP_FIFO:
-    case TPM_DEVICE_INTERFACE_PTP_CRB:
+    case Tpm2PtpInterfaceFifo:
+    case Tpm2PtpInterfaceCrb:
       Tcg2ConfigInfo.TpmDeviceInterfacePtpFifoSupported = IsPtpFifoSupported((VOID *) (UINTN) PcdGet64 (PcdTpmBaseAddress));
       Tcg2ConfigInfo.TpmDeviceInterfacePtpCrbSupported  = IsPtpCrbSupported((VOID *) (UINTN) PcdGet64 (PcdTpmBaseAddress));
       TempBuffer[0] = 0;
@@ -807,7 +955,8 @@ InstallTcg2ConfigForm (
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "Tcg2ConfigDriver: Fail to set TCG2_STORAGE_INFO_NAME\n"));
   }
-  return EFI_SUCCESS;  
+
+  return EFI_SUCCESS;
 }
 
 /**
@@ -843,6 +992,6 @@ UninstallTcg2ConfigForm (
            );
     PrivateData->DriverHandle = NULL;
   }
-  
+
   FreePool (PrivateData);
 }

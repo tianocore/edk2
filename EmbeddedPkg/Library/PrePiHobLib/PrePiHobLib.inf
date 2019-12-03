@@ -1,14 +1,10 @@
 #/** @file
 #  Hob lib that does not contain the APIs as they are already in the PrePiLib
 #
+#  Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
 #  Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
 #
-#  This program and the accompanying materials
-#  are licensed and made available under the terms and conditions of the BSD License
-#  which accompanies this distribution. The full text of the license may be found at
-#  http://opensource.org/licenses/bsd-license.php
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 #
 #**/
@@ -23,7 +19,7 @@
 
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
 #
 
 [Sources.common]
@@ -46,9 +42,6 @@
   gEfiHobMemoryAllocStackGuid
 
 [FixedPcd.common]
-  gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize
-  gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize
-
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIReclaimMemory
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIMemoryNVS
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiReservedMemoryType

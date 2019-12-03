@@ -1,0 +1,71 @@
+## @file
+#  Include all platform action which can be customized by IBV/OEM.
+#
+#  Copyright (c) 2012 - 2016, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PlatformBootManagerLib
+  FILE_GUID                      = F0D9063A-DADB-4185-85E2-D7ACDA93F7A6
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PlatformBootManagerLib|DXE_DRIVER
+
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  PlatformData.c
+  PlatformConsole.c
+  PlatformConsole.h
+  PlatformBootManager.c
+  PlatformBootManager.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiPayloadPkg/UefiPayloadPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  UefiLib
+  UefiBootManagerLib
+  PcdLib
+  DxeServicesLib
+  MemoryAllocationLib
+  DevicePathLib
+  HiiLib
+  PrintLib
+  PlatformHookLib
+
+[Guids]
+  gEfiEndOfDxeEventGroupGuid
+
+[Protocols]
+  gEfiGenericMemTestProtocolGuid  ## CONSUMES
+  gEfiGraphicsOutputProtocolGuid  ## CONSUMES
+  gEfiUgaDrawProtocolGuid         ## CONSUMES
+  gEfiBootLogoProtocolGuid        ## CONSUMES
+  gEfiDxeSmmReadyToLockProtocolGuid
+  gEfiSmmAccess2ProtocolGuid
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut
+  gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConInConnectOnDemand
+  gUefiPayloadPkgTokenSpaceGuid.PcdShellFile
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits

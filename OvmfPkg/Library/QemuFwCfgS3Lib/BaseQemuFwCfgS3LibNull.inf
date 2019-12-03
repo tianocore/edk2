@@ -1,0 +1,38 @@
+## @file
+# Base Null library instance of the QemuFwCfgS3Lib class.
+#
+# This library instance returns constant FALSE from QemuFwCfgS3Enabled(), and
+# all other library functions trigger assertion failures. It is suitable for
+# QEMU targets and machine types that never enable S3.
+#
+#  Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (C) 2017, Red Hat, Inc.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 1.25
+  BASE_NAME                      = BaseQemuFwCfgS3LibNull
+  FILE_GUID                      = EA7D2B69-D221-4950-9C2C-C38A65BCC96E
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = QemuFwCfgS3Lib
+
+#
+# The following information is for reference only and not required by the build
+# tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64 EBC
+#
+
+[Sources]
+  QemuFwCfgS3Base.c
+  QemuFwCfgS3BasePei.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  DebugLib

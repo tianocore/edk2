@@ -2,14 +2,8 @@
   Intel FSP API definition from Intel Firmware Support Package External
   Architecture Specification v2.0.
 
-  Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2014 - 2019, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -216,13 +210,13 @@ EFI_STATUS
   and defined for each FSP binary. This will be documented in Integration guide with
   each FSP release.
   After FspMemInit completes its execution, it passes the pointer to the HobList and
-  returns to the boot loader from where it was called. BootLoader is responsible to 
-  migrate it's stack and data to Memory.
+  returns to the boot loader from where it was called. BootLoader is responsible to
+  migrate its stack and data to Memory.
   FspMemoryInit, TempRamExit and FspSiliconInit APIs provide an alternate method to
   complete the silicon initialization and provides bootloader an opportunity to get
   control after system memory is available and before the temporary RAM is torn down.
 
-  @param[in]  FspmUpdDataPtr          Pointer to the FSPM_UPD data sructure.
+  @param[in]  FspmUpdDataPtr          Pointer to the FSPM_UPD data structure.
   @param[out] HobListPtr              Pointer to receive the address of the HOB list.
 
   @retval EFI_SUCCESS                 FSP execution environment was initialized successfully.
@@ -277,7 +271,7 @@ EFI_STATUS
   @retval EFI_INVALID_PARAMETER       Input parameters are invalid.
   @retval EFI_UNSUPPORTED             The FSP calling conditions were not met.
   @retval EFI_DEVICE_ERROR            FSP initialization failed.
-  @retval FSP_STATUS_RESET_REQUIREDx  A reset is reuired. These status codes will not be returned during S3.
+  @retval FSP_STATUS_RESET_REQUIREDx  A reset is required. These status codes will not be returned during S3.
 **/
 typedef
 EFI_STATUS

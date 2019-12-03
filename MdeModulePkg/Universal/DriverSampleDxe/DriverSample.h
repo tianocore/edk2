@@ -1,13 +1,7 @@
 /** @file
 
-Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 Module Name:
 
@@ -33,6 +27,7 @@ Revision History
 #include <Protocol/HiiString.h>
 #include <Protocol/FormBrowserEx.h>
 #include <Protocol/HiiConfigKeyword.h>
+#include <Protocol/HiiPopup.h>
 
 #include <Guid/MdeModuleHii.h>
 #include <Library/DebugLib.h>
@@ -84,6 +79,8 @@ typedef struct {
   EFI_HII_HANDLE                   HiiHandle[2];
   DRIVER_SAMPLE_CONFIGURATION      Configuration;
   MY_EFI_VARSTORE_DATA             VarStoreConfig;
+  MY_EFI_BITS_VARSTORE_DATA        BitsVarStoreConfig;
+  MY_EFI_UNION_DATA                UnionConfig;
 
   //
   // Name/Value storage Name list
@@ -98,6 +95,7 @@ typedef struct {
   EFI_HII_STRING_PROTOCOL          *HiiString;
   EFI_HII_CONFIG_ROUTING_PROTOCOL  *HiiConfigRouting;
   EFI_CONFIG_KEYWORD_HANDLER_PROTOCOL *HiiKeywordHandler;
+  EFI_HII_POPUP_PROTOCOL              *HiiPopup;
 
   EFI_FORM_BROWSER2_PROTOCOL       *FormBrowser2;
 

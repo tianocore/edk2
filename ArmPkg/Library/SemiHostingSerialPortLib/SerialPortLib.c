@@ -3,13 +3,7 @@
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -109,7 +103,7 @@ SerialPortWrite (
   @param  NumberOfBytes    Number of output bytes which are cached in Buffer.
 
   @retval 0                Read data failed.
-  @retval !0               Aactual number of bytes read from serial device.
+  @retval !0               Actual number of bytes read from serial device.
 
 **/
 UINTN
@@ -126,10 +120,10 @@ SerialPortRead (
 
 
 /**
-  Check to see if any data is avaiable to be read from the debug device.
+  Check to see if any data is available to be read from the debug device.
 
-  @retval TRUE       At least one byte of data is avaiable to be read
-  @retval FALSE      No data is avaiable to be read
+  @retval TRUE       At least one byte of data is available to be read
+  @retval FALSE      No data is available to be read
 
 **/
 BOOLEAN

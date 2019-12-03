@@ -1,14 +1,8 @@
 ## @file
 # Provides drivers and definitions to support fsp in EDKII bios.
 #
-# Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
-# This program and the accompanying materials are licensed and made available under
-# the terms and conditions of the BSD License that accompanies this distribution.
-# The full text of the license may be found at
-# http://opensource.org/licenses/bsd-license.php.
-#
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
 
@@ -71,9 +65,8 @@
   ## Indicate the PEI memory size platform want to report
   gIntelFsp2WrapperTokenSpaceGuid.PcdPeiRecoveryMinMemSize|0x3000000|UINT32|0x40000005
 
-  ## This is the base address of FSP-T/M/S
+  ## This is the base address of FSP-T
   gIntelFsp2WrapperTokenSpaceGuid.PcdFsptBaseAddress|0x00000000|UINT32|0x00000300
-  gIntelFsp2WrapperTokenSpaceGuid.PcdFspmBaseAddress|0x00000000|UINT32|0x00000301
 
   ## This PCD indicates if FSP APIs are skipped from FSP wrapper.<BR><BR>
   #  If a bit is set, that means this FSP API is skipped.<BR>
@@ -93,6 +86,25 @@
   # @Prompt Skip FSP API from FSP wrapper.
   gIntelFsp2WrapperTokenSpaceGuid.PcdSkipFspApi|0x00000000|UINT32|0x40000009
 
+  ## This PCD decides how Wrapper code utilizes FSP
+  # 0: DISPATCH mode (FSP Wrapper will load PeiCore from FSP without calling FSP API)
+  # 1: API mode (FSP Wrapper will call FSP API)
+  #
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspModeSelection|0x00000001|UINT8|0x4000000A
+
 [PcdsFixedAtBuild, PcdsPatchableInModule,PcdsDynamic,PcdsDynamicEx]
+  #
+  ## These are the base address of FSP-M/S
+  #
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspmBaseAddress|0x00000000|UINT32|0x00001000
   gIntelFsp2WrapperTokenSpaceGuid.PcdFspsBaseAddress|0x00000000|UINT32|0x00001001
-  
+  #
+  # To provide flexibility for platform to pre-allocate FSP UPD buffer
+  #
+  # The PCDs define the pre-allocated FSPM and FSPS UPD Data Buffer Address.
+  # 0x00000000 - Platform will not pre-allocate UPD buffer before FspWrapper module
+  # non-zero   - Platform will pre-allocate UPD buffer and patch this value to
+  #              buffer address before FspWrapper module executing.
+  #
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspmUpdDataAddress|0x00000000|UINT32|0x50000000
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspsUpdDataAddress|0x00000000|UINT32|0x50000001

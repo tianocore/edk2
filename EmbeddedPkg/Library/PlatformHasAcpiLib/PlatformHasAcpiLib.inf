@@ -1,0 +1,34 @@
+## @file
+# A hook-in library for MdeModulePkg/Universal/Acpi/AcpiTableDxe.
+#
+# Plugging this library instance into AcpiTableDxe makes
+# EFI_ACPI_TABLE_PROTOCOL and (if enabled) EFI_ACPI_SDT_PROTOCOL depend on the
+# platform's dynamic decision whether to expose an ACPI-based hardware
+# description to the operating system.
+#
+# Universal and platform specific DXE drivers that produce ACPI tables depend
+# on EFI_ACPI_TABLE_PROTOCOL / EFI_ACPI_SDT_PROTOCOL in turn.
+#
+# Copyright (C) 2017, Red Hat, Inc.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 1.25
+  BASE_NAME                      = PlatformHasAcpiLib
+  FILE_GUID                      = 29beb028-0958-447b-be0a-12229235d77d
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PlatformHasAcpiLib|DXE_DRIVER
+  CONSTRUCTOR                    = PlatformHasAcpiInitialize
+
+[Sources]
+  PlatformHasAcpiLib.c
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+[Depex]
+  gEdkiiPlatformHasAcpiGuid

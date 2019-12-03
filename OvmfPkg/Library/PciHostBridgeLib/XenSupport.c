@@ -3,13 +3,7 @@
 
   Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials are licensed and made available
-  under the terms and conditions of the BSD License which accompanies this
-  distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT
-  WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 #include <PiDxe.h>
@@ -55,6 +49,22 @@ PcatPciRootBridgeBarExisted (
   EnableInterrupts ();
 }
 
+#define PCI_COMMAND_DECODE ((UINT16)(EFI_PCI_COMMAND_IO_SPACE | \
+                                     EFI_PCI_COMMAND_MEMORY_SPACE))
+STATIC
+VOID
+PcatPciRootBridgeDecodingDisable (
+  IN  UINTN                          Address
+  )
+{
+  UINT16                             Value;
+
+  Value = PciRead16 (Address);
+  if (Value & PCI_COMMAND_DECODE) {
+    PciWrite16 (Address, Value & ~(UINT32)PCI_COMMAND_DECODE);
+  }
+}
+
 STATIC
 VOID
 PcatPciRootBridgeParseBars (
@@ -66,9 +76,7 @@ PcatPciRootBridgeParseBars (
   IN UINTN                          BarOffsetEnd,
   IN PCI_ROOT_BRIDGE_APERTURE       *Io,
   IN PCI_ROOT_BRIDGE_APERTURE       *Mem,
-  IN PCI_ROOT_BRIDGE_APERTURE       *MemAbove4G,
-  IN PCI_ROOT_BRIDGE_APERTURE       *PMem,
-  IN PCI_ROOT_BRIDGE_APERTURE       *PMemAbove4G
+  IN PCI_ROOT_BRIDGE_APERTURE       *MemAbove4G
 
 )
 {
@@ -82,6 +90,11 @@ PcatPciRootBridgeParseBars (
   UINT64                            Length;
   UINT64                            Limit;
   PCI_ROOT_BRIDGE_APERTURE          *MemAperture;
+
+  // Disable address decoding for every device before OVMF starts sizing it
+  PcatPciRootBridgeDecodingDisable (
+    PCI_LIB_ADDRESS (Bus, Device, Function, PCI_COMMAND_OFFSET)
+  );
 
   for (Offset = BarOffsetBase; Offset < BarOffsetEnd; Offset += sizeof (UINT32)) {
     PcatPciRootBridgeBarExisted (
@@ -129,11 +142,7 @@ PcatPciRootBridgeParseBars (
           //
           Length = ((~Length) + 1) & 0xffffffff;
 
-          if ((Value & BIT3) == BIT3) {
-            MemAperture = PMem;
-          } else {
-            MemAperture = Mem;
-          }
+          MemAperture = Mem;
         } else {
           //
           // 64bit
@@ -149,8 +158,8 @@ PcatPciRootBridgeParseBars (
           Length = Length | LShiftU64 ((UINT64) UpperValue, 32);
           Length = (~Length) + 1;
 
-          if ((Value & BIT3) == BIT3) {
-            MemAperture = PMemAbove4G;
+          if (Base < BASE_4GB) {
+            MemAperture = Mem;
           } else {
             MemAperture = MemAbove4G;
           }
@@ -170,6 +179,8 @@ PcatPciRootBridgeParseBars (
   }
 }
 
+STATIC PCI_ROOT_BRIDGE_APERTURE mNonExistAperture = { MAX_UINT64, 0 };
+
 PCI_ROOT_BRIDGE *
 ScanForRootBridges (
   UINTN      *NumberOfRootBridges
@@ -186,7 +197,7 @@ ScanForRootBridges (
   UINT64     Base;
   UINT64     Limit;
   UINT64     Value;
-  PCI_ROOT_BRIDGE_APERTURE Io, Mem, MemAbove4G, PMem, PMemAbove4G, *MemAperture;
+  PCI_ROOT_BRIDGE_APERTURE Io, Mem, MemAbove4G, *MemAperture;
   PCI_ROOT_BRIDGE *RootBridges;
   UINTN      BarOffsetEnd;
 
@@ -202,8 +213,11 @@ ScanForRootBridges (
   for (PrimaryBus = 0; PrimaryBus <= PCI_MAX_BUS; PrimaryBus = SubBus + 1) {
     SubBus = PrimaryBus;
     Attributes = 0;
-    Io.Base = Mem.Base = MemAbove4G.Base = PMem.Base = PMemAbove4G.Base = MAX_UINT64;
-    Io.Limit = Mem.Limit = MemAbove4G.Limit = PMem.Limit = PMemAbove4G.Limit = 0;
+
+    ZeroMem (&Io, sizeof (Io));
+    ZeroMem (&Mem, sizeof (Mem));
+    ZeroMem (&MemAbove4G, sizeof (MemAbove4G));
+    Io.Base = Mem.Base = MemAbove4G.Base = MAX_UINT64;
     //
     // Scan all the PCI devices on the primary bus of the PCI root bridge
     //
@@ -308,16 +322,17 @@ ScanForRootBridges (
 
           //
           // Get the Prefetchable Memory range that the PPB is decoding
+          // and merge it into Memory range
           //
           Value = Pci.Bridge.PrefetchableMemoryBase & 0x0f;
           Base = ((UINT32) Pci.Bridge.PrefetchableMemoryBase & 0xfff0) << 16;
           Limit = (((UINT32) Pci.Bridge.PrefetchableMemoryLimit & 0xfff0)
                    << 16) | 0xfffff;
-          MemAperture = &PMem;
+          MemAperture = &Mem;
           if (Value == BIT0) {
             Base |= LShiftU64 (Pci.Bridge.PrefetchableBaseUpper32, 32);
             Limit |= LShiftU64 (Pci.Bridge.PrefetchableLimitUpper32, 32);
-            MemAperture = &PMemAbove4G;
+            MemAperture = &MemAbove4G;
           }
           if (Base < Limit) {
             if (MemAperture->Base > Base) {
@@ -368,8 +383,7 @@ ScanForRootBridges (
           OFFSET_OF (PCI_TYPE00, Device.Bar),
           BarOffsetEnd,
           &Io,
-          &Mem, &MemAbove4G,
-          &PMem, &PMemAbove4G
+          &Mem, &MemAbove4G
         );
 
         //
@@ -441,7 +455,7 @@ ScanForRootBridges (
       InitRootBridge (
         Attributes, Attributes, 0,
         (UINT8) PrimaryBus, (UINT8) SubBus,
-        &Io, &Mem, &MemAbove4G, &PMem, &PMemAbove4G,
+        &Io, &Mem, &MemAbove4G, &mNonExistAperture, &mNonExistAperture,
         &RootBridges[*NumberOfRootBridges]
       );
       RootBridges[*NumberOfRootBridges].ResourceAssigned = TRUE;

@@ -1,0 +1,14 @@
+///** @file
+//  This driver installs gEdkiiDebugPpiGuid PPI to provide
+//  debug services for PEIMs.
+//
+//  Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+//
+//  SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+//**/
+
+#string STR_MODULE_ABSTRACT             #language en-US "Provide debug services at PEI phase."
+
+#string STR_MODULE_DESCRIPTION          #language en-US "It produces gEdkiiDebugPpiGuid to print message to debug output device"
+

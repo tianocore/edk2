@@ -1,0 +1,50 @@
+## @file
+#  SSL/TLS Wrapper Library Instance based on OpenSSL.
+#
+#  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
+#  (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = TlsLib
+  MODULE_UNI_FILE                = TlsLib.uni
+  FILE_GUID                      = CC729DC5-4E21-0B36-1A00-3A8E1B86A155
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = TlsLib|DXE_DRIVER DXE_CORE UEFI_APPLICATION UEFI_DRIVER
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64
+#
+
+[Sources]
+  InternalTlsLib.h
+  TlsInit.c
+  TlsConfig.c
+  TlsProcess.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  CryptoPkg/CryptoPkg.dec
+
+[LibraryClasses]
+  BaseCryptLib
+  BaseMemoryLib
+  DebugLib
+  IntrinsicLib
+  MemoryAllocationLib
+  OpensslLib
+  SafeIntLib
+
+[BuildOptions]
+  #
+  # suppress the following warnings so we do not break the build with warnings-as-errors:
+  # C4090: 'function' : different 'const' qualifiers
+  #
+  MSFT:*_*_*_CC_FLAGS = /wd4090
+

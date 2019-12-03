@@ -1,15 +1,8 @@
 /** @file
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 
-This program and the accompanying materials
-are licensed and made available under the terms and conditions
-of the BSD License which accompanies this distribution.  The
-full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -37,10 +30,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/PcdLib.h>
 #include <Library/ReportStatusCodeLib.h>
 #include <Library/DebugAgentLib.h>
+#include <Library/MemoryAllocationLib.h>
 #include <IndustryStandard/PeImage.h>
 #include "Common/CommonHeader.h"
 
-#ifdef MDE_CPU_IA32 
+#ifdef MDE_CPU_IA32
 
 #pragma pack(1)
 
@@ -79,7 +73,7 @@ typedef union {
     UINT64  CacheDisabled:1;          // 0 = Cached, 1=Non-Cached
     UINT64  Accessed:1;               // 0 = Not accessed, 1 = Accessed (set by CPU)
     UINT64  Dirty:1;                  // 0 = Not Dirty, 1 = written by processor on access to page
-    UINT64  MustBe1:1;                // Must be 1 
+    UINT64  MustBe1:1;                // Must be 1
     UINT64  Global:1;                 // 0 = Not global page, 1 = global page TLB not cleared on CR3 write
     UINT64  Available:3;              // Available for use by system software
     UINT64  PAT:1;                    //
@@ -103,7 +97,7 @@ typedef union {
     UINT64  CacheDisabled:1;          // 0 = Cached, 1=Non-Cached
     UINT64  Accessed:1;               // 0 = Not accessed, 1 = Accessed (set by CPU)
     UINT64  Dirty:1;                  // 0 = Not Dirty, 1 = written by processor on access to page
-    UINT64  MustBe1:1;                // Must be 1 
+    UINT64  MustBe1:1;                // Must be 1
     UINT64  Global:1;                 // 0 = Not global page, 1 = global page TLB not cleared on CR3 write
     UINT64  Available:3;              // Available for use by system software
     UINT64  PAT:1;                    //

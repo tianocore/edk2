@@ -1,15 +1,9 @@
 ## @file
 #  This modules produce the Load File Protocol for UEFI HTTP boot.
-# 
-#  Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
-#  This program and the accompanying materials
-#  are licensed and made available under the terms and conditions of the BSD License
-#  which accompanies this distribution.  The full text of the license may be found at
-#  http://opensource.org/licenses/bsd-license.php
-#  
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-#  
+#
+#  Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
 ##
 
 [Defines]
@@ -60,6 +54,7 @@
   HttpLib
   HiiLib
   PrintLib
+  DpcLib
   UefiHiiServicesLib
   UefiBootManagerLib
 
@@ -67,7 +62,7 @@
   ## TO_START
   ## BY_START
   gEfiDevicePathProtocolGuid
-  
+
   gEfiLoadFileProtocolGuid                        ## BY_START
   gEfiHttpServiceBindingProtocolGuid              ## CONSUMES
   gEfiHttpProtocolGuid                            ## CONSUMES
@@ -84,6 +79,8 @@
   gEfiNetworkInterfaceIdentifierProtocolGuid_31   ## SOMETIMES_CONSUMES
   gEfiRamDiskProtocolGuid                         ## SOMETIMES_CONSUMES
   gEfiHiiConfigAccessProtocolGuid                 ## BY_START
+  gEfiHttpBootCallbackProtocolGuid                ## SOMETIMES_PRODUCES
+  gEfiAdapterInformationProtocolGuid              ## SOMETIMES_CONSUMES
 
 [Guids]
   ## SOMETIMES_CONSUMES ## GUID # HiiIsConfigHdrMatch   mHttpBootConfigStorageName
@@ -93,6 +90,10 @@
   gHttpBootConfigGuid
   gEfiVirtualCdGuid            ## SOMETIMES_CONSUMES ## GUID
   gEfiVirtualDiskGuid          ## SOMETIMES_CONSUMES ## GUID
+  gEfiAdapterInfoUndiIpv6SupportGuid             ## SOMETIMES_CONSUMES ## GUID
+
+[Pcd]
+  gEfiNetworkPkgTokenSpaceGuid.PcdAllowHttpConnections       ## CONSUMES
 
 [UserExtensions.TianoCore."ExtraFiles"]
   HttpBootDxeExtra.uni

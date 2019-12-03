@@ -2,13 +2,7 @@
   Initialization routines.
 
 Copyright (c) 2005 - 2013, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available
-under the terms and conditions of the BSD License which accompanies this
-distribution. The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -22,7 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @param  Handle                - The handle of parent device.
   @param  DiskIo                - The DiskIo of parent device.
   @param  DiskIo2               - The DiskIo2 of parent device.
-  @param  BlockIo               - The BlockIo of parent devicel
+  @param  BlockIo               - The BlockIo of parent device.
 
   @retval EFI_SUCCESS           - Allocate a new volume successfully.
   @retval EFI_OUT_OF_RESOURCES  - Can not allocate the memory.

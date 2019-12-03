@@ -1,14 +1,8 @@
 /** @file
   Provides interface to EFI_FILE_HANDLE functionality.
 
-  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -16,6 +10,7 @@
 #define _FILE_HANDLE_LIBRARY_HEADER_
 
 #include <Protocol/SimpleFileSystem.h>
+#include <Guid/FileInfo.h>
 
 /// The tag for use in identifying UNICODE files.
 /// If the file is UNICODE, the first 16 bits of the file will equal this value.
@@ -248,8 +243,8 @@ FileHandleFlush (
   @param[in] DirHandle          Handle to open file.
 
   @retval EFI_SUCCESS           DirHandle is a directory.
-  @retval EFI_INVALID_PARAMETER DirHandle is NULL. 
-                                The file information returns from FileHandleGetInfo is NULL. 
+  @retval EFI_INVALID_PARAMETER DirHandle is NULL.
+                                The file information returns from FileHandleGetInfo is NULL.
   @retval EFI_NOT_FOUND         DirHandle is not a directory.
 **/
 EFI_STATUS
@@ -356,8 +351,8 @@ FileHandleSetSize (
 
 /**
   Function to get a full filename given a EFI_FILE_HANDLE somewhere lower on the
-  directory 'stack'. If the file is a directory, then append the '\' char at the 
-  end of name string. If it's not a directory, then the last '\' should not be 
+  directory 'stack'. If the file is a directory, then append the '\' char at the
+  end of name string. If it's not a directory, then the last '\' should not be
   added.
 
   @param[in] Handle             Handle to the Directory or File to create path to.
@@ -438,11 +433,11 @@ FileHandleReturnLine(
 
 /**
   Function to write a line of text to a file.
-  
-  If the file is a Unicode file (with UNICODE file tag) then write the unicode 
+
+  If the file is a Unicode file (with UNICODE file tag) then write the unicode
   text.
   If the file is an ASCII file then write the ASCII text.
-  If the size of file is zero (without file tag at the beginning) then write 
+  If the size of file is zero (without file tag at the beginning) then write
   ASCII text as default.
 
   @param[in]     Handle         FileHandle to write to.
@@ -452,7 +447,7 @@ FileHandleReturnLine(
   @retval  EFI_SUCCESS            The data was written.
                                   Buffer is NULL.
   @retval  EFI_INVALID_PARAMETER  Handle is NULL.
-  @retval  EFI_OUT_OF_RESOURCES   Unable to allocate temporary space for ASCII 
+  @retval  EFI_OUT_OF_RESOURCES   Unable to allocate temporary space for ASCII
                                   string due to out of resources.
 
   @sa FileHandleWrite

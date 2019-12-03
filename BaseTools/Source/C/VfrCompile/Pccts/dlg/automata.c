@@ -90,7 +90,7 @@ set nfa_states;
 	if (dfa_size<=dfa_allocated){
 		/* need to redo array */
 		if (!dfa_array){
-			/* need some to do inital allocation */
+			/* need some to do initial allocation */
 			dfa_size=dfa_allocated+DFA_MIN;
 			dfa_array=(dfa_node **) malloc(sizeof(dfa_node*)*
 				dfa_size);
@@ -113,7 +113,7 @@ set nfa_states;
 }
 
 
-/* past a pointer to the start start of the nfa graph
+/* past a pointer to the start of the nfa graph
  * nfa_to_dfa convers this graph to dfa.  The function returns
  * a pointer to the first dfa state.
  * NOTE:  The function that prints out the table will have to figure out how
@@ -219,7 +219,7 @@ FILE *f;
 #endif
 
 /* Returns a pointer to a dfa node that has the same nfa nodes in it.
- * This may or maynot be a newly created node.
+ * This may or may not be a newly created node.
  */
 dfa_node *
 #ifdef __USE_PROTOS

@@ -2,21 +2,15 @@
   Main file for NULL named library for level 1 shell command functions.
 
   (C) Copyright 2013 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include "UefiShellLevel1CommandsLib.h"
 
 STATIC CONST CHAR16 mFileName[] = L"ShellCommands";
-EFI_HANDLE gShellLevel1HiiHandle = NULL;
+EFI_HII_HANDLE gShellLevel1HiiHandle = NULL;
 
 /**
   Return the help text filename.  Only used if no HII information found.
@@ -103,18 +97,18 @@ ShellLevel1CommandsLibDestructor (
   It functions so that count starts at 1 and it increases or decreases when it
   hits the specified tags.  when it hits zero the location has been found.
 
-  DecrementerTag and IncrementerTag are used to get around for/endfor and 
+  DecrementerTag and IncrementerTag are used to get around for/endfor and
   similar paired types where the entire middle should be ignored.
 
   If label is used it will be used instead of the count.
 
-  @param[in] Function          The function to use to enumerate through the 
+  @param[in] Function          The function to use to enumerate through the
                                list.  Normally GetNextNode or GetPreviousNode.
   @param[in] DecrementerTag    The tag to decrement the count at.
   @param[in] IncrementerTag    The tag to increment the count at.
   @param[in] Label             A label to look for.
   @param[in, out] ScriptFile   The pointer to the current script file structure.
-  @param[in] MovePast          TRUE makes function return 1 past the found 
+  @param[in] MovePast          TRUE makes function return 1 past the found
                                location.
   @param[in] FindOnly          TRUE to not change the ScriptFile.
   @param[in] CommandNode       The pointer to the Node to test.
@@ -227,21 +221,21 @@ TestNodeForMove (
   It functions so that count starts at 1 and it increases or decreases when it
   hits the specified tags.  when it hits zero the location has been found.
 
-  DecrementerTag and IncrementerTag are used to get around for/endfor and 
+  DecrementerTag and IncrementerTag are used to get around for/endfor and
   similar paired types where the entire middle should be ignored.
 
   If label is used it will be used instead of the count.
 
-  @param[in] Function          The function to use to enumerate through the 
+  @param[in] Function          The function to use to enumerate through the
                                list.  Normally GetNextNode or GetPreviousNode.
   @param[in] DecrementerTag    The tag to decrement the count at.
   @param[in] IncrementerTag    The tag to increment the count at.
   @param[in] Label             A label to look for.
   @param[in, out] ScriptFile   The pointer to the current script file structure.
-  @param[in] MovePast          TRUE makes function return 1 past the found 
+  @param[in] MovePast          TRUE makes function return 1 past the found
                                location.
   @param[in] FindOnly          TRUE to not change the ScriptFile.
-  @param[in] WrapAroundScript  TRUE to wrap end-to-begining or vise versa in 
+  @param[in] WrapAroundScript  TRUE to wrap end-to-begining or vise versa in
                                searching.
 **/
 BOOLEAN

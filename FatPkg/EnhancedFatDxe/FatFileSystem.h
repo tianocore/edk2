@@ -1,14 +1,8 @@
 /** @file
   Definitions for on-disk FAT structures.
 
-Copyright (c) 2005, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available
-under the terms and conditions of the BSD License which accompanies this
-distribution. The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2005 - 2017, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 
 **/
@@ -26,7 +20,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // FAT entry values
 //
-#define FAT_CLUSTER_SPECIAL_EXT       (-1 & (~0xF))
+#define FAT_CLUSTER_SPECIAL_EXT       (MAX_UINTN & (~0xF))
 #define FAT_CLUSTER_SPECIAL           ((FAT_CLUSTER_SPECIAL_EXT) | 0x07)
 #define FAT_CLUSTER_FREE              0
 #define FAT_CLUSTER_RESERVED          (FAT_CLUSTER_SPECIAL)

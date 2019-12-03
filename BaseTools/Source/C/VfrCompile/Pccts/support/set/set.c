@@ -554,7 +554,7 @@ register char *s;
 	static set a;
 	register unsigned *p, *endp;
 
-	set_new(a, strlen(s));
+	set_new(a, (unsigned) strlen(s));
 	p = a.setword;
 	endp = &(a.setword[a.n]);
 	do {

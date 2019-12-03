@@ -1,13 +1,7 @@
 /** @file
 
 Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 
 **/
@@ -70,7 +64,7 @@ GetDirNameFromFullPath (
 
 /**
 
-  Construct full path accroding to dir and file path.
+  Construct full path according to dir and file path.
 
   @param  DirPath         - dir path
   @param  FilePath        - file path
@@ -127,7 +121,7 @@ EdbSymbolTypeToStr (
 
 /**
 
-  Find the symbol accroding to address and display symbol.
+  Find the symbol according to address and display symbol.
 
   @param  Address         - SymbolAddress
   @param  DebuggerPrivate - EBC Debugger private data structure
@@ -149,7 +143,7 @@ DebuggerDisplaySymbolAccrodingToAddress (
   // Find the nearest symbol address
   //
   CandidateAddress = EbdFindSymbolAddress (Address, EdbMatchSymbolTypeNearestAddress, &Object, &Entry);
-  if (CandidateAddress == 0 || CandidateAddress == (UINTN) -1) {
+  if (CandidateAddress == 0 || CandidateAddress == (UINTN) -1 || Entry == NULL) {
     EDBPrint (L"Symbole at Address not found!\n");
     return EFI_DEBUG_CONTINUE;
   } else if (Address != CandidateAddress) {
@@ -166,7 +160,7 @@ DebuggerDisplaySymbolAccrodingToAddress (
 //  EDBPrint (L"  0xFFFFFFFF00000000 ( F) TestMain\n");
     EDBPrint (
       L"  0x%016lx %s %a\n",
-      (UINT64)Entry->RVA + Object->BaseAddress,
+      (UINT64)Entry->Rva + Object->BaseAddress,
       EdbSymbolTypeToStr (Entry->Type),
       Entry->Name
       );
@@ -176,7 +170,7 @@ DebuggerDisplaySymbolAccrodingToAddress (
 //  EDBPrint (L"  0xFFFF0000 ( F) TestMain\n");
     EDBPrint (
       L"  0x%08x %s %a\n",
-      Entry->RVA + Object->BaseAddress,
+      Entry->Rva + Object->BaseAddress,
       EdbSymbolTypeToStr (Entry->Type),
       Entry->Name
       );
@@ -190,7 +184,7 @@ DebuggerDisplaySymbolAccrodingToAddress (
 
 /**
 
-  Find the symbol accroding to name and display symbol.
+  Find the symbol according to name and display symbol.
 
   @param  SymbolFileName  - The Symbol File Name, NULL means for all
   @param  SymbolName      - The Symbol Name, NULL means for all
@@ -273,7 +267,7 @@ DebuggerDisplaySymbolAccrodingToName (
       if (sizeof(UINTN) == sizeof(UINT64)) {
         EDBPrint (
           L"  0x%016lx %s %a (%a)\n",
-          (UINT64)Entry->RVA + Object->BaseAddress,
+          (UINT64)Entry->Rva + Object->BaseAddress,
           EdbSymbolTypeToStr (Entry->Type),
           Entry->Name,
           Entry->ObjName
@@ -281,7 +275,7 @@ DebuggerDisplaySymbolAccrodingToName (
       } else {
         EDBPrint (
           L"  0x%08x %s %a (%a)\n",
-          Entry->RVA + Object->BaseAddress,
+          Entry->Rva + Object->BaseAddress,
           EdbSymbolTypeToStr (Entry->Type),
           Entry->Name,
           Entry->ObjName

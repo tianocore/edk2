@@ -1,16 +1,10 @@
 ## @file
-# This file is used to define class objects of INF file [Binaries] section. 
-# It will consumed by InfParser. 
+# This file is used to define class objects of INF file [Binaries] section.
+# It will consumed by InfParser.
 #
-# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
-# This program and the accompanying materials are licensed and made available 
-# under the terms and conditions of the BSD License which accompanies this 
-# distribution. The full text of the license may be found at 
-# http://opensource.org/licenses/bsd-license.php
-#
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
 
 '''
 InfBinaryObject
@@ -117,7 +111,7 @@ class InfBianryCommonItem(InfBianryItem, CurrentLine):
         self.Family = Family
     def GetFamily(self):
         return self.Family
-    
+
     def SetGuidValue(self, GuidValue):
         self.GuidValue = GuidValue
     def GetGuidValue(self):
@@ -228,7 +222,7 @@ class InfBinariesObject(InfSectionCommonDef):
                                  Line=VerCurrentLine.GetLineNo(),
                                  ExtraData=VerCurrentLine.GetLineString())
                 #
-                # Validate Feature Flag Express   
+                # Validate Feature Flag Express
                 #
                 FeatureFlagRtv = IsValidFeatureFlagExp(VerContent[3].\
                                                        strip())
@@ -246,15 +240,15 @@ class InfBinariesObject(InfSectionCommonDef):
             #
             # Determine binary file name duplicate. Follow below rule:
             #
-            # A binary filename must not be duplicated within 
-            # a [Binaries] section. A binary filename may appear in 
-            # multiple architectural [Binaries] sections. A binary 
-            # filename listed in an architectural [Binaries] section 
-            # must not be listed in the common architectural 
+            # A binary filename must not be duplicated within
+            # a [Binaries] section. A binary filename may appear in
+            # multiple architectural [Binaries] sections. A binary
+            # filename listed in an architectural [Binaries] section
+            # must not be listed in the common architectural
             # [Binaries] section.
-            # 
+            #
             # NOTE: This check will not report error now.
-            # 
+            #
             for Item in self.Binaries:
                 if Item.GetFileName() == InfBianryVerItemObj.GetFileName():
                     ItemSupArchList = Item.GetSupArchList()
@@ -271,8 +265,8 @@ class InfBinariesObject(InfSectionCommonDef):
                                 #
                                 pass
 
-            if InfBianryVerItemObj != None:
-                if self.Binaries.has_key((InfBianryVerItemObj)):
+            if InfBianryVerItemObj is not None:
+                if (InfBianryVerItemObj) in self.Binaries:
                     BinariesList = self.Binaries[InfBianryVerItemObj]
                     BinariesList.append((InfBianryVerItemObj, VerComment))
                     self.Binaries[InfBianryVerItemObj] = BinariesList
@@ -315,7 +309,7 @@ class InfBinariesObject(InfSectionCommonDef):
                                  Line=CurrentLineOfItem.GetLineNo(),
                                  ExtraData=CurrentLineOfItem.GetLineString())
                     return False
-                
+
             if len(ItemContent) > 7:
                 Logger.Error("InfParser",
                              ToolError.FORMAT_INVALID,
@@ -335,7 +329,7 @@ class InfBinariesObject(InfSectionCommonDef):
                 BinaryFileType = ItemContent[0].strip()
                 if BinaryFileType == 'RAW' or BinaryFileType == 'ACPI' or BinaryFileType == 'ASL':
                     BinaryFileType = 'BIN'
-                    
+
                 if BinaryFileType not in DT.BINARY_FILE_TYPE_LIST:
                     Logger.Error("InfParser",
                                  ToolError.FORMAT_INVALID,
@@ -344,10 +338,10 @@ class InfBinariesObject(InfSectionCommonDef):
                                  File=CurrentLineOfItem.GetFileName(),
                                  Line=CurrentLineOfItem.GetLineNo(),
                                  ExtraData=CurrentLineOfItem.GetLineString())
-                    
+
                 if BinaryFileType == 'SUBTYPE_GUID':
                     BinaryFileType = 'FREEFORM'
-                    
+
                 if BinaryFileType == 'LIB' or BinaryFileType == 'UEFI_APP':
                     Logger.Error("InfParser",
                                  ToolError.FORMAT_INVALID,
@@ -407,7 +401,7 @@ class InfBinariesObject(InfSectionCommonDef):
                 #
                 if BinaryFileType != 'FREEFORM':
                     InfBianryCommonItemObj.SetTarget(ItemContent[2])
-                    
+
             if len(ItemContent) >= 4:
                 #
                 # Add Family information
@@ -416,13 +410,13 @@ class InfBinariesObject(InfSectionCommonDef):
                     InfBianryCommonItemObj.SetFamily(ItemContent[3])
                 else:
                     InfBianryCommonItemObj.SetTarget(ItemContent[3])
-                    
+
             if len(ItemContent) >= 5:
                 #
-                # TagName entries are build system specific. If there 
-                # is content in the entry, the tool must exit 
+                # TagName entries are build system specific. If there
+                # is content in the entry, the tool must exit
                 # gracefully with an error message that indicates build
-                # system specific content cannot be distributed using 
+                # system specific content cannot be distributed using
                 # the UDP
                 #
                 if BinaryFileType != 'FREEFORM':
@@ -435,7 +429,7 @@ class InfBinariesObject(InfSectionCommonDef):
                                      ExtraData=CurrentLineOfItem.GetLineString())
                 else:
                     InfBianryCommonItemObj.SetFamily(ItemContent[4])
-                    
+
             if len(ItemContent) >= 6:
                 #
                 # Add FeatureFlagExp
@@ -449,7 +443,7 @@ class InfBinariesObject(InfSectionCommonDef):
                                      Line=CurrentLineOfItem.GetLineNo(),
                                      ExtraData=CurrentLineOfItem.GetLineString())
                     #
-                    # Validate Feature Flag Express   
+                    # Validate Feature Flag Express
                     #
                     FeatureFlagRtv = IsValidFeatureFlagExp(ItemContent[5].strip())
                     if not FeatureFlagRtv[0]:
@@ -468,7 +462,7 @@ class InfBinariesObject(InfSectionCommonDef):
                                      File=CurrentLineOfItem.GetFileName(),
                                      Line=CurrentLineOfItem.GetLineNo(),
                                      ExtraData=CurrentLineOfItem.GetLineString())
-                        
+
             if len(ItemContent) == 7:
                 if ItemContent[6].strip() == '':
                     Logger.Error("InfParser",
@@ -478,7 +472,7 @@ class InfBinariesObject(InfSectionCommonDef):
                                      Line=CurrentLineOfItem.GetLineNo(),
                                      ExtraData=CurrentLineOfItem.GetLineString())
                 #
-                # Validate Feature Flag Express   
+                # Validate Feature Flag Express
                 #
                 FeatureFlagRtv = IsValidFeatureFlagExp(ItemContent[6].strip())
                 if not FeatureFlagRtv[0]:
@@ -495,15 +489,15 @@ class InfBinariesObject(InfSectionCommonDef):
             #
             # Determine binary file name duplicate. Follow below rule:
             #
-            # A binary filename must not be duplicated within 
-            # a [Binaries] section. A binary filename may appear in 
-            # multiple architectural [Binaries] sections. A binary 
-            # filename listed in an architectural [Binaries] section 
-            # must not be listed in the common architectural 
+            # A binary filename must not be duplicated within
+            # a [Binaries] section. A binary filename may appear in
+            # multiple architectural [Binaries] sections. A binary
+            # filename listed in an architectural [Binaries] section
+            # must not be listed in the common architectural
             # [Binaries] section.
-            # 
+            #
             # NOTE: This check will not report error now.
-            # 
+            #
 #            for Item in self.Binaries:
 #                if Item.GetFileName() == InfBianryCommonItemObj.GetFileName():
 #                    ItemSupArchList = Item.GetSupArchList()
@@ -521,8 +515,8 @@ class InfBinariesObject(InfSectionCommonDef):
 #                                #
 #                                pass
 
-            if InfBianryCommonItemObj != None:
-                if self.Binaries.has_key((InfBianryCommonItemObj)):
+            if InfBianryCommonItemObj is not None:
+                if (InfBianryCommonItemObj) in self.Binaries:
                     BinariesList = self.Binaries[InfBianryCommonItemObj]
                     BinariesList.append((InfBianryCommonItemObj, ItemComment))
                     self.Binaries[InfBianryCommonItemObj] = BinariesList
@@ -537,16 +531,16 @@ class InfBinariesObject(InfSectionCommonDef):
         for ArchItem in ArchList:
             #
             # Validate Arch
-            #            
-            if (ArchItem == '' or ArchItem == None):
+            #
+            if (ArchItem == '' or ArchItem is None):
                 ArchItem = 'COMMON'
             __SupArchList.append(ArchItem)
 
-        if UiInf != None:
+        if UiInf is not None:
             if len(UiInf) > 0:
                 #
                 # Check UI
-                #                    
+                #
                 for UiItem in UiInf:
                     IsValidFileFlag = False
                     InfBianryUiItemObj = None
@@ -630,7 +624,7 @@ class InfBinariesObject(InfSectionCommonDef):
                                          Line=UiCurrentLine.GetLineNo(),
                                          ExtraData=UiCurrentLine.GetLineString())
                         #
-                        # Validate Feature Flag Express   
+                        # Validate Feature Flag Express
                         #
                         FeatureFlagRtv = IsValidFeatureFlagExp(UiContent[3].strip())
                         if not FeatureFlagRtv[0]:
@@ -647,15 +641,15 @@ class InfBinariesObject(InfSectionCommonDef):
                     #
                     # Determine binary file name duplicate. Follow below rule:
                     #
-                    # A binary filename must not be duplicated within 
-                    # a [Binaries] section. A binary filename may appear in 
-                    # multiple architectural [Binaries] sections. A binary 
-                    # filename listed in an architectural [Binaries] section 
-                    # must not be listed in the common architectural 
+                    # A binary filename must not be duplicated within
+                    # a [Binaries] section. A binary filename may appear in
+                    # multiple architectural [Binaries] sections. A binary
+                    # filename listed in an architectural [Binaries] section
+                    # must not be listed in the common architectural
                     # [Binaries] section.
-                    # 
+                    #
                     # NOTE: This check will not report error now.
-                    # 
+                    #
 #                    for Item in self.Binaries:
 #                        if Item.GetFileName() == InfBianryUiItemObj.GetFileName():
 #                            ItemSupArchList = Item.GetSupArchList()
@@ -672,8 +666,8 @@ class InfBinariesObject(InfSectionCommonDef):
 #                                        #
 #                                        pass
 
-                    if InfBianryUiItemObj != None:
-                        if self.Binaries.has_key((InfBianryUiItemObj)):
+                    if InfBianryUiItemObj is not None:
+                        if (InfBianryUiItemObj) in self.Binaries:
                             BinariesList = self.Binaries[InfBianryUiItemObj]
                             BinariesList.append((InfBianryUiItemObj, UiComment))
                             self.Binaries[InfBianryUiItemObj] = BinariesList
@@ -681,7 +675,7 @@ class InfBinariesObject(InfSectionCommonDef):
                             BinariesList = []
                             BinariesList.append((InfBianryUiItemObj, UiComment))
                             self.Binaries[InfBianryUiItemObj] = BinariesList
-        if Ver != None and len(Ver) > 0:
+        if Ver is not None and len(Ver) > 0:
             self.CheckVer(Ver, __SupArchList)
         if CommonBinary and len(CommonBinary) > 0:
             self.ParseCommonBinary(CommonBinary, __SupArchList)

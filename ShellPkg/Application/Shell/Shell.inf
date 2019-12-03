@@ -2,14 +2,9 @@
 #  This is the shell application
 #
 #  (C) Copyright 2013 Hewlett-Packard Development Company, L.P.<BR>
-#  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 #
-#  This program and the accompanying materials
-#  are licensed and made available under the terms and conditions of the BSD License
-#  which accompanies this distribution. The full text of the license may be found at
-#  http://opensource.org/licenses/bsd-license.php
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 #
 ##
@@ -17,7 +12,7 @@
 [Defines]
   INF_VERSION                    = 0x00010006
   BASE_NAME                      = Shell
-  FILE_GUID                      = 7C04A583-9E3E-4f1c-AD65-E05268D0B4D1
+  FILE_GUID                      = 7C04A583-9E3E-4f1c-AD65-E05268D0B4D1 # gUefiShellFileGuid
   MODULE_TYPE                    = UEFI_APPLICATION
   VERSION_STRING                 = 1.0
   ENTRY_POINT                    = UefiMain
@@ -25,7 +20,7 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
 #
 
 [Sources]
@@ -102,10 +97,8 @@
   gEfiShellPkgTokenSpaceGuid.PcdShellRequireHiiPlatform     ## CONSUMES
   gEfiShellPkgTokenSpaceGuid.PcdShellSupportFrameworkHii    ## CONSUMES
   gEfiShellPkgTokenSpaceGuid.PcdShellPageBreakDefault       ## CONSUMES
-  gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize      ## CONSUMES
   gEfiShellPkgTokenSpaceGuid.PcdShellInsertModeDefault      ## CONSUMES
   gEfiShellPkgTokenSpaceGuid.PcdShellScreenLogCount         ## CONSUMES
-  gEfiShellPkgTokenSpaceGuid.PcdShellMapNameLength          ## CONSUMES
   gEfiShellPkgTokenSpaceGuid.PcdShellPrintBufferSize        ## CONSUMES
   gEfiShellPkgTokenSpaceGuid.PcdShellForceConsole           ## CONSUMES
   gEfiShellPkgTokenSpaceGuid.PcdShellSupplier               ## CONSUMES

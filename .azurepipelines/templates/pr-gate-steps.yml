@@ -1,0 +1,130 @@
+## @file
+# File templates/pr-gate-steps.yml
+#
+# template file containing the steps to build
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+parameters:
+  tool_chain_tag: ''
+  build_pkgs: ''
+  build_targets: ''
+  build_archs: ''
+
+steps:
+- checkout: self
+  clean: true
+  fetchDepth: 1
+
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '3.7.x'
+    architecture: 'x64'
+
+- script: pip install -r pip-requirements.txt --upgrade
+  displayName: 'Install/Upgrade pip modules'
+
+# Set default
+- bash: |
+    echo "##vso[task.setvariable variable=pkgs_to_build]${{ parameters.build_pkgs }}"
+    echo "##vso[task.setvariable variable=pkg_count]${{ 1 }}"
+
+# trim the package list if this is a PR
+- task: CmdLine@1
+  displayName: Check if ${{ parameters.build_pkgs }} need testing
+  inputs:
+    filename: stuart_pr_eval
+    arguments: -c .pytool/CISettings.py -p ${{ parameters.build_pkgs }} --pr-target origin/$(System.PullRequest.targetBranch) --output-csv-format-string "##vso[task.setvariable variable=pkgs_to_build;isOutpout=true]{pkgcsv}" --output-count-format-string "##vso[task.setvariable variable=pkg_count;isOutpout=true]{pkgcount}"
+  condition: eq(variables['Build.Reason'], 'PullRequest')
+
+# build basetools
+- template: basetools-build-steps.yml
+  parameters:
+    tool_chain_tag: ${{ parameters.tool_chain_tag }}
+
+# install spell check prereqs
+- template: spell-check-prereq-steps.yml
+
+# Build repo
+- task: CmdLine@1
+  displayName: Setup ${{ parameters.build_pkgs }} ${{ parameters.build_archs}}
+  inputs:
+    filename: stuart_setup
+    arguments: -c .pytool/CISettings.py -p $(pkgs_to_build) -t ${{ parameters.build_targets}} -a ${{ parameters.build_archs}} TOOL_CHAIN_TAG=${{ parameters.tool_chain_tag}}
+  condition: and(gt(variables.pkg_count, 0), succeeded())
+
+- task: CmdLine@1
+  displayName: Update ${{ parameters.build_pkgs }} ${{ parameters.build_archs}}
+  inputs:
+    filename: stuart_update
+    arguments: -c .pytool/CISettings.py -p $(pkgs_to_build) -t ${{ parameters.build_targets}} -a ${{ parameters.build_archs}} TOOL_CHAIN_TAG=${{ parameters.tool_chain_tag}}
+  condition: and(gt(variables.pkg_count, 0), succeeded())
+
+- task: CmdLine@1
+  displayName: Build and Test ${{ parameters.build_pkgs }} ${{ parameters.build_archs}}
+  inputs:
+    filename: stuart_ci_build
+    arguments: -c .pytool/CISettings.py -p $(pkgs_to_build) -t ${{ parameters.build_targets}} -a ${{ parameters.build_archs}} TOOL_CHAIN_TAG=${{ parameters.tool_chain_tag}}
+  condition: and(gt(variables.pkg_count, 0), succeeded())
+
+# Publish Test Results to Azure Pipelines/TFS
+- task: PublishTestResults@2
+  displayName: 'Publish junit test results'
+  continueOnError: true
+  condition: and( succeededOrFailed(),gt(variables.pkg_count, 0))
+  inputs:
+    testResultsFormat: 'JUnit' # Options: JUnit, NUnit, VSTest, xUnit
+    testResultsFiles: 'Build/TestSuites.xml'
+    #searchFolder: '$(System.DefaultWorkingDirectory)' # Optional
+    mergeTestResults: true # Optional
+    testRunTitle: $(System.JobName) # Optional
+    #buildPlatform: # Optional
+    #buildConfiguration: # Optional
+    publishRunAttachments: true # Optional
+
+# Publish Test Results to Azure Pipelines/TFS
+- task: PublishTestResults@2
+  displayName: 'Publish host based test results for $(System.JobName)'
+  continueOnError: true
+  condition: and( succeededOrFailed(), gt(variables.pkg_count, 0))
+  inputs:
+    testResultsFormat: 'JUnit' # Options: JUnit, NUnit, VSTest, xUnit
+    testResultsFiles: 'Build/**/*.result.xml'
+    #searchFolder: '$(System.DefaultWorkingDirectory)' # Optional
+    mergeTestResults: false # Optional
+    testRunTitle: ${{ parameters.build_pkgs }} # Optional
+    #buildPlatform: # Optional
+    #buildConfiguration: # Optional
+    publishRunAttachments: true # Optional
+
+# Copy the build logs to the artifact staging directory
+- task: CopyFiles@2
+  displayName: "Copy build logs"
+  inputs:
+    targetFolder: '$(Build.ArtifactStagingDirectory)'
+    SourceFolder: 'Build'
+    contents: |
+      BUILDLOG_*.txt
+      BUILDLOG_*.md
+      CI_*.txt
+      CI_*.md
+      CISETUP.txt
+      SETUPLOG.txt
+      UPDATE_LOG.txt
+      PREVALLOG.txt
+      TestSuites.xml
+      **/BUILD_TOOLS_REPORT.html
+      **/OVERRIDELOG.TXT
+    flattenFolders: true
+  condition: succeededOrFailed()
+
+# Publish build artifacts to Azure Artifacts/TFS or a file share
+- task: PublishBuildArtifacts@1
+  continueOnError: true
+  displayName: "Publish build logs"
+  inputs:
+    pathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    artifactName: 'Build Logs $(System.JobName)'
+  condition: succeededOrFailed()

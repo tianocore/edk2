@@ -4,14 +4,8 @@
   ALL CODE IN THE SERIALIO STACK MUST BE RE-ENTRANT AND CALLABLE FROM
   INTERRUPT CONTEXT
 
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -569,7 +563,7 @@ DebugPortRead (
     LocalBufferSize = *BufferSize - (BufferPtr - (UINT8 *) Buffer);
   } while (LocalBufferSize != 0 && Timeout > 0);
 
-  *BufferSize = (UINTN) (BufferPtr - (UINT8 *) Buffer);
+  *BufferSize = (UINTN) BufferPtr - (UINTN) Buffer;
 
   return Status;
 }

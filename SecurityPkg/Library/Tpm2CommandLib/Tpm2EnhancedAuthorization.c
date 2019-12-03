@@ -1,14 +1,8 @@
 /** @file
   Implement TPM2 EnhancedAuthorization related command.
 
-Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved. <BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved. <BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -87,7 +81,7 @@ typedef struct {
   @param[in]  Expiration         Time when authorization will expire, measured in seconds from the time that nonceTPM was generated.
   @param[out] Timeout            Time value used to indicate to the TPM when the ticket expires.
   @param[out] PolicyTicket       A ticket that includes a value indicating when the authorization expires.
-  
+
   @retval EFI_SUCCESS            Operation completed successfully.
   @retval EFI_DEVICE_ERROR       The command was unsuccessful.
 **/
@@ -120,7 +114,7 @@ Tpm2PolicySecret (
   SendBuffer.Header.commandCode = SwapBytes32(TPM_CC_PolicySecret);
   SendBuffer.AuthHandle = SwapBytes32 (AuthHandle);
   SendBuffer.PolicySession = SwapBytes32 (PolicySession);
-  
+
   //
   // Add in Auth session
   //
@@ -148,7 +142,7 @@ Tpm2PolicySecret (
   Buffer += sizeof(UINT16);
   CopyMem (Buffer, PolicyRef->buffer, PolicyRef->size);
   Buffer += PolicyRef->size;
-  
+
   WriteUnaligned32 ((UINT32 *)Buffer, SwapBytes32((UINT32)Expiration));
   Buffer += sizeof(UINT32);
 
@@ -180,6 +174,12 @@ Tpm2PolicySecret (
   //
   Buffer = (UINT8 *)&RecvBuffer.Timeout;
   Timeout->size = SwapBytes16(ReadUnaligned16 ((UINT16 *)Buffer));
+  if (Timeout->size > sizeof(UINT64)) {
+    DEBUG ((DEBUG_ERROR, "Tpm2PolicySecret - Timeout->size error %x\n", Timeout->size));
+    Status = EFI_DEVICE_ERROR;
+    goto Done;
+  }
+
   Buffer += sizeof(UINT16);
   CopyMem (Timeout->buffer, Buffer, Timeout->size);
 
@@ -189,6 +189,12 @@ Tpm2PolicySecret (
   Buffer += sizeof(UINT32);
   PolicyTicket->digest.size = SwapBytes16(ReadUnaligned16 ((UINT16 *)Buffer));
   Buffer += sizeof(UINT16);
+  if (PolicyTicket->digest.size > sizeof(TPMU_HA)) {
+    DEBUG ((DEBUG_ERROR, "Tpm2PolicySecret - digest.size error %x\n", PolicyTicket->digest.size));
+    Status = EFI_DEVICE_ERROR;
+    goto Done;
+  }
+
   CopyMem (PolicyTicket->digest.buffer, Buffer, PolicyTicket->digest.size);
 
 Done:
@@ -208,7 +214,7 @@ Done:
 
   @param[in] PolicySession      Handle for the policy session being extended.
   @param[in] HashList           the list of hashes to check for a match.
-  
+
   @retval EFI_SUCCESS            Operation completed successfully.
   @retval EFI_DEVICE_ERROR       The command was unsuccessful.
 **/
@@ -273,7 +279,7 @@ Tpm2PolicyOR (
 
   @param[in]  PolicySession      Handle for the policy session being extended.
   @param[in]  Code               The allowed commandCode.
-  
+
   @retval EFI_SUCCESS            Operation completed successfully.
   @retval EFI_DEVICE_ERROR       The command was unsuccessful.
 **/
@@ -329,7 +335,7 @@ Tpm2PolicyCommandCode (
 
   @param[in]  PolicySession      Handle for the policy session.
   @param[out] PolicyHash         the current value of the policyHash of policySession.
-  
+
   @retval EFI_SUCCESS            Operation completed successfully.
   @retval EFI_DEVICE_ERROR       The command was unsuccessful.
 **/
@@ -379,6 +385,11 @@ Tpm2PolicyGetDigest (
   // Return the response
   //
   PolicyHash->size = SwapBytes16 (RecvBuffer.PolicyHash.size);
+  if (PolicyHash->size > sizeof(TPMU_HA)) {
+    DEBUG ((DEBUG_ERROR, "Tpm2PolicyGetDigest - PolicyHash->size error %x\n", PolicyHash->size));
+    return EFI_DEVICE_ERROR;
+  }
+
   CopyMem (PolicyHash->buffer, &RecvBuffer.PolicyHash.buffer, PolicyHash->size);
 
   return EFI_SUCCESS;

@@ -1,0 +1,31 @@
+///** @file
+//  String definitions for VLAN Configuration Form.
+//
+//  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+//  SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+//**/
+
+/=#
+
+#langdef en-US "English"
+
+#string STR_VLAN_FORM_SET_TITLE       #language en-US "VLAN Configuration"
+#string STR_VLAN_FORM_SET_TITLE_HELP  #language en-US "VLAN configuration for this network device"
+#string STR_VLAN_FORM_TITLE           #language en-US "VLAN Configuration"
+#string STR_VLAN_FORM_HELP            #language en-US "VLAN Configuration Help"
+#string STR_VLAN_CREATE_VLAN          #language en-US "Create new VLAN"
+
+#string STR_VLAN_VID_PROMPT           #language en-US "  VLAN ID"
+#string STR_VLAN_VID_HELP             #language en-US "VLAN ID of new VLAN or existing VLAN, valid value is 0~4094"
+#string STR_VLAN_PRIORITY_PROMPT      #language en-US "  Priority"
+#string STR_VLAN_PRIORITY_HELP        #language en-US "802.1Q Priority, valid value is 0~7"
+#string STR_VLAN_ADD_VLAN_PROMPT      #language en-US "Add VLAN"
+#string STR_VLAN_ADD_VLAN_HELP        #language en-US "Create a new VLAN or update existing VLAN"
+#string STR_VLAN_VLAN_LIST            #language en-US "Configured VLAN List"
+#string STR_VLAN_VLAN_LIST_HELP       #language en-US "Select for remove"
+#string STR_VLAN_REMOVE_VLAN_PROMPT   #language en-US "Remove VLAN"
+#string STR_VLAN_REMOVE_VLAN_HELP     #language en-US "Remove selected VLANs"
+#string STR_VLAN_NULL_STRING          #language en-US ""
+#string STR_GET_CURRENT_SETTING       #language en-US "Enter Configuration Menu"
+#string STR_GET_CURRENT_SETTING_HELP  #language en-US "Press ENTER to enter configuration menu for VLAN configuration."

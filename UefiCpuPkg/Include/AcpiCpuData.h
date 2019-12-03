@@ -1,14 +1,8 @@
 /** @file
 Definitions for CPU S3 data.
 
-Copyright (c) 2013 - 2015, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -22,18 +16,72 @@ typedef enum {
   Msr,
   ControlRegister,
   MemoryMapped,
-  CacheControl
+  CacheControl,
+
+  //
+  // Semaphore type used to control the execute sequence of the Msr.
+  // It will be insert between two Msr which has execute dependence.
+  //
+  Semaphore,
+  InvalidReg
 } REGISTER_TYPE;
+
+//
+// Describe the dependency type for different features.
+// The value set to CPU_REGISTER_TABLE_ENTRY.Value when the REGISTER_TYPE is Semaphore.
+//
+typedef enum {
+  NoneDepType,
+  ThreadDepType,
+  CoreDepType,
+  PackageDepType,
+  InvalidDepType
+} CPU_FEATURE_DEPENDENCE_TYPE;
+
+//
+// CPU information.
+//
+typedef struct {
+  //
+  // Record the package count in this CPU.
+  //
+  UINT32                      PackageCount;
+  //
+  // Record the max core count in this CPU.
+  // Different packages may have different core count, this value
+  // save the max core count in all the packages.
+  //
+  UINT32                      MaxCoreCount;
+  //
+  // Record the max thread count in this CPU.
+  // Different cores may have different thread count, this value
+  // save the max thread count in all the cores.
+  //
+  UINT32                      MaxThreadCount;
+  //
+  // This field points to an array.
+  // This array saves valid core count (type UINT32) of each package.
+  // The array has PackageCount elements.
+  //
+  // If the platform does not support MSR setting at S3 resume, and
+  // therefore it doesn't need the dependency semaphores, it should set
+  // this field to 0.
+  //
+  EFI_PHYSICAL_ADDRESS        ValidCoreCountPerPackage;
+} CPU_STATUS_INFORMATION;
 
 //
 // Element of register table entry
 //
 typedef struct {
-  REGISTER_TYPE  RegisterType;
-  UINT32         Index;
-  UINT8          ValidBitStart;
-  UINT8          ValidBitLength;
-  UINT64         Value;
+  REGISTER_TYPE  RegisterType;          // offset 0 - 3
+  UINT32         Index;                 // offset 4 - 7
+  UINT8          ValidBitStart;         // offset 8
+  UINT8          ValidBitLength;        // offset 9
+  BOOLEAN        TestThenWrite;         // offset 10
+  UINT8          Reserved1;             // offset 11
+  UINT32         HighIndex;             // offset 12-15, only valid for MemoryMapped
+  UINT64         Value;                 // offset 16-23
 } CPU_REGISTER_TABLE_ENTRY;
 
 //
@@ -55,15 +103,13 @@ typedef struct {
   //
   UINT32                    InitialApicId;
   //
-  // Buffer of CPU_REGISTER_TABLE_ENTRY structures.  This buffer must be
-  // allocated below 4GB from memory of type EfiACPIMemoryNVS.
+  // Physical address of CPU_REGISTER_TABLE_ENTRY structures.
   //
-  CPU_REGISTER_TABLE_ENTRY  *RegisterTableEntry;
+  EFI_PHYSICAL_ADDRESS      RegisterTableEntry;
 } CPU_REGISTER_TABLE;
 
 //
-// Data structure that is required for ACPI S3 resume.  This structure must be
-// allocated below 4GB from memory of type EfiACPIMemoryNVS.  The PCD
+// Data structure that is required for ACPI S3 resume. The PCD
 // PcdCpuS3DataAddress must be set to the physical address where this structure
 // is allocated
 //
@@ -76,21 +122,17 @@ typedef struct {
   //
   EFI_PHYSICAL_ADDRESS  StartupVector;
   //
-  // Physical address of structure of type IA32_DESCRIPTOR.  This structure must
-  // be allocated below 4GB from memory of type EfiACPIMemoryNVS.  The
+  // Physical address of structure of type IA32_DESCRIPTOR. The
   // IA32_DESCRIPTOR structure provides the base address and length of a GDT
-  // The buffer for GDT must also be allocated below 4GB from memory of type
-  // EfiACPIMemoryNVS.  The GDT must be filled in with the GDT contents that are
+  // The GDT must be filled in with the GDT contents that are
   // used during an ACPI S3 resume.  This is typically the contents of the GDT
   // used by the boot processor when the platform is booted.
   //
   EFI_PHYSICAL_ADDRESS  GdtrProfile;
   //
-  // Physical address of structure of type IA32_DESCRIPTOR.  This structure must
-  // be allocated below 4GB from memory of type EfiACPIMemoryNVS.  The
+  // Physical address of structure of type IA32_DESCRIPTOR.  The
   // IA32_DESCRIPTOR structure provides the base address and length of an IDT.
-  // The buffer for IDT must also be allocated below 4GB from memory of type
-  // EfiACPIMemoryNVS.  The IDT must be filled in with the IDT contents that are
+  // The IDT must be filled in with the IDT contents that are
   // used during an ACPI S3 resume.  This is typically the contents of the IDT
   // used by the boot processor when the platform is booted.
   //
@@ -98,7 +140,7 @@ typedef struct {
   //
   // Physical address of a buffer that is used as stacks during ACPI S3 resume.
   // The total size of this buffer, in bytes, is NumberOfCpus * StackSize.  This
-  // structure must be allocated below 4GB from memory of type EfiACPIMemoryNVS.
+  // structure must be allocated from memory of type EfiACPIMemoryNVS.
   //
   EFI_PHYSICAL_ADDRESS  StackAddress;
   //
@@ -116,14 +158,12 @@ typedef struct {
   // Physical address of structure of type MTRR_SETTINGS that contains a copy
   // of the MTRR settings that are compatible with the MTRR settings used by
   // the boot processor when the platform was booted.  These MTRR settings are
-  // used during an ACPI S3 resume.  This structure must be allocated below 4GB
-  // from memory of type EfiACPIMemoryNVS.
+  // used during an ACPI S3 resume.
   //
   EFI_PHYSICAL_ADDRESS  MtrrTable;
   //
   // Physical address of an array of CPU_REGISTER_TABLE structures, with
-  // NumberOfCpus entries.  This array must be allocated below 4GB from memory
-  // of type EfiACPIMemoryNVS.  If a register table is not required, then the
+  // NumberOfCpus entries.  If a register table is not required, then the
   // TableLength and AllocatedSize fields of CPU_REGISTER_TABLE are set to 0.
   // If TableLength is > 0, then elements of RegisterTableEntry are used to
   // initialize the CPU that matches InitialApicId, during an ACPI S3 resume,
@@ -132,8 +172,7 @@ typedef struct {
   EFI_PHYSICAL_ADDRESS  PreSmmInitRegisterTable;
   //
   // Physical address of an array of CPU_REGISTER_TABLE structures, with
-  // NumberOfCpus entries.  This array must be allocated below 4GB from memory
-  // of type EfiACPIMemoryNVS.  If a register table is not required, then the
+  // NumberOfCpus entries.  If a register table is not required, then the
   // TableLength and AllocatedSize fields of CPU_REGISTER_TABLE are set to 0.
   // If TableLength is > 0, then elements of RegisterTableEntry are used to
   // initialize the CPU that matches InitialApicId, during an ACPI S3 resume,
@@ -142,8 +181,7 @@ typedef struct {
   EFI_PHYSICAL_ADDRESS  RegisterTable;
   //
   // Physical address of a buffer that contains the machine check handler that
-  // is used during an ACPI S3 Resume.  This buffer must be allocated below 4GB
-  // from memory of type EfiACPIMemoryNVS.  In order for this machine check
+  // is used during an ACPI S3 Resume.  In order for this machine check
   // handler to be active on an AP during an ACPI S3 resume, the machine check
   // vector in the IDT provided by IdtrProfile must be initialized to transfer
   // control to this physical address.
@@ -155,6 +193,20 @@ typedef struct {
   // provided.
   //
   UINT32                ApMachineCheckHandlerSize;
+  //
+  // CPU information which is required when set the register table.
+  //
+  CPU_STATUS_INFORMATION     CpuStatus;
+  //
+  // Location info for each AP.
+  // It points to an array which saves all APs location info.
+  // The array count is the AP count in this CPU.
+  //
+  // If the platform does not support MSR setting at S3 resume, and
+  // therefore it doesn't need the dependency semaphores, it should set
+  // this field to 0.
+  //
+  EFI_PHYSICAL_ADDRESS  ApLocation;
 } ACPI_CPU_DATA;
 
 #endif

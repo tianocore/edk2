@@ -1590,7 +1590,7 @@ int *lastAltEmpty; /* MR23 */
 		   with input "C"
 
    Before MR21 the error message would be "expecting B - found C".  After MR21
-   the error message would be "expcect A, B - found C".  This was good, but it
+   the error message would be "expect A, B - found C".  This was good, but it
    caused problems for those using parser exceptions because the reference to
    B was generated inside the {...} where B really wasn't part of the block.
 
@@ -1781,7 +1781,7 @@ Junction *q;
 		followed by a loopBlock whereas the start of a (...)+ block is
 		represented as a single node: a plusBlock.  So if first_item_is_guess_block
 		is called when the current node is a loopBegin it starts with the
-		loop block rather than the the sub block which follows the loop block.
+		loop block rather than the sub block which follows the loop block.
 		However, we can't just skip past the loop block because some routines
 		depend on the old implementation.  So, we provide a new implementation
 		which does skip the loopBlock.  However, which should be called when ?
@@ -1968,7 +1968,7 @@ ActionNode *p;
                     (p->pred_fail == NULL ?                          /* MR23/MR27 */
                        	"0 /* report */" : "1 /* user action */"),   /* MR23/MR27 */
                     (p->pred_fail == NULL ?                          /* MR23 */
-                        "0; /* no user action */" : p->pred_fail));  /* MR23 */
+                        "; /* no user action */" : p->pred_fail));   /* MR23 */
 			tabs--;
 		}
 		else    /* not a predicate */
@@ -2618,7 +2618,7 @@ TokNode *p;
                     (a->pred_fail == NULL ?                          /* MR23/MR27 */
                        	"0 /* report */" : "1 /* user action */"),   /* MR23/MR27 */
                     (a->pred_fail == NULL ?                          /* MR23 */
-                        "0; /* no user action */" : a->pred_fail));  /* MR23 */
+                        "; /* no user action */" : a->pred_fail));   /* MR23 */
 			tabs--;
 /* Disabled in MR30 ************************************************************
    And moved into genAction
@@ -3496,7 +3496,7 @@ do {    /* MR10     Change recursion into iteration         */
 			/* MR23
 			   If there were only one return value operand and
 			   it had an initializer then it would have been
-			   initiailized in the declaration.
+			   initialized in the declaration.
 			*/
 
 			returnValueInitializer = getInitializer(q->ret);         /* MR23 */
@@ -3740,7 +3740,7 @@ RuleEntry *r;
         /* NOTICE: this is done only here, for the method definition, but  */
         /*         not for the method declaration inside the class         */
         /*         definition. This is exactly the behaviour defined in    */
-        /*         C++ standard for default paramters.                     */
+        /*         C++ standard for default parameters.                    */
 
 	DumpANSIFunctionArgDef(output,q, 0 /* emit initializers ? */);
 	_gen("\n");
@@ -3866,7 +3866,7 @@ int file;
 /* MR10 */    _gen(" *  ");
 /* MR10 */    for (i=0 ; i < Save_argc ; i++) {
 /* MR10 */      _gen(" ");
-/* MR10 */      _gen(Save_argv[i]);
+/* MR10 */      _gen1("%s", Save_argv[i]);
 /* MR10 */    };
 	_gen("\n");
 	_gen(" *\n");
@@ -3911,7 +3911,7 @@ int file;
 	}
 #endif
 	/* ###WARNING: This will have to change when SetWordSize changes */
-	if ( !GenCC ) _gen1("#define zzSET_SIZE %d\n", NumWords(TokenNum-1)*sizeof(unsigned));
+	if ( !GenCC ) _gen1("#define zzSET_SIZE %lu\n", NumWords(TokenNum-1)*sizeof(unsigned));
     if (TraceGen) {
       _gen("#ifndef zzTRACE_RULES\n");  /* MR20 */
       _gen("#define zzTRACE_RULES\n");  /* MR20 */
@@ -4125,7 +4125,7 @@ char * gate;                                    /* MR10 */
 	if ( LexGen ) fprintf(f, "#define zzEOF_TOKEN %d\n", (TokenInd!=NULL?TokenInd[EofToken]:EofToken));
 #endif
 	/* ###WARNING: This will have to change when SetWordSize changes */
-	fprintf(f, "#define zzSET_SIZE %d\n", NumWords(TokenNum-1)*sizeof(unsigned));
+	fprintf(f, "#define zzSET_SIZE %lu\n", NumWords(TokenNum-1)*sizeof(unsigned));
     if (TraceGen) {
       fprintf(f,"#ifndef zzTRACE_RULES\n");  /* MR20 */
       fprintf(f,"#define zzTRACE_RULES\n");  /* MR20 */
@@ -4726,7 +4726,7 @@ int bInitializer;
 		blocks to look like (...|...| epsilon) since there were
 		intervening generics.  This fixes the problem for this
 		particular case.  Things like actions or empty blocks of
-		various kinds will still cause problems, but I wasnt't
+		various kinds will still cause problems, but I wasn't
 		prepared to handle pathological cases like (A|()*). It
 		does handle (A | ()), which is a recommended idiom for
 		epsilon.

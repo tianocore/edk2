@@ -1,14 +1,10 @@
 /** @file
   Internal include file of DXE CPU IO2 Library.
-  
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials are licensed and made available
-  under the terms and conditions of the BSD License which accompanies this
-  distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
+
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -29,8 +25,10 @@
   Reads registers in the EFI CPU I/O space.
 
   Reads the I/O port specified by Port with registers width specified by Width.
-  The read value is returned. If such operations are not supported, then ASSERT().
+  The read value is returned.
+
   This function must guarantee that all I/O read and write operations are serialized.
+  If such operations are not supported, then ASSERT().
 
   @param  Port          The base address of the I/O operation.
                         The caller is responsible for aligning the Address if required.
@@ -42,16 +40,18 @@
 UINT64
 EFIAPI
 IoReadWorker (
-  IN      UINTN                     Port,
-  IN      EFI_CPU_IO_PROTOCOL_WIDTH Width
+  IN      UINTN                      Port,
+  IN      EFI_CPU_IO_PROTOCOL_WIDTH  Width
   );
 
 /**
   Writes registers in the EFI CPU I/O space.
 
   Writes the I/O port specified by Port with registers width and value specified by Width
-  and Data respectively.  Data is returned. If such operations are not supported, then ASSERT().
+  and Data respectively. Data is returned.
+
   This function must guarantee that all I/O read and write operations are serialized.
+  If such operations are not supported, then ASSERT().
 
   @param  Port          The base address of the I/O operation.
                         The caller is responsible for aligning the Address if required.
@@ -64,9 +64,59 @@ IoReadWorker (
 UINT64
 EFIAPI
 IoWriteWorker (
-  IN      UINTN                     Port,
-  IN      EFI_CPU_IO_PROTOCOL_WIDTH Width,
-  IN      UINT64                    Data
+  IN      UINTN                      Port,
+  IN      EFI_CPU_IO_PROTOCOL_WIDTH  Width,
+  IN      UINT64                     Data
+  );
+
+/**
+  Reads registers in the EFI CPU I/O space.
+
+  Reads the I/O port specified by Port with registers width specified by Width.
+  The port is read Count times, and the read data is stored in the provided Buffer.
+
+  This function must guarantee that all I/O read and write operations are serialized.
+  If such operations are not supported, then ASSERT().
+
+  @param  Port          The base address of the I/O operation.
+                        The caller is responsible for aligning the Address if required.
+  @param  Width         The width of the I/O operation.
+  @param  Count         The number of times to read I/O port.
+  @param  Buffer        The buffer to store the read data into.
+
+**/
+VOID
+EFIAPI
+IoReadFifoWorker (
+  IN      UINTN                      Port,
+  IN      EFI_CPU_IO_PROTOCOL_WIDTH  Width,
+  IN      UINTN                      Count,
+  IN      VOID                       *Buffer
+  );
+
+/**
+  Writes registers in the EFI CPU I/O space.
+
+  Writes the I/O port specified by Port with registers width specified by Width.
+  The port is written Count times, and the write data is retrieved from the provided Buffer.
+
+  This function must guarantee that all I/O read and write operations are serialized.
+  If such operations are not supported, then ASSERT().
+
+  @param  Port          The base address of the I/O operation.
+                        The caller is responsible for aligning the Address if required.
+  @param  Width         The width of the I/O operation.
+  @param  Count         The number of times to write I/O port.
+  @param  Buffer        The buffer to store the read data into.
+
+**/
+VOID
+EFIAPI
+IoWriteFifoWorker (
+  IN      UINTN                      Port,
+  IN      EFI_CPU_IO_PROTOCOL_WIDTH  Width,
+  IN      UINTN                      Count,
+  IN      VOID                       *Buffer
   );
 
 /**
@@ -101,7 +151,7 @@ MmioReadWorker (
                         The caller is responsible for aligning the Address if required.
   @param  Width         The width of the I/O operation.
   @param  Data          The value to write to the I/O port.
-  
+
   @return Data read from registers in the EFI system memory space.
 
 **/

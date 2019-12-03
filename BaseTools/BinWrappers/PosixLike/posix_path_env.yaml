@@ -1,0 +1,10 @@
+## @file
+# Set this folder on the path for all linux builds
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+{
+  "scope": "global-nix",
+  "flags": ["set_path"]
+}

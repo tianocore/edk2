@@ -2,13 +2,7 @@
 # This file is used to define class for data structure used in ECC
 #
 # Copyright (c) 2008 - 2014, Intel Corporation. All rights reserved.<BR>
-# This program and the accompanying materials
-# are licensed and made available under the terms and conditions of the BSD License
-# which accompanies this distribution.    The full text of the license may be found at
-# http://opensource.org/licenses/bsd-license.php
-#
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
 
 ##
 # Import Modules
@@ -64,6 +58,7 @@ MODEL_EFI_BINARY_FILE = 3008
 MODEL_EFI_SKU_ID = 3009
 MODEL_EFI_INCLUDE = 3010
 MODEL_EFI_DEPEX = 3011
+MODEL_EFI_DEFAULT_STORES = 3012
 
 MODEL_PCD = 4000
 MODEL_PCD_FIXED_AT_BUILD = 4001
@@ -77,6 +72,16 @@ MODEL_PCD_DYNAMIC = 4008
 MODEL_PCD_DYNAMIC_DEFAULT = 4009
 MODEL_PCD_DYNAMIC_VPD = 4010
 MODEL_PCD_DYNAMIC_HII = 4011
+MODEL_PCD_TYPE_LIST = [MODEL_PCD_FIXED_AT_BUILD,
+                        MODEL_PCD_PATCHABLE_IN_MODULE,
+                        MODEL_PCD_FEATURE_FLAG,
+                        MODEL_PCD_DYNAMIC_DEFAULT,
+                        MODEL_PCD_DYNAMIC_HII,
+                        MODEL_PCD_DYNAMIC_VPD,
+                        MODEL_PCD_DYNAMIC_EX_DEFAULT,
+                        MODEL_PCD_DYNAMIC_EX_HII,
+                        MODEL_PCD_DYNAMIC_EX_VPD
+                       ]
 
 MODEL_META_DATA_HEADER_COMMENT = 5000
 MODEL_META_DATA_HEADER = 5001
@@ -94,7 +99,6 @@ MODEL_META_DATA_PACKAGE = 5011
 MODEL_META_DATA_NMAKE = 5012
 MODEL_META_DATA_CONDITIONAL_STATEMENT_ELSEIF = 5013
 MODEL_META_DATA_CONDITIONAL_STATEMENT_ENDIF = 5014
-MODEL_META_DATA_COMPONENT_SOURCE_OVERRIDE_PATH = 5015
 MODEL_META_DATA_COMMENT = 5016
 MODEL_META_DATA_GLOBAL_DEFINE = 5017
 MODEL_META_DATA_SECTION_HEADER = 5100
@@ -166,7 +170,6 @@ MODEL_LIST = [('MODEL_UNKNOWN', MODEL_UNKNOWN),
               ("MODEL_META_DATA_CONDITIONAL_STATEMENT_IFDEF", MODEL_META_DATA_CONDITIONAL_STATEMENT_IFDEF),
               ("MODEL_META_DATA_CONDITIONAL_STATEMENT_IFNDEF", MODEL_META_DATA_CONDITIONAL_STATEMENT_IFNDEF),
               ("MODEL_META_DATA_CONDITIONAL_STATEMENT_ERROR", MODEL_META_DATA_CONDITIONAL_STATEMENT_ERROR),
-              ("MODEL_META_DATA_COMPONENT_SOURCE_OVERRIDE_PATH", MODEL_META_DATA_COMPONENT_SOURCE_OVERRIDE_PATH),
               ("MODEL_META_DATA_BUILD_OPTION", MODEL_META_DATA_BUILD_OPTION),
               ("MODEL_META_DATA_COMPONENT", MODEL_META_DATA_COMPONENT),
               ('MODEL_META_DATA_USER_EXTENSION', MODEL_META_DATA_USER_EXTENSION),
@@ -183,7 +186,7 @@ MODEL_LIST = [('MODEL_UNKNOWN', MODEL_UNKNOWN),
 # @param Header:           Header of a Function
 # @param Modifier:         Modifier of a Function
 # @param Name:             Name of a Function
-# @param ReturnStatement:  ReturnStatement of a Funciont
+# @param ReturnStatement:  ReturnStatement of a Function
 # @param StartLine:        StartLine of a Function
 # @param StartColumn:      StartColumn of a Function
 # @param EndLine:          EndLine of a Function
@@ -198,7 +201,7 @@ MODEL_LIST = [('MODEL_UNKNOWN', MODEL_UNKNOWN),
 # @var Header:             Header of a Function
 # @var Modifier:           Modifier of a Function
 # @var Name:               Name of a Function
-# @var ReturnStatement:    ReturnStatement of a Funciont
+# @var ReturnStatement:    ReturnStatement of a Function
 # @var StartLine:          StartLine of a Function
 # @var StartColumn:        StartColumn of a Function
 # @var EndLine:            EndLine of a Function

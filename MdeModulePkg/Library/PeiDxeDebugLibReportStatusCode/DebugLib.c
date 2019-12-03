@@ -4,14 +4,8 @@
   Note that if the debug message length is larger than the maximum allowable
   record length, then the debug message will be ignored directly.
 
-  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -27,11 +21,17 @@
 #include <Library/PcdLib.h>
 #include <Library/DebugPrintErrorLevelLib.h>
 
+//
+// VA_LIST can not initialize to NULL for all compiler, so we use this to
+// indicate a null VA_LIST
+//
+VA_LIST     mVaListNull;
+
 /**
   Prints a debug message to the debug output device if the specified error level is enabled.
 
-  If any bit in ErrorLevel is also set in DebugPrintErrorLevelLib function 
-  GetDebugPrintErrorLevel (), then print the message specified by Format and the 
+  If any bit in ErrorLevel is also set in DebugPrintErrorLevelLib function
+  GetDebugPrintErrorLevel (), then print the message specified by Format and the
   associated variable argument list to the debug output device.
 
   If Format is NULL, then ASSERT().
@@ -41,7 +41,7 @@
 
   @param  ErrorLevel  The error level of the debug message.
   @param  Format      Format string for the debug message to print.
-  @param  ...         Variable argument list whose contents are accessed 
+  @param  ...         Variable argument list whose contents are accessed
                       based on the format string specified by Format.
 
 **/
@@ -53,11 +53,47 @@ DebugPrint (
   ...
   )
 {
+  VA_LIST         Marker;
+
+  VA_START (Marker, Format);
+  DebugVPrint (ErrorLevel, Format, Marker);
+  VA_END (Marker);
+}
+
+/**
+  Prints a debug message to the debug output device if the specified
+  error level is enabled base on Null-terminated format string and a
+  VA_LIST argument list or a BASE_LIST argument list.
+
+  If any bit in ErrorLevel is also set in DebugPrintErrorLevelLib function
+  GetDebugPrintErrorLevel (), then print the message specified by Format and
+  the associated variable argument list to the debug output device.
+
+  Only one list type is used.
+  If BaseListMarker == NULL, then use VaListMarker.
+  Otherwise use BaseListMarker and the VaListMarker should be initilized as
+  mVaListNull.
+
+  If Format is NULL, then ASSERT().
+
+  @param  ErrorLevel      The error level of the debug message.
+  @param  Format          Format string for the debug message to print.
+  @param  VaListMarker    VA_LIST marker for the variable argument list.
+  @param  BaseListMarker  BASE_LIST marker for the variable argument list.
+
+**/
+VOID
+DebugPrintMarker (
+  IN  UINTN         ErrorLevel,
+  IN  CONST CHAR8   *Format,
+  IN  VA_LIST       VaListMarker,
+  IN  BASE_LIST     BaseListMarker
+  )
+{
   UINT64          Buffer[(EFI_STATUS_CODE_DATA_MAX_SIZE / sizeof (UINT64)) + 1];
   EFI_DEBUG_INFO  *DebugInfo;
   UINTN           TotalSize;
-  VA_LIST         VaListMarker;
-  BASE_LIST       BaseListMarker;
+  BASE_LIST       BaseListMarkerPointer;
   CHAR8           *FormatString;
   BOOLEAN         Long;
 
@@ -75,54 +111,61 @@ DebugPrint (
 
   //
   // Compute the total size of the record.
-  // Note that the passing-in format string and variable parameters will be constructed to 
+  // Note that the passing-in format string and variable parameters will be constructed to
   // the following layout:
   //
-  //         Buffer->|------------------------|
-  //                 |         Padding        | 4 bytes
-  //      DebugInfo->|------------------------|
-  //                 |      EFI_DEBUG_INFO    | sizeof(EFI_DEBUG_INFO)
-  // BaseListMarker->|------------------------|
-  //                 |           ...          |
-  //                 |   variable arguments   | 12 * sizeof (UINT64)
-  //                 |           ...          |
-  //                 |------------------------|
-  //                 |       Format String    |
-  //                 |------------------------|<- (UINT8 *)Buffer + sizeof(Buffer)
+  //                Buffer->|------------------------|
+  //                        |         Padding        | 4 bytes
+  //             DebugInfo->|------------------------|
+  //                        |      EFI_DEBUG_INFO    | sizeof(EFI_DEBUG_INFO)
+  // BaseListMarkerPointer->|------------------------|
+  //                        |           ...          |
+  //                        |   variable arguments   | 12 * sizeof (UINT64)
+  //                        |           ...          |
+  //                        |------------------------|
+  //                        |       Format String    |
+  //                        |------------------------|<- (UINT8 *)Buffer + sizeof(Buffer)
   //
   TotalSize = 4 + sizeof (EFI_DEBUG_INFO) + 12 * sizeof (UINT64) + AsciiStrSize (Format);
 
   //
-  // If the TotalSize is larger than the maximum record size, then return
+  // If the TotalSize is larger than the maximum record size, then truncate it.
   //
   if (TotalSize > sizeof (Buffer)) {
-    return;
+    TotalSize = sizeof (Buffer);
   }
 
   //
   // Fill in EFI_DEBUG_INFO
   //
-  // Here we skip the first 4 bytes of Buffer, because we must ensure BaseListMarker is
-  // 64-bit aligned, otherwise retrieving 64-bit parameter from BaseListMarker will cause
+  // Here we skip the first 4 bytes of Buffer, because we must ensure BaseListMarkerPointer is
+  // 64-bit aligned, otherwise retrieving 64-bit parameter from BaseListMarkerPointer will cause
   // exception on IPF. Buffer starts at 64-bit aligned address, so skipping 4 types (sizeof(EFI_DEBUG_INFO))
-  // just makes address of BaseListMarker, which follows DebugInfo, 64-bit aligned.
+  // just makes address of BaseListMarkerPointer, which follows DebugInfo, 64-bit aligned.
   //
   DebugInfo             = (EFI_DEBUG_INFO *)(Buffer) + 1;
   DebugInfo->ErrorLevel = (UINT32)ErrorLevel;
-  BaseListMarker        = (BASE_LIST)(DebugInfo + 1);
+  BaseListMarkerPointer = (BASE_LIST)(DebugInfo + 1);
   FormatString          = (CHAR8 *)((UINT64 *)(DebugInfo + 1) + 12);
 
   //
-  // Copy the Format string into the record
+  // Copy the Format string into the record. It will be truncated if it's too long.
   //
-  AsciiStrCpyS (FormatString, sizeof(Buffer) - (4 + sizeof(EFI_DEBUG_INFO) + 12 * sizeof(UINT64)), Format);
+  AsciiStrnCpyS (
+    FormatString, sizeof(Buffer) - (4 + sizeof(EFI_DEBUG_INFO) + 12 * sizeof(UINT64)),
+    Format,       sizeof(Buffer) - (4 + sizeof(EFI_DEBUG_INFO) + 12 * sizeof(UINT64)) - 1
+    );
 
   //
   // The first 12 * sizeof (UINT64) bytes following EFI_DEBUG_INFO are for variable arguments
   // of format in DEBUG string, which is followed by the DEBUG format string.
   // Here we will process the variable arguments and pack them in this area.
   //
-  VA_START (VaListMarker, Format);
+
+  //
+  // Use the actual format string.
+  //
+  Format = FormatString;
   for (; *Format != '\0'; Format++) {
     //
     // Only format with prefix % is processed.
@@ -159,13 +202,17 @@ DebugPrint (
         // '*' in format field means the precision of the field is specified by
         // a UINTN argument in the argument list.
         //
-        BASE_ARG (BaseListMarker, UINTN) = VA_ARG (VaListMarker, UINTN);
+        if (BaseListMarker == NULL) {
+          BASE_ARG (BaseListMarkerPointer, UINTN) = VA_ARG (VaListMarker, UINTN);
+        } else {
+          BASE_ARG (BaseListMarkerPointer, UINTN) = BASE_ARG (BaseListMarker, UINTN);
+        }
         continue;
       }
       if (*Format == '\0') {
         //
         // Make no output if Format string terminates unexpectedly when
-        // looking up for flag, width, precision and type. 
+        // looking up for flag, width, precision and type.
         //
         Format--;
       }
@@ -175,7 +222,7 @@ DebugPrint (
       //
       break;
     }
-    
+
     //
     // Pack variable arguments into the storage area following EFI_DEBUG_INFO.
     //
@@ -184,34 +231,52 @@ DebugPrint (
     }
     if (*Format == 'p' || *Format == 'X' || *Format == 'x' || *Format == 'd' || *Format == 'u') {
       if (Long) {
-        BASE_ARG (BaseListMarker, INT64) = VA_ARG (VaListMarker, INT64);
+        if (BaseListMarker == NULL) {
+          BASE_ARG (BaseListMarkerPointer, INT64) = VA_ARG (VaListMarker, INT64);
+        } else {
+          BASE_ARG (BaseListMarkerPointer, INT64) = BASE_ARG (BaseListMarker, INT64);
+        }
       } else {
-        BASE_ARG (BaseListMarker, int) = VA_ARG (VaListMarker, int);
+        if (BaseListMarker == NULL) {
+          BASE_ARG (BaseListMarkerPointer, int) = VA_ARG (VaListMarker, int);
+        } else {
+          BASE_ARG (BaseListMarkerPointer, int) = BASE_ARG (BaseListMarker, int);
+        }
       }
     } else if (*Format == 's' || *Format == 'S' || *Format == 'a' || *Format == 'g' || *Format == 't') {
-      BASE_ARG (BaseListMarker, VOID *) = VA_ARG (VaListMarker, VOID *);
+      if (BaseListMarker == NULL) {
+        BASE_ARG (BaseListMarkerPointer, VOID *) = VA_ARG (VaListMarker, VOID *);
+      } else {
+        BASE_ARG (BaseListMarkerPointer, VOID *) = BASE_ARG (BaseListMarker, VOID *);
+      }
     } else if (*Format == 'c') {
-      BASE_ARG (BaseListMarker, UINTN) = VA_ARG (VaListMarker, UINTN);
+      if (BaseListMarker == NULL) {
+        BASE_ARG (BaseListMarkerPointer, UINTN) = VA_ARG (VaListMarker, UINTN);
+      } else {
+        BASE_ARG (BaseListMarkerPointer, UINTN) = BASE_ARG (BaseListMarker, UINTN);
+      }
     } else if (*Format == 'r') {
-      BASE_ARG (BaseListMarker, RETURN_STATUS) = VA_ARG (VaListMarker, RETURN_STATUS);
+      if (BaseListMarker == NULL) {
+        BASE_ARG (BaseListMarkerPointer, RETURN_STATUS) = VA_ARG (VaListMarker, RETURN_STATUS);
+      } else {
+        BASE_ARG (BaseListMarkerPointer, RETURN_STATUS) = BASE_ARG (BaseListMarker, RETURN_STATUS);
+      }
     }
 
     //
     // If the converted BASE_LIST is larger than the 12 * sizeof (UINT64) allocated bytes, then ASSERT()
-    // This indicates that the DEBUG() macro is passing in more argument than can be handled by 
+    // This indicates that the DEBUG() macro is passing in more argument than can be handled by
     // the EFI_DEBUG_INFO record
     //
-    ASSERT ((CHAR8 *)BaseListMarker <= FormatString);
+    ASSERT ((CHAR8 *)BaseListMarkerPointer <= FormatString);
 
     //
     // If the converted BASE_LIST is larger than the 12 * sizeof (UINT64) allocated bytes, then return
     //
-    if ((CHAR8 *)BaseListMarker > FormatString) {
-      VA_END (VaListMarker);
+    if ((CHAR8 *)BaseListMarkerPointer > FormatString) {
       return;
     }
   }
-  VA_END (VaListMarker);
 
   //
   // Send the DebugInfo record
@@ -228,14 +293,68 @@ DebugPrint (
 }
 
 /**
-  Prints an assert message containing a filename, line number, and description.  
+  Prints a debug message to the debug output device if the specified
+  error level is enabled.
+
+  If any bit in ErrorLevel is also set in DebugPrintErrorLevelLib function
+  GetDebugPrintErrorLevel (), then print the message specified by Format and
+  the associated variable argument list to the debug output device.
+
+  If Format is NULL, then ASSERT().
+
+  @param  ErrorLevel    The error level of the debug message.
+  @param  Format        Format string for the debug message to print.
+  @param  VaListMarker  VA_LIST marker for the variable argument list.
+
+**/
+VOID
+EFIAPI
+DebugVPrint (
+  IN  UINTN         ErrorLevel,
+  IN  CONST CHAR8   *Format,
+  IN  VA_LIST       VaListMarker
+  )
+{
+  DebugPrintMarker (ErrorLevel, Format, VaListMarker, NULL);
+}
+
+/**
+  Prints a debug message to the debug output device if the specified
+  error level is enabled.
+  This function use BASE_LIST which would provide a more compatible
+  service than VA_LIST.
+
+  If any bit in ErrorLevel is also set in DebugPrintErrorLevelLib function
+  GetDebugPrintErrorLevel (), then print the message specified by Format and
+  the associated variable argument list to the debug output device.
+
+  If Format is NULL, then ASSERT().
+
+  @param  ErrorLevel      The error level of the debug message.
+  @param  Format          Format string for the debug message to print.
+  @param  BaseListMarker  BASE_LIST marker for the variable argument list.
+
+**/
+VOID
+EFIAPI
+DebugBPrint (
+  IN  UINTN         ErrorLevel,
+  IN  CONST CHAR8   *Format,
+  IN  BASE_LIST     BaseListMarker
+  )
+{
+  DebugPrintMarker (ErrorLevel, Format, mVaListNull, BaseListMarker);
+}
+
+/**
+  Prints an assert message containing a filename, line number, and description.
   This may be followed by a breakpoint or a dead loop.
 
   Print a message of the form "ASSERT <FileName>(<LineNumber>): <Description>\n"
-  to the debug output device.  If DEBUG_PROPERTY_ASSERT_BREAKPOINT_ENABLED bit of 
-  PcdDebugProperyMask is set then CpuBreakpoint() is called. Otherwise, if 
-  DEBUG_PROPERTY_ASSERT_DEADLOOP_ENABLED bit of PcdDebugProperyMask is set then 
-  CpuDeadLoop() is called.  If neither of these bits are set, then this function 
+  to the debug output device.  If DEBUG_PROPERTY_ASSERT_BREAKPOINT_ENABLED bit of
+  PcdDebugProperyMask is set then CpuBreakpoint() is called. Otherwise, if
+  DEBUG_PROPERTY_ASSERT_DEADLOOP_ENABLED bit of PcdDebugProperyMask is set then
+  CpuDeadLoop() is called.  If neither of these bits are set, then this function
   returns immediately after the message is printed to the debug output device.
   DebugAssert() must actively prevent recursion.  If DebugAssert() is called while
   processing another DebugAssert(), then DebugAssert() must return immediately.
@@ -359,14 +478,14 @@ DebugAssert (
 /**
   Fills a target buffer with PcdDebugClearMemoryValue, and returns the target buffer.
 
-  This function fills Length bytes of Buffer with the value specified by 
+  This function fills Length bytes of Buffer with the value specified by
   PcdDebugClearMemoryValue, and returns Buffer.
 
   If Buffer is NULL, then ASSERT().
-  If Length is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT(). 
+  If Length is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT().
 
   @param   Buffer  Pointer to the target buffer to be filled with PcdDebugClearMemoryValue.
-  @param   Length  Number of bytes in Buffer to fill with zeros PcdDebugClearMemoryValue. 
+  @param   Length  Number of bytes in Buffer to fill with zeros PcdDebugClearMemoryValue.
 
   @return  Buffer  Pointer to the target buffer filled with PcdDebugClearMemoryValue.
 
@@ -387,7 +506,7 @@ DebugClearMemory (
 /**
   Returns TRUE if ASSERT() macros are enabled.
 
-  This function returns TRUE if the DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED bit of 
+  This function returns TRUE if the DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED bit of
   PcdDebugProperyMask is set.  Otherwise FALSE is returned.
 
   @retval  TRUE    The DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED bit of PcdDebugProperyMask is set.
@@ -404,10 +523,10 @@ DebugAssertEnabled (
 }
 
 
-/**  
+/**
   Returns TRUE if DEBUG() macros are enabled.
 
-  This function returns TRUE if the DEBUG_PROPERTY_DEBUG_PRINT_ENABLED bit of 
+  This function returns TRUE if the DEBUG_PROPERTY_DEBUG_PRINT_ENABLED bit of
   PcdDebugProperyMask is set.  Otherwise FALSE is returned.
 
   @retval  TRUE    The DEBUG_PROPERTY_DEBUG_PRINT_ENABLED bit of PcdDebugProperyMask is set.
@@ -424,10 +543,10 @@ DebugPrintEnabled (
 }
 
 
-/**  
+/**
   Returns TRUE if DEBUG_CODE() macros are enabled.
 
-  This function returns TRUE if the DEBUG_PROPERTY_DEBUG_CODE_ENABLED bit of 
+  This function returns TRUE if the DEBUG_PROPERTY_DEBUG_CODE_ENABLED bit of
   PcdDebugProperyMask is set.  Otherwise FALSE is returned.
 
   @retval  TRUE    The DEBUG_PROPERTY_DEBUG_CODE_ENABLED bit of PcdDebugProperyMask is set.
@@ -444,10 +563,10 @@ DebugCodeEnabled (
 }
 
 
-/**  
+/**
   Returns TRUE if DEBUG_CLEAR_MEMORY() macro is enabled.
 
-  This function returns TRUE if the DEBUG_PROPERTY_CLEAR_MEMORY_ENABLED bit of 
+  This function returns TRUE if the DEBUG_PROPERTY_CLEAR_MEMORY_ENABLED bit of
   PcdDebugProperyMask is set.  Otherwise FALSE is returned.
 
   @retval  TRUE    The DEBUG_PROPERTY_CLEAR_MEMORY_ENABLED bit of PcdDebugProperyMask is set.

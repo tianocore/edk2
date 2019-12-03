@@ -1,16 +1,12 @@
 /** @file
   I/O Library.
-  The implementation of I/O operation for this library instance 
+  The implementation of I/O operation for this library instance
   are based on EFI_CPU_IO_PROTOCOL.
-  
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
+
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -118,7 +114,7 @@ MmioReadWorker (
                         The caller is responsible for aligning the Address if required.
   @param  Width         The width of the I/O operation.
   @param  Data          The value to write to the I/O port.
-  
+
   @return Data read from registers in the EFI system memory space.
 
 **/
@@ -194,7 +190,7 @@ IoWrite8 (
   serialized.
 
   If Port is not aligned on a 16-bit boundary, then ASSERT().
- 
+
   If 16-bit I/O port operations are not supported, then ASSERT().
 
   @param  Port  The I/O port to read.
@@ -252,7 +248,7 @@ IoWrite16 (
   Reads the 32-bit I/O port specified by Port. The 32-bit read value is returned.
   This function must guarantee that all I/O read and write operations are
   serialized.
- 
+
   If Port is not aligned on a 32-bit boundary, then ASSERT().
 
   If 32-bit I/O port operations are not supported, then ASSERT().
@@ -343,7 +339,7 @@ IoRead64 (
   operations are serialized.
 
   If Port is not aligned on a 64-bit boundary, then ASSERT().
- 
+
   If 64-bit I/O port operations are not supported, then ASSERT().
 
   @param  Port  The I/O port to write.
@@ -364,6 +360,220 @@ IoWrite64 (
   //
   ASSERT ((Port & 7) == 0);
   return IoWriteWorker (Port, SMM_IO_UINT64, Value);
+}
+
+/**
+  Reads an 8-bit I/O port fifo into a block of memory.
+
+  Reads the 8-bit I/O fifo port specified by Port.
+  The port is read Count times, and the read data is
+  stored in the provided Buffer.
+
+  This function must guarantee that all I/O read and write operations are
+  serialized.
+
+  If 8-bit I/O port operations are not supported, then ASSERT().
+
+  @param  Port    The I/O port to read.
+  @param  Count   The number of times to read I/O port.
+  @param  Buffer  The buffer to store the read data into.
+
+**/
+VOID
+EFIAPI
+IoReadFifo8 (
+  IN      UINTN                     Port,
+  IN      UINTN                     Count,
+  OUT     VOID                      *Buffer
+  )
+{
+  UINT8 *Buffer8;
+
+  Buffer8 = (UINT8 *)Buffer;
+  while (Count-- > 0) {
+    *Buffer8++ = IoRead8 (Port);
+  }
+}
+
+/**
+  Writes a block of memory into an 8-bit I/O port fifo.
+
+  Writes the 8-bit I/O fifo port specified by Port.
+  The port is written Count times, and the write data is
+  retrieved from the provided Buffer.
+
+  This function must guarantee that all I/O write and write operations are
+  serialized.
+
+  If 8-bit I/O port operations are not supported, then ASSERT().
+
+  @param  Port    The I/O port to write.
+  @param  Count   The number of times to write I/O port.
+  @param  Buffer  The buffer to retrieve the write data from.
+
+**/
+VOID
+EFIAPI
+IoWriteFifo8 (
+  IN      UINTN                     Port,
+  IN      UINTN                     Count,
+  IN      VOID                      *Buffer
+  )
+{
+  UINT8 *Buffer8;
+
+  Buffer8 = (UINT8 *)Buffer;
+  while (Count-- > 0) {
+    IoWrite8 (Port, *Buffer8++);
+  }
+}
+
+/**
+  Reads a 16-bit I/O port fifo into a block of memory.
+
+  Reads the 16-bit I/O fifo port specified by Port.
+  The port is read Count times, and the read data is
+  stored in the provided Buffer.
+
+  This function must guarantee that all I/O read and write operations are
+  serialized.
+
+  If 16-bit I/O port operations are not supported, then ASSERT().
+
+  @param  Port    The I/O port to read.
+  @param  Count   The number of times to read I/O port.
+  @param  Buffer  The buffer to store the read data into.
+
+**/
+VOID
+EFIAPI
+IoReadFifo16 (
+  IN      UINTN                     Port,
+  IN      UINTN                     Count,
+  OUT     VOID                      *Buffer
+  )
+{
+  UINT16 *Buffer16;
+
+  //
+  // Make sure Port is aligned on a 16-bit boundary.
+  //
+  ASSERT ((Port & 1) == 0);
+  Buffer16 = (UINT16 *)Buffer;
+  while (Count-- > 0) {
+    *Buffer16++ = IoRead16 (Port);
+  }
+}
+
+/**
+  Writes a block of memory into a 16-bit I/O port fifo.
+
+  Writes the 16-bit I/O fifo port specified by Port.
+  The port is written Count times, and the write data is
+  retrieved from the provided Buffer.
+
+  This function must guarantee that all I/O write and write operations are
+  serialized.
+
+  If 16-bit I/O port operations are not supported, then ASSERT().
+
+  @param  Port    The I/O port to write.
+  @param  Count   The number of times to write I/O port.
+  @param  Buffer  The buffer to retrieve the write data from.
+
+**/
+VOID
+EFIAPI
+IoWriteFifo16 (
+  IN      UINTN                     Port,
+  IN      UINTN                     Count,
+  IN      VOID                      *Buffer
+  )
+{
+  UINT16 *Buffer16;
+
+  //
+  // Make sure Port is aligned on a 16-bit boundary.
+  //
+  ASSERT ((Port & 1) == 0);
+  Buffer16 = (UINT16 *)Buffer;
+  while (Count-- > 0) {
+    IoWrite16 (Port, *Buffer16++);
+  }
+}
+
+/**
+  Reads a 32-bit I/O port fifo into a block of memory.
+
+  Reads the 32-bit I/O fifo port specified by Port.
+  The port is read Count times, and the read data is
+  stored in the provided Buffer.
+
+  This function must guarantee that all I/O read and write operations are
+  serialized.
+
+  If 32-bit I/O port operations are not supported, then ASSERT().
+
+  @param  Port    The I/O port to read.
+  @param  Count   The number of times to read I/O port.
+  @param  Buffer  The buffer to store the read data into.
+
+**/
+VOID
+EFIAPI
+IoReadFifo32 (
+  IN      UINTN                     Port,
+  IN      UINTN                     Count,
+  OUT     VOID                      *Buffer
+  )
+{
+  UINT32 *Buffer32;
+
+  //
+  // Make sure Port is aligned on a 32-bit boundary.
+  //
+  ASSERT ((Port & 3) == 0);
+  Buffer32 = (UINT32 *)Buffer;
+  while (Count-- > 0) {
+    *Buffer32++ = IoRead32 (Port);
+  }
+}
+
+/**
+  Writes a block of memory into a 32-bit I/O port fifo.
+
+  Writes the 32-bit I/O fifo port specified by Port.
+  The port is written Count times, and the write data is
+  retrieved from the provided Buffer.
+
+  This function must guarantee that all I/O write and write operations are
+  serialized.
+
+  If 32-bit I/O port operations are not supported, then ASSERT().
+
+  @param  Port    The I/O port to write.
+  @param  Count   The number of times to write I/O port.
+  @param  Buffer  The buffer to retrieve the write data from.
+
+**/
+VOID
+EFIAPI
+IoWriteFifo32 (
+  IN      UINTN                     Port,
+  IN      UINTN                     Count,
+  IN      VOID                      *Buffer
+  )
+{
+  UINT32 *Buffer32;
+
+  //
+  // Make sure Port is aligned on a 32-bit boundary.
+  //
+  ASSERT ((Port & 3) == 0);
+  Buffer32 = (UINT32 *)Buffer;
+  while (Count-- > 0) {
+    IoWrite32 (Port, *Buffer32++);
+  }
 }
 
 /**
@@ -420,7 +630,7 @@ MmioWrite8 (
   operations are serialized.
 
   If Address is not aligned on a 16-bit boundary, then ASSERT().
- 
+
   If 16-bit MMIO register operations are not supported, then ASSERT().
 
   @param  Address The MMIO register to read.
@@ -449,7 +659,7 @@ MmioRead16 (
   and write operations are serialized.
 
   If Address is not aligned on a 16-bit boundary, then ASSERT().
- 
+
   If 16-bit MMIO register operations are not supported, then ASSERT().
 
   @param  Address The MMIO register to write.
@@ -478,7 +688,7 @@ MmioWrite16 (
   operations are serialized.
 
   If Address is not aligned on a 32-bit boundary, then ASSERT().
-  
+
   If 32-bit MMIO register operations are not supported, then ASSERT().
 
   @param  Address The MMIO register to read.
@@ -507,7 +717,7 @@ MmioRead32 (
   and write operations are serialized.
 
   If Address is not aligned on a 32-bit boundary, then ASSERT().
- 
+
   If 32-bit MMIO register operations are not supported, then ASSERT().
 
   @param  Address The MMIO register to write.
@@ -536,7 +746,7 @@ MmioWrite32 (
   operations are serialized.
 
   If Address is not aligned on a 64-bit boundary, then ASSERT().
- 
+
   If 64-bit MMIO register operations are not supported, then ASSERT().
 
   @param  Address The MMIO register to read.
@@ -565,7 +775,7 @@ MmioRead64 (
   and write operations are serialized.
 
   If Address is not aligned on a 64-bit boundary, then ASSERT().
- 
+
   If 64-bit MMIO register operations are not supported, then ASSERT().
 
   @param  Address The MMIO register to write.

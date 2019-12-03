@@ -1,15 +1,9 @@
 /** @file
-  Platform Boot Manager library definition. A platform can implement 
+  Platform Boot Manager library definition. A platform can implement
   instances to support platform-specific behavior.
 
-Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -57,6 +51,19 @@ VOID
 EFIAPI
 PlatformBootManagerWaitCallback (
   UINT16          TimeoutRemain
+  );
+
+/**
+  The function is called when no boot option could be launched,
+  including platform recovery options and options pointing to applications
+  built into firmware volumes.
+
+  If this function returns, BDS attempts to enter an infinite loop.
+**/
+VOID
+EFIAPI
+PlatformBootManagerUnableToBoot (
+  VOID
   );
 
 #endif

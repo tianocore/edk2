@@ -2357,7 +2357,7 @@ NEXT_P:
  *      expression, such as "#pred NotA !A" or "#pred NotXY ! (X && Y) or
  *      "#pred XbarY !(X && Y)".  In particular, it cannot be set by any
  *      predicate expression occurring under any other circumstances.
- *      The #pred predicate expresssions are stored with in predEntry->pred
+ *      The #pred predicate expressions are stored with in predEntry->pred
  *      and do not normally appear anywhere else until the predicates are
  *      "unfolded" in order to recognize redundancies, conflicts, and
  *      tautologies.

@@ -1,14 +1,8 @@
 /** @file
 Functions implementation related with DHCPv4/v6 for DNS driver.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -36,6 +30,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #define DHCP6_TAG_DNS_REQUEST        6
 #define DHCP6_TAG_DNS_SERVER         23
+
+#define DNS_CHECK_MEDIA_GET_DHCP_WAITING_TIME    EFI_TIMER_PERIOD_SECONDS(20)
 
 //
 // The required Dns4 server information.
@@ -76,11 +72,11 @@ ParseDhcp4Ack (
   );
 
 /**
-  EFI_DHCP6_INFO_CALLBACK is provided by the consumer of the EFI DHCPv6 Protocol 
+  EFI_DHCP6_INFO_CALLBACK is provided by the consumer of the EFI DHCPv6 Protocol
   instance to intercept events that occurs in the DHCPv6 Information Request
   exchange process.
 
-  @param  This                  Pointer to the EFI_DHCP6_PROTOCOL instance that 
+  @param  This                  Pointer to the EFI_DHCP6_PROTOCOL instance that
                                 is used to configure this  callback function.
   @param  Context               Pointer to the context that is initialized in
                                 the EFI_DHCP6_PROTOCOL.InfoRequest().
@@ -141,5 +137,5 @@ GetDns6ServerFromDhcp6 (
   OUT UINT32                     *DnsServerCount,
   OUT EFI_IPv6_ADDRESS           **DnsServerList
   );
-  
+
 #endif

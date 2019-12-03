@@ -16,663 +16,807 @@
 
  SmmPerformanceHandlerEx(), SmmPerformanceHandler() will receive untrusted input and do basic validation.
 
-Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 
 #include "SmmCorePerformanceLibInternal.h"
 
-//
-// The data structure to hold global performance data.
-//
-GAUGE_DATA_HEADER       *mGaugeData;
+#define STRING_SIZE                       (FPDT_STRING_EVENT_RECORD_NAME_LENGTH * sizeof (CHAR8))
+#define FIRMWARE_RECORD_BUFFER            0x1000
+#define CACHE_HANDLE_GUID_COUNT           0x100
+
+SMM_BOOT_PERFORMANCE_TABLE    *mSmmBootPerformanceTable = NULL;
+
+typedef struct {
+  EFI_HANDLE    Handle;
+  CHAR8         NameString[FPDT_STRING_EVENT_RECORD_NAME_LENGTH];
+  EFI_GUID      ModuleGuid;
+} HANDLE_GUID_MAP;
+
+HANDLE_GUID_MAP      mCacheHandleGuidTable[CACHE_HANDLE_GUID_COUNT];
+UINTN                mCachePairCount = 0;
+
+UINT32               mPerformanceLength    = sizeof (SMM_BOOT_PERFORMANCE_TABLE);
+UINT32               mMaxPerformanceLength = 0;
+UINT32               mLoadImageCount       = 0;
+BOOLEAN              mFpdtDataIsReported   = FALSE;
+BOOLEAN              mLackSpaceIsReport    = FALSE;
+CHAR8                *mPlatformLanguage    = NULL;
+SPIN_LOCK            mSmmFpdtLock;
+PERFORMANCE_PROPERTY  mPerformanceProperty;
+UINT32               mCachedLength         = 0;
 
 //
-// The current maximum number of logging entries. If current number of 
-// entries exceeds this value, it will re-allocate a larger array and
-// migration the old data to the larger array.
+// Interfaces for SMM PerformanceMeasurement Protocol.
 //
-UINT32                  mMaxGaugeRecords;
-
-//
-// The handle to install Performance Protocol instance.
-//
-EFI_HANDLE              mHandle = NULL;
-
-BOOLEAN                 mPerformanceMeasurementEnabled;
-
-SPIN_LOCK               mSmmPerfLock;
-
-//
-// Interfaces for SMM Performance Protocol.
-//
-PERFORMANCE_PROTOCOL mPerformanceInterface = {
-  StartGauge,
-  EndGauge,
-  GetGauge
-};
-
-//
-// Interfaces for SMM PerformanceEx Protocol.
-//
-PERFORMANCE_EX_PROTOCOL mPerformanceExInterface = {
-  StartGaugeEx,
-  EndGaugeEx,
-  GetGaugeEx
+EDKII_PERFORMANCE_MEASUREMENT_PROTOCOL mPerformanceMeasurementInterface = {
+  CreatePerformanceMeasurement,
 };
 
 /**
-  Searches in the gauge array with keyword Handle, Token, Module and Identfier.
+  Return the pointer to the FPDT record in the allocated memory.
 
-  This internal function searches for the gauge entry in the gauge array.
-  If there is an entry that exactly matches the given keywords
-  and its end time stamp is zero, then the index of that gauge entry is returned;
-  otherwise, the the number of gauge entries in the array is returned.
+  @param  RecordSize             The size of FPDT record.
+  @param  FpdtRecordPtr          Pointer the FPDT record in the allocated memory.
 
-  @param  Handle                  Pointer to environment specific context used
-                                  to identify the component being measured.
-  @param  Token                   Pointer to a Null-terminated ASCII string
-                                  that identifies the component being measured.
-  @param  Module                  Pointer to a Null-terminated ASCII string
-                                  that identifies the module being measured.
-  @param  Identifier              32-bit identifier.
-
-  @retval The index of gauge entry in the array.
-
-**/
-UINT32
-SmmSearchForGaugeEntry (
-  IN CONST VOID                 *Handle,  OPTIONAL
-  IN CONST CHAR8                *Token,   OPTIONAL
-  IN CONST CHAR8                *Module,   OPTIONAL
-  IN CONST UINT32               Identifier
-  )
-{
-  UINT32                    Index;
-  UINT32                    Index2;
-  UINT32                    NumberOfEntries;
-  GAUGE_DATA_ENTRY_EX       *GaugeEntryExArray;
-
-  if (Token == NULL) {
-    Token = "";
-  }
-  if (Module == NULL) {
-    Module = "";
-  }
-
-  NumberOfEntries = mGaugeData->NumberOfEntries;
-  GaugeEntryExArray = (GAUGE_DATA_ENTRY_EX *) (mGaugeData + 1);
-
-  Index2 = 0;
-
-  for (Index = 0; Index < NumberOfEntries; Index++) {
-    Index2 = NumberOfEntries - 1 - Index;
-    if (GaugeEntryExArray[Index2].EndTimeStamp == 0 &&
-        (GaugeEntryExArray[Index2].Handle == (EFI_PHYSICAL_ADDRESS) (UINTN) Handle) &&
-        AsciiStrnCmp (GaugeEntryExArray[Index2].Token, Token, SMM_PERFORMANCE_STRING_LENGTH) == 0 &&
-        AsciiStrnCmp (GaugeEntryExArray[Index2].Module, Module, SMM_PERFORMANCE_STRING_LENGTH) == 0) {
-      Index = Index2;
-      break;
-    }
-  }
-
-  return Index;
-}
-
-/**
-  Adds a record at the end of the performance measurement log
-  that records the start time of a performance measurement.
-
-  Adds a record to the end of the performance measurement log
-  that contains the Handle, Token, Module and Identifier.
-  The end time of the new record must be set to zero.
-  If TimeStamp is not zero, then TimeStamp is used to fill in the start time in the record.
-  If TimeStamp is zero, the start time in the record is filled in with the value
-  read from the current time stamp.
-
-  @param  Handle                  Pointer to environment specific context used
-                                  to identify the component being measured.
-  @param  Token                   Pointer to a Null-terminated ASCII string
-                                  that identifies the component being measured.
-  @param  Module                  Pointer to a Null-terminated ASCII string
-                                  that identifies the module being measured.
-  @param  TimeStamp               64-bit time stamp.
-  @param  Identifier              32-bit identifier. If the value is 0, the created record
-                                  is same as the one created by StartGauge of PERFORMANCE_PROTOCOL.
-
-  @retval EFI_SUCCESS             The data was read correctly from the device.
-  @retval EFI_OUT_OF_RESOURCES    There are not enough resources to record the measurement.
-
+  @retval EFI_SUCCESS            Successfully get the pointer to the FPDT record.
+  @retval EFI_OUT_OF_RESOURCES   Ran out of space to store the records.
 **/
 EFI_STATUS
-EFIAPI
-StartGaugeEx (
-  IN CONST VOID   *Handle,  OPTIONAL
-  IN CONST CHAR8  *Token,   OPTIONAL
-  IN CONST CHAR8  *Module,  OPTIONAL
-  IN UINT64       TimeStamp,
-  IN UINT32       Identifier
-  )
+GetFpdtRecordPtr (
+  IN     UINT8               RecordSize,
+  IN OUT FPDT_RECORD_PTR     *FpdtRecordPtr
+)
 {
-  GAUGE_DATA_ENTRY_EX       *GaugeEntryExArray;
-  UINTN                     GaugeDataSize;
-  GAUGE_DATA_HEADER         *NewGaugeData;
-  UINTN                     OldGaugeDataSize;
-  GAUGE_DATA_HEADER         *OldGaugeData;
-  UINT32                    Index;
-
-  AcquireSpinLock (&mSmmPerfLock);
-
-  Index = mGaugeData->NumberOfEntries;
-  if (Index >= mMaxGaugeRecords) {
+  if (mFpdtDataIsReported) {
     //
-    // Try to enlarge the scale of gauge array.
+    // Append Boot records after Smm boot performance records have been reported.
     //
-    OldGaugeData      = mGaugeData;
-    OldGaugeDataSize  = sizeof (GAUGE_DATA_HEADER) + sizeof (GAUGE_DATA_ENTRY_EX) * mMaxGaugeRecords;
-
-    GaugeDataSize     = sizeof (GAUGE_DATA_HEADER) + sizeof (GAUGE_DATA_ENTRY_EX) * mMaxGaugeRecords * 2;
-
-    NewGaugeData = AllocateZeroPool (GaugeDataSize);
-    if (NewGaugeData == NULL) {
-      ReleaseSpinLock (&mSmmPerfLock);
+    if (mPerformanceLength + RecordSize > mMaxPerformanceLength) {
+      if (!mLackSpaceIsReport) {
+        DEBUG ((DEBUG_INFO, "SmmCorePerformanceLib: No enough space to save boot records\n"));
+        mLackSpaceIsReport = TRUE;
+      }
       return EFI_OUT_OF_RESOURCES;
+    } else {
+      //
+      // Covert buffer to FPDT Ptr Union type.
+      //
+      FpdtRecordPtr->RecordHeader = (EFI_ACPI_5_0_FPDT_PERFORMANCE_RECORD_HEADER *)((UINT8*)mSmmBootPerformanceTable + mSmmBootPerformanceTable->Header.Length);
     }
-
-    mGaugeData = NewGaugeData;
-    mMaxGaugeRecords *= 2;
-
+  } else {
     //
-    // Initialize new data array and migrate old data one.
+    // Check if pre-allocated buffer is full
     //
-    mGaugeData = CopyMem (mGaugeData, OldGaugeData, OldGaugeDataSize);
+    if (mPerformanceLength + RecordSize > mMaxPerformanceLength) {
+      mSmmBootPerformanceTable = ReallocatePool (
+                                   mPerformanceLength,
+                                   mPerformanceLength + RecordSize + FIRMWARE_RECORD_BUFFER,
+                                   mSmmBootPerformanceTable
+                              );
 
-    FreePool (OldGaugeData);
+      if (mSmmBootPerformanceTable == NULL) {
+        return EFI_OUT_OF_RESOURCES;
+      }
+      mSmmBootPerformanceTable->Header.Length = mPerformanceLength;
+      mMaxPerformanceLength = mPerformanceLength + RecordSize + FIRMWARE_RECORD_BUFFER;
+    }
+    //
+    // Covert buffer to FPDT Ptr Union type.
+    //
+    FpdtRecordPtr->RecordHeader = (EFI_ACPI_5_0_FPDT_PERFORMANCE_RECORD_HEADER *)((UINT8*)mSmmBootPerformanceTable + mSmmBootPerformanceTable->Header.Length);
   }
-
-  GaugeEntryExArray               = (GAUGE_DATA_ENTRY_EX *) (mGaugeData + 1);
-  GaugeEntryExArray[Index].Handle = (EFI_PHYSICAL_ADDRESS) (UINTN) Handle;
-
-  if (Token != NULL) {
-    AsciiStrnCpyS (GaugeEntryExArray[Index].Token, SMM_PERFORMANCE_STRING_SIZE, Token, SMM_PERFORMANCE_STRING_LENGTH);
-  }
-  if (Module != NULL) {
-    AsciiStrnCpyS (GaugeEntryExArray[Index].Module, SMM_PERFORMANCE_STRING_SIZE, Module, SMM_PERFORMANCE_STRING_LENGTH);
-  }
-
-  GaugeEntryExArray[Index].EndTimeStamp = 0;
-  GaugeEntryExArray[Index].Identifier = Identifier;
-
-  if (TimeStamp == 0) {
-    TimeStamp = GetPerformanceCounter ();
-  }
-  GaugeEntryExArray[Index].StartTimeStamp = TimeStamp;
-
-  mGaugeData->NumberOfEntries++;
-
-  ReleaseSpinLock (&mSmmPerfLock);
-
+  FpdtRecordPtr->RecordHeader->Length = 0;
   return EFI_SUCCESS;
 }
 
+
 /**
-  Searches the performance measurement log from the beginning of the log
-  for the first matching record that contains a zero end time and fills in a valid end time.
+Check whether the Token is a known one which is uesed by core.
 
-  Searches the performance measurement log from the beginning of the log
-  for the first record that matches Handle, Token and Module and has an end time value of zero.
-  If the record can not be found then return EFI_NOT_FOUND.
-  If the record is found and TimeStamp is not zero,
-  then the end time in the record is filled in with the value specified by TimeStamp.
-  If the record is found and TimeStamp is zero, then the end time in the matching record
-  is filled in with the current time stamp value.
+@param  Token      Pointer to a Null-terminated ASCII string
 
-  @param  Handle                  Pointer to environment specific context used
-                                  to identify the component being measured.
-  @param  Token                   Pointer to a Null-terminated ASCII string
-                                  that identifies the component being measured.
-  @param  Module                  Pointer to a Null-terminated ASCII string
-                                  that identifies the module being measured.
-  @param  TimeStamp               64-bit time stamp.
-  @param  Identifier              32-bit identifier. If the value is 0, the found record
-                                  is same as the one found by EndGauge of PERFORMANCE_PROTOCOL.
-
-  @retval EFI_SUCCESS             The end of  the measurement was recorded.
-  @retval EFI_NOT_FOUND           The specified measurement record could not be found.
+@retval TRUE       Is a known one used by core.
+@retval FALSE      Not a known one.
 
 **/
-EFI_STATUS
-EFIAPI
-EndGaugeEx (
-  IN CONST VOID   *Handle,  OPTIONAL
-  IN CONST CHAR8  *Token,   OPTIONAL
-  IN CONST CHAR8  *Module,  OPTIONAL
-  IN UINT64       TimeStamp,
+BOOLEAN
+IsKnownTokens (
+  IN CONST CHAR8  *Token
+  )
+{
+  if (Token == NULL) {
+    return FALSE;
+  }
+
+  if (AsciiStrCmp (Token, SEC_TOK) == 0 ||
+      AsciiStrCmp (Token, PEI_TOK) == 0 ||
+      AsciiStrCmp (Token, DXE_TOK) == 0 ||
+      AsciiStrCmp (Token, BDS_TOK) == 0 ||
+      AsciiStrCmp (Token, DRIVERBINDING_START_TOK) == 0 ||
+      AsciiStrCmp (Token, DRIVERBINDING_SUPPORT_TOK) == 0 ||
+      AsciiStrCmp (Token, DRIVERBINDING_STOP_TOK) == 0 ||
+      AsciiStrCmp (Token, LOAD_IMAGE_TOK) == 0 ||
+      AsciiStrCmp (Token, START_IMAGE_TOK) == 0 ||
+      AsciiStrCmp (Token, PEIM_TOK) == 0) {
+    return TRUE;
+  } else {
+    return FALSE;
+  }
+}
+
+/**
+Check whether the ID is a known one which map to the known Token.
+
+@param  Identifier  32-bit identifier.
+
+@retval TRUE        Is a known one used by core.
+@retval FALSE       Not a known one.
+
+**/
+BOOLEAN
+IsKnownID (
   IN UINT32       Identifier
   )
 {
-  GAUGE_DATA_ENTRY_EX *GaugeEntryExArray;
-  UINT32              Index;
-
-  AcquireSpinLock (&mSmmPerfLock);
-
-  if (TimeStamp == 0) {
-    TimeStamp = GetPerformanceCounter ();
+  if (Identifier == MODULE_START_ID ||
+      Identifier == MODULE_END_ID ||
+      Identifier == MODULE_LOADIMAGE_START_ID ||
+      Identifier == MODULE_LOADIMAGE_END_ID ||
+      Identifier == MODULE_DB_START_ID ||
+      Identifier == MODULE_DB_END_ID ||
+      Identifier == MODULE_DB_SUPPORT_START_ID ||
+      Identifier == MODULE_DB_SUPPORT_END_ID ||
+      Identifier == MODULE_DB_STOP_START_ID ||
+      Identifier == MODULE_DB_STOP_END_ID) {
+    return TRUE;
+  } else {
+    return FALSE;
   }
+}
 
-  Index = SmmSearchForGaugeEntry (Handle, Token, Module, Identifier);
-  if (Index >= mGaugeData->NumberOfEntries) {
-    ReleaseSpinLock (&mSmmPerfLock);
-    return EFI_NOT_FOUND;
+/**
+  Get the FPDT record identifier.
+
+  @param Attribute                The attribute of the Record.
+                                  PerfStartEntry: Start Record.
+                                  PerfEndEntry: End Record.
+  @param  Handle                  Pointer to environment specific context used to identify the component being measured.
+  @param  String                  Pointer to a Null-terminated ASCII string that identifies the component being measured.
+  @param  ProgressID              On return, pointer to the ProgressID.
+
+  @retval EFI_SUCCESS              Get record info successfully.
+  @retval EFI_INVALID_PARAMETER    No matched FPDT record.
+
+**/
+EFI_STATUS
+GetFpdtRecordId (
+  IN       PERF_MEASUREMENT_ATTRIBUTE  Attribute,
+  IN CONST VOID                        *Handle,
+  IN CONST CHAR8                       *String,
+  OUT UINT16                           *ProgressID
+  )
+{
+  //
+  // Token to Id.
+  //
+  if (String != NULL) {
+    if (AsciiStrCmp (String, START_IMAGE_TOK) == 0) {              // "StartImage:"
+      if (Attribute == PerfStartEntry) {
+        *ProgressID  = MODULE_START_ID;
+      } else {
+        *ProgressID  = MODULE_END_ID;
+      }
+    } else if (AsciiStrCmp (String, LOAD_IMAGE_TOK) == 0) {        // "LoadImage:"
+      if (Attribute == PerfStartEntry) {
+        *ProgressID  = MODULE_LOADIMAGE_START_ID;
+      } else {
+        *ProgressID  = MODULE_LOADIMAGE_END_ID;
+      }
+    } else {                                                      // Pref used in Modules
+      if (Attribute == PerfStartEntry) {
+        *ProgressID  = PERF_INMODULE_START_ID;
+      } else {
+        *ProgressID  = PERF_INMODULE_END_ID;
+      }
+    }
+  } else if (Handle != NULL) {                                    // Pref used in Modules
+    if (Attribute == PerfStartEntry) {
+      *ProgressID    = PERF_INMODULE_START_ID;
+    } else {
+      *ProgressID    = PERF_INMODULE_END_ID;
+    }
+  } else {
+    return EFI_UNSUPPORTED;
   }
-  GaugeEntryExArray = (GAUGE_DATA_ENTRY_EX *) (mGaugeData + 1);
-  GaugeEntryExArray[Index].EndTimeStamp = TimeStamp;
-
-  ReleaseSpinLock (&mSmmPerfLock);
-
   return EFI_SUCCESS;
 }
 
 /**
-  Retrieves a previously logged performance measurement.
-  It can also retrieve the log created by StartGauge and EndGauge of PERFORMANCE_PROTOCOL,
-  and then assign the Identifier with 0.
+  Get a human readable module name and module guid for the given image handle.
+  If module name can't be found, "" string will return.
+  If module guid can't be found, Zero Guid will return.
 
-  Retrieves the performance log entry from the performance log specified by LogEntryKey.
-  If it stands for a valid entry, then EFI_SUCCESS is returned and
-  GaugeDataEntryEx stores the pointer to that entry.
+  @param    Handle        Image handle or Controller handle.
+  @param    NameString    The ascii string will be filled into it. If not found, null string will return.
+  @param    BufferSize    Size of the input NameString buffer.
+  @param    ModuleGuid    Point to the guid buffer to store the got module guid value.
 
-  @param  LogEntryKey             The key for the previous performance measurement log entry.
-                                  If 0, then the first performance measurement log entry is retrieved.
-  @param  GaugeDataEntryEx        The indirect pointer to the extended gauge data entry specified by LogEntryKey
-                                  if the retrieval is successful.
-
-  @retval EFI_SUCCESS             The GuageDataEntryEx is successfully found based on LogEntryKey.
-  @retval EFI_NOT_FOUND           The LogEntryKey is the last entry (equals to the total entry number).
-  @retval EFI_INVALIDE_PARAMETER  The LogEntryKey is not a valid entry (greater than the total entry number).
-  @retval EFI_INVALIDE_PARAMETER  GaugeDataEntryEx is NULL.
-
+  @retval EFI_SUCCESS     Successfully get module name and guid.
+  @retval EFI_INVALID_PARAMETER  The input parameter NameString is NULL.
+  @retval other value  Module Name can't be got.
 **/
 EFI_STATUS
 EFIAPI
-GetGaugeEx (
-  IN  UINTN                 LogEntryKey,
-  OUT GAUGE_DATA_ENTRY_EX   **GaugeDataEntryEx
+GetModuleInfoFromHandle (
+  IN EFI_HANDLE        Handle,
+  OUT CHAR8            *NameString,
+  IN UINTN             BufferSize,
+  OUT EFI_GUID         *ModuleGuid OPTIONAL
   )
 {
-  UINTN               NumberOfEntries;
-  GAUGE_DATA_ENTRY_EX *GaugeEntryExArray;
+  EFI_STATUS                  Status;
+  EFI_LOADED_IMAGE_PROTOCOL   *LoadedImage;
+  EFI_DRIVER_BINDING_PROTOCOL *DriverBinding;
+  CHAR8                       *PdbFileName;
+  EFI_GUID                    *TempGuid;
+  UINTN                       StartIndex;
+  UINTN                       Index;
+  INTN                        Count;
+  BOOLEAN                     ModuleGuidIsGet;
+  UINTN                       StringSize;
+  CHAR16                      *StringPtr;
+  MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *FvFilePath;
 
-  NumberOfEntries = (UINTN) (mGaugeData->NumberOfEntries);
-  if (LogEntryKey > NumberOfEntries) {
+  if (NameString == NULL || BufferSize == 0) {
     return EFI_INVALID_PARAMETER;
   }
-  if (LogEntryKey == NumberOfEntries) {
-    return EFI_NOT_FOUND;
+
+  //
+  // Try to get the ModuleGuid and name string form the caached array.
+  //
+  if (mCachePairCount > 0) {
+    for (Count = mCachePairCount - 1; Count >= 0; Count--) {
+      if (Handle == mCacheHandleGuidTable[Count].Handle) {
+        CopyGuid (ModuleGuid, &mCacheHandleGuidTable[Count].ModuleGuid);
+        AsciiStrCpyS (NameString, FPDT_STRING_EVENT_RECORD_NAME_LENGTH, mCacheHandleGuidTable[Count].NameString);
+        return EFI_SUCCESS;
+      }
+    }
   }
 
-  GaugeEntryExArray = (GAUGE_DATA_ENTRY_EX *) (mGaugeData + 1);
+  Status = EFI_INVALID_PARAMETER;
+  LoadedImage     = NULL;
+  ModuleGuidIsGet = FALSE;
 
-  if (GaugeDataEntryEx == NULL) {
-    return EFI_INVALID_PARAMETER;
+  //
+  // Initialize GUID as zero value.
+  //
+  TempGuid    = &gZeroGuid;
+  //
+  // Initialize it as "" string.
+  //
+  NameString[0] = 0;
+
+  if (Handle != NULL) {
+    //
+    // Try Handle as ImageHandle.
+    //
+    Status = gBS->HandleProtocol (
+                  Handle,
+                  &gEfiLoadedImageProtocolGuid,
+                  (VOID**) &LoadedImage
+                  );
+
+    if (EFI_ERROR (Status)) {
+      //
+      // Try Handle as Controller Handle
+      //
+      Status = gBS->OpenProtocol (
+                    Handle,
+                    &gEfiDriverBindingProtocolGuid,
+                    (VOID **) &DriverBinding,
+                    NULL,
+                    NULL,
+                    EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                    );
+      if (!EFI_ERROR (Status)) {
+        //
+        // Get Image protocol from ImageHandle
+        //
+        Status = gBS->HandleProtocol (
+                      DriverBinding->ImageHandle,
+                      &gEfiLoadedImageProtocolGuid,
+                      (VOID**) &LoadedImage
+                      );
+      }
+    }
   }
-  *GaugeDataEntryEx = &GaugeEntryExArray[LogEntryKey];
 
-  return EFI_SUCCESS;
+  if (!EFI_ERROR (Status) && LoadedImage != NULL) {
+    //
+    // Get Module Guid from DevicePath.
+    //
+    if (LoadedImage->FilePath != NULL &&
+        LoadedImage->FilePath->Type == MEDIA_DEVICE_PATH &&
+        LoadedImage->FilePath->SubType == MEDIA_PIWG_FW_FILE_DP
+       ) {
+      //
+      // Determine GUID associated with module logging performance
+      //
+      ModuleGuidIsGet = TRUE;
+      FvFilePath      = (MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *) LoadedImage->FilePath;
+      TempGuid        = &FvFilePath->FvFileName;
+    }
+
+    //
+    // Method 1 Get Module Name from PDB string.
+    //
+    PdbFileName = PeCoffLoaderGetPdbPointer (LoadedImage->ImageBase);
+    if (PdbFileName != NULL && BufferSize > 0) {
+      StartIndex = 0;
+      for (Index = 0; PdbFileName[Index] != 0; Index++) {
+        if ((PdbFileName[Index] == '\\') || (PdbFileName[Index] == '/')) {
+          StartIndex = Index + 1;
+        }
+      }
+      //
+      // Copy the PDB file name to our temporary string.
+      // If the length is bigger than BufferSize, trim the redudant characters to avoid overflow in array boundary.
+      //
+      for (Index = 0; Index < BufferSize - 1; Index++) {
+        NameString[Index] = PdbFileName[Index + StartIndex];
+        if (NameString[Index] == 0 || NameString[Index] == '.') {
+          NameString[Index] = 0;
+          break;
+        }
+      }
+
+      if (Index == BufferSize - 1) {
+        NameString[Index] = 0;
+      }
+      //
+      // Module Name is got.
+      //
+      goto Done;
+    }
+  }
+
+  if (ModuleGuidIsGet) {
+    //
+    // Method 2 Try to get the image's FFS UI section by image GUID
+    //
+    StringPtr  = NULL;
+    StringSize = 0;
+    Status = GetSectionFromAnyFv (
+              TempGuid,
+              EFI_SECTION_USER_INTERFACE,
+              0,
+              (VOID **) &StringPtr,
+              &StringSize
+              );
+
+    if (!EFI_ERROR (Status)) {
+      //
+      // Method 3. Get the name string from FFS UI section
+      //
+      for (Index = 0; Index < BufferSize - 1 && StringPtr[Index] != 0; Index++) {
+        NameString[Index] = (CHAR8) StringPtr[Index];
+      }
+      NameString[Index] = 0;
+      FreePool (StringPtr);
+    }
+  }
+
+Done:
+  //
+  // Copy Module Guid
+  //
+  if (ModuleGuid != NULL) {
+    CopyGuid (ModuleGuid, TempGuid);
+    if (IsZeroGuid(TempGuid) && (Handle != NULL) && !ModuleGuidIsGet) {
+        // Handle is GUID
+        CopyGuid (ModuleGuid, (EFI_GUID *) Handle);
+    }
+  }
+
+  //
+  // Cache the Handle and Guid pairs.
+  //
+  if (mCachePairCount < CACHE_HANDLE_GUID_COUNT) {
+    mCacheHandleGuidTable[mCachePairCount].Handle = Handle;
+    CopyGuid (&mCacheHandleGuidTable[mCachePairCount].ModuleGuid, ModuleGuid);
+    AsciiStrCpyS (mCacheHandleGuidTable[mCachePairCount].NameString, FPDT_STRING_EVENT_RECORD_NAME_LENGTH, NameString);
+    mCachePairCount ++;
+  }
+
+  return Status;
 }
 
 /**
-  Adds a record at the end of the performance measurement log
-  that records the start time of a performance measurement.
+  Copies the string from Source into Destination and updates Length with the
+  size of the string.
 
-  Adds a record to the end of the performance measurement log
-  that contains the Handle, Token, and Module.
-  The end time of the new record must be set to zero.
-  If TimeStamp is not zero, then TimeStamp is used to fill in the start time in the record.
-  If TimeStamp is zero, the start time in the record is filled in with the value
-  read from the current time stamp.
-
-  @param  Handle                  Pointer to environment specific context used
-                                  to identify the component being measured.
-  @param  Token                   Pointer to a Null-terminated ASCII string
-                                  that identifies the component being measured.
-  @param  Module                  Pointer to a Null-terminated ASCII string
-                                  that identifies the module being measured.
-  @param  TimeStamp               64-bit time stamp.
-
-  @retval EFI_SUCCESS             The data was read correctly from the device.
-  @retval EFI_OUT_OF_RESOURCES    There are not enough resources to record the measurement.
+  @param Destination - destination of the string copy
+  @param Source      - pointer to the source string which will get copied
+  @param Length      - pointer to a length variable to be updated
 
 **/
-EFI_STATUS
-EFIAPI
-StartGauge (
-  IN CONST VOID   *Handle,  OPTIONAL
-  IN CONST CHAR8  *Token,   OPTIONAL
-  IN CONST CHAR8  *Module,  OPTIONAL
-  IN UINT64       TimeStamp
+VOID
+CopyStringIntoPerfRecordAndUpdateLength (
+  IN OUT CHAR8  *Destination,
+  IN     CONST CHAR8  *Source,
+  IN OUT UINT8  *Length
   )
 {
-  return StartGaugeEx (Handle, Token, Module, TimeStamp, 0);
+  UINTN  StringLen;
+  UINTN  DestMax;
+
+  ASSERT (Source != NULL);
+
+  if (PcdGetBool (PcdEdkiiFpdtStringRecordEnableOnly)) {
+    DestMax = STRING_SIZE;
+  } else {
+    DestMax = AsciiStrSize (Source);
+    if (DestMax > STRING_SIZE) {
+      DestMax = STRING_SIZE;
+    }
+  }
+  StringLen = AsciiStrLen (Source);
+  if (StringLen >= DestMax) {
+    StringLen = DestMax -1;
+  }
+
+  AsciiStrnCpyS(Destination, DestMax, Source, StringLen);
+  *Length += (UINT8)DestMax;
+
+  return;
 }
 
 /**
-  Searches the performance measurement log from the beginning of the log
-  for the first matching record that contains a zero end time and fills in a valid end time.
+  Create performance record with event description and a timestamp.
 
-  Searches the performance measurement log from the beginning of the log
-  for the first record that matches Handle, Token, and Module and has an end time value of zero.
-  If the record can not be found then return EFI_NOT_FOUND.
-  If the record is found and TimeStamp is not zero,
-  then the end time in the record is filled in with the value specified by TimeStamp.
-  If the record is found and TimeStamp is zero, then the end time in the matching record
-  is filled in with the current time stamp value.
+  @param CallerIdentifier  - Image handle or pointer to caller ID GUID.
+  @param Guid              - Pointer to a GUID.
+  @param String            - Pointer to a string describing the measurement.
+  @param Ticker            - 64-bit time stamp.
+  @param Address           - Pointer to a location in memory relevant to the measurement.
+  @param PerfId            - Performance identifier describing the type of measurement.
+  @param Attribute         - The attribute of the measurement. According to attribute can create a start
+                             record for PERF_START/PERF_START_EX, or a end record for PERF_END/PERF_END_EX,
+                             or a general record for other Perf macros.
 
-  @param  Handle                  Pointer to environment specific context used
-                                  to identify the component being measured.
-  @param  Token                   Pointer to a Null-terminated ASCII string
-                                  that identifies the component being measured.
-  @param  Module                  Pointer to a Null-terminated ASCII string
-                                  that identifies the module being measured.
-  @param  TimeStamp               64-bit time stamp.
+  @retval EFI_SUCCESS           - Successfully created performance record.
+  @retval EFI_OUT_OF_RESOURCES  - Ran out of space to store the records.
+  @retval EFI_INVALID_PARAMETER - Invalid parameter passed to function - NULL
+                                  pointer or invalid PerfId.
 
-  @retval EFI_SUCCESS             The end of  the measurement was recorded.
-  @retval EFI_NOT_FOUND           The specified measurement record could not be found.
-
-**/
-EFI_STATUS
-EFIAPI
-EndGauge (
-  IN CONST VOID   *Handle,  OPTIONAL
-  IN CONST CHAR8  *Token,   OPTIONAL
-  IN CONST CHAR8  *Module,  OPTIONAL
-  IN UINT64       TimeStamp
-  )
-{
-  return EndGaugeEx (Handle, Token, Module, TimeStamp, 0);
-}
-
-/**
-  Retrieves a previously logged performance measurement.
-  It can also retrieve the log created by StartGaugeEx and EndGaugeEx of PERFORMANCE_EX_PROTOCOL,
-  and then eliminate the Identifier.
-
-  Retrieves the performance log entry from the performance log specified by LogEntryKey.
-  If it stands for a valid entry, then EFI_SUCCESS is returned and
-  GaugeDataEntry stores the pointer to that entry.
-
-  @param  LogEntryKey             The key for the previous performance measurement log entry.
-                                  If 0, then the first performance measurement log entry is retrieved.
-  @param  GaugeDataEntry          The indirect pointer to the gauge data entry specified by LogEntryKey
-                                  if the retrieval is successful.
-
-  @retval EFI_SUCCESS             The GuageDataEntry is successfully found based on LogEntryKey.
-  @retval EFI_NOT_FOUND           The LogEntryKey is the last entry (equals to the total entry number).
-  @retval EFI_INVALIDE_PARAMETER  The LogEntryKey is not a valid entry (greater than the total entry number).
-  @retval EFI_INVALIDE_PARAMETER  GaugeDataEntry is NULL.
+  @retval EFI_SUCCESS           - Successfully created performance record
+  @retval EFI_OUT_OF_RESOURCES  - Ran out of space to store the records
+  @retval EFI_INVALID_PARAMETER - Invalid parameter passed to function - NULL
+                                  pointer or invalid PerfId
 
 **/
 EFI_STATUS
-EFIAPI
-GetGauge (
-  IN  UINTN               LogEntryKey,
-  OUT GAUGE_DATA_ENTRY    **GaugeDataEntry
+InsertFpdtRecord (
+  IN CONST VOID                        *CallerIdentifier,  OPTIONAL
+  IN CONST VOID                        *Guid,    OPTIONAL
+  IN CONST CHAR8                       *String,  OPTIONAL
+  IN       UINT64                      Ticker,
+  IN       UINT64                      Address,  OPTIONAL
+  IN       UINT16                      PerfId,
+  IN       PERF_MEASUREMENT_ATTRIBUTE  Attribute
   )
+
 {
-  EFI_STATUS          Status;
-  GAUGE_DATA_ENTRY_EX *GaugeEntryEx;
+  EFI_STATUS                   Status;
+  EFI_GUID                     ModuleGuid;
+  CHAR8                        ModuleName[FPDT_STRING_EVENT_RECORD_NAME_LENGTH];
+  FPDT_RECORD_PTR              FpdtRecordPtr;
+  FPDT_RECORD_PTR              CachedFpdtRecordPtr;
+  UINT64                       TimeStamp;
+  CONST CHAR8                  *StringPtr;
+  UINTN                        DestMax;
+  UINTN                        StringLen;
+  UINT16                       ProgressId;
 
-  GaugeEntryEx = NULL;
+  StringPtr     = NULL;
+  ZeroMem (ModuleName, sizeof (ModuleName));
 
-  Status = GetGaugeEx (LogEntryKey, &GaugeEntryEx);
+  //
+  // 1. Get the Perf Id for records from PERF_START/PERF_END, PERF_START_EX/PERF_END_EX.
+  //    notes: For other Perf macros (Attribute == PerfEntry), their Id is known.
+  //
+  if (Attribute != PerfEntry) {
+    //
+    // If PERF_START_EX()/PERF_END_EX() have specified the ProgressID,it has high priority.
+    // !!! Note: If the Perf is not the known Token used in the core but have same
+    // ID with the core Token, this case will not be supported.
+    // And in currtnt usage mode, for the unkown ID, there is a general rule:
+    // If it is start pref: the lower 4 bits of the ID should be 0.
+    // If it is end pref: the lower 4 bits of the ID should not be 0.
+    // If input ID doesn't follow the rule, we will adjust it.
+    //
+    if ((PerfId != 0) && (IsKnownID (PerfId)) && (!IsKnownTokens (String))) {
+      return EFI_INVALID_PARAMETER;
+    } else if ((PerfId != 0) && (!IsKnownID (PerfId)) && (!IsKnownTokens (String))) {
+      if ((Attribute == PerfStartEntry) && ((PerfId & 0x000F) != 0)) {
+        PerfId &= 0xFFF0;
+      } else if ((Attribute == PerfEndEntry) && ((PerfId & 0x000F) == 0)) {
+        PerfId += 1;
+      }
+    }
+    if (PerfId == 0) {
+      //
+      // Get ProgressID form the String Token.
+      //
+      Status = GetFpdtRecordId (Attribute, CallerIdentifier, String, &ProgressId);
+      if (EFI_ERROR (Status)) {
+        return Status;
+      }
+      PerfId = ProgressId;
+    }
+  }
+
+  //
+  // 2. Get the buffer to store the FPDT record.
+  //
+  Status = GetFpdtRecordPtr (FPDT_MAX_PERF_RECORD_SIZE, &FpdtRecordPtr);
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  if (GaugeDataEntry == NULL) {
-    return EFI_INVALID_PARAMETER;
+  //
+  // 3. Get the TimeStamp.
+  //
+  if (Ticker == 0) {
+    Ticker    = GetPerformanceCounter ();
+    TimeStamp = GetTimeInNanoSecond (Ticker);
+  } else if (Ticker == 1) {
+    TimeStamp = 0;
+  } else {
+    TimeStamp = GetTimeInNanoSecond (Ticker);
   }
 
-  *GaugeDataEntry = (GAUGE_DATA_ENTRY *) GaugeEntryEx;
+  //
+  // 4. Fill in the FPDT record according to different Performance Identifier.
+  //
+  switch (PerfId) {
+  case MODULE_START_ID:
+  case MODULE_END_ID:
+    GetModuleInfoFromHandle ((EFI_HANDLE)CallerIdentifier, ModuleName, sizeof (ModuleName), &ModuleGuid);
+    StringPtr = ModuleName;
+    //
+    // Cache the offset of start image start record and use to update the start image end record if needed.
+    //
+    if (PerfId == MODULE_START_ID && Attribute == PerfEntry) {
+      mCachedLength = mSmmBootPerformanceTable->Header.Length;
+    }
+    if (!PcdGetBool (PcdEdkiiFpdtStringRecordEnableOnly)) {
+      FpdtRecordPtr.GuidEvent->Header.Type                = FPDT_GUID_EVENT_TYPE;
+      FpdtRecordPtr.GuidEvent->Header.Length              = sizeof (FPDT_GUID_EVENT_RECORD);
+      FpdtRecordPtr.GuidEvent->Header.Revision            = FPDT_RECORD_REVISION_1;
+      FpdtRecordPtr.GuidEvent->ProgressID                 = PerfId;
+      FpdtRecordPtr.GuidEvent->Timestamp                  = TimeStamp;
+      CopyMem (&FpdtRecordPtr.GuidEvent->Guid, &ModuleGuid, sizeof (FpdtRecordPtr.GuidEvent->Guid));
+      if (CallerIdentifier == NULL && PerfId == MODULE_END_ID && mCachedLength != 0) {
+        CachedFpdtRecordPtr.RecordHeader = (EFI_ACPI_5_0_FPDT_PERFORMANCE_RECORD_HEADER *)((UINT8*)mSmmBootPerformanceTable + mCachedLength);
+        CopyMem (&FpdtRecordPtr.GuidEvent->Guid, &CachedFpdtRecordPtr.GuidEvent->Guid, sizeof (FpdtRecordPtr.GuidEvent->Guid));
+        mCachedLength = 0;
+      }
+    }
+    break;
+
+  case MODULE_LOADIMAGE_START_ID:
+  case MODULE_LOADIMAGE_END_ID:
+    GetModuleInfoFromHandle ((EFI_HANDLE)CallerIdentifier, ModuleName, sizeof (ModuleName), &ModuleGuid);
+    StringPtr = ModuleName;
+    if (PerfId == MODULE_LOADIMAGE_START_ID) {
+      mLoadImageCount++;
+      //
+      // Cache the offset of load image start record and use to be updated by the load image end record if needed.
+      //
+      if (CallerIdentifier == NULL && Attribute == PerfEntry) {
+        mCachedLength = mSmmBootPerformanceTable->Header.Length;
+      }
+    }
+    if (!PcdGetBool (PcdEdkiiFpdtStringRecordEnableOnly)) {
+      FpdtRecordPtr.GuidQwordEvent->Header.Type           = FPDT_GUID_QWORD_EVENT_TYPE;
+      FpdtRecordPtr.GuidQwordEvent->Header.Length         = sizeof (FPDT_GUID_QWORD_EVENT_RECORD);
+      FpdtRecordPtr.GuidQwordEvent->Header.Revision       = FPDT_RECORD_REVISION_1;
+      FpdtRecordPtr.GuidQwordEvent->ProgressID            = PerfId;
+      FpdtRecordPtr.GuidQwordEvent->Timestamp             = TimeStamp;
+      FpdtRecordPtr.GuidQwordEvent->Qword                 = mLoadImageCount;
+      CopyMem (&FpdtRecordPtr.GuidQwordEvent->Guid, &ModuleGuid, sizeof (FpdtRecordPtr.GuidQwordEvent->Guid));
+      if (PerfId == MODULE_LOADIMAGE_END_ID && mCachedLength != 0) {
+        CachedFpdtRecordPtr.RecordHeader = (EFI_ACPI_5_0_FPDT_PERFORMANCE_RECORD_HEADER *)((UINT8*)mSmmBootPerformanceTable + mCachedLength);
+        CopyMem (&CachedFpdtRecordPtr.GuidQwordEvent->Guid, &ModuleGuid, sizeof (CachedFpdtRecordPtr.GuidQwordEvent->Guid));
+        mCachedLength = 0;
+      }
+    }
+    break;
+
+  case PERF_EVENTSIGNAL_START_ID:
+  case PERF_EVENTSIGNAL_END_ID:
+  case PERF_CALLBACK_START_ID:
+  case PERF_CALLBACK_END_ID:
+    if (String == NULL || Guid == NULL) {
+      return EFI_INVALID_PARAMETER;
+    }
+    StringPtr = String;
+    if (AsciiStrLen (String) == 0) {
+      StringPtr = "unknown name";
+    }
+    if (!PcdGetBool (PcdEdkiiFpdtStringRecordEnableOnly)) {
+      FpdtRecordPtr.DualGuidStringEvent->Header.Type      = FPDT_DUAL_GUID_STRING_EVENT_TYPE;
+      FpdtRecordPtr.DualGuidStringEvent->Header.Length    = sizeof (FPDT_DUAL_GUID_STRING_EVENT_RECORD);
+      FpdtRecordPtr.DualGuidStringEvent->Header.Revision  = FPDT_RECORD_REVISION_1;
+      FpdtRecordPtr.DualGuidStringEvent->ProgressID       = PerfId;
+      FpdtRecordPtr.DualGuidStringEvent->Timestamp        = TimeStamp;
+      CopyMem (&FpdtRecordPtr.DualGuidStringEvent->Guid1, CallerIdentifier, sizeof (FpdtRecordPtr.DualGuidStringEvent->Guid1));
+      CopyMem (&FpdtRecordPtr.DualGuidStringEvent->Guid2, Guid, sizeof (FpdtRecordPtr.DualGuidStringEvent->Guid2));
+      CopyStringIntoPerfRecordAndUpdateLength (FpdtRecordPtr.DualGuidStringEvent->String, StringPtr, &FpdtRecordPtr.DualGuidStringEvent->Header.Length);
+    }
+    break;
+
+  case PERF_EVENT_ID:
+  case PERF_FUNCTION_START_ID:
+  case PERF_FUNCTION_END_ID:
+  case PERF_INMODULE_START_ID:
+  case PERF_INMODULE_END_ID:
+  case PERF_CROSSMODULE_START_ID:
+  case PERF_CROSSMODULE_END_ID:
+    GetModuleInfoFromHandle ((EFI_HANDLE)CallerIdentifier, ModuleName, sizeof (ModuleName), &ModuleGuid);
+    if (String != NULL) {
+      StringPtr = String;
+    } else {
+      StringPtr = ModuleName;
+    }
+    if (AsciiStrLen (StringPtr) == 0) {
+      StringPtr = "unknown name";
+    }
+    if (!PcdGetBool (PcdEdkiiFpdtStringRecordEnableOnly)) {
+      FpdtRecordPtr.DynamicStringEvent->Header.Type       = FPDT_DYNAMIC_STRING_EVENT_TYPE;
+      FpdtRecordPtr.DynamicStringEvent->Header.Length     = sizeof (FPDT_DYNAMIC_STRING_EVENT_RECORD);
+      FpdtRecordPtr.DynamicStringEvent->Header.Revision   = FPDT_RECORD_REVISION_1;
+      FpdtRecordPtr.DynamicStringEvent->ProgressID        = PerfId;
+      FpdtRecordPtr.DynamicStringEvent->Timestamp         = TimeStamp;
+      CopyMem (&FpdtRecordPtr.DynamicStringEvent->Guid, &ModuleGuid, sizeof (FpdtRecordPtr.DynamicStringEvent->Guid));
+      CopyStringIntoPerfRecordAndUpdateLength (FpdtRecordPtr.DynamicStringEvent->String, StringPtr, &FpdtRecordPtr.DynamicStringEvent->Header.Length);
+    }
+    break;
+
+  default:
+    if (Attribute != PerfEntry) {
+      GetModuleInfoFromHandle ((EFI_HANDLE)CallerIdentifier, ModuleName, sizeof (ModuleName), &ModuleGuid);
+      if (String != NULL) {
+        StringPtr = String;
+      } else {
+        StringPtr = ModuleName;
+      }
+      if (AsciiStrLen (StringPtr) == 0) {
+        StringPtr = "unknown name";
+      }
+      if (!PcdGetBool (PcdEdkiiFpdtStringRecordEnableOnly)) {
+        FpdtRecordPtr.DynamicStringEvent->Header.Type       = FPDT_DYNAMIC_STRING_EVENT_TYPE;
+        FpdtRecordPtr.DynamicStringEvent->Header.Length     = sizeof (FPDT_DYNAMIC_STRING_EVENT_RECORD);
+        FpdtRecordPtr.DynamicStringEvent->Header.Revision   = FPDT_RECORD_REVISION_1;
+        FpdtRecordPtr.DynamicStringEvent->ProgressID        = PerfId;
+        FpdtRecordPtr.DynamicStringEvent->Timestamp         = TimeStamp;
+        CopyMem (&FpdtRecordPtr.DynamicStringEvent->Guid, &ModuleGuid, sizeof (FpdtRecordPtr.DynamicStringEvent->Guid));
+        CopyStringIntoPerfRecordAndUpdateLength (FpdtRecordPtr.DynamicStringEvent->String, StringPtr, &FpdtRecordPtr.DynamicStringEvent->Header.Length);
+      }
+    } else {
+      return EFI_INVALID_PARAMETER;
+    }
+    break;
+  }
+
+  //
+  // 4.2 When PcdEdkiiFpdtStringRecordEnableOnly==TRUE, create string record for all Perf entries.
+  //
+  if (PcdGetBool (PcdEdkiiFpdtStringRecordEnableOnly)) {
+    if (StringPtr == NULL) {
+      return EFI_INVALID_PARAMETER;
+    }
+    FpdtRecordPtr.DynamicStringEvent->Header.Type       = FPDT_DYNAMIC_STRING_EVENT_TYPE;
+    FpdtRecordPtr.DynamicStringEvent->Header.Length     = sizeof (FPDT_DYNAMIC_STRING_EVENT_RECORD);
+    FpdtRecordPtr.DynamicStringEvent->Header.Revision   = FPDT_RECORD_REVISION_1;
+    FpdtRecordPtr.DynamicStringEvent->ProgressID        = PerfId;
+    FpdtRecordPtr.DynamicStringEvent->Timestamp         = TimeStamp;
+    if (Guid != NULL) {
+      //
+      // Cache the event guid in string event record.
+      //
+      CopyMem (&FpdtRecordPtr.DynamicStringEvent->Guid, Guid, sizeof (FpdtRecordPtr.DynamicStringEvent->Guid));
+    } else {
+      CopyMem (&FpdtRecordPtr.DynamicStringEvent->Guid, &ModuleGuid, sizeof (FpdtRecordPtr.DynamicStringEvent->Guid));
+    }
+    if (AsciiStrLen (StringPtr) == 0) {
+      StringPtr = "unknown name";
+    }
+    CopyStringIntoPerfRecordAndUpdateLength (FpdtRecordPtr.DynamicStringEvent->String, StringPtr, &FpdtRecordPtr.DynamicStringEvent->Header.Length);
+
+    if ((PerfId == MODULE_LOADIMAGE_START_ID) || (PerfId == MODULE_END_ID)) {
+      FpdtRecordPtr.DynamicStringEvent->Header.Length = (UINT8)(sizeof (FPDT_DYNAMIC_STRING_EVENT_RECORD)+ STRING_SIZE);
+    }
+    if ((PerfId == MODULE_LOADIMAGE_END_ID || PerfId == MODULE_END_ID) && mCachedLength != 0) {
+      CachedFpdtRecordPtr.RecordHeader = (EFI_ACPI_5_0_FPDT_PERFORMANCE_RECORD_HEADER *)((UINT8*)mSmmBootPerformanceTable + mCachedLength);
+      if (PerfId == MODULE_LOADIMAGE_END_ID) {
+        DestMax = CachedFpdtRecordPtr.DynamicStringEvent->Header.Length - sizeof (FPDT_DYNAMIC_STRING_EVENT_RECORD);
+        StringLen = AsciiStrLen (StringPtr);
+        if (StringLen >= DestMax) {
+          StringLen = DestMax -1;
+        }
+        CopyMem (&CachedFpdtRecordPtr.DynamicStringEvent->Guid, &ModuleGuid, sizeof (CachedFpdtRecordPtr.DynamicStringEvent->Guid));
+        AsciiStrnCpyS (CachedFpdtRecordPtr.DynamicStringEvent->String, DestMax, StringPtr, StringLen);
+      } else if (PerfId == MODULE_END_ID) {
+        DestMax = FpdtRecordPtr.DynamicStringEvent->Header.Length - sizeof (FPDT_DYNAMIC_STRING_EVENT_RECORD);
+        StringLen = AsciiStrLen (CachedFpdtRecordPtr.DynamicStringEvent->String);
+        if (StringLen >= DestMax) {
+          StringLen = DestMax -1;
+        }
+        CopyMem (&FpdtRecordPtr.DynamicStringEvent->Guid, &CachedFpdtRecordPtr.DynamicStringEvent->Guid, sizeof (CachedFpdtRecordPtr.DynamicStringEvent->Guid));
+        AsciiStrnCpyS (FpdtRecordPtr.DynamicStringEvent->String, DestMax, CachedFpdtRecordPtr.DynamicStringEvent->String, StringLen);
+      }
+      mCachedLength = 0;
+    }
+  }
+
+  //
+  // 5. Update the length of the used buffer after fill in the record.
+  //
+  mPerformanceLength += FpdtRecordPtr.RecordHeader->Length;
+  mSmmBootPerformanceTable->Header.Length += FpdtRecordPtr.RecordHeader->Length;
 
   return EFI_SUCCESS;
 }
 
 /**
-  Communication service SMI Handler entry.
+  SmmReadyToBoot protocol notification event handler.
 
-  This SMI handler provides services for the performance wrapper driver.
-  
-   Caution: This function may receive untrusted input.
-   Communicate buffer and buffer size are external input, so this function will do basic validation.
+  @param  Protocol   Points to the protocol's unique identifier
+  @param  Interface  Points to the interface instance
+  @param  Handle     The handle on which the interface was installed
 
-  @param[in]     DispatchHandle  The unique handle assigned to this handler by SmiHandlerRegister().
-  @param[in]     RegisterContext Points to an optional handler context which was specified when the
-                                 handler was registered.
-  @param[in, out] CommBuffer     A pointer to a collection of data in memory that will
-                                 be conveyed from a non-SMM environment into an SMM environment.
-  @param[in, out] CommBufferSize The size of the CommBuffer.
+  @retval EFI_SUCCESS   SmmReadyToBootCallback runs successfully
 
-  @retval EFI_SUCCESS                         The interrupt was handled and quiesced. No other handlers 
-                                              should still be called.
-  @retval EFI_WARN_INTERRUPT_SOURCE_QUIESCED  The interrupt has been quiesced but other handlers should 
-                                              still be called.
-  @retval EFI_WARN_INTERRUPT_SOURCE_PENDING   The interrupt is still pending and other handlers should still 
-                                              be called.
-  @retval EFI_INTERRUPT_PENDING               The interrupt could not be quiesced.
 **/
 EFI_STATUS
 EFIAPI
-SmmPerformanceHandlerEx (
-  IN     EFI_HANDLE                    DispatchHandle,
-  IN     CONST VOID                   *RegisterContext,
-  IN OUT VOID                          *CommBuffer,
-  IN OUT UINTN                         *CommBufferSize
+SmmReportFpdtRecordData (
+  IN CONST EFI_GUID                       *Protocol,
+  IN VOID                                 *Interface,
+  IN EFI_HANDLE                           Handle
   )
 {
-  EFI_STATUS                Status;
-  SMM_PERF_COMMUNICATE_EX   *SmmPerfCommData;
-  GAUGE_DATA_ENTRY_EX       *GaugeEntryExArray;
-  UINT64                    DataSize;
-  UINTN                     Index;
-  GAUGE_DATA_ENTRY_EX       *GaugeDataEx;
-  UINTN                     NumberOfEntries;
-  UINTN                     LogEntryKey;
-  UINTN                     TempCommBufferSize;
+  UINT64          SmmBPDTddr;
 
-  GaugeEntryExArray = NULL;
-
-  //
-  // If input is invalid, stop processing this SMI
-  //
-  if (CommBuffer == NULL || CommBufferSize == NULL) {
-    return EFI_SUCCESS;
+  if (!mFpdtDataIsReported && mSmmBootPerformanceTable != NULL) {
+    SmmBPDTddr = (UINT64)(UINTN)mSmmBootPerformanceTable;
+    REPORT_STATUS_CODE_EX (
+        EFI_PROGRESS_CODE,
+        EFI_SOFTWARE_SMM_DRIVER,
+        0,
+        NULL,
+        &gEdkiiFpdtExtendedFirmwarePerformanceGuid,
+        &SmmBPDTddr,
+        sizeof (UINT64)
+        );
+    //
+    // Set FPDT report state to TRUE.
+    //
+    mFpdtDataIsReported = TRUE;
   }
-
-  TempCommBufferSize = *CommBufferSize;
-
-  if(TempCommBufferSize < sizeof (SMM_PERF_COMMUNICATE_EX)) {
-    return EFI_SUCCESS;
-  }
-
-  if (!SmmIsBufferOutsideSmmValid ((UINTN)CommBuffer, TempCommBufferSize)) {
-    DEBUG ((EFI_D_ERROR, "SmmPerformanceHandlerEx: SMM communcation data buffer in SMRAM or overflow!\n"));
-    return EFI_SUCCESS;
-  }
-  
-  SmmPerfCommData = (SMM_PERF_COMMUNICATE_EX *)CommBuffer;
-
-  switch (SmmPerfCommData->Function) {
-    case SMM_PERF_FUNCTION_GET_GAUGE_ENTRY_NUMBER :
-       SmmPerfCommData->NumberOfEntries = mGaugeData->NumberOfEntries;
-       Status = EFI_SUCCESS;
-       break;
-
-    case SMM_PERF_FUNCTION_GET_GAUGE_DATA :
-      GaugeDataEx = SmmPerfCommData->GaugeDataEx;
-      NumberOfEntries = SmmPerfCommData->NumberOfEntries;
-      LogEntryKey = SmmPerfCommData->LogEntryKey;
-       if (GaugeDataEx == NULL || NumberOfEntries == 0 || LogEntryKey > mGaugeData->NumberOfEntries ||
-           NumberOfEntries > mGaugeData->NumberOfEntries || LogEntryKey > (mGaugeData->NumberOfEntries - NumberOfEntries)) {
-         Status = EFI_INVALID_PARAMETER;
-         break;
-       }
-
-       //
-       // Sanity check
-       //
-       DataSize = MultU64x32 (NumberOfEntries, sizeof(GAUGE_DATA_ENTRY_EX));
-       if (!SmmIsBufferOutsideSmmValid ((UINTN) GaugeDataEx, DataSize)) {
-         DEBUG ((EFI_D_ERROR, "SmmPerformanceHandlerEx: SMM Performance Data buffer in SMRAM or overflow!\n"));
-         Status = EFI_ACCESS_DENIED;
-         break;
-       }
-
-       GaugeEntryExArray = (GAUGE_DATA_ENTRY_EX *) (mGaugeData + 1);
-
-       for (Index = 0; Index < NumberOfEntries; Index++) {
-         CopyMem (
-           (UINT8 *) &GaugeDataEx[Index],
-           (UINT8 *) &GaugeEntryExArray[LogEntryKey++],
-           sizeof (GAUGE_DATA_ENTRY_EX)
-           );
-       }
-       Status = EFI_SUCCESS;
-       break;
-
-    default:
-       Status = EFI_UNSUPPORTED;
-  }
-
-
-  SmmPerfCommData->ReturnStatus = Status;
-  
   return EFI_SUCCESS;
 }
 
 /**
-  Communication service SMI Handler entry.
-
-  This SMI handler provides services for the performance wrapper driver.
-
-  Caution: This function may receive untrusted input.
-  Communicate buffer and buffer size are external input, so this function will do basic validation.
-
-  @param[in]     DispatchHandle  The unique handle assigned to this handler by SmiHandlerRegister().
-  @param[in]     RegisterContext Points to an optional handler context which was specified when the
-                                 handler was registered.
-  @param[in, out] CommBuffer     A pointer to a collection of data in memory that will
-                                 be conveyed from a non-SMM environment into an SMM environment.
-  @param[in, out] CommBufferSize The size of the CommBuffer.
-
-  @retval EFI_SUCCESS                         The interrupt was handled and quiesced. No other handlers 
-                                              should still be called.
-  @retval EFI_WARN_INTERRUPT_SOURCE_QUIESCED  The interrupt has been quiesced but other handlers should 
-                                              still be called.
-  @retval EFI_WARN_INTERRUPT_SOURCE_PENDING   The interrupt is still pending and other handlers should still 
-                                              be called.
-  @retval EFI_INTERRUPT_PENDING               The interrupt could not be quiesced.
-**/
-EFI_STATUS
-EFIAPI
-SmmPerformanceHandler (
-  IN     EFI_HANDLE                    DispatchHandle,
-  IN     CONST VOID                   *RegisterContext,
-  IN OUT VOID                          *CommBuffer,
-  IN OUT UINTN                         *CommBufferSize
-  )
-{
-  EFI_STATUS            Status;
-  SMM_PERF_COMMUNICATE  *SmmPerfCommData;
-  GAUGE_DATA_ENTRY_EX   *GaugeEntryExArray;
-  UINT64                DataSize;
-  UINTN                 Index;
-  GAUGE_DATA_ENTRY      *GaugeData;
-  UINTN                 NumberOfEntries;
-  UINTN                 LogEntryKey;
-  UINTN                 TempCommBufferSize;
-
-  GaugeEntryExArray = NULL;
-
-  //
-  // If input is invalid, stop processing this SMI
-  //
-  if (CommBuffer == NULL || CommBufferSize == NULL) {
-    return EFI_SUCCESS;
-  }
-
-  TempCommBufferSize = *CommBufferSize;
-
-  if(TempCommBufferSize < sizeof (SMM_PERF_COMMUNICATE)) {
-    return EFI_SUCCESS;
-  }
-
-  if (!SmmIsBufferOutsideSmmValid ((UINTN)CommBuffer, TempCommBufferSize)) {
-    DEBUG ((EFI_D_ERROR, "SmmPerformanceHandler: SMM communcation data buffer in SMRAM or overflow!\n"));
-    return EFI_SUCCESS;
-  }
-
-  SmmPerfCommData = (SMM_PERF_COMMUNICATE *)CommBuffer;
-
-  switch (SmmPerfCommData->Function) {
-    case SMM_PERF_FUNCTION_GET_GAUGE_ENTRY_NUMBER :
-       SmmPerfCommData->NumberOfEntries = mGaugeData->NumberOfEntries;
-       Status = EFI_SUCCESS;
-       break;
-
-    case SMM_PERF_FUNCTION_GET_GAUGE_DATA :
-       GaugeData = SmmPerfCommData->GaugeData;
-       NumberOfEntries = SmmPerfCommData->NumberOfEntries;
-       LogEntryKey = SmmPerfCommData->LogEntryKey;
-       if (GaugeData == NULL || NumberOfEntries == 0 || LogEntryKey > mGaugeData->NumberOfEntries ||
-           NumberOfEntries > mGaugeData->NumberOfEntries || LogEntryKey > (mGaugeData->NumberOfEntries - NumberOfEntries)) {
-         Status = EFI_INVALID_PARAMETER;
-         break;
-       }
-
-       //
-       // Sanity check
-       //
-       DataSize = MultU64x32 (NumberOfEntries, sizeof(GAUGE_DATA_ENTRY));
-       if (!SmmIsBufferOutsideSmmValid ((UINTN) GaugeData, DataSize)) {
-         DEBUG ((EFI_D_ERROR, "SmmPerformanceHandler: SMM Performance Data buffer in SMRAM or overflow!\n"));
-         Status = EFI_ACCESS_DENIED;
-         break;
-       }
-
-       GaugeEntryExArray = (GAUGE_DATA_ENTRY_EX *) (mGaugeData + 1);
-
-       for (Index = 0; Index < NumberOfEntries; Index++) {
-         CopyMem (
-           (UINT8 *) &GaugeData[Index],
-           (UINT8 *) &GaugeEntryExArray[LogEntryKey++],
-           sizeof (GAUGE_DATA_ENTRY)
-           );
-       }
-       Status = EFI_SUCCESS;
-       break;
-
-    default:
-       Status = EFI_UNSUPPORTED;
-  }
-
-
-  SmmPerfCommData->ReturnStatus = Status;
-  
-  return EFI_SUCCESS;
-}
-
-/**
-  SmmBase2 protocol notify callback function, when SMST and SMM memory service get initialized 
-  this function is callbacked to initialize the Smm Performance Lib 
+  SmmBase2 protocol notify callback function, when SMST and SMM memory service get initialized
+  this function is callbacked to initialize the Smm Performance Lib
 
   @param  Event    The event of notify protocol.
   @param  Context  Notify event context.
@@ -685,50 +829,51 @@ InitializeSmmCorePerformanceLib (
   IN VOID          *Context
   )
 {
-  EFI_STATUS                Status;
   EFI_HANDLE                Handle;
+  EFI_STATUS                Status;
+  VOID                      *SmmReadyToBootRegistration;
+  PERFORMANCE_PROPERTY      *PerformanceProperty;
 
   //
   // Initialize spin lock
   //
-  InitializeSpinLock (&mSmmPerfLock);
+  InitializeSpinLock (&mSmmFpdtLock);
 
-  mMaxGaugeRecords = INIT_SMM_GAUGE_DATA_ENTRIES;
-
-  mGaugeData = AllocateZeroPool (sizeof (GAUGE_DATA_HEADER) + (sizeof (GAUGE_DATA_ENTRY_EX) * mMaxGaugeRecords));
-  ASSERT (mGaugeData != NULL);
-  
   //
-  // Install the protocol interfaces.
+  // Install the protocol interfaces for SMM performance library instance.
   //
-  Status = gSmst->SmmInstallProtocolInterface (
-                    &mHandle,
-                    &gSmmPerformanceProtocolGuid,
-                    EFI_NATIVE_INTERFACE,
-                    &mPerformanceInterface
-                    );
-  ASSERT_EFI_ERROR (Status);
-
-  Status = gSmst->SmmInstallProtocolInterface (
-                    &mHandle,
-                    &gSmmPerformanceExProtocolGuid,
-                    EFI_NATIVE_INTERFACE,
-                    &mPerformanceExInterface
-                    );
-  ASSERT_EFI_ERROR (Status);
-
-  ///
-  /// Register SMM Performance SMI handler
-  ///
   Handle = NULL;
-  Status = gSmst->SmiHandlerRegister (SmmPerformanceHandler, &gSmmPerformanceProtocolGuid, &Handle);
+  Status = gSmst->SmmInstallProtocolInterface (
+                    &Handle,
+                    &gEdkiiSmmPerformanceMeasurementProtocolGuid,
+                    EFI_NATIVE_INTERFACE,
+                    &mPerformanceMeasurementInterface
+                    );
   ASSERT_EFI_ERROR (Status);
-  Status = gSmst->SmiHandlerRegister (SmmPerformanceHandlerEx, &gSmmPerformanceExProtocolGuid, &Handle);
-  ASSERT_EFI_ERROR (Status);
+
+  Status = gSmst->SmmRegisterProtocolNotify (
+                    &gEdkiiSmmReadyToBootProtocolGuid,
+                    SmmReportFpdtRecordData,
+                    &SmmReadyToBootRegistration
+                    );
+  Status = EfiGetSystemConfigurationTable (&gPerformanceProtocolGuid, (VOID **) &PerformanceProperty);
+  if (EFI_ERROR (Status)) {
+    //
+    // Install configuration table for performance property.
+    //
+    mPerformanceProperty.Revision  = PERFORMANCE_PROPERTY_REVISION;
+    mPerformanceProperty.Reserved  = 0;
+    mPerformanceProperty.Frequency = GetPerformanceCounterProperties (
+                                       &mPerformanceProperty.TimerStartValue,
+                                       &mPerformanceProperty.TimerEndValue
+                                       );
+    Status = gBS->InstallConfigurationTable (&gPerformanceProtocolGuid, &mPerformanceProperty);
+    ASSERT_EFI_ERROR (Status);
+  }
 }
 
 /**
-  The constructor function initializes the Performance Measurement Enable flag and 
+  The constructor function initializes the Performance Measurement Enable flag and
   registers SmmBase2 protocol notify callback.
   It will ASSERT() if one of these operations fails and it will always return EFI_SUCCESS.
 
@@ -749,8 +894,7 @@ SmmCorePerformanceLibConstructor (
   EFI_EVENT   Event;
   VOID        *Registration;
 
-  mPerformanceMeasurementEnabled =  (BOOLEAN) ((PcdGet8(PcdPerformanceLibraryPropertyMask) & PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED) != 0);
-  if (!mPerformanceMeasurementEnabled) {
+  if (!PerformanceMeasurementEnabled ()) {
     //
     // Do not initialize performance infrastructure if not required.
     //
@@ -781,6 +925,46 @@ SmmCorePerformanceLibConstructor (
   ASSERT_EFI_ERROR (Status);
 
   return EFI_SUCCESS;
+}
+
+/**
+  Create performance record with event description and a timestamp.
+
+  @param CallerIdentifier  - Image handle or pointer to caller ID GUID.
+  @param Guid              - Pointer to a GUID.
+  @param String            - Pointer to a string describing the measurement.
+  @param TimeStamp         - 64-bit time stamp.
+  @param Address           - Pointer to a location in memory relevant to the measurement.
+  @param Identifier        - Performance identifier describing the type of measurement.
+  @param Attribute         - The attribute of the measurement. According to attribute can create a start
+                             record for PERF_START/PERF_START_EX, or a end record for PERF_END/PERF_END_EX,
+                             or a general record for other Perf macros.
+
+  @retval EFI_SUCCESS           - Successfully created performance record.
+  @retval EFI_OUT_OF_RESOURCES  - Ran out of space to store the records.
+  @retval EFI_INVALID_PARAMETER - Invalid parameter passed to function - NULL
+                                  pointer or invalid PerfId.
+**/
+EFI_STATUS
+EFIAPI
+CreatePerformanceMeasurement(
+  IN CONST VOID                        *CallerIdentifier, OPTIONAL
+  IN CONST VOID                        *Guid,     OPTIONAL
+  IN CONST CHAR8                       *String,   OPTIONAL
+  IN       UINT64                      TimeStamp, OPTIONAL
+  IN       UINT64                      Address,   OPTIONAL
+  IN       UINT32                      Identifier,
+  IN       PERF_MEASUREMENT_ATTRIBUTE  Attribute
+  )
+{
+  EFI_STATUS   Status;
+
+  Status = EFI_SUCCESS;
+
+  AcquireSpinLock (&mSmmFpdtLock);
+  Status = InsertFpdtRecord (CallerIdentifier, Guid, String, TimeStamp, Address, (UINT16)Identifier, Attribute);
+  ReleaseSpinLock (&mSmmFpdtLock);
+  return Status;
 }
 
 /**
@@ -818,7 +1002,17 @@ StartPerformanceMeasurementEx (
   IN UINT32       Identifier
   )
 {
-  return (RETURN_STATUS) StartGaugeEx (Handle, Token, Module, TimeStamp, Identifier);
+  CONST CHAR8     *String;
+
+  if (Token != NULL) {
+    String = Token;
+  } else if (Module != NULL) {
+    String = Module;
+  } else {
+    String = NULL;
+  }
+
+  return (RETURN_STATUS)CreatePerformanceMeasurement (Handle, NULL, String, TimeStamp, 0, Identifier, PerfStartEntry);
 }
 
 /**
@@ -826,7 +1020,7 @@ StartPerformanceMeasurementEx (
   for the first matching record that contains a zero end time and fills in a valid end time.
 
   Searches the performance measurement log from the beginning of the log
-  for the first record that matches Handle, Token and Module and has an end time value of zero.
+  for the first record that matches Handle, Token, Module and Identifier and has an end time value of zero.
   If the record can not be found then return RETURN_NOT_FOUND.
   If the record is found and TimeStamp is not zero,
   then the end time in the record is filled in with the value specified by TimeStamp.
@@ -857,13 +1051,25 @@ EndPerformanceMeasurementEx (
   IN UINT32       Identifier
   )
 {
-  return (RETURN_STATUS) EndGaugeEx (Handle, Token, Module, TimeStamp, Identifier);
+  CONST CHAR8     *String;
+
+  if (Token != NULL) {
+    String = Token;
+  } else if (Module != NULL) {
+    String = Module;
+  } else {
+    String = NULL;
+  }
+
+  return (RETURN_STATUS)CreatePerformanceMeasurement (Handle, NULL, String, TimeStamp, 0, Identifier, PerfEndEntry);
 }
 
 /**
   Attempts to retrieve a performance measurement log entry from the performance measurement log.
   It can also retrieve the log created by StartPerformanceMeasurement and EndPerformanceMeasurement,
   and then assign the Identifier with 0.
+
+  !!! Not Support!!!
 
   Attempts to retrieve the performance log entry specified by LogEntryKey.  If LogEntryKey is
   zero on entry, then an attempt is made to retrieve the first entry from the performance log,
@@ -904,7 +1110,7 @@ EndPerformanceMeasurementEx (
 UINTN
 EFIAPI
 GetPerformanceMeasurementEx (
-  IN  UINTN       LogEntryKey, 
+  IN  UINTN       LogEntryKey,
   OUT CONST VOID  **Handle,
   OUT CONST CHAR8 **Token,
   OUT CONST CHAR8 **Module,
@@ -913,42 +1119,7 @@ GetPerformanceMeasurementEx (
   OUT UINT32      *Identifier
   )
 {
-  EFI_STATUS           Status;
-  GAUGE_DATA_ENTRY_EX  *GaugeData;
-
-  GaugeData = NULL;
-  
-  ASSERT (Handle != NULL);
-  ASSERT (Token != NULL);
-  ASSERT (Module != NULL);
-  ASSERT (StartTimeStamp != NULL);
-  ASSERT (EndTimeStamp != NULL);
-  ASSERT (Identifier != NULL);
-
-  Status = GetGaugeEx (LogEntryKey++, &GaugeData);
-
-  //
-  // Make sure that LogEntryKey is a valid log entry key,
-  //
-  ASSERT (Status != EFI_INVALID_PARAMETER);
-
-  if (EFI_ERROR (Status)) {
-    //
-    // The LogEntryKey is the last entry (equals to the total entry number).
-    //
-    return 0;
-  }
-
-  ASSERT (GaugeData != NULL);
-
-  *Handle         = (VOID *) (UINTN) GaugeData->Handle;
-  *Token          = GaugeData->Token;
-  *Module         = GaugeData->Module;
-  *StartTimeStamp = GaugeData->StartTimeStamp;
-  *EndTimeStamp   = GaugeData->EndTimeStamp;
-  *Identifier     = GaugeData->Identifier;
-
-  return LogEntryKey;
+  return 0;
 }
 
 /**
@@ -1027,6 +1198,8 @@ EndPerformanceMeasurement (
   It can also retrieve the log created by StartPerformanceMeasurementEx and EndPerformanceMeasurementEx,
   and then eliminate the Identifier.
 
+  !!! Not Support!!!
+
   Attempts to retrieve the performance log entry specified by LogEntryKey.  If LogEntryKey is
   zero on entry, then an attempt is made to retrieve the first entry from the performance log,
   and the key for the second entry in the log is returned.  If the performance log is empty,
@@ -1072,8 +1245,7 @@ GetPerformanceMeasurement (
   OUT UINT64      *EndTimeStamp
   )
 {
-  UINT32 Identifier;
-  return GetPerformanceMeasurementEx (LogEntryKey, Handle, Token, Module, StartTimeStamp, EndTimeStamp, &Identifier);
+  return 0;
 }
 
 /**
@@ -1094,5 +1266,61 @@ PerformanceMeasurementEnabled (
   VOID
   )
 {
-  return mPerformanceMeasurementEnabled;
+  return (BOOLEAN) ((PcdGet8(PcdPerformanceLibraryPropertyMask) & PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED) != 0);
 }
+
+/**
+  Create performance record with event description and a timestamp.
+
+  @param CallerIdentifier  - Image handle or pointer to caller ID GUID
+  @param Guid              - Pointer to a GUID
+  @param String            - Pointer to a string describing the measurement
+  @param Address           - Pointer to a location in memory relevant to the measurement
+  @param Identifier        - Performance identifier describing the type of measurement
+
+  @retval RETURN_SUCCESS           - Successfully created performance record
+  @retval RETURN_OUT_OF_RESOURCES  - Ran out of space to store the records
+  @retval RETURN_INVALID_PARAMETER - Invalid parameter passed to function - NULL
+                                     pointer or invalid PerfId
+
+**/
+RETURN_STATUS
+EFIAPI
+LogPerformanceMeasurement (
+  IN CONST VOID   *CallerIdentifier,
+  IN CONST VOID   *Guid,    OPTIONAL
+  IN CONST CHAR8  *String,  OPTIONAL
+  IN UINT64       Address, OPTIONAL
+  IN UINT32       Identifier
+  )
+{
+  return (RETURN_STATUS)CreatePerformanceMeasurement (CallerIdentifier, Guid, String, 0, Address, Identifier, PerfEntry);
+}
+
+/**
+  Check whether the specified performance measurement can be logged.
+
+  This function returns TRUE when the PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED bit of PcdPerformanceLibraryPropertyMask is set
+  and the Type disable bit in PcdPerformanceLibraryPropertyMask is not set.
+
+  @param Type        - Type of the performance measurement entry.
+
+  @retval TRUE         The performance measurement can be logged.
+  @retval FALSE        The performance measurement can NOT be logged.
+
+**/
+BOOLEAN
+EFIAPI
+LogPerformanceMeasurementEnabled (
+  IN  CONST UINTN        Type
+  )
+{
+  //
+  // When Performance measurement is enabled and the type is not filtered, the performance can be logged.
+  //
+  if (PerformanceMeasurementEnabled () && (PcdGet8(PcdPerformanceLibraryPropertyMask) & Type) == 0) {
+    return TRUE;
+  }
+  return FALSE;
+}
+

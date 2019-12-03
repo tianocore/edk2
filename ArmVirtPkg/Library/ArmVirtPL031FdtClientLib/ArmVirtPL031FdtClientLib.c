@@ -3,13 +3,7 @@
 
   Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -66,18 +60,16 @@ ArmVirtPL031FdtClientLibConstructor (
 
   DEBUG ((EFI_D_INFO, "Found PL031 RTC @ 0x%Lx\n", RegBase));
 
-  if (!FeaturePcdGet (PcdPureAcpiBoot)) {
-    //
-    // UEFI takes ownership of the RTC hardware, and exposes its functionality
-    // through the UEFI Runtime Services GetTime, SetTime, etc. This means we
-    // need to disable it in the device tree to prevent the OS from attaching
-    // its device driver as well.
-    //
-    Status = FdtClient->SetNodeProperty (FdtClient, Node, "status",
-                          "disabled", sizeof ("disabled"));
-    if (EFI_ERROR (Status)) {
-        DEBUG ((EFI_D_WARN, "Failed to set PL031 status to 'disabled'\n"));
-    }
+  //
+  // UEFI takes ownership of the RTC hardware, and exposes its functionality
+  // through the UEFI Runtime Services GetTime, SetTime, etc. This means we
+  // need to disable it in the device tree to prevent the OS from attaching
+  // its device driver as well.
+  //
+  Status = FdtClient->SetNodeProperty (FdtClient, Node, "status",
+                        "disabled", sizeof ("disabled"));
+  if (EFI_ERROR (Status)) {
+      DEBUG ((EFI_D_WARN, "Failed to set PL031 status to 'disabled'\n"));
   }
 
   return EFI_SUCCESS;

@@ -1,14 +1,8 @@
 /** @file
   Header file for Multi-Processor support.
 
-  Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -96,7 +90,7 @@ ReleaseMpSpinLock (
 
 **/
 BOOLEAN
-IsBsp (
+DebugAgentIsBsp (
   IN UINT32             ProcessorIndex
   );
 
@@ -189,7 +183,7 @@ UINT32
 FindNextPendingBreakCpu (
   VOID
   );
-  
+
 /**
   Check if all processors are in running status.
 
@@ -205,18 +199,18 @@ IsAllCpuRunning (
 /**
   Check if the current processor is the first breaking processor.
 
-  If yes, halt other processors.  
-  
+  If yes, halt other processors.
+
   @param[in] ProcessorIndex   Processor index value.
-  
+
   @return TRUE       This processor is the first breaking processor.
   @return FALSE      This processor is not the first breaking processor.
-                            
+
 **/
 BOOLEAN
 IsFirstBreakProcessor (
   IN UINT32              ProcessorIndex
   );
-  
+
 #endif
 

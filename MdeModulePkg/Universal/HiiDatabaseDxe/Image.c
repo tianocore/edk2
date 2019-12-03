@@ -2,20 +2,15 @@
 Implementation for EFI_HII_IMAGE_PROTOCOL.
 
 
-Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2007 - 2019, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 
 #include "HiiDatabase.h"
 
+#define MAX_UINT24    0xFFFFFF
 
 /**
   Get the imageid of last image block: EFI_HII_IIBT_END_BLOCK when input
@@ -105,7 +100,7 @@ GetImageIdOrAddress (
     case EFI_HII_IIBT_IMAGE_8BIT_TRANS:
       Length = sizeof (EFI_HII_IIBT_IMAGE_8BIT_BLOCK) - sizeof (UINT8) +
                BITMAP_LEN_8_BIT (
-                 ReadUnaligned16 (&((EFI_HII_IIBT_IMAGE_8BIT_BLOCK *) CurrentImageBlock)->Bitmap.Width),
+                 (UINT32) ReadUnaligned16 (&((EFI_HII_IIBT_IMAGE_8BIT_BLOCK *) CurrentImageBlock)->Bitmap.Width),
                  ReadUnaligned16 (&((EFI_HII_IIBT_IMAGE_8BIT_BLOCK *) CurrentImageBlock)->Bitmap.Height)
                  );
       ImageIdCurrent++;
@@ -115,7 +110,7 @@ GetImageIdOrAddress (
     case EFI_HII_IIBT_IMAGE_24BIT_TRANS:
       Length = sizeof (EFI_HII_IIBT_IMAGE_24BIT_BLOCK) - sizeof (EFI_HII_RGB_PIXEL) +
                BITMAP_LEN_24_BIT (
-                 ReadUnaligned16 ((VOID *) &((EFI_HII_IIBT_IMAGE_24BIT_BLOCK *) CurrentImageBlock)->Bitmap.Width),
+                 (UINT32) ReadUnaligned16 ((VOID *) &((EFI_HII_IIBT_IMAGE_24BIT_BLOCK *) CurrentImageBlock)->Bitmap.Width),
                  ReadUnaligned16 ((VOID *) &((EFI_HII_IIBT_IMAGE_24BIT_BLOCK *) CurrentImageBlock)->Bitmap.Height)
                  );
       ImageIdCurrent++;
@@ -369,7 +364,7 @@ Output4bitPixel (
   PaletteNum = (UINT16)(Palette->PaletteSize / sizeof (EFI_HII_RGB_PIXEL));
 
   ZeroMem (PaletteValue, sizeof (PaletteValue));
-  CopyRgbToGopPixel (PaletteValue, Palette->PaletteValue, PaletteNum);
+  CopyRgbToGopPixel (PaletteValue, Palette->PaletteValue, MIN (PaletteNum, ARRAY_SIZE (PaletteValue)));
   FreePool (Palette);
 
   //
@@ -446,14 +441,14 @@ Output8bitPixel (
   CopyMem (Palette, PaletteInfo, PaletteSize);
   PaletteNum = (UINT16)(Palette->PaletteSize / sizeof (EFI_HII_RGB_PIXEL));
   ZeroMem (PaletteValue, sizeof (PaletteValue));
-  CopyRgbToGopPixel (PaletteValue, Palette->PaletteValue, PaletteNum);
+  CopyRgbToGopPixel (PaletteValue, Palette->PaletteValue, MIN (PaletteNum, ARRAY_SIZE (PaletteValue)));
   FreePool (Palette);
 
   //
   // Convert the pixel from 8 bits to corresponding color.
   //
   for (Ypos = 0; Ypos < Image->Height; Ypos++) {
-    OffsetY = BITMAP_LEN_8_BIT (Image->Width, Ypos);
+    OffsetY = BITMAP_LEN_8_BIT ((UINT32) Image->Width, Ypos);
     //
     // All bits are meaningful since the bitmap is 8 bits per pixel.
     //
@@ -493,7 +488,7 @@ Output24bitPixel (
   BitMapPtr = Image->Bitmap;
 
   for (Ypos = 0; Ypos < Image->Height; Ypos++) {
-    OffsetY = BITMAP_LEN_8_BIT (Image->Width, Ypos);
+    OffsetY = BITMAP_LEN_8_BIT ((UINT32) Image->Width, Ypos);
     CopyRgbToGopPixel (&BitMapPtr[OffsetY], &Data[OffsetY], Image->Width);
   }
 
@@ -649,8 +644,19 @@ HiiNewImage (
     return EFI_NOT_FOUND;
   }
 
-  NewBlockSize = sizeof (EFI_HII_IIBT_IMAGE_24BIT_BLOCK) - sizeof (EFI_HII_RGB_PIXEL) +
-                 BITMAP_LEN_24_BIT (Image->Width, Image->Height);
+  EfiAcquireLock (&mHiiDatabaseLock);
+
+  //
+  // Calcuate the size of new image.
+  // Make sure the size doesn't overflow UINT32.
+  // Note: 24Bit BMP occpuies 3 bytes per pixel.
+  //
+  NewBlockSize = (UINT32)Image->Width * Image->Height;
+  if (NewBlockSize > (MAX_UINT32 - (sizeof (EFI_HII_IIBT_IMAGE_24BIT_BLOCK) - sizeof (EFI_HII_RGB_PIXEL))) / 3) {
+    EfiReleaseLock (&mHiiDatabaseLock);
+    return EFI_OUT_OF_RESOURCES;
+  }
+  NewBlockSize = NewBlockSize * 3 + (sizeof (EFI_HII_IIBT_IMAGE_24BIT_BLOCK) - sizeof (EFI_HII_RGB_PIXEL));
 
   //
   // Get the image package in the package list,
@@ -669,8 +675,22 @@ HiiNewImage (
     //
     // Update the package's image block by appending the new block to the end.
     //
+
+    //
+    // Make sure the final package length doesn't overflow.
+    // Length of the package header is represented using 24 bits. So MAX length is MAX_UINT24.
+    //
+    if (NewBlockSize > MAX_UINT24 - ImagePackage->ImagePkgHdr.Header.Length) {
+      EfiReleaseLock (&mHiiDatabaseLock);
+      return EFI_OUT_OF_RESOURCES;
+    }
+    //
+    // Because ImagePackage->ImageBlockSize < ImagePackage->ImagePkgHdr.Header.Length,
+    // So (ImagePackage->ImageBlockSize + NewBlockSize) <= MAX_UINT24
+    //
     ImageBlocks = AllocatePool (ImagePackage->ImageBlockSize + NewBlockSize);
     if (ImageBlocks == NULL) {
+      EfiReleaseLock (&mHiiDatabaseLock);
       return EFI_OUT_OF_RESOURCES;
     }
     //
@@ -699,11 +719,20 @@ HiiNewImage (
 
   } else {
     //
+    // Make sure the final package length doesn't overflow.
+    // Length of the package header is represented using 24 bits. So MAX length is MAX_UINT24.
+    //
+    if (NewBlockSize > MAX_UINT24 - (sizeof (EFI_HII_IMAGE_PACKAGE_HDR) + sizeof (EFI_HII_IIBT_END_BLOCK))) {
+      EfiReleaseLock (&mHiiDatabaseLock);
+      return EFI_OUT_OF_RESOURCES;
+    }
+    //
     // The specified package list does not contain image package.
     // Create one to add this image block.
     //
     ImagePackage = (HII_IMAGE_PACKAGE_INSTANCE *) AllocateZeroPool (sizeof (HII_IMAGE_PACKAGE_INSTANCE));
     if (ImagePackage == NULL) {
+      EfiReleaseLock (&mHiiDatabaseLock);
       return EFI_OUT_OF_RESOURCES;
     }
     //
@@ -732,6 +761,7 @@ HiiNewImage (
     ImagePackage->ImageBlock = AllocateZeroPool (NewBlockSize + sizeof (EFI_HII_IIBT_END_BLOCK));
     if (ImagePackage->ImageBlock == NULL) {
       FreePool (ImagePackage);
+      EfiReleaseLock (&mHiiDatabaseLock);
       return EFI_OUT_OF_RESOURCES;
     }
     ImageBlocks = ImagePackage->ImageBlock;
@@ -753,7 +783,7 @@ HiiNewImage (
   }
   WriteUnaligned16 ((VOID *) &((EFI_HII_IIBT_IMAGE_24BIT_BLOCK *) ImageBlocks)->Bitmap.Width, Image->Width);
   WriteUnaligned16 ((VOID *) &((EFI_HII_IIBT_IMAGE_24BIT_BLOCK *) ImageBlocks)->Bitmap.Height, Image->Height);
-  CopyGopToRgbPixel (((EFI_HII_IIBT_IMAGE_24BIT_BLOCK *) ImageBlocks)->Bitmap.Bitmap, Image->Bitmap, Image->Width * Image->Height);
+  CopyGopToRgbPixel (((EFI_HII_IIBT_IMAGE_24BIT_BLOCK *) ImageBlocks)->Bitmap.Bitmap, Image->Bitmap, (UINT32) Image->Width * Image->Height);
 
   //
   // Append the block end
@@ -768,6 +798,8 @@ HiiNewImage (
   if (gExportAfterReadyToBoot) {
     HiiGetDatabaseInfo(&Private->HiiDatabase);
   }
+
+  EfiReleaseLock (&mHiiDatabaseLock);
 
   return EFI_SUCCESS;
 }
@@ -895,8 +927,11 @@ IGetImage (
     // Use the common block code since the definition of these structures is the same.
     //
     CopyMem (&Iibt1bit, CurrentImageBlock, sizeof (EFI_HII_IIBT_IMAGE_1BIT_BLOCK));
-    ImageLength = sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL) *
-                  (Iibt1bit.Bitmap.Width * Iibt1bit.Bitmap.Height);
+    ImageLength = (UINTN) Iibt1bit.Bitmap.Width * Iibt1bit.Bitmap.Height;
+    if (ImageLength > MAX_UINTN / sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL)) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+    ImageLength  *= sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL);
     Image->Bitmap = AllocateZeroPool (ImageLength);
     if (Image->Bitmap == NULL) {
       return EFI_OUT_OF_RESOURCES;
@@ -945,9 +980,13 @@ IGetImage (
     // fall through
     //
   case EFI_HII_IIBT_IMAGE_24BIT:
-    Width = ReadUnaligned16 ((VOID *) &((EFI_HII_IIBT_IMAGE_24BIT_BLOCK *) CurrentImageBlock)->Bitmap.Width);
+    Width  = ReadUnaligned16 ((VOID *) &((EFI_HII_IIBT_IMAGE_24BIT_BLOCK *) CurrentImageBlock)->Bitmap.Width);
     Height = ReadUnaligned16 ((VOID *) &((EFI_HII_IIBT_IMAGE_24BIT_BLOCK *) CurrentImageBlock)->Bitmap.Height);
-    ImageLength = sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL) * (Width * Height);
+    ImageLength = (UINTN)Width * Height;
+    if (ImageLength > MAX_UINTN / sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL)) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+    ImageLength  *= sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL);
     Image->Bitmap = AllocateZeroPool (ImageLength);
     if (Image->Bitmap == NULL) {
       return EFI_OUT_OF_RESOURCES;
@@ -1018,7 +1057,7 @@ HiiGetImage (
 
   @retval EFI_SUCCESS            The new image was updated successfully.
   @retval EFI_NOT_FOUND          The image specified by ImageId is not in the
-                                                database. The specified PackageList is not in the database.    
+                                                database. The specified PackageList is not in the database.
   @retval EFI_INVALID_PARAMETER  The Image was NULL.
 
 **/
@@ -1064,6 +1103,8 @@ HiiSetImage (
     return EFI_NOT_FOUND;
   }
 
+  EfiAcquireLock (&mHiiDatabaseLock);
+
   //
   // Get the size of original image block. Use some common block code here
   // since the definition of some structures is the same.
@@ -1095,7 +1136,7 @@ HiiSetImage (
   case EFI_HII_IIBT_IMAGE_8BIT_TRANS:
     OldBlockSize = sizeof (EFI_HII_IIBT_IMAGE_8BIT_BLOCK) - sizeof (UINT8) +
                    BITMAP_LEN_8_BIT (
-                     ReadUnaligned16 (&((EFI_HII_IIBT_IMAGE_8BIT_BLOCK *) CurrentImageBlock)->Bitmap.Width),
+                     (UINT32) ReadUnaligned16 (&((EFI_HII_IIBT_IMAGE_8BIT_BLOCK *) CurrentImageBlock)->Bitmap.Width),
                      ReadUnaligned16 (&((EFI_HII_IIBT_IMAGE_8BIT_BLOCK *) CurrentImageBlock)->Bitmap.Height)
                      );
     break;
@@ -1103,28 +1144,47 @@ HiiSetImage (
   case EFI_HII_IIBT_IMAGE_24BIT_TRANS:
     OldBlockSize = sizeof (EFI_HII_IIBT_IMAGE_24BIT_BLOCK) - sizeof (EFI_HII_RGB_PIXEL) +
                    BITMAP_LEN_24_BIT (
-                     ReadUnaligned16 ((VOID *) &((EFI_HII_IIBT_IMAGE_24BIT_BLOCK *) CurrentImageBlock)->Bitmap.Width),
+                     (UINT32) ReadUnaligned16 ((VOID *) &((EFI_HII_IIBT_IMAGE_24BIT_BLOCK *) CurrentImageBlock)->Bitmap.Width),
                      ReadUnaligned16 ((VOID *) &((EFI_HII_IIBT_IMAGE_24BIT_BLOCK *) CurrentImageBlock)->Bitmap.Height)
                      );
     break;
   default:
+    EfiReleaseLock (&mHiiDatabaseLock);
     return EFI_NOT_FOUND;
   }
 
   //
   // Create the new image block according to input image.
   //
-  NewBlockSize = sizeof (EFI_HII_IIBT_IMAGE_24BIT_BLOCK) - sizeof (EFI_HII_RGB_PIXEL) +
-                 BITMAP_LEN_24_BIT (Image->Width, Image->Height);
+
+  //
+  // Make sure the final package length doesn't overflow.
+  // Length of the package header is represented using 24 bits. So MAX length is MAX_UINT24.
+  // 24Bit BMP occpuies 3 bytes per pixel.
+  //
+  NewBlockSize = (UINT32)Image->Width * Image->Height;
+  if (NewBlockSize > (MAX_UINT32 - (sizeof (EFI_HII_IIBT_IMAGE_24BIT_BLOCK) - sizeof (EFI_HII_RGB_PIXEL))) / 3) {
+    EfiReleaseLock (&mHiiDatabaseLock);
+    return EFI_OUT_OF_RESOURCES;
+  }
+  NewBlockSize = NewBlockSize * 3 + (sizeof (EFI_HII_IIBT_IMAGE_24BIT_BLOCK) - sizeof (EFI_HII_RGB_PIXEL));
+  if ((NewBlockSize > OldBlockSize) &&
+      (NewBlockSize - OldBlockSize > MAX_UINT24 - ImagePackage->ImagePkgHdr.Header.Length)
+      ) {
+    EfiReleaseLock (&mHiiDatabaseLock);
+    return EFI_OUT_OF_RESOURCES;
+  }
+
   //
   // Adjust the image package to remove the original block firstly then add the new block.
   //
   ImageBlocks = AllocateZeroPool (ImagePackage->ImageBlockSize + NewBlockSize - OldBlockSize);
   if (ImageBlocks == NULL) {
+    EfiReleaseLock (&mHiiDatabaseLock);
     return EFI_OUT_OF_RESOURCES;
   }
 
-  Part1Size = (UINT32) (UINTN) ((UINT8 *) CurrentImageBlock - (UINT8 *) ImagePackage->ImageBlock);
+  Part1Size = (UINT32) ((UINTN) CurrentImageBlock - (UINTN) ImagePackage->ImageBlock);
   Part2Size = ImagePackage->ImageBlockSize - Part1Size - OldBlockSize;
   CopyMem (ImageBlocks, ImagePackage->ImageBlock, Part1Size);
 
@@ -1140,7 +1200,7 @@ HiiSetImage (
   WriteUnaligned16 ((VOID *) &((EFI_HII_IIBT_IMAGE_24BIT_BLOCK *) NewImageBlock)->Bitmap.Width, Image->Width);
   WriteUnaligned16 ((VOID *) &((EFI_HII_IIBT_IMAGE_24BIT_BLOCK *) NewImageBlock)->Bitmap.Height, Image->Height);
   CopyGopToRgbPixel (((EFI_HII_IIBT_IMAGE_24BIT_BLOCK *) NewImageBlock)->Bitmap.Bitmap,
-                       Image->Bitmap, Image->Width * Image->Height);
+                       Image->Bitmap, (UINT32) Image->Width * Image->Height);
 
   CopyMem ((UINT8 *) NewImageBlock + NewBlockSize, (UINT8 *) CurrentImageBlock + OldBlockSize, Part2Size);
 
@@ -1158,6 +1218,7 @@ HiiSetImage (
     HiiGetDatabaseInfo(&Private->HiiDatabase);
   }
 
+  EfiReleaseLock (&mHiiDatabaseLock);
   return EFI_SUCCESS;
 
 }
@@ -1207,8 +1268,8 @@ HiiDrawImage (
   EFI_IMAGE_OUTPUT                    *ImageOut;
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL       *BltBuffer;
   UINTN                               BufferLen;
-  UINTN                               Width;
-  UINTN                               Height;
+  UINT16                              Width;
+  UINT16                              Height;
   UINTN                               Xpos;
   UINTN                               Ypos;
   UINTN                               OffsetY1;
@@ -1269,21 +1330,36 @@ HiiDrawImage (
   //
   if (*Blt != NULL) {
     //
+    // Make sure the BltX and BltY is inside the Blt area.
+    //
+    if ((BltX >= (*Blt)->Width) || (BltY >= (*Blt)->Height)) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    //
     // Clip the image by (Width, Height)
     //
 
     Width  = Image->Width;
     Height = Image->Height;
 
-    if (Width > (*Blt)->Width - BltX) {
-      Width = (*Blt)->Width - BltX;
+    if (Width > (*Blt)->Width - (UINT16)BltX) {
+      Width = (*Blt)->Width - (UINT16)BltX;
     }
-    if (Height > (*Blt)->Height - BltY) {
-      Height = (*Blt)->Height - BltY;
+    if (Height > (*Blt)->Height - (UINT16)BltY) {
+      Height = (*Blt)->Height - (UINT16)BltY;
     }
 
-    BufferLen = Width * Height * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL);
-    BltBuffer = (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *) AllocateZeroPool (BufferLen);
+    //
+    // Prepare the buffer for the temporary image.
+    // Make sure the buffer size doesn't overflow UINTN.
+    //
+    BufferLen = Width * Height;
+    if (BufferLen > MAX_UINTN / sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL)) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+    BufferLen *= sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL);
+    BltBuffer  = AllocateZeroPool (BufferLen);
     if (BltBuffer == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
@@ -1346,11 +1422,26 @@ HiiDrawImage (
     //
     // Allocate a new bitmap to hold the incoming image.
     //
-    Width  = Image->Width  + BltX;
-    Height = Image->Height + BltY;
 
-    BufferLen = Width * Height * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL);
-    BltBuffer = (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *) AllocateZeroPool (BufferLen);
+    //
+    // Make sure the final width and height doesn't overflow UINT16.
+    //
+    if ((BltX > (UINTN)MAX_UINT16 - Image->Width) || (BltY > (UINTN)MAX_UINT16 - Image->Height)) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    Width  = Image->Width  + (UINT16)BltX;
+    Height = Image->Height + (UINT16)BltY;
+
+    //
+    // Make sure the output image size doesn't overflow UINTN.
+    //
+    BufferLen = Width * Height;
+    if (BufferLen > MAX_UINTN / sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL)) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+    BufferLen *= sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL);
+    BltBuffer  = AllocateZeroPool (BufferLen);
     if (BltBuffer == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
@@ -1360,8 +1451,8 @@ HiiDrawImage (
       FreePool (BltBuffer);
       return EFI_OUT_OF_RESOURCES;
     }
-    ImageOut->Width        = (UINT16) Width;
-    ImageOut->Height       = (UINT16) Height;
+    ImageOut->Width        = Width;
+    ImageOut->Height       = Height;
     ImageOut->Image.Bitmap = BltBuffer;
 
     //
@@ -1375,7 +1466,7 @@ HiiDrawImage (
       return Status;
     }
     ASSERT (FontInfo != NULL);
-    for (Index = 0; Index < Width * Height; Index++) {
+    for (Index = 0; Index < (UINTN)Width * Height; Index++) {
       BltBuffer[Index] = FontInfo->BackgroundColor;
     }
     FreePool (FontInfo);
@@ -1426,8 +1517,8 @@ HiiDrawImage (
   @retval EFI_SUCCESS            The image was successfully drawn.
   @retval EFI_OUT_OF_RESOURCES   Unable to allocate an output buffer for Blt.
   @retval EFI_INVALID_PARAMETER  The Blt was NULL.
-  @retval EFI_NOT_FOUND          The image specified by ImageId is not in the database. 
-                           The specified PackageList is not in the database.                             
+  @retval EFI_NOT_FOUND          The image specified by ImageId is not in the database.
+                           The specified PackageList is not in the database.
 
 **/
 EFI_STATUS

@@ -134,7 +134,7 @@ int		level;	/* compression level to uses */
 
 
 /* given pointer to beginning of graph and recursively walks it trying
- * to find a maximal partition.  This partion in returned in maximal_class
+ * to find a maximal partition.  This partition in returned in maximal_class
  */
 #ifdef __USE_PROTOS
 void intersect_nfa_labels(nfa_node* start,set* maximal_class)

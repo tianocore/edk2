@@ -3,14 +3,8 @@
   Dummy function for runtime module, because CapsuleDxeRuntime
   does not need record capsule status variable.
 
-  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2016 - 2019, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -18,26 +12,6 @@
 #include <Protocol/FirmwareManagement.h>
 #include <Guid/FmpCapsule.h>
 #include <Library/CapsuleLib.h>
-
-/**
-  Check if this FMP capsule is processed.
-
-  @param[in] CapsuleHeader  The capsule image header
-  @param[in] PayloadIndex   FMP payload index
-  @param[in] ImageHeader    FMP image header
-
-  @retval TRUE  This FMP capsule is processed.
-  @retval FALSE This FMP capsule is not processed.
-**/
-BOOLEAN
-IsFmpCapsuleProcessed (
-  IN EFI_CAPSULE_HEADER                            *CapsuleHeader,
-  IN UINTN                                         PayloadIndex,
-  IN EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER  *ImageHeader
-  )
-{
-  return FALSE;
-}
 
 /**
   Record capsule status variable and to local cache.
@@ -64,6 +38,8 @@ RecordCapsuleStatusVariable (
   @param[in] CapsuleStatus  The capsule process stauts
   @param[in] PayloadIndex   FMP payload index
   @param[in] ImageHeader    FMP image header
+  @param[in] FmpDevicePath  DevicePath associated with the FMP producer
+  @param[in] CapFileName    Capsule file name
 
   @retval EFI_SUCCESS          The capsule status variable is recorded.
   @retval EFI_OUT_OF_RESOURCES No resource to record the capsule status variable.
@@ -73,7 +49,9 @@ RecordFmpCapsuleStatusVariable (
   IN EFI_CAPSULE_HEADER                            *CapsuleHeader,
   IN EFI_STATUS                                    CapsuleStatus,
   IN UINTN                                         PayloadIndex,
-  IN EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER  *ImageHeader
+  IN EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER  *ImageHeader,
+  IN EFI_DEVICE_PATH_PROTOCOL                      *FmpDevicePath, OPTIONAL
+  IN CHAR16                                        *CapFileName    OPTIONAL
   )
 {
   return EFI_UNSUPPORTED;

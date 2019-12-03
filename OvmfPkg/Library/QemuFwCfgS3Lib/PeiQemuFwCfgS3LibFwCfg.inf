@@ -1,0 +1,39 @@
+## @file
+# Limited functionality QemuFwCfgS3Lib instance, for PEI phase modules.
+#
+# QemuFwCfgS3Enabled() queries S3 enablement via fw_cfg. Other library APIs
+# will report lack of support.
+#
+#  Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (C) 2017, Red Hat, Inc.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 1.25
+  BASE_NAME                      = PeiQemuFwCfgS3LibFwCfg
+  FILE_GUID                      = DD8D28B4-C1DC-4CAF-BB93-074BE80DAE6D
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = QemuFwCfgS3Lib|PEIM
+
+#
+# The following information is for reference only and not required by the build
+# tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64 EBC
+#
+
+[Sources]
+  QemuFwCfgS3BasePei.c
+  QemuFwCfgS3Pei.c
+  QemuFwCfgS3PeiDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  QemuFwCfgLib

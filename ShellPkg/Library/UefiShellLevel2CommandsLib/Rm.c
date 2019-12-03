@@ -2,14 +2,8 @@
   Main file for attrib shell level 2 function.
 
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -24,15 +18,16 @@ STATIC CONST SHELL_PARAM_ITEM ParamList[] = {
   Determine if a directory has no files in it.
 
   @param[in] FileHandle   The EFI_HANDLE to the directory.
-  
+
   @retval TRUE  The directory has no files (or directories).
   @retval FALSE The directory has at least 1 file or directory in it.
 **/
 BOOLEAN
 IsDirectoryEmpty (
-  IN EFI_HANDLE   FileHandle
+  IN SHELL_FILE_HANDLE   FileHandle
   )
 {
+  EFI_STATUS      Status;
   EFI_FILE_INFO   *FileInfo;
   BOOLEAN         NoFile;
   BOOLEAN         RetVal;
@@ -41,8 +36,8 @@ IsDirectoryEmpty (
   NoFile = FALSE;
   FileInfo = NULL;
 
-  for (FileHandleFindFirstFile(FileHandle, &FileInfo)
-    ;  !NoFile
+  for (Status = FileHandleFindFirstFile(FileHandle, &FileInfo)
+    ;  !NoFile && !EFI_ERROR (Status)
     ;  FileHandleFindNextFile(FileHandle, FileInfo, &NoFile)
    ){
     if (StrStr(FileInfo->FileName, L".") != FileInfo->FileName
@@ -84,7 +79,7 @@ CascadeDelete(
   Status                = EFI_SUCCESS;
 
   if ((Node->Info->Attribute & EFI_FILE_READ_ONLY) == EFI_FILE_READ_ONLY) {
-    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_RM_LOG_DETELE_RO), gShellLevel2HiiHandle, L"rm", Node->FullName);  
+    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_RM_LOG_DETELE_RO), gShellLevel2HiiHandle, L"rm", Node->FullName);
     return (SHELL_ACCESS_DENIED);
   }
 
@@ -291,7 +286,7 @@ ShellCommandRunRm (
   Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR(Status)) {
     if (Status == EFI_VOLUME_CORRUPTED && ProblemParam != NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"rm", ProblemParam);  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"rm", ProblemParam);
       FreePool(ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -308,7 +303,7 @@ ShellCommandRunRm (
       //
       // we insufficient parameters
       //
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel2HiiHandle, L"rm");  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel2HiiHandle, L"rm");
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
       //
@@ -321,7 +316,7 @@ ShellCommandRunRm (
          ){
         Status = ShellOpenFileMetaArg((CHAR16*)Param, EFI_FILE_MODE_WRITE|EFI_FILE_MODE_READ, &FileList);
         if (EFI_ERROR(Status) || FileList == NULL || IsListEmpty(&FileList->Link)) {
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_NF), gShellLevel2HiiHandle, L"rm", (CHAR16*)Param);  
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_NF), gShellLevel2HiiHandle, L"rm", (CHAR16*)Param);
           ShellStatus = SHELL_NOT_FOUND;
           break;
         }

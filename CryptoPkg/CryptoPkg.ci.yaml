@@ -1,0 +1,47 @@
+## @file
+# CI configuration for CryptoPkg
+#
+# Copyright (c) Microsoft Corporation
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+{
+    "CompilerPlugin": {
+        "DscPath": "CryptoPkg.dsc"
+    },
+    "CharEncodingCheck": {
+        "IgnoreFiles": []
+    },
+    "DependencyCheck": {
+        "AcceptableDependencies": [
+            "MdePkg/MdePkg.dec",
+            "MdeModulePkg/MdeModulePkg.dec",
+            "CryptoPkg/CryptoPkg.dec",
+        ],
+        # For host based unit tests
+        "AcceptableDependencies-HOST_APPLICATION":[],
+        # For UEFI shell based apps
+        "AcceptableDependencies-UEFI_APPLICATION":[],
+        "IgnoreInf": []
+    },
+    "DscCompleteCheck": {
+        "DscPath": "CryptoPkg.dsc",
+        "IgnoreInf": []
+    },
+    "GuidCheck": {
+        "IgnoreGuidName": [],
+        "IgnoreGuidValue": [],
+        "IgnoreFoldersAndFiles": []
+    },
+    "LibraryClassCheck": {
+        "IgnoreHeaderFile": []
+    },
+
+    ## options defined ci/Plugin/SpellCheck
+    "SpellCheck": {
+        "skip": True,
+        "IgnoreFiles": [],           # use gitignore syntax to ignore errors in matching files
+        "ExtendWords": [],           # words to extend to the dictionary for this package
+        "IgnoreStandardPaths": [],   # Standard Plugin defined paths that should be ignore
+        "AdditionalIncludePaths": [] # Additional paths to spell check (wildcards supported)
+    }
+}

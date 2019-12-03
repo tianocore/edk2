@@ -2,13 +2,8 @@
 #  Provides the capability to update TPM state setup browser
 #  By this module, user may enable/disable/activate/deactivate/clear TPM, etc.
 #
-# Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
-# This program and the accompanying materials
-# are licensed and made available under the terms and conditions of the BSD License
-# which accompanies this distribution. The full text of the license may be found at
-# http://opensource.org/licenses/bsd-license.php
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
 
@@ -23,7 +18,7 @@
   UNLOAD_IMAGE                   = TcgConfigDriverUnload
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
 #
 
 [Sources]
@@ -58,8 +53,7 @@
   ## SOMETIMES_PRODUCES ## Variable:L"PhysicalPresence"
   ## SOMETIMES_CONSUMES ## Variable:L"PhysicalPresence"
   gEfiPhysicalPresenceGuid
-  
-  gEfiIfrTianoGuid                                    ## SOMETIMES_PRODUCES  ## GUID       # HII opcode
+
   ## PRODUCES            ## HII
   ## CONSUMES            ## HII
   gTcgConfigFormSetGuid
@@ -78,6 +72,6 @@
   gEfiHiiDatabaseProtocolGuid       AND
   gEfiVariableArchProtocolGuid      AND
   gEfiVariableWriteArchProtocolGuid
-  
+
 [UserExtensions.TianoCore."ExtraFiles"]
   TcgConfigDxeExtra.uni

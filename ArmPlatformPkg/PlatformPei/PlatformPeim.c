@@ -2,20 +2,14 @@
 *
 *  Copyright (c) 2011, ARM Limited. All rights reserved.
 *
-*  This program and the accompanying materials
-*  are licensed and made available under the terms and conditions of the BSD License
-*  which accompanies this distribution.  The full text of the license may be found at
-*  http://opensource.org/licenses/bsd-license.php
-*
-*  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-*  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+*  SPDX-License-Identifier: BSD-2-Clause-Patent
 *
 **/
 
 #include <PiPei.h>
 
 //
-// The protocols, PPI and GUID defintions for this module
+// The protocols, PPI and GUID definitions for this module
 //
 #include <Ppi/MasterBootMode.h>
 #include <Ppi/BootInRecoveryMode.h>
@@ -83,21 +77,23 @@ InitializePlatformPeim (
   )
 {
   EFI_STATUS                    Status;
-  UINTN                         BootMode;
+  EFI_BOOT_MODE                 BootMode;
 
   DEBUG ((EFI_D_LOAD | EFI_D_INFO, "Platform PEIM Loaded\n"));
 
-  PlatformPeim ();
-
-  BootMode  = ArmPlatformGetBootMode ();
-  Status    = (**PeiServices).SetBootMode (PeiServices, (UINT8) BootMode);
+  Status = PeiServicesSetBootMode (ArmPlatformGetBootMode ());
   ASSERT_EFI_ERROR (Status);
 
-  Status = (**PeiServices).InstallPpi (PeiServices, &mPpiListBootMode);
+  PlatformPeim ();
+
+  Status = PeiServicesGetBootMode (&BootMode);
+  ASSERT_EFI_ERROR (Status);
+
+  Status = PeiServicesInstallPpi (&mPpiListBootMode);
   ASSERT_EFI_ERROR (Status);
 
   if (BootMode == BOOT_IN_RECOVERY_MODE) {
-    Status = (**PeiServices).InstallPpi (PeiServices, &mPpiListRecoveryBootMode);
+    Status = PeiServicesInstallPpi (&mPpiListRecoveryBootMode);
     ASSERT_EFI_ERROR (Status);
   }
 

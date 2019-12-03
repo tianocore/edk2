@@ -12,14 +12,8 @@
   may not be modified without authorization. If platform fails to protect these resources,
   the authentication service provided in this driver will be broken, and the behavior is undefined.
 
-Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -36,6 +30,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Guid/AuthenticatedVariableFormat.h>
 #include <Guid/ImageAuthentication.h>
+
+#define TWO_BYTE_ENCODE       0x82
 
 ///
 /// Struct to record signature requirement defined by UEFI spec.
@@ -55,35 +51,6 @@ typedef enum {
   AuthVarTypePriv,
   AuthVarTypePayload
 } AUTHVAR_TYPE;
-
-///
-/// "AuthVarKeyDatabase" variable for the Public Key store
-/// of variables with EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS set.
-///
-/// GUID: gEfiAuthenticatedVariableGuid
-///
-/// We need maintain atomicity.
-///
-/// Format:
-/// +----------------------------+
-/// | AUTHVAR_KEY_DB_DATA        | <-- First AuthVarKey
-/// +----------------------------+
-/// | ......                     |
-/// +----------------------------+
-/// | AUTHVAR_KEY_DB_DATA        | <-- Last AuthKey
-/// +----------------------------+
-///
-#define AUTHVAR_KEYDB_NAME      L"AuthVarKeyDatabase"
-
-#define EFI_CERT_TYPE_RSA2048_SHA256_SIZE 256
-#define EFI_CERT_TYPE_RSA2048_SIZE        256
-
-#pragma pack(1)
-typedef struct {
-  UINT32    KeyIndex;
-  UINT8     KeyData[EFI_CERT_TYPE_RSA2048_SIZE];
-} AUTHVAR_KEY_DB_DATA;
-#pragma pack()
 
 ///
 ///  "certdb" variable stores the signer's certificates for non PK/KEK/DB/DBX
@@ -120,10 +87,6 @@ typedef struct {
 } AUTH_CERT_DB_DATA;
 #pragma pack()
 
-extern UINT8    *mPubKeyStore;
-extern UINT32   mPubKeyNumber;
-extern UINT32   mMaxKeyNumber;
-extern UINT32   mMaxKeyDbSize;
 extern UINT8    *mCertDbStore;
 extern UINT32   mMaxCertDbSize;
 extern UINT32   mPlatformMode;
@@ -173,7 +136,7 @@ VerifyTimeBasedPayloadAndUpdate (
 
 /**
   Delete matching signer's certificates when deleting common authenticated
-  variable by corresponding VariableName and VendorGuid from "certdb" or 
+  variable by corresponding VariableName and VendorGuid from "certdb" or
   "certdbv" according to authenticated variable attributes.
 
   @param[in]  VariableName   Name of authenticated Variable.
@@ -196,10 +159,10 @@ DeleteCertsFromDb (
 /**
   Clean up signer's certificates for common authenticated variable
   by corresponding VariableName and VendorGuid from "certdb".
-  Sytem may break down during Timebased Variable update & certdb update,
-  make them inconsistent,  this function is called in AuthVariable Init to ensure 
+  System may break down during Timebased Variable update & certdb update,
+  make them inconsistent,  this function is called in AuthVariable Init to ensure
   consistency
-  
+
   @retval  EFI_NOT_FOUND         Fail to find matching certs.
   @retval  EFI_SUCCESS           Find matching certs and output parameters.
 
@@ -293,7 +256,7 @@ ProcessVarWithKek (
   );
 
 /**
-  Process variable with EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS/EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS set
+  Process variable with EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS set
 
   Caution: This function may receive untrusted input.
   This function may be invoked in SMM mode, and datasize and data are external input.
@@ -310,9 +273,9 @@ ProcessVarWithKek (
 
   @return EFI_INVALID_PARAMETER           Invalid parameter.
   @return EFI_WRITE_PROTECTED             Variable is write-protected and needs authentication with
-                                          EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS set.
+                                          EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS or EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS set.
   @return EFI_OUT_OF_RESOURCES            The Database to save the public key is full.
-  @return EFI_SECURITY_VIOLATION          The variable is with EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS
+  @return EFI_SECURITY_VIOLATION          The variable is with EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS
                                           set, but the AuthInfo does NOT pass the validation
                                           check carried out by the firmware.
   @return EFI_SUCCESS                     Variable is not write-protected or pass validation successfully.
@@ -375,34 +338,6 @@ AuthServiceInternalUpdateVariable (
   IN VOID           *Data,
   IN UINTN          DataSize,
   IN UINT32         Attributes
-  );
-
-/**
-  Update the variable region with Variable information.
-
-  @param[in] VariableName           Name of variable.
-  @param[in] VendorGuid             Guid of variable.
-  @param[in] Data                   Data pointer.
-  @param[in] DataSize               Size of Data.
-  @param[in] Attributes             Attribute value of the variable.
-  @param[in] KeyIndex               Index of associated public key.
-  @param[in] MonotonicCount         Value of associated monotonic count.
-
-  @retval EFI_SUCCESS               The update operation is success.
-  @retval EFI_INVALID_PARAMETER     Invalid parameter.
-  @retval EFI_WRITE_PROTECTED       Variable is write-protected.
-  @retval EFI_OUT_OF_RESOURCES      There is not enough resource.
-
-**/
-EFI_STATUS
-AuthServiceInternalUpdateVariableWithMonotonicCount (
-  IN CHAR16         *VariableName,
-  IN EFI_GUID       *VendorGuid,
-  IN VOID           *Data,
-  IN UINTN          DataSize,
-  IN UINT32         Attributes,
-  IN UINT32         KeyIndex,
-  IN UINT64         MonotonicCount
   );
 
 /**

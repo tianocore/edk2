@@ -1,15 +1,9 @@
 ## @file
 #  Boot Maintenance Manager Library used by UiApp.
 #
-#  Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
-#  This program and the accompanying materials are licensed and made available under
-#  the terms and conditions of the BSD License that accompanies this distribution.
-#  The full text of the license may be found at
-#  http://opensource.org/licenses/bsd-license.php.
-#  
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-#  
+#  Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
 ##
 [Defines]
   INF_VERSION                    = 0x00010005
@@ -24,7 +18,7 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
 #
 
 [Sources]
@@ -62,7 +56,7 @@
   UefiHiiServicesLib
   UefiBootManagerLib
   FileExplorerLib
-  
+
 [Guids]
   gEfiGlobalVariableGuid                        ## SOMETIMES_PRODUCES ## Variable:L"BootNext" (The number of next boot option)
                                                 ## SOMETIMES_PRODUCES ## Variable:L"BootXX" (Boot option variable)
@@ -79,18 +73,17 @@
                                                 ## SOMETIMES_CONSUMES ## Variable:L"ConIn" (The device path of console in device)
                                                 ## SOMETIMES_CONSUMES ## Variable:L"ConOut" (The device path of console out device)
                                                 ## SOMETIMES_CONSUMES ## Variable:L"ErrOut" (The device path of error out device)
-  gEfiFileSystemVolumeLabelInfoIdGuid           ## CONSUMES ## GUID (Indicate the information type is volume)
-  gEfiFileInfoGuid                              ## CONSUMES ## GUID (Indicate the information type is file)
-  gEfiIfrTianoGuid                              ## CONSUMES ## GUID (Extended IFR Guid Opcode)
+  gEfiIfrTianoGuid                              ## SOMETIMES_CONSUMES ## GUID (Extended IFR Guid Opcode)
   gEfiIfrFrontPageGuid                          ## CONSUMES ## GUID
   gEfiIfrBootMaintenanceGuid                    ## CONSUMES ## GUID
- 
+
 [Protocols]
   gEfiSimpleFileSystemProtocolGuid              ## CONSUMES
   gEfiLoadFileProtocolGuid                      ## CONSUMES
   gEfiHiiConfigAccessProtocolGuid               ## CONSUMES
   gEfiSerialIoProtocolGuid                      ## CONSUMES
   gEfiDevicePathToTextProtocolGuid              ## CONSUMES
+  gEdkiiFormBrowserEx2ProtocolGuid              ## CONSUMES
 
 [FeaturePcd]
 

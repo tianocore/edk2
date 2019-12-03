@@ -1,14 +1,8 @@
 /** @file
   Provide FSP API related function.
 
-  Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2014 - 2017, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -99,7 +93,7 @@ CallFspNotifyPhase (
     return EFI_DEVICE_ERROR;
   }
 
-  NotifyPhaseApi = (FSP_NOTIFY_PHASE)(UINTN)(FspHeader->ImageBase + FspHeader->NotifyPhaseEntryOffset);
+  NotifyPhaseApi = (FSP_NOTIFY_PHASE)((UINTN)FspHeader->ImageBase + FspHeader->NotifyPhaseEntryOffset);
   InterruptState = SaveAndDisableInterrupts ();
   Status = Execute32BitCode ((UINTN)NotifyPhaseApi, (UINTN)NotifyPhaseParams, (UINTN)NULL);
   SetInterruptState (InterruptState);
@@ -132,7 +126,7 @@ CallFspMemoryInit (
     return EFI_DEVICE_ERROR;
   }
 
-  FspMemoryInitApi = (FSP_MEMORY_INIT)(UINTN)(FspHeader->ImageBase + FspHeader->FspMemoryInitEntryOffset);
+  FspMemoryInitApi = (FSP_MEMORY_INIT)((UINTN)FspHeader->ImageBase + FspHeader->FspMemoryInitEntryOffset);
   InterruptState = SaveAndDisableInterrupts ();
   Status = Execute32BitCode ((UINTN)FspMemoryInitApi, (UINTN)FspmUpdDataPtr, (UINTN)HobListPtr);
   SetInterruptState (InterruptState);
@@ -163,7 +157,7 @@ CallTempRamExit (
     return EFI_DEVICE_ERROR;
   }
 
-  TempRamExitApi = (FSP_TEMP_RAM_EXIT)(UINTN)(FspHeader->ImageBase + FspHeader->TempRamExitEntryOffset);
+  TempRamExitApi = (FSP_TEMP_RAM_EXIT)((UINTN)FspHeader->ImageBase + FspHeader->TempRamExitEntryOffset);
   InterruptState = SaveAndDisableInterrupts ();
   Status = Execute32BitCode ((UINTN)TempRamExitApi, (UINTN)TempRamExitParam, (UINTN)NULL);
   SetInterruptState (InterruptState);
@@ -194,7 +188,7 @@ CallFspSiliconInit (
     return EFI_DEVICE_ERROR;
   }
 
-  FspSiliconInitApi = (FSP_SILICON_INIT)(UINTN)(FspHeader->ImageBase + FspHeader->FspSiliconInitEntryOffset);
+  FspSiliconInitApi = (FSP_SILICON_INIT)((UINTN)FspHeader->ImageBase + FspHeader->FspSiliconInitEntryOffset);
   InterruptState = SaveAndDisableInterrupts ();
   Status = Execute32BitCode ((UINTN)FspSiliconInitApi, (UINTN)FspsUpdDataPtr, (UINTN)NULL);
   SetInterruptState (InterruptState);

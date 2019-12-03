@@ -1,14 +1,8 @@
 /** @file
-  PCI resouces support functions declaration for PCI Bus module.
+  PCI resources support functions declaration for PCI Bus module.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -82,11 +76,11 @@ InsertResourceNode (
 
 /**
   This routine is used to merge two different resource trees in need of
-  resoure degradation.
+  resource degradation.
 
   For example, if an upstream PPB doesn't support,
   prefetchable memory decoding, the PCI bus driver will choose to call this function
-  to merge prefectchable memory resource list into normal memory list.
+  to merge prefetchable memory resource list into normal memory list.
 
   If the TypeMerge is TRUE, Res resource type is changed to the type of destination resource
   type.
@@ -121,7 +115,7 @@ CalculateApertureIo16 (
   This function is used to calculate the resource aperture
   for a given bridge device.
 
-  @param Bridge      PCI resouce node for given bridge device.
+  @param Bridge      PCI resource node for given bridge device.
 
 **/
 VOID
@@ -130,7 +124,7 @@ CalculateResourceAperture (
   );
 
 /**
-  Get IO/Memory resource infor for given PCI device.
+  Get IO/Memory resource info for given PCI device.
 
   @param PciDev     Pci device instance.
   @param IoNode     Resource info node for IO .
@@ -175,8 +169,7 @@ CreateResourceNode (
   );
 
 /**
-  This function is used to extract resource request from
-  IOV VF device node list.
+  This function is used to create a IOV VF resource node.
 
   @param PciDev       Pci device instance.
   @param Length       Length of Io/Memory resource.
@@ -185,7 +178,7 @@ CreateResourceNode (
   @param ResType      Type of resource: IO/Memory.
   @param ResUsage     Resource usage.
 
-  @return PCI resource node created for given PCI device.
+  @return PCI resource node created for given VF PCI device.
           NULL means PCI resource node is not created.
 
 **/
@@ -285,10 +278,10 @@ BridgeSupportResourceDecode (
   This function is used to program the resource allocated
   for each resource node under specified bridge.
 
-  @param Base     Base address of resource to be progammed.
+  @param Base     Base address of resource to be programmed.
   @param Bridge   PCI resource node for the bridge device.
 
-  @retval EFI_SUCCESS            Successfully to program all resouces
+  @retval EFI_SUCCESS            Successfully to program all resources
                                  on given PCI bridge device.
   @retval EFI_OUT_OF_RESOURCES   Base is all one.
 
@@ -302,8 +295,8 @@ ProgramResource (
 /**
   Program Bar register for PCI device.
 
-  @param Base  Base address for PCI device resource to be progammed.
-  @param Node  Point to resoure node structure.
+  @param Base  Base address for PCI device resource to be programmed.
+  @param Node  Point to resource node structure.
 
 **/
 VOID
@@ -315,8 +308,8 @@ ProgramBar (
 /**
   Program IOV VF Bar register for PCI device.
 
-  @param Base  Base address for PCI device resource to be progammed.
-  @param Node  Point to resoure node structure.
+  @param Base  Base address for PCI device resource to be programmed.
+  @param Node  Point to resource node structure.
 
 **/
 EFI_STATUS
@@ -326,10 +319,10 @@ ProgramVfBar (
   );
 
 /**
-  Program PCI-PCI bridge apperture.
+  Program PCI-PCI bridge aperture.
 
   @param Base  Base address for resource.
-  @param Node  Point to resoure node structure.
+  @param Node  Point to resource node structure.
 
 **/
 VOID
@@ -341,13 +334,13 @@ ProgramPpbApperture (
 /**
   Program parent bridge for Option Rom.
 
-  @param PciDevice      Pci deivce instance.
-  @param OptionRomBase  Base address for Optiona Rom.
+  @param PciDevice      Pci device instance.
+  @param OptionRomBase  Base address for Option Rom.
   @param Enable         Enable or disable PCI memory.
 
 **/
 VOID
-ProgrameUpstreamBridgeForRom (
+ProgramUpstreamBridgeForRom (
   IN PCI_IO_DEVICE   *PciDevice,
   IN UINT32          OptionRomBase,
   IN BOOLEAN         Enable
@@ -382,7 +375,7 @@ InitializeResourcePool (
   );
 
 /**
-  Destory given resource tree.
+  Destroy given resource tree.
 
   @param Bridge  PCI resource root node of resource tree.
 

@@ -3,14 +3,9 @@
 #
 #  This library serializes and deserializes UEFI variables
 #
-#  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 #
-#  This program and the accompanying materials
-#  are licensed and made available under the terms and conditions of the BSD License
-#  which accompanies this distribution. The full text of the license may be found at
-#  http://opensource.org/licenses/bsd-license.php
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
 
@@ -20,10 +15,11 @@
   FILE_GUID                      = 9515f92a-83ae-45fd-9d2e-e3dc15df52d0
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = SerializeVariablesLib|DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER UEFI_DRIVER
+  LIBRARY_CLASS                  = SerializeVariablesLib|DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_DRIVER
 
 [Sources]
   SerializeVariablesLib.c
+  SerializeVariablesLib.h
 
 [Packages]
   MdePkg/MdePkg.dec

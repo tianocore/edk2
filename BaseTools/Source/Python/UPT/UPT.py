@@ -1,16 +1,10 @@
 ## @file
 #
-# This file is the main entry for UPT 
+# This file is the main entry for UPT
 #
-# Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
-# This program and the accompanying materials are licensed and made available 
-# under the terms and conditions of the BSD License which accompanies this 
-# distribution. The full text of the license may be found at 
-# http://opensource.org/licenses/bsd-license.php
-#
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
 '''
@@ -19,8 +13,14 @@ UPT
 
 ## import modules
 #
-from Core import FileHook
+import locale
 import sys
+from imp import reload
+encoding = locale.getdefaultlocale()[1]
+if encoding:
+    reload(sys)
+    sys.setdefaultencoding(encoding)
+from Core import FileHook
 import os.path
 from sys import platform
 import platform as pf
@@ -85,7 +85,7 @@ def SetLogLevel(Opt):
         Logger.SetLevel(Logger.VERBOSE)
     elif Opt.opt_quiet:
         Logger.SetLevel(Logger.QUIET + 1)
-    elif Opt.debug_level != None:
+    elif Opt.debug_level is not None:
         if Opt.debug_level < 0 or Opt.debug_level > 9:
             Logger.Warn("UPT", ST.ERR_DEBUG_LEVEL)
             Logger.SetLevel(Logger.INFO)
@@ -115,7 +115,7 @@ def Main():
 
     Parser.add_option("-q", "--quiet", action="store_true", dest="opt_quiet", help=ST.HLP_RETURN_AND_DISPLAY)
 
-    Parser.add_option("-i", "--install", action="store", type="string", dest="Install_Distribution_Package_File",
+    Parser.add_option("-i", "--install", action="append", type="string", dest="Install_Distribution_Package_File",
                       help=ST.HLP_SPECIFY_PACKAGE_NAME_INSTALL)
 
     Parser.add_option("-c", "--create", action="store", type="string", dest="Create_Distribution_Package_File",
@@ -174,20 +174,21 @@ def Main():
 
     try:
         GlobalData.gWORKSPACE, GlobalData.gPACKAGE_PATH = GetWorkspace()
-    except FatalError, XExcept:
+    except FatalError as XExcept:
         if Logger.GetLevel() <= Logger.DEBUG_9:
             Logger.Quiet(ST.MSG_PYTHON_ON % (python_version(), platform) + format_exc())
         return XExcept.args[0]
 
-    # Start *********************************************
     # Support WORKSPACE is a long path
-    # Only work well on windows
-    # Linux Solution TBD
+    # Only works for windows system
     if pf.system() == 'Windows':
-        os.system('@echo off\nsubst b: /D')
-        os.system('subst b: "%s"' % GlobalData.gWORKSPACE)
-        GlobalData.gWORKSPACE = 'B:\\'
-    # End ***********************************************
+        Vol = 'B:'
+        for Index in range(90, 65, -1):
+            Vol = chr(Index) + ':'
+            if not os.path.isdir(Vol):
+                os.system('subst %s "%s"' % (Vol, GlobalData.gWORKSPACE))
+                break
+        GlobalData.gWORKSPACE = '%s\\' % Vol
 
     WorkspaceDir = GlobalData.gWORKSPACE
 
@@ -222,12 +223,14 @@ def Main():
             RunModule = MkPkg.Main
 
         elif Opt.PackFileToInstall:
-            if not Opt.PackFileToInstall.endswith('.dist'):
-                Logger.Error("InstallPkg", FILE_TYPE_MISMATCH, ExtraData=ST.ERR_DIST_EXT_ERROR % Opt.PackFileToInstall)
+            AbsPath = []
+            for Item in Opt.PackFileToInstall:
+                if not Item.endswith('.dist'):
+                    Logger.Error("InstallPkg", FILE_TYPE_MISMATCH, ExtraData=ST.ERR_DIST_EXT_ERROR % Item)
 
-            AbsPath = GetFullPathDist(Opt.PackFileToInstall, WorkspaceDir)
-            if not AbsPath:
-                Logger.Error("InstallPkg", FILE_NOT_FOUND, ST.ERR_INSTALL_DIST_NOT_FOUND % Opt.PackFileToInstall)
+                AbsPath.append(GetFullPathDist(Item, WorkspaceDir))
+                if not AbsPath:
+                    Logger.Error("InstallPkg", FILE_NOT_FOUND, ST.ERR_INSTALL_DIST_NOT_FOUND % Item)
 
             Opt.PackFileToInstall = AbsPath
             setattr(Opt, 'PackageFile', Opt.PackFileToInstall)
@@ -286,7 +289,7 @@ def Main():
             return OPTION_MISSING
 
         ReturnCode = RunModule(Opt)
-    except FatalError, XExcept:
+    except FatalError as XExcept:
         ReturnCode = XExcept.args[0]
         if Logger.GetLevel() <= Logger.DEBUG_9:
             Logger.Quiet(ST.MSG_PYTHON_ON % (python_version(), platform) + \
@@ -301,11 +304,12 @@ def Main():
             else:
                 GlobalData.gDB.Commit()
                 Mgr.commit()
-        except StandardError:
+        except Exception:
             Logger.Quiet(ST.MSG_RECOVER_FAIL)
         GlobalData.gDB.CloseDb()
+
         if pf.system() == 'Windows':
-            os.system('subst b: /D')
+            os.system('subst %s /D' % GlobalData.gWORKSPACE.replace('\\', ''))
 
     return ReturnCode
 

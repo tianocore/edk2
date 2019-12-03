@@ -1,14 +1,8 @@
 /** @file
   Declares menubar interface functions.
 
-  Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved. <BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved. <BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -93,7 +87,7 @@ MenuBarRefresh (
 
   @param[in] Key                The pressed key.
 
-  @retval EFI_NOT_FOUND         The key was not a valid function key 
+  @retval EFI_NOT_FOUND         The key was not a valid function key
                                 (an error was sent to the status bar).
   @return The return value from the called dispatch function.
 **/
@@ -105,15 +99,15 @@ MenuBarDispatchFunctionKey (
 /**
   Function to dispatch the correct function based on a control-based key (ctrl+o...)
 
-  @param[in] Key                The pressed key.
+  @param[in] KeyData                The pressed key.
 
-  @retval EFI_NOT_FOUND         The key was not a valid control-based key 
+  @retval EFI_NOT_FOUND         The key was not a valid control-based key
                                 (an error was sent to the status bar).
   @return EFI_SUCCESS.
 **/
 EFI_STATUS
 MenuBarDispatchControlHotKey (
-  IN CONST EFI_INPUT_KEY   *Key
+  IN CONST EFI_KEY_DATA   *KeyData
   );
 
 #endif

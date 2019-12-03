@@ -2,14 +2,9 @@
 # Provides interface to shell functionality for shell commands and applications.
 #
 # (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
-# Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved. <BR>
+# Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 #
-#  This program and the accompanying materials
-#  are licensed and made available under the terms and conditions of the BSD License
-#  which accompanies this distribution. The full text of the license may be found at
-#  http://opensource.org/licenses/bsd-license.php
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 #
 ##
@@ -19,13 +14,13 @@
   BASE_NAME                      = UefiShellLib
   FILE_GUID                      = 449D0F00-2148-4a43-9836-F10B3980ECF5
   MODULE_TYPE                    = UEFI_DRIVER
-  VERSION_STRING                 = 1.1
+  VERSION_STRING                 = 1.2
   LIBRARY_CLASS                  = ShellLib|UEFI_APPLICATION UEFI_DRIVER DXE_RUNTIME_DRIVER DXE_DRIVER
   CONSTRUCTOR                    = ShellLibConstructor
   DESTRUCTOR                     = ShellLibDestructor
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
 #
 
 [Sources.common]
@@ -51,7 +46,6 @@
   SortLib
 
 [Protocols]
-  gEfiSimpleFileSystemProtocolGuid              ## SOMETIMES_CONSUMES
   gEfiUnicodeCollation2ProtocolGuid             ## CONSUMES
 
   # shell 2.0

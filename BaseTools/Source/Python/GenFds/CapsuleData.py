@@ -1,23 +1,17 @@
 ## @file
 # generate capsule
 #
-#  Copyright (c) 2007-2016, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007-2018, Intel Corporation. All rights reserved.<BR>
 #
-#  This program and the accompanying materials
-#  are licensed and made available under the terms and conditions of the BSD License
-#  which accompanies this distribution.  The full text of the license may be found at
-#  http://opensource.org/licenses/bsd-license.php
-#
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
 ##
 # Import Modules
 #
-import Ffs
-from GenFdsGlobalVariable import GenFdsGlobalVariable
-import StringIO
+from __future__ import absolute_import
+from .GenFdsGlobalVariable import GenFdsGlobalVariable
+from io import BytesIO
 from struct import pack
 import os
 from Common.Misc import SaveFileOnChange
@@ -32,13 +26,13 @@ class CapsuleData:
     #   @param  self        The object pointer
     def __init__(self):
         pass
-    
+
     ## generate capsule data
     #
     #   @param  self        The object pointer
     def GenCapsuleSubItem(self):
         pass
-        
+
 ## FFS class for capsule data
 #
 #
@@ -80,9 +74,9 @@ class CapsuleFv (CapsuleData):
     #
     def GenCapsuleSubItem(self):
         if self.FvName.find('.fv') == -1:
-            if self.FvName.upper() in GenFdsGlobalVariable.FdfParser.Profile.FvDict.keys():
-                FvObj = GenFdsGlobalVariable.FdfParser.Profile.FvDict.get(self.FvName.upper())
-                FdBuffer = StringIO.StringIO('')
+            if self.FvName.upper() in GenFdsGlobalVariable.FdfParser.Profile.FvDict:
+                FvObj = GenFdsGlobalVariable.FdfParser.Profile.FvDict[self.FvName.upper()]
+                FdBuffer = BytesIO()
                 FvObj.CapsuleName = self.CapsuleName
                 FvFile = FvObj.AddToBuffer(FdBuffer)
                 FvObj.CapsuleName = None
@@ -112,14 +106,14 @@ class CapsuleFd (CapsuleData):
     #
     def GenCapsuleSubItem(self):
         if self.FdName.find('.fd') == -1:
-            if self.FdName.upper() in GenFdsGlobalVariable.FdfParser.Profile.FdDict.keys():
-                FdObj = GenFdsGlobalVariable.FdfParser.Profile.FdDict.get(self.FdName.upper())
+            if self.FdName.upper() in GenFdsGlobalVariable.FdfParser.Profile.FdDict:
+                FdObj = GenFdsGlobalVariable.FdfParser.Profile.FdDict[self.FdName.upper()]
                 FdFile = FdObj.GenFd()
                 return FdFile
         else:
             FdFile = GenFdsGlobalVariable.ReplaceWorkspaceMacro(self.FdName)
             return FdFile
-        
+
 ## AnyFile class for capsule data
 #
 #
@@ -139,7 +133,7 @@ class CapsuleAnyFile (CapsuleData):
     #
     def GenCapsuleSubItem(self):
         return self.FileName
-    
+
 ## Afile class for capsule data
 #
 #
@@ -183,10 +177,16 @@ class CapsulePayload(CapsuleData):
         self.VendorCodeFile = []
         self.Certificate_Guid = None
         self.MonotonicCount = None
+        self.Existed = False
+        self.Buffer = None
 
     def GenCapsuleSubItem(self, AuthData=[]):
         if not self.Version:
-            self.Version = 0x00000002
+            self.Version = '0x00000002'
+        if not self.ImageIndex:
+            self.ImageIndex = '0x1'
+        if not self.HardwareInstance:
+            self.HardwareInstance = '0x0'
         ImageFileSize = os.path.getsize(self.ImageFile)
         if AuthData:
             # the ImageFileSize need include the full authenticated info size. From first bytes of MonotonicCount to last bytes of certificate.
@@ -201,12 +201,12 @@ class CapsulePayload(CapsuleData):
         #
         Guid = self.ImageTypeId.split('-')
         Buffer = pack('=ILHHBBBBBBBBBBBBIIQ',
-                       int(self.Version,16),
-                       int(Guid[0], 16), 
-                       int(Guid[1], 16), 
-                       int(Guid[2], 16), 
-                       int(Guid[3][-4:-2], 16), 
-                       int(Guid[3][-2:], 16),  
+                       int(self.Version, 16),
+                       int(Guid[0], 16),
+                       int(Guid[1], 16),
+                       int(Guid[2], 16),
+                       int(Guid[3][-4:-2], 16),
+                       int(Guid[3][-2:], 16),
                        int(Guid[4][-12:-10], 16),
                        int(Guid[4][-10:-8], 16),
                        int(Guid[4][-8:-6], 16),
@@ -223,7 +223,7 @@ class CapsulePayload(CapsuleData):
                        )
         if AuthData:
             Buffer += pack('QIHH', AuthData[0], AuthData[1], AuthData[2], AuthData[3])
-            Buffer += uuid.UUID(AuthData[4]).get_bytes_le()
+            Buffer += uuid.UUID(AuthData[4]).bytes_le
 
         #
         # Append file content to the structure
@@ -235,4 +235,5 @@ class CapsulePayload(CapsuleData):
             VendorFile = open(self.VendorCodeFile, 'rb')
             Buffer += VendorFile.read()
             VendorFile.close()
+        self.Existed = True
         return Buffer

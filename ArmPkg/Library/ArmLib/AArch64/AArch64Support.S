@@ -1,16 +1,10 @@
 #------------------------------------------------------------------------------
 #
 # Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
-# Copyright (c) 2011 - 2014, ARM Limited. All rights reserved.
+# Copyright (c) 2011 - 2017, ARM Limited. All rights reserved.
 # Copyright (c) 2016, Linaro Limited. All rights reserved.
 #
-# This program and the accompanying materials
-# are licensed and made available under the terms and conditions of the BSD License
-# which accompanies this distribution.  The full text of the license may be found at
-# http://opensource.org/licenses/bsd-license.php
-#
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 #------------------------------------------------------------------------------
 
@@ -20,6 +14,7 @@
 .set CTRL_M_BIT,      (1 << 0)
 .set CTRL_A_BIT,      (1 << 1)
 .set CTRL_C_BIT,      (1 << 2)
+.set CTRL_SA_BIT,     (1 << 3)
 .set CTRL_I_BIT,      (1 << 12)
 .set CTRL_V_BIT,      (1 << 12)
 .set CPACR_VFP_BITS,  (3 << 20)
@@ -259,6 +254,39 @@ ASM_FUNC(ArmDisableAlignmentCheck)
    isb
    ret
 
+ASM_FUNC(ArmEnableStackAlignmentCheck)
+   EL1_OR_EL2(x1)
+1: mrs     x0, sctlr_el1        // Get control register EL1
+   b       3f
+2: mrs     x0, sctlr_el2        // Get control register EL2
+3: orr     x0, x0, #CTRL_SA_BIT // Set SA (stack alignment check) bit
+   EL1_OR_EL2(x1)
+1: msr     sctlr_el1, x0        // Write back control register
+   b       3f
+2: msr     sctlr_el2, x0        // Write back control register
+3: dsb     sy
+   isb
+   ret
+
+
+ASM_FUNC(ArmDisableStackAlignmentCheck)
+   EL1_OR_EL2_OR_EL3(x1)
+1: mrs     x0, sctlr_el1        // Get control register EL1
+   b       4f
+2: mrs     x0, sctlr_el2        // Get control register EL2
+   b       4f
+3: mrs     x0, sctlr_el3        // Get control register EL3
+4: bic     x0, x0, #CTRL_SA_BIT // Clear SA (stack alignment check) bit
+   EL1_OR_EL2_OR_EL3(x1)
+1: msr     sctlr_el1, x0        // Write back control register
+   b       4f
+2: msr     sctlr_el2, x0        // Write back control register
+   b       4f
+3: msr     sctlr_el3, x0        // Write back control register
+4: dsb     sy
+   isb
+   ret
+
 
 // Always turned on in AArch64. Else implementation specific. Leave in for C compatibility for now
 ASM_FUNC(ArmEnableBranchPrediction)
@@ -273,7 +301,8 @@ ASM_FUNC(ArmDisableBranchPrediction)
 ASM_FUNC(AArch64AllDataCachesOperation)
 // We can use regs 0-7 and 9-15 without having to save/restore.
 // Save our link register on the stack. - The stack must always be quad-word aligned
-  str   x30, [sp, #-16]!
+  stp   x29, x30, [sp, #-16]!
+  mov   x29, sp
   mov   x1, x0                  // Save Function call in x1
   mrs   x6, clidr_el1           // Read EL1 CLIDR
   and   x3, x6, #0x7000000      // Mask out all but Level of Coherency (LoC)
@@ -324,7 +353,7 @@ L_Skip:
 L_Finished:
   dsb   sy
   isb
-  ldr   x30, [sp], #0x10
+  ldp   x29, x30, [sp], #0x10
   ret
 
 
@@ -368,9 +397,11 @@ ASM_FUNC(ArmEnableVFP)
   mov   x1, x30                 // Save LR
   bl    ArmReadIdPfr0           // Read EL1 Processor Feature Register (PFR0)
   mov   x30, x1                 // Restore LR
-  ands  x0, x0, #AARCH64_PFR0_FP// Extract bits indicating VFP implementation
-  cmp   x0, #0                  // VFP is implemented if '0'.
-  b.ne  4f                      // Exit if VFP not implemented.
+  ubfx  x0, x0, #16, #4         // Extract the FP bits 16:19
+  cmp   x0, #0xF                // Check if FP bits are '1111b',
+                                // i.e. Floating Point not implemented
+  b.eq  4f                      // Exit when VFP is not implemented.
+
   // FVP is implemented.
   // Make sure VFP exceptions are not trapped (to any exception level).
   mrs   x0, cpacr_el1           // Read EL1 Coprocessor Access Control Register (CPACR)
@@ -399,13 +430,13 @@ ASM_FUNC(ArmReadMpidr)
   ret
 
 
-// Keep old function names for C compatibilty for now. Change later?
+// Keep old function names for C compatibility for now. Change later?
 ASM_FUNC(ArmReadTpidrurw)
   mrs   x0, tpidr_el0           // read tpidr_el0 (v7 TPIDRURW) -> (v8 TPIDR_EL0)
   ret
 
 
-// Keep old function names for C compatibilty for now. Change later?
+// Keep old function names for C compatibility for now. Change later?
 ASM_FUNC(ArmWriteTpidrurw)
   msr   tpidr_el0, x0           // write tpidr_el0 (v7 TPIDRURW) -> (v8 TPIDR_EL0)
   ret
@@ -422,7 +453,7 @@ ASM_FUNC(ArmReadIdPfr0)
   ret
 
 
-// Q: id_aa64pfr1_el1 not defined yet. What does this funtion want to access?
+// Q: id_aa64pfr1_el1 not defined yet. What does this function want to access?
 // A: used to setup arch timer. Check if we have security extensions, permissions to set stuff.
 //    See: ArmPkg/Library/ArmArchTimerLib/AArch64/ArmArchTimerLib.c
 //    Not defined yet, but stick in here for now, should read all zeros.
@@ -443,6 +474,16 @@ ASM_FUNC(ArmReadHcr)
 // UINTN ArmReadCurrentEL(VOID)
 ASM_FUNC(ArmReadCurrentEL)
   mrs   x0, CurrentEL
+  ret
+
+// UINT32 ArmReadCntHctl(VOID)
+ASM_FUNC(ArmReadCntHctl)
+  mrs   x0, cnthctl_el2
+  ret
+
+// VOID ArmWriteCntHctl(UINT32 CntHctl)
+ASM_FUNC(ArmWriteCntHctl)
+  msr   cnthctl_el2, x0
   ret
 
 ASM_FUNCTION_REMOVE_IF_UNREFERENCED

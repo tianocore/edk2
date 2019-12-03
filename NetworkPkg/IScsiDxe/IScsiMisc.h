@@ -1,14 +1,8 @@
 /** @file
   Miscellaneous definitions for iSCSI driver.
 
-Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -33,6 +27,7 @@ typedef struct _ISCSI_DRIVER_DATA ISCSI_DRIVER_DATA;
 ///
 #define IP6_OLD_IPADDRESS_OFFSET      42
 
+
 #pragma pack(1)
 typedef struct _ISCSI_SESSION_CONFIG_NVDATA {
   UINT16            TargetPort;
@@ -45,6 +40,7 @@ typedef struct _ISCSI_SESSION_CONFIG_NVDATA {
 
   BOOLEAN           InitiatorInfoFromDhcp;
   BOOLEAN           TargetInfoFromDhcp;
+
   CHAR8             TargetName[ISCSI_NAME_MAX_SIZE];
   EFI_IP_ADDRESS    TargetIp;
   UINT8             PrefixLength;
@@ -57,7 +53,10 @@ typedef struct _ISCSI_SESSION_CONFIG_NVDATA {
   BOOLEAN           RedirectFlag;
   UINT16            OriginalTargetPort;     // The port of proxy/virtual target.
   EFI_IP_ADDRESS    OriginalTargetIp;       // The address of proxy/virtual target.
-  
+
+  BOOLEAN           DnsMode;  // Flag indicate whether the Target address is expressed as URL format.
+  CHAR8             TargetUrl[ISCSI_TARGET_URI_MAX_SIZE];
+
 } ISCSI_SESSION_CONFIG_NVDATA;
 #pragma pack()
 
@@ -76,7 +75,7 @@ IScsiGetSubnetMaskPrefixLength (
   );
 
 /**
-  Convert the hexadecimal encoded LUN string into the 64-bit LUN. 
+  Convert the hexadecimal encoded LUN string into the 64-bit LUN.
 
   @param[in]   Str             The hexadecimal encoded LUN string.
   @param[out]  Lun             Storage to return the 64-bit LUN.
@@ -148,7 +147,7 @@ IScsiAsciiStrToIp (
   @param[in, out]  HexStr      Pointer to the string.
   @param[in, out]  HexLength   The length of the string.
 
-  @retval EFI_SUCCESS          The binary data is converted to the hexadecimal string 
+  @retval EFI_SUCCESS          The binary data is converted to the hexadecimal string
                                and the length of the string is updated.
   @retval EFI_BUFFER_TOO_SMALL The string is too small.
   @retval EFI_INVALID_PARAMETER The IP string is malformatted.
@@ -212,6 +211,7 @@ IScsiGenRandom (
   Record the NIC information in a global structure.
 
   @param[in]  Controller         The handle of the controller.
+  @param[in]  Image              Handle of the image.
 
   @retval EFI_SUCCESS            The operation is completed.
   @retval EFI_OUT_OF_RESOURCES   Do not have sufficient resource to finish this
@@ -220,7 +220,8 @@ IScsiGenRandom (
 **/
 EFI_STATUS
 IScsiAddNic (
-  IN EFI_HANDLE  Controller
+  IN EFI_HANDLE  Controller,
+  IN EFI_HANDLE  Image
   );
 
 /**
@@ -236,6 +237,44 @@ IScsiAddNic (
 EFI_STATUS
 IScsiRemoveNic (
   IN EFI_HANDLE  Controller
+  );
+
+/**
+  Create and initialize the Attempts.
+
+  @param[in]  AttemptNum          The number of Attempts will be created.
+
+  @retval EFI_SUCCESS             The Attempts have been created successfully.
+  @retval Others                  Failed to create the Attempt.
+
+**/
+EFI_STATUS
+IScsiCreateAttempts (
+  IN UINTN            AttemptNum
+  );
+
+/**
+  Create the iSCSI configuration Keywords for each attempt.
+
+  @param[in]  KeywordNum          The number Sets of Keywords will be created.
+
+  @retval EFI_SUCCESS             The operation is completed.
+  @retval Others                  Failed to create the Keywords.
+
+**/
+EFI_STATUS
+IScsiCreateKeywords (
+  IN UINTN            KeywordNum
+  );
+
+/**
+
+  Free the attempt configure data variable.
+
+**/
+VOID
+IScsiCleanAttemptVariable (
+  IN   VOID
   );
 
 /**
@@ -327,15 +366,29 @@ IScsiCleanDriverData (
 
   @param[in]  Controller           The handle of the controller.
   @param[in]  IpVersion            IP_VERSION_4 or IP_VERSION_6.
-  
+
   @retval TRUE                     The handle of the controller need the Dhcp protocol.
   @retval FALSE                    The handle of the controller does not need the Dhcp protocol.
-  
+
 **/
 BOOLEAN
 IScsiDhcpIsConfigured (
   IN EFI_HANDLE  Controller,
   IN UINT8       IpVersion
+  );
+
+/**
+  Check wheather the Controller handle is configured to use DNS protocol.
+
+  @param[in]  Controller           The handle of the controller.
+
+  @retval TRUE                     The handle of the controller need the DNS protocol.
+  @retval FALSE                    The handle of the controller does not need the DNS protocol.
+
+**/
+BOOLEAN
+IScsiDnsIsConfigured (
+  IN EFI_HANDLE  Controller
   );
 
 /**
@@ -388,7 +441,7 @@ IScsiOnExitBootService (
   currently managing the controller specified by ControllerHandle.  This test
   is performed by evaluating if the the protocol specified by ProtocolGuid is
   present on ControllerHandle and is was opened by DriverBindingHandle and Nic
-  Device handle with an attribute of EFI_OPEN_PROTOCOL_BY_DRIVER. 
+  Device handle with an attribute of EFI_OPEN_PROTOCOL_BY_DRIVER.
   If ProtocolGuid is NULL, then ASSERT().
 
   @param  ControllerHandle     A handle for a controller to test.

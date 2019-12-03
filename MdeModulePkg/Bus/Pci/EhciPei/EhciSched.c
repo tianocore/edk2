@@ -2,16 +2,9 @@
 PEIM to produce gPeiUsb2HostControllerPpiGuid based on gPeiUsbControllerPpiGuid
 which is used to enable recovery function from USB Drivers.
 
-Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
-  
-This program and the accompanying materials
-are licensed and made available under the terms and conditions
-of the BSD License which accompanies this distribution.  The
-full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -19,7 +12,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 /**
   Create helper QTD/QH for the EHCI device.
-  
+
   @param  Ehc         The EHCI device.
 
   @retval EFI_OUT_OF_RESOURCES  Failed to allocate resource for helper QTD/QH.
@@ -95,7 +88,7 @@ EhcCreateHelpQ (
 
 /**
   Initialize the schedule data structure such as frame list.
-  
+
   @param  Ehc                   The EHCI device to init schedule data for.
 
   @retval EFI_OUT_OF_RESOURCES  Failed to allocate resource to init schedule data.
@@ -107,11 +100,13 @@ EhcInitSched (
   IN PEI_USB2_HC_DEV      *Ehc
   )
 {
+  VOID                  *Buf;
   EFI_PHYSICAL_ADDRESS  PhyAddr;
   VOID                  *Map;
   UINTN                 Index;
   UINT32                *Desc;
   EFI_STATUS            Status;
+  EFI_PHYSICAL_ADDRESS  PciAddr;
 
   //
   // First initialize the periodical schedule data:
@@ -124,15 +119,19 @@ EhcInitSched (
   // The Frame List ocupies 4K bytes,
   // and must be aligned on 4-Kbyte boundaries.
   //
-  Status = PeiServicesAllocatePages (
-             EfiBootServicesCode,
+  Status = IoMmuAllocateBuffer (
+             Ehc->IoMmu,
              1,
-             &PhyAddr
+             &Buf,
+             &PhyAddr,
+             &Map
              );
 
-  Map = NULL;
-  Ehc->PeriodFrameHost  = (VOID *)(UINTN)PhyAddr;
-  Ehc->PeriodFrame      = (VOID *)(UINTN)PhyAddr;
+  if (EFI_ERROR (Status) || (Buf == NULL)) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  Ehc->PeriodFrame      = Buf;
   Ehc->PeriodFrameMap   = Map;
   Ehc->High32bitAddr    = EHC_HIGH_32BIT (PhyAddr);
 
@@ -156,31 +155,32 @@ EhcInitSched (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  
+
   //
   // Initialize the frame list entries then set the registers
   //
   Desc = (UINT32 *) Ehc->PeriodFrame;
-
+  PciAddr  = UsbHcGetPciAddressForHostMem (Ehc->MemPool, Ehc->PeriodOne, sizeof (PEI_EHC_QH));
   for (Index = 0; Index < EHC_FRAME_LEN; Index++) {
-    Desc[Index] = QH_LINK (Ehc->PeriodOne, EHC_TYPE_QH, FALSE);
+    Desc[Index] = QH_LINK (PciAddr, EHC_TYPE_QH, FALSE);
   }
 
-  EhcWriteOpReg (Ehc, EHC_FRAME_BASE_OFFSET, EHC_LOW_32BIT (Ehc->PeriodFrame));
+  EhcWriteOpReg (Ehc, EHC_FRAME_BASE_OFFSET, EHC_LOW_32BIT (PhyAddr));
 
   //
   // Second initialize the asynchronous schedule:
   // Only need to set the AsynListAddr register to
   // the reclamation header
   //
-  EhcWriteOpReg (Ehc, EHC_ASYNC_HEAD_OFFSET, EHC_LOW_32BIT (Ehc->ReclaimHead));
+  PciAddr  = UsbHcGetPciAddressForHostMem (Ehc->MemPool, Ehc->ReclaimHead, sizeof (PEI_EHC_QH));
+  EhcWriteOpReg (Ehc, EHC_ASYNC_HEAD_OFFSET, EHC_LOW_32BIT (PciAddr));
   return EFI_SUCCESS;
 }
 
 /**
   Free the schedule data. It may be partially initialized.
-  
-  @param  Ehc   The EHCI device. 
+
+  @param  Ehc   The EHCI device.
 
 **/
 VOID
@@ -192,26 +192,27 @@ EhcFreeSched (
   EhcWriteOpReg (Ehc, EHC_ASYNC_HEAD_OFFSET, 0);
 
   if (Ehc->PeriodOne != NULL) {
-    UsbHcFreeMem (Ehc->MemPool, Ehc->PeriodOne, sizeof (PEI_EHC_QH));
+    UsbHcFreeMem (Ehc, Ehc->MemPool, Ehc->PeriodOne, sizeof (PEI_EHC_QH));
     Ehc->PeriodOne = NULL;
   }
 
   if (Ehc->ReclaimHead != NULL) {
-    UsbHcFreeMem (Ehc->MemPool, Ehc->ReclaimHead, sizeof (PEI_EHC_QH));
+    UsbHcFreeMem (Ehc, Ehc->MemPool, Ehc->ReclaimHead, sizeof (PEI_EHC_QH));
     Ehc->ReclaimHead = NULL;
   }
 
   if (Ehc->ShortReadStop != NULL) {
-    UsbHcFreeMem (Ehc->MemPool, Ehc->ShortReadStop, sizeof (PEI_EHC_QTD));
+    UsbHcFreeMem (Ehc, Ehc->MemPool, Ehc->ShortReadStop, sizeof (PEI_EHC_QTD));
     Ehc->ShortReadStop = NULL;
   }
 
   if (Ehc->MemPool != NULL) {
-    UsbHcFreeMemPool (Ehc->MemPool);
+    UsbHcFreeMemPool (Ehc, Ehc->MemPool);
     Ehc->MemPool = NULL;
   }
 
   if (Ehc->PeriodFrame != NULL) {
+    IoMmuFreeBuffer (Ehc->IoMmu, 1, Ehc->PeriodFrame, Ehc->PeriodFrameMap);
     Ehc->PeriodFrame = NULL;
   }
 }
@@ -222,7 +223,7 @@ EhcFreeSched (
   due to its interfaces. This simplifies the AsynList
   management: A reclamation header is always linked to
   the AsyncListAddr, the only active QH is appended to it.
-  
+
   @param  Ehc   The EHCI device.
   @param  Qh    The queue head to link.
 
@@ -252,7 +253,7 @@ EhcLinkQhToAsync (
 /**
   Unlink a queue head from the asynchronous schedule list.
   Need to synchronize with hardware.
-  
+
   @param  Ehc   The EHCI device.
   @param  Qh    The queue head to unlink.
 
@@ -283,13 +284,13 @@ EhcUnlinkQhFromAsync (
   // Set and wait the door bell to synchronize with the hardware
   //
   EhcSetAndWaitDoorBell (Ehc, EHC_GENERIC_TIMEOUT);
-  
+
   return;
 }
 
 /**
   Check the URB's execution result and update the URB's
-  result accordingly. 
+  result accordingly.
 
   @param Ehc   The EHCI device.
   @param Urb   The URB to check result.
@@ -350,13 +351,13 @@ EhcCheckUrbResult (
 
       Finished = TRUE;
       goto ON_EXIT;
-      
+
     } else if (EHC_BIT_IS_SET (State, QTD_STAT_ACTIVE)) {
       //
       // The QTD is still active, no need to check furthur.
       //
       Urb->Result |= EFI_USB_ERR_NOTEXECUTE;
-      
+
       Finished = FALSE;
       goto ON_EXIT;
 
@@ -379,7 +380,7 @@ EhcCheckUrbResult (
         // Status Stage of the setup transfer to get the finial result
         //
         if (QtdHw->AltNext == QTD_LINK (Ehc->ShortReadStop, FALSE)) {
-          
+
           Finished = TRUE;
           goto ON_EXIT;
         }
@@ -404,7 +405,7 @@ ON_EXIT:
 
 /**
   Execute the transfer by polling the URB. This is a synchronous operation.
-  
+
   @param  Ehc               The EHCI device.
   @param  Urb               The URB to execute.
   @param  TimeOut           The time to wait before abort, in millisecond.

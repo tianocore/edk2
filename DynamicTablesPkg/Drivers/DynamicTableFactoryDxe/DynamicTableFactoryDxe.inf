@@ -1,0 +1,51 @@
+## @file
+#  Module to manage the list of available table factories.
+#
+#  Copyright (c) 2017 - 2019, ARM Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010019
+  BASE_NAME                      = DynamicTableFactoryDxe
+  FILE_GUID                      = FE846898-7403-4932-B8AD-A0491F0C2CBA
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = DynamicTableFactoryDxeInitialize
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = ARM AARCH64
+#
+
+[Sources]
+  AcpiTableFactory/AcpiTableFactory.c
+  DeviceTreeTableFactory/DeviceTreeTableFactory.c
+  DynamicTableFactoryDxe.c
+  SmbiosTableFactory/SmbiosTableFactory.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  DynamicTablesPkg/DynamicTablesPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  MemoryAllocationLib
+  PrintLib
+  TableHelperLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[FixedPcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxCustomACPIGenerators
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxCustomSMBIOSGenerators
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxCustomDTGenerators
+
+[Protocols]
+  gEdkiiDynamicTableFactoryProtocolGuid         # PRODUCES
+
+[Depex]
+  TRUE

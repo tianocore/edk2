@@ -1,15 +1,9 @@
 /** @file
   The DriverEntryPoint and Unload for HttpUtilities driver.
 
-  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -25,7 +19,7 @@
   @retval EFI_INVALID_PARAMETER ImageHandle is not a valid image handle.
 
 **/
-EFI_STATUS 
+EFI_STATUS
 EFIAPI
 HttpUtilitiesDxeUnload (
   IN EFI_HANDLE  ImageHandle
@@ -59,11 +53,11 @@ HttpUtilitiesDxeUnload (
     // Firstly, find HttpUtilitiesProtocol interface
     //
     Status = gBS->OpenProtocol (
-                    HandleBuffer[Index], 
-                    &gEfiHttpUtilitiesProtocolGuid, 
-                    (VOID **) &HttpUtilitiesProtocol, 
-                    ImageHandle, 
-                    NULL, 
+                    HandleBuffer[Index],
+                    &gEfiHttpUtilitiesProtocolGuid,
+                    (VOID **) &HttpUtilitiesProtocol,
+                    ImageHandle,
+                    NULL,
                     EFI_OPEN_PROTOCOL_BY_HANDLE_PROTOCOL
                     );
     if (EFI_ERROR (Status)) {
@@ -72,7 +66,7 @@ HttpUtilitiesDxeUnload (
 
     //
     // Then, uninstall HttpUtilities interface
-    // 
+    //
     Status = gBS->UninstallMultipleProtocolInterfaces (
                     HandleBuffer[Index],
                     &gEfiHttpUtilitiesProtocolGuid, HttpUtilitiesProtocol,
@@ -120,7 +114,7 @@ HttpUtilitiesDxeDriverEntryPoint (
                   &mHttpUtilitiesProtocol,
                   NULL
                   );
-  
+
   return Status;
 }
 

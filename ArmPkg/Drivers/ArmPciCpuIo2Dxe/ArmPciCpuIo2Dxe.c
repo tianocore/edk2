@@ -4,13 +4,7 @@
 Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
 
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -152,7 +146,7 @@ CpuIoCheckParameter (
   //
   // Since MAX_ADDRESS can be the maximum integer value supported by the CPU and Count
   // can also be the maximum integer value supported by the CPU, this range
-  // check must be adjusted to avoid all oveflow conditions.
+  // check must be adjusted to avoid all overflow conditions.
   //
   // The following form of the range check is equivalent but assumes that
   // MAX_ADDRESS and MAX_IO_PORT_ADDRESS are of the form (2^n - 1).

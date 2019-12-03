@@ -1,19 +1,13 @@
 /** @file
   The default version of EFI_PEI_CPU_IO_PPI support published by PeiServices in
   PeiCore initialization phase.
- 
+
   EFI_PEI_CPU_IO_PPI is installed by some platform or chipset-specific PEIM that
   abstracts the processor-visible I/O operations. When PeiCore is started, the
   default version of EFI_PEI_CPU_IO_PPI will be assigned to PeiServices table.
-  
-Copyright (c) 2009, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+
+Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -52,12 +46,12 @@ EFI_PEI_CPU_IO_PPI gPeiDefaultCpuIoPpi = {
 
 /**
   Memory-based read services.
-  
-  This function is to perform the Memory Access Read service based on installed 
-  instance of the EFI_PEI_CPU_IO_PPI. 
-  If the EFI_PEI_CPU_IO_PPI is not installed by platform/chipset PEIM, then 
-  return EFI_NOT_YET_AVAILABLE. 
-   
+
+  This function is to perform the Memory Access Read service based on installed
+  instance of the EFI_PEI_CPU_IO_PPI.
+  If the EFI_PEI_CPU_IO_PPI is not installed by platform/chipset PEIM, then
+  return EFI_NOT_YET_AVAILABLE.
+
   @param  PeiServices           An indirect pointer to the PEI Services Table
                                 published by the PEI Foundation.
   @param  This                  Pointer to local data for the interface.
@@ -67,7 +61,7 @@ EFI_PEI_CPU_IO_PPI gPeiDefaultCpuIoPpi = {
   @param  Buffer                A pointer to the buffer of data.
 
   @retval EFI_SUCCESS           The function completed successfully.
-  @retval EFI_NOT_YET_AVAILABLE The service has not been installed.     
+  @retval EFI_NOT_YET_AVAILABLE The service has not been installed.
 **/
 EFI_STATUS
 EFIAPI
@@ -82,15 +76,15 @@ PeiDefaultMemRead (
 {
   return EFI_NOT_AVAILABLE_YET;
 }
-  
+
 /**
   Memory-based write services.
-   
-  This function is to perform the Memory Access Write service based on installed 
-  instance of the EFI_PEI_CPU_IO_PPI. 
-  If the EFI_PEI_CPU_IO_PPI is not installed by platform/chipset PEIM, then 
-  return EFI_NOT_YET_AVAILABLE. 
-   
+
+  This function is to perform the Memory Access Write service based on installed
+  instance of the EFI_PEI_CPU_IO_PPI.
+  If the EFI_PEI_CPU_IO_PPI is not installed by platform/chipset PEIM, then
+  return EFI_NOT_YET_AVAILABLE.
+
   @param  PeiServices           An indirect pointer to the PEI Services Table
                                 published by the PEI Foundation.
   @param  This                  Pointer to local data for the interface.
@@ -100,7 +94,7 @@ PeiDefaultMemRead (
   @param  Buffer                A pointer to the buffer of data.
 
   @retval EFI_SUCCESS           The function completed successfully.
-  @retval EFI_NOT_YET_AVAILABLE The service has not been installed.     
+  @retval EFI_NOT_YET_AVAILABLE The service has not been installed.
 **/
 EFI_STATUS
 EFIAPI
@@ -118,11 +112,11 @@ PeiDefaultMemWrite (
 
 /**
   IO-based read services.
-  
+
   This function is to perform the IO-base read service for the EFI_PEI_CPU_IO_PPI.
-  If the EFI_PEI_CPU_IO_PPI is not installed by platform/chipset PEIM, then 
-  return EFI_NOT_YET_AVAILABLE. 
-  
+  If the EFI_PEI_CPU_IO_PPI is not installed by platform/chipset PEIM, then
+  return EFI_NOT_YET_AVAILABLE.
+
   @param  PeiServices           An indirect pointer to the PEI Services Table
                                 published by the PEI Foundation.
   @param  This                  Pointer to local data for the interface.
@@ -150,11 +144,11 @@ PeiDefaultIoRead (
 
 /**
   IO-based write services.
-  
+
   This function is to perform the IO-base write service for the EFI_PEI_CPU_IO_PPI.
-  If the EFI_PEI_CPU_IO_PPI is not installed by platform/chipset PEIM, then 
-  return EFI_NOT_YET_AVAILABLE. 
-  
+  If the EFI_PEI_CPU_IO_PPI is not installed by platform/chipset PEIM, then
+  return EFI_NOT_YET_AVAILABLE.
+
   @param  PeiServices           An indirect pointer to the PEI Services Table
                                 published by the PEI Foundation.
   @param  This                  Pointer to local data for the interface.
@@ -182,10 +176,10 @@ PeiDefaultIoWrite (
 
 /**
   8-bit I/O read operations.
-  
-  If the EFI_PEI_CPU_IO_PPI is not installed by platform/chipset PEIM, then 
+
+  If the EFI_PEI_CPU_IO_PPI is not installed by platform/chipset PEIM, then
   return 0.
-  
+
   @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
   @param  This           Pointer to local data for the interface.
   @param  Address        The physical address of the access.
@@ -205,10 +199,10 @@ PeiDefaultIoRead8 (
 
 /**
   Reads an 16-bit I/O port.
-  
-  If the EFI_PEI_CPU_IO_PPI is not installed by platform/chipset PEIM, then 
+
+  If the EFI_PEI_CPU_IO_PPI is not installed by platform/chipset PEIM, then
   return 0.
-  
+
   @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
   @param  This           Pointer to local data for the interface.
   @param  Address        The physical address of the access.
@@ -228,10 +222,10 @@ PeiDefaultIoRead16 (
 
 /**
   Reads an 32-bit I/O port.
-  
-  If the EFI_PEI_CPU_IO_PPI is not installed by platform/chipset PEIM, then 
+
+  If the EFI_PEI_CPU_IO_PPI is not installed by platform/chipset PEIM, then
   return 0.
-  
+
   @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
   @param  This           Pointer to local data for the interface.
   @param  Address        The physical address of the access.
@@ -251,10 +245,10 @@ PeiDefaultIoRead32 (
 
 /**
   Reads an 64-bit I/O port.
-  
-  If the EFI_PEI_CPU_IO_PPI is not installed by platform/chipset PEIM, then 
+
+  If the EFI_PEI_CPU_IO_PPI is not installed by platform/chipset PEIM, then
   return 0.
-  
+
   @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
   @param  This           Pointer to local data for the interface.
   @param  Address        The physical address of the access.
@@ -276,7 +270,7 @@ PeiDefaultIoRead64 (
   8-bit I/O write operations.
   If the EFI_PEI_CPU_IO_PPI is not installed by platform/chipset PEIM, then do
   nothing.
-  
+
   @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
   @param  This           Pointer to local data for the interface.
   @param  Address        The physical address of the access.
@@ -291,13 +285,13 @@ PeiDefaultIoWrite8 (
   IN  UINT8                       Data
   )
 {
-}  
+}
 
 /**
   16-bit I/O write operations.
   If the EFI_PEI_CPU_IO_PPI is not installed by platform/chipset PEIM, then do
   nothing.
-  
+
   @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
   @param  This           Pointer to local data for the interface.
   @param  Address        The physical address of the access.
@@ -318,7 +312,7 @@ PeiDefaultIoWrite16 (
   32-bit I/O write operations.
   If the EFI_PEI_CPU_IO_PPI is not installed by platform/chipset PEIM, then do
   nothing.
-  
+
   @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
   @param  This           Pointer to local data for the interface.
   @param  Address        The physical address of the access.
@@ -339,7 +333,7 @@ PeiDefaultIoWrite32 (
   64-bit I/O write operations.
   If the EFI_PEI_CPU_IO_PPI is not installed by platform/chipset PEIM, then do
   nothing.
-  
+
   @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
   @param  This           Pointer to local data for the interface.
   @param  Address        The physical address of the access.
@@ -359,9 +353,9 @@ PeiDefaultIoWrite64 (
 /**
   8-bit memory read operations.
 
-  If the EFI_PEI_CPU_IO_PPI is not installed by platform/chipset PEIM, then 
+  If the EFI_PEI_CPU_IO_PPI is not installed by platform/chipset PEIM, then
   return 0.
-  
+
   @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
   @param  This           Pointer to local data for the interface.
   @param  Address        The physical address of the access.
@@ -378,14 +372,14 @@ PeiDefaultMemRead8 (
   )
 {
   return 0;
-}  
+}
 
 /**
   16-bit memory read operations.
 
-  If the EFI_PEI_CPU_IO_PPI is not installed by platform/chipset PEIM, then 
+  If the EFI_PEI_CPU_IO_PPI is not installed by platform/chipset PEIM, then
   return 0.
-  
+
   @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
   @param  This           Pointer to local data for the interface.
   @param  Address        The physical address of the access.
@@ -402,14 +396,14 @@ PeiDefaultMemRead16 (
   )
 {
   return 0;
-}  
+}
 
 /**
   32-bit memory read operations.
 
-  If the EFI_PEI_CPU_IO_PPI is not installed by platform/chipset PEIM, then 
+  If the EFI_PEI_CPU_IO_PPI is not installed by platform/chipset PEIM, then
   return 0.
-  
+
   @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
   @param  This           Pointer to local data for the interface.
   @param  Address        The physical address of the access.
@@ -426,14 +420,14 @@ PeiDefaultMemRead32 (
   )
 {
   return 0;
-} 
+}
 
 /**
   64-bit memory read operations.
 
-  If the EFI_PEI_CPU_IO_PPI is not installed by platform/chipset PEIM, then 
+  If the EFI_PEI_CPU_IO_PPI is not installed by platform/chipset PEIM, then
   return 0.
-  
+
   @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
   @param  This           Pointer to local data for the interface.
   @param  Address        The physical address of the access.
@@ -450,13 +444,13 @@ PeiDefaultMemRead64 (
   )
 {
   return 0;
-} 
+}
 
 /**
   8-bit memory write operations.
   If the EFI_PEI_CPU_IO_PPI is not installed by platform/chipset PEIM, then do
   nothing.
-  
+
   @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
   @param  This           Pointer to local data for the interface.
   @param  Address        The physical address of the access.
@@ -472,13 +466,13 @@ PeiDefaultMemWrite8 (
   IN  UINT8                         Data
   )
 {
-}  
+}
 
 /**
   16-bit memory write operations.
   If the EFI_PEI_CPU_IO_PPI is not installed by platform/chipset PEIM, then do
   nothing.
-  
+
   @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
   @param  This           Pointer to local data for the interface.
   @param  Address        The physical address of the access.
@@ -494,7 +488,7 @@ PeiDefaultMemWrite16 (
   IN  UINT16                        Data
   )
 {
-}  
+}
 
 /**
   32-bit memory write operations.
@@ -516,13 +510,13 @@ PeiDefaultMemWrite32 (
   IN  UINT32                        Data
   )
 {
-} 
+}
 
 /**
   64-bit memory write operations.
   If the EFI_PEI_CPU_IO_PPI is not installed by platform/chipset PEIM, then do
   nothing.
-  
+
   @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
   @param  This           Pointer to local data for the interface.
   @param  Address        The physical address of the access.
@@ -538,4 +532,4 @@ PeiDefaultMemWrite64 (
   IN  UINT64                        Data
   )
 {
-} 
+}

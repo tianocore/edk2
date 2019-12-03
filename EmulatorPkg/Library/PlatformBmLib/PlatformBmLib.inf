@@ -1,0 +1,68 @@
+## @file
+# Platfrom Boot Manager library
+#
+# Do platform action customized by IBV/OEM.
+# Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+# Portions copyright (c) 2011, Apple Inc. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PlatformBmLib
+  FILE_GUID                      = 59569181-CBF8-2E44-9C3E-C2AB2F5608E1
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PlatformBootManagerLib|DXE_DRIVER
+
+
+#
+#  The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  PlatformBm.c
+  PlatformBm.h
+  PlatformBmData.c
+  PlatformBmMemoryTest.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EmulatorPkg/EmulatorPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  BaseMemoryLib
+  DebugLib
+  PcdLib
+  UefiBootManagerLib
+  DevicePathLib
+  UefiLib
+  BootLogoLib
+  HobLib
+  HiiLib
+
+[Guids]
+  gEmuSystemConfigGuid
+  gEfiEndOfDxeEventGroupGuid
+
+[Protocols]
+  gEfiGenericMemTestProtocolGuid
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn
+  gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConInConnectOnDemand
+
+[Depex]
+  gEfiVariableArchProtocolGuid AND gEfiVariableWriteArchProtocolGuid

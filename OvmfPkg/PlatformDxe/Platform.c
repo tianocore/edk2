@@ -5,13 +5,7 @@
   Copyright (C) 2014, Red Hat, Inc.
   Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials are licensed and made available
-  under the terms and conditions of the BSD License which accompanies this
-  distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT
-  WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include <Library/BaseLib.h>
@@ -492,7 +486,7 @@ STATIC
 EFI_STATUS
 EFIAPI
 CreateResolutionOptions (
-  IN  EFI_HII_HANDLE  *PackageList,
+  IN  EFI_HII_HANDLE  PackageList,
   OUT VOID            **OpCodeBuffer,
   IN  UINTN           NumGopModes,
   IN  GOP_MODE        *GopModes
@@ -553,7 +547,7 @@ STATIC
 EFI_STATUS
 EFIAPI
 PopulateForm (
-  IN  EFI_HII_HANDLE  *PackageList,
+  IN  EFI_HII_HANDLE  PackageList,
   IN  EFI_GUID        *FormSetGuid,
   IN  EFI_FORM_ID     FormId,
   IN  UINTN           NumGopModes,

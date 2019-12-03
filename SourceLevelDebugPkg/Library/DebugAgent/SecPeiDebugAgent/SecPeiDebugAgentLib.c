@@ -1,14 +1,8 @@
 /** @file
   SEC Core Debug Agent Library instance implementition.
 
-  Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -32,7 +26,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_PEI_PPI_DESCRIPTOR           mVectorHandoffInf
   }
 };
 
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_PEI_NOTIFY_DESCRIPTOR mMemoryDiscoveredNotifyList[1] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_PEI_NOTIFY_DESCRIPTOR mDebugAgentMemoryDiscoveredNotifyList[1] = {
   {
     (EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
     &gEfiPeiMemoryDiscoveredPpiGuid,
@@ -213,7 +207,7 @@ GetMailboxPointer (
     // Fix up Debug Port handler and save new mailbox in IDT entry
     //
     Mailbox = (DEBUG_AGENT_MAILBOX *)((UINTN)Mailbox + ((UINTN)(MailboxLocationInHob) - (UINTN)MailboxLocationInIdt));
-    DebugPortHandle = (UINT64)((UINTN)Mailbox->DebugPortHandle + ((UINTN)(MailboxLocationInHob) - (UINTN)MailboxLocationInIdt));
+    DebugPortHandle = (UINTN)Mailbox->DebugPortHandle + ((UINTN)(MailboxLocationInHob) - (UINTN)MailboxLocationInIdt);
     UpdateMailboxContent (Mailbox, DEBUG_MAILBOX_DEBUG_PORT_HANDLE_INDEX, DebugPortHandle);
     *MailboxLocationInHob = (UINT64)(UINTN)Mailbox;
     SetLocationSavedMailboxPointerInIdtEntry (MailboxLocationInHob);
@@ -554,7 +548,7 @@ InitializeDebugAgent (
     // Register for a callback once memory has been initialized.
     // If memery has been ready, the callback funtion will be invoked immediately
     //
-    Status = PeiServicesNotifyPpi (&mMemoryDiscoveredNotifyList[0]);
+    Status = PeiServicesNotifyPpi (&mDebugAgentMemoryDiscoveredNotifyList[0]);
     if (EFI_ERROR (Status)) {
       DEBUG ((EFI_D_ERROR, "DebugAgent: Failed to register memory discovered callback function!\n"));
       CpuDeadLoop ();
@@ -582,8 +576,8 @@ InitializeDebugAgent (
     } else {
       Ia32Idtr =  (IA32_DESCRIPTOR *) Context;
       Ia32IdtEntry = (IA32_IDT_ENTRY *)(Ia32Idtr->Base);
-      MailboxLocationPointer = (UINT64 *) (UINTN) (Ia32IdtEntry[DEBUG_MAILBOX_VECTOR].Bits.OffsetLow +
-                                         (UINT32) (Ia32IdtEntry[DEBUG_MAILBOX_VECTOR].Bits.OffsetHigh << 16));
+      MailboxLocationPointer = (UINT64 *) ((UINTN) Ia32IdtEntry[DEBUG_MAILBOX_VECTOR].Bits.OffsetLow +
+                                          ((UINTN) Ia32IdtEntry[DEBUG_MAILBOX_VECTOR].Bits.OffsetHigh << 16));
       Mailbox = (DEBUG_AGENT_MAILBOX *) (UINTN)(*MailboxLocationPointer);
       //
       // Mailbox should valid and setup before executing thunk code

@@ -1,0 +1,24 @@
+#/* @file
+#  Copyright 2018 NXP
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#*/
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = BasePL011UartClockLib
+  FILE_GUID                      = af8fef24-afbb-472a-b8b7-13101a79703c
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PL011UartClockLib
+
+[Packages]
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  MdePkg/MdePkg.dec
+
+[Sources.common]
+  PL011UartClockLib.c
+
+[FixedPcd]
+  gArmPlatformTokenSpaceGuid.PL011UartClkInHz

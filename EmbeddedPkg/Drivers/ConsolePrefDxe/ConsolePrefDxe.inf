@@ -1,0 +1,55 @@
+## @file
+#
+#  Copyright (c) 2017, Linaro, Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION               = 0x00010019
+  BASE_NAME                 = ConsolePrefDxe
+  FILE_GUID                 = bbe2668c-0efc-46fb-9137-4f2da8f419f3
+  MODULE_TYPE               = DXE_DRIVER
+  VERSION_STRING            = 1.0
+  ENTRY_POINT               = ConsolePrefDxeEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES      = IA32 X64 ARM AARCH64
+#
+
+[Sources]
+  ConsolePrefDxe.c
+  ConsolePrefHii.vfr
+  ConsolePrefHii.uni
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  FdtLib
+  HiiLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
+  UefiRuntimeServicesTableLib
+
+[Guids]
+  gConsolePrefFormSetGuid
+  gFdtTableGuid
+  gEfiEventReadyToBootGuid
+
+[Protocols]
+  gEfiAcpiTableProtocolGuid
+  gEfiAcpiSdtProtocolGuid
+  gEfiGraphicsOutputProtocolGuid
+
+[Depex]
+  gEfiVariableArchProtocolGuid        AND
+  gEfiVariableWriteArchProtocolGuid

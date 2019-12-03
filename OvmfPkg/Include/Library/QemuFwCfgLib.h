@@ -4,88 +4,14 @@
   Copyright (c) 2011 - 2013, Intel Corporation. All rights reserved.<BR>
   Copyright (C) 2013, Red Hat, Inc.
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #ifndef __FW_CFG_LIB__
 #define __FW_CFG_LIB__
 
-//
-// The size, in bytes, of names of firmware configuration files, including at
-// least one terminating NUL byte.
-//
-#define QEMU_FW_CFG_FNAME_SIZE 56
-
-//
-// If the following bit is set in the UINT32 fw_cfg revision / feature bitmap
-// -- read from key 0x0001 with the basic IO Port or MMIO method --, then the
-// DMA interface is available.
-//
-#define FW_CFG_F_DMA BIT1
-
-//
-// Macros for the FW_CFG_DMA_ACCESS.Control bitmap (in native encoding).
-//
-#define FW_CFG_DMA_CTL_ERROR  BIT0
-#define FW_CFG_DMA_CTL_READ   BIT1
-#define FW_CFG_DMA_CTL_SKIP   BIT2
-#define FW_CFG_DMA_CTL_SELECT BIT3
-#define FW_CFG_DMA_CTL_WRITE  BIT4
-
-typedef enum {
-  QemuFwCfgItemSignature            = 0x0000,
-  QemuFwCfgItemInterfaceVersion     = 0x0001,
-  QemuFwCfgItemSystemUuid           = 0x0002,
-  QemuFwCfgItemRamSize              = 0x0003,
-  QemuFwCfgItemGraphicsEnabled      = 0x0004,
-  QemuFwCfgItemSmpCpuCount          = 0x0005,
-  QemuFwCfgItemMachineId            = 0x0006,
-  QemuFwCfgItemKernelAddress        = 0x0007,
-  QemuFwCfgItemKernelSize           = 0x0008,
-  QemuFwCfgItemKernelCommandLine    = 0x0009,
-  QemuFwCfgItemInitrdAddress        = 0x000a,
-  QemuFwCfgItemInitrdSize           = 0x000b,
-  QemuFwCfgItemBootDevice           = 0x000c,
-  QemuFwCfgItemNumaData             = 0x000d,
-  QemuFwCfgItemBootMenu             = 0x000e,
-  QemuFwCfgItemMaximumCpuCount      = 0x000f,
-  QemuFwCfgItemKernelEntry          = 0x0010,
-  QemuFwCfgItemKernelData           = 0x0011,
-  QemuFwCfgItemInitrdData           = 0x0012,
-  QemuFwCfgItemCommandLineAddress   = 0x0013,
-  QemuFwCfgItemCommandLineSize      = 0x0014,
-  QemuFwCfgItemCommandLineData      = 0x0015,
-  QemuFwCfgItemKernelSetupAddress   = 0x0016,
-  QemuFwCfgItemKernelSetupSize      = 0x0017,
-  QemuFwCfgItemKernelSetupData      = 0x0018,
-  QemuFwCfgItemFileDir              = 0x0019,
-
-  QemuFwCfgItemX86AcpiTables        = 0x8000,
-  QemuFwCfgItemX86SmbiosTables      = 0x8001,
-  QemuFwCfgItemX86Irq0Override      = 0x8002,
-  QemuFwCfgItemX86E820Table         = 0x8003,
-  QemuFwCfgItemX86HpetData          = 0x8004,
-
-} FIRMWARE_CONFIG_ITEM;
-
-//
-// Communication structure for the DMA access method. All fields are encoded in
-// big endian.
-//
-#pragma pack (1)
-typedef struct {
-  UINT32 Control;
-  UINT32 Length;
-  UINT64 Address;
-} FW_CFG_DMA_ACCESS;
-#pragma pack ()
+#include <IndustryStandard/QemuFwCfg.h>
 
 /**
   Returns a boolean indicating if the firmware configuration interface
@@ -155,6 +81,22 @@ EFIAPI
 QemuFwCfgWriteBytes (
   IN UINTN                  Size,
   IN VOID                   *Buffer
+  );
+
+
+/**
+  Skip bytes in the firmware configuration item.
+
+  Increase the offset of the firmware configuration item without transferring
+  bytes between the item and a caller-provided buffer. Subsequent read, write
+  or skip operations will commence at the increased offset.
+
+  @param[in] Size  Number of bytes to skip.
+**/
+VOID
+EFIAPI
+QemuFwCfgSkipBytes (
+  IN UINTN                  Size
   );
 
 
@@ -229,20 +171,6 @@ QemuFwCfgFindFile (
   IN   CONST CHAR8           *Name,
   OUT  FIRMWARE_CONFIG_ITEM  *Item,
   OUT  UINTN                 *Size
-  );
-
-
-/**
-  Determine if S3 support is explicitly enabled.
-
-  @retval  TRUE   if S3 support is explicitly enabled.
-           FALSE  otherwise. This includes unavailability of the firmware
-                  configuration interface.
-**/
-BOOLEAN
-EFIAPI
-QemuFwCfgS3Enabled (
-  VOID
   );
 
 #endif

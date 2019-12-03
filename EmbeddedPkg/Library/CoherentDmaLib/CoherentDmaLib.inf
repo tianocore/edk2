@@ -1,0 +1,30 @@
+#/** @file
+#
+#  Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
+#  Copyright (c) 2017, Linaro, Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010019
+  BASE_NAME                      = CoherentDmaLib
+  FILE_GUID                      = 0F2A0816-D319-4ee7-A6B8-D58524E4428F
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = DmaLib
+
+[Sources]
+  CoherentDmaLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  MemoryAllocationLib
+
+[Pcd]
+  gEmbeddedTokenSpaceGuid.PcdDmaDeviceOffset

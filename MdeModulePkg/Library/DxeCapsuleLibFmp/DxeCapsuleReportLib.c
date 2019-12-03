@@ -1,14 +1,8 @@
 /** @file
   DXE capsule report related function.
 
-  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2016 - 2019, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -30,20 +24,22 @@
 #include <Library/HobLib.h>
 #include <Library/PrintLib.h>
 #include <Library/ReportStatusCodeLib.h>
+#include <Library/DevicePathLib.h>
 #include <Library/CapsuleLib.h>
 
 #include <IndustryStandard/WindowsUxCapsule.h>
 
-typedef struct {
-  EFI_CAPSULE_RESULT_VARIABLE_HEADER  CapsuleResultHeader;
-  EFI_CAPSULE_RESULT_VARIABLE_FMP     CapsuleResultFmp;
-} CAPSULE_RESULT_VARIABLE_CACHE;
+/**
+  This routine is called to clear CapsuleOnDisk Relocation Info variable.
+  Total Capsule On Disk length is recorded in this variable
 
-#define CAPSULE_RESULT_VARIABLE_CACHE_COUNT   0x10
+  @retval EFI_SUCCESS   Capsule On Disk flags are cleared
 
-CAPSULE_RESULT_VARIABLE_CACHE *mCapsuleResultVariableCache;
-UINTN                         mCapsuleResultVariableCacheMaxCount;
-UINTN                         mCapsuleResultVariableCacheCount;
+**/
+EFI_STATUS
+CoDClearCapsuleRelocationInfo(
+  VOID
+  );
 
 /**
   Get current capsule last variable index.
@@ -77,96 +73,10 @@ GetCurrentCapsuleLastIndex (
 }
 
 /**
-  Check if this FMP capsule is processed.
-
-  @param[in] CapsuleHeader  The capsule image header
-  @param[in] PayloadIndex   FMP payload index
-  @param[in] ImageHeader    FMP image header
-
-  @retval TRUE  This FMP capsule is processed.
-  @retval FALSE This FMP capsule is not processed.
-**/
-BOOLEAN
-IsFmpCapsuleProcessed (
-  IN EFI_CAPSULE_HEADER                            *CapsuleHeader,
-  IN UINTN                                         PayloadIndex,
-  IN EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER  *ImageHeader
-  )
-{
-  UINTN                               Index;
-  EFI_CAPSULE_RESULT_VARIABLE_HEADER  *CapsuleResult;
-  EFI_CAPSULE_RESULT_VARIABLE_FMP     *CapsuleResultFmp;
-
-  for (Index = 0; Index < mCapsuleResultVariableCacheCount; Index++) {
-    //
-    // Check
-    //
-    CapsuleResult = &mCapsuleResultVariableCache[Index].CapsuleResultHeader;
-    if (CapsuleResult->VariableTotalSize >= sizeof(EFI_CAPSULE_RESULT_VARIABLE_HEADER)) {
-      if (CompareGuid(&CapsuleResult->CapsuleGuid, &gEfiFmpCapsuleGuid)) {
-        if (CapsuleResult->VariableTotalSize >= sizeof(EFI_CAPSULE_RESULT_VARIABLE_HEADER) + sizeof(EFI_CAPSULE_RESULT_VARIABLE_FMP)) {
-          CapsuleResultFmp = (EFI_CAPSULE_RESULT_VARIABLE_FMP *)(CapsuleResult + 1);
-          if (CompareGuid(&CapsuleResultFmp->UpdateImageTypeId, &ImageHeader->UpdateImageTypeId) &&
-              (CapsuleResultFmp->UpdateImageIndex == ImageHeader->UpdateImageIndex) &&
-              (CapsuleResultFmp->PayloadIndex == PayloadIndex) ) {
-            return TRUE;
-          }
-        }
-      }
-    }
-  }
-
-  return FALSE;
-}
-
-/**
-  Write a new capsule status variable cache.
-
-  @param[in] CapsuleResult      The capsule status variable
-  @param[in] CapsuleResultSize  The size of the capsule stauts variable in bytes
-
-  @retval EFI_SUCCESS          The capsule status variable is cached.
-  @retval EFI_OUT_OF_RESOURCES No resource to cache the capsule status variable.
-**/
-EFI_STATUS
-WriteNewCapsuleResultVariableCache (
-  IN VOID    *CapsuleResult,
-  IN UINTN   CapsuleResultSize
-  )
-{
-  if (CapsuleResultSize > sizeof(CAPSULE_RESULT_VARIABLE_CACHE)) {
-    CapsuleResultSize = sizeof(CAPSULE_RESULT_VARIABLE_CACHE);
-  }
-
-  if (mCapsuleResultVariableCacheCount == mCapsuleResultVariableCacheMaxCount) {
-    mCapsuleResultVariableCache = ReallocatePool(
-                                    mCapsuleResultVariableCacheMaxCount * sizeof(CAPSULE_RESULT_VARIABLE_CACHE),
-                                    (mCapsuleResultVariableCacheMaxCount + CAPSULE_RESULT_VARIABLE_CACHE_COUNT) * sizeof(CAPSULE_RESULT_VARIABLE_CACHE),
-                                    mCapsuleResultVariableCache
-                                    );
-    if (mCapsuleResultVariableCache == NULL) {
-      return EFI_OUT_OF_RESOURCES;
-    }
-    mCapsuleResultVariableCacheMaxCount += CAPSULE_RESULT_VARIABLE_CACHE_COUNT;
-  }
-
-  ASSERT(mCapsuleResultVariableCacheCount < mCapsuleResultVariableCacheMaxCount);
-  ASSERT(mCapsuleResultVariableCache != NULL);
-  CopyMem(
-    &mCapsuleResultVariableCache[mCapsuleResultVariableCacheCount],
-    CapsuleResult,
-    CapsuleResultSize
-    );
-  mCapsuleResultVariableCacheCount++;
-
-  return EFI_SUCCESS;
-}
-
-/**
   Get a new capsule status variable index.
 
   @return A new capsule status variable index.
-  @retval -1  No new capsule status variable index.
+  @retval 0  No new capsule status variable index. Rolling over.
 **/
 INTN
 GetNewCapsuleResultIndex (
@@ -177,7 +87,8 @@ GetNewCapsuleResultIndex (
 
   CurrentIndex = GetCurrentCapsuleLastIndex();
   if (CurrentIndex >= PcdGet16(PcdCapsuleMax)) {
-    return -1;
+    DEBUG((DEBUG_INFO, "  CapsuleResult variable Rolling Over!\n"));
+    return 0;
   }
 
   return CurrentIndex + 1;
@@ -205,9 +116,7 @@ WriteNewCapsuleResultVariable (
 
   CapsuleResultIndex = GetNewCapsuleResultIndex();
   DEBUG((DEBUG_INFO, "New CapsuleResultIndex - 0x%x\n", CapsuleResultIndex));
-  if (CapsuleResultIndex == -1) {
-    return EFI_OUT_OF_RESOURCES;
-  }
+
   UnicodeSPrint(
     CapsuleResultStr,
     sizeof(CapsuleResultStr),
@@ -256,16 +165,13 @@ RecordCapsuleStatusVariable (
   EFI_STATUS                          Status;
 
   CapsuleResultVariable.VariableTotalSize = sizeof(CapsuleResultVariable);
+  CapsuleResultVariable.Reserved = 0;
   CopyGuid (&CapsuleResultVariable.CapsuleGuid, &CapsuleHeader->CapsuleGuid);
   ZeroMem(&CapsuleResultVariable.CapsuleProcessed, sizeof(CapsuleResultVariable.CapsuleProcessed));
   gRT->GetTime(&CapsuleResultVariable.CapsuleProcessed, NULL);
   CapsuleResultVariable.CapsuleStatus = CapsuleStatus;
 
-  //
-  // Save Local Cache
-  //
-  Status = WriteNewCapsuleResultVariableCache(&CapsuleResultVariable, sizeof(CapsuleResultVariable));
-
+  Status = EFI_SUCCESS;
   if ((CapsuleHeader->Flags & CAPSULE_FLAGS_PERSIST_ACROSS_RESET) != 0) {
     Status = WriteNewCapsuleResultVariable(&CapsuleResultVariable, sizeof(CapsuleResultVariable));
   }
@@ -279,6 +185,8 @@ RecordCapsuleStatusVariable (
   @param[in] CapsuleStatus  The capsule process stauts
   @param[in] PayloadIndex   FMP payload index
   @param[in] ImageHeader    FMP image header
+  @param[in] FmpDevicePath  DevicePath associated with the FMP producer
+  @param[in] CapFileName    Capsule file name
 
   @retval EFI_SUCCESS          The capsule status variable is recorded.
   @retval EFI_OUT_OF_RESOURCES No resource to record the capsule status variable.
@@ -288,23 +196,48 @@ RecordFmpCapsuleStatusVariable (
   IN EFI_CAPSULE_HEADER                            *CapsuleHeader,
   IN EFI_STATUS                                    CapsuleStatus,
   IN UINTN                                         PayloadIndex,
-  IN EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER  *ImageHeader
+  IN EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER  *ImageHeader,
+  IN EFI_DEVICE_PATH_PROTOCOL                      *FmpDevicePath, OPTIONAL
+  IN CHAR16                                        *CapFileName    OPTIONAL
   )
 {
   EFI_CAPSULE_RESULT_VARIABLE_HEADER  *CapsuleResultVariableHeader;
   EFI_CAPSULE_RESULT_VARIABLE_FMP     *CapsuleResultVariableFmp;
   EFI_STATUS                          Status;
   UINT8                               *CapsuleResultVariable;
-  UINT32                              CapsuleResultVariableSize;
+  UINTN                               CapsuleResultVariableSize;
+  CHAR16                              *DevicePathStr;
+  UINTN                               DevicePathStrSize;
+  UINTN                               CapFileNameSize;
 
-  CapsuleResultVariable     = NULL;
-  CapsuleResultVariableSize = sizeof(EFI_CAPSULE_RESULT_VARIABLE_HEADER) + sizeof(EFI_CAPSULE_RESULT_VARIABLE_FMP);
-  CapsuleResultVariable     = AllocatePool (CapsuleResultVariableSize);
+  DevicePathStr   = NULL;
+  CapFileNameSize = sizeof(CHAR16);
+
+  if (FmpDevicePath != NULL) {
+    DevicePathStr = ConvertDevicePathToText (FmpDevicePath, FALSE, FALSE);
+  }
+  if (DevicePathStr != NULL) {
+    DevicePathStrSize = StrSize(DevicePathStr);
+  } else {
+    DevicePathStrSize = sizeof(CHAR16);
+  }
+
+  if (CapFileName != NULL) {
+    CapFileNameSize = StrSize(CapFileName);
+  }
+
+  //
+  // Allocate room for CapsuleFileName.
+  //
+  CapsuleResultVariableSize = sizeof(EFI_CAPSULE_RESULT_VARIABLE_HEADER) + sizeof(EFI_CAPSULE_RESULT_VARIABLE_FMP) + CapFileNameSize + DevicePathStrSize;
+
+  CapsuleResultVariable     = AllocateZeroPool (CapsuleResultVariableSize);
   if (CapsuleResultVariable == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
   CapsuleResultVariableHeader = (VOID *)CapsuleResultVariable;
-  CapsuleResultVariableHeader->VariableTotalSize = CapsuleResultVariableSize;
+  CapsuleResultVariableHeader->VariableTotalSize = (UINT32)CapsuleResultVariableSize;
+  CapsuleResultVariableHeader->Reserved = 0;
   CopyGuid(&CapsuleResultVariableHeader->CapsuleGuid, &CapsuleHeader->CapsuleGuid);
   ZeroMem(&CapsuleResultVariableHeader->CapsuleProcessed, sizeof(CapsuleResultVariableHeader->CapsuleProcessed));
   gRT->GetTime(&CapsuleResultVariableHeader->CapsuleProcessed, NULL);
@@ -316,11 +249,17 @@ RecordFmpCapsuleStatusVariable (
   CapsuleResultVariableFmp->UpdateImageIndex = ImageHeader->UpdateImageIndex;
   CopyGuid (&CapsuleResultVariableFmp->UpdateImageTypeId, &ImageHeader->UpdateImageTypeId);
 
-  //
-  // Save Local Cache
-  //
-  Status = WriteNewCapsuleResultVariableCache(CapsuleResultVariable, CapsuleResultVariableSize);
+  if (CapFileName != NULL) {
+    CopyMem((UINT8 *)CapsuleResultVariableFmp + sizeof(EFI_CAPSULE_RESULT_VARIABLE_FMP), CapFileName, CapFileNameSize);
+  }
 
+  if (DevicePathStr != NULL) {
+    CopyMem ((UINT8 *)CapsuleResultVariableFmp + sizeof(EFI_CAPSULE_RESULT_VARIABLE_FMP) + CapFileNameSize, DevicePathStr, DevicePathStrSize);
+    FreePool (DevicePathStr);
+    DevicePathStr = NULL;
+  }
+
+  Status = EFI_SUCCESS;
   if ((CapsuleHeader->Flags & CAPSULE_FLAGS_PERSIST_ACROSS_RESET) != 0) {
     Status = WriteNewCapsuleResultVariable(CapsuleResultVariable, CapsuleResultVariableSize);
   }
@@ -425,6 +364,10 @@ InitCapsuleLastVariable (
                         0,
                         NULL
                         );
+      } else {
+        if (CapsuleResult != NULL) {
+          FreePool (CapsuleResult);
+        }
       }
     }
 
@@ -460,7 +403,13 @@ InitCapsuleUpdateVariable (
   Index = 0;
   while (TRUE) {
     if (Index > 0) {
-      UnicodeValueToString (TempVarName, 0, Index, 0);
+      UnicodeValueToStringS (
+        TempVarName,
+        sizeof (CapsuleVarName) - ((UINTN)TempVarName - (UINTN)CapsuleVarName),
+        0,
+        Index,
+        0
+        );
     }
     Status = gRT->SetVariable (
                     CapsuleVarName,
@@ -480,6 +429,31 @@ InitCapsuleUpdateVariable (
 }
 
 /**
+  Initialize capsule relocation info variable.
+**/
+VOID
+InitCapsuleRelocationInfo (
+  VOID
+  )
+{
+  EFI_STATUS                   Status;
+  EDKII_VARIABLE_LOCK_PROTOCOL *VariableLock;
+
+  CoDClearCapsuleRelocationInfo();
+
+  //
+  // Unlock Capsule On Disk relocation Info variable only when Capsule On Disk flag is enabled
+  //
+  if (!CoDCheckCapsuleOnDiskFlag()) {
+    Status = gBS->LocateProtocol (&gEdkiiVariableLockProtocolGuid, NULL, (VOID **) &VariableLock);
+    if (!EFI_ERROR (Status)) {
+      Status = VariableLock->RequestToLock (VariableLock, COD_RELOCATION_INFO_VAR_NAME, &gEfiCapsuleVendorGuid);
+      ASSERT_EFI_ERROR (Status);
+    }
+  }
+}
+
+/**
   Initialize capsule related variables.
 **/
 VOID
@@ -490,6 +464,8 @@ InitCapsuleVariable (
   InitCapsuleUpdateVariable();
   InitCapsuleMaxVariable();
   InitCapsuleLastVariable();
+  InitCapsuleRelocationInfo();
+
   //
   // No need to clear L"Capsule####", because OS/APP should refer L"CapsuleLast"
   // to check status and delete them.

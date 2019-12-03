@@ -1,0 +1,16 @@
+// /** @file
+// Base library to support BMP graphics image conversion.
+//
+// Provides services to convert a BMP graphics image to a GOP BLT buffer and
+// from a GOP BLT buffer to a BMP graphics image.
+//
+// Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+#string STR_MODULE_ABSTRACT             #language en-US "BmpSupportLib instance"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "BmpSupportLib instance."
+

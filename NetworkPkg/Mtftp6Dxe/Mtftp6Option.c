@@ -1,15 +1,9 @@
 /** @file
   Mtftp6 option parse functions implementation.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -17,6 +11,7 @@
 
 CHAR8 *mMtftp6SupportedOptions[MTFTP6_SUPPORTED_OPTIONS_NUM] = {
   "blksize",
+  "windowsize",
   "timeout",
   "tsize",
   "multicast"
@@ -146,6 +141,7 @@ Mtftp6ParseMcastOption (
   @param[in]  Count         The num of the extension options.
   @param[in]  IsRequest     If FALSE, the extension options is included
                             by a request packet.
+  @param[in]  Operation     The current performed operation.
   @param[in]  ExtInfo       The pointer to the option information to be filled.
 
   @retval EFI_SUCCESS            Parse the multicast option successfully.
@@ -158,6 +154,7 @@ Mtftp6ParseExtensionOption (
   IN EFI_MTFTP6_OPTION        *Options,
   IN UINT32                   Count,
   IN BOOLEAN                  IsRequest,
+  IN UINT16                   Operation,
   IN MTFTP6_EXT_OPTION_INFO   *ExtInfo
   )
 {
@@ -227,6 +224,23 @@ Mtftp6ParseExtensionOption (
       }
 
       ExtInfo->BitMap |= MTFTP6_OPT_MCAST_BIT;
+
+    } else if (AsciiStriCmp ((CHAR8 *) Opt->OptionStr, "windowsize") == 0) {
+      if (Operation == EFI_MTFTP6_OPCODE_WRQ) {
+        //
+        // Currently, windowsize is not supported in the write operation.
+        //
+        return EFI_UNSUPPORTED;
+      }
+
+      Value = (UINT32) AsciiStrDecimalToUintn ((CHAR8 *) Opt->ValueStr);
+
+      if ((Value < 1)) {
+        return EFI_INVALID_PARAMETER;
+      }
+
+      ExtInfo->WindowSize = (UINT16) Value;
+      ExtInfo->BitMap |= MTFTP6_OPT_WINDOWSIZE_BIT;
 
     } else if (IsRequest) {
       //

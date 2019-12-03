@@ -1,0 +1,44 @@
+#/** @file
+#
+#  Copyright (c) 2013-2015, ARM Ltd. All rights reserved.<BR>
+#  Copyright (c) 2017, Linaro. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010019
+  BASE_NAME                      = AndroidBootImgLib
+  FILE_GUID                      = ed3b8739-6fa7-4cb1-8aeb-2496f8fcaefa
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = AndroidBootImgLib
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = ARM AARCH64
+#
+
+[Sources]
+  AndroidBootImgLib.c
+
+[LibraryClasses]
+  DebugLib
+  FdtLib
+  PrintLib
+  UefiBootServicesTableLib
+  UefiLib
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+
+[Protocols]
+  gAndroidBootImgProtocolGuid
+  gEfiLoadedImageProtocolGuid
+
+[Guids]
+  gFdtTableGuid

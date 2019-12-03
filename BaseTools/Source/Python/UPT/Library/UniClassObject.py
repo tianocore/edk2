@@ -1,19 +1,14 @@
 ## @file
 # Collect all defined strings in multiple uni files.
 #
-# Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2014 - 2019, Intel Corporation. All rights reserved.<BR>
 #
-# This program and the accompanying materials are licensed and made available 
-# under the terms and conditions of the BSD License which accompanies this 
-# distribution. The full text of the license may be found at 
-# http://opensource.org/licenses/bsd-license.php
-#
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 """
 Collect all defined strings in multiple uni files
 """
+from __future__ import print_function
 
 ##
 # Import Modules
@@ -23,7 +18,7 @@ import distutils.util
 from Logger import ToolError
 from Logger import Log as EdkLogger
 from Logger import StringTable as ST
-from Library.String import GetLineNo
+from Library.StringUtils import GetLineNo
 from Library.Misc import PathClass
 from Library.Misc import GetCharIndexOutStr
 from Library import DataType as DT
@@ -46,8 +41,6 @@ LF = u'\u000A'
 NULL = u'\u0000'
 TAB = u'\t'
 BACK_SPLASH = u'\\'
-
-gINCLUDE_PATTERN = re.compile("^!include[\s]+([\S]+)[\s]*$", re.MULTILINE | re.UNICODE)
 
 gLANG_CONV_TABLE = {'eng':'en', 'fra':'fr', \
                  'aar':'aa', 'abk':'ab', 'ave':'ae', 'afr':'af', 'aka':'ak', 'amh':'am', \
@@ -120,21 +113,23 @@ def UniToHexList(Uni):
 # @retval NewUni:  The converted unicode string
 #
 def ConvertSpecialUnicodes(Uni):
-    NewUni = Uni
+    OldUni = NewUni = Uni
     NewUni = NewUni.replace(u'\u00A9', '(c)')
     NewUni = NewUni.replace(u'\u00AE', '(r)')
     NewUni = NewUni.replace(u'\u2122', '(tm)')
+    if OldUni == NewUni:
+        NewUni = OldUni
     return NewUni
 
 ## GetLanguageCode1766
 #
 # Check the language code read from .UNI file and convert RFC 4646 codes to RFC 1766 codes
-# RFC 1766 language codes supported in compatiblity mode
+# RFC 1766 language codes supported in compatibility mode
 # RFC 4646 language codes supported in native mode
 #
 # @param LangName:   Language codes read from .UNI file
 #
-# @retval LangName:  Valid lanugage code in RFC 1766 format or None
+# @retval LangName:  Valid language code in RFC 1766 format or None
 #
 def GetLanguageCode1766(LangName, File=None):
     return LangName
@@ -149,9 +144,9 @@ def GetLanguageCode1766(LangName, File=None):
         if LangName.isalpha() and gLANG_CONV_TABLE.get(LangName.lower()):
             return LangName
         else:
-            EdkLogger.Error("Unicode File Parser", 
+            EdkLogger.Error("Unicode File Parser",
                              ToolError.FORMAT_INVALID,
-                             "Invalid RFC 1766 language code : %s" % LangName, 
+                             "Invalid RFC 1766 language code : %s" % LangName,
                              File)
     elif length == 5:
         if LangName[0:2].isalpha() and LangName[2] == '-':
@@ -163,20 +158,20 @@ def GetLanguageCode1766(LangName, File=None):
             for Key in gLANG_CONV_TABLE.keys():
                 if gLANG_CONV_TABLE.get(Key) == LangName[0:2].lower():
                     return Key
-        if LangName[0:3].isalpha() and gLANG_CONV_TABLE.get(LangName.lower()) == None and LangName[3] == '-':
+        if LangName[0:3].isalpha() and gLANG_CONV_TABLE.get(LangName.lower()) is None and LangName[3] == '-':
             for Key in gLANG_CONV_TABLE.keys():
                 if Key == LangName[0:3].lower():
                     return Key
 
-    EdkLogger.Error("Unicode File Parser", 
+    EdkLogger.Error("Unicode File Parser",
                              ToolError.FORMAT_INVALID,
-                             "Invalid RFC 4646 language code : %s" % LangName, 
+                             "Invalid RFC 4646 language code : %s" % LangName,
                              File)
-    
+
 ## GetLanguageCode
 #
 # Check the language code read from .UNI file and convert RFC 1766 codes to RFC 4646 codes if appropriate
-# RFC 1766 language codes supported in compatiblity mode
+# RFC 1766 language codes supported in compatibility mode
 # RFC 4646 language codes supported in native mode
 #
 # @param LangName:   Language codes read from .UNI file
@@ -188,13 +183,13 @@ def GetLanguageCode(LangName, IsCompatibleMode, File):
     if IsCompatibleMode:
         if length == 3 and LangName.isalpha():
             TempLangName = gLANG_CONV_TABLE.get(LangName.lower())
-            if TempLangName != None:
+            if TempLangName is not None:
                 return TempLangName
             return LangName
         else:
-            EdkLogger.Error("Unicode File Parser", 
+            EdkLogger.Error("Unicode File Parser",
                              ToolError.FORMAT_INVALID,
-                             "Invalid RFC 1766 language code : %s" % LangName, 
+                             "Invalid RFC 1766 language code : %s" % LangName,
                              File)
     if (LangName[0] == 'X' or LangName[0] == 'x') and LangName[1] == '-':
         return LangName
@@ -202,7 +197,7 @@ def GetLanguageCode(LangName, IsCompatibleMode, File):
         if LangName.isalpha():
             return LangName
     elif length == 3:
-        if LangName.isalpha() and gLANG_CONV_TABLE.get(LangName.lower()) == None:
+        if LangName.isalpha() and gLANG_CONV_TABLE.get(LangName.lower()) is None:
             return LangName
     elif length == 5:
         if LangName[0:2].isalpha() and LangName[2] == '-':
@@ -210,29 +205,29 @@ def GetLanguageCode(LangName, IsCompatibleMode, File):
     elif length >= 6:
         if LangName[0:2].isalpha() and LangName[2] == '-':
             return LangName
-        if LangName[0:3].isalpha() and gLANG_CONV_TABLE.get(LangName.lower()) == None and LangName[3] == '-':
+        if LangName[0:3].isalpha() and gLANG_CONV_TABLE.get(LangName.lower()) is None and LangName[3] == '-':
             return LangName
 
-    EdkLogger.Error("Unicode File Parser", 
+    EdkLogger.Error("Unicode File Parser",
                              ToolError.FORMAT_INVALID,
-                             "Invalid RFC 4646 language code : %s" % LangName, 
+                             "Invalid RFC 4646 language code : %s" % LangName,
                              File)
 
 ## FormatUniEntry
 #
-# Formated the entry in Uni file.
+# Formatted the entry in Uni file.
 #
 # @param StrTokenName    StrTokenName.
 # @param TokenValueList  A list need to be processed.
 # @param ContainerFile   ContainerFile.
 #
-# @return formated entry
+# @return formatted entry
 def FormatUniEntry(StrTokenName, TokenValueList, ContainerFile):
     SubContent = ''
     PreFormatLength = 40
     if len(StrTokenName) > PreFormatLength:
         PreFormatLength = len(StrTokenName) + 1
-    for (Lang, Value) in TokenValueList: 
+    for (Lang, Value) in TokenValueList:
         if not Value or Lang == DT.TAB_LANGUAGE_EN_X:
             continue
         if Lang == '':
@@ -272,14 +267,14 @@ class StringDefClassObject(object):
         self.UseOtherLangDef = UseOtherLangDef
         self.Length = 0
 
-        if Name != None:
+        if Name is not None:
             self.StringName = Name
             self.StringNameByteList = UniToHexList(Name)
-        if Value != None:
+        if Value is not None:
             self.StringValue = Value
             self.StringValueByteList = UniToHexList(self.StringValue)
             self.Length = len(self.StringValueByteList)
-        if Token != None:
+        if Token is not None:
             self.Token = Token
 
     def __str__(self):
@@ -290,7 +285,7 @@ class StringDefClassObject(object):
                repr(self.UseOtherLangDef)
 
     def UpdateValue(self, Value = None):
-        if Value != None:
+        if Value is not None:
             if self.StringValue:
                 self.StringValue = self.StringValue + '\r\n' + Value
             else:
@@ -329,20 +324,20 @@ class UniFileClassObject(object):
         if len(Lang) != 3:
             try:
                 FileIn = codecs.open(File.Path, mode='rb', encoding='utf_8').readlines()
-            except UnicodeError, Xstr:
+            except UnicodeError as Xstr:
                 FileIn = codecs.open(File.Path, mode='rb', encoding='utf_16').readlines()
-            except UnicodeError, Xstr:
+            except UnicodeError as Xstr:
                 FileIn = codecs.open(File.Path, mode='rb', encoding='utf_16_le').readlines()
             except:
-                EdkLogger.Error("Unicode File Parser", 
-                                ToolError.FILE_OPEN_FAILURE, 
+                EdkLogger.Error("Unicode File Parser",
+                                ToolError.FILE_OPEN_FAILURE,
                                 "File read failure: %s" % str(Xstr),
                                 ExtraData=File)
             LineNo = GetLineNo(FileIn, Line, False)
-            EdkLogger.Error("Unicode File Parser", 
+            EdkLogger.Error("Unicode File Parser",
                              ToolError.PARSER_ERROR,
-                             "Wrong language definition", 
-                             ExtraData="""%s\n\t*Correct format is like '#langdef en-US "English"'""" % Line, 
+                             "Wrong language definition",
+                             ExtraData="""%s\n\t*Correct format is like '#langdef en-US "English"'""" % Line,
                              File = File, Line = LineNo)
         else:
             LangName = GetLanguageCode(Lang[1], self.IsCompatibleMode, self.File)
@@ -366,7 +361,7 @@ class UniFileClassObject(object):
         if not IsLangInDef:
             #
             # The found STRING tokens will be added into new language string list
-            # so that the unique STRING identifier is reserved for all languages in the package list. 
+            # so that the unique STRING identifier is reserved for all languages in the package list.
             #
             FirstLangName = self.LanguageDef[0][0]
             if LangName != FirstLangName:
@@ -376,10 +371,10 @@ class UniFileClassObject(object):
                         OtherLang = Item.UseOtherLangDef
                     else:
                         OtherLang = FirstLangName
-                    self.OrderedStringList[LangName].append (StringDefClassObject(Item.StringName, 
-                                                                                  '', 
-                                                                                  Item.Referenced, 
-                                                                                  Item.Token, 
+                    self.OrderedStringList[LangName].append (StringDefClassObject(Item.StringName,
+                                                                                  '',
+                                                                                  Item.Referenced,
+                                                                                  Item.Token,
                                                                                   OtherLang))
                     self.OrderedStringDict[LangName][Item.StringName] = len(self.OrderedStringList[LangName]) - 1
         return True
@@ -395,8 +390,8 @@ class UniFileClassObject(object):
         # Check the string name is the upper character
         if Name != '':
             MatchString = re.match('[A-Z0-9_]+', Name, re.UNICODE)
-            if MatchString == None or MatchString.end(0) != len(Name):
-                EdkLogger.Error("Unicode File Parser", 
+            if MatchString is None or MatchString.end(0) != len(Name):
+                EdkLogger.Error("Unicode File Parser",
                              ToolError.FORMAT_INVALID,
                              'The string token name %s in UNI file %s must be upper case character.' %(Name, self.File))
         LanguageList = Item.split(u'#language ')
@@ -407,7 +402,7 @@ class UniFileClassObject(object):
                 Language = LanguageList[IndexI].split()[0]
                 #.replace(u'\r\n', u'')
                 Value = \
-                LanguageList[IndexI][LanguageList[IndexI].find(u'\"') + len(u'\"') : LanguageList[IndexI].rfind(u'\"')] 
+                LanguageList[IndexI][LanguageList[IndexI].find(u'\"') + len(u'\"') : LanguageList[IndexI].rfind(u'\"')]
                 Language = GetLanguageCode(Language, self.IsCompatibleMode, self.File)
                 self.AddStringToList(Name, Language, Value)
 
@@ -425,7 +420,7 @@ class UniFileClassObject(object):
     #
     def PreProcess(self, File, IsIncludeFile=False):
         if not os.path.exists(File.Path) or not os.path.isfile(File.Path):
-            EdkLogger.Error("Unicode File Parser", 
+            EdkLogger.Error("Unicode File Parser",
                              ToolError.FILE_NOT_FOUND,
                              ExtraData=File.Path)
 
@@ -438,14 +433,14 @@ class UniFileClassObject(object):
 
         try:
             FileIn = codecs.open(File.Path, mode='rb', encoding='utf_8').readlines()
-        except UnicodeError, Xstr:
+        except UnicodeError as Xstr:
             FileIn = codecs.open(File.Path, mode='rb', encoding='utf_16').readlines()
         except UnicodeError:
             FileIn = codecs.open(File.Path, mode='rb', encoding='utf_16_le').readlines()
         except:
             EdkLogger.Error("Unicode File Parser", ToolError.FILE_OPEN_FAILURE, ExtraData=File.Path)
-        
-        
+
+
         #
         # get the file header
         #
@@ -468,7 +463,7 @@ class UniFileClassObject(object):
             if Line.startswith(DT.TAB_COMMENT_EDK1_SPLIT) and HeaderStart and not HeaderEnd and FirstGenHeader:
                 self.UniFileHeader += Line + '\r\n'
                 continue
-        
+
         #
         # Use unique identifier
         #
@@ -477,8 +472,8 @@ class UniFileClassObject(object):
         MultiLineFeedExits = False
         #
         # 0: initial value
-        # 1: signle String entry exist
-        # 2: line feed exist under the some signle String entry
+        # 1: single String entry exist
+        # 2: line feed exist under the some single String entry
         #
         StringEntryExistsFlag = 0
         for Line in FileIn:
@@ -487,7 +482,7 @@ class UniFileClassObject(object):
             Line = Line.strip()
             #
             # Ignore comment line and empty line
-            #            
+            #
             if Line == u'' or Line.startswith(u'//'):
                 #
                 # Change the single line String entry flag status
@@ -496,7 +491,7 @@ class UniFileClassObject(object):
                     StringEntryExistsFlag = 2
                 #
                 # If the '#string' line and the '#language' line are not in the same line,
-                # there should be only one line feed character betwwen them
+                # there should be only one line feed character between them
                 #
                 if MultiLineFeedExits:
                     EdkLogger.Error("Unicode File Parser", ToolError.FORMAT_INVALID, ExtraData=File.Path)
@@ -504,7 +499,7 @@ class UniFileClassObject(object):
 
             MultiLineFeedExits = False
             #
-            # Process comment embeded in string define lines
+            # Process comment embedded in string define lines
             #
             FindFlag = Line.find(u'//')
             if FindFlag != -1 and Line.find(u'//') < Line.find(u'"'):
@@ -514,7 +509,7 @@ class UniFileClassObject(object):
                     FileIn[LineCount-1] = Line
                     FileIn[LineCount] = '\r\n'
                     LineCount -= 1
-                    for Index in xrange (LineCount + 1, len (FileIn) - 1):
+                    for Index in range (LineCount + 1, len (FileIn) - 1):
                         if (Index == len(FileIn) -1):
                             FileIn[Index] = '\r\n'
                         else:
@@ -529,7 +524,7 @@ class UniFileClassObject(object):
                         EdkLogger.Error("Unicode File Parser", ToolError.FORMAT_INVALID, ExtraData=File.Path)
                 else:
                     EdkLogger.Error("Unicode File Parser", ToolError.FORMAT_INVALID, ExtraData=File.Path)
-                    
+
             Line = Line.replace(UNICODE_WIDE_CHAR, WIDE_CHAR)
             Line = Line.replace(UNICODE_NARROW_CHAR, NARROW_CHAR)
             Line = Line.replace(UNICODE_NON_BREAKING_CHAR, NON_BREAKING_CHAR)
@@ -543,37 +538,46 @@ class UniFileClassObject(object):
             Line = Line.replace(u'\t', u' ')
             Line = Line.replace(u'\u0006', u'\\')
 
-            # IncList = gINCLUDE_PATTERN.findall(Line)
-            IncList = []
-            if len(IncList) == 1:
-                for Dir in [File.Dir] + self.IncludePathList:
-                    IncFile = PathClass(str(IncList[0]), Dir)
-                    self.IncFileList.append(IncFile)
-                    if os.path.isfile(IncFile.Path):
-                        Lines.extend(self.PreProcess(IncFile, True))
-                        break
-                else:
-                    EdkLogger.Error("Unicode File Parser", 
-                                    ToolError.FILE_NOT_FOUND, 
-                                    Message="Cannot find include file", 
-                                    ExtraData=str(IncList[0]))
-                continue
-            
+            #
+            # Check if single line has correct '"'
+            #
+            if Line.startswith(u'#string') and Line.find(u'#language') > -1 and Line.find('"') > Line.find(u'#language'):
+                if not Line.endswith('"'):
+                    EdkLogger.Error("Unicode File Parser", ToolError.FORMAT_INVALID,
+                                    ExtraData='''The line %s misses '"' at the end of it in file %s'''
+                                                 % (LineCount, File.Path))
+
             #
             # Between Name entry and Language entry can not contain line feed
             #
             if Line.startswith(u'#string') and Line.find(u'#language') == -1:
                 MultiLineFeedExits = True
-                
+
             if Line.startswith(u'#string') and Line.find(u'#language') > 0 and Line.find(u'"') < 0:
                 MultiLineFeedExits = True
-            
+
             #
             # Between Language entry and String entry can not contain line feed
             #
             if Line.startswith(u'#language') and len(Line.split()) == 2:
                 MultiLineFeedExits = True
-            
+
+            #
+            # Check the situation that there only has one '"' for the language entry
+            #
+            if Line.startswith(u'#string') and Line.find(u'#language') > 0 and Line.count(u'"') == 1:
+                EdkLogger.Error("Unicode File Parser", ToolError.FORMAT_INVALID,
+                                ExtraData='''The line %s misses '"' at the end of it in file %s'''
+                                % (LineCount, File.Path))
+
+            #
+            # Check the situation that there has more than 2 '"' for the language entry
+            #
+            if Line.startswith(u'#string') and Line.find(u'#language') > 0 and Line.replace(u'\\"', '').count(u'"') > 2:
+                EdkLogger.Error("Unicode File Parser", ToolError.FORMAT_INVALID,
+                                ExtraData='''The line %s has more than 2 '"' for language entry in file %s'''
+                                % (LineCount, File.Path))
+
             #
             # Between two String entry, can not contain line feed
             #
@@ -587,6 +591,15 @@ class UniFileClassObject(object):
                     EdkLogger.Error("Unicode File Parser", ToolError.FORMAT_INVALID,
                                     ExtraData='''The line %s misses '"' at the end of it in file %s'''
                                               % (LineCount, File.Path))
+
+                #
+                # Check the situation that there has more than 2 '"' for the language entry
+                #
+                if Line.strip() and Line.replace(u'\\"', '').count(u'"') > 2:
+                    EdkLogger.Error("Unicode File Parser", ToolError.FORMAT_INVALID,
+                                    ExtraData='''The line %s has more than 2 '"' for language entry in file %s'''
+                                    % (LineCount, File.Path))
+
             elif Line.startswith(u'#language'):
                 if StringEntryExistsFlag == 2:
                     EdkLogger.Error("Unicode File Parser", ToolError.FORMAT_INVALID,
@@ -596,7 +609,7 @@ class UniFileClassObject(object):
                 StringEntryExistsFlag = 0
 
             Lines.append(Line)
-        
+
         #
         # Convert string def format as below
         #
@@ -609,11 +622,11 @@ class UniFileClassObject(object):
         #     "Mi segunda secuencia 1"
         #     "Mi segunda secuencia 2"
         #
-        
+
         if not IsIncludeFile and not Lines:
             EdkLogger.Error("Unicode File Parser", ToolError.FORMAT_INVALID, \
                 Message=ST.ERR_UNIPARSE_NO_SECTION_EXIST, \
-                ExtraData=File.Path) 
+                ExtraData=File.Path)
 
         NewLines = []
         StrName = u''
@@ -623,7 +636,7 @@ class UniFileClassObject(object):
                 EdkLogger.Error("Unicode File Parser", ToolError.FORMAT_INVALID, \
                                 Message=ST.ERR_UNIPARSE_STRNAME_FORMAT_ERROR % StrName.split()[1], \
                                 ExtraData=File.Path)
-                
+
             if StrName and len(StrName.split()[1].split(DT.TAB_UNDERLINE_SPLIT)) == 4:
                 StringTokenList = StrName.split()[1].split(DT.TAB_UNDERLINE_SPLIT)
                 if (StringTokenList[3].upper() in [DT.TAB_STR_TOKENPROMPT, DT.TAB_STR_TOKENHELP] and \
@@ -632,19 +645,19 @@ class UniFileClassObject(object):
                     EdkLogger.Error("Unicode File Parser", ToolError.FORMAT_INVALID, \
                                 Message=ST.ERR_UNIPARSE_STRTOKEN_FORMAT_ERROR % StrName.split()[1], \
                                 ExtraData=File.Path)
-                    
+
             if Line.count(u'#language') > 1:
                 EdkLogger.Error("Unicode File Parser", ToolError.FORMAT_INVALID, \
                                 Message=ST.ERR_UNIPARSE_SEP_LANGENTRY_LINE % Line, \
-                                ExtraData=File.Path) 
-            
+                                ExtraData=File.Path)
+
             if Line.startswith(u'//'):
                 continue
             elif Line.startswith(u'#langdef'):
                 if len(Line.split()) == 2:
                     NewLines.append(Line)
                     continue
-                elif len(Line.split()) > 2 and Line.find(u'"') > 0:                    
+                elif len(Line.split()) > 2 and Line.find(u'"') > 0:
                     NewLines.append(Line[:Line.find(u'"')].strip())
                     NewLines.append(Line[Line.find(u'"'):])
                 else:
@@ -667,10 +680,10 @@ class UniFileClassObject(object):
                     if Line[Line.find(u'#language')-1] != ' ' or \
                        Line[Line.find(u'#language')+len(u'#language')] != u' ':
                         EdkLogger.Error("Unicode File Parser", ToolError.FORMAT_INVALID, ExtraData=File.Path)
-                        
+
                     if Line.find(u'"') > 0:
                         EdkLogger.Error("Unicode File Parser", ToolError.FORMAT_INVALID, ExtraData=File.Path)
-                        
+
                     StrName = Line.split()[0] + u' ' + Line.split()[1]
                     if StrName:
                         if StrName.split()[1] not in ExistStrNameList:
@@ -692,11 +705,11 @@ class UniFileClassObject(object):
                     if Line[Line.find(u'#language')-1] != u' ' or \
                        Line[Line.find(u'#language')+len(u'#language')] != u' ':
                         EdkLogger.Error("Unicode File Parser", ToolError.FORMAT_INVALID, ExtraData=File.Path)
-                    
+
                     if Line[Line.find(u'"')-1] != u' ':
-                        EdkLogger.Error("Unicode File Parser", ToolError.FORMAT_INVALID, ExtraData=File.Path)  
-                    
-                    StrName = Line.split()[0] + u' ' + Line.split()[1]     
+                        EdkLogger.Error("Unicode File Parser", ToolError.FORMAT_INVALID, ExtraData=File.Path)
+
+                    StrName = Line.split()[0] + u' ' + Line.split()[1]
                     if StrName:
                         if StrName.split()[1] not in ExistStrNameList:
                             ExistStrNameList.append(StrName.split()[1].strip())
@@ -706,11 +719,11 @@ class UniFileClassObject(object):
                                                     DT.TAB_DEC_BINARY_ABSTRACT, DT.TAB_DEC_BINARY_DESCRIPTION]:
                             EdkLogger.Error("Unicode File Parser", ToolError.FORMAT_INVALID, \
                                             Message=ST.ERR_UNIPARSE_MULTI_ENTRY_EXIST % StrName.split()[1], \
-                                            ExtraData=File.Path)      
+                                            ExtraData=File.Path)
                     if IsIncludeFile:
                         if StrName not in NewLines:
                             NewLines.append((Line[:Line.find(u'#language')]).strip())
-                    else:                
+                    else:
                         NewLines.append((Line[:Line.find(u'#language')]).strip())
                     NewLines.append((Line[Line.find(u'#language'):Line.find(u'"')]).strip())
                     NewLines.append((Line[Line.find(u'"'):]).strip())
@@ -739,22 +752,22 @@ class UniFileClassObject(object):
                     EdkLogger.Error("Unicode File Parser", ToolError.FORMAT_INVALID, ExtraData=File.Path)
                 NewLines.append(Line)
             else:
-                print Line
+                print(Line)
                 EdkLogger.Error("Unicode File Parser", ToolError.FORMAT_INVALID, ExtraData=File.Path)
-                    
+
         if StrName and not StrName.split()[1].startswith(u'STR_'):
             EdkLogger.Error("Unicode File Parser", ToolError.FORMAT_INVALID, \
                                 Message=ST.ERR_UNIPARSE_STRNAME_FORMAT_ERROR % StrName.split()[1], \
-                                ExtraData=File.Path)    
-        
+                                ExtraData=File.Path)
+
         if StrName and not NewLines:
             EdkLogger.Error("Unicode File Parser", ToolError.FORMAT_INVALID, \
                             Message=ST.ERR_UNI_MISS_LANGENTRY % StrName, \
                             ExtraData=File.Path)
-        
+
         #
         # Check Abstract, Description, BinaryAbstract and BinaryDescription order,
-        # should be Abstract, Description, BinaryAbstract, BinaryDesctiption
+        # should be Abstract, Description, BinaryAbstract, BinaryDescription
         AbstractPosition = -1
         DescriptionPosition = -1
         BinaryAbstractPosition = -1
@@ -770,7 +783,7 @@ class UniFileClassObject(object):
                     BinaryDescriptionPosition = ExistStrNameList.index(StrName)
                 else:
                     DescriptionPosition = ExistStrNameList.index(StrName)
-                    
+
         OrderList = sorted([AbstractPosition, DescriptionPosition])
         BinaryOrderList = sorted([BinaryAbstractPosition, BinaryDescriptionPosition])
         Min = OrderList[0]
@@ -782,39 +795,39 @@ class UniFileClassObject(object):
                    BinaryMax > Max):
                 EdkLogger.Error("Unicode File Parser", ToolError.FORMAT_INVALID, \
                                 Message=ST.ERR_UNIPARSE_ENTRY_ORDER_WRONG, \
-                                ExtraData=File.Path) 
+                                ExtraData=File.Path)
         elif BinaryAbstractPosition > -1:
             if not(BinaryAbstractPosition > Max):
                 EdkLogger.Error("Unicode File Parser", ToolError.FORMAT_INVALID, \
                                 Message=ST.ERR_UNIPARSE_ENTRY_ORDER_WRONG, \
-                                ExtraData=File.Path)  
-            
+                                ExtraData=File.Path)
+
         if  DescriptionPosition > -1:
             if not(DescriptionPosition == Max and AbstractPosition == Min and \
                    DescriptionPosition > AbstractPosition):
                 EdkLogger.Error("Unicode File Parser", ToolError.FORMAT_INVALID, \
                                 Message=ST.ERR_UNIPARSE_ENTRY_ORDER_WRONG, \
-                                ExtraData=File.Path)  
-        
+                                ExtraData=File.Path)
+
         if not self.UniFileHeader:
-            EdkLogger.Error("Unicode File Parser", ToolError.FORMAT_INVALID, 
+            EdkLogger.Error("Unicode File Parser", ToolError.FORMAT_INVALID,
                             Message = ST.ERR_NO_SOURCE_HEADER,
                             ExtraData=File.Path)
-        
+
         return NewLines
 
     #
     # Load a .uni file
     #
     def LoadUniFile(self, File = None):
-        if File == None:
-            EdkLogger.Error("Unicode File Parser", 
-                            ToolError.PARSER_ERROR, 
-                            Message='No unicode file is given', 
+        if File is None:
+            EdkLogger.Error("Unicode File Parser",
+                            ToolError.PARSER_ERROR,
+                            Message='No unicode file is given',
                             ExtraData=File.Path)
-   
+
         self.File = File
-        
+
         #
         # Process special char in file
         #
@@ -857,10 +870,10 @@ class UniFileClassObject(object):
                 SecondLine.find(u'#string ') < 0 and SecondLine.find(u'#language ') >= 0 and \
                 ThirdLine.find(u'#string ') < 0 and ThirdLine.find(u'#language ') < 0:
                 if Line.find('"') > 0 or SecondLine.find('"') > 0:
-                    EdkLogger.Error("Unicode File Parser", ToolError.FORMAT_INVALID, 
+                    EdkLogger.Error("Unicode File Parser", ToolError.FORMAT_INVALID,
                                 Message=ST.ERR_UNIPARSE_DBLQUOTE_UNMATCHED,
                                 ExtraData=File.Path)
-                    
+
                 Name = Line[Line.find(u'#string ') + len(u'#string ') : ].strip(' ')
                 Language = SecondLine[SecondLine.find(u'#language ') + len(u'#language ') : ].strip(' ')
                 for IndexJ in range(IndexI + 2, len(Lines)):
@@ -902,50 +915,50 @@ class UniFileClassObject(object):
         for LangNameItem in self.LanguageDef:
             if Language == LangNameItem[0]:
                 break
-            
+
         if Language not in self.OrderedStringList:
             self.OrderedStringList[Language] = []
             self.OrderedStringDict[Language] = {}
-            
+
         IsAdded = True
         if Name in self.OrderedStringDict[Language]:
             IsAdded = False
-            if Value != None:
+            if Value is not None:
                 ItemIndexInList = self.OrderedStringDict[Language][Name]
                 Item = self.OrderedStringList[Language][ItemIndexInList]
                 Item.UpdateValue(Value)
-                Item.UseOtherLangDef = ''   
+                Item.UseOtherLangDef = ''
 
         if IsAdded:
             Token = len(self.OrderedStringList[Language])
             if Index == -1:
-                self.OrderedStringList[Language].append(StringDefClassObject(Name, 
-                                                                             Value, 
-                                                                             Referenced, 
-                                                                             Token, 
+                self.OrderedStringList[Language].append(StringDefClassObject(Name,
+                                                                             Value,
+                                                                             Referenced,
+                                                                             Token,
                                                                              UseOtherLangDef))
                 self.OrderedStringDict[Language][Name] = Token
                 for LangName in self.LanguageDef:
                     #
                     # New STRING token will be added into all language string lists.
-                    # so that the unique STRING identifier is reserved for all languages in the package list. 
+                    # so that the unique STRING identifier is reserved for all languages in the package list.
                     #
                     if LangName[0] != Language:
                         if UseOtherLangDef != '':
                             OtherLangDef = UseOtherLangDef
                         else:
                             OtherLangDef = Language
-                        self.OrderedStringList[LangName[0]].append(StringDefClassObject(Name, 
-                                                                                        '', 
-                                                                                        Referenced, 
-                                                                                        Token, 
+                        self.OrderedStringList[LangName[0]].append(StringDefClassObject(Name,
+                                                                                        '',
+                                                                                        Referenced,
+                                                                                        Token,
                                                                                         OtherLangDef))
                         self.OrderedStringDict[LangName[0]][Name] = len(self.OrderedStringList[LangName[0]]) - 1
             else:
-                self.OrderedStringList[Language].insert(Index, StringDefClassObject(Name, 
-                                                                                    Value, 
-                                                                                    Referenced, 
-                                                                                    Token, 
+                self.OrderedStringList[Language].insert(Index, StringDefClassObject(Name,
+                                                                                    Value,
+                                                                                    Referenced,
+                                                                                    Token,
                                                                                     UseOtherLangDef))
                 self.OrderedStringDict[Language][Name] = Index
 
@@ -1031,27 +1044,27 @@ class UniFileClassObject(object):
     # Show the instance itself
     #
     def ShowMe(self):
-        print self.LanguageDef
+        print(self.LanguageDef)
         #print self.OrderedStringList
         for Item in self.OrderedStringList:
-            print Item
+            print(Item)
             for Member in self.OrderedStringList[Item]:
-                print str(Member)
-    
+                print(str(Member))
+
     #
-    # Read content from '!include' UNI file 
+    # Read content from '!include' UNI file
     #
     def ReadIncludeUNIfile(self, FilaPath):
         if self.File:
             pass
-        
+
         if not os.path.exists(FilaPath) or not os.path.isfile(FilaPath):
-            EdkLogger.Error("Unicode File Parser", 
+            EdkLogger.Error("Unicode File Parser",
                              ToolError.FILE_NOT_FOUND,
                              ExtraData=FilaPath)
         try:
             FileIn = codecs.open(FilaPath, mode='rb', encoding='utf_8').readlines()
-        except UnicodeError, Xstr:
+        except UnicodeError as Xstr:
             FileIn = codecs.open(FilaPath, mode='rb', encoding='utf_16').readlines()
         except UnicodeError:
             FileIn = codecs.open(FilaPath, mode='rb', encoding='utf_16_le').readlines()

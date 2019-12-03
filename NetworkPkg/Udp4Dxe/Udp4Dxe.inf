@@ -1,0 +1,64 @@
+## @file
+#  This module produces EFI UDP Protocol and EFI UDPv4 Service Binding Protocol.
+#
+#  This module produces EFI UDP(User Datagram Protocol) Protocol upon EFI IPv4
+#  Protocol, to provide basic UDPv4 I/O services.
+#
+#  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Udp4Dxe
+  MODULE_UNI_FILE                = Udp4Dxe.uni
+  FILE_GUID                      = 6d6963ab-906d-4a65-a7ca-bd40e5d6af2b
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = Udp4DriverEntryPoint
+  UNLOAD_IMAGE                   = NetLibDefaultUnload
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+#  DRIVER_BINDING                =  gUdp4DriverBinding
+#  COMPONENT_NAME                =  gUdp4ComponentName
+#  COMPONENT_NAME2               =  gUdp4ComponentName2
+#
+
+[Sources]
+  Udp4Impl.h
+  Udp4Main.c
+  ComponentName.c
+  Udp4Impl.c
+  Udp4Driver.h
+  Udp4Driver.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  NetworkPkg/NetworkPkg.dec
+
+
+[LibraryClasses]
+  UefiLib
+  BaseLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiRuntimeServicesTableLib
+  DebugLib
+  IpIoLib
+  NetLib
+  DpcLib
+
+[Protocols]
+  gEfiUdp4ServiceBindingProtocolGuid            ## BY_START
+  gEfiIp4ServiceBindingProtocolGuid             ## TO_START
+  gEfiUdp4ProtocolGuid                          ## BY_START
+  gEfiIp4ProtocolGuid                           ## TO_START
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  Udp4DxeExtra.uni

@@ -3,13 +3,7 @@
 
   Copyright (c) 2011-2013 ARM Ltd. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -25,7 +19,6 @@
 #include <Library/PcdLib.h>
 #include <Library/IoLib.h>
 #include <Library/ArmGenericTimerCounterLib.h>
-#include <Library/ArmArchTimer.h>
 
 #include <Protocol/Timer.h>
 #include <Protocol/HardwareInterrupt.h>
@@ -307,11 +300,12 @@ TimerInterruptHandler (
   //
   OriginalTPL = gBS->RaiseTPL (TPL_HIGH_LEVEL);
 
+  // Signal end of interrupt early to help avoid losing subsequent ticks
+  // from long duration handlers
+  gInterrupt->EndOfInterrupt (gInterrupt, Source);
+
   // Check if the timer interrupt is active
   if ((ArmGenericTimerGetTimerCtrlReg () ) & ARM_ARCH_TIMER_ISTATUS) {
-
-    // Signal end of interrupt early to help avoid losing subsequent ticks from long duration handlers
-    gInterrupt->EndOfInterrupt (gInterrupt, Source);
 
     if (mTimerNotifyFunction) {
       mTimerNotifyFunction (mTimerPeriod * mElapsedPeriod);
@@ -337,11 +331,9 @@ TimerInterruptHandler (
 
     // Set next compare value
     ArmGenericTimerSetCompareVal (CompareValue);
-    ArmGenericTimerEnableTimer ();
+    ArmGenericTimerReenableTimer ();
+    ArmInstructionSynchronizationBarrier ();
   }
-
-  // Enable timer interrupts
-  gInterrupt->EnableInterruptSource (gInterrupt, Source);
 
   gBS->RestoreTPL (OriginalTPL);
 }
@@ -373,7 +365,7 @@ TimerInitialize (
   UINT32      TimerHypIntrNum;
 
   if (ArmIsArchTimerImplemented () == 0) {
-    DEBUG ((EFI_D_ERROR, "ARM Architectural Timer is not available in the CPU, hence cann't use this Driver \n"));
+    DEBUG ((DEBUG_ERROR, "ARM Architectural Timer is not available in the CPU, hence can't use this Driver \n"));
     ASSERT (0);
   }
 

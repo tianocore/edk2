@@ -1,14 +1,8 @@
 /** @file
   Miscellaneous functions.
 
-Copyright (c) 2005 - 2013, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available
-under the terms and conditions of the BSD License which accompanies this
-distribution. The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 
 **/
@@ -120,7 +114,7 @@ FatDestroySubtask (
   @param  IFile                 - The instance of the open file.
   @param  Task                  - The task to be executed.
 
-  @retval EFI_SUCCESS           - The task was executed sucessfully.
+  @retval EFI_SUCCESS           - The task was executed successfully.
   @return other                 - An error occurred when executing the task.
 
 **/
@@ -132,6 +126,7 @@ FatQueueTask (
 {
   EFI_STATUS          Status;
   LIST_ENTRY          *Link;
+  LIST_ENTRY          *NextLink;
   FAT_SUBTASK         *Subtask;
 
   //
@@ -149,13 +144,21 @@ FatQueueTask (
   EfiReleaseLock (&FatTaskLock);
 
   Status = EFI_SUCCESS;
-  for ( Link = GetFirstNode (&Task->Subtasks)
-      ; !IsNull (&Task->Subtasks, Link)
-      ; Link = GetNextNode (&Task->Subtasks, Link)
+  //
+  // Use NextLink to store the next link of the list, because Link might be remove from the
+  // doubly-linked list and get freed in the end of current loop.
+  //
+  // Also, list operation APIs like IsNull() and GetNextNode() are avoided during the loop, since
+  // they may check the validity of doubly-linked lists by traversing them. These APIs cannot
+  // handle list elements being removed during the traverse.
+  //
+  for ( Link = GetFirstNode (&Task->Subtasks), NextLink = GetNextNode (&Task->Subtasks, Link)
+      ; Link != &Task->Subtasks
+      ; Link = NextLink, NextLink = Link->ForwardLink
       ) {
     Subtask = CR (Link, FAT_SUBTASK, Link, FAT_SUBTASK_SIGNATURE);
     if (Subtask->Write) {
-      
+
       Status = IFile->OFile->Volume->DiskIo2->WriteDiskEx (
                                                 IFile->OFile->Volume->DiskIo2,
                                                 IFile->OFile->Volume->MediaId,
@@ -216,7 +219,7 @@ FatQueueTask (
   @param  IoMode                - The access mode.
   @param  DirtyValue            - Set the volume as dirty or not.
 
-  @retval EFI_SUCCESS           - Set the new FAT entry value sucessfully.
+  @retval EFI_SUCCESS           - Set the new FAT entry value successfully.
   @return other                 - An error occurred when operation the FAT entries.
 
 **/
@@ -301,7 +304,7 @@ FatOnAccessComplete (
   @param  Task                    point to task instance.
 
   @retval EFI_SUCCESS           - The operation is performed successfully.
-  @retval EFI_VOLUME_CORRUPTED  - The accesss is
+  @retval EFI_VOLUME_CORRUPTED  - The access is
   @return Others                - The status of read/write the disk
 
 **/

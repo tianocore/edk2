@@ -1,18 +1,14 @@
 ## @file
 #  SdMmcPciHcDxe driver is used to manage those host controllers which comply with SD
-#  Host Controller Simplified Specifiction version 3.0.
+#  Host Controller Simplified Specification version 3.0 plus the 64-bit System Addressing
+#  support in SD Host Controller Simplified Specification version 4.20.
 #
 #  It will produce EFI_SD_MMC_PASS_THRU_PROTOCOL to allow sending SD/MMC/eMMC cmds
 #  to specified devices from upper layer.
 #
-#  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2015 - 2019, Intel Corporation. All rights reserved.<BR>
 #
-#  This program and the accompanying materials
-#  are licensed and made available under the terms and conditions of the BSD License
-#  which accompanies this distribution. The full text of the license may be found at
-#  http://opensource.org/licenses/bsd-license.php
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 #
 ##
@@ -29,7 +25,7 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
 #
 #  DRIVER_BINDING                =  gSdMmcPciHcDxeDriverBinding
 #  COMPONENT_NAME                =  gSdMmcPciHcDxeComponentName
@@ -48,6 +44,7 @@
 
 [Packages]
   MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
 
 [LibraryClasses]
   DevicePathLib
@@ -61,6 +58,7 @@
   DebugLib
 
 [Protocols]
+  gEdkiiSdMmcOverrideProtocolGuid               ## SOMETIMES_CONSUMES
   gEfiDevicePathProtocolGuid                    ## TO_START
   gEfiPciIoProtocolGuid                         ## TO_START
   gEfiSdMmcPassThruProtocolGuid                 ## BY_START

@@ -4,13 +4,7 @@ Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
 Portions copyright (c) 2011 - 2012, ARM Ltd. All rights reserved.<BR>
 
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -27,7 +21,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 /**
   Append string to debugger script file, create file if needed.
 
-  This library can show up in mulitple places so we need to append the file every time we write to it.
+  This library can show up in multiple places so we need to append the file every time we write to it.
   For example Sec can use this to load the DXE core, and the DXE core would use this to load all the
   other modules. So we have two instances of the library in the system.
 

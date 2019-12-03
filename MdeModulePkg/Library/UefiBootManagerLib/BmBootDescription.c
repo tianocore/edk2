@@ -1,15 +1,9 @@
 /** @file
   Library functions which relate with boot option description.
 
-Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -155,6 +149,7 @@ BmGetDescriptionFromDiskInfo (
   CONST UINTN                  SerialNumberLength = 20;
   CHAR8                        *StrPtr;
   UINT8                        Temp;
+  EFI_DEVICE_PATH_PROTOCOL     *DevicePath;
 
   Description  = NULL;
 
@@ -229,6 +224,28 @@ BmGetDescriptionFromDiskInfo (
 
       BmEliminateExtraSpaces (Description);
     }
+  } else if (CompareGuid (&DiskInfo->Interface, &gEfiDiskInfoSdMmcInterfaceGuid)) {
+    DevicePath = DevicePathFromHandle (Handle);
+    if (DevicePath == NULL) {
+      return NULL;
+    }
+
+    while (!IsDevicePathEnd (DevicePath) && (DevicePathType (DevicePath) != MESSAGING_DEVICE_PATH)) {
+      DevicePath = NextDevicePathNode (DevicePath);
+    }
+    if (IsDevicePathEnd (DevicePath)) {
+      return NULL;
+    }
+
+    if (DevicePathSubType (DevicePath) == MSG_SD_DP) {
+      Description = L"SD Device";
+    } else if (DevicePathSubType (DevicePath) == MSG_EMMC_DP) {
+      Description = L"eMMC Device";
+    } else {
+      return NULL;
+    }
+
+    Description = AllocateCopyPool (StrSize (Description), Description);
   }
 
   return Description;
@@ -382,13 +399,13 @@ BmGetNetworkDescription (
 
   //
   // The PXE device path is like:
-  //   ....../Mac(...)[/Vlan(...)]
-  //   ....../Mac(...)[/Vlan(...)]/IPv4(...)
-  //   ....../Mac(...)[/Vlan(...)]/IPv6(...)
+  //   ....../Mac(...)[/Vlan(...)][/Wi-Fi(...)]
+  //   ....../Mac(...)[/Vlan(...)][/Wi-Fi(...)]/IPv4(...)
+  //   ....../Mac(...)[/Vlan(...)][/Wi-Fi(...)]/IPv6(...)
   //
   // The HTTP device path is like:
-  //   ....../Mac(...)[/Vlan(...)]/IPv4(...)/Uri(...)
-  //   ....../Mac(...)[/Vlan(...)]/IPv6(...)/Uri(...)
+  //   ....../Mac(...)[/Vlan(...)][/Wi-Fi(...)]/IPv4(...)[/Dns(...)]/Uri(...)
+  //   ....../Mac(...)[/Vlan(...)][/Wi-Fi(...)]/IPv6(...)[/Dns(...)]/Uri(...)
   //
   while (!IsDevicePathEnd (DevicePath) &&
          ((DevicePathType (DevicePath) != MESSAGING_DEVICE_PATH) ||
@@ -404,6 +421,9 @@ BmGetNetworkDescription (
   Mac = (MAC_ADDR_DEVICE_PATH *) DevicePath;
   DevicePath = NextDevicePathNode (DevicePath);
 
+  //
+  // Locate the optional Vlan node
+  //
   if ((DevicePathType (DevicePath) == MESSAGING_DEVICE_PATH) &&
       (DevicePathSubType (DevicePath) == MSG_VLAN_DP)
       ) {
@@ -413,6 +433,18 @@ BmGetNetworkDescription (
     Vlan = NULL;
   }
 
+  //
+  // Skip the optional Wi-Fi node
+  //
+  if ((DevicePathType (DevicePath) == MESSAGING_DEVICE_PATH) &&
+      (DevicePathSubType (DevicePath) == MSG_WIFI_DP)
+      ) {
+    DevicePath = NextDevicePathNode (DevicePath);
+  }
+
+  //
+  // Locate the IP node
+  //
   if ((DevicePathType (DevicePath) == MESSAGING_DEVICE_PATH) &&
       ((DevicePathSubType (DevicePath) == MSG_IPv4_DP) ||
        (DevicePathSubType (DevicePath) == MSG_IPv6_DP))
@@ -423,6 +455,18 @@ BmGetNetworkDescription (
     Ip = NULL;
   }
 
+  //
+  // Skip the optional DNS node
+  //
+  if ((DevicePathType (DevicePath) == MESSAGING_DEVICE_PATH) &&
+      (DevicePathSubType (DevicePath) == MSG_DNS_DP)
+      ) {
+    DevicePath = NextDevicePathNode (DevicePath);
+  }
+
+  //
+  // Locate the URI node
+  //
   if ((DevicePathType (DevicePath) == MESSAGING_DEVICE_PATH) &&
       (DevicePathSubType (DevicePath) == MSG_URI_DP)
       ) {
@@ -498,6 +542,107 @@ BmGetLoadFileDescription (
   }
 
   return NULL;
+}
+
+/**
+  Return the boot description for NVME boot device.
+
+  @param Handle                Controller handle.
+
+  @return  The description string.
+**/
+CHAR16 *
+BmGetNvmeDescription (
+  IN EFI_HANDLE                      Handle
+  )
+{
+  EFI_STATUS                               Status;
+  EFI_NVM_EXPRESS_PASS_THRU_PROTOCOL       *NvmePassthru;
+  EFI_DEV_PATH_PTR                         DevicePath;
+  EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET CommandPacket;
+  EFI_NVM_EXPRESS_COMMAND                  Command;
+  EFI_NVM_EXPRESS_COMPLETION               Completion;
+  NVME_ADMIN_CONTROLLER_DATA               ControllerData;
+  CHAR16                                   *Description;
+  CHAR16                                   *Char;
+  UINTN                                    Index;
+
+  Status = gBS->HandleProtocol (Handle, &gEfiDevicePathProtocolGuid, (VOID **) &DevicePath.DevPath);
+  if (EFI_ERROR (Status)) {
+    return NULL;
+  }
+
+  Status = gBS->LocateDevicePath (&gEfiNvmExpressPassThruProtocolGuid, &DevicePath.DevPath, &Handle);
+  if (EFI_ERROR (Status) ||
+      (DevicePathType (DevicePath.DevPath) != MESSAGING_DEVICE_PATH) ||
+      (DevicePathSubType (DevicePath.DevPath) != MSG_NVME_NAMESPACE_DP)) {
+    //
+    // Do not return description when the Handle is not a child of NVME controller.
+    //
+    return NULL;
+  }
+
+  //
+  // Send ADMIN_IDENTIFY command to NVME controller to get the model and serial number.
+  //
+  Status = gBS->HandleProtocol (Handle, &gEfiNvmExpressPassThruProtocolGuid, (VOID **) &NvmePassthru);
+  ASSERT_EFI_ERROR (Status);
+
+  ZeroMem (&CommandPacket, sizeof(EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET));
+  ZeroMem (&Command, sizeof(EFI_NVM_EXPRESS_COMMAND));
+  ZeroMem (&Completion, sizeof(EFI_NVM_EXPRESS_COMPLETION));
+
+  Command.Cdw0.Opcode = NVME_ADMIN_IDENTIFY_CMD;
+  //
+  // According to Nvm Express 1.1 spec Figure 38, When not used, the field shall be cleared to 0h.
+  // For the Identify command, the Namespace Identifier is only used for the Namespace data structure.
+  //
+  Command.Nsid        = 0;
+  CommandPacket.NvmeCmd        = &Command;
+  CommandPacket.NvmeCompletion = &Completion;
+  CommandPacket.TransferBuffer = &ControllerData;
+  CommandPacket.TransferLength = sizeof (ControllerData);
+  CommandPacket.CommandTimeout = EFI_TIMER_PERIOD_SECONDS (5);
+  CommandPacket.QueueType      = NVME_ADMIN_QUEUE;
+  //
+  // Set bit 0 (Cns bit) to 1 to identify a controller
+  //
+  Command.Cdw10                = 1;
+  Command.Flags                = CDW10_VALID;
+
+  Status = NvmePassthru->PassThru (
+                               NvmePassthru,
+                               0,
+                               &CommandPacket,
+                               NULL
+                               );
+  if (EFI_ERROR (Status)) {
+    return NULL;
+  }
+
+  Description = AllocateZeroPool (
+                  (ARRAY_SIZE (ControllerData.Mn) + 1
+                   + ARRAY_SIZE (ControllerData.Sn) + 1
+                   + MAXIMUM_VALUE_CHARACTERS + 1
+                   ) * sizeof (CHAR16));
+  if (Description != NULL) {
+    Char = Description;
+    for (Index = 0; Index < ARRAY_SIZE (ControllerData.Mn); Index++) {
+      *(Char++) = (CHAR16) ControllerData.Mn[Index];
+    }
+    *(Char++) = L' ';
+    for (Index = 0; Index < ARRAY_SIZE (ControllerData.Sn); Index++) {
+      *(Char++) = (CHAR16) ControllerData.Sn[Index];
+    }
+    *(Char++) = L' ';
+    UnicodeValueToStringS (
+      Char, sizeof (CHAR16) * (MAXIMUM_VALUE_CHARACTERS + 1),
+      0, DevicePath.NvmeNamespace->NamespaceId, 0
+      );
+    BmEliminateExtraSpaces (Description);
+  }
+
+  return Description;
 }
 
 /**
@@ -606,6 +751,7 @@ BM_GET_BOOT_DESCRIPTION mBmBootDescriptionHandlers[] = {
   BmGetDescriptionFromDiskInfo,
   BmGetNetworkDescription,
   BmGetLoadFileDescription,
+  BmGetNvmeDescription,
   BmGetMiscDescription
 };
 

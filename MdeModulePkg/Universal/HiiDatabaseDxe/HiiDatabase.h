@@ -1,14 +1,8 @@
 /** @file
 Private structures definitions in HiiDatabase.
 
-Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -31,7 +25,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Guid/HiiKeyBoardLayout.h>
 #include <Guid/GlobalVariable.h>
-
+#include <Guid/MdeModuleHii.h>
+#include <Guid/VariableFormat.h>
+#include <Guid/PcdDataBaseSignatureGuid.h>
 
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -59,10 +55,18 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define BITMAP_LEN_8_BIT(Width, Height)  ((Width) * (Height))
 #define BITMAP_LEN_24_BIT(Width, Height) ((Width) * (Height) * 3)
 
+extern EFI_LOCK mHiiDatabaseLock;
+
 //
 // IFR data structure
 //
 // BASE_CR (a, IFR_DEFAULT_VALUE_DATA, Entry) to get the whole structure.
+
+typedef struct {
+  LIST_ENTRY            Entry;             // Link to VarStorage Default Data
+  UINT16                DefaultId;
+  VARIABLE_STORE_HEADER *VariableStorage;
+} VARSTORAGE_DEFAULT_DATA;
 
 typedef struct {
   LIST_ENTRY          Entry;             // Link to VarStorage
@@ -77,11 +81,14 @@ typedef struct {
   LIST_ENTRY          Entry;             // Link to Block array
   UINT16              Offset;
   UINT16              Width;
+  UINT16              BitOffset;
+  UINT16              BitWidth;
   EFI_QUESTION_ID     QuestionId;
   UINT8               OpCode;
   UINT8               Scope;
   LIST_ENTRY          DefaultValueEntry; // Link to its default value array
   CHAR16              *Name;
+  BOOLEAN             IsBitVar;
 } IFR_BLOCK_DATA;
 
 //
@@ -379,10 +386,10 @@ typedef struct _HII_DATABASE_PRIVATE_DATA {
 
   @param  BufferLen              The length of the Buffer in bytes.
 
-  @param  Buffer                 Points to a buffer which will be converted to be the 
+  @param  Buffer                 Points to a buffer which will be converted to be the
                                  content of the generated string.
 
-  @param  Flag                   If 1, the buffer contains data for the value of GUID or PATH stored in 
+  @param  Flag                   If 1, the buffer contains data for the value of GUID or PATH stored in
                                  UINT8 *; if 2, the buffer contains unicode string for the value of NAME;
                                  if 3, the buffer contains other data.
 
@@ -449,21 +456,21 @@ IsFontInfoExisted (
 /**
 
    This function invokes the matching registered function.
-    
+
    @param  Private           HII Database driver private structure.
    @param  NotifyType        The type of change concerning the database.
    @param  PackageInstance   Points to the package referred to by the notification.
    @param  PackageType       Package type
    @param  Handle            The handle of the package list which contains the specified package.
-    
-   @retval EFI_SUCCESS            Already checked all registered function and invoked 
+
+   @retval EFI_SUCCESS            Already checked all registered function and invoked
                                   if matched.
    @retval EFI_INVALID_PARAMETER  Any input parameter is not valid.
-     
+
 **/
 EFI_STATUS
 InvokeRegisteredFunction (
-  IN HII_DATABASE_PRIVATE_DATA    *Private, 
+  IN HII_DATABASE_PRIVATE_DATA    *Private,
   IN EFI_HII_DATABASE_NOTIFY_TYPE NotifyType,
   IN VOID                         *PackageInstance,
   IN UINT8                        PackageType,
@@ -497,7 +504,7 @@ GetSystemFont (
 /**
   Parse all string blocks to find a String block specified by StringId.
   If StringId = (EFI_STRING_ID) (-1), find out all EFI_HII_SIBT_FONT blocks
-  within this string package and backup its information. If LastStringId is 
+  within this string package and backup its information. If LastStringId is
   specified, the string id of last string block will also be output.
   If StringId = 0, output the string id of last string block (EFI_HII_SIBT_STRING).
 
@@ -723,8 +730,8 @@ HiiStringToImage (
                                   RowInfoArray or Blt.
   @retval EFI_INVALID_PARAMETER The Blt or PackageList was NULL.
   @retval EFI_INVALID_PARAMETER Flags were invalid combination.
-  @retval EFI_NOT_FOUND         The specified PackageList is not in the Database or the stringid is not 
-                          in the specified PackageList. 
+  @retval EFI_NOT_FOUND         The specified PackageList is not in the Database or the stringid is not
+                          in the specified PackageList.
 
 **/
 EFI_STATUS
@@ -795,7 +802,7 @@ HiiGetGlyph (
   @param  StringInfoOut           Upon return, contains the matching font's information.
                                   If NULL, then no information is returned. This buffer
                                   is allocated with a call to the Boot Service AllocatePool().
-                                  It is the caller's responsibility to call the Boot 
+                                  It is the caller's responsibility to call the Boot
                                   Service FreePool() when the caller no longer requires
                                   the contents of StringInfoOut.
   @param  String                  Points to the string which will be tested to
@@ -1056,7 +1063,7 @@ HiiDrawImage (
   @retval EFI_SUCCESS             The image was successfully drawn.
   @retval EFI_OUT_OF_RESOURCES    Unable to allocate an output buffer for Blt.
   @retval EFI_INVALID_PARAMETER  The Blt was NULL.
-  @retval EFI_NOT_FOUND          The image specified by ImageId is not in the database. 
+  @retval EFI_NOT_FOUND          The image specified by ImageId is not in the database.
                            The specified PackageList is not in the database.
 
 **/
@@ -1643,7 +1650,7 @@ HiiListPackageLists (
   @retval EFI_NOT_FOUND           The specified Handle could not be found in the
                                   current database.
   @retval EFI_INVALID_PARAMETER   BufferSize was NULL.
-  @retval EFI_INVALID_PARAMETER   The value referenced by BufferSize was not zero 
+  @retval EFI_INVALID_PARAMETER   The value referenced by BufferSize was not zero
                                   and Buffer was NULL.
 
 **/
@@ -1714,7 +1721,7 @@ HiiRegisterPackageNotify (
                                   unregistered.
 
   @retval EFI_SUCCESS             Notification is unregistered successfully.
-  @retval EFI_NOT_FOUND          The incoming notification handle does not exist 
+  @retval EFI_NOT_FOUND          The incoming notification handle does not exist
                            in current hii database.
 
 **/
@@ -1901,8 +1908,8 @@ HiiConfigRoutingExtractConfig (
                                   instance.
   @param  Results                 Null-terminated Unicode string in
                                   <MultiConfigAltResp> format which has all values
-                                  filled in for the entirety of the current HII 
-                                  database. String to be allocated by the  called 
+                                  filled in for the entirety of the current HII
+                                  database. String to be allocated by the  called
                                   function. De-allocation is up to the caller.
 
   @retval EFI_SUCCESS             The Results string is filled with the values
@@ -2053,7 +2060,7 @@ HiiBlockToConfig (
                                   value pair. Block is left updated and
                                   Progress points at the '&' preceding the first
                                   non-<BlockName>.
-  @retval EFI_BUFFER_TOO_SMALL    Block not large enough. Progress undefined. 
+  @retval EFI_BUFFER_TOO_SMALL    Block not large enough. Progress undefined.
                                   BlockSize is updated with the required buffer size.
 
 **/
@@ -2125,18 +2132,18 @@ HiiGetAltCfg (
   This function accepts a <MultiKeywordResp> formatted string, finds the associated
   keyword owners, creates a <MultiConfigResp> string from it and forwards it to the
   EFI_HII_ROUTING_PROTOCOL.RouteConfig function.
-  
-  If there is an issue in resolving the contents of the KeywordString, then the 
-  function returns an error and also sets the Progress and ProgressErr with the 
+
+  If there is an issue in resolving the contents of the KeywordString, then the
+  function returns an error and also sets the Progress and ProgressErr with the
   appropriate information about where the issue occurred and additional data about
-  the nature of the issue. 
-  
+  the nature of the issue.
+
   In the case when KeywordString containing multiple keywords, when an EFI_NOT_FOUND
   error is generated during processing the second or later keyword element, the system
-  storage associated with earlier keywords is not modified. All elements of the 
+  storage associated with earlier keywords is not modified. All elements of the
   KeywordString must successfully pass all tests for format and access prior to making
   any modifications to storage.
-  
+
   In the case when EFI_DEVICE_ERROR is returned from the processing of a KeywordString
   containing multiple keywords, the state of storage associated with earlier keywords
   is undefined.
@@ -2144,18 +2151,18 @@ HiiGetAltCfg (
 
   @param This             Pointer to the EFI_KEYWORD_HANDLER _PROTOCOL instance.
 
-  @param KeywordString    A null-terminated string in <MultiKeywordResp> format. 
+  @param KeywordString    A null-terminated string in <MultiKeywordResp> format.
 
-  @param Progress         On return, points to a character in the KeywordString. 
-                          Points to the string's NULL terminator if the request 
-                          was successful. Points to the most recent '&' before 
+  @param Progress         On return, points to a character in the KeywordString.
+                          Points to the string's NULL terminator if the request
+                          was successful. Points to the most recent '&' before
                           the first failing name / value pair (or the beginning
                           of the string if the failure is in the first name / value
                           pair) if the request was not successful.
 
   @param ProgressErr      If during the processing of the KeywordString there was
-                          a failure, this parameter gives additional information 
-                          about the possible source of the problem. The various 
+                          a failure, this parameter gives additional information
+                          about the possible source of the problem. The various
                           errors are defined in "Related Definitions" below.
 
 
@@ -2163,16 +2170,16 @@ HiiGetAltCfg (
 
   @retval EFI_INVALID_PARAMETER   One or more of the following are TRUE:
                                   1. KeywordString is NULL.
-                                  2. Parsing of the KeywordString resulted in an 
+                                  2. Parsing of the KeywordString resulted in an
                                      error. See Progress and ProgressErr for more data.
 
-  @retval EFI_NOT_FOUND           An element of the KeywordString was not found. 
+  @retval EFI_NOT_FOUND           An element of the KeywordString was not found.
                                   See ProgressErr for more data.
 
-  @retval EFI_OUT_OF_RESOURCES    Required system resources could not be allocated.  
+  @retval EFI_OUT_OF_RESOURCES    Required system resources could not be allocated.
                                   See ProgressErr for more data.
-                                  
-  @retval EFI_ACCESS_DENIED       The action violated system policy. See ProgressErr 
+
+  @retval EFI_ACCESS_DENIED       The action violated system policy. See ProgressErr
                                   for more data.
 
   @retval EFI_DEVICE_ERROR        An unexpected system error occurred. See ProgressErr
@@ -2180,7 +2187,7 @@ HiiGetAltCfg (
 
 **/
 EFI_STATUS
-EFIAPI 
+EFIAPI
 EfiConfigKeywordHandlerSetData (
   IN EFI_CONFIG_KEYWORD_HANDLER_PROTOCOL *This,
   IN CONST EFI_STRING                    KeywordString,
@@ -2190,56 +2197,56 @@ EfiConfigKeywordHandlerSetData (
 
 /**
 
-  This function accepts a <MultiKeywordRequest> formatted string, finds the underlying 
+  This function accepts a <MultiKeywordRequest> formatted string, finds the underlying
   keyword owners, creates a <MultiConfigRequest> string from it and forwards it to the
   EFI_HII_ROUTING_PROTOCOL.ExtractConfig function.
-  
+
   If there is an issue in resolving the contents of the KeywordString, then the function
   returns an EFI_INVALID_PARAMETER and also set the Progress and ProgressErr with the
   appropriate information about where the issue occurred and additional data about the
   nature of the issue.
-  
+
   In the case when KeywordString is NULL, or contains multiple keywords, or when
   EFI_NOT_FOUND is generated while processing the keyword elements, the Results string
-  contains values returned for all keywords processed prior to the keyword generating the 
+  contains values returned for all keywords processed prior to the keyword generating the
   error but no values for the keyword with error or any following keywords.
 
-  
+
   @param This           Pointer to the EFI_KEYWORD_HANDLER _PROTOCOL instance.
-  
+
   @param NameSpaceId    A null-terminated string containing the platform configuration
                         language to search through in the system. If a NULL is passed
                         in, then it is assumed that any platform configuration language
                         with the prefix of "x-UEFI-" are searched.
-                        
+
   @param KeywordString  A null-terminated string in <MultiKeywordRequest> format. If a
-                        NULL is passed in the KeywordString field, all of the known 
-                        keywords in the system for the NameSpaceId specified are 
+                        NULL is passed in the KeywordString field, all of the known
+                        keywords in the system for the NameSpaceId specified are
                         returned in the Results field.
-  
+
   @param Progress       On return, points to a character in the KeywordString. Points
-                        to the string's NULL terminator if the request was successful. 
+                        to the string's NULL terminator if the request was successful.
                         Points to the most recent '&' before the first failing name / value
                         pair (or the beginning of the string if the failure is in the first
                         name / value pair) if the request was not successful.
-                        
+
   @param ProgressErr    If during the processing of the KeywordString there was a
-                        failure, this parameter gives additional information about the 
+                        failure, this parameter gives additional information about the
                         possible source of the problem. See the definitions in SetData()
                         for valid value definitions.
-  
+
   @param Results        A null-terminated string in <MultiKeywordResp> format is returned
-                        which has all the values filled in for the keywords in the 
+                        which has all the values filled in for the keywords in the
                         KeywordString. This is a callee-allocated field, and must be freed
-                        by the caller after being used. 
+                        by the caller after being used.
 
   @retval EFI_SUCCESS             The specified action was completed successfully.
-  
+
   @retval EFI_INVALID_PARAMETER   One or more of the following are TRUE:
                                   1.Progress, ProgressErr, or Results is NULL.
                                   2.Parsing of the KeywordString resulted in an error. See
                                     Progress and ProgressErr for more data.
-  
+
 
   @retval EFI_NOT_FOUND           An element of the KeywordString was not found. See
                                   ProgressErr for more data.
@@ -2249,7 +2256,7 @@ EfiConfigKeywordHandlerSetData (
 
   @retval EFI_OUT_OF_RESOURCES    Required system resources could not be allocated.  See
                                   ProgressErr for more data.
-                                  
+
   @retval EFI_ACCESS_DENIED       The action violated system policy.  See ProgressErr for
                                   more data.
 
@@ -2258,12 +2265,12 @@ EfiConfigKeywordHandlerSetData (
 
 **/
 EFI_STATUS
-EFIAPI 
+EFIAPI
 EfiConfigKeywordHandlerGetData (
   IN EFI_CONFIG_KEYWORD_HANDLER_PROTOCOL  *This,
   IN CONST EFI_STRING                     NameSpaceId, OPTIONAL
   IN CONST EFI_STRING                     KeywordString, OPTIONAL
-  OUT EFI_STRING                          *Progress, 
+  OUT EFI_STRING                          *Progress,
   OUT UINT32                              *ProgressErr,
   OUT EFI_STRING                          *Results
   );
@@ -2287,11 +2294,11 @@ HiiCompareLanguage (
 
 /**
   Retrieves a pointer to a Null-terminated ASCII string containing the list
-  of languages that an HII handle in the HII Database supports.  The returned 
+  of languages that an HII handle in the HII Database supports.  The returned
   string is allocated using AllocatePool().  The caller is responsible for freeing
   the returned string using FreePool().  The format of the returned string follows
   the language format assumed the HII Database.
-  
+
   If HiiHandle is NULL, then ASSERT().
 
   @param[in]  HiiHandle  A handle that was previously registered in the HII Database.
@@ -2318,12 +2325,12 @@ This function mainly use to get HiiDatabase information.
 
 **/
 EFI_STATUS
-HiiGetDatabaseInfo(
+HiiGetDatabaseInfo (
   IN CONST EFI_HII_DATABASE_PROTOCOL        *This
   );
 
 /**
-This is an internal function,mainly use to get and update configuration settings information.
+This function mainly use to get and update ConfigResp string.
 
 @param  This                   A pointer to the EFI_HII_DATABASE_PROTOCOL instance.
 
@@ -2332,7 +2339,7 @@ This is an internal function,mainly use to get and update configuration settings
 
 **/
 EFI_STATUS
-HiiGetConfigurationSetting(
+HiiGetConfigRespInfo (
   IN CONST EFI_HII_DATABASE_PROTOCOL        *This
   );
 

@@ -1,14 +1,8 @@
 /** @file
 handles console redirection from boot manager
 
-Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -100,11 +94,11 @@ UpdateComAttributeFromVariable (
 
 /**
   Update the multi-instance device path of Terminal Device based on
-  the global TerminalMenu. If ChangeTernimal is TRUE, the terminal 
+  the global TerminalMenu. If ChangeTernimal is TRUE, the terminal
   device path in the Terminal Device in TerminalMenu is also updated.
 
   @param DevicePath      The multi-instance device path.
-  @param ChangeTerminal  TRUE, then device path in the Terminal Device 
+  @param ChangeTerminal  TRUE, then device path in the Terminal Device
                          in TerminalMenu is also updated; FALSE, no update.
 
   @return EFI_SUCCESS    The function completes successfully.
@@ -732,7 +726,7 @@ UpdateComAttributeFromVariable (
                          and BM_CONSOLE_ERR_CONTEXT_SELECT.
 
   @retval EFI_UNSUPPORTED The type passed in is not in the 3 types defined.
-  @retval EFI_NOT_FOUND   If the EFI Variable defined in UEFI spec with name "ConOutDev", 
+  @retval EFI_NOT_FOUND   If the EFI Variable defined in UEFI spec with name "ConOutDev",
                           "ConInDev" or "ConErrDev" doesn't exists.
   @retval EFI_OUT_OF_RESOURCES Not enough resource to complete the operations.
   @retval EFI_SUCCESS          Function completes successfully.
@@ -903,6 +897,7 @@ IsTerminalDevicePath (
   VENDOR_DEVICE_PATH        *Vendor;
   UART_DEVICE_PATH          *Uart;
   ACPI_HID_DEVICE_PATH      *Acpi;
+  UINTN                     Index;
 
   IsTerminal = FALSE;
 
@@ -935,35 +930,20 @@ IsTerminalDevicePath (
   }
 
   //
-  // There are four kinds of Terminal types
+  // There are 9 kinds of Terminal types
   // check to see whether this devicepath
   // is one of that type
   //
-  if (CompareGuid (&Vendor->Guid, &TerminalTypeGuid[0])) {
-    *Termi      = TerminalTypePcAnsi;
-    IsTerminal  = TRUE;
-  } else {
-    if (CompareGuid (&Vendor->Guid, &TerminalTypeGuid[1])) {
-      *Termi      = TerminalTypeVt100;
-      IsTerminal  = TRUE;
-    } else {
-      if (CompareGuid (&Vendor->Guid, &TerminalTypeGuid[2])) {
-        *Termi      = TerminalTypeVt100Plus;
-        IsTerminal  = TRUE;
-      } else {
-        if (CompareGuid (&Vendor->Guid, &TerminalTypeGuid[3])) {
-          *Termi      = TerminalTypeVtUtf8;
-          IsTerminal  = TRUE;
-        } else {
-          if (CompareGuid (&Vendor->Guid, &TerminalTypeGuid[4])) {
-            *Termi      = TerminalTypeTtyTerm;
-            IsTerminal  = TRUE;
-          } else {
-            IsTerminal = FALSE;
-          }
-        }
-      }
+  for (Index = 0; Index < ARRAY_SIZE (TerminalTypeGuid); Index++) {
+    if (CompareGuid (&Vendor->Guid, &TerminalTypeGuid[Index])) {
+      *Termi = Index;
+      IsTerminal = TRUE;
+      break;
     }
+  }
+
+  if (Index == ARRAY_SIZE (TerminalTypeGuid)) {
+    IsTerminal = FALSE;
   }
 
   if (!IsTerminal) {
@@ -1021,25 +1001,33 @@ GetConsoleOutMode (
 
   @param CallbackData    The BMM context data.
 
-**/  
-VOID  
+**/
+VOID
 GetConsoleInCheck (
   IN  BMM_CALLBACK_DATA    *CallbackData
   )
 {
   UINT16              Index;
-  BM_MENU_ENTRY       *NewMenuEntry; 
+  BM_MENU_ENTRY       *NewMenuEntry;
   UINT8               *ConInCheck;
   BM_CONSOLE_CONTEXT  *NewConsoleContext;
+  BM_TERMINAL_CONTEXT *NewTerminalContext;
 
   ASSERT (CallbackData != NULL);
 
   ConInCheck = &CallbackData->BmmFakeNvData.ConsoleInCheck[0];
   for (Index = 0; ((Index < ConsoleInpMenu.MenuNumber) && \
-       (Index < MAX_MENU_NUMBER)) ; Index++) {  
+       (Index < MAX_MENU_NUMBER)) ; Index++) {
     NewMenuEntry      = BOpt_GetMenuEntry (&ConsoleInpMenu, Index);
-    NewConsoleContext = (BM_CONSOLE_CONTEXT *) NewMenuEntry->VariableContext;  
+    NewConsoleContext = (BM_CONSOLE_CONTEXT *) NewMenuEntry->VariableContext;
     ConInCheck[Index] = NewConsoleContext->IsActive;
+  }
+
+  for (Index = 0; Index < TerminalMenu.MenuNumber; Index++) {
+    NewMenuEntry                = BOpt_GetMenuEntry (&TerminalMenu, Index);
+    NewTerminalContext          = (BM_TERMINAL_CONTEXT *) NewMenuEntry->VariableContext;
+    ASSERT (Index + ConsoleInpMenu.MenuNumber < MAX_MENU_NUMBER);
+    ConInCheck[Index + ConsoleInpMenu.MenuNumber] = NewTerminalContext->IsConIn;
   }
 }
 
@@ -1050,24 +1038,32 @@ GetConsoleInCheck (
 
   @param CallbackData    The BMM context data.
 
-**/      
-VOID    
+**/
+VOID
 GetConsoleOutCheck (
   IN  BMM_CALLBACK_DATA    *CallbackData
   )
 {
   UINT16              Index;
-  BM_MENU_ENTRY       *NewMenuEntry; 
+  BM_MENU_ENTRY       *NewMenuEntry;
   UINT8               *ConOutCheck;
   BM_CONSOLE_CONTEXT  *NewConsoleContext;
-  
+  BM_TERMINAL_CONTEXT *NewTerminalContext;
+
   ASSERT (CallbackData != NULL);
   ConOutCheck = &CallbackData->BmmFakeNvData.ConsoleOutCheck[0];
   for (Index = 0; ((Index < ConsoleOutMenu.MenuNumber) && \
-       (Index < MAX_MENU_NUMBER)) ; Index++) {  
+       (Index < MAX_MENU_NUMBER)) ; Index++) {
     NewMenuEntry      = BOpt_GetMenuEntry (&ConsoleOutMenu, Index);
-    NewConsoleContext = (BM_CONSOLE_CONTEXT *) NewMenuEntry->VariableContext;  
+    NewConsoleContext = (BM_CONSOLE_CONTEXT *) NewMenuEntry->VariableContext;
     ConOutCheck[Index] = NewConsoleContext->IsActive;
+  }
+
+  for (Index = 0; Index < TerminalMenu.MenuNumber; Index++) {
+    NewMenuEntry                = BOpt_GetMenuEntry (&TerminalMenu, Index);
+    NewTerminalContext          = (BM_TERMINAL_CONTEXT *) NewMenuEntry->VariableContext;
+    ASSERT (Index + ConsoleOutMenu.MenuNumber < MAX_MENU_NUMBER);
+    ConOutCheck[Index + ConsoleOutMenu.MenuNumber] = NewTerminalContext->IsConOut;
   }
 }
 
@@ -1078,24 +1074,32 @@ GetConsoleOutCheck (
 
   @param CallbackData    The BMM context data.
 
-**/        
-VOID  
+**/
+VOID
 GetConsoleErrCheck (
   IN  BMM_CALLBACK_DATA    *CallbackData
   )
 {
   UINT16              Index;
-  BM_MENU_ENTRY       *NewMenuEntry; 
+  BM_MENU_ENTRY       *NewMenuEntry;
   UINT8               *ConErrCheck;
   BM_CONSOLE_CONTEXT  *NewConsoleContext;
+  BM_TERMINAL_CONTEXT *NewTerminalContext;
 
   ASSERT (CallbackData != NULL);
   ConErrCheck = &CallbackData->BmmFakeNvData.ConsoleErrCheck[0];
   for (Index = 0; ((Index < ConsoleErrMenu.MenuNumber) && \
-       (Index < MAX_MENU_NUMBER)) ; Index++) {  
+       (Index < MAX_MENU_NUMBER)) ; Index++) {
     NewMenuEntry      = BOpt_GetMenuEntry (&ConsoleErrMenu, Index);
-    NewConsoleContext = (BM_CONSOLE_CONTEXT *) NewMenuEntry->VariableContext;  
+    NewConsoleContext = (BM_CONSOLE_CONTEXT *) NewMenuEntry->VariableContext;
     ConErrCheck[Index] = NewConsoleContext->IsActive;
+  }
+
+  for (Index = 0; Index < TerminalMenu.MenuNumber; Index++) {
+    NewMenuEntry                = BOpt_GetMenuEntry (&TerminalMenu, Index);
+    NewTerminalContext          = (BM_TERMINAL_CONTEXT *) NewMenuEntry->VariableContext;
+    ASSERT (Index + ConsoleErrMenu.MenuNumber < MAX_MENU_NUMBER);
+    ConErrCheck[Index + ConsoleErrMenu.MenuNumber] = NewTerminalContext->IsStdErr;
   }
 }
 
@@ -1107,22 +1111,22 @@ GetConsoleErrCheck (
   @param CallbackData    The BMM context data.
 
 **/
-VOID  
+VOID
 GetTerminalAttribute (
   IN  BMM_CALLBACK_DATA    *CallbackData
   )
 {
   BMM_FAKE_NV_DATA     *CurrentFakeNVMap;
   BM_MENU_ENTRY        *NewMenuEntry;
-  BM_TERMINAL_CONTEXT  *NewTerminalContext;    
-  UINT16               TerminalIndex;  
+  BM_TERMINAL_CONTEXT  *NewTerminalContext;
+  UINT16               TerminalIndex;
   UINT8                AttributeIndex;
 
   ASSERT (CallbackData != NULL);
 
-  CurrentFakeNVMap = &CallbackData->BmmFakeNvData;     
+  CurrentFakeNVMap = &CallbackData->BmmFakeNvData;
   for (TerminalIndex = 0; ((TerminalIndex < TerminalMenu.MenuNumber) && \
-       (TerminalIndex < MAX_MENU_NUMBER)); TerminalIndex++) {  
+       (TerminalIndex < MAX_MENU_NUMBER)); TerminalIndex++) {
     NewMenuEntry        = BOpt_GetMenuEntry (&TerminalMenu, TerminalIndex);
     NewTerminalContext  = (BM_TERMINAL_CONTEXT *) NewMenuEntry->VariableContext;
     for (AttributeIndex = 0; AttributeIndex < sizeof (BaudRateList) / sizeof (BaudRateList [0]); AttributeIndex++) {
@@ -1136,7 +1140,7 @@ GetTerminalAttribute (
         NewTerminalContext->DataBitsIndex = AttributeIndex;
         break;
       }
-    }    
+    }
 
     for (AttributeIndex = 0; AttributeIndex < ARRAY_SIZE (ParityList); AttributeIndex++) {
       if (NewTerminalContext->Parity == (UINT64) (ParityList[AttributeIndex].Value)) {
@@ -1154,7 +1158,7 @@ GetTerminalAttribute (
     CurrentFakeNVMap->COMBaudRate[TerminalIndex]     = NewTerminalContext->BaudRateIndex;
     CurrentFakeNVMap->COMDataRate[TerminalIndex]     = NewTerminalContext->DataBitsIndex;
     CurrentFakeNVMap->COMStopBits[TerminalIndex]     = NewTerminalContext->StopBitsIndex;
-    CurrentFakeNVMap->COMParity[TerminalIndex]       = NewTerminalContext->ParityIndex; 
+    CurrentFakeNVMap->COMParity[TerminalIndex]       = NewTerminalContext->ParityIndex;
     CurrentFakeNVMap->COMTerminalType[TerminalIndex] = NewTerminalContext->TerminalType;
     CurrentFakeNVMap->COMFlowControl[TerminalIndex]  = NewTerminalContext->FlowControl;
   }

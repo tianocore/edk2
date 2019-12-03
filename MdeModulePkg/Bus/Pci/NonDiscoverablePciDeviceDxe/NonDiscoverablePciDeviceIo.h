@@ -2,18 +2,14 @@
 
   Copyright (C) 2016, Linaro Ltd. All rights reserved.<BR>
 
-  This program and the accompanying materials are licensed and made available
-  under the terms and conditions of the BSD License which accompanies this
-  distribution. The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT
-  WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #ifndef __NON_DISCOVERABLE_PCI_DEVICE_IO_H__
 #define __NON_DISCOVERABLE_PCI_DEVICE_IO_H__
+
+#include <PiDxe.h>
 
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
@@ -25,6 +21,7 @@
 
 #include <Protocol/ComponentName.h>
 #include <Protocol/NonDiscoverableDevice.h>
+#include <Protocol/Cpu.h>
 #include <Protocol/PciIo.h>
 
 #define NON_DISCOVERABLE_PCI_DEVICE_SIG SIGNATURE_32 ('P', 'P', 'I', 'D')
@@ -37,6 +34,27 @@
 #define PCI_ID_DEVICE_DONTCARE        0x0000
 
 #define PCI_MAX_BARS                  6
+
+extern EFI_CPU_ARCH_PROTOCOL      *mCpu;
+
+typedef struct {
+  //
+  // The linked-list next pointer
+  //
+  LIST_ENTRY          List;
+  //
+  // The address of the uncached allocation
+  //
+  VOID                *HostAddress;
+  //
+  // The number of pages in the allocation
+  //
+  UINTN               NumPages;
+  //
+  // The attributes of the allocation
+  //
+  UINT64              Attributes;
+} NON_DISCOVERABLE_DEVICE_UNCACHED_ALLOCATION;
 
 typedef struct {
   UINT32                    Signature;
@@ -71,8 +89,25 @@ typedef struct {
   // Whether this device has been enabled
   //
   BOOLEAN                   Enabled;
+  //
+  // Linked list to keep track of uncached allocations performed
+  // on behalf of this device
+  //
+  LIST_ENTRY                UncachedAllocationList;
+  //
+  // Unique ID for this device instance: needed so that we can report unique
+  // segment/bus/device number for each device instance. Note that this number
+  // may change when disconnecting/reconnecting the driver.
+  //
+  UINTN                     UniqueId;
 } NON_DISCOVERABLE_PCI_DEVICE;
 
+/**
+  Initialize PciIo Protocol.
+
+  @param  Device      Point to NON_DISCOVERABLE_PCI_DEVICE instance.
+
+**/
 VOID
 InitializePciIoProtocol (
   NON_DISCOVERABLE_PCI_DEVICE     *Device

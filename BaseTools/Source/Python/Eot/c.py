@@ -3,27 +3,23 @@
 #
 #  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #
-#  This program and the accompanying materials
-#  are licensed and made available under the terms and conditions of the BSD License
-#  which accompanies this distribution.  The full text of the license may be found at
-#  http://opensource.org/licenses/bsd-license.php
-#
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
 ##
 # Import Modules
 #
+from __future__ import print_function
+from __future__ import absolute_import
 import sys
 import Common.LongFilePathOs as os
 import re
-import CodeFragmentCollector
-import FileProfile
+from . import CodeFragmentCollector
+from . import FileProfile
 from CommonDataClass import DataClass
 from Common import EdkLogger
-from EotToolError import *
-import EotGlobalData
+from .EotToolError import *
+from . import EotGlobalData
 
 # Global Dicts
 IncludeFileListDict = {}
@@ -127,11 +123,11 @@ def GetIdentifierList():
 
     for pp in FileProfile.PPDirectiveList:
         Type = GetIdType(pp.Content)
-        IdPP = DataClass.IdentifierClass(-1, '', '', '', pp.Content, Type, -1, -1, pp.StartPos[0],pp.StartPos[1],pp.EndPos[0],pp.EndPos[1])
+        IdPP = DataClass.IdentifierClass(-1, '', '', '', pp.Content, Type, -1, -1, pp.StartPos[0], pp.StartPos[1], pp.EndPos[0], pp.EndPos[1])
         IdList.append(IdPP)
 
     for ae in FileProfile.AssignmentExpressionList:
-        IdAE = DataClass.IdentifierClass(-1, ae.Operator, '', ae.Name, ae.Value, DataClass.MODEL_IDENTIFIER_ASSIGNMENT_EXPRESSION, -1, -1, ae.StartPos[0],ae.StartPos[1],ae.EndPos[0],ae.EndPos[1])
+        IdAE = DataClass.IdentifierClass(-1, ae.Operator, '', ae.Name, ae.Value, DataClass.MODEL_IDENTIFIER_ASSIGNMENT_EXPRESSION, -1, -1, ae.StartPos[0], ae.StartPos[1], ae.EndPos[0], ae.EndPos[1])
         IdList.append(IdAE)
 
     FuncDeclPattern = GetFuncDeclPattern()
@@ -153,7 +149,7 @@ def GetIdentifierList():
                     var.Modifier += ' ' + FuncNamePartList[Index]
                     var.Declarator = var.Declarator.lstrip().lstrip(FuncNamePartList[Index])
                     Index += 1
-            IdVar = DataClass.IdentifierClass(-1, var.Modifier, '', var.Declarator, '', DataClass.MODEL_IDENTIFIER_FUNCTION_DECLARATION, -1, -1, var.StartPos[0],var.StartPos[1],var.EndPos[0],var.EndPos[1])
+            IdVar = DataClass.IdentifierClass(-1, var.Modifier, '', var.Declarator, '', DataClass.MODEL_IDENTIFIER_FUNCTION_DECLARATION, -1, -1, var.StartPos[0], var.StartPos[1], var.EndPos[0], var.EndPos[1])
             IdList.append(IdVar)
             continue
 
@@ -166,7 +162,7 @@ def GetIdentifierList():
                     var.Modifier += ' ' + Name[LSBPos:]
                     Name = Name[0:LSBPos]
 
-                IdVar = DataClass.IdentifierClass(-1, var.Modifier, '', Name, (len(DeclList) > 1 and [DeclList[1]]or [''])[0], DataClass.MODEL_IDENTIFIER_VARIABLE, -1, -1, var.StartPos[0],var.StartPos[1],var.EndPos[0],var.EndPos[1])
+                IdVar = DataClass.IdentifierClass(-1, var.Modifier, '', Name, (len(DeclList) > 1 and [DeclList[1]]or [''])[0], DataClass.MODEL_IDENTIFIER_VARIABLE, -1, -1, var.StartPos[0], var.StartPos[1], var.EndPos[0], var.EndPos[1])
                 IdList.append(IdVar)
         else:
             DeclList = var.Declarator.split('=')
@@ -175,7 +171,7 @@ def GetIdentifierList():
                 LSBPos = var.Declarator.find('[')
                 var.Modifier += ' ' + Name[LSBPos:]
                 Name = Name[0:LSBPos]
-            IdVar = DataClass.IdentifierClass(-1, var.Modifier, '', Name, (len(DeclList) > 1 and [DeclList[1]]or [''])[0], DataClass.MODEL_IDENTIFIER_VARIABLE, -1, -1, var.StartPos[0],var.StartPos[1],var.EndPos[0],var.EndPos[1])
+            IdVar = DataClass.IdentifierClass(-1, var.Modifier, '', Name, (len(DeclList) > 1 and [DeclList[1]]or [''])[0], DataClass.MODEL_IDENTIFIER_VARIABLE, -1, -1, var.StartPos[0], var.StartPos[1], var.EndPos[0], var.EndPos[1])
             IdList.append(IdVar)
 
     for enum in FileProfile.EnumerationDefinitionList:
@@ -183,7 +179,7 @@ def GetIdentifierList():
         RBPos = enum.Content.find('}')
         Name = enum.Content[4:LBPos].strip()
         Value = enum.Content[LBPos+1:RBPos]
-        IdEnum = DataClass.IdentifierClass(-1, '', '', Name, Value, DataClass.MODEL_IDENTIFIER_ENUMERATE, -1, -1, enum.StartPos[0],enum.StartPos[1],enum.EndPos[0],enum.EndPos[1])
+        IdEnum = DataClass.IdentifierClass(-1, '', '', Name, Value, DataClass.MODEL_IDENTIFIER_ENUMERATE, -1, -1, enum.StartPos[0], enum.StartPos[1], enum.EndPos[0], enum.EndPos[1])
         IdList.append(IdEnum)
 
     for su in FileProfile.StructUnionDefinitionList:
@@ -200,7 +196,7 @@ def GetIdentifierList():
         else:
             Name = su.Content[SkipLen:LBPos].strip()
             Value = su.Content[LBPos+1:RBPos]
-        IdPE = DataClass.IdentifierClass(-1, '', '', Name, Value, Type, -1, -1, su.StartPos[0],su.StartPos[1],su.EndPos[0],su.EndPos[1])
+        IdPE = DataClass.IdentifierClass(-1, '', '', Name, Value, Type, -1, -1, su.StartPos[0], su.StartPos[1], su.EndPos[0], su.EndPos[1])
         IdList.append(IdPE)
 
     TdFuncPointerPattern = GetTypedefFuncPointerPattern()
@@ -223,11 +219,11 @@ def GetIdentifierList():
             Name = TmpStr[0:RBPos]
             Value = 'FP' + TmpStr[RBPos + 1:]
 
-        IdTd = DataClass.IdentifierClass(-1, Modifier, '', Name, Value, DataClass.MODEL_IDENTIFIER_TYPEDEF, -1, -1, td.StartPos[0],td.StartPos[1],td.EndPos[0],td.EndPos[1])
+        IdTd = DataClass.IdentifierClass(-1, Modifier, '', Name, Value, DataClass.MODEL_IDENTIFIER_TYPEDEF, -1, -1, td.StartPos[0], td.StartPos[1], td.EndPos[0], td.EndPos[1])
         IdList.append(IdTd)
 
     for funcCall in FileProfile.FunctionCallingList:
-        IdFC = DataClass.IdentifierClass(-1, '', '', funcCall.FuncName, funcCall.ParamList, DataClass.MODEL_IDENTIFIER_FUNCTION_CALLING, -1, -1, funcCall.StartPos[0],funcCall.StartPos[1],funcCall.EndPos[0],funcCall.EndPos[1])
+        IdFC = DataClass.IdentifierClass(-1, '', '', funcCall.FuncName, funcCall.ParamList, DataClass.MODEL_IDENTIFIER_FUNCTION_CALLING, -1, -1, funcCall.StartPos[0], funcCall.StartPos[1], funcCall.EndPos[0], funcCall.EndPos[1])
         IdList.append(IdFC)
     return IdList
 
@@ -329,7 +325,7 @@ def GetFunctionList():
                 FuncDef.Modifier += ' ' + FuncNamePartList[Index]
                 Index += 1
 
-        FuncObj = DataClass.FunctionClass(-1, FuncDef.Declarator, FuncDef.Modifier, FuncName.strip(), '', FuncDef.StartPos[0],FuncDef.StartPos[1],FuncDef.EndPos[0],FuncDef.EndPos[1], FuncDef.LeftBracePos[0], FuncDef.LeftBracePos[1], -1, ParamIdList, [])
+        FuncObj = DataClass.FunctionClass(-1, FuncDef.Declarator, FuncDef.Modifier, FuncName.strip(), '', FuncDef.StartPos[0], FuncDef.StartPos[1], FuncDef.EndPos[0], FuncDef.EndPos[1], FuncDef.LeftBracePos[0], FuncDef.LeftBracePos[1], -1, ParamIdList, [])
         FuncObjList.append(FuncObj)
 
     return FuncObjList
@@ -384,4 +380,4 @@ if __name__ == '__main__':
     EdkLogger.SetLevel(EdkLogger.QUIET)
     CollectSourceCodeDataIntoDB(sys.argv[1])
 
-    print 'Done!'
+    print('Done!')

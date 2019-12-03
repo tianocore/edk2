@@ -1,14 +1,8 @@
 /** @file
   ACPI Sdt Protocol Driver
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved. <BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved. <BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -16,7 +10,7 @@
 
 /**
   Retrieve option term according to AmlByteEncoding and Buffer.
-  
+
   @param[in]    AmlByteEncoding      AML Byte Encoding.
   @param[in]    Buffer               AML buffer.
   @param[in]    MaxBufferSize        AML buffer MAX size. The parser can not parse any data exceed this region.
@@ -25,7 +19,7 @@
                                      for the specified index.
   @param[out]   Data                 Upon return, points to the pointer to the data.
   @param[out]   DataSize             Upon return, points to the size of Data.
-  
+
   @retval       EFI_SUCCESS           Success.
   @retval       EFI_INVALID_PARAMETER Buffer does not refer to a valid ACPI object.
 **/
@@ -125,7 +119,7 @@ AmlParseOptionTerm (
 
 /**
   Retrieve information according to AmlByteEncoding and Buffer.
-  
+
   @param[in]    AmlByteEncoding      AML Byte Encoding.
   @param[in]    Buffer               AML buffer.
   @param[in]    MaxBufferSize        AML buffer MAX size. The parser can not parse any data exceed this region.
@@ -135,7 +129,7 @@ AmlParseOptionTerm (
                                      for the specified index.
   @param[out]   Data                 Upon return, points to the pointer to the data.
   @param[out]   DataSize             Upon return, points to the size of Data.
-  
+
   @retval       EFI_SUCCESS           Success.
   @retval       EFI_INVALID_PARAMETER Buffer does not refer to a valid ACPI object.
 **/
@@ -286,11 +280,11 @@ AmlParseOptionCommon (
 
 /**
   Return object size.
-  
+
   @param[in]    AmlByteEncoding      AML Byte Encoding.
   @param[in]    Buffer               AML object buffer.
   @param[in]    MaxBufferSize        AML object buffer MAX size. The parser can not parse any data exceed this region.
-  
+
   @return       Size of the object.
 **/
 UINTN
@@ -321,9 +315,9 @@ AmlGetObjectSize (
 
 /**
   Return object name.
-  
+
   @param[in]    AmlHandle            AML handle.
-  
+
   @return       Name of the object.
 **/
 CHAR8 *
@@ -374,10 +368,10 @@ AmlGetObjectName (
 
 /**
   Return offset of last option.
-  
+
   @param[in]    AmlHandle            AML Handle.
   @param[out]   Buffer               Upon return, points to the offset after last option.
-  
+
   @retval       EFI_SUCCESS           Success.
   @retval       EFI_INVALID_PARAMETER AmlHandle does not refer to a valid ACPI object.
 **/
@@ -419,7 +413,7 @@ AmlGetOffsetAfterLastOption (
 
 /**
   Retrieve information according to AmlHandle
-  
+
   @param[in]    AmlHandle            AML handle.
   @param[in]    Index                Index of the data to retrieve from the object. In general, indexes read from left-to-right
                                      in the ACPI encoding, with index 0 always being the ACPI opcode.
@@ -427,7 +421,7 @@ AmlGetOffsetAfterLastOption (
                                      for the specified index.
   @param[out]   Data                 Upon return, points to the pointer to the data.
   @param[out]   DataSize             Upon return, points to the size of Data.
-  
+
   @retval       EFI_SUCCESS           Success.
   @retval       EFI_INVALID_PARAMETER AmlHandle does not refer to a valid ACPI object.
 **/

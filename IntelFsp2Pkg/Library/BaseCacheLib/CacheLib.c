@@ -1,13 +1,7 @@
 /** @file
 
-  Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2014 - 2019, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -58,8 +52,8 @@ IsDefaultType (
   @param[in]  BaseAddress     Base address.
   @param[in]  Size            Size.
 
-  @retval Zero      Alligned.
-  @retval Non-Zero  Not alligned.
+  @retval Zero      Aligned.
+  @retval Non-Zero  Not aligned.
 
 **/
 UINT32
@@ -223,7 +217,7 @@ Power2MaxMemory (
   }
 
   //
-  // Compute inital power of 2 size to return
+  // Compute initial power of 2 size to return
   //
   Result = GetPowerOfTwo64(MemoryLength);
 
@@ -253,8 +247,8 @@ Power2MaxMemory (
   @param[in]  BaseAddress     Base address.
   @param[in]  Size            Size.
 
-  @retval Zero      Alligned.
-  @retval Non-Zero  Not alligned.
+  @retval Zero      Aligned.
+  @retval Non-Zero  Not aligned.
 
 **/
 UINT32

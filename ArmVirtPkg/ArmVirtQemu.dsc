@@ -3,13 +3,7 @@
 #  Copyright (c) 2014, Linaro Limited. All rights reserved.
 #  Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.
 #
-#  This program and the accompanying materials
-#  are licensed and made available under the terms and conditions of the BSD License
-#  which accompanies this distribution.  The full text of the license may be found at
-#  http://opensource.org/licenses/bsd-license.php
-#
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 #
 
@@ -25,7 +19,7 @@
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/ArmVirtQemu-$(ARCH)
   SUPPORTED_ARCHITECTURES        = AARCH64|ARM
-  BUILD_TARGETS                  = DEBUG|RELEASE
+  BUILD_TARGETS                  = DEBUG|RELEASE|NOOPT
   SKUID_IDENTIFIER               = DEFAULT
   FLASH_DEFINITION               = ArmVirtPkg/ArmVirtQemu.fdf
 
@@ -33,16 +27,25 @@
   # Defines for default states.  These can be changed on the command line.
   # -D FLAG=VALUE
   #
+  DEFINE TTY_TERMINAL            = FALSE
   DEFINE SECURE_BOOT_ENABLE      = FALSE
-  DEFINE PURE_ACPI_BOOT_ENABLE   = FALSE
+
+  #
+  # Network definition
+  #
+  DEFINE NETWORK_IP6_ENABLE              = FALSE
+  DEFINE NETWORK_HTTP_BOOT_ENABLE        = FALSE
+  DEFINE NETWORK_SNP_ENABLE              = FALSE
+  DEFINE NETWORK_TLS_ENABLE              = FALSE
+  DEFINE NETWORK_ALLOW_HTTP_CONNECTIONS  = TRUE
+
+!if $(NETWORK_SNP_ENABLE) == TRUE
+  !error "NETWORK_SNP_ENABLE is IA32/X64/EBC only"
+!endif
+
+!include NetworkPkg/NetworkDefines.dsc.inc
 
 !include ArmVirtPkg/ArmVirt.dsc.inc
-
-[LibraryClasses.AARCH64]
-  ArmCpuLib|ArmPkg/Drivers/ArmCpuLib/ArmCortexAEMv8Lib/ArmCortexAEMv8Lib.inf
-
-[LibraryClasses.ARM]
-  ArmCpuLib|ArmPkg/Drivers/ArmCpuLib/ArmCortexA15Lib/ArmCortexA15Lib.inf
 
 [LibraryClasses.common]
   ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
@@ -52,17 +55,17 @@
   VirtioLib|OvmfPkg/Library/VirtioLib/VirtioLib.inf
   VirtioMmioDeviceLib|OvmfPkg/Library/VirtioMmioDeviceLib/VirtioMmioDeviceLib.inf
   QemuFwCfgLib|ArmVirtPkg/Library/QemuFwCfgLib/QemuFwCfgLib.inf
+  QemuFwCfgS3Lib|OvmfPkg/Library/QemuFwCfgS3Lib/BaseQemuFwCfgS3LibNull.inf
 
-  ArmPlatformLib|ArmVirtPkg/Library/ArmVirtPlatformLib/ArmVirtPlatformLib.inf
-  ArmPlatformSysConfigLib|ArmPlatformPkg/Library/ArmPlatformSysConfigLibNull/ArmPlatformSysConfigLibNull.inf
+  ArmPlatformLib|ArmPlatformPkg/Library/ArmPlatformLibNull/ArmPlatformLibNull.inf
 
   TimerLib|ArmPkg/Library/ArmArchTimerLib/ArmArchTimerLib.inf
   NorFlashPlatformLib|ArmVirtPkg/Library/NorFlashQemuLib/NorFlashQemuLib.inf
 
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibNull/DxeCapsuleLibNull.inf
-  UefiBootManagerLib|MdeModulePkg/Library/UefiBootManagerLib/UefiBootManagerLib.inf
   BootLogoLib|MdeModulePkg/Library/BootLogoLib/BootLogoLib.inf
   PlatformBootManagerLib|ArmVirtPkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
+  PlatformBmPrintScLib|OvmfPkg/Library/PlatformBmPrintScLib/PlatformBmPrintScLib.inf
   CustomizedDisplayLib|MdeModulePkg/Library/CustomizedDisplayLib/CustomizedDisplayLib.inf
   FrameBufferBltLib|MdeModulePkg/Library/FrameBufferBltLib/FrameBufferBltLib.inf
   QemuBootOrderLib|OvmfPkg/Library/QemuBootOrderLib/QemuBootOrderLib.inf
@@ -71,14 +74,14 @@
   PciSegmentLib|MdePkg/Library/BasePciSegmentLibPci/BasePciSegmentLibPci.inf
   PciHostBridgeLib|ArmVirtPkg/Library/FdtPciHostBridgeLib/FdtPciHostBridgeLib.inf
 
+[LibraryClasses.common.PEIM]
+  ArmVirtMemInfoLib|ArmVirtPkg/Library/QemuVirtMemInfoLib/QemuVirtMemInfoPeiLib.inf
+
+[LibraryClasses.common.DXE_DRIVER]
+  ReportStatusCodeLib|MdeModulePkg/Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.inf
+
 [LibraryClasses.common.UEFI_DRIVER]
   UefiScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
-
-[BuildOptions]
-  RVCT:*_*_ARM_PLATFORM_FLAGS == --cpu Cortex-A15 -I$(WORKSPACE)/ArmVirtPkg/Include
-  GCC:*_*_ARM_PLATFORM_FLAGS == -mcpu=cortex-a15 -I$(WORKSPACE)/ArmVirtPkg/Include
-  *_*_AARCH64_PLATFORM_FLAGS == -I$(WORKSPACE)/ArmVirtPkg/Include
-
 
 ################################################################################
 #
@@ -95,12 +98,9 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutGopSupport|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutUgaSupport|FALSE
 
-!if $(PURE_ACPI_BOOT_ENABLE) == TRUE
-  gArmVirtTokenSpaceGuid.PcdPureAcpiBoot|TRUE
-!endif
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTurnOffUsbLegacySupport|TRUE
 
 [PcdsFixedAtBuild.common]
-  gArmPlatformTokenSpaceGuid.PcdCoreCount|1
 !if $(ARCH) == AARCH64
   gArmTokenSpaceGuid.PcdVFPEnabled|1
 !endif
@@ -109,17 +109,17 @@
   gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize|0x4000
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize|0x2000
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxAuthVariableSize|0x2800
+!if $(NETWORK_TLS_ENABLE) == TRUE
+  #
+  # The cumulative and individual VOLATILE variable size limits should be set
+  # high enough for accommodating several and/or large CA certificates.
+  #
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize|0x80000
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVolatileVariableSize|0x40000
+!endif
 
   # Size of the region used by UEFI in permanent memory (Reserved 64MB)
   gArmPlatformTokenSpaceGuid.PcdSystemMemoryUefiRegionSize|0x04000000
-
-  #
-  # ARM Pcds
-  #
-  gArmTokenSpaceGuid.PcdArmUncachedMemoryMask|0x0000000040000000
-
-  ## Trustzone enable (to make the transition from EL3 to EL2 in ArmPlatformPkg/Sec)
-  gArmTokenSpaceGuid.PcdTrustzoneSupport|FALSE
 
   #
   # ARM PrimeCell
@@ -132,6 +132,8 @@
   ## 0-PCANSI, 1-VT100, 2-VT00+, 3-UTF8, 4-TTYTERM
 !if $(TTY_TERMINAL) == TRUE
   gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType|4
+  # Set terminal type to TtyTerm, the value encoded is EFI_TTY_TERM_GUID
+  gArmVirtTokenSpaceGuid.PcdTerminalTypeGuidBuffer|{0x80, 0x6d, 0x91, 0x7d, 0xb1, 0x5b, 0x8c, 0x45, 0xa4, 0x8f, 0xe2, 0x5f, 0xdd, 0x51, 0xef, 0x94}
 !else
   gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType|1
 !endif
@@ -141,6 +143,11 @@
   #
   gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|0
 
+  #
+  # Network Pcds
+  #
+!include NetworkPkg/NetworkPcds.dsc.inc
+
   # System Memory Base -- fixed at 0x4000_0000
   gArmTokenSpaceGuid.PcdSystemMemoryBase|0x40000000
 
@@ -149,7 +156,6 @@
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdResetOnMemoryTypeInformationChange|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdBootManagerMenuFile|{ 0x21, 0xaa, 0x2c, 0x46, 0x14, 0x76, 0x03, 0x45, 0x83, 0x6e, 0x8a, 0xb6, 0xf4, 0x66, 0x23, 0x31 }
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdShellFile|{ 0x83, 0xA5, 0x04, 0x7C, 0x3E, 0x9E, 0x1C, 0x4F, 0xAD, 0x65, 0xE0, 0x52, 0x68, 0xD0, 0xB4, 0xD1 }
 
   #
   # The maximum physical I/O addressability of the processor, set with
@@ -157,13 +163,21 @@
   #
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize|16
 
-[PcdsFixedAtBuild.AARCH64]
+  #
+  # Enable the non-executable DXE stack. (This gets set up by DxeIpl)
+  #
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack|TRUE
 
-  # KVM limits it IPA space to 40 bits (1 TB), so there is no need to
-  # support anything bigger, even if the host hardware does
-  gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize|40
+!if $(SECURE_BOOT_ENABLE) == TRUE
+  # override the default values from SecurityPkg to ensure images from all sources are verified in secure boot
+  gEfiSecurityPkgTokenSpaceGuid.PcdOptionRomImageVerificationPolicy|0x04
+  gEfiSecurityPkgTokenSpaceGuid.PcdFixedMediaImageVerificationPolicy|0x04
+  gEfiSecurityPkgTokenSpaceGuid.PcdRemovableMediaImageVerificationPolicy|0x04
+!endif
 
+  gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|3
+
+[PcdsFixedAtBuild.AARCH64]
   # Clearing BIT0 in this PCD prevents installing a 32-bit SMBIOS entry point,
   # if the entry point version is >= 3.0. AARCH64 OSes cannot assume the
   # presence of the 32-bit entry point anyway (because many AARCH64 systems
@@ -223,6 +237,9 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosDocRev|0x0
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuSmbiosValidated|FALSE
 
+[PcdsDynamicHii]
+  gArmVirtTokenSpaceGuid.PcdForceNoAcpi|L"ForceNoAcpi"|gArmVirtVariableGuid|0x0|FALSE|NV,BS
+
 ################################################################################
 #
 # Components Section - list of all EDK II Modules needed by this Platform
@@ -255,6 +272,7 @@
   MdeModulePkg/Core/Dxe/DxeMain.inf {
     <LibraryClasses>
       NULL|MdeModulePkg/Library/DxeCrc32GuidedSectionExtractLib/DxeCrc32GuidedSectionExtractLib.inf
+      DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
   }
   MdeModulePkg/Universal/PCD/Dxe/Pcd.inf {
     <LibraryClasses>
@@ -269,6 +287,9 @@
   MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf {
     <LibraryClasses>
       NULL|MdeModulePkg/Library/VarCheckUefiLib/VarCheckUefiLib.inf
+      NULL|EmbeddedPkg/Library/NvVarStoreFormattedLib/NvVarStoreFormattedLib.inf
+      # don't use unaligned CopyMem () on the UEFI varstore NOR flash region
+      BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
   }
 !if $(SECURE_BOOT_ENABLE) == TRUE
   MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf {
@@ -276,13 +297,14 @@
       NULL|SecurityPkg/Library/DxeImageVerificationLib/DxeImageVerificationLib.inf
   }
   SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
+  OvmfPkg/EnrollDefaultKeys/EnrollDefaultKeys.inf
 !else
   MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
 !endif
   MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
   MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
   MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
-  EmbeddedPkg/ResetRuntimeDxe/ResetRuntimeDxe.inf
+  MdeModulePkg/Universal/ResetSystemRuntimeDxe/ResetSystemRuntimeDxe.inf
   EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf {
     <LibraryClasses>
       NULL|ArmVirtPkg/Library/ArmVirtPL031FdtClientLib/ArmVirtPL031FdtClientLib.inf
@@ -306,6 +328,11 @@
   MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
 
   #
+  # Status Code Routing
+  #
+  MdeModulePkg/Universal/ReportStatusCodeRouter/RuntimeDxe/ReportStatusCodeRouterRuntimeDxe.inf
+
+  #
   # Platform Driver
   #
   ArmVirtPkg/VirtioFdtDxe/VirtioFdtDxe.inf
@@ -317,17 +344,22 @@
   OvmfPkg/VirtioRngDxe/VirtioRng.inf
 
   #
-  # FAT filesystem + GPT/MBR partitioning
+  # FAT filesystem + GPT/MBR partitioning + UDF filesystem
   #
   MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
   MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
   MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
   FatPkg/EnhancedFatDxe/Fat.inf
+  MdeModulePkg/Universal/Disk/UdfDxe/UdfDxe.inf
 
   #
   # Bds
   #
-  MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
+  MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf {
+    <LibraryClasses>
+      DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
+      PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
+  }
   MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
   MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
   MdeModulePkg/Universal/DriverHealthManagerDxe/DriverHealthManagerDxe.inf
@@ -339,6 +371,17 @@
       NULL|MdeModulePkg/Library/BootManagerUiLib/BootManagerUiLib.inf
       NULL|MdeModulePkg/Library/BootMaintenanceManagerUiLib/BootMaintenanceManagerUiLib.inf
   }
+
+  #
+  # Networking stack
+  #
+!include NetworkPkg/NetworkComponents.dsc.inc
+!if $(NETWORK_TLS_ENABLE) == TRUE
+  NetworkPkg/TlsAuthConfigDxe/TlsAuthConfigDxe.inf {
+    <LibraryClasses>
+      NULL|OvmfPkg/Library/TlsAuthConfigLib/TlsAuthConfigLib.inf
+  }
+!endif
 
   #
   # SCSI Bus and Disk Driver
@@ -373,7 +416,7 @@
   #
   # Video support
   #
-  OvmfPkg/QemuVideoDxe/QemuVideoDxe.inf
+  OvmfPkg/QemuRamfbDxe/QemuRamfbDxe.inf
   OvmfPkg/VirtioGpuDxe/VirtioGpu.inf
   OvmfPkg/PlatformDxe/Platform.inf
 
@@ -385,11 +428,14 @@
   MdeModulePkg/Bus/Pci/XhciDxe/XhciDxe.inf
   MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
   MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
+  MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
 
-[Components.AARCH64]
   #
   # ACPI Support
   #
+  ArmVirtPkg/PlatformHasAcpiDtDxe/PlatformHasAcpiDtDxe.inf
+[Components.AARCH64]
+  MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResourceTableDxe.inf
   OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpiPlatformDxe.inf {
     <LibraryClasses>
       NULL|ArmVirtPkg/Library/FdtPciPcdProducerLib/FdtPciPcdProducerLib.inf

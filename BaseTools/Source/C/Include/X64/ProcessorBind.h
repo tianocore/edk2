@@ -1,15 +1,9 @@
 /** @file
   Processor or Compiler specific defines and types x64 (Intel(r) EM64T, AMD64).
 
-  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials are licensed and made available
-  under the terms and conditions of the BSD License which accompanies this
-  distribution.  The full text of the license may be found at
-    http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -30,8 +24,8 @@
 #endif
 
 
-#if _MSC_EXTENSIONS 
-    
+#if _MSC_EXTENSIONS
+
 //
 // Disable warning that make it impossible to compile at /W4
 // This only works for Microsoft* tools
@@ -66,12 +60,12 @@
   //
   // No ANSI C 2000 stdint.h integer width declarations, so define equivalents
   //
- 
-  #if _MSC_EXTENSIONS 
-    
+
+  #if _MSC_EXTENSIONS
+
 
     //
-    // use Microsoft C complier dependent integer width types 
+    // use Microsoft C compiler dependent integer width types
     //
     typedef unsigned __int64    UINT64;
     typedef __int64             INT64;
@@ -85,9 +79,9 @@
     typedef char                CHAR8;
     typedef char                INT8;
   #else
-    #ifdef _EFI_P64 
+    #ifdef _EFI_P64
       //
-      // P64 - is Intel Itanium(TM) speak for pointers being 64-bit and longs and ints 
+      // P64 - is Intel Itanium(TM) speak for pointers being 64-bit and longs and ints
       //  are 32-bits
       //
       typedef unsigned long long  UINT64;
@@ -151,37 +145,32 @@ typedef INT64   INTN;
 #define MAX_2_BITS  0xC000000000000000ULL
 
 //
-// Maximum legal Itanium-based address
-//
-#define MAX_ADDRESS   0xFFFFFFFFFFFFFFFFULL
-
-//
 // Modifier to ensure that all protocol member functions and EFI intrinsics
 // use the correct C calling convention. All protocol member functions and
-// EFI intrinsics are required to modify thier member functions with EFIAPI.
+// EFI intrinsics are required to modify their member functions with EFIAPI.
 //
-#if _MSC_EXTENSIONS 
+#if _MSC_EXTENSIONS
   ///
-  /// Define the standard calling convention reguardless of optimization level.
+  /// Define the standard calling convention regardless of optimization level.
   /// __cdecl is Microsoft* specific C extension.
-  /// 
-  #define EFIAPI __cdecl  
+  ///
+  #define EFIAPI __cdecl
 #elif __GNUC__
   ///
-  /// Define the standard calling convention reguardless of optimization level.
+  /// Define the standard calling convention regardless of optimization level.
   /// efidecl is an extension to GCC that supports the differnece between x64
   /// GCC ABI and x64 Microsoft* ABI. EFI is closer to the Microsoft* ABI and
-  /// EFIAPI makes sure the right ABI is used for public interfaces. 
+  /// EFIAPI makes sure the right ABI is used for public interfaces.
   /// eficecl is a work in progress and we do not yet have the compiler
   ///
-  #define EFIAPI 
+  #define EFIAPI
 #else
-  #define EFIAPI       
+  #define EFIAPI
 #endif
 
 //
 // The Microsoft* C compiler can removed references to unreferenced data items
-//  if the /OPT:REF linker option is used. We defined a macro as this is a 
+//  if the /OPT:REF linker option is used. We defined a macro as this is a
 //  a non standard extension
 //
 #if _MSC_EXTENSIONS

@@ -1,15 +1,9 @@
 /** @file
-  Basic serial IO abstaction for GDB
+  Basic serial IO abstraction for GDB
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -40,11 +34,11 @@
 //---------------------------------------------
 // UART Register Bit Defines
 //---------------------------------------------
-#define LSR_TXRDY               0x20
-#define LSR_RXDA                0x01
-#define DLAB                    0x01
-#define ENABLE_FIFO             0x01
-#define CLEAR_FIFOS             0x06
+#define LSR_TXRDY               0x20U
+#define LSR_RXDA                0x01U
+#define DLAB                    0x01U
+#define ENABLE_FIFO             0x01U
+#define CLEAR_FIFOS             0x06U
 
 
 
@@ -86,7 +80,7 @@ GdbSerialLibConstructor (
 
 
 /**
-  Sets the baud rate, receive FIFO depth, transmit/receice time out, parity,
+  Sets the baud rate, receive FIFO depth, transmit/receive time out, parity,
   data buts, and stop bits on a serial device. This call is optional as the serial
   port will be set up with defaults base on PCD values.
 
@@ -95,13 +89,13 @@ GdbSerialLibConstructor (
   @param  Parity           The type of parity to use on this serial device. A Parity value of
                            DefaultParity will use the device's default parity value.
   @param  DataBits         The number of data bits to use on the serial device. A DataBits
-                           vaule of 0 will use the device's default data bit setting.
+                           value of 0 will use the device's default data bit setting.
   @param  StopBits         The number of stop bits to use on this serial device. A StopBits
                            value of DefaultStopBits will use the device's default number of
                            stop bits.
 
   @retval EFI_SUCCESS      The device was configured.
-  @retval EFI_DEVICE_ERROR The serial device could not be coonfigured.
+  @retval EFI_DEVICE_ERROR The serial device could not be configured.
 
 **/
 RETURN_STATUS

@@ -1,15 +1,9 @@
 /** @file
   The implementation of EFI IPv6 Configuration Protocol.
 
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -47,13 +41,18 @@ Ip6ConfigOnPolicyChanged (
   IN EFI_IP6_CONFIG_POLICY  NewPolicy
   )
 {
-  LIST_ENTRY      *Entry;
-  LIST_ENTRY      *Entry2;
-  LIST_ENTRY      *Next;
-  IP6_INTERFACE   *IpIf;
-  IP6_DAD_ENTRY   *DadEntry;
-  IP6_DELAY_JOIN_LIST       *DelayNode;
-  
+  LIST_ENTRY          *Entry;
+  LIST_ENTRY          *Entry2;
+  LIST_ENTRY          *Next;
+  IP6_INTERFACE       *IpIf;
+  IP6_DAD_ENTRY       *DadEntry;
+  IP6_DELAY_JOIN_LIST *DelayNode;
+  IP6_ADDRESS_INFO    *AddrInfo;
+  IP6_PROTOCOL        *Instance;
+  BOOLEAN             Recovery;
+
+  Recovery = FALSE;
+
   //
   // Currently there are only two policies: Manual and Automatic. Regardless of
   // what transition is going on, i.e., Manual -> Automatic and Automatic ->
@@ -80,18 +79,48 @@ Ip6ConfigOnPolicyChanged (
       );
   }
 
-  //
-  // All IPv6 children that use global unicast address as it's source address
-  // should be destryoed now. The survivers are those use the link-local address
-  // or the unspecified address as the source address.
-  // TODO: Conduct a check here.
-  Ip6RemoveAddr (
-    IpSb,
-    &IpSb->DefaultInterface->AddressList,
-    &IpSb->DefaultInterface->AddressCount,
-    NULL,
-    0
-    );
+  if (!IsListEmpty (&IpSb->DefaultInterface->AddressList) && IpSb->DefaultInterface->AddressCount > 0) {
+    //
+    // If any IPv6 children (Instance) in configured state and use global unicast address, it will be
+    // destroyed in Ip6RemoveAddr() function later. Then, the upper layer driver's Stop() function will be
+    // called, which may break the upper layer network stacks. So, the driver should take the responsibility
+    // for the recovery by using ConnectController() after Ip6RemoveAddr().
+    // Here, just check whether need to recover the upper layer network stacks later.
+    //
+    NET_LIST_FOR_EACH (Entry, &IpSb->DefaultInterface->AddressList) {
+      AddrInfo = NET_LIST_USER_STRUCT_S (Entry, IP6_ADDRESS_INFO, Link, IP6_ADDR_INFO_SIGNATURE);
+      if (!IsListEmpty (&IpSb->Children)) {
+        NET_LIST_FOR_EACH (Entry2, &IpSb->Children) {
+          Instance = NET_LIST_USER_STRUCT_S (Entry2, IP6_PROTOCOL, Link, IP6_PROTOCOL_SIGNATURE);
+          if ((Instance->State == IP6_STATE_CONFIGED) && EFI_IP6_EQUAL (&Instance->ConfigData.StationAddress, &AddrInfo->Address)) {
+            Recovery = TRUE;
+            break;
+          }
+        }
+      }
+    }
+
+    //
+    // All IPv6 children that use global unicast address as it's source address
+    // should be destroyed now. The survivers are those use the link-local address
+    // or the unspecified address as the source address.
+    // TODO: Conduct a check here.
+    Ip6RemoveAddr (
+      IpSb,
+      &IpSb->DefaultInterface->AddressList,
+      &IpSb->DefaultInterface->AddressCount,
+      NULL,
+      0
+      );
+
+    if (IpSb->Controller != NULL && Recovery) {
+      //
+      // ConnectController() to recover the upper layer network stacks.
+      //
+      gBS->ConnectController (IpSb->Controller, NULL, NULL, TRUE);
+    }
+  }
+
 
   NET_LIST_FOR_EACH (Entry, &IpSb->Interfaces) {
     //
@@ -130,7 +159,6 @@ Ip6ConfigOnPolicyChanged (
     //
     IpSb->Ticks                   = (UINT32) IP6_GET_TICKS (IP6_ONE_SECOND_IN_MS);
   }
-
 }
 
 /**
@@ -692,7 +720,7 @@ Ip6ConfigSetPolicy (
     DataItem->DataSize = 0;
     DataItem->Status   = EFI_NOT_FOUND;
     NetMapIterate (&DataItem->EventMap, Ip6ConfigSignalEvent, NULL);
-    
+
     if (NewPolicy == Ip6ConfigPolicyManual) {
       //
       // The policy is changed from automatic to manual. Stop the DHCPv6 process
@@ -756,7 +784,7 @@ Ip6ConfigSetDadXmits (
 /**
   The callback function for Ip6SetAddr. The prototype is defined
   as IP6_DAD_CALLBACK. It is called after Duplicate Address Detection is performed
-  for the manual address set by Ip6ConfigSetMaunualAddress.
+  for the manual address set by Ip6ConfigSetManualAddress.
 
   @param[in]     IsDadPassed   If TRUE, Duplicate Address Detection passed.
   @param[in]     TargetAddress The tentative IPv6 address to be checked.
@@ -783,6 +811,10 @@ Ip6ManualAddrDadCallback (
   NET_CHECK_SIGNATURE (Instance, IP6_CONFIG_INSTANCE_SIGNATURE);
   Item       = &Instance->DataItem[Ip6ConfigDataTypeManualAddress];
   ManualAddr = NULL;
+
+  if (Item->DataSize == 0) {
+    return;
+  }
 
   for (Index = 0; Index < Item->DataSize / sizeof (EFI_IP6_CONFIG_MANUAL_ADDRESS); Index++) {
     //
@@ -892,7 +924,7 @@ Ip6ManualAddrDadCallback (
 
 **/
 EFI_STATUS
-Ip6ConfigSetMaunualAddress (
+Ip6ConfigSetManualAddress (
   IN IP6_CONFIG_INSTANCE  *Instance,
   IN UINTN                DataSize,
   IN VOID                 *Data
@@ -915,10 +947,26 @@ Ip6ConfigSetMaunualAddress (
   IP6_PREFIX_LIST_ENTRY          *PrefixEntry;
   EFI_STATUS                     Status;
   BOOLEAN                        IsUpdated;
+  LIST_ENTRY                     *Next;
+  IP6_DAD_ENTRY                  *DadEntry;
+  IP6_DELAY_JOIN_LIST            *DelayNode;
+
+  NewAddress      = NULL;
+  TmpAddress      = NULL;
+  CurrentAddrInfo = NULL;
+  Copy            = NULL;
+  Entry           = NULL;
+  Entry2          = NULL;
+  IpIf            = NULL;
+  PrefixEntry     = NULL;
+  Next            = NULL;
+  DadEntry        = NULL;
+  DelayNode       = NULL;
+  Status          = EFI_SUCCESS;
 
   ASSERT (Instance->DataItem[Ip6ConfigDataTypeManualAddress].Status != EFI_NOT_READY);
 
-  if (((DataSize % sizeof (EFI_IP6_CONFIG_MANUAL_ADDRESS)) != 0) || (DataSize == 0)) {
+  if ((DataSize != 0) && ((DataSize % sizeof (EFI_IP6_CONFIG_MANUAL_ADDRESS)) != 0)) {
     return EFI_BAD_BUFFER_SIZE;
   }
 
@@ -926,239 +974,302 @@ Ip6ConfigSetMaunualAddress (
     return EFI_WRITE_PROTECTED;
   }
 
-  NewAddressCount = DataSize / sizeof (EFI_IP6_CONFIG_MANUAL_ADDRESS);
-  NewAddress      = (EFI_IP6_CONFIG_MANUAL_ADDRESS *) Data;
-
-  for (Index1 = 0; Index1 < NewAddressCount; Index1++, NewAddress++) {
-
-    if (NetIp6IsLinkLocalAddr (&NewAddress->Address)    ||
-        !NetIp6IsValidUnicast (&NewAddress->Address)    ||
-        (NewAddress->PrefixLength > 128)
-        ) {
-      //
-      // make sure the IPv6 address is unicast and not link-local address &&
-      // the prefix length is valid.
-      //
-      return EFI_INVALID_PARAMETER;
-    }
-
-    TmpAddress = NewAddress + 1;
-    for (Index2 = Index1 + 1; Index2 < NewAddressCount; Index2++, TmpAddress++) {
-      //
-      // Any two addresses in the array can't be equal.
-      //
-      if (EFI_IP6_EQUAL (&TmpAddress->Address, &NewAddress->Address)) {
-
-        return EFI_INVALID_PARAMETER;
-      }
-    }
-  }
-
   IpSb = IP6_SERVICE_FROM_IP6_CONFIG_INSTANCE (Instance);
 
-  //
-  // Build the current source address list.
-  //
-  InitializeListHead (&CurrentSourceList);
-  CurrentSourceCount = 0;
+  DataItem = &Instance->DataItem[Ip6ConfigDataTypeManualAddress];
 
-  NET_LIST_FOR_EACH (Entry, &IpSb->Interfaces) {
-    IpIf = NET_LIST_USER_STRUCT_S (Entry, IP6_INTERFACE, Link, IP6_INTERFACE_SIGNATURE);
+  if (Data != NULL && DataSize != 0) {
+    NewAddressCount = DataSize / sizeof (EFI_IP6_CONFIG_MANUAL_ADDRESS);
+    NewAddress      = (EFI_IP6_CONFIG_MANUAL_ADDRESS *) Data;
 
-    NET_LIST_FOR_EACH (Entry2, &IpIf->AddressList) {
-      CurrentAddrInfo = NET_LIST_USER_STRUCT_S (Entry2, IP6_ADDRESS_INFO, Link, IP6_ADDR_INFO_SIGNATURE);
+    for (Index1 = 0; Index1 < NewAddressCount; Index1++, NewAddress++) {
 
-      Copy            = AllocateCopyPool (sizeof (IP6_ADDRESS_INFO), CurrentAddrInfo);
-      if (Copy == NULL) {
-        break;
+      if (NetIp6IsLinkLocalAddr (&NewAddress->Address)    ||
+          !NetIp6IsValidUnicast (&NewAddress->Address)    ||
+          (NewAddress->PrefixLength > 128)
+          ) {
+        //
+        // make sure the IPv6 address is unicast and not link-local address &&
+        // the prefix length is valid.
+        //
+        return EFI_INVALID_PARAMETER;
       }
 
-      InsertTailList (&CurrentSourceList, &Copy->Link);
-      CurrentSourceCount++;
+      TmpAddress = NewAddress + 1;
+      for (Index2 = Index1 + 1; Index2 < NewAddressCount; Index2++, TmpAddress++) {
+        //
+        // Any two addresses in the array can't be equal.
+        //
+        if (EFI_IP6_EQUAL (&TmpAddress->Address, &NewAddress->Address)) {
+
+          return EFI_INVALID_PARAMETER;
+        }
+      }
     }
-  }
 
-  //
-  // Update the value... a long journey starts
-  //
-  NewAddress = AllocateCopyPool (DataSize, Data);
-  if (NewAddress == NULL) {
-    Ip6RemoveAddr (NULL, &CurrentSourceList, &CurrentSourceCount, NULL, 0);
+    //
+    // Build the current source address list.
+    //
+    InitializeListHead (&CurrentSourceList);
+    CurrentSourceCount = 0;
 
-    return EFI_OUT_OF_RESOURCES;
-  }
+    NET_LIST_FOR_EACH (Entry, &IpSb->Interfaces) {
+      IpIf = NET_LIST_USER_STRUCT_S (Entry, IP6_INTERFACE, Link, IP6_INTERFACE_SIGNATURE);
 
-  //
-  // Store the new data, and init the DataItem status to EFI_NOT_READY because
-  // we may have an asynchronous configuration process.
-  //
-  DataItem = &Instance->DataItem[Ip6ConfigDataTypeManualAddress];
-  if (DataItem->Data.Ptr != NULL) {
-    FreePool (DataItem->Data.Ptr);
-  }
-  DataItem->Data.Ptr = NewAddress;
-  DataItem->DataSize = DataSize;
-  DataItem->Status   = EFI_NOT_READY;
+      NET_LIST_FOR_EACH (Entry2, &IpIf->AddressList) {
+        CurrentAddrInfo = NET_LIST_USER_STRUCT_S (Entry2, IP6_ADDRESS_INFO, Link, IP6_ADDR_INFO_SIGNATURE);
 
-  //
-  // Trigger DAD, it's an asynchronous process.
-  //
-  IsUpdated  = FALSE;
+        Copy            = AllocateCopyPool (sizeof (IP6_ADDRESS_INFO), CurrentAddrInfo);
+        if (Copy == NULL) {
+          break;
+        }
 
-  for (Index1 = 0; Index1 < NewAddressCount; Index1++, NewAddress++) {
-    if (Ip6IsOneOfSetAddress (IpSb, &NewAddress->Address, NULL, &CurrentAddrInfo)) {
-      ASSERT (CurrentAddrInfo != NULL);
+        InsertTailList (&CurrentSourceList, &Copy->Link);
+        CurrentSourceCount++;
+      }
+    }
+
+    //
+    // Update the value... a long journey starts
+    //
+    NewAddress = AllocateCopyPool (DataSize, Data);
+    if (NewAddress == NULL) {
+      Ip6RemoveAddr (NULL, &CurrentSourceList, &CurrentSourceCount, NULL, 0);
+
+      return EFI_OUT_OF_RESOURCES;
+    }
+
+    //
+    // Store the new data, and init the DataItem status to EFI_NOT_READY because
+    // we may have an asynchronous configuration process.
+    //
+    if (DataItem->Data.Ptr != NULL) {
+      FreePool (DataItem->Data.Ptr);
+    }
+    DataItem->Data.Ptr = NewAddress;
+    DataItem->DataSize = DataSize;
+    DataItem->Status   = EFI_NOT_READY;
+
+    //
+    // Trigger DAD, it's an asynchronous process.
+    //
+    IsUpdated  = FALSE;
+
+    for (Index1 = 0; Index1 < NewAddressCount; Index1++, NewAddress++) {
+      if (Ip6IsOneOfSetAddress (IpSb, &NewAddress->Address, NULL, &CurrentAddrInfo)) {
+        ASSERT (CurrentAddrInfo != NULL);
+        //
+        // Remove this already existing source address from the CurrentSourceList
+        // built before.
+        //
+        Ip6RemoveAddr (
+          NULL,
+          &CurrentSourceList,
+          &CurrentSourceCount,
+          &CurrentAddrInfo->Address,
+          128
+          );
+
+        //
+        // If the new address's prefix length is not specified, just use the previous configured
+        // prefix length for this address.
+        //
+        if (NewAddress->PrefixLength == 0) {
+          NewAddress->PrefixLength = CurrentAddrInfo->PrefixLength;
+        }
+
+        //
+        // This manual address is already in use, see whether prefix length is changed.
+        //
+        if (NewAddress->PrefixLength != CurrentAddrInfo->PrefixLength) {
+          //
+          // Remove the on-link prefix table, the route entry will be removed
+          // implicitly.
+          //
+          PrefixEntry = Ip6FindPrefixListEntry (
+                          IpSb,
+                          TRUE,
+                          CurrentAddrInfo->PrefixLength,
+                          &CurrentAddrInfo->Address
+                          );
+          if (PrefixEntry != NULL) {
+            Ip6DestroyPrefixListEntry (IpSb, PrefixEntry, TRUE, FALSE);
+          }
+
+          //
+          // Save the prefix length.
+          //
+          CurrentAddrInfo->PrefixLength = NewAddress->PrefixLength;
+          IsUpdated = TRUE;
+        }
+
+        //
+        // create a new on-link prefix entry.
+        //
+        PrefixEntry = Ip6FindPrefixListEntry (
+                        IpSb,
+                        TRUE,
+                        NewAddress->PrefixLength,
+                        &NewAddress->Address
+                        );
+        if (PrefixEntry == NULL) {
+          Ip6CreatePrefixListEntry (
+            IpSb,
+            TRUE,
+            (UINT32) IP6_INFINIT_LIFETIME,
+            (UINT32) IP6_INFINIT_LIFETIME,
+            NewAddress->PrefixLength,
+            &NewAddress->Address
+            );
+        }
+
+        CurrentAddrInfo->IsAnycast = NewAddress->IsAnycast;
+        //
+        // Artificially mark this address passed DAD be'coz it is already in use.
+        //
+        Ip6ManualAddrDadCallback (TRUE, &NewAddress->Address, Instance);
+      } else {
+        //
+        // A new address.
+        //
+        IsUpdated = TRUE;
+
+        //
+        // Set the new address, this will trigger DAD and activate the address if
+        // DAD succeeds.
+        //
+        Ip6SetAddress (
+          IpSb->DefaultInterface,
+          &NewAddress->Address,
+          NewAddress->IsAnycast,
+          NewAddress->PrefixLength,
+          (UINT32) IP6_INFINIT_LIFETIME,
+          (UINT32) IP6_INFINIT_LIFETIME,
+          Ip6ManualAddrDadCallback,
+          Instance
+          );
+      }
+    }
+
+    //
+    // Check the CurrentSourceList, it now contains those addresses currently in
+    // use and will be removed.
+    //
+    IpIf = IpSb->DefaultInterface;
+
+    while (!IsListEmpty (&CurrentSourceList)) {
+      IsUpdated = TRUE;
+
+      CurrentAddrInfo = NET_LIST_HEAD (&CurrentSourceList, IP6_ADDRESS_INFO, Link);
+
       //
-      // Remove this already existing source address from the CurrentSourceList
-      // built before.
+      // This local address is going to be removed, the IP instances that are
+      // currently using it will be destroyed.
       //
       Ip6RemoveAddr (
-        NULL,
-        &CurrentSourceList,
-        &CurrentSourceCount,
+        IpSb,
+        &IpIf->AddressList,
+        &IpIf->AddressCount,
         &CurrentAddrInfo->Address,
         128
         );
 
       //
-      // If the new address's prefix length is not specified, just use the previous configured
-      // prefix length for this address.
-      //
-      if (NewAddress->PrefixLength == 0) {
-        NewAddress->PrefixLength = CurrentAddrInfo->PrefixLength;
-      }
-
-      //
-      // This manual address is already in use, see whether prefix length is changed.
-      //
-      if (NewAddress->PrefixLength != CurrentAddrInfo->PrefixLength) {
-        //
-        // Remove the on-link prefix table, the route entry will be removed
-        // implicitly.
-        //
-        PrefixEntry = Ip6FindPrefixListEntry (
-                        IpSb,
-                        TRUE,
-                        CurrentAddrInfo->PrefixLength,
-                        &CurrentAddrInfo->Address
-                        );
-        if (PrefixEntry != NULL) {
-          Ip6DestroyPrefixListEntry (IpSb, PrefixEntry, TRUE, FALSE);
-        }
-
-        //
-        // Save the prefix length.
-        //
-        CurrentAddrInfo->PrefixLength = NewAddress->PrefixLength;
-        IsUpdated = TRUE;
-      }
-
-      //
-      // create a new on-link prefix entry.
+      // Remove the on-link prefix table, the route entry will be removed
+      // implicitly.
       //
       PrefixEntry = Ip6FindPrefixListEntry (
                       IpSb,
                       TRUE,
-                      NewAddress->PrefixLength,
-                      &NewAddress->Address
+                      CurrentAddrInfo->PrefixLength,
+                      &CurrentAddrInfo->Address
                       );
-      if (PrefixEntry == NULL) {
-        Ip6CreatePrefixListEntry (
-          IpSb,
-          TRUE,
-          (UINT32) IP6_INFINIT_LIFETIME,
-          (UINT32) IP6_INFINIT_LIFETIME,
-          NewAddress->PrefixLength,
-          &NewAddress->Address
-          );
+      if (PrefixEntry != NULL) {
+        Ip6DestroyPrefixListEntry (IpSb, PrefixEntry, TRUE, FALSE);
       }
 
-      CurrentAddrInfo->IsAnycast = NewAddress->IsAnycast;
-      //
-      // Artificially mark this address passed DAD be'coz it is already in use.
-      //
-      Ip6ManualAddrDadCallback (TRUE, &NewAddress->Address, Instance);
-    } else {
-      //
-      // A new address.
-      //
-      IsUpdated = TRUE;
-
-      //
-      // Set the new address, this will trigger DAD and activate the address if
-      // DAD succeeds.
-      //
-      Ip6SetAddress (
-        IpSb->DefaultInterface,
-        &NewAddress->Address,
-        NewAddress->IsAnycast,
-        NewAddress->PrefixLength,
-        (UINT32) IP6_INFINIT_LIFETIME,
-        (UINT32) IP6_INFINIT_LIFETIME,
-        Ip6ManualAddrDadCallback,
-        Instance
-        );
-    }
-  }
-
-  //
-  // Check the CurrentSourceList, it now contains those addresses currently in
-  // use and will be removed.
-  //
-  IpIf = IpSb->DefaultInterface;
-
-  while (!IsListEmpty (&CurrentSourceList)) {
-    IsUpdated = TRUE;
-
-    CurrentAddrInfo = NET_LIST_HEAD (&CurrentSourceList, IP6_ADDRESS_INFO, Link);
-
-    //
-    // This local address is going to be removed, the IP instances that are
-    // currently using it will be destroyed.
-    //
-    Ip6RemoveAddr (
-      IpSb,
-      &IpIf->AddressList,
-      &IpIf->AddressCount,
-      &CurrentAddrInfo->Address,
-      128
-      );
-
-    //
-    // Remove the on-link prefix table, the route entry will be removed
-    // implicitly.
-    //
-    PrefixEntry = Ip6FindPrefixListEntry (
-                    IpSb,
-                    TRUE,
-                    CurrentAddrInfo->PrefixLength,
-                    &CurrentAddrInfo->Address
-                    );
-    if (PrefixEntry != NULL) {
-      Ip6DestroyPrefixListEntry (IpSb, PrefixEntry, TRUE, FALSE);
+      RemoveEntryList (&CurrentAddrInfo->Link);
+      FreePool (CurrentAddrInfo);
     }
 
-    RemoveEntryList (&CurrentAddrInfo->Link);
-    FreePool (CurrentAddrInfo);
-  }
-
-  if (IsUpdated) {
-    if (DataItem->Status == EFI_NOT_READY) {
-      //
-      // If DAD is disabled on this interface, the configuration process is
-      // actually synchronous, and the data item's status will be changed to
-      // the final status before we reach here, just check it.
-      //
-      Status = EFI_NOT_READY;
+    if (IsUpdated) {
+      if (DataItem->Status == EFI_NOT_READY) {
+        //
+        // If DAD is disabled on this interface, the configuration process is
+        // actually synchronous, and the data item's status will be changed to
+        // the final status before we reach here, just check it.
+        //
+        Status = EFI_NOT_READY;
+      } else {
+        Status = EFI_SUCCESS;
+      }
     } else {
-      Status = EFI_SUCCESS;
+      //
+      // No update is taken, reset the status to success and return EFI_ABORTED.
+      //
+      DataItem->Status = EFI_SUCCESS;
+      Status           = EFI_ABORTED;
     }
   } else {
     //
-    // No update is taken, reset the status to success and return EFI_ABORTED.
+    // DataSize is 0 and Data is NULL, clean up the manual address.
     //
-    DataItem->Status = EFI_SUCCESS;
-    Status           = EFI_ABORTED;
+    if (DataItem->Data.Ptr != NULL) {
+      FreePool (DataItem->Data.Ptr);
+    }
+    DataItem->Data.Ptr = NULL;
+    DataItem->DataSize = 0;
+    DataItem->Status   = EFI_NOT_FOUND;
+
+    Ip6CleanDefaultRouterList (IpSb);
+    Ip6CleanPrefixListTable (IpSb, &IpSb->OnlinkPrefix);
+    Ip6CleanPrefixListTable (IpSb, &IpSb->AutonomousPrefix);
+    Ip6CleanAssembleTable (&IpSb->Assemble);
+
+    if (IpSb->LinkLocalOk) {
+      Ip6CreatePrefixListEntry (
+        IpSb,
+        TRUE,
+        (UINT32) IP6_INFINIT_LIFETIME,
+        (UINT32) IP6_INFINIT_LIFETIME,
+        IP6_LINK_LOCAL_PREFIX_LENGTH,
+        &IpSb->LinkLocalAddr
+        );
+    }
+
+    Ip6RemoveAddr (
+      IpSb,
+      &IpSb->DefaultInterface->AddressList,
+      &IpSb->DefaultInterface->AddressCount,
+      NULL,
+      0
+      );
+
+    NET_LIST_FOR_EACH (Entry, &IpSb->Interfaces) {
+      //
+      // Remove all pending delay node and DAD entries for the global addresses.
+      //
+      IpIf = NET_LIST_USER_STRUCT_S (Entry, IP6_INTERFACE, Link, IP6_INTERFACE_SIGNATURE);
+
+      NET_LIST_FOR_EACH_SAFE (Entry2, Next, &IpIf->DelayJoinList) {
+        DelayNode = NET_LIST_USER_STRUCT (Entry2, IP6_DELAY_JOIN_LIST, Link);
+        if (!NetIp6IsLinkLocalAddr (&DelayNode->AddressInfo->Address)) {
+          RemoveEntryList (&DelayNode->Link);
+          FreePool (DelayNode);
+        }
+      }
+
+      NET_LIST_FOR_EACH_SAFE (Entry2, Next, &IpIf->DupAddrDetectList) {
+        DadEntry = NET_LIST_USER_STRUCT_S (Entry2, IP6_DAD_ENTRY, Link, IP6_DAD_ENTRY_SIGNATURE);
+
+        if (!NetIp6IsLinkLocalAddr (&DadEntry->AddressInfo->Address)) {
+          //
+          // Fail this DAD entry if the address is not link-local.
+          //
+          Ip6OnDADFinished (FALSE, IpIf, DadEntry);
+        }
+      }
+    }
   }
 
   return Status;
@@ -1206,7 +1317,15 @@ Ip6ConfigSetGateway (
   IP6_DEFAULT_ROUTER    *DefaultRouter;
   VOID                  *Tmp;
 
-  if ((DataSize % sizeof (EFI_IPv6_ADDRESS) != 0) || (DataSize == 0)) {
+  OldGateway      = NULL;
+  NewGateway      = NULL;
+  Item            = NULL;
+  DefaultRouter   = NULL;
+  Tmp             = NULL;
+  OneRemoved      = FALSE;
+  OneAdded        = FALSE;
+
+  if ((DataSize != 0) && (DataSize % sizeof (EFI_IPv6_ADDRESS) != 0)) {
     return EFI_BAD_BUFFER_SIZE;
   }
 
@@ -1214,86 +1333,87 @@ Ip6ConfigSetGateway (
     return EFI_WRITE_PROTECTED;
   }
 
-  NewGateway      = (EFI_IPv6_ADDRESS *) Data;
-  NewGatewayCount = DataSize / sizeof (EFI_IPv6_ADDRESS);
-  for (Index1 = 0; Index1 < NewGatewayCount; Index1++) {
-
-    if (!NetIp6IsValidUnicast (NewGateway + Index1)) {
-
-      return EFI_INVALID_PARAMETER;
-    }
-
-    for (Index2 = Index1 + 1; Index2 < NewGatewayCount; Index2++) {
-      if (EFI_IP6_EQUAL (NewGateway + Index1, NewGateway + Index2)) {
-        return EFI_INVALID_PARAMETER;
-      }
-    }
-  }
-
   IpSb            = IP6_SERVICE_FROM_IP6_CONFIG_INSTANCE (Instance);
   Item            = &Instance->DataItem[Ip6ConfigDataTypeGateway];
   OldGateway      = Item->Data.Gateway;
   OldGatewayCount = Item->DataSize / sizeof (EFI_IPv6_ADDRESS);
-  OneRemoved      = FALSE;
-  OneAdded        = FALSE;
-
-  if (NewGatewayCount != OldGatewayCount) {
-    Tmp = AllocatePool (DataSize);
-    if (Tmp == NULL) {
-      return EFI_OUT_OF_RESOURCES;
-    }
-  } else {
-    Tmp = NULL;
-  }
 
   for (Index1 = 0; Index1 < OldGatewayCount; Index1++) {
     //
-    // Find the gateways that are no long in the new setting and remove them.
+    // Remove this default router.
     //
-    for (Index2 = 0; Index2 < NewGatewayCount; Index2++) {
-      if (EFI_IP6_EQUAL (OldGateway + Index1, NewGateway + Index2)) {
-        OneRemoved = TRUE;
-        break;
-      }
-    }
-
-    if (Index2 == NewGatewayCount) {
-      //
-      // Remove this default router.
-      //
-      DefaultRouter = Ip6FindDefaultRouter (IpSb, OldGateway + Index1);
-      if (DefaultRouter != NULL) {
-        Ip6DestroyDefaultRouter (IpSb, DefaultRouter);
-      }
+    DefaultRouter = Ip6FindDefaultRouter (IpSb, OldGateway + Index1);
+    if (DefaultRouter != NULL) {
+      Ip6DestroyDefaultRouter (IpSb, DefaultRouter);
+      OneRemoved = TRUE;
     }
   }
 
-  for (Index1 = 0; Index1 < NewGatewayCount; Index1++) {
+  if (Data != NULL && DataSize != 0) {
+    NewGateway      = (EFI_IPv6_ADDRESS *) Data;
+    NewGatewayCount = DataSize / sizeof (EFI_IPv6_ADDRESS);
+    for (Index1 = 0; Index1 < NewGatewayCount; Index1++) {
 
-    DefaultRouter = Ip6FindDefaultRouter (IpSb, NewGateway + Index1);
-    if (DefaultRouter == NULL) {
-      Ip6CreateDefaultRouter (IpSb, NewGateway + Index1, IP6_INF_ROUTER_LIFETIME);
-      OneAdded = TRUE;
+      if (!NetIp6IsValidUnicast (NewGateway + Index1)) {
+
+        return EFI_INVALID_PARAMETER;
+      }
+
+      for (Index2 = Index1 + 1; Index2 < NewGatewayCount; Index2++) {
+        if (EFI_IP6_EQUAL (NewGateway + Index1, NewGateway + Index2)) {
+          return EFI_INVALID_PARAMETER;
+        }
+      }
     }
-  }
 
-  if (!OneRemoved && !OneAdded) {
-    Item->Status = EFI_SUCCESS;
-    return EFI_ABORTED;
+    if (NewGatewayCount != OldGatewayCount) {
+      Tmp = AllocatePool (DataSize);
+      if (Tmp == NULL) {
+        return EFI_OUT_OF_RESOURCES;
+      }
+    } else {
+      Tmp = NULL;
+    }
+
+    for (Index1 = 0; Index1 < NewGatewayCount; Index1++) {
+
+      DefaultRouter = Ip6FindDefaultRouter (IpSb, NewGateway + Index1);
+      if (DefaultRouter == NULL) {
+        Ip6CreateDefaultRouter (IpSb, NewGateway + Index1, IP6_INF_ROUTER_LIFETIME);
+        OneAdded = TRUE;
+      }
+    }
+
+    if (!OneRemoved && !OneAdded) {
+      Item->Status = EFI_SUCCESS;
+      return EFI_ABORTED;
+    } else {
+
+      if (Tmp != NULL) {
+        if (Item->Data.Ptr != NULL) {
+          FreePool (Item->Data.Ptr);
+        }
+        Item->Data.Ptr = Tmp;
+      }
+
+      CopyMem (Item->Data.Ptr, Data, DataSize);
+      Item->DataSize = DataSize;
+      Item->Status   = EFI_SUCCESS;
+      return EFI_SUCCESS;
+    }
   } else {
-
-    if (Tmp != NULL) {
-      if (Item->Data.Ptr != NULL) {
-        FreePool (Item->Data.Ptr);
-      }
-      Item->Data.Ptr = Tmp;
+    //
+    // DataSize is 0 and Data is NULL, clean up the Gateway address.
+    //
+    if (Item->Data.Ptr != NULL) {
+      FreePool (Item->Data.Ptr);
     }
-
-    CopyMem (Item->Data.Ptr, Data, DataSize);
-    Item->DataSize = DataSize;
-    Item->Status   = EFI_SUCCESS;
-    return EFI_SUCCESS;
+    Item->Data.Ptr = NULL;
+    Item->DataSize = 0;
+    Item->Status   = EFI_NOT_FOUND;
   }
+
+  return EFI_SUCCESS;
 }
 
 /**
@@ -1327,7 +1447,6 @@ Ip6ConfigSetDnsServer (
 {
   UINTN                 OldIndex;
   UINTN                 NewIndex;
-  UINTN                 Index1;
   EFI_IPv6_ADDRESS      *OldDns;
   EFI_IPv6_ADDRESS      *NewDns;
   UINTN                 OldDnsCount;
@@ -1336,7 +1455,12 @@ Ip6ConfigSetDnsServer (
   BOOLEAN               OneAdded;
   VOID                  *Tmp;
 
-  if ((DataSize % sizeof (EFI_IPv6_ADDRESS) != 0) || (DataSize == 0)) {
+  OldDns = NULL;
+  NewDns = NULL;
+  Item   = NULL;
+  Tmp    = NULL;
+
+  if ((DataSize != 0) && (DataSize % sizeof (EFI_IPv6_ADDRESS) != 0)) {
     return EFI_BAD_BUFFER_SIZE;
   }
 
@@ -1344,80 +1468,89 @@ Ip6ConfigSetDnsServer (
     return EFI_WRITE_PROTECTED;
   }
 
-  Item        = &Instance->DataItem[Ip6ConfigDataTypeDnsServer];
-  NewDns      = (EFI_IPv6_ADDRESS *) Data;
-  OldDns      = Item->Data.DnsServers;
-  NewDnsCount = DataSize / sizeof (EFI_IPv6_ADDRESS);
-  OldDnsCount = Item->DataSize / sizeof (EFI_IPv6_ADDRESS);
-  OneAdded    = FALSE;
+  Item = &Instance->DataItem[Ip6ConfigDataTypeDnsServer];
 
-  if (NewDnsCount != OldDnsCount) {
-    Tmp = AllocatePool (DataSize);
-    if (Tmp == NULL) {
-      return EFI_OUT_OF_RESOURCES;
-    }
-  } else {
-    Tmp = NULL;
-  }
+  if (Data != NULL && DataSize != 0) {
+    NewDns      = (EFI_IPv6_ADDRESS *) Data;
+    OldDns      = Item->Data.DnsServers;
+    NewDnsCount = DataSize / sizeof (EFI_IPv6_ADDRESS);
+    OldDnsCount = Item->DataSize / sizeof (EFI_IPv6_ADDRESS);
+    OneAdded    = FALSE;
 
-  for (NewIndex = 0; NewIndex < NewDnsCount; NewIndex++) {
-
-    if (!NetIp6IsValidUnicast (NewDns + NewIndex)) {
-      //
-      // The dns server address must be unicast.
-      //
-      FreePool (Tmp);
-      return EFI_INVALID_PARAMETER;
+    if (NewDnsCount != OldDnsCount) {
+      Tmp = AllocatePool (DataSize);
+      if (Tmp == NULL) {
+        return EFI_OUT_OF_RESOURCES;
+      }
+    } else {
+      Tmp = NULL;
     }
 
-    for (Index1 = NewIndex + 1; Index1 < NewDnsCount; Index1++) {
-      if (EFI_IP6_EQUAL (NewDns + NewIndex, NewDns + Index1)) {
-        FreePool (Tmp);
+    for (NewIndex = 0; NewIndex < NewDnsCount; NewIndex++) {
+
+      if (!NetIp6IsValidUnicast (NewDns + NewIndex)) {
+        //
+        // The dns server address must be unicast.
+        //
+        if (Tmp != NULL) {
+          FreePool (Tmp);
+        }
         return EFI_INVALID_PARAMETER;
       }
-    }
 
-    if (OneAdded) {
-      //
-      // If any address in the new setting is not in the old settings, skip the
-      // comparision below.
-      //
-      continue;
-    }
+      if (OneAdded) {
+        //
+        // If any address in the new setting is not in the old settings, skip the
+        // comparision below.
+        //
+        continue;
+      }
 
-    for (OldIndex = 0; OldIndex < OldDnsCount; OldIndex++) {
-      if (EFI_IP6_EQUAL (NewDns + NewIndex, OldDns + OldIndex)) {
-        //
-        // If found break out.
-        //
-        break;
+      for (OldIndex = 0; OldIndex < OldDnsCount; OldIndex++) {
+        if (EFI_IP6_EQUAL (NewDns + NewIndex, OldDns + OldIndex)) {
+          //
+          // If found break out.
+          //
+          break;
+        }
+      }
+
+      if (OldIndex == OldDnsCount) {
+        OneAdded = TRUE;
       }
     }
 
-    if (OldIndex == OldDnsCount) {
-      OneAdded = TRUE;
-    }
-  }
-
-  if (!OneAdded && (DataSize == Item->DataSize)) {
-    //
-    // No new item is added and the size is the same.
-    //
-    Item->Status = EFI_SUCCESS;
-    return EFI_ABORTED;
-  } else {
-    if (Tmp != NULL) {
-      if (Item->Data.Ptr != NULL) {
-        FreePool (Item->Data.Ptr);
+    if (!OneAdded && (DataSize == Item->DataSize)) {
+      //
+      // No new item is added and the size is the same.
+      //
+      Item->Status = EFI_SUCCESS;
+      return EFI_ABORTED;
+    } else {
+      if (Tmp != NULL) {
+        if (Item->Data.Ptr != NULL) {
+          FreePool (Item->Data.Ptr);
+        }
+        Item->Data.Ptr = Tmp;
       }
-      Item->Data.Ptr = Tmp;
-    }
 
-    CopyMem (Item->Data.Ptr, Data, DataSize);
-    Item->DataSize = DataSize;
-    Item->Status   = EFI_SUCCESS;
-    return EFI_SUCCESS;
+      CopyMem (Item->Data.Ptr, Data, DataSize);
+      Item->DataSize = DataSize;
+      Item->Status   = EFI_SUCCESS;
+    }
+  } else  {
+    //
+    // DataSize is 0 and Data is NULL, clean up the DnsServer address.
+    //
+    if (Item->Data.Ptr != NULL) {
+      FreePool (Item->Data.Ptr);
+    }
+    Item->Data.Ptr = NULL;
+    Item->DataSize = 0;
+    Item->Status   = EFI_NOT_FOUND;
   }
+
+  return EFI_SUCCESS;
 }
 
 /**
@@ -1434,11 +1567,12 @@ Ip6ConfigInitIfInfo (
   OUT EFI_IP6_CONFIG_INTERFACE_INFO  *IfInfo
   )
 {
-  IfInfo->Name[0] = L'e';
-  IfInfo->Name[1] = L't';
-  IfInfo->Name[2] = L'h';
-  IfInfo->Name[3] = (CHAR16) (L'0' + IpSb->Ip6ConfigInstance.IfIndex);
-  IfInfo->Name[4] = 0;
+  UnicodeSPrint (
+    IfInfo->Name,
+    sizeof (IfInfo->Name),
+    L"eth%d",
+    IpSb->Ip6ConfigInstance.IfIndex
+  );
 
   IfInfo->IfType        = IpSb->SnpMode.IfType;
   IfInfo->HwAddressSize = IpSb->SnpMode.HwAddressSize;
@@ -1825,9 +1959,8 @@ Ip6ConfigOnDhcp6SbInstalled (
                                 network stack was set successfully.
   @retval EFI_INVALID_PARAMETER One or more of the following are TRUE:
                                 - This is NULL.
-                                - Data is NULL.
-                                - One or more fields in Data do not match the requirement of the
-                                  data type indicated by DataType.
+                                - One or more fields in Data and DataSizedo not match the
+                                  requirement of the data type indicated by DataType.
   @retval EFI_WRITE_PROTECTED   The specified configuration data is read-only or the specified
                                 configuration data cannot be set under the current policy.
   @retval EFI_ACCESS_DENIED     Another set operation on the specified configuration
@@ -1855,7 +1988,7 @@ EfiIp6ConfigSetData (
   IP6_CONFIG_INSTANCE  *Instance;
   IP6_SERVICE          *IpSb;
 
-  if ((This == NULL) || (Data == NULL)) {
+  if ((This == NULL) || (Data == NULL && DataSize != 0) || (Data != NULL && DataSize == 0)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -2219,7 +2352,7 @@ Ip6ConfigInitInstance (
   SET_DATA_ATTRIB (DataItem->Attribute, DATA_ATTRIB_SIZE_FIXED);
 
   DataItem           = &Instance->DataItem[Ip6ConfigDataTypeManualAddress];
-  DataItem->SetData  = Ip6ConfigSetMaunualAddress;
+  DataItem->SetData  = Ip6ConfigSetManualAddress;
   DataItem->Status   = EFI_NOT_FOUND;
 
   DataItem           = &Instance->DataItem[Ip6ConfigDataTypeGateway];

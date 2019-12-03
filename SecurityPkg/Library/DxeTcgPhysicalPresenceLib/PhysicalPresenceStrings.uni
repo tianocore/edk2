@@ -1,15 +1,9 @@
 /** @file
   String definitions for TPM 1.2 physical presence confirm text.
 
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
-This program and the accompanying materials 
-are licensed and made available under the terms and conditions of the BSD License 
-which accompanies this distribution.  The full text of the license may be found at 
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, 
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -19,8 +13,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #string TPM_PPI_HEAD_STR              #language en-US    "A configuration change was requested to allow the Operating System to %s the computer's TPM (Trusted Platform Module) without asking for user confirmation in the future.\n\n"
 #string TPM_UPGRADE_HEAD_STR          #language en-US    "A configuration change was requested to %s to the TPM's (Trusted Platform Module) firmware.\n\n"
 
-#string TPM_ACCEPT_KEY                #language en-US    "Press F10 " 
-#string TPM_CAUTION_KEY               #language en-US    "Press F12 " 
+#string TPM_ACCEPT_KEY                #language en-US    "Press F10 "
+#string TPM_CAUTION_KEY               #language en-US    "Press F12 "
 #string TPM_REJECT_KEY                #language en-US    "to %s the TPM \nPress ESC to reject this change request and continue\n"
 
 #string TPM_ENABLE                    #language en-US    "enable"

@@ -1,0 +1,128 @@
+// *++
+//
+// (C) Copyright 2014-2015 Hewlett-Packard Development Company, L.P.<BR>
+// Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+// (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+//
+// Module Name:
+//
+//   DpStrings.uni
+//
+// Abstract:
+//
+//   String definitions for the Shell dp command
+//
+// Revision History:
+//
+// --*/
+
+/=#
+
+#langdef   en-US "English"
+
+#string STR_DP_UP                      #language en-US  "UP"
+#string STR_DP_DOWN                    #language en-US  "DOWN"
+#string STR_DP_DASHES                  #language en-US  "-------------------------------------------------------------------------------\n"
+#string STR_DP_SECTION_HEADER          #language en-US  "\n==[ %s ]========\n"
+#string STR_DP_INVALID_ARG             #language en-US  "Invalid argument(s)\n"
+#string STR_DP_TOO_MANY                #language en-US  "Too many arguments\n"
+#string STR_DP_TOO_FEW                 #language en-US  "Too few arguments\n"
+#string STR_DP_INVALID_NUM_ARG         #language en-US  "Invalid argument(s), the value of %H%s%N must be numbers\n"
+#string STR_DP_INVALID_RANGE           #language en-US  "Invalid argument(s), the value of %H%s%N must be between %H%d%N and %H%d%N\n"
+#string STR_DP_CONFLICT_ARG            #language en-US  "Invalid argument(s), %H%s%N can not be used together with %H%s%N\n"
+#string STR_DP_NO_RAW_ALL              #language en-US  "Invalid argument(s), -n flag must use with -A or -R\n"
+#string STR_DP_HANDLES_ERROR           #language en-US  "Locate all handles error - %r\n"
+#string STR_DP_ERROR_NAME              #language en-US  "Unknown driver name"
+#string STR_PERF_PROPERTY_NOT_FOUND    #language en-US  "Performance property not found\n"
+#string STR_DP_BUILD_REVISION          #language en-US  "\nDP Build Version:       %d.%d\n"
+#string STR_DP_KHZ                     #language en-US  "System Performance Timer Frequency:   %,8d (KHz)\n"
+#string STR_DP_TIMER_PROPERTIES        #language en-US  "System Performance Timer counts %s from 0x%Lx to 0x%Lx\n"
+#string STR_DP_VERBOSE_THRESHOLD       #language en-US  "Measurements less than %,Ld microseconds are not displayed.\n"
+#string STR_DP_SECTION_PHASES          #language en-US  "Major Phases"
+#string STR_DP_SEC_PHASE               #language en-US  "  SEC Phase Duration:      %L8d (us)\n"
+#string STR_DP_PHASE_BDSTO             #language en-US  "         BDS Timeout:   %L8d (ms) included in BDS Duration\n"
+#string STR_DP_PHASE_DURATION          #language en-US  "%5a Phase Duration:   %L8d (ms)\n"
+#string STR_DP_TOTAL_DURATION          #language en-US  "Total       Duration:   %L8d (ms)\n"
+#string STR_DP_SECTION_DRIVERS         #language en-US  "Drivers by Handle"
+#string STR_DP_HANDLE_SECTION          #language en-US  "Index:  Handle                Driver Name               Description    Time(us)\n"
+#string STR_DP_HANDLE_VARS             #language en-US  "%5d:  [%3x]   %36s    %11s    %L8d\n"
+#string STR_DP_HANDLE_SECTION2         #language en-US  "Index: Handle               Driver Name             Description  Time(us)    ID\n"
+#string STR_DP_HANDLE_VARS2            #language en-US  "%5d: [%3x]  %36s  %11s  %L8d %5d\n"
+#string STR_DP_SECTION_PEIMS           #language en-US  "PEIMs"
+#string STR_DP_PEIM_SECTION            #language en-US  "Index:                Instance GUID              Token    Time(us)\n"
+#string STR_DP_PEIM_VARS               #language en-US  "%5d:    %g   PEIM    %L8d\n"
+#string STR_DP_PEIM_SECTION2           #language en-US  "Index:               Instance GUID            Token  Time(us)    ID\n"
+#string STR_DP_PEIM_VARS2              #language en-US  "%5d:   %g PEIM  %L8d %5d\n"
+#string STR_DP_SECTION_GENERAL         #language en-US  "General"
+#string STR_DP_GLOBAL_SECTION          #language en-US  "Index                      Name                         Description    Time(us)\n"
+#string STR_DP_GLOBAL_VARS             #language en-US  "%5d:%25s     %31s    %L8d\n"
+#string STR_DP_GLOBAL_SECTION2         #language en-US  "Index                      Name                     Description  Time(us)    ID\n"
+#string STR_DP_GLOBAL_VARS2            #language en-US  "%5d:%25s %31s  %L8d %5d\n"
+#string STR_DP_SECTION_CUMULATIVE      #language en-US  "Cumulative"
+#string STR_DP_CUMULATIVE_SECT_1       #language en-US  "(Times in microsec.)     Cumulative   Average     Shortest    Longest\n"
+#string STR_DP_CUMULATIVE_SECT_2       #language en-US  "   Name         Count     Duration    Duration    Duration    Duration\n"
+#string STR_DP_CUMULATIVE_STATS        #language en-US  "%11a   %8d  %L10d  %L10d  %L10d  %L10d\n"
+#string STR_DP_SECTION_STATISTICS      #language en-US  "Statistics"
+#string STR_DP_STATS_NUMTRACE          #language en-US  "There were %d measurements taken, of which:\n"
+#string STR_DP_STATS_NUMINCOMPLETE     #language en-US  "%,8d are incomplete.\n"
+#string STR_DP_STATS_NUMPHASES         #language en-US  "%,8d are major execution phases.\n"
+#string STR_DP_STATS_NUMHANDLES        #language en-US  "%,8d have non-NULL handles, %d are NULL.\n"
+#string STR_DP_STATS_NUMPEIMS          #language en-US  "%,8d are PEIMs.\n"
+#string STR_DP_STATS_NUMGLOBALS        #language en-US  "%,8d are general measurements.\n"
+#string STR_DP_STATS_NUMPROFILE        #language en-US  "%,8d are profiling records.\n"
+#string STR_DP_SECTION_ALL             #language en-US  "Sequential Trace Records"
+#string STR_DP_ALL_HEADR               #language en-US  "\nIndex      Handle                 Module                      Token    Time(us)\n"
+#string STR_DP_ALL_VARS                #language en-US  "%5d:%3s0x%08p %36s %13s %L8d\n"
+#string STR_DP_ALL_DASHES2             #language en-US  "-------------------------------------------------------------------------------------\n"
+#string STR_DP_ALL_HEADR2              #language en-US  "\nIndex      Handle                 Module                      Token    Time(us)    ID\n"
+#string STR_DP_ALL_VARS2               #language en-US  "%5d:%3s0x%08p %36s %13s %L8d %5d\n"
+#string STR_DP_SECTION_RAWTRACE        #language en-US  "RAW Trace"
+#string STR_DP_RAW_DASHES              #language en-US  "---------------------------------------------------------------------------------------------------------------------------\n"
+#string STR_DP_RAW_VARS                #language en-US  "%5d: %16LX %16LX %16LX  %31a  %31a\n"
+#string STR_DP_RAW_HEADR               #language en-US  "\nIndex       Handle        Start Count       End Count                  Token                          Module\n"
+#string STR_DP_RAW_DASHES2             #language en-US  "---------------------------------------------------------------------------------------------------------------------------------\n"
+#string STR_DP_RAW_VARS2               #language en-US  "%5d: %16LX %16LX %16LX  %31a  %31a %5d\n"
+#string STR_DP_RAW_HEADR2              #language en-US  "\nIndex       Handle        Start Count       End Count                  Token                          Module                   ID\n"
+#string STR_DP_INCOMPLETE              #language en-US  " I "
+#string STR_DP_COMPLETE                #language en-US  "   "
+#string STR_ALIT_UNKNOWN               #language en-US  "Unknown"
+#string STR_DP_GET_ACPI_FPDT_FAIL      #language en-US  "Fail to get Firmware Performance Data Table (FPDT) in ACPI Table\n"
+
+#string STR_GET_HELP_DP         #language en-US ""
+".TH dp 0 "Display performance metrics"\r\n"
+".SH NAME\r\n"
+"Displays performance metrics that are stored in memory.\r\n"
+".SH SYNOPSIS\r\n"
+"DP [-b] [-v] [-x] [-s | -A | -R] [-t value] [-n count] [-c [token]][-i] [-?]\r\n"
+".SH OPTIONS\r\n"
+" \r\n"
+"  -b       - Displays on multiple pages\r\n"
+"  -v       - Displays additional information\r\n"
+"  -x       - Prevents display of individual measurements for cumulative items\r\n"
+"  -s       - Displays summary information only\r\n"
+"  -A       - Displays all measurements in a list\r\n"
+"  -R       - Displays all measurements in raw format\r\n"
+"  -t VALUE - Sets display threshold to VALUE microseconds\r\n"
+"  -n COUNT - Limits display to COUNT lines in All and Raw modes\r\n"
+"  -i       - Displays identifier\r\n"
+"  -c TOKEN - Display pre-defined and custom cumulative data\r\n"
+"             Pre-defined cumulative token are:\r\n"
+"             1. LoadImage:\r\n"
+"             2. StartImage:\r\n"
+"             3. DB:Start:\r\n"
+"             4. DB:Support:\r\n"
+"  -?       - Displays DP help information\r\n"
+".SH DESCRIPTION\r\n"
+" \r\n"
+"NOTES:\r\n"
+"  1. Displays Performance metrics that are stored in memory.\r\n"
+".SH RETURNVALUES\r\n"
+" \r\n"
+"RETURN VALUES:\r\n"
+"  SHELL_SUCCESS            The action was completed as requested.\r\n"
+"  SHELL_NOT_FOUND          The requested option was not found.\r\n"
+"  SHELL_INVALID_PARAMETER  One of the passed in parameters was incorrectly formatted or its value was out of bounds.\r\n"
+"  SHELL_UNSUPPORTED        The action as requested was unsupported.\r\n"
+"  SHELL_OUT_OF_RESOURCES   There was insufficient free space for the request to be completed.\r\n"

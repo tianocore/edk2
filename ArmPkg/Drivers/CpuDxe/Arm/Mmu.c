@@ -3,26 +3,15 @@
 Copyright (c) 2009, Hewlett-Packard Company. All rights reserved.<BR>
 Portions copyright (c) 2010, Apple Inc. All rights reserved.<BR>
 Portions copyright (c) 2013, ARM Ltd. All rights reserved.<BR>
+Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
 
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 
 --*/
 
 #include <Library/MemoryAllocationLib.h>
 #include "CpuDxe.h"
-
-// First Level Descriptors
-typedef UINT32    ARM_FIRST_LEVEL_DESCRIPTOR;
-
-// Second Level Descriptors
-typedef UINT32    ARM_PAGE_TABLE_ENTRY;
 
 EFI_STATUS
 SectionToGcdAttributes (
@@ -62,7 +51,7 @@ SectionToGcdAttributes (
   // determine protection attributes
   switch(SectionAttributes & TT_DESCRIPTOR_SECTION_AP_MASK) {
     case TT_DESCRIPTOR_SECTION_AP_NO_NO: // no read, no write
-      //*GcdAttributes |= EFI_MEMORY_WP | EFI_MEMORY_RP;
+      //*GcdAttributes |= EFI_MEMORY_RO | EFI_MEMORY_RP;
       break;
 
     case TT_DESCRIPTOR_SECTION_AP_RW_NO:
@@ -73,7 +62,7 @@ SectionToGcdAttributes (
     // read only cases map to write-protect
     case TT_DESCRIPTOR_SECTION_AP_RO_NO:
     case TT_DESCRIPTOR_SECTION_AP_RO_RO:
-      *GcdAttributes |= EFI_MEMORY_WP;
+      *GcdAttributes |= EFI_MEMORY_RO;
       break;
 
     default:
@@ -126,7 +115,7 @@ PageToGcdAttributes (
   // determine protection attributes
   switch(PageAttributes & TT_DESCRIPTOR_PAGE_AP_MASK) {
     case TT_DESCRIPTOR_PAGE_AP_NO_NO: // no read, no write
-      //*GcdAttributes |= EFI_MEMORY_WP | EFI_MEMORY_RP;
+      //*GcdAttributes |= EFI_MEMORY_RO | EFI_MEMORY_RP;
       break;
 
     case TT_DESCRIPTOR_PAGE_AP_RW_NO:
@@ -137,7 +126,7 @@ PageToGcdAttributes (
     // read only cases map to write-protect
     case TT_DESCRIPTOR_PAGE_AP_RO_NO:
     case TT_DESCRIPTOR_PAGE_AP_RO_RO:
-      *GcdAttributes |= EFI_MEMORY_WP;
+      *GcdAttributes |= EFI_MEMORY_RO;
       break;
 
     default:
@@ -245,7 +234,7 @@ SyncCacheConfig (
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR     *MemorySpaceMap;
 
 
-  DEBUG ((EFI_D_PAGE, "SyncCacheConfig()\n"));
+  DEBUG ((DEBUG_PAGE, "SyncCacheConfig()\n"));
 
   // This code assumes MMU is enabled and filed with section translations
   ASSERT (ArmMmuEnabled ());
@@ -342,366 +331,6 @@ SyncCacheConfig (
   return EFI_SUCCESS;
 }
 
-
-
-EFI_STATUS
-UpdatePageEntries (
-  IN EFI_PHYSICAL_ADDRESS      BaseAddress,
-  IN UINT64                    Length,
-  IN UINT64                    Attributes,
-  IN EFI_PHYSICAL_ADDRESS      VirtualMask
-  )
-{
-  EFI_STATUS    Status;
-  UINT32        EntryValue;
-  UINT32        EntryMask;
-  UINT32        FirstLevelIdx;
-  UINT32        Offset;
-  UINT32        NumPageEntries;
-  UINT32        Descriptor;
-  UINT32        p;
-  UINT32        PageTableIndex;
-  UINT32        PageTableEntry;
-  UINT32        CurrentPageTableEntry;
-  VOID          *Mva;
-
-  volatile ARM_FIRST_LEVEL_DESCRIPTOR   *FirstLevelTable;
-  volatile ARM_PAGE_TABLE_ENTRY         *PageTable;
-
-  Status = EFI_SUCCESS;
-
-  // EntryMask: bitmask of values to change (1 = change this value, 0 = leave alone)
-  // EntryValue: values at bit positions specified by EntryMask
-  EntryMask = TT_DESCRIPTOR_PAGE_TYPE_MASK;
-  EntryValue = TT_DESCRIPTOR_PAGE_TYPE_PAGE;
-  // Although the PI spec is unclear on this the GCD guarantees that only
-  // one Attribute bit is set at a time, so we can safely use a switch statement
-  switch (Attributes) {
-    case EFI_MEMORY_UC:
-      // modify cacheability attributes
-      EntryMask |= TT_DESCRIPTOR_PAGE_CACHE_POLICY_MASK;
-      // map to strongly ordered
-      EntryValue |= TT_DESCRIPTOR_PAGE_CACHE_POLICY_STRONGLY_ORDERED; // TEX[2:0] = 0, C=0, B=0
-      break;
-
-    case EFI_MEMORY_WC:
-      // modify cacheability attributes
-      EntryMask |= TT_DESCRIPTOR_PAGE_CACHE_POLICY_MASK;
-      // map to normal non-cachable
-      EntryValue |= TT_DESCRIPTOR_PAGE_CACHE_POLICY_NON_CACHEABLE; // TEX [2:0]= 001 = 0x2, B=0, C=0
-      break;
-
-    case EFI_MEMORY_WT:
-      // modify cacheability attributes
-      EntryMask |= TT_DESCRIPTOR_PAGE_CACHE_POLICY_MASK;
-      // write through with no-allocate
-      EntryValue |= TT_DESCRIPTOR_PAGE_CACHE_POLICY_WRITE_THROUGH_NO_ALLOC; // TEX [2:0] = 0, C=1, B=0
-      break;
-
-    case EFI_MEMORY_WB:
-      // modify cacheability attributes
-      EntryMask |= TT_DESCRIPTOR_PAGE_CACHE_POLICY_MASK;
-      // write back (with allocate)
-      EntryValue |= TT_DESCRIPTOR_PAGE_CACHE_POLICY_WRITE_BACK_ALLOC; // TEX [2:0] = 001, C=1, B=1
-      break;
-
-    case EFI_MEMORY_WP:
-    case EFI_MEMORY_XP:
-    case EFI_MEMORY_UCE:
-      // cannot be implemented UEFI definition unclear for ARM
-      // Cause a page fault if these ranges are accessed.
-      EntryValue = TT_DESCRIPTOR_PAGE_TYPE_FAULT;
-      DEBUG ((EFI_D_PAGE, "SetMemoryAttributes(): setting page %lx with unsupported attribute %x will page fault on access\n", BaseAddress, Attributes));
-      break;
-
-    default:
-      return EFI_UNSUPPORTED;
-  }
-
-  // Obtain page table base
-  FirstLevelTable = (ARM_FIRST_LEVEL_DESCRIPTOR *)ArmGetTTBR0BaseAddress ();
-
-  // Calculate number of 4KB page table entries to change
-  NumPageEntries = Length / TT_DESCRIPTOR_PAGE_SIZE;
-
-  // Iterate for the number of 4KB pages to change
-  Offset = 0;
-  for(p = 0; p < NumPageEntries; p++) {
-    // Calculate index into first level translation table for page table value
-
-    FirstLevelIdx = TT_DESCRIPTOR_SECTION_BASE_ADDRESS(BaseAddress + Offset) >> TT_DESCRIPTOR_SECTION_BASE_SHIFT;
-    ASSERT (FirstLevelIdx < TRANSLATION_TABLE_SECTION_COUNT);
-
-    // Read the descriptor from the first level page table
-    Descriptor = FirstLevelTable[FirstLevelIdx];
-
-    // Does this descriptor need to be converted from section entry to 4K pages?
-    if (!TT_DESCRIPTOR_SECTION_TYPE_IS_PAGE_TABLE(Descriptor)) {
-      Status = ConvertSectionToPages (FirstLevelIdx << TT_DESCRIPTOR_SECTION_BASE_SHIFT);
-      if (EFI_ERROR(Status)) {
-        // Exit for loop
-        break;
-      }
-
-      // Re-read descriptor
-      Descriptor = FirstLevelTable[FirstLevelIdx];
-    }
-
-    // Obtain page table base address
-    PageTable = (ARM_PAGE_TABLE_ENTRY *)TT_DESCRIPTOR_PAGE_BASE_ADDRESS(Descriptor);
-
-    // Calculate index into the page table
-    PageTableIndex = ((BaseAddress + Offset) & TT_DESCRIPTOR_PAGE_INDEX_MASK) >> TT_DESCRIPTOR_PAGE_BASE_SHIFT;
-    ASSERT (PageTableIndex < TRANSLATION_TABLE_PAGE_COUNT);
-
-    // Get the entry
-    CurrentPageTableEntry = PageTable[PageTableIndex];
-
-    // Mask off appropriate fields
-    PageTableEntry = CurrentPageTableEntry & ~EntryMask;
-
-    // Mask in new attributes and/or permissions
-    PageTableEntry |= EntryValue;
-
-    if (VirtualMask != 0) {
-      // Make this virtual address point at a physical page
-      PageTableEntry &= ~VirtualMask;
-    }
-
-    if (CurrentPageTableEntry  != PageTableEntry) {
-      Mva = (VOID *)(UINTN)((((UINTN)FirstLevelIdx) << TT_DESCRIPTOR_SECTION_BASE_SHIFT) + (PageTableIndex << TT_DESCRIPTOR_PAGE_BASE_SHIFT));
-      if ((CurrentPageTableEntry & TT_DESCRIPTOR_PAGE_CACHEABLE_MASK) == TT_DESCRIPTOR_PAGE_CACHEABLE_MASK) {
-        // The current section mapping is cacheable so Clean/Invalidate the MVA of the page
-        // Note assumes switch(Attributes), not ARMv7 possibilities
-        WriteBackInvalidateDataCacheRange (Mva, TT_DESCRIPTOR_PAGE_SIZE);
-      }
-
-      // Only need to update if we are changing the entry
-      PageTable[PageTableIndex] = PageTableEntry;
-      ArmUpdateTranslationTableEntry ((VOID *)&PageTable[PageTableIndex], Mva);
-    }
-
-    Status = EFI_SUCCESS;
-    Offset += TT_DESCRIPTOR_PAGE_SIZE;
-
-  } // End first level translation table loop
-
-  return Status;
-}
-
-
-
-EFI_STATUS
-UpdateSectionEntries (
-  IN EFI_PHYSICAL_ADDRESS      BaseAddress,
-  IN UINT64                    Length,
-  IN UINT64                    Attributes,
-  IN EFI_PHYSICAL_ADDRESS      VirtualMask
-  )
-{
-  EFI_STATUS    Status = EFI_SUCCESS;
-  UINT32        EntryMask;
-  UINT32        EntryValue;
-  UINT32        FirstLevelIdx;
-  UINT32        NumSections;
-  UINT32        i;
-  UINT32        CurrentDescriptor;
-  UINT32        Descriptor;
-  VOID          *Mva;
-  volatile ARM_FIRST_LEVEL_DESCRIPTOR   *FirstLevelTable;
-
-  // EntryMask: bitmask of values to change (1 = change this value, 0 = leave alone)
-  // EntryValue: values at bit positions specified by EntryMask
-
-  // Make sure we handle a section range that is unmapped
-  EntryMask = TT_DESCRIPTOR_SECTION_TYPE_MASK;
-  EntryValue = TT_DESCRIPTOR_SECTION_TYPE_SECTION;
-
-  // Although the PI spec is unclear on this the GCD guarantees that only
-  // one Attribute bit is set at a time, so we can safely use a switch statement
-  switch(Attributes) {
-    case EFI_MEMORY_UC:
-      // modify cacheability attributes
-      EntryMask |= TT_DESCRIPTOR_SECTION_CACHE_POLICY_MASK;
-      // map to strongly ordered
-      EntryValue |= TT_DESCRIPTOR_SECTION_CACHE_POLICY_STRONGLY_ORDERED; // TEX[2:0] = 0, C=0, B=0
-      break;
-
-    case EFI_MEMORY_WC:
-      // modify cacheability attributes
-      EntryMask |= TT_DESCRIPTOR_SECTION_CACHE_POLICY_MASK;
-      // map to normal non-cachable
-      EntryValue |= TT_DESCRIPTOR_SECTION_CACHE_POLICY_NON_CACHEABLE; // TEX [2:0]= 001 = 0x2, B=0, C=0
-      break;
-
-    case EFI_MEMORY_WT:
-      // modify cacheability attributes
-      EntryMask |= TT_DESCRIPTOR_SECTION_CACHE_POLICY_MASK;
-      // write through with no-allocate
-      EntryValue |= TT_DESCRIPTOR_SECTION_CACHE_POLICY_WRITE_THROUGH_NO_ALLOC; // TEX [2:0] = 0, C=1, B=0
-      break;
-
-    case EFI_MEMORY_WB:
-      // modify cacheability attributes
-      EntryMask |= TT_DESCRIPTOR_SECTION_CACHE_POLICY_MASK;
-      // write back (with allocate)
-      EntryValue |= TT_DESCRIPTOR_SECTION_CACHE_POLICY_WRITE_BACK_ALLOC; // TEX [2:0] = 001, C=1, B=1
-      break;
-
-    case EFI_MEMORY_WP:
-    case EFI_MEMORY_XP:
-    case EFI_MEMORY_RP:
-    case EFI_MEMORY_UCE:
-      // cannot be implemented UEFI definition unclear for ARM
-      // Cause a page fault if these ranges are accessed.
-      EntryValue = TT_DESCRIPTOR_SECTION_TYPE_FAULT;
-      DEBUG ((EFI_D_PAGE, "SetMemoryAttributes(): setting section %lx with unsupported attribute %x will page fault on access\n", BaseAddress, Attributes));
-      break;
-
-
-    default:
-      return EFI_UNSUPPORTED;
-  }
-
-  // obtain page table base
-  FirstLevelTable = (ARM_FIRST_LEVEL_DESCRIPTOR *)ArmGetTTBR0BaseAddress ();
-
-  // calculate index into first level translation table for start of modification
-  FirstLevelIdx = TT_DESCRIPTOR_SECTION_BASE_ADDRESS(BaseAddress) >> TT_DESCRIPTOR_SECTION_BASE_SHIFT;
-  ASSERT (FirstLevelIdx < TRANSLATION_TABLE_SECTION_COUNT);
-
-  // calculate number of 1MB first level entries this applies to
-  NumSections = Length / TT_DESCRIPTOR_SECTION_SIZE;
-
-  // iterate through each descriptor
-  for(i=0; i<NumSections; i++) {
-    CurrentDescriptor = FirstLevelTable[FirstLevelIdx + i];
-
-    // has this descriptor already been coverted to pages?
-    if (TT_DESCRIPTOR_SECTION_TYPE_IS_PAGE_TABLE(CurrentDescriptor)) {
-      // forward this 1MB range to page table function instead
-      Status = UpdatePageEntries ((FirstLevelIdx + i) << TT_DESCRIPTOR_SECTION_BASE_SHIFT, TT_DESCRIPTOR_SECTION_SIZE, Attributes, VirtualMask);
-    } else {
-      // still a section entry
-
-      // mask off appropriate fields
-      Descriptor = CurrentDescriptor & ~EntryMask;
-
-      // mask in new attributes and/or permissions
-      Descriptor |= EntryValue;
-      if (VirtualMask != 0) {
-        Descriptor &= ~VirtualMask;
-      }
-
-      if (CurrentDescriptor  != Descriptor) {
-        Mva = (VOID *)(UINTN)(((UINTN)FirstLevelTable) << TT_DESCRIPTOR_SECTION_BASE_SHIFT);
-        if ((CurrentDescriptor & TT_DESCRIPTOR_SECTION_CACHEABLE_MASK) == TT_DESCRIPTOR_SECTION_CACHEABLE_MASK) {
-          // The current section mapping is cacheable so Clean/Invalidate the MVA of the section
-          // Note assumes switch(Attributes), not ARMv7 possabilities
-          WriteBackInvalidateDataCacheRange (Mva, SIZE_1MB);
-        }
-
-        // Only need to update if we are changing the descriptor
-        FirstLevelTable[FirstLevelIdx + i] = Descriptor;
-        ArmUpdateTranslationTableEntry ((VOID *)&FirstLevelTable[FirstLevelIdx + i], Mva);
-      }
-
-      Status = EFI_SUCCESS;
-    }
-  }
-
-  return Status;
-}
-
-EFI_STATUS
-ConvertSectionToPages (
-  IN EFI_PHYSICAL_ADDRESS  BaseAddress
-  )
-{
-  EFI_STATUS              Status;
-  EFI_PHYSICAL_ADDRESS    PageTableAddr;
-  UINT32                  FirstLevelIdx;
-  UINT32                  SectionDescriptor;
-  UINT32                  PageTableDescriptor;
-  UINT32                  PageDescriptor;
-  UINT32                  Index;
-
-  volatile ARM_FIRST_LEVEL_DESCRIPTOR   *FirstLevelTable;
-  volatile ARM_PAGE_TABLE_ENTRY         *PageTable;
-
-  DEBUG ((EFI_D_PAGE, "Converting section at 0x%x to pages\n", (UINTN)BaseAddress));
-
-  // Obtain page table base
-  FirstLevelTable = (ARM_FIRST_LEVEL_DESCRIPTOR *)ArmGetTTBR0BaseAddress ();
-
-  // Calculate index into first level translation table for start of modification
-  FirstLevelIdx = TT_DESCRIPTOR_SECTION_BASE_ADDRESS(BaseAddress) >> TT_DESCRIPTOR_SECTION_BASE_SHIFT;
-  ASSERT (FirstLevelIdx < TRANSLATION_TABLE_SECTION_COUNT);
-
-  // Get section attributes and convert to page attributes
-  SectionDescriptor = FirstLevelTable[FirstLevelIdx];
-  PageDescriptor = TT_DESCRIPTOR_PAGE_TYPE_PAGE | ConvertSectionAttributesToPageAttributes (SectionDescriptor, FALSE);
-
-  // Allocate a page table for the 4KB entries (we use up a full page even though we only need 1KB)
-  Status = gBS->AllocatePages (AllocateAnyPages, EfiBootServicesData, 1, &PageTableAddr);
-  if (EFI_ERROR(Status)) {
-    return Status;
-  }
-
-  PageTable = (volatile ARM_PAGE_TABLE_ENTRY *)(UINTN)PageTableAddr;
-
-  // Write the page table entries out
-  for (Index = 0; Index < TRANSLATION_TABLE_PAGE_COUNT; Index++) {
-    PageTable[Index] = TT_DESCRIPTOR_PAGE_BASE_ADDRESS(BaseAddress + (Index << 12)) | PageDescriptor;
-  }
-
-  // Flush d-cache so descriptors make it back to uncached memory for subsequent table walks
-  WriteBackInvalidateDataCacheRange ((VOID *)(UINTN)PageTableAddr, TT_DESCRIPTOR_PAGE_SIZE);
-
-  // Formulate page table entry, Domain=0, NS=0
-  PageTableDescriptor = (((UINTN)PageTableAddr) & TT_DESCRIPTOR_SECTION_PAGETABLE_ADDRESS_MASK) | TT_DESCRIPTOR_SECTION_TYPE_PAGE_TABLE;
-
-  // Write the page table entry out, replacing section entry
-  FirstLevelTable[FirstLevelIdx] = PageTableDescriptor;
-
-  return EFI_SUCCESS;
-}
-
-
-
-EFI_STATUS
-SetMemoryAttributes (
-  IN EFI_PHYSICAL_ADDRESS      BaseAddress,
-  IN UINT64                    Length,
-  IN UINT64                    Attributes,
-  IN EFI_PHYSICAL_ADDRESS      VirtualMask
-  )
-{
-  EFI_STATUS    Status;
-
-  if(((BaseAddress & 0xFFFFF) == 0) && ((Length & 0xFFFFF) == 0)) {
-    // Is the base and length a multiple of 1 MB?
-    DEBUG ((EFI_D_PAGE, "SetMemoryAttributes(): MMU section 0x%x length 0x%x to %lx\n", (UINTN)BaseAddress, (UINTN)Length, Attributes));
-    Status = UpdateSectionEntries (BaseAddress, Length, Attributes, VirtualMask);
-  } else {
-    // Base and/or length is not a multiple of 1 MB
-    DEBUG ((EFI_D_PAGE, "SetMemoryAttributes(): MMU page 0x%x length 0x%x to %lx\n", (UINTN)BaseAddress, (UINTN)Length, Attributes));
-    Status = UpdatePageEntries (BaseAddress, Length, Attributes, VirtualMask);
-  }
-
-  // Flush d-cache so descriptors make it back to uncached memory for subsequent table walks
-  // flush and invalidate pages
-  //TODO: Do we really need to invalidate the caches everytime we change the memory attributes ?
-  ArmCleanInvalidateDataCache ();
-
-  ArmInvalidateInstructionCache ();
-
-  // Invalidate all TLB entries so changes are synced
-  ArmInvalidateTlb ();
-
-  return Status;
-}
-
 UINT64
 EfiAttributeToArmAttribute (
   IN UINT64                    EfiAttributes
@@ -730,20 +359,14 @@ EfiAttributeToArmAttribute (
       ArmAttributes = TT_DESCRIPTOR_SECTION_CACHE_POLICY_WRITE_BACK_ALLOC; // TEX [2:0] = 001, C=1, B=1
       break;
 
-    case EFI_MEMORY_WP:
-    case EFI_MEMORY_XP:
-    case EFI_MEMORY_RP:
     case EFI_MEMORY_UCE:
     default:
-      // Cannot be implemented UEFI definition unclear for ARM
-      // Cause a page fault if these ranges are accessed.
       ArmAttributes = TT_DESCRIPTOR_SECTION_TYPE_FAULT;
-      DEBUG ((EFI_D_PAGE, "SetMemoryAttributes(): Unsupported attribute %x will page fault on access\n", EfiAttributes));
       break;
   }
 
   // Determine protection attributes
-  if (EfiAttributes & EFI_MEMORY_WP) {
+  if (EfiAttributes & EFI_MEMORY_RO) {
     ArmAttributes |= TT_DESCRIPTOR_SECTION_AP_RO_RO;
   } else {
     ArmAttributes |= TT_DESCRIPTOR_SECTION_AP_RW_RW;
@@ -828,6 +451,9 @@ GetMemoryRegion (
 
   // Get the section at the given index
   SectionDescriptor = FirstLevelTable[TableIndex];
+  if (!SectionDescriptor) {
+    return EFI_NOT_FOUND;
+  }
 
   // If 'BaseAddress' belongs to the section then round it to the section boundary
   if (((SectionDescriptor & TT_DESCRIPTOR_SECTION_TYPE_MASK) == TT_DESCRIPTOR_SECTION_TYPE_SECTION) ||

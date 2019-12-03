@@ -7,14 +7,8 @@
 #  protected mode, setup flat memory model, enable temporary memory and
 #  call into SecStartup().
 #
-#  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
-#  This program and the accompanying materials
-#  are licensed and made available under the terms and conditions of the BSD License
-#  which accompanies this distribution.  The full text of the license may be found at
-#  http://opensource.org/licenses/bsd-license.php
-#
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
 
@@ -30,7 +24,7 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
 #
 
 [Sources]
@@ -50,7 +44,6 @@
 [LibraryClasses]
   BaseMemoryLib
   DebugLib
-  BaseLib
   PlatformSecLib
   PcdLib
   DebugAgentLib
@@ -71,6 +64,14 @@
   ## SOMETIMES_PRODUCES
   gEfiSecPlatformInformation2PpiGuid
   gEfiTemporaryRamDonePpiGuid                          ## PRODUCES
+  ## NOTIFY
+  ## SOMETIMES_CONSUMES
+  gPeiSecPerformancePpiGuid
+  gEfiPeiCoreFvLocationPpiGuid
+
+[Guids]
+  ## SOMETIMES_PRODUCES   ## HOB
+  gEfiFirmwarePerformanceGuid
 
 [Pcd]
   gUefiCpuPkgTokenSpaceGuid.PcdPeiTemporaryRamStackSize  ## CONSUMES

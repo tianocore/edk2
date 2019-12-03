@@ -1,14 +1,8 @@
 /** @file
   Routines dealing with file open.
 
-Copyright (c) 2005 - 2014, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available
-under the terms and conditions of the BSD License which accompanies this
-distribution. The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -80,7 +74,7 @@ FatAllocateIFile (
   @retval EFI_SUCCESS           - Open the file successfully.
   @retval EFI_INVALID_PARAMETER - The open mode is conflict with the attributes
                           or the file name is not valid.
-  @retval EFI_NOT_FOUND         - Conficts between dir intention and attribute.
+  @retval EFI_NOT_FOUND         - Conflicts between dir intention and attribute.
   @retval EFI_WRITE_PROTECTED   - Can't open for write if the volume is read only.
   @retval EFI_ACCESS_DENIED     - If the file's attribute is read only, and the
                           open is for read-write fail it.
@@ -234,7 +228,7 @@ FatOpenEx (
   }
 
   //
-  // Check for valid Attributes for file creation case. 
+  // Check for valid Attributes for file creation case.
   //
   if (((OpenMode & EFI_FILE_MODE_CREATE) != 0) && (Attributes & (EFI_FILE_READ_ONLY | (~EFI_FILE_VALID_ATTR))) != 0) {
     return EFI_INVALID_PARAMETER;

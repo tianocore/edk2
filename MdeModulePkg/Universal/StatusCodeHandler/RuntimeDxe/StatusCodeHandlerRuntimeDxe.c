@@ -2,21 +2,15 @@
   Status Code Handler Driver which produces general handlers and hook them
   onto the DXE status code router.
 
-  Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include "StatusCodeHandlerRuntimeDxe.h"
 
 EFI_EVENT                 mVirtualAddressChangeEvent = NULL;
-EFI_EVENT                 mExitBootServicesEvent     = NULL;
+static EFI_EVENT          mExitBootServicesEvent     = NULL;
 EFI_RSC_HANDLER_PROTOCOL  *mRscHandlerProtocol       = NULL;
 
 /**
@@ -66,9 +60,9 @@ VirtualAddressChangeCallBack (
 }
 
 /**
-  Dispatch initialization request to sub status code devices based on 
+  Dispatch initialization request to sub status code devices based on
   customized feature flags.
- 
+
 **/
 VOID
 InitializationDispatcherWorker (
@@ -99,11 +93,11 @@ InitializationDispatcherWorker (
   }
 
   //
-  // Replay Status code which saved in GUID'ed HOB to all supported devices. 
+  // Replay Status code which saved in GUID'ed HOB to all supported devices.
   //
   if (FeaturePcdGet (PcdStatusCodeReplayIn)) {
-    // 
-    // Journal GUID'ed HOBs to find all record entry, if found, 
+    //
+    // Journal GUID'ed HOBs to find all record entry, if found,
     // then output record to support replay device.
     //
     Hob.Raw   = GetFirstGuidHob (&gMemoryStatusCodeRecordGuid);
@@ -152,7 +146,7 @@ InitializationDispatcherWorker (
 
   @param  ImageHandle       The firmware allocated handle for the EFI image.
   @param  SystemTable       A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS       The entry point is executed successfully.
 
 **/

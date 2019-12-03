@@ -1,0 +1,16 @@
+// /** @file
+// Provides the helper routines for HTTP.
+//
+// This library instance provides the helper routines to parse the HTTP message byte stream.
+//
+// Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Provides the helper routines for HTTP"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This library instance provides the helper routines to parse the HTTP message byte stream."
+

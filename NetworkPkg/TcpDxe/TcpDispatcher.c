@@ -2,15 +2,9 @@
   The implementation of a dispatch routine for processing TCP requests.
 
   (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -360,7 +354,7 @@ TcpAttachPcb (
   } else {
     IpProtocolGuid = &gEfiIp6ProtocolGuid;
   }
-  
+
   Tcb = AllocateZeroPool (sizeof (TCP_CB));
 
   if (Tcb == NULL) {
@@ -398,7 +392,7 @@ TcpAttachPcb (
     IpIoRemoveIp (IpIo, Tcb->IpInfo);
     return Status;
   }
-  
+
   InitializeListHead (&Tcb->List);
   InitializeListHead (&Tcb->SndQue);
   InitializeListHead (&Tcb->RcvQue);
@@ -423,14 +417,7 @@ TcpDetachPcb (
 {
   TCP_PROTO_DATA   *ProtoData;
   TCP_CB           *Tcb;
-  EFI_GUID         *IpProtocolGuid;
 
-  if (Sk->IpVersion == IP_VERSION_4) {
-    IpProtocolGuid = &gEfiIp4ProtocolGuid;
-  } else {
-    IpProtocolGuid = &gEfiIp6ProtocolGuid;
-  }
-  
   ProtoData = (TCP_PROTO_DATA *) Sk->ProtoReserved;
   Tcb       = ProtoData->TcpPcb;
 
@@ -438,16 +425,6 @@ TcpDetachPcb (
 
   TcpFlushPcb (Tcb);
 
-  //
-  // Close the IP protocol.
-  //
-  gBS->CloseProtocol (
-         Tcb->IpInfo->ChildHandle,
-         IpProtocolGuid,
-         ProtoData->TcpService->IpIo->Image,
-         Sk->SockHandle
-         );
-  
   IpIoRemoveIp (ProtoData->TcpService->IpIo, Tcb->IpInfo);
 
   FreePool (Tcb);

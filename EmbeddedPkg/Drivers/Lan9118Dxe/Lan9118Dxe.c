@@ -2,13 +2,7 @@
 *
 *  Copyright (c) 2012-2014, ARM Limited. All rights reserved.
 *
-*  This program and the accompanying materials
-*  are licensed and made available under the terms and conditions of the BSD License
-*  which accompanies this distribution.  The full text of the license may be found at
-*  http://opensource.org/licenses/bsd-license.php
-*
-*  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-*  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+*  SPDX-License-Identifier: BSD-2-Clause-Patent
 *
 **/
 
@@ -40,6 +34,7 @@ LAN9118_DEVICE_PATH Lan9118PathTemplate =  {
 **
 */
 EFI_STATUS
+EFIAPI
 Lan9118DxeEntry (
   IN EFI_HANDLE Handle,
   IN EFI_SYSTEM_TABLE *SystemTable
@@ -1445,7 +1440,7 @@ SnpReceive (
     return EFI_BUFFER_TOO_SMALL;
   }
 
-  // Set the amount of data to be transfered out of FIFO for THIS packet
+  // Set the amount of data to be transferred out of FIFO for THIS packet
   // This can be used to trigger an interrupt, and status can be checked
   RxCfgValue = Lan9118MmioRead32 (LAN9118_RX_CFG);
   RxCfgValue &= ~(RXCFG_RX_DMA_CNT_MASK);

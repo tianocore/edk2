@@ -2,13 +2,7 @@
 *
 *  Copyright (c) 2011-2015, ARM Limited. All rights reserved.
 *
-*  This program and the accompanying materials
-*  are licensed and made available under the terms and conditions of the BSD License
-*  which accompanies this distribution.  The full text of the license may be found at
-*  http://opensource.org/licenses/bsd-license.php
-*
-*  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-*  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+*  SPDX-License-Identifier: BSD-2-Clause-Patent
 *
 **/
 
@@ -129,7 +123,8 @@ MemoryPeim (
   FdTop = (EFI_PHYSICAL_ADDRESS)PcdGet64 (PcdFdBaseAddress) + (EFI_PHYSICAL_ADDRESS)PcdGet32 (PcdFdSize);
 
   // EDK2 does not have the concept of boot firmware copied into DRAM. To avoid the DXE
-  // core to overwrite this area we must mark the region with the attribute non-present
+  // core to overwrite this area we must create a memory allocation HOB for the region,
+  // but this only works if we split off the underlying resource descriptor as well.
   if ((PcdGet64 (PcdFdBaseAddress) >= PcdGet64 (PcdSystemMemoryBase)) && (FdTop <= SystemMemoryTop)) {
     Found = FALSE;
 
@@ -145,12 +140,10 @@ MemoryPeim (
         ResourceTop = NextHob.ResourceDescriptor->PhysicalStart + ResourceLength;
 
         if (PcdGet64 (PcdFdBaseAddress) == NextHob.ResourceDescriptor->PhysicalStart) {
-          if (SystemMemoryTop == FdTop) {
-            NextHob.ResourceDescriptor->ResourceAttribute = ResourceAttributes & ~EFI_RESOURCE_ATTRIBUTE_PRESENT;
-          } else {
-            // Create the System Memory HOB for the firmware with the non-present attribute
+          if (SystemMemoryTop != FdTop) {
+            // Create the System Memory HOB for the firmware
             BuildResourceDescriptorHob (EFI_RESOURCE_SYSTEM_MEMORY,
-                                        ResourceAttributes & ~EFI_RESOURCE_ATTRIBUTE_PRESENT,
+                                        ResourceAttributes,
                                         PcdGet64 (PcdFdBaseAddress),
                                         PcdGet32 (PcdFdSize));
 
@@ -159,9 +152,9 @@ MemoryPeim (
             NextHob.ResourceDescriptor->ResourceLength -= PcdGet32(PcdFdSize);
           }
         } else {
-          // Create the System Memory HOB for the firmware with the non-present attribute
+          // Create the System Memory HOB for the firmware
           BuildResourceDescriptorHob (EFI_RESOURCE_SYSTEM_MEMORY,
-                                      ResourceAttributes & ~EFI_RESOURCE_ATTRIBUTE_PRESENT,
+                                      ResourceAttributes,
                                       PcdGet64 (PcdFdBaseAddress),
                                       PcdGet32 (PcdFdSize));
 
@@ -177,6 +170,12 @@ MemoryPeim (
                                         ResourceTop - FdTop);
           }
         }
+
+        // Mark the memory covering the Firmware Device as boot services data
+        BuildMemoryAllocationHob (PcdGet64 (PcdFdBaseAddress),
+                                  PcdGet32 (PcdFdSize),
+                                  EfiBootServicesData);
+
         Found = TRUE;
         break;
       }

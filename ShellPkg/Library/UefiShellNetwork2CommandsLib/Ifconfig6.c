@@ -2,14 +2,9 @@
   The implementation for Shell command IfConfig6.
 
   Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+  (C) Copyright 2017 Hewlett Packard Enterprise Development LP<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 #include "UefiShellNetwork2CommandsLib.h"
@@ -1317,20 +1312,21 @@ IfConfig6SetInterfaceInfo (
 
       VarArg= VarArg->Next;
 
-      if (StrCmp (VarArg->Arg, L"host") == 0) {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_ERR_INVALID_IP_CONFIG), gShellNetwork2HiiHandle, Status);
-        ShellStatus = SHELL_INVALID_PARAMETER;
-        goto ON_EXIT;
-      } else if (StrCmp (VarArg->Arg, L"gw") == 0) {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_ERR_INVALID_GW_CONFIG), gShellNetwork2HiiHandle, Status);
-        ShellStatus = SHELL_INVALID_PARAMETER;
-        goto ON_EXIT;
-      } else if (StrCmp (VarArg->Arg, L"dns") == 0) {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_ERR_INVALID_DNS_CONFIG), gShellNetwork2HiiHandle, Status);
-        ShellStatus = SHELL_INVALID_PARAMETER;
-        goto ON_EXIT;
+      if (VarArg != NULL) {
+        if (StrCmp (VarArg->Arg, L"host") == 0) {
+          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_ERR_INVALID_IP_CONFIG), gShellNetwork2HiiHandle, Status);
+          ShellStatus = SHELL_INVALID_PARAMETER;
+          goto ON_EXIT;
+        } else if (StrCmp (VarArg->Arg, L"gw") == 0) {
+          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_ERR_INVALID_GW_CONFIG), gShellNetwork2HiiHandle, Status);
+          ShellStatus = SHELL_INVALID_PARAMETER;
+          goto ON_EXIT;
+        } else if (StrCmp (VarArg->Arg, L"dns") == 0) {
+          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_ERR_INVALID_DNS_CONFIG), gShellNetwork2HiiHandle, Status);
+          ShellStatus = SHELL_INVALID_PARAMETER;
+          goto ON_EXIT;
+        }
       }
-
     } else if (StrCmp (VarArg->Arg, L"man") == 0) {
       //
       // Set manual config policy.
@@ -1489,6 +1485,7 @@ IfConfig6SetInterfaceInfo (
             &CfgManAddr[Index].Address,
             &CfgManAddr[Index].PrefixLength
             );
+          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_INFO_NEWLINE), gShellNetwork2HiiHandle);
         }
       }
 

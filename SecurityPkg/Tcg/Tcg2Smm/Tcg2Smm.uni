@@ -4,19 +4,14 @@
 // This driver implements TPM 2.0 definition block in ACPI table and
 // registers SMI callback functions for TCG2 physical presence and
 // MemoryClear to handle the requests from ACPI method.
-// 
+//
 // Caution: This module requires additional review when modified.
 // This driver will have external input - variable and ACPINvs data in SMM mode.
 // This external input must be validated carefully to avoid security issue.
 //
-// Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
 //
-// This program and the accompanying materials
-// are licensed and made available under the terms and conditions of the BSD License
-// which accompanies this distribution. The full text of the license may be found at
-// http://opensource.org/licenses/bsd-license.php
-// THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-// WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+// SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // **/
 

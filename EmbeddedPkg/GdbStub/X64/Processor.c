@@ -3,13 +3,7 @@
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -260,7 +254,7 @@ BasicWriteRegister (
  Writes the new value of n-th register received into the input buffer to the n-th register
 
  @param   SystemContext   Register content at time of the exception
- @param   InBuffer      Ponter to the input buffer received from gdb server
+ @param   InBuffer      Pointer to the input buffer received from gdb server
  **/
 VOID
 EFIAPI
@@ -644,7 +638,7 @@ EnableDebugRegister (
 
 
 /**
-  Returns register number 0 - 3 for the maching debug register.
+  Returns register number 0 - 3 for the matching debug register.
   This function compares incoming Address, Type, Length and
   if there is a match then it returns the appropriate register number.
   In case of mismatch, function returns EFI_NOT_FOUND message.

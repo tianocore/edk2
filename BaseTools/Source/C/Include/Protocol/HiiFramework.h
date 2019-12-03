@@ -2,19 +2,13 @@
   This file defines the Human Interface Infrastructure protocol which will
   be used by resources which want to publish IFR/Font/String data and have it
   collected by the Configuration engine.
-  
+
   @par Revision Reference:
   This protocol is defined in HII spec 0.92.
 
-  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials are licensed and made available
-  under the terms and conditions of the BSD License which accompanies this
-  distribution.  The full text of the license may be found at
-    http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 

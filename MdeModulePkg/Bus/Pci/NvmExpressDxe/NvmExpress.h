@@ -3,14 +3,8 @@
   NVM Express specification.
 
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
-  Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2013 - 2019, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -34,6 +28,7 @@
 #include <Protocol/DiskInfo.h>
 #include <Protocol/DriverSupportedEfiVersion.h>
 #include <Protocol/StorageSecurityCommand.h>
+#include <Protocol/ResetNotification.h>
 
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -44,6 +39,7 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiDriverEntryPoint.h>
+#include <Library/ReportStatusCodeLib.h>
 
 typedef struct _NVME_CONTROLLER_PRIVATE_DATA NVME_CONTROLLER_PRIVATE_DATA;
 typedef struct _NVME_DEVICE_PRIVATE_DATA     NVME_DEVICE_PRIVATE_DATA;
@@ -145,6 +141,11 @@ struct _NVME_CONTROLLER_PRIVATE_DATA {
   NVME_SQTDBL                         SqTdbl[NVME_MAX_QUEUES];
   NVME_CQHDBL                         CqHdbl[NVME_MAX_QUEUES];
   UINT16                              AsyncSqHead;
+
+  //
+  // Flag to indicate internal IO queue creation.
+  //
+  BOOLEAN                             CreateIoQueue;
 
   UINT8                               Pt[NVME_MAX_QUEUES];
   UINT16                              Cid[NVME_MAX_QUEUES];
@@ -292,6 +293,11 @@ typedef struct {
 
   EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET *Packet;
   UINT16                                   CommandId;
+  VOID                                     *MapPrpList;
+  UINTN                                    PrpListNo;
+  VOID                                     *PrpListHost;
+  VOID                                     *MapData;
+  VOID                                     *MapMeta;
   EFI_EVENT                                CallerEvent;
 } NVME_PASS_THRU_ASYNC_REQ;
 
@@ -714,6 +720,26 @@ NvmExpressBuildDevicePath (
 VOID
 NvmeDumpStatus (
   IN NVME_CQ             *Cq
+  );
+
+/**
+  Register the shutdown notification through the ResetNotification protocol.
+
+  Register the shutdown notification when mNvmeControllerNumber increased from 0 to 1.
+**/
+VOID
+NvmeRegisterShutdownNotification (
+  VOID
+  );
+
+/**
+  Unregister the shutdown notification through the ResetNotification protocol.
+
+  Unregister the shutdown notification when mNvmeControllerNumber decreased from 1 to 0.
+**/
+VOID
+NvmeUnregisterShutdownNotification (
+  VOID
   );
 
 #endif

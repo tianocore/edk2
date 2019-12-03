@@ -2,13 +2,7 @@
 
   Copyright (C) 2016, Linaro Ltd. All rights reserved.<BR>
 
-  This program and the accompanying materials are licensed and made available
-  under the terms and conditions of the BSD License which accompanies this
-  distribution. The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT
-  WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -16,12 +10,17 @@
 
 #include <Protocol/DriverBinding.h>
 
+#define MAX_NON_DISCOVERABLE_PCI_DEVICE_ID   (32 * 256)
+
+STATIC UINTN               mUniqueIdCounter = 0;
+EFI_CPU_ARCH_PROTOCOL      *mCpu;
+
 //
 // We only support the following device types
 //
 STATIC
 CONST EFI_GUID * CONST
-SupportedNonDiscoverableDevices [] = {
+SupportedNonDiscoverableDevices[] = {
   &gEdkiiNonDiscoverableAhciDeviceGuid,
   &gEdkiiNonDiscoverableEhciDeviceGuid,
   &gEdkiiNonDiscoverableNvmeDeviceGuid,
@@ -47,6 +46,19 @@ SupportedNonDiscoverableDevices [] = {
 //   -  6.3 Protocol Handler Services
 //
 
+/**
+  Supported function of Driver Binding protocol for this driver.
+  Test to see if this driver supports ControllerHandle.
+
+  @param This                   Protocol instance pointer.
+  @param DeviceHandle           Handle of device to test.
+  @param RemainingDevicePath    A pointer to the device path.
+                                it should be ignored by device driver.
+
+  @retval EFI_SUCCESS           This driver supports this device.
+  @retval other                 This driver does not support this device.
+
+**/
 STATIC
 EFI_STATUS
 EFIAPI
@@ -69,14 +81,7 @@ NonDiscoverablePciDeviceSupported (
     return Status;
   }
 
-  //
-  // Restricted to DMA coherent for now
-  //
   Status = EFI_UNSUPPORTED;
-  if (Device->DmaType != NonDiscoverableDeviceDmaTypeCoherent) {
-    goto CloseProtocol;
-  }
-
   for (Idx = 0; Idx < ARRAY_SIZE (SupportedNonDiscoverableDevices); Idx++) {
     if (CompareGuid (Device->Type, SupportedNonDiscoverableDevices [Idx])) {
       Status = EFI_SUCCESS;
@@ -108,6 +113,19 @@ CloseProtocol:
   return Status;
 }
 
+/**
+  This routine is called right after the .Supported() called and
+  Start this driver on ControllerHandle.
+
+  @param This                   Protocol instance pointer.
+  @param DeviceHandle           Handle of device to bind driver to.
+  @param RemainingDevicePath    A pointer to the device path.
+                                it should be ignored by device driver.
+
+  @retval EFI_SUCCESS           This driver is added to this device.
+  @retval other                 Some error occurs when binding this driver to this device.
+
+**/
 STATIC
 EFI_STATUS
 EFIAPI
@@ -119,6 +137,11 @@ NonDiscoverablePciDeviceStart (
 {
   NON_DISCOVERABLE_PCI_DEVICE   *Dev;
   EFI_STATUS                    Status;
+
+  ASSERT (mUniqueIdCounter < MAX_NON_DISCOVERABLE_PCI_DEVICE_ID);
+  if (mUniqueIdCounter >= MAX_NON_DISCOVERABLE_PCI_DEVICE_ID) {
+    return EFI_OUT_OF_RESOURCES;
+  }
 
   Dev = AllocateZeroPool (sizeof *Dev);
   if (Dev == NULL) {
@@ -146,6 +169,8 @@ NonDiscoverablePciDeviceStart (
     goto CloseProtocol;
   }
 
+  Dev->UniqueId = mUniqueIdCounter++;
+
   return EFI_SUCCESS;
 
 CloseProtocol:
@@ -158,7 +183,18 @@ FreeDev:
   return Status;
 }
 
+/**
+  Stop this driver on ControllerHandle.
 
+  @param This               Protocol instance pointer.
+  @param DeviceHandle       Handle of device to stop driver on.
+  @param NumberOfChildren   Not used.
+  @param ChildHandleBuffer  Not used.
+
+  @retval EFI_SUCCESS   This driver is removed from this device.
+  @retval other         Some error occurs when removing this driver from this device.
+
+**/
 STATIC
 EFI_STATUS
 EFIAPI
@@ -214,9 +250,16 @@ STATIC EFI_DRIVER_BINDING_PROTOCOL gDriverBinding = {
   NULL
 };
 
-//
-// Entry point of this driver.
-//
+/**
+  Entry point of this driver.
+
+  @param  ImageHandle     Image handle this driver.
+  @param  SystemTable     Pointer to the System Table.
+
+  @retval EFI_SUCCESS     The entry point is executed successfully.
+  @retval other           Some error occurred when executing this entry point.
+
+**/
 EFI_STATUS
 EFIAPI
 NonDiscoverablePciDeviceDxeEntryPoint (
@@ -224,6 +267,11 @@ NonDiscoverablePciDeviceDxeEntryPoint (
   IN EFI_SYSTEM_TABLE *SystemTable
   )
 {
+  EFI_STATUS      Status;
+
+  Status = gBS->LocateProtocol (&gEfiCpuArchProtocolGuid, NULL, (VOID **)&mCpu);
+  ASSERT_EFI_ERROR(Status);
+
   return EfiLibInstallDriverBindingComponentName2 (
            ImageHandle,
            SystemTable,

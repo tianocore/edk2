@@ -4,13 +4,7 @@ Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2011 Hewlett Packard Corporation. All rights reserved.<BR>
 Copyright (c) 2011-2013, ARM Limited. All rights reserved.<BR>
 
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 Module Name:
 
@@ -29,7 +23,7 @@ Abstract:
 //
 #include <PiPei.h>
 //
-// The protocols, PPI and GUID defintions for this module
+// The protocols, PPI and GUID definitions for this module
 //
 #include <Ppi/ArmMpCoreInfo.h>
 
@@ -73,7 +67,7 @@ InitializeCpuPeim (
   ArmEnableBranchPrediction ();
 
   // Publish the CPU memory and io spaces sizes
-  BuildCpuHob (PcdGet8 (PcdPrePiCpuMemorySize), PcdGet8 (PcdPrePiCpuIoSize));
+  BuildCpuHob (ArmGetPhysicalAddressBits (), PcdGet8 (PcdPrePiCpuIoSize));
 
   // Only MP Core platform need to produce gArmMpCoreInfoPpiGuid
   Status = PeiServicesLocatePpi (&gArmMpCoreInfoPpiGuid, 0, NULL, (VOID**)&ArmMpCoreInfoPpi);

@@ -1,0 +1,33 @@
+## @file
+# Base library to support BMP graphics image conversion.
+#
+# Provides services to convert a BMP graphics image to a GOP BLT buffer and
+# from a GOP BLT buffer to a BMP graphics image.
+#
+# Copyright (c) 2017, Microsoft Corporation
+#
+# All rights reserved.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION     = 0x00010017
+  BASE_NAME       = BaseBmpSupportLib
+  MODULE_UNI_FILE = BaseBmpSupportLib.uni
+  FILE_GUID       = CF5F650B-C208-409A-B889-0755172E2B0C
+  VERSION_STRING  = 1.0
+  MODULE_TYPE     = BASE
+  LIBRARY_CLASS   = BmpSupportLib
+
+[LibraryClasses]
+  DebugLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  SafeIntLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[Sources]
+  BmpSupportLib.c

@@ -13,14 +13,8 @@
 
   InitCommunicateBuffer() is really function to check the variable data size.
 
-Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2010 - 2019, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 #include <PiDxe.h>
@@ -44,30 +38,41 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/EventGroup.h>
 #include <Guid/SmmVariableCommon.h>
 
+#include "PrivilegePolymorphic.h"
+#include "VariableParsing.h"
+
 EFI_HANDLE                       mHandle                    = NULL;
 EFI_SMM_VARIABLE_PROTOCOL       *mSmmVariable               = NULL;
 EFI_EVENT                        mVirtualAddressChangeEvent = NULL;
 EFI_SMM_COMMUNICATION_PROTOCOL  *mSmmCommunication          = NULL;
 UINT8                           *mVariableBuffer            = NULL;
 UINT8                           *mVariableBufferPhysical    = NULL;
+VARIABLE_INFO_ENTRY             *mVariableInfo              = NULL;
+VARIABLE_STORE_HEADER           *mVariableRuntimeHobCacheBuffer           = NULL;
+VARIABLE_STORE_HEADER           *mVariableRuntimeNvCacheBuffer            = NULL;
+VARIABLE_STORE_HEADER           *mVariableRuntimeVolatileCacheBuffer      = NULL;
 UINTN                            mVariableBufferSize;
+UINTN                            mVariableRuntimeHobCacheBufferSize;
+UINTN                            mVariableRuntimeNvCacheBufferSize;
+UINTN                            mVariableRuntimeVolatileCacheBufferSize;
 UINTN                            mVariableBufferPayloadSize;
+BOOLEAN                          mVariableRuntimeCachePendingUpdate;
+BOOLEAN                          mVariableRuntimeCacheReadLock;
+BOOLEAN                          mVariableAuthFormat;
+BOOLEAN                          mHobFlushComplete;
 EFI_LOCK                         mVariableServicesLock;
 EDKII_VARIABLE_LOCK_PROTOCOL     mVariableLock;
 EDKII_VAR_CHECK_PROTOCOL         mVarCheck;
 
 /**
-  SecureBoot Hook for SetVariable.
-
-  @param[in] VariableName                 Name of Variable to be found.
-  @param[in] VendorGuid                   Variable vendor GUID.
+  Some Secure Boot Policy Variable may update following other variable changes(SecureBoot follows PK change, etc).
+  Record their initial State when variable write service is ready.
 
 **/
 VOID
 EFIAPI
-SecureBootHook (
-  IN CHAR16                                 *VariableName,
-  IN EFI_GUID                               *VendorGuid
+RecordSecureBootPolicyVarData(
+  VOID
   );
 
 /**
@@ -112,6 +117,72 @@ ReleaseLockOnlyAtBootTime (
   if (!EfiAtRuntime ()) {
     EfiReleaseLock (Lock);
   }
+}
+
+/**
+  Return TRUE if ExitBootServices () has been called.
+
+  @retval TRUE If ExitBootServices () has been called. FALSE if ExitBootServices () has not been called.
+**/
+BOOLEAN
+AtRuntime (
+  VOID
+  )
+{
+  return EfiAtRuntime ();
+}
+
+/**
+  Initialize the variable cache buffer as an empty variable store.
+
+  @param[out]     VariableCacheBuffer     A pointer to pointer of a cache variable store.
+  @param[in,out]  TotalVariableCacheSize  On input, the minimum size needed for the UEFI variable store cache
+                                          buffer that is allocated. On output, the actual size of the buffer allocated.
+                                          If TotalVariableCacheSize is zero, a buffer will not be allocated and the
+                                          function will return with EFI_SUCCESS.
+
+  @retval EFI_SUCCESS             The variable cache was allocated and initialized successfully.
+  @retval EFI_INVALID_PARAMETER   A given pointer is NULL or an invalid variable store size was specified.
+  @retval EFI_OUT_OF_RESOURCES    Insufficient resources are available to allocate the variable store cache buffer.
+
+**/
+EFI_STATUS
+InitVariableCache (
+  OUT    VARIABLE_STORE_HEADER   **VariableCacheBuffer,
+  IN OUT UINTN                   *TotalVariableCacheSize
+  )
+{
+  VARIABLE_STORE_HEADER   *VariableCacheStorePtr;
+
+  if (TotalVariableCacheSize == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+  if (*TotalVariableCacheSize == 0) {
+    return EFI_SUCCESS;
+  }
+  if (VariableCacheBuffer == NULL || *TotalVariableCacheSize < sizeof (VARIABLE_STORE_HEADER)) {
+    return EFI_INVALID_PARAMETER;
+  }
+  *TotalVariableCacheSize = ALIGN_VALUE (*TotalVariableCacheSize, sizeof (UINT32));
+
+  //
+  // Allocate NV Storage Cache and initialize it to all 1's (like an erased FV)
+  //
+  *VariableCacheBuffer =  (VARIABLE_STORE_HEADER *) AllocateRuntimePages (
+                            EFI_SIZE_TO_PAGES (*TotalVariableCacheSize)
+                            );
+  if (*VariableCacheBuffer == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+  VariableCacheStorePtr = *VariableCacheBuffer;
+  SetMem32 ((VOID *) VariableCacheStorePtr, *TotalVariableCacheSize, (UINT32) 0xFFFFFFFF);
+
+  ZeroMem ((VOID *) VariableCacheStorePtr, sizeof (VARIABLE_STORE_HEADER));
+  VariableCacheStorePtr->Size    = (UINT32) *TotalVariableCacheSize;
+  VariableCacheStorePtr->Format  = VARIABLE_STORE_FORMATTED;
+  VariableCacheStorePtr->State   = VARIABLE_STORE_HEALTHY;
+
+  return EFI_SUCCESS;
 }
 
 /**
@@ -432,7 +503,56 @@ Done:
 }
 
 /**
-  This code finds variable in storage blocks (Volatile or Non-Volatile).
+  Signals SMM to synchronize any pending variable updates with the runtime cache(s).
+
+**/
+VOID
+SyncRuntimeCache (
+  VOID
+  )
+{
+  //
+  // Init the communicate buffer. The buffer data size is:
+  // SMM_COMMUNICATE_HEADER_SIZE + SMM_VARIABLE_COMMUNICATE_HEADER_SIZE.
+  //
+  InitCommunicateBuffer (NULL, 0, SMM_VARIABLE_FUNCTION_SYNC_RUNTIME_CACHE);
+
+  //
+  // Send data to SMM.
+  //
+  SendCommunicateBuffer (0);
+}
+
+/**
+  Check whether a SMI must be triggered to retrieve pending cache updates.
+
+  If the variable HOB was finished being flushed since the last check for a runtime cache update, this function
+  will prevent the HOB cache from being used for future runtime cache hits.
+
+**/
+VOID
+CheckForRuntimeCacheSync (
+  VOID
+  )
+{
+  if (mVariableRuntimeCachePendingUpdate) {
+    SyncRuntimeCache ();
+  }
+  ASSERT (!mVariableRuntimeCachePendingUpdate);
+
+  //
+  // The HOB variable data may have finished being flushed in the runtime cache sync update
+  //
+  if (mHobFlushComplete && mVariableRuntimeHobCacheBuffer != NULL) {
+    if (!EfiAtRuntime ()) {
+      FreePages (mVariableRuntimeHobCacheBuffer, EFI_SIZE_TO_PAGES (mVariableRuntimeHobCacheBufferSize));
+    }
+    mVariableRuntimeHobCacheBuffer = NULL;
+  }
+}
+
+/**
+  Finds the given variable in a runtime cache variable store.
 
   Caution: This function may receive untrusted input.
   The data size is external input, so this function will validate it carefully to avoid buffer overflow.
@@ -444,20 +564,133 @@ Done:
                                      data, this value contains the required size.
   @param[out]     Data               Data pointer.
 
+  @retval EFI_SUCCESS                Found the specified variable.
   @retval EFI_INVALID_PARAMETER      Invalid parameter.
-  @retval EFI_SUCCESS                Find the specified variable.
-  @retval EFI_NOT_FOUND              Not found.
-  @retval EFI_BUFFER_TO_SMALL        DataSize is too small for the result.
+  @retval EFI_NOT_FOUND              The specified variable could not be found.
 
 **/
 EFI_STATUS
-EFIAPI
-RuntimeServiceGetVariable (
+FindVariableInRuntimeCache (
   IN      CHAR16                            *VariableName,
   IN      EFI_GUID                          *VendorGuid,
   OUT     UINT32                            *Attributes OPTIONAL,
   IN OUT  UINTN                             *DataSize,
-  OUT     VOID                              *Data
+  OUT     VOID                              *Data OPTIONAL
+  )
+{
+  EFI_STATUS              Status;
+  UINTN                   TempDataSize;
+  VARIABLE_POINTER_TRACK  RtPtrTrack;
+  VARIABLE_STORE_TYPE     StoreType;
+  VARIABLE_STORE_HEADER   *VariableStoreList[VariableStoreTypeMax];
+
+  Status = EFI_NOT_FOUND;
+
+  if (VariableName == NULL || VendorGuid == NULL || DataSize == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  ZeroMem (&RtPtrTrack, sizeof (RtPtrTrack));
+
+  //
+  // The UEFI specification restricts Runtime Services callers from invoking the same or certain other Runtime Service
+  // functions prior to completion and return from a previous Runtime Service call. These restrictions prevent
+  // a GetVariable () or GetNextVariable () call from being issued until a prior call has returned. The runtime
+  // cache read lock should always be free when entering this function.
+  //
+  ASSERT (!mVariableRuntimeCacheReadLock);
+
+  mVariableRuntimeCacheReadLock = TRUE;
+  CheckForRuntimeCacheSync ();
+
+  if (!mVariableRuntimeCachePendingUpdate) {
+    //
+    // 0: Volatile, 1: HOB, 2: Non-Volatile.
+    // The index and attributes mapping must be kept in this order as FindVariable
+    // makes use of this mapping to implement search algorithm.
+    //
+    VariableStoreList[VariableStoreTypeVolatile] = mVariableRuntimeVolatileCacheBuffer;
+    VariableStoreList[VariableStoreTypeHob]      = mVariableRuntimeHobCacheBuffer;
+    VariableStoreList[VariableStoreTypeNv]       = mVariableRuntimeNvCacheBuffer;
+
+    for (StoreType = (VARIABLE_STORE_TYPE) 0; StoreType < VariableStoreTypeMax; StoreType++) {
+      if (VariableStoreList[StoreType] == NULL) {
+        continue;
+      }
+
+      RtPtrTrack.StartPtr = GetStartPointer (VariableStoreList[StoreType]);
+      RtPtrTrack.EndPtr   = GetEndPointer   (VariableStoreList[StoreType]);
+      RtPtrTrack.Volatile = (BOOLEAN) (StoreType == VariableStoreTypeVolatile);
+
+      Status = FindVariableEx (VariableName, VendorGuid, FALSE, &RtPtrTrack, mVariableAuthFormat);
+      if (!EFI_ERROR (Status)) {
+        break;
+      }
+    }
+
+    if (!EFI_ERROR (Status)) {
+      //
+      // Get data size
+      //
+      TempDataSize = DataSizeOfVariable (RtPtrTrack.CurrPtr, mVariableAuthFormat);
+      ASSERT (TempDataSize != 0);
+
+      if (*DataSize >= TempDataSize) {
+        if (Data == NULL) {
+          Status = EFI_INVALID_PARAMETER;
+          goto Done;
+        }
+
+        CopyMem (Data, GetVariableDataPtr (RtPtrTrack.CurrPtr, mVariableAuthFormat), TempDataSize);
+        if (Attributes != NULL) {
+          *Attributes = RtPtrTrack.CurrPtr->Attributes;
+        }
+
+        *DataSize = TempDataSize;
+
+        UpdateVariableInfo (VariableName, VendorGuid, RtPtrTrack.Volatile, TRUE, FALSE, FALSE, TRUE, &mVariableInfo);
+
+        Status = EFI_SUCCESS;
+        goto Done;
+      } else {
+        *DataSize = TempDataSize;
+        Status = EFI_BUFFER_TOO_SMALL;
+        goto Done;
+      }
+    }
+  }
+
+Done:
+  mVariableRuntimeCacheReadLock = FALSE;
+
+  return Status;
+}
+
+/**
+  Finds the given variable in a variable store in SMM.
+
+  Caution: This function may receive untrusted input.
+  The data size is external input, so this function will validate it carefully to avoid buffer overflow.
+
+  @param[in]      VariableName       Name of Variable to be found.
+  @param[in]      VendorGuid         Variable vendor GUID.
+  @param[out]     Attributes         Attribute value of the variable found.
+  @param[in, out] DataSize           Size of Data found. If size is less than the
+                                     data, this value contains the required size.
+  @param[out]     Data               Data pointer.
+
+  @retval EFI_SUCCESS                Found the specified variable.
+  @retval EFI_INVALID_PARAMETER      Invalid parameter.
+  @retval EFI_NOT_FOUND              The specified variable could not be found.
+
+**/
+EFI_STATUS
+FindVariableInSmm (
+  IN      CHAR16                            *VariableName,
+  IN      EFI_GUID                          *VendorGuid,
+  OUT     UINT32                            *Attributes OPTIONAL,
+  IN OUT  UINTN                             *DataSize,
+  OUT     VOID                              *Data OPTIONAL
   )
 {
   EFI_STATUS                                Status;
@@ -481,8 +714,6 @@ RuntimeServiceGetVariable (
     return EFI_INVALID_PARAMETER;
   }
 
-  AcquireLockOnlyAtBootTime(&mVariableServicesLock);
-
   //
   // Init the communicate buffer. The buffer data size is:
   // SMM_COMMUNICATE_HEADER_SIZE + SMM_VARIABLE_COMMUNICATE_HEADER_SIZE + PayloadSize.
@@ -495,7 +726,7 @@ RuntimeServiceGetVariable (
   }
   PayloadSize = OFFSET_OF (SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE, Name) + VariableNameSize + TempDataSize;
 
-  Status = InitCommunicateBuffer ((VOID **)&SmmVariableHeader, PayloadSize, SMM_VARIABLE_FUNCTION_GET_VARIABLE);
+  Status = InitCommunicateBuffer ((VOID **) &SmmVariableHeader, PayloadSize, SMM_VARIABLE_FUNCTION_GET_VARIABLE);
   if (EFI_ERROR (Status)) {
     goto Done;
   }
@@ -541,13 +772,60 @@ RuntimeServiceGetVariable (
   }
 
 Done:
-  ReleaseLockOnlyAtBootTime (&mVariableServicesLock);
   return Status;
 }
 
+/**
+  This code finds variable in storage blocks (Volatile or Non-Volatile).
+
+  Caution: This function may receive untrusted input.
+  The data size is external input, so this function will validate it carefully to avoid buffer overflow.
+
+  @param[in]      VariableName       Name of Variable to be found.
+  @param[in]      VendorGuid         Variable vendor GUID.
+  @param[out]     Attributes         Attribute value of the variable found.
+  @param[in, out] DataSize           Size of Data found. If size is less than the
+                                     data, this value contains the required size.
+  @param[out]     Data               Data pointer.
+
+  @retval EFI_INVALID_PARAMETER      Invalid parameter.
+  @retval EFI_SUCCESS                Find the specified variable.
+  @retval EFI_NOT_FOUND              Not found.
+  @retval EFI_BUFFER_TO_SMALL        DataSize is too small for the result.
+
+**/
+EFI_STATUS
+EFIAPI
+RuntimeServiceGetVariable (
+  IN      CHAR16                            *VariableName,
+  IN      EFI_GUID                          *VendorGuid,
+  OUT     UINT32                            *Attributes OPTIONAL,
+  IN OUT  UINTN                             *DataSize,
+  OUT     VOID                              *Data
+  )
+{
+  EFI_STATUS                                Status;
+
+  if (VariableName == NULL || VendorGuid == NULL || DataSize == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+  if (VariableName[0] == 0) {
+    return EFI_NOT_FOUND;
+  }
+
+  AcquireLockOnlyAtBootTime (&mVariableServicesLock);
+  if (FeaturePcdGet (PcdEnableVariableRuntimeCache)) {
+    Status = FindVariableInRuntimeCache (VariableName, VendorGuid, Attributes, DataSize, Data);
+  } else {
+    Status = FindVariableInSmm (VariableName, VendorGuid, Attributes, DataSize, Data);
+  }
+  ReleaseLockOnlyAtBootTime (&mVariableServicesLock);
+
+  return Status;
+}
 
 /**
-  This code Finds the Next available variable.
+  Finds the next available variable in a runtime cache variable store.
 
   @param[in, out] VariableNameSize   Size of the variable name.
   @param[in, out] VariableName       Pointer to variable name.
@@ -560,8 +838,81 @@ Done:
 
 **/
 EFI_STATUS
-EFIAPI
-RuntimeServiceGetNextVariableName (
+GetNextVariableNameInRuntimeCache (
+  IN OUT  UINTN                             *VariableNameSize,
+  IN OUT  CHAR16                            *VariableName,
+  IN OUT  EFI_GUID                          *VendorGuid
+  )
+{
+  EFI_STATUS              Status;
+  UINTN                   VarNameSize;
+  VARIABLE_HEADER         *VariablePtr;
+  VARIABLE_STORE_HEADER   *VariableStoreHeader[VariableStoreTypeMax];
+
+  Status = EFI_NOT_FOUND;
+
+  //
+  // The UEFI specification restricts Runtime Services callers from invoking the same or certain other Runtime Service
+  // functions prior to completion and return from a previous Runtime Service call. These restrictions prevent
+  // a GetVariable () or GetNextVariable () call from being issued until a prior call has returned. The runtime
+  // cache read lock should always be free when entering this function.
+  //
+  ASSERT (!mVariableRuntimeCacheReadLock);
+
+  CheckForRuntimeCacheSync ();
+
+  mVariableRuntimeCacheReadLock = TRUE;
+  if (!mVariableRuntimeCachePendingUpdate) {
+    //
+    // 0: Volatile, 1: HOB, 2: Non-Volatile.
+    // The index and attributes mapping must be kept in this order as FindVariable
+    // makes use of this mapping to implement search algorithm.
+    //
+    VariableStoreHeader[VariableStoreTypeVolatile] = mVariableRuntimeVolatileCacheBuffer;
+    VariableStoreHeader[VariableStoreTypeHob]      = mVariableRuntimeHobCacheBuffer;
+    VariableStoreHeader[VariableStoreTypeNv]       = mVariableRuntimeNvCacheBuffer;
+
+    Status =  VariableServiceGetNextVariableInternal (
+                VariableName,
+                VendorGuid,
+                VariableStoreHeader,
+                &VariablePtr,
+                mVariableAuthFormat
+                );
+    if (!EFI_ERROR (Status)) {
+      VarNameSize = NameSizeOfVariable (VariablePtr, mVariableAuthFormat);
+      ASSERT (VarNameSize != 0);
+      if (VarNameSize <= *VariableNameSize) {
+        CopyMem (VariableName, GetVariableNamePtr (VariablePtr, mVariableAuthFormat), VarNameSize);
+        CopyMem (VendorGuid, GetVendorGuidPtr (VariablePtr, mVariableAuthFormat), sizeof (EFI_GUID));
+        Status = EFI_SUCCESS;
+      } else {
+        Status = EFI_BUFFER_TOO_SMALL;
+      }
+
+      *VariableNameSize = VarNameSize;
+    }
+  }
+  mVariableRuntimeCacheReadLock = FALSE;
+
+  return Status;
+}
+
+/**
+  Finds the next available variable in a SMM variable store.
+
+  @param[in, out] VariableNameSize   Size of the variable name.
+  @param[in, out] VariableName       Pointer to variable name.
+  @param[in, out] VendorGuid         Variable Vendor Guid.
+
+  @retval EFI_INVALID_PARAMETER      Invalid parameter.
+  @retval EFI_SUCCESS                Find the specified variable.
+  @retval EFI_NOT_FOUND              Not found.
+  @retval EFI_BUFFER_TO_SMALL        DataSize is too small for the result.
+
+**/
+EFI_STATUS
+GetNextVariableNameInSmm (
   IN OUT  UINTN                             *VariableNameSize,
   IN OUT  CHAR16                            *VariableName,
   IN OUT  EFI_GUID                          *VendorGuid
@@ -573,10 +924,6 @@ RuntimeServiceGetNextVariableName (
   UINTN                                           OutVariableNameSize;
   UINTN                                           InVariableNameSize;
 
-  if (VariableNameSize == NULL || VariableName == NULL || VendorGuid == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
   OutVariableNameSize   = *VariableNameSize;
   InVariableNameSize    = StrSize (VariableName);
   SmmGetNextVariableName = NULL;
@@ -587,8 +934,6 @@ RuntimeServiceGetNextVariableName (
   if (InVariableNameSize > mVariableBufferPayloadSize - OFFSET_OF (SMM_VARIABLE_COMMUNICATE_GET_NEXT_VARIABLE_NAME, Name)) {
     return EFI_INVALID_PARAMETER;
   }
-
-  AcquireLockOnlyAtBootTime(&mVariableServicesLock);
 
   //
   // Init the communicate buffer. The buffer data size is:
@@ -648,7 +993,59 @@ RuntimeServiceGetNextVariableName (
   CopyMem (VariableName, SmmGetNextVariableName->Name, SmmGetNextVariableName->NameSize);
 
 Done:
+  return Status;
+}
+
+/**
+  This code Finds the Next available variable.
+
+  @param[in, out] VariableNameSize   Size of the variable name.
+  @param[in, out] VariableName       Pointer to variable name.
+  @param[in, out] VendorGuid         Variable Vendor Guid.
+
+  @retval EFI_INVALID_PARAMETER      Invalid parameter.
+  @retval EFI_SUCCESS                Find the specified variable.
+  @retval EFI_NOT_FOUND              Not found.
+  @retval EFI_BUFFER_TO_SMALL        DataSize is too small for the result.
+
+**/
+EFI_STATUS
+EFIAPI
+RuntimeServiceGetNextVariableName (
+  IN OUT  UINTN                             *VariableNameSize,
+  IN OUT  CHAR16                            *VariableName,
+  IN OUT  EFI_GUID                          *VendorGuid
+  )
+{
+  EFI_STATUS              Status;
+  UINTN                   MaxLen;
+
+  Status = EFI_NOT_FOUND;
+
+  if (VariableNameSize == NULL || VariableName == NULL || VendorGuid == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Calculate the possible maximum length of name string, including the Null terminator.
+  //
+  MaxLen = *VariableNameSize / sizeof (CHAR16);
+  if ((MaxLen == 0) || (StrnLenS (VariableName, MaxLen) == MaxLen)) {
+    //
+    // Null-terminator is not found in the first VariableNameSize bytes of the input VariableName buffer,
+    // follow spec to return EFI_INVALID_PARAMETER.
+    //
+    return EFI_INVALID_PARAMETER;
+  }
+
+  AcquireLockOnlyAtBootTime (&mVariableServicesLock);
+  if (FeaturePcdGet (PcdEnableVariableRuntimeCache)) {
+    Status = GetNextVariableNameInRuntimeCache (VariableNameSize, VariableName, VendorGuid);
+  } else {
+    Status = GetNextVariableNameInSmm (VariableNameSize, VariableName, VendorGuid);
+  }
   ReleaseLockOnlyAtBootTime (&mVariableServicesLock);
+
   return Status;
 }
 
@@ -877,6 +1274,17 @@ OnReadyToBoot (
   //
   SendCommunicateBuffer (0);
 
+  //
+  // Install the system configuration table for variable info data captured
+  //
+  if (FeaturePcdGet (PcdEnableVariableRuntimeCache) && FeaturePcdGet (PcdVariableCollectStatistics)) {
+    if (mVariableAuthFormat) {
+      gBS->InstallConfigurationTable (&gEfiAuthenticatedVariableGuid, mVariableInfo);
+    } else {
+      gBS->InstallConfigurationTable (&gEfiVariableGuid, mVariableInfo);
+    }
+  }
+
   gBS->CloseEvent (Event);
 }
 
@@ -900,6 +1308,9 @@ VariableAddressChangeEvent (
 {
   EfiConvertPointer (0x0, (VOID **) &mVariableBuffer);
   EfiConvertPointer (0x0, (VOID **) &mSmmCommunication);
+  EfiConvertPointer (EFI_OPTIONAL_PTR, (VOID **) &mVariableRuntimeHobCacheBuffer);
+  EfiConvertPointer (EFI_OPTIONAL_PTR, (VOID **) &mVariableRuntimeNvCacheBuffer);
+  EfiConvertPointer (EFI_OPTIONAL_PTR, (VOID **) &mVariableRuntimeVolatileCacheBuffer);
 }
 
 /**
@@ -977,6 +1388,159 @@ Done:
 }
 
 /**
+  This code gets information needed from SMM for runtime cache initialization.
+
+  @param[out] TotalHobStorageSize         Output pointer for the total HOB storage size in bytes.
+  @param[out] TotalNvStorageSize          Output pointer for the total non-volatile storage size in bytes.
+  @param[out] TotalVolatileStorageSize    Output pointer for the total volatile storage size in bytes.
+  @param[out] AuthenticatedVariableUsage  Output pointer that indicates if authenticated variables are to be used.
+
+  @retval EFI_SUCCESS                     Retrieved the size successfully.
+  @retval EFI_INVALID_PARAMETER           TotalNvStorageSize parameter is NULL.
+  @retval EFI_OUT_OF_RESOURCES            The memory resources needed for a CommBuffer are not available.
+  @retval Others                          Could not retrieve the size successfully.
+
+**/
+EFI_STATUS
+GetRuntimeCacheInfo (
+  OUT UINTN                         *TotalHobStorageSize,
+  OUT UINTN                         *TotalNvStorageSize,
+  OUT UINTN                         *TotalVolatileStorageSize,
+  OUT BOOLEAN                       *AuthenticatedVariableUsage
+  )
+{
+  EFI_STATUS                                          Status;
+  SMM_VARIABLE_COMMUNICATE_GET_RUNTIME_CACHE_INFO     *SmmGetRuntimeCacheInfo;
+  EFI_SMM_COMMUNICATE_HEADER                          *SmmCommunicateHeader;
+  SMM_VARIABLE_COMMUNICATE_HEADER                     *SmmVariableFunctionHeader;
+  UINTN                                               CommSize;
+  UINT8                                               *CommBuffer;
+
+  SmmGetRuntimeCacheInfo = NULL;
+  CommBuffer = mVariableBuffer;
+
+  if (TotalHobStorageSize == NULL || TotalNvStorageSize == NULL || TotalVolatileStorageSize == NULL || AuthenticatedVariableUsage == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (CommBuffer == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  AcquireLockOnlyAtBootTime (&mVariableServicesLock);
+
+  CommSize = SMM_COMMUNICATE_HEADER_SIZE + SMM_VARIABLE_COMMUNICATE_HEADER_SIZE + sizeof (SMM_VARIABLE_COMMUNICATE_GET_RUNTIME_CACHE_INFO);
+  ZeroMem (CommBuffer, CommSize);
+
+  SmmCommunicateHeader = (EFI_SMM_COMMUNICATE_HEADER *) CommBuffer;
+  CopyGuid (&SmmCommunicateHeader->HeaderGuid, &gEfiSmmVariableProtocolGuid);
+  SmmCommunicateHeader->MessageLength = SMM_VARIABLE_COMMUNICATE_HEADER_SIZE + sizeof (SMM_VARIABLE_COMMUNICATE_GET_RUNTIME_CACHE_INFO);
+
+  SmmVariableFunctionHeader = (SMM_VARIABLE_COMMUNICATE_HEADER *) SmmCommunicateHeader->Data;
+  SmmVariableFunctionHeader->Function = SMM_VARIABLE_FUNCTION_GET_RUNTIME_CACHE_INFO;
+  SmmGetRuntimeCacheInfo = (SMM_VARIABLE_COMMUNICATE_GET_RUNTIME_CACHE_INFO *) SmmVariableFunctionHeader->Data;
+
+  //
+  // Send data to SMM.
+  //
+  Status = mSmmCommunication->Communicate (mSmmCommunication, CommBuffer, &CommSize);
+  ASSERT_EFI_ERROR (Status);
+  if (CommSize <= SMM_VARIABLE_COMMUNICATE_HEADER_SIZE) {
+    Status = EFI_BAD_BUFFER_SIZE;
+    goto Done;
+  }
+
+  Status = SmmVariableFunctionHeader->ReturnStatus;
+  if (EFI_ERROR (Status)) {
+    goto Done;
+  }
+
+  //
+  // Get data from SMM.
+  //
+  *TotalHobStorageSize = SmmGetRuntimeCacheInfo->TotalHobStorageSize;
+  *TotalNvStorageSize = SmmGetRuntimeCacheInfo->TotalNvStorageSize;
+  *TotalVolatileStorageSize = SmmGetRuntimeCacheInfo->TotalVolatileStorageSize;
+  *AuthenticatedVariableUsage = SmmGetRuntimeCacheInfo->AuthenticatedVariableUsage;
+
+Done:
+  ReleaseLockOnlyAtBootTime (&mVariableServicesLock);
+  return Status;
+}
+
+/**
+  Sends the runtime variable cache context information to SMM.
+
+  @retval EFI_SUCCESS               Retrieved the size successfully.
+  @retval EFI_INVALID_PARAMETER     TotalNvStorageSize parameter is NULL.
+  @retval EFI_OUT_OF_RESOURCES      The memory resources needed for a CommBuffer are not available.
+  @retval Others                    Could not retrieve the size successfully.;
+
+**/
+EFI_STATUS
+SendRuntimeVariableCacheContextToSmm (
+  VOID
+  )
+{
+  EFI_STATUS                                                Status;
+  SMM_VARIABLE_COMMUNICATE_RUNTIME_VARIABLE_CACHE_CONTEXT   *SmmRuntimeVarCacheContext;
+  EFI_SMM_COMMUNICATE_HEADER                                *SmmCommunicateHeader;
+  SMM_VARIABLE_COMMUNICATE_HEADER                           *SmmVariableFunctionHeader;
+  UINTN                                                     CommSize;
+  UINT8                                                     *CommBuffer;
+
+  SmmRuntimeVarCacheContext = NULL;
+  CommBuffer = mVariableBuffer;
+
+  if (CommBuffer == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  AcquireLockOnlyAtBootTime (&mVariableServicesLock);
+
+  //
+  // Init the communicate buffer. The buffer data size is:
+  // SMM_COMMUNICATE_HEADER_SIZE + SMM_VARIABLE_COMMUNICATE_HEADER_SIZE + sizeof (SMM_VARIABLE_COMMUNICATE_RUNTIME_VARIABLE_CACHE_CONTEXT);
+  //
+  CommSize = SMM_COMMUNICATE_HEADER_SIZE + SMM_VARIABLE_COMMUNICATE_HEADER_SIZE + sizeof (SMM_VARIABLE_COMMUNICATE_RUNTIME_VARIABLE_CACHE_CONTEXT);
+  ZeroMem (CommBuffer, CommSize);
+
+  SmmCommunicateHeader = (EFI_SMM_COMMUNICATE_HEADER *) CommBuffer;
+  CopyGuid (&SmmCommunicateHeader->HeaderGuid, &gEfiSmmVariableProtocolGuid);
+  SmmCommunicateHeader->MessageLength = SMM_VARIABLE_COMMUNICATE_HEADER_SIZE + sizeof (SMM_VARIABLE_COMMUNICATE_RUNTIME_VARIABLE_CACHE_CONTEXT);
+
+  SmmVariableFunctionHeader = (SMM_VARIABLE_COMMUNICATE_HEADER *) SmmCommunicateHeader->Data;
+  SmmVariableFunctionHeader->Function = SMM_VARIABLE_FUNCTION_INIT_RUNTIME_VARIABLE_CACHE_CONTEXT;
+  SmmRuntimeVarCacheContext = (SMM_VARIABLE_COMMUNICATE_RUNTIME_VARIABLE_CACHE_CONTEXT *) SmmVariableFunctionHeader->Data;
+
+  SmmRuntimeVarCacheContext->RuntimeHobCache = mVariableRuntimeHobCacheBuffer;
+  SmmRuntimeVarCacheContext->RuntimeVolatileCache = mVariableRuntimeVolatileCacheBuffer;
+  SmmRuntimeVarCacheContext->RuntimeNvCache = mVariableRuntimeNvCacheBuffer;
+  SmmRuntimeVarCacheContext->PendingUpdate = &mVariableRuntimeCachePendingUpdate;
+  SmmRuntimeVarCacheContext->ReadLock = &mVariableRuntimeCacheReadLock;
+  SmmRuntimeVarCacheContext->HobFlushComplete = &mHobFlushComplete;
+
+  //
+  // Send data to SMM.
+  //
+  Status = mSmmCommunication->Communicate (mSmmCommunication, CommBuffer, &CommSize);
+  ASSERT_EFI_ERROR (Status);
+  if (CommSize <= SMM_VARIABLE_COMMUNICATE_HEADER_SIZE) {
+    Status = EFI_BAD_BUFFER_SIZE;
+    goto Done;
+  }
+
+  Status = SmmVariableFunctionHeader->ReturnStatus;
+  if (EFI_ERROR (Status)) {
+    goto Done;
+  }
+
+Done:
+  ReleaseLockOnlyAtBootTime (&mVariableServicesLock);
+  return Status;
+}
+
+/**
   Initialize variable service and install Variable Architectural protocol.
 
   @param[in] Event    Event whose notification function is being invoked.
@@ -992,7 +1556,7 @@ SmmVariableReady (
 {
   EFI_STATUS                                Status;
 
-  Status = gBS->LocateProtocol (&gEfiSmmVariableProtocolGuid, NULL, (VOID **)&mSmmVariable);
+  Status = gBS->LocateProtocol (&gEfiSmmVariableProtocolGuid, NULL, (VOID **) &mSmmVariable);
   if (EFI_ERROR (Status)) {
     return;
   }
@@ -1013,6 +1577,42 @@ SmmVariableReady (
   // Save the buffer physical address used for SMM conmunication.
   //
   mVariableBufferPhysical = mVariableBuffer;
+
+  if (FeaturePcdGet (PcdEnableVariableRuntimeCache)) {
+    DEBUG ((DEBUG_INFO, "Variable driver runtime cache is enabled.\n"));
+    //
+    // Allocate runtime variable cache memory buffers.
+    //
+    Status =  GetRuntimeCacheInfo (
+                &mVariableRuntimeHobCacheBufferSize,
+                &mVariableRuntimeNvCacheBufferSize,
+                &mVariableRuntimeVolatileCacheBufferSize,
+                &mVariableAuthFormat
+                );
+    if (!EFI_ERROR (Status)) {
+      Status = InitVariableCache (&mVariableRuntimeHobCacheBuffer, &mVariableRuntimeHobCacheBufferSize);
+      if (!EFI_ERROR (Status)) {
+        Status = InitVariableCache (&mVariableRuntimeNvCacheBuffer, &mVariableRuntimeNvCacheBufferSize);
+        if (!EFI_ERROR (Status)) {
+          Status = InitVariableCache (&mVariableRuntimeVolatileCacheBuffer, &mVariableRuntimeVolatileCacheBufferSize);
+          if (!EFI_ERROR (Status)) {
+            Status = SendRuntimeVariableCacheContextToSmm ();
+            if (!EFI_ERROR (Status)) {
+              SyncRuntimeCache ();
+            }
+          }
+        }
+      }
+      if (EFI_ERROR (Status)) {
+        mVariableRuntimeHobCacheBuffer = NULL;
+        mVariableRuntimeNvCacheBuffer = NULL;
+        mVariableRuntimeVolatileCacheBuffer = NULL;
+      }
+    }
+    ASSERT_EFI_ERROR (Status);
+  } else {
+    DEBUG ((DEBUG_INFO, "Variable driver runtime cache is disabled.\n"));
+  }
 
   gRT->GetVariable         = RuntimeServiceGetVariable;
   gRT->GetNextVariableName = RuntimeServiceGetNextVariableName;
@@ -1078,6 +1678,12 @@ SmmVariableWriteReady (
   if (EFI_ERROR (Status)) {
     return;
   }
+
+  //
+  // Some Secure Boot Policy Var (SecureBoot, etc) updates following other
+  // Secure Boot Policy Variable change.  Record their initial value.
+  //
+  RecordSecureBootPolicyVarData();
 
   Status = gBS->InstallProtocolInterface (
                   &mHandle,

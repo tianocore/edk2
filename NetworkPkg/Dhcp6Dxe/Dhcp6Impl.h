@@ -1,15 +1,9 @@
 /** @file
   Dhcp6 internal data structure and definition declaration.
 
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -37,6 +31,7 @@
 #include <Library/BaseLib.h>
 #include <Library/NetLib.h>
 #include <Library/PrintLib.h>
+#include <Guid/ZeroGuid.h>
 
 
 typedef struct _DHCP6_IA_CB    DHCP6_IA_CB;
@@ -61,11 +56,12 @@ typedef struct _DHCP6_INSTANCE DHCP6_INSTANCE;
 #define DHCP6_PORT_CLIENT         546
 #define DHCP6_PORT_SERVER         547
 
+#define DHCP_CHECK_MEDIA_WAITING_TIME    EFI_TIMER_PERIOD_SECONDS(20)
+
 #define DHCP6_INSTANCE_FROM_THIS(Instance) CR ((Instance), DHCP6_INSTANCE, Dhcp6, DHCP6_INSTANCE_SIGNATURE)
 #define DHCP6_SERVICE_FROM_THIS(Service)   CR ((Service), DHCP6_SERVICE, ServiceBinding, DHCP6_SERVICE_SIGNATURE)
 
 extern EFI_IPv6_ADDRESS           mAllDhcpRelayAndServersAddress;
-extern EFI_IPv6_ADDRESS           mAllDhcpServersAddress;
 extern EFI_DHCP6_PROTOCOL         gDhcp6ProtocolTemplate;
 
 //
@@ -129,7 +125,7 @@ struct _DHCP6_INSTANCE {
   BOOLEAN                       MediaPresent;
   //
   // StartTime is used to calculate the 'elapsed-time' option. Refer to RFC3315,
-  // the elapsed-time is amount of time since the client began its current DHCP transaction. 
+  // the elapsed-time is amount of time since the client began its current DHCP transaction.
   //
   UINT64                        StartTime;
 };

@@ -1,0 +1,14 @@
+// /** @file
+// The SioBusDxe driver is used to create child devices on the ISA bus and
+// installs the Super I/O protocols on them.
+//
+// Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT       #language en-US "Manage ISA devices on the ISA bus"
+
+#string STR_MODULE_DESCRIPTION    #language en-US "The SioBusDxe driver is used to create child devices on the ISA bus and installs the Super I/O protocols on them."

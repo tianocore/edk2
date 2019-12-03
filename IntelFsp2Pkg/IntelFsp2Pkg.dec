@@ -1,14 +1,8 @@
 ## @file
 # Provides driver and definitions to build fsp in EDKII bios.
 #
-# Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
-# This program and the accompanying materials are licensed and made available under
-# the terms and conditions of the BSD License that accompanies this distribution.
-# The full text of the license may be found at
-# http://opensource.org/licenses/bsd-license.php.
-#
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# Copyright (c) 2014 - 2019, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
 
@@ -20,7 +14,7 @@
 
 [Includes]
   Include
-  
+
 [LibraryClasses]
   ##  @libraryclass  Provides cache-as-ram support.
   CacheAsRamLib|Include/Library/CacheAsRamLib.h
@@ -39,9 +33,31 @@
 
   ##  @libraryclass  Provides FSP switch stack function.
   FspSwitchStackLib|Include/Library/FspSwitchStackLib.h
-  
+
   ##  @libraryclass  Provides FSP platform sec related actions.
   FspSecPlatformLib|Include/Library/FspSecPlatformLib.h
+
+[Ppis]
+  #
+  # PPI to indicate FSP is ready to enter notify phase
+  # This provides flexibility for any late initialization that must be done right before entering notify phase.
+  #
+  gFspReadyForNotifyPhasePpiGuid        = { 0xcd167c1e, 0x6e0b, 0x42b3, {0x82, 0xf6, 0xe3, 0xe9, 0x06, 0x19, 0x98, 0x10}}
+
+  #
+  # PPI as dependency on some modules which only required for API mode
+  #
+  gFspInApiModePpiGuid                  = { 0xa1eeab87, 0xc859, 0x479d, {0x89, 0xb5, 0x14, 0x61, 0xf4, 0x06, 0x1a, 0x3e}}
+
+  #
+  # PPI for Architectural configuration data for FSP-M
+  #
+  gFspmArchConfigPpiGuid                = { 0x824d5a3a, 0xaf92, 0x4c0c, {0x9f, 0x19, 0x19, 0x52, 0x6d, 0xca, 0x4a, 0xbb}}
+
+  #
+  # PPI to tear down the temporary memory set up by TempRamInit ().
+  #
+  gFspTempRamExitPpiGuid                = { 0xbc1cfbdb, 0x7e50, 0x42be, {0xb4, 0x87, 0x22, 0xe0, 0xa9, 0x0c, 0xb0, 0x52}}
 
 [Guids]
   #
@@ -71,10 +87,18 @@
   gIntelFsp2PkgTokenSpaceGuid.PcdFspBootFirmwareVolumeBase|0xFFF80000|UINT32|0x10000003
   gIntelFsp2PkgTokenSpaceGuid.PcdFspHeaderSpecVersion     |      0x20| UINT8|0x00000002
 
+  #
   # x % of FSP temporary memory will be used for heap
   # (100 - x) % of FSP temporary memory will be used for stack
+  # 0 means FSP will share the stack with boot loader and FSP temporary memory is heap
+  #   Note: This mode assumes boot loader stack is large enough for FSP to use.
+  #
   gIntelFsp2PkgTokenSpaceGuid.PcdFspHeapSizePercentage    |        50| UINT8|0x10000004
-  
+  #
+  # Maximal Interrupt supported in IDT table.
+  #
+  gIntelFsp2PkgTokenSpaceGuid.PcdFspMaxInterruptSupported |        34| UINT8|0x10000005
+
 [PcdsFixedAtBuild,PcdsDynamic,PcdsDynamicEx]
   gIntelFsp2PkgTokenSpaceGuid.PcdFspReservedMemoryLength |0x00100000|UINT32|0x46530000
   gIntelFsp2PkgTokenSpaceGuid.PcdBootLoaderEntry         |0xFFFFFFE4|UINT32|0x46530100

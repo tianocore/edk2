@@ -3,13 +3,7 @@
 #  Copyright (c) 2014-2016, Linaro Limited. All rights reserved.
 #  Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.
 #
-#  This program and the accompanying materials
-#  are licensed and made available under the terms and conditions of the BSD License
-#  which accompanies this distribution.  The full text of the license may be found at
-#  http://opensource.org/licenses/bsd-license.php
-#
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
 ################################################################################
@@ -56,15 +50,6 @@
      PEI_DEPEX PEI_DEPEX Optional       $(INF_OUTPUT)/$(MODULE_NAME).depex
      TE       TE Align = Auto           $(INF_OUTPUT)/$(MODULE_NAME).efi
      UI       STRING="$(MODULE_NAME)" Optional
-  }
-
-[Rule.Common.PEIM.TIANOCOMPRESSED]
-  FILE PEIM = $(NAMED_GUID) DEBUG_MYTOOLS_IA32 {
-    PEI_DEPEX PEI_DEPEX Optional        $(INF_OUTPUT)/$(MODULE_NAME).depex
-    GUIDED A31280AD-481E-41B6-95E8-127F4C984779 PROCESSING_REQUIRED = TRUE {
-      PE32      PE32                    $(INF_OUTPUT)/$(MODULE_NAME).efi
-      UI        STRING="$(MODULE_NAME)" Optional
-    }
   }
 
 [Rule.Common.DXE_CORE]

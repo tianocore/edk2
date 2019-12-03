@@ -1,14 +1,8 @@
 /** @file
   Debug Agent library implementition.
 
-  Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -20,6 +14,11 @@ UINTN                       mSavedDebugRegisters[6];
 IA32_IDT_GATE_DESCRIPTOR    mIdtEntryTable[33];
 BOOLEAN                     mSkipBreakpoint = FALSE;
 BOOLEAN                     mSmmDebugIdtInitFlag = FALSE;
+BOOLEAN                     mApicTimerRestore = FALSE;
+BOOLEAN                     mPeriodicMode;
+UINT32                      mTimerCycle;
+UINTN                       mApicTimerDivisor;
+UINT8                       mVector;
 
 CHAR8 mWarningMsgIgnoreSmmEntryBreak[] = "Ignore smmentrybreak setting for SMI issued during DXE debugging!\r\n";
 
@@ -72,7 +71,7 @@ GetMailboxFromHob (
   )
 {
   EFI_HOB_GUID_TYPE        *GuidHob;
-  UINT64                   *MailboxLocation;  
+  UINT64                   *MailboxLocation;
   DEBUG_AGENT_MAILBOX      *Mailbox;
 
   GuidHob = GetFirstGuidHob (&gEfiDebugAgentGuid);
@@ -82,7 +81,7 @@ GetMailboxFromHob (
   MailboxLocation = (UINT64 *) (GET_GUID_HOB_DATA(GuidHob));
   Mailbox = (DEBUG_AGENT_MAILBOX *)(UINTN)(*MailboxLocation);
   VerifyMailboxChecksum (Mailbox);
-  
+
   return Mailbox;
 }
 
@@ -191,8 +190,6 @@ InitializeDebugAgent (
   DEBUG_AGENT_MAILBOX           *Mailbox;
   UINT64                        *MailboxLocation;
   UINT32                        DebugTimerFrequency;
-  BOOLEAN                       PeriodicMode;
-  UINTN                         TimerCycle;
 
   switch (InitFlag) {
   case DEBUG_AGENT_INIT_SMM:
@@ -221,7 +218,7 @@ InitializeDebugAgent (
     //
     // Check if Debug Agent initialized in SEC/PEI phase
     //
-    Mailbox = GetMailboxFromHob (); 
+    Mailbox = GetMailboxFromHob ();
     if (Mailbox != NULL) {
       mMailboxPointer = Mailbox;
       break;
@@ -234,7 +231,7 @@ InitializeDebugAgent (
     //
     // Save original IDT entries
     //
-    AsmReadIdtr (&IdtDescriptor);      
+    AsmReadIdtr (&IdtDescriptor);
     CopyMem (&IdtEntry, (VOID *)IdtDescriptor.Base, 33 * sizeof(IA32_IDT_GATE_DESCRIPTOR));
     //
     // Initialized Debug Agent
@@ -266,11 +263,11 @@ InitializeDebugAgent (
     }
     //
     // Find and report PE/COFF image info to HOST
-    //  
+    //
     FindAndReportModuleImageInfo (SIZE_4KB);
     //
     // Restore saved IDT entries
-    //     
+    //
     CopyMem ((VOID *)IdtDescriptor.Base, &IdtEntry, 33 * sizeof(IA32_IDT_GATE_DESCRIPTOR));
 
     break;
@@ -289,9 +286,10 @@ InitializeDebugAgent (
     // Check if CPU APIC Timer is working, otherwise initialize it.
     //
     InitializeLocalApicSoftwareEnable (TRUE);
-    GetApicTimerState (NULL, &PeriodicMode, NULL);
-    TimerCycle = GetApicTimerInitCount ();
-    if (!PeriodicMode || TimerCycle == 0) {
+    GetApicTimerState (&mApicTimerDivisor, &mPeriodicMode, &mVector);
+    mTimerCycle = GetApicTimerInitCount ();
+    if (!mPeriodicMode || mTimerCycle == 0) {
+      mApicTimerRestore = TRUE;
       InitializeDebugTimer (NULL, FALSE);
     }
     Mailbox = GetMailboxPointer ();
@@ -327,6 +325,13 @@ InitializeDebugAgent (
     //
     mSkipBreakpoint = FALSE;
     RestoreDebugRegister ();
+    //
+    // Restore APIC Timer
+    //
+    if (mApicTimerRestore) {
+      InitializeApicTimer (mApicTimerDivisor, mTimerCycle, mPeriodicMode, mVector);
+      mApicTimerRestore = FALSE;
+    }
     break;
 
   case DEBUG_AGENT_INIT_THUNK_PEI_IA32TOX64:
@@ -336,8 +341,8 @@ InitializeDebugAgent (
     } else {
       Ia32Idtr =  (IA32_DESCRIPTOR *) Context;
       Ia32IdtEntry = (IA32_IDT_ENTRY *)(Ia32Idtr->Base);
-      MailboxLocation = (UINT64 *) (UINTN) (Ia32IdtEntry[DEBUG_MAILBOX_VECTOR].Bits.OffsetLow + 
-                                  (UINT32) (Ia32IdtEntry[DEBUG_MAILBOX_VECTOR].Bits.OffsetHigh << 16));
+      MailboxLocation = (UINT64 *) ((UINTN) Ia32IdtEntry[DEBUG_MAILBOX_VECTOR].Bits.OffsetLow +
+                                   ((UINTN) Ia32IdtEntry[DEBUG_MAILBOX_VECTOR].Bits.OffsetHigh << 16));
       mMailboxPointer = (DEBUG_AGENT_MAILBOX *)(UINTN)(*MailboxLocation);
       VerifyMailboxChecksum (mMailboxPointer);
       //
@@ -370,12 +375,12 @@ InitializeDebugAgent (
 
   default:
     //
-    // Only DEBUG_AGENT_INIT_PREMEM_SEC and DEBUG_AGENT_INIT_POSTMEM_SEC are allowed for this 
+    // Only DEBUG_AGENT_INIT_PREMEM_SEC and DEBUG_AGENT_INIT_POSTMEM_SEC are allowed for this
     // Debug Agent library instance.
     //
     DEBUG ((EFI_D_ERROR, "Debug Agent: The InitFlag value is not allowed!\n"));
     CpuDeadLoop ();
-    break;    
+    break;
   }
 }
 

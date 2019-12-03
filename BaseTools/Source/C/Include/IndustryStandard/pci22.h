@@ -1,15 +1,9 @@
 /** @file
   Support for PCI 2.2 standard.
 
-  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials are licensed and made available
-  under the terms and conditions of the BSD License which accompanies this
-  distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -98,7 +92,7 @@ typedef union {
 } PCI_TYPE_GENERIC;
 
 typedef struct {
-  UINT32  CardBusSocketReg; // Cardus Socket/ExCA Base
+  UINT32  CardBusSocketReg; // Cardbus Socket/ExCA Base
   // Address Register
   //
   UINT16  Reserved;
@@ -168,7 +162,7 @@ typedef struct {
 #define PCI_CLASS_BRIDGE_ISA_PDECODE  0x80
 #define PCI_CLASS_ISA_POSITIVE_DECODE 0x80  // obsolete
 
-#define PCI_CLASS_SCC                 0x07  // Simple communications controllers 
+#define PCI_CLASS_SCC                 0x07  // Simple communications controllers
 #define PCI_SUBCLASS_SERIAL           0x00
 #define PCI_IF_GENERIC_XT             0x00
 #define PCI_IF_16450                  0x01
@@ -197,8 +191,8 @@ typedef struct {
 #define PCI_IF_8259_PIC               0x00
 #define PCI_IF_ISA_PIC                0x01
 #define PCI_IF_EISA_PIC               0x02
-#define PCI_IF_APIC_CONTROLLER        0x10 // I/O APIC interrupt controller , 32 bye none-prefectable memory.  
-#define PCI_IF_APIC_CONTROLLER2       0x20 
+#define PCI_IF_APIC_CONTROLLER        0x10 // I/O APIC interrupt controller , 32 byte none-prefetchable memory.
+#define PCI_IF_APIC_CONTROLLER2       0x20
 #define PCI_SUBCLASS_TIMER            0x02
 #define PCI_IF_8254_TIMER             0x00
 #define PCI_IF_ISA_TIMER              0x01
@@ -249,7 +243,7 @@ typedef struct {
 
 #define PCI_SECURITY_CONTROLLER       0x10 // Encryption and decryption controller
 #define PCI_SUBCLASS_NET_COMPUT       0x00
-#define PCI_SUBCLASS_ENTERTAINMENT    0x10 
+#define PCI_SUBCLASS_ENTERTAINMENT    0x10
 
 #define PCI_CLASS_DPIO                0x11
 

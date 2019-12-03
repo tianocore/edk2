@@ -3,14 +3,7 @@ Private Header file for Usb Host Controller PEIM
 
 Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
 
-This program and the accompanying materials
-are licensed and made available under the terms and conditions
-of the BSD License which accompanies this distribution.  The
-full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -29,6 +22,7 @@ struct _USBHC_MEM_BLOCK {
   UINT8                 *Buf;
   UINT8                 *BufHost;
   UINTN                 BufLen; // Memory size in bytes
+  VOID                  *Mapping;
   USBHC_MEM_BLOCK       *Next;
 };
 
@@ -112,6 +106,7 @@ UsbHcGetHostAddrForPciAddr (
   @param  HostAddress           The system memory address to map to the PCI controller.
   @param  DeviceAddress         The resulting map address for the bus master PCI controller to
                                 use to access the hosts HostAddress.
+  @param  Mapping               A resulting value to pass to Unmap().
 
   @retval EFI_SUCCESS           Success to allocate aligned pages.
   @retval EFI_INVALID_PARAMETER Pages or Alignment is not valid.
@@ -123,7 +118,8 @@ UsbHcAllocateAlignedPages (
   IN UINTN                      Pages,
   IN UINTN                      Alignment,
   OUT VOID                      **HostAddress,
-  OUT EFI_PHYSICAL_ADDRESS      *DeviceAddress
+  OUT EFI_PHYSICAL_ADDRESS      *DeviceAddress,
+  OUT VOID                      **Mapping
   );
 
 /**
@@ -131,12 +127,14 @@ UsbHcAllocateAlignedPages (
 
   @param  HostAddress           The system memory address to map to the PCI controller.
   @param  Pages                 The number of pages to free.
+  @param  Mapping               The mapping value returned from Map().
 
 **/
 VOID
 UsbHcFreeAlignedPages (
   IN VOID               *HostAddress,
-  IN UINTN              Pages
+  IN UINTN              Pages,
+  IN VOID               *Mapping
   );
 
 #endif

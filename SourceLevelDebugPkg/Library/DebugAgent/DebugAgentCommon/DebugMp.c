@@ -1,14 +1,8 @@
 /** @file
   Multi-Processor support functions implementation.
 
-  Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -75,7 +69,7 @@ HaltOtherProcessors (
   )
 {
   DebugAgentMsgPrint (DEBUG_AGENT_INFO, "processor[%x]:Try to halt other processors.\n", CurrentProcessorIndex);
-  if (!IsBsp (CurrentProcessorIndex)) {
+  if (!DebugAgentIsBsp (CurrentProcessorIndex)) {
     SetIpiSentByApFlag (TRUE);;
   }
 
@@ -137,15 +131,15 @@ GetProcessorIndex (
 
 **/
 BOOLEAN
-IsBsp (
+DebugAgentIsBsp (
   IN UINT32  ProcessorIndex
   )
 {
   MSR_IA32_APIC_BASE_REGISTER  MsrApicBase;
-  
+
   //
   // If there are less than 2 CPUs detected, then the currently executing CPU
-  // must be the BSP.  This avoids an access to an MSR that may not be supported 
+  // must be the BSP.  This avoids an access to an MSR that may not be supported
   // on single core CPUs.
   //
   if (mDebugCpuData.CpuCount < 2) {

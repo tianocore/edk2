@@ -6,14 +6,9 @@
 # the related operations in SMM handler in SMM FTW module. You can use the FTW protocol
 # before End Of Dxe or use FaultTolerantWriteDxe module instead if you really want to.
 #
-# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
-#  This program and the accompanying materials
-#  are licensed and made available under the terms and conditions of the BSD License
-#  which accompanies this distribution. The full text of the license may be found at
-#  http://opensource.org/licenses/bsd-license.php
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
 
@@ -36,13 +31,13 @@
   FaultTolerantWriteSmmDxe.c
   FaultTolerantWriteSmmDxe.h
   FaultTolerantWriteSmmCommon.h
-  
+
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
 
 [LibraryClasses]
-  BaseLib  
+  BaseLib
   UefiBootServicesTableLib
   DebugLib
   DxeServicesTableLib
@@ -56,7 +51,7 @@
   ## CONSUMES
   gEfiSmmFaultTolerantWriteProtocolGuid
   gEfiFirmwareVolumeBlockProtocolGuid           ## CONSUMES
-   
+
 [Depex]
   gEfiSmmCommunicationProtocolGuid
 

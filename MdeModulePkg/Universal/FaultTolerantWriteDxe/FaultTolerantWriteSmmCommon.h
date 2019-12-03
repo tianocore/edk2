@@ -1,15 +1,9 @@
 /** @file
 
-  The common header file for SMM FTW module and SMM FTW DXE Module. 
+  The common header file for SMM FTW module and SMM FTW DXE Module.
 
-Copyright (c) 2011, Intel Corporation. All rights reserved. <BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. 
+Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved. <BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -76,5 +70,44 @@ typedef struct {
   BOOLEAN                               Complete;
   UINT8                                 Data[1];
 } SMM_FTW_GET_LAST_WRITE_HEADER;
+
+/**
+  Shared entry point of the module.
+
+  @retval EFI_SUCCESS           The initialization finished successfully.
+  @retval EFI_OUT_OF_RESOURCES  Allocate memory error
+  @retval EFI_INVALID_PARAMETER Workspace or Spare block does not exist
+
+**/
+EFI_STATUS
+MmFaultTolerantWriteInitialize (
+  VOID
+  );
+
+/**
+  This function checks if the buffer is valid per processor architecture and
+  does not overlap with SMRAM.
+
+  @param Buffer The buffer start address to be checked.
+  @param Length The buffer length to be checked.
+
+  @retval TRUE  This buffer is valid per processor architecture and does not
+                overlap with SMRAM.
+  @retval FALSE This buffer is not valid per processor architecture or overlaps
+                with SMRAM.
+**/
+BOOLEAN
+FtwSmmIsBufferOutsideSmmValid (
+  IN EFI_PHYSICAL_ADDRESS  Buffer,
+  IN UINT64                Length
+  );
+
+/**
+  Notify the system that the SMM FTW driver is ready.
+**/
+VOID
+FtwNotifySmmReady (
+  VOID
+  );
 
 #endif

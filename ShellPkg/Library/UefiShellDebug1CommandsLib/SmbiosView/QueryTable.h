@@ -2,19 +2,15 @@
   Build a table, each item is (key, info) pair.
   and give a interface of query a string out of a table.
 
-  Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2005 - 2019, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #ifndef _SMBIOS_QUERY_TABLE_H_
 #define _SMBIOS_QUERY_TABLE_H_
+
+#include <IndustryStandard/SmBios.h>
 
 #define QUERY_TABLE_UNFOUND 0xFF
 
@@ -564,6 +560,30 @@ DisplayMemoryDeviceTypeDetail (
   );
 
 /**
+  Display Memory Device (Type 17) memory technology.
+
+  @param[in] Para     The key of the structure.
+  @param[in] Option   The optional information.
+**/
+VOID
+DisplayMemoryDeviceMemoryTechnology (
+  IN UINT8  Para,
+  IN UINT8  Option
+  );
+
+/**
+  Display Memory Device (Type 17) memory operating mode capability.
+
+  @param[in] Para     The key of the structure.
+  @param[in] Option   The optional information.
+**/
+VOID
+DisplayMemoryDeviceMemoryOperatingModeCapability (
+  IN UINT16  Para,
+  IN UINT8   Option
+  );
+
+/**
   Display 32-bit Memory Error Information (Type 18) type.
 
   @param[in] ErrorType  The key of the structure.
@@ -775,6 +795,18 @@ DisplayMemoryChannelType (
 **/
 VOID
 DisplayIPMIDIBMCInterfaceType (
+  IN UINT8 Key,
+  IN UINT8 Option
+  );
+
+/**
+  Display Management Controller Host Interface (Type 42) information.
+
+  @param[in] Key      The key of the structure.
+  @param[in] Option   The optional information.
+**/
+VOID
+DisplayMCHostInterfaceType (
   IN UINT8 Key,
   IN UINT8 Option
   );

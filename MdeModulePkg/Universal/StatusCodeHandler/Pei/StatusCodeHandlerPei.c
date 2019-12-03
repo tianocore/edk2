@@ -2,14 +2,8 @@
   Report Status Code Handler PEIM which produces general handlers and hook them
   onto the PEI status code router.
 
-  Copyright (c) 2009, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -17,7 +11,7 @@
 
 /**
   Entry point of Status Code PEIM.
-  
+
   This function is the entry point of this Status Code PEIM.
   It initializes supported status code devices according to PCD settings,
   and installs Status Code PPI.
@@ -54,13 +48,13 @@ StatusCodeHandlerPeiEntry (
   if (FeaturePcdGet (PcdStatusCodeUseSerial)) {
     Status = SerialPortInitialize();
     ASSERT_EFI_ERROR (Status);
-    Status = RscHandlerPpi->Register (SerialStatusCodeReportWorker);                     
+    Status = RscHandlerPpi->Register (SerialStatusCodeReportWorker);
     ASSERT_EFI_ERROR (Status);
   }
   if (FeaturePcdGet (PcdStatusCodeUseMemory)) {
     Status = MemoryStatusCodeInitializeWorker ();
     ASSERT_EFI_ERROR (Status);
-    Status = RscHandlerPpi->Register (MemoryStatusCodeReportWorker);                     
+    Status = RscHandlerPpi->Register (MemoryStatusCodeReportWorker);
     ASSERT_EFI_ERROR (Status);
   }
 

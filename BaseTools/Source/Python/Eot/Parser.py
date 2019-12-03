@@ -2,28 +2,48 @@
 # This file is used to define common parsing related functions used in parsing
 # Inf/Dsc/Makefile process
 #
-# Copyright (c) 2008 - 2014, Intel Corporation. All rights reserved.<BR>
-# This program and the accompanying materials
-# are licensed and made available under the terms and conditions of the BSD License
-# which accompanies this distribution.  The full text of the license may be found at
-# http://opensource.org/licenses/bsd-license.php
-#
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
 ##
 # Import Modules
 #
+from __future__ import absolute_import
 import Common.LongFilePathOs as os, re
 import Common.EdkLogger as EdkLogger
 from Common.DataType import *
 from CommonDataClass.DataClass import *
-from Common.String import CleanString, GetSplitValueList, ReplaceMacro
-import EotGlobalData
-from Common.Misc import sdict
-from Common.String import GetSplitList
+from Common.StringUtils import CleanString, GetSplitValueList, ReplaceMacro
+from . import EotGlobalData
+from Common.StringUtils import GetSplitList
 from Common.LongFilePathSupport import OpenLongFilePath as open
+
+import subprocess
+
+## DeCompress
+#
+# Call external decompress tool to decompress the fv section
+#
+def DeCompress(Method, Input):
+    # Write the input to a temp file
+    open('_Temp.bin', 'wb').write(Input)
+    cmd = ''
+    if Method == 'Lzma':
+        cmd = r'LzmaCompress -o _New.bin -d _Temp.bin'
+    if Method == 'Efi':
+        cmd = r'TianoCompress -d --uefi -o _New.bin _Temp.bin'
+    if Method == 'Framework':
+        cmd = r'TianoCompress -d -o _New.bin _Temp.bin'
+
+    # Call tool to create the decompressed output file
+    Process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    Process.communicate()[0]
+
+    # Return the beffer of New.bin
+    if os.path.exists('_New.bin'):
+        return open('_New.bin', 'rb').read()
+
 
 ## PreProcess() method
 #
@@ -36,7 +56,7 @@ from Common.LongFilePathSupport import OpenLongFilePath as open
 #  @param  MergeMultipleLines: Switch for if merge multiple lines
 #  @param  LineNo: Default line no
 #
-#  @return Lines: The file contents after remvoing comments
+#  @return Lines: The file contents after removing comments
 #
 def PreProcess(Filename, MergeMultipleLines = True, LineNo = -1):
     Lines = []
@@ -623,7 +643,7 @@ def SearchProtocols(SqlCommand, Table, SourceFileID, SourceFileFullPath, ItemMod
 #  @param ItemMode: Mode of item
 #
 def SearchFunctionCalling(Table, SourceFileID, SourceFileFullPath, ItemType, ItemMode):
-    LibraryList = sdict()
+    LibraryList = {}
     Db = EotGlobalData.gDb.TblReport
     Parameters, ItemName, GuidName, GuidMacro, GuidValue, BelongsToFunction = [], '', '', '', '', ''
     if ItemType == 'Protocol' and ItemMode == 'Produced':
@@ -731,7 +751,7 @@ def GetParameter(Parameter, Index = 1):
 #  @return: The name of parameter
 #
 def GetParameterName(Parameter):
-    if type(Parameter) == type('') and Parameter.startswith('&'):
+    if isinstance(Parameter, type('')) and Parameter.startswith('&'):
         return Parameter[1:].replace('{', '').replace('}', '').replace('\r', '').replace('\n', '').strip()
     else:
         return Parameter.strip()
@@ -744,7 +764,7 @@ def GetParameterName(Parameter):
 #  @param Table: Table to be searched
 #  @param Key: The keyword
 #
-#  @return Value: The value of the the keyword
+#  @return Value: The value of the keyword
 #
 def FindKeyValue(Db, Table, Key):
     SqlCommand = """select Value from %s where Name = '%s' and (Model = %s or Model = %s)""" % (Table, Key, MODEL_IDENTIFIER_VARIABLE, MODEL_IDENTIFIER_ASSIGNMENT_EXPRESSION)

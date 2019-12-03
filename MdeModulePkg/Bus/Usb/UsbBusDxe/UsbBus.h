@@ -2,14 +2,8 @@
 
     Usb Bus Driver Binding and Bus IO Protocol.
 
-Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -123,7 +117,7 @@ typedef struct _USB_HUB_API    USB_HUB_API;
 
 //
 // Send general device request timeout.
-// 
+//
 // The USB Specification 2.0, section 11.24.1 recommends a value of
 // 50 milliseconds.  We use a value of 500 milliseconds to work
 // around slower hubs and devices.

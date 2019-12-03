@@ -2,14 +2,8 @@
   This file implements ATA_PASSTHRU_PROCTOCOL and EXT_SCSI_PASSTHRU_PROTOCOL interfaces
   for managed ATA controllers.
 
-  Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -94,6 +88,7 @@ ATA_ATAPI_PASS_THRU_INSTANCE gAtaAtapiPassThruInstanceTemplate = {
     NULL,
     NULL
   },
+  0,                  // EnabledPciAttributes
   0,                  // OriginalAttributes
   0,                  // PreviousPort
   0,                  // PreviousPortMultiplier
@@ -139,6 +134,15 @@ UINT8 mScsiId[TARGET_MAX_BYTES] = {
   0xFF, 0xFF, 0xFF, 0xFF,
   0xFF, 0xFF, 0xFF, 0xFF,
   0xFF, 0xFF, 0xFF, 0xFF
+};
+
+EDKII_ATA_ATAPI_POLICY_PROTOCOL *mAtaAtapiPolicy;
+EDKII_ATA_ATAPI_POLICY_PROTOCOL mDefaultAtaAtapiPolicy = {
+  EDKII_ATA_ATAPI_POLICY_VERSION,
+  2,  // PuisEnable
+  0,  // DeviceSleepEnable
+  0,  // AggressiveDeviceSleepEnable
+  0   // Reserved
 };
 
 /**
@@ -670,7 +674,7 @@ AtaAtapiPassThruStart (
   EFI_IDE_CONTROLLER_INIT_PROTOCOL  *IdeControllerInit;
   ATA_ATAPI_PASS_THRU_INSTANCE      *Instance;
   EFI_PCI_IO_PROTOCOL               *PciIo;
-  UINT64                            Supports;
+  UINT64                            EnabledPciAttributes;
   UINT64                            OriginalPciAttributes;
 
   Status                = EFI_SUCCESS;
@@ -722,20 +726,28 @@ AtaAtapiPassThruStart (
                     PciIo,
                     EfiPciIoAttributeOperationSupported,
                     0,
-                    &Supports
+                    &EnabledPciAttributes
                     );
   if (!EFI_ERROR (Status)) {
-    Supports &= (UINT64)EFI_PCI_DEVICE_ENABLE;
+    EnabledPciAttributes &= (UINT64)EFI_PCI_DEVICE_ENABLE;
     Status = PciIo->Attributes (
                       PciIo,
                       EfiPciIoAttributeOperationEnable,
-                      Supports,
+                      EnabledPciAttributes,
                       NULL
                       );
   }
 
   if (EFI_ERROR (Status)) {
     goto ErrorExit;
+  }
+
+  Status = gBS->LocateProtocol (&gEdkiiAtaAtapiPolicyProtocolGuid, NULL, (VOID **)&mAtaAtapiPolicy);
+  if (EFI_ERROR (Status)) {
+    //
+    // If there is no AtaAtapiPolicy exposed, use the default policy.
+    //
+    mAtaAtapiPolicy = &mDefaultAtaAtapiPolicy;
   }
 
   //
@@ -749,6 +761,7 @@ AtaAtapiPassThruStart (
   Instance->ControllerHandle      = Controller;
   Instance->IdeControllerInit     = IdeControllerInit;
   Instance->PciIo                 = PciIo;
+  Instance->EnabledPciAttributes  = EnabledPciAttributes;
   Instance->OriginalPciAttributes = OriginalPciAttributes;
   Instance->AtaPassThru.Mode      = &Instance->AtaPassThruMode;
   Instance->ExtScsiPassThru.Mode  = &Instance->ExtScsiPassThruMode;
@@ -808,12 +821,11 @@ ErrorExit:
     gBS->CloseEvent (Instance->TimerEvent);
   }
 
-  //
-  // Remove all inserted ATA devices.
-  //
-  DestroyDeviceInfoList(Instance);
-
   if (Instance != NULL) {
+    //
+    // Remove all inserted ATA devices.
+    //
+    DestroyDeviceInfoList (Instance);
     FreePool (Instance);
   }
   return EFI_UNSUPPORTED;
@@ -859,7 +871,6 @@ AtaAtapiPassThruStop (
   EFI_ATA_PASS_THRU_PROTOCOL        *AtaPassThru;
   EFI_PCI_IO_PROTOCOL               *PciIo;
   EFI_AHCI_REGISTERS                *AhciRegisters;
-  UINT64                            Supports;
 
   DEBUG ((EFI_D_INFO, "==AtaAtapiPassThru Stop== Controller = %x\n", Controller));
 
@@ -912,12 +923,22 @@ AtaAtapiPassThruStop (
   //
   DestroyDeviceInfoList (Instance);
 
+  PciIo = Instance->PciIo;
+
+  //
+  // Disable this ATA host controller.
+  //
+  PciIo->Attributes (
+           PciIo,
+           EfiPciIoAttributeOperationDisable,
+           Instance->EnabledPciAttributes,
+           NULL
+           );
+
   //
   // If the current working mode is AHCI mode, then pre-allocated resource
   // for AHCI initialization should be released.
   //
-  PciIo = Instance->PciIo;
-
   if (Instance->Mode == EfiAtaAhciMode) {
     AhciRegisters = &Instance->AhciRegisters;
     PciIo->Unmap (
@@ -946,25 +967,6 @@ AtaAtapiPassThruStop (
              PciIo,
              EFI_SIZE_TO_PAGES ((UINTN) AhciRegisters->MaxReceiveFisSize),
              AhciRegisters->AhciRFis
-             );
-  }
-
-  //
-  // Disable this ATA host controller.
-  //
-  Status = PciIo->Attributes (
-                    PciIo,
-                    EfiPciIoAttributeOperationSupported,
-                    0,
-                    &Supports
-                    );
-  if (!EFI_ERROR (Status)) {
-    Supports &= (UINT64)EFI_PCI_DEVICE_ENABLE;
-    PciIo->Attributes (
-             PciIo,
-             EfiPciIoAttributeOperationDisable,
-             Supports,
-             NULL
              );
   }
 

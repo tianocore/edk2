@@ -1,15 +1,9 @@
 /** @file
   UEFI Component Name(2) protocol implementation for UDP6 driver.
 
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -237,10 +231,10 @@ Udp6ComponentNameGetDriverName (
 
   @param  Udp6[in]                  A pointer to the EFI_UDP6_PROTOCOL.
 
-  
+
   @retval EFI_SUCCESS               Update the ControllerNameTable of this instance successfully.
   @retval EFI_INVALID_PARAMETER     The input parameter is invalid.
-  
+
 **/
 EFI_STATUS
 UpdateName (

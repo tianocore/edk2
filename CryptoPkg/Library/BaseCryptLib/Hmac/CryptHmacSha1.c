@@ -1,22 +1,26 @@
 /** @file
   HMAC-SHA1 Wrapper Implementation over OpenSSL.
 
-Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include "InternalCryptLib.h"
 #include <openssl/hmac.h>
 
+//
+// NOTE: OpenSSL redefines the size of HMAC_CTX at crypto/hmac/hmac_lcl.h
+//       #define HMAC_MAX_MD_CBLOCK_SIZE     144
+//
+//
+#define  HMAC_SHA1_CTX_SIZE   (sizeof(void *) * 4 + sizeof(unsigned int) + \
+                             sizeof(unsigned char) * 144)
+
 /**
   Retrieves the size, in bytes, of the context buffer required for HMAC-SHA1 operations.
+  (NOTE: This API is deprecated.
+         Use HmacSha1New() / HmacSha1Free() for HMAC-SHA1 Context operations.)
 
   @return  The size, in bytes, of the context buffer required for HMAC-SHA1 operations.
 
@@ -29,8 +33,49 @@ HmacSha1GetContextSize (
 {
   //
   // Retrieves the OpenSSL HMAC-SHA1 Context Size
+  // NOTE: HMAC_CTX object was made opaque in openssl-1.1.x, here we just use the
+  //       fixed size as a workaround to make this API work for compatibility.
+  //       We should retire HmacSha15GetContextSize() in future, and use HmacSha1New()
+  //       and HmacSha1Free() for context allocation and release.
   //
-  return (UINTN) (sizeof (HMAC_CTX));
+  return (UINTN) HMAC_SHA1_CTX_SIZE;
+}
+
+/**
+  Allocates and initializes one HMAC_CTX context for subsequent HMAC-SHA1 use.
+
+  @return  Pointer to the HMAC_CTX context that has been initialized.
+           If the allocations fails, HmacSha1New() returns NULL.
+
+**/
+VOID *
+EFIAPI
+HmacSha1New (
+  VOID
+  )
+{
+  //
+  // Allocates & Initializes HMAC_CTX Context by OpenSSL HMAC_CTX_new()
+  //
+  return (VOID *) HMAC_CTX_new ();
+}
+
+/**
+  Release the specified HMAC_CTX context.
+
+  @param[in]  HmacSha1Ctx  Pointer to the HMAC_CTX context to be released.
+
+**/
+VOID
+EFIAPI
+HmacSha1Free (
+  IN  VOID  *HmacSha1Ctx
+  )
+{
+  //
+  // Free OpenSSL HMAC_CTX Context
+  //
+  HMAC_CTX_free ((HMAC_CTX *)HmacSha1Ctx);
 }
 
 /**
@@ -65,8 +110,13 @@ HmacSha1Init (
   //
   // OpenSSL HMAC-SHA1 Context Initialization
   //
-  HMAC_CTX_init (HmacSha1Context);
-  HMAC_Init_ex (HmacSha1Context, Key, (UINT32) KeySize, EVP_sha1(), NULL);
+  memset(HmacSha1Context, 0, HMAC_SHA1_CTX_SIZE);
+  if (HMAC_CTX_reset ((HMAC_CTX *)HmacSha1Context) != 1) {
+    return FALSE;
+  }
+  if (HMAC_Init_ex ((HMAC_CTX *)HmacSha1Context, Key, (UINT32) KeySize, EVP_sha1(), NULL) != 1) {
+    return FALSE;
+  }
 
   return TRUE;
 }
@@ -98,7 +148,9 @@ HmacSha1Duplicate (
     return FALSE;
   }
 
-  CopyMem (NewHmacSha1Context, HmacSha1Context, sizeof (HMAC_CTX));
+  if (HMAC_CTX_copy ((HMAC_CTX *)NewHmacSha1Context, (HMAC_CTX *)HmacSha1Context) != 1) {
+    return FALSE;
+  }
 
   return TRUE;
 }
@@ -146,7 +198,9 @@ HmacSha1Update (
   //
   // OpenSSL HMAC-SHA1 digest update
   //
-  HMAC_Update (HmacSha1Context, Data, DataSize);
+  if (HMAC_Update ((HMAC_CTX *)HmacSha1Context, Data, DataSize) != 1) {
+    return FALSE;
+  }
 
   return TRUE;
 }
@@ -190,8 +244,12 @@ HmacSha1Final (
   //
   // OpenSSL HMAC-SHA1 digest finalization
   //
-  HMAC_Final (HmacSha1Context, HmacValue, &Length);
-  HMAC_CTX_cleanup (HmacSha1Context);
+  if (HMAC_Final ((HMAC_CTX *)HmacSha1Context, HmacValue, &Length) != 1) {
+    return FALSE;
+  }
+  if (HMAC_CTX_reset ((HMAC_CTX *)HmacSha1Context) != 1) {
+    return FALSE;
+  }
 
   return TRUE;
 }

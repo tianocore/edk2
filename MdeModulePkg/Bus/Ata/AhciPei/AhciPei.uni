@@ -1,0 +1,14 @@
+// /** @file
+// The AhciPei driver is used to manage ATA hard disk device working under AHCI
+// mode at PEI phase.
+//
+// Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Manage AHCI mode ATA hard disk device at PEI phase"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "The AhciPei driver is used to manage ATA hard disk device working under AHCI mode at PEI phase."

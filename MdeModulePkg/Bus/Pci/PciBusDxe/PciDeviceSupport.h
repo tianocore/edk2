@@ -1,14 +1,8 @@
 /** @file
   Supporting functions declaration for PCI devices management.
 
-Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -50,7 +44,7 @@ InsertPciDevice (
   );
 
 /**
-  Destroy root bridge and remove it from deivce tree.
+  Destroy root bridge and remove it from device tree.
 
   @param RootBridge     The bridge want to be removed.
 
@@ -80,7 +74,7 @@ DestroyPciDeviceTree (
 
   @param  Controller    Root bridge handle.
 
-  @retval EFI_SUCCESS   Destory all devcie nodes successfully.
+  @retval EFI_SUCCESS   Destroy all device nodes successfully.
   @retval EFI_NOT_FOUND Cannot find any PCI device under specified
                         root bridge.
 
@@ -187,7 +181,7 @@ StartPciDevices (
 /**
   Create root bridge device.
 
-  @param RootBridgeHandle    Specified root bridge hanle.
+  @param RootBridgeHandle    Specified root bridge handle.
 
   @return The crated root bridge device instance, NULL means no
           root bridge device instance created.
@@ -214,9 +208,9 @@ GetRootBridgeByHandle (
 
 
 /**
-  Judege whether Pci device existed.
+  Judge whether Pci device existed.
 
-  @param Bridge       Parent bridege instance.
+  @param Bridge       Parent bridge instance.
   @param PciIoDevice  Device instance.
 
   @retval TRUE        Pci device existed.
@@ -230,55 +224,38 @@ PciDeviceExisted (
   );
 
 /**
-  Get the active VGA device on the same segment.
+  Get the active VGA device on the specified Host Bridge.
 
-  @param VgaDevice    PCI IO instance for the VGA device.
+  @param HostBridgeHandle    Host Bridge handle.
 
-  @return The active VGA device on the same segment.
+  @return The active VGA device on the specified Host Bridge.
 
 **/
 PCI_IO_DEVICE *
-ActiveVGADeviceOnTheSameSegment (
-  IN PCI_IO_DEVICE        *VgaDevice
+LocateVgaDeviceOnHostBridge (
+  IN EFI_HANDLE           HostBridgeHandle
   );
 
 /**
-  Get the active VGA device on the root bridge.
+  Locate the active VGA device under the bridge.
 
-  @param RootBridge  PCI IO instance for the root bridge.
+  @param Bridge  PCI IO instance for the bridge.
 
   @return The active VGA device.
 
 **/
 PCI_IO_DEVICE *
-ActiveVGADeviceOnTheRootBridge (
-  IN PCI_IO_DEVICE        *RootBridge
+LocateVgaDevice (
+  IN PCI_IO_DEVICE        *Bridge
   );
 
-/**
-  Get HPC PCI address according to its device path.
-
-  @param RootBridge           Root bridege Io instance.
-  @param RemainingDevicePath  Given searching device path.
-  @param PciAddress           Buffer holding searched result.
-
-  @retval EFI_SUCCESS         PCI address was stored in PciAddress.
-  @retval EFI_NOT_FOUND       Can not find the specific device path.
-
-**/
-EFI_STATUS
-GetHpcPciAddressFromRootBridge (
-  IN  PCI_IO_DEVICE                    *RootBridge,
-  IN  EFI_DEVICE_PATH_PROTOCOL         *RemainingDevicePath,
-  OUT UINT64                           *PciAddress
-  );
 
 /**
   Destroy a pci device node.
 
   All direct or indirect allocated resource for this node will be freed.
 
-  @param PciIoDevice  A pointer to the PCI_IO_DEVICE to be destoried.
+  @param PciIoDevice  A pointer to the PCI_IO_DEVICE to be destroyed.
 
 **/
 VOID

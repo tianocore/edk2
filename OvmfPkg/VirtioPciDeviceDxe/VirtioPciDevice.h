@@ -3,14 +3,9 @@
   Internal definitions for the VirtIo PCI Device driver
 
   Copyright (C) 2013, ARM Ltd
+  Copyright (c) 2017, AMD Inc, All rights reserved.<BR>
 
-  This program and the accompanying materials are licensed and made available
-  under the terms and conditions of the BSD License which accompanies this
-  distribution. The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT
-  WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -96,15 +91,15 @@ VirtioPciGetQueueSize (
 EFI_STATUS
 EFIAPI
 VirtioPciSetQueueAlignment (
-  VIRTIO_DEVICE_PROTOCOL         *This,
-  UINT32                         Alignment
+  IN  VIRTIO_DEVICE_PROTOCOL         *This,
+  IN  UINT32                         Alignment
   );
 
 EFI_STATUS
 EFIAPI
 VirtioPciSetPageSize (
-  VIRTIO_DEVICE_PROTOCOL         *This,
-  UINT32                         PageSize
+  IN  VIRTIO_DEVICE_PROTOCOL         *This,
+  IN  UINT32                         PageSize
   );
 
 EFI_STATUS
@@ -125,35 +120,69 @@ EFI_STATUS
 EFIAPI
 VirtioPciSetQueueAddress (
   IN VIRTIO_DEVICE_PROTOCOL  *This,
-  IN VRING                   *Ring
+  IN VRING                   *Ring,
+  IN UINT64                  RingBaseShift
   );
 
 EFI_STATUS
 EFIAPI
 VirtioPciSetQueueSel (
-  VIRTIO_DEVICE_PROTOCOL         *This,
-  UINT16                         Sel
+  IN  VIRTIO_DEVICE_PROTOCOL         *This,
+  IN  UINT16                         Sel
   );
 
 EFI_STATUS
 EFIAPI
 VirtioPciSetQueueNotify (
-  VIRTIO_DEVICE_PROTOCOL         *This,
-  UINT16                         Index
+  IN  VIRTIO_DEVICE_PROTOCOL         *This,
+  IN  UINT16                         Index
   );
 
 EFI_STATUS
 EFIAPI
 VirtioPciSetQueueSize (
-  VIRTIO_DEVICE_PROTOCOL         *This,
-  UINT16                         Size
+  IN  VIRTIO_DEVICE_PROTOCOL         *This,
+  IN  UINT16                         Size
   );
 
 EFI_STATUS
 EFIAPI
 VirtioPciSetDeviceStatus (
-  VIRTIO_DEVICE_PROTOCOL         *This,
-  UINT8                          DeviceStatus
+  IN  VIRTIO_DEVICE_PROTOCOL         *This,
+  IN  UINT8                          DeviceStatus
   );
 
+EFI_STATUS
+EFIAPI
+VirtioPciAllocateSharedPages (
+  IN  VIRTIO_DEVICE_PROTOCOL        *This,
+  IN  UINTN                         NumPages,
+  OUT VOID                          **HostAddress
+  );
+
+VOID
+EFIAPI
+VirtioPciFreeSharedPages (
+  IN  VIRTIO_DEVICE_PROTOCOL        *This,
+  IN  UINTN                         NumPages,
+  IN  VOID                          *HostAddress
+  );
+
+EFI_STATUS
+EFIAPI
+VirtioPciMapSharedBuffer (
+  IN      VIRTIO_DEVICE_PROTOCOL        *This,
+  IN      VIRTIO_MAP_OPERATION          Operation,
+  IN      VOID                          *HostAddress,
+  IN OUT  UINTN                         *NumberOfBytes,
+  OUT     EFI_PHYSICAL_ADDRESS          *DeviceAddress,
+  OUT     VOID                          **Mapping
+  );
+
+EFI_STATUS
+EFIAPI
+VirtioPciUnmapSharedBuffer (
+  IN  VIRTIO_DEVICE_PROTOCOL        *This,
+  IN  VOID                          *Mapping
+  );
 #endif // _VIRTIO_PCI_DEVICE_DXE_H_

@@ -4,17 +4,10 @@
 
   Copyright (C) 2016, Red Hat, Inc.
 
-  This program and the accompanying materials are licensed and made available
-  under the terms and conditions of the BSD License which accompanies this
-  distribution. The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT
-  WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 
 #include "VirtioGpu.h"
@@ -115,11 +108,17 @@ ReleaseGopResources (
   }
 
   //
-  // Release backing pages.
+  // Unmap and release backing pages.
   //
-  FreePages (VgpuGop->BackingStore, VgpuGop->NumberOfPages);
+  VirtioGpuUnmapAndFreeBackingStore (
+    VgpuGop->ParentBus,      // VgpuDev
+    VgpuGop->NumberOfPages,  // NumberOfPages
+    VgpuGop->BackingStore,   // HostAddress
+    VgpuGop->BackingStoreMap // Mapping
+    );
   VgpuGop->BackingStore  = NULL;
   VgpuGop->NumberOfPages = 0;
+  VgpuGop->BackingStoreMap = NULL;
 
   //
   // Destroy the currently used 2D host resource.
@@ -231,11 +230,14 @@ GopSetMode (
   IN  UINT32                       ModeNumber
   )
 {
-  VGPU_GOP   *VgpuGop;
-  UINT32     NewResourceId;
-  UINTN      NewNumberOfBytes;
-  UINTN      NewNumberOfPages;
-  VOID       *NewBackingStore;
+  VGPU_GOP             *VgpuGop;
+  UINT32               NewResourceId;
+  UINTN                NewNumberOfBytes;
+  UINTN                NewNumberOfPages;
+  VOID                 *NewBackingStore;
+  EFI_PHYSICAL_ADDRESS NewBackingStoreDeviceAddress;
+  VOID                 *NewBackingStoreMap;
+
   EFI_STATUS Status;
   EFI_STATUS Status2;
 
@@ -294,32 +296,34 @@ GopSetMode (
   }
 
   //
-  // Allocate guest backing store.
+  // Allocate, zero and map guest backing store, for bus master common buffer
+  // operation.
   //
   NewNumberOfBytes = mGopResolutions[ModeNumber].Width *
                      mGopResolutions[ModeNumber].Height * sizeof (UINT32);
   NewNumberOfPages = EFI_SIZE_TO_PAGES (NewNumberOfBytes);
-  NewBackingStore = AllocatePages (NewNumberOfPages);
-  if (NewBackingStore == NULL) {
-    Status = EFI_OUT_OF_RESOURCES;
+  Status = VirtioGpuAllocateZeroAndMapBackingStore (
+             VgpuGop->ParentBus,            // VgpuDev
+             NewNumberOfPages,              // NumberOfPages
+             &NewBackingStore,              // HostAddress
+             &NewBackingStoreDeviceAddress, // DeviceAddress
+             &NewBackingStoreMap            // Mapping
+             );
+  if (EFI_ERROR (Status)) {
     goto DestroyHostResource;
   }
-  //
-  // Fill visible part of backing store with black.
-  //
-  ZeroMem (NewBackingStore, NewNumberOfBytes);
 
   //
   // Attach backing store to the host resource.
   //
   Status = VirtioGpuResourceAttachBacking (
-             VgpuGop->ParentBus, // VgpuDev
-             NewResourceId,      // ResourceId
-             NewBackingStore,    // FirstBackingPage
-             NewNumberOfPages    // NumberOfPages
+             VgpuGop->ParentBus,           // VgpuDev
+             NewResourceId,                // ResourceId
+             NewBackingStoreDeviceAddress, // BackingStoreDeviceAddress
+             NewNumberOfPages              // NumberOfPages
              );
   if (EFI_ERROR (Status)) {
-    goto FreeBackingStore;
+    goto UnmapAndFreeBackingStore;
   }
 
   //
@@ -392,6 +396,7 @@ GopSetMode (
   VgpuGop->ResourceId = NewResourceId;
   VgpuGop->BackingStore = NewBackingStore;
   VgpuGop->NumberOfPages = NewNumberOfPages;
+  VgpuGop->BackingStoreMap = NewBackingStoreMap;
 
   //
   // Populate Mode and ModeInfo (mutable fields only).
@@ -410,8 +415,13 @@ DetachBackingStore:
     CpuDeadLoop ();
   }
 
-FreeBackingStore:
-  FreePages (NewBackingStore, NewNumberOfPages);
+UnmapAndFreeBackingStore:
+  VirtioGpuUnmapAndFreeBackingStore (
+    VgpuGop->ParentBus, // VgpuDev
+    NewNumberOfPages,   // NumberOfPages
+    NewBackingStore,    // HostAddress
+    NewBackingStoreMap  // Mapping
+    );
 
 DestroyHostResource:
   Status2 = VirtioGpuResourceUnref (VgpuGop->ParentBus, NewResourceId);

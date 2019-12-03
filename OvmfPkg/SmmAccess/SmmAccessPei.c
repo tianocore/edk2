@@ -13,13 +13,7 @@
   Copyright (C) 2013, 2015, Red Hat, Inc.<BR>
   Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials are licensed and made available
-  under the terms and conditions of the BSD License which accompanies this
-  distribution. The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT
-  WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -318,8 +312,9 @@ SmmAccessPeiEntryPoint (
   //
   // Set TSEG Memory Base.
   //
+  InitQ35TsegMbytes ();
   PciWrite32 (DRAMC_REGISTER_Q35 (MCH_TSEGMB),
-    (TopOfLowRamMb - FixedPcdGet8 (PcdQ35TsegMbytes)) << MCH_TSEGMB_MB_SHIFT);
+    (TopOfLowRamMb - mQ35TsegMbytes) << MCH_TSEGMB_MB_SHIFT);
 
   //
   // Set TSEG size, and disable TSEG visibility outside of SMM. Note that the
@@ -327,9 +322,10 @@ SmmAccessPeiEntryPoint (
   // *restricted* to SMM.
   //
   EsmramcVal &= ~(UINT32)MCH_ESMRAMC_TSEG_MASK;
-  EsmramcVal |= FixedPcdGet8 (PcdQ35TsegMbytes) == 8 ? MCH_ESMRAMC_TSEG_8MB :
-                FixedPcdGet8 (PcdQ35TsegMbytes) == 2 ? MCH_ESMRAMC_TSEG_2MB :
-                MCH_ESMRAMC_TSEG_1MB;
+  EsmramcVal |= mQ35TsegMbytes == 8 ? MCH_ESMRAMC_TSEG_8MB :
+                mQ35TsegMbytes == 2 ? MCH_ESMRAMC_TSEG_2MB :
+                mQ35TsegMbytes == 1 ? MCH_ESMRAMC_TSEG_1MB :
+                MCH_ESMRAMC_TSEG_EXT;
   EsmramcVal |= MCH_ESMRAMC_T_EN;
   PciWrite8 (DRAMC_REGISTER_Q35 (MCH_ESMRAMC), EsmramcVal);
 

@@ -2,16 +2,10 @@
 #  Client-side iSCSI service.
 #
 #  The iSCSI driver provides iSCSI service in the preboot environment and supports
-#  booting over iSCSI.
-#                                                    
-# Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
-# This program and the accompanying materials
-# are licensed and made available under the terms and conditions of the BSD License
-# which accompanies this distribution.  The full text of the license may be found at
-# http://opensource.org/licenses/bsd-license.php
+#  booting over iSCSI. This driver supports both IPv4 and IPv6 network stack.
 #
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
 
@@ -28,7 +22,7 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF
+#  VALID_ARCHITECTURES           = IA32 X64
 #
 #  DRIVER_BINDING                =  gIScsiDriverBinding
 #  COMPONENT_NAME                =  gIScsiComponentName
@@ -50,12 +44,14 @@
   IScsiDhcp.h
   IScsiDhcp6.c
   IScsiDhcp6.h
+  IScsiDns.c
+  IScsiDns.h
   IScsiDriver.c
   IScsiDriver.h
   IScsiExtScsiPassThru.c
   IScsiIbft.c
   IScsiIbft.h
-  IScsiInitiatorName.c 
+  IScsiInitiatorName.c
   IScsiImpl.h
   IScsiMisc.c
   IScsiMisc.h
@@ -80,7 +76,7 @@
   PrintLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
-  UefiLib  
+  UefiLib
   UefiRuntimeServicesTableLib
   UefiHiiServicesLib
   BaseCryptLib
@@ -89,14 +85,20 @@
   gEfiAcpiTableProtocolGuid                     ## SOMETIMES_CONSUMES ## SystemTable
   gEfiDriverBindingProtocolGuid                 ## SOMETIMES_PRODUCES
   gEfiPciIoProtocolGuid                         ## SOMETIMES_CONSUMES
-  gEfiDhcp4ProtocolGuid                         ## TO_START
-  gEfiDhcp6ProtocolGuid                         ## TO_START  
-  gEfiDhcp4ServiceBindingProtocolGuid           ## TO_START
-  gEfiDhcp6ServiceBindingProtocolGuid           ## TO_START  
+  gEfiDhcp4ProtocolGuid                         ## SOMETIMES_CONSUMES
+  gEfiDhcp6ProtocolGuid                         ## SOMETIMES_CONSUMES
+  gEfiDhcp4ServiceBindingProtocolGuid           ## SOMETIMES_CONSUMES
+  gEfiDhcp6ServiceBindingProtocolGuid           ## SOMETIMES_CONSUMES
+  gEfiDns4ServiceBindingProtocolGuid            ## SOMETIMES_CONSUMES
+  gEfiDns4ProtocolGuid                          ## SOMETIMES_CONSUMES
+  gEfiDns6ServiceBindingProtocolGuid            ## SOMETIMES_CONSUMES
+  gEfiDns6ProtocolGuid                          ## SOMETIMES_CONSUMES
+  gEfiIp4Config2ProtocolGuid                    ## SOMETIMES_CONSUMES
+  gEfiIp6ConfigProtocolGuid                     ## SOMETIMES_CONSUMES
   gEfiTcp4ProtocolGuid                          ## TO_START
-  gEfiTcp6ProtocolGuid                          ## TO_START  
+  gEfiTcp6ProtocolGuid                          ## TO_START
   gEfiTcp4ServiceBindingProtocolGuid            ## TO_START
-  gEfiTcp6ServiceBindingProtocolGuid            ## TO_START  
+  gEfiTcp6ServiceBindingProtocolGuid            ## TO_START
   gEfiExtScsiPassThruProtocolGuid               ## BY_START
   gEfiHiiConfigAccessProtocolGuid               ## PRODUCES
   ## TO_START
@@ -105,21 +107,24 @@
   ## PRODUCES
   ## UNDEFINED # Variable
   gEfiIScsiInitiatorNameProtocolGuid
-  ## PRODUCES       
+  ## PRODUCES
   gEfiAuthenticationInfoProtocolGuid
-  ## CONSUMES
+  ## SOMETIMES_CONSUMES
   gEfiAdapterInformationProtocolGuid
+  gEfiNetworkInterfaceIdentifierProtocolGuid_31 ## SOMETIMES_CONSUMES
 
 [Guids]
   gEfiEventExitBootServicesGuid                 ## SOMETIMES_CONSUMES ## Event
   gEfiIfrTianoGuid                              ## SOMETIMES_PRODUCES ## UNDEFINED
   gEfiAcpiTableGuid                             ## SOMETIMES_CONSUMES ## SystemTable
   gEfiAcpi10TableGuid                           ## SOMETIMES_CONSUMES ## SystemTable
-  gEfiAcpi20TableGuid                           ## SOMETIMES_CONSUMES ## SystemTable
   gEfiAdapterInfoNetworkBootGuid                ## SOMETIMES_CONSUMES ## UNDEFINED
-  
+  gEfiAdapterInfoUndiIpv6SupportGuid            ## SOMETIMES_CONSUMES ## GUID
+
   ## SOMETIMES_PRODUCES ## Variable:L"AttemptOrder"
   ## SOMETIMES_CONSUMES ## Variable:L"AttemptOrder"
+  ## SOMETIMES_PRODUCES ## Variable:L"InitialAttemptOrder"
+  ## SOMETIMES_CONSUMES ## Variable:L"InitialAttemptOrder"
   ## SOMETIMES_CONSUMES ## UNDEFINED # HiiIsConfigHdrMatch   mVendorStorageName
   ## SOMETIMES_PRODUCES ## UNDEFINED # HiiConstructConfigHdr mVendorStorageName
   ## SOMETIMES_PRODUCES ## UNDEFINED # HiiGetBrowserData     mVendorStorageName
@@ -129,6 +134,7 @@
 
 [Pcd]
   gEfiNetworkPkgTokenSpaceGuid.PcdIScsiAIPNetworkBootPolicy ## CONSUMES
-  
+  gEfiNetworkPkgTokenSpaceGuid.PcdMaxIScsiAttemptNumber     ## CONSUMES
+
 [UserExtensions.TianoCore."ExtraFiles"]
   IScsiDxeExtra.uni

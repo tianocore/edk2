@@ -1,0 +1,28 @@
+//
+// DumpDynPcd is a shell application to dump dynamic pcd information.
+//
+// Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+//**/
+
+/=#
+
+#langdef en-US "English"
+
+#string STR_DUMP_DYN_PCD_HELP_INFORMATION       #language en-US ""
+                                                                ".TH DumpDynPcd 0 "Dump dynamic[ex] PCD info."\r\n"
+                                                                ".SH NAME\r\n"
+                                                                "Dump dynamic[ex] PCD info.\r\n"
+                                                                ".SH SYNOPSIS\r\n"
+                                                                " \r\n"
+                                                                "DumpDynPcd [PcdName].\r\n"
+                                                                ".SH OPTIONS\r\n"
+                                                                " \r\n"
+                                                                "  PcdName    Specifies the name of PCD.\r\n"
+                                                                "             A literal[or partial] name or a pattern as specified in\r\n"
+                                                                "             the MetaiMatch() function of the EFI_UNICODE_COLLATION2_PROCOOL.\r\n"
+                                                                "             If it is absent, dump all PCDs' info.\r\n"
+                                                                "The PCD data is printed as hexadecimal dump.\n"
+                                                                "\r\n"
+

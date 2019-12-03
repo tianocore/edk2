@@ -1,0 +1,36 @@
+## @file
+#  SPCR Table Generator
+#
+#  Copyright (c) 2017 - 2018, ARM Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x00010019
+  BASE_NAME      = AcpiSpcrLibArm
+  FILE_GUID      = 55088136-7B78-4974-B1EE-F630150D0DE7
+  VERSION_STRING = 1.0
+  MODULE_TYPE    = DXE_DRIVER
+  LIBRARY_CLASS  = NULL|DXE_DRIVER
+  CONSTRUCTOR    = AcpiSpcrLibConstructor
+  DESTRUCTOR     = AcpiSpcrLibDestructor
+
+[Sources]
+  SpcrGenerator.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  DynamicTablesPkg/DynamicTablesPkg.dec
+
+[LibraryClasses]
+  BaseLib
+
+[Pcd]
+
+[Protocols]
+
+[Guids]
+

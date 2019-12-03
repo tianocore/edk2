@@ -1,0 +1,37 @@
+## @file
+# dec file for Dynamic Tables Framework.
+#
+# Copyright (c) 2017 - 2018, ARM Limited. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  DEC_SPECIFICATION              = 0x00010005
+  PACKAGE_NAME                   = DynamicTablesPkg
+  PACKAGE_GUID                   = 188EB346-8ABA-460E-A105-0F9D76F7324A
+  PACKAGE_VERSION                = 1.0
+
+[Includes]
+  Include
+
+[Protocols]
+
+  # Configuration Manager Protocol GUID
+  gEdkiiConfigurationManagerProtocolGuid = { 0xd85a4835, 0x5a82, 0x4894, { 0xac, 0x2, 0x70, 0x6f, 0x43, 0xd5, 0x97, 0x8e } }
+
+  # Dynamic Table Factory Protocol GUID
+  gEdkiiDynamicTableFactoryProtocolGuid = { 0x91d1e327, 0xfe5a, 0x49b8, { 0xab, 0x65, 0xe, 0xce, 0x2d, 0xdb, 0x45, 0xec } }
+
+[PcdsFixedAtBuild]
+
+  # Maximum number of Custom ACPI Generators
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxCustomACPIGenerators|1|UINT16|0xC0000001
+
+  # Maximum number of Custom SMBIOS Generators
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxCustomSMBIOSGenerators|1|UINT16|0xC0000002
+
+  # Maximum number of Custom DT Generators
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxCustomDTGenerators|1|UINT16|0xC0000003
+

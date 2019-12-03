@@ -4,14 +4,8 @@
 
   (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -98,40 +92,6 @@ InternalShellProtocolIsSimpleFileSystemPresent(
   return (FALSE);
 }
 
-/**
-  Internal worker debug helper function to print out maps as they are added.
-
-  @param[in] Mapping        string mapping that has been added
-  @param[in] DevicePath     pointer to device path that has been mapped.
-
-  @retval EFI_SUCCESS   the operation was successful.
-  @return other         an error ocurred
-
-  @sa LocateHandle
-  @sa OpenProtocol
-**/
-EFI_STATUS
-InternalShellProtocolDebugPrintMessage (
-  IN CONST CHAR16                   *Mapping,
-  IN CONST EFI_DEVICE_PATH_PROTOCOL *DevicePath
-  )
-{
-  EFI_STATUS                        Status;
-  CHAR16                            *Temp;
-
-  Status = EFI_SUCCESS;
-  DEBUG_CODE_BEGIN();
-
-  if (Mapping != NULL) {
-    DEBUG((EFI_D_INFO, "Added new map item:\"%S\"\r\n", Mapping));
-  }
-  Temp = ConvertDevicePathToText(DevicePath, TRUE, TRUE);
-  DEBUG((EFI_D_INFO, "DevicePath: %S\r\n", Temp));
-  FreePool(Temp);
-
-  DEBUG_CODE_END();
-  return (Status);
-}
 
 /**
   This function creates a mapping for a device path.
@@ -477,7 +437,7 @@ EfiShellGetFilePathFromDevicePath(
         //  UEFI Shell spec section 3.7)
         if ((PathSize != 0)                        &&
             (PathForReturn != NULL)                &&
-            (PathForReturn[PathSize - 1] != L'\\') &&
+            (PathForReturn[PathSize / sizeof (CHAR16) - 1] != L'\\') &&
             (AlignedNode->PathName[0]    != L'\\')) {
           PathForReturn = StrnCatGrow (&PathForReturn, &PathSize, L"\\", 1);
         }
@@ -598,7 +558,8 @@ EfiShellGetDevicePathFromFilePath(
   //
   // build the full device path
   //
-  if (*(Path+StrLen(MapName)+1) == CHAR_NULL) {
+  if ((*(Path+StrLen(MapName)) != CHAR_NULL) &&
+      (*(Path+StrLen(MapName)+1) == CHAR_NULL)) {
     DevicePathForReturn = FileDevicePath(Handle, L"\\");
   } else {
     DevicePathForReturn = FileDevicePath(Handle, Path+StrLen(MapName));
@@ -826,7 +787,8 @@ EfiShellGetDeviceName(
   @retval EFI_NOT_FOUND         EFI_SIMPLE_FILE_SYSTEM could not be found or the root directory
                                 could not be opened.
   @retval EFI_VOLUME_CORRUPTED  The data structures in the volume were corrupted.
-  @retval EFI_DEVICE_ERROR      The device had an error
+  @retval EFI_DEVICE_ERROR      The device had an error.
+  @retval Others                Error status returned from EFI_SIMPLE_FILE_SYSTEM_PROTOCOL->OpenVolume().
 **/
 EFI_STATUS
 EFIAPI
@@ -866,8 +828,12 @@ EfiShellOpenRootByHandle(
   // Open the root volume now...
   //
   Status = SimpleFileSystem->OpenVolume(SimpleFileSystem, &RealFileHandle);
+  if (EFI_ERROR(Status)) {
+    return Status;
+  }
+
   *FileHandle = ConvertEfiFileProtocolToShellHandle(RealFileHandle, EfiShellGetMapFromDevicePath(&DevPath));
-  return (Status);
+  return (EFI_SUCCESS);
 }
 
 /**
@@ -1327,7 +1293,7 @@ EfiShellOpenFileByName(
   // We are opening a regular file.
   //
   DevicePath = EfiShellGetDevicePathFromFilePath(FileName);
-//  DEBUG_CODE(InternalShellProtocolDebugPrintMessage (NULL, DevicePath););
+
   if (DevicePath == NULL) {
     return (EFI_NOT_FOUND);
   }
@@ -1416,7 +1382,7 @@ EfiShellEnablePageBreak (
                                 variables with the format 'x=y', where x is the
                                 environment variable name and y is the value. If this
                                 is NULL, then the current shell environment is used.
-                            
+
   @param[out] StartImageStatus  Returned status from gBS->StartImage.
 
   @retval EFI_SUCCESS       The command executed successfully. The  status code
@@ -1454,7 +1420,7 @@ InternalShellExecuteDevicePath(
   ZeroMem(&ShellParamsProtocol, sizeof(EFI_SHELL_PARAMETERS_PROTOCOL));
 
   NewHandle = NULL;
-  
+
   NewCmdLine = AllocateCopyPool (StrSize (CommandLine), CommandLine);
   if (NewCmdLine == NULL) {
     return EFI_OUT_OF_RESOURCES;
@@ -1499,8 +1465,8 @@ InternalShellExecuteDevicePath(
     //
     if (LoadedImage->ImageCodeType != EfiLoaderCode){
       ShellPrintHiiEx(
-        -1, 
-        -1, 
+        -1,
+        -1,
         NULL,
         STRING_TOKEN (STR_SHELL_IMAGE_NOT_APP),
         ShellInfoObject.HiiHandle
@@ -1624,7 +1590,7 @@ FreeAlloc:
                                 variables with the format 'x=y', where x is the
                                 environment variable name and y is the value. If this
                                 is NULL, then the current shell environment is used.
-                
+
   @param[out] StartImageStatus  Returned status from the command line.
 
   @retval EFI_SUCCESS       The command executed successfully. The  status code
@@ -1678,6 +1644,7 @@ InternalShellExecute(
 STATIC
 BOOLEAN
 NestingEnabled(
+  VOID
 )
 {
   EFI_STATUS  Status;
@@ -1781,7 +1748,7 @@ EfiShellExecute(
     Temp = NULL;
     Size = 0;
     ASSERT((Temp == NULL && Size == 0) || (Temp != NULL));
-    StrnCatGrow(&Temp, &Size, L"Shell.efi -_exit ", 0);
+    StrnCatGrow(&Temp, &Size, L"Shell.efi -exit ", 0);
     StrnCatGrow(&Temp, &Size, CommandLine, 0);
 
     Status = InternalShellExecuteDevicePath(
@@ -2203,7 +2170,7 @@ EfiShellGetGuidFromName(
   if (Guid == NULL || GuidName == NULL) {
     return (EFI_INVALID_PARAMETER);
   }
- 
+
   Status = GetGuidFromStringName(GuidName, NULL, &NewGuid);
 
   if (!EFI_ERROR(Status)) {
@@ -2254,52 +2221,7 @@ EfiShellGetGuidName(
   return (EFI_SUCCESS);
 }
 
-/**
-  Updates a file name to be preceeded by the mapped drive name
 
-  @param[in] BasePath      the Mapped drive name to prepend
-  @param[in, out] Path     pointer to pointer to the file name to update.
-
-  @retval EFI_SUCCESS
-  @retval EFI_OUT_OF_RESOURCES
-**/
-EFI_STATUS
-UpdateFileName(
-  IN CONST CHAR16 *BasePath,
-  IN OUT CHAR16   **Path
-  )
-{
-  CHAR16              *Path2;
-  UINTN               Path2Size;
-
-  Path2Size = 0;
-  Path2 = NULL;
-
-  ASSERT(Path      != NULL);
-  ASSERT(*Path     != NULL);
-  ASSERT(BasePath  != NULL);
-
-  //
-  // convert a local path to an absolute path
-  //
-  if (StrStr(*Path, L":") == NULL) {
-    ASSERT((Path2 == NULL && Path2Size == 0) || (Path2 != NULL));
-    StrnCatGrow(&Path2, &Path2Size, BasePath, 0);
-    if (Path2 == NULL) {
-      return (EFI_OUT_OF_RESOURCES);
-    }
-    ASSERT((Path2 == NULL && Path2Size == 0) || (Path2 != NULL));
-    StrnCatGrow(&Path2, &Path2Size, (*Path)[0] == L'\\'?(*Path) + 1 :*Path, 0);
-    if (Path2 == NULL) {
-      return (EFI_OUT_OF_RESOURCES);
-    }
-  }
-
-  FreePool(*Path);
-  (*Path) = Path2;
-
-  return (EFI_SUCCESS);
-}
 
 /**
   If FileHandle is a directory then the function reads from FileHandle and reads in
@@ -2755,8 +2677,8 @@ EfiShellGetEnvEx(
       ; Node = (ENV_VAR_LIST*)GetNextNode(&gShellEnvVarList.Link, &Node->Link)
      ){
       ASSERT(Node->Key != NULL);
-      StrCpyS( CurrentWriteLocation, 
-                (Size)/sizeof(CHAR16) - (CurrentWriteLocation - ((CHAR16*)Buffer)), 
+      StrCpyS( CurrentWriteLocation,
+                (Size)/sizeof(CHAR16) - (CurrentWriteLocation - ((CHAR16*)Buffer)),
                 Node->Key
                 );
       CurrentWriteLocation += StrLen(CurrentWriteLocation) + 1;
@@ -2917,36 +2839,15 @@ EfiShellSetEnv(
   //
   // Make sure we dont 'set' a predefined read only variable
   //
-  if (gUnicodeCollation->StriColl(
-        gUnicodeCollation,
-        (CHAR16*)Name,
-        L"cwd") == 0
-    ||gUnicodeCollation->StriColl(
-        gUnicodeCollation,
-        (CHAR16*)Name,
-        L"Lasterror") == 0
-    ||gUnicodeCollation->StriColl(
-        gUnicodeCollation,
-        (CHAR16*)Name,
-        L"profiles") == 0
-    ||gUnicodeCollation->StriColl(
-        gUnicodeCollation,
-        (CHAR16*)Name,
-        L"uefishellsupport") == 0
-    ||gUnicodeCollation->StriColl(
-        gUnicodeCollation,
-        (CHAR16*)Name,
-        L"uefishellversion") == 0
-    ||gUnicodeCollation->StriColl(
-        gUnicodeCollation,
-        (CHAR16*)Name,
-        L"uefiversion") == 0
-    ||(!ShellInfoObject.ShellInitSettings.BitUnion.Bits.NoNest &&
-      gUnicodeCollation->StriColl(
-        gUnicodeCollation,
-        (CHAR16*)Name,
-        (CHAR16*)mNoNestingEnvVarName) == 0)
-       ){
+  if ((StrCmp (Name, L"cwd") == 0) ||
+      (StrCmp (Name, L"lasterror") == 0) ||
+      (StrCmp (Name, L"profiles") == 0) ||
+      (StrCmp (Name, L"uefishellsupport") == 0) ||
+      (StrCmp (Name, L"uefishellversion") == 0) ||
+      (StrCmp (Name, L"uefiversion") == 0) ||
+      (!ShellInfoObject.ShellInitSettings.BitUnion.Bits.NoNest &&
+       StrCmp (Name, mNoNestingEnvVarName) == 0)
+     ) {
     return (EFI_INVALID_PARAMETER);
   }
   return (InternalEfiShellSetEnv(Name, Value, Volatile));
@@ -3079,10 +2980,10 @@ EfiShellSetCurDir(
       // make that the current file system mapping
       //
       if (MapListItem != NULL) {
-        gShellCurDir = MapListItem;
+        gShellCurMapping = MapListItem;
       }
     } else {
-      MapListItem = gShellCurDir;
+      MapListItem = gShellCurMapping;
     }
 
     if (MapListItem == NULL) {
@@ -3131,7 +3032,7 @@ EfiShellSetCurDir(
       FreePool (DirectoryName);
       return (EFI_INVALID_PARAMETER);
     }
-//    gShellCurDir = MapListItem;
+//    gShellCurMapping = MapListItem;
     if (DirectoryName != NULL) {
       //
       // change current dir on that file system
@@ -3157,7 +3058,7 @@ EfiShellSetCurDir(
   //
   // if updated the current directory then update the environment variable
   //
-  if (MapListItem == gShellCurDir) {
+  if (MapListItem == gShellCurMapping) {
     Size = 0;
     ASSERT((TempString == NULL && Size == 0) || (TempString != NULL));
     StrnCatGrow(&TempString, &Size, MapListItem->MapName, 0);
@@ -3226,9 +3127,9 @@ EfiShellGetHelpText(
         return EFI_OUT_OF_RESOURCES;
       }
 
-      StrnCpyS( FixCommand, 
-                (StrSize(Command) - 4 * sizeof (CHAR16))/sizeof(CHAR16), 
-                Command, 
+      StrnCpyS( FixCommand,
+                (StrSize(Command) - 4 * sizeof (CHAR16))/sizeof(CHAR16),
+                Command,
                 StrLen(Command)-4
                 );
       Status = ProcessManFile(FixCommand, FixCommand, Sections, NULL, HelpText);
@@ -3285,9 +3186,10 @@ EfiShellIsRootShell(
 **/
 CHAR16 *
 InternalEfiShellGetListAlias(
+  VOID
   )
 {
-  
+
   EFI_STATUS        Status;
   EFI_GUID          Guid;
   CHAR16            *VariableName;
@@ -3322,17 +3224,17 @@ InternalEfiShellGetListAlias(
         RetVal = NULL;
         break;
       }
-      
+
       NameSize = NameBufferSize;
       Status = gRT->GetNextVariableName(&NameSize, VariableName, &Guid);
     }
-    
+
     if (EFI_ERROR (Status)) {
       SHELL_FREE_NON_NULL(RetVal);
       RetVal = NULL;
       break;
     }
-    
+
     if (CompareGuid(&Guid, &gShellAliasGuid)){
       ASSERT((RetVal == NULL && RetSize == 0) || (RetVal != NULL));
       RetVal = StrnCatGrow(&RetVal, &RetSize, VariableName, 0);
@@ -3347,10 +3249,10 @@ InternalEfiShellGetListAlias(
 /**
   Convert a null-terminated unicode string, in-place, to all lowercase.
   Then return it.
-  
+
   @param  Str    The null-terminated string to be converted to all lowercase.
-  
-  @return        The null-terminated string converted into all lowercase.  
+
+  @return        The null-terminated string converted into all lowercase.
 **/
 CHAR16 *
 ToLower (
@@ -3377,7 +3279,7 @@ ToLower (
   @param[out] Volatile          upon return of a single command if TRUE indicates
                                 this is stored in a volatile fashion.  FALSE otherwise.
 
-  @return                      	If Alias is not NULL, it will return a pointer to
+  @return                        If Alias is not NULL, it will return a pointer to
                                 the NULL-terminated command for that alias.
                                 If Alias is NULL, ReturnedData points to a ';'
                                 delimited list of alias (e.g.
@@ -3463,40 +3365,40 @@ InternalSetAlias(
 {
   EFI_STATUS  Status;
   CHAR16      *AliasLower;
+  BOOLEAN     DeleteAlias;
 
-  // Convert to lowercase to make aliases case-insensitive
-  if (Alias != NULL) {
-    AliasLower = AllocateCopyPool (StrSize (Alias), Alias);
-    if (AliasLower == NULL) {
-      return EFI_OUT_OF_RESOURCES;
-    }
-    ToLower (AliasLower);
-  } else {
-    AliasLower = NULL;
-  }
-
-  //
-  // We must be trying to remove one if Alias is NULL
-  //
+  DeleteAlias = FALSE;
   if (Alias == NULL) {
     //
+    // We must be trying to remove one if Alias is NULL
     // remove an alias (but passed in COMMAND parameter)
     //
-    Status = (gRT->SetVariable((CHAR16*)Command, &gShellAliasGuid, 0, 0, NULL));
+    Alias       = Command;
+    DeleteAlias = TRUE;
+  }
+  ASSERT (Alias != NULL);
+
+  //
+  // Convert to lowercase to make aliases case-insensitive
+  //
+  AliasLower = AllocateCopyPool (StrSize (Alias), Alias);
+  if (AliasLower == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+  ToLower (AliasLower);
+
+  if (DeleteAlias) {
+    Status = gRT->SetVariable (AliasLower, &gShellAliasGuid, 0, 0, NULL);
   } else {
-    //
-    // Add and replace are the same
-    //
-
-    // We dont check the error return on purpose since the variable may not exist.
-    gRT->SetVariable((CHAR16*)Command, &gShellAliasGuid, 0, 0, NULL);
-
-    Status = (gRT->SetVariable((CHAR16*)Alias, &gShellAliasGuid, EFI_VARIABLE_BOOTSERVICE_ACCESS|(Volatile?0:EFI_VARIABLE_NON_VOLATILE), StrSize(Command), (VOID*)Command));
+    Status = gRT->SetVariable (
+                    AliasLower, &gShellAliasGuid,
+                    EFI_VARIABLE_BOOTSERVICE_ACCESS | (Volatile ? 0 : EFI_VARIABLE_NON_VOLATILE),
+                    StrSize (Command), (VOID *) Command
+                    );
   }
 
-  if (Alias != NULL) {
-    FreePool (AliasLower);
-  }
+  FreePool (AliasLower);
+
   return Status;
 }
 
@@ -3793,7 +3695,7 @@ CleanUpShellEnvironment (
 {
   EFI_STATUS                        Status;
   EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *SimpleEx;
-  
+
   CleanUpShellProtocol (NewShell);
 
   Status = gBS->CloseEvent(NewShell->ExecutionBreak);
@@ -3836,21 +3738,21 @@ NotificationFunction(
   if ( ((KeyData->Key.UnicodeChar == L'c') &&
         (KeyData->KeyState.KeyShiftState == (EFI_SHIFT_STATE_VALID|EFI_LEFT_CONTROL_PRESSED) || KeyData->KeyState.KeyShiftState  == (EFI_SHIFT_STATE_VALID|EFI_RIGHT_CONTROL_PRESSED))) ||
       (KeyData->Key.UnicodeChar == 3)
-      ){ 
+      ){
     if (ShellInfoObject.NewEfiShellProtocol->ExecutionBreak == NULL) {
       return (EFI_UNSUPPORTED);
     }
     return (gBS->SignalEvent(ShellInfoObject.NewEfiShellProtocol->ExecutionBreak));
   } else if  ((KeyData->Key.UnicodeChar == L's') &&
               (KeyData->KeyState.KeyShiftState  == (EFI_SHIFT_STATE_VALID|EFI_LEFT_CONTROL_PRESSED) || KeyData->KeyState.KeyShiftState  == (EFI_SHIFT_STATE_VALID|EFI_RIGHT_CONTROL_PRESSED))
-              ){ 
+              ){
     ShellInfoObject.HaltOutput = TRUE;
   }
   return (EFI_SUCCESS);
 }
 
 /**
-  Function to start monitoring for CTRL-C using SimpleTextInputEx.  This 
+  Function to start monitoring for CTRL-C using SimpleTextInputEx.  This
   feature's enabled state was not known when the shell initially launched.
 
   @retval EFI_SUCCESS           The feature is enabled.
@@ -3874,8 +3776,8 @@ InernalEfiShellStartMonitor(
     EFI_OPEN_PROTOCOL_GET_PROTOCOL);
   if (EFI_ERROR(Status)) {
     ShellPrintHiiEx(
-      -1, 
-      -1, 
+      -1,
+      -1,
       NULL,
       STRING_TOKEN (STR_SHELL_NO_IN_EX),
       ShellInfoObject.HiiHandle);
@@ -3896,7 +3798,7 @@ InernalEfiShellStartMonitor(
     &KeyData,
     NotificationFunction,
     &ShellInfoObject.CtrlCNotifyHandle1);
-  
+
   KeyData.KeyState.KeyShiftState  = EFI_SHIFT_STATE_VALID|EFI_RIGHT_CONTROL_PRESSED;
   if (!EFI_ERROR(Status)) {
     Status = SimpleEx->RegisterKeyNotify(

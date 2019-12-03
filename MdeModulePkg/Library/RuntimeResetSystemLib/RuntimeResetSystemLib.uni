@@ -1,0 +1,16 @@
+// /** @file
+// Runtime Reset System Library instance that calls gRT->ResetSystem().
+//
+// Runtime Reset System Library instance that calls gRT->ResetSystem().
+//
+// Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Runtime Reset System Library instance that calls gRT->ResetSystem()"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "Runtime Reset System Library instance that calls gRT->ResetSystem()."
+

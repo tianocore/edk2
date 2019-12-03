@@ -1,0 +1,19 @@
+// /** @file
+// This module produces EFI TLS Protocol, EFI TLS Service Binding Protocol and
+// EFI TLS Configuration Protocol.
+//
+// This module produces EFI TLS (Transport Layer Security) Protocol, EFI TLS
+// Service Binding Protocol, and EFI TLS Configuration Protocol to provide TLS
+// services.
+//
+// Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "UEFI TLS service"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This module produces EFI TLS Protocol, EFI TLS Service Binding Protocol and EFI TLS Configuration Protocol to provide EFI TLS services."
+

@@ -1,14 +1,8 @@
 /** @file
 Variable operation that will be used by bootmaint
 
-Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -16,13 +10,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 /**
   Delete Boot Option that represent a Deleted state in BootOptionMenu.
-  After deleting this boot option, call Var_ChangeBootOrder to
-  make sure BootOrder is in valid state.
 
-  @retval EFI_SUCCESS   If all boot load option EFI Variables corresponding to  
+  @retval EFI_SUCCESS   If all boot load option EFI Variables corresponding to
                         BM_LOAD_CONTEXT marked for deletion is deleted.
   @retval EFI_NOT_FOUND If can not find the boot option want to be deleted.
-  @return Others        If failed to update the "BootOrder" variable after deletion. 
+  @return Others        If failed to update the "BootOrder" variable after deletion.
 
 **/
 EFI_STATUS
@@ -32,12 +24,10 @@ Var_DelBootOption (
 {
   BM_MENU_ENTRY   *NewMenuEntry;
   BM_LOAD_CONTEXT *NewLoadContext;
-  UINT16          BootString[10];
   EFI_STATUS      Status;
   UINTN           Index;
   UINTN           Index2;
 
-  Status  = EFI_SUCCESS;
   Index2  = 0;
   for (Index = 0; Index < BootOptionMenu.MenuNumber; Index++) {
     NewMenuEntry = BOpt_GetMenuEntry (&BootOptionMenu, (Index - Index2));
@@ -50,14 +40,10 @@ Var_DelBootOption (
       continue;
     }
 
-    UnicodeSPrint (
-      BootString,
-      sizeof (BootString),
-      L"Boot%04x",
-      NewMenuEntry->OptionNumber
-      );
-
-    EfiLibDeleteVariable (BootString, &gEfiGlobalVariableGuid);
+    Status = EfiBootManagerDeleteLoadOptionVariable (NewMenuEntry->OptionNumber,LoadOptionTypeBoot);
+    if (EFI_ERROR (Status)) {
+     return Status;
+    }
     Index2++;
     //
     // If current Load Option is the same as BootNext,
@@ -75,102 +61,11 @@ Var_DelBootOption (
 
   BootOptionMenu.MenuNumber -= Index2;
 
-  Status = Var_ChangeBootOrder ();
-  return Status;
-}
-
-/**
-  After any operation on Boot####, there will be a discrepancy in BootOrder.
-  Since some are missing but in BootOrder, while some are present but are
-  not reflected by BootOrder. Then a function rebuild BootOrder from
-  scratch by content from BootOptionMenu is needed.
-
-
-  
-
-  @retval  EFI_SUCCESS  The boot order is updated successfully.
-  @return               EFI_STATUS other than EFI_SUCCESS if failed to
-                        Set the "BootOrder" EFI Variable.
-
-**/
-EFI_STATUS
-Var_ChangeBootOrder (
-  VOID
-  )
-{
-
-  EFI_STATUS    Status;
-  BM_MENU_ENTRY *NewMenuEntry;
-  UINT16        *BootOrderList;
-  UINT16        *BootOrderListPtr;
-  UINTN         BootOrderListSize;
-  UINTN         Index;
-
-  BootOrderList     = NULL;
-  BootOrderListSize = 0;
-  //
-  // First check whether BootOrder is present in current configuration
-  //
-  GetEfiGlobalVariable2 (L"BootOrder", (VOID **) &BootOrderList, &BootOrderListSize);
-
-  //
-  // If exists, delete it to hold new BootOrder
-  //
-  if (BootOrderList != NULL) {
-    EfiLibDeleteVariable (L"BootOrder", &gEfiGlobalVariableGuid);
-    FreePool (BootOrderList);
-    BootOrderList = NULL;
-  }
-  //
-  // Maybe here should be some check method to ensure that
-  // no new added boot options will be added
-  // but the setup engine now will give only one callback
-  // that is to say, user are granted only one chance to
-  // decide whether the boot option will be added or not
-  // there should be no indictor to show whether this
-  // is a "new" boot option
-  //
-  BootOrderListSize = BootOptionMenu.MenuNumber;
-
-  if (BootOrderListSize > 0) {
-    BootOrderList = AllocateZeroPool (BootOrderListSize * sizeof (UINT16));
-    ASSERT (BootOrderList != NULL);
-    BootOrderListPtr = BootOrderList;
-
-    //
-    // Get all current used Boot#### from BootOptionMenu.
-    // OptionNumber in each BM_LOAD_OPTION is really its
-    // #### value.
-    //
-    for (Index = 0; Index < BootOrderListSize; Index++) {
-      NewMenuEntry    = BOpt_GetMenuEntry (&BootOptionMenu, Index);
-      *BootOrderList  = (UINT16) NewMenuEntry->OptionNumber;
-      BootOrderList++;
-    }
-
-    BootOrderList = BootOrderListPtr;
-
-    //
-    // After building the BootOrderList, write it back
-    //
-    Status = gRT->SetVariable (
-                    L"BootOrder",
-                    &gEfiGlobalVariableGuid,
-                    VAR_FLAG,
-                    BootOrderListSize * sizeof (UINT16),
-                    BootOrderList
-                    );
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
-  }
   return EFI_SUCCESS;
 }
 
 /**
-  Delete Load Option that represent a Deleted state in BootOptionMenu.
-  After deleting this Driver option, call Var_ChangeDriverOrder to
-  make sure DriverOrder is in valid state.
+  Delete Load Option that represent a Deleted state in DriverOptionMenu.
 
   @retval EFI_SUCCESS       Load Option is successfully updated.
   @retval EFI_NOT_FOUND     Fail to find the driver option want to be deleted.
@@ -185,12 +80,10 @@ Var_DelDriverOption (
 {
   BM_MENU_ENTRY   *NewMenuEntry;
   BM_LOAD_CONTEXT *NewLoadContext;
-  UINT16          DriverString[12];
   EFI_STATUS      Status;
   UINTN           Index;
   UINTN           Index2;
 
-  Status  = EFI_SUCCESS;
   Index2  = 0;
   for (Index = 0; Index < DriverOptionMenu.MenuNumber; Index++) {
     NewMenuEntry = BOpt_GetMenuEntry (&DriverOptionMenu, (Index - Index2));
@@ -202,15 +95,11 @@ Var_DelDriverOption (
     if (!NewLoadContext->Deleted) {
       continue;
     }
+    Status = EfiBootManagerDeleteLoadOptionVariable (NewMenuEntry->OptionNumber,LoadOptionTypeDriver);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
 
-    UnicodeSPrint (
-      DriverString,
-      sizeof (DriverString),
-      L"Driver%04x",
-      NewMenuEntry->OptionNumber
-      );
-
-    EfiLibDeleteVariable (DriverString, &gEfiGlobalVariableGuid);
     Index2++;
 
     RemoveEntryList (&NewMenuEntry->Link);
@@ -220,83 +109,6 @@ Var_DelDriverOption (
 
   DriverOptionMenu.MenuNumber -= Index2;
 
-  Status = Var_ChangeDriverOrder ();
-  return Status;
-}
-
-/**
-  After any operation on Driver####, there will be a discrepancy in
-  DriverOrder. Since some are missing but in DriverOrder, while some
-  are present but are not reflected by DriverOrder. Then a function
-  rebuild DriverOrder from scratch by content from DriverOptionMenu is
-  needed.
-
-  @retval  EFI_SUCCESS  The driver order is updated successfully.
-  @return  Other status than EFI_SUCCESS if failed to set the "DriverOrder" EFI Variable.
-
-**/
-EFI_STATUS
-Var_ChangeDriverOrder (
-  VOID
-  )
-{
-  EFI_STATUS    Status;
-  BM_MENU_ENTRY *NewMenuEntry;
-  UINT16        *DriverOrderList;
-  UINT16        *DriverOrderListPtr;
-  UINTN         DriverOrderListSize;
-  UINTN         Index;
-
-  DriverOrderList     = NULL;
-  DriverOrderListSize = 0;
-
-  //
-  // First check whether DriverOrder is present in current configuration
-  //
-  GetEfiGlobalVariable2 (L"DriverOrder", (VOID **) &DriverOrderList, &DriverOrderListSize);
-  //
-  // If exists, delete it to hold new DriverOrder
-  //
-  if (DriverOrderList != NULL) {
-    EfiLibDeleteVariable (L"DriverOrder", &gEfiGlobalVariableGuid);
-    FreePool (DriverOrderList);
-    DriverOrderList = NULL;
-  }
-
-  DriverOrderListSize = DriverOptionMenu.MenuNumber;
-
-  if (DriverOrderListSize > 0) {
-    DriverOrderList = AllocateZeroPool (DriverOrderListSize * sizeof (UINT16));
-    ASSERT (DriverOrderList != NULL);
-    DriverOrderListPtr = DriverOrderList;
-
-    //
-    // Get all current used Driver#### from DriverOptionMenu.
-    // OptionNumber in each BM_LOAD_OPTION is really its
-    // #### value.
-    //
-    for (Index = 0; Index < DriverOrderListSize; Index++) {
-      NewMenuEntry      = BOpt_GetMenuEntry (&DriverOptionMenu, Index);
-      *DriverOrderList  = (UINT16) NewMenuEntry->OptionNumber;
-      DriverOrderList++;
-    }
-
-    DriverOrderList = DriverOrderListPtr;
-
-    //
-    // After building the DriverOrderList, write it back
-    //
-    Status = gRT->SetVariable (
-                    L"DriverOrder",
-                    &gEfiGlobalVariableGuid,
-                    VAR_FLAG,
-                    DriverOrderListSize * sizeof (UINT16),
-                    DriverOrderList
-                    );
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
-  }
   return EFI_SUCCESS;
 }
 
@@ -306,7 +118,7 @@ Var_ChangeDriverOrder (
 
   This function clear the EFI variable defined by ConsoleName and
   gEfiGlobalVariableGuid. It then build the multi-instance device
-  path by appending the device path of the Console (In/Out/Err) instance 
+  path by appending the device path of the Console (In/Out/Err) instance
   in ConsoleMenu. Then it scan all corresponding console device by
   scanning Terminal (built from device supporting Serial I/O instances)
   devices in TerminalMenu. At last, it save a EFI variable specifed
@@ -370,7 +182,7 @@ Var_UpdateConsoleOption (
         ) {
       Vendor.Header.Type    = MESSAGING_DEVICE_PATH;
       Vendor.Header.SubType = MSG_VENDOR_DP;
-      
+
       ASSERT (NewTerminalContext->TerminalType < (ARRAY_SIZE (TerminalTypeGuid)));
       CopyMem (
         &Vendor.Guid,
@@ -443,7 +255,7 @@ Var_UpdateConsoleOutOption (
   console device.
 
   @retval EFI_SUCCESS    The function complete successfully.
-  @return The EFI variable can not be saved. See gRT->SetVariable for detail return information.  
+  @return The EFI variable can not be saved. See gRT->SetVariable for detail return information.
 **/
 EFI_STATUS
 Var_UpdateErrorOutOption (
@@ -454,8 +266,8 @@ Var_UpdateErrorOutOption (
 }
 
 /**
-  This function create a currently loaded Drive Option from 
-  the BMM. It then appends this Driver Option to the end of 
+  This function create a currently loaded Drive Option from
+  the BMM. It then appends this Driver Option to the end of
   the "DriverOrder" list. It append this Driver Opotion to the end
   of DriverOptionMenu.
 
@@ -583,8 +395,8 @@ Var_UpdateDriverOption (
 }
 
 /**
-  This function create a currently loaded Boot Option from 
-  the BMM. It then appends this Boot Option to the end of 
+  This function create a currently loaded Boot Option from
+  the BMM. It then appends this Boot Option to the end of
   the "BootOrder" list. It also append this Boot Opotion to the end
   of BootOptionMenu.
 
@@ -703,7 +515,7 @@ Var_UpdateBootOption (
 }
 
 /**
-  This function update the "BootNext" EFI Variable. If there is 
+  This function update the "BootNext" EFI Variable. If there is
   no "BootNext" specified in BMM, this EFI Variable is deleted.
   It also update the BMM context data specified the "BootNext"
   vaule.
@@ -711,7 +523,7 @@ Var_UpdateBootOption (
   @param CallbackData    The BMM context data.
 
   @retval EFI_SUCCESS    The function complete successfully.
-  @return                The EFI variable can be saved. See gRT->SetVariable 
+  @return                The EFI variable can be saved. See gRT->SetVariable
                          for detail return information.
 
 **/
@@ -815,7 +627,7 @@ Var_UpdateBootOrder (
                   BootOrder
                   );
   FreePool (BootOrder);
-  
+
   BOpt_FreeMenu (&BootOptionMenu);
   BOpt_GetBootOptions (CallbackData);
 

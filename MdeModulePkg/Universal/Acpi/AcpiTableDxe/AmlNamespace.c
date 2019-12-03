@@ -1,14 +1,8 @@
 /** @file
   ACPI Sdt Protocol Driver
 
-  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved. <BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved. <BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -16,11 +10,11 @@
 
 /**
   Construct node list according to the AML handle.
-  
+
   @param[in]    AmlHandle            AML handle.
   @param[in]    AmlRootNodeList      AML root node list.
   @param[in]    AmlParentNodeList    AML parent node list.
-  
+
   @retval       EFI_SUCCESS           Success.
   @retval       EFI_INVALID_PARAMETER AML handle does not refer to a valid ACPI object.
 **/
@@ -33,11 +27,11 @@ AmlConstructNodeList (
 
 /**
   Create AML Node.
-  
+
   @param[in]    NameSeg              AML NameSeg.
   @param[in]    Parent               AML parent node list.
   @param[in]    AmlByteEncoding      AML Byte Encoding.
-  
+
   @return       AML Node.
 **/
 EFI_AML_NODE_LIST *
@@ -66,11 +60,11 @@ AmlCreateNode (
 
 /**
   Find the AML NameSeg in the children of AmlParentNodeList.
-  
+
   @param[in]    NameSeg              AML NameSeg.
   @param[in]    AmlParentNodeList    AML parent node list.
   @param[in]    Create               TRUE means to create node if not found.
-  
+
   @return       AmlChildNode whoes name is same as NameSeg.
 **/
 EFI_AML_NODE_LIST *
@@ -120,12 +114,12 @@ AmlFindNodeInThis (
 
 /**
   Find the AML NameString in the children of AmlParentNodeList or AmlRootNodeList.
-  
+
   @param[in]    NameString           AML NameString.
   @param[in]    AmlRootNodeList      AML root node list.
   @param[in]    AmlParentNodeList    AML parent node list.
   @param[in]    Create               TRUE means to create node if not found.
-  
+
   @return       AmlChildNode whoes name is same as NameSeg.
 **/
 EFI_AML_NODE_LIST *
@@ -166,7 +160,7 @@ AmlFindNodeInTheTree (
   } else {
     AmlCurrentNodeList = AmlParentNodeList;
   }
-  
+
   //
   // Handle name segment
   //
@@ -206,13 +200,13 @@ AmlFindNodeInTheTree (
 
 /**
   Insert the NameString to the AmlNodeList.
-  
+
   @param[in]    NameString           AML NameString.
   @param[in]    Buffer               Buffer for the Node.
   @param[in]    Size                 Size for the Node.
   @param[in]    AmlRootNodeList      AML root node list.
   @param[in]    AmlParentNodeList    AML parent node list.
-  
+
   @return       AmlChildNode whoes name is NameString.
 **/
 EFI_AML_NODE_LIST *
@@ -278,11 +272,11 @@ AmlInsertNodeToTree (
 
 /**
   Construct child node list according to the AML handle.
-  
+
   @param[in]    AmlHandle            AML handle.
   @param[in]    AmlRootNodeList      AML root node list.
   @param[in]    AmlParentNodeList    AML parent node list.
-  
+
   @retval       EFI_SUCCESS           Success.
   @retval       EFI_INVALID_PARAMETER AML handle does not refer to a valid ACPI object.
 **/
@@ -369,11 +363,11 @@ AmlConstructNodeListForChild (
 
 /**
   Construct node list according to the AML handle.
-  
+
   @param[in]    AmlHandle            AML handle.
   @param[in]    AmlRootNodeList      AML root node list.
   @param[in]    AmlParentNodeList    AML parent node list.
-  
+
   @retval       EFI_SUCCESS           Success.
   @retval       EFI_INVALID_PARAMETER AML handle does not refer to a valid ACPI object.
 **/
@@ -420,7 +414,7 @@ AmlConstructNodeList (
 
 /**
   Destruct node list
-  
+
   @param[in]    AmlParentNodeList    AML parent node list.
 **/
 VOID
@@ -465,7 +459,7 @@ AmlDestructNodeList (
 
 /**
   Dump node list
-  
+
   @param[in]    AmlParentNodeList    AML parent node list.
   @param[in]    Level                Output debug level.
 **/
@@ -502,16 +496,16 @@ AmlDumpNodeInfo (
 
 /**
   Returns the handle of the ACPI object representing the specified ACPI AML path
-  
+
   @param[in]    AmlHandle   Points to the handle of the object representing the starting point for the path search.
   @param[in]    AmlPath     Points to the ACPI AML path.
   @param[out]   Buffer      On return, points to the ACPI object which represents AcpiPath, relative to
                             HandleIn.
   @param[in]    FromRoot    TRUE means to find AML path from \ (Root) Node.
                             FALSE means to find AML path from this Node (The HandleIn).
-                            
+
   @retval EFI_SUCCESS           Success
-  @retval EFI_INVALID_PARAMETER HandleIn does not refer to a valid ACPI object.                            
+  @retval EFI_INVALID_PARAMETER HandleIn does not refer to a valid ACPI object.
 **/
 EFI_STATUS
 AmlFindPath (

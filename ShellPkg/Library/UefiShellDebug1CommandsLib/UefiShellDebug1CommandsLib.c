@@ -1,14 +1,8 @@
 /** @file
   Main file for NULL named library for debug1 profile shell command functions.
 
-  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -16,7 +10,7 @@
 #include <Library/BcfgCommandLib.h>
 
 STATIC CONST CHAR16 mFileName[] = L"Debug1Commands";
-EFI_HANDLE gShellDebug1HiiHandle = NULL;
+EFI_HII_HANDLE gShellDebug1HiiHandle = NULL;
 
 /**
   Gets the debug file name.  This will be used if HII is not working.
@@ -113,34 +107,6 @@ UefiShellDebug1CommandsLibDestructor (
   return (EFI_SUCCESS);
 }
 
-/**
-  Convert a Unicode character to upper case only if
-  it maps to a valid small-case ASCII character.
-
-  This internal function only deal with Unicode character
-  which maps to a valid small-case ASCII character, i.e.
-  L'a' to L'z'. For other Unicode character, the input character
-  is returned directly.
-
-  @param  Char  The character to convert.
-
-  @retval LowerCharacter   If the Char is with range L'a' to L'z'.
-  @retval Unchanged        Otherwise.
-
-
-  //Stolen from MdePkg Baselib
-**/
-CHAR16
-CharToUpper (
-  IN      CHAR16                    Char
-  )
-{
-  if (Char >= L'a' && Char <= L'z') {
-    return (CHAR16) (Char - (L'a' - L'A'));
-  }
-
-  return Char;
-}
 
 /**
   Function returns a system configuration table that is stored in the
@@ -172,125 +138,8 @@ GetSystemConfigurationTable (
 }
 
 /**
-  Convert a Unicode character to numerical value.
-
-  This internal function only deal with Unicode character
-  which maps to a valid hexadecimal ASII character, i.e.
-  L'0' to L'9', L'a' to L'f' or L'A' to L'F'. For other
-  Unicode character, the value returned does not make sense.
-
-  @param  Char  The character to convert.
-
-  @return The numerical value converted.
-
-**/
-UINTN
-HexCharToUintn (
-  IN      CHAR16                    Char
-  )
-{
-  if (Char >= L'0' && Char <= L'9') {
-    return Char - L'0';
-  }
-
-  return (UINTN) (10 + CharToUpper (Char) - L'A');
-}
-
-/**
-  Convert a string representation of a guid to a Guid value.
-
-  @param[in] StringGuid    The pointer to the string of a guid.
-  @param[in, out] Guid     The pointer to the GUID structure to populate.
-
-  @retval EFI_INVALID_PARAMETER   A parameter was invalid.
-  @retval EFI_SUCCESS             The conversion was successful.
-**/
-EFI_STATUS
-ConvertStringToGuid (
-  IN CONST CHAR16 *StringGuid,
-  IN OUT EFI_GUID *Guid
-  )
-{
-  CHAR16  *TempCopy;
-  CHAR16  *TempSpot;
-  CHAR16  *Walker;
-  UINT64  TempVal;
-  EFI_STATUS Status;
-
-  if (StringGuid == NULL) {
-    return (EFI_INVALID_PARAMETER);
-  } else if (StrLen(StringGuid) != 36) {
-    return (EFI_INVALID_PARAMETER);
-  } 
-  TempCopy = NULL;
-  TempCopy = StrnCatGrow(&TempCopy, NULL, StringGuid, 0);
-  if (TempCopy == NULL) {
-    return (EFI_OUT_OF_RESOURCES);
-  }
-  Walker   = TempCopy;
-  TempSpot = StrStr(Walker, L"-");
-  if (TempSpot != NULL) {
-    *TempSpot = CHAR_NULL;
-  }
-  Status = ShellConvertStringToUint64(Walker, &TempVal, TRUE, FALSE);
-  if (EFI_ERROR(Status)) {
-    FreePool(TempCopy);
-    return (Status);
-  }
-  Guid->Data1 = (UINT32)TempVal;
-  Walker += 9;
-  TempSpot = StrStr(Walker, L"-");
-  if (TempSpot != NULL) {
-    *TempSpot = CHAR_NULL;
-  }
-  Status = ShellConvertStringToUint64(Walker, &TempVal, TRUE, FALSE);
-  if (EFI_ERROR(Status)) {
-    FreePool(TempCopy);
-    return (Status);
-  }
-  Guid->Data2 = (UINT16)TempVal;
-  Walker += 5;
-  TempSpot = StrStr(Walker, L"-");
-  if (TempSpot != NULL) {
-    *TempSpot = CHAR_NULL;
-  }
-  Status = ShellConvertStringToUint64(Walker, &TempVal, TRUE, FALSE);
-  if (EFI_ERROR(Status)) {
-    FreePool(TempCopy);
-    return (Status);
-  }
-  Guid->Data3 = (UINT16)TempVal;
-  Walker += 5;
-  Guid->Data4[0] = (UINT8)(HexCharToUintn(Walker[0]) * 16);
-  Guid->Data4[0] = (UINT8)(Guid->Data4[0]+ (UINT8)HexCharToUintn(Walker[1]));
-  Walker += 2;
-  Guid->Data4[1] = (UINT8)(HexCharToUintn(Walker[0]) * 16);
-  Guid->Data4[1] = (UINT8)(Guid->Data4[1] + (UINT8)HexCharToUintn(Walker[1]));
-  Walker += 3;
-  Guid->Data4[2] = (UINT8)(HexCharToUintn(Walker[0]) * 16);
-  Guid->Data4[2] = (UINT8)(Guid->Data4[2] + (UINT8)HexCharToUintn(Walker[1]));
-  Walker += 2;
-  Guid->Data4[3] = (UINT8)(HexCharToUintn(Walker[0]) * 16);
-  Guid->Data4[3] = (UINT8)(Guid->Data4[3] + (UINT8)HexCharToUintn(Walker[1]));
-  Walker += 2;
-  Guid->Data4[4] = (UINT8)(HexCharToUintn(Walker[0]) * 16);
-  Guid->Data4[4] = (UINT8)(Guid->Data4[4] + (UINT8)HexCharToUintn(Walker[1]));
-  Walker += 2;
-  Guid->Data4[5] = (UINT8)(HexCharToUintn(Walker[0]) * 16);
-  Guid->Data4[5] = (UINT8)(Guid->Data4[5] + (UINT8)HexCharToUintn(Walker[1]));
-  Walker += 2;
-  Guid->Data4[6] = (UINT8)(HexCharToUintn(Walker[0]) * 16);
-  Guid->Data4[6] = (UINT8)(Guid->Data4[6] + (UINT8)HexCharToUintn(Walker[1]));
-  Walker += 2;
-  Guid->Data4[7] = (UINT8)(HexCharToUintn(Walker[0]) * 16);
-  Guid->Data4[7] = (UINT8)(Guid->Data4[7] + (UINT8)HexCharToUintn(Walker[1]));
-  FreePool(TempCopy);
-  return (EFI_SUCCESS);
-}
-
-/**
   Clear the line at the specified Row.
-  
+
   @param[in] Row                The row number to be cleared ( start from 1 )
   @param[in] LastCol            The last printable column.
   @param[in] LastRow            The last printable row.
@@ -302,6 +151,7 @@ EditorClearLine (
   IN UINTN LastRow
   )
 {
+  UINTN  Col;
   CHAR16 Line[200];
 
   if (Row == 0) {
@@ -310,22 +160,28 @@ EditorClearLine (
 
   //
   // prepare a blank line
+  // If max column is larger, split to multiple prints.
   //
-  SetMem16(Line, LastCol*sizeof(CHAR16), L' ');
+  SetMem16 (Line, sizeof (Line), L' ');
+  Line[ARRAY_SIZE (Line) - 1] = CHAR_NULL;
 
-  if (Row == LastRow) {
+  for (Col = 1; Col <= LastCol; Col += ARRAY_SIZE (Line) - 1) {
+    if (Col + ARRAY_SIZE (Line) - 1 > LastCol) {
+      if (Row == LastRow) {
+        //
+        // if CHAR_NULL is still at position LastCol, it will cause first line error
+        //
+        Line[(LastCol - 1) % (ARRAY_SIZE (Line) - 1)] = CHAR_NULL;
+      } else {
+        Line[LastCol % (ARRAY_SIZE (Line) - 1)] = CHAR_NULL;
+      }
+    }
+
     //
-    // if CHAR_NULL is still at position 80, it will cause first line error
+    // print out the blank line
     //
-    Line[LastCol - 1] = CHAR_NULL;
-  } else {
-    Line[LastCol] = CHAR_NULL;
+    ShellPrintEx ((INT32) Col - 1, (INT32) Row - 1, Line);
   }
-
-  //
-  // print out the blank line
-  //
-  ShellPrintEx (0, ((INT32)Row) - 1, Line);
 }
 
 /**
@@ -353,7 +209,7 @@ IsValidFileNameChar (
 
 /**
   Check if file name has illegal characters.
-  
+
   @param Name       The filename to check.
 
   @retval TRUE      The filename is ok.
@@ -433,18 +289,18 @@ EditGetDefaultFileName (
 }
 
 /**
-  Read a file into an allocated buffer.  The buffer is the responsibility 
+  Read a file into an allocated buffer.  The buffer is the responsibility
   of the caller to free.
 
   @param[in]  FileName          The filename of the file to open.
-  @param[out] Buffer            Upon successful return, the pointer to the 
-                                address of the allocated buffer.                                  
+  @param[out] Buffer            Upon successful return, the pointer to the
+                                address of the allocated buffer.
   @param[out] BufferSize        If not NULL, then the pointer to the size
                                 of the allocated buffer.
   @param[out] ReadOnly          Upon successful return TRUE if the file is
                                 read only.  FALSE otherwise.
 
-  @retval EFI_NOT_FOUND         The filename did not represent a file in the 
+  @retval EFI_NOT_FOUND         The filename did not represent a file in the
                                 file system.
   @retval EFI_SUCCESS           The file was read into the buffer.
   @retval EFI_OUT_OF_RESOURCES  A memory allocation failed.
@@ -491,7 +347,7 @@ ReadFileIntoBuffer (
     }
 
     Info = ShellGetFileInfo(FileHandle);
-    
+
     if (Info->Attribute & EFI_FILE_DIRECTORY) {
       FreePool (Info);
       return EFI_INVALID_PARAMETER;

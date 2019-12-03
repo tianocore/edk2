@@ -1,13 +1,7 @@
 #/* @file
 #  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
 #
-#  This program and the accompanying materials
-#  are licensed and made available under the terms and conditions of the BSD License
-#  which accompanies this distribution.  The full text of the license may be found at
-#  http://opensource.org/licenses/bsd-license.php
-#
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 #*/
 
@@ -26,13 +20,22 @@
 #
 
 [Sources]
+  libfdt_internal.h
+  fdt_empty_tree.c
+  fdt_overlay.c
   fdt_ro.c
   fdt_rw.c
   fdt_strerror.c
+  fdt_strtoul.c
   fdt_sw.c
   fdt_wip.c
   fdt.c
+  fdt_addresses.c
 
 [Packages]
   MdePkg/MdePkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib

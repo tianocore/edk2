@@ -1,14 +1,8 @@
 /** @file
   Produce EFI_BLOCK_IO_PROTOCOL on a RAM disk device.
 
-  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2016 - 2019, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -54,6 +48,7 @@ RamDiskInitBlockIo (
   EFI_BLOCK_IO_PROTOCOL           *BlockIo;
   EFI_BLOCK_IO2_PROTOCOL          *BlockIo2;
   EFI_BLOCK_IO_MEDIA              *Media;
+  UINT32                          Remainder;
 
   BlockIo  = &PrivateData->BlockIo;
   BlockIo2 = &PrivateData->BlockIo2;
@@ -69,11 +64,18 @@ RamDiskInitBlockIo (
   Media->LogicalPartition = FALSE;
   Media->ReadOnly         = FALSE;
   Media->WriteCaching     = FALSE;
-  Media->BlockSize        = RAM_DISK_BLOCK_SIZE;
-  Media->LastBlock        = DivU64x32 (
-                              PrivateData->Size + RAM_DISK_BLOCK_SIZE - 1,
-                              RAM_DISK_BLOCK_SIZE
-                              ) - 1;
+
+  for (Media->BlockSize = RAM_DISK_DEFAULT_BLOCK_SIZE;
+       Media->BlockSize >= 1;
+       Media->BlockSize = Media->BlockSize >> 1) {
+    Media->LastBlock = DivU64x32Remainder (PrivateData->Size, Media->BlockSize, &Remainder) - 1;
+    if (Remainder == 0) {
+      break;
+    }
+  }
+  ASSERT (Media->BlockSize != 0);
+
+  return;
 }
 
 
@@ -137,18 +139,18 @@ RamDiskBlkIoReadBlocks (
   RAM_DISK_PRIVATE_DATA           *PrivateData;
   UINTN                           NumberOfBlocks;
 
+  PrivateData = RAM_DISK_PRIVATE_FROM_BLKIO (This);
+
+  if (MediaId != PrivateData->Media.MediaId) {
+    return EFI_MEDIA_CHANGED;
+  }
+
   if (Buffer == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
   if (BufferSize == 0) {
     return EFI_SUCCESS;
-  }
-
-  PrivateData = RAM_DISK_PRIVATE_FROM_BLKIO (This);
-
-  if (MediaId != PrivateData->Media.MediaId) {
-    return EFI_MEDIA_CHANGED;
   }
 
   if ((BufferSize % PrivateData->Media.BlockSize) != 0) {
@@ -212,14 +214,6 @@ RamDiskBlkIoWriteBlocks (
   RAM_DISK_PRIVATE_DATA           *PrivateData;
   UINTN                           NumberOfBlocks;
 
-  if (Buffer == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  if (BufferSize == 0) {
-    return EFI_SUCCESS;
-  }
-
   PrivateData = RAM_DISK_PRIVATE_FROM_BLKIO (This);
 
   if (MediaId != PrivateData->Media.MediaId) {
@@ -228,6 +222,14 @@ RamDiskBlkIoWriteBlocks (
 
   if (TRUE == PrivateData->Media.ReadOnly) {
     return EFI_WRITE_PROTECTED;
+  }
+
+  if (Buffer == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (BufferSize == 0) {
+    return EFI_SUCCESS;
   }
 
   if ((BufferSize % PrivateData->Media.BlockSize) != 0) {

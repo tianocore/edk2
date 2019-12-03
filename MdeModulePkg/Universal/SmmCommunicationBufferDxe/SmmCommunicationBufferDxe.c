@@ -8,13 +8,7 @@ Any other driver or application can get the table and know the common
 communication buffer.
 
 Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -26,7 +20,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DebugLib.h>
 #include <Library/UefiLib.h>
-#include <Library/PcdLib.h>
 #include <Guid/PiSmmCommunicationRegionTable.h>
 
 #define DEFAULT_COMMON_PI_SMM_COMMUNIATION_REGION_PAGES  4

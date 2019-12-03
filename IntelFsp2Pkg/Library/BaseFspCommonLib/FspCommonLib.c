@@ -1,13 +1,7 @@
 /** @file
 
-  Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2014 - 2019, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -87,9 +81,9 @@ GetFspGlobalDataPointer (
 }
 
 /**
-  This function gets back the FSP API first parameter passed by the bootlaoder.
+  This function gets back the FSP API first parameter passed by the bootloader.
 
-  @retval ApiParameter FSP API first parameter passed by the bootlaoder.
+  @retval ApiParameter FSP API first parameter passed by the bootloader.
 **/
 UINT32
 EFIAPI
@@ -104,9 +98,26 @@ GetFspApiParameter (
 }
 
 /**
-  This function gets back the FSP API second parameter passed by the bootlaoder.
+  This function returns the FSP entry stack pointer from address of the first API parameter.
 
-  @retval ApiParameter FSP API second parameter passed by the bootlaoder.
+  @retval FSP entry stack pointer.
+**/
+VOID*
+EFIAPI
+GetFspEntryStack (
+  VOID
+  )
+{
+  FSP_GLOBAL_DATA  *FspData;
+
+  FspData  = GetFspGlobalDataPointer ();
+  return (VOID*)(FspData->CoreStack + CONTEXT_STACK_OFFSET(ApiParam[0]));
+}
+
+/**
+  This function gets back the FSP API second parameter passed by the bootloader.
+
+  @retval ApiParameter FSP API second parameter passed by the bootloader.
 **/
 UINT32
 EFIAPI
@@ -516,17 +527,19 @@ FspApiReturnStatusReset (
   )
 {
   volatile BOOLEAN  LoopUntilReset;
-  
+
   LoopUntilReset = TRUE;
   DEBUG ((DEBUG_INFO, "FSP returning control to Bootloader with reset required return status %x\n",FspResetType));
-  ///
-  /// Below code is not an infinite loop.The control will go back to API calling function in BootLoader each time BootLoader
-  /// calls the FSP API without honoring the reset request by FSP
-  ///
-  do {
-    SetFspApiReturnStatus ((EFI_STATUS)FspResetType);
-    Pei2LoaderSwitchStack ();
-    DEBUG ((DEBUG_ERROR, "!!!ERROR: FSP has requested BootLoader for reset. But BootLoader has not honored the reset\n"));
-    DEBUG ((DEBUG_ERROR, "!!!ERROR: Please add support in BootLoader to honor the reset request from FSP\n"));
-  } while (LoopUntilReset);
+  if (GetFspGlobalDataPointer ()->FspMode == FSP_IN_API_MODE) {
+    ///
+    /// Below code is not an infinite loop.The control will go back to API calling function in BootLoader each time BootLoader
+    /// calls the FSP API without honoring the reset request by FSP
+    ///
+    do {
+      SetFspApiReturnStatus ((EFI_STATUS)FspResetType);
+      Pei2LoaderSwitchStack ();
+      DEBUG ((DEBUG_ERROR, "!!!ERROR: FSP has requested BootLoader for reset. But BootLoader has not honored the reset\n"));
+      DEBUG ((DEBUG_ERROR, "!!!ERROR: Please add support in BootLoader to honor the reset request from FSP\n"));
+    } while (LoopUntilReset);
+  }
 }

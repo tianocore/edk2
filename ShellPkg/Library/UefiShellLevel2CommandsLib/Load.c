@@ -2,14 +2,8 @@
   Main file for attrib shell level 2 function.
 
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2009 - 2019, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -118,6 +112,15 @@ LoadDriver(
     &LoadedDriverHandle);
 
   if (EFI_ERROR(Status)) {
+    //
+    // With EFI_SECURITY_VIOLATION retval, the Image was loaded and an ImageHandle was created
+    // with a valid EFI_LOADED_IMAGE_PROTOCOL, but the image can not be started right now.
+    // If the caller doesn't have the option to defer the execution of an image, we should
+    // unload image for the EFI_SECURITY_VIOLATION to avoid resource leak.
+    //
+    if (Status == EFI_SECURITY_VIOLATION) {
+      gBS->UnloadImage (LoadedDriverHandle);
+    }
     ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_LOAD_NOT_IMAGE), gShellLevel2HiiHandle, FileName, Status);
   } else {
     //
@@ -212,7 +215,7 @@ ShellCommandRunLoad (
   Status = ShellCommandLineParse (LoadParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR(Status)) {
     if (Status == EFI_VOLUME_CORRUPTED && ProblemParam != NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"load", ProblemParam);  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"load", ProblemParam);
       FreePool(ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -228,7 +231,7 @@ ShellCommandRunLoad (
       //
       // we didnt get a single file to load parameter
       //
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel2HiiHandle, L"load");  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel2HiiHandle, L"load");
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
       for ( ParamCount = 1
@@ -259,7 +262,7 @@ ShellCommandRunLoad (
           //
           // no files found.
           //
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_NF), gShellLevel2HiiHandle, L"load", (CHAR16*)ShellCommandLineGetRawValue(Package, ParamCount));  
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_NF), gShellLevel2HiiHandle, L"load", (CHAR16*)ShellCommandLineGetRawValue(Package, ParamCount));
           ShellStatus = SHELL_NOT_FOUND;
         }
       } // for loop for params

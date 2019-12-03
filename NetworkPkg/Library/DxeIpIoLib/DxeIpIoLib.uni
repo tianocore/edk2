@@ -1,0 +1,16 @@
+// /** @file
+// This library instance provides IP services upon EFI IPv4/IPv6 Protocols.
+//
+// This library instance provides IP services upon EFI IPv4/IPv6 Protocols.
+//
+// Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "EFI IPv4/IPv6 IP Services Library"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This library instance provides IP services upon EFI IPv4/IPv6 Protocols."
+

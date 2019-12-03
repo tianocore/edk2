@@ -2,13 +2,7 @@
 
   Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials are licensed and made available
-  under the terms and conditions of the BSD License which accompanies this
-  distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
   Module Name:
 
@@ -645,7 +639,7 @@ FvbProtocolEraseBlocks (
       break;
     }
 
-    NumOfLba = VA_ARG (args, UINT32);
+    NumOfLba = VA_ARG (args, UINTN);
 
     //
     // Check input parameters
@@ -665,7 +659,7 @@ FvbProtocolEraseBlocks (
       break;
     }
 
-    NumOfLba = VA_ARG (args, UINT32);
+    NumOfLba = VA_ARG (args, UINTN);
 
     while (NumOfLba > 0) {
       Status = QemuFlashEraseBlock (StartingLba);
@@ -827,42 +821,6 @@ ValidateFvHeader (
   }
 
   return EFI_SUCCESS;
-}
-
-STATIC
-EFI_STATUS
-MarkMemoryRangeForRuntimeAccess (
-  EFI_PHYSICAL_ADDRESS                BaseAddress,
-  UINTN                               Length
-  )
-{
-  EFI_STATUS                          Status;
-
-  //
-  // Mark flash region as runtime memory
-  //
-  Status = gDS->RemoveMemorySpace (
-                  BaseAddress,
-                  Length
-                  );
-
-  Status = gDS->AddMemorySpace (
-                  EfiGcdMemoryTypeSystemMemory,
-                  BaseAddress,
-                  Length,
-                  EFI_MEMORY_UC | EFI_MEMORY_RUNTIME
-                  );
-  ASSERT_EFI_ERROR (Status);
-
-  Status = gBS->AllocatePages (
-                  AllocateAddress,
-                  EfiRuntimeServicesData,
-                  EFI_SIZE_TO_PAGES (Length),
-                  &BaseAddress
-                  );
-  ASSERT_EFI_ERROR (Status);
-
-  return Status;
 }
 
 STATIC
@@ -1091,7 +1049,7 @@ FvbInitialize (
   //
   InstallProtocolInterfaces (FvbDevice);
 
-  MarkMemoryRangeForRuntimeAccess (BaseAddress, Length);
+  MarkIoMemoryRangeForRuntimeAccess (BaseAddress, Length);
 
   //
   // Set several PCD values to point to flash

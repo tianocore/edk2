@@ -1,0 +1,103 @@
+## @file
+# Entry Point of Win Emulator
+#
+# Main executable file of Win Emulator that loads Sec core after initialization finished.
+# Copyright (c) 2008 - 2019, Intel Corporation. All rights reserved.<BR>
+# Portions copyright (c) 2008 - 2011, Apple Inc. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = WinHost
+  FILE_GUID                      = 62E8F833-2B0A-4C19-A966-63C180588BE7
+  MODULE_TYPE                    = USER_DEFINED
+  VERSION_STRING                 = 1.0
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  WinMemoryAllocationLib.c
+  WinGopInput.c
+  WinGopScreen.c
+  WinGop.h
+  WinFileSystem.c
+  WinBlockIo.c
+  WinThunk.c
+  WinHost.h
+  WinHost.c
+  WinInclude.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EmulatorPkg/EmulatorPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  PcdLib
+  PrintLib
+  BaseMemoryLib
+  BaseLib
+  PeCoffLib
+  ThunkPpiList
+  ThunkProtocolList
+  PpiListLib
+  PeiServicesLib
+  FrameBufferBltLib
+
+[Ppis]
+  gEmuThunkPpiGuid
+
+[Protocols]
+  gEmuIoThunkProtocolGuid
+  gEmuGraphicsWindowProtocolGuid
+  gEmuBlockIoProtocolGuid
+  gEfiSimpleFileSystemProtocolGuid
+
+[Guids]
+  gEfiFileSystemVolumeLabelInfoIdGuid           # SOMETIMES_CONSUMED
+  gEfiFileInfoGuid                              # SOMETIMES_CONSUMED
+  gEfiFileSystemInfoGuid                        # SOMETIMES_CONSUMED
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdInitValueInTempStack
+
+  gEmulatorPkgTokenSpaceGuid.PcdEmuBootMode
+  gEmulatorPkgTokenSpaceGuid.PcdEmuFirmwareVolume
+  gEmulatorPkgTokenSpaceGuid.PcdEmuMemorySize
+  gEmulatorPkgTokenSpaceGuid.PcdEmuFdBaseAddress
+  gEmulatorPkgTokenSpaceGuid.PcdEmuVirtualDisk
+  gEmulatorPkgTokenSpaceGuid.PcdEmuGop|L"GOP Window"
+  gEmulatorPkgTokenSpaceGuid.PcdEmuFileSystem
+  gEmulatorPkgTokenSpaceGuid.PcdPeiServicesTablePage
+
+[BuildOptions]
+  MSFT:*_*_*_DLINK_FLAGS            == /out:"$(BIN_DIR)\$(BASE_NAME).exe" /base:0x10000000 /pdb:"$(BIN_DIR)\$(BASE_NAME).pdb"
+  MSFT:*_*_*_CC_FLAGS               == /nologo /W4 /WX /Gy /c /D UNICODE /Od /Oy- /FIAutoGen.h /EHs-c- /GF /Gs8192 /Zi /Gm /D _CRT_SECURE_NO_WARNINGS /D _CRT_SECURE_NO_DEPRECATE
+  MSFT:*_*_*_PP_FLAGS               == /nologo /E /TC /FIAutoGen.h
+
+  MSFT:*_VS2015_IA32_DLINK_FLAGS     = /LIBPATH:"%VS2015_PREFIX%Lib" /LIBPATH:"%VS2015_PREFIX%VC\Lib" /LIBPATH:"%UniversalCRTSdkDir%lib\%UCRTVersion%\ucrt\x86" /LIBPATH:"%WindowsSdkDir%lib\%WindowsSDKLibVersion%\um\x86" /NOLOGO /SUBSYSTEM:CONSOLE /NODEFAULTLIB /IGNORE:4086 /MAP /OPT:REF /DEBUG /MACHINE:I386 /LTCG Kernel32.lib MSVCRTD.lib Gdi32.lib User32.lib Winmm.lib Advapi32.lib vcruntimed.lib ucrtd.lib
+  MSFT:*_VS2015x86_IA32_DLINK_FLAGS  = /LIBPATH:"%VS2015_PREFIX%Lib" /LIBPATH:"%VS2015_PREFIX%VC\Lib" /LIBPATH:"%UniversalCRTSdkDir%lib\%UCRTVersion%\ucrt\x86" /LIBPATH:"%WindowsSdkDir%lib\%WindowsSDKLibVersion%\um\x86" /NOLOGO /SUBSYSTEM:CONSOLE /NODEFAULTLIB /IGNORE:4086 /MAP /OPT:REF /DEBUG /MACHINE:I386 /LTCG Kernel32.lib MSVCRTD.lib Gdi32.lib User32.lib Winmm.lib Advapi32.lib vcruntimed.lib ucrtd.lib
+  MSFT:*_VS2017_IA32_DLINK_FLAGS     = /LIBPATH:"%VCToolsInstallDir%lib\x86" /LIBPATH:"%UniversalCRTSdkDir%lib\%UCRTVersion%\ucrt\x86" /LIBPATH:"%WindowsSdkDir%lib\%WindowsSDKLibVersion%\um\x86" /NOLOGO /SUBSYSTEM:CONSOLE /NODEFAULTLIB /IGNORE:4086 /MAP /OPT:REF /DEBUG /MACHINE:I386 /LTCG Kernel32.lib MSVCRTD.lib vcruntimed.lib ucrtd.lib Gdi32.lib User32.lib Winmm.lib Advapi32.lib
+  MSFT:*_*_IA32_ASM_FLAGS           == /nologo /W3 /WX /c /coff /Cx /Zd /W0 /Zi
+  MSFT:*_*_IA32_ASMLINK_FLAGS       == /link /nologo /tiny
+
+  MSFT:*_VS2015_X64_DLINK_FLAGS      = /LIBPATH:"%VS2015_PREFIX%VC\Lib\AMD64" /LIBPATH:"%UniversalCRTSdkDir%lib\%UCRTVersion%\ucrt\x64" /LIBPATH:"%WindowsSdkDir%lib\%WindowsSDKLibVersion%\um\x64" /NOLOGO /SUBSYSTEM:CONSOLE /NODEFAULTLIB /IGNORE:4086 /MAP /OPT:REF /DEBUG /MACHINE:AMD64 /LTCG Kernel32.lib MSVCRTD.lib vcruntimed.lib ucrtd.lib Gdi32.lib User32.lib Winmm.lib Advapi32.lib
+  MSFT:*_VS2015x86_X64_DLINK_FLAGS   = /LIBPATH:"%VS2015_PREFIX%VC\Lib\AMD64" /LIBPATH:"%UniversalCRTSdkDir%lib\%UCRTVersion%\ucrt\x64" /LIBPATH:"%WindowsSdkDir%lib\%WindowsSDKLibVersion%\um\x64" /NOLOGO /SUBSYSTEM:CONSOLE /NODEFAULTLIB /IGNORE:4086 /MAP /OPT:REF /DEBUG /MACHINE:AMD64 /LTCG Kernel32.lib MSVCRTD.lib vcruntimed.lib ucrtd.lib Gdi32.lib User32.lib Winmm.lib Advapi32.lib
+  MSFT:*_VS2017_X64_DLINK_FLAGS      = /LIBPATH:"%VCToolsInstallDir%lib\x64" /LIBPATH:"%UniversalCRTSdkDir%lib\%UCRTVersion%\ucrt\x64" /LIBPATH:"%WindowsSdkDir%lib\%WindowsSDKLibVersion%\um\x64" /NOLOGO /SUBSYSTEM:CONSOLE /NODEFAULTLIB /IGNORE:4086 /MAP /OPT:REF /DEBUG /MACHINE:AMD64 /LTCG Kernel32.lib MSVCRTD.lib vcruntimed.lib ucrtd.lib Gdi32.lib User32.lib Winmm.lib Advapi32.lib
+  MSFT:*_*_X64_ASM_FLAGS            == /nologo /W3 /WX /c /Cx /Zd /W0 /Zi
+  MSFT:*_*_X64_ASMLINK_FLAGS        == /link /nologo
+
+  GCC:*_CLANGPDB_X64_DLINK_FLAGS == /out:"$(BIN_DIR)\$(BASE_NAME).exe" /base:0x10000000 /pdb:"$(BIN_DIR)\$(BASE_NAME).pdb"  /LIBPATH:"%UniversalCRTSdkDir%lib\%UCRTVersion%\ucrt\x64" /LIBPATH:"%WindowsSdkDir%lib\%WindowsSDKLibVersion%\um\x64" /LIBPATH:"%VCToolsInstallDir%lib\x64"   /NOLOGO /SUBSYSTEM:CONSOLE /NODEFAULTLIB /IGNORE:4086  /OPT:REF /DEBUG /MACHINE:AMD64 Kernel32.lib MSVCRTD.lib vcruntimed.lib ucrtd.lib Gdi32.lib User32.lib Winmm.lib Advapi32.lib /lldmap  /EXPORT:InitializeDriver=_ModuleEntryPoint
+  GCC:*_CLANGPDB_X64_CC_FLAGS == -m64 -g -fshort-wchar -fno-strict-aliasing -Wall -c -include AutoGen.h -D _CRT_SECURE_NO_WARNINGS -Wnonportable-include-path  -D UNICODE -D _CRT_SECURE_NO_DEPRECATE
+
+  GCC:*_CLANGPDB_IA32_DLINK_FLAGS == /out:"$(BIN_DIR)\$(BASE_NAME).exe" /base:0x10000000 /pdb:"$(BIN_DIR)\$(BASE_NAME).pdb" /LIBPATH:"%UniversalCRTSdkDir%lib\%UCRTVersion%\ucrt\x86" /LIBPATH:"%WindowsSdkDir%lib\%WindowsSDKLibVersion%\um\x86" /LIBPATH:"%VCToolsInstallDir%ib\x86"   /NOLOGO /SUBSYSTEM:CONSOLE /NODEFAULTLIB /IGNORE:4086  /OPT:REF /DEBUG /MACHINE:I386 Kernel32.lib MSVCRTD.lib vcruntimed.lib ucrtd.lib Gdi32.lib User32.lib Winmm.lib Advapi32.lib /lldmap  /EXPORT:InitializeDriver=_ModuleEntryPoint
+  GCC:*_CLANGPDB_IA32_CC_FLAGS == -m32 -g -fshort-wchar -fno-strict-aliasing -Wall -c -include AutoGen.h -D _CRT_SECURE_NO_WARNINGS -Wnonportable-include-path  -D UNICODE -D _CRT_SECURE_NO_DEPRECATE

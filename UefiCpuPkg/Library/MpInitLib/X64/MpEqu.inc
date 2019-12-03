@@ -1,12 +1,6 @@
 ;------------------------------------------------------------------------------ ;
-; Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
-; This program and the accompanying materials
-; are licensed and made available under the terms and conditions of the BSD License
-; which accompanies this distribution.  The full text of the license may be found at
-; http://opensource.org/licenses/bsd-license.php.
-;
-; THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-; WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+; Copyright (c) 2015 - 2019, Intel Corporation. All rights reserved.<BR>
+; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;
 ; Module Name:
 ;
@@ -33,11 +27,17 @@ GdtrLocation                  equ        LockLocation + 20h
 IdtrLocation                  equ        LockLocation + 2Ah
 BufferStartLocation           equ        LockLocation + 34h
 ModeOffsetLocation            equ        LockLocation + 3Ch
-NumApsExecutingLocation       equ        LockLocation + 44h
+ApIndexLocation               equ        LockLocation + 44h
 CodeSegmentLocation           equ        LockLocation + 4Ch
 DataSegmentLocation           equ        LockLocation + 54h
 EnableExecuteDisableLocation  equ        LockLocation + 5Ch
 Cr3Location                   equ        LockLocation + 64h
 InitFlagLocation              equ        LockLocation + 6Ch
 CpuInfoLocation               equ        LockLocation + 74h
-
+NumApsExecutingLocation       equ        LockLocation + 7Ch
+InitializeFloatingPointUnitsAddress equ  LockLocation + 8Ch
+ModeTransitionMemoryLocation        equ  LockLocation + 94h
+ModeTransitionSegmentLocation       equ  LockLocation + 98h
+ModeHighMemoryLocation              equ  LockLocation + 9Ah
+ModeHighSegmentLocation             equ  LockLocation + 9Eh
+Enable5LevelPagingLocation          equ  LockLocation + 0A0h

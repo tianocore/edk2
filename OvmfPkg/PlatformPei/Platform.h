@@ -2,13 +2,7 @@
   Platform PEI module include file.
 
   Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -53,6 +47,11 @@ AddressWidthInitialization (
   VOID
   );
 
+VOID
+Q35TsegMbytesInitialization (
+  VOID
+  );
+
 EFI_STATUS
 PublishPeiMemory (
   VOID
@@ -60,6 +59,11 @@ PublishPeiMemory (
 
 UINT32
 GetSystemMemorySizeBelow4gb (
+  VOID
+  );
+
+VOID
+QemuUc32BaseInitialization (
   VOID
   );
 
@@ -78,6 +82,11 @@ InstallFeatureControlCallback (
   VOID
   );
 
+VOID
+InstallClearCacheCallback (
+  VOID
+  );
+
 EFI_STATUS
 InitializeXen (
   VOID
@@ -85,6 +94,11 @@ InitializeXen (
 
 BOOLEAN
 XenDetect (
+  VOID
+  );
+
+VOID
+AmdSevInitialize (
   VOID
   );
 
@@ -102,5 +116,9 @@ extern BOOLEAN mS3Supported;
 extern UINT8 mPhysMemAddressWidth;
 
 extern UINT32 mMaxCpuCount;
+
+extern UINT16 mHostBridgeDevId;
+
+extern UINT32 mQemuUc32Base;
 
 #endif // _PLATFORM_PEI_H_INCLUDED_

@@ -1,14 +1,8 @@
 /** @file
   Implementation of the shared functions to do the platform driver vverride mapping.
 
-  Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2007 - 2019, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -751,7 +745,7 @@ InitOverridesMapping (
       //
       // Check buffer overflow.
       //
-      if ((OverrideItem->ControllerDevicePath == NULL) || (VariableIndex < (UINT8 *) ControllerDevicePath) || 
+      if ((OverrideItem->ControllerDevicePath == NULL) || (VariableIndex < (UINT8 *) ControllerDevicePath) ||
           (VariableIndex > (UINT8 *) VariableBuffer + BufferSize)) {
         Corrupted = TRUE;
         break;
@@ -781,7 +775,7 @@ InitOverridesMapping (
         //
         // Check buffer overflow
         //
-        if ((DriverImageInfo->DriverImagePath == NULL) || (VariableIndex < (UINT8 *) DriverDevicePath) || 
+        if ((DriverImageInfo->DriverImagePath == NULL) || (VariableIndex < (UINT8 *) DriverDevicePath) ||
             (VariableIndex < (UINT8 *) VariableBuffer + BufferSize)) {
           Corrupted = TRUE;
           break;
@@ -1094,7 +1088,7 @@ SaveOverridesMapping (
     if (EFI_ERROR (Status)) {
       if (NumIndex > 0) {
         //
-        // Delete all PlatDriOver variables when full mapping can't be set.  
+        // Delete all PlatDriOver variables when full mapping can't be set.
         //
         DeleteOverridesVariables ();
       }
@@ -1112,7 +1106,7 @@ SaveOverridesMapping (
 
   @param  ImageHandle          The Image handle
   @param  BindingHandle        The BindingHandle of the found Driver Binding protocol.
-                               If Binding protocol is not found, it is set to NULL. 
+                               If Binding protocol is not found, it is set to NULL.
 
   @return                      Pointer into the Binding Protocol interface
   @retval NULL                 The parameter is not valid or the binding protocol is not found.
@@ -1492,6 +1486,15 @@ GetDriverFromMapping (
                 DriverImageInfo->ImageHandle = ImageHandle;
               }
             } else {
+              //
+              // With EFI_SECURITY_VIOLATION retval, the Image was loaded and an ImageHandle was created
+              // with a valid EFI_LOADED_IMAGE_PROTOCOL, but the image can not be started right now.
+              // If the caller doesn't have the option to defer the execution of an image, we should
+              // unload image for the EFI_SECURITY_VIOLATION to avoid resource leak.
+              //
+              if (Status == EFI_SECURITY_VIOLATION) {
+                gBS->UnloadImage (ImageHandle);
+              }
               DriverImageInfo->UnLoadable = TRUE;
               DriverImageInfo->ImageHandle = NULL;
             }
@@ -1551,8 +1554,8 @@ GetDriverFromMapping (
 
   @retval EFI_INVALID_PARAMETER    ControllerDevicePath or MappingDataBase is NULL.
   @retval EFI_NOT_FOUND            ControllerDevicePath is not found in MappingDataBase or
-                                   DriverImageDevicePath is not found in the found DriverImage Info list. 
-  @retval EFI_SUCCESS              The controller's total override driver number and 
+                                   DriverImageDevicePath is not found in the found DriverImage Info list.
+  @retval EFI_SUCCESS              The controller's total override driver number and
                                    input DriverImage's order number is correctly return.
 **/
 EFI_STATUS
@@ -1668,14 +1671,14 @@ CheckMapping (
                                    override driver image item
   @param  DriverImageDevicePath    The driver image device path need to be insert
   @param  MappingDataBase          Mapping database list entry pointer
-  @param  DriverImageNO            The inserted order number. If this number is taken, 
+  @param  DriverImageNO            The inserted order number. If this number is taken,
                                    the larger available number will be used.
 
   @retval EFI_INVALID_PARAMETER    ControllerDevicePath is NULL, or DriverImageDevicePath is NULL
                                    or MappingDataBase is NULL
-  @retval EFI_ALREADY_STARTED      The input Controller to input DriverImage has been 
+  @retval EFI_ALREADY_STARTED      The input Controller to input DriverImage has been
                                    recorded into the mapping database.
-  @retval EFI_SUCCESS              The Controller and DriverImage are inserted into 
+  @retval EFI_SUCCESS              The Controller and DriverImage are inserted into
                                    the mapping database successfully.
 
 **/
@@ -1799,7 +1802,7 @@ InsertDriverImage (
 /**
   Delete a controller's override driver from the mapping database.
 
-  @param  ControllerDevicePath     The controller device path will be deleted 
+  @param  ControllerDevicePath     The controller device path will be deleted
                                    when all drivers images on it are removed.
   @param  DriverImageDevicePath    The driver image device path will be delete.
                                    If NULL, all driver image will be delete.
@@ -1807,7 +1810,7 @@ InsertDriverImage (
 
   @retval EFI_INVALID_PARAMETER    ControllerDevicePath is NULL, or MappingDataBase is NULL
   @retval EFI_NOT_FOUND            ControllerDevicePath is not found in MappingDataBase or
-                                   DriverImageDevicePath is not found in the found DriverImage Info list. 
+                                   DriverImageDevicePath is not found in the found DriverImage Info list.
   @retval EFI_SUCCESS              Delete the specified driver successfully.
 
 **/

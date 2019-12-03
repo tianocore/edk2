@@ -3,13 +3,7 @@
 *  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
 *  Copyright (c) 2014, Linaro Limited. All rights reserved.
 *
-*  This program and the accompanying materials
-*  are licensed and made available under the terms and conditions of the BSD License
-*  which accompanies this distribution.  The full text of the license may be found at
-*  http://opensource.org/licenses/bsd-license.php
-*
-*  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-*  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+*  SPDX-License-Identifier: BSD-2-Clause-Patent
 *
 **/
 
@@ -39,7 +33,9 @@ PlatformPeim (
   INT32              Node, Prev;
   CONST CHAR8        *Compatible;
   CONST CHAR8        *CompItem;
+  CONST CHAR8        *NodeStatus;
   INT32              Len;
+  INT32              StatusLen;
   CONST UINT64       *RegProp;
   UINT64             UartBase;
 
@@ -83,6 +79,11 @@ PlatformPeim (
       CompItem += 1 + AsciiStrLen (CompItem)) {
 
       if (AsciiStrCmp (CompItem, "arm,pl011") == 0) {
+        NodeStatus = fdt_getprop (Base, Node, "status", &StatusLen);
+        if (NodeStatus != NULL && AsciiStrCmp (NodeStatus, "okay") != 0) {
+          continue;
+        }
+
         RegProp = fdt_getprop (Base, Node, "reg", &Len);
         ASSERT (Len == 16);
 

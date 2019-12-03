@@ -3,15 +3,9 @@
 #
 # It will install S3 Save State protocol to store or record various IO operations to be replayed during an S3 resume.
 #
-# Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 #
-# This program and the accompanying materials are
-# licensed and made available under the terms and conditions of the BSD License
-# which accompanies this distribution.  The full text of the license may be found at
-# http://opensource.org/licenses/bsd-license.php
-#
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
 
@@ -28,7 +22,7 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
 #
 
 [Sources]
@@ -42,7 +36,6 @@
 
 [LibraryClasses]
   UefiBootServicesTableLib
-  MemoryAllocationLib
   UefiDriverEntryPoint
   BaseMemoryLib
   BaseLib
@@ -50,12 +43,11 @@
   PcdLib
   HobLib
   LockBoxLib
+  UefiLib
 
 [Guids]
   gEfiAcpiVariableGuid                       ## PRODUCES  ## UNDEFINED # LockBox Save Data.
   gEfiAcpiS3ContextGuid                      ## PRODUCES  ## UNDEFINED # LockBox Save Data.
-  gEfiAcpi20TableGuid                        ## SOMETIMES_CONSUMES  ## SystemTable
-  gEfiAcpi10TableGuid                        ## SOMETIMES_CONSUMES  ## SystemTable
   gEfiEndOfDxeEventGroupGuid                 ## CONSUMES  ## Event
 
 [Protocols]

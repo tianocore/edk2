@@ -1,14 +1,8 @@
 /** @file
   VFR file used by the iSCSI configuration component.
-  
-Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -113,7 +107,7 @@ formset
       text   = STRING_TOKEN (STR_NO_SAVE_AND_EXIT),
       flags  = INTERACTIVE,
       key    = KEY_IGNORE_DELETE_ATTEMPT;
-  endform;    
+  endform;
 
   form formid = FORMID_ATTEMPT_FORM,
     title  = STRING_TOKEN(STR_ISCSI_ATTEMPT_FORM_TITLE);
@@ -121,10 +115,10 @@ formset
     string  varid   = ISCSI_CONFIG_IFR_NVDATA.AttemptName,
             prompt  = STRING_TOKEN(STR_ISCSI_ATTEMPT_NAME),
             help    = STRING_TOKEN(STR_ISCSI_ATTEMPT_NAME_HELP),
-            flags   = INTERACTIVE,
+            flags   = READ_ONLY,
             key     = KEY_ATTEMPT_NAME,
             minsize = 0,
-            maxsize = ATTEMPT_NAME_MAX_SIZE,
+            maxsize = ATTEMPT_NAME_SIZE,
     endstring;
 
     subtitle text = STRING_TOKEN(STR_NULL);
@@ -157,8 +151,8 @@ formset
             minimum = CONNECT_MIN_RETRY,
             maximum = CONNECT_MAX_RETRY,
             step    = 0,
-    endnumeric;  
-    
+    endnumeric;
+
     numeric varid   = ISCSI_CONFIG_IFR_NVDATA.ConnectTimeout,
             prompt  = STRING_TOKEN(STR_ISCSI_CONFIG_TIMEOUT),
             help    = STRING_TOKEN(STR_ISCSI_CONFIG_TIMEOUT_HELP),
@@ -171,7 +165,7 @@ formset
 
     subtitle text = STRING_TOKEN(STR_NULL);
 
-    string  varid   = ISCSI_CONFIG_IFR_NVDATA.IsId, 
+    string  varid   = ISCSI_CONFIG_IFR_NVDATA.IsId,
             prompt  = STRING_TOKEN(STR_ISCSI_CONFIG_ISID),
             help    = STRING_TOKEN(STR_ISCSI_CONFIG_ISID_HELP),
             flags   = INTERACTIVE,
@@ -191,9 +185,10 @@ formset
     endcheckbox;
     endif;
 
-    suppressif ideqval ISCSI_CONFIG_IFR_NVDATA.InitiatorInfoFromDhcp == 0x01 OR
-               ideqval ISCSI_CONFIG_IFR_NVDATA.IpMode == IP_MODE_IP6 OR 
+    suppressif ideqval ISCSI_CONFIG_IFR_NVDATA.IpMode == IP_MODE_IP6 OR
                ideqval ISCSI_CONFIG_IFR_NVDATA.IpMode == IP_MODE_AUTOCONFIG;
+
+    grayoutif ideqval ISCSI_CONFIG_IFR_NVDATA.InitiatorInfoFromDhcp == 0x01;
     string  varid   = ISCSI_CONFIG_IFR_NVDATA.LocalIp,
             prompt  = STRING_TOKEN(STR_ISCSI_LOCAL_IP_ADDRESS),
             help    = STRING_TOKEN(STR_ISCSI_IP_ADDRESS_HELP),
@@ -220,12 +215,13 @@ formset
             minsize = IP4_MIN_SIZE,
             maxsize = IP4_MAX_SIZE,
     endstring;
-    
+    endif;
+
     endif;
 
     suppressif ideqval ISCSI_CONFIG_IFR_NVDATA.IpMode == IP_MODE_AUTOCONFIG;
     subtitle text = STRING_TOKEN(STR_NULL);
-    endif;     
+    endif;
 
     suppressif ideqval ISCSI_CONFIG_IFR_NVDATA.IpMode == IP_MODE_AUTOCONFIG OR
                ideqval ISCSI_CONFIG_IFR_NVDATA.InitiatorInfoFromDhcp == 0x00;
@@ -249,12 +245,12 @@ formset
     endstring;
 
     string  varid   = ISCSI_CONFIG_IFR_NVDATA.TargetIp,
-            prompt  = STRING_TOKEN(STR_ISCSI_TARGET_IP_ADDRESS),
-            help    = STRING_TOKEN(STR_ISCSI_IP_ADDRESS_HELP),
+            prompt  = STRING_TOKEN(STR_ISCSI_TARGET_ADDRESS),
+            help    = STRING_TOKEN(STR_ISCSI_TARGET_ADDRESS_HELP),
             flags   = INTERACTIVE,
             key     = KEY_TARGET_IP,
-            minsize = IP_MIN_SIZE,
-            maxsize = IP_MAX_SIZE,
+            minsize = ISCSI_TARGET_URI_MIN_SIZE,
+            maxsize = ISCSI_TARGET_URI_MAX_SIZE,
     endstring;
 
     numeric varid   = ISCSI_CONFIG_IFR_NVDATA.TargetPort,
@@ -274,22 +270,22 @@ formset
             minsize = LUN_MIN_SIZE,
             maxsize = LUN_MAX_SIZE,
     endstring;
-    
+
     endif;
 
     suppressif ideqval ISCSI_CONFIG_IFR_NVDATA.IpMode == IP_MODE_AUTOCONFIG;
     subtitle text = STRING_TOKEN(STR_NULL);
-    endif; 
+    endif;
 
     oneof varid  = ISCSI_CONFIG_IFR_NVDATA.AuthenticationType,
-          questionid = KEY_AUTH_TYPE,      
+          questionid = KEY_AUTH_TYPE,
           prompt = STRING_TOKEN(STR_AUTHEN_TYPE_PROMPT),
           help   = STRING_TOKEN(STR_AUTHEN_TYPE_HELP),
           option text = STRING_TOKEN(STR_AUTHEN_TYPE_CHAP),     value = ISCSI_AUTH_TYPE_CHAP, flags = 0;
           option text = STRING_TOKEN(STR_AUTHEN_TYPE_NONE),     value = ISCSI_AUTH_TYPE_NONE, flags = DEFAULT;
     endoneof;
 
-    suppressif NOT ideqval ISCSI_CONFIG_IFR_NVDATA.AuthenticationType == ISCSI_AUTH_TYPE_CHAP;    
+    suppressif NOT ideqval ISCSI_CONFIG_IFR_NVDATA.AuthenticationType == ISCSI_AUTH_TYPE_CHAP;
     oneof varid  = ISCSI_CONFIG_IFR_NVDATA.CHAPType,
           prompt = STRING_TOKEN(STR_CHAP_TYPE_PROMPT),
           help   = STRING_TOKEN(STR_CHAP_TYPE_HELP),
@@ -342,6 +338,48 @@ formset
 
     endif;
 
+    suppressif TRUE;
+
+    string  varid   = ISCSI_CONFIG_IFR_NVDATA.ISCSIMacAddr,
+            prompt  = STRING_TOKEN(STR_ISCSI_MAC_PROMPT),
+            help    = STRING_TOKEN(STR_ISCSI_MAC_PROMPT),
+            minsize = 0,
+            maxsize = ISCSI_MAX_MAC_STRING_LEN,
+    endstring;
+
+    string  varid   = ISCSI_CONFIG_IFR_NVDATA.ISCSIAttemptOrder,
+            prompt  = STRING_TOKEN(STR_ISCSI_ATTEMPT_ORDER),
+            help    = STRING_TOKEN(STR_ISCSI_ATTEMPT_ORDER),
+            minsize = 0,
+            maxsize = ATTEMPT_NAME_LIST_SIZE,
+    endstring;
+
+    string  varid   = ISCSI_CONFIG_IFR_NVDATA.ISCSIAddAttemptList,
+            prompt  = STRING_TOKEN(STR_ISCSI_ADD_ATTEMPTS),
+            help    = STRING_TOKEN(STR_ISCSI_ADD_ATTEMPTS),
+            minsize = 0,
+            maxsize = ATTEMPT_NAME_LIST_SIZE,
+    endstring;
+
+    string  varid   = ISCSI_CONFIG_IFR_NVDATA.ISCSIDeleteAttemptList,
+            prompt  = STRING_TOKEN(STR_ISCSI_DELETE_ATTEMPTS),
+            help    = STRING_TOKEN(STR_ISCSI_DELETE_ATTEMPTS),
+            minsize = 0,
+            maxsize = ATTEMPT_NAME_LIST_SIZE,
+    endstring;
+
+    string  varid   = ISCSI_CONFIG_IFR_NVDATA.ISCSIDisplayAttemptList,
+            prompt  = STRING_TOKEN(STR_ISCSI_DISPLAY_ATTEMPTS),
+            help    = STRING_TOKEN(STR_ISCSI_DISPLAY_ATTEMPTS),
+            flags   = READ_ONLY,
+            minsize = 0,
+            maxsize = ATTEMPT_NAME_LIST_SIZE,
+    endstring;
+
+    label KEYWORD_ENTRY_LABEL;
+    label LABEL_END;
+    endif;
+
     subtitle text = STRING_TOKEN(STR_NULL);
 
     text
@@ -349,7 +387,7 @@ formset
       text   = STRING_TOKEN (STR_SAVE_CHANGES),
       flags  = INTERACTIVE,
       key    = KEY_SAVE_ATTEMPT_CONFIG;
-      
+
     goto FORMID_MAIN_FORM,
     prompt = STRING_TOKEN (STR_RETURN_MAIN_FORM),
     help   = STRING_TOKEN (STR_RETURN_MAIN_FORM),

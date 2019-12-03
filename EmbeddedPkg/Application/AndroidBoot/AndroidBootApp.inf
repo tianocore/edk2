@@ -1,0 +1,58 @@
+#/** @file
+#
+#  Copyright (c) 2013-2015, ARM Ltd. All rights reserved.<BR>
+#  Copyright (c) 2017, Linaro. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010019
+  BASE_NAME                      = AndroidBootApp
+  FILE_GUID                      = 3a738b36-b9c5-4763-abbd-6cbd4b25f9ff
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = AndroidBootAppEntryPoint
+
+[Sources.common]
+  AndroidBootApp.c
+
+[LibraryClasses]
+  AndroidBootImgLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  DevicePathLib
+  DxeServicesTableLib
+  FdtLib
+  MemoryAllocationLib
+  PcdLib
+  PrintLib
+  UefiApplicationEntryPoint
+  UefiBootServicesTableLib
+  UefiLib
+  UefiRuntimeServicesTableLib
+
+[Protocols]
+  gAndroidFastbootPlatformProtocolGuid
+  gEfiBlockIoProtocolGuid
+  gEfiDevicePathFromTextProtocolGuid
+  gEfiSimpleTextOutProtocolGuid
+  gEfiSimpleTextInProtocolGuid
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+[Packages.ARM, Packages.AARCH64]
+  ArmPkg/ArmPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+
+[Guids]
+  gFdtTableGuid
+
+[Pcd]
+  gEmbeddedTokenSpaceGuid.PcdAndroidBootDevicePath

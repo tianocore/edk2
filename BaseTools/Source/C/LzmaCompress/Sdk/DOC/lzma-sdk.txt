@@ -1,4 +1,4 @@
-LZMA SDK 16.04
+LZMA SDK 18.05
 --------------
 
 LZMA SDK provides the documentation, samples, header files,
@@ -54,7 +54,7 @@ LZMA SDK Contents
     - C                     - small SFXs for installers (7z decompression)
     -     C++               - SFXs and SFXs for installers (7z decompression)
 
-  Precomiled binaries:
+  Precompiled binaries:
 
     - console programs for lzma / 7z / xz compression and decompression
     - SFX modules for installers.

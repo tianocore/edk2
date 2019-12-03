@@ -1,14 +1,8 @@
 /** @file
  Section Extraction PEIM
 
-Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -50,7 +44,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
                                 output buffer. If the input
                                 section's GuidedSectionHeader.
                                 Attributes field has the
-                                EFI_GUIDED_SECTION_AUTH_STATUS_VALID 
+                                EFI_GUIDED_SECTION_AUTH_STATUS_VALID
                                 bit as clear,
                                 AuthenticationStatus must return
                                 zero. These bits reflect the
@@ -60,14 +54,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
                                 EFI_SUCCESS, the value of
                                 AuthenticationStatus is
                                 undefined.
-  
+
   @retval EFI_SUCCESS           The InputSection was
                                 successfully processed and the
                                 section contents were returned.
-  
+
   @retval EFI_OUT_OF_RESOURCES  The system has insufficient
                                 resources to process the request.
-  
+
   @retval EFI_INVALID_PARAMETER The GUID in InputSection does
                                 not match this instance of the
                                 GUIDed Section Extraction PPI.
@@ -121,7 +115,7 @@ CONST EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI mCustomGuidedSectionExtractionPpi = 
                                 output buffer. If the input
                                 section's GuidedSectionHeader.
                                 Attributes field has the
-                                EFI_GUIDED_SECTION_AUTH_STATUS_VALID 
+                                EFI_GUIDED_SECTION_AUTH_STATUS_VALID
                                 bit as clear,
                                 AuthenticationStatus must return
                                 zero. These bits reflect the
@@ -131,14 +125,14 @@ CONST EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI mCustomGuidedSectionExtractionPpi = 
                                 EFI_SUCCESS, the value of
                                 AuthenticationStatus is
                                 undefined.
-  
+
   @retval EFI_SUCCESS           The InputSection was
                                 successfully processed and the
                                 section contents were returned.
-  
+
   @retval EFI_OUT_OF_RESOURCES  The system has insufficient
                                 resources to process the request.
-  
+
   @retval EFI_INVALID_PARAMETER The GUID in InputSection does
                                 not match this instance of the
                                 GUIDed Section Extraction PPI.
@@ -159,7 +153,7 @@ CustomGuidedSectionExtract (
   UINT32          ScratchBufferSize;
   UINT32          OutputBufferSize;
   UINT16          SectionAttribute;
-  
+
   //
   // Init local variable
   //
@@ -174,12 +168,12 @@ CustomGuidedSectionExtract (
              &ScratchBufferSize,
              &SectionAttribute
              );
-  
+
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "GetInfo from guided section Failed - %r\n", Status));
     return Status;
   }
-  
+
   if (ScratchBufferSize != 0) {
     //
     // Allocate scratch buffer
@@ -190,24 +184,19 @@ CustomGuidedSectionExtract (
     }
   }
 
-  if (((SectionAttribute & EFI_GUIDED_SECTION_PROCESSING_REQUIRED) != 0) && OutputBufferSize > 0) {  
+  if (((SectionAttribute & EFI_GUIDED_SECTION_PROCESSING_REQUIRED) != 0) && OutputBufferSize > 0) {
     //
     // Allocate output buffer
     //
-    *OutputBuffer = AllocatePages (EFI_SIZE_TO_PAGES (OutputBufferSize) + 1);
+    *OutputBuffer = AllocatePages (EFI_SIZE_TO_PAGES (OutputBufferSize));
     if (*OutputBuffer == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
     DEBUG ((DEBUG_INFO, "Customized Guided section Memory Size required is 0x%x and address is 0x%p\n", OutputBufferSize, *OutputBuffer));
-    //
-    // *OutputBuffer still is one section. Adjust *OutputBuffer offset, 
-    // skip EFI section header to make section data at page alignment.
-    //
-    *OutputBuffer = (VOID *)((UINT8 *) *OutputBuffer + EFI_PAGE_SIZE - sizeof (EFI_COMMON_SECTION_HEADER));
   }
-  
+
   Status = ExtractGuidedSectionDecode (
-             InputSection, 
+             InputSection,
              OutputBuffer,
              ScratchBuffer,
              AuthenticationStatus
@@ -219,16 +208,16 @@ CustomGuidedSectionExtract (
     DEBUG ((DEBUG_ERROR, "Extract guided section Failed - %r\n", Status));
     return Status;
   }
-  
+
   *OutputSize = (UINTN) OutputBufferSize;
-  
+
   return EFI_SUCCESS;
 }
 
 /**
   Main entry for Section Extraction PEIM driver.
-  
-  This routine registers the Section Extraction PPIs that have been registered 
+
+  This routine registers the Section Extraction PPIs that have been registered
   with the Section Extraction Library.
 
   @param  FileHandle  Handle of the file being invoked.
@@ -243,7 +232,7 @@ EFIAPI
 SectionExtractionPeiEntry (
   IN       EFI_PEI_FILE_HANDLE  FileHandle,
   IN CONST EFI_PEI_SERVICES     **PeiServices
-  ) 
+  )
 {
   EFI_STATUS              Status;
   EFI_GUID                *ExtractHandlerGuidTable;
@@ -251,10 +240,10 @@ SectionExtractionPeiEntry (
   EFI_PEI_PPI_DESCRIPTOR  *GuidPpi;
 
   //
-  // Get custom extract guided section method guid list 
+  // Get custom extract guided section method guid list
   //
   ExtractHandlerNumber = ExtractGuidedSectionGetGuidList (&ExtractHandlerGuidTable);
-  
+
   //
   // Install custom extraction guid PPI
   //
@@ -269,6 +258,6 @@ SectionExtractionPeiEntry (
       ASSERT_EFI_ERROR (Status);
     }
   }
-  
+
   return EFI_SUCCESS;
 }

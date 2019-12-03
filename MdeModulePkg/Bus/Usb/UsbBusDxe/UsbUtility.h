@@ -3,13 +3,7 @@
     Manage Usb Port/Hc/Etc.
 
 Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -36,55 +30,6 @@ UsbHcGetCapability (
   OUT UINT8               *Is64BitCapable
   );
 
-/**
-  Reset the host controller.
-
-  @param  UsbBus                The usb bus driver.
-  @param  Attributes            The reset type, only global reset is used by this driver.
-
-  @retval EFI_SUCCESS           The reset operation succeeded.
-  @retval EFI_INVALID_PARAMETER Attributes is not valid.
-  @retval EFI_UNSUPPOURTED      The type of reset specified by Attributes is
-                                not currently supported by the host controller.
-  @retval EFI_DEVICE_ERROR      Host controller isn't halted to reset.
-**/
-EFI_STATUS
-UsbHcReset (
-  IN USB_BUS              *UsbBus,
-  IN UINT16               Attributes
-  );
-
-/**
-  Get the current operation state of the host controller.
-
-  @param  UsbBus           The USB bus driver.
-  @param  State            The host controller operation state.
-
-  @retval EFI_SUCCESS      The operation state is returned in State.
-  @retval Others           Failed to get the host controller state.
-
-**/
-EFI_STATUS
-UsbHcGetState (
-  IN  USB_BUS             *UsbBus,
-  OUT EFI_USB_HC_STATE    *State
-  );
-
-/**
-  Set the host controller operation state.
-
-  @param  UsbBus           The USB bus driver.
-  @param  State            The state to set.
-
-  @retval EFI_SUCCESS      The host controller is now working at State.
-  @retval Others           Failed to set operation state.
-
-**/
-EFI_STATUS
-UsbHcSetState (
-  IN  USB_BUS             *UsbBus,
-  IN EFI_USB_HC_STATE     State
-  );
 
 /**
   Get the root hub port state.
@@ -286,71 +231,6 @@ UsbHcSyncInterruptTransfer (
   OUT UINT32                              *UsbResult
   );
 
-/**
-  Execute a synchronous Isochronous USB transfer.
-
-  @param  UsbBus           The USB bus driver.
-  @param  DevAddr          The target device address.
-  @param  EpAddr           The target endpoint address, with direction encoded in
-                           bit 7.
-  @param  DevSpeed         The device's speed.
-  @param  MaxPacket        The endpoint's max packet size.
-  @param  BufferNum        The number of data buffer.
-  @param  Data             Array of pointers to data buffer.
-  @param  DataLength       The length of data buffer.
-  @param  Translator       The transaction translator for low/full speed device.
-  @param  UsbResult        The result of USB execution.
-
-  @retval EFI_UNSUPPORTED  The isochronous transfer isn't supported now.
-
-**/
-EFI_STATUS
-UsbHcIsochronousTransfer (
-  IN  USB_BUS                             *UsbBus,
-  IN  UINT8                               DevAddr,
-  IN  UINT8                               EpAddr,
-  IN  UINT8                               DevSpeed,
-  IN  UINTN                               MaxPacket,
-  IN  UINT8                               BufferNum,
-  IN  OUT VOID                            *Data[EFI_USB_MAX_ISO_BUFFER_NUM],
-  IN  UINTN                               DataLength,
-  IN  EFI_USB2_HC_TRANSACTION_TRANSLATOR  *Translator,
-  OUT UINT32                              *UsbResult
-  );
-
-/**
-  Queue an asynchronous isochronous transfer.
-
-  @param  UsbBus           The USB bus driver.
-  @param  DevAddr          The target device address.
-  @param  EpAddr           The target endpoint address, with direction encoded in
-                           bit 7.
-  @param  DevSpeed         The device's speed.
-  @param  MaxPacket        The endpoint's max packet size.
-  @param  BufferNum        The number of data buffer.
-  @param  Data             Array of pointers to data buffer.
-  @param  DataLength       The length of data buffer.
-  @param  Translator       The transaction translator for low/full speed device.
-  @param  Callback         The function to call when data is transferred.
-  @param  Context          The context to the callback function.
-
-  @retval EFI_UNSUPPORTED  The asynchronous isochronous transfer isn't supported.
-
-**/
-EFI_STATUS
-UsbHcAsyncIsochronousTransfer (
-  IN  USB_BUS                             *UsbBus,
-  IN  UINT8                               DevAddr,
-  IN  UINT8                               EpAddr,
-  IN  UINT8                               DevSpeed,
-  IN  UINTN                               MaxPacket,
-  IN  UINT8                               BufferNum,
-  IN OUT VOID                             *Data[EFI_USB_MAX_ISO_BUFFER_NUM],
-  IN  UINTN                               DataLength,
-  IN  EFI_USB2_HC_TRANSACTION_TRANSLATOR  *Translator,
-  IN  EFI_ASYNC_USB_TRANSFER_CALLBACK     Callback,
-  IN  VOID                                *Context
-  );
 
 /**
   Open the USB host controller protocol BY_CHILD.

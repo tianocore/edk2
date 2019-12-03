@@ -1,15 +1,9 @@
 /** @file
   Implementation for EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL protocol.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 Copyright (C) 2016 Silicon Graphics, Inc. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -66,15 +60,15 @@ UNICODE_TO_CHAR  UnicodeToPcAnsiOrAscii[] = {
   { BLOCKELEMENT_FULL_BLOCK,            0xdb, L'*' },
   { BLOCKELEMENT_LIGHT_SHADE,           0xb0, L'+' },
 
-  { GEOMETRICSHAPE_UP_TRIANGLE,         0x1e, L'^' },
-  { GEOMETRICSHAPE_RIGHT_TRIANGLE,      0x10, L'>' },
-  { GEOMETRICSHAPE_DOWN_TRIANGLE,       0x1f, L'v' },
-  { GEOMETRICSHAPE_LEFT_TRIANGLE,       0x11, L'<' },
+  { GEOMETRICSHAPE_UP_TRIANGLE,         '^', L'^' },
+  { GEOMETRICSHAPE_RIGHT_TRIANGLE,      '>', L'>' },
+  { GEOMETRICSHAPE_DOWN_TRIANGLE,       'v', L'v' },
+  { GEOMETRICSHAPE_LEFT_TRIANGLE,       '<', L'<' },
 
-  { ARROW_LEFT,                         0x3c, L'<' },
-  { ARROW_UP,                           0x18, L'^' },
-  { ARROW_RIGHT,                        0x3e, L'>' },
-  { ARROW_DOWN,                         0x19, L'v' },
+  { ARROW_LEFT,                         '<', L'<' },
+  { ARROW_UP,                           '^', L'^' },
+  { ARROW_RIGHT,                        '>', L'>' },
+  { ARROW_DOWN,                         'v', L'v' },
 
   { 0x0000,                             0x00, L'\0' }
 };
@@ -188,6 +182,7 @@ TerminalConOutOutputString (
   CHAR8                       AsciiChar;
   EFI_STATUS                  Status;
   UINT8                       ValidBytes;
+  CHAR8                       CrLfStr[2];
   //
   //  flag used to indicate whether condition happens which will cause
   //  return EFI_WARN_UNKNOWN_GLYPH
@@ -223,10 +218,14 @@ TerminalConOutOutputString (
 
     switch (TerminalDevice->TerminalType) {
 
-    case PCANSITYPE:
-    case VT100TYPE:
-    case VT100PLUSTYPE:
-    case TTYTERMTYPE:
+    case TerminalTypePcAnsi:
+    case TerminalTypeVt100:
+    case TerminalTypeVt100Plus:
+    case TerminalTypeTtyTerm:
+    case TerminalTypeLinux:
+    case TerminalTypeXtermR6:
+    case TerminalTypeVt400:
+    case TerminalTypeSCO:
 
       if (!TerminalIsValidTextGraphics (*WString, &GraphicChar, &AsciiChar)) {
         //
@@ -252,7 +251,7 @@ TerminalConOutOutputString (
 
       }
 
-      if (TerminalDevice->TerminalType != PCANSITYPE) {
+      if (TerminalDevice->TerminalType != TerminalTypePcAnsi) {
         GraphicChar = AsciiChar;
       }
 
@@ -270,7 +269,7 @@ TerminalConOutOutputString (
 
       break;
 
-    case VTUTF8TYPE:
+    case TerminalTypeVtUtf8:
       UnicodeToUtf8 (*WString, &Utf8Char, &ValidBytes);
       Length = ValidBytes;
       Status = TerminalDevice->SerialIo->Write (
@@ -316,7 +315,7 @@ TerminalConOutOutputString (
           Mode->CursorRow++;
         }
 
-        if (TerminalDevice->TerminalType == TTYTERMTYPE &&
+        if (TerminalDevice->TerminalType == TerminalTypeTtyTerm &&
             !TerminalDevice->OutputEscChar) {
           //
           // We've written the last character on the line.  The
@@ -326,7 +325,8 @@ TerminalConOutOutputString (
           // the driver, but only if we're not in the middle of
           // printing an escape sequence.
           //
-          CHAR8 CrLfStr[] = {'\r', '\n'};
+          CrLfStr[0] = '\r';
+          CrLfStr[1] = '\n';
 
           Length = sizeof(CrLfStr);
 
@@ -396,14 +396,14 @@ TerminalConOutTestString (
 
   switch (TerminalDevice->TerminalType) {
 
-  case PCANSITYPE:
-  case VT100TYPE:
-  case VT100PLUSTYPE:
-  case TTYTERMTYPE:
+  case TerminalTypePcAnsi:
+  case TerminalTypeVt100:
+  case TerminalTypeVt100Plus:
+  case TerminalTypeTtyTerm:
     Status = AnsiTestString (TerminalDevice, WString);
     break;
 
-  case VTUTF8TYPE:
+  case TerminalTypeVtUtf8:
     Status = VTUTF8TestString (TerminalDevice, WString);
     break;
 
@@ -449,7 +449,7 @@ TerminalConOutQueryMode (
   //
   // Get Terminal device data structure pointer.
   //
-  TerminalDevice = TERMINAL_CON_OUT_DEV_FROM_THIS (This);  
+  TerminalDevice = TERMINAL_CON_OUT_DEV_FROM_THIS (This);
   *Columns = TerminalDevice->TerminalConsoleModeData[ModeNumber].Columns;
   *Rows    = TerminalDevice->TerminalConsoleModeData[ModeNumber].Rows;
 
@@ -467,7 +467,7 @@ TerminalConOutQueryMode (
   @param ModeNumber    The text mode to set.
 
   @retval EFI_SUCCESS       The requested text mode is set.
-  @retval EFI_DEVICE_ERROR  The requested text mode cannot be set 
+  @retval EFI_DEVICE_ERROR  The requested text mode cannot be set
                             because of serial device error.
   @retval EFI_UNSUPPORTED   The text mode number is not valid.
 
@@ -789,7 +789,7 @@ TerminalConOutSetCursorPosition (
   // within the current line if possible, and don't output anyting if
   // it isn't necessary.
   //
-  if (TerminalDevice->TerminalType == TTYTERMTYPE &&
+  if (TerminalDevice->TerminalType == TerminalTypeTtyTerm &&
       (UINTN)Mode->CursorRow == Row) {
     if ((UINTN)Mode->CursorColumn > Column) {
       mCursorBackwardString[FW_BACK_OFFSET + 0] = (CHAR16) ('0' + ((Mode->CursorColumn - Column) / 10));
@@ -909,7 +909,7 @@ TerminalIsValidTextGraphics (
   Detects if a valid ASCII char.
 
   @param  Ascii        An ASCII character.
-                       
+
   @retval TRUE         If it is a valid ASCII character.
   @retval FALSE        If it is not a valid ASCII character.
 
@@ -933,7 +933,7 @@ TerminalIsValidAscii (
   Detects if a valid EFI control character.
 
   @param  CharC        An input EFI Control character.
-                       
+
   @retval TRUE         If it is a valid EFI control character.
   @retval FALSE        If it is not a valid EFI control character.
 

@@ -1,14 +1,8 @@
 /** @file
   Guid for Pcd DataBase Signature.
 
-Copyright (c) 2012 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under
-the terms and conditions of the BSD License that accompanies this distribution.
-The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2012 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -30,10 +24,9 @@ typedef UINT64 SKU_ID;
 #define PCD_TYPE_DATA         (0x0U << PCD_TYPE_SHIFT)
 #define PCD_TYPE_HII          (0x8U << PCD_TYPE_SHIFT)
 #define PCD_TYPE_VPD          (0x4U << PCD_TYPE_SHIFT)
-#define PCD_TYPE_SKU_ENABLED  (0x2U << PCD_TYPE_SHIFT)
 #define PCD_TYPE_STRING       (0x1U << PCD_TYPE_SHIFT)
 
-#define PCD_TYPE_ALL_SET      (PCD_TYPE_DATA | PCD_TYPE_HII | PCD_TYPE_VPD | PCD_TYPE_SKU_ENABLED | PCD_TYPE_STRING)
+#define PCD_TYPE_ALL_SET      (PCD_TYPE_DATA | PCD_TYPE_HII | PCD_TYPE_VPD | PCD_TYPE_STRING)
 
 #define PCD_DATUM_TYPE_SHIFT  24
 
@@ -60,11 +53,6 @@ typedef struct  {
   UINT16  TokenNumber;          // Token Number for Dynamic-Ex PCD.
   UINT16  ExGuidIndex;          // Index of GuidTable in units of GUID.
 } DYNAMICEX_MAPPING;
-
-typedef struct {
-  UINT32  SkuDataStartOffset;   // Offset(with DATUM TYPE info) from the PCD_DB.
-  UINT32  SkuIdTableOffset;     // Offset from the PCD_DB.
-} SKU_HEAD;
 
 typedef struct {
   UINT32  StringIndex;          // Offset in String Table in units of UINT8.
@@ -94,8 +82,9 @@ typedef UINT32 TABLE_OFFSET;
 typedef struct {
     GUID                  Signature;            // PcdDataBaseGuid.
     UINT32                BuildVersion;
-    UINT32                Length;
+    UINT32                Length;               // Length of DEFAULT SKU PCD DB
     SKU_ID                SystemSkuId;          // Current SkuId value.
+    UINT32                LengthForAllSkus;     // Length of all SKU PCD DB
     UINT32                UninitDataBaseSize;   // Total size for PCD those default value with 0.
     TABLE_OFFSET          LocalTokenNumberTableOffset;
     TABLE_OFFSET          ExMapTableOffset;
@@ -107,7 +96,7 @@ typedef struct {
     UINT16                LocalTokenCount;      // LOCAL_TOKEN_NUMBER for all.
     UINT16                ExTokenCount;         // EX_TOKEN_NUMBER for DynamicEx.
     UINT16                GuidTableCount;       // The Number of Guid in GuidTable.
-    UINT8                 Pad[2];               // Pad bytes to satisfy the alignment.
+    UINT8                 Pad[6];               // Pad bytes to satisfy the alignment.
 
     //
     // Default initialized external PCD database binary structure
@@ -115,7 +104,6 @@ typedef struct {
     // Padding is needed to keep necessary alignment
     //
     //SKU_ID                         SkuIdTable[];            // SkuIds system supports.
-    //SKU_ID                         SkuIndexTable[];         // SkuIds for each PCD with SKU enable.
     //UINT64                         ValueUint64[];
     //UINT32                         ValueUint32[];
     //VPD_HEAD                       VpdHead[];               // VPD Offset
@@ -125,7 +113,6 @@ typedef struct {
     //STRING_HEAD                    StringHead[];            // String PCD
     //PCD_NAME_INDEX                 PcdNameTable[];          // PCD name index info. It can be accessed by the PcdNameTableOffset.
     //VARIABLE_HEAD                  VariableHead[];          // HII PCD
-    //SKU_HEAD                       SkuHead[];               // Store SKU info for each PCD with SKU enable.
     //UINT8                          StringTable[];           // String for String PCD value and HII PCD Variable Name. It can be accessed by StringTableOffset.
     //SIZE_INFO                      SizeTable[];             // MaxSize and CurSize for String PCD. It can be accessed by SizeTableOffset.
     //UINT16                         ValueUint16[];
@@ -146,5 +133,96 @@ typedef struct {
   DXE_PCD_DATABASE  *DxeDb;
 } PCD_DATABASE;
 
+typedef struct {
+  UINT32 Offset:24;
+  UINT32 Value:8;
+} PCD_DATA_DELTA;
+
+typedef struct {
+  SKU_ID SkuId;
+  UINT16 DefaultId;
+  UINT8  Reserved[6];
+} PCD_DEFAULT_INFO;
+
+typedef struct {
+  //
+  // Full size, it must be at 8 byte alignment.
+  //
+  UINT32 DataSize;
+  //
+  // HeaderSize includes HeaderSize fields and DefaultInfo arrays
+  //
+  UINT32 HeaderSize;
+  //
+  // DefaultInfo arrays those have the same default setting.
+  //
+  PCD_DEFAULT_INFO DefaultInfo[1];
+  //
+  // Default data is stored as variable storage or the array of DATA_DELTA.
+  //
+} PCD_DEFAULT_DATA;
+
+#define PCD_NV_STORE_DEFAULT_BUFFER_SIGNATURE SIGNATURE_32('N', 'S', 'D', 'B')
+
+typedef struct {
+  //
+  // PCD_NV_STORE_DEFAULT_BUFFER_SIGNATURE
+  //
+  UINT32    Signature;
+  //
+  // Length of the taken default buffer
+  //
+  UINT32    Length;
+  //
+  // Length of the total reserved buffer
+  //
+  UINT32    MaxLength;
+  //
+  // Reserved for 8 byte alignment
+  //
+  UINT32    Reserved;
+  // one or more PCD_DEFAULT_DATA
+} PCD_NV_STORE_DEFAULT_BUFFER_HEADER;
+
+//
+// NvStoreDefaultValueBuffer layout:
+// +-------------------------------------+
+// | PCD_NV_STORE_DEFAULT_BUFFER_HEADER  |
+// +-------------------------------------+
+// | PCD_DEFAULT_DATA (DEFAULT, Standard)|
+// +-------------------------------------+
+// | PCD_DATA_DELTA   (DEFAULT, Standard)|
+// +-------------------------------------+
+// | ......                              |
+// +-------------------------------------+
+// | PCD_DEFAULT_DATA (SKU A, Standard)  |
+// +-------------------------------------+
+// | PCD_DATA_DELTA   (SKU A, Standard)  |
+// +-------------------------------------+
+// | ......                              |
+// +-------------------------------------+
+//
+
+#pragma pack(1)
+typedef struct {
+  SKU_ID    SkuId;
+  SKU_ID    SkuIdCompared;
+  UINT32    Length;
+  // PCD_DATA_DELTA   DeltaData[]
+} PCD_DATABASE_SKU_DELTA;
+
+//
+// PCD database layout:
+// +---------------------------------+
+// | PCD_DATABASE_INIT (DEFAULT SKU) |
+// +---------------------------------+
+// | PCD_DATABASE_SKU_DELTA (SKU A)  |
+// +---------------------------------+
+// | PCD_DATABASE_SKU_DELTA (SKU B)  |
+// +---------------------------------+
+// | ......                          |
+// +---------------------------------+
+//
+#pragma pack()
 
 #endif

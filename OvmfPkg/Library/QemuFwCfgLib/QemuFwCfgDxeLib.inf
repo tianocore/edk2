@@ -1,0 +1,51 @@
+## @file
+#
+#  Stateful, implicitly initialized fw_cfg library.
+#
+#  Copyright (C) 2013, Red Hat, Inc.
+#  Copyright (c) 2008 - 2012, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = QemuFwCfgDxeLib
+  FILE_GUID                      = 80474090-55e7-4c28-b25c-9f236ba41f28
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = QemuFwCfgLib|DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER
+
+  CONSTRUCTOR                    = QemuFwCfgInitialize
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  QemuFwCfgLibInternal.h
+  QemuFwCfgLib.c
+  QemuFwCfgDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  IoLib
+  MemoryAllocationLib
+  MemEncryptSevLib
+
+[Protocols]
+  gEdkiiIoMmuProtocolGuid                         ## SOMETIMES_CONSUMES
+
+[Depex]
+  gEdkiiIoMmuProtocolGuid OR gIoMmuAbsentProtocolGuid

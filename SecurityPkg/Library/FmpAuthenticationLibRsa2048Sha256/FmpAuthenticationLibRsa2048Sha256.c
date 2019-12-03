@@ -10,14 +10,8 @@
   FmpAuthenticatedHandlerRsa2048Sha256(), AuthenticateFmpImage() will receive
   untrusted input and do basic validation.
 
-  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -133,7 +127,7 @@ FmpAuthenticatedHandlerRsa2048Sha256 (
   }
 
   //
-  // Fail if the PublicKey is not one of the public keys in PcdRsa2048Sha256PublicKeyBuffer
+  // Fail if the PublicKey is not one of the public keys in the input PublicKeyData.
   //
   PublicKey = (VOID *)PublicKeyData;
   PublicKeyBufferSize = PublicKeyDataLength;
@@ -306,6 +300,11 @@ AuthenticateFmpImage (
     return RETURN_UNSUPPORTED;
   }
 
+  if ((PublicKeyDataLength % SHA256_DIGEST_SIZE) != 0) {
+    DEBUG ((DEBUG_ERROR, "PublicKeyDataLength is not multiple SHA256 size\n"));
+    return RETURN_UNSUPPORTED;
+  }
+
   if (ImageSize < sizeof(EFI_FIRMWARE_IMAGE_AUTHENTICATION)) {
     DEBUG((DEBUG_ERROR, "AuthenticateFmpImage - ImageSize too small\n"));
     return RETURN_INVALID_PARAMETER;
@@ -314,7 +313,7 @@ AuthenticateFmpImage (
     DEBUG((DEBUG_ERROR, "AuthenticateFmpImage - dwLength too small\n"));
     return RETURN_INVALID_PARAMETER;
   }
-  if (Image->AuthInfo.Hdr.dwLength > MAX_UINTN - sizeof(UINT64)) {
+  if ((UINTN) Image->AuthInfo.Hdr.dwLength > MAX_UINTN - sizeof(UINT64)) {
     DEBUG((DEBUG_ERROR, "AuthenticateFmpImage - dwLength too big\n"));
     return RETURN_INVALID_PARAMETER;
   }

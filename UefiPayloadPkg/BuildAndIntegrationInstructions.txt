@@ -1,0 +1,82 @@
+================================================================================
+Build And Integration Instructions
+2019 March 27th
+================================================================================
+
+================================================================================
+DISCLAIMER
+================================================================================
+This release note as well as the software described in it is furnished under license
+and may only be used or copied in accordance with the terms of the license. The
+information in this manual is furnished for informational use only, is subject to
+change without notice, and should not be construed as a commitment by Intel Corporation.
+Intel Corporation assumes no responsibility or liability for any errors or inaccuracies
+that may appear in this document or any software that may be provided in association
+with this document.
+Except as permitted by such license, no part of this document may be reproduced,
+stored in a retrieval system, or transmitted in any form or by any means without
+the express written consent of Intel Corporation.
+
+================================================================================
+                                     INDEX
+================================================================================
+A. INTRODUCTION
+B. HOW TO BUILD
+C. HOW TO INTEGRATE INTO COREBOOT
+D. HOW TO INTEGRATE INTO SLIM BOOTLOADER
+
+================================================================================
+A. INTRODUCTION
+================================================================================
+This document provides instructions on how to build UEFI Payload and how to
+integrate it into coreboot or Slim Bootloader firmware.
+
+================================================================================
+B. HOW TO BUILD
+================================================================================
+1. Run the below two commands in windows command prompt window:
+   edksetup.bat
+
+   For debug ia32 build:
+   build -a IA32 -p UefiPayloadPkg\UefiPayloadPkgIa32.dsc -b DEBUG -t <ToolChain> -D BOOTLOADER=<Bootloader>
+
+   For release ia32 build:
+   build -a IA32 -p UefiPayloadPkg\UefiPayloadPkgIa32.dsc -b RELEASE -t <ToolChain> -D BOOTLOADER=<Bootloader>
+
+   For debug X64 build:
+   build -a IA32 -a X64 -p UefiPayloadPkg\UefiPayloadPkgIa32X64.dsc -b DEBUG -t <ToolChain> -D BOOTLOADER=<Bootloader>
+
+   For release X64 build:
+   build -a IA32 -a X64 -p UefiPayloadPkg\UefiPayloadPkgIa32X64.dsc -b RELEASE -t <ToolChain> -D BOOTLOADER=<Bootloader>
+
+   <ToolChain> is the EDK II build environment on your host. Currently it was tested
+   with VS2015x86 toolchain.
+   <Bootloader> could be "SBL" for Slim Bootloader and "COREBOOT" for coreboot.
+
+   Refer to https://github.com/tianocore/tianocore.github.io/wiki/UDK2018-How-to-Build for
+   details about EDK II build steps.
+
+2. If build is successfully, the payload image (UEFIPAYLOAD.fd) will be generated inside the
+   folder of Build\UefiPayloadPkg.
+
+================================================================================
+C. HOW TO INTEGRATE INTO COREBOOT
+================================================================================
+1. Copy the payload image (UEFIPAYLOAD.fd) into the top-level directory of Coreboot source tree.
+2. Run "make menuconfig" in linux console to start Coreboot configuration surface.
+3. In the Payload section,
+   1) Choose "An ELF executable payload" for the option of "Add a payload".
+   2) Type the path of payload image for the option of "Payload path and filename".
+   3) Select the option of "Use LZMA compression for payloads".
+4. If the graphics console is required in UEFI payload, enable framebuffer initialization in coreboot.
+   This could be done by enabling native graphics or using VGA BIOS option rom.
+5. Build the coreboot firmware image.
+
+================================================================================
+D. HOW TO INTEGRATE INTO SLIM BOOTLOADER
+================================================================================
+Please refer https://slimbootloader.github.io/how-tos/integrate-multiple-payloads.html for below steps.
+1. Copy the payload image (UEFIPAYLOAD.fd) into Slim Bootloader source at PayloadPkg\PayloadBins\UefiPld.fd
+2. Update config data to make UEFI payload as default payload if required.
+3. Build Slim Bootloader with UEFI payload:
+   BuildLoader.py build <Platform> -p "OsLoader.efi:LLDR:Lz4;UefiPld.fd:UEFI:Lzma"

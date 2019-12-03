@@ -2,14 +2,8 @@
   Console Platform DXE Driver, install Console Device Guids and update Console
   Environment Variables.
 
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -80,7 +74,7 @@ InitializeConPlatform(
 
 
 /**
-  Test to see if EFI_SIMPLE_TEXT_INPUT_PROTOCOL is supported on ControllerHandle. 
+  Test to see if EFI_SIMPLE_TEXT_INPUT_PROTOCOL is supported on ControllerHandle.
 
   @param  This                Protocol instance pointer.
   @param  ControllerHandle    Handle of device to test.
@@ -108,7 +102,7 @@ ConPlatformTextInDriverBindingSupported (
 
 
 /**
-  Test to see if EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL is supported on ControllerHandle. 
+  Test to see if EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL is supported on ControllerHandle.
 
   @param  This                Protocol instance pointer.
   @param  ControllerHandle    Handle of device to test.
@@ -136,7 +130,7 @@ ConPlatformTextOutDriverBindingSupported (
 
 
 /**
-  Test to see if the specified protocol is supported on ControllerHandle. 
+  Test to see if the specified protocol is supported on ControllerHandle.
 
   @param  This                Protocol instance pointer.
   @param  ControllerHandle    Handle of device to test.
@@ -202,9 +196,8 @@ ConPlatformDriverBindingSupported (
   Start this driver on ControllerHandle by opening Simple Text Input Protocol,
   reading Device Path, and installing Console In Devcice GUID on ControllerHandle.
 
-  If this devcie is not one hot-plug devce, append its device path into the 
-  console environment variables ConInDev.
-  
+  Append its device path into the console environment variables ConInDev.
+
   @param  This                 Protocol instance pointer.
   @param  ControllerHandle     Handle of device to bind driver to
   @param  RemainingDevicePath  Optional parameter use to pick a specific child
@@ -270,58 +263,32 @@ ConPlatformTextInDriverBindingStart (
   }
 
   //
-  // Check the device path, if it is a hot plug device,
-  // do not put the device path into ConInDev, and install
-  // gEfiConsoleInDeviceGuid to the device handle directly.
-  // The policy is, make hot plug device plug in and play immediately.
+  // Append the device path to the ConInDev environment variable
   //
-  if (IsHotPlugDevice (DevicePath)) {
+  ConPlatformUpdateDeviceVariable (
+    L"ConInDev",
+    DevicePath,
+    Append
+    );
+
+  //
+  // If the device path is an instance in the ConIn environment variable,
+  // then install EfiConsoleInDeviceGuid onto ControllerHandle
+  //
+  if (IsInConInVariable) {
     gBS->InstallMultipleProtocolInterfaces (
            &ControllerHandle,
            &gEfiConsoleInDeviceGuid,
            NULL,
            NULL
            );
-    //
-    // Append the device path to ConInDev only if it is in ConIn variable.
-    //
-    if (IsInConInVariable) {
-      ConPlatformUpdateDeviceVariable (
-        L"ConInDev",
-        DevicePath,
-        Append
-        );
-    }
   } else {
-    //
-    // If it is not a hot-plug device, append the device path to the
-    // ConInDev environment variable
-    //
-    ConPlatformUpdateDeviceVariable (
-      L"ConInDev",
-      DevicePath,
-      Append
-      );
-
-    //
-    // If the device path is an instance in the ConIn environment variable,
-    // then install EfiConsoleInDeviceGuid onto ControllerHandle
-    //
-    if (IsInConInVariable) {
-      gBS->InstallMultipleProtocolInterfaces (
-             &ControllerHandle,
-             &gEfiConsoleInDeviceGuid,
-             NULL,
-             NULL
-             );
-    } else {
-      gBS->CloseProtocol (
-             ControllerHandle,
-             &gEfiSimpleTextInProtocolGuid,
-             This->DriverBindingHandle,
-             ControllerHandle
-             );
-    }
+    gBS->CloseProtocol (
+           ControllerHandle,
+           &gEfiSimpleTextInProtocolGuid,
+           This->DriverBindingHandle,
+           ControllerHandle
+           );
   }
 
   return EFI_SUCCESS;
@@ -334,9 +301,8 @@ ConPlatformTextInDriverBindingStart (
   reading Device Path, and installing Console Out Devcic GUID, Standard Error
   Device GUID on ControllerHandle.
 
-  If this devcie is not one hot-plug devce, append its device path into the 
-  console environment variables ConOutDev, ErrOutDev.
-  
+  Append its device path into the console environment variables ConOutDev, ErrOutDev.
+
   @param  This                 Protocol instance pointer.
   @param  ControllerHandle     Handle of device to bind driver to
   @param  RemainingDevicePath  Optional parameter use to pick a specific child
@@ -416,102 +382,66 @@ ConPlatformTextOutDriverBindingStart (
   }
 
   //
-  // Check the device path, if it is a hot plug device,
-  // do not put the device path into ConOutDev and ErrOutDev,
-  // and install gEfiConsoleOutDeviceGuid to the device handle directly.
-  // The policy is, make hot plug device plug in and play immediately.
+  // Append the device path to the ConOutDev and ErrOutDev environment variable.
+  // For GOP device path, append the sibling device path as well.
   //
-  if (IsHotPlugDevice (DevicePath)) {
+  if (!ConPlatformUpdateGopCandidate (DevicePath)) {
+    ConPlatformUpdateDeviceVariable (
+      L"ConOutDev",
+      DevicePath,
+      Append
+      );
+    //
+    // Then append the device path to the ErrOutDev environment variable
+    //
+    ConPlatformUpdateDeviceVariable (
+      L"ErrOutDev",
+      DevicePath,
+      Append
+      );
+  }
+
+  //
+  // If the device path is an instance in the ConOut environment variable,
+  // then install EfiConsoleOutDeviceGuid onto ControllerHandle
+  //
+  if (IsInConOutVariable) {
+    NeedClose = FALSE;
+    Status = gBS->InstallMultipleProtocolInterfaces (
+                    &ControllerHandle,
+                    &gEfiConsoleOutDeviceGuid,
+                    NULL,
+                    NULL
+                    );
+  }
+  //
+  // If the device path is an instance in the ErrOut environment variable,
+  // then install EfiStandardErrorDeviceGuid onto ControllerHandle
+  //
+  if (IsInErrOutVariable) {
+    NeedClose = FALSE;
     gBS->InstallMultipleProtocolInterfaces (
            &ControllerHandle,
-           &gEfiConsoleOutDeviceGuid,
+           &gEfiStandardErrorDeviceGuid,
            NULL,
            NULL
            );
-    //
-    // Append the device path to ConOutDev only if it is in ConOut variable.
-    //
-    if (IsInConOutVariable) {
-      ConPlatformUpdateDeviceVariable (
-        L"ConOutDev",
-        DevicePath,
-        Append
-        );
-    }
-    //
-    // Append the device path to ErrOutDev only if it is in ErrOut variable.
-    //
-    if (IsInErrOutVariable) {
-      ConPlatformUpdateDeviceVariable (
-        L"ErrOutDev",
-        DevicePath,
-        Append
-        );
-    }
-  } else {
-    //
-    // If it is not a hot-plug device, append the device path to 
-    // the ConOutDev and ErrOutDev environment variable.
-    // For GOP device path, append the sibling device path as well.
-    //
-    if (!ConPlatformUpdateGopCandidate (DevicePath)) {
-      ConPlatformUpdateDeviceVariable (
-        L"ConOutDev",
-        DevicePath,
-        Append
-        );
-      //
-      // Then append the device path to the ErrOutDev environment variable
-      //
-      ConPlatformUpdateDeviceVariable (
-        L"ErrOutDev",
-        DevicePath,
-        Append
-        );
-    }
+  }
 
-    //
-    // If the device path is an instance in the ConOut environment variable,
-    // then install EfiConsoleOutDeviceGuid onto ControllerHandle
-    //
-    if (IsInConOutVariable) {
-      NeedClose = FALSE;
-      Status = gBS->InstallMultipleProtocolInterfaces (
-                      &ControllerHandle,
-                      &gEfiConsoleOutDeviceGuid,
-                      NULL,
-                      NULL
-                      );
-    }
-    //
-    // If the device path is an instance in the ErrOut environment variable,
-    // then install EfiStandardErrorDeviceGuid onto ControllerHandle
-    //
-    if (IsInErrOutVariable) {
-      NeedClose = FALSE;
-      gBS->InstallMultipleProtocolInterfaces (
-             &ControllerHandle,
-             &gEfiStandardErrorDeviceGuid,
-             NULL,
-             NULL
-             );
-    }
-
-    if (NeedClose) {
-      gBS->CloseProtocol (
-             ControllerHandle,
-             &gEfiSimpleTextOutProtocolGuid,
-             This->DriverBindingHandle,
-             ControllerHandle
-             );
-    }
+  if (NeedClose) {
+    gBS->CloseProtocol (
+           ControllerHandle,
+           &gEfiSimpleTextOutProtocolGuid,
+           This->DriverBindingHandle,
+           ControllerHandle
+           );
   }
 
   return EFI_SUCCESS;
 }
 
 /**
-  Stop this driver on ControllerHandle by removing Console In Devcice GUID 
+  Stop this driver on ControllerHandle by removing Console In Devcice GUID
   and closing the Simple Text Input protocol on ControllerHandle.
 
   @param  This              Protocol instance pointer.
@@ -585,7 +515,7 @@ ConPlatformTextInDriverBindingStop (
 
 
 /**
-  Stop this driver on ControllerHandle by removing Console Out Devcice GUID 
+  Stop this driver on ControllerHandle by removing Console Out Devcice GUID
   and closing the Simple Text Output protocol on ControllerHandle.
 
   @param  This              Protocol instance pointer.
@@ -714,7 +644,7 @@ ConPlatformUnInstallProtocol (
   @param  Name             String part of EFI variable name
 
   @return Dynamically allocated memory that contains a copy of the EFI variable.
-          Caller is repsoncible freeing the buffer. Return NULL means Variable 
+          Caller is repsoncible freeing the buffer. Return NULL means Variable
           was not read.
 
 **/
@@ -823,6 +753,273 @@ IsGopSibling (
 }
 
 /**
+  Check whether a USB device match the specified USB Class device path. This
+  function follows "Load Option Processing" behavior in UEFI specification.
+
+  @param UsbIo       USB I/O protocol associated with the USB device.
+  @param UsbClass    The USB Class device path to match.
+
+  @retval TRUE       The USB device match the USB Class device path.
+  @retval FALSE      The USB device does not match the USB Class device path.
+
+**/
+BOOLEAN
+MatchUsbClass (
+  IN EFI_USB_IO_PROTOCOL        *UsbIo,
+  IN USB_CLASS_DEVICE_PATH      *UsbClass
+  )
+{
+  EFI_STATUS                    Status;
+  EFI_USB_DEVICE_DESCRIPTOR     DevDesc;
+  EFI_USB_INTERFACE_DESCRIPTOR  IfDesc;
+  UINT8                         DeviceClass;
+  UINT8                         DeviceSubClass;
+  UINT8                         DeviceProtocol;
+
+  if ((DevicePathType (UsbClass) != MESSAGING_DEVICE_PATH) ||
+      (DevicePathSubType (UsbClass) != MSG_USB_CLASS_DP)){
+    return FALSE;
+  }
+
+  //
+  // Check Vendor Id and Product Id.
+  //
+  Status = UsbIo->UsbGetDeviceDescriptor (UsbIo, &DevDesc);
+  if (EFI_ERROR (Status)) {
+    return FALSE;
+  }
+
+  if ((UsbClass->VendorId != 0xffff) &&
+      (UsbClass->VendorId != DevDesc.IdVendor)) {
+    return FALSE;
+  }
+
+  if ((UsbClass->ProductId != 0xffff) &&
+      (UsbClass->ProductId != DevDesc.IdProduct)) {
+    return FALSE;
+  }
+
+  DeviceClass    = DevDesc.DeviceClass;
+  DeviceSubClass = DevDesc.DeviceSubClass;
+  DeviceProtocol = DevDesc.DeviceProtocol;
+  if (DeviceClass == 0) {
+    //
+    // If Class in Device Descriptor is set to 0, use the Class, SubClass and
+    // Protocol in Interface Descriptor instead.
+    //
+    Status = UsbIo->UsbGetInterfaceDescriptor (UsbIo, &IfDesc);
+    if (EFI_ERROR (Status)) {
+      return FALSE;
+    }
+
+    DeviceClass    = IfDesc.InterfaceClass;
+    DeviceSubClass = IfDesc.InterfaceSubClass;
+    DeviceProtocol = IfDesc.InterfaceProtocol;
+  }
+
+  //
+  // Check Class, SubClass and Protocol.
+  //
+  if ((UsbClass->DeviceClass != 0xff) &&
+      (UsbClass->DeviceClass != DeviceClass)) {
+    return FALSE;
+  }
+
+  if ((UsbClass->DeviceSubClass != 0xff) &&
+      (UsbClass->DeviceSubClass != DeviceSubClass)) {
+    return FALSE;
+  }
+
+  if ((UsbClass->DeviceProtocol != 0xff) &&
+      (UsbClass->DeviceProtocol != DeviceProtocol)) {
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+/**
+  Check whether a USB device match the specified USB WWID device path. This
+  function follows "Load Option Processing" behavior in UEFI specification.
+
+  @param UsbIo       USB I/O protocol associated with the USB device.
+  @param UsbWwid     The USB WWID device path to match.
+
+  @retval TRUE       The USB device match the USB WWID device path.
+  @retval FALSE      The USB device does not match the USB WWID device path.
+
+**/
+BOOLEAN
+MatchUsbWwid (
+  IN EFI_USB_IO_PROTOCOL        *UsbIo,
+  IN USB_WWID_DEVICE_PATH       *UsbWwid
+  )
+{
+  EFI_STATUS                   Status;
+  EFI_USB_DEVICE_DESCRIPTOR    DevDesc;
+  EFI_USB_INTERFACE_DESCRIPTOR IfDesc;
+  UINT16                       *LangIdTable;
+  UINT16                       TableSize;
+  UINT16                       Index;
+  CHAR16                       *CompareStr;
+  UINTN                        CompareLen;
+  CHAR16                       *SerialNumberStr;
+  UINTN                        Length;
+
+  if ((DevicePathType (UsbWwid) != MESSAGING_DEVICE_PATH) ||
+      (DevicePathSubType (UsbWwid) != MSG_USB_WWID_DP)) {
+    return FALSE;
+  }
+
+  //
+  // Check Vendor Id and Product Id.
+  //
+  Status = UsbIo->UsbGetDeviceDescriptor (UsbIo, &DevDesc);
+  if (EFI_ERROR (Status)) {
+    return FALSE;
+  }
+  if ((DevDesc.IdVendor != UsbWwid->VendorId) ||
+      (DevDesc.IdProduct != UsbWwid->ProductId)) {
+    return FALSE;
+  }
+
+  //
+  // Check Interface Number.
+  //
+  Status = UsbIo->UsbGetInterfaceDescriptor (UsbIo, &IfDesc);
+  if (EFI_ERROR (Status)) {
+    return FALSE;
+  }
+  if (IfDesc.InterfaceNumber != UsbWwid->InterfaceNumber) {
+    return FALSE;
+  }
+
+  //
+  // Check Serial Number.
+  //
+  if (DevDesc.StrSerialNumber == 0) {
+    return FALSE;
+  }
+
+  //
+  // Get all supported languages.
+  //
+  TableSize = 0;
+  LangIdTable = NULL;
+  Status = UsbIo->UsbGetSupportedLanguages (UsbIo, &LangIdTable, &TableSize);
+  if (EFI_ERROR (Status) || (TableSize == 0) || (LangIdTable == NULL)) {
+    return FALSE;
+  }
+
+  //
+  // Serial number in USB WWID device path is the last 64-or-less UTF-16 characters.
+  //
+  CompareStr = (CHAR16 *) (UINTN) (UsbWwid + 1);
+  CompareLen = (DevicePathNodeLength (UsbWwid) - sizeof (USB_WWID_DEVICE_PATH)) / sizeof (CHAR16);
+  if (CompareStr[CompareLen - 1] == L'\0') {
+    CompareLen--;
+  }
+
+  //
+  // Compare serial number in each supported language.
+  //
+  for (Index = 0; Index < TableSize / sizeof (UINT16); Index++) {
+    SerialNumberStr = NULL;
+    Status = UsbIo->UsbGetStringDescriptor (
+                      UsbIo,
+                      LangIdTable[Index],
+                      DevDesc.StrSerialNumber,
+                      &SerialNumberStr
+                      );
+    if (EFI_ERROR (Status) || (SerialNumberStr == NULL)) {
+      continue;
+    }
+
+    Length = StrLen (SerialNumberStr);
+    if ((Length >= CompareLen) &&
+        (CompareMem (SerialNumberStr + Length - CompareLen, CompareStr, CompareLen * sizeof (CHAR16)) == 0)) {
+      FreePool (SerialNumberStr);
+      return TRUE;
+    }
+
+    FreePool (SerialNumberStr);
+  }
+
+  return FALSE;
+}
+
+/**
+  Compare whether a full console device path matches a USB shortform device path.
+
+  @param[in] FullPath      Full console device path.
+  @param[in] ShortformPath Short-form device path. Short-form device node may in the beginning or in the middle.
+
+  @retval TRUE  The full console device path matches the short-form device path.
+  @retval FALSE The full console device path doesn't match the short-form device path.
+**/
+BOOLEAN
+MatchUsbShortformDevicePath (
+  IN EFI_DEVICE_PATH_PROTOCOL  *FullPath,
+  IN EFI_DEVICE_PATH_PROTOCOL  *ShortformPath
+  )
+{
+  EFI_STATUS                Status;
+  EFI_DEVICE_PATH_PROTOCOL  *ShortformNode;
+  UINTN                     ParentDevicePathSize;
+  EFI_DEVICE_PATH_PROTOCOL  *RemainingDevicePath;
+  EFI_USB_IO_PROTOCOL       *UsbIo;
+  EFI_HANDLE                Handle;
+
+  for ( ShortformNode = ShortformPath
+      ; !IsDevicePathEnd (ShortformNode)
+      ; ShortformNode = NextDevicePathNode (ShortformNode)
+      ) {
+    if ((DevicePathType (ShortformNode) == MESSAGING_DEVICE_PATH) &&
+        ((DevicePathSubType (ShortformNode) == MSG_USB_CLASS_DP) ||
+         (DevicePathSubType (ShortformNode) == MSG_USB_WWID_DP))
+        ) {
+      break;
+    }
+  }
+
+  //
+  // Skip further compare when it's not a shortform device path.
+  //
+  if (IsDevicePathEnd (ShortformNode)) {
+    return FALSE;
+  }
+
+  //
+  // Compare the parent device path when the ShortformPath doesn't start with short-form node.
+  //
+  ParentDevicePathSize = (UINTN) ShortformNode - (UINTN) ShortformPath;
+  RemainingDevicePath  = FullPath;
+  Status               = gBS->LocateDevicePath (&gEfiUsbIoProtocolGuid, &RemainingDevicePath, &Handle);
+  if (EFI_ERROR (Status)) {
+    return FALSE;
+  }
+  if (ParentDevicePathSize != 0) {
+    if ((ParentDevicePathSize > (UINTN) RemainingDevicePath - (UINTN) FullPath) ||
+        (CompareMem (FullPath, ShortformPath, ParentDevicePathSize) != 0)) {
+      return FALSE;
+    }
+  }
+
+  //
+  // Compar the USB layer.
+  //
+  Status = gBS->HandleProtocol(
+                  Handle,
+                  &gEfiUsbIoProtocolGuid,
+                  (VOID **) &UsbIo
+                  );
+  ASSERT_EFI_ERROR (Status);
+
+  return MatchUsbClass (UsbIo, (USB_CLASS_DEVICE_PATH *)ShortformNode) ||
+         MatchUsbWwid (UsbIo, (USB_WWID_DEVICE_PATH *)ShortformNode);
+}
+
+/**
   Function compares a device path data structure to that of all the nodes of a
   second device path instance.
 
@@ -881,7 +1078,8 @@ ConPlatformMatchDevicePaths (
   // Search for the match of 'Single' in 'Multi'
   //
   while (DevicePathInst != NULL) {
-    if ((CompareMem (Single, DevicePathInst, Size) == 0) || IsGopSibling (Single, DevicePathInst)) {
+    if ((CompareMem (Single, DevicePathInst, Size) == 0) ||
+      IsGopSibling (Single, DevicePathInst) || MatchUsbShortformDevicePath (Single, DevicePathInst)) {
       if (!Delete) {
         //
         // If Delete is FALSE, return EFI_SUCCESS if Single is found in Multi.
@@ -922,7 +1120,7 @@ ConPlatformMatchDevicePaths (
 }
 
 /**
-  Update console environment variables. 
+  Update console environment variables.
 
   @param  VariableName    Console environment variables, ConOutDev, ConInDev
                           ErrOutDev, ConIn ,ConOut or ErrOut.
@@ -958,7 +1156,7 @@ ConPlatformUpdateDeviceVariable (
   if (Operation != Delete) {
     //
     // Match specified DevicePath in Console Variable.
-    // 
+    //
     Status = ConPlatformMatchDevicePaths (
                VariableDevicePath,
                DevicePath,
@@ -1030,53 +1228,6 @@ ConPlatformUpdateDeviceVariable (
 }
 
 /**
-  Check if the device supports hot-plug through its device path.
-
-  This function could be updated to check more types of Hot Plug devices.
-  Currently, it checks USB and PCCard device.
-
-  @param  DevicePath            Pointer to device's device path.
-
-  @retval TRUE                  The devcie is a hot-plug device
-  @retval FALSE                 The devcie is not a hot-plug device.
-
-**/
-BOOLEAN
-IsHotPlugDevice (
-  IN  EFI_DEVICE_PATH_PROTOCOL    *DevicePath
-  )
-{
-  EFI_DEVICE_PATH_PROTOCOL     *CheckDevicePath;
-
-  CheckDevicePath = DevicePath;
-  while (!IsDevicePathEnd (CheckDevicePath)) {
-    //
-    // Check device whether is hot plug device or not throught Device Path
-    // 
-    if ((DevicePathType (CheckDevicePath) == MESSAGING_DEVICE_PATH) &&
-        (DevicePathSubType (CheckDevicePath) == MSG_USB_DP ||
-         DevicePathSubType (CheckDevicePath) == MSG_USB_CLASS_DP ||
-         DevicePathSubType (CheckDevicePath) == MSG_USB_WWID_DP)) {
-      //
-      // If Device is USB device
-      //
-      return TRUE;
-    }
-    if ((DevicePathType (CheckDevicePath) == HARDWARE_DEVICE_PATH) &&
-        (DevicePathSubType (CheckDevicePath) == HW_PCCARD_DP)) {
-      //
-      // If Device is PCCard
-      //
-      return TRUE;
-    }
-  
-    CheckDevicePath = NextDevicePathNode (CheckDevicePath);
-  }
-
-  return FALSE;
-}
-
-/**
   Update ConOutDev and ErrOutDev variables to add the device path of
   GOP controller itself and the sibling controllers.
 
@@ -1094,10 +1245,6 @@ ConPlatformUpdateGopCandidate (
   EFI_STATUS                           Status;
   EFI_HANDLE                           PciHandle;
   EFI_HANDLE                           GopHandle;
-  EFI_OPEN_PROTOCOL_INFORMATION_ENTRY  *OpenInfoBuffer;
-  UINTN                                EntryCount;
-  UINTN                                Index;
-  EFI_DEVICE_PATH_PROTOCOL             *ChildDevicePath;
   EFI_DEVICE_PATH_PROTOCOL             *TempDevicePath;
 
   //
@@ -1115,40 +1262,10 @@ ConPlatformUpdateGopCandidate (
   if (EFI_ERROR (Status)) {
     return FALSE;
   }
-
-  Status = gBS->OpenProtocolInformation (
-                  PciHandle,
-                  &gEfiPciIoProtocolGuid,
-                  &OpenInfoBuffer,
-                  &EntryCount
-                  );
-  if (EFI_ERROR (Status)) {
-    return FALSE;
+  TempDevicePath = EfiBootManagerGetGopDevicePath (PciHandle);
+  if (TempDevicePath != NULL) {
+    ConPlatformUpdateDeviceVariable (L"ConOutDev", TempDevicePath, Append);
+    ConPlatformUpdateDeviceVariable (L"ErrOutDev", TempDevicePath, Append);
   }
-
-  for (Index = 0; Index < EntryCount; Index++) {
-    //
-    // Query all the children created by the GOP driver
-    //
-    if ((OpenInfoBuffer[Index].Attributes & EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER) != 0) {
-      Status = gBS->OpenProtocol (
-                      OpenInfoBuffer[Index].ControllerHandle,
-                      &gEfiDevicePathProtocolGuid,
-                      (VOID **) &ChildDevicePath,
-                      NULL,
-                      NULL,
-                      EFI_OPEN_PROTOCOL_GET_PROTOCOL
-                      );
-      if (!EFI_ERROR (Status)) {
-        //
-        // Append the device path to ConOutDev and ErrOutDev
-        //
-        ConPlatformUpdateDeviceVariable (L"ConOutDev", ChildDevicePath, Append);
-        ConPlatformUpdateDeviceVariable (L"ErrOutDev", ChildDevicePath, Append);
-      }
-    }
-  }
-  FreePool (OpenInfoBuffer);
-
   return TRUE;
 }

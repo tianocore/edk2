@@ -2,13 +2,7 @@
 *
 *  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
 *
-*  This program and the accompanying materials
-*  are licensed and made available under the terms and conditions of the BSD License
-*  which accompanies this distribution.  The full text of the license may be found at
-*  http://opensource.org/licenses/bsd-license.php
-*
-*  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-*  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+*  SPDX-License-Identifier: BSD-2-Clause-Patent
 *
 **/
 
@@ -67,7 +61,7 @@ PublishArmProcessorTable (
         // Allocate Runtime memory for ARM processor table
         ArmProcessorTable = (ARM_PROCESSOR_TABLE*)AllocateRuntimePool(sizeof(ARM_PROCESSOR_TABLE));
 
-        // Check if the memory allocation is succesful or not
+        // Check if the memory allocation is successful or not
         ASSERT(NULL != ArmProcessorTable);
 
         // Set ARM processor table to default values
@@ -87,7 +81,7 @@ PublishArmProcessorTable (
         ArmProcessorTable->ArmCpus = (ARM_CORE_INFO*)AllocateRuntimePool (
            ArmProcessorTable->NumberOfEntries * sizeof(ARM_CORE_INFO));
 
-        // Check if the memory allocation is succesful or not
+        // Check if the memory allocation is successful or not
         ASSERT(NULL != ArmProcessorTable->ArmCpus);
 
         // Copy ARM Processor Table data from HOB list to newly allocated memory

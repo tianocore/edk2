@@ -2,15 +2,9 @@
   Implementation of EFI_COMPONENT_NAME_PROTOCOL and
   EFI_COMPONENT_NAME2_PROTOCOL protocol.
 
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -238,10 +232,10 @@ Ip6ComponentNameGetDriverName (
 
   @param  Ip6[in]                   A pointer to the EFI_IP6_PROTOCOL.
 
-  
+
   @retval EFI_SUCCESS               Update the ControllerNameTable of this instance successfully.
   @retval EFI_INVALID_PARAMETER     The input parameter is invalid.
-  
+
 **/
 EFI_STATUS
 UpdateName (
@@ -320,7 +314,7 @@ UpdateName (
       FreeUnicodeStringTable (gIp6ControllerNameTable);
       gIp6ControllerNameTable = NULL;
   }
-  
+
   Status = AddUnicodeString2 (
              "eng",
              gIp6ComponentName.SupportedLanguages,
@@ -331,7 +325,7 @@ UpdateName (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  
+
   return AddUnicodeString2 (
            "en",
            gIp6ComponentName2.SupportedLanguages,
@@ -421,7 +415,7 @@ Ip6ComponentNameGetControllerName (
 {
   EFI_STATUS                    Status;
   EFI_IP6_PROTOCOL              *Ip6;
-  
+
   //
   // Only provide names for child handles.
   //
@@ -430,7 +424,7 @@ Ip6ComponentNameGetControllerName (
   }
 
   //
-  // Make sure this driver produced ChildHandle 
+  // Make sure this driver produced ChildHandle
   //
   Status = EfiTestChildHandle (
              ControllerHandle,

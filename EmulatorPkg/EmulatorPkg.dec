@@ -2,14 +2,10 @@
 #
 # This is the Emu Emulation Environment Platform
 #
-# Copyright (c) 2008 - 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2019, Intel Corporation. All rights reserved.<BR>
 # Portions copyright (c) 2011, Apple Inc. All rights reserved.
 #
-#    This program and the accompanying materials are licensed and made available
-#    under the terms and conditions of the BSD License which accompanies this distribution.
-#    The full text of the license may be found at http://opensource.org/licenses/bsd-license.php
-#    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES
-#    OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#    SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
 
@@ -70,7 +66,7 @@
   gEmulatorPkgTokenSpaceGuid.PcdEmuApCount|L"0"|VOID*|0x00001019
 
   ## Magic page to implement PEI Services Table Pointer Lib
-  gEmulatorPkgTokenSpaceGuid.PcdPeiServicesTablePage|0x1003000000|UINT64|0x0000101b
+  gEmulatorPkgTokenSpaceGuid.PcdPeiServicesTablePage|0x1013000000|UINT64|0x0000101b
 
   ## Size of the packet filter
   gEmulatorPkgTokenSpaceGuid.PcdNetworkPacketFilterSize|524288|UINT32|0x0000101c
@@ -96,7 +92,7 @@
   gEmulatorPkgTokenSpaceGuid.PcdEmuVirtualDisk|L"disk.dmg:FW"|VOID*|0x00001001
 
   gEmulatorPkgTokenSpaceGuid.PcdEmuGop|L"GOP Window"|VOID*|0x00001018
-  gEmulatorPkgTokenSpaceGuid.PcdEmuFileSystem|L".!../../../../../EdkShellBinPkg/bin/ia32/Apps"|VOID*|0x00001004
+  gEmulatorPkgTokenSpaceGuid.PcdEmuFileSystem|L"."|VOID*|0x00001004
   gEmulatorPkgTokenSpaceGuid.PcdEmuSerialPort|L"/dev/ttyS0"|VOID*|0x00001002
   gEmulatorPkgTokenSpaceGuid.PcdEmuNetworkInterface|L"en0"|VOID*|0x0000100d
 

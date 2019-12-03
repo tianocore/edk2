@@ -1,14 +1,10 @@
 /** @file
   Ia32-specific functionality for DxeLoad.
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -71,7 +67,7 @@ Create4GPageTablesIa32Pae (
   IN EFI_PHYSICAL_ADDRESS   StackBase,
   IN UINTN                  StackSize
   )
-{  
+{
   UINT8                                         PhysicalAddressBits;
   EFI_PHYSICAL_ADDRESS                          PhysicalAddress;
   UINTN                                         IndexOfPdpEntries;
@@ -82,6 +78,12 @@ Create4GPageTablesIa32Pae (
   PAGE_TABLE_ENTRY                              *PageDirectoryEntry;
   UINTN                                         TotalPagesNum;
   UINTN                                         PageAddress;
+  UINT64                                        AddressEncMask;
+
+  //
+  // Make sure AddressEncMask is contained to smallest supported address field
+  //
+  AddressEncMask = PcdGet64 (PcdPteMemoryEncryptionAddressOrMask) & PAGING_1G_ADDRESS_MASK_64;
 
   PhysicalAddressBits = 32;
 
@@ -91,7 +93,7 @@ Create4GPageTablesIa32Pae (
   NumberOfPdpEntriesNeeded = (UINT32) LShiftU64 (1, (PhysicalAddressBits - 30));
 
   TotalPagesNum = NumberOfPdpEntriesNeeded + 1;
-  PageAddress = (UINTN) AllocatePages (TotalPagesNum);
+  PageAddress = (UINTN) AllocatePageTableMemory (TotalPagesNum);
   ASSERT (PageAddress != 0);
 
   PageMap = (VOID *) PageAddress;
@@ -104,18 +106,20 @@ Create4GPageTablesIa32Pae (
     //
     // Each Directory Pointer entries points to a page of Page Directory entires.
     // So allocate space for them and fill them in in the IndexOfPageDirectoryEntries loop.
-    //       
+    //
     PageDirectoryEntry = (VOID *) PageAddress;
     PageAddress += SIZE_4KB;
 
     //
     // Fill in a Page Directory Pointer Entries
     //
-    PageDirectoryPointerEntry->Uint64 = (UINT64) (UINTN) PageDirectoryEntry;
+    PageDirectoryPointerEntry->Uint64 = (UINT64) (UINTN) PageDirectoryEntry | AddressEncMask;
     PageDirectoryPointerEntry->Bits.Present = 1;
 
     for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectoryEntry++, PhysicalAddress += SIZE_2MB) {
-      if ((PhysicalAddress < StackBase + StackSize) && ((PhysicalAddress + SIZE_2MB) > StackBase)) {
+      if ((IsNullDetectionEnabled () && PhysicalAddress == 0)
+          || ((PhysicalAddress < StackBase + StackSize)
+              && ((PhysicalAddress + SIZE_2MB) > StackBase))) {
         //
         // Need to split this 2M page that covers stack range.
         //
@@ -124,7 +128,7 @@ Create4GPageTablesIa32Pae (
         //
         // Fill in the Page Directory entries
         //
-        PageDirectoryEntry->Uint64 = (UINT64) PhysicalAddress;
+        PageDirectoryEntry->Uint64 = (UINT64) PhysicalAddress | AddressEncMask;
         PageDirectoryEntry->Bits.ReadWrite = 1;
         PageDirectoryEntry->Bits.Present = 1;
         PageDirectoryEntry->Bits.MustBe1 = 1;
@@ -138,6 +142,12 @@ Create4GPageTablesIa32Pae (
       sizeof (PAGE_MAP_AND_DIRECTORY_POINTER)
       );
   }
+
+  //
+  // Protect the page table by marking the memory used for page table to be
+  // read-only.
+  //
+  EnablePageTableProtection ((UINTN)PageMap, FALSE);
 
   return (UINTN) PageMap;
 }
@@ -171,34 +181,38 @@ IsIa32PaeSupport (
 }
 
 /**
-  The function will check if Execute Disable Bit is available.
+  The function will check if page table should be setup or not.
 
-  @retval TRUE      Execute Disable Bit is available.
-  @retval FALSE     Execute Disable Bit is not available.
+  @retval TRUE      Page table should be created.
+  @retval FALSE     Page table should not be created.
 
 **/
 BOOLEAN
-IsExecuteDisableBitAvailable (
+ToBuildPageTable (
   VOID
   )
 {
-  UINT32            RegEax;
-  UINT32            RegEdx;
-  BOOLEAN           Available;
-
-  Available = FALSE;
-  AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
-  if (RegEax >= 0x80000001) {
-    AsmCpuid (0x80000001, NULL, NULL, NULL, &RegEdx);
-    if ((RegEdx & BIT20) != 0) {
-      //
-      // Bit 20: Execute Disable Bit available.
-      //
-      Available = TRUE;
-    }
+  if (!IsIa32PaeSupport ()) {
+    return FALSE;
   }
 
-  return Available;
+  if (IsNullDetectionEnabled ()) {
+    return TRUE;
+  }
+
+  if (PcdGet8 (PcdHeapGuardPropertyMask) != 0) {
+    return TRUE;
+  }
+
+  if (PcdGetBool (PcdCpuStackGuard)) {
+    return TRUE;
+  }
+
+  if (IsEnableNonExecNeeded ()) {
+    return TRUE;
+  }
+
+  return FALSE;
 }
 
 /**
@@ -231,6 +245,14 @@ HandOffToDxeCore (
   EFI_VECTOR_HANDOFF_INFO   *VectorInfo;
   EFI_PEI_VECTOR_HANDOFF_INFO_PPI *VectorHandoffInfoPpi;
   BOOLEAN                   BuildPageTablesIa32Pae;
+
+  //
+  // Clear page 0 and mark it as allocated if NULL pointer detection is enabled.
+  //
+  if (IsNullDetectionEnabled ()) {
+    ClearFirst4KPage (HobList.Raw);
+    BuildMemoryAllocationHob (0, EFI_PAGES_TO_SIZE (1), EfiBootServicesData);
+  }
 
   Status = PeiServicesAllocatePages (EfiBootServicesData, EFI_SIZE_TO_PAGES (STACK_SIZE), &BaseOfStack);
   ASSERT_EFI_ERROR (Status);
@@ -265,9 +287,16 @@ HandOffToDxeCore (
     //
     // End of PEI phase signal
     //
+    PERF_EVENT_SIGNAL_BEGIN (gEndOfPeiSignalPpi.Guid);
     Status = PeiServicesInstallPpi (&gEndOfPeiSignalPpi);
+    PERF_EVENT_SIGNAL_END (gEndOfPeiSignalPpi.Guid);
     ASSERT_EFI_ERROR (Status);
 
+    //
+    // Paging might be already enabled. To avoid conflict configuration,
+    // disable paging first anyway.
+    //
+    AsmWriteCr0 (AsmReadCr0 () & (~BIT31));
     AsmWriteCr3 (PageTables);
 
     //
@@ -371,19 +400,28 @@ HandOffToDxeCore (
     TopOfStack = (EFI_PHYSICAL_ADDRESS) (UINTN) ALIGN_POINTER (TopOfStack, CPU_STACK_ALIGNMENT);
 
     PageTables = 0;
-    BuildPageTablesIa32Pae = (BOOLEAN) (PcdGetBool (PcdSetNxForStack) && IsIa32PaeSupport () && IsExecuteDisableBitAvailable ());
+    BuildPageTablesIa32Pae = ToBuildPageTable ();
     if (BuildPageTablesIa32Pae) {
       PageTables = Create4GPageTablesIa32Pae (BaseOfStack, STACK_SIZE);
-      EnableExecuteDisableBit ();
+      if (IsEnableNonExecNeeded ()) {
+        EnableExecuteDisableBit();
+      }
     }
 
     //
     // End of PEI phase signal
     //
+    PERF_EVENT_SIGNAL_BEGIN (gEndOfPeiSignalPpi.Guid);
     Status = PeiServicesInstallPpi (&gEndOfPeiSignalPpi);
+    PERF_EVENT_SIGNAL_END (gEndOfPeiSignalPpi.Guid);
     ASSERT_EFI_ERROR (Status);
 
     if (BuildPageTablesIa32Pae) {
+      //
+      // Paging might be already enabled. To avoid conflict configuration,
+      // disable paging first anyway.
+      //
+      AsmWriteCr0 (AsmReadCr0 () & (~BIT31));
       AsmWriteCr3 (PageTables);
       //
       // Set Physical Address Extension (bit 5 of CR4).

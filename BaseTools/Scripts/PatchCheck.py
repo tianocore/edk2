@@ -1,16 +1,9 @@
 ## @file
 #  Check a patch for various format issues
 #
-#  Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2015 - 2019, Intel Corporation. All rights reserved.<BR>
 #
-#  This program and the accompanying materials are licensed and made
-#  available under the terms and conditions of the BSD License which
-#  accompanies this distribution. The full text of the license may be
-#  found at http://opensource.org/licenses/bsd-license.php
-#
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS"
-#  BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER
-#  EXPRESS OR IMPLIED.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
 from __future__ import print_function
@@ -74,11 +67,17 @@ class CommitMessageCheck:
             print(prefix, line)
             count += 1
 
+    # Find 'contributed-under:' at the start of a line ignoring case and
+    # requires ':' to be present.  Matches if there is white space before
+    # the tag or between the tag and the ':'.
+    contributed_under_re = \
+        re.compile(r'^\s*contributed-under\s*:', re.MULTILINE|re.IGNORECASE)
+
     def check_contributed_under(self):
-        cu_msg='Contributed-under: TianoCore Contribution Agreement 1.0'
-        if self.msg.find(cu_msg) < 0:
-            self.error('Missing Contributed-under! (Note: this must be ' +
-                       'added by the code contributor!)')
+        match = self.contributed_under_re.search(self.msg)
+        if match is not None:
+            self.error('Contributed-under! (Note: this must be ' +
+                       'removed by the code contributor!)')
 
     @staticmethod
     def make_signature_re(sig, re_input=False):
@@ -243,6 +242,7 @@ class GitDiffCheck:
         self.count = len(self.lines)
         self.line_num = 0
         self.state = START
+        self.new_bin = []
         while self.line_num < self.count and self.format_ok:
             line_num = self.line_num
             self.run()
@@ -254,6 +254,11 @@ class GitDiffCheck:
             return
         if self.ok:
             print('The code passed all checks.')
+        if self.new_bin:
+            print('\nWARNING - The following binary files will be added ' +
+                  'into the repository:')
+            for binary in self.new_bin:
+                print('  ' + binary)
 
     def run(self):
         line = self.lines[self.line_num]
@@ -265,7 +270,8 @@ class GitDiffCheck:
             if line.startswith('@@ '):
                 self.state = PRE_PATCH
             elif len(line) >= 1 and line[0] not in ' -+' and \
-                 not line.startswith(r'\ No newline '):
+                 not line.startswith('\r\n') and  \
+                 not line.startswith(r'\ No newline ') and not self.binary:
                 for line in self.lines[self.line_num + 1:]:
                     if line.startswith('diff --git'):
                         self.format_error('diff found after end of patch')
@@ -276,21 +282,25 @@ class GitDiffCheck:
         if self.state == START:
             if line.startswith('diff --git'):
                 self.state = PRE_PATCH
-                self.set_filename(None)
+                self.filename = line[13:].split(' ', 1)[0]
+                self.is_newfile = False
+                self.force_crlf = not self.filename.endswith('.sh')
             elif len(line.rstrip()) != 0:
                 self.format_error("didn't find diff command")
             self.line_num += 1
         elif self.state == PRE_PATCH:
-            if line.startswith('+++ b/'):
-                self.set_filename(line[6:].rstrip())
             if line.startswith('@@ '):
                 self.state = PATCH
                 self.binary = False
-            elif line.startswith('GIT binary patch'):
+            elif line.startswith('GIT binary patch') or \
+                 line.startswith('Binary files'):
                 self.state = PATCH
                 self.binary = True
+                if self.is_newfile:
+                    self.new_bin.append(self.filename)
             else:
                 ok = False
+                self.is_newfile = self.newfile_prefix_re.match(line)
                 for pfx in self.pre_patch_prefixes:
                     if line.startswith(pfx):
                         ok = True
@@ -300,10 +310,12 @@ class GitDiffCheck:
         elif self.state == PATCH:
             if self.binary:
                 pass
-            if line.startswith('-'):
+            elif line.startswith('-'):
                 pass
             elif line.startswith('+'):
                 self.check_added_line(line[1:])
+            elif line.startswith('\r\n'):
+                pass
             elif line.startswith(r'\ No newline '):
                 pass
             elif not line.startswith(' '):
@@ -319,23 +331,23 @@ class GitDiffCheck:
         'old mode ',
         'new mode ',
         'similarity index ',
+        'copy from ',
+        'copy to ',
         'rename ',
-        'Binary files ',
         )
 
     line_endings = ('\r\n', '\n\r', '\n', '\r')
 
-    def set_filename(self, filename):
-        self.hunk_filename = filename
-        if filename:
-            self.force_crlf = not filename.endswith('.sh')
-        else:
-            self.force_crlf = True
+    newfile_prefix_re = \
+        re.compile(r'''^
+                       index\ 0+\.\.
+                   ''',
+                   re.VERBOSE)
 
     def added_line_error(self, msg, line):
         lines = [ msg ]
-        if self.hunk_filename is not None:
-            lines.append('File: ' + self.hunk_filename)
+        if self.filename is not None:
+            lines.append('File: ' + self.filename)
         lines.append('Line: ' + line)
 
         self.error(*lines)
@@ -517,6 +529,8 @@ class CheckGitCommits:
                 print('Checking git commit:', commit)
             patch = self.read_patch_from_git(commit)
             self.ok &= CheckOnePatch(commit, patch).ok
+        if not commits:
+            print("Couldn't find commit matching: '{}'".format(rev_spec))
 
     def read_commit_list_from_git(self, rev_spec, max_count):
         # Run git to get the commit patch
@@ -525,11 +539,11 @@ class CheckGitCommits:
             cmd.append('--max-count=' + str(max_count))
         cmd.append(rev_spec)
         out = self.run_git(*cmd)
-        return out.split()
+        return out.split() if out else []
 
     def read_patch_from_git(self, commit):
         # Run git to get the commit patch
-        return self.run_git('show', '--pretty=email', commit)
+        return self.run_git('show', '--pretty=email', '--no-textconv', commit)
 
     def run_git(self, *args):
         cmd = [ 'git' ]
@@ -537,7 +551,8 @@ class CheckGitCommits:
         p = subprocess.Popen(cmd,
                      stdout=subprocess.PIPE,
                      stderr=subprocess.STDOUT)
-        return p.communicate()[0].decode('utf-8', 'ignore')
+        Result = p.communicate()
+        return Result[0].decode('utf-8', 'ignore') if Result[0] and Result[0].find(b"fatal")!=0 else None
 
 class CheckOnePatchFile:
     """Performs a patch check for a single file.

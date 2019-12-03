@@ -1,15 +1,9 @@
 /** @file
   Support functions implementation for UEFI HTTP boot driver.
 
-Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
-This program and the accompanying materials are licensed and made available under
-the terms and conditions of the BSD License that accompanies this distribution.
-The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                          
-    
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -86,11 +80,10 @@ HttpBootUintnToAscDecWithFormat (
 {
   UINTN                          Remainder;
 
-  while (Length > 0) {
-    Length--;
+  for (; Length > 0; Length--) {
     Remainder      = Number % 10;
     Number        /= 10;
-    Buffer[Length] = (UINT8) ('0' + Remainder);
+    Buffer[Length - 1] = (UINT8) ('0' + Remainder);
   }
 }
 
@@ -161,42 +154,46 @@ HttpBootPrintErrorMessage (
   AsciiPrint ("\n");
 
   switch (StatusCode) {
-  case HTTP_STATUS_300_MULTIPLE_CHIOCES:
+  case HTTP_STATUS_300_MULTIPLE_CHOICES:
     AsciiPrint ("\n  Redirection: 300 Multiple Choices");
-    break; 
-    
+    break;
+
   case HTTP_STATUS_301_MOVED_PERMANENTLY:
     AsciiPrint ("\n  Redirection: 301 Moved Permanently");
-    break; 
-    
+    break;
+
   case HTTP_STATUS_302_FOUND:
     AsciiPrint ("\n  Redirection: 302 Found");
-    break; 
-    
+    break;
+
   case HTTP_STATUS_303_SEE_OTHER:
     AsciiPrint ("\n  Redirection: 303 See Other");
-    break; 
+    break;
 
   case HTTP_STATUS_304_NOT_MODIFIED:
     AsciiPrint ("\n  Redirection: 304 Not Modified");
-    break; 
+    break;
 
   case HTTP_STATUS_305_USE_PROXY:
     AsciiPrint ("\n  Redirection: 305 Use Proxy");
-    break; 
+    break;
 
   case HTTP_STATUS_307_TEMPORARY_REDIRECT:
     AsciiPrint ("\n  Redirection: 307 Temporary Redirect");
-    break; 
+    break;
+
+  case HTTP_STATUS_308_PERMANENT_REDIRECT:
+    AsciiPrint ("\n  Redirection: 308 Permanent Redirect");
+    break;
 
   case HTTP_STATUS_400_BAD_REQUEST:
     AsciiPrint ("\n  Client Error: 400 Bad Request");
     break;
-    
+
   case HTTP_STATUS_401_UNAUTHORIZED:
     AsciiPrint ("\n  Client Error: 401 Unauthorized");
     break;
-    
+
   case HTTP_STATUS_402_PAYMENT_REQUIRED:
     AsciiPrint ("\n  Client Error: 402 Payment Required");
     break;
@@ -286,7 +283,7 @@ HttpBootPrintErrorMessage (
     break;
 
   default: ;
-  
+
   }
 }
 
@@ -316,13 +313,13 @@ HttpBootCommonNotify (
 
   @retval EFI_SUCCESS             Operation succeeded.
   @retval EFI_DEVICE_ERROR        An unexpected network error occurred.
-  @retval Others                  Other errors as indicated.  
+  @retval Others                  Other errors as indicated.
 **/
 EFI_STATUS
 HttpBootDns (
   IN     HTTP_BOOT_PRIVATE_DATA   *Private,
   IN     CHAR16                   *HostName,
-     OUT EFI_IPv6_ADDRESS         *IpAddress 
+     OUT EFI_IPv6_ADDRESS         *IpAddress
   )
 {
   EFI_STATUS                      Status;
@@ -334,14 +331,14 @@ HttpBootDns (
   EFI_IPv6_ADDRESS                *DnsServerList;
   UINTN                           DnsServerListCount;
   UINTN                           DataSize;
-  BOOLEAN                         IsDone;  
-  
+  BOOLEAN                         IsDone;
+
   DnsServerList       = NULL;
   DnsServerListCount  = 0;
   Dns6                = NULL;
   Dns6Handle          = NULL;
   ZeroMem (&Token, sizeof (EFI_DNS6_COMPLETION_TOKEN));
-  
+
   //
   // Get DNS server list from EFI IPv6 Configuration protocol.
   //
@@ -356,7 +353,7 @@ HttpBootDns (
       DnsServerList = AllocatePool (DataSize);
       if (DnsServerList == NULL) {
         return EFI_OUT_OF_RESOURCES;
-      }  
+      }
 
       Status = Ip6Config->GetData (Ip6Config, Ip6ConfigDataTypeDnsServer, &DataSize, DnsServerList);
       if (EFI_ERROR (Status)) {
@@ -378,8 +375,8 @@ HttpBootDns (
              );
   if (EFI_ERROR (Status)) {
     goto Exit;
-  } 
-  
+  }
+
   Status = gBS->OpenProtocol (
                   Dns6Handle,
                   &gEfiDns6ProtocolGuid,
@@ -408,7 +405,7 @@ HttpBootDns (
   if (EFI_ERROR (Status)) {
     goto Exit;
   }
-  
+
   Token.Status = EFI_NOT_READY;
   IsDone       = FALSE;
   //
@@ -436,11 +433,11 @@ HttpBootDns (
   while (!IsDone) {
     Dns6->Poll (Dns6);
   }
-  
+
   //
   // Name resolution is done, check result.
   //
-  Status = Token.Status;  
+  Status = Token.Status;
   if (!EFI_ERROR (Status)) {
     if (Token.RspData.H2AData == NULL) {
       Status = EFI_DEVICE_ERROR;
@@ -470,7 +467,7 @@ Exit:
 
   if (Dns6 != NULL) {
     Dns6->Configure (Dns6, NULL);
-    
+
     gBS->CloseProtocol (
            Dns6Handle,
            &gEfiDns6ProtocolGuid,
@@ -491,8 +488,8 @@ Exit:
   if (DnsServerList != NULL) {
     FreePool (DnsServerList);
   }
-  
-  return Status;  
+
+  return Status;
 }
 /**
   Create a HTTP_IO_HEADER to hold the HTTP header items.
@@ -500,7 +497,7 @@ Exit:
   @param[in]  MaxHeaderCount         The maximun number of HTTP header in this holder.
 
   @return    A pointer of the HTTP header holder or NULL if failed.
-  
+
 **/
 HTTP_IO_HEADER *
 HttpBootCreateHeader (
@@ -525,7 +522,7 @@ HttpBootCreateHeader (
 }
 
 /**
-  Destroy the HTTP_IO_HEADER and release the resouces. 
+  Destroy the HTTP_IO_HEADER and release the resouces.
 
   @param[in]  HttpIoHeader       Point to the HTTP header holder to be destroyed.
 
@@ -536,7 +533,7 @@ HttpBootFreeHeader (
   )
 {
   UINTN      Index;
-  
+
   if (HttpIoHeader != NULL) {
     if (HttpIoHeader->HeaderCount != 0) {
       for (Index = 0; Index < HttpIoHeader->HeaderCount; Index++) {
@@ -559,7 +556,7 @@ HttpBootFreeHeader (
   @retval  EFI_INVALID_PARAMETER Any input parameter is invalid.
   @retval  EFI_OUT_OF_RESOURCES  Insufficient resource to complete the operation.
   @retval  Other                 Unexpected error happened.
-  
+
 **/
 EFI_STATUS
 HttpBootSetHeader (
@@ -571,7 +568,7 @@ HttpBootSetHeader (
   EFI_HTTP_HEADER       *Header;
   UINTN                 StrSize;
   CHAR8                 *NewFieldValue;
-  
+
   if (HttpIoHeader == NULL || FieldName == NULL || FieldValue == NULL) {
     return EFI_INVALID_PARAMETER;
   }
@@ -615,7 +612,7 @@ HttpBootSetHeader (
     }
     CopyMem (NewFieldValue, FieldValue, StrSize);
     NewFieldValue[StrSize -1] = '\0';
-    
+
     if (Header->FieldValue != NULL) {
       FreePool (Header->FieldValue);
     }
@@ -626,6 +623,41 @@ HttpBootSetHeader (
 }
 
 /**
+  Notify the callback function when an event is triggered.
+
+  @param[in]  Context         The opaque parameter to the function.
+
+**/
+VOID
+EFIAPI
+HttpIoNotifyDpc (
+  IN VOID                *Context
+  )
+{
+  *((BOOLEAN *) Context) = TRUE;
+}
+
+/**
+  Request HttpIoNotifyDpc as a DPC at TPL_CALLBACK.
+
+  @param[in]  Event                 The event signaled.
+  @param[in]  Context               The opaque parameter to the function.
+
+**/
+VOID
+EFIAPI
+HttpIoNotify (
+  IN EFI_EVENT              Event,
+  IN VOID                   *Context
+  )
+{
+  //
+  // Request HttpIoNotifyDpc as a DPC at TPL_CALLBACK
+  //
+  QueueDpc (TPL_CALLBACK, HttpIoNotifyDpc, Context);
+}
+
+/**
   Create a HTTP_IO to access the HTTP service. It will create and configure
   a HTTP child handle.
 
@@ -633,8 +665,11 @@ HttpBootSetHeader (
   @param[in]  Controller     The handle of the controller.
   @param[in]  IpVersion      IP_VERSION_4 or IP_VERSION_6.
   @param[in]  ConfigData     The HTTP_IO configuration data.
+  @param[in]  Callback       Callback function which will be invoked when specified
+                             HTTP_IO_CALLBACK_EVENT happened.
+  @param[in]  Context        The Context data which will be passed to the Callback function.
   @param[out] HttpIo         The HTTP_IO.
-  
+
   @retval EFI_SUCCESS            The HTTP_IO is created and configured.
   @retval EFI_INVALID_PARAMETER  One or more parameters are invalid.
   @retval EFI_UNSUPPORTED        One or more of the control options are not
@@ -649,6 +684,8 @@ HttpIoCreateIo (
   IN EFI_HANDLE             Controller,
   IN UINT8                  IpVersion,
   IN HTTP_IO_CONFIG_DATA    *ConfigData,
+  IN HTTP_IO_CALLBACK       Callback,
+  IN VOID                   *Context,
   OUT HTTP_IO               *HttpIo
   )
 {
@@ -658,7 +695,7 @@ HttpIoCreateIo (
   EFI_HTTPv6_ACCESS_POINT   Http6AccessPoint;
   EFI_HTTP_PROTOCOL         *Http;
   EFI_EVENT                 Event;
-  
+
   if ((Image == NULL) || (Controller == NULL) || (ConfigData == NULL) || (HttpIo == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
@@ -668,10 +705,10 @@ HttpIoCreateIo (
   }
 
   ZeroMem (HttpIo, sizeof (HTTP_IO));
-  
+
   //
   // Create the HTTP child instance and get the HTTP protocol.
-  //  
+  //
   Status = NetLibCreateServiceChild (
              Controller,
              Image,
@@ -701,25 +738,27 @@ HttpIoCreateIo (
   HttpIo->Controller  = Controller;
   HttpIo->IpVersion   = IpVersion;
   HttpIo->Http        = Http;
+  HttpIo->Callback    = Callback;
+  HttpIo->Context     = Context;
 
   ZeroMem (&HttpConfigData, sizeof (EFI_HTTP_CONFIG_DATA));
   HttpConfigData.HttpVersion        = HttpVersion11;
   HttpConfigData.TimeOutMillisec    = ConfigData->Config4.RequestTimeOut;
   if (HttpIo->IpVersion == IP_VERSION_4) {
     HttpConfigData.LocalAddressIsIPv6 = FALSE;
-    
+
     Http4AccessPoint.UseDefaultAddress = ConfigData->Config4.UseDefaultAddress;
     Http4AccessPoint.LocalPort         = ConfigData->Config4.LocalPort;
     IP4_COPY_ADDRESS (&Http4AccessPoint.LocalAddress, &ConfigData->Config4.LocalIp);
     IP4_COPY_ADDRESS (&Http4AccessPoint.LocalSubnet, &ConfigData->Config4.SubnetMask);
-    HttpConfigData.AccessPoint.IPv4Node = &Http4AccessPoint;   
+    HttpConfigData.AccessPoint.IPv4Node = &Http4AccessPoint;
   } else {
     HttpConfigData.LocalAddressIsIPv6 = TRUE;
     Http6AccessPoint.LocalPort        = ConfigData->Config6.LocalPort;
     IP6_COPY_ADDRESS (&Http6AccessPoint.LocalAddress, &ConfigData->Config6.LocalIp);
     HttpConfigData.AccessPoint.IPv6Node = &Http6AccessPoint;
   }
-  
+
   Status = Http->Configure (Http, &HttpConfigData);
   if (EFI_ERROR (Status)) {
     goto ON_ERROR;
@@ -731,7 +770,7 @@ HttpIoCreateIo (
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL,
                   TPL_NOTIFY,
-                  HttpBootCommonNotify,
+                  HttpIoNotify,
                   &HttpIo->IsTxDone,
                   &Event
                   );
@@ -744,7 +783,7 @@ HttpIoCreateIo (
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL,
                   TPL_NOTIFY,
-                  HttpBootCommonNotify,
+                  HttpIoNotify,
                   &HttpIo->IsRxDone,
                   &Event
                   );
@@ -770,7 +809,7 @@ HttpIoCreateIo (
   HttpIo->TimeoutEvent = Event;
 
   return EFI_SUCCESS;
-  
+
 ON_ERROR:
   HttpIoDestroyIo (HttpIo);
 
@@ -778,7 +817,7 @@ ON_ERROR:
 }
 
 /**
-  Destroy the HTTP_IO and release the resouces. 
+  Destroy the HTTP_IO and release the resouces.
 
   @param[in]  HttpIo          The HTTP_IO which wraps the HTTP service to be destroyed.
 
@@ -809,7 +848,7 @@ HttpIoDestroyIo (
   if (Event != NULL) {
     gBS->CloseEvent (Event);
   }
-  
+
   Http = HttpIo->Http;
   if (Http != NULL) {
     Http->Configure (Http, NULL);
@@ -831,14 +870,14 @@ HttpIoDestroyIo (
 
 /**
   Synchronously send a HTTP REQUEST message to the server.
-  
+
   @param[in]   HttpIo           The HttpIo wrapping the HTTP service.
   @param[in]   Request          A pointer to storage such data as URL and HTTP method.
-  @param[in]   HeaderCount      Number of HTTP header structures in Headers list. 
+  @param[in]   HeaderCount      Number of HTTP header structures in Headers list.
   @param[in]   Headers          Array containing list of HTTP headers.
   @param[in]   BodyLength       Length in bytes of the HTTP body.
-  @param[in]   Body             Body associated with the HTTP request. 
-  
+  @param[in]   Body             Body associated with the HTTP request.
+
   @retval EFI_SUCCESS            The HTTP request is trasmitted.
   @retval EFI_INVALID_PARAMETER  One or more parameters are invalid.
   @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory.
@@ -870,6 +909,17 @@ HttpIoSendRequest (
   HttpIo->ReqToken.Message->BodyLength   = BodyLength;
   HttpIo->ReqToken.Message->Body         = Body;
 
+  if (HttpIo->Callback != NULL) {
+    Status = HttpIo->Callback (
+               HttpIoRequest,
+               HttpIo->ReqToken.Message,
+               HttpIo->Context
+               );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
+
   //
   // Queue the request token to HTTP instances.
   //
@@ -895,12 +945,12 @@ HttpIoSendRequest (
 
 /**
   Synchronously receive a HTTP RESPONSE message from the server.
-  
+
   @param[in]   HttpIo           The HttpIo wrapping the HTTP service.
   @param[in]   RecvMsgHeader    TRUE to receive a new HTTP response (from message header).
                                 FALSE to continue receive the previous response message.
   @param[out]  ResponseData     Point to a wrapper of the received response data.
-  
+
   @retval EFI_SUCCESS            The HTTP response is received.
   @retval EFI_INVALID_PARAMETER  One or more parameters are invalid.
   @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory.
@@ -950,7 +1000,7 @@ HttpIoRecvResponse (
                    Http,
                    &HttpIo->RspToken
                    );
-  
+
   if (EFI_ERROR (Status)) {
     gBS->SetTimer (HttpIo->TimeoutEvent, TimerCancel, 0);
     return Status;
@@ -970,12 +1020,24 @@ HttpIoRecvResponse (
     // Timeout occurs, cancel the response token.
     //
     Http->Cancel (Http, &HttpIo->RspToken);
-   
+
     Status = EFI_TIMEOUT;
-    
+
     return Status;
   } else {
     HttpIo->IsRxDone = FALSE;
+  }
+
+  if ((HttpIo->Callback != NULL) &&
+      (HttpIo->RspToken.Status == EFI_SUCCESS || HttpIo->RspToken.Status == EFI_HTTP_ERROR)) {
+    Status = HttpIo->Callback (
+               HttpIoResponse,
+               HttpIo->RspToken.Message,
+               HttpIo->Context
+               );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
   }
 
   //
@@ -990,13 +1052,64 @@ HttpIoRecvResponse (
 }
 
 /**
+  This function checks the HTTP(S) URI scheme.
+
+  @param[in]    Uri              The pointer to the URI string.
+
+  @retval EFI_SUCCESS            The URI scheme is valid.
+  @retval EFI_INVALID_PARAMETER  The URI scheme is not HTTP or HTTPS.
+  @retval EFI_ACCESS_DENIED      HTTP is disabled and the URI is HTTP.
+
+**/
+EFI_STATUS
+HttpBootCheckUriScheme (
+  IN      CHAR8                  *Uri
+  )
+{
+  UINTN                Index;
+  EFI_STATUS           Status;
+
+  Status = EFI_SUCCESS;
+
+  //
+  // Convert the scheme to all lower case.
+  //
+  for (Index = 0; Index < AsciiStrLen (Uri); Index++) {
+    if (Uri[Index] == ':') {
+      break;
+    }
+    if (Uri[Index] >= 'A' && Uri[Index] <= 'Z') {
+      Uri[Index] -= (CHAR8)('A' - 'a');
+    }
+  }
+
+  //
+  // Return EFI_INVALID_PARAMETER if the URI is not HTTP or HTTPS.
+  //
+  if ((AsciiStrnCmp (Uri, "http://", 7) != 0) && (AsciiStrnCmp (Uri, "https://", 8) != 0)) {
+    DEBUG ((EFI_D_ERROR, "HttpBootCheckUriScheme: Invalid Uri.\n"));
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // HTTP is disabled, return EFI_ACCESS_DENIED if the URI is HTTP.
+  //
+  if (!PcdGetBool (PcdAllowHttpConnections) && (AsciiStrnCmp (Uri, "http://", 7) == 0)) {
+    DEBUG ((EFI_D_ERROR, "HttpBootCheckUriScheme: HTTP is disabled.\n"));
+    return EFI_ACCESS_DENIED;
+  }
+
+  return Status;
+}
+
+/**
   Get the URI address string from the input device path.
 
   Caller need to free the buffer in the UriAddress pointer.
-  
+
   @param[in]   FilePath         Pointer to the device path which contains a URI device path node.
   @param[out]  UriAddress       The URI address string extract from the device path.
-  
+
   @retval EFI_SUCCESS            The URI string is returned.
   @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory.
 
@@ -1057,11 +1170,11 @@ HttpBootParseFilePath (
   and also the image's URI info.
 
   @param[in]    Uri              The pointer to the image's URI string.
-  @param[in]    UriParser        URI Parse result returned by NetHttpParseUrl(). 
-  @param[in]    HeaderCount      Number of HTTP header structures in Headers list. 
+  @param[in]    UriParser        URI Parse result returned by NetHttpParseUrl().
+  @param[in]    HeaderCount      Number of HTTP header structures in Headers list.
   @param[in]    Headers          Array containing list of HTTP headers.
   @param[out]   ImageType        The image type of the downloaded file.
-  
+
   @retval EFI_SUCCESS            The image type is returned in ImageType.
   @retval EFI_INVALID_PARAMETER  ImageType, Uri or UriParser is NULL.
   @retval EFI_INVALID_PARAMETER  HeaderCount is not zero, and Headers is NULL.
@@ -1093,12 +1206,20 @@ HttpBootCheckImageType (
 
   //
   // Determine the image type by the HTTP Content-Type header field first.
-  //   "application/efi" -> EFI Image
+  //   "application/efi"         -> EFI Image
+  //   "application/vnd.efi-iso" -> CD/DVD Image
+  //   "application/vnd.efi-img" -> Virtual Disk Image
   //
   Header = HttpFindHeader (HeaderCount, Headers, HTTP_HEADER_CONTENT_TYPE);
   if (Header != NULL) {
     if (AsciiStriCmp (Header->FieldValue, HTTP_CONTENT_TYPE_APP_EFI) == 0) {
       *ImageType = ImageTypeEfi;
+      return EFI_SUCCESS;
+    } else if (AsciiStriCmp (Header->FieldValue, HTTP_CONTENT_TYPE_APP_ISO) == 0) {
+      *ImageType = ImageTypeVirtualCd;
+      return EFI_SUCCESS;
+    } else if (AsciiStriCmp (Header->FieldValue, HTTP_CONTENT_TYPE_APP_IMG) == 0) {
+      *ImageType = ImageTypeVirtualDisk;
       return EFI_SUCCESS;
     }
   }
@@ -1136,7 +1257,7 @@ HttpBootCheckImageType (
 
 /**
   This function register the RAM disk info to the system.
-  
+
   @param[in]       Private         The pointer to the driver's private data.
   @param[in]       BufferSize      The size of Buffer in bytes.
   @param[in]       Buffer          The base address of the RAM disk.
@@ -1160,7 +1281,7 @@ HttpBootRegisterRamDisk (
   EFI_STATUS                 Status;
   EFI_DEVICE_PATH_PROTOCOL   *DevicePath;
   EFI_GUID                   *RamDiskType;
-  
+
   ASSERT (Private != NULL);
   ASSERT (Buffer != NULL);
   ASSERT (BufferSize != 0);
@@ -1178,7 +1299,7 @@ HttpBootRegisterRamDisk (
   } else {
     return EFI_UNSUPPORTED;
   }
-  
+
   Status = RamDisk->Register (
              (UINTN)Buffer,
              (UINT64)BufferSize,
@@ -1193,3 +1314,25 @@ HttpBootRegisterRamDisk (
   return Status;
 }
 
+/**
+  Indicate if the HTTP status code indicates a redirection.
+
+  @param[in]  StatusCode      HTTP status code from server.
+
+  @return                     TRUE if it's redirection.
+
+**/
+BOOLEAN
+HttpBootIsHttpRedirectStatusCode (
+  IN   EFI_HTTP_STATUS_CODE        StatusCode
+  )
+{
+  if (StatusCode == HTTP_STATUS_301_MOVED_PERMANENTLY ||
+      StatusCode == HTTP_STATUS_302_FOUND ||
+      StatusCode == HTTP_STATUS_307_TEMPORARY_REDIRECT ||
+      StatusCode == HTTP_STATUS_308_PERMANENT_REDIRECT) {
+    return TRUE;
+  }
+
+  return FALSE;
+}

@@ -1,13 +1,7 @@
 /** @file
   Copyright (c) 2016, Linaro, Ltd. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -32,7 +26,7 @@ typedef enum {
 /**
   Register a non-discoverable MMIO device
 
-  @param[in]      DeviceType          The type of non-discoverable device
+  @param[in]      Type                The type of non-discoverable device
   @param[in]      DmaType             Whether the device is DMA coherent
   @param[in]      InitFunc            Initialization routine to be invoked when
                                       the device is enabled
@@ -43,6 +37,8 @@ typedef enum {
   @param[in]      NumMmioResources    The number of UINTN base/size pairs that
                                       follow, each describing an MMIO region
                                       owned by the device
+  @param[in]  ...                     The variable argument list which contains the
+                                      info about MmioResources.
 
   @retval EFI_SUCCESS                 The registration succeeded.
   @retval Other                       The registration failed.

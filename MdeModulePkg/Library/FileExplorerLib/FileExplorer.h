@@ -1,14 +1,8 @@
 /** @file
    File explorer lib.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #ifndef _FILE_EXPLORER_H_
@@ -23,7 +17,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/DevicePath.h>
 #include <Protocol/SimpleFileSystem.h>
 #include <Protocol/DevicePathToText.h>
-#include <Protocol/LoadFile.h>
 #include <Protocol/FormBrowser2.h>
 
 #include <Library/DebugLib.h>
@@ -51,6 +44,8 @@ typedef struct {
   VENDOR_DEVICE_PATH             VendorDevicePath;
   EFI_DEVICE_PATH_PROTOCOL       End;
 } HII_VENDOR_DEVICE_PATH;
+
+#pragma pack()
 
 typedef struct {
   EFI_HANDLE                        DeviceHandle;
@@ -101,8 +96,6 @@ typedef struct {
 
 #define FILE_EXPLORER_PRIVATE_FROM_THIS(a)  CR (a, FILE_EXPLORER_CALLBACK_DATA, FeConfigAccess, FILE_EXPLORER_CALLBACK_DATA_SIGNATURE)
 
-#pragma pack()
-
 extern UINT8    FileExplorerVfrBin[];
 
 #define MENU_OPTION_SIGNATURE      SIGNATURE_32 ('m', 'e', 'n', 'u')
@@ -114,7 +107,11 @@ extern UINT8    FileExplorerVfrBin[];
 #define MAX_CHAR                480
 #define FILE_OPTION_OFFSET      0x8000
 #define FILE_OPTION_MASK        0x7FFF
-
+#define QUESTION_ID_UPDATE_STEP 200
+#define MAX_FILE_NAME_LEN       20
+#define MAX_FOLDER_NAME_LEN     20
+#define NEW_FILE_QUESTION_ID_BASE   0x5000;
+#define NEW_FOLDER_QUESTION_ID_BASE 0x6000;
 
 /**
   This function processes the results of changes in configuration.
@@ -223,8 +220,8 @@ EFI_STATUS
 LibUpdateFileExplorer (
   IN UINT16                       KeyValue
   );
-  
-  
+
+
 /**
   Get the device path info saved in the menu structure.
 
@@ -236,4 +233,4 @@ LibGetDevicePath (
   IN UINT16                       KeyValue
   );
 
-#endif 
+#endif

@@ -1,0 +1,68 @@
+## @file
+#  Provides the capability to configure Tls Authentication in a setup browser
+#  By this module, user may change the content of TlsCaCertificate.
+#
+# Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION               = 0x00010005
+  BASE_NAME                 = TlsAuthConfigDxe
+  MODULE_UNI_FILE           = TlsAuthConfigDxe.uni
+  FILE_GUID                 = 7ca1024f-eb17-11e5-9dba-28d2447c4829
+  MODULE_TYPE               = DXE_DRIVER
+  VERSION_STRING            = 1.0
+  ENTRY_POINT               = TlsAuthConfigDxeDriverEntryPoint
+  UNLOAD_IMAGE              = TlsAuthConfigDxeUnload
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  NetworkPkg/NetworkPkg.dec
+
+[Sources]
+  TlsAuthConfigImpl.c
+  TlsAuthConfigImpl.h
+  TlsAuthConfigNvData.h
+  TlsAuthConfigDxe.c
+  TlsAuthConfigDxeStrings.uni
+  TlsAuthConfigVfr.vfr
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  UefiLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  UefiDriverEntryPoint
+  DebugLib
+  HiiLib
+  DevicePathLib
+  UefiHiiServicesLib
+  FileExplorerLib
+  PrintLib
+
+[Protocols]
+  gEfiDevicePathProtocolGuid                    ## PRODUCES
+  gEfiHiiConfigAccessProtocolGuid               ## PRODUCES
+
+[Guids]
+  gTlsAuthConfigGuid                            ## PRODUCES  ## GUID
+  gEfiCertX509Guid                              ## SOMETIMES_CONSUMES  ## GUID  # Indicate the cert type
+  gEfiIfrTianoGuid                              ## SOMETIMES_PRODUCES  ## HII
+  gEfiTlsCaCertificateGuid                      ## PRODUCES  ## Variable:L"TlsCaCertificate"
+
+[Depex]
+  gEfiHiiConfigRoutingProtocolGuid  AND
+  gEfiHiiDatabaseProtocolGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  TlsAuthConfigDxeExtra.uni
+

@@ -2,13 +2,8 @@
   Module to clarify the element info of the smbios structure.
 
   Copyright (c) 2005 - 2015, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  (C) Copyright 2017 - 2019 Hewlett Packard Enterprise Development LP<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -420,4 +415,27 @@ DisplaySPSCharacteristics (
   IN UINT8   Option
   );
 
+/**
+  Display TPM Device (Type 43) Characteristics.
+
+  @param[in] Chara    The information bits.
+  @param[in] Option   The optional information.
+**/
+VOID
+DisplayTpmDeviceCharacteristics (
+  IN UINT64  Chara,
+  IN UINT8   Option
+  );
+
+/**
+  Display Processor Architecture Type (Type 44).
+
+  @param[in] Key            The key of the structure.
+  @param[in] Option         The optional information.
+**/
+VOID
+DisplayProcessorArchitectureType (
+  IN UINT8 Key,
+  IN UINT8 Option
+  );
 #endif

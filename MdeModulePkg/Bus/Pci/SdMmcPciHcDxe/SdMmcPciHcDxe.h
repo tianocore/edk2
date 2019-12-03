@@ -2,14 +2,9 @@
 
   Provides some data structure definitions used by the SD/MMC host controller driver.
 
+Copyright (c) 2018-2019, NVIDIA CORPORATION. All rights reserved.
 Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -35,6 +30,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/DriverBinding.h>
 #include <Protocol/ComponentName.h>
 #include <Protocol/ComponentName2.h>
+#include <Protocol/SdMmcOverride.h>
 #include <Protocol/SdMmcPassThru.h>
 
 #include "SdMmcPciHci.h"
@@ -42,6 +38,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 extern EFI_COMPONENT_NAME_PROTOCOL  gSdMmcPciHcComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL gSdMmcPciHcComponentName2;
 extern EFI_DRIVER_BINDING_PROTOCOL  gSdMmcPciHcDriverBinding;
+
+extern EDKII_SD_MMC_OVERRIDE        *mOverride;
 
 #define SD_MMC_HC_PRIVATE_SIGNATURE  SIGNATURE_32 ('s', 'd', 't', 'f')
 
@@ -80,11 +78,12 @@ typedef enum {
 } EFI_SD_MMC_SLOT_TYPE;
 
 typedef struct {
-  BOOLEAN                           Enable;
-  EFI_SD_MMC_SLOT_TYPE              SlotType;
-  BOOLEAN                           MediaPresent;
-  BOOLEAN                           Initialized;
-  SD_MMC_CARD_TYPE                  CardType;
+  BOOLEAN                            Enable;
+  EFI_SD_MMC_SLOT_TYPE               SlotType;
+  BOOLEAN                            MediaPresent;
+  BOOLEAN                            Initialized;
+  SD_MMC_CARD_TYPE                   CardType;
+  EDKII_SD_MMC_OPERATING_PARAMETERS  OperatingParameters;
 } SD_MMC_HC_SLOT;
 
 typedef struct {
@@ -113,9 +112,21 @@ typedef struct {
   SD_MMC_HC_SLOT                      Slot[SD_MMC_HC_MAX_SLOT];
   SD_MMC_HC_SLOT_CAP                  Capability[SD_MMC_HC_MAX_SLOT];
   UINT64                              MaxCurrent[SD_MMC_HC_MAX_SLOT];
+  UINT16                              ControllerVersion[SD_MMC_HC_MAX_SLOT];
 
-  UINT32                              ControllerVersion;
+  //
+  // Some controllers may require to override base clock frequency
+  // value stored in Capabilities Register 1.
+  //
+  UINT32                              BaseClkFreq[SD_MMC_HC_MAX_SLOT];
 } SD_MMC_HC_PRIVATE_DATA;
+
+typedef struct {
+  SD_MMC_BUS_MODE               BusTiming;
+  UINT8                         BusWidth;
+  UINT32                        ClockFreq;
+  EDKII_SD_MMC_DRIVER_STRENGTH  DriverStrength;
+} SD_MMC_BUS_SETTINGS;
 
 #define SD_MMC_HC_TRB_SIG             SIGNATURE_32 ('T', 'R', 'B', 'T')
 
@@ -136,12 +147,15 @@ typedef struct {
   EFI_PHYSICAL_ADDRESS                DataPhy;
   VOID                                *DataMap;
   SD_MMC_HC_TRANSFER_MODE             Mode;
+  SD_MMC_HC_ADMA_LENGTH_MODE          AdmaLengthMode;
 
   EFI_EVENT                           Event;
   BOOLEAN                             Started;
   UINT64                              Timeout;
 
-  SD_MMC_HC_ADMA_DESC_LINE            *AdmaDesc;
+  SD_MMC_HC_ADMA_32_DESC_LINE         *Adma32Desc;
+  SD_MMC_HC_ADMA_64_V3_DESC_LINE      *Adma64V3Desc;
+  SD_MMC_HC_ADMA_64_V4_DESC_LINE      *Adma64V4Desc;
   EFI_PHYSICAL_ADDRESS                AdmaDescPhy;
   VOID                                *AdmaMap;
   UINT32                              AdmaPages;
@@ -780,6 +794,39 @@ EFI_STATUS
 SdCardIdentification (
   IN SD_MMC_HC_PRIVATE_DATA             *Private,
   IN UINT8                              Slot
+  );
+
+/**
+  Software reset the specified SD/MMC host controller.
+
+  @param[in] Private        A pointer to the SD_MMC_HC_PRIVATE_DATA instance.
+  @param[in] Slot           The slot number of the SD card to send the command to.
+
+  @retval EFI_SUCCESS       The software reset executes successfully.
+  @retval Others            The software reset fails.
+
+**/
+EFI_STATUS
+SdMmcHcReset (
+  IN SD_MMC_HC_PRIVATE_DATA *Private,
+  IN UINT8                  Slot
+  );
+
+/**
+  Initial SD/MMC host controller with lowest clock frequency, max power and max timeout value
+  at initialization.
+
+  @param[in] Private        A pointer to the SD_MMC_HC_PRIVATE_DATA instance.
+  @param[in] Slot           The slot number of the SD card to send the command to.
+
+  @retval EFI_SUCCESS       The host controller is initialized successfully.
+  @retval Others            The host controller isn't initialized successfully.
+
+**/
+EFI_STATUS
+SdMmcHcInitHost (
+  IN SD_MMC_HC_PRIVATE_DATA *Private,
+  IN UINT8                  Slot
   );
 
 #endif

@@ -2,13 +2,7 @@
   Get SEC platform information(2) PPI and reinstall it.
 
   Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -37,8 +31,8 @@ EFI_PEI_PPI_DESCRIPTOR mPeiSecPlatformInformation2 = {
 /**
   Worker function to parse CPU BIST information from Guided HOB.
 
-  @param[out] StructureSize     Pointer to the variable describing size of the input buffer.
-  @param[out] StructureBuffer   Pointer to the buffer save CPU BIST information.
+  @param[in, out] StructureSize     Pointer to the variable describing size of the input buffer.
+  @param[in, out] StructureBuffer   Pointer to the buffer save CPU BIST information.
 
   @retval EFI_SUCCESS           The data was successfully returned.
   @retval EFI_BUFFER_TOO_SMALL  The buffer was too small.
@@ -79,9 +73,9 @@ GetBistFromHob (
 /**
   Implementation of the PlatformInformation service in EFI_SEC_PLATFORM_INFORMATION_PPI.
 
-  @param[in]  PeiServices                Pointer to the PEI Services Table.
-  @param[out] StructureSize              Pointer to the variable describing size of the input buffer.
-  @param[out  PlatformInformationRecord  Pointer to the EFI_SEC_PLATFORM_INFORMATION_RECORD.
+  @param[in]      PeiServices                Pointer to the PEI Services Table.
+  @param[in, out] StructureSize              Pointer to the variable describing size of the input buffer.
+  @param[out]     PlatformInformationRecord  Pointer to the EFI_SEC_PLATFORM_INFORMATION_RECORD.
 
   @retval EFI_SUCCESS                    The data was successfully returned.
   @retval EFI_BUFFER_TOO_SMALL           The buffer was too small.
@@ -101,9 +95,9 @@ SecPlatformInformationBist (
 /**
   Implementation of the PlatformInformation2 service in EFI_SEC_PLATFORM_INFORMATION2_PPI.
 
-  @param[in]  PeiServices                The pointer to the PEI Services Table.
-  @param[out] StructureSize              The pointer to the variable describing size of the input buffer.
-  @param[out] PlatformInformationRecord2 The pointer to the EFI_SEC_PLATFORM_INFORMATION_RECORD2.
+  @param[in]      PeiServices                The pointer to the PEI Services Table.
+  @param[in, out] StructureSize              The pointer to the variable describing size of the input buffer.
+  @param[out]     PlatformInformationRecord2 The pointer to the EFI_SEC_PLATFORM_INFORMATION_RECORD2.
 
   @retval EFI_SUCCESS                    The data was successfully returned.
   @retval EFI_BUFFER_TOO_SMALL           The buffer was too small. The current buffer size needed to

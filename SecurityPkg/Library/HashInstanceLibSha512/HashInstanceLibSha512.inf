@@ -1,0 +1,40 @@
+## @file
+#  Provides BaseCrypto SHA512 hash service
+#
+#  This library can be registered to BaseCrypto router, to serve as hash engine.
+#
+# Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = HashInstanceLibSha512
+  MODULE_UNI_FILE                = HashInstanceLibSha512.uni
+  FILE_GUID                      = 959C3685-AC3F-4F3E-AC5B-7E2A64BADD36
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL
+  CONSTRUCTOR                    = HashInstanceLibSha512Constructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  HashInstanceLibSha512.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  SecurityPkg/SecurityPkg.dec
+  CryptoPkg/CryptoPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  BaseCryptLib

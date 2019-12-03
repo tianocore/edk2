@@ -2,14 +2,8 @@
   Produce the UEFI boot service GetNextMonotonicCount() and runtime service
   GetNextHighMonotonicCount().
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -51,7 +45,7 @@ EFI_EVENT   mEfiMtcEvent;
   The high 32-bit value is nonvolatile and is increased by one on whenever the
   system resets or the low 32-bit counter overflows.
 
-  @param  Count	                Pointer to returned value.
+  @param  Count                  Pointer to returned value.
 
   @retval EFI_SUCCESS           The next monotonic count was returned.
   @retval EFI_DEVICE_ERROR      The device is not functioning properly.
@@ -123,7 +117,7 @@ MonotonicCounterDriverGetNextMonotonicCount (
 
   This function may only be called at Runtime.
 
-  @param  HighCount	            Pointer to returned value.
+  @param  HighCount              Pointer to returned value.
 
   @retval EFI_SUCCESS           The next high monotonic count was returned.
   @retval EFI_INVALID_PARAMETER HighCount is NULL.

@@ -1,15 +1,9 @@
 ## @file
 # This file is used to parse DEC file. It will consumed by DecParser
 #
-# Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
-# This program and the accompanying materials are licensed and made available 
-# under the terms and conditions of the BSD License which accompanies this 
-# distribution. The full text of the license may be found at 
-# http://opensource.org/licenses/bsd-license.php
-#
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
 '''
 DecParser
 '''
@@ -57,10 +51,10 @@ from Object.Parser.DecObject import DecPcdObject
 from Object.Parser.DecObject import DecPcdItemObject
 from Library.Misc import GuidStructureStringToGuidString
 from Library.Misc import CheckGuidRegFormat
-from Library.String import ReplaceMacro
-from Library.String import GetSplitValueList
-from Library.String import gMACRO_PATTERN
-from Library.String import ConvertSpecialChar
+from Library.StringUtils import ReplaceMacro
+from Library.StringUtils import GetSplitValueList
+from Library.StringUtils import gMACRO_PATTERN
+from Library.StringUtils import ConvertSpecialChar
 from Library.CommentParsing import ParsePcdErrorCode
 
 ##
@@ -75,31 +69,31 @@ class _DecBase:
         # Data parsed by 'self' are saved to this object
         #
         self.ItemObject = None
-    
+
     def GetDataObject(self):
         return self.ItemObject
-    
+
     def GetLocalMacro(self):
         return self._LocalMacro
-    
+
     ## BlockStart
     #
     # Called if a new section starts
     #
     def BlockStart(self):
         self._LocalMacro = {}
-    
+
     ## _CheckReDefine
     #
     # @param Key: to be checked if multi-defined
-    # @param Scope: Format: [[SectionName, Arch], ...]. 
+    # @param Scope: Format: [[SectionName, Arch], ...].
     #               If scope is none, use global scope
     #
     def _CheckReDefine(self, Key, Scope = None):
         if not Scope:
             Scope = self._RawData.CurrentScope
             return
-        
+
         SecArch = []
         #
         # Copy scope to SecArch, avoid Scope be changed outside
@@ -108,7 +102,7 @@ class _DecBase:
         if Key not in self._ItemDict:
             self._ItemDict[Key] = [[SecArch, self._RawData.LineIndex]]
             return
-        
+
         for Value in self._ItemDict[Key]:
             for SubValue in Scope:
                 #
@@ -132,18 +126,18 @@ class _DecBase:
                     self._LoggerError(ST.ERR_DECPARSE_REDEFINE % (Key, Value[1]))
                     return
         self._ItemDict[Key].append([SecArch, self._RawData.LineIndex])
-    
+
     ## CheckRequiredFields
     # Some sections need to check if some fields exist, define section for example
     # Derived class can re-implement, top parser will call this function after all parsing done
-    #  
+    #
     def CheckRequiredFields(self):
         if self._RawData:
             pass
         return True
-    
+
     ## IsItemRequired
-    # In DEC spec, sections must have at least one statement except user 
+    # In DEC spec, sections must have at least one statement except user
     # extension.
     # For example: "[guids" [<attribs>] "]" <EOL> <statements>+
     # sub class can override this method to indicate if statement is a must.
@@ -152,12 +146,12 @@ class _DecBase:
         if self._RawData:
             pass
         return False
-    
+
     def _LoggerError(self, ErrorString):
-        Logger.Error(TOOL_NAME, FILE_PARSE_FAILURE, File=self._RawData.Filename, 
+        Logger.Error(TOOL_NAME, FILE_PARSE_FAILURE, File=self._RawData.Filename,
                      Line = self._RawData.LineIndex,
                      ExtraData=ErrorString + ST.ERR_DECPARSE_LINE % self._RawData.CurrentLine)
-    
+
     def _ReplaceMacro(self, String):
         if gMACRO_PATTERN.findall(String):
             String = ReplaceMacro(String, self._LocalMacro, False,
@@ -169,11 +163,11 @@ class _DecBase:
             MacroUsed = gMACRO_PATTERN.findall(String)
             if MacroUsed:
                 Logger.Error(TOOL_NAME, FILE_PARSE_FAILURE,
-                             File=self._RawData.Filename, 
+                             File=self._RawData.Filename,
                              Line = self._RawData.LineIndex,
                              ExtraData = ST.ERR_DECPARSE_MACRO_RESOLVE % (str(MacroUsed), String))
         return String
-    
+
     def _MacroParser(self, String):
         TokenList = GetSplitValueList(String, ' ', 1)
         if len(TokenList) < 2 or TokenList[1] == '':
@@ -184,7 +178,7 @@ class _DecBase:
             self._LoggerError(ST.ERR_DECPARSE_MACRO_NAME)
         elif not IsValidToken(MACRO_PATTERN, TokenList[0]):
             self._LoggerError(ST.ERR_DECPARSE_MACRO_NAME_UPPER % TokenList[0])
-        
+
         if len(TokenList) == 1:
             self._LocalMacro[TokenList[0]] = ''
         else:
@@ -202,7 +196,7 @@ class _DecBase:
         #
         return None
 
-    
+
     ## _TailCommentStrategy
     #
     # This function can be derived to parse tail comment
@@ -216,7 +210,7 @@ class _DecBase:
         if self._RawData:
             pass
         return False
-    
+
     ## _StopCurrentParsing
     #
     # Called in Parse if current parsing should be stopped when encounter some
@@ -229,7 +223,7 @@ class _DecBase:
         if self._RawData:
             pass
         return Line[0] == DT.TAB_SECTION_START and Line[-1] == DT.TAB_SECTION_END
-    
+
     ## _TryBackSlash
     #
     # Split comment and DEC content, concatenate lines if end of char is '\'
@@ -246,7 +240,7 @@ class _DecBase:
             if Line == '':
                 self._LoggerError(ST.ERR_DECPARSE_BACKSLASH_EMPTY)
                 break
-            
+
             if Comment:
                 CommentList.append((Comment, self._RawData.LineIndex))
             if Line[-1] != DT.TAB_SLASH:
@@ -269,7 +263,7 @@ class _DecBase:
                 if not Line or Line[-1] == DT.TAB_SLASH:
                     self._LoggerError(ST.ERR_DECPARSE_BACKSLASH_EMPTY)
                 CatLine += Line
-         
+
         #
         # All MACRO values defined by the DEFINE statements in any section
         # (except [Userextensions] sections for Intel) of the INF or DEC file
@@ -286,17 +280,17 @@ class _DecBase:
             self._RawData.CurrentLine = CatLine
 
         return CatLine, CommentList
-    
+
     ## Parse
-    # This is a template method in which other member functions which might 
-    # override by sub class are called. It is responsible for reading file 
+    # This is a template method in which other member functions which might
+    # override by sub class are called. It is responsible for reading file
     # line by line, and call other member functions to parse. This function
     # should not be re-implement by sub class.
     #
     def Parse(self):
         HeadComments = []
         TailComments = []
-        
+
         #======================================================================
         # CurComments may pointer to HeadComments or TailComments
         #======================================================================
@@ -304,7 +298,7 @@ class _DecBase:
         CurObj = None
         ItemNum = 0
         FromBuf = False
-        
+
         #======================================================================
         # Used to report error information if empty section found
         #======================================================================
@@ -333,20 +327,20 @@ class _DecBase:
                     # Set tail comments to previous statement if not empty.
                     #==========================================================
                     CurObj.SetTailComment(CurObj.GetTailComment()+TailComments)
-                
+
                 if not FromBuf:
                     del TailComments[:]
                 CurComments = TailComments
                 Comments = []
                 if Comment:
                     Comments = [(Comment, self._RawData.LineIndex)]
-                
+
                 #==============================================================
                 # Try if last char of line has backslash
                 #==============================================================
                 Line, Comments = self._TryBackSlash(Line, Comments)
                 CurComments.extend(Comments)
-                
+
                 #==============================================================
                 # Macro found
                 #==============================================================
@@ -356,7 +350,7 @@ class _DecBase:
                     del TailComments[:]
                     CurComments = HeadComments
                     continue
-                
+
                 if self._StopCurrentParsing(Line):
                     #==========================================================
                     # This line does not belong to this parse,
@@ -364,7 +358,7 @@ class _DecBase:
                     #==========================================================
                     self._RawData.SetNext(Line, HeadComments, TailComments)
                     break
-                
+
                 Obj = self._ParseItem()
                 ItemNum += 1
                 if Obj:
@@ -387,7 +381,7 @@ class _DecBase:
                     CurComments.append(((Comment, self._RawData.LineIndex)))
                 else:
                     del CurComments[:]
-        
+
         if self._IsStatementRequired() and ItemNum == 0:
             Logger.Error(
                     TOOL_NAME, FILE_PARSE_FAILURE,
@@ -405,7 +399,7 @@ class _DecDefine(_DecBase):
         self.ItemObject = DecDefineObject(RawData.Filename)
         self._LocalMacro = self._RawData.Macros
         self._DefSecNum = 0
-        
+
         #
         # Each field has a function to validate
         #
@@ -416,12 +410,12 @@ class _DecDefine(_DecBase):
             DT.TAB_DEC_DEFINES_PACKAGE_VERSION     :   self._SetPackageVersion,
             DT.TAB_DEC_DEFINES_PKG_UNI_FILE        :   self._SetPackageUni,
         }
-    
+
     def BlockStart(self):
         self._DefSecNum += 1
         if self._DefSecNum > 1:
             self._LoggerError(ST.ERR_DECPARSE_DEFINE_MULTISEC)
-    
+
     ## CheckRequiredFields
     #
     # Check required fields: DEC_SPECIFICATION, PACKAGE_NAME
@@ -430,21 +424,21 @@ class _DecDefine(_DecBase):
     def CheckRequiredFields(self):
         Ret = False
         if self.ItemObject.GetPackageSpecification() == '':
-            Logger.Error(TOOL_NAME, FILE_PARSE_FAILURE, File=self._RawData.Filename, 
+            Logger.Error(TOOL_NAME, FILE_PARSE_FAILURE, File=self._RawData.Filename,
                          ExtraData=ST.ERR_DECPARSE_DEFINE_REQUIRED % DT.TAB_DEC_DEFINES_DEC_SPECIFICATION)
         elif self.ItemObject.GetPackageName() == '':
-            Logger.Error(TOOL_NAME, FILE_PARSE_FAILURE, File=self._RawData.Filename, 
+            Logger.Error(TOOL_NAME, FILE_PARSE_FAILURE, File=self._RawData.Filename,
                          ExtraData=ST.ERR_DECPARSE_DEFINE_REQUIRED % DT.TAB_DEC_DEFINES_PACKAGE_NAME)
         elif self.ItemObject.GetPackageGuid() == '':
-            Logger.Error(TOOL_NAME, FILE_PARSE_FAILURE, File=self._RawData.Filename, 
+            Logger.Error(TOOL_NAME, FILE_PARSE_FAILURE, File=self._RawData.Filename,
                          ExtraData=ST.ERR_DECPARSE_DEFINE_REQUIRED % DT.TAB_DEC_DEFINES_PACKAGE_GUID)
         elif self.ItemObject.GetPackageVersion() == '':
-            Logger.Error(TOOL_NAME, FILE_PARSE_FAILURE, File=self._RawData.Filename, 
+            Logger.Error(TOOL_NAME, FILE_PARSE_FAILURE, File=self._RawData.Filename,
                          ExtraData=ST.ERR_DECPARSE_DEFINE_REQUIRED % DT.TAB_DEC_DEFINES_PACKAGE_VERSION)
         else:
             Ret = True
         return Ret
-    
+
     def _ParseItem(self):
         Line = self._RawData.CurrentLine
         TokenList = GetSplitValueList(Line, DT.TAB_EQUAL_SPLIT, 1)
@@ -456,13 +450,13 @@ class _DecDefine(_DecBase):
             self._LoggerError(ST.ERR_DECPARSE_DEFINE_UNKNOWKEY % TokenList[0])
         else:
             self.DefineValidation[TokenList[0]](TokenList[1])
-        
+
         DefineItem = DecDefineItemObject()
         DefineItem.Key   = TokenList[0]
         DefineItem.Value = TokenList[1]
         self.ItemObject.AddItem(DefineItem, self._RawData.CurrentScope)
         return DefineItem
-    
+
     def _SetDecSpecification(self, Token):
         if self.ItemObject.GetPackageSpecification():
             self._LoggerError(ST.ERR_DECPARSE_DEFINE_DEFINED % DT.TAB_DEC_DEFINES_DEC_SPECIFICATION)
@@ -470,21 +464,21 @@ class _DecDefine(_DecBase):
             if not IsValidDecVersionVal(Token):
                 self._LoggerError(ST.ERR_DECPARSE_DEFINE_SPEC)
         self.ItemObject.SetPackageSpecification(Token)
-    
+
     def _SetPackageName(self, Token):
         if self.ItemObject.GetPackageName():
             self._LoggerError(ST.ERR_DECPARSE_DEFINE_DEFINED % DT.TAB_DEC_DEFINES_PACKAGE_NAME)
         if not IsValidWord(Token):
             self._LoggerError(ST.ERR_DECPARSE_DEFINE_PKGNAME)
         self.ItemObject.SetPackageName(Token)
-    
+
     def _SetPackageGuid(self, Token):
         if self.ItemObject.GetPackageGuid():
             self._LoggerError(ST.ERR_DECPARSE_DEFINE_DEFINED % DT.TAB_DEC_DEFINES_PACKAGE_GUID)
         if not CheckGuidRegFormat(Token):
             self._LoggerError(ST.ERR_DECPARSE_DEFINE_PKGGUID)
         self.ItemObject.SetPackageGuid(Token)
-    
+
     def _SetPackageVersion(self, Token):
         if self.ItemObject.GetPackageVersion():
             self._LoggerError(ST.ERR_DECPARSE_DEFINE_DEFINED % DT.TAB_DEC_DEFINES_PACKAGE_VERSION)
@@ -494,7 +488,7 @@ class _DecDefine(_DecBase):
             if not DT.TAB_SPLIT in Token:
                 Token = Token + '.0'
             self.ItemObject.SetPackageVersion(Token)
-            
+
     def _SetPackageUni(self, Token):
         if self.ItemObject.GetPackageUniFile():
             self._LoggerError(ST.ERR_DECPARSE_DEFINE_DEFINED % DT.TAB_DEC_DEFINES_PKG_UNI_FILE)
@@ -508,13 +502,13 @@ class _DecInclude(_DecBase):
     def __init__(self, RawData):
         _DecBase.__init__(self, RawData)
         self.ItemObject = DecIncludeObject(RawData.Filename)
-    
+
     def _ParseItem(self):
         Line = self._RawData.CurrentLine
-        
+
         if not IsValidPath(Line, self._RawData.PackagePath):
-            self._LoggerError(ST.ERR_DECPARSE_INCLUDE % Line) 
-        
+            self._LoggerError(ST.ERR_DECPARSE_INCLUDE % Line)
+
         Item = DecIncludeItemObject(StripRoot(self._RawData.PackagePath, Line), self._RawData.PackagePath)
         self.ItemObject.AddItem(Item, self._RawData.CurrentScope)
         return Item
@@ -527,32 +521,32 @@ class _DecLibraryclass(_DecBase):
     def __init__(self, RawData):
         _DecBase.__init__(self, RawData)
         self.ItemObject = DecLibraryclassObject(RawData.Filename)
-    
+
     def _ParseItem(self):
         Line = self._RawData.CurrentLine
         TokenList = GetSplitValueList(Line, DT.TAB_VALUE_SPLIT)
         if len(TokenList) != 2:
-            self._LoggerError(ST.ERR_DECPARSE_LIBCLASS_SPLIT) 
+            self._LoggerError(ST.ERR_DECPARSE_LIBCLASS_SPLIT)
         if TokenList[0] == '' or TokenList[1] == '':
             self._LoggerError(ST.ERR_DECPARSE_LIBCLASS_EMPTY)
         if not IsValidToken('[A-Z][0-9A-Za-z]*', TokenList[0]):
             self._LoggerError(ST.ERR_DECPARSE_LIBCLASS_LIB)
-        
+
         self._CheckReDefine(TokenList[0])
-        
+
         Value = TokenList[1]
         #
         # Must end with .h
         #
         if not Value.endswith('.h'):
             self._LoggerError(ST.ERR_DECPARSE_LIBCLASS_PATH_EXT)
-        
+
         #
         # Path must be existed
         #
         if not IsValidPath(Value, self._RawData.PackagePath):
             self._LoggerError(ST.ERR_DECPARSE_INCLUDE % Value)
-        
+
         Item = DecLibraryclassItemObject(TokenList[0], StripRoot(self._RawData.PackagePath, Value),
                                          self._RawData.PackagePath)
         self.ItemObject.AddItem(Item, self._RawData.CurrentScope)
@@ -571,38 +565,38 @@ class _DecPcd(_DecBase):
         # Key is token space and token number (integer), value is C name
         #
         self.TokenMap = {}
-    
+
     def _ParseItem(self):
         Line = self._RawData.CurrentLine
         TokenList = Line.split(DT.TAB_VALUE_SPLIT)
         if len(TokenList) < 4:
             self._LoggerError(ST.ERR_DECPARSE_PCD_SPLIT)
-        
+
         #
         # Token space guid C name
         #
         PcdName = GetSplitValueList(TokenList[0], DT.TAB_SPLIT)
         if len(PcdName) != 2 or PcdName[0] == '' or PcdName[1] == '':
             self._LoggerError(ST.ERR_DECPARSE_PCD_NAME)
-        
+
         Guid = PcdName[0]
         if not IsValidToken(CVAR_PATTERN, Guid):
             self._LoggerError(ST.ERR_DECPARSE_PCD_CVAR_GUID)
-        
+
         #
         # PCD C name
         #
         CName = PcdName[1]
         if not IsValidToken(CVAR_PATTERN, CName):
             self._LoggerError(ST.ERR_DECPARSE_PCD_CVAR_PCDCNAME)
-        
+
         self._CheckReDefine(Guid + DT.TAB_SPLIT + CName)
-        
+
         #
         # Default value, may be C array, string or number
         #
         Data = DT.TAB_VALUE_SPLIT.join(TokenList[1:-2]).strip()
-        
+
         #
         # PCD data type
         #
@@ -620,21 +614,21 @@ class _DecPcd(_DecBase):
         if not IsValidToken(PCD_TOKEN_PATTERN, Token):
             self._LoggerError(ST.ERR_DECPARSE_PCD_TOKEN % Token)
         elif not Token.startswith('0x') and not Token.startswith('0X'):
-            if long(Token) > 4294967295:
+            if int(Token) > 4294967295:
                 self._LoggerError(ST.ERR_DECPARSE_PCD_TOKEN_INT % Token)
-            Token = hex(long(Token))[:-1]
-        
-        IntToken = long(Token, 0)
+            Token = '0x%x' % int(Token)
+
+        IntToken = int(Token, 0)
         if (Guid, IntToken) in self.TokenMap:
             if self.TokenMap[Guid, IntToken] != CName:
                 self._LoggerError(ST.ERR_DECPARSE_PCD_TOKEN_UNIQUE%(Token))
         else:
             self.TokenMap[Guid, IntToken] = CName
-        
+
         Item = DecPcdItemObject(Guid, CName, Data, DataType, Token)
         self.ItemObject.AddItem(Item, self._RawData.CurrentScope)
         return Item
-        
+
 ## _DecGuid
 #
 # Parse GUID, PPI, Protocol section
@@ -651,21 +645,21 @@ class _DecGuid(_DecBase):
             DT.TAB_PPIS.upper()      :   self.PpiObj,
             DT.TAB_PROTOCOLS.upper() :   self.ProtocolObj
         }
-    
+
     def GetDataObject(self):
         if self._RawData.CurrentScope:
             return self.ObjectDict[self._RawData.CurrentScope[0][0]]
         return None
-    
+
     def GetGuidObject(self):
         return self.GuidObj
-    
+
     def GetPpiObject(self):
         return self.PpiObj
-    
+
     def GetProtocolObject(self):
         return self.ProtocolObj
-    
+
     def _ParseItem(self):
         Line = self._RawData.CurrentLine
         TokenList = GetSplitValueList(Line, DT.TAB_EQUAL_SPLIT, 1)
@@ -677,9 +671,9 @@ class _DecGuid(_DecBase):
             self._LoggerError(ST.ERR_DECPARSE_CGUID_GUID)
         if not IsValidToken(CVAR_PATTERN, TokenList[0]):
             self._LoggerError(ST.ERR_DECPARSE_PCD_CVAR_GUID)
-        
+
         self._CheckReDefine(TokenList[0])
-        
+
         if TokenList[1][0] != '{':
             if not CheckGuidRegFormat(TokenList[1]):
                 self._LoggerError(ST.ERR_DECPARSE_DEFINE_PKGGUID)
@@ -691,7 +685,7 @@ class _DecGuid(_DecBase):
             GuidString = GuidStructureStringToGuidString(TokenList[1])
             if TokenList[1][0] != '{' or TokenList[1][-1] != '}' or GuidString == '':
                 self._LoggerError(ST.ERR_DECPARSE_CGUID_GUIDFORMAT)
-    
+
             #
             # Check C format GUID
             #
@@ -705,7 +699,7 @@ class _DecGuid(_DecBase):
 
 ## _DecUserExtension
 #
-# Parse user extention section
+# Parse user extension section
 #
 class _DecUserExtension(_DecBase):
     def __init__(self, RawData):
@@ -713,7 +707,7 @@ class _DecUserExtension(_DecBase):
         self.ItemObject = DecUserExtensionObject(RawData.Filename)
         self._Headers = []
         self._CurItems = []
-    
+
     def BlockStart(self):
         self._CurItems = []
         for Header in self._RawData.CurrentScope:
@@ -721,7 +715,7 @@ class _DecUserExtension(_DecBase):
                 self._LoggerError(ST.ERR_DECPARSE_UE_DUPLICATE)
             else:
                 self._Headers.append(Header)
-            
+
             for Item in self._CurItems:
                 if Item.UserId == Header[1] and Item.IdString == Header[2]:
                     Item.ArchAndModuleType.append(Header[3])
@@ -734,7 +728,7 @@ class _DecUserExtension(_DecBase):
                 self._CurItems.append(Item)
                 self.ItemObject.AddItem(Item, None)
         self._LocalMacro = {}
-    
+
     def _ParseItem(self):
         Line = self._RawData.CurrentLine
         Item = None
@@ -749,10 +743,10 @@ class _DecUserExtension(_DecBase):
 #
 # Top dec parser
 #
-class Dec(_DecBase, _DecComments):    
-    def __init__(self, DecFile, Parse = True):        
+class Dec(_DecBase, _DecComments):
+    def __init__(self, DecFile, Parse = True):
         try:
-            Content = ConvertSpecialChar(open(DecFile, 'rb').readlines())
+            Content = ConvertSpecialChar(open(DecFile, 'r').readlines())
         except BaseException:
             Logger.Error(TOOL_NAME, FILE_OPEN_FAILURE, File=DecFile,
                          ExtraData=ST.ERR_DECPARSE_FILEOPEN % DecFile)
@@ -776,20 +770,20 @@ class Dec(_DecBase, _DecComments):
                 NewContent.append(Line + '\r')
 
         RawData = FileContent(DecFile, NewContent)
-        
+
         _DecComments.__init__(self)
         _DecBase.__init__(self, RawData)
-        
+
         self.BinaryHeadComment = []
         self.PcdErrorCommentDict = {}
-        
+
         self._Define    = _DecDefine(RawData)
         self._Include   = _DecInclude(RawData)
         self._Guid      = _DecGuid(RawData)
         self._LibClass  = _DecLibraryclass(RawData)
         self._Pcd       = _DecPcd(RawData)
         self._UserEx    = _DecUserExtension(RawData)
-        
+
         #
         # DEC file supported data types (one type per section)
         #
@@ -815,7 +809,7 @@ class Dec(_DecBase, _DecComments):
             # Parsing done, check required fields
             #
             self.CheckRequiredFields()
-    
+
     def CheckRequiredFields(self):
         for SectionParser in self._SectionParser.values():
             if not SectionParser.CheckRequiredFields():
@@ -831,7 +825,7 @@ class Dec(_DecBase, _DecComments):
         FileHeaderLineIndex = -1
         BinaryHeaderLineIndex = -1
         TokenSpaceGuidCName = ''
-        
+
         #
         # Parse PCD error comment section
         #
@@ -853,13 +847,13 @@ class Dec(_DecBase, _DecComments):
                 self._RawData.CurrentLine = self._RawData.CurrentLine.replace(DT.TAB_COMMENT_SPLIT, '').strip()
                 if self._RawData.CurrentLine != '':
                     if DT.TAB_VALUE_SPLIT not in self._RawData.CurrentLine:
-                        self._LoggerError(ST.ERR_DECPARSE_PCDERRORMSG_MISS_VALUE_SPLIT)   
-                          
+                        self._LoggerError(ST.ERR_DECPARSE_PCDERRORMSG_MISS_VALUE_SPLIT)
+
                     PcdErrorNumber, PcdErrorMsg = GetSplitValueList(self._RawData.CurrentLine, DT.TAB_VALUE_SPLIT, 1)
                     PcdErrorNumber = ParsePcdErrorCode(PcdErrorNumber, self._RawData.Filename, self._RawData.LineIndex)
                     if not PcdErrorMsg.strip():
                         self._LoggerError(ST.ERR_DECPARSE_PCD_MISS_ERRORMSG)
-                        
+
                     self.PcdErrorCommentDict[(TokenSpaceGuidCName, PcdErrorNumber)] = PcdErrorMsg.strip()
             else:
                 TokenSpaceGuidCName = ''
@@ -870,27 +864,27 @@ class Dec(_DecBase, _DecComments):
 
         while not self._RawData.IsEndOfFile():
             Line, Comment = CleanString(self._RawData.GetNextLine())
-            
+
             #
             # Header must be pure comment
             #
             if Line != '':
                 self._RawData.UndoNextLine()
                 break
-            
+
             if Comment and Comment.startswith(DT.TAB_SPECIAL_COMMENT) and Comment.find(DT.TAB_HEADER_COMMENT) > 0 \
                 and not Comment[2:Comment.find(DT.TAB_HEADER_COMMENT)].strip():
                 IsFileHeader = True
                 IsBinaryHeader = False
                 FileHeaderLineIndex = self._RawData.LineIndex
-                
+
             #
-            # Get license information before '@file' 
-            #   
+            # Get license information before '@file'
+            #
             if not IsFileHeader and not IsBinaryHeader and Comment and Comment.startswith(DT.TAB_COMMENT_SPLIT) and \
             DT.TAB_BINARY_HEADER_COMMENT not in Comment:
                 self._HeadComment.append((Comment, self._RawData.LineIndex))
-            
+
             if Comment and IsFileHeader and \
             not(Comment.startswith(DT.TAB_SPECIAL_COMMENT) \
             and Comment.find(DT.TAB_BINARY_HEADER_COMMENT) > 0):
@@ -899,15 +893,15 @@ class Dec(_DecBase, _DecComments):
             # Double '#' indicates end of header comments
             #
             if (not Comment or Comment == DT.TAB_SPECIAL_COMMENT) and IsFileHeader:
-                IsFileHeader = False  
+                IsFileHeader = False
                 continue
-            
+
             if Comment and Comment.startswith(DT.TAB_SPECIAL_COMMENT) \
             and Comment.find(DT.TAB_BINARY_HEADER_COMMENT) > 0:
                 IsBinaryHeader = True
                 IsFileHeader = False
                 BinaryHeaderLineIndex = self._RawData.LineIndex
-                
+
             if Comment and IsBinaryHeader:
                 self.BinaryHeadComment.append((Comment, self._RawData.LineIndex))
             #
@@ -916,23 +910,23 @@ class Dec(_DecBase, _DecComments):
             if (not Comment or Comment == DT.TAB_SPECIAL_COMMENT) and IsBinaryHeader:
                 IsBinaryHeader = False
                 break
-            
+
             if FileHeaderLineIndex > -1 and not IsFileHeader and not IsBinaryHeader:
                 break
 
         if FileHeaderLineIndex > BinaryHeaderLineIndex and FileHeaderLineIndex > -1 and BinaryHeaderLineIndex > -1:
             self._LoggerError(ST.ERR_BINARY_HEADER_ORDER)
-            
+
         if FileHeaderLineIndex == -1:
 #            self._LoggerError(ST.ERR_NO_SOURCE_HEADER)
-            Logger.Error(TOOL_NAME, FORMAT_INVALID, 
+            Logger.Error(TOOL_NAME, FORMAT_INVALID,
                          ST.ERR_NO_SOURCE_HEADER,
                          File=self._RawData.Filename)
         return
-    
+
     def _StopCurrentParsing(self, Line):
         return False
-    
+
     def _ParseItem(self):
         self._SectionHeaderParser()
         if len(self._RawData.CurrentScope) == 0:
@@ -955,8 +949,8 @@ class Dec(_DecBase, _DecComments):
             if Token.upper() != DT.TAB_USER_EXTENSIONS.upper():
                 self._LoggerError(ST.ERR_DECPARSE_SECTION_UE)
             UserExtension = Token.upper()
-            Par.AssertChar(DT.TAB_SPLIT, ST.ERR_DECPARSE_SECTION_UE, self._RawData.LineIndex)     
-            
+            Par.AssertChar(DT.TAB_SPLIT, ST.ERR_DECPARSE_SECTION_UE, self._RawData.LineIndex)
+
             #
             # UserID
             #
@@ -991,7 +985,7 @@ class Dec(_DecBase, _DecComments):
         Par.AssertEnd(ST.ERR_DECPARSE_SECTION_UE, self._RawData.LineIndex)
         if 'COMMON' in ArchList and len(ArchList) > 1:
             self._LoggerError(ST.ERR_DECPARSE_SECTION_COMMON)
- 
+
     ## Section header parser
     #
     # The section header is always in following format:
@@ -1001,7 +995,7 @@ class Dec(_DecBase, _DecComments):
     def _SectionHeaderParser(self):
         if self._RawData.CurrentLine[0] != DT.TAB_SECTION_START or self._RawData.CurrentLine[-1] != DT.TAB_SECTION_END:
             self._LoggerError(ST.ERR_DECPARSE_SECTION_IDENTIFY)
-        
+
         RawSection = self._RawData.CurrentLine[1:-1].strip().upper()
         #
         # Check defines section which is only allowed to occur once and
@@ -1033,13 +1027,13 @@ class Dec(_DecBase, _DecComments):
                 SectionNames.append(SectionName)
             #
             # In DEC specification, all section headers have at most two part:
-            # SectionName.Arch except UserExtention
+            # SectionName.Arch except UserExtension
             #
             if len(ItemList) > 2:
                 self._LoggerError(ST.ERR_DECPARSE_SECTION_SUBTOOMANY % Item)
 
             if DT.TAB_PCDS_FEATURE_FLAG_NULL.upper() in SectionNames and len(SectionNames) > 1:
-                self._LoggerError(ST.ERR_DECPARSE_SECTION_FEATUREFLAG % DT.TAB_PCDS_FEATURE_FLAG_NULL) 
+                self._LoggerError(ST.ERR_DECPARSE_SECTION_FEATUREFLAG % DT.TAB_PCDS_FEATURE_FLAG_NULL)
             #
             # S1 is always Arch
             #
@@ -1064,7 +1058,7 @@ class Dec(_DecBase, _DecComments):
             for Sec in SectionNames:
                 if not Sec.startswith(DT.TAB_PCDS.upper()):
                     self._LoggerError(ST.ERR_DECPARSE_SECTION_NAME % str(SectionNames))
-    
+
     def GetDefineSectionMacro(self):
         return self._Define.GetLocalMacro()
     def GetDefineSectionObject(self):
@@ -1084,11 +1078,11 @@ class Dec(_DecBase, _DecComments):
     def GetUserExtensionSectionObject(self):
         return self._UserEx.GetDataObject()
     def GetPackageSpecification(self):
-        return self._Define.GetDataObject().GetPackageSpecification()   
+        return self._Define.GetDataObject().GetPackageSpecification()
     def GetPackageName(self):
-        return self._Define.GetDataObject().GetPackageName()   
+        return self._Define.GetDataObject().GetPackageName()
     def GetPackageGuid(self):
-        return self._Define.GetDataObject().GetPackageGuid()    
+        return self._Define.GetDataObject().GetPackageGuid()
     def GetPackageVersion(self):
         return self._Define.GetDataObject().GetPackageVersion()
     def GetPackageUniFile(self):

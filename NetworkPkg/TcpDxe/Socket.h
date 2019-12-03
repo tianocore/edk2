@@ -1,15 +1,9 @@
 /** @file
   Common head file for TCP socket.
 
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -361,7 +355,7 @@ typedef enum {
 ///
 typedef struct _SOCK_BUFFER {
   UINT32        HighWater;  ///< The buffersize upper limit of sock_buffer
-  UINT32        LowWater;   ///< The low warter mark of sock_buffer
+  UINT32        LowWater;   ///< The low water mark of sock_buffer
   NET_BUF_QUEUE *DataQueue; ///< The queue to buffer data
 } SOCK_BUFFER;
 
@@ -425,8 +419,8 @@ typedef struct _SOCK_INIT_DATA {
 
   SOCKET                 *Parent;        ///< The parent of this socket
   UINT32                 BackLog;        ///< The connection limit for listening socket
-  UINT32                 SndBufferSize;  ///< The high warter mark of send buffer
-  UINT32                 RcvBufferSize;  ///< The high warter mark of receive buffer
+  UINT32                 SndBufferSize;  ///< The high water mark of send buffer
+  UINT32                 RcvBufferSize;  ///< The high water mark of receive buffer
   UINT8                  IpVersion;
   VOID                   *Protocol;      ///< The pointer to protocol function template
                                          ///< wanted to install on socket
@@ -450,7 +444,7 @@ typedef struct _SOCK_INIT_DATA {
 } SOCK_INIT_DATA;
 
 ///
-///  The union type of TCP and UDP protocol.
+///  The union type of TCP4 and TCP6 protocol.
 ///
 typedef union _NET_PROTOCOL {
   EFI_TCP4_PROTOCOL      Tcp4Protocol;    ///< Tcp4 protocol
@@ -502,7 +496,7 @@ struct _TCP_SOCKET {
   SOCK_PROTO_HANDLER        ProtoHandler;     ///< The request handler of protocol
   UINT8                     ProtoReserved[PROTO_RESERVED_LEN];  ///< Data fields reserved for protocol
   UINT8                     IpVersion;
-  NET_PROTOCOL              NetProtocol;                        ///< TCP or UDP protocol socket used
+  NET_PROTOCOL              NetProtocol;                        ///< TCP4 or TCP6 protocol socket used
   //
   // Callbacks after socket is created and before socket is to be destroyed.
   //
@@ -897,25 +891,6 @@ EFI_STATUS
 SockGetMode (
   IN     SOCKET *Sock,
   IN OUT VOID   *Mode
-  );
-
-/**
-  Configure the low level protocol to join a multicast group for
-  this socket's connection.
-
-  @param[in]  Sock             Pointer to the socket of the connection to join the
-                               specific multicast group.
-  @param[in]  GroupInfo        Pointer to the multicast group information.
-
-  @retval EFI_SUCCESS          The configuration completed successfully.
-  @retval EFI_ACCESS_DENIED    Failed to get the lock to access the socket.
-  @retval EFI_NOT_STARTED      The socket is not configured.
-
-**/
-EFI_STATUS
-SockGroup (
-  IN SOCKET *Sock,
-  IN VOID   *GroupInfo
   );
 
 /**

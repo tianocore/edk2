@@ -1,14 +1,8 @@
 /** @file
 File explorer related functions.
 
-Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under
-the terms and conditions of the BSD License that accompanies this distribution.
-The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2004 - 2019, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -61,7 +55,7 @@ HII_VENDOR_DEVICE_PATH  FeHiiVendorDevicePath = {
   {
     END_DEVICE_PATH_TYPE,
     END_ENTIRE_DEVICE_PATH_SUBTYPE,
-    { 
+    {
       (UINT8) (END_DEVICE_PATH_LENGTH),
       (UINT8) ((END_DEVICE_PATH_LENGTH) >> 8)
     }
@@ -72,6 +66,25 @@ VOID                *mLibStartOpCodeHandle = NULL;
 VOID                *mLibEndOpCodeHandle = NULL;
 EFI_IFR_GUID_LABEL  *mLibStartLabel = NULL;
 EFI_IFR_GUID_LABEL  *mLibEndLabel = NULL;
+UINT16              mQuestionIdUpdate;
+CHAR16  mNewFileName[MAX_FILE_NAME_LEN];
+CHAR16  mNewFolderName[MAX_FOLDER_NAME_LEN];
+UINTN  mNewFileQuestionId    = NEW_FILE_QUESTION_ID_BASE;
+UINTN  mNewFolderQuestionId  = NEW_FOLDER_QUESTION_ID_BASE;
+
+/**
+  Create a new file or folder in current directory.
+
+  @param FileName              Point to the fileNmae or folder.
+  @param CreateFile            CreateFile== TRUE  means create a new file.
+                               CreateFile== FALSE means create a new Folder.
+
+**/
+EFI_STATUS
+LibCreateNewFile (
+  IN CHAR16     *FileName,
+  IN BOOLEAN    CreateFile
+  );
 
 /**
   This function allows a caller to extract the current configuration for one
@@ -174,9 +187,13 @@ LibCallback (
 {
   EFI_STATUS    Status;
   BOOLEAN       NeedExit;
+  CHAR16        *NewFileName;
+  CHAR16        *NewFolderName;
 
   NeedExit = TRUE;
-  
+  NewFileName   = NULL;
+  NewFolderName = NULL;
+
   if (Action != EFI_BROWSER_ACTION_CHANGING && Action != EFI_BROWSER_ACTION_CHANGED) {
     //
     // Do nothing for other UEFI Action. Only do call back when data is changed.
@@ -188,7 +205,55 @@ LibCallback (
     if ((Value == NULL) || (ActionRequest == NULL)) {
       return EFI_INVALID_PARAMETER;
     }
-    
+
+    if (QuestionId == KEY_VALUE_CREATE_FILE_AND_EXIT) {
+      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
+      if (!IsZeroBuffer (mNewFileName, sizeof (mNewFileName))) {
+        Status = LibCreateNewFile (mNewFileName,TRUE);
+        ZeroMem (mNewFileName,sizeof (mNewFileName));
+      }
+    }
+
+    if (QuestionId == KEY_VALUE_NO_CREATE_FILE_AND_EXIT) {
+      ZeroMem (mNewFileName,sizeof (mNewFileName));
+      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
+    }
+
+    if (QuestionId == KEY_VALUE_CREATE_FOLDER_AND_EXIT) {
+      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
+      if (!IsZeroBuffer (mNewFolderName, sizeof (mNewFolderName))) {
+        Status = LibCreateNewFile (mNewFolderName, FALSE);
+        ZeroMem (mNewFolderName,sizeof (mNewFolderName));
+      }
+    }
+
+    if (QuestionId == KEY_VALUE_NO_CREATE_FOLDER_AND_EXIT) {
+      ZeroMem (mNewFolderName,sizeof (mNewFolderName));
+      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
+    }
+
+    if (QuestionId == NEW_FILE_NAME_ID) {
+      NewFileName = HiiGetString (gFileExplorerPrivate.FeHiiHandle, Value->string, NULL);
+      if (NewFileName != NULL) {
+        StrCpyS (mNewFileName, MAX_FILE_NAME_LEN, NewFileName);
+        FreePool (NewFileName);
+        NewFileName = NULL;
+      } else {
+        return EFI_INVALID_PARAMETER;
+      }
+    }
+
+    if (QuestionId == NEW_FOLDER_NAME_ID) {
+      NewFolderName = HiiGetString (gFileExplorerPrivate.FeHiiHandle, Value->string, NULL);
+      if (NewFolderName != NULL) {
+        StrCpyS (mNewFolderName, MAX_FOLDER_NAME_LEN, NewFolderName);
+        FreePool (NewFolderName);
+        NewFolderName = NULL;
+      } else {
+        return EFI_INVALID_PARAMETER;
+      }
+    }
+
     if (QuestionId >= FILE_OPTION_OFFSET) {
       LibGetDevicePath(QuestionId);
 
@@ -207,8 +272,8 @@ LibCallback (
     if (Value == NULL) {
       return EFI_INVALID_PARAMETER;
     }
-    
     if (QuestionId >= FILE_OPTION_OFFSET) {
+      LibGetDevicePath(QuestionId);
       Status = LibUpdateFileExplorer (QuestionId);
       if (EFI_ERROR (Status)) {
         return Status;
@@ -483,7 +548,7 @@ LibFileInfo (
 
   Buffer      = NULL;
   BufferSize  = 0;
-  
+
   Status = FHand->GetInfo (
                     FHand,
                     InfoType,
@@ -620,19 +685,19 @@ LibAppendFileName (
 
   Size1 = StrSize (Str1);
   Size2 = StrSize (Str2);
-  
+
   //
   // Check overflow
   //
   if (((MAX_UINTN - Size1) < Size2) || ((MAX_UINTN - Size1 - Size2) < sizeof(CHAR16))) {
     return NULL;
   }
-  
+
   MaxLen = (Size1 + Size2 + sizeof (CHAR16))/ sizeof (CHAR16);
   Str   = AllocateZeroPool (Size1 + Size2 + sizeof (CHAR16));
   ASSERT (Str != NULL);
 
-  TmpStr = AllocateZeroPool (Size1 + Size2 + sizeof (CHAR16)); 
+  TmpStr = AllocateZeroPool (Size1 + Size2 + sizeof (CHAR16));
   ASSERT (TmpStr != NULL);
 
   StrCpyS (Str, MaxLen, Str1);
@@ -653,11 +718,11 @@ LibAppendFileName (
       //
 
       //
-      // Use TmpStr as a backup, as StrCpyS in BaseLib does not handle copy of two strings 
+      // Use TmpStr as a backup, as StrCpyS in BaseLib does not handle copy of two strings
       // that overlap.
       //
       StrCpyS (TmpStr, MaxLen, Ptr + 3);
-      StrCpyS (LastSlash, MaxLen - (UINTN) (LastSlash - Str), TmpStr);
+      StrCpyS (LastSlash, MaxLen - ((UINTN) LastSlash - (UINTN) Str) / sizeof (CHAR16), TmpStr);
       Ptr = LastSlash;
     } else if (*Ptr == '\\' && *(Ptr + 1) == '.' && *(Ptr + 2) == '\\') {
       //
@@ -665,11 +730,11 @@ LibAppendFileName (
       //
 
       //
-      // Use TmpStr as a backup, as StrCpyS in BaseLib does not handle copy of two strings 
+      // Use TmpStr as a backup, as StrCpyS in BaseLib does not handle copy of two strings
       // that overlap.
       //
       StrCpyS (TmpStr, MaxLen, Ptr + 2);
-      StrCpyS (Ptr, MaxLen - (UINTN) (Ptr - Str), TmpStr);
+      StrCpyS (Ptr, MaxLen - ((UINTN) Ptr - (UINTN) Str) / sizeof (CHAR16), TmpStr);
       Ptr = LastSlash;
     } else if (*Ptr == '\\') {
       LastSlash = Ptr;
@@ -679,7 +744,7 @@ LibAppendFileName (
   }
 
   FreePool (TmpStr);
-  
+
   return Str;
 }
 
@@ -699,9 +764,7 @@ LibFindFileSystem (
   )
 {
   UINTN                        NoSimpleFsHandles;
-  UINTN                        NoLoadFileHandles;
   EFI_HANDLE                   *SimpleFsHandle;
-  EFI_HANDLE                   *LoadFileHandle;
   UINT16                       *VolumeLabel;
   UINTN                        Index;
   EFI_STATUS                   Status;
@@ -711,7 +774,6 @@ LibFindFileSystem (
   EFI_FILE_SYSTEM_VOLUME_LABEL *Info;
 
   NoSimpleFsHandles = 0;
-  NoLoadFileHandles = 0;
   OptionNumber      = 0;
 
   //
@@ -777,7 +839,7 @@ LibFindFileSystem (
         VolumeLabel,
         MenuEntry->HelpString
         );
-  	  MenuEntry->DisplayStringToken = HiiSetString (
+      MenuEntry->DisplayStringToken = HiiSetString (
                                              gFileExplorerPrivate.FeHiiHandle,
                                              0,
                                              MenuEntry->DisplayString,
@@ -796,57 +858,6 @@ LibFindFileSystem (
     FreePool (SimpleFsHandle);
   }
 
-  //
-  // Searching for handles that support Load File protocol
-  //
-  Status = gBS->LocateHandleBuffer (
-                  ByProtocol,
-                  &gEfiLoadFileProtocolGuid,
-                  NULL,
-                  &NoLoadFileHandles,
-                  &LoadFileHandle
-                  );
-
-  if (!EFI_ERROR (Status)) {
-    for (Index = 0; Index < NoLoadFileHandles; Index++) {
-      MenuEntry = LibCreateMenuEntry ();
-      if (NULL == MenuEntry) {
-        FreePool (LoadFileHandle);
-        return EFI_OUT_OF_RESOURCES;
-      }
-
-      FileContext = (FILE_CONTEXT *) MenuEntry->VariableContext;
-      FileContext->DeviceHandle = LoadFileHandle[Index];
-      FileContext->IsRoot = TRUE;
-
-      FileContext->DevicePath = DevicePathFromHandle (FileContext->DeviceHandle);
-      FileContext->FileName = LibDevicePathToStr (FileContext->DevicePath);
-
-      MenuEntry->HelpString = LibDevicePathToStr (FileContext->DevicePath);
-      MenuEntry->DisplayString = AllocateZeroPool (MAX_CHAR);
-      ASSERT (MenuEntry->DisplayString != NULL);
-      UnicodeSPrint (
-        MenuEntry->DisplayString,
-        MAX_CHAR,
-        L"Load File [%s]",
-        MenuEntry->HelpString
-        );
-      MenuEntry->DisplayStringToken = HiiSetString (
-                                           gFileExplorerPrivate.FeHiiHandle,
-                                           0,
-                                           MenuEntry->DisplayString,
-                                           NULL
-                                           );
-
-      OptionNumber++;
-      InsertTailList (&gFileExplorerPrivate.FsOptionMenu->Head, &MenuEntry->Link);
-    }
-  }
-
-  if (NoLoadFileHandles != 0) {
-    FreePool (LoadFileHandle);
-  }
-
   gFileExplorerPrivate.FsOptionMenu->MenuNumber = OptionNumber;
 
   return EFI_SUCCESS;
@@ -854,16 +865,16 @@ LibFindFileSystem (
 
 /**
   Find the file handle from the input menu info.
-  
+
   @param  MenuEntry        Input Menu info.
   @param  RetFileHandle    Return the file handle for the input device path.
-  
+
   @retval EFI_SUCESS       Find the file handle success.
   @retval Other            Find the file handle failure.
 **/
 EFI_STATUS
 LibGetFileHandleFromMenu (
-  IN  MENU_ENTRY                *MenuEntry,  
+  IN  MENU_ENTRY                *MenuEntry,
   OUT EFI_FILE_HANDLE           *RetFileHandle
   )
 {
@@ -900,18 +911,18 @@ LibGetFileHandleFromMenu (
 
 /**
   Find the file handle from the input device path info.
-  
+
   @param  RootDirectory    Device path info.
   @param  RetFileHandle    Return the file handle for the input device path.
   @param  ParentFileName   Parent file name.
   @param  DeviceHandle     Driver handle for this partition.
-  
+
   @retval EFI_SUCESS       Find the file handle success.
   @retval Other            Find the file handle failure.
 **/
 EFI_STATUS
 LibGetFileHandleFromDevicePath (
-  IN  EFI_DEVICE_PATH_PROTOCOL  *RootDirectory,  
+  IN  EFI_DEVICE_PATH_PROTOCOL  *RootDirectory,
   OUT EFI_FILE_HANDLE           *RetFileHandle,
   OUT UINT16                    **ParentFileName,
   OUT EFI_HANDLE                *DeviceHandle
@@ -936,12 +947,12 @@ LibGetFileHandleFromDevicePath (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  
+
   Status = gBS->HandleProtocol (Handle, &gEfiSimpleFileSystemProtocolGuid, (VOID**)&Volume);
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  
+
   //
   // Open the Volume to get the File System handle
   //
@@ -957,7 +968,7 @@ LibGetFileHandleFromDevicePath (
     *RetFileHandle = FileHandle;
     return EFI_SUCCESS;
   }
-  
+
   //
   // Duplicate the device path to avoid the access to unaligned device path node.
   // Because the device path consists of one or more FILE PATH MEDIA DEVICE PATH
@@ -973,7 +984,7 @@ LibGetFileHandleFromDevicePath (
     Status = EFI_OUT_OF_RESOURCES;
     goto Done;
   }
-        
+
   //
   // Parse each MEDIA_FILEPATH_DP node. There may be more than one, since the
   // directory information and filename can be seperate. The goal is to inch
@@ -1039,12 +1050,78 @@ Done:
 }
 
 /**
+  Create a new file or folder in current directory.
+
+  @param FileName              Point to the fileNmae or folder name.
+  @param CreateFile            CreateFile== TRUE  means create a new file.
+                               CreateFile== FALSE means create a new Folder.
+
+**/
+EFI_STATUS
+LibCreateNewFile (
+  IN CHAR16     *FileName,
+  IN BOOLEAN    CreateFile
+  )
+{
+  EFI_FILE_HANDLE      FileHandle;
+  EFI_FILE_HANDLE      NewHandle;
+  EFI_HANDLE           DeviceHandle;
+  EFI_STATUS           Status;
+  CHAR16               *ParentName;
+  CHAR16               *FullFileName;
+
+  NewHandle = NULL;
+  FullFileName = NULL;
+
+  LibGetFileHandleFromDevicePath(gFileExplorerPrivate.RetDevicePath, &FileHandle, &ParentName, &DeviceHandle);
+  FullFileName = LibAppendFileName (ParentName, FileName);
+  if (FullFileName == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+  if (CreateFile) {
+    Status = FileHandle->Open(
+                          FileHandle,
+                          &NewHandle,
+                          FullFileName,
+                          EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE| EFI_FILE_MODE_CREATE,
+                          0
+                          );
+    if (EFI_ERROR (Status)) {
+      FileHandle->Close (FileHandle);
+      return Status;
+    }
+  } else {
+    Status = FileHandle->Open(
+                          FileHandle,
+                          &NewHandle,
+                          FullFileName,
+                          EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE| EFI_FILE_MODE_CREATE,
+                          EFI_FILE_DIRECTORY
+                          );
+    if (EFI_ERROR (Status)) {
+      FileHandle->Close (FileHandle);
+      return Status;
+    }
+  }
+
+  FileHandle->Close (FileHandle);
+
+  //
+  // Return the DevicePath of the new created file or folder.
+  //
+  gFileExplorerPrivate.RetDevicePath = FileDevicePath (DeviceHandle, FullFileName);
+
+  return EFI_SUCCESS;
+
+}
+
+/**
   Find files under current directory.
-  
+
   All files and sub-directories in current directory
   will be stored in DirectoryMenu for future use.
 
-  @param FileHandle    Parent file handle. 
+  @param FileHandle    Parent file handle.
   @param FileName      Parent file name.
   @param DeviceHandle  Driver handle for this partition.
 
@@ -1140,7 +1217,7 @@ LibFindFiles (
       } else {
         NewMenuEntry->DisplayString = LibStrDuplicate (DirInfo->FileName);
       }
-      
+
       NewMenuEntry->DisplayStringToken = HiiSetString (
                                            gFileExplorerPrivate.FeHiiHandle,
                                            0,
@@ -1230,16 +1307,46 @@ LibUpdateFileExplorePage (
   MENU_ENTRY      *NewMenuEntry;
   FILE_CONTEXT    *NewFileContext;
   MENU_OPTION     *MenuOption;
+  BOOLEAN         CreateNewFile;
 
   NewMenuEntry    = NULL;
   NewFileContext  = NULL;
+  CreateNewFile   = FALSE;
 
   LibRefreshUpdateData ();
   MenuOption = gFileExplorerPrivate.FsOptionMenu;
 
+  mQuestionIdUpdate += QUESTION_ID_UPDATE_STEP;
+
   for (Index = 0; Index < MenuOption->MenuNumber; Index++) {
     NewMenuEntry    = LibGetMenuEntry (MenuOption, Index);
     NewFileContext  = (FILE_CONTEXT *) NewMenuEntry->VariableContext;
+
+    if (!NewFileContext->IsRoot && !CreateNewFile) {
+      HiiCreateGotoOpCode (
+        mLibStartOpCodeHandle,
+        FORM_ADD_NEW_FILE_ID,
+        STRING_TOKEN (STR_NEW_FILE),
+        STRING_TOKEN (STR_NEW_FILE_HELP),
+        EFI_IFR_FLAG_CALLBACK,
+        (UINT16) (mNewFileQuestionId++)
+        );
+      HiiCreateGotoOpCode (
+        mLibStartOpCodeHandle,
+        FORM_ADD_NEW_FOLDER_ID,
+        STRING_TOKEN (STR_NEW_FOLDER),
+        STRING_TOKEN (STR_NEW_FOLDER_HELP),
+        EFI_IFR_FLAG_CALLBACK,
+        (UINT16) (mNewFolderQuestionId++)
+        );
+      HiiCreateTextOpCode(
+        mLibStartOpCodeHandle,
+        STRING_TOKEN (STR_NULL_STRING),
+        STRING_TOKEN (STR_NULL_STRING),
+        0
+        );
+      CreateNewFile = TRUE;
+    }
 
     if (!NewFileContext->IsDir) {
       //
@@ -1247,7 +1354,7 @@ LibUpdateFileExplorePage (
       //
       HiiCreateActionOpCode (
         mLibStartOpCodeHandle,
-        (UINT16) (FILE_OPTION_OFFSET + Index),
+        (UINT16) (FILE_OPTION_OFFSET + Index + mQuestionIdUpdate),
         NewMenuEntry->DisplayStringToken,
         STRING_TOKEN (STR_NULL_STRING),
         EFI_IFR_FLAG_CALLBACK,
@@ -1263,7 +1370,7 @@ LibUpdateFileExplorePage (
         NewMenuEntry->DisplayStringToken,
         STRING_TOKEN (STR_NULL_STRING),
         EFI_IFR_FLAG_CALLBACK,
-        (UINT16) (FILE_OPTION_OFFSET + Index)
+        (UINT16) (FILE_OPTION_OFFSET + Index + mQuestionIdUpdate)
         );
     }
   }
@@ -1298,7 +1405,7 @@ LibUpdateFileExplorer (
   EFI_FILE_HANDLE FileHandle;
 
   Status = EFI_SUCCESS;
-  FileOptionMask = (UINT16) (FILE_OPTION_MASK & KeyValue);
+  FileOptionMask = (UINT16) (FILE_OPTION_MASK & KeyValue) - mQuestionIdUpdate;
   NewMenuEntry   = LibGetMenuEntry (gFileExplorerPrivate.FsOptionMenu, FileOptionMask);
   NewFileContext = (FILE_CONTEXT *) NewMenuEntry->VariableContext;
 
@@ -1333,7 +1440,7 @@ LibGetDevicePath (
   MENU_ENTRY      *NewMenuEntry;
   FILE_CONTEXT    *NewFileContext;
 
-  FileOptionMask    = (UINT16) (FILE_OPTION_MASK & KeyValue);
+  FileOptionMask    = (UINT16) (FILE_OPTION_MASK & KeyValue) - mQuestionIdUpdate;
 
   NewMenuEntry = LibGetMenuEntry (gFileExplorerPrivate.FsOptionMenu, FileOptionMask);
 
@@ -1346,7 +1453,7 @@ LibGetDevicePath (
 }
 
 /**
-  Choose a file in the specified directory. 
+  Choose a file in the specified directory.
 
   If user input NULL for the RootDirectory, will choose file in the system.
 
@@ -1382,6 +1489,7 @@ ChooseFile (
     return EFI_INVALID_PARAMETER;
   }
 
+  mQuestionIdUpdate = 0;
   FileName = NULL;
 
   gFileExplorerPrivate.RetDevicePath = NULL;
@@ -1498,7 +1606,7 @@ FileExplorerLibConstructor (
   //
   Status = gBS->LocateProtocol (&gEfiFormBrowser2ProtocolGuid, NULL, (VOID **) &gFileExplorerPrivate.FormBrowser2);
   ASSERT_EFI_ERROR (Status);
-    
+
   InitializeListHead (&gFileExplorerPrivate.FsOptionMenu->Head);
 
   return EFI_SUCCESS;
@@ -1533,8 +1641,9 @@ FileExplorerLibDestructor (
                     NULL
                     );
     ASSERT_EFI_ERROR (Status);
-    
+
     HiiRemovePackages (gFileExplorerPrivate.FeHiiHandle);
+    gFileExplorerPrivate.FeDriverHandle = NULL;
   }
 
   FreePool (gHiiVendorDevicePath);

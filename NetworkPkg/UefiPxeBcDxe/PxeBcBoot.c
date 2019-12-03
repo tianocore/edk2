@@ -1,16 +1,10 @@
 /** @file
   Boot functions implementation for UefiPxeBc Driver.
 
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -102,14 +96,14 @@ PxeBcSelectBootPrompt (
   //
   // According to the PXE specification 2.1, Table 2-1 PXE DHCP Options,
   // we must not consider a boot prompt or boot menu if all of the following hold:
-  //   - the PXE_DISCOVERY_CONTROL tag(6) is present inside the Vendor Options(43), and has bit 3 set  
+  //   - the PXE_DISCOVERY_CONTROL tag(6) is present inside the Vendor Options(43), and has bit 3 set
   //   - a boot file name has been presented in the initial DHCP or ProxyDHCP offer packet.
   //
   if (IS_DISABLE_PROMPT_MENU (VendorOpt->DiscoverCtrl) &&
       Cache->Dhcp4.OptList[PXEBC_DHCP4_TAG_INDEX_BOOTFILE] != NULL) {
     return EFI_ABORTED;
   }
-  
+
   if (!IS_VALID_BOOT_PROMPT (VendorOpt->BitMap)) {
     return EFI_TIMEOUT;
   }
@@ -471,7 +465,7 @@ PxeBcDhcp4BootInfo (
   UINT16                      Value;
   PXEBC_VENDOR_OPTION         *VendorOpt;
   PXEBC_BOOT_SVR_ENTRY        *Entry;
-  
+
   PxeBc       = &Private->PxeBc;
   Mode        = PxeBc->Mode;
   Status      = EFI_SUCCESS;
@@ -789,8 +783,8 @@ PxeBcExtractDiscoverInfo (
       if (Info->IpCnt >= 1) {
         *DiscoverInfo = AllocatePool (sizeof (*Info) + (Info->IpCnt - 1) * sizeof (**SrvList));
         if (*DiscoverInfo == NULL) {
-          return EFI_OUT_OF_RESOURCES;       
-        }     
+          return EFI_OUT_OF_RESOURCES;
+        }
         CopyMem (*DiscoverInfo, Info, sizeof (*Info));
         Info = *DiscoverInfo;
       }
@@ -951,7 +945,7 @@ PxeBcDiscoverBootFile (
           &Mode->ProxyOffer.Dhcpv4,
           &Mode->PxeReply.Dhcpv4,
           Private->PxeReply.Dhcp4.Packet.Ack.Length
-          );      
+          );
       }
       Mode->ProxyOfferReceived = TRUE;
     }
@@ -994,7 +988,7 @@ PxeBcInstallCallback (
   //
   PxeBc  = &Private->PxeBc;
   Status = gBS->HandleProtocol (
-                  Private->Controller,
+                  Private->Mode.UsingIpv6 ? Private->Ip6Nic->Controller : Private->Ip4Nic->Controller,
                   &gEfiPxeBaseCodeCallbackProtocolGuid,
                   (VOID **) &Private->PxeBcCallback
                   );
@@ -1010,7 +1004,7 @@ PxeBcInstallCallback (
     // Install a default callback if user didn't offer one.
     //
     Status = gBS->InstallProtocolInterface (
-                    &Private->Controller,
+                    Private->Mode.UsingIpv6 ? &Private->Ip6Nic->Controller : &Private->Ip4Nic->Controller,
                     &gEfiPxeBaseCodeCallbackProtocolGuid,
                     EFI_NATIVE_INTERFACE,
                     &Private->LoadFileCallback
@@ -1054,7 +1048,7 @@ PxeBcUninstallCallback (
     PxeBc->SetParameters (PxeBc, NULL, NULL, NULL, NULL, &NewMakeCallback);
 
     gBS->UninstallProtocolInterface (
-          Private->Controller,
+          Private->Mode.UsingIpv6 ? Private->Ip6Nic->Controller : Private->Ip4Nic->Controller,
           &gEfiPxeBaseCodeCallbackProtocolGuid,
           &Private->LoadFileCallback
           );
@@ -1242,7 +1236,7 @@ ON_EXIT:
   } else if (Status == EFI_NO_MEDIA) {
     AsciiPrint ("\n  PXE-E12: Could not detect network connection.\n");
   } else if (Status == EFI_NO_RESPONSE) {
-    AsciiPrint ("\n  PXE-E16: No offer received.\n");
+    AsciiPrint ("\n  PXE-E16: No valid offer received.\n");
   } else if (Status == EFI_TIMEOUT) {
     AsciiPrint ("\n  PXE-E18: Server response timeout.\n");
   } else if (Status == EFI_ABORTED) {

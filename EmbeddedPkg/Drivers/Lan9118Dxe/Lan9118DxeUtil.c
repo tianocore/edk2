@@ -2,13 +2,7 @@
 *
 *  Copyright (c) 2012-2014, ARM Limited. All rights reserved.
 *
-*  This program and the accompanying materials
-*  are licensed and made available under the terms and conditions of the BSD License
-*  which accompanies this distribution.  The full text of the license may be found at
-*  http://opensource.org/licenses/bsd-license.php
-*
-*  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-*  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+*  SPDX-License-Identifier: BSD-2-Clause-Patent
 *
 **/
 
@@ -433,7 +427,7 @@ Lan9118Initialize (
   if ((Lan9118MmioRead32 (LAN9118_E2P_CMD) & E2P_EPC_MAC_ADDRESS_LOADED) == 0) {
     DEBUG ((EFI_D_ERROR, "Warning: There was an error detecting EEPROM or loading the MAC Address.\n"));
 
-    // If we had an address before (set by StationAddess), continue to use it
+    // If we had an address before (set by StationAddress), continue to use it
     if (CompareMem (&Snp->Mode->CurrentAddress, &mZeroMac, NET_ETHER_ADDR_LEN)) {
       Lan9118SetMacAddress (&Snp->Mode->CurrentAddress, Snp);
     } else {

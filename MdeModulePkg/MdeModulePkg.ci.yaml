@@ -1,0 +1,80 @@
+## @file
+# CI configuration for MdeModulePkg
+#
+# Copyright (c) Microsoft Corporation
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+{
+    ## options defined ci/Plugin/CompilerPlugin
+    "CompilerPlugin": {
+        "DscPath": "MdeModulePkg.dsc"
+    },
+
+    ## options defined ci/Plugin/CharEncodingCheck
+    "CharEncodingCheck": {
+        "IgnoreFiles": []
+    },
+
+    ## options defined ci/Plugin/DependencyCheck
+    "DependencyCheck": {
+        "AcceptableDependencies": [
+            "MdePkg/MdePkg.dec",
+            "MdeModulePkg/MdeModulePkg.dec",
+            "StandaloneMmPkg/StandaloneMmPkg.dec",
+            "ArmPkg/ArmPkg.dec"  # this should be fixed by promoting an abstraction
+        ],
+        # For host based unit tests
+        "AcceptableDependencies-HOST_APPLICATION":[],
+        # For UEFI shell based apps
+        "AcceptableDependencies-UEFI_APPLICATION":[],
+        "IgnoreInf": []
+    },
+
+    ## options defined ci/Plugin/DscCompleteCheck
+    "DscCompleteCheck": {
+        "IgnoreInf": [],
+        "DscPath": "MdeModulePkg.dsc"
+    },
+
+    ## options defined ci/Plugin/GuidCheck
+    "GuidCheck": {
+        "IgnoreGuidName": [],
+        "IgnoreGuidValue": ["00000000-0000-0000-0000-000000000000"],
+        "IgnoreFoldersAndFiles": [],
+        "IgnoreDuplicates": [
+            "gEdkiiFormBrowserExProtocolGuid=gEfiFormBrowserExProtocolGuid",
+            "gEfiPeiMmAccessPpiGuid=gPeiSmmAccessPpiGuid",
+            "gPeiSmmControlPpiGuid=gEfiPeiMmControlPpiGuid",
+        ]
+    },
+
+    ## options defined ci/Plugin/LibraryClassCheck
+    "LibraryClassCheck": {
+        "IgnoreHeaderFile": []
+    },
+
+    ## options defined ci/Plugin/SpellCheck
+    "SpellCheck": {
+        "AuditOnly": True,           # Fails test but run in AuditOnly mode to collect log
+        "IgnoreStandardPaths": [     # Standard Plugin defined paths that should be ignore
+            "*.c", "*.asm", "*.h", "*.nasm", "*.s", "*.asl", "*.inf"
+        ],
+        "IgnoreFiles": [             # use gitignore syntax to ignore errors in matching files
+            "Library/LzmaCustomDecompressLib/Sdk/DOC/*"
+        ],
+        "ExtendWords": [           # words to extend to the dictionary for this package
+            "LIGHTGRAY",
+            "DARKGRAY",
+            "LIGHTBLUE",
+            "LIGHTGREEN",
+            "LIGHTCYAN",
+            "LIGHTRED",
+            "LIGHTMAGENTA",
+            "FVMAIN",
+            "VARCHECKPCD",
+            "Getxx",
+            "lzturbo"
+        ],
+        "AdditionalIncludePaths": [] # Additional paths to spell check relative to package root (wildcards supported)
+    }
+}

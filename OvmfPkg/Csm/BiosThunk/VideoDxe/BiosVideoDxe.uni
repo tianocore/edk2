@@ -1,0 +1,17 @@
+// /** @file
+// Video driver based on legacy bios.
+//
+// This driver by using Legacy Bios protocol service to support csm Video
+// and produce Graphics Output Protocol.
+//
+// Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Video driver based on legacy bios"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This driver uses the Legacy Bios protocol service to utilize the CSM Video Support and produce the Graphics Output Protocol."
+

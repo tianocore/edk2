@@ -1,15 +1,9 @@
-/** @file   
+/** @file
   ACPI 6.1 definitions from the ACPI Specification Revision 6.1 January, 2016.
 
-  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
  (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
-  This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #ifndef _ACPI_6_1_H_
@@ -88,7 +82,7 @@ typedef struct {
 
 //
 // Root System Description Table
-// No definition needed as it is a common description table header, the same with 
+// No definition needed as it is a common description table header, the same with
 // EFI_ACPI_DESCRIPTION_HEADER, followed by a variable number of UINT32 table pointers.
 //
 
@@ -99,7 +93,7 @@ typedef struct {
 
 //
 // Extended System Description Table
-// No definition needed as it is a common description table header, the same with 
+// No definition needed as it is a common description table header, the same with
 // EFI_ACPI_DESCRIPTION_HEADER, followed by a variable number of UINT64 table pointers.
 //
 
@@ -1400,7 +1394,7 @@ typedef struct {
 #define EFI_ACPI_6_1_NFIT_GUID_RAM_DISK_SUPPORTING_VIRTUAL_DISK_REGION_VOLATILE   { 0x77AB535A, 0x45FC, 0x624B, { 0x55, 0x60, 0xF7, 0xB2, 0x81, 0xD1, 0xF9, 0x6E }}
 #define EFI_ACPI_6_1_NFIT_GUID_RAM_DISK_SUPPORTING_VIRTUAL_CD_REGION_VOLATILE     { 0x3D5ABD30, 0x4175, 0x87CE, { 0x6D, 0x64, 0xD2, 0xAD, 0xE5, 0x23, 0xC4, 0xBB }}
 #define EFI_ACPI_6_1_NFIT_GUID_RAM_DISK_SUPPORTING_VIRTUAL_DISK_REGION_PERSISTENT { 0x5CEA02C9, 0x4D07, 0x69D3, { 0x26, 0x9F ,0x44, 0x96, 0xFB, 0xE0, 0x96, 0xF9 }}
-#define EFI_ACPI_6_1_NFIT_GUID_RAM_DISK_SUPPORTING_VIRTUAL_CD_REGION_PERSISTENT   { 0x08018188, 0x42CD, 0xBB48, { 0x10, 0x0F, 0x53, 0x87, 0xD5, 0x3D, 0xED, 0x3D ]}
+#define EFI_ACPI_6_1_NFIT_GUID_RAM_DISK_SUPPORTING_VIRTUAL_CD_REGION_PERSISTENT   { 0x08018188, 0x42CD, 0xBB48, { 0x10, 0x0F, 0x53, 0x87, 0xD5, 0x3D, 0xED, 0x3D }}
 typedef struct {
   UINT16                                      Type;
   UINT16                                      Length;
@@ -2052,7 +2046,9 @@ typedef struct {
 //
 // PCCT Subspace type
 //
-#define EFI_ACPI_6_1_PCCT_SUBSPACE_TYPE_GENERIC  0x00
+#define EFI_ACPI_6_1_PCCT_SUBSPACE_TYPE_GENERIC                         0x00
+#define EFI_ACPI_6_1_PCCT_SUBSPACE_TYPE_1_HW_REDUCED_COMMUNICATIONS     0x01
+#define EFI_ACPI_6_1_PCCT_SUBSPACE_TYPE_2_HW_REDUCED_COMMUNICATIONS     0x02
 
 ///
 /// PCC Subspace Structure Header
@@ -2093,7 +2089,7 @@ typedef struct {
   UINT8                                    CommandComplete:1;
   UINT8                                    SciDoorbell:1;
   UINT8                                    Error:1;
-  UINT8                                    PlatformNotification:1;  
+  UINT8                                    PlatformNotification:1;
   UINT8                                    Reserved:4;
   UINT8                                    Reserved1;
 } EFI_ACPI_6_1_PCCT_GENERIC_SHARED_MEMORY_REGION_STATUS;
@@ -2104,6 +2100,50 @@ typedef struct {
   EFI_ACPI_6_1_PCCT_GENERIC_SHARED_MEMORY_REGION_STATUS     Status;
 } EFI_ACPI_6_1_PCCT_GENERIC_SHARED_MEMORY_REGION_HEADER;
 
+#define EFI_ACPI_6_1_PCCT_SUBSPACE_DOORBELL_INTERRUPT_FLAGS_POLARITY    BIT0
+#define EFI_ACPI_6_1_PCCT_SUBSPACE_DOORBELL_INTERRUPT_FLAGS_MODE        BIT1
+
+///
+/// Type 1 HW-Reduced Communications Subspace Structure
+///
+typedef struct {
+  UINT8                                    Type;
+  UINT8                                    Length;
+  UINT32                                   DoorbellInterrupt;
+  UINT8                                    DoorbellInterruptFlags;
+  UINT8                                    Reserved;
+  UINT64                                   BaseAddress;
+  UINT64                                   AddressLength;
+  EFI_ACPI_6_1_GENERIC_ADDRESS_STRUCTURE   DoorbellRegister;
+  UINT64                                   DoorbellPreserve;
+  UINT64                                   DoorbellWrite;
+  UINT32                                   NominalLatency;
+  UINT32                                   MaximumPeriodicAccessRate;
+  UINT16                                   MinimumRequestTurnaroundTime;
+} EFI_ACPI_6_1_PCCT_SUBSPACE_1_HW_REDUCED_COMMUNICATIONS;
+
+///
+/// Type 2 HW-Reduced Communications Subspace Structure
+///
+typedef struct {
+  UINT8                                    Type;
+  UINT8                                    Length;
+  UINT32                                   DoorbellInterrupt;
+  UINT8                                    DoorbellInterruptFlags;
+  UINT8                                    Reserved;
+  UINT64                                   BaseAddress;
+  UINT64                                   AddressLength;
+  EFI_ACPI_6_1_GENERIC_ADDRESS_STRUCTURE   DoorbellRegister;
+  UINT64                                   DoorbellPreserve;
+  UINT64                                   DoorbellWrite;
+  UINT32                                   NominalLatency;
+  UINT32                                   MaximumPeriodicAccessRate;
+  UINT16                                   MinimumRequestTurnaroundTime;
+  EFI_ACPI_6_1_GENERIC_ADDRESS_STRUCTURE   DoorbellAckRegister;
+  UINT64                                   DoorbellAckPreserve;
+  UINT64                                   DoorbellAckWrite;
+} EFI_ACPI_6_1_PCCT_SUBSPACE_2_HW_REDUCED_COMMUNICATIONS;
+
 //
 // Known table signatures
 //
@@ -2111,7 +2151,7 @@ typedef struct {
 ///
 /// "RSD PTR " Root System Description Pointer
 ///
-#define EFI_ACPI_6_1_ROOT_SYSTEM_DESCRIPTION_POINTER_SIGNATURE  SIGNATURE_64('R', 'S', 'D', ' ', 'P', 'T', 'R', ' ') 
+#define EFI_ACPI_6_1_ROOT_SYSTEM_DESCRIPTION_POINTER_SIGNATURE  SIGNATURE_64('R', 'S', 'D', ' ', 'P', 'T', 'R', ' ')
 
 ///
 /// "APIC" Multiple APIC Description Table
@@ -2284,9 +2324,9 @@ typedef struct {
 #define EFI_ACPI_6_1_ISCSI_BOOT_FIRMWARE_TABLE_SIGNATURE  SIGNATURE_32('i', 'B', 'F', 'T')
 
 ///
-/// "IORT" Interrupt Source Override
+/// "IORT" I/O Remapping Table
 ///
-#define EFI_ACPI_6_1_INTERRUPT_SOURCE_OVERRIDE_SIGNATURE  SIGNATURE_32('I', 'O', 'R', 'T')
+#define EFI_ACPI_6_1_IO_REMAPPING_TABLE_SIGNATURE  SIGNATURE_32('I', 'O', 'R', 'T')
 
 ///
 /// "IVRS" I/O Virtualization Reporting Structure

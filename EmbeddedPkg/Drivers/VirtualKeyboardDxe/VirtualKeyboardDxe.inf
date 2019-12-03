@@ -1,0 +1,54 @@
+## @file
+# Virtual Keyboard driver.
+#
+#  Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2018, Linaro Ltd. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010019
+  BASE_NAME                      = VirtualKeyboardDxe
+  FILE_GUID                      = 88079b18-b42b-44aa-a6f2-b83911075e89
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = InitializeVirtualKeyboard
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64
+#
+#  DRIVER_BINDING                = gVirtualKeyboardDriverBinding
+#  COMPONENT_NAME                = gVirtualKeyboardComponentName
+#
+
+[Sources.common]
+  ComponentName.c
+  VirtualKeyboard.c
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  IoLib
+  ReportStatusCodeLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
+
+[Protocols]
+  gEfiDriverBindingProtocolGuid
+  gEfiSimpleTextInProtocolGuid
+  gEfiSimpleTextInputExProtocolGuid
+  gPlatformVirtualKeyboardProtocolGuid
+
+[Depex]
+  TRUE

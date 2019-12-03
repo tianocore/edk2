@@ -1,17 +1,11 @@
 /** @file
-  This contains all code necessary to build the GenFvImage.exe utility.       
+  This contains all code necessary to build the GenFvImage.exe utility.
   This utility relies heavily on the GenFvImage Lib.  Definitions for both
-  can be found in the Tiano Firmware Volume Generation Utility 
+  can be found in the Tiano Firmware Volume Generation Utility
   Specification, review draft.
 
-Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -38,7 +32,7 @@ EFI_GUID  mEfiFirmwareFileSystem2Guid = EFI_FIRMWARE_FILE_SYSTEM2_GUID;
 EFI_GUID  mEfiFirmwareFileSystem3Guid = EFI_FIRMWARE_FILE_SYSTEM3_GUID;
 
 STATIC
-VOID 
+VOID
 Version (
   VOID
 )
@@ -62,7 +56,7 @@ Returns:
 }
 
 STATIC
-VOID 
+VOID
 Usage (
   VOID
   )
@@ -86,11 +80,11 @@ Returns:
   // Summary usage
   //
   fprintf (stdout, "\nUsage: %s [options]\n\n", UTILITY_NAME);
-  
+
   //
   // Copyright declaration
-  // 
-  fprintf (stdout, "Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.\n\n");
+  //
+  fprintf (stdout, "Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.\n\n");
 
   //
   // Details Option
@@ -128,7 +122,7 @@ Returns:
                         FV base address when current FV base address is set.\n");
   fprintf (stdout, "  -m logfile, --map logfile\n\
                         Logfile is the output fv map file name. if it is not\n\
-                        given, the FvName.map will be the default map file name\n"); 
+                        given, the FvName.map will be the default map file name\n");
   fprintf (stdout, "  -g Guid, --guid Guid\n\
                         GuidValue is one specific capsule guid value\n\
                         or fv file system guid value.\n\
@@ -141,7 +135,7 @@ Returns:
                         Capsule OEM Flag is an integer between 0x0000 and 0xffff\n");
   fprintf (stdout, "  --capheadsize HeadSize\n\
                         HeadSize is one HEX or DEC format value\n\
-                        HeadSize is required by Capsule Image.\n");                        
+                        HeadSize is required by Capsule Image.\n");
   fprintf (stdout, "  -c, --capsule         Create Capsule Image.\n");
   fprintf (stdout, "  -p, --dump            Dump Capsule Image header.\n");
   fprintf (stdout, "  -v, --verbose         Turn on verbose output with informational messages.\n");
@@ -170,14 +164,14 @@ Arguments:
   FvInfFileName      The name of an FV image description file or Capsule Image.
 
   Arguments come in pair in any order.
-    -I FvInfFileName 
+    -I FvInfFileName
 
 Returns:
 
   EFI_SUCCESS            No error conditions detected.
   EFI_INVALID_PARAMETER  One or more of the input parameters is invalid.
-  EFI_OUT_OF_RESOURCES   A resource required by the utility was unavailable.  
-                         Most commonly this will be memory allocation 
+  EFI_OUT_OF_RESOURCES   A resource required by the utility was unavailable.
+                         Most commonly this will be memory allocation
                          or file creation.
   EFI_LOAD_ERROR         GenFvImage.lib could not be loaded.
   EFI_ABORTED            Error executing the GenFvImage lib.
@@ -216,7 +210,7 @@ Returns:
   Status        = EFI_SUCCESS;
 
   SetUtilityName (UTILITY_NAME);
-  
+
   if (argc == 1) {
     Error (NULL, 0, 1001, "Missing options", "No input options specified.");
     Usage ();
@@ -227,13 +221,13 @@ Returns:
   // Init global data to Zero
   //
   memset (&mFvDataInfo, 0, sizeof (FV_INFO));
-  memset (&mCapDataInfo, 0, sizeof (CAP_INFO)); 
+  memset (&mCapDataInfo, 0, sizeof (CAP_INFO));
   //
   // Set the default FvGuid
   //
   memcpy (&mFvDataInfo.FvFileSystemGuid, &mEfiFirmwareFileSystem2Guid, sizeof (EFI_GUID));
   mFvDataInfo.ForceRebase = -1;
-   
+
   //
   // Parse command line
   //
@@ -243,12 +237,12 @@ Returns:
   if ((stricmp (argv[0], "-h") == 0) || (stricmp (argv[0], "--help") == 0)) {
     Version ();
     Usage ();
-    return STATUS_SUCCESS;    
+    return STATUS_SUCCESS;
   }
 
   if (stricmp (argv[0], "--version") == 0) {
     Version ();
-    return STATUS_SUCCESS;    
+    return STATUS_SUCCESS;
   }
 
   while (argc > 0) {
@@ -260,7 +254,7 @@ Returns:
       }
       argc -= 2;
       argv += 2;
-      continue; 
+      continue;
     }
 
     if ((stricmp (argv[0], "-a") == 0) || (stricmp (argv[0], "--addrfile") == 0)) {
@@ -271,7 +265,7 @@ Returns:
       }
       argc -= 2;
       argv += 2;
-      continue; 
+      continue;
     }
 
     if ((stricmp (argv[0], "-o") == 0) || (stricmp (argv[0], "--outputfile") == 0)) {
@@ -282,54 +276,54 @@ Returns:
       }
       argc -= 2;
       argv += 2;
-      continue; 
+      continue;
     }
 
     if ((stricmp (argv[0], "-r") == 0) || (stricmp (argv[0], "--baseaddr") == 0)) {
       Status = AsciiStringToUint64 (argv[1], FALSE, &TempNumber);
       if (EFI_ERROR (Status)) {
         Error (NULL, 0, 1003, "Invalid option value", "%s = %s", argv[0], argv[1]);
-        return STATUS_ERROR;        
+        return STATUS_ERROR;
       }
       mFvDataInfo.BaseAddress    = TempNumber;
       mFvDataInfo.BaseAddressSet = TRUE;
       argc -= 2;
       argv += 2;
-      continue; 
+      continue;
     }
 
     if ((stricmp (argv[0], "-b") == 0) || (stricmp (argv[0], "--blocksize") == 0)) {
       Status = AsciiStringToUint64 (argv[1], FALSE, &TempNumber);
       if (EFI_ERROR (Status)) {
         Error (NULL, 0, 1003, "Invalid option value", "%s = %s", argv[0], argv[1]);
-        return STATUS_ERROR;        
+        return STATUS_ERROR;
       }
       if (TempNumber == 0) {
         Error (NULL, 0, 1003, "Invalid option value", "Fv block size can't be be set to zero");
-        return STATUS_ERROR;        
+        return STATUS_ERROR;
       }
       mFvDataInfo.FvBlocks[0].Length = (UINT32) TempNumber;
       DebugMsg (NULL, 0, 9, "FV Block Size", "%s = 0x%llx", EFI_BLOCK_SIZE_STRING, (unsigned long long) TempNumber);
       argc -= 2;
       argv += 2;
-      continue; 
+      continue;
     }
 
     if ((stricmp (argv[0], "-n") == 0) || (stricmp (argv[0], "--numberblock") == 0)) {
       Status = AsciiStringToUint64 (argv[1], FALSE, &TempNumber);
       if (EFI_ERROR (Status)) {
         Error (NULL, 0, 1003, "Invalid option value", "%s = %s", argv[0], argv[1]);
-        return STATUS_ERROR;        
+        return STATUS_ERROR;
       }
       if (TempNumber == 0) {
         Error (NULL, 0, 1003, "Invalid option value", "Fv block number can't be set to zero");
-        return STATUS_ERROR;        
+        return STATUS_ERROR;
       }
       mFvDataInfo.FvBlocks[0].NumBlocks = (UINT32) TempNumber;
       DebugMsg (NULL, 0, 9, "FV Number Block", "%s = 0x%llx", EFI_NUM_BLOCKS_STRING, (unsigned long long) TempNumber);
       argc -= 2;
       argv += 2;
-      continue; 
+      continue;
     }
 
     if ((strcmp (argv[0], "-f") == 0) || (stricmp (argv[0], "--ffsfile") == 0)) {
@@ -348,38 +342,38 @@ Returns:
       argv += 2;
 
       if (argc > 0) {
-		    if ((stricmp (argv[0], "-s") == 0) || (stricmp (argv[0], "--filetakensize") == 0)) {
-		      if (argv[1] == NULL) {
-		        Error (NULL, 0, 1003, "Invalid option value", "Ffsfile Size can't be null");
-		        return STATUS_ERROR;
-		      }
-		      Status = AsciiStringToUint64 (argv[1], FALSE, &TempNumber);
-		      if (EFI_ERROR (Status)) {
-		        Error (NULL, 0, 1003, "Invalid option value", "%s = %s", argv[0], argv[1]);
-		        return STATUS_ERROR;        
-		      }
-		      mFvDataInfo.SizeofFvFiles[Index] = (UINT32) TempNumber;
-	      	DebugMsg (NULL, 0, 9, "FV component file size", "the %uth size is %s", (unsigned) Index + 1, argv[1]);
-	      	argc -= 2;
-	      	argv += 2;
+        if ((stricmp (argv[0], "-s") == 0) || (stricmp (argv[0], "--filetakensize") == 0)) {
+          if (argv[1] == NULL) {
+            Error (NULL, 0, 1003, "Invalid option value", "Ffsfile Size can't be null");
+            return STATUS_ERROR;
+          }
+          Status = AsciiStringToUint64 (argv[1], FALSE, &TempNumber);
+          if (EFI_ERROR (Status)) {
+            Error (NULL, 0, 1003, "Invalid option value", "%s = %s", argv[0], argv[1]);
+            return STATUS_ERROR;
+          }
+          mFvDataInfo.SizeofFvFiles[Index] = (UINT32) TempNumber;
+          DebugMsg (NULL, 0, 9, "FV component file size", "the %uth size is %s", (unsigned) Index + 1, argv[1]);
+          argc -= 2;
+          argv += 2;
         }
       }
       Index ++;
-      continue; 
+      continue;
     }
 
     if ((stricmp (argv[0], "-s") == 0) || (stricmp (argv[0], "--filetakensize") == 0)) {
       Error (NULL, 0, 1003, "Invalid option", "It must be specified together with -f option to specify the file size.");
-      return STATUS_ERROR; 
+      return STATUS_ERROR;
     }
 
     if ((stricmp (argv[0], "-c") == 0) || (stricmp (argv[0], "--capsule") == 0)) {
       CapsuleFlag = TRUE;
       argc --;
       argv ++;
-      continue; 
+      continue;
     }
-  
+
     if ((strcmp (argv[0], "-F") == 0) || (stricmp (argv[0], "--force-rebase") == 0)) {
       if (argv[1] == NULL) {
         Error (NULL, 0, 1003, "Invalid option value", "Froce rebase flag can't be null");
@@ -397,8 +391,8 @@ Returns:
 
       argc -= 2;
       argv += 2;
-      continue; 
-    } 
+      continue;
+    }
 
     if (stricmp (argv[0], "--capheadsize") == 0) {
       //
@@ -407,13 +401,13 @@ Returns:
       Status = AsciiStringToUint64 (argv[1], FALSE, &TempNumber);
       if (EFI_ERROR (Status)) {
         Error (NULL, 0, 1003, "Invalid option value", "%s = %s", argv[0], argv[1]);
-        return STATUS_ERROR;        
+        return STATUS_ERROR;
       }
       mCapDataInfo.HeaderSize = (UINT32) TempNumber;
       DebugMsg (NULL, 0, 9, "Capsule Header size", "%s = 0x%llx", EFI_CAPSULE_HEADER_SIZE_STRING, (unsigned long long) TempNumber);
       argc -= 2;
       argv += 2;
-      continue; 
+      continue;
     }
 
     if (stricmp (argv[0], "--capflag") == 0) {
@@ -437,7 +431,7 @@ Returns:
       DebugMsg (NULL, 0, 9, "Capsule Flag", argv[1]);
       argc -= 2;
       argv += 2;
-      continue; 
+      continue;
     }
 
     if (stricmp (argv[0], "--capoemflag") == 0) {
@@ -468,7 +462,7 @@ Returns:
       DebugMsg (NULL, 0, 9, "Capsule Guid", "%s = %s", EFI_CAPSULE_GUID_STRING, argv[1]);
       argc -= 2;
       argv += 2;
-      continue; 
+      continue;
     }
 
     if ((stricmp (argv[0], "-g") == 0) || (stricmp (argv[0], "--guid") == 0)) {
@@ -486,7 +480,7 @@ Returns:
       DebugMsg (NULL, 0, 9, "FV Guid", "%s = %s", EFI_FV_FILESYSTEMGUID_STRING, argv[1]);
       argc -= 2;
       argv += 2;
-      continue; 
+      continue;
     }
 
     if (stricmp (argv[0], "--FvNameGuid") == 0) {
@@ -502,14 +496,14 @@ Returns:
       DebugMsg (NULL, 0, 9, "FV Name Guid", "%s = %s", EFI_FV_NAMEGUID_STRING, argv[1]);
       argc -= 2;
       argv += 2;
-      continue; 
+      continue;
     }
 
     if ((stricmp (argv[0], "-p") == 0) || (stricmp (argv[0], "--dump") == 0)) {
       DumpCapsule = TRUE;
       argc --;
       argv ++;
-      continue; 
+      continue;
     }
 
     if ((stricmp (argv[0], "-m") == 0) || (stricmp (argv[0], "--map") == 0)) {
@@ -520,7 +514,7 @@ Returns:
       }
       argc -= 2;
       argv += 2;
-      continue; 
+      continue;
     }
 
     if ((stricmp (argv[0], "-v") == 0) || (stricmp (argv[0], "--verbose") == 0)) {
@@ -564,7 +558,7 @@ Returns:
   }
 
   VerboseMsg ("%s tool start.", UTILITY_NAME);
-  
+
   //
   // check input parameter, InfFileName can be NULL
   //
@@ -581,7 +575,7 @@ Returns:
   if (OutFileName != NULL) {
     VerboseMsg ("the output file name is %s", OutFileName);
   }
-  
+
   //
   // Read the INF file image
   //
@@ -591,7 +585,7 @@ Returns:
       return STATUS_ERROR;
     }
   }
-  
+
   if (DumpCapsule) {
     VerboseMsg ("Dump the capsule header information for the input capsule image %s", InfFileName);
     //
@@ -607,23 +601,25 @@ Returns:
         return STATUS_ERROR;
       }
     }
-    fprintf (FpFile, "Capsule %s Image Header Information\n", InfFileName);
-    fprintf (FpFile, "  GUID                  %08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X\n", 
-                    (unsigned) CapsuleHeader->CapsuleGuid.Data1,
-                    (unsigned) CapsuleHeader->CapsuleGuid.Data2,
-                    (unsigned) CapsuleHeader->CapsuleGuid.Data3,
-                    (unsigned) CapsuleHeader->CapsuleGuid.Data4[0],
-                    (unsigned) CapsuleHeader->CapsuleGuid.Data4[1],
-                    (unsigned) CapsuleHeader->CapsuleGuid.Data4[2],
-                    (unsigned) CapsuleHeader->CapsuleGuid.Data4[3],
-                    (unsigned) CapsuleHeader->CapsuleGuid.Data4[4],
-                    (unsigned) CapsuleHeader->CapsuleGuid.Data4[5],
-                    (unsigned) CapsuleHeader->CapsuleGuid.Data4[6],
-                    (unsigned) CapsuleHeader->CapsuleGuid.Data4[7]);
-    fprintf (FpFile, "  Header size           0x%08X\n", (unsigned) CapsuleHeader->HeaderSize);
-    fprintf (FpFile, "  Flags                 0x%08X\n", (unsigned) CapsuleHeader->Flags);
-    fprintf (FpFile, "  Capsule image size    0x%08X\n", (unsigned) CapsuleHeader->CapsuleImageSize);
-    fclose (FpFile);
+    if (FpFile != NULL) {
+      fprintf (FpFile, "Capsule %s Image Header Information\n", InfFileName);
+      fprintf (FpFile, "  GUID                  %08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X\n",
+                      (unsigned) CapsuleHeader->CapsuleGuid.Data1,
+                      (unsigned) CapsuleHeader->CapsuleGuid.Data2,
+                      (unsigned) CapsuleHeader->CapsuleGuid.Data3,
+                      (unsigned) CapsuleHeader->CapsuleGuid.Data4[0],
+                      (unsigned) CapsuleHeader->CapsuleGuid.Data4[1],
+                      (unsigned) CapsuleHeader->CapsuleGuid.Data4[2],
+                      (unsigned) CapsuleHeader->CapsuleGuid.Data4[3],
+                      (unsigned) CapsuleHeader->CapsuleGuid.Data4[4],
+                      (unsigned) CapsuleHeader->CapsuleGuid.Data4[5],
+                      (unsigned) CapsuleHeader->CapsuleGuid.Data4[6],
+                      (unsigned) CapsuleHeader->CapsuleGuid.Data4[7]);
+      fprintf (FpFile, "  Header size           0x%08X\n", (unsigned) CapsuleHeader->HeaderSize);
+      fprintf (FpFile, "  Flags                 0x%08X\n", (unsigned) CapsuleHeader->Flags);
+      fprintf (FpFile, "  Capsule image size    0x%08X\n", (unsigned) CapsuleHeader->CapsuleImageSize);
+      fclose (FpFile);
+    }
   } else if (CapsuleFlag) {
     VerboseMsg ("Create capsule image");
     //
@@ -634,7 +630,7 @@ Returns:
     }
 
     Status = GenerateCapImage (
-              InfFileImage, 
+              InfFileImage,
               InfFileSize,
               OutFileName
               );
@@ -665,7 +661,7 @@ Returns:
   if (InfFileImage != NULL) {
     free (InfFileImage);
   }
-  
+
   //
   //  update boot driver address and runtime driver address in address file
   //
@@ -687,7 +683,7 @@ Returns:
     fflush (FpFile);
     fclose (FpFile);
   }
-  
+
   if (Status == EFI_SUCCESS) {
     DebugMsg (NULL, 0, 9, "The Total Fv Size", "%s = 0x%x", EFI_FV_TOTAL_SIZE_STRING, (unsigned) mFvTotalSize);
     DebugMsg (NULL, 0, 9, "The used Fv Size", "%s = 0x%x", EFI_FV_TAKEN_SIZE_STRING, (unsigned) mFvTakenSize);

@@ -2,13 +2,8 @@
   This file contains AML code definition in the latest ACPI spec.
 
   Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2019, ARM Limited. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -36,6 +31,7 @@
 #define AML_PACKAGE_OP               0x12
 #define AML_VAR_PACKAGE_OP           0x13
 #define AML_METHOD_OP                0x14
+#define AML_EXTERNAL_OP              0x15
 #define AML_DUAL_NAME_PREFIX         0x2e
 #define AML_MULTI_NAME_PREFIX        0x2f
 #define AML_NAME_CHAR_A              0x41

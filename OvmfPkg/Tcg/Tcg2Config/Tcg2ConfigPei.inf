@@ -1,0 +1,47 @@
+## @file
+# Set TPM device type
+#
+# In SecurityPkg, this module initializes the TPM device type based on a UEFI
+# variable and/or hardware detection. In OvmfPkg, the module only performs TPM2
+# hardware detection.
+#
+# Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (C) 2018, Red Hat, Inc.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Tcg2ConfigPei
+  FILE_GUID                      = BF7F2B0C-9F2F-4889-AB5C-12460022BE87
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = Tcg2ConfigPeimEntryPoint
+
+[Sources]
+  Tcg2ConfigPeim.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  PeimEntryPoint
+  DebugLib
+  PeiServicesLib
+  Tpm2DeviceLib
+
+[Guids]
+  gEfiTpmDeviceSelectedGuid           ## PRODUCES ## GUID # Used as a PPI GUID
+  gEfiTpmDeviceInstanceTpm20DtpmGuid  ## SOMETIMES_CONSUMES
+
+[Ppis]
+  gPeiTpmInitializationDonePpiGuid    ## SOMETIMES_PRODUCES
+
+[Pcd]
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid                 ## PRODUCES
+
+[Depex]
+  TRUE

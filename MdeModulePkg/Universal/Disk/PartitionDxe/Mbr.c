@@ -3,23 +3,18 @@
 
   MBR - Master Boot Record is in the first sector of a partitioned hard disk.
         The MBR supports four partitions per disk. The MBR also contains legacy
-        code that is not run on an EFI system. The legacy code reads the 
-        first sector of the active partition into memory and 
+        code that is not run on an EFI system. The legacy code reads the
+        first sector of the active partition into memory and
 
-  BPB - BIOS Parameter Block is in the first sector of a FAT file system. 
-        The BPB contains information about the FAT file system. The BPB is 
+  BPB - BIOS Parameter Block is in the first sector of a FAT file system.
+        The BPB contains information about the FAT file system. The BPB is
         always on the first sector of a media. The first sector also contains
         the legacy boot strap code.
 
+Copyright (c) 2018 Qualcomm Datacenter Technologies, Inc.
 Copyright (c) 2014, Hewlett-Packard Development Company, L.P.<BR>
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -30,7 +25,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @param  Mbr         Parent Handle.
   @param  LastLba     Last Lba address on the device.
-   
+
   @retval TRUE        Mbr is a Valid MBR.
   @retval FALSE       Mbr is not a Valid MBR.
 
@@ -75,7 +70,7 @@ PartitionValidMbr (
       // return FALSE since no block devices on a system are implemented
       // with INT 13h
       //
-    
+
       DEBUG((EFI_D_INFO, "PartitionValidMbr: Bad MBR partition size EndingLBA(%1x) > LastLBA(%1x)\n", EndingLBA, LastLba));
 
       return FALSE;
@@ -112,7 +107,7 @@ PartitionValidMbr (
   @param[in]  BlockIo           Parent BlockIo interface.
   @param[in]  BlockIo2          Parent BlockIo2 interface.
   @param[in]  DevicePath        Parent Device Path.
-   
+
   @retval EFI_SUCCESS       A child handle was added.
   @retval EFI_MEDIA_CHANGED Media change was detected.
   @retval Others            MBR partition was not found.
@@ -129,24 +124,32 @@ PartitionInstallMbrChildHandles (
   IN  EFI_DEVICE_PATH_PROTOCOL     *DevicePath
   )
 {
-  EFI_STATUS                Status;
-  MASTER_BOOT_RECORD        *Mbr;
-  UINT32                    ExtMbrStartingLba;
-  UINT32                    Index;
-  HARDDRIVE_DEVICE_PATH     HdDev;
-  HARDDRIVE_DEVICE_PATH     ParentHdDev;
-  EFI_STATUS                Found;
-  EFI_DEVICE_PATH_PROTOCOL  *DevicePathNode;
-  EFI_DEVICE_PATH_PROTOCOL  *LastDevicePathNode;
-  UINT32                    BlockSize;
-  UINT32                    MediaId;
-  EFI_LBA                   LastBlock;
+  EFI_STATUS                   Status;
+  MASTER_BOOT_RECORD           *Mbr;
+  UINT32                       ExtMbrStartingLba;
+  UINT32                       Index;
+  HARDDRIVE_DEVICE_PATH        HdDev;
+  HARDDRIVE_DEVICE_PATH        ParentHdDev;
+  EFI_STATUS                   Found;
+  EFI_DEVICE_PATH_PROTOCOL     *DevicePathNode;
+  EFI_DEVICE_PATH_PROTOCOL     *LastDevicePathNode;
+  UINT32                       BlockSize;
+  UINT32                       MediaId;
+  EFI_LBA                      LastBlock;
+  EFI_PARTITION_INFO_PROTOCOL  PartitionInfo;
 
   Found           = EFI_NOT_FOUND;
 
   BlockSize = BlockIo->Media->BlockSize;
   MediaId   = BlockIo->Media->MediaId;
   LastBlock = BlockIo->Media->LastBlock;
+
+  //
+  // Ensure the block size can hold the MBR
+  //
+  if (BlockSize < sizeof (MASTER_BOOT_RECORD)) {
+    return EFI_NOT_FOUND;
+  }
 
   Mbr = AllocatePool (BlockSize);
   if (Mbr == NULL) {
@@ -213,9 +216,9 @@ PartitionInstallMbrChildHandles (
       if (Mbr->Partition[Index].OSIndicator == PMBR_GPT_PARTITION) {
         //
         // This is the guard MBR for the GPT. If you ever see a GPT disk with zero partitions you can get here.
-        //  We can not produce an MBR BlockIo for this device as the MBR spans the GPT headers. So formating 
+        //  We can not produce an MBR BlockIo for this device as the MBR spans the GPT headers. So formating
         //  this BlockIo would corrupt the GPT structures and require a recovery that would corrupt the format
-        //  that corrupted the GPT partition. 
+        //  that corrupted the GPT partition.
         //
         continue;
       }
@@ -224,6 +227,14 @@ PartitionInstallMbrChildHandles (
       HdDev.PartitionStart  = UNPACK_UINT32 (Mbr->Partition[Index].StartingLBA);
       HdDev.PartitionSize   = UNPACK_UINT32 (Mbr->Partition[Index].SizeInLBA);
       CopyMem (HdDev.Signature, &(Mbr->UniqueMbrSignature[0]), sizeof (Mbr->UniqueMbrSignature));
+
+      ZeroMem (&PartitionInfo, sizeof (EFI_PARTITION_INFO_PROTOCOL));
+      PartitionInfo.Revision = EFI_PARTITION_INFO_PROTOCOL_REVISION;
+      PartitionInfo.Type     = PARTITION_TYPE_MBR;
+      if (Mbr->Partition[Index].OSIndicator == EFI_PARTITION) {
+        PartitionInfo.System = 1;
+      }
+      CopyMem (&PartitionInfo.Info.Mbr, &Mbr->Partition[Index], sizeof (MBR_PARTITION_RECORD));
 
       Status = PartitionInstallChildHandle (
                 This,
@@ -234,10 +245,11 @@ PartitionInstallMbrChildHandles (
                 BlockIo2,
                 DevicePath,
                 (EFI_DEVICE_PATH_PROTOCOL *) &HdDev,
+                &PartitionInfo,
                 HdDev.PartitionStart,
                 HdDev.PartitionStart + HdDev.PartitionSize - 1,
                 MBR_SIZE,
-                (BOOLEAN) (Mbr->Partition[Index].OSIndicator == EFI_PARTITION)
+                ((Mbr->Partition[Index].OSIndicator == EFI_PARTITION) ? &gEfiPartTypeSystemPartGuid: NULL)
                 );
 
       if (!EFI_ERROR (Status)) {
@@ -288,6 +300,14 @@ PartitionInstallMbrChildHandles (
       //
       *((UINT32 *) &HdDev.Signature[0]) = 0;
 
+      ZeroMem (&PartitionInfo, sizeof (EFI_PARTITION_INFO_PROTOCOL));
+      PartitionInfo.Revision = EFI_PARTITION_INFO_PROTOCOL_REVISION;
+      PartitionInfo.Type     = PARTITION_TYPE_MBR;
+      if (Mbr->Partition[0].OSIndicator == EFI_PARTITION) {
+        PartitionInfo.System = 1;
+      }
+      CopyMem (&PartitionInfo.Info.Mbr, &Mbr->Partition[0], sizeof (MBR_PARTITION_RECORD));
+
       Status = PartitionInstallChildHandle (
                  This,
                  Handle,
@@ -297,10 +317,11 @@ PartitionInstallMbrChildHandles (
                  BlockIo2,
                  DevicePath,
                  (EFI_DEVICE_PATH_PROTOCOL *) &HdDev,
+                 &PartitionInfo,
                  HdDev.PartitionStart - ParentHdDev.PartitionStart,
                  HdDev.PartitionStart - ParentHdDev.PartitionStart + HdDev.PartitionSize - 1,
                  MBR_SIZE,
-                 (BOOLEAN) (Mbr->Partition[0].OSIndicator == EFI_PARTITION)
+                 ((Mbr->Partition[0].OSIndicator == EFI_PARTITION) ? &gEfiPartTypeSystemPartGuid: NULL)
                  );
       if (!EFI_ERROR (Status)) {
         Found = EFI_SUCCESS;

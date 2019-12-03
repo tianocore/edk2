@@ -1,15 +1,9 @@
 ## @file
 # Source Level Debug Package.
 #
-# Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 #
-#    This program and the accompanying materials
-#    are licensed and made available under the terms and conditions of the BSD License
-#    which accompanies this distribution. The full text of the license may be found at
-#    http://opensource.org/licenses/bsd-license.php
-#
-#    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-#    WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#    SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
 
@@ -30,7 +24,7 @@
 
 [LibraryClasses.common]
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
-  DebugPrintErrorLevelLib|MdePkg/Library/BaseDebugPrintErrorLevelLib/BaseDebugPrintErrorLevelLib.inf  
+  DebugPrintErrorLevelLib|MdePkg/Library/BaseDebugPrintErrorLevelLib/BaseDebugPrintErrorLevelLib.inf
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
   BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
@@ -99,6 +93,8 @@
 ###################################################################################################
 
 [Components.common]
+  SourceLevelDebugPkg/Library/DebugCommunicationLibUsb3/DebugCommunicationLibUsb3Dxe.inf
+  SourceLevelDebugPkg/Library/DebugCommunicationLibUsb3/DebugCommunicationLibUsb3Pei.inf
   SourceLevelDebugPkg/Library/DebugCommunicationLibSerialPort/DebugCommunicationLibSerialPort.inf
   SourceLevelDebugPkg/Library/DebugCommunicationLibUsb/DebugCommunicationLibUsb.inf
   SourceLevelDebugPkg/Library/PeCoffExtraActionLibDebug/PeCoffExtraActionLibDebug.inf

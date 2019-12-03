@@ -1,0 +1,37 @@
+#/** @file
+#
+#  Implement virtual EFI RealTimeClock runtime services.
+#
+#  Copyright (c) 2019, Pete Batard <pete@akeo.ie>
+#  Copyright (c) 2018, Andrei Warkentin <andrey.warkentin@gmail.com>
+#  Copyright (c) Microsoft Corporation. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = VirtualRealTimeClockLib
+  FILE_GUID                      = 1E27D461-78F3-4F7D-B1C2-F72384F13A6E
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = RealTimeClockLib
+
+[Sources.common]
+  VirtualRealTimeClockLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+
+[LibraryClasses]
+  IoLib
+  DebugLib
+  TimerLib
+  TimeBaseLib
+  UefiRuntimeLib
+
+# Current usage of this library expects GCC in a UNIX-like shell environment with the date command
+[BuildOptions]
+  GCC:*_*_*_CC_FLAGS = -DBUILD_EPOCH=`date +%s`

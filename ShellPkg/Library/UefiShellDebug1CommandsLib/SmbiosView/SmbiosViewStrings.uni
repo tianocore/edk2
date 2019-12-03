@@ -1,15 +1,9 @@
 // /**
 //
-// Copyright (c) 2005 - 2015, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
 // (C) Copyright 2014-2015 Hewlett-Packard Development Company, L.P.<BR>
-// (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
-// This program and the accompanying materials
-// are licensed and made available under the terms and conditions of the BSD License
-// which accompanies this distribution. The full text of the license may be found at
-// http://opensource.org/licenses/bsd-license.php
-//
-// THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-// WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+// (C) Copyright 2015-2019 Hewlett Packard Enterprise Development LP<BR>
+// SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Module Name:
 //
@@ -104,6 +98,11 @@
 #string STR_SMBIOSVIEW_PRINTINFO_INSTALLED                      #language en-US "Installed "
 #string STR_SMBIOSVIEW_PRINTINFO_ENABLED                        #language en-US "Enabled "
 #string STR_SMBIOSVIEW_PRINTINFO_EXTERNAL                       #language en-US "External "
+#string STR_SMBIOSVIEW_PRINTINFO_SLOT_PEER_GROUPS               #language en-US "Peer Groups %d:\r\n"
+#string STR_SMBIOSVIEW_PRINTINFO_SEGMENT_GROUP_NUM              #language en-US "  SegmentGroup Num: 0x%04x\r\n"
+#string STR_SMBIOSVIEW_PRINTINFO_BUS_NUM                        #language en-US "  Bus Num:          0x%02x\r\n"
+#string STR_SMBIOSVIEW_PRINTINFO_DEV_FUNC_NUM                   #language en-US "  DevFunc Num:      0x%02x\r\n"
+#string STR_SMBIOSVIEW_PRINTINFO_DATA_BUS_WIDTH                 #language en-US "  DataBus Width:    %d\r\n"
 #string STR_SMBIOSVIEW_PRINTINFO_DESC_STRING                    #language en-US "Description String: "
 #string STR_SMBIOSVIEW_PRINTINFO_SUPOPRTED_EVENT                #language en-US "Supported Event Log Type Descriptors %d:\r\n"
 #string STR_SMBIOSVIEW_PRINTINFO_ACCESS_METHOD_NOT_SUPOPRTED    #language en-US "Access Method %d has not supported\r\n"
@@ -133,7 +132,7 @@
 #string STR_SMBIOSVIEW_PRINTINFO_SELECTED_BOOT_SUPPORTED        #language en-US "Selectable Boot is supported\r\n"
 #string STR_SMBIOSVIEW_PRINTINFO_BIOS_ROM_SOCKETED              #language en-US "BIOS ROM is socketed\r\n"
 #string STR_SMBIOSVIEW_PRINTINFO_BOOT_FROM_PC_CARD              #language en-US "Boot From PC Card(PCMCIA)is supported\r\n"
-#string STR_SMBIOSVIEW_PRINTINFO_EDD_ENHANCED_DRIVER            #language en-US "EDD Enhanced Disk Driver) Specification is supported\r\n"
+#string STR_SMBIOSVIEW_PRINTINFO_EDD_ENHANCED_DRIVER            #language en-US "EDD (Enhanced Disk Driver) Specification is supported\r\n"
 #string STR_SMBIOSVIEW_PRINTINFO_JAPANESE_FLOPPY_NEC            #language en-US "Int 13h - Japanese Floppy for NEC 9800 1.2mb (3.5\",1k Bytes/Sector, 360 RPM) is supported\r\n"
 #string STR_SMBIOSVIEW_PRINTINFO_JAPANESE_FLOPPY_TOSHIBA        #language en-US "Int 13h - Japanese Floppy for Toshiba 1.2mn (3.5\", 360 RPM) is supported\r\n"
 #string STR_SMBIOSVIEW_PRINTINFO_FLOPPY_SERVICES_SUPPORTED      #language en-US "Int 13h - 5.25\"/360KB Floppy Services are supported\r\n"
@@ -380,6 +379,7 @@
 #string STR_SMBIOSVIEW_PRINTINFO_POWER_SUPPLY_REPLACE           #language en-US "Power supply is hot replaceable\r\n"
 #string STR_SMBIOSVIEW_PRINTINFO_POWER_SUPPLY_NOT_REPLACE       #language en-US "Power supply is not hot replaceable\r\n"
 #string STR_SMBIOSVIEW_PRINTINFO_BIOS_SIZE                      #language en-US "BiosSize:  %d KB\r\n"
+#string STR_SMBIOSVIEW_PRINTINFO_EXTENDED_BIOS_SIZE             #language en-US "ExtendedBiosSize:  %d %s\r\n"
 #string STR_SMBIOSVIEW_QUERYTABLE_NO_INFO                       #language en-US "No Info"
 #string STR_SMBIOSVIEW_QUERYTABLE_RSVD_BITS_SET                 #language en-US "\r\nIt also has reserved bits set 1 --- reserved bits: 0x%x"
 #string STR_SMBIOSVIEW_QUERYTABLE_SYSTEM_WAKEUP_TYPE            #language en-US "System Wakeup Type:"
@@ -426,6 +426,8 @@
 #string STR_SMBIOSVIEW_QUERYTABLE_MEM_DEVICE_FORM_FACTOR        #language en-US "Memory Device - Form Factor: "
 #string STR_SMBIOSVIEW_QUERYTABLE_MEM_DEVICE_TYPE               #language en-US "Memory Device - Type: "
 #string STR_SMBIOSVIEW_QUERYTABLE_MEM_DEVICE_TYPE_DETAIL        #language en-US "Memory Device - Type Detail: "
+#string STR_SMBIOSVIEW_QUERYTABLE_MEM_DEVICE_MEMORY_TECHNOLOGY  #language en-US "Memory Device - Memory Technology: "
+#string STR_SMBIOSVIEW_QUERYTABLE_MEM_DEVICE_MEM_OPER_MODE_CAPA #language en-US "Memory Device - Memory Operating Mode Capability: "
 #string STR_SMBIOSVIEW_QUERYTABLE_MEM_ERROR_INFO                #language en-US "32-bit Memory Error Information - Type: "
 #string STR_SMBIOSVIEW_QUERYTABLE_MEM_ERROR_GRANULARITY         #language en-US "Memory Error - Error granularity: "
 #string STR_SMBIOSVIEW_QUERYTABLE_MEM_ERROR_OP                  #language en-US "Memory Error - Error Operation: "
@@ -443,7 +445,9 @@
 #string STR_SMBIOSVIEW_QUERYTABLE_MANAGEMENT_DEV_ADDR_TYPE      #language en-US "Management Device - Address Type:"
 #string STR_SMBIOSVIEW_QUERYTABLE_MEM_CHANNEL_TYPE              #language en-US "Memory Channel Type:"
 #string STR_SMBIOSVIEW_QUERYTABLE_BMC_INTERFACE_TYPE            #language en-US "BMC Interface Type:"
+#string STR_SMBIOSVIEW_QUERYTABLE_MC_HOST_INTERFACE_TYPE        #language en-US "MC Host Interface Type:"
 #string STR_SMBIOSVIEW_QUERYTABLE_STRUCT_TYPE                   #language en-US "Structure Type:"
+#string STR_SMBIOSVIEW_QUERYTABLE_PROCESSOR_ARCH_TYPE           #language en-US "Processor Architecture Type:"
 #string STR_SMBIOSVIEW_SMBIOSVIEW_ONE_VAR_ARGV                  #language en-US "%s "
 #string STR_SMBIOSVIEW_SMBIOSVIEW_QUERY_STRUCT_COND             #language en-US "Query Structure, conditions are:\r\n"
 #string STR_SMBIOSVIEW_SMBIOSVIEW_QUERYTYPE_RANDOM              #language en-US "QueryType   = Random \r\n"
@@ -488,4 +492,10 @@
 #string STR_SMBIOSVIEW_SMBIOSVIEW_SMBIOS_TABLE                  #language en-US "SmbiosView: SMBIOS table damaged\r\n"
 #string STR_SMBIOSVIEW_SMBIOSVIEW_OUT_OF_MEM                    #language en-US "SmbiosView: Out of memory\r\n"
 #string STR_SMBIOSVIEW_SMBIOSVIEW_CANNOT_ACCESS_STATS           #language en-US "SmbiosView: Cannot access statistics table\r\n"
+#string STR_SMBIOSVIEW_PRINTINFO_TPM_DEVICE_CHAR                #language en-US "TPM Device Characteristics: \r\n"
+#string STR_SMBIOSVIEW_PRINTINFO_TPM_DEVICE_CHAR_NOT_SUPPORTED  #language en-US "TPM Device Characteristics Not Supported\r\n"
+#string STR_SMBIOSVIEW_PRINTINFO_TPM_DEVICE_CONFIG_FWU          #language en-US "Family configurable via firmware update\r\n"
+#string STR_SMBIOSVIEW_PRINTINFO_TPM_DEVICE_CONFIG_PLAT_SW      #language en-US "Family configurable via platform software support\r\n"
+#string STR_SMBIOSVIEW_PRINTINFO_TPM_DEVICE_CONFIG_OEM          #language en-US "Family configurable via OEM proprietary mechanism\r\n"
+#string STR_SMBIOSVIEW_PRINTINFO_BITS_06_63                     #language en-US "Bits 6:63 are reserved\r\n"
 

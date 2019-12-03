@@ -2,15 +2,9 @@
   Dhcp6 support functions implementation.
 
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -64,11 +58,11 @@ Dhcp6GenerateClientId (
   //
   // If System UUID is found from SMBIOS Table, use DUID-UUID type.
   //
-  if ((PcdGet8 (PcdDhcp6UidType) == Dhcp6DuidTypeUuid) && !EFI_ERROR (NetLibGetSystemGuid (&Uuid))) {
+  if ((PcdGet8 (PcdDhcp6UidType) == Dhcp6DuidTypeUuid) && !EFI_ERROR (NetLibGetSystemGuid (&Uuid)) && !CompareGuid (&Uuid, &gZeroGuid)) {
     //
     //
     //  The format of DUID-UUID:
-    //   
+    //
     //    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
     //   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
     //   |          DUID-Type (4)        |    UUID (128 bits)            |
@@ -91,16 +85,16 @@ Dhcp6GenerateClientId (
     // sizeof (Duid-type + UUID-size) = 18 bytes
     //
     Duid->Length = (UINT16) (18);
-  
+
     //
     // Set the Duid-type and copy UUID.
     //
     WriteUnaligned16 ((UINT16 *) (Duid->Duid), HTONS (Dhcp6DuidTypeUuid));
-  
+
     CopyMem (Duid->Duid + 2, &Uuid, sizeof(EFI_GUID));
 
   } else {
-      
+
     //
     //
     //  The format of DUID-LLT:
@@ -123,7 +117,7 @@ Dhcp6GenerateClientId (
     gRT->GetTime (&Time, NULL);
     Stamp = (UINT32)
       (
-        (((((Time.Year - 2000) * 360 + (Time.Month - 1)) * 30 + (Time.Day - 1)) * 24 + Time.Hour) * 60 + Time.Minute) *
+        ((((UINT32)(Time.Year - 2000) * 360 + (Time.Month - 1) * 30 + (Time.Day - 1)) * 24 + Time.Hour) * 60 + Time.Minute) *
         60 +
         Time.Second
       );
@@ -135,12 +129,12 @@ Dhcp6GenerateClientId (
     if (Duid == NULL) {
       return NULL;
     }
-  
+
     //
     // sizeof (Duid-type + hardware-type + time) = 8 bytes
     //
     Duid->Length = (UINT16) (Mode->HwAddressSize + 8);
-  
+
     //
     // Set the Duid-type, hardware-type, time and copy the hardware address.
     //
@@ -687,7 +681,7 @@ Dhcp6AppendIaAddrOption (
   //      .                        IAaddr-options                         .
   //      .                                                               .
   //      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-  
+
   //
   // Fill the value of Ia Address option type
   //
@@ -881,14 +875,14 @@ SetElapsedTime (
   // Generate a time stamp of the centiseconds from 2000/1/1, assume 30day/month.
   //
   gRT->GetTime (&Time, NULL);
-  CurrentStamp = (UINT64)
-    (
-      ((((((Time.Year - 2000) * 360 +
-       (Time.Month - 1)) * 30 +
-       (Time.Day - 1)) * 24 + Time.Hour) * 60 +
-       Time.Minute) * 60 + Time.Second) * 100
-       + DivU64x32(Time.Nanosecond, 10000000)
-    );
+  CurrentStamp = MultU64x32 (
+                   ((((UINT32)(Time.Year - 2000) * 360 + (Time.Month - 1) * 30 + (Time.Day - 1)) * 24 + Time.Hour) * 60 + Time.Minute) * 60 + Time.Second,
+                   100
+                   ) +
+                 DivU64x32(
+                   Time.Nanosecond,
+                   10000000
+                   );
 
   //
   // Sentinel value of 0 means that this is the first DHCP packet that we are
@@ -1000,7 +994,7 @@ Dhcp6SeekIaOption (
 }
 
 /**
-  Check whether the incoming IPv6 address in IaAddr is one of the maintained 
+  Check whether the incoming IPv6 address in IaAddr is one of the maintained
   addresses in the IA control blcok.
 
   @param[in]  IaAddr            The pointer to the IA Address to be checked.
@@ -1019,7 +1013,7 @@ Dhcp6AddrIsInCurrentIa (
   UINT32    Index;
 
   ASSERT (IaAddr != NULL && CurrentIa != NULL);
-  
+
   for (Index = 0; Index < CurrentIa->IaAddressCount; Index++) {
     if (EFI_IP6_EQUAL(&IaAddr->IpAddress, &CurrentIa->IaAddress[Index].IpAddress)) {
       return TRUE;
@@ -1303,7 +1297,7 @@ EFI_STATUS
 Dhcp6GetMappingTimeOut (
   IN  EFI_IP6_CONFIG_PROTOCOL       *Ip6Cfg,
   OUT UINTN                         *TimeOut
-  ) 
+  )
 {
   EFI_STATUS            Status;
   UINTN                 DataSize;
@@ -1323,8 +1317,8 @@ Dhcp6GetMappingTimeOut (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  
+
   *TimeOut = TICKS_PER_SECOND * DadXmits.DupAddrDetectTransmits + DHCP6_DAD_ADDITIONAL_DELAY;
-  
+
   return EFI_SUCCESS;
 }

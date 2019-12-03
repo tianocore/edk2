@@ -1,14 +1,9 @@
 ## @file
 #  PeCoffExtraAction Library to support source level debug.
 #
-#  Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 #
-#  This program and the accompanying materials
-#  are licensed and made available under the terms and conditions of the BSD License
-#  which accompanies this distribution. The full text of the license may be found at
-#  http://opensource.org/licenses/bsd-license.php.
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 #
 ##
@@ -34,15 +29,11 @@
 
 [Sources.IA32]
   Ia32/IntHandlerFuncs.c
-  Ia32/IntHandler.asm
   Ia32/IntHandler.nasm
-  Ia32/IntHandler.S
 
 [Sources.X64]
   X64/IntHandlerFuncs.c
-  X64/IntHandler.asm
   X64/IntHandler.nasm
-  X64/IntHandler.S
 
 [Packages]
   MdePkg/MdePkg.dec

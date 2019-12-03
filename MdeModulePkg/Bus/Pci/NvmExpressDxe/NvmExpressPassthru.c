@@ -3,14 +3,8 @@
   NVM Express specification.
 
   (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -317,6 +311,100 @@ EXIT:
 
 
 /**
+  Aborts the asynchronous PassThru requests.
+
+  @param[in] Private        The pointer to the NVME_CONTROLLER_PRIVATE_DATA
+                            data structure.
+
+  @retval EFI_SUCCESS       The asynchronous PassThru requests have been aborted.
+  @return EFI_DEVICE_ERROR  Fail to abort all the asynchronous PassThru requests.
+
+**/
+EFI_STATUS
+AbortAsyncPassThruTasks (
+  IN NVME_CONTROLLER_PRIVATE_DATA    *Private
+  )
+{
+  EFI_PCI_IO_PROTOCOL                *PciIo;
+  LIST_ENTRY                         *Link;
+  LIST_ENTRY                         *NextLink;
+  NVME_BLKIO2_SUBTASK                *Subtask;
+  NVME_BLKIO2_REQUEST                *BlkIo2Request;
+  NVME_PASS_THRU_ASYNC_REQ           *AsyncRequest;
+  EFI_BLOCK_IO2_TOKEN                *Token;
+  EFI_TPL                            OldTpl;
+  EFI_STATUS                         Status;
+
+  PciIo  = Private->PciIo;
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
+
+  //
+  // Cancel the unsubmitted subtasks.
+  //
+  for (Link = GetFirstNode (&Private->UnsubmittedSubtasks);
+       !IsNull (&Private->UnsubmittedSubtasks, Link);
+       Link = NextLink) {
+    NextLink      = GetNextNode (&Private->UnsubmittedSubtasks, Link);
+    Subtask       = NVME_BLKIO2_SUBTASK_FROM_LINK (Link);
+    BlkIo2Request = Subtask->BlockIo2Request;
+    Token         = BlkIo2Request->Token;
+
+    BlkIo2Request->UnsubmittedSubtaskNum--;
+    if (Subtask->IsLast) {
+      BlkIo2Request->LastSubtaskSubmitted = TRUE;
+    }
+    Token->TransactionStatus = EFI_ABORTED;
+
+    RemoveEntryList (Link);
+    InsertTailList (&BlkIo2Request->SubtasksQueue, Link);
+    gBS->SignalEvent (Subtask->Event);
+  }
+
+  //
+  // Cleanup the resources for the asynchronous PassThru requests.
+  //
+  for (Link = GetFirstNode (&Private->AsyncPassThruQueue);
+       !IsNull (&Private->AsyncPassThruQueue, Link);
+       Link = NextLink) {
+    NextLink = GetNextNode (&Private->AsyncPassThruQueue, Link);
+    AsyncRequest = NVME_PASS_THRU_ASYNC_REQ_FROM_THIS (Link);
+
+    if (AsyncRequest->MapData != NULL) {
+      PciIo->Unmap (PciIo, AsyncRequest->MapData);
+    }
+    if (AsyncRequest->MapMeta != NULL) {
+      PciIo->Unmap (PciIo, AsyncRequest->MapMeta);
+    }
+    if (AsyncRequest->MapPrpList != NULL) {
+      PciIo->Unmap (PciIo, AsyncRequest->MapPrpList);
+    }
+    if (AsyncRequest->PrpListHost != NULL) {
+      PciIo->FreeBuffer (
+               PciIo,
+               AsyncRequest->PrpListNo,
+               AsyncRequest->PrpListHost
+               );
+    }
+
+    RemoveEntryList (Link);
+    gBS->SignalEvent (AsyncRequest->CallerEvent);
+    FreePool (AsyncRequest);
+  }
+
+  if (IsListEmpty (&Private->AsyncPassThruQueue) &&
+      IsListEmpty (&Private->UnsubmittedSubtasks)) {
+    Status = EFI_SUCCESS;
+  } else {
+    Status = EFI_DEVICE_ERROR;
+  }
+
+  gBS->RestoreTPL (OldTpl);
+
+  return Status;
+}
+
+
+/**
   Sends an NVM Express Command Packet to an NVM Express controller or namespace. This function supports
   both blocking I/O and non-blocking I/O. The blocking I/O functionality is required, and the non-blocking
   I/O functionality is optional.
@@ -359,10 +447,12 @@ NvmExpressPassThru (
 {
   NVME_CONTROLLER_PRIVATE_DATA   *Private;
   EFI_STATUS                     Status;
+  EFI_STATUS                     PreviousStatus;
   EFI_PCI_IO_PROTOCOL            *PciIo;
   NVME_SQ                        *Sq;
   NVME_CQ                        *Cq;
   UINT16                         QueueId;
+  UINT16                         QueueSize;
   UINT32                         Bytes;
   UINT16                         Offset;
   EFI_EVENT                      TimerEvent;
@@ -451,6 +541,7 @@ NvmExpressPassThru (
   Prp         = NULL;
   TimerEvent  = NULL;
   Status      = EFI_SUCCESS;
+  QueueSize   = MIN (NVME_ASYNC_CSQ_SIZE, Private->Cap.Mqes) + 1;
 
   if (Packet->QueueType == NVME_ADMIN_QUEUE) {
     QueueId = 0;
@@ -463,7 +554,7 @@ NvmExpressPassThru (
       //
       // Submission queue full check.
       //
-      if ((Private->SqTdbl[QueueId].Sqt + 1) % (NVME_ASYNC_CSQ_SIZE + 1) ==
+      if ((Private->SqTdbl[QueueId].Sqt + 1) % QueueSize ==
           Private->AsyncSqHead) {
         return EFI_NOT_READY;
       }
@@ -492,14 +583,25 @@ NvmExpressPassThru (
   }
 
   Sq->Prp[0] = (UINT64)(UINTN)Packet->TransferBuffer;
-  //
-  // If the NVMe cmd has data in or out, then mapping the user buffer to the PCI controller specific addresses.
-  // Note here we don't handle data buffer for CreateIOSubmitionQueue and CreateIOCompletionQueue cmds because
-  // these two cmds are special which requires their data buffer must support simultaneous access by both the
-  // processor and a PCI Bus Master. It's caller's responsbility to ensure this.
-  //
-  if (((Sq->Opc & (BIT0 | BIT1)) != 0) && (Sq->Opc != NVME_ADMIN_CRIOCQ_CMD) && (Sq->Opc != NVME_ADMIN_CRIOSQ_CMD)) {
-    if ((Packet->TransferLength == 0) || (Packet->TransferBuffer == NULL)) {
+  if ((Packet->QueueType == NVME_ADMIN_QUEUE) &&
+      ((Sq->Opc == NVME_ADMIN_CRIOCQ_CMD) || (Sq->Opc == NVME_ADMIN_CRIOSQ_CMD))) {
+    //
+    // Currently, we only use the IO Completion/Submission queues created internally
+    // by this driver during controller initialization. Any other IO queues created
+    // will not be consumed here. The value is little to accept external IO queue
+    // creation requests, so here we will return EFI_UNSUPPORTED for external IO
+    // queue creation request.
+    //
+    if (!Private->CreateIoQueue) {
+      DEBUG ((DEBUG_ERROR, "NvmExpressPassThru: Does not support external IO queues creation request.\n"));
+      return EFI_UNSUPPORTED;
+    }
+  } else if ((Sq->Opc & (BIT0 | BIT1)) != 0) {
+    //
+    // If the NVMe cmd has data in or out, then mapping the user buffer to the PCI controller specific addresses.
+    //
+    if (((Packet->TransferLength != 0) && (Packet->TransferBuffer == NULL)) ||
+        ((Packet->TransferLength == 0) && (Packet->TransferBuffer != NULL))) {
       return EFI_INVALID_PARAMETER;
     }
 
@@ -509,21 +611,23 @@ NvmExpressPassThru (
       Flag = EfiPciIoOperationBusMasterWrite;
     }
 
-    MapLength = Packet->TransferLength;
-    Status = PciIo->Map (
-                      PciIo,
-                      Flag,
-                      Packet->TransferBuffer,
-                      &MapLength,
-                      &PhyAddr,
-                      &MapData
-                      );
-    if (EFI_ERROR (Status) || (Packet->TransferLength != MapLength)) {
-      return EFI_OUT_OF_RESOURCES;
-    }
+    if ((Packet->TransferLength != 0) && (Packet->TransferBuffer != NULL)) {
+      MapLength = Packet->TransferLength;
+      Status = PciIo->Map (
+                        PciIo,
+                        Flag,
+                        Packet->TransferBuffer,
+                        &MapLength,
+                        &PhyAddr,
+                        &MapData
+                        );
+      if (EFI_ERROR (Status) || (Packet->TransferLength != MapLength)) {
+        return EFI_OUT_OF_RESOURCES;
+      }
 
-    Sq->Prp[0] = PhyAddr;
-    Sq->Prp[1] = 0;
+      Sq->Prp[0] = PhyAddr;
+      Sq->Prp[1] = 0;
+    }
 
     if((Packet->MetadataLength != 0) && (Packet->MetadataBuffer != NULL)) {
       MapLength = Packet->MetadataLength;
@@ -560,6 +664,7 @@ NvmExpressPassThru (
     PhyAddr = (Sq->Prp[0] + EFI_PAGE_SIZE) & ~(EFI_PAGE_SIZE - 1);
     Prp = NvmeCreatePrpList (PciIo, PhyAddr, EFI_SIZE_TO_PAGES(Offset + Bytes) - 1, &PrpListHost, &PrpListNo, &MapPrpList);
     if (Prp == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
       goto EXIT;
     }
 
@@ -598,12 +703,12 @@ NvmExpressPassThru (
   //
   if ((Event != NULL) && (QueueId != 0)) {
     Private->SqTdbl[QueueId].Sqt =
-      (Private->SqTdbl[QueueId].Sqt + 1) % (NVME_ASYNC_CSQ_SIZE + 1);
+      (Private->SqTdbl[QueueId].Sqt + 1) % QueueSize;
   } else {
     Private->SqTdbl[QueueId].Sqt ^= 1;
   }
   Data = ReadUnaligned32 ((UINT32*)&Private->SqTdbl[QueueId]);
-  PciIo->Mem.Write (
+  Status = PciIo->Mem.Write (
                PciIo,
                EfiPciIoWidthUint32,
                NVME_BAR,
@@ -611,6 +716,10 @@ NvmExpressPassThru (
                1,
                &Data
                );
+
+  if (EFI_ERROR (Status)) {
+    goto EXIT;
+  }
 
   //
   // For non-blocking requests, return directly if the command is placed
@@ -627,6 +736,11 @@ NvmExpressPassThru (
     AsyncRequest->Packet        = Packet;
     AsyncRequest->CommandId     = Sq->Cid;
     AsyncRequest->CallerEvent   = Event;
+    AsyncRequest->MapData       = MapData;
+    AsyncRequest->MapMeta       = MapMeta;
+    AsyncRequest->MapPrpList    = MapPrpList;
+    AsyncRequest->PrpListNo     = PrpListNo;
+    AsyncRequest->PrpListHost   = PrpListHost;
 
     OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
     InsertTailList (&Private->AsyncPassThruQueue, &AsyncRequest->Link);
@@ -672,17 +786,54 @@ NvmExpressPassThru (
     } else {
       Status = EFI_DEVICE_ERROR;
       //
-      // Copy the Respose Queue entry for this command to the callers response buffer
-      //
-      CopyMem(Packet->NvmeCompletion, Cq, sizeof(EFI_NVM_EXPRESS_COMPLETION));
-    
-      //
       // Dump every completion entry status for debugging.
       //
       DEBUG_CODE_BEGIN();
         NvmeDumpStatus(Cq);
       DEBUG_CODE_END();
     }
+    //
+    // Copy the Respose Queue entry for this command to the callers response buffer
+    //
+    CopyMem(Packet->NvmeCompletion, Cq, sizeof(EFI_NVM_EXPRESS_COMPLETION));
+  } else {
+    //
+    // Timeout occurs for an NVMe command. Reset the controller to abort the
+    // outstanding commands.
+    //
+    DEBUG ((DEBUG_ERROR, "NvmExpressPassThru: Timeout occurs for an NVMe command.\n"));
+
+    //
+    // Disable the timer to trigger the process of async transfers temporarily.
+    //
+    Status = gBS->SetTimer (Private->TimerEvent, TimerCancel, 0);
+    if (EFI_ERROR (Status)) {
+      goto EXIT;
+    }
+
+    //
+    // Reset the NVMe controller.
+    //
+    Status = NvmeControllerInit (Private);
+    if (!EFI_ERROR (Status)) {
+      Status = AbortAsyncPassThruTasks (Private);
+      if (!EFI_ERROR (Status)) {
+        //
+        // Re-enable the timer to trigger the process of async transfers.
+        //
+        Status = gBS->SetTimer (Private->TimerEvent, TimerPeriodic, NVME_HC_ASYNC_TIMER);
+        if (!EFI_ERROR (Status)) {
+          //
+          // Return EFI_TIMEOUT to indicate a timeout occurs for NVMe PassThru command.
+          //
+          Status = EFI_TIMEOUT;
+        }
+      }
+    } else {
+      Status = EFI_DEVICE_ERROR;
+    }
+
+    goto EXIT;
   }
 
   if ((Private->CqHdbl[QueueId].Cqh ^= 1) == 0) {
@@ -690,7 +841,8 @@ NvmExpressPassThru (
   }
 
   Data = ReadUnaligned32 ((UINT32*)&Private->CqHdbl[QueueId]);
-  PciIo->Mem.Write (
+  PreviousStatus = Status;
+  Status = PciIo->Mem.Write (
                PciIo,
                EfiPciIoWidthUint32,
                NVME_BAR,
@@ -698,6 +850,9 @@ NvmExpressPassThru (
                1,
                &Data
                );
+  // The return status of PciIo->Mem.Write should not override
+  // previous status if previous status contains error.
+  Status = EFI_ERROR (PreviousStatus) ? PreviousStatus : Status;
 
   //
   // For now, the code does not support the non-blocking feature for admin queue.

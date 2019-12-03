@@ -4,15 +4,10 @@
   This driver is dispatched by Dxe core and the driver will reload itself to ACPI reserved memory
   in the entry point. The functionality is to interpret and restore the S3 boot script
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -23,6 +18,7 @@ EFI_GUID              mBootScriptExecutorImageGuid = {
 };
 
 BOOLEAN               mPage1GSupport = FALSE;
+UINT64                mAddressEncMask = 0;
 
 /**
   Entry function of Boot script exector. This function will be executed in
@@ -70,12 +66,12 @@ S3BootScriptExecutorEntryFunction (
   // for that parameter.
   //
   Status = S3BootScriptExecute ();
-  
+
   //
   // If invalid script table or opcode in S3 boot script table.
   //
   ASSERT_EFI_ERROR (Status);
-  
+
   if (EFI_ERROR (Status)) {
     CpuDeadLoop ();
     return Status;
@@ -93,7 +89,7 @@ S3BootScriptExecutorEntryFunction (
   //
   if (PeiS3ResumeState != 0) {
     //
-    // Need report status back to S3ResumePeim. 
+    // Need report status back to S3ResumePeim.
     // If boot script execution is failed, S3ResumePeim wil report the error status code.
     //
     PeiS3ResumeState->ReturnStatus = (UINT64)(UINTN)Status;
@@ -101,7 +97,7 @@ S3BootScriptExecutorEntryFunction (
       //
       // X64 S3 Resume
       //
-      DEBUG ((EFI_D_ERROR, "Call AsmDisablePaging64() to return to S3 Resume in PEI Phase\n"));
+      DEBUG ((DEBUG_INFO, "Call AsmDisablePaging64() to return to S3 Resume in PEI Phase\n"));
       PeiS3ResumeState->AsmTransferControl = (EFI_PHYSICAL_ADDRESS)(UINTN)AsmTransferControl32;
 
       if ((Facs != NULL) &&
@@ -126,7 +122,7 @@ S3BootScriptExecutorEntryFunction (
       //
       // IA32 S3 Resume
       //
-      DEBUG ((EFI_D_ERROR, "Call SwitchStack() to return to S3 Resume in PEI Phase\n"));
+      DEBUG ((DEBUG_INFO, "Call SwitchStack() to return to S3 Resume in PEI Phase\n"));
       PeiS3ResumeState->AsmTransferControl = (EFI_PHYSICAL_ADDRESS)(UINTN)AsmTransferControl;
 
       SwitchStack (
@@ -143,7 +139,7 @@ S3BootScriptExecutorEntryFunction (
     CpuDeadLoop();
     return EFI_UNSUPPORTED;
   }
-  
+
   //
   // S3ResumePeim does not provide a way to jump back to itself, so resume to OS here directly
   //
@@ -154,11 +150,11 @@ S3BootScriptExecutorEntryFunction (
     TempStackTop = (UINTN)&TempStack + sizeof(TempStack);
     if ((Facs->Version == EFI_ACPI_4_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_VERSION) &&
         ((Facs->Flags & EFI_ACPI_4_0_64BIT_WAKE_SUPPORTED_F) != 0) &&
-        ((Facs->Flags & EFI_ACPI_4_0_OSPM_64BIT_WAKE__F) != 0)) {
+        ((Facs->OspmFlags & EFI_ACPI_4_0_OSPM_64BIT_WAKE__F) != 0)) {
       //
       // X64 long mode waking vector
       //
-      DEBUG (( EFI_D_ERROR, "Transfer to 64bit OS waking vector - %x\r\n", (UINTN)Facs->XFirmwareWakingVector));
+      DEBUG ((DEBUG_INFO, "Transfer to 64bit OS waking vector - %x\r\n", (UINTN)Facs->XFirmwareWakingVector));
       if (FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
         SwitchStack (
           (SWITCH_STACK_ENTRY_POINT)(UINTN)Facs->XFirmwareWakingVector,
@@ -175,7 +171,7 @@ S3BootScriptExecutorEntryFunction (
       //
       // IA32 protected mode waking vector (Page disabled)
       //
-      DEBUG (( EFI_D_ERROR, "Transfer to 32bit OS waking vector - %x\r\n", (UINTN)Facs->XFirmwareWakingVector));
+      DEBUG ((DEBUG_INFO, "Transfer to 32bit OS waking vector - %x\r\n", (UINTN)Facs->XFirmwareWakingVector));
       if (FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
         AsmDisablePaging64 (
           0x10,
@@ -197,7 +193,7 @@ S3BootScriptExecutorEntryFunction (
     //
     // 16bit Realmode waking vector
     //
-    DEBUG (( EFI_D_ERROR, "Transfer to 16bit OS waking vector - %x\r\n", (UINTN)Facs->FirmwareWakingVector));
+    DEBUG ((DEBUG_INFO, "Transfer to 16bit OS waking vector - %x\r\n", (UINTN)Facs->FirmwareWakingVector));
     AsmTransferControl (Facs->FirmwareWakingVector, 0x0);
   }
 
@@ -252,9 +248,9 @@ RegisterMemoryProfileImage (
 /**
   This is the Event notification function to reload BootScriptExecutor image
   to RESERVED mem and save it to LockBox.
-  
+
   @param    Event   Pointer to this event
-  @param    Context Event handler private data 
+  @param    Context Event handler private data
  **/
 VOID
 EFIAPI
@@ -271,6 +267,7 @@ ReadyToLockEventNotify (
   UINTN                                         Pages;
   EFI_PHYSICAL_ADDRESS                          FfsBuffer;
   PE_COFF_LOADER_IMAGE_CONTEXT                  ImageContext;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR               MemDesc;
 
   Status = gBS->LocateProtocol (&gEfiDxeSmmReadyToLockProtocolGuid, NULL, &Interface);
   if (EFI_ERROR (Status)) {
@@ -320,12 +317,25 @@ ReadyToLockEventNotify (
                   &FfsBuffer
                   );
   ASSERT_EFI_ERROR (Status);
+
+  //
+  // Make sure that the buffer can be used to store code.
+  //
+  Status = gDS->GetMemorySpaceDescriptor (FfsBuffer, &MemDesc);
+  if (!EFI_ERROR (Status) && (MemDesc.Attributes & EFI_MEMORY_XP) != 0) {
+    gDS->SetMemorySpaceAttributes (
+           FfsBuffer,
+           EFI_PAGES_TO_SIZE (Pages),
+           MemDesc.Attributes & (~EFI_MEMORY_XP)
+           );
+  }
+
   ImageContext.ImageAddress = (PHYSICAL_ADDRESS)(UINTN)FfsBuffer;
   //
   // Align buffer on section boundary
   //
   ImageContext.ImageAddress += ImageContext.SectionAlignment - 1;
-  ImageContext.ImageAddress &= ~((EFI_PHYSICAL_ADDRESS)(ImageContext.SectionAlignment - 1));
+  ImageContext.ImageAddress &= ~((EFI_PHYSICAL_ADDRESS)ImageContext.SectionAlignment - 1);
   //
   // Load the image to our new buffer
   //
@@ -406,6 +416,11 @@ BootScriptExecutorEntryPoint (
   if (!PcdGetBool (PcdAcpiS3Enable)) {
     return EFI_UNSUPPORTED;
   }
+
+  //
+  // Make sure AddressEncMask is contained to smallest supported address field.
+  //
+  mAddressEncMask = PcdGet64 (PcdPteMemoryEncryptionAddressOrMask) & PAGING_1G_ADDRESS_MASK_64;
 
   //
   // Test if the gEfiCallerIdGuid of this image is already installed. if not, the entry

@@ -5,13 +5,7 @@
   Copyright (C) 2013, Red Hat, Inc.
   Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials are licensed and made available
-  under the terms and conditions of the BSD License which accompanies this
-  distribution. The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT
-  WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -73,11 +67,12 @@ VirtioNetTransmit (
   IN UINT16                      *Protocol OPTIONAL
   )
 {
-  VNET_DEV   *Dev;
-  EFI_TPL    OldTpl;
-  EFI_STATUS Status;
-  UINT16     DescIdx;
-  UINT16     AvailIdx;
+  VNET_DEV              *Dev;
+  EFI_TPL               OldTpl;
+  EFI_STATUS            Status;
+  UINT16                DescIdx;
+  UINT16                AvailIdx;
+  EFI_PHYSICAL_ADDRESS  DeviceAddress;
 
   if (This == NULL || BufferSize == 0 || Buffer == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -144,10 +139,24 @@ VirtioNetTransmit (
   }
 
   //
+  // Map the transmit buffer system physical address to device address.
+  //
+  Status = VirtioNetMapTxBuf (
+             Dev,
+             Buffer,
+             BufferSize,
+             &DeviceAddress
+             );
+  if (EFI_ERROR (Status)) {
+    Status = EFI_DEVICE_ERROR;
+    goto Exit;
+  }
+
+  //
   // virtio-0.9.5, 2.4.1 Supplying Buffers to The Device
   //
   DescIdx = Dev->TxFreeStack[Dev->TxCurPending++];
-  Dev->TxRing.Desc[DescIdx + 1].Addr  = (UINTN) Buffer;
+  Dev->TxRing.Desc[DescIdx + 1].Addr  = DeviceAddress;
   Dev->TxRing.Desc[DescIdx + 1].Len   = (UINT32) BufferSize;
 
   //

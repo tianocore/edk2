@@ -1,15 +1,9 @@
 /** @file
-  HPET register definitions from the IA-PC HPET (High Precision Event Timers) 
+  HPET register definitions from the IA-PC HPET (High Precision Event Timers)
   Specification, Revision 1.0a, October 2004.
 
-  Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -76,14 +70,14 @@ typedef union {
     UINT32  LevelTriggeredInterrupt:1;
     UINT32  InterruptEnable:1;
     UINT32  PeriodicInterruptEnable:1;
-    UINT32  PeriodicInterruptCapablity:1;
-    UINT32  CounterSizeCapablity:1;
+    UINT32  PeriodicInterruptCapability:1;
+    UINT32  CounterSizeCapability:1;
     UINT32  ValueSetEnable:1;
     UINT32  Reserved1:1;
     UINT32  CounterSizeEnable:1;
     UINT32  InterruptRoute:5;
     UINT32  MsiInterruptEnable:1;
-    UINT32  MsiInterruptCapablity:1;
+    UINT32  MsiInterruptCapability:1;
     UINT32  Reserved2:16;
     UINT32  InterruptRouteCapability;
   } Bits;

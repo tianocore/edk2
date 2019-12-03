@@ -1,0 +1,25 @@
+#/** @file
+#
+#  Copyright (c) 2016 - 2017, ARM Ltd. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = ArmSvcLib
+  FILE_GUID                      = 8e3618d7-f01d-4d65-b32b-4c70aacc8e49
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ArmSvcLib
+
+[Sources.ARM]
+  Arm/ArmSvc.asm    | RVCT
+  Arm/ArmSvc.S      | GCC
+
+[Sources.AARCH64]
+  AArch64/ArmSvc.S
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  MdePkg/MdePkg.dec

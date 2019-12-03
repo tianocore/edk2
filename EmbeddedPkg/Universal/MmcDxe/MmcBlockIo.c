@@ -2,13 +2,7 @@
 *
 *  Copyright (c) 2011-2015, ARM Limited. All rights reserved.
 *
-*  This program and the accompanying materials
-*  are licensed and made available under the terms and conditions of the BSD License
-*  which accompanies this distribution.  The full text of the license may be found at
-*  http://opensource.org/licenses/bsd-license.php
-*
-*  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-*  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+*  SPDX-License-Identifier: BSD-2-Clause-Patent
 *
 **/
 
@@ -148,12 +142,23 @@ MmcTransferBlock (
   MmcHostInstance = MMC_HOST_INSTANCE_FROM_BLOCK_IO_THIS (This);
   MmcHost = MmcHostInstance->MmcHost;
 
-  //Set command argument based on the card access mode (Byte mode or Block mode)
-  if ((MmcHostInstance->CardInfo.OCRData.AccessMode & MMC_OCR_ACCESS_MASK) ==
-      MMC_OCR_ACCESS_SECTOR) {
-    CmdArg = Lba;
+  if (MmcHostInstance->CardInfo.CardType != EMMC_CARD) {
+    //Set command argument based on the card capacity
+    //if 0 : SDSC card
+    //if 1 : SDXC/SDHC
+    if (MmcHostInstance->CardInfo.OCRData.AccessMode & SD_CARD_CAPACITY) {
+      CmdArg = Lba;
+    } else {
+      CmdArg = Lba * This->Media->BlockSize;
+    }
   } else {
-    CmdArg = Lba * This->Media->BlockSize;
+    //Set command argument based on the card access mode (Byte mode or Block mode)
+    if ((MmcHostInstance->CardInfo.OCRData.AccessMode & MMC_OCR_ACCESS_MASK) ==
+        MMC_OCR_ACCESS_SECTOR) {
+      CmdArg = Lba;
+    } else {
+      CmdArg = Lba * This->Media->BlockSize;
+    }
   }
 
   Status = MmcHost->SendCommand (MmcHost, Cmd, CmdArg);
@@ -206,6 +211,7 @@ MmcTransferBlock (
     if (EFI_ERROR (Status)) {
       DEBUG ((EFI_D_BLKIO, "%a(): Error and Status:%r\n", __func__, Status));
     }
+    MmcHost->ReceiveResponse (MmcHost, MMC_RESPONSE_TYPE_R1b, Response);
   }
 
   Status = MmcNotifyState (MmcHostInstance, MmcTransferState);

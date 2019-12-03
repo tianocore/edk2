@@ -2,10 +2,8 @@
   reggnu.c -  Oniguruma (regular expression library)
 **********************************************************************/
 /*-
- * Copyright (c) 2002-2008  K.Kosako  <sndgk393 AT ybb DOT ne DOT jp>
+ * Copyright (c) 2002-2019  K.Kosako  <sndgk393 AT ybb DOT ne DOT jp>
  * All rights reserved.
- *
- * (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -30,10 +28,7 @@
  */
 
 #include "regint.h"
-
-#ifndef ONIGGNU_H
 #include "oniggnu.h"
-#endif
 
 extern void
 re_free_registers(OnigRegion* r)
@@ -44,7 +39,7 @@ re_free_registers(OnigRegion* r)
 
 extern int
 re_adjust_startpos(regex_t* reg, const char* string, int size,
-		   int startpos, int range)
+                   int startpos, int range)
 {
   if (startpos > 0 && ONIGENC_MBC_MAXLEN(reg->enc) != 1 && startpos < size) {
     UChar *p;
@@ -56,7 +51,7 @@ re_adjust_startpos(regex_t* reg, const char* string, int size,
     else {
       p = ONIGENC_LEFT_ADJUST_CHAR_HEAD(reg->enc, (UChar* )string, s);
     }
-    return (int)(p - (UChar* )string);
+    return (int )(p - (UChar* )string);
   }
 
   return startpos;
@@ -64,20 +59,20 @@ re_adjust_startpos(regex_t* reg, const char* string, int size,
 
 extern int
 re_match(regex_t* reg, const char* str, int size, int pos,
-	 struct re_registers* regs)
+         struct re_registers* regs)
 {
   return onig_match(reg, (UChar* )str, (UChar* )(str + size),
-		    (UChar* )(str + pos), regs, ONIG_OPTION_NONE);
+                    (UChar* )(str + pos), regs, ONIG_OPTION_NONE);
 }
 
 extern int
 re_search(regex_t* bufp, const char* string, int size, int startpos, int range,
-	  struct re_registers* regs)
+          struct re_registers* regs)
 {
   return onig_search(bufp, (UChar* )string, (UChar* )(string + size),
-		     (UChar* )(string + startpos),
-		     (UChar* )(string + startpos + range),
-		     regs, ONIG_OPTION_NONE);
+                     (UChar* )(string + startpos),
+                     (UChar* )(string + startpos + range),
+                     regs, ONIG_OPTION_NONE);
 }
 
 extern int
@@ -95,29 +90,6 @@ re_compile_pattern(const char* pattern, int size, regex_t* reg, char* ebuf)
   return r;
 }
 
-#ifdef USE_RECOMPILE_API
-extern int
-re_recompile_pattern(const char* pattern, int size, regex_t* reg, char* ebuf)
-{
-  int r;
-  OnigErrorInfo einfo;
-  OnigEncoding enc;
-
-  /* I think encoding and options should be arguments of this function.
-     But this is adapted to present re.c. (2002/11/29)
-   */
-  enc = OnigEncDefaultCharEncoding;
-
-  r = onig_recompile(reg, (UChar* )pattern, (UChar* )(pattern + size),
-		     reg->options, enc, OnigDefaultSyntax, &einfo);
-  if (r != ONIG_NORMAL) {
-    if (IS_NOT_NULL(ebuf))
-      (void )onig_error_code_to_str((UChar* )ebuf, r, &einfo);
-  }
-  return r;
-}
-#endif
-
 extern void
 re_free_pattern(regex_t* reg)
 {
@@ -131,9 +103,9 @@ re_alloc_pattern(regex_t** reg)
   if (IS_NULL(*reg)) return ONIGERR_MEMORY;
 
   return onig_reg_init(*reg, ONIG_OPTION_DEFAULT,
-		       ONIGENC_CASE_FOLD_DEFAULT,
-		       OnigEncDefaultCharEncoding,
-		       OnigDefaultSyntax);
+                       ONIGENC_CASE_FOLD_DEFAULT,
+                       OnigEncDefaultCharEncoding,
+                       OnigDefaultSyntax);
 }
 
 extern void
@@ -151,19 +123,9 @@ re_mbcinit(int mb_code)
   case RE_MBCTYPE_ASCII:
     enc = ONIG_ENCODING_ASCII;
     break;
-  case RE_MBCTYPE_EUC:
-    enc = ONIG_ENCODING_EUC_JP;
-    break;
-  case RE_MBCTYPE_SJIS:
-    enc = ONIG_ENCODING_SJIS;
-    break;
-  case RE_MBCTYPE_UTF8:
-    enc = ONIG_ENCODING_UTF8;
-    break;
-  default:
-    return ;
-    break;
   }
+
+  onig_initialize(&enc, 1);
 
   onigenc_set_default_encoding(enc);
 }

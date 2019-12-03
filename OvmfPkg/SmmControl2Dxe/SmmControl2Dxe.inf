@@ -13,13 +13,7 @@
 #
 # Copyright (C) 2013, 2015, Red Hat, Inc.
 #
-# This program and the accompanying materials are licensed and made available
-# under the terms and conditions of the BSD License which accompanies this
-# distribution. The full text of the license may be found at
-# http://opensource.org/licenses/bsd-license.php
-#
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT
-# WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
 
@@ -39,25 +33,34 @@
 #
 
 [Sources]
+  SmiFeatures.h
+  SmiFeatures.c
   SmmControl2Dxe.c
 
 [Packages]
   MdePkg/MdePkg.dec
   OvmfPkg/OvmfPkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
 
 [LibraryClasses]
   BaseLib
   DebugLib
   IoLib
+  MemoryAllocationLib
   PcdLib
   PciLib
   QemuFwCfgLib
+  QemuFwCfgS3Lib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
 
 [Protocols]
   gEfiS3SaveStateProtocolGuid   ## SOMETIMES_CONSUMES
   gEfiSmmControl2ProtocolGuid   ## PRODUCES
+
+[Pcd]
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmApSyncTimeout ## SOMETIMES_PRODUCES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmSyncMode      ## SOMETIMES_PRODUCES
 
 [FeaturePcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire

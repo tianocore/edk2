@@ -1,0 +1,52 @@
+#/** @file
+#  INF file for the SMSC LAN91x series Network Controller Driver.
+#
+#  Copyright (c) 2013-2017 Linaro.org
+#
+#  Derived from the LAN9118 driver. Original sources
+#  Copyright (c) 2012-2013, ARM Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010019
+  BASE_NAME                      = Lan91xDxe
+  FILE_GUID                      = 5c12ea2f-9897-48af-8138-25f4ce6ff8d6
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 0.1
+  ENTRY_POINT                    = Lan91xDxeEntry
+
+[Sources.common]
+  Lan91xDxe.c
+  Lan91xDxeHw.h
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  NetworkPkg/NetworkPkg.dec
+
+[LibraryClasses]
+  ArmLib
+  BaseLib
+  BaseMemoryLib
+  DevicePathLib
+  IoLib
+  NetLib
+  TimerLib
+  UefiDriverEntryPoint
+  UefiLib
+
+[Protocols]
+  gEfiSimpleNetworkProtocolGuid
+  gEfiMetronomeArchProtocolGuid
+  gEfiPxeBaseCodeProtocolGuid
+  gEfiDevicePathProtocolGuid
+
+[FixedPcd]
+  gEmbeddedTokenSpaceGuid.PcdLan91xDxeBaseAddress
+
+[Depex]
+  TRUE

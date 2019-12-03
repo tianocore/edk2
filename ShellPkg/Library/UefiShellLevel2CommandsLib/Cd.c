@@ -3,18 +3,163 @@
 
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2018, Dell Technologies. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include "UefiShellLevel2CommandsLib.h"
+
+/**
+  Function will replace drive identifier with CWD.
+
+  If FullPath begining with ':' is invalid path, then ASSERT.
+  If FullPath not include dirve identifier , then do nothing.
+  If FullPath likes "fs0:\xx" or "fs0:/xx" , then do nothing.
+  If FullPath likes "fs0:xxx" or "fs0:", the drive replaced by CWD.
+
+  @param[in, out]   FullPath    The pointer to the string containing the path.
+  @param[in]        Cwd         Current directory.
+
+  @retval   EFI_SUCCESS         Success.
+  @retval   EFI_OUT_OF_SOURCES  A memory allocation failed.
+**/
+EFI_STATUS
+ReplaceDriveWithCwd (
+  IN OUT    CHAR16  **FullPath,
+  IN CONST  CHAR16  *Cwd
+  )
+{
+  CHAR16        *Splitter;
+  CHAR16        *TempBuffer;
+  UINTN         TotalSize;
+
+  Splitter   = NULL;
+  TempBuffer = NULL;
+  TotalSize  = 0;
+
+  if (FullPath == NULL || *FullPath == NULL) {
+    return EFI_SUCCESS;
+  }
+
+  Splitter = StrStr (*FullPath, L":");
+  ASSERT(Splitter != *FullPath);
+
+  if (Splitter != NULL && *(Splitter + 1) != L'\\' && *(Splitter + 1) != L'/') {
+    TotalSize = StrSize (Cwd) + StrSize (Splitter + 1);
+    TempBuffer = AllocateZeroPool (TotalSize);
+    if (TempBuffer == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+
+    StrCpyS (TempBuffer, TotalSize / sizeof(CHAR16), Cwd);
+    StrCatS (TempBuffer, TotalSize / sizeof(CHAR16), L"\\");
+    StrCatS (TempBuffer, TotalSize / sizeof(CHAR16), Splitter + 1);
+
+    FreePool(*FullPath);
+    *FullPath = TempBuffer;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  function to determine if FullPath is under current filesystem.
+
+  @param[in]    FullPath    The target location to determine.
+  @param[in]    Cwd         Current directory.
+
+  @retval       TRUE        The FullPath is in the current filesystem.
+  @retval       FALSE       The FullPaht isn't in the current filesystem.
+**/
+BOOLEAN
+IsCurrentFileSystem (
+  IN CONST CHAR16   *FullPath,
+  IN CONST CHAR16   *Cwd
+  )
+{
+  CHAR16 *Splitter1;
+  CHAR16 *Splitter2;
+
+  Splitter1 = NULL;
+  Splitter2 = NULL;
+
+  ASSERT(FullPath != NULL);
+
+  Splitter1 = StrStr (FullPath, L":");
+  if (Splitter1 == NULL) {
+    return TRUE;
+  }
+
+  Splitter2 = StrStr (Cwd, L":");
+
+  if (((UINTN) Splitter1 - (UINTN) FullPath) != ((UINTN) Splitter2 - (UINTN) Cwd)) {
+    return FALSE;
+  } else {
+    if (StrniCmp (FullPath, Cwd, ((UINTN) Splitter1 - (UINTN) FullPath) / sizeof (CHAR16)) == 0) {
+      return TRUE;
+    } else {
+      return FALSE;
+    }
+  }
+}
+
+/**
+  Extract drive string and path string from FullPath.
+
+  The caller must be free Drive and Path.
+
+  @param[in]    FullPath    A path to be extracted.
+  @param[out]   Drive       Buffer to save drive identifier.
+  @param[out]   Path        Buffer to save path.
+
+  @retval       EFI_SUCCESS           Success.
+  @retval       EFI_OUT_OF_RESOUCES   A memory allocation failed.
+**/
+EFI_STATUS
+ExtractDriveAndPath (
+  IN CONST CHAR16   *FullPath,
+  OUT CHAR16        **Drive,
+  OUT CHAR16        **Path
+  )
+{
+  CHAR16 *Splitter;
+
+  ASSERT (FullPath != NULL);
+
+  Splitter = StrStr (FullPath, L":");
+
+  if (Splitter == NULL) {
+    *Drive = NULL;
+    *Path = AllocateCopyPool (StrSize (FullPath), FullPath);
+    if (*Path == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+  } else {
+    if (*(Splitter + 1) == CHAR_NULL) {
+      *Drive = AllocateCopyPool (StrSize (FullPath), FullPath);
+      *Path = NULL;
+      if (*Drive == NULL) {
+        return EFI_OUT_OF_RESOURCES;
+      }
+    } else {
+      *Drive = AllocateCopyPool ((Splitter - FullPath + 2) * sizeof(CHAR16), FullPath);
+      if (*Drive == NULL) {
+        return EFI_OUT_OF_RESOURCES;
+      }
+      (*Drive)[Splitter - FullPath + 1] = CHAR_NULL;
+
+      *Path = AllocateCopyPool (StrSize (Splitter + 1), Splitter + 1);
+      if (*Path == NULL) {
+        FreePool (*Drive);
+        return EFI_OUT_OF_RESOURCES;
+      }
+    }
+  }
+
+  return EFI_SUCCESS;
+}
 
 /**
   Function for 'cd' command.
@@ -31,23 +176,26 @@ ShellCommandRunCd (
 {
   EFI_STATUS        Status;
   LIST_ENTRY        *Package;
-  CONST CHAR16      *Directory;
-  CHAR16            *Cwd;
+  CONST CHAR16      *Cwd;
   CHAR16            *Path;
   CHAR16            *Drive;
-  UINTN             CwdSize;
-  UINTN             DriveSize;
   CHAR16            *ProblemParam;
   SHELL_STATUS      ShellStatus;
-  SHELL_FILE_HANDLE Handle;
   CONST CHAR16      *Param1;
   CHAR16            *Param1Copy;
-  CHAR16*           Walker;
+  CHAR16            *Walker;
+  CHAR16            *Splitter;
+  CHAR16            *TempBuffer;
+  UINTN             TotalSize;
 
-  ProblemParam = NULL;
-  ShellStatus = SHELL_SUCCESS;
-  Drive = NULL;
-  DriveSize = 0;
+  ProblemParam  = NULL;
+  ShellStatus   = SHELL_SUCCESS;
+  Cwd           = NULL;
+  Path          = NULL;
+  Drive         = NULL;
+  Splitter      = NULL;
+  TempBuffer    = NULL;
+  TotalSize     = 0;
 
   Status = CommandInit();
   ASSERT_EFI_ERROR(Status);
@@ -64,7 +212,7 @@ ShellCommandRunCd (
   Status = ShellCommandLineParse (EmptyParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR(Status)) {
     if (Status == EFI_VOLUME_CORRUPTED && ProblemParam != NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"cd", ProblemParam);  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"cd", ProblemParam);
       FreePool(ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -78,7 +226,7 @@ ShellCommandRunCd (
   if (ShellCommandLineGetFlag(Package, L"-?")) {
     ASSERT(FALSE);
   } else if (ShellCommandLineGetRawValue(Package, 2) != NULL) {
-    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"cd");  
+    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"cd");
     ShellStatus = SHELL_INVALID_PARAMETER;
   } else {
     //
@@ -87,194 +235,103 @@ ShellCommandRunCd (
     // else If there are 2 value parameters, then print the error message
     // else If there is  1 value paramerer , then change the directory
     //
-    Param1 = ShellCommandLineGetRawValue(Package, 1);
-    if (Param1 == NULL) {
-      //
-      // display the current directory
-      //
-      Directory = ShellGetCurrentDir(NULL);
-      if (Directory != NULL) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CD_PRINT), gShellLevel2HiiHandle, Directory);
-      } else {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_CWD), gShellLevel2HiiHandle, L"cd");  
-        ShellStatus = SHELL_NOT_FOUND;
-      }
+    Cwd = ShellGetCurrentDir (NULL);
+    if (Cwd == NULL) {
+      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN(STR_GEN_NO_CWD), gShellLevel2HiiHandle, L"cd");
+      ShellStatus = SHELL_NOT_FOUND;
     } else {
-      Param1Copy = CatSPrint(NULL, L"%s", Param1, NULL);
-      for (Walker = Param1Copy; Walker != NULL && *Walker != CHAR_NULL ; Walker++) {
-        if (*Walker == L'\"') {
-          CopyMem(Walker, Walker+1, StrSize(Walker) - sizeof(Walker[0]));
+      Param1 = ShellCommandLineGetRawValue (Package, 1);
+      if (Param1 == NULL) {
+        //
+        // display the current directory
+        //
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN(STR_CD_PRINT), gShellLevel2HiiHandle, Cwd);
+      } else {
+        Param1Copy = CatSPrint (NULL, L"%s", Param1, NULL);
+        for (Walker = Param1Copy; Walker != NULL && *Walker != CHAR_NULL; Walker++) {
+          if (*Walker == L'\"') {
+            CopyMem (Walker, Walker + 1, StrSize(Walker) - sizeof(Walker[0]));
+          }
         }
-      }
-      
-      if (Param1Copy != NULL) {
-        Param1Copy = PathCleanUpDirectories(Param1Copy);
-      }
-      if (Param1Copy != NULL) {
-        if (StrCmp(Param1Copy, L".") == 0) {
-          //
-          // nothing to do... change to current directory
-          //
-        } else if (StrCmp(Param1Copy, L"..") == 0) {
-          //
-          // Change up one directory...
-          //
-          Directory = ShellGetCurrentDir(NULL);
-          if (Directory == NULL) {
-            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_CWD), gShellLevel2HiiHandle, L"cd");  
-            ShellStatus = SHELL_NOT_FOUND;
-          } else {
-            CwdSize = StrSize(Directory) + sizeof(CHAR16);
-            Cwd = AllocateZeroPool(CwdSize);
-            if (Cwd == NULL) {
-              ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_OUT_MEM), gShellLevel2HiiHandle, L"cd");
-              ShellStatus = SHELL_OUT_OF_RESOURCES;
-            } else {
-              StrCpyS (Cwd, StrSize (Directory) / sizeof (CHAR16) + 1, Directory);
-              StrCatS (Cwd, StrSize (Directory) / sizeof (CHAR16) + 1, L"\\");
-              Drive = GetFullyQualifiedPath (Cwd);
-              PathRemoveLastItem (Drive);
-              FreePool (Cwd);
-            }
-          }
-          if (ShellStatus == SHELL_SUCCESS && Drive != NULL) {
-            //
-            // change directory on current drive letter
-            //
-            Status = gEfiShellProtocol->SetCurDir(NULL, Drive);
-            if (Status == EFI_NOT_FOUND) {
-              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CD_NF), gShellLevel2HiiHandle, L"cd");  
-              ShellStatus = SHELL_NOT_FOUND;
-            }
-          }
-        } else if (StrCmp(Param1Copy, L"\\") == 0) {
-          //
-          // Move to root of current drive
-          //
-          Directory = ShellGetCurrentDir(NULL);
-          if (Directory == NULL) {
-            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_CWD), gShellLevel2HiiHandle, L"cd");  
-            ShellStatus = SHELL_NOT_FOUND;
-          } else {
-            CwdSize = StrSize(Directory) + sizeof(CHAR16);
-            Cwd = AllocateZeroPool(CwdSize);
-            if (Cwd == NULL) {
-              ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_OUT_MEM), gShellLevel2HiiHandle, L"cd");
-              ShellStatus = SHELL_OUT_OF_RESOURCES;
-            } else {
-              StrCpyS (Cwd, StrSize (Directory) / sizeof (CHAR16) + 1, Directory);
-              StrCatS (Cwd, StrSize (Directory) / sizeof (CHAR16) + 1, L"\\");
-              Drive = GetFullyQualifiedPath (Cwd);
-              while (PathRemoveLastItem (Drive)) {
-                //
-                // Check if Drive contains 'fsx:\' only or still points to a sub-directory.
-                // Don't remove trailing '\' from Drive if it points to the root directory.
-                //
-                Path = StrStr (Drive, L":\\");
-                if ((Path != NULL) && (*(Path + 2) == CHAR_NULL)) {
-                  break;
-                }
-              }
-              FreePool (Cwd);
-            }
-          }
-          if (ShellStatus == SHELL_SUCCESS && Drive != NULL) {
-            //
-            // change directory on current drive letter
-            //
-            Status = gEfiShellProtocol->SetCurDir(NULL, Drive);
-            if (Status == EFI_NOT_FOUND) {
-              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CD_NF), gShellLevel2HiiHandle, L"cd");  
-              ShellStatus = SHELL_NOT_FOUND;
-            }
-          }
-        } else if (StrStr(Param1Copy, L":") == NULL) {
-          //
-          // change directory without a drive identifier
-          //
-          if (ShellGetCurrentDir(NULL) == NULL) {
-            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_CWD), gShellLevel2HiiHandle, L"cd");  
-            ShellStatus = SHELL_NOT_FOUND;
-          } else {
-            ASSERT((Drive == NULL && DriveSize == 0) || (Drive != NULL));
-            Drive = StrnCatGrow(&Drive, &DriveSize, ShellGetCurrentDir(NULL), 0);
-            Drive = StrnCatGrow(&Drive, &DriveSize, L"\\", 0);
-            if (*Param1Copy == L'\\') {
-              while (PathRemoveLastItem(Drive)) ;
-              Drive = StrnCatGrow(&Drive, &DriveSize, Param1Copy+1, 0);
-            } else {
-              Drive = StrnCatGrow(&Drive, &DriveSize, Param1Copy, 0);
-            }
-            //
-            // Verify that this is a valid directory
-            //
-            Status = gEfiShellProtocol->OpenFileByName(Drive, &Handle, EFI_FILE_MODE_READ);
-            if (EFI_ERROR(Status)) {
-              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_DIR_NF), gShellLevel2HiiHandle, L"cd", Drive);  
-              ShellStatus = SHELL_NOT_FOUND;
-            } else if (EFI_ERROR(FileHandleIsDirectory(Handle))) {
-              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NOT_DIR), gShellLevel2HiiHandle, L"cd", Drive);  
-              ShellStatus = SHELL_NOT_FOUND;
-            }
-            if (ShellStatus == SHELL_SUCCESS && Drive != NULL) {
-              //
-              // change directory on current drive letter
-              //
-              Status = gEfiShellProtocol->SetCurDir(NULL, Drive);
-              if (Status == EFI_NOT_FOUND) {
-                ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CD_NF), gShellLevel2HiiHandle, L"cd");  
-                ShellStatus = SHELL_NOT_FOUND;
-              }
-            }
-            if (Handle != NULL) {
-              gEfiShellProtocol->CloseFile(Handle);
-              DEBUG_CODE(Handle = NULL;);
-            }
-          }
+
+        if (Param1Copy != NULL && IsCurrentFileSystem (Param1Copy, Cwd)) {
+          Status = ReplaceDriveWithCwd (&Param1Copy,Cwd);
         } else {
           //
-          // change directory with a drive letter
+          // Can't use cd command to change filesystem.
           //
-          Drive = AllocateCopyPool(StrSize(Param1Copy), Param1Copy);
-          if (Drive == NULL) {
-            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_MEM), gShellLevel2HiiHandle, L"cd");  
-            ShellStatus = SHELL_OUT_OF_RESOURCES;
-          } else {
-            Path = StrStr(Drive, L":");
-            ASSERT(Path != NULL);
-            if (EFI_ERROR(ShellIsDirectory(Param1Copy))) {
-              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NOT_DIR), gShellLevel2HiiHandle, L"cd", Param1Copy);  
-              ShellStatus = SHELL_NOT_FOUND;
-            } else if (*(Path+1) == CHAR_NULL) {
-              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CD_NF), gShellLevel2HiiHandle, L"cd");  
-              ShellStatus = SHELL_NOT_FOUND;
+          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_CD_NF), gShellLevel2HiiHandle, L"cd");
+          Status = EFI_NOT_FOUND;
+        }
+
+        if (!EFI_ERROR(Status) && Param1Copy != NULL) {
+          Splitter = StrStr (Cwd, L":");
+          if (Param1Copy[0] == L'\\') {
+            //
+            // Absolute Path on current drive letter.
+            //
+            TotalSize = ((Splitter - Cwd + 1) * sizeof(CHAR16)) + StrSize(Param1Copy);
+            TempBuffer = AllocateZeroPool (TotalSize);
+            if (TempBuffer == NULL) {
+              Status = EFI_OUT_OF_RESOURCES;
             } else {
-              *(Path+1) = CHAR_NULL;
-              if (Path == Drive + StrLen(Drive)) {
-                ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CD_NF), gShellLevel2HiiHandle, L"cd");  
-                ShellStatus = SHELL_NOT_FOUND;
-              } else {
-                Status = gEfiShellProtocol->SetCurDir(Drive, Path+2);
-                ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CD_PRINT), gShellLevel2HiiHandle, ShellGetCurrentDir(Drive));
-              }
+              StrnCpyS (TempBuffer, TotalSize / sizeof(CHAR16), Cwd, (Splitter - Cwd + 1));
+              StrCatS (TempBuffer, TotalSize / sizeof(CHAR16), Param1Copy);
+
+              FreePool (Param1Copy);
+              Param1Copy = TempBuffer;
+              TempBuffer = NULL;
             }
-            if (Status == EFI_NOT_FOUND) {
-              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CD_NF), gShellLevel2HiiHandle, L"cd");  
-              Status = SHELL_NOT_FOUND;
-            } else if (EFI_ERROR(Status)) {
-              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_DIR_NF), gShellLevel2HiiHandle, L"cd", Param1Copy);  
-              Status = SHELL_NOT_FOUND;
+          } else {
+            if (StrStr (Param1Copy,L":") == NULL) {
+              TotalSize = StrSize (Cwd) + StrSize (Param1Copy);
+              TempBuffer = AllocateZeroPool (TotalSize);
+              if (TempBuffer == NULL) {
+                Status = EFI_OUT_OF_RESOURCES;
+              } else {
+                StrCpyS (TempBuffer, TotalSize / sizeof (CHAR16), Cwd);
+                StrCatS (TempBuffer, TotalSize / sizeof (CHAR16), L"\\");
+                StrCatS (TempBuffer, TotalSize / sizeof (CHAR16), Param1Copy);
+
+                FreePool (Param1Copy);
+                Param1Copy = TempBuffer;
+                TempBuffer = NULL;
+              }
             }
           }
         }
+
+        if (!EFI_ERROR(Status)) {
+          Param1Copy = PathCleanUpDirectories (Param1Copy);
+          Status = ExtractDriveAndPath (Param1Copy, &Drive, &Path);
+        }
+
+        if (!EFI_ERROR (Status) && Drive != NULL && Path != NULL) {
+          if (EFI_ERROR(ShellIsDirectory (Param1Copy))) {
+            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN(STR_GEN_NOT_DIR), gShellLevel2HiiHandle, L"cd", Param1Copy);
+            ShellStatus = SHELL_NOT_FOUND;
+          } else {
+            Status = gEfiShellProtocol->SetCurDir (Drive, Path + 1);
+            if (EFI_ERROR (Status)) {
+              ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN(STR_GEN_DIR_NF), gShellLevel2HiiHandle, L"cd", Param1Copy);
+              ShellStatus = SHELL_NOT_FOUND;
+            }
+          }
+        }
+
+        if (Drive != NULL) {
+          FreePool (Drive);
+        }
+
+        if (Path != NULL) {
+          FreePool (Path);
+        }
+
+        FreePool (Param1Copy);
       }
-      FreePool(Param1Copy);
     }
   }
 
-  if (Drive != NULL) {
-    FreePool(Drive);
-  }
   //
   // free the command line package
   //

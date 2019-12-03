@@ -1,24 +1,19 @@
 ## @file
-# This file is used to parse a strings file and create or add to a string database 
+# This file is used to parse a strings file and create or add to a string database
 # file.
 #
-# Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
-# This program and the accompanying materials
-# are licensed and made available under the terms and conditions of the BSD License
-# which accompanies this distribution.  The full text of the license may be found at
-# http://opensource.org/licenses/bsd-license.php
-#
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
 
 ##
 # Import Modules
 #
+from __future__ import absolute_import
 import re
 import Common.EdkLogger as EdkLogger
 from Common.BuildToolError import *
-from UniClassObject import *
-from StringIO import StringIO
+from .UniClassObject import *
+from io import BytesIO
 from struct import pack, unpack
 from Common.LongFilePathSupport import OpenLongFilePath as open
 
@@ -59,11 +54,7 @@ NOT_REFERENCED = 'not referenced'
 COMMENT_NOT_REFERENCED = ' ' + COMMENT + NOT_REFERENCED
 CHAR_ARRAY_DEFIN = 'unsigned char'
 COMMON_FILE_NAME = 'Strings'
-OFFSET = 'offset'
-STRING = 'string'
-TO = 'to'
 STRING_TOKEN = re.compile('STRING_TOKEN *\(([A-Z0-9_]+) *\)', re.MULTILINE | re.UNICODE)
-COMPATIBLE_STRING_TOKEN = re.compile('STRING_TOKEN *\(([A-Z0-9_]+) *\)', re.MULTILINE | re.UNICODE)
 
 EFI_HII_ARRAY_SIZE_LENGTH = 4
 EFI_HII_PACKAGE_HEADER_LENGTH = 4
@@ -98,7 +89,7 @@ PRINTABLE_LANGUAGE_NAME_STRING_NAME = '$PRINTABLE_LANGUAGE_NAME'
 # @retval:       The formatted hex string
 #
 def DecToHexStr(Dec, Digit = 8):
-    return eval("'0x%0" + str(Digit) + "X' % int(Dec)")
+    return '0x{0:0{1}X}'.format(Dec, Digit)
 
 ## Convert a dec number to a hex list
 #
@@ -113,11 +104,8 @@ def DecToHexStr(Dec, Digit = 8):
 # @retval:       A list for formatted hex string
 #
 def DecToHexList(Dec, Digit = 8):
-    Hex = eval("'%0" + str(Digit) + "X' % int(Dec)")
-    List = []
-    for Bit in range(Digit - 2, -1, -2):
-        List.append(HexHeader + Hex[Bit:Bit + 2])
-    return List
+    Hex = '{0:0{1}X}'.format(Dec, Digit)
+    return ["0x" + Hex[Bit:Bit + 2] for Bit in range(Digit - 2, -1, -2)]
 
 ## Convert a acsii string to a hex list
 #
@@ -129,27 +117,10 @@ def DecToHexList(Dec, Digit = 8):
 # @retval:       A list for formatted hex string
 #
 def AscToHexList(Ascii):
-    List = []
-    for Item in Ascii:
-        List.append('0x%02X' % ord(Item))
-
-    return List
-
-## Create header of .h file
-#
-# Create a header of .h file
-#
-# @param BaseName: The basename of strings
-#
-# @retval Str:     A string for .h file header
-#
-def CreateHFileHeader(BaseName):
-    Str = ''
-    for Item in H_C_FILE_HEADER:
-        Str = WriteLine(Str, Item)
-    Str = WriteLine(Str, '#ifndef _' + BaseName.upper() + '_STRINGS_DEFINE_H_')
-    Str = WriteLine(Str, '#define _' + BaseName.upper() + '_STRINGS_DEFINE_H_')
-    return Str
+    try:
+        return ['0x{0:02X}'.format(Item) for Item in Ascii]
+    except:
+        return ['0x{0:02X}'.format(ord(Item)) for Item in Ascii]
 
 ## Create content of .h file
 #
@@ -163,7 +134,7 @@ def CreateHFileHeader(BaseName):
 # @retval Str:           A string of .h file content
 #
 def CreateHFileContent(BaseName, UniObjectClass, IsCompatibleMode, UniGenCFlag):
-    Str = ''
+    Str = []
     ValueStartPtr = 60
     Line = COMMENT_DEFINE_STR + ' ' + LANGUAGE_NAME_STRING_NAME + ' ' * (ValueStartPtr - len(DEFINE_STR + LANGUAGE_NAME_STRING_NAME)) + DecToHexStr(0, 4) + COMMENT_NOT_REFERENCED
     Str = WriteLine(Str, Line)
@@ -171,13 +142,13 @@ def CreateHFileContent(BaseName, UniObjectClass, IsCompatibleMode, UniGenCFlag):
     Str = WriteLine(Str, Line)
     UnusedStr = ''
 
-    #Group the referred/Unused STRING token together. 
+    #Group the referred/Unused STRING token together.
     for Index in range(2, len(UniObjectClass.OrderedStringList[UniObjectClass.LanguageDef[0][0]])):
         StringItem = UniObjectClass.OrderedStringList[UniObjectClass.LanguageDef[0][0]][Index]
         Name = StringItem.StringName
         Token = StringItem.Token
         Referenced = StringItem.Referenced
-        if Name != None:
+        if Name is not None:
             Line = ''
             if Referenced == True:
                 if (ValueStartPtr - len(DEFINE_STR + Name)) <= 0:
@@ -192,12 +163,12 @@ def CreateHFileContent(BaseName, UniObjectClass, IsCompatibleMode, UniGenCFlag):
                     Line = COMMENT_DEFINE_STR + ' ' + Name + ' ' * (ValueStartPtr - len(DEFINE_STR + Name)) + DecToHexStr(Token, 4) + COMMENT_NOT_REFERENCED
                 UnusedStr = WriteLine(UnusedStr, Line)
 
-    Str = ''.join([Str, UnusedStr])
+    Str.extend( UnusedStr)
 
     Str = WriteLine(Str, '')
     if IsCompatibleMode or UniGenCFlag:
         Str = WriteLine(Str, 'extern unsigned char ' + BaseName + 'Strings[];')
-    return Str
+    return "".join(Str)
 
 ## Create a complete .h file
 #
@@ -213,20 +184,7 @@ def CreateHFileContent(BaseName, UniObjectClass, IsCompatibleMode, UniGenCFlag):
 def CreateHFile(BaseName, UniObjectClass, IsCompatibleMode, UniGenCFlag):
     HFile = WriteLine('', CreateHFileContent(BaseName, UniObjectClass, IsCompatibleMode, UniGenCFlag))
 
-    return HFile
-
-## Create header of .c file
-#
-# Create a header of .c file
-#
-# @retval Str:     A string for .c file header
-#
-def CreateCFileHeader():
-    Str = ''
-    for Item in H_C_FILE_HEADER:
-        Str = WriteLine(Str, Item)
-
-    return Str
+    return "".join(HFile)
 
 ## Create a buffer to store all items in an array
 #
@@ -250,7 +208,7 @@ def CreateArrayItem(Array, Width = 16):
     MaxLength = Width
     Index = 0
     Line = '  '
-    ArrayItem = ''
+    ArrayItem = []
 
     for Item in Array:
         if Index < MaxLength:
@@ -262,7 +220,7 @@ def CreateArrayItem(Array, Width = 16):
             Index = 1
     ArrayItem = Write(ArrayItem, Line.rstrip())
 
-    return ArrayItem
+    return "".join(ArrayItem)
 
 ## CreateCFileStringValue
 #
@@ -277,7 +235,7 @@ def CreateCFileStringValue(Value):
     Value = [StringBlockType] + Value
     Str = WriteLine('', CreateArrayItem(Value))
 
-    return Str
+    return "".join(Str)
 
 ## GetFilteredLanguage
 #
@@ -298,29 +256,29 @@ def GetFilteredLanguage(UniLanguageList, LanguageFilterList):
         # first check for exact match
         if Language in UniLanguageList:
             if Language not in UniLanguageListFiltered:
-                UniLanguageListFiltered += [Language]
+                UniLanguageListFiltered.append(Language)
         # find the first one with the same/equivalent primary tag
         else:
             if Language.find('-') != -1:
                 PrimaryTag = Language[0:Language.find('-')].lower()
             else:
                 PrimaryTag = Language
-            
+
             if len(PrimaryTag) == 3:
                 PrimaryTag = LangConvTable.get(PrimaryTag)
-            
+
             for UniLanguage in UniLanguageList:
                 if UniLanguage.find('-') != -1:
                     UniLanguagePrimaryTag = UniLanguage[0:UniLanguage.find('-')].lower()
                 else:
                     UniLanguagePrimaryTag = UniLanguage
-                
+
                 if len(UniLanguagePrimaryTag) == 3:
                     UniLanguagePrimaryTag = LangConvTable.get(UniLanguagePrimaryTag)
 
                 if PrimaryTag == UniLanguagePrimaryTag:
                     if UniLanguage not in UniLanguageListFiltered:
-                        UniLanguageListFiltered += [UniLanguage]
+                        UniLanguageListFiltered.append(UniLanguage)
                     break
             else:
                 # Here is rule 3 for "get best language"
@@ -332,10 +290,10 @@ def GetFilteredLanguage(UniLanguageList, LanguageFilterList):
                     for UniLanguage in UniLanguageList:
                         if UniLanguage.startswith('en-') or UniLanguage.startswith('eng-'):
                             if UniLanguage not in UniLanguageListFiltered:
-                                UniLanguageListFiltered += [UniLanguage]
+                                UniLanguageListFiltered.append(UniLanguage)
                             break
                     else:
-                        UniLanguageListFiltered += [DefaultTag]
+                        UniLanguageListFiltered.append(DefaultTag)
     return  UniLanguageListFiltered
 
 
@@ -347,7 +305,7 @@ def GetFilteredLanguage(UniLanguageList, LanguageFilterList):
 # @param UniObjectClass   A UniObjectClass instance
 # @param IsCompatibleMode Compatible mode
 # @param UniBinBuffer     UniBinBuffer to contain UniBinary data.
-# @param FilterInfo       Platform language filter information 
+# @param FilterInfo       Platform language filter information
 #
 # @retval Str:           A string of .c file content
 #
@@ -365,14 +323,14 @@ def CreateCFileContent(BaseName, UniObjectClass, IsCompatibleMode, UniBinBuffer,
     else:
         # EDK module is using ISO639-2 format filter, convert to the RFC4646 format
         LanguageFilterList = [LangConvTable.get(F.lower()) for F in FilterInfo[1]]
-    
+
     UniLanguageList = []
     for IndexI in range(len(UniObjectClass.LanguageDef)):
         UniLanguageList += [UniObjectClass.LanguageDef[IndexI][0]]
 
     UniLanguageListFiltered = GetFilteredLanguage(UniLanguageList, LanguageFilterList)
- 
-        
+
+
     #
     # Create lines for each language's strings
     #
@@ -380,8 +338,8 @@ def CreateCFileContent(BaseName, UniObjectClass, IsCompatibleMode, UniBinBuffer,
         Language = UniObjectClass.LanguageDef[IndexI][0]
         if Language not in UniLanguageListFiltered:
             continue
-        
-        StringBuffer = StringIO()
+
+        StringBuffer = BytesIO()
         StrStringValue = ''
         ArrayLength = 0
         NumberOfUseOtherLangDef = 0
@@ -443,7 +401,7 @@ def CreateCFileContent(BaseName, UniObjectClass, IsCompatibleMode, UniBinBuffer,
         # Add an EFI_HII_SIBT_END at last
         #
         Str = WriteLine(Str, '  ' + EFI_HII_SIBT_END + ",")
-        
+
         #
         # Create binary UNI string
         #
@@ -479,7 +437,7 @@ def CreateCFileContent(BaseName, UniObjectClass, IsCompatibleMode, UniBinBuffer,
     #
     AllStr = Write(AllStr, Str)
 
-    return AllStr
+    return "".join(AllStr)
 
 ## Create end of .c file
 #
@@ -498,16 +456,15 @@ def CreateCFileEnd():
 # @param BaseName:        The basename of strings
 # @param UniObjectClass   A UniObjectClass instance
 # @param IsCompatibleMode Compatible Mode
-# @param FilterInfo       Platform language filter information 
+# @param FilterInfo       Platform language filter information
 #
 # @retval CFile:          A string of complete .c file
 #
 def CreateCFile(BaseName, UniObjectClass, IsCompatibleMode, FilterInfo):
     CFile = ''
-    #CFile = WriteLine(CFile, CreateCFileHeader())
     CFile = WriteLine(CFile, CreateCFileContent(BaseName, UniObjectClass, IsCompatibleMode, None, FilterInfo))
     CFile = WriteLine(CFile, CreateCFileEnd())
-    return CFile
+    return "".join(CFile)
 
 ## GetFileList
 #
@@ -519,11 +476,11 @@ def CreateCFile(BaseName, UniObjectClass, IsCompatibleMode, FilterInfo):
 # @retval FileList:    A list of all files found
 #
 def GetFileList(SourceFileList, IncludeList, SkipList):
-    if IncludeList == None:
+    if IncludeList is None:
         EdkLogger.error("UnicodeStringGather", AUTOGEN_ERROR, "Include path for unicode file is not defined")
 
     FileList = []
-    if SkipList == None:
+    if SkipList is None:
         SkipList = []
 
     for File in SourceFileList:
@@ -569,16 +526,16 @@ def SearchString(UniObjectClass, FileList, IsCompatibleMode):
         return UniObjectClass
 
     for File in FileList:
-        if os.path.isfile(File):
-            Lines = open(File, 'r')
-            for Line in Lines:
-                if not IsCompatibleMode:
-                    StringTokenList = STRING_TOKEN.findall(Line)
-                else:
-                    StringTokenList = COMPATIBLE_STRING_TOKEN.findall(Line)
-                for StrName in StringTokenList:
-                    EdkLogger.debug(EdkLogger.DEBUG_5, "Found string identifier: " + StrName)
-                    UniObjectClass.SetStringReferenced(StrName)
+        try:
+            if os.path.isfile(File):
+                Lines = open(File, 'r')
+                for Line in Lines:
+                    for StrName in STRING_TOKEN.findall(Line):
+                        EdkLogger.debug(EdkLogger.DEBUG_5, "Found string identifier: " + StrName)
+                        UniObjectClass.SetStringReferenced(StrName)
+        except:
+            EdkLogger.error("UnicodeStringGather", AUTOGEN_ERROR, "SearchString: Error while processing file", File=File, RaiseError=False)
+            raise
 
     UniObjectClass.ReToken()
 
@@ -589,15 +546,15 @@ def SearchString(UniObjectClass, FileList, IsCompatibleMode):
 # This function is used for UEFI2.1 spec
 #
 #
-def GetStringFiles(UniFilList, SourceFileList, IncludeList, IncludePathList, SkipList, BaseName, IsCompatibleMode = False, ShellMode = False, UniGenCFlag = True, UniGenBinBuffer = None, FilterInfo = [True, []]):  
+def GetStringFiles(UniFilList, SourceFileList, IncludeList, IncludePathList, SkipList, BaseName, IsCompatibleMode = False, ShellMode = False, UniGenCFlag = True, UniGenBinBuffer = None, FilterInfo = [True, []]):
     if len(UniFilList) > 0:
         if ShellMode:
             #
             # support ISO 639-2 codes in .UNI files of EDK Shell
             #
-            Uni = UniFileClassObject(sorted (UniFilList), True, IncludePathList)
+            Uni = UniFileClassObject(sorted(UniFilList, key=lambda x: x.File), True, IncludePathList)
         else:
-            Uni = UniFileClassObject(sorted (UniFilList), IsCompatibleMode, IncludePathList)
+            Uni = UniFileClassObject(sorted(UniFilList, key=lambda x: x.File), IsCompatibleMode, IncludePathList)
     else:
         EdkLogger.error("UnicodeStringGather", AUTOGEN_ERROR, 'No unicode files given')
 
@@ -618,13 +575,30 @@ def GetStringFiles(UniFilList, SourceFileList, IncludeList, IncludePathList, Ski
 # Write an item
 #
 def Write(Target, Item):
-    return ''.join([Target, Item])
+    if isinstance(Target,str):
+        Target = [Target]
+    if not Target:
+        Target = []
+    if isinstance(Item,list):
+        Target.extend(Item)
+    else:
+        Target.append(Item)
+    return Target
 
 #
 # Write an item with a break line
 #
 def WriteLine(Target, Item):
-    return ''.join([Target, Item, '\n'])
+    if isinstance(Target,str):
+        Target = [Target]
+    if not Target:
+        Target = []
+    if isinstance(Item, list):
+        Target.extend(Item)
+    else:
+        Target.append(Item)
+    Target.append('\n')
+    return Target
 
 # This acts like the main() function for the script, unless it is 'import'ed into another
 # script.

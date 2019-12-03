@@ -1,14 +1,8 @@
 /** @file
   Implement TPM2 Context related command.
 
-Copyright (c) 2014, Intel Corporation. All rights reserved. <BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved. <BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -36,7 +30,7 @@ typedef struct {
   This command causes all context associated with a loaded object or session to be removed from TPM memory.
 
   @param[in]  FlushHandle        The handle of the item to flush.
-  
+
   @retval EFI_SUCCESS            Operation completed successfully.
   @retval EFI_DEVICE_ERROR       The command was unsuccessful.
 **/
@@ -59,7 +53,7 @@ Tpm2FlushContext (
   SendBuffer.Header.commandCode = SwapBytes32(TPM_CC_FlushContext);
 
   SendBuffer.FlushHandle = SwapBytes32 (FlushHandle);
- 
+
   SendBufferSize = (UINT32) sizeof (SendBuffer);
   SendBuffer.Header.paramSize = SwapBytes32 (SendBufferSize);
 

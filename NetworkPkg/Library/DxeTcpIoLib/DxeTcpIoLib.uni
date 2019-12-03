@@ -1,0 +1,16 @@
+// /** @file
+// This library instance provides TCP services by EFI TCPv4/TCPv6 Protocols.
+//
+// This library instance provides TCP services by EFI TCPv4/TCPv6 Protocols.
+//
+// Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Provides TCP services by EFI TCPv4/TCPv6 Protocols"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This library instance provides TCP services by EFI TCPv4/TCPv6 Protocols."
+

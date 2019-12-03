@@ -1,0 +1,33 @@
+/** @file
+  String definitions for Tls Authentication Configuration form.
+
+Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+#langdef en-US "English"
+
+#string STR_TLS_AUTH_CONFIG_TITLE                    #language en-US "Tls Auth Configuration"
+#string STR_TLS_AUTH_CONFIG_HELP                     #language en-US "Press <Enter> to select Tls Auth Configuration."
+
+#string STR_TLS_AUTH_CONFIG_SERVER_CA              #language en-US "Server CA Configuration"
+#string STR_TLS_AUTH_CONFIG_SERVER_CA_HELP         #language en-US "Press <Enter> to configure Server CA."
+#string STR_TLS_AUTH_CONFIG_CLIENT_CERT            #language en-US "Client Cert Configuration"
+#string STR_TLS_AUTH_CONFIG_CLIENT_CERT_HELP       #language en-US "Client cert configuration is unsupported currently."
+
+#string STR_TLS_AUTH_CONFIG_ENROLL_CERT              #language en-US "Enroll Cert"
+#string STR_TLS_AUTH_CONFIG_ENROLL_CERT_HELP         #language en-US "Press <Enter> to enroll cert."
+#string STR_TLS_AUTH_CONFIG_DELETE_CERT              #language en-US "Delete Cert"
+#string STR_TLS_AUTH_CONFIG_DELETE_CERT_HELP         #language en-US "Press <Enter> to delete cert."
+
+#string STR_TLS_AUTH_CONFIG_ADD_CERT_FILE            #language en-US "Enroll Cert Using File"
+
+#string STR_TLS_AUTH_CONFIG_CERT_GUID                #language en-US "Cert GUID"
+#string STR_TLS_AUTH_CONFIG_CERT_GUID_HELP           #language en-US "Input digit character in 11111111-2222-3333-4444-1234567890ab format."
+#string STR_TLS_AUTH_CONFIG_SAVE_AND_EXIT            #language en-US "Commit Changes and Exit"
+#string STR_TLS_AUTH_CONFIG_NO_SAVE_AND_EXIT         #language en-US "Discard Changes and Exit"
+
+#string STR_CERT_TYPE_PCKS_GUID                      #language en-US "GUID for CERT"
+
+#string STR_NULL                                     #language en-US ""

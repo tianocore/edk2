@@ -2,13 +2,7 @@
 
  Copyright (c) 2011 - 2014, ARM Ltd. All rights reserved.<BR>
 
- This program and the accompanying materials
- are licensed and made available under the terms and conditions of the BSD License
- which accompanies this distribution.  The full text of the license may be found at
- http://opensource.org/licenses/bsd-license.php
-
- THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
- WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+ SPDX-License-Identifier: BSD-2-Clause-Patent
 
  --*/
 
@@ -25,6 +19,7 @@
 
 #include <Guid/VariableFormat.h>
 #include <Guid/SystemNvDataGuid.h>
+#include <Guid/NvVarStoreFormatted.h>
 
 #include "NorFlashDxe.h"
 
@@ -58,10 +53,6 @@ InitializeFvAndVariableStoreHeaders (
   UINTN                               HeadersLength;
   EFI_FIRMWARE_VOLUME_HEADER          *FirmwareVolumeHeader;
   VARIABLE_STORE_HEADER               *VariableStoreHeader;
-
-  if (!Instance->Initialized && Instance->Initialize) {
-    Instance->Initialize (Instance);
-  }
 
   HeadersLength = sizeof(EFI_FIRMWARE_VOLUME_HEADER) + sizeof(EFI_FV_BLOCK_MAP_ENTRY) + sizeof(VARIABLE_STORE_HEADER);
   Headers = AllocateZeroPool(HeadersLength);
@@ -431,10 +422,6 @@ FvbRead (
 
   DEBUG ((DEBUG_BLKIO, "FvbRead(Parameters: Lba=%ld, Offset=0x%x, *NumBytes=0x%x, Buffer @ 0x%08x)\n", Instance->StartLba + Lba, Offset, *NumBytes, Buffer));
 
-  if (!Instance->Initialized && Instance->Initialize) {
-    Instance->Initialize(Instance);
-  }
-
   TempStatus = EFI_SUCCESS;
 
   // Cache the block size to avoid de-referencing pointers all the time
@@ -628,10 +615,16 @@ FvbEraseBlocks (
     }
 
     // How many Lba blocks are we requested to erase?
-    NumOfLba = VA_ARG (Args, UINT32);
+    NumOfLba = VA_ARG (Args, UINTN);
 
     // All blocks must be within range
-    DEBUG ((DEBUG_BLKIO, "FvbEraseBlocks: Check if: ( StartingLba=%ld + NumOfLba=%d - 1 ) > LastBlock=%ld.\n", Instance->StartLba + StartingLba, NumOfLba, Instance->Media.LastBlock));
+    DEBUG ((
+      DEBUG_BLKIO,
+      "FvbEraseBlocks: Check if: ( StartingLba=%ld + NumOfLba=%Lu - 1 ) > LastBlock=%ld.\n",
+      Instance->StartLba + StartingLba,
+      (UINT64)NumOfLba,
+      Instance->Media.LastBlock
+      ));
     if ((NumOfLba == 0) || ((Instance->StartLba + StartingLba + NumOfLba - 1) > Instance->Media.LastBlock)) {
       VA_END (Args);
       DEBUG ((EFI_D_ERROR, "FvbEraseBlocks: ERROR - Lba range goes past the last Lba.\n"));
@@ -656,7 +649,7 @@ FvbEraseBlocks (
     }
 
     // How many Lba blocks are we requested to erase?
-    NumOfLba = VA_ARG (Args, UINT32);
+    NumOfLba = VA_ARG (Args, UINTN);
 
     // Go through each one and erase it
     while (NumOfLba > 0) {
@@ -719,8 +712,30 @@ NorFlashFvbInitialize (
   UINTN       RuntimeMmioRegionSize;
 
   DEBUG((DEBUG_BLKIO,"NorFlashFvbInitialize\n"));
+  ASSERT((Instance != NULL));
 
-  Instance->Initialized = TRUE;
+  //
+  // Declare the Non-Volatile storage as EFI_MEMORY_RUNTIME
+  //
+
+  // Note: all the NOR Flash region needs to be reserved into the UEFI Runtime memory;
+  //       even if we only use the small block region at the top of the NOR Flash.
+  //       The reason is when the NOR Flash memory is set into program mode, the command
+  //       is written as the base of the flash region (ie: Instance->DeviceBaseAddress)
+  RuntimeMmioRegionSize = (Instance->RegionBaseAddress - Instance->DeviceBaseAddress) + Instance->Size;
+
+  Status = gDS->AddMemorySpace (
+      EfiGcdMemoryTypeMemoryMappedIo,
+      Instance->DeviceBaseAddress, RuntimeMmioRegionSize,
+      EFI_MEMORY_UC | EFI_MEMORY_RUNTIME
+      );
+  ASSERT_EFI_ERROR (Status);
+
+  Status = gDS->SetMemorySpaceAttributes (
+      Instance->DeviceBaseAddress, RuntimeMmioRegionSize,
+      EFI_MEMORY_UC | EFI_MEMORY_RUNTIME);
+  ASSERT_EFI_ERROR (Status);
+
   mFlashNvStorageVariableBase = FixedPcdGet32 (PcdFlashNvStorageVariableBase);
 
   // Set the index of the first LBA for the FVB
@@ -757,25 +772,15 @@ NorFlashFvbInitialize (
   }
 
   //
-  // Declare the Non-Volatile storage as EFI_MEMORY_RUNTIME
+  // The driver implementing the variable read service can now be dispatched;
+  // the varstore headers are in place.
   //
-
-  // Note: all the NOR Flash region needs to be reserved into the UEFI Runtime memory;
-  //       even if we only use the small block region at the top of the NOR Flash.
-  //       The reason is when the NOR Flash memory is set into program mode, the command
-  //       is written as the base of the flash region (ie: Instance->DeviceBaseAddress)
-  RuntimeMmioRegionSize = (Instance->RegionBaseAddress - Instance->DeviceBaseAddress) + Instance->Size;
-
-  Status = gDS->AddMemorySpace (
-      EfiGcdMemoryTypeMemoryMappedIo,
-      Instance->DeviceBaseAddress, RuntimeMmioRegionSize,
-      EFI_MEMORY_UC | EFI_MEMORY_RUNTIME
-      );
-  ASSERT_EFI_ERROR (Status);
-
-  Status = gDS->SetMemorySpaceAttributes (
-      Instance->DeviceBaseAddress, RuntimeMmioRegionSize,
-      EFI_MEMORY_UC | EFI_MEMORY_RUNTIME);
+  Status = gBS->InstallProtocolInterface (
+                  &gImageHandle,
+                  &gEdkiiNvVarStoreFormattedGuid,
+                  EFI_NATIVE_INTERFACE,
+                  NULL
+                  );
   ASSERT_EFI_ERROR (Status);
 
   //

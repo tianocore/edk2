@@ -1,14 +1,9 @@
 ## @file
 #  Debug Agent library instance for Dxe Core and Dxe modules.
 #
-#  Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 #
-#  This program and the accompanying materials
-#  are licensed and made available under the terms and conditions of the BSD License
-#  which accompanies this distribution. The full text of the license may be found at
-#  http://opensource.org/licenses/bsd-license.php.
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 #
 ##
@@ -42,16 +37,12 @@
   DebugAgentCommon/DebugMp.h
 
 [Sources.Ia32]
-  DebugAgentCommon/Ia32/AsmFuncs.S
-  DebugAgentCommon/Ia32/AsmFuncs.asm
   DebugAgentCommon/Ia32/AsmFuncs.nasm
   DebugAgentCommon/Ia32/ArchDebugSupport.h
   DebugAgentCommon/Ia32/ArchDebugSupport.c
   DebugAgentCommon/Ia32/DebugException.h
 
 [Sources.X64]
-  DebugAgentCommon/X64/AsmFuncs.S
-  DebugAgentCommon/X64/AsmFuncs.asm
   DebugAgentCommon/X64/AsmFuncs.nasm
   DebugAgentCommon/X64/ArchDebugSupport.h
   DebugAgentCommon/X64/ArchDebugSupport.c
@@ -95,10 +86,11 @@
 
 [Protocols]
   gEfiSerialIoProtocolGuid                      ## SOMETIMES_PRODUCES
-  gEfiDevicePathProtocolGuid                    ## SOMETIMES_PRODUCES 
+  gEfiDevicePathProtocolGuid                    ## SOMETIMES_PRODUCES
 
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdFSBClock                                  ## SOMETIMES_CONSUMES
   gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdExceptionsIgnoredByDebugger  ## SOMETIMES_CONSUMES
   gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdDebugPortHandleBufferSize    ## CONSUMES
+  gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdTransferProtocolRevision     ## CONSUMES
 

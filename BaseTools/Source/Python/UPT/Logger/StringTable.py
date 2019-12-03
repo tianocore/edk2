@@ -1,15 +1,9 @@
 ## @file
 # This file is used to define strings used in the UPT tool
 #
-# Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
-# This program and the accompanying materials are licensed and made available 
-# under the terms and conditions of the BSD License which accompanies this 
-# distribution. The full text of the license may be found at 
-# http://opensource.org/licenses/bsd-license.php
-#
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 """
 This file contains user visible strings in a format that can be used for
@@ -42,7 +36,7 @@ MSG_USAGE_STRING = _("\n"
 MSG_VERSION_NUMBER = _("1.1")
 MSG_VERSION = _("UEFI Packaging Tool (UEFIPT) - Revision " + \
                 MSG_VERSION_NUMBER)
-MSG_COPYRIGHT = _("Copyright (c) 2011 - 2016 Intel Corporation All Rights Reserved.")
+MSG_COPYRIGHT = _("Copyright (c) 2011 - 2018 Intel Corporation All Rights Reserved.")
 MSG_VERSION_COPYRIGHT = _("\n  %s\n  %s" % (MSG_VERSION, MSG_COPYRIGHT))
 MSG_USAGE = _("%s [options]\n%s" % ("UPT", MSG_VERSION_COPYRIGHT))
 MSG_DESCRIPTION = _("The UEFIPT is used to create, " + \
@@ -118,7 +112,7 @@ ERR_INF_PARSER_DEPEX_SECTION_MODULE_TYPE_ERROR = \
 ERR_INF_PARSER_DEPEX_SECTION_CONTENT_MISSING = \
     _("Missing content in: %s")
 ERR_INF_PARSER_DEPEX_SECTION_CONTENT_ERROR  = \
-    _("The [Depex] section contains invalid content: %s")                    
+    _("The [Depex] section contains invalid content: %s")
 ERR_INF_PARSER_DEPEX_SECTION_SEC_TYPE_ERROR = \
     _("The format is incorrect. The section type keyword of the content in the"
       " [Depex] section is only for 'PEI_DEPEX', 'DXE_DEPEX', 'SMM_DEPEX', "
@@ -135,22 +129,22 @@ ERR_INF_PARSER_LIBRARY_SECTION_CONTENT_ERROR = \
 ERR_INF_PARSER_LIBRARY_SECTION_LIBNAME_MISSING = \
     _("Format invalid. Please specify a library name.")
 ERR_INF_PARSER_SOURCES_SECTION_CONTENT_ERROR = \
-    _("The format is incorrect. It should be formated as follows: "
+    _("The format is incorrect. It should be formatted as follows: "
       "FileName, Family | TagName | ToolCode | FeatureFlagExpr.")
 ERR_INF_PARSER_PCD_SECTION_TYPE_ERROR = \
     _("The PCD section type is incorrect. The value should be this list: %s")
 ERR_INF_PARSER_PCD_SECTION_CONTENT_ERROR = \
-    _("PcdName format invalid." 
+    _("PcdName format invalid."
       "Should like following: PcdName | Value | FeatureFlag.")
 ERR_INF_PARSER_PCD_NAME_FORMAT_ERROR = \
-    _("Format invalid." 
-      "Should like following: <TokenSpaceGuidCName>.<PcdCName> ")   
+    _("Format invalid."
+      "Should like following: <TokenSpaceGuidCName>.<PcdCName> ")
 ERR_INF_PARSER_GUID_PPI_PROTOCOL_SECTION_CONTENT_ERROR = \
     _("The format is incorrect. "
-      "It should be formated as follows: CName | FeatureFlag.")
+      "It should be formatted as follows: CName | FeatureFlag.")
 ERR_INF_PARSER_PACKAGE_SECTION_CONTENT_ERROR = \
     _("The format is incorrect. "
-      "It should be formated as follows:  <TokenSpaceGuidCName>.<PcdCName>")
+      "It should be formatted as follows:  <TokenSpaceGuidCName>.<PcdCName>")
 ERR_INF_PARSER_PCD_TAIL_COMMENTS_INVALID = \
     _("The format is incorrect. "
       "Multiple usage descriptions must be described on subsequent lines.")
@@ -181,7 +175,7 @@ ERR_INF_PARSER_PCD_CVAR_GUID = \
 ERR_INF_PARSER_PCD_CVAR_PCDCNAME = \
     _("PcdCName must be valid C variable format.")
 ERR_INF_PARSER_PCD_VALUE_INVALID = \
-    _("The PCD value is incorrect. It must be corrected before continuing.")    
+    _("The PCD value is incorrect. It must be corrected before continuing.")
 ERR_INF_PARSER_FEATURE_FLAG_EXP_SYNTAX_INVLID = \
     _("Incorrect feature flag expression: %s")
 ERR_INF_PARSER_FEATURE_FLAG_EXP_MISSING = \
@@ -191,13 +185,13 @@ ERR_INF_PARSER_INVALID_CNAME = \
 ERR_INF_PARSER_CNAME_MISSING = \
     _("Missing CName. Specify a valid C variable name.")
 ERR_INF_PARSER_DEFINE_SECTION_KEYWORD_INVALID = \
-    _("The Define section contains an invalid keyword:  \"%s\"."  
+    _("The Define section contains an invalid keyword:  \"%s\"."
     "It must be corrected before continuing.")
 ERR_INF_PARSER_FILE_MISS_DEFINE = \
     _("The following file listed in the module "
       "directory is not listed in the INF: %s")
 ERR_INF_PARSER_VERSION_NUMBER_DEPRICATED = \
-    _("VERSION_NUMBER depricated.  "
+    _("VERSION_NUMBER deprecated.  "
       "The INF file %s should be modified to use the VERSION_STRING instead.")
 ERR_INF_PARSER_VER_EXIST_BOTH_NUM_STR = \
     _("The INF file %s defines both VERSION_NUMBER and VERSION_STRING, "
@@ -206,7 +200,7 @@ ERR_INF_PARSER_NOT_SUPPORT_EDKI_INF = _("EDKI INF is not supported")
 ERR_INF_PARSER_EDKI_COMMENT_IN_EDKII = _("The EDKI style comment is not supported in EDKII modules")
 
 ERR_INF_PARSER_FEATUREPCD_USAGE_INVALID = _("The usage for FeaturePcd can only"
-    " be type of \"CONSUMES\".") 
+    " be type of \"CONSUMES\".")
 
 ERR_INF_PARSER_DEFINE_ITEM_NO_NAME = _("No name specified")
 ERR_INF_PARSER_DEFINE_ITEM_NO_VALUE = _("No value specified")
@@ -221,9 +215,9 @@ ERR_INF_NO_PKG_DEPENDENCY_INFO = _("There are no packages defined that use the A
 #
 ERR_INF_PARSER_ITEM_DUPLICATE_IN_DEC = \
 _('"%s" is redefined in its dependent DEC files')
-ERR_INF_PARSER_ITEM_DUPLICATE = _("%s define duplicated! " 
+ERR_INF_PARSER_ITEM_DUPLICATE = _("%s define duplicated! "
                                   "It must be corrected before continuing.")
-ERR_INF_PARSER_ITEM_DUPLICATE_COMMON = _("%s define duplicated! Item listed" 
+ERR_INF_PARSER_ITEM_DUPLICATE_COMMON = _("%s define duplicated! Item listed"
 "in an architectural section must not be listed in the common architectural"
 "section.It must be corrected before continuing.")
 ERR_INF_PARSER_UE_SECTION_DUPLICATE_ERROR = \
@@ -237,11 +231,11 @@ _("The name 'NULL' for LibraryClass is a reserved word."
 
 ERR_GLOBAL_MARCO_INVALID = \
 _("Using global MACRO in INF/DEC is not permitted: %s . "
-"It must be corrected before continuing.")                                          
+"It must be corrected before continuing.")
 
 ERR_MARCO_DEFINITION_MISS_ERROR = \
 _("MACRO expand incorrectly, can not find the MACRO definition. "
-"It must be corrected before continuing.") 
+"It must be corrected before continuing.")
 
 #
 # AsBuilt related
@@ -257,7 +251,7 @@ ERR_ASBUILD_PCD_SECTION_TYPE = _("The AsBuilt INF file contains a PCD section ty
 ERR_ASBUILD_PATCHPCD_FORMAT_INVALID = _("The AsBuilt PatchPcd entry must contain 3 elements: PcdName|Value|Offset")
 ERR_ASBUILD_PCDEX_FORMAT_INVALID = _("The AsBuilt PcdEx entry must contain one element: PcdName")
 ERR_ASBUILD_PCD_VALUE_INVALID = \
-    _("The AsBuilt PCD value %s is incorrect or not align with it's datum type %s. "
+    _("The AsBuilt PCD value %s is incorrect or not align with its datum type %s. "
       "It must be corrected before continuing.")
 ERR_ASBUILD_PCD_TOKENSPACE_GUID_VALUE_MISS = _("Package file value could not be retrieved for %s.")
 ERR_ASBUILD_PCD_DECLARITION_MISS = _("PCD Declaration in DEC files could not be found for: %s.")
@@ -322,8 +316,9 @@ MSG_NEW_FILE_NAME_FOR_DIST      = _(
     "Provide new filename for distribution file to be saved:\n")
 MSG_UPDATE_PACKAGE_DATABASE    = _("Update Distribution Package Database ...")
 MSG_PYTHON_ON                  = _("(Python %s on %s) ")
+MSG_EDKII_MAIL_ADDR            = 'devel@edk2.groups.io'
 MSG_SEARCH_FOR_HELP            = _(
-    "\n(Please send email to edk2-devel@lists.01.org for\n"
+    "\n(Please send email to %s for\n"
     " help, attach the following call stack trace.)\n")
 MSG_REMOVE_TEMP_FILE_STARTED   = _("Removing temp files started ... ")
 MSG_REMOVE_TEMP_FILE_DONE   = _("Removing temp files ... Done.")
@@ -370,7 +365,7 @@ MSG_RECOVER_FAIL = _('Recovery failed.')
 #
 
 ERR_DEPENDENCY_NOT_MATCH         = _(
-    "Module %s's dependency on package %s (GUID %s Version %s) " 
+    "Module %s's dependency on package %s (GUID %s Version %s) "
     "cannot be satisfied")
 ERR_MODULE_NOT_INSTALLED         = _(
     "This module is not installed in the workspace: %s\n")
@@ -475,7 +470,7 @@ ERR_FILELIST_EXIST               = _(
 ERR_COPYRIGHT_CONTENT            = _(
     "The copyright content must contain the word \"Copyright\" (case insensitive).")
 ERR_WRONG_FILELIST_FORMAT        = \
-_('File list format is incorrect.' 
+_('File list format is incorrect.'
   'The correct format is: filename|key=value[|key=value]')
 ERR_FILELIST_ATTR                = _(
     "The value of attribute \"%s\" includes illegal character.")
@@ -585,7 +580,7 @@ _("Only a distribution file name without a path is allowed for "
   "the distribution to be replaced during replace. Current given: '%s'.")
 ERR_UNIPARSE_DBLQUOTE_UNMATCHED = \
 _("Only Language entry can contain a couple of matched quote in one line")
-ERR_UNIPARSE_NO_SECTION_EXIST = _("No PakcageDef or ModuleDef section exists in the UNI file.")
+ERR_UNIPARSE_NO_SECTION_EXIST = _("No PackageDef or ModuleDef section exists in the UNI file.")
 ERR_UNIPARSE_STRNAME_FORMAT_ERROR = _("The String Token Name %s must start with \"STR_\"")
 ERR_UNIPARSE_SEP_LANGENTRY_LINE = _("Each <LangEntry> should be in a separate line :%s.")
 ERR_UNIPARSE_MULTI_ENTRY_EXIST = \
@@ -593,7 +588,7 @@ _("There are same entries : %s in the UNI file, every kind of entry should be on
 ERR_UNIPARSE_ENTRY_ORDER_WRONG = \
 _("The string entry order in UNI file should be <AbstractStrings>, <DescriptionStrings>, \
 <BinaryAbstractStrings>, <BinaryDescriptionStrings>.")
-ERR_UNIPARSE_STRTOKEN_FORMAT_ERROR = _("The String Token Type %s must be one of the '_PROMPT', '_HELP' and '_ERR_'.") 
+ERR_UNIPARSE_STRTOKEN_FORMAT_ERROR = _("The String Token Type %s must be one of the '_PROMPT', '_HELP' and '_ERR_'.")
 ERR_UNIPARSE_LINEFEED_UNDER_EXIST = _("Line feed should not exist under this line: %s.")
 ERR_UNIPARSE_LINEFEED_UP_EXIST = _("Line feed should not exist up this line: %s.")
 ERR_UNI_MISS_STRING_ENTRY = _("String entry missed in this Entry, %s.")
@@ -672,7 +667,7 @@ _("Library class format error, must be Libraryclass|Headerpath.")
 ERR_DECPARSE_LIBCLASS_EMPTY         = \
 _("Class name or file name must not be empty.")
 ERR_DECPARSE_LIBCLASS_LIB           = \
-_("Class name format error, must start with upper case letter followed with " 
+_("Class name format error, must start with upper case letter followed with "
   "zero or more alphanumeric characters.")
 ERR_DECPARSE_LIBCLASS_PATH_EXT      = _("File name must be end with .h.")
 ERR_DECPARSE_LIBCLASS_PATH_DOT      = _("Path must not include '..'.")
@@ -695,7 +690,7 @@ _("Incorrect  value [%s] of type [%s].  Value  must be printable and in the "
   "form of{...} for array, or ""..."" for string, or L""..."""
   "for unicode string.")
 ERR_DECPARSE_PCD_VALUE_EMPTY        = \
-_("Pcd value can not be empty.") 
+_("Pcd value can not be empty.")
 ERR_DECPARSE_PCD_BOOL               = \
 _("Invalid value [%s] of type [%s]; must be expression, TRUE, FALSE, 0 or 1.")
 ERR_DECPARSE_PCD_INT                = _("Incorrect value [%s] of type [%s]."\
@@ -719,14 +714,14 @@ _("No GUID name specified, must be <CName> = <GuidValueInCFormat>.")
 ERR_DECPARSE_CGUID_GUID             = \
 _("No GUID value specified, must be <CName> = <GuidValueInCFormat>.")
 ERR_DECPARSE_CGUID_GUIDFORMAT       = \
-_("Incorrect GUID value format, must be <GuidValueInCFormat:" 
+_("Incorrect GUID value format, must be <GuidValueInCFormat:"
   "{8,4,4,{2,2,2,2,2,2,2,2}}>.")
 ERR_DECPARSE_CGUID_NOT_FOUND = _("Unable to find the GUID value of this GUID CName : '%s'.")
 ERR_DECPARSE_FILEOPEN               = _("Unable to open: [%s].")
 ERR_DECPARSE_SECTION_EMPTY          = _("Empty sections are not allowed.")
-ERR_DECPARSE_SECTION_UE             = _("Incorrect UserExtentions format. "
+ERR_DECPARSE_SECTION_UE             = _("Incorrect UserExtensions format. "
                             "Must be UserExtenxions.UserId.IdString[.Arch]+.")
-ERR_DECPARSE_SECTION_UE_USERID      = _("Invalid UserId, must be underscore" 
+ERR_DECPARSE_SECTION_UE_USERID      = _("Invalid UserId, must be underscore"
                                         "or alphanumeric characters.")
 ERR_DECPARSE_SECTION_UE_IDSTRING    = \
     _("Incorrect IdString, must be \" ... \".")
@@ -785,7 +780,7 @@ WRN_MODULE_EXISTED        = _("This module already exists: %s")
 WRN_FILE_EXISTED          = _("This file already exists: %s")
 WRN_FILE_NOT_OVERWRITTEN  = \
 _("This file already exist and cannot be overwritten: %s")
-WRN_DIST_PKG_INSTALLED = _("This distribution package has previously been installed.")
+WRN_DIST_PKG_INSTALLED = _("This distribution package %s has previously been installed.")
 WRN_DIST_NOT_FOUND         = _(
     "Distribution is not found at location %s")
 WRN_MULTI_PCD_RANGES      = _(
@@ -805,7 +800,7 @@ WRN_INF_PARSER_MODULE_INVALID_EVENT_TYPE = \
 WRN_INF_PARSER_MODULE_INVALID_BOOTMODE_TYPE = \
     _("This is an incorrect BOOTMODE type: %s")
 WRN_INVALID_MODULE_TYPE = \
-    _("This is an incorrect Module type: %s")  
+    _("This is an incorrect Module type: %s")
 WRN_MODULE_PARSE_FAILED = \
     _("Parsing of this module did not complete correctly: %s.")
 WRN_EDK1_INF_FOUND = \
@@ -826,7 +821,7 @@ HLP_PRINT_DEBUG_INFO             = _(
     "Print DEBUG statements, where DEBUG_LEVEL is 0-9")
 HLP_PRINT_INFORMATIONAL_STATEMENT = _("Print informational statements")
 HLP_RETURN_NO_DISPLAY            = _(
-    "Returns only the exit code, informational and error messages are" 
+    "Returns only the exit code, informational and error messages are"
     " not displayed")
 HLP_RETURN_AND_DISPLAY           = _(
     "Returns the exit code and displays  error messages only")

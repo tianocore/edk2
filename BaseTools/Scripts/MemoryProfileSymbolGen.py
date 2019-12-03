@@ -3,24 +3,19 @@
 #
 # This tool depends on DIA2Dump.exe (VS) or nm (gcc) to parse debug entry.
 #
-# Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
-# This program and the accompanying materials are licensed and made available under
-# the terms and conditions of the BSD License that accompanies this distribution.
-# The full text of the license may be found at
-# http://opensource.org/licenses/bsd-license.php.
-#
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
 
+from __future__ import print_function
 import os
 import re
 import sys
 from optparse import OptionParser
 
 versionNumber = "1.1"
-__copyright__ = "Copyright (c) 2016, Intel Corporation. All rights reserved."
+__copyright__ = "Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved."
 
 class Symbols:
     def __init__(self):
@@ -58,10 +53,10 @@ class Symbols:
         try:
             nmCommand = "nm"
             nmLineOption = "-l"
-            print "parsing (debug) - " + pdbName
+            print("parsing (debug) - " + pdbName)
             os.system ('%s %s %s > nmDump.line.log' % (nmCommand, nmLineOption, pdbName))
         except :
-            print 'ERROR: nm command not available.  Please verify PATH'
+            print('ERROR: nm command not available.  Please verify PATH')
             return
 
         #
@@ -71,7 +66,7 @@ class Symbols:
         reportLines = linefile.readlines()
         linefile.close()
 
-        # 000113ca T AllocatePool	c:\home\edk-ii\MdePkg\Library\UefiMemoryAllocationLib\MemoryAllocationLib.c:399
+        # 000113ca T AllocatePool  c:\home\edk-ii\MdePkg\Library\UefiMemoryAllocationLib\MemoryAllocationLib.c:399
         patchLineFileMatchString = "([0-9a-fA-F]*)\s+[T|D|t|d]\s+(\w+)\s*((?:[a-zA-Z]:)?[\w+\-./_a-zA-Z0-9\\\\]*):?([0-9]*)"
 
         for reportLine in reportLines:
@@ -111,11 +106,11 @@ class Symbols:
             DIA2DumpCommand = "Dia2Dump.exe"
             #DIA2SymbolOption = "-p"
             DIA2LinesOption = "-l"
-            print "parsing (pdb) - " + pdbName
+            print("parsing (pdb) - " + pdbName)
             #os.system ('%s %s %s > DIA2Dump.symbol.log' % (DIA2DumpCommand, DIA2SymbolOption, pdbName))
             os.system ('%s %s %s > DIA2Dump.line.log' % (DIA2DumpCommand, DIA2LinesOption, pdbName))
         except :
-            print 'ERROR: DIA2Dump command not available.  Please verify PATH'
+            print('ERROR: DIA2Dump command not available.  Please verify PATH')
             return
 
         #
@@ -126,9 +121,9 @@ class Symbols:
         linefile.close()
 
         #   ** GetDebugPrintErrorLevel
-        #	line 32 at [0000C790][0001:0000B790], len = 0x3	c:\home\edk-ii\mdepkg\library\basedebugprinterrorlevellib\basedebugprinterrorlevellib.c (MD5: 687C0AE564079D35D56ED5D84A6164CC)
-        #	line 36 at [0000C793][0001:0000B793], len = 0x5
-        #	line 37 at [0000C798][0001:0000B798], len = 0x2
+        #  line 32 at [0000C790][0001:0000B790], len = 0x3  c:\home\edk-ii\mdepkg\library\basedebugprinterrorlevellib\basedebugprinterrorlevellib.c (MD5: 687C0AE564079D35D56ED5D84A6164CC)
+        #  line 36 at [0000C793][0001:0000B793], len = 0x5
+        #  line 37 at [0000C798][0001:0000B798], len = 0x2
 
         patchLineFileMatchString = "\s+line ([0-9]+) at \[([0-9a-fA-F]{8})\]\[[0-9a-fA-F]{4}\:[0-9a-fA-F]{8}\], len = 0x[0-9a-fA-F]+\s*([\w+\-\:./_a-zA-Z0-9\\\\]*)\s*"
         patchLineFileMatchStringFunc = "\*\*\s+(\w+)\s*"
@@ -190,7 +185,7 @@ def processLine(newline):
 
     driverPrefixLen = len("Driver - ")
     # get driver name
-    if cmp(newline[0:driverPrefixLen],"Driver - ") == 0 :
+    if cmp(newline[0:driverPrefixLen], "Driver - ") == 0 :
         driverlineList = newline.split(" ")
         driverName = driverlineList[2]
         #print "Checking : ", driverName
@@ -213,7 +208,7 @@ def processLine(newline):
         else :
             symbolsFile.symbolsTable[driverName].parse_debug_file (driverName, pdbName)
 
-    elif cmp(newline,"") == 0 :
+    elif cmp(newline, "") == 0 :
         driverName = ""
 
     # check entry line
@@ -226,7 +221,7 @@ def processLine(newline):
         rvaName = ""
         symbolName = ""
 
-    if cmp(rvaName,"") == 0 :
+    if cmp(rvaName, "") == 0 :
         return newline
     else :
         return newline + symbolName
@@ -254,16 +249,16 @@ def main():
     try :
         file = open(Options.inputfilename)
     except Exception:
-        print "fail to open " + Options.inputfilename
+        print("fail to open " + Options.inputfilename)
         return 1
     try :
         newfile = open(Options.outputfilename, "w")
     except Exception:
-        print "fail to open " + Options.outputfilename
+        print("fail to open " + Options.outputfilename)
         return 1
 
     try:
-        while 1:
+        while True:
             line = file.readline()
             if not line:
                 break

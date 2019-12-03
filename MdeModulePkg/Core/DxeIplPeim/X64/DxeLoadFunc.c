@@ -1,14 +1,8 @@
 /** @file
   x64-specifc functionality for DxeLoad.
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -41,6 +35,14 @@ HandOffToDxeCore (
   UINT32                          Index;
   EFI_VECTOR_HANDOFF_INFO         *VectorInfo;
   EFI_PEI_VECTOR_HANDOFF_INFO_PPI *VectorHandoffInfoPpi;
+
+  //
+  // Clear page 0 and mark it as allocated if NULL pointer detection is enabled.
+  //
+  if (IsNullDetectionEnabled ()) {
+    ClearFirst4KPage (HobList.Raw);
+    BuildMemoryAllocationHob (0, EFI_PAGES_TO_SIZE (1), EfiBootServicesData);
+  }
 
   //
   // Get Vector Hand-off Info PPI and build Guided HOB
@@ -91,8 +93,9 @@ HandOffToDxeCore (
     // for the DxeIpl and the DxeCore are both X64.
     //
     ASSERT (PcdGetBool (PcdSetNxForStack) == FALSE);
+    ASSERT (PcdGetBool (PcdCpuStackGuard) == FALSE);
   }
-  
+
   //
   // End of PEI phase signal
   //
@@ -105,7 +108,7 @@ HandOffToDxeCore (
 
   //
   // Update the contents of BSP stack HOB to reflect the real stack info passed to DxeCore.
-  //    
+  //
   UpdateStackHob ((EFI_PHYSICAL_ADDRESS)(UINTN) BaseOfStack, STACK_SIZE);
 
   //

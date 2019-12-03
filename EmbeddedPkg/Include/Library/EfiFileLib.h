@@ -1,24 +1,18 @@
 /** @file
   Library functions that perform file IO. Memory buffer, file system, and
-  fimrware volume operations are supproted.
+  firmware volume operations are supported.
 
   Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
   Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
   Basic support for opening files on different device types. The device string
   is in the form of DevType:Path. Current DevType is required as there is no
   current mounted device concept of current working directory concept implement
   by this library.
 
-  Device names are case insensative and only check the leading characters for
+  Device names are case insensitive and only check the leading characters for
   unique matches. Thus the following are all the same:
     LoadFile0:
     l0:
@@ -30,7 +24,7 @@
   l1:          - EFI LoadFile device one.
   B0:          - EFI BlockIo zero.
   fs3:         - EFI Simple File System device 3
-  Fv2:         - EFI Firmware VOlume device 2
+  Fv2:         - EFI Firmware Volume device 2
   1.2.3.4:name - TFTP IP and file name
 
 **/

@@ -1,14 +1,9 @@
 /** @file
   Decode an El Torito formatted CD-ROM
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2018 Qualcomm Datacenter Technologies, Inc.
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -44,22 +39,23 @@ PartitionInstallElToritoChildHandles (
   IN  EFI_DEVICE_PATH_PROTOCOL     *DevicePath
   )
 {
-  EFI_STATUS              Status;
-  UINT64                  VolDescriptorOffset;
-  UINT32                  Lba2KB;
-  EFI_BLOCK_IO_MEDIA      *Media;
-  CDROM_VOLUME_DESCRIPTOR *VolDescriptor;
-  ELTORITO_CATALOG        *Catalog;
-  UINTN                   Check;
-  UINTN                   Index;
-  UINTN                   BootEntry;
-  UINTN                   MaxIndex;
-  UINT16                  *CheckBuffer;
-  CDROM_DEVICE_PATH       CdDev;
-  UINT32                  SubBlockSize;
-  UINT32                  SectorCount;
-  EFI_STATUS              Found;
-  UINT32                  VolSpaceSize;
+  EFI_STATUS                   Status;
+  UINT64                       VolDescriptorOffset;
+  UINT32                       Lba2KB;
+  EFI_BLOCK_IO_MEDIA           *Media;
+  CDROM_VOLUME_DESCRIPTOR      *VolDescriptor;
+  ELTORITO_CATALOG             *Catalog;
+  UINTN                        Check;
+  UINTN                        Index;
+  UINTN                        BootEntry;
+  UINTN                        MaxIndex;
+  UINT16                       *CheckBuffer;
+  CDROM_DEVICE_PATH            CdDev;
+  UINT32                       SubBlockSize;
+  UINT32                       SectorCount;
+  EFI_STATUS                   Found;
+  UINT32                       VolSpaceSize;
+  EFI_PARTITION_INFO_PROTOCOL  PartitionInfo;
 
   Found         = EFI_NOT_FOUND;
   Media         = BlockIo->Media;
@@ -248,6 +244,10 @@ PartitionInstallElToritoChildHandles (
                                 );
       }
 
+      ZeroMem (&PartitionInfo, sizeof (EFI_PARTITION_INFO_PROTOCOL));
+      PartitionInfo.Revision = EFI_PARTITION_INFO_PROTOCOL_REVISION;
+      PartitionInfo.Type     = PARTITION_TYPE_OTHER;
+
       Status = PartitionInstallChildHandle (
                 This,
                 Handle,
@@ -257,10 +257,11 @@ PartitionInstallElToritoChildHandles (
                 BlockIo2,
                 DevicePath,
                 (EFI_DEVICE_PATH_PROTOCOL *) &CdDev,
+                &PartitionInfo,
                 Catalog->Boot.Lba * (SIZE_2KB / Media->BlockSize),
                 Catalog->Boot.Lba * (SIZE_2KB / Media->BlockSize) + CdDev.PartitionSize - 1,
                 SubBlockSize,
-                FALSE
+                NULL
                 );
       if (!EFI_ERROR (Status)) {
         Found = EFI_SUCCESS;

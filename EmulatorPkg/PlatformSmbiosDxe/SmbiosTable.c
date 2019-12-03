@@ -8,19 +8,13 @@
     Processor Information (Type 4) - CPU Driver
     Cache Information (Type 7) - For cache that is external to processor
     System Slots (Type 9) - If system has slots
-    Physical Memory Array (Type 16) 
+    Physical Memory Array (Type 16)
     Memory Device (Type 17) - For each socketed system-memory Device
     Memory Array Mapped Address (Type 19) - One per contiguous block per Physical Memroy Array
     System Boot Information (Type 32)
 
   Copyright (c) 2012, Apple Inc. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -69,9 +63,9 @@ SMBIOS_TABLE_TYPE0 gSmbiosType0Template = {
     0,    //  PrinterIsSupported                :1;
     0,    //  CgaMonoIsSupported                :1;
     0,    //  NecPc98                           :1;
-    0     //  ReservedForVendor                 :32; ///< Bits 32-63. Bits 32-47 reserved for BIOS vendor 
-                                                 ///< and bits 48-63 reserved for System Vendor. 
-  },           
+    0     //  ReservedForVendor                 :32; ///< Bits 32-63. Bits 32-47 reserved for BIOS vendor
+                                                 ///< and bits 48-63 reserved for System Vendor.
+  },
   {       // BIOSCharacteristicsExtensionBytes[]
     0x81, //  AcpiIsSupported                   :1;
           //  UsbLegacyIsSupported              :1;
@@ -108,7 +102,7 @@ SMBIOS_TABLE_TYPE1 gSmbiosType1Template = {
   3,    // Version String
   4,    // SerialNumber String
   { 0x25EF0280, 0xEC82, 0x42B0, { 0x8F, 0xB6, 0x10, 0xAD, 0xCC, 0xC6, 0x7C, 0x02 } },
-  SystemWakeupTypePowerSwitch,  
+  SystemWakeupTypePowerSwitch,
   5,    // SKUNumber String
   6,    // Family String
 };
@@ -119,7 +113,7 @@ CHAR8  *gSmbiosType1Strings[] = {
   "System Serial#",
   "System SKU#",
   "edk2",
-  NULL 
+  NULL
 };
 
 SMBIOS_TABLE_TYPE2  gSmbiosType2Template = {
@@ -139,7 +133,7 @@ SMBIOS_TABLE_TYPE2  gSmbiosType2Template = {
   },
   6,    // LocationInChassis String
   0,                        // ChassisHandle;
-  BaseBoardTypeMotherBoard, // BoardType;            
+  BaseBoardTypeMotherBoard, // BoardType;
   0,                        // NumberOfContainedObjectHandles;
   { 0 }                     // ContainedObjectHandles[1];
 };
@@ -150,7 +144,7 @@ CHAR8  *gSmbiosType2Strings[] = {
   "Base Board Serial#",
   "Base Board Asset Tag#",
   "Part Component",
-  NULL  
+  NULL
 };
 
 SMBIOS_TABLE_TYPE3  gSmbiosType3Template = {
@@ -160,10 +154,10 @@ SMBIOS_TABLE_TYPE3  gSmbiosType3Template = {
   2,                        // Version String
   3,                        // SerialNumber String
   4,                        // AssetTag String
-  ChassisStateSafe,         // BootupState;           
-  ChassisStateSafe,         // PowerSupplyState;       
-  ChassisStateSafe,         // ThermalState;           
-  ChassisSecurityStatusNone,// SecurityStatus;         
+  ChassisStateSafe,         // BootupState;
+  ChassisStateSafe,         // PowerSupplyState;
+  ChassisStateSafe,         // ThermalState;
+  ChassisSecurityStatusNone,// SecurityStatus;
   { 0, 0, 0, 0 },           // OemDefined[4];
   0,    // Height;
   0,    // NumberofPowerCords;
@@ -176,7 +170,7 @@ CHAR8  *gSmbiosType3Strings[] = {
   "EmulatorPkg",
   "Chassis Board Serial#",
   "Chassis Board Asset Tag#",
-  NULL  
+  NULL
 };
 
 SMBIOS_TABLE_TYPE8  gSmbiosType8Template1 = {

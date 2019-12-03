@@ -2,14 +2,8 @@
 
   This file contains the definination for host controller schedule routines.
 
-Copyright (c) 2007 - 2009, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -162,6 +156,39 @@ EhciDelAllAsyncIntTransfers (
   IN USB2_HC_DEV          *Ehc
   );
 
+/**
+  Insert a single asynchronous interrupt transfer for
+  the device and endpoint.
+
+  @param  Ehc               The EHCI device.
+  @param  DevAddr           The device address.
+  @param  EpAddr            Endpoint addrress & its direction.
+  @param  DevSpeed          The device speed.
+  @param  Toggle            Initial data toggle to use.
+  @param  MaxPacket         The max packet length of the endpoint.
+  @param  Hub               The transaction translator to use.
+  @param  DataLen           The length of data buffer.
+  @param  Callback          The function to call when data is transferred.
+  @param  Context           The context to the callback.
+  @param  Interval          The interval for interrupt transfer.
+
+  @return Created URB or NULL.
+
+**/
+URB *
+EhciInsertAsyncIntTransfer (
+  IN USB2_HC_DEV                        *Ehc,
+  IN UINT8                              DevAddr,
+  IN UINT8                              EpAddr,
+  IN UINT8                              DevSpeed,
+  IN UINT8                              Toggle,
+  IN UINTN                              MaxPacket,
+  IN EFI_USB2_HC_TRANSACTION_TRANSLATOR *Hub,
+  IN UINTN                              DataLen,
+  IN EFI_ASYNC_USB_TRANSFER_CALLBACK    Callback,
+  IN VOID                               *Context,
+  IN UINTN                              Interval
+  );
 
 /**
   Interrupt transfer periodic check handler.

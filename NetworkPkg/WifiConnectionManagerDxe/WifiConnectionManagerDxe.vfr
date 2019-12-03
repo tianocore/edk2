@@ -1,0 +1,347 @@
+/** @file
+  Vfr files used in WiFi Connection Manager.
+
+  Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+#include "WifiConnectionMgrConfigNVDataStruct.h"
+
+#define EFI_NETWORK_DEVICE_CLASS  0x04
+
+formset
+  guid     = WIFI_CONNECTION_MANAGER_CONFIG_GUID,
+  title    = STRING_TOKEN(STR_WIFI_MGR_FORM_TITLE),
+  help     = STRING_TOKEN(STR_WIFI_MGR_FORM_HELP),
+  class    = EFI_NETWORK_DEVICE_CLASS,
+  subclass = 0x03,
+
+  varstore WIFI_MANAGER_IFR_NVDATA,
+    varid = MANAGER_VARSTORE_ID,
+    name  = WIFI_MANAGER_IFR_NVDATA,
+    guid  = WIFI_CONNECTION_MANAGER_CONFIG_GUID;
+
+  form formid = FORMID_MAC_SELECTION,
+    title = STRING_TOKEN(STR_WIFI_MAC_FORM_TITLE);
+
+    suppressif TRUE;
+      text
+        help   = STRING_TOKEN(STR_NULL_STRING),
+        text   = STRING_TOKEN(STR_NULL_STRING),
+        flags  = INTERACTIVE,
+        key    = KEY_MAC_LIST;
+      endif;
+
+    label LABEL_MAC_ENTRY;
+    label LABEL_END;
+  endform;
+
+  form formid = FORMID_WIFI_MAINPAGE,
+    title = STRING_TOKEN(STR_NETWORK_MANAGEMENT_TITLE);
+
+    text
+      help   = STRING_TOKEN(STR_MAC_ADDRESS_HELP),      // Help string
+      text   = STRING_TOKEN(STR_MAC_ADDRESS_TITLE),     // Prompt string
+        text   = STRING_TOKEN(STR_MAC_ADDRESS);         // TextTwo
+
+    text
+      help   = STRING_TOKEN(STR_NULL_STRING),           // Help string
+      text   = STRING_TOKEN(STR_CONNECTION_INFO),       // Prompt string
+        text   = STRING_TOKEN(STR_CONNECTED_SSID);      // TextTwo;
+
+    subtitle text = STRING_TOKEN(STR_NULL_STRING);
+    subtitle text = STRING_TOKEN(STR_NULL_STRING);
+
+    goto FORMID_NETWORK_LIST,
+         prompt = STRING_TOKEN(STR_NETWORK_LIST),
+         help   = STRING_TOKEN(STR_NETWORK_LIST_HELP),
+         flags  = INTERACTIVE,
+         key    = KEY_NETWORK_LIST;
+
+    goto FORMID_WIFI_SETTINGS,
+         prompt = STRING_TOKEN(STR_WIFI_SETTINGS),
+         help   = STRING_TOKEN(STR_WIFI_SETTINGS_HELP),
+         flags  = INTERACTIVE,
+         key    = KEY_WIFI_SETTINGS;
+
+    action
+         questionid  = KEY_REFRESH_TITLE_CONNECTION_STATUS,
+         prompt      = STRING_TOKEN(STR_NULL_STRING),
+         help        = STRING_TOKEN(STR_NULL_STRING),
+         flags       = INTERACTIVE,
+         config      = STRING_TOKEN(STR_NULL_STRING),
+         refreshguid = WIFI_CONFIG_MAIN_FORM_REFRESH_GUID,
+    endaction;
+
+  endform;
+
+  form formid = FORMID_NETWORK_LIST,
+    title = STRING_TOKEN(STR_NETWORK_LIST);
+
+    numeric varid   = WIFI_MANAGER_IFR_NVDATA.ProfileCount,
+            prompt  = STRING_TOKEN(STR_REFRESH_NETWORK_COUNT),
+            help    = STRING_TOKEN(STR_REFRESH_NETWORK_COUNT_HELP),
+            flags   = INTERACTIVE | READ_ONLY,
+            key     = KEY_REFRESH_NETWORK_LIST,
+            minimum = 0,
+            maximum = 0xffffffff,
+            step    = 0,
+            default = 0,
+            refreshguid = WIFI_CONFIG_NETWORK_LIST_REFRESH_GUID,
+    endnumeric;
+
+    subtitle text = STRING_TOKEN(STR_NULL_STRING);
+
+    label LABEL_NETWORK_LIST_ENTRY;
+    label LABEL_END;
+  endform;
+
+  form formid = FORMID_CONNECT_NETWORK,
+    title = STRING_TOKEN(STR_NETWORK_CONFIGURATION);
+
+    subtitle text = STRING_TOKEN(STR_NULL_STRING);
+
+    text
+      help   = STRING_TOKEN(STR_CONNECT_STATUS_TITLE_HELP), // Help string
+      text   = STRING_TOKEN(STR_CONNECT_STATUS_TITLE),      // Prompt string
+        text   = STRING_TOKEN(STR_CONNECT_STATUS);          // TextTwo
+
+    subtitle text = STRING_TOKEN(STR_NULL_STRING);
+
+    text
+      help   = STRING_TOKEN(STR_SSID_HELP),     // Help string
+      text   = STRING_TOKEN(STR_SSID_TITLE),    // Prompt string
+        text   = STRING_TOKEN(STR_SSID);        // TextTwo
+
+    text
+      help   = STRING_TOKEN(STR_SECURITY_TYPE_HELP),       // Help string
+      text   = STRING_TOKEN(STR_SECURITY_TYPE_TITLE),      // Prompt string
+        text   = STRING_TOKEN(STR_SECURITY_TYPE);          // TextTwo
+
+
+    suppressif NOT ideqval WIFI_MANAGER_IFR_NVDATA.SecurityType == SECURITY_TYPE_WPA2_PERSONAL;
+      password  varid    = WIFI_MANAGER_IFR_NVDATA.Password,
+                prompt   = STRING_TOKEN(STR_PASSWORD),
+                help     = STRING_TOKEN(STR_PASSWORD_HELP),
+                flags    = INTERACTIVE,
+                key      = KEY_PASSWORD_CONNECT_NETWORK,
+                minsize  = PASSWORD_MIN_LEN,
+                maxsize  = PASSWORD_MAX_LEN,
+      endpassword;
+    endif;
+
+    suppressif NOT ideqval WIFI_MANAGER_IFR_NVDATA.SecurityType == SECURITY_TYPE_WPA2_ENTERPRISE;
+
+      oneof varid       = WIFI_MANAGER_IFR_NVDATA.EapAuthMethod,
+            questionid  = KEY_EAP_AUTH_METHOD_CONNECT_NETWORK,
+            prompt      = STRING_TOKEN(STR_EAP_AUTH_METHOD),
+            help        = STRING_TOKEN(STR_EAP_AUTH_METHOD_HELP),
+            flags       = INTERACTIVE,
+            option text = STRING_TOKEN(STR_EAP_AUTH_METHOD_TTLS), value = EAP_AUTH_METHOD_TTLS, flags = DEFAULT;
+            option text = STRING_TOKEN(STR_EAP_AUTH_METHOD_PEAP), value = EAP_AUTH_METHOD_PEAP, flags = 0;
+            option text = STRING_TOKEN(STR_EAP_AUTH_METHOD_TLS),  value = EAP_AUTH_METHOD_TLS,  flags = 0;
+      endoneof;
+
+      suppressif NOT ideqvallist WIFI_MANAGER_IFR_NVDATA.EapAuthMethod == EAP_AUTH_METHOD_TLS
+                                                                          EAP_AUTH_METHOD_TTLS
+                                                                          EAP_AUTH_METHOD_PEAP;
+
+        goto FORMID_ENROLL_CERT,
+           prompt = STRING_TOKEN(STR_EAP_ENROLL_CA_CERT),
+           help   = STRING_TOKEN(STR_EAP_ENROLL_CA_CERT_HELP),
+           flags  = INTERACTIVE,
+           key    = KEY_ENROLL_CA_CERT_CONNECT_NETWORK;
+
+        suppressif NOT ideqval WIFI_MANAGER_IFR_NVDATA.EapAuthMethod == EAP_AUTH_METHOD_TLS;
+
+            goto FORMID_ENROLL_CERT,
+               prompt = STRING_TOKEN(STR_EAP_ENROLL_CLIENT_CERT),
+               help   = STRING_TOKEN(STR_EAP_ENROLL_CLIENT_CERT_HELP),
+               flags  = INTERACTIVE,
+               key    = KEY_ENROLL_CLIENT_CERT_CONNECT_NETWORK;
+
+            goto FORMID_ENROLL_PRIVATE_KEY,
+               prompt = STRING_TOKEN(STR_EAP_ENROLL_CLIENT_KEY),
+               help   = STRING_TOKEN(STR_EAP_ENROLL_CLIENT_KEY_HELP),
+               flags  = INTERACTIVE,
+               key    = KEY_ENROLL_PRIVATE_KEY_CONNECT_NETWORK;
+
+        endif;
+
+        suppressif NOT ideqvallist WIFI_MANAGER_IFR_NVDATA.EapAuthMethod == EAP_AUTH_METHOD_TTLS
+                                                                            EAP_AUTH_METHOD_PEAP;
+
+            oneof varid       = WIFI_MANAGER_IFR_NVDATA.EapSecondAuthMethod,
+                  questionid  = KEY_EAP_SEAUTH_METHOD_CONNECT_NETWORK,
+                  prompt      = STRING_TOKEN(STR_EAP_SEAUTH_METHOD),
+                  help        = STRING_TOKEN(STR_EAP_SEAUTH_METHOD_HELP),
+                  flags       = INTERACTIVE,
+                  option text = STRING_TOKEN(STR_EAP_SEAUTH_METHOD_MSCHAPV2), value = EAP_SEAUTH_METHOD_MSCHAPV2, flags = DEFAULT;
+            endoneof;
+        endif;
+
+        string  varid  = WIFI_MANAGER_IFR_NVDATA.EapIdentity,
+                prompt  = STRING_TOKEN(STR_EAP_IDENTITY),
+                help    = STRING_TOKEN(STR_EAP_IDENTITY_HELP),
+                flags   = INTERACTIVE,
+                key     = KEY_EAP_IDENTITY_CONNECT_NETWORK,
+                minsize = 6,
+                maxsize = EAP_IDENTITY_LEN,
+        endstring;
+
+        suppressif NOT ideqvallist WIFI_MANAGER_IFR_NVDATA.EapAuthMethod == EAP_AUTH_METHOD_TTLS
+                                                                            EAP_AUTH_METHOD_PEAP;
+
+            password  varid    = WIFI_MANAGER_IFR_NVDATA.EapPassword,
+                      prompt   = STRING_TOKEN(STR_EAP_PASSWORD),
+                      help     = STRING_TOKEN(STR_EAP_PASSWORD_HELP),
+                      flags    = INTERACTIVE,
+                      key      = KEY_EAP_PASSWORD_CONNECT_NETWORK,
+                      minsize  = 0,
+                      maxsize  = PASSWORD_MAX_LEN,
+            endpassword;
+        endif;
+      endif;
+    endif;
+
+    subtitle text = STRING_TOKEN(STR_NULL_STRING);
+
+    text
+      help   = STRING_TOKEN(STR_CONNECT_NOW_HELP),
+      text   = STRING_TOKEN(STR_CONNECT_NOW),
+      flags  = INTERACTIVE,
+      key    = KEY_CONNECT_ACTION;
+
+    action
+      questionid  = KEY_REFRESH_CONNECT_CONFIGURATION,
+      prompt      = STRING_TOKEN(STR_NULL_STRING),
+      help        = STRING_TOKEN(STR_NULL_STRING),
+      flags       = INTERACTIVE,
+      config      = STRING_TOKEN(STR_NULL_STRING),
+      refreshguid = WIFI_CONFIG_CONNECT_FORM_REFRESH_GUID,
+    endaction;
+
+  endform;
+
+  form formid = FORMID_ENROLL_CERT,
+    title = STRING_TOKEN(STR_EAP_ENROLL_CERT);
+
+    goto FORMID_ENROLL_CERT,
+         prompt = STRING_TOKEN(STR_EAP_ENROLL_CERT_FROM_FILE),
+         help   = STRING_TOKEN(STR_EAP_ENROLL_CERT_FROM_FILE_HELP),
+         flags  = INTERACTIVE,
+         key    = KEY_EAP_ENROLL_CERT_FROM_FILE;
+
+    text
+      help   = STRING_TOKEN(STR_NULL_STRING),
+      text   = STRING_TOKEN(STR_EAP_ENROLLED_CERT_NAME),
+      flags  = INTERACTIVE,
+      key    = KEY_ENROLLED_CERT_NAME;
+
+    subtitle text = STRING_TOKEN(STR_NULL_STRING);
+
+    text
+      help   = STRING_TOKEN(STR_SAVE_EXIT_HELP),
+      text   = STRING_TOKEN(STR_SAVE_EXIT),
+      flags  = INTERACTIVE,
+      key    = KEY_SAVE_CERT_TO_MEM;
+
+    text
+      help   = STRING_TOKEN(STR_NO_SAVE_EXIT_HELP),
+      text   = STRING_TOKEN(STR_NO_SAVE_EXIT),
+      flags  = INTERACTIVE,
+      key    = KEY_NO_SAVE_CERT_TO_MEM;
+
+  endform;
+
+  form formid = FORMID_ENROLL_PRIVATE_KEY,
+    title = STRING_TOKEN(STR_EAP_ENROLL_CLIENT_KEY);
+
+    goto FORMID_ENROLL_PRIVATE_KEY,
+         prompt = STRING_TOKEN(STR_EAP_ENROLL_KEY_FROM_FILE),
+         help   = STRING_TOKEN(STR_EAP_ENROLL_KEY_FROM_FILE_HELP),
+         flags  = INTERACTIVE,
+         key    = KEY_EAP_ENROLL_PRIVATE_KEY_FROM_FILE;
+
+    text
+      help   = STRING_TOKEN(STR_NULL_STRING),
+      text   = STRING_TOKEN(STR_EAP_ENROLLED_PRIVATE_KEY_NAME),
+      flags  = INTERACTIVE,
+      key    = KEY_ENROLLED_PRIVATE_KEY_NAME;
+
+    subtitle text = STRING_TOKEN(STR_NULL_STRING);
+
+    password  varid    = WIFI_MANAGER_IFR_NVDATA.PrivateKeyPassword,
+              prompt   = STRING_TOKEN(STR_EAP_CLIENT_KEY_PASSWORD),
+              help     = STRING_TOKEN(STR_NULL_STRING),
+              flags    = INTERACTIVE,
+              key      = KEY_PRIVATE_KEY_PASSWORD,
+              minsize  = 0,
+              maxsize  = PASSWORD_MAX_LEN,
+    endpassword;
+
+    subtitle text = STRING_TOKEN(STR_NULL_STRING);
+    subtitle text = STRING_TOKEN(STR_NULL_STRING);
+
+    text
+      help   = STRING_TOKEN(STR_SAVE_EXIT_HELP),
+      text   = STRING_TOKEN(STR_SAVE_EXIT),
+      flags  = INTERACTIVE,
+      key    = KEY_SAVE_PRIVATE_KEY_TO_MEM;
+
+    text
+      help   = STRING_TOKEN(STR_NO_SAVE_EXIT_HELP),
+      text   = STRING_TOKEN(STR_NO_SAVE_EXIT),
+      flags  = INTERACTIVE,
+      key    = KEY_NO_SAVE_PRIVATE_KEY_TO_MEM;
+
+  endform;
+
+  form formid = FORMID_WIFI_SETTINGS,
+    title = STRING_TOKEN(STR_WIFI_SETTINGS_FORM_TITLE);
+
+    subtitle text = STRING_TOKEN(STR_NULL_STRING);
+
+    goto FORMID_HIDDEN_NETWORK_LIST,
+         prompt = STRING_TOKEN(STR_HIDDEN_NETWORK),
+         help   = STRING_TOKEN(STR_HIDDEN_NETWORK_HELP),
+         flags  = INTERACTIVE,
+         key    = KEY_HIDDEN_NETWORK;
+
+  endform;
+
+  form formid = FORMID_HIDDEN_NETWORK_LIST,
+    title = STRING_TOKEN(STR_HIDDEN_NETWORK_FORM_TITLE);
+
+    string
+      varid   = WIFI_MANAGER_IFR_NVDATA.SSId,
+      prompt  = STRING_TOKEN(STR_SSID_TITLE),
+      help    = STRING_TOKEN(STR_SSID_HELP),
+      flags   = INTERACTIVE,
+      minsize = SSID_MIN_LEN,
+      maxsize = SSID_MAX_LEN,
+    endstring;
+
+    text
+      help   = STRING_TOKEN(STR_ADD_HIDDEN_NETWORK_HELP),
+      text   = STRING_TOKEN(STR_ADD_HIDDEN_NETWORK),
+      flags  = INTERACTIVE,
+      key    = KEY_ADD_HIDDEN_NETWORK;
+
+    subtitle text = STRING_TOKEN(STR_NULL_STRING);
+    subtitle text = STRING_TOKEN(STR_HIDDEN_NETWORK_LIST);
+
+    label LABEL_HIDDEN_NETWORK_ENTRY;
+    label LABEL_END;
+
+    text
+      help   = STRING_TOKEN(STR_REMOVE_HIDDEN_NETWORK_HELP),
+      text   = STRING_TOKEN(STR_REMOVE_HIDDEN_NETWORK),
+      flags  = INTERACTIVE,
+      key    = KEY_REMOVE_HIDDEN_NETWORK;
+
+  endform;
+
+endformset;

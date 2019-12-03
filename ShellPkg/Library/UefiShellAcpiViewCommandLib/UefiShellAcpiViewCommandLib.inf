@@ -1,0 +1,75 @@
+##  @file
+# Provides Shell 'acpiview' command functions
+#
+# Copyright (c) 2016 - 2019, ARM Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010019
+  BASE_NAME                      = UefiShellAcpiViewCommandLib
+  FILE_GUID                      = FB5B305E-84F5-461F-940D-82D345757AFA
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL|UEFI_APPLICATION UEFI_DRIVER
+  CONSTRUCTOR                    = UefiShellAcpiViewCommandLibConstructor
+  DESTRUCTOR                     = UefiShellAcpiViewCommandLibDestructor
+
+[Sources.common]
+  UefiShellAcpiViewCommandLib.uni
+  UefiShellAcpiViewCommandLib.c
+  UefiShellAcpiViewCommandLib.h
+  AcpiParser.h
+  AcpiTableParser.h
+  AcpiView.h
+  AcpiParser.c
+  AcpiTableParser.c
+  AcpiView.c
+  Parsers/Bgrt/BgrtParser.c
+  Parsers/Dbg2/Dbg2Parser.c
+  Parsers/Dsdt/DsdtParser.c
+  Parsers/Fadt/FadtParser.c
+  Parsers/Gtdt/GtdtParser.c
+  Parsers/Iort/IortParser.c
+  Parsers/Madt/MadtParser.c
+  Parsers/Mcfg/McfgParser.c
+  Parsers/Pptt/PpttParser.c
+  Parsers/Rsdp/RsdpParser.c
+  Parsers/Slit/SlitParser.c
+  Parsers/Spcr/SpcrParser.c
+  Parsers/Srat/SratParser.c
+  Parsers/Ssdt/SsdtParser.c
+  Parsers/Xsdt/XsdtParser.c
+  Parsers/Madt/MadtParser.h
+  Parsers/Pptt/PpttParser.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  ShellPkg/ShellPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  MemoryAllocationLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  ShellCommandLib
+  ShellLib
+  UefiLib
+  UefiRuntimeServicesTableLib
+  UefiBootServicesTableLib
+  PcdLib
+  HiiLib
+  PrintLib
+  FileHandleLib
+
+
+[FixedPcd]
+  gEfiShellPkgTokenSpaceGuid.PcdShellProfileMask ## CONSUMES
+
+[Guids]
+  gShellAcpiViewHiiGuid           ## CONSUMES ## HII
+  gEfiAcpiTableGuid               ## SOMETIMES_CONSUMES ## SystemTable

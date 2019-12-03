@@ -5,13 +5,8 @@
 #  protocols based on Serial I/O protocol for serial devices including hotplug serial
 #  devices.
 #
-#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
-#  This program and the accompanying materials
-#  are licensed and made available under the terms and conditions of the BSD License
-#  which accompanies this distribution. The full text of the license may be found at
-#  http://opensource.org/licenses/bsd-license.php
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 #
 ##
@@ -28,7 +23,7 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
 #
 #  DRIVER_BINDING                =  gTerminalDriverBinding
 #  COMPONENT_NAME                =  gTerminalComponentName
@@ -74,6 +69,10 @@
   gEfiVT100PlusGuid                             ## SOMETIMES_CONSUMES ## GUID # used with a Vendor-Defined Messaging Device Path
   gEfiPcAnsiGuid                                ## SOMETIMES_CONSUMES ## GUID # used with a Vendor-Defined Messaging Device Path
   gEfiTtyTermGuid                               ## SOMETIMES_CONSUMES ## GUID # used with a Vendor-Defined Messaging Device Path
+  gEdkiiLinuxTermGuid                           ## SOMETIMES_CONSUMES ## GUID # used with a Vendor-Defined Messaging Device Path
+  gEdkiiXtermR6Guid                             ## SOMETIMES_CONSUMES ## GUID # used with a Vendor-Defined Messaging Device Path
+  gEdkiiVT400Guid                               ## SOMETIMES_CONSUMES ## GUID # used with a Vendor-Defined Messaging Device Path
+  gEdkiiSCOTermGuid                             ## SOMETIMES_CONSUMES ## GUID # used with a Vendor-Defined Messaging Device Path
   gEdkiiStatusCodeDataTypeVariableGuid          ## SOMETIMES_CONSUMES ## GUID
 
 [Protocols]

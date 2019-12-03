@@ -1,0 +1,18 @@
+// /** @file
+// This module produces EFI DHCPv4 Protocol and EFI DHCPv4 Service Binding Protocol.
+//
+// This module produces EFI DHCPv4 Protocol upon EFI UDPv4 Protocol, to provide the
+// capability to collect configuration information for the EFI IPv4 Protocol drivers
+// and to provide DHCPv4 server and PXE boot server discovery services.
+//
+// Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "EFI DHCPv4 Driver"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This module produces EFI DHCPv4 Protocol using the EFI UDPv4 Protocol, providing the capability to collect configuration information for the EFI IPv4 Protocol drivers and providing DHCPv4 server and PXE boot server discovery services."
+

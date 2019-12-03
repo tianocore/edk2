@@ -1,15 +1,9 @@
 /** @file
-  GUID used to identify status code records HOB that originate from the PEI status code.    
-  
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
-(C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
-This program and the accompanying materials are licensed and made available under
-the terms and conditions of the BSD License that accompanies this distribution.
-The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.
+  GUID used to identify status code records HOB that originate from the PEI status code.
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+(C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -17,9 +11,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define __MEMORY_STATUS_CODE_RECORD_H__
 
 ///
-/// Global ID used to identify GUIDed HOBs that start with a structure of type 
-/// MEMORY_STATUSCODE_PACKET_HEADER, followed by an array of structures of type 
-/// MEMORY_STATUSCODE_RECORD.  These GUIDed HOBs record all the information 
+/// Global ID used to identify GUIDed HOBs that start with a structure of type
+/// MEMORY_STATUSCODE_PACKET_HEADER, followed by an array of structures of type
+/// MEMORY_STATUSCODE_RECORD.  These GUIDed HOBs record all the information
 /// passed into the ReportStatusCode() service of PEI Services Table.
 ///
 ///  <pre>
@@ -38,7 +32,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   }
 
 ///
-/// A header structure that is followed by an array of records that contain the 
+/// A header structure that is followed by an array of records that contain the
 /// parameters passed into the ReportStatusCode() service in the PEI Services Table.
 ///
 typedef struct {
@@ -57,7 +51,7 @@ typedef struct {
 } MEMORY_STATUSCODE_PACKET_HEADER;
 
 ///
-/// A header structure that is followed by an array of records that contain the 
+/// A header structure that is followed by an array of records that contain the
 /// parameters passed into the ReportStatusCode() service in the DXE Services Table.
 ///
 typedef struct {
@@ -76,7 +70,7 @@ typedef struct {
 } RUNTIME_MEMORY_STATUSCODE_HEADER;
 
 ///
-/// A structure that contains the parameters passed into the ReportStatusCode() 
+/// A structure that contains the parameters passed into the ReportStatusCode()
 /// service in the PEI Services Table.
 ///
 typedef struct {

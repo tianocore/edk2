@@ -3,13 +3,7 @@
 *
 *  Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
 *
-*  This program and the accompanying materials are
-*  licensed and made available under the terms and conditions of the BSD License
-*  which accompanies this distribution.  The full text of the license may be found at
-*  http://opensource.org/licenses/bsd-license.php
-*
-*  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-*  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+*  SPDX-License-Identifier: BSD-2-Clause-Patent
 *
 **/
 
@@ -22,6 +16,7 @@
 
 #include <Guid/Fdt.h>
 #include <Guid/FdtHob.h>
+#include <Guid/PlatformHasDeviceTree.h>
 
 #include <Protocol/FdtClient.h>
 
@@ -29,6 +24,7 @@ STATIC VOID  *mDeviceTreeBase;
 
 STATIC
 EFI_STATUS
+EFIAPI
 GetNodeProperty (
   IN  FDT_CLIENT_PROTOCOL     *This,
   IN  INT32                   Node,
@@ -55,6 +51,7 @@ GetNodeProperty (
 
 STATIC
 EFI_STATUS
+EFIAPI
 SetNodeProperty (
   IN  FDT_CLIENT_PROTOCOL     *This,
   IN  INT32                   Node,
@@ -73,6 +70,33 @@ SetNodeProperty (
   }
 
   return EFI_SUCCESS;
+}
+
+STATIC
+BOOLEAN
+IsNodeEnabled (
+  INT32                       Node
+  )
+{
+  CONST CHAR8   *NodeStatus;
+  INT32         Len;
+
+  //
+  // A missing status property implies 'ok' so ignore any errors that
+  // may occur here. If the status property is present, check whether
+  // it is set to 'ok' or 'okay', anything else is treated as 'disabled'.
+  //
+  NodeStatus = fdt_getprop (mDeviceTreeBase, Node, "status", &Len);
+  if (NodeStatus == NULL) {
+    return TRUE;
+  }
+  if (Len >= 5 && AsciiStrCmp (NodeStatus, "okay") == 0) {
+    return TRUE;
+  }
+  if (Len >= 3 && AsciiStrCmp (NodeStatus, "ok") == 0) {
+    return TRUE;
+  }
+  return FALSE;
 }
 
 STATIC
@@ -96,6 +120,10 @@ FindNextCompatibleNode (
     Next = fdt_next_node (mDeviceTreeBase, Prev, NULL);
     if (Next < 0) {
       break;
+    }
+
+    if (!IsNodeEnabled (Next)) {
+      continue;
     }
 
     Type = fdt_getprop (mDeviceTreeBase, Next, "compatible", &Len);
@@ -219,6 +247,11 @@ FindNextMemoryNodeReg (
       break;
     }
 
+    if (!IsNodeEnabled (Next)) {
+      DEBUG ((DEBUG_WARN, "%a: ignoring disabled memory node\n", __FUNCTION__));
+      continue;
+    }
+
     DeviceType = fdt_getprop (mDeviceTreeBase, Next, "device_type", &Len);
     if (DeviceType != NULL && AsciiStrCmp (DeviceType, "memory") == 0) {
       //
@@ -267,6 +300,7 @@ FindMemoryNodeReg (
 
 STATIC
 EFI_STATUS
+EFIAPI
 GetOrInsertChosenNode (
   IN  FDT_CLIENT_PROTOCOL     *This,
   OUT INT32                   *Node
@@ -303,6 +337,40 @@ STATIC FDT_CLIENT_PROTOCOL mFdtClientProtocol = {
   GetOrInsertChosenNode,
 };
 
+STATIC
+VOID
+EFIAPI
+OnPlatformHasDeviceTree (
+  IN EFI_EVENT Event,
+  IN VOID      *Context
+  )
+{
+  EFI_STATUS Status;
+  VOID       *Interface;
+  VOID       *DeviceTreeBase;
+
+  Status = gBS->LocateProtocol (
+                  &gEdkiiPlatformHasDeviceTreeGuid,
+                  NULL,                             // Registration
+                  &Interface
+                  );
+  if (EFI_ERROR (Status)) {
+    return;
+  }
+
+  DeviceTreeBase = Context;
+  DEBUG ((
+    DEBUG_INFO,
+    "%a: exposing DTB @ 0x%p to OS\n",
+    __FUNCTION__,
+    DeviceTreeBase
+    ));
+  Status = gBS->InstallConfigurationTable (&gFdtTableGuid, DeviceTreeBase);
+  ASSERT_EFI_ERROR (Status);
+
+  gBS->CloseEvent (Event);
+}
+
 EFI_STATUS
 EFIAPI
 InitializeFdtClientDxe (
@@ -313,6 +381,8 @@ InitializeFdtClientDxe (
   VOID              *Hob;
   VOID              *DeviceTreeBase;
   EFI_STATUS        Status;
+  EFI_EVENT         PlatformHasDeviceTreeEvent;
+  VOID              *Registration;
 
   Hob = GetFirstGuidHob (&gFdtHobGuid);
   if (Hob == NULL || GET_GUID_HOB_DATA_SIZE (Hob) != sizeof (UINT64)) {
@@ -330,15 +400,65 @@ InitializeFdtClientDxe (
 
   DEBUG ((EFI_D_INFO, "%a: DTB @ 0x%p\n", __FUNCTION__, mDeviceTreeBase));
 
-  if (!FeaturePcdGet (PcdPureAcpiBoot)) {
-    //
-    // Only install the FDT as a configuration table if we want to leave it up
-    // to the OS to decide whether it prefers ACPI over DT.
-    //
-    Status = gBS->InstallConfigurationTable (&gFdtTableGuid, DeviceTreeBase);
-    ASSERT_EFI_ERROR (Status);
+  //
+  // Register a protocol notify for the EDKII Platform Has Device Tree
+  // Protocol.
+  //
+  Status = gBS->CreateEvent (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_CALLBACK,
+                  OnPlatformHasDeviceTree,
+                  DeviceTreeBase,             // Context
+                  &PlatformHasDeviceTreeEvent
+                  );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: CreateEvent(): %r\n", __FUNCTION__, Status));
+    return Status;
   }
 
-  return gBS->InstallProtocolInterface (&ImageHandle, &gFdtClientProtocolGuid,
-                EFI_NATIVE_INTERFACE, &mFdtClientProtocol);
+  Status = gBS->RegisterProtocolNotify (
+                  &gEdkiiPlatformHasDeviceTreeGuid,
+                  PlatformHasDeviceTreeEvent,
+                  &Registration
+                  );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: RegisterProtocolNotify(): %r\n",
+      __FUNCTION__,
+      Status
+      ));
+    goto CloseEvent;
+  }
+
+  //
+  // Kick the event; the protocol could be available already.
+  //
+  Status = gBS->SignalEvent (PlatformHasDeviceTreeEvent);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: SignalEvent(): %r\n", __FUNCTION__, Status));
+    goto CloseEvent;
+  }
+
+  Status = gBS->InstallProtocolInterface (
+                  &ImageHandle,
+                  &gFdtClientProtocolGuid,
+                  EFI_NATIVE_INTERFACE,
+                  &mFdtClientProtocol
+                  );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: InstallProtocolInterface(): %r\n",
+      __FUNCTION__,
+      Status
+      ));
+    goto CloseEvent;
+  }
+
+  return Status;
+
+CloseEvent:
+  gBS->CloseEvent (PlatformHasDeviceTreeEvent);
+  return Status;
 }

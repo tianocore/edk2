@@ -1,14 +1,8 @@
 ## @file
 # This file is used to create/update/query/erase a common table
 #
-# Copyright (c) 2008, Intel Corporation. All rights reserved.<BR>
-# This program and the accompanying materials
-# are licensed and made available under the terms and conditions of the BSD License
-# which accompanies this distribution.  The full text of the license may be found at
-# http://opensource.org/licenses/bsd-license.php
-#
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
 ##
@@ -19,7 +13,7 @@ import Common.EdkLogger as EdkLogger
 ## TableFile
 #
 # This class defined a common table
-# 
+#
 # @param object:     Inherited from object class
 #
 # @param Cursor:     Cursor of the database
@@ -30,7 +24,7 @@ class Table(object):
         self.Cur = Cursor
         self.Table = ''
         self.ID = 0
-    
+
     ## Create table
     #
     # Create a table
@@ -46,18 +40,18 @@ class Table(object):
     #
     def Insert(self, SqlCommand):
         self.Exec(SqlCommand)
-    
+
     ## Query table
     #
     # Query all records of the table
-    #  
+    #
     def Query(self):
-        EdkLogger.verbose("\nQuery tabel %s started ..." % self.Table)
+        EdkLogger.verbose("\nQuery table %s started ..." % self.Table)
         SqlCommand = """select * from %s""" % self.Table
         self.Cur.execute(SqlCommand)
         for Rs in self.Cur:
             EdkLogger.verbose(str(Rs))
-        
+
         TotalCount = self.GetCount()
         EdkLogger.verbose("*** Total %s records in table %s ***" % (TotalCount, self.Table) )
         EdkLogger.verbose("Query tabel %s DONE!" % self.Table)
@@ -70,7 +64,7 @@ class Table(object):
         SqlCommand = """drop table IF EXISTS %s""" % self.Table
         self.Cur.execute(SqlCommand)
         EdkLogger.verbose("Drop tabel %s ... DONE!" % self.Table)
-    
+
     ## Get count
     #
     # Get a count of all records of the table
@@ -82,12 +76,12 @@ class Table(object):
         self.Cur.execute(SqlCommand)
         for Item in self.Cur:
             return Item[0]
-    
+
     ## Generate ID
     #
     # Generate an ID if input ID is -1
     #
-    # @param ID:   Input ID 
+    # @param ID:   Input ID
     #
     # @retval ID:  New generated ID
     #
@@ -96,14 +90,14 @@ class Table(object):
             self.ID = self.ID + 1
 
         return self.ID
-    
+
     ## Init the ID of the table
     #
     # Init the ID of the table
     #
     def InitID(self):
         self.ID = self.GetCount()
-    
+
     ## Exec
     #
     # Exec Sql Command, return result

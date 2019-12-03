@@ -1,0 +1,31 @@
+## @file
+#  Provides services to retrieve values from Version 1 of a capsule's FMP Payload
+#  Header. The FMP Payload Header structure is not defined in the library class.
+#  Instead, services are provided to retrieve information from the FMP Payload
+#  Header.  If information is added to the FMP Payload Header, then new services
+#  may be added to this library class to retrieve the new information.
+#
+#  Copyright (c) 2016, Microsoft Corporation. All rights reserved.<BR>
+#  Copyright (c) 2018 - 2019, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = FmpPayloadHeaderLibV1
+  FILE_GUID                      = 98A79A6C-513C-4E72-8375-39C0A7244C4B
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = FmpPayloadHeaderLib|DXE_DRIVER UEFI_DRIVER UEFI_APPLICATION
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64
+#
+
+[Sources]
+  FmpPayloadHeaderLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  FmpDevicePkg/FmpDevicePkg.dec

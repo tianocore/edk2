@@ -1,13 +1,7 @@
 /** @file
 
-Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 
 **/
@@ -134,7 +128,10 @@ EbcDebuggerPushCallstackDest (
     //
     ASSERT (mDebuggerPrivate.CallStackEntry[EFI_DEBUGGER_TRACE_MAX].Type == Type);
     for (Index = 0; Index < EFI_DEBUGGER_CALLSTACK_MAX; Index++) {
-      mDebuggerPrivate.CallStackEntry[Index] = mDebuggerPrivate.CallStackEntry[Index + 1];
+      CopyMem (&mDebuggerPrivate.CallStackEntry[Index],
+               &mDebuggerPrivate.CallStackEntry[Index + 1],
+               sizeof (mDebuggerPrivate.CallStackEntry[Index])
+               );
     }
     mDebuggerPrivate.CallStackEntry[EFI_DEBUGGER_CALLSTACK_MAX - 1].DestAddress = DestEntry;
     mDebuggerPrivate.CallStackEntryCount = EFI_DEBUGGER_CALLSTACK_MAX;

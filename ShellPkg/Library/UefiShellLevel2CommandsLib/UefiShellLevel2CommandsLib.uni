@@ -1,14 +1,8 @@
 // /**
 //
 // (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
-// Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
-// This program and the accompanying materials
-// are licensed and made available under the terms and conditions of the BSD License
-// which accompanies this distribution. The full text of the license may be found at
-// http://opensource.org/licenses/bsd-license.php
-//
-// THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-// WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+// Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+// SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Module Name:
 //
@@ -271,7 +265,7 @@
 "     variable %cwd%.\r\n"
 ".SH EXAMPLES\r\n"
 " \r\n"
-"EXAMPLES:\r\n"     
+"EXAMPLES:\r\n"
 "  * To change the current file system to the mapped fs0 file system:\r\n"
 "    Shell> fs0:\r\n"
 " \r\n"
@@ -294,7 +288,7 @@
 "    fs1:\> cd Tmp\r\n"
 ".SH RETURNVALUES\r\n"
 " \r\n"
-"RETURN VALUES:\r\n"     
+"RETURN VALUES:\r\n"
 "  SHELL_SUCCESS             The action was completed as requested.\r\n"
 "  SHELL_SECURITY_VIOLATION  This function was not performed due to a security\r\n"
 "                            violation.\r\n"
@@ -464,18 +458,15 @@
 "MKDIR dir [dir...]\r\n"
 ".SH OPTIONS\r\n"
 " \r\n"
-"  dir - Specifies the name of a directory or directories to create. (Wildcards are not\r\n"
-"        allowed) \r\n"
+"  dir - Specifies the name of a directory or directories to create.\r\n"
+"        (Wildcards are not allowed)\r\n"
 ".SH DESCRIPTION\r\n"
 " \r\n"
 "NOTES:\r\n"
-"  1. The parent directory must already exist.\r\n"
-"  2. If the directory already exists, mkdir will abort.\r\n"
-"  3. Specifying additional directory parameters dependent on previous\r\n"
-"     directory parameters is not allowed:\r\n"
-"     For example, mkdir new new\Test is not allowed.\r\n"
-"  4. Redirecting output to a file that exists under the directory specified\r\n"
-"     by this command is not allowed.\r\n"
+"  1. Mkdir can create one or more new directories.\r\n"
+"  2. If dir includes nested directories, then parent directories will be\r\n"
+"     created before child directories.\r\n"
+"  3. If the directory already exists, mkdir will exit with an error.\r\n"
 ".SH EXAMPLES\r\n"
 " \r\n"
 "EXAMPLES:\r\n"
@@ -726,7 +717,7 @@
 "     is specified by sname is deleted.\r\n"
 ".SH EXAMPLES\r\n"
 " \r\n"
-"EXAMPLES:\r\n"  
+"EXAMPLES:\r\n"
 "  * To add an environment variable:\r\n"
 "    Shell> set DiagnosticPath fs0:\efi\diag;fs1:\efi\diag\r\n"
 " \r\n"

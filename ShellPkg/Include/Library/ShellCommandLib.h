@@ -4,16 +4,10 @@
   This library is for use ONLY by shell commands linked into the shell application.
   This library will not function if it is used for UEFI Shell 2.0 Applications.
 
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
   (C) Copyright 2013-2014 Hewlett-Packard Development Company, L.P.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -48,7 +42,7 @@ typedef struct {
 /// List of Mappings - DeviceName and Drive Letter(ism).
 extern        SHELL_MAP_LIST                      gShellMapList;
 /// Pointer to node of current directory in the mMapList.
-extern        SHELL_MAP_LIST                      *gShellCurDir;
+extern        SHELL_MAP_LIST                      *gShellCurMapping;
 
 /**
   Returns the help MAN fileName for a given shell command.
@@ -142,7 +136,7 @@ ShellCommandRegisterCommandName (
   IN        UINT32                      ShellMinSupportLevel,
   IN CONST  CHAR16                      *ProfileName,
   IN CONST  BOOLEAN                     CanAffectLE,
-  IN CONST  EFI_HANDLE                  HiiHandle,
+  IN CONST  EFI_HII_HANDLE              HiiHandle,
   IN CONST  EFI_STRING_ID               ManFormatHelp
   );
 
@@ -507,10 +501,10 @@ ShellCommandConsistMappingUnInitialize (
   );
 
 /**
-  Create a consistent mapped name for the device specified by DevicePath 
+  Create a consistent mapped name for the device specified by DevicePath
   based on the Table.
 
-  This must be called after ShellCommandConsistMappingInitialize() and 
+  This must be called after ShellCommandConsistMappingInitialize() and
   before ShellCommandConsistMappingUnInitialize() is called.
 
   @param[in] DevicePath   The pointer to the dev path for the device.

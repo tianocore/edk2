@@ -2,15 +2,9 @@
 #  This driver is a sample implementation of the Graphics Output Protocol for
 #  the QEMU (Cirrus Logic 5446) video controller.
 #
-#  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 #
-#  This program and the accompanying materials
-#  are licensed and made available under the terms and conditions of the BSD License
-#  which accompanies this distribution. The full text of the license may be found at
-#  http://opensource.org/licenses/bsd-license.php
-#
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
 
@@ -26,7 +20,7 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC ARM AARCH64
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
 #
 #  DRIVER_BINDING                =  gQemuVideoDriverBinding
 #  COMPONENT_NAME                =  gQemuVideoComponentName
@@ -35,17 +29,17 @@
 [Sources.common]
   ComponentName.c
   Driver.c
-  DriverSupportedEfiVersion.c
   Gop.c
   Initialize.c
+  Qemu.h
 
 [Sources.Ia32, Sources.X64]
   VbeShim.c
+  VbeShim.h
 
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
-  OptionRomPkg/OptionRomPkg.dec
   OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
@@ -54,6 +48,7 @@
   DebugLib
   DevicePathLib
   MemoryAllocationLib
+  PcdLib
   PciLib
   PrintLib
   TimerLib
@@ -62,11 +57,10 @@
   UefiLib
 
 [Protocols]
-  gEfiDriverSupportedEfiVersionProtocolGuid     # PROTOCOL ALWAYS_PRODUCED
   gEfiGraphicsOutputProtocolGuid                # PROTOCOL BY_START
   gEfiDevicePathProtocolGuid                    # PROTOCOL BY_START
   gEfiPciIoProtocolGuid                         # PROTOCOL TO_START
 
 [Pcd]
-  gOptionRomPkgTokenSpaceGuid.PcdDriverSupportedEfiVersion
-
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
+  gEfiMdeModulePkgTokenSpaceGuid.PcdNullPointerDetectionPropertyMask

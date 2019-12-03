@@ -4,13 +4,7 @@
 #
 # Copyright (C) 2013, Red Hat, Inc.
 #
-# This program and the accompanying materials are licensed and made available
-# under the terms and conditions of the BSD License which accompanies this
-# distribution. The full text of the license may be found at
-# http://opensource.org/licenses/bsd-license.php
-#
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT
-# WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
 
@@ -69,9 +63,15 @@ faithfully indented) that implement the transition.
   [SnpInitialize.c]            |  | [SnpShutdown.c]
   VirtioNetInitialize          |  | VirtioNetShutdown
     VirtioNetInitRing {Rx, Tx} |  |   VirtioNetShutdownRx [SnpSharedHelpers.c]
-      VirtioRingInit           |  |   VirtioNetShutdownTx [SnpSharedHelpers.c]
-    VirtioNetInitTx            |  |   VirtioRingUninit {Tx, Rx}
-    VirtioNetInitRx            |  |
+      VirtioRingInit           |  |     VirtIo->UnmapSharedBuffer
+      VirtioRingMap            |  |     VirtIo->FreeSharedPages
+    VirtioNetInitTx            |  |   VirtioNetShutdownTx [SnpSharedHelpers.c]
+      VirtIo->AllocateShare... |  |     VirtIo->UnmapSharedBuffer
+      VirtioMapAllBytesInSh... |  |     VirtIo->FreeSharedPages
+    VirtioNetInitRx            |  |   VirtioNetUninitRing [SnpSharedHelpers.c]
+      VirtIo->AllocateShare... |  |                       {Tx, Rx}
+      VirtioMapAllBytesInSh... |  |     VirtIo->UnmapSharedBuffer
+                               |  |     VirtioRingUninit
                                v  |
                   +-----------------------------+
                   | EfiSimpleNetworkInitialized |
@@ -245,7 +245,7 @@ In VirtioNetInitRx, the guest allocates the fixed size Receive Destination
 Area, which accommodates all packets delivered asynchronously by the host. To
 each packet, a slice of this area is dedicated; each slice is further
 subdivided into virtio-net request header and network packet data. The
-(guest-physical) addresses of these sub-slices are denoted with A2, A3, A4 and
+(device-physical) addresses of these sub-slices are denoted with A2, A3, A4 and
 so on. Importantly, an even-subscript "A" always belongs to a virtio-net
 request header, while an odd-subscript "A" always belongs to a packet
 sub-slice.
@@ -310,10 +310,14 @@ in the following:
   that is shared by all of the head descriptors. This virtio-net request header
   is never modified by the host.
 
-- Each tail descriptor is re-pointed to the caller-supplied packet buffer
-  whenever VirtioNetTransmit places the corresponding head descriptor on the
-  Available Ring. The caller is responsible to hang on to the unmodified buffer
-  until it is reported transmitted by VirtioNetGetStatus.
+- Each tail descriptor is re-pointed to the device-mapped address of the
+  caller-supplied packet buffer whenever VirtioNetTransmit places the
+  corresponding head descriptor on the Available Ring. A reverse mapping, from
+  the device-mapped address to the caller-supplied packet address, is saved in
+  an associative data structure that belongs to the driver instance.
+
+- Per spec, the caller is responsible to hang on to the unmodified packet
+  buffer until it is reported transmitted by VirtioNetGetStatus.
 
 Steps of packet transmission:
 
@@ -336,9 +340,11 @@ Steps of packet transmission:
 - Client code calls VirtioNetGetStatus. In case the Used Ring is empty, the
   function reports no Tx completion. Otherwise, a head descriptor's index is
   consumed from the Used Ring and recycled to the private stack. The client
-  code's original packet buffer address is fetched from the tail descriptor
-  (where it has been stored at VirtioNetTransmit time) and returned to the
-  caller.
+  code's original packet buffer address is calculated by fetching the
+  device-mapped address from the tail descriptor (where it has been stored at
+  VirtioNetTransmit time), and by looking up the device-mapped address in the
+  associative data structure. The reverse-mapped packet buffer address is
+  returned to the caller.
 
 - The Len field of the Used Ring Element is not checked. The host is assumed to
   have transmitted the entire packet -- VirtioNetTransmit had forced it below

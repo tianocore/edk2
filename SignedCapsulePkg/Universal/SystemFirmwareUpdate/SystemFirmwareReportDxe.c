@@ -8,14 +8,8 @@
 
   FmpSetImage() will receive untrusted input and do basic validation.
 
-  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -145,7 +139,7 @@ DispatchSystemFmpImages (
   @retval EFI_ABORTED            The operation is aborted.
   @retval EFI_INVALID_PARAMETER  The Image was NULL.
   @retval EFI_UNSUPPORTED        The operation is not supported.
-  @retval EFI_SECURITY_VIOLATIO  The operation could not be performed due to an authentication failure.
+  @retval EFI_SECURITY_VIOLATION The operation could not be performed due to an authentication failure.
 
 **/
 EFI_STATUS
@@ -194,21 +188,32 @@ FmpSetImage (
   }
 
   //
-  // Pass Thru
+  // Pass Thru to System FMP Protocol on same handle as FMP Protocol
   //
-  Status = gBS->LocateProtocol(&gSystemFmpProtocolGuid, NULL, (VOID **)&SystemFmp);
+  Status = gBS->HandleProtocol(
+                  SystemFmpPrivate->Handle,
+                  &gSystemFmpProtocolGuid,
+                  (VOID **)&SystemFmp
+                  );
   if (EFI_ERROR(Status)) {
-    DEBUG((DEBUG_INFO, "(Agent)SetImage - SystemFmpProtocol - %r\n", Status));
-    SystemFmpPrivate->LastAttempt.LastAttemptStatus = LAST_ATTEMPT_STATUS_ERROR_INVALID_FORMAT;
-    VarStatus = gRT->SetVariable(
-                       SYSTEM_FMP_LAST_ATTEMPT_VARIABLE_NAME,
-                       &gSystemFmpLastAttemptVariableGuid,
-                       EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
-                       sizeof(SystemFmpPrivate->LastAttempt),
-                       &SystemFmpPrivate->LastAttempt
-                       );
-    DEBUG((DEBUG_INFO, "(Agent)SetLastAttemp - %r\n", VarStatus));
-    return Status;
+    Status = gBS->LocateProtocol (
+                    &gSystemFmpProtocolGuid,
+                    NULL,
+                    (VOID **)&SystemFmp
+                    );
+    if (EFI_ERROR(Status)) {
+      DEBUG((DEBUG_INFO, "(Agent)SetImage - SystemFmpProtocol - %r\n", Status));
+      SystemFmpPrivate->LastAttempt.LastAttemptStatus = LAST_ATTEMPT_STATUS_ERROR_INVALID_FORMAT;
+      VarStatus = gRT->SetVariable(
+                         SYSTEM_FMP_LAST_ATTEMPT_VARIABLE_NAME,
+                         &gSystemFmpLastAttemptVariableGuid,
+                         EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
+                         sizeof(SystemFmpPrivate->LastAttempt),
+                         &SystemFmpPrivate->LastAttempt
+                         );
+      DEBUG((DEBUG_INFO, "(Agent)SetLastAttemp - %r\n", VarStatus));
+      return Status;
+    }
   }
 
   return SystemFmp->SetImage(SystemFmp, ImageIndex, Image, ImageSize, VendorCode, Progress, AbortReason);

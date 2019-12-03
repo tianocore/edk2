@@ -6,13 +6,7 @@
 # Copyright (c) 2014, ARM Limited. All rights reserved.<BR>
 # Copyright (c) 2016 HP Development Company, L.P.<BR>
 #
-# This program and the accompanying materials
-# are licensed and made available under the terms and conditions of the BSD License
-# which accompanies this distribution.  The full text of the license may be found at
-# http://opensource.org/licenses/bsd-license.php
-#
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 #------------------------------------------------------------------------------
 
@@ -233,7 +227,7 @@ ASM_PFX(AsmCommonExceptionEntry):
   ldr       R5, [SP, #0x58]         @ PC is the LR pushed by srsfd
                                     @ Check to see if we have to adjust for Thumb entry
   sub       r4, r0, #1              @ if (ExceptionType == 1 || ExceptionType == 2)) {
-  cmp       r4, #1                  @   // UND & SVC have differnt LR adjust for Thumb
+  cmp       r4, #1                  @   // UND & SVC have different LR adjust for Thumb
   bhi       NoAdjustNeeded
 
   tst       r1, #0x20               @   if ((CPSR & T)) == T) {  // Thumb Mode on entry

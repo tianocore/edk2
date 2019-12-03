@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{B4E1783F-FD72-4214-B0F7-69271BAD5DDF}</ProjectGuid>
+    <Keyword>MakeFileProj</Keyword>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <NMakeBuildCommandLine>BuildVS.bat -a IA32</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>BuildVS.bat -a IA32 all</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>BuildVS.bat -a IA32 clean</NMakeCleanCommandLine>
+    <OutDir>..\..\..\Build\EmulatorIA32\DEBUG_VS2017\</OutDir>
+    <IntDir>..\..\..\Build\EmulatorIA32\DEBUG_VS2017\</IntDir>
+    <IncludePath>..\..\..\MdePkg\Include;..\..\..\MdePkg\Include\Ia32;..\..\..\MdeModulePkg\Include;..\..\..\EmulatorPkg\Include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <NMakeBuildCommandLine>BuildVS.bat -a IA32 -b RELEASE</NMakeBuildCommandLine>
+    <NMakePreprocessorDefinitions>
+    </NMakePreprocessorDefinitions>
+    <NMakeReBuildCommandLine>BuildVS.bat -a IA32 -b RELEASE all</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>BuildVS.bat -a IA32 -b RELEASE clean</NMakeCleanCommandLine>
+    <OutDir>..\..\..\Build\EmulatorIA32\DEBUG_VS2017\</OutDir>
+    <IntDir>..\..\..\Build\EmulatorIA32\DEBUG_VS2017\</IntDir>
+    <IncludePath>..\..\..\MdePkg\Include;..\..\..\MdePkg\Include\Ia32;..\..\..\MdeModulePkg\Include;..\..\..\EmulatorPkg\Include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <NMakeBuildCommandLine>BuildVS.bat -a X64</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>BuildVS.bat -a X64 all</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>BuildVS.bat -a X64 clean</NMakeCleanCommandLine>
+    <OutDir>..\..\..\Build\EmulatorX64\DEBUG_VS2017\</OutDir>
+    <IntDir>..\..\..\Build\EmulatorX64\DEBUG_VS2017\</IntDir>
+    <IncludePath>..\..\..\MdePkg\Include;..\..\..\MdePkg\Include\X64;..\..\..\MdeModulePkg\Include;..\..\..\EmulatorPkg\Include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <NMakeBuildCommandLine>BuildVS.bat -a X64 -b RELEASE</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>BuildVS.bat -a X64 -b RELEASE all</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>BuildVS.bat -a X64 -b RELEASE clean</NMakeCleanCommandLine>
+    <OutDir>..\..\Build\EmulatorX64\DEBUG_VS2017\</OutDir>
+    <IntDir>..\..\Build\EmulatorX64\DEBUG_VS2017\</IntDir>
+    <IncludePath>..\..\..\MdePkg\Include;..\..\..\MdePkg\Include\X64;..\..\..\MdeModulePkg\Include;..\..\..\EmulatorPkg\Include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Host\WinBlockIo.c" />
+    <ClCompile Include="..\Host\WinFileSystem.c" />
+    <ClCompile Include="..\Host\WinGopInput.c" />
+    <ClCompile Include="..\Host\WinGopScreen.c" />
+    <ClCompile Include="..\Host\WinHost.c" />
+    <ClCompile Include="..\Host\WinMemoryAllocationLib.c" />
+    <ClCompile Include="..\Host\WinThunk.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Host\WinGop.h" />
+    <ClInclude Include="..\Host\WinHost.h" />
+    <ClInclude Include="..\Host\WinInclude.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Host\WinHost.inf" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

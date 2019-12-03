@@ -1,15 +1,9 @@
 /** @file
   The function declaration that provided for Socket Interface.
 
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -17,6 +11,7 @@
 #define _SOCK_IMPL_H_
 
 #include "Socket.h"
+#include "TcpMain.h"
 
 /**
   Signal a event with the given status.
@@ -79,13 +74,13 @@ SockConnFlush (
 /**
   Cancel the tokens in the specific token list.
 
-  @param[in]       Token                 Pointer to the Token. If NULL, all tokens 
-                                         in SpecifiedTokenList will be canceled.  
+  @param[in]       Token                 Pointer to the Token. If NULL, all tokens
+                                         in SpecifiedTokenList will be canceled.
   @param[in, out]  SpecifiedTokenList    Pointer to the token list to be checked.
-  
+
   @retval EFI_SUCCESS          Cancel the tokens in the specific token listsuccessfully.
   @retval EFI_NOT_FOUND        The Token is not found in SpecifiedTokenList.
-  
+
 **/
 EFI_STATUS
 SockCancelToken (

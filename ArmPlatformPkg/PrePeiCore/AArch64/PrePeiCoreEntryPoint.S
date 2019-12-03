@@ -1,13 +1,7 @@
 //
 //  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
 //
-//  This program and the accompanying materials
-//  are licensed and made available under the terms and conditions of the BSD License
-//  which accompanies this distribution.  The full text of the license may be found at
-//  http://opensource.org/licenses/bsd-license.php
-//
-//  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-//  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+//  SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 //
 
@@ -76,6 +70,9 @@ _PrepareArguments:
   // Ensure we're jumping to FV version of the code (not boot remapped alias)
   ldr   x3, =ASM_PFX(CEntryPoint)
 
+  // Set the frame pointer to NULL so any backtraces terminate here
+  mov   x29, xzr
+
   // Jump to PrePeiCore C code
   //    x0 = mp_id
   //    x1 = pei_core_address
@@ -84,4 +81,10 @@ _PrepareArguments:
 
 _SetupPrimaryCoreStack:
   mov   sp, x1
+  MOV64 (x8, FixedPcdGet64 (PcdCPUCoresStackBase))
+  MOV64 (x9, FixedPcdGet32 (PcdInitValueInTempStack) |\
+             FixedPcdGet32 (PcdInitValueInTempStack) << 32)
+0:stp   x9, x9, [x8], #16
+  cmp   x8, x1
+  b.lt  0b
   b     _PrepareArguments

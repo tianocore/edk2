@@ -1,15 +1,9 @@
 /** @file
   Mtftp6 option parse functions declaration.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -26,7 +20,7 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 
-#define MTFTP6_SUPPORTED_OPTIONS_NUM  4
+#define MTFTP6_SUPPORTED_OPTIONS_NUM  5
 #define MTFTP6_OPCODE_LEN             2
 #define MTFTP6_ERRCODE_LEN            2
 #define MTFTP6_BLKNO_LEN              2
@@ -39,11 +33,13 @@
 #define MTFTP6_OPT_TIMEOUT_BIT        0x02
 #define MTFTP6_OPT_TSIZE_BIT          0x04
 #define MTFTP6_OPT_MCAST_BIT          0x08
+#define MTFTP6_OPT_WINDOWSIZE_BIT     0X10
 
 extern CHAR8 *mMtftp6SupportedOptions[MTFTP6_SUPPORTED_OPTIONS_NUM];
 
 typedef struct {
   UINT16                    BlkSize;
+  UINT16                    WindowSize;
   UINT8                     Timeout;
   UINT32                    Tsize;
   EFI_IPv6_ADDRESS          McastIp;
@@ -76,11 +72,12 @@ Mtftp6ParseMcastOption (
   @param[in]  Count         The num of the extension options.
   @param[in]  IsRequest     If FALSE, the extension options is included
                             by a request packet.
+  @param[in]  Operation     The current performed operation.
   @param[in]  ExtInfo       The pointer to the option information to be filled.
 
-  @retval EFI_SUCCESS            Parse the multi-cast option successfully.
-  @retval EFI_INVALID_PARAMETER  An option is malformatted.
-  @retval EFI_UNSUPPORTED        An option is not supported.
+  @retval EFI_SUCCESS            Parse the multicast option successfully.
+  @retval EFI_INVALID_PARAMETER  There is one option is malformatted at least.
+  @retval EFI_UNSUPPORTED        There is one option is not supported at least.
 
 **/
 EFI_STATUS
@@ -88,6 +85,7 @@ Mtftp6ParseExtensionOption (
   IN EFI_MTFTP6_OPTION        *Options,
   IN UINT32                   Count,
   IN BOOLEAN                  IsRequest,
+  IN UINT16                   Operation,
   IN MTFTP6_EXT_OPTION_INFO   *ExtInfo
   );
 

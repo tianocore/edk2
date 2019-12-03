@@ -1,14 +1,8 @@
 /** @file
 Functions useful to operate file directories by parsing file path.
 
-Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -87,7 +81,7 @@ Returns:
   }
 
   //
-  // 
+  //
   //
   for (Offset = Length; Offset > 0; Offset--) {
     if ((Return[Offset] == '/') || (Return[Offset] == '\\')) {
@@ -195,7 +189,7 @@ Returns:
   }
 
   //
-  // 
+  //
   //
   for (Offset = Length; Offset > 0; Offset--) {
     if ((Return[Offset] == '/') || (Return[Offset] == '\\')) {
@@ -228,7 +222,7 @@ Routine Description:
 Arguments:
 
   OldPath     Path name of replace the final segment
-  Peer        The new path name to concatinate to become the peer path
+  Peer        The new path name to concatenate to become the peer path
 
 Returns:
 

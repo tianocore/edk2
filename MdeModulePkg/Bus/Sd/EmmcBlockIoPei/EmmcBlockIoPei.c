@@ -1,13 +1,7 @@
 /** @file
 
-  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -135,6 +129,11 @@ EMMC_PEIM_HC_PRIVATE_DATA gEmmcHcPrivateTemplate = {
     EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST,
     &gEfiPeiVirtualBlockIo2PpiGuid,
     NULL
+  },
+  {                               // EndOfPeiNotifyList
+    (EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
+    &gEfiEndOfPeiSignalPpiGuid,
+    EmmcBlockIoPeimEndOfPei
   },
   {                               // Slot
     {
@@ -619,6 +618,36 @@ EmmcBlockIoPeimReadBlocks2 (
 }
 
 /**
+  One notified function to cleanup the allocated DMA buffers at the end of PEI.
+
+  @param[in]  PeiServices        Pointer to PEI Services Table.
+  @param[in]  NotifyDescriptor   Pointer to the descriptor for the Notification
+                                 event that caused this function to execute.
+  @param[in]  Ppi                Pointer to the PPI data associated with this function.
+
+  @retval     EFI_SUCCESS  The function completes successfully
+
+**/
+EFI_STATUS
+EFIAPI
+EmmcBlockIoPeimEndOfPei (
+  IN EFI_PEI_SERVICES           **PeiServices,
+  IN EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDescriptor,
+  IN VOID                       *Ppi
+  )
+{
+  EMMC_PEIM_HC_PRIVATE_DATA       *Private;
+
+  Private = GET_EMMC_PEIM_HC_PRIVATE_DATA_FROM_THIS_NOTIFY (NotifyDescriptor);
+
+  if ((Private->Pool != NULL) && (Private->Pool->Head != NULL)) {
+    EmmcPeimFreeMemPool (Private->Pool);
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
   The user code starts with this function.
 
   @param  FileHandle             Handle of the file being invoked.
@@ -671,6 +700,8 @@ InitializeEmmcBlockIoPeim (
   if (EFI_ERROR (Status)) {
     return EFI_DEVICE_ERROR;
   }
+
+  IoMmuInit ();
 
   Controller = 0;
   MmioBase   = NULL;
@@ -800,6 +831,11 @@ InitializeEmmcBlockIoPeim (
 
     if (!EFI_ERROR (Status)) {
       PeiServicesInstallPpi (&Private->BlkIoPpiList);
+      PeiServicesNotifyPpi (&Private->EndOfPeiNotifyList);
+    } else {
+      if (Private->Pool->Head != NULL) {
+        EmmcPeimFreeMemPool (Private->Pool);
+      }
     }
   }
 

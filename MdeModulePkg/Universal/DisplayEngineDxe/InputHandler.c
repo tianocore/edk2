@@ -1,14 +1,8 @@
 /** @file
 Implementation for handling user input from the User Interfaces.
 
-Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -34,14 +28,14 @@ GetFieldFromOp (
   if (OpCode->OpCode == EFI_IFR_STRING_OP) {
     StringOp = (EFI_IFR_STRING *) OpCode;
     *Minimum = StringOp->MinSize;
-    *Maximum = StringOp->MaxSize;    
+    *Maximum = StringOp->MaxSize;
   } else if (OpCode->OpCode == EFI_IFR_PASSWORD_OP) {
     PasswordOp = (EFI_IFR_PASSWORD *) OpCode;
     *Minimum = PasswordOp->MinSize;
-    *Maximum = PasswordOp->MaxSize;       
+    *Maximum = PasswordOp->MaxSize;
   } else {
     *Minimum = 0;
-    *Maximum = 0;       
+    *Maximum = 0;
   }
 }
 
@@ -160,11 +154,11 @@ ReadString (
     if (!IsPassword) {
       PrintStringAt (Start + 1, Top + 3, BufferedString);
     }
-    
+
     gST->ConOut->SetAttribute (gST->ConOut, EFI_TEXT_ATTR (EFI_LIGHTGRAY, EFI_BLACK));
     gST->ConOut->SetCursorPosition (gST->ConOut, Start + GetStringWidth (StringPtr) / 2, Top + 3);
   }
-  
+
   do {
     Status = WaitForKeyStroke (&Key);
     ASSERT_EFI_ERROR (Status);
@@ -264,7 +258,7 @@ ReadString (
           for (Index = 0; Index < CurrentCursor; Index++) {
             TempString[Index] = StringPtr[Index];
           }
-		  TempString[Index] = CHAR_NULL;
+      TempString[Index] = CHAR_NULL;
           StrCatS (TempString, MaxLen, KeyPad);
           StrCatS (TempString, MaxLen, StringPtr + CurrentCursor);
           StrCpyS (StringPtr, MaxLen, TempString);
@@ -361,7 +355,7 @@ AdjustQuestionValue (
       QuestionValue->Value.date.Day = Maximum;
     }
   }
-  
+
   //
   // Change the Year area.
   //
@@ -400,7 +394,7 @@ GetValueFromNum (
   EFI_IFR_NUMERIC       *NumericOp;
 
   NumericOp = (EFI_IFR_NUMERIC *) OpCode;
-  
+
   switch (NumericOp->Flags & EFI_IFR_NUMERIC_SIZE) {
   case EFI_IFR_NUMERIC_SIZE_1:
     if (IntInput) {
@@ -415,7 +409,7 @@ GetValueFromNum (
     *Step    = NumericOp->data.u8.Step;
     *StorageWidth = (UINT16) sizeof (UINT8);
     break;
-  
+
   case EFI_IFR_NUMERIC_SIZE_2:
     if (IntInput) {
       *Minimum = (INT64) (INT16) NumericOp->data.u16.MinValue;
@@ -429,7 +423,7 @@ GetValueFromNum (
     *Step    = NumericOp->data.u16.Step;
     *StorageWidth = (UINT16) sizeof (UINT16);
     break;
-  
+
   case EFI_IFR_NUMERIC_SIZE_4:
     if (IntInput) {
       *Minimum = (INT64) (INT32) NumericOp->data.u32.MinValue;
@@ -443,7 +437,7 @@ GetValueFromNum (
     *Step    = NumericOp->data.u32.Step;
     *StorageWidth = (UINT16) sizeof (UINT32);
     break;
-  
+
   case EFI_IFR_NUMERIC_SIZE_8:
     if (IntInput) {
       *Minimum = (INT64) NumericOp->data.u64.MinValue;
@@ -457,7 +451,7 @@ GetValueFromNum (
     *Step    = NumericOp->data.u64.Step;
     *StorageWidth = (UINT16) sizeof (UINT64);
     break;
-  
+
   default:
     break;
   }
@@ -524,6 +518,7 @@ GetNumericInput (
 
   Question      = MenuOption->ThisTag;
   QuestionValue = &Question->CurrentValue;
+  ZeroMem (InputText, MAX_NUMERIC_INPUT_WIDTH * sizeof (CHAR16));
 
   //
   // Only two case, user can enter to this function: Enter and +/- case.
@@ -556,8 +551,8 @@ GetNumericInput (
     case 1:
       switch (QuestionValue->Value.date.Month) {
       case 2:
-        if ((QuestionValue->Value.date.Year % 4) == 0  && 
-            ((QuestionValue->Value.date.Year % 100) != 0 || 
+        if ((QuestionValue->Value.date.Year % 4) == 0  &&
+            ((QuestionValue->Value.date.Year % 100) != 0 ||
             (QuestionValue->Value.date.Year % 400) == 0)) {
           Maximum = 29;
         } else {
@@ -573,7 +568,7 @@ GetNumericInput (
       default:
         Maximum = 31;
         break;
-      } 
+      }
 
       EraseLen = 3;
       EditValue = QuestionValue->Value.date.Day;
@@ -690,16 +685,17 @@ GetNumericInput (
       if (MenuOption->Sequence == 0) {
         InputText[0] = LEFT_NUMERIC_DELIMITER;
         SetUnicodeMem (InputText + 1, InputWidth, L' ');
+        InputText[InputWidth + 1] = DATE_SEPARATOR;
+        InputText[InputWidth + 2] = L'\0';
+      } else  if (MenuOption->Sequence == 1){
+        SetUnicodeMem (InputText, InputWidth, L' ');
+        InputText[InputWidth] = DATE_SEPARATOR;
+        InputText[InputWidth + 1] = L'\0';
       } else {
         SetUnicodeMem (InputText, InputWidth, L' ');
+        InputText[InputWidth] = RIGHT_NUMERIC_DELIMITER;
+        InputText[InputWidth + 1] = L'\0';
       }
-
-      if (MenuOption->Sequence == 2) {
-        InputText[InputWidth + 1] = RIGHT_NUMERIC_DELIMITER;
-      } else {
-        InputText[InputWidth + 1] = DATE_SEPARATOR;
-      }
-      InputText[InputWidth + 2] = L'\0';
 
       PrintStringAt (Column, Row, InputText);
       if (MenuOption->Sequence == 0) {
@@ -713,16 +709,17 @@ GetNumericInput (
       if (MenuOption->Sequence == 0) {
         InputText[0] = LEFT_NUMERIC_DELIMITER;
         SetUnicodeMem (InputText + 1, InputWidth, L' ');
+        InputText[InputWidth + 1] = TIME_SEPARATOR;
+        InputText[InputWidth + 2] = L'\0';
+      } else if (MenuOption->Sequence == 1){
+        SetUnicodeMem (InputText, InputWidth, L' ');
+        InputText[InputWidth] = TIME_SEPARATOR;
+        InputText[InputWidth + 1] = L'\0';
       } else {
         SetUnicodeMem (InputText, InputWidth, L' ');
+        InputText[InputWidth] = RIGHT_NUMERIC_DELIMITER;
+        InputText[InputWidth + 1] = L'\0';
       }
-
-      if (MenuOption->Sequence == 2) {
-        InputText[InputWidth + 1] = RIGHT_NUMERIC_DELIMITER;
-      } else {
-        InputText[InputWidth + 1] = TIME_SEPARATOR;
-      }
-      InputText[InputWidth + 2] = L'\0';
 
       PrintStringAt (Column, Row, InputText);
       if (MenuOption->Sequence == 0) {
@@ -904,7 +901,7 @@ EnterCarriageReturn:
       if (IntInput) {
         //
         // After user input Enter, need to check whether the input value.
-        // If input a negative value, should compare with maximum value. 
+        // If input a negative value, should compare with maximum value.
         // else compare with the minimum value.
         //
         if (Negative) {
@@ -974,7 +971,7 @@ EnterCarriageReturn:
       // Sample like: 2012.02.29 -> 2013.02.29 -> 2013.02.01
       //              2013.03.29 -> 2013.02.29 -> 2013.02.28
       //
-      if (Question->OpCode->OpCode  == EFI_IFR_DATE_OP && 
+      if (Question->OpCode->OpCode  == EFI_IFR_DATE_OP &&
         (MenuOption->Sequence == 0 || MenuOption->Sequence == 2)) {
         AdjustQuestionValue (QuestionValue, (UINT8)MenuOption->Sequence);
       }
@@ -1133,12 +1130,12 @@ AdjustOptionOrder (
       break;
     }
   }
-  
+
   *PopUpMenuLines = Index;
-  
+
   //
   // Prepare HiiValue array
-  //  
+  //
   HiiValueArray = AllocateZeroPool (*PopUpMenuLines * sizeof (EFI_HII_VALUE));
   ASSERT (HiiValueArray != NULL);
 
@@ -1146,21 +1143,21 @@ AdjustOptionOrder (
     HiiValueArray[Index].Type = ValueType;
     HiiValueArray[Index].Value.u64 = GetArrayData (ValueArray, ValueType, Index);
   }
-  
+
   for (Index = 0; Index < *PopUpMenuLines; Index++) {
     OneOfOption = ValueToOption (Question, &HiiValueArray[*PopUpMenuLines - Index - 1]);
     if (OneOfOption == NULL) {
       return EFI_NOT_FOUND;
     }
-  
+
     RemoveEntryList (&OneOfOption->Link);
-  
+
     //
     // Insert to head.
     //
     InsertHeadList (&Question->OptionListHead, &OneOfOption->Link);
   }
-  
+
   FreePool (HiiValueArray);
 
   return EFI_SUCCESS;
@@ -1188,13 +1185,13 @@ IsValuesEqual (
   case EFI_IFR_TYPE_BOOLEAN:
   case EFI_IFR_TYPE_NUM_SIZE_8:
     return (BOOLEAN) (Value1->u8 == Value2->u8);
-  
+
   case EFI_IFR_TYPE_NUM_SIZE_16:
     return (BOOLEAN) (Value1->u16 == Value2->u16);
-  
+
   case EFI_IFR_TYPE_NUM_SIZE_32:
     return (BOOLEAN) (Value1->u32 == Value2->u32);
-  
+
   case EFI_IFR_TYPE_NUM_SIZE_64:
     return (BOOLEAN) (Value1->u64 == Value2->u64);
 
@@ -1657,7 +1654,7 @@ TheKey:
       gST->ConOut->SetAttribute (gST->ConOut, SavedAttribute);
 
       return EFI_SUCCESS;
-      
+
     default:
       break;
     }

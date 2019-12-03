@@ -2,16 +2,9 @@
 PEIM to produce gPeiUsb2HostControllerPpiGuid based on gPeiUsbControllerPpiGuid
 which is used to enable recovery function from USB Drivers.
 
-Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
-  
-This program and the accompanying materials
-are licensed and made available under the terms and conditions
-of the BSD License which accompanies this distribution.  The
-full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -20,7 +13,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 /**
   Delete a single asynchronous interrupt transfer for
   the device and endpoint.
-  
+
   @param  Ehc         The EHCI device.
   @param  Data        Current data not associated with a QTD.
   @param  DataLen     The length of the data.
@@ -96,7 +89,7 @@ EhcCreateQtd (
       Len += ThisBufLen;
       Data += ThisBufLen;
     }
-    
+
     //
     // Need to fix the last pointer if the Qtd can't hold all the
     // user's data to make sure that the length is in the unit of
@@ -120,7 +113,7 @@ EhcCreateQtd (
     1. SplitXState in the Status field.
     2. Microframe S-mask.
     3. Microframe C-mask.
-  
+
   @param  Ep    The queue head's related endpoint.
   @param  QhHw  The queue head to initialize.
 
@@ -142,7 +135,7 @@ EhcInitIntQh (
     QhHw->SMask = QH_MICROFRAME_0;
     return ;
   }
-  
+
   //
   // For low/full speed device, the transfer must go through
   // the split transaction. Need to update three fields
@@ -160,7 +153,7 @@ EhcInitIntQh (
 
 /**
   Allocate and initialize a EHCI queue head.
-  
+
   @param  Ehci      The EHCI device.
   @param  Ep        The endpoint to create queue head for.
 
@@ -185,7 +178,7 @@ EhcCreateQh (
   Qh->Signature       = EHC_QH_SIG;
   Qh->NextQh          = NULL;
   Qh->Interval        = Ep->PollRate;
-  
+
   InitializeListHead (&Qh->Qtds);
 
   QhHw                = &Qh->QhHw;
@@ -250,7 +243,7 @@ EhcCreateQh (
   can't support high speed endpoint with a interval less
   than 8 microframe because interval is specified in
   the unit of ms (millisecond).
-  
+
   @param Interval       The interval to convert.
 
   @retval The converted interval.
@@ -266,7 +259,7 @@ EhcConvertPollRate (
   if (Interval == 0) {
     return 1;
   }
-  
+
   //
   // Find the index (1 based) of the highest non-zero bit
   //
@@ -282,7 +275,7 @@ EhcConvertPollRate (
 
 /**
   Free a list of QTDs.
-  
+
   @param  Ehc         The EHCI device.
   @param  Qtds        The list head of the QTD.
 
@@ -301,13 +294,13 @@ EhcFreeQtds (
     Qtd = EFI_LIST_CONTAINER (Entry, PEI_EHC_QTD, QtdList);
 
     RemoveEntryList (&Qtd->QtdList);
-    UsbHcFreeMem (Ehc->MemPool, Qtd, sizeof (PEI_EHC_QTD));
+    UsbHcFreeMem (Ehc, Ehc->MemPool, Qtd, sizeof (PEI_EHC_QTD));
   }
 }
 
 /**
   Free an allocated URB. It is possible for it to be partially inited.
-  
+
   @param  Ehc         The EHCI device.
   @param  Urb         The URB to free.
 
@@ -318,19 +311,27 @@ EhcFreeUrb (
   IN PEI_URB              *Urb
   )
 {
+  if (Urb->RequestPhy != NULL) {
+    IoMmuUnmap (Ehc->IoMmu, Urb->RequestMap);
+  }
+
+  if (Urb->DataMap != NULL) {
+    IoMmuUnmap (Ehc->IoMmu, Urb->DataMap);
+  }
+
   if (Urb->Qh != NULL) {
     //
     // Ensure that this queue head has been unlinked from the
     // schedule data structures. Free all the associated QTDs
     //
     EhcFreeQtds (Ehc, &Urb->Qh->Qtds);
-    UsbHcFreeMem (Ehc->MemPool, Urb->Qh, sizeof (PEI_EHC_QH));
+    UsbHcFreeMem (Ehc, Ehc->MemPool, Urb->Qh, sizeof (PEI_EHC_QH));
   }
 }
 
 /**
   Create a list of QTDs for the URB.
-  
+
   @param  Ehc         The EHCI device.
   @param  Urb         The URB to create QTDs for.
 
@@ -372,7 +373,7 @@ EhcCreateQtds (
   if (Ep->Direction == EfiUsbDataIn) {
     AlterNext = QTD_LINK (Ehc->ShortReadStop, FALSE);
   }
-  
+
   //
   // Build the Setup and status packets for control transfer
   //
@@ -449,7 +450,7 @@ EhcCreateQtds (
 
     Len += Qtd->DataLen;
   }
-  
+
   //
   // Insert the status packet for control transfer
   //
@@ -488,7 +489,7 @@ ON_ERROR:
 
 /**
   Create a new URB and its associated QTD.
-  
+
   @param  Ehc               The EHCI device.
   @param  DevAddr           The device address.
   @param  EpAddr            Endpoint addrress & its direction.
@@ -511,7 +512,7 @@ PEI_URB *
 EhcCreateUrb (
   IN PEI_USB2_HC_DEV                    *Ehc,
   IN UINT8                              DevAddr,
-  IN UINT8                              EpAddr,  
+  IN UINT8                              EpAddr,
   IN UINT8                              DevSpeed,
   IN UINT8                              Toggle,
   IN UINTN                              MaxPacket,
@@ -527,14 +528,14 @@ EhcCreateUrb (
 {
   USB_ENDPOINT                  *Ep;
   EFI_PHYSICAL_ADDRESS          PhyAddr;
+  EDKII_IOMMU_OPERATION         MapOp;
   EFI_STATUS                    Status;
   UINTN                         Len;
   PEI_URB                       *Urb;
   VOID                          *Map;
 
-    
   Map = NULL;
-  
+
   Urb = Ehc->Urb;
   Urb->Signature  = EHC_URB_SIG;
   InitializeListHead (&Urb->UrbList);
@@ -570,14 +571,21 @@ EhcCreateUrb (
   if (Urb->Qh == NULL) {
     goto ON_ERROR;
   }
-  
+
+  Urb->RequestPhy = NULL;
+  Urb->RequestMap = NULL;
+  Urb->DataPhy  = NULL;
+  Urb->DataMap  = NULL;
+
   //
   // Map the request and user data
   //
   if (Request != NULL) {
     Len     = sizeof (EFI_USB_DEVICE_REQUEST);
-    PhyAddr =  (EFI_PHYSICAL_ADDRESS) (UINTN) Request ;
-    if ( (Len != sizeof (EFI_USB_DEVICE_REQUEST))) {
+    MapOp   = EdkiiIoMmuOperationBusMasterRead;
+    Status  = IoMmuMap (Ehc->IoMmu, MapOp, Request, &Len, &PhyAddr, &Map);
+
+    if (EFI_ERROR (Status) || (Len != sizeof (EFI_USB_DEVICE_REQUEST))) {
       goto ON_ERROR;
     }
 
@@ -587,8 +595,16 @@ EhcCreateUrb (
 
   if (Data != NULL) {
     Len      = DataLen;
-    PhyAddr  =  (EFI_PHYSICAL_ADDRESS) (UINTN) Data ;
-    if ( (Len != DataLen)) {
+
+    if (Ep->Direction == EfiUsbDataIn) {
+      MapOp = EdkiiIoMmuOperationBusMasterWrite;
+    } else {
+      MapOp = EdkiiIoMmuOperationBusMasterRead;
+    }
+
+    Status  = IoMmuMap (Ehc->IoMmu, MapOp, Data, &Len, &PhyAddr, &Map);
+
+    if (EFI_ERROR (Status) || (Len != DataLen)) {
       goto ON_ERROR;
     }
 

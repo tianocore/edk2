@@ -1,14 +1,8 @@
 /** @file
   TCG EFI Platform Definition in TCG_EFI_Platform_1_20_Final
 
-  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -22,13 +16,21 @@
 //
 // Standard event types
 //
+#define EV_PREBOOT_CERT             ((TCG_EVENTTYPE) 0x00000000)
 #define EV_POST_CODE                ((TCG_EVENTTYPE) 0x00000001)
 #define EV_NO_ACTION                ((TCG_EVENTTYPE) 0x00000003)
 #define EV_SEPARATOR                ((TCG_EVENTTYPE) 0x00000004)
+#define EV_ACTION                   ((TCG_EVENTTYPE) 0x00000005)
 #define EV_S_CRTM_CONTENTS          ((TCG_EVENTTYPE) 0x00000007)
 #define EV_S_CRTM_VERSION           ((TCG_EVENTTYPE) 0x00000008)
 #define EV_CPU_MICROCODE            ((TCG_EVENTTYPE) 0x00000009)
+#define EV_PLATFORM_CONFIG_FLAGS    ((TCG_EVENTTYPE) 0x0000000A)
 #define EV_TABLE_OF_DEVICES         ((TCG_EVENTTYPE) 0x0000000B)
+#define EV_COMPACT_HASH             ((TCG_EVENTTYPE) 0x0000000C)
+#define EV_NONHOST_CODE             ((TCG_EVENTTYPE) 0x0000000F)
+#define EV_NONHOST_CONFIG           ((TCG_EVENTTYPE) 0x00000010)
+#define EV_NONHOST_INFO             ((TCG_EVENTTYPE) 0x00000011)
+#define EV_OMIT_BOOT_DEVICE_EVENTS  ((TCG_EVENTTYPE) 0x00000012)
 
 //
 // EFI specific event types
@@ -43,11 +45,12 @@
 #define EV_EFI_ACTION                       (EV_EFI_EVENT_BASE + 7)
 #define EV_EFI_PLATFORM_FIRMWARE_BLOB       (EV_EFI_EVENT_BASE + 8)
 #define EV_EFI_HANDOFF_TABLES               (EV_EFI_EVENT_BASE + 9)
+#define EV_EFI_HCRTM_EVENT                  (EV_EFI_EVENT_BASE + 0x10)
 #define EV_EFI_VARIABLE_AUTHORITY           (EV_EFI_EVENT_BASE + 0xE0)
 
 #define EFI_CALLING_EFI_APPLICATION         \
   "Calling EFI Application from Boot Option"
-#define EFI_RETURNING_FROM_EFI_APPLICATOIN  \
+#define EFI_RETURNING_FROM_EFI_APPLICATION  \
   "Returning from EFI Application from Boot Option"
 #define EFI_EXIT_BOOT_SERVICES_INVOCATION   \
   "Exit Boot Services Invocation"
@@ -151,6 +154,7 @@ typedef struct tdEFI_HANDOFF_TABLE_POINTERS {
 /// This structure serves as the header for measuring variables. The name of the
 /// variable (in Unicode format) should immediately follow, then the variable
 /// data.
+/// This is defined in TCG EFI Platform Spec for TPM1.1 or 1.2 V1.22
 ///
 typedef struct tdEFI_VARIABLE_DATA {
   EFI_GUID                          VariableName;
@@ -159,6 +163,22 @@ typedef struct tdEFI_VARIABLE_DATA {
   CHAR16                            UnicodeName[1];
   INT8                              VariableData[1];  ///< Driver or platform-specific data
 } EFI_VARIABLE_DATA;
+
+///
+/// UEFI_VARIABLE_DATA
+///
+/// This structure serves as the header for measuring variables. The name of the
+/// variable (in Unicode format) should immediately follow, then the variable
+/// data.
+/// This is defined in TCG PC Client Firmware Profile Spec 00.21
+///
+typedef struct tdUEFI_VARIABLE_DATA {
+  EFI_GUID                          VariableName;
+  UINT64                            UnicodeNameLength;
+  UINT64                            VariableDataLength;
+  CHAR16                            UnicodeName[1];
+  INT8                              VariableData[1];  ///< Driver or platform-specific data
+} UEFI_VARIABLE_DATA;
 
 //
 // For TrEE1.0 compatibility
@@ -173,7 +193,7 @@ typedef struct {
 
 typedef struct tdEFI_GPT_DATA {
   EFI_PARTITION_TABLE_HEADER  EfiPartitionHeader;
-  UINTN                       NumberOfPartitions; 
+  UINTN                       NumberOfPartitions;
   EFI_PARTITION_ENTRY         Partitions[1];
 } EFI_GPT_DATA;
 
@@ -187,6 +207,17 @@ typedef struct tdTCG_PCR_EVENT2 {
   UINT32              EventSize;
   UINT8               Event[1];
 } TCG_PCR_EVENT2;
+
+//
+// TCG PCR Event2 Header
+// Follow TCG EFI Protocol Spec 5.2 Crypto Agile Log Entry Format
+//
+typedef struct tdTCG_PCR_EVENT2_HDR{
+  TCG_PCRINDEX        PCRIndex;
+  TCG_EVENTTYPE       EventType;
+  TPML_DIGEST_VALUES  Digests;
+  UINT32              EventSize;
+} TCG_PCR_EVENT2_HDR;
 
 //
 // Log Header Entry Data
@@ -267,6 +298,33 @@ typedef struct {
   //
 //UINT8               vendorInfo[vendorInfoSize];
 } TCG_EfiSpecIDEventStruct;
+
+
+
+#define TCG_EfiStartupLocalityEvent_SIGNATURE      "StartupLocality"
+
+
+//
+// PC Client PTP spec Table 8 Relationship between Locality and Locality Attribute
+//
+#define LOCALITY_0_INDICATOR        0x01
+#define LOCALITY_1_INDICATOR        0x02
+#define LOCALITY_2_INDICATOR        0x03
+#define LOCALITY_3_INDICATOR        0x04
+#define LOCALITY_4_INDICATOR        0x05
+
+
+//
+// Startup Locality Event
+//
+typedef struct tdTCG_EfiStartupLocalityEvent{
+  UINT8       Signature[16];
+  //
+  // The Locality Indicator which sent the TPM2_Startup command
+  //
+  UINT8       StartupLocality;
+} TCG_EfiStartupLocalityEvent;
+
 
 //
 // Restore original structure alignment

@@ -10,14 +10,8 @@
   into memory.
 
 (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
-Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -45,7 +39,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @param MemSize     The size of the block of memory pointed to by MemBase
   @param DataSize    How big a free block we want to find
 
-  @return A pointer to a memory block of at least DataSize that lies somewhere 
+  @return A pointer to a memory block of at least DataSize that lies somewhere
           between MemBase and (MemBase + MemSize). The memory pointed to does not
           contain any of the capsule block descriptors or capsule blocks pointed to
           by the BlockList.
@@ -75,7 +69,7 @@ FindFreeMem (
   @param MemSize        size of the system memory pointed to by MemBase
 
   @retval NULL    could not relocate the descriptors
-  @retval Pointer to the base of the successfully-relocated block descriptors. 
+  @retval Pointer to the base of the successfully-relocated block descriptors.
 
 **/
 EFI_CAPSULE_BLOCK_DESCRIPTOR *
@@ -93,7 +87,7 @@ RelocateBlockDescriptors (
   @param CapsuleHeader   The pointer to EFI_CAPSULE_HEADER
 
   @retval FALSE  Capsule is OK
-  @retval TRUE   Capsule is corrupted 
+  @retval TRUE   Capsule is corrupted
 
 **/
 BOOLEAN
@@ -153,7 +147,7 @@ GetCapsuleInfo (
   @param MemSize     The size of the block of memory pointed to by MemBase
   @param DataSize    How big a free block we want to find
 
-  @return A pointer to a memory block of at least DataSize that lies somewhere 
+  @return A pointer to a memory block of at least DataSize that lies somewhere
           between MemBase and (MemBase + MemSize). The memory pointed to does not
           contain any of the capsule block descriptors or capsule blocks pointed to
           by the BlockList.
@@ -258,7 +252,7 @@ ValidateCapsuleByMemoryResource (
   // Sanity Check
   //
   if (Size > MAX_ADDRESS) {
-    DEBUG ((EFI_D_ERROR, "ERROR: Size(0x%lx) > MAX_ADDRESS\n", Size));
+    DEBUG ((DEBUG_ERROR, "ERROR: Size(0x%lx) > MAX_ADDRESS\n", Size));
     return FALSE;
   }
 
@@ -266,7 +260,7 @@ ValidateCapsuleByMemoryResource (
   // Sanity Check
   //
   if (Address > (MAX_ADDRESS - Size)) {
-    DEBUG ((EFI_D_ERROR, "ERROR: Address(0x%lx) > (MAX_ADDRESS - Size(0x%lx))\n", Address, Size));
+    DEBUG ((DEBUG_ERROR, "ERROR: Address(0x%lx) > (MAX_ADDRESS - Size(0x%lx))\n", Address, Size));
     return FALSE;
   }
 
@@ -280,14 +274,14 @@ ValidateCapsuleByMemoryResource (
   for (Index = 0; MemoryResource[Index].ResourceLength != 0; Index++) {
     if ((Address >= MemoryResource[Index].PhysicalStart) &&
         ((Address + Size) <= (MemoryResource[Index].PhysicalStart + MemoryResource[Index].ResourceLength))) {
-      DEBUG ((EFI_D_INFO, "Address(0x%lx) Size(0x%lx) in MemoryResource[0x%x] - Start(0x%lx) Length(0x%lx)\n",
+      DEBUG ((DEBUG_INFO, "Address(0x%lx) Size(0x%lx) in MemoryResource[0x%x] - Start(0x%lx) Length(0x%lx)\n",
                           Address, Size,
                           Index, MemoryResource[Index].PhysicalStart, MemoryResource[Index].ResourceLength));
       return TRUE;
     }
   }
 
-  DEBUG ((EFI_D_ERROR, "ERROR: Address(0x%lx) Size(0x%lx) not in any MemoryResource\n", Address, Size));
+  DEBUG ((DEBUG_ERROR, "ERROR: Address(0x%lx) Size(0x%lx) not in any MemoryResource\n", Address, Size));
   return FALSE;
 }
 
@@ -312,7 +306,7 @@ ValidateCapsuleIntegrity (
   UINTN                          CapsuleCount;
   EFI_CAPSULE_BLOCK_DESCRIPTOR   *Ptr;
 
-  DEBUG ((EFI_D_INFO, "ValidateCapsuleIntegrity\n"));
+  DEBUG ((DEBUG_INFO, "ValidateCapsuleIntegrity\n"));
 
   //
   // Go through the list to look for inconsistencies. Check for:
@@ -321,7 +315,7 @@ ValidateCapsuleIntegrity (
   //   * The first capsule header flag
   //   * The first capsule header HeaderSize
   //   * Below check will be done in ValidateCapsuleByMemoryResource()
-  //     Length > MAX_ADDRESS 
+  //     Length > MAX_ADDRESS
   //     Ptr + sizeof (EFI_CAPSULE_BLOCK_DESCRIPTOR) > MAX_ADDRESS
   //     DataBlock + Length > MAX_ADDRESS
   //
@@ -333,15 +327,15 @@ ValidateCapsuleIntegrity (
     return NULL;
   }
 
-  DEBUG ((EFI_D_INFO, "Ptr - 0x%x\n", Ptr));
-  DEBUG ((EFI_D_INFO, "Ptr->Length - 0x%x\n", Ptr->Length));
-  DEBUG ((EFI_D_INFO, "Ptr->Union - 0x%x\n", Ptr->Union.ContinuationPointer));
+  DEBUG ((DEBUG_INFO, "Ptr - 0x%p\n", Ptr));
+  DEBUG ((DEBUG_INFO, "Ptr->Length - 0x%lx\n", Ptr->Length));
+  DEBUG ((DEBUG_INFO, "Ptr->Union - 0x%lx\n", Ptr->Union.ContinuationPointer));
   while ((Ptr->Length != 0) || (Ptr->Union.ContinuationPointer != (EFI_PHYSICAL_ADDRESS) (UINTN) NULL)) {
     //
     // Make sure the descriptor is aligned at UINT64 in memory
     //
     if ((UINTN) Ptr & (sizeof(UINT64) - 1)) {
-      DEBUG ((EFI_D_ERROR, "ERROR: BlockList address failed alignment check\n"));
+      DEBUG ((DEBUG_ERROR, "ERROR: BlockList address failed alignment check\n"));
       return NULL;
     }
 
@@ -354,9 +348,9 @@ ValidateCapsuleIntegrity (
       if (!ValidateCapsuleByMemoryResource (MemoryResource, (EFI_PHYSICAL_ADDRESS) (UINTN) Ptr, sizeof (EFI_CAPSULE_BLOCK_DESCRIPTOR))) {
         return NULL;
       }
-      DEBUG ((EFI_D_INFO, "Ptr(C) - 0x%x\n", Ptr));
-      DEBUG ((EFI_D_INFO, "Ptr->Length - 0x%x\n", Ptr->Length));
-      DEBUG ((EFI_D_INFO, "Ptr->Union - 0x%x\n", Ptr->Union.ContinuationPointer));
+      DEBUG ((DEBUG_INFO, "Ptr(C) - 0x%p\n", Ptr));
+      DEBUG ((DEBUG_INFO, "Ptr->Length - 0x%lx\n", Ptr->Length));
+      DEBUG ((DEBUG_INFO, "Ptr->Union - 0x%lx\n", Ptr->Union.ContinuationPointer));
     } else {
       if (!ValidateCapsuleByMemoryResource (MemoryResource, Ptr->Union.DataBlock, Ptr->Length)) {
         return NULL;
@@ -375,14 +369,14 @@ ValidateCapsuleIntegrity (
         // Sanity check
         //
         if (Ptr->Length < sizeof(EFI_CAPSULE_HEADER)) {
-          DEBUG ((EFI_D_ERROR, "ERROR: Ptr->Length(0x%lx) < sizeof(EFI_CAPSULE_HEADER)\n", Ptr->Length));
+          DEBUG ((DEBUG_ERROR, "ERROR: Ptr->Length(0x%lx) < sizeof(EFI_CAPSULE_HEADER)\n", Ptr->Length));
           return NULL;
         }
         //
         // Make sure HeaderSize field is valid
         //
         if (CapsuleHeader->HeaderSize > CapsuleHeader->CapsuleImageSize) {
-          DEBUG ((EFI_D_ERROR, "ERROR: CapsuleHeader->HeaderSize(0x%x) > CapsuleHeader->CapsuleImageSize(0x%x)\n", CapsuleHeader->HeaderSize, CapsuleHeader->CapsuleImageSize));
+          DEBUG ((DEBUG_ERROR, "ERROR: CapsuleHeader->HeaderSize(0x%x) > CapsuleHeader->CapsuleImageSize(0x%x)\n", CapsuleHeader->HeaderSize, CapsuleHeader->CapsuleImageSize));
           return NULL;
         }
         if (IsCapsuleCorrupted (CapsuleHeader)) {
@@ -395,7 +389,7 @@ ValidateCapsuleIntegrity (
       if (CapsuleSize >= Ptr->Length) {
         CapsuleSize = CapsuleSize - Ptr->Length;
       } else {
-        DEBUG ((EFI_D_ERROR, "ERROR: CapsuleSize(0x%lx) < Ptr->Length(0x%lx)\n", CapsuleSize, Ptr->Length));
+        DEBUG ((DEBUG_ERROR, "ERROR: CapsuleSize(0x%lx) < Ptr->Length(0x%lx)\n", CapsuleSize, Ptr->Length));
         //
         // Sanity check
         //
@@ -409,9 +403,9 @@ ValidateCapsuleIntegrity (
       if (!ValidateCapsuleByMemoryResource (MemoryResource, (EFI_PHYSICAL_ADDRESS) (UINTN) Ptr, sizeof (EFI_CAPSULE_BLOCK_DESCRIPTOR))) {
         return NULL;
       }
-      DEBUG ((EFI_D_INFO, "Ptr(B) - 0x%x\n", Ptr));
-      DEBUG ((EFI_D_INFO, "Ptr->Length - 0x%x\n", Ptr->Length));
-      DEBUG ((EFI_D_INFO, "Ptr->Union - 0x%x\n", Ptr->Union.ContinuationPointer));
+      DEBUG ((DEBUG_INFO, "Ptr(B) - 0x%p\n", Ptr));
+      DEBUG ((DEBUG_INFO, "Ptr->Length - 0x%lx\n", Ptr->Length));
+      DEBUG ((DEBUG_INFO, "Ptr->Union - 0x%lx\n", Ptr->Union.ContinuationPointer));
     }
   }
 
@@ -419,7 +413,7 @@ ValidateCapsuleIntegrity (
     //
     // No any capsule is found in BlockList
     //
-    DEBUG ((EFI_D_ERROR, "ERROR: CapsuleCount(0x%x) == 0\n", CapsuleCount));
+    DEBUG ((DEBUG_ERROR, "ERROR: CapsuleCount(0x%x) == 0\n", CapsuleCount));
     return NULL;
   }
 
@@ -427,7 +421,7 @@ ValidateCapsuleIntegrity (
     //
     // Capsule data is incomplete.
     //
-    DEBUG ((EFI_D_ERROR, "ERROR: CapsuleSize(0x%lx) != 0\n", CapsuleSize));
+    DEBUG ((DEBUG_ERROR, "ERROR: CapsuleSize(0x%lx) != 0\n", CapsuleSize));
     return NULL;
   }
 
@@ -450,7 +444,7 @@ ValidateCapsuleIntegrity (
   @param MemSize        size of the system memory pointed to by MemBase
 
   @retval NULL    could not relocate the descriptors
-  @retval Pointer to the base of the successfully-relocated block descriptors. 
+  @retval Pointer to the base of the successfully-relocated block descriptors.
 
 **/
 EFI_CAPSULE_BLOCK_DESCRIPTOR  *
@@ -515,7 +509,7 @@ RelocateBlockDescriptors (
         }
 
         CopyMem ((VOID *) RelocBuffer, (VOID *) (UINTN) TempBlockDesc->Union.DataBlock, (UINTN) TempBlockDesc->Length);
-        DEBUG ((EFI_D_INFO, "Capsule relocate descriptors from/to/size  0x%lX 0x%lX 0x%lX\n", TempBlockDesc->Union.DataBlock, (UINT64)(UINTN)RelocBuffer, TempBlockDesc->Length));
+        DEBUG ((DEBUG_INFO, "Capsule relocate descriptors from/to/size  0x%lX 0x%lX 0x%lX\n", TempBlockDesc->Union.DataBlock, (UINT64)(UINTN)RelocBuffer, TempBlockDesc->Length));
         TempBlockDesc->Union.DataBlock = (EFI_PHYSICAL_ADDRESS) (UINTN) RelocBuffer;
       }
       TempBlockDesc++;
@@ -552,7 +546,7 @@ RelocateBlockDescriptors (
         return NULL;
       }
       CopyMem ((VOID *) RelocBuffer, (VOID *) CurrBlockDescHead, BlockListSize);
-      DEBUG ((EFI_D_INFO, "Capsule reloc descriptor block #2\n"));
+      DEBUG ((DEBUG_INFO, "Capsule reloc descriptor block #2\n"));
       //
       // Point the previous block's next point to this copied version. If
       // the tail pointer is null, then this is the first descriptor block.
@@ -651,7 +645,7 @@ GetCapsuleInfo (
   UINTN                          ThisCapsuleImageSize;
   EFI_CAPSULE_HEADER             *CapsuleHeader;
 
-  DEBUG ((EFI_D_INFO, "GetCapsuleInfo enter\n"));
+  DEBUG ((DEBUG_INFO, "GetCapsuleInfo enter\n"));
 
   ASSERT (Desc != NULL);
 
@@ -673,7 +667,7 @@ GetCapsuleInfo (
       // While here we need check all capsules size.
       //
       if (Desc->Length >= (MAX_ADDRESS - Size)) {
-        DEBUG ((EFI_D_ERROR, "ERROR: Desc->Length(0x%lx) >= (MAX_ADDRESS - Size(0x%x))\n", Desc->Length, Size));
+        DEBUG ((DEBUG_ERROR, "ERROR: Desc->Length(0x%lx) >= (MAX_ADDRESS - Size(0x%x))\n", Desc->Length, Size));
         return EFI_OUT_OF_RESOURCES;
       }
       Size += (UINTN) Desc->Length;
@@ -707,7 +701,7 @@ GetCapsuleInfo (
   // If no descriptors, then fail
   //
   if (Count == 0) {
-    DEBUG ((EFI_D_ERROR, "ERROR: Count == 0\n"));
+    DEBUG ((DEBUG_ERROR, "ERROR: Count == 0\n"));
     return EFI_NOT_FOUND;
   }
 
@@ -737,7 +731,7 @@ GetCapsuleInfo (
   @param CapsuleHeader   The pointer to EFI_CAPSULE_HEADER
 
   @retval FALSE  Capsule is OK
-  @retval TRUE   Capsule is corrupted 
+  @retval TRUE   Capsule is corrupted
 
 **/
 BOOLEAN
@@ -769,7 +763,7 @@ IsCapsuleCorrupted (
   capsule gets coalesced. This can be useful in narrowing down
   where capsule data corruption occurs.
 
-  The test pattern mode fills in memory with a counting UINT32 value. 
+  The test pattern mode fills in memory with a counting UINT32 value.
   If the capsule is not divided up in a multiple of 4-byte blocks, then
   things get messy doing the check. Therefore there are some cases
   here where we just give up and skip the pre-coalesce check.
@@ -787,7 +781,7 @@ CapsuleTestPatternPreCoalesce (
   UINT32  TestCounter;
   UINT32  TestSize;
 
-  DEBUG ((EFI_D_INFO, "CapsuleTestPatternPreCoalesce\n"));
+  DEBUG ((DEBUG_INFO, "CapsuleTestPatternPreCoalesce\n"));
 
   //
   // Find first data descriptor
@@ -803,7 +797,7 @@ CapsuleTestPatternPreCoalesce (
   // First one better be long enough to at least hold the test signature
   //
   if (Desc->Length < sizeof (UINT32)) {
-    DEBUG ((EFI_D_INFO, "Capsule test pattern pre-coalesce punted #1\n"));
+    DEBUG ((DEBUG_INFO, "Capsule test pattern pre-coalesce punted #1\n"));
     return ;
   }
 
@@ -823,13 +817,13 @@ CapsuleTestPatternPreCoalesce (
   TestPtr += 2;
   while (1) {
     if ((TestSize & 0x03) != 0) {
-      DEBUG ((EFI_D_INFO, "Capsule test pattern pre-coalesce punted #2\n"));
+      DEBUG ((DEBUG_INFO, "Capsule test pattern pre-coalesce punted #2\n"));
       return ;
     }
 
     while (TestSize > 0) {
       if (*TestPtr != TestCounter) {
-        DEBUG ((EFI_D_INFO, "Capsule test pattern pre-coalesce failed data corruption check\n"));
+        DEBUG ((DEBUG_INFO, "Capsule test pattern pre-coalesce failed data corruption check\n"));
         return ;
       }
 
@@ -865,7 +859,7 @@ EFI_STATUS
 BuildCapsuleDescriptors (
   IN  EFI_PHYSICAL_ADDRESS            *BlockListBuffer,
   IN  MEMORY_RESOURCE_DESCRIPTOR      *MemoryResource,
-  OUT EFI_CAPSULE_BLOCK_DESCRIPTOR    **BlockDescriptorList 
+  OUT EFI_CAPSULE_BLOCK_DESCRIPTOR    **BlockDescriptorList
   )
 {
   UINTN                            Index;
@@ -873,7 +867,7 @@ BuildCapsuleDescriptors (
   EFI_CAPSULE_BLOCK_DESCRIPTOR     *TempBlock;
   EFI_CAPSULE_BLOCK_DESCRIPTOR     *HeadBlock;
 
-  DEBUG ((EFI_D_INFO, "BuildCapsuleDescriptors enter\n"));
+  DEBUG ((DEBUG_INFO, "BuildCapsuleDescriptors enter\n"));
 
   LastBlock         = NULL;
   HeadBlock         = NULL;
@@ -904,11 +898,11 @@ BuildCapsuleDescriptors (
         }
       }
     } else {
-      DEBUG ((EFI_D_ERROR, "ERROR: BlockListBuffer[Index](0x%lx) < MAX_ADDRESS\n", BlockListBuffer[Index]));
+      DEBUG ((DEBUG_ERROR, "ERROR: BlockListBuffer[Index](0x%lx) < MAX_ADDRESS\n", BlockListBuffer[Index]));
     }
     Index ++;
   }
-  
+
   if (HeadBlock != NULL) {
     *BlockDescriptorList = HeadBlock;
     return EFI_SUCCESS;
@@ -930,7 +924,7 @@ BuildCapsuleDescriptors (
                    | ------------------------- |            |
                    | |  Capsule [0]          | |            |
                    | ------------------------- |            |
-                   |    Capsule Image          |            |   
+                   |    Capsule Image          |            |
 CapsuleImageBase-->+---------------------------+
                    | ------------------------- |            |
                    | |  CapsuleOffset[Num-1] | |            |
@@ -1004,9 +998,9 @@ CapsuleDataCoalesce (
   UINT8                          *DestPtr;
   UINTN                          DestLength;
   UINT8                          *RelocPtr;
-  UINTN                          CapsuleTimes; 
-  UINT64                         SizeLeft; 
-  UINT64                         CapsuleImageSize; 
+  UINTN                          CapsuleTimes;
+  UINT64                         SizeLeft;
+  UINT64                         CapsuleImageSize;
   UINTN                          CapsuleSize;
   UINTN                          CapsuleNumber;
   UINTN                          DescriptorsSize;
@@ -1022,7 +1016,7 @@ CapsuleDataCoalesce (
   EFI_CAPSULE_BLOCK_DESCRIPTOR   *TempBlockDesc;
   EFI_CAPSULE_BLOCK_DESCRIPTOR   PrivateDataDesc[2];
 
-  DEBUG ((EFI_D_INFO, "CapsuleDataCoalesce enter\n"));
+  DEBUG ((DEBUG_INFO, "CapsuleDataCoalesce enter\n"));
 
   CapsuleIndex     = 0;
   SizeLeft         = 0;
@@ -1055,15 +1049,15 @@ CapsuleDataCoalesce (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  DEBUG ((EFI_D_INFO, "CapsuleSize - 0x%x\n", CapsuleSize));
-  DEBUG ((EFI_D_INFO, "CapsuleNumber - 0x%x\n", CapsuleNumber));
-  DEBUG ((EFI_D_INFO, "NumDescriptors - 0x%x\n", NumDescriptors));
+  DEBUG ((DEBUG_INFO, "CapsuleSize - 0x%x\n", CapsuleSize));
+  DEBUG ((DEBUG_INFO, "CapsuleNumber - 0x%x\n", CapsuleNumber));
+  DEBUG ((DEBUG_INFO, "NumDescriptors - 0x%x\n", NumDescriptors));
   if ((CapsuleSize == 0) || (NumDescriptors == 0) || (CapsuleNumber == 0)) {
     return EFI_NOT_FOUND;
   }
 
   if (CapsuleNumber - 1 >= (MAX_ADDRESS - (sizeof (EFI_CAPSULE_PEIM_PRIVATE_DATA)  + sizeof(UINT64))) / sizeof(UINT64)) {
-    DEBUG ((EFI_D_ERROR, "ERROR: CapsuleNumber - 0x%x\n", CapsuleNumber));
+    DEBUG ((DEBUG_ERROR, "ERROR: CapsuleNumber - 0x%x\n", CapsuleNumber));
     return EFI_BUFFER_TOO_SMALL;
   }
 
@@ -1093,7 +1087,7 @@ CapsuleDataCoalesce (
   // Sanity check
   //
   if (CapsuleSize >= (MAX_ADDRESS - (sizeof (EFI_CAPSULE_PEIM_PRIVATE_DATA) + (CapsuleNumber - 1) * sizeof(UINT64) + sizeof(UINT64)))) {
-    DEBUG ((EFI_D_ERROR, "ERROR: CapsuleSize - 0x%x\n", CapsuleSize));
+    DEBUG ((DEBUG_ERROR, "ERROR: CapsuleSize - 0x%x\n", CapsuleSize));
     return EFI_BUFFER_TOO_SMALL;
   }
   //
@@ -1105,7 +1099,7 @@ CapsuleDataCoalesce (
   // Sanity check
   //
   if (NumDescriptors >= (MAX_ADDRESS / sizeof(EFI_CAPSULE_BLOCK_DESCRIPTOR))) {
-    DEBUG ((EFI_D_ERROR, "ERROR: NumDescriptors - 0x%x\n", NumDescriptors));
+    DEBUG ((DEBUG_ERROR, "ERROR: NumDescriptors - 0x%x\n", NumDescriptors));
     return EFI_BUFFER_TOO_SMALL;
   }
   DescriptorsSize  = NumDescriptors * sizeof (EFI_CAPSULE_BLOCK_DESCRIPTOR);
@@ -1113,7 +1107,7 @@ CapsuleDataCoalesce (
   // Sanity check
   //
   if (DescriptorsSize >= (MAX_ADDRESS - CapsuleSize)) {
-    DEBUG ((EFI_D_ERROR, "ERROR: DescriptorsSize - 0x%lx, CapsuleSize - 0x%lx\n", (UINT64)DescriptorsSize, (UINT64)CapsuleSize));
+    DEBUG ((DEBUG_ERROR, "ERROR: DescriptorsSize - 0x%lx, CapsuleSize - 0x%lx\n", (UINT64)DescriptorsSize, (UINT64)CapsuleSize));
     return EFI_BUFFER_TOO_SMALL;
   }
 
@@ -1121,10 +1115,10 @@ CapsuleDataCoalesce (
   // Don't go below some min address. If the base is below it,
   // then move it up and adjust the size accordingly.
   //
-  DEBUG ((EFI_D_INFO, "Capsule Memory range from 0x%8X to 0x%8X\n", (UINTN) *MemoryBase, (UINTN)*MemoryBase + *MemorySize));
+  DEBUG ((DEBUG_INFO, "Capsule Memory range from 0x%8X to 0x%8X\n", (UINTN) *MemoryBase, (UINTN)*MemoryBase + *MemorySize));
   if ((UINTN)*MemoryBase < (UINTN) MIN_COALESCE_ADDR) {
     if (((UINTN)*MemoryBase + *MemorySize) < (UINTN) MIN_COALESCE_ADDR) {
-      DEBUG ((EFI_D_ERROR, "ERROR: *MemoryBase + *MemorySize - 0x%x\n", (UINTN)*MemoryBase + *MemorySize));
+      DEBUG ((DEBUG_ERROR, "ERROR: *MemoryBase + *MemorySize - 0x%x\n", (UINTN)*MemoryBase + *MemorySize));
       return EFI_BUFFER_TOO_SMALL;
     } else {
       *MemorySize = *MemorySize - ((UINTN) MIN_COALESCE_ADDR - (UINTN) *MemoryBase);
@@ -1133,13 +1127,13 @@ CapsuleDataCoalesce (
   }
 
   if (*MemorySize <= (CapsuleSize + DescriptorsSize)) {
-    DEBUG ((EFI_D_ERROR, "ERROR: CapsuleSize + DescriptorsSize - 0x%x\n", CapsuleSize + DescriptorsSize));
+    DEBUG ((DEBUG_ERROR, "ERROR: CapsuleSize + DescriptorsSize - 0x%x\n", CapsuleSize + DescriptorsSize));
     return EFI_BUFFER_TOO_SMALL;
   }
 
   FreeMemBase = *MemoryBase;
   FreeMemSize = *MemorySize;
-  DEBUG ((EFI_D_INFO, "Capsule Free Memory from 0x%8X to 0x%8X\n", (UINTN) FreeMemBase, (UINTN) FreeMemBase + FreeMemSize));
+  DEBUG ((DEBUG_INFO, "Capsule Free Memory from 0x%8X to 0x%8X\n", (UINTN) FreeMemBase, (UINTN) FreeMemBase + FreeMemSize));
 
   //
   // Relocate all the block descriptors to low memory to make further
@@ -1205,7 +1199,7 @@ CapsuleDataCoalesce (
         }
 
         CopyMem ((VOID *) RelocPtr, (VOID *) (UINTN) TempBlockDesc->Union.DataBlock, (UINTN) TempBlockDesc->Length);
-        DEBUG ((EFI_D_INFO, "Capsule reloc data block from 0x%8X to 0x%8X with size 0x%8X\n",
+        DEBUG ((DEBUG_INFO, "Capsule reloc data block from 0x%8X to 0x%8X with size 0x%8X\n",
                 (UINTN) TempBlockDesc->Union.DataBlock, (UINTN) RelocPtr, (UINTN) TempBlockDesc->Length));
 
         TempBlockDesc->Union.DataBlock = (EFI_PHYSICAL_ADDRESS) (UINTN) RelocPtr;
@@ -1247,7 +1241,7 @@ CapsuleDataCoalesce (
         //
         ASSERT (PrivateDataPtr->Signature == EFI_CAPSULE_PEIM_PRIVATE_DATA_SIGNATURE);
         ASSERT ((UINTN)DestPtr >= (UINTN)CapsuleImageBase);
-        PrivateDataPtr->CapsuleOffset[CapsuleIndex++] = (UINT64)((UINTN)DestPtr - (UINTN)CapsuleImageBase);
+        PrivateDataPtr->CapsuleOffset[CapsuleIndex++] = (UINTN)DestPtr - (UINTN)CapsuleImageBase;
       }
 
       //
@@ -1256,7 +1250,7 @@ CapsuleDataCoalesce (
       ASSERT (CurrentBlockDesc->Length <= SizeLeft);
 
       CopyMem ((VOID *) DestPtr, (VOID *) (UINTN) (CurrentBlockDesc->Union.DataBlock), (UINTN)CurrentBlockDesc->Length);
-      DEBUG ((EFI_D_INFO, "Capsule coalesce block no.0x%lX from 0x%lX to 0x%lX with size 0x%lX\n",(UINT64)CapsuleTimes,
+      DEBUG ((DEBUG_INFO, "Capsule coalesce block no.0x%lX from 0x%lX to 0x%lX with size 0x%lX\n",(UINT64)CapsuleTimes,
              CurrentBlockDesc->Union.DataBlock, (UINT64)(UINTN)DestPtr, CurrentBlockDesc->Length));
       DestPtr += CurrentBlockDesc->Length;
       SizeLeft -= CurrentBlockDesc->Length;
@@ -1265,7 +1259,7 @@ CapsuleDataCoalesce (
         //
         //Here is the end of the current capsule image.
         //
-        CapsuleBeginFlag = TRUE; 
+        CapsuleBeginFlag = TRUE;
       }
     } else {
       //

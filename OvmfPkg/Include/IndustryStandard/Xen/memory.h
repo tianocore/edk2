@@ -1,25 +1,9 @@
 /******************************************************************************
  * memory.h
- * 
+ *
  * Memory reservation and information.
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to
- * deal in the Software without restriction, including without limitation the
- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
- * sell copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
+ * SPDX-License-Identifier: MIT
  *
  * Copyright (c) 2005, Keir Fraser <keir@xensource.com>
  */
@@ -80,6 +64,29 @@ struct xen_remove_from_physmap {
 };
 typedef struct xen_remove_from_physmap xen_remove_from_physmap_t;
 DEFINE_XEN_GUEST_HANDLE(xen_remove_from_physmap_t);
+
+/*
+ * Returns the pseudo-physical memory map as it was when the domain
+ * was started (specified by XENMEM_set_memory_map).
+ * arg == addr of xen_memory_map_t.
+ */
+#define XENMEM_memory_map           9
+struct xen_memory_map {
+    /*
+     * On call the number of entries which can be stored in buffer. On
+     * return the number of entries which have been stored in
+     * buffer.
+     */
+    UINT32 nr_entries;
+
+    /*
+     * Entries in the buffer are in the same format as returned by the
+     * BIOS INT 0x15 EAX=0xE820 call.
+     */
+    XEN_GUEST_HANDLE(void) buffer;
+};
+typedef struct xen_memory_map xen_memory_map_t;
+DEFINE_XEN_GUEST_HANDLE(xen_memory_map_t);
 
 #endif /* __XEN_PUBLIC_MEMORY_H__ */
 

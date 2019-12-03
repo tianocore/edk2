@@ -1,17 +1,11 @@
 /** @file
   StatusCode related definitions in PI.
 
-Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
-The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                            
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Revision Reference:
-  These status codes are defined in UEFI Platform Initialization Specification 1.2, 
+  These status codes are defined in UEFI Platform Initialization Specification 1.2,
   Volume 3: Shared Architectural Elements.
 
 **/
@@ -133,7 +127,7 @@ typedef struct {
 #define EFI_SOFTWARE        0x03000000
 ///@}
 
-/// 
+///
 /// Computing Unit Subclass definitions.
 /// Values of 8-127 are reserved for future use by this specification.
 /// Values of 128-255 are reserved for OEM use.
@@ -790,6 +784,7 @@ typedef struct {
 #define EFI_SW_DXE_BS_PC_LEGACY_BOOT_EVENT            (EFI_SUBCLASS_SPECIFIC | 0x00000002)
 #define EFI_SW_DXE_BS_PC_EXIT_BOOT_SERVICES_EVENT     (EFI_SUBCLASS_SPECIFIC | 0x00000003)
 #define EFI_SW_DXE_BS_PC_VIRTUAL_ADDRESS_CHANGE_EVENT (EFI_SUBCLASS_SPECIFIC | 0x00000004)
+#define EFI_SW_DXE_BS_PC_ATTEMPT_BOOT_ORDER_EVENT     (EFI_SUBCLASS_SPECIFIC | 0x00000007)
 ///@}
 
 //
@@ -1186,9 +1181,9 @@ typedef struct {
 /// definitions in the EFI specification.
 ///
 ///@{
-#define EFI_SW_EC_ARM_RESET                          EXCEPT_ARM_RESET 
-#define EFI_SW_EC_ARM_UNDEFINED_INSTRUCTION          EXCEPT_ARM_UNDEFINED_INSTRUCTION 
-#define EFI_SW_EC_ARM_SOFTWARE_INTERRUPT             EXCEPT_ARM_SOFTWARE_INTERRUPT 
+#define EFI_SW_EC_ARM_RESET                          EXCEPT_ARM_RESET
+#define EFI_SW_EC_ARM_UNDEFINED_INSTRUCTION          EXCEPT_ARM_UNDEFINED_INSTRUCTION
+#define EFI_SW_EC_ARM_SOFTWARE_INTERRUPT             EXCEPT_ARM_SOFTWARE_INTERRUPT
 #define EFI_SW_EC_ARM_PREFETCH_ABORT                 EXCEPT_ARM_PREFETCH_ABORT
 #define EFI_SW_EC_ARM_DATA_ABORT                     EXCEPT_ARM_DATA_ABORT
 #define EFI_SW_EC_ARM_RESERVED                       EXCEPT_ARM_RESERVED
