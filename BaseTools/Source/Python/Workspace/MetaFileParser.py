@@ -1612,46 +1612,47 @@ class DscParser(MetaFileParser):
             # First search the include file under the same directory as DSC file
             #
             IncludedFile1 = PathClass(IncludedFile, self.MetaFile.Dir)
-            ErrorCode, ErrorInfo1 = IncludedFile1.Validate()
-            if ErrorCode != 0:
-                #
-                # Also search file under the WORKSPACE directory
-                #
-                IncludedFile1 = PathClass(IncludedFile, GlobalData.gWorkspace)
-                ErrorCode, ErrorInfo2 = IncludedFile1.Validate()
+            if self._Enabled:
+                ErrorCode, ErrorInfo1 = IncludedFile1.Validate()
                 if ErrorCode != 0:
-                    EdkLogger.error('parser', ErrorCode, File=self._FileWithError,
-                                    Line=self._LineIndex + 1, ExtraData=ErrorInfo1 + "\n" + ErrorInfo2)
+                    #
+                    # Also search file under the WORKSPACE directory
+                    #
+                    IncludedFile1 = PathClass(IncludedFile, GlobalData.gWorkspace)
+                    ErrorCode, ErrorInfo2 = IncludedFile1.Validate()
+                    if ErrorCode != 0:
+                        EdkLogger.error('parser', ErrorCode, File=self._FileWithError,
+                                        Line=self._LineIndex + 1, ExtraData=ErrorInfo1 + "\n" + ErrorInfo2)
 
-            self._FileWithError = IncludedFile1
+                self._FileWithError = IncludedFile1
 
-            FromItem = self._Content[self._ContentIndex - 1][0]
-            if self._InSubsection:
-                Owner = self._Content[self._ContentIndex - 1][8]
-            else:
-                Owner = self._Content[self._ContentIndex - 1][0]
-            IncludedFileTable = MetaFileStorage(self._RawTable.DB, IncludedFile1, MODEL_FILE_DSC, False, FromItem=FromItem)
-            Parser = DscParser(IncludedFile1, self._FileType, self._Arch, IncludedFileTable,
-                               Owner=Owner, From=FromItem)
+                FromItem = self._Content[self._ContentIndex - 1][0]
+                if self._InSubsection:
+                    Owner = self._Content[self._ContentIndex - 1][8]
+                else:
+                    Owner = self._Content[self._ContentIndex - 1][0]
+                IncludedFileTable = MetaFileStorage(self._RawTable.DB, IncludedFile1, MODEL_FILE_DSC, False, FromItem=FromItem)
+                Parser = DscParser(IncludedFile1, self._FileType, self._Arch, IncludedFileTable,
+                                   Owner=Owner, From=FromItem)
 
-            self.IncludedFiles.add (IncludedFile1)
+                self.IncludedFiles.add (IncludedFile1)
 
-            # set the parser status with current status
-            Parser._SectionName = self._SectionName
-            Parser._SubsectionType = self._SubsectionType
-            Parser._InSubsection = self._InSubsection
-            Parser._SectionType = self._SectionType
-            Parser._Scope = self._Scope
-            Parser._Enabled = self._Enabled
-            # Parse the included file
-            Parser.StartParse()
-            # Insert all records in the table for the included file into dsc file table
-            Records = IncludedFileTable.GetAll()
-            if Records:
-                self._Content[self._ContentIndex:self._ContentIndex] = Records
-                self._Content.pop(self._ContentIndex - 1)
-                self._ValueList = None
-                self._ContentIndex -= 1
+                # set the parser status with current status
+                Parser._SectionName = self._SectionName
+                Parser._SubsectionType = self._SubsectionType
+                Parser._InSubsection = self._InSubsection
+                Parser._SectionType = self._SectionType
+                Parser._Scope = self._Scope
+                Parser._Enabled = self._Enabled
+                # Parse the included file
+                Parser.StartParse()
+                # Insert all records in the table for the included file into dsc file table
+                Records = IncludedFileTable.GetAll()
+                if Records:
+                    self._Content[self._ContentIndex:self._ContentIndex] = Records
+                    self._Content.pop(self._ContentIndex - 1)
+                    self._ValueList = None
+                    self._ContentIndex -= 1
 
     def __ProcessPackages(self):
         self._ValueList[0] = ReplaceMacro(self._ValueList[0], self._Macros)
