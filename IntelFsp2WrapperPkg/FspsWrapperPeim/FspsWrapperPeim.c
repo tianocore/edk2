@@ -352,7 +352,7 @@ FspsWrapperInitApiMode (
   EFI_BOOT_MODE        BootMode;
 
   //
-  // Register MemoryDiscovered Nofity to run FspSiliconInit
+  // Register MemoryDiscovered Notify to run FspSiliconInit
   //
   Status = PeiServicesNotifyPpi (&mPeiMemoryDiscoveredNotifyDesc);
   ASSERT_EFI_ERROR (Status);

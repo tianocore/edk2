@@ -40,7 +40,7 @@ CallFspNotifyPhase (
 /**
   Call FSP API - FspMemoryInit.
 
-  @param[in]  FspmUpdDataPtr          Pointer to the FSPM_UPD data sructure.
+  @param[in]  FspmUpdDataPtr          Pointer to the FSPM_UPD data structure.
   @param[out] HobListPtr              Pointer to receive the address of the HOB list.
 
   @return EFI status returned by FspMemoryInit API.

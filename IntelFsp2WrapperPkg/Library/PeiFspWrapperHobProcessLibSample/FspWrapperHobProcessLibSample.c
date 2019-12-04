@@ -29,11 +29,11 @@
 #define PEI_ADDITIONAL_MEMORY_SIZE    (16 * EFI_PAGE_SIZE)
 
 /**
-  Get the mem size in memory type infromation table.
+  Get the mem size in memory type information table.
 
   @param[in] PeiServices  PEI Services table.
 
-  @return the mem size in memory type infromation table.
+  @return the mem size in memory type information table.
 **/
 UINT64
 GetMemorySizeInMemoryTypeInformation (
