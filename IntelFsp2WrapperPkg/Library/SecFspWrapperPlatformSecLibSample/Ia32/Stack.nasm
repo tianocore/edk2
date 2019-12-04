@@ -5,7 +5,7 @@
 ;
 ; Abstract:
 ;
-;   Switch the stack from temporary memory to permenent memory.
+;   Switch the stack from temporary memory to permanent memory.
 ;
 ;------------------------------------------------------------------------------
 
