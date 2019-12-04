@@ -14,7 +14,7 @@
 
   @note At this point, memory is NOT ready, PeiServices are available to use.
 
-  @param[in,out] FspUpdRgnPtr   A pointer to the UPD data region data strcture.
+  @param[in,out] FspUpdRgnPtr   A pointer to the UPD data region data structure.
 
 **/
 VOID
@@ -28,7 +28,7 @@ UpdateFspmUpdData (
 /**
   This function overrides the default configurations in the FSP-S UPD data region.
 
-  @param[in,out] FspUpdRgnPtr   A pointer to the UPD data region data strcture.
+  @param[in,out] FspUpdRgnPtr   A pointer to the UPD data region data structure.
 
 **/
 VOID

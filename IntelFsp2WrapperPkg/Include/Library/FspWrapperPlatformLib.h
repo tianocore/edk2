@@ -12,7 +12,7 @@
 /**
   This function overrides the default configurations in the FSP-M UPD data region.
 
-  @param[in,out] FspUpdRgnPtr   A pointer to the UPD data region data strcture.
+  @param[in,out] FspUpdRgnPtr   A pointer to the UPD data region data structure.
 
 **/
 VOID
@@ -24,7 +24,7 @@ UpdateFspmUpdData (
 /**
   This function overrides the default configurations in the FSP-S UPD data region.
 
-  @param[in,out] FspUpdRgnPtr   A pointer to the UPD data region data strcture.
+  @param[in,out] FspUpdRgnPtr   A pointer to the UPD data region data structure.
 
 **/
 VOID

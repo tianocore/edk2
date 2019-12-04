@@ -207,7 +207,7 @@ TempRamInitDone:
   cmp eax, 8000000Eh      ;Check if EFI_NOT_FOUND returned. Error code for Microcode Update not found.
   je  CallSecFspInit      ;If microcode not found, don't hang, but continue.
 
-  cmp eax, 0              ;Check if EFI_SUCCESS retuned.
+  cmp eax, 0              ;Check if EFI_SUCCESS returned.
   jnz FspApiFailed
 
   ;   ECX: start of range
