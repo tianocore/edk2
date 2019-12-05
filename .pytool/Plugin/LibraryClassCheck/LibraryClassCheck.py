@@ -67,7 +67,7 @@ class LibraryClassCheck(ICiBuildPlugin):
         abs_dec_path = self.__GetPkgDec(abs_pkg_path)
         wsr_dec_path = Edk2pathObj.GetEdk2RelativePathFromAbsolutePath(abs_dec_path)
 
-        if abs_dec_path is None or wsr_dec_path is "" or not os.path.isfile(abs_dec_path):
+        if abs_dec_path is None or wsr_dec_path == "" or not os.path.isfile(abs_dec_path):
             tc.SetSkipped()
             tc.LogStdError("No DEC file {0} in package {1}".format(abs_dec_path, abs_pkg_path))
             return -1
