@@ -61,7 +61,7 @@ class DscCompleteCheck(ICiBuildPlugin):
         abs_dsc_path = os.path.join(abs_pkg_path, pkgconfig["DscPath"].strip())
         wsr_dsc_path = Edk2pathObj.GetEdk2RelativePathFromAbsolutePath(abs_dsc_path)
 
-        if abs_dsc_path is None or wsr_dsc_path is "" or not os.path.isfile(abs_dsc_path):
+        if abs_dsc_path is None or wsr_dsc_path == "" or not os.path.isfile(abs_dsc_path):
             tc.SetSkipped()
             tc.LogStdError("Package Dsc not found")
             return 0
