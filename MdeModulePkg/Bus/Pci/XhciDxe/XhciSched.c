@@ -1291,7 +1291,7 @@ XhcExecTransfer (
   }
 
   Status = EFI_SUCCESS;
-  Loop   = Timeout * XHC_1_MILLISECOND;
+  Loop   = Timeout;
   if (Timeout == 0) {
     Loop = 0xFFFFFFFF;
   }
@@ -1303,7 +1303,7 @@ XhcExecTransfer (
     if (Finished) {
       break;
     }
-    gBS->Stall (XHC_1_MICROSECOND);
+    gBS->Stall (XHC_1_MILLISECOND);
   }
 
   if (Index == Loop) {
