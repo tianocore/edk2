@@ -368,7 +368,7 @@ HFileImageSave (
   //
   // set status string
   //
-  Str = CatSPrint(NULL, L"%d Lines Wrote", NumLines);
+  Str = CatSPrint(NULL, L"%d Lines Written", NumLines);
   StatusBarSetStatusString (Str);
   FreePool (Str);
 

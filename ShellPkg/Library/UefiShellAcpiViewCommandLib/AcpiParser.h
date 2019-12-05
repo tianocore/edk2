@@ -529,6 +529,27 @@ ParseAcpiDsdt (
   );
 
 /**
+  This function parses the ACPI FACS table.
+  When trace is enabled this function parses the FACS table and
+  traces the ACPI table fields.
+
+  This function also performs validation of the ACPI table fields.
+
+  @param [in] Trace              If TRUE, trace the ACPI fields.
+  @param [in] Ptr                Pointer to the start of the buffer.
+  @param [in] AcpiTableLength    Length of the ACPI table.
+  @param [in] AcpiTableRevision  Revision of the ACPI table.
+**/
+VOID
+EFIAPI
+ParseAcpiFacs (
+  IN BOOLEAN Trace,
+  IN UINT8*  Ptr,
+  IN UINT32  AcpiTableLength,
+  IN UINT8   AcpiTableRevision
+  );
+
+/**
   This function parses the ACPI FADT table.
   This function parses the FADT table and optionally traces the ACPI
   table fields.
