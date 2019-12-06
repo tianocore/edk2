@@ -1006,7 +1006,6 @@ SetStringWorker (
       TmpSize
       );
 
-    ZeroMem (StringPackage->StringBlock, OldBlockSize);
     FreePool (StringPackage->StringBlock);
     StringPackage->StringBlock = Block;
     StringPackage->StringPkgHdr->Header.Length += (UINT32) (BlockSize - OldBlockSize);
@@ -1040,7 +1039,6 @@ SetStringWorker (
       OldBlockSize - (StringTextPtr - StringPackage->StringBlock) - StringSize
       );
 
-    ZeroMem (StringPackage->StringBlock, OldBlockSize);
     FreePool (StringPackage->StringBlock);
     StringPackage->StringBlock = Block;
     StringPackage->StringPkgHdr->Header.Length += (UINT32) (BlockSize - OldBlockSize);
@@ -1092,7 +1090,6 @@ SetStringWorker (
 
   CopyMem (BlockPtr, StringPackage->StringBlock, OldBlockSize);
 
-  ZeroMem (StringPackage->StringBlock, OldBlockSize);
   FreePool (StringPackage->StringBlock);
   StringPackage->StringBlock = Block;
   StringPackage->StringPkgHdr->Header.Length += Ext2.Length;
@@ -1278,7 +1275,6 @@ HiiNewString (
       // Append a EFI_HII_SIBT_END block to the end.
       //
       *BlockPtr = EFI_HII_SIBT_END;
-      ZeroMem (StringPackage->StringBlock, OldBlockSize);
       FreePool (StringPackage->StringBlock);
       StringPackage->StringBlock = StringBlock;
       StringPackage->StringPkgHdr->Header.Length += Ucs2BlockSize;
@@ -1410,7 +1406,6 @@ HiiNewString (
     // Append a EFI_HII_SIBT_END block to the end.
     //
     *BlockPtr = EFI_HII_SIBT_END;
-    ZeroMem (StringPackage->StringBlock, OldBlockSize);
     FreePool (StringPackage->StringBlock);
     StringPackage->StringBlock = StringBlock;
     StringPackage->StringPkgHdr->Header.Length += Ucs2BlockSize;
@@ -1453,7 +1448,6 @@ HiiNewString (
       // Append a EFI_HII_SIBT_END block to the end.
       //
       *BlockPtr = EFI_HII_SIBT_END;
-      ZeroMem (StringPackage->StringBlock, OldBlockSize);
       FreePool (StringPackage->StringBlock);
       StringPackage->StringBlock = StringBlock;
       StringPackage->StringPkgHdr->Header.Length += Ucs2FontBlockSize;
@@ -1515,7 +1509,6 @@ HiiNewString (
       // Append a EFI_HII_SIBT_END block to the end.
       //
       *BlockPtr = EFI_HII_SIBT_END;
-      ZeroMem (StringPackage->StringBlock, OldBlockSize);
       FreePool (StringPackage->StringBlock);
       StringPackage->StringBlock = StringBlock;
       StringPackage->StringPkgHdr->Header.Length += FontBlockSize + Ucs2FontBlockSize;
