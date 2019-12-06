@@ -481,6 +481,7 @@ S: Maintained
 
 StandaloneMmPkg
 F: StandaloneMmPkg/
-M: Achin Gupta <achin.gupta@arm.com>
+M: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+M: Sami Mujawar <sami.mujawar@arm.com>
 M: Jiewen Yao <jiewen.yao@intel.com>
 R: Supreeth Venkatesh <supreeth.venkatesh@arm.com>
