@@ -217,6 +217,17 @@ typedef struct {
 
 #define PROCEDURE_TOKEN_FROM_LINK(a)  CR (a, PROCEDURE_TOKEN, Link, PROCEDURE_TOKEN_SIGNATURE)
 
+#define TOKEN_BUFFER_SIGNATURE  SIGNATURE_32 ('T', 'K', 'B', 'S')
+
+typedef struct {
+  UINTN                   Signature;
+  LIST_ENTRY              Link;
+
+  UINT8                   *Buffer;
+} TOKEN_BUFFER;
+
+#define TOKEN_BUFFER_FROM_LINK(a)  CR (a, TOKEN_BUFFER, Link, TOKEN_BUFFER_SIGNATURE)
+
 //
 // Private structure for the SMM CPU module that is stored in DXE Runtime memory
 // Contains the SMM Configuration Protocols that is produced.
@@ -243,6 +254,10 @@ typedef struct {
   PROCEDURE_WRAPPER               *ApWrapperFunc;
   LIST_ENTRY                      TokenList;
 
+  LIST_ENTRY                      OldTokenBufList;
+
+  UINT8                           *CurrentTokenBuf;
+  UINT32                          UsedTokenNum;     // Only record tokens used in CurrentTokenBuf.
 } SMM_CPU_PRIVATE_DATA;
 
 extern SMM_CPU_PRIVATE_DATA  *gSmmCpuPrivate;
