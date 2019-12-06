@@ -148,6 +148,10 @@
   # @Prompt Specify size of good stack of exception which need switching stack.
   gUefiCpuPkgTokenSpaceGuid.PcdCpuKnownGoodStackSize|2048|UINT32|0x30002001
 
+  ## Count of pre allocated SMM MP tokens per chunk.
+  # @Prompt Specify the count of pre allocated SMM MP tokens per chunk.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmMpTokenCountPerChunk|64|UINT32|0x30002002
+
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   ## This value is the CPU Local APIC base address, which aligns the address on a 4-KByte boundary.
   # @Prompt Configure base address of CPU Local APIC

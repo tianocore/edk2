@@ -272,3 +272,6 @@
                                                                                             "24000000  -  6th and 7th generation Intel Core processors and Intel Xeon W Processor Family(24MHz).<BR>\n"
                                                                                             "19200000  -  Intel Atom processors based on Goldmont Microarchitecture with CPUID signature 06_5CH(19.2MHz).<BR>\n"
 
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuSmmMpTokenCountPerChunk_PROMPT  #language en-US "Specify the count of pre allocated SMM MP tokens per chunk.\n"
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuSmmMpTokenCountPerChunk_HELP    #language en-US "This value used to specify the count of pre allocated SMM MP tokens per chunk.\n"
