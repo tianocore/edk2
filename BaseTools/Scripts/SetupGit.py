@@ -2,6 +2,7 @@
 #  Set up the git configuration for contributing to TianoCore projects
 #
 #  Copyright (c) 2019, Linaro Ltd. All rights reserved.<BR>
+#  Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -53,29 +54,30 @@ MIN_GIT_VERSION = (1, 9, 0)
 
 # Set of options to be set identically for all repositories
 OPTIONS = [
-    {'section': 'am',          'option': 'keepcr',         'value': True},
-    {'section': 'am',          'option': 'signoff',        'value': True},
-    {'section': 'cherry-pick', 'option': 'signoff',        'value': True},
-    {'section': 'color',       'option': 'diff',           'value': True},
-    {'section': 'color',       'option': 'grep',           'value': 'auto'},
-    {'section': 'commit',      'option': 'signoff',        'value': True},
-    {'section': 'core',        'option': 'abbrev',         'value': 12},
+    {'section': 'am',          'option': 'keepcr',            'value': True},
+    {'section': 'am',          'option': 'signoff',           'value': True},
+    {'section': 'cherry-pick', 'option': 'signoff',           'value': True},
+    {'section': 'color',       'option': 'diff',              'value': True},
+    {'section': 'color',       'option': 'grep',              'value': 'auto'},
+    {'section': 'commit',      'option': 'signoff',           'value': True},
+    {'section': 'core',        'option': 'abbrev',            'value': 12},
     {'section': 'core',        'option': 'attributesFile',
      'value': os.path.join(CONFDIR, 'gitattributes').replace('\\', '/')},
-    {'section': 'core',        'option': 'whitespace',     'value': 'cr-at-eol'},
-    {'section': 'diff',        'option': 'algorithm',      'value': 'patience'},
+    {'section': 'core',        'option': 'whitespace',        'value': 'cr-at-eol'},
+    {'section': 'diff',        'option': 'algorithm',         'value': 'patience'},
     {'section': 'diff',        'option': 'orderFile',
      'value': os.path.join(CONFDIR, 'diff.order').replace('\\', '/')},
-    {'section': 'diff',        'option': 'renames',        'value': 'copies'},
-    {'section': 'diff',        'option': 'statGraphWidth', 'value': '20'},
-    {'section': 'diff "ini"',    'option': 'xfuncname',
+    {'section': 'diff',        'option': 'renames',           'value': 'copies'},
+    {'section': 'diff',        'option': 'statGraphWidth',    'value': '20'},
+    {'section': 'diff "ini"',  'option': 'xfuncname',
      'value': '^\\\\[[A-Za-z0-9_., ]+]'},
-    {'section': 'format',      'option': 'coverLetter',    'value': True},
-    {'section': 'format',      'option': 'numbered',       'value': True},
-    {'section': 'format',      'option': 'signoff',        'value': False},
-    {'section': 'notes',       'option': 'rewriteRef',     'value': 'refs/notes/commits'},
-    {'section': 'sendemail',   'option': 'chainreplyto',   'value': False},
-    {'section': 'sendemail',   'option': 'thread',         'value': True},
+    {'section': 'format',      'option': 'coverLetter',       'value': True},
+    {'section': 'format',      'option': 'numbered',          'value': True},
+    {'section': 'format',      'option': 'signoff',           'value': False},
+    {'section': 'notes',       'option': 'rewriteRef',        'value': 'refs/notes/commits'},
+    {'section': 'sendemail',   'option': 'chainreplyto',      'value': False},
+    {'section': 'sendemail',   'option': 'thread',            'value': True},
+    {'section': 'sendemail',   'option': 'transferEncoding',  'value': '8bit'},
     ]
 
 
