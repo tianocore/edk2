@@ -652,6 +652,21 @@ PublishAcpiTable (
   ASSERT_EFI_ERROR (Status);
 
   //
+  // Measure to PCR[0] with event EV_POST_CODE ACPI DATA.
+  // The measurement has to be done before any update.
+  // Otherwise, the PCR record would be different after TPM FW update
+  // or the PCD configuration change.
+  //
+  TpmMeasureAndLogData(
+    0,
+    EV_POST_CODE,
+    EV_POSTCODE_INFO_ACPI_DATA,
+    ACPI_DATA_LEN,
+    Table,
+    TableSize
+    );
+
+  //
   // Update Table version before measuring it to PCR
   //
   Status = UpdatePPVersion(Table, (CHAR8 *)PcdGetPtr(PcdTcgPhysicalPresenceInterfaceVer));
@@ -662,21 +677,6 @@ PublishAcpiTable (
     "Current physical presence interface version - %a\n",
     (CHAR8 *) PcdGetPtr(PcdTcgPhysicalPresenceInterfaceVer)
     ));
-
-  //
-  // Measure to PCR[0] with event EV_POST_CODE ACPI DATA.
-  // The measurement has to be done before UpdateHID since TPM2 ACPI HID
-  // imply TPM Firmware Version. Otherwise, the PCR record would be
-  // different after TPM FW update.
-  //
-  TpmMeasureAndLogData(
-    0,
-    EV_POST_CODE,
-    EV_POSTCODE_INFO_ACPI_DATA,
-    ACPI_DATA_LEN,
-    Table,
-    TableSize
-    );
 
   //
   // Update TPM2 HID after measuring it to PCR
@@ -753,6 +753,21 @@ PublishTpm2 (
   EFI_TPM2_ACPI_CONTROL_AREA     *ControlArea;
   TPM2_PTP_INTERFACE_TYPE        InterfaceType;
 
+  //
+  // Measure to PCR[0] with event EV_POST_CODE ACPI DATA.
+  // The measurement has to be done before any update.
+  // Otherwise, the PCR record would be different after event log update
+  // or the PCD configuration change.
+  //
+  TpmMeasureAndLogData(
+    0,
+    EV_POST_CODE,
+    EV_POSTCODE_INFO_ACPI_DATA,
+    ACPI_DATA_LEN,
+    &mTpm2AcpiTemplate,
+    mTpm2AcpiTemplate.Header.Length
+    );
+
   mTpm2AcpiTemplate.Header.Revision = PcdGet8(PcdTpm2AcpiTableRev);
   DEBUG((DEBUG_INFO, "Tpm2 ACPI table revision is %d\n", mTpm2AcpiTemplate.Header.Revision));
 
@@ -775,18 +790,6 @@ PublishTpm2 (
     //
     mTpm2AcpiTemplate.Header.Length = sizeof(EFI_TPM2_ACPI_TABLE);
   }
-
-  //
-  // Measure to PCR[0] with event EV_POST_CODE ACPI DATA
-  //
-  TpmMeasureAndLogData(
-    0,
-    EV_POST_CODE,
-    EV_POSTCODE_INFO_ACPI_DATA,
-    ACPI_DATA_LEN,
-    &mTpm2AcpiTemplate,
-    mTpm2AcpiTemplate.Header.Length
-    );
 
   InterfaceType = PcdGet8(PcdActiveTpmInterfaceType);
   switch (InterfaceType) {
