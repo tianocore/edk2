@@ -33,7 +33,7 @@ def RunCommand(WorkDir=None, *Args, **kwargs):
     if "stderr" not in kwargs:
         kwargs["stderr"] = subprocess.STDOUT
     if "stdout" not in kwargs:
-        kwargs["stdout"] = subprocess.PIPE
+        kwargs["stdout"] = sys.stdout
     p = subprocess.Popen(Args, cwd=WorkDir, stderr=kwargs["stderr"], stdout=kwargs["stdout"])
     stdout, stderr = p.communicate()
     message = ""
