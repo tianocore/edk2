@@ -185,12 +185,6 @@ class BuildFile(object):
         self._FileType = FileType
         FileContent = self._TEMPLATE_.Replace(self._TemplateDict)
         FileName = self._FILE_NAME_[FileType]
-        if not os.path.exists(os.path.join(self._AutoGenObject.MakeFileDir, "deps.txt")):
-            with open(os.path.join(self._AutoGenObject.MakeFileDir, "deps.txt"),"w+") as fd:
-                fd.write("")
-        if not os.path.exists(os.path.join(self._AutoGenObject.MakeFileDir, "dependency")):
-            with open(os.path.join(self._AutoGenObject.MakeFileDir, "dependency"),"w+") as fd:
-                fd.write("")
         return SaveFileOnChange(os.path.join(self._AutoGenObject.MakeFileDir, FileName), FileContent, False)
 
     ## Return a list of directory creation command string
@@ -310,6 +304,9 @@ MAKE_FILE = ${makefile_path}
 ${BEGIN}${file_macro}
 ${END}
 
+COMMON_DEPS = ${BEGIN}${common_dependency_file} \\
+              ${END}
+
 #
 # Overridable Target Macro Definitions
 #
@@ -384,8 +381,6 @@ gen_libs:
 gen_fds:
 \t@"$(MAKE)" $(MAKE_FLAGS) -f $(BUILD_DIR)${separator}${makefile_name} fds
 \t@cd $(MODULE_BUILD_DIR)
-
-${INCLUDETAG}
 
 #
 # Individual Object Build Targets
@@ -520,6 +515,9 @@ cleanlib:
                     # Remove duplicated include path, if any
                     if Attr == "FLAGS":
                         Value = RemoveDupOption(Value, IncPrefix, MyAgo.IncludePathList)
+                        if self._AutoGenObject.BuildRuleFamily == TAB_COMPILER_MSFT and Tool == 'CC' and '/GM' in Value:
+                            Value = Value.replace(' /MP', '')
+                            MyAgo.BuildOption[Tool][Attr] = Value
                         if Tool == "OPTROM" and PCI_COMPRESS_Flag:
                             ValueList = Value.split()
                             if ValueList:
@@ -542,7 +540,7 @@ cleanlib:
                 UnexpandMacro = []
                 NewStr = []
                 for Str in StrList:
-                    if '$' in Str or '-MMD' in Str or '-MF' in Str:
+                    if '$' in Str:
                         UnexpandMacro.append(Str)
                     else:
                         NewStr.append(Str)
@@ -592,9 +590,10 @@ cleanlib:
                                                 )
         FileMacroList.append(FileMacro)
         # Add support when compiling .nasm source files
-        IncludePathList = []
-        asmsource = [item for item in MyAgo.SourceFileList if item.File.upper().endswith((".NASM",".ASM",".NASMB","S"))]
-        if asmsource:
+        for File in self.FileCache.keys():
+            if not str(File).endswith('.nasm'):
+                continue
+            IncludePathList = []
             for P in  MyAgo.IncludePathList:
                 IncludePath = self._INC_FLAG_['NASM'] + self.PlaceMacro(P, self.Macros)
                 if IncludePath.endswith(os.sep):
@@ -607,6 +606,7 @@ cleanlib:
                     IncludePath = os.path.join(IncludePath, '')
                 IncludePathList.append(IncludePath)
             FileMacroList.append(self._FILE_MACRO_TEMPLATE.Replace({"macro_name": "NASM_INC", "source_file": IncludePathList}))
+            break
 
         # Generate macros used to represent files containing list of input files
         for ListFileMacro in self.ListFileMacros:
@@ -696,7 +696,6 @@ cleanlib:
             "file_macro"                : FileMacroList,
             "file_build_target"         : self.BuildTargetList,
             "backward_compatible_target": BcTargetList,
-            "INCLUDETAG"                   : self._INCLUDE_CMD_[self._FileType] + " " + os.path.join("$(MODULE_BUILD_DIR)","dependency")
         }
 
         return MakefileTemplateDict
@@ -904,10 +903,16 @@ cleanlib:
                 if Item in SourceFileList:
                     SourceFileList.remove(Item)
 
-        FileDependencyDict = {item:ForceIncludedFile for item in SourceFileList}
+        FileDependencyDict = self.GetFileDependency(
+                                    SourceFileList,
+                                    ForceIncludedFile,
+                                    self._AutoGenObject.IncludePathList + self._AutoGenObject.BuildOptionIncPathList
+                                    )
 
-        for Dependency in FileDependencyDict.values():
-            self.DependencyHeaderFileSet.update(set(Dependency))
+
+        if FileDependencyDict:
+            for Dependency in FileDependencyDict.values():
+                self.DependencyHeaderFileSet.update(set(Dependency))
 
         # Get a set of unique package includes from MetaFile
         parentMetaFileIncludes = set()
@@ -967,16 +972,42 @@ cleanlib:
                         ExtraData = "Local Header: " + aFile + " not found in " + self._AutoGenObject.MetaFile.Path
                         )
 
+        DepSet = None
         for File,Dependency in FileDependencyDict.items():
             if not Dependency:
+                FileDependencyDict[File] = ['$(FORCE_REBUILD)']
                 continue
 
             self._AutoGenObject.AutoGenDepSet |= set(Dependency)
+
+            # skip non-C files
+            if File.Ext not in [".c", ".C"] or File.Name == "AutoGen.c":
+                continue
+            elif DepSet is None:
+                DepSet = set(Dependency)
+            else:
+                DepSet &= set(Dependency)
+        # in case nothing in SourceFileList
+        if DepSet is None:
+            DepSet = set()
+        #
+        # Extract common files list in the dependency files
+        #
+        for File in DepSet:
+            self.CommonFileDependency.append(self.PlaceMacro(File.Path, self.Macros))
 
         CmdSumDict = {}
         CmdTargetDict = {}
         CmdCppDict = {}
         DependencyDict = FileDependencyDict.copy()
+        for File in FileDependencyDict:
+            # skip non-C files
+            if File.Ext not in [".c", ".C"] or File.Name == "AutoGen.c":
+                continue
+            NewDepSet = set(FileDependencyDict[File])
+            NewDepSet -= DepSet
+            FileDependencyDict[File] = ["$(COMMON_DEPS)"] + list(NewDepSet)
+            DependencyDict[File] = list(NewDepSet)
 
         # Convert target description object to target string in makefile
         if self._AutoGenObject.BuildRuleFamily == TAB_COMPILER_MSFT and TAB_C_CODE_FILE in self._AutoGenObject.Targets:
@@ -1049,13 +1080,17 @@ cleanlib:
                     else:
                         CmdCppDict[item.Target.SubDir] = ['$(MAKE_FILE)', Path]
                     if CppPath.Path in DependencyDict:
-                        for Temp in DependencyDict[CppPath.Path]:
-                            try:
-                                Path = self.PlaceMacro(Temp.Path, self.Macros)
-                            except:
-                                continue
-                            if Path not in (self.CommonFileDependency + CmdCppDict[item.Target.SubDir]):
-                                CmdCppDict[item.Target.SubDir].append(Path)
+                        if '$(FORCE_REBUILD)' in DependencyDict[CppPath.Path]:
+                            if '$(FORCE_REBUILD)' not in (self.CommonFileDependency + CmdCppDict[item.Target.SubDir]):
+                                CmdCppDict[item.Target.SubDir].append('$(FORCE_REBUILD)')
+                        else:
+                            for Temp in DependencyDict[CppPath.Path]:
+                                try:
+                                    Path = self.PlaceMacro(Temp.Path, self.Macros)
+                                except:
+                                    continue
+                                if Path not in (self.CommonFileDependency + CmdCppDict[item.Target.SubDir]):
+                                    CmdCppDict[item.Target.SubDir].append(Path)
         if T.Commands:
             CommandList = T.Commands[:]
             for Item in CommandList[:]:
@@ -1074,7 +1109,7 @@ cleanlib:
                     CommandList.pop(Index)
                     if SingleCommandList[-1].endswith("%s%s.c" % (TAB_SLASH, CmdSumDict[CmdSign[3:].rsplit(TAB_SLASH, 1)[0]])):
                         Cpplist = CmdCppDict[T.Target.SubDir]
-                        Cpplist.insert(0, '$(OBJLIST_%d): ' % list(self.ObjTargetDict.keys()).index(T.Target.SubDir))
+                        Cpplist.insert(0, '$(OBJLIST_%d): $(COMMON_DEPS)' % list(self.ObjTargetDict.keys()).index(T.Target.SubDir))
                         T.Commands[Index] = '%s\n\t%s' % (' \\\n\t'.join(Cpplist), CmdTargetDict[CmdSign])
                     else:
                         T.Commands.pop(Index)
