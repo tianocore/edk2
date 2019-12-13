@@ -87,6 +87,7 @@
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType           ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdErrorCodeSetVariable    ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUpdateConInVariable     ## CONSUMES
 
 # [Event]
 # # Relative timer event set by UnicodeToEfiKey(), used to be one 2 seconds input timeout.
