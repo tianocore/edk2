@@ -1041,12 +1041,6 @@
   # @Prompt Enable UEFI Stack Guard.
   gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard|FALSE|BOOLEAN|0x30001055
 
-  ## This PCD holds the information if ConIn variable needs to be updated every boot.<BR><BR>
-  #   TRUE  - ConIn will be updated every boot<BR>
-  #   FALSE - ConIn will be updated every boot<BR>
-  # @Prompt Enable preserving ConIn NVRAM variable across boots.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdUpdateConInVariable|FALSE|BOOLEAN|0x30001056
-
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   ## Dynamic type PCD can be registered callback function for Pcd setting action.
   #  PcdMaxPeiPcdCallBackNumberPerPcdEntry indicates the maximum number of callback function
@@ -1548,6 +1542,12 @@
   ## Specify the console output row of text setup.
   # @Prompt Console Output Row of Text Setup
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetupConOutRow|25|UINT32|0x4000000e
+
+  ## This PCD holds the information if ConIn variable needs to be updated every boot.<BR><BR>
+  #   TRUE  - ConIn will be updated every boot<BR>
+  #   FALSE - ConIn will be updated every boot<BR>
+  # @Prompt Enable preserving ConIn NVRAM variable across boots.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUpdateConInVariable|FALSE|BOOLEAN|0x4000000f
 
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## UART clock frequency is for the baud rate configuration.
