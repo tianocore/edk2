@@ -24,7 +24,7 @@ import traceback
 import multiprocessing
 from threading import Thread,Event,BoundedSemaphore
 import threading
-from subprocess import Popen,PIPE
+from subprocess import Popen,PIPE, STDOUT
 from collections import OrderedDict, defaultdict
 from Common.buildoptions import BuildOption,BuildTarget
 from AutoGen.PlatformAutoGen import PlatformAutoGen
@@ -230,7 +230,7 @@ def LaunchCommand(Command, WorkingDir,ModuleAuto = None):
     EndOfProcedure = None
     try:
         # launch the command
-        Proc = MakeSubProc(Command, stdout=PIPE, stderr=PIPE, env=os.environ, cwd=WorkingDir, bufsize=-1, shell=True)
+        Proc = MakeSubProc(Command, stdout=PIPE, stderr=STDOUT, env=os.environ, cwd=WorkingDir, bufsize=-1, shell=True)
 
         # launch two threads to read the STDOUT and STDERR
         EndOfProcedure = Event()
@@ -241,11 +241,6 @@ def LaunchCommand(Command, WorkingDir,ModuleAuto = None):
             StdOutThread.setDaemon(False)
             StdOutThread.start()
 
-        if Proc.stderr:
-            StdErrThread = Thread(target=ReadMessage, args=(Proc.stderr, EdkLogger.quiet, EndOfProcedure,Proc.ProcOut))
-            StdErrThread.setName("STDERR-Redirector")
-            StdErrThread.setDaemon(False)
-            StdErrThread.start()
 
         # waiting for program exit
         Proc.wait()
@@ -261,8 +256,6 @@ def LaunchCommand(Command, WorkingDir,ModuleAuto = None):
 
     if Proc.stdout:
         StdOutThread.join()
-    if Proc.stderr:
-        StdErrThread.join()
 
     # check the return code of the program
     if Proc.returncode != 0:
