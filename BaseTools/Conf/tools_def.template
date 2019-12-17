@@ -337,7 +337,7 @@ DEFINE DTC_BIN                 = ENV(DTC_PREFIX)dtc
 #                             Required to build platforms or ACPI tables:
 #                               Microsoft ASL ACPI Compiler (asl.exe) v4.0.0 from
 #                               http://download.microsoft.com/download/2/c/1/2c16c7e0-96c1-40f5-81fc-3e4bf7b65496/microsoft_asl_compiler-v4-0-0.msi
-#                        Notes: Since this tool chain is obsolete, it doesn’t enable the compiler option for included header file list generation,
+#                        Notes: Since this tool chain is obsolete, it doesn't enable the compiler option for included header file list generation,
 #                               and lose the incremental build capability.
 #   RVCTLINUX   -unix-   Requires:
 #                             ARM C/C++ Compiler, 5.00
@@ -345,7 +345,7 @@ DEFINE DTC_BIN                 = ENV(DTC_PREFIX)dtc
 #                             Required to build platforms or ACPI tables:
 #                               Intel(r) ACPI Compiler from
 #                               https://acpica.org/downloads
-#                        Notes: Since this tool chain is obsolete, it doesn’t enable the compiler option for included header file list generation,
+#                        Notes: Since this tool chain is obsolete, it doesn't enable the compiler option for included header file list generation,
 #                               and lose the incremental build capability.
 # * Commented out - All versions of VS2005 use the same standard install directory
 #
