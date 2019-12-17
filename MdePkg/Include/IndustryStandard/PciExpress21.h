@@ -304,7 +304,7 @@ typedef union {
     UINT16 AtomicOpEgressBlocking : 1;
     UINT16 IdoRequest : 1;
     UINT16 IdoCompletion : 1;
-    UINT16 LtrMechanism : 2;
+    UINT16 LtrMechanism : 1;
     UINT16 EmergencyPowerReductionRequest : 1;
     UINT16 TenBitTagRequesterEnable : 1;
     UINT16 Obff : 2;
