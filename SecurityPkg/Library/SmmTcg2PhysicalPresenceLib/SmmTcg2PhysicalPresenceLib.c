@@ -135,7 +135,8 @@ Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunctionEx (
     goto EXIT;
   }
 
-  if (PpData.PPRequest != *OperationRequest) {
+  if (PpData.PPRequest != *OperationRequest
+    || PpData.PPRequestParameter != *RequestParameter) {
     PpData.PPFunction = (UINT8)*FunctionIndex;
     PpData.PPRequest = (UINT8)*OperationRequest;
     PpData.PPRequestParameter = *RequestParameter;
