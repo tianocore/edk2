@@ -270,7 +270,7 @@ class ModuleAutoGen(AutoGen):
     #
     @cached_class_function
     def __hash__(self):
-        return hash((self.MetaFile, self.Arch))
+        return hash((self.MetaFile, self.Arch, self.ToolChain,self.BuildTarget))
     def __repr__(self):
         return "%s [%s]" % (self.MetaFile, self.Arch)
 
