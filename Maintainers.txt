@@ -378,8 +378,8 @@ NetworkPkg
 F: NetworkPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/NetworkPkg
 M: Jiaxin Wu <jiaxin.wu@intel.com>
+M: Maciej Rabeda <maciej.rabeda@linux.intel.com>
 R: Siyuan Fu <siyuan.fu@intel.com>
-R: Maciej Rabeda <maciej.rabeda@intel.com>
 
 OvmfPkg
 F: OvmfPkg/
