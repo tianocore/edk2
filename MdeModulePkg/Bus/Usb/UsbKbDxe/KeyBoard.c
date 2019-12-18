@@ -801,7 +801,6 @@ InitUSBKeyboard (
   IN OUT USB_KB_DEV   *UsbKeyboardDevice
   )
 {
-  UINT8               Protocol;
   EFI_STATUS          Status;
 
   REPORT_STATUS_CODE_WITH_DEVICE_PATH (
@@ -814,21 +813,28 @@ InitUSBKeyboard (
   InitQueue (&UsbKeyboardDevice->EfiKeyQueue, sizeof (EFI_KEY_DATA));
   InitQueue (&UsbKeyboardDevice->EfiKeyQueueForNotify, sizeof (EFI_KEY_DATA));
 
-  UsbGetProtocolRequest (
-    UsbKeyboardDevice->UsbIo,
-    UsbKeyboardDevice->InterfaceDescriptor.InterfaceNumber,
-    &Protocol
-    );
   //
   // Set boot protocol for the USB Keyboard.
   // This driver only supports boot protocol.
   //
-  if (Protocol != BOOT_PROTOCOL) {
-    UsbSetProtocolRequest (
-      UsbKeyboardDevice->UsbIo,
-      UsbKeyboardDevice->InterfaceDescriptor.InterfaceNumber,
-      BOOT_PROTOCOL
+  Status = UsbSetProtocolRequest (
+             UsbKeyboardDevice->UsbIo,
+             UsbKeyboardDevice->InterfaceDescriptor.InterfaceNumber,
+             BOOT_PROTOCOL
+             );
+  if (EFI_ERROR (Status)) {
+    //
+    // If protocol could not be set here, it means
+    // the keyboard interface has some errors and could
+    // not be initialized
+    //
+    REPORT_STATUS_CODE_WITH_DEVICE_PATH (
+      EFI_ERROR_CODE | EFI_ERROR_MINOR,
+      (EFI_PERIPHERAL_KEYBOARD | EFI_P_EC_INTERFACE_ERROR),
+      UsbKeyboardDevice->DevicePath
       );
+
+    return EFI_DEVICE_ERROR;
   }
 
   UsbKeyboardDevice->CtrlOn     = FALSE;
