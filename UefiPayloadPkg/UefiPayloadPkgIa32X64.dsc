@@ -25,6 +25,7 @@
   FLASH_DEFINITION                    = UefiPayloadPkg/UefiPayloadPkg.fdf
 
   DEFINE SOURCE_DEBUG_ENABLE          = FALSE
+  DEFINE PS2_KEYBOARD_ENABLE          = FALSE
 
   #
   # SBL:      UEFI payload for Slim Bootloader
@@ -492,6 +493,10 @@
   # ISA Support
   #
   MdeModulePkg/Universal/SerialDxe/SerialDxe.inf
+!if $(PS2_KEYBOARD_ENABLE) == TRUE
+  OvmfPkg/SioBusDxe/SioBusDxe.inf
+  MdeModulePkg/Bus/Isa/Ps2KeyboardDxe/Ps2KeyboardDxe.inf
+!endif
 
   #
   # Console Support
