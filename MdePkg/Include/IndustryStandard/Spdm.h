@@ -1,6 +1,6 @@
 /** @file
   Definitions of Security Protocol & Data Model Specification (SPDM)
-  version 0.99a in Distributed Management Task Force (DMTF).
+  version 1.0.0 in Distributed Management Task Force (DMTF).
 
 Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -215,7 +215,7 @@ typedef struct {
 ///
 typedef struct {
   SPDM_MESSAGE_HEADER  Header;
-  UINT32               Nonce;
+  UINT8                Nonce[32];
 } SPDM_CHALLENGE_REQUEST;
 
 ///
@@ -224,7 +224,7 @@ typedef struct {
 typedef struct {
   SPDM_MESSAGE_HEADER  Header;
 //UINT8                CertChainHash[DigestSize];
-//UINT32               Nonce;
+//UINT8                Nonce[32];
 //UINT8                MeasurementSummaryHash[DigestSize];
 //UINT16               OpaqueLength;
 //UINT8                OpaqueData[OpaqueLength];
@@ -236,7 +236,7 @@ typedef struct {
 ///
 typedef struct {
   SPDM_MESSAGE_HEADER  Header;
-  UINT32               Nonce;
+  UINT8                Nonce[32];
 } SPDM_GET_MEASUREMENTS_REQUEST;
 
 ///
@@ -277,7 +277,7 @@ typedef struct {
   UINT8                NumberOfBlocks;
   UINT8                MeasurementRecordLength[3];
 //UINT8                MeasurementRecord[MeasurementRecordLength];
-//UINT32               Nonce;
+//UINT8                Nonce[32];
 //UINT16               OpaqueLength;
 //UINT8                OpaqueData[OpaqueLength];
 //UINT8                Signature[KeySize];
