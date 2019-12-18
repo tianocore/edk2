@@ -1249,7 +1249,8 @@ Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunction (
     return TCG_PP_SUBMIT_REQUEST_TO_PREOS_NOT_IMPLEMENTED;
   }
 
-  if (PpData.PPRequest != OperationRequest) {
+  if (PpData.PPRequest != OperationRequest
+    || PpData.PPRequestParameter != RequestParameter) {
     PpData.PPFunction = (UINT8)FunctionIndex;
     PpData.PPRequest = (UINT8)OperationRequest;
     PpData.PPRequestParameter = RequestParameter;
