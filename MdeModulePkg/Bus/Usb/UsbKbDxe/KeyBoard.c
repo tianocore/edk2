@@ -801,10 +801,8 @@ InitUSBKeyboard (
   IN OUT USB_KB_DEV   *UsbKeyboardDevice
   )
 {
-  UINT16              ConfigValue;
   UINT8               Protocol;
   EFI_STATUS          Status;
-  UINT32              TransferResult;
 
   REPORT_STATUS_CODE_WITH_DEVICE_PATH (
     EFI_PROGRESS_CODE,
@@ -815,41 +813,6 @@ InitUSBKeyboard (
   InitQueue (&UsbKeyboardDevice->UsbKeyQueue, sizeof (USB_KEY));
   InitQueue (&UsbKeyboardDevice->EfiKeyQueue, sizeof (EFI_KEY_DATA));
   InitQueue (&UsbKeyboardDevice->EfiKeyQueueForNotify, sizeof (EFI_KEY_DATA));
-
-  //
-  // Use the config out of the descriptor
-  // Assumed the first config is the correct one and this is not always the case
-  //
-  Status = UsbGetConfiguration (
-             UsbKeyboardDevice->UsbIo,
-             &ConfigValue,
-             &TransferResult
-             );
-  if (EFI_ERROR (Status)) {
-    ConfigValue = 0x01;
-    //
-    // Uses default configuration to configure the USB Keyboard device.
-    //
-    Status = UsbSetConfiguration (
-               UsbKeyboardDevice->UsbIo,
-               ConfigValue,
-               &TransferResult
-               );
-    if (EFI_ERROR (Status)) {
-      //
-      // If configuration could not be set here, it means
-      // the keyboard interface has some errors and could
-      // not be initialized
-      //
-      REPORT_STATUS_CODE_WITH_DEVICE_PATH (
-        EFI_ERROR_CODE | EFI_ERROR_MINOR,
-        (EFI_PERIPHERAL_KEYBOARD | EFI_P_EC_INTERFACE_ERROR),
-        UsbKeyboardDevice->DevicePath
-        );
-
-      return EFI_DEVICE_ERROR;
-    }
-  }
 
   UsbGetProtocolRequest (
     UsbKeyboardDevice->UsbIo,
