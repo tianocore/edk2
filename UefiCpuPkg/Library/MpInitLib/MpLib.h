@@ -122,6 +122,8 @@ typedef struct {
   UINT64                         CurrentTime;
   UINT64                         TotalTime;
   EFI_EVENT                      WaitEvent;
+  UINT32                         ProcessorSignature;
+  UINT8                          PlatformId;
 } CPU_AP_DATA;
 
 //

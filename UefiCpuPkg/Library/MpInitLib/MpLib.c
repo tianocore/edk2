@@ -548,7 +548,8 @@ InitializeApData (
   IN     UINT64           ApTopOfStack
   )
 {
-  CPU_INFO_IN_HOB          *CpuInfoInHob;
+  CPU_INFO_IN_HOB                  *CpuInfoInHob;
+  MSR_IA32_PLATFORM_ID_REGISTER    PlatformIdMsr;
 
   CpuInfoInHob = (CPU_INFO_IN_HOB *) (UINTN) CpuMpData->CpuInfoInHob;
   CpuInfoInHob[ProcessorNumber].InitialApicId = GetInitialApicId ();
@@ -558,6 +559,17 @@ InitializeApData (
 
   CpuMpData->CpuData[ProcessorNumber].Waiting    = FALSE;
   CpuMpData->CpuData[ProcessorNumber].CpuHealthy = (BistData == 0) ? TRUE : FALSE;
+
+  PlatformIdMsr.Uint64 = AsmReadMsr64 (MSR_IA32_PLATFORM_ID);
+  CpuMpData->CpuData[ProcessorNumber].PlatformId = (UINT8) PlatformIdMsr.Bits.PlatformId;
+
+  AsmCpuid (
+    CPUID_VERSION_INFO,
+    &CpuMpData->CpuData[ProcessorNumber].ProcessorSignature,
+    NULL,
+    NULL,
+    NULL
+    );
 
   InitializeSpinLock(&CpuMpData->CpuData[ProcessorNumber].ApLock);
   SetApState (&CpuMpData->CpuData[ProcessorNumber], CpuStateIdle);
