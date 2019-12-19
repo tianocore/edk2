@@ -56,6 +56,10 @@ gAslIncludePattern = re.compile("^(\s*)[iI]nclude\s*\(\"?([^\"\(\)]+)\"\)", re.M
 gAslCIncludePattern = re.compile(r'^(\s*)#include\s*[<"]\s*([-\\/\w.]+)\s*([>"])', re.MULTILINE)
 ## Patterns used to convert EDK conventions to EDK2 ECP conventions
 
+## Regular expression for finding header file inclusions
+gIncludePattern = re.compile(r"^[ \t]*[%]?[ \t]*include(?:[ \t]*(?:\\(?:\r\n|\r|\n))*[ \t]*)*(?:\(?[\"<]?[ \t]*)([-\w.\\/() \t]+)(?:[ \t]*[\">]?\)?)", re.MULTILINE | re.UNICODE | re.IGNORECASE)
+
+
 ## file cache to avoid circular include in ASL file
 gIncludedAslFile = []
 
@@ -253,9 +257,10 @@ def TrimPreprocessedVfr(Source, Target):
 #                           first for the included file; otherwise, only the path specified
 #                           in the IncludePathList will be searched.
 #
-def DoInclude(Source, Indent='', IncludePathList=[], LocalSearchPath=None):
+def DoInclude(Source, Indent='', IncludePathList=[], LocalSearchPath=None, IncludeFileList = None, filetype=None):
     NewFileContent = []
-
+    if IncludeFileList is None:
+        IncludeFileList = []
     try:
         #
         # Search LocalSearchPath first if it is specified.
@@ -288,24 +293,37 @@ def DoInclude(Source, Indent='', IncludePathList=[], LocalSearchPath=None):
                        ExtraData= "%s -> %s" % (" -> ".join(gIncludedAslFile), IncludeFile))
         return []
     gIncludedAslFile.append(IncludeFile)
-
+    IncludeFileList.append(IncludeFile.strip())
     for Line in F:
         LocalSearchPath = None
-        Result = gAslIncludePattern.findall(Line)
-        if len(Result) == 0:
-            Result = gAslCIncludePattern.findall(Line)
-            if len(Result) == 0 or os.path.splitext(Result[0][1])[1].lower() not in [".asl", ".asi"]:
+        if filetype == "ASL":
+            Result = gAslIncludePattern.findall(Line)
+            if len(Result) == 0:
+                Result = gAslCIncludePattern.findall(Line)
+                if len(Result) == 0 or os.path.splitext(Result[0][1])[1].lower() not in [".asl", ".asi"]:
+                    NewFileContent.append("%s%s" % (Indent, Line))
+                    continue
+                #
+                # We should first search the local directory if current file are using pattern #include "XXX"
+                #
+                if Result[0][2] == '"':
+                    LocalSearchPath = os.path.dirname(IncludeFile)
+            CurrentIndent = Indent + Result[0][0]
+            IncludedFile = Result[0][1]
+            NewFileContent.extend(DoInclude(IncludedFile, CurrentIndent, IncludePathList, LocalSearchPath,IncludeFileList,filetype))
+            NewFileContent.append("\n")
+        elif filetype == "ASM":
+            Result = gIncludePattern.findall(Line)
+            if len(Result) == 0:
                 NewFileContent.append("%s%s" % (Indent, Line))
                 continue
-            #
-            # We should first search the local directory if current file are using pattern #include "XXX"
-            #
-            if Result[0][2] == '"':
-                LocalSearchPath = os.path.dirname(IncludeFile)
-        CurrentIndent = Indent + Result[0][0]
-        IncludedFile = Result[0][1]
-        NewFileContent.extend(DoInclude(IncludedFile, CurrentIndent, IncludePathList, LocalSearchPath))
-        NewFileContent.append("\n")
+
+            IncludedFile = Result[0]
+
+            IncludedFile = IncludedFile.strip()
+            IncludedFile = os.path.normpath(IncludedFile)
+            NewFileContent.extend(DoInclude(IncludedFile, '', IncludePathList, LocalSearchPath,IncludeFileList,filetype))
+            NewFileContent.append("\n")
 
     gIncludedAslFile.pop()
 
@@ -320,7 +338,7 @@ def DoInclude(Source, Indent='', IncludePathList=[], LocalSearchPath=None):
 # @param  Target          File to store the trimmed content
 # @param  IncludePathFile The file to log the external include path
 #
-def TrimAslFile(Source, Target, IncludePathFile):
+def TrimAslFile(Source, Target, IncludePathFile,AslDeps = False):
     CreateDirectory(os.path.dirname(Target))
 
     SourceDir = os.path.dirname(Source)
@@ -349,14 +367,65 @@ def TrimAslFile(Source, Target, IncludePathFile):
                     EdkLogger.warn("Trim", "Invalid include line in include list file.", IncludePathFile, LineNum)
         except:
             EdkLogger.error("Trim", FILE_OPEN_FAILURE, ExtraData=IncludePathFile)
-
-    Lines = DoInclude(Source, '', IncludePathList)
+    AslIncludes = []
+    Lines = DoInclude(Source, '', IncludePathList,IncludeFileList=AslIncludes,filetype='ASL')
+    AslIncludes = [item for item in AslIncludes if item !=Source]
+    if AslDeps and AslIncludes:
+        SaveFileOnChange(os.path.join(os.path.dirname(Target),os.path.basename(Source))+".trim.deps", " \\\n".join([Source+":"] +AslIncludes),False)
 
     #
     # Undef MIN and MAX to avoid collision in ASL source code
     #
     Lines.insert(0, "#undef MIN\n#undef MAX\n")
 
+    # save all lines trimmed
+    try:
+        with open(Target, 'w') as File:
+            File.writelines(Lines)
+    except:
+        EdkLogger.error("Trim", FILE_OPEN_FAILURE, ExtraData=Target)
+
+## Trim ASM file
+#
+# Output ASM include statement with the content the included file
+#
+# @param  Source          File to be trimmed
+# @param  Target          File to store the trimmed content
+# @param  IncludePathFile The file to log the external include path
+#
+def TrimAsmFile(Source, Target, IncludePathFile):
+    CreateDirectory(os.path.dirname(Target))
+
+    SourceDir = os.path.dirname(Source)
+    if SourceDir == '':
+        SourceDir = '.'
+
+    #
+    # Add source directory as the first search directory
+    #
+    IncludePathList = [SourceDir]
+    #
+    # If additional include path file is specified, append them all
+    # to the search directory list.
+    #
+    if IncludePathFile:
+        try:
+            LineNum = 0
+            with open(IncludePathFile, 'r') as File:
+                FileLines = File.readlines()
+            for Line in FileLines:
+                LineNum += 1
+                if Line.startswith("/I") or Line.startswith ("-I"):
+                    IncludePathList.append(Line[2:].strip())
+                else:
+                    EdkLogger.warn("Trim", "Invalid include line in include list file.", IncludePathFile, LineNum)
+        except:
+            EdkLogger.error("Trim", FILE_OPEN_FAILURE, ExtraData=IncludePathFile)
+    AsmIncludes = []
+    Lines = DoInclude(Source, '', IncludePathList,IncludeFileList=AsmIncludes,filetype='ASM')
+    AsmIncludes = [item for item in AsmIncludes if item != Source]
+    if AsmIncludes:
+        SaveFileOnChange(os.path.join(os.path.dirname(Target),os.path.basename(Source))+".trim.deps", " \\\n".join([Source+":"] +AsmIncludes),False)
     # save all lines trimmed
     try:
         with open(Target, 'w') as File:
@@ -440,8 +509,12 @@ def Options():
                           help="The input file is preprocessed VFR file"),
         make_option("--Vfr-Uni-Offset", dest="FileType", const="VfrOffsetBin", action="store_const",
                           help="The input file is EFI image"),
+        make_option("--asl-deps", dest="AslDeps", const="True", action="store_const",
+                          help="Generate Asl dependent files."),
         make_option("-a", "--asl-file", dest="FileType", const="Asl", action="store_const",
                           help="The input file is ASL file"),
+        make_option( "--asm-file", dest="FileType", const="Asm", action="store_const",
+                          help="The input file is asm file"),
         make_option("-c", "--convert-hex", dest="ConvertHex", action="store_true",
                           help="Convert standard hex format (0xabcd) to MASM format (abcdh)"),
 
@@ -515,9 +588,11 @@ def Main():
         elif CommandOptions.FileType == "Asl":
             if CommandOptions.OutputFile is None:
                 CommandOptions.OutputFile = os.path.splitext(InputFile)[0] + '.iii'
-            TrimAslFile(InputFile, CommandOptions.OutputFile, CommandOptions.IncludePathFile)
+            TrimAslFile(InputFile, CommandOptions.OutputFile, CommandOptions.IncludePathFile,CommandOptions.AslDeps)
         elif CommandOptions.FileType == "VfrOffsetBin":
             GenerateVfrBinSec(CommandOptions.ModuleName, CommandOptions.DebugDir, CommandOptions.OutputFile)
+        elif CommandOptions.FileType == "Asm":
+            TrimAsmFile(InputFile, CommandOptions.OutputFile, CommandOptions.IncludePathFile)
         else :
             if CommandOptions.OutputFile is None:
                 CommandOptions.OutputFile = os.path.splitext(InputFile)[0] + '.iii'

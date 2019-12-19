@@ -159,6 +159,8 @@ class MemoryDataPipe(DataPipe):
 
         self.DataContainer = {"LogLevel": EdkLogger.GetLevel()}
 
+        self.DataContainer = {"UseHashCache":GlobalData.gUseHashCache}
+
         self.DataContainer = {"BinCacheSource":GlobalData.gBinCacheSource}
 
         self.DataContainer = {"BinCacheDest":GlobalData.gBinCacheDest}
