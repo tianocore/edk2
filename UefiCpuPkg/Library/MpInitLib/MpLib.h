@@ -44,6 +44,20 @@
 #define CPU_SWITCH_STATE_LOADED 2
 
 //
+// Default maximum number of entries to store the microcode patches information
+//
+#define DEFAULT_MAX_MICROCODE_PATCH_NUM 8
+
+//
+// Data structure for microcode patch information
+//
+typedef struct {
+  UINTN    Address;
+  UINTN    Size;
+  UINTN    AlignedSize;
+} MICROCODE_PATCH_INFO;
+
+//
 // CPU exchange information for switch BSP
 //
 typedef struct {
@@ -573,6 +587,16 @@ VOID
 MicrocodeDetect (
   IN CPU_MP_DATA             *CpuMpData,
   IN BOOLEAN                 IsBspCallIn
+  );
+
+/**
+  Load the required microcode patches data into memory.
+
+  @param[in, out]  CpuMpData    The pointer to CPU MP Data structure.
+**/
+VOID
+LoadMicrocodePatch (
+  IN OUT CPU_MP_DATA             *CpuMpData
   );
 
 /**
