@@ -759,6 +759,30 @@ SdMmcHcStopClock (
 }
 
 /**
+  Start the SD clock.
+
+  @param[in] PciIo  The PCI IO protocol instance.
+  @param[in] Slot   The slot number.
+
+  @retval EFI_SUCCESS  Succeeded to start the SD clock.
+  @rtval  Others       Failed to start the SD clock.
+**/
+EFI_STATUS
+SdMmcHcStartSdClock (
+  IN EFI_PCI_IO_PROTOCOL  *PciIo,
+  IN UINT8                Slot
+  )
+{
+  UINT16                    ClockCtrl;
+
+  //
+  // Set SD Clock Enable in the Clock Control register to 1
+  //
+  ClockCtrl = BIT2;
+  return SdMmcHcOrMmio (PciIo, Slot, SD_MMC_HC_CLOCK_CTRL, sizeof (ClockCtrl), &ClockCtrl);
+}
+
+/**
   SD/MMC card clock supply.
 
   Refer to SD Host Controller Simplified spec 3.0 Section 3.2.1 for details.
@@ -879,11 +903,10 @@ SdMmcHcClockSupply (
     return Status;
   }
 
-  //
-  // Set SD Clock Enable in the Clock Control register to 1
-  //
-  ClockCtrl = BIT2;
-  Status = SdMmcHcOrMmio (PciIo, Slot, SD_MMC_HC_CLOCK_CTRL, sizeof (ClockCtrl), &ClockCtrl);
+  Status = SdMmcHcStartSdClock (PciIo, Slot);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   //
   // We don't notify the platform on first time setup to avoid changing

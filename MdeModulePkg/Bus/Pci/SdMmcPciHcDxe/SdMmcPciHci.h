@@ -479,6 +479,21 @@ SdMmcHcStopClock (
   );
 
 /**
+  Start the SD clock.
+
+  @param[in] PciIo  The PCI IO protocol instance.
+  @param[in] Slot   The slot number.
+
+  @retval EFI_SUCCESS  Succeeded to start the SD clock.
+  @rtval  Others       Failed to start the SD clock.
+**/
+EFI_STATUS
+SdMmcHcStartSdClock (
+  IN EFI_PCI_IO_PROTOCOL  *PciIo,
+  IN UINT8                Slot
+  );
+
+/**
   SD/MMC bus power control.
 
   Refer to SD Host Controller Simplified spec 3.0 Section 3.3 for details.
