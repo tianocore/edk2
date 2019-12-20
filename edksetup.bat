@@ -113,6 +113,18 @@ if not defined NASM_PREFIX (
     @if not exist "C:\nasm\nasm.exe" echo   Attempting to build modules that require NASM will fail.
 )
 
+:check_CLANGPDB
+@REM In Windows, set CLANG_HOST_BIN=n to use nmake command
+@set CLANG_HOST_BIN=n
+if not defined CLANG_BIN (
+    @echo.
+    @echo !!! WARNING !!! CLANG_BIN environment variable is not set
+    @if exist "C:\Program Files\LLVM\bin\clang.exe" (
+        @set CLANG_BIN=C:\Program Files\LLVM\bin\
+        @echo   Found LLVM, setting CLANG_BIN environment variable to C:\Program Files\LLVM\bin\
+    )
+)
+
 :check_cygwin
 if defined CYGWIN_HOME (
   if not exist "%CYGWIN_HOME%" (
