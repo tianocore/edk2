@@ -1327,13 +1327,10 @@ SdCardIdentification (
         goto Error;
       }
 
-      //
-      // Restart the clock with first time parameters.
-      // NOTE: it is not required to actually restart the clock
-      // and go through internal clock setup again. Some time
-      // could be saved if we simply started the SD clock.
-      //
-      SdMmcHcClockSupply (Private, Slot, 0, TRUE, 400);
+      Status = SdMmcHcStartSdClock (PciIo, Slot);
+      if (EFI_ERROR (Status)) {
+        goto Error;
+      }
 
       gBS->Stall (1000);
 
