@@ -727,7 +727,7 @@ EmmcSwitchBusTiming (
   //
   // Convert the clock freq unit from MHz to KHz.
   //
-  Status = SdMmcHcClockSupply (PciIo, Slot, ClockFreq * 1000, Private->BaseClkFreq[Slot], Private->ControllerVersion[Slot]);
+  Status = SdMmcHcClockSupply (Private, Slot, BusTiming, FALSE, ClockFreq * 1000);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -743,24 +743,6 @@ EmmcSwitchBusTiming (
   if ((DevStatus & BIT7) != 0) {
     DEBUG ((DEBUG_ERROR, "EmmcSwitchBusTiming: The switch operation fails as DevStatus is 0x%08x\n", DevStatus));
     return EFI_DEVICE_ERROR;
-  }
-
-  if (mOverride != NULL && mOverride->NotifyPhase != NULL) {
-    Status = mOverride->NotifyPhase (
-                          Private->ControllerHandle,
-                          Slot,
-                          EdkiiSdMmcSwitchClockFreqPost,
-                          &BusTiming
-                          );
-    if (EFI_ERROR (Status)) {
-      DEBUG ((
-        DEBUG_ERROR,
-        "%a: SD/MMC switch clock freq post notifier callback failed - %r\n",
-        __FUNCTION__,
-        Status
-        ));
-      return Status;
-    }
   }
 
   return Status;
