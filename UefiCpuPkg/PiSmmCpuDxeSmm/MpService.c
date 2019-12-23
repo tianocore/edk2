@@ -403,38 +403,6 @@ IsPresentAp (
 }
 
 /**
-  Check whether execute in single AP or all APs.
-
-  Compare two Tokens used by different APs to know whether in StartAllAps call.
-
-  Whether is an valid AP base on AP's Present flag.
-
-  @retval  TRUE      IN StartAllAps call.
-  @retval  FALSE     Not in StartAllAps call.
-
-**/
-BOOLEAN
-InStartAllApsCall (
-  VOID
-  )
-{
-  UINTN      ApIndex;
-  UINTN      ApIndex2;
-
-  for (ApIndex = mMaxNumberOfCpus; ApIndex-- > 0;) {
-    if (IsPresentAp (ApIndex) && (mSmmMpSyncData->CpuData[ApIndex].Token != NULL)) {
-      for (ApIndex2 = ApIndex; ApIndex2-- > 0;) {
-        if (IsPresentAp (ApIndex2) && (mSmmMpSyncData->CpuData[ApIndex2].Token != NULL)) {
-          return mSmmMpSyncData->CpuData[ApIndex2].Token == mSmmMpSyncData->CpuData[ApIndex].Token;
-        }
-      }
-    }
-  }
-
-  return FALSE;
-}
-
-/**
   Clean up the status flags used during executing the procedure.
 
   @param   CpuIndex      The AP index which calls this function.
@@ -445,40 +413,15 @@ ReleaseToken (
   IN UINTN                  CpuIndex
   )
 {
-  UINTN                             Index;
-  BOOLEAN                           Released;
+  PROCEDURE_TOKEN                         *Token;
 
-  if (InStartAllApsCall ()) {
-    //
-    // In Start All APs mode, make sure all APs have finished task.
-    //
-    if (WaitForAllAPsNotBusy (FALSE)) {
-      //
-      // Clean the flags update in the function call.
-      //
-      Released = FALSE;
-      for (Index = mMaxNumberOfCpus; Index-- > 0;) {
-        //
-        // Only In SMM APs need to be clean up.
-        //
-        if (mSmmMpSyncData->CpuData[Index].Present && mSmmMpSyncData->CpuData[Index].Token != NULL) {
-          if (!Released) {
-            ReleaseSpinLock (mSmmMpSyncData->CpuData[Index].Token);
-            Released = TRUE;
-          }
-          mSmmMpSyncData->CpuData[Index].Token = NULL;
-        }
-      }
-    }
-  } else {
-    //
-    // In single AP mode.
-    //
-    if (mSmmMpSyncData->CpuData[CpuIndex].Token != NULL) {
-      ReleaseSpinLock (mSmmMpSyncData->CpuData[CpuIndex].Token);
-      mSmmMpSyncData->CpuData[CpuIndex].Token = NULL;
-    }
+  Token = mSmmMpSyncData->CpuData[CpuIndex].Token;
+
+  if (InterlockedDecrement (&Token->RunningApCount) == 0) {
+    ReleaseSpinLock (Token->SpinLock);
   }
+
+  mSmmMpSyncData->CpuData[CpuIndex].Token = NULL;
 }
 
 /**
@@ -912,12 +855,14 @@ APHandler (
       *mSmmMpSyncData->CpuData[CpuIndex].Status = ProcedureStatus;
     }
 
+    if (mSmmMpSyncData->CpuData[CpuIndex].Token != NULL) {
+      ReleaseToken (CpuIndex);
+    }
+
     //
     // Release BUSY
     //
     ReleaseSpinLock (mSmmMpSyncData->CpuData[CpuIndex].Busy);
-
-    ReleaseToken (CpuIndex);
   }
 
   if (SmmCpuFeaturesNeedConfigureMtrrs()) {
@@ -1111,7 +1056,7 @@ IsTokenInUse (
   while (!IsNull (&gSmmCpuPrivate->TokenList, Link)) {
     ProcToken = PROCEDURE_TOKEN_FROM_LINK (Link);
 
-    if (ProcToken->ProcedureToken == Token) {
+    if (ProcToken->SpinLock == Token) {
       return TRUE;
     }
 
@@ -1124,16 +1069,18 @@ IsTokenInUse (
 /**
   create token and save it to the maintain list.
 
+  @param     RunningApCount   Input running AP count.
+
   @retval    return the spin lock used as token.
 
 **/
-SPIN_LOCK *
+PROCEDURE_TOKEN *
 CreateToken (
-  VOID
+  IN UINT32              RunningApCount
   )
 {
   PROCEDURE_TOKEN     *ProcToken;
-  SPIN_LOCK           *CpuToken;
+  SPIN_LOCK           *SpinLock;
   UINTN               SpinLockSize;
   TOKEN_BUFFER        *TokenBuf;
   UINT32              TokenCountPerChunk;
@@ -1160,20 +1107,21 @@ CreateToken (
     gSmmCpuPrivate->UsedTokenNum = 0;
   }
 
-  CpuToken = (SPIN_LOCK *)(gSmmCpuPrivate->CurrentTokenBuf + SpinLockSize * gSmmCpuPrivate->UsedTokenNum);
+  SpinLock = (SPIN_LOCK *)(gSmmCpuPrivate->CurrentTokenBuf + SpinLockSize * gSmmCpuPrivate->UsedTokenNum);
   gSmmCpuPrivate->UsedTokenNum++;
 
-  InitializeSpinLock (CpuToken);
-  AcquireSpinLock (CpuToken);
+  InitializeSpinLock (SpinLock);
+  AcquireSpinLock (SpinLock);
 
   ProcToken = AllocatePool (sizeof (PROCEDURE_TOKEN));
   ASSERT (ProcToken != NULL);
   ProcToken->Signature = PROCEDURE_TOKEN_SIGNATURE;
-  ProcToken->ProcedureToken = CpuToken;
+  ProcToken->SpinLock = SpinLock;
+  ProcToken->RunningApCount = RunningApCount;
 
   InsertTailList (&gSmmCpuPrivate->TokenList, &ProcToken->Link);
 
-  return CpuToken;
+  return ProcToken;
 }
 
 /**
@@ -1246,6 +1194,8 @@ InternalSmmStartupThisAp (
   IN OUT  EFI_STATUS                     *CpuStatus
   )
 {
+  PROCEDURE_TOKEN    *ProcToken;
+
   if (CpuIndex >= gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus) {
     DEBUG((DEBUG_ERROR, "CpuIndex(%d) >= gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus(%d)\n", CpuIndex, gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus));
     return EFI_INVALID_PARAMETER;
@@ -1278,14 +1228,12 @@ InternalSmmStartupThisAp (
 
   AcquireSpinLock (mSmmMpSyncData->CpuData[CpuIndex].Busy);
 
-  if (Token != NULL) {
-    *Token = (MM_COMPLETION) CreateToken ();
-  }
-
   mSmmMpSyncData->CpuData[CpuIndex].Procedure = Procedure;
   mSmmMpSyncData->CpuData[CpuIndex].Parameter = ProcArguments;
   if (Token != NULL) {
-    mSmmMpSyncData->CpuData[CpuIndex].Token   = (SPIN_LOCK *)(*Token);
+    ProcToken= CreateToken (1);
+    mSmmMpSyncData->CpuData[CpuIndex].Token = ProcToken;
+    *Token = (MM_COMPLETION)ProcToken->SpinLock;
   }
   mSmmMpSyncData->CpuData[CpuIndex].Status    = CpuStatus;
   if (mSmmMpSyncData->CpuData[CpuIndex].Status != NULL) {
@@ -1343,6 +1291,7 @@ InternalSmmStartupAllAPs (
 {
   UINTN               Index;
   UINTN               CpuCount;
+  PROCEDURE_TOKEN     *ProcToken;
 
   if ((TimeoutInMicroseconds != 0) && ((mSmmMp.Attributes & EFI_MM_MP_TIMEOUT_SUPPORTED) == 0)) {
     return EFI_INVALID_PARAMETER;
@@ -1371,7 +1320,10 @@ InternalSmmStartupAllAPs (
   }
 
   if (Token != NULL) {
-    *Token = (MM_COMPLETION) CreateToken ();
+    ProcToken = CreateToken ((UINT32)mMaxNumberOfCpus);
+    *Token = (MM_COMPLETION)ProcToken->SpinLock;
+  } else {
+    ProcToken = NULL;
   }
 
   //
@@ -1391,8 +1343,8 @@ InternalSmmStartupAllAPs (
     if (IsPresentAp (Index)) {
       mSmmMpSyncData->CpuData[Index].Procedure = (EFI_AP_PROCEDURE2) Procedure;
       mSmmMpSyncData->CpuData[Index].Parameter = ProcedureArguments;
-      if (Token != NULL) {
-        mSmmMpSyncData->CpuData[Index].Token   = (SPIN_LOCK *)(*Token);
+      if (ProcToken != NULL) {
+        mSmmMpSyncData->CpuData[Index].Token   = ProcToken;
       }
       if (CPUStatus != NULL) {
         mSmmMpSyncData->CpuData[Index].Status    = &CPUStatus[Index];
@@ -1407,6 +1359,13 @@ InternalSmmStartupAllAPs (
       //
       if (CPUStatus != NULL) {
         CPUStatus[Index] = EFI_NOT_STARTED;
+      }
+
+      //
+      // Decrease the count to mark this processor(AP or BSP) as finished.
+      //
+      if (ProcToken != NULL) {
+        WaitForSemaphore (&ProcToken->RunningApCount);
       }
     }
   }
