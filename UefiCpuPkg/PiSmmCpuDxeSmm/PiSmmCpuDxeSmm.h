@@ -212,7 +212,8 @@ typedef struct {
   UINTN                   Signature;
   LIST_ENTRY              Link;
 
-  SPIN_LOCK               *ProcedureToken;
+  SPIN_LOCK               *SpinLock;
+  volatile UINT32         RunningApCount;
 } PROCEDURE_TOKEN;
 
 #define PROCEDURE_TOKEN_FROM_LINK(a)  CR (a, PROCEDURE_TOKEN, Link, PROCEDURE_TOKEN_SIGNATURE)
@@ -407,7 +408,7 @@ typedef struct {
   volatile VOID                     *Parameter;
   volatile UINT32                   *Run;
   volatile BOOLEAN                  *Present;
-  SPIN_LOCK                         *Token;
+  PROCEDURE_TOKEN                   *Token;
   EFI_STATUS                        *Status;
 } SMM_CPU_DATA_BLOCK;
 
