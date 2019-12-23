@@ -9,6 +9,7 @@
 #include "MpLib.h"
 #include <Library/PeiServicesLib.h>
 #include <Guid/S3SmmInitDone.h>
+#include <Guid/MicrocodePatchHob.h>
 
 /**
   S3 SMM Init Done notification function.
@@ -291,6 +292,59 @@ CheckAndUpdateApsStatus (
 }
 
 /**
+  Build the microcode patch HOB that contains the base address and size of the
+  microcode patch stored in the memory.
+
+  @param[in]  CpuMpData    Pointer to the CPU_MP_DATA structure.
+
+**/
+VOID
+BuildMicrocodeCacheHob (
+  IN CPU_MP_DATA    *CpuMpData
+  )
+{
+  EDKII_MICROCODE_PATCH_HOB    *MicrocodeHob;
+  UINTN                        HobDataLength;
+  UINT32                       Index;
+
+  HobDataLength = sizeof (EDKII_MICROCODE_PATCH_HOB) +
+                  sizeof (UINT64) * CpuMpData->CpuCount;
+
+  MicrocodeHob  = AllocatePool (HobDataLength);
+  if (MicrocodeHob == NULL) {
+    ASSERT (FALSE);
+    return;
+  }
+
+  //
+  // Store the information of the memory region that holds the microcode patches.
+  //
+  MicrocodeHob->MicrocodePatchAddress    = CpuMpData->MicrocodePatchAddress;
+  MicrocodeHob->MicrocodePatchRegionSize = CpuMpData->MicrocodePatchRegionSize;
+
+  //
+  // Store the detected microcode patch for each processor as well.
+  //
+  MicrocodeHob->ProcessorCount = CpuMpData->CpuCount;
+  for (Index = 0; Index < CpuMpData->CpuCount; Index++) {
+    if (CpuMpData->CpuData[Index].MicrocodeEntryAddr != 0) {
+      MicrocodeHob->ProcessorSpecificPatchOffset[Index] =
+        CpuMpData->CpuData[Index].MicrocodeEntryAddr - CpuMpData->MicrocodePatchAddress;
+    } else {
+      MicrocodeHob->ProcessorSpecificPatchOffset[Index] = MAX_UINT64;
+    }
+  }
+
+  BuildGuidDataHob (
+    &gEdkiiMicrocodePatchHobGuid,
+    MicrocodeHob,
+    HobDataLength
+    );
+
+  return;
+}
+
+/**
   Initialize global data for MP support.
 
   @param[in] CpuMpData  The pointer to CPU MP Data structure.
@@ -302,6 +356,7 @@ InitMpGlobalData (
 {
   EFI_STATUS  Status;
 
+  BuildMicrocodeCacheHob (CpuMpData);
   SaveCpuMpData (CpuMpData);
 
   ///

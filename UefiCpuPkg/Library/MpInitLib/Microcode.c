@@ -65,13 +65,15 @@ GetCurrentMicrocodeSignature (
          It does not guarantee that the data has not been modified.
          CPU has its own mechanism to verify Microcode Binary part.
 
-  @param[in]  CpuMpData    The pointer to CPU MP Data structure.
-  @param[in]  IsBspCallIn  Indicate whether the caller is BSP or not.
+  @param[in]  CpuMpData        The pointer to CPU MP Data structure.
+  @param[in]  ProcessorNumber  The handle number of the processor. The range is
+                               from 0 to the total number of logical processors
+                               minus 1.
 **/
 VOID
 MicrocodeDetect (
   IN CPU_MP_DATA             *CpuMpData,
-  IN BOOLEAN                 IsBspCallIn
+  IN UINTN                   ProcessorNumber
   )
 {
   UINT32                                  ExtendedTableLength;
@@ -93,6 +95,7 @@ MicrocodeDetect (
   MSR_IA32_PLATFORM_ID_REGISTER           PlatformIdMsr;
   UINT32                                  ProcessorFlags;
   UINT32                                  ThreadId;
+  BOOLEAN                                 IsBspCallIn;
 
   //
   // set ProcessorFlags to suppress incorrect compiler/analyzer warnings
@@ -107,6 +110,7 @@ MicrocodeDetect (
   }
 
   CurrentRevision = GetCurrentMicrocodeSignature ();
+  IsBspCallIn     = (ProcessorNumber == (UINTN)CpuMpData->BspNumber) ? TRUE : FALSE;
   if (CurrentRevision != 0 && !IsBspCallIn) {
     //
     // Skip loading microcode if it has been loaded successfully
@@ -295,6 +299,16 @@ MicrocodeDetect (
   } while (((UINTN) MicrocodeEntryPoint < MicrocodeEnd));
 
 Done:
+  if (LatestRevision != 0) {
+    //
+    // Save the detected microcode patch entry address (including the
+    // microcode patch header) for each processor.
+    // It will be used when building the microcode patch cache HOB.
+    //
+    CpuMpData->CpuData[ProcessorNumber].MicrocodeEntryAddr =
+      (UINTN) MicrocodeData -  sizeof (CPU_MICROCODE_HEADER);
+  }
+
   if (LatestRevision > CurrentRevision) {
     //
     // BIOS only authenticate updates that contain a numerically larger revision
