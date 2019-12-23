@@ -399,12 +399,16 @@ ApInitializeSync (
   )
 {
   CPU_MP_DATA  *CpuMpData;
+  UINTN        ProcessorNumber;
+  EFI_STATUS   Status;
 
   CpuMpData = (CPU_MP_DATA *) Buffer;
+  Status = GetProcessorNumber (CpuMpData, &ProcessorNumber);
+  ASSERT_EFI_ERROR (Status);
   //
   // Load microcode on AP
   //
-  MicrocodeDetect (CpuMpData, FALSE);
+  MicrocodeDetect (CpuMpData, ProcessorNumber);
   //
   // Sync BSP's MTRR table to AP
   //
@@ -1761,7 +1765,7 @@ MpInitLibInitialize (
   //
   // Detect and apply Microcode on BSP
   //
-  MicrocodeDetect (CpuMpData, TRUE);
+  MicrocodeDetect (CpuMpData, CpuMpData->BspNumber);
   //
   // Store BSP's MTRR setting
   //
