@@ -138,6 +138,7 @@ typedef struct {
   EFI_EVENT                      WaitEvent;
   UINT32                         ProcessorSignature;
   UINT8                          PlatformId;
+  UINT64                         MicrocodeEntryAddr;
 } CPU_AP_DATA;
 
 //
@@ -580,13 +581,15 @@ CheckAndUpdateApsStatus (
 /**
   Detect whether specified processor can find matching microcode patch and load it.
 
-  @param[in]  CpuMpData    The pointer to CPU MP Data structure.
-  @param[in]  IsBspCallIn  Indicate whether the caller is BSP or not.
+  @param[in]  CpuMpData        The pointer to CPU MP Data structure.
+  @param[in]  ProcessorNumber  The handle number of the processor. The range is
+                               from 0 to the total number of logical processors
+                               minus 1.
 **/
 VOID
 MicrocodeDetect (
   IN CPU_MP_DATA             *CpuMpData,
-  IN BOOLEAN                 IsBspCallIn
+  IN UINTN                   ProcessorNumber
   );
 
 /**
@@ -617,6 +620,21 @@ IsMwaitSupport (
 VOID
 EnableDebugAgent (
   VOID
+  );
+
+/**
+  Find the current Processor number by APIC ID.
+
+  @param[in]  CpuMpData         Pointer to PEI CPU MP Data
+  @param[out] ProcessorNumber   Return the pocessor number found
+
+  @retval EFI_SUCCESS          ProcessorNumber is found and returned.
+  @retval EFI_NOT_FOUND        ProcessorNumber is not found.
+**/
+EFI_STATUS
+GetProcessorNumber (
+  IN CPU_MP_DATA               *CpuMpData,
+  OUT UINTN                    *ProcessorNumber
   );
 
 #endif
