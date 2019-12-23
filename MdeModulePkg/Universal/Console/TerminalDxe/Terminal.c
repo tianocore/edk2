@@ -1068,12 +1068,30 @@ TerminalUpdateConsoleDevVariable (
   EFI_DEVICE_PATH_PROTOCOL  *Variable;
   EFI_DEVICE_PATH_PROTOCOL  *NewVariable;
   EFI_DEVICE_PATH_PROTOCOL  *TempDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL  *CheckDevicePath;
   EDKII_SET_VARIABLE_STATUS *SetVariableStatus;
 
   //
   // Get global variable and its size according to the name given.
   //
   Status = GetEfiGlobalVariable2 (VariableName, (VOID**)&Variable, NULL);
+
+  if (StrCmp(L"ConIn", VariableName) == 0) {
+    if (Status == EFI_SUCCESS) {
+      CheckDevicePath = Variable;
+      while (!IsDevicePathEnd (CheckDevicePath)) {
+        if ((DevicePathType (CheckDevicePath) == MESSAGING_DEVICE_PATH) && 
+     		(DevicePathSubType (CheckDevicePath) == MSG_UART_DP)) {
+          //
+          // UART device path in ConIn variable exist, don't update ConIn variable
+          //
+          return;
+        }
+        CheckDevicePath = NextDevicePathNode (CheckDevicePath);
+      }
+    }
+  }
+
   if (Status == EFI_NOT_FOUND) {
     Status   = EFI_SUCCESS;
     Variable = NULL;
