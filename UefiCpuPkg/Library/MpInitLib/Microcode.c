@@ -85,6 +85,7 @@ MicrocodeDetect (
   UINTN                                   Index;
   UINT8                                   PlatformId;
   CPUID_VERSION_INFO_EAX                  Eax;
+  CPU_AP_DATA                             *CpuData;
   UINT32                                  CurrentRevision;
   UINT32                                  LatestRevision;
   UINTN                                   TotalSize;
@@ -92,15 +93,8 @@ MicrocodeDetect (
   UINT32                                  InCompleteCheckSum32;
   BOOLEAN                                 CorrectMicrocode;
   VOID                                    *MicrocodeData;
-  MSR_IA32_PLATFORM_ID_REGISTER           PlatformIdMsr;
-  UINT32                                  ProcessorFlags;
   UINT32                                  ThreadId;
   BOOLEAN                                 IsBspCallIn;
-
-  //
-  // set ProcessorFlags to suppress incorrect compiler/analyzer warnings
-  //
-  ProcessorFlags = 0;
 
   if (CpuMpData->MicrocodePatchRegionSize == 0) {
     //
@@ -127,28 +121,25 @@ MicrocodeDetect (
   }
 
   ExtendedTableLength = 0;
-  //
-  // Here data of CPUID leafs have not been collected into context buffer, so
-  // GetProcessorCpuid() cannot be used here to retrieve CPUID data.
-  //
-  AsmCpuid (CPUID_VERSION_INFO, &Eax.Uint32, NULL, NULL, NULL);
-
-  //
-  // The index of platform information resides in bits 50:52 of MSR IA32_PLATFORM_ID
-  //
-  PlatformIdMsr.Uint64 = AsmReadMsr64 (MSR_IA32_PLATFORM_ID);
-  PlatformId = (UINT8) PlatformIdMsr.Bits.PlatformId;
+  Eax.Uint32 = CpuMpData->CpuData[ProcessorNumber].ProcessorSignature;
+  PlatformId = CpuMpData->CpuData[ProcessorNumber].PlatformId;
 
   //
   // Check whether AP has same processor with BSP.
   // If yes, direct use microcode info saved by BSP.
   //
   if (!IsBspCallIn) {
-    if ((CpuMpData->ProcessorSignature == Eax.Uint32) &&
-        (CpuMpData->ProcessorFlags & (1 << PlatformId)) != 0) {
-        MicrocodeData = (VOID *)(UINTN) CpuMpData->MicrocodeDataAddress;
-        LatestRevision = CpuMpData->MicrocodeRevision;
-        goto Done;
+    //
+    // Get the CPU data for BSP
+    //
+    CpuData = &(CpuMpData->CpuData[CpuMpData->BspNumber]);
+    if ((CpuData->ProcessorSignature == Eax.Uint32) &&
+        (CpuData->PlatformId == PlatformId) &&
+        (CpuData->MicrocodeEntryAddr != 0)) {
+      MicrocodeEntryPoint = (CPU_MICROCODE_HEADER *)(UINTN) CpuData->MicrocodeEntryAddr;
+      MicrocodeData       = (VOID *) (MicrocodeEntryPoint + 1);
+      LatestRevision      = MicrocodeEntryPoint->UpdateRevision;
+      goto Done;
     }
   }
 
@@ -216,7 +207,6 @@ MicrocodeDetect (
         CheckSum32 += MicrocodeEntryPoint->Checksum;
         if (CheckSum32 == 0) {
           CorrectMicrocode = TRUE;
-          ProcessorFlags = MicrocodeEntryPoint->ProcessorFlags;
         }
       } else if ((MicrocodeEntryPoint->DataSize != 0) &&
                  (MicrocodeEntryPoint->UpdateRevision > LatestRevision)) {
@@ -260,7 +250,6 @@ MicrocodeDetect (
                     // Find one
                     //
                     CorrectMicrocode = TRUE;
-                    ProcessorFlags = ExtendedTable->ProcessorFlag;
                     break;
                   }
                 }
@@ -331,18 +320,6 @@ Done:
                 loaded microcode signature [0x%08x]\n", CurrentRevision, LatestRevision));
       ReleaseSpinLock(&CpuMpData->MpLock);
     }
-  }
-
-  if (IsBspCallIn && (LatestRevision != 0)) {
-    //
-    // Save BSP processor info and microcode info for later AP use.
-    //
-    CpuMpData->ProcessorSignature   = Eax.Uint32;
-    CpuMpData->ProcessorFlags       = ProcessorFlags;
-    CpuMpData->MicrocodeDataAddress = (UINTN) MicrocodeData;
-    CpuMpData->MicrocodeRevision    = LatestRevision;
-    DEBUG ((DEBUG_INFO, "BSP Microcode:: signature [0x%08x], ProcessorFlags [0x%08x], \
-       MicroData [0x%08x], Revision [0x%08x]\n", Eax.Uint32, ProcessorFlags, (UINTN) MicrocodeData, LatestRevision));
   }
 }
 
