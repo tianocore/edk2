@@ -1,6 +1,7 @@
 /** @file
   Library functions which relates with booting.
 
+Copyright (c) 2019, NVIDIA CORPORATION. All rights reserved.
 Copyright (c) 2011 - 2019, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -2258,12 +2259,15 @@ EfiBootManagerRefreshAllBootOption (
   VOID
   )
 {
-  EFI_STATUS                    Status;
-  EFI_BOOT_MANAGER_LOAD_OPTION  *NvBootOptions;
-  UINTN                         NvBootOptionCount;
-  EFI_BOOT_MANAGER_LOAD_OPTION  *BootOptions;
-  UINTN                         BootOptionCount;
-  UINTN                         Index;
+  EFI_STATUS                           Status;
+  EFI_BOOT_MANAGER_LOAD_OPTION         *NvBootOptions;
+  UINTN                                NvBootOptionCount;
+  EFI_BOOT_MANAGER_LOAD_OPTION         *BootOptions;
+  UINTN                                BootOptionCount;
+  EFI_BOOT_MANAGER_LOAD_OPTION         *UpdatedBootOptions;
+  UINTN                                UpdatedBootOptionCount;
+  UINTN                                Index;
+  EDKII_PLATFORM_BOOT_MANAGER_PROTOCOL *PlatformBootManager;
 
   //
   // Optionally refresh the legacy boot option
@@ -2273,7 +2277,6 @@ EfiBootManagerRefreshAllBootOption (
   }
 
   BootOptions   = BmEnumerateBootOptions (&BootOptionCount);
-  NvBootOptions = EfiBootManagerGetLoadOptions (&NvBootOptionCount, LoadOptionTypeBoot);
 
   //
   // Mark the boot option as added by BDS by setting OptionalData to a special GUID
@@ -2282,6 +2285,30 @@ EfiBootManagerRefreshAllBootOption (
     BootOptions[Index].OptionalData     = AllocateCopyPool (sizeof (EFI_GUID), &mBmAutoCreateBootOptionGuid);
     BootOptions[Index].OptionalDataSize = sizeof (EFI_GUID);
   }
+
+  //
+  // Locate Platform Boot Options Protocol
+  //
+  Status = gBS->LocateProtocol (&gEdkiiPlatformBootManagerProtocolGuid,
+                                NULL,
+                                (VOID **)&PlatformBootManager);
+  if (!EFI_ERROR (Status)) {
+    //
+    // If found, call platform specific refresh to all auto enumerated and NV
+    // boot options.
+    //
+    Status = PlatformBootManager->RefreshAllBootOptions ((CONST EFI_BOOT_MANAGER_LOAD_OPTION *)BootOptions,
+                                                         (CONST UINTN)BootOptionCount,
+                                                         &UpdatedBootOptions,
+                                                         &UpdatedBootOptionCount);
+    if (!EFI_ERROR (Status)) {
+      EfiBootManagerFreeLoadOptions (BootOptions, BootOptionCount);
+      BootOptions = UpdatedBootOptions;
+      BootOptionCount = UpdatedBootOptionCount;
+    }
+  }
+
+  NvBootOptions = EfiBootManagerGetLoadOptions (&NvBootOptionCount, LoadOptionTypeBoot);
 
   //
   // Remove invalid EFI boot options from NV

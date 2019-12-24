@@ -1,6 +1,7 @@
 /** @file
   BDS library definition, include the file and data structure
 
+Copyright (c) 2019, NVIDIA CORPORATION. All rights reserved.
 Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -41,6 +42,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Protocol/VariableLock.h>
 #include <Protocol/RamDisk.h>
 #include <Protocol/DeferredImageLoad.h>
+#include <Protocol/PlatformBootManager.h>
 
 #include <Guid/MemoryTypeInformation.h>
 #include <Guid/FileInfo.h>

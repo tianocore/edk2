@@ -5,6 +5,7 @@
 #  manipulation, hotkey registration, UEFI boot, connect/disconnect, console
 #  manipulation, driver health checking and etc.
 #
+#  Copyright (c) 2019, NVIDIA CORPORATION. All rights reserved.
 #  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 #  (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -107,6 +108,7 @@
   gEfiFormBrowser2ProtocolGuid                  ## SOMETIMES_CONSUMES
   gEfiRamDiskProtocolGuid                       ## SOMETIMES_CONSUMES
   gEfiDeferredImageLoadProtocolGuid             ## SOMETIMES_CONSUMES
+  gEdkiiPlatformBootManagerProtocolGuid         ## SOMETIMES_CONSUMES
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdResetOnMemoryTypeInformationChange      ## SOMETIMES_CONSUMES
