@@ -263,11 +263,6 @@ struct _CPU_MP_DATA {
   BOOLEAN                        PeriodicMode;
   BOOLEAN                        TimerInterruptState;
 
-  UINT32                         ProcessorSignature;
-  UINT32                         ProcessorFlags;
-  UINT64                         MicrocodeDataAddress;
-  UINT32                         MicrocodeRevision;
-
   //
   // Whether need to use Init-Sipi-Sipi to wake up the APs.
   // Two cases need to set this value to TRUE. One is in HLT
