@@ -516,9 +516,6 @@ TerminalDriverBindingStart (
     // if the serial device is a hot plug device, do not update the
     // ConInDev, ConOutDev, and StdErrDev variables.
     //
-    if (PcdGetBool(PcdUpdateConInVariable)) {
-      TerminalUpdateConsoleDevVariable(L"ConIn", ParentDevicePath);
-    }
     TerminalUpdateConsoleDevVariable (EFI_CON_IN_DEV_VARIABLE_NAME, ParentDevicePath);
     TerminalUpdateConsoleDevVariable (EFI_CON_OUT_DEV_VARIABLE_NAME, ParentDevicePath);
     TerminalUpdateConsoleDevVariable (EFI_ERR_OUT_DEV_VARIABLE_NAME, ParentDevicePath);
@@ -1106,24 +1103,13 @@ TerminalUpdateConsoleDevVariable (
 
   VariableSize = GetDevicePathSize (Variable);
 
-  if (StrCmp(L"ConIn", VariableName) != 0) {
-    Status = gRT->SetVariable(
-      VariableName,
-      &gEfiGlobalVariableGuid,
-      EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-      VariableSize,
-      Variable
-    );
-  }
-  else {
-    Status = gRT->SetVariable(
-      VariableName,
-      &gEfiGlobalVariableGuid,
-      EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
-      VariableSize,
-      Variable
-    );
-  }
+  Status = gRT->SetVariable (
+                  VariableName,
+                  &gEfiGlobalVariableGuid,
+                  EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+                  VariableSize,
+                  Variable
+                  );
 
   if (EFI_ERROR (Status)) {
     NameSize = StrSize (VariableName);
