@@ -1446,12 +1446,6 @@
   ## Include/Protocol/EdidOverride.h
   gEfiEdidOverrideProtocolGuid   = { 0x48ECB431, 0xFB72, 0x45C0, { 0xA9, 0x22, 0xF4, 0x58, 0xFE, 0x04, 0x0B, 0xD5 }}
 
-  ## Include/Protocol/UgaIo.h
-  gEfiUgaIoProtocolGuid          = { 0x61A4D49E, 0x6F68, 0x4F1B, { 0xB9, 0x22, 0xA8, 0x6E, 0xED, 0x0B, 0x07, 0xA2 }}
-
-  ## Include/Protocol/UgaDraw.h
-  gEfiUgaDrawProtocolGuid        = { 0x982C298B, 0xF4FA, 0x41CB, { 0xB8, 0x38, 0x77, 0xAA, 0x68, 0x8F, 0xB8, 0x39 }}
-
   ## Include/Protocol/LoadedImage.h
   gEfiLoadedImageProtocolGuid    = { 0x5B1B31A1, 0x9562, 0x11D2, { 0x8E, 0x3F, 0x00, 0xA0, 0xC9, 0x69, 0x72, 0x3B }}
 
@@ -1941,12 +1935,6 @@
   #   FALSE - Does not deprecate global variable LangCodes.<BR>
   # @Prompt Deprecate Global Variable LangCodes.
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangDeprecate|FALSE|BOOLEAN|0x00000012
-
-  ## Indicates if UGA Draw Protocol is still consumed.<BR><BR>
-  #   TRUE  - Consume UGA Draw protocol.<BR>
-  #   FALSE - Does not consume UGA Draw protocol.<BR>
-  # @Prompt Consume UGA Draw Protocol.
-  gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport|TRUE|BOOLEAN|0x00000027
 
   ## Indicates if a check will be made to see if a specified node is a member of linked list
   #  in the following BaseLib functions: GetNextNode(), IsNull(), IsNodeAtEnd(), SwapListEntries().<BR><BR>
