@@ -1,7 +1,7 @@
 /** @file
 
   Copyright (c) 2008 - 2011, Apple Inc. All rights reserved.<BR>
-  Copyright (c) 2011 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011 - 2021, Intel Corporation. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -200,7 +200,7 @@ ReverseGasketUint64Uint64 (
   );
 
 //
-// Gasket functions for EFI_EMU_UGA_IO_PROTOCOL
+// Gasket functions for EFI_EMU_GRAPHICS_WINDOW_PROTOCOL
 //
 
 EFI_STATUS
@@ -243,10 +243,10 @@ GasketX11RegisterKeyNotify (
 EFI_STATUS
 EFIAPI
 GasketX11Blt (
-  IN  EMU_GRAPHICS_WINDOW_PROTOCOL    *GraphicsWindows,
-  IN  EFI_UGA_PIXEL                   *BltBuffer OPTIONAL,
-  IN  EFI_UGA_BLT_OPERATION           BltOperation,
-  IN  EMU_GRAPHICS_WINDOWS__BLT_ARGS  *Args
+  IN  EMU_GRAPHICS_WINDOW_PROTOCOL       *GraphicsWindows,
+  IN  EFI_GRAPHICS_OUTPUT_BLT_PIXEL      *BltBuffer OPTIONAL,
+  IN  EFI_GRAPHICS_OUTPUT_BLT_OPERATION  BltOperation,
+  IN  EMU_GRAPHICS_WINDOWS__BLT_ARGS     *Args
   );
 
 EFI_STATUS
