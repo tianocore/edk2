@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2021, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 Module Name:
@@ -396,10 +396,10 @@ WinNtWndSize (
 // TODO:    Delta - add argument and description to function comment
 EFI_STATUS
 WinNtWndBlt (
-  IN  EMU_GRAPHICS_WINDOW_PROTOCOL    *GraphicsIo,
-  IN  EFI_UGA_PIXEL                   *BltBuffer OPTIONAL,
-  IN  EFI_UGA_BLT_OPERATION           BltOperation,
-  IN  EMU_GRAPHICS_WINDOWS__BLT_ARGS  *Args
+  IN  EMU_GRAPHICS_WINDOW_PROTOCOL       *GraphicsIo,
+  IN  EFI_GRAPHICS_OUTPUT_BLT_PIXEL      *BltBuffer OPTIONAL,
+  IN  EFI_GRAPHICS_OUTPUT_BLT_OPERATION  BltOperation,
+  IN  EMU_GRAPHICS_WINDOWS__BLT_ARGS     *Args
   )
 {
   RETURN_STATUS          RStatus;
