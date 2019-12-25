@@ -1,7 +1,7 @@
 /** @file
   Provides interface to advanced shell functionality for parsing both handle and protocol database.
 
-  Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011 - 2021, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
   (C) Copyright 2013-2016 Hewlett-Packard Development Company, L.P.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -94,8 +94,6 @@
 #include <Protocol/HiiConfigAccess.h>
 #include <Protocol/FormBrowser2.h>
 #include <Protocol/DeviceIo.h>
-#include <Protocol/UgaDraw.h>
-#include <Protocol/UgaIo.h>
 #include <Protocol/DriverConfiguration.h>
 #include <Protocol/DriverConfiguration2.h>
 #include <Protocol/DevicePathUtilities.h>
