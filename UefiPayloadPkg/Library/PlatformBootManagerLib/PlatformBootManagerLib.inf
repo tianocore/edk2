@@ -53,14 +53,12 @@
 [Protocols]
   gEfiGenericMemTestProtocolGuid  ## CONSUMES
   gEfiGraphicsOutputProtocolGuid  ## CONSUMES
-  gEfiUgaDrawProtocolGuid         ## CONSUMES
   gEfiBootLogoProtocolGuid        ## CONSUMES
   gEfiDxeSmmReadyToLockProtocolGuid
   gEfiSmmAccess2ProtocolGuid
 
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut
-  gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn
   gEfiMdeModulePkgTokenSpaceGuid.PcdConInConnectOnDemand
