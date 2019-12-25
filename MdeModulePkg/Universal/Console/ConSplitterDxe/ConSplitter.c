@@ -16,7 +16,7 @@
   never removed. Such design ensures system function well during none console
   device situation.
 
-Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2021, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -108,15 +108,6 @@ GLOBAL_REMOVE_IF_UNREFERENCED TEXT_IN_SPLITTER_PRIVATE_DATA  mConIn = {
 };
 
 //
-// Uga Draw Protocol Private Data template
-//
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UGA_DRAW_PROTOCOL  mUgaDrawProtocolTemplate = {
-  ConSplitterUgaDrawGetMode,
-  ConSplitterUgaDrawSetMode,
-  ConSplitterUgaDrawBlt
-};
-
-//
 // Graphics Output Protocol Private Data template
 //
 GLOBAL_REMOVE_IF_UNREFERENCED EFI_GRAPHICS_OUTPUT_PROTOCOL  mGraphicsOutputProtocolTemplate = {
@@ -156,21 +147,10 @@ GLOBAL_REMOVE_IF_UNREFERENCED TEXT_OUT_SPLITTER_PRIVATE_DATA  mConOut = {
   {
     NULL,
     NULL,
-    NULL
-  },
-  0,
-  0,
-  0,
-  0,
-
-  {
-    NULL,
-    NULL,
     NULL,
     NULL
   },
   (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION *)NULL,
-  0,
   0,
 
   0,
@@ -212,21 +192,10 @@ GLOBAL_REMOVE_IF_UNREFERENCED TEXT_OUT_SPLITTER_PRIVATE_DATA  mStdErr = {
   {
     NULL,
     NULL,
-    NULL
-  },
-  0,
-  0,
-  0,
-  0,
-
-  {
-    NULL,
-    NULL,
     NULL,
     NULL
   },
   (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION *)NULL,
-  0,
   0,
 
   0,
@@ -422,7 +391,7 @@ ToggleStateSyncReInitialization (
   Installs driver module protocols and. Creates virtual device handles for ConIn,
   ConOut, and StdErr. Installs Simple Text In protocol, Simple Text In Ex protocol,
   Simple Pointer protocol, Absolute Pointer protocol on those virtual handlers.
-  Installs Graphics Output protocol and/or UGA Draw protocol if needed.
+  Installs Graphics Output protocol if need.
 
   @param[in] ImageHandle    The firmware allocated handle for the EFI image.
   @param[in] SystemTable    A pointer to the EFI System Table.
@@ -492,14 +461,6 @@ ConSplitterDriverEntry (
              &gConSplitterStdErrComponentName2
              );
   ASSERT_EFI_ERROR (Status);
-
-  //
-  // Either Graphics Output protocol or UGA Draw protocol must be supported.
-  //
-  ASSERT (
-    FeaturePcdGet (PcdConOutGopSupport) ||
-    FeaturePcdGet (PcdConOutUgaSupport)
-    );
 
   //
   // The driver creates virtual handles for ConIn, ConOut, StdErr.
@@ -757,13 +718,7 @@ ConSplitterTextOutConstructor (
   //
   // Copy protocols template
   //
-  if (FeaturePcdGet (PcdConOutUgaSupport)) {
-    CopyMem (&ConOutPrivate->UgaDraw, &mUgaDrawProtocolTemplate, sizeof (EFI_UGA_DRAW_PROTOCOL));
-  }
-
-  if (FeaturePcdGet (PcdConOutGopSupport)) {
-    CopyMem (&ConOutPrivate->GraphicsOutput, &mGraphicsOutputProtocolTemplate, sizeof (EFI_GRAPHICS_OUTPUT_PROTOCOL));
-  }
+  CopyMem (&ConOutPrivate->GraphicsOutput, &mGraphicsOutputProtocolTemplate, sizeof (EFI_GRAPHICS_OUTPUT_PROTOCOL));
 
   //
   // Initialize console output splitter's private data.
@@ -806,56 +761,47 @@ ConSplitterTextOutConstructor (
   ConOutPrivate->TextOutQueryData[0].Rows    = 25;
   TextOutSetMode (ConOutPrivate, 0);
 
-  if (FeaturePcdGet (PcdConOutUgaSupport)) {
-    //
-    // Setup the UgaDraw to 800 x 600 x 32 bits per pixel, 60Hz.
-    //
-    ConSplitterUgaDrawSetMode (&ConOutPrivate->UgaDraw, 800, 600, 32, 60);
+  //
+  // Setup resource for mode information in Graphics Output Protocol interface
+  //
+  if ((ConOutPrivate->GraphicsOutput.Mode = AllocateZeroPool (sizeof (EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE))) == NULL) {
+    return EFI_OUT_OF_RESOURCES;
   }
 
-  if (FeaturePcdGet (PcdConOutGopSupport)) {
-    //
-    // Setup resource for mode information in Graphics Output Protocol interface
-    //
-    if ((ConOutPrivate->GraphicsOutput.Mode = AllocateZeroPool (sizeof (EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE))) == NULL) {
-      return EFI_OUT_OF_RESOURCES;
-    }
-
-    if ((ConOutPrivate->GraphicsOutput.Mode->Info = AllocateZeroPool (sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION))) == NULL) {
-      return EFI_OUT_OF_RESOURCES;
-    }
-
-    //
-    // Setup the DevNullGraphicsOutput to 800 x 600 x 32 bits per pixel
-    // DevNull will be updated to user-defined mode after driver has started.
-    //
-    if ((ConOutPrivate->GraphicsOutputModeBuffer = AllocateZeroPool (sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION))) == NULL) {
-      return EFI_OUT_OF_RESOURCES;
-    }
-
-    Info                       = &ConOutPrivate->GraphicsOutputModeBuffer[0];
-    Info->Version              = 0;
-    Info->HorizontalResolution = 800;
-    Info->VerticalResolution   = 600;
-    Info->PixelFormat          = PixelBltOnly;
-    Info->PixelsPerScanLine    = 800;
-    CopyMem (ConOutPrivate->GraphicsOutput.Mode->Info, Info, sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION));
-    ConOutPrivate->GraphicsOutput.Mode->SizeOfInfo = sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION);
-
-    //
-    // Initialize the following items, theset items remain unchanged in GraphicsOutput->SetMode()
-    // GraphicsOutputMode->FrameBufferBase, GraphicsOutputMode->FrameBufferSize
-    //
-    ConOutPrivate->GraphicsOutput.Mode->FrameBufferBase = (EFI_PHYSICAL_ADDRESS)(UINTN)NULL;
-    ConOutPrivate->GraphicsOutput.Mode->FrameBufferSize = 0;
-
-    ConOutPrivate->GraphicsOutput.Mode->MaxMode = 1;
-    //
-    // Initial current mode to unknown state, and then set to mode 0
-    //
-    ConOutPrivate->GraphicsOutput.Mode->Mode = 0xffff;
-    ConOutPrivate->GraphicsOutput.SetMode (&ConOutPrivate->GraphicsOutput, 0);
+  if ((ConOutPrivate->GraphicsOutput.Mode->Info = AllocateZeroPool (sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION))) == NULL) {
+    return EFI_OUT_OF_RESOURCES;
   }
+
+  //
+  // Setup the DevNullGraphicsOutput to 800 x 600 x 32 bits per pixel
+  // DevNull will be updated to user-defined mode after driver has started.
+  //
+  if ((ConOutPrivate->GraphicsOutputModeBuffer = AllocateZeroPool (sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION))) == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  Info                       = &ConOutPrivate->GraphicsOutputModeBuffer[0];
+  Info->Version              = 0;
+  Info->HorizontalResolution = 800;
+  Info->VerticalResolution   = 600;
+  Info->PixelFormat          = PixelBltOnly;
+  Info->PixelsPerScanLine    = 800;
+  CopyMem (ConOutPrivate->GraphicsOutput.Mode->Info, Info, sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION));
+  ConOutPrivate->GraphicsOutput.Mode->SizeOfInfo = sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION);
+
+  //
+  // Initialize the following items, theset items remain unchanged in GraphicsOutput->SetMode()
+  // GraphicsOutputMode->FrameBufferBase, GraphicsOutputMode->FrameBufferSize
+  //
+  ConOutPrivate->GraphicsOutput.Mode->FrameBufferBase = (EFI_PHYSICAL_ADDRESS)(UINTN)NULL;
+  ConOutPrivate->GraphicsOutput.Mode->FrameBufferSize = 0;
+
+  ConOutPrivate->GraphicsOutput.Mode->MaxMode = 1;
+  //
+  // Initial current mode to unknown state, and then set to mode 0
+  //
+  ConOutPrivate->GraphicsOutput.Mode->Mode = 0xffff;
+  ConOutPrivate->GraphicsOutput.SetMode (&ConOutPrivate->GraphicsOutput, 0);
 
   return EFI_SUCCESS;
 }
@@ -1332,12 +1278,9 @@ ConSplitterConOutDriverBindingStart (
   IN  EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
 {
-  EFI_STATUS                            Status;
-  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL       *TextOut;
-  EFI_GRAPHICS_OUTPUT_PROTOCOL          *GraphicsOutput;
-  EFI_UGA_DRAW_PROTOCOL                 *UgaDraw;
-  UINTN                                 SizeOfInfo;
-  EFI_GRAPHICS_OUTPUT_MODE_INFORMATION  *Info;
+  EFI_STATUS                       Status;
+  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *TextOut;
+  EFI_GRAPHICS_OUTPUT_PROTOCOL     *GraphicsOutput;
 
   //
   // Start ConSplitter on ControllerHandle, and create the virtual
@@ -1356,7 +1299,6 @@ ConSplitterConOutDriverBindingStart (
   }
 
   GraphicsOutput = NULL;
-  UgaDraw        = NULL;
   //
   // Try to Open Graphics Output protocol
   //
@@ -1369,20 +1311,6 @@ ConSplitterConOutDriverBindingStart (
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
                   );
 
-  if (EFI_ERROR (Status) && FeaturePcdGet (PcdUgaConsumeSupport)) {
-    //
-    // Open UGA DRAW protocol
-    //
-    gBS->OpenProtocol (
-           ControllerHandle,
-           &gEfiUgaDrawProtocolGuid,
-           (VOID **)&UgaDraw,
-           This->DriverBindingHandle,
-           mConOut.VirtualHandle,
-           EFI_OPEN_PROTOCOL_GET_PROTOCOL
-           );
-  }
-
   //
   // When new console device is added, the new mode will be set later,
   // so put current mode back to init state.
@@ -1393,37 +1321,8 @@ ConSplitterConOutDriverBindingStart (
   // If both ConOut and StdErr incorporate the same Text Out device,
   // their MaxMode and QueryData should be the intersection of both.
   //
-  Status = ConSplitterTextOutAddDevice (&mConOut, TextOut, GraphicsOutput, UgaDraw);
+  Status = ConSplitterTextOutAddDevice (&mConOut, TextOut, GraphicsOutput);
   ConSplitterTextOutSetAttribute (&mConOut.TextOut, EFI_TEXT_ATTR (EFI_LIGHTGRAY, EFI_BLACK));
-
-  if (FeaturePcdGet (PcdConOutUgaSupport)) {
-    //
-    // Get the UGA mode data of ConOut from the current mode
-    //
-    if (GraphicsOutput != NULL) {
-      Status = GraphicsOutput->QueryMode (GraphicsOutput, GraphicsOutput->Mode->Mode, &SizeOfInfo, &Info);
-      if (EFI_ERROR (Status)) {
-        return Status;
-      }
-
-      ASSERT (SizeOfInfo <= sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION));
-
-      mConOut.UgaHorizontalResolution = Info->HorizontalResolution;
-      mConOut.UgaVerticalResolution   = Info->VerticalResolution;
-      mConOut.UgaColorDepth           = 32;
-      mConOut.UgaRefreshRate          = 60;
-
-      FreePool (Info);
-    } else if (UgaDraw != NULL) {
-      Status = UgaDraw->GetMode (
-                          UgaDraw,
-                          &mConOut.UgaHorizontalResolution,
-                          &mConOut.UgaVerticalResolution,
-                          &mConOut.UgaColorDepth,
-                          &mConOut.UgaRefreshRate
-                          );
-    }
-  }
 
   return Status;
 }
@@ -1477,7 +1376,7 @@ ConSplitterStdErrDriverBindingStart (
   // If both ConOut and StdErr incorporate the same Text Out device,
   // their MaxMode and QueryData should be the intersection of both.
   //
-  Status = ConSplitterTextOutAddDevice (&mStdErr, TextOut, NULL, NULL);
+  Status = ConSplitterTextOutAddDevice (&mStdErr, TextOut, NULL);
   ConSplitterTextOutSetAttribute (&mStdErr.TextOut, EFI_TEXT_ATTR (EFI_LIGHTGRAY, EFI_BLACK));
 
   return Status;
@@ -2737,7 +2636,6 @@ ConSplitterGetIntersectionBetweenConOutAndStrErr (
 
   @param  Private               Text Out Splitter pointer.
   @param  GraphicsOutput        Graphics Output protocol pointer.
-  @param  UgaDraw               UGA Draw protocol pointer.
 
   @retval EFI_SUCCESS           Output mode added successfully.
   @retval other                 Failed to add output mode.
@@ -2746,8 +2644,7 @@ ConSplitterGetIntersectionBetweenConOutAndStrErr (
 EFI_STATUS
 ConSplitterAddGraphicsOutputMode (
   IN  TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private,
-  IN  EFI_GRAPHICS_OUTPUT_PROTOCOL    *GraphicsOutput,
-  IN  EFI_UGA_DRAW_PROTOCOL           *UgaDraw
+  IN  EFI_GRAPHICS_OUTPUT_PROTOCOL    *GraphicsOutput
   )
 {
   EFI_STATUS                            Status;
@@ -2762,12 +2659,8 @@ ConSplitterAddGraphicsOutputMode (
   UINTN                                 NumberIndex;
   BOOLEAN                               Match;
   BOOLEAN                               AlreadyExist;
-  UINT32                                UgaHorizontalResolution;
-  UINT32                                UgaVerticalResolution;
-  UINT32                                UgaColorDepth;
-  UINT32                                UgaRefreshRate;
 
-  ASSERT (GraphicsOutput != NULL || UgaDraw != NULL);
+  ASSERT (GraphicsOutput != NULL);
 
   CurrentGraphicsOutputMode = Private->GraphicsOutput.Mode;
 
@@ -2775,14 +2668,6 @@ ConSplitterAddGraphicsOutputMode (
   CurrentIndex = 0;
   Status       = EFI_SUCCESS;
 
-  if (Private->CurrentNumberOfUgaDraw != 0) {
-    //
-    // If any UGA device has already been added, then there is no need to
-    // calculate intersection of display mode of different GOP/UGA device,
-    // since only one display mode will be exported (i.e. user-defined mode)
-    //
-    goto Done;
-  }
 
   if (GraphicsOutput != NULL) {
     if (Private->CurrentNumberOfGraphicsOutput == 0) {
@@ -2937,49 +2822,10 @@ ConSplitterAddGraphicsOutputMode (
         }
       }
     }
-  } else if (UgaDraw != NULL) {
-    //
-    // Graphics console driver can ensure the same mode for all GOP devices
-    // so we can get the current mode from this video device
-    //
-    UgaDraw->GetMode (
-               UgaDraw,
-               &UgaHorizontalResolution,
-               &UgaVerticalResolution,
-               &UgaColorDepth,
-               &UgaRefreshRate
-               );
-
-    CurrentGraphicsOutputMode->MaxMode         = 1;
-    Info                                       = CurrentGraphicsOutputMode->Info;
-    Info->Version                              = 0;
-    Info->HorizontalResolution                 = UgaHorizontalResolution;
-    Info->VerticalResolution                   = UgaVerticalResolution;
-    Info->PixelFormat                          = PixelBltOnly;
-    Info->PixelsPerScanLine                    = UgaHorizontalResolution;
-    CurrentGraphicsOutputMode->SizeOfInfo      = sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION);
-    CurrentGraphicsOutputMode->FrameBufferBase = (EFI_PHYSICAL_ADDRESS)(UINTN)NULL;
-    CurrentGraphicsOutputMode->FrameBufferSize = 0;
-
-    //
-    // Update the private mode buffer
-    //
-    CopyMem (&Private->GraphicsOutputModeBuffer[0], Info, sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION));
-
-    //
-    // Only mode 0 is available to be set
-    //
-    CurrentIndex = 0;
   }
-
-Done:
 
   if (GraphicsOutput != NULL) {
     Private->CurrentNumberOfGraphicsOutput++;
-  }
-
-  if (UgaDraw != NULL) {
-    Private->CurrentNumberOfUgaDraw++;
   }
 
   //
@@ -3130,7 +2976,6 @@ ConsplitterSetConsoleOutMode (
   @param  Private                  Text Out Splitter pointer.
   @param  TextOut                  Simple Text Output protocol pointer.
   @param  GraphicsOutput           Graphics Output protocol pointer.
-  @param  UgaDraw                  UGA Draw protocol pointer.
 
   @retval EFI_SUCCESS              Text Output Device added successfully.
   @retval EFI_OUT_OF_RESOURCES     Could not grow the buffer size.
@@ -3140,21 +2985,14 @@ EFI_STATUS
 ConSplitterTextOutAddDevice (
   IN  TEXT_OUT_SPLITTER_PRIVATE_DATA   *Private,
   IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *TextOut,
-  IN  EFI_GRAPHICS_OUTPUT_PROTOCOL     *GraphicsOutput,
-  IN  EFI_UGA_DRAW_PROTOCOL            *UgaDraw
+  IN  EFI_GRAPHICS_OUTPUT_PROTOCOL     *GraphicsOutput
   )
 {
-  EFI_STATUS                            Status;
-  UINTN                                 CurrentNumOfConsoles;
-  INT32                                 MaxMode;
-  UINT32                                UgaHorizontalResolution;
-  UINT32                                UgaVerticalResolution;
-  UINT32                                UgaColorDepth;
-  UINT32                                UgaRefreshRate;
-  TEXT_OUT_AND_GOP_DATA                 *TextAndGop;
-  UINTN                                 SizeOfInfo;
-  EFI_GRAPHICS_OUTPUT_MODE_INFORMATION  *Info;
-  EFI_STATUS                            DeviceStatus;
+  EFI_STATUS             Status;
+  UINTN                  CurrentNumOfConsoles;
+  INT32                  MaxMode;
+  TEXT_OUT_AND_GOP_DATA  *TextAndGop;
+  EFI_STATUS             DeviceStatus;
 
   Status                      = EFI_SUCCESS;
   CurrentNumOfConsoles        = Private->CurrentNumberOfConsoles;
@@ -3186,7 +3024,6 @@ ConSplitterTextOutAddDevice (
 
   TextAndGop->TextOut        = TextOut;
   TextAndGop->GraphicsOutput = GraphicsOutput;
-  TextAndGop->UgaDraw        = UgaDraw;
 
   if (CurrentNumOfConsoles == 0) {
     //
@@ -3215,101 +3052,21 @@ ConSplitterTextOutAddDevice (
   //
   // This device display mode will be added into Graphics Ouput modes.
   //
-  if ((GraphicsOutput != NULL) || (UgaDraw != NULL)) {
-    DeviceStatus = ConSplitterAddGraphicsOutputMode (Private, GraphicsOutput, UgaDraw);
+  if (GraphicsOutput != NULL) {
+    DeviceStatus = ConSplitterAddGraphicsOutputMode (Private, GraphicsOutput);
   }
 
-  if (FeaturePcdGet (PcdConOutUgaSupport)) {
+  if (!EFI_ERROR (DeviceStatus)) {
     //
-    // If UGA is produced by Consplitter
+    // Graphics Output Protocol is installed
+    // on virtual handle.
     //
-    if (GraphicsOutput != NULL) {
-      Status = GraphicsOutput->QueryMode (GraphicsOutput, GraphicsOutput->Mode->Mode, &SizeOfInfo, &Info);
-      if (EFI_ERROR (Status)) {
-        return Status;
-      }
-
-      ASSERT (SizeOfInfo <= sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION));
-
-      UgaHorizontalResolution = Info->HorizontalResolution;
-      UgaVerticalResolution   = Info->VerticalResolution;
-
-      FreePool (Info);
-    } else if (UgaDraw != NULL) {
-      Status = UgaDraw->GetMode (
-                          UgaDraw,
-                          &UgaHorizontalResolution,
-                          &UgaVerticalResolution,
-                          &UgaColorDepth,
-                          &UgaRefreshRate
-                          );
-      if (!EFI_ERROR (Status) && EFI_ERROR (DeviceStatus)) {
-        //
-        // if GetMode is successfully and UGA device hasn't been set, set it
-        //
-        Status = ConSplitterUgaDrawSetMode (
-                   &Private->UgaDraw,
-                   UgaHorizontalResolution,
-                   UgaVerticalResolution,
-                   UgaColorDepth,
-                   UgaRefreshRate
-                   );
-      }
-
-      //
-      // If GetMode/SetMode is failed, set to 800x600 mode
-      //
-      if (EFI_ERROR (Status)) {
-        Status = ConSplitterUgaDrawSetMode (
-                   &Private->UgaDraw,
-                   800,
-                   600,
-                   32,
-                   60
-                   );
-      }
-    }
-  }
-
-  if (((!EFI_ERROR (DeviceStatus)) || (!EFI_ERROR (Status))) &&
-      ((Private->CurrentNumberOfGraphicsOutput + Private->CurrentNumberOfUgaDraw) == 1))
-  {
-    if (!FeaturePcdGet (PcdConOutGopSupport)) {
-      //
-      // If Graphics Outpurt protocol not supported, UGA Draw protocol is installed
-      // on the virtual handle.
-      //
-      Status = gBS->InstallMultipleProtocolInterfaces (
-                      &mConOut.VirtualHandle,
-                      &gEfiUgaDrawProtocolGuid,
-                      &mConOut.UgaDraw,
-                      NULL
-                      );
-    } else if (!FeaturePcdGet (PcdConOutUgaSupport)) {
-      //
-      // If UGA Draw protocol not supported, Graphics Output Protocol is installed
-      // on virtual handle.
-      //
-      Status = gBS->InstallMultipleProtocolInterfaces (
-                      &mConOut.VirtualHandle,
-                      &gEfiGraphicsOutputProtocolGuid,
-                      &mConOut.GraphicsOutput,
-                      NULL
-                      );
-    } else {
-      //
-      // Boot Graphics Output protocol and UGA Draw protocol are supported,
-      // both they will be installed on virtual handle.
-      //
-      Status = gBS->InstallMultipleProtocolInterfaces (
-                      &mConOut.VirtualHandle,
-                      &gEfiGraphicsOutputProtocolGuid,
-                      &mConOut.GraphicsOutput,
-                      &gEfiUgaDrawProtocolGuid,
-                      &mConOut.UgaDraw,
-                      NULL
-                      );
-    }
+    Status = gBS->InstallMultipleProtocolInterfaces (
+                    &mConOut.VirtualHandle,
+                    &gEfiGraphicsOutputProtocolGuid,
+                    &mConOut.GraphicsOutput,
+                    NULL
+                    );
   }
 
   //
@@ -3353,10 +3110,6 @@ ConSplitterTextOutDeleteDevice (
   TextOutList          = Private->TextOutList;
   while (Index >= 0) {
     if (TextOutList->TextOut == TextOut) {
-      if (TextOutList->UgaDraw != NULL) {
-        Private->CurrentNumberOfUgaDraw--;
-      }
-
       if (TextOutList->GraphicsOutput != NULL) {
         Private->CurrentNumberOfGraphicsOutput--;
       }
@@ -3377,33 +3130,16 @@ ConSplitterTextOutDeleteDevice (
     return EFI_NOT_FOUND;
   }
 
-  if ((Private->CurrentNumberOfGraphicsOutput == 0) && (Private->CurrentNumberOfUgaDraw == 0)) {
+  if (Private->CurrentNumberOfGraphicsOutput == 0) {
     //
-    // If there is not any physical GOP and UGA device in system,
-    // Consplitter GOP or UGA protocol will be uninstalled
+    // If there is not any physical GOP in system,
+    // Consplitter GOP protocol will be uninstalled
     //
-    if (!FeaturePcdGet (PcdConOutGopSupport)) {
-      Status = gBS->UninstallProtocolInterface (
-                      Private->VirtualHandle,
-                      &gEfiUgaDrawProtocolGuid,
-                      &Private->UgaDraw
-                      );
-    } else if (!FeaturePcdGet (PcdConOutUgaSupport)) {
-      Status = gBS->UninstallProtocolInterface (
-                      Private->VirtualHandle,
-                      &gEfiGraphicsOutputProtocolGuid,
-                      &Private->GraphicsOutput
-                      );
-    } else {
-      Status = gBS->UninstallMultipleProtocolInterfaces (
-                      Private->VirtualHandle,
-                      &gEfiUgaDrawProtocolGuid,
-                      &Private->UgaDraw,
-                      &gEfiGraphicsOutputProtocolGuid,
-                      &Private->GraphicsOutput,
-                      NULL
-                      );
-    }
+    Status = gBS->UninstallProtocolInterface (
+                    Private->VirtualHandle,
+                    &gEfiGraphicsOutputProtocolGuid,
+                    &Private->GraphicsOutput
+                    );
   }
 
   if (CurrentNumOfConsoles == 0) {
