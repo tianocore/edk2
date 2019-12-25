@@ -98,7 +98,7 @@ PlatformBootManagerEnableQuietBoot (
   Use SystemTable Conout to turn on video based Simple Text Out consoles. The
   Simple Text Out screens will now be synced up with all non video output devices
 
-  @retval EFI_SUCCESS     UGA devices are back in text mode and synced up.
+  @retval EFI_SUCCESS     Graphic devices are back in text mode and synced up.
 
 **/
 EFI_STATUS
