@@ -1,7 +1,7 @@
 /** @file
   Private data structures for the Console Splitter driver
 
-Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2021, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -21,7 +21,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Protocol/SimpleTextIn.h>
 #include <Protocol/SimpleTextInEx.h>
 #include <Protocol/GraphicsOutput.h>
-#include <Protocol/UgaDraw.h>
 
 #include <Guid/ConsoleInDevice.h>
 #include <Guid/StandardErrorDevice.h>
@@ -182,7 +181,6 @@ typedef struct {
 
 typedef struct {
   EFI_GRAPHICS_OUTPUT_PROTOCOL       *GraphicsOutput;
-  EFI_UGA_DRAW_PROTOCOL              *UgaDraw;
   EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL    *TextOut;
 } TEXT_OUT_AND_GOP_DATA;
 
@@ -195,16 +193,9 @@ typedef struct {
   EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL         TextOut;
   EFI_SIMPLE_TEXT_OUTPUT_MODE             TextOutMode;
 
-  EFI_UGA_DRAW_PROTOCOL                   UgaDraw;
-  UINT32                                  UgaHorizontalResolution;
-  UINT32                                  UgaVerticalResolution;
-  UINT32                                  UgaColorDepth;
-  UINT32                                  UgaRefreshRate;
-
   EFI_GRAPHICS_OUTPUT_PROTOCOL            GraphicsOutput;
   EFI_GRAPHICS_OUTPUT_MODE_INFORMATION    *GraphicsOutputModeBuffer;
   UINTN                                   CurrentNumberOfGraphicsOutput;
-  UINTN                                   CurrentNumberOfUgaDraw;
 
   UINTN                                   CurrentNumberOfConsoles;
   TEXT_OUT_AND_GOP_DATA                   *TextOutList;
@@ -230,13 +221,6 @@ typedef struct {
       TEXT_OUT_SPLITTER_PRIVATE_DATA_SIGNATURE              \
       )
 
-#define UGA_DRAW_SPLITTER_PRIVATE_DATA_FROM_THIS(a) \
-  CR ((a),                                          \
-      TEXT_OUT_SPLITTER_PRIVATE_DATA,               \
-      UgaDraw,                                      \
-      TEXT_OUT_SPLITTER_PRIVATE_DATA_SIGNATURE      \
-      )
-
 #define CONSOLE_CONTROL_SPLITTER_PRIVATE_DATA_FROM_THIS(a)  \
   CR ((a),                                                  \
       TEXT_OUT_SPLITTER_PRIVATE_DATA,                       \
@@ -254,7 +238,7 @@ typedef struct {
   Installs driver module protocols and. Creates virtual device handles for ConIn,
   ConOut, and StdErr. Installs Simple Text In protocol, Simple Text In Ex protocol,
   Simple Pointer protocol, Absolute Pointer protocol on those virtual handlers.
-  Installs Graphics Output protocol and/or UGA Draw protocol if needed.
+  Installs Graphics Output protocol if needed.
 
   @param[in] ImageHandle    The firmware allocated handle for the EFI image.
   @param[in] SystemTable    A pointer to the EFI System Table.
@@ -1202,7 +1186,6 @@ ConSplitterSimplePointerDeleteDevice (
   @param  Private                  Text Out Splitter pointer.
   @param  TextOut                  Simple Text Output protocol pointer.
   @param  GraphicsOutput           Graphics Output protocol pointer.
-  @param  UgaDraw                  UGA Draw protocol pointer.
 
   @retval EFI_SUCCESS              Text Output Device added successfully.
   @retval EFI_OUT_OF_RESOURCES     Could not grow the buffer size.
@@ -1212,8 +1195,7 @@ EFI_STATUS
 ConSplitterTextOutAddDevice (
   IN  TEXT_OUT_SPLITTER_PRIVATE_DATA   *Private,
   IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *TextOut,
-  IN  EFI_GRAPHICS_OUTPUT_PROTOCOL     *GraphicsOutput,
-  IN  EFI_UGA_DRAW_PROTOCOL            *UgaDraw
+  IN  EFI_GRAPHICS_OUTPUT_PROTOCOL     *GraphicsOutput
   );
 
 /**
@@ -1848,119 +1830,7 @@ ConSplitterGraphicsOutputBlt (
   IN  UINTN                              DestinationY,
   IN  UINTN                              Width,
   IN  UINTN                              Height,
-  IN  UINTN                              Delta         OPTIONAL
-  );
-
-/**
-  Return the current video mode information.
-
-  @param  This                  The EFI_UGA_DRAW_PROTOCOL instance.
-  @param  HorizontalResolution  The size of video screen in pixels in the X dimension.
-  @param  VerticalResolution    The size of video screen in pixels in the Y dimension.
-  @param  ColorDepth            Number of bits per pixel, currently defined to be 32.
-  @param  RefreshRate           The refresh rate of the monitor in Hertz.
-
-  @retval EFI_SUCCESS           Mode information returned.
-  @retval EFI_NOT_STARTED       Video display is not initialized. Call SetMode ()
-  @retval EFI_INVALID_PARAMETER One of the input args was NULL.
-
-**/
-EFI_STATUS
-EFIAPI
-ConSplitterUgaDrawGetMode (
-  IN  EFI_UGA_DRAW_PROTOCOL  *This,
-  OUT UINT32                 *HorizontalResolution,
-  OUT UINT32                 *VerticalResolution,
-  OUT UINT32                 *ColorDepth,
-  OUT UINT32                 *RefreshRate
-  );
-
-/**
-  Set the current video mode information.
-
-  @param  This                 The EFI_UGA_DRAW_PROTOCOL instance.
-  @param  HorizontalResolution The size of video screen in pixels in the X dimension.
-  @param  VerticalResolution   The size of video screen in pixels in the Y dimension.
-  @param  ColorDepth           Number of bits per pixel, currently defined to be 32.
-  @param  RefreshRate          The refresh rate of the monitor in Hertz.
-
-  @retval EFI_SUCCESS          Mode information returned.
-  @retval EFI_NOT_STARTED      Video display is not initialized. Call SetMode ()
-  @retval EFI_OUT_OF_RESOURCES Out of resources.
-
-**/
-EFI_STATUS
-EFIAPI
-ConSplitterUgaDrawSetMode (
-  IN  EFI_UGA_DRAW_PROTOCOL  *This,
-  IN UINT32                  HorizontalResolution,
-  IN UINT32                  VerticalResolution,
-  IN UINT32                  ColorDepth,
-  IN UINT32                  RefreshRate
-  );
-
-/**
-  Blt a rectangle of pixels on the graphics screen.
-
-  The following table defines actions for BltOperations.
-
-  EfiUgaVideoFill:
-    Write data from the  BltBuffer pixel (SourceX, SourceY)
-    directly to every pixel of the video display rectangle
-    (DestinationX, DestinationY)
-    (DestinationX + Width, DestinationY + Height).
-    Only one pixel will be used from the BltBuffer. Delta is NOT used.
-  EfiUgaVideoToBltBuffer:
-    Read data from the video display rectangle
-    (SourceX, SourceY) (SourceX + Width, SourceY + Height) and place it in
-    the BltBuffer rectangle (DestinationX, DestinationY )
-    (DestinationX + Width, DestinationY + Height). If DestinationX or
-    DestinationY is not zero then Delta must be set to the length in bytes
-    of a row in the BltBuffer.
-  EfiUgaBltBufferToVideo:
-    Write data from the  BltBuffer rectangle
-    (SourceX, SourceY) (SourceX + Width, SourceY + Height) directly to the
-    video display rectangle (DestinationX, DestinationY)
-    (DestinationX + Width, DestinationY + Height). If SourceX or SourceY is
-    not zero then Delta must be set to the length in bytes of a row in the
-    BltBuffer.
-  EfiUgaVideoToVideo:
-    Copy from the video display rectangle
-    (SourceX, SourceY) (SourceX + Width, SourceY + Height) .
-    to the video display rectangle (DestinationX, DestinationY)
-    (DestinationX + Width, DestinationY + Height).
-    The BltBuffer and Delta  are not used in this mode.
-
-  @param  This           Protocol instance pointer.
-  @param  BltBuffer      Buffer containing data to blit into video buffer. This
-                         buffer has a size of Width*Height*sizeof(EFI_UGA_PIXEL)
-  @param  BltOperation   Operation to perform on BlitBuffer and video memory
-  @param  SourceX        X coordinate of source for the BltBuffer.
-  @param  SourceY        Y coordinate of source for the BltBuffer.
-  @param  DestinationX   X coordinate of destination for the BltBuffer.
-  @param  DestinationY   Y coordinate of destination for the BltBuffer.
-  @param  Width          Width of rectangle in BltBuffer in pixels.
-  @param  Height         Hight of rectangle in BltBuffer in pixels.
-  @param  Delta          OPTIONAL
-
-  @retval EFI_SUCCESS            The Blt operation completed.
-  @retval EFI_INVALID_PARAMETER  BltOperation is not valid.
-  @retval EFI_DEVICE_ERROR       A hardware error occurred writting to the video buffer.
-
-**/
-EFI_STATUS
-EFIAPI
-ConSplitterUgaDrawBlt (
-  IN  EFI_UGA_DRAW_PROTOCOL  *This,
-  IN  EFI_UGA_PIXEL          *BltBuffer  OPTIONAL,
-  IN  EFI_UGA_BLT_OPERATION  BltOperation,
-  IN  UINTN                  SourceX,
-  IN  UINTN                  SourceY,
-  IN  UINTN                  DestinationX,
-  IN  UINTN                  DestinationY,
-  IN  UINTN                  Width,
-  IN  UINTN                  Height,
-  IN  UINTN                  Delta         OPTIONAL
+  IN  UINTN                              Delta       OPTIONAL
   );
 
 /**
