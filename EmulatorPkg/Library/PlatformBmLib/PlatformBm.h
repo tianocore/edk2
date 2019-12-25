@@ -1,6 +1,6 @@
 /*++ @file
 
-Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2021, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2011, Apple Inc. All rights reserved.
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -60,7 +60,7 @@ typedef struct {
   EMU_VENDOR_DEVICE_PATH_NODE    EmuBus;
   EMU_VENDOR_DEVICE_PATH_NODE    EmuGraphicsWindow;
   EFI_DEVICE_PATH_PROTOCOL       End;
-} EMU_PLATFORM_UGA_DEVICE_PATH;
+} EMU_PLATFORM_GRAPHICS_WINDOW_DEVICE_PATH;
 
 //
 // Platform BDS Functions
