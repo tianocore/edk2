@@ -2,7 +2,7 @@
   Head file for BDS Platform specific code
 
   Copyright (C) 2015-2016, Red Hat, Inc.
-  Copyright (c) 2004 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2004 - 2022, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -43,7 +43,7 @@ EnableQuietBoot (
   Simple Text Out screens will now be synced up with all non video output
   devices
 
-  @retval EFI_SUCCESS     UGA devices are back in text mode and synced up.
+  @retval EFI_SUCCESS     Graphic devices are back in text mode and synced up.
 **/
 EFI_STATUS
 DisableQuietBoot (

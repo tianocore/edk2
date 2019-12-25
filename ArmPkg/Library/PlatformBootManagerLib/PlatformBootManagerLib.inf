@@ -3,7 +3,7 @@
 #
 #  Copyright (C) 2015-2016, Red Hat, Inc.
 #  Copyright (c) 2014, ARM Ltd. All rights reserved.<BR>
-#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2022, Intel Corporation. All rights reserved.<BR>
 #  Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -50,9 +50,6 @@
   UefiBootServicesTableLib
   UefiLib
   UefiRuntimeServicesTableLib
-
-[FeaturePcd]
-  gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport
 
 [FixedPcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable
