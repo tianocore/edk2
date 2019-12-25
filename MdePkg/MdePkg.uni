@@ -373,12 +373,6 @@
                                                                                                "TRUE  - Deprecate global variable LangCodes.<BR>\n"
                                                                                                "FALSE - Does not deprecate global variable LangCodes.<BR>"
 
-#string STR_gEfiMdePkgTokenSpaceGuid_PcdUgaConsumeSupport_PROMPT  #language en-US "Consume UGA Draw Protocol"
-
-#string STR_gEfiMdePkgTokenSpaceGuid_PcdUgaConsumeSupport_HELP  #language en-US "Indicates if UGA Draw Protocol is still consumed.<BR><BR>\n"
-                                                                                "TRUE  - Consume UGA Draw protocol.<BR>\n"
-                                                                                "FALSE - Does not consume UGA Draw protocol.<BR>"
-
 #string STR_gEfiMdePkgTokenSpaceGuid_PcdVerifyNodeInList_PROMPT  #language en-US "Verify Node In List"
 
 #string STR_gEfiMdePkgTokenSpaceGuid_PcdVerifyNodeInList_HELP  #language en-US "Indicates if a check will be made to see if a specified node is a member of linked list in the following BaseLib functions: GetNextNode(), IsNull(), IsNodeAtEnd(), SwapListEntries().<BR><BR>\n"
