@@ -427,7 +427,7 @@ ASM_PFX(GasketSecEmuThunkAddress):
   ret
 
 //
-// Gasket functions for EFI_EMU_UGA_IO_PROTOCOL
+// Gasket functions for EFI_EMU_GRAPHICS_WINDOW_PROTOCOL
 //
 
 ASM_GLOBAL ASM_PFX(GasketX11Size)
