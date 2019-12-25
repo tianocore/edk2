@@ -1,6 +1,6 @@
 // /**
 //
-// Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved. <BR>
+// Copyright (c) 2010 - 2021, Intel Corporation. All rights reserved. <BR>
 // (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
 // (C) Copyright 2015-2021 Hewlett Packard Enterprise Development LP<BR>
 // SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -161,8 +161,6 @@
 #string STR_SHELL_ALIAS           #language en-US "ShellAlias"
 #string STR_DEVICE_IO             #language en-US "DeviceIO"
 #string STR_TCP                   #language en-US "TCP"
-#string STR_UGA_DRAW              #language en-US "UGADraw"
-#string STR_UGA_IO                #language en-US "UGAIO"
 #string STR_ESP                   #language en-US "EFISystemPartition"
 #string STR_GPT_NBR               #language en-US "LegacyMBR"
 #string STR_DRIVER_CONFIG         #language en-US "DriverConfiguration"
