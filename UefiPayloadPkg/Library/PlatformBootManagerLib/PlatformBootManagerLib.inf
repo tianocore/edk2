@@ -1,7 +1,7 @@
 ## @file
 #  Include all platform action which can be customized by IBV/OEM.
 #
-#  Copyright (c) 2012 - 2021, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2012 - 2022, Intel Corporation. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -55,7 +55,6 @@
 [Protocols]
   gEfiGenericMemTestProtocolGuid  ## CONSUMES
   gEfiGraphicsOutputProtocolGuid  ## CONSUMES
-  gEfiUgaDrawProtocolGuid         ## CONSUMES
   gEfiBootLogoProtocolGuid        ## CONSUMES
   gEfiDxeSmmReadyToLockProtocolGuid
   gEfiSmmAccess2ProtocolGuid
@@ -65,7 +64,6 @@
 
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut
-  gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn
   gEfiMdeModulePkgTokenSpaceGuid.PcdConInConnectOnDemand
