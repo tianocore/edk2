@@ -217,6 +217,8 @@ struct _CPU_MP_DATA {
   UINT64                         CpuInfoInHob;
   UINT32                         CpuCount;
   UINT32                         BspNumber;
+  UINT64                         MicrocodePatchAddress;
+  UINT64                         MicrocodePatchRegionSize;
   //
   // The above fields data will be passed from PEI to DXE
   // Please make sure the fields offset same in the different
@@ -260,8 +262,6 @@ struct _CPU_MP_DATA {
   UINT8                          Vector;
   BOOLEAN                        PeriodicMode;
   BOOLEAN                        TimerInterruptState;
-  UINT64                         MicrocodePatchAddress;
-  UINT64                         MicrocodePatchRegionSize;
 
   UINT32                         ProcessorSignature;
   UINT32                         ProcessorFlags;
