@@ -16,7 +16,10 @@
 
     ## options defined ci/Plugin/CharEncodingCheck
     "CharEncodingCheck": {
-        "IgnoreFiles": []
+        "IgnoreFiles": [
+            "MdeModulePkg/Universal/RegularExpressionDxe/oniguruma/test/testc.c",
+            "MdeModulePkg/Universal/RegularExpressionDxe/oniguruma/windows/testc.c"
+        ]
     },
 
     ## options defined ci/Plugin/DependencyCheck
