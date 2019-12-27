@@ -144,6 +144,8 @@ class Settings(CiBuildSettingsManager, UpdateSettingsManager, SetupSettingsManag
             "CryptoPkg/Library/OpensslLib/openssl", False))
         rs.append(RequiredSubmodule(
             "UnitTestFrameworkPkg/Library/CmockaLib/cmocka", False))
+        rs.append(RequiredSubmodule(
+            "MdeModulePkg/Universal/RegularExpressionDxe/oniguruma", False))
         return rs
 
     def GetName(self):
