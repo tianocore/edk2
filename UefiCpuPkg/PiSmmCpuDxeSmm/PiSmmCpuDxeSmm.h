@@ -214,6 +214,7 @@ typedef struct {
 
   SPIN_LOCK               *SpinLock;
   volatile UINT32         RunningApCount;
+  BOOLEAN                 Used;
 } PROCEDURE_TOKEN;
 
 #define PROCEDURE_TOKEN_FROM_LINK(a)  CR (a, PROCEDURE_TOKEN, Link, PROCEDURE_TOKEN_SIGNATURE)
@@ -254,11 +255,6 @@ typedef struct {
 
   PROCEDURE_WRAPPER               *ApWrapperFunc;
   LIST_ENTRY                      TokenList;
-
-  LIST_ENTRY                      OldTokenBufList;
-
-  UINT8                           *CurrentTokenBuf;
-  UINT32                          UsedTokenNum;     // Only record tokens used in CurrentTokenBuf.
 } SMM_CPU_PRIVATE_DATA;
 
 extern SMM_CPU_PRIVATE_DATA  *gSmmCpuPrivate;
