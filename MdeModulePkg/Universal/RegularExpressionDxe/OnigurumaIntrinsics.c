@@ -3,6 +3,7 @@
   Provide intrinsics within Oniguruma
 
   (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
+  Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/

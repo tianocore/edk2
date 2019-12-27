@@ -63,7 +63,7 @@ contains the following components that are covered by additional licenses:
 * [MdeModulePkg/Library/LzmaCustomDecompressLib](MdeModulePkg/Library/LzmaCustomDecompressLib/LZMA-SDK-README.txt)
 * [IntelFrameworkModulePkg/Library/LzmaCustomDecompressLib/Sdk](IntelFrameworkModulePkg/Library/LzmaCustomDecompressLib/LZMA-SDK-README.txt)
 * [BaseTools/Source/C/VfrCompile/Pccts](BaseTools/Source/C/VfrCompile/Pccts/RIGHTS)
-* [MdeModulePkg/Universal/RegularExpressionDxe/Oniguruma](MdeModulePkg/Universal/RegularExpressionDxe/Oniguruma/README)
+* [MdeModulePkg/Universal/RegularExpressionDxe/oniguruma](https://github.com/kkos/oniguruma/blob/master/README.md)
 * [OvmfPkg](OvmfPkg/License.txt)
 * [CryptoPkg/Library/OpensslLib/openssl](https://github.com/openssl/openssl/blob/50eaac9f3337667259de725451f201e784599687/LICENSE)
 * [ArmPkg/Library/ArmSoftFloatLib/berkeley-softfloat-3](https://github.com/ucb-bar/berkeley-softfloat-3/blob/b64af41c3276f97f0e181920400ee056b9c88037/COPYING.txt)
@@ -199,6 +199,7 @@ as possible as we can. Currently EDK II contains the following submodules
 
 - CryptoPkg/Library/OpensslLib/openssl
 - ArmPkg/Library/ArmSoftFloatLib/berkeley-softfloat-3
+- MdeModulePkg/Universal/RegularExpressionDxe/oniguruma
 
 ArmSoftFloatLib is actually required by OpensslLib. It's inevitable
 in openssl-1.1.1 (since stable201905) for floating point parameter
