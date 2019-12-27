@@ -8,4 +8,7 @@
   "scope": "cibuild",
   "name": "Char Encoding Check Test",
   "module": "CharEncodingCheck"
+  "CharEncodingCheck": {
+    "IgnoreFiles": [(MdeModulePkg/Universal/RegularExpressionDxe/oniguruma/test/testc.c),(MdeModulePkg/Universal/RegularExpressionDxe/oniguruma/windows/testc.c)]
+  }
 }

@@ -7,3 +7,6 @@
 [submodule "UnitTestFrameworkPkg/Library/CmockaLib/cmocka"]
 	path = UnitTestFrameworkPkg/Library/CmockaLib/cmocka
 	url = https://git.cryptomilk.org/projects/cmocka.git
+[submodule "MdeModulePkg/Universal/RegularExpressionDxe/oniguruma"]
+	path = MdeModulePkg/Universal/RegularExpressionDxe/oniguruma
+	url = https://github.com/kkos/oniguruma
