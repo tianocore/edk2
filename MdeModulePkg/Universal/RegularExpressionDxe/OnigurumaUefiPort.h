@@ -3,6 +3,7 @@
   Module to rewrite stdlib references within Oniguruma
 
   (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP<BR>
+  Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -15,14 +16,35 @@
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 
-#undef _WIN32
+
+#define ONIG_NO_STANDARD_C_HEADERS
+#define ONIG_NO_PRINT
 #define P_(args) args
 
-#define SIZEOF_LONG sizeof(long)
-#define SIZEOF_INT  sizeof(int)
-typedef UINTN size_t;
+#define INT_MAX   0x7FFFFFFF
+#define LONG_MAX  0x7FFFFFFF
+#define UINT_MAX  0xFFFFFFFF
+#define ULONG_MAX 0xFFFFFFFF
 
-#define malloc(n) AllocatePool(n)
+
+#define SIZEOF_LONG      4
+#define SIZEOF_LONG_LONG 8
+typedef UINTN       size_t;
+typedef UINT32      uint32_t;
+typedef INTN        intptr_t;
+
+#ifndef offsetof
+#define offsetof OFFSET_OF
+#endif
+
+#ifdef MDE_CPU_IA32
+#define SIZEOF_VOIDP 4
+#endif
+
+#ifdef MDE_CPU_X64
+#define SIZEOF_VOIDP 8
+#endif
+
 #define calloc(n,s) AllocateZeroPool((n)*(s))
 
 #define free(p)             \
@@ -35,7 +57,6 @@ typedef UINTN size_t;
     }                       \
   } while (FALSE)
 
-#define realloc(OldPtr,NewSize,OldSize) ReallocatePool(OldSize,NewSize,OldPtr)
 #define xmemmove(Dest,Src,Length) CopyMem(Dest,Src,Length)
 #define xmemcpy(Dest,Src,Length) CopyMem(Dest,Src,Length)
 #define xmemset(Buffer,Value,Length) SetMem(Buffer,Length,Value)
@@ -44,6 +65,7 @@ typedef UINTN size_t;
 #define va_list VA_LIST
 #define va_arg(a,b) VA_ARG(a,b)
 #define va_end(a) VA_END(a)
+#define va_start VA_START
 
 #define FILE VOID
 #define stdout NULL
@@ -51,19 +73,29 @@ typedef UINTN size_t;
 #define fputs(a,b)
 #define vsnprintf (int)AsciiVSPrint
 #define _vsnprintf vsnprintf
+#define xsnprintf sprintf_s
+#define xvsnprintf  vsnprintf
+#define alloca malloc
 
 #define setlocale(a,b)
 #define LC_ALL 0
 
+#define UCHAR_MAX 255
 #define MAX_STRING_SIZE 0x1000
 #define strlen_s(String,MaxSize)            AsciiStrnLenS (String, MaxSize)
+#define xstrncpy(Dest, Src, MaxSize)        strcat_s(Dest,MaxSize,Src)
+#define xstrcat(Dest,Src,MaxSize)           strcat(Dest,Src,MaxSize)
+#define strcat(Dest,Src,MaxSize)            strcat_s(Dest,MaxSize,Src)
 #define strcat_s(Dest,MaxSize,Src)          AsciiStrCatS (Dest, MaxSize, Src)
 #define strncpy_s(Dest,MaxSize,Src,Length)  AsciiStrnCpyS (Dest, MaxSize, Src, Length)
 #define strcmp                              OnigStrCmp
 
-int OnigStrCmp (char* Str1, char* Str2);
+int OnigStrCmp (const char* Str1, const char* Str2);
 
 int EFIAPI sprintf_s (char *str, size_t sizeOfBuffer, char const *fmt, ...);
+int strlen(const char* str);
+void* malloc(size_t size);
+void* realloc(void *ptr, size_t size);
 
 #define exit(n) ASSERT(FALSE);
 
