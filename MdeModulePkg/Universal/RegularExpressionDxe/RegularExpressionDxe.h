@@ -2,6 +2,7 @@
   EFI_REGULAR_EXPRESSION_PROTOCOL Header File.
 
   (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
+  Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -10,7 +11,7 @@
 #ifndef __REGULAR_EXPRESSIONDXE_H__
 #define __REGULAR_EXPRESSIONDXE_H__
 
-#include "Oniguruma/oniguruma.h"
+#include "oniguruma/src/oniguruma.h"
 
 #include <Uefi.h>
 #include <Protocol/RegularExpressionProtocol.h>
