@@ -85,6 +85,7 @@
 
   gTcgEvent2EntryHobGuid                             ## SOMETIMES_CONSUMES  ## HOB
   gTpm2StartupLocalityHobGuid                        ## SOMETIMES_CONSUMES  ## HOB
+  gTcg800155PlatformIdEventHobGuid                   ## SOMETIMES_CONSUMES  ## HOB
 
 [Protocols]
   gEfiTcg2ProtocolGuid                               ## PRODUCES
