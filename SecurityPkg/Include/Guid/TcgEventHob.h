@@ -49,4 +49,15 @@ extern EFI_GUID gTpmErrorHobGuid;
 
 extern EFI_GUID gTpm2StartupLocalityHobGuid;
 
+///
+/// The Global ID of a GUIDed HOB used to record TCG 800-155 PlatformId Event.
+/// HOB payload is the whole TCG_Sp800_155_PlatformId_Event2 according to TCG 800-155 PlatformId Event.
+///
+#define EFI_TCG_800_155_PLATFORM_ID_EVENT_HOB_GUID \
+  { \
+    0xe2c3bc69, 0x615c, 0x4b5b, { 0x8e, 0x5c, 0xa0, 0x33, 0xa9, 0xc2, 0x5e, 0xd6 } \
+  }
+
+extern EFI_GUID gTcg800155PlatformIdEventHobGuid;
+
 #endif
