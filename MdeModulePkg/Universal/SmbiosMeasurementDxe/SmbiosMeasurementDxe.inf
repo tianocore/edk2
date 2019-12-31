@@ -11,7 +11,7 @@
 #
 # A platform may use its own policy to filter some fields in SMBIOS table.
 #
-# Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2015 - 2019, Intel Corporation. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -48,6 +48,7 @@
   UefiLib
   UefiDriverEntryPoint
   DebugLib
+  PcdLib
   TpmMeasurementLib
 
 [Protocols]
@@ -56,6 +57,9 @@
 [Guids]
   gEfiSmbiosTableGuid                               ## SOMETIMES_CONSUMES ## SystemTable
   gEfiSmbios3TableGuid                              ## SOMETIMES_CONSUMES ## SystemTable
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTcgPfpMeasurementRevision            ## CONSUMES
 
 [Depex]
   gEfiSmbiosProtocolGuid
