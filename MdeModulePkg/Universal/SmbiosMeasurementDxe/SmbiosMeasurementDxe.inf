@@ -57,6 +57,9 @@
   gEfiSmbiosTableGuid                               ## SOMETIMES_CONSUMES ## SystemTable
   gEfiSmbios3TableGuid                              ## SOMETIMES_CONSUMES ## SystemTable
 
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTcgPfpMeasurementRevision            ## CONSUMES
+
 [Depex]
   gEfiSmbiosProtocolGuid
 
