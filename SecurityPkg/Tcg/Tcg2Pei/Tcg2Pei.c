@@ -37,6 +37,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/MemoryAllocationLib.h>
 #include <Library/ReportStatusCodeLib.h>
 #include <Library/ResetSystemLib.h>
+#include <Library/PrintLib.h>
 
 #define PERF_ID_TCG2_PEI  0x3080
 
@@ -77,6 +78,18 @@ UINT32 mMeasuredBaseFvIndex = 0;
 EFI_PLATFORM_FIRMWARE_BLOB *mMeasuredChildFvInfo;
 UINT32 mMeasuredMaxChildFvIndex = 0;
 UINT32 mMeasuredChildFvIndex = 0;
+
+#pragma pack (1)
+
+#define FV_HANDOFF_TABLE_DESC  "Fv(XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX)"
+typedef struct {
+  UINT8                             BlobDescriptionSize;
+  UINT8                             BlobDescription[sizeof(FV_HANDOFF_TABLE_DESC)];
+  EFI_PHYSICAL_ADDRESS              BlobBase;
+  UINT64                            BlobLength;
+} FV_HANDOFF_TABLE_POINTERS2;
+
+#pragma pack ()
 
 /**
   Measure and record the Firmware Volume Information once FvInfoPPI install.
@@ -447,6 +460,48 @@ MeasureCRTMVersion (
            );
 }
 
+/*
+  Get the FvName from the FV header.
+
+  Causion: The FV is untrusted input.
+
+  @param[in]  FvBase            Base address of FV image.
+  @param[in]  FvLength          Length of FV image.
+
+  @return FvName pointer
+  @retval NULL   FvName is NOT found
+*/
+VOID *
+GetFvName (
+  IN EFI_PHYSICAL_ADDRESS           FvBase,
+  IN UINT64                         FvLength
+  )
+{
+  EFI_FIRMWARE_VOLUME_HEADER      *FvHeader;
+  EFI_FIRMWARE_VOLUME_EXT_HEADER  *FvExtHeader;
+
+  if (FvBase >= MAX_ADDRESS) {
+    return NULL;
+  }
+  if (FvLength >= MAX_ADDRESS - FvBase) {
+    return NULL;
+  }
+  if (FvLength < sizeof(EFI_FIRMWARE_VOLUME_HEADER)) {
+    return NULL;
+  }
+
+  FvHeader = (EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)FvBase;
+  if (FvHeader->ExtHeaderOffset < sizeof(EFI_FIRMWARE_VOLUME_HEADER)) {
+    return NULL;
+  }
+  if (FvHeader->ExtHeaderOffset + sizeof(EFI_FIRMWARE_VOLUME_EXT_HEADER) > FvLength) {
+    return NULL;
+  }
+  FvExtHeader = (EFI_FIRMWARE_VOLUME_EXT_HEADER *)(UINTN)(FvBase + FvHeader->ExtHeaderOffset);
+
+  return &FvExtHeader->FvName;
+}
+
 /**
   Measure FV image.
   Add it into the measured FV list after the FV is measured successfully.
@@ -469,6 +524,9 @@ MeasureFvImage (
   UINT32                                                Index;
   EFI_STATUS                                            Status;
   EFI_PLATFORM_FIRMWARE_BLOB                            FvBlob;
+  FV_HANDOFF_TABLE_POINTERS2                            FvBlob2;
+  VOID                                                  *EventData;
+  VOID                                                  *FvName;
   TCG_PCR_EVENT_HDR                                     TcgEventHdr;
   UINT32                                                Instance;
   UINT32                                                Tpm2HashMask;
@@ -566,11 +624,26 @@ MeasureFvImage (
   //
   // Init the log event for FV measurement
   //
-  FvBlob.BlobBase       = FvBase;
-  FvBlob.BlobLength     = FvLength;
-  TcgEventHdr.PCRIndex  = 0;
-  TcgEventHdr.EventType = EV_EFI_PLATFORM_FIRMWARE_BLOB;
-  TcgEventHdr.EventSize = sizeof (FvBlob);
+  if (PcdGet32(PcdTcgPfpMeasurementRevision) >= TCG_EfiSpecIDEventStruct_SPEC_ERRATA_TPM2_REV_105) {
+    FvBlob2.BlobDescriptionSize = sizeof(FvBlob2.BlobDescription);
+    CopyMem (FvBlob2.BlobDescription, FV_HANDOFF_TABLE_DESC, sizeof(FvBlob2.BlobDescription));
+    FvName = GetFvName (FvBase, FvLength);
+    if (FvName != NULL) {
+      AsciiSPrint ((CHAR8 *)FvBlob2.BlobDescription, sizeof(FvBlob2.BlobDescription), "Fv(%g)", FvName);
+    }
+    FvBlob2.BlobBase      = FvBase;
+    FvBlob2.BlobLength    = FvLength;
+    TcgEventHdr.EventType = EV_EFI_PLATFORM_FIRMWARE_BLOB2;
+    TcgEventHdr.EventSize = sizeof (FvBlob2);
+    EventData             = &FvBlob2;
+  } else {
+    FvBlob.BlobBase       = FvBase;
+    FvBlob.BlobLength     = FvLength;
+    TcgEventHdr.PCRIndex  = 0;
+    TcgEventHdr.EventType = EV_EFI_PLATFORM_FIRMWARE_BLOB;
+    TcgEventHdr.EventSize = sizeof (FvBlob);
+    EventData             = &FvBlob;
+  }
 
   if (Tpm2HashMask == 0) {
     //
@@ -583,9 +656,9 @@ MeasureFvImage (
                );
 
     if (!EFI_ERROR(Status)) {
-       Status = LogHashEvent (&DigestList, &TcgEventHdr, (UINT8*) &FvBlob);
-       DEBUG ((DEBUG_INFO, "The pre-hashed FV which is extended & logged by Tcg2Pei starts at: 0x%x\n", FvBlob.BlobBase));
-       DEBUG ((DEBUG_INFO, "The pre-hashed FV which is extended & logged by Tcg2Pei has the size: 0x%x\n", FvBlob.BlobLength));
+       Status = LogHashEvent (&DigestList, &TcgEventHdr, EventData);
+       DEBUG ((DEBUG_INFO, "The pre-hashed FV which is extended & logged by Tcg2Pei starts at: 0x%x\n", FvBase));
+       DEBUG ((DEBUG_INFO, "The pre-hashed FV which is extended & logged by Tcg2Pei has the size: 0x%x\n", FvLength));
     } else if (Status == EFI_DEVICE_ERROR) {
       BuildGuidHob (&gTpmErrorHobGuid,0);
       REPORT_STATUS_CODE (
@@ -599,13 +672,13 @@ MeasureFvImage (
     //
     Status = HashLogExtendEvent (
                0,
-               (UINT8*) (UINTN) FvBlob.BlobBase,
-               (UINTN) FvBlob.BlobLength,
-               &TcgEventHdr,
-               (UINT8*) &FvBlob
+               (UINT8*) (UINTN) FvBase, // HashData
+               (UINTN) FvLength,        // HashDataLen
+               &TcgEventHdr,            // EventHdr
+               EventData                // EventData
                );
-    DEBUG ((DEBUG_INFO, "The FV which is measured by Tcg2Pei starts at: 0x%x\n", FvBlob.BlobBase));
-    DEBUG ((DEBUG_INFO, "The FV which is measured by Tcg2Pei has the size: 0x%x\n", FvBlob.BlobLength));
+    DEBUG ((DEBUG_INFO, "The FV which is measured by Tcg2Pei starts at: 0x%x\n", FvBase));
+    DEBUG ((DEBUG_INFO, "The FV which is measured by Tcg2Pei has the size: 0x%x\n", FvLength));
   }
 
   if (EFI_ERROR(Status)) {
