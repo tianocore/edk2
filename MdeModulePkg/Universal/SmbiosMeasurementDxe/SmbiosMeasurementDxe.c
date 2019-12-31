@@ -577,8 +577,8 @@ MeasureSmbiosTable (
                TableAddress,            // HashData
                TableLength              // HashDataLen
                );
-    if (EFI_ERROR (Status)) {
-      return ;
+    if (!EFI_ERROR (Status)) {
+      gBS->CloseEvent (Event) ;
     }
   }
 
