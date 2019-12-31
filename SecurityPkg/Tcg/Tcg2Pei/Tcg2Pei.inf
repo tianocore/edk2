@@ -54,6 +54,7 @@
   MemoryAllocationLib
   ReportStatusCodeLib
   ResetSystemLib
+  PrintLib
 
 [Guids]
   gTcgEventEntryHobGuid                                                ## PRODUCES               ## HOB
@@ -74,6 +75,7 @@
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString              ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTcgPfpMeasurementRevision          ## CONSUMES
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid                     ## CONSUMES
   gEfiSecurityPkgTokenSpaceGuid.PcdTpm2InitializationPolicy            ## CONSUMES
   gEfiSecurityPkgTokenSpaceGuid.PcdTpm2SelfTestPolicy                  ## SOMETIMES_CONSUMES
