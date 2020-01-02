@@ -7,7 +7,7 @@
   3) RsaSetKey
   4) RsaPkcs1Verify
 
-Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2020, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -250,7 +250,7 @@ RsaSetKey (
   If RsaContext is NULL, then return FALSE.
   If MessageHash is NULL, then return FALSE.
   If Signature is NULL, then return FALSE.
-  If HashSize is not equal to the size of MD5, SHA-1 or SHA-256 digest, then return FALSE.
+  If HashSize is not equal to the size of MD5, SHA-1, SHA-256, SHA-384 or SHA-512 digest, then return FALSE.
 
   @param[in]  RsaContext   Pointer to RSA context for signature verification.
   @param[in]  MessageHash  Pointer to octet message hash to be checked.
@@ -288,7 +288,7 @@ RsaPkcs1Verify (
 
   //
   // Determine the message digest algorithm according to digest size.
-  //   Only MD5, SHA-1 or SHA-256 algorithm is supported.
+  //   Only MD5, SHA-1, SHA-256, SHA-384 or SHA-512 algorithm is supported.
   //
   switch (HashSize) {
   case MD5_DIGEST_SIZE:
@@ -301,6 +301,14 @@ RsaPkcs1Verify (
 
   case SHA256_DIGEST_SIZE:
     DigestType = NID_sha256;
+    break;
+
+  case SHA384_DIGEST_SIZE:
+    DigestType = NID_sha384;
+    break;
+
+  case SHA512_DIGEST_SIZE:
+    DigestType = NID_sha512;
     break;
 
   default:
