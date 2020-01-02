@@ -196,7 +196,7 @@ class CommitMessageCheck:
             self.error('Empty commit message!')
             return
 
-        if count >= 1 and len(lines[0]) >= 72:
+        if count >= 1 and len(lines[0].rstrip()) >= 72:
             self.error('First line of commit message (subject line) ' +
                        'is too long.')
 
