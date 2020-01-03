@@ -1,7 +1,7 @@
 /** @file
   Implementation of loading microcode on processors.
 
-  Copyright (c) 2015 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2020, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -105,12 +105,6 @@ MicrocodeDetect (
 
   CurrentRevision = GetCurrentMicrocodeSignature ();
   IsBspCallIn     = (ProcessorNumber == (UINTN)CpuMpData->BspNumber) ? TRUE : FALSE;
-  if (CurrentRevision != 0 && !IsBspCallIn) {
-    //
-    // Skip loading microcode if it has been loaded successfully
-    //
-    return;
-  }
 
   GetProcessorLocationByApicId (GetInitialApicId (), NULL, NULL, &ThreadId);
   if (ThreadId != 0) {
