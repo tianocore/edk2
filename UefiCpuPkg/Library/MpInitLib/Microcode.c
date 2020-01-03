@@ -105,12 +105,6 @@ MicrocodeDetect (
 
   CurrentRevision = GetCurrentMicrocodeSignature ();
   IsBspCallIn     = (ProcessorNumber == (UINTN)CpuMpData->BspNumber) ? TRUE : FALSE;
-  if (CurrentRevision != 0 && !IsBspCallIn) {
-    //
-    // Skip loading microcode if it has been loaded successfully
-    //
-    return;
-  }
 
   GetProcessorLocationByApicId (GetInitialApicId (), NULL, NULL, &ThreadId);
   if (ThreadId != 0) {
