@@ -1,7 +1,7 @@
 /** @file
   Common header file for MP Initialize Library.
 
-  Copyright (c) 2016 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2020, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -54,7 +54,6 @@
 typedef struct {
   UINTN    Address;
   UINTN    Size;
-  UINTN    AlignedSize;
 } MICROCODE_PATCH_INFO;
 
 //
