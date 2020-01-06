@@ -102,24 +102,6 @@ ResetShutdown (
 
 
 /**
-  Calling this function causes the system to enter a power state for capsule
-  update.
-
-  Reset update should not return, if it returns, it means the system does
-  not support capsule update.
-
-**/
-VOID
-EFIAPI
-EnterS3WithImmediateWake (
-  VOID
-  )
-{
-  AcpiPmControl (1);
-  ASSERT (FALSE);
-}
-
-/**
   This function causes a systemwide reset. The exact type of the reset is
   defined by the EFI_GUID that follows the Null-terminated Unicode string passed
   into ResetData. If the platform does not recognize the EFI_GUID in ResetData
