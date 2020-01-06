@@ -797,6 +797,30 @@ SdCardIdentification (
   );
 
 /**
+  SD/MMC card clock supply.
+
+  Refer to SD Host Controller Simplified spec 3.0 Section 3.2.1 for details.
+
+  @param[in] Private         A pointer to the SD_MMC_HC_PRIVATE_DATA instance.
+  @param[in] Slot            The slot number of the SD card to send the command to.
+  @param[in] BusTiming       BusTiming at which the frequency change is done.
+  @param[in] FirstTimeSetup  Flag to indicate whether the clock is being setup for the first time.
+  @param[in] ClockFreq       The max clock frequency to be set. The unit is KHz.
+
+  @retval EFI_SUCCESS       The clock is supplied successfully.
+  @retval Others            The clock isn't supplied successfully.
+
+**/
+EFI_STATUS
+SdMmcHcClockSupply (
+  IN SD_MMC_HC_PRIVATE_DATA  *Private,
+  IN UINT8                   Slot,
+  IN SD_MMC_BUS_MODE         BusTiming,
+  IN BOOLEAN                 FirstTimeSetup,
+  IN UINT64                  ClockFreq
+  );
+
+/**
   Software reset the specified SD/MMC host controller.
 
   @param[in] Private        A pointer to the SD_MMC_HC_PRIVATE_DATA instance.
