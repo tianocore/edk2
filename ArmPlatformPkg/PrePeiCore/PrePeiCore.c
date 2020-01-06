@@ -77,6 +77,11 @@ CEntryPoint (
   ASSERT (((UINTN)PeiVectorTable & ARM_VECTOR_TABLE_ALIGNMENT) == 0);
   ArmWriteVBar ((UINTN)PeiVectorTable);
 
+  // Enable Floating Point
+  if (FixedPcdGet32 (PcdVFPEnabled)) {
+    ArmEnableVFP ();
+  }
+
   //Note: The MMU will be enabled by MemoryPeim. Only the primary core will have the MMU on.
 
   // If not primary Jump to Secondary Main
