@@ -78,10 +78,6 @@
   # Define if the GICv3 controller should use the GICv2 legacy
   gArmTokenSpaceGuid.PcdArmGicV3WithV2Legacy|FALSE|BOOLEAN|0x00000042
 
-  # Whether to implement warm reboot for capsule update using a jump back to the
-  # PEI entry point with caches and interrupts disabled.
-  gArmTokenSpaceGuid.PcdArmReenterPeiForCapsuleWarmReboot|FALSE|BOOLEAN|0x0000001F
-
 [PcdsFeatureFlag.ARM]
   # Whether to map normal memory as non-shareable. FALSE is the safe choice, but
   # TRUE may be appropriate to fix performance problems if you don't care about
