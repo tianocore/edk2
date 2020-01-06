@@ -2003,6 +2003,14 @@
   # @Prompt Capsule On Disk relocation device path.
   gEfiMdeModulePkgTokenSpaceGuid.PcdCodRelocationDevPath|{0xFF}|VOID*|0x0000002f
 
+  ## Indicates which TCG Platform Firmware Profile revision the EDKII firmware follows.
+  #  The revision number is defined in MdePkg/Include/IndustryStandard/UefiTcgPlatform.h
+  #  0:   This is for compatiblity support.
+  #  105: This is the first revision to support 800-155 is related event, such as
+  #       EV_EFI_PLATFORM_FIRMWARE_BLOB2 and EV_EFI_HANDOFF_TABLES2.
+  # @Prompt TCG Platform Firmware Profile revision.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTcgPfpMeasurementRevision|0|UINT32|0x00010077
+
 [PcdsPatchableInModule]
   ## Specify memory size with page number for PEI code when
   #  Loading Module at Fixed Address feature is enabled.

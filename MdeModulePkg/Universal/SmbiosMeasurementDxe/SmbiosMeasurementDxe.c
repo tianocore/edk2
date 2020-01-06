@@ -1,7 +1,7 @@
 /** @file
   This driver measures SMBIOS table to TPM.
 
-Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2019, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -20,6 +20,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/PcdLib.h>
 #include <Library/TpmMeasurementLib.h>
 
 #define FIELD_SIZE_OF(TYPE, Field) ((UINTN)sizeof(((TYPE *)0)->Field))
@@ -107,6 +108,18 @@ SMBIOS_FILTER_STRUCT  mSmbiosFilterStandardTableBlackList[] = {
 
 EFI_SMBIOS_PROTOCOL *mSmbios;
 UINTN               mMaxLen;
+
+#pragma pack (1)
+
+#define SMBIOS_HANDOFF_TABLE_DESC  "SmbiosTable"
+typedef struct {
+  UINT8                             TableDescriptionSize;
+  UINT8                             TableDescription[sizeof(SMBIOS_HANDOFF_TABLE_DESC)];
+  UINT64                            NumberOfTables;
+  EFI_CONFIGURATION_TABLE           TableEntry[1];
+} SMBIOS_HANDOFF_TABLE_POINTERS2;
+
+#pragma pack ()
 
 /**
 
@@ -460,6 +473,10 @@ MeasureSmbiosTable (
 {
   EFI_STATUS                        Status;
   EFI_HANDOFF_TABLE_POINTERS        HandoffTables;
+  SMBIOS_HANDOFF_TABLE_POINTERS2    SmbiosHandoffTables2;
+  UINT32                            EventType;
+  VOID                              *EventLog;
+  UINT32                            EventLogSize;
   SMBIOS_TABLE_ENTRY_POINT          *SmbiosTable;
   SMBIOS_TABLE_3_0_ENTRY_POINT      *Smbios3Table;
   VOID                              *SmbiosTableAddress;
@@ -569,16 +586,29 @@ MeasureSmbiosTable (
       CopyGuid (&(HandoffTables.TableEntry[0].VendorGuid), &gEfiSmbiosTableGuid);
       HandoffTables.TableEntry[0].VendorTable = SmbiosTable;
     }
+    EventType = EV_EFI_HANDOFF_TABLES;
+    EventLog = &HandoffTables;
+    EventLogSize = sizeof (HandoffTables);
+
+    if (PcdGet32(PcdTcgPfpMeasurementRevision) >= TCG_EfiSpecIDEventStruct_SPEC_ERRATA_TPM2_REV_105) {
+      SmbiosHandoffTables2.TableDescriptionSize = sizeof(SmbiosHandoffTables2.TableDescription);
+      CopyMem (SmbiosHandoffTables2.TableDescription, SMBIOS_HANDOFF_TABLE_DESC, sizeof(SmbiosHandoffTables2.TableDescription));
+      SmbiosHandoffTables2.NumberOfTables = HandoffTables.NumberOfTables;
+      CopyMem (&(SmbiosHandoffTables2.TableEntry[0]), &(HandoffTables.TableEntry[0]), sizeof(SmbiosHandoffTables2.TableEntry[0]));
+      EventType = EV_EFI_HANDOFF_TABLES2;
+      EventLog = &SmbiosHandoffTables2;
+      EventLogSize = sizeof (SmbiosHandoffTables2);
+    }
     Status = TpmMeasureAndLogData (
                1,                       // PCRIndex
-               EV_EFI_HANDOFF_TABLES,   // EventType
-               &HandoffTables,          // EventLog
-               sizeof (HandoffTables),  // LogLen
+               EventType,               // EventType
+               EventLog,                // EventLog
+               EventLogSize,            // LogLen
                TableAddress,            // HashData
                TableLength              // HashDataLen
                );
-    if (EFI_ERROR (Status)) {
-      return ;
+    if (!EFI_ERROR (Status)) {
+      gBS->CloseEvent (Event) ;
     }
   }
 
