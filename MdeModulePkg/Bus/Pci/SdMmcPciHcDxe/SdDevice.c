@@ -1145,27 +1145,9 @@ SdCardSetBusMode (
     return Status;
   }
 
-  Status = SdMmcHcClockSupply (PciIo, Slot, BusMode.ClockFreq * 1000, Private->BaseClkFreq[Slot], Private->ControllerVersion[Slot]);
+  Status = SdMmcHcClockSupply (Private, Slot, BusMode.BusTiming, FALSE, BusMode.ClockFreq * 1000);
   if (EFI_ERROR (Status)) {
     return Status;
-  }
-
-  if (mOverride != NULL && mOverride->NotifyPhase != NULL) {
-    Status = mOverride->NotifyPhase (
-                          Private->ControllerHandle,
-                          Slot,
-                          EdkiiSdMmcSwitchClockFreqPost,
-                          &BusMode.BusTiming
-                          );
-    if (EFI_ERROR (Status)) {
-      DEBUG ((
-        DEBUG_ERROR,
-        "%a: SD/MMC switch clock freq post notifier callback failed - %r\n",
-        __FUNCTION__,
-        Status
-        ));
-      return Status;
-    }
   }
 
   if ((BusMode.BusTiming == SdMmcUhsSdr104) || ((BusMode.BusTiming == SdMmcUhsSdr50) && (Capability->TuningSDR50 != 0))) {
@@ -1345,7 +1327,10 @@ SdCardIdentification (
         goto Error;
       }
 
-      SdMmcHcInitClockFreq (PciIo, Slot, Private->BaseClkFreq[Slot], Private->ControllerVersion[Slot]);
+      Status = SdMmcHcStartSdClock (PciIo, Slot);
+      if (EFI_ERROR (Status)) {
+        goto Error;
+      }
 
       gBS->Stall (1000);
 

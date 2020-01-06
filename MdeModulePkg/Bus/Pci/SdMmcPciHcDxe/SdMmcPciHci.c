@@ -759,15 +759,39 @@ SdMmcHcStopClock (
 }
 
 /**
+  Start the SD clock.
+
+  @param[in] PciIo  The PCI IO protocol instance.
+  @param[in] Slot   The slot number.
+
+  @retval EFI_SUCCESS  Succeeded to start the SD clock.
+  @rtval  Others       Failed to start the SD clock.
+**/
+EFI_STATUS
+SdMmcHcStartSdClock (
+  IN EFI_PCI_IO_PROTOCOL  *PciIo,
+  IN UINT8                Slot
+  )
+{
+  UINT16                    ClockCtrl;
+
+  //
+  // Set SD Clock Enable in the Clock Control register to 1
+  //
+  ClockCtrl = BIT2;
+  return SdMmcHcOrMmio (PciIo, Slot, SD_MMC_HC_CLOCK_CTRL, sizeof (ClockCtrl), &ClockCtrl);
+}
+
+/**
   SD/MMC card clock supply.
 
   Refer to SD Host Controller Simplified spec 3.0 Section 3.2.1 for details.
 
-  @param[in] PciIo          The PCI IO protocol instance.
-  @param[in] Slot           The slot number of the SD card to send the command to.
-  @param[in] ClockFreq      The max clock frequency to be set. The unit is KHz.
-  @param[in] BaseClkFreq    The base clock frequency of host controller in MHz.
-  @param[in] ControllerVer  The version of host controller.
+  @param[in] Private         A pointer to the SD_MMC_HC_PRIVATE_DATA instance.
+  @param[in] Slot            The slot number of the SD card to send the command to.
+  @param[in] BusTiming       BusTiming at which the frequency change is done.
+  @param[in] FirstTimeSetup  Flag to indicate whether the clock is being setup for the first time.
+  @param[in] ClockFreq       The max clock frequency to be set. The unit is KHz.
 
   @retval EFI_SUCCESS       The clock is supplied successfully.
   @retval Others            The clock isn't supplied successfully.
@@ -775,11 +799,11 @@ SdMmcHcStopClock (
 **/
 EFI_STATUS
 SdMmcHcClockSupply (
-  IN EFI_PCI_IO_PROTOCOL    *PciIo,
-  IN UINT8                  Slot,
-  IN UINT64                 ClockFreq,
-  IN UINT32                 BaseClkFreq,
-  IN UINT16                 ControllerVer
+  IN SD_MMC_HC_PRIVATE_DATA  *Private,
+  IN UINT8                   Slot,
+  IN SD_MMC_BUS_MODE         BusTiming,
+  IN BOOLEAN                 FirstTimeSetup,
+  IN UINT64                  ClockFreq
   )
 {
   EFI_STATUS                Status;
@@ -787,13 +811,15 @@ SdMmcHcClockSupply (
   UINT32                    Divisor;
   UINT32                    Remainder;
   UINT16                    ClockCtrl;
+  UINT32                    BaseClkFreq;
+  UINT16                    ControllerVer;
+  EFI_PCI_IO_PROTOCOL       *PciIo;
 
-  //
-  // Calculate a divisor for SD clock frequency
-  //
-  ASSERT (BaseClkFreq != 0);
+  PciIo = Private->PciIo;
+  BaseClkFreq = Private->BaseClkFreq[Slot];
+  ControllerVer = Private->ControllerVersion[Slot];
 
-  if (ClockFreq == 0) {
+  if (BaseClkFreq == 0 || ClockFreq == 0) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -877,11 +903,33 @@ SdMmcHcClockSupply (
     return Status;
   }
 
+  Status = SdMmcHcStartSdClock (PciIo, Slot);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
   //
-  // Set SD Clock Enable in the Clock Control register to 1
+  // We don't notify the platform on first time setup to avoid changing
+  // legacy behavior. During first time setup we also don't know what type
+  // of the card slot it is and which enum value of BusTiming applies.
   //
-  ClockCtrl = BIT2;
-  Status = SdMmcHcOrMmio (PciIo, Slot, SD_MMC_HC_CLOCK_CTRL, sizeof (ClockCtrl), &ClockCtrl);
+  if (!FirstTimeSetup && mOverride != NULL && mOverride->NotifyPhase != NULL) {
+    Status = mOverride->NotifyPhase (
+                          Private->ControllerHandle,
+                          Slot,
+                          EdkiiSdMmcSwitchClockFreqPost,
+                          &BusTiming
+                          );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: SD/MMC switch clock freq post notifier callback failed - %r\n",
+        __FUNCTION__,
+        Status
+        ));
+      return Status;
+    }
+  }
 
   return Status;
 }
@@ -1039,49 +1087,6 @@ SdMmcHcInitV4Enhancements (
 }
 
 /**
-  Supply SD/MMC card with lowest clock frequency at initialization.
-
-  @param[in] PciIo          The PCI IO protocol instance.
-  @param[in] Slot           The slot number of the SD card to send the command to.
-  @param[in] BaseClkFreq    The base clock frequency of host controller in MHz.
-  @param[in] ControllerVer  The version of host controller.
-
-  @retval EFI_SUCCESS       The clock is supplied successfully.
-  @retval Others            The clock isn't supplied successfully.
-
-**/
-EFI_STATUS
-SdMmcHcInitClockFreq (
-  IN EFI_PCI_IO_PROTOCOL    *PciIo,
-  IN UINT8                  Slot,
-  IN UINT32                 BaseClkFreq,
-  IN UINT16                 ControllerVer
-  )
-{
-  EFI_STATUS                Status;
-  UINT32                    InitFreq;
-
-  //
-  // According to SDHCI specification ver. 4.2, BaseClkFreq field value of
-  // the Capability Register 1 can be zero, which means a need for obtaining
-  // the clock frequency via another method. Fail in case it is not updated
-  // by SW at this point.
-  //
-  if (BaseClkFreq == 0) {
-    //
-    // Don't support get Base Clock Frequency information via another method
-    //
-    return EFI_UNSUPPORTED;
-  }
-  //
-  // Supply 400KHz clock frequency at initialization phase.
-  //
-  InitFreq = 400;
-  Status = SdMmcHcClockSupply (PciIo, Slot, InitFreq, BaseClkFreq, ControllerVer);
-  return Status;
-}
-
-/**
   Supply SD/MMC card with maximum voltage at initialization.
 
   Refer to SD Host Controller Simplified spec 3.0 Section 3.3 for details.
@@ -1216,7 +1221,14 @@ SdMmcHcInitHost (
     return Status;
   }
 
-  Status = SdMmcHcInitClockFreq (PciIo, Slot, Private->BaseClkFreq[Slot], Private->ControllerVersion[Slot]);
+  //
+  // Perform first time clock setup with 400 KHz frequency.
+  // We send the 0 as the BusTiming value because at this time
+  // we still do not know the slot type and which enum value will apply.
+  // Since it is a first time setup SdMmcHcClockSupply won't notify
+  // the platofrm driver anyway so it doesn't matter.
+  //
+  Status = SdMmcHcClockSupply (Private, Slot, 0, TRUE, 400);
   if (EFI_ERROR (Status)) {
     return Status;
   }
