@@ -77,9 +77,8 @@ DxeRuntimeDebugLibSerialPortConstructor (
     return Status;
   }
 
-  return SystemTable->BootServices->CreateEventEx (EVT_NOTIFY_SIGNAL,
+  return SystemTable->BootServices->CreateEvent (EVT_SIGNAL_EXIT_BOOT_SERVICES,
                                       TPL_NOTIFY, ExitBootServicesEvent, NULL,
-                                      &gEfiEventExitBootServicesGuid,
                                       &mEfiExitBootServicesEvent);
 }
 

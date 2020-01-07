@@ -124,12 +124,11 @@ DxeRuntimePciExpressLibConstructor (
   //
   // Register SetVirtualAddressMap () notify function
   //
-  Status = gBS->CreateEventEx (
-                  EVT_NOTIFY_SIGNAL,
+  Status = gBS->CreateEvent (
+                  EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE,
                   TPL_NOTIFY,
                   DxeRuntimePciExpressLibVirtualNotify,
                   NULL,
-                  &gEfiEventVirtualAddressChangeGuid,
                   &mDxeRuntimePciExpressLibVirtualNotifyEvent
                   );
   ASSERT_EFI_ERROR (Status);
