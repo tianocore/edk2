@@ -46,9 +46,6 @@
   PrintLib
   DebugPrintErrorLevelLib
 
-[Guids]
-  gEfiEventExitBootServicesGuid                 ## CONSUMES
-
 [Protocols]
   gEfiDebugPortProtocolGuid                     ## CONSUMES
 

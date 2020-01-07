@@ -64,12 +64,11 @@ DxeDebugLibConstructor(
 {
   mDebugST = SystemTable;
 
-  SystemTable->BootServices->CreateEventEx (
-                                EVT_NOTIFY_SIGNAL,
+  SystemTable->BootServices->CreateEvent (
+                                EVT_SIGNAL_EXIT_BOOT_SERVICES,
                                 TPL_NOTIFY,
                                 ExitBootServicesCallback,
                                 NULL,
-                                &gEfiEventExitBootServicesGuid,
                                 &mExitBootServicesEvent
                                 );
 

@@ -39,8 +39,3 @@
   UefiBootServicesTableLib
   UefiRuntimeServicesTableLib
   DebugLib
-
-[Guids]
-  gEfiEventExitBootServicesGuid             ## CONSUMES ## Event
-  gEfiEventVirtualAddressChangeGuid         ## CONSUMES ## Event
-

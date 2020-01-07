@@ -93,23 +93,21 @@ RuntimeDriverLibConstruct (
   //
   // Register SetVirtualAddressMap () notify function
   //
-  Status = gBS->CreateEventEx (
-                  EVT_NOTIFY_SIGNAL,
+  Status = gBS->CreateEvent (
+                  EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE,
                   TPL_NOTIFY,
                   RuntimeLibVirtualNotifyEvent,
                   NULL,
-                  &gEfiEventVirtualAddressChangeGuid,
                   &mEfiVirtualNotifyEvent
                   );
 
   ASSERT_EFI_ERROR (Status);
 
-  Status = gBS->CreateEventEx (
-                  EVT_NOTIFY_SIGNAL,
+  Status = gBS->CreateEvent (
+                  EVT_SIGNAL_EXIT_BOOT_SERVICES,
                   TPL_NOTIFY,
                   RuntimeLibExitBootServicesEvent,
                   NULL,
-                  &gEfiEventExitBootServicesGuid,
                   &mEfiExitBootServicesEvent
                   );
 
