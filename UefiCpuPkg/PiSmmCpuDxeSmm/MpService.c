@@ -137,7 +137,7 @@ ReleaseAllAPs (
 {
   UINTN                             Index;
 
-  for (Index = 0; Index < mMaxNumberOfCpus; Index++) {
+  for (Index = mMaxNumberOfCpus; Index-- > 0;) {
     if (IsPresentAp (Index)) {
       ReleaseSemaphore (mSmmMpSyncData->CpuData[Index].Run);
     }
@@ -170,7 +170,7 @@ AllCpusInSmmWithExceptions (
 
   CpuData = mSmmMpSyncData->CpuData;
   ProcessorInfo = gSmmCpuPrivate->ProcessorInfo;
-  for (Index = 0; Index < mMaxNumberOfCpus; Index++) {
+  for (Index = mMaxNumberOfCpus; Index-- > 0;) {
     if (!(*(CpuData[Index].Present)) && ProcessorInfo[Index].ProcessorId != INVALID_APIC_ID) {
       if (((Exceptions & ARRIVAL_EXCEPTION_DELAYED) != 0) && SmmCpuFeaturesGetSmmRegister (Index, SmmRegSmmDelayed) != 0) {
         continue;
@@ -305,7 +305,7 @@ SmmWaitForApArrival (
     //
     // Send SMI IPIs to bring outside processors in
     //
-    for (Index = 0; Index < mMaxNumberOfCpus; Index++) {
+    for (Index = mMaxNumberOfCpus; Index-- > 0;) {
       if (!(*(mSmmMpSyncData->CpuData[Index].Present)) && gSmmCpuPrivate->ProcessorInfo[Index].ProcessorId != INVALID_APIC_ID) {
         SendSmiIpi ((UINT32)gSmmCpuPrivate->ProcessorInfo[Index].ProcessorId);
       }
@@ -361,7 +361,7 @@ WaitForAllAPsNotBusy (
 {
   UINTN                             Index;
 
-  for (Index = 0; Index < mMaxNumberOfCpus; Index++) {
+  for (Index = mMaxNumberOfCpus; Index-- > 0;) {
     //
     // Ignore BSP and APs which not call in SMM.
     //
@@ -608,7 +608,7 @@ BSPHandler (
     //
     while (TRUE) {
       PresentCount = 0;
-      for (Index = 0; Index < mMaxNumberOfCpus; Index++) {
+      for (Index = mMaxNumberOfCpus; Index-- > 0;) {
         if (*(mSmmMpSyncData->CpuData[Index].Present)) {
           PresentCount ++;
         }
@@ -1343,7 +1343,7 @@ InternalSmmStartupAllAPs (
   }
 
   CpuCount = 0;
-  for (Index = 0; Index < mMaxNumberOfCpus; Index++) {
+  for (Index = mMaxNumberOfCpus; Index-- > 0;) {
     if (IsPresentAp (Index)) {
       CpuCount ++;
 
@@ -1375,13 +1375,13 @@ InternalSmmStartupAllAPs (
   // Here code always use AcquireSpinLock instead of AcquireSpinLockOrFail for not
   // block mode.
   //
-  for (Index = 0; Index < mMaxNumberOfCpus; Index++) {
+  for (Index = mMaxNumberOfCpus; Index-- > 0;) {
     if (IsPresentAp (Index)) {
       AcquireSpinLock (mSmmMpSyncData->CpuData[Index].Busy);
     }
   }
 
-  for (Index = 0; Index < mMaxNumberOfCpus; Index++) {
+  for (Index = mMaxNumberOfCpus; Index-- > 0;) {
     if (IsPresentAp (Index)) {
       mSmmMpSyncData->CpuData[Index].Procedure = (EFI_AP_PROCEDURE2) Procedure;
       mSmmMpSyncData->CpuData[Index].Parameter = ProcedureArguments;
