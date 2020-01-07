@@ -46,9 +46,6 @@
   PrintLib
   DebugPrintErrorLevelLib
 
-[Guids]
-  gEfiEventExitBootServicesGuid                 ## CONSUMES
-
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue        ## SOMETIMES_CONSUMES
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask            ## CONSUMES

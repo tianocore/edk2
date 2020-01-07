@@ -41,9 +41,6 @@
   PrintLib
   SerialPortLib
 
-[Guids]
-  gEfiEventExitBootServicesGuid                         ## CONSUMES ## Event
-
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue     ## SOMETIMES_CONSUMES
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask         ## CONSUMES
