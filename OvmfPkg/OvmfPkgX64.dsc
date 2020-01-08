@@ -643,9 +643,6 @@
       NULL|SecurityPkg/Library/HashInstanceLibSha512/HashInstanceLibSha512.inf
       NULL|SecurityPkg/Library/HashInstanceLibSm3/HashInstanceLibSm3.inf
   }
-!if $(TPM2_CONFIG_ENABLE) == TRUE
-  SecurityPkg/Tcg/Tcg2Config/Tcg2ConfigDxe.inf
-!endif
 !endif
 
   #
@@ -914,6 +911,9 @@
   }
 !endif
 
+  #
+  # TPM2 support
+  #
 !if $(TPM2_ENABLE) == TRUE
   SecurityPkg/Tcg/Tcg2Dxe/Tcg2Dxe.inf {
     <LibraryClasses>
@@ -926,4 +926,7 @@
       NULL|SecurityPkg/Library/HashInstanceLibSha512/HashInstanceLibSha512.inf
       NULL|SecurityPkg/Library/HashInstanceLibSm3/HashInstanceLibSm3.inf
   }
+!if $(TPM2_CONFIG_ENABLE) == TRUE
+  SecurityPkg/Tcg/Tcg2Config/Tcg2ConfigDxe.inf
+!endif
 !endif
