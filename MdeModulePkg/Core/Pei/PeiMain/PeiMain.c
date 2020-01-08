@@ -418,6 +418,22 @@ PeiCore (
       ProcessPpiListFromSec ((CONST EFI_PEI_SERVICES **) &PrivateData.Ps, PpiList);
     }
   } else {
+    if (
+      (!(PrivateData.HobList.HandoffInformationTable->BootMode == BOOT_ON_S3_RESUME) && PcdGetBool (PcdShadowPeimOnBoot)) ||
+      ((PrivateData.HobList.HandoffInformationTable->BootMode == BOOT_ON_S3_RESUME) && PcdGetBool (PcdShadowPeimOnS3Boot))
+      ) {
+      DEBUG ((DEBUG_VERBOSE, "PPI lists before temporary RAM evacuation:\n"));
+      DumpPpiList (&PrivateData);
+
+      //
+      // Migrate installed content from Temporary RAM to Permanent RAM
+      //
+      EvacuateTempRam (&PrivateData, SecCoreData);
+
+      DEBUG ((DEBUG_VERBOSE, "PPI lists after temporary RAM evacuation:\n"));
+      DumpPpiList (&PrivateData);
+    }
+
     //
     // Try to locate Temporary RAM Done Ppi.
     //
