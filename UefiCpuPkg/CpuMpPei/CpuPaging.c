@@ -604,12 +604,6 @@ MemoryDiscoveredPpiNotifyCallback (
 {
   EFI_STATUS      Status;
   BOOLEAN         InitStackGuard;
-  BOOLEAN         InterruptState;
-
-  InterruptState = SaveAndDisableInterrupts ();
-  Status = MigrateGdt ();
-  ASSERT_EFI_ERROR (Status);
-  SetInterruptState (InterruptState);
 
   //
   // Paging must be setup first. Otherwise the exception TSS setup during MP
