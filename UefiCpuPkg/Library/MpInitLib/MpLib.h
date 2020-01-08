@@ -29,6 +29,9 @@
 #include <Library/MtrrLib.h>
 #include <Library/HobLib.h>
 
+#include <IndustryStandard/FirmwareInterfaceTable.h>
+
+
 #define WAKEUP_AP_SIGNAL SIGNATURE_32 ('S', 'T', 'A', 'P')
 
 #define CPU_INIT_MP_LIB_HOB_GUID \
@@ -587,12 +590,12 @@ MicrocodeDetect (
   );
 
 /**
-  Load the required microcode patches data into memory.
+  Shadow the required microcode patches data into memory.
 
   @param[in, out]  CpuMpData    The pointer to CPU MP Data structure.
 **/
 VOID
-LoadMicrocodePatch (
+ShadowMicrocodeUpdatePatch (
   IN OUT CPU_MP_DATA             *CpuMpData
   );
 
