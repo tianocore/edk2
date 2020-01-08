@@ -185,6 +185,22 @@ Dump8Chars (
   );
 
 /**
+  This function traces 12 characters which can be optionally
+  formated using the format string if specified.
+
+  If no format string is specified the Format must be NULL.
+
+  @param [in] Format  Optional format string for tracing the data.
+  @param [in] Ptr     Pointer to the start of the buffer.
+**/
+VOID
+EFIAPI
+Dump12Chars (
+  IN CONST CHAR16* Format OPTIONAL,
+  IN       UINT8*  Ptr
+  );
+
+/**
   This function indents and prints the ACPI table Field Name.
 
   @param [in] Indent      Number of spaces to add to the global table
