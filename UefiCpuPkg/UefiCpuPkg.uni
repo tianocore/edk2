@@ -100,6 +100,12 @@
                                                                                            "TRUE  - locked.<BR>\n"
                                                                                            "FALSE - unlocked.<BR>"
 
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuShadowMicrocodeByFit_PROMPT  #language en-US "FIT based microcode shadowing"
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuShadowMicrocodeByFit_HELP  #language en-US "Indicates if FIT based microcode shadowing will be enabled.<BR><BR>\n"
+                                                                                       "TRUE  - FIT base microcode shadowing will be enabled.<BR>\n"
+                                                                                       "FALSE - FIT base microcode shadowing will be disabled.<BR>"
+
 #string STR_gUefiCpuPkgTokenSpaceGuid_PcdPeiTemporaryRamStackSize_PROMPT  #language en-US "Stack size in the temporary RAM"
 
 #string STR_gUefiCpuPkgTokenSpaceGuid_PcdPeiTemporaryRamStackSize_HELP  #language en-US "Specifies stack size in the temporary RAM. 0 means half of TemporaryRamSize."

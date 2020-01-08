@@ -139,6 +139,12 @@
   # @Prompt Lock SMM Feature Control MSR.
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmFeatureControlMsrLock|TRUE|BOOLEAN|0x3213210B
 
+  ## Indicates if FIT based microcode shadowing will be enabled.<BR><BR>
+  #   TRUE  - FIT base microcode shadowing will be enabled.<BR>
+  #   FALSE - FIT base microcode shadowing will be disabled.<BR>
+  # @Prompt FIT based microcode shadowing.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuShadowMicrocodeByFit|FALSE|BOOLEAN|0x3213210D
+
 [PcdsFixedAtBuild]
   ## List of exception vectors which need switching stack.
   #  This PCD will only take into effect if PcdCpuStackGuard is enabled.

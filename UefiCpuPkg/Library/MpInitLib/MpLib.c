@@ -1,7 +1,7 @@
 /** @file
   CPU MP Initialize Library common functions.
 
-  Copyright (c) 2016 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2020, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -1744,7 +1744,7 @@ MpInitLibInitialize (
     //
     // Load required microcode patches data into memory
     //
-    LoadMicrocodePatch (CpuMpData);
+    ShadowMicrocodeUpdatePatch (CpuMpData);
   } else {
     //
     // APs have been wakeup before, just get the CPU Information
