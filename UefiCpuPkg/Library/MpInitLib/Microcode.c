@@ -391,16 +391,7 @@ LoadMicrocodePatchWorker (
       Patches[Index].Size
       );
 
-    //
-    // Zero-fill the padding area
-    // Please note that AlignedSize will be no less than Size
-    //
-    ZeroMem (
-      Walker + Patches[Index].Size,
-      Patches[Index].AlignedSize - Patches[Index].Size
-      );
-
-    Walker += Patches[Index].AlignedSize;
+    Walker += Patches[Index].Size;
   }
 
   //
@@ -572,14 +563,9 @@ LoadMicrocodePatch (
       //
       // Store the information of this microcode patch
       //
-      if (TotalSize > ALIGN_VALUE (TotalSize, SIZE_1KB) ||
-          ALIGN_VALUE (TotalSize, SIZE_1KB) > MAX_UINTN - TotalLoadSize) {
-        goto OnExit;
-      }
-      PatchInfoBuffer[PatchCount - 1].Address     = (UINTN) MicrocodeEntryPoint;
-      PatchInfoBuffer[PatchCount - 1].Size        = TotalSize;
-      PatchInfoBuffer[PatchCount - 1].AlignedSize = ALIGN_VALUE (TotalSize, SIZE_1KB);
-      TotalLoadSize += PatchInfoBuffer[PatchCount - 1].AlignedSize;
+      PatchInfoBuffer[PatchCount - 1].Address = (UINTN) MicrocodeEntryPoint;
+      PatchInfoBuffer[PatchCount - 1].Size    = TotalSize;
+      TotalLoadSize += TotalSize;
     }
 
     //
