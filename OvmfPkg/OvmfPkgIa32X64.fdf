@@ -350,6 +350,9 @@ INF  MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
 INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
 !endif
 
+#
+# TPM2 support
+#
 !if $(TPM2_ENABLE) == TRUE
 INF  SecurityPkg/Tcg/Tcg2Dxe/Tcg2Dxe.inf
 !if $(TPM2_CONFIG_ENABLE) == TRUE
