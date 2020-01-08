@@ -1348,7 +1348,7 @@ HttpResponseWorker (
     //
     // Process the received the body packet.
     //
-    HttpMsg->BodyLength = MIN (Fragment.Len, (UINT32) HttpMsg->BodyLength);
+    HttpMsg->BodyLength = MIN ((UINTN) Fragment.Len, HttpMsg->BodyLength);
 
     CopyMem (HttpMsg->Body, Fragment.Bulk, HttpMsg->BodyLength);
 
