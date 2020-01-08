@@ -68,6 +68,8 @@
   ## SOMETIMES_CONSUMES
   gPeiSecPerformancePpiGuid
   gEfiPeiCoreFvLocationPpiGuid
+  ## CONSUMES
+  gRepublishSecPpiPpiGuid
 
 [Guids]
   ## SOMETIMES_PRODUCES   ## HOB
