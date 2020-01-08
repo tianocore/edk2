@@ -1387,6 +1387,37 @@ BmExpandLoadFile (
   //
   FileBuffer = AllocateReservedPages (EFI_SIZE_TO_PAGES (BufferSize));
   if (FileBuffer == NULL) {
+    DEBUG_CODE (
+      EFI_DEVICE_PATH *LoadFilePath;
+      CHAR16          *LoadFileText;
+      CHAR16          *FileText;
+
+      LoadFilePath = DevicePathFromHandle (LoadFileHandle);
+      if (LoadFilePath == NULL) {
+        LoadFileText = NULL;
+      } else {
+        LoadFileText = ConvertDevicePathToText (LoadFilePath, FALSE, FALSE);
+      }
+      FileText = ConvertDevicePathToText (FilePath, FALSE, FALSE);
+
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a:%a: failed to allocate reserved pages: "
+        "BufferSize=%Lu LoadFile=\"%s\" FilePath=\"%s\"\n",
+        gEfiCallerBaseName,
+        __FUNCTION__,
+        (UINT64)BufferSize,
+        LoadFileText,
+        FileText
+        ));
+
+      if (FileText != NULL) {
+        FreePool (FileText);
+      }
+      if (LoadFileText != NULL) {
+        FreePool (LoadFileText);
+      }
+      );
     return NULL;
   }
 
