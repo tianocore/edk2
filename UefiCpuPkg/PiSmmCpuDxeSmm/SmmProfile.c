@@ -657,11 +657,9 @@ InitPaging (
             Pt = AllocatePageTableMemory (1);
             ASSERT (Pt != NULL);
 
-            *Pd = (UINTN) Pt | IA32_PG_RW | IA32_PG_P;
-
             // Split it
-            for (PtIndex = 0; PtIndex < SIZE_4KB / sizeof(*Pt); PtIndex++, Pt++) {
-              *Pt = Address + ((PtIndex << 12) | mAddressEncMask | PAGE_ATTRIBUTE_BITS);
+            for (PtIndex = 0; PtIndex < SIZE_4KB / sizeof(*Pt); PtIndex++) {
+              Pt[PtIndex] = Address + ((PtIndex << 12) | mAddressEncMask | PAGE_ATTRIBUTE_BITS);
             } // end for PT
             *Pd = (UINT64)(UINTN)Pt | mAddressEncMask | PAGE_ATTRIBUTE_BITS;
           } // end if IsAddressSplit
