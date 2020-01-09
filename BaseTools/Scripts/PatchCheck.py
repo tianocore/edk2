@@ -26,18 +26,22 @@ class Verbose:
 class EmailAddressCheck:
     """Checks an email address."""
 
-    def __init__(self, email):
+    def __init__(self, email, description):
         self.ok = True
 
         if email is None:
             self.error('Email address is missing!')
             return
+        if description is None:
+            self.error('Email description is missing!')
+            return
 
+        self.description = "'" + description + "'"
         self.check_email_address(email)
 
     def error(self, *err):
         if self.ok and Verbose.level > Verbose.ONELINE:
-            print('The email address is not valid:')
+            print('The ' + self.description + ' email address is not valid:')
         self.ok = False
         if Verbose.level < Verbose.NORMAL:
             return
@@ -174,7 +178,7 @@ class CommitMessageCheck:
             if s[2] != ' ':
                 self.error("There should be a space after '" + sig + ":'")
 
-            EmailAddressCheck(s[3])
+            EmailAddressCheck(s[3], sig)
 
         return sigs
 
