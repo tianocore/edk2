@@ -2,6 +2,7 @@
 #  Check a patch for various format issues
 #
 #  Copyright (c) 2015 - 2019, Intel Corporation. All rights reserved.<BR>
+#  Copyright (C) 2020, Red Hat, Inc.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -21,6 +22,58 @@ import sys
 class Verbose:
     SILENT, ONELINE, NORMAL = range(3)
     level = NORMAL
+
+class EmailAddressCheck:
+    """Checks an email address."""
+
+    def __init__(self, email):
+        self.ok = True
+
+        if email is None:
+            self.error('Email address is missing!')
+            return
+
+        self.check_email_address(email)
+
+    def error(self, *err):
+        if self.ok and Verbose.level > Verbose.ONELINE:
+            print('The email address is not valid:')
+        self.ok = False
+        if Verbose.level < Verbose.NORMAL:
+            return
+        count = 0
+        for line in err:
+            prefix = (' *', '  ')[count > 0]
+            print(prefix, line)
+            count += 1
+
+    email_re1 = re.compile(r'(?:\s*)(.*?)(\s*)<(.+)>\s*$',
+                           re.MULTILINE|re.IGNORECASE)
+
+    def check_email_address(self, email):
+        email = email.strip()
+        mo = self.email_re1.match(email)
+        if mo is None:
+            self.error("Email format is invalid: " + email.strip())
+            return
+
+        name = mo.group(1).strip()
+        if name == '':
+            self.error("Name is not provided with email address: " +
+                       email)
+        else:
+            quoted = len(name) > 2 and name[0] == '"' and name[-1] == '"'
+            if name.find(',') >= 0 and not quoted:
+                self.error('Add quotes (") around name with a comma: ' +
+                           name)
+
+        if mo.group(2) == '':
+            self.error("There should be a space between the name and " +
+                       "email address: " + email)
+
+        if mo.group(3).find(' ') >= 0:
+            self.error("The email address cannot contain a space: " +
+                       mo.group(3))
 
 class CommitMessageCheck:
     """Checks the contents of a git commit message."""
@@ -121,37 +174,9 @@ class CommitMessageCheck:
             if s[2] != ' ':
                 self.error("There should be a space after '" + sig + ":'")
 
-            self.check_email_address(s[3])
+            EmailAddressCheck(s[3])
 
         return sigs
-
-    email_re1 = re.compile(r'(?:\s*)(.*?)(\s*)<(.+)>\s*$',
-                           re.MULTILINE|re.IGNORECASE)
-
-    def check_email_address(self, email):
-        email = email.strip()
-        mo = self.email_re1.match(email)
-        if mo is None:
-            self.error("Email format is invalid: " + email.strip())
-            return
-
-        name = mo.group(1).strip()
-        if name == '':
-            self.error("Name is not provided with email address: " +
-                       email)
-        else:
-            quoted = len(name) > 2 and name[0] == '"' and name[-1] == '"'
-            if name.find(',') >= 0 and not quoted:
-                self.error('Add quotes (") around name with a comma: ' +
-                           name)
-
-        if mo.group(2) == '':
-            self.error("There should be a space between the name and " +
-                       "email address: " + email)
-
-        if mo.group(3).find(' ') >= 0:
-            self.error("The email address cannot contain a space: " +
-                       mo.group(3))
 
     def check_signed_off_by(self):
         sob='Signed-off-by'
