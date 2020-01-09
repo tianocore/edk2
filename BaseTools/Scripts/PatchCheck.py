@@ -1,7 +1,7 @@
 ## @file
 #  Check a patch for various format issues
 #
-#  Copyright (c) 2015 - 2019, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2015 - 2020, Intel Corporation. All rights reserved.<BR>
 #  Copyright (C) 2020, Red Hat, Inc.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -91,6 +91,8 @@ class CommitMessageCheck:
 
         self.subject = subject
         self.msg = message
+
+        print (subject)
 
         self.check_contributed_under()
         self.check_signed_off_by()
@@ -208,6 +210,8 @@ class CommitMessageCheck:
         for sig in self.sig_types:
             self.find_signatures(sig)
 
+    cve_re = re.compile('CVE-[0-9]{4}-[0-9]{5}[^0-9]')
+
     def check_overall_format(self):
         lines = self.msg.splitlines()
 
@@ -225,9 +229,26 @@ class CommitMessageCheck:
             self.error('Empty commit message!')
             return
 
-        if count >= 1 and len(lines[0].rstrip()) >= 72:
-            self.error('First line of commit message (subject line) ' +
-                       'is too long.')
+        if count >= 1 and re.search(self.cve_re, lines[0]):
+            #
+            # If CVE-xxxx-xxxxx is present in subject line, then limit length of
+            # subject line to 92 characters
+            #
+            if len(lines[0].rstrip()) >= 93:
+                self.error(
+                    'First line of commit message (subject line) is too long (%d >= 93).' %
+                    (len(lines[0].rstrip()))
+                    )
+        else:
+            #
+            # If CVE-xxxx-xxxxx is not present in subject line, then limit
+            # length of subject line to 75 characters
+            #
+            if len(lines[0].rstrip()) >= 76:
+                self.error(
+                    'First line of commit message (subject line) is too long (%d >= 76).' %
+                    (len(lines[0].rstrip()))
+                    )
 
         if count >= 1 and len(lines[0].strip()) == 0:
             self.error('First line of commit message (subject line) ' +
@@ -241,7 +262,14 @@ class CommitMessageCheck:
             if (len(lines[i]) >= 76 and
                 len(lines[i].split()) > 1 and
                 not lines[i].startswith('git-svn-id:')):
-                self.error('Line %d of commit message is too long.' % (i + 1))
+                #
+                # Print a warning if body line is longer than 75 characters
+                #
+                print(
+                    'WARNING - Line %d of commit message is too long (%d >= 76).' %
+                    (i + 1, len(lines[i]))
+                    )
+                print(lines[i])
 
         last_sig_line = None
         for i in range(count - 1, 0, -1):
@@ -535,8 +563,25 @@ class CheckOnePatch:
         else:
             self.stat = mo.group('stat')
             self.commit_msg = mo.group('commit_message')
+        #
+        # Parse subject line from email header.  The subject line may be
+        # composed of multiple parts with different encodings.  Decode and
+        # combine all the parts to produce a single string with the contents of
+        # the decoded subject line.
+        #
+        parts = email.header.decode_header(pmail.get('subject'))
+        subject = ''
+        for (part, encoding) in parts:
+            if encoding:
+                part = part.decode(encoding)
+            else:
+                try:
+                    part = part.decode()
+                except:
+                    pass
+            subject = subject + part
 
-        self.commit_subject = pmail['subject'].replace('\r\n', '')
+        self.commit_subject = subject.replace('\r\n', '')
         self.commit_subject = self.commit_subject.replace('\n', '')
         self.commit_subject = self.subject_prefix_re.sub('', self.commit_subject, 1)
 
