@@ -552,6 +552,8 @@ class CheckGitCommits:
                 else:
                     blank_line = True
                 print('Checking git commit:', commit)
+            email = self.read_committer_email_address_from_git(commit)
+            self.ok &= EmailAddressCheck(email, 'Committer').ok
             patch = self.read_patch_from_git(commit)
             self.ok &= CheckOnePatch(commit, patch).ok
         if not commits:
@@ -569,6 +571,10 @@ class CheckGitCommits:
     def read_patch_from_git(self, commit):
         # Run git to get the commit patch
         return self.run_git('show', '--pretty=email', '--no-textconv', commit)
+
+    def read_committer_email_address_from_git(self, commit):
+        # Run git to get the committer email
+        return self.run_git('show', '--pretty=%cn <%ce>', '--no-patch', commit)
 
     def run_git(self, *args):
         cmd = [ 'git' ]
