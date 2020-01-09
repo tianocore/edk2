@@ -1142,6 +1142,8 @@ FindFirstFreeToken (
 
   If no free token, allocate new tokens then return the free one.
 
+  @param RunningApsCount    The Running Aps count for this token.
+
   @retval    return the first free PROCEDURE_TOKEN.
 
 **/
