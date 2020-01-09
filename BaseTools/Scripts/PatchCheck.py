@@ -451,6 +451,9 @@ class CheckOnePatch:
         self.patch = patch
         self.find_patch_pieces()
 
+        email_check = EmailAddressCheck(self.author_email, 'Author')
+        email_ok = email_check.ok
+
         msg_check = CommitMessageCheck(self.commit_subject, self.commit_msg)
         msg_ok = msg_check.ok
 
@@ -459,7 +462,7 @@ class CheckOnePatch:
             diff_check = GitDiffCheck(self.diff)
             diff_ok = diff_check.ok
 
-        self.ok = msg_ok and diff_ok
+        self.ok = email_ok and msg_ok and diff_ok
 
         if Verbose.level == Verbose.ONELINE:
             if self.ok:
@@ -536,6 +539,8 @@ class CheckOnePatch:
         self.commit_subject = pmail['subject'].replace('\r\n', '')
         self.commit_subject = self.commit_subject.replace('\n', '')
         self.commit_subject = self.subject_prefix_re.sub('', self.commit_subject, 1)
+
+        self.author_email = pmail['from']
 
 class CheckGitCommits:
     """Reads patches from git based on the specified git revision range.
