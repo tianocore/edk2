@@ -70,7 +70,7 @@ gAutoGenPhase = False
 # The Conf dir outside the workspace dir
 #
 gConfDirectory = ''
-
+gCmdConfDir = ''
 gBuildDirectory = ''
 #
 # The relative default database file path
