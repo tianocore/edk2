@@ -4,7 +4,7 @@
   information provided through PCDs and libraries.
 
   Copyright (c) 2016, Microsoft Corporation. All rights reserved.<BR>
-  Copyright (c) 2018 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2018 - 2020, Intel Corporation. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -12,6 +12,7 @@
 
 #include "FmpDxe.h"
 #include "VariableSupport.h"
+#include "Dependency.h"
 
 ///
 /// FILE_GUID from FmpDxe.inf.  When FmpDxe.inf is used in a platform, the
@@ -275,6 +276,13 @@ PopulateDescriptor (
   )
 {
   EFI_STATUS  Status;
+  VOID        *Image;
+  UINTN       ImageSize;
+  BOOLEAN     IsDepexValid;
+  UINT32      DepexSize;
+
+  Image     = NULL;
+  ImageSize = 0;
 
   if (Private->DescriptorPopulated) {
     return;
@@ -378,7 +386,47 @@ PopulateDescriptor (
   Private->Descriptor.LastAttemptVersion = GetLastAttemptVersionFromVariable (Private);
   Private->Descriptor.LastAttemptStatus  = GetLastAttemptStatusFromVariable (Private);
 
+  //
+  // Get the dependency from the FmpDeviceLib and populate it to the descriptor.
+  //
+  Private->Descriptor.Dependencies = NULL;
+
+  //
+  // Check the attribute IMAGE_ATTRIBUTE_DEPENDENCY
+  //
+  if (Private->Descriptor.AttributesSupported & IMAGE_ATTRIBUTE_DEPENDENCY) {
+    //
+    // The parameter "Image" of FmpDeviceGetImage() is extended to contain the dependency.
+    // Get the dependency from the Image.
+    //
+    ImageSize = Private->Descriptor.Size;
+    Image = AllocatePool (ImageSize);
+    if (Image != NULL) {
+      Status = FmpDeviceGetImage (Image, &ImageSize);
+      if (Status == EFI_BUFFER_TOO_SMALL) {
+        FreePool (Image);
+        Image = AllocatePool (ImageSize);
+        if (Image != NULL) {
+          Status = FmpDeviceGetImage (Image, &ImageSize);
+        }
+      }
+    }
+    if (!EFI_ERROR (Status) && Image != NULL) {
+      IsDepexValid = ValidateImageDepex ((EFI_FIRMWARE_IMAGE_DEP *) Image, ImageSize, &DepexSize);
+      if (IsDepexValid == TRUE) {
+        Private->Descriptor.Dependencies = AllocatePool (DepexSize);
+        if (Private->Descriptor.Dependencies != NULL) {
+          CopyMem (Private->Descriptor.Dependencies->Dependencies, Image, DepexSize);
+        }
+      }
+    }
+  }
+
   Private->DescriptorPopulated = TRUE;
+
+  if (Image != NULL) {
+    FreePool (Image);
+  }
 }
 
 /**
@@ -540,12 +588,17 @@ GetTheImage (
   EFI_STATUS                        Status;
   FIRMWARE_MANAGEMENT_PRIVATE_DATA  *Private;
   UINTN                             Size;
+  UINT8                             *ImageBuffer;
+  UINTN                             ImageBufferSize;
+  UINT32                            DepexSize;
 
   if (!FeaturePcdGet (PcdFmpDeviceStorageAccessEnable)) {
     return EFI_UNSUPPORTED;
   }
 
-  Status = EFI_SUCCESS;
+  Status          = EFI_SUCCESS;
+  ImageBuffer     = NULL;
+  DepexSize       = 0;
 
   //
   // Retrieve the private context structure
@@ -575,8 +628,45 @@ GetTheImage (
   if (EFI_ERROR (Status)) {
     Size = 0;
   }
-  if (*ImageSize < Size) {
-    *ImageSize = Size;
+
+  //
+  // The parameter "Image" of FmpDeviceGetImage() is extended to contain the dependency.
+  // Get the Fmp Payload from the Image.
+  //
+  ImageBufferSize = Size;
+  ImageBuffer = AllocatePool (ImageBufferSize);
+  if (ImageBuffer == NULL) {
+    DEBUG ((DEBUG_ERROR, "FmpDxe(%s): GetImage() - AllocatePool fails.\n", mImageIdName));
+    Status = EFI_NOT_FOUND;
+    goto cleanup;
+  }
+  Status = FmpDeviceGetImage (ImageBuffer, &ImageBufferSize);
+  if (Status == EFI_BUFFER_TOO_SMALL) {
+    FreePool (ImageBuffer);
+    ImageBuffer = AllocatePool (ImageBufferSize);
+    if (ImageBuffer == NULL) {
+      DEBUG ((DEBUG_ERROR, "FmpDxe(%s): GetImage() - AllocatePool fails.\n", mImageIdName));
+      Status = EFI_NOT_FOUND;
+      goto cleanup;
+    }
+    Status = FmpDeviceGetImage (ImageBuffer, &ImageBufferSize);
+  }
+  if (EFI_ERROR (Status)) {
+    goto cleanup;
+  }
+
+  //
+  // Check the attribute IMAGE_ATTRIBUTE_DEPENDENCY
+  //
+  if (Private->Descriptor.AttributesSetting & IMAGE_ATTRIBUTE_DEPENDENCY) {
+    //
+    // Validate the dependency to get its size.
+    //
+    ValidateImageDepex ((EFI_FIRMWARE_IMAGE_DEP *) ImageBuffer, ImageBufferSize, &DepexSize);
+  }
+
+  if (*ImageSize < ImageBufferSize - DepexSize) {
+    *ImageSize = ImageBufferSize - DepexSize;
     DEBUG ((DEBUG_VERBOSE, "FmpDxe(%s): GetImage() - ImageSize is to small.\n", mImageIdName));
     Status = EFI_BUFFER_TOO_SMALL;
     goto cleanup;
@@ -588,8 +678,17 @@ GetTheImage (
     goto cleanup;
   }
 
-  Status = FmpDeviceGetImage (Image, ImageSize);
+  //
+  // Image is after the dependency expression.
+  //
+  *ImageSize = ImageBufferSize - DepexSize;
+  CopyMem (Image, ImageBuffer + DepexSize, *ImageSize);
+  Status = EFI_SUCCESS;
+
 cleanup:
+  if (ImageBuffer != NULL) {
+    FreePool (ImageBuffer);
+  }
 
   return Status;
 }
@@ -710,6 +809,10 @@ CheckTheImage (
   UINTN                             PublicKeyDataLength;
   UINT8                             *PublicKeyDataXdr;
   UINT8                             *PublicKeyDataXdrEnd;
+  EFI_FIRMWARE_IMAGE_DEP            *Dependencies;
+  UINT32                            DependenciesSize;
+  BOOLEAN                           IsDepexValid;
+  BOOLEAN                           IsDepexSatisfied;
 
   Status           = EFI_SUCCESS;
   RawSize          = 0;
@@ -718,6 +821,8 @@ CheckTheImage (
   Version          = 0;
   FmpHeaderSize    = 0;
   AllHeaderSize    = 0;
+  Dependencies     = NULL;
+  DependenciesSize = 0;
 
   if (!FeaturePcdGet (PcdFmpDeviceStorageAccessEnable)) {
     return EFI_UNSUPPORTED;
@@ -842,10 +947,33 @@ CheckTheImage (
   }
   Status = GetFmpPayloadHeaderVersion (FmpPayloadHeader, FmpPayloadSize, &Version);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "FmpDxe(%s): CheckTheImage() - GetFmpPayloadHeaderVersion failed %r.\n", mImageIdName, Status));
-    *ImageUpdatable = IMAGE_UPDATABLE_INVALID;
-    Status = EFI_SUCCESS;
-    goto cleanup;
+    //
+    // Check if there is dependency expression
+    //
+    IsDepexValid = ValidateImageDepex ((EFI_FIRMWARE_IMAGE_DEP*) FmpPayloadHeader, FmpPayloadSize, &DependenciesSize);
+    if (IsDepexValid && (DependenciesSize < FmpPayloadSize)) {
+      //
+      // Fmp payload is after dependency expression
+      //
+      Dependencies = (EFI_FIRMWARE_IMAGE_DEP*) FmpPayloadHeader;
+      FmpPayloadHeader = (UINT8 *) Dependencies + DependenciesSize;
+      FmpPayloadSize = FmpPayloadSize - DependenciesSize;
+      Status = GetFmpPayloadHeaderVersion (FmpPayloadHeader, FmpPayloadSize, &Version);
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_ERROR, "FmpDxe(%s): CheckTheImage() - GetFmpPayloadHeaderVersion failed %r.\n", mImageIdName, Status));
+        *ImageUpdatable = IMAGE_UPDATABLE_INVALID;
+        Status = EFI_SUCCESS;
+        goto cleanup;
+      }
+    } else {
+      DEBUG ((DEBUG_ERROR, "FmpDxe(%s): CheckTheImage() - Dependency is invalid.\n", mImageIdName));
+      mDependenciesCheckStatus = DEPENDENCIES_INVALID;
+      *ImageUpdatable = IMAGE_UPDATABLE_INVALID;
+      Status = EFI_SUCCESS;
+      goto cleanup;
+    }
+  } else {
+    DEBUG ((DEBUG_WARN, "FmpDxe(%s): CheckTheImage() - No dependency associated in image.\n", mImageIdName));
   }
 
   //
@@ -858,6 +986,22 @@ CheckTheImage (
       mImageIdName, Version, Private->Descriptor.LowestSupportedImageVersion)
       );
     *ImageUpdatable = IMAGE_UPDATABLE_INVALID_OLD;
+    Status = EFI_SUCCESS;
+    goto cleanup;
+  }
+
+  //
+  // Evaluate dependency expression
+  //
+  Status = EvaluateImageDependencies (Private->Descriptor.ImageTypeId, Version, Dependencies, DependenciesSize, &IsDepexSatisfied);
+  if (!IsDepexSatisfied || EFI_ERROR (Status)) {
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "FmpDxe(%s): CheckTheImage() - Dependency check failed %r.\n", mImageIdName, Status));
+    } else {
+      DEBUG ((DEBUG_ERROR, "FmpDxe(%s): CheckTheImage() - Dependency is not satisfied.\n", mImageIdName));
+    }
+    mDependenciesCheckStatus = DEPENDENCIES_UNSATISFIED;
+    *ImageUpdatable = IMAGE_UPDATABLE_INVALID;
     Status = EFI_SUCCESS;
     goto cleanup;
   }
@@ -877,7 +1021,7 @@ CheckTheImage (
   // Call FmpDevice Lib Check Image on the
   // Raw payload.  So all headers need stripped off
   //
-  AllHeaderSize = GetAllHeaderSize ( (EFI_FIRMWARE_IMAGE_AUTHENTICATION *)Image, FmpHeaderSize );
+  AllHeaderSize = GetAllHeaderSize ( (EFI_FIRMWARE_IMAGE_AUTHENTICATION *)Image, FmpHeaderSize + DependenciesSize);
   if (AllHeaderSize == 0) {
     DEBUG ((DEBUG_ERROR, "FmpDxe(%s): CheckTheImage() - GetAllHeaderSize failed.\n", mImageIdName));
     Status = EFI_ABORTED;
@@ -967,6 +1111,11 @@ SetTheImage (
   UINT32                            LastAttemptStatus;
   UINT32                            Version;
   UINT32                            LowestSupportedVersion;
+  EFI_FIRMWARE_IMAGE_DEP            *Dependencies;
+  UINT32                            DependenciesSize;
+  BOOLEAN                           IsDepexValid;
+  UINT8                             *ImageBuffer;
+  UINTN                             ImageBufferSize;
 
   Status             = EFI_SUCCESS;
   Updateable         = 0;
@@ -975,8 +1124,12 @@ SetTheImage (
   FmpHeader          = NULL;
   FmpPayloadSize     = 0;
   AllHeaderSize      = 0;
-  IncomingFwVersion = 0;
+  IncomingFwVersion  = 0;
   LastAttemptStatus  = LAST_ATTEMPT_STATUS_ERROR_UNSUCCESSFUL;
+  Dependencies       = NULL;
+  DependenciesSize   = 0;
+  ImageBuffer        = NULL;
+  ImageBufferSize    = 0;
 
   if (!FeaturePcdGet (PcdFmpDeviceStorageAccessEnable)) {
     return EFI_UNSUPPORTED;
@@ -1009,6 +1162,11 @@ SetTheImage (
   }
 
   //
+  // Set check status to satisfied before CheckTheImage()
+  //
+  mDependenciesCheckStatus = DEPENDENCIES_SATISFIED;
+
+  //
   // Call check image to verify the image
   //
   Status = CheckTheImage (This, ImageIndex, Image, ImageSize, &Updateable);
@@ -1031,6 +1189,21 @@ SetTheImage (
     goto cleanup;
   }
   Status = GetFmpPayloadHeaderVersion (FmpHeader, FmpPayloadSize, &IncomingFwVersion);
+  if (EFI_ERROR (Status)) {
+    //
+    // Check if there is dependency expression
+    //
+    IsDepexValid = ValidateImageDepex ((EFI_FIRMWARE_IMAGE_DEP*) FmpHeader, FmpPayloadSize, &DependenciesSize);
+    if (IsDepexValid && (DependenciesSize < FmpPayloadSize)) {
+      //
+      // Fmp payload is after dependency expression
+      //
+      Dependencies = (EFI_FIRMWARE_IMAGE_DEP*) FmpHeader;
+      FmpHeader = (UINT8 *) FmpHeader + DependenciesSize;
+      FmpPayloadSize = FmpPayloadSize - DependenciesSize;
+      Status = GetFmpPayloadHeaderVersion (FmpHeader, FmpPayloadSize, &IncomingFwVersion);
+    }
+  }
   if (!EFI_ERROR (Status)) {
     //
     // Set to actual value
@@ -1045,6 +1218,11 @@ SetTheImage (
       "FmpDxe(%s): SetTheImage() - Check The Image returned that the Image was not valid for update.  Updatable value = 0x%X.\n",
       mImageIdName, Updateable)
       );
+    if (mDependenciesCheckStatus == DEPENDENCIES_UNSATISFIED) {
+      LastAttemptStatus = LAST_ATTEMPT_STATUS_ERROR_UNSATISFIED_DEPENDENCIES;
+    } else if (mDependenciesCheckStatus == DEPENDENCIES_INVALID) {
+      LastAttemptStatus = LAST_ATTEMPT_STATUS_ERROR_INVALID_FORMAT;
+    }
     Status = EFI_ABORTED;
     goto cleanup;
   }
@@ -1138,11 +1316,39 @@ SetTheImage (
     goto cleanup;
   }
 
-  AllHeaderSize = GetAllHeaderSize ( (EFI_FIRMWARE_IMAGE_AUTHENTICATION *)Image, FmpHeaderSize );
+  AllHeaderSize = GetAllHeaderSize ((EFI_FIRMWARE_IMAGE_AUTHENTICATION *)Image, FmpHeaderSize + DependenciesSize);
   if (AllHeaderSize == 0) {
     DEBUG ((DEBUG_ERROR, "FmpDxe(%s): SetTheImage() - GetAllHeaderSize failed.\n", mImageIdName));
     Status = EFI_ABORTED;
     goto cleanup;
+  }
+
+  //
+  // Check the attribute IMAGE_ATTRIBUTE_DEPENDENCY
+  //
+  if (Private->Descriptor.AttributesSetting & IMAGE_ATTRIBUTE_DEPENDENCY) {
+    //
+    // To support saving dependency, extend param "Image" of FmpDeviceSetImage() to
+    // contain the dependency inside. FmpDeviceSetImage() is responsible for saving
+    // the dependency which can be used for future dependency check.
+    //
+    ImageBufferSize = DependenciesSize + ImageSize - AllHeaderSize;
+    ImageBuffer = AllocatePool (ImageBufferSize);
+    if (ImageBuffer == NULL) {
+      DEBUG ((DEBUG_ERROR, "FmpDxe(%s): SetTheImage() - AllocatePool failed.\n", mImageIdName));
+      Status = EFI_ABORTED;
+      goto cleanup;
+    }
+    CopyMem (ImageBuffer, Dependencies->Dependencies, DependenciesSize);
+    CopyMem (ImageBuffer + DependenciesSize, (UINT8 *)Image + AllHeaderSize, ImageBufferSize - DependenciesSize);
+  } else {
+    ImageBufferSize = ImageSize - AllHeaderSize;
+    ImageBuffer = AllocateCopyPool(ImageBufferSize, (UINT8 *)Image + AllHeaderSize);
+    if (ImageBuffer == NULL) {
+      DEBUG ((DEBUG_ERROR, "FmpDxe(%s): SetTheImage() - AllocatePool failed.\n", mImageIdName));
+      Status = EFI_ABORTED;
+      goto cleanup;
+    }
   }
 
   //
@@ -1154,8 +1360,8 @@ SetTheImage (
   //Copy the requested image to the firmware using the FmpDeviceLib
   //
   Status = FmpDeviceSetImage (
-             (((UINT8 *)Image) + AllHeaderSize),
-             ImageSize - AllHeaderSize,
+             ImageBuffer,
+             ImageBufferSize,
              VendorCode,
              FmpDxeProgress,
              IncomingFwVersion,
@@ -1192,6 +1398,10 @@ SetTheImage (
   LastAttemptStatus = LAST_ATTEMPT_STATUS_SUCCESS;
 
 cleanup:
+  if (ImageBuffer != NULL) {
+    FreePool (ImageBuffer);
+  }
+
   mProgressFunc = NULL;
   SetLastAttemptStatusInVariable (Private, LastAttemptStatus);
 
