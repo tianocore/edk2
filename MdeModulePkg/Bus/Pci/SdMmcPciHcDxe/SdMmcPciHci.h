@@ -485,7 +485,7 @@ SdMmcHcStopClock (
   @param[in] Slot   The slot number.
 
   @retval EFI_SUCCESS  Succeeded to start the SD clock.
-  @rtval  Others       Failed to start the SD clock.
+  @retval Others       Failed to start the SD clock.
 **/
 EFI_STATUS
 SdMmcHcStartSdClock (
