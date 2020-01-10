@@ -3060,12 +3060,14 @@ ConSplitterTextOutAddDevice (
     DeviceStatus = ConSplitterAddGraphicsOutputMode (Private, GraphicsOutput);
   }
 
-  Status = GraphicsOutput->QueryMode (GraphicsOutput, GraphicsOutput->Mode->Mode, &SizeOfInfo, &Info);
-  if (EFI_ERROR (Status)) {
-    return Status;
+  if (GraphicsOutput != NULL) {
+    Status = GraphicsOutput->QueryMode (GraphicsOutput, GraphicsOutput->Mode->Mode, &SizeOfInfo, &Info);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+    ASSERT ( SizeOfInfo <= sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION));
+    FreePool (Info);
   }
-  ASSERT ( SizeOfInfo <= sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION));
-  FreePool (Info);
 
   if (((!EFI_ERROR (DeviceStatus)) || (!EFI_ERROR (Status))) &&
       ((Private->CurrentNumberOfGraphicsOutput) == 1)) {
