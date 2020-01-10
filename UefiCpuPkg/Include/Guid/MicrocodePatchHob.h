@@ -3,7 +3,7 @@
     A. Base address and size of the loaded microcode patches data;
     B. Detected microcode patch for each processor within system.
 
-  Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2019 - 2020, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -38,7 +38,15 @@ typedef struct {
   // If no microcode patch is detected for certain processor, the relating
   // element will be set to MAX_UINT64.
   //
-  UINT64    ProcessorSpecificPatchOffset[0];
+  //UINT64    ProcessorSpecificPatchOffset[];
+  //
+  // An array with 'ProcessorCount' elements that stores the original
+  // microcode patch address in flash if the patch has been shadowed to
+  // memory. This address will be the same one as specified by
+  // "MicrocodePatchAddress" with "PatchOffset" if the patch wasn't
+  // shadowed to memory.
+  //
+  //UINT64    ProcessorSpecificPatchAddrInRom[];
 } EDKII_MICROCODE_PATCH_HOB;
 
 #endif

@@ -29,6 +29,8 @@
 #include <Library/MtrrLib.h>
 #include <Library/HobLib.h>
 
+#include <Guid/MicrocodePatchHob.h>
+
 #include <IndustryStandard/FirmwareInterfaceTable.h>
 
 
@@ -56,6 +58,7 @@
 //
 typedef struct {
   UINTN    Address;
+  UINTN    AddressInRam;
   UINTN    Size;
 } MICROCODE_PATCH_INFO;
 
@@ -273,6 +276,12 @@ struct _CPU_MP_DATA {
   // driver.
   //
   BOOLEAN                        WakeUpByInitSipiSipi;
+
+  //
+  // Shadow infomation of the microcode patch data.
+  //
+  UINTN                          PatchCount;
+  MICROCODE_PATCH_INFO           *PatchInfoBuffer;
 };
 
 extern EFI_GUID mCpuInitMpLibHobGuid;

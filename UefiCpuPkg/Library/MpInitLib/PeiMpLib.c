@@ -1,7 +1,7 @@
 /** @file
   MP initialize support functions for PEI phase.
 
-  Copyright (c) 2016 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2020, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -292,6 +292,40 @@ CheckAndUpdateApsStatus (
 }
 
 /**
+  Find the corresponding microcode patch address in ROM before the shadow
+  operation.
+
+  @param[in]  CpuMpData             Pointer to the CPU_MP_DATA structure.
+  @param[in]  MicrocodeEntryAddr    Loaded microcode address to be checked.
+
+  @return    Microcode address in ROM, or MAX_UINT64 if this microcode was
+             not been shadowed.
+**/
+UINT64
+RomAddrOfShadowedMicrocode (
+  IN CPU_MP_DATA    *CpuMpData,
+  IN UINT64         MicrocodeEntryAddr
+  )
+{
+  UINT32                       Index;
+
+  if (CpuMpData->PatchInfoBuffer == NULL) {
+    //
+    // No shadow.
+    //
+    return MicrocodeEntryAddr;
+  }
+
+  for (Index = 0; Index < CpuMpData->PatchCount; Index++) {
+    if (CpuMpData->PatchInfoBuffer[Index].AddressInRam == MicrocodeEntryAddr) {
+      return CpuMpData->PatchInfoBuffer[Index].Address;
+    }
+  }
+
+  return MicrocodeEntryAddr;
+}
+
+/**
   Build the microcode patch HOB that contains the base address and size of the
   microcode patch stored in the memory.
 
@@ -306,8 +340,11 @@ BuildMicrocodeCacheHob (
   EDKII_MICROCODE_PATCH_HOB    *MicrocodeHob;
   UINTN                        HobDataLength;
   UINT32                       Index;
+  UINT64                       *ProcessorSpecificPatchOffset;
+  UINT64                       *ProcessorSpecificPatchAddrInRom;
 
   HobDataLength = sizeof (EDKII_MICROCODE_PATCH_HOB) +
+                  sizeof (UINT64) * CpuMpData->CpuCount +
                   sizeof (UINT64) * CpuMpData->CpuCount;
 
   MicrocodeHob  = AllocatePool (HobDataLength);
@@ -317,10 +354,14 @@ BuildMicrocodeCacheHob (
   }
 
   //
-  // Store the information of the memory region that holds the microcode patches.
+  // Store information of the memory region that holds the microcode patches.
   //
   MicrocodeHob->MicrocodePatchAddress    = CpuMpData->MicrocodePatchAddress;
   MicrocodeHob->MicrocodePatchRegionSize = CpuMpData->MicrocodePatchRegionSize;
+  ProcessorSpecificPatchOffset =
+    (UINT64*) ((UINTN )MicrocodeHob + sizeof (EDKII_MICROCODE_PATCH_HOB));
+  ProcessorSpecificPatchAddrInRom =
+    (UINT64*) ((UINTN )ProcessorSpecificPatchOffset + sizeof (UINT64) * CpuMpData->CpuCount);
 
   //
   // Store the detected microcode patch for each processor as well.
@@ -328,10 +369,15 @@ BuildMicrocodeCacheHob (
   MicrocodeHob->ProcessorCount = CpuMpData->CpuCount;
   for (Index = 0; Index < CpuMpData->CpuCount; Index++) {
     if (CpuMpData->CpuData[Index].MicrocodeEntryAddr != 0) {
-      MicrocodeHob->ProcessorSpecificPatchOffset[Index] =
+      ProcessorSpecificPatchOffset[Index] =
         CpuMpData->CpuData[Index].MicrocodeEntryAddr - CpuMpData->MicrocodePatchAddress;
+      ProcessorSpecificPatchAddrInRom[Index] = RomAddrOfShadowedMicrocode (
+                                                 CpuMpData,
+                                                 CpuMpData->CpuData[Index].MicrocodeEntryAddr
+                                                 );
     } else {
-      MicrocodeHob->ProcessorSpecificPatchOffset[Index] = MAX_UINT64;
+      ProcessorSpecificPatchOffset[Index]    = MAX_UINT64;
+      ProcessorSpecificPatchAddrInRom[Index] = MAX_UINT64;
     }
   }
 

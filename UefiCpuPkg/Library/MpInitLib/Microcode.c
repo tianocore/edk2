@@ -460,6 +460,7 @@ ShadowMicrocodePatchWorker (
       (VOID *) Patches[Index].Address,
       Patches[Index].Size
       );
+    Patches[Index].AddressInRam = (UINTN) Walker;
     Walker += Patches[Index].Size;
   }
 
@@ -519,7 +520,7 @@ ShadowMicrocodePatchByPcd (
   PatchCount      = 0;
   MaxPatchNumber  = DEFAULT_MAX_MICROCODE_PATCH_NUM;
   TotalLoadSize   = 0;
-  PatchInfoBuffer = AllocatePool (MaxPatchNumber * sizeof (MICROCODE_PATCH_INFO));
+  PatchInfoBuffer = AllocateZeroPool (MaxPatchNumber * sizeof (MICROCODE_PATCH_INFO));
   if (PatchInfoBuffer == NULL) {
     return;
   }
@@ -563,7 +564,7 @@ ShadowMicrocodePatchByPcd (
           //
           // Overflow check for MaxPatchNumber
           //
-          goto OnExit;
+          goto OnError;
         }
 
         PatchInfoBuffer = ReallocatePool (
@@ -572,7 +573,7 @@ ShadowMicrocodePatchByPcd (
                             PatchInfoBuffer
                             );
         if (PatchInfoBuffer == NULL) {
-          goto OnExit;
+          goto OnError;
         }
         MaxPatchNumber = MaxPatchNumber * 2;
       }
@@ -581,7 +582,7 @@ ShadowMicrocodePatchByPcd (
       // Store the information of this microcode patch
       //
       PatchInfoBuffer[PatchCount - 1].Address = (UINTN) MicrocodeEntryPoint;
-      PatchInfoBuffer[PatchCount - 1].Size    = TotalSize;
+      PatchInfoBuffer[PatchCount - 1].Size            = TotalSize;
       TotalLoadSize += TotalSize;
     }
 
@@ -601,7 +602,11 @@ ShadowMicrocodePatchByPcd (
     ShadowMicrocodePatchWorker (CpuMpData, PatchInfoBuffer, PatchCount, TotalLoadSize);
   }
 
-OnExit:
+  CpuMpData->PatchCount = PatchCount;
+  CpuMpData->PatchInfoBuffer = PatchInfoBuffer;
+  return;
+
+OnError:
   if (PatchInfoBuffer != NULL) {
     FreePool (PatchInfoBuffer);
   }
@@ -674,7 +679,7 @@ ShadowMicrocodePatchByFit (
     return EFI_NOT_FOUND;
   }
 
-  PatchInfoBuffer = AllocatePool (MaxPatchNumber * sizeof (MICROCODE_PATCH_INFO));
+  PatchInfoBuffer = AllocateZeroPool (MaxPatchNumber * sizeof (MICROCODE_PATCH_INFO));
   if (PatchInfoBuffer == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -689,8 +694,8 @@ ShadowMicrocodePatchByFit (
       MicrocodeEntryPoint = (CPU_MICROCODE_HEADER *) (UINTN) FitEntry[Index].Address;
       TotalSize = (MicrocodeEntryPoint->DataSize == 0) ? 2048 : MicrocodeEntryPoint->TotalSize;
       if (IsMicrocodePatchNeedLoad (CpuMpData, MicrocodeEntryPoint)) {
-        PatchInfoBuffer[PatchCount].Address     = (UINTN) MicrocodeEntryPoint;
-        PatchInfoBuffer[PatchCount].Size        = TotalSize;
+        PatchInfoBuffer[PatchCount].Address = (UINTN) MicrocodeEntryPoint;
+        PatchInfoBuffer[PatchCount].Size            = TotalSize;
         TotalLoadSize += TotalSize;
         PatchCount++;
       }
@@ -707,7 +712,8 @@ ShadowMicrocodePatchByFit (
     ShadowMicrocodePatchWorker (CpuMpData, PatchInfoBuffer, PatchCount, TotalLoadSize);
   }
 
-  FreePool (PatchInfoBuffer);
+  CpuMpData->PatchCount = PatchCount;
+  CpuMpData->PatchInfoBuffer = PatchInfoBuffer;
   return EFI_SUCCESS;
 }
 
