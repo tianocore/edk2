@@ -31,6 +31,7 @@ import json
 from Common.Uefi.Capsule.UefiCapsuleHeader import UefiCapsuleHeaderClass
 from Common.Uefi.Capsule.FmpCapsuleHeader  import FmpCapsuleHeaderClass
 from Common.Uefi.Capsule.FmpAuthHeader     import FmpAuthHeaderClass
+from Common.Uefi.Capsule.CapsuleDependency import CapsuleDependencyClass
 from Common.Edk2.Capsule.FmpPayloadHeader  import FmpPayloadHeaderClass
 
 #
@@ -306,6 +307,7 @@ if __name__ == '__main__':
             OpenSslOtherPublicCertFile   = ConvertJsonValue (Config, 'OpenSslOtherPublicCertFile', os.path.expandvars, Required = False, Default = None, Open = True)
             OpenSslTrustedPublicCertFile = ConvertJsonValue (Config, 'OpenSslTrustedPublicCertFile', os.path.expandvars, Required = False, Default = None, Open = True)
             SigningToolPath              = ConvertJsonValue (Config, 'SigningToolPath', os.path.expandvars, Required = False, Default = None)
+            DepexExp                     = ConvertJsonValue (Config, 'Dependencies', str, Required = False, Default = None)
 
             #
             # Read binary input file
@@ -330,7 +332,8 @@ if __name__ == '__main__':
                                             OpenSslSignerPrivateCertFile,
                                             OpenSslOtherPublicCertFile,
                                             OpenSslTrustedPublicCertFile,
-                                            SigningToolPath
+                                            SigningToolPath,
+                                            DepexExp
                                             ))
 
     def GenerateOutputJson (PayloadJsonDescriptorList):
@@ -348,7 +351,8 @@ if __name__ == '__main__':
                                   "OpenSslSignerPrivateCertFile": str(PayloadDescriptor.OpenSslSignerPrivateCertFile),
                                   "OpenSslOtherPublicCertFile": str(PayloadDescriptor.OpenSslOtherPublicCertFile),
                                   "OpenSslTrustedPublicCertFile": str(PayloadDescriptor.OpenSslTrustedPublicCertFile),
-                                  "SigningToolPath": str(PayloadDescriptor.SigningToolPath)
+                                  "SigningToolPath": str(PayloadDescriptor.SigningToolPath),
+                                  "Dependencies" : str(PayloadDescriptor.DepexExp)
                               }for PayloadDescriptor in PayloadJsonDescriptorList
                           ]
                       }
@@ -424,7 +428,8 @@ if __name__ == '__main__':
                      OpenSslSignerPrivateCertFile = None,
                      OpenSslOtherPublicCertFile   = None,
                      OpenSslTrustedPublicCertFile = None,
-                     SigningToolPath              = None
+                     SigningToolPath              = None,
+                     DepexExp                     = None
                      ):
             self.Payload                      = Payload
             self.Guid                         = Guid
@@ -438,6 +443,7 @@ if __name__ == '__main__':
             self.OpenSslOtherPublicCertFile   = OpenSslOtherPublicCertFile
             self.OpenSslTrustedPublicCertFile = OpenSslTrustedPublicCertFile
             self.SigningToolPath              = SigningToolPath
+            self.DepexExp                     = DepexExp
 
             self.UseSignTool = self.SignToolPfxFile is not None
             self.UseOpenSsl  = (self.OpenSslSignerPrivateCertFile is not None and
@@ -446,6 +452,7 @@ if __name__ == '__main__':
             self.AnyOpenSsl  = (self.OpenSslSignerPrivateCertFile is not None or
                                 self.OpenSslOtherPublicCertFile is not None or
                                 self.OpenSslTrustedPublicCertFile is not None)
+            self.UseDependency = self.DepexExp is not None
 
         def Validate(self, args):
             if self.UseSignTool and self.AnyOpenSsl:
@@ -544,7 +551,8 @@ if __name__ == '__main__':
                                             args.OpenSslSignerPrivateCertFile,
                                             args.OpenSslOtherPublicCertFile,
                                             args.OpenSslTrustedPublicCertFile,
-                                            args.SigningToolPath
+                                            args.SigningToolPath,
+                                            None
                                             ))
         for SinglePayloadDescriptor in PayloadDescriptorList:
             try:
@@ -564,6 +572,12 @@ if __name__ == '__main__':
             except:
                 print ('GenerateCapsule: error: can not encode FMP Payload Header')
                 sys.exit (1)
+            if SinglePayloadDescriptor.UseDependency:
+                CapsuleDependency.Payload = Result
+                CapsuleDependency.DepexExp = SinglePayloadDescriptor.DepexExp
+                Result = CapsuleDependency.Encode ()
+                if args.Verbose:
+                    CapsuleDependency.DumpInfo ()
             if SinglePayloadDescriptor.UseOpenSsl or SinglePayloadDescriptor.UseSignTool:
                 #
                 # Sign image with 64-bit MonotonicCount appended to end of image
@@ -657,7 +671,8 @@ if __name__ == '__main__':
                                             args.OpenSslSignerPrivateCertFile,
                                             args.OpenSslOtherPublicCertFile,
                                             args.OpenSslTrustedPublicCertFile,
-                                            args.SigningToolPath
+                                            args.SigningToolPath,
+                                            None
                                             ))
         #
         # Perform additional verification on payload descriptors
@@ -700,7 +715,8 @@ if __name__ == '__main__':
                                                                 PayloadDescriptorList[Index].OpenSslSignerPrivateCertFile,
                                                                 PayloadDescriptorList[Index].OpenSslOtherPublicCertFile,
                                                                 PayloadDescriptorList[Index].OpenSslTrustedPublicCertFile,
-                                                                PayloadDescriptorList[Index].SigningToolPath
+                                                                PayloadDescriptorList[Index].SigningToolPath,
+                                                                None
                                                                 ))
                 else:
                     PayloadDescriptorList[0].Payload = FmpCapsuleHeader.GetFmpCapsuleImageHeader (0).Payload
@@ -708,6 +724,7 @@ if __name__ == '__main__':
                         if Index > 0:
                             PayloadDecodeFile = FmpCapsuleHeader.GetFmpCapsuleImageHeader (Index).Payload
                             PayloadDescriptorList.append (PayloadDescriptor (PayloadDecodeFile,
+                                                            None,
                                                             None,
                                                             None,
                                                             None,
@@ -736,7 +753,8 @@ if __name__ == '__main__':
                                                             PayloadDescriptorList[Index].OpenSslSignerPrivateCertFile,
                                                             PayloadDescriptorList[Index].OpenSslOtherPublicCertFile,
                                                             PayloadDescriptorList[Index].OpenSslTrustedPublicCertFile,
-                                                            PayloadDescriptorList[Index].SigningToolPath
+                                                            PayloadDescriptorList[Index].SigningToolPath,
+                                                            None
                                                             ))
                 JsonIndex = 0
                 for SinglePayloadDescriptor in PayloadDescriptorList:
@@ -782,6 +800,23 @@ if __name__ == '__main__':
                         if args.Verbose:
                             print ('--------')
                             print ('No EFI_FIRMWARE_IMAGE_AUTHENTICATION')
+
+                    PayloadSignature = struct.unpack ('<I', SinglePayloadDescriptor.Payload[0:4])
+                    if PayloadSignature != FmpPayloadHeader.Signature:
+                        SinglePayloadDescriptor.UseDependency = True
+                        try:
+                            SinglePayloadDescriptor.Payload = CapsuleDependency.Decode (SinglePayloadDescriptor.Payload)
+                            PayloadJsonDescriptorList[JsonIndex].DepexExp = CapsuleDependency.DepexExp
+                            if args.Verbose:
+                                print ('--------')
+                                CapsuleDependency.DumpInfo ()
+                        except Exception as Msg:
+                            print ('GenerateCapsule: error: invalid dependency expression')
+                    else:
+                        if args.Verbose:
+                            print ('--------')
+                            print ('No EFI_FIRMWARE_IMAGE_DEP')
+
                     try:
                         SinglePayloadDescriptor.Payload = FmpPayloadHeader.Decode (SinglePayloadDescriptor.Payload)
                         PayloadJsonDescriptorList[JsonIndex].FwVersion = FmpPayloadHeader.FwVersion
@@ -852,6 +887,18 @@ if __name__ == '__main__':
                     except:
                         print ('--------')
                         print ('No EFI_FIRMWARE_IMAGE_AUTHENTICATION')
+
+                    PayloadSignature = struct.unpack ('<I', Result[0:4])
+                    if PayloadSignature != FmpPayloadHeader.Signature:
+                        try:
+                            Result = CapsuleDependency.Decode (Result)
+                            print ('--------')
+                            CapsuleDependency.DumpInfo ()
+                        except:
+                            print ('GenerateCapsule: error: invalid dependency expression')
+                    else:
+                        print ('--------')
+                        print ('No EFI_FIRMWARE_IMAGE_DEP')
                     try:
                         Result = FmpPayloadHeader.Decode (Result)
                         print ('--------')
@@ -973,6 +1020,7 @@ if __name__ == '__main__':
     FmpCapsuleHeader  = FmpCapsuleHeaderClass ()
     FmpAuthHeader     = FmpAuthHeaderClass ()
     FmpPayloadHeader  = FmpPayloadHeaderClass ()
+    CapsuleDependency = CapsuleDependencyClass ()
 
     EmbeddedDriverDescriptorList = []
     PayloadDescriptorList = []
