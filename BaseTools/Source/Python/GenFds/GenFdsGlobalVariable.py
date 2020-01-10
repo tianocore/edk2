@@ -23,9 +23,9 @@ from Common.BuildToolError import COMMAND_FAILURE,GENFDS_ERROR
 from Common import EdkLogger
 from Common.Misc import SaveFileOnChange
 
-from Common.TargetTxtClassObject import TargetTxt
-from Common.ToolDefClassObject import ToolDef
-from AutoGen.BuildEngine import BuildRuleObj
+from Common.TargetTxtClassObject import TargetTxtDict
+from Common.ToolDefClassObject import ToolDefDict
+from AutoGen.BuildEngine import ToolBuildRule
 import Common.DataType as DataType
 from Common.Misc import PathClass
 from Common.LongFilePathSupport import OpenLongFilePath as open
@@ -96,12 +96,15 @@ class GenFdsGlobalVariable:
     def _LoadBuildRule():
         if GenFdsGlobalVariable.__BuildRuleDatabase:
             return GenFdsGlobalVariable.__BuildRuleDatabase
-        GenFdsGlobalVariable.__BuildRuleDatabase = BuildRuleObj
-        ToolDefinitionFile = TargetTxt.TargetTxtDictionary[DataType.TAB_TAT_DEFINES_TOOL_CHAIN_CONF]
+        BuildRule = ToolBuildRule()
+        GenFdsGlobalVariable.__BuildRuleDatabase = BuildRule.ToolBuildRule
+        TargetObj = TargetTxtDict()
+        ToolDefinitionFile = TargetObj.Target.TargetTxtDictionary[DataType.TAB_TAT_DEFINES_TOOL_CHAIN_CONF]
         if ToolDefinitionFile == '':
             ToolDefinitionFile = "Conf/tools_def.txt"
         if os.path.isfile(ToolDefinitionFile):
-            ToolDefinition = ToolDef.ToolsDefTxtDatabase
+            ToolDefObj = ToolDefDict((os.path.join(os.getenv("WORKSPACE"), "Conf")))
+            ToolDefinition = ToolDefObj.ToolDef.ToolsDefTxtDatabase
             if DataType.TAB_TOD_DEFINES_BUILDRULEFAMILY in ToolDefinition \
                and GenFdsGlobalVariable.ToolChainTag in ToolDefinition[DataType.TAB_TOD_DEFINES_BUILDRULEFAMILY] \
                and ToolDefinition[DataType.TAB_TOD_DEFINES_BUILDRULEFAMILY][GenFdsGlobalVariable.ToolChainTag]:
@@ -830,6 +833,8 @@ class GenFdsGlobalVariable:
 #  @param  NameGuid         The Guid name
 #
 def FindExtendTool(KeyStringList, CurrentArchList, NameGuid):
+    ToolDefObj = ToolDefDict((os.path.join(os.getenv("WORKSPACE"), "Conf")))
+    ToolDef = ToolDefObj.ToolDef
     ToolDb = ToolDef.ToolsDefTxtDatabase
     # if user not specify filter, try to deduce it from global data.
     if KeyStringList is None or KeyStringList == []:

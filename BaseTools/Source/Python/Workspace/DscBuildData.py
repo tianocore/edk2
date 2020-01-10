@@ -19,8 +19,8 @@ from Common.Misc import *
 from types import *
 from Common.Expression import *
 from CommonDataClass.CommonClass import SkuInfoClass
-from Common.TargetTxtClassObject import TargetTxt
-from Common.ToolDefClassObject import ToolDef
+from Common.TargetTxtClassObject import TargetTxtDict
+from Common.ToolDefClassObject import ToolDefDict
 from .MetaDataTable import *
 from .MetaFileTable import *
 from .MetaFileParser import *
@@ -3296,6 +3296,8 @@ class DscBuildData(PlatformBuildClassObject):
     @property
     def ToolChainFamily(self):
         self._ToolChainFamily = TAB_COMPILER_MSFT
+        TargetObj = TargetTxtDict()
+        TargetTxt = TargetObj.Target
         BuildConfigurationFile = os.path.normpath(os.path.join(GlobalData.gConfDirectory, "target.txt"))
         if os.path.isfile(BuildConfigurationFile) == True:
             ToolDefinitionFile = TargetTxt.TargetTxtDictionary[DataType.TAB_TAT_DEFINES_TOOL_CHAIN_CONF]
@@ -3303,7 +3305,8 @@ class DscBuildData(PlatformBuildClassObject):
                 ToolDefinitionFile = "tools_def.txt"
                 ToolDefinitionFile = os.path.normpath(mws.join(self.WorkspaceDir, 'Conf', ToolDefinitionFile))
             if os.path.isfile(ToolDefinitionFile) == True:
-                ToolDefinition = ToolDef.ToolsDefTxtDatabase
+                ToolDefObj = ToolDefDict((os.path.join(os.getenv("WORKSPACE"), "Conf")))
+                ToolDefinition = ToolDefObj.ToolDef.ToolsDefTxtDatabase
                 if TAB_TOD_DEFINES_FAMILY not in ToolDefinition \
                    or self._Toolchain not in ToolDefinition[TAB_TOD_DEFINES_FAMILY] \
                    or not ToolDefinition[TAB_TOD_DEFINES_FAMILY][self._Toolchain]:
