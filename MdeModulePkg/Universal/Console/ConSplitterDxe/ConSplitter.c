@@ -462,11 +462,6 @@ ConSplitterDriverEntry(
   ASSERT_EFI_ERROR (Status);
 
   //
-  // Graphics Output protocol must be supported.
-  //
-  ASSERT (FeaturePcdGet (PcdConOutGopSupport));
-
-  //
   // The driver creates virtual handles for ConIn, ConOut, StdErr.
   // The virtual handles will always exist even if no console exist in the
   // system. This is need to support hotplug devices like USB.
@@ -720,9 +715,7 @@ ConSplitterTextOutConstructor (
   //
   // Copy protocols template
   //
-  if (FeaturePcdGet (PcdConOutGopSupport)) {
-    CopyMem (&ConOutPrivate->GraphicsOutput, &mGraphicsOutputProtocolTemplate, sizeof (EFI_GRAPHICS_OUTPUT_PROTOCOL));
-  }
+  CopyMem (&ConOutPrivate->GraphicsOutput, &mGraphicsOutputProtocolTemplate, sizeof (EFI_GRAPHICS_OUTPUT_PROTOCOL));
 
   //
   // Initilize console output splitter's private data.
@@ -764,47 +757,44 @@ ConSplitterTextOutConstructor (
   ConOutPrivate->TextOutQueryData[0].Rows     = 25;
   TextOutSetMode (ConOutPrivate, 0);
 
-
-  if (FeaturePcdGet (PcdConOutGopSupport)) {
-    //
-    // Setup resource for mode information in Graphics Output Protocol interface
-    //
-    if ((ConOutPrivate->GraphicsOutput.Mode = AllocateZeroPool (sizeof (EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE))) == NULL) {
-      return EFI_OUT_OF_RESOURCES;
-    }
-    if ((ConOutPrivate->GraphicsOutput.Mode->Info = AllocateZeroPool (sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION))) == NULL) {
-      return EFI_OUT_OF_RESOURCES;
-    }
-    //
-    // Setup the DevNullGraphicsOutput to 800 x 600 x 32 bits per pixel
-    // DevNull will be updated to user-defined mode after driver has started.
-    //
-    if ((ConOutPrivate->GraphicsOutputModeBuffer = AllocateZeroPool (sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION))) == NULL) {
-      return EFI_OUT_OF_RESOURCES;
-    }
-    Info = &ConOutPrivate->GraphicsOutputModeBuffer[0];
-    Info->Version = 0;
-    Info->HorizontalResolution = 800;
-    Info->VerticalResolution = 600;
-    Info->PixelFormat = PixelBltOnly;
-    Info->PixelsPerScanLine = 800;
-    CopyMem (ConOutPrivate->GraphicsOutput.Mode->Info, Info, sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION));
-    ConOutPrivate->GraphicsOutput.Mode->SizeOfInfo = sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION);
-
-    //
-    // Initialize the following items, theset items remain unchanged in GraphicsOutput->SetMode()
-    // GraphicsOutputMode->FrameBufferBase, GraphicsOutputMode->FrameBufferSize
-    //
-    ConOutPrivate->GraphicsOutput.Mode->FrameBufferBase = (EFI_PHYSICAL_ADDRESS) (UINTN) NULL;
-    ConOutPrivate->GraphicsOutput.Mode->FrameBufferSize = 0;
-
-    ConOutPrivate->GraphicsOutput.Mode->MaxMode = 1;
-    //
-    // Initial current mode to unknown state, and then set to mode 0
-    //
-    ConOutPrivate->GraphicsOutput.Mode->Mode = 0xffff;
-    ConOutPrivate->GraphicsOutput.SetMode (&ConOutPrivate->GraphicsOutput, 0);
+  //
+  // Setup resource for mode information in Graphics Output Protocol interface
+  //
+  if ((ConOutPrivate->GraphicsOutput.Mode = AllocateZeroPool (sizeof (EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE))) == NULL) {
+    return EFI_OUT_OF_RESOURCES;
   }
+  if ((ConOutPrivate->GraphicsOutput.Mode->Info = AllocateZeroPool (sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION))) == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+  //
+  // Setup the DevNullGraphicsOutput to 800 x 600 x 32 bits per pixel
+  // DevNull will be updated to user-defined mode after driver has started.
+  //
+  if ((ConOutPrivate->GraphicsOutputModeBuffer = AllocateZeroPool (sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION))) == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+  Info = &ConOutPrivate->GraphicsOutputModeBuffer[0];
+  Info->Version = 0;
+  Info->HorizontalResolution = 800;
+  Info->VerticalResolution = 600;
+  Info->PixelFormat = PixelBltOnly;
+  Info->PixelsPerScanLine = 800;
+  CopyMem (ConOutPrivate->GraphicsOutput.Mode->Info, Info, sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION));
+  ConOutPrivate->GraphicsOutput.Mode->SizeOfInfo = sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION);
+
+  //
+  // Initialize the following items, theset items remain unchanged in GraphicsOutput->SetMode()
+  // GraphicsOutputMode->FrameBufferBase, GraphicsOutputMode->FrameBufferSize
+  //
+  ConOutPrivate->GraphicsOutput.Mode->FrameBufferBase = (EFI_PHYSICAL_ADDRESS) (UINTN) NULL;
+  ConOutPrivate->GraphicsOutput.Mode->FrameBufferSize = 0;
+
+  ConOutPrivate->GraphicsOutput.Mode->MaxMode = 1;
+  //
+  // Initial current mode to unknown state, and then set to mode 0
+  //
+  ConOutPrivate->GraphicsOutput.Mode->Mode = 0xffff;
+  ConOutPrivate->GraphicsOutput.SetMode (&ConOutPrivate->GraphicsOutput, 0);
 
   return EFI_SUCCESS;
 }
