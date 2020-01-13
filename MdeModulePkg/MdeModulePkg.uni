@@ -703,18 +703,6 @@
                                                                                              "TRUE  - Installs Unicode Collation 2 Protocol.<BR>\n"
                                                                                              "FALSE - Does not install Unicode Collation 2 Protocol.<BR>"
 
-#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdConOutGopSupport_PROMPT  #language en-US "Enable ConOut GOP support"
-
-#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdConOutGopSupport_HELP  #language en-US "Indicates if Graphics Output Protocol will be installed on virtual handle created by ConsplitterDxe. It could be set FALSE to save size.<BR><BR>\n"
-                                                                                     "TRUE  - Installs Graphics Output Protocol on virtual handle created by ConsplitterDxe.<BR>\n"
-                                                                                     "FALSE - Does not install Graphics Output Protocol on virtual handle created by ConsplitterDxe.<BR>"
-
-#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdConOutUgaSupport_PROMPT  #language en-US "Enable ConOut UGA support"
-
-#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdConOutUgaSupport_HELP  #language en-US "Indicates if UGA Draw Protocol will be installed on virtual handle created by ConsplitterDxe. It could be set FALSE to save size.<BR><BR>\n"
-                                                                                     "TRUE  - Installs UGA Draw Protocol on virtual handle created by ConsplitterDxe.<BR>\n"
-                                                                                     "FALSE - Does not install UGA Draw Protocol on virtual handle created by ConsplitterDxe.<BR>"
-
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdPeiCoreImageLoaderSearchTeSectionFirst_PROMPT  #language en-US "PeiCore search TE section first"
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdPeiCoreImageLoaderSearchTeSectionFirst_HELP  #language en-US "Indicates PeiCore will first search TE section from the PEIM to load the image, or PE32 section, when PeiCore dispatches a PEI module. This PCD is used to tune PEI phase performance to reduce the search image time. It can be set according to the generated image section type.<BR><BR>\n"
