@@ -2,7 +2,7 @@
   This library is only intended to be used by PlatformBootManagerLib
   to show progress bar and LOGO.
 
-Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2021, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -26,7 +26,7 @@ BootLogoEnableLogo (
   Use SystemTable ConOut to turn on video based Simple Text Out consoles. The
   Simple Text Out screens will now be synced up with all non-video output devices.
 
-  @retval EFI_SUCCESS     UGA devices are back in text mode and synced up.
+  @retval EFI_SUCCESS     Graphic device are back in text mode and synced up.
 
 **/
 EFI_STATUS
