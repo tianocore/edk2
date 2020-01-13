@@ -726,20 +726,6 @@
   # @Prompt Enable Unicode Collation 2 support.
   gEfiMdeModulePkgTokenSpaceGuid.PcdUnicodeCollation2Support|TRUE|BOOLEAN|0x00010041
 
-  ## Indicates if Graphics Output Protocol will be installed on virtual handle created by ConsplitterDxe.
-  #  It could be set FALSE to save size.<BR><BR>
-  #   TRUE  - Installs Graphics Output Protocol on virtual handle created by ConsplitterDxe.<BR>
-  #   FALSE - Does not install Graphics Output Protocol on virtual handle created by ConsplitterDxe.<BR>
-  # @Prompt Enable ConOut GOP support.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutGopSupport|TRUE|BOOLEAN|0x00010042
-
-  ## Indicates if UGA Draw Protocol will be installed on virtual handle created by ConsplitterDxe.
-  #  It could be set FALSE to save size.<BR><BR>
-  #   TRUE  - Installs UGA Draw Protocol on virtual handle created by ConsplitterDxe.<BR>
-  #   FALSE - Does not install UGA Draw Protocol on virtual handle created by ConsplitterDxe.<BR>
-  # @Prompt Enable ConOut UGA support.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutUgaSupport|TRUE|BOOLEAN|0x00010043
-
   ## Indicates PeiCore will first search TE section from the PEIM to load the image, or PE32 section, when PeiCore dispatches a PEI module.
   #  This PCD is used to tune PEI phase performance to reduce the search image time.
   #  It can be set according to the generated image section type.<BR><BR>
