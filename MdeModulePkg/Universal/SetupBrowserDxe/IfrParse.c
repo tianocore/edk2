@@ -1,15 +1,15 @@
 /** @file
 Parser for IFR binary encoding.
 
-Copyright (c) 2007 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2020, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include "Setup.h"
 
-UINT16           mStatementIndex;
-UINT16           mExpressionOpCodeIndex;
+UINTN            mStatementIndex;
+UINTN            mExpressionOpCodeIndex;
 EFI_QUESTION_ID  mUsedQuestionId;
 extern LIST_ENTRY      gBrowserStorageList;
 /**
@@ -1106,12 +1106,12 @@ IsUnKnownOpCode (
 VOID
 CountOpCodes (
   IN  FORM_BROWSER_FORMSET  *FormSet,
-  IN OUT  UINT16            *NumberOfStatement,
-  IN OUT  UINT16            *NumberOfExpression
+  OUT  UINTN             *NumberOfStatement,
+  OUT  UINTN             *NumberOfExpression
   )
 {
-  UINT16  StatementCount;
-  UINT16  ExpressionCount;
+  UINTN   StatementCount;
+  UINTN   ExpressionCount;
   UINT8   *OpCodeData;
   UINTN   Offset;
   UINTN   OpCodeLen;
@@ -1169,8 +1169,8 @@ ParseOpCodes (
   QUESTION_DEFAULT        *CurrentDefault;
   QUESTION_OPTION         *CurrentOption;
   UINT8                   Width;
-  UINT16                  NumberOfStatement;
-  UINT16                  NumberOfExpression;
+  UINTN                   NumberOfStatement;
+  UINTN                   NumberOfExpression;
   EFI_IMAGE_ID            *ImageId;
   BOOLEAN                 SuppressForQuestion;
   BOOLEAN                 SuppressForOption;
