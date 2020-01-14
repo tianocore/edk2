@@ -70,7 +70,7 @@ Tianocore Stewards
 F: *
 M: Andrew Fish <afish@apple.com>
 M: Laszlo Ersek <lersek@redhat.com>
-M: Leif Lindholm <leif.lindholm@linaro.org>
+M: Leif Lindholm <leif@nuviainc.com>
 M: Michael D Kinney <michael.d.kinney@intel.com>
 
 Responsible Disclosure, Reporting Security Issues
@@ -87,7 +87,7 @@ UEFI Shell Binaries (ShellBinPkg.zip) from EDK II Releases:
 W: https://github.com/tianocore/edk2/releases/
 M: Ray Ni <ray.ni@intel.com>                  (Ia32/X64)
 M: Zhichao Gao <zhichao.gao@intel.com>        (Ia32/X64)
-M: Leif Lindholm <leif.lindholm@linaro.org>   (ARM/AArch64)
+M: Leif Lindholm <leif@nuviainc.com>          (ARM/AArch64)
 M: Ard Biesheuvel <ard.biesheuvel@linaro.org> (ARM/AArch64)
 
 EDK II Architectures:
@@ -95,7 +95,7 @@ EDK II Architectures:
 ARM, AARCH64
 F: */AArch64/
 F: */Arm/
-M: Leif Lindholm <leif.lindholm@linaro.org>
+M: Leif Lindholm <leif@nuviainc.com>
 M: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
 EDK II Continuous Integration:
@@ -126,13 +126,13 @@ EDK II Packages:
 ArmPkg
 F: ArmPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/ArmPkg
-M: Leif Lindholm <leif.lindholm@linaro.org>
+M: Leif Lindholm <leif@nuviainc.com>
 M: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
 ArmPlatformPkg
 F: ArmPlatformPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/ArmPlatformPkg
-M: Leif Lindholm <leif.lindholm@linaro.org>
+M: Leif Lindholm <leif@nuviainc.com>
 M: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
 ArmVirtPkg
@@ -140,7 +140,7 @@ F: ArmVirtPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/ArmVirtPkg
 M: Laszlo Ersek <lersek@redhat.com>
 M: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-R: Leif Lindholm <leif.lindholm@linaro.org>
+R: Leif Lindholm <leif@nuviainc.com>
 
 ArmVirtPkg: modules used on Xen
 F: ArmVirtPkg/ArmVirtXen.*
@@ -173,7 +173,7 @@ M: Alexei Fedorov <Alexei.Fedorov@arm.com>
 EmbeddedPkg
 F: EmbeddedPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/EmbeddedPkg
-M: Leif Lindholm <leif.lindholm@linaro.org>
+M: Leif Lindholm <leif@nuviainc.com>
 M: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
 EmulatorPkg
