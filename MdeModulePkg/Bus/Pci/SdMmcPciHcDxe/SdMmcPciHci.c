@@ -2138,6 +2138,137 @@ SdMmcExecTrb (
 }
 
 /**
+  Performs SW reset based on passed error status mask.
+
+  @param[in]  Private       Pointer to driver private data.
+  @param[in]  Slot          Index of the slot to reset.
+  @param[in]  ErrIntStatus  Error interrupt status mask.
+
+  @retval EFI_SUCCESS  Software reset performed successfully.
+  @retval Other        Software reset failed.
+**/
+EFI_STATUS
+SdMmcSoftwareReset (
+  IN SD_MMC_HC_PRIVATE_DATA  *Private,
+  IN UINT8                   Slot,
+  IN UINT16                  ErrIntStatus
+  )
+{
+  UINT8       SwReset;
+  EFI_STATUS  Status;
+
+  SwReset = 0;
+  if ((ErrIntStatus & 0x0F) != 0) {
+    SwReset |= BIT1;
+  }
+  if ((ErrIntStatus & 0x70) != 0) {
+    SwReset |= BIT2;
+  }
+
+  Status  = SdMmcHcRwMmio (
+              Private->PciIo,
+              Slot,
+              SD_MMC_HC_SW_RST,
+              FALSE,
+              sizeof (SwReset),
+              &SwReset
+              );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = SdMmcHcWaitMmioSet (
+             Private->PciIo,
+             Slot,
+             SD_MMC_HC_SW_RST,
+             sizeof (SwReset),
+             0xFF,
+             0,
+             SD_MMC_HC_GENERIC_TIMEOUT
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Checks the error status in error status register
+  and issues appropriate software reset as described in
+  SD specification section 3.10.
+
+  @param[in] Private    Pointer to driver private data.
+  @param[in] Trb        Pointer to currently executing TRB.
+  @param[in] IntStatus  Normal interrupt status mask.
+
+  @retval EFI_CRC_ERROR  CRC error happened during CMD execution.
+  @retval EFI_SUCCESS    No error reported.
+  @retval Others         Some other error happened.
+
+**/
+EFI_STATUS
+SdMmcCheckAndRecoverErrors (
+  IN SD_MMC_HC_PRIVATE_DATA  *Private,
+  IN UINT8                   Slot,
+  IN UINT16                  IntStatus
+  )
+{
+  UINT16      ErrIntStatus;
+  EFI_STATUS  Status;
+  EFI_STATUS  ErrorStatus;
+
+  if ((IntStatus & BIT15) == 0) {
+    return EFI_SUCCESS;
+  }
+
+  Status = SdMmcHcRwMmio (
+             Private->PciIo,
+             Slot,
+             SD_MMC_HC_ERR_INT_STS,
+             TRUE,
+             sizeof (ErrIntStatus),
+             &ErrIntStatus
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // If the data timeout error is reported
+  // but data transfer is signaled as completed we
+  // have to ignore data timeout. We also assume that no
+  // other error is present on the link since data transfer
+  // completed successfully. Error interrupt status
+  // register is going to be reset when the next command
+  // is started.
+  //
+  if (((ErrIntStatus & BIT4) != 0) && ((IntStatus & BIT1) != 0)) {
+    return EFI_SUCCESS;
+  }
+
+  //
+  // We treat both CMD and DAT CRC errors and
+  // end bits errors as EFI_CRC_ERROR. This will
+  // let higher layer know that the error possibly
+  // happened due to random bus condition and the
+  // command can be retried.
+  //
+  if ((ErrIntStatus & (BIT1 | BIT2 | BIT5 | BIT6)) != 0) {
+    ErrorStatus = EFI_CRC_ERROR;
+  } else {
+    ErrorStatus = EFI_DEVICE_ERROR;
+  }
+
+  Status = SdMmcSoftwareReset (Private, Slot, ErrIntStatus);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  return ErrorStatus;
+}
+
+/**
   Check the TRB execution result.
 
   @param[in] Private        A pointer to the SD_MMC_HC_PRIVATE_DATA instance.
@@ -2160,10 +2291,8 @@ SdMmcCheckTrbResult (
   UINT32                              Response[4];
   UINT64                              SdmaAddr;
   UINT8                               Index;
-  UINT8                               SwReset;
   UINT32                              PioLength;
 
-  SwReset = 0;
   Packet  = Trb->Packet;
   //
   // Check Trb execution result by reading Normal Interrupt Status register.
@@ -2179,87 +2308,23 @@ SdMmcCheckTrbResult (
   if (EFI_ERROR (Status)) {
     goto Done;
   }
+
+  //
+  // Check if there are any errors reported by host controller
+  // and if neccessary recover the controller before next command is executed.
+  //
+  Status = SdMmcCheckAndRecoverErrors (Private, Trb->Slot, IntStatus);
+  if (EFI_ERROR (Status)) {
+    goto Done;
+  }
+
   //
   // Check Transfer Complete bit is set or not.
   //
   if ((IntStatus & BIT1) == BIT1) {
-    if ((IntStatus & BIT15) == BIT15) {
-      //
-      // Read Error Interrupt Status register to check if the error is
-      // Data Timeout Error.
-      // If yes, treat it as success as Transfer Complete has higher
-      // priority than Data Timeout Error.
-      //
-      Status = SdMmcHcRwMmio (
-                 Private->PciIo,
-                 Trb->Slot,
-                 SD_MMC_HC_ERR_INT_STS,
-                 TRUE,
-                 sizeof (IntStatus),
-                 &IntStatus
-                 );
-      if (!EFI_ERROR (Status)) {
-        if ((IntStatus & BIT4) == BIT4) {
-          Status = EFI_SUCCESS;
-        } else {
-          Status = EFI_DEVICE_ERROR;
-        }
-      }
-    }
-
     goto Done;
   }
-  //
-  // Check if there is a error happened during cmd execution.
-  // If yes, then do error recovery procedure to follow SD Host Controller
-  // Simplified Spec 3.0 section 3.10.1.
-  //
-  if ((IntStatus & BIT15) == BIT15) {
-    Status = SdMmcHcRwMmio (
-               Private->PciIo,
-               Trb->Slot,
-               SD_MMC_HC_ERR_INT_STS,
-               TRUE,
-               sizeof (IntStatus),
-               &IntStatus
-               );
-    if (EFI_ERROR (Status)) {
-      goto Done;
-    }
-    if ((IntStatus & 0x0F) != 0) {
-      SwReset |= BIT1;
-    }
-    if ((IntStatus & 0x70) != 0) {
-      SwReset |= BIT2;
-    }
 
-    Status  = SdMmcHcRwMmio (
-                Private->PciIo,
-                Trb->Slot,
-                SD_MMC_HC_SW_RST,
-                FALSE,
-                sizeof (SwReset),
-                &SwReset
-                );
-    if (EFI_ERROR (Status)) {
-      goto Done;
-    }
-    Status = SdMmcHcWaitMmioSet (
-               Private->PciIo,
-               Trb->Slot,
-               SD_MMC_HC_SW_RST,
-               sizeof (SwReset),
-               0xFF,
-               0,
-               SD_MMC_HC_GENERIC_TIMEOUT
-               );
-    if (EFI_ERROR (Status)) {
-      goto Done;
-    }
-
-    Status = EFI_DEVICE_ERROR;
-    goto Done;
-  }
   //
   // Check if DMA interrupt is signalled for the SDMA transfer.
   //
