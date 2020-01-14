@@ -7,7 +7,7 @@
   It would expose EFI_SD_MMC_PASS_THRU_PROTOCOL for upper layer use.
 
   Copyright (c) 2018-2019, NVIDIA CORPORATION. All rights reserved.
-  Copyright (c) 2015 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2020, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -2229,7 +2229,7 @@ SdMmcCheckTrbResult (
     if ((IntStatus & 0x0F) != 0) {
       SwReset |= BIT1;
     }
-    if ((IntStatus & 0xF0) != 0) {
+    if ((IntStatus & 0x70) != 0) {
       SwReset |= BIT2;
     }
 
