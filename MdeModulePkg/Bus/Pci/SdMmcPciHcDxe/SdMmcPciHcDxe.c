@@ -211,8 +211,10 @@ Done:
       gBS->SignalEvent (TrbEvent);
       return;
     }
-  }
-  if ((Trb != NULL) && (Status != EFI_NOT_READY)) {
+  } else if ((Trb != NULL) && (Status == EFI_CRC_ERROR) && (Trb->Retries > 0)) {
+    Trb->Retries--;
+    Trb->Started = FALSE;
+  } else if ((Trb != NULL)) {
     RemoveEntryList (Link);
     Trb->Packet->TransactionStatus = Status;
     TrbEvent = Trb->Event;
