@@ -1683,6 +1683,7 @@ SdMmcCreateTrb (
   Trb->Event     = Event;
   Trb->Started   = FALSE;
   Trb->Timeout   = Packet->Timeout;
+  Trb->Retries   = SD_MMC_TRB_RETRIES;
   Trb->Private   = Private;
 
   if ((Packet->InTransferLength != 0) && (Packet->InDataBuffer != NULL)) {
