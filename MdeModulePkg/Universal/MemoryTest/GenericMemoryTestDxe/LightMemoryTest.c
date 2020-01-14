@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2020, Intel Corporation. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -677,10 +677,12 @@ GenMemoryTestFinished (
   Private = GENERIC_MEMORY_TEST_PRIVATE_FROM_THIS (This);
 
   //
-  // Perform Data and Address line test
+  // Perform Data and Address line test only if not ignore memory test
   //
-  Status = PerformAddressDataLineTest (Private);
-  ASSERT_EFI_ERROR (Status);
+  if (Private->CoverLevel != IGNORE) {
+    Status = PerformAddressDataLineTest (Private);
+    ASSERT_EFI_ERROR (Status);
+  }
 
   //
   // Add the non tested memory range to system memory map through GCD service
