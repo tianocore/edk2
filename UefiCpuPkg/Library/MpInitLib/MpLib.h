@@ -1,7 +1,7 @@
 /** @file
   Common header file for MP Initialize Library.
 
-  Copyright (c) 2016 - 2020, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2019, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -252,7 +252,6 @@ struct _CPU_MP_DATA {
   CPU_EXCHANGE_ROLE_INFO         APInfo;
   MTRR_SETTINGS                  MtrrTable;
   UINT8                          ApLoopMode;
-  UINT8                          DcuMode;
   UINT8                          ApTargetCState;
   UINT16                         PmCodeSegment;
   CPU_AP_DATA                    *CpuData;
