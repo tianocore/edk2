@@ -1621,7 +1621,8 @@ DxeImageVerificationHandler (
   //
   if (Policy == ALWAYS_EXECUTE) {
     return EFI_SUCCESS;
-  } else if (Policy == NEVER_EXECUTE) {
+  }
+  if (Policy == NEVER_EXECUTE) {
     return EFI_ACCESS_DENIED;
   }
 
@@ -1833,7 +1834,8 @@ DxeImageVerificationHandler (
       DEBUG ((DEBUG_INFO, "DxeImageVerificationLib: Image is signed but %s hash of image is found in DBX.\n", mHashTypeStr));
       IsVerified = FALSE;
       break;
-    } else if (!IsVerified) {
+    }
+    if (!IsVerified) {
       if (IsSignatureFoundInDatabase (EFI_IMAGE_SECURITY_DATABASE, mImageDigest, &mCertType, mImageDigestSize)) {
         IsVerified = TRUE;
       } else {
@@ -1851,25 +1853,24 @@ DxeImageVerificationHandler (
 
   if (IsVerified) {
     return EFI_SUCCESS;
-  } else {
-    Status = EFI_ACCESS_DENIED;
-    if (Action == EFI_IMAGE_EXECUTION_AUTH_SIG_FAILED || Action == EFI_IMAGE_EXECUTION_AUTH_SIG_FOUND) {
-      //
-      // Get image hash value as signature of executable.
-      //
-      SignatureListSize = sizeof (EFI_SIGNATURE_LIST) + sizeof (EFI_SIGNATURE_DATA) - 1 + mImageDigestSize;
-      SignatureList     = (EFI_SIGNATURE_LIST *) AllocateZeroPool (SignatureListSize);
-      if (SignatureList == NULL) {
-        Status = EFI_OUT_OF_RESOURCES;
-        goto Done;
-      }
-      SignatureList->SignatureHeaderSize  = 0;
-      SignatureList->SignatureListSize    = (UINT32) SignatureListSize;
-      SignatureList->SignatureSize        = (UINT32) (sizeof (EFI_SIGNATURE_DATA) - 1 + mImageDigestSize);
-      CopyMem (&SignatureList->SignatureType, &mCertType, sizeof (EFI_GUID));
-      Signature = (EFI_SIGNATURE_DATA *) ((UINT8 *) SignatureList + sizeof (EFI_SIGNATURE_LIST));
-      CopyMem (Signature->SignatureData, mImageDigest, mImageDigestSize);
+  }
+  Status = EFI_ACCESS_DENIED;
+  if (Action == EFI_IMAGE_EXECUTION_AUTH_SIG_FAILED || Action == EFI_IMAGE_EXECUTION_AUTH_SIG_FOUND) {
+    //
+    // Get image hash value as signature of executable.
+    //
+    SignatureListSize = sizeof (EFI_SIGNATURE_LIST) + sizeof (EFI_SIGNATURE_DATA) - 1 + mImageDigestSize;
+    SignatureList     = (EFI_SIGNATURE_LIST *) AllocateZeroPool (SignatureListSize);
+    if (SignatureList == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto Done;
     }
+    SignatureList->SignatureHeaderSize  = 0;
+    SignatureList->SignatureListSize    = (UINT32) SignatureListSize;
+    SignatureList->SignatureSize        = (UINT32) (sizeof (EFI_SIGNATURE_DATA) - 1 + mImageDigestSize);
+    CopyMem (&SignatureList->SignatureType, &mCertType, sizeof (EFI_GUID));
+    Signature = (EFI_SIGNATURE_DATA *) ((UINT8 *) SignatureList + sizeof (EFI_SIGNATURE_LIST));
+    CopyMem (Signature->SignatureData, mImageDigest, mImageDigestSize);
   }
 
 Done:
