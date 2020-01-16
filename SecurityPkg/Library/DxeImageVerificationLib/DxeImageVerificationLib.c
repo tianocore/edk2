@@ -1548,7 +1548,8 @@ Done:
                                  execution table.
   @retval EFI_ACCESS_DENIED      The file specified by File and FileBuffer did not
                                  authenticate, and the platform policy dictates that the DXE
-                                 Foundation many not use File.
+                                 Foundation may not use File. The image has
+                                 been added to the file execution table.
 
 **/
 EFI_STATUS
@@ -1872,7 +1873,8 @@ DxeImageVerificationHandler (
 
 Failed:
   //
-  // Policy decides to defer or reject the image; add its information in image executable information table.
+  // Policy decides to defer or reject the image; add its information in image
+  // executable information table in either case.
   //
   NameStr = ConvertDevicePathToText (File, FALSE, TRUE);
   AddImageExeInfo (Action, NameStr, File, SignatureList, SignatureListSize);
@@ -1885,7 +1887,10 @@ Failed:
     FreePool (SignatureList);
   }
 
-  return EFI_SECURITY_VIOLATION;
+  if (Policy == DEFER_EXECUTE_ON_SECURITY_VIOLATION) {
+    return EFI_SECURITY_VIOLATION;
+  }
+  return EFI_ACCESS_DENIED;
 }
 
 /**
