@@ -195,7 +195,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 ///
 #define ASM_PFX(name) _CONCATENATE (__USER_LABEL_PREFIX__, name)
 
-#if __APPLE__
+#ifdef __APPLE__
   //
   // Apple extension that is used by the linker to optimize code size
   // with assembly functions. Put at the end of your .S files
@@ -799,7 +799,7 @@ typedef UINTN  *BASE_LIST;
 **/
 #ifdef MDE_CPU_EBC
   #define STATIC_ASSERT(Expression, Message)
-#elif _MSC_EXTENSIONS
+#elif defined(_MSC_EXTENSIONS)
   #define STATIC_ASSERT static_assert
 #else
   #define STATIC_ASSERT _Static_assert
