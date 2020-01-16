@@ -1541,7 +1541,6 @@ Done:
                                  and non-NULL FileBuffer did authenticate, and the platform
                                  policy dictates that the DXE Foundation may execute the image in
                                  FileBuffer.
-  @retval EFI_OUT_RESOURCE       Fail to allocate memory.
   @retval EFI_SECURITY_VIOLATION The file specified by File did not authenticate, and
                                  the platform policy dictates that File should be placed
                                  in the untrusted state. The image has been added to the file
@@ -1862,7 +1861,6 @@ DxeImageVerificationHandler (
     SignatureListSize = sizeof (EFI_SIGNATURE_LIST) + sizeof (EFI_SIGNATURE_DATA) - 1 + mImageDigestSize;
     SignatureList     = (EFI_SIGNATURE_LIST *) AllocateZeroPool (SignatureListSize);
     if (SignatureList == NULL) {
-      Status = EFI_OUT_OF_RESOURCES;
       goto Done;
     }
     SignatureList->SignatureHeaderSize  = 0;
