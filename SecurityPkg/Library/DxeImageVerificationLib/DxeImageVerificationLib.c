@@ -1563,7 +1563,7 @@ DxeImageVerificationHandler (
 {
   EFI_STATUS                           Status;
   EFI_IMAGE_DOS_HEADER                 *DosHdr;
-  EFI_STATUS                           VerifyStatus;
+  BOOLEAN                              IsVerified;
   EFI_SIGNATURE_LIST                   *SignatureList;
   UINTN                                SignatureListSize;
   EFI_SIGNATURE_DATA                   *Signature;
@@ -1588,7 +1588,7 @@ DxeImageVerificationHandler (
   PkcsCertData      = NULL;
   Action            = EFI_IMAGE_EXECUTION_AUTH_UNTESTED;
   Status            = EFI_ACCESS_DENIED;
-  VerifyStatus      = EFI_ACCESS_DENIED;
+  IsVerified        = FALSE;
 
 
   //
@@ -1812,16 +1812,16 @@ DxeImageVerificationHandler (
     //
     if (IsForbiddenByDbx (AuthData, AuthDataSize)) {
       Action = EFI_IMAGE_EXECUTION_AUTH_SIG_FAILED;
-      VerifyStatus = EFI_ACCESS_DENIED;
+      IsVerified = FALSE;
       break;
     }
 
     //
     // Check the digital signature against the valid certificate in allowed database (db).
     //
-    if (EFI_ERROR (VerifyStatus)) {
+    if (!IsVerified) {
       if (IsAllowedByDb (AuthData, AuthDataSize)) {
-        VerifyStatus = EFI_SUCCESS;
+        IsVerified = TRUE;
       }
     }
 
@@ -1831,11 +1831,11 @@ DxeImageVerificationHandler (
     if (IsSignatureFoundInDatabase (EFI_IMAGE_SECURITY_DATABASE1, mImageDigest, &mCertType, mImageDigestSize)) {
       Action = EFI_IMAGE_EXECUTION_AUTH_SIG_FOUND;
       DEBUG ((DEBUG_INFO, "DxeImageVerificationLib: Image is signed but %s hash of image is found in DBX.\n", mHashTypeStr));
-      VerifyStatus = EFI_ACCESS_DENIED;
+      IsVerified = FALSE;
       break;
-    } else if (EFI_ERROR (VerifyStatus)) {
+    } else if (!IsVerified) {
       if (IsSignatureFoundInDatabase (EFI_IMAGE_SECURITY_DATABASE, mImageDigest, &mCertType, mImageDigestSize)) {
-        VerifyStatus = EFI_SUCCESS;
+        IsVerified = TRUE;
       } else {
         DEBUG ((DEBUG_INFO, "DxeImageVerificationLib: Image is signed but signature is not allowed by DB and %s hash of image is not found in DB/DBX.\n", mHashTypeStr));
       }
@@ -1846,10 +1846,10 @@ DxeImageVerificationHandler (
     //
     // The Size in Certificate Table or the attribute certificate table is corrupted.
     //
-    VerifyStatus = EFI_ACCESS_DENIED;
+    IsVerified = FALSE;
   }
 
-  if (!EFI_ERROR (VerifyStatus)) {
+  if (IsVerified) {
     return EFI_SUCCESS;
   } else {
     Status = EFI_ACCESS_DENIED;
