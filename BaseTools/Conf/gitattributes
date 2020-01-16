@@ -17,3 +17,14 @@
 *.fdf     diff=ini
 *.fdf.inc diff=ini
 *.inf     diff=ini
+*.c       diff=cpp
+*.C       diff=cpp
+*.cc      diff=cpp
+*.CC      diff=cpp
+*.cpp     diff=cpp
+*.Cpp     diff=cpp
+*.CPP     diff=cpp
+*.aslc    diff=cpp
+*.act     diff=cpp
+*.h       diff=cpp
+*.H       diff=cpp
