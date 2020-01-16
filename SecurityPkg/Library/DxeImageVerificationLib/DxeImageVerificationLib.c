@@ -1655,7 +1655,7 @@ DxeImageVerificationHandler (
   // Read the Dos header.
   //
   if (FileBuffer == NULL) {
-    return EFI_INVALID_PARAMETER;
+    return EFI_ACCESS_DENIED;
   }
 
   mImageBase  = (UINT8 *) FileBuffer;
