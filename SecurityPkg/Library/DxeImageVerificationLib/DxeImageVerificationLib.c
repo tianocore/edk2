@@ -1676,7 +1676,7 @@ DxeImageVerificationHandler (
     // The information can't be got from the invalid PeImage
     //
     DEBUG ((DEBUG_INFO, "DxeImageVerificationLib: PeImage invalid. Cannot retrieve image information.\n"));
-    goto Done;
+    goto Failed;
   }
 
   DosHdr = (EFI_IMAGE_DOS_HEADER *) mImageBase;
@@ -1698,7 +1698,7 @@ DxeImageVerificationHandler (
     // It is not a valid Pe/Coff file.
     //
     DEBUG ((DEBUG_INFO, "DxeImageVerificationLib: Not a valid PE/COFF image.\n"));
-    goto Done;
+    goto Failed;
   }
 
   if (mNtHeader.Pe32->OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
@@ -1729,7 +1729,7 @@ DxeImageVerificationHandler (
     //
     if (!HashPeImage (HASHALG_SHA256)) {
       DEBUG ((DEBUG_INFO, "DxeImageVerificationLib: Failed to hash this image using %s.\n", mHashTypeStr));
-      goto Done;
+      goto Failed;
     }
 
     if (IsSignatureFoundInDatabase (EFI_IMAGE_SECURITY_DATABASE1, mImageDigest, &mCertType, mImageDigestSize)) {
@@ -1737,7 +1737,7 @@ DxeImageVerificationHandler (
       // Image Hash is in forbidden database (DBX).
       //
       DEBUG ((DEBUG_INFO, "DxeImageVerificationLib: Image is not signed and %s hash of image is forbidden by DBX.\n", mHashTypeStr));
-      goto Done;
+      goto Failed;
     }
 
     if (IsSignatureFoundInDatabase (EFI_IMAGE_SECURITY_DATABASE, mImageDigest, &mCertType, mImageDigestSize)) {
@@ -1751,7 +1751,7 @@ DxeImageVerificationHandler (
     // Image Hash is not found in both forbidden and allowed database.
     //
     DEBUG ((DEBUG_INFO, "DxeImageVerificationLib: Image is not signed and %s hash of image is not found in DB/DBX.\n", mHashTypeStr));
-    goto Done;
+    goto Failed;
   }
 
   //
@@ -1860,7 +1860,7 @@ DxeImageVerificationHandler (
     SignatureListSize = sizeof (EFI_SIGNATURE_LIST) + sizeof (EFI_SIGNATURE_DATA) - 1 + mImageDigestSize;
     SignatureList     = (EFI_SIGNATURE_LIST *) AllocateZeroPool (SignatureListSize);
     if (SignatureList == NULL) {
-      goto Done;
+      goto Failed;
     }
     SignatureList->SignatureHeaderSize  = 0;
     SignatureList->SignatureListSize    = (UINT32) SignatureListSize;
@@ -1870,19 +1870,17 @@ DxeImageVerificationHandler (
     CopyMem (Signature->SignatureData, mImageDigest, mImageDigestSize);
   }
 
-Done:
-  if (Status != EFI_SUCCESS) {
-    //
-    // Policy decides to defer or reject the image; add its information in image executable information table.
-    //
-    NameStr = ConvertDevicePathToText (File, FALSE, TRUE);
-    AddImageExeInfo (Action, NameStr, File, SignatureList, SignatureListSize);
-    if (NameStr != NULL) {
-      DEBUG((EFI_D_INFO, "The image doesn't pass verification: %s\n", NameStr));
-      FreePool(NameStr);
-    }
-    Status = EFI_SECURITY_VIOLATION;
+Failed:
+  //
+  // Policy decides to defer or reject the image; add its information in image executable information table.
+  //
+  NameStr = ConvertDevicePathToText (File, FALSE, TRUE);
+  AddImageExeInfo (Action, NameStr, File, SignatureList, SignatureListSize);
+  if (NameStr != NULL) {
+    DEBUG ((DEBUG_INFO, "The image doesn't pass verification: %s\n", NameStr));
+    FreePool(NameStr);
   }
+  Status = EFI_SECURITY_VIOLATION;
 
   if (SignatureList != NULL) {
     FreePool (SignatureList);
