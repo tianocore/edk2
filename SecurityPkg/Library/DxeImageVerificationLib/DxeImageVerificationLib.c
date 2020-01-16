@@ -1560,7 +1560,6 @@ DxeImageVerificationHandler (
   IN  BOOLEAN                          BootPolicy
   )
 {
-  EFI_STATUS                           Status;
   EFI_IMAGE_DOS_HEADER                 *DosHdr;
   BOOLEAN                              IsVerified;
   EFI_SIGNATURE_LIST                   *SignatureList;
@@ -1588,7 +1587,6 @@ DxeImageVerificationHandler (
   SecDataDir        = NULL;
   PkcsCertData      = NULL;
   Action            = EFI_IMAGE_EXECUTION_AUTH_UNTESTED;
-  Status            = EFI_ACCESS_DENIED;
   IsVerified        = FALSE;
 
 
@@ -1880,13 +1878,12 @@ Failed:
     DEBUG ((DEBUG_INFO, "The image doesn't pass verification: %s\n", NameStr));
     FreePool(NameStr);
   }
-  Status = EFI_SECURITY_VIOLATION;
 
   if (SignatureList != NULL) {
     FreePool (SignatureList);
   }
 
-  return Status;
+  return EFI_SECURITY_VIOLATION;
 }
 
 /**
