@@ -704,7 +704,7 @@ GetImageExeInfoTableSize (
   @param[in]  Name            Input a null-terminated, user-friendly name.
   @param[in]  DevicePath      Input device path pointer.
   @param[in]  Signature       Input signature info in EFI_SIGNATURE_LIST data structure.
-  @param[in]  SignatureSize   Size of signature.
+  @param[in]  SignatureSize   Size of signature. Must be zero if Signature is NULL.
 
 **/
 VOID
@@ -761,6 +761,7 @@ AddImageExeInfo (
   //
   // Signature size can be odd. Pad after signature to ensure next EXECUTION_INFO entry align
   //
+  ASSERT (Signature != NULL || SignatureSize == 0);
   NewImageExeInfoEntrySize = sizeof (EFI_IMAGE_EXECUTION_INFO) + NameStringLen + DevicePathSize + SignatureSize;
 
   NewImageExeInfoTable      = (EFI_IMAGE_EXECUTION_INFO_TABLE *) AllocateRuntimePool (ImageExeInfoTableSize + NewImageExeInfoEntrySize);
@@ -1858,6 +1859,7 @@ DxeImageVerificationHandler (
     SignatureListSize = sizeof (EFI_SIGNATURE_LIST) + sizeof (EFI_SIGNATURE_DATA) - 1 + mImageDigestSize;
     SignatureList     = (EFI_SIGNATURE_LIST *) AllocateZeroPool (SignatureListSize);
     if (SignatureList == NULL) {
+      SignatureListSize = 0;
       goto Failed;
     }
     SignatureList->SignatureHeaderSize  = 0;
