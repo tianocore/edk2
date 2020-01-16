@@ -1580,6 +1580,7 @@ DxeImageVerificationHandler (
   EFI_IMAGE_DATA_DIRECTORY             *SecDataDir;
   UINT32                               OffSet;
   CHAR16                               *NameStr;
+  RETURN_STATUS                        PeCoffStatus;
 
   SignatureList     = NULL;
   SignatureListSize = 0;
@@ -1669,16 +1670,14 @@ DxeImageVerificationHandler (
   //
   // Get information about the image being loaded
   //
-  Status = PeCoffLoaderGetImageInfo (&ImageContext);
-  if (EFI_ERROR (Status)) {
+  PeCoffStatus = PeCoffLoaderGetImageInfo (&ImageContext);
+  if (RETURN_ERROR (PeCoffStatus)) {
     //
     // The information can't be got from the invalid PeImage
     //
     DEBUG ((DEBUG_INFO, "DxeImageVerificationLib: PeImage invalid. Cannot retrieve image information.\n"));
     goto Done;
   }
-
-  Status = EFI_ACCESS_DENIED;
 
   DosHdr = (EFI_IMAGE_DOS_HEADER *) mImageBase;
   if (DosHdr->e_magic == EFI_IMAGE_DOS_SIGNATURE) {
