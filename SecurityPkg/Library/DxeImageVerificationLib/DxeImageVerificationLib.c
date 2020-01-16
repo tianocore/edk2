@@ -1581,6 +1581,7 @@ DxeImageVerificationHandler (
   UINT32                               OffSet;
   CHAR16                               *NameStr;
   RETURN_STATUS                        PeCoffStatus;
+  EFI_STATUS                           HashStatus;
 
   SignatureList     = NULL;
   SignatureListSize = 0;
@@ -1802,8 +1803,8 @@ DxeImageVerificationHandler (
       continue;
     }
 
-    Status = HashPeImageByType (AuthData, AuthDataSize);
-    if (EFI_ERROR (Status)) {
+    HashStatus = HashPeImageByType (AuthData, AuthDataSize);
+    if (EFI_ERROR (HashStatus)) {
       continue;
     }
 
