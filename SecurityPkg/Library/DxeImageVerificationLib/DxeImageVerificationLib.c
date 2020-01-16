@@ -1853,7 +1853,6 @@ DxeImageVerificationHandler (
   if (IsVerified) {
     return EFI_SUCCESS;
   }
-  Status = EFI_ACCESS_DENIED;
   if (Action == EFI_IMAGE_EXECUTION_AUTH_SIG_FAILED || Action == EFI_IMAGE_EXECUTION_AUTH_SIG_FOUND) {
     //
     // Get image hash value as signature of executable.
