@@ -1,45 +1,13 @@
 /** @file
   HMAC-SHA1 Wrapper Implementation over OpenSSL.
 
-Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2020, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include "InternalCryptLib.h"
 #include <openssl/hmac.h>
-
-//
-// NOTE: OpenSSL redefines the size of HMAC_CTX at crypto/hmac/hmac_lcl.h
-//       #define HMAC_MAX_MD_CBLOCK_SIZE     144
-//
-//
-#define  HMAC_SHA1_CTX_SIZE   (sizeof(void *) * 4 + sizeof(unsigned int) + \
-                             sizeof(unsigned char) * 144)
-
-/**
-  Retrieves the size, in bytes, of the context buffer required for HMAC-SHA1 operations.
-  (NOTE: This API is deprecated.
-         Use HmacSha1New() / HmacSha1Free() for HMAC-SHA1 Context operations.)
-
-  @return  The size, in bytes, of the context buffer required for HMAC-SHA1 operations.
-
-**/
-UINTN
-EFIAPI
-HmacSha1GetContextSize (
-  VOID
-  )
-{
-  //
-  // Retrieves the OpenSSL HMAC-SHA1 Context Size
-  // NOTE: HMAC_CTX object was made opaque in openssl-1.1.x, here we just use the
-  //       fixed size as a workaround to make this API work for compatibility.
-  //       We should retire HmacSha15GetContextSize() in future, and use HmacSha1New()
-  //       and HmacSha1Free() for context allocation and release.
-  //
-  return (UINTN) HMAC_SHA1_CTX_SIZE;
-}
 
 /**
   Allocates and initializes one HMAC_CTX context for subsequent HMAC-SHA1 use.

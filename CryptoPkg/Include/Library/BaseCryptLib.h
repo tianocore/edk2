@@ -4,7 +4,7 @@
   primitives (Hash Serials, HMAC, RSA, Diffie-Hellman, etc) for UEFI security
   functionality enabling.
 
-Copyright (c) 2009 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2020, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -1026,23 +1026,6 @@ Sm3HashAll (
 //=====================================================================================
 
 /**
-  Retrieves the size, in bytes, of the context buffer required for HMAC-MD5 operations.
-  (NOTE: This API is deprecated.
-         Use HmacMd5New() / HmacMd5Free() for HMAC-MD5 Context operations.)
-
-  If this interface is not supported, then return zero.
-
-  @return  The size, in bytes, of the context buffer required for HMAC-MD5 operations.
-  @retval  0   This interface is not supported.
-
-**/
-UINTN
-EFIAPI
-HmacMd5GetContextSize (
-  VOID
-  );
-
-/**
   Allocates and initializes one HMAC_CTX context for subsequent HMAC-MD5 use.
 
   If this interface is not supported, then return NULL.
@@ -1176,23 +1159,6 @@ HmacMd5Final (
   );
 
 /**
-  Retrieves the size, in bytes, of the context buffer required for HMAC-SHA1 operations.
-  (NOTE: This API is deprecated.
-         Use HmacSha1New() / HmacSha1Free() for HMAC-SHA1 Context operations.)
-
-  If this interface is not supported, then return zero.
-
-  @return  The size, in bytes, of the context buffer required for HMAC-SHA1 operations.
-  @retval  0   This interface is not supported.
-
-**/
-UINTN
-EFIAPI
-HmacSha1GetContextSize (
-  VOID
-  );
-
-/**
   Allocates and initializes one HMAC_CTX context for subsequent HMAC-SHA1 use.
 
   If this interface is not supported, then return NULL.
@@ -1323,23 +1289,6 @@ EFIAPI
 HmacSha1Final (
   IN OUT  VOID   *HmacSha1Context,
   OUT     UINT8  *HmacValue
-  );
-
-/**
-  Retrieves the size, in bytes, of the context buffer required for HMAC-SHA256 operations.
-  (NOTE: This API is deprecated.
-         Use HmacSha256New() / HmacSha256Free() for HMAC-SHA256 Context operations.)
-
-  If this interface is not supported, then return zero.
-
-  @return  The size, in bytes, of the context buffer required for HMAC-SHA256 operations.
-  @retval  0   This interface is not supported.
-
-**/
-UINTN
-EFIAPI
-HmacSha256GetContextSize (
-  VOID
   );
 
 /**
