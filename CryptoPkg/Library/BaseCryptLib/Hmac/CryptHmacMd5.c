@@ -1,44 +1,13 @@
 /** @file
   HMAC-MD5 Wrapper Implementation over OpenSSL.
 
-Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2020, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include "InternalCryptLib.h"
 #include <openssl/hmac.h>
-
-//
-// NOTE: OpenSSL redefines the size of HMAC_CTX at crypto/hmac/hmac_lcl.h
-//       #define HMAC_MAX_MD_CBLOCK_SIZE     144
-//
-#define HMAC_MD5_CTX_SIZE    (sizeof(void *) * 4 + sizeof(unsigned int) + \
-                             sizeof(unsigned char) * 144)
-
-/**
-  Retrieves the size, in bytes, of the context buffer required for HMAC-MD5 operations.
-  (NOTE: This API is deprecated.
-         Use HmacMd5New() / HmacMd5Free() for HMAC-MD5 Context operations.)
-
-  @return  The size, in bytes, of the context buffer required for HMAC-MD5 operations.
-
-**/
-UINTN
-EFIAPI
-HmacMd5GetContextSize (
-  VOID
-  )
-{
-  //
-  // Retrieves the OpenSSL HMAC-MD5 Context Size
-  // NOTE: HMAC_CTX object was made opaque in openssl-1.1.x, here we just use the
-  //       fixed size as a workaround to make this API work for compatibility.
-  //       We should retire HmacMd5GetContextSize() in future, and use HmacMd5New()
-  //       and HmacMd5Free() for context allocation and release.
-  //
-  return (UINTN) HMAC_MD5_CTX_SIZE;
-}
 
 /**
   Allocates and initializes one HMAC_CTX context for subsequent HMAC-MD5 use.

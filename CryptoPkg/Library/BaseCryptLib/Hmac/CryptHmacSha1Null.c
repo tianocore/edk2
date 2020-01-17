@@ -1,32 +1,12 @@
 /** @file
   HMAC-SHA1 Wrapper Implementation which does not provide real capabilities.
 
-Copyright (c) 2012 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2012 - 2020, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include "InternalCryptLib.h"
-
-/**
-  Retrieves the size, in bytes, of the context buffer required for HMAC-SHA1 operations.
-  (NOTE: This API is deprecated.
-         Use HmacSha1New() / HmacSha1Free() for HMAC-SHA1 Context operations.)
-
-  Return zero to indicate this interface is not supported.
-
-  @retval  0   This interface is not supported.
-
-**/
-UINTN
-EFIAPI
-HmacSha1GetContextSize (
-  VOID
-  )
-{
-  ASSERT (FALSE);
-  return 0;
-}
 
 /**
   Allocates and initializes one HMAC_CTX context for subsequent HMAC-SHA1 use.
