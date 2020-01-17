@@ -1775,11 +1775,15 @@ MpInitLibInitialize (
   // Wakeup APs to do some AP initialize sync (Microcode & MTRR)
   //
   if (CpuMpData->CpuCount > 1) {
+    CpuMpData->InitFlag = ApInitReconfig;
     WakeUpAP (CpuMpData, TRUE, 0, ApInitializeSync, CpuMpData, TRUE);
+    //
+    // Wait for all APs finished initialization
+    //
     while (CpuMpData->FinishedCount < (CpuMpData->CpuCount - 1)) {
       CpuPause ();
     }
-
+    CpuMpData->InitFlag = ApInitDone;
     for (Index = 0; Index < CpuMpData->CpuCount; Index++) {
       SetApState (&CpuMpData->CpuData[Index], CpuStateIdle);
     }
