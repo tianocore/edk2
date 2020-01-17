@@ -1,7 +1,7 @@
 ## @file
 # Build cache intermediate result and state
 #
-# Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2019 - 2020, Intel Corporation. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 from Common.caching import cached_property
@@ -64,6 +64,9 @@ class IncludesAutoGen():
         except Exception as e:
             print(e)
         SaveFileOnChange(os.path.join(self.makefile_folder,"dependency"),deps_include_str,False)
+
+    def CreateDepsTarget(self):
+        SaveFileOnChange(os.path.join(self.makefile_folder,"deps_target"),"\n".join([item +":" for item in self.DepsCollection]),False)
 
     @cached_property
     def deps_files(self):
