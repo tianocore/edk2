@@ -65,12 +65,12 @@ HmacMd5Free (
 }
 
 /**
-  Initializes user-supplied memory pointed by HmacMd5Context as HMAC-MD5 context for
-  subsequent use.
+  Set user-supplied key for subsequent use. It must be done before any
+  calling to HmacMd5Update().
 
   Return FALSE to indicate this interface is not supported.
 
-  @param[out]  HmacMd5Context  Pointer to HMAC-MD5 context being initialized.
+  @param[out]  HmacMd5Context  Pointer to HMAC-MD5 context.
   @param[in]   Key             Pointer to the user-supplied key.
   @param[in]   KeySize         Key size in bytes.
 
@@ -79,7 +79,7 @@ HmacMd5Free (
 **/
 BOOLEAN
 EFIAPI
-HmacMd5Init (
+HmacMd5SetKey (
   OUT  VOID         *HmacMd5Context,
   IN   CONST UINT8  *Key,
   IN   UINTN        KeySize

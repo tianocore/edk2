@@ -1073,24 +1073,24 @@ HmacMd5Free (
   );
 
 /**
-  Initializes user-supplied memory pointed by HmacMd5Context as HMAC-MD5 context for
-  subsequent use.
+  Set user-supplied key for subsequent use. It must be done before any
+  calling to HmacMd5Update().
 
   If HmacMd5Context is NULL, then return FALSE.
   If this interface is not supported, then return FALSE.
 
-  @param[out]  HmacMd5Context  Pointer to HMAC-MD5 context being initialized.
+  @param[out]  HmacMd5Context  Pointer to HMAC-MD5 context.
   @param[in]   Key             Pointer to the user-supplied key.
   @param[in]   KeySize         Key size in bytes.
 
-  @retval TRUE   HMAC-MD5 context initialization succeeded.
-  @retval FALSE  HMAC-MD5 context initialization failed.
+  @retval TRUE   Key is set successfully.
+  @retval FALSE  Key is set unsuccessfully.
   @retval FALSE  This interface is not supported.
 
 **/
 BOOLEAN
 EFIAPI
-HmacMd5Init (
+HmacMd5SetKey (
   OUT  VOID         *HmacMd5Context,
   IN   CONST UINT8  *Key,
   IN   UINTN        KeySize
@@ -1123,8 +1123,8 @@ HmacMd5Duplicate (
 
   This function performs HMAC-MD5 digest on a data buffer of the specified size.
   It can be called multiple times to compute the digest of long or discontinuous data streams.
-  HMAC-MD5 context should be already correctly initialized by HmacMd5Init(), and should not be
-  finalized by HmacMd5Final(). Behavior with invalid context is undefined.
+  HMAC-MD5 context should be initialized by HmacMd5New(), and should not be finalized by
+  HmacMd5Final(). Behavior with invalid context is undefined.
 
   If HmacMd5Context is NULL, then return FALSE.
   If this interface is not supported, then return FALSE.
@@ -1152,8 +1152,8 @@ HmacMd5Update (
   This function completes HMAC-MD5 hash computation and retrieves the digest value into
   the specified memory. After this function has been called, the HMAC-MD5 context cannot
   be used again.
-  HMAC-MD5 context should be already correctly initialized by HmacMd5Init(), and should not be
-  finalized by HmacMd5Final(). Behavior with invalid HMAC-MD5 context is undefined.
+  HMAC-MD5 context should be initialized by HmacMd5New(), and should not be finalized by
+  HmacMd5Final(). Behavior with invalid HMAC-MD5 context is undefined.
 
   If HmacMd5Context is NULL, then return FALSE.
   If HmacValue is NULL, then return FALSE.
@@ -1223,24 +1223,24 @@ HmacSha1Free (
   );
 
 /**
-  Initializes user-supplied memory pointed by HmacSha1Context as HMAC-SHA1 context for
-  subsequent use.
+  Set user-supplied key for subsequent use. It must be done before any
+  calling to HmacSha1Update().
 
   If HmacSha1Context is NULL, then return FALSE.
   If this interface is not supported, then return FALSE.
 
-  @param[out]  HmacSha1Context  Pointer to HMAC-SHA1 context being initialized.
+  @param[out]  HmacSha1Context  Pointer to HMAC-SHA1 context.
   @param[in]   Key              Pointer to the user-supplied key.
   @param[in]   KeySize          Key size in bytes.
 
-  @retval TRUE   HMAC-SHA1 context initialization succeeded.
-  @retval FALSE  HMAC-SHA1 context initialization failed.
+  @retval TRUE   The Key is set successfully.
+  @retval FALSE  The Key is set unsuccessfully.
   @retval FALSE  This interface is not supported.
 
 **/
 BOOLEAN
 EFIAPI
-HmacSha1Init (
+HmacSha1SetKey (
   OUT  VOID         *HmacSha1Context,
   IN   CONST UINT8  *Key,
   IN   UINTN        KeySize
@@ -1273,8 +1273,8 @@ HmacSha1Duplicate (
 
   This function performs HMAC-SHA1 digest on a data buffer of the specified size.
   It can be called multiple times to compute the digest of long or discontinuous data streams.
-  HMAC-SHA1 context should be already correctly initialized by HmacSha1Init(), and should not
-  be finalized by HmacSha1Final(). Behavior with invalid context is undefined.
+  HMAC-SHA1 context should be initialized by HmacSha1New(), and should not be finalized by
+  HmacSha1Final(). Behavior with invalid context is undefined.
 
   If HmacSha1Context is NULL, then return FALSE.
   If this interface is not supported, then return FALSE.
@@ -1302,8 +1302,8 @@ HmacSha1Update (
   This function completes HMAC-SHA1 hash computation and retrieves the digest value into
   the specified memory. After this function has been called, the HMAC-SHA1 context cannot
   be used again.
-  HMAC-SHA1 context should be already correctly initialized by HmacSha1Init(), and should
-  not be finalized by HmacSha1Final(). Behavior with invalid HMAC-SHA1 context is undefined.
+  HMAC-SHA1 context should be initialized by HmacSha1New(), and should not be finalized
+  by HmacSha1Final(). Behavior with invalid HMAC-SHA1 context is undefined.
 
   If HmacSha1Context is NULL, then return FALSE.
   If HmacValue is NULL, then return FALSE.
@@ -1368,24 +1368,24 @@ HmacSha256Free (
   );
 
 /**
-  Initializes user-supplied memory pointed by HmacSha256Context as HMAC-SHA256 context for
-  subsequent use.
+  Set user-supplied key for subsequent use. It must be done before any
+  calling to HmacSha256Update().
 
   If HmacSha256Context is NULL, then return FALSE.
   If this interface is not supported, then return FALSE.
 
-  @param[out]  HmacSha256Context  Pointer to HMAC-SHA256 context being initialized.
+  @param[out]  HmacSha256Context  Pointer to HMAC-SHA256 context.
   @param[in]   Key                Pointer to the user-supplied key.
   @param[in]   KeySize            Key size in bytes.
 
-  @retval TRUE   HMAC-SHA256 context initialization succeeded.
-  @retval FALSE  HMAC-SHA256 context initialization failed.
+  @retval TRUE   The Key is set successfully.
+  @retval FALSE  The Key is set unsuccessfully.
   @retval FALSE  This interface is not supported.
 
 **/
 BOOLEAN
 EFIAPI
-HmacSha256Init (
+HmacSha256SetKey (
   OUT  VOID         *HmacSha256Context,
   IN   CONST UINT8  *Key,
   IN   UINTN        KeySize
@@ -1418,8 +1418,8 @@ HmacSha256Duplicate (
 
   This function performs HMAC-SHA256 digest on a data buffer of the specified size.
   It can be called multiple times to compute the digest of long or discontinuous data streams.
-  HMAC-SHA256 context should be already correctly initialized by HmacSha256Init(), and should not
-  be finalized by HmacSha256Final(). Behavior with invalid context is undefined.
+  HMAC-SHA256 context should be initialized by HmacSha256New(), and should not be finalized
+  by HmacSha256Final(). Behavior with invalid context is undefined.
 
   If HmacSha256Context is NULL, then return FALSE.
   If this interface is not supported, then return FALSE.
@@ -1447,8 +1447,8 @@ HmacSha256Update (
   This function completes HMAC-SHA256 hash computation and retrieves the digest value into
   the specified memory. After this function has been called, the HMAC-SHA256 context cannot
   be used again.
-  HMAC-SHA256 context should be already correctly initialized by HmacSha256Init(), and should
-  not be finalized by HmacSha256Final(). Behavior with invalid HMAC-SHA256 context is undefined.
+  HMAC-SHA256 context should be initialized by HmacSha256New(), and should not be finalized
+  by HmacSha256Final(). Behavior with invalid HMAC-SHA256 context is undefined.
 
   If HmacSha256Context is NULL, then return FALSE.
   If HmacValue is NULL, then return FALSE.
