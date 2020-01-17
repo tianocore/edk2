@@ -2,7 +2,7 @@
 # build a platform or a module
 #
 #  Copyright (c) 2014, Hewlett-Packard Development Company, L.P.<BR>
-#  Copyright (c) 2007 - 2019, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2020, Intel Corporation. All rights reserved.<BR>
 #  Copyright (c) 2018, Hewlett Packard Enterprise Development, L.P.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -280,6 +280,7 @@ def LaunchCommand(Command, WorkingDir,ModuleAuto = None):
         iau.UpdateDepsFileforTrim()
         iau.CreateModuleDeps()
         iau.CreateDepsInclude()
+        iau.CreateDepsTarget()
     return "%dms" % (int(round((time.time() - BeginTime) * 1000)))
 
 ## The smallest unit that can be built in multi-thread build mode
