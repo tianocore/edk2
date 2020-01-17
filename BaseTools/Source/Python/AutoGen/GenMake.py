@@ -1,7 +1,7 @@
 ## @file
 # Create makefile for MS nmake and GNU make
 #
-# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2020, Intel Corporation. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
@@ -190,6 +190,9 @@ class BuildFile(object):
                 fd.write("")
         if not os.path.exists(os.path.join(self._AutoGenObject.MakeFileDir, "dependency")):
             with open(os.path.join(self._AutoGenObject.MakeFileDir, "dependency"),"w+") as fd:
+                fd.write("")
+        if not os.path.exists(os.path.join(self._AutoGenObject.MakeFileDir, "deps_target")):
+            with open(os.path.join(self._AutoGenObject.MakeFileDir, "deps_target"),"w+") as fd:
                 fd.write("")
         return SaveFileOnChange(os.path.join(self._AutoGenObject.MakeFileDir, FileName), FileContent, False)
 
@@ -696,7 +699,9 @@ cleanlib:
             "file_macro"                : FileMacroList,
             "file_build_target"         : self.BuildTargetList,
             "backward_compatible_target": BcTargetList,
-            "INCLUDETAG"                   : self._INCLUDE_CMD_[self._FileType] + " " + os.path.join("$(MODULE_BUILD_DIR)","dependency")
+            "INCLUDETAG"                   : "\n".join([self._INCLUDE_CMD_[self._FileType] + " " + os.path.join("$(MODULE_BUILD_DIR)","dependency"),
+                                                              self._INCLUDE_CMD_[self._FileType] + " " + os.path.join("$(MODULE_BUILD_DIR)","deps_target")
+                                                              ])
         }
 
         return MakefileTemplateDict
