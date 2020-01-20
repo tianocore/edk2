@@ -322,6 +322,20 @@ DumpIortNodeSmmuV1V2 (
     PARSER_PARAMS (IortNodeSmmuV1V2Parser)
     );
 
+  // Check if the values used to control the parsing logic have been
+  // successfully read.
+  if ((InterruptContextCount == NULL)   ||
+      (InterruptContextOffset == NULL)  ||
+      (PmuInterruptCount == NULL)       ||
+      (PmuInterruptOffset == NULL)) {
+    IncrementErrorCount ();
+    Print (
+      L"ERROR: Insufficient SMMUv1/2 node length. Length = %d\n",
+      Length
+      );
+    return;
+  }
+
   Offset = *InterruptContextOffset;
   Index = 0;
 
@@ -432,6 +446,17 @@ DumpIortNodeIts (
             Length,
             PARSER_PARAMS (IortNodeItsParser)
             );
+
+  // Check if the values used to control the parsing logic have been
+  // successfully read.
+  if (ItsCount == NULL) {
+    IncrementErrorCount ();
+    Print (
+      L"ERROR: Insufficient ITS group length. Length = %d.\n",
+      Length
+      );
+    return;
+  }
 
   Index = 0;
 
@@ -617,6 +642,18 @@ ParseAcpiIort (
     PARSER_PARAMS (IortParser)
     );
 
+  // Check if the values used to control the parsing logic have been
+  // successfully read.
+  if ((IortNodeCount == NULL) ||
+      (IortNodeOffset == NULL)) {
+    IncrementErrorCount ();
+    Print (
+      L"ERROR: Insufficient table length. AcpiTableLength = %d.\n",
+      AcpiTableLength
+      );
+    return;
+  }
+
   Offset = *IortNodeOffset;
   NodePtr = Ptr + Offset;
   Index = 0;
@@ -634,6 +671,21 @@ ParseAcpiIort (
       AcpiTableLength - Offset,
       PARSER_PARAMS (IortNodeHeaderParser)
       );
+
+    // Check if the values used to control the parsing logic have been
+    // successfully read.
+    if ((IortNodeType == NULL)        ||
+        (IortNodeLength == NULL)      ||
+        (IortIdMappingCount == NULL)  ||
+        (IortIdMappingOffset == NULL)) {
+      IncrementErrorCount ();
+      Print (
+        L"ERROR: Insufficient remaining table buffer length to read the " \
+          L"IORT node header. Length = %d.\n",
+        AcpiTableLength - Offset
+        );
+      return;
+    }
 
     // Make sure the IORT Node is inside the table
     if ((Offset + (*IortNodeLength)) > AcpiTableLength) {
