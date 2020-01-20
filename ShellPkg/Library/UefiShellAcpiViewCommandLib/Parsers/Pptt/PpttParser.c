@@ -264,6 +264,17 @@ DumpProcessorHierarchyNodeStructure (
              PARSER_PARAMS (ProcessorHierarchyNodeStructureParser)
              );
 
+  // Check if the values used to control the parsing logic have been
+  // successfully read.
+  if (NumberOfPrivateResources == NULL) {
+    IncrementErrorCount ();
+    Print (
+      L"ERROR: Insufficient Processor Hierarchy Node length. Length = %d.\n",
+      Length
+      );
+    return;
+  }
+
   // Make sure the Private Resource array lies inside this structure
   if (Offset + (*NumberOfPrivateResources * sizeof (UINT32)) > Length) {
     IncrementErrorCount ();
@@ -387,6 +398,7 @@ ParseAcpiPptt (
              AcpiTableLength,
              PARSER_PARAMS (PpttParser)
              );
+
   ProcessorTopologyStructurePtr = Ptr + Offset;
 
   while (Offset < AcpiTableLength) {
@@ -399,6 +411,19 @@ ParseAcpiPptt (
       AcpiTableLength - Offset,
       PARSER_PARAMS (ProcessorTopologyStructureHeaderParser)
       );
+
+    // Check if the values used to control the parsing logic have been
+    // successfully read.
+    if ((ProcessorTopologyStructureType == NULL) ||
+        (ProcessorTopologyStructureLength == NULL)) {
+      IncrementErrorCount ();
+      Print (
+        L"ERROR: Insufficient remaining table buffer length to read the " \
+          L"processor topology structure header. Length = %d.\n",
+        AcpiTableLength - Offset
+        );
+      return;
+    }
 
     // Make sure the PPTT structure lies inside the table
     if ((Offset + *ProcessorTopologyStructureLength) > AcpiTableLength) {
