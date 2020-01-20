@@ -30,7 +30,7 @@ STATIC CONST ACPI_PARSER SlitParser[] = {
 /**
   Macro to get the value of a System Locality
 **/
-#define SLIT_ELEMENT(Ptr, i, j) *(Ptr + (MultU64x64 (i, LocalityCount)) + j)
+#define SLIT_ELEMENT(Ptr, i, j) *(Ptr + (i * LocalityCount) + j)
 
 /**
   This function parses the ACPI SLIT table.
@@ -57,9 +57,9 @@ ParseAcpiSlit (
   )
 {
   UINT32 Offset;
-  UINT64 Count;
-  UINT64 Index;
-  UINT64 LocalityCount;
+  UINT32 Count;
+  UINT32 Index;
+  UINT32 LocalityCount;
   UINT8* LocalityPtr;
   CHAR16 Buffer[80];  // Used for AsciiName param of ParseAcpi
 
@@ -87,8 +87,45 @@ ParseAcpiSlit (
     return;
   }
 
+  /*
+    Despite the 'Number of System Localities' being a 64-bit field in SLIT,
+    the maximum number of localities that can be represented in SLIT is limited
+    by the 'Length' field of the ACPI table.
+
+    Since the ACPI table length field is 32-bit wide. The maximum number of
+    localities that can be represented in SLIT can be calculated as:
+
+    MaxLocality = sqrt (MAX_UINT32 - sizeof (EFI_ACPI_6_3_SYSTEM_LOCALITY_DISTANCE_INFORMATION_TABLE_HEADER))
+                = 65535
+                = MAX_UINT16
+  */
+  if (*SlitSystemLocalityCount > MAX_UINT16) {
+    IncrementErrorCount ();
+    Print (
+      L"ERROR: The Number of System Localities provided can't be represented " \
+        L"in the SLIT table. SlitSystemLocalityCount = %ld. " \
+        L"MaxLocalityCountAllowed = %d.\n",
+      *SlitSystemLocalityCount,
+      MAX_UINT16
+      );
+    return;
+  }
+
+  LocalityCount = (UINT32)*SlitSystemLocalityCount;
+
+  // Make sure system localities fit in the table buffer provided
+  if (Offset + (LocalityCount * LocalityCount) > AcpiTableLength) {
+    IncrementErrorCount ();
+    Print (
+      L"ERROR: Invalid Number of System Localities. " \
+        L"SlitSystemLocalityCount = %ld. AcpiTableLength = %d.\n",
+      *SlitSystemLocalityCount,
+      AcpiTableLength
+      );
+    return;
+  }
+
   LocalityPtr = Ptr + Offset;
-  LocalityCount = *SlitSystemLocalityCount;
 
   // We only print the Localities if the count is less than 16
   // If the locality count is more than 16 then refer to the
