@@ -123,6 +123,24 @@ DumpDbgDeviceInfo (
     PARSER_PARAMS (DbgDevInfoParser)
     );
 
+  // Check if the values used to control the parsing logic have been
+  // successfully read.
+  if ((GasCount == NULL)              ||
+      (NameSpaceStringLength == NULL) ||
+      (NameSpaceStringOffset == NULL) ||
+      (OEMDataLength == NULL)         ||
+      (OEMDataOffset == NULL)         ||
+      (BaseAddrRegOffset == NULL)     ||
+      (AddrSizeOffset == NULL)) {
+    IncrementErrorCount ();
+    Print (
+      L"ERROR: Insufficient Debug Device Information Structure length. " \
+        L"Length = %d.\n",
+      Length
+      );
+    return;
+  }
+
   // GAS
   Index = 0;
   Offset = *BaseAddrRegOffset;
@@ -224,6 +242,18 @@ ParseAcpiDbg2 (
              PARSER_PARAMS (Dbg2Parser)
              );
 
+  // Check if the values used to control the parsing logic have been
+  // successfully read.
+  if ((OffsetDbgDeviceInfo == NULL) ||
+      (NumberDbgDeviceInfo == NULL)) {
+    IncrementErrorCount ();
+    Print (
+      L"ERROR: Insufficient table length. AcpiTableLength = %d\n",
+      AcpiTableLength
+      );
+    return;
+  }
+
   Offset = *OffsetDbgDeviceInfo;
   Index = 0;
 
@@ -238,6 +268,19 @@ ParseAcpiDbg2 (
       AcpiTableLength - Offset,
       PARSER_PARAMS (DbgDevInfoHeaderParser)
       );
+
+    // Check if the values used to control the parsing logic have been
+    // successfully read.
+    if (DbgDevInfoLen == NULL) {
+      IncrementErrorCount ();
+      Print (
+        L"ERROR: Insufficient remaining table buffer length to read the " \
+          L"Debug Device Information structure's 'Length' field. " \
+          L"RemainingTableBufferLength = %d.\n",
+        AcpiTableLength - Offset
+        );
+      return;
+    }
 
     // Make sure the Debug Device Information structure lies inside the table.
     if ((Offset + *DbgDevInfoLen) > AcpiTableLength) {
