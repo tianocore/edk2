@@ -543,8 +543,15 @@ ParseAcpi (
 
   for (Index = 0; Index < ParserItems; Index++) {
     if ((Offset + Parser[Index].Length) > Length) {
+
+      // For fields outside the buffer length provided, reset any pointers
+      // which were supposed to be updated by this function call
+      if (Parser[Index].ItemPtr != NULL) {
+        *Parser[Index].ItemPtr = NULL;
+      }
+
       // We don't parse past the end of the max length specified
-      break;
+      continue;
     }
 
     if (GetConsistencyChecking () &&
