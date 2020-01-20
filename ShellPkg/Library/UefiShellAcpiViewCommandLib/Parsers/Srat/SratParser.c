@@ -399,6 +399,19 @@ ParseAcpiSrat (
       PARSER_PARAMS (SratResourceAllocationParser)
       );
 
+    // Check if the values used to control the parsing logic have been
+    // successfully read.
+    if ((SratRAType == NULL) ||
+        (SratRALength == NULL)) {
+      IncrementErrorCount ();
+      Print (
+        L"ERROR: Insufficient remaining table buffer length to read the " \
+          L"Static Resource Allocation structure header. Length = %d.\n",
+        AcpiTableLength - Offset
+        );
+      return;
+    }
+
     // Make sure the SRAT structure lies inside the table
     if ((Offset + *SratRALength) > AcpiTableLength) {
       IncrementErrorCount ();
