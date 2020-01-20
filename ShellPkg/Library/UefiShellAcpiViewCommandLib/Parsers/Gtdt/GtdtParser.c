@@ -189,6 +189,18 @@ DumpGTBlock (
     PARSER_PARAMS (GtBlockParser)
     );
 
+  // Check if the values used to control the parsing logic have been
+  // successfully read.
+  if ((GtBlockTimerCount == NULL) ||
+      (GtBlockTimerOffset == NULL)) {
+    IncrementErrorCount ();
+    Print (
+      L"ERROR: Insufficient GT Block Structure length. Length = %d.\n",
+      Length
+      );
+    return;
+  }
+
   Offset = *GtBlockTimerOffset;
   Index = 0;
 
@@ -272,6 +284,18 @@ ParseAcpiGtdt (
     PARSER_PARAMS (GtdtParser)
     );
 
+  // Check if the values used to control the parsing logic have been
+  // successfully read.
+  if ((GtdtPlatformTimerCount == NULL) ||
+      (GtdtPlatformTimerOffset == NULL)) {
+    IncrementErrorCount ();
+    Print (
+      L"ERROR: Insufficient table length. AcpiTableLength = %d.\n",
+      AcpiTableLength
+      );
+    return;
+  }
+
   TimerPtr = Ptr + *GtdtPlatformTimerOffset;
   Offset = *GtdtPlatformTimerOffset;
   Index = 0;
@@ -289,6 +313,19 @@ ParseAcpiGtdt (
       AcpiTableLength - Offset,
       PARSER_PARAMS (GtPlatformTimerHeaderParser)
       );
+
+    // Check if the values used to control the parsing logic have been
+    // successfully read.
+    if ((PlatformTimerType == NULL) ||
+        (PlatformTimerLength == NULL)) {
+      IncrementErrorCount ();
+      Print (
+        L"ERROR: Insufficient remaining table buffer length to read the " \
+          L"Platform Timer Structure header. Length = %d.\n",
+        AcpiTableLength - Offset
+        );
+      return;
+    }
 
     // Make sure the Platform Timer is inside the table.
     if ((Offset + *PlatformTimerLength) > AcpiTableLength) {
