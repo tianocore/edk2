@@ -1,7 +1,7 @@
 /** @file
   SLIT table parser
 
-  Copyright (c) 2016 - 2018, ARM Limited. All rights reserved.
+  Copyright (c) 2016 - 2019, ARM Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -75,9 +75,21 @@ ParseAcpiSlit (
              AcpiTableLength,
              PARSER_PARAMS (SlitParser)
              );
-  LocalityPtr = Ptr + Offset;
 
+  // Check if the values used to control the parsing logic have been
+  // successfully read.
+  if (SlitSystemLocalityCount == NULL) {
+    IncrementErrorCount ();
+    Print (
+      L"ERROR: Insufficient table length. AcpiTableLength = %d.\n",
+      AcpiTableLength
+      );
+    return;
+  }
+
+  LocalityPtr = Ptr + Offset;
   LocalityCount = *SlitSystemLocalityCount;
+
   // We only print the Localities if the count is less than 16
   // If the locality count is more than 16 then refer to the
   // raw data dump.
