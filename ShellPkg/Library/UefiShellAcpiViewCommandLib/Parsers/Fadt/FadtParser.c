@@ -1,7 +1,7 @@
 /** @file
   FADT table parser
 
-  Copyright (c) 2016 - 2019, ARM Limited. All rights reserved.
+  Copyright (c) 2016 - 2020, ARM Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -230,9 +230,11 @@ ParseAcpiFadt (
     );
 
   if (Trace) {
-    Print (L"\nSummary:\n");
-    PrintFieldName (2, L"FADT Version");
-    Print (L"%d.%d\n",  *AcpiHdrInfo.Revision, *FadtMinorRevision);
+    if (FadtMinorRevision != NULL) {
+      Print (L"\nSummary:\n");
+      PrintFieldName (2, L"FADT Version");
+      Print (L"%d.%d\n",  *AcpiHdrInfo.Revision, *FadtMinorRevision);
+    }
 
     if (*GetAcpiXsdtHeaderInfo ()->OemTableId != *AcpiHdrInfo.OemTableId) {
       IncrementErrorCount ();
@@ -294,21 +296,20 @@ ParseAcpiFadt (
       );
   }
 
-  // If X_DSDT is not zero then use X_DSDT and ignore DSDT,
-  // else use DSDT.
-  if (*X_DsdtAddress != 0) {
+  // If X_DSDT is valid then use X_DSDT and ignore DSDT, else use DSDT.
+  if ((X_DsdtAddress != NULL) && (*X_DsdtAddress != 0)) {
     DsdtPtr = (UINT8*)(UINTN)(*X_DsdtAddress);
-  } else if (*DsdtAddress != 0) {
+  } else if ((DsdtAddress != NULL) && (*DsdtAddress != 0)) {
     DsdtPtr = (UINT8*)(UINTN)(*DsdtAddress);
   } else {
-    // Both DSDT and X_DSDT cannot be zero.
+    // Both DSDT and X_DSDT cannot be invalid.
 #if defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
     if (Trace) {
       // The DSDT Table is mandatory for ARM systems
       // as the CPU information MUST be presented in
       // the DSDT.
       IncrementErrorCount ();
-      Print (L"ERROR: Both X_DSDT and DSDT are NULL.\n");
+      Print (L"ERROR: Both X_DSDT and DSDT are invalid.\n");
     }
 #endif
     return;
