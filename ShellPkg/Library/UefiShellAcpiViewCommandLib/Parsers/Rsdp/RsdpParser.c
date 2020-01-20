@@ -138,6 +138,18 @@ ParseAcpiRsdp (
     PARSER_PARAMS (RsdpParser)
     );
 
+  // Check if the values used to control the parsing logic have been
+  // successfully read.
+  if (XsdtAddress == NULL) {
+    IncrementErrorCount ();
+    Print (
+      L"ERROR: Insufficient table length. AcpiTableLength = %d." \
+        L"RSDP parsing aborted.\n",
+      AcpiTableLength
+      );
+    return;
+  }
+
   // This code currently supports parsing of XSDT table only
   // and does not parse the RSDT table. Platforms provide the
   // RSDT to enable compatibility with ACPI 1.0 operating systems.
