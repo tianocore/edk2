@@ -253,7 +253,7 @@ ParseAcpiFadt (
     // present.
     if ((Trace) &&
         (Flags != NULL) &&
-        ((*Flags & EFI_ACPI_6_3_HW_REDUCED_ACPI) != 0)) {
+        ((*Flags & EFI_ACPI_6_3_HW_REDUCED_ACPI) != EFI_ACPI_6_3_HW_REDUCED_ACPI)) {
       IncrementErrorCount ();
       Print (L"ERROR: No FACS table found, "
                L"both X_FIRMWARE_CTRL and FIRMWARE_CTRL are zero.\n");
