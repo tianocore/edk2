@@ -260,6 +260,19 @@ ParseAcpiMadt (
       PARSER_PARAMS (MadtInterruptControllerHeaderParser)
       );
 
+    // Check if the values used to control the parsing logic have been
+    // successfully read.
+    if ((MadtInterruptControllerType == NULL) ||
+        (MadtInterruptControllerLength == NULL)) {
+      IncrementErrorCount ();
+      Print (
+        L"ERROR: Insufficient remaining table buffer length to read the " \
+          L"Interrupt Controller Structure header. Length = %d.\n",
+        AcpiTableLength - Offset
+        );
+      return;
+    }
+
     // Make sure forward progress is made.
     if (*MadtInterruptControllerLength < 2) {
       IncrementErrorCount ();
