@@ -1,0 +1,76 @@
+## @file
+# CI configuration for UnitTestFrameworkPkg
+#
+# Copyright (c) Microsoft Corporation
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+{
+    ## options defined .pytool/Plugin/CompilerPlugin
+    "CompilerPlugin": {
+        "DscPath": "UnitTestFrameworkPkg.dsc"
+    },
+    ## options defined .pytool/Plugin/HostUnitTestCompilerPlugin
+    "HostUnitTestCompilerPlugin": {
+        "DscPath": "Test/UnitTestFrameworkPkgHostTest.dsc"
+    },
+    ## options defined .pytool/Plugin/CharEncodingCheck
+    "CharEncodingCheck": {
+        "IgnoreFiles": []
+    },
+
+    ## options defined .pytool/Plugin/DependencyCheck
+    "DependencyCheck": {
+        "AcceptableDependencies": [
+            "MdePkg/MdePkg.dec",
+            "UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec"
+        ],
+        # For host based unit tests
+        "AcceptableDependencies-HOST_APPLICATION":[],
+        # For UEFI shell based apps
+        "AcceptableDependencies-UEFI_APPLICATION":[
+            "MdeModulePkg/MdeModulePkg.dec",
+            "ShellPkg/ShellPkg.dec"
+        ],
+        "IgnoreInf": []
+    },
+    ## options defined .pytool/Plugin/DscCompleteCheck
+    "DscCompleteCheck": {
+        "DscPath": "UnitTestFrameworkPkg.dsc",
+        "IgnoreInf": []
+    },
+    ## options defined .pytool/Plugin/HostUnitTestDscCompleteCheck
+    "HostUnitTestDscCompleteCheck": {
+        "IgnoreInf": [],
+        "DscPath": "Test/UnitTestFrameworkPkgHostTest.dsc"
+    },
+    ## options defined .pytool/Plugin/GuidCheck
+    "GuidCheck": {
+        "IgnoreGuidName": [],
+        "IgnoreGuidValue": [],
+        "IgnoreFoldersAndFiles": [],
+        "IgnoreDuplicates": []
+    },
+    ## options defined .pytool/Plugin/LibraryClassCheck
+    "LibraryClassCheck": {
+        "IgnoreHeaderFile": []
+    },
+
+    ## options defined .pytool/Plugin/SpellCheck
+    "SpellCheck": {
+        "AuditOnly": False,           # Fails test but run in AuditOnly mode to collect log
+        "IgnoreFiles": [             # use gitignore syntax to ignore errors in matching files
+            "/Library/CmockaLib/cmocka/**/*.*"  # not going to spell check a submodule
+        ],
+        "ExtendWords": [             # words to extend to the dictionary for this package
+            "cmocka",
+            "buildmodule",
+            "criterium",
+            "pytool",
+            "pytools",
+            "NOFAILURE",
+            "DHAVE" # build flag for cmocka in the INF
+        ],
+        "IgnoreStandardPaths": [],   # Standard Plugin defined paths that should be ignore
+        "AdditionalIncludePaths": [] # Additional paths to spell check (wildcards supported)
+    }
+}
