@@ -1,7 +1,7 @@
 /** @file
   MP initialize support functions for PEI phase.
 
-  Copyright (c) 2016 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2020, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -9,7 +9,6 @@
 #include "MpLib.h"
 #include <Library/PeiServicesLib.h>
 #include <Guid/S3SmmInitDone.h>
-#include <Guid/MicrocodePatchHob.h>
 
 /**
   S3 SMM Init Done notification function.

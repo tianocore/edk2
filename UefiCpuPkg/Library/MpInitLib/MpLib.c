@@ -1682,10 +1682,6 @@ MpInitLibInitialize (
   CpuMpData->SwitchBspFlag    = FALSE;
   CpuMpData->CpuData          = (CPU_AP_DATA *) (CpuMpData + 1);
   CpuMpData->CpuInfoInHob     = (UINT64) (UINTN) (CpuMpData->CpuData + MaxLogicalProcessorNumber);
-  if (OldCpuMpData != NULL) {
-    CpuMpData->MicrocodePatchRegionSize = OldCpuMpData->MicrocodePatchRegionSize;
-    CpuMpData->MicrocodePatchAddress    = OldCpuMpData->MicrocodePatchAddress;
-  }
   InitializeSpinLock(&CpuMpData->MpLock);
 
   //
@@ -1740,11 +1736,6 @@ MpInitLibInitialize (
       //
       CollectProcessorCount (CpuMpData);
     }
-
-    //
-    // Load required microcode patches data into memory
-    //
-    ShadowMicrocodeUpdatePatch (CpuMpData);
   } else {
     //
     // APs have been wakeup before, just get the CPU Information
@@ -1760,6 +1751,17 @@ MpInitLibInitialize (
       CpuMpData->CpuData[Index].ApFunction = 0;
       CopyMem (&CpuMpData->CpuData[Index].VolatileRegisters, &VolatileRegisters, sizeof (CPU_VOLATILE_REGISTERS));
     }
+  }
+
+  if (!GetMicrocodePatchInfoFromHob (
+         &CpuMpData->MicrocodePatchAddress,
+         &CpuMpData->MicrocodePatchRegionSize
+         )) {
+    //
+    // The microcode patch information cache HOB does not exist, which means
+    // the microcode patches data has not been loaded into memory yet
+    //
+    ShadowMicrocodeUpdatePatch (CpuMpData);
   }
 
   //
