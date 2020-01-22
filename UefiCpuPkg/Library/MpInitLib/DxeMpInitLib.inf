@@ -1,7 +1,7 @@
 ## @file
 #  MP Initialize Library instance for DXE driver.
 #
-#  Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2016 - 2020, Intel Corporation. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -58,6 +58,7 @@
 [Guids]
   gEfiEventExitBootServicesGuid                 ## CONSUMES  ## Event
   gEfiEventLegacyBootGuid                       ## SOMETIMES_CONSUMES  ## Event
+  gEdkiiMicrocodePatchHobGuid                   ## SOMETIMES_CONSUMES  ## HOB
 
 [Pcd]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber        ## CONSUMES
