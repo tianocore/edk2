@@ -9,6 +9,10 @@
     "CompilerPlugin": {
         "DscPath": "MdeModulePkg.dsc"
     },
+    ## options defined ci/Plugin/HostUnitTestCompilerPlugin
+    "HostUnitTestCompilerPlugin": {
+        "DscPath": "Test/MdeModulePkgHostTest.dsc"
+    },
 
     ## options defined ci/Plugin/CharEncodingCheck
     "CharEncodingCheck": {
@@ -24,7 +28,9 @@
             "ArmPkg/ArmPkg.dec"  # this should be fixed by promoting an abstraction
         ],
         # For host based unit tests
-        "AcceptableDependencies-HOST_APPLICATION":[],
+        "AcceptableDependencies-HOST_APPLICATION":[
+            "UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec"
+        ],
         # For UEFI shell based apps
         "AcceptableDependencies-UEFI_APPLICATION":[],
         "IgnoreInf": []
@@ -34,6 +40,11 @@
     "DscCompleteCheck": {
         "IgnoreInf": [],
         "DscPath": "MdeModulePkg.dsc"
+    },
+    ## options defined ci/Plugin/HostUnitTestDscCompleteCheck
+    "HostUnitTestDscCompleteCheck": {
+        "IgnoreInf": [""],
+        "DscPath": "Test/MdeModulePkgHostTest.dsc"
     },
 
     ## options defined ci/Plugin/GuidCheck
