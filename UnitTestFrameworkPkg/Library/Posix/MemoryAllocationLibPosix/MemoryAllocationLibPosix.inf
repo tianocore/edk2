@@ -1,0 +1,27 @@
+## @file
+#  Instance of Memory Allocation Library based on POSIX APIs
+#
+#  Uses POSIX APIs malloc() and free() to allocate and free memory.
+#
+#  Copyright (c) 2018 - 2020, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION     = 0x00010005
+  BASE_NAME       = MemoryAllocationLibPosix
+  MODULE_UNI_FILE = MemoryAllocationLibPosix.uni
+  FILE_GUID       = A1672454-A3D3-4AAC-A86B-8D63132BBB91
+  MODULE_TYPE     = UEFI_DRIVER
+  VERSION_STRING  = 1.0
+  LIBRARY_CLASS   = MemoryAllocationLib|HOST_APPLICATION
+
+[Sources]
+  MemoryAllocationLibPosix.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib

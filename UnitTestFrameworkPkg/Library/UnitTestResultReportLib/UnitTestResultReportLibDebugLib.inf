@@ -1,0 +1,28 @@
+## @file
+# Library to support printing out the unit test report using DEBUG() macros.
+#
+# Copyright (c) Microsoft Corporation.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION     = 0x00010017
+  BASE_NAME       = UnitTestResultReportLibDebugLib
+  MODULE_UNI_FILE = UnitTestResultReportLibDebugLib.uni
+  FILE_GUID       = BED736D4-D197-475F-B7CE-0D828FF2C9A6
+  VERSION_STRING  = 1.0
+  MODULE_TYPE     = UEFI_DRIVER
+  LIBRARY_CLASS   = UnitTestResultReportLib
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  PrintLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+
+[Sources]
+  UnitTestResultReportLib.c
+  UnitTestResultReportLibDebugLib.c
