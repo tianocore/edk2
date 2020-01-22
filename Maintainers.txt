@@ -479,6 +479,13 @@ M: Guo Dong <guo.dong@intel.com>
 M: Benjamin You <benjamin.you@intel.com>
 S: Maintained
 
+UnitTestFrameworkPkg
+F: UnitTestFrameworkPkg/
+M: Michael D Kinney <michael.d.kinney@intel.com>
+R: Sean Brogan <sean.brogan@microsoft.com>
+R: Bret Barkelew <Bret.Barkelew@microsoft.com>
+S: Maintained
+
 StandaloneMmPkg
 F: StandaloneMmPkg/
 M: Ard Biesheuvel <ard.biesheuvel@linaro.org>
