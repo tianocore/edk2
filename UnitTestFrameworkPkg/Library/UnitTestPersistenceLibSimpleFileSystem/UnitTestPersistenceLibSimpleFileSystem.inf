@@ -1,0 +1,47 @@
+## @file
+# UEFI Simple File System based version of the Unit Test Persistence Lib
+#
+# Instance of the Unit Test Persistence Lib that utilizes the UEFI filesystem
+# that a test application is running from to save a serialized version of the
+# internal test state in case the test needs to quit and restore.
+#
+# Copyright (c) Microsoft Corporation.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION     = 0x00010017
+  BASE_NAME       = UnitTestPersistenceLibSimpleFileSystem
+  MODULE_UNI_FILE = UnitTestPersistenceLibSimpleFileSystem.uni
+  FILE_GUID       = 9200844A-CDFD-4368-B4BD-106354702605
+  VERSION_STRING  = 1.0
+  MODULE_TYPE     = UEFI_APPLICATION
+  LIBRARY_CLASS   = UnitTestPersistenceLib
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  UnitTestPersistenceLibSimpleFileSystem.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+  ShellPkg/ShellPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  UefiBootServicesTableLib
+  BaseLib
+  ShellLib
+
+[Protocols]
+  gEfiLoadedImageProtocolGuid
+  gEfiSimpleFileSystemProtocolGuid
+
+[Guids]
+  gEfiFileInfoGuid
+  gEfiFileSystemInfoGuid
