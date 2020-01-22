@@ -100,7 +100,7 @@ class CharEncodingCheck(ICiBuildPlugin):
                     overall_status += 1
 
         tc.LogStdOut("Tested Encoding on {0} files".format(files_tested))
-        if overall_status is not 0:
+        if overall_status != 0:
             tc.SetFailed("CharEncoding {0} Failed.  Errors {1}".format(packagename, overall_status), "CHAR_ENCODING_CHECK_FAILED")
         else:
             tc.SetSuccess()

@@ -1,4 +1,7 @@
-# @file DscCompleteCheck.py
+# @file HostUnitTestDscCompleteCheck.py
+#
+# This is a copy of DscCompleteCheck with different filtering logic.
+# It should be discussed if this should be one plugin
 #
 # Copyright (c) Microsoft Corporation.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -11,15 +14,15 @@ from edk2toollib.uefi.edk2.parsers.inf_parser import InfParser
 from edk2toolext.environment.var_dict import VarDict
 
 
-class DscCompleteCheck(ICiBuildPlugin):
+class HostUnitTestDscCompleteCheck(ICiBuildPlugin):
     """
-    A CiBuildPlugin that scans the package dsc file and confirms all modules (inf files) are
+    A CiBuildPlugin that scans the package Host Unit Test dsc file and confirms all Host application modules (inf files) are
     listed in the components sections.
 
     Configuration options:
-    "DscCompleteCheck": {
-        "DscPath": "<path to dsc from root of pkg>"
-        "IgnoreInf": []  # Ignore INF if found in filesystem by not dsc
+    "HostUnitTestDscCompleteCheck": {
+        "DscPath": "", # Path to Host based unit test DSC file
+        "IgnoreInf": []  # Ignore INF if found in filesystem but not dsc
     }
     """
 
@@ -35,7 +38,7 @@ class DscCompleteCheck(ICiBuildPlugin):
                 testclassname: a descriptive string for the testcase can include whitespace
                 classname: should be patterned <packagename>.<plugin>.<optionally any unique condition>
         """
-        return ("Check the " + packagename + " DSC for a being complete", packagename + ".DscCompleteCheck")
+        return ("Check the " + packagename + " Host Unit Test DSC for a being complete", packagename + ".HostUnitTestDscCompleteCheck")
 
     ##
     # External function of plugin.  This function is used to perform the task of the MuBuild Plugin
@@ -66,7 +69,7 @@ class DscCompleteCheck(ICiBuildPlugin):
 
         if abs_dsc_path is None or wsr_dsc_path == "" or not os.path.isfile(abs_dsc_path):
             tc.SetSkipped()
-            tc.LogStdError("Package Dsc not found")
+            tc.LogStdError("Package Host Unit Test Dsc not found")
             return 0
 
         # Get INF Files
@@ -84,9 +87,9 @@ class DscCompleteCheck(ICiBuildPlugin):
                     INFFiles.remove(a)
                 except:
                     tc.LogStdError(
-                        "DscCompleteCheck.IgnoreInf -> {0} not found in filesystem.  Invalid ignore file".format(a))
+                        "HostUnitTestDscCompleteCheck.IgnoreInf -> {0} not found in filesystem.  Invalid ignore file".format(a))
                     logging.info(
-                        "DscCompleteCheck.IgnoreInf -> {0} not found in filesystem.  Invalid ignore file".format(a))
+                        "HostUnitTestDscCompleteCheck.IgnoreInf -> {0} not found in filesystem.  Invalid ignore file".format(a))
 
         # DSC Parser
         dp = DscParser()
@@ -110,14 +113,18 @@ class DscCompleteCheck(ICiBuildPlugin):
                     continue
 
                 if(infp.Dict["MODULE_TYPE"] == "HOST_APPLICATION"):
-                    tc.LogStdOut(
-                        "Ignoring INF.  Module type is HOST_APPLICATION {0}".format(INF))
-                    continue
+                    # should compile test a library that is declared type HOST_APPLICATION
+                    pass
 
-                if len(infp.SupportedPhases) == 1 and \
-                   "HOST_APPLICATION" in infp.SupportedPhases:
+                elif len(infp.SupportedPhases) > 0 and \
+                        "HOST_APPLICATION" in infp.SupportedPhases:
+                    # should compile test a library that supports HOST_APPLICATION but
+                    # require it to be an explicit opt-in
+                    pass
+
+                else:
                     tc.LogStdOut(
-                        "Ignoring Library INF due to only supporting type HOST_APPLICATION {0}".format(INF))
+                        "Ignoring INF. MODULE_TYPE or suppored phases not HOST_APPLICATION {0}".format(INF))
                     continue
 
                 logging.critical(INF + " not in " + wsr_dsc_path)
@@ -126,7 +133,7 @@ class DscCompleteCheck(ICiBuildPlugin):
 
         # If XML object exists, add result
         if overall_status != 0:
-            tc.SetFailed("DscCompleteCheck {0} Failed.  Errors {1}".format(
+            tc.SetFailed("HostUnitTestDscCompleteCheck {0} Failed.  Errors {1}".format(
                 wsr_dsc_path, overall_status), "CHECK_FAILED")
         else:
             tc.SetSuccess()
