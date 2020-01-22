@@ -22,10 +22,10 @@ jobs:
     matrix:
       TARGET_MDE_CPU:
         Build.Pkgs: 'MdePkg,UefiCpuPkg'
-        Build.Targets: 'DEBUG,RELEASE,NO-TARGET'
+        Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
       TARGET_MDEMODULE_DEBUG:
         Build.Pkgs: 'MdeModulePkg'
-        Build.Targets: 'DEBUG'
+        Build.Targets: 'DEBUG,NOOPT'
       TARGET_MDEMODULE_RELEASE:
         Build.Pkgs: 'MdeModulePkg'
         Build.Targets: 'RELEASE,NO-TARGET'
@@ -35,9 +35,9 @@ jobs:
       TARGET_OTHER:
         Build.Pkgs: 'PcAtChipsetPkg,ShellPkg'
         Build.Targets: 'DEBUG,RELEASE,NO-TARGET'
-      TARGET_FMP:
-        Build.Pkgs: 'FmpDevicePkg,FatPkg'
-        Build.Targets: 'DEBUG,RELEASE,NO-TARGET'
+      TARGET_FMP_FAT_TEST:
+        Build.Pkgs: 'FmpDevicePkg,FatPkg,UnitTestFrameworkPkg'
+        Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
       TARGET_CRYPTO:
         Build.Pkgs: 'CryptoPkg'
         Build.Targets: 'DEBUG,RELEASE,NO-TARGET'
