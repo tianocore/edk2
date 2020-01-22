@@ -93,6 +93,7 @@ MicrocodeDetect (
   UINT32                                  InCompleteCheckSum32;
   BOOLEAN                                 CorrectMicrocode;
   VOID                                    *MicrocodeData;
+  MSR_IA32_PLATFORM_ID_REGISTER           PlatformIdMsr;
   UINT32                                  ThreadId;
   BOOLEAN                                 IsBspCallIn;
 
@@ -115,8 +116,18 @@ MicrocodeDetect (
   }
 
   ExtendedTableLength = 0;
-  Eax.Uint32 = CpuMpData->CpuData[ProcessorNumber].ProcessorSignature;
-  PlatformId = CpuMpData->CpuData[ProcessorNumber].PlatformId;
+  //
+  // Here data of CPUID leafs have not been collected into context buffer, so
+  // GetProcessorCpuid() cannot be used here to retrieve CPUID data.
+  //
+  AsmCpuid (CPUID_VERSION_INFO, &Eax.Uint32, NULL, NULL, NULL);
+
+  //
+  // The index of platform information resides in bits 50:52 of MSR IA32_PLATFORM_ID
+  //
+  PlatformIdMsr.Uint64 = AsmReadMsr64 (MSR_IA32_PLATFORM_ID);
+  PlatformId = (UINT8) PlatformIdMsr.Bits.PlatformId;
+
 
   //
   // Check whether AP has same processor with BSP.
