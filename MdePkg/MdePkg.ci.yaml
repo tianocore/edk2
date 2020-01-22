@@ -10,8 +10,13 @@
         "DscPath": "MdePkg.dsc"
     },
 
+    ## options defined ci/Plugin/HostUnitTestCompilerPlugin
+    "HostUnitTestCompilerPlugin": {
+        "DscPath": "Test/MdePkgHostTest.dsc"
+    },
+
     ## options defined ci/Plugin/CharEncodingCheck
-"CharEncodingCheck": {
+    "CharEncodingCheck": {
         "IgnoreFiles": []
     },
 
@@ -21,7 +26,9 @@
             "MdePkg/MdePkg.dec"
         ],
         # For host based unit tests
-        "AcceptableDependencies-HOST_APPLICATION":[],
+        "AcceptableDependencies-HOST_APPLICATION":[
+            "UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec"
+        ],
         # For UEFI shell based apps
         "AcceptableDependencies-UEFI_APPLICATION":[],
         "IgnoreInf": []
@@ -29,8 +36,14 @@
 
     ## options defined ci/Plugin/DscCompleteCheck
     "DscCompleteCheck": {
-        "IgnoreInf": [],
+        "IgnoreInf": [""],
         "DscPath": "MdePkg.dsc"
+    },
+
+    ## options defined ci/Plugin/HostUnitTestDscCompleteCheck
+    "HostUnitTestDscCompleteCheck": {
+        "IgnoreInf": [""],
+        "DscPath": "Test/MdePkgHostTest.dsc"
     },
 
     ## options defined ci/Plugin/GuidCheck
