@@ -113,7 +113,7 @@ class DependencyCheck(ICiBuildPlugin):
                     overall_status += 1
 
         # If XML object exists, add results
-        if overall_status is not 0:
+        if overall_status != 0:
             tc.SetFailed("Failed with {0} errors".format(overall_status), "DEPENDENCYCHECK_FAILED")
         else:
             tc.SetSuccess()

@@ -146,7 +146,7 @@ class LibraryClassCheck(ICiBuildPlugin):
 
 
         # If XML object exists, add result
-        if overall_status is not 0:
+        if overall_status != 0:
             tc.SetFailed("LibraryClassCheck {0} Failed.  Errors {1}".format(wsr_dec_path, overall_status), "CHECK_FAILED")
         else:
             tc.SetSuccess()

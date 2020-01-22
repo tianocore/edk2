@@ -221,7 +221,7 @@ class GuidCheck(ICiBuildPlugin):
 
         # add result to test case
         overall_status = len(Errors)
-        if overall_status is not 0:
+        if overall_status != 0:
             tc.SetFailed("GuidCheck {0} Failed.  Errors {1}".format(
                 packagename, overall_status), "CHECK_FAILED")
         else:

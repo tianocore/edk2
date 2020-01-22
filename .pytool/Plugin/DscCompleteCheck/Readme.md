@@ -7,6 +7,11 @@ that it would not be built if the package were built). This is critical because
 much of the CI infrastructure assumes that all modules will be listed in the DSC
 and compiled.
 
+This test will ignore INFs in the following cases:
+
+1. When MODULE_TYPE = HOST_APPLICATION
+2. When a Library instance **only** supports the HOST_APPLICATION environment
+
 ## Configuration
 
 The plugin has a few configuration options to support the UEFI codebase.
@@ -14,7 +19,7 @@ The plugin has a few configuration options to support the UEFI codebase.
 ``` yaml
 "DscCompleteCheck": {
         "DscPath": "",   # Path to dsc from root of package
-        "IgnoreInf": []  # Ignore INF if found in filesystem by not dsc
+        "IgnoreInf": []  # Ignore INF if found in filesystem but not dsc
     }
 ```
 
