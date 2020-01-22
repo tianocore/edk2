@@ -1,0 +1,12 @@
+##
+# IUefiBuildPlugin used to run any unittests that
+# were built on this build.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+{
+  "scope": "host-test-win",
+  "name": "Windows Host-Based Unit Test Runner",
+  "module": "HostBasedUnitTestRunner"
+}
