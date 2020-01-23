@@ -341,7 +341,21 @@ class GitDiffCheck:
                 self.state = PRE_PATCH
                 self.filename = line[13:].split(' ', 1)[0]
                 self.is_newfile = False
-                self.force_crlf = not self.filename.endswith('.sh')
+                self.force_crlf = True
+                self.force_notabs = True
+                if self.filename.endswith('.sh'):
+                    #
+                    # Do not enforce CR/LF line endings for linux shell scripts.
+                    #
+                    self.force_crlf = False
+                if self.filename == '.gitmodules':
+                    #
+                    # .gitmodules is updated by git and uses tabs and LF line
+                    # endings.  Do not enforce no tabs and do not enforce
+                    # CR/LF line endings.
+                    #
+                    self.force_crlf = False
+                    self.force_notabs = False
             elif len(line.rstrip()) != 0:
                 self.format_error("didn't find diff command")
             self.line_num += 1
@@ -355,6 +369,11 @@ class GitDiffCheck:
                 self.binary = True
                 if self.is_newfile:
                     self.new_bin.append(self.filename)
+            elif line.startswith('new file mode 160000'):
+                #
+                # New submodule.  Do not enforce CR/LF line endings
+                #
+                self.force_crlf = False
             else:
                 ok = False
                 self.is_newfile = self.newfile_prefix_re.match(line)
@@ -429,7 +448,7 @@ class GitDiffCheck:
         if self.force_crlf and eol != '\r\n':
             self.added_line_error('Line ending (%s) is not CRLF' % repr(eol),
                                   line)
-        if '\t' in line:
+        if self.force_notabs and '\t' in line:
             self.added_line_error('Tab character used', line)
         if len(stripped) < len(line):
             self.added_line_error('Trailing whitespace found', line)
