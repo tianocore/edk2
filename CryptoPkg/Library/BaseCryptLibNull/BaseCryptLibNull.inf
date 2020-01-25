@@ -6,7 +6,7 @@
 #  This external input must be validated carefully to avoid security issues such as
 #  buffer overflow or integer overflow.
 #
-#  Copyright (c) 2009 - 2019, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2009 - 2020, Intel Corporation. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -37,6 +37,7 @@
   Hmac/CryptHmacMd5Null.c
   Hmac/CryptHmacSha1Null.c
   Hmac/CryptHmacSha256Null.c
+  Kdf/CryptHkdfNull.c
   Cipher/CryptAesNull.c
   Cipher/CryptTdesNull.c
   Cipher/CryptArc4Null.c
