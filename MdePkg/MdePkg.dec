@@ -2265,10 +2265,6 @@
   # @ValidList  0x80000001 | 8, 16, 32
   gEfiMdePkgTokenSpaceGuid.PcdPort80DataWidth|8|UINT8|0x0000002d
 
-  ## This value is used to configure X86 Processor FSB clock.
-  # @Prompt FSB Clock.
-  gEfiMdePkgTokenSpaceGuid.PcdFSBClock|200000000|UINT32|0x0000000c
-
   ## The maximum printable number of characters. UefLib functions: AsciiPrint(), AsciiErrorPrint(),
   #  PrintXY(), AsciiPrintXY(), Print(), ErrorPrint() base on this PCD value to print characters.
   # @Prompt Maximum Printable Number of Characters.
@@ -2371,6 +2367,10 @@
   #  The value of 0xFFFF then firmware will wait for user input before booting.
   # @Prompt Boot Timeout (s)
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|0xffff|UINT16|0x0000002c
+
+  ## This value is used to configure X86 Processor FSB clock.
+  # @Prompt FSB Clock.
+  gEfiMdePkgTokenSpaceGuid.PcdFSBClock|200000000|UINT32|0x0000000c
 
 [UserExtensions.TianoCore."ExtraFiles"]
   MdePkgExtra.uni
