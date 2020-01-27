@@ -646,7 +646,7 @@ SerialPortWrite (
     // Wait for the serial port to be ready, to make sure both the transmit FIFO
     // and shift register empty.
     //
-    while ((SerialPortReadRegister (SerialRegisterBase, R_UART_LSR) & B_UART_LSR_TEMT) == 0);
+    while ((SerialPortReadRegister (SerialRegisterBase, R_UART_LSR) & (B_UART_LSR_TEMT | B_UART_LSR_TXRDY)) != (B_UART_LSR_TEMT | B_UART_LSR_TXRDY));
 
     //
     // Fill then entire Tx FIFO
