@@ -91,9 +91,6 @@ WindowsCFLAGS = 'CFLAGS = $(CFLAGS) /wd4200 /wd4034 /wd4101 '
 LinuxCFLAGS = 'BUILD_CFLAGS += -Wno-pointer-to-int-cast -Wno-unused-variable '
 PcdMakefileEnd = '''
 !INCLUDE $(BASE_TOOLS_PATH)\Source\C\Makefiles\ms.common
-
-LIBS = $(LIB_PATH)\Common.lib
-
 !INCLUDE $(BASE_TOOLS_PATH)\Source\C\Makefiles\ms.app
 '''
 
@@ -2637,10 +2634,10 @@ class DscBuildData(PlatformBuildClassObject):
 
         MakeApp = PcdMakefileHeader
         if sys.platform == "win32":
-            MakeApp = MakeApp + 'APPFILE = %s\%s.exe\n' % (self.OutputPath, PcdValueInitName) + 'APPNAME = %s\n' % (PcdValueInitName) + 'OBJECTS = %s\%s.obj\n' % (self.OutputPath, PcdValueInitName) + 'INC = '
+            MakeApp = MakeApp + 'APPFILE = %s\%s.exe\n' % (self.OutputPath, PcdValueInitName) + 'APPNAME = %s\n' % (PcdValueInitName) + 'OBJECTS = %s\%s.obj %s.obj\n' % (self.OutputPath, PcdValueInitName, os.path.normpath(mws.join(GlobalData.gGlobalDefines["EDK_TOOLS_PATH"], "Source/C/Common/PcdValueCommon"))) + 'INC = '
         else:
             MakeApp = MakeApp + PcdGccMakefile
-            MakeApp = MakeApp + 'APPFILE = %s/%s\n' % (self.OutputPath, PcdValueInitName) + 'APPNAME = %s\n' % (PcdValueInitName) + 'OBJECTS = %s/%s.o\n' % (self.OutputPath, PcdValueInitName) + \
+            MakeApp = MakeApp + 'APPFILE = %s/%s\n' % (self.OutputPath, PcdValueInitName) + 'APPNAME = %s\n' % (PcdValueInitName) + 'OBJECTS = %s/%s.o %s.o\n' % (self.OutputPath, PcdValueInitName, os.path.normpath(mws.join(GlobalData.gGlobalDefines["EDK_TOOLS_PATH"], "Source/C/Common/PcdValueCommon"))) + \
                       'include $(MAKEROOT)/Makefiles/app.makefile\n' + 'INCLUDE +='
 
         IncSearchList = []
@@ -2723,8 +2720,8 @@ class DscBuildData(PlatformBuildClassObject):
                     IncludeFileFullPaths.append(os.path.normpath(includefullpath))
                     break
         SearchPathList = []
-        SearchPathList.append(os.path.normpath(mws.join(GlobalData.gWorkspace, "BaseTools/Source/C/Include")))
-        SearchPathList.append(os.path.normpath(mws.join(GlobalData.gWorkspace, "BaseTools/Source/C/Common")))
+        SearchPathList.append(os.path.normpath(mws.join(GlobalData.gGlobalDefines["EDK_TOOLS_PATH"], "BaseTools/Source/C/Include")))
+        SearchPathList.append(os.path.normpath(mws.join(GlobalData.gGlobalDefines["EDK_TOOLS_PATH"], "BaseTools/Source/C/Common")))
         SearchPathList.extend(str(item) for item in IncSearchList)
         IncFileList = GetDependencyList(IncludeFileFullPaths, SearchPathList)
         for include_file in IncFileList:
@@ -2743,9 +2740,33 @@ class DscBuildData(PlatformBuildClassObject):
         else:
             Dest_PcdValueInitExe = os.path.join(self.OutputPath, PcdValueInitName) +".exe"
         Messages = ''
+
+        VsDevCmd = {
+            "VS2019"   : '"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Enterprise\\Common7\\Tools\\VsDevCmd.bat"',
+            "VS2017"   : '"C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Enterprise\\Common7\\Tools\\VsDevCmd.bat"',
+            "VS2015"   : '"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\Common7\\Tools\\VsDevCmd.bat"',
+            "VS2015x86": '"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\Common7\\Tools\\VsDevCmd.bat"',
+            "VS2013"   : '"C:\\Program Files (x86)\\Microsoft Visual Studio 12.0\\Common7\\Tools\\VsDevCmd.bat"',
+            "VS2013x86": '"C:\\Program Files (x86)\\Microsoft Visual Studio 12.0\\Common7\\Tools\\VsDevCmd.bat"',
+            "VS2012"   : '"C:\\Program Files (x86)\\Microsoft Visual Studio 11.0\\Common7\\Tools\\VsDevCmd.bat"',
+            "VS2012x86": '"C:\\Program Files (x86)\\Microsoft Visual Studio 11.0\\Common7\\Tools\\VsDevCmd.bat"',
+            "VS2010"   : '"C:\\Program Files (x86)\\Microsoft Visual Studio 10.0\\VC\\vcvarsall.bat" x86',
+            "VS2010x86": '"C:\\Program Files (x86)\\Microsoft Visual Studio 10.0\\VC\\vcvarsall.bat" x86'
+        }
+
         if sys.platform == "win32":
             MakeCommand = 'nmake -f %s' % (MakeFileName)
             returncode, StdOut, StdErr = DscBuildData.ExecuteCommand (MakeCommand)
+            if returncode != 0:
+                #
+                # If the nmake command failed, then lookup and run the VS
+                # Development Environment script for the current ToolChain and
+                # try the nmake command again.
+                #
+                if self._Toolchain in VsDevCmd:
+                    MakeCommand = VsDevCmd[self._Toolchain] + '&' + MakeCommand
+                    if os.path.exists (MakeCommand.split('"')[1]):
+                        returncode, StdOut, StdErr = DscBuildData.ExecuteCommand (MakeCommand)
             Messages = StdOut
         else:
             MakeCommand = 'make -f %s' % (MakeFileName)
