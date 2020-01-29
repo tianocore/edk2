@@ -276,3 +276,8 @@
   #  runtime OS from tampering with firmware structures (special memory ranges
   #  used by OVMF, the varstore pflash chip, LockBox etc).
   gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire|FALSE|BOOLEAN|0x1e
+
+  ## Informs modules (including pre-DXE-phase modules) whether the platform
+  #  firmware contains a CSM (Compatibility Support Module).
+  #
+  gUefiOvmfPkgTokenSpaceGuid.PcdCsmEnable|FALSE|BOOLEAN|0x35
