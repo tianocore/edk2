@@ -1,7 +1,7 @@
 /** @file
   ACPI parser
 
-  Copyright (c) 2016 - 2019, ARM Limited. All rights reserved.
+  Copyright (c) 2016 - 2020, ARM Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
@@ -673,7 +673,7 @@ DumpGas (
   IN UINT8*        Ptr
   )
 {
-  DumpGasStruct (Ptr, 2, GAS_LENGTH);
+  DumpGasStruct (Ptr, 2, sizeof (EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE));
 }
 
 /**
@@ -694,7 +694,7 @@ DumpAcpiHeader (
            0,
            "ACPI Table Header",
            Ptr,
-           ACPI_DESCRIPTION_HEADER_LENGTH,
+           sizeof (EFI_ACPI_DESCRIPTION_HEADER),
            PARSER_PARAMS (AcpiHeaderParser)
            );
 }
@@ -728,7 +728,7 @@ ParseAcpiHeader (
                   0,
                   NULL,
                   Ptr,
-                  ACPI_DESCRIPTION_HEADER_LENGTH,
+                  sizeof (EFI_ACPI_DESCRIPTION_HEADER),
                   PARSER_PARAMS (AcpiHeaderParser)
                   );
 
