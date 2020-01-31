@@ -152,33 +152,16 @@ PlatformBootManagerBeforeConsole (
   VOID
 )
 {
-  EFI_INPUT_KEY                Enter;
-  EFI_INPUT_KEY                F2;
-  EFI_INPUT_KEY                Down;
+  EFI_INPUT_KEY                Escape;
   EFI_BOOT_MANAGER_LOAD_OPTION BootOption;
 
   //
-  // Register ENTER as CONTINUE key
+  // Map Escape to Boot Manager Menu
   //
-  Enter.ScanCode    = SCAN_NULL;
-  Enter.UnicodeChar = CHAR_CARRIAGE_RETURN;
-  EfiBootManagerRegisterContinueKeyOption (0, &Enter, NULL);
-
-  //
-  // Map F2 to Boot Manager Menu
-  //
-  F2.ScanCode    = SCAN_F2;
-  F2.UnicodeChar = CHAR_NULL;
+  Escape.ScanCode    = SCAN_ESC;
+  Escape.UnicodeChar = CHAR_NULL;
   EfiBootManagerGetBootManagerMenu (&BootOption);
-  EfiBootManagerAddKeyOptionVariable (NULL, (UINT16) BootOption.OptionNumber, 0, &F2, NULL);
-
-  //
-  // Also add Down key to Boot Manager Menu since some serial terminals don't support F2 key.
-  //
-  Down.ScanCode    = SCAN_DOWN;
-  Down.UnicodeChar = CHAR_NULL;
-  EfiBootManagerGetBootManagerMenu (&BootOption);
-  EfiBootManagerAddKeyOptionVariable (NULL, (UINT16) BootOption.OptionNumber, 0, &Down, NULL);
+  EfiBootManagerAddKeyOptionVariable (NULL, (UINT16) BootOption.OptionNumber, 0, &Escape, NULL);
 
   //
   // Install ready to lock.
@@ -224,13 +207,7 @@ PlatformBootManagerAfterConsole (
   //
   PlatformRegisterFvBootOption (PcdGetPtr (PcdShellFile), L"UEFI Shell", LOAD_OPTION_ACTIVE);
 
-  Print (
-    L"\n"
-    L"F2 or Down      to enter Boot Manager Menu.\n"
-    L"ENTER           to boot directly.\n"
-    L"\n"
-  );
-
+  Print (L"Pess ESC to enter Boot Manager Menu.\n");
 }
 
 /**
