@@ -1,0 +1,60 @@
+## @file
+# RISC-V Timer Arch protocol module.
+#
+# Copyright (c) 2016, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+#
+# This program and the accompanying materials                          
+# are licensed and made available under the terms and conditions of the BSD License         
+# which accompanies this distribution.  The full text of the license may be found at        
+# http://opensource.org/licenses/bsd-license.php                                            
+#                                                                                           
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Timer
+  MODULE_UNI_FILE                = Timer.uni
+  FILE_GUID                      = f2765dec-6b41-11d5-8e71-00902707b35e
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = TimerDriverInitialize
+
+[Packages]
+  MdePkg/MdePkg.dec
+  RiscVPkg/RiscVPkg.dec
+
+[LibraryClasses]
+  UefiBootServicesTableLib
+  BaseLib
+  DebugLib
+  UefiDriverEntryPoint
+  IoLib
+  RiscVCpuLib
+
+[Sources]
+  Timer.h
+  Timer.c
+
+[Sources.riscv32]
+  Riscv32/Riscv32Timer.s
+
+[Sources.riscv64]
+  Riscv32/Riscv32Timer.s
+
+[Protocols]
+  gEfiCpuArchProtocolGuid       ## CONSUMES 
+  gEfiTimerArchProtocolGuid     ## PRODUCES
+
+[Pcd]
+  gUefiRiscVPkgTokenSpaceGuid.PcdRiscVMachineTimerTickInNanoSecond
+  gUefiRiscVPkgTokenSpaceGuid.PcdRiscVMachineTimerFrequencyInHerz
+
+[Depex]
+  gEfiCpuArchProtocolGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  TimerExtra.uni

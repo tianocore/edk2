@@ -39,6 +39,16 @@
 [Includes.AARCH64]
   Include/AArch64
 
+[Includes.RISCV128]
+  Include/RiscV128
+
+[Includes.RISCV64]
+  Include/RiscV64
+
+[Includes.RISCV32]
+  Include/RiscV32
+
+
 [LibraryClasses]
   ##  @libraryclass  Provides most usb APIs to support the Hid requests defined in Usb Hid 1.1 spec
   #                  and the standard requests defined in Usb 1.1 spec.

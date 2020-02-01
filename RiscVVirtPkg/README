@@ -1,0 +1,77 @@
+## @file
+#  Readme of how to build and launch RiscVVirtPkg
+#
+#  Copyright (c) 2016, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+=== EDKII RISC-V Virtual Package OVERVIEW ===
+
+The RISC-V virtual package project is RISC-V UEFI port on EDKII OVMF package.
+The binary built from RiscVVirtPkg can be lanuched on QEMU for emulating RISC-V ISA.
+
+More information about UEFI can be found at http://www.tianocore.org
+More information about OVMF can be found at http://www.tianocore.org/ovmf/
+More information about RISC-V can be found at http://riscv.org
+
+=== STATUS ===
+
+Current capabilities:
+  Current implementation can boot UEFI to internal shell.
+
+* We preserved the capability of supporting RISC-V 32/64/128 arch
+* Currently we only have the implementation of RISC-V 64 arch
+* ACPI, SMBIOS, SMM and MP are not yet supported.
+* QEMU RISC-V port
+  - Video, USB keyboard
+* Only GCC can build RISC-V arch
+
+=== FUTURE PLANS ===
+
+* Implement ACPI, MP, SMBIO and SMM for RISC-V.
+
+=== BUILDING RiscVVirtPkg ===
+
+Pre-requisites:
+* Build environment capable of build the edk2 MdeModulePkg.
+* GCC
+  GCC RISC-V port can be found at https://github.com/riscv/riscv-gnu-toolchain
+  More information for building GCC RISC-V port can be found at http://riscv.org/download.html#tab_gnu-toolchain
+* QEMU
+  QEMU RISC-V port can be found at https://github.com/riscv/riscv-qemu.
+  More information for building QEMU RISC-V port can be found at http://riscv.org/download.html#tab_qemu
+
+***For RISC-V UEFI port, we made some modifications on both GCC tool chain and QEMU RISC-V port base on above official links.
+   Those chanegs are not reviewed and committed to the corresponding repository yet.
+
+Update Conf/target.txt ACTIVE_PLATFORM for RiscVVirtPkg:
+  * RiscVVirtPkg/RiscVVirt64.fdf
+  * RiscVVirtPkg/RiscVVirt64.dsc
+  * RiscVVirtPkg/RiscVVirtPkg.dec
+
+ACTIVE_PLATFORM       = RiscVVirtPkg/RiscVVirt64.dsc
+TARGET                = DEBUG
+TARGET_ARCH           = RISCV64
+TOOL_CHAIN_TAG        = GCC52RISCV
+
+You can build RiscVVirtPkg through EDKII "build" under prompt.
+You can build RiscVVirtPkg with debug serial port message under prompt
+  build -D DEBUG_ON_SERIAL_PORT
+
+=== RUNNING RiscVVirtPkg on QEMU ===
+* Once your RiscVVirtPkg is built, you can find the flash device RISCVVIRT.fd under FV/ directory.
+* After QEMU RISC-V port is built. You can find the executable file qemu-system-riscvpcat under
+  YourQEMU/riscv-qemu/riscvpcat-softmmu.
+* copy RISCVVIRT.fd to YourQEMU/riscv-qemu/riscvpcat-softmmu and launch RISCVVIRT.fd as below,
+  ./qemu-system-riscvpcat -bios RISCVVIRT.fd -usb -usbdevice keyboard
+* You can assign serial port to QEMU platform and have the debug messages output to terminal (like gdkterm).
+  ./qemu-system-riscvpcat -bios -serial /dev/pts/8 RISCVVIRT.fd -usb -usbdevice keyboard
+

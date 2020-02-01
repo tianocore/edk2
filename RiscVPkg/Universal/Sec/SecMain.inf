@@ -1,0 +1,81 @@
+## @file
+#  RISC-V SEC module.
+#
+#  Copyright (c) 2016, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SecMain
+  FILE_GUID                      = df1ccef6-f301-4a63-9661-fc6030dcc880
+  MODULE_TYPE                    = SEC
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = SecMain
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = RISCV64 RISCV32 EBC
+#
+
+[Sources]
+  SecMain.c
+  TrapHandler.c
+
+[Sources.RISCV32]
+
+[Sources.RISCV64]
+  Riscv64/SecEntry.s
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  OvmfPkg/OvmfPkg.dec
+  RiscVPkg/RiscVPkg.dec
+  RiscVVirtPkg/RiscVVirtPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  BaseMemoryLib
+  PcdLib
+  DebugAgentLib
+  IoLib
+  PeCoffLib
+  PeCoffGetEntryPointLib
+  PeCoffExtraActionLib
+  ExtractGuidedSectionLib
+  RiscVPlatformTempMemoryInitLib
+  RiscVCpuLib
+  #PeiHobLib
+  #PeiServicesTablePointerLib
+  #PeiServicesLib
+
+[Ppis]
+  gEfiTemporaryRamSupportPpiGuid # PPI ALWAYS_PRODUCED
+  gEfiTemporaryRamDonePpiGuid    # PPI ALWAYS_PRODUCED
+
+[Guids]
+  gUefiRiscVMachineContextGuid
+
+[Pcd]
+  gUefiRiscVPkgTokenSpaceGuid.PcdRiscVPeiFvBase
+  gUefiRiscVPkgTokenSpaceGuid.PcdRiscVPeiFvSize
+  gUefiRiscVPkgTokenSpaceGuid.PcdRiscVSecPeiTempRamSize
+  gUefiRiscVPkgTokenSpaceGuid.PcdRiscVSecPeiTempRamBase	
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfPeiMemFvBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfPeiMemFvSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDxeMemFvBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDxeMemFvSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfPeiMemFvBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfPeiMemFvSize
+  #gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPageTablesBase

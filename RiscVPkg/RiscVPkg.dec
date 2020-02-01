@@ -1,0 +1,58 @@
+## @file  RiscVPkg.dec
+# This Package provides UEFI RISC-V modules and libraries.
+#
+# Copyright (c) 2016, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+#
+# This program and the accompanying materials are licensed and made available under
+# the terms and conditions of the BSD License which accompanies this distribution.
+# The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  DEC_SPECIFICATION              = 0x00010005
+  PACKAGE_NAME                   = RiscVPkg
+  PACKAGE_UNI_FILE               = RiscVPkg.uni
+  PACKAGE_GUID                   = 993C7CAC-C87C-4F08-A2CF-AD3AABA859D1
+  PACKAGE_VERSION                = 0.1
+
+[Includes]
+  Include
+
+[LibraryClasses]
+
+[LibraryClasses.RISCV32, LibraryClasses.RISCV64]
+
+[Guids]
+  gUefiRiscVPkgTokenSpaceGuid  = { 0x4261e9c8, 0x52c0, 0x4b34, { 0x85, 0x3d, 0x48, 0x46, 0xea, 0xd3, 0xb7, 0x2c}}
+  gUefiRiscVMachineContextGuid = { 0xdad19cd5, 0x9d1f, 0x4f38, { 0xbc, 0xba, 0x10, 0x81, 0xe4, 0xcd, 0xb7, 0x3f}}
+
+[PcdsFixedAtBuild]
+  gUefiRiscVPkgTokenSpaceGuid.PcdRiscVSecPeiTempRamBase|0x0|UINT32|0x00001000
+  gUefiRiscVPkgTokenSpaceGuid.PcdRiscVSecPeiTempRamSize|0x0|UINT32|0x00001001
+  gUefiRiscVPkgTokenSpaceGuid.PcdRiscVPeiFvBase|0x0|UINT32|0x00001002
+  gUefiRiscVPkgTokenSpaceGuid.PcdRiscVPeiFvSize|0x0|UINT32|0x00001003
+  gUefiRiscVPkgTokenSpaceGuid.PcdRiscVDxeFvBase|0x0|UINT32|0x00001004
+  gUefiRiscVPkgTokenSpaceGuid.PcdRiscVDxeFvSize|0x0|UINT32|0x00001005
+  #
+  #                                                   1000000000
+  # PcdRiscVMachineTimerTickInNanoSecond = ---------------------------------------
+  #                                          PcdRiscVMachineTimerFrequencyInHerz
+  #
+  gUefiRiscVPkgTokenSpaceGuid.PcdRiscVMachineTimerTickInNanoSecond|100|UINT64|0x00001010
+  gUefiRiscVPkgTokenSpaceGuid.PcdRiscVMachineTimerFrequencyInHerz|10000000|UINT64|0x00001011
+  #
+  # POST screen logo
+  #
+  gUefiRiscVPkgTokenSpaceGuid.PcdRiscvUEfiLogoFile |{ 0x16, 0x9e, 0x32, 0x67, 0xd3, 0x19, 0xca, 0x46, 0x9f, 0x2e, 0xa3, 0x73, 0x1a, 0x5f, 0xb3, 0x39 }|VOID*|0x00001020
+ 
+[PcdsPatchableInModule]
+
+[PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  RiscVPkgExtra.uni

@@ -7,6 +7,7 @@
   Common Object File Format Specification, Revision 8.3 - February 6, 2013.
   This file also includes some definitions in PI Specification, Revision 1.0.
 
+Copyright (c) 2016, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -34,6 +35,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define IMAGE_FILE_MACHINE_X64             0x8664
 #define IMAGE_FILE_MACHINE_ARMTHUMB_MIXED  0x01c2
 #define IMAGE_FILE_MACHINE_ARM64           0xAA64
+#define IMAGE_FILE_MACHINE_RISCV32         0x5032
+#define IMAGE_FILE_MACHINE_RISCV64         0x5064
+#define IMAGE_FILE_MACHINE_RISCV128        0x5128
+
 
 //
 // EXE file formats
@@ -488,7 +493,10 @@ typedef struct {
 #define EFI_IMAGE_REL_BASED_HIGHADJ         4
 #define EFI_IMAGE_REL_BASED_MIPS_JMPADDR    5
 #define EFI_IMAGE_REL_BASED_ARM_MOV32A      5
+#define EFI_IMAGE_REL_BASED_RISCV_HI20      5
 #define EFI_IMAGE_REL_BASED_ARM_MOV32T      7
+#define EFI_IMAGE_REL_BASED_RISCV_LOW12I    7
+#define EFI_IMAGE_REL_BASED_RISCV_LOW12S    8
 #define EFI_IMAGE_REL_BASED_IA64_IMM64      9
 #define EFI_IMAGE_REL_BASED_MIPS_JMPADDR16  9
 #define EFI_IMAGE_REL_BASED_DIR64           10

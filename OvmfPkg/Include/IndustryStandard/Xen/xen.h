@@ -22,6 +22,8 @@
 #include "arch-x86/xen.h"
 #elif defined(__arm__) || defined (__aarch64__)
 #include "arch-arm/xen.h"
+#elif defined(MDE_CPU_RISCV32) || defined (MDE_CPU_RISCV64) || defined (MDE_CPU_RISCV128)
+#include "arch-riscv/xen.h"
 #else
 #error "Unsupported architecture"
 #endif

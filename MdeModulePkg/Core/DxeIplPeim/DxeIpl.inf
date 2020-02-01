@@ -49,6 +49,9 @@
 [Sources.ARM, Sources.AARCH64]
   Arm/DxeLoadFunc.c
 
+[Sources.RISCV64]
+  Riscv64/DxeLoadFunc.c
+
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
