@@ -4,7 +4,7 @@
 #  This Package provides cryptographic-related libraries for UEFI security modules.
 #  It also provides a test application to test libraries.
 #
-#  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2009 - 2020, Intel Corporation. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -32,6 +32,10 @@
   ##  @libraryclass  Provides TLS library functions for EFI TLS protocol.
   ##
   TlsLib|Include/Library/TlsLib.h
+
+[Guids]
+  ## Crypto package token space guid.
+  gEfiCryptoPkgTokenSpaceGuid      = { 0x6bd7de60, 0x9ef7, 0x4899, { 0x97, 0xd0, 0xab, 0xff, 0xfd, 0xe9, 0x70, 0xf2 } }
 
 [UserExtensions.TianoCore."ExtraFiles"]
   CryptoPkgExtra.uni
