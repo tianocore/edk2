@@ -8,7 +8,7 @@
 //**/
 #define FORMSET_GUID  { 0x847bc3fe, 0xb974, 0x446d, 0x94, 0x49, 0x5a, 0xd5, 0x41, 0x2e, 0x99, 0x3b }
 
-#define BOOT_MANAGER_FORM_ID     0x1000
+#define BOOT_MANAGER_FORM_ID     0x1030
 
 #define LABEL_BOOT_OPTION        0x00
 #define LABEL_BOOT_OPTION_END    0x01
@@ -20,31 +20,24 @@ formset
   classguid = gEfiIfrFrontPageGuid,
 
   form formid = BOOT_MANAGER_FORM_ID,
-       title  = STRING_TOKEN(STR_BM_BANNER);
-
-    subtitle text = STRING_TOKEN(STR_LAST_STRING);
-    subtitle text = STRING_TOKEN(STR_BOOT_OPTION_BANNER);
-    subtitle text = STRING_TOKEN(STR_LAST_STRING);
+    title  = STRING_TOKEN(STR_BM_BANNER);
 
     //
     //Add this invisable text in order to indicate enter Boot Manager form.
     //
     suppressif TRUE;
-          text
-              help  = STRING_TOKEN(STR_LAST_STRING ),
-              text  = STRING_TOKEN(STR_LAST_STRING ),
-              flags = INTERACTIVE,
-              key   = 0x1212;
-     endif;
+      text
+        help  = STRING_TOKEN(STR_EMPTY_STRING),
+        text  = STRING_TOKEN(STR_EMPTY_STRING),
+        flags = INTERACTIVE,
+        key   = 0x1212;
+    endif;
 
     //
     // This is where we will dynamically add choices for the Boot Manager
     //
     label LABEL_BOOT_OPTION;
     label LABEL_BOOT_OPTION_END;
-
-    subtitle text = STRING_TOKEN(STR_LAST_STRING);
-    subtitle text = STRING_TOKEN(STR_HELP_FOOTER);
 
   endform;
 
