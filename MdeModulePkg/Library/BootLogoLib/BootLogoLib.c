@@ -173,6 +173,10 @@ BootLogoEnableLogo (
       DestX = 0;
       DestY = (SizeOfY - Image.Height) / 2;
       break;
+    case EdkiiPlatformLogoDisplayAttributeMicrosoftRecommended:
+      DestX = (SizeOfX - Image.Width) / 2;
+      DestY = (SizeOfY * 382) / 1000 - Image.Height / 2;
+      break;
     case EdkiiPlatformLogoDisplayAttributeCenter:
       DestX = (SizeOfX - Image.Width) / 2;
       DestY = (SizeOfY - Image.Height) / 2;
