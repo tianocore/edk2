@@ -4,7 +4,7 @@
 // This Package provides cryptographic-related libraries for UEFI security modules.
 // It also provides a test application to test libraries.
 //
-// Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2009 - 2020, Intel Corporation. All rights reserved.<BR>
 //
 // SPDX-License-Identifier: BSD-2-Clause-Patent
 //
@@ -14,6 +14,22 @@
 #string STR_PACKAGE_ABSTRACT            #language en-US "Provides cryptographic-related libraries for UEFI security modules"
 
 #string STR_PACKAGE_DESCRIPTION         #language en-US "This Package provides cryptographic-related libraries for UEFI security modules."
+
+
+
+#string STR_gEfiCryptoPkgTokenSpaceGuid_PcdHashApiLibPolicy_PROMPT  #language en-US "HASH algorithm to calculate hash"
+
+#string STR_gEfiCryptoPkgTokenSpaceGuid_PcdHashApiLibPolicy_HELP  #language en-US "This PCD indicates the HASH algorithm to calculate hash of data.<BR><BR>\n"
+                                                                                        "Based on the value set, the required algorithm is chosen to calculate\n"
+                                                                                        "the hash of data.<BR>\n"
+                                                                                        "The default hashing algorithm for BaseHashApiLib is set to SHA256.<BR>\n"
+                                                                                        "0x00000001  -  MD4.<BR>\n"
+                                                                                        "0x00000002  -  MD5.<BR>\n"
+                                                                                        "0x00000003  -  SHA1.<BR>\n"
+                                                                                        "0x00000004  -  SHA256.<BR>\n"
+                                                                                        "0x00000005  -  SHA384.<BR>\n"
+                                                                                        "0x00000006  -  SHA512.<BR>\n"
+                                                                                        "0x00000007  -  SM3.<BR>"
 
 
 
