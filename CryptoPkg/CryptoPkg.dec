@@ -33,9 +33,29 @@
   ##
   TlsLib|Include/Library/TlsLib.h
 
+  ##  @libraryclass  Provides Unified API for different hash implementations.
+  #
+  HashApiLib|Include/Library/HashApiLib.h
+
 [Guids]
   ## Crypto package token space guid.
   gEfiCryptoPkgTokenSpaceGuid      = { 0x6bd7de60, 0x9ef7, 0x4899, { 0x97, 0xd0, 0xab, 0xff, 0xfd, 0xe9, 0x70, 0xf2 } }
+
+[PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
+  ## This PCD indicates the HASH algorithm to calculate hash of data
+  #  Based on the value set, the required algorithm is chosen to calculate
+  #  the hash of data.<BR>
+  #  The default hashing algorithm for BaseHashApiLib is set to SHA256.<BR>
+  #     0x00000001    - MD4.<BR>
+  #     0x00000002    - MD5.<BR>
+  #     0x00000003    - SHA1.<BR>
+  #     0x00000004    - SHA256.<BR>
+  #     0x00000005    - SHA384.<BR>
+  #     0x00000006    - SHA512.<BR>
+  #     0x00000007    - SM3_256.<BR>
+  # @Prompt Set policy for hashing unsigned image for Secure Boot.
+  # @ValidRange 0x80000001 | 0x00000001 - 0x00000007
+  gEfiCryptoPkgTokenSpaceGuid.PcdHashApiLibPolicy|0x04|UINT8|0x00000001
 
 [UserExtensions.TianoCore."ExtraFiles"]
   CryptoPkgExtra.uni

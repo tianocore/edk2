@@ -1,0 +1,17 @@
+// /** @file
+// Provides Unified API for Hash Calculation
+//
+// This library is BaseHashApiLib. It will redirect hash request to
+// each individual hash API, such as SHA1, SHA256, SHA384, SM3 based
+// on hashing algorithm specified by PcdHashApiLibPolicy.
+//
+// Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Provides hash service by specified hash handler"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This library is Unified Hash API. It will redirect hash request to the hash handler specified by PcdHashApiLibPolicy."

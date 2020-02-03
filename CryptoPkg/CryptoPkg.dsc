@@ -1,7 +1,7 @@
 ## @file
 #  Cryptographic Library Package for UEFI Security Implementation.
 #
-#  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2009 - 2020, Intel Corporation. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -44,6 +44,7 @@
 
   IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
   OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
+  HashApiLib|CryptoPkg/Library/BaseHashApiLib/BaseHashApiLib.inf
 
 [LibraryClasses.ARM, LibraryClasses.AARCH64]
   #
@@ -120,6 +121,7 @@
   CryptoPkg/Library/TlsLibNull/TlsLibNull.inf
   CryptoPkg/Library/OpensslLib/OpensslLib.inf
   CryptoPkg/Library/OpensslLib/OpensslLibCrypto.inf
+  CryptoPkg/Library/BaseHashApiLib/BaseHashApiLib.inf
 
 [Components.IA32, Components.X64]
   CryptoPkg/Library/BaseCryptLib/SmmCryptLib.inf
