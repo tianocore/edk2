@@ -261,7 +261,8 @@ PlatformBootManagerUnableToBoot (
   // AsciiPrint() will NULL-check gST->ConOut internally. We check gST->ConIn
   // here to see if it makes sense to request and wait for a keypress.
   //
-  if (gST->ConIn != NULL) {
+  if (gST->ConOut != NULL && gST->ConIn != NULL) {
+    gST->ConOut->ClearScreen (gST->ConOut);
     AsciiPrint (
       "%a: No bootable option or device was found.\n"
       "%a: Press any key to enter the Boot Manager Menu.\n",
