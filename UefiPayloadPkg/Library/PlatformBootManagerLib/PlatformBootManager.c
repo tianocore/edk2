@@ -240,6 +240,50 @@ PlatformBootManagerUnableToBoot (
   VOID
   )
 {
-  return;
+  EFI_STATUS                   Status;
+  EFI_INPUT_KEY                Key;
+  EFI_BOOT_MANAGER_LOAD_OPTION BootManagerMenu;
+  UINTN                        Index;
+
+  //
+  // BootManagerMenu doesn't contain the correct information when return status
+  // is EFI_NOT_FOUND.
+  //
+  Status = EfiBootManagerGetBootManagerMenu (&BootManagerMenu);
+  if (EFI_ERROR (Status)) {
+    return;
+  }
+  //
+  // Normally BdsDxe does not print anything to the system console, but this is
+  // a last resort -- the end-user will likely not see any DEBUG messages
+  // logged in this situation.
+  //
+  // AsciiPrint() will NULL-check gST->ConOut internally. We check gST->ConIn
+  // here to see if it makes sense to request and wait for a keypress.
+  //
+  if (gST->ConIn != NULL) {
+    AsciiPrint (
+      "%a: No bootable option or device was found.\n"
+      "%a: Press any key to enter the Boot Manager Menu.\n",
+      gEfiCallerBaseName,
+      gEfiCallerBaseName
+      );
+    Status = gBS->WaitForEvent (1, &gST->ConIn->WaitForKey, &Index);
+    ASSERT_EFI_ERROR (Status);
+    ASSERT (Index == 0);
+
+    //
+    // Drain any queued keys.
+    //
+    while (!EFI_ERROR (gST->ConIn->ReadKeyStroke (gST->ConIn, &Key))) {
+      //
+      // just throw away Key
+      //
+    }
+  }
+
+  for (;;) {
+    EfiBootManagerBoot (&BootManagerMenu);
+  }
 }
 
