@@ -647,11 +647,13 @@ class CheckGitCommits:
 
     def read_patch_from_git(self, commit):
         # Run git to get the commit patch
-        return self.run_git('show', '--pretty=email', '--no-textconv', commit)
+        return self.run_git('show', '--pretty=email', '--no-textconv',
+                            '--no-use-mailmap', commit)
 
     def read_committer_email_address_from_git(self, commit):
         # Run git to get the committer email
-        return self.run_git('show', '--pretty=%cn <%ce>', '--no-patch', commit)
+        return self.run_git('show', '--pretty=%cn <%ce>', '--no-patch',
+                            '--no-use-mailmap', commit)
 
     def run_git(self, *args):
         cmd = [ 'git' ]
