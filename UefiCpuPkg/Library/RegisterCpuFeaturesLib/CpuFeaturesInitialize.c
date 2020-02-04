@@ -504,8 +504,8 @@ DumpRegisterTableOnProcessor (
       DEBUG ((
         DebugPrintErrorLevel,
         "Processor: %04d: Index %04d, MSR  : %08x, Bit Start: %02d, Bit Length: %02d, Value: %016lx\r\n",
-        ProcessorNumber,
-        FeatureIndex,
+        (UINT32) ProcessorNumber,
+        (UINT32) FeatureIndex,
         RegisterTableEntry->Index,
         RegisterTableEntry->ValidBitStart,
         RegisterTableEntry->ValidBitLength,
@@ -516,8 +516,8 @@ DumpRegisterTableOnProcessor (
       DEBUG ((
         DebugPrintErrorLevel,
         "Processor: %04d: Index %04d, CR   : %08x, Bit Start: %02d, Bit Length: %02d, Value: %016lx\r\n",
-        ProcessorNumber,
-        FeatureIndex,
+        (UINT32) ProcessorNumber,
+        (UINT32) FeatureIndex,
         RegisterTableEntry->Index,
         RegisterTableEntry->ValidBitStart,
         RegisterTableEntry->ValidBitLength,
@@ -527,9 +527,9 @@ DumpRegisterTableOnProcessor (
     case MemoryMapped:
       DEBUG ((
         DebugPrintErrorLevel,
-        "Processor: %04d: Index %04d, MMIO : %08lx, Bit Start: %02d, Bit Length: %02d, Value: %016lx\r\n",
-        ProcessorNumber,
-        FeatureIndex,
+        "Processor: %04d: Index %04d, MMIO : %016lx, Bit Start: %02d, Bit Length: %02d, Value: %016lx\r\n",
+        (UINT32) ProcessorNumber,
+        (UINT32) FeatureIndex,
         RegisterTableEntry->Index | LShiftU64 (RegisterTableEntry->HighIndex, 32),
         RegisterTableEntry->ValidBitStart,
         RegisterTableEntry->ValidBitLength,
@@ -539,9 +539,9 @@ DumpRegisterTableOnProcessor (
     case CacheControl:
       DEBUG ((
         DebugPrintErrorLevel,
-        "Processor: %04d: Index %04d, CACHE: %08lx, Bit Start: %02d, Bit Length: %02d, Value: %016lx\r\n",
-        ProcessorNumber,
-        FeatureIndex,
+        "Processor: %04d: Index %04d, CACHE: %08x, Bit Start: %02d, Bit Length: %02d, Value: %016lx\r\n",
+        (UINT32) ProcessorNumber,
+        (UINT32) FeatureIndex,
         RegisterTableEntry->Index,
         RegisterTableEntry->ValidBitStart,
         RegisterTableEntry->ValidBitLength,
@@ -552,8 +552,8 @@ DumpRegisterTableOnProcessor (
       DEBUG ((
         DebugPrintErrorLevel,
         "Processor: %04d: Index %04d, SEMAP: %s\r\n",
-        ProcessorNumber,
-        FeatureIndex,
+        (UINT32) ProcessorNumber,
+        (UINT32) FeatureIndex,
         mDependTypeStr[MIN ((UINT32)RegisterTableEntry->Value, InvalidDepType)]
         ));
       break;
