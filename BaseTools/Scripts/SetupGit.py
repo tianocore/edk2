@@ -74,6 +74,7 @@ OPTIONS = [
     {'section': 'format',      'option': 'coverLetter',       'value': True},
     {'section': 'format',      'option': 'numbered',          'value': True},
     {'section': 'format',      'option': 'signoff',           'value': False},
+    {'section': 'log',         'option': 'mailmap',           'value': True},
     {'section': 'notes',       'option': 'rewriteRef',        'value': 'refs/notes/commits'},
     {'section': 'sendemail',   'option': 'chainreplyto',      'value': False},
     {'section': 'sendemail',   'option': 'thread',            'value': True},
