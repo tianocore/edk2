@@ -79,6 +79,10 @@ class EmailAddressCheck:
             self.error("The email address cannot contain a space: " +
                        mo.group(3))
 
+        if ' via Groups.Io' in name and mo.group(3).endswith('@groups.io'):
+            self.error("Email rewritten by lists DMARC / DKIM / SPF: " +
+                       email)
+
 class CommitMessageCheck:
     """Checks the contents of a git commit message."""
 
