@@ -623,7 +623,7 @@ typedef char* VA_LIST;
 
 #elif defined(__GNUC__) || defined(__clang__)
 
-#if defined(MDE_CPU_X64) && !defined(NO_MSABI_VA_FUNCS) && !defined(__clang__)
+#if defined(MDE_CPU_X64) && !defined(NO_MSABI_VA_FUNCS)
 //
 // X64 only. Use MS ABI version of GCC built-in macros for variable argument lists.
 //
