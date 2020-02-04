@@ -787,7 +787,7 @@ BootManagerCallback (
 {
   EFI_BOOT_MANAGER_LOAD_OPTION *BootOption;
   UINTN                        BootOptionCount;
-  EFI_INPUT_KEY                Key;
+  //EFI_INPUT_KEY                Key;
 
   if (Action == EFI_BROWSER_ACTION_FORM_OPEN) {
     //
@@ -831,13 +831,13 @@ BootManagerCallback (
   EfiBootManagerBoot (&BootOption[QuestionId - 1]);
   BmSetConsoleMode (TRUE);
 
-  if (EFI_ERROR (BootOption[QuestionId - 1].Status)) {
-    gST->ConOut->OutputString (
-                  gST->ConOut,
-                  HiiGetString (gBootManagerPrivate.HiiHandle, STRING_TOKEN (STR_ANY_KEY_CONTINUE), NULL)
-                  );
-    gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
-  }
+  //if (EFI_ERROR (BootOption[QuestionId - 1].Status)) {
+  //  gST->ConOut->OutputString (
+  //                gST->ConOut,
+  //                HiiGetString (gBootManagerPrivate.HiiHandle, STRING_TOKEN (STR_ANY_KEY_CONTINUE), NULL)
+  //                );
+  //  gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
+  //}
 
   EfiBootManagerFreeLoadOptions (BootOption, BootOptionCount);
 
