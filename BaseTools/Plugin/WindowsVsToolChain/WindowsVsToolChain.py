@@ -22,6 +22,9 @@ class WindowsVsToolChain(IUefiBuildPlugin):
 
     def do_pre_build(self, thebuilder):
         self.Logger = logging.getLogger("WindowsVsToolChain")
+        interesting_keys = ["ExtensionSdkDir", "INCLUDE", "LIB", "LIBPATH", "UniversalCRTSdkDir",
+                            "UCRTVersion", "WindowsLibPath", "WindowsSdkBinPath", "WindowsSdkDir", "WindowsSdkVerBinPath",
+                            "WindowsSDKVersion", "VCToolsInstallDir", "Path"]
 
 #
         # VS2017 - Follow VS2017 where there is potential for many versions of the tools.
@@ -55,6 +58,16 @@ class WindowsVsToolChain(IUefiBuildPlugin):
                                       "Tools", "MSVC", vc_ver)
                 prefix = prefix + os.path.sep
                 shell_environment.GetEnvironment().set_shell_var("VS2017_PREFIX", prefix)
+
+                shell_env = shell_environment.GetEnvironment()
+                # Use the tools lib to determine the correct values for the vars that interest us.
+                vs_vars = locate_tools.QueryVcVariables(
+                    interesting_keys, "amd64", vs_version="vs2017")
+                for (k, v) in vs_vars.items():
+                    if k.upper() == "PATH":
+                        shell_env.insert_path(v)
+                    else:
+                        shell_env.set_shell_var(k, v)
 
             # now confirm it exists
             if not os.path.exists(shell_environment.GetEnvironment().get_shell_var("VS2017_PREFIX")):
@@ -93,6 +106,16 @@ class WindowsVsToolChain(IUefiBuildPlugin):
                                       "Tools", "MSVC", vc_ver)
                 prefix = prefix + os.path.sep
                 shell_environment.GetEnvironment().set_shell_var("VS2019_PREFIX", prefix)
+
+                shell_env = shell_environment.GetEnvironment()
+                # Use the tools lib to determine the correct values for the vars that interest us.
+                vs_vars = locate_tools.QueryVcVariables(
+                    interesting_keys, "amd64", vs_version="vs2019")
+                for (k, v) in vs_vars.items():
+                    if k.upper() == "PATH":
+                        shell_env.insert_path(v)
+                    else:
+                        shell_env.set_shell_var(k, v)
 
             # now confirm it exists
             if not os.path.exists(shell_environment.GetEnvironment().get_shell_var("VS2019_PREFIX")):
