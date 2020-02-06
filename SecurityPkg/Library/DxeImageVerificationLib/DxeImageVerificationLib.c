@@ -955,17 +955,19 @@ Done:
   @param[in]  Signature           Pointer to signature that is searched for.
   @param[in]  CertType            Pointer to hash algorithm.
   @param[in]  SignatureSize       Size of Signature.
+  @param[out] IsFound             Search result. Only valid if EFI_SUCCESS returned
 
-  @return TRUE                    Found the signature in the variable database.
-  @return FALSE                   Not found the signature in the variable database.
+  @retval EFI_SUCCESS             Finished the search without any error.
+  @retval Others                  Error occurred in the search of database.
 
 **/
-BOOLEAN
+EFI_STATUS
 IsSignatureFoundInDatabase (
-  IN CHAR16             *VariableName,
-  IN UINT8              *Signature,
-  IN EFI_GUID           *CertType,
-  IN UINTN              SignatureSize
+  IN  CHAR16            *VariableName,
+  IN  UINT8             *Signature,
+  IN  EFI_GUID          *CertType,
+  IN  UINTN             SignatureSize,
+  OUT BOOLEAN           *IsFound
   )
 {
   EFI_STATUS          Status;
@@ -975,22 +977,28 @@ IsSignatureFoundInDatabase (
   UINT8               *Data;
   UINTN               Index;
   UINTN               CertCount;
-  BOOLEAN             IsFound;
 
   //
   // Read signature database variable.
   //
-  IsFound   = FALSE;
+  *IsFound  = FALSE;
   Data      = NULL;
   DataSize  = 0;
   Status    = gRT->GetVariable (VariableName, &gEfiImageSecurityDatabaseGuid, NULL, &DataSize, NULL);
   if (Status != EFI_BUFFER_TOO_SMALL) {
-    return FALSE;
+    if (Status == EFI_NOT_FOUND) {
+      //
+      // No database, no need to search.
+      //
+      Status = EFI_SUCCESS;
+    }
+
+    return Status;
   }
 
   Data = (UINT8 *) AllocateZeroPool (DataSize);
   if (Data == NULL) {
-    return FALSE;
+    return EFI_OUT_OF_RESOURCES;
   }
 
   Status = gRT->GetVariable (VariableName, &gEfiImageSecurityDatabaseGuid, NULL, &DataSize, Data);
@@ -1010,7 +1018,7 @@ IsSignatureFoundInDatabase (
           //
           // Find the signature in database.
           //
-          IsFound = TRUE;
+          *IsFound = TRUE;
           //
           // Entries in UEFI_IMAGE_SECURITY_DATABASE that are used to validate image should be measured
           //
@@ -1023,7 +1031,7 @@ IsSignatureFoundInDatabase (
         Cert = (EFI_SIGNATURE_DATA *) ((UINT8 *) Cert + CertList->SignatureSize);
       }
 
-      if (IsFound) {
+      if (*IsFound) {
         break;
       }
     }
@@ -1037,7 +1045,7 @@ Done:
     FreePool (Data);
   }
 
-  return IsFound;
+  return Status;
 }
 
 /**
@@ -1642,6 +1650,8 @@ DxeImageVerificationHandler (
   CHAR16                               *NameStr;
   RETURN_STATUS                        PeCoffStatus;
   EFI_STATUS                           HashStatus;
+  EFI_STATUS                           DbStatus;
+  BOOLEAN                              IsFound;
 
   SignatureList     = NULL;
   SignatureListSize = 0;
@@ -1650,7 +1660,7 @@ DxeImageVerificationHandler (
   PkcsCertData      = NULL;
   Action            = EFI_IMAGE_EXECUTION_AUTH_UNTESTED;
   IsVerified        = FALSE;
-
+  IsFound           = FALSE;
 
   //
   // Check the image type and get policy setting.
@@ -1792,7 +1802,14 @@ DxeImageVerificationHandler (
       goto Failed;
     }
 
-    if (IsSignatureFoundInDatabase (EFI_IMAGE_SECURITY_DATABASE1, mImageDigest, &mCertType, mImageDigestSize)) {
+    DbStatus = IsSignatureFoundInDatabase (
+                 EFI_IMAGE_SECURITY_DATABASE1,
+                 mImageDigest,
+                 &mCertType,
+                 mImageDigestSize,
+                 &IsFound
+                 );
+    if (EFI_ERROR (DbStatus) || IsFound) {
       //
       // Image Hash is in forbidden database (DBX).
       //
@@ -1800,7 +1817,14 @@ DxeImageVerificationHandler (
       goto Failed;
     }
 
-    if (IsSignatureFoundInDatabase (EFI_IMAGE_SECURITY_DATABASE, mImageDigest, &mCertType, mImageDigestSize)) {
+    DbStatus = IsSignatureFoundInDatabase (
+                 EFI_IMAGE_SECURITY_DATABASE,
+                 mImageDigest,
+                 &mCertType,
+                 mImageDigestSize,
+                 &IsFound
+                 );
+    if (!EFI_ERROR (DbStatus) && IsFound) {
       //
       // Image Hash is in allowed database (DB).
       //
@@ -1888,14 +1912,29 @@ DxeImageVerificationHandler (
     //
     // Check the image's hash value.
     //
-    if (IsSignatureFoundInDatabase (EFI_IMAGE_SECURITY_DATABASE1, mImageDigest, &mCertType, mImageDigestSize)) {
+    DbStatus = IsSignatureFoundInDatabase (
+                 EFI_IMAGE_SECURITY_DATABASE1,
+                 mImageDigest,
+                 &mCertType,
+                 mImageDigestSize,
+                 &IsFound
+                 );
+    if (EFI_ERROR (DbStatus) || IsFound) {
       Action = EFI_IMAGE_EXECUTION_AUTH_SIG_FOUND;
       DEBUG ((DEBUG_INFO, "DxeImageVerificationLib: Image is signed but %s hash of image is found in DBX.\n", mHashTypeStr));
       IsVerified = FALSE;
       break;
     }
+
     if (!IsVerified) {
-      if (IsSignatureFoundInDatabase (EFI_IMAGE_SECURITY_DATABASE, mImageDigest, &mCertType, mImageDigestSize)) {
+      DbStatus = IsSignatureFoundInDatabase (
+                   EFI_IMAGE_SECURITY_DATABASE,
+                   mImageDigest,
+                   &mCertType,
+                   mImageDigestSize,
+                   &IsFound
+                   );
+      if (!EFI_ERROR (DbStatus) && IsFound) {
         IsVerified = TRUE;
       } else {
         DEBUG ((DEBUG_INFO, "DxeImageVerificationLib: Image is signed but signature is not allowed by DB and %s hash of image is not found in DB/DBX.\n", mHashTypeStr));
