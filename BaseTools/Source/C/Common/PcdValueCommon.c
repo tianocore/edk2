@@ -478,7 +478,7 @@ Returns:
   //
   // Read all of the file contents.
   //
-  BytesRead = fread (*FileBuffer, sizeof (UINT8), *FileSize, InputFile);
+  BytesRead = (UINT32)fread (*FileBuffer, sizeof (UINT8), *FileSize, InputFile);
   if (BytesRead != *FileSize * sizeof (UINT8)) {
     fprintf (stderr, "Error reading the input file %s\n", InputFileName);
     fclose (InputFile);
