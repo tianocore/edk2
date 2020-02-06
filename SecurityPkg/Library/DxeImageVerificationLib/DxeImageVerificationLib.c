@@ -1459,15 +1459,26 @@ IsAllowedByDb (
             DbxDataSize = 0;
             Status   = gRT->GetVariable (EFI_IMAGE_SECURITY_DATABASE1, &gEfiImageSecurityDatabaseGuid, NULL, &DbxDataSize, NULL);
             if (Status != EFI_BUFFER_TOO_SMALL) {
+              if (Status != EFI_NOT_FOUND) {
+                VerifyStatus = FALSE;
+              }
               goto Done;
             }
             DbxData = (UINT8 *) AllocateZeroPool (DbxDataSize);
             if (DbxData == NULL) {
+              //
+              // Force not-allowed-by-db to avoid bypass
+              //
+              VerifyStatus = FALSE;
               goto Done;
             }
 
             Status = gRT->GetVariable (EFI_IMAGE_SECURITY_DATABASE1, &gEfiImageSecurityDatabaseGuid, NULL, &DbxDataSize, (VOID *) DbxData);
             if (EFI_ERROR (Status)) {
+              //
+              // Force not-allowed-by-db to avoid bypass
+              //
+              VerifyStatus = FALSE;
               goto Done;
             }
 
