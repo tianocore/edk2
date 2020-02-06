@@ -91,9 +91,6 @@ WindowsCFLAGS = 'CFLAGS = $(CFLAGS) /wd4200 /wd4034 /wd4101 '
 LinuxCFLAGS = 'BUILD_CFLAGS += -Wno-pointer-to-int-cast -Wno-unused-variable '
 PcdMakefileEnd = '''
 !INCLUDE $(BASE_TOOLS_PATH)\Source\C\Makefiles\ms.common
-
-LIBS = $(LIB_PATH)\Common.lib
-
 !INCLUDE $(BASE_TOOLS_PATH)\Source\C\Makefiles\ms.app
 '''
 
@@ -2637,10 +2634,10 @@ class DscBuildData(PlatformBuildClassObject):
 
         MakeApp = PcdMakefileHeader
         if sys.platform == "win32":
-            MakeApp = MakeApp + 'APPFILE = %s\%s.exe\n' % (self.OutputPath, PcdValueInitName) + 'APPNAME = %s\n' % (PcdValueInitName) + 'OBJECTS = %s\%s.obj\n' % (self.OutputPath, PcdValueInitName) + 'INC = '
+            MakeApp = MakeApp + 'APPFILE = %s\%s.exe\n' % (self.OutputPath, PcdValueInitName) + 'APPNAME = %s\n' % (PcdValueInitName) + 'OBJECTS = %s\%s.obj %s.obj\n' % (self.OutputPath, PcdValueInitName, os.path.normpath(mws.join(GlobalData.gGlobalDefines["EDK_TOOLS_PATH"], "Source/C/Common/PcdValueCommon"))) + 'INC = '
         else:
             MakeApp = MakeApp + PcdGccMakefile
-            MakeApp = MakeApp + 'APPFILE = %s/%s\n' % (self.OutputPath, PcdValueInitName) + 'APPNAME = %s\n' % (PcdValueInitName) + 'OBJECTS = %s/%s.o\n' % (self.OutputPath, PcdValueInitName) + \
+            MakeApp = MakeApp + 'APPFILE = %s/%s\n' % (self.OutputPath, PcdValueInitName) + 'APPNAME = %s\n' % (PcdValueInitName) + 'OBJECTS = %s/%s.o %s.o\n' % (self.OutputPath, PcdValueInitName, os.path.normpath(mws.join(GlobalData.gGlobalDefines["EDK_TOOLS_PATH"], "Source/C/Common/PcdValueCommon"))) + \
                       'include $(MAKEROOT)/Makefiles/app.makefile\n' + 'INCLUDE +='
 
         IncSearchList = []
@@ -2739,8 +2736,8 @@ class DscBuildData(PlatformBuildClassObject):
                     IncludeFileFullPaths.append(os.path.normpath(includefullpath))
                     break
         SearchPathList = []
-        SearchPathList.append(os.path.normpath(mws.join(GlobalData.gWorkspace, "BaseTools/Source/C/Include")))
-        SearchPathList.append(os.path.normpath(mws.join(GlobalData.gWorkspace, "BaseTools/Source/C/Common")))
+        SearchPathList.append(os.path.normpath(mws.join(GlobalData.gGlobalDefines["EDK_TOOLS_PATH"], "BaseTools/Source/C/Include")))
+        SearchPathList.append(os.path.normpath(mws.join(GlobalData.gGlobalDefines["EDK_TOOLS_PATH"], "BaseTools/Source/C/Common")))
         SearchPathList.extend(str(item) for item in IncSearchList)
         IncFileList = GetDependencyList(IncludeFileFullPaths, SearchPathList)
         for include_file in IncFileList:
@@ -2768,6 +2765,7 @@ class DscBuildData(PlatformBuildClassObject):
             returncode, StdOut, StdErr = DscBuildData.ExecuteCommand (MakeCommand)
             Messages = StdErr
 
+        EdkLogger.verbose ('%s\n%s\n%s' % (MakeCommand, StdOut, StdErr))
         Messages = Messages.split('\n')
         MessageGroup = []
         if returncode != 0:
@@ -2777,16 +2775,21 @@ class DscBuildData(PlatformBuildClassObject):
             File.close()
             for Message in Messages:
                 if " error" in Message or "warning" in Message:
-                    FileInfo = Message.strip().split('(')
-                    if len (FileInfo) > 1:
-                        FileName = FileInfo [0]
-                        FileLine = FileInfo [1].split (')')[0]
-                    else:
-                        FileInfo = Message.strip().split(':')
-                        if len(FileInfo) < 2:
-                            continue
-                        FileName = FileInfo [0]
-                        FileLine = FileInfo [1]
+                    try:
+                        FileInfo = Message.strip().split('(')
+                        if len (FileInfo) > 1:
+                            FileName = FileInfo [0]
+                            FileLine = FileInfo [1].split (')')[0]
+                        else:
+                            FileInfo = Message.strip().split(':')
+                            if len(FileInfo) < 2:
+                                continue
+                            FileName = FileInfo [0]
+                            FileLine = FileInfo [1]
+                    except:
+                        continue
+                    if "PcdValueInit.c" not in FileName:
+                        continue
                     if FileLine.isdigit():
                         error_line = FileData[int (FileLine) - 1]
                         if r"//" in error_line:
@@ -2812,13 +2815,14 @@ class DscBuildData(PlatformBuildClassObject):
             if MessageGroup:
                 EdkLogger.error("build", PCD_STRUCTURE_PCD_ERROR, "\n".join(MessageGroup) )
             else:
-                EdkLogger.error('Build', COMMAND_FAILURE, 'Can not execute command: %s' % MakeCommand)
+                EdkLogger.error('Build', COMMAND_FAILURE, 'Can not execute command: %s\n%s\n%s' % (MakeCommand, StdOut, StdErr))
 
         if DscBuildData.NeedUpdateOutput(OutputValueFile, Dest_PcdValueInitExe, InputValueFile):
             Command = Dest_PcdValueInitExe + ' -i %s -o %s' % (InputValueFile, OutputValueFile)
             returncode, StdOut, StdErr = DscBuildData.ExecuteCommand (Command)
+            EdkLogger.verbose ('%s\n%s\n%s' % (Command, StdOut, StdErr))
             if returncode != 0:
-                EdkLogger.warn('Build', COMMAND_FAILURE, 'Can not collect output from command: %s' % Command)
+                EdkLogger.warn('Build', COMMAND_FAILURE, 'Can not collect output from command: %s\n%s\n' % (Command, StdOut, StdErr))
 
         File = open (OutputValueFile, 'r')
         FileBuffer = File.readlines()
