@@ -604,7 +604,7 @@ DhcpEndSession (
                                     is, all the option value that we care.
 
   @retval EFI_SUCCESS           The packet is successfully processed.
-  @retval Others                Some error occured.
+  @retval Others                Some error occurred.
 
 **/
 EFI_STATUS
@@ -632,7 +632,7 @@ DhcpHandleSelect (
 
   //
   // Call the user's callback. The action according to the return is as:
-  // 1. EFI_SUCESS: stop waiting for more offers, select the offer now
+  // 1. EFI_SUCCESS: stop waiting for more offers, select the offer now
   // 2. EFI_NOT_READY: wait for more offers
   // 3. EFI_ABORTED: abort the address acquiring.
   //
@@ -679,7 +679,7 @@ ON_EXIT:
                                     is, all the option value that we care.
 
   @retval EFI_SUCCESS           The packet is successfully processed.
-  @retval Others                Some error occured.
+  @retval Others                Some error occurred.
 
 **/
 EFI_STATUS
@@ -772,7 +772,7 @@ ON_EXIT:
                                     is, all the option value that we care.
 
   @retval EFI_SUCCESS           The packet is successfully processed.
-  @retval Others                Some error occured.
+  @retval Others                Some error occurred.
 
 **/
 EFI_STATUS
@@ -856,7 +856,7 @@ ON_EXIT:
                                     is, all the option value that we care.
 
   @retval EFI_SUCCESS           The packet is successfully processed.
-  @retval Others                Some error occured.
+  @retval Others                Some error occurred.
 
 **/
 EFI_STATUS
@@ -1473,7 +1473,7 @@ DhcpRetransmit (
 /**
   Each DHCP service has three timer. Two of them are count down timer.
   One for the packet retransmission. The other is to collect the offers.
-  The third timer increaments the lease life which is compared to T1, T2,
+  The third timer increments the lease life which is compared to T1, T2,
   and lease to determine the time to renew and rebind the lease.
   DhcpOnTimerTick will be called once every second.
 

@@ -326,7 +326,7 @@ Dhcp4DriverBindingStart (
   }
 
   //
-  // Install the Dhcp4ServiceBinding Protocol onto ControlerHandle
+  // Install the Dhcp4ServiceBinding Protocol onto ControllerHandle
   //
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &ControllerHandle,
@@ -438,7 +438,7 @@ Dhcp4DriverBindingStop (
   DhcpSb = DHCP_SERVICE_FROM_THIS (ServiceBinding);
   if (!IsListEmpty (&DhcpSb->Children)) {
     //
-    // Destroy all the children instances before destory the service.
+    // Destroy all the children instances before destroy the service.
     //
     List = &DhcpSb->Children;
     Status = NetDestroyLinkList (
@@ -523,7 +523,7 @@ DhcpInitProtocol (
                       then a new handle is created. If it is a pointer to an existing UEFI handle,
                       then the protocol is added to the existing UEFI handle.
 
-  @retval EFI_SUCCES            The protocol was added to ChildHandle.
+  @retval EFI_SUCCESS           The protocol was added to ChildHandle.
   @retval EFI_INVALID_PARAMETER ChildHandle is NULL.
   @retval EFI_OUT_OF_RESOURCES  There are not enough resources available to create
                                 the child
@@ -617,7 +617,7 @@ Dhcp4ServiceBindingCreateChild (
   @param  This        Pointer to the EFI_SERVICE_BINDING_PROTOCOL instance.
   @param  ChildHandle Handle of the child to destroy
 
-  @retval EFI_SUCCES            The protocol was removed from ChildHandle.
+  @retval EFI_SUCCESS           The protocol was removed from ChildHandle.
   @retval EFI_UNSUPPORTED       ChildHandle does not support the protocol that is being removed.
   @retval EFI_INVALID_PARAMETER Child handle is NULL.
   @retval EFI_ACCESS_DENIED     The protocol could not be removed from the ChildHandle
