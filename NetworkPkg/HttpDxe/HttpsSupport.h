@@ -149,7 +149,7 @@ TlsCommonReceive (
   );
 
 /**
-  Receive one TLS PDU. An TLS PDU contains an TLS record header and it's
+  Receive one TLS PDU. An TLS PDU contains an TLS record header and its
   corresponding record data. These two parts will be put into two blocks of buffers in the
   net buffer.
 
