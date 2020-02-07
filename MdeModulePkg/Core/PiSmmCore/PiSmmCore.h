@@ -171,7 +171,7 @@ typedef struct {
   EFI_GUID            ProtocolID;
   /// All protocol interfaces
   LIST_ENTRY          Protocols;
-  /// Registerd notification handlers
+  /// Registered notification handlers
   LIST_ENTRY          Notify;
 } PROTOCOL_ENTRY;
 
@@ -562,7 +562,7 @@ SmmLocateHandle (
 /**
   Return the first Protocol Interface that matches the Protocol GUID. If
   Registration is pasased in return a Protocol Instance that was just add
-  to the system. If Retistration is NULL return the first Protocol Interface
+  to the system. If Registration is NULL return the first Protocol Interface
   you find.
 
   @param  Protocol               The protocol to search for
@@ -602,7 +602,7 @@ SmmLocateProtocol (
   @retval EFI_NOT_FOUND          No handles match the search.
   @retval EFI_OUT_OF_RESOURCES   There is not enough pool memory to store the
                                  matching results.
-  @retval EFI_INVALID_PARAMETER  One or more paramters are not valid.
+  @retval EFI_INVALID_PARAMETER  One or more parameters are not valid.
 
 **/
 EFI_STATUS
@@ -641,7 +641,7 @@ SmiManage (
 /**
   Registers a handler to execute within SMM.
 
-  @param  Handler        Handler service funtion pointer.
+  @param  Handler        Handler service function pointer.
   @param  HandlerType    Points to the handler type or NULL for root SMI handlers.
   @param  DispatchHandle On return, contains a unique handle which can be used to later unregister the handler function.
 
@@ -873,12 +873,12 @@ SmmEfiNotAvailableYetArg5 (
   );
 
 //
-//Functions used during debug buils
+//Functions used during debug builds
 //
 
 /**
   Traverse the discovered list for any drivers that were discovered but not loaded
-  because the dependency experessions evaluated to false.
+  because the dependency expressions evaluated to false.
 
 **/
 VOID
