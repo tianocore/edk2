@@ -96,7 +96,7 @@ EfiDhcp6Start (
   OldTpl           = gBS->RaiseTPL (TPL_CALLBACK);
 
   //
-  // Check Media Satus.
+  // Check Media Status.
   //
   MediaStatus = EFI_SUCCESS;
   NetLibDetectMediaWaitTimeout (Service->Controller, DHCP_CHECK_MEDIA_WAITING_TIME, &MediaStatus);
@@ -220,7 +220,7 @@ EfiDhcp6Stop (
   }
 
   //
-  // Poll udp out of the net tpl if synchoronus call.
+  // Poll udp out of the net tpl if synchronous call.
   //
   if (Instance->Config->IaInfoEvent == NULL) {
     ASSERT (Udp6 != NULL);
@@ -694,7 +694,7 @@ EfiDhcp6InfoRequest (
   }
 
   //
-  // Poll udp out of the net tpl if synchoronus call.
+  // Poll udp out of the net tpl if synchronous call.
   //
   if (TimeoutEvent == NULL) {
 
@@ -823,7 +823,7 @@ EfiDhcp6RenewRebind (
   gBS->RestoreTPL (OldTpl);
 
   //
-  // Poll udp out of the net tpl if synchoronus call.
+  // Poll udp out of the net tpl if synchronous call.
   //
   if (Instance->Config->IaInfoEvent == NULL) {
 
@@ -958,7 +958,7 @@ EfiDhcp6Decline (
   gBS->RestoreTPL (OldTpl);
 
   //
-  // Poll udp out of the net tpl if synchoronus call.
+  // Poll udp out of the net tpl if synchronous call.
   //
   if (Instance->Config->IaInfoEvent == NULL) {
 
@@ -1099,7 +1099,7 @@ EfiDhcp6Release (
   gBS->RestoreTPL (OldTpl);
 
   //
-  // Poll udp out of the net tpl if synchoronus call.
+  // Poll udp out of the net tpl if synchronous call.
   //
   if (Instance->Config->IaInfoEvent == NULL) {
     while (Instance->UdpSts == EFI_ALREADY_STARTED) {
