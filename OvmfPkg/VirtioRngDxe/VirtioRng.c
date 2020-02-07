@@ -156,7 +156,7 @@ VirtioRngGetRNG (
 
   Dev = VIRTIO_ENTROPY_SOURCE_FROM_RNG (This);
   //
-  // Map Buffer's system phyiscal address to device address
+  // Map Buffer's system physical address to device address
   //
   Status = VirtioMapAllBytesInSharedBuffer (
              Dev->VirtIo,

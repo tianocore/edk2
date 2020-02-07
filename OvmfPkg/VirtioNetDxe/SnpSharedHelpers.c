@@ -118,7 +118,7 @@ VirtioNetUninitRing (
                                   a lack of resources.
   @return                         Status codes from
                                   VirtioMapAllBytesInSharedBuffer()
-  @retval EFI_SUCCESS             Caller-supplied buffer is succesfully mapped.
+  @retval EFI_SUCCESS             Caller-supplied buffer is successfully mapped.
 */
 EFI_STATUS
 EFIAPI
