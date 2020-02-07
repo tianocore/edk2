@@ -1,5 +1,5 @@
 /*++ @file
-  Stub SEC that is called from the OS appliation that is the root of the emulator.
+  Stub SEC that is called from the OS application that is the root of the emulator.
 
   The OS application will call the SEC with the PEI Entry Point API.
 
@@ -90,7 +90,7 @@ _ModuleEntryPoint (
     SecReseveredMemorySize += sizeof (EFI_PEI_PPI_DESCRIPTOR);
 
     if ((Ppi->Flags & EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST) == EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST) {
-      // Since we are appending, need to clear out privious list terminator.
+      // Since we are appending, need to clear out previous list terminator.
       Ppi->Flags &= ~EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST;
       break;
     }
@@ -136,6 +136,5 @@ _ModuleEntryPoint (
   ASSERT (FALSE);
   return;
 }
-
 
 

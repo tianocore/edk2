@@ -1,5 +1,5 @@
 /*++ @file
-  Stub SEC that is called from the OS appliation that is the root of the emulator.
+  Stub SEC that is called from the OS application that is the root of the emulator.
 
   The OS application will call the SEC with the PEI Entry Point API.
 
@@ -23,7 +23,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 
 //
-// I think this shold be defined in a MdePkg include file?
+// I think this should be defined in a MdePkg include file?
 //
 VOID
 EFIAPI
