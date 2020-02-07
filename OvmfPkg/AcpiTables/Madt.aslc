@@ -147,7 +147,7 @@ ReferenceAcpiTable (
 {
   //
   // Reference the table being generated to prevent the optimizer from removing the
-  // data structure from the exeutable
+  // data structure from the executable
   //
   return (VOID*)&Madt;
 }

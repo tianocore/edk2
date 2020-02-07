@@ -131,7 +131,7 @@ EFI_STATUS
 
   This services sets the power state of the ISA controller specified by Device to
   the power state specified by OnOff.  TRUE denotes on, FALSE denotes off.
-  If the power state is sucessfully set on the ISA Controller, then
+  If the power state is successfully set on the ISA Controller, then
   EFI_SUCCESS is returned.
 
   @param[in] This     The pointer to the EFI_ISA_ACPI_PROTOCOL instance.
