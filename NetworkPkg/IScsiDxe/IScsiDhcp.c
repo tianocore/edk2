@@ -193,7 +193,7 @@ ON_EXIT:
 }
 
 /**
-  The callback function registerd to the DHCP4 instance that is used to select
+  The callback function registered to the DHCP4 instance that is used to select
   the qualified DHCP OFFER.
 
   @param[in]  This         The DHCP4 protocol.
@@ -460,7 +460,7 @@ IScsiDoDhcp (
   // the active state, If the DHCP4 D.O.R.A started by IP4 auto
   // configuration and has not been completed, the Dhcp4 state machine
   // will not be in the right state for the iSCSI to start a new round D.O.R.A.
-  // So, we need to switch it's policy to static.
+  // So, we need to switch its policy to static.
   //
   Status = gBS->HandleProtocol (Controller, &gEfiIp4Config2ProtocolGuid, (VOID **) &Ip4Config2);
   if (!EFI_ERROR (Status)) {

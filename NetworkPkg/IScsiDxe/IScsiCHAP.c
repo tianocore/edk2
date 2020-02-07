@@ -9,7 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "IScsiImpl.h"
 
 /**
-  Initator calculates its own expected hash value.
+  Initiator calculates its own expected hash value.
 
   @param[in]   ChapIdentifier     iSCSI CHAP identifier sent by authenticator.
   @param[in]   ChapSecret         iSCSI CHAP secret of the authenticator.
@@ -88,7 +88,7 @@ Exit:
 }
 
 /**
-  The initator checks the CHAP response replied by target against its own
+  The initiator checks the CHAP response replied by target against its own
   calculation of the expected hash value.
 
   @param[in]   AuthData             iSCSI CHAP authentication data.

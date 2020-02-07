@@ -249,7 +249,7 @@ IScsiComponentNameGetControllerName (
   }
 
   //
-  // Get the handle of the controller we are controling.
+  // Get the handle of the controller we are controlling.
   //
   IScsiController = NetLibGetNicHandle (ControllerHandle, &gEfiTcp4ProtocolGuid);
   if (IScsiController != NULL) {
