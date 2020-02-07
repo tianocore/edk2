@@ -1,5 +1,5 @@
 ## @file
-#  This module produces EFI MNP Protocol, EFI MNP Servie Binding Protocol and EFI VLAN Protocol.
+#  This module produces EFI MNP Protocol, EFI MNP Service Binding Protocol and EFI VLAN Protocol.
 #
 #  This module produces EFI Managed Network Protocol upon EFI Simple Network Protocol,
 #  to provide raw asynchronous network I/O services. It also produces EFI VLAN Protocol

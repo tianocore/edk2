@@ -1,5 +1,5 @@
 /** @file
-  Declaration of strctures and functions for MnpDxe driver.
+  Declaration of structures and functions for MnpDxe driver.
 
 Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -223,7 +223,7 @@ MnpDriverBindingStop (
                                      it is not NULL, then the I/O services are added
                                      to the existing child handle.
 
-  @retval EFI_SUCCES                 The protocol was added to ChildHandle.
+  @retval EFI_SUCCESS                The protocol was added to ChildHandle.
   @retval EFI_INVALID_PARAMETER      ChildHandle is NULL.
   @retval EFI_OUT_OF_RESOURCES       There are not enough resources available to
                                      create the child.
@@ -248,7 +248,7 @@ MnpServiceBindingCreateChild (
                                  instance.
   @param[in]  ChildHandle        Handle of the child to destroy.
 
-  @retval EFI_SUCCES             The protocol was removed from ChildHandle.
+  @retval EFI_SUCCESS            The protocol was removed from ChildHandle.
   @retval EFI_UNSUPPORTED        ChildHandle does not support the protocol that
                                  is being removed.
   @retval EFI_INVALID_PARAMETER  ChildHandle is NULL.

@@ -376,8 +376,8 @@ MnpGroups (
   if ((!Instance->ConfigData.EnableMulticastReceive) ||
     ((MacAddress != NULL) && !NET_MAC_IS_MULTICAST (MacAddress, &SnpMode->BroadcastAddress, SnpMode->HwAddressSize))) {
     //
-    // The instance isn't configured to do mulitcast receive. OR
-    // the passed in MacAddress is not a mutlticast mac address.
+    // The instance isn't configured to do multicast receive. OR
+    // the passed in MacAddress is not a multicast mac address.
     //
     Status = EFI_INVALID_PARAMETER;
     goto ON_EXIT;
@@ -713,7 +713,7 @@ MnpCancel (
   }
 
   //
-  // Dispatch the DPC queued by the NotifyFunction of the cancled token's events.
+  // Dispatch the DPC queued by the NotifyFunction of the canceled token's events.
   //
   DispatchDpc ();
 
