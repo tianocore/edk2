@@ -257,7 +257,7 @@ ON_EXIT:
 
   @retval EFI_ABORTED     User cancel operation.
   @retval EFI_SUCCESS     Select the boot menu success.
-  @retval EFI_NOT_READY   Read the input key from the keybroad has not finish.
+  @retval EFI_NOT_READY   Read the input key from the keyboard has not finish.
 
 **/
 EFI_STATUS
@@ -970,7 +970,7 @@ PxeBcDiscoverBootFile (
   @param[in, out] Private           Pointer to PxeBc private data.
   @param[out]     NewMakeCallback   If TRUE, it is a new callback.
                                     Otherwise, it is not new callback.
-  @retval EFI_SUCCESS          PxeBaseCodeCallbackProtocol installed succesfully.
+  @retval EFI_SUCCESS          PxeBaseCodeCallbackProtocol installed successfully.
   @retval Others               Failed to install PxeBaseCodeCallbackProtocol.
 
 **/

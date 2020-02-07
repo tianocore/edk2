@@ -123,7 +123,7 @@ typedef struct {
 
   @retval EFI_ABORTED     User canceled the operation.
   @retval EFI_SUCCESS     Selected the boot menu successfully.
-  @retval EFI_NOT_READY   Read the input key from the keybroad has not finish.
+  @retval EFI_NOT_READY   Read the input key from the keyboard has not finish.
 
 **/
 EFI_STATUS
@@ -174,7 +174,7 @@ PxeBcParseDhcp6Packet (
   @param[in]  Private             The pointer to the PxeBc private data.
   @param[in]  Address             The pointer to the ready address.
 
-  @retval     EFI_SUCCESS         Registered the address succesfully.
+  @retval     EFI_SUCCESS         Registered the address successfully.
   @retval     Others              Failed to register the address.
 
 **/
@@ -226,8 +226,8 @@ PxeBcDhcp6Discover (
 
   @param[in]  Private             The pointer to PXEBC_PRIVATE_DATA.
 
-  @retval     EFI_SUCCESS         Switch the IP policy succesfully.
-  @retval     Others              Unexpect error happened.
+  @retval     EFI_SUCCESS         Switch the IP policy successfully.
+  @retval     Others              Unexpected error happened.
 
 **/
 EFI_STATUS

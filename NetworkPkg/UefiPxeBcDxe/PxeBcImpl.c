@@ -204,7 +204,7 @@ EfiPxeBcStart (
     //the active state, If the DHCP4 D.O.R.A started by IP4 auto
     //configuration and has not been completed, the Dhcp4 state machine
     //will not be in the right state for the PXE to start a new round D.O.R.A.
-    //so we need to switch it's policy to static.
+    //so we need to switch its policy to static.
     //
     Status = PxeBcSetIp4Policy (Private);
     if (EFI_ERROR (Status)) {
@@ -631,7 +631,7 @@ EfiPxeBcDiscover (
       }
       if (Index != Info->IpCnt) {
         //
-        // It's invalid if the first server doesn't accecpt any response
+        // It's invalid if the first server doesn't accept any response
         // but any of the other servers does accept any response.
         //
         Status = EFI_INVALID_PARAMETER;
@@ -1410,7 +1410,7 @@ EfiPxeBcUdpRead (
 
   if (IsMatched) {
     //
-    // Copy the rececived packet to user if matched by filter.
+    // Copy the received packet to user if matched by filter.
     //
     if (Mode->UsingIpv6) {
       Udp6Rx = Udp6Token.Packet.RxData;
@@ -1685,7 +1685,7 @@ EfiPxeBcSetIpFilter (
         for (Index = 0; Index < NewFilter->IpCnt; ++Index) {
           if (IP4_IS_MULTICAST (EFI_NTOHL (NewFilter->IpList[Index].v4))) {
             //
-            // Join the mutilcast group.
+            // Join the multicast group.
             //
             Status = Private->Udp4Read->Groups (Private->Udp4Read, TRUE, &NewFilter->IpList[Index].v4);
             if (EFI_ERROR (Status)) {
@@ -1723,7 +1723,7 @@ EfiPxeBcSetIpFilter (
         for (Index = 0; Index < NewFilter->IpCnt; ++Index) {
           if (IP6_IS_MULTICAST (&NewFilter->IpList[Index].v6)) {
             //
-            // Join the mutilcast group.
+            // Join the multicast group.
             //
             Status = Private->Udp6Read->Groups (Private->Udp6Read, TRUE, &NewFilter->IpList[Index].v6);
             if (EFI_ERROR (Status)) {

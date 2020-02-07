@@ -25,7 +25,7 @@ EFI_IPv6_ADDRESS   mAllDhcpRelayAndServersAddress = {{0xFF, 2, 0, 0, 0, 0, 0, 0,
   @param[in]  OptTag        The required option tag.
 
   @retval     NULL          Failed to parse the required option.
-  @retval     Others        The postion of the required option in buffer.
+  @retval     Others        The position of the required option in buffer.
 
 **/
 EFI_DHCP6_PACKET_OPTION *
@@ -370,7 +370,7 @@ Exit:
 
   @retval EFI_ABORTED     User cancel operation.
   @retval EFI_SUCCESS     Selected the boot menu successfully.
-  @retval EFI_NOT_READY   Read the input key from the keybroad has not finish.
+  @retval EFI_NOT_READY   Read the input key from the keyboard has not finish.
 
 **/
 EFI_STATUS
@@ -674,7 +674,7 @@ PxeBcParseDhcp6Packet (
 
   //
   // The offer with assigned client address is NOT a proxy offer.
-  // An ia_na option, embeded with valid ia_addr option and a status_code of success.
+  // An ia_na option, embedded with valid ia_addr option and a status_code of success.
   //
   Option = Options[PXEBC_DHCP6_IDX_IA_NA];
   if (Option != NULL) {
@@ -1431,7 +1431,7 @@ PxeBcHandleDhcp6Offer (
       }
     } else {
       //
-      //  Othewise, the bootfilename must be included in DhcpOnly offer.
+      //  Otherwise, the bootfilename must be included in DhcpOnly offer.
       //
       ASSERT (Cache6->OptList[PXEBC_DHCP6_IDX_BOOT_FILE_URL] != NULL);
     }
@@ -1480,7 +1480,7 @@ PxeBcUnregisterIp6Address (
 
   @retval     EFI_SUCCESS         Found a valid gateway address successfully.
   @retval     EFI_TIMEOUT         The operation is time out.
-  @retval     Other               Unexpect error happened.
+  @retval     Other               Unexpected error happened.
 
 **/
 EFI_STATUS
@@ -1594,7 +1594,7 @@ ON_EXIT:
   @param[in]  Private             The pointer to PXEBC_PRIVATE_DATA.
   @param[in]  Address             The pointer to the ready address.
 
-  @retval     EFI_SUCCESS         Registered the address succesfully.
+  @retval     EFI_SUCCESS         Registered the address successfully.
   @retval     Others              Failed to register the address.
 
 **/
@@ -1774,8 +1774,8 @@ ON_EXIT:
 
   @param[in]  Private             The pointer to PXEBC_PRIVATE_DATA.
 
-  @retval     EFI_SUCCESS         Switch the IP policy succesfully.
-  @retval     Others              Unexpect error happened.
+  @retval     EFI_SUCCESS         Switch the IP policy successfully.
+  @retval     Others              Unexpected error happened.
 
 **/
 EFI_STATUS
@@ -1915,7 +1915,7 @@ PxeBcDhcp6CallBack (
   Callback  = Private->PxeBcCallback;
 
   //
-  // Callback to user when any traffic ocurred if has.
+  // Callback to user when any traffic occurred if has.
   //
   if (Dhcp6Event != Dhcp6SelectAdvertise && Callback != NULL) {
     Received = (BOOLEAN) (Dhcp6Event == Dhcp6RcvdAdvertise || Dhcp6Event == Dhcp6RcvdReply);
