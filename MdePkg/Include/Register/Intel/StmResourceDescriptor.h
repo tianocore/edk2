@@ -179,7 +179,7 @@ typedef struct {
 } STM_RSC_ALL_RESOURCES_DESC;
 
 /**
-  STM Register Volation Descriptor
+  STM Register Violation Descriptor
 **/
 typedef struct {
   STM_RSC_DESC_HEADER  Hdr;

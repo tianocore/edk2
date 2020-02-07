@@ -1,5 +1,5 @@
 /** @file
-  MSR Defintions for Intel Atom processors based on the Goldmont Plus microarchitecture.
+  MSR Definitions for Intel Atom processors based on the Goldmont Plus microarchitecture.
 
   Provides defines for Machine Specific Registers(MSR) indexes. Data structures
   are provided for MSRs that contain one or more bit fields.  If the MSR value
