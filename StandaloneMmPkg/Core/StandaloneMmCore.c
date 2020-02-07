@@ -354,7 +354,7 @@ MmEntryPoint (
   //PlatformHookBeforeMmDispatch ();
 
   //
-  // If a legacy boot has occured, then make sure gMmCorePrivate is not accessed
+  // If a legacy boot has occurred, then make sure gMmCorePrivate is not accessed
   //
 
   //

@@ -50,7 +50,7 @@ MmCoreFfsFindMmDriver (
 
 Routine Description:
   Given the pointer to the Firmware Volume Header find the
-  MM driver and return it's PE32 image.
+  MM driver and return its PE32 image.
 
 Arguments:
   FwVolHeader - Pointer to memory mapped FV
