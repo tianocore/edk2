@@ -24,7 +24,7 @@ Abstract:
 #include <Protocol/Dpc.h>
 
 //
-// Internal data struture for managing DPCs.  A DPC entry is either on the free
+// Internal data structure for managing DPCs.  A DPC entry is either on the free
 // list or on a DPC queue at a specific EFI_TPL.
 //
 typedef struct {
