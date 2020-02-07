@@ -197,7 +197,7 @@ UsbBootExecCmd (
 
   //
   // If ExecCommand() returns no error and CmdResult is success,
-  // then the commnad transfer is successful.
+  // then the command transfer is successful.
   //
   if ((CmdResult == USB_MASS_CMD_SUCCESS) && !EFI_ERROR (Status)) {
     return EFI_SUCCESS;
@@ -610,7 +610,7 @@ UsbScsiModeSense (
   This function get the parameters for the USB mass storage media,
   It is used both to initialize the media during the Start() phase
   of Driver Binding Protocol and to re-initialize it when the media is
-  changed. Althought the RemoveableMedia is unlikely to change,
+  changed. Although the RemoveableMedia is unlikely to change,
   it is also included here.
 
   @param  UsbMass                The device to retrieve disk gemotric.

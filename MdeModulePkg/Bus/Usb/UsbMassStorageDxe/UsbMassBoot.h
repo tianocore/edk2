@@ -77,7 +77,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // Mass command timeout, refers to specification[USB20-9.2.6.1]
 //
 // USB2.0 Spec define the up-limit timeout 5s for all command. USB floppy,
-// USB CD-Rom and iPod devices are much slower than USB key when reponse
+// USB CD-Rom and iPod devices are much slower than USB key when response
 // most of commands, So we set 5s as timeout here.
 //
 #define USB_BOOT_GENERAL_CMD_TIMEOUT    (5 * USB_MASS_1_SECOND)
@@ -213,7 +213,7 @@ typedef struct {
   This function get the parameters for the USB mass storage media,
   It is used both to initialize the media during the Start() phase
   of Driver Binding Protocol and to re-initialize it when the media is
-  changed. Althought the RemoveableMedia is unlikely to change,
+  changed. Although the RemoveableMedia is unlikely to change,
   it is also included here.
 
   @param  UsbMass                The device to retrieve disk gemotric.
