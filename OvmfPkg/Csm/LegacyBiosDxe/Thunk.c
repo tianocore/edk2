@@ -127,8 +127,8 @@ LegacyBiosFarCall86 (
   Provide NULL interrupt handler which is used to check
   if there is more than one HW interrupt registers with the CPU AP.
 
-  @param  InterruptType - The type of interrupt that occured
-  @param  SystemContext - A pointer to the system context when the interrupt occured
+  @param  InterruptType - The type of interrupt that occurred
+  @param  SystemContext - A pointer to the system context when the interrupt occurred
 
 **/
 VOID

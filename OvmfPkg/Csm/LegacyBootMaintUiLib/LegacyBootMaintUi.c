@@ -1,5 +1,5 @@
 /** @file
-  Legacy Boot Maintainence UI implementation.
+  Legacy Boot Maintenance UI implementation.
 
 Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2018 Hewlett Packard Enterprise Development LP<BR>
@@ -237,10 +237,10 @@ OrderLegacyBootOption4SameType (
 
 /**
   Update the legacy BBS boot option. L"LegacyDevOrder" and gEfiLegacyDevOrderVariableGuid EFI Variable
-  is udpated with the new Legacy Boot order. The EFI Variable of "Boot####" and gEfiGlobalVariableGuid
+  is updated with the new Legacy Boot order. The EFI Variable of "Boot####" and gEfiGlobalVariableGuid
   is also updated.
 
-  @param NVMapData   The data for egacy BBS boot.
+  @param NVMapData   The data for legacy BBS boot.
 
   @return EFI_SUCCESS           The function completed successfully.
   @retval EFI_NOT_FOUND         If L"LegacyDevOrder" and gEfiLegacyDevOrderVariableGuid EFI Variable can not be found.
@@ -725,7 +725,7 @@ CreateLegacyMenuStringToken (
   Create a dynamic page so that Legacy Device boot order
   can be set for specified device type.
 
-  @param UpdatePageId    The form ID. It also spefies the legacy device type.
+  @param UpdatePageId    The form ID. It also specifies the legacy device type.
 
 
 **/
@@ -1127,8 +1127,8 @@ LegacyBootOptionCallback (
     if (QuestionId == FORM_FLOPPY_BOOT_ID) {
       if (!mFirstEnterLegacyForm) {
         //
-        // The leagcyBootMaintUiLib depends on the LegacyBootManagerLib to realize its functionality.
-        // We need to do the leagcy boot options related actions after the LegacyBootManagerLib has been initialized.
+        // The legacyBootMaintUiLib depends on the LegacyBootManagerLib to realize its functionality.
+        // We need to do the legacy boot options related actions after the LegacyBootManagerLib has been initialized.
         // Opening the legacy menus is the appropriate time that the LegacyBootManagerLib has already been initialized.
         //
         mFirstEnterLegacyForm = TRUE;
@@ -1403,7 +1403,7 @@ GetLegacyOptions (
   @param ImageHandle     The image handle.
   @param SystemTable     The system table.
 
-  @retval  EFI_SUCEESS  Install Boot manager menu success.
+  @retval  EFI_SUCCESS  Install Boot manager menu success.
   @retval  Other        Return error status.
 
 **/

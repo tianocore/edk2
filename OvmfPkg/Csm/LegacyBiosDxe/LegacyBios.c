@@ -107,7 +107,7 @@ AllocateLegacyMemory (
   64 KB blocks.
 
   Note: inconsistency with the Framework CSM spec. Per the spec, this function may be
-  invoked only once. This limitation is relaxed to allow multiple calls in this implemenation.
+  invoked only once. This limitation is relaxed to allow multiple calls in this implementation.
 
   @param  This                       Protocol instance pointer.
   @param  LegacyMemorySize           Size of required region
@@ -319,7 +319,7 @@ ShadowAndStartLegacy16 (
   Private->LegacyBiosImageSize  = (UINT32) LegacyBiosImageSize;
 
   //
-  // Can only shadow into memory allocated for legacy useage.
+  // Can only shadow into memory allocated for legacy usage.
   //
   ASSERT (Private->BiosStart > Private->OptionRom);
 
@@ -983,7 +983,7 @@ LegacyBiosInstall (
          );
 
   //
-  // Allocate 0 - 4K for real mode interupt vectors and BDA.
+  // Allocate 0 - 4K for real mode interrupt vectors and BDA.
   //
   AllocateLegacyMemory (
     AllocateAddress,

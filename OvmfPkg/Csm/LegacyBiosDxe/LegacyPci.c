@@ -678,7 +678,7 @@ TranslateBusPirq (
 
 
 Search busses starting from slot bus for final bus >= Secondary bus and
-final bus <= Suborninate bus. Assumption is bus entries increase in bus
+final bus <= Subordinate bus. Assumption is bus entries increase in bus
 number.
 Starting PIRQ is A,B,C,D.
 Bus 2, Device 7 satisfies search criteria. Rotate (A,B,C,D) left by device
@@ -914,7 +914,7 @@ InstallLegacyIrqHandler (
   Legacy8259      = Private->Legacy8259;
   //
   // Disable interrupt in PIC, in case shared, to prevent an
-  // interrupt from occuring.
+  // interrupt from occurring.
   //
   Legacy8259->GetMask (
                 Legacy8259,
@@ -1049,7 +1049,7 @@ InstallLegacyIrqHandler (
 
 /**
   Program the interrupt routing register in all the PCI devices. On a PC AT system
-  this register contains the 8259 IRQ vector that matches it's PCI interrupt.
+  this register contains the 8259 IRQ vector that matches its PCI interrupt.
 
   @param  Private                Legacy  BIOS Instance data
 
@@ -2582,7 +2582,7 @@ LegacyBiosInstallRom (
   // do not follow the standard of setting AX = 0 on success.
   //
   //
-  // The ROM could have updated it's size so we need to read again.
+  // The ROM could have updated its size so we need to read again.
   //
   if (((EFI_LEGACY_EXPANSION_ROM_HEADER *) RuntimeAddress)->Signature != PCI_EXPANSION_ROM_HEADER_SIGNATURE) {
     //

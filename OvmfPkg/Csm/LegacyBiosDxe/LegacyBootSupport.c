@@ -962,7 +962,7 @@ GenericLegacyBoot (
   }
 
   //
-  // We do not ASSERT if SmbiosTable not found. It is possbile that a platform does not produce SmbiosTable.
+  // We do not ASSERT if SmbiosTable not found. It is possible that a platform does not produce SmbiosTable.
   //
   if (mReserveSmbiosEntryPoint == 0) {
     DEBUG ((EFI_D_INFO, "Smbios table is not found!\n"));
@@ -982,7 +982,7 @@ GenericLegacyBoot (
                );
   }
   //
-  // We do not ASSERT if AcpiTable not found. It is possbile that a platform does not produce AcpiTable.
+  // We do not ASSERT if AcpiTable not found. It is possible that a platform does not produce AcpiTable.
   //
   if (AcpiTable == NULL) {
     DEBUG ((EFI_D_INFO, "ACPI table is not found!\n"));

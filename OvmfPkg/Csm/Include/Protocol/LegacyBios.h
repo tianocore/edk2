@@ -1,7 +1,7 @@
 /** @file
   The EFI Legacy BIOS Protocol is used to abstract legacy Option ROM usage
   under EFI and Legacy OS boot.  This file also includes all the related
-  COMPATIBILIY16 structures and defintions.
+  COMPATIBILIY16 structures and definitions.
 
   Note: The names for EFI_IA32_REGISTER_SET elements were picked to follow
   well known naming conventions.
@@ -213,7 +213,7 @@ typedef struct {
   /// value of the start of the PCI Express memory-mapped configuration registers and
   /// must be filled in prior to EfiCompatibility code issuing the Compatibility16 function
   /// Compatibility16InitializeYourself().
-  /// Compatibility16InitializeYourself() is defined in Compatability16
+  /// Compatibility16InitializeYourself() is defined in Compatibility16
   /// Functions.
   ///
   UINT32                            PciExpressBase;
@@ -251,7 +251,7 @@ typedef struct {
 
 ///
 /// Functions provided by the CSM binary which communicate between the EfiCompatibility
-/// and Compatability16 code.
+/// and Compatibility16 code.
 ///
 /// Inconsistent with the specification here:
 /// The member's name started with "Compatibility16" [defined in Intel Framework

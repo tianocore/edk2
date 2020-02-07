@@ -30,7 +30,7 @@ typedef struct _EFI_VGA_MINI_PORT_PROTOCOL  EFI_VGA_MINI_PORT_PROTOCOL;
   ModeNumber of 1 is a request for an 80x50 text mode.  If ModeNumber is greater
   than MaxModeNumber, then EFI_UNSUPPORTED is returned.  If the VGA controller
   is not functioning properly, then EFI_DEVICE_ERROR is returned.  If the VGA
-  controller is sucessfully set to the mode number specified by ModeNumber, then
+  controller is successfully set to the mode number specified by ModeNumber, then
   EFI_SUCCESS is returned.
 
   @param[in] This         A pointer to the EFI_VGA_MINI_PORT_PROTOCOL instance.

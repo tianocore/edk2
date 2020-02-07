@@ -145,7 +145,7 @@ typedef struct {
   @param[in] SrcOffset    The offset of the source in ISA MMIO space.
   @param[in] Count        The number tranfers to perform for this copy operation.
 
-  @retval EFI_SUCCESS             The data was copied sucessfully.
+  @retval EFI_SUCCESS             The data was copied successfully.
   @retval EFI_UNSUPPORTED         The DestOffset or SrcOffset is not valid for this device.
   @retval EFI_INVALID_PARAMETER   Width or Count, or both, were invalid.
   @retval EFI_OUT_OF_RESOURCES    The request could not be completed due to a lack of resources.

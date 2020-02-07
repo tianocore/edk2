@@ -381,7 +381,7 @@ BiosVideoDriverBindingStart (
         (FeaturePcdGet (PcdBiosVideoCheckVbeEnable) || FeaturePcdGet (PcdBiosVideoCheckVgaEnable))) {
       //
       // If RemainingDevicePath is the End of Device Path Node,
-      // don't create any child device and return EFI_SUCESS
+      // don't create any child device and return EFI_SUCCESS
       Status = EFI_SUCCESS;
       goto Done;
     }
@@ -3211,7 +3211,7 @@ BiosVideoVgaMiniPortSetMode (
 /**
   Event handler for Exit Boot Service.
 
-  @param  Event       The event that be siganlled when exiting boot service.
+  @param  Event       The event that be signalled when exiting boot service.
   @param  Context     Pointer to instance of BIOS_VIDEO_DEV.
 
 **/
