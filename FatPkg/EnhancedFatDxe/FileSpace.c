@@ -223,7 +223,7 @@ FatSetFatEntry (
 
 /**
 
-  Free the cluster clain.
+  Free the cluster chain.
 
   @param  Volume                - FAT file system volume.
   @param  Cluster               - The first cluster of cluster chain.
@@ -575,8 +575,8 @@ FatOFilePosition (
   ASSERT_VOLUME_LOCKED (Volume);
 
   //
-  // If this is the fixed root dir, then compute it's position
-  // from it's fixed info in the fat bpb
+  // If this is the fixed root dir, then compute its position
+  // from its fixed info in the fat bpb
   //
   if (OFile->IsFixedRootDir) {
     OFile->PosDisk  = Volume->RootPos + Position;

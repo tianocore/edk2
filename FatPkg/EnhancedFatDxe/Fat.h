@@ -236,7 +236,7 @@ struct _FAT_OFILE {
   UINTN               Signature;
   FAT_VOLUME          *Volume;
   //
-  // A permanant error code to return to all accesses to
+  // A permanent error code to return to all accesses to
   // this opened file
   //
   EFI_STATUS          Error;
@@ -246,7 +246,7 @@ struct _FAT_OFILE {
   LIST_ENTRY          Opens;
 
   //
-  // The dynamic infomation
+  // The dynamic information
   //
   UINTN               FileSize;
   UINTN               FileCluster;
@@ -1863,7 +1863,7 @@ FatCreate8Dot3Name (
   @param  FatName               - The Char8 string needs to be converted.
   @param  Len                   - The length of the fat name.
   @param  LowerCase             - Indicate whether to convert the string to lower case.
-  @param  Str                   - The result of the convertion.
+  @param  Str                   - The result of the conversion.
 
 **/
 VOID

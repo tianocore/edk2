@@ -417,7 +417,7 @@ FatDriverBindingStart (
   Status = FatAllocateVolume (ControllerHandle, DiskIo, DiskIo2, BlockIo);
 
   //
-  // When the media changes on a device it will Reinstall the BlockIo interaface.
+  // When the media changes on a device it will Reinstall the BlockIo interface.
   // This will cause a call to our Stop(), and a subsequent reentrant call to our
   // Start() successfully. We should leave the device open when this happen.
   //
