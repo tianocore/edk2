@@ -78,7 +78,7 @@ VOID *
 
   Caller should make sure BaseAddress and Length is at page boundary.
 
-  Caller need guarentee the TPL <= TPL_NOTIFY, if there is split page request.
+  Caller need guarantee the TPL <= TPL_NOTIFY, if there is split page request.
 
   @param  PagingContext     The paging context. NULL means get page table from current CPU context.
   @param  BaseAddress       The physical address that is the start address of a memory region.

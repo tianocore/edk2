@@ -1,5 +1,5 @@
 /** @file
-  C based implemention of IA32 interrupt handling only
+  C based implementation of IA32 interrupt handling only
   requiring a minimal assembly interrupt entry point.
 
   Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
