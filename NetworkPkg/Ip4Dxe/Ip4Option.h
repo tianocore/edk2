@@ -20,7 +20,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 /**
   Validate the IP4 option format for both the packets we received
   and will transmit. It will compute the ICMP error message fields
-  if the option is mal-formated. But this information isn't used.
+  if the option is malformatted. But this information isn't used.
 
   @param[in]  Option            The first byte of the option
   @param[in]  OptionLen         The length of the whole option
@@ -28,7 +28,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
                                 otherwise the option we wants to transmit.
 
   @retval TRUE     The option is properly formatted
-  @retval FALSE    The option is mal-formated
+  @retval FALSE    The option is malformatted
 
 **/
 BOOLEAN

@@ -83,7 +83,7 @@ extern EFI_IP4_ICMP_TYPE  mIp4SupportedIcmp[];
   @param[in]  Packet             The content of the ICMP query with IP4 head
                                  removed.
 
-  @retval EFI_INVALID_PARAMETER  The packet is malformated.
+  @retval EFI_INVALID_PARAMETER  The packet is malformatted.
   @retval EFI_SUCCESS            The ICMP message is successfully processed.
   @retval Others                 Failed to handle ICMP packet.
 

@@ -155,7 +155,7 @@ NetStringToIp (
                                  options on output
   @param  Options                The option array to fill in
 
-  @retval EFI_INVALID_PARAMETER  The packet is mal-formated
+  @retval EFI_INVALID_PARAMETER  The packet is malformatted
   @retval EFI_BUFFER_TOO_SMALL   The Options array is too small
   @retval EFI_SUCCESS            The packet has been parsed into the Options array.
 
@@ -398,7 +398,7 @@ Mtftp4ExtractMcast (
   @param  Operation              The current performed operation.
   @param  MtftpOption            The MTFTP4_OPTION for easy access.
 
-  @retval EFI_INVALID_PARAMETER  The option is mal-formated
+  @retval EFI_INVALID_PARAMETER  The option is malformatted
   @retval EFI_UNSUPPORTED        Some option isn't supported
   @retval EFI_SUCCESS            The option are OK and has been parsed.
 
@@ -516,7 +516,7 @@ Mtftp4ParseOption (
   @param  Operation              The current performed operation.
   @param  MtftpOption            The MTFTP_OPTION for easy access.
 
-  @retval EFI_INVALID_PARAMETER  The packet option is mal-formated
+  @retval EFI_INVALID_PARAMETER  The packet option is malformatted
   @retval EFI_UNSUPPORTED        Some option isn't supported
   @retval EFI_SUCCESS            The option are OK and has been parsed.
 
