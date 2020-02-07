@@ -11,7 +11,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Specification Reference:
-  AMD64 Architecture Programming Manaul volume 2, March 2017, Sections 15.34
+  AMD64 Architecture Programming Manual volume 2, March 2017, Sections 15.34
 
 **/
 
@@ -364,7 +364,7 @@ typedef union {
     ///
     UINT32  Page1GB:1;
     ///
-    /// [Bit 27] RDTSCP intructions.
+    /// [Bit 27] RDTSCP instructions.
     ///
     UINT32  RDTSCP:1;
     ///
@@ -513,9 +513,9 @@ typedef union {
 
   @retval  EAX  Extended APIC ID described by the type
                 CPUID_AMD_PROCESSOR_TOPOLOGY_EAX.
-  @retval  EBX  Core Indentifiers described by the type
+  @retval  EBX  Core Identifiers described by the type
                 CPUID_AMD_PROCESSOR_TOPOLOGY_EBX.
-  @retval  ECX  Node Indentifiers described by the type
+  @retval  ECX  Node Identifiers described by the type
                 CPUID_AMD_PROCESSOR_TOPOLOGY_ECX.
   @retval  EDX  Reserved.
 **/

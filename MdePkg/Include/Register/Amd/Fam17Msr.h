@@ -10,7 +10,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Specification Reference:
-  AMD64 Architecture Programming Manaul volume 2, March 2017, Sections 15.34
+  AMD64 Architecture Programming Manual volume 2, March 2017, Sections 15.34
 
 **/
 
