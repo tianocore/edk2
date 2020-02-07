@@ -1,5 +1,5 @@
 /** @file
-  Ip4 internal functions and type defintions.
+  Ip4 internal functions and type definitions.
 
 Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
@@ -134,7 +134,7 @@ struct _IP4_PROTOCOL {
   LIST_ENTRY                Link;       // Link to all the IP protocol from the service
 
   //
-  // User's transmit/receive tokens, and received/deliverd packets
+  // User's transmit/receive tokens, and received/delivered packets
   //
   NET_MAP                   RxTokens;
   NET_MAP                   TxTokens;   // map between (User's Token, IP4_TXTOKE_WRAP)
@@ -260,7 +260,7 @@ Ip4ServiceConfigMnp (
   );
 
 /**
-  Intiialize the IP4_PROTOCOL structure to the unconfigured states.
+  Initialize the IP4_PROTOCOL structure to the unconfigured states.
 
   @param  IpSb                   The IP4 service instance.
   @param  IpInstance             The IP4 child instance.
@@ -315,7 +315,7 @@ Ip4Cancel (
 
   @retval EFI_ALREADY_STARTED    Want to join the group, but already a member of it
   @retval EFI_OUT_OF_RESOURCES   Failed to allocate some resources.
-  @retval EFI_DEVICE_ERROR       Failed to set the group configuraton
+  @retval EFI_DEVICE_ERROR       Failed to set the group configuration
   @retval EFI_SUCCESS            Successfully updated the group setting.
   @retval EFI_NOT_FOUND          Try to leave the group which it isn't a member.
 

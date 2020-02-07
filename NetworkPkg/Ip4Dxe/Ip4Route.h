@@ -1,5 +1,5 @@
 /** @file
-  EFI IP4 route table and route cache table defintions.
+  EFI IP4 route table and route cache table definitions.
 
 Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -56,8 +56,8 @@ typedef struct {
 ///
 /// The route cache table is organized as a hash table. Each
 /// IP4 route table has a embedded route cache. For now the
-/// route cache and route table are binded togehter. But keep
-/// the route cache a seperated structure in case we want to
+/// route cache and route table are binded together. But keep
+/// the route cache a separated structure in case we want to
 /// detach them later.
 ///
 typedef struct {
@@ -138,7 +138,7 @@ Ip4AddRoute (
 
   @retval EFI_SUCCESS           The route entry is successfully removed
   @retval EFI_NOT_FOUND         There is no route entry in the table with that
-                                properity.
+                                property.
 
 **/
 EFI_STATUS
@@ -151,7 +151,7 @@ Ip4DelRoute (
 
 /**
   Find a route cache with the dst and src. This is used by ICMP
-  redirect messasge process. All kinds of redirect is treated as
+  redirect message process. All kinds of redirect is treated as
   host redirect according to RFC1122. So, only route cache entries
   are modified according to the ICMP redirect message.
 
@@ -215,7 +215,7 @@ Ip4Route (
   @param[in]  IpInstance        The IP4 child that requests the route table.
 
   @retval EFI_SUCCESS           The route table is successfully build
-  @retval EFI_OUT_OF_RESOURCES  Failed to allocate the memory for the rotue table.
+  @retval EFI_OUT_OF_RESOURCES  Failed to allocate the memory for the route table.
 
 **/
 EFI_STATUS

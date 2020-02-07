@@ -198,7 +198,7 @@ EfiIp4Routes (
   @retval  EFI_NOT_STARTED       This instance has not been started.
   @retval  EFI_NO_MAPPING        When using the default address, configuration (DHCP, BOOTP,
                                  RARP, etc.) is not finished yet.
-  @retval  EFI_INVALID_PARAMETER One or more pameters are invalid.
+  @retval  EFI_INVALID_PARAMETER One or more parameters are invalid.
   @retval  EFI_ACCESS_DENIED     The transmit completion token with the same Token.Event
                                  was already in the transmit queue.
   @retval  EFI_NOT_READY         The completion token could not be queued because the transmit
@@ -525,7 +525,7 @@ Ip4ServiceConfigMnp (
 
 
 /**
-  Intiialize the IP4_PROTOCOL structure to the unconfigured states.
+  Initialize the IP4_PROTOCOL structure to the unconfigured states.
 
   @param  IpSb                   The IP4 service instance.
   @param  IpInstance             The IP4 child instance.
@@ -985,7 +985,7 @@ ON_EXIT:
 
   @retval EFI_ALREADY_STARTED    Want to join the group, but already a member of it.
   @retval EFI_OUT_OF_RESOURCES   Failed to allocate some resources.
-  @retval EFI_DEVICE_ERROR       Failed to set the group configuraton.
+  @retval EFI_DEVICE_ERROR       Failed to set the group configuration.
   @retval EFI_SUCCESS            Successfully updated the group setting.
   @retval EFI_NOT_FOUND          Try to leave the group which it isn't a member.
 
@@ -1043,7 +1043,7 @@ Ip4Groups (
   //
   // Leave the group. Leave all the groups if GroupAddress is NULL.
   // Must iterate from the end to the beginning because the GroupCount
-  // is decreamented each time an address is removed..
+  // is decremented each time an address is removed..
   //
   for (Index = IpInstance->GroupCount; Index > 0 ; Index--) {
     ASSERT (IpInstance->Groups != NULL);
@@ -1283,7 +1283,7 @@ ON_EXIT:
   @param[in]  Map                    The container of either user's transmit or receive
                                      token.
   @param[in]  Item                   Current item to check against.
-  @param[in]  Context                The Token to check againist.
+  @param[in]  Context                The Token to check against.
 
   @retval EFI_ACCESS_DENIED      The token or event has already been enqueued in IP.
   @retval EFI_SUCCESS            The current item isn't the same token/event as the
@@ -1557,7 +1557,7 @@ Ip4OnPacketSent (
   @retval  EFI_NOT_STARTED       This instance has not been started.
   @retval  EFI_NO_MAPPING        When using the default address, configuration (DHCP, BOOTP,
                                  RARP, etc.) is not finished yet.
-  @retval  EFI_INVALID_PARAMETER One or more pameters are invalid.
+  @retval  EFI_INVALID_PARAMETER One or more parameters are invalid.
   @retval  EFI_ACCESS_DENIED     The transmit completion token with the same Token.Event
                                  was already in the transmit queue.
   @retval  EFI_NOT_READY         The completion token could not be queued because the transmit
@@ -1619,7 +1619,7 @@ EfiIp4Transmit (
   }
 
   //
-  // make sure that token is properly formated
+  // make sure that token is properly formatted
   //
   Status = Ip4TxTokenValid (Token, IpIf, Config->RawData);
 

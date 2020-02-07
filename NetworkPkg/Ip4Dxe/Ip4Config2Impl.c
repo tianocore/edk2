@@ -174,7 +174,7 @@ Ip4Config2SignalEvent (
 /**
   Read the configuration data from variable storage according to the VarName and
   gEfiIp4Config2ProtocolGuid. It checks the integrity of variable data. If the
-  data is corrupted, it clears the variable data to ZERO. Othewise, it outputs the
+  data is corrupted, it clears the variable data to ZERO. Otherwise, it outputs the
   configuration data to IP4_CONFIG2_INSTANCE.
 
   @param[in]      VarName       The pointer to the variable name
@@ -377,7 +377,7 @@ Ip4Config2WriteConfigData (
   @param[out]  Table       The built IP4 route table.
 
   @retval EFI_SUCCESS           The route table is successfully build
-  @retval EFI_NOT_FOUND         Failed to allocate the memory for the rotue table.
+  @retval EFI_NOT_FOUND         Failed to allocate the memory for the route table.
 
 **/
 EFI_STATUS
@@ -912,7 +912,7 @@ Ip4StartAutoConfig (
 
   //
   // A host must not invoke DHCP configuration if it is already
-  // participating in the DHCP configuraiton process.
+  // participating in the DHCP configuration process.
   //
   if (Instance->Dhcp4Handle != NULL) {
     return EFI_SUCCESS;
@@ -1234,7 +1234,7 @@ Ip4Config2SetPolicy (
                                 under the current policy.
   @retval EFI_INVALID_PARAMETER One or more fields in Data is invalid.
   @retval EFI_OUT_OF_RESOURCES  Fail to allocate resource to complete the operation.
-  @retval EFI_NOT_READY         An asynchrous process is invoked to set the specified
+  @retval EFI_NOT_READY         An asynchronous process is invoked to set the specified
                                 configuration data, and the process is not finished.
   @retval EFI_ABORTED           The manual addresses to be set equal current
                                 configuration.
@@ -1721,7 +1721,7 @@ EfiIp4Config2SetData (
     }
   } else {
     //
-    // Another asynchornous process is on the way.
+    // Another asynchronous process is on the way.
     //
     Status = EFI_ACCESS_DENIED;
   }

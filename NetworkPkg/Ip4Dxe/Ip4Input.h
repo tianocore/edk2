@@ -128,7 +128,7 @@ Ip4AccpetFrame (
 
 /**
   Demultiple the packet. the packet delivery is processed in two
-  passes. The first pass will enque a shared copy of the packet
+  passes. The first pass will enqueue a shared copy of the packet
   to each IP4 child that accepts the packet. The second pass will
   deliver a non-shared copy of the packet to each IP4 child that
   has pending receive requests. Data is copied if more than one
@@ -215,7 +215,7 @@ Ip4PacketTimerTicking (
   actions: bypass the packet, discard the packet, or protect the packet.
 
   @param[in]       IpSb          The IP4 service instance.
-  @param[in, out]  Head          The The caller supplied IP4 header.
+  @param[in, out]  Head          The caller supplied IP4 header.
   @param[in, out]  Netbuf        The IP4 packet to be processed by IPsec.
   @param[in, out]  Options       The caller supplied options.
   @param[in, out]  OptionsLen    The length of the option.
@@ -227,7 +227,7 @@ Ip4PacketTimerTicking (
   @retval EFI_SUCCESS            The packet was bypassed and all buffers remain the same.
   @retval EFI_SUCCESS            The packet was protected.
   @retval EFI_ACCESS_DENIED      The packet was discarded.
-  @retval EFI_OUT_OF_RESOURCES   There is no suffcient resource to complete the operation.
+  @retval EFI_OUT_OF_RESOURCES   There is no sufficient resource to complete the operation.
   @retval EFI_BUFFER_TOO_SMALL   The number of non-empty block is bigger than the
                                  number of input data blocks when build a fragment table.
 

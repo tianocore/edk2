@@ -1,5 +1,5 @@
 /** @file
-  Definition for IP4 pesudo interface structure.
+  Definition for IP4 pseudo interface structure.
 
 Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -325,7 +325,7 @@ Ip4CancelReceive (
 
   @retval EFI_ALREADY_STARTED   There is already a pending receive request.
   @retval EFI_OUT_OF_RESOURCES  Failed to allocate resource to receive.
-  @retval EFI_SUCCESS           The recieve request has been started.
+  @retval EFI_SUCCESS           The receive request has been started.
   @retval other                 Other error occurs.
 
 **/
