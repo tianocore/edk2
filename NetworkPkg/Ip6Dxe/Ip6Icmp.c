@@ -393,7 +393,7 @@ Ip6ProcessIcmpInformation (
   @param[in]  Packet             The content of the ICMPv6 packet with IP head
                                  removed.
 
-  @retval EFI_INVALID_PARAMETER  The packet is malformated.
+  @retval EFI_INVALID_PARAMETER  The packet is malformatted.
   @retval EFI_SUCCESS            The ICMPv6 message successfully processed.
   @retval Others                 Failed to handle the ICMPv6 packet.
 
@@ -554,7 +554,7 @@ Ip6IsAnycast (
   @param[in]  Pointer            If not NULL, identifies the octet offset within
                                  the invoking packet where the error was detected.
 
-  @retval EFI_INVALID_PARAMETER  The packet is malformated.
+  @retval EFI_INVALID_PARAMETER  The packet is malformatted.
   @retval EFI_OUT_OF_RESOURCES   There is no sufficient resource to complete the
                                  operation.
   @retval EFI_SUCCESS            The ICMPv6 message was successfully sent out.
