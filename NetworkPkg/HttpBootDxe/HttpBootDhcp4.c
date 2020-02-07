@@ -94,7 +94,7 @@ HttpBootBuildDhcp4Options (
   OptEnt.Uuid->Type       = 0;
   if (EFI_ERROR (NetLibGetSystemGuid ((EFI_GUID *) OptEnt.Uuid->Guid))) {
     //
-    // Zero the Guid to indicate NOT programable if failed to get system Guid.
+    // Zero the Guid to indicate NOT programmable if failed to get system Guid.
     //
     ZeroMem (OptEnt.Uuid->Guid, sizeof (EFI_GUID));
   }
