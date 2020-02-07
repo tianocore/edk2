@@ -591,7 +591,7 @@ LoadRecoveryCapsule (
 
 /**
   Finds the recovery file on a FAT volume.
-  This function finds the the recovery file named FileName on a specified FAT volume and returns
+  This function finds the recovery file named FileName on a specified FAT volume and returns
   its FileHandle pointer.
 
   @param  PrivateData             Global memory map for accessing global
