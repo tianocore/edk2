@@ -431,7 +431,7 @@ MmLoadImage (
     //
     // Copy the PDB file name to our temporary string, and replace .pdb with .efi
     // The PDB file name is limited in the range of 0~255.
-    // If the length is bigger than 255, trim the redudant characters to avoid overflow in array boundary.
+    // If the length is bigger than 255, trim the redundant characters to avoid overflow in array boundary.
     //
     for (Index = 0; Index < sizeof (EfiFileName) - 4; Index++) {
       EfiFileName[Index] = ImageContext.PdbPointer[Index + StartIndex];
