@@ -220,7 +220,7 @@ CloseSimpleTextInOnFile(
 }
 
 /**
-  Reset the text output device hardware and optionaly run diagnostics.
+  Reset the text output device hardware and optionally run diagnostics.
 
   @param  This                pointer to EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL
   @param ExtendedVerification Indicates that a more extensive test may be performed
