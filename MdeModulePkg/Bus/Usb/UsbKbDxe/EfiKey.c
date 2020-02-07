@@ -584,7 +584,7 @@ USBKeyboardDriverBindingStop (
                                   data for the key that was pressed.
 
   @retval EFI_SUCCESS             The keystroke information was returned.
-  @retval EFI_NOT_READY           There was no keystroke data availiable.
+  @retval EFI_NOT_READY           There was no keystroke data available.
   @retval EFI_DEVICE_ERROR        The keystroke information was not returned due to
                                   hardware errors.
   @retval EFI_INVALID_PARAMETER   KeyData is NULL.
@@ -685,7 +685,7 @@ USBKeyboardReset (
                                information for the key that was pressed.
 
   @retval EFI_SUCCESS          The keystroke information was returned.
-  @retval EFI_NOT_READY        There was no keystroke data availiable.
+  @retval EFI_NOT_READY        There was no keystroke data available.
   @retval EFI_DEVICE_ERROR     The keystroke information was not returned due to
                                hardware errors.
 
@@ -764,7 +764,7 @@ USBKeyboardWaitForKey (
   OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
 
   //
-  // WaitforKey doesn't suppor the partial key.
+  // WaitforKey doesn't support the partial key.
   // Considering if the partial keystroke is enabled, there maybe a partial
   // keystroke in the queue, so here skip the partial keystroke and get the
   // next key from the queue
@@ -871,7 +871,7 @@ KbdFreeNotifyList (
   @param  InputData         A pointer to keystroke data for the key that was pressed.
 
   @retval TRUE              Key pressed matches a registered key.
-  @retval FLASE             Key pressed does not matches a registered key.
+  @retval FALSE             Key pressed does not matches a registered key.
 
 **/
 BOOLEAN

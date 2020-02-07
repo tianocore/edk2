@@ -1,5 +1,5 @@
 /** @file
-Pei USB ATATPI command implementations.
+Pei USB ATAPI command implementations.
 
 Copyright (c) 1999 - 2018, Intel Corporation. All rights reserved.<BR>
 
