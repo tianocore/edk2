@@ -133,7 +133,7 @@ PthreadCreate (
     EnabledOnEntry = FALSE;
   }
 
-  // Aquire lock for global, SecFakePthreadStart runs in a different thread.
+  // Acquire lock for global, SecFakePthreadStart runs in a different thread.
   pthread_mutex_lock (&mThreadMangle.Mutex);
   mThreadMangle.Start   = Start;
 
