@@ -34,7 +34,7 @@ Mtftp4RrqInput (
   Start the MTFTP session to download.
 
   It will first initialize some of the internal states then build and send a RRQ
-  reqeuest packet, at last, it will start receive for the downloading.
+  request packet, at last, it will start receive for the downloading.
 
   @param  Instance              The Mtftp session
   @param  Operation             The MTFTP opcode, it may be a EFI_MTFTP4_OPCODE_RRQ
@@ -55,7 +55,7 @@ Mtftp4RrqStart (
   //
   // The valid block number range are [1, 0xffff]. For example:
   // the client sends an RRQ request to the server, the server
-  // transfers the DATA1 block. If option negoitation is ongoing,
+  // transfers the DATA1 block. If option negotiation is ongoing,
   // the server will send back an OACK, then client will send ACK0.
   //
   Status = Mtftp4InitBlockRange (&Instance->Blocks, 1, 0xffff);
@@ -544,8 +544,8 @@ Mtftp4RrqHandleOack (
 
     //
     // Save the multicast info. Always update the Master, only update the
-    // multicast IP address, block size, window size, timeoute at the first time. If IP
-    // address is updated, create a UDP child to receive the multicast.
+    // multicast IP address, block size, window size, timeout at the first time.
+    // If IP address is updated, create a UDP child to receive the multicast.
     //
     Instance->Master = Reply.Master;
 

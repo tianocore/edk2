@@ -113,7 +113,7 @@ Mtftp4ServiceBindingCreateChild (
   @param  This                   The service binding instance
   @param  ChildHandle            The child handle to destroy
 
-  @retval EFI_INVALID_PARAMETER  The parameter is invaid.
+  @retval EFI_INVALID_PARAMETER  The parameter is invalid.
   @retval EFI_UNSUPPORTED        The child may have already been destroyed.
   @retval EFI_SUCCESS            The child is destroyed and removed from the
                                  parent's child list.

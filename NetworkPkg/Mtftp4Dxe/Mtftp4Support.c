@@ -46,7 +46,7 @@ Mtftp4AllocateRange (
 
   RRQ and WRQ have different requirements for Start and End.
   For example, during start up, WRQ initializes its whole valid block range
-  to [0, 0xffff]. This is bacause the server will send us a ACK0 to inform us
+  to [0, 0xffff]. This is because the server will send us a ACK0 to inform us
   to start the upload. When the client received ACK0, it will remove 0 from the
   range, get the next block number, which is 1, then upload the BLOCK1. For RRQ
   without option negotiation, the server will directly send us the BLOCK1 in
@@ -197,7 +197,7 @@ Mtftp4RemoveBlockNum (
     // 3. (Start < Num) && (End >= Num):
     //    if End == Num, only need to decrease the End by one because
     //    we have (Start < Num) && (Num == End), so (Start <= End - 1).
-    //    if (End > Num), the hold is splited into two holes, with
+    //    if (End > Num), the hold is split into two holes, with
     //    [Start, Num - 1] and [Num + 1, End].
     //
     if (Range->Start > Num) {
@@ -649,7 +649,7 @@ Mtftp4OnTimerTick (
     }
 
     //
-    // Retransmit the packet if haven't reach the maxmium retry count,
+    // Retransmit the packet if haven't reach the maximum retry count,
     // otherwise exit the transfer.
     //
     if (++Instance->CurRetry < Instance->MaxRetry) {

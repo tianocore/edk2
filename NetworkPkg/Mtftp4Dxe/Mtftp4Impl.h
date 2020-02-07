@@ -201,7 +201,7 @@ Mtftp4WrqStart (
   Start the MTFTP session to download.
 
   It will first initialize some of the internal states then build and send a RRQ
-  reqeuest packet, at last, it will start receive for the downloading.
+  request packet, at last, it will start receive for the downloading.
 
   @param  Instance              The Mtftp session
   @param  Operation             The MTFTP opcode, it may be a EFI_MTFTP4_OPCODE_RRQ
