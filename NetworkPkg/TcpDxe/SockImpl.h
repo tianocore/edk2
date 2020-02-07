@@ -93,7 +93,7 @@ SockCancelToken (
 
   @param[in]  SockInitData          Pointer to the initial data of the socket.
 
-  @return Pointer to the newly created socket, return NULL when exception occured.
+  @return Pointer to the newly created socket, return NULL when exception occurred.
 
 **/
 SOCKET *

@@ -255,12 +255,12 @@ SockDestroyChild (
 
 /**
   Create a socket and its associated protocol control block
-  with the intial data SockInitData and protocol specific
+  with the initial data SockInitData and protocol specific
   data ProtoData.
 
-  @param[in]  SockInitData         Inital data to setting the socket.
+  @param[in]  SockInitData         Initial data to setting the socket.
 
-  @return Pointer to the newly created socket. If NULL, an error condition occured.
+  @return Pointer to the newly created socket. If NULL, an error condition occurred.
 
 **/
 SOCKET *
@@ -397,7 +397,7 @@ OnExit:
 /**
   Initiate a connection establishment process.
 
-  @param[in]  Sock             Pointer to the socket to initiate the initate the
+  @param[in]  Sock             Pointer to the socket to initiate the
                                connection.
   @param[in]  Token            Pointer to the token used for the connection
                                operation.
@@ -474,7 +474,7 @@ OnExit:
   @param[in]  Sock             Pointer to the socket to accept connections.
   @param[in]  Token            The token to accept a connection.
 
-  @retval EFI_SUCCESS          Either a connection is accpeted or the Token is
+  @retval EFI_SUCCESS          Either a connection is accepted or the Token is
                                buffered for further acception.
   @retval EFI_ACCESS_DENIED    Failed to get the lock to access the socket, or the
                                socket is closed, or the socket is not configured to

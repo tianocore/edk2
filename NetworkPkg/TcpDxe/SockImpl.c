@@ -89,7 +89,7 @@ SockFreeFoo (
   @param[in]  BufLen                The maximum length of the data buffer to
                                     store the received data in the socket layer.
 
-  @return The length of the data can be retreived.
+  @return The length of the data can be retrieved.
 
 **/
 UINT32
@@ -270,7 +270,7 @@ SockProcessSndToken (
       );
 
     //
-    // Proceess it in the light of SockType
+    // Process it in the light of SockType
     //
     SndToken  = (SOCK_IO_TOKEN *) SockToken->Token;
     TxData    = SndToken->Packet.TxData;
