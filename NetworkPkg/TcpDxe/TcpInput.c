@@ -246,7 +246,7 @@ TcpComputeRtt (
 
   //
   // Step 2.4: Limit the RTO to at least 1 second
-  // Step 2.5: Limit the RTO to a maxium value that
+  // Step 2.5: Limit the RTO to a maximum value that
   // is at least 60 second
   //
   if (Tcb->Rto < TCP_RTO_MIN) {
@@ -681,7 +681,7 @@ TcpQueueData (
   Adjust the send queue or the retransmit queue.
 
   @param[in]  Tcb      Pointer to the TCP_CB of this TCP instance.
-  @param[in]  Ack      The acknowledge seuqence number of the received segment.
+  @param[in]  Ack      The acknowledge sequence number of the received segment.
 
   @retval          0     An error condition occurred.
   @retval          1     No error occurred.
@@ -1024,7 +1024,7 @@ TcpInput (
         goto StepSix;
       } else {
         //
-        // Received a SYN segment without ACK, simultanous open.
+        // Received a SYN segment without ACK, simultaneous open.
         //
         TcpSetState (Tcb, TCP_SYN_RCVD);
 
@@ -1103,7 +1103,7 @@ TcpInput (
 
       //
       // This TCB comes from either a LISTEN TCB,
-      // or active open TCB with simultanous open.
+      // or active open TCB with simultaneous open.
       // Do NOT signal user CONNECTION refused
       // if it comes from a LISTEN TCB.
       //

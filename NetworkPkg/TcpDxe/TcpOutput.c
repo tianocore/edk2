@@ -477,7 +477,7 @@ TcpGetSegmentSndQue (
 
   //
   // If SYN is set and out of the range, clear the flag.
-  // Becuase the sequence of the first byte is SEG.SEQ+1,
+  // Because the sequence of the first byte is SEG.SEQ+1,
   // adjust Offset by -1. If SYN is in the range, copy
   // one byte less.
   //
@@ -660,7 +660,7 @@ TcpRetransmit (
   UINT32  Len;
 
   //
-  // Compute the maxium length of retransmission. It is
+  // Compute the maximum length of retransmission. It is
   // limited by three factors:
   // 1. Less than SndMss
   // 2. Must in the current send window

@@ -309,7 +309,7 @@ TcpFlushPcb (
 
     if (Sock->DevicePath != NULL) {
       //
-      // Uninstall the device path protocl.
+      // Uninstall the device path protocol.
       //
       gBS->UninstallProtocolInterface (
              Sock->SockHandle,
@@ -549,7 +549,7 @@ TcpConfigurePcb (
   }
 
   //
-  // Initalize the operating information in this Tcb
+  // Initialize the operating information in this Tcb
   //
   ASSERT (Tcb->State == TCP_CLOSED &&
     IsListEmpty (&Tcb->SndQue) &&
@@ -751,7 +751,7 @@ OnExit:
 }
 
 /**
-  The procotol handler provided to the socket layer, which is used to
+  The protocol handler provided to the socket layer, which is used to
   dispatch the socket level requests by calling the corresponding
   TCP layer functions.
 
