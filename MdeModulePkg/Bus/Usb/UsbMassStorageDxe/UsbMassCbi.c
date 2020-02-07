@@ -305,7 +305,7 @@ UsbCbiDataTransfer (
       if (TransStatus == EFI_USB_ERR_NAK) {
         //
         // The device can NAK the host if either the data/buffer isn't
-        // aviable or the command is in-progress.
+        // available or the command is in-progress.
         // If data are partially transferred, we just ignore NAK and continue.
         // If all data have been transferred and status is NAK, then we retry for several times.
         // If retry exceeds the USB_CBI_MAX_RETRY, then return error status.
@@ -378,7 +378,7 @@ UsbCbiGetStatus (
   Timeout   = Timeout / USB_MASS_1_MILLISECOND;
 
   //
-  // Attemp to the read the result from interrupt endpoint
+  // Attempt to the read the result from interrupt endpoint
   //
   for (Retry = 0; Retry < USB_CBI_MAX_RETRY; Retry++) {
     TransStatus = 0;

@@ -14,14 +14,14 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 extern USB_MASS_TRANSPORT mUsbBotTransport;
 
 //
-// Usb Bulk-Only class specfic request
+// Usb Bulk-Only class specific request
 //
 #define USB_BOT_RESET_REQUEST    0xFF       ///< Bulk-Only Mass Storage Reset
 #define USB_BOT_GETLUN_REQUEST   0xFE       ///< Get Max Lun
 #define USB_BOT_CBW_SIGNATURE    0x43425355 ///< dCBWSignature, tag the packet as CBW
 #define USB_BOT_CSW_SIGNATURE    0x53425355 ///< dCSWSignature, tag the packet as CSW
 #define USB_BOT_MAX_LUN          0x0F       ///< Lun number is from 0 to 15
-#define USB_BOT_MAX_CMDLEN       16         ///< Maxium number of command from command set
+#define USB_BOT_MAX_CMDLEN       16         ///< Maximum number of command from command set
 
 //
 // Usb BOT command block status values
