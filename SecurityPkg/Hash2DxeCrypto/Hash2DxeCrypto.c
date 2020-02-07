@@ -87,7 +87,7 @@ BOOLEAN
   This function completes hash computation and retrieves the digest value into
   the specified memory. After this function has been called, the Hash context cannot
   be used again.
-  Hash context should be already correctly intialized by HashInit(), and should not be
+  Hash context should be already correctly initialized by HashInit(), and should not be
   finalized by HashFinal(). Behavior with invalid Hash context is undefined.
 
   If HashContext is NULL, then return FALSE.
