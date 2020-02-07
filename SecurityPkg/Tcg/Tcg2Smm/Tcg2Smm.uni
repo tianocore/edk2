@@ -1,5 +1,5 @@
 // /** @file
-// Provides ACPI metholds for TPM 2.0 support
+// Provides ACPI methods for TPM 2.0 support
 //
 // This driver implements TPM 2.0 definition block in ACPI table and
 // registers SMI callback functions for TCG2 physical presence and

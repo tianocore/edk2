@@ -61,7 +61,7 @@ OnReadyToBoot (
   Typically, there are 2 mechanism for resetting eDrive. They are:
   1. TPer Reset through IEEE 1667 protocol.
   2. TPer Reset through native TCG protocol.
-  This routine will detect what protocol the attached eDrive comform to, TCG or
+  This routine will detect what protocol the attached eDrive conform to, TCG or
   IEEE 1667 protocol. Then send out TPer Reset command separately.
 
   @param[in] Ssp      The pointer to EFI_STORAGE_SECURITY_COMMAND_PROTOCOL instance.
@@ -109,7 +109,7 @@ InitiateTPerReset (
                   MediaId,
                   100000000,                    // Timeout 10-sec
                   0,                            // SecurityProtocol
-                  0,                            // SecurityProtocolSpecifcData
+                  0,                            // SecurityProtocolSpecificData
                   Len,                          // PayloadBufferSize,
                   Buffer,                       // PayloadBuffer
                   &XferSize
@@ -145,7 +145,7 @@ InitiateTPerReset (
                   MediaId,
                   100000000,                    // Timeout 10-sec
                   0,                            // SecurityProtocol
-                  0,                            // SecurityProtocolSpecifcData
+                  0,                            // SecurityProtocolSpecificData
                   Len,                          // PayloadBufferSize,
                   Buffer,                       // PayloadBuffer
                   &XferSize
@@ -197,7 +197,7 @@ InitiateTPerReset (
                     MediaId,
                     100000000,                    // Timeout 10-sec
                     SECURITY_PROTOCOL_TCG,        // SecurityProtocol
-                    0x0400,                       // SecurityProtocolSpecifcData
+                    0x0400,                       // SecurityProtocolSpecificData
                     512,                          // PayloadBufferSize,
                     Buffer                        // PayloadBuffer
                     );

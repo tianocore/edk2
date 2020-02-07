@@ -1,5 +1,5 @@
 // /** @file
-// Implements ACPI metholds for the TCG feature
+// Implements ACPI methods for the TCG feature
 //
 // This driver implements TPM definition block in ACPI table and registers SMI
 // callback functions for physical presence and MemoryClear to handle the requests

@@ -588,7 +588,7 @@ TcgAddEndTransaction(
   );
 
 /**
-  Initial the tcg parse stucture.
+  Initial the tcg parse structure.
 
   @param    ParseStruct    Input parse structure.
   @param    Buffer         Input buffer data.
@@ -1218,7 +1218,7 @@ TcgParseSyncSession(
   @param     HostSession       Host session data.
   @param     AceRow            Ace row info.
   @param     Authority1        Authority 1 info.
-  @param     LogicalOperator   Logiccal operator info.
+  @param     LogicalOperator   Logical operator info.
   @param     Authority2        Authority 2 info.
 
   @retval    Return the action result.
