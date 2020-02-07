@@ -110,7 +110,7 @@ MnpDriverBindingSupported (
   }
 
   //
-  // Close the openned SNP protocol.
+  // Close the opened SNP protocol.
   //
   gBS->CloseProtocol (
          ControllerHandle,
@@ -419,7 +419,7 @@ MnpDriverBindingStop (
                                      it is not NULL, then the I/O services are added
                                      to the existing child handle.
 
-  @retval EFI_SUCCES                 The protocol was added to ChildHandle.
+  @retval EFI_SUCCESS                The protocol was added to ChildHandle.
   @retval EFI_INVALID_PARAMETER      ChildHandle is NULL.
   @retval EFI_OUT_OF_RESOURCES       There are not enough resources available to
                                      create the child.
@@ -450,7 +450,7 @@ MnpServiceBindingCreateChild (
   //
   Instance = AllocateZeroPool (sizeof (MNP_INSTANCE_DATA));
   if (Instance == NULL) {
-    DEBUG ((EFI_D_ERROR, "MnpServiceBindingCreateChild: Faild to allocate memory for the new instance.\n"));
+    DEBUG ((DEBUG_ERROR, "MnpServiceBindingCreateChild: Failed to allocate memory for the new instance.\n"));
 
     return EFI_OUT_OF_RESOURCES;
   }
@@ -535,7 +535,7 @@ ErrorExit:
                                  instance.
   @param[in]  ChildHandle        Handle of the child to destroy.
 
-  @retval EFI_SUCCES             The protocol was removed from ChildHandle.
+  @retval EFI_SUCCESS            The protocol was removed from ChildHandle.
   @retval EFI_UNSUPPORTED        ChildHandle does not support the protocol that
                                  is being removed.
   @retval EFI_INVALID_PARAMETER  ChildHandle is NULL.
@@ -660,7 +660,7 @@ MnpServiceBindingDestroyChild (
   @param[in]  ImageHandle  The image handle of the driver.
   @param[in]  SystemTable  The system table.
 
-  @retval EFI_SUCCES       The driver binding and component name protocols are
+  @retval EFI_SUCCESS      The driver binding and component name protocols are
                            successfully installed.
   @retval Others           Other errors as indicated.
 
