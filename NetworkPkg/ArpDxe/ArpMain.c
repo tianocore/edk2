@@ -175,7 +175,7 @@ ArpAdd (
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   //
-  // See whether the entry to add exists. Check the DeinedCacheTable first.
+  // See whether the entry to add exists. Check the DeniedCacheTable first.
   //
   CacheEntry = ArpFindDeniedCacheEntry (
                  ArpService,
@@ -198,7 +198,7 @@ ArpAdd (
 
   if ((CacheEntry != NULL) && !Overwrite) {
     //
-    // The entry to add exists, if not Overwirte, deny this add request.
+    // The entry to add exists, if not Overwrite, deny this add request.
     //
     Status = EFI_ACCESS_DENIED;
     goto UNLOCK_EXIT;
@@ -542,7 +542,7 @@ ArpRequest (
   ProtocolAddress.AddressPtr = TargetSwAddress;
 
   //
-  // Initialize the TargetHwAddrss to a zero address.
+  // Initialize the TargetHwAddress to a zero address.
   //
   ZeroMem (TargetHwAddress, SnpMode->HwAddressSize);
 
@@ -675,7 +675,7 @@ SIGNAL_USER:
 
   If the request is in the internal ARP request queue, the request is aborted
   immediately and its ResolvedEvent is signaled. Only an asynchronous address
-  request needs to be canceled. If TargeSwAddress and ResolveEvent are both
+  request needs to be canceled. If TargetSwAddress and ResolvedEvent are both
   NULL, all the pending asynchronous requests that have been issued by This
   instance will be cancelled and their corresponding events will be signaled.
 
@@ -729,7 +729,7 @@ ArpCancel (
 
   //
   // Dispatch the DPCs queued by the NotifyFunction of the events signaled
-  // by ArpCancleRequest.
+  // by ArpCancelRequest.
   //
   DispatchDpc ();
 

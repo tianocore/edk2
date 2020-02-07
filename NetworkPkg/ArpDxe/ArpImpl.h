@@ -436,7 +436,7 @@ ArpRequest (
 
   If the request is in the internal ARP request queue, the request is aborted
   immediately and its ResolvedEvent is signaled. Only an asynchronous address
-  request needs to be canceled. If TargeSwAddress and ResolveEvent are both
+  request needs to be canceled. If TargetSwAddress and ResolvedEvent are both
   NULL, all the pending asynchronous requests that have been issued by This
   instance will be cancelled and their corresponding events will be signaled.
 
@@ -599,7 +599,7 @@ ArpDeleteCacheEntry (
   );
 
 /**
-  Send out an arp frame using the CachEntry and the ArpOpCode.
+  Send out an arp frame using the CacheEntry and the ArpOpCode.
 
   @param[in]  Instance               Pointer to the instance context data.
   @param[in]  CacheEntry             Pointer to the configuration data used to
@@ -636,7 +636,7 @@ ArpInitInstance (
 /**
   Process the Arp packets received from Mnp, the procedure conforms to RFC826.
 
-  @param[in]  Context            Pointer to the context data registerd to the
+  @param[in]  Context            Pointer to the context data registered to the
                                  Event.
 
   @return None.
@@ -652,7 +652,7 @@ ArpOnFrameRcvdDpc (
   Queue ArpOnFrameRcvdDpc as a DPC at TPL_CALLBACK.
 
   @param[in]  Event                  The Event this notify function registered to.
-  @param[in]  Context                Pointer to the context data registerd to the
+  @param[in]  Context                Pointer to the context data registered to the
                                      Event.
 
   @return None.
@@ -668,7 +668,7 @@ ArpOnFrameRcvd (
 /**
   Process the already sent arp packets.
 
-  @param[in]  Context                Pointer to the context data registerd to the
+  @param[in]  Context                Pointer to the context data registered to the
                                      Event.
 
   @return None.
@@ -684,7 +684,7 @@ ArpOnFrameSentDpc (
   Request ArpOnFrameSentDpc as a DPC at TPL_CALLBACK.
 
   @param[in]  Event                  The Event this notify function registered to.
-  @param[in]  Context                Pointer to the context data registerd to the
+  @param[in]  Context                Pointer to the context data registered to the
                                      Event.
 
   @return None.
@@ -701,7 +701,7 @@ ArpOnFrameSent (
   Process the arp cache olding and drive the retrying arp requests.
 
   @param[in]  Event                  The Event this notify function registered to.
-  @param[in]  Context                Pointer to the context data registerd to the
+  @param[in]  Context                Pointer to the context data registered to the
                                      Event.
 
   @return None.
