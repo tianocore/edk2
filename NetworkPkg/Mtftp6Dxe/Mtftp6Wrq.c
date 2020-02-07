@@ -174,7 +174,7 @@ Mtftp6WrqHandleAck (
 
   if (Expected < 0) {
     //
-    // The block range is empty. It may either because the the last
+    // The block range is empty. It may either because the last
     // block has been ACKed, or the sequence number just looped back,
     // that is, there is more than 0xffff blocks.
     //

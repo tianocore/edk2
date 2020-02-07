@@ -42,7 +42,7 @@ Mtftp6ParseMcastOption (
   CHAR8                     *TempStr;
 
   //
-  // The multicast option is formated like "addr,port,mc"
+  // The multicast option is formatted like "addr,port,mc"
   // The server can also omit the ip and port, use ",,1"
   //
   if (*Str == ',') {
@@ -135,7 +135,7 @@ Mtftp6ParseMcastOption (
 
 
 /**
-  Parse the MTFTP6 extesion options.
+  Parse the MTFTP6 extension options.
 
   @param[in]  Options       The pointer to the extension options list.
   @param[in]  Count         The num of the extension options.

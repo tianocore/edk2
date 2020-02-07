@@ -334,7 +334,7 @@ Mtftp6RrqInput (
 
 /**
   Start the Mtftp6 instance to download. It first initializes some
-  of the internal states then builds and sends an RRQ reqeuest packet.
+  of the internal states then builds and sends an RRQ request packet.
   Finally, it starts receive for the downloading.
 
   @param[in]  Instance              The pointer to the Mtftp6 instance.

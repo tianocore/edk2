@@ -46,7 +46,7 @@ Mtftp6AllocateRange (
   Initialize the block range for either RRQ or WRQ. RRQ and WRQ have
   different requirements for Start and End. For example, during startup,
   WRQ initializes its whole valid block range to [0, 0xffff]. This
-  is bacause the server will send an ACK0 to inform the user to start the
+  is because the server will send an ACK0 to inform the user to start the
   upload. When the client receives an ACK0, it will remove 0 from the range,
   get the next block number, which is 1, then upload the BLOCK1. For RRQ
   without option negotiation, the server will directly send the BLOCK1
@@ -197,7 +197,7 @@ Mtftp6RemoveBlockNum (
     // 3. (Start < Num) && (End >= Num):
     //    if End == Num, only need to decrease the End by one because
     //    we have (Start < Num) && (Num == End), so (Start <= End - 1).
-    //    if (End > Num), the hold is splited into two holes, with
+    //    if (End > Num), the hold is split into two holes, with
     //    [Start, Num - 1] and [Num + 1, End].
     //
     if (Range->Start > Num) {
@@ -991,7 +991,7 @@ Mtftp6OperationClean (
   write file, and read directory.
 
   @param[in]  This                   The MTFTP session.
-  @param[in]  Token                  The token than encapsues the user's request.
+  @param[in]  Token                  The token than encapsules the user's request.
   @param[in]  OpCode                 The operation to perform.
 
   @retval EFI_INVALID_PARAMETER  Some of the parameters are invalid.
@@ -1227,7 +1227,7 @@ Mtftp6OnTimerTick (
     }
 
     //
-    // Retransmit the packet if haven't reach the maxmium retry count,
+    // Retransmit the packet if haven't reach the maximum retry count,
     // otherwise exit the transfer.
     //
     if (Instance->CurRetry < Instance->MaxRetry) {
