@@ -138,7 +138,7 @@ USBMouseAbsolutePointerDriverBindingSupported (
 /**
   Starts the mouse device with this driver.
 
-  This function consumes USB I/O Portocol, intializes USB mouse device,
+  This function consumes USB I/O Protocol, initializes USB mouse device,
   installs Absolute Pointer Protocol, and submits Asynchronous Interrupt
   Transfer to manage the USB mouse device.
 
