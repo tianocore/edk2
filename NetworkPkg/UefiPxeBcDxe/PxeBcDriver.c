@@ -1,5 +1,5 @@
 /** @file
-  Driver Binding functions implementationfor for UefiPxeBc Driver.
+  Driver Binding functions implementation for UefiPxeBc Driver.
 
   (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2007 - 2019, Intel Corporation. All rights reserved.<BR>
@@ -1184,7 +1184,7 @@ PxeBcCreateIp6Children (
   }
 
   //
-  // Set IPv6 avaiable flag and set default configure data for
+  // Set IPv6 available flag and set default configure data for
   // Udp6Read and Ip6 instance.
   //
   Status = PxeBcCheckIpv6Support (ControllerHandle, Private, &Private->Mode.Ipv6Available);

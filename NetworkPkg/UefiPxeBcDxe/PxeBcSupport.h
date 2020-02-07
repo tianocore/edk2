@@ -21,7 +21,7 @@
 
 
 /**
-  Flush the previous configration using the new station Ip address.
+  Flush the previous configuration using the new station Ip address.
 
   @param[in]   Private        Pointer to PxeBc private data.
   @param[in]   StationIp      Pointer to the station Ip address.
@@ -59,7 +59,7 @@ PxeBcCommonNotify (
 
   @param  Mode           Pointer to EFI_PXE_BASE_CODE_MODE.
   @param  Ip4Addr        The Ip4 address for resolution.
-  @param  MacAddress     The resoluted MAC address if the resolution is successful.
+  @param  MacAddress     The resolved MAC address if the resolution is successful.
                          The value is undefined if resolution fails.
 
   @retval TRUE           Found a matched entry.
@@ -156,7 +156,7 @@ PxeBcConfigUdp4Write (
   @param[in]       StationIp            Pointer to the station address.
   @param[in, out]  SrcPort              Pointer to the source port.
 
-  @retval          EFI_SUCCESS          Successfuly configured this instance.
+  @retval          EFI_SUCCESS          Successfully configured this instance.
   @retval          Others               Failed to configure this instance.
 
 **/
@@ -234,7 +234,7 @@ PxeBcUdp6Write (
   @param[in]  Session             Pointer to the current UDPv4 session.
   @param[in]  OpFlags             Operation flag for UdpRead/UdpWrite.
 
-  @retval     TRUE                Succesfully passed the Ip filter.
+  @retval     TRUE                Successfully passed the Ip filter.
   @retval     FALSE               Failed to pass the Ip filter.
 
 **/
@@ -254,7 +254,7 @@ PxeBcCheckByIpFilter (
   @param[in, out]  DestIp         Pointer to the dest Ip address.
   @param[in]       OpFlags        Operation flag for UdpRead/UdpWrite.
 
-  @retval     TRUE                Succesfully passed the IPv4 filter.
+  @retval     TRUE                Successfully passed the IPv4 filter.
   @retval     FALSE               Failed to pass the IPv4 filter.
 
 **/
@@ -275,7 +275,7 @@ PxeBcCheckByDestIp (
   @param[in, out]  DestPort       Pointer to the destination port.
   @param[in]       OpFlags        Operation flag for UdpRead/UdpWrite.
 
-  @retval     TRUE                Succesfully passed the IPv4 filter.
+  @retval     TRUE                Successfully passed the IPv4 filter.
   @retval     FALSE               Failed to pass the IPv4 filter.
 
 **/
@@ -296,7 +296,7 @@ PxeBcCheckByDestPort (
   @param[in, out]  SrcIp          Pointer to the source Ip address.
   @param[in]       OpFlags        Operation flag for UdpRead/UdpWrite.
 
-  @retval     TRUE                Succesfully passed the IPv4 filter.
+  @retval     TRUE                Successfully passed the IPv4 filter.
   @retval     FALSE               Failed to pass the IPv4 filter.
 
 **/
@@ -317,7 +317,7 @@ PxeBcFilterBySrcIp (
   @param[in, out]  SrcPort        Pointer to the source port.
   @param[in]       OpFlags        Operation flag for UdpRead/UdpWrite.
 
-  @retval     TRUE                Succesfully passed the IPv4 filter.
+  @retval     TRUE                Successfully passed the IPv4 filter.
   @retval     FALSE               Failed to pass the IPv4 filter.
 
 **/
