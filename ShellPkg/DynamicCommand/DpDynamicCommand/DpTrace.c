@@ -85,7 +85,7 @@ GetPerformanceMeasurementRecord (
   @post The SummaryData and CumData structures contain statistics for the
         current performance logs.
 
-  @param[in, out] CustomCumulativeData  A pointer to the cumtom cumulative data.
+  @param[in, out] CustomCumulativeData  A pointer to the custom cumulative data.
 
 **/
 VOID
@@ -830,7 +830,7 @@ ProcessGlobal(
      - Update the instance count and the total, minimum, and maximum durations.
   Finally, print the gathered cumulative statistics.
 
-  @param[in]    CustomCumulativeData  A pointer to the cumtom cumulative data.
+  @param[in]    CustomCumulativeData  A pointer to the custom cumulative data.
 
 **/
 VOID
