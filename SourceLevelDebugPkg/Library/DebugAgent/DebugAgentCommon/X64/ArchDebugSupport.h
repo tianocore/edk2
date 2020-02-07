@@ -1,5 +1,5 @@
 /** @file
-  X64 specific defintions for debug agent library instance.
+  X64 specific definitions for debug agent library instance.
 
   Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent

@@ -17,7 +17,7 @@ typedef struct {
 } DEBUG_CPU_DATA;
 
 typedef struct {
-  SPIN_LOCK                 MpContextSpinLock;   ///< Lock for writting MP context
+  SPIN_LOCK                 MpContextSpinLock;   ///< Lock for writing MP context
   SPIN_LOCK                 DebugPortSpinLock;   ///< Lock for access debug port
   SPIN_LOCK                 MailboxSpinLock;     ///< Lock for accessing mail box
   UINT8                     CpuBreakMask[DEBUG_CPU_MAX_COUNT/8];        ///< Bitmask of all breaking CPUs
@@ -26,8 +26,8 @@ typedef struct {
   UINT32                    BspIndex;            ///< Processor index value of BSP
   UINT32                    BreakAtCpuIndex;     ///< Processor index value of the current breaking CPU
   UINT32                    DebugTimerInitCount; ///< Record BSP's init timer count
-  BOOLEAN                   IpiSentByAp;         ///< TRUR: IPI is sent by AP. TALSE: IPI is sent by BSP
-  BOOLEAN                   RunCommandSet;       ///< TRUE: RUN commmand is executing. FALSE : RUN command has been executed.
+  BOOLEAN                   IpiSentByAp;         ///< TRUE: IPI is sent by AP. FALSE: IPI is sent by BSP
+  BOOLEAN                   RunCommandSet;       ///< TRUE: RUN command is executing. FALSE: RUN command has been executed.
 } DEBUG_MP_CONTEXT;
 
 extern DEBUG_MP_CONTEXT volatile   mDebugMpContext;

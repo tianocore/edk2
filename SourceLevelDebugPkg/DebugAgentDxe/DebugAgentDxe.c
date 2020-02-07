@@ -41,7 +41,7 @@ DisableDebugTimerExitBootService (
   @param[in] SystemTable    A pointer to the EFI System Table.
 
   @retval EFI_SUCCESS       The entry point is executed successfully.
-  @retval other             Some error occurs when initialzed Debug Agent.
+  @retval other             Some error occurs when initialized Debug Agent.
 
 **/
 EFI_STATUS

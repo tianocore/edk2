@@ -1,5 +1,5 @@
 /** @file
-  Debug Agent library implementition for Dxe Core and Dxr modules.
+  Debug Agent library implementation for Dxe Core and Dxr modules.
 
   Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
