@@ -1,5 +1,5 @@
 /** @file
-  CPU exception handler library implemenation for SMM modules.
+  CPU exception handler library implementation for SMM modules.
 
   Copyright (c) 2013 - 2017, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
