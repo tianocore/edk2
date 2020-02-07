@@ -103,7 +103,7 @@ ParseRecoveryDataFile (
     //
 
     //
-    // FileBuid
+    // FileGuid
     //
     Status = GetGuidFromDataFile(
                Context,

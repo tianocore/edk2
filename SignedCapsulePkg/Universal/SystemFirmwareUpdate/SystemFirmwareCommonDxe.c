@@ -331,8 +331,8 @@ InitializePrivateData (
                      &VarSize,
                      &SystemFmpPrivate->LastAttempt
                      );
-  DEBUG((DEBUG_INFO, "GetLastAttemp - %r\n", VarStatus));
-  DEBUG((DEBUG_INFO, "GetLastAttemp Version - 0x%x, State - 0x%x\n", SystemFmpPrivate->LastAttempt.LastAttemptVersion, SystemFmpPrivate->LastAttempt.LastAttemptStatus));
+  DEBUG((DEBUG_INFO, "GetLastAttempt - %r\n", VarStatus));
+  DEBUG((DEBUG_INFO, "GetLastAttempt Version - 0x%x, State - 0x%x\n", SystemFmpPrivate->LastAttempt.LastAttemptVersion, SystemFmpPrivate->LastAttempt.LastAttemptStatus));
 
   return EFI_SUCCESS;
 }

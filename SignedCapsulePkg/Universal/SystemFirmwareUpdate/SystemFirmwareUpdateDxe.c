@@ -493,7 +493,7 @@ FmpSetImage (
   // the current variable driver may not manage the new NVRAM region.
   //
   if (mNvRamUpdated) {
-    DEBUG ((DEBUG_INFO, "NvRamUpdated, Update Variable Serivces\n"));
+    DEBUG ((DEBUG_INFO, "NvRamUpdated, Update Variable Services\n"));
     gRT->GetVariable         = GetVariableHook;
     gRT->GetNextVariableName = GetNextVariableNameHook;
     gRT->SetVariable         = SetVariableHook;
@@ -514,7 +514,7 @@ FmpSetImage (
                      sizeof(SystemFmpPrivate->LastAttempt),
                      &SystemFmpPrivate->LastAttempt
                      );
-  DEBUG((DEBUG_INFO, "SetLastAttemp - %r\n", VarStatus));
+  DEBUG((DEBUG_INFO, "SetLastAttempt - %r\n", VarStatus));
 
   return Status;
 }
