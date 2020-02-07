@@ -244,7 +244,7 @@ EmmcPeimHcInitHost (
   Refer to EMMC Electrical Standard Spec 5.1 Section 6.10.4 for details.
 
   @param[in] Slot           The slot number of the Emmc card to send the command to.
-  @param[in] Access         The access mode of SWTICH command.
+  @param[in] Access         The access mode of SWITCH command.
   @param[in] Index          The offset of the field to be access.
   @param[in] Value          The value to be set to the specified field of EXT_CSD register.
   @param[in] CmdSet         The value of CmdSet field of EXT_CSD register.
