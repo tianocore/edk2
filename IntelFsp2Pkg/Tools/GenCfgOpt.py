@@ -1,6 +1,6 @@
 ## @ GenCfgOpt.py
 #
-# Copyright (c) 2014 - 2019, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2014 - 2020, Intel Corporation. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -439,6 +439,7 @@ EndList
 
         MaxAlign = 32   #Default align to 32, but if there are 64 bit unit, align to 64
         SizeAlign = 0   #record the struct max align
+        Base = 0        #Starting offset of sub-structure.
         while len(DscLines):
             DscLine  = DscLines.pop(0).strip()
             Handle   = False
