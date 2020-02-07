@@ -62,8 +62,8 @@ define RemoveFirmwareSymbolFile
 end
 
 if gInXcode == 1
-  # in Xcode the program is already runing. Issuing a run command
-  # will cause a fatal debugger error. The break point sciprt that
+  # in Xcode the program is already running. Issuing a run command
+  # will cause a fatal debugger error. The break point script that
   # is used to source this script sets gInCode to 1.
 else
   #

@@ -38,7 +38,7 @@ UINTN       gFdInfoCount = 0;
 EMU_FD_INFO *gFdInfo;
 
 //
-// Array that supports seperate memory rantes.
+// Array that supports separate memory ranges.
 //  The memory ranges are set in system.cmd via the EFI_MEMORY_SIZE variable.
 //  The number of array elements is allocated base on parsing
 //  EFI_MEMORY_SIZE and the memory is never freed.
@@ -379,7 +379,7 @@ Arguments:
 Returns:
   EFI_SUCCESS      - The file was opened and mapped.
   EFI_NOT_FOUND    - FileName was not found in the current directory
-  EFI_DEVICE_ERROR - An error occured attempting to map the opened file
+  EFI_DEVICE_ERROR - An error occurred attempting to map the opened file
 
 **/
 EFI_STATUS
@@ -523,7 +523,7 @@ Arguments:
   PeiCorePe32File         - SEC PE32
 
 Returns:
-  Success means control is transfered and thus we should never return
+  Success means control is transferred and thus we should never return
 
 **/
 VOID
@@ -611,7 +611,7 @@ Routine Description:
   It allows discontinuous memory regions to be supported by the emulator.
   It uses gSystemMemory[] and gSystemMemoryCount that were created by
   parsing the host environment variable EFI_MEMORY_SIZE.
-  The size comes from the varaible and the address comes from the call to
+  The size comes from the variable and the address comes from the call to
   UnixOpenFile.
 
 Arguments:
@@ -661,7 +661,7 @@ Routine Description:
 
  This is all of GCD for system memory passed to DXE Core. FV
  mapping and other device mapped into system memory are not
- inlcuded in the check.
+ included in the check.
 
 Arguments:
   Index      - Which memory region to use
@@ -775,7 +775,7 @@ SecPeCoffGetEntryPoint (
 
 Routine Description:
   Return the FD Size and base address. Since the FD is loaded from a
-  file into host memory only the SEC will know it's address.
+  file into host memory only the SEC will know its address.
 
 Arguments:
   Index  - Which FD, starts at zero.
@@ -898,7 +898,7 @@ Routine Description:
   The ModHandle is needed to unload the image.
 
 Arguments:
-  ImageContext - Input data returned from PE Laoder Library. Used to find the
+  ImageContext - Input data returned from PE Loader Library. Used to find the
                  .PDB file name of the PE Image.
   ModHandle    - Returned from LoadLibraryEx() and stored for call to
                  FreeLibrary().
@@ -922,7 +922,7 @@ AddHandle (
   for (Index = 0; Index < mImageContextModHandleArraySize; Index++, Array++) {
     if (Array->ImageContext == NULL) {
       //
-      // Make a copy of the stirng and store the ModHandle
+      // Make a copy of the string and store the ModHandle
       //
       Array->ImageContext = ImageContext;
       Array->ModHandle    = ModHandle;
@@ -933,7 +933,7 @@ AddHandle (
   //
   // No free space in mImageContextModHandleArray so grow it by
   // IMAGE_CONTEXT_TO_MOD_HANDLE entires. realloc will
-  // copy the old values to the new locaiton. But it does
+  // copy the old values to the new location. But it does
   // not zero the new memory area.
   //
   PreviousSize = mImageContextModHandleArraySize * sizeof (IMAGE_CONTEXT_TO_MOD_HANDLE);
@@ -961,11 +961,11 @@ Routine Description:
   Return the ModHandle and delete the entry in the array.
 
 Arguments:
-  ImageContext - Input data returned from PE Laoder Library. Used to find the
+  ImageContext - Input data returned from PE Loader Library. Used to find the
                  .PDB file name of the PE Image.
 
 Returns:
-  ModHandle - ModHandle assoicated with ImageContext is returned
+  ModHandle - ModHandle associated with ImageContext is returned
   NULL      - No ModHandle associated with ImageContext
 
 **/
@@ -1129,7 +1129,7 @@ SecGdbScriptBreak (
 
 
 /**
-  Adds the image to a gdb script so it's symbols can be loaded.
+  Adds the image to a gdb script so its symbols can be loaded.
   The AddFirmwareSymbolFile helper macro is used.
 
   @param  ImageContext  The PE/COFF image context
@@ -1202,7 +1202,7 @@ SecPeCoffRelocateImageExtraAction (
 
 
 /**
-  Adds the image to a gdb script so it's symbols can be unloaded.
+  Adds the image to a gdb script so its symbols can be unloaded.
   The RemoveFirmwareSymbolFile helper macro is used.
 
   @param  ImageContext  The PE/COFF image context
