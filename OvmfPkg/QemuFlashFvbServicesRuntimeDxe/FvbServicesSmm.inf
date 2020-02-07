@@ -1,8 +1,8 @@
 ## @file
-#  Component description file for QEMU Flash Fimware Volume Block SMM driver
+#  Component description file for QEMU Flash Firmware Volume Block SMM driver
 #  module.
 #
-#  This SMM driver implements and produces the SMM Fimware Volue Block Protocol
+#  This SMM driver implements and produces the SMM Firmware Volue Block Protocol
 #  for a QEMU flash device.
 #
 #  Copyright (C) 2015, Red Hat, Inc.

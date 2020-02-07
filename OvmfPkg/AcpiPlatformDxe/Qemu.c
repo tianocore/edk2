@@ -137,7 +137,7 @@ QemuInstallAcpiMadtTable (
   ++Iso;
 
   //
-  // Set Level-tiggered, Active High for all possible PCI link targets.
+  // Set Level-triggered, Active High for all possible PCI link targets.
   //
   for (Loop = 0; Loop < 16; ++Loop) {
     if ((PcdGet16 (Pcd8259LegacyModeEdgeLevel) & (1 << Loop)) == 0) {
@@ -148,7 +148,7 @@ QemuInstallAcpiMadtTable (
     Iso->Bus                         = 0x00; // ISA
     Iso->Source                      = (UINT8) Loop;
     Iso->GlobalSystemInterruptVector = (UINT32) Loop;
-    Iso->Flags                       = 0x000D; // Level-tiggered, Active High
+    Iso->Flags                       = 0x000D; // Level-triggered, Active High
     ++Iso;
   }
   ASSERT (

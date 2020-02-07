@@ -412,7 +412,7 @@ typedef struct {
                           If the call doesn't succeed, the contents of this
                           structure is indeterminate.
 
-  @param[out]    IsFinal  In case of successul parsing, this parameter signals
+  @param[out]    IsFinal  In case of successful parsing, this parameter signals
                           whether the node just parsed is the final node in the
                           device path. The call after a final node will attempt
                           to start parsing the next path. If the call doesn't
