@@ -1113,7 +1113,7 @@ InstallQemuFwCfgTables (
       goto UninstallAcpiTables;
     }
     //
-    // Ownership of S3Context has been transfered.
+    // Ownership of S3Context has been transferred.
     //
     S3Context = NULL;
   }

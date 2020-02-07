@@ -164,7 +164,7 @@ AllocFwCfgDmaAccessBuffer (
 
   //
   // As per UEFI spec, in order to map a host address with
-  // BusMasterCommomBuffer64, the buffer must be allocated using the IOMMU
+  // BusMasterCommonBuffer64, the buffer must be allocated using the IOMMU
   // AllocateBuffer()
   //
   Status = mIoMmuProtocol->AllocateBuffer (

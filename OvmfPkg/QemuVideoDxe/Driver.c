@@ -206,7 +206,7 @@ QemuVideoControllerDriverStart (
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   //
-  // Allocate Private context data for GOP inteface.
+  // Allocate Private context data for GOP interface.
   //
   Private = AllocateZeroPool (sizeof (QEMU_VIDEO_PRIVATE_DATA));
   if (Private == NULL) {

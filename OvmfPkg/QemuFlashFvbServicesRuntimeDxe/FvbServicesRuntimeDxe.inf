@@ -1,8 +1,8 @@
 ## @file
-#  Component description file for QEMU Flash Fimware Volume Block DXE driver
+#  Component description file for QEMU Flash Firmware Volume Block DXE driver
 #  module.
 #
-#  This DXE runtime driver implements and produces the Fimware Volue Block
+#  This DXE runtime driver implements and produces the Firmware Volue Block
 #  Protocol for a QEMU flash device.
 #
 #  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
