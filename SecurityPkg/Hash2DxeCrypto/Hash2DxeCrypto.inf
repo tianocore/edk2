@@ -1,7 +1,7 @@
 ## @file
 #  Produces the UEFI HASH2 protocol
 #
-#  This module will use EDKII crypto libary to HASH2 protocol.
+#  This module will use EDKII crypto library to HASH2 protocol.
 #
 #  (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
 #  Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
