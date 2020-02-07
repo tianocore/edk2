@@ -704,7 +704,7 @@ Done:
   @retval EFI_WRITE_PROTECTED   The device can not be written to.
   @retval EFI_DEVICE_ERROR      Fail to detect media.
   @retval EFI_NO_MEDIA          Media is not present.
-  @retval EFI_MEDIA_CHNAGED     Media has changed.
+  @retval EFI_MEDIA_CHANGED     Media has changed.
   @retval EFI_BAD_BUFFER_SIZE   The Buffer was not a multiple of the block size of the device.
   @retval EFI_INVALID_PARAMETER Invalid parameter passed in.
 
@@ -3166,7 +3166,7 @@ CheckTargetStatus (
 
   When encountering error during the process, if retrieve sense keys before
   error encountered, it returns the sense keys with return status set to EFI_SUCCESS,
-  and NeedRetry set to FALSE; otherwize, return the proper return status.
+  and NeedRetry set to FALSE; otherwise, return the proper return status.
 
   @param  ScsiDiskDevice     The pointer of SCSI_DISK_DEV
   @param  NeedRetry          The pointer of flag indicates if need a retry
@@ -3438,7 +3438,7 @@ ScsiDiskReadSectors (
     // As ScsiDisk and ScsiBus driver are used to manage SCSI or ATAPI devices, we have to use
     // the lowest transfer rate to calculate the possible maximum timeout value for each operation.
     // From the above table, we could know 2.1Mbytes per second is lowest one.
-    // The timout value is rounded up to nearest integar and here an additional 30s is added
+    // The timeout value is rounded up to nearest integer and here an additional 30s is added
     // to follow ATA spec in which it mentioned that the device may take up to 30s to respond
     // commands in the Standby/Idle mode.
     //
@@ -3482,7 +3482,7 @@ ScsiDiskReadSectors (
       // it is invalid to request more sectors in the CDB than the entire
       // transfer (ie. ByteCount) can carry.
       //
-      // In addition, ByteCount is only expected to go down, or stay unchaged.
+      // In addition, ByteCount is only expected to go down, or stay unchanged.
       // Therefore we don't need to update Timeout: the original timeout should
       // accommodate shorter transfers too.
       //
@@ -3603,7 +3603,7 @@ ScsiDiskWriteSectors (
     // As ScsiDisk and ScsiBus driver are used to manage SCSI or ATAPI devices, we have to use
     // the lowest transfer rate to calculate the possible maximum timeout value for each operation.
     // From the above table, we could know 2.1Mbytes per second is lowest one.
-    // The timout value is rounded up to nearest integar and here an additional 30s is added
+    // The timeout value is rounded up to nearest integer and here an additional 30s is added
     // to follow ATA spec in which it mentioned that the device may take up to 30s to respond
     // commands in the Standby/Idle mode.
     //
@@ -3646,7 +3646,7 @@ ScsiDiskWriteSectors (
       // it is invalid to request more sectors in the CDB than the entire
       // transfer (ie. ByteCount) can carry.
       //
-      // In addition, ByteCount is only expected to go down, or stay unchaged.
+      // In addition, ByteCount is only expected to go down, or stay unchanged.
       // Therefore we don't need to update Timeout: the original timeout should
       // accommodate shorter transfers too.
       //
@@ -3787,7 +3787,7 @@ ScsiDiskAsyncReadSectors (
     // we have to use the lowest transfer rate to calculate the possible
     // maximum timeout value for each operation.
     // From the above table, we could know 2.1Mbytes per second is lowest one.
-    // The timout value is rounded up to nearest integar and here an additional
+    // The timeout value is rounded up to nearest integer and here an additional
     // 30s is added to follow ATA spec in which it mentioned that the device
     // may take up to 30s to respond commands in the Standby/Idle mode.
     //
@@ -4004,7 +4004,7 @@ ScsiDiskAsyncWriteSectors (
     // we have to use the lowest transfer rate to calculate the possible
     // maximum timeout value for each operation.
     // From the above table, we could know 2.1Mbytes per second is lowest one.
-    // The timout value is rounded up to nearest integar and here an additional
+    // The timeout value is rounded up to nearest integer and here an additional
     // 30s is added to follow ATA spec in which it mentioned that the device
     // may take up to 30s to respond commands in the Standby/Idle mode.
     //
@@ -4143,10 +4143,10 @@ ScsiDiskRead10 (
   UINTN       Action;
 
   //
-  // Implement a backoff algorithem to resolve some compatibility issues that
+  // Implement a backoff algorithm to resolve some compatibility issues that
   // some SCSI targets or ATAPI devices couldn't correctly response reading/writing
   // big data in a single operation.
-  // This algorithem will at first try to execute original request. If the request fails
+  // This algorithm will at first try to execute original request. If the request fails
   // with media error sense data or else, it will reduce the transfer length to half and
   // try again till the operation succeeds or fails with one sector transfer length.
   //
@@ -4268,10 +4268,10 @@ ScsiDiskWrite10 (
   UINTN       Action;
 
   //
-  // Implement a backoff algorithem to resolve some compatibility issues that
+  // Implement a backoff algorithm to resolve some compatibility issues that
   // some SCSI targets or ATAPI devices couldn't correctly response reading/writing
   // big data in a single operation.
-  // This algorithem will at first try to execute original request. If the request fails
+  // This algorithm will at first try to execute original request. If the request fails
   // with media error sense data or else, it will reduce the transfer length to half and
   // try again till the operation succeeds or fails with one sector transfer length.
   //
@@ -4391,10 +4391,10 @@ ScsiDiskRead16 (
   UINTN       Action;
 
   //
-  // Implement a backoff algorithem to resolve some compatibility issues that
+  // Implement a backoff algorithm to resolve some compatibility issues that
   // some SCSI targets or ATAPI devices couldn't correctly response reading/writing
   // big data in a single operation.
-  // This algorithem will at first try to execute original request. If the request fails
+  // This algorithm will at first try to execute original request. If the request fails
   // with media error sense data or else, it will reduce the transfer length to half and
   // try again till the operation succeeds or fails with one sector transfer length.
   //
@@ -4515,10 +4515,10 @@ ScsiDiskWrite16 (
   UINTN       Action;
 
   //
-  // Implement a backoff algorithem to resolve some compatibility issues that
+  // Implement a backoff algorithm to resolve some compatibility issues that
   // some SCSI targets or ATAPI devices couldn't correctly response reading/writing
   // big data in a single operation.
-  // This algorithem will at first try to execute original request. If the request fails
+  // This algorithm will at first try to execute original request. If the request fails
   // with media error sense data or else, it will reduce the transfer length to half and
   // try again till the operation succeeds or fails with one sector transfer length.
   //

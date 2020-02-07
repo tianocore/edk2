@@ -185,7 +185,7 @@ extern EFI_COMPONENT_NAME2_PROTOCOL  gScsiDiskComponentName2;
 //
 // SCSI Disk Timeout Experience Value
 //
-// As ScsiDisk and ScsiBus driver are used to manage SCSI or ATAPI devices, the timout
+// As ScsiDisk and ScsiBus driver are used to manage SCSI or ATAPI devices, the timeout
 // value is updated to 30s to follow ATA/ATAPI spec in which the device may take up to 30s
 // to respond command.
 //
@@ -412,7 +412,7 @@ ScsiDiskComponentNameGetControllerName (
   @retval EFI_SUCCESS          The device was reset.
   @retval EFI_DEVICE_ERROR     The device is not functioning properly and could
                                not be reset.
-  @return EFI_STATUS is retured from EFI_SCSI_IO_PROTOCOL.ResetDevice().
+  @return EFI_STATUS is returned from EFI_SCSI_IO_PROTOCOL.ResetDevice().
 
 **/
 EFI_STATUS
@@ -464,7 +464,7 @@ ScsiDiskReadBlocks (
   @retval EFI_WRITE_PROTECTED   The device can not be written to.
   @retval EFI_DEVICE_ERROR      Fail to detect media.
   @retval EFI_NO_MEDIA          Media is not present.
-  @retval EFI_MEDIA_CHNAGED     Media has changed.
+  @retval EFI_MEDIA_CHANGED     Media has changed.
   @retval EFI_BAD_BUFFER_SIZE   The Buffer was not a multiple of the block size of the device.
   @retval EFI_INVALID_PARAMETER Invalid parameter passed in.
 
@@ -1010,7 +1010,7 @@ CheckTargetStatus (
 
   When encountering error during the process, if retrieve sense keys before
   error encountered, it returns the sense keys with return status set to EFI_SUCCESS,
-  and NeedRetry set to FALSE; otherwize, return the proper return status.
+  and NeedRetry set to FALSE; otherwise, return the proper return status.
 
   @param  ScsiDiskDevice     The pointer of SCSI_DISK_DEV
   @param  NeedRetry          The pointer of flag indicates if need a retry
@@ -1444,7 +1444,7 @@ ScsiDiskIsHardwareError (
   @param  SenseCounts  The number of sense key
 
   @retval TRUE   Media is changed.
-  @retval FALSE  Medit is NOT changed.
+  @retval FALSE  Media is NOT changed.
 **/
 BOOLEAN
 ScsiDiskIsMediaChange (

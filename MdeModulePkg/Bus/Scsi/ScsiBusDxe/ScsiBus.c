@@ -487,7 +487,7 @@ SCSIBusDriverBindingStart (
   } else {
     //
     // If RemainingDevicePath is the End of Device Path Node,
-    // skip enumerate any device and return EFI_SUCESSS
+    // skip enumerate any device and return EFI_SUCCESS
     //
     ScanOtherPuns = FALSE;
   }
@@ -644,7 +644,7 @@ SCSIBusDriverBindingStop (
              );
       //
       // When Start() succeeds to open ExtPassThru, it always tries to open PassThru BY_DRIVER.
-      // Its intent is to prevent another SCSI Bus Driver from woking on the same host handle.
+      // Its intent is to prevent another SCSI Bus Driver from working on the same host handle.
       // So Stop() needs to try to close PassThru if present here.
       //
       gBS->CloseProtocol (
@@ -1099,7 +1099,7 @@ ScsiExecuteSCSICommand (
 
   @param  This           Protocol instance pointer
   @param  Controller     Controller handle
-  @param  TargetId       Tartget to be scanned
+  @param  TargetId       Target to be scanned
   @param  Lun            The Lun of the SCSI device on the SCSI channel.
   @param  ScsiBusDev     The pointer of SCSI_BUS_DEVICE
 

@@ -50,7 +50,7 @@ typedef struct {
 } SCSI_EVENT_DATA;
 
 //
-// SCSI Bus Controller device strcuture
+// SCSI Bus Controller device structure
 //
 #define SCSI_BUS_DEVICE_SIGNATURE  SIGNATURE_32 ('s', 'c', 's', 'i')
 
@@ -450,7 +450,7 @@ ScsiExecuteSCSICommand (
 
   @param  This           Protocol instance pointer
   @param  Controller     Controller handle
-  @param  TargetId       Tartget to be scanned
+  @param  TargetId       Target to be scanned
   @param  Lun            The Lun of the SCSI device on the SCSI channel.
   @param  ScsiBusDev     The pointer of SCSI_BUS_DEVICE
 
