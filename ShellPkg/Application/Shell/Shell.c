@@ -1081,7 +1081,7 @@ ProcessCommandLine(
           }
         }
         //
-        // If an argumnent contains a space, then add double quotes before the argument
+        // If an argument contains a space, then add double quotes before the argument
         //
         if (StrStr (gEfiShellParametersProtocol->Argv[LoopVar], L" ") != NULL) {
           StrnCatGrow(&ShellInfoObject.ShellInitSettings.FileOptions,
@@ -1102,7 +1102,7 @@ ProcessCommandLine(
           return (EFI_OUT_OF_RESOURCES);
         }
         //
-        // If an argumnent contains a space, then add double quotes after the argument
+        // If an argument contains a space, then add double quotes after the argument
         //
         if (StrStr (gEfiShellParametersProtocol->Argv[LoopVar], L" ") != NULL) {
           StrnCatGrow(&ShellInfoObject.ShellInitSettings.FileOptions,
@@ -1176,7 +1176,7 @@ LocateStartupScript (
   }
 
   //
-  // Try to find 'Startup.nsh' in the execution path defined by the envrionment variable PATH.
+  // Try to find 'Startup.nsh' in the execution path defined by the environment variable PATH.
   //
   if ((StartupScriptPath == NULL) || EFI_ERROR (ShellIsFile (StartupScriptPath))) {
     SHELL_FREE_NON_NULL (StartupScriptPath);
@@ -2251,7 +2251,7 @@ SetLastError(
 }
 
 /**
-  Converts the command line to it's post-processed form.  this replaces variables and alias' per UEFI Shell spec.
+  Converts the command line to its post-processed form.  this replaces variables and alias' per UEFI Shell spec.
 
   @param[in,out] CmdLine        pointer to the command line to update
 

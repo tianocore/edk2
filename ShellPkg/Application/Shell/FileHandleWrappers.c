@@ -517,7 +517,7 @@ FileInterfaceStdInRead(
   gST->ConOut->QueryMode (gST->ConOut, gST->ConOut->Mode->Mode, &TotalColumn, &TotalRow);
 
   //
-  // Limit the line length to the buffer size or the minimun size of the
+  // Limit the line length to the buffer size or the minimum size of the
   // screen. (The smaller takes effect)
   //
   MaxStr = TotalColumn * (TotalRow - 1) - StartColumn;
@@ -865,7 +865,7 @@ FileInterfaceStdInRead(
       //
       if (Key.UnicodeChar != CHAR_BACKSPACE && !(Key.UnicodeChar == 0 && Key.ScanCode == SCAN_DELETE)) {
         //
-        // Calulate row and column of the tail of current string
+        // Calculate row and column of the tail of current string
         //
         TailRow     = Row + (StringLen - StringCurPos + Column + OutputLength) / TotalColumn;
         TailColumn  = (StringLen - StringCurPos + Column + OutputLength) % TotalColumn;
@@ -932,7 +932,7 @@ FileInterfaceStdInRead(
 }
 
 //
-// FILE sytle interfaces for StdIn/StdOut/StdErr
+// FILE style interfaces for StdIn/StdOut/StdErr
 //
 EFI_FILE_PROTOCOL FileInterfaceStdIn = {
   EFI_FILE_REVISION,
@@ -1069,7 +1069,7 @@ FileInterfaceEnvClose(
          ) {
         ((CHAR16*)NewBuffer)[TotalSize / sizeof (CHAR16) - 3] = CHAR_NULL;
         //
-        // If the NewBuffer end with \r\n\0, We will repace '\r' by '\0' and then update TotalSize.
+        // If the NewBuffer end with \r\n\0, We will replace '\r' by '\0' and then update TotalSize.
         //
         TotalSize -= sizeof(CHAR16) * 2;
       }

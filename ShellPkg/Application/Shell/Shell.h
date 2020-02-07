@@ -135,7 +135,7 @@ typedef struct {
 extern SHELL_INFO ShellInfoObject;
 
 /**
-  Converts the command line to it's post-processed form.  this replaces variables and alias' per UEFI Shell spec.
+  Converts the command line to its post-processed form.  this replaces variables and alias' per UEFI Shell spec.
 
   @param[in,out] CmdLine        pointer to the command line to update
 

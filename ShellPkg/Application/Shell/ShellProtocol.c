@@ -96,7 +96,7 @@ InternalShellProtocolIsSimpleFileSystemPresent(
 /**
   This function creates a mapping for a device path.
 
-  If both DeviecPath and Mapping are NULL, this will reset the mapping to default values.
+  If both DevicePath and Mapping are NULL, this will reset the mapping to default values.
 
   @param DevicePath             Points to the device path. If this is NULL and Mapping points to a valid mapping,
                                 then the mapping will be deleted.
@@ -152,7 +152,7 @@ EfiShellSetMap(
     } // for loop
 
     //
-    // We didnt find one to delete
+    // We didn't find one to delete
     //
     return (EFI_NOT_FOUND);
   }
@@ -232,7 +232,7 @@ EfiShellGetDevicePathFromMap(
   device path. If there is an exact match, the mapping is returned and *DevicePath
   points to the end-of-device-path node.
 
-  If there are multiple map names they will be semi-colon seperated in the
+  If there are multiple map names they will be semi-colon separated in the
   NULL-terminated string.
 
   @param DevicePath             On entry, points to a device path pointer. On
@@ -910,8 +910,8 @@ EfiShellBatchIsActive (
   @param Attributes               the File Attributes to use when creating a new file.
 
   @retval EFI_SUCCESS             the file is open and FileHandle is valid
-  @retval EFI_UNSUPPORTED         the device path cotained non-path elements
-  @retval other                   an error ocurred.
+  @retval EFI_UNSUPPORTED         the device path contained non-path elements
+  @retval other                   an error occurred.
 **/
 EFI_STATUS
 InternalOpenFileDevicePath(
@@ -946,7 +946,7 @@ InternalOpenFileDevicePath(
     Handle1 = ConvertShellHandleToEfiFileProtocol(ShellHandle);
     if (Handle1 != NULL) {
       //
-      // chop off the begining part before the file system part...
+      // chop off the beginning part before the file system part...
       //
       ///@todo BlockIo?
       Status = gBS->LocateDevicePath(&gEfiSimpleFileSystemProtocolGuid,
@@ -1064,14 +1064,14 @@ InternalOpenFileDevicePath(
   already exists and is non-volatile then EFI_INVALID_PARAMETER is returned.
 
   @param FileName           Pointer to NULL-terminated file path
-  @param FileAttribs        The new file's attrbiutes.  the different attributes are
+  @param FileAttribs        The new file's attributes.  the different attributes are
                             described in EFI_FILE_PROTOCOL.Open().
   @param FileHandle         On return, points to the created file handle or directory's handle
 
   @retval EFI_SUCCESS       The file was opened.  FileHandle points to the new file's handle.
   @retval EFI_INVALID_PARAMETER One of the parameters has an invalid value.
   @retval EFI_UNSUPPORTED   could not open the file path
-  @retval EFI_NOT_FOUND     the specified file could not be found on the devide, or could not
+  @retval EFI_NOT_FOUND     the specified file could not be found on the device, or could not
                             file the file system on the device.
   @retval EFI_NO_MEDIA      the device has no medium.
   @retval EFI_MEDIA_CHANGED The device has a different medium in it or the medium is no
@@ -1908,7 +1908,7 @@ typedef struct {
   @param[in] Node     The node to copy from.
   @param[in] Save     TRUE to set Node->Handle to NULL, FALSE otherwise.
 
-  @retval NULL        a memory allocation error ocurred
+  @retval NULL        a memory allocation error occurred
   @return != NULL     a pointer to the new node
 **/
 EFI_SHELL_FILE_INFO*
@@ -1960,7 +1960,7 @@ InternalDuplicateShellFileInfo(
   @param[in] Handle           Handle member initial value.
   @param[in] Info             Info struct to copy.
 
-  @retval NULL                An error ocurred.
+  @retval NULL                An error occurred.
   @return                     a pointer to the newly allocated structure.
 **/
 EFI_SHELL_FILE_INFO *
@@ -2120,7 +2120,7 @@ EfiShellFindFilesInDir(
     //
     ShellFileListItem = CreateAndPopulateShellFileInfo(
       BasePath,
-      EFI_SUCCESS,  // success since we didnt fail to open it...
+      EFI_SUCCESS,  // success since we didn't fail to open it...
       FileInfo->FileName,
       NULL,         // no handle since not open
       FileInfo);
@@ -2706,7 +2706,7 @@ EfiShellGetEnvEx(
         Status = SHELL_GET_ENVIRONMENT_VARIABLE_AND_ATTRIBUTES(Name, Attributes, &Size, Buffer);
       }
       //
-      // we didnt get it (might not exist)
+      // we didn't get it (might not exist)
       // free the memory if we allocated any and return NULL
       //
       if (EFI_ERROR(Status)) {
@@ -2927,7 +2927,7 @@ EfiShellGetCurDir(
                                 directory is changed.
   @param Dir                    Points to the NULL-terminated directory on the device specified by FileSystem.
 
-  @retval EFI_SUCCESS           The operation was sucessful
+  @retval EFI_SUCCESS           The operation was successful
   @retval EFI_NOT_FOUND         The file system could not be found
 **/
 EFI_STATUS
@@ -3179,12 +3179,12 @@ EfiShellIsRootShell(
 }
 
 /**
-  function to return a semi-colon delimeted list of all alias' in the current shell
+  function to return a semi-colon delimited list of all alias' in the current shell
 
   up to caller to free the memory.
 
   @retval NULL    No alias' were found
-  @retval NULL    An error ocurred getting alias'
+  @retval NULL    An error occurred getting alias'
   @return !NULL   a list of all alias'
 **/
 CHAR16 *
@@ -3287,7 +3287,7 @@ ToLower (
                                 If Alias is NULL, ReturnedData points to a ';'
                                 delimited list of alias (e.g.
                                 ReturnedData = "dir;del;copy;mfp") that is NULL-terminated.
-  @retval NULL                  an error ocurred
+  @retval NULL                  an error occurred
   @retval NULL                  Alias was not a valid Alias
 **/
 CONST CHAR16 *
@@ -3612,7 +3612,7 @@ CreatePopulateInstallShellProtocol (
                             (VOID*)(&mShellProtocol));
         if (!EFI_ERROR(Status)) {
           //
-          // we reinstalled sucessfully.  log this so we can reverse it later.
+          // we reinstalled successfully.  log this so we can reverse it later.
           //
 
           //
@@ -3759,7 +3759,7 @@ NotificationFunction(
   feature's enabled state was not known when the shell initially launched.
 
   @retval EFI_SUCCESS           The feature is enabled.
-  @retval EFI_OUT_OF_RESOURCES  There is not enough mnemory available.
+  @retval EFI_OUT_OF_RESOURCES  There is not enough memory available.
 **/
 EFI_STATUS
 InernalEfiShellStartMonitor(

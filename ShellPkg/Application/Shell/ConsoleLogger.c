@@ -310,9 +310,9 @@ UpdateDisplayFromHistory(
         StringSegment = &Screen[Column];
 
         //
-        // Find the first char with a different arrribute and make that temporarily NULL
+        // Find the first char with a different attribute and make that temporarily NULL
         // so we can do fewer printout statements.  (later) restore that one and we will
-        // start at that collumn on the next loop.
+        // start at that column on the next loop.
         //
         StringSegmentEndChar = CHAR_NULL;
         for ( StringSegmentEnd = StringSegment
@@ -395,7 +395,7 @@ UpdateDisplayFromHistory(
 }
 
 /**
-  Reset the text output device hardware and optionaly run diagnostics
+  Reset the text output device hardware and optionally run diagnostics
 
   @param  This                pointer to EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL
   @param ExtendedVerification Indicates that a more extensive test may be performed
@@ -723,7 +723,7 @@ ConsoleLoggerPrintWithPageBreak(
       ConsoleLoggerOutputStringSplit (LineStart, ConsoleInfo);
 
       //
-      // restore the temp NULL terminator to it's original character
+      // restore the temp NULL terminator to its original character
       //
       *((CHAR16*)(Walker+1)) = TempChar;
 
@@ -770,7 +770,7 @@ ConsoleLoggerPrintWithPageBreak(
         ConsoleLoggerOutputStringSplit (LineStart, ConsoleInfo);
 
         //
-        // restore the temp NULL terminator to it's original character
+        // restore the temp NULL terminator to its original character
         //
         *((CHAR16*)(Walker+1)) = TempChar;
 
@@ -1189,7 +1189,7 @@ ConsoleLoggerEnableCursor (
 
   @param[in] ConsoleInfo  The pointer to the instance of the console logger information.
 
-  This will be used when a mode has changed or a reset ocurred to verify all
+  This will be used when a mode has changed or a reset occurred to verify all
   history buffers.
 **/
 EFI_STATUS

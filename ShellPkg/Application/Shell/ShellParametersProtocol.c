@@ -69,13 +69,13 @@ FindEndOfParameter(
   This will also remove all remaining ^ characters after processing.
 
   @param[in, out] Walker          pointer to string of command line.  Adjusted to
-                                  reminaing command line on return
+                                  remaining command line on return
   @param[in, out] TempParameter   pointer to string of command line item extracted.
   @param[in]      Length          buffer size of TempParameter.
   @param[in]      StripQuotation  if TRUE then strip the quotation marks surrounding
                                   the parameters.
 
-  @return   EFI_INALID_PARAMETER  A required parameter was NULL or pointed to a NULL or empty string.
+  @return   EFI_INVALID_PARAMETER A required parameter was NULL or pointed to a NULL or empty string.
   @return   EFI_NOT_FOUND         A closing " could not be found on the specified string
 **/
 EFI_STATUS
@@ -126,7 +126,7 @@ DEBUG_CODE_END();
   StrnCpyS(*TempParameter, Length / sizeof(CHAR16), (*Walker), NextDelim - *Walker);
 
   //
-  // Add a CHAR_NULL if we didnt get one via the copy
+  // Add a CHAR_NULL if we didn't get one via the copy
   //
   if (*NextDelim != CHAR_NULL) {
     (*TempParameter)[NextDelim - *Walker] = CHAR_NULL;
@@ -184,7 +184,7 @@ DEBUG_CODE_END();
   @param[in, out] Argv            pointer to array of strings; one for each parameter
   @param[in, out] Argc            pointer to number of strings in Argv array
 
-  @return EFI_SUCCESS           the operation was sucessful
+  @return EFI_SUCCESS           the operation was successful
   @return EFI_OUT_OF_RESOURCES  a memory allocation failed.
 **/
 EFI_STATUS
@@ -416,7 +416,7 @@ CreatePopulateInstallShellParametersProtocol (
 }
 
 /**
-  frees all memory used by createion and installation of shell parameters protocol
+  frees all memory used by creation and installation of shell parameters protocol
   and if there was an old version installed it will restore that one.
 
   @param NewShellParameters the interface of EFI_SHELL_PARAMETERS_PROTOCOL that is
@@ -466,7 +466,7 @@ CleanUpShellParametersProtocol (
 }
 
 /**
-  Determin if a file name represents a unicode file.
+  Determine if a file name represents a unicode file.
 
   @param[in] FileName     Pointer to the filename to open.
 
@@ -526,7 +526,7 @@ StripQuotes (
 }
 
 /**
-  Calcualte the 32-bit CRC in a EFI table using the service provided by the
+  Calculate the 32-bit CRC in a EFI table using the service provided by the
   gRuntime service.
 
   @param  Hdr                    Pointer to an EFI standard header
@@ -651,7 +651,7 @@ WriteFileTag (
 
 
 /**
-  Funcion will replace the current StdIn and StdOut in the ShellParameters protocol
+  Function will replace the current StdIn and StdOut in the ShellParameters protocol
   structure by parsing NewCommandLine.  The current values are returned to the
   user.
 
@@ -664,7 +664,7 @@ WriteFileTag (
   @param[out] OldStdErr                  Pointer to old StdErr.
   @param[out] SystemTableInfo            Pointer to old system table information.
 
-  @retval   EFI_SUCCESS                 Operation was sucessful, Argv and Argc are valid.
+  @retval   EFI_SUCCESS                 Operation was successful, Argv and Argc are valid.
   @retval   EFI_OUT_OF_RESOURCES        A memory allocation failed.
 **/
 EFI_STATUS
@@ -1257,7 +1257,7 @@ UpdateStdInStdOutStdErr(
 }
 
 /**
-  Funcion will replace the current StdIn and StdOut in the ShellParameters protocol
+  Function will replace the current StdIn and StdOut in the ShellParameters protocol
   structure with StdIn and StdOut.  The current values are de-allocated.
 
   @param[in, out] ShellParameters      Pointer to parameter structure to modify.
@@ -1327,7 +1327,7 @@ RestoreStdInStdOutStdErr (
   return (EFI_SUCCESS);
 }
 /**
-  Funcion will replace the current Argc and Argv in the ShellParameters protocol
+  Function will replace the current Argc and Argv in the ShellParameters protocol
   structure by parsing NewCommandLine.  The current values are returned to the
   user.
 
@@ -1339,7 +1339,7 @@ RestoreStdInStdOutStdErr (
   @param[out] OldArgv                    Pointer to old list of parameters.
   @param[out] OldArgc                    Pointer to old number of items in Argv list.
 
-  @retval   EFI_SUCCESS                 Operation was sucessful, Argv and Argc are valid.
+  @retval   EFI_SUCCESS                 Operation was successful, Argv and Argc are valid.
   @retval   EFI_OUT_OF_RESOURCES        A memory allocation failed.
 **/
 EFI_STATUS
@@ -1375,7 +1375,7 @@ UpdateArgcArgv(
 }
 
 /**
-  Funcion will replace the current Argc and Argv in the ShellParameters protocol
+  Function will replace the current Argc and Argv in the ShellParameters protocol
   structure with Argv and Argc.  The current values are de-allocated and the
   OldArgv must not be deallocated by the caller.
 
