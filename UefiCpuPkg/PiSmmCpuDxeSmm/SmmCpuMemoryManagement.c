@@ -465,7 +465,7 @@ ConvertMemoryPageAttributes (
   }
 
   //
-  // Below logic is to check 2M/4K page to make sure we donot waist memory.
+  // Below logic is to check 2M/4K page to make sure we do not waste memory.
   //
   while (Length != 0) {
     PageEntry = GetPageTableEntry (BaseAddress, &PageAttribute);
@@ -1065,7 +1065,7 @@ IsUefiPageNotPresent (
 }
 
 /**
-  Merge continous memory map entries whose type is
+  Merge continuous memory map entries whose type is
   EfiLoaderCode/Data, EfiBootServicesCode/Data, EfiConventionalMemory,
   EfiUnusableMemory, EfiACPIReclaimMemory, because the memory described by
   these entries will be set as NOT present in SMM page table.
