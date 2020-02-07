@@ -118,7 +118,7 @@ FreeEnvironmentVariableList(
   @param[in, out] ListHead       The pointer to pointer to LIST ENTRY object for
                                  storing this list.
 
-  @retval EFI_SUCCESS           the list was created sucessfully.
+  @retval EFI_SUCCESS           the list was created successfully.
 **/
 EFI_STATUS
 GetEnvironmentVariableList(
@@ -233,7 +233,7 @@ GetEnvironmentVariableList(
   @param[in] ListHead           The pointer to LIST_ENTRY from
                                 GetShellEnvVarList().
 
-  @retval EFI_SUCCESS           the list was Set sucessfully.
+  @retval EFI_SUCCESS           the list was Set successfully.
 **/
 EFI_STATUS
 SetEnvironmentVariableList(
@@ -266,7 +266,7 @@ SetEnvironmentVariableList(
   FreeEnvironmentVariableList(&VarList.Link);
 
   //
-  // set all the variables fron the list
+  // set all the variables from the list
   //
   for ( Node = (ENV_VAR_LIST*)GetFirstNode(ListHead)
       ; !IsNull(ListHead, &Node->Link)
@@ -479,7 +479,7 @@ ShellAddEnvVarToList (
   }
 
   //
-  // If the environment varialbe key doesn't exist in list just insert
+  // If the environment variable key doesn't exist in list just insert
   // a new node.
   //
   LocalKey = AllocateCopyPool (StrSize(Key), Key);

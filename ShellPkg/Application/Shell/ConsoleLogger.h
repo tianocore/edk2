@@ -117,7 +117,7 @@ UpdateDisplayFromHistory(
   );
 
 /**
-  Reset the text output device hardware and optionaly run diagnostics
+  Reset the text output device hardware and optionally run diagnostics
 
   @param This                 Pointer to EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL
   @param ExtendedVerification Indicates that a more extensive test may be performed
@@ -305,7 +305,7 @@ ConsoleLoggerEnableCursor (
 
   @param[in] ConsoleInfo  The pointer to the instance of the console logger information.
 
-  This will be used when a mode has changed or a reset ocurred to verify all
+  This will be used when a mode has changed or a reset occurred to verify all
   history buffers.
 **/
 EFI_STATUS

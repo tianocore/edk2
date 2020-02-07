@@ -179,12 +179,12 @@ SearchPathForFile(
 }
 
 /**
-  parses through the MAN file specified by SHELL_FILE_HANDLE and returns the
-  detailed help for any sub section specified in the comma seperated list of
+  Parses through the MAN file specified by SHELL_FILE_HANDLE and returns the
+  detailed help for any sub section specified in the comma separated list of
   sections provided.  If the end of the file or a .TH section is found then
   return.
 
-  Upon a sucessful return the caller is responsible to free the memory in *HelpText
+  Upon a successful return the caller is responsible to free the memory in *HelpText
 
   @param[in] Handle             FileHandle to read from
   @param[in] Sections           name of command's sub sections to find
@@ -193,8 +193,8 @@ SearchPathForFile(
   @param[in] Ascii              TRUE if the file is ASCII, FALSE otherwise.
 
   @retval EFI_OUT_OF_RESOURCES  a memory allocation failed.
-  @retval EFI_SUCCESS           the section was found and its description sotred in
-                                an alloceted buffer.
+  @retval EFI_SUCCESS           the section was found and its description stored in
+                                an allocated buffer.
 **/
 EFI_STATUS
 ManFileFindSections(
@@ -296,11 +296,11 @@ ManFileFindSections(
 /**
   Parses a line from a MAN file to see if it is the Title Header. If it is, then
   if the "Brief Description" is desired, allocate a buffer for it and return a
-  copy. Upon a sucessful return the caller is responsible to free the memory in
+  copy. Upon a successful return the caller is responsible to free the memory in
   *BriefDesc
 
   Uses a simple state machine that allows "unlimited" whitespace before and after the
-  ".TH", compares Command and the MAN file commnd name without respect to case, and
+  ".TH", compares Command and the MAN file command name without respect to case, and
   allows "unlimited" whitespace and '0' and '1' characters before the Short Description.
   The PCRE regex describing this functionality is: ^\s*\.TH\s+(\S)\s[\s01]*(.*)$
   where group 1 is the Command Name and group 2 is the Short Description.
@@ -421,11 +421,11 @@ IsTitleHeader(
 }
 
 /**
-  parses through the MAN file specified by SHELL_FILE_HANDLE and returns the
+  Parses through the MAN file specified by SHELL_FILE_HANDLE and returns the
   "Brief Description" for the .TH section as specified by Command.  If the
   command section is not found return EFI_NOT_FOUND.
 
-  Upon a sucessful return the caller is responsible to free the memory in *BriefDesc
+  Upon a successful return the caller is responsible to free the memory in *BriefDesc
 
   @param[in] Handle              FileHandle to read from
   @param[in] Command             name of command's section to find as entered on the
@@ -512,7 +512,7 @@ ManFileFindTitleSection(
   information will be returned. If Sections is NULL, then all help text information
   available will be returned.
 
-  if BriefDesc is NULL, then the breif description will not be savedd seperatly,
+  if BriefDesc is NULL, then the breif description will not be saved separately,
   but placed first in the main HelpText.
 
   @param[in] ManFileName        Points to the NULL-terminated UEFI Shell MAN file name.
