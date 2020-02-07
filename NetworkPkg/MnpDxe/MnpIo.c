@@ -190,12 +190,12 @@ MnpBuildTxPacket (
 /**
   Synchronously send out the packet.
 
-  This functon places the packet buffer to SNP driver's tansmit queue. The packet
-  can be considered successfully sent out once SNP acccetp the packet, while the
+  This function places the packet buffer to SNP driver's tansmit queue. The packet
+  can be considered successfully sent out once SNP accept the packet, while the
   packet buffer recycle is deferred for better performance.
 
   @param[in]       MnpServiceData      Pointer to the mnp service context data.
-  @param[in]       Packet              Pointer to the pakcet buffer.
+  @param[in]       Packet              Pointer to the packet buffer.
   @param[in]       Length              The length of the packet.
   @param[in, out]  Token               Pointer to the token the packet generated from.
 
@@ -422,7 +422,7 @@ MnpDeliverPacket (
   packet.
 
   @param[in]  Event               The event this notify function registered to.
-  @param[in]  Context             Pointer to the context data registerd to the Event.
+  @param[in]  Context             Pointer to the context data registered to the Event.
 
 **/
 VOID

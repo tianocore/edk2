@@ -707,7 +707,7 @@ MnpCreateServiceData (
   //
   MnpServiceData = AllocateZeroPool (sizeof (MNP_SERVICE_DATA));
   if (MnpServiceData == NULL) {
-    DEBUG ((EFI_D_ERROR, "MnpCreateServiceData: Faild to allocate memory for the new Mnp Service Data.\n"));
+    DEBUG ((DEBUG_ERROR, "MnpCreateServiceData: Failed to allocate memory for the new Mnp Service Data.\n"));
 
     return NULL;
   }
@@ -742,7 +742,7 @@ MnpCreateServiceData (
                          &MnpServiceData->DevicePath
                          );
     if (MnpServiceHandle == NULL) {
-      DEBUG ((EFI_D_ERROR, "MnpCreateServiceData: Faild to create child handle.\n"));
+      DEBUG ((DEBUG_ERROR, "MnpCreateServiceData: Failed to create child handle.\n"));
 
       return NULL;
     }
@@ -1325,7 +1325,7 @@ MnpStop (
 
   if (MnpDeviceData->ConfiguredChildrenNumber > 0) {
     //
-    // If there are other configured chilren, return and keep the timers and
+    // If there are other configured children, return and keep the timers and
     // simple network unchanged.
     //
     return EFI_SUCCESS;
@@ -1402,7 +1402,7 @@ MnpFlushRcvdDataQueue (
 
   @param[in, out]  Instance     Pointer to the mnp instance context data.
   @param[in]       ConfigData   Pointer to the configuration data used to configure
-                                the isntance.
+                                the instance.
 
   @retval EFI_SUCCESS           The Instance is configured.
   @retval EFI_UNSUPPORTED       EnableReceiveTimestamps is on and the
@@ -1605,7 +1605,7 @@ MnpConfigReceiveFilters (
       EnableFilterBits |= EFI_SIMPLE_NETWORK_RECEIVE_MULTICAST;
 
       //
-      // Allocate pool for the mulicast addresses.
+      // Allocate pool for the multicast addresses.
       //
       MCastFilterCnt  = MnpDeviceData->GroupAddressCount;
       MCastFilter     = AllocatePool (sizeof (EFI_MAC_ADDRESS) * MCastFilterCnt);
@@ -1696,7 +1696,7 @@ MnpConfigReceiveFilters (
 
   @param[in, out]  Instance        Pointer to the mnp instance context data.
   @param[in, out]  CtrlBlk         Pointer to the group address control block.
-  @param[in, out]  GroupAddress    Pointer to the group adress.
+  @param[in, out]  GroupAddress    Pointer to the group address.
   @param[in]       MacAddress      Pointer to the mac address.
   @param[in]       HwAddressSize   The hardware address size.
 
@@ -1851,7 +1851,7 @@ MnpGroupOp (
 
   if (JoinFlag) {
     //
-    // A new gropu address is to be added.
+    // A new group address is to be added.
     //
     GroupAddress  = NULL;
     AddressExist  = FALSE;

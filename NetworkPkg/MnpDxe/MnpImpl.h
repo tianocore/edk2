@@ -284,7 +284,7 @@ MnpFlushRcvdDataQueue (
 
   @param[in, out]  Instance     Pointer to the mnp instance context data.
   @param[in]       ConfigData   Pointer to the configuration data used to configure
-                                the isntance.
+                                the instance.
 
   @retval EFI_SUCCESS           The Instance is configured.
   @retval EFI_UNSUPPORTED       EnableReceiveTimestamps is on and the
@@ -361,12 +361,12 @@ MnpBuildTxPacket (
 /**
   Synchronously send out the packet.
 
-  This functon places the packet buffer to SNP driver's tansmit queue. The packet
-  can be considered successfully sent out once SNP acccetp the packet, while the
+  This function places the packet buffer to SNP driver's tansmit queue. The packet
+  can be considered successfully sent out once SNP accept the packet, while the
   packet buffer recycle is deferred for better performance.
 
   @param[in]       MnpServiceData      Pointer to the mnp service context data.
-  @param[in]       Packet              Pointer to the pakcet buffer.
+  @param[in]       Packet              Pointer to the packet buffer.
   @param[in]       Length              The length of the packet.
   @param[in, out]  Token               Pointer to the token the packet generated from.
 
@@ -404,7 +404,7 @@ MnpInstanceDeliverPacket (
   packet.
 
   @param[in]  Event               The event this notify function registered to.
-  @param[in]  Context             Pointer to the context data registerd to the Event.
+  @param[in]  Context             Pointer to the context data registered to the Event.
 
 **/
 VOID
@@ -480,8 +480,8 @@ MnpAllocTxBuf (
 
   @param[in, out]  MnpDeviceData     Pointer to the mnp device context data.
 
-  @retval EFI_SUCCESS             Successed to recyclethe transmitted buffer address.
-  @retval Others                  Failed to recyclethe transmitted buffer address.
+  @retval EFI_SUCCESS             Successed to recycle the transmitted buffer address.
+  @retval Others                  Failed to recycle the transmitted buffer address.
 
 **/
 EFI_STATUS
