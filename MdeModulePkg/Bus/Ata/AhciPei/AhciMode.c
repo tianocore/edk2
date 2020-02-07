@@ -266,7 +266,7 @@ AhciWaitMemSet (
 
   do {
     //
-    // Access sytem memory to see if the value is the tested one.
+    // Access system memory to see if the value is the tested one.
     //
     // The system memory pointed by Address will be updated by the
     // SATA Host Controller, "volatile" is introduced to prevent
@@ -520,7 +520,7 @@ AhciBuildCommand (
 }
 
 /**
-  Buid a command FIS.
+  Build a command FIS.
 
   @param[in,out] CmdFis             A pointer to the EFI_AHCI_COMMAND_FIS data
                                     structure.
@@ -801,7 +801,7 @@ AhciPioTransfer (
   AhciWriteReg (AhciBar, Offset, Data64.Uint32.Upper32);
 
   //
-  // Single task envrionment, we only use one command table for all port
+  // Single task environment, we only use one command table for all port
   //
   Offset = AHCI_PORT_START + Port * AHCI_PORT_REG_WIDTH + AHCI_PORT_CLB;
   OldCmdListLo  = AhciReadReg (AhciBar, Offset);
@@ -1843,7 +1843,7 @@ AhciModeInitialization (
       if (EFI_ERROR (Status)) {
         DEBUG ((
           DEBUG_ERROR,
-          "%a: Error occured when waiting for the first D2H register FIS - %r\n",
+          "%a: Error occurred when waiting for the first D2H register FIS - %r\n",
           __FUNCTION__, Status
           ));
         continue;

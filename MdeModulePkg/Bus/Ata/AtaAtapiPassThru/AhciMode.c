@@ -219,7 +219,7 @@ AhciWaitMemSet (
 
   do {
     //
-    // Access sytem memory to see if the value is the tested one.
+    // Access system memory to see if the value is the tested one.
     //
     // The system memory pointed by Address will be updated by the
     // SATA Host Controller, "volatile" is introduced to prevent
@@ -581,7 +581,7 @@ AhciBuildCommand (
 }
 
 /**
-  Buid a command FIS.
+  Build a command FIS.
 
   @param  CmdFis            A pointer to the EFI_AHCI_COMMAND_FIS data structure.
   @param  AtaCommandBlock   A pointer to the AhciBuildCommandFis data structure.
@@ -997,7 +997,7 @@ AhciDmaTransfer (
   }
 
   //
-  // Wait for command compelte
+  // Wait for command complete
   //
   FisBaseAddr = (UINTN)AhciRegisters->AhciRFis + Port * sizeof (EFI_AHCI_RECEIVED_FIS);
   Offset      = FisBaseAddr + EFI_AHCI_D2H_FIS_OFFSET;
@@ -1903,7 +1903,7 @@ AhciCreateTransferDescriptor (
 
   PortImplementBitMap  = AhciReadReg(PciIo, EFI_AHCI_PI_OFFSET);
   //
-  // Get the highest bit of implemented ports which decides how many bytes are allocated for recived FIS.
+  // Get the highest bit of implemented ports which decides how many bytes are allocated for received FIS.
   //
   MaxPortNumber        = (UINT8)(UINTN)(HighBitSet32(PortImplementBitMap) + 1);
   if (MaxPortNumber == 0) {
@@ -1958,7 +1958,7 @@ AhciCreateTransferDescriptor (
 
   //
   // Allocate memory for command list
-  // Note that the implemenation is a single task model which only use a command list for all ports.
+  // Note that the implementation is a single task model which only use a command list for all ports.
   //
   Buffer = NULL;
   MaxCommandListSize = MaxCommandSlotNumber * sizeof (EFI_AHCI_COMMAND_LIST);
@@ -2713,7 +2713,7 @@ AhciModeInitialization (
       } else {
         continue;
       }
-      DEBUG ((EFI_D_INFO, "port [%d] port mulitplier [%d] has a [%a]\n",
+      DEBUG ((DEBUG_INFO, "port [%d] port multitplier [%d] has a [%a]\n",
               Port, 0, DeviceType == EfiIdeCdrom ? "cdrom" : "harddisk"));
 
       //
@@ -2761,7 +2761,7 @@ AhciModeInitialization (
       TransferMode.ModeNumber = (UINT8) (SupportedModes->PioMode.Mode);
 
       //
-      // Set supported DMA mode on this IDE device. Note that UDMA & MDMA cann't
+      // Set supported DMA mode on this IDE device. Note that UDMA & MDMA can't
       // be set together. Only one DMA mode can be set to a device. If setting
       // DMA mode operation fails, we can continue moving on because we only use
       // PIO mode at boot time. DMA modes are used by certain kind of OS booting
