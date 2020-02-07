@@ -96,7 +96,7 @@ Udp6DgramRcvd (
   );
 
 /**
-  This function cancle the token specified by Arg in the Map.
+  This function cancel the token specified by Arg in the Map.
 
   @param[in]  Map             Pointer to the NET_MAP.
   @param[in]  Item            Pointer to the NET_MAP_ITEM.
@@ -458,7 +458,7 @@ Udp6CheckTimeout (
 
 
 /**
-  This function intializes the new created udp instance.
+  This function initializes the new created udp instance.
 
   @param[in]       Udp6Service      Pointer to the UDP6_SERVICE_DATA.
   @param[in, out]  Instance         Pointer to the un-initialized UDP6_INSTANCE_DATA.
@@ -575,7 +575,7 @@ Udp6FindInstanceByPort (
 
 /**
   This function tries to bind the udp instance according to the configured port
-  allocation stragety.
+  allocation strategy.
 
   @param[in]  InstanceList       Pointer to the head of the list linking the udp
                                  instances.
@@ -832,7 +832,7 @@ Udp6ValidateTxToken (
 
     if ((UdpSessionData->DestinationPort == 0) && (ConfigData->RemotePort == 0)) {
       //
-      // Ambiguous; no avalaible DestinationPort for this token.
+      // Ambiguous; no available DestinationPort for this token.
       //
       return EFI_INVALID_PARAMETER;
     }
@@ -841,7 +841,7 @@ Udp6ValidateTxToken (
         NetIp6IsUnspecifiedAddr (&ConfigData->RemoteAddress)
         ) {
       //
-      // The DestinationAddress is not specificed.
+      // The DestinationAddress is not specified.
       //
       return EFI_INVALID_PARAMETER;
     }
@@ -915,7 +915,7 @@ Udp6TokenExist (
   pseudo HeadSum to reduce some overhead.
 
   @param[in]  Packet           Pointer to the NET_BUF contains the udp datagram.
-  @param[in]  HeadSum          Checksum of the pseudo header, execpt the length
+  @param[in]  HeadSum          Checksum of the pseudo header, except the length
                                field.
 
   @return The 16-bit checksum of this udp datagram.
@@ -1123,7 +1123,7 @@ Udp6LeaveGroup (
 
 
 /**
-  This function cancle the token specified by Arg in the Map.
+  This function cancel the token specified by Arg in the Map.
 
   @param[in]  Map             Pointer to the NET_MAP.
   @param[in]  Item            Pointer to the NET_MAP_ITEM.
@@ -1276,7 +1276,7 @@ Udp6InstanceCancelToken (
                                  from the received udp datagram.
 
   @retval TRUE     The udp datagram matches the receiving requirements of the Instance.
-  @retval FALSE    The udp datagram does not matche the receiving requirements of the Instance.
+  @retval FALSE    The udp datagram does not match the receiving requirements of the Instance.
 
 **/
 BOOLEAN
@@ -1814,7 +1814,7 @@ Udp6SendPortUnreach (
     );
 
   //
-  // Set the checksum as zero, and IP6 driver will calcuate it with pseudo header.
+  // Set the checksum as zero, and IP6 driver will calculate it with pseudo header.
   //
   IcmpErrHdr->Head.Checksum = 0;
 
