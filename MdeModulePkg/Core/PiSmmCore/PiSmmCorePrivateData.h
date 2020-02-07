@@ -65,7 +65,7 @@ typedef struct {
 
   ///
   /// The SMM Foundation Entry Point.  The SMM Core fills in this field when the
-  /// SMM Core is initialized.  The SMM IPL is responsbile for registering this entry
+  /// SMM Core is initialized.  The SMM IPL is responsible for registering this entry
   /// point with the SMM Configuration Protocol.  The SMM Configuration Protocol may
   /// not be available at the time the SMM IPL and SMM Core are started, so the SMM IPL
   /// sets up a protocol notification on the SMM Configuration Protocol and registers
@@ -92,14 +92,14 @@ typedef struct {
   EFI_SMM_SYSTEM_TABLE2           *Smst;
 
   ///
-  /// This field is used by the SMM Communicatioon Protocol to pass a buffer into
+  /// This field is used by the SMM Communication Protocol to pass a buffer into
   /// a software SMI handler and for the software SMI handler to pass a buffer back to
   /// the caller of the SMM Communication Protocol.
   ///
   VOID                            *CommunicationBuffer;
 
   ///
-  /// This field is used by the SMM Communicatioon Protocol to pass the size of a buffer,
+  /// This field is used by the SMM Communication Protocol to pass the size of a buffer,
   /// in bytes, into a software SMI handler and for the software SMI handler to pass the
   /// size, in bytes, of a buffer back to the caller of the SMM Communication Protocol.
   ///

@@ -39,7 +39,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // For a normal configuration of system with 4G memory, two levels of tables
 // can track the whole memory, because two levels (L3+L4) of map tables have
-// already coverred 37-bit of memory address. And for a normal UEFI BIOS,
+// already covered 37-bit of memory address. And for a normal UEFI BIOS,
 // less than 128M memory would be consumed during boot. That means we just
 // need
 //

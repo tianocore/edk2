@@ -34,7 +34,7 @@ IHANDLE *
 /**
   Routine to get the next Handle, when you are searching for all handles.
 
-  @param  Position               Information about which Handle to seach for.
+  @param  Position               Information about which Handle to search for.
   @param  Interface              Return the interface structure for the matching
                                  protocol.
 
@@ -70,7 +70,7 @@ SmmGetNextLocateAllHandles (
   Routine to get the next Handle, when you are searching for register protocol
   notifies.
 
-  @param  Position               Information about which Handle to seach for.
+  @param  Position               Information about which Handle to search for.
   @param  Interface              Return the interface structure for the matching
                                  protocol.
 
@@ -116,7 +116,7 @@ SmmGetNextLocateByRegisterNotify (
 /**
   Routine to get the next Handle, when you are searching for a given protocol.
 
-  @param  Position               Information about which Handle to seach for.
+  @param  Position               Information about which Handle to search for.
   @param  Interface              Return the interface structure for the matching
                                  protocol.
 
@@ -173,7 +173,7 @@ SmmGetNextLocateByProtocol (
 /**
   Return the first Protocol Interface that matches the Protocol GUID. If
   Registration is pasased in return a Protocol Instance that was just add
-  to the system. If Retistration is NULL return the first Protocol Interface
+  to the system. If Registration is NULL return the first Protocol Interface
   you find.
 
   @param  Protocol               The protocol to search for

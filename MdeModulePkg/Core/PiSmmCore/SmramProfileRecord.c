@@ -78,7 +78,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_DEVICE_PATH_PROTOCOL *mSmramProfileDriverPath;
 GLOBAL_REMOVE_IF_UNREFERENCED UINTN                    mSmramProfileDriverPathSize;
 
 /**
-  Dump SMRAM infromation.
+  Dump SMRAM information.
 
 **/
 VOID
@@ -2797,7 +2797,7 @@ DumpSmramProfile (
 }
 
 /**
-  Dump SMRAM infromation.
+  Dump SMRAM information.
 
 **/
 VOID
