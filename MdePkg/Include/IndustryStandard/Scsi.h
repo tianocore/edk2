@@ -154,7 +154,7 @@
 #define EFI_SCSI_OP_SEND_VOL_TAG      0xb6
 
 //
-// Additional commands for Communition Devices
+// Additional commands for Communication Devices
 //
 #define EFI_SCSI_OP_GET_MESSAGE6    0x08
 #define EFI_SCSI_OP_GET_MESSAGE10   0x28
