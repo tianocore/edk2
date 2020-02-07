@@ -192,7 +192,7 @@ BotDataPhase (
   TransferredSize = 0;
 
   //
-  // retrieve the the max packet length of the given endpoint
+  // retrieve the max packet length of the given endpoint
   //
   if (Direction == EfiUsbDataIn) {
     MaxPacketLen  = (PeiBotDev->BulkInEndpoint)->MaxPacketSize;
