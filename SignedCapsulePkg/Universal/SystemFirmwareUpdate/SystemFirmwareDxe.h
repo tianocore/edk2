@@ -113,7 +113,7 @@ typedef struct {
 
 #define  ABORT_REASON_MAX_SIZE              0x40  // UnicodeStringSize including final L'\0'
 
-#define  CAPSULE_IMAGE_ADDITIONAL_MAX_SIZE  (0x20020 + 0xA0000) // Addtional size for Capsule Header, FV block alignment + DispatchImage.
+#define  CAPSULE_IMAGE_ADDITIONAL_MAX_SIZE  (0x20020 + 0xA0000) // Additional size for Capsule Header, FV block alignment + DispatchImage.
 
 typedef struct {
   UINT8       ImageIndex;

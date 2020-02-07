@@ -153,7 +153,7 @@ ParseUpdateDataFile (
     (*UpdateArray)[Index].BaseAddress = (EFI_PHYSICAL_ADDRESS) Num64;
 
     //
-    // FileBuid
+    // FileGuid
     //
     Status = GetGuidFromDataFile(
                Context,
