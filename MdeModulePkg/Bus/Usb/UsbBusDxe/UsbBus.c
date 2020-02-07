@@ -96,10 +96,10 @@ UsbIoControlTransfer (
              UsbStatus
              );
   //
-  // If the request completed sucessfully and the Direction of the request is
+  // If the request completed successfully and the Direction of the request is
   // EfiUsbDataIn or EfiUsbDataOut, then make sure the actual number of bytes
-  // transfered is the same as the number of bytes requested.  If a different
-  // number of bytes were transfered, then return EFI_DEVICE_ERROR.
+  // transferred is the same as the number of bytes requested.  If a different
+  // number of bytes were transferred, then return EFI_DEVICE_ERROR.
   //
   if (!EFI_ERROR (Status)) {
     if (Direction != EfiUsbNoData && DataLength != RequestedDataLength) {
@@ -389,7 +389,7 @@ ON_EXIT:
                                  the request.
   @param  PollInterval           The interval to poll the transfer result, (in ms).
   @param  DataLength             The length of perodic data transfer.
-  @param  Callback               The function to call periodicaly when transfer is
+  @param  Callback               The function to call periodically when transfer is
                                  ready.
   @param  Context                The context to the callback.
 
@@ -490,7 +490,7 @@ UsbIoIsochronousTransfer (
   @param  DeviceEndpoint         The device endpoint.
   @param  Data                   The data to transfer.
   @param  DataLength             The length of perodic data transfer.
-  @param  IsochronousCallBack    The function to call periodicaly when transfer is
+  @param  IsochronousCallBack    The function to call periodically when transfer is
                                  ready.
   @param  Context                The context to the callback.
 
@@ -1355,7 +1355,7 @@ UsbBusControllerDriverStart (
       if (IsDevicePathEnd (RemainingDevicePath)) {
         //
         // If RemainingDevicePath is the End of Device Path Node,
-        // skip enumerate any device and return EFI_SUCESSS
+        // skip enumerate any device and return EFI_SUCCESS
         //
         return EFI_SUCCESS;
       }

@@ -131,7 +131,7 @@ PeiUsbControlTransfer (
   @param  DeviceEndpoint        Endpoint number and its direction in bit 7.
   @param  Data                  A pointer to the buffer of data to transmit
                                 from or receive into.
-  @param  DataLength            The lenght of the data buffer.
+  @param  DataLength            The length of the data buffer.
   @param  Timeout               Indicates the maximum time, in millisecond, which the
                                 transfer is allowed to complete. If Timeout is 0, then
                                 the caller must wait for the function to be completed

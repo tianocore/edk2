@@ -757,7 +757,7 @@ UsbEnumerateNewDev (
 
   //
   // After port is reset, hub establishes a signal path between
-  // the device and host (DEFALUT state). Device's registers are
+  // the device and host (DEFAULT state). Device's registers are
   // reset, use default address 0 (host enumerates one device at
   // a time) , and ready to respond to control transfer at EP 0.
   //
