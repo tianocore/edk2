@@ -484,33 +484,33 @@ typedef union {
 //
 // ATA Packet Command Code
 //
-#define ATA_CMD_FORMAT_UNIT                             0x04   ///< defined in ATAPI Removable Rewritable Media Devcies
+#define ATA_CMD_FORMAT_UNIT                             0x04   ///< defined in ATAPI Removable Rewritable Media Devices
 #define ATA_CMD_SOFT_RESET                              0x08   ///< defined from ATA-3
 #define ATA_CMD_PACKET                                  0xA0   ///< defined from ATA-3
 #define ATA_CMD_IDENTIFY_DEVICE                         0xA1   ///< defined from ATA-3
 #define ATA_CMD_SERVICE                                 0xA2   ///< defined from ATA-3
 #define ATA_CMD_TEST_UNIT_READY                         0x00   ///< defined from ATA-1
 #define ATA_CMD_REQUEST_SENSE                           0x03   ///< defined from ATA-4
-#define ATA_CMD_INQUIRY                                 0x12   ///< defined in ATAPI Removable Rewritable Media Devcies
-#define ATA_CMD_READ_FORMAT_CAPACITY                    0x23   ///< defined in ATAPI Removable Rewritable Media Devcies
-#define ATA_CMD_READ_CAPACITY                           0x25   ///< defined in ATAPI Removable Rewritable Media Devcies
-#define ATA_CMD_READ_10                                 0x28   ///< defined in ATAPI Removable Rewritable Media Devcies
-#define ATA_CMD_WRITE_10                                0x2A   ///< defined in ATAPI Removable Rewritable Media Devcies
-#define ATA_CMD_ATAPI_SEEK                              0x2B   ///< defined in ATAPI Removable Rewritable Media Devcies
-#define ATA_CMD_WRITE_AND_VERIFY                        0x2E   ///< defined in ATAPI Removable Rewritable Media Devcies
-#define ATA_CMD_VERIFY                                  0x2F   ///< defined in ATAPI Removable Rewritable Media Devcies
-#define ATA_CMD_READ_12                                 0xA8   ///< defined in ATAPI Removable Rewritable Media Devcies
-#define ATA_CMD_WRITE_12                                0xAA   ///< defined in ATAPI Removable Rewritable Media Devcies
-#define ATA_CMD_START_STOP_UNIT                         0x1B   ///< defined in ATAPI Removable Rewritable Media Devcies
-#define ATA_CMD_PREVENT_ALLOW_MEDIA_REMOVAL             0x1E   ///< defined in ATAPI Removable Rewritable Media Devcies
-#define ATA_CMD_MODE_SELECT                             0x55   ///< defined in ATAPI Removable Rewritable Media Devcies
+#define ATA_CMD_INQUIRY                                 0x12   ///< defined in ATAPI Removable Rewritable Media Devices
+#define ATA_CMD_READ_FORMAT_CAPACITY                    0x23   ///< defined in ATAPI Removable Rewritable Media Devices
+#define ATA_CMD_READ_CAPACITY                           0x25   ///< defined in ATAPI Removable Rewritable Media Devices
+#define ATA_CMD_READ_10                                 0x28   ///< defined in ATAPI Removable Rewritable Media Devices
+#define ATA_CMD_WRITE_10                                0x2A   ///< defined in ATAPI Removable Rewritable Media Devices
+#define ATA_CMD_ATAPI_SEEK                              0x2B   ///< defined in ATAPI Removable Rewritable Media Devices
+#define ATA_CMD_WRITE_AND_VERIFY                        0x2E   ///< defined in ATAPI Removable Rewritable Media Devices
+#define ATA_CMD_VERIFY                                  0x2F   ///< defined in ATAPI Removable Rewritable Media Devices
+#define ATA_CMD_READ_12                                 0xA8   ///< defined in ATAPI Removable Rewritable Media Devices
+#define ATA_CMD_WRITE_12                                0xAA   ///< defined in ATAPI Removable Rewritable Media Devices
+#define ATA_CMD_START_STOP_UNIT                         0x1B   ///< defined in ATAPI Removable Rewritable Media Devices
+#define ATA_CMD_PREVENT_ALLOW_MEDIA_REMOVAL             0x1E   ///< defined in ATAPI Removable Rewritable Media Devices
+#define ATA_CMD_MODE_SELECT                             0x55   ///< defined in ATAPI Removable Rewritable Media Devices
 
-#define ATA_CMD_MODE_SENSE                              0x5A   ///< defined in ATAPI Removable Rewritable Media Devcies
-    #define ATA_PAGE_CODE_READ_WRITE_ERROR                  0x01   ///< defined in ATAPI Removable Rewritable Media Devcies
-    #define ATA_PAGE_CODE_CACHING_PAGE                      0x08   ///< defined in ATAPI Removable Rewritable Media Devcies
-    #define ATA_PAGE_CODE_REMOVABLE_BLOCK_CAPABILITIES      0x1B   ///< defined in ATAPI Removable Rewritable Media Devcies
-    #define ATA_PAGE_CODE_TIMER_PROTECT_PAGE                0x1C   ///< defined in ATAPI Removable Rewritable Media Devcies
-    #define ATA_PAGE_CODE_RETURN_ALL_PAGES                  0x3F   ///< defined in ATAPI Removable Rewritable Media Devcies
+#define ATA_CMD_MODE_SENSE                              0x5A   ///< defined in ATAPI Removable Rewritable Media Devices
+    #define ATA_PAGE_CODE_READ_WRITE_ERROR                  0x01   ///< defined in ATAPI Removable Rewritable Media Devices
+    #define ATA_PAGE_CODE_CACHING_PAGE                      0x08   ///< defined in ATAPI Removable Rewritable Media Devices
+    #define ATA_PAGE_CODE_REMOVABLE_BLOCK_CAPABILITIES      0x1B   ///< defined in ATAPI Removable Rewritable Media Devices
+    #define ATA_PAGE_CODE_TIMER_PROTECT_PAGE                0x1C   ///< defined in ATAPI Removable Rewritable Media Devices
+    #define ATA_PAGE_CODE_RETURN_ALL_PAGES                  0x3F   ///< defined in ATAPI Removable Rewritable Media Devices
 
 #define ATA_CMD_GET_CONFIGURATION                       0x46   ///< defined in ATAPI Multimedia Devices
    #define ATA_GCCD_RT_FIELD_VALUE_ALL                      0x00   ///< defined in ATAPI Multimedia Devices

@@ -1281,7 +1281,7 @@ typedef struct {
   ///
   UINT64                                          ExitBootServicesEntry;
   ///
-  /// Timer value logged at the point just prior towhen the OS loader gaining
+  /// Timer value logged at the point just prior to when the OS loader gaining
   /// control back from calls the ExitBootServices function for UEFI compatible firmware.
   /// For non-UEFI compatible boots, this field must be zero.
   ///
@@ -1650,13 +1650,13 @@ typedef struct {
 #define EFI_ACPI_6_2_SECURE_DEVICES_TABLE_REVISION      0x01
 
 ///
-/// Secure Devcice types
+/// Secure Device types
 ///
 #define EFI_ACPI_6_2_SDEV_TYPE_PCIE_ENDPOINT_DEVICE     0x01
 #define EFI_ACPI_6_2_SDEV_TYPE_ACPI_NAMESPACE_DEVICE    0x00
 
 ///
-/// Secure Devcice flags
+/// Secure Device flags
 ///
 #define EFI_ACPI_6_2_SDEV_FLAG_ALLOW_HANDOFF            BIT0
 
@@ -2890,7 +2890,7 @@ typedef struct {
 #define EFI_ACPI_6_2_SOFTWARE_LICENSING_TABLE_SIGNATURE  SIGNATURE_32('S', 'L', 'I', 'C')
 
 ///
-/// "SPCR" Serial Port Concole Redirection Table
+/// "SPCR" Serial Port Console Redirection Table
 ///
 #define EFI_ACPI_6_2_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_SIGNATURE  SIGNATURE_32('S', 'P', 'C', 'R')
 

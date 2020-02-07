@@ -37,7 +37,7 @@ typedef struct {
 #pragma pack()
 
 //
-// Define for Desriptor
+// Define for Descriptor
 //
 #define ACPI_SMALL_ITEM_FLAG                   0x00
 #define ACPI_LARGE_ITEM_FLAG                   0x01
@@ -109,7 +109,7 @@ typedef struct {
 #pragma pack(1)
 
 ///
-/// The commond definition of QWORD, DWORD, and WORD
+/// The common definition of QWORD, DWORD, and WORD
 /// Address Space Descriptors.
 ///
 typedef PACKED struct {

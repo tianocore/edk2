@@ -127,12 +127,12 @@
 //
 
 //
-//  Definitions for Prepare for Discoveery command
+//  Definitions for Prepare for Discovery command
 //
 #define IPMI_BRIDGE_PREPARE_FOR_DISCOVERY  0x10
 
 //
-//  Constants and Structure definitions for "Prepare for Discoveery" command to follow here
+//  Constants and Structure definitions for "Prepare for Discovery" command to follow here
 //
 
 //

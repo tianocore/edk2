@@ -5,7 +5,7 @@
     PCI Local Bus Specification, 2.2
     PCI-to-PCI Bridge Architecture Specification, Revision 1.2
     PC Card Standard, 8.0
-    PCI Power Management Interface Specifiction, Revision 1.2
+    PCI Power Management Interface Specification, Revision 1.2
 
   Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2014 - 2015, Hewlett-Packard Development Company, L.P.<BR>
@@ -111,11 +111,11 @@ typedef union {
 } PCI_TYPE_GENERIC;
 
 ///
-/// CardBus Conroller Configuration Space,
+/// CardBus Controller Configuration Space,
 /// Section 4.5.1, PC Card Standard. 8.0
 ///
 typedef struct {
-  UINT32  CardBusSocketReg;     ///< Cardus Socket/ExCA Base
+  UINT32  CardBusSocketReg;     ///< Cardbus Socket/ExCA Base
   UINT8   Cap_Ptr;
   UINT8   Reserved;
   UINT16  SecondaryStatus;      ///< Secondary Status
@@ -222,7 +222,7 @@ typedef struct {
 #define     PCI_IF_8259_PIC               0x00
 #define     PCI_IF_ISA_PIC                0x01
 #define     PCI_IF_EISA_PIC               0x02
-#define     PCI_IF_APIC_CONTROLLER        0x10  ///< I/O APIC interrupt controller , 32 bye none-prefectable memory.
+#define     PCI_IF_APIC_CONTROLLER        0x10  ///< I/O APIC interrupt controller , 32 byte none-prefetchable memory.
 #define     PCI_IF_APIC_CONTROLLER2       0x20
 #define   PCI_SUBCLASS_DMA              0x01
 #define     PCI_IF_8237_DMA               0x00
@@ -509,7 +509,7 @@ typedef struct {
 #define IS_PCI_MULTI_FUNC(_p)         ((_p)->Hdr.HeaderType & HEADER_TYPE_MULTI_FUNCTION)
 
 ///
-/// Rom Base Address in Bridge, defined in PCI-to-PCI Bridge Architecure Specification,
+/// Rom Base Address in Bridge, defined in PCI-to-PCI Bridge Architecture Specification,
 ///
 #define PCI_BRIDGE_ROMBAR             0x38
 
@@ -642,7 +642,7 @@ typedef struct {
 
 ///
 /// PMC - Power Management Capabilities
-/// Section 3.2.3, PCI Power Management Interface Specifiction, Revision 1.2
+/// Section 3.2.3, PCI Power Management Interface Specification, Revision 1.2
 ///
 typedef union {
   struct {
@@ -662,7 +662,7 @@ typedef union {
 
 ///
 /// PMCSR - Power Management Control/Status
-/// Section 3.2.4, PCI Power Management Interface Specifiction, Revision 1.2
+/// Section 3.2.4, PCI Power Management Interface Specification, Revision 1.2
 ///
 typedef union {
   struct {
@@ -685,7 +685,7 @@ typedef union {
 
 ///
 /// PMCSR_BSE - PMCSR PCI-to-PCI Bridge Support Extensions
-/// Section 3.2.5, PCI Power Management Interface Specifiction, Revision 1.2
+/// Section 3.2.5, PCI Power Management Interface Specification, Revision 1.2
 ///
 typedef union {
   struct {
@@ -698,7 +698,7 @@ typedef union {
 
 ///
 /// Power Management Register Block Definition
-/// Section 3.2, PCI Power Management Interface Specifiction, Revision 1.2
+/// Section 3.2, PCI Power Management Interface Specification, Revision 1.2
 ///
 typedef struct {
   EFI_PCI_CAPABILITY_HDR  Hdr;
@@ -732,7 +732,7 @@ typedef struct {
 
 ///
 /// Slot Numbering Capabilities Register
-/// Section 3.2.6, PCI-to-PCI Bridge Architeture Specification, Revision 1.2
+/// Section 3.2.6, PCI-to-PCI Bridge Architecture Specification, Revision 1.2
 ///
 typedef struct {
   EFI_PCI_CAPABILITY_HDR  Hdr;

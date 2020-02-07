@@ -309,11 +309,11 @@ typedef struct {
   UINT32 Exlat;             /* Exit Latency */
   UINT8  Rrt:5;             /* Relative Read Throughput */
   UINT8  Rsvd3:3;           /* Reserved as of Nvm Express 1.1 Spec */
-  UINT8  Rrl:5;             /* Relative Read Leatency */
+  UINT8  Rrl:5;             /* Relative Read Latency */
   UINT8  Rsvd4:3;           /* Reserved as of Nvm Express 1.1 Spec */
   UINT8  Rwt:5;             /* Relative Write Throughput */
   UINT8  Rsvd5:3;           /* Reserved as of Nvm Express 1.1 Spec */
-  UINT8  Rwl:5;             /* Relative Write Leatency */
+  UINT8  Rwl:5;             /* Relative Write Latency */
   UINT8  Rsvd6:3;           /* Reserved as of Nvm Express 1.1 Spec */
   UINT8  Rsvd7[16];         /* Reserved as of Nvm Express 1.1 Spec */
 } NVME_PSDESCRIPTOR;
@@ -329,7 +329,7 @@ typedef struct {
   UINT16 Ssvid;               /* PCI sub-system vendor ID */
   UINT8  Sn[20];              /* Product serial number */
 
-  UINT8  Mn[40];              /* Proeduct model number */
+  UINT8  Mn[40];              /* Product model number */
   UINT8  Fr[8];               /* Firmware Revision */
   UINT8  Rab;                 /* Recommended Arbitration Burst */
   UINT8  Ieee_oui[3];         /* Organization Unique Identifier */
@@ -657,7 +657,7 @@ typedef union {
 //
 typedef struct {
   //
-  // CDW 0, Common to all comnmands
+  // CDW 0, Common to all commands
   //
   UINT8  Opc;               // Opcode
   UINT8  Fuse:2;            // Fused Operation
@@ -869,7 +869,7 @@ typedef struct {
   //
   UINT8  AvailableSpareThreshold;
   //
-  // Contains a vendor specific estimate of the percentage of NVM subsystem life used based on the actual usage and the manufacturer?s prediction of NVM life. A value of 100 indicates that the estimated endurance of the NVM in the NVM subsystem has been consumed, but may not indicate an NVM subsystem failure. The value is allowed to exceed 100. Percentages greater than 254 shall be represented as 255. This value shall be updated once per power-on hour (when the controller is not in a sleep state).
+  // Contains a vendor specific estimate of the percentage of NVM subsystem life used based on the actual usage and the manufacturer's prediction of NVM life. A value of 100 indicates that the estimated endurance of the NVM in the NVM subsystem has been consumed, but may not indicate an NVM subsystem failure. The value is allowed to exceed 100. Percentages greater than 254 shall be represented as 255. This value shall be updated once per power-on hour (when the controller is not in a sleep state).
   //
   UINT8  PercentageUsed;
   UINT8  Reserved1[26];
