@@ -257,7 +257,7 @@ PeiLoadFixAddressIsMemoryRangeAvailable (
 
   This function should only be invoked when Loading Module at Fixed Address(LMFA) feature is enabled. When feature is
   configured as Load Modules at Fix Absolute Address, this function is to validate the top address assigned by user. When
-  feature is configured as Load Modules at Fixed Offset, the functino is to find the top address which is TOLM-TSEG in general.
+  feature is configured as Load Modules at Fixed Offset, the function is to find the top address which is TOLM-TSEG in general.
   And also the function will re-install PEI memory.
 
   @param PrivateData         Pointer to the private data passed in from caller
@@ -604,7 +604,7 @@ PeiLoadFixAddressHook(
        );
     }
     //
-    // Delete CurrentHob by marking it as unused since the the memory range described by is rebuilt.
+    // Delete CurrentHob by marking it as unused since the memory range described by is rebuilt.
     //
     GET_HOB_TYPE (CurrentHob) = EFI_HOB_TYPE_UNUSED;
   }
@@ -751,7 +751,7 @@ PeiCheckAndSwitchStack (
 
     //
     // Calculate stack offset and heap offset between temporary memory and new permanent
-    // memory seperately.
+    // memory separately.
     //
     TopOfOldStack = (UINTN)SecCoreData->StackBase + SecCoreData->StackSize;
     TopOfNewStack = Private->PhysicalMemoryBegin + NewStackSize;
@@ -1229,7 +1229,7 @@ PeiDispatcher (
 
       //
       // Before walking through the next FV, we should set them to NULL/0 to
-      // start at the begining of the next FV.
+      // start at the beginning of the next FV.
       //
       Private->CurrentFileHandle = NULL;
       Private->CurrentPeimCount = 0;
@@ -1259,7 +1259,7 @@ PeiDispatcher (
 
   @param PrivateData     PeiCore's private data structure
   @param OldCoreData     Old data from SecCore
-                         NULL if being run in non-permament memory mode.
+                         NULL if being run in non-permanent memory mode.
   @param SecCoreData     Points to a data structure containing information about the PEI core's operating
                          environment, such as the size and location of temporary RAM, the stack location and
                          the BFV location.

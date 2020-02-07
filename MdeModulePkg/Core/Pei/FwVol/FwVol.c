@@ -178,7 +178,7 @@ CalculateHeaderChecksum (
   if (IS_FFS_FILE2 (FileHeader)) {
     CopyMem (&TestFileHeader, FileHeader, sizeof (EFI_FFS_FILE_HEADER2));
     //
-    // Ingore State and File field in FFS header.
+    // Ignore State and File field in FFS header.
     //
     TestFileHeader.State = 0;
     TestFileHeader.IntegrityCheck.Checksum.File = 0;
@@ -187,7 +187,7 @@ CalculateHeaderChecksum (
   } else {
     CopyMem (&TestFileHeader, FileHeader, sizeof (EFI_FFS_FILE_HEADER));
     //
-    // Ingore State and File field in FFS header.
+    // Ignore State and File field in FFS header.
     //
     TestFileHeader.State = 0;
     TestFileHeader.IntegrityCheck.Checksum.File = 0;
