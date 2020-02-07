@@ -4,7 +4,7 @@
   The driver will use the new RDRAND instruction to produce high-quality, high-performance
   entropy and random number.
 
-  RNG Algoritnms defined in UEFI 2.4:
+  RNG Algorithms defined in UEFI 2.4:
    - EFI_RNG_ALGORITHM_SP800_90_CTR_256_GUID  - Supported
      (RDRAND implements a hardware NIST SP800-90 AES-CTR-256 based DRBG)
    - EFI_RNG_ALGORITHM_RAW                    - Supported
