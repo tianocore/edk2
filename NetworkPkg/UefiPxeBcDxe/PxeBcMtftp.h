@@ -33,7 +33,7 @@
   @param[in, out] BufferSize     Pointer to buffer size.
 
   @retval EFI_SUCCESS        Successfully obtained the size of file.
-  @retval EFI_NOT_FOUND      Parse the tftp ptions failed.
+  @retval EFI_NOT_FOUND      Parse the tftp options failed.
   @retval EFI_DEVICE_ERROR   The network device encountered an error during this operation.
   @retval Others             Did not obtain the size of the file.
 
@@ -119,7 +119,7 @@ PxeBcTftpWriteFile (
   @param[in, out]  BufferSize     Pointer to buffer size.
   @param[in]       DontUseBuffer  Indicates whether with a receive buffer.
 
-  @retval EFI_SUCCES         Successfully obtained the data from the file included in directory.
+  @retval EFI_SUCCESS        Successfully obtained the data from the file included in directory.
   @retval EFI_DEVICE_ERROR   The network device encountered an error during this operation.
   @retval Others             Operation failed.
 

@@ -106,8 +106,8 @@ PxeBcMtftp6CheckPacket (
   @param[in]      WindowSize     Pointer to required window size.
   @param[in, out] BufferSize     Pointer to buffer size.
 
-  @retval EFI_SUCCESS        Sucessfully obtained the size of file.
-  @retval EFI_NOT_FOUND      Parse the tftp ptions failed.
+  @retval EFI_SUCCESS        Successfully obtained the size of file.
+  @retval EFI_NOT_FOUND      Parse the tftp options failed.
   @retval EFI_DEVICE_ERROR   The network device encountered an error during this operation.
   @retval Others             Has not obtained the size of the file.
 
@@ -512,7 +512,7 @@ PxeBcMtftp6ReadDirectory (
   @param[in]  PacketLen      Length of EFI_MTFTP4_PACKET.
   @param[in]  Packet         Pointer to EFI_MTFTP4_PACKET to be checked.
 
-  @retval EFI_SUCCESS    The current operation succeeeded.
+  @retval EFI_SUCCESS    The current operation succeeded.
   @retval EFI_ABORTED    Abort the current transfer process.
 
 **/
@@ -896,7 +896,7 @@ PxeBcMtftp4WriteFile (
   @param[in, out]  BufferSize     Pointer to buffer size.
   @param[in]       DontUseBuffer  Indicates whether to use a receive buffer.
 
-  @retval EFI_SUCCES         Successfully obtained the data from the file included in the directory.
+  @retval EFI_SUCCESS        Successfully obtained the data from the file included in the directory.
   @retval EFI_DEVICE_ERROR   The network device encountered an error during this operation.
   @retval Others             Operation failed.
 
@@ -1037,7 +1037,7 @@ PxeBcTftpGetFileSize (
   @param[in, out] BufferSize     Pointer to buffer size.
   @param[in]      DontUseBuffer  Indicates whether to use a receive buffer.
 
-  @retval EFI_SUCCESS        Sucessfully read the data from the special file.
+  @retval EFI_SUCCESS        Successfully read the data from the special file.
   @retval EFI_DEVICE_ERROR   The network device encountered an error during this operation.
   @retval Others             Read data from file failed.
 
@@ -1143,7 +1143,7 @@ PxeBcTftpWriteFile (
   @param[in, out]  BufferSize     Pointer to buffer size.
   @param[in]       DontUseBuffer  Indicatse whether to use a receive buffer.
 
-  @retval EFI_SUCCES         Successfully obtained the data from the file included in the directory.
+  @retval EFI_SUCCESS        Successfully obtained the data from the file included in the directory.
   @retval EFI_DEVICE_ERROR   The network device encountered an error during this operation.
   @retval Others             Operation failed.
 

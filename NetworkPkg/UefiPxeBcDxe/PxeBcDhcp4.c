@@ -78,7 +78,7 @@ PxeBcParseDhcp4Options (
 
 
 /**
-  Parse the PXE vender options and extract the information from them.
+  Parse the PXE vendor options and extract the information from them.
 
   @param[in]  Dhcp4Option        Pointer to vendor options in buffer.
   @param[in]  VendorOption       Pointer to structure to store information in vendor options.
@@ -312,7 +312,7 @@ PxeBcBuildDhcp4Options (
 
   if (EFI_ERROR (NetLibGetSystemGuid ((EFI_GUID *) OptEnt.Uuid->Guid))) {
     //
-    // Zero the Guid to indicate NOT programable if failed to get system Guid.
+    // Zero the Guid to indicate NOT programmable if failed to get system Guid.
     //
     DEBUG ((EFI_D_WARN, "PXE: Failed to read system GUID from the smbios table!\n"));
     ZeroMem (OptEnt.Uuid->Guid, sizeof (EFI_GUID));
@@ -1125,7 +1125,7 @@ PxeBcHandleDhcp4Offer (
       }
     } else {
       //
-      //  Othewise, the bootfile name must be included in DhcpOnly offer.
+      //  Otherwise, the bootfile name must be included in DhcpOnly offer.
       //
       if (Options[PXEBC_DHCP4_TAG_INDEX_BOOTFILE] == NULL) {
         Status = EFI_NOT_FOUND;
@@ -1275,7 +1275,7 @@ PxeBcDhcp4CallBack (
       //
       if (EFI_ERROR (NetLibGetSystemGuid ((EFI_GUID *) Packet->Dhcp4.Header.ClientHwAddr))) {
         //
-        // Zero the Guid to indicate NOT programable if failed to get system Guid.
+        // Zero the Guid to indicate NOT programmable if failed to get system Guid.
         //
         DEBUG ((EFI_D_WARN, "PXE: Failed to read system GUID from the smbios table!\n"));
         ZeroMem (Packet->Dhcp4.Header.ClientHwAddr, sizeof (EFI_GUID));
@@ -1464,7 +1464,7 @@ PxeBcDhcp4Discover (
   if (Mode->SendGUID) {
     if (EFI_ERROR (NetLibGetSystemGuid ((EFI_GUID *) Token.Packet->Dhcp4.Header.ClientHwAddr))) {
       //
-      // Zero the Guid to indicate NOT programable if failed to get system Guid.
+      // Zero the Guid to indicate NOT programmable if failed to get system Guid.
       //
       DEBUG ((EFI_D_WARN, "PXE: Failed to read system GUID from the smbios table!\n"));
       ZeroMem (Token.Packet->Dhcp4.Header.ClientHwAddr, sizeof (EFI_GUID));
