@@ -1,5 +1,5 @@
 /** @file
-  This module provide Hand-Off Block manupulation.
+  This module provide Hand-Off Block manipulation.
 
 Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
