@@ -60,7 +60,7 @@
   ImageOffset = <ImageOffset>    # Fv offset of this SystemFirmware image (HEX)
   FileGuid    = XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX  # PcdEdkiiSystemFirmwareFileGuid
 
-  NOTE: The [Name?] entry may have differnt FileGuid.
+  NOTE: The [Name?] entry may have different FileGuid.
   Only the one, whose FileGuid matches PcdEdkiiSystemFirmwareFileGuid, takes effect.
   The other entry is ignored.
 
@@ -80,7 +80,7 @@
   ImageOffset = <ImageOffset>    # Image offset of this SystemFirmware image (HEX)
   FileGuid    = XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX  # PcdEdkiiSystemFirmwareFileGuid
 
-  NOTE: The [Name?] entry may have differnt FileGuid.
+  NOTE: The [Name?] entry may have different FileGuid.
   Only the one, whose FileGuid matches PcdEdkiiSystemFirmwareFileGuid, takes effect.
   The other entry is ignored.
 
