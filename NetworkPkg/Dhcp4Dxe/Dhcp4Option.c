@@ -230,7 +230,7 @@ DhcpOptionIsValid (
   @param[out] Para                   The variable to save the interested parameter
 
   @retval EFI_SUCCESS            The DHCP option is successfully extracted.
-  @retval EFI_INVALID_PARAMETER  The DHCP option is mal-formated
+  @retval EFI_INVALID_PARAMETER  The DHCP option is malformatted
 
 **/
 EFI_STATUS
@@ -303,7 +303,7 @@ DhcpGetParameter (
                                      option.
 
   @retval EFI_SUCCESS            All the options are valid
-  @retval EFI_INVALID_PARAMETER  The options are mal-formated.
+  @retval EFI_INVALID_PARAMETER  The options are malformatted.
 
 **/
 EFI_STATUS
@@ -538,7 +538,7 @@ DhcpFillOption (
 
   @retval EFI_NOT_FOUND          Cannot find any option.
   @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory to parse the packet.
-  @retval EFI_INVALID_PARAMETER  The options are mal-formated
+  @retval EFI_INVALID_PARAMETER  The options are malformatted
   @retval EFI_SUCCESS            The options are parsed into OptionPoint
 
 **/
@@ -639,7 +639,7 @@ ON_EXIT:
   @param[out] Para                   The variable to save the DHCP parameters.
 
   @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory to validate the packet.
-  @retval EFI_INVALID_PARAMETER  The options are mal-formated
+  @retval EFI_INVALID_PARAMETER  The options are malformatted
   @retval EFI_SUCCESS            The options are parsed into OptionPoint
 
 **/
@@ -770,7 +770,7 @@ DhcpAppendOption (
                                      function.
 
   @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory
-  @retval EFI_INVALID_PARAMETER  The options in SeekPacket are mal-formated
+  @retval EFI_INVALID_PARAMETER  The options in SeekPacket are malformatted
   @retval EFI_SUCCESS            The packet is build.
 
 **/

@@ -2983,7 +2983,7 @@ NetLibGetNicHandle (
   @param[out]     Ip4Address     The pointer to the converted IPv4 address.
 
   @retval EFI_SUCCESS            Convert to IPv4 address successfully.
-  @retval EFI_INVALID_PARAMETER  The string is mal-formated or Ip4Address is NULL.
+  @retval EFI_INVALID_PARAMETER  The string is malformatted or Ip4Address is NULL.
 
 **/
 EFI_STATUS
@@ -3013,7 +3013,7 @@ NetLibAsciiStrToIp4 (
   @param[out]     Ip6Address     The pointer to the converted IPv6 address.
 
   @retval EFI_SUCCESS            Convert to IPv6 address successfully.
-  @retval EFI_INVALID_PARAMETER  The string is mal-formated or Ip6Address is NULL.
+  @retval EFI_INVALID_PARAMETER  The string is malformatted or Ip6Address is NULL.
 
 **/
 EFI_STATUS
@@ -3042,7 +3042,7 @@ NetLibAsciiStrToIp6 (
   @param[out]     Ip4Address     The pointer to the converted IPv4 address.
 
   @retval EFI_SUCCESS            Convert to IPv4 address successfully.
-  @retval EFI_INVALID_PARAMETER  The string is mal-formated or Ip4Address is NULL.
+  @retval EFI_INVALID_PARAMETER  The string is malformatted or Ip4Address is NULL.
 
 **/
 EFI_STATUS
@@ -3072,7 +3072,7 @@ NetLibStrToIp4 (
   @param[out]     Ip6Address     The pointer to the converted IPv6 address.
 
   @retval EFI_SUCCESS            Convert to IPv6 address successfully.
-  @retval EFI_INVALID_PARAMETER  The string is mal-formated or Ip6Address is NULL.
+  @retval EFI_INVALID_PARAMETER  The string is malformatted or Ip6Address is NULL.
 
 **/
 EFI_STATUS
@@ -3103,7 +3103,7 @@ NetLibStrToIp6 (
   @param[out]     PrefixLength   The pointer to the converted prefix length.
 
   @retval EFI_SUCCESS            Convert to IPv6 address successfully.
-  @retval EFI_INVALID_PARAMETER  The string is mal-formated or Ip6Address is NULL.
+  @retval EFI_INVALID_PARAMETER  The string is malformatted or Ip6Address is NULL.
 
 **/
 EFI_STATUS

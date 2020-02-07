@@ -517,7 +517,7 @@ Mtftp6RrqHandleOack (
       Mtftp6SendError (
         Instance,
         EFI_MTFTP6_ERRORCODE_ILLEGAL_OPERATION,
-        (UINT8 *) "Mal-formated OACK packet"
+        (UINT8 *) "Malformatted OACK packet"
         );
     }
 

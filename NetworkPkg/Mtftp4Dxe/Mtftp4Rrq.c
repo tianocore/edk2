@@ -533,7 +533,7 @@ Mtftp4RrqHandleOack (
       Mtftp4SendError (
         Instance,
         EFI_MTFTP4_ERRORCODE_ILLEGAL_OPERATION,
-        (UINT8 *) "Mal-formated OACK packet"
+        (UINT8 *) "Malformatted OACK packet"
         );
     }
 

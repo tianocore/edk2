@@ -19,7 +19,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
                                 otherwise the option we wants to transmit.
 
   @retval TRUE     The option is properly formatted
-  @retval FALSE    The option is mal-formated
+  @retval FALSE    The option is malformatted
 
 **/
 BOOLEAN
