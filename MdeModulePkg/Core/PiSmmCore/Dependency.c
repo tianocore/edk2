@@ -192,7 +192,7 @@ SmmIsSchedulable (
   if (DriverEntry->Depex == NULL) {
     //
     // A NULL Depex means that the SMM driver is not built correctly.
-    // All SMM drivers must have a valid depex expressiion.
+    // All SMM drivers must have a valid depex expression.
     //
     DEBUG ((DEBUG_DISPATCH, "  RESULT = FALSE (Depex is empty)\n"));
     ASSERT (FALSE);
@@ -371,7 +371,7 @@ SmmIsSchedulable (
     // The math is done out of order, but it should not matter. That is
     // we may add in the sizeof (EFI_GUID) before we account for the OP Code.
     // This is not an issue, since we just need the correct end result. You
-    // need to be careful using Iterator in the loop as it's intermediate value
+    // need to be careful using Iterator in the loop as its intermediate value
     // may be strange.
     //
     Iterator++;

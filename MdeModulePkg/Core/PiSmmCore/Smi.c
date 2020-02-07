@@ -196,7 +196,7 @@ SmiManage (
 /**
   Registers a handler to execute within SMM.
 
-  @param  Handler        Handler service funtion pointer.
+  @param  Handler        Handler service function pointer.
   @param  HandlerType    Points to the handler type or NULL for root SMI handlers.
   @param  DispatchHandle On return, contains a unique handle which can be used to later unregister the handler function.
 

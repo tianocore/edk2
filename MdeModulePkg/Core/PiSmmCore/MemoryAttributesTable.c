@@ -152,7 +152,7 @@ SortMemoryMap (
 }
 
 /**
-  Merge continous memory map entries whose have same attributes.
+  Merge continuous memory map entries whose have same attributes.
 
   @param[in, out]  MemoryMap              A pointer to the buffer in which firmware places
                                           the current memory map.
@@ -300,7 +300,7 @@ GetImageRecordByAddress (
   @param[in]       ImageRecord            An image record whose [ImageBase, ImageSize] covered
                                           by old memory map entry.
   @param[in, out]  NewRecord              A pointer to several new memory map entries.
-                                          The caller gurantee the buffer size be 1 +
+                                          The caller guarantee the buffer size be 1 +
                                           (SplitRecordCount * DescriptorSize) calculated
                                           below.
   @param[in]       OldRecord              A pointer to one old memory map entry.
@@ -450,7 +450,7 @@ GetMaxSplitRecordCount (
 
   @param[in]       OldRecord              A pointer to one old memory map entry.
   @param[in, out]  NewRecord              A pointer to several new memory map entries.
-                                          The caller gurantee the buffer size be 1 +
+                                          The caller guarantee the buffer size be 1 +
                                           (SplitRecordCount * DescriptorSize) calculated
                                           below.
   @param[in]       MaxSplitRecordCount    The max number of splitted entries
@@ -667,7 +667,7 @@ SplitTable (
   This function for GetMemoryMap() with memory attributes table.
 
   It calls original GetMemoryMap() to get the original memory map information. Then
-  plus the additional memory map entries for PE Code/Data seperation.
+  plus the additional memory map entries for PE Code/Data separation.
 
   @param[in, out]  MemoryMapSize          A pointer to the size, in bytes, of the
                                           MemoryMap buffer. On input, this is the size of

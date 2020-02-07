@@ -707,7 +707,7 @@ SmmIplSmmConfigurationEventNotify (
   }
 
   //
-  // Register the SMM Entry Point provided by the SMM Core with the SMM COnfiguration protocol
+  // Register the SMM Entry Point provided by the SMM Core with the SMM Configuration protocol
   //
   Status = SmmConfiguration->RegisterSmmEntry (SmmConfiguration, gSmmCorePrivate->SmmEntryPoint);
   ASSERT_EFI_ERROR (Status);
@@ -964,7 +964,7 @@ ExecuteSmmCoreFromSmram (
   }
 
   //
-  // Initilize ImageContext
+  // Initialize ImageContext
   //
   ImageContext.Handle    = SourceBuffer;
   ImageContext.ImageRead = PeCoffLoaderImageReadFromMemory;
@@ -1082,7 +1082,7 @@ ExecuteSmmCoreFromSmram (
   }
 
   //
-  // Always free memory allocted by GetFileBufferByFilePath ()
+  // Always free memory allocated by GetFileBufferByFilePath ()
   //
   FreePool (SourceBuffer);
 
@@ -1763,7 +1763,7 @@ SmmIplEntry (
   ASSERT_EFI_ERROR (Status);
 
   //
-  // Create the set of protocol and event notififcations that the SMM IPL requires
+  // Create the set of protocol and event notifications that the SMM IPL requires
   //
   for (Index = 0; mSmmIplEvents[Index].NotifyFunction != NULL; Index++) {
     if (mSmmIplEvents[Index].Protocol) {

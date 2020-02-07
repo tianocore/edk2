@@ -17,7 +17,7 @@
             and After dependencies. This is done recursively as the call to add
             to the mScheduledQueue checks for Before and recursively adds
             all Befores. It then addes the item that was passed in and then
-            processess the After dependecies by recursively calling the routine.
+            processes the After dependencies by recursively calling the routine.
 
   Dispatcher Rules:
   The rules for the dispatcher are similar to the DXE dispatcher.
@@ -25,7 +25,7 @@
   The rules for DXE dispatcher are in chapter 10 of the DXE CIS. Figure 10-3
   is the state diagram for the DXE dispatcher
 
-  Depex - Dependency Expresion.
+  Depex - Dependency Expression.
 
   Copyright (c) 2014, Hewlett-Packard Development Company, L.P.
   Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
@@ -83,12 +83,12 @@ LIST_ENTRY  mScheduledQueue = INITIALIZE_LIST_HEAD_VARIABLE (mScheduledQueue);
 LIST_ENTRY  mFvHandleList = INITIALIZE_LIST_HEAD_VARIABLE (mFvHandleList);
 
 //
-// Flag for the SMM Dispacher.  TRUE if dispatcher is execuing.
+// Flag for the SMM Dispatcher.  TRUE if dispatcher is executing.
 //
 BOOLEAN  gDispatcherRunning = FALSE;
 
 //
-// Flag for the SMM Dispacher.  TRUE if there is one or more SMM drivers ready to be dispatched
+// Flag for the SMM Dispatcher.  TRUE if there is one or more SMM drivers ready to be dispatched
 //
 BOOLEAN  gRequestDispatch = FALSE;
 
@@ -175,7 +175,7 @@ CheckAndMarkFixLoadingMemoryUsageBitMap (
      return EFI_NOT_FOUND;
    }
    //
-   // Test if the memory is avalaible or not.
+   // Test if the memory is available or not.
    //
    BaseOffsetPageNumber = EFI_SIZE_TO_PAGES((UINT32)(ImageBase - SmmCodeBase));
    TopOffsetPageNumber  = EFI_SIZE_TO_PAGES((UINT32)(ImageBase + ImageSize - SmmCodeBase));
@@ -458,7 +458,7 @@ SmmLoadImage (
     Status = GetPeCoffImageFixLoadingAssignedAddress (&ImageContext);
     if (!EFI_ERROR (Status)) {
       //
-      // Since the memory range to load Smm core alreay been cut out, so no need to allocate and free this range
+      // Since the memory range to load Smm core already been cut out, so no need to allocate and free this range
       // following statements is to bypass SmmFreePages
       //
       PageCount = 0;
@@ -664,7 +664,7 @@ SmmLoadImage (
       //
       // Copy the PDB file name to our temporary string, and replace .pdb with .efi
       // The PDB file name is limited in the range of 0~255.
-      // If the length is bigger than 255, trim the redudant characters to avoid overflow in array boundary.
+      // If the length is bigger than 255, trim the redundant characters to avoid overflow in array boundary.
       //
       for (Index = 0; Index < sizeof (EfiFileName) - 4; Index++) {
         EfiFileName[Index] = ImageContext.PdbPointer[Index + StartIndex];
@@ -741,7 +741,7 @@ SmmPreProcessDepex (
 
   @param  DriverEntry           Driver to work on.
 
-  @retval EFI_SUCCESS           Depex read and preprossesed
+  @retval EFI_SUCCESS           Depex read and preprocessed
   @retval EFI_PROTOCOL_ERROR    The section extraction protocol returned an error
                                 and  Depex reading needs to be retried.
   @retval Error                 DEPEX not found.
@@ -1093,8 +1093,8 @@ FvHasBeenProcessed (
 }
 
 /**
-  Remember that Fv protocol on FvHandle has had it's drivers placed on the
-  mDiscoveredList. This fucntion adds entries on the mFvHandleList. Items are
+  Remember that Fv protocol on FvHandle has had its drivers placed on the
+  mDiscoveredList. This function adds entries on the mFvHandleList. Items are
   never removed/freed from the mFvHandleList.
 
   @param  FvHandle              The handle of a FV that has been processed
@@ -1165,7 +1165,7 @@ SmmFvToDevicePath (
 
 /**
   Add an entry to the mDiscoveredList. Allocate memory to store the DriverEntry,
-  and initilize any state variables. Read the Depex from the FV and store it
+  and initialize any state variables. Read the Depex from the FV and store it
   in DriverEntry. Pre-process the Depex to set the Before and After state.
   The Discovered list is never free'ed and contains booleans that represent the
   other possible SMM driver states.
@@ -1473,7 +1473,7 @@ SmmDriverDispatchHandler (
 
 /**
   Traverse the discovered list for any drivers that were discovered but not loaded
-  because the dependency experessions evaluated to false.
+  because the dependency expressions evaluated to false.
 
 **/
 VOID
