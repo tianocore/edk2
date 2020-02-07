@@ -25,7 +25,7 @@ EFI_PCI_IO_PROTOCOL         *mUsb3PciIo = NULL;
 /**
   Creates a named event that can be signaled.
 
-  This function creates an event using NotifyTpl, NoifyFunction.
+  This function creates an event using NotifyTpl, NotifyFunction.
   If Name is NULL, then ASSERT().
   If NotifyTpl is not a legal TPL value, then ASSERT().
   If NotifyFunction is NULL, then ASSERT().

@@ -152,7 +152,7 @@ XhcCheckNewEvent (
 
   EvtRing->EventRingDequeue += sizeof (TRB_TEMPLATE);
   //
-  // If the dequeue pointer is beyond the ring, then roll-back it to the begining of the ring.
+  // If the dequeue pointer is beyond the ring, then roll-back it to the beginning of the ring.
   //
   if ((UINTN)EvtRing->EventRingDequeue >= ((UINTN) EvtRing->EventRingSeg0 + sizeof (TRB_TEMPLATE) * EvtRing->TrbNumber)) {
     EvtRing->EventRingDequeue = EvtRing->EventRingSeg0;
@@ -510,7 +510,7 @@ XhcCreateUrb (
   @param  Direction             The direction of data transfer.
   @param  Data                  Array of pointers to the buffers of data to transmit
                                 from or receive into.
-  @param  DataLength            The lenght of the data buffer.
+  @param  DataLength            The length of the data buffer.
   @param  Timeout               Indicates the maximum time, in microsecond, which
                                 the transfer is allowed to complete.
 
