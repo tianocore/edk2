@@ -1,7 +1,7 @@
 /** @file
   The EFI Legacy BIOS Protocol is used to abstract legacy Option ROM usage
   under EFI and Legacy OS boot.  This file also includes all the related
-  COMPATIBILIY16 structures and definitions.
+  COMPATIBILITY16 structures and definitions.
 
   Note: The names for EFI_IA32_REGISTER_SET elements were picked to follow
   well known naming conventions.
