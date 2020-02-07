@@ -15,7 +15,7 @@
 /**
   Initialize the debug port.
 
-  This function will initialize debug port to get it ready for data transmition. If
+  This function will initialize debug port to get it ready for data transmission. If
   certain Debug Communication Library instance has to save some private data in the
   stack, this function must work on the mode that doesn't return to the caller, then
   the caller needs to wrap up all rest of logic after DebugPortInitialize() into one
