@@ -627,7 +627,7 @@ DumpMemoryProfileMemoryRange (
   @param[in] ProfileSize        Memory profile size.
   @param[in] Signature          Signature.
 
-  @return Pointer to the stucture with the signature.
+  @return Pointer to the structure with the signature.
 
 **/
 VOID *
