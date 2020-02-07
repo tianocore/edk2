@@ -12,7 +12,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 
 //
-// Globle varible to cache pointer to Smbus protocol.
+// Global variable to cache pointer to Smbus protocol.
 //
 EFI_SMBUS_HC_PROTOCOL      *mSmbus = NULL;
 

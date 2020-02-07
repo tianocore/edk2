@@ -9,7 +9,7 @@
   Please attention this library instance can not be used util EFI_SYSTEM_TABLE was
   initialized.
 
-  This library contains contruct function to retrieve EFI_DXE_SERIVCE, this construct
+  This library contains construct function to retrieve EFI_DXE_SERVICE, this construct
   function will be invoked in DXE driver's autogen file.
 
   Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>

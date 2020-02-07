@@ -16,7 +16,7 @@
 # Note: A driver of type DXE_RUNTIME_DRIVER and DXE_SMM_DRIVER can only use this DxePcdLib
 #  in their initialization without any issues to access Dynamic and DynamicEx PCD. They can't
 #  access Dynamic and DynamicEx PCD in the implementation of runtime services and SMI handlers.
-#  Because EFI_PCD_PROTOCOL is DXE protocol that is not aviable in OS runtime phase.
+#  Because EFI_PCD_PROTOCOL is DXE protocol that is not available in OS runtime phase.
 #
 # Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 #

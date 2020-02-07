@@ -171,7 +171,7 @@ GetSectionFromFv (
 
 
 /**
-  Searches the FFS file the the currently executing module was loaded from and returns the first matching FFS section.
+  Searches the FFS file the currently executing module was loaded from and returns the first matching FFS section.
 
   This function searches the FFS file that the currently executing module was loaded from for a FFS sections of type SectionType.
   If the FFS file contains at least SectionInstance instances of the FFS section specified by SectionType,

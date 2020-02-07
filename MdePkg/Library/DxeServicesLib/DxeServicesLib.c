@@ -25,7 +25,7 @@
 /**
   Identify the device handle from which the Image is loaded from. As this device handle is passed to
   GetSectionFromFv as the identifier for a Firmware Volume, an EFI_FIRMWARE_VOLUME2_PROTOCOL
-  protocol instance should be located succesfully by calling gBS->HandleProtocol ().
+  protocol instance should be located successfully by calling gBS->HandleProtocol ().
 
   This function locates the EFI_LOADED_IMAGE_PROTOCOL instance installed
   on ImageHandle. It then returns EFI_LOADED_IMAGE_PROTOCOL.DeviceHandle.
@@ -71,7 +71,7 @@ InternalImageHandleToFvHandle (
   Section type and instance number from the specified Firmware Volume.
 
   This functions first locate the EFI_FIRMWARE_VOLUME2_PROTOCOL protocol instance on FvHandle in order to
-  carry out the Firmware Volume read operation. The function then reads the Firmware Section found sepcifed
+  carry out the Firmware Volume read operation. The function then reads the Firmware Section found specified
   by NameGuid, SectionType and SectionInstance.
 
   The details of this search order is defined in description of EFI_FIRMWARE_VOLUME2_PROTOCOL.ReadSection ()
@@ -94,7 +94,7 @@ InternalImageHandleToFvHandle (
   @param  SectionType             The Firmware Section type.
   @param  SectionInstance         The instance number of Firmware Section to
                                   read from starting from 0.
-  @param  Buffer                  On output, Buffer contains the the data read
+  @param  Buffer                  On output, Buffer contains the data read
                                   from the section in the Firmware File found.
   @param  Size                    On output, the size of Buffer.
 
@@ -517,7 +517,7 @@ GetSectionFromFv (
 
 
 /**
-  Searches the FFS file the the currently executing module was loaded from and returns the first matching FFS section.
+  Searches the FFS file the currently executing module was loaded from and returns the first matching FFS section.
 
   This function searches the FFS file that the currently executing module was loaded from for a FFS sections of type SectionType.
   If the FFS file contains at least SectionInstance instances of the FFS section specified by SectionType,
@@ -597,7 +597,7 @@ GetSectionFromFfs (
                                         selection. If FALSE, then FilePath must
                                         match an exact file to be loaded.
   @param[in]       FilePath             The pointer to the device path of the file
-                                        that is absracted to the file buffer.
+                                        that is abstracted to the file buffer.
   @param[out]      FileSize             The pointer to the size of the abstracted
                                         file buffer.
   @param[out]      AuthenticationStatus Pointer to the authentication status.
@@ -745,7 +745,7 @@ GetFileBufferByFilePath (
         }
         //
         // Parse each MEDIA_FILEPATH_DP node. There may be more than one, since the
-        // directory information and filename can be seperate. The goal is to inch
+        // directory information and filename can be separate. The goal is to inch
         // our way down each device path node and close the previous node
         //
         DevicePathNode = TempDevicePathNode;
