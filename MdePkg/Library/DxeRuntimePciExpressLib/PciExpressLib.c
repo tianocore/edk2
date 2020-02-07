@@ -298,7 +298,7 @@ PciExpressRegisterForRuntimeAccess (
   Address = GetPciExpressAddress (Address & 0x0ffff000);
 
   //
-  // See if Address has already been registerd for runtime access
+  // See if Address has already been registered for runtime access
   //
   for (Index = 0; Index < mDxeRuntimePciExpressLibNumberOfRuntimeRanges; Index++) {
     if (mDxeRuntimePciExpressLibRegistrationTable[Index].PhysicalAddress == Address) {
@@ -1456,7 +1456,7 @@ PciExpressBitFieldAndThenOr32 (
   Size into the buffer specified by Buffer. This function only allows the PCI
   configuration registers from a single PCI function to be read. Size is
   returned. When possible 32-bit PCI configuration read cycles are used to read
-  from StartAdress to StartAddress + Size. Due to alignment restrictions, 8-bit
+  from StartAddress to StartAddress + Size. Due to alignment restrictions, 8-bit
   and 16-bit PCI configuration read cycles may be used at the beginning and the
   end of the range.
 
@@ -1559,7 +1559,7 @@ PciExpressReadBuffer (
   Size from the buffer specified by Buffer. This function only allows the PCI
   configuration registers from a single PCI function to be written. Size is
   returned. When possible 32-bit PCI configuration write cycles are used to
-  write from StartAdress to StartAddress + Size. Due to alignment restrictions,
+  write from StartAddress to StartAddress + Size. Due to alignment restrictions,
   8-bit and 16-bit PCI configuration write cycles may be used at the beginning
   and the end of the range.
 

@@ -22,5 +22,5 @@
 
 #string STR_MODULE_ABSTRACT             #language en-US "PCD Library using PCD Protocol"
 
-#string STR_MODULE_DESCRIPTION          #language en-US "There are two PCD protocols: 1) PCD_PROTOCOL It is an EDKII implementation that supporst Dynamic/DynamicEx PCDs. 2) EFI_PCD_PROTOCOL It is defined by PI Specification 1.2, Vol 3, which only support dynamicEx type PCD.  For dynamicEx type PCDs, it is compatible between PCD_PROTOCOL and EFI_PCD_PROTOCOL.  This library instance uses the PCD_PROTOCOL to handle dynamic PCD requests and uses EFI_PCD_PROTOCOL to handle DynamicEx type PCDs."
+#string STR_MODULE_DESCRIPTION          #language en-US "There are two PCD protocols: 1) PCD_PROTOCOL It is an EDKII implementation that supports Dynamic/DynamicEx PCDs. 2) EFI_PCD_PROTOCOL It is defined by PI Specification 1.2, Vol 3, which only support dynamicEx type PCD.  For dynamicEx type PCDs, it is compatible between PCD_PROTOCOL and EFI_PCD_PROTOCOL.  This library instance uses the PCD_PROTOCOL to handle dynamic PCD requests and uses EFI_PCD_PROTOCOL to handle DynamicEx type PCDs."
 
