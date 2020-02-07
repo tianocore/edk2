@@ -587,8 +587,8 @@ MouseReset (
 
   Status = EFI_SUCCESS;
   //
-  // The PS2 mouse driver reset behavior is always successfully return no matter wheater or not there is mouse connected to system.
-  // This behavior is needed by performance speed. The following mouse command only succeessfully finish when mouse device is
+  // The PS2 mouse driver reset behavior is always successfully return no matter whether or not there is mouse connected to system.
+  // This behavior is needed by performance speed. The following mouse command only successfully finish when mouse device is
   // connected to system, so if PS2 mouse device not connect to system or user not ask for, we skip the mouse configuration and enabling
   //
   if (ExtendedVerification && CheckMouseConnect (MouseDev)) {

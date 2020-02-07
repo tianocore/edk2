@@ -124,7 +124,7 @@ PS2MouseDriverSupported (
 /**
   Start this driver on ControllerHandle by opening a IsaIo
   protocol, creating PS2_MOUSE_ABSOLUTE_POINTER_DEV device and install gEfiAbsolutePointerProtocolGuid
-  finnally.
+  finally.
 
   @param  This                 Protocol instance pointer.
   @param  ControllerHandle     Handle of device to bind driver to

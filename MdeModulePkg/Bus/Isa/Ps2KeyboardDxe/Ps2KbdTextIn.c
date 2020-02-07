@@ -77,7 +77,7 @@ PushEfikeyBufTail (
 }
 
 /**
-  Judge whether is a registed key
+  Judge whether is a registered key
 
   @param RegsiteredData       A pointer to a buffer that is filled in with the keystroke
                               state data for the key that was registered.
@@ -85,7 +85,7 @@ PushEfikeyBufTail (
                               state data for the key that was pressed.
 
   @retval TRUE                Key be pressed matches a registered key.
-  @retval FLASE               Match failed.
+  @retval FALSE               Match failed.
 
 **/
 BOOLEAN
@@ -120,7 +120,7 @@ IsKeyRegistered (
 
 /**
     Reads the next keystroke from the input device. The WaitForKey Event can
-    be used to test for existance of a keystroke via WaitForEvent () call.
+    be used to test for existence of a keystroke via WaitForEvent () call.
 
     @param ConsoleInDev          Ps2 Keyboard private structure
     @param KeyData               A pointer to a buffer that is filled in with the keystroke
@@ -128,7 +128,7 @@ IsKeyRegistered (
 
 
     @retval EFI_SUCCESS             The keystroke information was returned.
-    @retval EFI_NOT_READY           There was no keystroke data availiable.
+    @retval EFI_NOT_READY           There was no keystroke data available.
     @retval EFI_DEVICE_ERROR        The keystroke information was not returned due to
                                     hardware errors.
     @retval EFI_INVALID_PARAMETER   KeyData is NULL.
@@ -308,7 +308,7 @@ KeyboardReadKeyStroke (
   Signal the event if there is key available
 
   @param Event    the event object
-  @param Context  waitting context
+  @param Context  waiting context
 
 **/
 VOID
@@ -333,7 +333,7 @@ KeyboardWaitForKey (
 
   if (!ConsoleIn->KeyboardErr) {
     //
-    // WaitforKey doesn't suppor the partial key.
+    // WaitforKey doesn't support the partial key.
     // Considering if the partial keystroke is enabled, there maybe a partial
     // keystroke in the queue, so here skip the partial keystroke and get the
     // next key from the queue
@@ -381,7 +381,7 @@ KeyboardWaitForKeyEx (
 }
 
 /**
-  Reset the input device and optionaly run diagnostics
+  Reset the input device and optionally run diagnostics
 
   @param This                     Protocol instance pointer.
   @param ExtendedVerification     Driver may perform diagnostics on reset.
@@ -411,7 +411,7 @@ KeyboardEfiResetEx (
 
 /**
     Reads the next keystroke from the input device. The WaitForKey Event can
-    be used to test for existance of a keystroke via WaitForEvent () call.
+    be used to test for existence of a keystroke via WaitForEvent () call.
 
 
     @param This         Protocol instance pointer.
@@ -419,7 +419,7 @@ KeyboardEfiResetEx (
                         state data for the key that was pressed.
 
     @retval EFI_SUCCESS           The keystroke information was returned.
-    @retval EFI_NOT_READY         There was no keystroke data availiable.
+    @retval EFI_NOT_READY         There was no keystroke data available.
     @retval EFI_DEVICE_ERROR      The keystroke information was not returned due to
                                   hardware errors.
     @retval EFI_INVALID_PARAMETER KeyData is NULL.
@@ -540,7 +540,7 @@ Exit:
     @param NotifyHandle               Points to the unique handle assigned to the registered notification.
 
     @retval EFI_SUCCESS               The notification function was registered successfully.
-    @retval EFI_OUT_OF_RESOURCES      Unable to allocate resources for necesssary data structures.
+    @retval EFI_OUT_OF_RESOURCES      Unable to allocate resources for necessary data structures.
     @retval EFI_INVALID_PARAMETER     KeyData or NotifyHandle or KeyNotificationFunction is NULL.
 
 **/
