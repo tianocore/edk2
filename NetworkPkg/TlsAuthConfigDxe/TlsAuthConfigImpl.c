@@ -298,7 +298,7 @@ ON_EXIT:
   @param[in]    QuestionIdBase      Base question id of the cert list.
   @param[in]    DeleteIndex         Cert index to delete.
 
-  @retval   EFI_SUCCESS             Delete siganture successfully.
+  @retval   EFI_SUCCESS             Delete signature successfully.
   @retval   EFI_NOT_FOUND           Can't find the signature item,
   @retval   EFI_OUT_OF_RESOURCES    Could not allocate needed resources.
 **/
@@ -597,7 +597,7 @@ DevicePathToStr (
 
   @param DevicePath       Device path.
 
-  @retval NULL            Not enough memory resourece for AllocateCopyPool.
+  @retval NULL            Not enough memory resource for AllocateCopyPool.
   @retval Other           A new allocated string that represents the file name.
 
 **/
@@ -1303,7 +1303,7 @@ TlsAuthConfigAccessExtractConfig (
   @param Progress       A pointer to a string filled in with the
                         offset of the most recent '&' before the
                         first failing name / value pair (or the
-                        beginn ing of the string if the failure
+                        beginning of the string if the failure
                         is in the first name / value pair) or
                         the terminating NULL if all was
                         successful.
