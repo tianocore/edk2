@@ -181,7 +181,7 @@ Ip4CopyOption (
 
   //
   // Head length is in the unit of 4 bytes. Now, Len is the
-  // acutal option length to appear in the IP header.
+  // actual option length to appear in the IP header.
   //
   Len = ((Next + 3) &~0x03);
 

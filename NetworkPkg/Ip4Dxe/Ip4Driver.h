@@ -47,7 +47,7 @@ Ip4DriverEntryPoint (
   );
 
 //
-// Function prototypes for the Drivr Binding Protocol
+// Function prototypes for the Driver Binding Protocol
 //
 /**
   Test to see if this driver supports ControllerHandle. This service
@@ -143,7 +143,7 @@ Ip4DriverBindingStop (
                       then a new handle is created. If it is a pointer to an existing UEFI handle,
                       then the protocol is added to the existing UEFI handle.
 
-  @retval EFI_SUCCES            The protocol was added to ChildHandle.
+  @retval EFI_SUCCESS           The protocol was added to ChildHandle.
   @retval EFI_INVALID_PARAMETER ChildHandle is NULL.
   @retval EFI_OUT_OF_RESOURCES  There are not enough resources available to create
                                 the child
@@ -167,7 +167,7 @@ Ip4ServiceBindingCreateChild (
   @param  This        Pointer to the EFI_SERVICE_BINDING_PROTOCOL instance.
   @param  ChildHandle Handle of the child to destroy
 
-  @retval EFI_SUCCES            The protocol was removed from ChildHandle.
+  @retval EFI_SUCCESS           The protocol was removed from ChildHandle.
   @retval EFI_UNSUPPORTED       ChildHandle does not support the protocol that is being removed.
   @retval EFI_INVALID_PARAMETER Child handle is NULL.
   @retval EFI_ACCESS_DENIED     The protocol could not be removed from the ChildHandle

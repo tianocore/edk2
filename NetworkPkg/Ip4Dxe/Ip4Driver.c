@@ -581,7 +581,7 @@ Ip4DriverBindingStart (
   Ip4Cfg2  = &IpSb->Ip4Config2Instance.Ip4Config2;
 
   //
-  // Install the Ip4ServiceBinding Protocol onto ControlerHandle
+  // Install the Ip4ServiceBinding Protocol onto ControllerHandle
   //
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &ControllerHandle,
@@ -829,7 +829,7 @@ ON_ERROR:
                       then a new handle is created. If it is a pointer to an existing UEFI handle,
                       then the protocol is added to the existing UEFI handle.
 
-  @retval EFI_SUCCES            The protocol was added to ChildHandle.
+  @retval EFI_SUCCESS           The protocol was added to ChildHandle.
   @retval EFI_INVALID_PARAMETER ChildHandle is NULL.
   @retval EFI_OUT_OF_RESOURCES  There are not enough resources available to create
                                 the child
@@ -933,7 +933,7 @@ ON_ERROR:
   @param  This        Pointer to the EFI_SERVICE_BINDING_PROTOCOL instance.
   @param  ChildHandle Handle of the child to destroy
 
-  @retval EFI_SUCCES            The protocol was removed from ChildHandle.
+  @retval EFI_SUCCESS           The protocol was removed from ChildHandle.
   @retval EFI_UNSUPPORTED       ChildHandle does not support the protocol that is being removed.
   @retval EFI_INVALID_PARAMETER Child handle is NULL.
   @retval EFI_ACCESS_DENIED     The protocol could not be removed from the ChildHandle
@@ -1020,14 +1020,14 @@ Ip4ServiceBindingDestroyChild (
   // Uninstall the IP4 protocol first. Many thing happens during
   // this:
   // 1. The consumer of the IP4 protocol will be stopped if it
-  // opens the protocol BY_DRIVER. For eaxmple, if MNP driver is
+  // opens the protocol BY_DRIVER. For example, if MNP driver is
   // stopped, IP driver's stop function will be called, and uninstall
   // EFI_IP4_PROTOCOL will trigger the UDP's stop function. This
   // makes it possible to create the network stack bottom up, and
   // stop it top down.
   // 2. the upper layer will recycle the received packet. The recycle
   // event's TPL is higher than this function. The recycle events
-  // will be called back before preceeding. If any packets not recycled,
+  // will be called back before preceding. If any packets not recycled,
   // that means there is a resource leak.
   //
   gBS->RestoreTPL (OldTpl);

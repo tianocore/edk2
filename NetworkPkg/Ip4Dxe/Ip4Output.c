@@ -21,10 +21,10 @@ UINT16  mIp4Id;
                            Fragment, Ttl, Protocol, Src and Dst. All the fields
                            are in host byte order. This function will fill in
                            the Ver, HeadLen, and checksum.
-  @param  Option           The orginal IP4 option to copy from
+  @param  Option           The original IP4 option to copy from
   @param  OptLen           The length of the IP4 option
 
-  @retval EFI_BAD_BUFFER_SIZE  There is no enought room in the head space of
+  @retval EFI_BAD_BUFFER_SIZE  There is no enough room in the head space of
                                Packet.
   @retval EFI_SUCCESS          The IP4 header is successfully added to the packet.
 
@@ -300,7 +300,7 @@ Ip4Output (
 
   } else if (GateWay == IP4_ALLZERO_ADDRESS) {
     //
-    // Route the packet unless overrided, that is, GateWay isn't zero.
+    // Route the packet unless overridden, that is, GateWay isn't zero.
     //
     if (IpInstance == NULL) {
       CacheEntry = Ip4Route (IpSb->DefaultRouteTable, Head->Dst, Head->Src, IpIf->SubnetMask, TRUE);
@@ -331,7 +331,7 @@ Ip4Output (
 
   if (Packet->TotalSize + HeadLen > Mtu) {
     //
-    // Fragmentation is diabled for RawData mode.
+    // Fragmentation is disabled for RawData mode.
     //
     if (RawData) {
       return EFI_BAD_BUFFER_SIZE;
@@ -399,7 +399,7 @@ Ip4Output (
   }
 
   //
-  // Send the first fragment, it is either the orginal packet, or the
+  // Send the first fragment, it is either the original packet, or the
   // first fragment of a fragmented packet. It seems that there is a subtle
   // bug here: what if the caller free the packet in Callback and IpIf (or
   // MNP child used by that interface) still holds the fragments and try
@@ -420,7 +420,7 @@ Ip4Output (
   //    is bound with the Packet. It will only be freed when all
   //    the references to Packet have been released. Upon then, the
   //    Packet's OnFree callback will release the IP4_TXTOKEN_WRAP,
-  //    and singal the user's recycle event. So, also no problem for
+  //    and signal the user's recycle event. So, also no problem for
   //    upper layer's packets.
   //
   Ip4PrependHead (Packet, Head, Option, OptLen);

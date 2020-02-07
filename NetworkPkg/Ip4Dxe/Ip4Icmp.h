@@ -10,7 +10,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define __EFI_IP4_ICMP_H__
 
   //
-  // ICMP type definations
+  // ICMP type definitions
   //
 #define ICMP_ECHO_REPLY            0
 #define ICMP_DEST_UNREACHABLE      3
@@ -27,7 +27,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define ICMP_DEFAULT_CODE          0
 
   //
-  // ICMP code definations for ICMP_DEST_UNREACHABLE
+  // ICMP code definitions for ICMP_DEST_UNREACHABLE
   //
 #define ICMP_NET_UNREACHABLE       0
 #define ICMP_HOST_UNREACHABLE      1
@@ -44,13 +44,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define ICMP_HOST_UNREACHABLE_TOS  12
 
   //
-  // ICMP code definations for ICMP_TIME_EXCEEDED
+  // ICMP code definitions for ICMP_TIME_EXCEEDED
   //
 #define ICMP_TIMEOUT_IN_TRANSIT    0
 #define ICMP_TIMEOUT_REASSEMBLE    1  // Host may generate
 
   //
-  // ICMP code definations for ICMP_TIME_EXCEEDED
+  // ICMP code definitions for ICMP_TIME_EXCEEDED
   //
 #define ICMP_NET_REDIRECT          0
 #define ICMP_HOST_REDIRECT         1
