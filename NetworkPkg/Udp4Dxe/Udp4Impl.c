@@ -119,7 +119,7 @@ Udp4CancelTokens (
   @param[in]  Udp4Session        Pointer to the EFI_UDP4_SESSION_DATA abstracted
                                  from the received udp datagram.
 
-  @retval TRUE       The udp datagram matches the receiving requirments of the
+  @retval TRUE       The udp datagram matches the receiving requirements of the
                      udp Instance.
   @retval FALSE      Otherwise.
 
@@ -439,7 +439,7 @@ Udp4CheckTimeout (
 
 
 /**
-  This function intializes the new created udp instance.
+  This function initializes the new created udp instance.
 
   @param[in]      Udp4Service       Pointer to the UDP4_SERVICE_DATA.
   @param[in, out] Instance          Pointer to the un-initialized UDP4_INSTANCE_DATA.
@@ -851,7 +851,7 @@ Udp4ValidateTxToken (
 
     if ((UdpSessionData->DestinationPort == 0) && (ConfigData->RemotePort == 0)) {
       //
-      // Ambiguous, no avalaible DestinationPort for this token.
+      // Ambiguous, no available DestinationPort for this token.
       //
       return EFI_INVALID_PARAMETER;
     }
@@ -864,7 +864,7 @@ Udp4ValidateTxToken (
     }
   } else if (EFI_IP4_EQUAL (&ConfigData->RemoteAddress, &mZeroIp4Addr)) {
     //
-    // the configured RemoteAddress is all zero, and the user doens't override the
+    // the configured RemoteAddress is all zero, and the user doesn't override the
     // destination address.
     //
     return EFI_INVALID_PARAMETER;
@@ -922,7 +922,7 @@ Udp4TokenExist (
   pseudo HeadSum to reduce some overhead.
 
   @param[in]  Packet             Pointer to the NET_BUF contains the udp datagram.
-  @param[in]  HeadSum            Checksum of the pseudo header execpt the length
+  @param[in]  HeadSum            Checksum of the pseudo header except the length
                                  field.
 
   @retval The 16-bit checksum of this udp datagram.
@@ -1264,7 +1264,7 @@ Udp4InstanceCancelToken (
   @param[in]  Udp4Session        Pointer to the EFI_UDP4_SESSION_DATA abstracted
                                  from the received udp datagram.
 
-  @retval TRUE       The udp datagram matches the receiving requirments of the
+  @retval TRUE       The udp datagram matches the receiving requirements of the
                      udp Instance.
   @retval FALSE      Otherwise.
 
