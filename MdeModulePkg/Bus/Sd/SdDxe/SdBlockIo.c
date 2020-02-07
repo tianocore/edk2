@@ -9,7 +9,7 @@
 #include "SdDxe.h"
 
 /**
-  Nonblocking I/O callback funtion when the event is signaled.
+  Nonblocking I/O callback function when the event is signaled.
 
   @param[in]  Event     The Event this notify function registered to.
   @param[in]  Context   Pointer to the context data registered to the
@@ -569,7 +569,7 @@ Error:
   @retval EFI_WRITE_PROTECTED   The device can not be read/written to.
   @retval EFI_DEVICE_ERROR      The device reported an error while performing the read/write.
   @retval EFI_NO_MEDIA          There is no media in the device.
-  @retval EFI_MEDIA_CHNAGED     The MediaId does not matched the current device.
+  @retval EFI_MEDIA_CHANGED     The MediaId does not match the current device.
   @retval EFI_BAD_BUFFER_SIZE   The Buffer was not a multiple of the block size of the device.
   @retval EFI_INVALID_PARAMETER The read/write request contains LBAs that are not valid,
                                 or the buffer is not on proper alignment.
@@ -721,7 +721,7 @@ SdReset (
   @retval EFI_SUCCESS           The data was read correctly from the device.
   @retval EFI_DEVICE_ERROR      The device reported an error while performing the read.
   @retval EFI_NO_MEDIA          There is no media in the device.
-  @retval EFI_MEDIA_CHANGED     The MediaId does not matched the current device.
+  @retval EFI_MEDIA_CHANGED     The MediaId does not match the current device.
   @retval EFI_BAD_BUFFER_SIZE   The Buffer was not a multiple of the block size of the device.
   @retval EFI_INVALID_PARAMETER The read request contains LBAs that are not valid,
                                 or the buffer is not on proper alignment.
@@ -760,7 +760,7 @@ SdReadBlocks (
   @retval EFI_WRITE_PROTECTED   The device can not be written to.
   @retval EFI_DEVICE_ERROR      The device reported an error while performing the write.
   @retval EFI_NO_MEDIA          There is no media in the device.
-  @retval EFI_MEDIA_CHNAGED     The MediaId does not matched the current device.
+  @retval EFI_MEDIA_CHANGED     The MediaId does not match the current device.
   @retval EFI_BAD_BUFFER_SIZE   The Buffer was not a multiple of the block size of the device.
   @retval EFI_INVALID_PARAMETER The write request contains LBAs that are not valid,
                                 or the buffer is not on proper alignment.
@@ -918,7 +918,7 @@ SdReadBlocksEx (
   @retval EFI_WRITE_PROTECTED   The device can not be written to.
   @retval EFI_DEVICE_ERROR      The device reported an error while performing the write.
   @retval EFI_NO_MEDIA          There is no media in the device.
-  @retval EFI_MEDIA_CHNAGED     The MediaId does not matched the current device.
+  @retval EFI_MEDIA_CHANGED     The MediaId does not match the current device.
   @retval EFI_BAD_BUFFER_SIZE   The Buffer was not a multiple of the block size of the device.
   @retval EFI_INVALID_PARAMETER The write request contains LBAs that are not valid,
                                 or the buffer is not on proper alignment.
