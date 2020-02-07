@@ -4,7 +4,7 @@
 #  It installs the Capsule Architectural Protocol defined in PI1.0a to signify
 #  the capsule runtime services are ready.
 #
-#  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2020, Intel Corporation. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -82,7 +82,8 @@
   gEdkiiVariableLockProtocolGuid
 
 [FeaturePcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSupportUpdateCapsuleReset   ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSupportUpdateCapsuleReset        ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSupportProcessCapsuleAtRuntime   ## CONSUMES
 
 [FeaturePcd.X64]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode      ## CONSUMES

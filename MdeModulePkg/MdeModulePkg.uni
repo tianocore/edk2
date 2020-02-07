@@ -4,7 +4,7 @@
 // It also provides the definitions(including PPIs/PROTOCOLs/GUIDs and library classes)
 // and libraries instances, which are used for those modules.
 //
-// Copyright (c) 2007 - 2019, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2007 - 2020, Intel Corporation. All rights reserved.<BR>
 //
 // SPDX-License-Identifier: BSD-2-Clause-Patent
 //
@@ -1008,6 +1008,13 @@
                                                                                                    "which requires that all PCI MMIO BARs are located below 4 GB.<BR>"
                                                                                                    "TRUE  - All PCI MMIO BARs of a device will be located below 4 GB if it has an option ROM.<BR>"
                                                                                                    "FALSE - PCI MMIO BARs of a device may be located above 4 GB even if it has an option ROM.<BR>"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdSupportProcessCapsuleAtRuntime_PROMPT  #language en-US "Enable process non-reset capsule image at runtime."
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdSupportProcessCapsuleAtRuntime_HELP  #language en-US "Indicates if the platform can support process non-reset capsule image at runtime.<BR><BR>\n"
+                                                                                                   "TRUE  - Supports process non-reset capsule image at runtime.<BR>\n"
+                                                                                                   "FALSE - Does not support process non-reset capsule image at runtime.<BR>"
+
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdStatusCodeSubClassCapsule_PROMPT  #language en-US "Status Code for Capsule subclass definitions"
 
