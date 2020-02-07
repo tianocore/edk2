@@ -240,7 +240,7 @@ FatalError:
                         Script opcodes. If the function returns successfully,
                         the caller must set the S3Context pointer -- originally
                         returned by AllocateS3Context() -- immediately to NULL,
-                        because the ownership of S3Context has been transfered.
+                        because the ownership of S3Context has been transferred.
 
   @retval EFI_SUCCESS The translation of S3Context to ACPI S3 Boot Script
                       opcodes has been successfully executed or queued. (This
