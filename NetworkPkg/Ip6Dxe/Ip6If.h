@@ -1,5 +1,5 @@
 /** @file
-  Definition for IP6 pesudo interface structure.
+  Definition for IP6 pseudo interface structure.
 
   Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
 
@@ -203,7 +203,7 @@ Ip6OnFrameReceived (
 
   @retval EFI_ALREADY_STARTED   There is already a pending receive request.
   @retval EFI_OUT_OF_RESOURCES  Failed to allocate resources to receive.
-  @retval EFI_SUCCESS           The recieve request has been started.
+  @retval EFI_SUCCESS           The receive request has been started.
 
 **/
 EFI_STATUS

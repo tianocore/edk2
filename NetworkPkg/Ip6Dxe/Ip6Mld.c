@@ -383,7 +383,7 @@ ERROR:
 
   @retval EFI_OUT_OF_RESOURCES      There are not sufficient resources to complete
                                     the operation.
-  @retval EFI_SUCESS                The address is added to the group address array.
+  @retval EFI_SUCCESS               The address is added to the group address array.
 
 **/
 EFI_STATUS
@@ -496,8 +496,8 @@ Ip6JoinGroup (
   }
 
   //
-  // Repeat the report once or twcie after short delays [Unsolicited Report Interval] (default:10s)
-  // Simulate this operation as a Multicast-Address-Specific Query was received for that addresss.
+  // Repeat the report once or twice after short delays [Unsolicited Report Interval] (default:10s)
+  // Simulate this operation as a Multicast-Address-Specific Query was received for that address.
   //
   Group = Ip6CreateMldEntry (IpSb, Address, IP6_UNSOLICITED_REPORT_INTERVAL);
   if (Group == NULL) {
@@ -604,7 +604,7 @@ Ip6LeaveGroup (
 
   @retval EFI_ALREADY_STARTED   Wants to join the group, but is already a member of it
   @retval EFI_OUT_OF_RESOURCES  Failed to allocate sufficient resources.
-  @retval EFI_DEVICE_ERROR      Failed to set the group configuraton.
+  @retval EFI_DEVICE_ERROR      Failed to set the group configuration.
   @retval EFI_SUCCESS           Successfully updated the group setting.
   @retval EFI_NOT_FOUND         Try to leave the group which it isn't a member.
 

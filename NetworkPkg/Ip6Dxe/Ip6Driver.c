@@ -498,7 +498,7 @@ ON_ERROR:
   @param[in]  RemainingDevicePath Optional parameter used to pick a specific child
                                   device to start.
 
-  @retval EFI_SUCCES              This driver is added to ControllerHandle.
+  @retval EFI_SUCCESS             This driver is added to ControllerHandle.
   @retval EFI_ALREADY_STARTED     This driver is already running on ControllerHandle.
   @retval other                   This driver does not support this device.
 
@@ -547,7 +547,7 @@ Ip6DriverBindingStart (
   Ip6Cfg  = &IpSb->Ip6ConfigInstance.Ip6Config;
 
   //
-  // Install the Ip6ServiceBinding Protocol onto ControlerHandle
+  // Install the Ip6ServiceBinding Protocol onto ControllerHandle
   //
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &ControllerHandle,
@@ -823,7 +823,7 @@ Exit:
                                  is not NULL, then the I/O services are added to
                                  the existing child handle.
 
-  @retval EFI_SUCCES             The child handle was created with the I/O services.
+  @retval EFI_SUCCESS            The child handle was created with the I/O services.
   @retval EFI_OUT_OF_RESOURCES   There are not enough resources available to create
                                  the child.
   @retval other                  The child handle was not created.
@@ -925,7 +925,7 @@ ON_ERROR:
   @param[in]  This               Protocol instance pointer.
   @param[in]  ChildHandle        Handle of the child to destroy.
 
-  @retval EFI_SUCCES             The I/O services were removed from the child
+  @retval EFI_SUCCESS            The I/O services were removed from the child
                                  handle.
   @retval EFI_UNSUPPORTED        The child handle does not support the I/O services
                                   that are being removed.
@@ -1005,14 +1005,14 @@ Ip6ServiceBindingDestroyChild (
   // Uninstall the IP6 protocol first. Many thing happens during
   // this:
   // 1. The consumer of the IP6 protocol will be stopped if it
-  // opens the protocol BY_DRIVER. For eaxmple, if MNP driver is
+  // opens the protocol BY_DRIVER. For example, if MNP driver is
   // stopped, IP driver's stop function will be called, and uninstall
   // EFI_IP6_PROTOCOL will trigger the UDP's stop function. This
   // makes it possible to create the network stack bottom up, and
   // stop it top down.
   // 2. the upper layer will recycle the received packet. The recycle
   // event's TPL is higher than this function. The recycle events
-  // will be called back before preceeding. If any packets not recycled,
+  // will be called back before preceding. If any packets not recycled,
   // that means there is a resource leak.
   //
   gBS->RestoreTPL (OldTpl);

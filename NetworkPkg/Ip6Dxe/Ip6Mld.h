@@ -124,7 +124,7 @@ Ip6LeaveGroup (
 
   @retval EFI_ALREADY_STARTED   Wants to join the group, but is already a member of it.
   @retval EFI_OUT_OF_RESOURCES  Failed to allocate some resources.
-  @retval EFI_DEVICE_ERROR      Failed to set the group configuraton.
+  @retval EFI_DEVICE_ERROR      Failed to set the group configuration.
   @retval EFI_SUCCESS           Successfully updated the group setting.
   @retval EFI_NOT_FOUND         Tried to leave a group of whom it isn't a member.
 
