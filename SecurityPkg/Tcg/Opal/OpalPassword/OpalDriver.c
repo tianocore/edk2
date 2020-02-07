@@ -2583,7 +2583,7 @@ OpalDriverGetDriverDeviceName(
   @param ImageHandle     Image Handle this driver.
   @param SystemTable     Pointer to SystemTable.
 
-  @retval EFI_SUCCESS     This function always complete successfully.
+  @retval EFI_SUCCESS    This function always complete successfully.
 **/
 EFI_STATUS
 EFIAPI

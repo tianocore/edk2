@@ -141,7 +141,7 @@ Tcg2ConfigPeimEntryPoint (
   ASSERT_EFI_ERROR (Status);
 
   //
-  // Even if no TPM is selected or detected, we still need intall TpmInitializationDonePpi.
+  // Even if no TPM is selected or detected, we still need install TpmInitializationDonePpi.
   // Because TcgPei or Tcg2Pei will not run, but we still need a way to notify other driver.
   // Other driver can know TPM initialization state by TpmInitializedPpi.
   //

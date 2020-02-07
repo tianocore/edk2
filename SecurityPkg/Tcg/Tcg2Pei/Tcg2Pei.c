@@ -1006,7 +1006,7 @@ PeimEntryMA (
     }
 
     //
-    // Only intall TpmInitializedPpi on success
+    // Only install TpmInitializedPpi on success
     //
     Status = PeiServicesInstallPpi (&mTpmInitializedPpiList);
     ASSERT_EFI_ERROR (Status);
@@ -1027,7 +1027,7 @@ Done:
       );
   }
   //
-  // Always intall TpmInitializationDonePpi no matter success or fail.
+  // Always install TpmInitializationDonePpi no matter success or fail.
   // Other driver can know TPM initialization state by TpmInitializedPpi.
   //
   Status2 = PeiServicesInstallPpi (&mTpmInitializationDonePpiList);
