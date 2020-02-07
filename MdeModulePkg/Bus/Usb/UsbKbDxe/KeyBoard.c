@@ -253,7 +253,7 @@ UINT8 EfiKeyToUsbKeyCodeConvertionTable[] = {
 };
 
 //
-// Keyboard modifier value to EFI Scan Code convertion table
+// Keyboard modifier value to EFI Scan Code conversion table
 // EFI Scan Code and the modifier values are defined in UEFI spec.
 //
 UINT8 ModifierValueToEfiScanCodeConvertionTable[] = {
@@ -569,7 +569,7 @@ FindPhysicalKey (
 
   This function is registered to event of EFI_HII_SET_KEYBOARD_LAYOUT_EVENT_GUID
   group type, which will be triggered by EFI_HII_DATABASE_PROTOCOL.SetKeyboardLayout().
-  It tries to get curent keyboard layout from HII database.
+  It tries to get current keyboard layout from HII database.
 
   @param  Event        Event being signaled.
   @param  Context      Points to USB_KB_DEV instance.
@@ -1084,7 +1084,7 @@ KeyboardHandler (
 
   //
   // Handle modifier key's pressing or releasing situation.
-  // According to USB HID Firmware spec, Byte 0 uses folloing map of Modifier keys:
+  // According to USB HID Firmware spec, Byte 0 uses following map of Modifier keys:
   // Bit0: Left Control,  Keycode: 0xe0
   // Bit1: Left Shift,    Keycode: 0xe1
   // Bit2: Left Alt,      Keycode: 0xe2
