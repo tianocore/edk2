@@ -44,7 +44,7 @@ Ip6RouteCacheHash (
   @param[in]  GatewayAddress  The next hop address. This is an optional parameter
                               that may be NULL.
 
-  @return NULL if failed to allocate memeory; otherwise, the newly created route entry.
+  @return NULL if failed to allocate memory; otherwise, the newly created route entry.
 
 **/
 IP6_ROUTE_ENTRY *
@@ -105,7 +105,7 @@ Ip6FreeRouteEntry (
   2. The local route entries have precedence over the default route entry.
 
   @param[in]  RtTable       The route table to search from.
-  @param[in]  Destination   The destionation address to search. If NULL, search
+  @param[in]  Destination   The destination address to search. If NULL, search
                             the route table by NextHop.
   @param[in]  NextHop       The next hop address. If NULL, search the route table
                             by Destination.
@@ -210,7 +210,7 @@ Ip6FreeRouteCacheEntry (
 
 /**
   Find a route cache with the destination and source address. This is
-  used by the ICMPv6 redirect messasge process.
+  used by the ICMPv6 redirect message process.
 
   @param[in]  RtTable       The route table to search the cache for.
   @param[in]  Dest          The destination address.

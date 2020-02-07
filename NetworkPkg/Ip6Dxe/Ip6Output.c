@@ -870,7 +870,7 @@ Ip6Output (
 
     for (Index = 0, Offset = 0, PacketLen = Mtu; Index < Num; Index++) {
       //
-      // Get fragment from the Packet, append UnFragnmentLen spare buffer
+      // Get fragment from the Packet, append UnFragmentLen spare buffer
       // before the fragmented data, the corresponding data is filled in later.
       //
       Fragment = NetbufGetFragment (Packet, Offset, PacketLen, UnFragmentLen);

@@ -214,7 +214,7 @@ Ip6CreateLinkLocalAddr (
   }
 
   //
-  // Get the interface id if it is manully configured.
+  // Get the interface id if it is manually configured.
   //
   Ip6Config = &IpSb->Ip6ConfigInstance.Ip6Config;
   DataSize  = sizeof (EFI_IP6_CONFIG_INTERFACE_ID);

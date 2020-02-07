@@ -139,7 +139,7 @@ struct _IP6_PROTOCOL {
 
   UINT8                     PrefixLength; // PrefixLength of the configured station address.
   //
-  // User's transmit/receive tokens, and received/deliverd packets
+  // User's transmit/receive tokens, and received/delivered packets
   //
   NET_MAP                   RxTokens;
   NET_MAP                   TxTokens;   // map between (User's Token, IP6_TXTOKE_WRAP)
@@ -412,7 +412,7 @@ EfiIp6GetModeData (
   @retval EFI_DEVICE_ERROR       An unexpected system or network error occurred. The EFI IPv6
                                  Protocol driver instance was not opened.
   @retval EFI_UNSUPPORTED        Default protocol specified through
-                                 Ip6ConfigData.DefaulProtocol isn't supported.
+                                 Ip6ConfigData.DefaultProtocol isn't supported.
 
 **/
 EFI_STATUS
@@ -470,7 +470,7 @@ EfiIp6Groups (
   the destination IPv6 address arithmetically. The gateway address must be on the same subnet as the
   configured station address.
 
-  The default route is added with Destination and PrefixLegth both set to all zeros. The
+  The default route is added with Destination and PrefixLength both set to all zeros. The
   default route matches all destination IPv6 addresses that do not match any other routes.
 
   All EFI IPv6 Protocol instances share a routing table.
@@ -642,7 +642,7 @@ EfiIp6Transmit (
   is signaled.
 
   Current Udp implementation creates an IP child for each Udp child.
-  It initates a asynchronous receive immediately whether or not
+  It initiates a asynchronous receive immediately whether or not
   there is no mapping. Therefore, disable the returning EFI_NO_MAPPING for now.
   To enable it, the following check must be performed:
 

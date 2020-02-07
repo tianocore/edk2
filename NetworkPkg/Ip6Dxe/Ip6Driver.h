@@ -66,7 +66,7 @@ Ip6DriverEntryPoint (
   );
 
 //
-// Function prototypes for the Drivr Binding Protocol
+// Function prototypes for the Driver Binding Protocol
 //
 
 /**
@@ -98,7 +98,7 @@ Ip6DriverBindingSupported (
   @param[in]  RemainingDevicePath Optional parameter used to pick a specific child
                                   device to start.
 
-  @retval EFI_SUCCES              This driver is added to ControllerHandle.
+  @retval EFI_SUCCESS             This driver is added to ControllerHandle.
   @retval EFI_ALREADY_STARTED     This driver is already running on ControllerHandle.
   @retval other                   This driver does not support this device.
 
@@ -147,7 +147,7 @@ Ip6DriverBindingStop (
                                  is not NULL, then the I/O services are added to
                                  the existing child handle.
 
-  @retval EFI_SUCCES             The child handle was created with the I/O services.
+  @retval EFI_SUCCESS            The child handle was created with the I/O services.
   @retval EFI_OUT_OF_RESOURCES   There are not enough resources available to create
                                  the child.
   @retval other                  The child handle was not created.
@@ -166,7 +166,7 @@ Ip6ServiceBindingCreateChild (
   @param[in]  This               Protocol instance pointer.
   @param[in]  ChildHandle        Handle of the child to destroy.
 
-  @retval EFI_SUCCES             The I/O services were removed from the child
+  @retval EFI_SUCCESS            The I/O services were removed from the child
                                  handle.
   @retval EFI_UNSUPPORTED        The child handle does not support the I/O services
                                   that are being removed.

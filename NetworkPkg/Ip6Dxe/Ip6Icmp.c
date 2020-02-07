@@ -300,7 +300,7 @@ Ip6ProcessIcmpError (
   }
 
   //
-  // Notify the upper-layer process that an ICMPv6 eror message is received.
+  // Notify the upper-layer process that an ICMPv6 error message is received.
   //
   IP6_GET_CLIP_INFO (Packet)->Status = EFI_ICMP_ERROR;
   return Ip6Demultiplex (IpSb, Head, Packet);
