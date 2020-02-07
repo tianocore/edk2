@@ -280,7 +280,7 @@ ScanForRootBridges (
           //
           if (Pci.Bridge.SubordinateBus > SubBus) {
             //
-            // If the suborinate bus number of the PCI-PCI bridge is greater
+            // If the subordinate bus number of the PCI-PCI bridge is greater
             // than the PCI root bridge's current subordinate bus number,
             // then update the PCI root bridge's subordinate bus number
             //
@@ -419,7 +419,7 @@ ScanForRootBridges (
 
         //
         // See if the PCI Device is a PCI - ISA or PCI - EISA
-        // or ISA_POSITIVIE_DECODE Bridge device
+        // or ISA_POSITIVE_DECODE Bridge device
         //
         if (Pci.Hdr.ClassCode[2] == PCI_CLASS_BRIDGE) {
           if (Pci.Hdr.ClassCode[1] == PCI_CLASS_BRIDGE_ISA ||

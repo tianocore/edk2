@@ -53,7 +53,7 @@ XenBusEventChannelAllocate (
   Send an event to the remote end of the channel whose local endpoint is Port.
 
   @param This       A pointer to the XENBUS_PROTOCOL.
-  @param Port       Local port to the the event from.
+  @param Port       Local port to the event from.
 
   @retval UINT32    The return value from the hypercall, 0 if success.
 **/

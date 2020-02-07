@@ -27,7 +27,7 @@
   @param FromBackend  Read frontend or backend value.
   @param ValuePtr     Where to put the value.
 
-  @retval XENSTORE_STATUS_SUCCESS  If succefull, will update ValuePtr.
+  @retval XENSTORE_STATUS_SUCCESS  If successful, will update ValuePtr.
   @return                          Any other return value indicate the error,
                                    ValuePtr is not updated in this case.
 **/

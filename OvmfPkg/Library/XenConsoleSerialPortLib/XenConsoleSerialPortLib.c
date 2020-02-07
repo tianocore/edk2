@@ -247,13 +247,13 @@ SerialPortGetControl (
 }
 
 /**
-  Sets the baud rate, receive FIFO depth, transmit/receice time out, parity,
+  Sets the baud rate, receive FIFO depth, transmit/receive time out, parity,
   data bits, and stop bits on a serial device.
 
   @param BaudRate           The requested baud rate. A BaudRate value of 0 will use the
                             device's default interface speed.
                             On output, the value actually set.
-  @param ReveiveFifoDepth   The requested depth of the FIFO on the receive side of the
+  @param ReceiveFifoDepth   The requested depth of the FIFO on the receive side of the
                             serial interface. A ReceiveFifoDepth value of 0 will use
                             the device's default FIFO depth.
                             On output, the value actually set.
@@ -266,7 +266,7 @@ SerialPortGetControl (
                             DefaultParity will use the device's default parity value.
                             On output, the value actually set.
   @param DataBits           The number of data bits to use on the serial device. A DataBits
-                            vaule of 0 will use the device's default data bit setting.
+                            value of 0 will use the device's default data bit setting.
                             On output, the value actually set.
   @param StopBits           The number of stop bits to use on this serial device. A StopBits
                             value of DefaultStopBits will use the device's default number of

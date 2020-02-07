@@ -215,7 +215,7 @@ XENSTORE_STATUS
   Grant access to the page Frame to the domain DomainId.
 
   @param This       A pointer to XENBUS_PROTOCOL instance.
-  @param DomainId   ID of the domain to grant acces to.
+  @param DomainId   ID of the domain to grant access to.
   @param Frame      Frame Number of the page to grant access to.
   @param ReadOnly   Provide read-only or read-write access.
   @param RefPtr     Reference number of the grant will be written to this pointer.
@@ -266,7 +266,7 @@ UINT32
   Send an event to the remote end of the channel whose local endpoint is Port.
 
   @param This       A pointer to the XENBUS_PROTOCOL.
-  @param Port       Local port to the the event from.
+  @param Port       Local port to the event from.
 
   @retval UINT32    The return value from the hypercall, 0 if success.
 **/
