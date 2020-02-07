@@ -59,7 +59,7 @@ AcpiTimerLibConstructor (
 
   //
   // If the register offset to the BAR for the ACPI I/O Port Base Address is 0x0000, then
-  // no PCI register programming is required to enable access to the the ACPI registers
+  // no PCI register programming is required to enable access to the ACPI registers
   // specified by PcdAcpiIoPortBaseAddress
   //
   if (PcdGet16 (PcdAcpiIoPciBarRegisterOffset) == 0x0000) {

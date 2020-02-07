@@ -58,7 +58,7 @@ UINT8   gBreakSet = 0;
   If the serial device could not be initialized, then return RETURN_DEVICE_ERROR.
 
   @retval RETURN_SUCCESS        The serial device was initialized.
-  @retval RETURN_DEVICE_ERROR   The serail device could not be initialized.
+  @retval RETURN_DEVICE_ERROR   The serial device could not be initialized.
 
 **/
 RETURN_STATUS
@@ -139,7 +139,7 @@ SerialPortWrite (
 
   while ((NumberOfBytes--) != 0) {
     //
-    // Wait for the serail port to be ready.
+    // Wait for the serial port to be ready.
     //
     do {
       Data = IoRead8 ((UINT16) gUartBase + LSR_OFFSET);
@@ -180,7 +180,7 @@ SerialPortRead (
 
   while ((NumberOfBytes--) != 0) {
     //
-    // Wait for the serail port to be ready.
+    // Wait for the serial port to be ready.
     //
     do {
       Data = IoRead8 ((UINT16) gUartBase + LSR_OFFSET);
