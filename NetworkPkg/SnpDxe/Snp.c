@@ -782,7 +782,7 @@ SimpleNetworkDriverStop (
 
   if (PcdGetBool (PcdSnpCreateExitBootServicesEvent)) {
     //
-    // Close EXIT_BOOT_SERIVES Event
+    // Close EXIT_BOOT_SERVICES Event
     //
     gBS->CloseEvent (Snp->ExitBootServicesEvent);
   }
@@ -840,9 +840,9 @@ EFI_DRIVER_BINDING_PROTOCOL gSimpleNetworkDriverBinding = {
   @param ImageHandle       The driver image handle.
   @param SystemTable       The system table.
 
-  @retval EFI_SUCEESS      Initialization routine has found UNDI hardware,
+  @retval EFI_SUCCESS      Initialization routine has found UNDI hardware,
                            loaded it's ROM, and installed a notify event for
-                           the Network Indentifier Interface Protocol
+                           the Network Identifier Interface Protocol
                            successfully.
   @retval Other            Return value from HandleProtocol for
                            DeviceIoProtocol or LoadedImageProtocol

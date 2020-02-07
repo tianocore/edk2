@@ -53,7 +53,7 @@ SnpUndi32CallbackBlock (
   @param UniqueId      This was supplied to UNDI at Undi_Start, SNP uses this to
                        store Undi interface context (Undi does not read or write
                        this variable).
-  @param MicroSeconds  Number of micro seconds to pause, ususlly multiple of 10.
+  @param MicroSeconds  Number of micro seconds to pause, usually multiple of 10.
 
 **/
 VOID

@@ -10,7 +10,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 
 /**
-  Nofication call back function for WaitForPacket event.
+  Notification call back function for WaitForPacket event.
 
   @param  Event       EFI Event.
   @param  SnpPtr      Pointer to SNP_DRIVER structure.
