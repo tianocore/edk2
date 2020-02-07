@@ -224,7 +224,7 @@ TcpBuildOption (
                            successfully pasrsed options.
 
   @retval          0       The options are successfully pasrsed.
-  @retval          -1      Ilegal option was found.
+  @retval          -1      Illegal option was found.
 
 **/
 INTN

@@ -40,12 +40,12 @@
 #define TCP_OPTION_MSS_FAST  ((TCP_OPTION_MSS << 24) | (TCP_OPTION_MSS_LEN << 16))
 
 //
-// Other misc definations
+// Other misc definitions
 //
 #define TCP_OPTION_RCVD_MSS        0x01
 #define TCP_OPTION_RCVD_WS         0x02
 #define TCP_OPTION_RCVD_TS         0x04
-#define TCP_OPTION_MAX_WS          14      ///< Maxium window scale value
+#define TCP_OPTION_MAX_WS          14      ///< Maximum window scale value
 #define TCP_OPTION_MAX_WIN         0xffff  ///< Max window size in TCP header
 
 ///
@@ -111,7 +111,7 @@ TcpBuildOption (
                            successfully pasrsed options.
 
   @retval          0       The options successfully pasrsed.
-  @retval          -1      Ilegal option was found.
+  @retval          -1      Illegal option was found.
 
 **/
 INTN

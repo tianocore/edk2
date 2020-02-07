@@ -86,9 +86,9 @@
 #define TCP_TICK                 200                ///< Every TCP tick is 200ms.
 #define TCP_TICK_HZ              5                  ///< The frequence of TCP tick.
 #define TCP_RTT_SHIFT            3                  ///< SRTT & RTTVAR scaled by 8.
-#define TCP_RTO_MIN              TCP_TICK_HZ        ///< The minium value of RTO.
-#define TCP_RTO_MAX              (TCP_TICK_HZ * 60) ///< The maxium value of RTO.
-#define TCP_FOLD_RTT             4                  ///< Timeout threshod to fold RTT.
+#define TCP_RTO_MIN              TCP_TICK_HZ        ///< The minimum value of RTO.
+#define TCP_RTO_MAX              (TCP_TICK_HZ * 60) ///< The maximum value of RTO.
+#define TCP_FOLD_RTT             4                  ///< Timeout threshold to fold RTT.
 
 //
 // Default values for some timers
@@ -103,7 +103,7 @@
 #define TCP_CONNECT_TIME         (75 * TCP_TICK_HZ)
 
 //
-// The header space to be reserved before TCP data to accomodate :
+// The header space to be reserved before TCP data to accommodate:
 // 60byte IP head + 60byte TCP head + link layer head
 //
 #define TCP_MAX_HEAD             192
@@ -236,7 +236,7 @@ struct _TCP_CONTROL_BLOCK {
   LIST_ENTRY        List;     ///< Back and forward link entry
   TCP_CB            *Parent;  ///< The parent TCP_CB structure
 
-  SOCKET            *Sk;      ///< The socket it controled.
+  SOCKET            *Sk;      ///< The socket it controlled.
   TCP_PEER          LocalEnd; ///< Local endpoint.
   TCP_PEER          RemoteEnd;///< Remote endpoint.
 
@@ -320,9 +320,9 @@ struct _TCP_CONTROL_BLOCK {
   //
   UINT32            KeepAliveIdle;   ///< Idle time before sending first probe.
   UINT32            KeepAlivePeriod; ///< Interval for subsequent keep alive probe.
-  UINT8             MaxKeepAlive;    ///< Maxium keep alive probe times.
+  UINT8             MaxKeepAlive;    ///< Maximum keep alive probe times.
   UINT8             KeepAliveProbes; ///< The number of keep alive probe.
-  UINT16            MaxRexmit;       ///< The maxium number of retxmit before abort.
+  UINT16            MaxRexmit;       ///< The maximum number of retxmit before abort.
   UINT32            FinWait2Timeout; ///< The FIN_WAIT_2 timeout.
   UINT32            TimeWaitTimeout; ///< The TIME_WAIT timeout.
   UINT32            ConnectTimeout;  ///< The connect establishment timeout.

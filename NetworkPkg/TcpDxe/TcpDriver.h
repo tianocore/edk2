@@ -203,13 +203,13 @@ Tcp6DriverBindingStop (
   );
 
 /**
-  The Callback funtion called after the TCP socket is created.
+  The Callback function called after the TCP socket is created.
 
   @param[in]  This            Pointer to the socket just created.
   @param[in]  Context         The context of the socket.
 
   @retval EFI_SUCCESS         This protocol is installed successfully.
-  @retval other               An error occured.
+  @retval other               An error occurred.
 
 **/
 EFI_STATUS
@@ -248,7 +248,7 @@ TcpDestroySocketCallback (
                                 If it is a pointer to an existing UEFI handle,
                                 then the protocol is added to the existing UEFI handle.
 
-  @retval EFI_SUCCES            The protocol was added to ChildHandle.
+  @retval EFI_SUCCESS           The protocol was added to ChildHandle.
   @retval EFI_INVALID_PARAMETER ChildHandle is NULL.
   @retval EFI_OUT_OF_RESOURCES  There are not enough resources available to create
                                 the child.
@@ -272,7 +272,7 @@ TcpServiceBindingCreateChild (
   @param  This        Pointer to the EFI_SERVICE_BINDING_PROTOCOL instance.
   @param  ChildHandle Handle of the child to destroy.
 
-  @retval EFI_SUCCES            The protocol was removed from ChildHandle.
+  @retval EFI_SUCCESS           The protocol was removed from ChildHandle.
   @retval EFI_UNSUPPORTED       ChildHandle does not support the protocol that is being removed.
   @retval EFI_INVALID_PARAMETER The child handle is NULL.
   @retval EFI_ACCESS_DENIED     The protocol could not be removed from the ChildHandle
