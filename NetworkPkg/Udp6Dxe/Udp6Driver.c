@@ -117,7 +117,7 @@ Udp6DriverBindingSupported (
   @param[in]  RemainingDevicePath    Optional parameter use to pick a specific child
                                      device to start.
 
-  @retval EFI_SUCCES             This driver is added to ControllerHandle.
+  @retval EFI_SUCCESS            This driver is added to ControllerHandle.
   @retval EFI_OUT_OF_RESOURCES   The required system resource can't be allocated.
   @retval other                  This driver does not support this device.
 
@@ -223,7 +223,7 @@ Udp6DestroyChildEntryInHandleBuffer (
                                      of children is zero stop the entire bus driver.
   @param[in]  ChildHandleBuffer      List of Child Handles to Stop. It is optional.
 
-  @retval EFI_SUCCES             This driver is removed ControllerHandle.
+  @retval EFI_SUCCESS            This driver is removed ControllerHandle.
   @retval EFI_DEVICE_ERROR       Can't find the NicHandle from the ControllerHandle and specified GUID.
   @retval other                  This driver was not removed from this device.
 
@@ -310,7 +310,7 @@ Udp6DriverBindingStop (
                                then a new handle is created. If it is a pointer to an existing UEFI handle,
                                then the protocol is added to the existing UEFI handle.
 
-  @retval EFI_SUCCES            The protocol was added to ChildHandle.
+  @retval EFI_SUCCESS           The protocol was added to ChildHandle.
   @retval EFI_INVALID_PARAMETER This is NULL or ChildHandle is NULL.
   @retval EFI_OUT_OF_RESOURCES  There are not enough resources available to create
                                 the child.
@@ -443,7 +443,7 @@ ON_ERROR:
   @param[in]  This               Protocol instance pointer.
   @param[in]  ChildHandle        Handle of the child to destroy.
 
-  @retval EFI_SUCCES             The I/O services were removed from the child
+  @retval EFI_SUCCESS            The I/O services were removed from the child
                                  handle.
   @retval EFI_UNSUPPORTED        The child handle does not support the I/O services
                                  that are being removed.

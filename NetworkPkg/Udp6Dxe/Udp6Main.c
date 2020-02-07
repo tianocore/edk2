@@ -104,7 +104,7 @@ Udp6GetModeData (
 
   @retval EFI_SUCCESS            The configuration settings were set, changed, or
                                  reset successfully.
-  @retval EFI_NO_MAPPING         When the UdpConifgData.UseAnyStationAddress is set
+  @retval EFI_NO_MAPPING         When the UdpConfigData.UseAnyStationAddress is set
                                  to true and there is no address available for the IP6
                                  driver to bind a source address to this instance.
   @retval EFI_INVALID_PARAMETER  One or more following conditions are TRUE:
@@ -368,7 +368,7 @@ Udp6Groups (
   // Keep a local copy of the configured multicast IPs because IpIo receives
   // datagrams from the 0 station address IP instance and then UDP delivers to
   // the matched instance. This copy of multicast IPs is used to avoid receive
-  // the mutlicast datagrams destinated to multicast IPs the other instances configured.
+  // the multicast datagrams destinated to multicast IPs the other instances configured.
   //
   if (JoinFlag) {
 
@@ -423,13 +423,13 @@ ON_EXIT:
                                  One or more of the
                                  Token.Packet.TxData.FragmentTable[].FragmentBuffer
                                  fields is NULL. One or more of the
-                                 Token.Packet.TxData.UdpSessionData.DestinationAddres
+                                 Token.Packet.TxData.UdpSessionData.DestinationAddress
                                  are not valid unicast IPv6
                                  addresses if the  UdpSessionData is not NULL.
                                  Token.Packet.TxData.UdpSessionData.
                                  DestinationAddress is NULL
                                  Token.Packet.TxData.UdpSessionData.
-                                 DestinatioPort
+                                 DestinationPort
                                  is zero.
                                  Token.Packet.TxData.UdpSessionData is NULL and this
                                  instance's UdpConfigData.RemoteAddress  is unspecified.
@@ -586,7 +586,7 @@ Udp6Transmit (
       }
     } else {
       //
-      // Set the checksum is zero if the ConfigData->StationAddress is unspcified
+      // Set the checksum is zero if the ConfigData->StationAddress is unspecified
       // and the Ipv6 will fill the correct value of this checksum.
       //
       Udp6Header->Checksum = 0;
@@ -807,7 +807,7 @@ Udp6Cancel (
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   //
-  // Cancle the tokens specified by Token for this instance.
+  // Cancel the tokens specified by Token for this instance.
   //
   Status = Udp6InstanceCancelToken (Instance, Token);
 

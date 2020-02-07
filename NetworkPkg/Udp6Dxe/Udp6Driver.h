@@ -78,7 +78,7 @@ Udp6DriverBindingSupported (
   @param[in]  RemainingDevicePath    Optional parameter use to pick a specific child
                                      device to start.
 
-  @retval EFI_SUCCES             This driver is added to ControllerHandle.
+  @retval EFI_SUCCESS            This driver is added to ControllerHandle.
   @retval EFI_OUT_OF_RESOURCES   The required system resource can't be allocated.
   @retval other                  This driver does not support this device.
 
@@ -132,7 +132,7 @@ Udp6DriverBindingStop (
                                then a new handle is created. If it is a pointer to an existing UEFI handle,
                                then the protocol is added to the existing UEFI handle.
 
-  @retval EFI_SUCCES            The protocol was added to ChildHandle.
+  @retval EFI_SUCCESS           The protocol was added to ChildHandle.
   @retval EFI_INVALID_PARAMETER This is NULL or ChildHandle is NULL.
   @retval EFI_OUT_OF_RESOURCES  There are not enough resources available to create
                                 the child.
@@ -155,7 +155,7 @@ Udp6ServiceBindingCreateChild (
   @param[in]  This               Protocol instance pointer.
   @param[in]  ChildHandle        Handle of the child to destroy.
 
-  @retval EFI_SUCCES             The I/O services were removed from the child
+  @retval EFI_SUCCESS            The I/O services were removed from the child
                                  handle.
   @retval EFI_UNSUPPORTED        The child handle does not support the I/O services
                                  that are being removed.
