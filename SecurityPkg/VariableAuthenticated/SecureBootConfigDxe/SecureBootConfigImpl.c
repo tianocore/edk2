@@ -4071,7 +4071,7 @@ ON_EXIT:
 }
 
 /**
-  This functino to load signature data under the signature list.
+  This function to load signature data under the signature list.
 
   @param[in]  PrivateData         Module's private data.
   @param[in]  LabelId             Label number to insert opcodes.
