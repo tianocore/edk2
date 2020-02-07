@@ -1,5 +1,5 @@
 /** @file
-  IA32/x64 architecture specific defintions needed by debug transfer protocol.It is only
+  IA32/x64 architecture specific definitions needed by debug transfer protocol.It is only
   intended to be used by Debug related module implementation.
 
   Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
