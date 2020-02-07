@@ -27,7 +27,7 @@ XenGrantTableInit (
   );
 
 /**
-  Desinitilize the Grant Table.
+  De-initialize the Grant Table.
 **/
 VOID
 XenGrantTableDeinit (
