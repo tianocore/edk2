@@ -1,5 +1,5 @@
 /** @file
-  XenBus Bus driver implemtation.
+  XenBus Bus driver implementation.
 
   This file implement the necessary to discover and enumerate Xen PV devices
   through XenStore.

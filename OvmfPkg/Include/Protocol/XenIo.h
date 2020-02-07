@@ -1,7 +1,7 @@
 /** @file
   XenIo protocol to abstract arch specific details
 
-  The Xen implementations for the Intel and ARM archictures differ in the way
+  The Xen implementations for the Intel and ARM architectures differ in the way
   the base address of the grant table is communicated to the guest. The former
   uses a virtual PCI device, while the latter uses a device tree node.
   In order to allow the XenBusDxe UEFI driver to be reused for the non-PCI
