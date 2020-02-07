@@ -22,7 +22,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define TIS_TIMEOUT_MAX             (90000 * 1000)  // 90s
 
 //
-// Max TPM command/reponse length
+// Max TPM command/response length
 //
 #define TPMCMDBUFLENGTH             0x500
 
@@ -77,7 +77,7 @@ TisPcWaitRegisterBits (
 }
 
 /**
-  Get BurstCount by reading the burstCount field of a TIS regiger
+  Get BurstCount by reading the burstCount field of a TIS register
   in the time of default TIS_TIMEOUT_D.
 
   @param[in]  TisReg                Pointer to TIS register.
@@ -340,7 +340,7 @@ Tpm2TisTpmCommand (
     DEBUG ((EFI_D_VERBOSE, "\n"));
   );
   //
-  // Check the reponse data header (tag,parasize and returncode )
+  // Check the response data header (tag,parasize and returncode )
   //
   CopyMem (&Data16, BufferOut, sizeof (UINT16));
   // TPM2 should not use this RSP_COMMAND

@@ -60,7 +60,7 @@ TisPcWaitRegisterBits (
 }
 
 /**
-  Get BurstCount by reading the burstCount field of a TIS regiger
+  Get BurstCount by reading the burstCount field of a TIS register
   in the time of default TIS_TIMEOUT_D.
 
   @param[in]  TisReg                Pointer to TIS register.
