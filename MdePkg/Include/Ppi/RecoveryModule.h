@@ -36,7 +36,7 @@
 
   @par Revision Reference:
   This PPI is defined in UEFI Platform Initialization Specification 1.2 Errata B Volume 1:
-  Pre-EFI Initalization Core Interface
+  Pre-EFI Initialization Core Interface
 
 **/
 

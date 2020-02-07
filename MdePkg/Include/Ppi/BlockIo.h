@@ -15,7 +15,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Revision Reference:
   This PPI is defined in UEFI Platform Initialization Specification 1.2 Volume 1:
-  Pre-EFI Initalization Core Interface.
+  Pre-EFI Initialization Core Interface.
 
 **/
 
@@ -58,7 +58,7 @@ typedef enum {
 /// Specification inconsistency here:
 /// PEI_BLOCK_IO_MEDIA has been changed to EFI_PEI_BLOCK_IO_MEDIA.
 /// Inconsistency exists in UEFI Platform Initialization Specification 1.2
-/// Volume 1: Pre-EFI Initalization Core Interface, where all referrences to
+/// Volume 1: Pre-EFI Initialization Core Interface, where all references to
 /// this structure name are with the "EFI_" prefix, except for the definition
 /// which is without "EFI_".  So the name of PEI_BLOCK_IO_MEDIA is taken as the
 /// exception, and EFI_PEI_BLOCK_IO_MEDIA is used to comply with most of

@@ -7,7 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Revision Reference:
   This PPI is defined in UEFI Platform Initialization Specification 1.4 Volume 1:
-  Pre-EFI Initalization Core Interface.
+  Pre-EFI Initialization Core Interface.
 
 **/
 
