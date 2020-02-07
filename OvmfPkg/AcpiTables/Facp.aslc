@@ -21,7 +21,7 @@ EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE FACP = {
     EFI_ACPI_CREATOR_ID,        // ASL compiler vendor ID
     EFI_ACPI_CREATOR_REVISION   // ASL compiler revision number
   },
-  0,                // Physical addesss of FACS
+  0,                // Physical address of FACS
   0,                // Physical address of DSDT
   RESERVED,         // System Interrupt Model in ACPI 1.0, eliminated in 2.0
   EFI_ACPI_2_0_PM_PROFILE_UNSPECIFIED, // Preferred PM profile
@@ -62,8 +62,8 @@ EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE FACP = {
   GAS2_IO(RESET_REG, 1), // Extended address of the Reset Register
   RESET_VALUE,           // Value for the Reset Register to reset the system
   { RESERVED },     // reserved[3]
-  0,                // 64-bit physical addesss of FACS, set at installation
-  0,                // 64-bit physical addesss of DSDT, set at installation
+  0,                // 64-bit physical address of FACS, set at installation
+  0,                // 64-bit physical address of DSDT, set at installation
 
   GAS2_IO(PM1a_EVT_BLK, PM1_EVT_LEN), // Ext. addr. of PM 1a Event Reg Blk
   { 0 },                              // PM 1b Event Reg Blk unsupported
@@ -83,7 +83,7 @@ ReferenceAcpiTable (
 {
   //
   // Reference the table being generated to prevent the optimizer from removing the
-  // data structure from the exeutable
+  // data structure from the executable
   //
   return (VOID*)&FACP;
 }
