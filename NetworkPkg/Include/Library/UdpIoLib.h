@@ -43,7 +43,7 @@ typedef struct {
 
   This prototype is used by both receive and sending when calling
   UdpIoRecvDatagram() or UdpIoSendDatagram(). When receiving, Netbuf is allocated by the
-  UDP access point and released by the user. When sending, the user allocates the the NetBuf,
+  UDP access point and released by the user. When sending, the user allocates the NetBuf,
   which is then provided to the callback as a reference.
 
   @param[in] Packet       The packet received or sent.
@@ -197,7 +197,7 @@ BOOLEAN
 
   @param[in]  UdpIo                 The UDP_IO to cancel packet.
   @param[in]  IoStatus              The IoStatus to return to the packet owners.
-  @param[in]  ToCancel              The select funtion to test whether to cancel this
+  @param[in]  ToCancel              The select function to test whether to cancel this
                                     packet or not.
   @param[in]  Context               The opaque parameter to the ToCancel.
 
@@ -228,7 +228,7 @@ UdpIoCancelDgrams (
   @param[in]  ImageHandle           The image handle for the driver.
   @param[in]  Configure             The function to configure the created UDP child.
   @param[in]  UdpVersion            The UDP protocol version, UDP4 or UDP6.
-  @param[in]  Context               The opaque parameter for the Configure funtion.
+  @param[in]  Context               The opaque parameter for the Configure function.
 
   @return The newly-created UDP_IO, or NULL if failed.
 

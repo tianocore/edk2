@@ -36,7 +36,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define DEFAULT_ZERO_START     ((UINTN) ~0)
 
 //
-// All the supported IP4 maskes in host byte order.
+// All the supported IP4 masks in host byte order.
 //
 GLOBAL_REMOVE_IF_UNREFERENCED IP4_ADDR  gIp4AllMasks[IP4_MASK_NUM] = {
   0x00000000,
@@ -130,7 +130,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED VLAN_DEVICE_PATH mNetVlanDevicePathTemplate = {
   to send the syslog packets. The caller isn't required to close
   the SNP after use because the SNP is opened by HandleProtocol.
 
-  @return The point to SNP if one is properly openned. Otherwise NULL
+  @return The point to SNP if one is properly opened. Otherwise NULL
 
 **/
 EFI_SIMPLE_NETWORK_PROTOCOL *
@@ -304,7 +304,7 @@ ON_EXIT:
   @param[in]  File      The file that contains the current log
   @param[in]  Line      The line of code in the File that contains the current log
   @param[in]  Message   The log message
-  @param[in]  BufLen    The lenght of the Buf
+  @param[in]  BufLen    The length of the Buf
   @param[out] Buf       The buffer to put the packet data
 
   @return The length of the syslog packet built, 0 represents no packet is built.
@@ -480,7 +480,7 @@ NetDebugASPrint (
   Because it isn't open the SNP BY_DRIVER, apply caution when using it.
 
   @param Level    The severity level of the message.
-  @param Module   The Moudle that generates the log.
+  @param Module   The Module that generates the log.
   @param File     The file that contains the log.
   @param Line     The exact line that contains the log.
   @param Message  The user message to log.
@@ -518,7 +518,7 @@ NetDebugOutput (
   }
 
   //
-  // Allocate a maxium of 1024 bytes, the caller should ensure
+  // Allocate a maximum of 1024 bytes, the caller should ensure
   // that the message plus the ethernet/ip/udp header is shorter
   // than this
   //
@@ -1129,7 +1129,7 @@ NetListInsertBefore (
   If it has been removed, then restart the traversal from the head.
   If it hasn't been removed, then continue with the next node directly.
   This function will end the iterate and return the CallBack's last return value if error happens,
-  or retrun EFI_SUCCESS if 2 complete passes are made with no changes in the number of children in the list.
+  or return EFI_SUCCESS if 2 complete passes are made with no changes in the number of children in the list.
 
   @param[in]    List             The head of the list.
   @param[in]    CallBack         Pointer to the callback function to destroy one node in the list.
@@ -1353,7 +1353,7 @@ NetMapGetCount (
   Return one allocated item.
 
   If the Recycled doubly linked list of the netmap is empty, it will try to allocate
-  a batch of items if there are enough resources and add corresponding nodes to the begining
+  a batch of items if there are enough resources and add corresponding nodes to the beginning
   of the Recycled doubly linked list of the netmap. Otherwise, it will directly remove
   the fist node entry of the Recycled doubly linked list and return the corresponding item.
 
@@ -3299,7 +3299,7 @@ NetLibGetSystemGuid (
     String = (CHAR8 *) (Smbios.Raw + Smbios.Hdr->Length);
 
     //
-    // Step 2: Skip over unformated string section.
+    // Step 2: Skip over unformatted string section.
     //
     do {
       //

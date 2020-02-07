@@ -748,7 +748,7 @@ EFI_STATUS
   If it has been removed, then restart the traversal from the head.
   If it hasn't been removed, then continue with the next node directly.
   This function will end the iterate and return the CallBack's last return value if error happens,
-  or retrun EFI_SUCCESS if 2 complete passes are made with no changes in the number of children in the list.
+  or return EFI_SUCCESS if 2 complete passes are made with no changes in the number of children in the list.
 
   @param[in]    List             The head of the list.
   @param[in]    CallBack         Pointer to the callback function to destroy one node in the list.

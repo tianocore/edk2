@@ -1677,7 +1677,7 @@ HttpGetFieldNameAndValue (
 /**
   Free existing HeaderFields.
 
-  @param[in]  HeaderFields       Pointer to array of key/value header pairs waitting for free.
+  @param[in]  HeaderFields       Pointer to array of key/value header pairs waiting for free.
   @param[in]  FieldCount         The number of header pairs in HeaderFields.
 
 **/
@@ -1717,7 +1717,7 @@ HttpFreeHeaderFields (
                                   the HTTP request message.
   @param[in]   Url                The URL of a remote host.
   @param[out]  RequestMsg         Pointer to the created HTTP request message.
-                                  NULL if any error occured.
+                                  NULL if any error occurred.
   @param[out]  RequestMsgSize     Size of the RequestMsg (in bytes).
 
   @retval EFI_SUCCESS             If HTTP request string was created successfully.
