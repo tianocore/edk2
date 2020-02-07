@@ -147,7 +147,7 @@ struct _HTTP_BOOT_PRIVATE_DATA {
   HTTP_BOOT_VIRTUAL_NIC                     *Ip6Nic;
 
   //
-  // Cousumed children
+  // Consumed children
   //
   EFI_HANDLE                                Ip6Child;
   EFI_HANDLE                                Dhcp4Child;
@@ -348,7 +348,7 @@ HttpBootIp4DxeDriverBindingSupported (
   @retval EFI_SUCCESS              The device was started.
   @retval EFI_DEVICE_ERROR         The device could not be started due to a device error.Currently not implemented.
   @retval EFI_OUT_OF_RESOURCES     The request could not be completed due to a lack of resources.
-  @retval Others                   The driver failded to start the device.
+  @retval Others                   The driver failed to start the device.
 
 **/
 EFI_STATUS
@@ -476,7 +476,7 @@ HttpBootIp6DxeDriverBindingSupported (
   @retval EFI_SUCCESS              The device was started.
   @retval EFI_DEVICE_ERROR         The device could not be started due to a device error.Currently not implemented.
   @retval EFI_OUT_OF_RESOURCES     The request could not be completed due to a lack of resources.
-  @retval Others                   The driver failded to start the device.
+  @retval Others                   The driver failed to start the device.
 
 **/
 EFI_STATUS

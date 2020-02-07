@@ -14,7 +14,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @param[in] Private           Pointer to HTTP Boot private data.
 
-  @retval EFI_SUCCESS          HTTP Boot Callback Protocol installed succesfully.
+  @retval EFI_SUCCESS          HTTP Boot Callback Protocol installed successfully.
   @retval Others               Failed to install HTTP Boot Callback Protocol.
 
 **/

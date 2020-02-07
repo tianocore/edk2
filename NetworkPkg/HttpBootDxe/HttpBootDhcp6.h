@@ -110,8 +110,8 @@ HttpBootDhcp6Sarr (
 
   @param[in]  Private             The pointer to HTTP_BOOT_PRIVATE_DATA.
 
-  @retval     EFI_SUCCESS         Switch the IP policy succesfully.
-  @retval     Others              Unexpect error happened.
+  @retval     EFI_SUCCESS         Switch the IP policy successfully.
+  @retval     Others              Unexpected error happened.
 
 **/
 EFI_STATUS
