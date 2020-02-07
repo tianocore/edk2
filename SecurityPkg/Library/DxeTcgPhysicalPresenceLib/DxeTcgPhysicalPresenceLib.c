@@ -185,7 +185,7 @@ TpmPhysicalPresence (
   @param[in] TcgProtocol              EFI TCG Protocol instance.
   @param[in] Ordinal                  TPM command code.
   @param[in] AdditionalParameterSize  Additional parameter size.
-  @param[in] AdditionalParameters     Pointer to the Additional paramaters.
+  @param[in] AdditionalParameters     Pointer to the Additional parameters.
 
   @retval TCG_PP_OPERATION_RESPONSE_BIOS_FAILURE  Error occurred during sending command to TPM or
                                                   receiving response from TPM.

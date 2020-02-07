@@ -1,6 +1,6 @@
 /** @file
   This library is BaseCrypto router. It will redirect hash request to each individual
-  hash handler registerd, such as SHA1, SHA256.
+  hash handler registered, such as SHA1, SHA256.
   Platform can use PcdTpm2HashMask to mask some hash engines.
 
 Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved. <BR>
