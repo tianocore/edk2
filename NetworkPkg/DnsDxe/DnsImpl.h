@@ -182,7 +182,7 @@ typedef struct {
   @param[in] TokenMap          All DNSv4 Token entrys.
   @param[in] TokenEntry        TokenEntry need to be removed.
 
-  @retval EFI_SUCCESS          Remove TokenEntry from TokenMap sucessfully.
+  @retval EFI_SUCCESS          Remove TokenEntry from TokenMap successfully.
   @retval EFI_NOT_FOUND        TokenEntry is not found in TokenMap.
 
 **/
@@ -198,7 +198,7 @@ Dns4RemoveTokenEntry (
   @param[in] TokenMap           All DNSv6 Token entrys.
   @param[in] TokenEntry         TokenEntry need to be removed.
 
-  @retval EFI_SUCCESS           Remove TokenEntry from TokenMap sucessfully.
+  @retval EFI_SUCCESS           Remove TokenEntry from TokenMap successfully.
   @retval EFI_NOT_FOUND         TokenEntry is not found in TokenMap.
 
 **/
@@ -209,7 +209,7 @@ Dns6RemoveTokenEntry (
   );
 
 /**
-  This function cancle the token specified by Arg in the Map.
+  This function cancel the token specified by Arg in the Map.
 
   @param[in]  Map             Pointer to the NET_MAP.
   @param[in]  Item            Pointer to the NET_MAP_ITEM.
@@ -233,7 +233,7 @@ Dns4CancelTokens (
   );
 
 /**
-  This function cancle the token specified by Arg in the Map.
+  This function cancel the token specified by Arg in the Map.
 
   @param[in]  Map             Pointer to the NET_MAP.
   @param[in]  Item            Pointer to the NET_MAP_ITEM.
@@ -263,7 +263,7 @@ Dns6CancelTokens (
   @param[in]  Token               Pointer to the token to be get.
   @param[out] TokenEntry          Pointer to TokenEntry corresponding Token.
 
-  @retval EFI_SUCCESS             Get the TokenEntry from the TokensMap sucessfully.
+  @retval EFI_SUCCESS             Get the TokenEntry from the TokensMap successfully.
   @retval EFI_NOT_FOUND           TokenEntry is not found in TokenMap.
 
 **/
@@ -282,7 +282,7 @@ GetDns4TokenEntry (
   @param[in]  Token               Pointer to the token to be get.
   @param[out] TokenEntry          Pointer to TokenEntry corresponding Token.
 
-  @retval EFI_SUCCESS             Get the TokenEntry from the TokensMap sucessfully.
+  @retval EFI_SUCCESS             Get the TokenEntry from the TokensMap successfully.
   @retval EFI_NOT_FOUND           TokenEntry is not found in TokenMap.
 
 **/
@@ -410,7 +410,7 @@ DnsDummyExtFree (
   @param  UdpCfgData             The UDP configure data to reconfigure the UDP_IO
 
   @retval TRUE                   The default address is retrieved and UDP is reconfigured.
-  @retval FALSE                  Some error occured.
+  @retval FALSE                  Some error occurred.
 
 **/
 BOOLEAN
@@ -429,7 +429,7 @@ Dns4GetMapping (
   @param  UdpCfgData             The UDP configure data to reconfigure the UDP_IO
 
   @retval TRUE                   Configure the Udp6 instance successfully.
-  @retval FALSE                  Some error occured.
+  @retval FALSE                  Some error occurred.
 
 **/
 BOOLEAN
@@ -743,7 +743,7 @@ Dns4GetModeData (
 
   @retval EFI_SUCCESS             The operation completed successfully.
   @retval EFI_UNSUPPORTED         The designated protocol is not supported.
-  @retval EFI_INVALID_PARAMTER    Thisis NULL.
+  @retval EFI_INVALID_PARAMETER   This is NULL.
                                   The StationIp address provided in DnsConfigData is not a
                                   valid unicast.
                                   DnsServerList is NULL while DnsServerListCount
@@ -869,9 +869,9 @@ Dns4GeneralLookUp (
 
   @param[in]  This                Pointer to EFI_DNS4_PROTOCOL instance.
   @param[in]  DeleteFlag          If FALSE, this function is to add one entry to the
-                                  DNS Cahce. If TRUE, this function will delete
+                                  DNS Cache. If TRUE, this function will delete
                                   matching DNS Cache entry.
-  @param[in]  Override            If TRUE, the maching DNS cache entry will be
+  @param[in]  Override            If TRUE, the matching DNS cache entry will be
                                   overwritten with the supplied parameter. If FALSE,
                                   EFI_ACCESS_DENIED will be returned if the entry to
                                   be added is already existed.
@@ -989,7 +989,7 @@ Dns6GetModeData (
                                   storage to be allocated and released by caller.
 
   @retval EFI_SUCCESS             The operation completed successfully.
-  @retval EFI_INVALID_PARAMTER    This is NULL.
+  @retval EFI_INVALID_PARAMETER    This is NULL.
                                   The StationIp address provided in DnsConfigData is not zero and not a valid unicast.
                                   DnsServerList is NULL while DnsServerList Count is not ZERO.
                                   DnsServerList Count is ZERO while DnsServerList is not NULL.
@@ -1117,9 +1117,9 @@ Dns6GeneralLookUp (
 
   @param[in]  This                Pointer to EFI_DNS6_PROTOCOL instance.
   @param[in]  DeleteFlag          If FALSE, this function is to add one entry to the
-                                  DNS Cahce. If TRUE, this function will delete
+                                  DNS Cache. If TRUE, this function will delete
                                   matching DNS Cache entry.
-  @param[in]  Override            If TRUE, the maching DNS cache entry will be
+  @param[in]  Override            If TRUE, the matching DNS cache entry will be
                                   overwritten with the supplied parameter. If FALSE,
                                   EFI_ACCESS_DENIED will be returned if the entry to
                                   be added is already existed.
