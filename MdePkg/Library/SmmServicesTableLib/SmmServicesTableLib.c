@@ -36,7 +36,7 @@ SmmServicesTableLibConstructor (
   //
   // Retrieve SMM Base2 Protocol,  Do not use gBS from UefiBootServicesTableLib on purpose
   // to prevent inclusion of gBS, gST, and gImageHandle from SMM Drivers unless the
-  // SMM driver explicity declares that dependency.
+  // SMM driver explicitly declares that dependency.
   //
   Status = SystemTable->BootServices->LocateProtocol (
                                         &gEfiSmmBase2ProtocolGuid,
