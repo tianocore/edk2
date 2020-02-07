@@ -45,7 +45,7 @@ typedef struct {
   @param  OptionList             The point to get the option array.
 
   @retval EFI_INVALID_PARAMETER  The parametera are invalid or packet isn't a
-                                 well-formated OACK packet.
+                                 well-formatted OACK packet.
   @retval EFI_SUCCESS            The option array is build
   @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory for the array
 

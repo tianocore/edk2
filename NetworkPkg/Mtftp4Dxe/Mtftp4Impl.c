@@ -226,7 +226,7 @@ Mtftp4OverrideValid (
   @param  UdpCfgData             The UDP configure data to reconfigure the UDP_IO
 
   @retval TRUE                   The default address is retrieved and UDP is reconfigured.
-  @retval FALSE                  Some error occured.
+  @retval FALSE                  Some error occurred.
 
 **/
 BOOLEAN
@@ -342,7 +342,7 @@ Mtftp4ConfigUnicastPort (
   write file, and read directory.
 
   @param  This                   The MTFTP session
-  @param  Token                  The token than encapsues the user's request.
+  @param  Token                  The token than encapsules the user's request.
   @param  Operation              The operation to do
 
   @retval EFI_INVALID_PARAMETER  Some of the parameters are invalid.
@@ -601,9 +601,9 @@ EfiMtftp4GetModeData (
                                  2.MtftpConfigData.UseDefaultSetting is FALSE and
                                    MtftpConfigData.StationIp is not a valid IPv4
                                    unicast address.
-                                 3.MtftpCofigData.UseDefaultSetting is FALSE and
+                                 3.MtftpConfigData.UseDefaultSetting is FALSE and
                                    MtftpConfigData.SubnetMask is invalid.
-                                 4.MtftpCofigData.ServerIp is not a valid IPv4
+                                 4.MtftpConfigData.ServerIp is not a valid IPv4
                                    unicast address.
                                  5.MtftpConfigData.UseDefaultSetting is FALSE and
                                    MtftpConfigData.GatewayIp is not a valid IPv4
@@ -946,7 +946,7 @@ EfiMtftp4ReadDirectory (
   or ICMP ERROR packet. Retries occur only if no response packets are received
   from the MTFTPv4 server before the timeout expires.
   It is implemented with EfiMtftp4ReadFile: build a token, then pass it to
-  EfiMtftp4ReadFile. In its check packet callback abort the opertions.
+  EfiMtftp4ReadFile. In its check packet callback abort the operations.
 
   @param  This                   Pointer to the EFI_MTFTP4_PROTOCOL instance
   @param  OverrideData           Data that is used to override the existing

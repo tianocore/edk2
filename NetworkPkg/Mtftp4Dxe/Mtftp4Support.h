@@ -28,7 +28,7 @@ typedef struct {
 
   RRQ and WRQ have different requirements for Start and End.
   For example, during start up, WRQ initializes its whole valid block range
-  to [0, 0xffff]. This is bacause the server will send us a ACK0 to inform us
+  to [0, 0xffff]. This is because the server will send us a ACK0 to inform us
   to start the upload. When the client received ACK0, it will remove 0 from the
   range, get the next block number, which is 1, then upload the BLOCK1. For RRQ
   without option negotiation, the server will directly send us the BLOCK1 in
