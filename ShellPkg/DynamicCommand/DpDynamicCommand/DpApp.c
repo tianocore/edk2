@@ -24,7 +24,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_STRING_ID mStringHelpTokenId = STRING_TOKEN (S
   @param ImageHandle            The image handle of the process.
   @param SystemTable            The EFI System Table pointer.
 
-  @retval EFI_SUCCESS           Tftp command is executed sucessfully.
+  @retval EFI_SUCCESS           Tftp command is executed successfully.
   @retval EFI_ABORTED           HII package was failed to initialize.
   @retval others                Other errors when executing tftp command.
 **/

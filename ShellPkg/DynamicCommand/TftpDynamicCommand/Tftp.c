@@ -15,7 +15,7 @@ EFI_HII_HANDLE   mTftpHiiHandle;
 
 /*
    Constant strings and definitions related to the message indicating the amount of
-   progress in the dowloading of a TFTP file.
+   progress in the downloading of a TFTP file.
 */
 
 // Frame for the progression slider
@@ -48,7 +48,7 @@ CONST CHAR16         *mLocalFilePath;
   @param[out] Value     UINT16 value
 
   @return     TRUE      The value was returned.
-  @return     FALSE     A parsing error occured.
+  @return     FALSE     A parsing error occurred.
 **/
 STATIC
 BOOLEAN
@@ -585,7 +585,7 @@ RunTftp (
   @param[out] Value     UINT16 value
 
   @return     TRUE      The value was returned.
-  @return     FALSE     A parsing error occured.
+  @return     FALSE     A parsing error occurred.
 **/
 STATIC
 BOOLEAN
@@ -1081,7 +1081,7 @@ CheckPacket (
 }
 
 /**
-  Retrive HII package list from ImageHandle and publish to HII database.
+  Retrieve HII package list from ImageHandle and publish to HII database.
 
   @param ImageHandle            The image handle of the process.
 
