@@ -188,7 +188,7 @@ EfiHttpConfigure (
 
   } else {
     //
-    // Reset all the resources related to HttpInsance.
+    // Reset all the resources related to HttpInstance.
     //
     HttpCleanProtocol (HttpInstance);
     HttpInstance->State = HTTP_STATE_UNCONFIGED;
@@ -756,7 +756,7 @@ HttpCancelTokens (
   if (!HttpInstance->LocalAddressIsIPv6) {
     if (Wrap->TcpWrap.Rx4Token.CompletionToken.Event != NULL) {
       //
-      // Cancle the Token before close its Event.
+      // Cancel the Token before close its Event.
       //
       HttpInstance->Tcp4->Cancel (HttpInstance->Tcp4, &Wrap->TcpWrap.Rx4Token.CompletionToken);
 
@@ -768,7 +768,7 @@ HttpCancelTokens (
   } else {
     if (Wrap->TcpWrap.Rx6Token.CompletionToken.Event != NULL) {
       //
-      // Cancle the Token before close its Event.
+      // Cancel the Token before close its Event.
       //
       HttpInstance->Tcp6->Cancel (HttpInstance->Tcp6, &Wrap->TcpWrap.Rx6Token.CompletionToken);
 
@@ -956,7 +956,7 @@ HttpBodyParserCallback (
   @param[in]  Wrap                Pointer to HTTP token's wrap data.
 
   @retval EFI_SUCCESS             Allocation succeeded.
-  @retval EFI_OUT_OF_RESOURCES    Failed to complete the opration due to lack of resources.
+  @retval EFI_OUT_OF_RESOURCES    Failed to complete the operation due to lack of resources.
   @retval EFI_NOT_READY           Can't find a corresponding Tx4Token/Tx6Token or
                                   the EFI_HTTP_UTILITIES_PROTOCOL is not available.
 
@@ -1284,7 +1284,7 @@ HttpResponseWorker (
         }
       }
       //
-      // Return since we aready received required data.
+      // Return since we already received required data.
       //
       Status = EFI_SUCCESS;
       goto Exit;
