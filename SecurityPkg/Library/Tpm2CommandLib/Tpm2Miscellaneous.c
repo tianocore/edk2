@@ -1,5 +1,5 @@
 /** @file
-  Implement TPM2 Miscellanenous related command.
+  Implement TPM2 Miscellaneous related command.
 
 Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved. <BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
