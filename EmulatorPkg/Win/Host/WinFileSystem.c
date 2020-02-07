@@ -391,7 +391,7 @@ GetNextFileNameToken (
   If FileName contains only a single L'\', return TRUE.
   If FileName contains two adjacent L'\', return FALSE.
   If FileName conatins L'/' , return FALSE.
-  If FielName contains more than two dots seperated with other FileName characters
+  If FileName contains more than two dots separated with other FileName characters
   by L'\', return FALSE. For example, L'.\...\filename.txt' is invalid path name. But L'..TwoDots\filename.txt' is valid path name.
 
   @param FileName  The File Name String to check.

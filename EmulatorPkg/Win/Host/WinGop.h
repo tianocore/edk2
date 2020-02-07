@@ -78,7 +78,7 @@ typedef struct {
   UINT32                        Width;
   UINT32                        Height;
   //
-  // This screen is used to redraw the scree when windows events happen. It's
+  // This screen is used to redraw the screen when windows events happen. It's
   // updated in the main thread and displayed in the windows thread.
   //
   BITMAPV4HEADER                *VirtualScreenInfo;
