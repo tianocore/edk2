@@ -28,7 +28,7 @@ typedef struct _EFI_ISA_HC_PPI *PEFI_ISA_HC_PPI;
   that more than one caller may be assigned to the same aperture.
   It may be possible that a single hardware aperture may be used for more than
   one device. This function tracks the number of times that each aperture is
-  referenced, and doesa not close the hardware aperture (via CloseIoAperture())
+  referenced, and does not close the hardware aperture (via CloseIoAperture())
   until there are no more references to it.
 
   @param This             A pointer to this instance of the EFI_ISA_HC_PPI.

@@ -43,7 +43,7 @@ typedef struct {
   //
   UINT32    VectorNumber;
   //
-  // A bitmask that describes the attributes ofthe interrupt or exception vector.
+  // A bitmask that describes the attributes of the interrupt or exception vector.
   //
   UINT32    Attribute;
   //
