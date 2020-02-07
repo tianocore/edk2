@@ -1,5 +1,5 @@
 /** @file
-  SEC Core Debug Agent Library instance implementition.
+  SEC Core Debug Agent Library instance implementation.
 
   Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -198,7 +198,7 @@ GetMailboxPointer (
 
   MailboxLocationInHob = GetMailboxLocationFromHob ();
   //
-  // Compare mailbox in IDT enry with mailbox in HOB,
+  // Compare mailbox in IDT entry with mailbox in HOB,
   // need to fix mailbox location if HOB moved by PEI CORE
   //
   if (MailboxLocationInHob != MailboxLocationInIdt && MailboxLocationInHob != NULL) {
@@ -323,7 +323,7 @@ DebugAgentCallbackMemoryDiscoveredPpi (
 
   This function is used to set up debug environment for SEC and PEI phase.
 
-  If InitFlag is DEBUG_AGENT_INIT_PREMEM_SEC, it will overirde IDT table entries
+  If InitFlag is DEBUG_AGENT_INIT_PREMEM_SEC, it will override IDT table entries
   and initialize debug port. It will enable interrupt to support break-in feature.
   It will set up debug agent Mailbox in cache-as-ramfrom. It will be called before
   physical memory is ready.
@@ -546,7 +546,7 @@ InitializeDebugAgent (
     SetDebugFlag (DEBUG_AGENT_FLAG_INIT_ARCH, DEBUG_ARCH_SYMBOL);
     //
     // Register for a callback once memory has been initialized.
-    // If memery has been ready, the callback funtion will be invoked immediately
+    // If memory has been ready, the callback function will be invoked immediately
     //
     Status = PeiServicesNotifyPpi (&mDebugAgentMemoryDiscoveredNotifyList[0]);
     if (EFI_ERROR (Status)) {
@@ -626,7 +626,7 @@ InitializeDebugAgent (
     EnableInterrupts ();
   }
   //
-  // If Function is not NULL, invoke it always whatever debug agent was initialized sucesssfully or not.
+  // If Function is not NULL, invoke it always whatever debug agent was initialized successfully or not.
   //
   if (Function != NULL) {
     Function (Context);
