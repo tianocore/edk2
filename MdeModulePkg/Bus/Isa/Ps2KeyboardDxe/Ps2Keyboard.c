@@ -77,7 +77,7 @@ KbdControllerDriverStop (
   @param ListHead  Pointer to list head
 
   @retval EFI_INVALID_PARAMETER  ListHead is NULL
-  @retval EFI_SUCCESS            Sucess to free NotifyList
+  @retval EFI_SUCCESS            Success to free NotifyList
 **/
 EFI_STATUS
 KbdFreeNotifyList (
@@ -597,7 +597,7 @@ KbdControllerDriverStop (
   @param ListHead  Pointer to list head
 
   @retval EFI_INVALID_PARAMETER  ListHead is NULL
-  @retval EFI_SUCCESS            Sucess to free NotifyList
+  @retval EFI_SUCCESS            Success to free NotifyList
 **/
 EFI_STATUS
 KbdFreeNotifyList (
