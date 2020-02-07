@@ -282,7 +282,7 @@ struct _PEI_CORE_INSTANCE {
   EFI_PHYSICAL_ADDRESS               LoadModuleAtFixAddressTopAddress;
   //
   // The field is define for Loading modules at fixed address feature to tracker the PEI code
-  // memory range usage. It is a bit mapped array in which every bit indicates the correspoding memory page
+  // memory range usage. It is a bit mapped array in which every bit indicates the corresponding memory page
   // available or not.
   //
   UINT64                            *PeiCodeMemoryRangeUsageBitMap;
@@ -555,7 +555,7 @@ PeiLocatePpi (
 
   @retval EFI_SUCCESS           if successful
   @retval EFI_OUT_OF_RESOURCES  if no space in the database
-  @retval EFI_INVALID_PARAMETER if not a good decriptor
+  @retval EFI_INVALID_PARAMETER if not a good descriptor
 
 **/
 EFI_STATUS
