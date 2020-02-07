@@ -300,7 +300,7 @@ WinNtWndGetKey (
 
   Routine Description:
     Reads the next keystroke from the input device. The WaitForKey Event can
-    be used to test for existance of a keystroke via WaitForEvent () call.
+    be used to test for existence of a keystroke via WaitForEvent () call.
 
   Arguments:
     Private    - The private structure of WinNt Gop device.
@@ -309,7 +309,7 @@ WinNtWndGetKey (
 
   Returns:
     EFI_SUCCESS           - The keystroke information was returned.
-    EFI_NOT_READY         - There was no keystroke data availiable.
+    EFI_NOT_READY         - There was no keystroke data available.
     EFI_DEVICE_ERROR      - The keystroke information was not returned due to
                             hardware errors.
     EFI_INVALID_PARAMETER - KeyData is NULL.

@@ -346,7 +346,7 @@ WinNtBlockIoReadBlocks (
                                 the Event is NULL.
   @retval EFI_WRITE_PROTECTED   The device can not be written to.
   @retval EFI_NO_MEDIA          There is no media in the device.
-  @retval EFI_MEDIA_CHNAGED     The MediaId does not matched the current device.
+  @retval EFI_MEDIA_CHANGED     The MediaId does not match the current device.
   @retval EFI_DEVICE_ERROR      The device reported an error while performing the write.
   @retval EFI_BAD_BUFFER_SIZE   The Buffer was not a multiple of the block size of the device.
   @retval EFI_INVALID_PARAMETER The write request contains LBAs that are not valid,
@@ -411,7 +411,7 @@ WinNtBlockIoWriteBlocks (
   @retval EFI_SUCCESS          The flush request was queued if Event is not NULL.
                                All outstanding data was written correctly to the
                                device if the Event is NULL.
-  @retval EFI_DEVICE_ERROR     The device reported an error while writting back
+  @retval EFI_DEVICE_ERROR     The device reported an error while writing back
                                the data.
   @retval EFI_WRITE_PROTECTED  The device cannot be written to.
   @retval EFI_NO_MEDIA         There is no media in the device.

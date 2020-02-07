@@ -82,7 +82,7 @@ Arguments:
   SecCorePe32File         - SEC Core PE32
 
 Returns:
-  Success means control is transfered and thus we should never return
+  Success means control is transferred and thus we should never return
 
 --*/
 ;
