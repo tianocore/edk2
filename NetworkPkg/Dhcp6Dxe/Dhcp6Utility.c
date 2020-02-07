@@ -312,7 +312,7 @@ Dhcp6CleanupModeData (
 
   @param[in]  Base          The base value of the time.
   @param[in]  IsFirstRt     If TRUE, it is the first time to calculate expire time.
-  @param[in]  NeedSigned    If TRUE, the the signed factor is needed.
+  @param[in]  NeedSigned    If TRUE, the signed factor is needed.
 
   @return     Expire        The calculated result for the new expire time.
 
@@ -506,7 +506,7 @@ Dhcp6DepriveAddress (
     //
     // If release all Ia addresses, just copy the configured Ia and then set
     // its address count as zero.
-    // We may decline/release part of addresses at the begining. So it's a
+    // We may decline/release part of addresses at the beginning. So it's a
     // forwarding step to update address infor for decline/release, while the
     // other infor such as Ia state will be updated when receiving reply.
     //
@@ -995,7 +995,7 @@ Dhcp6SeekIaOption (
 
 /**
   Check whether the incoming IPv6 address in IaAddr is one of the maintained
-  addresses in the IA control blcok.
+  addresses in the IA control block.
 
   @param[in]  IaAddr            The pointer to the IA Address to be checked.
   @param[in]  CurrentIa         The pointer to the IA in IA control block.
@@ -1023,9 +1023,9 @@ Dhcp6AddrIsInCurrentIa (
 }
 
 /**
-  Parse the address option and update the address infomation.
+  Parse the address option and update the address information.
 
-  @param[in]      CurrentIa     The pointer to the Ia Address in control blcok.
+  @param[in]      CurrentIa     The pointer to the Ia Address in control block.
   @param[in]      IaInnerOpt    The pointer to the buffer.
   @param[in]      IaInnerLen    The length to parse.
   @param[out]     AddrNum       The number of addresses.
@@ -1107,7 +1107,7 @@ Dhcp6ParseAddrOption (
 
 
 /**
-  Create a control blcok for the Ia according to the corresponding options.
+  Create a control block for the Ia according to the corresponding options.
 
   @param[in]  Instance              The pointer to DHCP6 Instance.
   @param[in]  IaInnerOpt            The pointer to the inner options in the Ia option.
@@ -1229,7 +1229,7 @@ Dhcp6CacheIa (
 }
 
 /**
-  Append CacheIa to the currrent IA. Meanwhile, clear CacheIa.ValidLifetime to 0.
+  Append CacheIa to the current IA. Meanwhile, clear CacheIa.ValidLifetime to 0.
 
   @param[in]  Instance            The pointer to DHCP6 instance.
 
@@ -1285,7 +1285,7 @@ Dhcp6AppendCacheIa (
 }
 
 /**
-  Calculate the Dhcp6 get mapping timeout by adding additinal delay to the IP6 DAD transmits count.
+  Calculate the Dhcp6 get mapping timeout by adding additional delay to the IP6 DAD transmits count.
 
   @param[in]   Ip6Cfg              The pointer to Ip6 config protocol.
   @param[out]  TimeOut             The time out value in 100ns units.

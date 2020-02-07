@@ -71,7 +71,7 @@ Dhcp6CleanupModeData (
 
   @param[in]  Base          The base value of the time.
   @param[in]  IsFirstRt     If TRUE, it is the first time to calculate expire time.
-  @param[in]  NeedSigned    If TRUE, the the signed factor is needed.
+  @param[in]  NeedSigned    If TRUE, the signed factor is needed.
 
   @return     Expire        The calculated result for the new expire time.
 
@@ -165,7 +165,7 @@ Dhcp6OnTransmitted (
 
   @param[in, out] Buf           The pointer to buffer.
   @param[in]      OptType       The option type.
-  @param[in]      OptLen        The lenght of option content.s
+  @param[in]      OptLen        The length of option content.s
   @param[in]      Data          The pointer to the option content.
 
   @return         Buf           The position to append the next option.
@@ -270,7 +270,7 @@ Dhcp6SeekIaOption (
 /**
   Parse the address option and update the address info.
 
-  @param[in]      CurrentIa     The pointer to the Ia Address in control blcok.
+  @param[in]      CurrentIa     The pointer to the Ia Address in control block.
   @param[in]      IaInnerOpt    The pointer to the buffer.
   @param[in]      IaInnerLen    The length to parse.
   @param[out]     AddrNum       The number of addresses.
@@ -287,7 +287,7 @@ Dhcp6ParseAddrOption (
   );
 
 /**
-  Create a control blcok for the Ia according to the corresponding options.
+  Create a control block for the Ia according to the corresponding options.
 
   @param[in]  Instance              The pointer to DHCP6 Instance.
   @param[in]  IaInnerOpt            The pointer to the inner options in the Ia option.
@@ -327,7 +327,7 @@ Dhcp6CacheIa (
 
 
 /**
-  Append CacheIa to the currrent IA. Meanwhile, clear CacheIa.ValidLifetime to 0.
+  Append CacheIa to the current IA. Meanwhile, clear CacheIa.ValidLifetime to 0.
 
   @param[in]  Instance            The pointer to DHCP6 instance.
 
@@ -338,7 +338,7 @@ Dhcp6AppendCacheIa (
   );
 
 /**
-  Calculate the Dhcp6 get mapping timeout by adding additinal delay to the IP6 DAD transmits count.
+  Calculate the Dhcp6 get mapping timeout by adding additional delay to the IP6 DAD transmits count.
 
   @param[in]   Ip6Cfg              The pointer to Ip6 config protocol.
   @param[out]  TimeOut             The time out value in 100ns units.
