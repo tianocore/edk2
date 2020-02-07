@@ -81,9 +81,9 @@ typedef struct {
 ///
 /// Structure used to describe and validate the format of DHCP options.
 /// Type is the options' data type, such as DHCP_OPTION_INT8. MinOccur
-/// is the minium occurance of this data type. MaxOccur is defined
+/// is the minimum occurrence of this data type. MaxOccur is defined
 /// similarly. If MaxOccur is -1, it means that there is no limit on the
-/// maximum occurance. Alert tells whether DHCP client should further
+/// maximum occurrence. Alert tells whether DHCP client should further
 /// inspect the option to parse DHCP_PARAMETER.
 ///
 typedef struct {
@@ -114,8 +114,8 @@ EFI_STATUS
                                      found
   @param[in]  Context                The opaque parameter for Check
 
-  @retval EFI_SUCCESS            The DHCP packet's options are well formated
-  @retval EFI_INVALID_PARAMETER  The DHCP packet's options are not well formated
+  @retval EFI_SUCCESS            The DHCP packet's options are well formatted
+  @retval EFI_INVALID_PARAMETER  The DHCP packet's options are not well formatted
 
 **/
 EFI_STATUS
@@ -133,7 +133,7 @@ DhcpIterateOptions (
   @param[out] Para                   The variable to save the DHCP parameters.
 
   @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory to validate the packet.
-  @retval EFI_INVALID_PARAMETER  The options are malformatted
+  @retval EFI_INVALID_PARAMETER  The options are mal-formatted
   @retval EFI_SUCCESS            The options are parsed into OptionPoint
 
 **/
@@ -146,8 +146,8 @@ DhcpValidateOptions (
 /**
   Parse the options of a DHCP packet. It supports RFC 3396: Encoding
   Long Options in DHCP. That is, it will combine all the option value
-  of all the occurances of each option.
-  A little bit of implemenation:
+  of all the occurrences of each option.
+  A little bit of implementation:
   It adopts the "Key indexed counting" algorithm. First, it allocates
   an array of 256 DHCP_OPTION_COUNTs because DHCP option tag is encoded
   as a UINT8. It then iterates the DHCP packet to get data length of
@@ -167,7 +167,7 @@ DhcpValidateOptions (
 
   @retval EFI_NOT_FOUND          Cannot find any option.
   @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory to parse the packet.
-  @retval EFI_INVALID_PARAMETER  The options are malformatted
+  @retval EFI_INVALID_PARAMETER  The options are mal-formatted
   @retval EFI_SUCCESS            The options are parsed into OptionPoint
 
 **/
@@ -211,7 +211,7 @@ DhcpAppendOption (
                                      function.
 
   @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory
-  @retval EFI_INVALID_PARAMETER  The options in SeekPacket are malformatted
+  @retval EFI_INVALID_PARAMETER  The options in SeekPacket are mal-formatted
   @retval EFI_SUCCESS            The packet is build.
 
 **/

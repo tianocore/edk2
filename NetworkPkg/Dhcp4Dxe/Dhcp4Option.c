@@ -195,7 +195,7 @@ DhcpOptionIsValid (
   }
 
   //
-  // Validate the occurance of the option unit is with in [MinOccur, MaxOccur]
+  // Validate the occurrence of the option unit is with in [MinOccur, MaxOccur]
   //
   Occur = Len / Unit;
 
@@ -230,7 +230,7 @@ DhcpOptionIsValid (
   @param[out] Para                   The variable to save the interested parameter
 
   @retval EFI_SUCCESS            The DHCP option is successfully extracted.
-  @retval EFI_INVALID_PARAMETER  The DHCP option is malformatted
+  @retval EFI_INVALID_PARAMETER  The DHCP option is mal-formatted
 
 **/
 EFI_STATUS
@@ -303,7 +303,7 @@ DhcpGetParameter (
                                      option.
 
   @retval EFI_SUCCESS            All the options are valid
-  @retval EFI_INVALID_PARAMETER  The options are malformatted.
+  @retval EFI_INVALID_PARAMETER  The options are mal-formatted.
 
 **/
 EFI_STATUS
@@ -376,8 +376,8 @@ DhcpIterateBufferOptions (
                                      found
   @param[in]  Context                The opaque parameter for Check
 
-  @retval EFI_SUCCESS            The DHCP packet's options are well formated
-  @retval EFI_INVALID_PARAMETER  The DHCP packet's options are not well formated
+  @retval EFI_SUCCESS            The DHCP packet's options are well formatted
+  @retval EFI_INVALID_PARAMETER  The DHCP packet's options are not well formatted
 
 **/
 EFI_STATUS
@@ -438,7 +438,7 @@ DhcpIterateOptions (
 
 /**
   Call back function to DhcpIterateOptions to compute each option's
-  length. It just adds the data length of all the occurances of this
+  length. It just adds the data length of all the occurrences of this
   Tag. Context is an array of 256 DHCP_OPTION_COUNT.
 
   @param[in]  Tag                    The current option to check
@@ -473,7 +473,7 @@ DhcpGetOptionLen (
 
   @param[in]  Tag                    The option to consolidate its data
   @param[in]  Len                    The length of option data
-  @param[in]  Data                   The data of the option's current occurance
+  @param[in]  Data                   The data of the option's current occurrence
   @param[in]  Context                The context, which is DHCP_OPTION_CONTEXT. This
                                      array is  just a wrap to pass THREE parameters.
 
@@ -517,8 +517,8 @@ DhcpFillOption (
 /**
   Parse the options of a DHCP packet. It supports RFC 3396: Encoding
   Long Options in DHCP. That is, it will combine all the option value
-  of all the occurances of each option.
-  A little bit of implemenation:
+  of all the occurrences of each option.
+  A little bit of implementation:
   It adopts the "Key indexed counting" algorithm. First, it allocates
   an array of 256 DHCP_OPTION_COUNTs because DHCP option tag is encoded
   as a UINT8. It then iterates the DHCP packet to get data length of
@@ -538,7 +538,7 @@ DhcpFillOption (
 
   @retval EFI_NOT_FOUND          Cannot find any option.
   @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory to parse the packet.
-  @retval EFI_INVALID_PARAMETER  The options are malformatted
+  @retval EFI_INVALID_PARAMETER  The options are mal-formatted
   @retval EFI_SUCCESS            The options are parsed into OptionPoint
 
 **/
@@ -639,7 +639,7 @@ ON_EXIT:
   @param[out] Para                   The variable to save the DHCP parameters.
 
   @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory to validate the packet.
-  @retval EFI_INVALID_PARAMETER  The options are malformatted
+  @retval EFI_INVALID_PARAMETER  The options are mal-formatted
   @retval EFI_SUCCESS            The options are parsed into OptionPoint
 
 **/
@@ -770,7 +770,7 @@ DhcpAppendOption (
                                      function.
 
   @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory
-  @retval EFI_INVALID_PARAMETER  The options in SeekPacket are malformatted
+  @retval EFI_INVALID_PARAMETER  The options in SeekPacket are mal-formatted
   @retval EFI_SUCCESS            The packet is build.
 
 **/
@@ -794,7 +794,7 @@ DhcpBuild (
   UINT8                     *Buf;
 
   //
-  // Use an array of DHCP_OPTION to mark the existance
+  // Use an array of DHCP_OPTION to mark the existence
   // and position of each valid options.
   //
   Mark = AllocatePool (sizeof (DHCP_OPTION) * DHCP_MAX_OPTIONS);

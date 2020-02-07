@@ -108,7 +108,7 @@ DhcpSendMessage (
 /**
   Each DHCP service has three timer. Two of them are count down timer.
   One for the packet retransmission. The other is to collect the offers.
-  The third timer increaments the lease life which is compared to T1, T2,
+  The third timer increments the lease life which is compared to T1, T2,
   and lease to determine the time to renew and rebind the lease.
   DhcpOnTimerTick will be called once every second.
 
