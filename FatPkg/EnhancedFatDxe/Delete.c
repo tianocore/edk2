@@ -56,7 +56,7 @@ FatDelete (
     goto Done;
   }
   //
-  // If the file has a permanant error, skip the delete
+  // If the file has a permanent error, skip the delete
   //
   Status = OFile->Error;
   if (!EFI_ERROR (Status)) {

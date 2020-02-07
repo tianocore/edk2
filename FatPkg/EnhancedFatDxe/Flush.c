@@ -226,7 +226,7 @@ FatOFileFlush (
   //
   do {
     //
-    // If the file has a permanant error, then don't write any
+    // If the file has a permanent error, then don't write any
     // of its data to the device (may be from different media)
     //
     if (EFI_ERROR (OFile->Error)) {
@@ -319,7 +319,7 @@ FatCheckOFileRef (
 
   Check the references of all open files on the volume.
   Any open file (that is checked) that is no longer
-  referenced, is freed - and it's parent open file
+  referenced, is freed - and its parent open file
   is then referenced checked.
 
   @param  Volume                - The volume to check the pending open file list.

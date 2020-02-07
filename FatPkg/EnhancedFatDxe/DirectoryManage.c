@@ -13,7 +13,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   Get a directory entry from disk for the Ofile.
 
   @param  Parent                - The parent of the OFile which need to update.
-  @param  IoMode                - Indicate whether to read directory entry or write directroy entry.
+  @param  IoMode                - Indicate whether to read directory entry or write directory entry.
   @param  EntryPos              - The position of the directory entry to be accessed.
   @param  Entry                 - The directory entry read or written.
 

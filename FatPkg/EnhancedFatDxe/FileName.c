@@ -128,7 +128,7 @@ FatTrimAsciiTrailingBlanks (
   @param  FatName               - The Char8 string needs to be converted.
   @param  Len                   - The length of the fat name.
   @param  LowerCase             - Indicate whether to convert the string to lower case.
-  @param  Str                   - The result of the convertion.
+  @param  Str                   - The result of the conversion.
 
 **/
 VOID
