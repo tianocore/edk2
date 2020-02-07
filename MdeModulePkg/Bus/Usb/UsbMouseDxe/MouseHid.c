@@ -22,7 +22,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   Only short item is supported here.
 
   @param  StartPos          Start position of the HID item to get.
-  @param  EndPos            End position of the range to get the the next HID item.
+  @param  EndPos            End position of the range to get the next HID item.
   @param  HidItem           Buffer for the HID Item to return.
 
   @return Pointer to end of the HID item returned.
