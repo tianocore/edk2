@@ -21,7 +21,7 @@
 #include <Pi/PiFirmwareVolume.h>
 
 //
-// The protocols, PPI and GUID defintions for this module
+// The protocols, PPI and GUID definitions for this module
 //
 #include <Guid/SystemNvDataGuid.h>
 //
@@ -41,7 +41,7 @@ typedef struct {
 
 EFI_FVB_MEDIA_INFO  mPlatformFvbMediaInfo[] = {
   //
-  // Systen NvStorage FVB
+  // System NvStorage FVB
   //
   {
     FixedPcdGet32 (PcdFlashNvStorageVariableSize) +
