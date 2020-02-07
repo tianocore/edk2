@@ -284,7 +284,7 @@ extern UINT8  mSmmSaveStateRegisterLma;
 
   @retval EFI_SUCCESS   The register was read from Save State
   @retval EFI_NOT_FOUND The register is not defined for the Save State of Processor
-  @retval EFI_INVALID_PARAMTER   This or Buffer is NULL.
+  @retval EFI_INVALID_PARAMETER   This or Buffer is NULL.
 
 **/
 EFI_STATUS
@@ -308,7 +308,7 @@ SmmReadSaveState (
 
   @retval EFI_SUCCESS   The register was written from Save State
   @retval EFI_NOT_FOUND The register is not defined for the Save State of Processor
-  @retval EFI_INVALID_PARAMTER   ProcessorIndex or Width is not correct
+  @retval EFI_INVALID_PARAMETER   ProcessorIndex or Width is not correct
 
 **/
 EFI_STATUS
@@ -336,7 +336,7 @@ This function supports reading a CPU Save State register in SMBase relocation ha
 
 @retval EFI_SUCCESS           The register was read from Save State.
 @retval EFI_NOT_FOUND         The register is not defined for the Save State of Processor.
-@retval EFI_INVALID_PARAMTER  This or Buffer is NULL.
+@retval EFI_INVALID_PARAMETER  This or Buffer is NULL.
 
 **/
 EFI_STATUS
@@ -363,7 +363,7 @@ This function supports writing a CPU Save State register in SMBase relocation ha
 
 @retval EFI_SUCCESS           The register was written to Save State.
 @retval EFI_NOT_FOUND         The register is not defined for the Save State of Processor.
-@retval EFI_INVALID_PARAMTER  ProcessorIndex or Width is not correct.
+@retval EFI_INVALID_PARAMETER  ProcessorIndex or Width is not correct.
 
 **/
 EFI_STATUS
@@ -1263,7 +1263,7 @@ EdkiiSmmGetMemoryAttributes (
 
 /**
   This function fixes up the address of the global variable or function
-  referred in SmmInit assembly files to be the absoute address.
+  referred in SmmInit assembly files to be the absolute address.
 **/
 VOID
 EFIAPI
@@ -1272,7 +1272,7 @@ PiSmmCpuSmmInitFixupAddress (
 
 /**
   This function fixes up the address of the global variable or function
-  referred in SmiEntry assembly files to be the absoute address.
+  referred in SmiEntry assembly files to be the absolute address.
 **/
 VOID
 EFIAPI

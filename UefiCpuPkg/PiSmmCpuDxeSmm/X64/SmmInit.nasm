@@ -72,7 +72,7 @@ BITS 64
 ASM_PFX(gPatchSmmInitStack):
     and     sp, 0xfff0                  ; make sure RSP is 16-byte aligned
     ;
-    ; Accoring to X64 calling convention, XMM0~5 are volatile, we need to save
+    ; According to X64 calling convention, XMM0~5 are volatile, we need to save
     ; them before calling C-function.
     ;
     sub     rsp, 0x60

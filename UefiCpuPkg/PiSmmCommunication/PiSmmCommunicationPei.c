@@ -366,7 +366,7 @@ Communicate (
   @param  FileHandle              Handle of the file being invoked.
   @param  PeiServices             Pointer to PEI Services table.
 
-  @retval EFI_SUCEESS
+  @retval EFI_SUCCESS
   @return Others          Some error occurs.
 **/
 EFI_STATUS

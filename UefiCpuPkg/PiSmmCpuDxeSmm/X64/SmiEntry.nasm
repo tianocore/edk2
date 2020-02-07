@@ -16,7 +16,7 @@
 %include "Nasm.inc"
 
 ;
-; Variables referrenced by C code
+; Variables referenced by C code
 ;
 
 %define MSR_IA32_S_CET                     0x6A2
