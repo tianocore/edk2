@@ -775,7 +775,7 @@ CheckForInput (
 /**
   I/O work flow to wait input buffer empty in given time.
 
-  @param Timeout Wating time.
+  @param Timeout Waiting time.
 
   @retval EFI_TIMEOUT if input is still not empty in given time.
   @retval EFI_SUCCESS input is empty.
