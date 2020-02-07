@@ -185,7 +185,7 @@ VlanConfigComponentNameGetControllerName (
   @param[in]  RemainingDevicePath  Optional parameter use to pick a specific child
                                    device to start.
 
-  @retval EFI_SUCCES           This driver supports this device
+  @retval EFI_SUCCESS          This driver supports this device
   @retval EFI_ALREADY_STARTED  This driver is already running on this device
   @retval other                This driver does not support this device
 
@@ -206,7 +206,7 @@ VlanConfigDriverBindingSupported (
   @param[in]  RemainingDevicePath  Optional parameter use to pick a specific child
                                    device to start.
 
-  @retval EFI_SUCCES           This driver is added to ControllerHandle
+  @retval EFI_SUCCESS          This driver is added to ControllerHandle
   @retval EFI_ALREADY_STARTED  This driver is already running on ControllerHandle
   @retval other                This driver does not support this device
 
@@ -228,7 +228,7 @@ VlanConfigDriverBindingStart (
                                    of children is zero stop the entire bus driver.
   @param[in]  ChildHandleBuffer    List of Child Handles to Stop.
 
-  @retval EFI_SUCCES           This driver is removed ControllerHandle
+  @retval EFI_SUCCESS          This driver is removed ControllerHandle
   @retval other                This driver was not removed from this device
 
 **/
