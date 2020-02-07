@@ -171,7 +171,7 @@ Mtftp4WrqHandleAck (
   if (Expected < 0) {
 
     //
-    // The block range is empty. It may either because the the last
+    // The block range is empty. It may either because the last
     // block has been ACKed, or the sequence number just looped back,
     // that is, there is more than 0xffff blocks.
     //
@@ -245,11 +245,11 @@ Mtftp4WrqOackValid (
   @param  Instance              The MTFTP session
   @param  Packet                The received OACK packet
   @param  Len                   The length of the packet
-  @param  Completed             Whether the transmisson has completed. NOT used by
+  @param  Completed             Whether the transmission has completed. NOT used by
                                 this function.
 
   @retval EFI_SUCCESS           The OACK process is OK
-  @retval EFI_TFTP_ERROR        Some error occured, and the session reset.
+  @retval EFI_TFTP_ERROR        Some error occurred, and the session reset.
 
 **/
 EFI_STATUS

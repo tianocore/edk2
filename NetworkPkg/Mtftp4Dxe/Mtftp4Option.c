@@ -18,13 +18,13 @@ CHAR8 *mMtftp4SupportedOptions[MTFTP4_SUPPORTED_OPTIONS] = {
 
 
 /**
-  Check whether two ascii strings are equel, ignore the case.
+  Check whether two ascii strings are equal, ignore the case.
 
   @param  Str1                   The first ascii string
   @param  Str2                   The second ascii string
 
   @retval TRUE                   Two strings are equal when case is ignored.
-  @retval FALSE                  Two string are not equal.
+  @retval FALSE                  Two strings are not equal.
 
 **/
 BOOLEAN
@@ -93,7 +93,7 @@ NetStringToU32 (
   Convert a string of the format "192.168.0.1" to an IP address.
 
   @param  Str                    The string representation of IP
-  @param  Ip                     The varible to get IP.
+  @param  Ip                     The variable to get IP.
 
   @retval EFI_INVALID_PARAMETER  The IP string is invalid.
   @retval EFI_SUCCESS            The IP is parsed into the Ip
@@ -126,7 +126,7 @@ NetStringToIp (
     Addr = (Addr << 8) | Byte;
 
     //
-    // Skip all the digitals and check whether the sepeator is the dot
+    // Skip all the digitals and check whether the separator is the dot
     //
     while (NET_IS_DIGIT (*Str)) {
       Str++;
@@ -230,7 +230,7 @@ Mtftp4FillOptions (
   @param  OptionList             The point to get the option array.
 
   @retval EFI_INVALID_PARAMETER  The parametera are invalid or packet isn't a
-                                 well-formated OACK packet.
+                                 well-formatted OACK packet.
   @retval EFI_SUCCESS            The option array is build
   @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory for the array
 
@@ -314,7 +314,7 @@ Mtftp4ExtractMcast (
   UINT32                    Num;
 
   //
-  // The multicast option is formated like "204.0.0.1,1857,1"
+  // The multicast option is formatted like "204.0.0.1,1857,1"
   // The server can also omit the ip and port, use ",,1"
   //
   if (*Value == ',') {
@@ -461,7 +461,7 @@ Mtftp4ParseOption (
     } else if (NetStringEqualNoCase (This->OptionStr, (UINT8 *) "multicast")) {
       //
       // Multicast option, if it is a request, the value must be a zero
-      // length string, otherwise, it is formated like "204.0.0.1,1857,1\0"
+      // length string, otherwise, it is formatted like "204.0.0.1,1857,1\0"
       //
       if (Request) {
         if (*(This->ValueStr) != '\0') {
