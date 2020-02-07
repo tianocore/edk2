@@ -293,7 +293,7 @@ IScsiConvertIsIdToString (
   @param[in]  String             The string is "&OFFSET=".
   @param[out] Value              The Offset value.
 
-  @retval EFI_OUT_OF_RESOURCES   Insufficient resources to store neccessary
+  @retval EFI_OUT_OF_RESOURCES   Insufficient resources to store necessary
                                  structures.
   @retval EFI_SUCCESS            Value of <Number> is outputted in Number
                                  successfully.
@@ -2229,7 +2229,7 @@ IScsiConfigAddAttemptsByKeywords (
 
   @retval EFI_NOT_FOUND          Cannot find the corresponding variable.
   @retval EFI_SUCCESS            The operation is completed successfully.
-  @retval EFI_ABOTRED            This operation is aborted cause of error
+  @retval EFI_ABORTED            This operation is aborted cause of error
                                  configuration.
   @retval EFI_OUT_OF_RESOURCES   Fail to finish the operation due to lack of
                                  resources.
@@ -3024,7 +3024,7 @@ IScsiFormExtractConfig (
   }
 
   //
-  // Extract all AttemptConfigData to Keyword stroage of IfrNvData.
+  // Extract all AttemptConfigData to Keyword storage of IfrNvData.
   //
   IScsiConvertAttemptConfigDataToIfrNvDataByKeyword (IfrNvData);
 

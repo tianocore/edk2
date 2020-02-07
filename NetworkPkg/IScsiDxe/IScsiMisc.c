@@ -272,7 +272,7 @@ IScsiAsciiStrToIp (
 }
 
 /**
-  Convert the mac address into a hexadecimal encoded "-" seperated string.
+  Convert the mac address into a hexadecimal encoded "-" separated string.
 
   @param[in]  Mac     The mac address.
   @param[in]  Len     Length in bytes of the mac address.
@@ -2412,7 +2412,7 @@ IScsiGetTcpConnDevicePath (
         //  Add a judgement here to support previous versions of IPv4_DEVICE_PATH.
         //  In previous versions of IPv4_DEVICE_PATH, GatewayIpAddress and SubnetMask
         //  do not exist.
-        //  In new version of IPv4_DEVICE_PATH, structcure length is 27.
+        //  In new version of IPv4_DEVICE_PATH, structure length is 27.
         //
 
         PathLen = DevicePathNodeLength (&DPathNode->Ipv4);
@@ -2502,7 +2502,7 @@ IScsiOnExitBootService (
 
   This function tests whether the driver specified by DriverBindingHandle is
   currently managing the controller specified by ControllerHandle.  This test
-  is performed by evaluating if the the protocol specified by ProtocolGuid is
+  is performed by evaluating if the protocol specified by ProtocolGuid is
   present on ControllerHandle and is was opened by DriverBindingHandle and Nic
   Device handle with an attribute of EFI_OPEN_PROTOCOL_BY_DRIVER.
   If ProtocolGuid is NULL, then ASSERT().
