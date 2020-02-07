@@ -384,7 +384,7 @@ Finish:
   and other exception operations.  The File parameter allows for possible logging
   within the SAP of the driver.
 
-  If File is NULL, then EFI_INVALID_PARAMETER is returned.
+  If File is NULL, then EFI_ACCESS_DENIED is returned.
 
   If the file specified by File with an authentication status specified by
   AuthenticationStatus is safe for the DXE Core to use, then EFI_SUCCESS is returned.
@@ -434,6 +434,13 @@ DxeTpm2MeasureBootHandler (
   EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *FvbProtocol;
   EFI_PHYSICAL_ADDRESS                FvAddress;
   UINT32                              Index;
+
+  //
+  // Check for invalid parameters.
+  //
+  if (File == NULL) {
+    return EFI_ACCESS_DENIED;
+  }
 
   Status = gBS->LocateProtocol (&gEfiTcg2ProtocolGuid, NULL, (VOID **) &Tcg2Protocol);
   if (EFI_ERROR (Status)) {
