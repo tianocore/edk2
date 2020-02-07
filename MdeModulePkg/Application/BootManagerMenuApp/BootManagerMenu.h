@@ -47,7 +47,7 @@ typedef struct _BOOT_MENU_POPUP_DATA {
   EFI_STRING_ID                   HelpToken[HELP_TOKEN_COUNT];   // All of help string ID
   UINTN                           SelectItem;                    // Current select  item
   BOOT_MENU_SCREEN                MenuScreen;                    // Boot menu screen information
-  BOOT_MENU_SCROLL_BAR_CONTROL    ScrollBarControl;              // Boot menu scroll bar inoformation
+  BOOT_MENU_SCROLL_BAR_CONTROL    ScrollBarControl;              // Boot menu scroll bar information
 } BOOT_MENU_POPUP_DATA;
 
 #endif
