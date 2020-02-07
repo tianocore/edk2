@@ -784,7 +784,7 @@ MatchUsbClass (
   // If connect class policy, determine whether to create device handle by the five fields
   // in class device path node.
   //
-  // In addtion, hub interface is always matched for this policy.
+  // In addition, hub interface is always matched for this policy.
   //
   if ((ActIfDesc->InterfaceClass == USB_HUB_CLASS_CODE) &&
       (ActIfDesc->InterfaceSubClass == USB_HUB_SUBCLASS_CODE)) {
@@ -1018,7 +1018,7 @@ UsbBusAddWantedUsbIoDP (
   } else {
     //
     // If RemainingDevicePath is the End of Device Path Node,
-    // skip enumerate any device and return EFI_SUCESSS
+    // skip enumerate any device and return EFI_SUCCESS
     //
     return EFI_SUCCESS;
   }
@@ -1034,7 +1034,7 @@ UsbBusAddWantedUsbIoDP (
   Check whether a usb child device is the wanted device in a bus.
 
   @param  Bus     The Usb bus's private data pointer.
-  @param  UsbIf   The usb child device inferface.
+  @param  UsbIf   The usb child device interface.
 
   @retval True    If a usb child device is the wanted device in a bus.
   @retval False   If a usb child device is *NOT* the wanted device in a bus.
@@ -1136,7 +1136,7 @@ UsbBusIsWantedUsbIO (
 }
 
 /**
-  Recursively connnect every wanted usb child device to ensure they all fully connected.
+  Recursively connect every wanted usb child device to ensure they all fully connected.
   Check all the child Usb IO handles in this bus, recursively connecte if it is wanted usb child device.
 
   @param  UsbBusId                  Point to EFI_USB_BUS_PROTOCOL interface.

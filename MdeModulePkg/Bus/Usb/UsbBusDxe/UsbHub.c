@@ -545,7 +545,7 @@ UsbOnHubInterrupt (
   // OK, actually something is changed, save the change map
   // then signal the HUB to do enumeration. This is a good
   // practise since UsbOnHubInterrupt is called in the context
-  // of host contrller's AsyncInterrupt monitor.
+  // of host controller's AsyncInterrupt monitor.
   //
   HubIf->ChangeMap = AllocateZeroPool (DataLength);
 
@@ -630,7 +630,7 @@ UsbHubInit (
 
   //
   // OK, set IsHub to TRUE. Now usb bus can handle this device
-  // as a working HUB. If failed eariler, bus driver will not
+  // as a working HUB. If failed earlier, bus driver will not
   // recognize it as a hub. Other parts of the bus should be able
   // to work.
   //

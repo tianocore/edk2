@@ -159,7 +159,7 @@ typedef struct _EFI_USB_BUS_PROTOCOL {
 
 //
 // Stands for the real USB device. Each device may
-// has several seperately working interfaces.
+// has several separately working interfaces.
 //
 struct _USB_DEVICE {
   USB_BUS                   *Bus;
@@ -265,8 +265,8 @@ struct _USB_BUS {
   // USB Bus driver need to control the recursive connect policy of the bus, only those wanted
   // usb child device will be recursively connected.
   //
-  // WantedUsbIoDPList tracks the Usb child devices which user want to recursivly fully connecte,
-  // every wanted child device is stored in a item of the WantedUsbIoDPList, whose structrure is
+  // WantedUsbIoDPList tracks the Usb child devices which user want to recursively fully connecte,
+  // every wanted child device is stored in a item of the WantedUsbIoDPList, whose structure is
   // DEVICE_PATH_LIST_ITEM
   //
   LIST_ENTRY                WantedUsbIoDPList;
@@ -337,7 +337,7 @@ UsbBusAddWantedUsbIoDP (
   Check whether a usb child device is the wanted device in a bus.
 
   @param  Bus     The Usb bus's private data pointer.
-  @param  UsbIf   The usb child device inferface.
+  @param  UsbIf   The usb child device interface.
 
   @retval True    If a usb child device is the wanted device in a bus.
   @retval False   If a usb child device is *NOT* the wanted device in a bus.
@@ -351,7 +351,7 @@ UsbBusIsWantedUsbIO (
   );
 
 /**
-  Recursively connnect every wanted usb child device to ensure they all fully connected.
+  Recursively connect every wanted usb child device to ensure they all fully connected.
   Check all the child Usb IO handles in this bus, recursively connecte if it is wanted usb child device.
 
   @param  UsbBusId                  Point to EFI_USB_BUS_PROTOCOL interface.
@@ -461,7 +461,7 @@ UsbIoSyncInterruptTransfer (
                                  the request.
   @param  PollInterval           The interval to poll the transfer result, (in ms).
   @param  DataLength             The length of perodic data transfer.
-  @param  Callback               The function to call periodicaly when transfer is
+  @param  Callback               The function to call periodically when transfer is
                                  ready.
   @param  Context                The context to the callback.
 
@@ -512,7 +512,7 @@ UsbIoIsochronousTransfer (
   @param  DeviceEndpoint         The device endpoint.
   @param  Data                   The data to transfer.
   @param  DataLength             The length of perodic data transfer.
-  @param  IsochronousCallBack    The function to call periodicaly when transfer is
+  @param  IsochronousCallBack    The function to call periodically when transfer is
                                  ready.
   @param  Context                The context to the callback.
 
