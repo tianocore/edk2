@@ -128,7 +128,7 @@ EmmcPeimAllocMemFromBlock (
     //
     // If current bit is zero, the corresponding memory unit is
     // available, otherwise we need to restart our searching.
-    // Available counts the consective number of zero bit.
+    // Available counts the consecutive number of zero bit.
     //
     if (!EMMC_PEIM_MEM_BIT_IS_SET (Block->Bits[Byte], Bit)) {
       Available++;

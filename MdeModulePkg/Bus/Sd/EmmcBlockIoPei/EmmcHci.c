@@ -1290,7 +1290,7 @@ EmmcPeimExecTrb (
   BlkCount = 0;
   if (Trb->Mode != EmmcNoData) {
     //
-    // Calcuate Block Count.
+    // Calculate Block Count.
     //
     BlkCount = (UINT16)(Trb->DataLen / Trb->BlockSize);
   }
@@ -2017,7 +2017,7 @@ EmmcPeimGetExtCsd (
   Refer to EMMC Electrical Standard Spec 5.1 Section 6.10.4 for details.
 
   @param[in] Slot           The slot number of the Emmc card to send the command to.
-  @param[in] Access         The access mode of SWTICH command.
+  @param[in] Access         The access mode of SWITCH command.
   @param[in] Index          The offset of the field to be access.
   @param[in] Value          The value to be set to the specified field of EXT_CSD register.
   @param[in] CmdSet         The value of CmdSet field of EXT_CSD register.
@@ -2273,7 +2273,7 @@ EmmcPeimSendTuningBlk (
 }
 
 /**
-  Tunning the clock to get HS200 optimal sampling point.
+  Tuning the clock to get HS200 optimal sampling point.
 
   Command SEND_TUNING_BLOCK may be sent up to 40 times until the host finishes the
   tuning procedure.
@@ -2509,7 +2509,7 @@ EmmcPeimSwitchToHighSpeed (
     return Status;
   }
   //
-  // Set to Hight Speed timing
+  // Set to High Speed timing
   //
   HostCtrl1 = BIT2;
   Status = EmmcPeimHcOrMmio (Slot->EmmcHcBase + EMMC_HC_HOST_CTRL1, sizeof (HostCtrl1), &HostCtrl1);
@@ -2658,7 +2658,7 @@ EmmcPeimSwitchToHS400 (
     return Status;
   }
   //
-  // Set to Hight Speed timing and set the clock frequency to a value less than 52MHz.
+  // Set to High Speed timing and set the clock frequency to a value less than 52MHz.
   //
   HsTiming = 1;
   Status = EmmcPeimSwitchClockFreq (Slot, Rca, HsTiming, 52);
@@ -2752,7 +2752,7 @@ EmmcPeimSetBusMode (
     BusWidth = 4;
   }
   //
-  // Get Deivce_Type from EXT_CSD register.
+  // Get Device_Type from EXT_CSD register.
   //
   Status = EmmcPeimGetExtCsd (Slot, &Slot->ExtCsd);
   if (EFI_ERROR (Status)) {
