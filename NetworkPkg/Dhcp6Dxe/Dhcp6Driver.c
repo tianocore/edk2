@@ -1,6 +1,6 @@
 /** @file
   Driver Binding functions and Service Binding functions
-  implementationfor for Dhcp6 Driver.
+  implementation for Dhcp6 Driver.
 
   Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 
@@ -300,7 +300,7 @@ Dhcp6CreateInstance (
 
   //
   // There is a timer for each Dhcp6 instance, which is used to track the
-  // lease time of Ia and the retransmisson time of all sent packets.
+  // lease time of Ia and the retransmission time of all sent packets.
   //
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL | EVT_TIMER,
@@ -445,7 +445,7 @@ Dhcp6DriverBindingStart (
   DHCP6_SERVICE                   *Service;
 
   //
-  // Check the Dhcp6 serivce whether already started.
+  // Check the Dhcp6 service whether already started.
   //
   Status = gBS->OpenProtocol (
                   ControllerHandle,
@@ -551,7 +551,7 @@ Dhcp6DriverBindingStop (
   Service = DHCP6_SERVICE_FROM_THIS (ServiceBinding);
   if (!IsListEmpty (&Service->Child)) {
     //
-    // Destroy all the children instances before destory the service.
+    // Destroy all the children instances before destroy the service.
     //
     List = &Service->Child;
     Status = NetDestroyLinkList (
@@ -603,7 +603,7 @@ ON_EXIT:
                               then a new handle is created. If it is a pointer to an existing
                               UEFI handle, then the protocol is added to the existing UEFI handle.
 
-  @retval EFI_SUCCES            The protocol was added to ChildHandle.
+  @retval EFI_SUCCESS           The protocol was added to ChildHandle.
   @retval EFI_INVALID_PARAMETER ChildHandle is NULL.
   @retval other                 The child handle was not created.
 
@@ -715,7 +715,7 @@ ON_ERROR:
   @param[in]  This        Pointer to the EFI_SERVICE_BINDING_PROTOCOL instance.
   @param[in]  ChildHandle Handle of the child to destroy
 
-  @retval EFI_SUCCES            The protocol was removed from ChildHandle.
+  @retval EFI_SUCCESS           The protocol was removed from ChildHandle.
   @retval EFI_UNSUPPORTED       ChildHandle does not support the protocol that is being removed.
   @retval EFI_INVALID_PARAMETER Child handle is NULL.
   @retval EFI_ACCESS_DENIED     The protocol could not be removed from the ChildHandle
