@@ -20,7 +20,7 @@
   @param[in] Shell                  The instance of the shell protocol used in the context
                                     of processing this command.
 
-  @return EFI_SUCCESS               the operation was sucessful
+  @return EFI_SUCCESS               the operation was successful
   @return other                     the operation failed.
 **/
 SHELL_STATUS
@@ -71,7 +71,7 @@ EFI_SHELL_DYNAMIC_COMMAND_PROTOCOL mTftpDynamicCommand = {
   @param ImageHandle            The image handle of the process.
   @param SystemTable            The EFI System Table pointer.
 
-  @retval EFI_SUCCESS           Tftp command is executed sucessfully.
+  @retval EFI_SUCCESS           Tftp command is executed successfully.
   @retval EFI_ABORTED           HII package was failed to initialize.
   @retval others                Other errors when executing tftp command.
 **/

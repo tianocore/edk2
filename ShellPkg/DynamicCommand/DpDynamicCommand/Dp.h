@@ -127,7 +127,7 @@ RunDp (
   );
 
 /**
-  Retrive HII package list from ImageHandle and publish to HII database.
+  Retrieve HII package list from ImageHandle and publish to HII database.
 
   @param ImageHandle            The image handle of the process.
 
