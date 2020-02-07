@@ -419,7 +419,7 @@ VirtioNetDriverBindingSupported (
                                    device error.Currently not implemented.
   @retval EFI_OUT_OF_RESOURCES     The request could not be completed due to a
                                    lack of resources.
-  @retval Others                   The driver failded to start the device.
+  @retval Others                   The driver failed to start the device.
 
 **/
 

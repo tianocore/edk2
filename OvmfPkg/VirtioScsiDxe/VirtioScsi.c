@@ -497,7 +497,7 @@ VirtioScsiPassThru (
     //  * we perform the request fine
     //  * but we fail to unmap the "InDataMapping"
     //
-    // In that case simply returing the EFI_DEVICE_ERROR is not sufficient. In
+    // In that case simply returning the EFI_DEVICE_ERROR is not sufficient. In
     // addition to the error code we also need to update Packet fields
     // accordingly so that we report the full loss of the incoming transfer.
     //
