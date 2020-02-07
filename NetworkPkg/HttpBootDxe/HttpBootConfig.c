@@ -552,7 +552,7 @@ HttpBootConfigFormInit (
 
   CallbackInfo = &Private->CallbackInfo;
 
-  if (CallbackInfo->Initilized) {
+  if (CallbackInfo->Initialized) {
     return EFI_SUCCESS;
   }
 
@@ -632,7 +632,7 @@ HttpBootConfigFormInit (
     FreePool (MacString);
     FreePool (OldMenuString);
 
-    CallbackInfo->Initilized = TRUE;
+    CallbackInfo->Initialized = TRUE;
     return EFI_SUCCESS;
   }
 
