@@ -158,7 +158,7 @@ typedef struct {
 
   @retval EFI_UNSUPPORTED        Return this value when the BARs is not IO type
   @retval EFI_SUCCESS            Get the Base address successfully
-  @retval Other                  Read the pci configureation data error
+  @retval Other                  Read the pci configuration data error
 
 **/
 EFI_STATUS

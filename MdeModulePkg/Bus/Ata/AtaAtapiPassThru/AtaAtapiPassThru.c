@@ -1,5 +1,5 @@
 /** @file
-  This file implements ATA_PASSTHRU_PROCTOCOL and EXT_SCSI_PASSTHRU_PROTOCOL interfaces
+  This file implements ATA_PASSTHRU_PROTOCOL and EXT_SCSI_PASSTHRU_PROTOCOL interfaces
   for managed ATA controllers.
 
   Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
@@ -404,7 +404,7 @@ AsyncNonBlockingTransferRoutine (
   Instance   = (ATA_ATAPI_PASS_THRU_INSTANCE *) Context;
   EntryHeader = &Instance->NonBlockingTaskList;
   //
-  // Get the Taks from the Taks List and execute it, until there is
+  // Get the Tasks from the Tasks List and execute it, until there is
   // no task in the list or the device is busy with task (EFI_NOT_READY).
   //
   while (TRUE) {
@@ -538,7 +538,7 @@ AtaAtapiPassThruSupported (
   EFI_IDE_CONTROLLER_INIT_PROTOCOL  *IdeControllerInit;
 
   //
-  // SATA Controller is a device driver, and should ingore the
+  // SATA Controller is a device driver, and should ignore the
   // "RemainingDevicePath" according to UEFI spec
   //
   Status = gBS->OpenProtocol (
@@ -659,7 +659,7 @@ AtaAtapiPassThruSupported (
   @retval EFI_SUCCESS              The device was started.
   @retval EFI_DEVICE_ERROR         The device could not be started due to a device error.Currently not implemented.
   @retval EFI_OUT_OF_RESOURCES     The request could not be completed due to a lack of resources.
-  @retval Others                   The driver failded to start the device.
+  @retval Others                   The driver failed to start the device.
 
 **/
 EFI_STATUS

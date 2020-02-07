@@ -1,5 +1,5 @@
 ## @file
-#  ATA Bus driver to enumerate and identfy ATA devices.
+#  ATA Bus driver to enumerate and identify ATA devices.
 #
 #  This driver follows UEFI driver model and layers on ATA Pass Thru protocol defined
 #  in UEFI spec 2.2. It installs Block IO and Disk Info protocol for each ATA device

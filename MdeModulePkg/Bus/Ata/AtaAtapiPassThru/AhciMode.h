@@ -263,7 +263,7 @@ typedef struct {
 } EFI_AHCI_COMMAND_PRDT;
 
 //
-// Command table data strucute which is pointed to by the entry in the command list
+// Command table data structure which is pointed to by the entry in the command list
 //
 typedef struct {
   EFI_AHCI_COMMAND_FIS      CommandFis;       // A software constructed FIS.
@@ -283,7 +283,7 @@ typedef struct {
   UINT8    AhciD2HRegisterFis[0x14];      // D2H Register Fis: offset 0x40
   UINT8    AhciD2HRegisterFisRsvd[0x04];
   UINT64   AhciSetDeviceBitsFis;          // Set Device Bits Fix: offset 0x58
-  UINT8    AhciUnknownFis[0x40];          // Unkonwn Fis: offset 0x60
+  UINT8    AhciUnknownFis[0x40];          // Unknown Fis: offset 0x60
   UINT8    AhciUnknownFisRsvd[0x60];
 } EFI_AHCI_RECEIVED_FIS;
 

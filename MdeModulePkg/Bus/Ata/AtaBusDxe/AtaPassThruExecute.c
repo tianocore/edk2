@@ -536,7 +536,7 @@ TransferAtaDevice (
   //
   // As AtaBus is used to manage ATA devices, we have to use the lowest transfer rate to
   // calculate the possible maximum timeout value for each read/write operation.
-  // The timout value is rounded up to nearest integar and here an additional 30s is added
+  // The timeout value is rounded up to nearest integer and here an additional 30s is added
   // to follow ATA spec in which it mentioned that the device may take up to 30s to respond
   // commands in the Standby/Idle mode.
   //
@@ -634,7 +634,7 @@ AtaTerminateNonBlockingTask (
 }
 
 /**
-  Call back funtion when the event is signaled.
+  Call back function when the event is signaled.
 
   @param[in]  Event     The Event this notify function registered to.
   @param[in]  Context   Pointer to the context data registered to the

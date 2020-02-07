@@ -408,7 +408,7 @@ AtaBusDriverBindingSupported (
   @retval EFI_SUCCESS              The device was started.
   @retval EFI_DEVICE_ERROR         The device could not be started due to a device error.Currently not implemented.
   @retval EFI_OUT_OF_RESOURCES     The request could not be completed due to a lack of resources.
-  @retval Others                   The driver failded to start the device.
+  @retval Others                   The driver failed to start the device.
 
 **/
 EFI_STATUS
@@ -614,7 +614,7 @@ AtaBlockIoReset (
   @retval EFI_SUCCESS           The data was read correctly from the device.
   @retval EFI_DEVICE_ERROR      The device reported an error while performing the read.
   @retval EFI_NO_MEDIA          There is no media in the device.
-  @retval EFI_MEDIA_CHANGED     The MediaId does not matched the current device.
+  @retval EFI_MEDIA_CHANGED     The MediaId does not match the current device.
   @retval EFI_BAD_BUFFER_SIZE   The Buffer was not a multiple of the block size of the device.
   @retval EFI_INVALID_PARAMETER The read request contains LBAs that are not valid,
                                 or the buffer is not on proper alignment.
@@ -645,7 +645,7 @@ AtaBlockIoReadBlocks (
   @retval EFI_WRITE_PROTECTED   The device can not be written to.
   @retval EFI_DEVICE_ERROR      The device reported an error while performing the write.
   @retval EFI_NO_MEDIA          There is no media in the device.
-  @retval EFI_MEDIA_CHNAGED     The MediaId does not matched the current device.
+  @retval EFI_MEDIA_CHANGED     The MediaId does not match the current device.
   @retval EFI_BAD_BUFFER_SIZE   The Buffer was not a multiple of the block size of the device.
   @retval EFI_INVALID_PARAMETER The write request contains LBAs that are not valid,
                                 or the buffer is not on proper alignment.
@@ -679,7 +679,7 @@ AtaBlockIoFlushBlocks (
   );
 
 /**
-  Reset the Block Device throught Block I/O2 protocol.
+  Reset the Block Device through Block I/O2 protocol.
 
   @param[in]  This                 Indicates a pointer to the calling context.
   @param[in]  ExtendedVerification Driver may perform diagnostics on reset.
@@ -749,7 +749,7 @@ AtaBlockIoReadBlocksEx (
   @retval EFI_WRITE_PROTECTED   The device can not be written to.
   @retval EFI_DEVICE_ERROR      The device reported an error while performing the write.
   @retval EFI_NO_MEDIA          There is no media in the device.
-  @retval EFI_MEDIA_CHNAGED     The MediaId does not matched the current device.
+  @retval EFI_MEDIA_CHANGED     The MediaId does not match the current device.
   @retval EFI_BAD_BUFFER_SIZE   The Buffer was not a multiple of the block size of the device.
   @retval EFI_INVALID_PARAMETER The write request contains LBAs that are not valid,
                                 or the buffer is not on proper alignment.
@@ -1061,7 +1061,7 @@ AtaStorageSecuritySendData (
   Typically, there are 2 mechanism for resetting eDrive. They are:
   1. TPer Reset through IEEE 1667 protocol.
   2. TPer Reset through native TCG protocol.
-  This routine will detect what protocol the attached eDrive comform to, TCG or
+  This routine will detect what protocol the attached eDrive conform to, TCG or
   IEEE 1667 protocol. Then send out TPer Reset command separately.
 
   @param[in] AtaDevice    ATA_DEVICE pointer.

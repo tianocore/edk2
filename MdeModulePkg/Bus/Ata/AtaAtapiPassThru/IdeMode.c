@@ -46,7 +46,7 @@ IdeReadPortB (
   write a 1-byte data to a specific IDE port.
 
   @param  PciIo  A pointer to EFI_PCI_IO_PROTOCOL data structure
-  @param  Port   The IDE port to be writen
+  @param  Port   The IDE port to be written
   @param  Data   The data to write to the port
 **/
 VOID
@@ -76,7 +76,7 @@ IdeWritePortB (
   write a 1-word data to a specific IDE port.
 
   @param  PciIo  A pointer to EFI_PCI_IO_PROTOCOL data structure
-  @param  Port   The IDE port to be writen
+  @param  Port   The IDE port to be written
   @param  Data   The data to write to the port
 **/
 VOID
@@ -106,7 +106,7 @@ IdeWritePortW (
   write a 2-word data to a specific IDE port.
 
   @param  PciIo  A pointer to EFI_PCI_IO_PROTOCOL data structure
-  @param  Port   The IDE port to be writen
+  @param  Port   The IDE port to be written
   @param  Data   The data to write to the port
 **/
 VOID
@@ -718,12 +718,12 @@ WaitForBSYClear (
   Table 2. BARs for Register Mapping
 
   @param[in]      PciIo          Pointer to the EFI_PCI_IO_PROTOCOL instance
-  @param[in, out] IdeRegisters    Pointer to EFI_IDE_REGISTERS which is used to
+  @param[in, out] IdeRegisters   Pointer to EFI_IDE_REGISTERS which is used to
                                  store the IDE i/o port registers' base addresses
 
   @retval EFI_UNSUPPORTED        Return this value when the BARs is not IO type
   @retval EFI_SUCCESS            Get the Base address successfully
-  @retval Other                  Read the pci configureation data error
+  @retval Other                  Read the pci configuration data error
 
 **/
 EFI_STATUS
@@ -983,7 +983,7 @@ AtaPioDataInOut (
   Increment = 256;
 
   //
-  // used to record bytes of currently transfered data
+  // used to record bytes of currently transferred data
   //
   WordCount = 0;
 
@@ -1688,7 +1688,7 @@ AtaPacketReadWrite (
   RequiredWordCount = *ByteCount >> 1;
 
   //
-  // No data transfer is premitted.
+  // No data transfer is permitted.
   //
   if (RequiredWordCount == 0) {
     return EFI_SUCCESS;
@@ -2509,7 +2509,7 @@ DetectAndConfigIdeDevice (
     }
 
     //
-    // Set supported DMA mode on this IDE device. Note that UDMA & MDMA cann't
+    // Set supported DMA mode on this IDE device. Note that UDMA & MDMA can't
     // be set together. Only one DMA mode can be set to a device. If setting
     // DMA mode operation fails, we can continue moving on because we only use
     // PIO mode at boot time. DMA modes are used by certain kind of OS booting
