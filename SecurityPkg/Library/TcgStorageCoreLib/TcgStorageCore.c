@@ -837,7 +837,7 @@ TcgAddEndTransaction(
 }
 
 /**
-  Initial the tcg parse stucture.
+  Initial the tcg parse structure.
 
   @param    ParseStruct    Input parse structure.
   @param    Buffer         Input buffer data.

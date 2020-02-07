@@ -640,7 +640,7 @@ TcgSetAuthorityEnabled(
   @param     HostSession       Host session data.
   @param     AceRow            Ace row info.
   @param     Authority1        Authority 1 info.
-  @param     LogicalOperator   Logiccal operator info.
+  @param     LogicalOperator   Logical operator info.
   @param     Authority2        Authority 2 info.
 
   @retval    Return the action result.
