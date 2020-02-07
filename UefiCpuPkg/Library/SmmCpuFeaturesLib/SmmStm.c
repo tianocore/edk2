@@ -913,7 +913,7 @@ AddPiResource (
     }
 
     //
-    // Copy EndResource for intialization
+    // Copy EndResource for initialization
     //
     mStmResourcesPtr = (UINT8 *)(UINTN)NewResource;
     mStmResourceTotalSize = NewResourceSize;
@@ -1236,7 +1236,7 @@ LoadMonitor (
 /**
   This function return BIOS STM resource.
   Produced by SmmStm.
-  Comsumed by SmmMpService when Init.
+  Consumed by SmmMpService when Init.
 
   @return BIOS STM resource
 

@@ -138,7 +138,7 @@ GetPiResource (
   );
 
 /**
-  This functin initialize STM configuration table.
+  This function initialize STM configuration table.
 **/
 VOID
 StmSmmConfigurationTableInit (
@@ -169,7 +169,7 @@ GetStmResource (
 
 /**
   This function fixes up the address of the global variable or function
-  referred in SmiEntry assembly files to be the absoute address.
+  referred in SmiEntry assembly files to be the absolute address.
 **/
 VOID
 EFIAPI
