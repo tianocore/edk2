@@ -271,7 +271,7 @@ typedef struct {
 
 ///
 /// Inconsistent with specification here:
-/// The following defintion may not comply with Framework Specification HII 0.92. To
+/// The following definition may not comply with Framework Specification HII 0.92. To
 /// keep the inconsistant is for implementation needed.
 ///@{
 typedef struct {

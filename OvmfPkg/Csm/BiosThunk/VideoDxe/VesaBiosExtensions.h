@@ -250,7 +250,7 @@ typedef struct {
 #define VESA_BIOS_EXTENSIONS_VERSION_3_0  0x0300
 
 //
-// Super VGA Information Block Capabilities field bit defintions
+// Super VGA Information Block Capabilities field bit definitions
 //
 #define VESA_BIOS_EXTENSIONS_CAPABILITY_8_BIT_DAC 0x01  // 0: DAC width is fixed at 6 bits/color
 // 1: DAC width switchable to 8 bits/color
@@ -358,7 +358,7 @@ typedef struct {
 } VESA_BIOS_EXTENSIONS_MODE_INFORMATION_BLOCK;
 
 //
-// Super VGA Mode Information Block ModeAttributes field bit defintions
+// Super VGA Mode Information Block ModeAttributes field bit definitions
 //
 #define VESA_BIOS_EXTENSIONS_MODE_ATTRIBUTE_HARDWARE  0x0001  // 0: Mode not supported in handware
 // 1: Mode supported in handware
@@ -396,7 +396,7 @@ typedef struct {
 #define VESA_BIOS_EXTENSIONS_MODE_ATTRIBUTE_DUAL_DISPLAY  0x1000  // 0: No dual display start address support
 // 1: Dual display start address support
 //
-// Super VGA Mode Information Block WinAAttribite/WinBAttributes field bit defintions
+// Super VGA Mode Information Block WinAAttribite/WinBAttributes field bit definitions
 //
 #define VESA_BIOS_EXTENSIONS_WINX_ATTRIBUTE_RELOCATABLE 0x01  // 0: Single non-relocatable window only
 // 1: Relocatable window(s) are supported
@@ -407,7 +407,7 @@ typedef struct {
 #define VESA_BIOS_EXTENSIONS_WINX_ATTRIBUTE_WRITABLE  0x04  // 0: Window is not writable
 // 1: Window is writable
 //
-// Super VGA Mode Information Block DirectColorMode field bit defintions
+// Super VGA Mode Information Block DirectColorMode field bit definitions
 //
 #define VESA_BIOS_EXTENSIONS_DIRECT_COLOR_MODE_PROG_COLOR_RAMP  0x01  // 0: Color ram is fixed
 // 1: Color ramp is programmable
