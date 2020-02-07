@@ -19,7 +19,7 @@ formset
     guid = TLS_AUTH_CONFIG_GUID;
 
   //
-  // ##1 Form1: Main form for Tls Auth configration
+  // ##1 Form1: Main form for Tls Auth configuration
   //
   form formid = TLS_AUTH_CONFIG_FORMID1_FORM,
     title  = STRING_TOKEN(STR_TLS_AUTH_CONFIG_TITLE);
@@ -27,7 +27,7 @@ formset
     subtitle text = STRING_TOKEN(STR_NULL);
 
     //
-    // Display Server CA configration
+    // Display Server CA configuration
     //
     goto TLS_AUTH_CONFIG_FORMID2_FORM,
          prompt = STRING_TOKEN(STR_TLS_AUTH_CONFIG_SERVER_CA),
@@ -38,7 +38,7 @@ formset
     subtitle text = STRING_TOKEN(STR_NULL);
 
     //
-    // Display Client cert configration
+    // Display Client cert configuration
     //
     grayoutif TRUE; /// Current unsupported.
     goto TLS_AUTH_CONFIG_FORMID3_FORM,
