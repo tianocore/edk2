@@ -720,7 +720,7 @@ cleanlib:
                     if Dst not in self.ResultFileList:
                         self.ResultFileList.append(Dst)
                     if '%s :' %(Dst) not in self.BuildTargetList:
-                        self.BuildTargetList.append("%s :" %(Dst))
+                        self.BuildTargetList.append("%s : %s" %(Dst,Src))
                         self.BuildTargetList.append('\t' + self._CP_TEMPLATE_[self._FileType] %{'Src': Src, 'Dst': Dst})
 
             FfsCmdList = Cmd[0]
