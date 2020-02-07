@@ -15,11 +15,11 @@
 //
 // Gaskets are EFI ABI to UNIX ABI calls
 // EFI ABI code will sub 40 (0x28) from %rsp before calling a function
-//  This is the 32 (0x20) byte to spill registers and 8 bytes to align stack on 16 byte boundry.
+//  This is the 32 (0x20) byte to spill registers and 8 bytes to align stack on 16 byte boundary.
 //
   .text
 
-// 32 byte shadow to spill rcx-r9, 8 bytes to align stack on 16 byte boundry
+// 32 byte shadow to spill rcx-r9, 8 bytes to align stack on 16 byte boundary
 // Any call with 0 - 4 arguments allocates 40 bytes on the stack.
 // For more than 4 args you always have to increase in quanta of 16 so 5 or 6 args is 56,
 // 7 or 8 args is 72, and 9 or 10 args is 88

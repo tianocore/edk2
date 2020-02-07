@@ -6,7 +6,7 @@
  is just a template that needs to get filled in.
 
 Copyright (c) 2004 - 2009, Intel Corporation. All rights reserved.<BR>
-Portitions copyright (c) 2011, Apple Inc. All rights reserved.
+Portions copyright (c) 2011, Apple Inc. All rights reserved.
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
 

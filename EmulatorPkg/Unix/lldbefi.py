@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 #
-#  Copyright 2014 Apple Inc. All righes reserved.
+#  Copyright 2014 Apple Inc. All rights reserved.
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -278,7 +278,7 @@ def EFI_DEVICE_PATH_PROTOCOL_TypeSummary (valobj,internal_dict):
 
     Address = long ("%d" % valobj.addr)
     if (Address == lldb.LLDB_INVALID_ADDRESS):
-      # Need to reserach this, it seems to be the nested struct case
+      # Need to research this, it seems to be the nested struct case
       ExprStr = ""
     elif (Type & 0x7f == 0x7f):
       ExprStr = "End Device Path" if SubType == 0xff else "End This Instance"
@@ -304,7 +304,7 @@ def EFI_DEVICE_PATH_PROTOCOL_TypeSummary (valobj,internal_dict):
 
 def TypePrintFormating(debugger):
     #
-    # Set the default print formating for EFI types in lldb.
+    # Set the default print formatting for EFI types in lldb.
     # seems lldb defaults to decimal.
     #
     category = debugger.GetDefaultCategory()
@@ -390,7 +390,7 @@ def LoadEmulatorEfiSymbols(frame, bp_loc , internal_dict):
     FileName = frame.thread.process.ReadCStringFromMemory (FileNamePtr, FileNameLen, Error)
     if not Error.Success():
         print "!ReadCStringFromMemory() did not find a %d byte C string at %x" % (FileNameLen, FileNamePtr)
-        # make breakpoint command contiue
+        # make breakpoint command continue
         return False
 
     debugger = frame.thread.process.target.debugger
@@ -410,12 +410,12 @@ def LoadEmulatorEfiSymbols(frame, bp_loc , internal_dict):
                 if not target.RemoveModule (SBModule):
                     print "!lldb.target.RemoveModule (%s) FAILED" % SBModule
 
-    # make breakpoint command contiue
+    # make breakpoint command continue
     return False
 
 def GuidToCStructStr (guid, Name=False):
   #
-  # Convert a 16-byte bytesarry (or bytearray compat object) to C guid string
+  # Convert a 16-byte bytesarray (or bytearray compat object) to C guid string
   # { 0xB402621F, 0xA940, 0x1E4A, { 0x86, 0x6B, 0x4D, 0xC9, 0x16, 0x2B, 0x34, 0x7C } }
   #
   # Name=True means lookup name in GuidNameDict and us it if you find it
@@ -522,7 +522,7 @@ def __lldb_init_module (debugger, internal_dict):
             if len(data) >= 2:
                 guid_dict[data[0].upper()] = data[1].strip('\n')
 
-    # init EFI specific type formaters
+    # init EFI specific type formatters
     TypePrintFormating (debugger)
 
 

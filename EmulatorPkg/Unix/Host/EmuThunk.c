@@ -6,7 +6,7 @@
   The mUnixThunkTable exists so that a change to EFI_EMU_THUNK_PROTOCOL
   will cause an error in initializing the array if all the member functions
   are not added. It looks like adding a element to end and not initializing
-  it may cause the table to be initaliized with the members at the end being
+  it may cause the table to be initialized with the members at the end being
   set to zero. This is bad as jumping to zero will crash.
 
 Copyright (c) 2004 - 2019, Intel Corporation. All rights reserved.<BR>
