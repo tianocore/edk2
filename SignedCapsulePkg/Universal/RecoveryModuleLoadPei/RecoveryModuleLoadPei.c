@@ -20,7 +20,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Uefi.h>
 #include <PiPei.h>
 //
-// The protocols, PPI and GUID defintions for this module
+// The protocols, PPI and GUID definitions for this module
 //
 #include <Ppi/MasterBootMode.h>
 #include <Ppi/BootInRecoveryMode.h>
@@ -144,7 +144,7 @@ IsFmpCapsuleGuid (
 }
 
 /**
-  This function assumes the input Capusule image already passes basic check in
+  This function assumes the input Capsule image already passes basic check in
   ValidateFmpCapsule().
 
   Criteria of system FMP capsule is:
@@ -235,7 +235,7 @@ IsValidCapsuleHeader (
   @param[out]  IsSystemFmp          If it is a system FMP.
   @param[out]  EmbeddedDriverCount  The EmbeddedDriverCount in the FMP capsule.
 
-  @retval EFI_SUCESS             Input capsule is a correct FMP capsule.
+  @retval EFI_SUCCESS            Input capsule is a correct FMP capsule.
   @retval EFI_INVALID_PARAMETER  Input capsule is not a correct FMP capsule.
 **/
 EFI_STATUS
@@ -398,7 +398,7 @@ InitializeRecoveryModule (
   @param[in]  FvImage         Points to the DXE FV image.
   @param[in]  FvImageSize     The length of the DXE FV image in bytes.
 
-  @retval EFI_SUCESS            Create hob and install FvInfo PPI successfully.
+  @retval EFI_SUCCESS           Create hob and install FvInfo PPI successfully.
   @retval EFI_VOLUME_CORRUPTED  The input data is not an FV.
   @retval EFI_OUT_OF_RESOURCES  No enough resource to process the input data.
 **/
@@ -479,7 +479,7 @@ CreateHobForRecoveryCapsule (
   @param[in]  ConfigImage             Points to the config file image.
   @param[in]  ConfigImageSize         The length of the config file image in bytes.
 
-  @retval EFI_SUCESS             Process Recovery Image successfully.
+  @retval EFI_SUCCESS            Process Recovery Image successfully.
 **/
 EFI_STATUS
 RecoverImage (
@@ -554,7 +554,7 @@ RecoverImage (
   @param[in]  Image         Points to the recovery image.
   @param[in]  Length        The length of the recovery image in bytes.
 
-  @retval EFI_SUCESS             Process Recovery Image successfully.
+  @retval EFI_SUCCESS            Process Recovery Image successfully.
   @retval EFI_SECURITY_VIOLATION Recovery image is not processed due to security violation.
 **/
 EFI_STATUS
@@ -607,7 +607,7 @@ ProcessRecoveryImage (
   @param[in]  CapsuleHeader         Points to a capsule header.
   @param[in]  IsSystemFmp           If this capsule is a system FMP capsule.
 
-  @retval EFI_SUCESS            Process Capsule Image successfully.
+  @retval EFI_SUCCESS           Process Capsule Image successfully.
   @retval EFI_UNSUPPORTED       Capsule image is not supported by the firmware.
   @retval EFI_VOLUME_CORRUPTED  FV volume in the capsule is corrupted.
   @retval EFI_OUT_OF_RESOURCES  Not enough memory.
