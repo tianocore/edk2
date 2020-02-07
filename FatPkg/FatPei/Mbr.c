@@ -51,7 +51,7 @@ PartitionValidMbr (
     EndingLBA   = StartingLBA + UNPACK_UINT32 (Mbr->Partition[Index1].SizeInLBA) - 1;
     if (EndingLBA > LastLba) {
       //
-      // Compatability Errata:
+      // Compatibility Errata:
       //  Some systems try to hide drive space with their INT 13h driver
       //  This does not hide space from the OS driver. This means the MBR
       //  that gets created from DOS is smaller than the MBR created from
