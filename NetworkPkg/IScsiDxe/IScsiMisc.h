@@ -46,7 +46,7 @@ typedef struct _ISCSI_SESSION_CONFIG_NVDATA {
   UINT8             PrefixLength;
   UINT8             BootLun[8];
 
-  UINT16            ConnectTimeout; ///< timout value in milliseconds.
+  UINT16            ConnectTimeout; ///< timeout value in milliseconds.
   UINT8             ConnectRetryCount;
   UINT8             IsId[6];
 
@@ -104,7 +104,7 @@ IScsiLunToUnicodeStr (
   );
 
 /**
-  Convert the mac address into a hexadecimal encoded "-" seperated string.
+  Convert the mac address into a hexadecimal encoded "-" separated string.
 
   @param[in]  Mac     The mac address.
   @param[in]  Len     Length in bytes of the mac address.
@@ -352,7 +352,7 @@ IScsiCreateDriverData (
 
   @param[in]              Private The iSCSI driver data.
 
-  @retval EFI_SUCCES      The clean operation is successful.
+  @retval EFI_SUCCESS     The clean operation is successful.
   @retval Others          Other errors as indicated.
 
 **/
@@ -439,7 +439,7 @@ IScsiOnExitBootService (
 
   This function tests whether the driver specified by DriverBindingHandle is
   currently managing the controller specified by ControllerHandle.  This test
-  is performed by evaluating if the the protocol specified by ProtocolGuid is
+  is performed by evaluating if the protocol specified by ProtocolGuid is
   present on ControllerHandle and is was opened by DriverBindingHandle and Nic
   Device handle with an attribute of EFI_OPEN_PROTOCOL_BY_DRIVER.
   If ProtocolGuid is NULL, then ASSERT().

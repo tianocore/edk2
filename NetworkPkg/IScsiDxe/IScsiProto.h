@@ -308,7 +308,7 @@ typedef struct _ISCSI_SENSE_DATA {
 } ISCSI_SENSE_DATA;
 
 ///
-/// iSCSI Task Managment Function Request.
+/// iSCSI Task Management Function Request.
 ///
 typedef struct _ISCSI_TMF_REQUEST {
   UINT8   OpCode;
@@ -870,7 +870,7 @@ IScsiReceivePdu (
 
   @param[in, out]  Conn          The connection in iSCSI login.
 
-  @retval EFI_SUCCESS          The parmeter check is passed and negotiation is finished.
+  @retval EFI_SUCCESS          The parameter check is passed and negotiation is finished.
   @retval EFI_PROTOCOL_ERROR   Some kind of iSCSI protocol error occurred.
   @retval EFI_OUT_OF_RESOURCES Failed to allocate memory.
 
@@ -897,7 +897,7 @@ IScsiFillOpParams (
   Pad the iSCSI AHS or data segment to an integer number of 4 byte words.
 
   @param[in, out]  Pdu         The iSCSI pdu which contains segments to pad.
-  @param[in]       Len         The length of the last semgnet in the PDU.
+  @param[in]       Len         The length of the last segment in the PDU.
 
   @retval EFI_SUCCESS          The segment is padded or no need to pad it.
   @retval EFI_OUT_OF_RESOURCES There is not enough remaining free space to add the
@@ -978,7 +978,7 @@ IScsiNormalizeName (
   @param[in, out]  Packet    The request packet containing IO request, SCSI command
                              buffer and buffers to read/write.
 
-  @retval EFI_SUCCES           The SCSI command is executed and the result is updated to
+  @retval EFI_SUCCESS          The SCSI command is executed and the result is updated to
                                the Packet.
   @retval EFI_DEVICE_ERROR     Session state was not as required.
   @retval EFI_OUT_OF_RESOURCES Failed to allocate memory.
@@ -999,7 +999,7 @@ IScsiExecuteScsiCommand (
 
   @param[in]  Session           The iSCSI session
 
-  @retval EFI_SUCCES            The session is reinstated from some error.
+  @retval EFI_SUCCESS           The session is reinstated from some error.
   @retval Other                 Reinstatement failed.
 
 **/
