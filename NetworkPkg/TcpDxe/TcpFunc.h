@@ -46,7 +46,7 @@ TcpInitTcbLocal (
   Initialize the peer related members.
 
   @param[in, out]  Tcb    Pointer to the TCP_CB of this TCP instance.
-  @param[in]       Seg    Pointer to the segment that contains the peer's intial information.
+  @param[in]       Seg    Pointer to the segment that contains the peer's initial information.
   @param[in]       Opt    Pointer to the options announced by the peer.
 
 **/
@@ -668,7 +668,7 @@ Tcp6RefreshNeighbor (
 //
 
 /**
-  The procotol handler provided to the socket layer, used to
+  The protocol handler provided to the socket layer, used to
   dispatch the socket level requests by calling the corresponding
   TCP layer functions.
 

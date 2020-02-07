@@ -89,7 +89,7 @@ TcpInitTcbLocal (
   Initialize the peer related members.
 
   @param[in, out]  Tcb    Pointer to the TCP_CB of this TCP instance.
-  @param[in]       Seg    Pointer to the segment that contains the peer's intial info.
+  @param[in]       Seg    Pointer to the segment that contains the peer's initial info.
   @param[in]       Opt    Pointer to the options announced by the peer.
 
 **/

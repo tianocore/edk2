@@ -149,7 +149,7 @@ TcpConnectTimeout (
   if (!TCP_CONNECTED (Tcb->State)) {
     DEBUG (
       (EFI_D_ERROR,
-      "TcpConnectTimeout: connection closed because conenction timer timeout for TCB %p\n",
+      "TcpConnectTimeout: connection closed because connection timer timeout for TCB %p\n",
       Tcb)
       );
 
