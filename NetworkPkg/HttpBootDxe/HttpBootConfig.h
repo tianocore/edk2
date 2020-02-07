@@ -32,7 +32,7 @@ extern   UINT8                            HttpBootConfigVfrBin[];
 
 struct _HTTP_BOOT_FORM_CALLBACK_INFO {
   UINT32                           Signature;
-  BOOLEAN                          Initilized;
+  BOOLEAN                          Initialized;
   EFI_HANDLE                       ChildHandle;
   EFI_DEVICE_PATH_PROTOCOL         *HiiVendorDevicePath;
   EFI_HII_HANDLE                   RegisteredHandle;
