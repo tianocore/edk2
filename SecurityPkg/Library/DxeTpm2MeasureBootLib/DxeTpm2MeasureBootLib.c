@@ -478,7 +478,7 @@ DxeTpm2MeasureBootHandler (
   Status = gBS->LocateDevicePath (&gEfiBlockIoProtocolGuid, &DevicePathNode, &Handle);
   if (!EFI_ERROR (Status) && !mTcg2MeasureGptTableFlag) {
     //
-    // Find the gpt partion on the given devicepath
+    // Find the gpt partition on the given devicepath
     //
     DevicePathNode = OrigDevicePathNode;
     ASSERT (DevicePathNode != NULL);

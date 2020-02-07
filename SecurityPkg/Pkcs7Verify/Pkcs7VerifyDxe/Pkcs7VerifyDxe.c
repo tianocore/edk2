@@ -519,7 +519,7 @@ IsValidTimestamp (
   @param[in]  SignedData      Pointer to buffer containing ASN.1 DER-encoded PKCS7
                               signature.
   @param[in]  SignedDataSize  The size of SignedData buffer in bytes.
-  @param[in]  InHash          Pointer to the buffer containing the hash of the mesage data
+  @param[in]  InHash          Pointer to the buffer containing the hash of the message data
                               previously signed and to be verified.
   @param[in]  InHashSize      The size of InHash buffer in bytes.
   @param[in]  RevokedDb       Pointer to a list of pointers to EFI_SIGNATURE_LIST
