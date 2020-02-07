@@ -1843,6 +1843,11 @@ typedef struct {
   UINT64                                    VolatileSize;
   UINT64                                    CacheSize;
   UINT64                                    LogicalSize;
+  //
+  // Add for smbios 3.3.0
+  //
+  UINT32                                    ExtendedSpeed;
+  UINT32                                    ExtendedConfiguredMemorySpeed;
 } SMBIOS_TABLE_TYPE17;
 
 ///
