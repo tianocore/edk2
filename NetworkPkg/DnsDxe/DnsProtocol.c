@@ -158,7 +158,7 @@ ON_EXIT:
 
   @retval EFI_SUCCESS             The operation completed successfully.
   @retval EFI_UNSUPPORTED         The designated protocol is not supported.
-  @retval EFI_INVALID_PARAMTER    Thisis NULL.
+  @retval EFI_INVALID_PARAMETER   This is NULL.
                                   The StationIp address provided in DnsConfigData is not a
                                   valid unicast.
                                   DnsServerList is NULL while DnsServerListCount
@@ -721,9 +721,9 @@ ON_EXIT:
 
   @param[in]  This                Pointer to EFI_DNS4_PROTOCOL instance.
   @param[in]  DeleteFlag          If FALSE, this function is to add one entry to the
-                                  DNS Cahce. If TRUE, this function will delete
+                                  DNS Cache. If TRUE, this function will delete
                                   matching DNS Cache entry.
-  @param[in]  Override            If TRUE, the maching DNS cache entry will be
+  @param[in]  Override            If TRUE, the matching DNS cache entry will be
                                   overwritten with the supplied parameter. If FALSE,
                                   EFI_ACCESS_DENIED will be returned if the entry to
                                   be added is already existed.
@@ -864,7 +864,7 @@ Dns4Cancel (
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   //
-  // Cancle the tokens specified by Token for this instance.
+  // Cancel the tokens specified by Token for this instance.
   //
   Status = Dns4InstanceCancelToken (Instance, Token);
 
@@ -1007,7 +1007,7 @@ ON_EXIT:
                                   storage to be allocated and released by caller.
 
   @retval EFI_SUCCESS             The operation completed successfully.
-  @retval EFI_INVALID_PARAMTER    This is NULL.
+  @retval EFI_INVALID_PARAMETER    This is NULL.
                                   The StationIp address provided in DnsConfigData is not zero and not a valid unicast.
                                   DnsServerList is NULL while DnsServerList Count is not ZERO.
                                   DnsServerList Count is ZERO while DnsServerList is not NULL.
@@ -1566,9 +1566,9 @@ ON_EXIT:
 
   @param[in]  This                Pointer to EFI_DNS6_PROTOCOL instance.
   @param[in]  DeleteFlag          If FALSE, this function is to add one entry to the
-                                  DNS Cahce. If TRUE, this function will delete
+                                  DNS Cache. If TRUE, this function will delete
                                   matching DNS Cache entry.
-  @param[in]  Override            If TRUE, the maching DNS cache entry will be
+  @param[in]  Override            If TRUE, the matching DNS cache entry will be
                                   overwritten with the supplied parameter. If FALSE,
                                   EFI_ACCESS_DENIED will be returned if the entry to
                                   be added is already existed.
@@ -1713,7 +1713,7 @@ Dns6Cancel (
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   //
-  // Cancle the tokens specified by Token for this instance.
+  // Cancel the tokens specified by Token for this instance.
   //
   Status = Dns6InstanceCancelToken (Instance, Token);
 
