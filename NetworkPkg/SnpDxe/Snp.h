@@ -1,5 +1,5 @@
 /** @file
-    Declaration of strctures and functions for SnpDxe driver.
+    Declaration of structures and functions for SnpDxe driver.
 
 Copyright (c) 2004 - 2019, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -289,7 +289,7 @@ SnpUndi32CallbackBlock (
   @param UniqueId      This was supplied to UNDI at Undi_Start, SNP uses this to
                        store Undi interface context (Undi does not read or write
                        this variable)
-  @param MicroSeconds  number of micro seconds to pause, ususlly multiple of 10.
+  @param MicroSeconds  number of micro seconds to pause, usually multiple of 10.
 **/
 VOID
 EFIAPI
@@ -378,7 +378,7 @@ SnpUndi32CallbackUnmap (
   need to synchronize their contents whenever it writes to/reads from the buffer
   using either the cpu address or the device address.
 
-  EFI does not provide a sync call, since virt=physical, we sould just do
+  EFI does not provide a sync call, since virt=physical, we should just do
   the synchronization ourself here!
 
   @param UniqueId    This was supplied to UNDI at Undi_Start, SNP uses this to store
@@ -1015,7 +1015,7 @@ SnpUndi32Receive (
   );
 
 /**
-  Nofication call back function for WaitForPacket event.
+  Notification call back function for WaitForPacket event.
 
   @param  Event       EFI Event.
   @param  SnpPtr      Pointer to SNP_DRIVER structure.
