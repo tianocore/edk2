@@ -68,7 +68,7 @@ CommonExceptionHandlerWorker (
         //
         ArchRestoreExceptionContext (ExceptionType, SystemContext, ExceptionHandlerData);
         //
-        // Rlease spin lock for ApicId
+        // Release spin lock for ApicId
         //
         ReleaseSpinLock (&ReservedVectors[ExceptionType].SpinLock);
         break;
@@ -230,7 +230,7 @@ InitializeCpuExceptionHandlersWorker (
   IdtEntryCount = (IdtDescriptor.Limit + 1) / sizeof (IA32_IDT_GATE_DESCRIPTOR);
   if (IdtEntryCount > CPU_EXCEPTION_NUM) {
     //
-    // CPU exeption library only setup CPU_EXCEPTION_NUM exception handler at most
+    // CPU exception library only setup CPU_EXCEPTION_NUM exception handler at most
     //
     IdtEntryCount = CPU_EXCEPTION_NUM;
   }

@@ -15,7 +15,7 @@
 %include "StuffRsbNasm.inc"
 
 ;
-; Variables referrenced by C code
+; Variables referenced by C code
 ;
 
 %define MSR_IA32_MISC_ENABLE 0x1A0
