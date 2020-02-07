@@ -440,7 +440,7 @@ Udp4CleanService (
   );
 
 /**
-  This function intializes the new created udp instance.
+  This function initializes the new created udp instance.
 
   @param[in]      Udp4Service       Pointer to the UDP4_SERVICE_DATA.
   @param[in, out] Instance          Pointer to the un-initialized UDP4_INSTANCE_DATA.
@@ -574,7 +574,7 @@ Udp4TokenExist (
   pseudo HeadSum to reduce some overhead.
 
   @param[in]  Packet             Pointer to the NET_BUF contains the udp datagram.
-  @param[in]  HeadSum            Checksum of the pseudo header execpt the length
+  @param[in]  HeadSum            Checksum of the pseudo header except the length
                                  field.
 
   @retval The 16-bit checksum of this udp datagram.
