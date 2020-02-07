@@ -53,7 +53,7 @@
 [PcdsDynamicEx]
   ## This dynamic PCD holds the EDKII system firmware image descriptor.
   #  This information can be used for version check in EDKII system FMP capsule.
-  #  Only if the new EdkiiSystemFrimwareImageDescriptor.Version is not less than
+  #  Only if the new EdkiiSystemFirmwareImageDescriptor.Version is not less than
   #  the current PcdEdkiiSystemFirmwareImageDescriptor.LowestSupportedVersion,
   #  the EDKII system FmpCapsule will be processed.
   #  The data structure of this PCD is EDKII_SYSTEM_FIRMWARE_IMAGE_DESCRIPTOR,
@@ -65,7 +65,7 @@
 
   ## This dynamic PCD hold the GUID of a firmware FFS which includes EDKII
   #  system firmware image.
-  #  An EDKII system firmware udpate module need consume this PCD to extract
+  #  An EDKII system firmware update module need consume this PCD to extract
   #  the EDKII system firmware from the capsule image.
   #  It must be in [PcdsDynamicEx], because the EDKII system firmware update module may
   #  consume the PCD produced in current system firmware image.
