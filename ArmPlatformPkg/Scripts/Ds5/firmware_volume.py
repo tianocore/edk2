@@ -81,7 +81,7 @@ class EfiSectionTE:
             filename = self.base_te + debug_rva + 0xc
         else:
             filename = self.base_te + debug_rva + 0x10
-        filename = struct.unpack("200s", self.ec.getMemoryService().read(filename, 200, 32))[0]
+        filename = struct.unpack("400s", self.ec.getMemoryService().read(filename, 400, 32))[0]
         return filename[0:string.find(filename,'\0')]
 
     def get_debug_elfbase(self):
@@ -119,7 +119,7 @@ class EfiSectionPE32:
             filename = self.base_pe32 + debug_rva + 0xc
         else:
             filename = self.base_pe32 + debug_rva + 0x10
-        filename = struct.unpack("200s", self.ec.getMemoryService().read(str(filename), 200, 32))[0]
+        filename = struct.unpack("400s", self.ec.getMemoryService().read(str(filename), 400, 32))[0]
         return filename[0:string.find(filename,'\0')]
 
     def get_debug_elfbase(self):
@@ -154,7 +154,7 @@ class EfiSectionPE64:
             filename = self.base_pe64 + debug_rva + 0xc
         else:
             filename = self.base_pe64 + debug_rva + 0x10
-        filename = struct.unpack("200s", self.ec.getMemoryService().read(str(filename), 200, 32))[0]
+        filename = struct.unpack("400s", self.ec.getMemoryService().read(str(filename), 400, 32))[0]
         return filename[0:string.find(filename,'\0')]
 
     def get_debug_elfbase(self):
