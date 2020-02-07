@@ -22,7 +22,7 @@ GetRandomNoise64 (
   )
 {
   //
-  // Return FALSE will fallback to use PerformaceCounter to
+  // Return FALSE will fallback to use PerformanceCounter to
   // generate noise.
   //
   return FALSE;
