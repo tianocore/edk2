@@ -301,7 +301,7 @@ HttpCreateTcpConnCloseEvent (
 
   if (!HttpInstance->LocalAddressIsIPv6) {
     //
-    // Create events for variuos asynchronous operations.
+    // Create events for various asynchronous operations.
     //
     Status = gBS->CreateEvent (
                     EVT_NOTIFY_SIGNAL,
@@ -330,7 +330,7 @@ HttpCreateTcpConnCloseEvent (
 
   } else {
     //
-    // Create events for variuos asynchronous operations.
+    // Create events for various asynchronous operations.
     //
     Status = gBS->CreateEvent (
                     EVT_NOTIFY_SIGNAL,
@@ -618,7 +618,7 @@ HttpCloseTcpRxEvent (
 }
 
 /**
-  Intiialize the HTTP_PROTOCOL structure to the unconfigured state.
+  Initialize the HTTP_PROTOCOL structure to the unconfigured state.
 
   @param[in, out]  HttpInstance         Pointer to HTTP_PROTOCOL structure.
   @param[in]       IpVersion            Indicate us TCP4 protocol or TCP6 protocol.
@@ -1636,7 +1636,7 @@ ON_ERROR:
   @param[in]  Map                The container of either user's transmit or receive
                                  token.
   @param[in]  Item               Current item to check against.
-  @param[in]  Context            The Token to check againist.
+  @param[in]  Context            The Token to check against.
 
   @retval EFI_ACCESS_DENIED      The token or event has already been enqueued in IP
   @retval EFI_SUCCESS            The current item isn't the same token/event as the
@@ -1669,7 +1669,7 @@ HttpTokenExist (
 
   @param[in]  Map                The container of Tx4Token or Tx6Token.
   @param[in]  Item               Current item to check against.
-  @param[in]  Context            The Token to check againist.
+  @param[in]  Context            The Token to check against.
 
   @retval EFI_NOT_READY          The HTTP message is still queued in the list.
   @retval EFI_SUCCESS            The HTTP message has been sent out.
@@ -1695,11 +1695,11 @@ HttpTcpNotReady (
 }
 
 /**
-  Transmit the HTTP or HTTPS mssage by processing the associated HTTP token.
+  Transmit the HTTP or HTTPS message by processing the associated HTTP token.
 
   @param[in]  Map                The container of Tx4Token or Tx6Token.
   @param[in]  Item               Current item to check against.
-  @param[in]  Context            The Token to check againist.
+  @param[in]  Context            The Token to check against.
 
   @retval EFI_OUT_OF_RESOURCES   Failed to allocate resources.
   @retval EFI_SUCCESS            The HTTP message is queued into TCP transmit
@@ -1774,7 +1774,7 @@ HttpTcpTransmit (
 
   @param[in]  Map                The container of Rx4Token or Rx6Token.
   @param[in]  Item               Current item to check against.
-  @param[in]  Context            The Token to check againist.
+  @param[in]  Context            The Token to check against.
 
   @retval EFI_SUCCESS            The HTTP response is queued into TCP receive
                                  queue.
@@ -1800,7 +1800,7 @@ HttpTcpReceive (
 
   @param[in]       HttpInstance     The HTTP instance private data.
   @param[in, out]  SizeofHeaders    The HTTP header length.
-  @param[in, out]  BufferSize       The size of buffer to cacahe the header message.
+  @param[in, out]  BufferSize       The size of buffer to cache the header message.
   @param[in]       Timeout          The time to wait for receiving the header packet.
 
   @retval EFI_SUCCESS               The HTTP header is received.
@@ -1880,7 +1880,7 @@ HttpTcpReceiveHeader (
 
         if (!HttpInstance->IsRxDone) {
           //
-          // Cancle the Token before close its Event.
+          // Cancel the Token before close its Event.
           //
           Tcp4->Cancel (HttpInstance->Tcp4, &Rx4Token->CompletionToken);
           gBS->CloseEvent (Rx4Token->CompletionToken.Event);
@@ -1980,7 +1980,7 @@ HttpTcpReceiveHeader (
 
         if (!HttpInstance->IsRxDone) {
           //
-          // Cancle the Token before close its Event.
+          // Cancel the Token before close its Event.
           //
           Tcp6->Cancel (HttpInstance->Tcp6, &Rx6Token->CompletionToken);
           gBS->CloseEvent (Rx6Token->CompletionToken.Event);
