@@ -151,7 +151,7 @@ Udp6CleanInstance (
   );
 
 /**
-  This function intializes the new created udp instance.
+  This function initializes the new created udp instance.
 
   @param[in]      Udp6Service      Pointer to the UDP6_SERVICE_DATA.
   @param[in, out]  Instance         Pointer to the un-initialized UDP6_INSTANCE_DATA.
@@ -221,7 +221,7 @@ Udp6GetModeData (
 
   @retval EFI_SUCCESS            The configuration settings were set, changed, or
                                  reset successfully.
-  @retval EFI_NO_MAPPING         When the UdpConifgData.UseAnyStationAddress is set
+  @retval EFI_NO_MAPPING         When the UdpConfigData.UseAnyStationAddress is set
                                  to true  and there is no address available for IP6
                                  driver to binding  source address to this
                                  instance.
@@ -281,12 +281,12 @@ Udp6Configure (
                                  .FragmentBuffer fields is NULL.
                                  One or more of the
                                  Token.Packet.TxData.UdpSessionData.
-                                 DestinationAddres are not valid unicast IPv6
+                                 DestinationAddress are not valid unicast IPv6
                                  addresses, if the  UdpSessionData is not NULL.
                                  Token.Packet.TxData.UdpSessionData.
-                                 DestinationAddres is NULL
+                                 DestinationAddress is NULL
                                  Token.Packet.TxData.UdpSessionData.
-                                 DestinatioPort is zero.
+                                 DestinationPort is zero.
                                  Token.Packet.TxData.UdpSessionData is
                                  NULL and this  instance's
                                  UdpConfigData.RemoteAddress is unspecified.
@@ -430,7 +430,7 @@ Udp6Groups (
 
 /**
   This function tries to bind the udp instance according to the configured port
-  allocation stragety.
+  allocation strategy.
 
   @param[in]  InstanceList       Pointer to the head of the list linking the udp
                                  instances.
