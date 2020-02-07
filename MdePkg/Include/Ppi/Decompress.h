@@ -1,5 +1,5 @@
 /** @file
-  Provides decompression services to the PEI Foundatoin.
+  Provides decompression services to the PEI Foundation.
 
   Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
