@@ -200,7 +200,7 @@ TcpIoReset (
   @param[in]   TcpIo           The TcpIo wrapping the TCP socket.
   @param[in]   Packet          The packet to transmit.
 
-  @retval EFI_SUCCESS            The packet is trasmitted.
+  @retval EFI_SUCCESS            The packet is transmitted.
   @retval EFI_INVALID_PARAMETER  One or more parameters are invalid.
   @retval EFI_UNSUPPORTED        One or more of the control options are not
                                  supported in the implementation.
@@ -221,14 +221,14 @@ TcpIoTransmit (
 
   @param[in, out]  TcpIo       The TcpIo which wraps the socket to be destroyed.
   @param[in]       Packet      The buffer to hold the data copy from the socket rx buffer.
-  @param[in]       AsyncMode   Is this receive asyncronous or not.
+  @param[in]       AsyncMode   Is this receive asynchronous or not.
   @param[in]       Timeout     The time to wait for receiving the amount of data the Packet
                                can hold. Set to NULL for infinite wait.
 
   @retval EFI_SUCCESS            The required amount of data is received from the socket.
   @retval EFI_INVALID_PARAMETER  One or more parameters are invalid.
   @retval EFI_DEVICE_ERROR       An unexpected network or system error occurred.
-  @retval EFI_OUT_OF_RESOURCES   Failed to allocate momery.
+  @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory.
   @retval EFI_TIMEOUT            Failed to receive the required amount of data in the
                                  specified time period.
   @retval Others                 Other errors as indicated.

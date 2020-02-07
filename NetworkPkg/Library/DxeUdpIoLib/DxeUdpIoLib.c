@@ -147,7 +147,7 @@ UdpIoRecycleDgram (
 /**
   The event handle for UDP receive request.
 
-  It will build a NET_BUF from the recieved UDP data, then deliver it
+  It will build a NET_BUF from the received UDP data, then deliver it
   to the receiver.
 
   @param[in]  Context               The UDP RX token.
@@ -335,7 +335,7 @@ UdpIoOnDgramRcvd (
   @param[in]  UdpIo                 The UdpIo to receive packets from.
   @param[in]  CallBack              The function to call when receive finished.
   @param[in]  Context               The opaque parameter to the CallBack.
-  @param[in]  HeadLen               The head length to reserver for the packet.
+  @param[in]  HeadLen               The head length to reserve for the packet.
 
   @return The Wrapped request or NULL if failed to allocate resources or some errors happened.
 
@@ -410,7 +410,7 @@ UdpIoCreateRxToken (
   @param[in]  UdpIo                 The UdpIo to send packet to.
   @param[in]  Packet                The user's packet.
   @param[in]  EndPoint              The local and remote access point.
-  @param[in]  Gateway               The overrided next hop.
+  @param[in]  Gateway               The overridden next hop.
   @param[in]  CallBack              The function to call when transmission completed.
   @param[in]  Context               The opaque parameter to the call back.
 
@@ -590,7 +590,7 @@ UdpIoCreateTxToken (
   @param[in]  ImageHandle           The image handle for the driver.
   @param[in]  Configure             The function to configure the created UDP child.
   @param[in]  UdpVersion            The UDP protocol version, UDP4 or UDP6.
-  @param[in]  Context               The opaque parameter for the Configure funtion.
+  @param[in]  Context               The opaque parameter for the Configure function.
 
   @return Newly-created UDP_IO or NULL if failed.
 
@@ -755,7 +755,7 @@ FREE_MEM:
 
   @param[in]  UdpIo                 The UDP_IO to cancel packet.
   @param[in]  IoStatus              The IoStatus to return to the packet owners.
-  @param[in]  ToCancel              The select funtion to test whether to cancel this
+  @param[in]  ToCancel              The select function to test whether to cancel this
                                     packet or not.
   @param[in]  Context               The opaque parameter to the ToCancel.
 

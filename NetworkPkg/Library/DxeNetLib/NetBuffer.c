@@ -602,7 +602,7 @@ NetbufGetFragment (
 
   if (HeadSpace != 0) {
     //
-    // Allocate an extra block to accomdate the head space.
+    // Allocate an extra block to accommodate the head space.
     //
     BlockOpNum++;
 
@@ -791,7 +791,7 @@ NetbufFromExt (
 
         if (Len == 0) {
           //
-          // Increament the index number to point to the next
+          // Increment the index number to point to the next
           // non-empty fragment.
           //
           Index++;
