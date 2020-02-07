@@ -393,7 +393,7 @@ CpuSetMemoryAttributes (
 
   //
   // If this function is called because GCD SetMemorySpaceAttributes () is called
-  // by RefreshGcdMemoryAttributes (), then we are just synchronzing GCD memory
+  // by RefreshGcdMemoryAttributes (), then we are just synchronizing GCD memory
   // map with MTRR values. So there is no need to modify MTRRs, just return immediately
   // to avoid unnecessary computing.
   //
@@ -456,7 +456,7 @@ CpuSetMemoryAttributes (
     CurrentCacheType = MtrrGetMemoryAttribute(BaseAddress);
     if (CurrentCacheType != CacheType) {
       //
-      // call MTRR libary function
+      // call MTRR library function
       //
       Status = MtrrSetMemoryAttribute (
                  BaseAddress,
@@ -831,7 +831,7 @@ RefreshMemoryAttributesFromMtrr (
         Attributes = CurrentAttributes;
       } else {
         //
-        // If fixed MTRR attribute changed, then set memory attribute for previous atrribute
+        // If fixed MTRR attribute changed, then set memory attribute for previous attribute
         //
         if (CurrentAttributes != Attributes) {
           SetGcdMemorySpaceAttributes (
@@ -1045,7 +1045,7 @@ IntersectMemoryDescriptor (
   @param Length       Length of the MMIO space.
   @param Capabilities Capabilities of the MMIO space.
 
-  @retval EFI_SUCCES The MMIO space was added successfully.
+  @retval EFI_SUCCESS The MMIO space was added successfully.
 **/
 EFI_STATUS
 AddMemoryMappedIoSpace (

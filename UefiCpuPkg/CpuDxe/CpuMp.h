@@ -147,7 +147,7 @@ GetProcessorInfo (
        and releases the BSP to continue with other tasks.
     -# The caller can use the CheckEvent() and WaitForEvent() services to check
        the state of the WaitEvent created in step 1.
-    -# When the APs complete their task or TimeoutInMicroSecondss expires, the MP
+    -# When the APs complete their task or TimeoutInMicroSeconds expires, the MP
        Service signals WaitEvent by calling the EFI SignalEvent() function. If
        FailedCpuList is not NULL, its content is available when WaitEvent is
        signaled. If all APs returned from Procedure prior to the timeout, then
@@ -254,7 +254,7 @@ StartupAllAPs (
   This function is used to dispatch one enabled AP to the function specified by
   Procedure passing in the argument specified by ProcedureArgument.  If WaitEvent
   is NULL, execution is in blocking mode. The BSP waits until the AP finishes or
-  TimeoutInMicroSecondss expires. Otherwise, execution is in non-blocking mode.
+  TimeoutInMicroSeconds expires. Otherwise, execution is in non-blocking mode.
   BSP proceeds to the next task without waiting for the AP. If a non-blocking mode
   is requested after the UEFI Event EFI_EVENT_GROUP_READY_TO_BOOT is signaled,
   then EFI_UNSUPPORTED must be returned.
