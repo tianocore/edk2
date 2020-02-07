@@ -38,7 +38,7 @@ DumpUxCapsule (
 {
   EFI_DISPLAY_CAPSULE                           *DisplayCapsule;
   DisplayCapsule = (EFI_DISPLAY_CAPSULE *)CapsuleHeader;
-  Print(L"[UxCapusule]\n");
+  Print(L"[UxCapsule]\n");
   Print(L"CapsuleHeader:\n");
   Print(L"  CapsuleGuid      - %g\n", &DisplayCapsule->CapsuleHeader.CapsuleGuid);
   Print(L"  HeaderSize       - 0x%x\n", DisplayCapsule->CapsuleHeader.HeaderSize);
@@ -199,7 +199,7 @@ DumpCapsule (
     DumpFmpCapsule(CapsuleHeader);
   }
   if (IsNestedFmpCapsule(CapsuleHeader)) {
-    Print(L"[NestedCapusule]\n");
+    Print(L"[NestedCapsule]\n");
     Print(L"CapsuleHeader:\n");
     Print(L"  CapsuleGuid      - %g\n", &CapsuleHeader->CapsuleGuid);
     Print(L"  HeaderSize       - 0x%x\n", CapsuleHeader->HeaderSize);
