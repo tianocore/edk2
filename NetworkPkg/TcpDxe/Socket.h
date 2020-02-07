@@ -107,8 +107,8 @@
 
   @param[in]  Sock           Pointer to the socket.
 
-  @retval TRUE               The socket is unconfigued.
-  @retval FALSE              The socket is not unconfigued.
+  @retval TRUE               The socket is unconfigured.
+  @retval FALSE              The socket is not unconfigured.
 
 **/
 #define SOCK_IS_UNCONFIGURED(Sock)  ((Sock)->ConfigureState == SO_UNCONFIGURED)
@@ -118,8 +118,8 @@
 
   @param[in] Sock            Pointer to the socket
 
-  @retval TRUE               The socket is configued
-  @retval FALSE              The socket is not configued
+  @retval TRUE               The socket is configured
+  @retval FALSE              The socket is not configured
 
 **/
 #define SOCK_IS_CONFIGURED(Sock) \
@@ -131,8 +131,8 @@
 
   @param[in] Sock            Pointer to the socket.
 
-  @retval TRUE               The socket is configued to active mode.
-  @retval FALSE              The socket is not configued to active mode.
+  @retval TRUE               The socket is configured to active mode.
+  @retval FALSE              The socket is not configured to active mode.
 
 **/
 #define SOCK_IS_CONFIGURED_ACTIVE(Sock) ((Sock)->ConfigureState == SO_CONFIGURED_ACTIVE)
@@ -142,8 +142,8 @@
 
   @param[in] Sock            Pointer to the socket.
 
-  @retval TRUE               The socket is configued to passive mode.
-  @retval FALSE              The socket is not configued to passive mode.
+  @retval TRUE               The socket is configured to passive mode.
+  @retval FALSE              The socket is not configured to passive mode.
 
 **/
 #define SOCK_IS_CONNECTED_PASSIVE(Sock) ((Sock)->ConfigureState == SO_CONFIGURED_PASSIVE)
@@ -380,13 +380,13 @@ EFI_STATUS
   );
 
 /**
-  The Callback funtion called after the TCP socket is created.
+  The Callback function called after the TCP socket is created.
 
   @param[in]  This            Pointer to the socket just created.
   @param[in]  Context         Context of the socket.
 
   @retval EFI_SUCCESS         This protocol installed successfully.
-  @retval other               Some error occured.
+  @retval other               Some error occurred.
 
 **/
 typedef
@@ -429,7 +429,7 @@ typedef struct _SOCK_INIT_DATA {
   // Callbacks after socket is created and before socket is to be destroyed.
   //
   SOCK_CREATE_CALLBACK   CreateCallback;  ///< Callback after created
-  SOCK_DESTROY_CALLBACK  DestroyCallback; ///< Callback before destroied
+  SOCK_DESTROY_CALLBACK  DestroyCallback; ///< Callback before destroyed
   VOID                   *Context;        ///< The context of the callback
 
   //
@@ -501,7 +501,7 @@ struct _TCP_SOCKET {
   // Callbacks after socket is created and before socket is to be destroyed.
   //
   SOCK_CREATE_CALLBACK      CreateCallback;   ///< Callback after created
-  SOCK_DESTROY_CALLBACK     DestroyCallback;  ///< Callback before destroied
+  SOCK_DESTROY_CALLBACK     DestroyCallback;  ///< Callback before destroyed
   VOID                      *Context;         ///< The context of the callback
 };
 
@@ -512,7 +512,7 @@ typedef struct _SOCK_TOKEN {
   LIST_ENTRY            TokenList;      ///< The entry to add in the token list
   SOCK_COMPLETION_TOKEN *Token;         ///< The application's token
   UINT32                RemainDataLen;  ///< Unprocessed data length
-  SOCKET                *Sock;          ///< The poninter to the socket this token
+  SOCKET                *Sock;          ///< The pointer to the socket this token
                                         ///< belongs to
 } SOCK_TOKEN;
 
@@ -524,7 +524,7 @@ typedef struct _TCP_RSV_DATA {
 } TCP_RSV_DATA;
 
 //
-// Socket provided oprerations for low layer protocol implemented in SockImpl.c
+// Socket provided operations for low layer protocol implemented in SockImpl.c
 //
 
 /**
@@ -676,12 +676,12 @@ SockNoMoreData (
 
 /**
   Create a socket and its associated protocol control block
-  with the intial data SockInitData and protocol specific
+  with the initial data SockInitData and protocol specific
   data ProtoData.
 
-  @param[in]  SockInitData         Inital data to setting the socket.
+  @param[in]  SockInitData         Initial data to setting the socket.
 
-  @return Pointer to the newly created socket. If NULL, an error condition occured.
+  @return Pointer to the newly created socket. If NULL, an error condition occurred.
 
 **/
 SOCKET *
@@ -723,7 +723,7 @@ SockConfigure (
 /**
   Initiate a connection establishment process.
 
-  @param[in]  Sock             Pointer to the socket to initiate the initate the
+  @param[in]  Sock             Pointer to the socket to initiate the
                                connection.
   @param[in]  Token            Pointer to the token used for the connection
                                operation.
