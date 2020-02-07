@@ -4,7 +4,7 @@
   It installs the Capsule Architectural Protocol defined in PI1.0a to signify
   the capsule runtime services are ready.
 
-Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2020, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -138,7 +138,7 @@ UpdateCapsule (
     // Platform specific update for the non-reset capsule image.
     //
     if ((CapsuleHeader->Flags & CAPSULE_FLAGS_PERSIST_ACROSS_RESET) == 0) {
-      if (EfiAtRuntime ()) {
+      if (EfiAtRuntime () && !FeaturePcdGet (PcdSupportProcessCapsuleAtRuntime)) {
         Status = EFI_OUT_OF_RESOURCES;
       } else {
         Status = ProcessCapsuleImage(CapsuleHeader);
