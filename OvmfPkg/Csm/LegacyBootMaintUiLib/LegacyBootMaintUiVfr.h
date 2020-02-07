@@ -1,5 +1,5 @@
 /** @file
-  Legacy Boot Maintainence UI definition.
+  Legacy Boot Maintenance UI definition.
 
 Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent

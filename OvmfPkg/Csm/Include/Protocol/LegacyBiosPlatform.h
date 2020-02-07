@@ -1,5 +1,5 @@
 /** @file
-  The EFI Legacy BIOS Patform Protocol is used to mate a Legacy16
+  The EFI Legacy BIOS Platform Protocol is used to mate a Legacy16
   implementation with this EFI code. The EFI driver that produces
   the Legacy BIOS protocol is generic and consumes this protocol.
   A driver that matches the Legacy16 produces this protocol
@@ -383,7 +383,7 @@ typedef enum {
   ///
   ///     ShadowAddress First free OpROM area, after other OpROMs have been dispatched..
   ///
-  ///     Compatibility16Table Pointer to the Compatability16 Table.
+  ///     Compatibility16Table Pointer to the Compatibility16 Table.
   ///
   ///       AdditionalData NULL.
   ///

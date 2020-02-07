@@ -241,7 +241,7 @@ BiosVideoCheckForVga (
 
 
 /**
-  Release resource for biso video instance.
+  Release resource for BIOS video instance.
 
   @param  BiosVideoPrivate       Video child device private data structure
 
@@ -347,9 +347,9 @@ BiosVideoGraphicsOutputVbeBlt (
 
 
 /**
-  Grahpics Output protocol instance to block transfer for VGA device.
+  Graphics Output protocol instance to block transfer for VGA device.
 
-  @param  This                   Pointer to Grahpics Output protocol instance
+  @param  This                   Pointer to Graphics Output protocol instance
   @param  BltBuffer              The data to transfer to screen
   @param  BltOperation           The operation to perform
   @param  SourceX                The X coordinate of the source for BltOperation
@@ -412,7 +412,7 @@ BiosVideoVgaMiniPortSetMode (
 /**
   Event handler for Exit Boot Service.
 
-  @param  Event       The event that be siganlled when exiting boot service.
+  @param  Event       The event that be signalled when exiting boot service.
   @param  Context     Pointer to instance of BIOS_VIDEO_DEV.
 
 **/
@@ -506,7 +506,7 @@ BiosVideoChildHandleUninstall (
   );
 
 /**
-  Release resource for biso video instance.
+  Release resource for BIOS video instance.
 
   @param  BiosVideoPrivate       Video child device private data structure
 

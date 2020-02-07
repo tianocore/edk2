@@ -501,7 +501,7 @@ typedef struct {
   EFI_GENERIC_MEMORY_TEST_PROTOCOL  *GenericMemoryTest;
 
   //
-  // TRUE if PCI Interupt Line registers have been programmed.
+  // TRUE if PCI Interrupt Line registers have been programmed.
   //
   BOOLEAN                           PciInterruptLine;
 
@@ -706,7 +706,7 @@ LegacyBiosInt86 (
   the Stack argument
 
   @param  This                   Protocol instance pointer.
-  @param  Segment                Segemnt of 16-bit mode call
+  @param  Segment                Segment of 16-bit mode call
   @param  Offset                 Offset of 16-bit mdoe call
   @param  Regs                   Register contexted passed into (and returned) from
                                  thunk to  16-bit mode
@@ -1004,7 +1004,7 @@ InitLegacyIdeController (
 
 /**
   Program the interrupt routing register in all the PCI devices. On a PC AT system
-  this register contains the 8259 IRQ vector that matches it's PCI interrupt.
+  this register contains the 8259 IRQ vector that matches its PCI interrupt.
 
   @param  Private                Legacy  BIOS Instance data
 
@@ -1418,7 +1418,7 @@ RelocateImageUnder4GIfNeeded (
   the Stack argument
 
   @param  This       Protocol instance pointer.
-  @param  Segment    Segemnt of 16-bit mode call
+  @param  Segment    Segment of 16-bit mode call
   @param  Offset     Offset of 16-bit mdoe call
   @param  Regs       Register contexted passed into (and returned) from thunk to
                      16-bit mode
