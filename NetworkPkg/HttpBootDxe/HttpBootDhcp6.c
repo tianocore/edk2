@@ -126,7 +126,7 @@ HttpBootBuildDhcp6Options (
   @param[in]  OptTag        The required option tag.
 
   @retval     NULL          Failed to parse the required option.
-  @retval     Others        The postion of the required option in buffer.
+  @retval     Others        The position of the required option in buffer.
 
 **/
 EFI_DHCP6_PACKET_OPTION *
@@ -225,7 +225,7 @@ HttpBootParseDhcp6Packet (
   }
   //
   // The offer with assigned client address is NOT a proxy offer.
-  // An ia_na option, embeded with valid ia_addr option and a status_code of success.
+  // An ia_na option, embedded with valid ia_addr option and a status_code of success.
   //
   Option = Options[HTTP_BOOT_DHCP6_IDX_IA_NA];
   if (Option != NULL) {
@@ -514,7 +514,7 @@ HttpBootDhcp6CallBack (
 
   @retval     EFI_SUCCESS         Found a valid gateway address successfully.
   @retval     EFI_TIMEOUT         The operation is time out.
-  @retval     Other               Unexpect error happened.
+  @retval     Other               Unexpected error happened.
 
 **/
 EFI_STATUS
@@ -628,8 +628,8 @@ ON_EXIT:
 
   @param[in]  Private             The pointer to HTTP_BOOT_PRIVATE_DATA.
 
-  @retval     EFI_SUCCESS         Switch the IP policy succesfully.
-  @retval     Others              Unexpect error happened.
+  @retval     EFI_SUCCESS         Switch the IP policy successfully.
+  @retval     Others              Unexpected error happened.
 
 **/
 EFI_STATUS

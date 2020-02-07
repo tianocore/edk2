@@ -41,7 +41,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 /// DHCP offer types among HTTP boot.
 /// Dhcp4 and Dhcp6 share this definition, and corresponding
-/// relatioinship is as follows:
+/// relationship is as follows:
 ///   Dhcp4Discover <> Dhcp6Solicit
 ///   Dhcp4Offer    <> Dhcp6Advertise
 ///   Dhcp4Request  <> Dhcp6Request

@@ -494,7 +494,7 @@ Exit:
 /**
   Create a HTTP_IO_HEADER to hold the HTTP header items.
 
-  @param[in]  MaxHeaderCount         The maximun number of HTTP header in this holder.
+  @param[in]  MaxHeaderCount         The maximum number of HTTP header in this holder.
 
   @return    A pointer of the HTTP header holder or NULL if failed.
 
@@ -522,7 +522,7 @@ HttpBootCreateHeader (
 }
 
 /**
-  Destroy the HTTP_IO_HEADER and release the resouces.
+  Destroy the HTTP_IO_HEADER and release the resources.
 
   @param[in]  HttpIoHeader       Point to the HTTP header holder to be destroyed.
 
@@ -765,7 +765,7 @@ HttpIoCreateIo (
   }
 
   //
-  // Create events for variuos asynchronous operations.
+  // Create events for various asynchronous operations.
   //
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL,
@@ -817,7 +817,7 @@ ON_ERROR:
 }
 
 /**
-  Destroy the HTTP_IO and release the resouces.
+  Destroy the HTTP_IO and release the resources.
 
   @param[in]  HttpIo          The HTTP_IO which wraps the HTTP service to be destroyed.
 
@@ -878,7 +878,7 @@ HttpIoDestroyIo (
   @param[in]   BodyLength       Length in bytes of the HTTP body.
   @param[in]   Body             Body associated with the HTTP request.
 
-  @retval EFI_SUCCESS            The HTTP request is trasmitted.
+  @retval EFI_SUCCESS            The HTTP request is transmitted.
   @retval EFI_INVALID_PARAMETER  One or more parameters are invalid.
   @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory.
   @retval EFI_DEVICE_ERROR       An unexpected network or system error occurred.
@@ -1179,7 +1179,7 @@ HttpBootParseFilePath (
   @retval EFI_INVALID_PARAMETER  ImageType, Uri or UriParser is NULL.
   @retval EFI_INVALID_PARAMETER  HeaderCount is not zero, and Headers is NULL.
   @retval EFI_NOT_FOUND          Failed to identify the image type.
-  @retval Others                 Unexpect error happened.
+  @retval Others                 Unexpected error happened.
 
 **/
 EFI_STATUS
