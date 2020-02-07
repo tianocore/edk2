@@ -81,7 +81,7 @@ CleanUpPage (
 
   @param DevicePath       Device path.
 
-  @retval NULL            Not enough memory resourece for AllocateCopyPool.
+  @retval NULL            Not enough memory resource for AllocateCopyPool.
   @retval Other           A new allocated string that represents the file name.
 
 **/
