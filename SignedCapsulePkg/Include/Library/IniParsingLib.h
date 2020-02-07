@@ -14,7 +14,7 @@
          3.1) an ASCII String. The valid format is [A-Za-z0-9_]+
          3.2) a GUID. The valid format is xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx, where x is [A-Fa-f0-9]
          3.3) a decimal value. The valid format is [0-9]+
-         3.4) a heximal value. The valid format is 0x[A-Fa-f0-9]+
+         3.4) a hexadecimal value. The valid format is 0x[A-Fa-f0-9]+
       4) '#' or ';' can be used as comment at anywhere.
       5) TAB(0x20) or SPACE(0x9) can be used as separator.
       6) LF(\n, 0xA) or CR(\r, 0xD) can be used as line break.
@@ -106,14 +106,14 @@ GetDecimalUintnFromDataFile (
   );
 
 /**
-  Get section entry heximal UINTN value.
+  Get section entry hexadecimal UINTN value.
 
   @param[in]  Context         INI Config file context.
   @param[in]  SectionName     Section name.
   @param[in]  EntryName       Section entry name.
-  @param[out] Data            Point to the got heximal UINTN value.
+  @param[out] Data            Point to the got hexadecimal UINTN value.
 
-  @retval EFI_SUCCESS    Section entry heximal UINTN value is got.
+  @retval EFI_SUCCESS    Section entry hexadecimal UINTN value is got.
   @retval EFI_NOT_FOUND  Section is not found.
 **/
 EFI_STATUS
@@ -126,14 +126,14 @@ GetHexUintnFromDataFile (
   );
 
 /**
-  Get section entry heximal UINT64 value.
+  Get section entry hexadecimal UINT64 value.
 
   @param[in]  Context         INI Config file context.
   @param[in]  SectionName     Section name.
   @param[in]  EntryName       Section entry name.
-  @param[out] Data            Point to the got heximal UINT64 value.
+  @param[out] Data            Point to the got hexadecimal UINT64 value.
 
-  @retval EFI_SUCCESS    Section entry heximal UINT64 value is got.
+  @retval EFI_SUCCESS    Section entry hexadecimal UINT64 value is got.
   @retval EFI_NOT_FOUND  Section is not found.
 **/
 EFI_STATUS
