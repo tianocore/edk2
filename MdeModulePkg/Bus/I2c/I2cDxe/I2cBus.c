@@ -538,7 +538,7 @@ I2cBusDriverSupported (
   @retval EFI_SUCCESS              The device was started.
   @retval EFI_DEVICE_ERROR         The device could not be started due to a device error.Currently not implemented.
   @retval EFI_OUT_OF_RESOURCES     The request could not be completed due to a lack of resources.
-  @retval Others                   The driver failded to start the device.
+  @retval Others                   The driver failed to start the device.
 
 **/
 EFI_STATUS
@@ -623,7 +623,7 @@ I2cBusDriverStart (
   if ((RemainingDevicePath != NULL) && IsDevicePathEnd (RemainingDevicePath)) {
     //
     // If RemainingDevicePath is the End of Device Path Node,
-    // don't create any child device and return EFI_SUCESS
+    // don't create any child device and return EFI_SUCCESS
     //
     return EFI_SUCCESS;
   }
