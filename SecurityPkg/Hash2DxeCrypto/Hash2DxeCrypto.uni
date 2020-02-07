@@ -1,7 +1,7 @@
 // /** @file
 // Produces the UEFI HASH2 protocol
 //
-// This module will use EDKII crypto libary to HASH2 protocol.
+// This module will use EDKII crypto library to HASH2 protocol.
 //
 // Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
 //
@@ -12,5 +12,5 @@
 
 #string STR_MODULE_ABSTRACT             #language en-US "Produces UEFI HASH2 protocol"
 
-#string STR_MODULE_DESCRIPTION          #language en-US "This module will use EDKII crypto libary to HASH2 protocol."
+#string STR_MODULE_DESCRIPTION          #language en-US "This module will use EDKII crypto library to HASH2 protocol."
 
