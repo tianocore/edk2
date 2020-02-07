@@ -1,7 +1,7 @@
 ;------------------------------------------------------------------------------
 ;
 ; Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
-; Portitions copyright (c) 2011, Apple Inc. All rights reserved.
+; Portions copyright (c) 2011, Apple Inc. All rights reserved.
 ; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;
 ;------------------------------------------------------------------------------
