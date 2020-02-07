@@ -403,7 +403,7 @@ IpIoOpen (
 
   This function is called after IpIoOpen(). The data to be sent is wrapped in
   Pkt. The IP instance wrapped in IpIo is used for sending by default but can be
-  overriden by Sender. Other sending configs, like source address and gateway
+  overridden by Sender. Other sending configs, like source address and gateway
   address etc., are specified in OverrideData.
 
   @param[in, out]  IpIo                  Pointer to an IP_IO instance used for sending IP
@@ -508,7 +508,7 @@ IpIoConfigIp (
 
   This function pairs with IpIoAddIp(). The IpInfo is previously created by
   IpIoAddIp(). The IP_IO_IP_INFO::RefCnt is decremented and the IP instance
-  will be dstroyed if the RefCnt is zero.
+  will be destroyed if the RefCnt is zero.
 
   @param[in]  IpIo                  The pointer to the IP_IO instance.
   @param[in]  IpInfo                The pointer to the IpInfo to be removed.

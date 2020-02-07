@@ -123,7 +123,7 @@ IpIoTransmitHandler (
 
   @retval       EFI_SUCCESS        The IP child is created and the IP protocol
                                    interface is retrieved.
-  @retval       EFI_UNSUPPORTED    Upsupported IpVersion.
+  @retval       EFI_UNSUPPORTED    Unsupported IpVersion.
   @retval       Others             The required operation failed.
 
 **/
@@ -191,7 +191,7 @@ IpIoCreateIpChildOpenProtocol (
 
 
 /**
-  This function close the previously openned IP protocol and destroy the IP child.
+  This function close the previously opened IP protocol and destroy the IP child.
 
   @param[in]  ControllerHandle    The controller handle.
   @param[in]  ImageHandle         The image handle.
@@ -201,7 +201,7 @@ IpIoCreateIpChildOpenProtocol (
 
   @retval     EFI_SUCCESS         The IP protocol is closed and the relevant IP child
                                   is destroyed.
-  @retval     EFI_UNSUPPORTED     Upsupported IpVersion.
+  @retval     EFI_UNSUPPORTED     Unsupported IpVersion.
   @retval     Others              The required operation failed.
 
 **/
@@ -228,7 +228,7 @@ IpIoCloseProtocolDestroyIpChild (
   }
 
   //
-  // Close the previously openned IP protocol.
+  // Close the previously opened IP protocol.
   //
   Status = gBS->CloseProtocol (
                   ChildHandle,
@@ -626,7 +626,7 @@ IpIoExtFree (
   @param[in]       Context              Pointer to the context.
   @param[in]       NotifyData           Pointer to the notify data.
   @param[in]       Dest                 Pointer to the destination IP address.
-  @param[in]       Override             Pointer to the overriden IP_IO data.
+  @param[in]       Override             Pointer to the overridden IP_IO data.
 
   @return Pointer to the data structure created to wrap the packet. If any error occurs,
           then return NULL.
@@ -1497,7 +1497,7 @@ IpIoStop (
   IpIo->IsConfigured = FALSE;
 
   //
-  // Detroy the Ip List used by IpIo
+  // Destroy the Ip List used by IpIo
   //
 
   while (!IsListEmpty (&(IpIo->IpList))) {
@@ -1577,7 +1577,7 @@ IpIoDestroy (
 
   This function is called after IpIoOpen(). The data to be sent is wrapped in
   Pkt. The IP instance wrapped in IpIo is used for sending by default but can be
-  overriden by Sender. Other sending configs, like source address and gateway
+  overridden by Sender. Other sending configs, like source address and gateway
   address etc., are specified in OverrideData.
 
   @param[in, out]  IpIo                  Pointer to an IP_IO instance used for sending IP
@@ -1991,7 +1991,7 @@ IpIoConfigIp (
 
   This function pairs with IpIoAddIp(). The IpInfo is previously created by
   IpIoAddIp(). The IP_IO_IP_INFO::RefCnt is decremented and the IP instance
-  will be dstroyed if the RefCnt is zero.
+  will be destroyed if the RefCnt is zero.
 
   @param[in]  IpIo                  Pointer to the IP_IO instance.
   @param[in]  IpInfo                Pointer to the IpInfo to be removed.
