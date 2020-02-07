@@ -23,7 +23,7 @@ typedef struct _IP4_SERVICE    IP4_SERVICE;
 #define IP4_LINK_PROMISC      0x00000004
 
 //
-// IP4 address cast type classfication. Keep it true that any
+// IP4 address cast type classification. Keep it true that any
 // type bigger than or equal to LOCAL_BROADCAST is broadcast.
 //
 #define IP4_PROMISCUOUS       1
@@ -63,13 +63,13 @@ typedef struct _IP4_SERVICE    IP4_SERVICE;
 #define IP4_IS_BROADCAST(CastType) ((CastType) >= IP4_LOCAL_BROADCAST)
 
 ///
-/// Conver the Microsecond to second. IP transmit/receive time is
+/// Convert the Microsecond to second. IP transmit/receive time is
 /// in the unit of microsecond. IP ticks once per second.
 ///
 #define IP4_US_TO_SEC(Us) (((Us) + 999999) / 1000000)
 
 /**
-  Return the cast type (Unicast/Boradcast) specific to an
+  Return the cast type (Unicast/Broadcast) specific to an
   interface. All the addresses are host byte ordered.
 
   @param[in]  IpAddr                The IP address to classify in host byte order
@@ -77,7 +77,7 @@ typedef struct _IP4_SERVICE    IP4_SERVICE;
 
   @return The cast type of this IP address specific to the interface.
   @retval IP4_LOCAL_HOST        The IpAddr equals to the interface's address
-  @retval IP4_SUBNET_BROADCAST  The IpAddr is a directed subnet boradcast to  the
+  @retval IP4_SUBNET_BROADCAST  The IpAddr is a directed subnet broadcast to  the
                                 interface
   @retval IP4_NET_BROADCAST     The IpAddr is a network broadcast to the interface
   @retval 0                     Otherwise.
@@ -146,7 +146,7 @@ Ip4FindNet (
   Find an interface of the service with the same Ip/Netmask pair.
 
   @param[in]  IpSb                  Ip4 service binding instance
-  @param[in]  Ip                    The Ip adress to find (host byte order)
+  @param[in]  Ip                    The Ip address to find (host byte order)
   @param[in]  Netmask               The network to find (host byte order)
 
   @return The IP4_INTERFACE point if found, otherwise NULL
@@ -199,10 +199,10 @@ Ip4NtohHead (
 /**
   Validate that Ip/Netmask pair is OK to be used as station
   address. Only continuous netmasks are supported. and check
-  that StationAddress is a unicast address on the newtwork.
+  that StationAddress is a unicast address on the network.
 
   @param[in]  Ip                 The IP address to validate.
-  @param[in]  Netmask            The netmaks of the IP.
+  @param[in]  Netmask            The netmask of the IP.
 
   @retval TRUE                   The Ip/Netmask pair is valid.
   @retval FALSE                  The Ip/Netmask pair is invalid.

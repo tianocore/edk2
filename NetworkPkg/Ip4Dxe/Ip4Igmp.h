@@ -170,7 +170,7 @@ Ip4CombineGroups (
   @param  Count             The number of group addresses in the Groups.
   @param  Addr              The IP4 multicast address to remove.
 
-  @return The nubmer of group addresses in the Groups after remove.
+  @return The number of group addresses in the Groups after remove.
           It is Count if the Addr isn't in the Groups.
 
 **/

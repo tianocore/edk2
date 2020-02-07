@@ -149,7 +149,7 @@ Ip4FindMac (
 
   @param[in]  IpSb               The IP4 service instance that requests the
                                  transmission.
-  @param[in]  Dst                The destinaton to send to.
+  @param[in]  Dst                The destination to send to.
   @param[in]  Type               The IGMP message type, such as IGMP v1 membership
                                  report.
   @param[in]  Group              The group address in the IGMP message head.
@@ -273,7 +273,7 @@ Ip4JoinGroup (
 
   //
   // If the IP service already is a member in the group, just
-  // increase the refernce count and return.
+  // increase the reference count and return.
   //
   Group     = Ip4FindGroup (IgmpCtrl, Address);
 
@@ -587,7 +587,7 @@ Ip4CombineGroups (
   @param  Count             The number of group addresses in the Groups.
   @param  Addr              The IP4 multicast address to remove.
 
-  @return The nubmer of group addresses in the Groups after remove.
+  @return The number of group addresses in the Groups after remove.
           It is Count if the Addr isn't in the Groups.
 
 **/

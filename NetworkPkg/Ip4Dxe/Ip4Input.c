@@ -387,7 +387,7 @@ Ip4Reassemble (
     RemoveEntryList (&Assemble->Link);
 
     //
-    // If the packet is properly formated, the last fragment's End
+    // If the packet is properly formatted, the last fragment's End
     // equals to the packet's total length. Otherwise, the packet
     // is a fake, drop it now.
     //
@@ -468,7 +468,7 @@ Ip4IpSecFree (
   actions: bypass the packet, discard the packet, or protect the packet.
 
   @param[in]       IpSb          The IP4 service instance.
-  @param[in, out]  Head          The The caller supplied IP4 header.
+  @param[in, out]  Head          The caller supplied IP4 header.
   @param[in, out]  Netbuf        The IP4 packet to be processed by IPsec.
   @param[in, out]  Options       The caller supplied options.
   @param[in, out]  OptionsLen    The length of the option.
@@ -480,7 +480,7 @@ Ip4IpSecFree (
   @retval EFI_SUCCESS            The packet was bypassed and all buffers remain the same.
   @retval EFI_SUCCESS            The packet was protected.
   @retval EFI_ACCESS_DENIED      The packet was discarded.
-  @retval EFI_OUT_OF_RESOURCES   There is no suffcient resource to complete the operation.
+  @retval EFI_OUT_OF_RESOURCES   There is no sufficient resource to complete the operation.
   @retval EFI_BUFFER_TOO_SMALL   The number of non-empty block is bigger than the
                                  number of input data blocks when build a fragment table.
 
@@ -625,7 +625,7 @@ Ip4IpSecProcessPacket (
     }
 
     //
-    // Free orginal Netbuf.
+    // Free original Netbuf.
     //
     NetIpSecNetbufFree (*Netbuf);
     *Netbuf = TxWrap->Packet;
@@ -689,8 +689,8 @@ ON_EXIT:
   @param[in]       Flag            The link layer flag for the packet received, such
                                    as multicast.
 
-  @retval     EFI_SEUCCESS               The recieved packet is in well form.
-  @retval     EFI_INVAILD_PARAMETER      The recieved packet is malformed.
+  @retval     EFI_SUCCESS                The received packet is in well form.
+  @retval     EFI_INVALID_PARAMETER      The received packet is malformed.
 
 **/
 EFI_STATUS
@@ -891,8 +891,8 @@ Ip4AccpetFrame (
   ZeroMem (&ZeroHead, sizeof (IP4_HEAD));
   if (0 == CompareMem (Head, &ZeroHead, sizeof (IP4_HEAD))) {
   // Packet may have been changed. Head, HeadLen, TotalLen, and
-  // info must be reloaded bofore use. The ownership of the packet
-  // is transfered to the packet process logic.
+  // info must be reloaded before use. The ownership of the packet
+  // is transferred to the packet process logic.
   //
     Head = (IP4_HEAD *) NetbufGetByte (Packet, 0, NULL);
     ASSERT (Head != NULL);
@@ -973,7 +973,7 @@ Ip4InstanceFrameAcceptable (
   Config = &IpInstance->ConfigData;
 
   //
-  // Dirty trick for the Tiano UEFI network stack implmentation. If
+  // Dirty trick for the Tiano UEFI network stack implementation. If
   // ReceiveTimeout == -1, the receive of the packet for this instance
   // is disabled. The UEFI spec don't have such capability. We add
   // this to improve the performance because IP will make a copy of
@@ -1086,7 +1086,7 @@ Ip4InstanceEnquePacket (
   }
 
   //
-  // Enque a shared copy of the packet.
+  // Enqueue a shared copy of the packet.
   //
   Clone = NetbufClone (Packet);
 
@@ -1365,7 +1365,7 @@ Ip4InterfaceEnquePacket (
   //
   // First, check that the packet is acceptable to this interface
   // and find the local cast type for the interface. A packet sent
-  // to say 192.168.1.1 should NOT be delliever to 10.0.0.1 unless
+  // to say 192.168.1.1 should NOT be deliver to 10.0.0.1 unless
   // promiscuous receiving.
   //
   LocalType = 0;
@@ -1381,7 +1381,7 @@ Ip4InterfaceEnquePacket (
 
   } else {
     //
-    // Check the destination againist local IP. If the station
+    // Check the destination against local IP. If the station
     // address is 0.0.0.0, it means receiving all the IP destined
     // to local non-zero IP. Otherwise, it is necessary to compare
     // the destination to the interface's IP address.
@@ -1463,7 +1463,7 @@ Ip4InterfaceDeliverPacket (
 
 /**
   Demultiple the packet. the packet delivery is processed in two
-  passes. The first pass will enque a shared copy of the packet
+  passes. The first pass will enqueue a shared copy of the packet
   to each IP4 child that accepts the packet. The second pass will
   deliver a non-shared copy of the packet to each IP4 child that
   has pending receive requests. Data is copied if more than one
@@ -1495,7 +1495,7 @@ Ip4Demultiplex (
   INTN                      Enqueued;
 
   //
-  // Two pass delivery: first, enque a shared copy of the packet
+  // Two pass delivery: first, enqueue a shared copy of the packet
   // to each instance that accept the packet.
   //
   Enqueued = 0;

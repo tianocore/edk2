@@ -9,7 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 
 /**
-  Return the cast type (Unicast/Boradcast) specific to an
+  Return the cast type (Unicast/Broadcast) specific to an
   interface. All the addresses are host byte ordered.
 
   @param[in]  IpAddr                The IP address to classify in host byte order
@@ -17,7 +17,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @return The cast type of this IP address specific to the interface.
   @retval IP4_LOCAL_HOST        The IpAddr equals to the interface's address
-  @retval IP4_SUBNET_BROADCAST  The IpAddr is a directed subnet boradcast to  the
+  @retval IP4_SUBNET_BROADCAST  The IpAddr is a directed subnet broadcast to  the
                                 interface
   @retval IP4_NET_BROADCAST     The IpAddr is a network broadcast to the interface
   @retval 0                     Otherwise.
@@ -182,7 +182,7 @@ Ip4FindNet (
   Find an interface of the service with the same Ip/Netmask pair.
 
   @param[in]  IpSb                  Ip4 service binding instance
-  @param[in]  Ip                    The Ip adress to find (host byte order)
+  @param[in]  Ip                    The Ip address to find (host byte order)
   @param[in]  Netmask               The network to find (host byte order)
 
   @return The IP4_INTERFACE point if found, otherwise NULL
@@ -266,10 +266,10 @@ Ip4NtohHead (
 /**
   Validate that Ip/Netmask pair is OK to be used as station
   address. Only continuous netmasks are supported. and check
-  that StationAddress is a unicast address on the newtwork.
+  that StationAddress is a unicast address on the network.
 
   @param[in]  Ip                 The IP address to validate.
-  @param[in]  Netmask            The netmaks of the IP.
+  @param[in]  Netmask            The netmask of the IP.
 
   @retval TRUE                   The Ip/Netmask pair is valid.
   @retval FALSE                  The Ip/Netmask pair is invalid.

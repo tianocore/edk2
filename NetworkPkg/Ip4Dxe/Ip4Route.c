@@ -9,14 +9,14 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 
 /**
-  Allocate a route entry then initialize it with the Dest/Netmaks
+  Allocate a route entry then initialize it with the Dest/Netmask
   and Gateway.
 
   @param[in]  Dest                  The destination network
   @param[in]  Netmask               The destination network mask
   @param[in]  GateWay               The nexthop address
 
-  @return NULL if failed to allocate memeory, otherwise the newly created
+  @return NULL if failed to allocate memory, otherwise the newly created
           route entry.
 
 **/
@@ -129,7 +129,7 @@ Ip4FreeRouteCacheEntry (
 /**
   Initialize an empty route cache table.
 
-  @param[in, out]  RtCache               The rotue cache table to initialize.
+  @param[in, out]  RtCache               The route cache table to initialize.
 
 **/
 VOID
@@ -359,7 +359,7 @@ Ip4AddRoute (
 
   @retval EFI_SUCCESS           The route entry is successfully removed
   @retval EFI_NOT_FOUND         There is no route entry in the table with that
-                                properity.
+                                property.
 
 **/
 EFI_STATUS
@@ -396,7 +396,7 @@ Ip4DelRoute (
 
 /**
   Find a route cache with the dst and src. This is used by ICMP
-  redirect messasge process. All kinds of redirect is treated as
+  redirect message process. All kinds of redirect is treated as
   host redirect according to RFC1122. So, only route cache entries
   are modified according to the ICMP redirect message.
 
@@ -444,7 +444,7 @@ Ip4FindRouteCache (
   2. The local route entries have precedence over the default route entry.
 
   @param[in]  RtTable               The route table to search from
-  @param[in]  Dst                   The destionation address to search
+  @param[in]  Dst                   The destination address to search
 
   @return NULL if no route matches the Dst, otherwise the point to the
           most specific route to the Dst.
@@ -605,7 +605,7 @@ Ip4Route (
   @param[in]  IpInstance        The IP4 child that requests the route table.
 
   @retval EFI_SUCCESS           The route table is successfully build
-  @retval EFI_OUT_OF_RESOURCES  Failed to allocate the memory for the rotue table.
+  @retval EFI_OUT_OF_RESOURCES  Failed to allocate the memory for the route table.
 
 **/
 EFI_STATUS

@@ -1,5 +1,5 @@
 /** @file
-  Implement IP4 pesudo interface.
+  Implement IP4 pseudo interface.
 
 Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -9,13 +9,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "Ip4Impl.h"
 
 //
-// Mac address with all zero, used to determine whethter the ARP
+// Mac address with all zero, used to determine whether the ARP
 // resolve succeeded. Failed ARP requests zero the MAC address buffer.
 //
 EFI_MAC_ADDRESS  mZeroMacAddress;
 
 /**
-  Callback funtion when frame transmission is finished. It will
+  Callback function when frame transmission is finished. It will
   call the frame owner's callback function to tell it the result.
 
   @param[in]  Context            Context which is point to the token.
@@ -567,7 +567,7 @@ Ip4SetAddress (
   //
   // Set the ip/netmask, then compute the subnet broadcast
   // and network broadcast for easy access. When computing
-  // nework broadcast, the subnet mask is most like longer
+  // network broadcast, the subnet mask is most like longer
   // than the default netmask (not subneted) as defined in
   // RFC793. If that isn't the case, we are aggregating the
   // networks, use the subnet's mask instead.
@@ -983,7 +983,7 @@ Ip4OnArpResolved (
 
 
 /**
-  Callback funtion when frame transmission is finished. It will
+  Callback function when frame transmission is finished. It will
   call the frame owner's callback function to tell it the result.
 
   @param[in]  Context            Context which is point to the token.
@@ -1255,7 +1255,7 @@ Ip4OnFrameReceivedDpc (
   }
 
   //
-  // Wrap the frame in a net buffer then deliever it to IP input.
+  // Wrap the frame in a net buffer then deliver it to IP input.
   // IP will reassemble the packet, and deliver it to upper layer
   //
   Netfrag.Len  = MnpRxData->DataLength;
@@ -1311,7 +1311,7 @@ Ip4OnFrameReceived (
 
   @retval EFI_ALREADY_STARTED   There is already a pending receive request.
   @retval EFI_OUT_OF_RESOURCES  Failed to allocate resource to receive.
-  @retval EFI_SUCCESS           The recieve request has been started.
+  @retval EFI_SUCCESS           The receive request has been started.
   @retval other                 Other error occurs.
 
 **/

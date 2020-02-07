@@ -988,7 +988,7 @@ Failure:
   @param[out] Progress       A pointer to a string filled in with the
                              offset of the most recent '&' before the
                              first failing name / value pair (or the
-                             beginn ing of the string if the failure
+                             beginning of the string if the failure
                              is in the first name / value pair) or
                              the terminating NULL if all was
                              successful.
@@ -1098,7 +1098,7 @@ Ip4FormRouteConfig (
                                  variable and its data.
   @retval EFI_DEVICE_ERROR       The variable could not be saved.
   @retval EFI_UNSUPPORTED        The specified Action is not supported by the
-                                 callback.Currently not implemented.
+                                 callback. Currently not implemented.
   @retval EFI_INVALID_PARAMETERS Passing in wrong parameter.
   @retval Others                 Other errors as indicated.
 

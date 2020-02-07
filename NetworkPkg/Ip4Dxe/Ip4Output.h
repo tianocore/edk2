@@ -99,10 +99,10 @@ Ip4CancelPacket (
                            Fragment, Ttl, Protocol, Src and Dst. All the fields
                            are in host byte order. This function will fill in
                            the Ver, HeadLen, and checksum.
-  @param  Option           The orginal IP4 option to copy from
+  @param  Option           The original IP4 option to copy from
   @param  OptLen           The length of the IP4 option
 
-  @retval EFI_BAD_BUFFER_SIZE  There is no enought room in the head space of
+  @retval EFI_BAD_BUFFER_SIZE  There is no enough room in the head space of
                                Packet.
   @retval EFI_SUCCESS          The IP4 header is successfully added to the packet.
 
