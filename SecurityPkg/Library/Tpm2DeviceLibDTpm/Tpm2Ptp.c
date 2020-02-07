@@ -26,7 +26,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define PTP_TIMEOUT_MAX             (90000 * 1000)  // 90s
 
 //
-// Max TPM command/reponse length
+// Max TPM command/response length
 //
 #define TPMCMDBUFLENGTH             0x500
 
@@ -290,7 +290,7 @@ PtpCrbTpmCommand (
     DEBUG ((EFI_D_VERBOSE, "\n"));
   );
   //
-  // Check the reponse data header (tag, parasize and returncode)
+  // Check the response data header (tag, parasize and returncode)
   //
   CopyMem (&Data16, BufferOut, sizeof (UINT16));
   // TPM2 should not use this RSP_COMMAND

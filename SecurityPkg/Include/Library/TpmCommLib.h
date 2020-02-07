@@ -185,7 +185,7 @@ typedef TIS_PC_REGISTERS  *TIS_PC_REGISTERS_PTR;
 #define TIS_TIMEOUT_D               750 * 1000   // 750ms
 
 //
-// Max TPM command/reponse length
+// Max TPM command/response length
 //
 #define TPMCMDBUFLENGTH             1024
 
@@ -210,7 +210,7 @@ TisPcWaitRegisterBits (
   );
 
 /**
-  Get BurstCount by reading the burstCount field of a TIS regiger
+  Get BurstCount by reading the burstCount field of a TIS register
   in the time of default TIS_TIMEOUT_D.
 
   @param[in]  TisReg                Pointer to TIS register.
