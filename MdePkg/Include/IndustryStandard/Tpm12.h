@@ -597,7 +597,7 @@ typedef struct tdTPM_CHANGEAUTH_VALIDATE {
 
 ///
 /// Part 2, section 5.12: TPM_MIGRATIONKEYAUTH
-///   decalared after section 10 to catch declaration of TPM_PUBKEY
+///   declared after section 10 to catch declaration of TPM_PUBKEY
 ///
 /// Part 2 section 10.1: TPM_KEY_PARMS
 ///   [size_is(parmSize)] BYTE* parms;

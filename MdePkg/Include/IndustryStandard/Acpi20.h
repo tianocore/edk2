@@ -11,7 +11,7 @@
 #include <IndustryStandard/Acpi10.h>
 
 //
-// Define for Desriptor
+// Define for Descriptor
 //
 #define ACPI_LARGE_GENERIC_REGISTER_DESCRIPTOR_NAME          0x02
 
@@ -505,7 +505,7 @@ typedef struct {
 #define EFI_ACPI_2_0_SYSTEM_LOCALITY_INFORMATION_TABLE_SIGNATURE  SIGNATURE_32('S', 'L', 'I', 'T')
 
 ///
-/// "SPCR" Serial Port Concole Redirection Table
+/// "SPCR" Serial Port Console Redirection Table
 ///
 #define EFI_ACPI_2_0_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_SIGNATURE  SIGNATURE_32('S', 'P', 'C', 'R')
 

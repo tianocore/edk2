@@ -11,7 +11,7 @@
 #include <IndustryStandard/Acpi20.h>
 
 //
-// Define for Desriptor
+// Define for Descriptor
 //
 #define ACPI_LARGE_EXTENDED_ADDRESS_SPACE_DESCRIPTOR_NAME    0x0B
 
@@ -684,7 +684,7 @@ typedef struct {
 #define EFI_ACPI_3_0_PCI_EXPRESS_MEMORY_MAPPED_CONFIGURATION_SPACE_BASE_ADDRESS_DESCRIPTION_TABLE_SIGNATURE  SIGNATURE_32('M', 'C', 'F', 'G')
 
 ///
-/// "SPCR" Serial Port Concole Redirection Table
+/// "SPCR" Serial Port Console Redirection Table
 ///
 #define EFI_ACPI_3_0_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_SIGNATURE  SIGNATURE_32('S', 'P', 'C', 'R')
 
