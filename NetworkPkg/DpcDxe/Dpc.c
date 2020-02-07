@@ -28,7 +28,7 @@ EFI_DPC_PROTOCOL mDpc = {
 };
 
 //
-// Global variables used to meaasure the DPC Queue Depths
+// Global variables used to measure the DPC Queue Depths
 //
 UINTN  mDpcQueueDepth = 0;
 UINTN  mMaxDpcQueueDepth = 0;
@@ -42,7 +42,7 @@ UINTN  mMaxDpcQueueDepth = 0;
 LIST_ENTRY      mDpcEntryFreeList = INITIALIZE_LIST_HEAD_VARIABLE(mDpcEntryFreeList);
 
 //
-// An array of DPC queues.  A DPC queue is allocated for every leval EFI_TPL value.
+// An array of DPC queues.  A DPC queue is allocated for every level EFI_TPL value.
 // As DPCs are queued, they are added to the end of the linked list.
 // As DPCs are dispatched, they are removed from the beginning of the linked list.
 //
@@ -299,7 +299,7 @@ DpcDispatchDpc (
   @param  ImageHandle            The image handle of the driver.
   @param  SystemTable            The system table.
 
-  @retval EFI_SUCCES             The DPC queues were initialized and the EFI_DPC_PROTOCOL was
+  @retval EFI_SUCCESS            The DPC queues were initialized and the EFI_DPC_PROTOCOL was
                                  installed onto a new handle.
   @retval Others                 Failed to install EFI_DPC_PROTOCOL.
 

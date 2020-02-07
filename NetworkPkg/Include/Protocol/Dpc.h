@@ -20,7 +20,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
     }
 
 //
-// Forward reference for pure ANSI compatability
+// Forward reference for pure ANSI compatibility
 //
 typedef struct _EFI_DPC_PROTOCOL  EFI_DPC_PROTOCOL;
 
