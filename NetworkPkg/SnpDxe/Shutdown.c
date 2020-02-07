@@ -1,5 +1,5 @@
 /** @file
-    Implementation of shuting down a network adapter.
+    Implementation of shutting down a network adapter.
 
 Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
