@@ -1,5 +1,5 @@
 /** @file
-  Debug Agent library implementition.
+  Debug Agent library implementation.
 
   Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -152,13 +152,13 @@ RestoreDebugRegister (
 /**
   Initialize debug agent.
 
-  This function is used to set up debug enviroment for source level debug
+  This function is used to set up debug environment for source level debug
   in SMM code.
 
-  If InitFlag is DEBUG_AGENT_INIT_SMM, it will overirde IDT table entries
+  If InitFlag is DEBUG_AGENT_INIT_SMM, it will override IDT table entries
   and initialize debug port. It will get debug agent Mailbox from GUIDed HOB,
   it it exists, debug agent wiil copied it into the local Mailbox in SMM space.
-  it will overirde IDT table entries and initialize debug port. Context will be
+  it will override IDT table entries and initialize debug port. Context will be
   NULL.
   If InitFlag is DEBUG_AGENT_INIT_ENTER_SMI, debug agent will save Debug
   Registers and get local Mailbox in SMM space. Context will be NULL.
@@ -295,7 +295,7 @@ InitializeDebugAgent (
     Mailbox = GetMailboxPointer ();
     if (GetDebugFlag (DEBUG_AGENT_FLAG_AGENT_IN_PROGRESS) == 1) {
       //
-      // If Debug Agent has been communicaton state with HOST, we need skip
+      // If Debug Agent has been communication state with HOST, we need skip
       // any break points set in SMM, set Skip Breakpoint flag
       //
       mSkipBreakpoint = TRUE;

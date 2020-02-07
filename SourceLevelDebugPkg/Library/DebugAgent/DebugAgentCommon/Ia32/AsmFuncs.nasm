@@ -226,7 +226,7 @@ NoExtrPush:
     push    ebx         ; temporarily save value of ebx on stack
     cpuid               ; use CPUID to determine if FXSAVE/FXRESTOR and
                         ; DE are supported
-    pop     ebx         ; retore value of ebx that was overwritten by CPUID
+    pop     ebx         ; restore value of ebx that was overwritten by CPUID
     mov     eax, cr4
     push    eax         ; push cr4 firstly
     test    edx, BIT24  ; Test for FXSAVE/FXRESTOR support
@@ -407,7 +407,7 @@ NoExtrPush:
     mov     esp, ebp
     pop     ebp         ; restore ebp maybe updated
     pop     esp         ; restore esp maybe updated
-    sub     esp, 4 * 3  ; restore interupt pushced stack
+    sub     esp, 4 * 3  ; restore interrupt pushced stack
 
     iretd
 
