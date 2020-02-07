@@ -1179,7 +1179,7 @@ ParseDnsResponse (
   RemainingLength  = Length;
 
   //
-  // Check whether the remaining packet length is avaiable or not.
+  // Check whether the remaining packet length is available or not.
   //
   if (RemainingLength <= sizeof (DNS_HEADER)) {
     *Completed = FALSE;
@@ -1217,7 +1217,7 @@ ParseDnsResponse (
   QueryNameLen = (UINT32) AsciiStrLen (QueryName) + 1;
 
   //
-  // Check whether the remaining packet length is avaiable or not.
+  // Check whether the remaining packet length is available or not.
   //
   if (RemainingLength <= QueryNameLen + sizeof (DNS_QUERY_SECTION)) {
     *Completed = FALSE;
@@ -1376,7 +1376,7 @@ ParseDnsResponse (
   //
   while (AnswerSectionNum < DnsHeader->AnswersNum) {
     //
-    // Check whether the remaining packet length is avaiable or not.
+    // Check whether the remaining packet length is available or not.
     //
     if (RemainingLength <= sizeof (UINT16) + sizeof (DNS_ANSWER_SECTION)) {
       *Completed = FALSE;
@@ -1404,7 +1404,7 @@ ParseDnsResponse (
     AnswerSection->DataLength = NTOHS (AnswerSection->DataLength);
 
     //
-    // Check whether the remaining packet length is avaiable or not.
+    // Check whether the remaining packet length is available or not.
     //
     if (RemainingLength < AnswerSection->DataLength) {
       *Completed = FALSE;
