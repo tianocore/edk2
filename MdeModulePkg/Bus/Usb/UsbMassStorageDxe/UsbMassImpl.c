@@ -367,7 +367,7 @@ UsbMassInitMedia (
 }
 
 /**
-  Initilize the USB Mass Storage transport.
+  Initialize the USB Mass Storage transport.
 
   This function tries to find the matching USB Mass Storage transport
   protocol for USB device. If found, initializes the matching transport.
@@ -770,7 +770,7 @@ ON_EXIT:
 /**
   Starts the USB mass storage device with this driver.
 
-  This function consumes USB I/O Portocol, intializes USB mass storage device,
+  This function consumes USB I/O Protocol, initializes USB mass storage device,
   installs Block I/O Protocol, and submits Asynchronous Interrupt
   Transfer to manage the USB mass storage device.
 

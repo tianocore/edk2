@@ -326,7 +326,7 @@ UsbBotGetStatus (
 
   for (Index = 0; Index < USB_BOT_RECV_CSW_RETRY; Index++) {
     //
-    // Attemp to the read Command Status Wrapper from bulk in endpoint
+    // Attempt to the read Command Status Wrapper from bulk in endpoint
     //
     ZeroMem (&Csw, sizeof (USB_BOT_CSW));
     Result = 0;
@@ -553,7 +553,7 @@ UsbBotGetMaxLun (
   UsbBot = (USB_BOT_PROTOCOL *) Context;
 
   //
-  // Issue a class specific Bulk-Only Mass Storage get max lun reqest.
+  // Issue a class specific Bulk-Only Mass Storage get max lun request.
   // according to section 3.2 of USB Mass Storage Class Bulk-Only Transport Spec, v1.0.
   //
   Request.RequestType = 0xA1;
