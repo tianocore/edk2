@@ -96,7 +96,7 @@
  *   All generic sub-operations
  *
  *  HYPERVISOR_physdev_op
- *   No sub-operations are currenty supported
+ *   No sub-operations are currently supported
  *
  *  HYPERVISOR_sysctl
  *   All generic sub-operations, with the exception of:

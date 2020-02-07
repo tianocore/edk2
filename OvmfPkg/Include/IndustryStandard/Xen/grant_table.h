@@ -365,7 +365,7 @@ DEFINE_XEN_GUEST_HANDLE(gnttab_unmap_grant_ref_t);
  /*
   * GNTMAP_contains_pte subflag:
   *  0 => This map request contains a host virtual address.
-  *  1 => This map request contains the machine addess of the PTE to update.
+  *  1 => This map request contains the machine address of the PTE to update.
   */
 #define _GNTMAP_contains_pte    (4)
 #define GNTMAP_contains_pte     (1<<_GNTMAP_contains_pte)
@@ -386,7 +386,7 @@ DEFINE_XEN_GUEST_HANDLE(gnttab_unmap_grant_ref_t);
 /* ` enum grant_status { */
 #define GNTST_okay             (0)  /* Normal return.                        */
 #define GNTST_general_error    (-1) /* General undefined error.              */
-#define GNTST_bad_domain       (-2) /* Unrecognsed domain id.                */
+#define GNTST_bad_domain       (-2) /* Unrecognised domain id.               */
 #define GNTST_bad_gntref       (-3) /* Unrecognised or inappropriate gntref. */
 #define GNTST_bad_handle       (-4) /* Unrecognised or inappropriate handle. */
 #define GNTST_bad_virt_addr    (-5) /* Inappropriate virtual address to map. */

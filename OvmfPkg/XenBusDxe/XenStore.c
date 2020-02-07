@@ -138,7 +138,7 @@ typedef struct {
    */
   LIST_ENTRY WatchEvents;
 
-  /** Lock protecting the watch calback list. */
+  /** Lock protecting the watch callback list. */
   EFI_LOCK WatchEventsLock;
 
   /**
@@ -761,7 +761,7 @@ XenStoreReadReply (
 }
 
 /**
-  Send a message with an optionally muti-part body to the XenStore service.
+  Send a message with an optionally multi-part body to the XenStore service.
 
   @param Transaction    The transaction to use for this request.
   @param RequestType    The type of message to send.
