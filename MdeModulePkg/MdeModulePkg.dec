@@ -4,7 +4,7 @@
 # and libraries instances, which are used for those modules.
 #
 # Copyright (c) 2019, NVIDIA CORPORATION. All rights reserved.
-# Copyright (c) 2007 - 2019, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2020, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
 # (C) Copyright 2016 - 2019 Hewlett Packard Enterprise Development LP<BR>
 # Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
@@ -869,6 +869,12 @@
   #   FALSE - PCI MMIO BARs of a device may be located above 4 GB even if it has an option ROM
   # @Prompt Degrade 64-bit PCI MMIO BARs for legacy BIOS option ROMs
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciDegradeResourceForOptionRom|TRUE|BOOLEAN|0x0001003a
+
+  ## Indicates if the platform can support process non-reset capsule image at runtime.<BR><BR>
+  #   TRUE  - Supports process non-reset capsule image at runtime.<BR>
+  #   FALSE - Does not support process non-reset capsule image at runtime.<BR>
+  # @Prompt Enable process non-reset capsule image at runtime.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSupportProcessCapsuleAtRuntime|FALSE|BOOLEAN|0x00010079
 
 [PcdsFeatureFlag.IA32, PcdsFeatureFlag.ARM, PcdsFeatureFlag.AARCH64]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciDegradeResourceForOptionRom|FALSE|BOOLEAN|0x0001003a
