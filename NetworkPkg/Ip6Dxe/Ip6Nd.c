@@ -1645,7 +1645,7 @@ Ip6ProcessNeighborSolicit (
   //
   // Sends a Neighbor Advertisement as response.
   // Set the Router flag to zero since the node is a host.
-  // If the source address of the solicitation is unspeicifed, and target address
+  // If the source address of the solicitation is unspecified, and target address
   // is one of the maintained address, reply a unsolicited multicast advertisement.
   //
   if (IsDAD && IsMaintained) {
@@ -2087,7 +2087,7 @@ Ip6ProcessRouterAdvertise (
   }
 
   //
-  // If an valid router advertisment is received, stops router solicitation.
+  // If an valid router advertisement is received, stops router solicitation.
   //
   IpSb->RouterAdvertiseReceived = TRUE;
 
@@ -2251,7 +2251,7 @@ Ip6ProcessRouterAdvertise (
           //
           if (!Ip6IsOneOfSetAddress (IpSb, &StatelessAddress, NULL, NULL)) {
             //
-            // And also not in the DAD process, check its uniqeness firstly.
+            // And also not in the DAD process, check its uniqueness firstly.
             //
             if (Ip6FindDADEntry (IpSb, &StatelessAddress, NULL) == NULL) {
               Status = Ip6SetAddress (
@@ -2303,7 +2303,7 @@ Ip6ProcessRouterAdvertise (
 
           } else if (PrefixList->ValidLifetime <= 7200) {
             //
-            // If RemainingLifetime is less than or equls to 2 hours, ignore the
+            // If RemainingLifetime is less than or equals to 2 hours, ignore the
             // Prefix Information option with regards to the valid lifetime.
             // TODO: If this option has been authenticated, set the valid lifetime.
             //
@@ -2365,7 +2365,7 @@ Exit:
                                  the IP head removed.
 
   @retval EFI_INVALID_PARAMETER  The parameter is invalid.
-  @retval EFI_OUT_OF_RESOURCES   Insuffcient resources to complete the
+  @retval EFI_OUT_OF_RESOURCES   Insufficient resources to complete the
                                  operation.
   @retval EFI_SUCCESS            Successfully updated the route caches.
 
@@ -3069,7 +3069,7 @@ Ip6NdFasterTimerTicking (
 
 /**
   The heartbeat timer of ND module in 1 second. This time routine handles following
-  things: 1) maitain default router list; 2) maintain prefix options;
+  things: 1) maintain default router list; 2) maintain prefix options;
   3) maintain route caches.
 
   @param[in]  IpSb              The IP6 service binding instance.

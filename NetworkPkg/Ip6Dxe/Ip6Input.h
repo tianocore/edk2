@@ -149,7 +149,7 @@ Ip6InstanceDeliverPacket (
   @retval EFI_SUCCESS            The packet was bypassed, and all buffers remain the same.
   @retval EFI_SUCCESS            The packet was protected.
   @retval EFI_ACCESS_DENIED      The packet was discarded.
-  @retval EFI_OUT_OF_RESOURCES   There are not suffcient resources to complete the operation.
+  @retval EFI_OUT_OF_RESOURCES   There are not sufficient resources to complete the operation.
   @retval EFI_BUFFER_TOO_SMALL   The number of non-empty blocks is bigger than the
                                  number of input data blocks when building a fragment table.
 
@@ -192,11 +192,11 @@ Ip6CleanAssembleTable (
 
 /**
   Demultiple the packet. the packet delivery is processed in two
-  passes. The first pass will enque a shared copy of the packet
+  passes. The first pass will enqueue a shared copy of the packet
   to each IP6 child that accepts the packet. The second pass will
   deliver a non-shared copy of the packet to each IP6 child that
   has pending receive requests. Data is copied if more than one
-  child wants to consume the packet bacause each IP child need
+  child wants to consume the packet because each IP child need
   its own copy of the packet to make changes.
 
   @param[in]  IpSb          The IP6 service instance that received the packet.

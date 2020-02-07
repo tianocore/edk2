@@ -1,5 +1,5 @@
 /** @file
-  Definitions for EFI IPv6 Configuartion Protocol implementation.
+  Definitions for EFI IPv6 Configuration Protocol implementation.
 
   Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 
@@ -210,7 +210,7 @@ struct _IP6_CONFIG_INSTANCE {
 /**
   Read the configuration data from variable storage according to the VarName and
   gEfiIp6ConfigProtocolGuid. It checks the integrity of variable data. If the
-  data is corrupted, it clears the variable data to ZERO. Othewise, it outputs the
+  data is corrupted, it clears the variable data to ZERO. Otherwise, it outputs the
   configuration data to IP6_CONFIG_INSTANCE.
 
   @param[in]      VarName  The pointer to the variable name

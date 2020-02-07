@@ -288,7 +288,7 @@ Ip6IsIllegalProtocol (
 }
 
 /**
-  Intiialize the IP6_PROTOCOL structure to the unconfigured states.
+  Initialize the IP6_PROTOCOL structure to the unconfigured states.
 
   @param[in]       IpSb                   The IP6 service instance.
   @param[in, out]  IpInstance             The IP6 child instance.
@@ -604,7 +604,7 @@ Ip6ServiceConfigMnp (
   @retval EFI_DEVICE_ERROR       An unexpected system or network error occurred. The EFI IPv6
                                  Protocol driver instance was not opened.
   @retval EFI_UNSUPPORTED        Default protocol specified through
-                                 Ip6ConfigData.DefaulProtocol isn't supported.
+                                 Ip6ConfigData.DefaultProtocol isn't supported.
 
 **/
 EFI_STATUS
@@ -787,7 +787,7 @@ ON_EXIT:
   the destination IPv6 address arithmetically. The gateway address must be on the same subnet as the
   configured station address.
 
-  The default route is added with Destination and PrefixLegth both set to all zeros. The
+  The default route is added with Destination and PrefixLength both set to all zeros. The
   default route matches all destination IPv6 addresses that do not match any other routes.
 
   All EFI IPv6 Protocol instances share a routing table.
@@ -1001,7 +1001,7 @@ Exit:
   @param[in]  Map                The container of either user's transmit or receive
                                  token.
   @param[in]  Item               Current item to check against.
-  @param[in]  Context            The Token to check againist.
+  @param[in]  Context            The Token to check against.
 
   @retval EFI_ACCESS_DENIED      The token or event has already been enqueued in IP
   @retval EFI_SUCCESS            The current item isn't the same token/event as the
@@ -1449,7 +1449,7 @@ Exit:
   is signaled.
 
   Current Udp implementation creates an IP child for each Udp child.
-  It initates a asynchronous receive immediately no matter whether
+  It initiates a asynchronous receive immediately no matter whether
   there is no mapping or not. Therefore, disable the returning EFI_NO_MAPPING for now.
   To enable it, the following check must be performed:
 

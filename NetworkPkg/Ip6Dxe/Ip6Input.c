@@ -319,7 +319,7 @@ Ip6Reassemble (
     }
 
     //
-    // Backup the first fragment in case the reasembly of that packet fail.
+    // Backup the first fragment in case the reassembly of that packet fail.
     //
     Duplicate = NetbufDuplicate (Packet, NULL, sizeof (EFI_IP6_HEADER));
     if (Duplicate == NULL) {
@@ -371,7 +371,7 @@ Ip6Reassemble (
   //
   // Deliver the whole packet if all the fragments received.
   // All fragments received if:
-  //  1. received the last one, so, the totoal length is know
+  //  1. received the last one, so, the total length is known
   //  2. received all the data. If the last fragment on the
   //     queue ends at the total length, all data is received.
   //
@@ -380,7 +380,7 @@ Ip6Reassemble (
     RemoveEntryList (&Assemble->Link);
 
     //
-    // If the packet is properly formated, the last fragment's End
+    // If the packet is properly formatted, the last fragment's End
     // equals to the packet's total length. Otherwise, the packet
     // is a fake, drop it now.
     //
@@ -396,7 +396,7 @@ Ip6Reassemble (
     //
     // This TmpPacket is used to hold the unfragmentable part, i.e.,
     // the IPv6 header and the unfragmentable extension headers. Be noted that
-    // the Fragment Header is exluded.
+    // the Fragment Header is excluded.
     //
     TmpPacket = NetbufGetFragment (Fragment, 0, This->HeadLen, 0);
     ASSERT (TmpPacket != NULL);
@@ -489,7 +489,7 @@ Ip6IpSecFree (
   @retval EFI_SUCCESS            The packet was bypassed, and all buffers remain the same.
   @retval EFI_SUCCESS            The packet was protected.
   @retval EFI_ACCESS_DENIED      The packet was discarded.
-  @retval EFI_OUT_OF_RESOURCES   There are not suffcient resources to complete the operation.
+  @retval EFI_OUT_OF_RESOURCES   There are not sufficient resources to complete the operation.
   @retval EFI_BUFFER_TOO_SMALL   The number of non-empty blocks is bigger than the
                                  number of input data blocks when building a fragment table.
 
@@ -718,7 +718,7 @@ ON_EXIT:
   @param[in, out] Packet        The received IP6 packet to be processed.
   @param[in]      Flag          The link layer flag for the packet received, such
                                 as multicast.
-  @param[out]     Payload       The pointer to the payload of the recieved packet.
+  @param[out]     Payload       The pointer to the payload of the received packet.
                                 it starts from the first byte of the extension header.
   @param[out]     LastHead      The pointer of NextHeader of the last extension
                                 header processed by IP6.
@@ -1070,7 +1070,7 @@ Ip6AcceptFrame (
 
   //
   // Packet may have been changed. The ownership of the packet
-  // is transfered to the packet process logic.
+  // is transferred to the packet process logic.
   //
   Head  = Packet->Ip.Ip6;
   IP6_GET_CLIP_INFO (Packet)->Status = EFI_SUCCESS;
@@ -1283,7 +1283,7 @@ Ip6InstanceFrameAcceptable (
   Proto  = NULL;
 
   //
-  // Dirty trick for the Tiano UEFI network stack implmentation. If
+  // Dirty trick for the Tiano UEFI network stack implementation. If
   // ReceiveTimeout == -1, the receive of the packet for this instance
   // is disabled. The UEFI spec don't have such captibility. We add
   // this to improve the performance because IP will make a copy of
@@ -1428,7 +1428,7 @@ Ip6InstanceEnquePacket (
   }
 
   //
-  // Enque a shared copy of the packet.
+  // Enqueue a shared copy of the packet.
   //
   Clone = NetbufClone (Packet);
 
@@ -1661,7 +1661,7 @@ Ip6Demultiplex (
   INTN                      Enqueued;
 
   //
-  // Two pass delivery: first, enque a shared copy of the packet
+  // Two pass delivery: first, enqueue a shared copy of the packet
   // to each instance that accept the packet.
   //
   Enqueued = 0;

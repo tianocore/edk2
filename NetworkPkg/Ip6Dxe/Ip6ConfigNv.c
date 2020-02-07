@@ -407,7 +407,7 @@ Exit:
 
 /**
   This function converts the different format of address list to string format and
-  then generates the corresponding text opcode to illustarate the address info in
+  then generates the corresponding text opcode to illustrate the address info in
   IP6 configuration page. Currently, the following formats are supported:
   EFI_IP6_ADDRESS_INFO AddressType: Ip6ConfigNvHostAddress;
   EFI_IPv6_ADDRESS     AddressType: Ip6ConfigNvGatewayAddress and Ip6ConfigNvDnsAddress;
@@ -1470,7 +1470,7 @@ Exit:
   @param[out] Progress       A pointer to a string filled in with the
                              offset of the most recent '&' before the
                              first failing name / value pair (or the
-                             beginn ing of the string if the failure
+                             beginning of the string if the failure
                              is in the first name / value pair) or
                              the terminating NULL if all was
                              successful.
@@ -1622,7 +1622,7 @@ Ip6GetCurrentSetting (
   }
 
   //
-  // Get gateway adderss list.
+  // Get gateway address list.
   //
   if (Data != NULL) {
     FreePool (Data);
