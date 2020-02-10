@@ -17,6 +17,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <IndustryStandard/Tpm20.h>
 #include <Protocol/Tcg2Protocol.h>
+#include <Guid/Tcg2PhysicalPresenceData.h>
 #include <Library/Tcg2PhysicalPresenceLib.h>
 
 /**
@@ -29,7 +30,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   If OperationRequest < 128, then ASSERT().
 
   @param[in]      PlatformAuth     platform auth value. NULL means no platform auth change.
-  @param[in]      OperationRequest TPM physical presence operation request.
+  @param[in]      PPData           Ptr to EFI_TCG2_PHYSICAL_PRESENCE data.
   @param[in, out] ManagementFlags  BIOS TPM Management Flags.
   @param[out]     ResetRequired    If reset is required to vendor settings in effect.
                                    True, it indicates the reset is required.
@@ -41,7 +42,7 @@ UINT32
 EFIAPI
 Tcg2PpVendorLibExecutePendingRequest (
   IN TPM2B_AUTH             *PlatformAuth,  OPTIONAL
-  IN UINT32                 OperationRequest,
+  IN EFI_TCG2_PHYSICAL_PRESENCE  *PPData,
   IN OUT UINT32             *ManagementFlags,
   OUT BOOLEAN               *ResetRequired
   );
@@ -74,8 +75,8 @@ Tcg2PpVendorLibHasValidRequest (
 
 /**
   The callback for TPM vendor specific physical presence which is called for
-  Submit TPM Operation Request to Pre-OS Environment and
-  Submit TPM Operation Request to Pre-OS Environment 2.
+  Submit TPM Operation Request to Pre-OS Environment (Function Index 2) and
+  Submit TPM Operation Request to Pre-OS Environment 2 (Function Index 7).
 
   This API should be invoked in OS runtime phase to interface with ACPI method.
 
@@ -83,9 +84,8 @@ Tcg2PpVendorLibHasValidRequest (
 
   If OperationRequest < 128, then ASSERT().
 
-  @param[in]      OperationRequest TPM physical presence operation request.
+  @param[in]      *PPData          Ptr to EFI_TCG2_PHYSICAL_PRESENCE data
   @param[in]      ManagementFlags  BIOS TPM Management Flags.
-  @param[in]      RequestParameter Extra parameter from the passed package.
 
   @return Return Code for Submit TPM Operation Request to Pre-OS Environment and
           Submit TPM Operation Request to Pre-OS Environment 2.
@@ -93,9 +93,8 @@ Tcg2PpVendorLibHasValidRequest (
 UINT32
 EFIAPI
 Tcg2PpVendorLibSubmitRequestToPreOSFunction (
-  IN UINT32                 OperationRequest,
-  IN UINT32                 ManagementFlags,
-  IN UINT32                 RequestParameter
+  IN EFI_TCG2_PHYSICAL_PRESENCE  *PPdata,
+  IN UINT32                      ManagementFlags
   );
 
 /**
