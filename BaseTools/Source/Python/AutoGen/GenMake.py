@@ -612,9 +612,10 @@ cleanlib:
                 IncludePath = self._INC_FLAG_['NASM'] + self.PlaceMacro(P, self.Macros)
                 if IncludePath.endswith(os.sep):
                     IncludePath = IncludePath.rstrip(os.sep)
-                # When compiling .nasm files, need to add a literal backslash at each path
-                # To specify a literal backslash at the end of the line, precede it with a caret (^)
-                if P == MyAgo.IncludePathList[-1] and os.sep == '\\':
+                # When compiling .nasm files, need to add a literal backslash at each path.
+                # In nmake makfiles, a trailing literal backslash must be escaped with a caret ('^').
+                # It is otherwise replaced with a space (' '). This is not necessary for GNU makfefiles.
+                if P == MyAgo.IncludePathList[-1] and self._Platform == WIN32_PLATFORM and self._FileType == NMAKE_FILETYPE:
                     IncludePath = ''.join([IncludePath, '^', os.sep])
                 else:
                     IncludePath = os.path.join(IncludePath, '')
