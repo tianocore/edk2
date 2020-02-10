@@ -4,6 +4,7 @@
 #  Copyright (c) 2014, Hewlett-Packard Development Company, L.P.<BR>
 #  Copyright (c) 2007 - 2020, Intel Corporation. All rights reserved.<BR>
 #  Copyright (c) 2018, Hewlett Packard Enterprise Development, L.P.<BR>
+#  Copyright (c) 2020, ARM Limited. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -736,6 +737,7 @@ class Build():
         self.AutoGenTime    = 0
         self.MakeTime       = 0
         self.GenFdsTime     = 0
+        self.MakeFileName   = ""
         TargetObj = TargetTxtDict()
         ToolDefObj = ToolDefDict((os.path.join(os.getenv("WORKSPACE"),"Conf")))
         self.TargetTxt = TargetObj.Target
@@ -1251,8 +1253,6 @@ class Build():
                                 (AutoGenObject.BuildTarget, AutoGenObject.ToolChain, AutoGenObject.Arch),
                             ExtraData=str(AutoGenObject))
 
-        makefile = GenMake.BuildFile(AutoGenObject)._FILE_NAME_[GenMake.gMakeType]
-
         # run
         if Target == 'run':
             return True
@@ -1278,7 +1278,7 @@ class Build():
                 if not Lib.IsBinaryModule:
                     DirList.append((os.path.join(AutoGenObject.BuildDir, Lib.BuildDir),Lib))
             for Lib, LibAutoGen in DirList:
-                NewBuildCommand = BuildCommand + ['-f', os.path.normpath(os.path.join(Lib, makefile)), 'pbuild']
+                NewBuildCommand = BuildCommand + ['-f', os.path.normpath(os.path.join(Lib, self.MakeFileName)), 'pbuild']
                 LaunchCommand(NewBuildCommand, AutoGenObject.MakeFileDir,LibAutoGen)
             return True
 
@@ -1289,7 +1289,7 @@ class Build():
                 if not Lib.IsBinaryModule:
                     DirList.append((os.path.join(AutoGenObject.BuildDir, Lib.BuildDir),Lib))
             for Lib, LibAutoGen in DirList:
-                NewBuildCommand = BuildCommand + ['-f', os.path.normpath(os.path.join(Lib, makefile)), 'pbuild']
+                NewBuildCommand = BuildCommand + ['-f', os.path.normpath(os.path.join(Lib, self.MakeFileName)), 'pbuild']
                 LaunchCommand(NewBuildCommand, AutoGenObject.MakeFileDir,LibAutoGen)
 
             DirList = []
@@ -1297,7 +1297,7 @@ class Build():
                 if not ModuleAutoGen.IsBinaryModule:
                     DirList.append((os.path.join(AutoGenObject.BuildDir, ModuleAutoGen.BuildDir),ModuleAutoGen))
             for Mod,ModAutoGen in DirList:
-                NewBuildCommand = BuildCommand + ['-f', os.path.normpath(os.path.join(Mod, makefile)), 'pbuild']
+                NewBuildCommand = BuildCommand + ['-f', os.path.normpath(os.path.join(Mod, self.MakeFileName)), 'pbuild']
                 LaunchCommand(NewBuildCommand, AutoGenObject.MakeFileDir,ModAutoGen)
             self.CreateAsBuiltInf()
             if GlobalData.gBinCacheDest:
@@ -1312,7 +1312,7 @@ class Build():
         # cleanlib
         if Target == 'cleanlib':
             for Lib in AutoGenObject.LibraryBuildDirectoryList:
-                LibMakefile = os.path.normpath(os.path.join(Lib, makefile))
+                LibMakefile = os.path.normpath(os.path.join(Lib, self.MakeFileName))
                 if os.path.exists(LibMakefile):
                     NewBuildCommand = BuildCommand + ['-f', LibMakefile, 'cleanall']
                     LaunchCommand(NewBuildCommand, AutoGenObject.MakeFileDir)
@@ -1321,12 +1321,12 @@ class Build():
         # clean
         if Target == 'clean':
             for Mod in AutoGenObject.ModuleBuildDirectoryList:
-                ModMakefile = os.path.normpath(os.path.join(Mod, makefile))
+                ModMakefile = os.path.normpath(os.path.join(Mod, self.MakeFileName))
                 if os.path.exists(ModMakefile):
                     NewBuildCommand = BuildCommand + ['-f', ModMakefile, 'cleanall']
                     LaunchCommand(NewBuildCommand, AutoGenObject.MakeFileDir)
             for Lib in AutoGenObject.LibraryBuildDirectoryList:
-                LibMakefile = os.path.normpath(os.path.join(Lib, makefile))
+                LibMakefile = os.path.normpath(os.path.join(Lib, self.MakeFileName))
                 if os.path.exists(LibMakefile):
                     NewBuildCommand = BuildCommand + ['-f', LibMakefile, 'cleanall']
                     LaunchCommand(NewBuildCommand, AutoGenObject.MakeFileDir)
@@ -2040,10 +2040,10 @@ class Build():
             ModuleBuildDirectoryList = data_pipe.Get("ModuleBuildDirectoryList")
 
             for m_build_dir in LibraryBuildDirectoryList:
-                if not os.path.exists(os.path.join(m_build_dir,GenMake.BuildFile._FILE_NAME_[GenMake.gMakeType])):
+                if not os.path.exists(os.path.join(m_build_dir,self.MakeFileName)):
                     return None
             for m_build_dir in ModuleBuildDirectoryList:
-                if not os.path.exists(os.path.join(m_build_dir,GenMake.BuildFile._FILE_NAME_[GenMake.gMakeType])):
+                if not os.path.exists(os.path.join(m_build_dir,self.MakeFileName)):
                     return None
             Wa = WorkSpaceInfo(
                 workspacedir,active_p,target,toolchain,archlist
@@ -2128,6 +2128,11 @@ class Build():
             Pa.DataPipe.DataContainer = {"Workspace_timestamp": Wa._SrcTimeStamp}
             Pa.DataPipe.DataContainer = {"CommandTarget": self.Target}
             Pa.CreateLibModuelDirs()
+            # Fetch the MakeFileName.
+            self.MakeFileName = Pa.MakeFileName
+            if not self.MakeFileName:
+                self.MakeFileName = Pa.MakeFile
+
             Pa.DataPipe.DataContainer = {"LibraryBuildDirectoryList":Pa.LibraryBuildDirectoryList}
             Pa.DataPipe.DataContainer = {"ModuleBuildDirectoryList":Pa.ModuleBuildDirectoryList}
             Pa.DataPipe.DataContainer = {"FdsCommandDict": Wa.GenFdsCommandDict}

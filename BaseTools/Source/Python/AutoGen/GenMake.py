@@ -2,6 +2,7 @@
 # Create makefile for MS nmake and GNU make
 #
 # Copyright (c) 2007 - 2020, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2020, ARM Limited. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
@@ -52,13 +53,10 @@ gIncludeMacroConversion = {
   "EFI_PPI_DEPENDENCY"              :   gPpiDefinition,
 }
 
-## default makefile type
-gMakeType = ""
-if sys.platform == "win32":
-    gMakeType = "nmake"
-else:
-    gMakeType = "gmake"
-
+NMAKE_FILETYPE = "nmake"
+GMAKE_FILETYPE = "gmake"
+WIN32_PLATFORM = "win32"
+POSIX_PLATFORM = "posix"
 
 ## BuildFile class
 #
@@ -73,9 +71,16 @@ class BuildFile(object):
 
     ## default file name for each type of build file
     _FILE_NAME_ = {
-        "nmake" :   "Makefile",
-        "gmake" :   "GNUmakefile"
+        NMAKE_FILETYPE :   "Makefile",
+        GMAKE_FILETYPE :   "GNUmakefile"
     }
+
+    # Get Makefile name.
+    def getMakefileName(self):
+        if not self._FileType:
+            return self._DEFAULT_FILE_NAME_
+        else:
+            return self._FILE_NAME_[self._FileType]
 
     ## Fixed header string for makefile
     _MAKEFILE_HEADER = '''#
@@ -94,8 +99,8 @@ class BuildFile(object):
 
     ## Header string for each type of build file
     _FILE_HEADER_ = {
-        "nmake" :   _MAKEFILE_HEADER % _FILE_NAME_["nmake"],
-        "gmake" :   _MAKEFILE_HEADER % _FILE_NAME_["gmake"]
+        NMAKE_FILETYPE :   _MAKEFILE_HEADER % _FILE_NAME_[NMAKE_FILETYPE],
+        GMAKE_FILETYPE :   _MAKEFILE_HEADER % _FILE_NAME_[GMAKE_FILETYPE]
     }
 
     ## shell commands which can be used in build file in the form of macro
@@ -106,7 +111,7 @@ class BuildFile(object):
     #   $(RD)     remove dir command
     #
     _SHELL_CMD_ = {
-        "nmake" : {
+        WIN32_PLATFORM : {
             "CP"    :   "copy /y",
             "MV"    :   "move /y",
             "RM"    :   "del /f /q",
@@ -114,7 +119,7 @@ class BuildFile(object):
             "RD"    :   "rmdir /s /q",
         },
 
-        "gmake" : {
+        POSIX_PLATFORM : {
             "CP"    :   "cp -f",
             "MV"    :   "mv -f",
             "RM"    :   "rm -f",
@@ -125,40 +130,40 @@ class BuildFile(object):
 
     ## directory separator
     _SEP_ = {
-        "nmake" :   "\\",
-        "gmake" :   "/"
+        WIN32_PLATFORM :   "\\",
+        POSIX_PLATFORM :   "/"
     }
 
     ## directory creation template
     _MD_TEMPLATE_ = {
-        "nmake" :   'if not exist %(dir)s $(MD) %(dir)s',
-        "gmake" :   "$(MD) %(dir)s"
+        WIN32_PLATFORM :   'if not exist %(dir)s $(MD) %(dir)s',
+        POSIX_PLATFORM :   "$(MD) %(dir)s"
     }
 
     ## directory removal template
     _RD_TEMPLATE_ = {
-        "nmake" :   'if exist %(dir)s $(RD) %(dir)s',
-        "gmake" :   "$(RD) %(dir)s"
+        WIN32_PLATFORM :   'if exist %(dir)s $(RD) %(dir)s',
+        POSIX_PLATFORM :   "$(RD) %(dir)s"
     }
     ## cp if exist
     _CP_TEMPLATE_ = {
-        "nmake" :   'if exist %(Src)s $(CP) %(Src)s %(Dst)s',
-        "gmake" :   "test -f %(Src)s && $(CP) %(Src)s %(Dst)s"
+        WIN32_PLATFORM :   'if exist %(Src)s $(CP) %(Src)s %(Dst)s',
+        POSIX_PLATFORM :   "test -f %(Src)s && $(CP) %(Src)s %(Dst)s"
     }
 
     _CD_TEMPLATE_ = {
-        "nmake" :   'if exist %(dir)s cd %(dir)s',
-        "gmake" :   "test -e %(dir)s && cd %(dir)s"
+        WIN32_PLATFORM :   'if exist %(dir)s cd %(dir)s',
+        POSIX_PLATFORM :   "test -e %(dir)s && cd %(dir)s"
     }
 
     _MAKE_TEMPLATE_ = {
-        "nmake" :   'if exist %(file)s "$(MAKE)" $(MAKE_FLAGS) -f %(file)s',
-        "gmake" :   'test -e %(file)s && "$(MAKE)" $(MAKE_FLAGS) -f %(file)s'
+        WIN32_PLATFORM :   'if exist %(file)s "$(MAKE)" $(MAKE_FLAGS) -f %(file)s',
+        POSIX_PLATFORM :   'test -e %(file)s && "$(MAKE)" $(MAKE_FLAGS) -f %(file)s'
     }
 
     _INCLUDE_CMD_ = {
-        "nmake" :   '!INCLUDE',
-        "gmake" :   "include"
+        NMAKE_FILETYPE :   '!INCLUDE',
+        GMAKE_FILETYPE :   "include"
     }
 
     _INC_FLAG_ = {TAB_COMPILER_MSFT : "/I", "GCC" : "-I", "INTEL" : "-I", "RVCT" : "-I", "NASM" : "-I"}
@@ -169,22 +174,30 @@ class BuildFile(object):
     #
     def __init__(self, AutoGenObject):
         self._AutoGenObject = AutoGenObject
-        self._FileType = gMakeType
 
-    ## Create build file
+        MakePath = AutoGenObject.BuildOption.get('MAKE', {}).get('PATH')
+        if not MakePath:
+            self._FileType = ""
+        elif "nmake" in MakePath:
+            self._FileType = NMAKE_FILETYPE
+        else:
+            self._FileType = "gmake"
+
+        if sys.platform == "win32":
+            self._Platform = WIN32_PLATFORM
+        else:
+            self._Platform = POSIX_PLATFORM
+
+    ## Create build file.
     #
-    #   @param  FileType    Type of build file. Only nmake and gmake are supported now.
+    #  Only nmake and gmake are supported.
     #
-    #   @retval TRUE        The build file is created or re-created successfully
-    #   @retval FALSE       The build file exists and is the same as the one to be generated
+    #  @retval TRUE     The build file is created or re-created successfully.
+    #  @retval FALSE    The build file exists and is the same as the one to be generated.
     #
-    def Generate(self, FileType=gMakeType):
-        if FileType not in self._FILE_NAME_:
-            EdkLogger.error("build", PARAMETER_INVALID, "Invalid build type [%s]" % FileType,
-                            ExtraData="[%s]" % str(self._AutoGenObject))
-        self._FileType = FileType
+    def Generate(self):
         FileContent = self._TEMPLATE_.Replace(self._TemplateDict)
-        FileName = self._FILE_NAME_[FileType]
+        FileName = self.getMakefileName()
         if not os.path.exists(os.path.join(self._AutoGenObject.MakeFileDir, "deps.txt")):
             with open(os.path.join(self._AutoGenObject.MakeFileDir, "deps.txt"),"w+") as fd:
                 fd.write("")
@@ -203,7 +216,7 @@ class BuildFile(object):
     #   @retval     list        The directory creation command list
     #
     def GetCreateDirectoryCommand(self, DirList):
-        return [self._MD_TEMPLATE_[self._FileType] % {'dir':Dir} for Dir in DirList]
+        return [self._MD_TEMPLATE_[self._Platform] % {'dir':Dir} for Dir in DirList]
 
     ## Return a list of directory removal command string
     #
@@ -212,7 +225,7 @@ class BuildFile(object):
     #   @retval     list        The directory removal command list
     #
     def GetRemoveDirectoryCommand(self, DirList):
-        return [self._RD_TEMPLATE_[self._FileType] % {'dir':Dir} for Dir in DirList]
+        return [self._RD_TEMPLATE_[self._Platform] % {'dir':Dir} for Dir in DirList]
 
     def PlaceMacro(self, Path, MacroDefinitions=None):
         if Path.startswith("$("):
@@ -462,11 +475,8 @@ cleanlib:
     # Compose a dict object containing information used to do replacement in template
     @property
     def _TemplateDict(self):
-        if self._FileType not in self._SEP_:
-            EdkLogger.error("build", PARAMETER_INVALID, "Invalid Makefile type [%s]" % self._FileType,
-                            ExtraData="[%s]" % str(self._AutoGenObject))
         MyAgo = self._AutoGenObject
-        Separator = self._SEP_[self._FileType]
+        Separator = self._SEP_[self._Platform]
 
         # break build if no source files and binary files are found
         if len(MyAgo.SourceFileList) == 0 and len(MyAgo.BinaryFileList) == 0:
@@ -628,10 +638,10 @@ cleanlib:
 
         BcTargetList = []
 
-        MakefileName = self._FILE_NAME_[self._FileType]
+        MakefileName = self.getMakefileName()
         LibraryMakeCommandList = []
         for D in self.LibraryBuildDirectoryList:
-            Command = self._MAKE_TEMPLATE_[self._FileType] % {"file":os.path.join(D, MakefileName)}
+            Command = self._MAKE_TEMPLATE_[self._Platform] % {"file":os.path.join(D, MakefileName)}
             LibraryMakeCommandList.append(Command)
 
         package_rel_dir = MyAgo.SourceDir
@@ -683,8 +693,8 @@ cleanlib:
             "separator"                 : Separator,
             "module_tool_definitions"   : ToolsDef,
 
-            "shell_command_code"        : list(self._SHELL_CMD_[self._FileType].keys()),
-            "shell_command"             : list(self._SHELL_CMD_[self._FileType].values()),
+            "shell_command_code"        : list(self._SHELL_CMD_[self._Platform].keys()),
+            "shell_command"             : list(self._SHELL_CMD_[self._Platform].values()),
 
             "module_entry_point"        : ModuleEntryPoint,
             "image_entry_point"         : ImageEntryPoint,
@@ -721,7 +731,7 @@ cleanlib:
                         self.ResultFileList.append(Dst)
                     if '%s :' %(Dst) not in self.BuildTargetList:
                         self.BuildTargetList.append("%s : %s" %(Dst,Src))
-                        self.BuildTargetList.append('\t' + self._CP_TEMPLATE_[self._FileType] %{'Src': Src, 'Dst': Dst})
+                        self.BuildTargetList.append('\t' + self._CP_TEMPLATE_[self._Platform] %{'Src': Src, 'Dst': Dst})
 
             FfsCmdList = Cmd[0]
             for index, Str in enumerate(FfsCmdList):
@@ -1222,7 +1232,7 @@ ${BEGIN}\t-@${create_directory_command}\n${END}\
     # Compose a dict object containing information used to do replacement in template
     @property
     def _TemplateDict(self):
-        Separator = self._SEP_[self._FileType]
+        Separator = self._SEP_[self._Platform]
         MyAgo = self._AutoGenObject
         if self._FileType not in MyAgo.CustomMakefile:
             EdkLogger.error('build', OPTION_NOT_SUPPORTED, "No custom makefile for %s" % self._FileType,
@@ -1252,7 +1262,7 @@ ${BEGIN}\t-@${create_directory_command}\n${END}\
                     ToolsDef.append("%s_%s = %s" % (Tool, Attr, MyAgo.BuildOption[Tool][Attr]))
             ToolsDef.append("")
 
-        MakefileName = self._FILE_NAME_[self._FileType]
+        MakefileName = self.getMakefileName()
         MakefileTemplateDict = {
             "makefile_header"           : self._FILE_HEADER_[self._FileType],
             "makefile_path"             : os.path.join("$(MODULE_BUILD_DIR)", MakefileName),
@@ -1285,8 +1295,8 @@ ${BEGIN}\t-@${create_directory_command}\n${END}\
             "separator"                 : Separator,
             "module_tool_definitions"   : ToolsDef,
 
-            "shell_command_code"        : list(self._SHELL_CMD_[self._FileType].keys()),
-            "shell_command"             : list(self._SHELL_CMD_[self._FileType].values()),
+            "shell_command_code"        : list(self._SHELL_CMD_[self._Platform].keys()),
+            "shell_command"             : list(self._SHELL_CMD_[self._Platform].values()),
 
             "create_directory_command"  : self.GetCreateDirectoryCommand(self.IntermediateDirectoryList),
             "custom_makefile_content"   : CustomMakefile
@@ -1413,7 +1423,7 @@ cleanlib:
     # Compose a dict object containing information used to do replacement in template
     @property
     def _TemplateDict(self):
-        Separator = self._SEP_[self._FileType]
+        Separator = self._SEP_[self._Platform]
 
         MyAgo = self._AutoGenObject
         if "MAKE" not in MyAgo.ToolDefinition or "PATH" not in MyAgo.ToolDefinition["MAKE"]:
@@ -1424,13 +1434,13 @@ cleanlib:
         self.ModuleBuildDirectoryList = self.GetModuleBuildDirectoryList()
         self.LibraryBuildDirectoryList = self.GetLibraryBuildDirectoryList()
 
-        MakefileName = self._FILE_NAME_[self._FileType]
+        MakefileName = self.getMakefileName()
         LibraryMakefileList = []
         LibraryMakeCommandList = []
         for D in self.LibraryBuildDirectoryList:
             D = self.PlaceMacro(D, {"BUILD_DIR":MyAgo.BuildDir})
             Makefile = os.path.join(D, MakefileName)
-            Command = self._MAKE_TEMPLATE_[self._FileType] % {"file":Makefile}
+            Command = self._MAKE_TEMPLATE_[self._Platform] % {"file":Makefile}
             LibraryMakefileList.append(Makefile)
             LibraryMakeCommandList.append(Command)
         self.LibraryMakeCommandList = LibraryMakeCommandList
@@ -1440,7 +1450,7 @@ cleanlib:
         for D in self.ModuleBuildDirectoryList:
             D = self.PlaceMacro(D, {"BUILD_DIR":MyAgo.BuildDir})
             Makefile = os.path.join(D, MakefileName)
-            Command = self._MAKE_TEMPLATE_[self._FileType] % {"file":Makefile}
+            Command = self._MAKE_TEMPLATE_[self._Platform] % {"file":Makefile}
             ModuleMakefileList.append(Makefile)
             ModuleMakeCommandList.append(Command)
 
@@ -1460,8 +1470,8 @@ cleanlib:
 
             "toolchain_tag"             : MyAgo.ToolChain,
             "build_target"              : MyAgo.BuildTarget,
-            "shell_command_code"        : list(self._SHELL_CMD_[self._FileType].keys()),
-            "shell_command"             : list(self._SHELL_CMD_[self._FileType].values()),
+            "shell_command_code"        : list(self._SHELL_CMD_[self._Platform].keys()),
+            "shell_command"             : list(self._SHELL_CMD_[self._Platform].values()),
             "build_architecture_list"   : MyAgo.Arch,
             "architecture"              : MyAgo.Arch,
             "separator"                 : Separator,
@@ -1519,7 +1529,7 @@ class TopLevelMakefile(BuildFile):
     # Compose a dict object containing information used to do replacement in template
     @property
     def _TemplateDict(self):
-        Separator = self._SEP_[self._FileType]
+        Separator = self._SEP_[self._Platform]
 
         # any platform autogen object is ok because we just need common information
         MyAgo = self._AutoGenObject
@@ -1575,10 +1585,10 @@ class TopLevelMakefile(BuildFile):
             else:
                 ExtraOption += " --pcd " + pcdname + '=' + pcd[3]
 
-        MakefileName = self._FILE_NAME_[self._FileType]
+        MakefileName = self.getMakefileName()
         SubBuildCommandList = []
         for A in MyAgo.ArchList:
-            Command = self._MAKE_TEMPLATE_[self._FileType] % {"file":os.path.join("$(BUILD_DIR)", A, MakefileName)}
+            Command = self._MAKE_TEMPLATE_[self._Platform] % {"file":os.path.join("$(BUILD_DIR)", A, MakefileName)}
             SubBuildCommandList.append(Command)
 
         MakefileTemplateDict = {
@@ -1593,8 +1603,8 @@ class TopLevelMakefile(BuildFile):
 
             "toolchain_tag"             : MyAgo.ToolChain,
             "build_target"              : MyAgo.BuildTarget,
-            "shell_command_code"        : list(self._SHELL_CMD_[self._FileType].keys()),
-            "shell_command"             : list(self._SHELL_CMD_[self._FileType].values()),
+            "shell_command_code"        : list(self._SHELL_CMD_[self._Platform].keys()),
+            "shell_command"             : list(self._SHELL_CMD_[self._Platform].values()),
             'arch'                      : list(MyAgo.ArchList),
             "build_architecture_list"   : ','.join(MyAgo.ArchList),
             "separator"                 : Separator,
