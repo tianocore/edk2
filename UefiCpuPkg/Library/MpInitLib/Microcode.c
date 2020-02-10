@@ -620,109 +620,6 @@ OnExit:
 }
 
 /**
-  Shadow the required microcode patches data into memory according to FIT microcode entry.
-
-  @param[in, out]  CpuMpData    The pointer to CPU MP Data structure.
-
-  @return EFI_SUCCESS           Microcode patch is shadowed into memory.
-  @return EFI_UNSUPPORTED       FIT based microcode shadowing is not supported.
-  @return EFI_OUT_OF_RESOURCES  No enough memory resource.
-  @return EFI_NOT_FOUND         There is something wrong in FIT microcode entry.
-
-**/
-EFI_STATUS
-ShadowMicrocodePatchByFit (
-  IN OUT CPU_MP_DATA             *CpuMpData
-  )
-{
-  UINT64                            FitPointer;
-  FIRMWARE_INTERFACE_TABLE_ENTRY    *FitEntry;
-  UINT32                            EntryNum;
-  UINT32                            Index;
-  MICROCODE_PATCH_INFO              *PatchInfoBuffer;
-  UINTN                             MaxPatchNumber;
-  CPU_MICROCODE_HEADER              *MicrocodeEntryPoint;
-  UINTN                             PatchCount;
-  UINTN                             TotalSize;
-  UINTN                             TotalLoadSize;
-
-  if (!FeaturePcdGet (PcdCpuShadowMicrocodeByFit)) {
-    return EFI_UNSUPPORTED;
-  }
-
-  FitPointer = *(UINT64 *) (UINTN) FIT_POINTER_ADDRESS;
-  if ((FitPointer == 0) ||
-      (FitPointer == 0xFFFFFFFFFFFFFFFF) ||
-      (FitPointer == 0xEEEEEEEEEEEEEEEE)) {
-    //
-    // No FIT table.
-    //
-    ASSERT (FALSE);
-    return EFI_NOT_FOUND;
-  }
-  FitEntry = (FIRMWARE_INTERFACE_TABLE_ENTRY *) (UINTN) FitPointer;
-  if ((FitEntry[0].Type != FIT_TYPE_00_HEADER) ||
-      (FitEntry[0].Address != FIT_TYPE_00_SIGNATURE)) {
-    //
-    // Invalid FIT table, treat it as no FIT table.
-    //
-    ASSERT (FALSE);
-    return EFI_NOT_FOUND;
-  }
-
-  EntryNum = *(UINT32 *)(&FitEntry[0].Size[0]) & 0xFFFFFF;
-
-  //
-  // Calculate microcode entry number
-  //
-  MaxPatchNumber = 0;
-  for (Index = 0; Index < EntryNum; Index++) {
-    if (FitEntry[Index].Type == FIT_TYPE_01_MICROCODE) {
-      MaxPatchNumber++;
-    }
-  }
-  if (MaxPatchNumber == 0) {
-    return EFI_NOT_FOUND;
-  }
-
-  PatchInfoBuffer = AllocatePool (MaxPatchNumber * sizeof (MICROCODE_PATCH_INFO));
-  if (PatchInfoBuffer == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  //
-  // Fill up microcode patch info buffer according to FIT table.
-  //
-  PatchCount = 0;
-  TotalLoadSize = 0;
-  for (Index = 0; Index < EntryNum; Index++) {
-    if (FitEntry[Index].Type == FIT_TYPE_01_MICROCODE) {
-      MicrocodeEntryPoint = (CPU_MICROCODE_HEADER *) (UINTN) FitEntry[Index].Address;
-      TotalSize = (MicrocodeEntryPoint->DataSize == 0) ? 2048 : MicrocodeEntryPoint->TotalSize;
-      if (IsMicrocodePatchNeedLoad (CpuMpData, MicrocodeEntryPoint)) {
-        PatchInfoBuffer[PatchCount].Address     = (UINTN) MicrocodeEntryPoint;
-        PatchInfoBuffer[PatchCount].Size        = TotalSize;
-        TotalLoadSize += TotalSize;
-        PatchCount++;
-      }
-    }
-  }
-
-  if (PatchCount != 0) {
-    DEBUG ((
-      DEBUG_INFO,
-      "%a: 0x%x microcode patches will be loaded into memory, with size 0x%x.\n",
-      __FUNCTION__, PatchCount, TotalLoadSize
-      ));
-
-    ShadowMicrocodePatchWorker (CpuMpData, PatchInfoBuffer, PatchCount, TotalLoadSize);
-  }
-
-  FreePool (PatchInfoBuffer);
-  return EFI_SUCCESS;
-}
-
-/**
   Shadow the required microcode patches data into memory.
 
   @param[in, out]  CpuMpData    The pointer to CPU MP Data structure.
@@ -734,7 +631,7 @@ ShadowMicrocodeUpdatePatch (
 {
   EFI_STATUS     Status;
 
-  Status = ShadowMicrocodePatchByFit (CpuMpData);
+  Status = PlatformShadowMicrocode (CpuMpData);
   if (EFI_ERROR (Status)) {
     ShadowMicrocodePatchByPcd (CpuMpData);
   }

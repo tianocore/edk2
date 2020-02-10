@@ -60,7 +60,9 @@
   gUefiCpuPkgTokenSpaceGuid.PcdCpuMicrocodePatchRegionSize         ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuApLoopMode                       ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuApTargetCstate                   ## SOMETIMES_CONSUMES
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuShadowMicrocodeByFit             ## CONSUMES
+
+[Ppis]
+  gEdkiiPeiShadowMicrocodePpiGuid        ## SOMETIMES_CONSUMES
 
 [Guids]
   gEdkiiS3SmmInitDoneGuid
