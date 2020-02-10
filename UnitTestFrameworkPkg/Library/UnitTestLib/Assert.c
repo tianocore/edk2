@@ -247,7 +247,7 @@ UnitTestAssertEqual (
   IN CONST CHAR8  *DescriptionB
   )
 {
-  if ((ValueA != ValueB)) {
+  if (ValueA != ValueB) {
     UnitTestLogFailure (
       FAILURETYPE_ASSERTEQUAL,
       "%a::%d Value %a != %a (%d != %d)!\n",
@@ -365,7 +365,7 @@ UnitTestAssertNotEqual (
   IN CONST CHAR8  *DescriptionB
   )
 {
-  if ((ValueA == ValueB)) {
+  if (ValueA == ValueB) {
     UnitTestLogFailure (
       FAILURETYPE_ASSERTNOTEQUAL,
       "%a::%d Value %a == %a (%d == %d)!\n",
@@ -420,7 +420,7 @@ UnitTestAssertStatusEqual (
   IN CONST CHAR8  *Description
   )
 {
-  if ((Status != Expected)) {
+  if (Status != Expected) {
     UnitTestLogFailure (
       FAILURETYPE_ASSERTSTATUSEQUAL,
       "%a::%d Status '%a' is %r, should be %r!\n",
