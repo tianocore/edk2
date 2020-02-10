@@ -136,7 +136,7 @@ UnitTestLogInit (
     return;
   }
 
-  if((Buffer != NULL) && (BufferSize > 0) && ((BufferSize <= UNIT_TEST_MAX_LOG_BUFFER))) {
+  if((Buffer != NULL) && (BufferSize > 0) && (BufferSize <= UNIT_TEST_MAX_LOG_BUFFER)) {
     CopyMem (Test->Log, Buffer, BufferSize);
   }
 }
