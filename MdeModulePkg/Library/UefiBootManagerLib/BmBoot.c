@@ -2103,6 +2103,322 @@ BmMatchPartitionDevicePathNode (
 }
 
 /**
+  Get the headers (dos, image, optional header) from an image
+
+  @param  Device                SimpleFileSystem device handle
+  @param  FileName              File name for the image
+  @param  DosHeader             Pointer to dos header
+  @param  Hdr                   The buffer in which to return the PE32, PE32+, or TE header.
+
+  @retval EFI_SUCCESS           Successfully get the machine type.
+  @retval EFI_NOT_FOUND         The file is not found.
+  @retval EFI_LOAD_ERROR        File is not a valid image file.
+
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+BdsLibGetImageHeader (
+  IN  EFI_HANDLE                  Device,
+  IN  CHAR16                      *FileName,
+  OUT EFI_IMAGE_DOS_HEADER        *DosHeader,
+  OUT EFI_IMAGE_OPTIONAL_HEADER_PTR_UNION   Hdr
+  )
+{
+  EFI_STATUS                       Status;
+  EFI_SIMPLE_FILE_SYSTEM_PROTOCOL  *Volume;
+  EFI_FILE_HANDLE                  Root;
+  EFI_FILE_HANDLE                  ThisFile;
+  UINTN                            BufferSize;
+  UINT64                           FileSize;
+  EFI_FILE_INFO                    *Info;
+
+  Root     = NULL;
+  ThisFile = NULL;
+  //
+  // Handle the file system interface to the device
+  //
+  Status = gBS->HandleProtocol (
+                  Device,
+                  &gEfiSimpleFileSystemProtocolGuid,
+                  (VOID *) &Volume
+                  );
+  if (EFI_ERROR (Status)) {
+    goto Done;
+  }
+
+  Status = Volume->OpenVolume (
+                     Volume,
+                     &Root
+                     );
+  if (EFI_ERROR (Status)) {
+    Root = NULL;
+    goto Done;
+  }
+  ASSERT (Root != NULL);
+  Status = Root->Open (Root, &ThisFile, FileName, EFI_FILE_MODE_READ, 0);
+  if (EFI_ERROR (Status)) {
+    goto Done;
+  }
+  ASSERT (ThisFile != NULL);
+
+  //
+  // Get file size
+  //
+  BufferSize  = SIZE_OF_EFI_FILE_INFO + 200;
+  do {
+    Info   = NULL;
+    Status = gBS->AllocatePool (EfiBootServicesData, BufferSize, (VOID **) &Info);
+    if (EFI_ERROR (Status)) {
+      goto Done;
+    }
+    Status = ThisFile->GetInfo (
+                         ThisFile,
+                         &gEfiFileInfoGuid,
+                         &BufferSize,
+                         Info
+                         );
+    if (!EFI_ERROR (Status)) {
+      break;
+    }
+    if (Status != EFI_BUFFER_TOO_SMALL) {
+      FreePool (Info);
+      goto Done;
+    }
+    FreePool (Info);
+  } while (TRUE);
+
+  FileSize = Info->FileSize;
+  FreePool (Info);
+
+  //
+  // Read dos header
+  //
+  BufferSize = sizeof (EFI_IMAGE_DOS_HEADER);
+  Status = ThisFile->Read (ThisFile, &BufferSize, DosHeader);
+  if (EFI_ERROR (Status) ||
+      BufferSize < sizeof (EFI_IMAGE_DOS_HEADER) ||
+      FileSize <= DosHeader->e_lfanew ||
+      DosHeader->e_magic != EFI_IMAGE_DOS_SIGNATURE) {
+    Status = EFI_LOAD_ERROR;
+    goto Done;
+  }
+
+  //
+  // Move to PE signature
+  //
+  Status = ThisFile->SetPosition (ThisFile, DosHeader->e_lfanew);
+  if (EFI_ERROR (Status)) {
+    Status = EFI_LOAD_ERROR;
+    goto Done;
+  }
+
+  //
+  // Read and check PE signature
+  //
+  BufferSize = sizeof (EFI_IMAGE_OPTIONAL_HEADER_UNION);
+  Status = ThisFile->Read (ThisFile, &BufferSize, Hdr.Pe32);
+  if (EFI_ERROR (Status) ||
+      BufferSize < sizeof (EFI_IMAGE_OPTIONAL_HEADER_UNION) ||
+      Hdr.Pe32->Signature != EFI_IMAGE_NT_SIGNATURE) {
+    Status = EFI_LOAD_ERROR;
+    goto Done;
+  }
+
+  //
+  // Check PE32 or PE32+ magic
+  //
+  if (Hdr.Pe32->OptionalHeader.Magic != EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC &&
+      Hdr.Pe32->OptionalHeader.Magic != EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC) {
+    Status = EFI_LOAD_ERROR;
+    goto Done;
+  }
+
+ Done:
+  if (ThisFile != NULL) {
+    ThisFile->Close (ThisFile);
+  }
+  if (Root != NULL) {
+    Root->Close (Root);
+  }
+  return Status;
+}
+
+/**
+  Return the bootable media handle.
+  First, check the device is connected
+  Second, check whether the device path point to a device which support SimpleFileSystemProtocol,
+  Third, detect the the default boot file in the Media, and return the removable Media handle.
+
+  @param  DevicePath  Device Path to a  bootable device
+
+  @return  The bootable media handle. If the media on the DevicePath is not bootable, NULL will return.
+
+**/
+EFI_HANDLE
+EFIAPI
+BdsLibGetBootableHandle (
+  IN  EFI_DEVICE_PATH_PROTOCOL      *DevicePath
+  )
+{
+  EFI_STATUS                      Status;
+  EFI_TPL                         OldTpl;
+  EFI_DEVICE_PATH_PROTOCOL        *UpdatedDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL        *DupDevicePath;
+  EFI_HANDLE                      Handle;
+  EFI_BLOCK_IO_PROTOCOL           *BlockIo;
+  VOID                            *Buffer;
+  EFI_DEVICE_PATH_PROTOCOL        *TempDevicePath;
+  UINTN                           Size;
+  UINTN                           TempSize;
+  EFI_HANDLE                      ReturnHandle;
+  EFI_HANDLE                      *SimpleFileSystemHandles;
+
+  UINTN                           NumberSimpleFileSystemHandles;
+  UINTN                           Index;
+  EFI_IMAGE_DOS_HEADER            DosHeader;
+  EFI_IMAGE_OPTIONAL_HEADER_UNION       HdrData;
+  EFI_IMAGE_OPTIONAL_HEADER_PTR_UNION   Hdr;
+
+  UpdatedDevicePath = DevicePath;
+
+  //
+  // Enter to critical section to protect the acquired BlockIo instance
+  // from getting released due to the USB mass storage hotplug event
+  //
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
+
+  //
+  // Check whether the device is connected
+  //
+  Status = gBS->LocateDevicePath (&gEfiBlockIoProtocolGuid, &UpdatedDevicePath, &Handle);
+  if (EFI_ERROR (Status)) {
+    //
+    // Skip the case that the boot option point to a simple file protocol which does not consume block Io protocol,
+    //
+    Status = gBS->LocateDevicePath (&gEfiSimpleFileSystemProtocolGuid, &UpdatedDevicePath, &Handle);
+    if (EFI_ERROR (Status)) {
+      //
+      // Fail to find the proper BlockIo and simple file protocol, maybe because device not present, we need to connect it firstly
+      //
+      UpdatedDevicePath = DevicePath;
+      Status            = gBS->LocateDevicePath (&gEfiDevicePathProtocolGuid, &UpdatedDevicePath, &Handle);
+      gBS->ConnectController (Handle, NULL, NULL, TRUE);
+    }
+  } else {
+    //
+    // For removable device boot option, its contained device path only point to the removable device handle,
+    // should make sure all its children handles (its child partion or media handles) are created and connected.
+    //
+    gBS->ConnectController (Handle, NULL, NULL, TRUE);
+    //
+    // Get BlockIo protocol and check removable attribute
+    //
+    Status = gBS->HandleProtocol (Handle, &gEfiBlockIoProtocolGuid, (VOID **)&BlockIo);
+    ASSERT_EFI_ERROR (Status);
+
+    //
+    // Issue a dummy read to the device to check for media change.
+    // When the removable media is changed, any Block IO read/write will
+    // cause the BlockIo protocol be reinstalled and EFI_MEDIA_CHANGED is
+    // returned. After the Block IO protocol is reinstalled, subsequent
+    // Block IO read/write will success.
+    //
+    Buffer = AllocatePool (BlockIo->Media->BlockSize);
+    if (Buffer != NULL) {
+      BlockIo->ReadBlocks (
+               BlockIo,
+               BlockIo->Media->MediaId,
+               0,
+               BlockIo->Media->BlockSize,
+               Buffer
+               );
+      FreePool(Buffer);
+    }
+  }
+
+  //
+  // Detect the the default boot file from removable Media
+  //
+
+  //
+  // If fail to get bootable handle specified by a USB boot option, the BDS should try to find other bootable device in the same USB bus
+  // Try to locate the USB node device path first, if fail then use its previous PCI node to search
+  //
+  DupDevicePath = DuplicateDevicePath (DevicePath);
+  ASSERT (DupDevicePath != NULL);
+
+  UpdatedDevicePath = DupDevicePath;
+  Status = gBS->LocateDevicePath (&gEfiDevicePathProtocolGuid, &UpdatedDevicePath, &Handle);
+  //
+  // if the resulting device path point to a usb node, and the usb node is a dummy node, should only let device path only point to the previous Pci node
+  // Acpi()/Pci()/Usb() --> Acpi()/Pci()
+  //
+  if ((DevicePathType (UpdatedDevicePath) == MESSAGING_DEVICE_PATH) &&
+      (DevicePathSubType (UpdatedDevicePath) == MSG_USB_DP)) {
+    //
+    // Remove the usb node, let the device path only point to PCI node
+    //
+    SetDevicePathEndNode (UpdatedDevicePath);
+    UpdatedDevicePath = DupDevicePath;
+  } else {
+    UpdatedDevicePath = DevicePath;
+  }
+
+  //
+  // Get the device path size of boot option
+  //
+  Size = GetDevicePathSize(UpdatedDevicePath) - sizeof (EFI_DEVICE_PATH_PROTOCOL); // minus the end node
+  ReturnHandle = NULL;
+  gBS->LocateHandleBuffer (
+      ByProtocol,
+      &gEfiSimpleFileSystemProtocolGuid,
+      NULL,
+      &NumberSimpleFileSystemHandles,
+      &SimpleFileSystemHandles
+      );
+  for (Index = 0; Index < NumberSimpleFileSystemHandles; Index++) {
+    //
+    // Get the device path size of SimpleFileSystem handle
+    //
+    TempDevicePath = DevicePathFromHandle (SimpleFileSystemHandles[Index]);
+    TempSize = GetDevicePathSize (TempDevicePath)- sizeof (EFI_DEVICE_PATH_PROTOCOL); // minus the end node
+    //
+    // Check whether the device path of boot option is part of the  SimpleFileSystem handle's device path
+    //
+    if (Size <= TempSize && CompareMem (TempDevicePath, UpdatedDevicePath, Size)==0) {
+      //
+      // Load the default boot file \EFI\BOOT\boot{machinename}.EFI from removable Media
+      //  machinename is ia32, ia64, x64, ...
+      //
+      Hdr.Union = &HdrData;
+      Status = BdsLibGetImageHeader (
+                 SimpleFileSystemHandles[Index],
+                 EFI_REMOVABLE_MEDIA_FILE_NAME,
+                 &DosHeader,
+                 Hdr
+                 );
+      if (!EFI_ERROR (Status) &&
+        EFI_IMAGE_MACHINE_TYPE_SUPPORTED (Hdr.Pe32->FileHeader.Machine) &&
+        Hdr.Pe32->OptionalHeader.Subsystem == EFI_IMAGE_SUBSYSTEM_EFI_APPLICATION) {
+        ReturnHandle = SimpleFileSystemHandles[Index];
+        break;
+      }
+    }
+  }
+
+  FreePool(DupDevicePath);
+
+  if (SimpleFileSystemHandles != NULL) {
+    FreePool(SimpleFileSystemHandles);
+  }
+
+  gBS->RestoreTPL (OldTpl);
+
+  return ReturnHandle;
+}
+
+/**
   Emuerate all possible bootable medias in the following order:
   1. Removable BlockIo            - The boot option only points to the removable media
                                     device, like USB key, DVD, Floppy etc.
@@ -2132,6 +2448,7 @@ BmEnumerateBootOptions (
   UINTN                                 Removable;
   UINTN                                 Index;
   CHAR16                                *Description;
+  EFI_DEVICE_PATH_PROTOCOL              *DevicePath;
 
   ASSERT (BootOptionCount != NULL);
 
@@ -2165,6 +2482,12 @@ BmEnumerateBootOptions (
       //
       if (BlkIo->Media->LogicalPartition) {
         continue;
+      }
+
+      // Skip devices that do not have an EFI volume
+      DevicePath = DevicePathFromHandle (Handles[Index]);
+      if (BdsLibGetBootableHandle (DevicePath) == NULL) {
+          continue;
       }
 
       //
