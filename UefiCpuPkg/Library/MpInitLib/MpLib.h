@@ -31,9 +31,6 @@
 
 #include <Guid/MicrocodePatchHob.h>
 
-#include <IndustryStandard/FirmwareInterfaceTable.h>
-
-
 #define WAKEUP_AP_SIGNAL SIGNATURE_32 ('S', 'T', 'A', 'P')
 
 #define CPU_INIT_MP_LIB_HOB_GUID \
@@ -655,6 +652,22 @@ EFI_STATUS
 GetProcessorNumber (
   IN CPU_MP_DATA               *CpuMpData,
   OUT UINTN                    *ProcessorNumber
+  );
+
+/**
+  This funtion will try to invoke platform specific microcode shadow logic to
+  relocate microcode update patches into memory.
+
+  @param[in] CpuMpData  The pointer to CPU MP Data structure.
+
+  @retval EFI_SUCCESS              Shadow microcode success.
+  @retval EFI_OUT_OF_RESOURCES     No enough resource to complete the operation.
+  @retval EFI_UNSUPPORTED          Can't find platform specific microcode shadow
+                                   PPI/Protocol.
+**/
+EFI_STATUS
+PlatformShadowMicrocode (
+  IN OUT CPU_MP_DATA             *CpuMpData
   );
 
 #endif
