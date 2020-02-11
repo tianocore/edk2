@@ -1,7 +1,7 @@
 ## @file  UefiCpuPkg.dec
 # This Package provides UEFI compatible CPU modules and libraries.
 #
-# Copyright (c) 2007 - 2019, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2020, Intel Corporation. All rights reserved.<BR>
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -81,6 +81,9 @@
 [Ppis]
   gEdkiiPeiMpServices2PpiGuid =    { 0x5cb9cb3d, 0x31a4, 0x480c, { 0x94, 0x98, 0x29, 0xd2, 0x69, 0xba, 0xcf, 0xba}}
 
+  ## Include/Ppi/ShadowMicrocode.h
+  gEdkiiPeiShadowMicrocodePpiGuid = { 0x430f6965, 0x9a69, 0x41c5, { 0x93, 0xed, 0x8b, 0xf0, 0x64, 0x35, 0xc1, 0xc6 }}
+
 [PcdsFeatureFlag]
   ## Indicates if SMM Profile will be enabled.
   #  If enabled, instruction executions in and data accesses to memory outside of SMRAM will be logged.
@@ -138,12 +141,6 @@
   #   FALSE - SMM Feature Control MSR will not be locked.<BR>
   # @Prompt Lock SMM Feature Control MSR.
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmFeatureControlMsrLock|TRUE|BOOLEAN|0x3213210B
-
-  ## Indicates if FIT based microcode shadowing will be enabled.<BR><BR>
-  #   TRUE  - FIT base microcode shadowing will be enabled.<BR>
-  #   FALSE - FIT base microcode shadowing will be disabled.<BR>
-  # @Prompt FIT based microcode shadowing.
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuShadowMicrocodeByFit|FALSE|BOOLEAN|0x3213210D
 
 [PcdsFixedAtBuild]
   ## List of exception vectors which need switching stack.
