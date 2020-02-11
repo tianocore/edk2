@@ -21,4 +21,5 @@
 #string STR_BM_BANNER                  #language en-US  "One Time Boot"
 #string STR_BOOT_MANAGER_HELP          #language en-US  "Boot an entry one time"
 #string STR_ANY_KEY_CONTINUE           #language en-US  "Press any key to continue..."
+#string STR_NO_BOOTABLE_MEDIA          #language en-US  "No bootable media found"
 #string STR_EMPTY_STRING               #language en-US  ""
