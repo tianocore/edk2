@@ -3380,14 +3380,14 @@ SafeUint64Mult (
       //
       // a * d must be less than 2^32 or there would be bits set in the high 64-bits
       //
-      ProductAD = (((UINT64)DwordA) *(UINT64)DwordD);
+      ProductAD = MultU64x64 ((UINT64)DwordA, (UINT64)DwordD);
       if ((ProductAD & 0xffffffff00000000) == 0) {
         DwordB = (UINT32)Multiplicand;
 
         //
         // b * c must be less than 2^32 or there would be bits set in the high 64-bits
         //
-        ProductBC = (((UINT64)DwordB) *(UINT64)DwordC);
+        ProductBC = MultU64x64 ((UINT64)DwordB, (UINT64)DwordC);
         if ((ProductBC & 0xffffffff00000000) == 0) {
           //
           // now sum them all up checking for overflow.
@@ -3397,7 +3397,7 @@ SafeUint64Mult (
             //
             // b * d
             //
-            ProductBD = (((UINT64)DwordB) *(UINT64)DwordD);
+            ProductBD = MultU64x64 ((UINT64)DwordB, (UINT64)DwordD);
 
             if (!RETURN_ERROR (SafeUint64Add (UnsignedResult, ProductBD, &UnsignedResult))) {
               *Result = UnsignedResult;
