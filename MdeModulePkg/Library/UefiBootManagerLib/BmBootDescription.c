@@ -179,15 +179,15 @@ BmGetDescriptionFromDiskInfo (
       }
 
       Length = Index;
-      Description[Length++] = L' ';
+      //Description[Length++] = L' ';
 
-      for (Index = 0; Index + 1 < SerialNumberLength; Index += 2) {
-        Description[Length + Index]     = (CHAR16) IdentifyData.SerialNo[Index + 1];
-        Description[Length + Index + 1] = (CHAR16) IdentifyData.SerialNo[Index];
-      }
-      Length += Index;
+      //for (Index = 0; Index + 1 < SerialNumberLength; Index += 2) {
+      //  Description[Length + Index]     = (CHAR16) IdentifyData.SerialNo[Index + 1];
+      //  Description[Length + Index + 1] = (CHAR16) IdentifyData.SerialNo[Index];
+      //}
+      //Length += Index;
       Description[Length++] = L'\0';
-      ASSERT (Length == ModelNameLength + SerialNumberLength + 2);
+      //ASSERT (Length == ModelNameLength + SerialNumberLength + 2);
 
       BmEliminateExtraSpaces (Description);
     }
@@ -309,15 +309,16 @@ BmGetUsbDescription (
     Product = &NullChar;
   }
 
-  Status = UsbIo->UsbGetStringDescriptor (
-                    UsbIo,
-                    mBmUsbLangId,
-                    DevDesc.StrSerialNumber,
-                    &SerialNumber
-                    );
-  if (EFI_ERROR (Status)) {
-    SerialNumber = &NullChar;
-  }
+  //Status = UsbIo->UsbGetStringDescriptor (
+  //                  UsbIo,
+  //                  mBmUsbLangId,
+  //                  DevDesc.StrSerialNumber,
+  //                  &SerialNumber
+  //                  );
+  //if (EFI_ERROR (Status)) {
+  //  SerialNumber = &NullChar;
+  //}
+  SerialNumber = &NullChar;
 
   if ((Manufacturer == &NullChar) &&
       (Product == &NullChar) &&
@@ -630,15 +631,15 @@ BmGetNvmeDescription (
     for (Index = 0; Index < ARRAY_SIZE (ControllerData.Mn); Index++) {
       *(Char++) = (CHAR16) ControllerData.Mn[Index];
     }
-    *(Char++) = L' ';
-    for (Index = 0; Index < ARRAY_SIZE (ControllerData.Sn); Index++) {
-      *(Char++) = (CHAR16) ControllerData.Sn[Index];
-    }
-    *(Char++) = L' ';
-    UnicodeValueToStringS (
-      Char, sizeof (CHAR16) * (MAXIMUM_VALUE_CHARACTERS + 1),
-      0, DevicePath.NvmeNamespace->NamespaceId, 0
-      );
+    //*(Char++) = L' ';
+    //for (Index = 0; Index < ARRAY_SIZE (ControllerData.Sn); Index++) {
+    //  *(Char++) = (CHAR16) ControllerData.Sn[Index];
+    //}
+    //*(Char++) = L' ';
+    //UnicodeValueToStringS (
+    //  Char, sizeof (CHAR16) * (MAXIMUM_VALUE_CHARACTERS + 1),
+    //  0, DevicePath.NvmeNamespace->NamespaceId, 0
+    //  );
     BmEliminateExtraSpaces (Description);
   }
 
