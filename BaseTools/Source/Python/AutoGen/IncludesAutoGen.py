@@ -111,6 +111,8 @@ class IncludesAutoGen():
                         continue
                     dependency_file = item.strip(" \\\n")
                     dependency_file = dependency_file.strip('''"''')
+                    if dependency_file == '':
+                        continue
                     if os.path.normpath(dependency_file +".deps") == abspath:
                         continue
                     filename = os.path.basename(dependency_file).strip()
