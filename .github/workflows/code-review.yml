@@ -31,3 +31,15 @@ jobs:
         architecture: 'x64'
     - name: PatchCheck
       run: python BaseTools/Scripts/PatchCheck.py ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}
+    - name: Send mail
+      uses: dawidd6/action-send-mail@master
+      with:
+        server_address: smtp.gmail.com
+        server_port: 465
+        username: ${{secrets.MAIL_USERNAME}}
+        password: ${{secrets.MAIL_PASSWORD}}
+        subject: edk2: Create Pull Request
+        body: Create pull request on ${{github.repository}}
+        to: ${{secrets.GROUPS_IO_EDK2_CODE_REVIEW_EMAIL_ADDRESS}}
+        from: TianoCoreGitHubActionsBot
+        content_type: text/html
