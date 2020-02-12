@@ -2042,7 +2042,7 @@ class FdReport(object):
         self.VPDBaseAddress = 0
         self.VPDSize = 0
         for index, FdRegion in enumerate(Fd.RegionList):
-            if str(FdRegion.RegionType) is 'FILE' and Wa.Platform.VpdToolGuid in str(FdRegion.RegionDataList):
+            if str(FdRegion.RegionType) == 'FILE' and Wa.Platform.VpdToolGuid in str(FdRegion.RegionDataList):
                 self.VPDBaseAddress = self.FdRegionList[index].BaseAddress
                 self.VPDSize = self.FdRegionList[index].Size
                 break
