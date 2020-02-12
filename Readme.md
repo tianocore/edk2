@@ -58,7 +58,7 @@ The majority of the content in the EDK II open source project uses a
 [BSD-2-Clause Plus Patent License](License.txt).  The EDK II open source project
 contains the following components that are covered by additional licenses:
 * [BaseTools/Source/C/BrotliCompress](BaseTools/Source/C/BrotliCompress/LICENSE)
-* [MdeModulePkg/Library/BrotliCustomDecompressLib](MdeModulePkg/Library/BrotliCustomDecompressLib/LICENSE)
+* [MdeModulePkg/Library/BrotliCustomDecompressLib/brotli](https://github.com/google/brotli/blob/master/LICENSE)
 * [BaseTools/Source/C/LzmaCompress](BaseTools/Source/C/LzmaCompress/LZMA-SDK-README.txt)
 * [MdeModulePkg/Library/LzmaCustomDecompressLib](MdeModulePkg/Library/LzmaCustomDecompressLib/LZMA-SDK-README.txt)
 * [IntelFrameworkModulePkg/Library/LzmaCustomDecompressLib/Sdk](IntelFrameworkModulePkg/Library/LzmaCustomDecompressLib/LZMA-SDK-README.txt)
@@ -200,6 +200,7 @@ as possible as we can. Currently EDK II contains the following submodules
 - CryptoPkg/Library/OpensslLib/openssl
 - ArmPkg/Library/ArmSoftFloatLib/berkeley-softfloat-3
 - MdeModulePkg/Universal/RegularExpressionDxe/oniguruma
+- MdeModulePkg/Library/BrotliCustomDecompressLib/brotli
 
 ArmSoftFloatLib is actually required by OpensslLib. It's inevitable
 in openssl-1.1.1 (since stable201905) for floating point parameter

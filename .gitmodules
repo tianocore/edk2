@@ -10,3 +10,6 @@
 [submodule "MdeModulePkg/Universal/RegularExpressionDxe/oniguruma"]
 	path = MdeModulePkg/Universal/RegularExpressionDxe/oniguruma
 	url = https://github.com/kkos/oniguruma
+[submodule "MdeModulePkg/Library/BrotliCustomDecompressLib/brotli"]
+	path = MdeModulePkg/Library/BrotliCustomDecompressLib/brotli
+	url = https://github.com/google/brotli
