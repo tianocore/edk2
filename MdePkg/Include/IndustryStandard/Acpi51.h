@@ -4,6 +4,7 @@
   Copyright (c) 2014 Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
+  Copyright (c) 2020, ARM Ltd. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
@@ -2077,6 +2078,11 @@ typedef struct {
 /// "MSDM" MS Data Management Table
 ///
 #define EFI_ACPI_5_1_DATA_MANAGEMENT_TABLE_SIGNATURE  SIGNATURE_32('M', 'S', 'D', 'M')
+
+///
+/// "PCCT" Platform Communications Channel Table
+///
+#define EFI_ACPI_5_1_PLATFORM_COMMUNICATIONS_CHANNEL_TABLE_SIGNATURE  SIGNATURE_32('P', 'C', 'C', 'T')
 
 ///
 /// "SLIC" MS Software Licensing Table Specification
