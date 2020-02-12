@@ -4,7 +4,7 @@
 #  It is based on the Brotli v0.5.2.
 #  Brotli was released on the website https://github.com/google/brotli.
 #
-#  Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2017 - 2020, Intel Corporation. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -29,27 +29,35 @@
 
 [Sources]
   GuidedSectionExtraction.c
+  BrotliDecUefiSupport.c
+  BrotliDecUefiSupport.h
   BrotliDecompress.c
   BrotliDecompressLibInternal.h
-  common/dictionary.c
-  common/transform.c
-  dec/bit_reader.c
-  dec/decode.c
-  dec/huffman.c
-  dec/state.c
-  brotli/decode.h
-  brotli/port.h
-  brotli/types.h
-  common/constants.h
-  common/context.h
-  common/dictionary.h
-  common/platform.h
-  common/transform.h
-  common/version.h
-  dec/bit_reader.h
-  dec/huffman.h
-  dec/state.h
-  dec/prefix.h
+  # Wrapper header files start #
+  stddef.h
+  stdint.h
+  stdlib.h
+  string.h
+  # Wrapper header files end #
+  brotli/c/common/dictionary.c
+  brotli/c/common/transform.c
+  brotli/c/dec/bit_reader.c
+  brotli/c/dec/decode.c
+  brotli/c/dec/huffman.c
+  brotli/c/dec/state.c
+  brotli/c/include/brotli/decode.h
+  brotli/c/include/brotli/port.h
+  brotli/c/include/brotli/types.h
+  brotli/c/common/constants.h
+  brotli/c/common/context.h
+  brotli/c/common/dictionary.h
+  brotli/c/common/platform.h
+  brotli/c/common/transform.h
+  brotli/c/common/version.h
+  brotli/c/dec/bit_reader.h
+  brotli/c/dec/huffman.h
+  brotli/c/dec/state.h
+  brotli/c/dec/prefix.h
 
 [Packages]
   MdePkg/MdePkg.dec
