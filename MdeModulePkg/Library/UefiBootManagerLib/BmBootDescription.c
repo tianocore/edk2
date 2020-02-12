@@ -15,7 +15,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define PRODUCT_IDENTIFICATION_LENGTH    16
 
 CONST UINT16 mBmUsbLangId    = 0x0409; // English
-CHAR16       mBmUefiPrefix[] = L"UEFI ";
+//CHAR16       mBmUefiPrefix[] = L"UEFI ";
 
 LIST_ENTRY mPlatformBootDescriptionHandlers = INITIALIZE_LIST_HEAD_VARIABLE (mPlatformBootDescriptionHandlers);
 
@@ -785,10 +785,12 @@ BmGetBootDescription (
       // Avoid description confusion between UEFI & Legacy boot option by adding "UEFI " prefix
       // ONLY for core provided boot description handler.
       //
-      Temp = AllocatePool (StrSize (DefaultDescription) + sizeof (mBmUefiPrefix));
+      //Temp = AllocatePool (StrSize (DefaultDescription) + sizeof (mBmUefiPrefix));
+      Temp = AllocatePool (StrSize (DefaultDescription));
       ASSERT (Temp != NULL);
-      StrCpyS (Temp, (StrSize (DefaultDescription) + sizeof (mBmUefiPrefix)) / sizeof (CHAR16), mBmUefiPrefix);
-      StrCatS (Temp, (StrSize (DefaultDescription) + sizeof (mBmUefiPrefix)) / sizeof (CHAR16), DefaultDescription);
+      //StrCpyS (Temp, (StrSize (DefaultDescription) + sizeof (mBmUefiPrefix)) / sizeof (CHAR16), mBmUefiPrefix);
+      //StrCatS (Temp, (StrSize (DefaultDescription) + sizeof (mBmUefiPrefix)) / sizeof (CHAR16), DefaultDescription);
+      StrCpyS (Temp, StrSize (DefaultDescription) / sizeof (CHAR16), DefaultDescription);
       FreePool (DefaultDescription);
       DefaultDescription = Temp;
       break;
