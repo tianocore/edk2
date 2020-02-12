@@ -7,3 +7,6 @@
 [submodule "UnitTestFrameworkPkg/Library/CmockaLib/cmocka"]
 	path = UnitTestFrameworkPkg/Library/CmockaLib/cmocka
 	url = https://git.cryptomilk.org/projects/cmocka.git
+[submodule "MdeModulePkg/Library/BrotliCustomDecompressLib/brotli"]
+	path = MdeModulePkg/Library/BrotliCustomDecompressLib/brotli
+	url = https://github.com/google/brotli
