@@ -772,7 +772,7 @@ Tcg2GetEventLog (
   return EFI_SUCCESS;
 }
 
-/*
+/**
   Return if this is a Tcg800155PlatformIdEvent.
 
   @param[in]      NewEventHdr         Pointer to a TCG_PCR_EVENT_HDR/TCG_PCR_EVENT_EX data structure.
@@ -783,7 +783,7 @@ Tcg2GetEventLog (
   @retval TRUE   This is a Tcg800155PlatformIdEvent.
   @retval FALSE  This is NOT a Tcg800155PlatformIdEvent.
 
-*/
+**/
 BOOLEAN
 Is800155Event (
   IN      VOID                      *NewEventHdr,
