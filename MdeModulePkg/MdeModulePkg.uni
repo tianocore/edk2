@@ -1314,3 +1314,7 @@
                                                                                     "when the PCD is TRUE but CPU doesn't support 5-Level Paging."
                                                                                     " TRUE  - 5-Level Paging will be enabled."
                                                                                     " FALSE - 5-Level Paging will not be enabled."
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdTcgPfpMeasurementRevision_PROMPT #language en-US "TCG Platform Firmware Profile revision"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdTcgPfpMeasurementRevision_HELP #language en-US "Indicates which TCG Platform Firmware Profile revision the EDKII firmware follows."
