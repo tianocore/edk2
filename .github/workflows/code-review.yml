@@ -32,14 +32,7 @@ jobs:
     - name: PatchCheck
       run: python BaseTools/Scripts/PatchCheck.py ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}
     - name: Send mail
-      uses: dawidd6/action-send-mail@master
-      with:
-        server_address: smtp.gmail.com
-        server_port: 465
-        username: ${{secrets.MAIL_USERNAME}}
-        password: ${{secrets.MAIL_PASSWORD}}
-        subject: [edk2] Create Pull Request
-        body: Create pull request on ${{github.repository}}
-        to: ${{secrets.GROUPS_IO_EDK2_CODE_REVIEW_EMAIL_ADDRESS}}
-        from: TianoCoreGitHubActionsBot
-        content_type: text/html
+      echo Subject: PR Updated SHA ${{ github.event.pull_request.head.sha }} > mail.txt
+      echo . >> mail.txt
+      echo PR Notification >> mail.txt
+      run: python .github/workflows/sendemail.py ${{secrets.MAIL_USERNAME}} ${{secrets.MAIL_PASSWORD}} ${{secrets.GROUPS_IO_EDK2_CODE_REVIEW_EMAIL_ADDRESS}} < mail.txt
