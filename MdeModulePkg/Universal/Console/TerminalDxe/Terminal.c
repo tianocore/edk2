@@ -516,9 +516,6 @@ TerminalDriverBindingStart (
     // if the serial device is a hot plug device, do not update the
     // ConInDev, ConOutDev, and StdErrDev variables.
     //
-    if (PcdGetBool(PcdUpdateConInVariable)) {
-      TerminalUpdateConsoleDevVariable(L"ConIn", ParentDevicePath);
-    }
     TerminalUpdateConsoleDevVariable (EFI_CON_IN_DEV_VARIABLE_NAME, ParentDevicePath);
     TerminalUpdateConsoleDevVariable (EFI_CON_OUT_DEV_VARIABLE_NAME, ParentDevicePath);
     TerminalUpdateConsoleDevVariable (EFI_ERR_OUT_DEV_VARIABLE_NAME, ParentDevicePath);
@@ -1068,30 +1065,12 @@ TerminalUpdateConsoleDevVariable (
   EFI_DEVICE_PATH_PROTOCOL  *Variable;
   EFI_DEVICE_PATH_PROTOCOL  *NewVariable;
   EFI_DEVICE_PATH_PROTOCOL  *TempDevicePath;
-  EFI_DEVICE_PATH_PROTOCOL  *CheckDevicePath;
   EDKII_SET_VARIABLE_STATUS *SetVariableStatus;
 
   //
   // Get global variable and its size according to the name given.
   //
   Status = GetEfiGlobalVariable2 (VariableName, (VOID**)&Variable, NULL);
-
-  if (StrCmp(L"ConIn", VariableName) == 0) {
-    if (Status == EFI_SUCCESS) {
-      CheckDevicePath = Variable;
-      while (!IsDevicePathEnd (CheckDevicePath)) {
-        if ((DevicePathType (CheckDevicePath) == MESSAGING_DEVICE_PATH) && 
-     		(DevicePathSubType (CheckDevicePath) == MSG_UART_DP)) {
-          //
-          // UART device path in ConIn variable exist, don't update ConIn variable
-          //
-          return;
-        }
-        CheckDevicePath = NextDevicePathNode (CheckDevicePath);
-      }
-    }
-  }
-
   if (Status == EFI_NOT_FOUND) {
     Status   = EFI_SUCCESS;
     Variable = NULL;
@@ -1124,24 +1103,13 @@ TerminalUpdateConsoleDevVariable (
 
   VariableSize = GetDevicePathSize (Variable);
 
-  if (StrCmp(L"ConIn", VariableName) != 0) {
-    Status = gRT->SetVariable(
-      VariableName,
-      &gEfiGlobalVariableGuid,
-      EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-      VariableSize,
-      Variable
-    );
-  }
-  else {
-    Status = gRT->SetVariable(
-      VariableName,
-      &gEfiGlobalVariableGuid,
-      EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
-      VariableSize,
-      Variable
-    );
-  }
+  Status = gRT->SetVariable (
+                  VariableName,
+                  &gEfiGlobalVariableGuid,
+                  EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+                  VariableSize,
+                  Variable
+                  );
 
   if (EFI_ERROR (Status)) {
     NameSize = StrSize (VariableName);
