@@ -2071,7 +2071,7 @@ InitializeP2C (
   PciIo->Pci.Write (PciIo, EfiPciIoWidthUint8, 0x3C, 1, &gAllZero);
 }
 
-/*
+/**
   Authenticate the PCI device by using DeviceSecurityProtocol.
 
   @param PciIoDevice  PCI device.
@@ -2079,7 +2079,7 @@ InitializeP2C (
   @retval EFI_SUCCESS     The device passes the authentication.
   @return not EFI_SUCCESS The device failes the authentication or
                           unexpected error happen during authentication.
-*/
+**/
 EFI_STATUS
 AuthenticatePciDevice (
   IN PCI_IO_DEVICE            *PciIoDevice
