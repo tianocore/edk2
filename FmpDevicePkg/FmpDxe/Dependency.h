@@ -56,7 +56,7 @@ EvaluateImageDependencies (
   IN CONST EFI_GUID                ImageTypeId,
   IN CONST UINT32                  Version,
   IN CONST EFI_FIRMWARE_IMAGE_DEP  *Dependencies,
-  IN CONST UINT32                  DependenciesSize,
+  IN CONST UINT32                  DepexSize,
   OUT BOOLEAN                      *IsSatisfied
   );
 
