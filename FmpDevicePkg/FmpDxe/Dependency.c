@@ -163,8 +163,8 @@ Push (
 /**
   Pop an element from the stack.
 
-  @param[in]  Value                  Element to pop.
-  @param[in]  Type                   Type of element.
+  @param[out]  Element                Element to pop.
+  @param[in]   Type                   Type of element.
 
   @retval EFI_SUCCESS            The value was popped onto the stack.
   @retval EFI_ACCESS_DENIED      The pop operation underflowed the stack.
