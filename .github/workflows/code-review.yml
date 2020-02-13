@@ -32,7 +32,8 @@ jobs:
     - name: PatchCheck
       run: python BaseTools/Scripts/PatchCheck.py ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}
     - name: Send mail
-      echo Subject: PR Updated SHA ${{ github.event.pull_request.head.sha }} > mail.txt
-      echo . >> mail.txt
-      echo Notification >> mail.txt
-      run: python .github/workflows/sendemail.py ${{secrets.MAIL_USERNAME}} ${{secrets.MAIL_PASSWORD}} ${{secrets.GROUPS_IO_EDK2_CODE_REVIEW_EMAIL_ADDRESS}} < mail.txt
+      run: |
+        echo Subject: PR Updated SHA ${{ github.event.pull_request.head.sha }} > mail.txt
+        echo . >> mail.txt
+        echo PR Notification >> mail.txt
+        python .github/workflows/sendemail.py ${{secrets.MAIL_USERNAME}} ${{secrets.MAIL_PASSWORD}} ${{secrets.GROUPS_IO_EDK2_CODE_REVIEW_EMAIL_ADDRESS}} < mail.txt
