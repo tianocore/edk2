@@ -460,7 +460,7 @@ MeasureCRTMVersion (
            );
 }
 
-/*
+/**
   Get the FvName from the FV header.
 
   Causion: The FV is untrusted input.
@@ -470,7 +470,7 @@ MeasureCRTMVersion (
 
   @return FvName pointer
   @retval NULL   FvName is NOT found
-*/
+**/
 VOID *
 GetFvName (
   IN EFI_PHYSICAL_ADDRESS           FvBase,
