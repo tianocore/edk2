@@ -413,7 +413,7 @@ PopulateDescriptor (
     }
     if (!EFI_ERROR (Status) && Image != NULL) {
       IsDepexValid = ValidateImageDepex ((EFI_FIRMWARE_IMAGE_DEP *) Image, ImageSize, &DepexSize);
-      if (IsDepexValid == TRUE) {
+      if (IsDepexValid) {
         Private->Descriptor.Dependencies = AllocatePool (DepexSize);
         if (Private->Descriptor.Dependencies != NULL) {
           CopyMem (Private->Descriptor.Dependencies->Dependencies, Image, DepexSize);
