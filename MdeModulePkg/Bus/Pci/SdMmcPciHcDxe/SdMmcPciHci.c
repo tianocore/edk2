@@ -2200,7 +2200,7 @@ SdMmcSoftwareReset (
   SD specification section 3.10.
 
   @param[in] Private    Pointer to driver private data.
-  @param[in] Trb        Pointer to currently executing TRB.
+  @param[in] Slot       Index of the slot for device.
   @param[in] IntStatus  Normal interrupt status mask.
 
   @retval EFI_CRC_ERROR  CRC error happened during CMD execution.
