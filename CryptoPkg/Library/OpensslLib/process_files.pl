@@ -157,7 +157,7 @@ foreach my $product ((@{$unified_info{libraries}},
 # Update the perl script to generate the missing header files
 #
 my @dir_list = ();
-for (keys %{$unified_info{dirinfo}}){
+for (sort keys %{$unified_info{dirinfo}}){
   push @dir_list,$_;
 }
 
