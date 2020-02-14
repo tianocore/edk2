@@ -59,7 +59,7 @@
     "SpellCheck": {
         "AuditOnly": False,           # Fails test but run in AuditOnly mode to collect log
         "IgnoreFiles": [             # use gitignore syntax to ignore errors in matching files
-            "/Library/CmockaLib/cmocka/**/*.*"  # not going to spell check a submodule
+            "Library/CmockaLib/cmocka/**/*.*"  # not going to spell check a submodule
         ],
         "ExtendWords": [             # words to extend to the dictionary for this package
             "cmocka",
@@ -68,7 +68,10 @@
             "pytool",
             "pytools",
             "NOFAILURE",
-            "DHAVE" # build flag for cmocka in the INF
+            "DHAVE", # build flag for cmocka in the INF
+            "corthon",      # Contact GitHub account in Readme
+            "mdkinney",     # Contact GitHub account in Readme
+            "spbrogan"      # Contact GitHub account in Readme
         ],
         "IgnoreStandardPaths": [],   # Standard Plugin defined paths that should be ignore
         "AdditionalIncludePaths": [] # Additional paths to spell check (wildcards supported)

@@ -2,31 +2,32 @@
 
 ## Basic Status
 
-| Package             | Windows VS2019 (IA32/X64)| Ubuntu GCC (IA32/X64/ARM/AARCH64) | Known Issues |
-| :----               | :-----                   | :----                             | :---         |
-| ArmPkg              |
-| ArmPlatformPkg      |
-| ArmVirtPkg          | SEE PACKAGE README | SEE PACKAGE README |
-| CryptoPkg           | :heavy_check_mark: | :heavy_check_mark: | Spell checking in audit mode
-| DynamicTablesPkg    |
-| EmbeddedPkg         |
-| EmulatorPkg         | SEE PACKAGE README | SEE PACKAGE README | Spell checking in audit mode
-| FatPkg              | :heavy_check_mark: | :heavy_check_mark: |
-| FmpDevicePkg        | :heavy_check_mark: | :heavy_check_mark: |
-| IntelFsp2Pkg        |
-| IntelFsp2WrapperPkg |
-| MdeModulePkg        | :heavy_check_mark: | :heavy_check_mark: | DxeIpl dependency on ArmPkg, Depends on StandaloneMmPkg, Spell checking in audit mode
-| MdePkg              | :heavy_check_mark: | :heavy_check_mark: | Spell checking in audit mode
-| NetworkPkg          | :heavy_check_mark: | :heavy_check_mark: | Spell checking in audit mode
-| OvmfPkg             | SEE PACKAGE README | SEE PACKAGE README | Spell checking in audit mode
-| PcAtChipsetPkg      | :heavy_check_mark: | :heavy_check_mark: |
-| SecurityPkg         | :heavy_check_mark: | :heavy_check_mark: | Spell checking in audit mode
-| ShellPkg            | :heavy_check_mark: | :heavy_check_mark: | Spell checking in audit mode, 3 modules are not being built by DSC
-| SignedCapsulePkg    |
-| SourceLevelDebugPkg |
-| StandaloneMmPkg     |
-| UefiCpuPkg          | :heavy_check_mark: | :heavy_check_mark: | Spell checking in audit mode, 2 binary modules not being built by DSC
-| UefiPayloadPkg      |
+| Package              | Windows VS2019 (IA32/X64)| Ubuntu GCC (IA32/X64/ARM/AARCH64) | Known Issues |
+| :----                | :-----                   | :----                             | :---         |
+| ArmPkg               |
+| ArmPlatformPkg       |
+| ArmVirtPkg           | SEE PACKAGE README | SEE PACKAGE README |
+| CryptoPkg            | :heavy_check_mark: | :heavy_check_mark: | Spell checking in audit mode
+| DynamicTablesPkg     |
+| EmbeddedPkg          |
+| EmulatorPkg          | SEE PACKAGE README | SEE PACKAGE README | Spell checking in audit mode
+| FatPkg               | :heavy_check_mark: | :heavy_check_mark: |
+| FmpDevicePkg         | :heavy_check_mark: | :heavy_check_mark: |
+| IntelFsp2Pkg         |
+| IntelFsp2WrapperPkg  |
+| MdeModulePkg         | :heavy_check_mark: | :heavy_check_mark: | DxeIpl dependency on ArmPkg, Depends on StandaloneMmPkg, Spell checking in audit mode
+| MdePkg               | :heavy_check_mark: | :heavy_check_mark: | Spell checking in audit mode
+| NetworkPkg           | :heavy_check_mark: | :heavy_check_mark: | Spell checking in audit mode
+| OvmfPkg              | SEE PACKAGE README | SEE PACKAGE README | Spell checking in audit mode
+| PcAtChipsetPkg       | :heavy_check_mark: | :heavy_check_mark: |
+| SecurityPkg          | :heavy_check_mark: | :heavy_check_mark: | Spell checking in audit mode
+| ShellPkg             | :heavy_check_mark: | :heavy_check_mark: | Spell checking in audit mode, 3 modules are not being built by DSC
+| SignedCapsulePkg     |
+| SourceLevelDebugPkg  |
+| StandaloneMmPkg      |
+| UefiCpuPkg           | :heavy_check_mark: | :heavy_check_mark: | Spell checking in audit mode, 2 binary modules not being built by DSC
+| UefiPayloadPkg       |
+| UnitTestFrameworkPkg | :heavy_check_mark: | :heavy_check_mark: |
 
 For more detailed status look at the test results of the latest CI run on the
 repo readme.
@@ -88,7 +89,7 @@ that a few steps should be followed.  Details of EDKII Tools can be found in the
      * VS 2017 or VS 2019
      * Windows SDK (for rc)
      * Windows WDK (for capsules)
-   * Ubuntu 16.04
+   * Ubuntu 18.04 or Fedora
      * GCC5
    * Easy to add more but this is the current state
 2. Python 3.7.x or newer on path
@@ -137,11 +138,31 @@ location makes more sense for the community.
 
 ### Module Inclusion Test - DscCompleteCheck
 
-This test scans all available modules (via INF files) and compares them to the
-package-level DSC file for the package each module is contained within. The test
-considers it an error if any module does not appear in the `Components` section
-of at least one package-level DSC (indicating that it would not be built if the
-package were built).
+This scans all INF files from a package and confirms they are
+listed in the package level DSC file. The test considers it an error if any INF
+does not appear in the `Components` section of the package-level DSC (indicating
+that it would not be built if the package were built). This is critical because
+much of the CI infrastructure assumes that all modules will be listed in the DSC
+and compiled.
+
+This test will ignore INFs in the following cases:
+
+1. When `MODULE_TYPE` = `HOST_APPLICATION`
+2. When a Library instance **only** supports the `HOST_APPLICATION` environment
+
+### Host Module Inclusion Test - HostUnitTestDscCompleteCheck
+
+This test scans all INF files from a package for those related to host
+based unit tests and confirms they are listed in the unit test DSC file for the package.
+The test considers it an error if any INF meeting the requirements does not appear
+in the `Components` section of the unit test DSC. This is critical because
+much of the CI infrastructure assumes that  modules will be listed in the DSC
+and compiled.
+
+This test will only require INFs in the following cases:
+
+1. When `MODULE_TYPE` = `HOST_APPLICATION`
+2. When a Library instance explicitly supports the `HOST_APPLICATION` environment
 
 ### Code Compilation Test - CompilerPlugin
 
@@ -149,6 +170,46 @@ Once the Module Inclusion Test has verified that all modules would be built if
 all package-level DSCs were built, the Code Compilation Test simply runs through
 and builds every package-level DSC on every toolchain and for every architecture
 that is supported. Any module that fails to build is considered an error.
+
+### Host Unit Test Compilation and Run Test - HostUnitTestCompilerPlugin
+
+A test that compiles the dsc for host based unit test apps.
+On Windows this will also enable a build plugin to execute that will run the unit tests and verify the results.
+
+These tools will be invoked on any CI
+pass that includes the NOOPT target. In order for these tools to do their job,
+the package and tests must be configured in a particular way...
+
+#### Including Host-Based Tests in the Package YAML
+
+For example, looking at the `MdeModulePkg.ci.yaml` config file, there are two
+config options that control HostBased test behavior:
+
+```json
+    ## options defined .pytool/Plugin/HostUnitTestCompilerPlugin
+    "HostUnitTestCompilerPlugin": {
+        "DscPath": "Test/MdeModulePkgHostTest.dsc"
+    },
+```
+
+This option tell the test builder to run. The test builder needs to know which
+modules in this package are host-based tests, so that DSC path is provided.
+
+#### Configuring the HostBased DSC
+
+The HostBased DSC for `MdeModulePkg` is located at
+`MdeModulePkg/Test/MdeModulePkgHostTest.dsc`.
+
+To add automated host-based unit test building to a new package, create a
+similar DSC. The new DSC should make sure to have the `NOOPT` BUILD_TARGET
+and should include the line:
+
+```
+!include UnitTestFrameworkPkg/UnitTestFrameworkPkgHost.dsc.inc
+```
+
+All of the modules that are included in the `Components` section of this
+DSC should be of type HOST_APPLICATION.
 
 ### GUID Uniqueness Test - GuidCheck
 
@@ -207,6 +268,8 @@ few standard scopes.
 | global-nix | edk2_invocable++                                     | Running on Linux based OS    |
 | edk2-build |                                                      | This indicates that an invocable is building EDK2 based UEFI code |
 | cibuild    | set in .pytool/CISettings.py                         | Suggested target for edk2 continuous integration builds.  Tools used for CiBuilds can use this scope.  Example: asl compiler |
+| host-based-test | set in .pytool/CISettings.py                    | Turns on the host based tests and plugin |
+| host-test-win | set in .pytool/CISettings.py                      | Enables the host based test runner for Windows |
 
 ## Future investments
 
