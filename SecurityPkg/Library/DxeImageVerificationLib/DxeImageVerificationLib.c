@@ -829,7 +829,7 @@ AddImageExeInfo (
 
 **/
 EFI_STATUS
-IsCertHashFoundInDatabase (
+IsCertHashFoundInDbx (
   IN  UINT8               *Certificate,
   IN  UINTN               CertSize,
   IN  EFI_SIGNATURE_LIST  *SignatureList,
@@ -1362,7 +1362,7 @@ IsForbiddenByDbx (
     //
     CertPtr = CertPtr + sizeof (UINT32) + CertSize;
 
-    Status = IsCertHashFoundInDatabase (Cert, CertSize, (EFI_SIGNATURE_LIST *)Data, DataSize, &RevocationTime, &IsFound);
+    Status = IsCertHashFoundInDbx (Cert, CertSize, (EFI_SIGNATURE_LIST *)Data, DataSize, &RevocationTime, &IsFound);
     if (EFI_ERROR (Status)) {
       //
       // Error in searching dbx. Consider it as 'found'. RevocationTime might
@@ -1528,7 +1528,7 @@ IsAllowedByDb (
             //
             // Here We still need to check if this RootCert's Hash is revoked
             //
-            Status = IsCertHashFoundInDatabase (RootCert, RootCertSize, (EFI_SIGNATURE_LIST *)DbxData, DbxDataSize, &RevocationTime, &IsFound);
+            Status = IsCertHashFoundInDbx (RootCert, RootCertSize, (EFI_SIGNATURE_LIST *)DbxData, DbxDataSize, &RevocationTime, &IsFound);
             if (EFI_ERROR (Status)) {
               //
               // Error in searching dbx. Consider it as 'found'. RevocationTime might
