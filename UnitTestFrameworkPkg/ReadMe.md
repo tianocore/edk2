@@ -58,7 +58,7 @@ header for the `UnitTestLib` is located in `MdePkg`, so you shouldn't need to de
 packages. As long as your DSC file knows where to find the lib implementation that you want to use,
 you should be good to go.
 
-See this example in 'SampleUnitTestApp.inf'...
+See this example in 'SampleUnitTestUefiShell.inf'...
 
 ```
 [Packages]
@@ -70,6 +70,14 @@ See this example in 'SampleUnitTestApp.inf'...
   DebugLib
   UnitTestLib
   PrintLib
+```
+
+Also, if you want you test to automatically be picked up by the Test Runner plugin, you will need
+to make sure that the module `BASE_NAME` contains the word `Test`...
+
+```
+[Defines]
+  BASE_NAME      = SampleUnitTestUefiShell
 ```
 
 ### Requirements - Code
@@ -221,9 +229,11 @@ https://api.cmocka.org/
 
 ## Development
 
-When using the EDK2 Pytools for CI testing, the host-based unit tests will be built and run on any build that includes the `NOOPT` build target.
+When using the EDK2 Pytools for CI testing, the host-based unit tests will be built and run on any build that includes
+the `NOOPT` build target.
 
-If you are trying to iterate on a single test, a convenient pattern is to build only that test module. For example, the following command will build only the SafeIntLib host-based test from the MdePkg...
+If you are trying to iterate on a single test, a convenient pattern is to build only that test module. For example,
+the following command will build only the SafeIntLib host-based test from the MdePkg...
 
 ```bash
 stuart_ci_build -c .pytool/CISettings.py TOOL_CHAIN_TAG=VS2017 -p MdePkg -t NOOPT BUILDMODULE=MdePkg/Test/UnitTest/Library/BaseSafeIntLib/TestBaseSafeIntLib.inf
@@ -250,8 +260,72 @@ reporting lib. This isn't currently possible with host-based. Only the assertion
 
 We will continue trying to make these as similar as possible.
 
+## Unit Test Location/Layout Rules
+
+Code/Test                                   | Location
+---------                                   | --------
+Host-Based Unit Tests for a Library/Protocol/PPI/GUID Interface   | If what's being tested is an interface (e.g. a library with a public header file, like DebugLib), the test should be scoped to the parent package.<br/>Example: `MdePkg/Test/UnitTest/[Library/Protocol/Ppi/Guid]/`<br/><br/>A real-world example of this is the BaseSafeIntLib test in MdePkg.<br/>`MdePkg/Test/UnitTest/Library/BaseSafeIntLib/TestBaseSafeIntLibHost.inf`
+Host-Based Unit Tests for a Library/Driver (PEI/DXE/SMM) implementation   | If what's being tested is a specific implementation (e.g. BaseDebugLibSerialPort for DebugLib), the test should be scoped to the implementation directory itself, in a UnitTest subdirectory.<br/><br/>Module Example: `MdeModulePkg/Universal/EsrtFmpDxe/UnitTest/`<br/>Library Example: `MdePkg/Library/BaseMemoryLib/UnitTest/`
+Host-Based Tests for a Functionality or Feature   | If you're writing a functional test that operates at the module level (i.e. if it's more than a single file or library), the test should be located in the package-level Tests directory under the HostFuncTest subdirectory.<br/>For example, if you were writing a test for the entire FMP Device Framework, you might put your test in:<br/>`FmpDevicePkg/Test/HostFuncTest/FmpDeviceFramework`<br/><br/>If the feature spans multiple packages, it's location should be determined by the package owners related to the feature.
+Non-Host-Based (PEI/DXE/SMM/Shell) Tests for a Functionality or Feature   | Similar to Host-Based, if the feature is in one package, should be located in the `*Pkg/Test/[Shell/Dxe/Smm/Pei]Test` directory.<br/><br/>If the feature spans multiple packages, it's location should be determined by the package owners related to the feature.<br/><br/>USAGE EXAMPLES<br/>PEI Example: MP_SERVICE_PPI. Or check MTRR configuration in a notification function.<br/> SMM Example: a test in a protocol callback function. (It is different with the solution that SmmAgent+ShellApp)<br/>DXE Example: a test in a UEFI event call back to check SPI/SMRAM status. <br/> Shell Example: the SMM handler audit test has a shell-based app that interacts with an SMM handler to get information. The SMM paging audit test gathers information about both DXE and SMM. And the SMM paging functional test actually forces errors into SMM via a DXE driver.
+
+### Example Directory Tree
+
+```text
+<PackageName>Pkg/
+  ComponentY/
+    ComponentY.inf
+    ComponentY.c
+    UnitTest/
+      ComponentYHostUnitTest.inf      # Host-Based Test for Driver Module
+      ComponentYUnitTest.c
+
+  Library/
+    GeneralPurposeLibBase/
+      ...
+
+    GeneralPurposeLibSerial/
+      ...
+
+    SpecificLibDxe/
+      SpecificLibDxe.c
+      SpecificLibDxe.inf
+      UnitTest/                      # Host-Based Test for Specific Library Implementation
+        SpecificLibDxeHostUnitTest.c
+        SpecificLibDxeHostUnitTest.inf
+  Test/
+    <Package>HostTest.dsc             # Host-Based Test Apps
+    UnitTest/
+      InterfaceX
+        InterfaceXHostUnitTest.inf    # Host-Based App (should be in Test/<Package>HostTest.dsc)
+        InterfaceXPeiUnitTest.inf     # PEIM Target-Based Test (if applicable)
+        InterfaceXDxeUnitTest.inf     # DXE Target-Based Test (if applicable)
+        InterfaceXSmmUnitTest.inf     # SMM Target-Based Test (if applicable)
+        InterfaceXShellUnitTest.inf   # Shell App Target-Based Test (if applicable)
+        InterfaceXUnitTest.c          # Test Logic
+
+      GeneralPurposeLib/              # Host-Based Test for any implementation of GeneralPurposeLib
+        GeneralPurposeLibTest.c
+        GeneralPurposeLibHostUnitTest.inf
+
+  <Package>Pkg.dsc          # Standard Modules and any Target-Based Test Apps (including in Test/)
+
+```
+
+### Future Locations in Consideration
+
+We don't know if these types will exist or be applicable yet, but if you write a support library or module that matches the following, please make sure they live in the correct place.
+
+Code/Test                                   | Location
+---------                                   | --------
+Host-Based Library Implementations                 | Host-Based Implementations of common libraries (eg. MemoryAllocationLibHost) should live in the same package that declares the library interface in its .DEC file in the `*Pkg/HostLibrary` directory. Should have 'Host' in the name.
+Host-Based Mocks and Stubs  | Mock and Stub libraries should live in the `UefiTestFrameworkPkg/StubLibrary` with either 'Mock' or 'Stub' in the library name.
+
+### If still in doubt...
+
+Hop on GitHub and ask @corthon, @mdkinney, or @spbrogan. ;)
+
 ## Copyright
 
 Copyright (c) Microsoft Corporation.
 SPDX-License-Identifier: BSD-2-Clause-Patent
-
