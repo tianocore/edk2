@@ -51,7 +51,6 @@ BEGIN {
                 "no-afalgeng",
                 "no-asm",
                 "no-async",
-                "no-autoalginit",
                 "no-autoerrinit",
                 "no-autoload-config",
                 "no-bf",
