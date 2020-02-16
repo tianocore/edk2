@@ -21,13 +21,11 @@
                                                                                         "Based on the value set, the required algorithm is chosen to calculate\n"
                                                                                         "the hash of data.<BR>\n"
                                                                                         "The default hashing algorithm for BaseHashApiLib is set to SHA256.<BR>\n"
-                                                                                        "0x00000001  -  MD4.<BR>\n"
-                                                                                        "0x00000002  -  MD5.<BR>\n"
-                                                                                        "0x00000003  -  SHA1.<BR>\n"
-                                                                                        "0x00000004  -  SHA256.<BR>\n"
-                                                                                        "0x00000005  -  SHA384.<BR>\n"
-                                                                                        "0x00000006  -  SHA512.<BR>\n"
-                                                                                        "0x00000007  -  SM3.<BR>"
+                                                                                        "0x00000001  -  HASH_ALG_SHA1.<BR>\n"
+                                                                                        "0x00000002  -  HASH_ALG_SHA256.<BR>\n"
+                                                                                        "0x00000004  -  HASH_ALG_SHA384.<BR>\n"
+                                                                                        "0x00000008  -  HASH_ALG_SHA512.<BR>\n"
+                                                                                        "0x00000010  -  HASH_ALG_SM3.<BR>"
 
 #string STR_gEfiCryptoPkgTokenSpaceGuid_PcdCryptoServiceFamilyEnable_PROMPT  #language en-US "Enable/Disable EDK II Crypto Protocol/PPI services"
 
