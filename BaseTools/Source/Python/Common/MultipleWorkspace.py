@@ -104,6 +104,8 @@ class MultipleWorkspace(object):
     #
     @classmethod
     def getWs(cls, Ws, Path):
+        if not cls.PACKAGES_PATH:
+            return Ws
         absPath = os.path.join(Ws, Path)
         if not os.path.exists(absPath):
             for Pkg in cls.PACKAGES_PATH:
@@ -146,5 +148,5 @@ class MultipleWorkspace(object):
     #
     @classmethod
     def getPkgPath(cls):
-        return cls.PACKAGES_PATH
+        return cls.PACKAGES_PATH if cls.PACKAGES_PATH else []
 
