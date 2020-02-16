@@ -9,22 +9,10 @@
 
 **/
 
-#ifndef __BASEHASHAPILIB_H_
-#define __BASEHASHAPILIB_H_
+#ifndef __HASH_API_LIB_H_
+#define __HASH_API_LIB_H_
 
 typedef VOID  *HASH_API_CONTEXT;
-
-//
-// Hash Algorithms
-//
-#define HASH_API_ALGO_INVALID    0x00000000
-#define HASH_API_ALGO_MD4        0x00000001
-#define HASH_API_ALGO_MD5        0x00000002
-#define HASH_API_ALGO_SHA1       0x00000003
-#define HASH_API_ALGO_SHA256     0x00000004
-#define HASH_API_ALGO_SHA384     0x00000005
-#define HASH_API_ALGO_SHA512     0x00000006
-#define HASH_API_ALGO_SM3_256    0x00000007
 
 /**
   Retrieves the size, in bytes, of the context buffer required for hash operations.
