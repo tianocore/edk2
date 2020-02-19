@@ -1,7 +1,7 @@
 /** @file
   DBG2 table parser
 
-  Copyright (c) 2016 - 2019, ARM Limited. All rights reserved.
+  Copyright (c) 2016 - 2020, ARM Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -282,15 +282,16 @@ ParseAcpiDbg2 (
       return;
     }
 
-    // Make sure the Debug Device Information structure lies inside the table.
-    if ((Offset + *DbgDevInfoLen) > AcpiTableLength) {
+    // Validate Debug Device Information Structure length
+    if ((*DbgDevInfoLen == 0) ||
+        ((Offset + (*DbgDevInfoLen)) > AcpiTableLength)) {
       IncrementErrorCount ();
       Print (
-        L"ERROR: Invalid Debug Device Information structure length. " \
-          L"DbgDevInfoLen = %d. RemainingTableBufferLength = %d. " \
-          L"DBG2 parsing aborted.\n",
+        L"ERROR: Invalid Debug Device Information Structure length. " \
+          L"Length = %d. Offset = %d. AcpiTableLength = %d.\n",
         *DbgDevInfoLen,
-        AcpiTableLength - Offset
+        Offset,
+        AcpiTableLength
         );
       return;
     }

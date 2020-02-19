@@ -1,7 +1,7 @@
 /** @file
   IORT table parser
 
-  Copyright (c) 2016 - 2019, ARM Limited. All rights reserved.
+  Copyright (c) 2016 - 2020, ARM Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -687,14 +687,16 @@ ParseAcpiIort (
       return;
     }
 
-    // Make sure the IORT Node is inside the table
-    if ((Offset + (*IortNodeLength)) > AcpiTableLength) {
+    // Validate IORT Node length
+    if ((*IortNodeLength == 0) ||
+        ((Offset + (*IortNodeLength)) > AcpiTableLength)) {
       IncrementErrorCount ();
       Print (
-        L"ERROR: Invalid IORT node length. IortNodeLength = %d. " \
-          L"RemainingTableBufferLength = %d. IORT parsing aborted.\n",
+        L"ERROR: Invalid IORT Node length. " \
+          L"Length = %d. Offset = %d. AcpiTableLength = %d.\n",
         *IortNodeLength,
-        AcpiTableLength - Offset
+        Offset,
+        AcpiTableLength
         );
       return;
     }

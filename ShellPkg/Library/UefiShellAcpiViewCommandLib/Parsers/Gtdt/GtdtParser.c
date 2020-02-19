@@ -1,7 +1,7 @@
 /** @file
   GTDT table parser
 
-  Copyright (c) 2016 - 2019, ARM Limited. All rights reserved.
+  Copyright (c) 2016 - 2020, ARM Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -327,15 +327,16 @@ ParseAcpiGtdt (
       return;
     }
 
-    // Make sure the Platform Timer is inside the table.
-    if ((Offset + *PlatformTimerLength) > AcpiTableLength) {
+    // Validate Platform Timer Structure length
+    if ((*PlatformTimerLength == 0) ||
+        ((Offset + (*PlatformTimerLength)) > AcpiTableLength)) {
       IncrementErrorCount ();
       Print (
         L"ERROR: Invalid Platform Timer Structure length. " \
-          L"PlatformTimerLength = %d. RemainingTableBufferLength = %d. " \
-          L"GTDT parsing aborted.\n",
+          L"Length = %d. Offset = %d. AcpiTableLength = %d.\n",
         *PlatformTimerLength,
-        AcpiTableLength - Offset
+        Offset,
+        AcpiTableLength
         );
       return;
     }
