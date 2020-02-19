@@ -1,7 +1,7 @@
 /** @file
   MADT table parser
 
-  Copyright (c) 2016 - 2019, ARM Limited. All rights reserved.
+  Copyright (c) 2016 - 2020, ARM Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -273,28 +273,16 @@ ParseAcpiMadt (
       return;
     }
 
-    // Make sure forward progress is made.
-    if (*MadtInterruptControllerLength < 2) {
+    // Validate Interrupt Controller Structure length
+    if ((*MadtInterruptControllerLength == 0) ||
+        ((Offset + (*MadtInterruptControllerLength)) > AcpiTableLength)) {
       IncrementErrorCount ();
       Print (
-        L"ERROR: Structure length is too small: " \
-          L"MadtInterruptControllerLength = %d. " \
-          L"MadtInterruptControllerType = %d. MADT parsing aborted.\n",
+        L"ERROR: Invalid Interrupt Controller Structure length. " \
+          L"Length = %d. Offset = %d. AcpiTableLength = %d.\n",
         *MadtInterruptControllerLength,
-        *MadtInterruptControllerType
-        );
-      return;
-    }
-
-    // Make sure the MADT structure lies inside the table
-    if ((Offset + *MadtInterruptControllerLength) > AcpiTableLength) {
-      IncrementErrorCount ();
-      Print (
-        L"ERROR: Invalid MADT structure length. " \
-          L"MadtInterruptControllerLength = %d. " \
-          L"RemainingTableBufferLength = %d. MADT parsing aborted.\n",
-        *MadtInterruptControllerLength,
-        AcpiTableLength - Offset
+        Offset,
+        AcpiTableLength
         );
       return;
     }
