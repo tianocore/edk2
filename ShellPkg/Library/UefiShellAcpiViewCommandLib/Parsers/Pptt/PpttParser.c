@@ -1,7 +1,7 @@
 /** @file
   PPTT table parser
 
-  Copyright (c) 2019, ARM Limited. All rights reserved.
+  Copyright (c) 2019 - 2020, ARM Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -425,15 +425,16 @@ ParseAcpiPptt (
       return;
     }
 
-    // Make sure the PPTT structure lies inside the table
-    if ((Offset + *ProcessorTopologyStructureLength) > AcpiTableLength) {
+    // Validate Processor Topology Structure length
+    if ((*ProcessorTopologyStructureLength == 0) ||
+        ((Offset + (*ProcessorTopologyStructureLength)) > AcpiTableLength)) {
       IncrementErrorCount ();
       Print (
-        L"ERROR: Invalid PPTT structure length. " \
-          L"ProcessorTopologyStructureLength = %d. " \
-          L"RemainingTableBufferLength = %d. PPTT parsing aborted.\n",
+        L"ERROR: Invalid Processor Topology Structure length. " \
+          L"Length = %d. Offset = %d. AcpiTableLength = %d.\n",
         *ProcessorTopologyStructureLength,
-        AcpiTableLength - Offset
+        Offset,
+        AcpiTableLength
         );
       return;
     }
