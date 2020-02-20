@@ -1,7 +1,7 @@
 /** @file
   The implementation of the ARP protocol.
 
-Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2020, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -113,7 +113,7 @@ ArpOnFrameRcvdDpc (
     //
     // Restart the receiving if packet size is not correct.
     //
-    goto RESTART_RECEIVE;
+    goto RECYCLE_RXDATA;
   }
 
   //
@@ -125,7 +125,7 @@ ArpOnFrameRcvdDpc (
   Head->OpCode    = NTOHS (Head->OpCode);
 
   if (RxData->DataLength < (sizeof (ARP_HEAD) + 2 * Head->HwAddrLen + 2 * Head->ProtoAddrLen)) {
-    goto RESTART_RECEIVE;
+    goto RECYCLE_RXDATA;
   }
 
   if ((Head->HwType != ArpService->SnpMode.IfType) ||
