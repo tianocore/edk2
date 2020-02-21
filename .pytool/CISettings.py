@@ -148,6 +148,8 @@ class Settings(CiBuildSettingsManager, UpdateSettingsManager, SetupSettingsManag
             "MdeModulePkg/Universal/RegularExpressionDxe/oniguruma", False))
         rs.append(RequiredSubmodule(
             "MdeModulePkg/Library/BrotliCustomDecompressLib/brotli", False))
+        rs.append(RequiredSubmodule(
+            "BaseTools/Source/C/BrotliCompress/brotli", False))
         return rs
 
     def GetName(self):

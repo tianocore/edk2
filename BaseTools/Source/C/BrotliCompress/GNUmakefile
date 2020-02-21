@@ -1,7 +1,7 @@
 ## @file
 # GNU/Linux makefile for 'Brotli' module build.
 #
-# Copyright (c) 2017 - 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2017 - 2020, Intel Corporation. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 MAKEROOT ?= ..
@@ -9,33 +9,33 @@ MAKEROOT ?= ..
 APPNAME = Brotli
 
 OBJECTS = \
-  tools/brotli.o \
-  common/dictionary.o \
-  common/transform.o \
-  dec/bit_reader.o \
-  dec/decode.o \
-  dec/huffman.o \
-  dec/state.o \
-  enc/backward_references.o \
-  enc/backward_references_hq.o \
-  enc/bit_cost.o \
-  enc/block_splitter.o \
-  enc/brotli_bit_stream.o \
-  enc/cluster.o \
-  enc/compress_fragment.o \
-  enc/compress_fragment_two_pass.o \
-  enc/dictionary_hash.o \
-  enc/encode.o \
-  enc/encoder_dict.o \
-  enc/entropy_encode.o \
-  enc/histogram.o \
-  enc/literal_cost.o \
-  enc/memory.o \
-  enc/metablock.o \
-  enc/static_dict.o \
-  enc/utf8_util.o
+  brotli/c/tools/brotli.o \
+  brotli/c/common/dictionary.o \
+  brotli/c/common/transform.o \
+  brotli/c/dec/bit_reader.o \
+  brotli/c/dec/decode.o \
+  brotli/c/dec/huffman.o \
+  brotli/c/dec/state.o \
+  brotli/c/enc/backward_references.o \
+  brotli/c/enc/backward_references_hq.o \
+  brotli/c/enc/bit_cost.o \
+  brotli/c/enc/block_splitter.o \
+  brotli/c/enc/brotli_bit_stream.o \
+  brotli/c/enc/cluster.o \
+  brotli/c/enc/compress_fragment.o \
+  brotli/c/enc/compress_fragment_two_pass.o \
+  brotli/c/enc/dictionary_hash.o \
+  brotli/c/enc/encode.o \
+  brotli/c/enc/encoder_dict.o \
+  brotli/c/enc/entropy_encode.o \
+  brotli/c/enc/histogram.o \
+  brotli/c/enc/literal_cost.o \
+  brotli/c/enc/memory.o \
+  brotli/c/enc/metablock.o \
+  brotli/c/enc/static_dict.o \
+  brotli/c/enc/utf8_util.o
 
 include $(MAKEROOT)/Makefiles/app.makefile
 
-TOOL_INCLUDE = -I ./include
+TOOL_INCLUDE = -I ./brotli/c/include
 LIBS += -lm
