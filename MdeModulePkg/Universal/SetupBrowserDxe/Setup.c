@@ -2,6 +2,7 @@
 Entry and initialization module for the browser.
 
 Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+(C) Copyright 2020 Hewlett Packard Enterprise Development LP<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -5844,7 +5845,7 @@ GetIfrBinaryData (
           //
           // Try to compare against formset GUID
           //
-          if (IsZeroGuid (FormSetGuid) ||
+          if (IsZeroGuid (ComparingGuid) ||
               CompareGuid (ComparingGuid, (EFI_GUID *)(OpCodeData + sizeof (EFI_IFR_OP_HEADER)))) {
             break;
           }
