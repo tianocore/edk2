@@ -81,7 +81,6 @@
             "gEfiDebugPortProtocolGuid=gEfiDebugPortVariableGuid=gEfiDebugPortDevicePathGuid", ## is this a bug
             "gEfiProcessorSpecificErrorSectionGuid=gEfiIa32X64ProcessorErrorSectionGuid",  ## is this a bug
             "gEfiSmmPeriodicTimerDispatch2ProtocolGuid=gEfiMmPeriodicTimerDispatchProtocolGuid",
-            "gEdkiiFormBrowserExProtocolGuid=gEfiFormBrowserExProtocolGuid",
             "gEfiPeiMmAccessPpiGuid=gPeiSmmAccessPpiGuid",
             "gPeiSmmControlPpiGuid=gEfiPeiMmControlPpiGuid"
             ]

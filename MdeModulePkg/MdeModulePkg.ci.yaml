@@ -53,7 +53,6 @@
         "IgnoreGuidValue": ["00000000-0000-0000-0000-000000000000"],
         "IgnoreFoldersAndFiles": [],
         "IgnoreDuplicates": [
-            "gEdkiiFormBrowserExProtocolGuid=gEfiFormBrowserExProtocolGuid",
             "gEfiPeiMmAccessPpiGuid=gPeiSmmAccessPpiGuid",
             "gPeiSmmControlPpiGuid=gEfiPeiMmControlPpiGuid",
         ]
