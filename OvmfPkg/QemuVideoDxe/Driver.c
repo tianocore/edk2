@@ -292,7 +292,7 @@ QemuVideoControllerDriverStart (
   }
 
   SupportedVgaIo &= (UINT64)(EFI_PCI_IO_ATTRIBUTE_VGA_IO | EFI_PCI_IO_ATTRIBUTE_VGA_IO_16);
-  if (SupportedVgaIo == 0) {
+  if (SupportedVgaIo == 0 && IS_PCI_VGA (&Pci)) {
     Status = EFI_UNSUPPORTED;
     goto ClosePciIo;
   }
