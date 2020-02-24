@@ -119,7 +119,7 @@ class dsc_section_type:
     dsc_module_types = ["COMMON", "BASE", "SEC", "PEI_CORE", "PEIM", "DXE_CORE",
                         "DXE_DRIVER", "DXE_RUNTIME_DRIVER", "DXE_SAL_DRIVER",
                         "DXE_SMM_DRIVER", "SMM_CORE", "UEFI_DRIVER",
-                        "UEFI_APPLICATION", "USER_DEFINED"]
+                        "UEFI_APPLICATION", "USER_DEFINED","HOST_APPLICATION","MM_STANDALONE","MM_CORE_STANDALONE"]
 
     def __init__(self, arch="common", module_type="common"):
         self.arch = arch.upper().strip()
@@ -383,6 +383,13 @@ class pcd_typed(pcd):
     def __repr__(self):
         return f"{self.namespace}.{self.name} = {self.value} |{self.datum_type}|{self.max_size} @ {self.source_info}"
 
+class pcd_vpd(pcd):
+    def __init__(self, namespace, name, initial_value, vpd_offset, max_size=0, source_info=None):
+        super().__init__(namespace, name, initial_value, source_info)
+        self.vpd_offset = vpd_offset
+        self.max_size = int(max_size)
+    def __repr__(self):
+        return f"{self.namespace}.{self.name} = {self.value} |{self.vpd_offset}|{self.max_size} @ {self.source_info}"
 
 pcd_variable_attributes = ["NV", "BS", "RT", "RO"]
 

@@ -13,10 +13,16 @@ from Common.StringUtils import NormPath,GetSplitValueList
 from Common.BuildToolError import *
 from Common.Misc import PathClass
 import Common.GlobalData as GlobalData
+from Common.Misc import tdict
 import uuid
 from Parser.MetaFileParser import DscParser
-from Common.Misc import ProcessDuplicatedInf
-
+from Common.Parsing import IsValidWord
+from random import sample
+import string
+import re
+from Common.Expression import ValueExpressionEx
+from CommonDataClass.Exceptions import BadExpression, EvaluationException
+from Common.Misc import CheckPcdDatum
 _PCD_TYPE_STRING_ = {
         MODEL_PCD_FIXED_AT_BUILD        :   TAB_PCDS_FIXED_AT_BUILD,
         MODEL_PCD_PATCHABLE_IN_MODULE   :   TAB_PCDS_PATCHABLE_IN_MODULE,
@@ -30,6 +36,126 @@ _PCD_TYPE_STRING_ = {
         MODEL_PCD_DYNAMIC_EX_HII        :   TAB_PCDS_DYNAMIC_EX_HII,
         MODEL_PCD_DYNAMIC_EX_VPD        :   TAB_PCDS_DYNAMIC_EX_VPD,
     }
+
+SkuIdPattern = re.compile(r'^[a-zA-Z_][a-zA-Z0-9_]*$')
+## regular expressions for finding decimal and hex numbers
+Pattern = re.compile('^[1-9]\d*|0$')
+HexPattern = re.compile(r'0[xX][0-9a-fA-F]+$')
+StructPattern = re.compile(r'[_a-zA-Z][0-9A-Za-z_]*$')
+
+def AnalyzePcdExpression(Setting):
+    RanStr = ''.join(sample(string.ascii_letters + string.digits, 8))
+    Setting = Setting.replace('\\\\', RanStr).strip()
+    # There might be escaped quote in a string: \", \\\" , \', \\\'
+    Data = Setting
+    # There might be '|' in string and in ( ... | ... ), replace it with '-'
+    NewStr = ''
+    InSingleQuoteStr = False
+    InDoubleQuoteStr = False
+    Pair = 0
+    for Index, ch in enumerate(Data):
+        if ch == '"' and not InSingleQuoteStr:
+            if Data[Index - 1] != '\\':
+                InDoubleQuoteStr = not InDoubleQuoteStr
+        elif ch == "'" and not InDoubleQuoteStr:
+            if Data[Index - 1] != '\\':
+                InSingleQuoteStr = not InSingleQuoteStr
+        elif ch == '(' and not (InSingleQuoteStr or InDoubleQuoteStr):
+            Pair += 1
+        elif ch == ')' and not (InSingleQuoteStr or InDoubleQuoteStr):
+            Pair -= 1
+
+        if (Pair > 0 or InSingleQuoteStr or InDoubleQuoteStr) and ch == TAB_VALUE_SPLIT:
+            NewStr += '-'
+        else:
+            NewStr += ch
+    FieldList = []
+    StartPos = 0
+    while True:
+        Pos = NewStr.find(TAB_VALUE_SPLIT, StartPos)
+        if Pos < 0:
+            FieldList.append(Setting[StartPos:].strip())
+            break
+        FieldList.append(Setting[StartPos:Pos].strip())
+        StartPos = Pos + 1
+    for i, ch in enumerate(FieldList):
+        if RanStr in ch:
+            FieldList[i] = ch.replace(RanStr,'\\\\')
+    return FieldList
+
+## AnalyzeDscPcd
+#
+#  Analyze DSC PCD value, since there is no data type info in DSC
+#  This function is used to match functions (AnalyzePcdData) used for retrieving PCD value from database
+#  1. Feature flag: TokenSpace.PcdCName|PcdValue
+#  2. Fix and Patch:TokenSpace.PcdCName|PcdValue[|VOID*[|MaxSize]]
+#  3. Dynamic default:
+#     TokenSpace.PcdCName|PcdValue[|VOID*[|MaxSize]]
+#     TokenSpace.PcdCName|PcdValue
+#  4. Dynamic VPD:
+#     TokenSpace.PcdCName|VpdOffset[|VpdValue]
+#     TokenSpace.PcdCName|VpdOffset[|MaxSize[|VpdValue]]
+#  5. Dynamic HII:
+#     TokenSpace.PcdCName|HiiString|VariableGuid|VariableOffset[|HiiValue]
+#  PCD value needs to be located in such kind of string, and the PCD value might be an expression in which
+#    there might have "|" operator, also in string value.
+#
+#  @param Setting: String contain information described above with "TokenSpace.PcdCName|" stripped
+#  @param PcdType: PCD type: feature, fixed, dynamic default VPD HII
+#  @param DataType: The datum type of PCD: VOID*, UNIT, BOOL
+#  @retval:
+#    ValueList: A List contain fields described above
+#    IsValid:   True if conforming EBNF, otherwise False
+#    Index:     The index where PcdValue is in ValueList
+#
+def AnalyzeDscPcd(Setting, PcdType):
+    FieldList = AnalyzePcdExpression(Setting)
+    DataType = ''
+    IsValid = True
+    if PcdType in (MODEL_PCD_FIXED_AT_BUILD, MODEL_PCD_PATCHABLE_IN_MODULE, MODEL_PCD_DYNAMIC_DEFAULT, MODEL_PCD_DYNAMIC_EX_DEFAULT):
+        Value = FieldList[0]
+        Size = ''
+        if len(FieldList) > 1 and FieldList[1]:
+            DataType = FieldList[1]
+            if FieldList[1] != TAB_VOID and StructPattern.match(FieldList[1]) is None:
+                IsValid = False
+        if len(FieldList) > 2:
+            Size = FieldList[2]
+        if Size:
+            try:
+                int(Size, 16) if Size.upper().startswith("0X") else int(Size)
+            except:
+                IsValid = False
+                Size = -1
+        return [str(Value), DataType, str(Size)], IsValid, 0
+    elif PcdType == MODEL_PCD_FEATURE_FLAG:
+        Value = FieldList[0]
+        Size = ''
+        return [Value, DataType, str(Size)], IsValid, 0
+    elif PcdType in (MODEL_PCD_DYNAMIC_VPD, MODEL_PCD_DYNAMIC_EX_VPD):
+        VpdOffset = FieldList[0]
+        Value = Size = ''
+        if Size:
+            try:
+                int(Size, 16) if Size.upper().startswith("0X") else int(Size)
+            except:
+                IsValid = False
+                Size = -1
+        return [VpdOffset, str(Size), Value], IsValid, 2
+    elif PcdType in (MODEL_PCD_DYNAMIC_HII, MODEL_PCD_DYNAMIC_EX_HII):
+        IsValid = (3 <= len(FieldList) <= 5)
+        HiiString = FieldList[0]
+        Guid = Offset = Value = Attribute = ''
+        if len(FieldList) > 1:
+            Guid = FieldList[1]
+        if len(FieldList) > 2:
+            Offset = FieldList[2]
+        if len(FieldList) > 3:
+            Value = FieldList[3]
+        if len(FieldList) > 4:
+            Attribute = FieldList[4]
+        return [HiiString, Guid, Offset, Value, Attribute], IsValid, 3
+    return [], False, 0
 
 class DscRecipe(object):
     def __init__(self, file_path, arch, workspace, packages_path=None):
@@ -266,11 +392,165 @@ class DscRecipe(object):
                 if len(RecordList) != 1:
                     EdkLogger.error('build', OPTION_UNKNOWN, 'Only FILE_GUID can be listed in <Defines> section.',
                                     File=self.MetaFile, ExtraData=str(ModuleFile), Line=LineNo)
-#                 ModuleFile = ProcessDuplicatedInf(ModuleFile, RecordList[0][2], GlobalData.gWorkspace)
-#                 ModuleFile.Arch = self._Arch
+
                 Module.defines.add(RecordList[0][2])
 
             target[component_sec_type].add(Module)
+        return target
+
+    def LoadSkus(self,target):
+        RecordList = self.dsc_parser[MODEL_EFI_SKU_ID, self._Arch]
+        for Record in RecordList:
+            if not Record[0]:
+                EdkLogger.error('build', FORMAT_INVALID, 'No Sku ID number',
+                                File=self.MetaFile, Line=Record[-1])
+            if not Record[1]:
+                EdkLogger.error('build', FORMAT_INVALID, 'No Sku ID name',
+                                File=self.MetaFile, Line=Record[-1])
+            if not Pattern.match(Record[0]) and not HexPattern.match(Record[0]):
+                EdkLogger.error('build', FORMAT_INVALID, "The format of the Sku ID number is invalid. It only support Integer and HexNumber",
+                                File=self.MetaFile, Line=Record[-1])
+            if not SkuIdPattern.match(Record[1]) or (Record[2] and not SkuIdPattern.match(Record[2])):
+                EdkLogger.error('build', FORMAT_INVALID, "The format of the Sku ID name is invalid. The correct format is '(a-zA-Z_)(a-zA-Z0-9_)*'",
+                                File=self.MetaFile, Line=Record[-1])
+
+            skuid = int(Record[0], 16) if Record[0].upper().startswith("0X") else int(Record[0])
+            skuname = Record[1].upper()
+            parentname = Record[2].upper() if Record[2] else "DEFAULT"
+            target.add(sku_id(skuid, skuname, parentname, self._SourceInfo(Record[-1])))
+        return target
+
+    def LoadDefaultStore(self,target):
+        self.DefaultStores = OrderedDict()
+        RecordList = self.dsc_parser[MODEL_EFI_DEFAULT_STORES, self._Arch]
+        for Record in RecordList:
+            if not Record[0]:
+                EdkLogger.error('build', FORMAT_INVALID, 'No DefaultStores ID number',
+                                File=self.MetaFile, Line=Record[-1])
+            if not Record[1]:
+                EdkLogger.error('build', FORMAT_INVALID, 'No DefaultStores ID name',
+                                File=self.MetaFile, Line=Record[-1])
+            if not Pattern.match(Record[0]) and not HexPattern.match(Record[0]):
+                EdkLogger.error('build', FORMAT_INVALID, "The format of the DefaultStores ID number is invalid. It only support Integer and HexNumber",
+                                File=self.MetaFile, Line=Record[-1])
+            if not IsValidWord(Record[1]):
+                EdkLogger.error('build', FORMAT_INVALID, "The format of the DefaultStores ID name is invalid. The correct format is '(a-zA-Z0-9_)(a-zA-Z0-9_-.)*'",
+                                File=self.MetaFile, Line=Record[-1])
+
+            target.add(default_store(int(Record[0], 16) if Record[0].upper().startswith("0X") else int(Record[0]), Record[1].upper(), self._SourceInfo(Record[-1])))
+
+        return target
+
+    def LoadLibClasses(self,target):
+        RecordList = self.dsc_parser[MODEL_EFI_LIBRARY_CLASS, self._Arch, None, -1]
+        Macros = self._Macros
+        LibraryClassSet = set()
+        #
+        # tdict is a special dict kind of type, used for selecting correct
+        # library instance for given library class and module type
+        #
+        LibraryClassDict = tdict(True, 3)
+        for Record in RecordList:
+            LibraryClass, LibraryInstance, Dummy, Arch, ModuleType, Dummy, Dummy, LineNo = Record
+            if LibraryClass == '' or LibraryClass == 'NULL':
+                self._NullLibraryNumber += 1
+                LibraryClass = 'NULL%d' % self._NullLibraryNumber
+                EdkLogger.verbose("Found forced library for arch=%s\n\t%s [%s]" % (Arch, LibraryInstance, LibraryClass))
+            LibraryClassSet.add(LibraryClass)
+            LibraryInstance = PathClass(NormPath(LibraryInstance, Macros), GlobalData.gWorkspace, Arch=self._Arch)
+            # check the file validation
+            ErrorCode, ErrorInfo = LibraryInstance.Validate('.inf')
+            if ErrorCode != 0:
+                EdkLogger.error('build', ErrorCode, File=self.MetaFile, Line=LineNo,
+                                ExtraData=ErrorInfo)
+
+            if ModuleType != TAB_COMMON and ModuleType not in SUP_MODULE_LIST:
+                EdkLogger.error('build', OPTION_UNKNOWN, "Unknown module type [%s]" % ModuleType,
+                                File=self.MetaFile, ExtraData=LibraryInstance, Line=LineNo)
+            LibraryClassDict[Arch, ModuleType, LibraryClass] = (LibraryInstance, LineNo)
+
+        # resolve the specific library instance for each class and each module type
+
+        for LibraryClass in LibraryClassSet:
+            # try all possible module types
+            for ModuleType in SUP_MODULE_LIST:
+                LibClassData = LibraryClassDict[self._Arch, ModuleType, LibraryClass]
+                if LibClassData is None:
+                    continue
+                LibraryInstance,LineNo = LibClassData
+                lib_sec_obj = dsc_section_type(self._Arch, ModuleType)
+                target[lib_sec_obj].add(library_class(LibraryClass, LibraryInstance, source_info=self._SourceInfo(LineNo)))
+
+        return target
+
+    def LoadBuildOptions(self,target):
+
+        RecordList = self.dsc_parser[MODEL_META_DATA_BUILD_OPTION, self._Arch, EDKII_NAME]
+        for ToolChainFamily, ToolChain, Option, Dummy1, Dummy2, Dummy3, Dummy4, LineNo in RecordList:
+            if Dummy3.upper() != TAB_COMMON:
+                continue
+            #
+            # Only flags can be appended
+            #
+            Target, Tag, Arch, Tool, Attr = ToolChain.split("_")
+            build_option_sec_obj = dsc_buildoption_section_type(self._Arch, EDKII_NAME)
+            if not ToolChain.endswith('_FLAGS') or Option.startswith('='):
+                build_option_obj = build_option(Tool,Attr,Option,Target,Tag,Arch,ToolChainFamily, True, self._SourceInfo(LineNo))
+                target[build_option_sec_obj].add(build_option_obj)
+            else:
+                build_option_obj = build_option(Tool,Attr,Option,Target,Tag,Arch,ToolChainFamily, False, self._SourceInfo(LineNo))
+                target[build_option_sec_obj].add(build_option_obj)
+        return target
+
+    def LoadPcds(self,target):
+        PcdTypeSet = (
+            MODEL_PCD_FIXED_AT_BUILD,
+            MODEL_PCD_PATCHABLE_IN_MODULE,
+            MODEL_PCD_FEATURE_FLAG,
+            MODEL_PCD_DYNAMIC_DEFAULT,
+            MODEL_PCD_DYNAMIC_HII,
+            MODEL_PCD_DYNAMIC_VPD,
+            MODEL_PCD_DYNAMIC_EX_DEFAULT,
+            MODEL_PCD_DYNAMIC_EX_HII,
+            MODEL_PCD_DYNAMIC_EX_VPD)
+        _PCD_TYPE_STRING_ = {
+            MODEL_PCD_FIXED_AT_BUILD        :   TAB_PCDS_FIXED_AT_BUILD,
+            MODEL_PCD_PATCHABLE_IN_MODULE   :   TAB_PCDS_PATCHABLE_IN_MODULE,
+            MODEL_PCD_FEATURE_FLAG          :   TAB_PCDS_FEATURE_FLAG,
+            MODEL_PCD_DYNAMIC               :   TAB_PCDS_DYNAMIC,
+            MODEL_PCD_DYNAMIC_DEFAULT       :   TAB_PCDS_DYNAMIC,
+            MODEL_PCD_DYNAMIC_HII           :   TAB_PCDS_DYNAMIC_HII,
+            MODEL_PCD_DYNAMIC_VPD           :   TAB_PCDS_DYNAMIC_VPD,
+            MODEL_PCD_DYNAMIC_EX            :   TAB_PCDS_DYNAMIC_EX,
+            MODEL_PCD_DYNAMIC_EX_DEFAULT    :   TAB_PCDS_DYNAMIC_EX,
+            MODEL_PCD_DYNAMIC_EX_HII        :   TAB_PCDS_DYNAMIC_EX_HII,
+            MODEL_PCD_DYNAMIC_EX_VPD        :   TAB_PCDS_DYNAMIC_EX_VPD,
+        }
+
+        for PcdType in PcdTypeSet:
+            RecordList = self.dsc_parser[PcdType, self._Arch]
+            for TokenSpaceGuid, PcdCName, Setting, Arch, SkuName, DefaultStore, Dummy4, LineNo in RecordList:
+                SkuName = SkuName.upper()
+                SkuName = TAB_DEFAULT if SkuName == TAB_COMMON else SkuName
+                if PcdType in (MODEL_PCD_DYNAMIC_HII, MODEL_PCD_DYNAMIC_EX_HII):
+                    pcd_sec_obj = dsc_pcd_section_type(_PCD_TYPE_STRING_[PcdType], self._Arch, SkuName, DefaultStore)
+                else:
+                    pcd_sec_obj = dsc_pcd_section_type(_PCD_TYPE_STRING_[PcdType], self._Arch, SkuName)
+
+                ValueList, IsValid, _ = AnalyzeDscPcd(Setting, PcdType)
+                if IsValid:
+                    if PcdType in (MODEL_PCD_DYNAMIC_VPD,MODEL_PCD_DYNAMIC_EX_VPD):
+                        VpdOffset, MaxDatumSize, InitialValue = ValueList
+                        MaxDatumSize = 0 if not MaxDatumSize else MaxDatumSize
+                        pcd_obj = pcd_vpd(TokenSpaceGuid,PcdCName,InitialValue,VpdOffset,MaxDatumSize,self._SourceInfo(LineNo))
+                    if PcdType in (MODEL_PCD_DYNAMIC_HII, MODEL_PCD_DYNAMIC_EX_HII):
+                        VariableName, VariableGuid, VariableOffset, DefaultValue, VarAttribute = ValueList
+                        pcd_obj = pcd_variable(TokenSpaceGuid,PcdCName,VariableName,VariableGuid,VariableOffset,DefaultValue,VarAttribute,self._SourceInfo(LineNo))
+                    else:
+                        PcdValue, DatumType, MaxDatumSize = ValueList
+                        MaxDatumSize = 0 if not MaxDatumSize else MaxDatumSize
+                        pcd_obj = pcd_typed(TokenSpaceGuid,PcdCName,PcdValue,DatumType,MaxDatumSize,self._SourceInfo(LineNo))
+                    target[pcd_sec_obj].add(pcd_obj)
         return target
 
 if __name__ == "__main__":
