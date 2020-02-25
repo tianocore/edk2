@@ -931,6 +931,8 @@ SdMmcHcClockSupply (
     }
   }
 
+  Private->Slot[Slot].CurrentFreq = ClockFreq;
+
   return Status;
 }
 

@@ -83,6 +83,7 @@ typedef struct {
   BOOLEAN                            MediaPresent;
   BOOLEAN                            Initialized;
   SD_MMC_CARD_TYPE                   CardType;
+  UINT64                             CurrentFreq;
   EDKII_SD_MMC_OPERATING_PARAMETERS  OperatingParameters;
 } SD_MMC_HC_SLOT;
 
