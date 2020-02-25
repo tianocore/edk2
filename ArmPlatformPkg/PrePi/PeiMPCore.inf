@@ -37,6 +37,7 @@
 
 [LibraryClasses]
   BaseLib
+  CacheMaintenanceLib
   DebugLib
   DebugAgentLib
   ArmLib
