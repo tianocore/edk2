@@ -28,7 +28,7 @@ EFI_DRIVER_BINDING_PROTOCOL gSdMmcPciHcDriverBinding = {
   NULL
 };
 
-#define SLOT_INIT_TEMPLATE {0, UnknownSlot, 0, 0, 0, \
+#define SLOT_INIT_TEMPLATE {0, UnknownSlot, 0, 0, 0, 0, \
                                {EDKII_SD_MMC_BUS_WIDTH_IGNORE,\
                                EDKII_SD_MMC_CLOCK_FREQ_IGNORE,\
                                {EDKII_SD_MMC_DRIVER_STRENGTH_IGNORE}}}
