@@ -8,6 +8,7 @@
 
 #include <PiPei.h>
 
+#include <Library/CacheMaintenanceLib.h>
 #include <Library/DebugAgentLib.h>
 #include <Library/PrePiLib.h>
 #include <Library/PrintLib.h>
@@ -178,8 +179,6 @@ CEntryPoint (
 
   // Data Cache enabled on Primary core when MMU is enabled.
   ArmDisableDataCache ();
-  // Invalidate Data cache
-  ArmInvalidateDataCache ();
   // Invalidate instruction cache
   ArmInvalidateInstructionCache ();
   // Enable Instruction Caches on all cores.
@@ -200,6 +199,10 @@ CEntryPoint (
 
   // If not primary Jump to Secondary Main
   if (ArmPlatformIsPrimaryCore (MpId)) {
+
+    InvalidateDataCacheRange ((VOID *)UefiMemoryBase,
+                              FixedPcdGet32 (PcdSystemMemoryUefiRegionSize));
+
     // Goto primary Main.
     PrimaryMain (UefiMemoryBase, StacksBase, StartTimeStamp);
   } else {
@@ -209,4 +212,3 @@ CEntryPoint (
   // DXE Core should always load and never return
   ASSERT (FALSE);
 }
-
