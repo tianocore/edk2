@@ -30,22 +30,27 @@
 [Packages]
   MdePkg/MdePkg.dec
   OvmfPkg/OvmfPkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
 
 [LibraryClasses]
   BaseLib
   DebugLib
   MmServicesTableLib
   PcdLib
+  SafeIntLib
   UefiDriverEntryPoint
 
 [Protocols]
   gEfiMmCpuIoProtocolGuid                                           ## CONSUMES
+  gEfiSmmCpuServiceProtocolGuid                                     ## CONSUMES
 
 [Pcd]
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuHotPlugDataAddress                ## CONSUMES
   gUefiOvmfPkgTokenSpaceGuid.PcdQ35SmramAtDefaultSmbase             ## CONSUMES
 
 [FeaturePcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire                     ## CONSUMES
 
 [Depex]
-  gEfiMmCpuIoProtocolGuid
+  gEfiMmCpuIoProtocolGuid AND
+  gEfiSmmCpuServiceProtocolGuid

@@ -6,21 +6,51 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
+#include <CpuHotPlugData.h>                  // CPU_HOT_PLUG_DATA
 #include <IndustryStandard/Q35MchIch9.h>     // ICH9_APM_CNT
 #include <IndustryStandard/QemuCpuHotplug.h> // QEMU_CPUHP_CMD_GET_PENDING
 #include <Library/BaseLib.h>                 // CpuDeadLoop()
 #include <Library/DebugLib.h>                // ASSERT()
 #include <Library/MmServicesTableLib.h>      // gMmst
 #include <Library/PcdLib.h>                  // PcdGetBool()
+#include <Library/SafeIntLib.h>              // SafeUintnSub()
 #include <Protocol/MmCpuIo.h>                // EFI_MM_CPU_IO_PROTOCOL
+#include <Protocol/SmmCpuService.h>          // EFI_SMM_CPU_SERVICE_PROTOCOL
 #include <Uefi/UefiBaseType.h>               // EFI_STATUS
 
+#include "ApicId.h"                          // APIC_ID
 #include "QemuCpuhp.h"                       // QemuCpuhpWriteCpuSelector()
 
 //
 // We use this protocol for accessing IO Ports.
 //
 STATIC EFI_MM_CPU_IO_PROTOCOL *mMmCpuIo;
+//
+// The following protocol is used to report the addition or removal of a CPU to
+// the SMM CPU driver (PiSmmCpuDxeSmm).
+//
+STATIC EFI_SMM_CPU_SERVICE_PROTOCOL *mMmCpuService;
+//
+// This structure is a communication side-channel between the
+// EFI_SMM_CPU_SERVICE_PROTOCOL consumer (i.e., this driver) and provider
+// (i.e., PiSmmCpuDxeSmm).
+//
+STATIC CPU_HOT_PLUG_DATA *mCpuHotPlugData;
+//
+// SMRAM arrays for fetching the APIC IDs of processors with pending events (of
+// known event types), for the time of just one MMI.
+//
+// The lifetimes of these arrays match that of this driver only because we
+// don't want to allocate SMRAM at OS runtime, and potentially fail (or
+// fragment the SMRAM map).
+//
+// These arrays provide room for ("possible CPU count" minus one) APIC IDs
+// each, as we don't expect every possible CPU to appear, or disappear, in a
+// single MMI. The numbers of used (populated) elements in the arrays are
+// determined on every MMI separately.
+//
+STATIC APIC_ID *mPluggedApicIds;
+STATIC APIC_ID *mToUnplugApicIds;
 //
 // Represents the registration of the CPU Hotplug MMI handler.
 //
@@ -84,6 +114,8 @@ CpuHotplugMmi (
 {
   EFI_STATUS Status;
   UINT8      ApmControl;
+  UINT32     PluggedCount;
+  UINT32     ToUnplugCount;
 
   //
   // Assert that we are entering this function due to our root MMI handler
@@ -119,6 +151,27 @@ CpuHotplugMmi (
   }
 
   //
+  // Collect the CPUs with pending events.
+  //
+  Status = QemuCpuhpCollectApicIds (
+             mMmCpuIo,
+             mCpuHotPlugData->ArrayLength,     // PossibleCpuCount
+             mCpuHotPlugData->ArrayLength - 1, // ApicIdCount
+             mPluggedApicIds,
+             &PluggedCount,
+             mToUnplugApicIds,
+             &ToUnplugCount
+             );
+  if (EFI_ERROR (Status)) {
+    goto Fatal;
+  }
+  if (ToUnplugCount > 0) {
+    DEBUG ((DEBUG_ERROR, "%a: hot-unplug is not supported yet\n",
+      __FUNCTION__));
+    goto Fatal;
+  }
+
+  //
   // We've handled this MMI.
   //
   return EFI_SUCCESS;
@@ -144,6 +197,7 @@ CpuHotplugEntry (
   )
 {
   EFI_STATUS Status;
+  UINTN      Size;
 
   //
   // This module should only be included when SMM support is required.
@@ -169,6 +223,51 @@ CpuHotplugEntry (
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a: locate MmCpuIo: %r\n", __FUNCTION__, Status));
     goto Fatal;
+  }
+  Status = gMmst->MmLocateProtocol (&gEfiSmmCpuServiceProtocolGuid,
+                    NULL /* Registration */, (VOID **)&mMmCpuService);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: locate MmCpuService: %r\n", __FUNCTION__,
+      Status));
+    goto Fatal;
+  }
+
+  //
+  // Our DEPEX on EFI_SMM_CPU_SERVICE_PROTOCOL guarantees that PiSmmCpuDxeSmm
+  // has pointed PcdCpuHotPlugDataAddress to CPU_HOT_PLUG_DATA in SMRAM.
+  //
+  mCpuHotPlugData = (VOID *)(UINTN)PcdGet64 (PcdCpuHotPlugDataAddress);
+  if (mCpuHotPlugData == NULL) {
+    Status = EFI_NOT_FOUND;
+    DEBUG ((DEBUG_ERROR, "%a: CPU_HOT_PLUG_DATA: %r\n", __FUNCTION__, Status));
+    goto Fatal;
+  }
+  //
+  // If the possible CPU count is 1, there's nothing for this driver to do.
+  //
+  if (mCpuHotPlugData->ArrayLength == 1) {
+    return EFI_UNSUPPORTED;
+  }
+  //
+  // Allocate the data structures that depend on the possible CPU count.
+  //
+  if (RETURN_ERROR (SafeUintnSub (mCpuHotPlugData->ArrayLength, 1, &Size)) ||
+      RETURN_ERROR (SafeUintnMult (sizeof (APIC_ID), Size, &Size))) {
+    Status = EFI_ABORTED;
+    DEBUG ((DEBUG_ERROR, "%a: invalid CPU_HOT_PLUG_DATA\n", __FUNCTION__));
+    goto Fatal;
+  }
+  Status = gMmst->MmAllocatePool (EfiRuntimeServicesData, Size,
+                    (VOID **)&mPluggedApicIds);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: MmAllocatePool(): %r\n", __FUNCTION__, Status));
+    goto Fatal;
+  }
+  Status = gMmst->MmAllocatePool (EfiRuntimeServicesData, Size,
+                    (VOID **)&mToUnplugApicIds);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: MmAllocatePool(): %r\n", __FUNCTION__, Status));
+    goto ReleasePluggedApicIds;
   }
 
   //
@@ -200,7 +299,7 @@ CpuHotplugEntry (
     Status = EFI_NOT_FOUND;
     DEBUG ((DEBUG_ERROR, "%a: modern CPU hotplug interface: %r\n",
       __FUNCTION__, Status));
-    goto Fatal;
+    goto ReleaseToUnplugApicIds;
   }
 
   //
@@ -214,10 +313,18 @@ CpuHotplugEntry (
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a: MmiHandlerRegister(): %r\n", __FUNCTION__,
       Status));
-    goto Fatal;
+    goto ReleaseToUnplugApicIds;
   }
 
   return EFI_SUCCESS;
+
+ReleaseToUnplugApicIds:
+  gMmst->MmFreePool (mToUnplugApicIds);
+  mToUnplugApicIds = NULL;
+
+ReleasePluggedApicIds:
+  gMmst->MmFreePool (mPluggedApicIds);
+  mPluggedApicIds = NULL;
 
 Fatal:
   ASSERT (FALSE);
