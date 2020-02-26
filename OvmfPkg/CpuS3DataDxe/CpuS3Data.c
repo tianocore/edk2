@@ -22,10 +22,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
-#include <Library/UefiBootServicesTableLib.h>
 #include <Library/DebugLib.h>
-#include <Library/MtrrLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/MtrrLib.h>
+#include <Library/UefiBootServicesTableLib.h>
 
 #include <Protocol/MpService.h>
 #include <Guid/EventGroup.h>
