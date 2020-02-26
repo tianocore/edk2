@@ -20,6 +20,7 @@
 
 #include "ApicId.h"                          // APIC_ID
 #include "QemuCpuhp.h"                       // QemuCpuhpWriteCpuSelector()
+#include "Smbase.h"                          // SmbaseAllocatePostSmmPen()
 
 //
 // We use this protocol for accessing IO Ports.
@@ -51,6 +52,11 @@ STATIC CPU_HOT_PLUG_DATA *mCpuHotPlugData;
 //
 STATIC APIC_ID *mPluggedApicIds;
 STATIC APIC_ID *mToUnplugApicIds;
+//
+// Address of the non-SMRAM reserved memory page that contains the Post-SMM Pen
+// for hot-added CPUs.
+//
+STATIC UINT32 mPostSmmPenAddress;
 //
 // Represents the registration of the CPU Hotplug MMI handler.
 //
@@ -116,6 +122,8 @@ CpuHotplugMmi (
   UINT8      ApmControl;
   UINT32     PluggedCount;
   UINT32     ToUnplugCount;
+  UINT32     PluggedIdx;
+  UINT32     NewSlot;
 
   //
   // Assert that we are entering this function due to our root MMI handler
@@ -172,9 +180,76 @@ CpuHotplugMmi (
   }
 
   //
+  // Process hot-added CPUs.
+  //
+  // The Post-SMM Pen need not be reinstalled multiple times within a single
+  // root MMI handling. Even reinstalling once per root MMI is only prudence;
+  // in theory installing the pen in the driver's entry point function should
+  // suffice.
+  //
+  SmbaseReinstallPostSmmPen (mPostSmmPenAddress);
+
+  PluggedIdx = 0;
+  NewSlot = 0;
+  while (PluggedIdx < PluggedCount) {
+    APIC_ID NewApicId;
+    UINTN   NewProcessorNumberByProtocol;
+
+    NewApicId = mPluggedApicIds[PluggedIdx];
+    //
+    // Find the first empty slot in CPU_HOT_PLUG_DATA.
+    //
+    while (NewSlot < mCpuHotPlugData->ArrayLength &&
+           mCpuHotPlugData->ApicId[NewSlot] != MAX_UINT64) {
+      NewSlot++;
+    }
+    if (NewSlot == mCpuHotPlugData->ArrayLength) {
+      DEBUG ((DEBUG_ERROR, "%a: no room for APIC ID " FMT_APIC_ID "\n",
+        __FUNCTION__, NewApicId));
+      goto Fatal;
+    }
+
+    //
+    // Store the APIC ID of the new processor to the slot.
+    //
+    mCpuHotPlugData->ApicId[NewSlot] = NewApicId;
+
+    //
+    // Relocate the SMBASE of the new CPU.
+    //
+    Status = SmbaseRelocate (NewApicId, mCpuHotPlugData->SmBase[NewSlot],
+               mPostSmmPenAddress);
+    if (EFI_ERROR (Status)) {
+      goto RevokeNewSlot;
+    }
+
+    //
+    // Add the new CPU with EFI_SMM_CPU_SERVICE_PROTOCOL.
+    //
+    Status = mMmCpuService->AddProcessor (mMmCpuService, NewApicId,
+                              &NewProcessorNumberByProtocol);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "%a: AddProcessor(" FMT_APIC_ID "): %r\n",
+        __FUNCTION__, NewApicId, Status));
+      goto RevokeNewSlot;
+    }
+
+    DEBUG ((DEBUG_INFO, "%a: hot-added APIC ID " FMT_APIC_ID ", SMBASE 0x%Lx, "
+      "EFI_SMM_CPU_SERVICE_PROTOCOL assigned number %Lu\n", __FUNCTION__,
+      NewApicId, (UINT64)mCpuHotPlugData->SmBase[NewSlot],
+      (UINT64)NewProcessorNumberByProtocol));
+
+    NewSlot++;
+    PluggedIdx++;
+  }
+
+  //
   // We've handled this MMI.
   //
   return EFI_SUCCESS;
+
+RevokeNewSlot:
+  mCpuHotPlugData->ApicId[NewSlot] = MAX_UINT64;
 
 Fatal:
   ASSERT (FALSE);
@@ -271,6 +346,15 @@ CpuHotplugEntry (
   }
 
   //
+  // Allocate the Post-SMM Pen for hot-added CPUs.
+  //
+  Status = SmbaseAllocatePostSmmPen (&mPostSmmPenAddress,
+             SystemTable->BootServices);
+  if (EFI_ERROR (Status)) {
+    goto ReleaseToUnplugApicIds;
+  }
+
+  //
   // Sanity-check the CPU hotplug interface.
   //
   // Both of the following features are part of QEMU 5.0, introduced primarily
@@ -299,7 +383,7 @@ CpuHotplugEntry (
     Status = EFI_NOT_FOUND;
     DEBUG ((DEBUG_ERROR, "%a: modern CPU hotplug interface: %r\n",
       __FUNCTION__, Status));
-    goto ReleaseToUnplugApicIds;
+    goto ReleasePostSmmPen;
   }
 
   //
@@ -313,10 +397,19 @@ CpuHotplugEntry (
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a: MmiHandlerRegister(): %r\n", __FUNCTION__,
       Status));
-    goto ReleaseToUnplugApicIds;
+    goto ReleasePostSmmPen;
   }
 
+  //
+  // Install the handler for the hot-added CPUs' first SMI.
+  //
+  SmbaseInstallFirstSmiHandler ();
+
   return EFI_SUCCESS;
+
+ReleasePostSmmPen:
+  SmbaseReleasePostSmmPen (mPostSmmPenAddress, SystemTable->BootServices);
+  mPostSmmPenAddress = 0;
 
 ReleaseToUnplugApicIds:
   gMmst->MmFreePool (mToUnplugApicIds);
