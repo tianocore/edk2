@@ -685,6 +685,7 @@
       NULL|SecurityPkg/Library/DxeImageVerificationLib/DxeImageVerificationLib.inf
 !endif
 !if $(TPM_ENABLE) == TRUE
+      NULL|SecurityPkg/Library/DxeTpmMeasureBootLib/DxeTpmMeasureBootLib.inf
       NULL|SecurityPkg/Library/DxeTpm2MeasureBootLib/DxeTpm2MeasureBootLib.inf
 !endif
   }
