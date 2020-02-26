@@ -10,6 +10,7 @@
 #include <Base.h>
 
 #include <Library/ArmLib.h>
+#include <Library/DebugLib.h>
 
 #include <Chipset/ArmV7.h>
 
@@ -41,6 +42,8 @@ ArmInvalidateDataCache (
   VOID
   )
 {
+  ASSERT (!ArmMmuEnabled ());
+
   ArmDataSynchronizationBarrier ();
   ArmV7DataCacheOperation (ArmInvalidateDataCacheEntryBySetWay);
 }
@@ -51,6 +54,8 @@ ArmCleanInvalidateDataCache (
   VOID
   )
 {
+  ASSERT (!ArmMmuEnabled ());
+
   ArmDataSynchronizationBarrier ();
   ArmV7DataCacheOperation (ArmCleanInvalidateDataCacheEntryBySetWay);
 }
@@ -61,6 +66,8 @@ ArmCleanDataCache (
   VOID
   )
 {
+  ASSERT (!ArmMmuEnabled ());
+
   ArmDataSynchronizationBarrier ();
   ArmV7DataCacheOperation (ArmCleanDataCacheEntryBySetWay);
 }
