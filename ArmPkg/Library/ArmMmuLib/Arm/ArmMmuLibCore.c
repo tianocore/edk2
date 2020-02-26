@@ -830,12 +830,3 @@ ArmClearMemoryRegionReadOnly (
 {
   return ArmSetMemoryAttributes (BaseAddress, Length, __EFI_MEMORY_RWX);
 }
-
-RETURN_STATUS
-EFIAPI
-ArmMmuBaseLibConstructor (
-  VOID
-  )
-{
-  return RETURN_SUCCESS;
-}
