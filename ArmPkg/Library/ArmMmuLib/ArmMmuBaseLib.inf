@@ -23,7 +23,9 @@
   AArch64/ArmMmuLibReplaceEntry.S
 
 [Sources.ARM]
+  Arm/ArmMmuLibConvert.c
   Arm/ArmMmuLibCore.c
+  Arm/ArmMmuLibUpdate.c
   Arm/ArmMmuLibV7Support.S   |GCC
   Arm/ArmMmuLibV7Support.asm |RVCT
 
