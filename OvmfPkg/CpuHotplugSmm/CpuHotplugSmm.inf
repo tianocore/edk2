@@ -24,8 +24,11 @@
 [Sources]
   ApicId.h
   CpuHotplug.c
+  PostSmmPen.nasm
   QemuCpuhp.c
   QemuCpuhp.h
+  Smbase.c
+  Smbase.h
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -34,6 +37,7 @@
 
 [LibraryClasses]
   BaseLib
+  BaseMemoryLib
   DebugLib
   MmServicesTableLib
   PcdLib
