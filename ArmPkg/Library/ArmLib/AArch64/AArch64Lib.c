@@ -7,11 +7,12 @@
 
 **/
 
-#include <Uefi.h>
-#include <Chipset/AArch64.h>
+#include <Base.h>
+
 #include <Library/ArmLib.h>
-#include <Library/BaseLib.h>
-#include <Library/IoLib.h>
+
+#include <Chipset/AArch64.h>
+
 #include "AArch64Lib.h"
 #include "ArmLibPrivate.h"
 
