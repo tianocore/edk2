@@ -22,6 +22,7 @@
 #
 
 [Sources]
+  ApicId.h
   CpuHotplug.c
   QemuCpuhp.c
   QemuCpuhp.h

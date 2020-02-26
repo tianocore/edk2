@@ -1,8 +1,8 @@
 /** @file
-  Simple wrapper functions that access QEMU's modern CPU hotplug register
-  block.
+  Simple wrapper functions and utility functions that access QEMU's modern CPU
+  hotplug register block.
 
-  These functions thinly wrap some of the registers described in
+  These functions manipulate some of the registers described in
   "docs/specs/acpi_cpu_hotplug.txt" in the QEMU source. IO Ports are accessed
   via EFI_MM_CPU_IO_PROTOCOL. If a protocol call fails, these functions don't
   return.
@@ -16,6 +16,9 @@
 #define QEMU_CPUHP_H_
 
 #include <Protocol/MmCpuIo.h>  // EFI_MM_CPU_IO_PROTOCOL
+#include <Uefi/UefiBaseType.h> // EFI_STATUS
+
+#include "ApicId.h"            // APIC_ID
 
 UINT32
 QemuCpuhpReadCommandData2 (
@@ -42,6 +45,17 @@ VOID
 QemuCpuhpWriteCommand (
   IN CONST EFI_MM_CPU_IO_PROTOCOL *MmCpuIo,
   IN UINT8                        Command
+  );
+
+EFI_STATUS
+QemuCpuhpCollectApicIds (
+  IN  CONST EFI_MM_CPU_IO_PROTOCOL *MmCpuIo,
+  IN  UINT32                       PossibleCpuCount,
+  IN  UINT32                       ApicIdCount,
+  OUT APIC_ID                      *PluggedApicIds,
+  OUT UINT32                       *PluggedCount,
+  OUT APIC_ID                      *ToUnplugApicIds,
+  OUT UINT32                       *ToUnplugCount
   );
 
 #endif // QEMU_CPUHP_H_
