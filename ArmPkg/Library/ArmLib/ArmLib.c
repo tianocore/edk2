@@ -10,8 +10,6 @@
 #include <Base.h>
 
 #include <Library/ArmLib.h>
-#include <Library/DebugLib.h>
-#include <Library/PcdLib.h>
 
 #include "ArmLibPrivate.h"
 
