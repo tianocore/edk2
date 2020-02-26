@@ -39,5 +39,6 @@
 
 #define QEMU_CPUHP_W_CMD                     0x5
 #define QEMU_CPUHP_CMD_GET_PENDING             0x0
+#define QEMU_CPUHP_CMD_GET_ARCH_ID             0x3
 
 #endif // QEMU_CPU_HOTPLUG_H_
