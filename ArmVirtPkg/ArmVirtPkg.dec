@@ -36,6 +36,12 @@
 [Protocols]
   gFdtClientProtocolGuid = { 0xE11FACA0, 0x4710, 0x4C8E, { 0xA7, 0xA2, 0x01, 0xBA, 0xA2, 0x59, 0x1B, 0x4C } }
 
+[PcdsFeatureFlag]
+  #
+  # Feature Flag PCD that defines whether TPM2 support is enabled
+  #
+  gArmVirtTokenSpaceGuid.PcdTpm2SupportEnabled|FALSE|BOOLEAN|0x00000004
+
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   #
   # This is the physical address where the device tree is expected to be stored

@@ -237,6 +237,11 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosDocRev|0x0
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuSmbiosValidated|FALSE
 
+  #
+  # TPM2 support
+  #
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress|0x0
+
 [PcdsDynamicHii]
   gArmVirtTokenSpaceGuid.PcdForceNoAcpi|L"ForceNoAcpi"|gArmVirtVariableGuid|0x0|FALSE|NV,BS
 
