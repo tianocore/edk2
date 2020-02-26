@@ -23,6 +23,8 @@
 
 [Sources]
   CpuHotplug.c
+  QemuCpuhp.c
+  QemuCpuhp.h
 
 [Packages]
   MdePkg/MdePkg.dec
