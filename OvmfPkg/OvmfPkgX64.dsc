@@ -898,7 +898,7 @@
   }
   UefiCpuPkg/PiSmmCpuDxeSmm/PiSmmCpuDxeSmm.inf {
     <LibraryClasses>
-      SmmCpuPlatformHookLib|UefiCpuPkg/Library/SmmCpuPlatformHookLibNull/SmmCpuPlatformHookLibNull.inf
+      SmmCpuPlatformHookLib|OvmfPkg/Library/SmmCpuPlatformHookLibQemu/SmmCpuPlatformHookLibQemu.inf
       SmmCpuFeaturesLib|OvmfPkg/Library/SmmCpuFeaturesLib/SmmCpuFeaturesLib.inf
   }
 
