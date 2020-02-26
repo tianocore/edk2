@@ -5,7 +5,10 @@
 @REM (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 @REM SPDX-License-Identifier: BSD-2-Clause-Patent
 @REM
+datjkeljdaj
+dtest 
 
+test 
 @REM set CYGWIN_HOME=C:\cygwin
 
 @REM usage:
@@ -28,7 +31,7 @@ cd %~dp0
 if not defined WORKSPACE (
   goto SetWorkSpace
 )
-
+test
 if %WORKSPACE% == %CD% (
   @REM Workspace is not changed.
   goto ParseArgs
