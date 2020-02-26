@@ -699,15 +699,6 @@ ArmConfigureMmu (
 
   ZeroMem (TranslationTable, RootTableEntryCount * sizeof(UINT64));
 
-  // Disable MMU and caches. ArmDisableMmu() also invalidates the TLBs
-  ArmDisableMmu ();
-  ArmDisableDataCache ();
-  ArmDisableInstructionCache ();
-
-  // Make sure nothing sneaked into the cache
-  ArmCleanInvalidateDataCache ();
-  ArmInvalidateInstructionCache ();
-
   TranslationTableAttribute = TT_ATTR_INDX_INVALID;
   while (MemoryTable->Length != 0) {
 
