@@ -33,6 +33,7 @@
   DEFINE SOURCE_DEBUG_ENABLE     = FALSE
   DEFINE TPM2_ENABLE             = FALSE
   DEFINE TPM2_CONFIG_ENABLE      = FALSE
+  DEFINE LOAD_X64_ON_IA32_ENABLE = FALSE
 
   #
   # Network definition
@@ -931,4 +932,8 @@
 !if $(TPM2_CONFIG_ENABLE) == TRUE
   SecurityPkg/Tcg/Tcg2Config/Tcg2ConfigDxe.inf
 !endif
+!endif
+
+!if $(LOAD_X64_ON_IA32_ENABLE) == TRUE
+  OvmfPkg/CompatImageLoaderDxe/CompatImageLoaderDxe.inf
 !endif

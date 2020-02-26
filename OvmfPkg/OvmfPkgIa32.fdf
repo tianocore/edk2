@@ -354,6 +354,10 @@ INF  SecurityPkg/Tcg/Tcg2Config/Tcg2ConfigDxe.inf
 !endif
 !endif
 
+!if $(LOAD_X64_ON_IA32_ENABLE) == TRUE
+INF  OvmfPkg/CompatImageLoaderDxe/CompatImageLoaderDxe.inf
+!endif
+
 ################################################################################
 
 [FV.FVMAIN_COMPACT]
