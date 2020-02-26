@@ -159,7 +159,7 @@ INF  OvmfPkg/SmmAccess/SmmAccessPei.inf
 !endif
 INF  UefiCpuPkg/CpuMpPei/CpuMpPei.inf
 
-!if $(TPM2_ENABLE) == TRUE
+!if $(TPM_ENABLE) == TRUE
 INF  OvmfPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf
 INF  SecurityPkg/Tcg/Tcg2Pei/Tcg2Pei.inf
 !endif
@@ -345,11 +345,11 @@ INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
 !endif
 
 #
-# TPM2 support
+# TPM support
 #
-!if $(TPM2_ENABLE) == TRUE
+!if $(TPM_ENABLE) == TRUE
 INF  SecurityPkg/Tcg/Tcg2Dxe/Tcg2Dxe.inf
-!if $(TPM2_CONFIG_ENABLE) == TRUE
+!if $(TPM_CONFIG_ENABLE) == TRUE
 INF  SecurityPkg/Tcg/Tcg2Config/Tcg2ConfigDxe.inf
 !endif
 !endif
