@@ -390,8 +390,16 @@ MmCommunicationInitialize (
                     MmGuidedEventNotify, mGuidedEventGuid[Index],
                     mGuidedEventGuid[Index], &mGuidedEvent[Index]);
     ASSERT_EFI_ERROR (Status);
+    if (EFI_ERROR (Status)) {
+      while (Index-- > 0) {
+        gBS->CloseEvent (mGuidedEvent[Index]);
+      }
+      goto UninstallProtocol;
+    }
   }
+  return EFI_SUCCESS;
 
+UninstallProtocol:
   gBS->UninstallProtocolInterface (
          mMmCommunicateHandle,
          &gEfiMmCommunicationProtocolGuid,
