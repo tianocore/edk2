@@ -174,6 +174,13 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
 
   #
+  # TPM2 support
+  #
+!if $(TPM2_ENABLE) == TRUE
+  INF SecurityPkg/Tcg/Tcg2Dxe/Tcg2Dxe.inf
+!endif
+
+  #
   # TianoCore logo (splash screen)
   #
   INF MdeModulePkg/Logo/LogoDxe.inf
