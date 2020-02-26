@@ -29,6 +29,7 @@
   #
   DEFINE TTY_TERMINAL            = FALSE
   DEFINE SECURE_BOOT_ENABLE      = FALSE
+  DEFINE TPM2_ENABLE             = FALSE
 
   #
   # Network definition
@@ -77,6 +78,10 @@
 [LibraryClasses.common.PEIM]
   ArmVirtMemInfoLib|ArmVirtPkg/Library/QemuVirtMemInfoLib/QemuVirtMemInfoPeiLib.inf
 
+!if $(TPM2_ENABLE) == TRUE
+  ResetSystemLib|MdeModulePkg/Library/PeiResetSystemLib/PeiResetSystemLib.inf
+!endif
+
 [LibraryClasses.common.DXE_DRIVER]
   ReportStatusCodeLib|MdeModulePkg/Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.inf
 
@@ -99,6 +104,8 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutUgaSupport|FALSE
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdTurnOffUsbLegacySupport|TRUE
+
+  gArmVirtTokenSpaceGuid.PcdTpm2SupportEnabled|$(TPM2_ENABLE)
 
 [PcdsFixedAtBuild.common]
 !if $(ARCH) == AARCH64
@@ -265,6 +272,13 @@
   ArmPkg/Drivers/CpuPei/CpuPei.inf
 
   MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
+
+!if $(TPM2_ENABLE) == TRUE
+  MdeModulePkg/Universal/ResetSystemPei/ResetSystemPei.inf {
+    <LibraryClasses>
+      ResetSystemLib|ArmVirtPkg/Library/ArmVirtPsciResetSystemPeiLib/ArmVirtPsciResetSystemPeiLib.inf
+  }
+!endif
 
   MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf {
     <LibraryClasses>
