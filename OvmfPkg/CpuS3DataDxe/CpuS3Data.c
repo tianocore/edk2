@@ -23,12 +23,16 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
+#include <Library/IoLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/MtrrLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 
 #include <Protocol/MpService.h>
 #include <Guid/EventGroup.h>
+
+#include <IndustryStandard/Q35MchIch9.h>
+#include <IndustryStandard/QemuCpuHotplug.h>
 
 //
 // Data structure used to allocate ACPI_CPU_DATA and its supporting structures
@@ -163,7 +167,6 @@ CpuS3DataInitialize (
   ACPI_CPU_DATA              *AcpiCpuData;
   EFI_MP_SERVICES_PROTOCOL   *MpServices;
   UINTN                      NumberOfCpus;
-  UINTN                      NumberOfEnabledProcessors;
   VOID                       *Stack;
   UINTN                      TableSize;
   CPU_REGISTER_TABLE         *RegisterTable;
@@ -175,6 +178,7 @@ CpuS3DataInitialize (
   VOID                       *Idt;
   EFI_EVENT                  Event;
   ACPI_CPU_DATA              *OldAcpiCpuData;
+  BOOLEAN                    FetchPossibleApicIds;
 
   if (!PcdGetBool (PcdAcpiS3Enable)) {
     return EFI_UNSUPPORTED;
@@ -190,24 +194,36 @@ CpuS3DataInitialize (
   AcpiCpuData = &AcpiCpuDataEx->AcpiCpuData;
 
   //
-  // Get MP Services Protocol
+  // The "SMRAM at default SMBASE" feature guarantees that
+  // QEMU_CPUHP_CMD_GET_ARCH_ID too is available.
   //
-  Status = gBS->LocateProtocol (
-                  &gEfiMpServiceProtocolGuid,
-                  NULL,
-                  (VOID **)&MpServices
-                  );
-  ASSERT_EFI_ERROR (Status);
+  FetchPossibleApicIds = PcdGetBool (PcdQ35SmramAtDefaultSmbase);
 
-  //
-  // Get the number of CPUs
-  //
-  Status = MpServices->GetNumberOfProcessors (
-                         MpServices,
-                         &NumberOfCpus,
-                         &NumberOfEnabledProcessors
-                         );
-  ASSERT_EFI_ERROR (Status);
+  if (FetchPossibleApicIds) {
+    NumberOfCpus = PcdGet32 (PcdCpuMaxLogicalProcessorNumber);
+  } else {
+    UINTN NumberOfEnabledProcessors;
+
+    //
+    // Get MP Services Protocol
+    //
+    Status = gBS->LocateProtocol (
+                    &gEfiMpServiceProtocolGuid,
+                    NULL,
+                    (VOID **)&MpServices
+                    );
+    ASSERT_EFI_ERROR (Status);
+
+    //
+    // Get the number of CPUs
+    //
+    Status = MpServices->GetNumberOfProcessors (
+                           MpServices,
+                           &NumberOfCpus,
+                           &NumberOfEnabledProcessors
+                           );
+    ASSERT_EFI_ERROR (Status);
+  }
   AcpiCpuData->NumberOfCpus = (UINT32)NumberOfCpus;
 
   //
@@ -263,20 +279,45 @@ CpuS3DataInitialize (
     RegisterTable = (CPU_REGISTER_TABLE *)AllocateZeroPages (TableSize);
     ASSERT (RegisterTable != NULL);
 
+    if (FetchPossibleApicIds) {
+      //
+      // Write a valid selector so that other hotplug registers can be
+      // accessed.
+      //
+      IoWrite32 (ICH9_CPU_HOTPLUG_BASE + QEMU_CPUHP_W_CPU_SEL, 0);
+      //
+      // We'll be fetching the APIC IDs.
+      //
+      IoWrite8 (ICH9_CPU_HOTPLUG_BASE + QEMU_CPUHP_W_CMD,
+        QEMU_CPUHP_CMD_GET_ARCH_ID);
+    }
     for (Index = 0; Index < NumberOfCpus; Index++) {
-      Status = MpServices->GetProcessorInfo (
-                           MpServices,
-                           Index,
-                           &ProcessorInfoBuffer
-                           );
-      ASSERT_EFI_ERROR (Status);
+      UINT32 InitialApicId;
 
-      RegisterTable[Index].InitialApicId      = (UINT32)ProcessorInfoBuffer.ProcessorId;
+      if (FetchPossibleApicIds) {
+        IoWrite32 (ICH9_CPU_HOTPLUG_BASE + QEMU_CPUHP_W_CPU_SEL,
+          (UINT32)Index);
+        InitialApicId = IoRead32 (
+                          ICH9_CPU_HOTPLUG_BASE + QEMU_CPUHP_RW_CMD_DATA);
+      } else {
+        Status = MpServices->GetProcessorInfo (
+                             MpServices,
+                             Index,
+                             &ProcessorInfoBuffer
+                             );
+        ASSERT_EFI_ERROR (Status);
+        InitialApicId = (UINT32)ProcessorInfoBuffer.ProcessorId;
+      }
+
+      DEBUG ((DEBUG_VERBOSE, "%a: Index=%05Lu ApicId=0x%08x\n", __FUNCTION__,
+        (UINT64)Index, InitialApicId));
+
+      RegisterTable[Index].InitialApicId      = InitialApicId;
       RegisterTable[Index].TableLength        = 0;
       RegisterTable[Index].AllocatedSize      = 0;
       RegisterTable[Index].RegisterTableEntry = 0;
 
-      RegisterTable[NumberOfCpus + Index].InitialApicId      = (UINT32)ProcessorInfoBuffer.ProcessorId;
+      RegisterTable[NumberOfCpus + Index].InitialApicId      = InitialApicId;
       RegisterTable[NumberOfCpus + Index].TableLength        = 0;
       RegisterTable[NumberOfCpus + Index].AllocatedSize      = 0;
       RegisterTable[NumberOfCpus + Index].RegisterTableEntry = 0;
