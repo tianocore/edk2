@@ -32,11 +32,14 @@
   PeimEntryPoint
   DebugLib
   PeiServicesLib
+  Tpm12CommandLib
+  Tpm12DeviceLib
   Tpm2DeviceLib
 
 [Guids]
   gEfiTpmDeviceSelectedGuid           ## PRODUCES ## GUID # Used as a PPI GUID
   gEfiTpmDeviceInstanceTpm20DtpmGuid  ## SOMETIMES_CONSUMES
+  gEfiTpmDeviceInstanceTpm12Guid      ## SOMETIMES_CONSUMES
 
 [Ppis]
   gPeiTpmInitializationDonePpiGuid    ## SOMETIMES_PRODUCES
