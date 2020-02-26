@@ -32,6 +32,8 @@
 
 #define QEMU_CPUHP_R_CPU_STAT                0x4
 #define QEMU_CPUHP_STAT_ENABLED                BIT0
+#define QEMU_CPUHP_STAT_INSERT                 BIT1
+#define QEMU_CPUHP_STAT_REMOVE                 BIT2
 
 #define QEMU_CPUHP_RW_CMD_DATA               0x8
 
