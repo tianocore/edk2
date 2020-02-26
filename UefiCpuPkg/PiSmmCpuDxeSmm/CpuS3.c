@@ -616,7 +616,12 @@ InitializeCpuBeforeRebase (
 
   PrepareApStartupVector (mAcpiCpuData.StartupVector);
 
-  mNumberToFinish = mAcpiCpuData.NumberOfCpus - 1;
+  if (FeaturePcdGet (PcdCpuHotPlugSupport)) {
+    ASSERT (mNumberOfCpus <= mAcpiCpuData.NumberOfCpus);
+  } else {
+    ASSERT (mNumberOfCpus == mAcpiCpuData.NumberOfCpus);
+  }
+  mNumberToFinish = (UINT32)(mNumberOfCpus - 1);
   mExchangeInfo->ApFunction  = (VOID *) (UINTN) InitializeAp;
 
   //
@@ -646,7 +651,12 @@ InitializeCpuAfterRebase (
   VOID
   )
 {
-  mNumberToFinish = mAcpiCpuData.NumberOfCpus - 1;
+  if (FeaturePcdGet (PcdCpuHotPlugSupport)) {
+    ASSERT (mNumberOfCpus <= mAcpiCpuData.NumberOfCpus);
+  } else {
+    ASSERT (mNumberOfCpus == mAcpiCpuData.NumberOfCpus);
+  }
+  mNumberToFinish = (UINT32)(mNumberOfCpus - 1);
 
   //
   // Signal that SMM base relocation is complete and to continue initialization for all APs.
