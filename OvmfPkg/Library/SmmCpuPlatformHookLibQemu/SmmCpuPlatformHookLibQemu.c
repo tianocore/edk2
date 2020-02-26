@@ -6,7 +6,10 @@ Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
+#include <Library/BaseLib.h>                 // AsmReadMsr64()
 #include <PiSmm.h>
+#include <Register/Intel/ArchitecturalMsr.h> // MSR_IA32_APIC_BASE_REGISTER
+
 #include <Library/SmmCpuPlatformHookLib.h>
 
 /**
@@ -75,7 +78,11 @@ PlatformSmmBspElection (
   OUT BOOLEAN     *IsBsp
   )
 {
-  return EFI_NOT_READY;
+  MSR_IA32_APIC_BASE_REGISTER ApicBaseMsr;
+
+  ApicBaseMsr.Uint64 = AsmReadMsr64 (MSR_IA32_APIC_BASE);
+  *IsBsp = (BOOLEAN)(ApicBaseMsr.Bits.BSP == 1);
+  return EFI_SUCCESS;
 }
 
 /**
