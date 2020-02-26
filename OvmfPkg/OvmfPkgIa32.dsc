@@ -437,6 +437,7 @@
 !endif
 !if $(SMM_REQUIRE) == TRUE
   gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire|TRUE
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuHotPlugSupport|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdEnableVariableRuntimeCache|FALSE
 !endif
 
