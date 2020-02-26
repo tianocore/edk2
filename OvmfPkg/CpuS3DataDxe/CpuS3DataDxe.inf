@@ -33,18 +33,18 @@
   CpuS3Data.c
 
 [Packages]
-  MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
   UefiCpuPkg/UefiCpuPkg.dec
 
 [LibraryClasses]
-  UefiDriverEntryPoint
-  UefiBootServicesTableLib
+  BaseLib
   BaseMemoryLib
   DebugLib
-  BaseLib
-  MtrrLib
   MemoryAllocationLib
+  MtrrLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
 
 [Guids]
   gEfiEndOfDxeEventGroupGuid         ## CONSUMES   ## Event
@@ -53,9 +53,9 @@
   gEfiMpServiceProtocolGuid          ## CONSUMES
 
 [Pcd]
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuApStackSize    ## CONSUMES
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuS3DataAddress  ## PRODUCES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable                    ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuApStackSize                       ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuS3DataAddress                     ## PRODUCES
 
 [Depex]
   gEfiMpServiceProtocolGuid
