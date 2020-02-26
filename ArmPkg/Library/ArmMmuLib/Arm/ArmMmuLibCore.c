@@ -147,6 +147,13 @@ PopulateLevel2PageTable (
 
       BaseSectionAddress = TT_DESCRIPTOR_SECTION_BASE_ADDRESS(*SectionEntry);
 
+      //
+      // Make sure we are not inadvertently hitting in the caches
+      // when populating the page tables
+      //
+      InvalidateDataCacheRange ((VOID *)TranslationTable,
+        TRANSLATION_TABLE_PAGE_SIZE);
+
       // Populate the new Level2 Page Table for the section
       PageEntry = (UINT32*)TranslationTable;
       for (Index = 0; Index < TRANSLATION_TABLE_PAGE_COUNT; Index++) {
@@ -166,6 +173,12 @@ PopulateLevel2PageTable (
     TranslationTable = (UINTN)AllocateAlignedPages (
                                 EFI_SIZE_TO_PAGES (TRANSLATION_TABLE_PAGE_SIZE),
                                 TRANSLATION_TABLE_PAGE_ALIGNMENT);
+    //
+    // Make sure we are not inadvertently hitting in the caches
+    // when populating the page tables
+    //
+    InvalidateDataCacheRange ((VOID *)TranslationTable,
+      TRANSLATION_TABLE_PAGE_SIZE);
     ZeroMem ((VOID *)TranslationTable, TRANSLATION_TABLE_PAGE_SIZE);
 
     *SectionEntry = (TranslationTable & TT_DESCRIPTOR_SECTION_PAGETABLE_ADDRESS_MASK) |
@@ -184,6 +197,13 @@ PopulateLevel2PageTable (
     PhysicalBase += TT_DESCRIPTOR_PAGE_SIZE;
   }
 
+  //
+  // Invalidate again to ensure that any line fetches that may have occurred
+  // [speculatively] since the previous invalidate are evicted again.
+  //
+  ArmDataMemoryBarrier ();
+  InvalidateDataCacheRange ((UINT32 *)TranslationTable + FirstPageOffset,
+    RemainLength / TT_DESCRIPTOR_PAGE_SIZE * sizeof (*PageEntry));
 }
 
 STATIC
@@ -258,7 +278,16 @@ FillTranslationTable (
         RemainLength >= TT_DESCRIPTOR_SECTION_SIZE) {
       // Case: Physical address aligned on the Section Size (1MB) && the length
       // is greater than the Section Size
-      *SectionEntry++ = TT_DESCRIPTOR_SECTION_BASE_ADDRESS(PhysicalBase) | Attributes;
+      *SectionEntry = TT_DESCRIPTOR_SECTION_BASE_ADDRESS(PhysicalBase) | Attributes;
+
+      //
+      // Issue a DMB to ensure that the page table entry update made it to
+      // memory before we issue the invalidate, otherwise, a subsequent
+      // speculative fetch could observe the old value.
+      //
+      ArmDataMemoryBarrier ();
+      ArmInvalidateDataCacheEntryByMVA ((UINTN)SectionEntry++);
+
       PhysicalBase += TT_DESCRIPTOR_SECTION_SIZE;
       RemainLength -= TT_DESCRIPTOR_SECTION_SIZE;
     } else {
@@ -268,8 +297,16 @@ FillTranslationTable (
       // Case: Physical address aligned on the Section Size (1MB) && the length
       //       does not fill a section
       // Case: Physical address NOT aligned on the Section Size (1MB)
-      PopulateLevel2PageTable (SectionEntry++, PhysicalBase, PageMapLength,
+      PopulateLevel2PageTable (SectionEntry, PhysicalBase, PageMapLength,
         MemoryRegion->Attributes);
+
+      //
+      // Issue a DMB to ensure that the page table entry update made it to
+      // memory before we issue the invalidate, otherwise, a subsequent
+      // speculative fetch could observe the old value.
+      //
+      ArmDataMemoryBarrier ();
+      ArmInvalidateDataCacheEntryByMVA ((UINTN)SectionEntry++);
 
       // If it is the last entry
       if (RemainLength < TT_DESCRIPTOR_SECTION_SIZE) {
@@ -309,6 +346,11 @@ ArmConfigureMmu (
     *TranslationTableSize = TRANSLATION_TABLE_SECTION_SIZE;
   }
 
+  //
+  // Make sure we are not inadvertently hitting in the caches
+  // when populating the page tables
+  //
+  InvalidateDataCacheRange (TranslationTable, TRANSLATION_TABLE_SECTION_SIZE);
   ZeroMem (TranslationTable, TRANSLATION_TABLE_SECTION_SIZE);
 
   // By default, mark the translation table as belonging to a uncached region
@@ -349,18 +391,6 @@ ArmConfigureMmu (
       }
     }
   }
-
-  ArmCleanInvalidateDataCache ();
-  ArmInvalidateInstructionCache ();
-
-  ArmDisableDataCache ();
-  ArmDisableInstructionCache();
-  // TLBs are also invalidated when calling ArmDisableMmu()
-  ArmDisableMmu ();
-
-  // Make sure nothing sneaked into the cache
-  ArmCleanInvalidateDataCache ();
-  ArmInvalidateInstructionCache ();
 
   ArmSetTTBR0 ((VOID *)(UINTN)(((UINTN)TranslationTable & ~TRANSLATION_TABLE_SECTION_ALIGNMENT_MASK) | (TTBRAttributes & 0x7F)));
 
