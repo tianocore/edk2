@@ -30,5 +30,23 @@ ArmV7AllDataCachesOperation (
   IN  ARM_V7_CACHE_OPERATION  DataCacheOperation
   );
 
+VOID
+EFIAPI
+ArmInvalidateDataCacheEntryBySetWay (
+  IN  UINTN  SetWayFormat
+  );
+
+VOID
+EFIAPI
+ArmCleanDataCacheEntryBySetWay (
+  IN  UINTN  SetWayFormat
+  );
+
+VOID
+EFIAPI
+ArmCleanInvalidateDataCacheEntryBySetWay (
+  IN  UINTN   SetWayFormat
+  );
+
 #endif // __ARM_V7_LIB_H__
 
