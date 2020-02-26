@@ -24,6 +24,8 @@
 [Sources]
   ApicId.h
   CpuHotplug.c
+  FirstSmiHandler.nasm
+  FirstSmiHandlerContext.h
   PostSmmPen.nasm
   QemuCpuhp.c
   QemuCpuhp.h
@@ -39,9 +41,11 @@
   BaseLib
   BaseMemoryLib
   DebugLib
+  LocalApicLib
   MmServicesTableLib
   PcdLib
   SafeIntLib
+  SynchronizationLib
   UefiDriverEntryPoint
 
 [Protocols]
