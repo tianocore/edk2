@@ -213,24 +213,6 @@ ArmCleanInvalidateDataCacheEntryByMVA (
 
 VOID
 EFIAPI
-ArmInvalidateDataCacheEntryBySetWay (
-  IN  UINTN  SetWayFormat
-  );
-
-VOID
-EFIAPI
-ArmCleanDataCacheEntryBySetWay (
-  IN  UINTN  SetWayFormat
-  );
-
-VOID
-EFIAPI
-ArmCleanInvalidateDataCacheEntryBySetWay (
-  IN  UINTN   SetWayFormat
-  );
-
-VOID
-EFIAPI
 ArmEnableDataCache (
   VOID
   );

@@ -17,5 +17,23 @@ AArch64AllDataCachesOperation (
   IN  AARCH64_CACHE_OPERATION  DataCacheOperation
   );
 
+VOID
+EFIAPI
+ArmInvalidateDataCacheEntryBySetWay (
+  IN  UINTN  SetWayFormat
+  );
+
+VOID
+EFIAPI
+ArmCleanDataCacheEntryBySetWay (
+  IN  UINTN  SetWayFormat
+  );
+
+VOID
+EFIAPI
+ArmCleanInvalidateDataCacheEntryBySetWay (
+  IN  UINTN   SetWayFormat
+  );
+
 #endif // __AARCH64_LIB_H__
 
