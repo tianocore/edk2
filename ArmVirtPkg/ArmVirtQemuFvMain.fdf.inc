@@ -178,6 +178,9 @@ READ_LOCK_STATUS   = TRUE
   #
 !if $(TPM2_ENABLE) == TRUE
   INF SecurityPkg/Tcg/Tcg2Dxe/Tcg2Dxe.inf
+!if $(TPM2_CONFIG_ENABLE) == TRUE
+  INF SecurityPkg/Tcg/Tcg2Config/Tcg2ConfigDxe.inf
+!endif
 !endif
 
   #
