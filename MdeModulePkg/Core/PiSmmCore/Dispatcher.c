@@ -902,6 +902,12 @@ SmmDispatcher (
       Status = ((EFI_IMAGE_ENTRY_POINT)(UINTN)DriverEntry->ImageEntryPoint)(DriverEntry->ImageHandle, gST);
       PERF_START_IMAGE_END (DriverEntry->ImageHandle);
       if (EFI_ERROR(Status)){
+        DEBUG ((
+          DEBUG_ERROR,
+          "Error: SMM image at %11p start failed: %r\n",
+          DriverEntry->SmmLoadedImage.ImageBase,
+          Status
+          ));
         UnregisterSmramProfileImage (DriverEntry, TRUE);
         SmmFreePages(DriverEntry->ImageBuffer, DriverEntry->NumberOfPage);
         //
