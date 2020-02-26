@@ -75,11 +75,17 @@
   PciSegmentLib|MdePkg/Library/BasePciSegmentLibPci/BasePciSegmentLibPci.inf
   PciHostBridgeLib|ArmVirtPkg/Library/FdtPciHostBridgeLib/FdtPciHostBridgeLib.inf
 
+!if $(TPM2_ENABLE) == TRUE
+  Tpm2CommandLib|SecurityPkg/Library/Tpm2CommandLib/Tpm2CommandLib.inf
+!endif
+
 [LibraryClasses.common.PEIM]
   ArmVirtMemInfoLib|ArmVirtPkg/Library/QemuVirtMemInfoLib/QemuVirtMemInfoPeiLib.inf
 
 !if $(TPM2_ENABLE) == TRUE
+  BaseCryptLib|CryptoPkg/Library/BaseCryptLib/PeiCryptLib.inf
   ResetSystemLib|MdeModulePkg/Library/PeiResetSystemLib/PeiResetSystemLib.inf
+  Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2DeviceLibDTpm.inf
 !endif
 
 [LibraryClasses.common.DXE_DRIVER]
@@ -248,6 +254,10 @@
   # TPM2 support
   #
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress|0x0
+!if $(TPM2_ENABLE) == TRUE
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid|{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2HashMask|0
+!endif
 
 [PcdsDynamicHii]
   gArmVirtTokenSpaceGuid.PcdForceNoAcpi|L"ForceNoAcpi"|gArmVirtVariableGuid|0x0|FALSE|NV,BS
@@ -277,6 +287,16 @@
   MdeModulePkg/Universal/ResetSystemPei/ResetSystemPei.inf {
     <LibraryClasses>
       ResetSystemLib|ArmVirtPkg/Library/ArmVirtPsciResetSystemPeiLib/ArmVirtPsciResetSystemPeiLib.inf
+  }
+  OvmfPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf
+  SecurityPkg/Tcg/Tcg2Pei/Tcg2Pei.inf {
+    <LibraryClasses>
+      HashLib|SecurityPkg/Library/HashLibBaseCryptoRouter/HashLibBaseCryptoRouterPei.inf
+      NULL|SecurityPkg/Library/HashInstanceLibSha1/HashInstanceLibSha1.inf
+      NULL|SecurityPkg/Library/HashInstanceLibSha256/HashInstanceLibSha256.inf
+      NULL|SecurityPkg/Library/HashInstanceLibSha384/HashInstanceLibSha384.inf
+      NULL|SecurityPkg/Library/HashInstanceLibSha512/HashInstanceLibSha512.inf
+      NULL|SecurityPkg/Library/HashInstanceLibSm3/HashInstanceLibSm3.inf
   }
 !endif
 
