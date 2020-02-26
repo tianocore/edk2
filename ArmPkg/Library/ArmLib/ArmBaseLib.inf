@@ -48,8 +48,5 @@
   ArmPkg/ArmPkg.dec
   MdePkg/MdePkg.dec
 
-[Protocols]
-  gEfiCpuArchProtocolGuid
-
 [FeaturePcd.ARM]
   gArmTokenSpaceGuid.PcdNormalMemoryNonshareableOverride
