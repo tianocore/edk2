@@ -7,12 +7,15 @@
 **/
 
 #include <IndustryStandard/Q35MchIch9.h>     // ICH9_APM_CNT
+#include <IndustryStandard/QemuCpuHotplug.h> // QEMU_CPUHP_CMD_GET_PENDING
 #include <Library/BaseLib.h>                 // CpuDeadLoop()
 #include <Library/DebugLib.h>                // ASSERT()
 #include <Library/MmServicesTableLib.h>      // gMmst
 #include <Library/PcdLib.h>                  // PcdGetBool()
 #include <Protocol/MmCpuIo.h>                // EFI_MM_CPU_IO_PROTOCOL
 #include <Uefi/UefiBaseType.h>               // EFI_STATUS
+
+#include "QemuCpuhp.h"                       // QemuCpuhpWriteCpuSelector()
 
 //
 // We use this protocol for accessing IO Ports.
@@ -165,6 +168,38 @@ CpuHotplugEntry (
                     NULL /* Registration */, (VOID **)&mMmCpuIo);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a: locate MmCpuIo: %r\n", __FUNCTION__, Status));
+    goto Fatal;
+  }
+
+  //
+  // Sanity-check the CPU hotplug interface.
+  //
+  // Both of the following features are part of QEMU 5.0, introduced primarily
+  // in commit range 3e08b2b9cb64..3a61c8db9d25:
+  //
+  // (a) the QEMU_CPUHP_CMD_GET_ARCH_ID command of the modern CPU hotplug
+  //     interface,
+  //
+  // (b) the "SMRAM at default SMBASE" feature.
+  //
+  // From these, (b) is restricted to 5.0+ machine type versions, while (a)
+  // does not depend on machine type version. Because we ensured the stricter
+  // condition (b) through PcdQ35SmramAtDefaultSmbase above, the (a)
+  // QEMU_CPUHP_CMD_GET_ARCH_ID command must now be available too. While we
+  // can't verify the presence of precisely that command, we can still verify
+  // (sanity-check) that the modern interface is active, at least.
+  //
+  // Consult the "Typical usecases | Detecting and enabling modern CPU hotplug
+  // interface" section in QEMU's "docs/specs/acpi_cpu_hotplug.txt", on the
+  // following.
+  //
+  QemuCpuhpWriteCpuSelector (mMmCpuIo, 0);
+  QemuCpuhpWriteCpuSelector (mMmCpuIo, 0);
+  QemuCpuhpWriteCommand (mMmCpuIo, QEMU_CPUHP_CMD_GET_PENDING);
+  if (QemuCpuhpReadCommandData2 (mMmCpuIo) != 0) {
+    Status = EFI_NOT_FOUND;
+    DEBUG ((DEBUG_ERROR, "%a: modern CPU hotplug interface: %r\n",
+      __FUNCTION__, Status));
     goto Fatal;
   }
 
