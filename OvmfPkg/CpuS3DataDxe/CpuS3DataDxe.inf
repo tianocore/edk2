@@ -35,12 +35,14 @@
 [Packages]
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
   UefiCpuPkg/UefiCpuPkg.dec
 
 [LibraryClasses]
   BaseLib
   BaseMemoryLib
   DebugLib
+  IoLib
   MemoryAllocationLib
   MtrrLib
   UefiBootServicesTableLib
@@ -55,7 +57,9 @@
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable                    ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuApStackSize                       ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber         ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuS3DataAddress                     ## PRODUCES
+  gUefiOvmfPkgTokenSpaceGuid.PcdQ35SmramAtDefaultSmbase             ## CONSUMES
 
 [Depex]
   gEfiMpServiceProtocolGuid
