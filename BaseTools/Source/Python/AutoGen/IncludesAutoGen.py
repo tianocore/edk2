@@ -52,17 +52,17 @@ class IncludesAutoGen():
             EdkLogger.error("build", PARAMETER_MISSING, Message="No Make path available.")
         elif "nmake" in MakePath:
             _INCLUDE_DEPS_TEMPLATE = TemplateString('''
-        ${BEGIN}
-        !IF EXIST(${deps_file})
-        !INCLUDE ${deps_file}
-        !ENDIF
-        ${END}
+${BEGIN}
+!IF EXIST(${deps_file})
+!INCLUDE ${deps_file}
+!ENDIF
+${END}
                ''')
         else:
             _INCLUDE_DEPS_TEMPLATE = TemplateString('''
-        ${BEGIN}
-        -include ${deps_file}
-        ${END}
+${BEGIN}
+-include ${deps_file}
+${END}
                ''')
 
         try:
