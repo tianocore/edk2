@@ -8,7 +8,7 @@
 # Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
 # (C) Copyright 2016 - 2019 Hewlett Packard Enterprise Development LP<BR>
 # Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
-# Copyright (c) 2016, Microsoft Corporation<BR>
+# Copyright (c) Microsoft Corporation.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -624,6 +624,9 @@
 #   0x80000006 | Incorrect error code provided.
 #
 
+  ## Include/Protocol/VariablePolicy.h
+  gEdkiiVariablePolicyProtocolGuid = { 0x81D1675C, 0x86F6, 0x48DF, { 0xBD, 0x95, 0x9A, 0x6E, 0x4F, 0x09, 0x25, 0xC3 } }
+
 [PcdsFeatureFlag]
   ## Indicates if the platform can support update capsule across a system reset.<BR><BR>
   #   TRUE  - Supports update capsule across a system reset.<BR>
@@ -1128,6 +1131,15 @@
   ## The size of volatile buffer. This buffer is used to store VOLATILE attribute variables.
   # @Prompt Variable storage size.
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize|0x10000|UINT32|0x30000005
+
+  ## Toggle for whether the VariablePolicy engine should allow disabling.
+  # The engine is enabled at power-on, but the interface allows the platform to
+  # disable enforcement for servicing flexibility. If this PCD is disabled, it will block the ability to
+  # disable the enforcement and VariablePolicy enforcement will always be ON.
+  #   TRUE - VariablePolicy can be disabled by request through the interface (until interface is locked)
+  #   FALSE - VariablePolicy interface will not accept requests to disable and is ALWAYS ON
+  # @Prompt Allow VariablePolicy enforcement to be disabled.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAllowVariablePolicyEnforcementDisable|FALSE|BOOLEAN|0x30000020
 
   ## FFS filename to find the ACPI tables.
   # @Prompt FFS name of ACPI tables storage.
