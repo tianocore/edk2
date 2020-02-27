@@ -1712,6 +1712,7 @@ SdMmcPrintTrb (
   DEBUG ((DebugLevel, "AdmaLengthMode: %d\n", Trb->AdmaLengthMode));
   DEBUG ((DebugLevel, "Event: %p\n", Trb->Event));
   DEBUG ((DebugLevel, "Started: %d\n", Trb->Started));
+  DEBUG ((DebugLevel, "CommandComplete: %d\n", Trb->CommandComplete));
   DEBUG ((DebugLevel, "Timeout: %ld\n", Trb->Timeout));
   DEBUG ((DebugLevel, "Retries: %d\n", Trb->Retries));
   DEBUG ((DebugLevel, "Adma32Desc: %p\n", Trb->Adma32Desc));
@@ -1762,6 +1763,7 @@ SdMmcCreateTrb (
   Trb->Packet    = Packet;
   Trb->Event     = Event;
   Trb->Started   = FALSE;
+  Trb->CommandComplete = FALSE;
   Trb->Timeout   = Packet->Timeout;
   Trb->Retries   = SD_MMC_TRB_RETRIES;
   Trb->Private   = Private;
@@ -2353,6 +2355,99 @@ SdMmcCheckAndRecoverErrors (
 }
 
 /**
+  Reads the response data into the TRB buffer.
+  This function assumes that caller made sure that
+  command has completed.
+
+  @param[in] Private  A pointer to the SD_MMC_HC_PRIVATE_DATA instance.
+  @param[in] Trb      The pointer to the SD_MMC_HC_TRB instance.
+
+  @retval EFI_SUCCESS  Response read successfully.
+  @retval Others       Failed to get response.
+**/
+EFI_STATUS
+SdMmcGetResponse (
+  IN SD_MMC_HC_PRIVATE_DATA  *Private,
+  IN SD_MMC_HC_TRB           *Trb
+  )
+{
+  EFI_SD_MMC_PASS_THRU_COMMAND_PACKET  *Packet;
+  UINT8                                Index;
+  UINT32                               Response[4];
+  EFI_STATUS                           Status;
+
+  Packet = Trb->Packet;
+
+  if (Packet->SdMmcCmdBlk->CommandType == SdMmcCommandTypeBc) {
+    return EFI_SUCCESS;
+  }
+
+  for (Index = 0; Index < 4; Index++) {
+    Status = SdMmcHcRwMmio (
+               Private->PciIo,
+               Trb->Slot,
+               SD_MMC_HC_RESPONSE + Index * 4,
+               TRUE,
+               sizeof (UINT32),
+               &Response[Index]
+               );
+      if (EFI_ERROR (Status)) {
+        return Status;
+      }
+    }
+  CopyMem (Packet->SdMmcStatusBlk, Response, sizeof (Response));
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Checks if the command completed. If the command
+  completed it gets the response and records the
+  command completion in the TRB.
+
+  @param[in] Private    A pointer to the SD_MMC_HC_PRIVATE_DATA instance.
+  @param[in] Trb        The pointer to the SD_MMC_HC_TRB instance.
+  @param[in] IntStatus  Snapshot of the normal interrupt status register.
+
+  @retval EFI_SUCCESS   Command completed successfully.
+  @retval EFI_NOT_READY Command completion still pending.
+  @retval Others        Command failed to complete.
+**/
+EFI_STATUS
+SdMmcCheckCommandComplete (
+  IN SD_MMC_HC_PRIVATE_DATA  *Private,
+  IN SD_MMC_HC_TRB           *Trb,
+  IN UINT16                  IntStatus
+  )
+{
+  UINT16      Data16;
+  EFI_STATUS  Status;
+
+  if ((IntStatus & BIT0) != 0) {
+    Data16 = BIT0;
+    Status = SdMmcHcRwMmio (
+               Private->PciIo,
+               Trb->Slot,
+               SD_MMC_HC_NOR_INT_STS,
+               FALSE,
+               sizeof (Data16),
+               &Data16
+               );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+    Status = SdMmcGetResponse (Private, Trb);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+    Trb->CommandComplete = TRUE;
+    return EFI_SUCCESS;
+  }
+
+  return EFI_NOT_READY;
+}
+
+/**
   Check the TRB execution result.
 
   @param[in] Private        A pointer to the SD_MMC_HC_PRIVATE_DATA instance.
@@ -2372,9 +2467,7 @@ SdMmcCheckTrbResult (
   EFI_STATUS                          Status;
   EFI_SD_MMC_PASS_THRU_COMMAND_PACKET *Packet;
   UINT16                              IntStatus;
-  UINT32                              Response[4];
   UINT64                              SdmaAddr;
-  UINT8                               Index;
   UINT32                              PioLength;
 
   Packet  = Trb->Packet;
@@ -2400,6 +2493,54 @@ SdMmcCheckTrbResult (
   Status = SdMmcCheckAndRecoverErrors (Private, Trb->Slot, IntStatus);
   if (EFI_ERROR (Status)) {
     goto Done;
+  }
+
+  //
+  // Tuning commands are the only ones that do not generate command
+  // complete interrupt. Process them here before entering the code
+  // that waits for command completion.
+  //
+  if (((Private->Slot[Trb->Slot].CardType == EmmcCardType) &&
+       (Packet->SdMmcCmdBlk->CommandIndex == EMMC_SEND_TUNING_BLOCK)) ||
+      ((Private->Slot[Trb->Slot].CardType == SdCardType) &&
+       (Packet->SdMmcCmdBlk->CommandIndex == SD_SEND_TUNING_BLOCK))) {
+    //
+    // When performing tuning procedure (Execute Tuning is set to 1) through PIO mode,
+    // wait Buffer Read Ready bit of Normal Interrupt Status Register to be 1.
+    // Refer to SD Host Controller Simplified Specification 3.0 figure 2-29 for details.
+    //
+    if ((IntStatus & BIT5) == BIT5) {
+      //
+      // Clear Buffer Read Ready interrupt at first.
+      //
+      IntStatus = BIT5;
+      SdMmcHcRwMmio (Private->PciIo, Trb->Slot, SD_MMC_HC_NOR_INT_STS, FALSE, sizeof (IntStatus), &IntStatus);
+      //
+      // Read data out from Buffer Port register
+      //
+      for (PioLength = 0; PioLength < Trb->DataLen; PioLength += 4) {
+        SdMmcHcRwMmio (Private->PciIo, Trb->Slot, SD_MMC_HC_BUF_DAT_PORT, TRUE, 4, (UINT8*)Trb->Data + PioLength);
+      }
+      Status = EFI_SUCCESS;
+      goto Done;
+    }
+  }
+
+  if (!Trb->CommandComplete) {
+    Status = SdMmcCheckCommandComplete (Private, Trb, IntStatus);
+    if (EFI_ERROR (Status)) {
+      goto Done;
+    } else {
+      //
+      // If the command doesn't require data transfer skip the transfer
+      // complete checking.
+      //
+      if ((Packet->SdMmcCmdBlk->CommandType != SdMmcCommandTypeAdtc) &&
+          (Packet->SdMmcCmdBlk->ResponseType != SdMmcResponseTypeR1b) &&
+          (Packet->SdMmcCmdBlk->ResponseType != SdMmcResponseTypeR5b)) {
+        goto Done;
+      }
+    }
   }
 
   //
@@ -2459,65 +2600,9 @@ SdMmcCheckTrbResult (
     Trb->DataPhy = (UINT64)(UINTN)SdmaAddr;
   }
 
-  if ((Packet->SdMmcCmdBlk->CommandType != SdMmcCommandTypeAdtc) &&
-      (Packet->SdMmcCmdBlk->ResponseType != SdMmcResponseTypeR1b) &&
-      (Packet->SdMmcCmdBlk->ResponseType != SdMmcResponseTypeR5b)) {
-    if ((IntStatus & BIT0) == BIT0) {
-      Status = EFI_SUCCESS;
-      goto Done;
-    }
-  }
-
-  if (((Private->Slot[Trb->Slot].CardType == EmmcCardType) &&
-       (Packet->SdMmcCmdBlk->CommandIndex == EMMC_SEND_TUNING_BLOCK)) ||
-      ((Private->Slot[Trb->Slot].CardType == SdCardType) &&
-       (Packet->SdMmcCmdBlk->CommandIndex == SD_SEND_TUNING_BLOCK))) {
-    //
-    // When performing tuning procedure (Execute Tuning is set to 1) through PIO mode,
-    // wait Buffer Read Ready bit of Normal Interrupt Status Register to be 1.
-    // Refer to SD Host Controller Simplified Specification 3.0 figure 2-29 for details.
-    //
-    if ((IntStatus & BIT5) == BIT5) {
-      //
-      // Clear Buffer Read Ready interrupt at first.
-      //
-      IntStatus = BIT5;
-      SdMmcHcRwMmio (Private->PciIo, Trb->Slot, SD_MMC_HC_NOR_INT_STS, FALSE, sizeof (IntStatus), &IntStatus);
-      //
-      // Read data out from Buffer Port register
-      //
-      for (PioLength = 0; PioLength < Trb->DataLen; PioLength += 4) {
-        SdMmcHcRwMmio (Private->PciIo, Trb->Slot, SD_MMC_HC_BUF_DAT_PORT, TRUE, 4, (UINT8*)Trb->Data + PioLength);
-      }
-      Status = EFI_SUCCESS;
-      goto Done;
-    }
-  }
 
   Status = EFI_NOT_READY;
 Done:
-  //
-  // Get response data when the cmd is executed successfully.
-  //
-  if (!EFI_ERROR (Status)) {
-    if (Packet->SdMmcCmdBlk->CommandType != SdMmcCommandTypeBc) {
-      for (Index = 0; Index < 4; Index++) {
-        Status = SdMmcHcRwMmio (
-                   Private->PciIo,
-                   Trb->Slot,
-                   SD_MMC_HC_RESPONSE + Index * 4,
-                   TRUE,
-                   sizeof (UINT32),
-                   &Response[Index]
-                   );
-        if (EFI_ERROR (Status)) {
-          SdMmcHcLedOnOff (Private->PciIo, Trb->Slot, FALSE);
-          return Status;
-        }
-      }
-      CopyMem (Packet->SdMmcStatusBlk, Response, sizeof (Response));
-    }
-  }
 
   if (Status != EFI_NOT_READY) {
     SdMmcHcLedOnOff (Private->PciIo, Trb->Slot, FALSE);
