@@ -1725,6 +1725,62 @@ SdMmcPrintTrb (
 }
 
 /**
+  Sets up host memory to allow DMA transfer.
+
+  @param[in] Private  A pointer to the SD_MMC_HC_PRIVATE_DATA instance.
+  @param[in] Slot     The slot number of the SD card to send the command to.
+  @param[in] Packet   A pointer to the SD command data structure.
+
+  @retval EFI_SUCCESS  Memory has been mapped for DMA transfer.
+  @retval Others       Memory has not been mapped.
+**/
+EFI_STATUS
+SdMmcSetupMemoryForDmaTransfer (
+  IN SD_MMC_HC_PRIVATE_DATA  *Private,
+  IN UINT8                   Slot,
+  IN SD_MMC_HC_TRB           *Trb
+  )
+{
+  EFI_PCI_IO_PROTOCOL_OPERATION Flag;
+  EFI_PCI_IO_PROTOCOL           *PciIo;
+  UINTN                         MapLength;
+  EFI_STATUS                    Status;
+
+  if (Trb->Read) {
+    Flag = EfiPciIoOperationBusMasterWrite;
+  } else {
+    Flag = EfiPciIoOperationBusMasterRead;
+  }
+
+  PciIo = Private->PciIo;
+  if (Trb->Data != NULL && Trb->DataLen != 0) {
+    MapLength = Trb->DataLen;
+    Status = PciIo->Map (
+                      PciIo,
+                      Flag,
+                      Trb->Data,
+                      &MapLength,
+                      &Trb->DataPhy,
+                      &Trb->DataMap
+                      );
+    if (EFI_ERROR (Status) || (Trb->DataLen != MapLength)) {
+      return EFI_BAD_BUFFER_SIZE;
+    }
+  }
+
+  if (Trb->Mode == SdMmcAdma32bMode ||
+      Trb->Mode == SdMmcAdma64bV3Mode ||
+      Trb->Mode == SdMmcAdma64bV4Mode) {
+    Status = BuildAdmaDescTable (Trb, Private->ControllerVersion[Slot]);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
   Create a new TRB for the SD/MMC cmd request.
 
   @param[in] Private        A pointer to the SD_MMC_HC_PRIVATE_DATA instance.
@@ -1748,9 +1804,6 @@ SdMmcCreateTrb (
   SD_MMC_HC_TRB                 *Trb;
   EFI_STATUS                    Status;
   EFI_TPL                       OldTpl;
-  EFI_PCI_IO_PROTOCOL_OPERATION Flag;
-  EFI_PCI_IO_PROTOCOL           *PciIo;
-  UINTN                         MapLength;
 
   Trb = AllocateZeroPool (sizeof (SD_MMC_HC_TRB));
   if (Trb == NULL) {
@@ -1793,29 +1846,6 @@ SdMmcCreateTrb (
        (Packet->SdMmcCmdBlk->CommandIndex == SD_SEND_TUNING_BLOCK))) {
     Trb->Mode = SdMmcPioMode;
   } else {
-    if (Trb->Read) {
-      Flag = EfiPciIoOperationBusMasterWrite;
-    } else {
-      Flag = EfiPciIoOperationBusMasterRead;
-    }
-
-    PciIo = Private->PciIo;
-    if (Trb->DataLen != 0) {
-      MapLength = Trb->DataLen;
-      Status = PciIo->Map (
-                        PciIo,
-                        Flag,
-                        Trb->Data,
-                        &MapLength,
-                        &Trb->DataPhy,
-                        &Trb->DataMap
-                        );
-      if (EFI_ERROR (Status) || (Trb->DataLen != MapLength)) {
-        Status = EFI_BAD_BUFFER_SIZE;
-        goto Error;
-      }
-    }
-
     if (Trb->DataLen == 0) {
       Trb->Mode = SdMmcNoData;
     } else if (Private->Capability[Slot].Adma2 != 0) {
@@ -1833,12 +1863,16 @@ SdMmcCreateTrb (
       if (Private->ControllerVersion[Slot] >= SD_MMC_HC_CTRL_VER_410) {
         Trb->AdmaLengthMode = SdMmcAdmaLen26b;
       }
-      Status = BuildAdmaDescTable (Trb, Private->ControllerVersion[Slot]);
+      Status = SdMmcSetupMemoryForDmaTransfer (Private, Slot, Trb);
       if (EFI_ERROR (Status)) {
         goto Error;
       }
     } else if (Private->Capability[Slot].Sdma != 0) {
       Trb->Mode = SdMmcSdmaMode;
+      Status = SdMmcSetupMemoryForDmaTransfer (Private, Slot, Trb);
+      if (EFI_ERROR (Status)) {
+        goto Error;
+      }
     } else {
       Trb->Mode = SdMmcPioMode;
     }
