@@ -1648,6 +1648,82 @@ BuildAdmaDescTable (
 }
 
 /**
+  Prints the contents of the command packet to the debug port.
+
+  @param[in] DebugLevel  Debug level at which the packet should be printed.
+  @param[in] Packet      Pointer to packet to print.
+**/
+VOID
+SdMmcPrintPacket (
+  IN UINT32                               DebugLevel,
+  IN EFI_SD_MMC_PASS_THRU_COMMAND_PACKET  *Packet
+  )
+{
+  if (Packet == NULL) {
+    return;
+  }
+
+  DEBUG ((DebugLevel, "Printing EFI_SD_MMC_PASS_THRU_COMMAND_PACKET\n"));
+  if (Packet->SdMmcCmdBlk != NULL) {
+    DEBUG ((DebugLevel, "Command index: %d, argument: %X\n", Packet->SdMmcCmdBlk->CommandIndex, Packet->SdMmcCmdBlk->CommandArgument));
+    DEBUG ((DebugLevel, "Command type: %d, response type: %d\n", Packet->SdMmcCmdBlk->CommandType, Packet->SdMmcCmdBlk->ResponseType));
+  }
+  if (Packet->SdMmcStatusBlk != NULL) {
+    DEBUG ((DebugLevel, "Response 0: %X, 1: %X, 2: %X, 3: %X\n",
+                           Packet->SdMmcStatusBlk->Resp0,
+                           Packet->SdMmcStatusBlk->Resp1,
+                           Packet->SdMmcStatusBlk->Resp2,
+                           Packet->SdMmcStatusBlk->Resp3
+                           ));
+  }
+  DEBUG ((DebugLevel, "Timeout: %ld\n", Packet->Timeout));
+  DEBUG ((DebugLevel, "InDataBuffer: %p\n", Packet->InDataBuffer));
+  DEBUG ((DebugLevel, "OutDataBuffer: %p\n", Packet->OutDataBuffer));
+  DEBUG ((DebugLevel, "InTransferLength: %d\n", Packet->InTransferLength));
+  DEBUG ((DebugLevel, "OutTransferLength: %d\n", Packet->OutTransferLength));
+  DEBUG ((DebugLevel, "TransactionStatus: %r\n", Packet->TransactionStatus));
+}
+
+/**
+  Prints the contents of the TRB to the debug port.
+
+  @param[in] DebugLevel  Debug level at which the TRB should be printed.
+  @param[in] Trb         Pointer to the TRB structure.
+**/
+VOID
+SdMmcPrintTrb (
+  IN UINT32         DebugLevel,
+  IN SD_MMC_HC_TRB  *Trb
+  )
+{
+  if (Trb == NULL) {
+    return;
+  }
+
+  DEBUG ((DebugLevel, "Printing SD_MMC_HC_TRB\n"));
+  DEBUG ((DebugLevel, "Slot: %d\n", Trb->Slot));
+  DEBUG ((DebugLevel, "BlockSize: %d\n", Trb->BlockSize));
+  DEBUG ((DebugLevel, "Data: %p\n", Trb->Data));
+  DEBUG ((DebugLevel, "DataLen: %d\n", Trb->DataLen));
+  DEBUG ((DebugLevel, "Read: %d\n", Trb->Read));
+  DEBUG ((DebugLevel, "DataPhy: %lX\n", Trb->DataPhy));
+  DEBUG ((DebugLevel, "DataMap: %p\n", Trb->DataMap));
+  DEBUG ((DebugLevel, "Mode: %d\n", Trb->Mode));
+  DEBUG ((DebugLevel, "AdmaLengthMode: %d\n", Trb->AdmaLengthMode));
+  DEBUG ((DebugLevel, "Event: %p\n", Trb->Event));
+  DEBUG ((DebugLevel, "Started: %d\n", Trb->Started));
+  DEBUG ((DebugLevel, "Timeout: %ld\n", Trb->Timeout));
+  DEBUG ((DebugLevel, "Retries: %d\n", Trb->Retries));
+  DEBUG ((DebugLevel, "Adma32Desc: %p\n", Trb->Adma32Desc));
+  DEBUG ((DebugLevel, "Adma64V3Desc: %p\n", Trb->Adma64V3Desc));
+  DEBUG ((DebugLevel, "Adma64V4Desc: %p\n", Trb->Adma64V4Desc));
+  DEBUG ((DebugLevel, "AdmaMap: %p\n", Trb->AdmaMap));
+  DEBUG ((DebugLevel, "AdmaPages: %X\n", Trb->AdmaPages));
+
+  SdMmcPrintPacket (DebugLevel, Trb->Packet);
+}
+
+/**
   Create a new TRB for the SD/MMC cmd request.
 
   @param[in] Private        A pointer to the SD_MMC_HC_PRIVATE_DATA instance.
@@ -2238,6 +2314,10 @@ SdMmcCheckAndRecoverErrors (
     return Status;
   }
 
+  DEBUG ((DEBUG_ERROR, "Error reported by SDHCI\n"));
+  DEBUG ((DEBUG_ERROR, "Interrupt status = %X\n", IntStatus));
+  DEBUG ((DEBUG_ERROR, "Error interrupt status = %X\n", ErrIntStatus));
+
   //
   // If the data timeout error is reported
   // but data transfer is signaled as completed we
@@ -2441,6 +2521,13 @@ Done:
 
   if (Status != EFI_NOT_READY) {
     SdMmcHcLedOnOff (Private->PciIo, Trb->Slot, FALSE);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "TRB failed with %r\n", Status));
+      SdMmcPrintTrb (DEBUG_ERROR, Trb);
+    } else {
+      DEBUG ((DEBUG_VERBOSE, "TRB success\n"));
+      SdMmcPrintTrb (DEBUG_VERBOSE, Trb);
+    }
   }
 
   return Status;
