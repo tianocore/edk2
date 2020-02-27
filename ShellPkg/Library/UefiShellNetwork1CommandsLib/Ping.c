@@ -614,6 +614,11 @@ Ping6OnEchoReplyReceived (
 
 ON_EXIT:
 
+  //
+  // Recycle the packet before reusing RxToken
+  //
+  gBS->SignalEvent (Private->IpChoice == PING_IP_CHOICE_IP6?((EFI_IP6_RECEIVE_DATA*)Private->RxToken.Packet.RxData)->RecycleSignal:((EFI_IP4_RECEIVE_DATA*)Private->RxToken.Packet.RxData)->RecycleSignal);
+
   if (Private->RxCount < Private->SendNum) {
     //
     // Continue to receive icmp echo reply packets.
@@ -632,10 +637,6 @@ ON_EXIT:
     //
     Private->Status = EFI_SUCCESS;
   }
-  //
-  // Singal to recycle the each rxdata here, not at the end of process.
-  //
-  gBS->SignalEvent (Private->IpChoice == PING_IP_CHOICE_IP6?((EFI_IP6_RECEIVE_DATA*)Private->RxToken.Packet.RxData)->RecycleSignal:((EFI_IP4_RECEIVE_DATA*)Private->RxToken.Packet.RxData)->RecycleSignal);
 }
 
 /**
