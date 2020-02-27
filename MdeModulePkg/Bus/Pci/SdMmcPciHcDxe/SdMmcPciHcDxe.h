@@ -158,6 +158,9 @@ typedef struct {
   UINT64                              Timeout;
   UINT32                              Retries;
 
+  BOOLEAN                             PioModeTransferCompleted;
+  UINT32                              PioBlockIndex;
+
   SD_MMC_HC_ADMA_32_DESC_LINE         *Adma32Desc;
   SD_MMC_HC_ADMA_64_V3_DESC_LINE      *Adma64V3Desc;
   SD_MMC_HC_ADMA_64_V4_DESC_LINE      *Adma64V4Desc;
