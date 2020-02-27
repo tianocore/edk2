@@ -129,6 +129,13 @@
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdVariableStoreSize_HELP  #language en-US "The size of volatile buffer. This buffer is used to store VOLATILE attribute variables."
 
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdAllowVariablePolicyEnforcementDisable_PROMPT  #language en-US "Allow VariablePolicy enforcement to be disabled."
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdAllowVariablePolicyEnforcementDisable_HELP  #language en-US "If this PCD is disabled, it will block the ability to<BR>\n"
+                                                                                                          "disable the enforcement and VariablePolicy enforcement will always be ON.<BR>\n"
+                                                                                                          "TRUE - VariablePolicy can be disabled by request through the interface (until interface is locked)<BR>\n"
+                                                                                                          "FALSE - VariablePolicy interface will not accept requests to disable and is ALWAYS ON<BR>\n"
+
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdAcpiTableStorageFile_PROMPT  #language en-US "FFS name of ACPI tables storage"
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdAcpiTableStorageFile_HELP  #language en-US "FFS filename to find the ACPI tables."
