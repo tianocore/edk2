@@ -2448,6 +2448,112 @@ SdMmcCheckCommandComplete (
 }
 
 /**
+  Update the SDMA address on the SDMA buffer boundary interrupt.
+
+  @param[in] Private    A pointer to the SD_MMC_HC_PRIVATE_DATA instance.
+  @param[in] Trb        The pointer to the SD_MMC_HC_TRB instance.
+
+  @retval EFI_SUCCESS  Updated SDMA buffer address.
+  @retval Others       Failed to update SDMA buffer address.
+**/
+EFI_STATUS
+SdMmcUpdateSdmaAddress (
+  IN SD_MMC_HC_PRIVATE_DATA  *Private,
+  IN SD_MMC_HC_TRB           *Trb
+  )
+{
+  UINT64      SdmaAddr;
+  EFI_STATUS  Status;
+
+  SdmaAddr = SD_MMC_SDMA_ROUND_UP ((UINTN)Trb->DataPhy, SD_MMC_SDMA_BOUNDARY);
+
+  if (Private->ControllerVersion[Trb->Slot] >= SD_MMC_HC_CTRL_VER_400) {
+    Status = SdMmcHcRwMmio (
+               Private->PciIo,
+               Trb->Slot,
+               SD_MMC_HC_ADMA_SYS_ADDR,
+               FALSE,
+               sizeof (UINT64),
+               &SdmaAddr
+               );
+  } else {
+    Status = SdMmcHcRwMmio (
+               Private->PciIo,
+               Trb->Slot,
+               SD_MMC_HC_SDMA_ADDR,
+               FALSE,
+               sizeof (UINT32),
+               &SdmaAddr
+               );
+  }
+
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Trb->DataPhy = (UINT64)(UINTN)SdmaAddr;
+  return EFI_SUCCESS;
+}
+
+/**
+  Checks if the data transfer completed and performs any actions
+  neccessary to continue the data transfer such as SDMA system
+  address fixup or PIO data transfer.
+
+  @param[in] Private    A pointer to the SD_MMC_HC_PRIVATE_DATA instance.
+  @param[in] Trb        The pointer to the SD_MMC_HC_TRB instance.
+  @param[in] IntStatus  Snapshot of the normal interrupt status register.
+
+  @retval EFI_SUCCESS   Data transfer completed successfully.
+  @retval EFI_NOT_READY Data transfer completion still pending.
+  @retval Others        Data transfer failed to complete.
+**/
+EFI_STATUS
+SdMmcCheckDataTransfer (
+  IN SD_MMC_HC_PRIVATE_DATA  *Private,
+  IN SD_MMC_HC_TRB           *Trb,
+  IN UINT16                  IntStatus
+  )
+{
+  UINT16      Data16;
+  EFI_STATUS  Status;
+
+  if ((IntStatus & BIT1) != 0) {
+    Data16 = BIT1;
+    Status = SdMmcHcRwMmio (
+               Private->PciIo,
+               Trb->Slot,
+               SD_MMC_HC_NOR_INT_STS,
+               FALSE,
+               sizeof (Data16),
+               &Data16
+               );
+    return Status;
+  }
+
+  if ((Trb->Mode == SdMmcSdmaMode) && ((IntStatus & BIT3) != 0)) {
+    Data16 = BIT3;
+    Status = SdMmcHcRwMmio (
+               Private->PciIo,
+               Trb->Slot,
+               SD_MMC_HC_NOR_INT_STS,
+               FALSE,
+               sizeof (Data16),
+               &Data16
+               );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+    Status = SdMmcUpdateSdmaAddress (Private, Trb);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
+
+  return EFI_NOT_READY;
+}
+
+/**
   Check the TRB execution result.
 
   @param[in] Private        A pointer to the SD_MMC_HC_PRIVATE_DATA instance.
@@ -2467,7 +2573,6 @@ SdMmcCheckTrbResult (
   EFI_STATUS                          Status;
   EFI_SD_MMC_PASS_THRU_COMMAND_PACKET *Packet;
   UINT16                              IntStatus;
-  UINT64                              SdmaAddr;
   UINT32                              PioLength;
 
   Packet  = Trb->Packet;
@@ -2530,80 +2635,18 @@ SdMmcCheckTrbResult (
     Status = SdMmcCheckCommandComplete (Private, Trb, IntStatus);
     if (EFI_ERROR (Status)) {
       goto Done;
-    } else {
-      //
-      // If the command doesn't require data transfer skip the transfer
-      // complete checking.
-      //
-      if ((Packet->SdMmcCmdBlk->CommandType != SdMmcCommandTypeAdtc) &&
-          (Packet->SdMmcCmdBlk->ResponseType != SdMmcResponseTypeR1b) &&
-          (Packet->SdMmcCmdBlk->ResponseType != SdMmcResponseTypeR5b)) {
-        goto Done;
-      }
     }
   }
 
-  //
-  // Check Transfer Complete bit is set or not.
-  //
-  if ((IntStatus & BIT1) == BIT1) {
-    goto Done;
+  if (Packet->SdMmcCmdBlk->CommandType == SdMmcCommandTypeAdtc ||
+      Packet->SdMmcCmdBlk->ResponseType == SdMmcResponseTypeR1b ||
+      Packet->SdMmcCmdBlk->ResponseType == SdMmcResponseTypeR5b) {
+    Status = SdMmcCheckDataTransfer (Private, Trb, IntStatus);
+  } else {
+    Status = EFI_SUCCESS;
   }
 
-  //
-  // Check if DMA interrupt is signalled for the SDMA transfer.
-  //
-  if ((Trb->Mode == SdMmcSdmaMode) && ((IntStatus & BIT3) == BIT3)) {
-    //
-    // Clear DMA interrupt bit.
-    //
-    IntStatus = BIT3;
-    Status    = SdMmcHcRwMmio (
-                  Private->PciIo,
-                  Trb->Slot,
-                  SD_MMC_HC_NOR_INT_STS,
-                  FALSE,
-                  sizeof (IntStatus),
-                  &IntStatus
-                  );
-    if (EFI_ERROR (Status)) {
-      goto Done;
-    }
-    //
-    // Update SDMA Address register.
-    //
-    SdmaAddr = SD_MMC_SDMA_ROUND_UP ((UINTN)Trb->DataPhy, SD_MMC_SDMA_BOUNDARY);
-
-    if (Private->ControllerVersion[Trb->Slot] >= SD_MMC_HC_CTRL_VER_400) {
-      Status = SdMmcHcRwMmio (
-                 Private->PciIo,
-                 Trb->Slot,
-                 SD_MMC_HC_ADMA_SYS_ADDR,
-                 FALSE,
-                 sizeof (UINT64),
-                 &SdmaAddr
-                 );
-    } else {
-      Status = SdMmcHcRwMmio (
-                 Private->PciIo,
-                 Trb->Slot,
-                 SD_MMC_HC_SDMA_ADDR,
-                 FALSE,
-                 sizeof (UINT32),
-                 &SdmaAddr
-                 );
-    }
-
-    if (EFI_ERROR (Status)) {
-      goto Done;
-    }
-    Trb->DataPhy = (UINT64)(UINTN)SdmaAddr;
-  }
-
-
-  Status = EFI_NOT_READY;
 Done:
-
   if (Status != EFI_NOT_READY) {
     SdMmcHcLedOnOff (Private->PciIo, Trb->Slot, FALSE);
     if (EFI_ERROR (Status)) {
