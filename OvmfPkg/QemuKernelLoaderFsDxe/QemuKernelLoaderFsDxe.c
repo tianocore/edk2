@@ -34,16 +34,29 @@ typedef enum {
 } KERNEL_BLOB_TYPE;
 
 typedef struct {
-  FIRMWARE_CONFIG_ITEM CONST SizeKey;
-  FIRMWARE_CONFIG_ITEM CONST DataKey;
-  CONST CHAR16 *       CONST Name;
-  UINT32                     Size;
-  UINT8                      *Data;
+  CONST CHAR16                  Name[8];
+  struct {
+    FIRMWARE_CONFIG_ITEM CONST  SizeKey;
+    FIRMWARE_CONFIG_ITEM CONST  DataKey;
+    UINT32                      Size;
+  }                             FwCfgItem[2];
+  UINT32                        Size;
+  UINT8                         *Data;
 } KERNEL_BLOB;
 
 STATIC KERNEL_BLOB mKernelBlob[KernelBlobTypeMax] = {
-  { QemuFwCfgItemKernelSize,      QemuFwCfgItemKernelData,      L"kernel"  },
-  { QemuFwCfgItemInitrdSize,      QemuFwCfgItemInitrdData,      L"initrd"  },
+  {
+    L"kernel",
+    {
+      { QemuFwCfgItemKernelSetupSize, QemuFwCfgItemKernelSetupData, },
+      { QemuFwCfgItemKernelSize,      QemuFwCfgItemKernelData,      },
+    }
+  }, {
+    L"initrd",
+    {
+      { QemuFwCfgItemInitrdSize,      QemuFwCfgItemInitrdData,      },
+    }
+  }
 };
 
 STATIC UINT64 mTotalBlobBytes;
@@ -850,12 +863,21 @@ FetchBlob (
   )
 {
   UINT32 Left;
+  UINTN  Idx;
+  UINT8  *ChunkData;
 
   //
   // Read blob size.
   //
-  QemuFwCfgSelectItem (Blob->SizeKey);
-  Blob->Size = QemuFwCfgRead32 ();
+  Blob->Size = 0;
+  for (Idx = 0; Idx < ARRAY_SIZE (Blob->FwCfgItem); Idx++) {
+    if (Blob->FwCfgItem[Idx].SizeKey == 0) {
+      break;
+    }
+    QemuFwCfgSelectItem (Blob->FwCfgItem[Idx].SizeKey);
+    Blob->FwCfgItem[Idx].Size = QemuFwCfgRead32 ();
+    Blob->Size += Blob->FwCfgItem[Idx].Size;
+  }
   if (Blob->Size == 0) {
     return EFI_SUCCESS;
   }
@@ -872,18 +894,28 @@ FetchBlob (
 
   DEBUG ((DEBUG_INFO, "%a: loading %Ld bytes for \"%s\"\n", __FUNCTION__,
     (INT64)Blob->Size, Blob->Name));
-  QemuFwCfgSelectItem (Blob->DataKey);
 
-  Left = Blob->Size;
-  do {
-    UINT32 Chunk;
+  ChunkData = Blob->Data;
+  for (Idx = 0; Idx < ARRAY_SIZE (Blob->FwCfgItem); Idx++) {
+    if (Blob->FwCfgItem[Idx].DataKey == 0) {
+      break;
+    }
+    QemuFwCfgSelectItem (Blob->FwCfgItem[Idx].DataKey);
 
-    Chunk = (Left < SIZE_1MB) ? Left : SIZE_1MB;
-    QemuFwCfgReadBytes (Chunk, Blob->Data + (Blob->Size - Left));
-    Left -= Chunk;
-    DEBUG ((DEBUG_VERBOSE, "%a: %Ld bytes remaining for \"%s\"\n",
-      __FUNCTION__, (INT64)Left, Blob->Name));
-  } while (Left > 0);
+    Left = Blob->FwCfgItem[Idx].Size;
+    while (Left > 0) {
+      UINT32 Chunk;
+
+      Chunk = (Left < SIZE_1MB) ? Left : SIZE_1MB;
+      QemuFwCfgReadBytes (Chunk, ChunkData + Blob->FwCfgItem[Idx].Size - Left);
+      Left -= Chunk;
+      DEBUG ((DEBUG_VERBOSE, "%a: %Ld bytes remaining for \"%s\" (%d)\n",
+        __FUNCTION__, (INT64)Left, Blob->Name, (INT32)Idx));
+    }
+
+    ChunkData += Blob->FwCfgItem[Idx].Size;
+  }
+
   return EFI_SUCCESS;
 }
 
