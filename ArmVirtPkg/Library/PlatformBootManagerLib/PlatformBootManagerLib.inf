@@ -44,9 +44,8 @@
   MemoryAllocationLib
   PcdLib
   PlatformBmPrintScLib
-  PrintLib
   QemuBootOrderLib
-  QemuFwCfgLib
+  QemuLoadImageLib
   ReportStatusCodeLib
   UefiBootManagerLib
   UefiBootServicesTableLib
@@ -64,19 +63,13 @@
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut
 
 [Guids]
-  gEfiFileInfoGuid
-  gEfiFileSystemInfoGuid
-  gEfiFileSystemVolumeLabelInfoIdGuid
   gEfiEndOfDxeEventGroupGuid
   gEfiGlobalVariableGuid
   gRootBridgesConnectedEventGroupGuid
   gUefiShellFileGuid
 
 [Protocols]
-  gEfiDevicePathProtocolGuid
   gEfiFirmwareVolume2ProtocolGuid
   gEfiGraphicsOutputProtocolGuid
-  gEfiLoadedImageProtocolGuid
   gEfiPciRootBridgeIoProtocolGuid
-  gEfiSimpleFileSystemProtocolGuid
   gVirtioDeviceProtocolGuid
