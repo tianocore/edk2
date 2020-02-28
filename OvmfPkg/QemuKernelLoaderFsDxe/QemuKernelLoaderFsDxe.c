@@ -30,7 +30,6 @@
 typedef enum {
   KernelBlobTypeKernel,
   KernelBlobTypeInitrd,
-  KernelBlobTypeCommandLine,
   KernelBlobTypeMax
 } KERNEL_BLOB_TYPE;
 
@@ -45,7 +44,6 @@ typedef struct {
 STATIC KERNEL_BLOB mKernelBlob[KernelBlobTypeMax] = {
   { QemuFwCfgItemKernelSize,      QemuFwCfgItemKernelData,      L"kernel"  },
   { QemuFwCfgItemInitrdSize,      QemuFwCfgItemInitrdData,      L"initrd"  },
-  { QemuFwCfgItemCommandLineSize, QemuFwCfgItemCommandLineData, L"cmdline" }
 };
 
 STATIC UINT64 mTotalBlobBytes;
@@ -865,7 +863,7 @@ FetchBlob (
   //
   // Read blob.
   //
-  Blob->Data = AllocatePool (Blob->Size);
+  Blob->Data = AllocatePages (EFI_SIZE_TO_PAGES ((UINTN)Blob->Size));
   if (Blob->Data == NULL) {
     DEBUG ((DEBUG_ERROR, "%a: failed to allocate %Ld bytes for \"%s\"\n",
       __FUNCTION__, (INT64)Blob->Size, Blob->Name));
@@ -969,7 +967,8 @@ FreeBlobs:
   while (BlobType > 0) {
     CurrentBlob = &mKernelBlob[--BlobType];
     if (CurrentBlob->Data != NULL) {
-      FreePool (CurrentBlob->Data);
+      FreePages (CurrentBlob->Data,
+        EFI_SIZE_TO_PAGES ((UINTN)CurrentBlob->Size));
       CurrentBlob->Size = 0;
       CurrentBlob->Data = NULL;
     }
