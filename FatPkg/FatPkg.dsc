@@ -4,6 +4,7 @@
 #  This Platform file is used to generate the Binary Fat Drivers
 #  for EDK II Prime release.
 #  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -14,7 +15,7 @@
   PLATFORM_GUID                  = 25b55dbc-9d0b-4a32-80da-46e1273d622c
   PLATFORM_VERSION               = 0.3
   DSC_SPECIFICATION              = 0x00010005
-  SUPPORTED_ARCHITECTURES        = IA32|X64|EBC|ARM|AARCH64
+  SUPPORTED_ARCHITECTURES        = IA32|X64|EBC|ARM|AARCH64|RISCV64
   OUTPUT_DIRECTORY               = Build/Fat
   BUILD_TARGETS                  = DEBUG|RELEASE|NOOPT
   SKUID_IDENTIFIER               = DEFAULT
