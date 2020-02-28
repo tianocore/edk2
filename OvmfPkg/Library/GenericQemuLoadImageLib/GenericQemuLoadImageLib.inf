@@ -1,0 +1,38 @@
+## @file
+#  Generic implementation of QemuLoadImageLib library class interface.
+#
+#  Copyright (c) 2020, ARM Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.27
+  BASE_NAME                      = GenericQemuLoadImageLib
+  FILE_GUID                      = 9e3e28da-c7b5-4f85-841a-84e6a9a1f1a0
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = QemuLoadImageLib|DXE_DRIVER
+
+[Sources]
+  GenericQemuLoadImageLib.c
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  MemoryAllocationLib
+  PrintLib
+  QemuFwCfgLib
+  UefiBootServicesTableLib
+
+[Protocols]
+  gEfiDevicePathProtocolGuid
+  gEfiLoadedImageProtocolGuid
+
+[Guids]
+  gQemuKernelLoaderFsMediaGuid
