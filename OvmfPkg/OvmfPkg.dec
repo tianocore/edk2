@@ -58,6 +58,11 @@
   #
   QemuBootOrderLib|Include/Library/QemuBootOrderLib.h
 
+  ##  @libraryclass  Load a kernel image and command line passed to QEMU via
+  #                  the command line
+  #
+  QemuLoadImageLib|Include/Library/QemuLoadImageLib.h
+
   ##  @libraryclass  Serialize (and deserialize) variables
   #
   SerializeVariablesLib|Include/Library/SerializeVariablesLib.h
