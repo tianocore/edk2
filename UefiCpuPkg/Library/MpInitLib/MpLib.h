@@ -2,6 +2,8 @@
   Common header file for MP Initialize Library.
 
   Copyright (c) 2016 - 2020, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2020, AMD Inc. All rights reserved.<BR>
+
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -12,6 +14,7 @@
 #include <PiPei.h>
 
 #include <Register/Intel/Cpuid.h>
+#include <Register/Amd/Cpuid.h>
 #include <Register/Intel/Msr.h>
 #include <Register/Intel/LocalApic.h>
 #include <Register/Intel/Microcode.h>

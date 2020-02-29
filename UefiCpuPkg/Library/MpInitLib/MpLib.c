@@ -2,6 +2,8 @@
   CPU MP Initialize Library common functions.
 
   Copyright (c) 2016 - 2020, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2020, AMD Inc. All rights reserved.<BR>
+
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -9,6 +11,30 @@
 #include "MpLib.h"
 
 EFI_GUID mCpuInitMpLibHobGuid = CPU_INIT_MP_LIB_HOB_GUID;
+
+
+/**
+  Determine if the standard CPU signature is "AuthenticAMD".
+
+  @retval TRUE  The CPU signature matches.
+  @retval FALSE The CPU signature does not match.
+
+**/
+STATIC
+BOOLEAN
+StandardSignatureIsAuthenticAMD (
+  VOID
+  )
+{
+  UINT32  RegEbx;
+  UINT32  RegEcx;
+  UINT32  RegEdx;
+
+  AsmCpuid (CPUID_SIGNATURE, NULL, &RegEbx, &RegEcx, &RegEdx);
+  return (RegEbx == CPUID_SIGNATURE_AUTHENTIC_AMD_EBX &&
+          RegEcx == CPUID_SIGNATURE_AUTHENTIC_AMD_ECX &&
+          RegEdx == CPUID_SIGNATURE_AUTHENTIC_AMD_EDX);
+}
 
 /**
   The function will check if BSP Execute Disable is enabled.
@@ -564,8 +590,13 @@ InitializeApData (
   CpuMpData->CpuData[ProcessorNumber].Waiting    = FALSE;
   CpuMpData->CpuData[ProcessorNumber].CpuHealthy = (BistData == 0) ? TRUE : FALSE;
 
-  PlatformIdMsr.Uint64 = AsmReadMsr64 (MSR_IA32_PLATFORM_ID);
-  CpuMpData->CpuData[ProcessorNumber].PlatformId = (UINT8) PlatformIdMsr.Bits.PlatformId;
+  //
+  // NOTE: PlatformId is not relevant on AMD platforms.
+  //
+  if (!StandardSignatureIsAuthenticAMD ()) {
+    PlatformIdMsr.Uint64 = AsmReadMsr64 (MSR_IA32_PLATFORM_ID);
+    CpuMpData->CpuData[ProcessorNumber].PlatformId = (UINT8)PlatformIdMsr.Bits.PlatformId;
+  }
 
   AsmCpuid (
     CPUID_VERSION_INFO,
