@@ -13,15 +13,18 @@
 #include <Guid/FileInfo.h>
 #include <Guid/FileSystemInfo.h>
 #include <Guid/FileSystemVolumeLabelInfo.h>
+#include <Guid/LinuxEfiInitrdMedia.h>
 #include <Guid/QemuKernelLoaderFsMedia.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
+#include <Library/DevicePathLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/QemuFwCfgLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Protocol/DevicePath.h>
+#include <Protocol/LoadFile2.h>
 #include <Protocol/SimpleFileSystem.h>
 
 //
@@ -78,6 +81,19 @@ STATIC CONST SINGLE_VENMEDIA_NODE_DEVPATH mFileSystemDevicePath = {
       { sizeof (VENDOR_DEVICE_PATH) }
     },
     QEMU_KERNEL_LOADER_FS_MEDIA_GUID
+  }, {
+    END_DEVICE_PATH_TYPE, END_ENTIRE_DEVICE_PATH_SUBTYPE,
+    { sizeof (EFI_DEVICE_PATH_PROTOCOL) }
+  }
+};
+
+STATIC CONST SINGLE_VENMEDIA_NODE_DEVPATH mInitrdDevicePath = {
+  {
+    {
+      MEDIA_DEVICE_PATH, MEDIA_VENDOR_DP,
+      { sizeof (VENDOR_DEVICE_PATH) }
+    },
+    LINUX_EFI_INITRD_MEDIA_GUID
   }, {
     END_DEVICE_PATH_TYPE, END_ENTIRE_DEVICE_PATH_SUBTYPE,
     { sizeof (EFI_DEVICE_PATH_PROTOCOL) }
@@ -839,6 +855,48 @@ STATIC CONST EFI_SIMPLE_FILE_SYSTEM_PROTOCOL mFileSystem = {
   StubFileSystemOpenVolume
 };
 
+STATIC
+EFI_STATUS
+EFIAPI
+InitrdLoadFile2 (
+  IN      EFI_LOAD_FILE2_PROTOCOL       *This,
+  IN      EFI_DEVICE_PATH_PROTOCOL      *FilePath,
+  IN      BOOLEAN                       BootPolicy,
+  IN  OUT UINTN                         *BufferSize,
+  OUT     VOID                          *Buffer     OPTIONAL
+  )
+{
+  CONST KERNEL_BLOB   *InitrdBlob = &mKernelBlob[KernelBlobTypeInitrd];
+
+  ASSERT (InitrdBlob->Size > 0);
+
+  if (BootPolicy) {
+    return EFI_UNSUPPORTED;
+  }
+
+  if (BufferSize == NULL || !IsDevicePathValid (FilePath, 0)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (FilePath->Type != END_DEVICE_PATH_TYPE ||
+      FilePath->SubType != END_ENTIRE_DEVICE_PATH_SUBTYPE) {
+    return EFI_NOT_FOUND;
+  }
+
+  if (Buffer == NULL || *BufferSize < InitrdBlob->Size) {
+    *BufferSize = InitrdBlob->Size;
+    return EFI_BUFFER_TOO_SMALL;
+  }
+
+  CopyMem (Buffer, InitrdBlob->Data, InitrdBlob->Size);
+
+  *BufferSize = InitrdBlob->Size;
+  return EFI_SUCCESS;
+}
+
+STATIC CONST EFI_LOAD_FILE2_PROTOCOL     mInitrdLoadFile2 = {
+  InitrdLoadFile2,
+};
 
 //
 // Utility functions.
@@ -949,6 +1007,7 @@ QemuKernelLoaderFsDxeEntrypoint (
   KERNEL_BLOB               *KernelBlob;
   EFI_STATUS                Status;
   EFI_HANDLE                FileSystemHandle;
+  EFI_HANDLE                InitrdLoadFile2Handle;
 
   if (!QemuFwCfgIsAvailable ()) {
     return EFI_NOT_FOUND;
@@ -993,7 +1052,27 @@ QemuKernelLoaderFsDxeEntrypoint (
     goto FreeBlobs;
   }
 
+  if (KernelBlob[KernelBlobTypeInitrd].Size > 0) {
+    InitrdLoadFile2Handle = NULL;
+    Status = gBS->InstallMultipleProtocolInterfaces (&InitrdLoadFile2Handle,
+                    &gEfiDevicePathProtocolGuid,  &mInitrdDevicePath,
+                    &gEfiLoadFile2ProtocolGuid,   &mInitrdLoadFile2,
+                    NULL);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "%a: InstallMultipleProtocolInterfaces(): %r\n",
+        __FUNCTION__, Status));
+      goto UninstallFileSystemHandle;
+    }
+  }
+
   return EFI_SUCCESS;
+
+UninstallFileSystemHandle:
+  Status = gBS->UninstallMultipleProtocolInterfaces (FileSystemHandle,
+                  &gEfiDevicePathProtocolGuid,       &mFileSystemDevicePath,
+                  &gEfiSimpleFileSystemProtocolGuid, &mFileSystem,
+                  NULL);
+  ASSERT_EFI_ERROR (Status);
 
 FreeBlobs:
   while (BlobType > 0) {
