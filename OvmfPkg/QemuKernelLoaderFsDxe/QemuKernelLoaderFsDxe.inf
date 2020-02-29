@@ -28,6 +28,7 @@
   BaseLib
   BaseMemoryLib
   DebugLib
+  DevicePathLib
   MemoryAllocationLib
   QemuFwCfgLib
   UefiBootServicesTableLib
@@ -42,6 +43,7 @@
 
 [Protocols]
   gEfiDevicePathProtocolGuid                ## PRODUCES
+  gEfiLoadFile2ProtocolGuid                 ## PRODUCES
   gEfiSimpleFileSystemProtocolGuid          ## PRODUCES
 
 [Depex]
