@@ -49,7 +49,7 @@
   NvVarsFileLib
   QemuFwCfgLib
   QemuFwCfgS3Lib
-  LoadLinuxLib
+  QemuLoadImageLib
   QemuBootOrderLib
   ReportStatusCodeLib
   UefiLib
