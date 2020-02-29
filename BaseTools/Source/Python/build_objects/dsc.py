@@ -25,6 +25,8 @@ class dsc_set(set):
             # TODO: get add the old_item to item
         super().add(item)
 
+
+
 class dsc_list(list):
 
     def __init__(self, allowed_classes=None):
@@ -466,7 +468,7 @@ class build_option:
         return True
 
     def __hash__(self):
-        return hash(self.__repr__(False))
+        return hash(self.__repr__())
 
     def __repr__(self, include_data=True):
         rep = "" if self.family is None else f"{self.family}:"

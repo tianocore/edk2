@@ -157,8 +157,22 @@ def AnalyzeDscPcd(Setting, PcdType):
         return [HiiString, Guid, Offset, Value, Attribute], IsValid, 3
     return [], False, 0
 
+def to_method(func):
+    def wrapper(*args, **kwargs):
+        return func(*args, **kwargs)
+    return wrapper
+class cached_data(object):
+    def __init__(self,function):
+        self._function = function
+        self._lock = False
+        self._value = None
+    def __call__(self,*args,**kwargs):
+        if not self._lock:
+            self._value = self._function(*args,**kwargs)
+            self._lock = True
+        return self._value
 class DscRecipe(object):
-    def __init__(self, file_path, arch, workspace, packages_path=None):
+    def __init__(self, file_path, arch, workspace, packages_path=None,build_target='', tool_chain_tag='', tool_family='', cmd_macro = None, cmd_pcd=None):
         self.dsc_file_path = PathClass(file_path,workspace)
         self.workspace = PathClass(workspace)
         self.packages_path = packages_path if packages_path else []
@@ -173,19 +187,33 @@ class DscRecipe(object):
         self.dsc_recipe = dsc(self.dsc_file_path)
         self.parsed = False
         GlobalData.gGlobalDefines['WORKSPACE'] = workspace
-        GlobalData.gGlobalDefines['TOOL_CHAIN_TAG'] = 'VS2015x86'
+        GlobalData.gGlobalDefines['TOOL_CHAIN_TAG'] = tool_chain_tag
+        GlobalData.gGlobalDefines['TARGET'] = build_target
+        GlobalData.gGlobalDefines['ARCH'] = arch
+        GlobalData.gGlobalDefines['FAMILY'] = tool_family
+        GlobalData.gCommandLineDefines = cmd_macro if cmd_macro else {}
+        GlobalData.BuildOptionPcd = cmd_pcd
+
         GlobalData.gWorkspace = workspace
         self._MacroDict = None
         self._NullLibraryNumber = 0
 
-    def get(self):
+    def read(self):
         if not self.parsed:
             self.init_recipe()
+            self.parsed = True
         return self.dsc_recipe
+    def write(self, file_path):
+        pass
 
     def init_recipe(self):
-        self.LoadDefines(self.dsc_recipe.defines)
-        self.LoadComponents(self.dsc_recipe.components)
+        self.ReadDefines()
+        self.ReadComponents()
+        self.ReadBuildOptions()
+        self.ReadDefaultStore()
+        self.ReadLibClasses()
+        self.ReadSkus()
+        self.ReadPcds()
 
     ## Get current effective macros
     @property
@@ -197,8 +225,10 @@ class DscRecipe(object):
             self._MacroDict.update(GlobalData.gCommandLineDefines)
         return self._MacroDict
 
-    def LoadDefines(self, target):
-        def_set = target
+    @to_method
+    @cached_data
+    def ReadDefines(self):
+        def_set = self.dsc_recipe.defines
         RecordList = self.dsc_parser[MODEL_META_DATA_HEADER, self._Arch]
         for Record in RecordList:
             Name = Record[1]
@@ -208,14 +238,14 @@ class DscRecipe(object):
                 OutputDirectory = NormPath(Record[2], self._Macros)
                 if ' ' in OutputDirectory:
                     EdkLogger.error("build", FORMAT_NOT_SUPPORTED, "No space is allowed in OUTPUT_DIRECTORY",
-                                    File=self.MetaFile, Line=Record[-1],
+                                    File=self.dsc_file_path, Line=Record[-1],
                                     ExtraData=OutputDirectory)
                 def_set.add(definition(Name,OutputDirectory,source_info=self.dsc_file_path))
             elif Name == TAB_DSC_DEFINES_FLASH_DEFINITION:
                 FlashDefinition = PathClass(NormPath(Record[2], self._Macros), GlobalData.gWorkspace)
                 ErrorCode, ErrorInfo = FlashDefinition.Validate('.fdf')
                 if ErrorCode != 0:
-                    EdkLogger.error('build', ErrorCode, File=self.MetaFile, Line=Record[-1],
+                    EdkLogger.error('build', ErrorCode, File=self.dsc_file_path, Line=Record[-1],
                                     ExtraData=ErrorInfo)
                 def_set.add(definition(Name,FlashDefinition,source_info=self.dsc_file_path))
             elif Name == TAB_DSC_PREBUILD:
@@ -223,7 +253,7 @@ class DscRecipe(object):
                 if Record[2][0] == '"':
                     if Record[2][-1] != '"':
                         EdkLogger.error('build', FORMAT_INVALID, 'Missing double quotes in the end of %s statement.' % TAB_DSC_PREBUILD,
-                                    File=self.MetaFile, Line=Record[-1])
+                                    File=self.dsc_file_path, Line=Record[-1])
                     PrebuildValue = Record[2][1:-1]
                 def_set.add(definition(Name,PrebuildValue,source_info=self.dsc_file_path))
             elif Name == TAB_DSC_POSTBUILD:
@@ -231,7 +261,7 @@ class DscRecipe(object):
                 if Record[2][0] == '"':
                     if Record[2][-1] != '"':
                         EdkLogger.error('build', FORMAT_INVALID, 'Missing double quotes in the end of %s statement.' % TAB_DSC_POSTBUILD,
-                                    File=self.MetaFile, Line=Record[-1])
+                                    File=self.dsc_file_path, Line=Record[-1])
                     PostbuildValue = Record[2][1:-1]
                 def_set.add(definition(Name,PostbuildValue,source_info=self.dsc_file_path))
             elif Name == TAB_DSC_DEFINES_SUPPORTED_ARCHITECTURES:
@@ -255,28 +285,28 @@ class DscRecipe(object):
             elif Name == TAB_DSC_DEFINES_RFC_LANGUAGES:
                 if not Record[2] or Record[2][0] != '"' or Record[2][-1] != '"' or len(Record[2]) == 1:
                     EdkLogger.error('build', FORMAT_NOT_SUPPORTED, 'language code for RFC_LANGUAGES must have double quotes around it, for example: RFC_LANGUAGES = "en-us;zh-hans"',
-                                    File=self.MetaFile, Line=Record[-1])
+                                    File=self.dsc_file_path, Line=Record[-1])
                 LanguageCodes = Record[2][1:-1]
                 if not LanguageCodes:
                     EdkLogger.error('build', FORMAT_NOT_SUPPORTED, 'one or more RFC4646 format language code must be provided for RFC_LANGUAGES statement',
-                                    File=self.MetaFile, Line=Record[-1])
+                                    File=self.dsc_file_path, Line=Record[-1])
                 LanguageList = GetSplitValueList(LanguageCodes, TAB_SEMI_COLON_SPLIT)
                 # check whether there is empty entries in the list
                 if None in LanguageList:
                     EdkLogger.error('build', FORMAT_NOT_SUPPORTED, 'one or more empty language code is in RFC_LANGUAGES statement',
-                                    File=self.MetaFile, Line=Record[-1])
+                                    File=self.dsc_file_path, Line=Record[-1])
                 def_set.add(definition(Name,LanguageList,source_info=self.dsc_file_path))
             elif Name == TAB_DSC_DEFINES_ISO_LANGUAGES:
                 if not Record[2] or Record[2][0] != '"' or Record[2][-1] != '"' or len(Record[2]) == 1:
                     EdkLogger.error('build', FORMAT_NOT_SUPPORTED, 'language code for ISO_LANGUAGES must have double quotes around it, for example: ISO_LANGUAGES = "engchn"',
-                                    File=self.MetaFile, Line=Record[-1])
+                                    File=self.dsc_file_path, Line=Record[-1])
                 LanguageCodes = Record[2][1:-1]
                 if not LanguageCodes:
                     EdkLogger.error('build', FORMAT_NOT_SUPPORTED, 'one or more ISO639-2 format language code must be provided for ISO_LANGUAGES statement',
-                                    File=self.MetaFile, Line=Record[-1])
+                                    File=self.dsc_file_path, Line=Record[-1])
                 if len(LanguageCodes) % 3:
                     EdkLogger.error('build', FORMAT_NOT_SUPPORTED, 'bad ISO639-2 format for ISO_LANGUAGES',
-                                    File=self.MetaFile, Line=Record[-1])
+                                    File=self.dsc_file_path, Line=Record[-1])
                 LanguageList = []
                 for i in range(0, len(LanguageCodes), 3):
                     LanguageList.append(LanguageCodes[i:i + 3])
@@ -289,7 +319,7 @@ class DscRecipe(object):
                 try:
                     uuid.UUID(Record[2])
                 except:
-                    EdkLogger.error("build", FORMAT_INVALID, "Invalid GUID format for VPD_TOOL_GUID", File=self.MetaFile)
+                    EdkLogger.error("build", FORMAT_INVALID, "Invalid GUID format for VPD_TOOL_GUID", File=self.dsc_file_path)
                 def_set.add(definition(Name,Record[2],source_info=self.dsc_file_path))
             else:
                 def_set.add(definition(Name,Record[2],source_info=self.dsc_file_path))
@@ -312,9 +342,11 @@ class DscRecipe(object):
     def _SourceInfo(self,LineNo):
         return ":".join((self.dsc_file_path.Path,str(LineNo)))
 
-    def LoadComponents(self,target):
-        if not isinstance(target, dsc_dict):
-            return
+    @to_method
+    @cached_data
+    def ReadComponents(self):
+        target = self.dsc_recipe.components
+
         self._OverrideDuplicateModule()
         RecordList = self.dsc_parser[MODEL_META_DATA_COMPONENT, self._Arch]
         component_sec_type = dsc_section_type(self._Arch)
@@ -327,7 +359,7 @@ class DscRecipe(object):
             # check the file validation
             ErrorCode, ErrorInfo = ModuleFile.Validate('.inf')
             if ErrorCode != 0:
-                EdkLogger.error('build', ErrorCode, File=self.MetaFile, Line=LineNo,
+                EdkLogger.error('build', ErrorCode, File=self.dsc_file_path, Line=LineNo,
                                 ExtraData=ErrorInfo)
 
             Module = component(ModuleFile, self._SourceInfo(LineNo))
@@ -343,7 +375,7 @@ class DscRecipe(object):
                 # check the file validation
                 ErrorCode, ErrorInfo = LibraryPath.Validate('.inf')
                 if ErrorCode != 0:
-                    EdkLogger.error('build', ErrorCode, File=self.MetaFile, Line=LineNo,
+                    EdkLogger.error('build', ErrorCode, File=self.dsc_file_path, Line=LineNo,
                                     ExtraData=ErrorInfo)
 
                 if LibraryClass == '' or LibraryClass == 'NULL':
@@ -391,28 +423,31 @@ class DscRecipe(object):
             if RecordList:
                 if len(RecordList) != 1:
                     EdkLogger.error('build', OPTION_UNKNOWN, 'Only FILE_GUID can be listed in <Defines> section.',
-                                    File=self.MetaFile, ExtraData=str(ModuleFile), Line=LineNo)
+                                    File=self.dsc_file_path, ExtraData=str(ModuleFile), Line=LineNo)
 
                 Module.defines.add(RecordList[0][2])
 
             target[component_sec_type].add(Module)
         return target
 
-    def LoadSkus(self,target):
+    @to_method
+    @cached_data
+    def ReadSkus(self):
+        target = self.dsc_recipe.skus
         RecordList = self.dsc_parser[MODEL_EFI_SKU_ID, self._Arch]
         for Record in RecordList:
             if not Record[0]:
                 EdkLogger.error('build', FORMAT_INVALID, 'No Sku ID number',
-                                File=self.MetaFile, Line=Record[-1])
+                                File=self.dsc_file_path, Line=Record[-1])
             if not Record[1]:
                 EdkLogger.error('build', FORMAT_INVALID, 'No Sku ID name',
-                                File=self.MetaFile, Line=Record[-1])
+                                File=self.dsc_file_path, Line=Record[-1])
             if not Pattern.match(Record[0]) and not HexPattern.match(Record[0]):
                 EdkLogger.error('build', FORMAT_INVALID, "The format of the Sku ID number is invalid. It only support Integer and HexNumber",
-                                File=self.MetaFile, Line=Record[-1])
+                                File=self.dsc_file_path, Line=Record[-1])
             if not SkuIdPattern.match(Record[1]) or (Record[2] and not SkuIdPattern.match(Record[2])):
                 EdkLogger.error('build', FORMAT_INVALID, "The format of the Sku ID name is invalid. The correct format is '(a-zA-Z_)(a-zA-Z0-9_)*'",
-                                File=self.MetaFile, Line=Record[-1])
+                                File=self.dsc_file_path, Line=Record[-1])
 
             skuid = int(Record[0], 16) if Record[0].upper().startswith("0X") else int(Record[0])
             skuname = Record[1].upper()
@@ -420,28 +455,33 @@ class DscRecipe(object):
             target.add(sku_id(skuid, skuname, parentname, self._SourceInfo(Record[-1])))
         return target
 
-    def LoadDefaultStore(self,target):
-        self.DefaultStores = OrderedDict()
+    @to_method
+    @cached_data
+    def ReadDefaultStore(self):
+        target = self.dsc_recipe.default_stores
         RecordList = self.dsc_parser[MODEL_EFI_DEFAULT_STORES, self._Arch]
         for Record in RecordList:
             if not Record[0]:
                 EdkLogger.error('build', FORMAT_INVALID, 'No DefaultStores ID number',
-                                File=self.MetaFile, Line=Record[-1])
+                                File=self.dsc_file_path, Line=Record[-1])
             if not Record[1]:
                 EdkLogger.error('build', FORMAT_INVALID, 'No DefaultStores ID name',
-                                File=self.MetaFile, Line=Record[-1])
+                                File=self.dsc_file_path, Line=Record[-1])
             if not Pattern.match(Record[0]) and not HexPattern.match(Record[0]):
                 EdkLogger.error('build', FORMAT_INVALID, "The format of the DefaultStores ID number is invalid. It only support Integer and HexNumber",
-                                File=self.MetaFile, Line=Record[-1])
+                                File=self.dsc_file_path, Line=Record[-1])
             if not IsValidWord(Record[1]):
                 EdkLogger.error('build', FORMAT_INVALID, "The format of the DefaultStores ID name is invalid. The correct format is '(a-zA-Z0-9_)(a-zA-Z0-9_-.)*'",
-                                File=self.MetaFile, Line=Record[-1])
+                                File=self.dsc_file_path, Line=Record[-1])
 
             target.add(default_store(int(Record[0], 16) if Record[0].upper().startswith("0X") else int(Record[0]), Record[1].upper(), self._SourceInfo(Record[-1])))
 
         return target
 
-    def LoadLibClasses(self,target):
+    @to_method
+    @cached_data
+    def ReadLibClasses(self):
+        target = self.dsc_recipe.library_classes
         RecordList = self.dsc_parser[MODEL_EFI_LIBRARY_CLASS, self._Arch, None, -1]
         Macros = self._Macros
         LibraryClassSet = set()
@@ -461,12 +501,12 @@ class DscRecipe(object):
             # check the file validation
             ErrorCode, ErrorInfo = LibraryInstance.Validate('.inf')
             if ErrorCode != 0:
-                EdkLogger.error('build', ErrorCode, File=self.MetaFile, Line=LineNo,
+                EdkLogger.error('build', ErrorCode, File=self.dsc_file_path, Line=LineNo,
                                 ExtraData=ErrorInfo)
 
             if ModuleType != TAB_COMMON and ModuleType not in SUP_MODULE_LIST:
                 EdkLogger.error('build', OPTION_UNKNOWN, "Unknown module type [%s]" % ModuleType,
-                                File=self.MetaFile, ExtraData=LibraryInstance, Line=LineNo)
+                                File=self.dsc_file_path, ExtraData=LibraryInstance, Line=LineNo)
             LibraryClassDict[Arch, ModuleType, LibraryClass] = (LibraryInstance, LineNo)
 
         # resolve the specific library instance for each class and each module type
@@ -483,17 +523,18 @@ class DscRecipe(object):
 
         return target
 
-    def LoadBuildOptions(self,target):
+    @to_method
+    @cached_data
+    def ReadBuildOptions(self):
+        target = self.dsc_recipe.build_options
 
         RecordList = self.dsc_parser[MODEL_META_DATA_BUILD_OPTION, self._Arch, EDKII_NAME]
         for ToolChainFamily, ToolChain, Option, Dummy1, Dummy2, Dummy3, Dummy4, LineNo in RecordList:
-            if Dummy3.upper() != TAB_COMMON:
-                continue
             #
             # Only flags can be appended
             #
             Target, Tag, Arch, Tool, Attr = ToolChain.split("_")
-            build_option_sec_obj = dsc_buildoption_section_type(self._Arch, EDKII_NAME)
+            build_option_sec_obj = dsc_buildoption_section_type(self._Arch, EDKII_NAME,Dummy3)
             if not ToolChain.endswith('_FLAGS') or Option.startswith('='):
                 build_option_obj = build_option(Tool,Attr,Option,Target,Tag,Arch,ToolChainFamily, True, self._SourceInfo(LineNo))
                 target[build_option_sec_obj].add(build_option_obj)
@@ -502,7 +543,10 @@ class DscRecipe(object):
                 target[build_option_sec_obj].add(build_option_obj)
         return target
 
-    def LoadPcds(self,target):
+    @to_method
+    @cached_data
+    def ReadPcds(self):
+        target = self.dsc_recipe.pcds
         PcdTypeSet = (
             MODEL_PCD_FIXED_AT_BUILD,
             MODEL_PCD_PATCHABLE_IN_MODULE,
@@ -553,12 +597,44 @@ class DscRecipe(object):
                     target[pcd_sec_obj].add(pcd_obj)
         return target
 
+## Open Dsc File
+#
+#  Return a DSC handler
+#
+#   @param      dsc_path        The relative path of platform description file
+#   @param      arch            Default Arch value for filtering sections
+#   @param      workspace       Workspace path
+#   @param      packagepath     A list of packages search path.
+#   @param      build_target    Build target
+#   @param      tool_chain_tag  Tool chain
+#   @param      tool_family     Build tool family
+#   @param      cmd_macro       A dict which store the macro and its value.
+#   @param      cmd_pcd         A string list. e.g. pcdtoken.pcdname=value
+#
+def OpenDsc(dsc_path, arch, workspace, packagepath,build_target='', tool_chain_tag='', tool_family='', cmd_macro = None, cmd_pcd=None):
+    return DscRecipe(dsc_path, arch, workspace, packagepath,build_target, tool_chain_tag, tool_family, cmd_macro, cmd_pcd)
+
 if __name__ == "__main__":
-    dsc_reci = DscRecipe(r"OvmfPkg\OvmfPkgIa32.dsc", "IA32", r"C:\BobFeng\ToolDev\EDKIITrunk\BobEdk2\edk2",[r"C:\BobFeng\ToolDev\EDKIITrunk\BobEdk2\edk2"])
-    dsc = dsc_reci.get()
+    dsc_handle = OpenDsc(r"OvmfPkg\OvmfPkgIa32.dsc", "IA32", r"C:\BobFeng\ToolDev\EDKIITrunk\BobEdk2\edk2",[r"C:\BobFeng\ToolDev\EDKIITrunk\BobEdk2\edk2"])
+    dsc = dsc_handle.read()
     for item in dsc.defines:
         print(item)
     for comps in dsc.components.values():
         for comp in comps:
             print(comp)
+    for items in dsc.pcds.values():
+        for pcd in items:
+            print(pcd)
+    for items in dsc.skus:
+        print(items)
+
+    for items in dsc.default_stores:
+        print(items)
+    for items in dsc.build_options.values():
+        for bo in items:
+            print(bo)
+
+    for item in dsc_handle.ReadDefines():
+        print(item)
+
 
