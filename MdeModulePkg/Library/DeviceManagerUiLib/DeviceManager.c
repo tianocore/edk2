@@ -619,7 +619,7 @@ CreateDeviceManagerForm(
         TokenHelp = HiiSetString (HiiHandle, 0, String, NULL);
         FreePool (String);
 
-        FormSetGuid = ((EFI_IFR_FORM_SET *)Ptr)->Guid;
+        CopyMem (&FormSetGuid, &((EFI_IFR_FORM_SET *) Ptr)->Guid, sizeof (EFI_GUID));
 
         //
         // Network device process
