@@ -1927,7 +1927,7 @@ Ip6ProcessRouterAdvertise (
   UINT32                    ReachableTime;
   UINT32                    RetransTimer;
   UINT16                    RouterLifetime;
-  UINT16                    Offset;
+  UINT32                    Offset;
   UINT8                     Type;
   UINT8                     Length;
   IP6_ETHER_ADDR_OPTION     LinkLayerOption;
@@ -2094,10 +2094,11 @@ Ip6ProcessRouterAdvertise (
   //
   // The only defined options that may appear are the Source
   // Link-Layer Address, Prefix information and MTU options.
-  // All included options have a length that is greater than zero.
+  // All included options have a length that is greater than zero and
+  // fit within the input packet.
   //
   Offset = 16;
-  while (Offset < Head->PayloadLength) {
+  while (Offset < (UINT32) Head->PayloadLength) {
     NetbufCopy (Packet, Offset, sizeof (UINT8), &Type);
     switch (Type) {
     case Ip6OptionEtherSource:
@@ -2105,9 +2106,12 @@ Ip6ProcessRouterAdvertise (
       // Update the neighbor cache
       //
       NetbufCopy (Packet, Offset, sizeof (IP6_ETHER_ADDR_OPTION), (UINT8 *) &LinkLayerOption);
-      if (LinkLayerOption.Length <= 0) {
-        goto Exit;
-      }
+
+      //
+      // Option size validity ensured by Ip6IsNDOptionValid().
+      //
+      ASSERT (LinkLayerOption.Length != 0);
+      ASSERT (Offset + (UINT32) LinkLayerOption.Length * 8 >= (UINT32) Head->PayloadLength);
 
       ZeroMem (&LinkLayerAddress, sizeof (EFI_MAC_ADDRESS));
       CopyMem (&LinkLayerAddress, LinkLayerOption.EtherAddr, 6);
@@ -2151,13 +2155,17 @@ Ip6ProcessRouterAdvertise (
         }
       }
 
-      Offset = (UINT16) (Offset + (UINT16) LinkLayerOption.Length * 8);
+      Offset += (UINT32) LinkLayerOption.Length * 8;
       break;
     case Ip6OptionPrefixInfo:
       NetbufCopy (Packet, Offset, sizeof (IP6_PREFIX_INFO_OPTION), (UINT8 *) &PrefixOption);
-      if (PrefixOption.Length != 4) {
-        goto Exit;
-      }
+
+      //
+      // Option size validity ensured by Ip6IsNDOptionValid().
+      //
+      ASSERT (PrefixOption.Length == 4);
+      ASSERT (Offset + (UINT32) PrefixOption.Length * 8 >= (UINT32) Head->PayloadLength);
+
       PrefixOption.ValidLifetime     = NTOHL (PrefixOption.ValidLifetime);
       PrefixOption.PreferredLifetime = NTOHL (PrefixOption.PreferredLifetime);
 
@@ -2321,9 +2329,12 @@ Ip6ProcessRouterAdvertise (
       break;
     case Ip6OptionMtu:
       NetbufCopy (Packet, Offset, sizeof (IP6_MTU_OPTION), (UINT8 *) &MTUOption);
-      if (MTUOption.Length != 1) {
-        goto Exit;
-      }
+
+      //
+      // Option size validity ensured by Ip6IsNDOptionValid().
+      //
+      ASSERT (MTUOption.Length == 1);
+      ASSERT (Offset + (UINT32) MTUOption.Length * 8 >= (UINT32) Head->PayloadLength);
 
       //
       // Use IPv6 minimum link MTU 1280 bytes as the maximum packet size in order
@@ -2338,11 +2349,10 @@ Ip6ProcessRouterAdvertise (
       // Silently ignore unrecognized options
       //
       NetbufCopy (Packet, Offset + sizeof (UINT8), sizeof (UINT8), &Length);
-      if (Length <= 0) {
-        goto Exit;
-      }
 
-      Offset = (UINT16) (Offset + (UINT16) Length * 8);
+      ASSERT (Length != 0);
+
+      Offset += (UINT32) Length * 8;
       break;
     }
   }

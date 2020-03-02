@@ -129,45 +129,74 @@ Ip6IsNDOptionValid (
   IN UINT16                 OptionLen
   )
 {
-  UINT16                    Offset;
-  UINT8                     OptionType;
+  UINT32                    Offset;
   UINT16                    Length;
+  IP6_OPTION_HEADER         *OptionHeader;
+
+  if (Option == NULL) {
+    ASSERT (Option != NULL);
+    return FALSE;
+  }
 
   Offset = 0;
 
-  while (Offset < OptionLen) {
-    OptionType = *(Option + Offset);
-     Length    = (UINT16) (*(Option + Offset + 1) * 8);
+  //
+  // RFC 4861 states that Neighbor Discovery packet can contain zero or more
+  // options. Start processing the options if at least Type + Length fields
+  // fit within the input buffer.
+  //
+  while (Offset + sizeof (IP6_OPTION_HEADER) - 1 < OptionLen) {
+    OptionHeader  = (IP6_OPTION_HEADER*) (Option + Offset);
+    Length        = (UINT16) OptionHeader->Length * 8;
 
-    switch (OptionType) {
+    switch (OptionHeader->Type) {
     case Ip6OptionPrefixInfo:
       if (Length != 32) {
         return FALSE;
       }
-
       break;
 
     case Ip6OptionMtu:
       if (Length != 8) {
         return FALSE;
       }
+      break;
 
+    default:
+      // RFC 4861 states that Length field cannot be 0.
+      if (Length == 0) {
+        return FALSE;
+      }
+      break;
+    }
+
+    //
+    // Check whether recognized options are within the input buffer's scope.
+    //
+    switch (OptionHeader->Type) {
+    case Ip6OptionEtherSource:
+    case Ip6OptionEtherTarget:
+    case Ip6OptionPrefixInfo:
+    case Ip6OptionRedirected:
+    case Ip6OptionMtu:
+      if (Offset + Length > (UINT32) OptionLen) {
+        return FALSE;
+      }
       break;
 
     default:
       //
-      // Check the length of Ip6OptionEtherSource, Ip6OptionEtherTarget, and
-      // Ip6OptionRedirected here. For unrecognized options, silently ignore
-      // and continue processing the message.
+      // Unrecognized options can be either valid (but unused) or invalid
+      // (garbage in between or right after valid options). Silently ignore.
       //
-      if (Length == 0) {
-        return FALSE;
-      }
-
       break;
     }
 
-    Offset = (UINT16) (Offset + Length);
+    //
+    // Advance to the next option.
+    // Length already considers option header's Type + Length.
+    //
+    Offset += Length;
   }
 
   return TRUE;
