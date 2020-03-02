@@ -56,11 +56,20 @@ VOID
   VOID                      *Context
   );
 
+typedef struct _IP6_OPTION_HEADER {
+  UINT8                     Type;
+  UINT8                     Length;
+} IP6_OPTION_HEADER;
+
+STATIC_ASSERT (sizeof (IP6_OPTION_HEADER) == 2, "IP6_OPTION_HEADER is expected to be exactly 2 bytes long.");
+
 typedef struct _IP6_ETHE_ADDR_OPTION {
   UINT8                     Type;
   UINT8                     Length;
   UINT8                     EtherAddr[6];
 } IP6_ETHER_ADDR_OPTION;
+
+STATIC_ASSERT (sizeof (IP6_ETHER_ADDR_OPTION) == 8, "IP6_ETHER_ADDR_OPTION is expected to be exactly 8 bytes long.");
 
 typedef struct _IP6_MTU_OPTION {
   UINT8                     Type;
@@ -68,6 +77,8 @@ typedef struct _IP6_MTU_OPTION {
   UINT16                    Reserved;
   UINT32                    Mtu;
 } IP6_MTU_OPTION;
+
+STATIC_ASSERT (sizeof (IP6_MTU_OPTION) == 8, "IP6_MTU_OPTION is expected to be exactly 8 bytes long.");
 
 typedef struct _IP6_PREFIX_INFO_OPTION {
   UINT8                     Type;
@@ -79,6 +90,8 @@ typedef struct _IP6_PREFIX_INFO_OPTION {
   UINT32                    Reserved2;
   EFI_IPv6_ADDRESS          Prefix;
 } IP6_PREFIX_INFO_OPTION;
+
+STATIC_ASSERT (sizeof (IP6_PREFIX_INFO_OPTION) == 32, "IP6_PREFIX_INFO_OPTION is expected to be exactly 32 bytes long.");
 
 typedef
 VOID
