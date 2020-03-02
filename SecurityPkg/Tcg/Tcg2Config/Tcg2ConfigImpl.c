@@ -223,7 +223,7 @@ SaveTcg2PpRequest (
   UINT32      ReturnCode;
   EFI_STATUS  Status;
 
-  ReturnCode = Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunction (TCG_ACPI_FUNCTION_SUBMIT_REQUEST_TO_BIOS_2, PpRequest, 0);
+  ReturnCode = Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunction (PpRequest, 0);
   if (ReturnCode == TCG_PP_SUBMIT_REQUEST_TO_PREOS_SUCCESS) {
     mCurrentPpRequest = PpRequest;
     Status = EFI_SUCCESS;
@@ -255,7 +255,7 @@ SaveTcg2PpRequestParameter (
   UINT32      ReturnCode;
   EFI_STATUS  Status;
 
-  ReturnCode = Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunction (TCG_ACPI_FUNCTION_SUBMIT_REQUEST_TO_BIOS_2, mCurrentPpRequest, PpRequestParameter);
+  ReturnCode = Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunction (mCurrentPpRequest, PpRequestParameter);
   if (ReturnCode == TCG_PP_SUBMIT_REQUEST_TO_PREOS_SUCCESS) {
     Status = EFI_SUCCESS;
   } else if (ReturnCode == TCG_PP_SUBMIT_REQUEST_TO_PREOS_GENERAL_FAILURE) {
@@ -294,7 +294,7 @@ SaveTcg2PCRBanksRequest (
     mTcg2ConfigPrivateDate->PCRBanksDesired &= ~(0x1 << PCRBankIndex);
   }
 
-  ReturnCode = Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunction (TCG_ACPI_FUNCTION_SUBMIT_REQUEST_TO_BIOS_2, TCG2_PHYSICAL_PRESENCE_SET_PCR_BANKS, mTcg2ConfigPrivateDate->PCRBanksDesired);
+  ReturnCode = Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunction (TCG2_PHYSICAL_PRESENCE_SET_PCR_BANKS, mTcg2ConfigPrivateDate->PCRBanksDesired);
   if (ReturnCode == TCG_PP_SUBMIT_REQUEST_TO_PREOS_SUCCESS) {
     Status = EFI_SUCCESS;
   } else if (ReturnCode == TCG_PP_SUBMIT_REQUEST_TO_PREOS_GENERAL_FAILURE) {
