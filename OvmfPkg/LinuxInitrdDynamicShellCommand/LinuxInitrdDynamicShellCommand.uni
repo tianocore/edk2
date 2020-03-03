@@ -18,6 +18,7 @@
 #langdef   en-US "english"
 
 #string STR_GEN_PROBLEM           #language en-US "%H%s%N: Unknown flag - '%H%s%N'\r\n"
+#string STR_GEN_ALREADY_INSTALLED #language en-US "%H%s%N: Linux initrd already provided by platform\r\n"
 #string STR_GEN_TOO_MANY          #language en-US "%H%s%N: Too many arguments.\r\n"
 #string STR_GEN_TOO_FEW           #language en-US "%H%s%N: Too few arguments.\r\n"
 #string STR_GEN_FIND_FAIL         #language en-US "%H%s%N: File not found - '%H%s%N'\r\n"
@@ -47,3 +48,5 @@
 "     Consumers of the LoadFile2 protocol on the LINUX_EFI_INITRD_MEDIA_GUID\r\n"
 "     device path that are started via means other than the shell will be able\r\n"
 "     to locate the protocol and invoke it.\r\n"
+"  3. Exposing an initrd using this command is only supported if no initrd is\r\n"
+"     already being exposed by another driver on the platform.\r\n"
