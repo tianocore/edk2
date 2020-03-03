@@ -2550,6 +2550,14 @@ TABLE_ITEM  MemoryDeviceTypeTable[] = {
   {
     MemoryTypeHBM2,
     L"  HBM2 (High Bandwidth Memory Generation 2)"
+  },
+  {
+    MemoryTypeDdr5,
+    L"  DDR5"
+  },
+  {
+    MemoryTypeLpddr5,
+    L"  LPDDR5"
   }
 };
 
