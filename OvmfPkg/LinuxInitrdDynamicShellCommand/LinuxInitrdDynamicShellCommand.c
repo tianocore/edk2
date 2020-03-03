@@ -54,6 +54,33 @@ STATIC CONST SINGLE_NODE_VENDOR_MEDIA_DEVPATH mInitrdDevicePath = {
 };
 
 STATIC
+BOOLEAN
+IsOtherInitrdDevicePathAlreadyInstalled (
+  VOID
+  )
+{
+  EFI_STATUS                  Status;
+  EFI_DEVICE_PATH_PROTOCOL    *DevicePath;
+  EFI_HANDLE                  Handle;
+
+  DevicePath = (EFI_DEVICE_PATH_PROTOCOL *)&mInitrdDevicePath;
+  Status = gBS->LocateDevicePath (&gEfiLoadFile2ProtocolGuid, &DevicePath,
+                  &Handle);
+  if (EFI_ERROR (Status)) {
+    return FALSE;
+  }
+
+  //
+  // Check whether the existing instance is one that we installed during
+  // a previous invocation.
+  //
+  if (Handle == mInitrdLoadFile2Handle) {
+    return FALSE;
+  }
+  return TRUE;
+}
+
+STATIC
 EFI_STATUS
 EFIAPI
 InitrdLoadFile2 (
@@ -217,6 +244,10 @@ RunInitrd (
     } else {
       ASSERT(FALSE);
     }
+  } else if (IsOtherInitrdDevicePathAlreadyInstalled ()) {
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_ALREADY_INSTALLED),
+      mLinuxInitrdShellCommandHiiHandle, L"initrd");
+    ShellStatus = SHELL_UNSUPPORTED;
   } else {
     if (ShellCommandLineGetCount (Package) > 2) {
       ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY),
