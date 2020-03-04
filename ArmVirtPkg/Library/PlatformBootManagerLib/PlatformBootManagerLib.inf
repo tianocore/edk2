@@ -68,6 +68,7 @@
   gEfiFileSystemInfoGuid
   gEfiFileSystemVolumeLabelInfoIdGuid
   gEfiEndOfDxeEventGroupGuid
+  gEfiGlobalVariableGuid
   gRootBridgesConnectedEventGroupGuid
   gUefiShellFileGuid
 
