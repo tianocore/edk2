@@ -137,8 +137,9 @@ UninstallLoadFile2Protocol (
     if (!EFI_ERROR (Status)) {
       mInitrdLoadFile2Handle = NULL;
     }
+    return Status;
   }
-  return Status;
+  return EFI_SUCCESS;
 }
 
 STATIC
