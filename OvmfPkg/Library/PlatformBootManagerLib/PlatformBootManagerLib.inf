@@ -38,6 +38,7 @@
   BaseLib
   MemoryAllocationLib
   UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
   BaseMemoryLib
   DebugLib
   PcdLib
@@ -79,5 +80,6 @@
 
 [Guids]
   gEfiEndOfDxeEventGroupGuid
+  gEfiGlobalVariableGuid
   gRootBridgesConnectedEventGroupGuid
   gUefiShellFileGuid
