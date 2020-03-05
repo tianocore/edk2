@@ -138,8 +138,9 @@ PopulateLevel2PageTable (
       // Case where a virtual memory map descriptor overlapped a section entry
 
       // Allocate a Level2 Page Table for this Section
-      TranslationTable = (UINTN)AllocatePages(EFI_SIZE_TO_PAGES(TRANSLATION_TABLE_PAGE_SIZE + TRANSLATION_TABLE_PAGE_ALIGNMENT));
-      TranslationTable = ((UINTN)TranslationTable + TRANSLATION_TABLE_PAGE_ALIGNMENT_MASK) & ~TRANSLATION_TABLE_PAGE_ALIGNMENT_MASK;
+      TranslationTable = (UINTN)AllocateAlignedPages (
+                                  EFI_SIZE_TO_PAGES (TRANSLATION_TABLE_PAGE_SIZE),
+                                  TRANSLATION_TABLE_PAGE_ALIGNMENT);
 
       // Translate the Section Descriptor into Page Descriptor
       SectionDescriptor = TT_DESCRIPTOR_PAGE_TYPE_PAGE | ConvertSectionAttributesToPageAttributes (*SectionEntry, FALSE);
@@ -162,9 +163,9 @@ PopulateLevel2PageTable (
       return;
     }
   } else {
-    TranslationTable = (UINTN)AllocatePages(EFI_SIZE_TO_PAGES(TRANSLATION_TABLE_PAGE_SIZE + TRANSLATION_TABLE_PAGE_ALIGNMENT));
-    TranslationTable = ((UINTN)TranslationTable + TRANSLATION_TABLE_PAGE_ALIGNMENT_MASK) & ~TRANSLATION_TABLE_PAGE_ALIGNMENT_MASK;
-
+    TranslationTable = (UINTN)AllocateAlignedPages (
+                                EFI_SIZE_TO_PAGES (TRANSLATION_TABLE_PAGE_SIZE),
+                                TRANSLATION_TABLE_PAGE_ALIGNMENT);
     ZeroMem ((VOID *)TranslationTable, TRANSLATION_TABLE_PAGE_SIZE);
 
     *SectionEntry = (TranslationTable & TT_DESCRIPTOR_SECTION_PAGETABLE_ADDRESS_MASK) |
@@ -289,16 +290,16 @@ ArmConfigureMmu (
   OUT UINTN                         *TranslationTableSize OPTIONAL
   )
 {
-  VOID*                         TranslationTable;
+  VOID                          *TranslationTable;
   ARM_MEMORY_REGION_ATTRIBUTES  TranslationTableAttribute;
   UINT32                        TTBRAttributes;
 
-  // Allocate pages for translation table.
-  TranslationTable = AllocatePages (EFI_SIZE_TO_PAGES (TRANSLATION_TABLE_SECTION_SIZE + TRANSLATION_TABLE_SECTION_ALIGNMENT));
+  TranslationTable = AllocateAlignedPages (
+                       EFI_SIZE_TO_PAGES (TRANSLATION_TABLE_SECTION_SIZE),
+                       TRANSLATION_TABLE_SECTION_ALIGNMENT);
   if (TranslationTable == NULL) {
     return RETURN_OUT_OF_RESOURCES;
   }
-  TranslationTable = (VOID*)(((UINTN)TranslationTable + TRANSLATION_TABLE_SECTION_ALIGNMENT_MASK) & ~TRANSLATION_TABLE_SECTION_ALIGNMENT_MASK);
 
   if (TranslationTableBase != NULL) {
     *TranslationTableBase = TranslationTable;
