@@ -32,6 +32,15 @@ GetCryptoServices (
   return (VOID *)mCryptoProtocol;
 }
 
+/**
+  Locate the valid Crypto Protocol.
+
+  @param  ImageHandle   The firmware allocated handle for the EFI image.
+  @param  SystemTable   A pointer to the EFI System Table.
+
+  @retval EFI_SUCCESS   The constructor executed correctly.
+  @retval EFI_NOT_FOUND Found no valid Crypto Protocol.
+**/
 EFI_STATUS
 EFIAPI
 DxeCryptLibConstructor (
