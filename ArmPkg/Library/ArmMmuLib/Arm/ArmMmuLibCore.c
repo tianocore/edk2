@@ -392,7 +392,7 @@ ArmConfigureMmu (
     }
   }
 
-  ArmSetTTBR0 ((VOID *)(UINTN)(((UINTN)TranslationTable & ~TRANSLATION_TABLE_SECTION_ALIGNMENT_MASK) | (TTBRAttributes & 0x7F)));
+  ArmSetTTBR0 ((VOID *)((UINTN)TranslationTable | TTBRAttributes));
 
   //
   // The TTBCR register value is undefined at reset in the Non-Secure world.
