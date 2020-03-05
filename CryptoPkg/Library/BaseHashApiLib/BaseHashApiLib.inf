@@ -17,7 +17,7 @@
   FILE_GUID                      = B1E566DD-DE7C-4F04-BDA0-B1295D3BE927
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = BaseHashApiLib
+  LIBRARY_CLASS                  = HashApiLib
 
 #
 # The following information is for reference only and not required by the build tools.
