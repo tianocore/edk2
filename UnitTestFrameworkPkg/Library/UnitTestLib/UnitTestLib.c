@@ -436,7 +436,6 @@ AddTestCase (
 
   Status          = EFI_SUCCESS;
   Suite           = (UNIT_TEST_SUITE *)SuiteHandle;
-  ParentFramework = (UNIT_TEST_FRAMEWORK *)Suite->ParentFramework;
 
   //
   // First, let's check to make sure that our parameters look good.
@@ -445,6 +444,7 @@ AddTestCase (
     return EFI_INVALID_PARAMETER;
   }
 
+  ParentFramework = (UNIT_TEST_FRAMEWORK *)Suite->ParentFramework;
   //
   // Create the new entry.
   NewTestEntry = AllocateZeroPool (sizeof( UNIT_TEST_LIST_ENTRY ));

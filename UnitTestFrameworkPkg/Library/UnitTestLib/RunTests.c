@@ -33,12 +33,12 @@ RunTestSuite (
   UNIT_TEST             *Test;
   UNIT_TEST_FRAMEWORK   *ParentFramework;
 
-  TestEntry       = NULL;
-  ParentFramework = (UNIT_TEST_FRAMEWORK *)Suite->ParentFramework;
-
   if (Suite == NULL) {
     return EFI_INVALID_PARAMETER;
   }
+
+  TestEntry       = NULL;
+  ParentFramework = (UNIT_TEST_FRAMEWORK *)Suite->ParentFramework;
 
   DEBUG ((DEBUG_VERBOSE, "---------------------------------------------------------\n"));
   DEBUG ((DEBUG_VERBOSE, "RUNNING TEST SUITE: %a\n", Suite->Title));
