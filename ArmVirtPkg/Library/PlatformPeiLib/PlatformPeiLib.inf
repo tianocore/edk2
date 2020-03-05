@@ -1,7 +1,7 @@
 #/** @file
 #
 #  Copyright (c) 2011-2015, ARM Limited. All rights reserved.
-#  Copyright (c) 2014, Linaro Limited. All rights reserved.
+#  Copyright (c) 2014-2020, Linaro Limited. All rights reserved.
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -11,7 +11,7 @@
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = PlatformPeiLib
   FILE_GUID                      = 59C11815-F8DA-4F49-B4FB-EC1E41ED1F06
-  MODULE_TYPE                    = SEC
+  MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = PlatformPeiLib
 
@@ -21,14 +21,21 @@
 [Packages]
   ArmPkg/ArmPkg.dec
   ArmVirtPkg/ArmVirtPkg.dec
-  MdePkg/MdePkg.dec
-  MdeModulePkg/MdeModulePkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[FeaturePcd]
+  gArmVirtTokenSpaceGuid.PcdTpm2SupportEnabled
 
 [LibraryClasses]
   DebugLib
   HobLib
   FdtLib
+  PcdLib
+  PeiServicesLib
 
 [FixedPcd]
   gArmTokenSpaceGuid.PcdFvSize
@@ -37,6 +44,11 @@
 [Pcd]
   gArmTokenSpaceGuid.PcdFvBaseAddress
   gArmVirtTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress         ## SOMETIMES_PRODUCES
+
+[Ppis]
+  gOvmfTpmDiscoveredPpiGuid                               ## SOMETIMES_PRODUCES
+  gPeiTpmInitializationDonePpiGuid                        ## SOMETIMES_PRODUCES
 
 [Guids]
   gEarlyPL011BaseAddressGuid

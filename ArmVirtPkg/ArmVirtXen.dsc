@@ -47,6 +47,7 @@
   BootLogoLib|MdeModulePkg/Library/BootLogoLib/BootLogoLib.inf
   PlatformBootManagerLib|ArmPkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
   CustomizedDisplayLib|MdeModulePkg/Library/CustomizedDisplayLib/CustomizedDisplayLib.inf
+  TpmMeasurementLib|MdeModulePkg/Library/TpmMeasurementLibNull/TpmMeasurementLibNull.inf
 
 [LibraryClasses.common.UEFI_DRIVER]
   UefiScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
@@ -95,6 +96,12 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable|TRUE
 
 [PcdsPatchableInModule.common]
+  # we need to provide a resolution for this PCD that supports PcdSet64()
+  # being called from ArmVirtPkg/Library/PlatformPeiLib/PlatformPeiLib.c,
+  # even though that call will be compiled out on this platform as it does
+  # not (and cannot) support the TPM2 driver stack
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress|0x0
+
   #
   # This will be overridden in the code
   #

@@ -756,17 +756,6 @@ CoreLoadPeImage (
   // Get the image entry point.
   //
   Image->EntryPoint   = (EFI_IMAGE_ENTRY_POINT)(UINTN)Image->ImageContext.EntryPoint;
-  if (Image->PeCoffEmu != NULL) {
-    Status = Image->PeCoffEmu->RegisterImage (Image->PeCoffEmu,
-                                 Image->ImageBasePage,
-                                 EFI_PAGES_TO_SIZE (Image->NumberOfPages),
-                                 &Image->EntryPoint);
-    if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_LOAD | DEBUG_ERROR,
-        "CoreLoadPeImage: Failed to register foreign image with emulator.\n"));
-      goto Done;
-    }
-  }
 
   //
   // Fill in the image information for the Loaded Image Protocol
@@ -1601,6 +1590,19 @@ CoreStartImage (
     DEBUG ((EFI_D_ERROR, "Image type %s can't be started ", GetMachineTypeName(Image->Machine)));
     DEBUG ((EFI_D_ERROR, "on %s UEFI system.\n", GetMachineTypeName(mDxeCoreImageMachineType)));
     return EFI_UNSUPPORTED;
+  }
+
+  if (Image->PeCoffEmu != NULL) {
+    Status = Image->PeCoffEmu->RegisterImage (Image->PeCoffEmu,
+                                 Image->ImageBasePage,
+                                 EFI_PAGES_TO_SIZE (Image->NumberOfPages),
+                                 &Image->EntryPoint);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_LOAD | DEBUG_ERROR,
+        "CoreLoadPeImage: Failed to register foreign image with emulator - %r\n",
+          Status));
+      return Status;
+    }
   }
 
   PERF_START_IMAGE_BEGIN (Handle);

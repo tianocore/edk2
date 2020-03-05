@@ -159,8 +159,9 @@ INF  OvmfPkg/SmmAccess/SmmAccessPei.inf
 !endif
 INF  UefiCpuPkg/CpuMpPei/CpuMpPei.inf
 
-!if $(TPM2_ENABLE) == TRUE
+!if $(TPM_ENABLE) == TRUE
 INF  OvmfPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf
+INF  SecurityPkg/Tcg/TcgPei/TcgPei.inf
 INF  SecurityPkg/Tcg/Tcg2Pei/Tcg2Pei.inf
 !endif
 
@@ -281,6 +282,7 @@ INF  MdeModulePkg/Universal/Disk/UdfDxe/UdfDxe.inf
 !if $(TOOL_CHAIN_TAG) != "XCODE5"
 INF  ShellPkg/DynamicCommand/TftpDynamicCommand/TftpDynamicCommand.inf
 !endif
+INF  OvmfPkg/LinuxInitrdDynamicShellCommand/LinuxInitrdDynamicShellCommand.inf
 INF  ShellPkg/Application/Shell/Shell.inf
 
 INF MdeModulePkg/Logo/LogoDxe.inf
@@ -317,9 +319,10 @@ INF  OvmfPkg/IoMmuDxe/IoMmuDxe.inf
 !if $(SMM_REQUIRE) == TRUE
 INF  OvmfPkg/SmmAccess/SmmAccess2Dxe.inf
 INF  OvmfPkg/SmmControl2Dxe/SmmControl2Dxe.inf
-INF  UefiCpuPkg/CpuS3DataDxe/CpuS3DataDxe.inf
+INF  OvmfPkg/CpuS3DataDxe/CpuS3DataDxe.inf
 INF  MdeModulePkg/Core/PiSmmCore/PiSmmIpl.inf
 INF  MdeModulePkg/Core/PiSmmCore/PiSmmCore.inf
+INF  OvmfPkg/CpuHotplugSmm/CpuHotplugSmm.inf
 INF  UefiCpuPkg/CpuIo2Smm/CpuIo2Smm.inf
 INF  MdeModulePkg/Universal/LockBox/SmmLockBox/SmmLockBox.inf
 INF  UefiCpuPkg/PiSmmCpuDxeSmm/PiSmmCpuDxeSmm.inf
@@ -344,13 +347,18 @@ INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
 !endif
 
 #
-# TPM2 support
+# TPM support
 #
-!if $(TPM2_ENABLE) == TRUE
+!if $(TPM_ENABLE) == TRUE
+INF  SecurityPkg/Tcg/TcgDxe/TcgDxe.inf
 INF  SecurityPkg/Tcg/Tcg2Dxe/Tcg2Dxe.inf
-!if $(TPM2_CONFIG_ENABLE) == TRUE
+!if $(TPM_CONFIG_ENABLE) == TRUE
 INF  SecurityPkg/Tcg/Tcg2Config/Tcg2ConfigDxe.inf
 !endif
+!endif
+
+!if $(LOAD_X64_ON_IA32_ENABLE) == TRUE
+INF  OvmfPkg/CompatImageLoaderDxe/CompatImageLoaderDxe.inf
 !endif
 
 ################################################################################
