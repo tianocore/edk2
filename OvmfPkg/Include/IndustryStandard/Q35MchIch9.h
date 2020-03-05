@@ -109,8 +109,9 @@
 //
 // IO ports
 //
-#define ICH9_APM_CNT 0xB2
-#define ICH9_APM_STS 0xB3
+#define ICH9_APM_CNT              0xB2
+#define ICH9_APM_CNT_CPU_HOTPLUG    0x04
+#define ICH9_APM_STS              0xB3
 
 #define ICH9_CPU_HOTPLUG_BASE 0x0CD8
 

@@ -44,6 +44,7 @@
 [LibraryClasses]
   ArmLib
   ArmPlatformLib
+  CacheMaintenanceLib
   BaseLib
   DebugLib
   DebugAgentLib

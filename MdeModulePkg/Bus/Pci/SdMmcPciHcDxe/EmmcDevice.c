@@ -559,6 +559,43 @@ EmmcTuningClkForHs200 (
 }
 
 /**
+  Check the SWITCH operation status.
+
+  @param[in] PassThru  A pointer to the EFI_SD_MMC_PASS_THRU_PROTOCOL instance.
+  @param[in] Slot      The slot number on which command should be sent.
+  @param[in] Rca       The relative device address.
+
+  @retval EFI_SUCCESS  The SWITCH finished siccessfully.
+  @retval others       The SWITCH failed.
+**/
+EFI_STATUS
+EmmcCheckSwitchStatus (
+  IN EFI_SD_MMC_PASS_THRU_PROTOCOL  *PassThru,
+  IN UINT8                          Slot,
+  IN UINT16                         Rca
+  )
+{
+  EFI_STATUS  Status;
+  UINT32      DevStatus;
+
+  Status = EmmcSendStatus (PassThru, Slot, Rca, &DevStatus);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "EmmcCheckSwitchStatus: Send status fails with %r\n", Status));
+    return Status;
+  }
+
+  //
+  // Check the switch operation is really successful or not.
+  //
+  if ((DevStatus & BIT7) != 0) {
+    DEBUG ((DEBUG_ERROR, "EmmcCheckSwitchStatus: The switch operation fails as DevStatus is 0x%08x\n", DevStatus));
+    return EFI_DEVICE_ERROR;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
   Switch the bus width to specified width.
 
   Refer to EMMC Electrical Standard Spec 5.1 Section 6.6.9 and SD Host Controller
@@ -591,7 +628,6 @@ EmmcSwitchBusWidth (
   UINT8               Index;
   UINT8               Value;
   UINT8               CmdSet;
-  UINT32              DevStatus;
 
   //
   // Write Byte, the Value field is written into the byte pointed by Index.
@@ -617,17 +653,9 @@ EmmcSwitchBusWidth (
     return Status;
   }
 
-  Status = EmmcSendStatus (PassThru, Slot, Rca, &DevStatus);
+  Status = EmmcCheckSwitchStatus (PassThru, Slot, Rca);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "EmmcSwitchBusWidth: Send status fails with %r\n", Status));
     return Status;
-  }
-  //
-  // Check the switch operation is really successful or not.
-  //
-  if ((DevStatus & BIT7) != 0) {
-    DEBUG ((DEBUG_ERROR, "EmmcSwitchBusWidth: The switch operation fails as DevStatus is 0x%08x\n", DevStatus));
-    return EFI_DEVICE_ERROR;
   }
 
   Status = SdMmcHcSetBusWidth (PciIo, Slot, BusWidth);
@@ -669,9 +697,9 @@ EmmcSwitchBusTiming (
   UINT8                     Index;
   UINT8                     Value;
   UINT8                     CmdSet;
-  UINT32                    DevStatus;
   SD_MMC_HC_PRIVATE_DATA    *Private;
   UINT8                     HostCtrl1;
+  BOOLEAN                   DelaySendStatus;
 
   Private = SD_MMC_HC_PRIVATE_FROM_THIS (PassThru);
   //
@@ -695,7 +723,7 @@ EmmcSwitchBusTiming (
       Value = 0;
       break;
     default:
-      DEBUG ((DEBUG_ERROR, "EmmcSwitchBusTiming: Unsupported BusTiming(%d\n)", BusTiming));
+      DEBUG ((DEBUG_ERROR, "EmmcSwitchBusTiming: Unsupported BusTiming(%d)\n", BusTiming));
       return EFI_INVALID_PARAMETER;
   }
 
@@ -725,6 +753,26 @@ EmmcSwitchBusTiming (
   }
 
   //
+  // For cases when we switch bus timing to higher mode from current we want to
+  // send SEND_STATUS at current, lower, frequency then the target frequency to avoid
+  // stability issues. It has been observed that some designs are unable to process the
+  // SEND_STATUS at higher frequency during switch to HS200 @200MHz irrespective of the number of retries
+  // and only running the clock tuning is able to make them work at target frequency.
+  //
+  // For cases when we are downgrading the frequency and current high frequency is invalid
+  // we have to first change the frequency to target frequency and then send the SEND_STATUS.
+  //
+  if (Private->Slot[Slot].CurrentFreq < (ClockFreq * 1000)) {
+    Status = EmmcCheckSwitchStatus (PassThru, Slot, Rca);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+    DelaySendStatus = FALSE;
+  } else {
+    DelaySendStatus = TRUE;
+  }
+
+  //
   // Convert the clock freq unit from MHz to KHz.
   //
   Status = SdMmcHcClockSupply (Private, Slot, BusTiming, FALSE, ClockFreq * 1000);
@@ -732,17 +780,11 @@ EmmcSwitchBusTiming (
     return Status;
   }
 
-  Status = EmmcSendStatus (PassThru, Slot, Rca, &DevStatus);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "EmmcSwitchBusTiming: Send status fails with %r\n", Status));
-    return Status;
-  }
-  //
-  // Check the switch operation is really successful or not.
-  //
-  if ((DevStatus & BIT7) != 0) {
-    DEBUG ((DEBUG_ERROR, "EmmcSwitchBusTiming: The switch operation fails as DevStatus is 0x%08x\n", DevStatus));
-    return EFI_DEVICE_ERROR;
+  if (DelaySendStatus) {
+    Status = EmmcCheckSwitchStatus (PassThru, Slot, Rca);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
   }
 
   return Status;

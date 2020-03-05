@@ -15,7 +15,7 @@
 // pruned again if no other references to them exist.
 //
 
-	.long	memcpy - .
-	.long	memset - .
-	.long	__stack_chk_fail - .
-	.long	__stack_chk_guard - .
+  .long memcpy - .
+  .long memset - .
+  .long __stack_chk_fail - .
+  .long __stack_chk_guard - .

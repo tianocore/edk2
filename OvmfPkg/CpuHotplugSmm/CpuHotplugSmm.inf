@@ -1,0 +1,64 @@
+## @file
+# Root SMI handler for VCPU hotplug SMIs.
+#
+# Copyright (c) 2020, Red Hat, Inc.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                = 1.29
+  PI_SPECIFICATION_VERSION   = 0x00010046                            # PI-1.7.0
+  BASE_NAME                  = CpuHotplugSmm
+  FILE_GUID                  = 84EEA114-C6BE-4445-8F90-51D97863E363
+  MODULE_TYPE                = DXE_SMM_DRIVER
+  ENTRY_POINT                = CpuHotplugEntry
+
+#
+# The following information is for reference only and not required by the build
+# tools.
+#
+# VALID_ARCHITECTURES        = IA32 X64
+#
+
+[Sources]
+  ApicId.h
+  CpuHotplug.c
+  FirstSmiHandler.nasm
+  FirstSmiHandlerContext.h
+  PostSmmPen.nasm
+  QemuCpuhp.c
+  QemuCpuhp.h
+  Smbase.c
+  Smbase.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  LocalApicLib
+  MmServicesTableLib
+  PcdLib
+  SafeIntLib
+  SynchronizationLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gEfiMmCpuIoProtocolGuid                                           ## CONSUMES
+  gEfiSmmCpuServiceProtocolGuid                                     ## CONSUMES
+
+[Pcd]
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuHotPlugDataAddress                ## CONSUMES
+  gUefiOvmfPkgTokenSpaceGuid.PcdQ35SmramAtDefaultSmbase             ## CONSUMES
+
+[FeaturePcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire                     ## CONSUMES
+
+[Depex]
+  gEfiMmCpuIoProtocolGuid AND
+  gEfiSmmCpuServiceProtocolGuid

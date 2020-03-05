@@ -83,6 +83,7 @@ typedef struct {
   BOOLEAN                            MediaPresent;
   BOOLEAN                            Initialized;
   SD_MMC_CARD_TYPE                   CardType;
+  UINT64                             CurrentFreq;
   EDKII_SD_MMC_OPERATING_PARAMETERS  OperatingParameters;
 } SD_MMC_HC_SLOT;
 
@@ -153,8 +154,12 @@ typedef struct {
 
   EFI_EVENT                           Event;
   BOOLEAN                             Started;
+  BOOLEAN                             CommandComplete;
   UINT64                              Timeout;
   UINT32                              Retries;
+
+  BOOLEAN                             PioModeTransferCompleted;
+  UINT32                              PioBlockIndex;
 
   SD_MMC_HC_ADMA_32_DESC_LINE         *Adma32Desc;
   SD_MMC_HC_ADMA_64_V3_DESC_LINE      *Adma64V3Desc;

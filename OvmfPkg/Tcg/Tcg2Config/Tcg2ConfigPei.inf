@@ -25,17 +25,21 @@
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
+  OvmfPkg/OvmfPkg.dec
   SecurityPkg/SecurityPkg.dec
 
 [LibraryClasses]
   PeimEntryPoint
   DebugLib
   PeiServicesLib
+  Tpm12CommandLib
+  Tpm12DeviceLib
   Tpm2DeviceLib
 
 [Guids]
   gEfiTpmDeviceSelectedGuid           ## PRODUCES ## GUID # Used as a PPI GUID
   gEfiTpmDeviceInstanceTpm20DtpmGuid  ## SOMETIMES_CONSUMES
+  gEfiTpmDeviceInstanceTpm12Guid      ## SOMETIMES_CONSUMES
 
 [Ppis]
   gPeiTpmInitializationDonePpiGuid    ## SOMETIMES_PRODUCES
@@ -43,5 +47,8 @@
 [Pcd]
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid                 ## PRODUCES
 
-[Depex]
+[Depex.IA32, Depex.X64]
   TRUE
+
+[Depex.ARM, Depex.AARCH64]
+  gOvmfTpmDiscoveredPpiGuid
