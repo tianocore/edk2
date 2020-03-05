@@ -328,7 +328,6 @@ ArmConfigureMmu (
   )
 {
   VOID                          *TranslationTable;
-  ARM_MEMORY_REGION_ATTRIBUTES  TranslationTableAttribute;
   UINT32                        TTBRAttributes;
 
   TranslationTable = AllocateAlignedPages (
@@ -353,28 +352,13 @@ ArmConfigureMmu (
   InvalidateDataCacheRange (TranslationTable, TRANSLATION_TABLE_SECTION_SIZE);
   ZeroMem (TranslationTable, TRANSLATION_TABLE_SECTION_SIZE);
 
-  // By default, mark the translation table as belonging to a uncached region
-  TranslationTableAttribute = ARM_MEMORY_REGION_ATTRIBUTE_UNCACHED_UNBUFFERED;
   while (MemoryTable->Length != 0) {
-    // Find the memory attribute for the Translation Table
-    if (((UINTN)TranslationTable >= MemoryTable->PhysicalBase) && ((UINTN)TranslationTable <= MemoryTable->PhysicalBase - 1 + MemoryTable->Length)) {
-      TranslationTableAttribute = MemoryTable->Attributes;
-    }
-
     FillTranslationTable (TranslationTable, MemoryTable);
     MemoryTable++;
   }
 
-  // Translate the Memory Attributes into Translation Table Register Attributes
-  if ((TranslationTableAttribute == ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK) ||
-      (TranslationTableAttribute == ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_WRITE_BACK)) {
-    TTBRAttributes = ArmHasMpExtensions () ? TTBR_MP_WRITE_BACK_ALLOC : TTBR_WRITE_BACK_ALLOC;
-  } else {
-    // Page tables must reside in memory mapped as write-back cacheable
-    ASSERT (0);
-    return RETURN_UNSUPPORTED;
-  }
-
+  TTBRAttributes = ArmHasMpExtensions () ? TTBR_MP_WRITE_BACK_ALLOC
+                                         : TTBR_WRITE_BACK_ALLOC;
   if (TTBRAttributes & TTBR_SHAREABLE) {
     if (PreferNonshareableMemory ()) {
       TTBRAttributes ^= TTBR_SHAREABLE;
