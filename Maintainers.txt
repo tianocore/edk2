@@ -88,7 +88,7 @@ W: https://github.com/tianocore/edk2/releases/
 M: Ray Ni <ray.ni@intel.com>                  (Ia32/X64)
 M: Zhichao Gao <zhichao.gao@intel.com>        (Ia32/X64)
 M: Leif Lindholm <leif@nuviainc.com>          (ARM/AArch64)
-M: Ard Biesheuvel <ard.biesheuvel@linaro.org> (ARM/AArch64)
+M: Ard Biesheuvel <ard.biesheuvel@arm.com>    (ARM/AArch64)
 
 EDK II Architectures:
 ---------------------
@@ -96,7 +96,7 @@ ARM, AARCH64
 F: */AArch64/
 F: */Arm/
 M: Leif Lindholm <leif@nuviainc.com>
-M: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+M: Ard Biesheuvel <ard.biesheuvel@arm.com>
 
 EDK II Continuous Integration:
 ------------------------------
@@ -127,19 +127,19 @@ ArmPkg
 F: ArmPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/ArmPkg
 M: Leif Lindholm <leif@nuviainc.com>
-M: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+M: Ard Biesheuvel <ard.biesheuvel@arm.com>
 
 ArmPlatformPkg
 F: ArmPlatformPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/ArmPlatformPkg
 M: Leif Lindholm <leif@nuviainc.com>
-M: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+M: Ard Biesheuvel <ard.biesheuvel@arm.com>
 
 ArmVirtPkg
 F: ArmVirtPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/ArmVirtPkg
 M: Laszlo Ersek <lersek@redhat.com>
-M: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+M: Ard Biesheuvel <ard.biesheuvel@arm.com>
 R: Leif Lindholm <leif@nuviainc.com>
 
 ArmVirtPkg: modules used on Xen
@@ -174,7 +174,7 @@ EmbeddedPkg
 F: EmbeddedPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/EmbeddedPkg
 M: Leif Lindholm <leif@nuviainc.com>
-M: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+M: Ard Biesheuvel <ard.biesheuvel@arm.com>
 
 EmulatorPkg
 F: EmulatorPkg/
@@ -386,7 +386,7 @@ F: OvmfPkg/
 W: http://www.tianocore.org/ovmf/
 M: Jordan Justen <jordan.l.justen@intel.com>
 M: Laszlo Ersek <lersek@redhat.com>
-M: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+M: Ard Biesheuvel <ard.biesheuvel@arm.com>
 S: Maintained
 
 OvmfPkg: Xen-related modules
@@ -488,7 +488,7 @@ S: Maintained
 
 StandaloneMmPkg
 F: StandaloneMmPkg/
-M: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+M: Ard Biesheuvel <ard.biesheuvel@arm.com>
 M: Sami Mujawar <sami.mujawar@arm.com>
 M: Jiewen Yao <jiewen.yao@intel.com>
 R: Supreeth Venkatesh <supreeth.venkatesh@arm.com>
