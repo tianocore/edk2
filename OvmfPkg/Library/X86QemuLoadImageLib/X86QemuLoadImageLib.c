@@ -460,7 +460,6 @@ QemuStartKernelImage (
 {
   EFI_STATUS                    Status;
   OVMF_LOADED_X86_LINUX_KERNEL  *LoadedImage;
-  EFI_HANDLE                    KernelImageHandle;
 
   Status = gBS->OpenProtocol (
                   *ImageHandle,
@@ -481,6 +480,8 @@ QemuStartKernelImage (
                   );
 #ifdef MDE_CPU_IA32
   if (Status == EFI_UNSUPPORTED) {
+    EFI_HANDLE KernelImageHandle;
+
     //
     // On IA32, EFI_UNSUPPORTED means that the image's machine type is X64 while
     // we are expecting a IA32 one, and the StartImage () boot service is unable
