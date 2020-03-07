@@ -163,6 +163,36 @@ FreePageTablesRecursive (
 }
 
 STATIC
+BOOLEAN
+IsBlockEntry (
+  IN  UINT64  Entry,
+  IN  UINTN   Level
+  )
+{
+  if (Level == 3) {
+    return (Entry & TT_TYPE_MASK) == TT_TYPE_BLOCK_ENTRY_LEVEL3;
+  }
+  return (Entry & TT_TYPE_MASK) == TT_TYPE_BLOCK_ENTRY;
+}
+
+STATIC
+BOOLEAN
+IsTableEntry (
+  IN  UINT64  Entry,
+  IN  UINTN   Level
+  )
+{
+  if (Level == 3) {
+    //
+    // TT_TYPE_TABLE_ENTRY aliases TT_TYPE_BLOCK_ENTRY_LEVEL3
+    // so we need to take the level into account as well.
+    //
+    return FALSE;
+  }
+  return (Entry & TT_TYPE_MASK) == TT_TYPE_TABLE_ENTRY;
+}
+
+STATIC
 EFI_STATUS
 UpdateRegionMappingRecursive (
   IN  UINT64      RegionStart,
@@ -203,7 +233,7 @@ UpdateRegionMappingRecursive (
     if (Level == 0 || ((RegionStart | BlockEnd) & BlockMask) != 0) {
       ASSERT (Level < 3);
 
-      if ((*Entry & TT_TYPE_MASK) != TT_TYPE_TABLE_ENTRY) {
+      if (!IsTableEntry (*Entry, Level)) {
         //
         // No table entry exists yet, so we need to allocate a page table
         // for the next level.
@@ -221,7 +251,7 @@ UpdateRegionMappingRecursive (
           InvalidateDataCacheRange (TranslationTable, EFI_PAGE_SIZE);
         }
 
-        if ((*Entry & TT_TYPE_MASK) == TT_TYPE_BLOCK_ENTRY) {
+        if (IsBlockEntry (*Entry, Level)) {
           //
           // We are splitting an existing block entry, so we have to populate
           // the new table with the attributes of the block entry it replaces.
@@ -252,7 +282,7 @@ UpdateRegionMappingRecursive (
                  AttributeSetMask, AttributeClearMask, TranslationTable,
                  Level + 1);
       if (EFI_ERROR (Status)) {
-        if ((*Entry & TT_TYPE_MASK) != TT_TYPE_TABLE_ENTRY) {
+        if (!IsTableEntry (*Entry, Level)) {
           //
           // We are creating a new table entry, so on failure, we can free all
           // allocations we made recursively, given that the whole subhierarchy
@@ -265,10 +295,10 @@ UpdateRegionMappingRecursive (
         return Status;
       }
 
-      if ((*Entry & TT_TYPE_MASK) != TT_TYPE_TABLE_ENTRY) {
+      if (!IsTableEntry (*Entry, Level)) {
         EntryValue = (UINTN)TranslationTable | TT_TYPE_TABLE_ENTRY;
         ReplaceTableEntry (Entry, EntryValue, RegionStart,
-                           (*Entry & TT_TYPE_MASK) == TT_TYPE_BLOCK_ENTRY);
+          IsBlockEntry (*Entry, Level));
       }
     } else {
       EntryValue = (*Entry & AttributeClearMask) | AttributeSetMask;
