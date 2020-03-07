@@ -497,7 +497,6 @@ ArmConfigureMmu (
   )
 {
   VOID*                         TranslationTable;
-  UINT32                        TranslationTableAttribute;
   UINT64                        MaxAddress;
   UINTN                         T0SZ;
   UINTN                         RootTableEntryCount;
@@ -618,27 +617,13 @@ ArmConfigureMmu (
     RootTableEntryCount * sizeof(UINT64));
   ZeroMem (TranslationTable, RootTableEntryCount * sizeof(UINT64));
 
-  TranslationTableAttribute = TT_ATTR_INDX_INVALID;
   while (MemoryTable->Length != 0) {
-
-    DEBUG_CODE_BEGIN ();
-      // Find the memory attribute for the Translation Table
-      if ((UINTN)TranslationTable >= MemoryTable->PhysicalBase &&
-          (UINTN)TranslationTable + EFI_PAGE_SIZE <= MemoryTable->PhysicalBase +
-                                                          MemoryTable->Length) {
-        TranslationTableAttribute = MemoryTable->Attributes;
-      }
-    DEBUG_CODE_END ();
-
     Status = FillTranslationTable (TranslationTable, MemoryTable);
     if (EFI_ERROR (Status)) {
       goto FREE_TRANSLATION_TABLE;
     }
     MemoryTable++;
   }
-
-  ASSERT (TranslationTableAttribute == ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK ||
-          TranslationTableAttribute == ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_WRITE_BACK);
 
   ArmSetMAIR (MAIR_ATTR(TT_ATTR_INDX_DEVICE_MEMORY, MAIR_ATTR_DEVICE_MEMORY) |                      // mapped to EFI_MEMORY_UC
               MAIR_ATTR(TT_ATTR_INDX_MEMORY_NON_CACHEABLE, MAIR_ATTR_NORMAL_MEMORY_NON_CACHEABLE) | // mapped to EFI_MEMORY_WC
