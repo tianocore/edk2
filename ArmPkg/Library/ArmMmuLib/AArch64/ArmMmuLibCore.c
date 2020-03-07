@@ -47,7 +47,7 @@ ArmMemoryAttributeToPageAttribute (
     return TT_ATTR_INDX_MEMORY_NON_CACHEABLE;
 
   default:
-    ASSERT(0);
+    ASSERT (0);
   case ARM_MEMORY_REGION_ATTRIBUTE_DEVICE:
   case ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_DEVICE:
     if (ArmReadCurrentEL () == AARCH64_EL2)
@@ -78,7 +78,9 @@ PageAttributeToGcdAttribute (
     GcdAttributes = EFI_MEMORY_WB;
     break;
   default:
-    DEBUG ((EFI_D_ERROR, "PageAttributeToGcdAttribute: PageAttributes:0x%lX not supported.\n", PageAttributes));
+    DEBUG ((DEBUG_ERROR,
+      "PageAttributeToGcdAttribute: PageAttributes:0x%lX not supported.\n",
+      PageAttributes));
     ASSERT (0);
     // The Global Coherency Domain (GCD) value is defined as a bit set.
     // Returning 0 means no attribute has been set.
@@ -86,13 +88,14 @@ PageAttributeToGcdAttribute (
   }
 
   // Determine protection attributes
-  if (((PageAttributes & TT_AP_MASK) == TT_AP_NO_RO) || ((PageAttributes & TT_AP_MASK) == TT_AP_RO_RO)) {
+  if (((PageAttributes & TT_AP_MASK) == TT_AP_NO_RO) ||
+      ((PageAttributes & TT_AP_MASK) == TT_AP_RO_RO)) {
     // Read only cases map to write-protect
     GcdAttributes |= EFI_MEMORY_RO;
   }
 
   // Process eXecute Never attribute
-  if ((PageAttributes & (TT_PXN_MASK | TT_UXN_MASK)) != 0 ) {
+  if ((PageAttributes & (TT_PXN_MASK | TT_UXN_MASK)) != 0) {
     GcdAttributes |= EFI_MEMORY_XP;
   }
 
@@ -503,7 +506,7 @@ ArmConfigureMmu (
   UINT64                        TCR;
   EFI_STATUS                    Status;
 
-  if(MemoryTable == NULL) {
+  if (MemoryTable == NULL) {
     ASSERT (MemoryTable != NULL);
     return EFI_INVALID_PARAMETER;
   }
@@ -544,7 +547,9 @@ ArmConfigureMmu (
     } else if (MaxAddress < SIZE_256TB) {
       TCR |= TCR_PS_256TB;
     } else {
-      DEBUG ((EFI_D_ERROR, "ArmConfigureMmu: The MaxAddress 0x%lX is not supported by this MMU configuration.\n", MaxAddress));
+      DEBUG ((DEBUG_ERROR,
+        "ArmConfigureMmu: The MaxAddress 0x%lX is not supported by this MMU configuration.\n",
+        MaxAddress));
       ASSERT (0); // Bigger than 48-bit memory space are not supported
       return EFI_UNSUPPORTED;
     }
@@ -566,7 +571,9 @@ ArmConfigureMmu (
     } else if (MaxAddress < SIZE_256TB) {
       TCR |= TCR_IPS_256TB;
     } else {
-      DEBUG ((EFI_D_ERROR, "ArmConfigureMmu: The MaxAddress 0x%lX is not supported by this MMU configuration.\n", MaxAddress));
+      DEBUG ((DEBUG_ERROR,
+        "ArmConfigureMmu: The MaxAddress 0x%lX is not supported by this MMU configuration.\n",
+        MaxAddress));
       ASSERT (0); // Bigger than 48-bit memory space are not supported
       return EFI_UNSUPPORTED;
     }
@@ -596,9 +603,12 @@ ArmConfigureMmu (
   if (TranslationTable == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
-  // We set TTBR0 just after allocating the table to retrieve its location from the subsequent
-  // functions without needing to pass this value across the functions. The MMU is only enabled
-  // after the translation tables are populated.
+  //
+  // We set TTBR0 just after allocating the table to retrieve its location from
+  // the subsequent functions without needing to pass this value across the
+  // functions. The MMU is only enabled after the translation tables are
+  // populated.
+  //
   ArmSetTTBR0 (TranslationTable);
 
   if (TranslationTableBase != NULL) {
@@ -606,7 +616,7 @@ ArmConfigureMmu (
   }
 
   if (TranslationTableSize != NULL) {
-    *TranslationTableSize = RootTableEntryCount * sizeof(UINT64);
+    *TranslationTableSize = RootTableEntryCount * sizeof (UINT64);
   }
 
   //
@@ -614,21 +624,29 @@ ArmConfigureMmu (
   // when populating the page tables.
   //
   InvalidateDataCacheRange (TranslationTable,
-    RootTableEntryCount * sizeof(UINT64));
-  ZeroMem (TranslationTable, RootTableEntryCount * sizeof(UINT64));
+    RootTableEntryCount * sizeof (UINT64));
+  ZeroMem (TranslationTable, RootTableEntryCount * sizeof (UINT64));
 
   while (MemoryTable->Length != 0) {
     Status = FillTranslationTable (TranslationTable, MemoryTable);
     if (EFI_ERROR (Status)) {
-      goto FREE_TRANSLATION_TABLE;
+      goto FreeTranslationTable;
     }
     MemoryTable++;
   }
 
-  ArmSetMAIR (MAIR_ATTR(TT_ATTR_INDX_DEVICE_MEMORY, MAIR_ATTR_DEVICE_MEMORY) |                      // mapped to EFI_MEMORY_UC
-              MAIR_ATTR(TT_ATTR_INDX_MEMORY_NON_CACHEABLE, MAIR_ATTR_NORMAL_MEMORY_NON_CACHEABLE) | // mapped to EFI_MEMORY_WC
-              MAIR_ATTR(TT_ATTR_INDX_MEMORY_WRITE_THROUGH, MAIR_ATTR_NORMAL_MEMORY_WRITE_THROUGH) | // mapped to EFI_MEMORY_WT
-              MAIR_ATTR(TT_ATTR_INDX_MEMORY_WRITE_BACK, MAIR_ATTR_NORMAL_MEMORY_WRITE_BACK));       // mapped to EFI_MEMORY_WB
+  //
+  // EFI_MEMORY_UC ==> MAIR_ATTR_DEVICE_MEMORY
+  // EFI_MEMORY_WC ==> MAIR_ATTR_NORMAL_MEMORY_NON_CACHEABLE
+  // EFI_MEMORY_WT ==> MAIR_ATTR_NORMAL_MEMORY_WRITE_THROUGH
+  // EFI_MEMORY_WB ==> MAIR_ATTR_NORMAL_MEMORY_WRITE_BACK
+  //
+  ArmSetMAIR (
+    MAIR_ATTR (TT_ATTR_INDX_DEVICE_MEMORY,        MAIR_ATTR_DEVICE_MEMORY)               |
+    MAIR_ATTR (TT_ATTR_INDX_MEMORY_NON_CACHEABLE, MAIR_ATTR_NORMAL_MEMORY_NON_CACHEABLE) |
+    MAIR_ATTR (TT_ATTR_INDX_MEMORY_WRITE_THROUGH, MAIR_ATTR_NORMAL_MEMORY_WRITE_THROUGH) |
+    MAIR_ATTR (TT_ATTR_INDX_MEMORY_WRITE_BACK,    MAIR_ATTR_NORMAL_MEMORY_WRITE_BACK)
+    );
 
   ArmDisableAlignmentCheck ();
   ArmEnableStackAlignmentCheck ();
@@ -638,7 +656,7 @@ ArmConfigureMmu (
   ArmEnableMmu ();
   return EFI_SUCCESS;
 
-FREE_TRANSLATION_TABLE:
+FreeTranslationTable:
   FreePages (TranslationTable, 1);
   return Status;
 }
