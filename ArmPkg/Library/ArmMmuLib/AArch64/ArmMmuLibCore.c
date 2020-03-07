@@ -204,6 +204,14 @@ UpdateRegionMappingRecursive (
           return EFI_OUT_OF_RESOURCES;
         }
 
+        if (!ArmMmuEnabled ()) {
+          //
+          // Make sure we are not inadvertently hitting in the caches
+          // when populating the page tables.
+          //
+          InvalidateDataCacheRange (TranslationTable, EFI_PAGE_SIZE);
+        }
+
         if ((*Entry & TT_TYPE_MASK) == TT_TYPE_BLOCK_ENTRY) {
           //
           // We are splitting an existing block entry, so we have to populate
@@ -602,6 +610,12 @@ ArmConfigureMmu (
     *TranslationTableSize = RootTableEntryCount * sizeof(UINT64);
   }
 
+  //
+  // Make sure we are not inadvertently hitting in the caches
+  // when populating the page tables.
+  //
+  InvalidateDataCacheRange (TranslationTable,
+    RootTableEntryCount * sizeof(UINT64));
   ZeroMem (TranslationTable, RootTableEntryCount * sizeof(UINT64));
 
   TranslationTableAttribute = TT_ATTR_INDX_INVALID;
