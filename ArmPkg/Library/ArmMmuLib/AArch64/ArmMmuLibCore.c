@@ -229,8 +229,12 @@ UpdateRegionMappingRecursive (
     // than a block, and recurse to create the block or page entries at
     // the next level. No block mappings are allowed at all at level 0,
     // so in that case, we have to recurse unconditionally.
+    // If we are changing a table entry and the AttributeClearMask is non-zero,
+    // we cannot replace it with a block entry without potentially losing
+    // attribute information, so keep the table entry in that case.
     //
-    if (Level == 0 || ((RegionStart | BlockEnd) & BlockMask) != 0) {
+    if (Level == 0 || ((RegionStart | BlockEnd) & BlockMask) != 0 ||
+        (IsTableEntry (*Entry, Level) && AttributeClearMask != 0)) {
       ASSERT (Level < 3);
 
       if (!IsTableEntry (*Entry, Level)) {
@@ -251,6 +255,8 @@ UpdateRegionMappingRecursive (
           InvalidateDataCacheRange (TranslationTable, EFI_PAGE_SIZE);
         }
 
+        ZeroMem (TranslationTable, EFI_PAGE_SIZE);
+
         if (IsBlockEntry (*Entry, Level)) {
           //
           // We are splitting an existing block entry, so we have to populate
@@ -268,8 +274,6 @@ UpdateRegionMappingRecursive (
             FreePages (TranslationTable, 1);
             return Status;
           }
-        } else {
-          ZeroMem (TranslationTable, EFI_PAGE_SIZE);
         }
       } else {
         TranslationTable = (VOID *)(UINTN)(*Entry & TT_ADDRESS_MASK_BLOCK_ENTRY);
@@ -306,7 +310,20 @@ UpdateRegionMappingRecursive (
       EntryValue |= (Level == 3) ? TT_TYPE_BLOCK_ENTRY_LEVEL3
                                  : TT_TYPE_BLOCK_ENTRY;
 
-      ReplaceTableEntry (Entry, EntryValue, RegionStart, FALSE);
+      if (IsTableEntry (*Entry, Level)) {
+        //
+        // We are replacing a table entry with a block entry. This is only
+        // possible if we are keeping none of the original attributes.
+        // We can free the table entry's page table, and all the ones below
+        // it, since we are dropping the only possible reference to it.
+        //
+        ASSERT (AttributeClearMask == 0);
+        TranslationTable = (VOID *)(UINTN)(*Entry & TT_ADDRESS_MASK_BLOCK_ENTRY);
+        ReplaceTableEntry (Entry, EntryValue, RegionStart, TRUE);
+        FreePageTablesRecursive (TranslationTable, Level + 1);
+      } else {
+        ReplaceTableEntry (Entry, EntryValue, RegionStart, FALSE);
+      }
     }
   }
   return EFI_SUCCESS;
