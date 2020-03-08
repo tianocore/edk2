@@ -124,18 +124,13 @@ typedef struct {
         CR (FilePointer, STUB_FILE, File, STUB_FILE_SIG)
 
 //
-// Tentative definition of the file protocol template. The initializer
-// (external definition) will be provided later.
-//
-STATIC CONST EFI_FILE_PROTOCOL mEfiFileProtocolTemplate;
-
-
-//
 // Protocol member functions for File.
 //
 
 /**
   Opens a new file relative to the source file's location.
+
+  (Forward declaration.)
 
   @param[in]  This        A pointer to the EFI_FILE_PROTOCOL instance that is
                           the file handle to the source location. This would
@@ -181,65 +176,7 @@ StubFileOpen (
   IN CHAR16             *FileName,
   IN UINT64             OpenMode,
   IN UINT64             Attributes
-  )
-{
-  CONST STUB_FILE *StubFile;
-  UINTN           BlobType;
-  STUB_FILE       *NewStubFile;
-
-  //
-  // We're read-only.
-  //
-  switch (OpenMode) {
-    case EFI_FILE_MODE_READ:
-      break;
-
-    case EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE:
-    case EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE | EFI_FILE_MODE_CREATE:
-      return EFI_WRITE_PROTECTED;
-
-    default:
-      return EFI_INVALID_PARAMETER;
-  }
-
-  //
-  // Only the root directory supports opening files in it.
-  //
-  StubFile = STUB_FILE_FROM_FILE (This);
-  if (StubFile->BlobType != KernelBlobTypeMax) {
-    return EFI_UNSUPPORTED;
-  }
-
-  //
-  // Locate the file.
-  //
-  for (BlobType = 0; BlobType < KernelBlobTypeMax; ++BlobType) {
-    if (StrCmp (FileName, mKernelBlob[BlobType].Name) == 0) {
-      break;
-    }
-  }
-  if (BlobType == KernelBlobTypeMax) {
-    return EFI_NOT_FOUND;
-  }
-
-  //
-  // Found it.
-  //
-  NewStubFile = AllocatePool (sizeof *NewStubFile);
-  if (NewStubFile == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  NewStubFile->Signature = STUB_FILE_SIG;
-  NewStubFile->BlobType  = (KERNEL_BLOB_TYPE)BlobType;
-  NewStubFile->Position  = 0;
-  CopyMem (&NewStubFile->File, &mEfiFileProtocolTemplate,
-    sizeof mEfiFileProtocolTemplate);
-  *NewHandle = &NewStubFile->File;
-
-  return EFI_SUCCESS;
-}
-
+  );
 
 /**
   Closes a specified file handle.
@@ -796,6 +733,74 @@ STATIC CONST EFI_FILE_PROTOCOL mEfiFileProtocolTemplate = {
   NULL,                       // WriteEx, revision 2
   NULL                        // FlushEx, revision 2
 };
+
+STATIC
+EFI_STATUS
+EFIAPI
+StubFileOpen (
+  IN EFI_FILE_PROTOCOL  *This,
+  OUT EFI_FILE_PROTOCOL **NewHandle,
+  IN CHAR16             *FileName,
+  IN UINT64             OpenMode,
+  IN UINT64             Attributes
+  )
+{
+  CONST STUB_FILE *StubFile;
+  UINTN           BlobType;
+  STUB_FILE       *NewStubFile;
+
+  //
+  // We're read-only.
+  //
+  switch (OpenMode) {
+    case EFI_FILE_MODE_READ:
+      break;
+
+    case EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE:
+    case EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE | EFI_FILE_MODE_CREATE:
+      return EFI_WRITE_PROTECTED;
+
+    default:
+      return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Only the root directory supports opening files in it.
+  //
+  StubFile = STUB_FILE_FROM_FILE (This);
+  if (StubFile->BlobType != KernelBlobTypeMax) {
+    return EFI_UNSUPPORTED;
+  }
+
+  //
+  // Locate the file.
+  //
+  for (BlobType = 0; BlobType < KernelBlobTypeMax; ++BlobType) {
+    if (StrCmp (FileName, mKernelBlob[BlobType].Name) == 0) {
+      break;
+    }
+  }
+  if (BlobType == KernelBlobTypeMax) {
+    return EFI_NOT_FOUND;
+  }
+
+  //
+  // Found it.
+  //
+  NewStubFile = AllocatePool (sizeof *NewStubFile);
+  if (NewStubFile == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  NewStubFile->Signature = STUB_FILE_SIG;
+  NewStubFile->BlobType  = (KERNEL_BLOB_TYPE)BlobType;
+  NewStubFile->Position  = 0;
+  CopyMem (&NewStubFile->File, &mEfiFileProtocolTemplate,
+    sizeof mEfiFileProtocolTemplate);
+  *NewHandle = &NewStubFile->File;
+
+  return EFI_SUCCESS;
+}
 
 
 //
