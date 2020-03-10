@@ -1051,24 +1051,7 @@ FvbInitialize (
 
   MarkIoMemoryRangeForRuntimeAccess (BaseAddress, Length);
 
-  //
-  // Set several PCD values to point to flash
-  //
-  PcdStatus = PcdSet64S (
-    PcdFlashNvStorageVariableBase64,
-    (UINTN) PcdGet32 (PcdOvmfFlashNvStorageVariableBase)
-    );
-  ASSERT_RETURN_ERROR (PcdStatus);
-  PcdStatus = PcdSet32S (
-    PcdFlashNvStorageFtwWorkingBase,
-    PcdGet32 (PcdOvmfFlashNvStorageFtwWorkingBase)
-    );
-  ASSERT_RETURN_ERROR (PcdStatus);
-  PcdStatus = PcdSet32S (
-    PcdFlashNvStorageFtwSpareBase,
-    PcdGet32 (PcdOvmfFlashNvStorageFtwSpareBase)
-    );
-  ASSERT_RETURN_ERROR (PcdStatus);
+  SetPcdFlashNvStorageBaseAddresses ();
 
   FwhInstance = (EFI_FW_VOL_INSTANCE *)
     (
