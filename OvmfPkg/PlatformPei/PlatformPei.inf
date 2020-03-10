@@ -30,6 +30,7 @@
   FeatureControl.c
   Fv.c
   MemDetect.c
+  MemTypeInfo.c
   Platform.c
   Platform.h
   Xen.c
@@ -112,6 +113,7 @@
 [Ppis]
   gEfiPeiMasterBootModePpiGuid
   gEfiPeiMpServicesPpiGuid
+  gEfiPeiReadOnlyVariable2PpiGuid
 
 [Depex]
   TRUE
