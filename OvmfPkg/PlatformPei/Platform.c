@@ -28,7 +28,6 @@
 #include <Library/QemuFwCfgLib.h>
 #include <Library/QemuFwCfgS3Lib.h>
 #include <Library/ResourcePublicationLib.h>
-#include <Guid/MemoryTypeInformation.h>
 #include <Ppi/MasterBootMode.h>
 #include <IndustryStandard/I440FxPiix4.h>
 #include <IndustryStandard/Pci22.h>
@@ -38,18 +37,6 @@
 
 #include "Platform.h"
 #include "Cmos.h"
-
-EFI_MEMORY_TYPE_INFORMATION mDefaultMemoryTypeInformation[] = {
-  { EfiACPIMemoryNVS,       0x004 },
-  { EfiACPIReclaimMemory,   0x008 },
-  { EfiReservedMemoryType,  0x004 },
-  { EfiRuntimeServicesData, 0x024 },
-  { EfiRuntimeServicesCode, 0x030 },
-  { EfiBootServicesCode,    0x180 },
-  { EfiBootServicesData,    0xF00 },
-  { EfiMaxMemoryType,       0x000 }
-};
-
 
 EFI_PEI_PPI_DESCRIPTOR   mPpiBootMode[] = {
   {
@@ -161,15 +148,6 @@ MemMapInitialization (
 
   PciIoBase = 0xC000;
   PciIoSize = 0x4000;
-
-  //
-  // Create Memory Type Information HOB
-  //
-  BuildGuidDataHob (
-    &gEfiMemoryTypeInformationGuid,
-    mDefaultMemoryTypeInformation,
-    sizeof(mDefaultMemoryTypeInformation)
-    );
 
   //
   // Video memory + Legacy BIOS region
@@ -811,6 +789,7 @@ InitializePlatform (
       ReserveEmuVariableNvStore ();
     }
     PeiFvInitialization ();
+    MemTypeInfoInitialization ();
     MemMapInitialization ();
     NoexecDxeInitialization ();
   }
