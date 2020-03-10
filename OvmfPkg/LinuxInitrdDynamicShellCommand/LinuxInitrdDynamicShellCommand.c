@@ -196,7 +196,7 @@ CacheInitrdFile (
     ASSERT_EFI_ERROR (Status);
   }
 
-  mInitrdFileSize = FileSize;
+  mInitrdFileSize = (UINTN)FileSize;
   return EFI_SUCCESS;
 
 FreeMemory:
