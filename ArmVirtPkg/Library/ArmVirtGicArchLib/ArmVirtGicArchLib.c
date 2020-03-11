@@ -110,7 +110,12 @@ ArmVirtGicArchLibConstructor (
     break;
 
   case 2:
-    ASSERT (RegSize == 32);
+    //
+    // When the GICv2 is emulated with virtualization=on, it adds a virtual
+    // set of control registers. This means the register property can be
+    // either 32 or 64 bytes in size.
+    //
+    ASSERT ((RegSize == 32) || (RegSize == 64));
 
     DistBase = SwapBytes64 (Reg[0]);
     CpuBase  = SwapBytes64 (Reg[2]);
