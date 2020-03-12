@@ -12,7 +12,7 @@
 ################################################################################
 
 [Defines]
-!include OvmfPkg.fdf.inc
+!include OvmfPkgDefines.fdf.inc
 
 #
 # This will allow the flash device image to be recognize as an ELF, with first
@@ -442,7 +442,7 @@ FILE FV_IMAGE = 9E21FD93-9C72-4c15-8C4B-E77F1DB2D792 {
    }
  }
 
-!include DecomprScratchEnd.fdf.inc
+!include FvmainCompactScratchEnd.fdf.inc
 
 ################################################################################
 
