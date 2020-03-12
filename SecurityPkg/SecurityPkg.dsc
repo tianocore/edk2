@@ -64,6 +64,7 @@
   TcgStorageCoreLib|SecurityPkg/Library/TcgStorageCoreLib/TcgStorageCoreLib.inf
   TcgStorageOpalLib|SecurityPkg/Library/TcgStorageOpalLib/TcgStorageOpalLib.inf
   ResetSystemLib|MdeModulePkg/Library/BaseResetSystemLibNull/BaseResetSystemLibNull.inf
+  RpmcLib|SecurityPkg/Library/RpmcLibNull/RpmcLibNull.inf
 
 [LibraryClasses.ARM]
   #
@@ -216,6 +217,11 @@
   #
   SecurityPkg/Library/TcgStorageCoreLib/TcgStorageCoreLib.inf
   SecurityPkg/Library/TcgStorageOpalLib/TcgStorageOpalLib.inf
+
+  #
+  # Variable Confidentiality & Integrity
+  #
+  SecurityPkg/Library/RpmcLibNull/RpmcLibNull.inf
 
   #
   # Other
