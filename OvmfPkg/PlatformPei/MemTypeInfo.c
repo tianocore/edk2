@@ -19,6 +19,12 @@
 
 #include "Platform.h"
 
+//
+// The NumberOfPages values below are ad-hoc. They are updated sporadically at
+// best (please refer to git-blame for past updates). The values capture a set
+// of BIN hints that made sense at a particular time, for some (now likely
+// unknown) workloads / boot paths.
+//
 STATIC EFI_MEMORY_TYPE_INFORMATION mDefaultMemoryTypeInformation[] = {
   { EfiACPIMemoryNVS,       0x004 },
   { EfiACPIReclaimMemory,   0x008 },
