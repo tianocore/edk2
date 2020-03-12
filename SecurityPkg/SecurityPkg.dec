@@ -76,6 +76,14 @@
   #
   TcgStorageOpalLib|Include/Library/TcgStorageOpalLib.h
 
+  ## @libraryclass  Provides interfaces to access RPMC device.
+  #
+  RpmcLib|Include/Library/RpmcLib.h
+
+  ## @libraryclass  Provides interfaces to access variable root key.
+  #
+  VariableKeyLib|Include/Library/VariableKeyLib.h
+
 [Guids]
   ## Security package token space guid.
   # Include/Guid/SecurityPkgTokenSpace.h
