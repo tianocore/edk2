@@ -384,7 +384,7 @@ QemuLoadKernelImage (
     //
     // Drop the terminating NUL, convert to UTF-16.
     //
-    KernelLoadedImage->LoadOptionsSize = (CommandLineSize - 1) * 2;
+    KernelLoadedImage->LoadOptionsSize = (UINT32) ((CommandLineSize - 1) * 2);
   }
 
   QemuFwCfgSelectItem (QemuFwCfgItemInitrdSize);
