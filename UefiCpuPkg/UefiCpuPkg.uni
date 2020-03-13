@@ -3,7 +3,7 @@
 //
 // This Package provides UEFI compatible CPU modules and libraries.
 //
-// Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2007 - 2020, Intel Corporation. All rights reserved.<BR>
 //
 // SPDX-License-Identifier: BSD-2-Clause-Patent
 //
@@ -275,3 +275,6 @@
 #string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuSmmMpTokenCountPerChunk_PROMPT  #language en-US "Specify the count of pre allocated SMM MP tokens per chunk.\n"
 
 #string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuSmmMpTokenCountPerChunk_HELP    #language en-US "This value used to specify the count of pre allocated SMM MP tokens per chunk.\n"
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuApStatusCheckIntervalInMicroSeconds_PROMPT  #language en-US "Periodic interval value in microseconds for AP status check in DXE.\n"
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuApStatusCheckIntervalInMicroSeconds_HELP    #language en-US "Periodic interval value in microseconds for the status check of APs for StartupAllAPs() and StartupThisAP() executed in non-blocking mode in DXE phase.\n"
