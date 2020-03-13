@@ -230,6 +230,12 @@
   # @Prompt This PCD is the nominal frequency of the core crystal clock in Hz as is CPUID Leaf 0x15:ECX
   gUefiCpuPkgTokenSpaceGuid.PcdCpuCoreCrystalClockFrequency|24000000|UINT64|0x32132113
 
+  ## Specifies the periodic interval value in microseconds for the status check
+  #  of APs for StartupAllAPs() and StartupThisAP() executed in non-blocking
+  #  mode in DXE phase.
+  # @Prompt Periodic interval value in microseconds for AP status check in DXE.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuApStatusCheckIntervalInMicroSeconds|100000|UINT32|0x0000001E
+
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## Specifies max supported number of Logical Processors.
   # @Prompt Configure max supported number of Logical Processors

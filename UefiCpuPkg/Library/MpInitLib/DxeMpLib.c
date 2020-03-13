@@ -15,7 +15,6 @@
 
 #include <Protocol/Timer.h>
 
-#define  AP_CHECK_INTERVAL     (EFI_TIMER_PERIOD_MILLISECONDS (100))
 #define  AP_SAFE_STACK_SIZE    128
 
 CPU_MP_DATA      *mCpuMpData = NULL;
@@ -451,7 +450,9 @@ InitMpGlobalData (
   Status = gBS->SetTimer (
                   mCheckAllApsEvent,
                   TimerPeriodic,
-                  AP_CHECK_INTERVAL
+                  EFI_TIMER_PERIOD_MICROSECONDS (
+                    PcdGet32 (PcdCpuApStatusCheckIntervalInMicroSeconds)
+                    )
                   );
   ASSERT_EFI_ERROR (Status);
 
