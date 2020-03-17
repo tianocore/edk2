@@ -2504,6 +2504,15 @@ typedef struct {
 } SMBIOS_TABLE_TYPE41;
 
 ///
+///  Management Controller Host Interface - Protocol Record Data Format.
+///
+typedef struct {
+  UINT8                        ProtocolType;
+  UINT8                        ProtocolTypeDataLen;
+  UINT8                        ProtocolTypeData[1];
+} MC_HOST_INTERFACE_PROTOCOL_RECORD;
+
+///
 /// Management Controller Host Interface - Interface Types.
 /// 00h - 3Fh: MCTP Host Interfaces
 ///
