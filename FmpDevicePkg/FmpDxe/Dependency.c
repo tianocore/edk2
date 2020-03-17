@@ -552,7 +552,7 @@ EvaluateImageDependencies (
     return EFI_ABORTED;
   }
 
-  mFmpImageInfoBuf = AllocatePool (sizeof(EFI_FIRMWARE_IMAGE_DESCRIPTOR *) * mNumberOfFmpInstance);
+  mFmpImageInfoBuf = AllocateZeroPool (sizeof(EFI_FIRMWARE_IMAGE_DESCRIPTOR *) * mNumberOfFmpInstance);
   if (mFmpImageInfoBuf == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
