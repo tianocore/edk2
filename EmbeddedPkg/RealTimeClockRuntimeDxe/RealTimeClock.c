@@ -85,10 +85,6 @@ IsDayValid (
   IN  EFI_TIME  *Time
   )
 {
-  ASSERT (Time->Day >= 1);
-  ASSERT (Time->Day <= mDayOfMonth[Time->Month - 1]);
-  ASSERT (Time->Month != 2 || IsLeapYear (Time) || Time->Day <= 28);
-
   if (Time->Day < 1 ||
       Time->Day > mDayOfMonth[Time->Month - 1] ||
       (Time->Month == 2 && !IsLeapYear (Time) && Time->Day > 28)) {
@@ -113,6 +109,7 @@ IsTimeValid(
       Time->Hour   > 23                 ||
       Time->Minute > 59                 ||
       Time->Second > 59                 ||
+      Time->Nanosecond > 999999999      ||
       !IsValidTimeZone (Time->TimeZone) ||
       !IsValidDaylight (Time->Daylight)) {
     return FALSE;
