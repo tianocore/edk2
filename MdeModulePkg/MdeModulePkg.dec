@@ -1548,12 +1548,6 @@
   # @Prompt Console Output Row of Text Setup
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetupConOutRow|25|UINT32|0x4000000e
 
-  ## This PCD holds the information if ConIn variable needs to be updated every boot.<BR><BR>
-  #   TRUE  - ConIn will be updated every boot<BR>
-  #   FALSE - ConIn will be updated every boot<BR>
-  # @Prompt Enable preserving ConIn NVRAM variable across boots.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdUpdateConInVariable|FALSE|BOOLEAN|0x4000000f
-
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## UART clock frequency is for the baud rate configuration.
   # @Prompt Serial Port Clock Rate.
