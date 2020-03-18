@@ -8,7 +8,7 @@
   of size reduction when compiler optimization is disabled. If MDEPKG_NDEBUG is
   defined, then debug and assert related macros wrapped by it are the NULL implementations.
 
-Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2020, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -289,7 +289,11 @@ DebugPrintLevelEnabled (
   @param  Expression  Boolean expression that evaluated to FALSE
 
 **/
+#if defined(__clang__) && defined(__FILE_NAME__)
+#define _ASSERT(Expression)  DebugAssert (__FILE_NAME__, __LINE__, #Expression)
+#else
 #define _ASSERT(Expression)  DebugAssert (__FILE__, __LINE__, #Expression)
+#endif
 
 
 /**
