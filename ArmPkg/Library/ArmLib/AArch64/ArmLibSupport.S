@@ -122,7 +122,7 @@ ASM_FUNC(ArmSetMAIR)
 ASM_FUNC(ArmUpdateTranslationTableEntry)
    dsb     nshst
    lsr     x1, x1, #12
-   EL1_OR_EL2_OR_EL3(x0)
+   EL1_OR_EL2_OR_EL3(x2)
 1: tlbi    vaae1, x1             // TLB Invalidate VA , EL1
    mrs     x2, sctlr_el1
    b       4f
