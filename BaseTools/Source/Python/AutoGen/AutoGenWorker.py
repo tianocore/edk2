@@ -256,7 +256,6 @@ class AutoGenWorkerInProcess(mp.Process):
                         CacheResult = Ma.CanSkipbyPreMakeCache()
                     except:
                         CacheResult = False
-                        traceback.print_exc(file=sys.stdout)
                         self.feedback_q.put(taskname)
 
                     if CacheResult:
@@ -273,7 +272,6 @@ class AutoGenWorkerInProcess(mp.Process):
                         CacheResult = Ma.CanSkipbyMakeCache()
                     except:
                         CacheResult = False
-                        traceback.print_exc(file=sys.stdout)
                         self.feedback_q.put(taskname)
 
                     if CacheResult:
@@ -285,7 +283,6 @@ class AutoGenWorkerInProcess(mp.Process):
         except Empty:
             pass
         except:
-            traceback.print_exc(file=sys.stdout)
             self.feedback_q.put(taskname)
         finally:
             self.feedback_q.put("Done")
