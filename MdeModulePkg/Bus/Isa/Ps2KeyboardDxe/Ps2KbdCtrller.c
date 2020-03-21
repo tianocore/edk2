@@ -1745,7 +1745,8 @@ InitKeyboard (
       KeyboardError (ConsoleIn, L"Some specific value not acquired from 8042 controller!\n\r");
       goto Done;
     }
-
+  }
+  
   //
   // Clear Keyboard Scancode Buffer
   //
@@ -1760,7 +1761,7 @@ InitKeyboard (
     KeyboardError (ConsoleIn, L"Some specific value not acquired from 8042 controller!\n\r");
     goto Done;
   }
-  //
+  
   if (Ps2Policy != NULL) {
     if ((Ps2Policy->KeyboardLight & EFI_KEYBOARD_CAPSLOCK) == EFI_KEYBOARD_CAPSLOCK) {
       ConsoleIn->CapsLock = TRUE;
@@ -1781,7 +1782,6 @@ InitKeyboard (
   if (EFI_ERROR (Status)) {
     KeyboardError (ConsoleIn, L"Update keyboard status lights error!\n\r");
     goto Done;
-    }
   }
   //
   // At last, we can now enable the mouse interface if appropriate
