@@ -1701,11 +1701,6 @@ InitKeyboard (
       goto Done;
     }
 
-    Status = KeyboardWaitForValue (ConsoleIn, KEYBOARD_8048_RETURN_8042_ACK);
-    if (EFI_ERROR (Status)) {
-      KeyboardError (ConsoleIn, L"Some specific value not acquired from 8042 controller!\n\r");
-      goto Done;
-    }
     //
     // wait for BAT completion code
     //
