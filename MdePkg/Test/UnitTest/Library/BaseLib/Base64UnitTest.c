@@ -252,9 +252,11 @@ RfcDecodeTest(
   BinSize = AsciiStrnLenS (binString, MAX_TEST_STRING_SIZE);
 
   BinData = AllocatePool (BinSize);
-  Btc->BufferToFree = BinData;
+  UT_ASSERT_NOT_NULL(BinData);
 
+  Btc->BufferToFree = BinData;
   ReturnSize = BinSize;
+
   Status = Base64Decode (b64String, b64StringLen, BinData, &ReturnSize);
 
   UT_ASSERT_STATUS_EQUAL (Status, Btc->ExpectedStatus);
