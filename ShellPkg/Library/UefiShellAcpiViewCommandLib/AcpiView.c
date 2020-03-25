@@ -2,6 +2,12 @@
 
   Copyright (c) 2016 - 2020, ARM Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
+
+  @par Glossary:
+    - Sbbr or SBBR   - Server Base Boot Requirements
+
+  @par Reference(s):
+    - Arm Server Base Boot Requirements 1.2, September 2019
 **/
 
 #include <Library/PrintLib.h>
@@ -15,6 +21,10 @@
 #include "AcpiTableParser.h"
 #include "AcpiView.h"
 #include "UefiShellAcpiViewCommandLib.h"
+
+#if defined(MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
+#include "Arm/SbbrValidator.h"
+#endif
 
 EFI_HII_HANDLE gShellAcpiViewHiiHandle = NULL;
 
@@ -438,6 +448,12 @@ AcpiView (
       return EFI_UNSUPPORTED;
     }
 
+#if defined(MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
+    if (GetMandatoryTableValidate ()) {
+      ArmSbbrResetTableCounts ();
+    }
+#endif
+
     // The RSDP length is 4 bytes starting at offset 20
     RsdpLength = *(UINT32*)(RsdpPtr + RSDP_LENGTH_OFFSET);
 
@@ -465,6 +481,12 @@ AcpiView (
       );
     return EFI_NOT_FOUND;
   }
+
+#if defined(MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
+  if (GetMandatoryTableValidate ()) {
+    ArmSbbrReqsValidate ((ARM_SBBR_VERSION)GetMandatoryTableSpec ());
+  }
+#endif
 
   ReportOption = GetReportOption ();
   if (ReportTableList != ReportOption) {
