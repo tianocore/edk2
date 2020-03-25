@@ -1,7 +1,7 @@
 /** @file
   Header file for AcpiView
 
-  Copyright (c) 2016 - 2019, ARM Limited. All rights reserved.
+  Copyright (c) 2016 - 2020, ARM Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
@@ -110,6 +110,48 @@ GetConsistencyChecking (
 VOID
 SetConsistencyChecking (
   BOOLEAN ConsistencyChecking
+  );
+
+/**
+  This function returns the ACPI table requirements validation flag.
+
+  @retval TRUE if check for mandatory table presence should be performed.
+**/
+BOOLEAN
+GetMandatoryTableValidate (
+  VOID
+  );
+
+/**
+  This function sets the ACPI table requirements validation flag.
+
+  @param  Validate    Enable/Disable ACPI table requirements validation.
+**/
+VOID
+SetMandatoryTableValidate (
+  BOOLEAN Validate
+  );
+
+/**
+  This function returns the identifier of specification to validate ACPI table
+  requirements against.
+
+  @return   ID of specification listing mandatory tables.
+**/
+UINTN
+GetMandatoryTableSpec (
+  VOID
+  );
+
+/**
+  This function sets the identifier of specification to validate ACPI table
+  requirements against.
+
+  @param  Spec      ID of specification listing mandatory tables.
+**/
+VOID
+SetMandatoryTableSpec (
+  UINTN Spec
   );
 
 /**
