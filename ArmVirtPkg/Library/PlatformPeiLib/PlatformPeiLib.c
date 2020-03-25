@@ -77,6 +77,11 @@ PlatformPeim (
 
   TpmBase = 0;
 
+  //
+  // Set Parent to suppress incorrect compiler/analyzer warnings.
+  //
+  Parent = 0;
+
   for (Prev = Depth = 0;; Prev = Node) {
     Node = fdt_next_node (Base, Prev, &Depth);
     if (Node < 0) {
