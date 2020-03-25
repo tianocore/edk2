@@ -142,15 +142,21 @@ ReplaceTableEntry (
 STATIC
 VOID
 FreePageTablesRecursive (
-  IN  UINT64  *TranslationTable
+  IN  UINT64  *TranslationTable,
+  IN  UINTN   Level
   )
 {
   UINTN   Index;
 
-  for (Index = 0; Index < TT_ENTRY_COUNT; Index++) {
-    if ((TranslationTable[Index] & TT_TYPE_MASK) == TT_TYPE_TABLE_ENTRY) {
-      FreePageTablesRecursive ((VOID *)(UINTN)(TranslationTable[Index] &
-                                               TT_ADDRESS_MASK_BLOCK_ENTRY));
+  ASSERT (Level <= 3);
+
+  if (Level < 3) {
+    for (Index = 0; Index < TT_ENTRY_COUNT; Index++) {
+      if ((TranslationTable[Index] & TT_TYPE_MASK) == TT_TYPE_TABLE_ENTRY) {
+        FreePageTablesRecursive ((VOID *)(UINTN)(TranslationTable[Index] &
+                                                 TT_ADDRESS_MASK_BLOCK_ENTRY),
+                                 Level + 1);
+      }
     }
   }
   FreePages (TranslationTable, 1);
@@ -254,7 +260,7 @@ UpdateRegionMappingRecursive (
           // possible for existing table entries, since we cannot revert the
           // modifications we made to the subhierarchy it represents.)
           //
-          FreePageTablesRecursive (TranslationTable);
+          FreePageTablesRecursive (TranslationTable, Level + 1);
         }
         return Status;
       }
