@@ -1,6 +1,6 @@
 // /**
 //
-// Copyright (c) 2016 - 2019, ARM Limited. All rights reserved.<BR>
+// Copyright (c) 2016 - 2020, ARM Limited. All rights reserved.<BR>
 // SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Module Name:
@@ -30,7 +30,7 @@
 "Display ACPI Table information.\r\n"
 ".SH SYNOPSIS\r\n"
 " \r\n"
-"ACPIVIEW [[-?] | [[-l] | [-s AcpiTable [-d]]] [-q] [-h]]\r\n"
+"ACPIVIEW [[-?] | [[[[-l] | [-s AcpiTable [-d]]] [-q] [-h]] [-r Spec]]]\r\n"
 " \r\n"
 ".SH OPTIONS\r\n"
 " \r\n"
@@ -41,6 +41,12 @@
 "  -d - Generate a binary file dump of the specified AcpiTable.\r\n"
 "  -q - Quiet. Suppress errors and warnings. Disables consistency checks.\r\n"
 "  -h - Enable colour highlighting.\r\n"
+"  -r - Validate that all required ACPI tables are installed\r\n"
+"         Spec  : Specification to validate against.\r\n"
+"                 For Arm, the possible values are:\r\n"
+"                   0 - Server Base Boot Requirements v1.0\r\n"
+"                   1 - Server Base Boot Requirements v1.1\r\n"
+"                   2 - Server Base Boot Requirements v1.2\r\n"
 "  -? - Show help.\r\n"
 " \r\n"
 ".SH DESCRIPTION\r\n"
@@ -117,6 +123,10 @@
 " \r\n"
 "  * To display contents of all ACPI tables:\r\n"
 "    fs0:\> acpiview\r\n"
+" \r\n"
+"  * To check if all Server Base Boot Requirements (SBBR) v1.2 mandatory\r\n"
+"    ACPI tables are installed (Arm only):\r\n"
+"    fs0:\> acpiview -r 2\r\n"
 " \r\n"
 ".SH RETURNVALUES\r\n"
 " \r\n"
