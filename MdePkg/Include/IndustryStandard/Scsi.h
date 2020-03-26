@@ -1,7 +1,7 @@
 /** @file
   Support for SCSI-2 standard
 
-  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2020, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -174,6 +174,12 @@
 //
 #define EFI_SCSI_DATA_IN  0
 #define EFI_SCSI_DATA_OUT 1
+
+//
+// SCSI Block Command Cache Control Parameters
+//
+#define EFI_SCSI_BLOCK_FUA  BIT3  ///< Force Unit Access
+#define EFI_SCSI_BLOCK_DPO  BIT4  ///< Disable Page Out
 
 //
 // Peripheral Device Type Definitions
