@@ -2347,7 +2347,7 @@ class Build():
                                 toolName = split[3]
                                 path = '_'.join(split[0:4]) + '_PATH'
                                 path = self.ToolDef.ToolsDefTxtDictionary[path]
-                                path = self.GetFullPathOfTool(path)
+                                path = self.GetRealPathOfTool(path)
                                 guidAttribs.append((guid, toolName, path))
 
                     # Write out GuidedSecTools.txt
@@ -2357,21 +2357,11 @@ class Build():
                         print(' '.join(guidedSectionTool), file=toolsFile)
                     toolsFile.close()
 
-    ## Returns the full path of the tool.
+    ## Returns the real path of the tool.
     #
-    def GetFullPathOfTool (self, tool):
+    def GetRealPathOfTool (self, tool):
         if os.path.exists(tool):
             return os.path.realpath(tool)
-        else:
-            # We need to search for the tool using the
-            # PATH environment variable.
-            for dirInPath in os.environ['PATH'].split(os.pathsep):
-                foundPath = os.path.join(dirInPath, tool)
-                if os.path.exists(foundPath):
-                    return os.path.realpath(foundPath)
-
-        # If the tool was not found in the path then we just return
-        # the input tool.
         return tool
 
     ## Launch the module or platform build
