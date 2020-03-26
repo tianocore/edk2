@@ -1367,7 +1367,14 @@ SdEraseBlocks (
     return Status;
   }
 
-  DEBUG ((EFI_D_ERROR, "SdEraseBlocks(): Lba 0x%x BlkNo 0x%x Event %p with %r\n", Lba, BlockNum, Token->Event, Status));
+  DEBUG ((
+    DEBUG_INFO,
+    "SdEraseBlocks(): Lba 0x%x BlkNo 0x%x Event %p with %r\n",
+    Lba,
+    BlockNum,
+    (Token != NULL) ? Token->Event : NULL,
+    Status
+    ));
 
   return Status;
 }
