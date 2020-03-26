@@ -65,7 +65,7 @@ GetStringForUnitTestStatus (
 {
   UINTN  Index;
 
-  for (Index = 0; Index < ARRAY_SIZE (mStatusStrings); Index++) {
+  for (Index = 0; Index < ARRAY_SIZE (mStatusStrings) - 1; Index++) {
     if (mStatusStrings[Index].Status == Status) {
       //
       // Return string from matching entry
@@ -87,7 +87,7 @@ GetStringForFailureType (
 {
   UINTN  Index;
 
-  for (Index = 0; Index < ARRAY_SIZE (mFailureTypeStrings); Index++) {
+  for (Index = 0; Index < ARRAY_SIZE (mFailureTypeStrings) - 1; Index++) {
     if (mFailureTypeStrings[Index].Type == Failure) {
       //
       // Return string from matching entry
