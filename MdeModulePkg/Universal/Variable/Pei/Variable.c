@@ -3,6 +3,7 @@
   PEI ReadOnly Varaiable2 PPI. These services operates the non volatile storage space.
 
 Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) Microsoft Corporation.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -1047,17 +1048,17 @@ PeiGetVariable (
     }
 
     GetVariableNameOrData (&StoreInfo, GetVariableDataPtr (Variable.CurrPtr, VariableHeader, StoreInfo.AuthFlag), VarDataSize, Data);
-
-    if (Attributes != NULL) {
-      *Attributes = VariableHeader->Attributes;
-    }
-
-    *DataSize = VarDataSize;
-    return EFI_SUCCESS;
+    Status = EFI_SUCCESS;
   } else {
-    *DataSize = VarDataSize;
-    return EFI_BUFFER_TOO_SMALL;
+    Status = EFI_BUFFER_TOO_SMALL;
   }
+
+  if (Attributes != NULL) {
+    *Attributes = VariableHeader->Attributes;
+  }
+  *DataSize = VarDataSize;
+
+  return Status;
 }
 
 /**
