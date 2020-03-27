@@ -14,6 +14,7 @@
   InitCommunicateBuffer() is really function to check the variable data size.
 
 Copyright (c) 2010 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) Microsoft Corporation.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -642,10 +643,6 @@ FindVariableInRuntimeCache (
         }
 
         CopyMem (Data, GetVariableDataPtr (RtPtrTrack.CurrPtr, mVariableAuthFormat), TempDataSize);
-        if (Attributes != NULL) {
-          *Attributes = RtPtrTrack.CurrPtr->Attributes;
-        }
-
         *DataSize = TempDataSize;
 
         UpdateVariableInfo (VariableName, VendorGuid, RtPtrTrack.Volatile, TRUE, FALSE, FALSE, TRUE, &mVariableInfo);
@@ -661,6 +658,11 @@ FindVariableInRuntimeCache (
   }
 
 Done:
+  if (Status == EFI_SUCCESS || Status == EFI_BUFFER_TOO_SMALL) {
+    if (Attributes != NULL && RtPtrTrack.CurrPtr != NULL) {
+      *Attributes = RtPtrTrack.CurrPtr->Attributes;
+    }
+  }
   mVariableRuntimeCacheReadLock = FALSE;
 
   return Status;
