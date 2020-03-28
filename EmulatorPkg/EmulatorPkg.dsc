@@ -236,20 +236,19 @@
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|L"Timeout"|gEfiGlobalVariableGuid|0x0|10
 
 [Components]
-!if "IA32" in $(ARCH) || "X64" in $(ARCH)
-  !if "MSFT" in $(FAMILY) || $(WIN_HOST_BUILD) == TRUE
-    ##
-    #  Emulator, OS WIN application
-    #  CLANGPDB is cross OS tool chain. It depends on WIN_HOST_BUILD flag
-    #  to build WinHost application.
-    ##
-    EmulatorPkg/Win/Host/WinHost.inf
-  !else
-    ##
-    #  Emulator, OS POSIX application
-    ##
-    EmulatorPkg/Unix/Host/Host.inf
-  !endif
+
+!if "MSFT" in $(FAMILY) || $(WIN_HOST_BUILD) == TRUE
+  ##
+  #  Emulator, OS WIN application
+  #  CLANGPDB is cross OS tool chain. It depends on WIN_HOST_BUILD flag
+  #  to build WinHost application.
+  ##
+  EmulatorPkg/Win/Host/WinHost.inf
+!else
+  ##
+  #  Emulator, OS POSIX application
+  ##
+  EmulatorPkg/Unix/Host/Host.inf
 !endif
 
 !ifndef $(SKIP_MAIN_BUILD)
@@ -334,7 +333,7 @@
 
   MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
   MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
-!if "XCODE5" not in $(TOOL_CHAIN_TAG)
+!if $(TOOL_CHAIN_TAG) != "XCODE5"
   MdeModulePkg/Logo/LogoDxe.inf
 !endif
   MdeModulePkg/Universal/LoadFileOnFv2/LoadFileOnFv2.inf
@@ -379,7 +378,7 @@
 
   FatPkg/EnhancedFatDxe/Fat.inf
 
-!if "XCODE5" not in $(TOOL_CHAIN_TAG)
+!if $(TOOL_CHAIN_TAG) != "XCODE5"
   ShellPkg/DynamicCommand/TftpDynamicCommand/TftpDynamicCommand.inf {
     <PcdsFixedAtBuild>
       gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize|FALSE
