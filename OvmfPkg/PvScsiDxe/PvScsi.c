@@ -11,16 +11,155 @@
 
 #include <IndustryStandard/Pci.h>
 #include <IndustryStandard/PvScsi.h>
+#include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>
 #include <Protocol/PciIo.h>
 #include <Uefi/UefiSpec.h>
+
+#include "PvScsi.h"
 
 //
 // Higher versions will be used before lower, 0x10-0xffffffef is the version
 // range for IHV (Indie Hardware Vendors)
 //
 #define PVSCSI_BINDING_VERSION      0x10
+
+//
+// Ext SCSI Pass Thru
+//
+
+STATIC
+EFI_STATUS
+EFIAPI
+PvScsiPassThru (
+  IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL                *This,
+  IN UINT8                                          *Target,
+  IN UINT64                                         Lun,
+  IN OUT EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET *Packet,
+  IN EFI_EVENT                                      Event    OPTIONAL
+  )
+{
+  return EFI_UNSUPPORTED;
+}
+
+STATIC
+EFI_STATUS
+EFIAPI
+PvScsiGetNextTargetLun (
+  IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL                *This,
+  IN OUT UINT8                                      **Target,
+  IN OUT UINT64                                     *Lun
+  )
+{
+  return EFI_UNSUPPORTED;
+}
+
+STATIC
+EFI_STATUS
+EFIAPI
+PvScsiBuildDevicePath (
+  IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL                *This,
+  IN UINT8                                          *Target,
+  IN UINT64                                         Lun,
+  IN OUT EFI_DEVICE_PATH_PROTOCOL                   **DevicePath
+  )
+{
+  return EFI_UNSUPPORTED;
+}
+
+STATIC
+EFI_STATUS
+EFIAPI
+PvScsiGetTargetLun (
+  IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL                *This,
+  IN EFI_DEVICE_PATH_PROTOCOL                       *DevicePath,
+  OUT UINT8                                         **Target,
+  OUT UINT64                                        *Lun
+  )
+{
+  return EFI_UNSUPPORTED;
+}
+
+STATIC
+EFI_STATUS
+EFIAPI
+PvScsiResetChannel (
+  IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL                *This
+  )
+{
+  return EFI_UNSUPPORTED;
+}
+
+STATIC
+EFI_STATUS
+EFIAPI
+PvScsiResetTargetLun (
+  IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL                *This,
+  IN UINT8                                          *Target,
+  IN UINT64                                         Lun
+  )
+{
+  return EFI_UNSUPPORTED;
+}
+
+STATIC
+EFI_STATUS
+EFIAPI
+PvScsiGetNextTarget (
+  IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL                *This,
+  IN OUT UINT8                                      **Target
+  )
+{
+  return EFI_UNSUPPORTED;
+}
+
+STATIC
+EFI_STATUS
+PvScsiInit (
+  IN OUT PVSCSI_DEV *Dev
+  )
+{
+  //
+  // Populate the exported interface's attributes
+  //
+  Dev->PassThru.Mode             = &Dev->PassThruMode;
+  Dev->PassThru.PassThru         = &PvScsiPassThru;
+  Dev->PassThru.GetNextTargetLun = &PvScsiGetNextTargetLun;
+  Dev->PassThru.BuildDevicePath  = &PvScsiBuildDevicePath;
+  Dev->PassThru.GetTargetLun     = &PvScsiGetTargetLun;
+  Dev->PassThru.ResetChannel     = &PvScsiResetChannel;
+  Dev->PassThru.ResetTargetLun   = &PvScsiResetTargetLun;
+  Dev->PassThru.GetNextTarget    = &PvScsiGetNextTarget;
+
+  //
+  // AdapterId is a target for which no handle will be created during bus scan.
+  // Prevent any conflict with real devices.
+  //
+  Dev->PassThruMode.AdapterId = MAX_UINT32;
+
+  //
+  // Set both physical and logical attributes for non-RAID SCSI channel
+  //
+  Dev->PassThruMode.Attributes = EFI_EXT_SCSI_PASS_THRU_ATTRIBUTES_PHYSICAL |
+                                 EFI_EXT_SCSI_PASS_THRU_ATTRIBUTES_LOGICAL;
+
+  //
+  // No restriction on transfer buffer alignment
+  //
+  Dev->PassThruMode.IoAlign = 0;
+
+  return EFI_SUCCESS;
+}
+
+STATIC
+VOID
+PvScsiUninit (
+  IN OUT PVSCSI_DEV *Dev
+  )
+{
+  // Currently nothing to do here
+}
 
 //
 // Driver Binding
@@ -90,7 +229,42 @@ PvScsiDriverBindingStart (
   IN EFI_DEVICE_PATH_PROTOCOL    *RemainingDevicePath OPTIONAL
   )
 {
-  return EFI_UNSUPPORTED;
+  PVSCSI_DEV *Dev;
+  EFI_STATUS Status;
+
+  Dev = (PVSCSI_DEV *) AllocateZeroPool (sizeof (*Dev));
+  if (Dev == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  Status = PvScsiInit (Dev);
+  if (EFI_ERROR (Status)) {
+    goto FreePvScsi;
+  }
+
+  //
+  // Setup complete, attempt to export the driver instance's PassThru interface
+  //
+  Dev->Signature = PVSCSI_SIG;
+  Status = gBS->InstallProtocolInterface (
+                  &ControllerHandle,
+                  &gEfiExtScsiPassThruProtocolGuid,
+                  EFI_NATIVE_INTERFACE,
+                  &Dev->PassThru
+                  );
+  if (EFI_ERROR (Status)) {
+    goto UninitDev;
+  }
+
+  return EFI_SUCCESS;
+
+UninitDev:
+  PvScsiUninit (Dev);
+
+FreePvScsi:
+  FreePool (Dev);
+
+  return Status;
 }
 
 STATIC
@@ -103,7 +277,38 @@ PvScsiDriverBindingStop (
   IN EFI_HANDLE                  *ChildHandleBuffer
   )
 {
-  return EFI_UNSUPPORTED;
+  EFI_STATUS                      Status;
+  EFI_EXT_SCSI_PASS_THRU_PROTOCOL *PassThru;
+  PVSCSI_DEV                      *Dev;
+
+  Status = gBS->OpenProtocol (
+                  ControllerHandle,
+                  &gEfiExtScsiPassThruProtocolGuid,
+                  (VOID **)&PassThru,
+                  This->DriverBindingHandle,
+                  ControllerHandle,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL // Lookup only
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Dev = PVSCSI_FROM_PASS_THRU (PassThru);
+
+  Status = gBS->UninstallProtocolInterface (
+                  ControllerHandle,
+                  &gEfiExtScsiPassThruProtocolGuid,
+                  &Dev->PassThru
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  PvScsiUninit (Dev);
+
+  FreePool (Dev);
+
+  return EFI_SUCCESS;
 }
 
 STATIC EFI_DRIVER_BINDING_PROTOCOL mPvScsiDriverBinding = {
