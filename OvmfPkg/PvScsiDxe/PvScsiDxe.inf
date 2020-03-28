@@ -39,5 +39,6 @@
   gEfiPciIoProtocolGuid             ## TO_START
 
 [Pcd]
-  gUefiOvmfPkgTokenSpaceGuid.PcdPvScsiMaxLunLimit       ## CONSUMES
-  gUefiOvmfPkgTokenSpaceGuid.PcdPvScsiMaxTargetLimit    ## CONSUMES
+  gUefiOvmfPkgTokenSpaceGuid.PcdPvScsiMaxLunLimit               ## CONSUMES
+  gUefiOvmfPkgTokenSpaceGuid.PcdPvScsiMaxTargetLimit            ## CONSUMES
+  gUefiOvmfPkgTokenSpaceGuid.PcdPvScsiWaitForCmpStallInUsecs    ## CONSUMES

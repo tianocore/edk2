@@ -33,6 +33,27 @@
 //
 
 /**
+  Reads a 32-bit value into BAR0 using MMIO
+**/
+STATIC
+EFI_STATUS
+PvScsiMmioRead32 (
+  IN CONST PVSCSI_DEV   *Dev,
+  IN UINT64             Offset,
+  OUT UINT32            *Value
+  )
+{
+  return Dev->PciIo->Mem.Read (
+                           Dev->PciIo,
+                           EfiPciIoWidthUint32,
+                           PCI_BAR_IDX0,
+                           Offset,
+                           1,   // Count
+                           Value
+                           );
+}
+
+/**
   Writes a 32-bit value into BAR0 using MMIO
 **/
 STATIC
@@ -134,6 +155,383 @@ PvScsiResetAdapter (
 }
 
 /**
+  Returns if PVSCSI request ring is full
+**/
+STATIC
+BOOLEAN
+PvScsiIsReqRingFull (
+  IN CONST PVSCSI_DEV   *Dev
+  )
+{
+  PVSCSI_RINGS_STATE *RingsState;
+  UINT32             ReqNumEntries;
+
+  RingsState = Dev->RingDesc.RingState;
+  ReqNumEntries = 1U << RingsState->ReqNumEntriesLog2;
+  return (RingsState->ReqProdIdx - RingsState->CmpConsIdx) >= ReqNumEntries;
+}
+
+/**
+  Returns pointer to current request descriptor to produce
+**/
+STATIC
+PVSCSI_RING_REQ_DESC *
+PvScsiGetCurrentRequest (
+  IN CONST PVSCSI_DEV   *Dev
+  )
+{
+  PVSCSI_RINGS_STATE *RingState;
+  UINT32             ReqNumEntries;
+
+  RingState = Dev->RingDesc.RingState;
+  ReqNumEntries = 1U << RingState->ReqNumEntriesLog2;
+  return Dev->RingDesc.RingReqs +
+         (RingState->ReqProdIdx & (ReqNumEntries - 1));
+}
+
+/**
+  Returns pointer to current completion descriptor to consume
+**/
+STATIC
+PVSCSI_RING_CMP_DESC *
+PvScsiGetCurrentResponse (
+  IN CONST PVSCSI_DEV   *Dev
+  )
+{
+  PVSCSI_RINGS_STATE *RingState;
+  UINT32             CmpNumEntries;
+
+  RingState = Dev->RingDesc.RingState;
+  CmpNumEntries = 1U << RingState->CmpNumEntriesLog2;
+  return Dev->RingDesc.RingCmps +
+         (RingState->CmpConsIdx & (CmpNumEntries - 1));
+}
+
+/**
+  Wait for device to signal completion of submitted requests
+**/
+STATIC
+EFI_STATUS
+PvScsiWaitForRequestCompletion (
+  IN CONST PVSCSI_DEV   *Dev
+  )
+{
+  EFI_STATUS Status;
+  UINT32     IntrStatus;
+
+  //
+  // Note: We don't yet support Timeout according to
+  // EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET.Timeout.
+  //
+  // This is consistent with some other Scsi PassThru drivers
+  // such as VirtioScsi.
+  //
+  for (;;) {
+    Status = PvScsiMmioRead32 (Dev, PvScsiRegOffsetIntrStatus, &IntrStatus);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    //
+    // PVSCSI_INTR_CMPL_MASK is set if device completed submitted requests
+    //
+    if ((IntrStatus & PVSCSI_INTR_CMPL_MASK) != 0) {
+      break;
+    }
+
+    gBS->Stall (Dev->WaitForCmpStallInUsecs);
+  }
+
+  //
+  // Acknowledge PVSCSI_INTR_CMPL_MASK in device interrupt-status register
+  //
+  return PvScsiMmioWrite32 (
+           Dev,
+           PvScsiRegOffsetIntrStatus,
+           PVSCSI_INTR_CMPL_MASK
+           );
+}
+
+/**
+  Create a fake host adapter error
+**/
+STATIC
+EFI_STATUS
+ReportHostAdapterError (
+  OUT EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET *Packet
+  )
+{
+  Packet->InTransferLength = 0;
+  Packet->OutTransferLength = 0;
+  Packet->SenseDataLength = 0;
+  Packet->HostAdapterStatus = EFI_EXT_SCSI_STATUS_HOST_ADAPTER_OTHER;
+  Packet->TargetStatus = EFI_EXT_SCSI_STATUS_TARGET_GOOD;
+  return EFI_DEVICE_ERROR;
+}
+
+/**
+  Create a fake host adapter overrun error
+**/
+STATIC
+EFI_STATUS
+ReportHostAdapterOverrunError (
+  OUT EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET *Packet
+  )
+{
+  Packet->SenseDataLength = 0;
+  Packet->HostAdapterStatus =
+            EFI_EXT_SCSI_STATUS_HOST_ADAPTER_DATA_OVERRUN_UNDERRUN;
+  Packet->TargetStatus = EFI_EXT_SCSI_STATUS_TARGET_GOOD;
+  return EFI_BAD_BUFFER_SIZE;
+}
+
+/**
+  Populate a PVSCSI request descriptor from the Extended SCSI Pass Thru
+  Protocol packet.
+**/
+STATIC
+EFI_STATUS
+PopulateRequest (
+  IN CONST PVSCSI_DEV                               *Dev,
+  IN UINT8                                          *Target,
+  IN UINT64                                         Lun,
+  IN OUT EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET *Packet,
+  OUT PVSCSI_RING_REQ_DESC                          *Request
+  )
+{
+  UINT8 TargetValue;
+
+  //
+  // We only use first byte of target identifer
+  //
+  TargetValue = *Target;
+
+  //
+  // Check for unsupported requests
+  //
+  if (
+      //
+      // Bidirectional transfer was requested
+      //
+      (Packet->InTransferLength > 0 && Packet->OutTransferLength > 0) ||
+      (Packet->DataDirection == EFI_EXT_SCSI_DATA_DIRECTION_BIDIRECTIONAL) ||
+      //
+      // Command Descriptor Block bigger than this constant should be considered
+      // out-of-band. We currently don't support these CDBs.
+      //
+      (Packet->CdbLength > PVSCSI_CDB_MAX_SIZE)
+      ) {
+
+    //
+    // This error code doesn't require updates to the Packet output fields
+    //
+    return EFI_UNSUPPORTED;
+  }
+
+  //
+  // Check for invalid parameters
+  //
+  if (
+      //
+      // Addressed invalid device
+      //
+      (TargetValue > Dev->MaxTarget) || (Lun > Dev->MaxLun) ||
+      //
+      // Invalid direction (there doesn't seem to be a macro for the "no data
+      // transferred" "direction", eg. for TEST UNIT READY)
+      //
+      (Packet->DataDirection > EFI_EXT_SCSI_DATA_DIRECTION_BIDIRECTIONAL) ||
+      //
+      // Trying to receive, but destination pointer is NULL, or contradicting
+      // transfer direction
+      //
+      ((Packet->InTransferLength > 0) &&
+       ((Packet->InDataBuffer == NULL) ||
+        (Packet->DataDirection == EFI_EXT_SCSI_DATA_DIRECTION_WRITE)
+        )
+       ) ||
+      //
+      // Trying to send, but source pointer is NULL, or contradicting
+      // transfer direction
+      //
+      ((Packet->OutTransferLength > 0) &&
+       ((Packet->OutDataBuffer == NULL) ||
+        (Packet->DataDirection == EFI_EXT_SCSI_DATA_DIRECTION_READ)
+        )
+       )
+      ) {
+
+    //
+    // This error code doesn't require updates to the Packet output fields
+    //
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Check for input/output buffer too large for DMA communication buffer
+  //
+  if (Packet->InTransferLength > sizeof (Dev->DmaBuf->Data)) {
+    Packet->InTransferLength = sizeof (Dev->DmaBuf->Data);
+    return ReportHostAdapterOverrunError (Packet);
+  }
+  if (Packet->OutTransferLength > sizeof (Dev->DmaBuf->Data)) {
+    Packet->OutTransferLength = sizeof (Dev->DmaBuf->Data);
+    return ReportHostAdapterOverrunError (Packet);
+  }
+
+  //
+  // Encode PVSCSI request
+  //
+  ZeroMem (Request, sizeof (*Request));
+
+  Request->Bus = 0;
+  Request->Target = TargetValue;
+  //
+  // This cast is safe as PVSCSI_DEV.MaxLun is defined as UINT8
+  //
+  Request->Lun[1] = (UINT8)Lun;
+  Request->SenseLen = Packet->SenseDataLength;
+  //
+  // DMA communication buffer SenseData overflow is not possible
+  // due to Packet->SenseDataLength defined as UINT8
+  //
+  Request->SenseAddr = PVSCSI_DMA_BUF_DEV_ADDR (Dev, SenseData);
+  Request->CdbLen = Packet->CdbLength;
+  CopyMem (Request->Cdb, Packet->Cdb, Packet->CdbLength);
+  Request->VcpuHint = 0;
+  Request->Tag = PVSCSI_SIMPLE_QUEUE_TAG;
+  if (Packet->DataDirection == EFI_EXT_SCSI_DATA_DIRECTION_READ) {
+    Request->Flags = PVSCSI_FLAG_CMD_DIR_TOHOST;
+    Request->DataLen = Packet->InTransferLength;
+  } else {
+    Request->Flags = PVSCSI_FLAG_CMD_DIR_TODEVICE;
+    Request->DataLen = Packet->OutTransferLength;
+    CopyMem (
+      Dev->DmaBuf->Data,
+      Packet->OutDataBuffer,
+      Packet->OutTransferLength
+      );
+  }
+  Request->DataAddr = PVSCSI_DMA_BUF_DEV_ADDR (Dev, Data);
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Handle the PVSCSI device response:
+  - Copy returned data from DMA communication buffer.
+  - Update fields in Extended SCSI Pass Thru Protocol packet as required.
+  - Translate response code to EFI status code and host adapter status.
+**/
+STATIC
+EFI_STATUS
+HandleResponse (
+  IN PVSCSI_DEV                                     *Dev,
+  IN OUT EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET *Packet,
+  IN CONST PVSCSI_RING_CMP_DESC                     *Response
+  )
+{
+  //
+  // Fix SenseDataLength to amount of data returned
+  //
+  if (Packet->SenseDataLength > Response->SenseLen) {
+    Packet->SenseDataLength = (UINT8)Response->SenseLen;
+  }
+  //
+  // Copy sense data from DMA communication buffer
+  //
+  CopyMem (
+    Packet->SenseData,
+    Dev->DmaBuf->SenseData,
+    Packet->SenseDataLength
+    );
+
+  //
+  // Copy device output from DMA communication buffer
+  //
+  if (Packet->DataDirection == EFI_EXT_SCSI_DATA_DIRECTION_READ) {
+    CopyMem (Packet->InDataBuffer, Dev->DmaBuf->Data, Packet->InTransferLength);
+  }
+
+  //
+  // Report target status
+  //
+  Packet->TargetStatus = Response->ScsiStatus;
+
+  //
+  // Host adapter status and function return value depend on
+  // device response's host status
+  //
+  switch (Response->HostStatus) {
+    case PvScsiBtStatSuccess:
+    case PvScsiBtStatLinkedCommandCompleted:
+    case PvScsiBtStatLinkedCommandCompletedWithFlag:
+      Packet->HostAdapterStatus = EFI_EXT_SCSI_STATUS_HOST_ADAPTER_OK;
+      return EFI_SUCCESS;
+
+    case PvScsiBtStatDataUnderrun:
+      //
+      // Report transferred amount in underrun
+      //
+      if (Packet->DataDirection == EFI_EXT_SCSI_DATA_DIRECTION_READ) {
+        Packet->InTransferLength = (UINT32)Response->DataLen;
+      } else {
+        Packet->OutTransferLength = (UINT32)Response->DataLen;
+      }
+      Packet->HostAdapterStatus =
+                EFI_EXT_SCSI_STATUS_HOST_ADAPTER_DATA_OVERRUN_UNDERRUN;
+      return EFI_SUCCESS;
+
+    case PvScsiBtStatDatarun:
+      Packet->HostAdapterStatus =
+                EFI_EXT_SCSI_STATUS_HOST_ADAPTER_DATA_OVERRUN_UNDERRUN;
+      return EFI_SUCCESS;
+
+    case PvScsiBtStatSelTimeout:
+      Packet->HostAdapterStatus =
+                EFI_EXT_SCSI_STATUS_HOST_ADAPTER_SELECTION_TIMEOUT;
+      return EFI_TIMEOUT;
+
+    case PvScsiBtStatBusFree:
+      Packet->HostAdapterStatus = EFI_EXT_SCSI_STATUS_HOST_ADAPTER_BUS_FREE;
+      break;
+
+    case PvScsiBtStatInvPhase:
+      Packet->HostAdapterStatus = EFI_EXT_SCSI_STATUS_HOST_ADAPTER_PHASE_ERROR;
+      break;
+
+    case PvScsiBtStatSensFailed:
+      Packet->HostAdapterStatus =
+                EFI_EXT_SCSI_STATUS_HOST_ADAPTER_REQUEST_SENSE_FAILED;
+      break;
+
+    case PvScsiBtStatTagReject:
+    case PvScsiBtStatBadMsg:
+      Packet->HostAdapterStatus =
+          EFI_EXT_SCSI_STATUS_HOST_ADAPTER_MESSAGE_REJECT;
+      break;
+
+    case PvScsiBtStatBusReset:
+      Packet->HostAdapterStatus = EFI_EXT_SCSI_STATUS_HOST_ADAPTER_BUS_RESET;
+      break;
+
+    case PvScsiBtStatHaTimeout:
+      Packet->HostAdapterStatus = EFI_EXT_SCSI_STATUS_HOST_ADAPTER_TIMEOUT;
+      return EFI_TIMEOUT;
+
+    case PvScsiBtStatScsiParity:
+      Packet->HostAdapterStatus = EFI_EXT_SCSI_STATUS_HOST_ADAPTER_PARITY_ERROR;
+      break;
+
+    default:
+      Packet->HostAdapterStatus = EFI_EXT_SCSI_STATUS_HOST_ADAPTER_OTHER;
+      break;
+  }
+
+  return EFI_DEVICE_ERROR;
+}
+
+/**
   Check if Target argument to EXT_SCSI_PASS_THRU.GetNextTarget() and
   EXT_SCSI_PASS_THRU.GetNextTargetLun() is initialized
 **/
@@ -168,7 +566,62 @@ PvScsiPassThru (
   IN EFI_EVENT                                      Event    OPTIONAL
   )
 {
-  return EFI_UNSUPPORTED;
+  PVSCSI_DEV            *Dev;
+  EFI_STATUS            Status;
+  PVSCSI_RING_REQ_DESC *Request;
+  PVSCSI_RING_CMP_DESC *Response;
+
+  Dev = PVSCSI_FROM_PASS_THRU (This);
+
+  if (PvScsiIsReqRingFull (Dev)) {
+    return EFI_NOT_READY;
+  }
+
+  Request = PvScsiGetCurrentRequest (Dev);
+
+  Status = PopulateRequest (Dev, Target, Lun, Packet, Request);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Writes to Request must be globally visible before making request
+  // available to device
+  //
+  MemoryFence ();
+  Dev->RingDesc.RingState->ReqProdIdx++;
+
+  Status = PvScsiMmioWrite32 (Dev, PvScsiRegOffsetKickRwIo, 0);
+  if (EFI_ERROR (Status)) {
+    //
+    // If kicking the host fails, we must fake a host adapter error.
+    // EFI_NOT_READY would save us the effort, but it would also suggest that
+    // the caller retry.
+    //
+    return ReportHostAdapterError (Packet);
+  }
+
+  Status = PvScsiWaitForRequestCompletion (Dev);
+  if (EFI_ERROR (Status)) {
+    //
+    // If waiting for request completion fails, we must fake a host adapter
+    // error. EFI_NOT_READY would save us the effort, but it would also suggest
+    // that the caller retry.
+    //
+    return ReportHostAdapterError (Packet);
+  }
+
+  Response = PvScsiGetCurrentResponse (Dev);
+  Status = HandleResponse (Dev, Packet, Response);
+
+  //
+  // Reads from response must complete before releasing completion entry
+  // to device
+  //
+  MemoryFence ();
+  Dev->RingDesc.RingState->CmpConsIdx++;
+
+  return Status;
 }
 
 STATIC
@@ -652,6 +1105,7 @@ PvScsiInit (
   //
   Dev->MaxTarget = PcdGet8 (PcdPvScsiMaxTargetLimit);
   Dev->MaxLun = PcdGet8 (PcdPvScsiMaxLunLimit);
+  Dev->WaitForCmpStallInUsecs = PcdGet32 (PcdPvScsiWaitForCmpStallInUsecs);
 
   //
   // Set PCI Attributes
