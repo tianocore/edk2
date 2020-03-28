@@ -9,7 +9,11 @@
 
 **/
 
+#include <IndustryStandard/Pci.h>
+#include <IndustryStandard/PvScsi.h>
+#include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>
+#include <Protocol/PciIo.h>
 #include <Uefi/UefiSpec.h>
 
 //
@@ -31,7 +35,50 @@ PvScsiDriverBindingSupported (
   IN EFI_DEVICE_PATH_PROTOCOL    *RemainingDevicePath OPTIONAL
   )
 {
-  return EFI_UNSUPPORTED;
+  EFI_STATUS          Status;
+  EFI_PCI_IO_PROTOCOL *PciIo;
+  PCI_TYPE00          Pci;
+
+  Status = gBS->OpenProtocol (
+                  ControllerHandle,
+                  &gEfiPciIoProtocolGuid,
+                  (VOID **)&PciIo,
+                  This->DriverBindingHandle,
+                  ControllerHandle,
+                  EFI_OPEN_PROTOCOL_BY_DRIVER
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = PciIo->Pci.Read (
+                        PciIo,
+                        EfiPciIoWidthUint32,
+                        0,
+                        sizeof (Pci) / sizeof (UINT32),
+                        &Pci
+                        );
+  if (EFI_ERROR (Status)) {
+    goto Done;
+  }
+
+  if ((Pci.Hdr.VendorId != PCI_VENDOR_ID_VMWARE) ||
+      (Pci.Hdr.DeviceId != PCI_DEVICE_ID_VMWARE_PVSCSI)) {
+    Status = EFI_UNSUPPORTED;
+    goto Done;
+  }
+
+  Status = EFI_SUCCESS;
+
+Done:
+  gBS->CloseProtocol (
+         ControllerHandle,
+         &gEfiPciIoProtocolGuid,
+         This->DriverBindingHandle,
+         ControllerHandle
+         );
+
+  return Status;
 }
 
 STATIC
