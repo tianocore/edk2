@@ -874,6 +874,29 @@ PvScsiSetPciAttributes (
     return Status;
   }
 
+  //
+  // Signal device supports 64-bit DMA addresses
+  //
+  Status = Dev->PciIo->Attributes (
+                         Dev->PciIo,
+                         EfiPciIoAttributeOperationEnable,
+                         EFI_PCI_IO_ATTRIBUTE_DUAL_ADDRESS_CYCLE,
+                         NULL
+                         );
+  if (EFI_ERROR (Status)) {
+    //
+    // Warn user that device will only be using 32-bit DMA addresses.
+    //
+    // Note that this does not prevent the device/driver from working
+    // and therefore we only warn and continue as usual.
+    //
+    DEBUG ((
+      DEBUG_WARN,
+      "%a: failed to enable 64-bit DMA addresses\n",
+      __FUNCTION__
+      ));
+  }
+
   return EFI_SUCCESS;
 }
 
