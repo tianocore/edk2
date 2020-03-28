@@ -230,6 +230,9 @@ INF  OvmfPkg/VirtioRngDxe/VirtioRng.inf
 INF  OvmfPkg/XenIoPciDxe/XenIoPciDxe.inf
 INF  OvmfPkg/XenBusDxe/XenBusDxe.inf
 INF  OvmfPkg/XenPvBlkDxe/XenPvBlkDxe.inf
+!if $(PVSCSI_ENABLE) == TRUE
+INF  OvmfPkg/PvScsiDxe/PvScsiDxe.inf
+!endif
 
 !if $(SECURE_BOOT_ENABLE) == TRUE
   INF  SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
