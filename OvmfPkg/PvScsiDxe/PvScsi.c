@@ -285,15 +285,67 @@ PvScsiGetNextTarget (
 
 STATIC
 EFI_STATUS
+PvScsiSetPciAttributes (
+  IN OUT PVSCSI_DEV *Dev
+  )
+{
+  EFI_STATUS Status;
+
+  //
+  // Backup original PCI Attributes
+  //
+  Status = Dev->PciIo->Attributes (
+                         Dev->PciIo,
+                         EfiPciIoAttributeOperationGet,
+                         0,
+                         &Dev->OriginalPciAttributes
+                         );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // TODO: Change PCI Attributes
+  //
+
+  return EFI_SUCCESS;
+}
+
+STATIC
+VOID
+PvScsiRestorePciAttributes (
+  IN PVSCSI_DEV *Dev
+  )
+{
+  Dev->PciIo->Attributes (
+                Dev->PciIo,
+                EfiPciIoAttributeOperationSet,
+                Dev->OriginalPciAttributes,
+                NULL
+                );
+}
+
+STATIC
+EFI_STATUS
 PvScsiInit (
   IN OUT PVSCSI_DEV *Dev
   )
 {
+  EFI_STATUS Status;
+
   //
   // Init configuration
   //
   Dev->MaxTarget = PcdGet8 (PcdPvScsiMaxTargetLimit);
   Dev->MaxLun = PcdGet8 (PcdPvScsiMaxLunLimit);
+
+  //
+  // Set PCI Attributes
+  //
+  Status = PvScsiSetPciAttributes (Dev);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   //
   // Populate the exported interface's attributes
@@ -333,7 +385,7 @@ PvScsiUninit (
   IN OUT PVSCSI_DEV *Dev
   )
 {
-  // Currently nothing to do here
+  PvScsiRestorePciAttributes (Dev);
 }
 
 //
