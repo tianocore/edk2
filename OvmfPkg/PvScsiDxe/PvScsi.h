@@ -51,6 +51,7 @@ typedef struct {
 typedef struct {
   UINT32                          Signature;
   EFI_PCI_IO_PROTOCOL             *PciIo;
+  EFI_EVENT                       ExitBoot;
   UINT64                          OriginalPciAttributes;
   PVSCSI_RING_DESC                RingDesc;
   PVSCSI_DMA_BUFFER               *DmaBuf;
