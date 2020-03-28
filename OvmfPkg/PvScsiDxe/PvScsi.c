@@ -11,6 +11,7 @@
 
 #include <IndustryStandard/Pci.h>
 #include <IndustryStandard/PvScsi.h>
+#include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>
@@ -24,6 +25,30 @@
 // range for IHV (Indie Hardware Vendors)
 //
 #define PVSCSI_BINDING_VERSION      0x10
+
+//
+// Ext SCSI Pass Thru utilities
+//
+
+/**
+  Check if Target argument to EXT_SCSI_PASS_THRU.GetNextTarget() and
+  EXT_SCSI_PASS_THRU.GetNextTargetLun() is initialized
+**/
+STATIC
+BOOLEAN
+IsTargetInitialized (
+  IN UINT8                                          *Target
+  )
+{
+  UINTN Idx;
+
+  for (Idx = 0; Idx < TARGET_MAX_BYTES; ++Idx) {
+    if (Target[Idx] != 0xFF) {
+      return TRUE;
+    }
+  }
+  return FALSE;
+}
 
 //
 // Ext SCSI Pass Thru
@@ -52,7 +77,54 @@ PvScsiGetNextTargetLun (
   IN OUT UINT64                                     *Lun
   )
 {
-  return EFI_UNSUPPORTED;
+  UINT8      *TargetPtr;
+  UINT8      LastTarget;
+  PVSCSI_DEV *Dev;
+
+  if (Target == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // The Target input parameter is unnecessarily a pointer-to-pointer
+  //
+  TargetPtr = *Target;
+
+  //
+  // If target not initialized, return first target & LUN
+  //
+  if (!IsTargetInitialized (TargetPtr)) {
+    ZeroMem (TargetPtr, TARGET_MAX_BYTES);
+    *Lun = 0;
+    return EFI_SUCCESS;
+  }
+
+  //
+  // We only use first byte of target identifer
+  //
+  LastTarget = *TargetPtr;
+
+  //
+  // Increment (target, LUN) pair if valid on input
+  //
+  Dev = PVSCSI_FROM_PASS_THRU (This);
+  if (LastTarget > Dev->MaxTarget || *Lun > Dev->MaxLun) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (*Lun < Dev->MaxLun) {
+    ++*Lun;
+    return EFI_SUCCESS;
+  }
+
+  if (LastTarget < Dev->MaxTarget) {
+    *Lun = 0;
+    ++LastTarget;
+    *TargetPtr = LastTarget;
+    return EFI_SUCCESS;
+  }
+
+  return EFI_NOT_FOUND;
 }
 
 STATIC
@@ -111,7 +183,47 @@ PvScsiGetNextTarget (
   IN OUT UINT8                                      **Target
   )
 {
-  return EFI_UNSUPPORTED;
+  UINT8      *TargetPtr;
+  UINT8      LastTarget;
+  PVSCSI_DEV *Dev;
+
+  if (Target == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // The Target input parameter is unnecessarily a pointer-to-pointer
+  //
+  TargetPtr = *Target;
+
+  //
+  // If target not initialized, return first target
+  //
+  if (!IsTargetInitialized (TargetPtr)) {
+    ZeroMem (TargetPtr, TARGET_MAX_BYTES);
+    return EFI_SUCCESS;
+  }
+
+  //
+  // We only use first byte of target identifer
+  //
+  LastTarget = *TargetPtr;
+
+  //
+  // Increment target if valid on input
+  //
+  Dev = PVSCSI_FROM_PASS_THRU (This);
+  if (LastTarget > Dev->MaxTarget) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (LastTarget < Dev->MaxTarget) {
+    ++LastTarget;
+    *TargetPtr = LastTarget;
+    return EFI_SUCCESS;
+  }
+
+  return EFI_NOT_FOUND;
 }
 
 STATIC
@@ -120,6 +232,12 @@ PvScsiInit (
   IN OUT PVSCSI_DEV *Dev
   )
 {
+  //
+  // Init configuration
+  //
+  Dev->MaxTarget = PcdGet8 (PcdPvScsiMaxTargetLimit);
+  Dev->MaxLun = PcdGet8 (PcdPvScsiMaxLunLimit);
+
   //
   // Populate the exported interface's attributes
   //
