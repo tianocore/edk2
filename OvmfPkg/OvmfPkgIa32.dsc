@@ -46,6 +46,11 @@
 !include NetworkPkg/NetworkDefines.dsc.inc
 
   #
+  # Device drivers
+  #
+  DEFINE PVSCSI_ENABLE           = TRUE
+
+  #
   # Flash size selection. Setting FD_SIZE_IN_KB on the command line directly to
   # one of the supported values, in place of any of the convenience macros, is
   # permitted.
@@ -736,6 +741,9 @@
   OvmfPkg/XenIoPciDxe/XenIoPciDxe.inf
   OvmfPkg/XenBusDxe/XenBusDxe.inf
   OvmfPkg/XenPvBlkDxe/XenPvBlkDxe.inf
+!if $(PVSCSI_ENABLE) == TRUE
+  OvmfPkg/PvScsiDxe/PvScsiDxe.inf
+!endif
   MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
   MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
   MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
