@@ -31,6 +31,107 @@
 //
 
 /**
+  Writes a 32-bit value into BAR0 using MMIO
+**/
+STATIC
+EFI_STATUS
+PvScsiMmioWrite32 (
+  IN CONST PVSCSI_DEV   *Dev,
+  IN UINT64             Offset,
+  IN UINT32             Value
+  )
+{
+  return Dev->PciIo->Mem.Write (
+                           Dev->PciIo,
+                           EfiPciIoWidthUint32,
+                           PCI_BAR_IDX0,
+                           Offset,
+                           1,   // Count
+                           &Value
+                           );
+}
+
+/**
+  Writes multiple words of data into BAR0 using MMIO
+**/
+STATIC
+EFI_STATUS
+PvScsiMmioWrite32Multiple (
+  IN CONST PVSCSI_DEV   *Dev,
+  IN UINT64             Offset,
+  IN UINTN              Count,
+  IN UINT32             *Words
+  )
+{
+  return Dev->PciIo->Mem.Write (
+                           Dev->PciIo,
+                           EfiPciIoWidthFifoUint32,
+                           PCI_BAR_IDX0,
+                           Offset,
+                           Count,
+                           Words
+                           );
+}
+
+/**
+  Send a PVSCSI command to device.
+
+  @param[in] Dev                    The pvscsi host device.
+  @param[in] Cmd                    The command to send to device.
+  @param[in] OPTIONAL DescWords     An optional command descriptor (If command
+                                    have a descriptor). The descriptor is
+                                    provided as an array of UINT32 words and
+                                    is must be 32-bit aligned.
+  @param[in] DescWordsCount         The number of words in command descriptor.
+                                    Caller must specify here 0 if DescWords
+                                    is not supplied (It is optional). In that
+                                    case, DescWords is ignored.
+
+  @return   Status codes returned by Dev->PciIo->Mem.Write().
+
+**/
+STATIC
+EFI_STATUS
+PvScsiWriteCmdDesc (
+  IN CONST PVSCSI_DEV   *Dev,
+  IN UINT32             Cmd,
+  IN UINT32             *DescWords      OPTIONAL,
+  IN UINTN              DescWordsCount
+  )
+{
+  EFI_STATUS Status;
+
+  if (DescWordsCount > PVSCSI_MAX_CMD_DATA_WORDS) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = PvScsiMmioWrite32 (Dev, PvScsiRegOffsetCommand, Cmd);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  if (DescWordsCount > 0) {
+    return PvScsiMmioWrite32Multiple (
+             Dev,
+             PvScsiRegOffsetCommandData,
+             DescWordsCount,
+             DescWords
+             );
+  }
+
+  return EFI_SUCCESS;
+}
+
+STATIC
+EFI_STATUS
+PvScsiResetAdapter (
+  IN CONST PVSCSI_DEV   *Dev
+  )
+{
+  return PvScsiWriteCmdDesc (Dev, PvScsiCmdAdapterReset, NULL, 0);
+}
+
+/**
   Check if Target argument to EXT_SCSI_PASS_THRU.GetNextTarget() and
   EXT_SCSI_PASS_THRU.GetNextTargetLun() is initialized
 **/
@@ -358,6 +459,14 @@ PvScsiInit (
   }
 
   //
+  // Reset adapter
+  //
+  Status = PvScsiResetAdapter (Dev);
+  if (EFI_ERROR (Status)) {
+    goto RestorePciAttributes;
+  }
+
+  //
   // Populate the exported interface's attributes
   //
   Dev->PassThru.Mode             = &Dev->PassThruMode;
@@ -387,6 +496,11 @@ PvScsiInit (
   Dev->PassThruMode.IoAlign = 0;
 
   return EFI_SUCCESS;
+
+RestorePciAttributes:
+  PvScsiRestorePciAttributes (Dev);
+
+  return Status;
 }
 
 STATIC
