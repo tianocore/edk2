@@ -305,8 +305,18 @@ PvScsiSetPciAttributes (
   }
 
   //
-  // TODO: Change PCI Attributes
+  // Enable MMIO-Space & Bus-Mastering
   //
+  Status = Dev->PciIo->Attributes (
+                         Dev->PciIo,
+                         EfiPciIoAttributeOperationEnable,
+                         (EFI_PCI_IO_ATTRIBUTE_MEMORY |
+                          EFI_PCI_IO_ATTRIBUTE_BUS_MASTER),
+                         NULL
+                         );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   return EFI_SUCCESS;
 }
