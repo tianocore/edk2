@@ -678,6 +678,19 @@ PvScsiInit (
   }
 
   //
+  // Allocate DMA communication buffer
+  //
+  Status = PvScsiAllocateSharedPages (
+             Dev,
+             EFI_SIZE_TO_PAGES (sizeof (*Dev->DmaBuf)),
+             (VOID **)&Dev->DmaBuf,
+             &Dev->DmaBufDmaDesc
+             );
+  if (EFI_ERROR (Status)) {
+    goto FreeRings;
+  }
+
+  //
   // Populate the exported interface's attributes
   //
   Dev->PassThru.Mode             = &Dev->PassThruMode;
@@ -708,6 +721,15 @@ PvScsiInit (
 
   return EFI_SUCCESS;
 
+FreeRings:
+  //
+  // Reset device to stop device usage of the rings.
+  // This is required to safely free the rings.
+  //
+  PvScsiResetAdapter (Dev);
+
+  PvScsiFreeRings (Dev);
+
 RestorePciAttributes:
   PvScsiRestorePciAttributes (Dev);
 
@@ -721,10 +743,24 @@ PvScsiUninit (
   )
 {
   //
-  // Reset device to stop device usage of the rings.
-  // This is required to safely free the rings.
+  // Reset device to:
+  // - Make device stop processing all requests.
+  // - Stop device usage of the rings.
+  //
+  // This is required to safely free the DMA communication buffer
+  // and the rings.
   //
   PvScsiResetAdapter (Dev);
+
+  //
+  // Free DMA communication buffer
+  //
+  PvScsiFreeSharedPages (
+    Dev,
+    EFI_SIZE_TO_PAGES (sizeof (*Dev->DmaBuf)),
+    Dev->DmaBuf,
+    &Dev->DmaBufDmaDesc
+    );
 
   PvScsiFreeRings (Dev);
 

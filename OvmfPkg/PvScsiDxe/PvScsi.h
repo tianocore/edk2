@@ -31,6 +31,21 @@ typedef struct {
   PVSCSI_DMA_DESC      RingCmpsDmaDesc;
 } PVSCSI_RING_DESC;
 
+typedef struct {
+  //
+  // As EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET.SenseDataLength is defined
+  // as UINT8, defining here SenseData size to MAX_UINT8 will guarantee it
+  // cannot overflow when passed to device.
+  //
+  UINT8     SenseData[MAX_UINT8];
+  //
+  // This size of the data is arbitrarily chosen.
+  // It seems to be sufficient for all I/O requests sent through
+  // EFI_SCSI_PASS_THRU_PROTOCOL.PassThru() for common boot scenarios.
+  //
+  UINT8     Data[0x2000];
+} PVSCSI_DMA_BUFFER;
+
 #define PVSCSI_SIG SIGNATURE_32 ('P', 'S', 'C', 'S')
 
 typedef struct {
@@ -38,6 +53,8 @@ typedef struct {
   EFI_PCI_IO_PROTOCOL             *PciIo;
   UINT64                          OriginalPciAttributes;
   PVSCSI_RING_DESC                RingDesc;
+  PVSCSI_DMA_BUFFER               *DmaBuf;
+  PVSCSI_DMA_DESC                 DmaBufDmaDesc;
   UINT8                           MaxTarget;
   UINT8                           MaxLun;
   EFI_EXT_SCSI_PASS_THRU_PROTOCOL PassThru;
@@ -46,5 +63,8 @@ typedef struct {
 
 #define PVSCSI_FROM_PASS_THRU(PassThruPointer) \
   CR (PassThruPointer, PVSCSI_DEV, PassThru, PVSCSI_SIG)
+
+#define PVSCSI_DMA_BUF_DEV_ADDR(Dev, MemberName) \
+  (Dev->DmaBufDmaDesc.DeviceAddress + OFFSET_OF(PVSCSI_DMA_BUFFER, MemberName))
 
 #endif // __PVSCSI_DXE_H_
