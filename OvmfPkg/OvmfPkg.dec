@@ -143,6 +143,12 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdPvScsiMaxTargetLimit|64|UINT8|0x36
   gUefiOvmfPkgTokenSpaceGuid.PcdPvScsiMaxLunLimit|0|UINT8|0x37
 
+  ## After PvScsiDxe sends a SCSI request to the device, it waits for
+  #  the request completion in a polling loop.
+  #  This constant defines how many micro-seconds to wait between each
+  #  polling loop iteration.
+  gUefiOvmfPkgTokenSpaceGuid.PcdPvScsiWaitForCmpStallInUsecs|5|UINT32|0x38
+
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashNvStorageEventLogBase|0x0|UINT32|0x8
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashNvStorageEventLogSize|0x0|UINT32|0x9
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFirmwareFdSize|0x0|UINT32|0xa

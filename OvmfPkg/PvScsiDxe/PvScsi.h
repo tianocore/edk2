@@ -57,6 +57,7 @@ typedef struct {
   PVSCSI_DMA_DESC                 DmaBufDmaDesc;
   UINT8                           MaxTarget;
   UINT8                           MaxLun;
+  UINTN                           WaitForCmpStallInUsecs;
   EFI_EXT_SCSI_PASS_THRU_PROTOCOL PassThru;
   EFI_EXT_SCSI_PASS_THRU_MODE     PassThruMode;
 } PVSCSI_DEV;
