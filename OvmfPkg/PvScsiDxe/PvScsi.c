@@ -412,9 +412,21 @@ PvScsiDriverBindingStart (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  Status = PvScsiInit (Dev);
+  Status = gBS->OpenProtocol (
+                  ControllerHandle,
+                  &gEfiPciIoProtocolGuid,
+                  (VOID **)&Dev->PciIo,
+                  This->DriverBindingHandle,
+                  ControllerHandle,
+                  EFI_OPEN_PROTOCOL_BY_DRIVER
+                  );
   if (EFI_ERROR (Status)) {
     goto FreePvScsi;
+  }
+
+  Status = PvScsiInit (Dev);
+  if (EFI_ERROR (Status)) {
+    goto ClosePciIo;
   }
 
   //
@@ -435,6 +447,14 @@ PvScsiDriverBindingStart (
 
 UninitDev:
   PvScsiUninit (Dev);
+
+ClosePciIo:
+  gBS->CloseProtocol (
+         ControllerHandle,
+         &gEfiPciIoProtocolGuid,
+         This->DriverBindingHandle,
+         ControllerHandle
+         );
 
 FreePvScsi:
   FreePool (Dev);
@@ -480,6 +500,13 @@ PvScsiDriverBindingStop (
   }
 
   PvScsiUninit (Dev);
+
+  gBS->CloseProtocol (
+         ControllerHandle,
+         &gEfiPciIoProtocolGuid,
+         This->DriverBindingHandle,
+         ControllerHandle
+         );
 
   FreePool (Dev);
 
