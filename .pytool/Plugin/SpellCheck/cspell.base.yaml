@@ -161,5 +161,6 @@
         "bootability",
         "Sdhci",
         "inmodule",
+        "RISCV",
     ]
 }
