@@ -1,0 +1,160 @@
+## @file
+# Azure Pipeline build file for building a platform.
+#
+# Platform: ArmVirtQemu
+# OS: Ubuntu
+# Toolchain: GCC5
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+trigger:
+  - master
+pr:
+  - master
+
+jobs:
+  - job: Build_GCC5_ARMVIRT
+
+    #Use matrix to speed up the build process
+    strategy:
+      matrix:
+        QEMU_AARCH64_DEBUG:
+          Build.File: "ArmVirtPkg/PlatformBuild.py"
+          Build.Arch: "AARCH64"
+          Build.Flags: ""
+          Build.Target: "DEBUG"
+        QEMU_AARCH64_RELEASE:
+          Build.File: "ArmVirtPkg/PlatformBuild.py"
+          Build.Arch: "AARCH64"
+          Build.Flags: ""
+          Build.Target: "RELEASE"
+        QEMU_AARCH64_NOOPT:
+          Build.File: "ArmVirtPkg/PlatformBuild.py"
+          Build.Arch: "AARCH64"
+          Build.Flags: ""
+          Build.Target: "NOOPT"
+    workspace:
+      clean: all
+
+    pool:
+      vmImage: "ubuntu-latest"
+
+    variables:
+      python_version: "3.8.x"
+      tool_chain_tag: "GCC5"
+
+    steps:
+      - checkout: self
+        clean: true
+        fetchDepth: 1
+
+      - task: UsePythonVersion@0
+        inputs:
+          versionSpec: $(python_version)
+          architecture: "x64"
+
+      - script: pip install -r pip-requirements.txt --upgrade
+        displayName: "Install/Upgrade pip modules"
+
+      # Build base tools
+      - bash: sudo apt-get update
+        displayName: Update apt
+
+      - bash: sudo apt-get install gcc g++ make uuid-dev
+        displayName: Install required tools
+
+      - task: CmdLine@1
+        displayName: Build Base Tools from source
+        inputs:
+          filename: python
+          arguments: BaseTools/Edk2ToolsBuild.py -t $(tool_chain_tag)
+
+      - task: CopyFiles@2
+        displayName: "Copy base tools build log"
+        inputs:
+          targetFolder: "$(Build.ArtifactStagingDirectory)"
+          SourceFolder: "BaseTools/BaseToolsBuild"
+          contents: |
+            BASETOOLS_BUILD*.*
+          flattenFolders: true
+
+      - bash: sudo apt-get install qemu
+        displayName: Install qemu
+
+      # Setup repo
+      - task: CmdLine@1
+        displayName: Setup
+        inputs:
+          filename: stuart_setup
+          arguments: -c $(Build.File) TOOL_CHAIN_TAG=$(tool_chain_tag) -t $(Build.Target) -a $(Build.Arch) $(Build.Flags)
+      # Stuart Update
+      - task: CmdLine@1
+        displayName: Update
+        inputs:
+          filename: stuart_update
+          arguments: -c $(Build.File) TOOL_CHAIN_TAG=$(tool_chain_tag) -t $(Build.Target) -a $(Build.Arch) $(Build.Flags)
+      # Build
+      - task: CmdLine@1
+        displayName: Build
+        inputs:
+          filename: stuart_build
+          arguments: -c $(Build.File) TOOL_CHAIN_TAG=$(tool_chain_tag) TARGET=$(Build.Target) -a $(Build.Arch) $(Build.Flags)
+      # execute emulator
+      - task: CmdLine@1
+        displayName: Run QEMU to shell
+        inputs:
+          filename: stuart_build
+          arguments: -c $(Build.File) TOOL_CHAIN_TAG=$(tool_chain_tag) TARGET=$(Build.Target) -a $(Build.Arch) $(Build.Flags) --FlashOnly MAKE_STARTUP_NSH=TRUE QEMU_HEADLESS=TRUE
+        timeoutInMinutes: 1
+
+      # Copy the build logs to the artifact staging directory
+      - task: CopyFiles@2
+        displayName: "Copy build logs"
+        inputs:
+          targetFolder: "$(Build.ArtifactStagingDirectory)"
+          SourceFolder: "Build"
+          contents: |
+            BUILDLOG_*.txt
+            BUILDLOG_*.md
+            CI_*.txt
+            CI_*.md
+            CISETUP.txt
+            SETUPLOG.txt
+            UPDATE_LOG.txt
+            PREVALLOG.txt
+            TestSuites.xml
+            **/BUILD_TOOLS_REPORT.html
+            **/OVERRIDELOG.TXT
+            BASETOOLS_BUILD*.*
+          flattenFolders: true
+        condition: succeededOrFailed()
+
+      # Publish build artifacts to Azure Artifacts/TFS or a file share
+      - task: PublishBuildArtifacts@1
+        continueOnError: true
+        displayName: "Publish build logs"
+        inputs:
+          pathtoPublish: "$(Build.ArtifactStagingDirectory)"
+          artifactName: "Build Logs $(System.JobName)"
+        condition: succeededOrFailed()
+
+  - job: FINISHED
+    dependsOn: Build_GCC5_ARMVIRT
+    condition: succeeded()
+    steps:
+      - checkout: none
+      - script: |
+          echo FINISHED
+          sleep 10
+        displayName: FINISHED
+
+  - job: FAILED
+    dependsOn: Build_GCC5_ARMVIRT
+    condition: failed()
+    steps:
+      - checkout: none
+      - script: |
+          echo FAILED
+          sleep 10
+        displayName: FAILED
