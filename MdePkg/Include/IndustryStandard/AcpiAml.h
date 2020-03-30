@@ -168,4 +168,12 @@
 #define AML_EXT_BANK_FIELD_OP        0x87
 #define AML_EXT_DATA_REGION_OP       0x88
 
+//
+// FieldElement OpCode
+//
+#define AML_FIELD_RESERVED_OP        0x00
+#define AML_FIELD_ACCESS_OP          0x01
+#define AML_FIELD_CONNECTION_OP      0x02
+#define AML_FIELD_EXT_ACCESS_OP      0x03
+
 #endif
