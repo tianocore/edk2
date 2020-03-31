@@ -19,9 +19,6 @@
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 
-// We use this index definition to define an invalid block entry
-#define TT_ATTR_INDX_INVALID    ((UINT32)~0)
-
 STATIC
 UINT64
 ArmMemoryAttributeToPageAttribute (
