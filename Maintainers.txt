@@ -435,6 +435,11 @@ OvmfPkg: CSM modules
 F: OvmfPkg/Csm/
 R: David Woodhouse <dwmw2@infradead.org>
 
+OvmfPkg: PVSCSI driver
+F: OvmfPkg/PvScsiDxe/
+R: Liran Alon <liran.alon@oracle.com>
+R: Nikita Leshenko <nikita.leshchenko@oracle.com>
+
 PcAtChipsetPkg
 F: PcAtChipsetPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/PcAtChipsetPkg
