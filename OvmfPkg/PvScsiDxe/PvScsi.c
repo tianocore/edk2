@@ -455,8 +455,12 @@ HandleResponse (
 
   //
   // Report target status
+  // (Strangely, PVSCSI interface defines Response->ScsiStatus as UINT16.
+  // But it should de-facto always have a value that fits UINT8. To avoid
+  // unexpected behavior, verify value is in UINT8 bounds before casting)
   //
-  Packet->TargetStatus = Response->ScsiStatus;
+  ASSERT (Response->ScsiStatus <= MAX_UINT8);
+  Packet->TargetStatus = (UINT8)Response->ScsiStatus;
 
   //
   // Host adapter status and function return value depend on
