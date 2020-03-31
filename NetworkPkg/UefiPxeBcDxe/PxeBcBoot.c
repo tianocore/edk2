@@ -482,7 +482,20 @@ PxeBcDhcp4BootInfo (
     Cache4 = &Private->DhcpAck.Dhcp4;
   }
 
-  ASSERT (Cache4->OptList[PXEBC_DHCP4_TAG_INDEX_BOOTFILE] != NULL);
+  if (Cache4->OptList[PXEBC_DHCP4_TAG_INDEX_BOOTFILE] == NULL) {
+    //
+    // This should never happen in a correctly configured DHCP / PXE
+    // environment. One misconfiguration that can cause it is two DHCP servers
+    // mistakenly running on the same network segment at the same time, and
+    // racing each other in answering DHCP requests. Thus, the DHCP packets
+    // that the edk2 PXE client considers "belonging together" may actually be
+    // entirely independent, coming from two (competing) DHCP servers.
+    //
+    // Try to deal with this gracefully. Note that this check is not
+    // comprehensive, as we don't try to identify all such errors.
+    //
+    return EFI_PROTOCOL_ERROR;
+  }
 
   //
   // Parse the boot server address.
@@ -612,7 +625,20 @@ PxeBcDhcp6BootInfo (
     Cache6 = &Private->DhcpAck.Dhcp6;
   }
 
-  ASSERT (Cache6->OptList[PXEBC_DHCP6_IDX_BOOT_FILE_URL] != NULL);
+  if (Cache6->OptList[PXEBC_DHCP6_IDX_BOOT_FILE_URL] == NULL) {
+    //
+    // This should never happen in a correctly configured DHCP / PXE
+    // environment. One misconfiguration that can cause it is two DHCP servers
+    // mistakenly running on the same network segment at the same time, and
+    // racing each other in answering DHCP requests. Thus, the DHCP packets
+    // that the edk2 PXE client considers "belonging together" may actually be
+    // entirely independent, coming from two (competing) DHCP servers.
+    //
+    // Try to deal with this gracefully. Note that this check is not
+    // comprehensive, as we don't try to identify all such errors.
+    //
+    return EFI_PROTOCOL_ERROR;
+  }
 
   //
   // Set the station address to IP layer.
