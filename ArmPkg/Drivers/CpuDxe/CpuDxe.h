@@ -134,13 +134,6 @@ GetMemoryRegion (
   OUT    UINTN                   *RegionAttributes
   );
 
-VOID
-GetRootTranslationTableInfo (
-  IN  UINTN    T0SZ,
-  OUT UINTN   *TableLevel,
-  OUT UINTN   *TableEntryCount
-  );
-
 EFI_STATUS
 SetGcdMemorySpaceAttributes (
   IN EFI_GCD_MEMORY_SPACE_DESCRIPTOR    *MemorySpaceMap,

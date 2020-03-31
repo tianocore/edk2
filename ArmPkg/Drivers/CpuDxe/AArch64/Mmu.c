@@ -15,6 +15,21 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #define TT_ATTR_INDX_INVALID    ((UINT32)~0)
 
+#define MIN_T0SZ        16
+#define BITS_PER_LEVEL  9
+
+STATIC
+VOID
+GetRootTranslationTableInfo (
+  IN  UINTN     T0SZ,
+  OUT UINTN     *RootTableLevel,
+  OUT UINTN     *RootTableEntryCount
+  )
+{
+  *RootTableLevel       = (T0SZ - MIN_T0SZ) / BITS_PER_LEVEL;
+  *RootTableEntryCount  = TT_ENTRY_COUNT >> (T0SZ - MIN_T0SZ) % BITS_PER_LEVEL;
+}
+
 STATIC
 UINT64
 GetFirstPageAttribute (
