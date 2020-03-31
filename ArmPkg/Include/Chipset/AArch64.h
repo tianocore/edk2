@@ -219,11 +219,6 @@ ArmReadCurrentEL (
   VOID
   );
 
-UINT64
-PageAttributeToGcdAttribute (
-  IN UINT64 PageAttributes
-  );
-
 UINTN
 ArmWriteCptr (
   IN  UINT64 Cptr
