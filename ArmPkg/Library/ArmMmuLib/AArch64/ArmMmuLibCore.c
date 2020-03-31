@@ -57,51 +57,6 @@ ArmMemoryAttributeToPageAttribute (
   }
 }
 
-UINT64
-PageAttributeToGcdAttribute (
-  IN UINT64 PageAttributes
-  )
-{
-  UINT64  GcdAttributes;
-
-  switch (PageAttributes & TT_ATTR_INDX_MASK) {
-  case TT_ATTR_INDX_DEVICE_MEMORY:
-    GcdAttributes = EFI_MEMORY_UC;
-    break;
-  case TT_ATTR_INDX_MEMORY_NON_CACHEABLE:
-    GcdAttributes = EFI_MEMORY_WC;
-    break;
-  case TT_ATTR_INDX_MEMORY_WRITE_THROUGH:
-    GcdAttributes = EFI_MEMORY_WT;
-    break;
-  case TT_ATTR_INDX_MEMORY_WRITE_BACK:
-    GcdAttributes = EFI_MEMORY_WB;
-    break;
-  default:
-    DEBUG ((DEBUG_ERROR,
-      "PageAttributeToGcdAttribute: PageAttributes:0x%lX not supported.\n",
-      PageAttributes));
-    ASSERT (0);
-    // The Global Coherency Domain (GCD) value is defined as a bit set.
-    // Returning 0 means no attribute has been set.
-    GcdAttributes = 0;
-  }
-
-  // Determine protection attributes
-  if (((PageAttributes & TT_AP_MASK) == TT_AP_NO_RO) ||
-      ((PageAttributes & TT_AP_MASK) == TT_AP_RO_RO)) {
-    // Read only cases map to write-protect
-    GcdAttributes |= EFI_MEMORY_RO;
-  }
-
-  // Process eXecute Never attribute
-  if ((PageAttributes & (TT_PXN_MASK | TT_UXN_MASK)) != 0) {
-    GcdAttributes |= EFI_MEMORY_XP;
-  }
-
-  return GcdAttributes;
-}
-
 #define MIN_T0SZ        16
 #define BITS_PER_LEVEL  9
 
