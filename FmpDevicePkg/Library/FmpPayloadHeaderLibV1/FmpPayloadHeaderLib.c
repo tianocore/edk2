@@ -27,9 +27,9 @@ typedef struct {
   UINT32  FwVersion;
   UINT32  LowestSupportedVersion;
 } FMP_PAYLOAD_HEADER;
-
+  
 #pragma pack()
-
+  
 ///
 /// Identifier is used to make sure the data in the header is for this structure
 /// and version.  If the structure changes update the last digit.
