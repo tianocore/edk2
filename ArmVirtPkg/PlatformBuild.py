@@ -168,6 +168,8 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         VirtualDrive = os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "VirtualDrive")
         os.makedirs(VirtualDrive, exist_ok=True)
         OutputPath_FV = os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "FV")
+        Built_FV = os.path.join(OutputPath_FV, "QEMU_EFI.fd")
+
 
         # should move into plugin since Qemu can be used by lots of
         # platforms.  Issue is --FlashOnly doesn't run prebuild and thus plugin is skipped
@@ -177,11 +179,17 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         else:
             logging.critical("QEMU folder not found in program Files")
 
+        # pad fd to 64mb
+        with open(Built_FV, "ab") as fvfile:
+            fvfile.seek(0, os.SEEK_END)
+            additional = b'\0' * ((64 * 1024 * 1024)-fvfile.tell())
+            fvfile.write(additional)
+
         if (self.env.GetValue("TARGET_ARCH").upper() == "AARCH64"):
             cmd = "qemu-system-aarch64"
             args  = "-M virt"
             args += " -cpu cortex-a57"                                          # emulate cpu
-            args += " -bios " + os.path.join(OutputPath_FV, "QEMU_EFI.fd")      # path to fw
+            args += " -pflash " +  Built_FV                                     # path to fw
             args += " -m 1024"                                                  # 1gb memory
             args += " -net none"                                                # turn off network
             args += " -serial stdio"                                            # Serial messages out
