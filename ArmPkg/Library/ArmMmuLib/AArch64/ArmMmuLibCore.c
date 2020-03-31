@@ -59,6 +59,16 @@ ArmMemoryAttributeToPageAttribute (
 
 #define MIN_T0SZ        16
 #define BITS_PER_LEVEL  9
+#define MAX_VA_BITS     48
+
+STATIC
+UINTN
+GetRootTableEntryCount (
+  IN  UINTN T0SZ
+  )
+{
+  return TT_ENTRY_COUNT >> (T0SZ - MIN_T0SZ) % BITS_PER_LEVEL;
+}
 
 VOID
 GetRootTranslationTableInfo (
@@ -285,36 +295,6 @@ UpdateRegionMappingRecursive (
 }
 
 STATIC
-VOID
-LookupAddresstoRootTable (
-  IN  UINT64  MaxAddress,
-  OUT UINTN  *T0SZ,
-  OUT UINTN  *TableEntryCount
-  )
-{
-  UINTN TopBit;
-
-  // Check the parameters are not NULL
-  ASSERT ((T0SZ != NULL) && (TableEntryCount != NULL));
-
-  // Look for the highest bit set in MaxAddress
-  for (TopBit = 63; TopBit != 0; TopBit--) {
-    if ((1ULL << TopBit) & MaxAddress) {
-      // MaxAddress top bit is found
-      TopBit = TopBit + 1;
-      break;
-    }
-  }
-  ASSERT (TopBit != 0);
-
-  // Calculate T0SZ from the top bit of the MaxAddress
-  *T0SZ = 64 - TopBit;
-
-  // Get the Table info from T0SZ
-  GetRootTranslationTableInfo (*T0SZ, NULL, TableEntryCount);
-}
-
-STATIC
 EFI_STATUS
 UpdateRegionMapping (
   IN  UINT64  RegionStart,
@@ -508,6 +488,7 @@ ArmConfigureMmu (
   )
 {
   VOID*                         TranslationTable;
+  UINTN                         MaxAddressBits;
   UINT64                        MaxAddress;
   UINTN                         T0SZ;
   UINTN                         RootTableEntryCount;
@@ -526,11 +507,11 @@ ArmConfigureMmu (
   // into account the architectural limitations that result from UEFI's
   // use of 4 KB pages.
   //
-  MaxAddress = MIN (LShiftU64 (1ULL, ArmGetPhysicalAddressBits ()) - 1,
-                    MAX_ALLOC_ADDRESS);
+  MaxAddressBits = MIN (ArmGetPhysicalAddressBits (), MAX_VA_BITS);
+  MaxAddress = LShiftU64 (1ULL, MaxAddressBits) - 1;
 
-  // Lookup the Table Level to get the information
-  LookupAddresstoRootTable (MaxAddress, &T0SZ, &RootTableEntryCount);
+  T0SZ = 64 - MaxAddressBits;
+  RootTableEntryCount = GetRootTableEntryCount (T0SZ);
 
   //
   // Set TCR that allows us to retrieve T0SZ in the subsequent functions
