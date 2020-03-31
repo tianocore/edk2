@@ -157,9 +157,6 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         VirtualDrive = os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "VirtualDrive")
         os.makedirs(VirtualDrive, exist_ok=True)
         OutputPath_FV = os.path.join(self.env.GetValue("BUILD_OUTPUT_BASE"), "FV")
-        QemuLogFile = os.path.join(self.env.GetValue("BUILD_OUT_TEMP"), "BootLog.txt")
-        if os.path.exists(QemuLogFile):
-            os.remove(QemuLogFile)
 
         # should move into plugin since Qemu can be used by lots of
         # platforms.  Issue is --FlashOnly doesn't run prebuild and thus plugin is skipped
@@ -170,7 +167,7 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
             logging.critical("QEMU folder not found in program Files")
 
         cmd = "qemu-system-x86_64"
-        args  = "-debugcon file:" + QemuLogFile                             # write messages to file
+        args  = "-debugcon stdio"                                           # write messages to stdio
         args += " -global isa-debugcon.iobase=0x402"                        # debug messages out thru virtual io port
         args += " -net none"                                                # turn off network
         args += f" -drive file=fat:rw:{VirtualDrive},format=raw,media=disk" # Mount disk with startup.nsh

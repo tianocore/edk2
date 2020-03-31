@@ -146,7 +146,6 @@ jobs:
             **/BUILD_TOOLS_REPORT.html
             **/OVERRIDELOG.TXT
             BASETOOLS_BUILD*.*
-            **/BootLog.txt
           flattenFolders: true
         condition: succeededOrFailed()
 
