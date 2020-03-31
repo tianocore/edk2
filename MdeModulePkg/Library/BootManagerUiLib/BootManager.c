@@ -484,7 +484,7 @@ UpdateBootManager (
   BOOLEAN                       IsLegacyOption;
   BOOLEAN                       NeedEndOp;
   UINTN                         MaxLen;
-  UINTN                         OptionCount;
+  UINTN                         OptionCount = 0;
 
   DeviceType = (UINT16) -1;
 
