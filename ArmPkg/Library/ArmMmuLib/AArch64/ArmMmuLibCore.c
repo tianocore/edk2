@@ -70,21 +70,13 @@ GetRootTableEntryCount (
   return TT_ENTRY_COUNT >> (T0SZ - MIN_T0SZ) % BITS_PER_LEVEL;
 }
 
-VOID
-GetRootTranslationTableInfo (
-  IN UINTN     T0SZ,
-  OUT UINTN   *TableLevel,
-  OUT UINTN   *TableEntryCount
+STATIC
+UINTN
+GetRootTableLevel (
+  IN  UINTN T0SZ
   )
 {
-  // Get the level of the root table
-  if (TableLevel) {
-    *TableLevel = (T0SZ - MIN_T0SZ) / BITS_PER_LEVEL;
-  }
-
-  if (TableEntryCount) {
-    *TableEntryCount = 1UL << (BITS_PER_LEVEL - (T0SZ - MIN_T0SZ) % BITS_PER_LEVEL);
-  }
+  return (T0SZ - MIN_T0SZ) / BITS_PER_LEVEL;
 }
 
 STATIC
@@ -303,7 +295,6 @@ UpdateRegionMapping (
   IN  UINT64  AttributeClearMask
   )
 {
-  UINTN     RootTableLevel;
   UINTN     T0SZ;
 
   if (((RegionStart | RegionLength) & EFI_PAGE_MASK)) {
@@ -311,11 +302,10 @@ UpdateRegionMapping (
   }
 
   T0SZ = ArmGetTCR () & TCR_T0SZ_MASK;
-  GetRootTranslationTableInfo (T0SZ, &RootTableLevel, NULL);
 
   return UpdateRegionMappingRecursive (RegionStart, RegionStart + RegionLength,
            AttributeSetMask, AttributeClearMask, ArmGetTTBR0BaseAddress (),
-           RootTableLevel);
+           GetRootTableLevel (T0SZ));
 }
 
 STATIC
