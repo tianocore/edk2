@@ -39,11 +39,6 @@ steps:
     arguments: -c .pytool/CISettings.py -p ${{ parameters.build_pkgs }} --pr-target origin/$(System.PullRequest.targetBranch) --output-csv-format-string "##vso[task.setvariable variable=pkgs_to_build;isOutpout=true]{pkgcsv}" --output-count-format-string "##vso[task.setvariable variable=pkg_count;isOutpout=true]{pkgcount}"
   condition: eq(variables['Build.Reason'], 'PullRequest')
 
-# build basetools
-- template: basetools-build-steps.yml
-  parameters:
-    tool_chain_tag: ${{ parameters.tool_chain_tag }}
-
 # install spell check prereqs
 - template: spell-check-prereq-steps.yml
 
@@ -61,6 +56,13 @@ steps:
     filename: stuart_update
     arguments: -c .pytool/CISettings.py -p $(pkgs_to_build) -t ${{ parameters.build_targets}} -a ${{ parameters.build_archs}} TOOL_CHAIN_TAG=${{ parameters.tool_chain_tag}}
   condition: and(gt(variables.pkg_count, 0), succeeded())
+
+# build basetools
+#   do this after setup and update so that code base dependencies
+#   are all resolved.
+- template: basetools-build-steps.yml
+  parameters:
+    tool_chain_tag: ${{ parameters.tool_chain_tag }}
 
 - task: CmdLine@1
   displayName: Build and Test ${{ parameters.build_pkgs }} ${{ parameters.build_archs}}
