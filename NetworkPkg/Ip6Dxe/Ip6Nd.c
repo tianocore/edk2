@@ -2111,7 +2111,7 @@ Ip6ProcessRouterAdvertise (
       // Option size validity ensured by Ip6IsNDOptionValid().
       //
       ASSERT (LinkLayerOption.Length != 0);
-      ASSERT (Offset + (UINT32) LinkLayerOption.Length * 8 >= (UINT32) Head->PayloadLength);
+      ASSERT (Offset + (UINT32) LinkLayerOption.Length * 8 <= (UINT32) Head->PayloadLength);
 
       ZeroMem (&LinkLayerAddress, sizeof (EFI_MAC_ADDRESS));
       CopyMem (&LinkLayerAddress, LinkLayerOption.EtherAddr, 6);
@@ -2164,7 +2164,7 @@ Ip6ProcessRouterAdvertise (
       // Option size validity ensured by Ip6IsNDOptionValid().
       //
       ASSERT (PrefixOption.Length == 4);
-      ASSERT (Offset + (UINT32) PrefixOption.Length * 8 >= (UINT32) Head->PayloadLength);
+      ASSERT (Offset + (UINT32) PrefixOption.Length * 8 <= (UINT32) Head->PayloadLength);
 
       PrefixOption.ValidLifetime     = NTOHL (PrefixOption.ValidLifetime);
       PrefixOption.PreferredLifetime = NTOHL (PrefixOption.PreferredLifetime);
@@ -2334,7 +2334,7 @@ Ip6ProcessRouterAdvertise (
       // Option size validity ensured by Ip6IsNDOptionValid().
       //
       ASSERT (MTUOption.Length == 1);
-      ASSERT (Offset + (UINT32) MTUOption.Length * 8 >= (UINT32) Head->PayloadLength);
+      ASSERT (Offset + (UINT32) MTUOption.Length * 8 <= (UINT32) Head->PayloadLength);
 
       //
       // Use IPv6 minimum link MTU 1280 bytes as the maximum packet size in order
