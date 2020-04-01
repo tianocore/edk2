@@ -1,0 +1,44 @@
+## @file
+#
+# This driver produces Extended SCSI Pass Thru Protocol instances for
+# pvscsi devices.
+#
+# Copyright (C) 2020, Oracle and/or its affiliates.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.29
+  BASE_NAME                      = PvScsiDxe
+  FILE_GUID                      = 30346B14-1580-4781-879D-BA0C55AE9BB2
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = PvScsiEntryPoint
+
+[Sources]
+  PvScsi.c
+  PvScsi.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
+
+[Protocols]
+  gEfiExtScsiPassThruProtocolGuid   ## BY_START
+  gEfiPciIoProtocolGuid             ## TO_START
+
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdPvScsiMaxLunLimit               ## CONSUMES
+  gUefiOvmfPkgTokenSpaceGuid.PcdPvScsiMaxTargetLimit            ## CONSUMES
+  gUefiOvmfPkgTokenSpaceGuid.PcdPvScsiWaitForCmpStallInUsecs    ## CONSUMES

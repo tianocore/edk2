@@ -413,7 +413,7 @@ AddGenericInitiatorAffinity (
     GenInitAff++;
     GenInitAffInfo++;
   }// while
-  return Status;
+  return EFI_SUCCESS;
 }
 
 /** Construct the SRAT ACPI table.
@@ -800,8 +800,8 @@ ACPI_TABLE_GENERATOR SratGenerator = {
 EFI_STATUS
 EFIAPI
 AcpiSratLibConstructor (
-  IN CONST EFI_HANDLE                ImageHandle,
-  IN       EFI_SYSTEM_TABLE  * CONST SystemTable
+  IN  EFI_HANDLE           ImageHandle,
+  IN  EFI_SYSTEM_TABLE  *  SystemTable
   )
 {
   EFI_STATUS  Status;
@@ -823,8 +823,8 @@ AcpiSratLibConstructor (
 EFI_STATUS
 EFIAPI
 AcpiSratLibDestructor (
-  IN CONST EFI_HANDLE                ImageHandle,
-  IN       EFI_SYSTEM_TABLE  * CONST SystemTable
+  IN  EFI_HANDLE           ImageHandle,
+  IN  EFI_SYSTEM_TABLE  *  SystemTable
   )
 {
   EFI_STATUS  Status;

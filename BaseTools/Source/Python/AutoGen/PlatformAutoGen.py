@@ -866,7 +866,8 @@ class PlatformAutoGen(AutoGen):
                             Value += " " + self._BuildOptionWithToolDef(RetVal)[Tool][Attr]
                         else:
                             Value = self._BuildOptionWithToolDef(RetVal)[Tool][Attr]
-
+                            Def = '_'.join([self.BuildTarget, self.ToolChain, self.Arch, Tool, Attr])
+                            self.Workspace.ToolDef.ToolsDefTxtDictionary[Def] = Value
                 if Attr == "PATH":
                     # Don't put MAKE definition in the file
                     if Tool != "MAKE":
