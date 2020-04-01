@@ -208,6 +208,40 @@ INF MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
 INF SecurityPkg/RandomNumberGenerator/RngDxe/RngDxe.inf
 
 #
+# Security
+#
+!if $(SECURE_BOOT_ENABLE) == TRUE
+  INF  SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
+  INF  UefiPayloadPkg/SecureBootEnrollDefaultKeys/SecureBootSetup.inf
+
+  FILE FREEFORM = A23665E3-ACA6-4F6D-80CC-341E7D7B8CC6 {
+    SECTION RAW = UefiPayloadPkg/SecureBootEnrollDefaultKeys/keys/kek.crt
+    SECTION UI = "SecureBootKekCert"
+  }
+
+  FILE FREEFORM = F8104268-A364-45F5-8E00-ABA3FDEA12BE {
+    SECTION RAW = UefiPayloadPkg/SecureBootEnrollDefaultKeys/keys/pk.crt
+    SECTION UI = "SecureBootPkCert"
+  }
+
+  FILE FREEFORM = 26A517B0-E3FD-46C2-8932-E926BF98941F {
+    SECTION RAW = UefiPayloadPkg/SecureBootEnrollDefaultKeys/keys/db-1.crt
+    SECTION UI = "SecureBootDb1Cert"
+  }
+
+  FILE FREEFORM = 91D2E32B-0134-4306-BA90-54EDCBF349CA {
+    SECTION RAW = UefiPayloadPkg/SecureBootEnrollDefaultKeys/keys/db-2.crt
+    SECTION UI = "SecureBootDb2Cert"
+  }
+
+  FILE FREEFORM = 74BB6E72-2A56-4D0E-A5B3-5D39FC2EE346 {
+    SECTION RAW = UefiPayloadPkg/SecureBootEnrollDefaultKeys/keys/crl.bin
+    SECTION UI = "SecureBootDbxCert"
+  }
+
+!endif
+
+#
 # Shell
 #
 !if $(SHELL_TYPE) == BUILD_SHELL
@@ -342,4 +376,17 @@ SET gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize = $(BLOCK_SIZE)
 [Rule.Common.SEC.RESET_VECTOR]
   FILE RAW = $(NAMED_GUID) {
     RAW RAW                |.raw
+  }
+
+[RULE.COMMON.USER_DEFINED]
+  FILE FREEFORM = $(NAMED_GUID) {
+    RAW BIN                |.crt
+    RAW BIN                |.bin
+  }
+
+[RULE.COMMON.USER_DEFINED.BINARY]
+  FILE FREEFORM = $(NAMED_GUID) {
+    RAW BIN                |.crt
+    RAW BIN                |.bin
+    UI       STRING="$(MODULE_NAME)" Optional
   }

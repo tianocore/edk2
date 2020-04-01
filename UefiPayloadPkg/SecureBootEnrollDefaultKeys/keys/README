@@ -1,0 +1,8 @@
+# PK certificate generation
+
+* Do not save private key for re-usage.
+* Generate a RSA 2048 / SHA256 x509 certificate
+* Exponent should be 65537
+* Microsoft certificates can be found here: https://docs.microsoft.com/en-us/windows-hardware/manufacture/desktop/windows-secure-boot-key-creation-and-management-guidance
+
+openssl req -outform DER -newkey rsa:2048 -keyout /dev/null -passout file:<(head -c 40 /dev/urandom) -x509 -days 365 -out pk.crt

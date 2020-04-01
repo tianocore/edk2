@@ -1,0 +1,54 @@
+## @file
+# This file handels SecureBoot setup.
+#
+#  Copyright (c) 2013 - 2019, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SecureBootSetup
+  MODULE_UNI_FILE                = SecureBootSetup.uni
+  FILE_GUID                      = 14693BD4-D114-4177-979E-37F279BAD620
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 0.1
+  ENTRY_POINT                    = DriverEntry
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  SecureBootSetup.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[Guids]
+  gEfiCertPkcs7Guid
+  gEfiCertX509Guid
+  gEfiCustomModeEnableGuid
+  gEfiGlobalVariableGuid
+  gEfiImageSecurityDatabaseGuid
+  gEfiSecureBootEnableDisableGuid
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  UefiRuntimeServicesTableLib
+  UefiDriverEntryPoint
+  DxeServicesLib
+  UefiBootServicesTableLib
+
+[Protocols]
+  gEfiTcgProtocolGuid                                ## CONSUMES
+  gEfiVariableWriteArchProtocolGuid                  ## NOTIFY
+
+[Depex]
+  AFTER gEfiVariableWriteArchProtocolGuid
