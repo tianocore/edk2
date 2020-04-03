@@ -242,6 +242,8 @@ MmcIoBlocks (
   UINTN                   BytesRemainingToBeTransfered;
   UINTN                   BlockCount;
   UINTN                   ConsumeSize;
+  UINT32                  MaxBlock;
+  UINTN                   RemainingBlock;
 
   BlockCount = 1;
   MmcHostInstance = MMC_HOST_INSTANCE_FROM_BLOCK_IO_THIS (This);
@@ -262,8 +264,18 @@ MmcIoBlocks (
     return EFI_NO_MEDIA;
   }
 
+  // Reading 0 Byte is valid
+  if (BufferSize == 0) {
+    return EFI_SUCCESS;
+  }
+
+  // The buffer size must be an exact multiple of the block size
+  if ((BufferSize % This->Media->BlockSize) != 0) {
+    return EFI_BAD_BUFFER_SIZE;
+  }
+
   if (MMC_HOST_HAS_ISMULTIBLOCK(MmcHost) && MmcHost->IsMultiBlock(MmcHost)) {
-    BlockCount = (BufferSize + This->Media->BlockSize - 1) / This->Media->BlockSize;
+    BlockCount = BufferSize / This->Media->BlockSize;
   }
 
   // All blocks must be within the device
@@ -275,23 +287,22 @@ MmcIoBlocks (
     return EFI_WRITE_PROTECTED;
   }
 
-  // Reading 0 Byte is valid
-  if (BufferSize == 0) {
-    return EFI_SUCCESS;
-  }
-
-  // The buffer size must be an exact multiple of the block size
-  if ((BufferSize % This->Media->BlockSize) != 0) {
-    return EFI_BAD_BUFFER_SIZE;
-  }
-
   // Check the alignment
   if ((This->Media->IoAlign > 2) && (((UINTN)Buffer & (This->Media->IoAlign - 1)) != 0)) {
     return EFI_INVALID_PARAMETER;
   }
 
+  // Max block number in single cmd is 65535 blocks.
+  MaxBlock = 0xFFFF;
+  RemainingBlock = BlockCount;
   BytesRemainingToBeTransfered = BufferSize;
   while (BytesRemainingToBeTransfered > 0) {
+
+    if (RemainingBlock <= MaxBlock) {
+      BlockCount = RemainingBlock;
+    } else {
+      BlockCount = MaxBlock;
+    }
 
     // Check if the Card is in Ready status
     CmdArg = MmcHostInstance->CardInfo.RCA << 16;
@@ -338,6 +349,7 @@ MmcIoBlocks (
       DEBUG ((EFI_D_ERROR, "%a(): Failed to transfer block and Status:%r\n", __func__, Status));
     }
 
+    RemainingBlock -= BlockCount;
     BytesRemainingToBeTransfered -= ConsumeSize;
     if (BytesRemainingToBeTransfered > 0) {
       Lba    += BlockCount;
