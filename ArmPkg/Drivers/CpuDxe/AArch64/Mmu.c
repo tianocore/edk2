@@ -13,7 +13,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/MemoryAllocationLib.h>
 #include "CpuDxe.h"
 
-#define TT_ATTR_INDX_INVALID    ((UINT32)~0)
+#define INVALID_ENTRY   ((UINT32)~0)
 
 #define MIN_T0SZ        16
 #define BITS_PER_LEVEL  9
@@ -98,7 +98,7 @@ GetFirstPageAttribute (
   {
     return FirstEntry & TT_ATTR_INDX_MASK;
   } else {
-    return TT_ATTR_INDX_INVALID;
+    return INVALID_ENTRY;
   }
 }
 
@@ -139,8 +139,8 @@ GetNextEntryAttribute (
     // If Entry is a Table Descriptor type entry then go through the sub-level table
     if ((EntryType == TT_TYPE_BLOCK_ENTRY) ||
         ((TableLevel == 3) && (EntryType == TT_TYPE_BLOCK_ENTRY_LEVEL3))) {
-      if ((*PrevEntryAttribute == TT_ATTR_INDX_INVALID) || (EntryAttribute != *PrevEntryAttribute)) {
-        if (*PrevEntryAttribute != TT_ATTR_INDX_INVALID) {
+      if ((*PrevEntryAttribute == INVALID_ENTRY) || (EntryAttribute != *PrevEntryAttribute)) {
+        if (*PrevEntryAttribute != INVALID_ENTRY) {
           // Update GCD with the last region
           SetGcdMemorySpaceAttributes (MemorySpaceMap, NumberOfDescriptors,
               *StartGcdRegion,
@@ -164,7 +164,7 @@ GetNextEntryAttribute (
                              (BaseAddress + (Index * TT_ADDRESS_AT_LEVEL(TableLevel))),
                              PrevEntryAttribute, StartGcdRegion);
     } else {
-      if (*PrevEntryAttribute != TT_ATTR_INDX_INVALID) {
+      if (*PrevEntryAttribute != INVALID_ENTRY) {
         // Update GCD with the last region
         SetGcdMemorySpaceAttributes (MemorySpaceMap, NumberOfDescriptors,
             *StartGcdRegion,
@@ -173,7 +173,7 @@ GetNextEntryAttribute (
 
         // Start of the new region
         *StartGcdRegion = BaseAddress + (Index * TT_ADDRESS_AT_LEVEL(TableLevel));
-        *PrevEntryAttribute = TT_ATTR_INDX_INVALID;
+        *PrevEntryAttribute = INVALID_ENTRY;
       }
     }
   }
@@ -238,7 +238,7 @@ SyncCacheConfig (
                                                &PageAttribute, &BaseAddressGcdRegion);
 
   // Update GCD with the last region if valid
-  if (PageAttribute != TT_ATTR_INDX_INVALID) {
+  if (PageAttribute != INVALID_ENTRY) {
     SetGcdMemorySpaceAttributes (MemorySpaceMap, NumberOfDescriptors,
         BaseAddressGcdRegion,
         EndAddressGcdRegion - BaseAddressGcdRegion,
