@@ -1,0 +1,22 @@
+## @file
+# Download GCC RISCV64 compiler from RISC-V Organization release site
+# Set shell variable GCC5_RISCV64_INSTALL to this folder
+#
+# This is only downloaded when a build activates scope gcc_riscv64_unknown
+#
+# Copyright (c) Microsoft Corporation.
+# Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+{
+  "scope": "gcc_riscv64_unknown",
+  "type": "web",
+  "name": "gcc_riscv64_unknown",
+  "source": "https://raw.githubusercontent.com/riscv/riscv-uefi-edk2-docs/master/gcc-riscv-edk2-ci-toolchain/gcc-riscv-9.2.0-2020.04-x86_64_riscv64-unknown-gnu.tar.xz",
+  "version": "9.2.0",
+  "compression_type": "tar",
+  "sha256": "28373643b69f0ce008273c3dc63f172aa1121952f1b9ae94d7485ac94af7f344",
+  "internal_path": "/gcc-riscv-9.2.0-2020.04-x86_64_riscv64-unknown-gnu",
+  "flags": ["set_shell_var", ],
+  "var_name": "GCC5_RISCV64_INSTALL"
+}
