@@ -1,6 +1,7 @@
 # @file
 #
 # Copyright (c) Microsoft Corporation.
+# Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 import os
@@ -54,10 +55,12 @@ class Settings(CiBuildSettingsManager, UpdateSettingsManager, SetupSettingsManag
 
     def GetArchitecturesSupported(self):
         ''' return iterable of edk2 architectures supported by this build '''
-        return ("IA32",
+        return (
+                "IA32",
                 "X64",
                 "ARM",
-                "AARCH64")
+                "AARCH64",
+                "RISCV64")
 
     def GetTargetsSupported(self):
         ''' return iterable of edk2 target tags supported by this build '''
@@ -130,6 +133,8 @@ class Settings(CiBuildSettingsManager, UpdateSettingsManager, SetupSettingsManag
                 scopes += ("gcc_aarch64_linux",)
             if "ARM" in self.ActualArchitectures:
                 scopes += ("gcc_arm_linux",)
+            if "RISCV64" in self.ActualArchitectures:
+                scopes += ("gcc_riscv64_unknown",)
 
         return scopes
 
