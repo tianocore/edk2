@@ -155,7 +155,7 @@ BmSetMemoryTypeInformationVariable (
   if (BootMode == BOOT_IN_RECOVERY_MODE) {
     return;
   }
-
+  return;
   //
   // Only check the the Memory Type Information variable in the boot mode
   // other than BOOT_WITH_DEFAULT_SETTINGS because the Memory Type
