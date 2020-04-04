@@ -126,7 +126,7 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
 
         The tuple should be (<workspace relative path to dsc file>, <input dictionary of dsc key value pairs>)
         '''
-        return (os.path.join("EmulatorPkg", "EmulatorPkg.dsc"), {})
+        return (os.path.join("ArmVirtPkg", "ArmVirtQemu.dsc"), {})
 
 
     # ####################################################################################### #
