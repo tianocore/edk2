@@ -12,6 +12,7 @@ from edk2toolext.environment.uefi_build import UefiBuilder
 from edk2toolext.invocables.edk2_platform_build import BuildSettingsManager
 from edk2toolext.invocables.edk2_setup import SetupSettingsManager, RequiredSubmodule
 from edk2toolext.invocables.edk2_update import UpdateSettingsManager
+from edk2toolext.invocables.edk2_pr_eval import PrEvalSettingsManager
 from edk2toollib.utility_functions import RunCmd
 
 
@@ -33,7 +34,7 @@ class CommonPlatform():
     # ####################################################################################### #
     #                         Configuration for Update & Setup                                #
     # ####################################################################################### #
-class SettingsManager(UpdateSettingsManager, SetupSettingsManager):
+class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSettingsManager):
 
     def GetPackagesSupported(self):
         ''' return iterable of edk2 packages supported by this build.
@@ -79,6 +80,40 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager):
     def GetActiveScopes(self):
         ''' return tuple containing scopes that should be active for this process '''
         return CommonPlatform.Scopes
+
+    def FilterPackagesToTest(self, changedFilesList: list, potentialPackagesList: list) -> list:
+        ''' Filter other cases that this package should be built
+        based on changed files. This should cover things that can't
+        be detected as dependencies. '''
+        build_these_packages = []
+        possible_packages = potentialPackagesList.copy()
+        for f in changedFilesList:
+            # BaseTools files that might change the build
+            if "BaseTools" in f:
+                if os.path.splitext(f) not in [".txt", ".md"]:
+                    build_these_packages = possible_packages
+                    break
+
+            # if the azure pipeline file changed
+            if ".azurepipelines" in f and "Ovmf" in f:
+                build_these_packages = possible_packages
+                break
+
+            # if the azure pipeline platform template file changed
+            if ".azurepipelines" in f and "platforms" in f and "templates" in f:
+                build_these_packages = possible_packages
+                break
+
+        return build_these_packages
+
+    def GetPlatformDscAndConfig(self) -> tuple:
+        ''' If a platform desires to provide its DSC then Policy 4 will evaluate if
+        any of the changes will be built in the dsc.
+
+        The tuple should be (<workspace relative path to dsc file>, <input dictionary of dsc key value pairs>)
+        '''
+        path = shell_environment.GetBuildVars().GetValue("ACTIVE_PLATFORM")
+        return (path, {})
 
 
     # ####################################################################################### #
