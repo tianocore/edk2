@@ -7,7 +7,7 @@
 #
 # Copyright (c) 2009 - 2019, Intel Corporation. All rights reserved.<BR>
 # (C) Copyright 2015 Hewlett Packard Enterprise Development LP <BR>
-# Copyright (c) 2017, Microsoft Corporation.  All rights reserved. <BR>
+# Copyright (c) Microsoft Corporation.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -271,6 +271,12 @@
   # @Prompt Status Code for TPM device definitions
   # @ValidList  0x80000003 | 0x010D0000
   gEfiSecurityPkgTokenSpaceGuid.PcdStatusCodeSubClassTpmDevice|0x010D0000|UINT32|0x00000007
+
+  ## Defines the IO port used to trigger a software System Management Interrupt (SMI).<BR><BR>
+  #  Used as the SMI Command IO port by security functionality that triggers a software SMI such
+  #  as Physical Presence Interface (PPI).<BR>
+  # @Prompt SMI Command IO port.
+  gEfiSecurityPkgTokenSpaceGuid.PcdSmiCommandIoPort|0xB2|UINT16|0x00000009
 
   ## Progress Code for FV verification result.<BR><BR>
   #  (EFI_SOFTWARE_PEI_MODULE | EFI_SUBCLASS_SPECIFIC | XXX)
