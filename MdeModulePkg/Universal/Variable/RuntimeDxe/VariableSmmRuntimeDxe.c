@@ -66,6 +66,17 @@ EDKII_VARIABLE_LOCK_PROTOCOL     mVariableLock;
 EDKII_VAR_CHECK_PROTOCOL         mVarCheck;
 
 /**
+  The logic to initialize the VariablePolicy engine is in its own file.
+
+**/
+EFI_STATUS
+EFIAPI
+VariablePolicySmmDxeMain (
+  IN    EFI_HANDLE                  ImageHandle,
+  IN    EFI_SYSTEM_TABLE            *SystemTable
+  );
+
+/**
   Some Secure Boot Policy Variable may update following other variable changes(SecureBoot follows PK change, etc).
   Record their initial State when variable write service is ready.
 
@@ -1795,6 +1806,9 @@ VariableSmmRuntimeInitialize (
          &gEfiEventVirtualAddressChangeGuid,
          &mVirtualAddressChangeEvent
          );
+
+  // Initialize the VariablePolicy protocol and engine.
+  VariablePolicySmmDxeMain (ImageHandle, SystemTable);
 
   return EFI_SUCCESS;
 }
