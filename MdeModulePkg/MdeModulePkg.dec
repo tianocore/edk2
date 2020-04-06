@@ -31,6 +31,9 @@
   ##  @libraryclass  Defines a set of methods to reset whole system.
   ResetSystemLib|Include/Library/ResetSystemLib.h
 
+  ##  @libraryclass  Business logic for storing and testing variable policies
+  VariablePolicyLib|Include/Library/VariablePolicyLib.h
+
   ##  @libraryclass  Defines a set of helper functions for resetting the system.
   ResetUtilityLib|Include/Library/ResetUtilityLib.h
 
