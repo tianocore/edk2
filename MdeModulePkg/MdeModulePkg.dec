@@ -149,6 +149,11 @@
   #
   DisplayUpdateProgressLib|Include/Library/DisplayUpdateProgressLib.h
 
+  ##  @libraryclass  This library contains helper functions for marshalling and
+  #   registering new policies with the VariablePolicy infrastructure.
+  #
+  VariablePolicyHelperLib|Include/Library/VariablePolicyHelperLib.h
+
 [Guids]
   ## MdeModule package token space guid
   # Include/Guid/MdeModulePkgTokenSpace.h
