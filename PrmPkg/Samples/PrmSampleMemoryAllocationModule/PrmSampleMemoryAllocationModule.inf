@@ -1,0 +1,41 @@
+## @file
+#  Sample PRM Driver
+#
+#  This driver simply uses an OS-provided debug message print service to write
+#  a debug message. Three PRM handlers are provided that each print a unique
+#  debug message.
+#
+#  Copyright (c) Microsoft Corporation
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PrmSampleMemoryAllocationModule
+  FILE_GUID                      = C6B3E74A-12E3-4364-8FB4-8C8B34DD153B
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = PrmSampleMemoryAllocationModuleInit
+
+[Sources]
+  PrmSampleMemoryAllocationModule.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  PrmPkg/PrmPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  PrintLib
+  UefiDriverEntryPoint
+  UefiLib
+
+[Depex]
+  TRUE
+
+[BuildOptions.common]
+  MSFT:*_*_*_DLINK_FLAGS  = /DLL /SUBSYSTEM:CONSOLE
