@@ -1,0 +1,10 @@
+// /** @file
+//
+// Copyright (c) Microsoft Corporation
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+// **/
+
+
+#string STR_PACKAGE_ABSTRACT            #language en-US "This package provides support for the Platform Runtime Mechanism (PRM)."
+
+#string STR_PACKAGE_DESCRIPTION         #language en-US "Provides infrastructure support code and sample PRM modules for PRM authors."
