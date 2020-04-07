@@ -22,6 +22,10 @@
   #
   LoadLinuxLib|Include/Library/LoadLinuxLib.h
 
+  ##  @libraryclass  Declares helper functions for Secure Encrypted
+  #                  Virtualization (SEV) guests.
+  MemEncryptSevLib|Include/Library/MemEncryptSevLib.h
+
   ##  @libraryclass  Save and restore variables using a file
   #
   NvVarsFileLib|Include/Library/NvVarsFileLib.h
@@ -45,6 +49,9 @@
   #                  return codes, to the UEFI console.
   PlatformBmPrintScLib|Include/Library/PlatformBmPrintScLib.h
 
+  ##  @libraryclass  Customize FVB2 protocol member functions for a platform.
+  PlatformFvbLib|Include/Library/PlatformFvbLib.h
+
   ##  @libraryclass  Access QEMU's firmware configuration interface
   #
   QemuFwCfgLib|Include/Library/QemuFwCfgLib.h
@@ -66,6 +73,13 @@
   ##  @libraryclass  Serialize (and deserialize) variables
   #
   SerializeVariablesLib|Include/Library/SerializeVariablesLib.h
+
+  ##  @libraryclass  Declares utility functions for virtio device drivers.
+  VirtioLib|Include/Library/VirtioLib.h
+
+  ##  @libraryclass  Install Virtio Device Protocol instances on virtio-mmio
+  #                  transports.
+  VirtioMmioDeviceLib|Include/Library/VirtioMmioDeviceLib.h
 
   ##  @libraryclass  Invoke Xen hypercalls
   #
