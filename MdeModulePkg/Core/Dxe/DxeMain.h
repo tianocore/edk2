@@ -2816,15 +2816,6 @@ CoreUpdateMemoryAttributes (
   );
 
 /**
-  Initialize PropertiesTable support.
-**/
-VOID
-EFIAPI
-CoreInitializePropertiesTable (
-  VOID
-  );
-
-/**
   Initialize MemoryAttrubutesTable support.
 **/
 VOID
