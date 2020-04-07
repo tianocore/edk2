@@ -2,6 +2,7 @@
   Function prototypes and defines on Memory Only PE COFF loader
 
   Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+  Portion Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -25,6 +26,14 @@
 #define IMAGE_ERROR_FAILED_RELOCATION            9
 #define IMAGE_ERROR_FAILED_ICACHE_FLUSH          10
 
+//
+// Macro definitions for RISC-V architecture.
+//
+#define RV_X(x, s, n) (((x) >> (s)) & ((1<<(n))-1))
+#define RISCV_IMM_BITS 12
+#define RISCV_IMM_REACH (1LL<<RISCV_IMM_BITS)
+#define RISCV_CONST_HIGH_PART(VALUE) \
+  (((VALUE) + (RISCV_IMM_REACH/2)) & ~(RISCV_IMM_REACH-1))
 
 //
 // PE/COFF Loader Read Function passed in by caller
