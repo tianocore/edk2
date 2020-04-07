@@ -94,7 +94,6 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode
   gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPropertiesTableEnable
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable
   gEfiMdeModulePkgTokenSpaceGuid.PcdPteMemoryEncryptionAddressOrMask
   gEfiSecurityPkgTokenSpaceGuid.PcdOptionRomImageVerificationPolicy
