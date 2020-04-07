@@ -34,7 +34,6 @@
   Misc/Stall.c
   Misc/SetWatchdogTimer.c
   Misc/InstallConfigurationTable.c
-  Misc/PropertiesTable.c
   Misc/MemoryAttributesTable.c
   Misc/MemoryProtection.c
   Library/Library.c
