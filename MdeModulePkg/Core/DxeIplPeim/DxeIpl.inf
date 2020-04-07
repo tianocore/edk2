@@ -7,6 +7,7 @@
 #
 #  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 #  Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
+#  Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -25,7 +26,7 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 EBC (EBC is for build only) AARCH64
+#  VALID_ARCHITECTURES           = IA32 X64 EBC (EBC is for build only) AARCH64 RISCV64
 #
 
 [Sources]
@@ -48,6 +49,9 @@
 
 [Sources.ARM, Sources.AARCH64]
   Arm/DxeLoadFunc.c
+
+[Sources.RISCV64]
+  RiscV64/DxeLoadFunc.c
 
 [Packages]
   MdePkg/MdePkg.dec
