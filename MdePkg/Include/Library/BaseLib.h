@@ -4,6 +4,8 @@
 
 Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
+Portions Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -124,6 +126,30 @@ typedef struct {
 
 #endif  // defined (MDE_CPU_AARCH64)
 
+#if defined (MDE_CPU_RISCV64)
+///
+/// The RISC-V architecture context buffer used by SetJump() and LongJump().
+///
+typedef struct {
+  UINT64                            RA;
+  UINT64                            S0;
+  UINT64                            S1;
+  UINT64                            S2;
+  UINT64                            S3;
+  UINT64                            S4;
+  UINT64                            S5;
+  UINT64                            S6;
+  UINT64                            S7;
+  UINT64                            S8;
+  UINT64                            S9;
+  UINT64                            S10;
+  UINT64                            S11;
+  UINT64                            SP;
+} BASE_LIBRARY_JUMP_BUFFER;
+
+#define BASE_LIBRARY_JUMP_BUFFER_ALIGNMENT 8
+
+#endif // defined (MDE_CPU_RISCV64)
 
 //
 // String Services
