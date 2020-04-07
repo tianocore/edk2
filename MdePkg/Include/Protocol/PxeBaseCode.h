@@ -3,6 +3,8 @@
   devices for network access and network booting.
 
 Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Revision Reference:
@@ -153,6 +155,8 @@ typedef UINT16  EFI_PXE_BASE_CODE_UDP_PORT;
 #define EFI_PXE_CLIENT_SYSTEM_ARCHITECTURE    0x000A
 #elif defined (MDE_CPU_AARCH64)
 #define EFI_PXE_CLIENT_SYSTEM_ARCHITECTURE    0x000B
+#elif defined (MDE_CPU_RISCV64)
+#define EFI_PXE_CLIENT_SYSTEM_ARCHITECTURE    0x001B
 #endif
 
 
