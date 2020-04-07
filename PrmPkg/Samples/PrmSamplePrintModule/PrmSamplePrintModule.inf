@@ -1,0 +1,39 @@
+## @file
+#  Sample PRM Driver
+#
+#  This driver simply uses an OS-provided debug message print service to write
+#  a debug message. Three PRM handlers are provided that each print a unique
+#  debug message.
+#
+#  Copyright (c) Microsoft Corporation
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PrmSamplePrintModule
+  FILE_GUID                      = 1652B3C2-A7A1-46AC-AF93-DD6DEE446669
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = PrmSamplePrintModuleInit
+
+[Sources]
+  PrmSamplePrintModule.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  PrmPkg/PrmPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  UefiDriverEntryPoint
+  UefiLib
+
+[Depex]
+  TRUE
+
+[BuildOptions.common]
+  MSFT:*_*_*_DLINK_FLAGS  = /DLL /SUBSYSTEM:CONSOLE
