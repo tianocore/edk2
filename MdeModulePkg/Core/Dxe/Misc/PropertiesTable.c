@@ -23,8 +23,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/PeCoffGetEntryPointLib.h>
 #include <Protocol/Runtime.h>
 
-#include <Guid/PropertiesTable.h>
-
 #include "DxeMain.h"
 #include "HeapGuard.h"
 
@@ -47,17 +45,11 @@ IMAGE_PROPERTIES_PRIVATE_DATA  mImagePropertiesPrivateData = {
   INITIALIZE_LIST_HEAD_VARIABLE (mImagePropertiesPrivateData.ImageRecordList)
 };
 
-EFI_PROPERTIES_TABLE  mPropertiesTable = {
-  EFI_PROPERTIES_TABLE_VERSION,
-  sizeof(EFI_PROPERTIES_TABLE),
-  EFI_PROPERTIES_RUNTIME_MEMORY_PROTECTION_NON_EXECUTABLE_PE_DATA
-};
-
 EFI_LOCK           mPropertiesTableLock = EFI_INITIALIZE_LOCK_VARIABLE (TPL_NOTIFY);
 
-BOOLEAN            mPropertiesTableEnable;
-
 BOOLEAN            mPropertiesTableEndOfDxe = FALSE;
+
+extern BOOLEAN     mMemoryAttributesTableEnable;
 
 //
 // Below functions are for MemoryMap
@@ -359,11 +351,7 @@ SetNewRecord (
       //
       // DATA
       //
-      if (!mPropertiesTableEnable) {
-        NewRecord->Type = TempRecord.Type;
-      } else {
-        NewRecord->Type = EfiRuntimeServicesData;
-      }
+      NewRecord->Type          = TempRecord.Type;
       NewRecord->PhysicalStart = TempRecord.PhysicalStart;
       NewRecord->VirtualStart  = 0;
       NewRecord->NumberOfPages = EfiSizeToPages(ImageRecordCodeSection->CodeSegmentBase - NewRecord->PhysicalStart);
@@ -376,11 +364,7 @@ SetNewRecord (
       //
       // CODE
       //
-      if (!mPropertiesTableEnable) {
-        NewRecord->Type = TempRecord.Type;
-      } else {
-        NewRecord->Type = EfiRuntimeServicesCode;
-      }
+      NewRecord->Type          = TempRecord.Type;
       NewRecord->PhysicalStart = ImageRecordCodeSection->CodeSegmentBase;
       NewRecord->VirtualStart  = 0;
       NewRecord->NumberOfPages = EfiSizeToPages(ImageRecordCodeSection->CodeSegmentSize);
@@ -404,11 +388,7 @@ SetNewRecord (
   // Final DATA
   //
   if (TempRecord.PhysicalStart < ImageEnd) {
-    if (!mPropertiesTableEnable) {
-      NewRecord->Type = TempRecord.Type;
-    } else {
-      NewRecord->Type = EfiRuntimeServicesData;
-    }
+    NewRecord->Type          = TempRecord.Type;
     NewRecord->PhysicalStart = TempRecord.PhysicalStart;
     NewRecord->VirtualStart  = 0;
     NewRecord->NumberOfPages = EfiSizeToPages (ImageEnd - TempRecord.PhysicalStart);
@@ -519,14 +499,8 @@ SplitRecord (
         //
         NewRecord = PREVIOUS_MEMORY_DESCRIPTOR (NewRecord, DescriptorSize);
         IsLastRecordData = FALSE;
-        if (!mPropertiesTableEnable) {
-          if ((NewRecord->Attribute & EFI_MEMORY_XP) != 0) {
-            IsLastRecordData = TRUE;
-          }
-        } else {
-          if (NewRecord->Type == EfiRuntimeServicesData) {
-            IsLastRecordData = TRUE;
-          }
+        if ((NewRecord->Attribute & EFI_MEMORY_XP) != 0) {
+          IsLastRecordData = TRUE;
         }
         if (IsLastRecordData) {
           //
@@ -538,11 +512,7 @@ SplitRecord (
           // Last record is CODE, create a new DATA entry.
           //
           NewRecord = NEXT_MEMORY_DESCRIPTOR (NewRecord, DescriptorSize);
-          if (!mPropertiesTableEnable) {
-            NewRecord->Type = TempRecord.Type;
-          } else {
-            NewRecord->Type = EfiRuntimeServicesData;
-          }
+          NewRecord->Type          = TempRecord.Type;
           NewRecord->PhysicalStart = TempRecord.PhysicalStart;
           NewRecord->VirtualStart  = 0;
           NewRecord->NumberOfPages = TempRecord.NumberOfPages;
@@ -751,7 +721,7 @@ CoreGetMemoryMapWithSeparatedImageSection (
   //
   // If PE code/data is not aligned, just return.
   //
-  if ((mPropertiesTable.MemoryProtectionAttribute & EFI_PROPERTIES_RUNTIME_MEMORY_PROTECTION_NON_EXECUTABLE_PE_DATA) == 0) {
+  if (!mMemoryAttributesTableEnable) {
     return CoreGetMemoryMap (MemoryMapSize, MemoryMap, MapKey, DescriptorSize, DescriptorVersion);
   }
 
@@ -803,12 +773,9 @@ SetPropertiesTableSectionAlignment (
   )
 {
   if (((SectionAlignment & (RUNTIME_PAGE_ALLOCATION_GRANULARITY - 1)) != 0) &&
-      ((mPropertiesTable.MemoryProtectionAttribute & EFI_PROPERTIES_RUNTIME_MEMORY_PROTECTION_NON_EXECUTABLE_PE_DATA) != 0)) {
+      mMemoryAttributesTableEnable) {
     DEBUG ((EFI_D_VERBOSE, "SetPropertiesTableSectionAlignment - Clear\n"));
-    mPropertiesTable.MemoryProtectionAttribute &= ~((UINT64)EFI_PROPERTIES_RUNTIME_MEMORY_PROTECTION_NON_EXECUTABLE_PE_DATA);
-    gBS->GetMemoryMap = CoreGetMemoryMap;
-    gBS->Hdr.CRC32 = 0;
-    gBS->CalculateCrc32 ((UINT8 *)gBS, gBS->Hdr.HeaderSize, &gBS->Hdr.CRC32);
+    mMemoryAttributesTableEnable = FALSE;
   }
 }
 
@@ -1015,35 +982,6 @@ SortImageRecord (
 
     ImageRecordLink = ImageRecordLink->ForwardLink;
     NextImageRecordLink = ImageRecordLink->ForwardLink;
-  }
-}
-
-/**
-  Dump image record.
-**/
-STATIC
-VOID
-DumpImageRecord (
-  VOID
-  )
-{
-  IMAGE_PROPERTIES_RECORD      *ImageRecord;
-  LIST_ENTRY                   *ImageRecordLink;
-  LIST_ENTRY                   *ImageRecordList;
-  UINTN                        Index;
-
-  ImageRecordList = &mImagePropertiesPrivateData.ImageRecordList;
-
-  for (ImageRecordLink = ImageRecordList->ForwardLink, Index= 0;
-       ImageRecordLink != ImageRecordList;
-       ImageRecordLink = ImageRecordLink->ForwardLink, Index++) {
-    ImageRecord = CR (
-                    ImageRecordLink,
-                    IMAGE_PROPERTIES_RECORD,
-                    Link,
-                    IMAGE_PROPERTIES_RECORD_SIGNATURE
-                    );
-    DEBUG ((EFI_D_VERBOSE, "  Image[%d]: 0x%016lx - 0x%016lx\n", Index, ImageRecord->ImageBase, ImageRecord->ImageSize));
   }
 }
 
@@ -1323,29 +1261,6 @@ InstallPropertiesTable (
   )
 {
   mPropertiesTableEndOfDxe = TRUE;
-  if (PcdGetBool (PcdPropertiesTableEnable)) {
-    EFI_STATUS  Status;
-
-    Status = gBS->InstallConfigurationTable (&gEfiPropertiesTableGuid, &mPropertiesTable);
-    ASSERT_EFI_ERROR (Status);
-
-    DEBUG ((EFI_D_INFO, "MemoryProtectionAttribute - 0x%016lx\n", mPropertiesTable.MemoryProtectionAttribute));
-    if ((mPropertiesTable.MemoryProtectionAttribute & EFI_PROPERTIES_RUNTIME_MEMORY_PROTECTION_NON_EXECUTABLE_PE_DATA) == 0) {
-      DEBUG ((EFI_D_ERROR, "MemoryProtectionAttribute NON_EXECUTABLE_PE_DATA is not set, "));
-      DEBUG ((EFI_D_ERROR, "because Runtime Driver Section Alignment is not %dK.\n", RUNTIME_PAGE_ALLOCATION_GRANULARITY >> 10));
-      return ;
-    }
-
-    gBS->GetMemoryMap = CoreGetMemoryMapWithSeparatedImageSection;
-    gBS->Hdr.CRC32 = 0;
-    gBS->CalculateCrc32 ((UINT8 *)gBS, gBS->Hdr.HeaderSize, &gBS->Hdr.CRC32);
-
-    DEBUG ((EFI_D_VERBOSE, "Total Image Count - 0x%x\n", mImagePropertiesPrivateData.ImageRecordCount));
-    DEBUG ((EFI_D_VERBOSE, "Dump ImageRecord:\n"));
-    DumpImageRecord ();
-
-    mPropertiesTableEnable = TRUE;
-  }
 }
 
 /**

@@ -18,7 +18,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Guid/EventGroup.h>
 
 #include <Guid/MemoryAttributesTable.h>
-#include <Guid/PropertiesTable.h>
 
 #include "DxeMain.h"
 
@@ -64,7 +63,7 @@ CoreGetMemoryMapWithSeparatedImageSection (
   OUT UINT32                    *DescriptorVersion
   );
 
-extern EFI_PROPERTIES_TABLE  mPropertiesTable;
+BOOLEAN                      mMemoryAttributesTableEnable = TRUE;
 EFI_MEMORY_ATTRIBUTES_TABLE  *mMemoryAttributesTable = NULL;
 BOOLEAN                      mMemoryAttributesTableReadyToBoot = FALSE;
 
@@ -96,8 +95,8 @@ InstallMemoryAttributesTable (
     return;
   }
 
-  if ((mPropertiesTable.MemoryProtectionAttribute & EFI_PROPERTIES_RUNTIME_MEMORY_PROTECTION_NON_EXECUTABLE_PE_DATA) == 0) {
-    DEBUG ((EFI_D_VERBOSE, "MemoryProtectionAttribute NON_EXECUTABLE_PE_DATA is not set, "));
+  if (!mMemoryAttributesTableEnable) {
+    DEBUG ((DEBUG_VERBOSE, "Cannot install Memory Attributes Table "));
     DEBUG ((EFI_D_VERBOSE, "because Runtime Driver Section Alignment is not %dK.\n", RUNTIME_PAGE_ALLOCATION_GRANULARITY >> 10));
     return ;
   }
