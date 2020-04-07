@@ -423,7 +423,6 @@ DxeMain (
 
   MemoryProfileInstallProtocol ();
 
-  CoreInitializePropertiesTable ();
   CoreInitializeMemoryAttributesTable ();
   CoreInitializeMemoryProtection ();
 
