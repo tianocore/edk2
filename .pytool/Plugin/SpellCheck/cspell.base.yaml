@@ -22,6 +22,8 @@
     ],
     "minWordLength": 5,
     "allowCompoundWords": false,
+    "maxNumberOfProblems": 200,
+    "maxDuplicateProblems": 200,
     "ignoreWords": [
         "muchange"
     ],
