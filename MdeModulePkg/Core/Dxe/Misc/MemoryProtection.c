@@ -35,7 +35,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <Guid/EventGroup.h>
 #include <Guid/MemoryAttributesTable.h>
-#include <Guid/PropertiesTable.h>
 
 #include <Protocol/FirmwareVolume2.h>
 #include <Protocol/SimpleFileSystem.h>
