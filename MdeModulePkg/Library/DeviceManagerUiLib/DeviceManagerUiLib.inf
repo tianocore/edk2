@@ -40,6 +40,7 @@
   DebugLib
   PrintLib
   HiiLib
+  UefiBootManagerLib
   UefiHiiServicesLib
 
 [Guids]
