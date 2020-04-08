@@ -1,0 +1,29 @@
+#/** @file
+#
+#  Copyright (c) 2019, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x0001001b
+  BASE_NAME                      = PlatformUpdateProgressLibNull
+  FILE_GUID                      = BFC3E25A-8AD0-4201-8A75-F00DE7964370
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PlatformUpdateProgressLib
+
+[Sources.common]
+  PlatformUpdateProgressLibNull.c
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  UefiLib
+  DebugLib
+
+[Pcd]
+
