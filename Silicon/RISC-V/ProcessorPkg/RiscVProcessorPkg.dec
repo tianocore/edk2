@@ -1,0 +1,47 @@
+## @file  RiscVProcesssorPkg.dec
+# This Package provides UEFI RISC-V processor modules and libraries.
+#
+# Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  DEC_SPECIFICATION              = 0x0001001b
+  PACKAGE_NAME                   = RiscVProcessorPkg
+  PACKAGE_UNI_FILE               = RiscVProcessorPkg.uni
+  PACKAGE_GUID                   = 993C7CAC-C87C-4F08-A2CF-AD3AABA859D1
+  PACKAGE_VERSION                = 1.0
+
+[Includes]
+  Include
+  Include/Library
+  Library/RiscVOpensbiLib/opensbi         # OpenSBI header file reference ("include/sbi/...")
+  Library/RiscVOpensbiLib/opensbi/include # Header file reference from opensbi files, ("sbi/...")
+
+[LibraryClasses]
+  RiscVPlatformDxeIplLib|Include/Library/RiscVPlatformDxeIpl.h
+  RiscVCpuLib|Include/Library/RiscVCpuLib.h
+  RiscVEdk2SbiLib|Include/Library/RiscVEdk2SbiLib.h
+
+[Guids]
+  gUefiRiscVPkgTokenSpaceGuid  = { 0x4261e9c8, 0x52c0, 0x4b34, { 0x85, 0x3d, 0x48, 0x46, 0xea, 0xd3, 0xb7, 0x2c}}
+
+[PcdsFixedAtBuild]
+  # Processor Specific Data GUID HOB GUID
+  gUefiRiscVPkgTokenSpaceGuid.PcdProcessorSpecificDataGuidHobGuid|{0x20, 0x72, 0xD5, 0x2F, 0xCF, 0x3C, 0x4C, 0xBC, 0xB1, 0x65, 0x94, 0x90, 0xDC, 0xF2, 0xFA, 0x93}|VOID*|0x00001000
+  gUefiRiscVPkgTokenSpaceGuid.PcdProcessorSmbiosGuidHobGuid|{0x0F, 0x34, 0x00, 0x92, 0x04, 0x12, 0x45, 0x4A, 0x9C, 0x11, 0xB8, 0x8B, 0xDF, 0xC6, 0xFA, 0x6F}|VOID*|0x00001001
+  gUefiRiscVPkgTokenSpaceGuid.PcdProcessorSmbiosType4GuidHobGuid|{0x5B, 0x36, 0xEA, 0x23, 0x79, 0x6D, 0x4F, 0xCF, 0x9C, 0x22, 0x25, 0xC0, 0x89, 0x8C, 0x25, 0xB9}|VOID*|0x00001002
+  gUefiRiscVPkgTokenSpaceGuid.PcdProcessorSmbiosType7GuidHobGuid|{0xBF, 0xB4, 0x6D, 0x1B, 0x7E, 0x10, 0x47, 0x44, 0xB8, 0xBD, 0xFF, 0x1E, 0xDD, 0xDF, 0x71, 0x65}|VOID*|0x00001003
+
+  #
+  #                                                   1000000000
+  # PcdRiscVMachineTimerTickInNanoSecond = ---------------------------------------
+  #                                          PcdRiscVMachineTimerFrequencyInHerz
+  #
+  gUefiRiscVPkgTokenSpaceGuid.PcdRiscVMachineTimerTickInNanoSecond|100|UINT64|0x00001010
+  gUefiRiscVPkgTokenSpaceGuid.PcdRiscVMachineTimerFrequencyInHerz|10000000|UINT64|0x00001011
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  RiscVProcessorPkgExtra.uni
