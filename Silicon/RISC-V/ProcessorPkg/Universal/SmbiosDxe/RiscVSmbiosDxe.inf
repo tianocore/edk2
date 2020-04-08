@@ -1,0 +1,55 @@
+## @file
+#  RISC-V SMBIOS DXE module.
+#
+#  Copyright (c) 2019, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001b
+  BASE_NAME                      = RiscVSmbiosDxe
+  MODULE_UNI_FILE                = RiscVSmbiosDxe.uni
+  FILE_GUID                      = 5FC01647-AADD-42E1-AD99-DF4CB89F5A92
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = RiscVSmbiosBuilderEntry
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  Silicon/RISC-V/ProcessorPkg/RiscVProcessorPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  HobLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Sources]
+  RiscVSmbiosDxe.c
+  RiscVSmbiosDxe.h
+
+[Protocols]
+  gEfiSmbiosProtocolGuid        # Consumed
+
+[Guids]
+
+
+[Pcd]
+
+[FixedPcd]
+  gUefiRiscVPkgTokenSpaceGuid.PcdProcessorSmbiosGuidHobGuid
+  gUefiRiscVPkgTokenSpaceGuid.PcdProcessorSmbiosType4GuidHobGuid
+  gUefiRiscVPkgTokenSpaceGuid.PcdProcessorSmbiosType7GuidHobGuid
+  gUefiRiscVPkgTokenSpaceGuid.PcdProcessorSpecificDataGuidHobGuid
+
+[Depex]
+  gEfiSmbiosProtocolGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  RiscVSmbiosDxeExtra.uni
