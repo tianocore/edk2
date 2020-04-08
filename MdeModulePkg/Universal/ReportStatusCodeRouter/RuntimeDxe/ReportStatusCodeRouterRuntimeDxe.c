@@ -3,6 +3,7 @@
   and Status Code Runtime Protocol.
 
   Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) Microsoft Corporation.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -307,6 +308,9 @@ ReportDispatcher (
     }
     if (Data != NULL) {
       CopyMem (&RscData->Data, Data, Data->HeaderSize + Data->Size);
+    } else {
+      ZeroMem (&RscData->Data, sizeof (RscData->Data));
+      RscData->Data.HeaderSize = sizeof (RscData->Data);
     }
 
     Status = gBS->SignalEvent (CallbackEntry->Event);
