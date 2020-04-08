@@ -1,0 +1,77 @@
+## @file  RiscVPlatformPkg.dec
+# This Package provides UEFI RISC-V platform modules and libraries.
+#
+# Copyright (c) 2019, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  DEC_SPECIFICATION              = 0x0001001b
+  PACKAGE_NAME                   = RiscVPlatformPkg
+  PACKAGE_UNI_FILE               = RiscVPlatformPkg.uni
+  PACKAGE_GUID                   = B51DBDBB-B43D-4D45-8CDD-1D6D1C691003
+  PACKAGE_VERSION                = 1.0
+
+[Includes]
+  Include
+
+[LibraryClasses]
+  FirmwareContextProcessorSpecificLib|Include/Library/FirmwareContextProcessorSpecificLib.h
+  RiscVPlatformTempMemoryInitLib|Include/Library/RiscVPlatformTempMemoryInitLib.h
+
+[Guids]
+  gUefiRiscVPlatformPkgTokenSpaceGuid  = {0x6A67AF99, 0x4592, 0x40F8, { 0xB6, 0xBE, 0x62, 0xBC, 0xA1, 0x0D, 0xA1, 0xEC}}
+
+[PcdsFixedAtBuild]
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdRiscVSecFvBase|0x0|UINT32|0x00001000
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdRiscVSecFvSize|0x0|UINT32|0x00001001
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdRiscVPeiFvBase|0x0|UINT32|0x00001002
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdRiscVPeiFvSize|0x0|UINT32|0x00001003
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdRiscVDxeFvBase|0x0|UINT32|0x00001004
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdRiscVDxeFvSize|0x0|UINT32|0x00001005
+
+#
+# Definition of EFI Variable region
+#
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdVariableFdBaseAddress|0|UINT32|0x00001010
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdVariableFdSize|0|UINT32|0x00001011
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdVariableFdBlockSize|0|UINT32|0x00001012
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPlatformFlashNvStorageVariableBase|0|UINT32|0x00001013
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPlatformFlashNvStorageFtwWorkingBase|0|UINT32|0x00001014
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPlatformFlashNvStorageFtwSpareBase|0|UINT32|0x00001015
+#
+# Firmware region which is protected by PMP.
+#
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdFwBlockSize|0|UINT32|0x00001020
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdFwStartAddress|0|UINT32|0x00001021
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdFwEndAddress|0|UINT32|0x00001022
+#
+# Definition of RISC-V Hart
+#
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdHartCount|0|UINT32|0x00001023
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdBootHartId|0|UINT32|0x00001024
+#
+# The bootable hart core number, which is incorporate with OpenSBI platform hart_index2id value.
+#
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdBootableHartNumber|0|UINT32|0x00001025
+#
+# Definitions for OpenSbi
+#
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdScratchRamBase|0|UINT32|0x00001100
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdScratchRamSize|0|UINT32|0x00001101
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdOpenSbiStackSize|0|UINT32|0x00001102
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdTemporaryRamBase|0|UINT32|0x00001103
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdTemporaryRamSize|0|UINT32|0x00001104
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPeiCorePrivilegeMode|0|UINT32|0x00001105
+
+[PcdsPatchableInModule]
+
+[PcdsFeatureFlag]
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdBootlogoOnlyEnable|FALSE|BOOLEAN|0x00001006
+
+[PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  RiscVPlatformPkgExtra.uni
