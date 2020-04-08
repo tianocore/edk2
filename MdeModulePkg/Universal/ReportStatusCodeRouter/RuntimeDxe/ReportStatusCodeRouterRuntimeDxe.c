@@ -65,7 +65,7 @@ RscHandlerNotification (
                      &RscData->Data
                      );
 
-    Address += (sizeof (RSC_DATA_ENTRY) + RscData->Data.Size);
+    Address += (OFFSET_OF (RSC_DATA_ENTRY, Data) + RscData->Data.HeaderSize + RscData->Data.Size);
     Address  = ALIGN_VARIABLE (Address);
   }
 
@@ -274,7 +274,7 @@ ReportDispatcher (
     RscData = (RSC_DATA_ENTRY *) (UINTN) CallbackEntry->EndPointer;
     CallbackEntry->EndPointer += sizeof (RSC_DATA_ENTRY);
     if (Data != NULL) {
-      CallbackEntry->EndPointer += Data->Size;
+      CallbackEntry->EndPointer += (Data->Size + Data->HeaderSize - sizeof (EFI_STATUS_CODE_DATA));
     }
 
     //
