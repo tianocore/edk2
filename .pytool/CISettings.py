@@ -39,7 +39,9 @@ class Settings(CiBuildSettingsManager, UpdateSettingsManager, SetupSettingsManag
         ''' return iterable of edk2 packages supported by this build.
         These should be edk2 workspace relative paths '''
 
-        return ("MdePkg",
+        return ("ArmVirtPkg",
+                "EmulatorPkg",
+                "MdePkg",
                 "MdeModulePkg",
                 "NetworkPkg",
                 "PcAtChipsetPkg",
@@ -49,7 +51,8 @@ class Settings(CiBuildSettingsManager, UpdateSettingsManager, SetupSettingsManag
                 "ShellPkg",
                 "FatPkg",
                 "CryptoPkg",
-                "UnitTestFrameworkPkg"
+                "UnitTestFrameworkPkg",
+                "OvmfPkg"
                 )
 
     def GetArchitecturesSupported(self):
