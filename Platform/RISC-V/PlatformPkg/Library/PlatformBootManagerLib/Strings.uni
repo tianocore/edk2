@@ -1,0 +1,28 @@
+///** @file
+//
+//    String definitions for PlatformBootManagerLib.
+//
+//  Copyright (c) 2019, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+//  Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
+//
+//  SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+//**/
+
+/=#
+
+#langdef   en-US "English"
+#langdef   fr-FR "Français"
+
+#string STR_PERFORM_MEM_TEST           #language en-US  "Perform memory test (ESC to skip)"
+                                       #language fr-FR  "Exécute l'examen de mémoire (ESC pour sauter)"
+#string STR_MEMORY_TEST_PERCENT        #language en-US  "% of the system memory tested OK"
+                                       #language fr-FR  "% de la mémoire de système essayée D'ACCORD"
+#string STR_ESC_TO_SKIP_MEM_TEST       #language en-US  "Press ESC key to skip memory test"
+                                       #language fr-FR  "Appuie sur ESC sauter examen de mémoire"
+#string STR_MEM_TEST_COMPLETED         #language en-US  " bytes of system memory tested OK\r\n"
+                                       #language fr-FR  " octets dela mémoire de système essayée D'ACCORD\r\n"
+#string STR_SYSTEM_MEM_ERROR           #language en-US  "System encounters memory errors"
+                                       #language fr-FR  "le Système rencontre les erreurs de mémoire"
+#string STR_START_BOOT_OPTION          #language en-US  "Start boot option"
+                                       #language fr-FR  "l'option de botte de Début"

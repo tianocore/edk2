@@ -1,0 +1,61 @@
+## @file
+#  Include all platform action which can be customized by IBV/OEM.
+#
+#  Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001b
+  BASE_NAME                      = PlatformBootManagerLib
+  FILE_GUID                      = 7DDA7916-6139-4D46-A415-30E854AF3BC7
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PlatformBootManagerLib|DXE_DRIVER
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = RISCV64
+#
+
+[Sources]
+  PlatformData.c
+  PlatformBootManager.c
+  PlatformBootManager.h
+  Strings.uni
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  Platform/RISC-V/PlatformPkg/RiscVPlatformPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  UefiLib
+  UefiBootManagerLib
+  PcdLib
+  PlatformMemoryTestLib
+  PlatformUpdateProgressLib
+  DxeServicesLib
+  MemoryAllocationLib
+  DevicePathLib
+  HiiLib
+  PrintLib
+
+[Guids]
+
+[Protocols]
+  gEfiGenericMemTestProtocolGuid  ## CONSUMES
+  gEfiGraphicsOutputProtocolGuid  ## CONSUMES
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConInConnectOnDemand
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdBootlogoOnlyEnable
