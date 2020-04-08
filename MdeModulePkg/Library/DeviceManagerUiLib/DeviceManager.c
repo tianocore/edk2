@@ -893,6 +893,13 @@ DeviceManagerUiLibConstructor (
   ASSERT (gDeviceManagerPrivate.HiiHandle != NULL);
 
   //
+  // The device manager form contains a page listing all the network
+  // controllers in the system. This list can only be populated if all
+  // handles have been connected, so do it here.
+  //
+  EfiBootManagerConnectAll ();
+
+  //
   // Update boot manager page
   //
   CreateDeviceManagerForm (DEVICE_MANAGER_FORM_ID);
