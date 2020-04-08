@@ -6,11 +6,11 @@
 | :----               | :-----                   | :----                             | :---         |
 | ArmPkg              |
 | ArmPlatformPkg      |
-| ArmVirtPkg          |
+| ArmVirtPkg          | SEE PACKAGE README | SEE PACKAGE README |
 | CryptoPkg           | :heavy_check_mark: | :heavy_check_mark: | Spell checking in audit mode
 | DynamicTablesPkg    |
 | EmbeddedPkg         |
-| EmulatorPkg         |
+| EmulatorPkg         | SEE PACKAGE README | SEE PACKAGE README | Spell checking in audit mode
 | FatPkg              | :heavy_check_mark: | :heavy_check_mark: |
 | FmpDevicePkg        | :heavy_check_mark: | :heavy_check_mark: |
 | IntelFsp2Pkg        |
@@ -18,7 +18,7 @@
 | MdeModulePkg        | :heavy_check_mark: | :heavy_check_mark: | DxeIpl dependency on ArmPkg, Depends on StandaloneMmPkg, Spell checking in audit mode
 | MdePkg              | :heavy_check_mark: | :heavy_check_mark: | Spell checking in audit mode
 | NetworkPkg          | :heavy_check_mark: | :heavy_check_mark: | Spell checking in audit mode
-| OvmfPkg             |
+| OvmfPkg             | SEE PACKAGE README | SEE PACKAGE README | Spell checking in audit mode
 | PcAtChipsetPkg      | :heavy_check_mark: | :heavy_check_mark: |
 | SecurityPkg         | :heavy_check_mark: | :heavy_check_mark: | Spell checking in audit mode
 | ShellPkg            | :heavy_check_mark: | :heavy_check_mark: | Spell checking in audit mode, 3 modules are not being built by DSC
@@ -77,7 +77,7 @@ per package configuration which comes from this file.
 ## Running CI locally
 
 The EDKII Tools environment (and by extension the ci) is designed to support
-easily and consistantly running locally and in a cloud ci environment.  To do
+easily and consistently running locally and in a cloud ci environment.  To do
 that a few steps should be followed.  Details of EDKII Tools can be found in the
 [docs folder here](https://github.com/tianocore/edk2-pytool-extensions/tree/master/docs)
 
@@ -216,8 +216,6 @@ few standard scopes.
 * Visual Studio AARCH64 and ARM support
 * BaseTools C tools CI/PR and binary release process
 * BaseTools Python tools CI/PR process
-* Host based unit testing
 * Extensible private/closed source platform reporting
-* Platform builds, validation
 * UEFI SCTs
 * Other automation
