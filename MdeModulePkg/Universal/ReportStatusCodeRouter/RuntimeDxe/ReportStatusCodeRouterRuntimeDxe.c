@@ -3,6 +3,7 @@
   and Status Code Runtime Protocol.
 
   Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) Microsoft Corporation.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -286,6 +287,7 @@ ReportDispatcher (
                       );
         if (NewBuffer != NULL) {
           CallbackEntry->EndPointer = (EFI_PHYSICAL_ADDRESS) (UINTN) NewBuffer + (CallbackEntry->EndPointer - CallbackEntry->StatusCodeDataBuffer);
+          RscData = (RSC_DATA_ENTRY *) (UINTN) ((UINTN) NewBuffer + ((UINTN) RscData - CallbackEntry->StatusCodeDataBuffer));
           CallbackEntry->StatusCodeDataBuffer = (EFI_PHYSICAL_ADDRESS) (UINTN) NewBuffer;
           CallbackEntry->BufferSize *= 2;
         }
