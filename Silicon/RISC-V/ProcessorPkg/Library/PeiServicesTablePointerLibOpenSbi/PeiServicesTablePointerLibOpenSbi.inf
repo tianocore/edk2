@@ -1,0 +1,39 @@
+## @file
+# Instance of PEI Services Table Pointer Library using RISC-V OpenSBI FirmwareContext.
+#
+#  PEI Services Table Pointer Library implementation that retrieves a pointer to the
+#  PEI Services Table from a RISC-V OpenSBI sbi_platform firmware context structure.
+#
+#  Copyright (c) 2019, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001b
+  BASE_NAME                      = PeiServicesTablePointerLibOpenSbi
+  MODULE_UNI_FILE                = PeiServicesTablePointerLibOpenSbi.uni
+  FILE_GUID                      = B4054E46-FE75-4290-B442-4836B1265D8F
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PeiServicesTablePointerLib|PEIM PEI_CORE
+
+  CONSTRUCTOR                    = PeiServicesTablePointerLibOpenSbiConstructor
+
+#
+#  VALID_ARCHITECTURES           = RISCV64
+#
+
+[Sources]
+  PeiServicesTablePointerOpenSbi.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  Silicon/RISC-V/ProcessorPkg/RiscVProcessorPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  RiscVCpuLib
+  RiscVEdk2SbiLib
+
