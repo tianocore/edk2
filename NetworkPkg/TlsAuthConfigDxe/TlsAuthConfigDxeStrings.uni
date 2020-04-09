@@ -28,6 +28,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #string STR_TLS_AUTH_CONFIG_SAVE_AND_EXIT            #language en-US "Commit Changes and Exit"
 #string STR_TLS_AUTH_CONFIG_NO_SAVE_AND_EXIT         #language en-US "Discard Changes and Exit"
 
+#string STR_TLS_AUTH_ENROLL_CERT_FAILURE             #language en-US "Enroll Cert Failure!"
+
 #string STR_CERT_TYPE_PCKS_GUID                      #language en-US "GUID for CERT"
 
 #string STR_NULL                                     #language en-US ""
