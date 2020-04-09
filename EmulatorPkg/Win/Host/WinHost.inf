@@ -4,6 +4,7 @@
 # Main executable file of Win Emulator that loads Sec core after initialization finished.
 # Copyright (c) 2008 - 2019, Intel Corporation. All rights reserved.<BR>
 # Portions copyright (c) 2008 - 2011, Apple Inc. All rights reserved.<BR>
+# (C) Copyright 2020 Hewlett Packard Enterprise Development LP<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -33,11 +34,13 @@
   WinThunk.c
   WinHost.h
   WinHost.c
+  WinPacketFilter.c
   WinInclude.h
 
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
+  NetworkPkg/NetworkPkg.dec
   EmulatorPkg/EmulatorPkg.dec
 
 [LibraryClasses]
@@ -61,6 +64,7 @@
   gEmuGraphicsWindowProtocolGuid
   gEmuBlockIoProtocolGuid
   gEfiSimpleFileSystemProtocolGuid
+  gEmuSnpProtocolGuid
 
 [Guids]
   gEfiFileSystemVolumeLabelInfoIdGuid           # SOMETIMES_CONSUMED
@@ -78,6 +82,7 @@
   gEmulatorPkgTokenSpaceGuid.PcdEmuGop|L"GOP Window"
   gEmulatorPkgTokenSpaceGuid.PcdEmuFileSystem
   gEmulatorPkgTokenSpaceGuid.PcdPeiServicesTablePage
+  gEmulatorPkgTokenSpaceGuid.PcdEmuNetworkInterface|L"0"
 
 [BuildOptions]
   MSFT:*_*_*_DLINK_FLAGS            == /out:"$(BIN_DIR)\$(BASE_NAME).exe" /base:0x10000000 /pdb:"$(BIN_DIR)\$(BASE_NAME).pdb"

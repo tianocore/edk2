@@ -1,6 +1,7 @@
 /**@file
 
 Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+(C) Copyright 2020 Hewlett Packard Enterprise Development LP<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 
@@ -29,6 +30,7 @@ Abstract:
 
 #include <Protocol/EmuBlockIo.h>
 #include <Protocol/BlockIo.h>
+#include <Protocol/EmuSnp.h>
 
 #include <Library/BaseLib.h>
 #include <Library/PeCoffLib.h>
@@ -41,6 +43,7 @@ Abstract:
 #include <Library/BaseMemoryLib.h>
 #include <Library/PeiServicesLib.h>
 #include <Library/PeCoffExtraActionLib.h>
+#include <Library/NetLib.h>
 
 
 #define TEMPORARY_RAM_SIZE                0x20000
@@ -200,4 +203,6 @@ extern EMU_THUNK_PROTOCOL    gEmuThunkProtocol;
 extern EMU_IO_THUNK_PROTOCOL mWinNtWndThunkIo;
 extern EMU_IO_THUNK_PROTOCOL mWinNtFileSystemThunkIo;
 extern EMU_IO_THUNK_PROTOCOL mWinNtBlockIoThunkIo;
+extern EMU_IO_THUNK_PROTOCOL mWinNtSnpThunkIo;
+
 #endif
