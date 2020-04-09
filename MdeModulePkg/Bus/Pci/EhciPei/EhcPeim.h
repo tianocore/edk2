@@ -2,6 +2,7 @@
 Private Header file for Usb Host Controller PEIM
 
 Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) Microsoft Corporation.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -17,6 +18,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Ppi/IoMmu.h>
 #include <Ppi/EndOfPeiPhase.h>
 
+#include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PeimEntryPoint.h>
 #include <Library/PeiServicesLib.h>
@@ -59,20 +61,6 @@ typedef struct _PEI_USB2_HC_DEV PEI_USB2_HC_DEV;
 // Sync transfer polling interval, set by experience.
 //
 #define EHC_SYNC_POLL_INTERVAL       (6 * EHC_1_MILLISECOND)
-
-//
-//Iterate through the double linked list. NOT delete safe
-//
-#define EFI_LIST_FOR_EACH(Entry, ListHead)    \
-  for(Entry = (ListHead)->ForwardLink; Entry != (ListHead); Entry = Entry->ForwardLink)
-
-//
-//Iterate through the double linked list. This is delete-safe.
-//Don't touch NextEntry
-//
-#define EFI_LIST_FOR_EACH_SAFE(Entry, NextEntry, ListHead)            \
-  for(Entry = (ListHead)->ForwardLink, NextEntry = Entry->ForwardLink;\
-      Entry != (ListHead); Entry = NextEntry, NextEntry = Entry->ForwardLink)
 
 #define EFI_LIST_CONTAINER(Entry, Type, Field) BASE_CR(Entry, Type, Field)
 
