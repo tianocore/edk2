@@ -36,8 +36,6 @@
 #define PCI_ID_VENDOR_UNKNOWN         0xffff
 #define PCI_ID_DEVICE_DONTCARE        0x0000
 
-#define PCI_MAX_BARS                  6
-
 extern EFI_CPU_ARCH_PROTOCOL      *mCpu;
 
 typedef struct {

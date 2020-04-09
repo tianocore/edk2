@@ -1679,8 +1679,8 @@ InitializePciIoProtocol (
     ASSERT (Desc->Desc == ACPI_ADDRESS_SPACE_DESCRIPTOR);
     ASSERT (Desc->ResType == ACPI_ADDRESS_SPACE_TYPE_MEM);
 
-    if (Idx >= PCI_MAX_BARS ||
-        (Idx == PCI_MAX_BARS - 1 && Desc->AddrSpaceGranularity == 64)) {
+    if (Idx >= PCI_MAX_BAR ||
+        (Idx == PCI_MAX_BAR - 1 && Desc->AddrSpaceGranularity == 64)) {
       DEBUG ((DEBUG_ERROR,
         "%a: resource count exceeds number of emulated BARs\n",
         __FUNCTION__));
