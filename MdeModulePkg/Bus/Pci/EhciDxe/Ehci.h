@@ -3,6 +3,7 @@
   Provides some data struct used by EHCI controller driver.
 
 Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) Microsoft Corporation.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -79,20 +80,6 @@ typedef struct _USB2_HC_DEV  USB2_HC_DEV;
 // to protect shared data structures.
 //
 #define  EHC_TPL                     TPL_NOTIFY
-
-//
-//Iterate through the double linked list. NOT delete safe
-//
-#define EFI_LIST_FOR_EACH(Entry, ListHead)    \
-  for(Entry = (ListHead)->ForwardLink; Entry != (ListHead); Entry = Entry->ForwardLink)
-
-//
-//Iterate through the double linked list. This is delete-safe.
-//Don't touch NextEntry
-//
-#define EFI_LIST_FOR_EACH_SAFE(Entry, NextEntry, ListHead)            \
-  for(Entry = (ListHead)->ForwardLink, NextEntry = Entry->ForwardLink;\
-      Entry != (ListHead); Entry = NextEntry, NextEntry = Entry->ForwardLink)
 
 #define EFI_LIST_CONTAINER(Entry, Type, Field) BASE_CR(Entry, Type, Field)
 
