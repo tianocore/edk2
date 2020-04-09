@@ -466,8 +466,8 @@ SimpleNetworkDriverStart (
   // the IO BAR.  Save the index of the BAR into the adapter info structure.
   // for regular 32bit BARs, 0 is memory mapped, 1 is io mapped
   //
-  Snp->MemoryBarIndex = 0;
-  Snp->IoBarIndex     = 1;
+  Snp->MemoryBarIndex = PCI_MAX_BAR;
+  Snp->IoBarIndex     = PCI_MAX_BAR;
   FoundMemoryBar      = FALSE;
   FoundIoBar          = FALSE;
   for (BarIndex = 0; BarIndex < PCI_MAX_BAR; BarIndex++) {
