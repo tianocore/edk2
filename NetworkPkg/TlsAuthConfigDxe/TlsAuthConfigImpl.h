@@ -14,6 +14,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <Protocol/HiiConfigAccess.h>
 #include <Protocol/SimpleFileSystem.h>
+#include <Protocol/HiiPopup.h>
 
 //
 // Libraries

@@ -52,6 +52,7 @@
 [Protocols]
   gEfiDevicePathProtocolGuid                    ## PRODUCES
   gEfiHiiConfigAccessProtocolGuid               ## PRODUCES
+  gEfiHiiPopupProtocolGuid                      ## CONSUMES
 
 [Guids]
   gTlsAuthConfigGuid                            ## PRODUCES  ## GUID
