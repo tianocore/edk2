@@ -290,6 +290,7 @@ ReportDispatcher (
         if (NewBuffer != NULL) {
           FailSafeEndPointer = (EFI_PHYSICAL_ADDRESS) (UINTN) NewBuffer + (FailSafeEndPointer - CallbackEntry->StatusCodeDataBuffer);
           CallbackEntry->EndPointer = (EFI_PHYSICAL_ADDRESS) (UINTN) NewBuffer + (CallbackEntry->EndPointer - CallbackEntry->StatusCodeDataBuffer);
+          RscData = (RSC_DATA_ENTRY *) (UINTN) ((UINTN) NewBuffer + ((UINTN) RscData - CallbackEntry->StatusCodeDataBuffer));
           CallbackEntry->StatusCodeDataBuffer = (EFI_PHYSICAL_ADDRESS) (UINTN) NewBuffer;
           CallbackEntry->BufferSize *= 2;
         }
