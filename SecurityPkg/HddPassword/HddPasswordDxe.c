@@ -2,6 +2,7 @@
   HDD password driver which is used to support HDD security feature.
 
   Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) Microsoft Corporation.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -115,7 +116,7 @@ BuildHddPasswordDeviceInfo (
   // Build HDD password device info and save them to LockBox.
   //
   DevInfoLength = 0;
-  EFI_LIST_FOR_EACH (Entry, &mHddPasswordConfigFormList) {
+  BASE_LIST_FOR_EACH (Entry, &mHddPasswordConfigFormList) {
     ConfigFormEntry = BASE_CR (Entry, HDD_PASSWORD_CONFIG_FORM_ENTRY, Link);
 
     //
@@ -164,7 +165,7 @@ BuildHddPasswordDeviceInfo (
   ASSERT (DevInfo != NULL);
 
   TempDevInfo = DevInfo;
-  EFI_LIST_FOR_EACH (Entry, &mHddPasswordConfigFormList) {
+  BASE_LIST_FOR_EACH (Entry, &mHddPasswordConfigFormList) {
     ConfigFormEntry = BASE_CR (Entry, HDD_PASSWORD_CONFIG_FORM_ENTRY, Link);
 
     if ((!PasswordIsFullZero (ConfigFormEntry->Password)) ||
@@ -472,7 +473,7 @@ HddPasswordEndOfDxeEventNotify (
   //
   // Zero passsword and freeze lock device.
   //
-  EFI_LIST_FOR_EACH (Entry, &mHddPasswordConfigFormList) {
+  BASE_LIST_FOR_EACH (Entry, &mHddPasswordConfigFormList) {
     ConfigFormEntry = BASE_CR (Entry, HDD_PASSWORD_CONFIG_FORM_ENTRY, Link);
 
     ZeroMem (ConfigFormEntry->Password, HDD_PASSWORD_MAX_LENGTH);
@@ -2026,7 +2027,7 @@ HddPasswordGetConfigFormEntryByIndex (
   CurrentIndex    = 0;
   ConfigFormEntry = NULL;
 
-  EFI_LIST_FOR_EACH (Entry, &mHddPasswordConfigFormList) {
+  BASE_LIST_FOR_EACH (Entry, &mHddPasswordConfigFormList) {
     if (CurrentIndex == Index) {
       ConfigFormEntry = BASE_CR (Entry, HDD_PASSWORD_CONFIG_FORM_ENTRY, Link);
       break;
@@ -2408,7 +2409,7 @@ HddPasswordConfigUpdateForm (
   ConfigFormEntry = NULL;
   EntryExisted    = FALSE;
 
-  EFI_LIST_FOR_EACH (Entry, &mHddPasswordConfigFormList) {
+  BASE_LIST_FOR_EACH (Entry, &mHddPasswordConfigFormList) {
     ConfigFormEntry = BASE_CR (Entry, HDD_PASSWORD_CONFIG_FORM_ENTRY, Link);
 
     if ((ConfigFormEntry->Bus == Bus) &&
@@ -2503,7 +2504,7 @@ HddPasswordConfigUpdateForm (
     EndLabel->Number       = HDD_DEVICE_LABEL_END;
 
     mNumberOfHddDevices = 0;
-    EFI_LIST_FOR_EACH (Entry, &mHddPasswordConfigFormList) {
+    BASE_LIST_FOR_EACH (Entry, &mHddPasswordConfigFormList) {
       ConfigFormEntry = BASE_CR (Entry, HDD_PASSWORD_CONFIG_FORM_ENTRY, Link);
 
       HiiCreateGotoOpCode (
