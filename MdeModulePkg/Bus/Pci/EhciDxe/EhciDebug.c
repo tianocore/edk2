@@ -3,6 +3,7 @@
   This file provides the information dump support for EHCI when in debug mode.
 
 Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) Microsoft Corporation.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -185,7 +186,7 @@ EhcDumpQh (
 
   DEBUG ((EFI_D_VERBOSE, "\n"));
 
-  EFI_LIST_FOR_EACH (Entry, &Qh->Qtds) {
+  BASE_LIST_FOR_EACH (Entry, &Qh->Qtds) {
     Qtd = EFI_LIST_CONTAINER (Entry, EHC_QTD, QtdList);
     EhcDumpQtd (Qtd, NULL);
 
