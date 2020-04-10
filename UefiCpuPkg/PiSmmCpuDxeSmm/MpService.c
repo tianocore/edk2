@@ -433,26 +433,6 @@ ResetTokens (
   VOID
   )
 {
-  LIST_ENTRY            *Link;
-  PROCEDURE_TOKEN       *ProcToken;
-
-  Link = GetFirstNode (&gSmmCpuPrivate->TokenList);
-  while (!IsNull (&gSmmCpuPrivate->TokenList, Link)) {
-    ProcToken = PROCEDURE_TOKEN_FROM_LINK (Link);
-
-    ProcToken->RunningApCount = 0;
-
-    //
-    // Check the spinlock status and release it if not released yet.
-    //
-    if (!AcquireSpinLockOrFail(ProcToken->SpinLock)) {
-      DEBUG((DEBUG_ERROR, "Risk::SpinLock still not released!"));
-    }
-    ReleaseSpinLock (ProcToken->SpinLock);
-
-    Link = GetNextNode (&gSmmCpuPrivate->TokenList, Link);
-  }
-
   //
   // Reset the FirstFreeToken to the beginning of token list upon exiting SMI.
   //
