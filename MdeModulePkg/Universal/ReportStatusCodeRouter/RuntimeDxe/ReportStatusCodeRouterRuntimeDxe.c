@@ -238,6 +238,7 @@ ReportDispatcher (
   RSC_DATA_ENTRY                *RscData;
   EFI_STATUS                    Status;
   VOID                          *NewBuffer;
+  EFI_PHYSICAL_ADDRESS          FailSafeEndPointer;
 
   //
   // Use atom operation to avoid the reentant of report.
@@ -268,6 +269,7 @@ ReportDispatcher (
     // If callback is registered with TPL lower than TPL_HIGH_LEVEL, event must be signaled at boot time to possibly wait for
     // allowed TPL to report status code. Related data should also be stored in data buffer.
     //
+    FailSafeEndPointer = CallbackEntry->EndPointer;
     CallbackEntry->EndPointer  = ALIGN_VARIABLE (CallbackEntry->EndPointer);
     RscData = (RSC_DATA_ENTRY *) (UINTN) CallbackEntry->EndPointer;
     CallbackEntry->EndPointer += sizeof (RSC_DATA_ENTRY);
@@ -286,6 +288,7 @@ ReportDispatcher (
                       (VOID *) (UINTN) CallbackEntry->StatusCodeDataBuffer
                       );
         if (NewBuffer != NULL) {
+          FailSafeEndPointer = (EFI_PHYSICAL_ADDRESS) (UINTN) NewBuffer + (FailSafeEndPointer - CallbackEntry->StatusCodeDataBuffer);
           CallbackEntry->EndPointer = (EFI_PHYSICAL_ADDRESS) (UINTN) NewBuffer + (CallbackEntry->EndPointer - CallbackEntry->StatusCodeDataBuffer);
           CallbackEntry->StatusCodeDataBuffer = (EFI_PHYSICAL_ADDRESS) (UINTN) NewBuffer;
           CallbackEntry->BufferSize *= 2;
@@ -297,6 +300,7 @@ ReportDispatcher (
     // If data buffer is used up, do not report for this time.
     //
     if (CallbackEntry->EndPointer > (CallbackEntry->StatusCodeDataBuffer + CallbackEntry->BufferSize)) {
+      CallbackEntry->EndPointer = FailSafeEndPointer;
       continue;
     }
 
