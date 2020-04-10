@@ -209,10 +209,6 @@
   # point only, for entry point versions >= 3.0.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosEntryPointProvideMethod|0x2
 
-  # ACPI predates the AARCH64 architecture by 5 versions, so
-  # we only target OSes that support ACPI v5.0 or later
-  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiExposedTableVersions|0x20
-
 [PcdsDynamicDefault.common]
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|3
 
