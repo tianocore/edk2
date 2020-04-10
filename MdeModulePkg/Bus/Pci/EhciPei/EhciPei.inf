@@ -5,6 +5,7 @@
 # which is used to enable recovery function from USB Drivers.
 #
 # Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) Microsoft Corporation.<BR>
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -47,6 +48,7 @@
 [LibraryClasses]
   IoLib
   TimerLib
+  BaseLib
   BaseMemoryLib
   PeimEntryPoint
   PeiServicesLib
