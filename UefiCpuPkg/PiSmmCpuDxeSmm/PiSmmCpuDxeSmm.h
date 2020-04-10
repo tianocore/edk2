@@ -214,7 +214,6 @@ typedef struct {
 
   SPIN_LOCK               *SpinLock;
   volatile UINT32         RunningApCount;
-  BOOLEAN                 Used;
 } PROCEDURE_TOKEN;
 
 #define PROCEDURE_TOKEN_FROM_LINK(a)  CR (a, PROCEDURE_TOKEN, Link, PROCEDURE_TOKEN_SIGNATURE)
