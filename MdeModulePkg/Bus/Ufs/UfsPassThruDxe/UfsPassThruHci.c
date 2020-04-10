@@ -3,6 +3,7 @@
   for upper layer application to execute UFS-supported SCSI cmds.
 
   Copyright (c) 2014 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) Microsoft Corporation.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -2285,7 +2286,7 @@ ProcessAsyncTaskList (
   // Check the entries in the async I/O queue are done or not.
   //
   if (!IsListEmpty(&Private->Queue)) {
-    EFI_LIST_FOR_EACH_SAFE (Entry, NextEntry, &Private->Queue) {
+    BASE_LIST_FOR_EACH_SAFE (Entry, NextEntry, &Private->Queue) {
       TransReq  = UFS_PASS_THRU_TRANS_REQ_FROM_THIS (Entry);
       Packet    = TransReq->Packet;
 
