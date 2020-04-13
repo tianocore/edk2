@@ -30,8 +30,10 @@ typedef struct {
   UINT16                              StructureLength;            ///< Length in bytes of this structure
   GUID                                Identifier;                 ///< GUID of the PRM handler for this structure
   UINT64                              PhysicalAddress;            ///< Physical address of this PRM handler
+#ifdef ALLOCATE_CONTEXT_BUFFER_IN_FW
   UINT64                              PrmContextBuffer;           ///< Physical address of the context buffer for this
                                                                   ///< PRM handler (PRM_CONTEXT_BUFFER *)
+#else
   UINT64                              StaticDataBuffer;           ///< Physical address of the static data buffer for
                                                                   ///< this PRM handler (PRM_DATA_BUFFER *)
   UINT64                              AcpiParameterBuffer;        ///< Physical address of the parameter buffer
@@ -39,6 +41,8 @@ typedef struct {
                                                                   ///< that is only used in the case of _DSM invocation.
                                                                   ///< If _DSM invocation is not used, this value is
                                                                   ///< ignored.
+#endif
+
 } PRM_HANDLER_INFORMATION_STRUCT;
 
 typedef struct {
