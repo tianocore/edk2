@@ -6,7 +6,7 @@
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 {
-  "scope": "host-test-win",
-  "name": "Windows Host-Based Unit Test Runner",
+  "scope": "host-based-test",
+  "name": "Host-Based Unit Test Runner",
   "module": "HostBasedUnitTestRunner"
 }
