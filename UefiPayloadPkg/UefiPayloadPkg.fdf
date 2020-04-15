@@ -207,6 +207,21 @@ INF MdeModulePkg/Universal/Disk/RamDiskDxe/RamDiskDxe.inf
 INF FatPkg/EnhancedFatDxe/Fat.inf
 
 #
+# Filesystem drivers
+#
+!if $(ARCH) == IA32
+INF  RuleOverride=BINARY USE = IA32 FSDrivers/exfat.inf
+INF  RuleOverride=BINARY USE = IA32 FSDrivers/ext2.inf
+INF  RuleOverride=BINARY USE = IA32 FSDrivers/ntfs.inf
+INF  RuleOverride=BINARY USE = IA32 FSDrivers/ext4.inf
+!else
+INF  RuleOverride=BINARY USE = X64 FSDrivers/exfat.inf
+INF  RuleOverride=BINARY USE = X64 FSDrivers/ext2.inf
+INF  RuleOverride=BINARY USE = X64 FSDrivers/ntfs.inf
+INF  RuleOverride=BINARY USE = X64 FSDrivers/ext4.inf
+!endif
+
+#
 # SD/eMMC Support
 #
 INF MdeModulePkg/Bus/Pci/SdMmcPciHcDxe/SdMmcPciHcDxe.inf
