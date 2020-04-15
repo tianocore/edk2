@@ -678,8 +678,6 @@ Finish:
   and other exception operations.  The File parameter allows for possible logging
   within the SAP of the driver.
 
-  If File is NULL, then EFI_ACCESS_DENIED is returned.
-
   If the file specified by File with an authentication status specified by
   AuthenticationStatus is safe for the DXE Core to use, then EFI_SUCCESS is returned.
 
@@ -691,6 +689,8 @@ Finish:
   AuthenticationStatus is not safe for the DXE Core to use right now, but it
   might be possible to use it at a future time, then EFI_SECURITY_VIOLATION is
   returned.
+
+  If check image specified by FileBuffer and File is NULL meanwhile, return EFI_ACCESS_DENIED.
 
   @param[in]      AuthenticationStatus  This is the authentication status returned
                                         from the securitymeasurement services for the
@@ -710,7 +710,7 @@ EFI_STATUS
 EFIAPI
 DxeTpmMeasureBootHandler (
   IN  UINT32                           AuthenticationStatus,
-  IN  CONST EFI_DEVICE_PATH_PROTOCOL   *File,
+  IN  CONST EFI_DEVICE_PATH_PROTOCOL   *File, OPTIONAL
   IN  VOID                             *FileBuffer,
   IN  UINTN                            FileSize,
   IN  BOOLEAN                          BootPolicy
@@ -731,13 +731,6 @@ DxeTpmMeasureBootHandler (
   EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *FvbProtocol;
   EFI_PHYSICAL_ADDRESS                FvAddress;
   UINT32                              Index;
-
-  //
-  // Check for invalid parameters.
-  //
-  if (File == NULL) {
-    return EFI_ACCESS_DENIED;
-  }
 
   Status = gBS->LocateProtocol (&gEfiTcgProtocolGuid, NULL, (VOID **) &TcgProtocol);
   if (EFI_ERROR (Status)) {
@@ -912,6 +905,13 @@ DxeTpmMeasureBootHandler (
   //
   Status = PeCoffLoaderGetImageInfo (&ImageContext);
   if (EFI_ERROR (Status)) {
+    //
+    // Check for invalid parameters.
+    //
+    if (File == NULL) {
+      return EFI_ACCESS_DENIED;
+    }
+
     //
     // The information can't be got from the invalid PeImage
     //
