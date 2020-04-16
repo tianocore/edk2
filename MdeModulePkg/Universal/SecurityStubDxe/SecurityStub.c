@@ -129,7 +129,7 @@ EFI_STATUS
 EFIAPI
 Security2StubAuthenticate (
   IN CONST EFI_SECURITY2_ARCH_PROTOCOL *This,
-  IN CONST EFI_DEVICE_PATH_PROTOCOL    *File,
+  IN CONST EFI_DEVICE_PATH_PROTOCOL    *File, OPTIONAL
   IN VOID                              *FileBuffer,
   IN UINTN                             FileSize,
   IN BOOLEAN                           BootPolicy
