@@ -32,7 +32,7 @@ EFI_STATUS
 EFIAPI
 DxeImageAuthenticationStatusHandler (
   IN  UINT32                           AuthenticationStatus,
-  IN  CONST EFI_DEVICE_PATH_PROTOCOL   *File,
+  IN  CONST EFI_DEVICE_PATH_PROTOCOL   *File, OPTIONAL
   IN  VOID                             *FileBuffer,
   IN  UINTN                            FileSize,
   IN  BOOLEAN                          BootPolicy
