@@ -6,14 +6,15 @@
 
 **/
 
-#include <Base.h>
+#include <Base.h>                   // BIT1
 
-#include <Library/BaseLib.h>
-#include <Library/DebugLib.h>
-#include <Library/IoLib.h>
-#include <Library/PciLib.h>
-#include <Library/TimerLib.h>
-#include <OvmfPlatforms.h>
+#include <Library/BaseLib.h>        // CpuDeadLoop()
+#include <Library/DebugLib.h>       // ASSERT()
+#include <Library/IoLib.h>          // IoWrite8()
+#include <Library/PciLib.h>         // PciRead16()
+#include <Library/ResetSystemLib.h> // ResetCold()
+#include <Library/TimerLib.h>       // MicroSecondDelay()
+#include <OvmfPlatforms.h>          // OVMF_HOSTBRIDGE_DID
 
 VOID
 AcpiPmControl (
