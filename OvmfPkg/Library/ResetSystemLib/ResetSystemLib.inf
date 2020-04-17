@@ -22,6 +22,7 @@
 #
 
 [Sources]
+  ResetShutdown.c
   ResetSystemLib.c
 
 [Packages]

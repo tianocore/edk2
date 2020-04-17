@@ -9,41 +9,9 @@
 #include <Base.h>                   // BIT1
 
 #include <Library/BaseLib.h>        // CpuDeadLoop()
-#include <Library/DebugLib.h>       // ASSERT()
 #include <Library/IoLib.h>          // IoWrite8()
-#include <Library/PciLib.h>         // PciRead16()
 #include <Library/ResetSystemLib.h> // ResetCold()
 #include <Library/TimerLib.h>       // MicroSecondDelay()
-#include <OvmfPlatforms.h>          // OVMF_HOSTBRIDGE_DID
-
-VOID
-AcpiPmControl (
-  UINTN SuspendType
-  )
-{
-  UINT16 AcpiPmBaseAddress;
-  UINT16 HostBridgeDevId;
-
-  ASSERT (SuspendType < 6);
-
-  AcpiPmBaseAddress = 0;
-  HostBridgeDevId = PciRead16 (OVMF_HOSTBRIDGE_DID);
-  switch (HostBridgeDevId) {
-  case INTEL_82441_DEVICE_ID:
-    AcpiPmBaseAddress = PIIX4_PMBA_VALUE;
-    break;
-  case INTEL_Q35_MCH_DEVICE_ID:
-    AcpiPmBaseAddress = ICH9_PMBASE_VALUE;
-    break;
-  default:
-    ASSERT (FALSE);
-    CpuDeadLoop ();
-  }
-
-  IoBitFieldWrite16 (AcpiPmBaseAddress + 4, 10, 13, (UINT16) SuspendType);
-  IoOr16 (AcpiPmBaseAddress + 4, BIT13);
-  CpuDeadLoop ();
-}
 
 /**
   Calling this function causes a system-wide reset. This sets
@@ -82,23 +50,6 @@ ResetWarm (
 {
   IoWrite8 (0x64, 0xfe);
   CpuDeadLoop ();
-}
-
-/**
-  Calling this function causes the system to enter a power state equivalent
-  to the ACPI G2/S5 or G3 states.
-
-  System shutdown should not return, if it returns, it means the system does
-  not support shut down reset.
-**/
-VOID
-EFIAPI
-ResetShutdown (
-  VOID
-  )
-{
-  AcpiPmControl (0);
-  ASSERT (FALSE);
 }
 
 
