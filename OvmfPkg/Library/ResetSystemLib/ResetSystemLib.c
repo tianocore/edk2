@@ -103,10 +103,11 @@ ResetShutdown (
 
 /**
   This function causes a systemwide reset. The exact type of the reset is
-  defined by the EFI_GUID that follows the Null-terminated Unicode string passed
-  into ResetData. If the platform does not recognize the EFI_GUID in ResetData
-  the platform must pick a supported reset type to perform.The platform may
-  optionally log the parameters from any non-normal reset that occurs.
+  defined by the EFI_GUID that follows the Null-terminated Unicode string
+  passed into ResetData. If the platform does not recognize the EFI_GUID in
+  ResetData the platform must pick a supported reset type to perform.The
+  platform may optionally log the parameters from any non-normal reset that
+  occurs.
 
   @param[in]  DataSize   The size, in bytes, of ResetData.
   @param[in]  ResetData  The data buffer starts with a Null-terminated string,
@@ -128,11 +129,12 @@ ResetPlatformSpecific (
   @param[in] ResetType      The type of reset to perform.
   @param[in] ResetStatus    The status code for the reset.
   @param[in] DataSize       The size, in bytes, of ResetData.
-  @param[in] ResetData      For a ResetType of EfiResetCold, EfiResetWarm, or EfiResetShutdown
-                            the data buffer starts with a Null-terminated string, optionally
-                            followed by additional binary data. The string is a description
-                            that the caller may use to further indicate the reason for the
-                            system reset.
+  @param[in] ResetData      For a ResetType of EfiResetCold, EfiResetWarm, or
+                            EfiResetShutdown the data buffer starts with a
+                            Null-terminated string, optionally followed by
+                            additional binary data. The string is a description
+                            that the caller may use to further indicate the
+                            reason for the system reset.
 **/
 VOID
 EFIAPI
