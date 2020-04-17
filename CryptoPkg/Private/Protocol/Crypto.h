@@ -451,145 +451,52 @@ BOOLEAN
 //=====================================================================================
 
 /**
-  Retrieves the size, in bytes, of the context buffer required for MD4 hash operations.
-
-  If this interface is not supported, then return zero.
-
-  @return  The size, in bytes, of the context buffer required for MD4 hash operations.
-  @retval  0   This interface is not supported.
+  MD4 is deprecated and unsupported any longer.
+  Keep the function field for binary compability.
 
 **/
 typedef
 UINTN
-(EFIAPI *EDKII_CRYPTO_MD4_GET_CONTEXT_SIZE) (
+(EFIAPI *DEPRECATED_EDKII_CRYPTO_MD4_GET_CONTEXT_SIZE) (
   VOID
   );
 
 
-/**
-  Initializes user-supplied memory pointed by Md4Context as MD4 hash context for
-  subsequent use.
-
-  If Md4Context is NULL, then return FALSE.
-  If this interface is not supported, then return FALSE.
-
-  @param[out]  Md4Context  Pointer to MD4 context being initialized.
-
-  @retval TRUE   MD4 context initialization succeeded.
-  @retval FALSE  MD4 context initialization failed.
-  @retval FALSE  This interface is not supported.
-
-**/
 typedef
 BOOLEAN
-(EFIAPI *EDKII_CRYPTO_MD4_INIT) (
+(EFIAPI *DEPRECATED_EDKII_CRYPTO_MD4_INIT) (
   OUT  VOID  *Md4Context
   );
 
 
-/**
-  Makes a copy of an existing MD4 context.
-
-  If Md4Context is NULL, then return FALSE.
-  If NewMd4Context is NULL, then return FALSE.
-  If this interface is not supported, then return FALSE.
-
-  @param[in]  Md4Context     Pointer to MD4 context being copied.
-  @param[out] NewMd4Context  Pointer to new MD4 context.
-
-  @retval TRUE   MD4 context copy succeeded.
-  @retval FALSE  MD4 context copy failed.
-  @retval FALSE  This interface is not supported.
-
-**/
 typedef
 BOOLEAN
-(EFIAPI *EDKII_CRYPTO_MD4_DUPLICATE) (
+(EFIAPI *DEPRECATED_EDKII_CRYPTO_MD4_DUPLICATE) (
   IN   CONST VOID  *Md4Context,
   OUT  VOID        *NewMd4Context
   );
 
 
-/**
-  Digests the input data and updates MD4 context.
-
-  This function performs MD4 digest on a data buffer of the specified size.
-  It can be called multiple times to compute the digest of long or discontinuous data streams.
-  MD4 context should be already correctly initialized by Md4Init(), and should not be finalized
-  by Md4Final(). Behavior with invalid context is undefined.
-
-  If Md4Context is NULL, then return FALSE.
-  If this interface is not supported, then return FALSE.
-
-  @param[in, out]  Md4Context  Pointer to the MD4 context.
-  @param[in]       Data        Pointer to the buffer containing the data to be hashed.
-  @param[in]       DataSize    Size of Data buffer in bytes.
-
-  @retval TRUE   MD4 data digest succeeded.
-  @retval FALSE  MD4 data digest failed.
-  @retval FALSE  This interface is not supported.
-
-**/
 typedef
 BOOLEAN
-(EFIAPI *EDKII_CRYPTO_MD4_UPDATE) (
+(EFIAPI *DEPRECATED_EDKII_CRYPTO_MD4_UPDATE) (
   IN OUT  VOID        *Md4Context,
   IN      CONST VOID  *Data,
   IN      UINTN       DataSize
   );
 
 
-/**
-  Completes computation of the MD4 digest value.
-
-  This function completes MD4 hash computation and retrieves the digest value into
-  the specified memory. After this function has been called, the MD4 context cannot
-  be used again.
-  MD4 context should be already correctly initialized by Md4Init(), and should not be
-  finalized by Md4Final(). Behavior with invalid MD4 context is undefined.
-
-  If Md4Context is NULL, then return FALSE.
-  If HashValue is NULL, then return FALSE.
-  If this interface is not supported, then return FALSE.
-
-  @param[in, out]  Md4Context  Pointer to the MD4 context.
-  @param[out]      HashValue   Pointer to a buffer that receives the MD4 digest
-                               value (16 bytes).
-
-  @retval TRUE   MD4 digest computation succeeded.
-  @retval FALSE  MD4 digest computation failed.
-  @retval FALSE  This interface is not supported.
-
-**/
 typedef
 BOOLEAN
-(EFIAPI *EDKII_CRYPTO_MD4_FINAL) (
+(EFIAPI *DEPRECATED_EDKII_CRYPTO_MD4_FINAL) (
   IN OUT  VOID   *Md4Context,
   OUT     UINT8  *HashValue
   );
 
 
-/**
-  Computes the MD4 message digest of a input data buffer.
-
-  This function performs the MD4 message digest of a given data buffer, and places
-  the digest value into the specified memory.
-
-  If this interface is not supported, then return FALSE.
-
-  @param[in]   Data        Pointer to the buffer containing the data to be hashed.
-  @param[in]   DataSize    Size of Data buffer in bytes.
-  @param[out]  HashValue   Pointer to a buffer that receives the MD4 digest
-                           value (16 bytes).
-
-  @retval TRUE   MD4 digest computation succeeded.
-  @retval FALSE  MD4 digest computation failed.
-  @retval FALSE  This interface is not supported.
-
-**/
 typedef
 BOOLEAN
-(EFIAPI *EDKII_CRYPTO_MD4_HASH_ALL) (
+(EFIAPI *DEPRECATED_EDKII_CRYPTO_MD4_HASH_ALL) (
   IN   CONST VOID  *Data,
   IN   UINTN       DataSize,
   OUT  UINT8       *HashValue
@@ -4007,13 +3914,13 @@ struct _EDKII_CRYPTO_PROTOCOL {
   EDKII_CRYPTO_HMAC_SHA256_DUPLICATE              HmacSha256Duplicate;
   EDKII_CRYPTO_HMAC_SHA256_UPDATE                 HmacSha256Update;
   EDKII_CRYPTO_HMAC_SHA256_FINAL                  HmacSha256Final;
-  /// Md4
-  EDKII_CRYPTO_MD4_GET_CONTEXT_SIZE               Md4GetContextSize;
-  EDKII_CRYPTO_MD4_INIT                           Md4Init;
-  EDKII_CRYPTO_MD4_DUPLICATE                      Md4Duplicate;
-  EDKII_CRYPTO_MD4_UPDATE                         Md4Update;
-  EDKII_CRYPTO_MD4_FINAL                          Md4Final;
-  EDKII_CRYPTO_MD4_HASH_ALL                       Md4HashAll;
+  /// Md4 - deprecated and unsupported
+  DEPRECATED_EDKII_CRYPTO_MD4_GET_CONTEXT_SIZE    DeprecatedMd4GetContextSize;
+  DEPRECATED_EDKII_CRYPTO_MD4_INIT                DeprecatedMd4Init;
+  DEPRECATED_EDKII_CRYPTO_MD4_DUPLICATE           DeprecatedMd4Duplicate;
+  DEPRECATED_EDKII_CRYPTO_MD4_UPDATE              DeprecatedMd4Update;
+  DEPRECATED_EDKII_CRYPTO_MD4_FINAL               DeprecatedMd4Final;
+  DEPRECATED_EDKII_CRYPTO_MD4_HASH_ALL            DeprecatedMd4HashAll;
   /// Md5
   EDKII_CRYPTO_MD5_GET_CONTEXT_SIZE               Md5GetContextSize;
   EDKII_CRYPTO_MD5_INIT                           Md5Init;
