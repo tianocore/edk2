@@ -230,6 +230,8 @@ BuildHobFromBl (
   SYSTEM_TABLE_INFO                *NewSysTableInfo;
   ACPI_BOARD_INFO                  AcpiBoardInfo;
   ACPI_BOARD_INFO                  *NewAcpiBoardInfo;
+  SMMSTORE_INFO                    SMMSTOREInfo;
+  SMMSTORE_INFO                    *NewSMMSTOREInfo;
   EFI_PEI_GRAPHICS_INFO_HOB        GfxInfo;
   EFI_PEI_GRAPHICS_INFO_HOB        *NewGfxInfo;
   EFI_PEI_GRAPHICS_DEVICE_INFO_HOB GfxDeviceInfo;
@@ -263,6 +265,16 @@ BuildHobFromBl (
     DEBUG ((DEBUG_INFO, "Created graphics device info hob\n"));
   }
 
+  //
+  // Create guid hob for SMMSTORE
+  //
+  Status = ParseSMMSTOREInfo (&SMMSTOREInfo);
+  if (!EFI_ERROR (Status)) {
+    NewSMMSTOREInfo = BuildGuidHob (&gEfiSMMSTOREInfoHobGuid, sizeof (SMMSTOREInfo));
+    ASSERT (NewSMMSTOREInfo != NULL);
+    CopyMem (NewSMMSTOREInfo, &SMMSTOREInfo, sizeof (SMMSTOREInfo));
+    DEBUG ((DEBUG_INFO, "Created SMMSTORE info hob\n"));
+  }
 
   //
   // Create guid hob for system tables like acpi table and smbios table

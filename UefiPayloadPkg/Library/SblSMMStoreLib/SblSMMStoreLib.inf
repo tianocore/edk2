@@ -1,0 +1,28 @@
+## @file
+#  SMMStore library for Slimbootloader
+#
+#  Copyright (c) 2020 9elements Agency GmbH.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SblSmmStoreLib
+  FILE_GUID                      = 2CA0BC03-A619-4B88-A0C5-06A1992750C3
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SmmStoreLib
+
+[Sources]
+  SblSMMStore.c
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiPayloadPkg/UefiPayloadPkg.dec

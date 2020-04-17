@@ -12,6 +12,7 @@
 #include <Guid/SerialPortInfoGuid.h>
 #include <Guid/SystemTableInfoGuid.h>
 #include <Guid/AcpiBoardInfoGuid.h>
+#include <Guid/SMMSTOREInfoGuid.h>
 
 #ifndef __BOOTLOADER_PARSE_LIB__
 #define __BOOTLOADER_PARSE_LIB__
@@ -115,6 +116,21 @@ RETURN_STATUS
 EFIAPI
 ParseGfxDeviceInfo (
   OUT EFI_PEI_GRAPHICS_DEVICE_INFO_HOB       *GfxDeviceInfo
+  );
+
+/**
+  Find the video frame buffer device information
+
+  @param  SMMSTOREInfo       Pointer to the SMMSTORE_INFO structure
+
+  @retval RETURN_SUCCESS     Successfully find the SMM store buffer information.
+  @retval RETURN_NOT_FOUND   Failed to find the SMM store buffer information .
+
+**/
+RETURN_STATUS
+EFIAPI
+ParseSMMSTOREInfo (
+  OUT SMMSTORE_INFO       *SMMSTOREInfo
   );
 
 #endif

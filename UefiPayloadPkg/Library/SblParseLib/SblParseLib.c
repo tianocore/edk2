@@ -221,3 +221,20 @@ ParseGfxDeviceInfo (
   return RETURN_SUCCESS;
 }
 
+/**
+  Find the video frame buffer device information
+
+  @param  SMMSTOREInfo       Pointer to the SMMSTORE_INFO structure
+
+  @retval RETURN_SUCCESS     Successfully find the SMM store buffer information.
+  @retval RETURN_NOT_FOUND   Failed to find the SMM store buffer information .
+
+**/
+RETURN_STATUS
+EFIAPI
+ParseSMMSTOREInfo (
+  OUT SMMSTORE_INFO       *SMMSTOREInfo
+  )
+{
+  return RETURN_NOT_FOUND;
+}
