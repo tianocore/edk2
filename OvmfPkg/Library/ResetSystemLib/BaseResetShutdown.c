@@ -1,5 +1,5 @@
 /** @file
-  Reset System Library Shutdown API implementation for OVMF.
+  Base Reset System Library Shutdown API implementation for OVMF.
 
   Copyright (C) 2020, Red Hat, Inc.
   Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
