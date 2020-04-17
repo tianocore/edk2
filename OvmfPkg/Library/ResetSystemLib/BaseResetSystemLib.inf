@@ -12,7 +12,7 @@
   FILE_GUID                      = 66564872-21d4-4d2a-a68b-1e844f980820
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = ResetSystemLib
+  LIBRARY_CLASS                  = ResetSystemLib|SEC PEI_CORE PEIM DXE_CORE
 
 #
 # The following information is for reference only and not required by the build
