@@ -157,13 +157,13 @@ ResetSystem (
 
   case EfiResetShutdown:
     ResetShutdown ();
-    return;
+    break;
 
   case EfiResetPlatformSpecific:
     ResetPlatformSpecific (DataSize, ResetData);
-    return;
+    break;
 
   default:
-    return;
+    break;
   }
 }
