@@ -1,5 +1,5 @@
 ## @file
-#  Library instance for ResetSystem library class for OVMF
+#  Base library instance for ResetSystem library class for OVMF
 #
 #  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -8,7 +8,7 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = ResetSystemLib
+  BASE_NAME                      = BaseResetSystemLib
   FILE_GUID                      = 66564872-21d4-4d2a-a68b-1e844f980820
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
@@ -22,7 +22,7 @@
 #
 
 [Sources]
-  ResetShutdown.c
+  BaseResetShutdown.c
   ResetSystemLib.c
 
 [Packages]
