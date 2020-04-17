@@ -124,161 +124,123 @@ CryptoServiceGetCryptoVersion (
 //=====================================================================================
 
 /**
-  Retrieves the size, in bytes, of the context buffer required for MD4 hash operations.
+  MD4 is deprecated and unsupported any longer.
+  Keep the function field for binary compability.
 
-  If this interface is not supported, then return zero.
-
-  @return  The size, in bytes, of the context buffer required for MD4 hash operations.
   @retval  0   This interface is not supported.
 
 **/
 UINTN
 EFIAPI
-CryptoServiceMd4GetContextSize (
+DeprecatedCryptoServiceMd4GetContextSize (
   VOID
   )
 {
-  return CALL_BASECRYPTLIB (Md4.Services.GetContextSize, Md4GetContextSize, (), 0);
+  return BaseCryptLibServiceDeprecated ("Md4GetContextSize"), 0;
 }
 
 /**
-  Initializes user-supplied memory pointed by Md4Context as MD4 hash context for
-  subsequent use.
-
-  If Md4Context is NULL, then return FALSE.
-  If this interface is not supported, then return FALSE.
+  MD4 is deprecated and unsupported any longer.
+  Keep the function field for binary compability.
 
   @param[out]  Md4Context  Pointer to MD4 context being initialized.
 
-  @retval TRUE   MD4 context initialization succeeded.
-  @retval FALSE  MD4 context initialization failed.
   @retval FALSE  This interface is not supported.
 
 **/
 BOOLEAN
 EFIAPI
-CryptoServiceMd4Init (
+DeprecatedCryptoServiceMd4Init (
   OUT  VOID  *Md4Context
   )
 {
-  return CALL_BASECRYPTLIB (Md4.Services.Init, Md4Init, (Md4Context), FALSE);
+  return BaseCryptLibServiceDeprecated ("Md4Init"), FALSE;
 }
 
 /**
-  Makes a copy of an existing MD4 context.
-
-  If Md4Context is NULL, then return FALSE.
-  If NewMd4Context is NULL, then return FALSE.
-  If this interface is not supported, then return FALSE.
+  MD4 is deprecated and unsupported any longer.
+  Keep the function field for binary compability.
 
   @param[in]  Md4Context     Pointer to MD4 context being copied.
   @param[out] NewMd4Context  Pointer to new MD4 context.
 
-  @retval TRUE   MD4 context copy succeeded.
-  @retval FALSE  MD4 context copy failed.
   @retval FALSE  This interface is not supported.
 
 **/
 BOOLEAN
 EFIAPI
-CryptoServiceMd4Duplicate (
+DeprecatedCryptoServiceMd4Duplicate (
   IN   CONST VOID  *Md4Context,
   OUT  VOID        *NewMd4Context
   )
 {
-  return CALL_BASECRYPTLIB (Md4.Services.Duplicate, Md4Duplicate, (Md4Context, NewMd4Context), FALSE);
+  return BaseCryptLibServiceDeprecated ("Md4Duplicate"), FALSE;
 }
 
 /**
-  Digests the input data and updates MD4 context.
-
-  This function performs MD4 digest on a data buffer of the specified size.
-  It can be called multiple times to compute the digest of long or discontinuous data streams.
-  MD4 context should be already correctly initialized by Md4Init(), and should not be finalized
-  by Md4Final(). Behavior with invalid context is undefined.
-
-  If Md4Context is NULL, then return FALSE.
-  If this interface is not supported, then return FALSE.
+  MD4 is deprecated and unsupported any longer.
+  Keep the function field for binary compability.
 
   @param[in, out]  Md4Context  Pointer to the MD4 context.
   @param[in]       Data        Pointer to the buffer containing the data to be hashed.
   @param[in]       DataSize    Size of Data buffer in bytes.
 
-  @retval TRUE   MD4 data digest succeeded.
-  @retval FALSE  MD4 data digest failed.
   @retval FALSE  This interface is not supported.
 
 **/
 BOOLEAN
 EFIAPI
-CryptoServiceMd4Update (
+DeprecatedCryptoServiceMd4Update (
   IN OUT  VOID        *Md4Context,
   IN      CONST VOID  *Data,
   IN      UINTN       DataSize
   )
 {
-  return CALL_BASECRYPTLIB (Md4.Services.Update, Md4Update, (Md4Context, Data, DataSize), FALSE);
+  return BaseCryptLibServiceDeprecated ("Md4Update"), FALSE;
 }
 
 /**
-  Completes computation of the MD4 digest value.
-
-  This function completes MD4 hash computation and retrieves the digest value into
-  the specified memory. After this function has been called, the MD4 context cannot
-  be used again.
-  MD4 context should be already correctly initialized by Md4Init(), and should not be
-  finalized by Md4Final(). Behavior with invalid MD4 context is undefined.
-
-  If Md4Context is NULL, then return FALSE.
-  If HashValue is NULL, then return FALSE.
-  If this interface is not supported, then return FALSE.
+  MD4 is deprecated and unsupported any longer.
+  Keep the function field for binary compability.
 
   @param[in, out]  Md4Context  Pointer to the MD4 context.
   @param[out]      HashValue   Pointer to a buffer that receives the MD4 digest
                                value (16 bytes).
 
-  @retval TRUE   MD4 digest computation succeeded.
-  @retval FALSE  MD4 digest computation failed.
   @retval FALSE  This interface is not supported.
 
 **/
 BOOLEAN
 EFIAPI
-CryptoServiceMd4Final (
+DeprecatedCryptoServiceMd4Final (
   IN OUT  VOID   *Md4Context,
   OUT     UINT8  *HashValue
   )
 {
-  return CALL_BASECRYPTLIB (Md4.Services.Final, Md4Final, (Md4Context, HashValue), FALSE);
+  return BaseCryptLibServiceDeprecated ("Md4Final"), FALSE;
 }
 
 /**
-  Computes the MD4 message digest of a input data buffer.
-
-  This function performs the MD4 message digest of a given data buffer, and places
-  the digest value into the specified memory.
-
-  If this interface is not supported, then return FALSE.
+  MD4 is deprecated and unsupported any longer.
+  Keep the function field for binary compability.
 
   @param[in]   Data        Pointer to the buffer containing the data to be hashed.
   @param[in]   DataSize    Size of Data buffer in bytes.
   @param[out]  HashValue   Pointer to a buffer that receives the MD4 digest
                            value (16 bytes).
 
-  @retval TRUE   MD4 digest computation succeeded.
-  @retval FALSE  MD4 digest computation failed.
   @retval FALSE  This interface is not supported.
 
 **/
 BOOLEAN
 EFIAPI
-CryptoServiceMd4HashAll (
+DeprecatedCryptoServiceMd4HashAll (
   IN   CONST VOID  *Data,
   IN   UINTN       DataSize,
   OUT  UINT8       *HashValue
   )
 {
-  return CALL_BASECRYPTLIB (Md4.Services.HashAll, Md4HashAll, (Data, DataSize, HashValue), FALSE);
+  return BaseCryptLibServiceDeprecated ("Md4HashAll"), FALSE;
 }
 
 /**
@@ -4440,13 +4402,13 @@ const EDKII_CRYPTO_PROTOCOL mEdkiiCrypto = {
   CryptoServiceHmacSha256Duplicate,
   CryptoServiceHmacSha256Update,
   CryptoServiceHmacSha256Final,
-  /// Md4
-  CryptoServiceMd4GetContextSize,
-  CryptoServiceMd4Init,
-  CryptoServiceMd4Duplicate,
-  CryptoServiceMd4Update,
-  CryptoServiceMd4Final,
-  CryptoServiceMd4HashAll,
+  /// Md4 - deprecated and unsupported
+  DeprecatedCryptoServiceMd4GetContextSize,
+  DeprecatedCryptoServiceMd4Init,
+  DeprecatedCryptoServiceMd4Duplicate,
+  DeprecatedCryptoServiceMd4Update,
+  DeprecatedCryptoServiceMd4Final,
+  DeprecatedCryptoServiceMd4HashAll,
   /// Md5
   CryptoServiceMd5GetContextSize,
   CryptoServiceMd5Init,
