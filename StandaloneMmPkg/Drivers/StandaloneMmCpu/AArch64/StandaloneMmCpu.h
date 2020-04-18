@@ -10,7 +10,7 @@
 #ifndef _ARM_TF_CPU_DRIVER_H_
 #define _ARM_TF_CPU_DRIVER_H_
 
-#include <Protocol/MmCommunication.h>
+#include <Protocol/MmCommunication2.h>
 #include <Protocol/MmConfiguration.h>
 #include <Protocol/MmCpu.h>
 #include <Guid/MpInformation.h>
