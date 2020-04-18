@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2016-2018, ARM Limited. All rights reserved.
+  Copyright (c) 2016-2019, ARM Limited. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -16,7 +16,7 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 
-#include <Protocol/MmCommunication.h>
+#include <Protocol/MmCommunication2.h>
 
 #include <IndustryStandard/ArmStdSmc.h>
 
@@ -39,39 +39,34 @@ STATIC EFI_HANDLE  mMmCommunicateHandle;
 /**
   Communicates with a registered handler.
 
-  This function provides an interface to send and receive messages to the
-  Standalone MM environment on behalf of UEFI services.  This function is part
-  of the MM Communication Protocol that may be called in physical mode prior to
-  SetVirtualAddressMap() and in virtual mode after SetVirtualAddressMap().
+  This function provides a service to send and receive messages from a registered UEFI service.
 
-  @param[in]      This                The EFI_MM_COMMUNICATION_PROTOCOL
-                                      instance.
-  @param[in, out] CommBuffer          A pointer to the buffer to convey
-                                      into MMRAM.
-  @param[in, out] CommSize            The size of the data buffer being
-                                      passed in. This is optional.
+  @param[in] This                The EFI_MM_COMMUNICATION_PROTOCOL instance.
+  @param[in] CommBufferPhysical  Physical address of the MM communication buffer
+  @param[in] CommBufferVirtual   Virtual address of the MM communication buffer
+  @param[in] CommSize            The size of the data buffer being passed in. On exit, the size of data
+                                 being returned. Zero if the handler does not wish to reply with any data.
+                                 This parameter is optional and may be NULL.
 
-  @retval EFI_SUCCESS                 The message was successfully posted.
-  @retval EFI_INVALID_PARAMETER       The CommBuffer was NULL.
-  @retval EFI_BAD_BUFFER_SIZE         The buffer size is incorrect for the MM
-                                      implementation. If this error is
-                                      returned, the MessageLength field in
-                                      the CommBuffer header or the integer
-                                      pointed by CommSize are updated to reflect
-                                      the maximum payload size the
-                                      implementation can accommodate.
-  @retval EFI_ACCESS_DENIED           The CommunicateBuffer parameter
-                                      or CommSize parameter, if not omitted,
-                                      are in address range that cannot be
-                                      accessed by the MM environment
+  @retval EFI_SUCCESS            The message was successfully posted.
+  @retval EFI_INVALID_PARAMETER  CommBufferPhysical was NULL or CommBufferVirtual was NULL.
+  @retval EFI_BAD_BUFFER_SIZE    The buffer is too large for the MM implementation.
+                                 If this error is returned, the MessageLength field
+                                 in the CommBuffer header or the integer pointed by
+                                 CommSize, are updated to reflect the maximum payload
+                                 size the implementation can accommodate.
+  @retval EFI_ACCESS_DENIED      The CommunicateBuffer parameter or CommSize parameter,
+                                 if not omitted, are in address range that cannot be
+                                 accessed by the MM environment.
+
 **/
-STATIC
 EFI_STATUS
 EFIAPI
-MmCommunicationCommunicate (
-  IN CONST EFI_MM_COMMUNICATION_PROTOCOL  *This,
-  IN OUT VOID                             *CommBuffer,
-  IN OUT UINTN                            *CommSize OPTIONAL
+MmCommunication2Communicate (
+  IN CONST EFI_MM_COMMUNICATION2_PROTOCOL   *This,
+  IN OUT VOID                               *CommBufferPhysical,
+  IN OUT VOID                               *CommBufferVirtual,
+  IN OUT UINTN                              *CommSize OPTIONAL
   )
 {
   EFI_MM_COMMUNICATE_HEADER   *CommunicateHeader;
@@ -87,11 +82,11 @@ MmCommunicationCommunicate (
   //
   // Check parameters
   //
-  if (CommBuffer == NULL) {
+  if (CommBufferVirtual == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  CommunicateHeader = CommBuffer;
+  CommunicateHeader = CommBufferVirtual;
   // CommBuffer is a mandatory parameter. Hence, Rely on
   // MessageLength + Header to ascertain the
   // total size of the communication payload rather than
@@ -136,7 +131,7 @@ MmCommunicationCommunicate (
   CommunicateSmcArgs.Arg1 = 0;
 
   // Copy Communication Payload
-  CopyMem ((VOID *)mNsCommBuffMemRegion.VirtualBase, CommBuffer, BufferSize);
+  CopyMem ((VOID *)mNsCommBuffMemRegion.VirtualBase, CommBufferVirtual, BufferSize);
 
   // comm_buffer_address (64-bit physical address)
   CommunicateSmcArgs.Arg2 = (UINTN)mNsCommBuffMemRegion.PhysicalBase;
@@ -149,7 +144,7 @@ MmCommunicationCommunicate (
 
   switch (CommunicateSmcArgs.Arg0) {
   case ARM_SMC_MM_RET_SUCCESS:
-    ZeroMem (CommBuffer, BufferSize);
+    ZeroMem (CommBufferVirtual, BufferSize);
     // On successful return, the size of data being returned is inferred from
     // MessageLength + Header.
     CommunicateHeader = (EFI_MM_COMMUNICATE_HEADER *)mNsCommBuffMemRegion.VirtualBase;
@@ -158,7 +153,7 @@ MmCommunicationCommunicate (
                  sizeof (CommunicateHeader->MessageLength);
 
     CopyMem (
-      CommBuffer,
+      CommBufferVirtual,
       (VOID *)mNsCommBuffMemRegion.VirtualBase,
       BufferSize
       );
@@ -191,8 +186,8 @@ MmCommunicationCommunicate (
 //
 // MM Communication Protocol instance
 //
-EFI_MM_COMMUNICATION_PROTOCOL  mMmCommunication = {
-  MmCommunicationCommunicate
+STATIC EFI_MM_COMMUNICATION2_PROTOCOL  mMmCommunication2 = {
+  MmCommunication2Communicate
 };
 
 /**
@@ -293,7 +288,7 @@ MmGuidedEventNotify (
   Header.Data[0] = 0;
 
   Size = sizeof (Header);
-  MmCommunicationCommunicate (&mMmCommunication, &Header, &Size);
+  MmCommunication2Communicate (&mMmCommunication2, &Header, &Header, &Size);
 }
 
 /**
@@ -312,7 +307,7 @@ MmGuidedEventNotify (
 **/
 EFI_STATUS
 EFIAPI
-MmCommunicationInitialize (
+MmCommunication2Initialize (
   IN EFI_HANDLE         ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
@@ -363,9 +358,9 @@ MmCommunicationInitialize (
   // Install the communication protocol
   Status = gBS->InstallProtocolInterface (
                   &mMmCommunicateHandle,
-                  &gEfiMmCommunicationProtocolGuid,
+                  &gEfiMmCommunication2ProtocolGuid,
                   EFI_NATIVE_INTERFACE,
-                  &mMmCommunication
+                  &mMmCommunication2
                   );
   if (EFI_ERROR(Status)) {
     DEBUG ((DEBUG_ERROR, "MmCommunicationInitialize: "
@@ -402,8 +397,8 @@ MmCommunicationInitialize (
 UninstallProtocol:
   gBS->UninstallProtocolInterface (
          mMmCommunicateHandle,
-         &gEfiMmCommunicationProtocolGuid,
-         &mMmCommunication
+         &gEfiMmCommunication2ProtocolGuid,
+         &mMmCommunication2
          );
 
 CleanAddedMemorySpace:
