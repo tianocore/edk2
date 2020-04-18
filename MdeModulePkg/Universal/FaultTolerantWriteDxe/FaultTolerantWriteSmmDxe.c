@@ -11,7 +11,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "FaultTolerantWriteSmmDxe.h"
 
 EFI_HANDLE                         mHandle                   = NULL;
-EFI_SMM_COMMUNICATION_PROTOCOL     *mSmmCommunication        = NULL;
+EFI_MM_COMMUNICATION2_PROTOCOL     *mMmCommunication2        = NULL;
 UINTN                              mPrivateDataSize          = 0;
 
 EFI_FAULT_TOLERANT_WRITE_PROTOCOL  mFaultTolerantWriteDriver = {
@@ -40,7 +40,7 @@ InitCommunicateBuffer (
   IN      UINTN                             Function
   )
 {
-  EFI_SMM_COMMUNICATE_HEADER                *SmmCommunicateHeader;
+  EFI_MM_COMMUNICATE_HEADER                 *SmmCommunicateHeader;
   SMM_FTW_COMMUNICATE_FUNCTION_HEADER       *SmmFtwFunctionHeader;
 
   //
@@ -74,7 +74,7 @@ InitCommunicateBuffer (
 **/
 EFI_STATUS
 SendCommunicateBuffer (
-  IN OUT  EFI_SMM_COMMUNICATE_HEADER        *SmmCommunicateHeader,
+  IN OUT  EFI_MM_COMMUNICATE_HEADER         *SmmCommunicateHeader,
   IN      UINTN                             DataSize
   )
 {
@@ -83,7 +83,10 @@ SendCommunicateBuffer (
   SMM_FTW_COMMUNICATE_FUNCTION_HEADER       *SmmFtwFunctionHeader;
 
   CommSize = DataSize + SMM_COMMUNICATE_HEADER_SIZE + SMM_FTW_COMMUNICATE_HEADER_SIZE;
-  Status = mSmmCommunication->Communicate (mSmmCommunication, SmmCommunicateHeader, &CommSize);
+  Status = mMmCommunication2->Communicate (mMmCommunication2,
+                                           SmmCommunicateHeader,
+                                           SmmCommunicateHeader,
+                                           &CommSize);
   ASSERT_EFI_ERROR (Status);
 
   SmmFtwFunctionHeader = (SMM_FTW_COMMUNICATE_FUNCTION_HEADER *) SmmCommunicateHeader->Data;
@@ -148,7 +151,7 @@ FtwGetMaxBlockSize (
 {
   EFI_STATUS                                Status;
   UINTN                                     PayloadSize;
-  EFI_SMM_COMMUNICATE_HEADER                *SmmCommunicateHeader;
+  EFI_MM_COMMUNICATE_HEADER                 *SmmCommunicateHeader;
   SMM_FTW_GET_MAX_BLOCK_SIZE_HEADER         *SmmFtwBlockSizeHeader;
 
   //
@@ -204,7 +207,7 @@ FtwAllocate (
 {
   EFI_STATUS                                Status;
   UINTN                                     PayloadSize;
-  EFI_SMM_COMMUNICATE_HEADER                *SmmCommunicateHeader;
+  EFI_MM_COMMUNICATE_HEADER                 *SmmCommunicateHeader;
   SMM_FTW_ALLOCATE_HEADER                   *SmmFtwAllocateHeader;
 
   //
@@ -270,7 +273,7 @@ FtwWrite (
 {
   EFI_STATUS                                Status;
   UINTN                                     PayloadSize;
-  EFI_SMM_COMMUNICATE_HEADER                *SmmCommunicateHeader;
+  EFI_MM_COMMUNICATE_HEADER                 *SmmCommunicateHeader;
   SMM_FTW_WRITE_HEADER                      *SmmFtwWriteHeader;
 
   //
@@ -336,7 +339,7 @@ FtwRestart (
 {
   EFI_STATUS                                Status;
   UINTN                                     PayloadSize;
-  EFI_SMM_COMMUNICATE_HEADER                *SmmCommunicateHeader;
+  EFI_MM_COMMUNICATE_HEADER                 *SmmCommunicateHeader;
   SMM_FTW_RESTART_HEADER                    *SmmFtwRestartHeader;
 
   //
@@ -381,7 +384,7 @@ FtwAbort (
   )
 {
   EFI_STATUS                                Status;
-  EFI_SMM_COMMUNICATE_HEADER                *SmmCommunicateHeader;
+  EFI_MM_COMMUNICATE_HEADER                 *SmmCommunicateHeader;
 
   //
   // Initialize the communicate buffer.
@@ -438,7 +441,7 @@ FtwGetLastWrite (
 {
   EFI_STATUS                                Status;
   UINTN                                     PayloadSize;
-  EFI_SMM_COMMUNICATE_HEADER                *SmmCommunicateHeader;
+  EFI_MM_COMMUNICATE_HEADER                 *SmmCommunicateHeader;
   SMM_FTW_GET_LAST_WRITE_HEADER             *SmmFtwGetLastWriteHeader;
 
   //
@@ -501,7 +504,7 @@ SmmFtwReady (
     return;
   }
 
-  Status = gBS->LocateProtocol (&gEfiSmmCommunicationProtocolGuid, NULL, (VOID **) &mSmmCommunication);
+  Status = gBS->LocateProtocol (&gEfiMmCommunication2ProtocolGuid, NULL, (VOID **) &mMmCommunication2);
   ASSERT_EFI_ERROR (Status);
 
   //
