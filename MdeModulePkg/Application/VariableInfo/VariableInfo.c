@@ -20,10 +20,10 @@
 #include <Guid/VariableFormat.h>
 #include <Guid/SmmVariableCommon.h>
 #include <Guid/PiSmmCommunicationRegionTable.h>
-#include <Protocol/SmmCommunication.h>
+#include <Protocol/MmCommunication2.h>
 #include <Protocol/SmmVariable.h>
 
-EFI_SMM_COMMUNICATION_PROTOCOL  *mSmmCommunication = NULL;
+EFI_MM_COMMUNICATION2_PROTOCOL  *mMmCommunication2 = NULL;
 
 /**
   This function get the variable statistics data from SMM variable driver.
@@ -41,7 +41,7 @@ EFI_SMM_COMMUNICATION_PROTOCOL  *mSmmCommunication = NULL;
 EFI_STATUS
 EFIAPI
 GetVariableStatisticsData (
-  IN OUT  EFI_SMM_COMMUNICATE_HEADER  *SmmCommunicateHeader,
+  IN OUT  EFI_MM_COMMUNICATE_HEADER   *SmmCommunicateHeader,
   IN OUT  UINTN                       *SmmCommunicateSize
   )
 {
@@ -49,12 +49,15 @@ GetVariableStatisticsData (
   SMM_VARIABLE_COMMUNICATE_HEADER     *SmmVariableFunctionHeader;
 
   CopyGuid (&SmmCommunicateHeader->HeaderGuid, &gEfiSmmVariableProtocolGuid);
-  SmmCommunicateHeader->MessageLength = *SmmCommunicateSize - OFFSET_OF (EFI_SMM_COMMUNICATE_HEADER, Data);
+  SmmCommunicateHeader->MessageLength = *SmmCommunicateSize - OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data);
 
   SmmVariableFunctionHeader = (SMM_VARIABLE_COMMUNICATE_HEADER *) &SmmCommunicateHeader->Data[0];
   SmmVariableFunctionHeader->Function = SMM_VARIABLE_FUNCTION_GET_STATISTICS;
 
-  Status = mSmmCommunication->Communicate (mSmmCommunication, SmmCommunicateHeader, SmmCommunicateSize);
+  Status = mMmCommunication2->Communicate (mMmCommunication2,
+                                           SmmCommunicateHeader,
+                                           SmmCommunicateHeader,
+                                           SmmCommunicateSize);
   ASSERT_EFI_ERROR (Status);
 
   Status = SmmVariableFunctionHeader->ReturnStatus;
@@ -76,7 +79,7 @@ PrintInfoFromSmm (
 {
   EFI_STATUS                                     Status;
   VARIABLE_INFO_ENTRY                            *VariableInfo;
-  EFI_SMM_COMMUNICATE_HEADER                     *CommBuffer;
+  EFI_MM_COMMUNICATE_HEADER                      *CommBuffer;
   UINTN                                          RealCommSize;
   UINTN                                          CommSize;
   SMM_VARIABLE_COMMUNICATE_HEADER                *FunctionHeader;
@@ -92,7 +95,7 @@ PrintInfoFromSmm (
     return Status;
   }
 
-  Status = gBS->LocateProtocol (&gEfiSmmCommunicationProtocolGuid, NULL, (VOID **) &mSmmCommunication);
+  Status = gBS->LocateProtocol (&gEfiMmCommunication2ProtocolGuid, NULL, (VOID **) &mMmCommunication2);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -117,7 +120,7 @@ PrintInfoFromSmm (
         if (Size > MaxSize) {
           MaxSize = Size;
           RealCommSize = MaxSize;
-          CommBuffer = (EFI_SMM_COMMUNICATE_HEADER *) (UINTN) Entry->PhysicalStart;
+          CommBuffer = (EFI_MM_COMMUNICATE_HEADER *) (UINTN) Entry->PhysicalStart;
         }
       }
     }

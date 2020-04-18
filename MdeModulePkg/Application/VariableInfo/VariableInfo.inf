@@ -41,7 +41,7 @@
   MemoryAllocationLib
 
 [Protocols]
-  gEfiSmmCommunicationProtocolGuid   ## SOMETIMES_CONSUMES
+  gEfiMmCommunication2ProtocolGuid   ## SOMETIMES_CONSUMES
 
   ## UNDEFINED            # Used to do smm communication
   ## SOMETIMES_CONSUMES
