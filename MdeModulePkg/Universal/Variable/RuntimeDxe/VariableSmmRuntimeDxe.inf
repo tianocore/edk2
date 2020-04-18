@@ -60,7 +60,7 @@
 [Protocols]
   gEfiVariableWriteArchProtocolGuid             ## PRODUCES
   gEfiVariableArchProtocolGuid                  ## PRODUCES
-  gEfiSmmCommunicationProtocolGuid              ## CONSUMES
+  gEfiMmCommunication2ProtocolGuid              ## CONSUMES
   ## CONSUMES
   ## NOTIFY
   ## UNDEFINED # Used to do smm communication
@@ -100,7 +100,7 @@
   gEfiImageSecurityDatabaseGuid
 
 [Depex]
-  gEfiSmmCommunicationProtocolGuid
+  gEfiMmCommunication2ProtocolGuid
 
 [UserExtensions.TianoCore."ExtraFiles"]
   VariableSmmRuntimeDxeExtra.uni
