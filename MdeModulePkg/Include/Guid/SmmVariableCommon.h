@@ -20,7 +20,7 @@ extern EFI_GUID gSmmVariableWriteGuid;
 //
 // This structure is used for SMM variable. the collected statistics data is saved in SMRAM. It can be got from
 // SMI handler. The communication buffer should be:
-// EFI_SMM_COMMUNICATE_HEADER + SMM_VARIABLE_COMMUNICATE_HEADER + payload.
+// EFI_MM_COMMUNICATE_HEADER + SMM_VARIABLE_COMMUNICATE_HEADER + payload.
 //
 typedef struct {
   UINTN       Function;
@@ -53,7 +53,7 @@ typedef struct {
 //
 #define SMM_VARIABLE_FUNCTION_EXIT_BOOT_SERVICE       6
 //
-// The payload for this function is VARIABLE_INFO_ENTRY. The GUID in EFI_SMM_COMMUNICATE_HEADER
+// The payload for this function is VARIABLE_INFO_ENTRY. The GUID in EFI_MM_COMMUNICATE_HEADER
 // is gEfiSmmVariableProtocolGuid.
 //
 #define SMM_VARIABLE_FUNCTION_GET_STATISTICS          7
@@ -81,7 +81,7 @@ typedef struct {
 ///
 /// Size of SMM communicate header, without including the payload.
 ///
-#define SMM_COMMUNICATE_HEADER_SIZE  (OFFSET_OF (EFI_SMM_COMMUNICATE_HEADER, Data))
+#define SMM_COMMUNICATE_HEADER_SIZE  (OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data))
 
 ///
 /// Size of SMM variable communicate header, without including the payload.
