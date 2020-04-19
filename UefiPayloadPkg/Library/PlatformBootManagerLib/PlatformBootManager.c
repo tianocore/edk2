@@ -257,6 +257,9 @@ PlatformBootManagerAfterConsole (
     L"ENTER           to boot directly.\n"
     L"\n"
     );
+
+  // Inject boot logo into BGRT table
+  AddBGRT();
 }
 
 /**

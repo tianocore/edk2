@@ -24,6 +24,7 @@
 #
 
 [Sources]
+  Bgrt.c
   BootLogoLib.c
 
 [Packages]
@@ -48,5 +49,12 @@
   gEfiUserManagerProtocolGuid                   ## CONSUMES
   gEdkiiPlatformLogoProtocolGuid                ## CONSUMES
 
+[Guids]
+  gEfiAcpiTableGuid                             ## CONSUMES ## GUID
+  gEfiAcpi20TableGuid                           ## CONSUMES ## GUID
+
 [FeaturePcd]
   gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport ## CONSUMES
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdLogoFile    ## CONSUMES
