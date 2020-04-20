@@ -10,6 +10,8 @@
 #ifndef _MEMORY_MAPPED_CONFIGURATION_SPACE_ACCESS_TABLE_H_
 #define _MEMORY_MAPPED_CONFIGURATION_SPACE_ACCESS_TABLE_H_
 
+#include <IndustryStandard/Acpi.h>
+
 //
 // Ensure proper structure formats
 //
