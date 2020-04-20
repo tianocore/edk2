@@ -451,20 +451,10 @@ BootMenuSelectItem (
   }
 
   //
-  // Print want to select item
-  //
-  FirstItem = BootMenuData->ScrollBarControl.FirstItem;
-  gST->ConOut->SetAttribute (gST->ConOut, EFI_WHITE | EFI_BACKGROUND_BLACK);
-  String = HiiGetString (gStringPackHandle, BootMenuData->PtrTokens[WantSelectItem], NULL);
-  PrintCol = StartCol  + 1;
-  PrintRow = StartRow + TITLE_TOKEN_COUNT + 2 + WantSelectItem - FirstItem;
-  PrintStringAt (PrintCol, PrintRow, String);
-  FreePool (String);
-
-  //
   // if Want Select and selected item isn't the same and doesn't re-draw selectable
   // items, clear select item
   //
+  FirstItem = BootMenuData->ScrollBarControl.FirstItem;
   if (WantSelectItem != BootMenuData->SelectItem && !RePaintItems) {
     gST->ConOut->SetAttribute (gST->ConOut, EFI_WHITE | EFI_BACKGROUND_BLUE);
     String = HiiGetString (gStringPackHandle, BootMenuData->PtrTokens[BootMenuData->SelectItem], NULL);
@@ -473,6 +463,16 @@ BootMenuSelectItem (
     PrintStringAt (PrintCol, PrintRow, String);
     FreePool (String);
   }
+
+  //
+  // Print want to select item
+  //
+  gST->ConOut->SetAttribute (gST->ConOut, EFI_WHITE | EFI_BACKGROUND_BLACK);
+  String = HiiGetString (gStringPackHandle, BootMenuData->PtrTokens[WantSelectItem], NULL);
+  PrintCol = StartCol  + 1;
+  PrintRow = StartRow + TITLE_TOKEN_COUNT + 2 + WantSelectItem - FirstItem;
+  PrintStringAt (PrintCol, PrintRow, String);
+  FreePool (String);
 
   gST->ConOut->SetAttribute (gST->ConOut, SavedAttribute);
   BootMenuData->SelectItem = WantSelectItem;
