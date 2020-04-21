@@ -4,6 +4,7 @@ This file contains the internal functions required to generate a Firmware Volume
 Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 Portions Copyright (c) 2011 - 2013, ARM Ltd. All rights reserved.<BR>
 Portions Copyright (c) 2016 HP Development Company, L.P.<BR>
+Portions Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -37,6 +38,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define ARM64_UNCONDITIONAL_JUMP_INSTRUCTION      0x14000000
 
 BOOLEAN mArm = FALSE;
+BOOLEAN mRiscV = FALSE;
 STATIC UINT32   MaxFfsAlignment = 0;
 BOOLEAN VtfFileFlag = FALSE;
 
@@ -2292,6 +2294,104 @@ Returns:
 }
 
 EFI_STATUS
+UpdateRiscvResetVectorIfNeeded (
+  MEMORY_FILE            *FvImage,
+  FV_INFO                *FvInfo
+  )
+/*++
+
+Routine Description:
+  This parses the FV looking for SEC and patches that address into the
+  beginning of the FV header.
+
+  For RISC-V ISA, the reset vector is at 0xfff~ff00h or 200h
+
+Arguments:
+  FvImage       Memory file for the FV memory image/
+  FvInfo        Information read from INF file.
+
+Returns:
+
+  EFI_SUCCESS             Function Completed successfully.
+  EFI_ABORTED             Error encountered.
+  EFI_INVALID_PARAMETER   A required parameter was NULL.
+  EFI_NOT_FOUND           PEI Core file not found.
+
+--*/
+{
+  EFI_STATUS                Status;
+  UINT16                    MachineType;
+  EFI_FILE_SECTION_POINTER  SecPe32;
+  EFI_PHYSICAL_ADDRESS      SecCoreEntryAddress;
+
+  UINT32 bSecCore;
+  UINT32 tmp;
+
+
+  //
+  // Verify input parameters
+  //
+  if (FvImage == NULL || FvInfo == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+  //
+  // Initialize FV library
+  //
+  InitializeFvLib (FvImage->FileImage, FvInfo->Size);
+
+  //
+  // Find the Sec Core
+  //
+  Status = FindCorePeSection(FvImage->FileImage, FvInfo->Size, EFI_FV_FILETYPE_SECURITY_CORE, &SecPe32);
+  if(EFI_ERROR(Status)) {
+    printf("skip because Secutiry Core not found\n");
+    return EFI_SUCCESS;
+  }
+
+  DebugMsg (NULL, 0, 9, "Update SEC core in FV Header", NULL);
+
+  Status = GetCoreMachineType(SecPe32, &MachineType);
+  if(EFI_ERROR(Status)) {
+    Error(NULL, 0, 3000, "Invalid", "Could not get the PE32 machine type for SEC core.");
+    return EFI_ABORTED;
+  }
+
+  if (MachineType != EFI_IMAGE_MACHINE_RISCV64) {
+    Error(NULL, 0, 3000, "Invalid", "Could not update SEC core because Machine type is not RiscV.");
+    return EFI_ABORTED;
+  }
+
+  Status = GetCoreEntryPointAddress(FvImage->FileImage, FvInfo, SecPe32, &SecCoreEntryAddress);
+  if(EFI_ERROR(Status)) {
+    Error(NULL, 0, 3000, "Invalid", "Could not get the PE32 entry point address for SEC Core.");
+    return EFI_ABORTED;
+  }
+
+  VerboseMsg("SecCore entry point Address = 0x%llX", (unsigned long long) SecCoreEntryAddress);
+  VerboseMsg("BaseAddress = 0x%llX", (unsigned long long) FvInfo->BaseAddress);
+  bSecCore = (UINT32)(SecCoreEntryAddress - FvInfo->BaseAddress);
+  VerboseMsg("offset = 0x%llX", bSecCore);
+
+  if(bSecCore > 0x0fffff) {
+    Error(NULL, 0, 3000, "Invalid", "SEC Entry point must be within 1MB of start of the FV");
+    return EFI_ABORTED;
+  }
+
+  tmp = bSecCore;
+  bSecCore = 0;
+  //J-type
+  bSecCore  = (tmp&0x100000)<<11; //imm[20]    at bit[31]
+  bSecCore |= (tmp&0x0007FE)<<20; //imm[10:1]  at bit[30:21]
+  bSecCore |= (tmp&0x000800)<<9;  //imm[11]    at bit[20]
+  bSecCore |= (tmp&0x0FF000);     //imm[19:12] at bit[19:12]
+  bSecCore |= 0x6F; //JAL opcode
+
+  memcpy(FvImage->FileImage, &bSecCore, sizeof(bSecCore));
+
+  return EFI_SUCCESS;
+}
+
+EFI_STATUS
 GetPe32Info (
   IN UINT8                  *Pe32,
   OUT UINT32                *EntryPoint,
@@ -2383,7 +2483,8 @@ Returns:
   // Verify machine type is supported
   //
   if ((*MachineType != EFI_IMAGE_MACHINE_IA32) &&  (*MachineType != EFI_IMAGE_MACHINE_X64) && (*MachineType != EFI_IMAGE_MACHINE_EBC) &&
-      (*MachineType != EFI_IMAGE_MACHINE_ARMT) && (*MachineType != EFI_IMAGE_MACHINE_AARCH64)) {
+      (*MachineType != EFI_IMAGE_MACHINE_ARMT) && (*MachineType != EFI_IMAGE_MACHINE_AARCH64) &&
+      (*MachineType != EFI_IMAGE_MACHINE_RISCV64)) {
     Error (NULL, 0, 3000, "Invalid", "Unrecognized machine type in the PE32 file.");
     return EFI_UNSUPPORTED;
   }
@@ -2826,7 +2927,8 @@ Returns:
       Error (NULL, 0, 4002, "Resource", "FV space is full, cannot add pad file between the last file and the VTF file.");
       goto Finish;
     }
-    if (!mArm) {
+
+    if (!mArm && !mRiscV) {
       //
       // Update reset vector (SALE_ENTRY for IPF)
       // Now for IA32 and IA64 platform, the fv which has bsf file must have the
@@ -2854,6 +2956,22 @@ Returns:
       goto Finish;
     }
 
+    //
+    // Update Checksum for FvHeader
+    //
+    FvHeader->Checksum = 0;
+    FvHeader->Checksum = CalculateChecksum16 ((UINT16 *) FvHeader, FvHeader->HeaderLength / sizeof (UINT16));
+  }
+
+  if (mRiscV) {
+     //
+     // Update RISCV reset vector.
+     //
+     Status = UpdateRiscvResetVectorIfNeeded (&FvImageMemoryFile, &mFvDataInfo);
+     if (EFI_ERROR (Status)) {
+       Error (NULL, 0, 3000, "Invalid", "Could not update the reset vector for RISC-V.");
+       goto Finish;
+    }
     //
     // Update Checksum for FvHeader
     //
@@ -3448,6 +3566,10 @@ Returns:
       mArm = TRUE;
     }
 
+    if (ImageContext.Machine == EFI_IMAGE_MACHINE_RISCV64) {
+      mRiscV = TRUE;
+    }
+
     //
     // Keep Image Context for PE image in FV
     //
@@ -3601,7 +3723,7 @@ Returns:
     ImageContext.DestinationAddress = NewPe32BaseAddress;
     Status                          = PeCoffLoaderRelocateImage (&ImageContext);
     if (EFI_ERROR (Status)) {
-      Error (NULL, 0, 3000, "Invalid", "RelocateImage() call failed on rebase of %s", FileName);
+      Error (NULL, 0, 3000, "Invalid", "RelocateImage() call failed on rebase of %s Status=%d", FileName, Status);
       free ((VOID *) MemoryImagePointer);
       return Status;
     }

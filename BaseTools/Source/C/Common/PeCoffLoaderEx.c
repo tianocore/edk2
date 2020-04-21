@@ -3,6 +3,7 @@ IA32 and X64 Specific relocation fixups
 
 Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 Portions Copyright (c) 2011 - 2013, ARM Ltd. All rights reserved.<BR>
+Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 --*/
@@ -61,6 +62,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define IMM64_SIGN_INST_WORD_POS_X      27
 #define IMM64_SIGN_VAL_POS_X            63
 
+UINT32 *RiscVHi20Fixup = NULL;
+
 RETURN_STATUS
 PeCoffLoaderRelocateIa32Image (
   IN UINT16      *Reloc,
@@ -93,6 +96,89 @@ Returns:
   return RETURN_UNSUPPORTED;
 }
 
+/*++
+
+Routine Description:
+
+  Performs an RISC-V specific relocation fixup
+
+Arguments:
+
+  Reloc      - Pointer to the relocation record
+
+  Fixup      - Pointer to the address to fix up
+
+  FixupData  - Pointer to a buffer to log the fixups
+
+  Adjust     - The offset to adjust the fixup
+
+Returns:
+
+  Status code
+
+--*/
+RETURN_STATUS
+PeCoffLoaderRelocateRiscVImage (
+  IN UINT16      *Reloc,
+  IN OUT CHAR8   *Fixup,
+  IN OUT CHAR8   **FixupData,
+  IN UINT64      Adjust
+  )
+{
+  UINT32 Value;
+  UINT32 Value2;
+  UINT32 OrgValue;
+
+  OrgValue = *(UINT32 *) Fixup;
+  OrgValue = OrgValue;
+  switch ((*Reloc) >> 12) {
+  case EFI_IMAGE_REL_BASED_RISCV_HI20:
+      RiscVHi20Fixup = (UINT32 *) Fixup;
+      break;
+
+  case EFI_IMAGE_REL_BASED_RISCV_LOW12I:
+      if (RiscVHi20Fixup != NULL) {
+        Value = (UINT32)(RV_X(*RiscVHi20Fixup, 12, 20) << 12);
+        Value2 = (UINT32)(RV_X(*(UINT32 *)Fixup, 20, 12));
+        if (Value2 & (RISCV_IMM_REACH/2)) {
+          Value2 |= ~(RISCV_IMM_REACH-1);
+        }
+        Value += Value2;
+        Value += (UINT32)Adjust;
+        Value2 = RISCV_CONST_HIGH_PART (Value);
+        *(UINT32 *)RiscVHi20Fixup = (RV_X (Value2, 12, 20) << 12) | \
+                                           (RV_X (*(UINT32 *)RiscVHi20Fixup, 0, 12));
+        *(UINT32 *)Fixup = (RV_X (Value, 0, 12) << 20) | \
+                           (RV_X (*(UINT32 *)Fixup, 0, 20));
+      }
+      RiscVHi20Fixup = NULL;
+      break;
+
+  case EFI_IMAGE_REL_BASED_RISCV_LOW12S:
+      if (RiscVHi20Fixup != NULL) {
+        Value = (UINT32)(RV_X(*RiscVHi20Fixup, 12, 20) << 12);
+        Value2 = (UINT32)(RV_X(*(UINT32 *)Fixup, 7, 5) | (RV_X(*(UINT32 *)Fixup, 25, 7) << 5));
+        if (Value2 & (RISCV_IMM_REACH/2)) {
+          Value2 |= ~(RISCV_IMM_REACH-1);
+        }
+        Value += Value2;
+        Value += (UINT32)Adjust;
+        Value2 = RISCV_CONST_HIGH_PART (Value);
+        *(UINT32 *)RiscVHi20Fixup = (RV_X (Value2, 12, 20) << 12) | \
+                                           (RV_X (*(UINT32 *)RiscVHi20Fixup, 0, 12));
+        Value2 = *(UINT32 *)Fixup & 0x01fff07f;
+        Value &= RISCV_IMM_REACH - 1;
+        *(UINT32 *)Fixup = Value2 | (UINT32)(((RV_X(Value, 0, 5) << 7) | (RV_X(Value, 5, 7) << 25)));
+      }
+      RiscVHi20Fixup = NULL;
+      break;
+
+  default:
+      return EFI_UNSUPPORTED;
+
+  }
+  return RETURN_SUCCESS;
+}
 
 /**
   Pass in a pointer to an ARM MOVT or MOVW immediate instruction and
