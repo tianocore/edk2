@@ -3,7 +3,7 @@
 #  Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 #  Portions copyright (c) 2011 - 2014, ARM Ltd. All rights reserved.<BR>
 #  Copyright (c) 2015, Hewlett-Packard Development Company, L.P.<BR>
-#  (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
+#  (C) Copyright 2020, Hewlett Packard Enterprise Development LP<BR>
 #  Copyright (c) Microsoft Corporation
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -267,11 +267,12 @@ DEFINE DTC_BIN                 = ENV(DTC_PREFIX)dtc
 #                               Intel(r) ACPI Compiler from
 #                               https://acpica.org/downloads
 #   GCC5        -Linux,Windows-  Requires:
-#                             GCC 5 with LTO support, targeting x86_64-linux-gnu, aarch64-linux-gnu, or arm-linux-gnueabi
+#                             GCC 5 with LTO support, targeting x86_64-linux-gnu, aarch64-linux-gnu, arm-linux-gnueabi or riscv64-linux-gnu
 #                        Optional:
 #                             Required to build platforms or ACPI tables:
 #                               Intel(r) ACPI Compiler from
 #                               https://acpica.org/downloads
+#
 #   CLANG35     -Linux,Windows-  Requires:
 #                             Clang v3.5 or later, and GNU binutils targeting aarch64-linux-gnu or arm-linux-gnueabi
 #                        Optional:
@@ -1946,6 +1947,7 @@ DEFINE GCC_IA32_RC_FLAGS           = -I binary -O elf32-i386          -B i386   
 DEFINE GCC_X64_RC_FLAGS            = -I binary -O elf64-x86-64        -B i386    --rename-section .data=.hii
 DEFINE GCC_ARM_RC_FLAGS            = -I binary -O elf32-littlearm     -B arm     --rename-section .data=.hii
 DEFINE GCC_AARCH64_RC_FLAGS        = -I binary -O elf64-littleaarch64 -B aarch64 --rename-section .data=.hii
+DEFINE GCC_RISCV64_RC_FLAGS        = -I binary -O elf64-littleriscv   -B riscv   --rename-section .data=.hii
 
 # GCC Build Flag for included header file list generation
 DEFINE GCC_DEPS_FLAGS              = -MMD -MF $@.deps
@@ -2019,6 +2021,22 @@ DEFINE GCC5_AARCH64_DLINK2_FLAGS     = DEF(GCC49_AARCH64_DLINK2_FLAGS) -Wno-erro
 DEFINE GCC5_ARM_ASLDLINK_FLAGS       = DEF(GCC49_ARM_ASLDLINK_FLAGS)
 DEFINE GCC5_AARCH64_ASLDLINK_FLAGS   = DEF(GCC49_AARCH64_ASLDLINK_FLAGS)
 DEFINE GCC5_ASLCC_FLAGS              = DEF(GCC49_ASLCC_FLAGS) -fno-lto
+
+DEFINE GCC5_RISCV_ALL_CC_FLAGS                    = -g -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-array-bounds -ffunction-sections -fdata-sections -include AutoGen.h -fno-common -DSTRING_ARRAY_NAME=$(BASE_NAME)Strings -msmall-data-limit=0
+DEFINE GCC5_RISCV_ALL_DLINK_COMMON                = -nostdlib -Wl,-n,-q,--gc-sections -z common-page-size=0x40
+DEFINE GCC5_RISCV_ALL_DLINK_FLAGS                 = DEF(GCC5_RISCV_ALL_DLINK_COMMON) -Wl,--entry,$(IMAGE_ENTRY_POINT) -u $(IMAGE_ENTRY_POINT) -Wl,-Map,$(DEST_DIR_DEBUG)/$(BASE_NAME).map
+DEFINE GCC5_RISCV_ALL_DLINK2_FLAGS                = -Wl,--defsym=PECOFF_HEADER_SIZE=0x220,--script=$(EDK_TOOLS_PATH)/Scripts/GccBase.lds
+DEFINE GCC5_RISCV_ALL_ASM_FLAGS                   = -c -x assembler -imacros $(DEST_DIR_DEBUG)/AutoGen.h
+DEFINE GCC5_RISCV_ALL_CC_FLAGS_WARNING_DISABLE    = -Wno-tautological-compare -Wno-pointer-compare
+
+DEFINE GCC5_RISCV_OPENSBI_TYPES                   = -DOPENSBI_EXTERNAL_SBI_TYPES=OpensbiTypes.h
+
+DEFINE GCC5_RISCV64_ARCH                   = rv64imafdc
+DEFINE GCC5_RISCV32_RISCV64_ASLDLINK_FLAGS = DEF(GCC5_RISCV_ALL_DLINK_COMMON) -Wl,--entry,ReferenceAcpiTable -u ReferenceAcpiTable
+DEFINE GCC5_RISCV64_CC_FLAGS               = DEF(GCC5_RISCV_ALL_CC_FLAGS) DEF(GCC5_RISCV_ALL_CC_FLAGS_WARNING_DISABLE) DEF(GCC5_RISCV_OPENSBI_TYPES) -march=DEF(GCC5_RISCV64_ARCH) -fno-builtin -fno-builtin-memcpy -fno-stack-protector -Wno-address -fno-asynchronous-unwind-tables -Wno-unused-but-set-variable -fpack-struct=8 -mcmodel=medany -mabi=lp64 -mno-relax
+DEFINE GCC5_RISCV64_DLINK_FLAGS            = DEF(GCC5_RISCV_ALL_DLINK_FLAGS) -Wl,-melf64lriscv,--oformat=elf64-littleriscv,--no-relax
+DEFINE GCC5_RISCV64_DLINK2_FLAGS           = DEF(GCC5_RISCV_ALL_DLINK2_FLAGS)
+DEFINE GCC5_RISCV64_ASM_FLAGS              = DEF(GCC5_RISCV_ALL_ASM_FLAGS) -march=DEF(GCC5_RISCV64_ARCH) -mcmodel=medany -mabi=lp64
 
 ####################################################################################
 #
@@ -2463,6 +2481,37 @@ RELEASE_GCC5_AARCH64_DLINK_XIPFLAGS = -z common-page-size=0x20
   NOOPT_GCC5_AARCH64_CC_FLAGS    = DEF(GCC5_AARCH64_CC_FLAGS) -O0
   NOOPT_GCC5_AARCH64_DLINK_FLAGS = DEF(GCC5_AARCH64_DLINK_FLAGS) -O0
   NOOPT_GCC5_AARCH64_DLINK_XIPFLAGS = -z common-page-size=0x20 -O0
+
+####################################################################################
+#
+# GCC RISC-V This configuration is used to compile under Linux to produce
+#             PE/COFF binaries using GCC RISC-V tool chain
+#
+####################################################################################
+
+##################
+# GCC5 RISCV64 definitions
+##################
+*_GCC5_RISCV64_OBJCOPY_PATH         = ENV(GCC5_RISCV64_PREFIX)objcopy
+*_GCC5_RISCV64_CC_PATH              = ENV(GCC5_RISCV64_PREFIX)gcc
+*_GCC5_RISCV64_SLINK_PATH           = ENV(GCC5_RISCV64_PREFIX)gcc-ar
+*_GCC5_RISCV64_DLINK_PATH           = ENV(GCC5_RISCV64_PREFIX)gcc
+*_GCC5_RISCV64_ASLDLINK_PATH        = ENV(GCC5_RISCV64_PREFIX)gcc
+*_GCC5_RISCV64_ASM_PATH             = ENV(GCC5_RISCV64_PREFIX)gcc
+*_GCC5_RISCV64_PP_PATH              = ENV(GCC5_RISCV64_PREFIX)gcc
+*_GCC5_RISCV64_VFRPP_PATH           = ENV(GCC5_RISCV64_PREFIX)gcc
+*_GCC5_RISCV64_ASLCC_PATH           = ENV(GCC5_RISCV64_PREFIX)gcc
+*_GCC5_RISCV64_ASLPP_PATH           = ENV(GCC5_RISCV64_PREFIX)gcc
+*_GCC5_RISCV64_RC_PATH              = ENV(GCC5_RISCV64_PREFIX)objcopy
+
+*_GCC5_RISCV64_ASLCC_FLAGS          = DEF(GCC_ASLCC_FLAGS)
+*_GCC5_RISCV64_ASLDLINK_FLAGS       = DEF(GCC5_RISCV32_RISCV64_ASLDLINK_FLAGS)
+*_GCC5_RISCV64_ASM_FLAGS            = DEF(GCC5_RISCV64_ASM_FLAGS)
+*_GCC5_RISCV64_CC_FLAGS             = DEF(GCC5_RISCV64_CC_FLAGS) -save-temps
+*_GCC5_RISCV64_DLINK_FLAGS          = DEF(GCC5_RISCV64_DLINK_FLAGS)
+*_GCC5_RISCV64_DLINK2_FLAGS         = DEF(GCC5_RISCV64_DLINK2_FLAGS)
+*_GCC5_RISCV64_RC_FLAGS             = DEF(GCC_RISCV64_RC_FLAGS)
+*_GCC5_RISCV64_OBJCOPY_FLAGS        =
 
 ####################################################################################
 #
