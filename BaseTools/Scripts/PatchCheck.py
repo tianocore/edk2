@@ -491,6 +491,53 @@ class GitDiffCheck:
             print(prefix, line)
             count += 1
 
+class LicenseCheck():
+
+    def __init__(self, diff):
+        self.ok = True
+        self.startcheck = False
+        self.license = True
+        lines = diff.splitlines(True)
+        count = len(lines)
+        line_index = 0
+        for line in lines:
+            if line.startswith('--- /dev/null'):
+                nextline = lines[line_index + 1]
+                added_file = self.Readdedfileformat.search(nextline).group(1)
+                added_file_extension = os.path.splitext(added_file)[1]
+                if added_file_extension in self.file_extension_list:
+                    self.startcheck = True
+                    self.license = False
+            if self.startcheck and self.license_name in line:
+                self.license = True
+            if line_index + 1 == count or lines[line_index + 1].startswith('diff --') and self.startcheck:
+                if not self.license:
+                    self.error(added_file)
+                self.startcheck = False
+                self.license = True
+            line_index = line_index + 1
+
+    def error(self, *err):
+        if self.ok and Verbose.level > Verbose.ONELINE:
+            print('License is missing!')
+        self.ok = False
+        if Verbose.level < Verbose.NORMAL:
+            return
+        count = 0
+        for line in err:
+            prefix = (' *', '  ')[count > 0]
+            error_format = 'Missing license in:'
+            print(prefix, error_format, line)
+            count += 1
+
+
+    license_name = 'BSD-2-Clause-Patent'
+
+    Readdedfileformat = re.compile(r'\+\+\+ b\/(.*)\n')
+
+    file_extension_list = [".c", ".h", ".inf", ".dsc", ".dec", ".py", ".bat", ".sh", ".uni", ".yaml", ".fdf", ".inc"]
+
+
 class CheckOnePatch:
     """Checks the contents of a git email formatted patch.
 
@@ -508,12 +555,15 @@ class CheckOnePatch:
         msg_check = CommitMessageCheck(self.commit_subject, self.commit_msg)
         msg_ok = msg_check.ok
 
+        license_check = LicenseCheck(self.diff)
+        license_ok = license_check.ok
+
         diff_ok = True
         if self.diff is not None:
             diff_check = GitDiffCheck(self.diff)
             diff_ok = diff_check.ok
 
-        self.ok = email_ok and msg_ok and diff_ok
+        self.ok = email_ok and msg_ok and diff_ok and license_ok
 
         if Verbose.level == Verbose.ONELINE:
             if self.ok:
