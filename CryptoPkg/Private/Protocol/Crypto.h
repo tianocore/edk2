@@ -31,14 +31,14 @@ typedef struct _EDKII_CRYPTO_PROTOCOL EDKII_CRYPTO_PROTOCOL;
   Returns the version of the EDK II Crypto Protocol.
 
   @return  The version of the EDK II Crypto Protocol.
-
+ 
 **/
 typedef
 UINTN
 (EFIAPI *EDKII_CRYPTO_GET_VERSION) (
   VOID
   );
-
+typedef struct _EDKII_CRYPTO_PROTOCOL EDKII_CRYPTO_PROTOCOL;
 //=====================================================================================
 //    MAC (Message Authentication Code) Primitive
 //=====================================================================================
@@ -71,7 +71,7 @@ VOID
 (EFIAPI *EDKII_CRYPTO_HMAC_MD5_FREE) (
   IN  VOID  *HmacMd5Ctx
   );
-
+typedef struct _EDKII_CRYPTO_PROTOCOL EDKII_CRYPTO_PROTOCOL;
 /**
   Set user-supplied key for subsequent use. It must be done before any
   calling to HmacMd5Update().
