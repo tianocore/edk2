@@ -2785,134 +2785,45 @@ BOOLEAN
   );
 
 /**
-  Retrieves the size, in bytes, of the context buffer required for ARC4 operations.
-
-  If this interface is not supported, then return zero.
-
-  @return  The size, in bytes, of the context buffer required for ARC4 operations.
-  @retval  0   This interface is not supported.
+  ARC4 is deprecated and unsupported any longer.
+  Keep the function field for binary compability.
 
 **/
 typedef
 UINTN
-(EFIAPI *EDKII_CRYPTO_ARC4_GET_CONTEXT_SIZE) (
+(EFIAPI *DEPRECATED_EDKII_CRYPTO_ARC4_GET_CONTEXT_SIZE) (
   VOID
   );
 
-/**
-  Initializes user-supplied memory as ARC4 context for subsequent use.
-
-  This function initializes user-supplied memory pointed by Arc4Context as ARC4 context.
-  In addition, it sets up all ARC4 key materials for subsequent encryption and decryption
-  operations.
-
-  If Arc4Context is NULL, then return FALSE.
-  If Key is NULL, then return FALSE.
-  If KeySize does not in the range of [5, 256] bytes, then return FALSE.
-  If this interface is not supported, then return FALSE.
-
-  @param[out]  Arc4Context  Pointer to ARC4 context being initialized.
-  @param[in]   Key          Pointer to the user-supplied ARC4 key.
-  @param[in]   KeySize      Size of ARC4 key in bytes.
-
-  @retval TRUE   ARC4 context initialization succeeded.
-  @retval FALSE  ARC4 context initialization failed.
-  @retval FALSE  This interface is not supported.
-
-**/
 typedef
 BOOLEAN
-(EFIAPI *EDKII_CRYPTO_ARC4_INIT) (
+(EFIAPI *DEPRECATED_EDKII_CRYPTO_ARC4_INIT) (
   OUT  VOID         *Arc4Context,
   IN   CONST UINT8  *Key,
   IN   UINTN        KeySize
   );
 
-/**
-  Performs ARC4 encryption on a data buffer of the specified size.
-
-  This function performs ARC4 encryption on data buffer pointed by Input, of specified
-  size of InputSize.
-  Arc4Context should be already correctly initialized by Arc4Init(). Behavior with
-  invalid ARC4 context is undefined.
-
-  If Arc4Context is NULL, then return FALSE.
-  If Input is NULL, then return FALSE.
-  If Output is NULL, then return FALSE.
-  If this interface is not supported, then return FALSE.
-
-  @param[in, out]  Arc4Context  Pointer to the ARC4 context.
-  @param[in]       Input        Pointer to the buffer containing the data to be encrypted.
-  @param[in]       InputSize    Size of the Input buffer in bytes.
-  @param[out]      Output       Pointer to a buffer that receives the ARC4 encryption output.
-
-  @retval TRUE   ARC4 encryption succeeded.
-  @retval FALSE  ARC4 encryption failed.
-  @retval FALSE  This interface is not supported.
-
-**/
 typedef
 BOOLEAN
-(EFIAPI *EDKII_CRYPTO_ARC4_ENCRYPT) (
+(EFIAPI *DEPRECATED_EDKII_CRYPTO_ARC4_ENCRYPT) (
   IN OUT  VOID         *Arc4Context,
   IN      CONST UINT8  *Input,
   IN      UINTN        InputSize,
   OUT     UINT8        *Output
   );
 
-/**
-  Performs ARC4 decryption on a data buffer of the specified size.
-
-  This function performs ARC4 decryption on data buffer pointed by Input, of specified
-  size of InputSize.
-  Arc4Context should be already correctly initialized by Arc4Init(). Behavior with
-  invalid ARC4 context is undefined.
-
-  If Arc4Context is NULL, then return FALSE.
-  If Input is NULL, then return FALSE.
-  If Output is NULL, then return FALSE.
-  If this interface is not supported, then return FALSE.
-
-  @param[in, out]  Arc4Context  Pointer to the ARC4 context.
-  @param[in]       Input        Pointer to the buffer containing the data to be decrypted.
-  @param[in]       InputSize    Size of the Input buffer in bytes.
-  @param[out]      Output       Pointer to a buffer that receives the ARC4 decryption output.
-
-  @retval TRUE   ARC4 decryption succeeded.
-  @retval FALSE  ARC4 decryption failed.
-  @retval FALSE  This interface is not supported.
-
-**/
 typedef
 BOOLEAN
-(EFIAPI *EDKII_CRYPTO_ARC4_DECRYPT) (
+(EFIAPI *DEPRECATED_EDKII_CRYPTO_ARC4_DECRYPT) (
   IN OUT  VOID   *Arc4Context,
   IN      UINT8  *Input,
   IN      UINTN  InputSize,
   OUT     UINT8  *Output
   );
 
-/**
-  Resets the ARC4 context to the initial state.
-
-  The function resets the ARC4 context to the state it had immediately after the
-  ARC4Init() function call.
-  Contrary to ARC4Init(), Arc4Reset() requires no secret key as input, but ARC4 context
-  should be already correctly initialized by ARC4Init().
-
-  If Arc4Context is NULL, then return FALSE.
-  If this interface is not supported, then return FALSE.
-
-  @param[in, out]  Arc4Context  Pointer to the ARC4 context.
-
-  @retval TRUE   ARC4 reset succeeded.
-  @retval FALSE  ARC4 reset failed.
-  @retval FALSE  This interface is not supported.
-
-**/
 typedef
 BOOLEAN
-(EFIAPI *EDKII_CRYPTO_ARC4_RESET) (
+(EFIAPI *DEPRECATED_EDKII_CRYPTO_ARC4_RESET) (
   IN OUT  VOID  *Arc4Context
   );
 
@@ -4014,12 +3925,12 @@ struct _EDKII_CRYPTO_PROTOCOL {
   EDKII_CRYPTO_AES_ECB_DECRYPT                    AesEcbDecrypt;
   EDKII_CRYPTO_AES_CBC_ENCRYPT                    AesCbcEncrypt;
   EDKII_CRYPTO_AES_CBC_DECRYPT                    AesCbcDecrypt;
-  /// Arc4
-  EDKII_CRYPTO_ARC4_GET_CONTEXT_SIZE              Arc4GetContextSize;
-  EDKII_CRYPTO_ARC4_INIT                          Arc4Init;
-  EDKII_CRYPTO_ARC4_ENCRYPT                       Arc4Encrypt;
-  EDKII_CRYPTO_ARC4_DECRYPT                       Arc4Decrypt;
-  EDKII_CRYPTO_ARC4_RESET                         Arc4Reset;
+  /// Arc4 - deprecated and unsupported
+  DEPRECATED_EDKII_CRYPTO_ARC4_GET_CONTEXT_SIZE   DeprecatedArc4GetContextSize;
+  DEPRECATED_EDKII_CRYPTO_ARC4_INIT               DeprecatedArc4Init;
+  DEPRECATED_EDKII_CRYPTO_ARC4_ENCRYPT            DeprecatedArc4Encrypt;
+  DEPRECATED_EDKII_CRYPTO_ARC4_DECRYPT            DeprecatedArc4Decrypt;
+  DEPRECATED_EDKII_CRYPTO_ARC4_RESET              DeprecatedArc4Reset;
   /// SM3
   EDKII_CRYPTO_SM3_GET_CONTEXT_SIZE               Sm3GetContextSize;
   EDKII_CRYPTO_SM3_INIT                           Sm3Init;

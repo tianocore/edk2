@@ -7,7 +7,7 @@
 #  buffer overflow or integer overflow.
 #
 #  Note: SHA-384 Digest functions, SHA-512 Digest functions,
-#  HMAC-MD5 functions, HMAC-SHA1/SHA256 functions, AES/TDES/ARC4 functions, RSA external
+#  HMAC-MD5 functions, HMAC-SHA1/SHA256 functions, AES/TDES functions, RSA external
 #  functions, PKCS#7 SignedData sign functions, Diffie-Hellman functions, and
 #  authenticode signature verification functions are not supported in this instance.
 #
@@ -46,7 +46,6 @@
   Kdf/CryptHkdfNull.c
   Cipher/CryptAesNull.c
   Cipher/CryptTdesNull.c
-  Cipher/CryptArc4Null.c
   Pk/CryptRsaBasic.c
   Pk/CryptRsaExtNull.c
   Pk/CryptPkcs1OaepNull.c
