@@ -38,6 +38,7 @@
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
   OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
@@ -52,6 +53,7 @@
   UefiBootServicesTableLib
   UefiDriverEntryPoint
   UefiRuntimeLib
+  VmgExitLib
 
 [Guids]
   gEfiEventVirtualAddressChangeGuid   # ALWAYS_CONSUMED
