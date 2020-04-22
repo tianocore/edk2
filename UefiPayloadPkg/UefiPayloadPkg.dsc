@@ -33,6 +33,7 @@
   DEFINE UNIVERSAL_PAYLOAD            = FALSE
   DEFINE SECURITY_STUB_ENABLE         = TRUE
   DEFINE SMM_SUPPORT                  = FALSE
+  DEFINE USE_PLATFORM_GOP             = FALSE
   #
   # SBL:      UEFI payload for Slim Bootloader
   # COREBOOT: UEFI payload for coreboot
@@ -666,7 +667,11 @@
 !if $(DISABLE_SERIAL_TERMINAL) == FALSE
   MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
 !endif
+!if $(USE_PLATFORM_GOP) == TRUE
+  UefiPayloadPkg/PlatformGopPolicy/PlatformGopPolicy.inf
+!else
   UefiPayloadPkg/GraphicsOutputDxe/GraphicsOutputDxe.inf
+!endif
 !if $(PERFORMANCE_MEASUREMENT_ENABLE)
   MdeModulePkg/Universal/Acpi/FirmwarePerformanceDataTableDxe/FirmwarePerformanceDxe.inf
 !endif

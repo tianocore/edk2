@@ -187,7 +187,21 @@ INF MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsoleDxe.inf
 !if $(DISABLE_SERIAL_TERMINAL) == FALSE
 INF MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
 !endif
+!if $(USE_PLATFORM_GOP) == TRUE
+INF UefiPayloadPkg/PlatformGopPolicy/PlatformGopPolicy.inf
+FILE DRIVER = FF0C8745-3270-4439-B74F-3E45F8C77064 {
+  SECTION DXE_DEPEX_EXP = {gPlatformGOPPolicyGuid}
+  SECTION PE32 = UefiPayloadPkg/IntelGopDriver.efi
+  SECTION UI = "IntelGopDriver"
+}
+
+FILE FREEFORM = 878AC2CC-5343-46F2-B563-51F89DAF56BA {
+  SECTION RAW = UefiPayloadPkg/vbt.bin
+  SECTION UI = "IntelGopVbt"
+}
+!else
 INF UefiPayloadPkg/GraphicsOutputDxe/GraphicsOutputDxe.inf
+!endif
 
 #
 # SCSI/ATA/IDE/DISK Support
