@@ -1156,6 +1156,38 @@ IoioExit (
 }
 
 /**
+  Handle a INVD event.
+
+  Use the VMGEXIT instruction to handle a INVD event.
+
+  @param[in, out] Ghcb             Pointer to the Guest-Hypervisor Communication
+                                   Block
+  @param[in, out] Regs             x64 processor context
+  @param[in]      InstructionData  Instruction parsing context
+
+  @retval 0                        Event handled successfully
+  @retval Others                   New exception value to propagate
+
+**/
+STATIC
+UINT64
+InvdExit (
+  IN OUT GHCB                     *Ghcb,
+  IN OUT EFI_SYSTEM_CONTEXT_X64   *Regs,
+  IN     SEV_ES_INSTRUCTION_DATA  *InstructionData
+  )
+{
+  UINT64  Status;
+
+  Status = VmgExit (Ghcb, SvmExitInvd, 0, 0);
+  if (Status) {
+    return Status;
+  }
+
+  return 0;
+}
+
+/**
   Handle a CPUID event.
 
   Use the VMGEXIT instruction to handle a CPUID event.
@@ -1328,6 +1360,10 @@ DoVcCommon (
 
   case SvmExitCpuid:
     NaeExit = CpuidExit;
+    break;
+
+  case SvmExitInvd:
+    NaeExit = InvdExit;
     break;
 
   case SvmExitIoioProt:
