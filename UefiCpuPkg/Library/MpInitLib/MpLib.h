@@ -31,6 +31,7 @@
 #include <Library/SynchronizationLib.h>
 #include <Library/MtrrLib.h>
 #include <Library/HobLib.h>
+#include <Library/PcdLib.h>
 
 #include <Guid/MicrocodePatchHob.h>
 
