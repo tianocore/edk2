@@ -34,9 +34,12 @@
    *_*_X64_NASMB_FLAGS = -I$(WORKSPACE)/UefiCpuPkg/ResetVector/Vtf0/
 
 [Pcd]
+  gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbSize
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbPageTableBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbPageTableSize
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPageTablesBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPageTablesSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamSize
