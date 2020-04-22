@@ -1,0 +1,12 @@
+// /** @file
+// VarCheckPolicyLib.uni
+//
+// Copyright (c) Microsoft Corporation.
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "NULL library implementation that conforms to the VarCheck interface to allow VariablePolicy engine to enforce policies"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "NULL library implementation that conforms to the VarCheck interface to allow VariablePolicy engine to enforce policies"
