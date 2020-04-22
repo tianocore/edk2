@@ -11,6 +11,8 @@
 #include <Library/VmgExitLib.h>
 #include "AMDSevVcCommon.h"
 
+#define CR4_OSXSAVE (1 << 18)
+
 //
 // Instruction execution mode definition
 //
@@ -631,6 +633,58 @@ IoioExit (
 }
 
 /**
+  Handle a CPUID event.
+
+  Use the VMGEXIT instruction to handle a CPUID event.
+
+  @param[in, out] Ghcb             Pointer to the Guest-Hypervisor Communication
+                                   Block
+  @param[in, out] Regs             x64 processor context
+  @param[in]      InstructionData  Instruction parsing context
+
+  @retval 0                        Event handled successfully
+  @retval Others                   New exception value to propagate
+
+**/
+STATIC
+UINT64
+CpuidExit (
+  IN OUT GHCB                     *Ghcb,
+  IN OUT EFI_SYSTEM_CONTEXT_X64   *Regs,
+  IN     SEV_ES_INSTRUCTION_DATA  *InstructionData
+  )
+{
+  UINT64  Status;
+
+  Ghcb->SaveArea.Rax = Regs->Rax;
+  GhcbSetRegValid (Ghcb, GhcbRax);
+  Ghcb->SaveArea.Rcx = Regs->Rcx;
+  GhcbSetRegValid (Ghcb, GhcbRcx);
+  if (Regs->Rax == 0x0000000d) {
+    Ghcb->SaveArea.XCr0 = (AsmReadCr4 () & CR4_OSXSAVE) ? AsmXGetBv (0) : 1;
+    GhcbSetRegValid (Ghcb, GhcbXCr0);
+  }
+
+  Status = VmgExit (Ghcb, SvmExitCpuid, 0, 0);
+  if (Status) {
+    return Status;
+  }
+
+  if (!GhcbIsRegValid (Ghcb, GhcbRax) ||
+      !GhcbIsRegValid (Ghcb, GhcbRbx) ||
+      !GhcbIsRegValid (Ghcb, GhcbRcx) ||
+      !GhcbIsRegValid (Ghcb, GhcbRdx)) {
+    return UnsupportedExit (Ghcb, Regs, InstructionData);
+  }
+  Regs->Rax = Ghcb->SaveArea.Rax;
+  Regs->Rbx = Ghcb->SaveArea.Rbx;
+  Regs->Rcx = Ghcb->SaveArea.Rcx;
+  Regs->Rdx = Ghcb->SaveArea.Rdx;
+
+  return 0;
+}
+
+/**
   Common #VC exception handling routine.
 
   Used to bridge different phases of UEFI execution.
@@ -660,6 +714,10 @@ DoVcCommon (
 
   ExitCode = Regs->ExceptionData;
   switch (ExitCode) {
+  case SvmExitCpuid:
+    NaeExit = CpuidExit;
+    break;
+
   case SvmExitIoioProt:
     NaeExit = IoioExit;
     break;
