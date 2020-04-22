@@ -101,6 +101,7 @@
   gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber
   gUefiCpuPkgTokenSpaceGuid.PcdCpuBootLogicalProcessorNumber
   gUefiCpuPkgTokenSpaceGuid.PcdCpuApStackSize
+  gUefiCpuPkgTokenSpaceGuid.PcdSevEsIsEnabled
 
 [FixedPcd]
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
