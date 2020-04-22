@@ -216,6 +216,16 @@ CProcedureInvoke:
 RendezvousFunnelProcEnd:
 
 ;-------------------------------------------------------------------------------------
+;SwitchToRealProc procedure follows.
+;NOT USED IN 32 BIT MODE.
+;-------------------------------------------------------------------------------------
+global ASM_PFX(SwitchToRealProc)
+ASM_PFX(SwitchToRealProc):
+SwitchToRealProcStart:
+    jmp        $                 ; Never reach here
+SwitchToRealProcEnd:
+
+;-------------------------------------------------------------------------------------
 ;  AsmRelocateApLoop (MwaitSupport, ApTargetCState, PmCodeSegment, TopOfApStack, CountTofinish);
 ;-------------------------------------------------------------------------------------
 global ASM_PFX(AsmRelocateApLoop)
@@ -263,6 +273,11 @@ ASM_PFX(AsmGetAddressMap):
     mov        dword [ebx + 0Ch], AsmRelocateApLoopStart
     mov        dword [ebx + 10h], AsmRelocateApLoopEnd - AsmRelocateApLoopStart
     mov        dword [ebx + 14h], Flat32Start - RendezvousFunnelProcStart
+    mov        dword [ebx + 18h], SwitchToRealProcEnd - SwitchToRealProcStart       ; SwitchToRealSize
+    mov        dword [ebx + 1Ch], SwitchToRealProcStart - RendezvousFunnelProcStart ; SwitchToRealOffset
+    mov        dword [ebx + 20h], SwitchToRealProcStart - Flat32Start               ; SwitchToRealNoNxOffset
+    mov        dword [ebx + 24h], 0                                                 ; SwitchToRealPM16ModeOffset
+    mov        dword [ebx + 28h], 0                                                 ; SwitchToRealPM16ModeSize
 
     popad
     ret
