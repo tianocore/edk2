@@ -40,7 +40,6 @@
   Kdf/CryptHkdf.c
   Cipher/CryptAes.c
   Cipher/CryptTdes.c
-  Cipher/CryptArc4.c
   Pk/CryptRsaBasic.c
   Pk/CryptRsaExt.c
   Pk/CryptPkcs1Oaep.c
