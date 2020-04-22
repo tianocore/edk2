@@ -292,7 +292,8 @@ struct _CPU_MP_DATA {
   UINT64                         GhcbBase;
 };
 
-#define AP_RESET_STACK_SIZE 64
+#define AP_SAFE_STACK_SIZE  128
+#define AP_RESET_STACK_SIZE AP_SAFE_STACK_SIZE
 
 #pragma pack(1)
 
@@ -348,8 +349,11 @@ VOID
   IN BOOLEAN                 MwaitSupport,
   IN UINTN                   ApTargetCState,
   IN UINTN                   PmCodeSegment,
+  IN UINTN                   Pm16CodeSegment,
   IN UINTN                   TopOfApStack,
-  IN UINTN                   NumberToFinish
+  IN UINTN                   NumberToFinish,
+  IN UINTN                   SevEsAPJumpTable,
+  IN UINTN                   WakeupBuffer
   );
 
 /**
