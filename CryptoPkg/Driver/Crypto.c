@@ -1612,152 +1612,94 @@ CryptoServiceHmacSha256Final (
 //=====================================================================================
 
 /**
-  Retrieves the size, in bytes, of the context buffer required for TDES operations.
+  TDES is deprecated and unsupported any longer.
+  Keep the function field for binary compability.
 
-  If this interface is not supported, then return zero.
-
-  @return  The size, in bytes, of the context buffer required for TDES operations.
   @retval  0   This interface is not supported.
 
 **/
 UINTN
 EFIAPI
-CryptoServiceTdesGetContextSize (
+DeprecatedCryptoServiceTdesGetContextSize (
   VOID
   )
 {
-  return CALL_BASECRYPTLIB (Tdes.Services.GetContextSize, TdesGetContextSize, (), 0);
+  return BaseCryptLibServiceDeprecated ("TdesGetContextSize"), 0;
 }
 
 /**
-  Initializes user-supplied memory as TDES context for subsequent use.
-
-  This function initializes user-supplied memory pointed by TdesContext as TDES context.
-  In addition, it sets up all TDES key materials for subsequent encryption and decryption
-  operations.
-  There are 3 key options as follows:
-  KeyLength = 64,  Keying option 1: K1 == K2 == K3 (Backward compatibility with DES)
-  KeyLength = 128, Keying option 2: K1 != K2 and K3 = K1 (Less Security)
-  KeyLength = 192  Keying option 3: K1 != K2 != K3 (Strongest)
-
-  If TdesContext is NULL, then return FALSE.
-  If Key is NULL, then return FALSE.
-  If KeyLength is not valid, then return FALSE.
-  If this interface is not supported, then return FALSE.
+  TDES is deprecated and unsupported any longer.
+  Keep the function field for binary compability.
 
   @param[out]  TdesContext  Pointer to TDES context being initialized.
   @param[in]   Key          Pointer to the user-supplied TDES key.
   @param[in]   KeyLength    Length of TDES key in bits.
 
-  @retval TRUE   TDES context initialization succeeded.
-  @retval FALSE  TDES context initialization failed.
   @retval FALSE  This interface is not supported.
 
 **/
 BOOLEAN
 EFIAPI
-CryptoServiceTdesInit (
+DeprecatedCryptoServiceTdesInit (
   OUT  VOID         *TdesContext,
   IN   CONST UINT8  *Key,
   IN   UINTN        KeyLength
   )
 {
-  return CALL_BASECRYPTLIB (Tdes.Services.Init, TdesInit, (TdesContext, Key, KeyLength), FALSE);
+  return BaseCryptLibServiceDeprecated ("TdesInit"), FALSE;
 }
 
 /**
-  Performs TDES encryption on a data buffer of the specified size in ECB mode.
-
-  This function performs TDES encryption on data buffer pointed by Input, of specified
-  size of InputSize, in ECB mode.
-  InputSize must be multiple of block size (8 bytes). This function does not perform
-  padding. Caller must perform padding, if necessary, to ensure valid input data size.
-  TdesContext should be already correctly initialized by TdesInit(). Behavior with
-  invalid TDES context is undefined.
-
-  If TdesContext is NULL, then return FALSE.
-  If Input is NULL, then return FALSE.
-  If InputSize is not multiple of block size (8 bytes), then return FALSE.
-  If Output is NULL, then return FALSE.
-  If this interface is not supported, then return FALSE.
+  TDES is deprecated and unsupported any longer.
+  Keep the function field for binary compability.
 
   @param[in]   TdesContext  Pointer to the TDES context.
   @param[in]   Input        Pointer to the buffer containing the data to be encrypted.
   @param[in]   InputSize    Size of the Input buffer in bytes.
   @param[out]  Output       Pointer to a buffer that receives the TDES encryption output.
 
-  @retval TRUE   TDES encryption succeeded.
-  @retval FALSE  TDES encryption failed.
   @retval FALSE  This interface is not supported.
 
 **/
 BOOLEAN
 EFIAPI
-CryptoServiceTdesEcbEncrypt (
+DeprecatedCryptoServiceTdesEcbEncrypt (
   IN   VOID         *TdesContext,
   IN   CONST UINT8  *Input,
   IN   UINTN        InputSize,
   OUT  UINT8        *Output
   )
 {
-  return CALL_BASECRYPTLIB (Tdes.Services.EcbEncrypt, TdesEcbEncrypt, (TdesContext, Input, InputSize, Output), FALSE);
+  return BaseCryptLibServiceDeprecated ("TdesEcbEncrypt"), FALSE;
 }
 
 /**
-  Performs TDES decryption on a data buffer of the specified size in ECB mode.
-
-  This function performs TDES decryption on data buffer pointed by Input, of specified
-  size of InputSize, in ECB mode.
-  InputSize must be multiple of block size (8 bytes). This function does not perform
-  padding. Caller must perform padding, if necessary, to ensure valid input data size.
-  TdesContext should be already correctly initialized by TdesInit(). Behavior with
-  invalid TDES context is undefined.
-
-  If TdesContext is NULL, then return FALSE.
-  If Input is NULL, then return FALSE.
-  If InputSize is not multiple of block size (8 bytes), then return FALSE.
-  If Output is NULL, then return FALSE.
-  If this interface is not supported, then return FALSE.
+  TDES is deprecated and unsupported any longer.
+  Keep the function field for binary compability.
 
   @param[in]   TdesContext  Pointer to the TDES context.
   @param[in]   Input        Pointer to the buffer containing the data to be decrypted.
   @param[in]   InputSize    Size of the Input buffer in bytes.
   @param[out]  Output       Pointer to a buffer that receives the TDES decryption output.
 
-  @retval TRUE   TDES decryption succeeded.
-  @retval FALSE  TDES decryption failed.
   @retval FALSE  This interface is not supported.
 
 **/
 BOOLEAN
 EFIAPI
-CryptoServiceTdesEcbDecrypt (
+DeprecatedCryptoServiceTdesEcbDecrypt (
   IN   VOID         *TdesContext,
   IN   CONST UINT8  *Input,
   IN   UINTN        InputSize,
   OUT  UINT8        *Output
   )
 {
-  return CALL_BASECRYPTLIB (Tdes.Services.EcbDecrypt, TdesEcbDecrypt, (TdesContext, Input, InputSize, Output), FALSE);
+  return BaseCryptLibServiceDeprecated ("TdesEcbDecrypt"), FALSE;
 }
 
 /**
-  Performs TDES encryption on a data buffer of the specified size in CBC mode.
-
-  This function performs TDES encryption on data buffer pointed by Input, of specified
-  size of InputSize, in CBC mode.
-  InputSize must be multiple of block size (8 bytes). This function does not perform
-  padding. Caller must perform padding, if necessary, to ensure valid input data size.
-  Initialization vector should be one block size (8 bytes).
-  TdesContext should be already correctly initialized by TdesInit(). Behavior with
-  invalid TDES context is undefined.
-
-  If TdesContext is NULL, then return FALSE.
-  If Input is NULL, then return FALSE.
-  If InputSize is not multiple of block size (8 bytes), then return FALSE.
-  If Ivec is NULL, then return FALSE.
-  If Output is NULL, then return FALSE.
-  If this interface is not supported, then return FALSE.
+  TDES is deprecated and unsupported any longer.
+  Keep the function field for binary compability.
 
   @param[in]   TdesContext  Pointer to the TDES context.
   @param[in]   Input        Pointer to the buffer containing the data to be encrypted.
@@ -1765,14 +1707,12 @@ CryptoServiceTdesEcbDecrypt (
   @param[in]   Ivec         Pointer to initialization vector.
   @param[out]  Output       Pointer to a buffer that receives the TDES encryption output.
 
-  @retval TRUE   TDES encryption succeeded.
-  @retval FALSE  TDES encryption failed.
   @retval FALSE  This interface is not supported.
 
 **/
 BOOLEAN
 EFIAPI
-CryptoServiceTdesCbcEncrypt (
+DeprecatedCryptoServiceTdesCbcEncrypt (
   IN   VOID         *TdesContext,
   IN   CONST UINT8  *Input,
   IN   UINTN        InputSize,
@@ -1780,26 +1720,12 @@ CryptoServiceTdesCbcEncrypt (
   OUT  UINT8        *Output
   )
 {
-  return CALL_BASECRYPTLIB (Tdes.Services.CbcEncrypt, TdesCbcEncrypt, (TdesContext, Input, InputSize, Ivec, Output), FALSE);
+  return BaseCryptLibServiceDeprecated ("TdesCbcEncrypt"), FALSE;
 }
 
 /**
-  Performs TDES decryption on a data buffer of the specified size in CBC mode.
-
-  This function performs TDES decryption on data buffer pointed by Input, of specified
-  size of InputSize, in CBC mode.
-  InputSize must be multiple of block size (8 bytes). This function does not perform
-  padding. Caller must perform padding, if necessary, to ensure valid input data size.
-  Initialization vector should be one block size (8 bytes).
-  TdesContext should be already correctly initialized by TdesInit(). Behavior with
-  invalid TDES context is undefined.
-
-  If TdesContext is NULL, then return FALSE.
-  If Input is NULL, then return FALSE.
-  If InputSize is not multiple of block size (8 bytes), then return FALSE.
-  If Ivec is NULL, then return FALSE.
-  If Output is NULL, then return FALSE.
-  If this interface is not supported, then return FALSE.
+  TDES is deprecated and unsupported any longer.
+  Keep the function field for binary compability.
 
   @param[in]   TdesContext  Pointer to the TDES context.
   @param[in]   Input        Pointer to the buffer containing the data to be encrypted.
@@ -1807,14 +1733,12 @@ CryptoServiceTdesCbcEncrypt (
   @param[in]   Ivec         Pointer to initialization vector.
   @param[out]  Output       Pointer to a buffer that receives the TDES encryption output.
 
-  @retval TRUE   TDES decryption succeeded.
-  @retval FALSE  TDES decryption failed.
   @retval FALSE  This interface is not supported.
 
 **/
 BOOLEAN
 EFIAPI
-CryptoServiceTdesCbcDecrypt (
+DeprecatedCryptoServiceTdesCbcDecrypt (
   IN   VOID         *TdesContext,
   IN   CONST UINT8  *Input,
   IN   UINTN        InputSize,
@@ -1822,7 +1746,7 @@ CryptoServiceTdesCbcDecrypt (
   OUT  UINT8        *Output
   )
 {
-  return CALL_BASECRYPTLIB (Tdes.Services.CbcDecrypt, TdesCbcDecrypt, (TdesContext, Input, InputSize, Ivec, Output), FALSE);
+  return BaseCryptLibServiceDeprecated ("TdesCbcDecrypt"), FALSE;
 }
 
 /**
@@ -4445,13 +4369,13 @@ const EDKII_CRYPTO_PROTOCOL mEdkiiCrypto = {
   CryptoServiceX509Free,
   CryptoServiceX509StackFree,
   CryptoServiceX509GetTBSCert,
-  /// TDES
-  CryptoServiceTdesGetContextSize,
-  CryptoServiceTdesInit,
-  CryptoServiceTdesEcbEncrypt,
-  CryptoServiceTdesEcbDecrypt,
-  CryptoServiceTdesCbcEncrypt,
-  CryptoServiceTdesCbcDecrypt,
+  /// TDES - deprecated and unsupported
+  DeprecatedCryptoServiceTdesGetContextSize,
+  DeprecatedCryptoServiceTdesInit,
+  DeprecatedCryptoServiceTdesEcbEncrypt,
+  DeprecatedCryptoServiceTdesEcbDecrypt,
+  DeprecatedCryptoServiceTdesCbcEncrypt,
+  DeprecatedCryptoServiceTdesCbcDecrypt,
   /// AES
   CryptoServiceAesGetContextSize,
   CryptoServiceAesInit,
