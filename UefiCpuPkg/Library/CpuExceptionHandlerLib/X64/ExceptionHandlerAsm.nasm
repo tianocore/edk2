@@ -18,6 +18,8 @@
 ; CommonExceptionHandler()
 ;
 
+%define VC_EXCEPTION 29
+
 extern ASM_PFX(mErrorCodeFlag)    ; Error code flags for exceptions
 extern ASM_PFX(mDoFarReturnFlag)  ; Do far return flag
 extern ASM_PFX(CommonExceptionHandler)
@@ -225,6 +227,9 @@ HasErrorCode:
     push    rax
 
 ;; UINT64  Dr0, Dr1, Dr2, Dr3, Dr6, Dr7;
+    cmp     qword [rbp + 8], VC_EXCEPTION
+    je      VcDebugRegs          ; For SEV-ES (#VC) Debug registers ignored
+
     mov     rax, dr7
     push    rax
     mov     rax, dr6
@@ -237,7 +242,19 @@ HasErrorCode:
     push    rax
     mov     rax, dr0
     push    rax
+    jmp     DrFinish
 
+VcDebugRegs:
+;; UINT64  Dr0, Dr1, Dr2, Dr3, Dr6, Dr7 are skipped for #VC to avoid exception recursion
+    xor     rax, rax
+    push    rax
+    push    rax
+    push    rax
+    push    rax
+    push    rax
+    push    rax
+
+DrFinish:
 ;; FX_SAVE_STATE_X64 FxSaveState;
     sub rsp, 512
     mov rdi, rsp
