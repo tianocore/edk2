@@ -50,6 +50,7 @@
   UefiCpuLib
   SynchronizationLib
   PeiServicesLib
+  PcdLib
 
 [Pcd]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber        ## CONSUMES
