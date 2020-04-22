@@ -224,6 +224,263 @@ GhcbSetRegValid (
 }
 
 /**
+  Return a pointer to the contents of the specified register.
+
+  Based upon the input register, return a pointer to the registers contents
+  in the x86 processor context.
+
+  @param[in] Regs      x64 processor context
+  @param[in] Register  Register to obtain pointer for
+
+  @retval              Pointer to the contents of the requested register
+
+**/
+STATIC
+INT64 *
+GetRegisterPointer (
+  IN EFI_SYSTEM_CONTEXT_X64   *Regs,
+  IN UINT8                    Register
+  )
+{
+  UINT64 *Reg;
+
+  switch (Register) {
+  case 0:
+    Reg = &Regs->Rax;
+    break;
+  case 1:
+    Reg = &Regs->Rcx;
+    break;
+  case 2:
+    Reg = &Regs->Rdx;
+    break;
+  case 3:
+    Reg = &Regs->Rbx;
+    break;
+  case 4:
+    Reg = &Regs->Rsp;
+    break;
+  case 5:
+    Reg = &Regs->Rbp;
+    break;
+  case 6:
+    Reg = &Regs->Rsi;
+    break;
+  case 7:
+    Reg = &Regs->Rdi;
+    break;
+  case 8:
+    Reg = &Regs->R8;
+    break;
+  case 9:
+    Reg = &Regs->R9;
+    break;
+  case 10:
+    Reg = &Regs->R10;
+    break;
+  case 11:
+    Reg = &Regs->R11;
+    break;
+  case 12:
+    Reg = &Regs->R12;
+    break;
+  case 13:
+    Reg = &Regs->R13;
+    break;
+  case 14:
+    Reg = &Regs->R14;
+    break;
+  case 15:
+    Reg = &Regs->R15;
+    break;
+  default:
+    Reg = NULL;
+  }
+  ASSERT (Reg != NULL);
+
+  return (INT64 *) Reg;
+}
+
+/**
+  Update the instruction parsing context for displacement bytes.
+
+  @param[in, out] InstructionData  Instruction parsing context
+  @param[in]      Size             The instruction displacement size
+
+**/
+STATIC
+VOID
+UpdateForDisplacement (
+  IN OUT SEV_ES_INSTRUCTION_DATA  *InstructionData,
+  IN     UINTN                    Size
+  )
+{
+  InstructionData->DisplacementSize = Size;
+  InstructionData->Immediate += Size;
+  InstructionData->End += Size;
+}
+
+/**
+  Determine if an instruction address if RIP relative.
+
+  Examine the instruction parsing context to determine if the address offset
+  is relative to the instruction pointer.
+
+  @param[in] InstructionData  Instruction parsing context
+
+  @retval TRUE                Instruction addressing is RIP relative
+  @retval FALSE               Instruction addressing is not RIP relative
+
+**/
+STATIC
+BOOLEAN
+IsRipRelative (
+  IN SEV_ES_INSTRUCTION_DATA  *InstructionData
+  )
+{
+  SEV_ES_INSTRUCTION_OPCODE_EXT  *Ext;
+
+  Ext = &InstructionData->Ext;
+
+  return ((InstructionData == LongMode64Bit) &&
+          (Ext->ModRm.Mod == 0) &&
+          (Ext->ModRm.Rm == 5)  &&
+          (InstructionData->SibPresent == FALSE));
+}
+
+/**
+  Return the effective address of a memory operand.
+
+  Examine the instruction parsing context to obtain the effective memory
+  address of a memory operand.
+
+  @param[in] Regs             x64 processor context
+  @param[in] InstructionData  Instruction parsing context
+
+  @retval                     The memory operand effective address
+
+**/
+STATIC
+UINTN
+GetEffectiveMemoryAddress (
+  IN EFI_SYSTEM_CONTEXT_X64   *Regs,
+  IN SEV_ES_INSTRUCTION_DATA  *InstructionData
+  )
+{
+  SEV_ES_INSTRUCTION_OPCODE_EXT  *Ext;
+  INTN                           EffectiveAddress;
+
+  Ext = &InstructionData->Ext;
+  EffectiveAddress = 0;
+
+  if (IsRipRelative (InstructionData)) {
+    /* RIP-relative displacement is a 32-bit signed value */
+    INT32 RipRelative;
+
+    RipRelative = *(INT32 *) InstructionData->Displacement;
+
+    UpdateForDisplacement (InstructionData, 4);
+    return (UINTN) ((INTN) Regs->Rip + RipRelative);
+  }
+
+  switch (Ext->ModRm.Mod) {
+  case 1:
+    UpdateForDisplacement (InstructionData, 1);
+    EffectiveAddress += (INT8) (*(INT8 *) (InstructionData->Displacement));
+    break;
+  case 2:
+    switch (InstructionData->AddrSize) {
+    case Size16Bits:
+      UpdateForDisplacement (InstructionData, 2);
+      EffectiveAddress += (INT16) (*(INT16 *) (InstructionData->Displacement));
+      break;
+    default:
+      UpdateForDisplacement (InstructionData, 4);
+      EffectiveAddress += (INT32) (*(INT32 *) (InstructionData->Displacement));
+      break;
+    }
+    break;
+  }
+
+  if (InstructionData->SibPresent) {
+    if (Ext->Sib.Index != 4) {
+      EffectiveAddress += (*GetRegisterPointer (Regs, Ext->Sib.Index) << Ext->Sib.Scale);
+    }
+
+    if ((Ext->Sib.Base != 5) || Ext->ModRm.Mod) {
+      EffectiveAddress += *GetRegisterPointer (Regs, Ext->Sib.Base);
+    } else {
+      UpdateForDisplacement (InstructionData, 4);
+      EffectiveAddress += (INT32) (*(INT32 *) (InstructionData->Displacement));
+    }
+  } else {
+    EffectiveAddress += *GetRegisterPointer (Regs, Ext->ModRm.Rm);
+  }
+
+  return (UINTN) EffectiveAddress;
+}
+
+/**
+  Decode a ModRM byte.
+
+  Examine the instruction parsing context to decode a ModRM byte and the SIB
+  byte, if present.
+
+  @param[in]      Regs             x64 processor context
+  @param[in, out] InstructionData  Instruction parsing context
+
+**/
+STATIC
+VOID
+DecodeModRm (
+  IN     EFI_SYSTEM_CONTEXT_X64   *Regs,
+  IN OUT SEV_ES_INSTRUCTION_DATA  *InstructionData
+  )
+{
+  SEV_ES_INSTRUCTION_REX_PREFIX  *RexPrefix;
+  SEV_ES_INSTRUCTION_OPCODE_EXT  *Ext;
+  SEV_ES_INSTRUCTION_MODRM       *ModRm;
+  SEV_ES_INSTRUCTION_SIB         *Sib;
+
+  RexPrefix = &InstructionData->RexPrefix;
+  Ext = &InstructionData->Ext;
+  ModRm = &InstructionData->ModRm;
+  Sib = &InstructionData->Sib;
+
+  InstructionData->ModRmPresent = TRUE;
+  ModRm->Uint8 = *(InstructionData->End);
+
+  InstructionData->Displacement++;
+  InstructionData->Immediate++;
+  InstructionData->End++;
+
+  Ext->ModRm.Mod = ModRm->Bits.Mod;
+  Ext->ModRm.Reg = (RexPrefix->Bits.BitR << 3) | ModRm->Bits.Reg;
+  Ext->ModRm.Rm  = (RexPrefix->Bits.BitB << 3) | ModRm->Bits.Rm;
+
+  Ext->RegData = *GetRegisterPointer (Regs, Ext->ModRm.Reg);
+
+  if (Ext->ModRm.Mod == 3) {
+    Ext->RmData = *GetRegisterPointer (Regs, Ext->ModRm.Rm);
+  } else {
+    if (ModRm->Bits.Rm == 4) {
+      InstructionData->SibPresent = TRUE;
+      Sib->Uint8 = *(InstructionData->End);
+
+      InstructionData->Displacement++;
+      InstructionData->Immediate++;
+      InstructionData->End++;
+
+      Ext->Sib.Scale = Sib->Bits.Scale;
+      Ext->Sib.Index = (RexPrefix->Bits.BitX << 3) | Sib->Bits.Index;
+      Ext->Sib.Base  = (RexPrefix->Bits.BitB << 3) | Sib->Bits.Base;
+    }
+
+    Ext->RmData = GetEffectiveMemoryAddress (Regs, InstructionData);
+  }
+}
+
+/**
   Decode instruction prefixes.
 
   Parse the instruction data to track the instruction prefixes that have
@@ -399,6 +656,181 @@ UnsupportedExit (
     Event.Elements.Valid  = 1;
 
     Status = Event.Uint64;
+  }
+
+  return Status;
+}
+
+/**
+  Handle an MMIO event.
+
+  Use the VMGEXIT instruction to handle either an MMIO read or an MMIO write.
+
+  @param[in, out] Ghcb             Pointer to the Guest-Hypervisor Communication
+                                   Block
+  @param[in, out] Regs             x64 processor context
+  @param[in, out] InstructionData  Instruction parsing context
+
+  @retval 0                        Event handled successfully
+  @retval Others                   New exception value to propagate
+
+**/
+STATIC
+UINT64
+MmioExit (
+  IN OUT GHCB                     *Ghcb,
+  IN OUT EFI_SYSTEM_CONTEXT_X64   *Regs,
+  IN OUT SEV_ES_INSTRUCTION_DATA  *InstructionData
+  )
+{
+  UINT64  ExitInfo1, ExitInfo2, Status;
+  UINTN   Bytes, SignByte;
+  INTN    *Register;
+  UINT8   OpCode;
+
+  Bytes = 0;
+
+  OpCode = *(InstructionData->OpCodes);
+  if (OpCode == 0x0F) {
+    OpCode = *(InstructionData->OpCodes + 1);
+  }
+
+  switch (OpCode) {
+  /* MMIO write */
+  case 0x88:
+    Bytes = 1;
+  case 0x89:
+    DecodeModRm (Regs, InstructionData);
+    Bytes = (Bytes) ? Bytes
+                    : (InstructionData->DataSize == Size16Bits) ? 2
+                    : (InstructionData->DataSize == Size32Bits) ? 4
+                    : (InstructionData->DataSize == Size64Bits) ? 8
+                    : 0;
+
+    if (InstructionData->Ext.ModRm.Mod == 3) {
+      /* NPF on two register operands??? */
+      return UnsupportedExit (Ghcb, Regs, InstructionData);
+    }
+
+    ExitInfo1 = InstructionData->Ext.RmData;
+    ExitInfo2 = Bytes;
+    CopyMem (Ghcb->SharedBuffer, &InstructionData->Ext.RegData, Bytes);
+
+    Ghcb->SaveArea.SwScratch = (UINT64) Ghcb->SharedBuffer;
+    Status = VmgExit (Ghcb, SvmExitMmioWrite, ExitInfo1, ExitInfo2);
+    if (Status) {
+      return Status;
+    }
+    break;
+
+  case 0xC6:
+    Bytes = 1;
+  case 0xC7:
+    DecodeModRm (Regs, InstructionData);
+    Bytes = (Bytes) ? Bytes
+                    : (InstructionData->DataSize == Size16Bits) ? 2
+                    : (InstructionData->DataSize == Size32Bits) ? 4
+                    : 0;
+
+    InstructionData->ImmediateSize = Bytes;
+    InstructionData->End += Bytes;
+
+    ExitInfo1 = InstructionData->Ext.RmData;
+    ExitInfo2 = Bytes;
+    CopyMem (Ghcb->SharedBuffer, InstructionData->Immediate, Bytes);
+
+    Ghcb->SaveArea.SwScratch = (UINT64) Ghcb->SharedBuffer;
+    Status = VmgExit (Ghcb, SvmExitMmioWrite, ExitInfo1, ExitInfo2);
+    if (Status) {
+      return Status;
+    }
+    break;
+
+  /* MMIO read */
+  case 0x8A:
+    Bytes = 1;
+  case 0x8B:
+    DecodeModRm (Regs, InstructionData);
+    Bytes = (Bytes) ? Bytes
+                    : (InstructionData->DataSize == Size16Bits) ? 2
+                    : (InstructionData->DataSize == Size32Bits) ? 4
+                    : (InstructionData->DataSize == Size64Bits) ? 8
+                    : 0;
+    if (InstructionData->Ext.ModRm.Mod == 3) {
+      /* NPF on two register operands??? */
+      return UnsupportedExit (Ghcb, Regs, InstructionData);
+    }
+
+    ExitInfo1 = InstructionData->Ext.RmData;
+    ExitInfo2 = Bytes;
+
+    Ghcb->SaveArea.SwScratch = (UINT64) Ghcb->SharedBuffer;
+    Status = VmgExit (Ghcb, SvmExitMmioRead, ExitInfo1, ExitInfo2);
+    if (Status) {
+      return Status;
+    }
+
+    Register = GetRegisterPointer (Regs, InstructionData->Ext.ModRm.Reg);
+    if (Bytes == 4) {
+      /* Zero-extend for 32-bit operation */
+      *Register = 0;
+    }
+    CopyMem (Register, Ghcb->SharedBuffer, Bytes);
+    break;
+
+  /* MMIO Read w/ zero-extension */
+  case 0xB6:
+    Bytes = 1;
+  case 0xB7:
+    Bytes = (Bytes) ? Bytes : 2;
+
+    ExitInfo1 = InstructionData->Ext.RmData;
+    ExitInfo2 = Bytes;
+
+    Ghcb->SaveArea.SwScratch = (UINT64) Ghcb->SharedBuffer;
+    Status = VmgExit (Ghcb, SvmExitMmioRead, ExitInfo1, ExitInfo2);
+    if (Status) {
+      return Status;
+    }
+
+    Register = GetRegisterPointer (Regs, InstructionData->Ext.ModRm.Reg);
+    SetMem (Register, InstructionData->DataSize, 0);
+    CopyMem (Register, Ghcb->SharedBuffer, Bytes);
+    break;
+
+  /* MMIO Read w/ sign-extension */
+  case 0xBE:
+    Bytes = 1;
+  case 0xBF:
+    Bytes = (Bytes) ? Bytes : 2;
+
+    ExitInfo1 = InstructionData->Ext.RmData;
+    ExitInfo2 = Bytes;
+
+    Ghcb->SaveArea.SwScratch = (UINT64) Ghcb->SharedBuffer;
+    Status = VmgExit (Ghcb, SvmExitMmioRead, ExitInfo1, ExitInfo2);
+    if (Status) {
+      return Status;
+    }
+
+    if (Bytes == 1) {
+      UINT8 *Data = (UINT8 *) Ghcb->SharedBuffer;
+
+      SignByte = (*Data & 0x80) ? 0xFF : 0x00;
+    } else {
+      UINT16 *Data = (UINT16 *) Ghcb->SharedBuffer;
+
+      SignByte = (*Data & 0x8000) ? 0xFF : 0x00;
+    }
+
+    Register = GetRegisterPointer (Regs, InstructionData->Ext.ModRm.Reg);
+    SetMem (Register, InstructionData->DataSize, SignByte);
+    CopyMem (Register, Ghcb->SharedBuffer, Bytes);
+    break;
+
+  default:
+    Status = GP_EXCEPTION;
+    ASSERT (FALSE);
   }
 
   return Status;
@@ -783,6 +1215,10 @@ DoVcCommon (
 
   case SvmExitMsr:
     NaeExit = MsrExit;
+    break;
+
+  case SvmExitNpf:
+    NaeExit = MmioExit;
     break;
 
   default:
