@@ -70,4 +70,5 @@
   gUefiCpuPkgTokenSpaceGuid.PcdCpuApLoopMode                           ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuApTargetCstate                       ## SOMETIMES_CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuApStatusCheckIntervalInMicroSeconds  ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdSevEsIsEnabled                          ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard                      ## CONSUMES
