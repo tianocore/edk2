@@ -39,7 +39,6 @@
   Hmac/CryptHmacSha256.c
   Kdf/CryptHkdf.c
   Cipher/CryptAes.c
-  Cipher/CryptTdes.c
   Pk/CryptRsaBasic.c
   Pk/CryptRsaExt.c
   Pk/CryptPkcs1Oaep.c
