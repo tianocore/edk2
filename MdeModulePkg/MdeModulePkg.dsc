@@ -19,6 +19,8 @@
   BUILD_TARGETS                  = DEBUG|RELEASE|NOOPT
   SKUID_IDENTIFIER               = DEFAULT
 
+!include UnitTestFrameworkPkg/UnitTestFrameworkPkgTarget.dsc.inc
+
 [LibraryClasses]
   #
   # Entry point
@@ -314,6 +316,10 @@
   MdeModulePkg/Library/VariablePolicyLib/VariablePolicyLib.inf
   MdeModulePkg/Library/VariablePolicyLib/VariablePolicyLibRuntimeDxe.inf
   MdeModulePkg/Library/VarCheckPolicyLib/VarCheckPolicyLib.inf
+  MdeModulePkg/Test/ShellTest/VariablePolicyFuncTestApp/VariablePolicyFuncTestApp.inf {
+    <LibraryClasses>
+      UnitTestBootLib|UnitTestFrameworkPkg/Library/UnitTestBootLibNull/UnitTestBootLibNull.inf
+  }
   MdeModulePkg/Library/VarCheckLib/VarCheckLib.inf
   MdeModulePkg/Library/VarCheckHiiLib/VarCheckHiiLib.inf
   MdeModulePkg/Library/VarCheckPcdLib/VarCheckPcdLib.inf

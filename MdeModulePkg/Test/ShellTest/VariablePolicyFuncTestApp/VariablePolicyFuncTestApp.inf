@@ -1,0 +1,42 @@
+## @file
+# Uefi Shell based Application that unit tests the Variable Policy Protocol
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = VariablePolicyFuncTestApp
+  FILE_GUID                      = B653C4C3-3FCC-4B6C-8051-5F692AEAECBA
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = UefiMain
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = X64 AARCH64
+#
+
+[Sources]
+  VariablePolicyFuncTestApp.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+
+[LibraryClasses]
+  UefiApplicationEntryPoint
+  BaseLib
+  UnitTestLib
+  UnitTestBootLib
+  PrintLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  MemoryAllocationLib
+  VariablePolicyHelperLib
+
+[Protocols]
+  gEdkiiVariablePolicyProtocolGuid
