@@ -313,6 +313,7 @@
   MdeModulePkg/Library/AuthVariableLibNull/AuthVariableLibNull.inf
   MdeModulePkg/Library/VariablePolicyLib/VariablePolicyLib.inf
   MdeModulePkg/Library/VariablePolicyLib/VariablePolicyLibRuntimeDxe.inf
+  MdeModulePkg/Library/VarCheckPolicyLib/VarCheckPolicyLib.inf
   MdeModulePkg/Library/VarCheckLib/VarCheckLib.inf
   MdeModulePkg/Library/VarCheckHiiLib/VarCheckHiiLib.inf
   MdeModulePkg/Library/VarCheckPcdLib/VarCheckPcdLib.inf
@@ -458,6 +459,7 @@
   MdeModulePkg/Core/PiSmmCore/PiSmmCore.inf
   MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmm.inf {
     <LibraryClasses>
+      NULL|MdeModulePkg/Library/VarCheckPolicyLib/VarCheckPolicyLib.inf
       NULL|MdeModulePkg/Library/VarCheckUefiLib/VarCheckUefiLib.inf
       NULL|MdeModulePkg/Library/VarCheckHiiLib/VarCheckHiiLib.inf
       NULL|MdeModulePkg/Library/VarCheckPcdLib/VarCheckPcdLib.inf
