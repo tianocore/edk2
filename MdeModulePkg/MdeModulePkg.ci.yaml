@@ -35,7 +35,9 @@
             "UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec"
         ],
         # For UEFI shell based apps
-        "AcceptableDependencies-UEFI_APPLICATION":[],
+        "AcceptableDependencies-UEFI_APPLICATION":[
+            "UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec"
+        ],
         "IgnoreInf": []
     },
 
