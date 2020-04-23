@@ -359,19 +359,3 @@ DebugPrintLevelEnabled (
 {
   return (BOOLEAN) ((ErrorLevel & PcdGet32(PcdFixedDebugPrintErrorLevel)) != 0);
 }
-
-/**
-  Return the result of detecting the debug I/O port device.
-
-  @retval TRUE   if the debug I/O port device was detected.
-  @retval FALSE  otherwise
-
-**/
-BOOLEAN
-EFIAPI
-PlatformDebugLibIoPortDetect (
-  VOID
-  )
-{
-  return IoRead8 (PcdGet16 (PcdDebugIoPort)) == BOCHS_DEBUG_PORT_MAGIC;
-}
