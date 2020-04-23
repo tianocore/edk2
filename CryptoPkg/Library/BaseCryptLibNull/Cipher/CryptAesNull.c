@@ -51,58 +51,6 @@ AesInit (
 }
 
 /**
-  Performs AES encryption on a data buffer of the specified size in ECB mode.
-
-  Return FALSE to indicate this interface is not supported.
-
-  @param[in]   AesContext  Pointer to the AES context.
-  @param[in]   Input       Pointer to the buffer containing the data to be encrypted.
-  @param[in]   InputSize   Size of the Input buffer in bytes.
-  @param[out]  Output      Pointer to a buffer that receives the AES encryption output.
-
-  @retval FALSE  This interface is not supported.
-
-**/
-BOOLEAN
-EFIAPI
-AesEcbEncrypt (
-  IN   VOID         *AesContext,
-  IN   CONST UINT8  *Input,
-  IN   UINTN        InputSize,
-  OUT  UINT8        *Output
-  )
-{
-  ASSERT (FALSE);
-  return FALSE;
-}
-
-/**
-  Performs AES decryption on a data buffer of the specified size in ECB mode.
-
-  Return FALSE to indicate this interface is not supported.
-
-  @param[in]   AesContext  Pointer to the AES context.
-  @param[in]   Input       Pointer to the buffer containing the data to be decrypted.
-  @param[in]   InputSize   Size of the Input buffer in bytes.
-  @param[out]  Output      Pointer to a buffer that receives the AES decryption output.
-
-  @retval FALSE  This interface is not supported.
-
-**/
-BOOLEAN
-EFIAPI
-AesEcbDecrypt (
-  IN   VOID         *AesContext,
-  IN   CONST UINT8  *Input,
-  IN   UINTN        InputSize,
-  OUT  UINT8        *Output
-  )
-{
-  ASSERT (FALSE);
-  return FALSE;
-}
-
-/**
   Performs AES encryption on a data buffer of the specified size in CBC mode.
 
   Return FALSE to indicate this interface is not supported.
