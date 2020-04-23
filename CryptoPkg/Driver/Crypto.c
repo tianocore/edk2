@@ -1801,79 +1801,51 @@ CryptoServiceAesInit (
 }
 
 /**
-  Performs AES encryption on a data buffer of the specified size in ECB mode.
-
-  This function performs AES encryption on data buffer pointed by Input, of specified
-  size of InputSize, in ECB mode.
-  InputSize must be multiple of block size (16 bytes). This function does not perform
-  padding. Caller must perform padding, if necessary, to ensure valid input data size.
-  AesContext should be already correctly initialized by AesInit(). Behavior with
-  invalid AES context is undefined.
-
-  If AesContext is NULL, then return FALSE.
-  If Input is NULL, then return FALSE.
-  If InputSize is not multiple of block size (16 bytes), then return FALSE.
-  If Output is NULL, then return FALSE.
-  If this interface is not supported, then return FALSE.
+  AES ECB Mode is deprecated and unsupported any longer.
+  Keep the function field for binary compability.
 
   @param[in]   AesContext  Pointer to the AES context.
   @param[in]   Input       Pointer to the buffer containing the data to be encrypted.
   @param[in]   InputSize   Size of the Input buffer in bytes.
   @param[out]  Output      Pointer to a buffer that receives the AES encryption output.
 
-  @retval TRUE   AES encryption succeeded.
-  @retval FALSE  AES encryption failed.
   @retval FALSE  This interface is not supported.
 
 **/
 BOOLEAN
 EFIAPI
-CryptoServiceAesEcbEncrypt (
+DeprecatedCryptoServiceAesEcbEncrypt (
   IN   VOID         *AesContext,
   IN   CONST UINT8  *Input,
   IN   UINTN        InputSize,
   OUT  UINT8        *Output
   )
 {
-  return CALL_BASECRYPTLIB (Aes.Services.EcbEncrypt, AesEcbEncrypt, (AesContext, Input, InputSize, Output), FALSE);
+  return BaseCryptLibServiceDeprecated ("AesEcbEncrypt"), FALSE;
 }
 
 /**
-  Performs AES decryption on a data buffer of the specified size in ECB mode.
-
-  This function performs AES decryption on data buffer pointed by Input, of specified
-  size of InputSize, in ECB mode.
-  InputSize must be multiple of block size (16 bytes). This function does not perform
-  padding. Caller must perform padding, if necessary, to ensure valid input data size.
-  AesContext should be already correctly initialized by AesInit(). Behavior with
-  invalid AES context is undefined.
-
-  If AesContext is NULL, then return FALSE.
-  If Input is NULL, then return FALSE.
-  If InputSize is not multiple of block size (16 bytes), then return FALSE.
-  If Output is NULL, then return FALSE.
-  If this interface is not supported, then return FALSE.
+  AES ECB Mode is deprecated and unsupported any longer.
+  Keep the function field for binary compability.
 
   @param[in]   AesContext  Pointer to the AES context.
   @param[in]   Input       Pointer to the buffer containing the data to be decrypted.
   @param[in]   InputSize   Size of the Input buffer in bytes.
   @param[out]  Output      Pointer to a buffer that receives the AES decryption output.
 
-  @retval TRUE   AES decryption succeeded.
-  @retval FALSE  AES decryption failed.
   @retval FALSE  This interface is not supported.
 
 **/
 BOOLEAN
 EFIAPI
-CryptoServiceAesEcbDecrypt (
+DeprecatedCryptoServiceAesEcbDecrypt (
   IN   VOID         *AesContext,
   IN   CONST UINT8  *Input,
   IN   UINTN        InputSize,
   OUT  UINT8        *Output
   )
 {
-  return CALL_BASECRYPTLIB (Aes.Services.EcbDecrypt, AesEcbDecrypt, (AesContext, Input, InputSize, Output), FALSE);
+  return BaseCryptLibServiceDeprecated ("AesEcbDecrypt"), FALSE;
 }
 
 /**
@@ -4376,11 +4348,11 @@ const EDKII_CRYPTO_PROTOCOL mEdkiiCrypto = {
   DeprecatedCryptoServiceTdesEcbDecrypt,
   DeprecatedCryptoServiceTdesCbcEncrypt,
   DeprecatedCryptoServiceTdesCbcDecrypt,
-  /// AES
+  /// AES - ECB mode is deprecated and unsupported
   CryptoServiceAesGetContextSize,
   CryptoServiceAesInit,
-  CryptoServiceAesEcbEncrypt,
-  CryptoServiceAesEcbDecrypt,
+  DeprecatedCryptoServiceAesEcbEncrypt,
+  DeprecatedCryptoServiceAesEcbDecrypt,
   CryptoServiceAesCbcEncrypt,
   CryptoServiceAesCbcDecrypt,
   /// Arc4 - deprecated and unsupported
