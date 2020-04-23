@@ -1,5 +1,5 @@
 /** @file
-  Base Debug library instance for QEMU debug port.
+  Base Debug library instance for hypervisor debug port.
   It uses PrintLib to send debug messages to a fixed I/O port.
 
   Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
