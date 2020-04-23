@@ -31,10 +31,22 @@ typedef struct {
   UINT16                                Revision;
   UINT16                                NumberPrmHandlers;
   GUID                                  ModuleGuid;
-  PRM_HANDLER_EXPORT_DESCRIPTOR_STRUCT  PrmHandlerExportDescriptors[3];
+} PRM_MODULE_EXPORT_DESCRIPTOR_STRUCT_HEADER;
+
+typedef struct {
+  PRM_MODULE_EXPORT_DESCRIPTOR_STRUCT_HEADER  Header;
+  PRM_HANDLER_EXPORT_DESCRIPTOR_STRUCT        PrmHandlerExportDescriptors[1];
 } PRM_MODULE_EXPORT_DESCRIPTOR_STRUCT;
 
 #pragma pack(pop)
+
+#if defined(_MSC_VER)
+  #define PRM_PACKED_STRUCT(definition) \
+  __pragma(pack(push, 1)) typedef struct definition __pragma(pack(pop))
+#elif defined (__GNUC__) || defined (__clang__)
+  #define PRM_PACKED_STRUCT(definition) \
+  typedef struct __attribute__((packed)) definition
+#endif
 
 /**
   A macro that declares a PRM Handler Export Descriptor for a PRM Handler.
@@ -73,8 +85,15 @@ typedef struct {
                                     this module.
 
 **/
-#define PRM_MODULE_EXPORT(...)                                                              \
-  PRM_EXPORT_API PRM_MODULE_EXPORT_DESCRIPTOR_STRUCT PRM_MODULE_EXPORT_DESCRIPTOR_NAME = {               \
+#define PRM_MODULE_EXPORT(...)                                                                            \
+  PRM_PACKED_STRUCT(                                                                                      \
+    {                                                                                                     \
+      PRM_MODULE_EXPORT_DESCRIPTOR_STRUCT_HEADER  Header;                                                 \
+      PRM_HANDLER_EXPORT_DESCRIPTOR_STRUCT        PrmHandlerExportDescriptors[VA_ARG_COUNT(__VA_ARGS__)]; \
+    } PRM_MODULE_EXPORT_DESCRIPTOR_STRUCT_                                                                \
+  );                                                                                                      \
+                                                                                                          \
+  PRM_EXPORT_API PRM_MODULE_EXPORT_DESCRIPTOR_STRUCT_ PRM_MODULE_EXPORT_DESCRIPTOR_NAME = {               \
     {                                                                                                     \
       PRM_MODULE_EXPORT_DESCRIPTOR_SIGNATURE,                                                             \
       PRM_MODULE_EXPORT_REVISION,                                                                         \
