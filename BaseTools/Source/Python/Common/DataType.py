@@ -3,6 +3,7 @@
 #
 # Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 # Portions copyright (c) 2011 - 2013, ARM Ltd. All rights reserved.<BR>
+# Portions Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 
 ##
@@ -52,7 +53,9 @@ TAB_ARCH_ARM = 'ARM'
 TAB_ARCH_EBC = 'EBC'
 TAB_ARCH_AARCH64 = 'AARCH64'
 
-ARCH_SET_FULL = {TAB_ARCH_IA32, TAB_ARCH_X64, TAB_ARCH_ARM, TAB_ARCH_EBC, TAB_ARCH_AARCH64, TAB_ARCH_COMMON}
+TAB_ARCH_RISCV64 = 'RISCV64'
+
+ARCH_SET_FULL = {TAB_ARCH_IA32, TAB_ARCH_X64, TAB_ARCH_ARM, TAB_ARCH_EBC, TAB_ARCH_AARCH64, TAB_ARCH_RISCV64, TAB_ARCH_COMMON}
 
 SUP_MODULE_BASE = 'BASE'
 SUP_MODULE_SEC = 'SEC'
