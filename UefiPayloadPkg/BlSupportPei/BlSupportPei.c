@@ -390,12 +390,24 @@ BlPeiEntryPoint (
   EFI_PEI_GRAPHICS_DEVICE_INFO_HOB GfxDeviceInfo;
   EFI_PEI_GRAPHICS_DEVICE_INFO_HOB *NewGfxDeviceInfo;
 
+  // Report lower 640KB of RAM.
+  // Mark memory as reserved to keep coreboot header in place.
+  //
+  BuildResourceDescriptorHob (
+    EFI_RESOURCE_MEMORY_RESERVED,
+    (
+    EFI_RESOURCE_ATTRIBUTE_PRESENT |
+    EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
+    EFI_RESOURCE_ATTRIBUTE_TESTED |
+    EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
+    EFI_RESOURCE_ATTRIBUTE_WRITE_COMBINEABLE |
+    EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE |
+    EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE
+    ),
+    (EFI_PHYSICAL_ADDRESS)(0),
+    (UINT64)(0x1000)
+    );
 
-  //
-  // Report lower 640KB of RAM. Attribute EFI_RESOURCE_ATTRIBUTE_TESTED
-  // is intentionally omitted to prevent erasing of the coreboot header
-  // record before it is processed by ParseMemoryInfo.
-  //
   BuildResourceDescriptorHob (
     EFI_RESOURCE_SYSTEM_MEMORY,
     (
@@ -406,8 +418,8 @@ BlPeiEntryPoint (
     EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE |
     EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE
     ),
-    (EFI_PHYSICAL_ADDRESS)(0),
-    (UINT64)(0xA0000)
+    (EFI_PHYSICAL_ADDRESS)(0x1000),
+    (UINT64)(0x9F000)
     );
 
   BuildResourceDescriptorHob (
