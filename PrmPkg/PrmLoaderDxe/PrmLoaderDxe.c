@@ -122,7 +122,7 @@ GetPrmModuleExportDescriptorTable (
         return EFI_NOT_FOUND;
       }
       TempExportDescriptor = (PRM_MODULE_EXPORT_DESCRIPTOR_STRUCT *) ((UINTN) CurrentImageAddress + ExportAddressTable[PrmModuleExportDescriptorOrdinal]);
-      if (TempExportDescriptor->Signature == PRM_MODULE_EXPORT_DESCRIPTOR_SIGNATURE) {
+      if (TempExportDescriptor->Header.Signature == PRM_MODULE_EXPORT_DESCRIPTOR_SIGNATURE) {
         *ExportDescriptor = TempExportDescriptor;
         DEBUG ((DEBUG_INFO, "  %a %a: PRM Module Export Descriptor found at 0x%x.\n", _DBGMSGID_, __FUNCTION__, (UINTN) ExportDescriptor));
       } else {
@@ -528,7 +528,7 @@ DiscoverPrmModules (
       sizeof (*(PrmModuleImageContextListEntry->Context))
       );
     InsertTailList (&mPrmModuleList, &PrmModuleImageContextListEntry->Link);
-    mPrmHandlerCount += TempPrmModuleImageContext.ExportDescriptor->NumberPrmHandlers;
+    mPrmHandlerCount += TempPrmModuleImageContext.ExportDescriptor->Header.NumberPrmHandlers;
     mPrmModuleCount++; // Todo: Match with global variable refactor change in the future
     DEBUG ((DEBUG_INFO, "%a %a: New PRM Module inserted into list to be processed.\n", _DBGMSGID_, __FUNCTION__));
   }
@@ -684,16 +684,16 @@ ProcessPrmModules (
       _DBGMSGID_,
       __FUNCTION__,
       (CHAR8 *) ((UINTN) CurrentImageAddress + CurrentImageExportDirectory->Name),
-      CurrentExportDescriptorStruct->NumberPrmHandlers
+      CurrentExportDescriptorStruct->Header.NumberPrmHandlers
       ));
 
     CurrentModuleInfoStruct->StructureRevision = PRM_MODULE_INFORMATION_STRUCT_REVISION;
     CurrentModuleInfoStruct->StructureLength = (
                                              OFFSET_OF (PRM_MODULE_INFORMATION_STRUCT, HandlerInfoStructure) +
-                                             (CurrentExportDescriptorStruct->NumberPrmHandlers * sizeof (PRM_HANDLER_INFORMATION_STRUCT))
+                                             (CurrentExportDescriptorStruct->Header.NumberPrmHandlers * sizeof (PRM_HANDLER_INFORMATION_STRUCT))
                                              );
-    CopyGuid (&CurrentModuleInfoStruct->Identifier, &CurrentExportDescriptorStruct->ModuleGuid);
-    CurrentModuleInfoStruct->HandlerCount       = (UINT32) CurrentExportDescriptorStruct->NumberPrmHandlers;
+    CopyGuid (&CurrentModuleInfoStruct->Identifier, &CurrentExportDescriptorStruct->Header.ModuleGuid);
+    CurrentModuleInfoStruct->HandlerCount       = (UINT32) CurrentExportDescriptorStruct->Header.NumberPrmHandlers;
     CurrentModuleInfoStruct->HandlerInfoOffset  = OFFSET_OF (PRM_MODULE_INFORMATION_STRUCT, HandlerInfoStructure);
 
     CurrentModuleInfoStruct->MajorRevision = 0;
@@ -737,7 +737,7 @@ ProcessPrmModules (
     //
     // Iterate across all PRM handlers in the PRM Module
     //
-    for (HandlerIndex = 0; HandlerIndex < CurrentExportDescriptorStruct->NumberPrmHandlers; HandlerIndex++) {
+    for (HandlerIndex = 0; HandlerIndex < CurrentExportDescriptorStruct->Header.NumberPrmHandlers; HandlerIndex++) {
       CurrentHandlerInfoStruct = &(CurrentModuleInfoStruct->HandlerInfoStructure[HandlerIndex]);
 
       CurrentHandlerInfoStruct->StructureRevision = PRM_HANDLER_INFORMATION_STRUCT_REVISION;
