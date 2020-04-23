@@ -7,7 +7,7 @@
 #  buffer overflow or integer overflow.
 #
 #  Note:
-#  HMAC-SHA1/SHA256 functions, AES functions, RSA external
+#  HMAC-SHA256 functions, AES functions, RSA external
 #  functions, PKCS#7 SignedData sign functions, Diffie-Hellman functions, X.509
 #  certificate handler functions, authenticode signature verification functions,
 #  PEM handler functions, and pseudorandom number generator functions are not
@@ -40,7 +40,6 @@
   Hash/CryptSha256.c
   Hash/CryptSm3.c
   Hash/CryptSha512.c
-  Hmac/CryptHmacSha1Null.c
   Hmac/CryptHmacSha256Null.c
   Kdf/CryptHkdfNull.c
   Cipher/CryptAesNull.c

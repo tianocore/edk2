@@ -7,8 +7,7 @@
 #  buffer overflow or integer overflow.
 #
 #  Note: SHA-384 Digest functions, SHA-512 Digest functions,
-#  HMAC-SHA1 functions, RSA external
-#  functions, PKCS#7 SignedData sign functions, Diffie-Hellman functions, and
+#  RSA external functions, PKCS#7 SignedData sign functions, Diffie-Hellman functions, and
 #  authenticode signature verification functions are not supported in this instance.
 #
 #  Copyright (c) 2010 - 2020, Intel Corporation. All rights reserved.<BR>
@@ -39,7 +38,6 @@
   Hash/CryptSha256.c
   Hash/CryptSm3.c
   Hash/CryptSha512Null.c
-  Hmac/CryptHmacSha1Null.c
   Hmac/CryptHmacSha256.c
   Kdf/CryptHkdfNull.c
   Cipher/CryptAes.c
