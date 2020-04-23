@@ -1160,154 +1160,120 @@ CryptoServiceSm3HashAll (
 //=====================================================================================
 
 /**
-  Allocates and initializes one HMAC_CTX context for subsequent HMAC-MD5 use.
+  HMAC MD5 is deprecated and unsupported any longer.
+  Keep the function field for binary compability.
 
-  If this interface is not supported, then return NULL.
-
-  @return  Pointer to the HMAC_CTX context that has been initialized.
-           If the allocations fails, HmacMd5New() returns NULL.
   @retval  NULL  This interface is not supported.
 
 **/
 VOID *
 EFIAPI
-CryptoServiceHmacMd5New (
+DeprecatedCryptoServiceHmacMd5New (
   VOID
   )
 {
-  return CALL_BASECRYPTLIB (HmacMd5.Services.New, HmacMd5New, (), NULL);
+  return BaseCryptLibServiceDeprecated ("HmacMd5New"), NULL;
 }
 
 /**
-  Release the specified HMAC_CTX context.
-
-  If this interface is not supported, then do nothing.
+  HMAC MD5 is deprecated and unsupported any longer.
+  Keep the function field for binary compability.
 
   @param[in]  HmacMd5Ctx  Pointer to the HMAC_CTX context to be released.
 
 **/
 VOID
 EFIAPI
-CryptoServiceHmacMd5Free (
+DeprecatedCryptoServiceHmacMd5Free (
   IN  VOID  *HmacMd5Ctx
   )
 {
-  CALL_VOID_BASECRYPTLIB (HmacMd5.Services.Free, HmacMd5Free, (HmacMd5Ctx));
+  BaseCryptLibServiceDeprecated ("HmacMd5Free");
 }
 
 /**
-  Set user-supplied key for subsequent use. It must be done before any
-  calling to HmacMd5Update().
-
-  If HmacMd5Context is NULL, then return FALSE.
-  If this interface is not supported, then return FALSE.
+  HMAC MD5 is deprecated and unsupported any longer.
+  Keep the function field for binary compability.
 
   @param[out]  HmacMd5Context  Pointer to HMAC-MD5 context.
   @param[in]   Key             Pointer to the user-supplied key.
   @param[in]   KeySize         Key size in bytes.
 
-  @retval TRUE   Key is set successfully.
-  @retval FALSE  Key is set unsuccessfully.
   @retval FALSE  This interface is not supported.
 
 **/
 BOOLEAN
 EFIAPI
-CryptoServiceHmacMd5SetKey (
+DeprecatedCryptoServiceHmacMd5SetKey (
   OUT  VOID         *HmacMd5Context,
   IN   CONST UINT8  *Key,
   IN   UINTN        KeySize
   )
 {
-  return CALL_BASECRYPTLIB (HmacMd5.Services.SetKey, HmacMd5SetKey, (HmacMd5Context, Key, KeySize), FALSE);
+  return BaseCryptLibServiceDeprecated ("HmacMd5SetKey"), FALSE;
 }
 
 /**
-  Makes a copy of an existing HMAC-MD5 context.
-
-  If HmacMd5Context is NULL, then return FALSE.
-  If NewHmacMd5Context is NULL, then return FALSE.
-  If this interface is not supported, then return FALSE.
+  HMAC MD5 is deprecated and unsupported any longer.
+  Keep the function field for binary compability.
 
   @param[in]  HmacMd5Context     Pointer to HMAC-MD5 context being copied.
   @param[out] NewHmacMd5Context  Pointer to new HMAC-MD5 context.
 
-  @retval TRUE   HMAC-MD5 context copy succeeded.
-  @retval FALSE  HMAC-MD5 context copy failed.
   @retval FALSE  This interface is not supported.
 
 **/
 BOOLEAN
 EFIAPI
-CryptoServiceHmacMd5Duplicate (
+DeprecatedCryptoServiceHmacMd5Duplicate (
   IN   CONST VOID  *HmacMd5Context,
   OUT  VOID        *NewHmacMd5Context
   )
 {
-  return CALL_BASECRYPTLIB (HmacMd5.Services.Duplicate, HmacMd5Duplicate, (HmacMd5Context, NewHmacMd5Context), FALSE);
+  return BaseCryptLibServiceDeprecated ("HmacMd5Duplicate"), FALSE;
 }
 
 /**
-  Digests the input data and updates HMAC-MD5 context.
-
-  This function performs HMAC-MD5 digest on a data buffer of the specified size.
-  It can be called multiple times to compute the digest of long or discontinuous data streams.
-  HMAC-MD5 context should be initialized by HmacMd5New(), and should not be finalized by
-  HmacMd5Final(). Behavior with invalid context is undefined.
-
-  If HmacMd5Context is NULL, then return FALSE.
-  If this interface is not supported, then return FALSE.
+  HMAC MD5 is deprecated and unsupported any longer.
+  Keep the function field for binary compability.
 
   @param[in, out]  HmacMd5Context  Pointer to the HMAC-MD5 context.
   @param[in]       Data            Pointer to the buffer containing the data to be digested.
   @param[in]       DataSize        Size of Data buffer in bytes.
 
-  @retval TRUE   HMAC-MD5 data digest succeeded.
-  @retval FALSE  HMAC-MD5 data digest failed.
   @retval FALSE  This interface is not supported.
 
 **/
 BOOLEAN
 EFIAPI
-CryptoServiceHmacMd5Update (
+DeprecatedCryptoServiceHmacMd5Update (
   IN OUT  VOID        *HmacMd5Context,
   IN      CONST VOID  *Data,
   IN      UINTN       DataSize
   )
 {
-  return CALL_BASECRYPTLIB (HmacMd5.Services.Update, HmacMd5Update, (HmacMd5Context, Data, DataSize), FALSE);
+  return BaseCryptLibServiceDeprecated ("HmacMd5Update"), FALSE;
 }
 
 /**
-  Completes computation of the HMAC-MD5 digest value.
-
-  This function completes HMAC-MD5 hash computation and retrieves the digest value into
-  the specified memory. After this function has been called, the HMAC-MD5 context cannot
-  be used again.
-  HMAC-MD5 context should be initialized by HmacMd5New(), and should not be finalized by
-  HmacMd5Final(). Behavior with invalid HMAC-MD5 context is undefined.
-
-  If HmacMd5Context is NULL, then return FALSE.
-  If HmacValue is NULL, then return FALSE.
-  If this interface is not supported, then return FALSE.
+  HMAC MD5 is deprecated and unsupported any longer.
+  Keep the function field for binary compability.
 
   @param[in, out]  HmacMd5Context  Pointer to the HMAC-MD5 context.
   @param[out]      HmacValue       Pointer to a buffer that receives the HMAC-MD5 digest
                                    value (16 bytes).
 
-  @retval TRUE   HMAC-MD5 digest computation succeeded.
-  @retval FALSE  HMAC-MD5 digest computation failed.
   @retval FALSE  This interface is not supported.
 
 **/
 BOOLEAN
 EFIAPI
-CryptoServiceHmacMd5Final (
+DeprecatedCryptoServiceHmacMd5Final (
   IN OUT  VOID   *HmacMd5Context,
   OUT     UINT8  *HmacValue
   )
 {
-  return CALL_BASECRYPTLIB (HmacMd5.Services.Final, HmacMd5Final, (HmacMd5Context, HmacValue), FALSE);
+  return BaseCryptLibServiceDeprecated ("HmacMd5Final"), FALSE;
 }
 
 /**
@@ -4234,13 +4200,13 @@ CryptoServiceTlsGetCertRevocationList (
 const EDKII_CRYPTO_PROTOCOL mEdkiiCrypto = {
   /// Version
   CryptoServiceGetCryptoVersion,
-  /// HMAC MD5
-  CryptoServiceHmacMd5New,
-  CryptoServiceHmacMd5Free,
-  CryptoServiceHmacMd5SetKey,
-  CryptoServiceHmacMd5Duplicate,
-  CryptoServiceHmacMd5Update,
-  CryptoServiceHmacMd5Final,
+  /// HMAC MD5 - deprecated and unsupported
+  DeprecatedCryptoServiceHmacMd5New,
+  DeprecatedCryptoServiceHmacMd5Free,
+  DeprecatedCryptoServiceHmacMd5SetKey,
+  DeprecatedCryptoServiceHmacMd5Duplicate,
+  DeprecatedCryptoServiceHmacMd5Update,
+  DeprecatedCryptoServiceHmacMd5Final,
   /// HMAC SHA1
   CryptoServiceHmacSha1New,
   CryptoServiceHmacSha1Free,

@@ -43,135 +43,48 @@ UINTN
 //    MAC (Message Authentication Code) Primitive
 //=====================================================================================
 /**
-  Allocates and initializes one HMAC_CTX context for subsequent HMAC-MD5 use.
-
-  If this interface is not supported, then return NULL.
-
-  @return  Pointer to the HMAC_CTX context that has been initialized.
-           If the allocations fails, HmacMd5New() returns NULL.
-  @retval  NULL  This interface is not supported.
+  HMAC MD5 is deprecated and unsupported any longer.
+  Keep the function field for binary compability.
 
 **/
 typedef
 VOID*
-(EFIAPI *EDKII_CRYPTO_HMAC_MD5_NEW) (
+(EFIAPI *DEPRECATED_EDKII_CRYPTO_HMAC_MD5_NEW) (
   VOID
   );
 
-/**
-  Release the specified HMAC_CTX context.
-
-  If this interface is not supported, then do nothing.
-
-  @param[in]  HmacMd5Ctx  Pointer to the HMAC_CTX context to be released.
-
-**/
 typedef
 VOID
-(EFIAPI *EDKII_CRYPTO_HMAC_MD5_FREE) (
+(EFIAPI *DEPRECATED_EDKII_CRYPTO_HMAC_MD5_FREE) (
   IN  VOID  *HmacMd5Ctx
   );
 
-/**
-  Set user-supplied key for subsequent use. It must be done before any
-  calling to HmacMd5Update().
-
-  If HmacMd5Context is NULL, then return FALSE.
-  If this interface is not supported, then return FALSE.
-
-  @param[out]  HmacMd5Context  Pointer to HMAC-MD5 context.
-  @param[in]   Key             Pointer to the user-supplied key.
-  @param[in]   KeySize         Key size in bytes.
-
-  @retval TRUE   HMAC-MD5 context initialization succeeded.
-  @retval FALSE  HMAC-MD5 context initialization failed.
-  @retval FALSE  This interface is not supported.
-
-**/
 typedef
 BOOLEAN
-(EFIAPI *EDKII_CRYPTO_HMAC_MD5_SET_KEY) (
+(EFIAPI *DEPRECATED_EDKII_CRYPTO_HMAC_MD5_SET_KEY) (
   OUT  VOID         *HmacMd5Context,
   IN   CONST UINT8  *Key,
   IN   UINTN        KeySize
   );
 
-/**
-  Makes a copy of an existing HMAC-MD5 context.
-
-  If HmacMd5Context is NULL, then return FALSE.
-  If NewHmacMd5Context is NULL, then return FALSE.
-  If this interface is not supported, then return FALSE.
-
-  @param[in]  HmacMd5Context     Pointer to HMAC-MD5 context being copied.
-  @param[out] NewHmacMd5Context  Pointer to new HMAC-MD5 context.
-
-  @retval TRUE   HMAC-MD5 context copy succeeded.
-  @retval FALSE  HMAC-MD5 context copy failed.
-  @retval FALSE  This interface is not supported.
-
-**/
 typedef
 BOOLEAN
-(EFIAPI *EDKII_CRYPTO_HMAC_MD5_DUPLICATE) (
+(EFIAPI *DEPRECATED_EDKII_CRYPTO_HMAC_MD5_DUPLICATE) (
   IN   CONST VOID  *HmacMd5Context,
   OUT  VOID        *NewHmacMd5Context
   );
 
-/**
-  Digests the input data and updates HMAC-MD5 context.
-
-  This function performs HMAC-MD5 digest on a data buffer of the specified size.
-  It can be called multiple times to compute the digest of long or discontinuous data streams.
-  HMAC-MD5 context should be initialized by HmacMd5New(), and should not be finalized by
-  HmacMd5Final(). Behavior with invalid context is undefined.
-
-  If HmacMd5Context is NULL, then return FALSE.
-  If this interface is not supported, then return FALSE.
-
-  @param[in, out]  HmacMd5Context  Pointer to the HMAC-MD5 context.
-  @param[in]       Data            Pointer to the buffer containing the data to be digested.
-  @param[in]       DataSize        Size of Data buffer in bytes.
-
-  @retval TRUE   HMAC-MD5 data digest succeeded.
-  @retval FALSE  HMAC-MD5 data digest failed.
-  @retval FALSE  This interface is not supported.
-
-**/
 typedef
 BOOLEAN
-(EFIAPI *EDKII_CRYPTO_HMAC_MD5_UPDATE) (
+(EFIAPI *DEPRECATED_EDKII_CRYPTO_HMAC_MD5_UPDATE) (
   IN OUT  VOID        *HmacMd5Context,
   IN      CONST VOID  *Data,
   IN      UINTN       DataSize
   );
 
-
-/**
-  Completes computation of the HMAC-MD5 digest value.
-
-  This function completes HMAC-MD5 hash computation and retrieves the digest value into
-  the specified memory. After this function has been called, the HMAC-MD5 context cannot
-  be used again.
-  HMAC-MD5 context should be initialized by HmacMd5New(), and should not be finalized by
-  HmacMd5Final(). Behavior with invalid HMAC-MD5 context is undefined.
-
-  If HmacMd5Context is NULL, then return FALSE.
-  If HmacValue is NULL, then return FALSE.
-  If this interface is not supported, then return FALSE.
-
-  @param[in, out]  HmacMd5Context  Pointer to the HMAC-MD5 context.
-  @param[out]      HmacValue       Pointer to a buffer that receives the HMAC-MD5 digest
-                                   value (16 bytes).
-
-  @retval TRUE   HMAC-MD5 digest computation succeeded.
-  @retval FALSE  HMAC-MD5 digest computation failed.
-  @retval FALSE  This interface is not supported.
-
-**/
 typedef
 BOOLEAN
-(EFIAPI *EDKII_CRYPTO_HMAC_MD5_FINAL) (
+(EFIAPI *DEPRECATED_EDKII_CRYPTO_HMAC_MD5_FINAL) (
   IN OUT  VOID   *HmacMd5Context,
   OUT     UINT8  *HmacValue
   );
@@ -3618,13 +3531,13 @@ EFI_STATUS
 struct _EDKII_CRYPTO_PROTOCOL {
   /// Version
   EDKII_CRYPTO_GET_VERSION                        GetVersion;
-  /// HMAC MD5
-  EDKII_CRYPTO_HMAC_MD5_NEW                       HmacMd5New;
-  EDKII_CRYPTO_HMAC_MD5_FREE                      HmacMd5Free;
-  EDKII_CRYPTO_HMAC_MD5_SET_KEY                   HmacMd5SetKey;
-  EDKII_CRYPTO_HMAC_MD5_DUPLICATE                 HmacMd5Duplicate;
-  EDKII_CRYPTO_HMAC_MD5_UPDATE                    HmacMd5Update;
-  EDKII_CRYPTO_HMAC_MD5_FINAL                     HmacMd5Final;
+  /// HMAC MD5 - deprecated and unsupported
+  DEPRECATED_EDKII_CRYPTO_HMAC_MD5_NEW            DeprecatedHmacMd5New;
+  DEPRECATED_EDKII_CRYPTO_HMAC_MD5_FREE           DeprecatedHmacMd5Free;
+  DEPRECATED_EDKII_CRYPTO_HMAC_MD5_SET_KEY        DeprecatedHmacMd5SetKey;
+  DEPRECATED_EDKII_CRYPTO_HMAC_MD5_DUPLICATE      DeprecatedHmacMd5Duplicate;
+  DEPRECATED_EDKII_CRYPTO_HMAC_MD5_UPDATE         DeprecatedHmacMd5Update;
+  DEPRECATED_EDKII_CRYPTO_HMAC_MD5_FINAL          DeprecatedHmacMd5Final;
   /// HMAC SHA1
   EDKII_CRYPTO_HMAC_SHA1_NEW                      HmacSha1New;
   EDKII_CRYPTO_HMAC_SHA1_FREE                     HmacSha1Free;
