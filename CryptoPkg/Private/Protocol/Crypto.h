@@ -2,6 +2,7 @@
   This Protocol provides Crypto services to DXE modules
 
   Copyright (C) Microsoft Corporation. All rights reserved.
+  Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -20,7 +21,7 @@
 /// the EDK II Crypto Protocol is extended, this version define must be
 /// increased.
 ///
-#define EDKII_CRYPTO_VERSION 6
+#define EDKII_CRYPTO_VERSION 7
 
 ///
 /// EDK II Crypto Protocol forward declaration
