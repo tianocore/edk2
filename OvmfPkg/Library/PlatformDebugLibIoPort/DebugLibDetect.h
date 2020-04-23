@@ -12,12 +12,6 @@
 
 #include <Base.h>
 
-//
-// The constant value that is read from the debug I/O port
-//
-#define BOCHS_DEBUG_PORT_MAGIC    0xE9
-
-
 /**
   Helper function to return whether the virtual machine has a debug I/O port.
   PlatformDebugLibIoPortFound can call this function directly or cache the
