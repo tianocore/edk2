@@ -1277,154 +1277,120 @@ DeprecatedCryptoServiceHmacMd5Final (
 }
 
 /**
-  Allocates and initializes one HMAC_CTX context for subsequent HMAC-SHA1 use.
+  HMAC SHA1 is deprecated and unsupported any longer.
+  Keep the function field for binary compability.
 
-  If this interface is not supported, then return NULL.
-
-  @return  Pointer to the HMAC_CTX context that has been initialized.
-           If the allocations fails, HmacSha1New() returns NULL.
   @return  NULL   This interface is not supported.
 
 **/
 VOID *
 EFIAPI
-CryptoServiceHmacSha1New (
+DeprecatedCryptoServiceHmacSha1New (
   VOID
   )
 {
-  return CALL_BASECRYPTLIB (HmacSha1.Services.New, HmacSha1New, (), NULL);
+  return BaseCryptLibServiceDeprecated ("HmacSha1New"), NULL;
 }
 
 /**
-  Release the specified HMAC_CTX context.
-
-  If this interface is not supported, then do nothing.
+  HMAC SHA1 is deprecated and unsupported any longer.
+  Keep the function field for binary compability.
 
   @param[in]  HmacSha1Ctx  Pointer to the HMAC_CTX context to be released.
 
 **/
 VOID
 EFIAPI
-CryptoServiceHmacSha1Free (
+DeprecatedCryptoServiceHmacSha1Free (
   IN  VOID  *HmacSha1Ctx
   )
 {
-  CALL_VOID_BASECRYPTLIB (HmacSha1.Services.Free, HmacSha1Free, (HmacSha1Ctx));
+  BaseCryptLibServiceDeprecated ("HmacSha1Free");
 }
 
 /**
-  Set user-supplied key for subsequent use. It must be done before any
-  calling to HmacSha1Update().
-
-  If HmacSha1Context is NULL, then return FALSE.
-  If this interface is not supported, then return FALSE.
+  HMAC SHA1 is deprecated and unsupported any longer.
+  Keep the function field for binary compability.
 
   @param[out]  HmacSha1Context  Pointer to HMAC-SHA1 context.
   @param[in]   Key              Pointer to the user-supplied key.
   @param[in]   KeySize          Key size in bytes.
 
-  @retval TRUE   The Key is set successfully.
-  @retval FALSE  The Key is set unsuccessfully.
   @retval FALSE  This interface is not supported.
 
 **/
 BOOLEAN
 EFIAPI
-CryptoServiceHmacSha1SetKey (
+DeprecatedCryptoServiceHmacSha1SetKey (
   OUT  VOID         *HmacSha1Context,
   IN   CONST UINT8  *Key,
   IN   UINTN        KeySize
   )
 {
-  return CALL_BASECRYPTLIB (HmacSha1.Services.SetKey, HmacSha1SetKey, (HmacSha1Context, Key, KeySize), FALSE);
+  return BaseCryptLibServiceDeprecated ("HmacSha1SetKey"), FALSE;
 }
 
 /**
-  Makes a copy of an existing HMAC-SHA1 context.
-
-  If HmacSha1Context is NULL, then return FALSE.
-  If NewHmacSha1Context is NULL, then return FALSE.
-  If this interface is not supported, then return FALSE.
+  HMAC SHA1 is deprecated and unsupported any longer.
+  Keep the function field for binary compability.
 
   @param[in]  HmacSha1Context     Pointer to HMAC-SHA1 context being copied.
   @param[out] NewHmacSha1Context  Pointer to new HMAC-SHA1 context.
 
-  @retval TRUE   HMAC-SHA1 context copy succeeded.
-  @retval FALSE  HMAC-SHA1 context copy failed.
   @retval FALSE  This interface is not supported.
 
 **/
 BOOLEAN
 EFIAPI
-CryptoServiceHmacSha1Duplicate (
+DeprecatedCryptoServiceHmacSha1Duplicate (
   IN   CONST VOID  *HmacSha1Context,
   OUT  VOID        *NewHmacSha1Context
   )
 {
-  return CALL_BASECRYPTLIB (HmacSha1.Services.Duplicate, HmacSha1Duplicate, (HmacSha1Context, NewHmacSha1Context), FALSE);
+  return BaseCryptLibServiceDeprecated ("HmacSha1Duplicate"), FALSE;
 }
 
 /**
-  Digests the input data and updates HMAC-SHA1 context.
-
-  This function performs HMAC-SHA1 digest on a data buffer of the specified size.
-  It can be called multiple times to compute the digest of long or discontinuous data streams.
-  HMAC-SHA1 context should be initialized by HmacSha1New(), and should not be finalized by
-  HmacSha1Final(). Behavior with invalid context is undefined.
-
-  If HmacSha1Context is NULL, then return FALSE.
-  If this interface is not supported, then return FALSE.
+  HMAC SHA1 is deprecated and unsupported any longer.
+  Keep the function field for binary compability.
 
   @param[in, out]  HmacSha1Context Pointer to the HMAC-SHA1 context.
   @param[in]       Data            Pointer to the buffer containing the data to be digested.
   @param[in]       DataSize        Size of Data buffer in bytes.
 
-  @retval TRUE   HMAC-SHA1 data digest succeeded.
-  @retval FALSE  HMAC-SHA1 data digest failed.
   @retval FALSE  This interface is not supported.
 
 **/
 BOOLEAN
 EFIAPI
-CryptoServiceHmacSha1Update (
+DeprecatedCryptoServiceHmacSha1Update (
   IN OUT  VOID        *HmacSha1Context,
   IN      CONST VOID  *Data,
   IN      UINTN       DataSize
   )
 {
-  return CALL_BASECRYPTLIB (HmacSha1.Services.Update, HmacSha1Update, (HmacSha1Context, Data, DataSize), FALSE);
+  return BaseCryptLibServiceDeprecated ("HmacSha1Update"), FALSE;
 }
 
 /**
-  Completes computation of the HMAC-SHA1 digest value.
-
-  This function completes HMAC-SHA1 hash computation and retrieves the digest value into
-  the specified memory. After this function has been called, the HMAC-SHA1 context cannot
-  be used again.
-  HMAC-SHA1 context should be initialized by HmacSha1New(), and should not be finalized
-  by HmacSha1Final(). Behavior with invalid HMAC-SHA1 context is undefined.
-
-  If HmacSha1Context is NULL, then return FALSE.
-  If HmacValue is NULL, then return FALSE.
-  If this interface is not supported, then return FALSE.
+  HMAC SHA1 is deprecated and unsupported any longer.
+  Keep the function field for binary compability.
 
   @param[in, out]  HmacSha1Context  Pointer to the HMAC-SHA1 context.
   @param[out]      HmacValue        Pointer to a buffer that receives the HMAC-SHA1 digest
                                     value (20 bytes).
 
-  @retval TRUE   HMAC-SHA1 digest computation succeeded.
-  @retval FALSE  HMAC-SHA1 digest computation failed.
   @retval FALSE  This interface is not supported.
 
 **/
 BOOLEAN
 EFIAPI
-CryptoServiceHmacSha1Final (
+DeprecatedCryptoServiceHmacSha1Final (
   IN OUT  VOID   *HmacSha1Context,
   OUT     UINT8  *HmacValue
   )
 {
-  return CALL_BASECRYPTLIB (HmacSha1.Services.Final, HmacSha1Final, (HmacSha1Context, HmacValue), FALSE);
+  return BaseCryptLibServiceDeprecated ("HmacSha1Final"), FALSE;
 }
 
 /**
@@ -4207,13 +4173,13 @@ const EDKII_CRYPTO_PROTOCOL mEdkiiCrypto = {
   DeprecatedCryptoServiceHmacMd5Duplicate,
   DeprecatedCryptoServiceHmacMd5Update,
   DeprecatedCryptoServiceHmacMd5Final,
-  /// HMAC SHA1
-  CryptoServiceHmacSha1New,
-  CryptoServiceHmacSha1Free,
-  CryptoServiceHmacSha1SetKey,
-  CryptoServiceHmacSha1Duplicate,
-  CryptoServiceHmacSha1Update,
-  CryptoServiceHmacSha1Final,
+  /// HMAC SHA1 - deprecated and unsupported
+  DeprecatedCryptoServiceHmacSha1New,
+  DeprecatedCryptoServiceHmacSha1Free,
+  DeprecatedCryptoServiceHmacSha1SetKey,
+  DeprecatedCryptoServiceHmacSha1Duplicate,
+  DeprecatedCryptoServiceHmacSha1Update,
+  DeprecatedCryptoServiceHmacSha1Final,
   /// HMAC SHA256
   CryptoServiceHmacSha256New,
   CryptoServiceHmacSha256Free,
