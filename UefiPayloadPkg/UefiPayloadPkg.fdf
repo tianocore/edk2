@@ -217,6 +217,11 @@ INF MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
 INF SecurityPkg/RandomNumberGenerator/RngDxe/RngDxe.inf
 
 #
+# Network Support
+#
+!include NetworkPkg/Network.fdf.inc
+
+#
 # Security
 #
 !if $(SECURE_BOOT_ENABLE) == TRUE
