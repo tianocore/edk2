@@ -2498,69 +2498,22 @@ BOOLEAN
   );
 
 /**
-  Performs AES encryption on a data buffer of the specified size in ECB mode.
-
-  This function performs AES encryption on data buffer pointed by Input, of specified
-  size of InputSize, in ECB mode.
-  InputSize must be multiple of block size (16 bytes). This function does not perform
-  padding. Caller must perform padding, if necessary, to ensure valid input data size.
-  AesContext should be already correctly initialized by AesInit(). Behavior with
-  invalid AES context is undefined.
-
-  If AesContext is NULL, then return FALSE.
-  If Input is NULL, then return FALSE.
-  If InputSize is not multiple of block size (16 bytes), then return FALSE.
-  If Output is NULL, then return FALSE.
-  If this interface is not supported, then return FALSE.
-
-  @param[in]   AesContext  Pointer to the AES context.
-  @param[in]   Input       Pointer to the buffer containing the data to be encrypted.
-  @param[in]   InputSize   Size of the Input buffer in bytes.
-  @param[out]  Output      Pointer to a buffer that receives the AES encryption output.
-
-  @retval TRUE   AES encryption succeeded.
-  @retval FALSE  AES encryption failed.
-  @retval FALSE  This interface is not supported.
+  AES ECB Mode is deprecated and unsupported any longer.
+  Keep the function field for binary compability.
 
 **/
 typedef
 BOOLEAN
-(EFIAPI *EDKII_CRYPTO_AES_ECB_ENCRYPT) (
+(EFIAPI *DEPRECATED_EDKII_CRYPTO_AES_ECB_ENCRYPT) (
   IN   VOID         *AesContext,
   IN   CONST UINT8  *Input,
   IN   UINTN        InputSize,
   OUT  UINT8        *Output
   );
 
-/**
-  Performs AES decryption on a data buffer of the specified size in ECB mode.
-
-  This function performs AES decryption on data buffer pointed by Input, of specified
-  size of InputSize, in ECB mode.
-  InputSize must be multiple of block size (16 bytes). This function does not perform
-  padding. Caller must perform padding, if necessary, to ensure valid input data size.
-  AesContext should be already correctly initialized by AesInit(). Behavior with
-  invalid AES context is undefined.
-
-  If AesContext is NULL, then return FALSE.
-  If Input is NULL, then return FALSE.
-  If InputSize is not multiple of block size (16 bytes), then return FALSE.
-  If Output is NULL, then return FALSE.
-  If this interface is not supported, then return FALSE.
-
-  @param[in]   AesContext  Pointer to the AES context.
-  @param[in]   Input       Pointer to the buffer containing the data to be decrypted.
-  @param[in]   InputSize   Size of the Input buffer in bytes.
-  @param[out]  Output      Pointer to a buffer that receives the AES decryption output.
-
-  @retval TRUE   AES decryption succeeded.
-  @retval FALSE  AES decryption failed.
-  @retval FALSE  This interface is not supported.
-
-**/
 typedef
 BOOLEAN
-(EFIAPI *EDKII_CRYPTO_AES_ECB_DECRYPT) (
+(EFIAPI *DEPRECATED_EDKII_CRYPTO_AES_ECB_DECRYPT) (
   IN   VOID         *AesContext,
   IN   CONST UINT8  *Input,
   IN   UINTN        InputSize,
@@ -3779,11 +3732,11 @@ struct _EDKII_CRYPTO_PROTOCOL {
   DEPRECATED_EDKII_CRYPTO_TDES_ECB_DECRYPT        DeprecatedTdesEcbDecrypt;
   DEPRECATED_EDKII_CRYPTO_TDES_CBC_ENCRYPT        DeprecatedTdesCbcEncrypt;
   DEPRECATED_EDKII_CRYPTO_TDES_CBC_DECRYPT        DeprecatedTdesCbcDecrypt;
-  /// AES
+  /// AES - ECB Mode is deprecated and unsupported
   EDKII_CRYPTO_AES_GET_CONTEXT_SIZE               AesGetContextSize;
   EDKII_CRYPTO_AES_INIT                           AesInit;
-  EDKII_CRYPTO_AES_ECB_ENCRYPT                    AesEcbEncrypt;
-  EDKII_CRYPTO_AES_ECB_DECRYPT                    AesEcbDecrypt;
+  DEPRECATED_EDKII_CRYPTO_AES_ECB_ENCRYPT         DeprecatedAesEcbEncrypt;
+  DEPRECATED_EDKII_CRYPTO_AES_ECB_DECRYPT         DeprecatedAesEcbDecrypt;
   EDKII_CRYPTO_AES_CBC_ENCRYPT                    AesCbcEncrypt;
   EDKII_CRYPTO_AES_CBC_DECRYPT                    AesCbcDecrypt;
   /// Arc4 - deprecated and unsupported
