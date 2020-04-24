@@ -122,7 +122,7 @@ IScsiDhcpExtractRootPath (
   //
   if ((!NET_IS_DIGIT (*(Field->Str))) && (*(Field->Str) != '[')) {
     ConfigNvData->DnsMode = TRUE;
-    if (Field->Len > sizeof (ConfigNvData->TargetUrl)) {
+    if ((Field->Len + 2) > sizeof (ConfigNvData->TargetUrl)) {
       return EFI_INVALID_PARAMETER;
     }
     CopyMem (&ConfigNvData->TargetUrl, Field->Str, Field->Len);
