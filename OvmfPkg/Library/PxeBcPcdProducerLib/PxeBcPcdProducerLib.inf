@@ -1,0 +1,33 @@
+## @file
+# Configure some PCDs dynamically for
+# "NetworkPkg/UefiPxeBcDxe/UefiPxeBcDxe.inf", from QEMU's fw_cfg.
+#
+# Copyright (C) 2020, Red Hat, Inc.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 1.29
+  BASE_NAME                      = PxeBcPcdProducerLib
+  FILE_GUID                      = 1da2723f-52df-432a-8d03-6e8fa8acc107
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL
+  CONSTRUCTOR                    = SetPxeBcPcds
+
+[Sources]
+  PxeBcPcd.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  NetworkPkg/NetworkPkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  PcdLib
+  QemuFwCfgSimpleParserLib
+
+[Pcd]
+  gEfiNetworkPkgTokenSpaceGuid.PcdIPv4PXESupport       ## SOMETIMES_PRODUCES
+  gEfiNetworkPkgTokenSpaceGuid.PcdIPv6PXESupport       ## SOMETIMES_PRODUCES
