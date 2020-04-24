@@ -161,7 +161,7 @@ IScsiDhcp6ExtractRootPath (
   // Server name is expressed as domain name, just save it.
   //
   if (ConfigNvData->DnsMode) {
-    if (Field->Len > sizeof (ConfigNvData->TargetUrl)) {
+    if ((Field->Len + 2) > sizeof (ConfigNvData->TargetUrl)) {
       return EFI_INVALID_PARAMETER;
     }
     CopyMem (&ConfigNvData->TargetUrl, Field->Str, Field->Len);
