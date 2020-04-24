@@ -242,7 +242,7 @@ InternalLegacyBiosFarCall (
       }
     }
     if (Count >= 2) {
-      DEBUG ((EFI_D_ERROR, "ERROR: More than one HW interrupt active with CSM enabled\n"));
+      DEBUG ((DEBUG_ERROR, "ERROR: More than one HW interrupt active with CSM enabled\n"));
     }
     ASSERT (Count < 2);
   );

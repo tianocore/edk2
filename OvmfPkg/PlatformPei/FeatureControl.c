@@ -78,7 +78,7 @@ OnMpServicesAvailable (
                          NULL                 // ProcedureArgument
                          );
   if (EFI_ERROR (Status) && Status != EFI_NOT_STARTED) {
-    DEBUG ((EFI_D_ERROR, "%a: StartupAllAps(): %r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a: StartupAllAps(): %r\n", __FUNCTION__, Status));
     return Status;
   }
 
@@ -122,7 +122,7 @@ InstallFeatureControlCallback (
 
   Status = PeiServicesNotifyPpi (&mMpServicesNotify);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "%a: failed to set up MP Services callback: %r\n",
+    DEBUG ((DEBUG_ERROR, "%a: failed to set up MP Services callback: %r\n",
       __FUNCTION__, Status));
   }
 }

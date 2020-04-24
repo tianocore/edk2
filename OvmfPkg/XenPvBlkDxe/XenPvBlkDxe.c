@@ -304,7 +304,7 @@ XenPvBlkDxeDriverBindingStart (
                     NULL
                     );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "XenPvBlk: install protocol fail: %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "XenPvBlk: install protocol fail: %r\n", Status));
     goto UninitBlockFront;
   }
 

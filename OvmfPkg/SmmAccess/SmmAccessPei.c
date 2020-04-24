@@ -258,7 +258,7 @@ SmmAccessPeiEntryPoint (
   //
   HostBridgeDevId = PciRead16 (OVMF_HOSTBRIDGE_DID);
   if (HostBridgeDevId != INTEL_Q35_MCH_DEVICE_ID) {
-    DEBUG ((EFI_D_ERROR, "%a: no SMRAM with host bridge DID=0x%04x; only "
+    DEBUG ((DEBUG_ERROR, "%a: no SMRAM with host bridge DID=0x%04x; only "
       "DID=0x%04x (Q35) is supported\n", __FUNCTION__, HostBridgeDevId,
       INTEL_Q35_MCH_DEVICE_ID));
     goto WrongConfig;
@@ -274,7 +274,7 @@ SmmAccessPeiEntryPoint (
   EsmramcVal = PciRead8 (DRAMC_REGISTER_Q35 (MCH_ESMRAMC));
   RegMask8 = MCH_ESMRAMC_SM_CACHE | MCH_ESMRAMC_SM_L1 | MCH_ESMRAMC_SM_L2;
   if ((EsmramcVal & RegMask8) != RegMask8) {
-    DEBUG ((EFI_D_ERROR, "%a: this Q35 implementation lacks SMRAM\n",
+    DEBUG ((DEBUG_ERROR, "%a: this Q35 implementation lacks SMRAM\n",
       __FUNCTION__));
     goto WrongConfig;
   }

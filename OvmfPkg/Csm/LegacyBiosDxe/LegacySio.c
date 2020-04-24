@@ -117,7 +117,7 @@ LegacyBiosBuildSioDataFromSio (
       }
     }
 
-    DEBUG ((EFI_D_INFO, "LegacySio: Address/Dma/Irq = %x/%d/%d\n", Address, Dma, Irq));
+    DEBUG ((DEBUG_INFO, "LegacySio: Address/Dma/Irq = %x/%d/%d\n", Address, Dma, Irq));
 
     DevicePath = DevicePathFromHandle (HandleBuffer[Index]);
     if (DevicePath == NULL) {

@@ -228,7 +228,7 @@ ReadNvVarsFile (
 
   Status = GetNvVarsFile (FsHandle, TRUE, &File);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_INFO, "FsAccess.c: Could not open NV Variables file on this file system\n"));
+    DEBUG ((DEBUG_INFO, "FsAccess.c: Could not open NV Variables file on this file system\n"));
     return Status;
   }
 
@@ -245,7 +245,7 @@ ReadNvVarsFile (
   }
 
   DEBUG ((
-    EFI_D_INFO,
+    DEBUG_INFO,
     "FsAccess.c: Read %Lu bytes from NV Variables file\n",
     (UINT64)FileSize
     ));
@@ -317,7 +317,7 @@ LoadNvVarsFromFs (
   BOOLEAN                        VarData;
   UINTN                          Size;
 
-  DEBUG ((EFI_D_INFO, "FsAccess.c: LoadNvVarsFromFs\n"));
+  DEBUG ((DEBUG_INFO, "FsAccess.c: LoadNvVarsFromFs\n"));
 
   //
   // We write a variable to indicate we've already loaded the
@@ -338,7 +338,7 @@ LoadNvVarsFromFs (
                   (VOID*) &VarData
                   );
   if (Status == EFI_SUCCESS) {
-    DEBUG ((EFI_D_INFO, "NV Variables were already loaded\n"));
+    DEBUG ((DEBUG_INFO, "NV Variables were already loaded\n"));
     return EFI_ALREADY_STARTED;
   }
 
@@ -347,7 +347,7 @@ LoadNvVarsFromFs (
   //
   Status = ReadNvVarsFile (FsHandle);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_INFO, "Error while restoring NV variable data\n"));
+    DEBUG ((DEBUG_INFO, "Error while restoring NV variable data\n"));
     return Status;
   }
 
@@ -359,7 +359,7 @@ LoadNvVarsFromFs (
   SetNvVarsVariable();
 
   DEBUG ((
-    EFI_D_INFO,
+    DEBUG_INFO,
     "FsAccess.c: Read NV Variables file (size=%Lu)\n",
     (UINT64)Size
     ));
@@ -469,7 +469,7 @@ SaveNvVarsToFs (
   //
   Status = GetNvVarsFile (FsHandle, FALSE, &File);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_INFO, "FsAccess.c: Unable to open file to saved NV Variables\n"));
+    DEBUG ((DEBUG_INFO, "FsAccess.c: Unable to open file to saved NV Variables\n"));
     return Status;
   }
 
@@ -498,7 +498,7 @@ SaveNvVarsToFs (
     //
     SetNvVarsVariable();
 
-    DEBUG ((EFI_D_INFO, "Saved NV Variables to NvVars file\n"));
+    DEBUG ((DEBUG_INFO, "Saved NV Variables to NvVars file\n"));
   }
 
   return Status;

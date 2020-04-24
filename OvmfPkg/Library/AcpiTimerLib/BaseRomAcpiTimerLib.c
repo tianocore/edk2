@@ -54,7 +54,7 @@ AcpiTimerLibConstructor (
       AcpiEnBit  = ICH9_ACPI_CNTL_ACPI_EN;
       break;
     default:
-      DEBUG ((EFI_D_ERROR, "%a: Unknown Host Bridge Device ID: 0x%04x\n",
+      DEBUG ((DEBUG_ERROR, "%a: Unknown Host Bridge Device ID: 0x%04x\n",
         __FUNCTION__, HostBridgeDevId));
       ASSERT (FALSE);
       return RETURN_UNSUPPORTED;
@@ -108,7 +108,7 @@ InternalAcpiGetTimerTick (
       Pmba = POWER_MGMT_REGISTER_Q35 (ICH9_PMBASE);
       break;
     default:
-      DEBUG ((EFI_D_ERROR, "%a: Unknown Host Bridge Device ID: 0x%04x\n",
+      DEBUG ((DEBUG_ERROR, "%a: Unknown Host Bridge Device ID: 0x%04x\n",
         __FUNCTION__, HostBridgeDevId));
       ASSERT (FALSE);
       return 0;

@@ -329,19 +329,19 @@ ProcessCmdAllocate (
   BLOB                 *Blob;
 
   if (Allocate->File[QEMU_LOADER_FNAME_SIZE - 1] != '\0') {
-    DEBUG ((EFI_D_ERROR, "%a: malformed file name\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: malformed file name\n", __FUNCTION__));
     return EFI_PROTOCOL_ERROR;
   }
 
   if (Allocate->Alignment > EFI_PAGE_SIZE) {
-    DEBUG ((EFI_D_ERROR, "%a: unsupported alignment 0x%x\n", __FUNCTION__,
+    DEBUG ((DEBUG_ERROR, "%a: unsupported alignment 0x%x\n", __FUNCTION__,
       Allocate->Alignment));
     return EFI_UNSUPPORTED;
   }
 
   Status = QemuFwCfgFindFile ((CHAR8 *)Allocate->File, &FwCfgItem, &FwCfgSize);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "%a: QemuFwCfgFindFile(\"%a\"): %r\n", __FUNCTION__,
+    DEBUG ((DEBUG_ERROR, "%a: QemuFwCfgFindFile(\"%a\"): %r\n", __FUNCTION__,
       Allocate->File, Status));
     return Status;
   }
@@ -372,7 +372,7 @@ ProcessCmdAllocate (
 
   Status = OrderedCollectionInsert (Tracker, NULL, Blob);
   if (Status == RETURN_ALREADY_STARTED) {
-    DEBUG ((EFI_D_ERROR, "%a: duplicated file \"%a\"\n", __FUNCTION__,
+    DEBUG ((DEBUG_ERROR, "%a: duplicated file \"%a\"\n", __FUNCTION__,
       Allocate->File));
     Status = EFI_PROTOCOL_ERROR;
   }
@@ -432,14 +432,14 @@ ProcessCmdAddPointer (
 
   if (AddPointer->PointerFile[QEMU_LOADER_FNAME_SIZE - 1] != '\0' ||
       AddPointer->PointeeFile[QEMU_LOADER_FNAME_SIZE - 1] != '\0') {
-    DEBUG ((EFI_D_ERROR, "%a: malformed file name\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: malformed file name\n", __FUNCTION__));
     return EFI_PROTOCOL_ERROR;
   }
 
   TrackerEntry = OrderedCollectionFind (Tracker, AddPointer->PointerFile);
   TrackerEntry2 = OrderedCollectionFind (Tracker, AddPointer->PointeeFile);
   if (TrackerEntry == NULL || TrackerEntry2 == NULL) {
-    DEBUG ((EFI_D_ERROR, "%a: invalid blob reference(s) \"%a\" / \"%a\"\n",
+    DEBUG ((DEBUG_ERROR, "%a: invalid blob reference(s) \"%a\" / \"%a\"\n",
       __FUNCTION__, AddPointer->PointerFile, AddPointer->PointeeFile));
     return EFI_PROTOCOL_ERROR;
   }
@@ -450,7 +450,7 @@ ProcessCmdAddPointer (
        AddPointer->PointerSize != 4 && AddPointer->PointerSize != 8) ||
       Blob->Size < AddPointer->PointerSize ||
       Blob->Size - AddPointer->PointerSize < AddPointer->PointerOffset) {
-    DEBUG ((EFI_D_ERROR, "%a: invalid pointer location or size in \"%a\"\n",
+    DEBUG ((DEBUG_ERROR, "%a: invalid pointer location or size in \"%a\"\n",
       __FUNCTION__, AddPointer->PointerFile));
     return EFI_PROTOCOL_ERROR;
   }
@@ -459,7 +459,7 @@ ProcessCmdAddPointer (
   PointerValue = 0;
   CopyMem (&PointerValue, PointerField, AddPointer->PointerSize);
   if (PointerValue >= Blob2->Size) {
-    DEBUG ((EFI_D_ERROR, "%a: invalid pointer value in \"%a\"\n", __FUNCTION__,
+    DEBUG ((DEBUG_ERROR, "%a: invalid pointer value in \"%a\"\n", __FUNCTION__,
       AddPointer->PointerFile));
     return EFI_PROTOCOL_ERROR;
   }
@@ -473,7 +473,7 @@ ProcessCmdAddPointer (
   PointerValue += (UINT64)(UINTN)Blob2->Base;
   if (AddPointer->PointerSize < 8 &&
       RShiftU64 (PointerValue, AddPointer->PointerSize * 8) != 0) {
-    DEBUG ((EFI_D_ERROR, "%a: relocated pointer value unrepresentable in "
+    DEBUG ((DEBUG_ERROR, "%a: relocated pointer value unrepresentable in "
       "\"%a\"\n", __FUNCTION__, AddPointer->PointerFile));
     return EFI_PROTOCOL_ERROR;
   }
@@ -515,13 +515,13 @@ ProcessCmdAddChecksum (
   BLOB                     *Blob;
 
   if (AddChecksum->File[QEMU_LOADER_FNAME_SIZE - 1] != '\0') {
-    DEBUG ((EFI_D_ERROR, "%a: malformed file name\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: malformed file name\n", __FUNCTION__));
     return EFI_PROTOCOL_ERROR;
   }
 
   TrackerEntry = OrderedCollectionFind (Tracker, AddChecksum->File);
   if (TrackerEntry == NULL) {
-    DEBUG ((EFI_D_ERROR, "%a: invalid blob reference \"%a\"\n", __FUNCTION__,
+    DEBUG ((DEBUG_ERROR, "%a: invalid blob reference \"%a\"\n", __FUNCTION__,
       AddChecksum->File));
     return EFI_PROTOCOL_ERROR;
   }
@@ -530,7 +530,7 @@ ProcessCmdAddChecksum (
   if (Blob->Size <= AddChecksum->ResultOffset ||
       Blob->Size < AddChecksum->Length ||
       Blob->Size - AddChecksum->Length < AddChecksum->Start) {
-    DEBUG ((EFI_D_ERROR, "%a: invalid checksum range in \"%a\"\n",
+    DEBUG ((DEBUG_ERROR, "%a: invalid checksum range in \"%a\"\n",
       __FUNCTION__, AddChecksum->File));
     return EFI_PROTOCOL_ERROR;
   }
@@ -907,7 +907,7 @@ Process2ndPassCmdAddPointer (
   }
 
   if (*NumInstalled == INSTALLED_TABLES_MAX) {
-    DEBUG ((EFI_D_ERROR, "%a: can't install more than %d tables\n",
+    DEBUG ((DEBUG_ERROR, "%a: can't install more than %d tables\n",
       __FUNCTION__, INSTALLED_TABLES_MAX));
     Status = EFI_OUT_OF_RESOURCES;
     goto RollbackSeenPointer;
@@ -917,7 +917,7 @@ Process2ndPassCmdAddPointer (
                            (VOID *)(UINTN)PointerValue, TableSize,
                            &InstalledKey[*NumInstalled]);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "%a: InstallAcpiTable(): %r\n", __FUNCTION__,
+    DEBUG ((DEBUG_ERROR, "%a: InstallAcpiTable(): %r\n", __FUNCTION__,
       Status));
     goto RollbackSeenPointer;
   }
@@ -980,7 +980,7 @@ InstallQemuFwCfgTables (
     return Status;
   }
   if (FwCfgSize % sizeof *LoaderEntry != 0) {
-    DEBUG ((EFI_D_ERROR, "%a: \"etc/table-loader\" has invalid size 0x%Lx\n",
+    DEBUG ((DEBUG_ERROR, "%a: \"etc/table-loader\" has invalid size 0x%Lx\n",
       __FUNCTION__, (UINT64)FwCfgSize));
     return EFI_PROTOCOL_ERROR;
   }
@@ -1128,7 +1128,7 @@ UninstallAcpiTables:
       AcpiProtocol->UninstallAcpiTable (AcpiProtocol, InstalledKey[Installed]);
     }
   } else {
-    DEBUG ((EFI_D_INFO, "%a: installed %d tables\n", __FUNCTION__, Installed));
+    DEBUG ((DEBUG_INFO, "%a: installed %d tables\n", __FUNCTION__, Installed));
   }
 
   for (SeenPointerEntry = OrderedCollectionMin (SeenPointers);

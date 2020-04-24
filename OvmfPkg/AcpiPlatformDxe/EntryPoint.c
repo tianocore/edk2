@@ -39,12 +39,12 @@ OnRootBridgesConnected (
 {
   EFI_STATUS Status;
 
-  DEBUG ((EFI_D_INFO,
+  DEBUG ((DEBUG_INFO,
     "%a: root bridges have been connected, installing ACPI tables\n",
     __FUNCTION__));
   Status = InstallAcpiTables (FindAcpiTableProtocol ());
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "%a: InstallAcpiTables: %r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a: InstallAcpiTables: %r\n", __FUNCTION__, Status));
   }
   gBS->CloseEvent (Event);
 }
@@ -66,7 +66,7 @@ AcpiPlatformEntryPoint (
   // the full functionality.
   //
   if (PcdGetBool (PcdPciDisableBusEnumeration)) {
-    DEBUG ((EFI_D_INFO, "%a: PCI or its enumeration disabled, installing "
+    DEBUG ((DEBUG_INFO, "%a: PCI or its enumeration disabled, installing "
       "ACPI tables\n", __FUNCTION__));
     return InstallAcpiTables (FindAcpiTableProtocol ());
   }
@@ -81,7 +81,7 @@ AcpiPlatformEntryPoint (
                   OnRootBridgesConnected, NULL /* Context */,
                   &gRootBridgesConnectedEventGroupGuid, &RootBridgesConnected);
   if (!EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_INFO,
+    DEBUG ((DEBUG_INFO,
       "%a: waiting for root bridges to be connected, registered callback\n",
       __FUNCTION__));
   }

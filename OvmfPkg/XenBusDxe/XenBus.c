@@ -148,7 +148,7 @@ XenBusAddDevice (
        * happen if a device is going away after
        * switching to Closed.
        */
-      DEBUG ((EFI_D_INFO, "XenBus: Device %a ignored. "
+      DEBUG ((DEBUG_INFO, "XenBus: Device %a ignored. "
               "State %d\n", DevicePath, State));
       Status = EFI_SUCCESS;
       goto out;
@@ -157,7 +157,7 @@ XenBusAddDevice (
     StatusXenStore = XenStoreRead (XST_NIL, DevicePath, "backend",
                                    NULL, (VOID **) &BackendPath);
     if (StatusXenStore != XENSTORE_STATUS_SUCCESS) {
-      DEBUG ((EFI_D_ERROR, "xenbus: %a no backend path.\n", DevicePath));
+      DEBUG ((DEBUG_ERROR, "xenbus: %a no backend path.\n", DevicePath));
       Status = EFI_NOT_FOUND;
       goto out;
     }
@@ -197,12 +197,12 @@ XenBusAddDevice (
                Private->Handle,
                EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER);
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "open by child controller fail (%r)\n",
+      DEBUG ((DEBUG_ERROR, "open by child controller fail (%r)\n",
               Status));
       goto ErrorOpenProtocolByChild;
     }
   } else {
-    DEBUG ((EFI_D_ERROR, "XenBus: does not exist: %a\n", DevicePath));
+    DEBUG ((DEBUG_ERROR, "XenBus: does not exist: %a\n", DevicePath));
     Status = EFI_NOT_FOUND;
   }
 
@@ -312,7 +312,7 @@ XenBusSetState (
   XENSTORE_STATUS Status;
   CHAR8 *Temp;
 
-  DEBUG ((EFI_D_INFO, "XenBus: Set state to %d\n", NewState));
+  DEBUG ((DEBUG_INFO, "XenBus: Set state to %d\n", NewState));
 
   Status = XenStoreRead (Transaction, This->Node, "state", NULL, (VOID **)&Temp);
   if (Status != XENSTORE_STATUS_SUCCESS) {
@@ -328,10 +328,10 @@ XenBusSetState (
     Status = XenStoreSPrint (Transaction, This->Node, "state", "%d", NewState);
   } while (Status == XENSTORE_STATUS_EAGAIN);
   if (Status != XENSTORE_STATUS_SUCCESS) {
-    DEBUG ((EFI_D_ERROR, "XenBus: failed to write new state\n"));
+    DEBUG ((DEBUG_ERROR, "XenBus: failed to write new state\n"));
     goto Out;
   }
-  DEBUG ((EFI_D_INFO, "XenBus: Set state to %d, done\n", NewState));
+  DEBUG ((DEBUG_INFO, "XenBus: Set state to %d, done\n", NewState));
 
 Out:
   return Status;

@@ -89,14 +89,14 @@ XenPvBlkDxeBlockIoReadWriteBlocks (
   }
 
   if (BufferSize % Media->BlockSize != 0) {
-    DEBUG ((EFI_D_ERROR, "XenPvBlkDxe: Bad buffer size: 0x%Lx\n",
+    DEBUG ((DEBUG_ERROR, "XenPvBlkDxe: Bad buffer size: 0x%Lx\n",
       (UINT64)BufferSize));
     return EFI_BAD_BUFFER_SIZE;
   }
 
   if (Lba > Media->LastBlock ||
       (BufferSize / Media->BlockSize) - 1 > Media->LastBlock - Lba) {
-    DEBUG ((EFI_D_ERROR,
+    DEBUG ((DEBUG_ERROR,
       "XenPvBlkDxe: %a with invalid LBA: 0x%Lx, size: 0x%Lx\n",
       IsWrite ? "Write" : "Read", Lba, (UINT64)BufferSize));
     return EFI_INVALID_PARAMETER;
@@ -150,7 +150,7 @@ XenPvBlkDxeBlockIoReadWriteBlocks (
     Sector += IoData.Size / 512;
     Status = XenPvBlockIo (&IoData, IsWrite);
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "XenPvBlkDxe: Error during %a operation.\n",
+      DEBUG ((DEBUG_ERROR, "XenPvBlkDxe: Error during %a operation.\n",
               IsWrite ? "write" : "read"));
       return Status;
     }
