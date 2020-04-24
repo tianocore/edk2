@@ -60,6 +60,7 @@
   PeimEntryPoint
   QemuFwCfgLib
   QemuFwCfgS3Lib
+  QemuFwCfgSimpleParserLib
   MtrrLib
   MemEncryptSevLib
   PcdLib
