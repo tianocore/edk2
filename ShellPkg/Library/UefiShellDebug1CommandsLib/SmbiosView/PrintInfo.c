@@ -49,7 +49,7 @@
 #define PRINT_STRUCT_VALUE(pStruct, type, element) \
   do { \
     ShellPrintEx(-1,-1,L"%a",#element); \
-    ShellPrintEx(-1,-1,L": %d\n", (pStruct->type->element)); \
+    ShellPrintEx(-1,-1,L": %u\n", (pStruct->type->element)); \
   } while (0);
 
 #define PRINT_STRUCT_VALUE_H(pStruct, type, element) \
