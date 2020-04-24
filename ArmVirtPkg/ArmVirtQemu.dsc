@@ -58,6 +58,7 @@
   VirtioMmioDeviceLib|OvmfPkg/Library/VirtioMmioDeviceLib/VirtioMmioDeviceLib.inf
   QemuFwCfgLib|ArmVirtPkg/Library/QemuFwCfgLib/QemuFwCfgLib.inf
   QemuFwCfgS3Lib|OvmfPkg/Library/QemuFwCfgS3Lib/BaseQemuFwCfgS3LibNull.inf
+  QemuFwCfgSimpleParserLib|OvmfPkg/Library/QemuFwCfgSimpleParserLib/QemuFwCfgSimpleParserLib.inf
   QemuLoadImageLib|OvmfPkg/Library/GenericQemuLoadImageLib/GenericQemuLoadImageLib.inf
 
   ArmPlatformLib|ArmPlatformPkg/Library/ArmPlatformLibNull/ArmPlatformLibNull.inf
@@ -257,6 +258,12 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuSmbiosValidated|FALSE
 
   #
+  # IPv4 and IPv6 PXE Boot support.
+  #
+  gEfiNetworkPkgTokenSpaceGuid.PcdIPv4PXESupport|0x01
+  gEfiNetworkPkgTokenSpaceGuid.PcdIPv6PXESupport|0x01
+
+  #
   # TPM2 support
   #
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress|0x0
@@ -430,6 +437,12 @@
   # Networking stack
   #
 !include NetworkPkg/NetworkComponents.dsc.inc
+
+  NetworkPkg/UefiPxeBcDxe/UefiPxeBcDxe.inf {
+    <LibraryClasses>
+      NULL|OvmfPkg/Library/PxeBcPcdProducerLib/PxeBcPcdProducerLib.inf
+  }
+
 !if $(NETWORK_TLS_ENABLE) == TRUE
   NetworkPkg/TlsAuthConfigDxe/TlsAuthConfigDxe.inf {
     <LibraryClasses>
