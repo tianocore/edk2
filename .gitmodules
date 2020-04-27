@@ -16,3 +16,4 @@
 [submodule "BaseTools/Source/C/BrotliCompress/brotli"]
 	path = BaseTools/Source/C/BrotliCompress/brotli
 	url = https://github.com/google/brotli
+	ignore = untracked
