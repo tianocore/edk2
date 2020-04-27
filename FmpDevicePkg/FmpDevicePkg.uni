@@ -80,4 +80,6 @@
                                                                                           "default value is empty, so by default the firmware device is locked at the"
                                                                                           "end of the DXE phase."
 
-
+#string STR_gFmpDevicePkgTokenSpaceGuid_PcdFmpDependencyCheckEnable_PROMPT  #language en-US "Fmp Dependency Check Enable"
+#string STR_gFmpDevicePkgTokenSpaceGuid_PcdFmpDependencyCheckEnable_HELP    #language en-US "Indicate whether to perform the Fmp dependency check during the update of a"
+                                                                                            "firmware device."
