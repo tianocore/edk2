@@ -1,0 +1,13 @@
+// /** @file
+// Provides FMP capsule dependency check services when updating the firmware
+// image of a FMP device.
+//
+// Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+#string STR_MODULE_ABSTRACT     #language en-US  "FMP Dependency Check Lib"
+
+#string STR_MODULE_DESCRIPTION  #language en-US  "Provides FMP capsule dependency check services when updating the firmware image of a FMP device."
