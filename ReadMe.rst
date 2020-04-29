@@ -64,7 +64,7 @@ OvmfPkg_Ubuntu_GCC5_          | IA32            |op32du|      |op32ru|      |op3
 License Details
 ---------------
 
-The majority of the content in the EDK II open source project uses a
+The majoritydfadfadsfd of the content in the EDK II open source project uses a
 `BSD-2-Clause Plus Patent License <License.txt>`__. The EDK II open
 source project contains the following components that are covered by additional
 licenses:
