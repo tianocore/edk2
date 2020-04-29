@@ -77,8 +77,12 @@ def get_section_maintainers(path, section):
        matching the provided path in the provided section."""
     maintainers = []
     lists = []
+    nowarn_status = ['Supported', 'Maintained']
 
     if path_in_section(path, section):
+        for status in section['status']:
+            if status not in nowarn_status:
+                print('WARNING: Maintained status for "%s" is \'%s\'!' % (path, status))
         for address in section['maintainer'], section['reviewer']:
             # Convert to list if necessary
             if isinstance(address, list):
