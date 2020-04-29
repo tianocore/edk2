@@ -74,35 +74,35 @@ QemuFlashDetected (
   }
 
   if (Offset >= mFdBlockSize) {
-    DEBUG ((EFI_D_INFO, "QEMU Flash: Failed to find probe location\n"));
+    DEBUG ((DEBUG_INFO, "QEMU Flash: Failed to find probe location\n"));
     return FALSE;
   }
 
-  DEBUG ((EFI_D_INFO, "QEMU Flash: Attempting flash detection at %p\n", Ptr));
+  DEBUG ((DEBUG_INFO, "QEMU Flash: Attempting flash detection at %p\n", Ptr));
 
   OriginalUint8 = *Ptr;
   *Ptr = CLEAR_STATUS_CMD;
   ProbeUint8 = *Ptr;
   if (OriginalUint8 != CLEAR_STATUS_CMD &&
       ProbeUint8 == CLEAR_STATUS_CMD) {
-    DEBUG ((EFI_D_INFO, "QemuFlashDetected => FD behaves as RAM\n"));
+    DEBUG ((DEBUG_INFO, "QemuFlashDetected => FD behaves as RAM\n"));
     *Ptr = OriginalUint8;
   } else {
     *Ptr = READ_STATUS_CMD;
     ProbeUint8 = *Ptr;
     if (ProbeUint8 == OriginalUint8) {
-      DEBUG ((EFI_D_INFO, "QemuFlashDetected => FD behaves as ROM\n"));
+      DEBUG ((DEBUG_INFO, "QemuFlashDetected => FD behaves as ROM\n"));
     } else if (ProbeUint8 == READ_STATUS_CMD) {
-      DEBUG ((EFI_D_INFO, "QemuFlashDetected => FD behaves as RAM\n"));
+      DEBUG ((DEBUG_INFO, "QemuFlashDetected => FD behaves as RAM\n"));
       *Ptr = OriginalUint8;
     } else if (ProbeUint8 == CLEARED_ARRAY_STATUS) {
-      DEBUG ((EFI_D_INFO, "QemuFlashDetected => FD behaves as FLASH\n"));
+      DEBUG ((DEBUG_INFO, "QemuFlashDetected => FD behaves as FLASH\n"));
       FlashDetected = TRUE;
       *Ptr = READ_ARRAY_CMD;
     }
   }
 
-  DEBUG ((EFI_D_INFO, "QemuFlashDetected => %a\n",
+  DEBUG ((DEBUG_INFO, "QemuFlashDetected => %a\n",
                       FlashDetected ? "Yes" : "No"));
   return FlashDetected;
 }

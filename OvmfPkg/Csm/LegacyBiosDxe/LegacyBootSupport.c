@@ -46,9 +46,9 @@ PrintBbsTable (
   UINT16 SubIndex;
   CHAR8  *String;
 
-  DEBUG ((EFI_D_INFO, "\n"));
-  DEBUG ((EFI_D_INFO, " NO  Prio bb/dd/ff cl/sc Type Stat segm:offs mfgs:mfgo dess:deso\n"));
-  DEBUG ((EFI_D_INFO, "=================================================================\n"));
+  DEBUG ((DEBUG_INFO, "\n"));
+  DEBUG ((DEBUG_INFO, " NO  Prio bb/dd/ff cl/sc Type Stat segm:offs mfgs:mfgo dess:deso\n"));
+  DEBUG ((DEBUG_INFO, "=================================================================\n"));
   for (Index = 0; Index < MAX_BBS_ENTRIES; Index++) {
     //
     // Filter
@@ -58,7 +58,7 @@ PrintBbsTable (
     }
 
     DEBUG ((
-      EFI_D_INFO,
+      DEBUG_INFO,
       " %02x: %04x %02x/%02x/%02x %02x/%02x %04x %04x",
       (UINTN) Index,
       (UINTN) BbsTable[Index].BootPriority,
@@ -71,7 +71,7 @@ PrintBbsTable (
       (UINTN) * (UINT16 *) &BbsTable[Index].StatusFlags
       ));
     DEBUG ((
-      EFI_D_INFO,
+      DEBUG_INFO,
       " %04x:%04x %04x:%04x %04x:%04x",
       (UINTN) BbsTable[Index].BootHandlerSegment,
       (UINTN) BbsTable[Index].BootHandlerOffset,
@@ -86,16 +86,16 @@ PrintBbsTable (
     //
     String = (CHAR8 *)(((UINTN)BbsTable[Index].DescStringSegment << 4) + BbsTable[Index].DescStringOffset);
     if (String != NULL) {
-      DEBUG ((EFI_D_INFO," ("));
+      DEBUG ((DEBUG_INFO," ("));
       for (SubIndex = 0; String[SubIndex] != 0; SubIndex++) {
-        DEBUG ((EFI_D_INFO, "%c", String[SubIndex]));
+        DEBUG ((DEBUG_INFO, "%c", String[SubIndex]));
       }
-      DEBUG ((EFI_D_INFO,")"));
+      DEBUG ((DEBUG_INFO,")"));
     }
-    DEBUG ((EFI_D_INFO,"\n"));
+    DEBUG ((DEBUG_INFO,"\n"));
   }
 
-  DEBUG ((EFI_D_INFO, "\n"));
+  DEBUG ((DEBUG_INFO, "\n"));
 
   return ;
 }
@@ -114,20 +114,20 @@ PrintHddInfo (
 {
   UINTN Index;
 
-  DEBUG ((EFI_D_INFO, "\n"));
+  DEBUG ((DEBUG_INFO, "\n"));
   for (Index = 0; Index < MAX_IDE_CONTROLLER; Index++) {
-    DEBUG ((EFI_D_INFO, "Index - %04x\n", Index));
-    DEBUG ((EFI_D_INFO, "  Status    - %04x\n", (UINTN)HddInfo[Index].Status));
-    DEBUG ((EFI_D_INFO, "  B/D/F     - %02x/%02x/%02x\n", (UINTN)HddInfo[Index].Bus, (UINTN)HddInfo[Index].Device, (UINTN)HddInfo[Index].Function));
-    DEBUG ((EFI_D_INFO, "  Command   - %04x\n", HddInfo[Index].CommandBaseAddress));
-    DEBUG ((EFI_D_INFO, "  Control   - %04x\n", HddInfo[Index].ControlBaseAddress));
-    DEBUG ((EFI_D_INFO, "  BusMaster - %04x\n", HddInfo[Index].BusMasterAddress));
-    DEBUG ((EFI_D_INFO, "  HddIrq    - %02x\n", HddInfo[Index].HddIrq));
-    DEBUG ((EFI_D_INFO, "  IdentifyDrive[0].Raw[0] - %x\n", HddInfo[Index].IdentifyDrive[0].Raw[0]));
-    DEBUG ((EFI_D_INFO, "  IdentifyDrive[1].Raw[0] - %x\n", HddInfo[Index].IdentifyDrive[1].Raw[0]));
+    DEBUG ((DEBUG_INFO, "Index - %04x\n", Index));
+    DEBUG ((DEBUG_INFO, "  Status    - %04x\n", (UINTN)HddInfo[Index].Status));
+    DEBUG ((DEBUG_INFO, "  B/D/F     - %02x/%02x/%02x\n", (UINTN)HddInfo[Index].Bus, (UINTN)HddInfo[Index].Device, (UINTN)HddInfo[Index].Function));
+    DEBUG ((DEBUG_INFO, "  Command   - %04x\n", HddInfo[Index].CommandBaseAddress));
+    DEBUG ((DEBUG_INFO, "  Control   - %04x\n", HddInfo[Index].ControlBaseAddress));
+    DEBUG ((DEBUG_INFO, "  BusMaster - %04x\n", HddInfo[Index].BusMasterAddress));
+    DEBUG ((DEBUG_INFO, "  HddIrq    - %02x\n", HddInfo[Index].HddIrq));
+    DEBUG ((DEBUG_INFO, "  IdentifyDrive[0].Raw[0] - %x\n", HddInfo[Index].IdentifyDrive[0].Raw[0]));
+    DEBUG ((DEBUG_INFO, "  IdentifyDrive[1].Raw[0] - %x\n", HddInfo[Index].IdentifyDrive[1].Raw[0]));
   }
 
-  DEBUG ((EFI_D_INFO, "\n"));
+  DEBUG ((DEBUG_INFO, "\n"));
 
   return ;
 }
@@ -163,9 +163,9 @@ PrintPciInterruptRegister (
   Device   = 0;
   Function = 0;
 
-  DEBUG ((EFI_D_INFO, "\n"));
-  DEBUG ((EFI_D_INFO, " bb/dd/ff interrupt line interrupt pin\n"));
-  DEBUG ((EFI_D_INFO, "======================================\n"));
+  DEBUG ((DEBUG_INFO, "\n"));
+  DEBUG ((DEBUG_INFO, " bb/dd/ff interrupt line interrupt pin\n"));
+  DEBUG ((DEBUG_INFO, "======================================\n"));
   for (Index = 0; Index < HandleNum; Index++) {
     Status = gBS->HandleProtocol (Handles[Index], &gEfiPciIoProtocolGuid, (VOID **) &PciIo);
     if (!EFI_ERROR (Status)) {
@@ -187,11 +187,11 @@ PrintPciInterruptRegister (
                         );
     }
     if (!EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_INFO, " %02x/%02x/%02x 0x%02x           0x%02x\n",
+      DEBUG ((DEBUG_INFO, " %02x/%02x/%02x 0x%02x           0x%02x\n",
               Bus, Device, Function, Interrupt[0], Interrupt[1]));
     }
   }
-  DEBUG ((EFI_D_INFO, "\n"));
+  DEBUG ((DEBUG_INFO, "\n"));
 
   if (Handles != NULL) {
     FreePool (Handles);
@@ -667,8 +667,8 @@ LegacyGetDataOrTable (
                                       0,
                                       0
                                       );
-        DEBUG ((EFI_D_INFO, "LegacyGetDataOrTable - ID: %x, %r\n", (UINTN)Id, Status));
-        DEBUG ((EFI_D_INFO, "  Table - %x, Size - %x, Location - %x, Alignment - %x\n", (UINTN)Table, (UINTN)TableSize, (UINTN)Location, (UINTN)Alignment));
+        DEBUG ((DEBUG_INFO, "LegacyGetDataOrTable - ID: %x, %r\n", (UINTN)Id, Status));
+        DEBUG ((DEBUG_INFO, "  Table - %x, Size - %x, Location - %x, Alignment - %x\n", (UINTN)Table, (UINTN)TableSize, (UINTN)Location, (UINTN)Alignment));
         break;
       }
 
@@ -697,7 +697,7 @@ LegacyGetDataOrTable (
       );
 
     if (Regs.X.AX != 0) {
-      DEBUG ((EFI_D_ERROR, "Table ID %x length insufficient\n", Id));
+      DEBUG ((DEBUG_ERROR, "Table ID %x length insufficient\n", Id));
       return EFI_OUT_OF_RESOURCES;
     } else {
       break;
@@ -721,7 +721,7 @@ LegacyGetDataOrTable (
     {
       Legacy16Table->MpTablePtr     = (UINT32) (Regs.X.DS * 16 + Regs.X.BX);
       Legacy16Table->MpTableLength  = (UINT32)TableSize;
-      DEBUG ((EFI_D_INFO, "MP table in legacy region - %x\n", (UINTN)Legacy16Table->MpTablePtr));
+      DEBUG ((DEBUG_INFO, "MP table in legacy region - %x\n", (UINTN)Legacy16Table->MpTablePtr));
       break;
     }
 
@@ -730,7 +730,7 @@ LegacyGetDataOrTable (
 
       Legacy16Table->OemIntSegment  = Regs.X.DS;
       Legacy16Table->OemIntOffset   = Regs.X.BX;
-      DEBUG ((EFI_D_INFO, "OemInt table in legacy region - %04x:%04x\n", (UINTN)Legacy16Table->OemIntSegment, (UINTN)Legacy16Table->OemIntOffset));
+      DEBUG ((DEBUG_INFO, "OemInt table in legacy region - %04x:%04x\n", (UINTN)Legacy16Table->OemIntSegment, (UINTN)Legacy16Table->OemIntOffset));
       break;
     }
 
@@ -738,7 +738,7 @@ LegacyGetDataOrTable (
     {
       Legacy16Table->Oem32Segment = Regs.X.DS;
       Legacy16Table->Oem32Offset  = Regs.X.BX;
-      DEBUG ((EFI_D_INFO, "Oem32 table in legacy region - %04x:%04x\n", (UINTN)Legacy16Table->Oem32Segment, (UINTN)Legacy16Table->Oem32Offset));
+      DEBUG ((DEBUG_INFO, "Oem32 table in legacy region - %04x:%04x\n", (UINTN)Legacy16Table->Oem32Segment, (UINTN)Legacy16Table->Oem32Offset));
       break;
     }
 
@@ -747,7 +747,7 @@ LegacyGetDataOrTable (
       //
       //          Legacy16Table->Oem16Segment = Regs.X.DS;
       //          Legacy16Table->Oem16Offset  = Regs.X.BX;
-      DEBUG ((EFI_D_INFO, "Oem16 table in legacy region - %04x:%04x\n", (UINTN)Legacy16Table->Oem16Segment, (UINTN)Legacy16Table->Oem16Offset));
+      DEBUG ((DEBUG_INFO, "Oem16 table in legacy region - %04x:%04x\n", (UINTN)Legacy16Table->Oem16Segment, (UINTN)Legacy16Table->Oem16Offset));
       break;
     }
 
@@ -880,7 +880,7 @@ GenericLegacyBoot (
 
   Private       = LEGACY_BIOS_INSTANCE_FROM_THIS (This);
   DEBUG_CODE (
-    DEBUG ((EFI_D_ERROR, "Start of legacy boot\n"));
+    DEBUG ((DEBUG_ERROR, "Start of legacy boot\n"));
   );
 
   Legacy16Table                         = Private->Legacy16Table;
@@ -943,7 +943,7 @@ GenericLegacyBoot (
     Private->Legacy16Table->E820Pointer = (UINT32) (Regs.X.DS * 16 + Regs.X.BX);
     Private->Legacy16Table->E820Length  = (UINT32) CopySize;
     if (Regs.X.AX != 0) {
-      DEBUG ((EFI_D_ERROR, "Legacy16 E820 length insufficient\n"));
+      DEBUG ((DEBUG_ERROR, "Legacy16 E820 length insufficient\n"));
       return EFI_OUT_OF_RESOURCES;
     } else {
       CopyMem (
@@ -965,7 +965,7 @@ GenericLegacyBoot (
   // We do not ASSERT if SmbiosTable not found. It is possible that a platform does not produce SmbiosTable.
   //
   if (mReserveSmbiosEntryPoint == 0) {
-    DEBUG ((EFI_D_INFO, "Smbios table is not found!\n"));
+    DEBUG ((DEBUG_INFO, "Smbios table is not found!\n"));
   }
   CreateSmbiosTableInReservedMemory ();
   EfiToLegacy16BootTable->SmbiosTable = (UINT32)(UINTN)mReserveSmbiosEntryPoint;
@@ -985,7 +985,7 @@ GenericLegacyBoot (
   // We do not ASSERT if AcpiTable not found. It is possible that a platform does not produce AcpiTable.
   //
   if (AcpiTable == NULL) {
-    DEBUG ((EFI_D_INFO, "ACPI table is not found!\n"));
+    DEBUG ((DEBUG_INFO, "ACPI table is not found!\n"));
   }
   EfiToLegacy16BootTable->AcpiTable = (UINT32)(UINTN)AcpiTable;
 
@@ -1245,7 +1245,7 @@ GenericLegacyBoot (
     // Here we could reduce UmaAddress down as far as Private->OptionRom, taking into
     // account the granularity of the access control.
     //
-    DEBUG((EFI_D_INFO, "Unlocking UMB RAM region 0x%x-0x%x\n", Private->Legacy16Table->UmaAddress,
+    DEBUG((DEBUG_INFO, "Unlocking UMB RAM region 0x%x-0x%x\n", Private->Legacy16Table->UmaAddress,
                         Private->Legacy16Table->UmaAddress + Private->Legacy16Table->UmaSize));
 
     Private->LegacyRegion->UnLock (
@@ -1285,7 +1285,7 @@ GenericLegacyBoot (
       (EFI_SOFTWARE_DXE_BS_DRIVER | EFI_SW_DXE_BS_PC_LEGACY_BOOT_EVENT)
       );
 
-    DEBUG ((EFI_D_INFO, "Legacy INT19 Boot...\n"));
+    DEBUG ((DEBUG_INFO, "Legacy INT19 Boot...\n"));
 
     //
     // Disable DXE Timer while executing in real mode
@@ -1944,7 +1944,7 @@ LegacyBiosBuildE820 (
   // Print DEBUG information
   //
   for (TempIndex = 0; TempIndex < Index; TempIndex++) {
-    DEBUG((EFI_D_INFO, "E820[%2d]: 0x%016lx - 0x%016lx, Type = %d\n",
+    DEBUG((DEBUG_INFO, "E820[%2d]: 0x%016lx - 0x%016lx, Type = %d\n",
       TempIndex,
       E820Table[TempIndex].BaseAddr,
       (E820Table[TempIndex].BaseAddr + E820Table[TempIndex].Length),

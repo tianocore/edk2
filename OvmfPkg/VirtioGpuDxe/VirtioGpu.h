@@ -295,7 +295,7 @@ VirtioGpuExitBoot (
   @retval EFI_SUCCESS            Operation successful.
 
   @retval EFI_DEVICE_ERROR       The host rejected the request. The host error
-                                 code has been logged on the EFI_D_ERROR level.
+                                 code has been logged on the DEBUG_ERROR level.
 
   @return                        Codes for unexpected errors in VirtIo
                                  messaging.

@@ -258,7 +258,7 @@ SmmAccessPeiEntryPoint (
   //
   HostBridgeDevId = PciRead16 (OVMF_HOSTBRIDGE_DID);
   if (HostBridgeDevId != INTEL_Q35_MCH_DEVICE_ID) {
-    DEBUG ((EFI_D_ERROR, "%a: no SMRAM with host bridge DID=0x%04x; only "
+    DEBUG ((DEBUG_ERROR, "%a: no SMRAM with host bridge DID=0x%04x; only "
       "DID=0x%04x (Q35) is supported\n", __FUNCTION__, HostBridgeDevId,
       INTEL_Q35_MCH_DEVICE_ID));
     goto WrongConfig;
@@ -274,7 +274,7 @@ SmmAccessPeiEntryPoint (
   EsmramcVal = PciRead8 (DRAMC_REGISTER_Q35 (MCH_ESMRAMC));
   RegMask8 = MCH_ESMRAMC_SM_CACHE | MCH_ESMRAMC_SM_L1 | MCH_ESMRAMC_SM_L2;
   if ((EsmramcVal & RegMask8) != RegMask8) {
-    DEBUG ((EFI_D_ERROR, "%a: this Q35 implementation lacks SMRAM\n",
+    DEBUG ((DEBUG_ERROR, "%a: this Q35 implementation lacks SMRAM\n",
       __FUNCTION__));
     goto WrongConfig;
   }
@@ -351,12 +351,12 @@ SmmAccessPeiEntryPoint (
     UINTN Idx;
 
     Count = SmramMapSize / sizeof SmramMap[0];
-    DEBUG ((EFI_D_VERBOSE, "%a: SMRAM map follows, %d entries\n", __FUNCTION__,
+    DEBUG ((DEBUG_VERBOSE, "%a: SMRAM map follows, %d entries\n", __FUNCTION__,
       (INT32)Count));
-    DEBUG ((EFI_D_VERBOSE, "% 20a % 20a % 20a % 20a\n", "PhysicalStart(0x)",
+    DEBUG ((DEBUG_VERBOSE, "% 20a % 20a % 20a % 20a\n", "PhysicalStart(0x)",
       "PhysicalSize(0x)", "CpuStart(0x)", "RegionState(0x)"));
     for (Idx = 0; Idx < Count; ++Idx) {
-      DEBUG ((EFI_D_VERBOSE, "% 20Lx % 20Lx % 20Lx % 20Lx\n",
+      DEBUG ((DEBUG_VERBOSE, "% 20Lx % 20Lx % 20Lx % 20Lx\n",
         SmramMap[Idx].PhysicalStart, SmramMap[Idx].PhysicalSize,
         SmramMap[Idx].CpuStart, SmramMap[Idx].RegionState));
     }

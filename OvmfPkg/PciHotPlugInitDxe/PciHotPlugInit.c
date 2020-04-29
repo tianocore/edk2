@@ -569,7 +569,7 @@ GetResourcePadding (
 
     DevicePathString = ConvertDevicePathToText (HpcDevicePath, FALSE, FALSE);
 
-    DEBUG ((EFI_D_VERBOSE, "%a: Address=%02x:%02x.%x DevicePath=%s\n",
+    DEBUG ((DEBUG_VERBOSE, "%a: Address=%02x:%02x.%x DevicePath=%s\n",
       __FUNCTION__, Address->Bus, Address->Device, Address->Function,
       (DevicePathString == NULL) ? L"<unavailable>" : DevicePathString));
 

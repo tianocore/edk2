@@ -93,7 +93,7 @@ VirtioMmioInit (
     // The ARM Base and Foundation Models do not report a valid VirtIo VendorId.
     // They return a value of 0x0 for the VendorId.
     //
-    DEBUG((EFI_D_WARN, "VirtioMmioInit: Warning: The VendorId (0x%X) does not "
+    DEBUG((DEBUG_WARN, "VirtioMmioInit: Warning: The VendorId (0x%X) does not "
                        "match the VirtIo VendorId (0x%X).\n",
                        VendorId, VIRTIO_VENDOR_ID));
   }

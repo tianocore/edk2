@@ -362,7 +362,7 @@ MiscInitialization (
       AcpiEnBit  = ICH9_ACPI_CNTL_ACPI_EN;
       break;
     default:
-      DEBUG ((EFI_D_ERROR, "%a: Unknown Host Bridge Device ID: 0x%04x\n",
+      DEBUG ((DEBUG_ERROR, "%a: Unknown Host Bridge Device ID: 0x%04x\n",
         __FUNCTION__, mHostBridgeDevId));
       ASSERT (FALSE);
       return;
@@ -448,7 +448,7 @@ ReserveEmuVariableNvStore (
       AllocateRuntimePages (
         EFI_SIZE_TO_PAGES (2 * PcdGet32 (PcdFlashNvStorageFtwSpareSize))
         );
-  DEBUG ((EFI_D_INFO,
+  DEBUG ((DEBUG_INFO,
           "Reserved variable store memory: 0x%lX; size: %dkb\n",
           VariableStore,
           (2 * PcdGet32 (PcdFlashNvStorageFtwSpareSize)) / 1024
@@ -465,15 +465,15 @@ DebugDumpCmos (
 {
   UINT32 Loop;
 
-  DEBUG ((EFI_D_INFO, "CMOS:\n"));
+  DEBUG ((DEBUG_INFO, "CMOS:\n"));
 
   for (Loop = 0; Loop < 0x80; Loop++) {
     if ((Loop % 0x10) == 0) {
-      DEBUG ((EFI_D_INFO, "%02x:", Loop));
+      DEBUG ((DEBUG_INFO, "%02x:", Loop));
     }
-    DEBUG ((EFI_D_INFO, " %02x", CmosRead8 (Loop)));
+    DEBUG ((DEBUG_INFO, " %02x", CmosRead8 (Loop)));
     if ((Loop % 0x10) == 0xf) {
-      DEBUG ((EFI_D_INFO, "\n"));
+      DEBUG ((DEBUG_INFO, "\n"));
     }
   }
 }
@@ -486,12 +486,12 @@ S3Verification (
 {
 #if defined (MDE_CPU_X64)
   if (FeaturePcdGet (PcdSmmSmramRequire) && mS3Supported) {
-    DEBUG ((EFI_D_ERROR,
+    DEBUG ((DEBUG_ERROR,
       "%a: S3Resume2Pei doesn't support X64 PEI + SMM yet.\n", __FUNCTION__));
-    DEBUG ((EFI_D_ERROR,
+    DEBUG ((DEBUG_ERROR,
       "%a: Please disable S3 on the QEMU command line (see the README),\n",
       __FUNCTION__));
-    DEBUG ((EFI_D_ERROR,
+    DEBUG ((DEBUG_ERROR,
       "%a: or build OVMF with \"OvmfPkgIa32X64.dsc\".\n", __FUNCTION__));
     ASSERT (FALSE);
     CpuDeadLoop ();
@@ -706,7 +706,7 @@ InitializePlatform (
   XenDetect ();
 
   if (QemuFwCfgS3Enabled ()) {
-    DEBUG ((EFI_D_INFO, "S3 support was detected on QEMU\n"));
+    DEBUG ((DEBUG_INFO, "S3 support was detected on QEMU\n"));
     mS3Supported = TRUE;
     Status = PcdSetBoolS (PcdAcpiS3Enable, TRUE);
     ASSERT_EFI_ERROR (Status);
@@ -736,7 +736,7 @@ InitializePlatform (
   InitializeRamRegions ();
 
   if (mXen) {
-    DEBUG ((EFI_D_INFO, "Xen was detected\n"));
+    DEBUG ((DEBUG_INFO, "Xen was detected\n"));
     InitializeXen ();
   }
 

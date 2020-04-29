@@ -175,7 +175,7 @@ XenIoPciDeviceBindingStart (
   ASSERT (BarDesc->ResType == ACPI_ADDRESS_SPACE_TYPE_MEM);
 
   /* Get a Memory address for mapping the Grant Table. */
-  DEBUG ((EFI_D_INFO, "XenIoPci: BAR at %LX\n", BarDesc->AddrRangeMin));
+  DEBUG ((DEBUG_INFO, "XenIoPci: BAR at %LX\n", BarDesc->AddrRangeMin));
   XenIo->GrantTableAddress = BarDesc->AddrRangeMin;
   FreePool (BarDesc);
 

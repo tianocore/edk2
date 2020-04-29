@@ -114,7 +114,7 @@ InstallVbeShim (
     //
     Handler = (Int0x10->Segment << 4) + Int0x10->Offset;
     if (Handler >= SegmentC && Handler < SegmentF) {
-      DEBUG ((EFI_D_INFO, "%a: Video BIOS handler found at %04x:%04x\n",
+      DEBUG ((DEBUG_INFO, "%a: Video BIOS handler found at %04x:%04x\n",
         __FUNCTION__, Int0x10->Segment, Int0x10->Offset));
       return;
     }
@@ -312,5 +312,5 @@ InstallVbeShim (
   Int0x10->Segment = (UINT16) ((UINT32)SegmentC >> 4);
   Int0x10->Offset  = (UINT16) ((UINTN) (VbeModeInfo + 1) - SegmentC);
 
-  DEBUG ((EFI_D_INFO, "%a: VBE shim installed\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a: VBE shim installed\n", __FUNCTION__));
 }

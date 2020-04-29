@@ -309,7 +309,7 @@ GetSelectedVgaDeviceInfo (
       if (!IS_PCI_VGA (&Pci)) {
         continue;
       }
-      DEBUG ((EFI_D_INFO,
+      DEBUG ((DEBUG_INFO,
         "PCI VGA: 0x%04x:0x%04x\n",
         Pci.Hdr.VendorId,
         Pci.Hdr.DeviceId

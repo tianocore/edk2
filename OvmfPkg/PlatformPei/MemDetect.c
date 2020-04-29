@@ -408,7 +408,7 @@ GetFirstNonAddress (
 
   if (Pci64Size == 0) {
     if (mBootMode != BOOT_ON_S3_RESUME) {
-      DEBUG ((EFI_D_INFO, "%a: disabling 64-bit PCI host aperture\n",
+      DEBUG ((DEBUG_INFO, "%a: disabling 64-bit PCI host aperture\n",
         __FUNCTION__));
       PcdStatus = PcdSet64S (PcdPciMmio64Size, 0);
       ASSERT_RETURN_ERROR (PcdStatus);
@@ -466,7 +466,7 @@ GetFirstNonAddress (
     PcdStatus = PcdSet64S (PcdPciMmio64Size, Pci64Size);
     ASSERT_RETURN_ERROR (PcdStatus);
 
-    DEBUG ((EFI_D_INFO, "%a: Pci64Base=0x%Lx Pci64Size=0x%Lx\n",
+    DEBUG ((DEBUG_INFO, "%a: Pci64Base=0x%Lx Pci64Size=0x%Lx\n",
       __FUNCTION__, Pci64Base, Pci64Size));
   }
 
@@ -626,7 +626,7 @@ PublishPeiMemory (
     MemorySize = mS3AcpiReservedMemorySize;
   } else {
     PeiMemoryCap = GetPeiMemoryCap ();
-    DEBUG ((EFI_D_INFO, "%a: mPhysMemAddressWidth=%d PeiMemoryCap=%u KB\n",
+    DEBUG ((DEBUG_INFO, "%a: mPhysMemAddressWidth=%d PeiMemoryCap=%u KB\n",
       __FUNCTION__, mPhysMemAddressWidth, PeiMemoryCap >> 10));
 
     //
@@ -705,7 +705,7 @@ QemuInitializeRam (
   MTRR_SETTINGS               MtrrSettings;
   EFI_STATUS                  Status;
 
-  DEBUG ((EFI_D_INFO, "%a called\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a called\n", __FUNCTION__));
 
   //
   // Determine total memory size available
