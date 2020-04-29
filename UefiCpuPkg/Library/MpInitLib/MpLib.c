@@ -686,18 +686,31 @@ ApWakeupFunction (
         WAKEUP_AP_SIGNAL,
         0
         );
-      if (CpuMpData->ApLoopMode == ApInHltLoop) {
+
+      if (CpuMpData->InitFlag == ApInitReconfig) {
         //
-        // Restore AP's volatile registers saved
+        // ApInitReconfig happens when:
+        // 1. AP is re-enabled after it's disabled, in either PEI or DXE phase.
+        // 2. AP is initialized in DXE phase.
+        // In either case, use the volatile registers value derived from BSP.
+        // NOTE: IDTR.BASE stored in CpuMpData->CpuData[0].VolatileRegisters points to a
+        //   different IDT shared by all APs.
         //
-        RestoreVolatileRegisters (&CpuMpData->CpuData[ProcessorNumber].VolatileRegisters, TRUE);
-      } else {
-        //
-        // The CPU driver might not flush TLB for APs on spot after updating
-        // page attributes. AP in mwait loop mode needs to take care of it when
-        // woken up.
-        //
-        CpuFlushTlb ();
+        RestoreVolatileRegisters (&CpuMpData->CpuData[0].VolatileRegisters, FALSE);
+      }  else {
+        if (CpuMpData->ApLoopMode == ApInHltLoop) {
+          //
+          // Restore AP's volatile registers saved before AP is halted
+          //
+          RestoreVolatileRegisters (&CpuMpData->CpuData[ProcessorNumber].VolatileRegisters, TRUE);
+        } else {
+          //
+          // The CPU driver might not flush TLB for APs on spot after updating
+          // page attributes. AP in mwait loop mode needs to take care of it when
+          // woken up.
+          //
+          CpuFlushTlb ();
+        }
       }
 
       if (GetApState (&CpuMpData->CpuData[ProcessorNumber]) == CpuStateReady) {
@@ -1780,7 +1793,6 @@ MpInitLibInitialize (
       InitializeSpinLock(&CpuMpData->CpuData[Index].ApLock);
       CpuMpData->CpuData[Index].CpuHealthy = (CpuInfoInHob[Index].Health == 0)? TRUE:FALSE;
       CpuMpData->CpuData[Index].ApFunction = 0;
-      CopyMem (&CpuMpData->CpuData[Index].VolatileRegisters, &VolatileRegisters, sizeof (CPU_VOLATILE_REGISTERS));
     }
   }
 
