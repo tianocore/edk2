@@ -38,7 +38,7 @@
   gEfiDiskIoProtocolGuid
   gEfiBlockIoProtocolGuid
   gEfiDevicePathProtocolGuid
-  gEfiMmcHostProtocolGuid
+  gEmbeddedMmcHostProtocolGuid
   gEfiDriverDiagnostics2ProtocolGuid
 
 [Depex]
