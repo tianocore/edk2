@@ -36,7 +36,7 @@
 [Protocols]
   gEfiCpuArchProtocolGuid
   gEfiDevicePathProtocolGuid
-  gEfiMmcHostProtocolGuid
+  gEmbeddedMmcHostProtocolGuid
 
 [Pcd]
   gArmPlatformTokenSpaceGuid.PcdPL180SysMciRegAddress
