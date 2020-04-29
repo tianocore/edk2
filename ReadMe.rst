@@ -67,7 +67,7 @@ License Details
 The majority of the content in the EDK II open source project uses a
 `BSD-2-Clause Plus Patent License <License.txt>`__. The EDK II open
 source project contains the following components that are covered by additional
-licenses:
+licenses:fdfd
 
 -  `BaseTools/Source/C/BrotliCompress/brotli <https://github.com/google/brotli/blob/master/LICENSE>`__
 -  `MdeModulePkg/Library/BrotliCustomDecompressLib/brotli <https://github.com/google/brotli/blob/master/LICENSE>`__
