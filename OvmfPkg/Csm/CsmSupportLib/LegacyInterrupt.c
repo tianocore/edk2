@@ -192,7 +192,7 @@ LegacyInterruptInstall (
       mLegacyInterruptDevice = LEGACY_INT_DEV_Q35;
       break;
     default:
-      DEBUG ((EFI_D_ERROR, "%a: Unknown Host Bridge Device ID: 0x%04x\n",
+      DEBUG ((DEBUG_ERROR, "%a: Unknown Host Bridge Device ID: 0x%04x\n",
         __FUNCTION__, HostBridgeDevId));
       ASSERT (FALSE);
       return EFI_UNSUPPORTED;

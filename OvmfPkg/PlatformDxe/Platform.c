@@ -228,7 +228,7 @@ ExtractConfig (
   MAIN_FORM_STATE MainFormState;
   EFI_STATUS      Status;
 
-  DEBUG ((EFI_D_VERBOSE, "%a: Request=\"%s\"\n", __FUNCTION__, Request));
+  DEBUG ((DEBUG_VERBOSE, "%a: Request=\"%s\"\n", __FUNCTION__, Request));
 
   Status = PlatformConfigToFormState (&MainFormState);
   if (EFI_ERROR (Status)) {
@@ -243,10 +243,10 @@ ExtractConfig (
                                 (VOID *) &MainFormState, sizeof MainFormState,
                                 Results, Progress);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "%a: BlockToConfig(): %r, Progress=\"%s\"\n",
+    DEBUG ((DEBUG_ERROR, "%a: BlockToConfig(): %r, Progress=\"%s\"\n",
       __FUNCTION__, Status, (Status == EFI_DEVICE_ERROR) ? NULL : *Progress));
   } else {
-    DEBUG ((EFI_D_VERBOSE, "%a: Results=\"%s\"\n", __FUNCTION__, *Results));
+    DEBUG ((DEBUG_VERBOSE, "%a: Results=\"%s\"\n", __FUNCTION__, *Results));
   }
   return Status;
 }
@@ -321,7 +321,7 @@ RouteConfig (
   UINTN           BlockSize;
   EFI_STATUS      Status;
 
-  DEBUG ((EFI_D_VERBOSE, "%a: Configuration=\"%s\"\n", __FUNCTION__,
+  DEBUG ((DEBUG_VERBOSE, "%a: Configuration=\"%s\"\n", __FUNCTION__,
     Configuration));
 
   //
@@ -343,7 +343,7 @@ RouteConfig (
   Status = gHiiConfigRouting->ConfigToBlock (gHiiConfigRouting, Configuration,
                                 (VOID *) &MainFormState, &BlockSize, Progress);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "%a: ConfigToBlock(): %r, Progress=\"%s\"\n",
+    DEBUG ((DEBUG_ERROR, "%a: ConfigToBlock(): %r, Progress=\"%s\"\n",
       __FUNCTION__, Status,
       (Status == EFI_BUFFER_TOO_SMALL) ? NULL : *Progress));
     return Status;
@@ -372,7 +372,7 @@ Callback (
   OUT    EFI_BROWSER_ACTION_REQUEST             *ActionRequest
   )
 {
-  DEBUG ((EFI_D_VERBOSE, "%a: Action=0x%Lx QuestionId=%d Type=%d\n",
+  DEBUG ((DEBUG_VERBOSE, "%a: Action=0x%Lx QuestionId=%d Type=%d\n",
     __FUNCTION__, (UINT64) Action, QuestionId, Type));
 
   if (Action != EFI_BROWSER_ACTION_CHANGED) {
@@ -661,7 +661,7 @@ ExecutePlatformConfig (
 
   Status = PlatformConfigLoad (&PlatformConfig, &OptionalElements);
   if (EFI_ERROR (Status)) {
-    DEBUG (((Status == EFI_NOT_FOUND) ? EFI_D_VERBOSE : EFI_D_ERROR,
+    DEBUG (((Status == EFI_NOT_FOUND) ? DEBUG_VERBOSE : DEBUG_ERROR,
       "%a: failed to load platform config: %r\n", __FUNCTION__, Status));
     return Status;
   }

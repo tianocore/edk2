@@ -80,7 +80,7 @@ DetectSmbiosVersion (
     SmbiosVersion = (UINT16)(QemuAnchor.V3.MajorVersion << 8 |
                              QemuAnchor.V3.MinorVersion);
 
-    DEBUG ((EFI_D_INFO, "%a: SMBIOS 3.x DocRev from QEMU: 0x%02x\n",
+    DEBUG ((DEBUG_INFO, "%a: SMBIOS 3.x DocRev from QEMU: 0x%02x\n",
       __FUNCTION__, QemuAnchor.V3.DocRev));
     PcdStatus = PcdSet8S (PcdSmbiosDocRev, QemuAnchor.V3.DocRev);
     ASSERT_RETURN_ERROR (PcdStatus);
@@ -90,7 +90,7 @@ DetectSmbiosVersion (
     return RETURN_SUCCESS;
   }
 
-  DEBUG ((EFI_D_INFO, "%a: SMBIOS version from QEMU: 0x%04x\n", __FUNCTION__,
+  DEBUG ((DEBUG_INFO, "%a: SMBIOS version from QEMU: 0x%04x\n", __FUNCTION__,
     SmbiosVersion));
   PcdStatus = PcdSet16S (PcdSmbiosVersion, SmbiosVersion);
   ASSERT_RETURN_ERROR (PcdStatus);

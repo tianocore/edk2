@@ -252,7 +252,7 @@ RemoveStaleFvFileOptions (
       DevicePathString = ConvertDevicePathToText(BootOptions[Index].FilePath,
                            FALSE, FALSE);
       DEBUG ((
-        EFI_ERROR (Status) ? EFI_D_WARN : EFI_D_VERBOSE,
+        EFI_ERROR (Status) ? DEBUG_WARN : DEBUG_VERBOSE,
         "%a: removing stale Boot#%04x %s: %r\n",
         __FUNCTION__,
         (UINT32)BootOptions[Index].OptionNumber,
@@ -356,7 +356,7 @@ PlatformBootManagerBeforeConsole (
   UINT16        FrontPageTimeout;
   RETURN_STATUS PcdStatus;
 
-  DEBUG ((EFI_D_INFO, "PlatformBootManagerBeforeConsole\n"));
+  DEBUG ((DEBUG_INFO, "PlatformBootManagerBeforeConsole\n"));
   InstallDevicePathCallback ();
 
   VisitAllInstancesOfProtocol (&gEfiPciRootBridgeIoProtocolGuid,
@@ -610,7 +610,7 @@ PrepareLpcBridgeDevicePath (
   DevPathStr = ConvertDevicePathToText (DevicePath, FALSE, FALSE);
   if (DevPathStr != NULL) {
     DEBUG((
-      EFI_D_INFO,
+      DEBUG_INFO,
       "BdsPlatform.c+%d: COM%d DevPath: %s\n",
       __LINE__,
       gPnp16550ComPortDeviceNode.UID + 1,
@@ -642,7 +642,7 @@ PrepareLpcBridgeDevicePath (
   DevPathStr = ConvertDevicePathToText (DevicePath, FALSE, FALSE);
   if (DevPathStr != NULL) {
     DEBUG((
-      EFI_D_INFO,
+      DEBUG_INFO,
       "BdsPlatform.c+%d: COM%d DevPath: %s\n",
       __LINE__,
       gPnp16550ComPortDeviceNode.UID + 1,
@@ -966,7 +966,7 @@ DetectAndPreparePlatformPciDevicePath (
     // Add IsaKeyboard to ConIn,
     // add IsaSerial to ConOut, ConIn, ErrOut
     //
-    DEBUG ((EFI_D_INFO, "Found LPC Bridge device\n"));
+    DEBUG ((DEBUG_INFO, "Found LPC Bridge device\n"));
     PrepareLpcBridgeDevicePath (Handle);
     return EFI_SUCCESS;
   }
@@ -977,7 +977,7 @@ DetectAndPreparePlatformPciDevicePath (
     //
     // Add them to ConOut, ConIn, ErrOut.
     //
-    DEBUG ((EFI_D_INFO, "Found PCI 16550 SERIAL device\n"));
+    DEBUG ((DEBUG_INFO, "Found PCI 16550 SERIAL device\n"));
     PreparePciSerialDevicePath (Handle);
     return EFI_SUCCESS;
   }
@@ -989,7 +989,7 @@ DetectAndPreparePlatformPciDevicePath (
     //
     // Add them to ConOut.
     //
-    DEBUG ((EFI_D_INFO, "Found PCI display device\n"));
+    DEBUG ((DEBUG_INFO, "Found PCI display device\n"));
     PreparePciDisplayDevicePath (Handle);
     return EFI_SUCCESS;
   }
@@ -1118,7 +1118,7 @@ SetPciIntLine (
     }
     if (RootBusNumber == 0 && RootSlot == 0) {
       DEBUG((
-        EFI_D_ERROR,
+        DEBUG_ERROR,
         "%a: PCI host bridge (00:00.0) should have no interrupts!\n",
         __FUNCTION__
         ));
@@ -1169,7 +1169,7 @@ SetPciIntLine (
       Status = PciIo->GetLocation (PciIo, &Segment, &Bus, &Device, &Function);
       ASSERT_EFI_ERROR (Status);
 
-      DEBUG ((EFI_D_VERBOSE, "%a: [%02x:%02x.%x] %s -> 0x%02x\n", __FUNCTION__,
+      DEBUG ((DEBUG_VERBOSE, "%a: [%02x:%02x.%x] %s -> 0x%02x\n", __FUNCTION__,
         (UINT32)Bus, (UINT32)Device, (UINT32)Function, DevPathString,
         IrqLine));
 
@@ -1237,7 +1237,7 @@ PciAcpiInitialization (
         //
         return;
       }
-      DEBUG ((EFI_D_ERROR, "%a: Unknown Host Bridge Device ID: 0x%04x\n",
+      DEBUG ((DEBUG_ERROR, "%a: Unknown Host Bridge Device ID: 0x%04x\n",
         __FUNCTION__, mHostBridgeDevId));
       ASSERT (FALSE);
       return;
@@ -1287,7 +1287,7 @@ ConnectRecursivelyIfPciMassStorage (
     DevPathStr = ConvertDevicePathToText (DevicePath, FALSE, FALSE);
     if (DevPathStr != NULL) {
       DEBUG((
-        EFI_D_INFO,
+        DEBUG_INFO,
         "Found %s device: %s\n",
         (IS_CLASS1 (PciHeader, PCI_CLASS_MASS_STORAGE) ?
          L"Mass Storage" :
@@ -1324,7 +1324,7 @@ EmuVariablesUpdatedCallback (
   IN  VOID      *Context
   )
 {
-  DEBUG ((EFI_D_INFO, "EmuVariablesUpdatedCallback\n"));
+  DEBUG ((DEBUG_INFO, "EmuVariablesUpdatedCallback\n"));
   UpdateNvVarsOnFileSystem ();
 }
 
@@ -1393,7 +1393,7 @@ PlatformBdsConnectSequence (
   UINTN         Index;
   RETURN_STATUS Status;
 
-  DEBUG ((EFI_D_INFO, "PlatformBdsConnectSequence\n"));
+  DEBUG ((DEBUG_INFO, "PlatformBdsConnectSequence\n"));
 
   Index = 0;
 
@@ -1473,10 +1473,10 @@ PlatformBootManagerAfterConsole (
 {
   EFI_BOOT_MODE                      BootMode;
 
-  DEBUG ((EFI_D_INFO, "PlatformBootManagerAfterConsole\n"));
+  DEBUG ((DEBUG_INFO, "PlatformBootManagerAfterConsole\n"));
 
   if (PcdGetBool (PcdOvmfFlashVariablesEnable)) {
-    DEBUG ((EFI_D_INFO, "PlatformBdsPolicyBehavior: not restoring NvVars "
+    DEBUG ((DEBUG_INFO, "PlatformBdsPolicyBehavior: not restoring NvVars "
       "from disk since flash variables appear to be supported.\n"));
   } else {
     //
@@ -1629,7 +1629,7 @@ InstallDevicePathCallback (
   VOID
   )
 {
-  DEBUG ((EFI_D_INFO, "Registered NotifyDevPath Event\n"));
+  DEBUG ((DEBUG_INFO, "Registered NotifyDevPath Event\n"));
   mEfiDevPathEvent = EfiCreateProtocolNotifyEvent (
                           &gEfiDevicePathProtocolGuid,
                           TPL_CALLBACK,

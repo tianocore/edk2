@@ -651,7 +651,7 @@ VirtioGpuDriverBindingStart (
       //
       // No child handle should be produced; we're done.
       //
-      DEBUG ((EFI_D_INFO, "%a: bound VirtIo=%p without producing GOP\n",
+      DEBUG ((DEBUG_INFO, "%a: bound VirtIo=%p without producing GOP\n",
         __FUNCTION__, (VOID *)VgpuDev->VirtIo));
       return EFI_SUCCESS;
     }
@@ -674,7 +674,7 @@ VirtioGpuDriverBindingStart (
   //
   // We're done.
   //
-  DEBUG ((EFI_D_INFO, "%a: produced GOP %a VirtIo=%p\n", __FUNCTION__,
+  DEBUG ((DEBUG_INFO, "%a: produced GOP %a VirtIo=%p\n", __FUNCTION__,
     VirtIoBoundJustNow ? "while binding" : "for pre-bound",
     (VOID *)VgpuDev->VirtIo));
   return EFI_SUCCESS;
@@ -756,7 +756,7 @@ VirtioGpuDriverBindingStop (
       break;
     }
 
-    DEBUG ((EFI_D_INFO, "%a: unbinding GOP-less VirtIo=%p\n", __FUNCTION__,
+    DEBUG ((DEBUG_INFO, "%a: unbinding GOP-less VirtIo=%p\n", __FUNCTION__,
       (VOID *)VgpuDev->VirtIo));
 
     Status = gBS->UninstallProtocolInterface (ControllerHandle,
@@ -797,7 +797,7 @@ VirtioGpuDriverBindingStop (
                         VgpuDev->Child->GopHandle,
                         &gVirtioDeviceProtocolGuid));
 
-    DEBUG ((EFI_D_INFO, "%a: destroying GOP under VirtIo=%p\n", __FUNCTION__,
+    DEBUG ((DEBUG_INFO, "%a: destroying GOP under VirtIo=%p\n", __FUNCTION__,
       (VOID *)VgpuDev->VirtIo));
     UninitVgpuGop (VgpuDev, ControllerHandle, This->DriverBindingHandle);
     break;

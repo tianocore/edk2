@@ -63,7 +63,7 @@ OnMpServicesAvailable (
   EFI_PEI_MP_SERVICES_PPI *MpServices;
   EFI_STATUS              Status;
 
-  DEBUG ((EFI_D_VERBOSE, "%a: %a\n", gEfiCallerBaseName, __FUNCTION__));
+  DEBUG ((DEBUG_VERBOSE, "%a: %a\n", gEfiCallerBaseName, __FUNCTION__));
 
   //
   // Write the MSR on all the APs in parallel.
@@ -78,7 +78,7 @@ OnMpServicesAvailable (
                          NULL                 // ProcedureArgument
                          );
   if (EFI_ERROR (Status) && Status != EFI_NOT_STARTED) {
-    DEBUG ((EFI_D_ERROR, "%a: StartupAllAps(): %r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a: StartupAllAps(): %r\n", __FUNCTION__, Status));
     return Status;
   }
 
@@ -122,7 +122,7 @@ InstallFeatureControlCallback (
 
   Status = PeiServicesNotifyPpi (&mMpServicesNotify);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "%a: failed to set up MP Services callback: %r\n",
+    DEBUG ((DEBUG_ERROR, "%a: failed to set up MP Services callback: %r\n",
       __FUNCTION__, Status));
   }
 }
