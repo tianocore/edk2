@@ -28,7 +28,7 @@ PeiFvInitialization (
 {
   BOOLEAN SecureS3Needed;
 
-  DEBUG ((EFI_D_INFO, "Platform PEI Firmware Volume Initialization\n"));
+  DEBUG ((DEBUG_INFO, "Platform PEI Firmware Volume Initialization\n"));
 
   //
   // Create a memory allocation HOB for the PEI FV.

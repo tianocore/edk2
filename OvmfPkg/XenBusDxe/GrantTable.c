@@ -107,7 +107,7 @@ XenGrantTableEndAccess (
   OldFlags = GrantTable[Ref].flags;
   do {
     if ((Flags = OldFlags) & (GTF_reading | GTF_writing)) {
-      DEBUG ((EFI_D_WARN, "WARNING: g.e. still in use! (%x)\n", Flags));
+      DEBUG ((DEBUG_WARN, "WARNING: g.e. still in use! (%x)\n", Flags));
       return EFI_NOT_READY;
     }
     OldFlags = InterlockedCompareExchange16 (&GrantTable[Ref].flags, Flags, 0);
@@ -142,7 +142,7 @@ XenGrantTableInit (
     Parameters.gpfn = (xen_pfn_t) ((UINTN) GrantTable >> EFI_PAGE_SHIFT) + Index;
     ReturnCode = XenHypercallMemoryOp (XENMEM_add_to_physmap, &Parameters);
     if (ReturnCode != 0) {
-      DEBUG ((EFI_D_ERROR,
+      DEBUG ((DEBUG_ERROR,
         "Xen GrantTable, add_to_physmap hypercall error: %Ld\n",
         (INT64)ReturnCode));
     }
@@ -164,11 +164,11 @@ XenGrantTableDeinit (
   for (Index = NR_GRANT_FRAMES - 1; Index >= 0; Index--) {
     Parameters.domid = DOMID_SELF;
     Parameters.gpfn = (xen_pfn_t) ((UINTN) GrantTable >> EFI_PAGE_SHIFT) + Index;
-    DEBUG ((EFI_D_INFO, "Xen GrantTable, removing %Lx\n",
+    DEBUG ((DEBUG_INFO, "Xen GrantTable, removing %Lx\n",
       (UINT64)Parameters.gpfn));
     ReturnCode = XenHypercallMemoryOp (XENMEM_remove_from_physmap, &Parameters);
     if (ReturnCode != 0) {
-      DEBUG ((EFI_D_ERROR,
+      DEBUG ((DEBUG_ERROR,
         "Xen GrantTable, remove_from_physmap hypercall error: %Ld\n",
         (INT64)ReturnCode));
     }

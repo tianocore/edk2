@@ -211,7 +211,7 @@ IterateVariablesInBuffer (
   //
   if (TotalSizeUsed != MaxSize) {
     DEBUG ((
-      EFI_D_ERROR,
+      DEBUG_ERROR,
       "Deserialize variables error: TotalSizeUsed(%Lu) != MaxSize(%Lu)\n",
       (UINT64)TotalSizeUsed,
       (UINT64)MaxSize

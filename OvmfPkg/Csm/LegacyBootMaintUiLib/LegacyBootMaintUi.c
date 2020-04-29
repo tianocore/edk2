@@ -808,7 +808,7 @@ UpdateLegacyDeviceOrderPage (
     break;
 
   default:
-    DEBUG ((EFI_D_ERROR, "Invalid command ID for updating page!\n"));
+    DEBUG ((DEBUG_ERROR, "Invalid command ID for updating page!\n"));
     return;
   }
 

@@ -59,14 +59,14 @@ QemuFwCfgInitialize (
 
   QemuFwCfgSelectItem (QemuFwCfgItemSignature);
   Signature = QemuFwCfgRead32 ();
-  DEBUG ((EFI_D_INFO, "FW CFG Signature: 0x%x\n", Signature));
+  DEBUG ((DEBUG_INFO, "FW CFG Signature: 0x%x\n", Signature));
   QemuFwCfgSelectItem (QemuFwCfgItemInterfaceVersion);
   Revision = QemuFwCfgRead32 ();
-  DEBUG ((EFI_D_INFO, "FW CFG Revision: 0x%x\n", Revision));
+  DEBUG ((DEBUG_INFO, "FW CFG Revision: 0x%x\n", Revision));
   if ((Signature != SIGNATURE_32 ('Q', 'E', 'M', 'U')) ||
       (Revision < 1)
      ) {
-    DEBUG ((EFI_D_INFO, "QemuFwCfg interface not supported.\n"));
+    DEBUG ((DEBUG_INFO, "QemuFwCfg interface not supported.\n"));
     mQemuFwCfgSupported = FALSE;
     return RETURN_SUCCESS;
   }

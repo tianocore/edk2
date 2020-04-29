@@ -216,7 +216,7 @@ CreateExtraRootBusMap (
     ASSERT (Entry != NULL);
     Acpi = OrderedCollectionUserStruct (Entry);
     Map->BusNumbers[Idx] = Acpi->UID;
-    DEBUG ((EFI_D_VERBOSE,
+    DEBUG ((DEBUG_VERBOSE,
       "%a: extra bus position 0x%Lx maps to bus number (UID) 0x%x\n",
       __FUNCTION__, (UINT64)(Idx + 1), Acpi->UID));
     ++Idx;

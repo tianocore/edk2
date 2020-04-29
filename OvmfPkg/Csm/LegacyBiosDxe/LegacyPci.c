@@ -374,7 +374,7 @@ GetPciLegacyRom (
           }
         }
       } else {
-        DEBUG ((EFI_D_ERROR, "GetPciLegacyRom - OpRom not match (%04x-%04x)\n", (UINTN)VendorId, (UINTN)DeviceId));
+        DEBUG ((DEBUG_ERROR, "GetPciLegacyRom - OpRom not match (%04x-%04x)\n", (UINTN)VendorId, (UINTN)DeviceId));
       }
     }
 
@@ -752,7 +752,7 @@ Rotate (B,C,D,A) by 1 giving C,D,A,B. Translated PIRQ is C.
   // In case we fail to find the Bridge just above us, this is some potential error and we want to warn the user
   //
   if(BridgeIndex >= NumberOfBridges){
-    DEBUG ((EFI_D_ERROR, "Cannot Find IRQ Routing for Bus %d, Device %d, Function %d\n", *PciBus, *PciDevice, *PciFunction));
+    DEBUG ((DEBUG_ERROR, "Cannot Find IRQ Routing for Bus %d, Device %d, Function %d\n", *PciBus, *PciDevice, *PciFunction));
   }
 
   *PirqIndex    = LocalPirqIndex;
@@ -823,9 +823,9 @@ CopyPirqTable (
 
     Private->Legacy16Table->IrqRoutingTablePointer = (UINT32) (Regs.X.DS * 16 + Regs.X.BX);
     if (Regs.X.AX != 0) {
-      DEBUG ((EFI_D_ERROR, "PIRQ table length insufficient - %x\n", PirqTableSize));
+      DEBUG ((DEBUG_ERROR, "PIRQ table length insufficient - %x\n", PirqTableSize));
     } else {
-      DEBUG ((EFI_D_INFO, "PIRQ table in legacy region - %x\n", Private->Legacy16Table->IrqRoutingTablePointer));
+      DEBUG ((DEBUG_INFO, "PIRQ table in legacy region - %x\n", Private->Legacy16Table->IrqRoutingTablePointer));
       Private->Legacy16Table->IrqRoutingTableLength = (UINT32)PirqTableSize;
       CopyMem (
         (VOID *) (UINTN)Private->Legacy16Table->IrqRoutingTablePointer,
@@ -858,24 +858,24 @@ DumpPciHandle (
   IN EFI_LEGACY_INSTALL_PCI_HANDLER  *PciHandle
   )
 {
-  DEBUG ((EFI_D_INFO, "PciBus             - %02x\n", (UINTN)PciHandle->PciBus));
-  DEBUG ((EFI_D_INFO, "PciDeviceFun       - %02x\n", (UINTN)PciHandle->PciDeviceFun));
-  DEBUG ((EFI_D_INFO, "PciSegment         - %02x\n", (UINTN)PciHandle->PciSegment));
-  DEBUG ((EFI_D_INFO, "PciClass           - %02x\n", (UINTN)PciHandle->PciClass));
-  DEBUG ((EFI_D_INFO, "PciSubclass        - %02x\n", (UINTN)PciHandle->PciSubclass));
-  DEBUG ((EFI_D_INFO, "PciInterface       - %02x\n", (UINTN)PciHandle->PciInterface));
+  DEBUG ((DEBUG_INFO, "PciBus             - %02x\n", (UINTN)PciHandle->PciBus));
+  DEBUG ((DEBUG_INFO, "PciDeviceFun       - %02x\n", (UINTN)PciHandle->PciDeviceFun));
+  DEBUG ((DEBUG_INFO, "PciSegment         - %02x\n", (UINTN)PciHandle->PciSegment));
+  DEBUG ((DEBUG_INFO, "PciClass           - %02x\n", (UINTN)PciHandle->PciClass));
+  DEBUG ((DEBUG_INFO, "PciSubclass        - %02x\n", (UINTN)PciHandle->PciSubclass));
+  DEBUG ((DEBUG_INFO, "PciInterface       - %02x\n", (UINTN)PciHandle->PciInterface));
 
-  DEBUG ((EFI_D_INFO, "PrimaryIrq         - %02x\n", (UINTN)PciHandle->PrimaryIrq));
-  DEBUG ((EFI_D_INFO, "PrimaryReserved    - %02x\n", (UINTN)PciHandle->PrimaryReserved));
-  DEBUG ((EFI_D_INFO, "PrimaryControl     - %04x\n", (UINTN)PciHandle->PrimaryControl));
-  DEBUG ((EFI_D_INFO, "PrimaryBase        - %04x\n", (UINTN)PciHandle->PrimaryBase));
-  DEBUG ((EFI_D_INFO, "PrimaryBusMaster   - %04x\n", (UINTN)PciHandle->PrimaryBusMaster));
+  DEBUG ((DEBUG_INFO, "PrimaryIrq         - %02x\n", (UINTN)PciHandle->PrimaryIrq));
+  DEBUG ((DEBUG_INFO, "PrimaryReserved    - %02x\n", (UINTN)PciHandle->PrimaryReserved));
+  DEBUG ((DEBUG_INFO, "PrimaryControl     - %04x\n", (UINTN)PciHandle->PrimaryControl));
+  DEBUG ((DEBUG_INFO, "PrimaryBase        - %04x\n", (UINTN)PciHandle->PrimaryBase));
+  DEBUG ((DEBUG_INFO, "PrimaryBusMaster   - %04x\n", (UINTN)PciHandle->PrimaryBusMaster));
 
-  DEBUG ((EFI_D_INFO, "SecondaryIrq       - %02x\n", (UINTN)PciHandle->SecondaryIrq));
-  DEBUG ((EFI_D_INFO, "SecondaryReserved  - %02x\n", (UINTN)PciHandle->SecondaryReserved));
-  DEBUG ((EFI_D_INFO, "SecondaryControl   - %04x\n", (UINTN)PciHandle->SecondaryControl));
-  DEBUG ((EFI_D_INFO, "SecondaryBase      - %04x\n", (UINTN)PciHandle->SecondaryBase));
-  DEBUG ((EFI_D_INFO, "SecondaryBusMaster - %04x\n", (UINTN)PciHandle->SecondaryBusMaster));
+  DEBUG ((DEBUG_INFO, "SecondaryIrq       - %02x\n", (UINTN)PciHandle->SecondaryIrq));
+  DEBUG ((DEBUG_INFO, "SecondaryReserved  - %02x\n", (UINTN)PciHandle->SecondaryReserved));
+  DEBUG ((DEBUG_INFO, "SecondaryControl   - %04x\n", (UINTN)PciHandle->SecondaryControl));
+  DEBUG ((DEBUG_INFO, "SecondaryBase      - %04x\n", (UINTN)PciHandle->SecondaryBase));
+  DEBUG ((DEBUG_INFO, "SecondaryBusMaster - %04x\n", (UINTN)PciHandle->SecondaryBusMaster));
   return;
 }
 
@@ -1254,7 +1254,7 @@ PciProgramAllInterruptLineRegisters (
       // If it does return failure status, check your PIRQ routing table to see if some item is missing or incorrect
       //
       if (EFI_ERROR (Status)) {
-        DEBUG ((EFI_D_ERROR, "Translate Pirq Failed - Status = %r\n ", Status));
+        DEBUG ((DEBUG_ERROR, "Translate Pirq Failed - Status = %r\n ", Status));
         continue;
       }
 
@@ -2110,7 +2110,7 @@ LegacyBiosInstallVgaRom (
         // This should be video thunk driver which is managing video device
         // So it need not start again
         //
-        DEBUG ((EFI_D_INFO, "Video thunk driver already start! Return!\n"));
+        DEBUG ((DEBUG_INFO, "Video thunk driver already start! Return!\n"));
         Private->VgaInstalled = TRUE;
         return EFI_SUCCESS;
       }
@@ -2321,7 +2321,7 @@ LegacyBiosInstallRom (
                     );
 
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "return LegacyBiosInstallRom(%d): EFI_OUT_OF_RESOURCES (no more space for OpROM)\n", __LINE__));
+      DEBUG ((DEBUG_ERROR, "return LegacyBiosInstallRom(%d): EFI_OUT_OF_RESOURCES (no more space for OpROM)\n", __LINE__));
       //
       // Report Status Code to indicate that there is no enough space for OpROM
       //
@@ -2337,7 +2337,7 @@ LegacyBiosInstallRom (
     //
     RuntimeAddress = Private->OptionRom;
     if (RuntimeAddress + *RuntimeImageLength > MaxRomAddr) {
-      DEBUG ((EFI_D_ERROR, "return LegacyBiosInstallRom(%d): EFI_OUT_OF_RESOURCES (no more space for OpROM)\n", __LINE__));
+      DEBUG ((DEBUG_ERROR, "return LegacyBiosInstallRom(%d): EFI_OUT_OF_RESOURCES (no more space for OpROM)\n", __LINE__));
       gBS->FreePages (PhysicalAddress, EFI_SIZE_TO_PAGES (ImageSize));
       //
       // Report Status Code to indicate that there is no enough space for OpROM
@@ -2355,7 +2355,7 @@ LegacyBiosInstallRom (
     //
     InitAddress    = PCI_START_ADDRESS (Private->OptionRom);
     if (InitAddress + ImageSize > MaxRomAddr) {
-      DEBUG ((EFI_D_ERROR, "return LegacyBiosInstallRom(%d): EFI_OUT_OF_RESOURCES (no more space for OpROM)\n", __LINE__));
+      DEBUG ((DEBUG_ERROR, "return LegacyBiosInstallRom(%d): EFI_OUT_OF_RESOURCES (no more space for OpROM)\n", __LINE__));
       //
       // Report Status Code to indicate that there is no enough space for OpROM
       //
@@ -2383,7 +2383,7 @@ LegacyBiosInstallRom (
                            &Granularity
                            );
 
-  DEBUG ((EFI_D_INFO, " Shadowing OpROM init/runtime/isize = %x/%x/%x\n", InitAddress, RuntimeAddress, ImageSize));
+  DEBUG ((DEBUG_INFO, " Shadowing OpROM init/runtime/isize = %x/%x/%x\n", InitAddress, RuntimeAddress, ImageSize));
 
   CopyMem ((VOID *) InitAddress, RomImage, ImageSize);
 
@@ -2501,7 +2501,7 @@ LegacyBiosInstallRom (
              &Device,
              &Function
              );
-    DEBUG ((EFI_D_INFO, "Shadowing OpROM on the PCI device %x/%x/%x\n", Bus, Device, Function));
+    DEBUG ((DEBUG_INFO, "Shadowing OpROM on the PCI device %x/%x/%x\n", Bus, Device, Function));
   }
 
   mIgnoreBbsUpdateFlag  = FALSE;
@@ -2526,7 +2526,7 @@ LegacyBiosInstallRom (
   // Otherwise, it may cause the system to hang in some cases
   //
   if (!EFI_ERROR (PciEnableStatus)) {
-    DEBUG ((EFI_D_INFO, " Legacy16DispatchOprom - %02x/%02x/%02x\n", Bus, Device, Function));
+    DEBUG ((DEBUG_INFO, " Legacy16DispatchOprom - %02x/%02x/%02x\n", Bus, Device, Function));
     Private->LegacyBios.FarCall86 (
       &Private->LegacyBios,
       Private->Legacy16CallSegment,
@@ -2594,7 +2594,7 @@ LegacyBiosInstallRom (
     *RuntimeImageLength = ((EFI_LEGACY_EXPANSION_ROM_HEADER *) RuntimeAddress)->Size512 * 512;
   }
 
-  DEBUG ((EFI_D_INFO, " fsize = %x\n", *RuntimeImageLength));
+  DEBUG ((DEBUG_INFO, " fsize = %x\n", *RuntimeImageLength));
 
   //
   // If OpROM runs in 2.0 mode
