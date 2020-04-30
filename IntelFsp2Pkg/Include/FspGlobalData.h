@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2020, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -22,6 +22,7 @@ typedef enum {
   FspMemoryInitApiIndex,
   TempRamExitApiIndex,
   FspSiliconInitApiIndex,
+  FspMultiPhaseSiInitApiIndex,
   FspApiIndexMax
 } FSP_API_INDEX;
 
@@ -52,10 +53,14 @@ typedef struct  {
    VOID               *SiliconInitUpdPtr;
    UINT8              ApiIdx;
    UINT8              FspMode; // 0: FSP in API mode; 1: FSP in DISPATCH mode
-   UINT8              Reserved3[30];
+   UINT8              OnSeparateStack;
+   UINT8              Reserved3;
+   UINT32             NumberOfPhases;
+   UINT32             PhasesExecuted;
+   UINT8              Reserved4[20];
    UINT32             PerfSig;
    UINT16             PerfLen;
-   UINT16             Reserved4;
+   UINT16             Reserved5;
    UINT32             PerfIdx;
    UINT64             PerfData[32];
 } FSP_GLOBAL_DATA;
