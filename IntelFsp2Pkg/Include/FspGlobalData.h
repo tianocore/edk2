@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2020, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -22,6 +22,7 @@ typedef enum {
   FspMemoryInitApiIndex,
   TempRamExitApiIndex,
   FspSiliconInitApiIndex,
+  FspMultiPhaseSiInitApiIndex,
   FspApiIndexMax
 } FSP_API_INDEX;
 
