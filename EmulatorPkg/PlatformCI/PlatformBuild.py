@@ -108,17 +108,11 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
         be detected as dependencies. '''
         build_these_packages = []
         possible_packages = potentialPackagesList.copy()
-        for f in changedFilesList:
-            # BaseTools files that might change the build
-            if "BaseTools" in f:
-                if os.path.splitext(f) not in [".txt", ".md"]:
-                    build_these_packages = possible_packages
-                    break
-            # if the azure pipeline platform template file changed
-            if "platform-build-run-steps.yml" in f:
-                build_these_packages = possible_packages
-                break
-        return build_these_packages
+        build_these_packages = possible_packages
+        logging.getLogger().critical("HELLO FROM PlatformBuild - FilterPackagesToTest")
+        for a in build_these_packages:
+            logging.getLogger().critical("Package is: " + a)
+        return []
 
     def GetPlatformDscAndConfig(self) -> tuple:
         ''' If a platform desires to provide its DSC then Policy 4 will evaluate if
