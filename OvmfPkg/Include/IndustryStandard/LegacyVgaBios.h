@@ -86,6 +86,44 @@ typedef struct {
   UINT32 MaxPixelClockHz;
   UINT8  Reserved[190];
 } VBE_MODE_INFO;
+
+typedef struct {
+  UINT16 ModeAttr;
+  UINT8  WindowAAttr;
+  UINT8  WindowBAttr;
+  UINT16 WindowGranularityKB;
+  UINT16 WindowSizeKB;
+  UINT16 WindowAStartSegment;
+  UINT16 WindowBStartSegment;
+  UINT32 WindowPositioningAddress;
+  UINT16 BytesPerScanLine;
+
+  UINT16 Width;
+  UINT16 Height;
+  UINT8  CharCellWidth;
+  UINT8  CharCellHeight;
+  UINT8  NumPlanes;
+  UINT8  BitsPerPixel;
+  UINT8  NumBanks;
+  UINT8  MemoryModel;
+  UINT8  BankSizeKB;
+  UINT8  NumImagePagesLessOne;
+  UINT8  Vbe3;
+
+  UINT8  RedMaskSize;
+  UINT8  RedMaskPos;
+  UINT8  GreenMaskSize;
+  UINT8  GreenMaskPos;
+  UINT8  BlueMaskSize;
+  UINT8  BlueMaskPos;
+  UINT8  ReservedMaskSize;
+  UINT8  ReservedMaskPos;
+  UINT8  DirectColorModeInfo;
+
+  UINT32 LfbAddress;
+  UINT32 OffScreenAddress;
+  UINT16 OffScreenSizeKB;
+} VBE2_MODE_INFO;
 #pragma pack ()
 
 #endif
