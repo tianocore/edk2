@@ -87,9 +87,6 @@
   gEmbeddedTokenSpaceGuid.PcdPrePiProduceMemoryTypeInformationHob|FALSE|BOOLEAN|0x0000001b
   gEmbeddedTokenSpaceGuid.PcdGdbSerial|FALSE|BOOLEAN|0x00000053
 
-  gEmbeddedTokenSpaceGuid.PcdSataSiI3132FeaturePMPSupport|FALSE|BOOLEAN|0x00000050
-  gEmbeddedTokenSpaceGuid.PcdSataSiI3132FeatureDirectCommandIssuing|FALSE|BOOLEAN|0x00000051
-
 [PcdsFixedAtBuild.common]
   gEmbeddedTokenSpaceGuid.PcdPrePiStackBase|0|UINT32|0x0000000b
   gEmbeddedTokenSpaceGuid.PcdPrePiStackSize|131072|UINT32|0x0000000c
