@@ -1,7 +1,7 @@
 ;; @file
 ;  Provide FSP API entry points.
 ;
-; Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2016 - 2020, Intel Corporation. All rights reserved.<BR>
 ; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;;
 
@@ -60,6 +60,9 @@ exit:
 FspApiCommon2:
   popad
   cmp    eax, 3   ; FspMemoryInit API
+  jz     FspApiCommon3
+
+  cmp    eax, 6   ; FspMultiPhaseSiInitApiIndex API
   jz     FspApiCommon3
 
   call   ASM_PFX(AsmGetFspInfoHeader)

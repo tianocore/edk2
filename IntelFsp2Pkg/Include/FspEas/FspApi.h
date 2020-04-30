@@ -1,14 +1,16 @@
 /** @file
   Intel FSP API definition from Intel Firmware Support Package External
-  Architecture Specification v2.0.
+  Architecture Specification v2.0 - v2.2
 
-  Copyright (c) 2014 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2020, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #ifndef _FSP_API_H_
 #define _FSP_API_H_
+
+#include <Pi/PiStatusCode.h>
 
 ///
 /// FSP Reset Status code
@@ -23,6 +25,65 @@
 #define FSP_STATUS_RESET_REQUIRED_7            0x40000007
 #define FSP_STATUS_RESET_REQUIRED_8            0x40000008
 /// @}
+
+///
+/// FSP Event related definition.
+///
+#define FSP_EVENT_CODE   0xF5000000
+#define FSP_POST_CODE    (FSP_EVENT_CODE | 0x00F80000)
+
+/*
+  FSP may optionally include the capability of generating events messages to aid in the debugging of firmware issues.
+  These events fall under three catagories: Error, Progress, and Debug. The event reporting mechanism follows the
+  status code services described in section 6 and 7 of the PI Specification v1.7 Volume 3.
+
+  @param[in] Type                   Indicates the type of event being reported.
+                                    See MdePkg/Include/Pi/PiStatusCode.h for the definition of EFI_STATUS_CODE_TYPE.
+  @param[in] Value                  Describes the current status of a hardware or software entity.
+                                    This includes information about the class and subclass that is used to classify the entity as well as an operation.
+                                    For progress events, the operation is the current activity. For error events, it is the exception.
+                                    For debug events, it is not defined at this time.
+                                    See MdePkg/Include/Pi/PiStatusCode.h for the definition of EFI_STATUS_CODE_VALUE.
+  @param[in] Instance               The enumeration of a hardware or software entity within the system.
+                                    A system may contain multiple entities that match a class/subclass pairing. The instance differentiates between them.
+                                    An instance of 0 indicates that instance information is unavailable, not meaningful, or not relevant.
+                                    Valid instance numbers start with 1.
+  @param[in] *CallerId              This parameter can be used to identify the sub-module within the FSP generating the event.
+                                    This parameter may be NULL.
+  @param[in] *Data                  This optional parameter may be used to pass additional data. The contents can have event-specific data.
+                                    For example, the FSP provides a EFI_STATUS_CODE_STRING_DATA instance to this parameter when sending debug messages.
+                                    This parameter is NULL when no additional data is provided.
+
+  @retval EFI_SUCCESS               The event was handled successfully.
+  @retval EFI_INVALID_PARAMETER     Input parameters are invalid.
+  @retval EFI_DEVICE_ERROR          The event handler failed.
+*/
+typedef
+EFI_STATUS
+(EFIAPI *FSP_EVENT_HANDLER) (
+  IN          EFI_STATUS_CODE_TYPE   Type,
+  IN          EFI_STATUS_CODE_VALUE  Value,
+  IN          UINT32                 Instance,
+  IN OPTIONAL EFI_GUID               *CallerId,
+  IN OPTIONAL EFI_STATUS_CODE_DATA   *Data
+  );
+
+/*
+  Handler for FSP-T debug log messages, provided by the bootloader.
+
+  @param[in] DebugMessage           A pointer to the debug message to be written to the log.
+  @param[in] MessageLength          Number of bytes to written to the debug log.
+
+  @retval UINT32                    The return value indicates the number of bytes actually written to
+                                    the debug log. If the return value is less than MessageLength,
+                                    an error occurred.
+*/
+typedef
+UINT32
+(EFIAPI *FSP_DEBUG_HANDLER) (
+  IN CHAR8*                 DebugMessage,
+  IN UINT32                 MessageLength
+  );
 
 #pragma pack(1)
 ///
@@ -77,7 +138,12 @@ typedef struct {
   /// Current boot mode.
   ///
   UINT32                      BootMode;
-  UINT8                       Reserved1[8];
+  ///
+  /// Optional event handler for the bootloader to be informed of events occurring during FSP execution.
+  /// This value is only valid if Revision is >= 2.
+  ///
+  FSP_EVENT_HANDLER           *FspEventHandler;
+  UINT8                       Reserved1[4];
 } FSPM_ARCH_UPD;
 
 ///
@@ -146,6 +212,40 @@ typedef struct {
   ///
   FSP_INIT_PHASE     Phase;
 } NOTIFY_PHASE_PARAMS;
+
+///
+/// Action definition for FspMultiPhaseSiInit API
+///
+typedef enum {
+  EnumMultiPhaseGetNumberOfPhases  = 0x0,
+  EnumMultiPhaseExecutePhase       = 0x1
+} FSP_MULTI_PHASE_ACTION;
+
+///
+/// Data structure returned by FSP when bootloader calling
+/// FspMultiPhaseSiInit API with action 0 (EnumMultiPhaseGetNumberOfPhases)
+///
+typedef struct {
+  UINT32                         NumberOfPhases;
+  UINT32                         PhasesExecuted;
+} FSP_MULTI_PHASE_GET_NUMBER_OF_PHASES_PARAMS;
+
+///
+/// FspMultiPhaseSiInit function parameter.
+///
+/// For action 0 (EnumMultiPhaseGetNumberOfPhases):
+///   - PhaseIndex must be 0.
+///   - MultiPhaseParamPtr should point to an instance of FSP_MULTI_PHASE_GET_NUMBER_OF_PHASES_PARAMS.
+///
+/// For action 1 (EnumMultiPhaseExecutePhase):
+///   - PhaseIndex will be the phase that will be executed by FSP.
+///   - MultiPhaseParamPtr shall be NULL.
+///
+typedef struct {
+  IN     FSP_MULTI_PHASE_ACTION  MultiPhaseAction;
+  IN     UINT32                  PhaseIndex;
+  IN OUT VOID                    *MultiPhaseParamPtr;
+} FSP_MULTI_PHASE_PARAMS;
 
 #pragma pack()
 
@@ -278,5 +378,29 @@ EFI_STATUS
 (EFIAPI *FSP_SILICON_INIT) (
   IN  VOID    *FspsUpdDataPtr
   );
+
+/**
+  This FSP API is expected to be called after FspSiliconInit but before FspNotifyPhase.
+  This FSP API provides multi-phase silicon initialization; which brings greater modularity
+  beyond the existing FspSiliconInit() API. Increased modularity is achieved by adding an
+  extra API to FSP-S. This allows the bootloader to add board specific initialization steps
+  throughout the SiliconInit flow as needed.
+
+  @param[in,out] FSP_MULTI_PHASE_PARAMS   For action - EnumMultiPhaseGetNumberOfPhases:
+                                            FSP_MULTI_PHASE_PARAMS->MultiPhaseParamPtr will contain
+                                            how many phases supported by FSP.
+                                          For action - EnumMultiPhaseExecutePhase:
+                                            FSP_MULTI_PHASE_PARAMS->MultiPhaseParamPtr shall be NULL.
+  @retval EFI_SUCCESS                     FSP execution environment was initialized successfully.
+  @retval EFI_INVALID_PARAMETER           Input parameters are invalid.
+  @retval EFI_UNSUPPORTED                 The FSP calling conditions were not met.
+  @retval EFI_DEVICE_ERROR                FSP initialization failed.
+  @retval FSP_STATUS_RESET_REQUIREDx      A reset is required. These status codes will not be returned during S3.
+**/
+typedef
+EFI_STATUS
+(EFIAPI *FSP_MULTI_PHASE_SI_INIT) (
+  IN FSP_MULTI_PHASE_PARAMS     *MultiPhaseSiInitParamPtr
+);
 
 #endif

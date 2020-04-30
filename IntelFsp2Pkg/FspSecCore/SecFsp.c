@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2014 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2020, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -159,6 +159,16 @@ FspGlobalDataInit (
   SetFspUpdDataPointer (FspmUpdDataPtr);
   SetFspMemoryInitUpdDataPointer (FspmUpdDataPtr);
   SetFspSiliconInitUpdDataPointer (NULL);
+
+  //
+  // Initialize OnSeparateStack value.
+  //
+  if (PcdGet8 (PcdFspHeapSizePercentage) != 0) {
+    //
+    // FSP is running on its own stack and may need switching stack when calling bootloader functions.
+    //
+    GetFspGlobalDataPointer ()->OnSeparateStack = 1;
+  }
 
   //
   // Initialize serial port
