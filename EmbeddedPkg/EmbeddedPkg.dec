@@ -141,9 +141,6 @@
   # duplex operation is suspected to be broken in the driver.
   gEmbeddedTokenSpaceGuid.PcdLan9118NegotiationFeatureMask|0xFFFFFEBF|UINT32|0x00000028
 
-  # LAN91x Ethernet Driver PCDs
-  gEmbeddedTokenSpaceGuid.PcdLan91xDxeBaseAddress|0x0|UINT32|0x00000029
-
   #
   # Android FastBoot
   #
