@@ -1,0 +1,30 @@
+## @file
+#  Base ACPI Timer Library Instance for Bhyve.
+#
+#  Copyright (C) 2020, Rebecca Cran <rebecca@bsdio.com>
+#  Copyright (C) 2014, Gabriel L. Somlo <somlo@cmu.edu>
+#  Copyright (c) 2008 - 2010, Intel Corporation. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION    = 0x00010005
+  BASE_NAME      = BaseAcpiTimerLibBhyve
+  FILE_GUID      = A5E3B247-7302-11EA-9C04-3CECEF0C1C08
+  MODULE_TYPE    = BASE
+  VERSION_STRING = 1.0
+  LIBRARY_CLASS  = TimerLib
+
+[Sources]
+  AcpiTimerLib.c
+  AcpiTimerLib.h
+  BaseAcpiTimerLibBhyve.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  IoLib
