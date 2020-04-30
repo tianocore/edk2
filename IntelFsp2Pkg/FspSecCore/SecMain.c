@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2014 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2020, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -220,6 +220,12 @@ SecTemporaryRamSupport (
 
   UINTN             CurrentStack;
   UINTN             FspStackBase;
+
+  //
+  // Override OnSeparateStack to 1 because this function will switch stack to permanent memory
+  // which makes FSP running on different stack from bootloader temporary ram stack.
+  //
+  GetFspGlobalDataPointer ()->OnSeparateStack = 1;
 
   if (PcdGet8 (PcdFspHeapSizePercentage) == 0) {
 

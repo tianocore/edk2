@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2020, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -59,7 +59,7 @@ FspApiCallingCheck (
         Status = EFI_UNSUPPORTED;
       }
     }
-  } else if (ApiIdx == FspSiliconInitApiIndex) {
+  } else if ((ApiIdx == FspSiliconInitApiIndex) || (ApiIdx == FspMultiPhaseSiInitApiIndex)) {
     //
     // FspSiliconInit check
     //
@@ -68,7 +68,7 @@ FspApiCallingCheck (
     } else {
       if (FspData->Signature != FSP_GLOBAL_DATA_SIGNATURE) {
         Status = EFI_UNSUPPORTED;
-      } else if (EFI_ERROR (FspUpdSignatureCheck (ApiIdx, ApiParam))) {
+      } else if (EFI_ERROR (FspUpdSignatureCheck (FspSiliconInitApiIndex, ApiParam))) {
         Status = EFI_INVALID_PARAMETER;
       }
     }
