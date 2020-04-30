@@ -12,5 +12,8 @@
 # https://www.python.org/dev/peps/pep-0440/#version-specifiers
 ##
 
-edk2-pytool-library==0.10.*
-edk2-pytool-extensions~=0.13.3
+
+#edk2-pytool-library==0.10.*
+#edk2-pytool-extensions~=0.13.3
+git+https://github.com/spbrogan/edk2-pytool-library.git@refs/heads/seandebug
+git+https://github.com/spbrogan/edk2-pytool-extensions.git@refs/heads/sean_debug
