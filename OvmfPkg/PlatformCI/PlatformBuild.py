@@ -28,9 +28,7 @@ class CommonPlatform():
     ArchSupported = ("IA32", "X64")
     TargetsSupported = ("DEBUG", "RELEASE", "NOOPT")
     Scopes = ('ovmf', 'edk2-build')
-    WorkspaceRoot = os.path.realpath(os.path.join(
-        os.path.dirname(os.path.abspath(__file__)), "..", ".."))
-
+    WorkspaceRoot = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     @classmethod
     def GetDscName(cls, ArchCsv: str) -> str:
         ''' return the DSC given the architectures requested.
