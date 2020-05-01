@@ -1,7 +1,7 @@
 /** @file
   UEFI SCSI Library implementation
 
-  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2020, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -1055,15 +1055,16 @@ ScsiWrite10Command (
   ZeroMem (&CommandPacket, sizeof (EFI_SCSI_IO_SCSI_REQUEST_PACKET));
   ZeroMem (Cdb, EFI_SCSI_OP_LENGTH_TEN);
 
-  CommandPacket.Timeout         = Timeout;
-  CommandPacket.OutDataBuffer    = DataBuffer;
-  CommandPacket.SenseData       = SenseData;
-  CommandPacket.OutTransferLength= *DataLength;
-  CommandPacket.Cdb             = Cdb;
+  CommandPacket.Timeout           = Timeout;
+  CommandPacket.OutDataBuffer     = DataBuffer;
+  CommandPacket.SenseData         = SenseData;
+  CommandPacket.OutTransferLength = *DataLength;
+  CommandPacket.Cdb               = Cdb;
   //
   // Fill Cdb for Write (10) Command
   //
   Cdb[0]                        = EFI_SCSI_OP_WRITE10;
+  Cdb[1]                        = EFI_SCSI_BLOCK_FUA;
   WriteUnaligned32 ((UINT32 *)&Cdb[2], SwapBytes32 (StartLba));
   WriteUnaligned16 ((UINT16 *)&Cdb[7], SwapBytes16 ((UINT16) SectorSize));
 
@@ -1263,6 +1264,7 @@ ScsiWrite16Command (
   // Fill Cdb for Write (16) Command
   //
   Cdb[0]                        = EFI_SCSI_OP_WRITE16;
+  Cdb[1]                        = EFI_SCSI_BLOCK_FUA;
   WriteUnaligned64 ((UINT64 *)&Cdb[2], SwapBytes64 (StartLba));
   WriteUnaligned32 ((UINT32 *)&Cdb[10], SwapBytes32 (SectorSize));
 

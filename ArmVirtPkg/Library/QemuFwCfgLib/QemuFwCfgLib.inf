@@ -15,7 +15,7 @@
   FILE_GUID                      = B271F41F-B841-48A9-BA8D-545B4BC2E2BF
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = QemuFwCfgLib|DXE_DRIVER
+  LIBRARY_CLASS                  = QemuFwCfgLib|DXE_DRIVER UEFI_DRIVER
 
   CONSTRUCTOR                    = QemuFwCfgInitialize
 

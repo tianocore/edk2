@@ -52,6 +52,7 @@
   DebugAgentLib
   SynchronizationLib
   VmgExitLib
+  PcdLib
 
 [Protocols]
   gEfiTimerArchProtocolGuid                     ## SOMETIMES_CONSUMES

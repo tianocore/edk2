@@ -362,7 +362,7 @@ XenBusDxeDriverBindingStart (
 
   Status = XenGetSharedInfoPage (Dev);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "XenBus: Unable to get the shared info page.\n"));
+    DEBUG ((DEBUG_ERROR, "XenBus: Unable to get the shared info page.\n"));
     Status = EFI_UNSUPPORTED;
     goto ErrorAllocated;
   }
@@ -442,7 +442,7 @@ XenBusDxeDriverBindingStop (
                ControllerHandle,
                EFI_OPEN_PROTOCOL_GET_PROTOCOL);
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "XenBusDxe: get children protocol failed: %r\n", Status));
+      DEBUG ((DEBUG_ERROR, "XenBusDxe: get children protocol failed: %r\n", Status));
       continue;
     }
     ChildData = XENBUS_PRIVATE_DATA_FROM_THIS (XenBusIo);

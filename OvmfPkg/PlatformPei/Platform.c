@@ -27,6 +27,7 @@
 #include <Library/PeiServicesLib.h>
 #include <Library/QemuFwCfgLib.h>
 #include <Library/QemuFwCfgS3Lib.h>
+#include <Library/QemuFwCfgSimpleParserLib.h>
 #include <Library/ResourcePublicationLib.h>
 #include <Ppi/MasterBootMode.h>
 #include <IndustryStandard/I440FxPiix4.h>
@@ -254,56 +255,12 @@ MemMapInitialization (
   ASSERT_RETURN_ERROR (PcdStatus);
 }
 
-EFI_STATUS
-GetNamedFwCfgBoolean (
-  IN  CHAR8   *FwCfgFileName,
-  OUT BOOLEAN *Setting
-  )
-{
-  EFI_STATUS           Status;
-  FIRMWARE_CONFIG_ITEM FwCfgItem;
-  UINTN                FwCfgSize;
-  UINT8                Value[3];
-
-  Status = QemuFwCfgFindFile (FwCfgFileName, &FwCfgItem, &FwCfgSize);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-  if (FwCfgSize > sizeof Value) {
-    return EFI_BAD_BUFFER_SIZE;
-  }
-  QemuFwCfgSelectItem (FwCfgItem);
-  QemuFwCfgReadBytes (FwCfgSize, Value);
-
-  if ((FwCfgSize == 1) ||
-      (FwCfgSize == 2 && Value[1] == '\n') ||
-      (FwCfgSize == 3 && Value[1] == '\r' && Value[2] == '\n')) {
-    switch (Value[0]) {
-      case '0':
-      case 'n':
-      case 'N':
-        *Setting = FALSE;
-        return EFI_SUCCESS;
-
-      case '1':
-      case 'y':
-      case 'Y':
-        *Setting = TRUE;
-        return EFI_SUCCESS;
-
-      default:
-        break;
-    }
-  }
-  return EFI_PROTOCOL_ERROR;
-}
-
 #define UPDATE_BOOLEAN_PCD_FROM_FW_CFG(TokenName)                   \
           do {                                                      \
             BOOLEAN       Setting;                                  \
             RETURN_STATUS PcdStatus;                                \
                                                                     \
-            if (!EFI_ERROR (GetNamedFwCfgBoolean (                  \
+            if (!RETURN_ERROR (QemuFwCfgParseBool (                 \
                               "opt/ovmf/" #TokenName, &Setting))) { \
               PcdStatus = PcdSetBoolS (TokenName, Setting);         \
               ASSERT_RETURN_ERROR (PcdStatus);                      \
@@ -405,7 +362,7 @@ MiscInitialization (
       AcpiEnBit  = ICH9_ACPI_CNTL_ACPI_EN;
       break;
     default:
-      DEBUG ((EFI_D_ERROR, "%a: Unknown Host Bridge Device ID: 0x%04x\n",
+      DEBUG ((DEBUG_ERROR, "%a: Unknown Host Bridge Device ID: 0x%04x\n",
         __FUNCTION__, mHostBridgeDevId));
       ASSERT (FALSE);
       return;
@@ -491,7 +448,7 @@ ReserveEmuVariableNvStore (
       AllocateRuntimePages (
         EFI_SIZE_TO_PAGES (2 * PcdGet32 (PcdFlashNvStorageFtwSpareSize))
         );
-  DEBUG ((EFI_D_INFO,
+  DEBUG ((DEBUG_INFO,
           "Reserved variable store memory: 0x%lX; size: %dkb\n",
           VariableStore,
           (2 * PcdGet32 (PcdFlashNvStorageFtwSpareSize)) / 1024
@@ -508,15 +465,15 @@ DebugDumpCmos (
 {
   UINT32 Loop;
 
-  DEBUG ((EFI_D_INFO, "CMOS:\n"));
+  DEBUG ((DEBUG_INFO, "CMOS:\n"));
 
   for (Loop = 0; Loop < 0x80; Loop++) {
     if ((Loop % 0x10) == 0) {
-      DEBUG ((EFI_D_INFO, "%02x:", Loop));
+      DEBUG ((DEBUG_INFO, "%02x:", Loop));
     }
-    DEBUG ((EFI_D_INFO, " %02x", CmosRead8 (Loop)));
+    DEBUG ((DEBUG_INFO, " %02x", CmosRead8 (Loop)));
     if ((Loop % 0x10) == 0xf) {
-      DEBUG ((EFI_D_INFO, "\n"));
+      DEBUG ((DEBUG_INFO, "\n"));
     }
   }
 }
@@ -529,12 +486,12 @@ S3Verification (
 {
 #if defined (MDE_CPU_X64)
   if (FeaturePcdGet (PcdSmmSmramRequire) && mS3Supported) {
-    DEBUG ((EFI_D_ERROR,
+    DEBUG ((DEBUG_ERROR,
       "%a: S3Resume2Pei doesn't support X64 PEI + SMM yet.\n", __FUNCTION__));
-    DEBUG ((EFI_D_ERROR,
+    DEBUG ((DEBUG_ERROR,
       "%a: Please disable S3 on the QEMU command line (see the README),\n",
       __FUNCTION__));
-    DEBUG ((EFI_D_ERROR,
+    DEBUG ((DEBUG_ERROR,
       "%a: or build OVMF with \"OvmfPkgIa32X64.dsc\".\n", __FUNCTION__));
     ASSERT (FALSE);
     CpuDeadLoop ();
@@ -749,7 +706,7 @@ InitializePlatform (
   XenDetect ();
 
   if (QemuFwCfgS3Enabled ()) {
-    DEBUG ((EFI_D_INFO, "S3 support was detected on QEMU\n"));
+    DEBUG ((DEBUG_INFO, "S3 support was detected on QEMU\n"));
     mS3Supported = TRUE;
     Status = PcdSetBoolS (PcdAcpiS3Enable, TRUE);
     ASSERT_EFI_ERROR (Status);
@@ -779,7 +736,7 @@ InitializePlatform (
   InitializeRamRegions ();
 
   if (mXen) {
-    DEBUG ((EFI_D_INFO, "Xen was detected\n"));
+    DEBUG ((DEBUG_INFO, "Xen was detected\n"));
     InitializeXen ();
   }
 

@@ -22,6 +22,8 @@
     ],
     "minWordLength": 5,
     "allowCompoundWords": false,
+    "maxNumberOfProblems": 200,
+    "maxDuplicateProblems": 200,
     "ignoreWords": [
         "muchange"
     ],
@@ -162,5 +164,19 @@
         "Sdhci",
         "inmodule",
         "RISCV",
+        "edksetup",
+        "iscsi",
+        "nvdata",
+        "pytools",
+        "NTDDI",
+        "Wnonportable",
+        "CLANGPDB",
+        "nologo",
+        "lldmap",
+        "ASMLINK",
+        "NODEFAULTLIB",
+        "vcruntimed",
+        "ucrtd",
+        "msvcrtd",
     ]
 }

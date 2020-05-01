@@ -1,5 +1,5 @@
 /** @file
-  Base Debug library instance for QEMU debug port.
+  Base Debug library instance for hypervisor debug port.
   It uses PrintLib to send debug messages to a fixed I/O port.
 
   Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
@@ -358,20 +358,4 @@ DebugPrintLevelEnabled (
   )
 {
   return (BOOLEAN) ((ErrorLevel & PcdGet32(PcdFixedDebugPrintErrorLevel)) != 0);
-}
-
-/**
-  Return the result of detecting the debug I/O port device.
-
-  @retval TRUE   if the debug I/O port device was detected.
-  @retval FALSE  otherwise
-
-**/
-BOOLEAN
-EFIAPI
-PlatformDebugLibIoPortDetect (
-  VOID
-  )
-{
-  return IoRead8 (PcdGet16 (PcdDebugIoPort)) == BOCHS_DEBUG_PORT_MAGIC;
 }

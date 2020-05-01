@@ -13,7 +13,7 @@
 ///
 /// Global ID for the MMC Host Protocol
 ///
-#define EFI_MMC_HOST_PROTOCOL_GUID \
+#define EMBEDDED_MMC_HOST_PROTOCOL_GUID \
   { 0x3e591c00, 0x9e4a, 0x11df, {0x92, 0x44, 0x00, 0x02, 0xA5, 0xD5, 0xC5, 0x1B } }
 
 #define MMC_RESPONSE_TYPE_R1        0
@@ -178,7 +178,7 @@ struct _EFI_MMC_HOST_PROTOCOL {
 #define MMC_HOST_HAS_ISMULTIBLOCK(Host) (Host->Revision >= MMC_HOST_PROTOCOL_REVISION && \
                                          Host->IsMultiBlock != NULL)
 
-extern EFI_GUID gEfiMmcHostProtocolGuid;
+extern EFI_GUID gEmbeddedMmcHostProtocolGuid;
 
 #endif
 

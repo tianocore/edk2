@@ -440,7 +440,7 @@ LegacyBmDeleteAllInvalidBootOptions (
 
     BbsIndex = LegacyBmFuzzyMatch (&BootOption[Index], BbsTable, BbsCount, BbsIndexUsed);
     if (BbsIndex == BbsCount) {
-      DEBUG ((EFI_D_INFO, "[LegacyBds] Delete Boot Option Boot%04x: %s\n", (UINTN) BootOption[Index].OptionNumber, BootOption[Index].Description));
+      DEBUG ((DEBUG_INFO, "[LegacyBds] Delete Boot Option Boot%04x: %s\n", (UINTN) BootOption[Index].OptionNumber, BootOption[Index].Description));
       //
       // Delete entry from LegacyDevOrder
       //
@@ -454,7 +454,7 @@ LegacyBmDeleteAllInvalidBootOptions (
       EfiBootManagerDeleteLoadOptionVariable (BootOption[Index].OptionNumber, BootOption[Index].OptionType);
     } else {
       if (((LEGACY_BM_BOOT_OPTION_BBS_DATA *) BootOption[Index].OptionalData)->BbsIndex != BbsIndex) {
-        DEBUG ((EFI_D_INFO, "[LegacyBds] Update Boot Option Boot%04x: %s Bbs0x%04x->Bbs0x%04x\n", (UINTN) BootOption[Index].OptionNumber, BootOption[Index].Description,
+        DEBUG ((DEBUG_INFO, "[LegacyBds] Update Boot Option Boot%04x: %s Bbs0x%04x->Bbs0x%04x\n", (UINTN) BootOption[Index].OptionNumber, BootOption[Index].Description,
                 (UINTN) ((LEGACY_BM_BOOT_OPTION_BBS_DATA *) BootOption[Index].OptionalData)->BbsIndex, (UINTN) BbsIndex));
         //
         // Update the BBS index in LegacyDevOrder
@@ -1506,7 +1506,7 @@ LegacyBmRefreshAllBootOption (
     if (LegacyBmFindBootOption (&BootOptions[Index], ExistingBootOptions, ExistingBootOptionCount) == -1) {
       Status = EfiBootManagerAddLoadOptionVariable (&BootOptions[Index], (UINTN) -1);
       DEBUG ((
-        EFI_D_INFO, "[LegacyBds] New Boot Option: Boot%04x Bbs0x%04x %s %r\n",
+        DEBUG_INFO, "[LegacyBds] New Boot Option: Boot%04x Bbs0x%04x %s %r\n",
         (UINTN) BootOptions[Index].OptionNumber,
         (UINTN) ((LEGACY_BM_BOOT_OPTION_BBS_DATA *) BootOptions[Index].OptionalData)->BbsIndex,
         BootOptions[Index].Description,

@@ -24,6 +24,7 @@
 #
 
 [Sources]
+  DebugIoPortQemu.c
   DebugLib.c
   DebugLibDetect.c
   DebugLibDetect.h

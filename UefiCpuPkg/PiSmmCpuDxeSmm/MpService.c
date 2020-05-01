@@ -433,27 +433,6 @@ ResetTokens (
   VOID
   )
 {
-  LIST_ENTRY            *Link;
-  PROCEDURE_TOKEN       *ProcToken;
-
-  Link = GetFirstNode (&gSmmCpuPrivate->TokenList);
-  while (!IsNull (&gSmmCpuPrivate->TokenList, Link)) {
-    ProcToken = PROCEDURE_TOKEN_FROM_LINK (Link);
-
-    ProcToken->RunningApCount = 0;
-    ProcToken->Used = FALSE;
-
-    //
-    // Check the spinlock status and release it if not released yet.
-    //
-    if (!AcquireSpinLockOrFail(ProcToken->SpinLock)) {
-      DEBUG((DEBUG_ERROR, "Risk::SpinLock still not released!"));
-    }
-    ReleaseSpinLock (ProcToken->SpinLock);
-
-    Link = GetNextNode (&gSmmCpuPrivate->TokenList, Link);
-  }
-
   //
   // Reset the FirstFreeToken to the beginning of token list upon exiting SMI.
   //
@@ -1049,10 +1028,13 @@ IsTokenInUse (
   }
 
   Link = GetFirstNode (&gSmmCpuPrivate->TokenList);
-  while (!IsNull (&gSmmCpuPrivate->TokenList, Link)) {
+  //
+  // Only search used tokens.
+  //
+  while (Link != gSmmCpuPrivate->FirstFreeToken) {
     ProcToken = PROCEDURE_TOKEN_FROM_LINK (Link);
 
-    if (ProcToken->Used && ProcToken->SpinLock == Token) {
+    if (ProcToken->SpinLock == Token) {
       return TRUE;
     }
 
@@ -1104,7 +1086,6 @@ AllocateTokenBuffer (
 
     ProcTokens[Index].Signature      = PROCEDURE_TOKEN_SIGNATURE;
     ProcTokens[Index].SpinLock       = SpinLock;
-    ProcTokens[Index].Used           = FALSE;
     ProcTokens[Index].RunningApCount = 0;
 
     InsertTailList (&gSmmCpuPrivate->TokenList, &ProcTokens[Index].Link);
@@ -1140,7 +1121,6 @@ GetFreeToken (
   NewToken = PROCEDURE_TOKEN_FROM_LINK (gSmmCpuPrivate->FirstFreeToken);
   gSmmCpuPrivate->FirstFreeToken = GetNextNode (&gSmmCpuPrivate->TokenList, gSmmCpuPrivate->FirstFreeToken);
 
-  NewToken->Used = TRUE;
   NewToken->RunningApCount = RunningApsCount;
   AcquireSpinLock (NewToken->SpinLock);
 

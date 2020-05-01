@@ -1,0 +1,95 @@
+## @file
+# Azure Pipeline build file for building a platform.
+#
+# Platform: EmulatorPkg
+# OS: Ubuntu
+# Toolchain: GCC5
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+trigger:
+  - master
+pr:
+  - master
+jobs:
+  - job: Platform_CI
+    variables:
+      package: 'EmulatorPkg'
+      vm_image: 'ubuntu-latest'
+      should_run: false
+      run_flags: "MAKE_STARTUP_NSH=TRUE"
+
+    #Use matrix to speed up the build process
+    strategy:
+        matrix:
+          EmulatorPkg_X64_DEBUG:
+            Build.File: "$(package)/PlatformCI/PlatformBuild.py"
+            Build.Arch: "X64"
+            Build.Flags: ""
+            Build.Target: "DEBUG"
+            Run.Flags: $(run_flags)
+            Run: $(should_run)
+          EmulatorPkg_X64_RELEASE:
+            Build.File: "$(package)/PlatformCI/PlatformBuild.py"
+            Build.Arch: "X64"
+            Build.Flags: ""
+            Build.Target: "RELEASE"
+            Run.Flags: $(run_flags)
+            Run: $(should_run)
+          EmulatorPkg_X64_NOOPT:
+            Build.File: "$(package)/PlatformCI/PlatformBuild.py"
+            Build.Arch: "X64"
+            Build.Flags: ""
+            Build.Target: "NOOPT"
+            Run.Flags: $(run_flags)
+            Run: $(should_run)
+          EmulatorPkg_IA32_DEBUG:
+            Build.File: "$(package)/PlatformCI/PlatformBuild.py"
+            Build.Arch: "IA32"
+            Build.Flags: ""
+            Build.Target: "DEBUG"
+            Run.Flags: $(run_flags)
+            Run: $(should_run)
+          EmulatorPkg_IA32_RELEASE:
+            Build.File: "$(package)/PlatformCI/PlatformBuild.py"
+            Build.Arch: "IA32"
+            Build.Flags: ""
+            Build.Target: "RELEASE"
+            Run.Flags: $(run_flags)
+            Run: $(should_run)
+          EmulatorPkg_IA32_NOOPT:
+            Build.File: "$(package)/PlatformCI/PlatformBuild.py"
+            Build.Arch: "IA32"
+            Build.Flags: ""
+            Build.Target: "NOOPT"
+            Run.Flags: $(run_flags)
+            Run: $(should_run)
+
+    workspace:
+      clean: all
+
+    pool:
+      vmImage: $(vm_image)
+
+    steps:
+    - template: ../../../.azurepipelines/templates/platform-build-run-steps.yml
+      parameters:
+        tool_chain_tag: GCC5
+        build_pkg: $(package)
+        build_target: $(Build.Target)
+        build_arch: $(Build.Arch)
+        build_file: $(Build.File)
+        build_flags: $(Build.Flags)
+        run_flags: $(Run.Flags)
+        # Add steps to install some IA32 only dependencies
+        extra_install_step:
+        - bash: sudo dpkg --add-architecture i386
+          displayName: Add i386 to dpkg
+          condition: and(gt(variables.pkg_count, 0), eq(variables['Build.Arch'], 'IA32'), succeeded())
+        - bash: sudo apt-get update
+          displayName: do apt-get update
+          condition: and(gt(variables.pkg_count, 0), eq(variables['Build.Arch'], 'IA32'), succeeded())
+        - bash: sudo apt-get install libc6-dev:i386 libx11-dev:i386 libxext-dev:i386 lib32gcc-7-dev
+          displayName: Add additional i386 packages
+          condition: and(gt(variables.pkg_count, 0), eq(variables['Build.Arch'], 'IA32'), succeeded())

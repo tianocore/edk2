@@ -37,7 +37,7 @@
 [Protocols]
   gEfiCpuArchProtocolGuid
   gEfiDevicePathProtocolGuid
-  gEfiMmcHostProtocolGuid
+  gEmbeddedMmcHostProtocolGuid
 
 [Pcd]
   gEmbeddedTokenSpaceGuid.PcdDwEmmcDxeBaseAddress

@@ -1,7 +1,7 @@
 ## @file
 #  EFI_REGULAR_EXPRESSION_PROTOCOL Implementation
 #
-#  Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2018-2020, Intel Corporation. All rights reserved.<BR>
 #  (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -18,40 +18,55 @@
 [Sources]
   RegularExpressionDxe.c
   RegularExpressionDxe.h
-  Oniguruma/OnigurumaUefiPort.h
-  Oniguruma/OnigurumaUefiPort.c
-  Oniguruma/OnigurumaIntrinsics.c | MSFT
+  OnigurumaUefiPort.h
+  OnigurumaUefiPort.c
+  OnigurumaIntrinsics.c | MSFT
+
+# Wrapper header files start #
+  stdio.h
+  stdarg.h
+  stddef.h
+  stdlib.h
+  string.h
+  config.h
+# Wrapper header files end #
 
 # Upstream Oniguruma code
-  Oniguruma/onig_init.c
-  Oniguruma/oniguruma.h
-  Oniguruma/regcomp.c
-  Oniguruma/regenc.c
-  Oniguruma/regenc.h
-  Oniguruma/regerror.c
-  Oniguruma/regexec.c
-  Oniguruma/oniggnu.h
-  Oniguruma/reggnu.c
-  Oniguruma/regint.h
-  Oniguruma/regparse.c
-  Oniguruma/regparse.h
-  Oniguruma/regposerr.c
-  Oniguruma/onigposix.h
-  Oniguruma/regposix.c
-  Oniguruma/regsyntax.c
-  Oniguruma/regtrav.c
-  Oniguruma/regversion.c
-  Oniguruma/st.c
-  Oniguruma/st.h
+  oniguruma/src/onig_init.c
+  oniguruma/src/oniguruma.h
+  oniguruma/src/regcomp.c
+  oniguruma/src/regenc.c
+  oniguruma/src/regenc.h
+  oniguruma/src/regerror.c
+  oniguruma/src/regexec.c
+  oniguruma/src/oniggnu.h
+  oniguruma/src/reggnu.c
+  oniguruma/src/regint.h
+  oniguruma/src/regparse.c
+  oniguruma/src/regparse.h
+  oniguruma/src/regposerr.c
+  oniguruma/src/onigposix.h
+  oniguruma/src/regposix.c
+  oniguruma/src/regsyntax.c
+  oniguruma/src/regtrav.c
+  oniguruma/src/regversion.c
+  oniguruma/src/st.c
+  oniguruma/src/st.h
 
 # Supported Character Encodings
-  Oniguruma/ascii.c
-  Oniguruma/unicode.c
-  Oniguruma/unicode_fold1_key.c
-  Oniguruma/unicode_fold2_key.c
-  Oniguruma/unicode_fold3_key.c
-  Oniguruma/unicode_unfold_key.c
-  Oniguruma/utf16_le.c
+  oniguruma/src/ascii.c
+  oniguruma/src/unicode.c
+  oniguruma/src/unicode_fold1_key.c
+  oniguruma/src/unicode_fold2_key.c
+  oniguruma/src/unicode_fold3_key.c
+  oniguruma/src/unicode_unfold_key.c
+  oniguruma/src/utf16_le.c
+  oniguruma/src/utf8.c
+  oniguruma/src/utf16_be.c
+  oniguruma/src/euc_jp.c
+  oniguruma/src/sjis.c
+  oniguruma/src/sjis_prop.c
+  oniguruma/src/euc_jp_prop.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -74,7 +89,7 @@
 
 [BuildOptions]
   # Enable STDARG for variable arguments
-  *_*_*_CC_FLAGS = -DHAVE_STDARG_H
+  *_*_*_CC_FLAGS = -DHAVE_STDARG_H -U_WIN32 -DONIG_VARIADIC_FUNC_ATTR=EFIAPI
 
   # Override MSFT build option to remove /Oi and /GL
   MSFT:*_*_*_CC_FLAGS          = /GL-
@@ -102,7 +117,7 @@
   MSFT:*_*_*_CC_FLAGS = /wd4456
 
   # Oniguruma: signed and unsigned mismatch/cast
-  MSFT:*_*_*_CC_FLAGS = /wd4018 /wd4245 /wd4389
+  MSFT:*_*_*_CC_FLAGS = /wd4018 /wd4245 /wd4389 /wd4090
 
   # Oniguruma: tag_end in parse_callout_of_name
   GCC:*_*_*_CC_FLAGS = -Wno-error=maybe-uninitialized

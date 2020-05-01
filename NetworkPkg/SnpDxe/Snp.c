@@ -2,6 +2,7 @@
   Implementation of driver entry point and driver binding protocol.
 
 Copyright (c) 2004 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) Microsoft Corporation.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -465,8 +466,8 @@ SimpleNetworkDriverStart (
   // the IO BAR.  Save the index of the BAR into the adapter info structure.
   // for regular 32bit BARs, 0 is memory mapped, 1 is io mapped
   //
-  Snp->MemoryBarIndex = 0;
-  Snp->IoBarIndex     = 1;
+  Snp->MemoryBarIndex = PCI_MAX_BAR;
+  Snp->IoBarIndex     = PCI_MAX_BAR;
   FoundMemoryBar      = FALSE;
   FoundIoBar          = FALSE;
   for (BarIndex = 0; BarIndex < PCI_MAX_BAR; BarIndex++) {
@@ -653,7 +654,7 @@ SimpleNetworkDriverStart (
     //
     Status = gBS->CreateEventEx (
                     EVT_NOTIFY_SIGNAL,
-                    TPL_NOTIFY,
+                    TPL_CALLBACK,
                     SnpNotifyExitBootServices,
                     Snp,
                     &gEfiEventExitBootServicesGuid,

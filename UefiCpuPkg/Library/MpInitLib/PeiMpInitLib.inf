@@ -51,6 +51,7 @@
   SynchronizationLib
   PeiServicesLib
   VmgExitLib
+  PcdLib
 
 [Pcd]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber        ## CONSUMES

@@ -137,7 +137,7 @@ LoadLinuxInitializeKernelSetup (
   //
   ZeroMem (KernelSetup, 0x1f1);
   ZeroMem (((UINT8 *)KernelSetup) + SetupEnd, 4096 - SetupEnd);
-  DEBUG ((EFI_D_INFO, "Cleared kernel setup 0-0x1f1, 0x%Lx-0x1000\n",
+  DEBUG ((DEBUG_INFO, "Cleared kernel setup 0-0x1f1, 0x%Lx-0x1000\n",
     (UINT64)SetupEnd));
 
   return EFI_SUCCESS;
@@ -338,7 +338,7 @@ SetupLinuxMemmap (
 
     default:
       DEBUG ((
-        EFI_D_ERROR,
+        DEBUG_ERROR,
         "Invalid EFI memory descriptor type (0x%x)!\n",
         MemoryMap->Type
         ));
@@ -643,7 +643,7 @@ LoadLinux (
   Bp->hdr.code32_start = (UINT32)(UINTN) Kernel;
   if (Bp->hdr.version >= 0x20c && Bp->hdr.handover_offset &&
       (Bp->hdr.xloadflags & (sizeof (UINTN) == 4 ? BIT2 : BIT3))) {
-    DEBUG ((EFI_D_INFO, "Jumping to kernel EFI handover point at ofs %x\n", Bp->hdr.handover_offset));
+    DEBUG ((DEBUG_INFO, "Jumping to kernel EFI handover point at ofs %x\n", Bp->hdr.handover_offset));
 
     DisableInterrupts ();
     JumpToUefiKernel ((VOID*) gImageHandle, (VOID*) gST, KernelSetup, Kernel);
@@ -654,7 +654,7 @@ LoadLinux (
   //
   SetupLinuxBootParams (KernelSetup);
 
-  DEBUG ((EFI_D_INFO, "Jumping to kernel\n"));
+  DEBUG ((DEBUG_INFO, "Jumping to kernel\n"));
   DisableInterrupts ();
   SetLinuxDescriptorTables ();
   JumpToKernel (Kernel, (VOID*) KernelSetup);

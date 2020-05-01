@@ -118,7 +118,7 @@ CalculateBestPioMode (
   if ((IdentifyData->AtaData.field_validity & 0x02) == 0x02) {
 
     AdvancedPioMode = IdentifyData->AtaData.advanced_pio_modes;
-    DEBUG ((EFI_D_INFO, "CalculateBestPioMode: AdvancedPioMode = %x\n", AdvancedPioMode));
+    DEBUG ((DEBUG_INFO, "CalculateBestPioMode: AdvancedPioMode = %x\n", AdvancedPioMode));
 
     for (Index = 0; Index < 8; Index++) {
       if ((AdvancedPioMode & 0x01) != 0) {
@@ -232,7 +232,7 @@ CalculateBestUdmaMode (
   }
 
   DeviceUDmaMode = IdentifyData->AtaData.ultra_dma_mode;
-  DEBUG ((EFI_D_INFO, "CalculateBestUdmaMode: DeviceUDmaMode = %x\n", DeviceUDmaMode));
+  DEBUG ((DEBUG_INFO, "CalculateBestUdmaMode: DeviceUDmaMode = %x\n", DeviceUDmaMode));
   DeviceUDmaMode &= 0x3f;
   TempMode = 0;                 // initialize it to UDMA-0
 
@@ -391,7 +391,7 @@ SataControllerStart (
   UINT32                            Data32;
   UINTN                             ChannelDeviceCount;
 
-  DEBUG ((EFI_D_INFO, "SataControllerStart START\n"));
+  DEBUG ((DEBUG_INFO, "SataControllerStart START\n"));
 
   BailLogMask = DEBUG_ERROR;
   SataPrivateData = NULL;
@@ -518,7 +518,7 @@ SataControllerStart (
     goto FreeIdentifyValid;
   }
 
-  DEBUG ((EFI_D_INFO, "SataControllerStart END status = %r\n", Status));
+  DEBUG ((DEBUG_INFO, "SataControllerStart END status = %r\n", Status));
   return Status;
 
 FreeIdentifyValid:
@@ -1034,7 +1034,7 @@ IdeInitCalculateMode (
   } else {
     (*SupportedModes)->PioMode.Valid = FALSE;
   }
-  DEBUG ((EFI_D_INFO, "IdeInitCalculateMode: PioMode = %x\n", (*SupportedModes)->PioMode.Mode));
+  DEBUG ((DEBUG_INFO, "IdeInitCalculateMode: PioMode = %x\n", (*SupportedModes)->PioMode.Mode));
 
   Status = CalculateBestUdmaMode (
             IdentifyData,
@@ -1049,7 +1049,7 @@ IdeInitCalculateMode (
   } else {
     (*SupportedModes)->UdmaMode.Valid = FALSE;
   }
-  DEBUG ((EFI_D_INFO, "IdeInitCalculateMode: UdmaMode = %x\n", (*SupportedModes)->UdmaMode.Mode));
+  DEBUG ((DEBUG_INFO, "IdeInitCalculateMode: UdmaMode = %x\n", (*SupportedModes)->UdmaMode.Mode));
 
   //
   // The modes other than PIO and UDMA are not supported

@@ -1383,7 +1383,6 @@ TlsAuthConfigAccessCallback (
   OUT    EFI_BROWSER_ACTION_REQUEST             *ActionRequest
   )
 {
-  EFI_INPUT_KEY                   Key;
   EFI_STATUS                      Status;
   RETURN_STATUS                   RStatus;
   TLS_AUTH_CONFIG_PRIVATE_DATA    *Private;
@@ -1391,6 +1390,8 @@ TlsAuthConfigAccessCallback (
   TLS_AUTH_CONFIG_IFR_NVDATA      *IfrNvData;
   UINT16                          LabelId;
   EFI_DEVICE_PATH_PROTOCOL        *File;
+  EFI_HII_POPUP_PROTOCOL          *HiiPopUp;
+  EFI_HII_POPUP_SELECTION         PopUpSelect;
 
   Status           = EFI_SUCCESS;
   File             = NULL;
@@ -1402,6 +1403,11 @@ TlsAuthConfigAccessCallback (
   Private = TLS_AUTH_CONFIG_PRIVATE_FROM_THIS (This);
 
   mTlsAuthPrivateData = Private;
+  Status = gBS->LocateProtocol (&gEfiHiiPopupProtocolGuid, NULL, (VOID**) &HiiPopUp);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Can't find Form PopUp protocol. Exit (%r)\n", Status));
+    return Status;
+  }
 
   //
   // Retrieve uncommitted data from Browser
@@ -1460,11 +1466,13 @@ TlsAuthConfigAccessCallback (
       if (EFI_ERROR (Status)) {
         CleanFileContext (Private);
 
-        CreatePopUp (
-          EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
-          &Key,
-          L"ERROR: Enroll Cert Failure!",
-          NULL
+        HiiPopUp->CreatePopup (
+          HiiPopUp,
+          EfiHiiPopupStyleError,
+          EfiHiiPopupTypeOk,
+          Private->RegisteredHandle,
+          STRING_TOKEN (STR_TLS_AUTH_ENROLL_CERT_FAILURE),
+          &PopUpSelect
           );
       }
       break;

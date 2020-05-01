@@ -1,5 +1,5 @@
 /** @file
-  Base Debug library instance for QEMU debug port.
+  Base Debug library instance for hypervisor debug port.
   It uses PrintLib to send debug messages to a fixed I/O port.
 
   Copyright (c) 2017, Red Hat, Inc.<BR>
@@ -11,12 +11,6 @@
 #define __DEBUG_IO_PORT_DETECT_H__
 
 #include <Base.h>
-
-//
-// The constant value that is read from the debug I/O port
-//
-#define BOCHS_DEBUG_PORT_MAGIC    0xE9
-
 
 /**
   Helper function to return whether the virtual machine has a debug I/O port.

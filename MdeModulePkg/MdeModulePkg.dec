@@ -24,6 +24,8 @@
 [Includes]
   Include
 
+[Includes.Common.Private]
+  Library/BrotliCustomDecompressLib/brotli/c/include
 
 [LibraryClasses]
   ##  @libraryclass  Defines a set of methods to reset whole system.
@@ -1547,6 +1549,9 @@
   ## Specify the console output row of text setup.
   # @Prompt Console Output Row of Text Setup
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetupConOutRow|25|UINT32|0x4000000e
+
+[PcdsFixedAtBuild.AARCH64, PcdsPatchableInModule.AARCH64]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiExposedTableVersions|0x20|UINT32|0x0001004c
 
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## UART clock frequency is for the baud rate configuration.

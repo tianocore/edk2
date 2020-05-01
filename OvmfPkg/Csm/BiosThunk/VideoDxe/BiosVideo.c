@@ -711,7 +711,7 @@ BiosVideoChildHandleInstall (
   //
   if (FeaturePcdGet (PcdBiosVideoCheckVbeEnable)) {
     Status = BiosVideoCheckForVbe (BiosVideoPrivate);
-    DEBUG ((EFI_D_INFO, "BiosVideoCheckForVbe - %r\n", Status));
+    DEBUG ((DEBUG_INFO, "BiosVideoCheckForVbe - %r\n", Status));
   } else {
     Status = EFI_UNSUPPORTED;
   }
@@ -720,11 +720,11 @@ BiosVideoChildHandleInstall (
     // The VESA BIOS Extensions are not compatible with Graphics Output, so check for support
     // for the standard 640x480 16 color VGA mode
     //
-    DEBUG ((EFI_D_INFO, "VgaCompatible - %x\n", BiosVideoPrivate->VgaCompatible));
+    DEBUG ((DEBUG_INFO, "VgaCompatible - %x\n", BiosVideoPrivate->VgaCompatible));
     if (BiosVideoPrivate->VgaCompatible) {
       if (FeaturePcdGet (PcdBiosVideoCheckVgaEnable)) {
         Status = BiosVideoCheckForVga (BiosVideoPrivate);
-        DEBUG ((EFI_D_INFO, "BiosVideoCheckForVga - %r\n", Status));
+        DEBUG ((DEBUG_INFO, "BiosVideoCheckForVga - %r\n", Status));
       } else {
         Status = EFI_UNSUPPORTED;
       }
@@ -1122,7 +1122,7 @@ ParseEdidData (
                  ((EdidDataBlock->EstablishedTimings[2] & 0x80) << 9) ;
     for (Index = 0; Index < VESA_BIOS_EXTENSIONS_EDID_ESTABLISHED_TIMING_MAX_NUMBER; Index ++) {
       if ((TimingBits & 0x1) != 0) {
-        DEBUG ((EFI_D_INFO, "Established Timing: %d x %d\n",
+        DEBUG ((DEBUG_INFO, "Established Timing: %d x %d\n",
         mEstablishedEdidTiming[Index].HorizontalResolution, mEstablishedEdidTiming[Index].VerticalResolution));
         ValidEdidTiming->Key[ValidNumber] = CalculateEdidKey (&mEstablishedEdidTiming[Index]);
         ValidNumber ++;
@@ -1164,7 +1164,7 @@ ParseEdidData (
           break;
       }
       RefreshRate = (UINT8) ((BufferIndex[1] & 0x1f) + 60);
-      DEBUG ((EFI_D_INFO, "Standard Timing: %d x %d\n", HorizontalResolution, VerticalResolution));
+      DEBUG ((DEBUG_INFO, "Standard Timing: %d x %d\n", HorizontalResolution, VerticalResolution));
       TempTiming.HorizontalResolution = HorizontalResolution;
       TempTiming.VerticalResolution = VerticalResolution;
       TempTiming.RefreshRate = RefreshRate;
@@ -1191,7 +1191,7 @@ ParseEdidData (
     //
     TempTiming.HorizontalResolution = ((UINT16)(BufferIndex[4] & 0xF0) << 4) | (BufferIndex[2]);
     TempTiming.VerticalResolution = ((UINT16)(BufferIndex[7] & 0xF0) << 4) | (BufferIndex[5]);
-    DEBUG ((EFI_D_INFO, "Detailed Timing %d: %d x %d\n",
+    DEBUG ((DEBUG_INFO, "Detailed Timing %d: %d x %d\n",
             Index, TempTiming.HorizontalResolution, TempTiming.VerticalResolution));
     ValidEdidTiming->Key[ValidNumber] = CalculateEdidKey (&TempTiming);
     ValidNumber ++;
@@ -1572,7 +1572,7 @@ BiosVideoCheckForVbe (
       continue;
     }
 
-    DEBUG ((EFI_D_INFO, "Video Controller Mode 0x%x: %d x %d\n",
+    DEBUG ((DEBUG_INFO, "Video Controller Mode 0x%x: %d x %d\n",
             VbeModeNumber, BiosVideoPrivate->VbeModeInformationBlock->XResolution, BiosVideoPrivate->VbeModeInformationBlock->YResolution));
 
     if (EdidFound && (ValidEdidTiming.ValidNumber > 0)) {
@@ -1737,7 +1737,7 @@ BiosVideoCheckForVbe (
     DEBUG_CODE (
       BIOS_VIDEO_MODE_DATA    *ModeData;
       ModeData = &BiosVideoPrivate->ModeData[HighestResolutionMode];
-      DEBUG ((EFI_D_INFO, "BiosVideo set highest resolution %d x %d\n",
+      DEBUG ((DEBUG_INFO, "BiosVideo set highest resolution %d x %d\n",
               ModeData->HorizontalResolution, ModeData->VerticalResolution));
     );
     PreferMode = HighestResolutionMode;

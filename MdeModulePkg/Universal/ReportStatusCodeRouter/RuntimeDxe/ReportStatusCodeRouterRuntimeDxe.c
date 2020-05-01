@@ -3,6 +3,7 @@
   and Status Code Runtime Protocol.
 
   Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) Microsoft Corporation.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -64,7 +65,7 @@ RscHandlerNotification (
                      &RscData->Data
                      );
 
-    Address += (sizeof (RSC_DATA_ENTRY) + RscData->Data.Size);
+    Address += (OFFSET_OF (RSC_DATA_ENTRY, Data) + RscData->Data.HeaderSize + RscData->Data.Size);
     Address  = ALIGN_VARIABLE (Address);
   }
 
@@ -237,6 +238,7 @@ ReportDispatcher (
   RSC_DATA_ENTRY                *RscData;
   EFI_STATUS                    Status;
   VOID                          *NewBuffer;
+  EFI_PHYSICAL_ADDRESS          FailSafeEndPointer;
 
   //
   // Use atom operation to avoid the reentant of report.
@@ -267,11 +269,12 @@ ReportDispatcher (
     // If callback is registered with TPL lower than TPL_HIGH_LEVEL, event must be signaled at boot time to possibly wait for
     // allowed TPL to report status code. Related data should also be stored in data buffer.
     //
+    FailSafeEndPointer = CallbackEntry->EndPointer;
     CallbackEntry->EndPointer  = ALIGN_VARIABLE (CallbackEntry->EndPointer);
     RscData = (RSC_DATA_ENTRY *) (UINTN) CallbackEntry->EndPointer;
     CallbackEntry->EndPointer += sizeof (RSC_DATA_ENTRY);
     if (Data != NULL) {
-      CallbackEntry->EndPointer += Data->Size;
+      CallbackEntry->EndPointer += (Data->Size + Data->HeaderSize - sizeof (EFI_STATUS_CODE_DATA));
     }
 
     //
@@ -285,7 +288,9 @@ ReportDispatcher (
                       (VOID *) (UINTN) CallbackEntry->StatusCodeDataBuffer
                       );
         if (NewBuffer != NULL) {
+          FailSafeEndPointer = (EFI_PHYSICAL_ADDRESS) (UINTN) NewBuffer + (FailSafeEndPointer - CallbackEntry->StatusCodeDataBuffer);
           CallbackEntry->EndPointer = (EFI_PHYSICAL_ADDRESS) (UINTN) NewBuffer + (CallbackEntry->EndPointer - CallbackEntry->StatusCodeDataBuffer);
+          RscData = (RSC_DATA_ENTRY *) (UINTN) ((UINTN) NewBuffer + ((UINTN) RscData - CallbackEntry->StatusCodeDataBuffer));
           CallbackEntry->StatusCodeDataBuffer = (EFI_PHYSICAL_ADDRESS) (UINTN) NewBuffer;
           CallbackEntry->BufferSize *= 2;
         }
@@ -296,6 +301,7 @@ ReportDispatcher (
     // If data buffer is used up, do not report for this time.
     //
     if (CallbackEntry->EndPointer > (CallbackEntry->StatusCodeDataBuffer + CallbackEntry->BufferSize)) {
+      CallbackEntry->EndPointer = FailSafeEndPointer;
       continue;
     }
 
@@ -307,6 +313,9 @@ ReportDispatcher (
     }
     if (Data != NULL) {
       CopyMem (&RscData->Data, Data, Data->HeaderSize + Data->Size);
+    } else {
+      ZeroMem (&RscData->Data, sizeof (RscData->Data));
+      RscData->Data.HeaderSize = sizeof (RscData->Data);
     }
 
     Status = gBS->SignalEvent (CallbackEntry->Event);

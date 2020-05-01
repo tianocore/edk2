@@ -815,7 +815,7 @@ ValidateFvHeader (
     Expected =
       (UINT16) (((UINTN) FwVolHeader->Checksum + 0x10000 - Checksum) & 0xffff);
 
-    DEBUG ((EFI_D_INFO, "FV@%p Checksum is 0x%x, expected 0x%x\n",
+    DEBUG ((DEBUG_INFO, "FV@%p Checksum is 0x%x, expected 0x%x\n",
             FwVolHeader, FwVolHeader->Checksum, Expected));
     return EFI_NOT_FOUND;
   }
@@ -859,7 +859,7 @@ InitializeVariableFvHeader (
     UINTN   Offset;
     UINTN   Start;
 
-    DEBUG ((EFI_D_INFO,
+    DEBUG ((DEBUG_INFO,
       "Variable FV header is not valid. It will be reinitialized.\n"));
 
     //
@@ -929,7 +929,7 @@ FvbInitialize (
     //
     // Return an error so image will be unloaded
     //
-    DEBUG ((EFI_D_INFO,
+    DEBUG ((DEBUG_INFO,
       "QEMU flash was not detected. Writable FVB is not being installed.\n"));
     return EFI_WRITE_PROTECTED;
   }
@@ -946,7 +946,7 @@ FvbInitialize (
 
   Status = InitializeVariableFvHeader ();
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_INFO,
+    DEBUG ((DEBUG_INFO,
       "QEMU Flash: Unable to initialize variable FV header\n"));
     return EFI_WRITE_PROTECTED;
   }
@@ -959,7 +959,7 @@ FvbInitialize (
     //
     Status = GetFvbInfo (Length, &FwVolHeader);
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_INFO, "EFI_ERROR (GetFvbInfo (Length, &FwVolHeader))\n"));
+      DEBUG ((DEBUG_INFO, "EFI_ERROR (GetFvbInfo (Length, &FwVolHeader))\n"));
       return EFI_WRITE_PROTECTED;
     }
   }

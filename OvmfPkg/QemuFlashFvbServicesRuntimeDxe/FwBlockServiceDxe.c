@@ -44,7 +44,7 @@ InstallProtocolInterfaces (
     // LocateDevicePath fails so install a new interface and device path
     //
     FwbHandle = NULL;
-    DEBUG ((EFI_D_INFO, "Installing QEMU flash FVB\n"));
+    DEBUG ((DEBUG_INFO, "Installing QEMU flash FVB\n"));
     Status = gBS->InstallMultipleProtocolInterfaces (
                     &FwbHandle,
                     &gEfiFirmwareVolumeBlockProtocolGuid,
@@ -65,7 +65,7 @@ InstallProtocolInterfaces (
                     );
     ASSERT_EFI_ERROR (Status);
 
-    DEBUG ((EFI_D_INFO, "Reinstalling FVB for QEMU flash region\n"));
+    DEBUG ((DEBUG_INFO, "Reinstalling FVB for QEMU flash region\n"));
     Status = gBS->ReinstallProtocolInterface (
                     FwbHandle,
                     &gEfiFirmwareVolumeBlockProtocolGuid,

@@ -4,6 +4,7 @@
     URB (Usb Request Block).
 
 Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) Microsoft Corporation.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -299,7 +300,7 @@ EhcFreeQtds (
   LIST_ENTRY              *Next;
   EHC_QTD                 *Qtd;
 
-  EFI_LIST_FOR_EACH_SAFE (Entry, Next, Qtds) {
+  BASE_LIST_FOR_EACH_SAFE (Entry, Next, Qtds) {
     Qtd = EFI_LIST_CONTAINER (Entry, EHC_QTD, QtdList);
 
     RemoveEntryList (&Qtd->QtdList);
@@ -482,7 +483,7 @@ EhcCreateQtds (
   //
   // OK, all the QTDs needed are created. Now, fix the NextQtd point
   //
-  EFI_LIST_FOR_EACH (Entry, &Qh->Qtds) {
+  BASE_LIST_FOR_EACH (Entry, &Qh->Qtds) {
     Qtd = EFI_LIST_CONTAINER (Entry, EHC_QTD, QtdList);
 
     //

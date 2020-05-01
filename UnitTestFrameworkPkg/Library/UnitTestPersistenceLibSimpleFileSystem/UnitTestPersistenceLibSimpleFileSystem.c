@@ -67,7 +67,7 @@ GetCacheFileDevicePath (
   // Before we can start, change test name from ASCII to Unicode.
   //
   CacheFilePathLength = AsciiStrLen (Framework->ShortTitle) + 1;
-  TestName = AllocatePool (CacheFilePathLength);
+  TestName = AllocatePool (CacheFilePathLength * sizeof(CHAR16));
   if (!TestName) {
     goto Exit;
   }

@@ -3,6 +3,7 @@
   XHCI transfer scheduling routines.
 
 Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) Microsoft Corporation.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -1051,7 +1052,7 @@ IsAsyncIntTrb (
   LIST_ENTRY              *Next;
   URB                     *CheckedUrb;
 
-  EFI_LIST_FOR_EACH_SAFE (Entry, Next, &Xhc->AsyncIntTransfers) {
+  BASE_LIST_FOR_EACH_SAFE (Entry, Next, &Xhc->AsyncIntTransfers) {
     CheckedUrb = EFI_LIST_CONTAINER (Entry, URB, UrbList);
     if (IsTransferRingTrb (Xhc, Trb, CheckedUrb)) {
       *Urb = CheckedUrb;
@@ -1346,7 +1347,7 @@ XhciDelAsyncIntTransfer (
 
   Urb = NULL;
 
-  EFI_LIST_FOR_EACH_SAFE (Entry, Next, &Xhc->AsyncIntTransfers) {
+  BASE_LIST_FOR_EACH_SAFE (Entry, Next, &Xhc->AsyncIntTransfers) {
     Urb = EFI_LIST_CONTAINER (Entry, URB, UrbList);
     if ((Urb->Ep.BusAddr == BusAddr) &&
         (Urb->Ep.EpAddr == EpNum) &&
@@ -1386,7 +1387,7 @@ XhciDelAllAsyncIntTransfers (
   URB                     *Urb;
   EFI_STATUS              Status;
 
-  EFI_LIST_FOR_EACH_SAFE (Entry, Next, &Xhc->AsyncIntTransfers) {
+  BASE_LIST_FOR_EACH_SAFE (Entry, Next, &Xhc->AsyncIntTransfers) {
     Urb = EFI_LIST_CONTAINER (Entry, URB, UrbList);
 
     //
@@ -1578,7 +1579,7 @@ XhcMonitorAsyncRequests (
 
   Xhc    = (USB_XHCI_INSTANCE*) Context;
 
-  EFI_LIST_FOR_EACH_SAFE (Entry, Next, &Xhc->AsyncIntTransfers) {
+  BASE_LIST_FOR_EACH_SAFE (Entry, Next, &Xhc->AsyncIntTransfers) {
     Urb = EFI_LIST_CONTAINER (Entry, URB, UrbList);
 
     //

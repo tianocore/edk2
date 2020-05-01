@@ -3,6 +3,7 @@
   and MemoryClear.
 
 Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) Microsoft Corporation.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -41,10 +42,10 @@ DefinitionBlock (
       //
       // Operational region for Smi port access
       //
-      OperationRegion (SMIP, SystemIO, 0xB2, 1)
+      OperationRegion (SMIP, SystemIO, FixedPcdGet16 (PcdSmiCommandIoPort), 1)
       Field (SMIP, ByteAcc, NoLock, Preserve)
       {
-          IOB2, 8
+          IOPN, 8
       }
 
       //
@@ -96,7 +97,7 @@ DefinitionBlock (
             //
             // Trigger the SMI interrupt
             //
-            Store (MCIN, IOB2)
+            Store (MCIN, IOPN)
           }
         }
         Return (0)
@@ -196,7 +197,7 @@ DefinitionBlock (
             //
             // Trigger the SMI interrupt
             //
-            Store (PPIN, IOB2)
+            Store (PPIN, IOPN)
             Return (FRET)
 
 
@@ -227,7 +228,7 @@ DefinitionBlock (
             //
             // Trigger the SMI interrupt
             //
-            Store (PPIN, IOB2)
+            Store (PPIN, IOPN)
 
             Store (LPPR, Index (TPM3, 0x01))
             Store (PPRP, Index (TPM3, 0x02))
@@ -255,7 +256,7 @@ DefinitionBlock (
             //
             // Trigger the SMI interrupt
             //
-            Store (PPIN, IOB2)
+            Store (PPIN, IOPN)
             Return (FRET)
           }
           Case (8)
@@ -269,7 +270,7 @@ DefinitionBlock (
             //
             // Trigger the SMI interrupt
             //
-            Store (PPIN, IOB2)
+            Store (PPIN, IOPN)
 
             Return (FRET)
           }
@@ -308,7 +309,7 @@ DefinitionBlock (
             //
             // Trigger the SMI interrupt
             //
-            Store (MCIN, IOB2)
+            Store (MCIN, IOPN)
             Return (MRET)
           }
           Default {BreakPoint}

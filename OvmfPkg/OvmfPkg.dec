@@ -60,6 +60,10 @@
   #
   QemuFwCfgS3Lib|Include/Library/QemuFwCfgS3Lib.h
 
+  ##  @libraryclass  Parse the contents of named fw_cfg files as simple
+  #                  (scalar) data types.
+  QemuFwCfgSimpleParserLib|Include/Library/QemuFwCfgSimpleParserLib.h
+
   ##  @libraryclass  Rewrite the BootOrder NvVar based on QEMU's "bootorder"
   #                  fw_cfg file.
   #

@@ -35,7 +35,7 @@ QemuFwCfgSelectItem (
   IN FIRMWARE_CONFIG_ITEM   QemuFwCfgItem
   )
 {
-  DEBUG ((EFI_D_INFO, "Select Item: 0x%x\n", (UINT16)(UINTN) QemuFwCfgItem));
+  DEBUG ((DEBUG_INFO, "Select Item: 0x%x\n", (UINT16)(UINTN) QemuFwCfgItem));
   IoWrite16 (FW_CFG_IO_SELECTOR, (UINT16)(UINTN) QemuFwCfgItem);
 }
 
