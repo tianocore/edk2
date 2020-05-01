@@ -106,10 +106,11 @@ def fuzzy_match_repo_url(one, other):
     return False
 
 
-def get_upstream(url):
+def get_upstream(url, name):
     """Extracts the dict for the current repo origin."""
     for upstream in UPSTREAMS:
-        if fuzzy_match_repo_url(upstream['repo'], url):
+        if (fuzzy_match_repo_url(upstream['repo'], url) or
+                upstream['name'] == name):
             return upstream
     print("Unknown upstream '%s' - aborting!" % url)
     sys.exit(3)
@@ -143,6 +144,11 @@ if __name__ == '__main__':
                         help='overwrite existing settings conflicting with program defaults',
                         action='store_true',
                         required=False)
+    PARSER.add_argument('-n', '--name', type=str, metavar='repo',
+                        choices=['edk2', 'edk2-platforms', 'edk2-non-osi'],
+                        help='set the repo name to configure for, if not '
+                             'detected automatically',
+                        required=False)
     PARSER.add_argument('-v', '--verbose',
                         help='enable more detailed output',
                         action='store_true',
@@ -156,7 +162,7 @@ if __name__ == '__main__':
 
     URL = REPO.remotes.origin.url
 
-    UPSTREAM = get_upstream(URL)
+    UPSTREAM = get_upstream(URL, ARGS.name)
     if not UPSTREAM:
         print("Upstream '%s' unknown, aborting!" % URL)
         sys.exit(7)
