@@ -30,8 +30,7 @@ class CommonPlatform():
     ArchSupported = ("AARCH64", "ARM")
     TargetsSupported = ("DEBUG", "RELEASE", "NOOPT")
     Scopes = ('armvirt', 'edk2-build')
-    WorkspaceRoot = os.path.realpath(os.path.join(
-        os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+    WorkspaceRoot = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
     # ####################################################################################### #
     #                         Configuration for Update & Setup                                #
