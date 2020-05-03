@@ -1,0 +1,30 @@
+## @file
+#
+#  Null implementation of the fw_cfg library.
+#
+#  Copyright (C) 2020, Rebecca Cran <rebecca@bsdio.com>
+#  Copyright (C) 2013, Red Hat, Inc.
+#  Copyright (c) 2008 - 2012, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = QemuFwCfgLibNull
+  FILE_GUID                      = B9D1A1F2-01E2-4732-982D-C7F9ED51AC6B
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = QemuFwCfgLib
+
+[Sources]
+  QemuFwCfgNull.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  DebugLib
