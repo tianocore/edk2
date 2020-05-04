@@ -11,8 +11,10 @@
 
 #include <IndustryStandard/FusionMptScsi.h>
 #include <IndustryStandard/Pci.h>
+#include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/PcdLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>
 #include <Protocol/PciIo.h>
@@ -34,6 +36,7 @@ typedef struct {
   UINT32                          Signature;
   EFI_EXT_SCSI_PASS_THRU_PROTOCOL PassThru;
   EFI_EXT_SCSI_PASS_THRU_MODE     PassThruMode;
+  UINT8                           MaxTarget;
 } MPT_SCSI_DEV;
 
 #define MPT_SCSI_FROM_PASS_THRU(PassThruPtr) \
@@ -58,6 +61,22 @@ MptScsiPassThru (
 }
 
 STATIC
+BOOLEAN
+IsTargetInitialized (
+  IN UINT8                                          *Target
+  )
+{
+  UINTN Idx;
+
+  for (Idx = 0; Idx < TARGET_MAX_BYTES; ++Idx) {
+    if (Target[Idx] != 0xFF) {
+      return TRUE;
+    }
+  }
+  return FALSE;
+}
+
+STATIC
 EFI_STATUS
 EFIAPI
 MptScsiGetNextTargetLun (
@@ -66,7 +85,28 @@ MptScsiGetNextTargetLun (
   IN OUT UINT64                                     *Lun
   )
 {
-  return EFI_UNSUPPORTED;
+  MPT_SCSI_DEV *Dev;
+
+  Dev = MPT_SCSI_FROM_PASS_THRU (This);
+  //
+  // Currently support only LUN 0, so hardcode it
+  //
+  if (!IsTargetInitialized (*Target)) {
+    ZeroMem (*Target, TARGET_MAX_BYTES);
+    *Lun = 0;
+  } else if (**Target > Dev->MaxTarget || *Lun > 0) {
+    return EFI_INVALID_PARAMETER;
+  } else if (**Target < Dev->MaxTarget) {
+    //
+    // This device interface support 256 targets only, so it's enough to
+    // increment the LSB of Target, as it will never overflow.
+    //
+    **Target += 1;
+  } else {
+    return EFI_NOT_FOUND;
+  }
+
+  return EFI_SUCCESS;
 }
 
 STATIC
@@ -77,7 +117,24 @@ MptScsiGetNextTarget (
   IN OUT UINT8                                     **Target
   )
 {
-  return EFI_UNSUPPORTED;
+  MPT_SCSI_DEV *Dev;
+
+  Dev = MPT_SCSI_FROM_PASS_THRU (This);
+  if (!IsTargetInitialized (*Target)) {
+    ZeroMem (*Target, TARGET_MAX_BYTES);
+  } else if (**Target > Dev->MaxTarget) {
+    return EFI_INVALID_PARAMETER;
+  } else if (**Target < Dev->MaxTarget) {
+    //
+    // This device interface support 256 targets only, so it's enough to
+    // increment the LSB of Target, as it will never overflow.
+    //
+    **Target += 1;
+  } else {
+    return EFI_NOT_FOUND;
+  }
+
+  return EFI_SUCCESS;
 }
 
 STATIC
@@ -205,6 +262,8 @@ MptScsiControllerStart (
   }
 
   Dev->Signature = MPT_SCSI_DEV_SIGNATURE;
+
+  Dev->MaxTarget = PcdGet8 (PcdMptScsiMaxTargetLimit);
 
   //
   // Host adapter channel, doesn't exist
