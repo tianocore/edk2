@@ -11,9 +11,12 @@
 
 #include <IndustryStandard/FusionMptScsi.h>
 #include <IndustryStandard/Pci.h>
+#include <Library/DebugLib.h>
+#include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>
 #include <Protocol/PciIo.h>
+#include <Protocol/ScsiPassThruExt.h>
 #include <Uefi/UefiSpec.h>
 
 //
@@ -21,6 +24,109 @@
 // range for IVH (Indie Hardware Vendors)
 //
 #define MPT_SCSI_BINDING_VERSION 0x10
+
+//
+// Runtime Structures
+//
+
+#define MPT_SCSI_DEV_SIGNATURE SIGNATURE_32 ('M','P','T','S')
+typedef struct {
+  UINT32                          Signature;
+  EFI_EXT_SCSI_PASS_THRU_PROTOCOL PassThru;
+  EFI_EXT_SCSI_PASS_THRU_MODE     PassThruMode;
+} MPT_SCSI_DEV;
+
+#define MPT_SCSI_FROM_PASS_THRU(PassThruPtr) \
+  CR (PassThruPtr, MPT_SCSI_DEV, PassThru, MPT_SCSI_DEV_SIGNATURE)
+
+//
+// Ext SCSI Pass Thru
+//
+
+STATIC
+EFI_STATUS
+EFIAPI
+MptScsiPassThru (
+  IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL                *This,
+  IN UINT8                                          *Target,
+  IN UINT64                                         Lun,
+  IN OUT EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET *Packet,
+  IN EFI_EVENT                                      Event     OPTIONAL
+  )
+{
+  return EFI_UNSUPPORTED;
+}
+
+STATIC
+EFI_STATUS
+EFIAPI
+MptScsiGetNextTargetLun (
+  IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL                *This,
+  IN OUT UINT8                                      **Target,
+  IN OUT UINT64                                     *Lun
+  )
+{
+  return EFI_UNSUPPORTED;
+}
+
+STATIC
+EFI_STATUS
+EFIAPI
+MptScsiGetNextTarget (
+  IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL               *This,
+  IN OUT UINT8                                     **Target
+  )
+{
+  return EFI_UNSUPPORTED;
+}
+
+STATIC
+EFI_STATUS
+EFIAPI
+MptScsiBuildDevicePath (
+  IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL               *This,
+  IN UINT8                                         *Target,
+  IN UINT64                                        Lun,
+  IN OUT EFI_DEVICE_PATH_PROTOCOL                  **DevicePath
+  )
+{
+  return EFI_UNSUPPORTED;
+}
+
+STATIC
+EFI_STATUS
+EFIAPI
+MptScsiGetTargetLun (
+  IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL               *This,
+  IN EFI_DEVICE_PATH_PROTOCOL                      *DevicePath,
+  OUT UINT8                                        **Target,
+  OUT UINT64                                       *Lun
+  )
+{
+  return EFI_UNSUPPORTED;
+}
+
+STATIC
+EFI_STATUS
+EFIAPI
+MptScsiResetChannel (
+  IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL               *This
+  )
+{
+  return EFI_UNSUPPORTED;
+}
+
+STATIC
+EFI_STATUS
+EFIAPI
+MptScsiResetTargetLun (
+  IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL               *This,
+  IN UINT8                                         *Target,
+  IN UINT64                                        Lun
+  )
+{
+  return EFI_UNSUPPORTED;
+}
 
 //
 // Driver Binding
@@ -90,7 +196,49 @@ MptScsiControllerStart (
   IN EFI_DEVICE_PATH_PROTOCOL               *RemainingDevicePath OPTIONAL
   )
 {
-  return EFI_UNSUPPORTED;
+  EFI_STATUS           Status;
+  MPT_SCSI_DEV         *Dev;
+
+  Dev = AllocateZeroPool (sizeof (*Dev));
+  if (Dev == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  Dev->Signature = MPT_SCSI_DEV_SIGNATURE;
+
+  //
+  // Host adapter channel, doesn't exist
+  //
+  Dev->PassThruMode.AdapterId = MAX_UINT32;
+  Dev->PassThruMode.Attributes =
+    EFI_EXT_SCSI_PASS_THRU_ATTRIBUTES_PHYSICAL |
+    EFI_EXT_SCSI_PASS_THRU_ATTRIBUTES_LOGICAL;
+
+  Dev->PassThru.Mode = &Dev->PassThruMode;
+  Dev->PassThru.PassThru = &MptScsiPassThru;
+  Dev->PassThru.GetNextTargetLun = &MptScsiGetNextTargetLun;
+  Dev->PassThru.BuildDevicePath = &MptScsiBuildDevicePath;
+  Dev->PassThru.GetTargetLun = &MptScsiGetTargetLun;
+  Dev->PassThru.ResetChannel = &MptScsiResetChannel;
+  Dev->PassThru.ResetTargetLun = &MptScsiResetTargetLun;
+  Dev->PassThru.GetNextTarget = &MptScsiGetNextTarget;
+
+  Status = gBS->InstallProtocolInterface (
+                  &ControllerHandle,
+                  &gEfiExtScsiPassThruProtocolGuid,
+                  EFI_NATIVE_INTERFACE,
+                  &Dev->PassThru
+                  );
+  if (EFI_ERROR (Status)) {
+    goto FreePool;
+  }
+
+  return EFI_SUCCESS;
+
+FreePool:
+  FreePool (Dev);
+
+  return Status;
 }
 
 STATIC
@@ -103,7 +251,36 @@ MptScsiControllerStop (
   IN  EFI_HANDLE                            *ChildHandleBuffer
   )
 {
-  return EFI_UNSUPPORTED;
+  EFI_STATUS                      Status;
+  EFI_EXT_SCSI_PASS_THRU_PROTOCOL *PassThru;
+  MPT_SCSI_DEV                    *Dev;
+
+  Status = gBS->OpenProtocol (
+                  ControllerHandle,
+                  &gEfiExtScsiPassThruProtocolGuid,
+                  (VOID **)&PassThru,
+                  This->DriverBindingHandle,
+                  ControllerHandle,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL // Lookup only
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Dev = MPT_SCSI_FROM_PASS_THRU (PassThru);
+
+  Status = gBS->UninstallProtocolInterface (
+                  ControllerHandle,
+                  &gEfiExtScsiPassThruProtocolGuid,
+                  &Dev->PassThru
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  FreePool (Dev);
+
+  return Status;
 }
 
 STATIC
