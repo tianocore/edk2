@@ -38,6 +38,7 @@ typedef struct {
   EFI_EXT_SCSI_PASS_THRU_MODE     PassThruMode;
   UINT8                           MaxTarget;
   EFI_PCI_IO_PROTOCOL             *PciIo;
+  UINT64                          OriginalPciAttributes;
 } MPT_SCSI_DEV;
 
 #define MPT_SCSI_FROM_PASS_THRU(PassThruPtr) \
@@ -335,6 +336,53 @@ MptScsiControllerStart (
     goto FreePool;
   }
 
+  Status = Dev->PciIo->Attributes (
+                         Dev->PciIo,
+                         EfiPciIoAttributeOperationGet,
+                         0,
+                         &Dev->OriginalPciAttributes
+                         );
+  if (EFI_ERROR (Status)) {
+    goto CloseProtocol;
+  }
+
+  //
+  // Enable I/O Space & Bus-Mastering
+  //
+  Status = Dev->PciIo->Attributes (
+                         Dev->PciIo,
+                         EfiPciIoAttributeOperationEnable,
+                         (EFI_PCI_IO_ATTRIBUTE_IO |
+                          EFI_PCI_IO_ATTRIBUTE_BUS_MASTER),
+                         NULL
+                         );
+  if (EFI_ERROR (Status)) {
+    goto CloseProtocol;
+  }
+
+  //
+  // Signal device supports 64-bit DMA addresses
+  //
+  Status = Dev->PciIo->Attributes (
+                         Dev->PciIo,
+                         EfiPciIoAttributeOperationEnable,
+                         EFI_PCI_IO_ATTRIBUTE_DUAL_ADDRESS_CYCLE,
+                         NULL
+                         );
+  if (EFI_ERROR (Status)) {
+    //
+    // Warn user that device will only be using 32-bit DMA addresses.
+    //
+    // Note that this does not prevent the device/driver from working
+    // and therefore we only warn and continue as usual.
+    //
+    DEBUG ((
+      DEBUG_WARN,
+      "%a: failed to enable 64-bit DMA addresses\n",
+      __FUNCTION__
+      ));
+  }
+
   //
   // Host adapter channel, doesn't exist
   //
@@ -359,10 +407,18 @@ MptScsiControllerStart (
                   &Dev->PassThru
                   );
   if (EFI_ERROR (Status)) {
-    goto CloseProtocol;
+    goto RestoreAttributes;
   }
 
   return EFI_SUCCESS;
+
+RestoreAttributes:
+  Dev->PciIo->Attributes (
+                Dev->PciIo,
+                EfiPciIoAttributeOperationSet,
+                Dev->OriginalPciAttributes,
+                NULL
+                );
 
 CloseProtocol:
   gBS->CloseProtocol (
@@ -414,6 +470,13 @@ MptScsiControllerStop (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
+  Dev->PciIo->Attributes (
+                Dev->PciIo,
+                EfiPciIoAttributeOperationSet,
+                Dev->OriginalPciAttributes,
+                NULL
+                );
 
   gBS->CloseProtocol (
          ControllerHandle,
