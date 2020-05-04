@@ -59,6 +59,7 @@ typedef struct {
   UINT32                          StallPerPollUsec;
   EFI_PCI_IO_PROTOCOL             *PciIo;
   UINT64                          OriginalPciAttributes;
+  EFI_EVENT                       ExitBoot;
   MPT_SCSI_DMA_BUFFER             *Dma;
   EFI_PHYSICAL_ADDRESS            DmaPhysical;
   VOID                            *DmaMapping;
@@ -763,6 +764,20 @@ MptScsiResetChannel (
 }
 
 STATIC
+VOID
+EFIAPI
+MptScsiExitBoot (
+  IN  EFI_EVENT Event,
+  IN  VOID      *Context
+  )
+{
+  MPT_SCSI_DEV *Dev;
+
+  Dev = Context;
+  DEBUG ((DEBUG_VERBOSE, "%a: Context=0x%p\n", __FUNCTION__, Context));
+  MptScsiReset (Dev);
+}
+STATIC
 EFI_STATUS
 EFIAPI
 MptScsiResetTargetLun (
@@ -955,6 +970,17 @@ MptScsiControllerStart (
     goto Unmap;
   }
 
+  Status = gBS->CreateEvent (
+                  EVT_SIGNAL_EXIT_BOOT_SERVICES,
+                  TPL_CALLBACK,
+                  &MptScsiExitBoot,
+                  Dev,
+                  &Dev->ExitBoot
+                  );
+  if (EFI_ERROR (Status)) {
+    goto UninitDev;
+  }
+
   //
   // Host adapter channel, doesn't exist
   //
@@ -979,10 +1005,13 @@ MptScsiControllerStart (
                   &Dev->PassThru
                   );
   if (EFI_ERROR (Status)) {
-    goto UninitDev;
+    goto CloseExitBoot;
   }
 
   return EFI_SUCCESS;
+
+CloseExitBoot:
+  gBS->CloseEvent (Dev->ExitBoot);
 
 UninitDev:
   MptScsiReset (Dev);
@@ -1058,6 +1087,8 @@ MptScsiControllerStop (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
+  gBS->CloseEvent (Dev->ExitBoot);
 
   MptScsiReset (Dev);
 
