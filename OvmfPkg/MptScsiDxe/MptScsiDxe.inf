@@ -24,9 +24,12 @@
   OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
+  DebugLib
+  MemoryAllocationLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
   UefiLib
 
 [Protocols]
-  gEfiPciIoProtocolGuid        ## TO_START
+  gEfiExtScsiPassThruProtocolGuid        ## BY_START
+  gEfiPciIoProtocolGuid                  ## TO_START
