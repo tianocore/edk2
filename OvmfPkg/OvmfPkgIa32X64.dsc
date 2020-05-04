@@ -48,6 +48,7 @@
   # Device drivers
   #
   DEFINE PVSCSI_ENABLE           = TRUE
+  DEFINE MPT_SCSI_ENABLE         = TRUE
 
   #
   # Flash size selection. Setting FD_SIZE_IN_KB on the command line directly to
@@ -768,6 +769,9 @@
   OvmfPkg/XenPvBlkDxe/XenPvBlkDxe.inf
 !if $(PVSCSI_ENABLE) == TRUE
   OvmfPkg/PvScsiDxe/PvScsiDxe.inf
+!endif
+!if $(MPT_SCSI_ENABLE) == TRUE
+  OvmfPkg/MptScsiDxe/MptScsiDxe.inf
 !endif
   MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
   MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf

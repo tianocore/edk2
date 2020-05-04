@@ -234,6 +234,9 @@ INF  OvmfPkg/XenPvBlkDxe/XenPvBlkDxe.inf
 !if $(PVSCSI_ENABLE) == TRUE
 INF  OvmfPkg/PvScsiDxe/PvScsiDxe.inf
 !endif
+!if $(MPT_SCSI_ENABLE) == TRUE
+INF  OvmfPkg/MptScsiDxe/MptScsiDxe.inf
+!endif
 
 !if $(SECURE_BOOT_ENABLE) == TRUE
   INF  SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
