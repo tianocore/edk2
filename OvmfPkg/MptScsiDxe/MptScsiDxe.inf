@@ -24,3 +24,4 @@
 
 [LibraryClasses]
   UefiDriverEntryPoint
+  UefiLib
