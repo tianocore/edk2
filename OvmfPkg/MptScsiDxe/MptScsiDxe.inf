@@ -24,6 +24,7 @@
   OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
+  BaseLib
   BaseMemoryLib
   DebugLib
   MemoryAllocationLib
@@ -38,3 +39,6 @@
 
 [FixedPcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdMptScsiMaxTargetLimit   ## CONSUMES
+
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdMptScsiStallPerPollUsec ## CONSUMES
