@@ -171,6 +171,9 @@
   #  by ScsiBusDxe.
   gUefiOvmfPkgTokenSpaceGuid.PcdMptScsiMaxTargetLimit|7|UINT8|0x39
 
+  ## Microseconds to stall between polling for MptScsi request result
+  gUefiOvmfPkgTokenSpaceGuid.PcdMptScsiStallPerPollUsec|5|UINT32|0x40
+
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashNvStorageEventLogBase|0x0|UINT32|0x8
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashNvStorageEventLogSize|0x0|UINT32|0x9
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFirmwareFdSize|0x0|UINT32|0xa
