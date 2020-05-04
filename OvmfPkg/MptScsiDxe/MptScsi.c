@@ -147,7 +147,36 @@ MptScsiBuildDevicePath (
   IN OUT EFI_DEVICE_PATH_PROTOCOL                  **DevicePath
   )
 {
-  return EFI_UNSUPPORTED;
+  MPT_SCSI_DEV     *Dev;
+  SCSI_DEVICE_PATH *ScsiDevicePath;
+
+  if (DevicePath == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // This device support 256 targets only, so it's enough to dereference
+  // the LSB of Target.
+  //
+  Dev = MPT_SCSI_FROM_PASS_THRU (This);
+  if (*Target > Dev->MaxTarget || Lun > 0) {
+    return EFI_NOT_FOUND;
+  }
+
+  ScsiDevicePath = AllocateZeroPool (sizeof (*ScsiDevicePath));
+  if (ScsiDevicePath == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  ScsiDevicePath->Header.Type      = MESSAGING_DEVICE_PATH;
+  ScsiDevicePath->Header.SubType   = MSG_SCSI_DP;
+  ScsiDevicePath->Header.Length[0] = (UINT8)sizeof (*ScsiDevicePath);
+  ScsiDevicePath->Header.Length[1] = (UINT8)(sizeof (*ScsiDevicePath) >> 8);
+  ScsiDevicePath->Pun              = *Target;
+  ScsiDevicePath->Lun              = (UINT16)Lun;
+
+  *DevicePath = &ScsiDevicePath->Header;
+  return EFI_SUCCESS;
 }
 
 STATIC
@@ -160,7 +189,35 @@ MptScsiGetTargetLun (
   OUT UINT64                                       *Lun
   )
 {
-  return EFI_UNSUPPORTED;
+  MPT_SCSI_DEV     *Dev;
+  SCSI_DEVICE_PATH *ScsiDevicePath;
+
+  if (DevicePath == NULL ||
+      Target == NULL || *Target == NULL || Lun == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (DevicePath->Type    != MESSAGING_DEVICE_PATH ||
+      DevicePath->SubType != MSG_SCSI_DP) {
+    return EFI_UNSUPPORTED;
+  }
+
+  Dev = MPT_SCSI_FROM_PASS_THRU (This);
+  ScsiDevicePath = (SCSI_DEVICE_PATH *)DevicePath;
+  if (ScsiDevicePath->Pun > Dev->MaxTarget ||
+      ScsiDevicePath->Lun > 0) {
+    return EFI_NOT_FOUND;
+  }
+
+  ZeroMem (*Target, TARGET_MAX_BYTES);
+  //
+  // This device support 256 targets only, so it's enough to set the LSB
+  // of Target.
+  //
+  **Target = (UINT8)ScsiDevicePath->Pun;
+  *Lun = ScsiDevicePath->Lun;
+
+  return EFI_SUCCESS;
 }
 
 STATIC
