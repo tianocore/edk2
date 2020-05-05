@@ -72,6 +72,7 @@
   %define GHCB_PT_ADDR (FixedPcdGet32 (PcdOvmfSecGhcbPageTableBase))
   %define GHCB_BASE (FixedPcdGet32 (PcdOvmfSecGhcbBase))
   %define GHCB_SIZE (FixedPcdGet32 (PcdOvmfSecGhcbSize))
+  %define SEV_ES_WORK_AREA (FixedPcdGet32 (PcdSevEsWorkAreaBase))
 %include "Ia32/PageTables64.asm"
 %endif
 
