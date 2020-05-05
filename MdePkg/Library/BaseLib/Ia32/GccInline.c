@@ -1791,3 +1791,20 @@ AsmXGetBv (
 }
 
 
+/**
+  Executes a VMGEXIT instruction.
+
+  Executes a VMGEXIT instruction. This function is only available on IA-32 and
+  X64.
+
+**/
+VOID
+EFIAPI
+AsmVmgExit (
+  VOID
+  )
+{
+  __asm__ __volatile__ ("rep; vmmcall":::"memory");
+}
+
+
