@@ -278,3 +278,6 @@
 
 #string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuApStatusCheckIntervalInMicroSeconds_PROMPT  #language en-US "Periodic interval value in microseconds for AP status check in DXE.\n"
 #string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuApStatusCheckIntervalInMicroSeconds_HELP    #language en-US "Periodic interval value in microseconds for the status check of APs for StartupAllAPs() and StartupThisAP() executed in non-blocking mode in DXE phase.\n"
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdSevEsIsEnabled_PROMPT  #language en-US "Specifies whether SEV-ES is enabled"
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdSevEsIsEnabled_HELP    #language en-US "Set to TRUE when running as an SEV-ES guest, FALSE otherwise."
