@@ -153,6 +153,7 @@
   Ia32/EnableCache.c | MSFT
   Ia32/DisableCache.c | MSFT
   Ia32/XGetBv.nasm | MSFT
+  Ia32/VmgExit.nasm | MSFT
 
 
   Ia32/GccInline.c | GCC
@@ -288,6 +289,7 @@
   X64/ReadCr0.nasm| MSFT
   X64/ReadEflags.nasm| MSFT
   X64/XGetBv.nasm | MSFT
+  X64/VmgExit.nasm | MSFT
 
 
   X64/Non-existing.c
