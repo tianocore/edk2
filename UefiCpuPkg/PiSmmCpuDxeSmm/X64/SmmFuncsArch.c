@@ -121,7 +121,7 @@ GetProtectedModeCS (
   GdtEntry = (IA32_SEGMENT_DESCRIPTOR *) GdtrDesc.Base;
   for (Index = 0; Index < GdtEntryCount; Index++) {
     if (GdtEntry->Bits.L == 0) {
-      if (GdtEntry->Bits.Type > 8 && GdtEntry->Bits.L == 0) {
+      if (GdtEntry->Bits.Type > 8 && GdtEntry->Bits.DB == 1) {
         break;
       }
     }
