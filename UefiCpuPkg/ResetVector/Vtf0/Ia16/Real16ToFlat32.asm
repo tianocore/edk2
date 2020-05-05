@@ -129,5 +129,14 @@ LINEAR_CODE64_SEL   equ $-GDT_BASE
     DB      0            ; base 31:24
 %endif
 
+; linear code segment descriptor
+LINEAR_CODE16_SEL     equ $-GDT_BASE
+    DW      0xffff       ; limit 15:0
+    DW      0            ; base 15:0
+    DB      0            ; base 23:16
+    DB      PRESENT_FLAG(1)|DPL(0)|SYSTEM_FLAG(1)|DESC_TYPE(CODE32_TYPE)
+    DB      GRANULARITY_FLAG(1)|DEFAULT_SIZE32(0)|CODE64_FLAG(0)|UPPER_LIMIT(0xf)
+    DB      0            ; base 31:24
+
 GDT_END:
 
