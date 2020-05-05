@@ -112,6 +112,8 @@
 
 [FixedPcd]
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
+  gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaBase
+  gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaSize
 
 [FeaturePcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdCsmEnable
