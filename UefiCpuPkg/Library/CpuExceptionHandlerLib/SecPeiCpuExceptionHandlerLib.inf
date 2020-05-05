@@ -26,16 +26,20 @@
   Ia32/ExceptionTssEntryAsm.nasm
   Ia32/ArchExceptionHandler.c
   Ia32/ArchInterruptDefs.h
+  Ia32/ArchAMDSevVcHandler.c
 
 [Sources.X64]
   X64/ExceptionHandlerAsm.nasm
   X64/ArchExceptionHandler.c
   X64/ArchInterruptDefs.h
+  X64/ArchAMDSevVcHandler.c
 
 [Sources.common]
   CpuExceptionCommon.h
   CpuExceptionCommon.c
   SecPeiCpuException.c
+  AMDSevVcHandler.c
+  AMDSevVcCommon.h
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -48,3 +52,4 @@
   PrintLib
   LocalApicLib
   PeCoffGetEntryPointLib
+  VmgExitLib
