@@ -237,6 +237,7 @@
 !else
   CpuExceptionHandlerLib|UefiCpuPkg/Library/CpuExceptionHandlerLib/Xcode5DxeCpuExceptionHandlerLib.inf
 !endif
+  VmgExitLib|UefiCpuPkg/Library/VmgExitLib/VmgExitLib.inf
 
 [LibraryClasses.common.DXE_DRIVER]
   PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
@@ -252,6 +253,7 @@
 !else
   CpuExceptionHandlerLib|UefiCpuPkg/Library/CpuExceptionHandlerLib/Xcode5DxeCpuExceptionHandlerLib.inf
 !endif
+  VmgExitLib|UefiCpuPkg/Library/VmgExitLib/VmgExitLib.inf
   MpInitLib|UefiCpuPkg/Library/MpInitLib/DxeMpInitLib.inf
 
 [LibraryClasses.common.DXE_RUNTIME_DRIVER]
