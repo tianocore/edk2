@@ -53,8 +53,25 @@
     %error "This implementation inherently depends on PcdOvmfSecPageTablesSize"
   %endif
 
+  %if (FixedPcdGet32 (PcdOvmfSecGhcbPageTableSize) != 0x1000)
+    %error "This implementation inherently depends on PcdOvmfSecGhcbPageTableSize"
+  %endif
+
+  %if (FixedPcdGet32 (PcdOvmfSecGhcbSize) != 0x2000)
+    %error "This implementation inherently depends on PcdOvmfSecGhcbSize"
+  %endif
+
+  %if ((FixedPcdGet32 (PcdOvmfSecGhcbBase) >> 21) != \
+       ((FixedPcdGet32 (PcdOvmfSecGhcbBase) + FixedPcdGet32 (PcdOvmfSecGhcbSize) - 1) >> 21))
+    %error "This implementation inherently depends on PcdOvmfSecGhcbBase not straddling a 2MB boundary"
+  %endif
+
   %define PT_ADDR(Offset) (FixedPcdGet32 (PcdOvmfSecPageTablesBase) + (Offset))
 %include "Ia32/Flat32ToFlat64.asm"
+
+  %define GHCB_PT_ADDR (FixedPcdGet32 (PcdOvmfSecGhcbPageTableBase))
+  %define GHCB_BASE (FixedPcdGet32 (PcdOvmfSecGhcbBase))
+  %define GHCB_SIZE (FixedPcdGet32 (PcdOvmfSecGhcbSize))
 %include "Ia32/PageTables64.asm"
 %endif
 
