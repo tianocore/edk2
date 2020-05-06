@@ -49,7 +49,7 @@
 #define PRINT_STRUCT_VALUE(pStruct, type, element) \
   do { \
     ShellPrintEx(-1,-1,L"%a",#element); \
-    ShellPrintEx(-1,-1,L": %d\n", (pStruct->type->element)); \
+    ShellPrintEx(-1,-1,L": %u\n", (pStruct->type->element)); \
   } while (0);
 
 #define PRINT_STRUCT_VALUE_H(pStruct, type, element) \
@@ -634,8 +634,8 @@ SmbiosPrintStructure (
       NumOfItem = (Struct->Type14->Hdr.Length - 5) / 3;
       PRINT_PENDING_STRING (Struct, Type14, GroupName);
       for (Index = 0; Index < NumOfItem; Index++) {
-        ShellPrintEx(-1,-1,L"ItemType %d: %d\n", Index + 1, Struct->Type14->Group[Index].ItemType);
-        ShellPrintEx(-1,-1,L"ItemHandle %d: %d\n", Index + 1, Struct->Type14->Group[Index].ItemHandle);
+        ShellPrintEx(-1,-1,L"ItemType %u: %u\n", Index + 1, Struct->Type14->Group[Index].ItemType);
+        ShellPrintEx(-1,-1,L"ItemHandle %u: %u\n", Index + 1, Struct->Type14->Group[Index].ItemHandle);
       }
     }
     break;
