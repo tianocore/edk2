@@ -41,7 +41,7 @@
 #define CALL_BASECRYPTLIB(Enable, Function, Args, ErrorReturnValue) \
   EDKII_CRYPTO_PCD->Enable                                          \
     ? Function Args                                                 \
-    : (BaseCryptLibServciceNotEnabled (#Function), ErrorReturnValue)
+    : (BaseCryptLibServiceNotEnabled (#Function), ErrorReturnValue)
 
 /**
   A macro used to call a void BaseCryptLib function if it is enabled.
@@ -61,7 +61,7 @@
 #define CALL_VOID_BASECRYPTLIB(Enable, Function, Args)  \
   EDKII_CRYPTO_PCD->Enable                              \
     ? Function Args                                     \
-    : BaseCryptLibServciceNotEnabled (#Function)
+    : BaseCryptLibServiceNotEnabled (#Function)
 
 /**
   Internal worker function that prints a debug message and asserts if a call is
@@ -78,11 +78,29 @@
 **/
 static
 VOID
-BaseCryptLibServciceNotEnabled (
+BaseCryptLibServiceNotEnabled (
   IN CONST CHAR8  *FunctionName
   )
 {
   DEBUG ((DEBUG_ERROR, "[%a] Function %a() is not enabled\n", gEfiCallerBaseName, FunctionName));
+  ASSERT_EFI_ERROR (EFI_UNSUPPORTED);
+}
+
+/**
+  Internal worker function that prints a debug message and asserts if a call is
+  made to a BaseCryptLib function that is deprecated and unsupported any longer.
+
+  @param[in]  FunctionName  Null-terminated ASCII string that is the name of an
+                            EDK II Crypto service.
+
+**/
+static
+VOID
+BaseCryptLibServiceDeprecated (
+  IN CONST CHAR8  *FunctionName
+  )
+{
+  DEBUG ((DEBUG_ERROR, "[%a] Function %a() is deprecated and unsupported any longer\n", gEfiCallerBaseName, FunctionName));
   ASSERT_EFI_ERROR (EFI_UNSUPPORTED);
 }
 
