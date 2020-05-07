@@ -5,6 +5,7 @@
 #  PRM handlers within those modules into a PRMT ACPI table such that the handlers are
 #  made available for invocation in the OS.
 #
+#  Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
 #  Copyright (c) Microsoft Corporation
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -23,6 +24,7 @@
   PrmAcpiTable.h
   PrmLoader.h
   PrmLoaderDxe.c
+  Prm.asl
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -42,6 +44,8 @@
   UefiBootServicesTableLib
   UefiDriverEntryPoint
   UefiLib
+  DxeServicesLib
+  PcdLib
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemId            ## CONSUMES
