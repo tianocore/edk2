@@ -3,6 +3,7 @@
   This file contains the implementation for a Platform Runtime Mechanism (PRM)
   loader driver.
 
+  Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
   Copyright (c) Microsoft Corporation
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -19,6 +20,7 @@
 #include <Library/PrmContextBufferLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>
+#include <Library/DxeServicesLib.h>
 #include <Protocol/AcpiTable.h>
 #include <Protocol/LoadedImage.h>
 #include <Protocol/PrmConfig.h>
@@ -809,6 +811,8 @@ PublishPrmAcpiTable (
   EFI_STATUS                              Status;
   EFI_ACPI_TABLE_PROTOCOL                 *AcpiTableProtocol;
   UINTN                                   TableKey;
+  EFI_ACPI_DESCRIPTION_HEADER             *Ssdt;
+  UINTN                                   SsdtSize;
 
   if (PrmAcpiDescriptionTable == NULL || PrmAcpiDescriptionTable->Header.Signature != PRM_TABLE_SIGNATURE) {
     return EFI_INVALID_PARAMETER;
@@ -830,6 +834,36 @@ PublishPrmAcpiTable (
       DEBUG ((DEBUG_INFO, "%a %a: The PRMT ACPI table was installed successfully.\n", _DBGMSGID_, __FUNCTION__));
     }
   }
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Load SSDT
+  //
+  Status = GetSectionFromFv (
+               &gEfiCallerIdGuid,
+               EFI_SECTION_RAW,
+               0,
+               (VOID **) &Ssdt,
+               &SsdtSize
+               );
+  ASSERT_EFI_ERROR (Status);
+  DEBUG ((DEBUG_INFO, "%a %a: SSDT loaded ...\n", _DBGMSGID_, __FUNCTION__));
+
+  //
+  // Update OEM ID
+  //
+  CopyMem (&Ssdt->OemId, PcdGetPtr (PcdAcpiDefaultOemId), sizeof (Ssdt->OemId));
+
+  //
+  // Publish the SSDT. Table is re-checksumed.
+  //
+  TableKey = 0;
+  Status = AcpiTableProtocol->InstallAcpiTable (
+                        AcpiTableProtocol,
+                        Ssdt,
+                        SsdtSize,
+                        &TableKey
+                        );
   ASSERT_EFI_ERROR (Status);
 
   return Status;
