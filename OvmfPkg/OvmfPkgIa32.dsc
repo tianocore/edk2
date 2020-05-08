@@ -537,6 +537,18 @@
 !endif
 
   #
+  # The NumberOfPages values below are ad-hoc. They are updated sporadically at
+  # best (please refer to git-blame for past updates). The values capture a set
+  # of BIN hints that made sense at a particular time, for some (now likely
+  # unknown) workloads / boot paths.
+  #
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIMemoryNVS|0x4
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIReclaimMemory|0x8
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiReservedMemoryType|0x4
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesCode|0x30
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData|0x24
+
+  #
   # Network Pcds
   #
 !include NetworkPkg/NetworkPcds.dsc.inc

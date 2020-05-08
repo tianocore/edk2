@@ -17,19 +17,16 @@
 
 #include "Platform.h"
 
-//
-// The NumberOfPages values below are ad-hoc. They are updated sporadically at
-// best (please refer to git-blame for past updates). The values capture a set
-// of BIN hints that made sense at a particular time, for some (now likely
-// unknown) workloads / boot paths.
-//
+#define MEMORY_TYPE_INFO_DEFAULT(Type) \
+  { Type, FixedPcdGet32 (PcdMemoryType ## Type) }
+
 STATIC EFI_MEMORY_TYPE_INFORMATION mMemoryTypeInformation[] = {
-  { EfiACPIMemoryNVS,       0x004 },
-  { EfiACPIReclaimMemory,   0x008 },
-  { EfiReservedMemoryType,  0x004 },
-  { EfiRuntimeServicesData, 0x024 },
-  { EfiRuntimeServicesCode, 0x030 },
-  { EfiMaxMemoryType,       0x000 }
+  MEMORY_TYPE_INFO_DEFAULT (EfiACPIMemoryNVS),
+  MEMORY_TYPE_INFO_DEFAULT (EfiACPIReclaimMemory),
+  MEMORY_TYPE_INFO_DEFAULT (EfiReservedMemoryType),
+  MEMORY_TYPE_INFO_DEFAULT (EfiRuntimeServicesCode),
+  MEMORY_TYPE_INFO_DEFAULT (EfiRuntimeServicesData),
+  { EfiMaxMemoryType, 0 }
 };
 
 STATIC
