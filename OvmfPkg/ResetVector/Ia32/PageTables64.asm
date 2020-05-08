@@ -89,6 +89,10 @@ SevExit:
 ; If SEV-ES is disabled then EAX will be zero.
 ;
 CheckSevEsFeature:
+    ; Initialize the first byte of the workarea to zero to communicate to
+    ; the SEC phase that SEV-ES is not enabled.
+    mov     byte[SEV_ES_WORK_AREA], 0
+
     xor       eax, eax
 
     ; SEV-ES can't be enabled if SEV isn't, so first check the encryption
@@ -107,6 +111,13 @@ CheckSevEsFeature:
 
     ; Restore encryption mask
     mov       edx, ebx
+
+    test      eax, eax
+    jz        NoSevEs
+
+    ; Set the first byte of the workarea to one to communicate to the SEC
+    ; phase that SEV-ES is enabled.
+    mov       byte[SEV_ES_WORK_AREA], 1
 
 NoSevEs:
     OneTimeCallRet CheckSevEsFeature
