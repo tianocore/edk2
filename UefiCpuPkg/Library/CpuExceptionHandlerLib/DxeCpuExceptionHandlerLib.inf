@@ -57,3 +57,4 @@
   PeCoffGetEntryPointLib
   MemoryAllocationLib
   DebugLib
+  VmgExitLib
