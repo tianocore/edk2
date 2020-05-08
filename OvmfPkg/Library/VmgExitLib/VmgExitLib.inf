@@ -1,0 +1,36 @@
+## @file
+#  VMGEXIT Support Library.
+#
+#  Copyright (C) 2020, Advanced Micro Devices, Inc. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = VmgExitLib
+  MODULE_UNI_FILE                = VmgExitLib.uni
+  FILE_GUID                      = 0e923c25-13cd-430b-8714-ffe85652a97b
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = VmgExitLib
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = X64
+#
+
+[Sources.X64]
+  X64/VmgExitVcHandler.c
+
+[Sources.common]
+  VmgExitLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseLib
+
