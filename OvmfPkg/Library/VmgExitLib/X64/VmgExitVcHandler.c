@@ -877,6 +877,50 @@ WbinvdExit (
 }
 
 /**
+  Handle a VMMCALL event.
+
+  Use the VMGEXIT instruction to handle either a VMMCALL event.
+
+  @param[in, out] Ghcb             Pointer to the Guest-Hypervisor Communication
+                                   Block
+  @param[in, out] Regs             x64 processor context
+  @param[in]      InstructionData  Instruction parsing context
+
+  @retval 0                        Event handled successfully
+  @retval Others                   New exception value to propagate
+
+**/
+STATIC
+UINT64
+VmmCallExit (
+  IN OUT GHCB                     *Ghcb,
+  IN OUT EFI_SYSTEM_CONTEXT_X64   *Regs,
+  IN     SEV_ES_INSTRUCTION_DATA  *InstructionData
+  )
+{
+  UINT64  Status;
+
+  DecodeModRm (Regs, InstructionData);
+
+  Ghcb->SaveArea.Rax = Regs->Rax;
+  GhcbSetRegValid (Ghcb, GhcbRax);
+  Ghcb->SaveArea.Cpl = (UINT8) (Regs->Cs & 0x3);
+  GhcbSetRegValid (Ghcb, GhcbCpl);
+
+  Status = VmgExit (Ghcb, SVM_EXIT_VMMCALL, 0, 0);
+  if (Status) {
+    return Status;
+  }
+
+  if (!GhcbIsRegValid (Ghcb, GhcbRax)) {
+    return UnsupportedExit (Ghcb, Regs, InstructionData);
+  }
+  Regs->Rax = Ghcb->SaveArea.Rax;
+
+  return 0;
+}
+
+/**
   Handle an MSR event.
 
   Use the VMGEXIT instruction to handle either a RDMSR or WRMSR event.
@@ -1387,6 +1431,10 @@ VmgExitHandleVc (
 
   case SVM_EXIT_MSR:
     NaeExit = MsrExit;
+    break;
+
+  case SVM_EXIT_VMMCALL:
+    NaeExit = VmmCallExit;
     break;
 
   case SVM_EXIT_WBINVD:
