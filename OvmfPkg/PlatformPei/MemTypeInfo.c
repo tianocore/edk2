@@ -1,7 +1,5 @@
 /** @file
-  Produce a default memory type information HOB unless we can determine, from
-  the existence of the "MemoryTypeInformation" variable, that the DXE IPL PEIM
-  will produce the HOB.
+  Produce the memory type information HOB.
 
   Copyright (C) 2017-2020, Red Hat, Inc.
 
@@ -25,7 +23,7 @@
 // of BIN hints that made sense at a particular time, for some (now likely
 // unknown) workloads / boot paths.
 //
-STATIC EFI_MEMORY_TYPE_INFORMATION mDefaultMemoryTypeInformation[] = {
+STATIC EFI_MEMORY_TYPE_INFORMATION mMemoryTypeInformation[] = {
   { EfiACPIMemoryNVS,       0x004 },
   { EfiACPIReclaimMemory,   0x008 },
   { EfiReservedMemoryType,  0x004 },
@@ -42,11 +40,117 @@ BuildMemTypeInfoHob (
 {
   BuildGuidDataHob (
     &gEfiMemoryTypeInformationGuid,
-    mDefaultMemoryTypeInformation,
-    sizeof mDefaultMemoryTypeInformation
+    mMemoryTypeInformation,
+    sizeof mMemoryTypeInformation
     );
-  DEBUG ((DEBUG_INFO, "%a: default memory type information HOB built\n",
-    __FUNCTION__));
+}
+
+/**
+  Refresh the mMemoryTypeInformation array (which we'll turn into the
+  MemoryTypeInformation HOB) from the MemoryTypeInformation UEFI variable.
+
+  Normally, the DXE IPL PEIM builds the HOB from the UEFI variable. But it does
+  so *transparently*. Instead, we consider the UEFI variable as a list of
+  hints, for updating our HOB defaults:
+
+  - Record types not covered in mMemoryTypeInformation are ignored. In
+    particular, this hides record types from the UEFI variable that may lead to
+    reboots without benefiting SMM security, such as EfiBootServicesData.
+
+  - Records that would lower the defaults in mMemoryTypeInformation are also
+    ignored.
+
+  @param[in] ReadOnlyVariable2  The EFI_PEI_READ_ONLY_VARIABLE2_PPI used for
+                                retrieving the MemoryTypeInformation UEFI
+                                variable.
+**/
+STATIC
+VOID
+RefreshMemTypeInfo (
+  IN EFI_PEI_READ_ONLY_VARIABLE2_PPI *ReadOnlyVariable2
+  )
+{
+  UINTN                       DataSize;
+  EFI_MEMORY_TYPE_INFORMATION Entries[EfiMaxMemoryType + 1];
+  EFI_STATUS                  Status;
+  UINTN                       NumEntries;
+  UINTN                       HobRecordIdx;
+
+  //
+  // Read the MemoryTypeInformation UEFI variable from the
+  // gEfiMemoryTypeInformationGuid namespace.
+  //
+  DataSize = sizeof Entries;
+  Status = ReadOnlyVariable2->GetVariable (
+                                ReadOnlyVariable2,
+                                EFI_MEMORY_TYPE_INFORMATION_VARIABLE_NAME,
+                                &gEfiMemoryTypeInformationGuid,
+                                NULL,
+                                &DataSize,
+                                Entries
+                                );
+  if (EFI_ERROR (Status)) {
+    //
+    // If the UEFI variable does not exist (EFI_NOT_FOUND), we can't use it for
+    // udpating mMemoryTypeInformation.
+    //
+    // If the UEFI variable exists but Entries is too small to hold it
+    // (EFI_BUFFER_TOO_SMALL), then the variable contents are arguably invalid.
+    // That's because Entries has room for every distinct EFI_MEMORY_TYPE,
+    // including the terminator record with EfiMaxMemoryType. Thus, we can't
+    // use the UEFI variable for updating mMemoryTypeInformation.
+    //
+    // If the UEFI variable couldn't be read for some other reason, we
+    // similarly can't use it for udpating mMemoryTypeInformation.
+    //
+    DEBUG ((DEBUG_ERROR, "%a: GetVariable(): %r\n", __FUNCTION__, Status));
+    return;
+  }
+
+  //
+  // Sanity-check the UEFI variable size against the record size.
+  //
+  if (DataSize % sizeof Entries[0] != 0) {
+    DEBUG ((DEBUG_ERROR, "%a: invalid UEFI variable size %Lu\n", __FUNCTION__,
+      (UINT64)DataSize));
+    return;
+  }
+  NumEntries = DataSize / sizeof Entries[0];
+
+  //
+  // For each record in mMemoryTypeInformation, except the terminator record,
+  // look up the first match (if any) in the UEFI variable, based on the memory
+  // type.
+  //
+  for (HobRecordIdx = 0;
+       HobRecordIdx < ARRAY_SIZE (mMemoryTypeInformation) - 1;
+       HobRecordIdx++) {
+    EFI_MEMORY_TYPE_INFORMATION *HobRecord;
+    UINTN                       Idx;
+    EFI_MEMORY_TYPE_INFORMATION *VariableRecord;
+
+    HobRecord = &mMemoryTypeInformation[HobRecordIdx];
+
+    for (Idx = 0; Idx < NumEntries; Idx++) {
+      VariableRecord = &Entries[Idx];
+
+      if (VariableRecord->Type == HobRecord->Type) {
+        break;
+      }
+    }
+
+    //
+    // If there is a match, allow the UEFI variable to increase NumberOfPages.
+    //
+    if (Idx < NumEntries &&
+        HobRecord->NumberOfPages < VariableRecord->NumberOfPages) {
+      DEBUG ((DEBUG_VERBOSE, "%a: Type 0x%x: NumberOfPages 0x%x -> 0x%x\n",
+        __FUNCTION__, HobRecord->Type, HobRecord->NumberOfPages,
+        VariableRecord->NumberOfPages));
+
+      HobRecord->NumberOfPages = VariableRecord->NumberOfPages;
+    }
+  }
 }
 
 /**
@@ -70,47 +174,10 @@ OnReadOnlyVariable2Available (
   IN VOID                       *Ppi
   )
 {
-  EFI_PEI_READ_ONLY_VARIABLE2_PPI *ReadOnlyVariable2;
-  UINTN                           DataSize;
-  EFI_STATUS                      Status;
-
   DEBUG ((DEBUG_VERBOSE, "%a\n", __FUNCTION__));
 
-  //
-  // Check if the "MemoryTypeInformation" variable exists, in the
-  // gEfiMemoryTypeInformationGuid namespace.
-  //
-  ReadOnlyVariable2 = Ppi;
-  DataSize = 0;
-  Status = ReadOnlyVariable2->GetVariable (
-                                ReadOnlyVariable2,
-                                EFI_MEMORY_TYPE_INFORMATION_VARIABLE_NAME,
-                                &gEfiMemoryTypeInformationGuid,
-                                NULL,
-                                &DataSize,
-                                NULL
-                                );
-  switch (Status) {
-  case EFI_BUFFER_TOO_SMALL:
-    //
-    // The variable exists; the DXE IPL PEIM will build the HOB from it.
-    //
-    break;
-  case EFI_NOT_FOUND:
-    //
-    // The variable does not exist; install the default memory type information
-    // HOB.
-    //
-    BuildMemTypeInfoHob ();
-    break;
-  default:
-    DEBUG ((DEBUG_ERROR, "%a: unexpected: GetVariable(): %r\n", __FUNCTION__,
-      Status));
-    ASSERT (FALSE);
-    CpuDeadLoop ();
-    break;
-  }
-
+  RefreshMemTypeInfo (Ppi);
+  BuildMemTypeInfoHob ();
   return EFI_SUCCESS;
 }
 
