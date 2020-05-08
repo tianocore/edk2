@@ -39,6 +39,8 @@ AmdSevEsInitialize (
   PHYSICAL_ADDRESS  GhcbBasePa;
   UINTN             GhcbPageCount, PageCount;
   RETURN_STATUS     PcdStatus, DecryptStatus;
+  IA32_DESCRIPTOR   Gdtr;
+  VOID              *Gdt;
 
   if (!MemEncryptSevEsIsEnabled ()) {
     return;
@@ -83,6 +85,22 @@ AmdSevEsInitialize (
     (UINT64)GhcbPageCount, GhcbBase));
 
   AsmWriteMsr64 (MSR_SEV_ES_GHCB, GhcbBasePa);
+
+  //
+  // The SEV support will clear the C-bit from non-RAM areas.  The early GDT
+  // lives in a non-RAM area, so when an exception occurs (like a #VC) the GDT
+  // will be read as un-encrypted even though it was created before the C-bit
+  // was cleared (encrypted). This will result in a failure to be able to
+  // handle the exception.
+  //
+  AsmReadGdtr (&Gdtr);
+
+  Gdt = AllocatePages (EFI_SIZE_TO_PAGES ((UINTN) Gdtr.Limit + 1));
+  ASSERT (Gdt != NULL);
+
+  CopyMem (Gdt, (VOID *) Gdtr.Base, Gdtr.Limit + 1);
+  Gdtr.Base = (UINTN) Gdt;
+  AsmWriteGdtr (&Gdtr);
 }
 
 /**
