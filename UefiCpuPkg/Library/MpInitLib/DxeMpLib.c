@@ -12,6 +12,8 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DebugAgentLib.h>
 #include <Library/DxeServicesTableLib.h>
+#include <Register/Amd/Fam17Msr.h>
+#include <Register/Amd/Ghcb.h>
 
 #include <Protocol/Timer.h>
 
@@ -145,6 +147,39 @@ GetModeTransitionBuffer (
 }
 
 /**
+  Return the address of the SEV-ES AP jump table.
+
+  This buffer is required in order for an SEV-ES guest to transition from
+  UEFI into an OS.
+
+  @retval other   Return SEV-ES AP jump table buffer
+**/
+UINTN
+GetSevEsAPMemory (
+  VOID
+  )
+{
+  EFI_STATUS            Status;
+  EFI_PHYSICAL_ADDRESS  StartAddress;
+
+  //
+  // Allocate 1 page for AP jump table page
+  //
+  StartAddress = BASE_4GB - 1;
+  Status = gBS->AllocatePages (
+                  AllocateMaxAddress,
+                  EfiReservedMemoryType,
+                  1,
+                  &StartAddress
+                  );
+  ASSERT_EFI_ERROR (Status);
+
+  DEBUG ((DEBUG_INFO, "Dxe: SevEsAPMemory = %lx\n", (UINTN) StartAddress));
+
+  return (UINTN) StartAddress;
+}
+
+/**
   Checks APs status and updates APs status if needed.
 
 **/
@@ -219,6 +254,38 @@ CheckApsStatus (
 }
 
 /**
+  Get Protected mode code segment with 16-bit default addressing
+  from current GDT table.
+
+  @return  Protected mode 16-bit code segment value.
+**/
+UINT16
+GetProtectedMode16CS (
+  VOID
+  )
+{
+  IA32_DESCRIPTOR          GdtrDesc;
+  IA32_SEGMENT_DESCRIPTOR  *GdtEntry;
+  UINTN                    GdtEntryCount;
+  UINT16                   Index;
+
+  Index = (UINT16) -1;
+  AsmReadGdtr (&GdtrDesc);
+  GdtEntryCount = (GdtrDesc.Limit + 1) / sizeof (IA32_SEGMENT_DESCRIPTOR);
+  GdtEntry = (IA32_SEGMENT_DESCRIPTOR *) GdtrDesc.Base;
+  for (Index = 0; Index < GdtEntryCount; Index++) {
+    if (GdtEntry->Bits.L == 0) {
+      if (GdtEntry->Bits.Type > 8 && GdtEntry->Bits.DB == 0) {
+        break;
+      }
+    }
+    GdtEntry++;
+  }
+  ASSERT (Index != GdtEntryCount);
+  return Index * 8;
+}
+
+/**
   Get Protected mode code segment from current GDT table.
 
   @return  Protected mode code segment value.
@@ -238,7 +305,7 @@ GetProtectedModeCS (
   GdtEntry = (IA32_SEGMENT_DESCRIPTOR *) GdtrDesc.Base;
   for (Index = 0; Index < GdtEntryCount; Index++) {
     if (GdtEntry->Bits.L == 0) {
-      if (GdtEntry->Bits.Type > 8 && GdtEntry->Bits.L == 0) {
+      if (GdtEntry->Bits.Type > 8 && GdtEntry->Bits.DB == 1) {
         break;
       }
     }
@@ -300,6 +367,7 @@ MpInitChangeApLoopCallback (
 
   CpuMpData = GetCpuMpData ();
   CpuMpData->PmCodeSegment = GetProtectedModeCS ();
+  CpuMpData->Pm16CodeSegment = GetProtectedMode16CS ();
   CpuMpData->ApLoopMode = PcdGet8 (PcdCpuApLoopMode);
   mNumberToFinish = CpuMpData->CpuCount - 1;
   WakeUpAP (CpuMpData, TRUE, 0, RelocateApLoop, NULL, TRUE);
