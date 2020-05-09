@@ -39,6 +39,7 @@ from Common.LongFilePathSupport import LongFilePath as LongFilePath
 from Common.MultipleWorkspace import MultipleWorkspace as mws
 from CommonDataClass.Exceptions import BadExpression
 from Common.caching import cached_property
+import struct
 
 ArrayIndex = re.compile("\[\s*[0-9a-fA-FxX]*\s*\]")
 ## Regular expression used to find out place holders in string template
@@ -1155,13 +1156,12 @@ def ParseFieldValue (Value):
         if Value[0] == '"' and Value[-1] == '"':
             Value = Value[1:-1]
         try:
-            Value = str(uuid.UUID(Value).bytes_le)
-            if Value.startswith("b'"):
-                Value = Value[2:-1]
-            Value = "'" + Value + "'"
+            Value = uuid.UUID(Value).bytes_le
+            ValueL, ValueH = struct.unpack('2Q', Value)
+            Value = (ValueH << 64 ) | ValueL
+
         except ValueError as Message:
             raise BadExpression(Message)
-        Value, Size = ParseFieldValue(Value)
         return Value, 16
     if Value.startswith('L"') and Value.endswith('"'):
         # Unicode String
