@@ -20,7 +20,6 @@
   RegularExpressionDxe.h
   OnigurumaUefiPort.h
   OnigurumaUefiPort.c
-  OnigurumaIntrinsics.c | MSFT
 
 # Wrapper header files start #
   stdio.h

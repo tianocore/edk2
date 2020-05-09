@@ -96,6 +96,8 @@ int EFIAPI sprintf_s (char *str, size_t sizeOfBuffer, char const *fmt, ...);
 int strlen(const char* str);
 void* malloc(size_t size);
 void* realloc(void *ptr, size_t size);
+void* memcpy (void *dest, const void *src, unsigned int count);
+void* memset (void *dest, char ch, unsigned int count);
 
 #define exit(n) ASSERT(FALSE);
 
