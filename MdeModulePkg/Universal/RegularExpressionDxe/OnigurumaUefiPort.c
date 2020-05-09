@@ -86,3 +86,13 @@ void * realloc (void *ptr, size_t size)
   return NULL;
 }
 
+void* memcpy (void *dest, const void *src, unsigned int count)
+{
+  return CopyMem (dest, src, (UINTN)count);
+}
+
+void* memset (void *dest, char ch, unsigned int count)
+{
+  return SetMem (dest, ch, count);
+}
+
