@@ -268,7 +268,7 @@ class EfiSection (EfiSectionClassObject):
                         else:
                             Align = str (ImageObj.SectionAlignment // 0x100000) + 'M'
 
-                    if File[(len(File)-4):] == '.efi':
+                    if File[(len(File)-4):] == '.efi' and FfsInf.InfModule.BaseName == os.path.basename(File)[:-4]:
                         MapFile = File.replace('.efi', '.map')
                         CopyMapFile = os.path.join(OutputPath, ModuleName + '.map')
                         if IsMakefile:
