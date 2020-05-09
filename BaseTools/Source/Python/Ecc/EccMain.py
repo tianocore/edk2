@@ -2,6 +2,7 @@
 # This file is used to be the main entrance of ECC tool
 #
 # Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) Microsoft Corporation.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
@@ -406,9 +407,9 @@ if __name__ == '__main__':
     EdkLogger.Initialize()
     EdkLogger.IsRaiseError = False
 
-    StartTime = time.clock()
+    StartTime = time.perf_counter()
     Ecc = Ecc()
-    FinishTime = time.clock()
+    FinishTime = time.perf_counter()
 
     BuildDuration = time.strftime("%M:%S", time.gmtime(int(round(FinishTime - StartTime))))
     EdkLogger.quiet("\n%s [%s]" % (time.strftime("%H:%M:%S, %b.%d %Y", time.localtime()), BuildDuration))
