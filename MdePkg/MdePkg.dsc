@@ -36,6 +36,7 @@
   MdePkg/Library/UefiFileHandleLib/UefiFileHandleLib.inf
   MdePkg/Library/BaseCacheMaintenanceLib/BaseCacheMaintenanceLib.inf
   MdePkg/Library/BaseCpuLib/BaseCpuLib.inf
+  MdePkg/Library/BaseDebugCommonLib/BaseDebugCommonLib.inf
   MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
   MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
   MdePkg/Library/BaseDebugPrintErrorLevelLib/BaseDebugPrintErrorLevelLib.inf

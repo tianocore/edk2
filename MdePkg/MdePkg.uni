@@ -189,7 +189,8 @@
                                                                                 "BIT2 - Enable Debug Code.<BR>\n"
                                                                                 "BIT3 - Enable Clear Memory.<BR>\n"
                                                                                 "BIT4 - Enable BreakPoint as ASSERT.<BR>\n"
-                                                                                "BIT5 - Enable DeadLoop as ASSERT.<BR>"
+                                                                                "BIT5 - Enable DeadLoop as ASSERT.<BR>\n"
+                                                                                "BIT6 - Treat constrait violations as ASSERT.<BR>"
 
 #string STR_gEfiMdePkgTokenSpaceGuid_ERR_80000002 #language en-US "Reserved bits must be set to zero."
 

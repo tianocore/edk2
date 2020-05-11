@@ -229,6 +229,9 @@
   #                  library class maps directly on top of the Timer class.
   S3StallLib|Include/Library/S3StallLib.h
 
+  ##  @libraryclass  Provides services to access common debugging features.
+  DebugCommonLib|Include/Library/DebugCommonLib.h
+
   ##  @libraryclass  Defines library APIs used by modules to get/set print error level.
   DebugPrintErrorLevelLib|Include/Library/DebugPrintErrorLevelLib.h
 
