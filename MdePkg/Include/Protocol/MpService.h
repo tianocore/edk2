@@ -48,6 +48,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   }
 
 ///
+/// Value used in the NumberProcessors parameter of the GetProcessorInfo function
+///
+#define CPU_V2_EXTENDED_TOPOLOGY BIT24
+
+///
 /// Forward declaration for the EFI_MP_SERVICES_PROTOCOL.
 ///
 typedef struct _EFI_MP_SERVICES_PROTOCOL EFI_MP_SERVICES_PROTOCOL;
@@ -97,6 +102,47 @@ typedef struct {
 } EFI_CPU_PHYSICAL_LOCATION;
 
 ///
+///  Structure that defines the 6-level physical location of the processor
+///
+typedef struct {
+///
+///    Package     Zero-based physical package number that identifies the cartridge of the processor.
+///
+UINT32  Package;
+///
+///    Module      Zero-based physical module number within package of the processor.
+///
+UINT32  Module;
+///
+///    Tile        Zero-based physical tile number within module of the processor.
+///
+UINT32  Tile;
+///
+///    Die         Zero-based physical die number within tile of the processor.
+///
+UINT32  Die;
+///
+///     Core        Zero-based physical core number within die of the processor.
+///
+UINT32  Core;
+///
+///     Thread      Zero-based logical thread number within core of the processor.
+///
+UINT32  Thread;
+} EFI_CPU_PHYSICAL_LOCATION2;
+
+
+typedef union {
+  /// The 6-level physical location of the processor, including the
+  /// physical package number that identifies the cartridge, the physical
+  /// module number within package, the physical tile number within the module,
+  /// the physical die number within the tile, the physical core number within
+  /// package, and logical thread number within core.
+  EFI_CPU_PHYSICAL_LOCATION2  Location2;
+} EXTENDED_PROCESSOR_INFORMATION;
+
+
+///
 /// Structure that describes information about a logical CPU.
 ///
 typedef struct {
@@ -132,6 +178,10 @@ typedef struct {
   /// logical thread number within core.
   ///
   EFI_CPU_PHYSICAL_LOCATION  Location;
+  ///
+  /// The extended information of the processor. This field is filled only when
+  /// CPU_V2_EXTENDED_TOPOLOGY is set in parameter ProcessorNumber.
+  EXTENDED_PROCESSOR_INFORMATION ExtendedInformation;
 } EFI_PROCESSOR_INFORMATION;
 
 /**
