@@ -152,6 +152,16 @@ F: ArmVirtPkg/XenPlatformHasAcpiDtDxe/
 F: ArmVirtPkg/XenioFdtDxe/
 R: Julien Grall <julien@xen.org>
 
+ArmVirtPkg: Kvmtool emulated platform support
+F: ArmVirtPkg/ArmVirtKvmTool.*
+F: ArmVirtPkg/KvmtoolPlatformDxe/
+F: ArmVirtPkg/Library/Fdt16550SerialPortHookLib/
+F: ArmVirtPkg/Library/KvmtoolPlatformPeiLib/
+F: ArmVirtPkg/Library/KvmtoolRtcFdtClientLib/
+F: ArmVirtPkg/Library/KvmtoolVirtMemInfoLib/
+F: ArmVirtPkg/Library/NorFlashKvmtoolLib/
+R: Sami Mujawar <sami.mujawar@arm.com>
+
 BaseTools
 F: BaseTools/
 W: https://github.com/tianocore/tianocore.github.io/wiki/BaseTools
