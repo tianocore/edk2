@@ -512,6 +512,14 @@
 !endif
   UefiPayloadPkg/GraphicsOutputDxe/GraphicsOutputDxe.inf
 
+  #
+  # Random Number Generator
+  #
+  SecurityPkg/RandomNumberGenerator/RngDxe/RngDxe.inf {
+      <LibraryClasses>
+      RngLib|UefiPayloadPkg/Library/BaseRngLib/BaseRngLib.inf
+  }
+
   #------------------------------
   #  Build the shell
   #------------------------------

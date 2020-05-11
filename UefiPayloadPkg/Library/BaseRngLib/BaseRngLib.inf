@@ -1,0 +1,32 @@
+## @file
+#  Instance of RNG (Random Number Generator) Library.
+#
+#  Copyright (c) 2020 9elements Agency GmbH.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BaseRngLib
+  MODULE_UNI_FILE                = BaseRngLib.uni
+  FILE_GUID                      = 05C48431-DE18-4550-931A-3350E8551498
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = RngLib
+  CONSTRUCTOR                    = BaseRngLibConstructor
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources.Ia32, Sources.X64]
+  BaseRng.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib

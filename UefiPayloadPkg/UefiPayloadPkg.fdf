@@ -183,6 +183,10 @@ INF MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
 INF MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
 INF MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
 
+#
+# Random Number Generator
+#
+INF SecurityPkg/RandomNumberGenerator/RngDxe/RngDxe.inf
 
 #
 # Shell
