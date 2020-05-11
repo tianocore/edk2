@@ -178,25 +178,6 @@
   $(OPENSSL_PATH)/crypto/cryptlib.c
   $(OPENSSL_PATH)/crypto/ctype.c
   $(OPENSSL_PATH)/crypto/cversion.c
-  $(OPENSSL_PATH)/crypto/des/cbc_cksm.c
-  $(OPENSSL_PATH)/crypto/des/cbc_enc.c
-  $(OPENSSL_PATH)/crypto/des/cfb64ede.c
-  $(OPENSSL_PATH)/crypto/des/cfb64enc.c
-  $(OPENSSL_PATH)/crypto/des/cfb_enc.c
-  $(OPENSSL_PATH)/crypto/des/des_enc.c
-  $(OPENSSL_PATH)/crypto/des/ecb3_enc.c
-  $(OPENSSL_PATH)/crypto/des/ecb_enc.c
-  $(OPENSSL_PATH)/crypto/des/fcrypt.c
-  $(OPENSSL_PATH)/crypto/des/fcrypt_b.c
-  $(OPENSSL_PATH)/crypto/des/ofb64ede.c
-  $(OPENSSL_PATH)/crypto/des/ofb64enc.c
-  $(OPENSSL_PATH)/crypto/des/ofb_enc.c
-  $(OPENSSL_PATH)/crypto/des/pcbc_enc.c
-  $(OPENSSL_PATH)/crypto/des/qud_cksm.c
-  $(OPENSSL_PATH)/crypto/des/rand_key.c
-  $(OPENSSL_PATH)/crypto/des/set_key.c
-  $(OPENSSL_PATH)/crypto/des/str2key.c
-  $(OPENSSL_PATH)/crypto/des/xcbc_enc.c
   $(OPENSSL_PATH)/crypto/dh/dh_ameth.c
   $(OPENSSL_PATH)/crypto/dh/dh_asn1.c
   $(OPENSSL_PATH)/crypto/dh/dh_check.c
@@ -514,8 +495,6 @@
   $(OPENSSL_PATH)/crypto/comp/comp_lcl.h
   $(OPENSSL_PATH)/crypto/conf/conf_def.h
   $(OPENSSL_PATH)/crypto/conf/conf_lcl.h
-  $(OPENSSL_PATH)/crypto/des/des_locl.h
-  $(OPENSSL_PATH)/crypto/des/spr.h
   $(OPENSSL_PATH)/crypto/dh/dh_locl.h
   $(OPENSSL_PATH)/crypto/dso/dso_locl.h
   $(OPENSSL_PATH)/crypto/evp/evp_locl.h
