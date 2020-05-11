@@ -80,6 +80,7 @@ BEGIN {
                 "no-poly1305",
                 "no-posix-io",
                 "no-rc2",
+                "no-rc4",
                 "no-rfc3779",
                 "no-rmd160",
                 "no-scrypt",
