@@ -5,7 +5,7 @@ Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Revision Reference:
-  PI Version 1.6
+  PI Version 1.7
 
 **/
 
@@ -690,7 +690,7 @@ EFI_STATUS
 //
 #define DXE_SERVICES_SIGNATURE            0x565245535f455844ULL
 #define DXE_SPECIFICATION_MAJOR_REVISION  1
-#define DXE_SPECIFICATION_MINOR_REVISION  60
+#define DXE_SPECIFICATION_MINOR_REVISION  70
 #define DXE_SERVICES_REVISION             ((DXE_SPECIFICATION_MAJOR_REVISION<<16) | (DXE_SPECIFICATION_MINOR_REVISION))
 
 typedef struct {
