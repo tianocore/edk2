@@ -212,6 +212,24 @@ DebugClearMemory (
   #define ASSERT(Expression)
 #endif
 
+
+/**
+  Macro that calls ASSERT when constrain assertions are enabled.
+
+  If DEBUG_PROPERTY_ASSERT_CONSTRAINT_ENABLED bit of PcdDebugProperyMask is set,
+  then this macro evaluates to an ASSERT macro passing in the original Expression.
+
+  @param  Expression  Boolean expression.
+
+**/
+#define ASSERT_CONSTRAINT(Expression)      \
+  do {                                     \
+    if (DebugAssertConstraintEnabled ()) { \
+      ASSERT (Expression);                 \
+    }                                      \
+  } while (FALSE)
+
+
 /**
   Macro that calls DebugPrint().
 

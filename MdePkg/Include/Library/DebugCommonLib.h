@@ -21,6 +21,7 @@
 #define DEBUG_PROPERTY_CLEAR_MEMORY_ENABLED       0x08
 #define DEBUG_PROPERTY_ASSERT_BREAKPOINT_ENABLED  0x10
 #define DEBUG_PROPERTY_ASSERT_DEADLOOP_ENABLED    0x20
+#define DEBUG_PROPERTY_ASSERT_CONSTRAINT_ENABLED  0x40
 
 //
 // Declare bits for PcdDebugPrintErrorLevel and the ErrorLevel parameter of DebugPrint()
@@ -131,6 +132,23 @@ DebugCodeEnabled (
 BOOLEAN
 EFIAPI
 DebugClearMemoryEnabled (
+  VOID
+  );
+
+
+/**
+  Returns TRUE if ASSERT_CONSTRAINT() macro is enabled.
+
+  This function returns TRUE if the DEBUG_PROPERTY_ASSERT_CONSTRAINT_ENABLED bit of
+  PcdDebugProperyMask is set.  Otherwise, FALSE is returned.
+
+  @retval  TRUE    The DEBUG_PROPERTY_ASSERT_CONSTRAINT_ENABLED bit of PcdDebugProperyMask is set.
+  @retval  FALSE   The DEBUG_PROPERTY_ASSERT_CONSTRAINT_ENABLED bit of PcdDebugProperyMask is clear.
+
+**/
+BOOLEAN
+EFIAPI
+DebugAssertConstraintEnabled (
   VOID
   );
 

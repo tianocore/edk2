@@ -94,6 +94,26 @@ DebugClearMemoryEnabled (
 
 
 /**
+  Returns TRUE if ASSERT_CONSTRAINT() macro is enabled.
+
+  This function returns TRUE if the DEBUG_PROPERTY_ASSERT_CONSTRAINT_ENABLED bit of
+  PcdDebugProperyMask is set.  Otherwise, FALSE is returned.
+
+  @retval  TRUE    The DEBUG_PROPERTY_ASSERT_CONSTRAINT_ENABLED bit of PcdDebugProperyMask is set.
+  @retval  FALSE   The DEBUG_PROPERTY_ASSERT_CONSTRAINT_ENABLED bit of PcdDebugProperyMask is clear.
+
+**/
+BOOLEAN
+EFIAPI
+DebugAssertConstraintEnabled (
+  VOID
+  )
+{
+  return (BOOLEAN) ((PcdGet8 (PcdDebugPropertyMask) & DEBUG_PROPERTY_ASSERT_CONSTRAINT_ENABLED) != 0);
+}
+
+
+/**
   Returns TRUE if any one of the bit is set both in ErrorLevel and PcdFixedDebugPrintErrorLevel.
 
   This function compares the bit mask of ErrorLevel and PcdFixedDebugPrintErrorLevel.
