@@ -12,6 +12,7 @@
   CmockaLib|UnitTestFrameworkPkg/Library/CmockaLib/CmockaLib.inf
   UnitTestLib|UnitTestFrameworkPkg/Library/UnitTestLib/UnitTestLibCmocka.inf
   DebugLib|UnitTestFrameworkPkg/Library/Posix/DebugLibPosix/DebugLibPosix.inf
+  DebugCommonLib|MdePkg/Library/BaseDebugCommonLib/BaseDebugCommonLib.inf
   MemoryAllocationLib|UnitTestFrameworkPkg/Library/Posix/MemoryAllocationLibPosix/MemoryAllocationLibPosix.inf
 
 [BuildOptions]

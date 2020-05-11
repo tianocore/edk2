@@ -28,6 +28,7 @@
   PcdLib
   PrintLib
   BaseLib
+  DebugCommonLib
 
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue     ## SOMETIMES_CONSUMES
