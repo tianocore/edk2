@@ -57,6 +57,7 @@
   gEfiBootLogoProtocolGuid        ## CONSUMES
   gEfiDxeSmmReadyToLockProtocolGuid
   gEfiSmmAccess2ProtocolGuid
+  gEfiPciRootBridgeIoProtocolGuid               ## CONSUMES
 
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut

@@ -138,6 +138,79 @@ PlatformRegisterFvBootOption (
   }
 }
 
+STATIC
+EFI_STATUS
+VisitAllInstancesOfProtocol (
+  IN EFI_GUID                    *Id,
+  IN PROTOCOL_INSTANCE_CALLBACK  CallBackFunction,
+  IN VOID                        *Context
+  )
+{
+  EFI_STATUS                Status;
+  UINTN                     HandleCount;
+  EFI_HANDLE                *HandleBuffer;
+  UINTN                     Index;
+  VOID                      *Instance;
+
+  //
+  // Start to check all the PciIo to find all possible device
+  //
+  HandleCount = 0;
+  HandleBuffer = NULL;
+  Status = gBS->LocateHandleBuffer (
+                  ByProtocol,
+                  Id,
+                  NULL,
+                  &HandleCount,
+                  &HandleBuffer
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  for (Index = 0; Index < HandleCount; Index++) {
+    Status = gBS->HandleProtocol (HandleBuffer[Index], Id, &Instance);
+    if (EFI_ERROR (Status)) {
+      continue;
+    }
+
+    Status = (*CallBackFunction) (
+               HandleBuffer[Index],
+               Instance,
+               Context
+               );
+  }
+
+  gBS->FreePool (HandleBuffer);
+
+  return EFI_SUCCESS;
+}
+
+STATIC
+EFI_STATUS
+EFIAPI
+ConnectRootBridge (
+  IN EFI_HANDLE  RootBridgeHandle,
+  IN VOID        *Instance,
+  IN VOID        *Context
+  )
+{
+  EFI_STATUS Status;
+
+  //
+  // Make the PCI bus driver connect the root bridge, non-recursively. This
+  // will produce a number of child handles with PciIo on them.
+  //
+  Status = gBS->ConnectController (
+                  RootBridgeHandle, // ControllerHandle
+                  NULL,             // DriverImageHandle
+                  NULL,             // RemainingDevicePath -- produce all
+                                    //   children
+                  FALSE             // Recursive
+                  );
+  return Status;
+}
+
 /**
   Do the platform specific action before the console is connected.
 
@@ -156,6 +229,9 @@ PlatformBootManagerBeforeConsole (
   EFI_INPUT_KEY                F2;
   EFI_INPUT_KEY                Down;
   EFI_BOOT_MANAGER_LOAD_OPTION BootOption;
+
+  VisitAllInstancesOfProtocol (&gEfiPciRootBridgeIoProtocolGuid,
+    ConnectRootBridge, NULL);
 
   PlatformConsoleInit ();
 
