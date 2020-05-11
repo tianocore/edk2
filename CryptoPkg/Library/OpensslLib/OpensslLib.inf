@@ -374,8 +374,6 @@
   $(OPENSSL_PATH)/crypto/rand/rand_unix.c
   $(OPENSSL_PATH)/crypto/rand/rand_vms.c
   $(OPENSSL_PATH)/crypto/rand/rand_win.c
-  $(OPENSSL_PATH)/crypto/rc4/rc4_enc.c
-  $(OPENSSL_PATH)/crypto/rc4/rc4_skey.c
   $(OPENSSL_PATH)/crypto/rsa/rsa_ameth.c
   $(OPENSSL_PATH)/crypto/rsa/rsa_asn1.c
   $(OPENSSL_PATH)/crypto/rsa/rsa_chk.c
@@ -531,7 +529,6 @@
   $(OPENSSL_PATH)/crypto/ocsp/ocsp_lcl.h
   $(OPENSSL_PATH)/crypto/pkcs12/p12_lcl.h
   $(OPENSSL_PATH)/crypto/rand/rand_lcl.h
-  $(OPENSSL_PATH)/crypto/rc4/rc4_locl.h
   $(OPENSSL_PATH)/crypto/rsa/rsa_locl.h
   $(OPENSSL_PATH)/crypto/sha/sha_locl.h
   $(OPENSSL_PATH)/crypto/siphash/siphash_local.h
