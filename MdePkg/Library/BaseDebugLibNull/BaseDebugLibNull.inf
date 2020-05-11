@@ -29,3 +29,13 @@
 [Packages]
   MdePkg/MdePkg.dec
 
+
+[LibraryClasses]
+  DebugCommonLib
+  PcdLib
+
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask         ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdFixedDebugPrintErrorLevel ## CONSUMES
+

@@ -36,6 +36,7 @@
 [LibraryClasses]
   BaseLib
   BaseMemoryLib
+  DebugCommonLib
   DebugPrintErrorLevelLib
   PcdLib
   PrintLib
