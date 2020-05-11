@@ -73,6 +73,7 @@ BEGIN {
                 "no-gost",
                 "no-hw",
                 "no-idea",
+                "no-md4",
                 "no-mdc2",
                 "no-pic",
                 "no-ocb",
