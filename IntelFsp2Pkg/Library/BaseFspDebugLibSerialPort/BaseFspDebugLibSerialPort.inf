@@ -35,6 +35,7 @@
   PcdLib
   PrintLib
   BaseLib
+  DebugCommonLib
   DebugDeviceLib
   DebugPrintErrorLevelLib
 
