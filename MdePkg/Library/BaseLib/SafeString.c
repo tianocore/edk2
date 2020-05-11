@@ -14,7 +14,7 @@
 
 #define SAFE_STRING_CONSTRAINT_CHECK(Expression, Status)  \
   do { \
-    ASSERT (Expression); \
+    ASSERT_CONSTRAINT (Expression); \
     if (!(Expression)) { \
       return Status; \
     } \
