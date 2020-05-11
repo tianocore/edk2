@@ -294,8 +294,6 @@
   $(OPENSSL_PATH)/crypto/kdf/tls1_prf.c
   $(OPENSSL_PATH)/crypto/lhash/lh_stats.c
   $(OPENSSL_PATH)/crypto/lhash/lhash.c
-  $(OPENSSL_PATH)/crypto/md4/md4_dgst.c
-  $(OPENSSL_PATH)/crypto/md4/md4_one.c
   $(OPENSSL_PATH)/crypto/md5/md5_dgst.c
   $(OPENSSL_PATH)/crypto/md5/md5_one.c
   $(OPENSSL_PATH)/crypto/mem.c
@@ -525,7 +523,6 @@
   $(OPENSSL_PATH)/crypto/evp/evp_locl.h
   $(OPENSSL_PATH)/crypto/hmac/hmac_lcl.h
   $(OPENSSL_PATH)/crypto/lhash/lhash_lcl.h
-  $(OPENSSL_PATH)/crypto/md4/md4_locl.h
   $(OPENSSL_PATH)/crypto/md5/md5_locl.h
   $(OPENSSL_PATH)/crypto/modes/modes_lcl.h
   $(OPENSSL_PATH)/crypto/objects/obj_dat.h
