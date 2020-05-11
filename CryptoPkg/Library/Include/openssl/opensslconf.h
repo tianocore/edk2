@@ -49,6 +49,9 @@ extern "C" {
 #ifndef OPENSSL_NO_CT
 # define OPENSSL_NO_CT
 #endif
+#ifndef OPENSSL_NO_DES
+# define OPENSSL_NO_DES
+#endif
 #ifndef OPENSSL_NO_DSA
 # define OPENSSL_NO_DSA
 #endif

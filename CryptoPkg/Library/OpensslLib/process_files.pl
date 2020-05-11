@@ -62,6 +62,7 @@ BEGIN {
                 "no-cms",
                 "no-ct",
                 "no-deprecated",
+                "no-des",
                 "no-dgram",
                 "no-dsa",
                 "no-dynamic-engine",
