@@ -24,6 +24,7 @@ typedef struct {
   UINT64             PmTimerRegBase;
   UINT64             ResetRegAddress;
   UINT64             PcieBaseAddress;
+  UINT64             PcieBaseSize;
 } ACPI_BOARD_INFO;
 
 #endif
