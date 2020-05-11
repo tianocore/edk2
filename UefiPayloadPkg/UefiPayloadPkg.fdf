@@ -229,6 +229,10 @@ INF MdeModulePkg/Bus/Usb/UsbMouseDxe/UsbMouseDxe.inf
 #
 INF  MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
 
+# Random Number Generator
+#
+INF SecurityPkg/RandomNumberGenerator/RngDxe/RngDxe.inf
+
 #
 # UEFI network modules
 #
