@@ -37,6 +37,7 @@
   ReportStatusCodeLib
   BaseMemoryLib
   BaseLib
+  DebugCommonLib
   DebugPrintErrorLevelLib
 
 [Pcd]
