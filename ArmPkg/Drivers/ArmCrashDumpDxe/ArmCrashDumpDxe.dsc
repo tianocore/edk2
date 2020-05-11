@@ -30,6 +30,7 @@
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
   BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
   DebugLib|MdePkg/Library/UefiDebugLibConOut/UefiDebugLibConOut.inf
+  DebugCommonLib|MdePkg/Library/BaseDebugCommonLib/BaseDebugCommonLib.inf
   DebugPrintErrorLevelLib|MdePkg/Library/BaseDebugPrintErrorLevelLib/BaseDebugPrintErrorLevelLib.inf
   DefaultExceptionHandlerLib|ArmPkg/Library/DefaultExceptionHandlerLib/DefaultExceptionHandlerLib.inf
   DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf

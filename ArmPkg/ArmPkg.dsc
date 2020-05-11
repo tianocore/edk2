@@ -35,6 +35,7 @@
   CacheMaintenanceLib|ArmPkg/Library/ArmCacheMaintenanceLib/ArmCacheMaintenanceLib.inf
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibNull/DxeCapsuleLibNull.inf
   DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
+  DebugCommonLib|MdePkg/Library/BaseDebugCommonLib/BaseDebugCommonLib.inf
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
   MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
