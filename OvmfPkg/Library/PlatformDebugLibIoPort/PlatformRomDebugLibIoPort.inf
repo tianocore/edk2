@@ -39,6 +39,7 @@
   PcdLib
   PrintLib
   BaseLib
+  DebugCommonLib
   DebugPrintErrorLevelLib
 
 [Pcd]
