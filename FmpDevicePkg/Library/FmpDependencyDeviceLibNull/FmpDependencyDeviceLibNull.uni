@@ -1,0 +1,12 @@
+// /** @file
+// Fmp Dependency Device Library Null instance.
+//
+// Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+#string STR_MODULE_ABSTRACT     #language en-US  "Fmp Dependency Device Library Null instance."
+
+#string STR_MODULE_DESCRIPTION  #language en-US  "Null instance that does not support saving and getting  dependency for Fmp device."
