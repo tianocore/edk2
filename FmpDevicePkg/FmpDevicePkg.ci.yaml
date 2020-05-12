@@ -8,6 +8,9 @@
     "CompilerPlugin": {
         "DscPath": "FmpDevicePkg.dsc"
     },
+    "HostUnitTestCompilerPlugin": {
+        "DscPath": "Test/FmpDeviceHostPkgTest.dsc"
+    },
     "CharEncodingCheck": {
         "IgnoreFiles": []
     },
@@ -18,11 +21,18 @@
             "FmpDevicePkg/FmpDevicePkg.dec",
             "CryptoPkg/CryptoPkg.dec"
         ],
+        "AcceptableDependencies-HOST_APPLICATION":[
+            "UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec"
+        ],
         "IgnoreInf": []
     },
     "DscCompleteCheck": {
         "DscPath": "FmpDevicePkg.dsc",
         "IgnoreInf": []
+    },
+    "HostUnitTestDscCompleteCheck": {
+        "IgnoreInf": [],
+        "DscPath": "Test/FmpDeviceHostPkgTest.dsc"
     },
     "GuidCheck": {
         "IgnoreGuidName": [],
