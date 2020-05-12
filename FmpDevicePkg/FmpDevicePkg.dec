@@ -7,7 +7,7 @@
 # customized using libraries and PCDs.
 #
 # Copyright (c) 2016, Microsoft Corporation. All rights reserved.<BR>
-# Copyright (c) 2018 - 2019, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2018 - 2020, Intel Corporation. All rights reserved.<BR>
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -34,6 +34,10 @@
   ##  @libraryclass  Provides firmware device specific services to support
   #                  updates of a firmware image stored in a firmware device.
   FmpDeviceLib|Include/Library/FmpDeviceLib.h
+
+  ##  @libraryclass  Provides generic services to support capsule dependency
+  #                  expression evaluation.
+  FmpDependencyLib|Include/Library/FmpDependencyLib.h
 
 [LibraryClasses.Common.Private]
   ##  @libraryclass  Provides services to retrieve values from a capsule's FMP
