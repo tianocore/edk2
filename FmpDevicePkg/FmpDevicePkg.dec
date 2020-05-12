@@ -39,6 +39,10 @@
   #                  expression evaluation.
   FmpDependencyLib|Include/Library/FmpDependencyLib.h
 
+  ##  @libraryclass  Provides platform specific services to support dependency
+  #                  check during update of firmware image.
+  FmpDependencyCheckLib|Include/Library/FmpDependencyCheckLib.h
+
 [LibraryClasses.Common.Private]
   ##  @libraryclass  Provides services to retrieve values from a capsule's FMP
   #                  Payload Header.  The structure is not included in the
