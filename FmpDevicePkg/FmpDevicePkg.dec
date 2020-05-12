@@ -43,6 +43,11 @@
   #                  check during update of firmware image.
   FmpDependencyCheckLib|Include/Library/FmpDependencyCheckLib.h
 
+  ##  @libraryclass  Provides firmware device specific services to support
+  #                  saving dependency to firmware device and getting dependency
+  #                  from firmware device.
+  FmpDependencyDeviceLib|Include/Library/FmpDependencyDeviceLib.h
+
 [LibraryClasses.Common.Private]
   ##  @libraryclass  Provides services to retrieve values from a capsule's FMP
   #                  Payload Header.  The structure is not included in the

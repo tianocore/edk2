@@ -1,0 +1,29 @@
+## @file
+#  Fmp Dependency Device Library Null instance.
+#
+#  Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION     = 0x00010005
+  BASE_NAME       = FmpDependencyDeviceLibNull
+  MODULE_UNI_FILE = FmpDependencyDeviceLibNull.uni
+  FILE_GUID       = 05BE67B1-0748-4022-97E6-7C0D2F992AA6
+  MODULE_TYPE     = DXE_DRIVER
+  VERSION_STRING  = 1.0
+  LIBRARY_CLASS   = FmpDependencyDeviceLib|DXE_DRIVER UEFI_DRIVER
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64
+#
+
+[Sources]
+  FmpDependencyDeviceLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  FmpDevicePkg/FmpDevicePkg.dec
