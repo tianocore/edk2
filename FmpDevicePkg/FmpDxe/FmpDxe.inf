@@ -28,8 +28,6 @@
 [Sources]
   FmpDxe.c
   FmpDxe.h
-  Dependency.c
-  Dependency.h
   DetectTestKey.c
   VariableSupport.h
   VariableSupport.c
@@ -54,6 +52,9 @@
   FmpDeviceLib
   FmpPayloadHeaderLib
   CapsuleUpdatePolicyLib
+  FmpDependencyLib
+  FmpDependencyCheckLib
+  FmpDependencyDeviceLib
 
 [Guids]
   gEfiEndOfDxeEventGroupGuid

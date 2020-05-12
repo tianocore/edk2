@@ -28,6 +28,9 @@
 #include <Library/FmpDeviceLib.h>
 #include <Library/FmpPayloadHeaderLib.h>
 #include <Library/CapsuleUpdatePolicyLib.h>
+#include <Library/FmpDependencyLib.h>
+#include <Library/FmpDependencyCheckLib.h>
+#include <Library/FmpDependencyDeviceLib.h>
 #include <Protocol/FirmwareManagement.h>
 #include <Protocol/FirmwareManagementProgress.h>
 #include <Protocol/VariableLock.h>
@@ -66,6 +69,7 @@ typedef struct {
   CHAR16                                       *LastAttemptStatusVariableName;
   CHAR16                                       *LastAttemptVersionVariableName;
   CHAR16                                       *FmpStateVariableName;
+  BOOLEAN                                      DependenciesSatisfied;
 } FIRMWARE_MANAGEMENT_PRIVATE_DATA;
 
 ///
