@@ -263,6 +263,7 @@ typedef struct {
 } EFI_SERIAL_IO_MODE;
 
 #define EFI_SERIAL_IO_PROTOCOL_REVISION    0x00010000
+#define EFI_SERIAL_IO_PROTOCOL_REVISION1p1 0x00010001
 #define SERIAL_IO_INTERFACE_REVISION  EFI_SERIAL_IO_PROTOCOL_REVISION
 
 ///
@@ -287,6 +288,14 @@ struct _EFI_SERIAL_IO_PROTOCOL {
   /// Pointer to SERIAL_IO_MODE data.
   ///
   EFI_SERIAL_IO_MODE          *Mode;
+  ///
+  /// Pointer to a GUID identifying the device connected to the serial port.
+  /// This field is NULL when the protocol is installed by the serial port
+  /// driver and may be populated by a platform driver for a serial port
+  /// with a known device attached. The field will remain NULL if there is
+  /// no platform serial device identification information available.
+  ///
+  CONST EFI_GUID              *DeviceTypeGuid; // Revision 1.1
 };
 
 extern EFI_GUID gEfiSerialIoProtocolGuid;
