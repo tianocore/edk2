@@ -719,6 +719,18 @@ typedef struct {
   UINT8                           StopBits;
 } UART_DEVICE_PATH;
 
+///
+/// NVDIMM Namespace Device Path SubType.
+///
+#define NVDIMM_NAMESPACE_DP               0x20
+typedef struct {
+  EFI_DEVICE_PATH_PROTOCOL        Header;
+  ///
+  /// Namespace unique label identifier UUID.
+  ///
+  EFI_GUID Uuid;
+} NVDIMM_NAMESPACE_DEVICE_PATH;
+
 //
 // Use VENDOR_DEVICE_PATH struct
 //
