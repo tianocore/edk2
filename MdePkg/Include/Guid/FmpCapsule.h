@@ -79,13 +79,22 @@ typedef struct {
   /// therefore can be modified without changing the Auth data.
   ///
   UINT64   UpdateHardwareInstance;
+
+  ///
+  /// A 64-bit bitmask that determines what sections are added to the payload.
+  /// #define CAPSULE_SUPPORT_AUTHENTICATION 0x0000000000000001
+  /// #define CAPSULE_SUPPORT_DEPENDENCY 0x0000000000000002
+  ///
+  UINT64   ImageCapsuleSupport;
 } EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER;
 
 #pragma pack()
 
 
 #define EFI_FIRMWARE_MANAGEMENT_CAPSULE_HEADER_INIT_VERSION       0x00000001
-#define EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER_INIT_VERSION 0x00000002
+#define EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER_INIT_VERSION 0x00000003
+#define CAPSULE_SUPPORT_AUTHENTICATION    0x0000000000000001
+#define CAPSULE_SUPPORT_DEPENDENCY        0x0000000000000002
 
 extern EFI_GUID gEfiFmpCapsuleGuid;
 
