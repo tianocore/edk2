@@ -98,6 +98,7 @@ DumpFmpCapsule (
     Print(L"  UpdateVendorCodeSize   - 0x%x\n", FmpImageHeader->UpdateVendorCodeSize);
     if (FmpImageHeader->Version >= EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER_INIT_VERSION) {
       Print(L"  UpdateHardwareInstance - 0x%lx\n", FmpImageHeader->UpdateHardwareInstance);
+      Print(L"  ImageCapsuleSupport - 0x%lx\n", FmpImageHeader->ImageCapsuleSupport);
     }
   }
 }
