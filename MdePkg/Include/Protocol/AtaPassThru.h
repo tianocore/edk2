@@ -315,7 +315,7 @@ EFI_STATUS
   @param[in]     PortMultiplierPort  The port multiplier port number of the ATA device for which a
                                      device path node is to be allocated and built. If there is no
                                      port multiplier, then specify 0xFFFF.
-  @param[in,out] DevicePath          A pointer to a single device path node that describes the ATA
+  @param[out]    DevicePath          A pointer to a single device path node that describes the ATA
                                      device specified by Port and PortMultiplierPort. This function
                                      is responsible for allocating the buffer DevicePath with the
                                      boot service AllocatePool(). It is the caller's responsibility
@@ -334,7 +334,7 @@ EFI_STATUS
   IN     EFI_ATA_PASS_THRU_PROTOCOL *This,
   IN     UINT16                     Port,
   IN     UINT16                     PortMultiplierPort,
-  IN OUT EFI_DEVICE_PATH_PROTOCOL   **DevicePath
+  OUT    EFI_DEVICE_PATH_PROTOCOL   **DevicePath
   );
 
 /**
