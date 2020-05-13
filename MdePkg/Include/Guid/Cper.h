@@ -95,6 +95,18 @@ typedef struct {
   { \
     0x667DD791, 0xC6B3, 0x4c27, { 0x8A, 0x6B, 0x0F, 0x8E, 0x72, 0x2D, 0xEB, 0x41 } \
   }
+#define EFI_EVENT_NOTIFICATION_TYPE_DMAR_SEA \
+  { \
+    0x9A78788A, 0xBBE8, 0x11E4, { 0x80, 0x9E, 0x67, 0x61, 0x1E, 0x5D, 0x46, 0xB0 } \
+  }
+#define EFI_EVENT_NOTIFICATION_TYPE_DMAR_SEI \
+  { \
+    0x5C284C81, 0xB0AE, 0x4E87, { 0xA3, 0x22, 0xB0, 0x4C, 0x85, 0x62, 0x43, 0x23 } \
+  }
+#define EFI_EVENT_NOTIFICATION_TYPE_DMAR_PEI \
+  { \
+    0x09A9D5AC, 0x5204, 0x4214, { 0x96, 0xE5, 0x94, 0x99, 0x2E, 0x75, 0x2B, 0xCD } \
+  }
 ///@}
 
 ///
@@ -1207,6 +1219,9 @@ extern EFI_GUID gEfiEventNotificationTypeInitGuid;
 extern EFI_GUID gEfiEventNotificationTypeNmiGuid;
 extern EFI_GUID gEfiEventNotificationTypeBootGuid;
 extern EFI_GUID gEfiEventNotificationTypeDmarGuid;
+extern EFI_GUID gEfiEventNotificationTypeSeaGuid;
+extern EFI_GUID gEfiEventNotificationTypeSeiGuid;
+extern EFI_GUID gEfiEventNotificationTypePeiGuid;
 
 extern EFI_GUID gEfiProcessorGenericErrorSectionGuid;
 extern EFI_GUID gEfiProcessorSpecificErrorSectionGuid;
