@@ -102,8 +102,8 @@ typedef struct {
 
   ///
   /// The unique identifier of the capsule whose processing result is recorded in this variable.
-  /// 0x00000000 – 0xEFFFFFFF – Implementation Reserved
-  /// 0xF0000000 – 0xFFFFFFFF – Specification Reserved
+  /// 0x00000000 - 0xEFFFFFFF - Implementation Reserved
+  /// 0xF0000000 - 0xFFFFFFFF - Specification Reserved
   /// #define REDFISH_DEFINED_JSON_SCHEMA 0xF000000
   /// The JSON payload shall conform to a Redfish-defined JSON schema, see DMTF-Redfish
   /// Specification.
