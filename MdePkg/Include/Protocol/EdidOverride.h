@@ -44,8 +44,8 @@ EFI_STATUS
   IN  EFI_EDID_OVERRIDE_PROTOCOL          *This,
   IN  EFI_HANDLE                          *ChildHandle,
   OUT UINT32                              *Attributes,
-  IN OUT UINTN                            *EdidSize,
-  IN OUT UINT8                            **Edid
+  OUT UINTN                               *EdidSize,
+  OUT UINT8                               **Edid
   );
 
 ///

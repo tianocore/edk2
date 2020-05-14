@@ -211,7 +211,7 @@ EFI_STATUS
                                          On output, it is the size of the buffer returned by the firmware if
                                          the buffer was large enough, or the size of the buffer needed to contain
                                          the map if the buffer was too small.
-  @param[in, out]  MemoryMap             A pointer to the buffer in which firmware places the current memory
+  @param[out]      MemoryMap             A pointer to the buffer in which firmware places the current memory
                                          map.
   @param[out]      MapKey                A pointer to the location in which firmware returns the key for the
                                          current memory map.
@@ -232,7 +232,7 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_GET_MEMORY_MAP)(
   IN OUT UINTN                       *MemoryMapSize,
-  IN OUT EFI_MEMORY_DESCRIPTOR       *MemoryMap,
+  OUT    EFI_MEMORY_DESCRIPTOR       *MemoryMap,
   OUT    UINTN                       *MapKey,
   OUT    UINTN                       *DescriptorSize,
   OUT    UINT32                      *DescriptorVersion
@@ -1556,7 +1556,7 @@ EFI_STATUS
   @param[in]       Protocol     Provides the protocol to search by.
                                 This parameter is only valid for a SearchType of ByProtocol.
   @param[in]       SearchKey    Supplies the search key depending on the SearchType.
-  @param[in, out]  NoHandles    The number of handles returned in Buffer.
+  @param[out]      NoHandles    The number of handles returned in Buffer.
   @param[out]      Buffer       A pointer to the buffer to return the requested array of handles that
                                 support Protocol.
 
@@ -1574,7 +1574,7 @@ EFI_STATUS
   IN     EFI_LOCATE_SEARCH_TYPE       SearchType,
   IN     EFI_GUID                     *Protocol,      OPTIONAL
   IN     VOID                         *SearchKey,     OPTIONAL
-  IN OUT UINTN                        *NoHandles,
+  OUT    UINTN                        *NoHandles,
   OUT    EFI_HANDLE                   **Buffer
   );
 

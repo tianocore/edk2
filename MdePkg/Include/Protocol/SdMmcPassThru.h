@@ -164,7 +164,7 @@ EFI_STATUS
   @param[in]     This           A pointer to the EFI_SD_MMMC_PASS_THRU_PROTOCOL instance.
   @param[in]     Slot           Specifies the slot number of the SD card for which a device
                                 path node is to be allocated and built.
-  @param[in,out] DevicePath     A pointer to a single device path node that describes the SD
+  @param[out]    DevicePath     A pointer to a single device path node that describes the SD
                                 card specified by Slot. This function is responsible for
                                 allocating the buffer DevicePath with the boot service
                                 AllocatePool(). It is the caller's responsibility to free
@@ -182,7 +182,7 @@ EFI_STATUS
 (EFIAPI *EFI_SD_MMC_PASS_THRU_BUILD_DEVICE_PATH) (
   IN     EFI_SD_MMC_PASS_THRU_PROTOCOL       *This,
   IN     UINT8                               Slot,
-  IN OUT EFI_DEVICE_PATH_PROTOCOL            **DevicePath
+  OUT    EFI_DEVICE_PATH_PROTOCOL            **DevicePath
 );
 
 /**
