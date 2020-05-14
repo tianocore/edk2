@@ -214,7 +214,7 @@ EFI_STATUS
   @param[in]     NamespaceId         The NVM Express namespace ID  for which a device path node is to be
                                      allocated and built. Caller must set the NamespaceId to zero if the
                                      device path node will contain a valid UUID.
-  @param[in,out] DevicePath          A pointer to a single device path node that describes the NVM Express
+  @param[out]    DevicePath          A pointer to a single device path node that describes the NVM Express
                                      namespace specified by NamespaceId. This function is responsible for
                                      allocating the buffer DevicePath with the boot service AllocatePool().
                                      It is the caller's responsibility to free DevicePath when the caller
@@ -231,7 +231,7 @@ EFI_STATUS
 (EFIAPI *EFI_NVM_EXPRESS_PASS_THRU_BUILD_DEVICE_PATH)(
   IN     EFI_NVM_EXPRESS_PASS_THRU_PROTOCOL          *This,
   IN     UINT32                                      NamespaceId,
-  IN OUT EFI_DEVICE_PATH_PROTOCOL                    **DevicePath
+  OUT    EFI_DEVICE_PATH_PROTOCOL                    **DevicePath
   );
 
 /**
