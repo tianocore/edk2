@@ -29,7 +29,6 @@
   $(OPENSSL_PATH)/crypto/aes/aes_cbc.c
   $(OPENSSL_PATH)/crypto/aes/aes_cfb.c
   $(OPENSSL_PATH)/crypto/aes/aes_core.c
-  $(OPENSSL_PATH)/crypto/aes/aes_ecb.c
   $(OPENSSL_PATH)/crypto/aes/aes_ige.c
   $(OPENSSL_PATH)/crypto/aes/aes_misc.c
   $(OPENSSL_PATH)/crypto/aes/aes_ofb.c
