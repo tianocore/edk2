@@ -259,7 +259,7 @@ EFI_STATUS
   IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL               *This,
   IN UINT8                                         *Target,
   IN UINT64                                        Lun,
-  IN OUT EFI_DEVICE_PATH_PROTOCOL                  **DevicePath
+  OUT EFI_DEVICE_PATH_PROTOCOL                     **DevicePath
   );
 
 /**
