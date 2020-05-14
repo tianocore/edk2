@@ -345,7 +345,7 @@ EFI_STATUS
   @param[in]      This           A pointer to the EFI_FIRMWARE_MANAGEMENT_PROTOCOL instance.
   @param[in]      ImageIndex     A unique number identifying the firmware image(s) within the device.
                                  The number is between 1 and DescriptorCount.
-  @param[in, out] Image          Points to the buffer where the current image is copied to.
+  @param[out]     Image          Points to the buffer where the current image is copied to.
   @param[in, out] ImageSize      On entry, points to the size of the buffer pointed to by Image, in bytes.
                                  On return, points to the length of the image, in bytes.
 
@@ -364,7 +364,7 @@ EFI_STATUS
 (EFIAPI *EFI_FIRMWARE_MANAGEMENT_PROTOCOL_GET_IMAGE)(
   IN  EFI_FIRMWARE_MANAGEMENT_PROTOCOL  *This,
   IN  UINT8                             ImageIndex,
-  IN  OUT  VOID                         *Image,
+  OUT  VOID                             *Image,
   IN  OUT  UINTN                        *ImageSize
   );
 
