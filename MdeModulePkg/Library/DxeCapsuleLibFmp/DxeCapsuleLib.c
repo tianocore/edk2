@@ -285,8 +285,10 @@ ValidateFmpCapsule (
       DEBUG((DEBUG_ERROR, "ImageHeader->Version(0x%x) Unknown\n", ImageHeader->Version));
       return EFI_INVALID_PARAMETER;
     }
-    if (ImageHeader->Version < EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER_INIT_VERSION) {
+    if (ImageHeader->Version == 1) {
       FmpImageHeaderSize = OFFSET_OF(EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER, UpdateHardwareInstance);
+    } else if (ImageHeader->Version == 2) {
+      FmpImageHeaderSize = OFFSET_OF(EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER, ImageCapsuleSupport);
     }
     if (FmpImageSize < FmpImageHeaderSize) {
       DEBUG((DEBUG_ERROR, "FmpImageSize(0x%lx) < FmpImageHeaderSize(0x%x)\n", FmpImageSize, FmpImageHeaderSize));
@@ -519,8 +521,11 @@ DumpFmpCapsule (
     DEBUG((DEBUG_VERBOSE, "    UpdateImageIndex       - 0x%x\n", ImageHeader->UpdateImageIndex));
     DEBUG((DEBUG_VERBOSE, "    UpdateImageSize        - 0x%x\n", ImageHeader->UpdateImageSize));
     DEBUG((DEBUG_VERBOSE, "    UpdateVendorCodeSize   - 0x%x\n", ImageHeader->UpdateVendorCodeSize));
-    if (ImageHeader->Version >= EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER_INIT_VERSION) {
+    if (ImageHeader->Version >= 2) {
       DEBUG((DEBUG_VERBOSE, "    UpdateHardwareInstance - 0x%lx\n", ImageHeader->UpdateHardwareInstance));
+      if (ImageHeader->Version >= EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER_INIT_VERSION) {
+        DEBUG((DEBUG_VERBOSE, "    ImageCapsuleSupport    - 0x%lx\n",  ImageHeader->ImageCapsuleSupport));
+      }
     }
   }
 }
@@ -928,9 +933,14 @@ SetFmpImageData (
   } else {
     //
     // If the EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER is version 1,
-    // Header should exclude UpdateHardwareInstance field
+    // Header should exclude UpdateHardwareInstance field, and
+    // ImageCapsuleSupport field if version is 2.
     //
-    Image = (UINT8 *)ImageHeader + OFFSET_OF(EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER, UpdateHardwareInstance);
+    if (ImageHeader->Version == 1) {
+      Image = (UINT8 *)ImageHeader + OFFSET_OF(EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER, UpdateHardwareInstance);
+    } else {
+      Image = (UINT8 *)ImageHeader + OFFSET_OF(EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER, ImageCapsuleSupport);
+    }
   }
 
   if (ImageHeader->UpdateVendorCodeSize == 0) {
@@ -943,8 +953,11 @@ SetFmpImageData (
   DEBUG((DEBUG_INFO, "ImageTypeId - %g, ", &ImageHeader->UpdateImageTypeId));
   DEBUG((DEBUG_INFO, "PayloadIndex - 0x%x, ", PayloadIndex));
   DEBUG((DEBUG_INFO, "ImageIndex - 0x%x ", ImageHeader->UpdateImageIndex));
-  if (ImageHeader->Version >= EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER_INIT_VERSION) {
+  if (ImageHeader->Version >= 2) {
     DEBUG((DEBUG_INFO, "(UpdateHardwareInstance - 0x%x)", ImageHeader->UpdateHardwareInstance));
+    if (ImageHeader->Version >= EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER_INIT_VERSION) {
+      DEBUG((DEBUG_INFO, "(ImageCapsuleSupport - 0x%x)", ImageHeader->ImageCapsuleSupport));
+    }
   }
   DEBUG((DEBUG_INFO, "\n"));
 
@@ -1239,7 +1252,10 @@ ProcessFmpCapsuleImage (
     ImageHeader  = (EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER *)((UINT8 *)FmpCapsuleHeader + ItemOffsetList[Index]);
 
     UpdateHardwareInstance = 0;
-    if (ImageHeader->Version >= EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER_INIT_VERSION) {
+    ///
+    /// UpdateHardwareInstance field was added in Version 2
+    ///
+    if (ImageHeader->Version >= 2) {
       UpdateHardwareInstance = ImageHeader->UpdateHardwareInstance;
     }
 
