@@ -507,6 +507,7 @@
   MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsoleDxe.inf
   MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
   UefiPayloadPkg/GraphicsOutputDxe/GraphicsOutputDxe.inf
+  UefiPayloadPkg/PciPlatformDxe/PciPlatformDxe.inf
 
   #------------------------------
   #  Build the shell

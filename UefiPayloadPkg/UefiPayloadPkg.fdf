@@ -133,6 +133,7 @@ INF MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitterDxe.inf
 INF MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsoleDxe.inf
 INF MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
 INF UefiPayloadPkg/GraphicsOutputDxe/GraphicsOutputDxe.inf
+INF UefiPayloadPkg/PciPlatformDxe/PciPlatformDxe.inf
 
 #
 # SCSI/ATA/IDE/DISK Support
