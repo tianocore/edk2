@@ -328,8 +328,14 @@ ValidateFmpCapsule (
       DEBUG((DEBUG_ERROR, "ImageHeader->Version(0x%x) Unknown\n", ImageHeader->Version));
       return EFI_INVALID_PARAMETER;
     }
-    if (ImageHeader->Version < EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER_INIT_VERSION) {
+    ///
+    /// Current Init ImageHeader version is 3. UpdateHardwareInstance field was added in version 2
+    /// and ImageCapsuleSupport field was added in version 3
+    ///
+    if (ImageHeader->Version == 1) {
       FmpImageHeaderSize = OFFSET_OF(EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER, UpdateHardwareInstance);
+    } else if (ImageHeader->Version == 2){
+      FmpImageHeaderSize = OFFSET_OF(EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER, ImageCapsuleSupport);
     }
 
     // No overflow
@@ -639,9 +645,14 @@ ProcessFmpCapsuleImage (
     } else {
       //
       // If the EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER is version 1, only match ImageTypeId.
-      // Header should exclude UpdateHardwareInstance field
+      // Header should exclude UpdateHardwareInstance field.
+      // If version is 2 Header should exclude ImageCapsuleSupport field.
       //
-      Image = (UINT8 *)ImageHeader + OFFSET_OF(EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER, UpdateHardwareInstance);
+      if (ImageHeader->Version == 1) {
+        Image = (UINT8 *)ImageHeader + OFFSET_OF(EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER, UpdateHardwareInstance);
+      } else {
+        Image = (UINT8 *)ImageHeader + OFFSET_OF(EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER, ImageCapsuleSupport);
+      }
     }
 
     Status = ProcessRecoveryImage (Image, ImageHeader->UpdateImageSize);
