@@ -511,6 +511,7 @@
 !endif
   MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
   UefiPayloadPkg/GraphicsOutputDxe/GraphicsOutputDxe.inf
+  UefiPayloadPkg/PciPlatformDxe/PciPlatformDxe.inf
 
   #------------------------------
   #  Build the shell
