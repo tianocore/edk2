@@ -509,6 +509,7 @@
   MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
 !endif
   UefiPayloadPkg/GraphicsOutputDxe/GraphicsOutputDxe.inf
+  UefiPayloadPkg/PciPlatformDxe/PciPlatformDxe.inf
 
   #
   # Random Number Generator
