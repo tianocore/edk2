@@ -3,7 +3,7 @@
 #
 #  This library will get TPM 2.0 physical presence information.
 #
-# Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2015 - 2020, Intel Corporation. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -42,6 +42,9 @@
 
 [Ppis]
   gEfiPeiReadOnlyVariable2PpiGuid       ## CONSUMES
+
+[Pcd]
+  gEfiSecurityPkgTokenSpaceGuid.PcdTcg2PhysicalPresenceFlags       ## SOMETIMES_CONSUMES
 
 [Depex]
   gEfiPeiReadOnlyVariable2PpiGuid

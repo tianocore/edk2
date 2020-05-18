@@ -10,7 +10,7 @@
   Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunction() and Tcg2PhysicalPresenceLibGetUserConfirmationStatusFunction()
   will receive untrusted input and do validation.
 
-Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2020, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -31,6 +31,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 EFI_SMM_VARIABLE_PROTOCOL  *mTcg2PpSmmVariable;
 BOOLEAN                    mIsTcg2PPVerLowerThan_1_3 = FALSE;
+UINT32                     mTcg2PhysicalPresenceFlags;
 
 /**
   The handler for TPM physical presence function:
@@ -162,7 +163,7 @@ Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunctionEx (
                                    &Flags
                                    );
     if (EFI_ERROR (Status)) {
-      Flags.PPFlags = TCG2_BIOS_TPM_MANAGEMENT_FLAG_DEFAULT | TCG2_BIOS_STORAGE_MANAGEMENT_FLAG_DEFAULT;
+      Flags.PPFlags = mTcg2PhysicalPresenceFlags;
     }
     ReturnCode = Tcg2PpVendorLibSubmitRequestToPreOSFunction (*OperationRequest, Flags.PPFlags, *RequestParameter);
   }
@@ -395,6 +396,8 @@ Tcg2PhysicalPresenceLibConstructor (
   //
   Status = gSmst->SmmLocateProtocol (&gEfiSmmVariableProtocolGuid, NULL, (VOID**)&mTcg2PpSmmVariable);
   ASSERT_EFI_ERROR (Status);
+
+  mTcg2PhysicalPresenceFlags = PcdGet32(PcdTcg2PhysicalPresenceFlags);
 
   return EFI_SUCCESS;
 }
