@@ -5,7 +5,7 @@
 #  It also provides the definitions(including PPIs/PROTOCOLs/GUIDs and library classes)
 #  and libraries instances, which are used for those features.
 #
-# Copyright (c) 2009 - 2019, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2020, Intel Corporation. All rights reserved.<BR>
 # (C) Copyright 2015 Hewlett Packard Enterprise Development LP <BR>
 # Copyright (c) Microsoft Corporation.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -435,7 +435,18 @@
 
   ## This PCD defines initial setting of TCG2 Persistent Firmware Management Flags
   # PCD can be configured for different settings in different scenarios
-  # Default setting is TCG2_BIOS_TPM_MANAGEMENT_FLAG_DEFAULT | TCG2_BIOS_STORAGE_MANAGEMENT_FLAG_DEFAULT
+  # This PCD follows UEFI TCG2 library definition bit of the BIOS TPM/Storage Management Flags<BR>
+  #    BIT0  -  Reserved <BR>
+  #    BIT1  -  TCG2_BIOS_TPM_MANAGEMENT_FLAG_PP_REQUIRED_FOR_CLEAR <BR>
+  #    BIT2  -  Reserved <BR>
+  #    BIT3  -  TCG2_LIB_PP_FLAG_RESET_TRACK <BR>
+  #    BIT4  -  TCG2_BIOS_TPM_MANAGEMENT_FLAG_PP_REQUIRED_FOR_TURN_ON <BR>
+  #    BIT5  -  TCG2_BIOS_TPM_MANAGEMENT_FLAG_PP_REQUIRED_FOR_TURN_OFF <BR>
+  #    BIT6  -  TCG2_BIOS_TPM_MANAGEMENT_FLAG_PP_REQUIRED_FOR_CHANGE_EPS <BR>
+  #    BIT7  -  TCG2_BIOS_TPM_MANAGEMENT_FLAG_PP_REQUIRED_FOR_CHANGE_PCRS <BR>
+  #    BIT16 -  TCG2_BIOS_STORAGE_MANAGEMENT_FLAG_PP_REQUIRED_FOR_ENABLE_BLOCK_SID <BR>
+  #    BIT17 -  TCG2_BIOS_STORAGE_MANAGEMENT_FLAG_PP_REQUIRED_FOR_DISABLE_BLOCK_SID <BR>
+  #    BIT18 -  TCG2_BIOS_STORAGE_MANAGEMENT_FLAG_ENABLE_BLOCK_SID <BR>
   # @Prompt Initial setting of TCG2 Persistent Firmware Management Flags
   gEfiSecurityPkgTokenSpaceGuid.PcdTcg2PhysicalPresenceFlags|0x700E2|UINT32|0x0001001B
 
