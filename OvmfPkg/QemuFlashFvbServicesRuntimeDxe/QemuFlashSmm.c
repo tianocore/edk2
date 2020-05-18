@@ -46,3 +46,19 @@ QemuFlashBeforeProbe (
              );
   ASSERT_EFI_ERROR (Status);
 }
+
+/**
+  Write to QEMU Flash
+
+  @param[in] Ptr    Pointer to the location to write.
+  @param[in] Value  The value to write.
+
+**/
+VOID
+QemuFlashPtrWrite (
+  IN        volatile UINT8    *Ptr,
+  IN        UINT8             Value
+  )
+{
+  *Ptr = Value;
+}
