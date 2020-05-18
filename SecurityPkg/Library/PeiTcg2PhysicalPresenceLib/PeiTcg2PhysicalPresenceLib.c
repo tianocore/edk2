@@ -3,7 +3,7 @@
 
   This library will get TPM 2.0 physical presence information.
 
-Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2020, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -47,7 +47,7 @@ Tcg2PhysicalPresenceLibGetManagementFlags (
                           &PpiFlags
                           );
   if (EFI_ERROR (Status)) {
-    PpiFlags.PPFlags = TCG2_BIOS_TPM_MANAGEMENT_FLAG_DEFAULT | TCG2_BIOS_STORAGE_MANAGEMENT_FLAG_DEFAULT;
+    PpiFlags.PPFlags = PcdGet32(PcdTcg2PhysicalPresenceFlags);
   }
   return PpiFlags.PPFlags;
 }
