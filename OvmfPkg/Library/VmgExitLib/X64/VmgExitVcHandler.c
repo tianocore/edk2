@@ -844,6 +844,45 @@ MmioExit (
 }
 
 /**
+  Handle a MWAIT event.
+
+  Use the VMGEXIT instruction to handle a MWAIT event.
+
+  @param[in, out] Ghcb             Pointer to the Guest-Hypervisor Communication
+                                   Block
+  @param[in, out] Regs             x64 processor context
+  @param[in]      InstructionData  Instruction parsing context
+
+  @retval 0                        Event handled successfully
+  @retval Others                   New exception value to propagate
+
+**/
+STATIC
+UINT64
+MwaitExit (
+  IN OUT GHCB                     *Ghcb,
+  IN OUT EFI_SYSTEM_CONTEXT_X64   *Regs,
+  IN     SEV_ES_INSTRUCTION_DATA  *InstructionData
+  )
+{
+  UINT64  Status;
+
+  DecodeModRm (Regs, InstructionData);
+
+  Ghcb->SaveArea.Rax = Regs->Rax;
+  GhcbSetRegValid (Ghcb, GhcbRax);
+  Ghcb->SaveArea.Rcx = Regs->Rcx;
+  GhcbSetRegValid (Ghcb, GhcbRcx);
+
+  Status = VmgExit (Ghcb, SVM_EXIT_MWAIT, 0, 0);
+  if (Status) {
+    return Status;
+  }
+
+  return 0;
+}
+
+/**
   Handle a MONITOR event.
 
   Use the VMGEXIT instruction to handle a MONITOR event.
@@ -1537,6 +1576,10 @@ VmgExitHandleVc (
 
   case SVM_EXIT_MONITOR:
     NaeExit = MonitorExit;
+    break;
+
+  case SVM_EXIT_MWAIT:
+    NaeExit = MwaitExit;
     break;
 
   case SVM_EXIT_NPF:
