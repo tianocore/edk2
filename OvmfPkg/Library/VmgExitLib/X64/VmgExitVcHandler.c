@@ -14,6 +14,16 @@
 
 #define CR4_OSXSAVE (1 << 18)
 
+#define DR7_RESET_VALUE 0x400
+
+//
+// Per-CPU data mapping structure
+//
+typedef struct {
+  BOOLEAN  Dr7Cached;
+  UINT64   Dr7;
+} SEV_ES_PER_CPU_DATA;
+
 //
 // Instruction execution mode definition
 //
@@ -1495,6 +1505,93 @@ RdtscExit (
 }
 
 /**
+  Handle a DR7 register write event.
+
+  Use the VMGEXIT instruction to handle a DR7 write event.
+
+  @param[in, out] Ghcb             Pointer to the Guest-Hypervisor Communication
+                                   Block
+  @param[in, out] Regs             x64 processor context
+  @param[in]      InstructionData  Instruction parsing context
+
+  @retval 0                        Event handled successfully
+  @retval Others                   New exception value to propagate
+
+**/
+STATIC
+UINT64
+Dr7WriteExit (
+  IN OUT GHCB                     *Ghcb,
+  IN OUT EFI_SYSTEM_CONTEXT_X64   *Regs,
+  IN     SEV_ES_INSTRUCTION_DATA  *InstructionData
+  )
+{
+  SEV_ES_INSTRUCTION_OPCODE_EXT  *Ext;
+  SEV_ES_PER_CPU_DATA            *SevEsData;
+  INTN                           *Register;
+  UINT64                         Status;
+
+  Ext = &InstructionData->Ext;
+  SevEsData = (SEV_ES_PER_CPU_DATA *) (Ghcb + 1);
+
+  DecodeModRm (Regs, InstructionData);
+
+  /* MOV DRn always treats MOD == 3 no matter how encoded */
+  Register = GetRegisterPointer (Regs, Ext->ModRm.Rm);
+
+  /* Using a value of 0 for ExitInfo1 means RAX holds the value */
+  Ghcb->SaveArea.Rax = *Register;
+  GhcbSetRegValid (Ghcb, GhcbRax);
+
+  Status = VmgExit (Ghcb, SVM_EXIT_DR7_WRITE, 0, 0);
+  if (Status) {
+    return Status;
+  }
+
+  SevEsData->Dr7 = *Register;
+  SevEsData->Dr7Cached = TRUE;
+
+  return 0;
+}
+
+/**
+  Handle a DR7 register read event.
+
+  Use the VMGEXIT instruction to handle a DR7 read event.
+
+  @param[in, out] Ghcb             Pointer to the Guest-Hypervisor Communication
+                                   Block
+  @param[in, out] Regs             x64 processor context
+  @param[in]      InstructionData  Instruction parsing context
+
+  @retval 0                        Event handled successfully
+
+**/
+STATIC
+UINT64
+Dr7ReadExit (
+  IN OUT GHCB                     *Ghcb,
+  IN OUT EFI_SYSTEM_CONTEXT_X64   *Regs,
+  IN     SEV_ES_INSTRUCTION_DATA  *InstructionData
+  )
+{
+  SEV_ES_INSTRUCTION_OPCODE_EXT  *Ext;
+  SEV_ES_PER_CPU_DATA            *SevEsData;
+  INTN                           *Register;
+
+  Ext = &InstructionData->Ext;
+  SevEsData = (SEV_ES_PER_CPU_DATA *) (Ghcb + 1);
+
+  DecodeModRm (Regs, InstructionData);
+
+  /* MOV DRn always treats MOD == 3 no matter how encoded */
+  Register = GetRegisterPointer (Regs, Ext->ModRm.Rm);
+  *Register = (SevEsData->Dr7Cached) ? SevEsData->Dr7 : DR7_RESET_VALUE;
+
+  return 0;
+}
+
+/**
   Handle a #VC exception.
 
   Performs the necessary processing to handle a #VC exception.
@@ -1538,6 +1635,14 @@ VmgExitHandleVc (
 
   ExitCode = Regs->ExceptionData;
   switch (ExitCode) {
+  case SVM_EXIT_DR7_READ:
+    NaeExit = Dr7ReadExit;
+    break;
+
+  case SVM_EXIT_DR7_WRITE:
+    NaeExit = Dr7WriteExit;
+    break;
+
   case SVM_EXIT_RDTSC:
     NaeExit = RdtscExit;
     break;
