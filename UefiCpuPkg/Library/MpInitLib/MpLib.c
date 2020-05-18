@@ -1727,6 +1727,7 @@ MpInitLibInitialize (
   CpuMpData->CpuData          = (CPU_AP_DATA *) (CpuMpData + 1);
   CpuMpData->CpuInfoInHob     = (UINT64) (UINTN) (CpuMpData->CpuData + MaxLogicalProcessorNumber);
   InitializeSpinLock(&CpuMpData->MpLock);
+  CpuMpData->SevEsIsEnabled = PcdGetBool (PcdSevEsIsEnabled);
 
   //
   // Make sure no memory usage outside of the allocated buffer.
