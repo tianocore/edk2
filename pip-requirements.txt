@@ -14,3 +14,4 @@
 
 edk2-pytool-library==0.10.*
 edk2-pytool-extensions~=0.13.3
+antlr4-python3-runtime==4.7.1
