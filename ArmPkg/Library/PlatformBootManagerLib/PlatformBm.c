@@ -583,7 +583,9 @@ PlatformBootManagerBeforeConsole (
   //
   // Add the hardcoded serial console device path to ConIn, ConOut, ErrOut.
   //
-  ASSERT (FixedPcdGet8 (PcdDefaultTerminalType) == 4);
+  STATIC_ASSERT (FixedPcdGet8 (PcdDefaultTerminalType) == 4,
+    "PcdDefaultTerminalType must be TTYTERM");
+
   CopyGuid (&mSerialConsole.TermType.Guid, &gEfiTtyTermGuid);
 
   EfiBootManagerUpdateConsoleVariable (ConIn,
