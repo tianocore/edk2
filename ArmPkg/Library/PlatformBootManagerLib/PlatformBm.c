@@ -585,6 +585,10 @@ PlatformBootManagerBeforeConsole (
   //
   STATIC_ASSERT (FixedPcdGet8 (PcdDefaultTerminalType) == 4,
     "PcdDefaultTerminalType must be TTYTERM");
+  STATIC_ASSERT (FixedPcdGet8 (PcdUartDefaultParity) != 0,
+    "PcdUartDefaultParity must be set to an actual value, not 'default'");
+  STATIC_ASSERT (FixedPcdGet8 (PcdUartDefaultStopBits) != 0,
+    "PcdUartDefaultStopBits must be set to an actual value, not 'default'");
 
   CopyGuid (&mSerialConsole.TermType.Guid, &gEfiTtyTermGuid);
 
