@@ -290,6 +290,99 @@ RfcDecodeTest(
   return UNIT_TEST_PASSED;
 }
 
+#define SOURCE_STRING  L"Hello"
+
+STATIC
+UNIT_TEST_STATUS
+EFIAPI
+SafeStringContraintCheckTest (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  RETURN_STATUS  Status;
+  CHAR16         Destination[20];
+  CHAR16         AllZero[20];
+
+  //
+  // Zero buffer used to verify Destination is not modified
+  //
+  ZeroMem (AllZero, sizeof (AllZero));
+
+  //
+  // Positive test case copy source unicode string to destination
+  //
+  ZeroMem (Destination, sizeof (Destination));
+  Status = StrCpyS (Destination, sizeof (Destination) / sizeof (CHAR16), SOURCE_STRING);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_MEM_EQUAL (Destination, SOURCE_STRING, sizeof (SOURCE_STRING));
+
+  //
+  // Positive test case with DestMax the same as Source size
+  //
+  ZeroMem (Destination, sizeof (Destination));
+  Status = StrCpyS (Destination, sizeof (SOURCE_STRING) / sizeof (CHAR16), SOURCE_STRING);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_MEM_EQUAL (Destination, SOURCE_STRING, sizeof (SOURCE_STRING));
+
+  //
+  // Negative test case with Destination NULL
+  //
+  ZeroMem (Destination, sizeof (Destination));
+  Status = StrCpyS (NULL, sizeof (Destination) / sizeof (CHAR16), SOURCE_STRING);
+  UT_ASSERT_STATUS_EQUAL (Status, RETURN_INVALID_PARAMETER);
+  UT_ASSERT_MEM_EQUAL (Destination, AllZero, sizeof (AllZero));
+
+  //
+  // Negative test case with Source NULL
+  //
+  ZeroMem (Destination, sizeof (Destination));
+  Status = StrCpyS (Destination, sizeof (Destination) / sizeof (CHAR16), NULL);
+  UT_ASSERT_STATUS_EQUAL (Status, RETURN_INVALID_PARAMETER);
+  UT_ASSERT_MEM_EQUAL (Destination, AllZero, sizeof (AllZero));
+
+  //
+  // Negative test case with DestMax too big
+  //
+  ZeroMem (Destination, sizeof (Destination));
+  Status = StrCpyS (Destination, MAX_UINTN, SOURCE_STRING);
+  UT_ASSERT_STATUS_EQUAL (Status, RETURN_INVALID_PARAMETER);
+  UT_ASSERT_MEM_EQUAL (Destination, AllZero, sizeof (AllZero));
+
+  //
+  // Negative test case with DestMax 0
+  //
+  ZeroMem (Destination, sizeof (Destination));
+  Status = StrCpyS (Destination, 0, SOURCE_STRING);
+  UT_ASSERT_STATUS_EQUAL (Status, RETURN_INVALID_PARAMETER);
+  UT_ASSERT_MEM_EQUAL (Destination, AllZero, sizeof (AllZero));
+
+  //
+  // Negative test case with DestMax smaller than Source size
+  //
+  ZeroMem (Destination, sizeof (Destination));
+  Status = StrCpyS (Destination, 1, SOURCE_STRING);
+  UT_ASSERT_STATUS_EQUAL (Status, RETURN_BUFFER_TOO_SMALL);
+  UT_ASSERT_MEM_EQUAL (Destination, AllZero, sizeof (AllZero));
+
+  //
+  // Negative test case with DestMax smaller than Source size by one character
+  //
+  ZeroMem (Destination, sizeof (Destination));
+  Status = StrCpyS (Destination, sizeof (SOURCE_STRING) / sizeof (CHAR16) - 1, SOURCE_STRING);
+  UT_ASSERT_STATUS_EQUAL (Status, RETURN_BUFFER_TOO_SMALL);
+  UT_ASSERT_MEM_EQUAL (Destination, AllZero, sizeof (AllZero));
+
+  //
+  // Negative test case with overlapping Destination and Source
+  //
+  ZeroMem (Destination, sizeof (Destination));
+  Status = StrCpyS (Destination, sizeof (Destination) / sizeof (CHAR16), Destination);
+  UT_ASSERT_STATUS_EQUAL (Status, RETURN_ACCESS_DENIED);
+  UT_ASSERT_MEM_EQUAL (Destination, AllZero, sizeof (AllZero));
+
+  return UNIT_TEST_PASSED;
+}
+
 /**
   Initialze the unit test framework, suite, and unit tests for the
   Base64 conversion APIs of BaseLib and run the unit tests.
@@ -309,6 +402,7 @@ UnitTestingEntry (
   UNIT_TEST_FRAMEWORK_HANDLE  Fw;
   UNIT_TEST_SUITE_HANDLE      b64EncodeTests;
   UNIT_TEST_SUITE_HANDLE      b64DecodeTests;
+  UNIT_TEST_SUITE_HANDLE      SafeStringTests;
 
   Fw = NULL;
 
@@ -366,6 +460,19 @@ UnitTestingEntry (
   AddTestCase (b64DecodeTests, "Too many padding characters", "Error3", RfcDecodeTest, NULL, CleanUpB64TestContext, &mBasicDecodeError3);
   AddTestCase (b64DecodeTests, "Incorrectly placed padding character", "Error4", RfcDecodeTest, NULL, CleanUpB64TestContext, &mBasicDecodeError4);
   AddTestCase (b64DecodeTests, "Too small of output buffer", "Error5", RfcDecodeTest, NULL, CleanUpB64TestContext, &mBasicDecodeError5);
+
+  //
+  // Populate the safe string Unit Test Suite.
+  //
+  Status = CreateUnitTestSuite (&SafeStringTests, Fw, "Safe String", "BaseLib.SafeString", NULL, NULL);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Failed in CreateUnitTestSuite for SafeStringTests\n"));
+    Status = EFI_OUT_OF_RESOURCES;
+    goto EXIT;
+  }
+
+  // --------------Suite-----------Description--------------Class Name----------Function--------Pre---Post-------------------Context-----------
+  AddTestCase (SafeStringTests, "SAFE_STRING_CONSTRAINT_CHECK", "SafeStringContraintCheckTest", SafeStringContraintCheckTest, NULL, NULL, NULL);
 
   //
   // Execute the tests.
