@@ -16,6 +16,7 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PciHostBridgeLib.h>
 #include <Library/PciLib.h>
+#include <Library/DxeServicesTableLib.h>
 #include "PciHostBridge.h"
 
 /**
@@ -139,6 +140,55 @@ PcatPciRootBridgeBarExisted (
   EnableInterrupts ();
 }
 
+STATIC
+EFI_STATUS
+PcatPciRootBridgeWarnAboutBrokenFW (
+  IN  UINT64            Start,
+  IN  UINT64            Limit
+)
+{
+  EFI_STATUS                            Status;
+  UINTN                                 Index;
+  UINT64                                IntersectionBase;
+  UINT64                                IntersectionEnd;
+  UINTN                                 NumberOfDescriptors;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR       *Map;
+
+  Status = gDS->GetMemorySpaceMap (&NumberOfDescriptors, &Map);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "%a: %a: GetMemorySpaceMap(): %r\n",
+      gEfiCallerBaseName, __FUNCTION__, Status));
+    return Status;
+  }
+
+  for (Index = 0; Index < NumberOfDescriptors; Index++) {
+    if (Map[Index].GcdMemoryType == EfiGcdMemoryTypeNonExistent) {
+      //
+      // Ignore non existent entries
+      //
+      continue;
+    }
+
+    IntersectionBase = MAX (Start, Map[Index].BaseAddress);
+    IntersectionEnd = MIN (Limit, Map[Index].BaseAddress + Map[Index].Length);
+    if (IntersectionBase >= IntersectionEnd) {
+      //
+      // The descriptor and the aperture don't overlap.
+      //
+      continue;
+    }
+
+    if (Map[Index].GcdMemoryType == EfiGcdMemoryTypeReserved) {
+      DEBUG ((EFI_D_ERROR, "%a: PCI aperature overlaps reserved memory region\n",
+        __FUNCTION__));
+      DEBUG ((EFI_D_ERROR, "%a: Please consider fixing EDK2 or your firmware\n",
+        __FUNCTION__));
+      return EFI_ACCESS_DENIED;
+    }
+  }
+  return EFI_SUCCESS;
+}
+
 /**
   Parse PCI bar and collect the assigned PCI resource information.
 
@@ -192,6 +242,9 @@ PcatPciRootBridgeParseBars (
   UINT64                            Length;
   UINT64                            Limit;
   PCI_ROOT_BRIDGE_APERTURE          *MemAperture;
+  UINT64                            NewBase;
+  UINT64                            NewLength;
+  EFI_STATUS                        Status;
 
   for (Offset = BarOffsetBase; Offset < BarOffsetEnd; Offset += sizeof (UINT32)) {
     PcatPciRootBridgeBarExisted (
@@ -271,6 +324,33 @@ PcatPciRootBridgeParseBars (
 
         Limit = Base + Length - 1;
         if ((Base > 0) && (Base < Limit)) {
+          NewBase = MemAperture->Base;
+          if (MemAperture->Base > Base) {
+            NewBase = Base;
+          }
+          NewLength = MemAperture->Base;
+          if (MemAperture->Limit < Limit) {
+            NewLength = Base;
+          }
+
+          //
+          // In case the BAR is placed on "the other side" of the MMCONF window
+          // this would cause the aperature to cover the MMCONF window, which
+          // isn't supported by EDK2.
+          //
+          Status = PcatPciRootBridgeWarnAboutBrokenFW(NewBase, NewLength);
+          if (EFI_ERROR (Status)) {
+            DEBUG ((EFI_D_ERROR, "%a: Not adding PCI %x:%x.%x BAR@%d %x:%x to aperature\n",
+              __FUNCTION__,
+              Bus,
+              Device,
+              Function,
+              Offset,
+              Base,
+              Limit));
+            continue;
+          }
+
           if (MemAperture->Base > Base) {
             MemAperture->Base = Base;
           }
