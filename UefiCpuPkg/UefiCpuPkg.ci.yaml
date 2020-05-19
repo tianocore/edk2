@@ -11,6 +11,10 @@
     "CompilerPlugin": {
         "DscPath": "UefiCpuPkg.dsc"
     },
+    ## options defined ci/Plugin/HostUnitTestCompilerPlugin
+    "HostUnitTestCompilerPlugin": {
+        "DscPath": "Test/UefiCpuPkgHostTest.dsc"
+    },
     "CharEncodingCheck": {
         "IgnoreFiles": []
     },
@@ -21,7 +25,9 @@
             "UefiCpuPkg/UefiCpuPkg.dec"
         ],
         # For host based unit tests
-        "AcceptableDependencies-HOST_APPLICATION":[],
+        "AcceptableDependencies-HOST_APPLICATION":[
+            "UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec"
+        ],
         # For UEFI shell based apps
         "AcceptableDependencies-UEFI_APPLICATION":[],
         "IgnoreInf": []
@@ -32,6 +38,10 @@
             "UefiCpuPkg/ResetVector/FixupVtf/Vtf.inf",
             "UefiCpuPkg/ResetVector/Vtf0/Vtf0.inf"
         ]
+    },
+    "HostUnitTestDscCompleteCheck": {
+        "IgnoreInf": [""],
+        "DscPath": "Test/UefiCpuPkgHostTest.dsc"
     },
     "GuidCheck": {
         "IgnoreGuidName": ["SecCore", "ResetVector"], # Expected duplication for gEfiFirmwareVolumeTopFileGuid
