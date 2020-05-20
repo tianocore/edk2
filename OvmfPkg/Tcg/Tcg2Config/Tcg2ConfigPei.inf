@@ -30,9 +30,9 @@
 
 [LibraryClasses]
   PeimEntryPoint
+  BaseLib
   DebugLib
   PeiServicesLib
-  Tpm12CommandLib
   Tpm12DeviceLib
   Tpm2DeviceLib
 
