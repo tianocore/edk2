@@ -282,6 +282,21 @@ typedef struct {
   //
 } ACPI_ADR_DEVICE_PATH;
 
+///
+/// ACPI NVDIMM Device Path SubType.
+///
+#define ACPI_NVDIMM_DP               0x04
+///
+///
+typedef struct {
+  EFI_DEVICE_PATH_PROTOCOL        Header;
+  ///
+  /// NFIT Device Handle, the _ADR of the NVDIMM device.
+  /// The value of this field comes from Section 9.20.3 of the ACPI 6.2A specification.
+  ///
+  UINT32                          NFITDeviceHandle;
+} ACPI_NVDIMM_DEVICE_PATH;
+
 #define ACPI_ADR_DISPLAY_TYPE_OTHER             0
 #define ACPI_ADR_DISPLAY_TYPE_VGA               1
 #define ACPI_ADR_DISPLAY_TYPE_TV                2
