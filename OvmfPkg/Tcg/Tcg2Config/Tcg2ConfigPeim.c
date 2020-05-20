@@ -15,11 +15,11 @@
 #include <PiPei.h>
 
 #include <Guid/TpmInstance.h>
+#include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PeiServicesLib.h>
 #include <Library/Tpm2DeviceLib.h>
 #include <Library/Tpm12DeviceLib.h>
-#include <Library/Tpm12CommandLib.h>
 #include <Ppi/TpmInitialized.h>
 
 STATIC CONST EFI_PEI_PPI_DESCRIPTOR mTpmSelectedPpi = {
