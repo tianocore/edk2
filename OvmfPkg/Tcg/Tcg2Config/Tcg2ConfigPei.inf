@@ -21,8 +21,13 @@
 
 [Sources]
   Tcg2ConfigPeim.c
-  Tpm12Support.c
   Tpm12Support.h
+
+[Sources.IA32, Sources.X64]
+  Tpm12Support.c
+
+[Sources.ARM, Sources.AARCH64]
+  Tpm12SupportNull.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -35,8 +40,10 @@
   BaseLib
   DebugLib
   PeiServicesLib
-  Tpm12DeviceLib
   Tpm2DeviceLib
+
+[LibraryClasses.IA32, LibraryClasses.X64]
+  Tpm12DeviceLib
 
 [Guids]
   gEfiTpmDeviceSelectedGuid           ## PRODUCES ## GUID # Used as a PPI GUID
