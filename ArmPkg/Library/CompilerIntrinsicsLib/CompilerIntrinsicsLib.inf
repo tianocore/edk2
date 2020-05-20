@@ -79,6 +79,9 @@
   Arm/ldivmod.asm      | MSFT
   Arm/llsr.asm         | MSFT
 
+[Sources.AARCH64]
+  AArch64/Atomics.S    | GCC
+
 [Packages]
   MdePkg/MdePkg.dec
   ArmPkg/ArmPkg.dec
