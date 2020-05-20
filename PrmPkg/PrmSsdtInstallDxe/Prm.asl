@@ -8,10 +8,10 @@
 DefinitionBlock (
     "Prm.aml",
     "SSDT",
-    0x01,
-    "OEMID",
+    2,
+    "OEMID ",
     "PRMOPREG",
-    0x3000
+    0x1000
     )
 {
     Scope (\_SB)
@@ -65,18 +65,6 @@ DefinitionBlock (
             Method (NTST)
             {
                 \_SB.PRMB.SETV (BUF1)
-            }
-            Method (TST1)
-            {
-                \_SB.PRMB.SETV (BUF1)
-            }
-            Method (TST2)
-            {
-                \_SB.PRMB.SETV (BUF2)
-            }
-            Method (TST3)
-            {
-                \_SB.PRMB.SETV (BUF3)
             }
         }
     }
