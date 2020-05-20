@@ -85,6 +85,11 @@
   $(PLATFORM_PACKAGE)/PrmLoaderDxe/PrmLoaderDxe.inf
 
   #
+  # PRM SSDT Installation Driver
+  #
+  $(PLATFORM_PACKAGE)/PrmSsdtInstallDxe/PrmSsdtInstallDxe.inf
+
+  #
   # PRM Sample Modules
   #
   $(PLATFORM_PACKAGE)/Samples/PrmSamplePrintModule/PrmSamplePrintModule.inf

@@ -24,7 +24,6 @@
   PrmAcpiTable.h
   PrmLoader.h
   PrmLoaderDxe.c
-  Prm.asl
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -39,13 +38,12 @@
   BaseMemoryLib
   DebugLib
   MemoryAllocationLib
+  PcdLib
   PeCoffLib
   PrmContextBufferLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
   UefiLib
-  DxeServicesLib
-  PcdLib
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemId            ## CONSUMES
