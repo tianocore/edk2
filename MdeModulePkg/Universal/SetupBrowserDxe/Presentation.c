@@ -19,6 +19,7 @@ LIST_ENTRY         mRefreshEventList = INITIALIZE_LIST_HEAD_VARIABLE (mRefreshEv
 UINT16             mCurFakeQestId;
 FORM_DISPLAY_ENGINE_FORM gDisplayFormData;
 BOOLEAN            mFinishRetrieveCall = FALSE;
+BOOLEAN            mDynamicFormUpdated = FALSE;
 
 /**
   Check whether the ConfigAccess protocol is available.
@@ -1762,6 +1763,7 @@ FormUpdateNotify (
   )
 {
   mHiiPackageListUpdated = TRUE;
+  mDynamicFormUpdated = TRUE;
 
   return EFI_SUCCESS;
 }
