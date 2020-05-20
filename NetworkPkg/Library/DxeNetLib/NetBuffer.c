@@ -1063,7 +1063,7 @@ NetbufAllocSpace (
     } else {
       NetbufGetByte (Nbuf, 0, &Index);
 
-      if ((NET_HEADSPACE(&(Nbuf->BlockOp[Index])) < Len) && (Index > 0)) {
+      if ((Index != 0) && (NET_HEADSPACE(&(Nbuf->BlockOp[Index])) < Len)) {
         Index--;
       }
     }
