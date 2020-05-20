@@ -21,6 +21,8 @@
 
 [Sources]
   Tcg2ConfigPeim.c
+  Tpm12Support.c
+  Tpm12Support.h
 
 [Packages]
   MdePkg/MdePkg.dec
