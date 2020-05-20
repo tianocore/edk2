@@ -52,12 +52,20 @@ typedef struct  {
    VOID               *MemoryInitUpdPtr;
    VOID               *SiliconInitUpdPtr;
    UINT8              ApiIdx;
-   UINT8              FspMode; // 0: FSP in API mode; 1: FSP in DISPATCH mode
+   ///
+   /// 0: FSP in API mode; 1: FSP in DISPATCH mode
+   ///
+   UINT8              FspMode;
    UINT8              OnSeparateStack;
    UINT8              Reserved3;
    UINT32             NumberOfPhases;
    UINT32             PhasesExecuted;
-   UINT8              Reserved4[20];
+   ///
+   /// To store function parameters pointer
+   /// so it can be retrieved after stack switched.
+   ///
+   VOID               *FunctionParameterPtr;
+   UINT8              Reserved4[16];
    UINT32             PerfSig;
    UINT16             PerfLen;
    UINT16             Reserved5;

@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2020, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -33,6 +33,22 @@
 UINT32
 EFIAPI
 Pei2LoaderSwitchStack (
+  VOID
+  );
+
+/**
+
+  This function is equivalent to Pei2LoaderSwitchStack () but just indicates
+  the stack after switched is FSP stack.
+
+  @return ReturnKey          After switching to the saved stack,
+                             this value will be saved in eax before returning.
+
+
+**/
+UINT32
+EFIAPI
+Loader2PeiSwitchStack (
   VOID
   );
 
