@@ -36,7 +36,7 @@ struct _GDT_ENTRIES {
   GDT_ENTRY LinearCode;
   GDT_ENTRY SysData;
   GDT_ENTRY SysCode;
-  GDT_ENTRY Spare4;
+  GDT_ENTRY SysCode16;
   GDT_ENTRY LinearData64;
   GDT_ENTRY LinearCode64;
   GDT_ENTRY Spare5;
@@ -49,7 +49,7 @@ struct _GDT_ENTRIES {
 #define LINEAR_CODE_SEL   OFFSET_OF (GDT_ENTRIES, LinearCode)
 #define SYS_DATA_SEL      OFFSET_OF (GDT_ENTRIES, SysData)
 #define SYS_CODE_SEL      OFFSET_OF (GDT_ENTRIES, SysCode)
-#define SPARE4_SEL        OFFSET_OF (GDT_ENTRIES, Spare4)
+#define SYS_CODE16_SEL    OFFSET_OF (GDT_ENTRIES, SysCode16)
 #define LINEAR_DATA64_SEL OFFSET_OF (GDT_ENTRIES, LinearData64)
 #define LINEAR_CODE64_SEL OFFSET_OF (GDT_ENTRIES, LinearCode64)
 #define SPARE5_SEL        OFFSET_OF (GDT_ENTRIES, Spare5)
