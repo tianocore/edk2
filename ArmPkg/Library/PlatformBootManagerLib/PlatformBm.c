@@ -23,10 +23,12 @@
 #include <Protocol/EsrtManagement.h>
 #include <Protocol/GraphicsOutput.h>
 #include <Protocol/LoadedImage.h>
+#include <Protocol/NonDiscoverableDevice.h>
 #include <Protocol/PciIo.h>
 #include <Protocol/PciRootBridgeIo.h>
 #include <Protocol/PlatformBootManager.h>
 #include <Guid/EventGroup.h>
+#include <Guid/NonDiscoverableDevice.h>
 #include <Guid/TtyTerm.h>
 #include <Guid/SerialPortLibVendor.h>
 
@@ -251,6 +253,37 @@ IsPciDisplay (
   }
 
   return IS_PCI_DISPLAY (&Pci);
+}
+
+
+/**
+  This FILTER_FUNCTION checks if a handle corresponds to a non-discoverable
+  USB host controller.
+**/
+STATIC
+BOOLEAN
+EFIAPI
+IsUsbHost (
+  IN EFI_HANDLE   Handle,
+  IN CONST CHAR16 *ReportText
+  )
+{
+  NON_DISCOVERABLE_DEVICE   *Device;
+  EFI_STATUS                Status;
+
+  Status = gBS->HandleProtocol (Handle,
+                  &gEdkiiNonDiscoverableDeviceProtocolGuid,
+                  (VOID **)&Device);
+  if (EFI_ERROR (Status)) {
+    return FALSE;
+  }
+
+  if (CompareGuid (Device->Type, &gEdkiiNonDiscoverableUhciDeviceGuid) ||
+      CompareGuid (Device->Type, &gEdkiiNonDiscoverableEhciDeviceGuid) ||
+      CompareGuid (Device->Type, &gEdkiiNonDiscoverableXhciDeviceGuid)) {
+    return TRUE;
+  }
+  return FALSE;
 }
 
 
@@ -573,6 +606,15 @@ PlatformBootManagerBeforeConsole (
   // ErrOut.
   //
   FilterAndProcess (&gEfiGraphicsOutputProtocolGuid, NULL, AddOutput);
+
+  //
+  // The core BDS code connects short-form USB device paths by explicitly
+  // looking for handles with PCI I/O installed, and checking the PCI class
+  // code whether it matches the one for a USB host controller. This means
+  // non-discoverable USB host controllers need to have the non-discoverable
+  // PCI driver attached first.
+  //
+  FilterAndProcess (&gEdkiiNonDiscoverableDeviceProtocolGuid, IsUsbHost, Connect);
 
   //
   // Add the hardcoded short-form USB keyboard device path to ConIn.
