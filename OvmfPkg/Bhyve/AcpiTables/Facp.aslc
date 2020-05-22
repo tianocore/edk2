@@ -1,0 +1,76 @@
+/*
+ * Copyright (c) 2020, Rebecca Cran <rebecca@bsdio.com>
+ * Copyright (c) 2014, Pluribus Networks, Inc.
+ *
+ * SPDX-License-Identifier: BSD-2-Clause-Patent
+ */
+
+#include "Platform.h"
+
+#define EFI_ACPI_OEM_TABLE_ID     SIGNATURE_64('B','V','F','A','C','P',' ',' ')
+
+EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE FACP = {
+  {
+    EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE,
+    sizeof (EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE),
+    EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE_REVISION,
+    0,                          // to make sum of entire table == 0
+    {EFI_ACPI_OEM_ID},          // OEMID is a 6 bytes long field
+    EFI_ACPI_OEM_TABLE_ID,      // OEM table identification(8 bytes long)
+    EFI_ACPI_OEM_REVISION,      // OEM revision number
+    EFI_ACPI_CREATOR_ID,        // ASL compiler vendor ID
+    EFI_ACPI_CREATOR_REVISION   // ASL compiler revision number
+  },
+  0,                // Physical addesss of FACS
+  0,                // Physical address of DSDT
+  INT_MODEL,        // System Interrupt Model
+  RESERVED,         // reserved
+  SCI_INT_VECTOR,   // System vector of SCI interrupt
+  SMI_CMD_IO_PORT,  // Port address of SMI command port
+  ACPI_ENABLE,      // value to write to port smi_cmd to enable ACPI
+  ACPI_DISABLE,     // value to write to port smi_cmd to disable ACPI
+  S4BIOS_REQ,       // Value to write to SMI CMD port to enter the S4BIOS state
+  0,                // PState control
+  PM1a_EVT_BLK,     // Port address of Power Mgt 1a Event Reg Blk
+  PM1b_EVT_BLK,     // Port address of Power Mgt 1b Event Reg Blk
+  PM1a_CNT_BLK,     // Port address of Power Mgt 1a Ctrl Reg Blk
+  PM1b_CNT_BLK,     // Port address of Power Mgt 1b Ctrl Reg Blk
+  PM2_CNT_BLK,      // Port address of Power Mgt 2  Ctrl Reg Blk
+  PM_TMR_BLK,       // Port address of Power Mgt Timer Ctrl Reg Blk
+  GPE0_BLK,         // Port addr of General Purpose Event 0 Reg Blk
+  GPE1_BLK,         // Port addr of General Purpose Event 1 Reg Blk
+  PM1_EVT_LEN,      // Byte Length of ports at pm1X_evt_blk
+  PM1_CNT_LEN,      // Byte Length of ports at pm1X_cnt_blk
+  PM2_CNT_LEN,      // Byte Length of ports at pm2_cnt_blk
+  PM_TM_LEN,        // Byte Length of ports at pm_tm_blk
+  GPE0_BLK_LEN,     // Byte Length of ports at gpe0_blk
+  GPE1_BLK_LEN,     // Byte Length of ports at gpe1_blk
+  GPE1_BASE,        // offset in gpe model where gpe1 events start
+  0,                // _CST support
+  P_LVL2_LAT,       // worst case HW latency to enter/exit C2 state
+  P_LVL3_LAT,       // worst case HW latency to enter/exit C3 state
+  FLUSH_SIZE,       // Size of area read to flush caches
+  FLUSH_STRIDE,     // Stride used in flushing caches
+  DUTY_OFFSET,      // bit location of duty cycle field in p_cnt reg
+  DUTY_WIDTH,       // bit width of duty cycle field in p_cnt reg
+  DAY_ALRM,         // index to day-of-month alarm in RTC CMOS RAM
+  MON_ALRM,         // index to month-of-year alarm in RTC CMOS RAM
+  CENTURY,          // index to century in RTC CMOS RAM
+  IAPC_BOOT_ARCH,   // Boot architecture flag
+  RESERVED,         // reserved
+  FACP_FLAGS,
+  FACP_RESET_REG,
+  FACP_RESET_VAL,
+};
+
+VOID*
+ReferenceAcpiTable (
+  VOID
+  )
+{
+  //
+  // Reference the table being generated to prevent the optimizer from removing the
+  // data structure from the exeutable
+  //
+  return (VOID*)&FACP;
+}
