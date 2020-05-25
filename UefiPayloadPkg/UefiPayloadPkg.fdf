@@ -193,6 +193,15 @@ INF MdeModulePkg/Bus/Sd/EmmcDxe/EmmcDxe.inf
 INF MdeModulePkg/Bus/Sd/SdDxe/SdDxe.inf
 
 #
+# TPM support
+#
+!if $(TPM_ENABLE) == TRUE
+INF  SecurityPkg/Tcg/TcgDxe/TcgDxe.inf
+INF  SecurityPkg/Tcg/Tcg2Dxe/Tcg2Dxe.inf
+INF  SecurityPkg/Tcg/Tcg2Config/Tcg2ConfigDxe.inf
+!endif
+
+#
 # Usb Support
 #
 INF MdeModulePkg/Bus/Pci/UhciDxe/UhciDxe.inf
