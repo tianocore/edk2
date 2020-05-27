@@ -15,7 +15,6 @@
 #include <PrmDataBuffer.h>
 #include <PrmExportDescriptor.h>
 #include <PrmMmio.h>
-#include <PrmModuleUpdate.h>
 #include <PrmOsServices.h>
 
 /**
@@ -45,24 +44,5 @@
     IN VOID                 *ParameterBuffer,   \
     IN PRM_CONTEXT_BUFFER   *ContextBuffer      \
     )                                           \
-
-/**
-  A macro that declares the PRM Module Update Lock Descriptor for a PRM Module.
-
-  This macro is intended to be used once in a PRM Module so the module update lock descriptor is
-  exported for the module.
-
-**/
-#define PRM_MODULE_UPDATE_LOCK_EXPORT                                                           \
-  PRM_EXPORT_API PRM_MODULE_UPDATE_LOCK_DESCRIPTOR PRM_MODULE_UPDATE_LOCK_DESCRIPTOR_NAME = {   \
-    PRM_MODULE_UPDATE_LOCK_DESCRIPTOR_SIGNATURE,                                                \
-    PRM_MODULE_UPDATE_LOCK_REVISION,                                                            \
-    { 0 }                                                                                       \
-  }                                                                                             \
-
-//
-// A PRM module is required to export the PRM Module Update Lock
-//
-PRM_MODULE_UPDATE_LOCK_EXPORT;
 
 #endif
