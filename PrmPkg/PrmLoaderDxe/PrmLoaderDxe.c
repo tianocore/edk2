@@ -26,7 +26,6 @@
 
 #include <PrmContextBuffer.h>
 #include <PrmMmio.h>
-#include <PrmModuleUpdate.h>
 
 LIST_ENTRY          mPrmModuleList;
 
@@ -706,23 +705,6 @@ ProcessPrmModules (
                 &CurrentModuleInfoStruct->MinorRevision
                 );
     ASSERT_EFI_ERROR (Status);
-
-    Status =  GetExportEntryAddress (
-                PRM_STRING (PRM_MODULE_UPDATE_LOCK_DESCRIPTOR_NAME),
-                CurrentImageAddress,
-                CurrentImageExportDirectory,
-                (EFI_PHYSICAL_ADDRESS *) &(CurrentModuleInfoStruct->ModuleUpdateLock)
-                );
-    ASSERT_EFI_ERROR (Status);
-    if (!EFI_ERROR (Status)) {
-      DEBUG ((
-        DEBUG_INFO,
-        "    %a %a: Found PRM module update lock physical address at 0x%016x.\n",
-        _DBGMSGID_,
-        __FUNCTION__,
-        CurrentModuleInfoStruct->ModuleUpdateLock
-        ));
-    }
 
     // It is currently valid for a PRM module not to use a context buffer
     Status = GetModuleContextBuffers (
