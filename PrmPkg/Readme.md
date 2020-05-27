@@ -153,34 +153,33 @@ motivation behind using PE/COFF export tables to expose PRM module information a
 definition consistent between firmware and OS load.
 
 ### PRM Module Exports
-A PRM module must contain at least three exports: A PRM Module Export Descriptor, a PRM Module Update Lock Descriptor,
-and at least one PRM handler. Here's an example of an export table from a PRM module that has a single PRM handler:
+A PRM module must contain at least two exports: A PRM Module Export Descriptor and at least one PRM handler. Here's
+an example of an export table from a PRM module that has a single PRM handler:
 
 ```
-  0000000000005000: 00 00 00 00 FF FF FF FF 00 00 00 00 46 50 00 00  ....ÿÿÿÿ....FP..
-  0000000000005010: 01 00 00 00 03 00 00 00 03 00 00 00 28 50 00 00  ............(P..
-  0000000000005020: 34 50 00 00 40 50 00 00 78 13 00 00 30 40 00 00  4P..@P..x...0@..
-  0000000000005030: 20 40 00 00 67 50 00 00 86 50 00 00 A0 50 00 00   @..gP...P...P..
-  0000000000005040: 00 00 01 00 02 00 50 72 6D 53 61 6D 70 6C 65 43  ......PrmSampleC
-  0000000000005050: 6F 6E 74 65 78 74 42 75 66 66 65 72 4D 6F 64 75  ontextBufferModu
-  0000000000005060: 6C 65 2E 64 6C 6C 00 44 75 6D 70 53 74 61 74 69  le.dll.DumpStati
-  0000000000005070: 63 44 61 74 61 42 75 66 66 65 72 50 72 6D 48 61  cDataBufferPrmHa
-  0000000000005080: 6E 64 6C 65 72 00 50 72 6D 4D 6F 64 75 6C 65 45  ndler.PrmModuleE
-  0000000000005090: 78 70 6F 72 74 44 65 73 63 72 69 70 74 6F 72 00  xportDescriptor.
-  00000000000050A0: 50 72 6D 4D 6F 64 75 6C 65 55 70 64 61 74 65 4C  PrmModuleUpdateL
-  00000000000050B0: 6F 63 6B 00                                      ock.
+  0000000000005000: 00 00 00 00 FF FF FF FF 00 00 00 00 3C 50 00 00  ............<P..
+  0000000000005010: 01 00 00 00 02 00 00 00 02 00 00 00 28 50 00 00  ............(P..
+  0000000000005020: 30 50 00 00 38 50 00 00 78 13 00 00 20 40 00 00  0P..8P..x... @..
+  0000000000005030: 5D 50 00 00 7C 50 00 00 00 00 01 00 50 72 6D 53  ]P..|P......PrmS
+  0000000000005040: 61 6D 70 6C 65 43 6F 6E 74 65 78 74 42 75 66 66  ampleContextBuff
+  0000000000005050: 65 72 4D 6F 64 75 6C 65 2E 64 6C 6C 00 44 75 6D  erModule.dll.Dum
+  0000000000005060: 70 53 74 61 74 69 63 44 61 74 61 42 75 66 66 65  pStaticDataBuffe
+  0000000000005070: 72 50 72 6D 48 61 6E 64 6C 65 72 00 50 72 6D 4D  rPrmHandler.PrmM
+  0000000000005080: 6F 64 75 6C 65 45 78 70 6F 72 74 44 65 73 63 72  oduleExportDescr
+  0000000000005090: 69 70 74 6F 72 00                                iptor.
 
     00000000 characteristics
     FFFFFFFF time date stamp
-        0.10 version
+        0.00 version
            1 ordinal base
-           3 number of functions
-           3 number of names
+           2 number of functions
+           2 number of names
 
     ordinal hint RVA      name
+
           1    0 00001378 DumpStaticDataBufferPrmHandler
-          2    1 00004030 PrmModuleExportDescriptor
-          3    2 00004020 PrmModuleUpdateLock
+          2    1 00004020 PrmModuleExportDescriptor
+
 ```
 ### PRM Image Format
 PRM modules are ultimately PE/COFF images. However, when packaged in firmware the PE/COFF image is placed into a

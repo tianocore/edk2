@@ -55,8 +55,6 @@ typedef struct {
   UINT16                              HandlerCount;               ///< Number of entries in the Handler Info array
   UINT32                              HandlerInfoOffset;          ///< Offset in bytes from the beginning of this
                                                                   ///< structure to the Handler Info array
-  UINT64                              ModuleUpdateLock;           ///< Physical address of the PRM Module Update Lock
-                                                                  ///< descriptor (PRM_MODULE_UPDATE_LOCK_DESCRIPTOR *)
   UINT64                              RuntimeMmioRanges;          ///< Physical address of the PRM MMIO Ranges
                                                                   ///< structure (PRM_MODULE_RUNTIME_MMIO_RANGES *)
   PRM_HANDLER_INFORMATION_STRUCT      HandlerInfoStructure[1];
