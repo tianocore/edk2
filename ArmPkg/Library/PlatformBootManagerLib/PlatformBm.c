@@ -754,11 +754,6 @@ PlatformBootManagerAfterConsole (
   }
 
   //
-  // Connect the rest of the devices.
-  //
-  EfiBootManagerConnectAll ();
-
-  //
   // On ARM, there is currently no reason to use the phased capsule
   // update approach where some capsules are dispatched before EndOfDxe
   // and some are dispatched after. So just handle all capsules here,
@@ -766,11 +761,6 @@ PlatformBootManagerAfterConsole (
   // feedback about what is going on.
   //
   HandleCapsules ();
-
-  //
-  // Enumerate all possible boot options.
-  //
-  EfiBootManagerRefreshAllBootOption ();
 
   //
   // Register UEFI Shell
