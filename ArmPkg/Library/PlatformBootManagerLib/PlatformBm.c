@@ -777,9 +777,7 @@ PlatformBootManagerAfterConsole (
   //
   Key.ScanCode     = SCAN_NULL;
   Key.UnicodeChar  = L's';
-  PlatformRegisterFvBootOption (
-    &gUefiShellFileGuid, L"UEFI Shell", LOAD_OPTION_ACTIVE, &Key
-    );
+  PlatformRegisterFvBootOption (&gUefiShellFileGuid, L"UEFI Shell", 0, &Key);
 }
 
 /**
