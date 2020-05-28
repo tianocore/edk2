@@ -357,7 +357,8 @@ VOID
 PlatformRegisterFvBootOption (
   CONST EFI_GUID                   *FileGuid,
   CHAR16                           *Description,
-  UINT32                           Attributes
+  UINT32                           Attributes,
+  EFI_INPUT_KEY                    *Key
   )
 {
   EFI_STATUS                        Status;
@@ -409,6 +410,9 @@ PlatformRegisterFvBootOption (
   if (OptionIndex == -1) {
     Status = EfiBootManagerAddLoadOptionVariable (&NewOption, MAX_UINTN);
     ASSERT_EFI_ERROR (Status);
+    Status = EfiBootManagerAddKeyOptionVariable (NULL,
+               (UINT16)NewOption.OptionNumber, 0, Key, NULL);
+    ASSERT (Status == EFI_SUCCESS || Status == EFI_ALREADY_STARTED);
   }
   EfiBootManagerFreeLoadOption (&NewOption);
   EfiBootManagerFreeLoadOptions (BootOptions, BootOptionCount);
@@ -721,6 +725,7 @@ PlatformBootManagerAfterConsole (
   UINTN                         FirmwareVerLength;
   UINTN                         PosX;
   UINTN                         PosY;
+  EFI_INPUT_KEY                 Key;
 
   FirmwareVerLength = StrLen (PcdGetPtr (PcdFirmwareVersionString));
 
@@ -770,8 +775,10 @@ PlatformBootManagerAfterConsole (
   //
   // Register UEFI Shell
   //
+  Key.ScanCode     = SCAN_NULL;
+  Key.UnicodeChar  = L's';
   PlatformRegisterFvBootOption (
-    &gUefiShellFileGuid, L"UEFI Shell", LOAD_OPTION_ACTIVE
+    &gUefiShellFileGuid, L"UEFI Shell", LOAD_OPTION_ACTIVE, &Key
     );
 }
 
