@@ -1854,7 +1854,8 @@ DxeImageVerificationHandler (
        OffSet += (WinCertificate->dwLength + ALIGN_SIZE (WinCertificate->dwLength))) {
     WinCertificate = (WIN_CERTIFICATE *) (mImageBase + OffSet);
     if ((SecDataDir->VirtualAddress + SecDataDir->Size - OffSet) <= sizeof (WIN_CERTIFICATE) ||
-        (SecDataDir->VirtualAddress + SecDataDir->Size - OffSet) < WinCertificate->dwLength) {
+        (SecDataDir->VirtualAddress + SecDataDir->Size - OffSet) < WinCertificate->dwLength ||
+		(MAX_UINT32 - WinCertificate->dwLength - ALIGN_SIZE (WinCertificate->dwLength)) < offset) {
       break;
     }
 
