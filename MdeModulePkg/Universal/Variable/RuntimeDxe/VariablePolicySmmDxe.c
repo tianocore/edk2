@@ -176,7 +176,7 @@ STATIC
 EFI_STATUS
 EFIAPI
 ProtocolRegisterVariablePolicy (
-  IN VARIABLE_POLICY_ENTRY    *NewPolicy
+  IN CONST VARIABLE_POLICY_ENTRY    *NewPolicy
   )
 {
   EFI_STATUS                                Status;
