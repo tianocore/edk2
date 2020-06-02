@@ -63,6 +63,7 @@ LocateVarPolicyPreReq (
   Getting Started tests.
 **/
 UNIT_TEST_STATUS
+EFIAPI
 CheckVpEnabled (
   IN UNIT_TEST_CONTEXT           Context
   )
@@ -79,6 +80,7 @@ CheckVpEnabled (
 } // CheckVpEnabled
 
 UNIT_TEST_STATUS
+EFIAPI
 CheckVpRevision (
   IN UNIT_TEST_CONTEXT           Context
   )
@@ -93,6 +95,7 @@ CheckVpRevision (
   NoLock Policy tests.
 **/
 UNIT_TEST_STATUS
+EFIAPI
 TestMinSizeNoLock (
   IN UNIT_TEST_CONTEXT           Context
   )
@@ -172,6 +175,7 @@ TestMinSizeNoLock (
 } // TestMinSizeNoLock
 
 UNIT_TEST_STATUS
+EFIAPI
 TestMaxSizeNoLock (
   IN UNIT_TEST_CONTEXT           Context
   )
@@ -251,6 +255,7 @@ TestMaxSizeNoLock (
 } // TestMaxSizeNoLock
 
 UNIT_TEST_STATUS
+EFIAPI
 TestMustHaveAttrNoLock (
   IN UNIT_TEST_CONTEXT           Context
   )
@@ -324,6 +329,7 @@ TestMustHaveAttrNoLock (
 } // TestMustHaveAttrNoLock
 
 UNIT_TEST_STATUS
+EFIAPI
 TestCantHaveAttrNoLock (
   IN UNIT_TEST_CONTEXT           Context
   )
@@ -376,6 +382,7 @@ TestCantHaveAttrNoLock (
 } // TestCantHaveAttrNoLock
 
 UNIT_TEST_STATUS
+EFIAPI
 TestMaxSizeNamespaceNoLock (
   IN UNIT_TEST_CONTEXT           Context
   )
@@ -458,6 +465,7 @@ TestMaxSizeNamespaceNoLock (
 } // TestMaxSizeNamespaceNoLock
 
 UNIT_TEST_STATUS
+EFIAPI
 TestMustHaveAttrWildcardNoLock (
   IN UNIT_TEST_CONTEXT           Context
   )
@@ -532,6 +540,7 @@ TestMustHaveAttrWildcardNoLock (
 } // TestMustHaveAttrWildcardNoLock
 
 UNIT_TEST_STATUS
+EFIAPI
 TestPolicyprioritizationNoLock (
   IN UNIT_TEST_CONTEXT           Context
   )
@@ -652,6 +661,7 @@ TestPolicyprioritizationNoLock (
   LockNow Policy tests.
 **/
 UNIT_TEST_STATUS
+EFIAPI
 TestExistingVarLockNow (
   IN UNIT_TEST_CONTEXT           Context
   )
@@ -712,6 +722,7 @@ TestExistingVarLockNow (
 } // TestExistingVarLockNow
 
 UNIT_TEST_STATUS
+EFIAPI
 TestNonexistentVarLockNow (
   IN UNIT_TEST_CONTEXT           Context
   )
@@ -762,6 +773,7 @@ TestNonexistentVarLockNow (
   LockOnCreate Policy tests.
 **/
 UNIT_TEST_STATUS
+EFIAPI
 TestExistingVarLockOnCreate (
   IN UNIT_TEST_CONTEXT           Context
   )
@@ -822,6 +834,7 @@ TestExistingVarLockOnCreate (
 } // TestExistingVarLockOnCreate
 
 UNIT_TEST_STATUS
+EFIAPI
 TestNonexistentVarLockOnCreate (
   IN UNIT_TEST_CONTEXT           Context
   )
@@ -920,6 +933,7 @@ TestNonexistentVarLockOnCreate (
   LockOnVarState Policy tests.
 **/
 UNIT_TEST_STATUS
+EFIAPI
 TestLockOnVarStateBeforeCreate (
   IN UNIT_TEST_CONTEXT           Context
   )
@@ -1019,6 +1033,7 @@ TestLockOnVarStateBeforeCreate (
 } // TestLockOnVarStateBeforeCreate
 
 UNIT_TEST_STATUS
+EFIAPI
 TestLockOnVarStateAfterCreate (
   IN UNIT_TEST_CONTEXT           Context
   )
@@ -1106,6 +1121,7 @@ TestLockOnVarStateAfterCreate (
 } // TestLockOnVarStateAfterCreate
 
 UNIT_TEST_STATUS
+EFIAPI
 TestLockOnVarStateInvalidLargeTrigger (
   IN UNIT_TEST_CONTEXT           Context
   )
@@ -1171,6 +1187,7 @@ TestLockOnVarStateInvalidLargeTrigger (
 } // TestLockOnVarStateInvalidLargeTrigger
 
 UNIT_TEST_STATUS
+EFIAPI
 TestLockOnVarStateWrongValueTrigger (
   IN UNIT_TEST_CONTEXT           Context
   )
@@ -1239,6 +1256,7 @@ TestLockOnVarStateWrongValueTrigger (
   Invalid policy tests.
 **/
 UNIT_TEST_STATUS
+EFIAPI
 TestInvalidAttributesPolicy (
   IN UNIT_TEST_CONTEXT           Context
   )
@@ -1349,6 +1367,7 @@ TestInvalidAttributesPolicy (
 } // TestInvalidAttributesPolicy
 
 UNIT_TEST_STATUS
+EFIAPI
 TestLargeMinSizePolicy (
   IN UNIT_TEST_CONTEXT           Context
   )
@@ -1373,6 +1392,7 @@ TestLargeMinSizePolicy (
 } // TestLargeMinSizePolicy
 
 UNIT_TEST_STATUS
+EFIAPI
 TestZeroMaxSizePolicy (
   IN UNIT_TEST_CONTEXT           Context
   )
@@ -1397,6 +1417,7 @@ TestZeroMaxSizePolicy (
 } // TestZeroMaxSizePolicy
 
 UNIT_TEST_STATUS
+EFIAPI
 TestInvalidPolicyTypePolicy (
   IN UNIT_TEST_CONTEXT           Context
   )
@@ -1438,6 +1459,7 @@ TestInvalidPolicyTypePolicy (
   Test dumping policy.
 **/
 UNIT_TEST_STATUS
+EFIAPI
 TestDumpPolicy (
   IN UNIT_TEST_CONTEXT           Context
   )
@@ -1473,6 +1495,7 @@ TestDumpPolicy (
   Test policy version.
 **/
 UNIT_TEST_STATUS
+EFIAPI
 TestPolicyVersion (
   IN UNIT_TEST_CONTEXT           Context
   )
@@ -1507,6 +1530,7 @@ TestPolicyVersion (
   Lock Policy Tests.
 **/
 UNIT_TEST_STATUS
+EFIAPI
 LockPolicyEngineTests (
   IN UNIT_TEST_CONTEXT           Context
   )
@@ -1619,6 +1643,7 @@ LockPolicyEngineTests (
 **/
 STATIC
 VOID
+EFIAPI
 SaveContextAndReboot (
   IN UNIT_TEST_CONTEXT           Context
   )
@@ -1659,6 +1684,7 @@ SaveContextAndReboot (
   Disable policy tests.
 **/
 UNIT_TEST_STATUS
+EFIAPI
 DisablePolicyEngineTests (
   IN UNIT_TEST_CONTEXT           Context
   )
@@ -1705,6 +1731,7 @@ DisablePolicyEngineTests (
 **/
 STATIC
 VOID
+EFIAPI
 FinalCleanup (
   IN UNIT_TEST_CONTEXT           Context
   )
@@ -1767,6 +1794,7 @@ FinalCleanup (
 
 **/
 EFI_STATUS
+EFIAPI
 UefiMain (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE* SystemTable)
