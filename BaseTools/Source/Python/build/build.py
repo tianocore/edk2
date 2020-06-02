@@ -880,7 +880,10 @@ class Build():
 
             self.AutoGenMgr.join()
             rt = self.AutoGenMgr.Status
-            return rt, 0
+            err = 0
+            if not rt:
+                err = UNKNOWN_ERROR
+            return rt, err
         except FatalError as e:
             return False, e.args[0]
         except:
@@ -2724,4 +2727,3 @@ if __name__ == '__main__':
     ## 0-127 is a safe return range, and 1 is a standard default error
     if r < 0 or r > 127: r = 1
     sys.exit(r)
-
