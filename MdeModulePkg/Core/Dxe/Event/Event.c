@@ -618,9 +618,9 @@ CoreCheckEvent (
     // Queue the wait notify function
     //
     CoreAcquireEventLock ();
-    if (Event->SignalCount == 0) {
-      CoreNotifyEvent (Event);
-    }
+    
+    CoreNotifyEvent (Event);
+    
     CoreReleaseEventLock ();
   }
 
