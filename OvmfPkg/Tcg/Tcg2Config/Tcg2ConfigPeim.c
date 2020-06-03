@@ -2,7 +2,7 @@
   Set TPM device type
 
   In SecurityPkg, this module initializes the TPM device type based on a UEFI
-  variable and/or hardware detection. In OvmfPkg, the module only performs TPM2
+  variable and/or hardware detection. In OvmfPkg, the module only performs TPM
   hardware detection.
 
   Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
