@@ -37,12 +37,12 @@
 
 [LibraryClasses]
   PeimEntryPoint
-  BaseLib
   DebugLib
   PeiServicesLib
   Tpm2DeviceLib
 
 [LibraryClasses.IA32, LibraryClasses.X64]
+  BaseLib
   Tpm12DeviceLib
 
 [Guids]
