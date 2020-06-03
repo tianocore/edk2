@@ -496,6 +496,13 @@ M: Ray Ni <ray.ni@intel.com>
 R: Laszlo Ersek <lersek@redhat.com>
 R: Rahul Kumar <rahul1.kumar@intel.com>
 
+UefiCpuPkg: Sec related modules
+F: UefiCpuPkg/SecCore/
+F: UefiCpuPkg/ResetVector/
+R: Debkumar De <debkumar.de@intel.com>
+R: Harry Han <harry.han@intel.com>
+R: Catharine West <catharine.west@intel.com>
+
 UefiPayloadPkg
 F: UefiPayloadPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/UefiPayloadPkg
