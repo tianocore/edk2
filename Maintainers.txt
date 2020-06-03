@@ -223,7 +223,7 @@ F: MdeModulePkg/Universal/Acpi/
 R: Dandan Bi <dandan.bi@intel.com>
 R: Liming Gao <liming.gao@intel.com>
 
-MdeModulePkg: ACPI S3 modules
+MdeModulePkg: ACPI modules related to S3
 F: MdeModulePkg/*LockBox*/
 F: MdeModulePkg/Include/*BootScript*.h
 F: MdeModulePkg/Include/*LockBox*.h
