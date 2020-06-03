@@ -494,6 +494,7 @@ W: https://github.com/tianocore/tianocore.github.io/wiki/UefiCpuPkg
 M: Eric Dong <eric.dong@intel.com>
 M: Ray Ni <ray.ni@intel.com>
 R: Laszlo Ersek <lersek@redhat.com>
+R: Rahul Kumar <rahul1.kumar@intel.com>
 
 UefiPayloadPkg
 F: UefiPayloadPkg/
