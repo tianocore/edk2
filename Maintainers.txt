@@ -470,6 +470,13 @@ F: SourceLevelDebugPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/SourceLevelDebugPkg
 M: Hao A Wu <hao.a.wu@intel.com>
 
+StandaloneMmPkg
+F: StandaloneMmPkg/
+M: Ard Biesheuvel <ard.biesheuvel@arm.com>
+M: Sami Mujawar <sami.mujawar@arm.com>
+M: Jiewen Yao <jiewen.yao@intel.com>
+R: Supreeth Venkatesh <supreeth.venkatesh@arm.com>
+
 UefiCpuPkg
 F: UefiCpuPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/UefiCpuPkg
@@ -491,10 +498,3 @@ M: Michael D Kinney <michael.d.kinney@intel.com>
 R: Sean Brogan <sean.brogan@microsoft.com>
 R: Bret Barkelew <Bret.Barkelew@microsoft.com>
 S: Maintained
-
-StandaloneMmPkg
-F: StandaloneMmPkg/
-M: Ard Biesheuvel <ard.biesheuvel@arm.com>
-M: Sami Mujawar <sami.mujawar@arm.com>
-M: Jiewen Yao <jiewen.yao@intel.com>
-R: Supreeth Venkatesh <supreeth.venkatesh@arm.com>
