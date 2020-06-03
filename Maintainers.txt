@@ -389,6 +389,25 @@ M: Laszlo Ersek <lersek@redhat.com>
 M: Ard Biesheuvel <ard.biesheuvel@arm.com>
 S: Maintained
 
+OvmfPkg: CSM modules
+F: OvmfPkg/Csm/
+R: David Woodhouse <dwmw2@infradead.org>
+
+OvmfPkg: MptScsi and PVSCSI driver
+F: OvmfPkg/MptScsiDxe/
+F: OvmfPkg/PvScsiDxe/
+R: Liran Alon <liran.alon@oracle.com>
+R: Nikita Leshenko <nikita.leshchenko@oracle.com>
+
+OvmfPkg: TCG- and TPM2-related modules
+F: OvmfPkg/Include/IndustryStandard/QemuTpm.h
+F: OvmfPkg/Library/PlatformBootManagerLib/BdsPlatform.c
+F: OvmfPkg/Library/Tcg2PhysicalPresenceLib*/
+F: OvmfPkg/PlatformPei/ClearCache.c
+F: OvmfPkg/Tcg/
+R: Marc-André Lureau <marcandre.lureau@redhat.com>
+R: Stefan Berger <stefanb@linux.ibm.com>
+
 OvmfPkg: Xen-related modules
 F: OvmfPkg/AcpiPlatformDxe/Xen.c
 F: OvmfPkg/Include/Guid/XenBusRootDevice.h
@@ -421,25 +440,6 @@ F: OvmfPkg/XenResetVector/
 F: OvmfPkg/XenTimerDxe/
 R: Anthony Perard <anthony.perard@citrix.com>
 R: Julien Grall <julien@xen.org>
-
-OvmfPkg: TCG- and TPM2-related modules
-F: OvmfPkg/Include/IndustryStandard/QemuTpm.h
-F: OvmfPkg/Library/PlatformBootManagerLib/BdsPlatform.c
-F: OvmfPkg/Library/Tcg2PhysicalPresenceLib*/
-F: OvmfPkg/PlatformPei/ClearCache.c
-F: OvmfPkg/Tcg/
-R: Marc-André Lureau <marcandre.lureau@redhat.com>
-R: Stefan Berger <stefanb@linux.ibm.com>
-
-OvmfPkg: CSM modules
-F: OvmfPkg/Csm/
-R: David Woodhouse <dwmw2@infradead.org>
-
-OvmfPkg: MptScsi and PVSCSI driver
-F: OvmfPkg/MptScsiDxe/
-F: OvmfPkg/PvScsiDxe/
-R: Liran Alon <liran.alon@oracle.com>
-R: Nikita Leshenko <nikita.leshchenko@oracle.com>
 
 PcAtChipsetPkg
 F: PcAtChipsetPkg/
