@@ -453,6 +453,11 @@ M: Jiewen Yao <jiewen.yao@intel.com>
 M: Jian J Wang <jian.j.wang@intel.com>
 R: Chao Zhang <chao.b.zhang@intel.com>
 
+SecurityPkg: Tcg related modules
+F: SecurityPkg/Tcg/
+R: Qi Zhang <qi1.zhang@intel.com>
+R: Rahul Kumar <rahul1.kumar@intel.com>
+
 ShellPkg
 F: ShellPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/ShellPkg
