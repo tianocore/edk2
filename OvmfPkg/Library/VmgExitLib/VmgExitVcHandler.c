@@ -1220,6 +1220,45 @@ CpuidExit (
 }
 
 /**
+  Handle a RDTSC event.
+
+  Use the VMGEXIT instruction to handle a RDTSC event.
+
+  @param[in, out] Ghcb             Pointer to the Guest-Hypervisor Communication
+                                   Block
+  @param[in, out] Regs             x64 processor context
+  @param[in]      InstructionData  Instruction parsing context
+
+  @return 0                        Event handled successfully
+  @return Others                   New exception value to propagate
+
+**/
+STATIC
+UINT64
+RdtscExit (
+  IN OUT GHCB                     *Ghcb,
+  IN OUT EFI_SYSTEM_CONTEXT_X64   *Regs,
+  IN     SEV_ES_INSTRUCTION_DATA  *InstructionData
+  )
+{
+  UINT64  Status;
+
+  Status = VmgExit (Ghcb, SVM_EXIT_RDTSC, 0, 0);
+  if (Status != 0) {
+    return Status;
+  }
+
+  if (!GhcbIsRegValid (Ghcb, GhcbRax) ||
+      !GhcbIsRegValid (Ghcb, GhcbRdx)) {
+    return UnsupportedExit (Ghcb, Regs, InstructionData);
+  }
+  Regs->Rax = Ghcb->SaveArea.Rax;
+  Regs->Rdx = Ghcb->SaveArea.Rdx;
+
+  return 0;
+}
+
+/**
   Handle a #VC exception.
 
   Performs the necessary processing to handle a #VC exception.
@@ -1263,6 +1302,10 @@ VmgExitHandleVc (
 
   ExitCode = Regs->ExceptionData;
   switch (ExitCode) {
+  case SVM_EXIT_RDTSC:
+    NaeExit = RdtscExit;
+    break;
+
   case SVM_EXIT_CPUID:
     NaeExit = CpuidExit;
     break;
