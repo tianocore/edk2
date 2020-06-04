@@ -99,11 +99,34 @@ typedef struct {
   ///
   UINT64                      Signature;
   ///
-  /// Revision of the Data structure. For FSP v2.0 value is 1.
+  /// Revision of the Data structure.
+  ///   For FSP spec 2.0/2.1 value is 1.
+  ///   For FSP spec 2.2 value is 2.
   ///
   UINT8                       Revision;
   UINT8                       Reserved[23];
 } FSP_UPD_HEADER;
+
+///
+/// FSPT_ARCH_UPD Configuration.
+///
+typedef struct {
+  ///
+  /// Revision Revision of the structure is 1 for this version of the specification.
+  ///
+  UINT8                       Revision;
+  UINT8                       Reserved[3];
+  ///
+  /// Length Length of the structure in bytes. The current value for this field is 32.
+  ///
+  UINT32                      Length;
+  ///
+  /// FspDebugHandler Optional debug handler for the bootloader to receive debug messages
+  /// occurring during FSP execution.
+  ///
+  FSP_DEBUG_HANDLER           FspDebugHandler;
+  UINT8                       Reserved1[20];
+} FSPT_ARCH_UPD;
 
 ///
 /// FSPM_ARCH_UPD Configuration.
@@ -146,6 +169,32 @@ typedef struct {
   UINT8                       Reserved1[4];
 } FSPM_ARCH_UPD;
 
+typedef struct {
+  ///
+  /// Revision Revision of the structure is 1 for this version of the specification.
+  ///
+  UINT8                      Revision;
+  UINT8                      Reserved[3];
+  ///
+  /// Length Length of the structure in bytes. The current value for this field is 32.
+  ///
+  UINT32                      Length;
+  ///
+  /// FspEventHandler Optional event handler for the bootloader to be informed of events
+  /// occurring during FSP execution.
+  ///
+  FSP_EVENT_HANDLER           FspEventHandler;
+  ///
+  /// A FSP binary may optionally implement multi-phase silicon initialization,
+  /// This is only supported if the FspMultiPhaseSiInitEntryOffset field in FSP_INFO_HEADER
+  /// is non-zero.
+  /// To enable multi-phase silicon initialization, the bootloader must set
+  /// EnableMultiPhaseSiliconInit to a non-zero value.
+  ///
+  UINT8                       EnableMultiPhaseSiliconInit;
+  UINT8                       Reserved1[19];
+} FSPS_ARCH_UPD;
+
 ///
 /// FSPT_UPD_COMMON Configuration.
 ///
@@ -155,6 +204,21 @@ typedef struct {
   ///
   FSP_UPD_HEADER              FspUpdHeader;
 } FSPT_UPD_COMMON;
+
+///
+/// FSPT_UPD_COMMON Configuration for FSP spec. 2.2 and above.
+///
+typedef struct {
+  ///
+  /// FSP_UPD_HEADER Configuration.
+  ///
+  FSP_UPD_HEADER              FspUpdHeader;
+
+  ///
+  /// FSPT_ARCH_UPD Configuration.
+  ///
+  FSPT_ARCH_UPD               FsptArchUpd;
+} FSPT_UPD_COMMON_FSP22;
 
 ///
 /// FSPM_UPD_COMMON Configuration.
@@ -179,6 +243,21 @@ typedef struct {
   ///
   FSP_UPD_HEADER              FspUpdHeader;
 } FSPS_UPD_COMMON;
+
+///
+/// FSPS_UPD_COMMON Configuration for FSP spec. 2.2 and above.
+///
+typedef struct {
+  ///
+  /// FSP_UPD_HEADER Configuration.
+  ///
+  FSP_UPD_HEADER              FspUpdHeader;
+
+  ///
+  /// FSPS_ARCH_UPD Configuration.
+  ///
+  FSPS_ARCH_UPD               FspsArchUpd;
+} FSPS_UPD_COMMON_FSP22;
 
 ///
 /// Enumeration of FSP_INIT_PHASE for NOTIFY_PHASE.

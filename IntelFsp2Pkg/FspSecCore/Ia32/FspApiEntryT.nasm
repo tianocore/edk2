@@ -1,7 +1,7 @@
 ;; @file
 ;  Provide FSP API entry points.
 ;
-; Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2016 - 2020, Intel Corporation. All rights reserved.<BR>
 ; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;;
 
@@ -78,6 +78,23 @@ struc LoadMicrocodeParams
     .size:
 endstruc
 
+struc LoadMicrocodeParamsFsp22
+    ; FSP_UPD_HEADER {
+    .FspUpdHeaderSignature:   resd    2
+    .FspUpdHeaderRevision:    resb    1
+    .FspUpdHeaderReserved:    resb   23
+    ; }
+    ; FSPT_ARCH_UPD{
+    .FsptArchUpd:             resd    8
+    ; }
+    ; FSPT_CORE_UPD {
+    .MicrocodeCodeAddr:       resd    1
+    .MicrocodeCodeSize:       resd    1
+    .CodeRegionBase:          resd    1
+    .CodeRegionSize:          resd    1
+    ; }
+    .size:
+endstruc
 
 ;
 ; Define SSE macros
@@ -169,6 +186,11 @@ ASM_PFX(LoadMicrocodeDefault):
 
    ; skip loading Microcode if the MicrocodeCodeSize is zero
    ; and report error if size is less than 2k
+   ; first check UPD header revision
+   cmp    byte [esp + LoadMicrocodeParamsFsp22.FspUpdHeaderRevision], 2
+   jae    Fsp22UpdHeader
+
+   ; UPD structure is compliant with FSP spec 2.0/2.1
    mov    eax, dword [esp + LoadMicrocodeParams.MicrocodeCodeSize]
    cmp    eax, 0
    jz     Exit2
@@ -176,6 +198,19 @@ ASM_PFX(LoadMicrocodeDefault):
    jl     ParamError
 
    mov    esi, dword [esp + LoadMicrocodeParams.MicrocodeCodeAddr]
+   cmp    esi, 0
+   jnz    CheckMainHeader
+   jmp    ParamError
+
+Fsp22UpdHeader:
+   ; UPD structure is compliant with FSP spec 2.2
+   mov    eax, dword [esp + LoadMicrocodeParamsFsp22.MicrocodeCodeSize]
+   cmp    eax, 0
+   jz     Exit2
+   cmp    eax, 0800h
+   jl     ParamError
+
+   mov    esi, dword [esp + LoadMicrocodeParamsFsp22.MicrocodeCodeAddr]
    cmp    esi, 0
    jnz    CheckMainHeader
 
@@ -276,6 +311,11 @@ CheckAddress:
    cmp   dword [esi + MicrocodeHdr.MicrocodeHdrVersion], 0ffffffffh
    jz    Done
 
+   ; Check UPD header revision
+   cmp    byte [esp + LoadMicrocodeParamsFsp22.FspUpdHeaderRevision], 2
+   jae    Fsp22UpdHeader1
+
+   ; UPD structure is compliant with FSP spec 2.0/2.1
    ; Is automatic size detection ?
    mov   eax, dword [esp + LoadMicrocodeParams.MicrocodeCodeSize]
    cmp   eax, 0ffffffffh
@@ -283,6 +323,19 @@ CheckAddress:
 
    ; Address >= microcode region address + microcode region size?
    add   eax, dword [esp + LoadMicrocodeParams.MicrocodeCodeAddr]
+   cmp   esi, eax
+   jae   Done        ;Jif address is outside of microcode region
+   jmp   CheckMainHeader
+
+Fsp22UpdHeader1:
+   ; UPD structure is compliant with FSP spec 2.2
+   ; Is automatic size detection ?
+   mov   eax, dword [esp + LoadMicrocodeParamsFsp22.MicrocodeCodeSize]
+   cmp   eax, 0ffffffffh
+   jz    LoadMicrocodeDefault4
+
+   ; Address >= microcode region address + microcode region size?
+   add   eax, dword [esp + LoadMicrocodeParamsFsp22.MicrocodeCodeAddr]
    cmp   esi, eax
    jae   Done        ;Jif address is outside of microcode region
    jmp   CheckMainHeader
@@ -349,11 +402,26 @@ ASM_PFX(EstablishStackFsp):
 
   push      DATA_LEN_OF_MCUD     ; Size of the data region
   push      4455434Dh            ; Signature of the  data region 'MCUD'
-  push      dword [edx + 2Ch]    ; Code size       sizeof(FSPT_UPD_COMMON) + 12
-  push      dword [edx + 28h]    ; Code base       sizeof(FSPT_UPD_COMMON) + 8
-  push      dword [edx + 24h]    ; Microcode size  sizeof(FSPT_UPD_COMMON) + 4
-  push      dword [edx + 20h]    ; Microcode base  sizeof(FSPT_UPD_COMMON) + 0
 
+  ; check UPD structure revision (edx + 8)
+  cmp       byte [edx + LoadMicrocodeParamsFsp22.FspUpdHeaderRevision], 2
+  jae       Fsp22UpdHeader2
+
+  ; UPD structure is compliant with FSP spec 2.0/2.1
+  push      dword [edx + LoadMicrocodeParams.CodeRegionSize]     ; Code size       sizeof(FSPT_UPD_COMMON) + 12
+  push      dword [edx + LoadMicrocodeParams.CodeRegionBase]     ; Code base       sizeof(FSPT_UPD_COMMON) + 8
+  push      dword [edx + LoadMicrocodeParams.MicrocodeCodeSize]  ; Microcode size  sizeof(FSPT_UPD_COMMON) + 4
+  push      dword [edx + LoadMicrocodeParams.MicrocodeCodeAddr]  ; Microcode base  sizeof(FSPT_UPD_COMMON) + 0
+  jmp       ContinueAfterUpdPush
+
+Fsp22UpdHeader2:
+  ; UPD structure is compliant with FSP spec 2.2
+  push      dword [edx + LoadMicrocodeParamsFsp22.CodeRegionSize]     ; Code size       sizeof(FSPT_UPD_COMMON) + 12
+  push      dword [edx + LoadMicrocodeParamsFsp22.CodeRegionBase]     ; Code base       sizeof(FSPT_UPD_COMMON) + 8
+  push      dword [edx + LoadMicrocodeParamsFsp22.MicrocodeCodeSize]  ; Microcode size  sizeof(FSPT_UPD_COMMON) + 4
+  push      dword [edx + LoadMicrocodeParamsFsp22.MicrocodeCodeAddr]  ; Microcode base  sizeof(FSPT_UPD_COMMON) + 0
+
+ContinueAfterUpdPush:
   ;
   ; Save API entry/exit timestamp into stack
   ;
