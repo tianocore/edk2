@@ -9,6 +9,9 @@
 !include UnitTestFrameworkPkg/UnitTestFrameworkPkgTarget.dsc.inc
 
 [LibraryClasses.common.HOST_APPLICATION]
+  BaseLib|MdePkg/Library/BaseLib/UnitTestHostBaseLib.inf
+  CpuLib|MdePkg/Library/BaseCpuLibNull/BaseCpuLibNull.inf
+  CacheMaintenanceLib|MdePkg/Library/BaseCacheMaintenanceLibNull/BaseCacheMaintenanceLibNull.inf
   CmockaLib|UnitTestFrameworkPkg/Library/CmockaLib/CmockaLib.inf
   UnitTestLib|UnitTestFrameworkPkg/Library/UnitTestLib/UnitTestLibCmocka.inf
   DebugLib|UnitTestFrameworkPkg/Library/Posix/DebugLibPosix/DebugLibPosix.inf
