@@ -320,12 +320,18 @@ QemuLoadKernelImage (
 
   case EFI_SECURITY_VIOLATION:
     //
-    // We are running with UEFI secure boot enabled, and the image failed to
-    // authenticate. For compatibility reasons, we fall back to the legacy
-    // loader in this case. Since the image has been loaded, we need to unload
-    // it before proceeding
+    // Since the image has been loaded, we need to unload it before proceeding
+    // to the EFI_ACCESS_DENIED case below.
     //
     gBS->UnloadImage (KernelImageHandle);
+    //
+    // Fall through
+    //
+  case EFI_ACCESS_DENIED:
+    //
+    // We are running with UEFI secure boot enabled, and the image failed to
+    // authenticate. For compatibility reasons, we fall back to the legacy
+    // loader in this case.
     //
     // Fall through
     //
