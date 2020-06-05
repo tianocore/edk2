@@ -42,6 +42,7 @@
   MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
   MdePkg/Library/BaseDebugPrintErrorLevelLib/BaseDebugPrintErrorLevelLib.inf
   MdePkg/Library/BaseLib/BaseLib.inf
+  MdePkg/Library/BaseLib/UnitTestHostBaseLib.inf
   MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
   MdePkg/Library/BaseOrderedCollectionRedBlackTreeLib/BaseOrderedCollectionRedBlackTreeLib.inf
   MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
