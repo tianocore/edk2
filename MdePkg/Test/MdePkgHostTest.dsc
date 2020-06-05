@@ -28,3 +28,8 @@
   #
   MdePkg/Test/UnitTest/Library/BaseSafeIntLib/TestBaseSafeIntLibHost.inf
   MdePkg/Test/UnitTest/Library/BaseLib/BaseLibUnitTestsHost.inf
+
+  #
+  # Build HOST_APPLICATION Libraries
+  #
+  MdePkg/Library/BaseLib/UnitTestHostBaseLib.inf
