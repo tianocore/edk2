@@ -1,0 +1,45 @@
+## @file
+# This driver produces gEfiSmbusHcProtocolGuid protocol to load access SMBUS devices
+#
+# Copyright (c) 2020, 9elements Agency GmbH
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SMBusi801Dxe
+  FILE_GUID                      = 390208DA-8E6F-4957-90D6-421737FEA9BF
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = InstallSmbusProtocol
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources.common]
+  SMBusi801Dxe.h
+  SMBusi801Dxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  DebugLib
+  IoLib
+  UefiLib
+  TimerLib
+  PciLib
+
+[Protocols]
+  gEfiSmbusHcProtocolGuid                       ## PRODUCES
+
+[Depex]
+  TRUE
