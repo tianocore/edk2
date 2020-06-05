@@ -179,6 +179,11 @@ INF MdeModulePkg/Bus/Isa/Ps2KeyboardDxe/Ps2KeyboardDxe.inf
 INF MdeModulePkg/Bus/Isa/Ps2MouseDxe/Ps2MouseDxe.inf
 
 #
+# SMBUS Support
+#
+INF UefiPayloadPkg/SmbusDxe/SMBusi801Dxe.inf
+
+#
 # Console Support
 #
 INF MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatformDxe.inf
