@@ -35,6 +35,7 @@
 [Components]
   MdePkg/Library/UefiFileHandleLib/UefiFileHandleLib.inf
   MdePkg/Library/BaseCacheMaintenanceLib/BaseCacheMaintenanceLib.inf
+  MdePkg/Library/BaseCacheMaintenanceLibNull/BaseCacheMaintenanceLibNull.inf
   MdePkg/Library/BaseCpuLib/BaseCpuLib.inf
   MdePkg/Library/BaseCpuLibNull/BaseCpuLibNull.inf
   MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
