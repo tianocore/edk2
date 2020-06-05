@@ -1,5 +1,5 @@
 //
-//  Copyright (c) 2016 - 2017, ARM Limited. All rights reserved.
+//  Copyright (c) 2016 - 2020, ARM Limited. All rights reserved.
 //
 //  SPDX-License-Identifier: BSD-2-Clause-Patent
 //
@@ -18,6 +18,9 @@ ASM_PFX(ArmCallSvc):
     ldm     r0, {r0-r7}
 
     svc     #0
+    // Prevent speculative execution beyond svc instruction
+    dsb     nsh
+    isb
 
     // Load the ARM_SVC_ARGS structure address from the stack into r8
     ldr     r8, [sp]
