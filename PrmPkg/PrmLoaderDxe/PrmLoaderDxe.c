@@ -738,11 +738,7 @@ ProcessPrmModules (
                   &CurrentContextBuffer
                   );
       if (!EFI_ERROR (Status)) {
-#ifdef ALLOCATE_CONTEXT_BUFFER_IN_FW
-        CurrentHandlerInfoStruct->PrmContextBuffer = (UINT64) (UINTN) CurrentContextBuffer;
-#else
         CurrentHandlerInfoStruct->StaticDataBuffer = (UINT64) (UINTN) CurrentContextBuffer->StaticDataBuffer;
-#endif
       }
 
       Status =  GetExportEntryAddress (
