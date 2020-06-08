@@ -151,16 +151,7 @@ ContextBufferModuleConfigLibConstructor (
   //
   // Allocate and populate the context buffer
   //
-#ifdef ALLOCATE_CONTEXT_BUFFER_IN_FW
-  //
-  // The context buffer allocated in FW will continue being used at OS runtime so it must
-  // be a runtime services data buffer.
-  //
-  // This sample module uses a single context buffer for all the handlers
-  // Todo: This can be done more elegantly in the future. Likely though a library service.
-  //
-  PrmContextBuffer = AllocateRuntimeZeroPool (sizeof (*PrmContextBuffer));
-#else
+
   //
   // This context buffer is not actually used by PRM handler at OS runtime. The OS will allocate
   // the actual context buffer passed to the PRM handler.
@@ -170,7 +161,6 @@ ContextBufferModuleConfigLibConstructor (
   // PRM_HANDLER_INFORMATION_STRUCT and PRM_MODULE_INFORMATION_STRUCT respectively for the PRM handler.
   //
   PrmContextBuffer = AllocateZeroPool (sizeof (*PrmContextBuffer));
-#endif
   ASSERT (PrmContextBuffer != NULL);
   if (PrmContextBuffer == NULL) {
     Status = EFI_OUT_OF_RESOURCES;

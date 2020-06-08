@@ -68,17 +68,11 @@ record (POR) configuration.
 The following list are the currently defined build flags (if any) that may be passed to the `build` command
 (e.g. -D FLAG=VALUE).
 
-* `ALLOCATE_CONTEXT_BUFFER_IN_FW` - Allocates the context buffer for each PRM handler in the firmware instead of
-   the operating system (OS).
+* NONE - No build flags are currently used.
 
    Additional detail: The context buffer structure is defined in [PrmContextBuffer.h](PrmPkg/Include/PrmContextBuffer.h).
-   This structure can be instantiated by either firmware with a physical pointer to the buffer placed in the
-   `PRM_HANDLER_INFORMATION_STRUCT` for each handler wherein the OS would convert that physical pointer and pass it
-   as a virtual address pointer to each PRM handler. Alternatively, the context buffer can be allocated and populated
-   by the OS where it would get all the information to populate the context buffer from other structures.
-
-   The default is for the OS to allocate and populate the buffer. The alternative option of the firmware doing this
-   work is kept in the source code until broader OS testing is completed.
+   This structure is passed as the context buffer to PRM handlers. The structure actually passed to PRM handlers is
+   allocated and populated by the OS where it gets all the information to populate the context buffer from other structures.
 
 ## Overview
 At a high-level, PRM can be viewed from three levels of granularity:
