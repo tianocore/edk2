@@ -9,38 +9,6 @@
 #include <AsmMacroIoLib.h>
 
 ASM_FUNC(_ModuleEntryPoint)
-  //
-  // We are built as a ET_DYN PIE executable, so we need to process all
-  // relative relocations if we are executing from a different offset than we
-  // were linked at. This is only possible if we are running from RAM.
-  //
-  ADRL  (r4, __reloc_base)
-  ADRL  (r5, __reloc_start)
-  ADRL  (r6, __reloc_end)
-
-.Lreloc_loop:
-  cmp   r5, r6
-  bhs   .Lreloc_done
-
-  //
-  // AArch32 uses the ELF32 REL format, which means each entry in the
-  // relocation table consists of
-  //
-  //   UINT32 offset          : the relative offset of the value that needs to
-  //                            be relocated
-  //   UINT32 info            : relocation type and symbol index (the latter is
-  //                            not used for R_ARM_RELATIVE relocations)
-  //
-  ldrd  r8, r9, [r5], #8      // read offset into r8 and info into r9
-  cmp   r9, #23               // check info == R_ARM_RELATIVE?
-  bne   .Lreloc_loop          // not a relative relocation? then skip
-
-  ldr   r9, [r8, r4]          // read addend into r9
-  add   r9, r9, r1            // add image base to addend to get relocated value
-  str   r9, [r8, r4]          // write relocated value at offset
-  b     .Lreloc_loop
-.Lreloc_done:
-
   // Do early platform specific actions
   bl    ASM_PFX(ArmPlatformPeiBootAction)
 
@@ -173,14 +141,23 @@ ASM_PFX(ArmPlatformPeiBootAction):
   str   r5, [r7]
 
   //
+  // The runtime address may be different from the link time address so fix
+  // up the PE/COFF relocations. Since we are calling a C function, use the
+  // window at the beginning of the FD image as a temp stack.
+  //
+  mov   r0, r5
+  ADRL  (r1, PeCoffLoaderImageReadFromMemory)
+  mov   sp, r5
+  bl    RelocatePeCoffImage
+
+  //
   // Discover the memory size and offset from the DTB, and record in the
   // respective PCDs. This will also return false if a corrupt DTB is
-  // encountered. Since we are calling a C function, use the window at the
-  // beginning of the FD image as a temp stack.
+  // encountered.
   //
+  mov   r0, r10
   ADRL  (r1, PcdGet64 (PcdSystemMemoryBase))
   ADRL  (r2, PcdGet64 (PcdSystemMemorySize))
-  mov   sp, r5
   bl    FindMemnode
   teq   r0, #0
   beq   .Lout
