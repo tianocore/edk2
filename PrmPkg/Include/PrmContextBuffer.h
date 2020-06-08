@@ -20,6 +20,18 @@
 #pragma pack(push, 1)
 
 //
+// Associates an ACPI parameter buffer with a particular PRM handler in
+// a PRM module.
+//
+// If either the GUID or address are zero then neither value is used to
+// copy the ACPI parameter buffer address to the PRMT ACPI table.
+//
+typedef struct {
+  EFI_GUID                              HandlerGuid;
+  UINT64                                AcpiParameterBufferAddress;
+} ACPI_PARAMETER_BUFFER_DESCRIPTOR;
+
+//
 // This is the context buffer structure that is passed to a PRM handler.
 //
 // At OS runtime, the OS will allocate and populate this structure and
@@ -124,6 +136,35 @@ typedef struct
   /// This pointer may be NULL if runtime memory ranges are not needed.
   ///
   PRM_RUNTIME_MMIO_RANGES                 *RuntimeMmioRanges;
+
+  ///
+  /// The number of ACPI parameter buffer descriptors in the array
+  /// AcpiParameterBufferDescriptors
+  ///
+  UINTN                                   AcpiParameterBufferDescriptorCount;
+
+  ///
+  /// A pointer to an array of ACPI parameter buffer descriptors. PRM module
+  /// configuration code uses this structure to associate a specific PRM
+  /// handler with an ACPI parameter buffer.
+  ///
+  /// An ACPI parameter buffer is a parameter buffer allocated by the PRM
+  /// module configuration code to be used by ACPI as a parameter buffer
+  /// to the associated PRM handler at OS runtime.
+  ///
+  /// This buffer is not required if:
+  /// 1. A parameter buffer is not used by a PRM handler at all
+  /// 2. A parameter buffer is used but the PRM handler is never invoked
+  ///    from ACPI (it is directly called by an OS device driver for example)
+  ///
+  /// In case #2 above, the direct PRM handler is responsible for allocating
+  /// a parameter buffer and passing that buffer to the PRM handler.
+  ///
+  /// A PRM module only needs to provide an ACPI_PARAMETER_BUFFER_DESCRIPTOR
+  /// for each PRM handler that actually uses an ACPI parameter buffer. If
+  /// no handlers use an ACPI parameter buffer this pointer should be NULL.
+  ///
+  ACPI_PARAMETER_BUFFER_DESCRIPTOR        *AcpiParameterBufferDescriptors;
 } PRM_MODULE_CONTEXT_BUFFERS;
 
 #pragma pack(pop)
