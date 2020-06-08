@@ -26,10 +26,8 @@
 #define _DBGMSGID_                "[PRMCONFIG]"
 
 STATIC  UINTN                     mMaxRuntimeMmioRangeCount;
-STATIC  UINTN                     mMaxStaticDataBufferCount;
 
 GLOBAL_REMOVE_IF_UNREFERENCED STATIC  PRM_RUNTIME_MMIO_RANGES   **mRuntimeMmioRanges;
-GLOBAL_REMOVE_IF_UNREFERENCED STATIC  PRM_DATA_BUFFER           ***mStaticDataBuffers;
 
 /**
   Converts the runtime memory range physical addresses to virtual addresses.
@@ -181,32 +179,12 @@ StoreVirtualMemoryAddressChangePointers (
   UINTN                       HandleCount;
   UINTN                       HandleIndex;
   UINTN                       RangeIndex;
-#ifdef ALLOCATE_CONTEXT_BUFFER_IN_FW
-  UINTN                       BufferIndex;
-  UINTN                       StaticDataBufferIndex;
-  PRM_CONTEXT_BUFFER          *CurrentContextBuffer;
-#endif
   EFI_HANDLE                  *HandleBuffer;
   PRM_CONFIG_PROTOCOL         *PrmConfigProtocol;
 
   DEBUG ((DEBUG_INFO, "%a %a - Entry.\n", _DBGMSGID_, __FUNCTION__));
 
   RangeIndex = 0;
-#ifdef ALLOCATE_CONTEXT_BUFFER_IN_FW
-  StaticDataBufferIndex = 0;
-
-  mStaticDataBuffers = AllocateRuntimeZeroPool (sizeof (*mStaticDataBuffers) * mMaxStaticDataBufferCount);
-  if (mStaticDataBuffers == NULL && mMaxStaticDataBufferCount > 0) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "  %a %a: Memory allocation for PRM static data buffer pointer array failed.\n",
-      _DBGMSGID_,
-      __FUNCTION__
-      ));
-    ASSERT (FALSE);
-    return;
-  }
-#endif
 
   mRuntimeMmioRanges = AllocateRuntimeZeroPool (sizeof (*mRuntimeMmioRanges) * mMaxRuntimeMmioRangeCount);
   if (mRuntimeMmioRanges == NULL && mMaxRuntimeMmioRangeCount > 0) {
@@ -240,28 +218,6 @@ StoreVirtualMemoryAddressChangePointers (
         continue;
       }
 
-#ifdef ALLOCATE_CONTEXT_BUFFER_IN_FW
-      for (BufferIndex = 0; BufferIndex < PrmConfigProtocol->ModuleContextBuffers.BufferCount; BufferIndex++) {
-        CurrentContextBuffer = &(PrmConfigProtocol->ModuleContextBuffers.Buffer[BufferIndex]);
-
-        if (CurrentContextBuffer->StaticDataBuffer != NULL) {
-          if (StaticDataBufferIndex >= mMaxStaticDataBufferCount) {
-            Status = EFI_BUFFER_TOO_SMALL;
-            DEBUG ((
-              DEBUG_ERROR,
-              "  %a %a: Index out of bounds - Actual count (%d) of PRM data buffers exceeds maximum count (%d).\n",
-              _DBGMSGID_,
-              __FUNCTION__,
-              StaticDataBufferIndex + 1,
-              mMaxStaticDataBufferCount
-              ));
-            ASSERT_EFI_ERROR (Status);
-            return;
-          }
-          mStaticDataBuffers[StaticDataBufferIndex++] = &CurrentContextBuffer->StaticDataBuffer;
-        }
-      }
-#endif
       if (PrmConfigProtocol->ModuleContextBuffers.RuntimeMmioRanges != NULL) {
         if (RangeIndex >= mMaxRuntimeMmioRangeCount) {
           Status = EFI_BUFFER_TOO_SMALL;
@@ -286,15 +242,6 @@ StoreVirtualMemoryAddressChangePointers (
       __FUNCTION__,
       RangeIndex
       ));
-#ifdef ALLOCATE_CONTEXT_BUFFER_IN_FW
-    DEBUG ((
-      DEBUG_INFO,
-      "  %a %a: %d static buffers saved for future virtual memory conversion.\n",
-      _DBGMSGID_,
-      __FUNCTION__,
-      StaticDataBufferIndex
-      ));
-#endif
   }
 }
 
@@ -396,15 +343,6 @@ PrmConfigVirtualAddressChangeEvent (
 {
   UINTN   Index;
 
-#ifdef ALLOCATE_CONTEXT_BUFFER_IN_FW
-  //
-  // Convert static data buffer pointers
-  //
-  for (Index = 0; Index < mMaxStaticDataBufferCount; Index++) {
-    gRT->ConvertPointer (0x0, (VOID **) mStaticDataBuffers[Index]);
-  }
-#endif
-
   //
   // Convert runtime MMIO ranges
   //
@@ -485,9 +423,6 @@ PrmConfigEndOfDxeNotification (
             CurrentContextBuffer->HandlerGuid
             ));
         }
-        if (CurrentContextBuffer->StaticDataBuffer != NULL) {
-          mMaxStaticDataBufferCount++;
-        }
       }
       DEBUG ((DEBUG_INFO, "      %a %a: Module context buffer validation complete.\n", _DBGMSGID_, __FUNCTION__));
 
@@ -550,13 +485,6 @@ PrmConfigEntryPoint (
                   &Event
                   );
   ASSERT_EFI_ERROR (Status);
-
-  DEBUG ((DEBUG_INFO, "  %a %a: Context buffers will be allocated in ", _DBGMSGID_, __FUNCTION__));
-#ifdef ALLOCATE_CONTEXT_BUFFER_IN_FW
-  DEBUG ((DEBUG_INFO, "firmware.\n"));
-#else
-  DEBUG ((DEBUG_INFO, "the operating system.\n"));
-#endif
 
   //
   // Register a notification function for virtual address change

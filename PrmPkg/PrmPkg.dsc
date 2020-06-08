@@ -110,8 +110,3 @@
 [BuildOptions]
 # Force deprecated interfaces off
   *_*_*_CC_FLAGS = -D DISABLE_NEW_DEPRECATED_INTERFACES
-
-# Append package-specific build settings
-!ifdef $(ALLOCATE_CONTEXT_BUFFER_IN_FW)
-  *_*_*_CC_FLAGS = -D ALLOCATE_CONTEXT_BUFFER_IN_FW
-!endif
