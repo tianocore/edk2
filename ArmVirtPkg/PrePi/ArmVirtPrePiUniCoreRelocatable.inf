@@ -46,6 +46,7 @@
   SerialPortLib
   ExtractGuidedSectionLib
   LzmaDecompressLib
+  PeCoffLib
   PrePiLib
   MemoryAllocationLib
   HobLib
@@ -95,6 +96,3 @@
   gArmVirtTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress
   gArmTokenSpaceGuid.PcdFdBaseAddress
   gArmTokenSpaceGuid.PcdFvBaseAddress
-
-[BuildOptions]
-  GCC:*_*_*_DLINK_FLAGS = -Wl,-Bsymbolic,-pie,-T,$(MODULE_DIR)/Scripts/PrePi-PIE.lds
