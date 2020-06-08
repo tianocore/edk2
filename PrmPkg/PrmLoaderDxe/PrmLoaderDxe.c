@@ -621,6 +621,7 @@ ProcessPrmModules (
   PRM_MODULE_IMAGE_CONTEXT_LIST_ENTRY     *TempListEntry;
   CONST CHAR8                             *CurrentExportDescriptorHandlerName;
 
+  ACPI_PARAMETER_BUFFER_DESCRIPTOR        *CurrentModuleAcpiParamDescriptors;
   PRM_CONTEXT_BUFFER                      *CurrentContextBuffer;
   PRM_MODULE_CONTEXT_BUFFERS              *CurrentModuleContextBuffers;
   PRM_MODULE_INFORMATION_STRUCT           *CurrentModuleInfoStruct;
@@ -628,6 +629,7 @@ ProcessPrmModules (
 
   EFI_STATUS                              Status;
   EFI_PHYSICAL_ADDRESS                    CurrentImageAddress;
+  UINTN                                   AcpiParamIndex;
   UINTN                                   HandlerIndex;
   UINT32                                  PrmAcpiDescriptionTableBufferSize;
 
@@ -677,6 +679,7 @@ ProcessPrmModules (
     CurrentImageAddress = TempListEntry->Context->PeCoffImageContext.ImageAddress;
     CurrentImageExportDirectory = TempListEntry->Context->ExportDirectory;
     CurrentExportDescriptorStruct = TempListEntry->Context->ExportDescriptor;
+    CurrentModuleAcpiParamDescriptors = NULL;
 
     DEBUG ((
       DEBUG_INFO,
@@ -715,6 +718,7 @@ ProcessPrmModules (
     ASSERT (!EFI_ERROR (Status) || Status == EFI_NOT_FOUND);
     if (!EFI_ERROR (Status) && CurrentModuleContextBuffers != NULL) {
       CurrentModuleInfoStruct->RuntimeMmioRanges = (UINT64) (UINTN) CurrentModuleContextBuffers->RuntimeMmioRanges;
+      CurrentModuleAcpiParamDescriptors = CurrentModuleContextBuffers->AcpiParameterBufferDescriptors;
     }
 
     //
@@ -758,6 +762,19 @@ ProcessPrmModules (
           CurrentExportDescriptorHandlerName,
           CurrentHandlerInfoStruct->PhysicalAddress
           ));
+      }
+
+      //
+      // Update the handler ACPI parameter buffer address if applicable
+      //
+      if (CurrentModuleAcpiParamDescriptors != NULL) {
+        for (AcpiParamIndex = 0; AcpiParamIndex < CurrentModuleContextBuffers->AcpiParameterBufferDescriptorCount; AcpiParamIndex++) {
+          if (CompareGuid (&CurrentModuleAcpiParamDescriptors[AcpiParamIndex].HandlerGuid, &CurrentHandlerInfoStruct->Identifier)) {
+            CurrentHandlerInfoStruct->AcpiParameterBuffer = (UINT64) (UINTN) (
+                                                              CurrentModuleAcpiParamDescriptors[AcpiParamIndex].AcpiParameterBufferAddress
+                                                              );
+          }
+        }
       }
     }
     CurrentModuleInfoStruct = (PRM_MODULE_INFORMATION_STRUCT *) ((UINTN) CurrentModuleInfoStruct + CurrentModuleInfoStruct->StructureLength);
