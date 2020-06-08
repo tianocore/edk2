@@ -159,6 +159,12 @@ INF UefiPayloadPkg/BlSupportDxe/BlSupportDxe.inf
 
 INF MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
 #
+# SMBUS Support
+#
+INF UefiPayloadPkg/SmbusDxe/SMBusi801Dxe.inf
+INF UefiPayloadPkg/SmbusConfigLoaderDxe/SMBusConfigLoader.inf
+
+#
 # PCI Support
 #
 INF MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
@@ -177,11 +183,6 @@ INF OvmfPkg/SioBusDxe/SioBusDxe.inf
 INF MdeModulePkg/Bus/Isa/Ps2KeyboardDxe/Ps2KeyboardDxe.inf
 !endif
 INF MdeModulePkg/Bus/Isa/Ps2MouseDxe/Ps2MouseDxe.inf
-
-#
-# SMBUS Support
-#
-INF UefiPayloadPkg/SmbusDxe/SMBusi801Dxe.inf
 
 #
 # Console Support
