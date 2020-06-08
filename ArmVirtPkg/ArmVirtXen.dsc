@@ -52,14 +52,12 @@
 [LibraryClasses.common.UEFI_DRIVER]
   UefiScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
 
-[BuildOptions.common.EDKII.SEC, BuildOptions.common.EDKII.BASE]
+[BuildOptions]
   #
-  # CLANG38 with LTO support enabled uses the GNU GOLD linker, which insists
-  # on emitting GOT based symbol references when running in shared mode, unless
-  # we override visibility to 'hidden' in all modules that make up the PrePi
-  # build.
+  # We need to avoid jump tables in SEC modules, so that the PE/COFF
+  # self-relocation code itself is guaranteed to be position independent.
   #
-  GCC:*_CLANG38_*_CC_FLAGS = -include $(WORKSPACE)/ArmVirtPkg/Include/Platform/Hidden.h
+  GCC:*_*_*_CC_FLAGS = -fno-jump-tables
 
 ################################################################################
 #
