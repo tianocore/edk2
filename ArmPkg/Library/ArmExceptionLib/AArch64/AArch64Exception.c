@@ -19,7 +19,8 @@ EFI_EXCEPTION_CALLBACK  gDebuggerExceptionHandlers[MAX_AARCH64_EXCEPTION + 1] = 
 PHYSICAL_ADDRESS        gExceptionVectorAlignmentMask = ARM_VECTOR_TABLE_ALIGNMENT;
 UINTN                   gDebuggerNoHandlerValue = 0; // todo: define for AArch64
 
-#define EL0_STACK_PAGES   2
+#define EL0_STACK_SIZE  EFI_PAGES_TO_SIZE(2)
+STATIC UINTN mNewStackBase[EL0_STACK_SIZE / sizeof (UINTN)];
 
 VOID
 RegisterEl0Stack (
@@ -31,14 +32,11 @@ RETURN_STATUS ArchVectorConfig(
   )
 {
   UINTN             HcrReg;
-  UINT8             *Stack;
 
-  Stack = AllocatePages (EL0_STACK_PAGES);
-  if (Stack == NULL) {
-    return RETURN_OUT_OF_RESOURCES;
-  }
-
-  RegisterEl0Stack ((UINT8 *)Stack + EFI_PAGES_TO_SIZE (EL0_STACK_PAGES));
+  // Round down sp by 16 bytes alignment
+  RegisterEl0Stack (
+    (VOID *)(((UINTN)mNewStackBase + EL0_STACK_SIZE) & ~0xFUL)
+    );
 
   if (ArmReadCurrentEL() == AARCH64_EL2) {
     HcrReg = ArmReadHcr();
