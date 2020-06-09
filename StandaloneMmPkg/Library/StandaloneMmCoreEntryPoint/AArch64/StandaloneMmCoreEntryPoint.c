@@ -225,6 +225,7 @@ _ModuleEntryPoint (
   VOID                                    *HobStart;
   VOID                                    *TeData;
   UINTN                                   TeDataSize;
+  EFI_PHYSICAL_ADDRESS                    ImageBase;
 
   // Get Secure Partition Manager Version Information
   Status = GetSpmVersion ();
@@ -253,6 +254,7 @@ _ModuleEntryPoint (
   Status = GetStandaloneMmCorePeCoffSections (
              TeData,
              &ImageContext,
+             &ImageBase,
              &SectionHeaderOffset,
              &NumberOfSections
              );
@@ -261,10 +263,21 @@ _ModuleEntryPoint (
     goto finish;
   }
 
+  //
+  // ImageBase may deviate from ImageContext.ImageAddress if we are dealing
+  // with a TE image, in which case the latter points to the actual offset
+  // of the image, whereas ImageBase refers to the address where the image
+  // would start if the stripped PE headers were still in place. In either
+  // case, we need to fix up ImageBase so it refers to the actual current
+  // load address.
+  //
+  ImageBase += (UINTN)TeData - ImageContext.ImageAddress;
+
   // Update the memory access permissions of individual sections in the
   // Standalone MM core module
   Status = UpdateMmFoundationPeCoffPermissions (
              &ImageContext,
+             ImageBase,
              SectionHeaderOffset,
              NumberOfSections,
              ArmSetMemoryRegionNoExec,
@@ -274,6 +287,15 @@ _ModuleEntryPoint (
 
   if (EFI_ERROR (Status)) {
     goto finish;
+  }
+
+  if (ImageContext.ImageAddress != (UINTN)TeData) {
+    ImageContext.ImageAddress = (UINTN)TeData;
+    ArmSetMemoryRegionNoExec (ImageBase, SIZE_4KB);
+    ArmClearMemoryRegionReadOnly (ImageBase, SIZE_4KB);
+
+    Status = PeCoffLoaderRelocateImage (&ImageContext);
+    ASSERT_EFI_ERROR (Status);
   }
 
   //

@@ -29,6 +29,7 @@ EFI_STATUS
 EFIAPI
 UpdateMmFoundationPeCoffPermissions (
   IN  CONST PE_COFF_LOADER_IMAGE_CONTEXT      *ImageContext,
+  IN  EFI_PHYSICAL_ADDRESS                    ImageBase,
   IN  UINT32                                  SectionHeaderOffset,
   IN  CONST  UINT16                           NumberOfSections,
   IN  REGION_PERMISSION_UPDATE_FUNC           TextUpdater,
@@ -87,7 +88,7 @@ UpdateMmFoundationPeCoffPermissions (
     // if it is a writeable section then mark it appropriately as well.
     //
     if ((SectionHeader.Characteristics & EFI_IMAGE_SCN_MEM_EXECUTE) == 0) {
-      Base = ImageContext->ImageAddress + SectionHeader.VirtualAddress;
+      Base = ImageBase + SectionHeader.VirtualAddress;
 
       TextUpdater (Base, SectionHeader.Misc.VirtualSize);
 
@@ -153,6 +154,7 @@ STATIC
 EFI_STATUS
 GetPeCoffSectionInformation (
   IN  OUT   PE_COFF_LOADER_IMAGE_CONTEXT      *ImageContext,
+      OUT   EFI_PHYSICAL_ADDRESS              *ImageBase,
       OUT   UINT32                            *SectionHeaderOffset,
       OUT   UINT16                            *NumberOfSections
   )
@@ -212,6 +214,7 @@ GetPeCoffSectionInformation (
     return Status;
   }
 
+  *ImageBase = ImageContext->ImageAddress;
   if (!ImageContext->IsTeImage) {
     ASSERT (Hdr.Pe32->Signature == EFI_IMAGE_NT_SIGNATURE);
 
@@ -232,7 +235,7 @@ GetPeCoffSectionInformation (
   } else {
     *SectionHeaderOffset = (UINTN)(sizeof (EFI_TE_IMAGE_HEADER));
     *NumberOfSections = Hdr.Te->NumberOfSections;
-    ImageContext->ImageAddress -= (UINT32)Hdr.Te->StrippedSize - sizeof (EFI_TE_IMAGE_HEADER);
+    *ImageBase -= (UINT32)Hdr.Te->StrippedSize - sizeof (EFI_TE_IMAGE_HEADER);
   }
   return RETURN_SUCCESS;
 }
@@ -242,6 +245,7 @@ EFIAPI
 GetStandaloneMmCorePeCoffSections (
   IN        VOID                            *TeData,
   IN  OUT   PE_COFF_LOADER_IMAGE_CONTEXT    *ImageContext,
+      OUT   EFI_PHYSICAL_ADDRESS            *ImageBase,
   IN  OUT   UINT32                          *SectionHeaderOffset,
   IN  OUT   UINT16                          *NumberOfSections
   )
@@ -255,7 +259,8 @@ GetStandaloneMmCorePeCoffSections (
 
   DEBUG ((DEBUG_INFO, "Found Standalone MM PE data - 0x%x\n", TeData));
 
-  Status = GetPeCoffSectionInformation (ImageContext, SectionHeaderOffset, NumberOfSections);
+  Status = GetPeCoffSectionInformation (ImageContext, ImageBase,
+             SectionHeaderOffset, NumberOfSections);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Unable to locate Standalone MM Core PE-COFF Section information - %r\n", Status));
     return Status;
