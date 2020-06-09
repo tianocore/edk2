@@ -3140,6 +3140,7 @@ Returns:
 --*/
 {
   UINTN               CurrentOffset;
+  UINTN               OrigOffset;
   UINTN               Index;
   FILE                *fpin;
   UINTN               FfsFileSize;
@@ -3148,8 +3149,10 @@ Returns:
   UINT32              FfsHeaderSize;
   EFI_FFS_FILE_HEADER FfsHeader;
   UINTN               VtfFileSize;
+  UINTN               MaxPadFileSize;
 
   FvExtendHeaderSize = 0;
+  MaxPadFileSize = 0;
   VtfFileSize = 0;
   fpin  = NULL;
   Index = 0;
@@ -3258,8 +3261,12 @@ Returns:
         //
         // Only EFI_FFS_FILE_HEADER is needed for a pad section.
         //
+        OrigOffset    = CurrentOffset;
         CurrentOffset = (CurrentOffset + FfsHeaderSize + sizeof(EFI_FFS_FILE_HEADER) + FfsAlignment - 1) & ~(FfsAlignment - 1);
         CurrentOffset -= FfsHeaderSize;
+        if ((CurrentOffset - OrigOffset) > MaxPadFileSize) {
+          MaxPadFileSize = CurrentOffset - OrigOffset;
+        }
       }
     }
 
@@ -3303,6 +3310,12 @@ Returns:
   //
   mFvTotalSize = FvInfoPtr->Size;
   mFvTakenSize = CurrentOffset;
+  if ((mFvTakenSize == mFvTotalSize) && (MaxPadFileSize > 0)) {
+    //
+    // This FV means TOP FFS has been taken. Then, check whether there is padding data for use.
+    //
+    mFvTakenSize = mFvTakenSize - MaxPadFileSize;
+  }
 
   return EFI_SUCCESS;
 }
