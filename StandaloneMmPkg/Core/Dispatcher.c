@@ -816,7 +816,7 @@ FvIsBeingProcessed (
 {
   KNOWN_FWVOL   *KnownFwVol;
 
-  DEBUG ((DEBUG_INFO, "FvIsBeingProcessed - 0x%08x\n", KnownFwVol));
+  DEBUG ((DEBUG_INFO, "FvIsBeingProcessed - 0x%08x\n", FwVolHeader));
 
   KnownFwVol = AllocatePool (sizeof (KNOWN_FWVOL));
   ASSERT (KnownFwVol != NULL);
