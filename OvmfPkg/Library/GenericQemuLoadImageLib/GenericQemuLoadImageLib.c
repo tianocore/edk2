@@ -106,7 +106,8 @@ QemuLoadKernelImage (
     goto UnloadImage;
 
   default:
-    DEBUG ((DEBUG_ERROR, "%a: LoadImage(): %r\n", __FUNCTION__, Status));
+    DEBUG ((Status == EFI_NOT_FOUND ? DEBUG_INFO : DEBUG_ERROR,
+      "%a: LoadImage(): %r\n", __FUNCTION__, Status));
     return Status;
   }
 
