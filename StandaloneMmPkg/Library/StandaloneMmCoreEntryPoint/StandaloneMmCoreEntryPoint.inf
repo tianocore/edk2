@@ -48,3 +48,6 @@
   gEfiMmPeiMmramMemoryReserveGuid
   gEfiStandaloneMmNonSecureBufferGuid
   gEfiArmTfCpuDriverEpDescriptorGuid
+
+[BuildOptions]
+  GCC:*_*_*_CC_FLAGS = -fpie

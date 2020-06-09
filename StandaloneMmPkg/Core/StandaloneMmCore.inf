@@ -75,3 +75,7 @@
   gEfiEventLegacyBootGuid
   gEfiEventExitBootServicesGuid
   gEfiEventReadyToBootGuid
+
+[BuildOptions]
+  GCC:*_*_*_CC_FLAGS = -fpie
+  GCC:*_*_*_DLINK_FLAGS = -Wl,-z,text,-Bsymbolic,-pie
