@@ -78,10 +78,14 @@ PL011UartInitializePort (
   UINT32      Integer;
   UINT32      Fractional;
   UINT32      HardwareFifoDepth;
+  UINT32      UartPid2;
 
-  HardwareFifoDepth = (PL011_UARTPID2_VER (MmioRead32 (UartBase + UARTPID2)) \
-                       > PL011_VER_R1P4) \
-                      ? 32 : 16 ;
+  HardwareFifoDepth = FixedPcdGet16 (PcdUartDefaultReceiveFifoDepth);
+  if (HardwareFifoDepth == 0) {
+    UartPid2 = MmioRead32 (UartBase + UARTPID2);
+    HardwareFifoDepth = (PL011_UARTPID2_VER (UartPid2) > PL011_VER_R1P4) ? 32 : 16;
+  }
+
   // The PL011 supports a buffer of 1, 16 or 32 chars. Therefore we can accept
   // 1 char buffer as the minimum FIFO size. Because everything can be rounded
   // down, there is no maximum FIFO size.

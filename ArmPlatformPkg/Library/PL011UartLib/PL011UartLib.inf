@@ -30,6 +30,7 @@
   ArmPlatformPkg/ArmPlatformPkg.dec
 
 [FixedPcd]
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultReceiveFifoDepth
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialBaudRate
 
   gArmPlatformTokenSpaceGuid.PL011UartInteger
