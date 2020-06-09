@@ -24,7 +24,7 @@ STATIC EFI_HANDLE  mPrmConfigProtocolHandle;
 STATIC CONST EFI_GUID mPrmModuleGuid = {0x5a6cf42b, 0x8bb4, 0x472c, {0xa2, 0x33, 0x5c, 0x4d, 0xc4, 0x03, 0x3d, 0xc7}};
 
 // {e1466081-7562-430f-896b-b0e523dc335a}
-STATIC CONST EFI_GUID mDumpStaticDataBufferPrmHandlerGuid = {0xe1466081, 0x7562, 0x430f, {0x89, 0x6b, 0xb0, 0xe5, 0x23, 0xdc, 0x33, 0x5a}};
+STATIC CONST EFI_GUID mCheckStaticDataBufferPrmHandlerGuid = {0xe1466081, 0x7562, 0x430f, {0x89, 0x6b, 0xb0, 0xe5, 0x23, 0xdc, 0x33, 0x5a}};
 
 /**
   Populates the static data buffer for this PRM module.
@@ -166,7 +166,7 @@ ContextBufferModuleConfigLibConstructor (
     Status = EFI_OUT_OF_RESOURCES;
     goto Done;
   }
-  CopyGuid (&PrmContextBuffer->HandlerGuid, &mDumpStaticDataBufferPrmHandlerGuid);
+  CopyGuid (&PrmContextBuffer->HandlerGuid, &mCheckStaticDataBufferPrmHandlerGuid);
   PrmContextBuffer->Signature = PRM_CONTEXT_BUFFER_SIGNATURE;
   PrmContextBuffer->Version = PRM_CONTEXT_BUFFER_INTERFACE_VERSION;
   PrmContextBuffer->StaticDataBuffer = StaticDataBuffer;
