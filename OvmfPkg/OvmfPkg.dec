@@ -281,6 +281,15 @@
   ## Number of page frames to use for storing grant table entries.
   gUefiOvmfPkgTokenSpaceGuid.PcdXenGrantFrames|4|UINT32|0x33
 
+  ## Specify the extra page table needed to mark the GHCB as unencrypted.
+  #  The value should be a multiple of 4KB for each.
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbPageTableBase|0x0|UINT32|0x3a
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbPageTableSize|0x0|UINT32|0x3b
+
+  ## The base address of the SEC GHCB page used by SEV-ES.
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBase|0|UINT32|0x3c
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbSize|0|UINT32|0x3d
+
 [PcdsDynamic, PcdsDynamicEx]
   gUefiOvmfPkgTokenSpaceGuid.PcdEmuVariableEvent|0|UINT64|2
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashVariablesEnable|FALSE|BOOLEAN|0x10
