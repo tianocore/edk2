@@ -52,6 +52,7 @@
   HobLib
   MemoryAllocationLib
   SynchronizationLib
+  VmgExitLib
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard    # CONSUMES
