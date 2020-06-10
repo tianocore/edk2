@@ -12,6 +12,7 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DebugAgentLib.h>
 #include <Library/DxeServicesTableLib.h>
+#include <Library/VmgExitLib.h>
 #include <Register/Amd/Fam17Msr.h>
 #include <Register/Amd/Ghcb.h>
 
@@ -85,6 +86,13 @@ GetWakeupBuffer (
 {
   EFI_STATUS              Status;
   EFI_PHYSICAL_ADDRESS    StartAddress;
+  EFI_MEMORY_TYPE         MemoryType;
+
+  if (PcdGetBool (PcdSevEsIsEnabled)) {
+    MemoryType = EfiReservedMemoryType;
+  } else {
+    MemoryType = EfiBootServicesData;
+  }
 
   //
   // Try to allocate buffer below 1M for waking vector.
@@ -97,7 +105,7 @@ GetWakeupBuffer (
   StartAddress = 0x88000;
   Status = gBS->AllocatePages (
                   AllocateMaxAddress,
-                  EfiBootServicesData,
+                  MemoryType,
                   EFI_SIZE_TO_PAGES (WakeupBufferSize),
                   &StartAddress
                   );
@@ -159,8 +167,10 @@ GetSevEsAPMemory (
   VOID
   )
 {
-  EFI_STATUS            Status;
-  EFI_PHYSICAL_ADDRESS  StartAddress;
+  EFI_STATUS                Status;
+  EFI_PHYSICAL_ADDRESS      StartAddress;
+  MSR_SEV_ES_GHCB_REGISTER  Msr;
+  GHCB                      *Ghcb;
 
   //
   // Allocate 1 page for AP jump table page
@@ -175,6 +185,16 @@ GetSevEsAPMemory (
   ASSERT_EFI_ERROR (Status);
 
   DEBUG ((DEBUG_INFO, "Dxe: SevEsAPMemory = %lx\n", (UINTN) StartAddress));
+
+  //
+  // Save the SevEsAPMemory as the AP jump table.
+  //
+  Msr.GhcbPhysicalAddress = AsmReadMsr64 (MSR_SEV_ES_GHCB);
+  Ghcb = Msr.Ghcb;
+
+  VmgInit (Ghcb);
+  VmgExit (Ghcb, SVM_EXIT_AP_JUMP_TABLE, 0, (UINT64) (UINTN) StartAddress);
+  VmgDone (Ghcb);
 
   return (UINTN) StartAddress;
 }
@@ -330,17 +350,26 @@ RelocateApLoop (
   BOOLEAN                MwaitSupport;
   ASM_RELOCATE_AP_LOOP   AsmRelocateApLoopFunc;
   UINTN                  ProcessorNumber;
+  UINTN                  StackStart;
 
   MpInitLibWhoAmI (&ProcessorNumber);
   CpuMpData    = GetCpuMpData ();
   MwaitSupport = IsMwaitSupport ();
+  if (CpuMpData->SevEsIsEnabled) {
+    StackStart = CpuMpData->SevEsAPResetStackStart;
+  } else {
+    StackStart = mReservedTopOfApStack;
+  }
   AsmRelocateApLoopFunc = (ASM_RELOCATE_AP_LOOP) (UINTN) mReservedApLoopFunc;
   AsmRelocateApLoopFunc (
     MwaitSupport,
     CpuMpData->ApTargetCState,
     CpuMpData->PmCodeSegment,
-    mReservedTopOfApStack - ProcessorNumber * AP_SAFE_STACK_SIZE,
-    (UINTN) &mNumberToFinish
+    CpuMpData->Pm16CodeSegment,
+    StackStart - ProcessorNumber * AP_SAFE_STACK_SIZE,
+    (UINTN) &mNumberToFinish,
+    CpuMpData->SevEsAPBuffer,
+    CpuMpData->WakeupBuffer
     );
   //
   // It should never reach here
@@ -374,6 +403,21 @@ MpInitChangeApLoopCallback (
   while (mNumberToFinish > 0) {
     CpuPause ();
   }
+
+  if (CpuMpData->SevEsIsEnabled && (CpuMpData->WakeupBuffer != (UINTN) -1)) {
+    //
+    // There are APs present. Re-use reserved memory area below 1MB from
+    // WakeupBuffer as the area to be used for transitioning to 16-bit mode
+    // in support of booting of the AP by an OS.
+    //
+    CopyMem (
+      (VOID *) CpuMpData->WakeupBuffer,
+      (VOID *) (CpuMpData->AddressMap.RendezvousFunnelAddress +
+                  CpuMpData->AddressMap.SwitchToRealPM16ModeOffset),
+      CpuMpData->AddressMap.SwitchToRealPM16ModeSize
+      );
+  }
+
   DEBUG ((DEBUG_INFO, "%a() done!\n", __FUNCTION__));
 }
 
