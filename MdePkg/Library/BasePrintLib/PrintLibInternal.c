@@ -27,13 +27,22 @@
 
 GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8 mHexStr[] = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
 
-GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8 * CONST mStatusString[] = {
+//
+// Longest string: RETURN_WARN_BUFFER_TOO_SMALL => 24 characters plus NUL byte
+//
+GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8 mWarningString[][24+1] = {
   "Success",                      //  RETURN_SUCCESS                = 0
   "Warning Unknown Glyph",        //  RETURN_WARN_UNKNOWN_GLYPH     = 1
   "Warning Delete Failure",       //  RETURN_WARN_DELETE_FAILURE    = 2
   "Warning Write Failure",        //  RETURN_WARN_WRITE_FAILURE     = 3
   "Warning Buffer Too Small",     //  RETURN_WARN_BUFFER_TOO_SMALL  = 4
   "Warning Stale Data",           //  RETURN_WARN_STALE_DATA        = 5
+};
+
+//
+// Longest string: RETURN_INCOMPATIBLE_VERSION => 20 characters plus NUL byte
+//
+GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8 mErrorString[][20+1] = {
   "Load Error",                   //  RETURN_LOAD_ERROR             = 1  | MAX_BIT
   "Invalid Parameter",            //  RETURN_INVALID_PARAMETER      = 2  | MAX_BIT
   "Unsupported",                  //  RETURN_UNSUPPORTED            = 3  | MAX_BIT
@@ -996,12 +1005,12 @@ BasePrintLibSPrintMarker (
           //
           Index = Status & ~MAX_BIT;
           if (Index > 0 && Index <= ERROR_STATUS_NUMBER) {
-            ArgumentString = mStatusString [Index + WARNING_STATUS_NUMBER];
+            ArgumentString = mErrorString [Index - 1];
           }
         } else {
           Index = Status;
           if (Index <= WARNING_STATUS_NUMBER) {
-            ArgumentString = mStatusString [Index];
+            ArgumentString = mWarningString [Index];
           }
         }
         if (ArgumentString == ValueBuffer) {
