@@ -2,11 +2,24 @@
 # CI configuration for CryptoPkg
 #
 # Copyright (c) Microsoft Corporation
+# Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 {
     "LicenseCheck": {
         "IgnoreFiles": []
+    },
+    "EccCheck": {
+        ## Exception sample looks like below:
+        ## "ExceptionList": [
+        ##     "<ErrorID>", "<KeyWord>"
+        ## ]
+        "ExceptionList": [
+        ],
+        ## Both file path and directory path are accepted.
+        "IgnoreFiles": [
+            "Library/OpensslLib/openssl"
+        ]
     },
     "CompilerPlugin": {
         "DscPath": "CryptoPkg.dsc"
