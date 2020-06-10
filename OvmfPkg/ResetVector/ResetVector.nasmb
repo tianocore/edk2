@@ -82,5 +82,6 @@
 
 %include "Main.asm"
 
+  %define SEV_ES_AP_RESET_IP  FixedPcdGet32 (PcdSevEsWorkAreaBase)
 %include "Ia16/ResetVectorVtf0.asm"
 
