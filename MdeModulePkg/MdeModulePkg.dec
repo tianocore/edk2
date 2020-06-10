@@ -2051,6 +2051,15 @@
   # @Prompt If there is any test key used by the platform.
   gEfiMdeModulePkgTokenSpaceGuid.PcdTestKeyUsed|FALSE|BOOLEAN|0x00030003
 
+  ## This dynamic PCD holds the base address of the GHCB pool allocation.
+  # @Prompt GHCB Pool Base Address
+  gEfiMdeModulePkgTokenSpaceGuid.PcdGhcbBase|0|UINT64|0x00030007
+
+  ## This dynamic PCD holds the total size of the GHCB pool allocation.
+  #  The amount of memory allocated for GHCBs is dependent on the number of APs.
+  # @Prompt GHCB Pool Size
+  gEfiMdeModulePkgTokenSpaceGuid.PcdGhcbSize|0|UINT64|0x00030008
+
 [PcdsDynamicEx]
   ## This dynamic PCD enables the default variable setting.
   #  Its value is the default store ID value. The default value is zero as Standard default.
