@@ -760,19 +760,6 @@
   # @Prompt Enable PCI bridge IO alignment probe.
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciBridgeIoAlignmentProbe|FALSE|BOOLEAN|0x0001004e
 
-  ## Indicates if StatusCode is reported via Serial port.<BR><BR>
-  #   TRUE  - Reports StatusCode via Serial port.<BR>
-  #   FALSE - Does not report StatusCode via Serial port.<BR>
-  # @Prompt Enable StatusCode via Serial port.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial|TRUE|BOOLEAN|0x00010022
-
-  ## Indicates if StatusCode is stored in memory.
-  #  The memory is boot time memory in PEI Phase and is runtime memory in DXE Phase.<BR><BR>
-  #   TRUE  - Stores StatusCode in memory.<BR>
-  #   FALSE - Does not store StatusCode in memory.<BR>
-  # @Prompt Enable StatusCode via memory.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory|FALSE|BOOLEAN|0x00010023
-
   ## Indicates if PEI phase StatusCode will be replayed in DXE phase.<BR><BR>
   #   TRUE  - Replays PEI phase StatusCode in DXE phased.<BR>
   #   FALSE - Does not replay PEI phase StatusCode in DXE phase.<BR>
@@ -2000,6 +1987,19 @@
   #       EV_EFI_PLATFORM_FIRMWARE_BLOB2 and EV_EFI_HANDOFF_TABLES2.
   # @Prompt TCG Platform Firmware Profile revision.
   gEfiMdeModulePkgTokenSpaceGuid.PcdTcgPfpMeasurementRevision|0|UINT32|0x00010077
+
+  ## Indicates if StatusCode is reported via Serial port.<BR><BR>
+  #   TRUE  - Reports StatusCode via Serial port.<BR>
+  #   FALSE - Does not report StatusCode via Serial port.<BR>
+  # @Prompt Enable StatusCode via Serial port.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial|TRUE|BOOLEAN|0x00010022
+
+  ## Indicates if StatusCode is stored in memory.
+  #  The memory is boot time memory in PEI Phase and is runtime memory in DXE Phase.<BR><BR>
+  #   TRUE  - Stores StatusCode in memory.<BR>
+  #   FALSE - Does not store StatusCode in memory.<BR>
+  # @Prompt Enable StatusCode via memory.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory|FALSE|BOOLEAN|0x00010023
 
 [PcdsPatchableInModule]
   ## Specify memory size with page number for PEI code when

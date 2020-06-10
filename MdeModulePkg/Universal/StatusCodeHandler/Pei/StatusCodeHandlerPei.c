@@ -2,7 +2,7 @@
   Report Status Code Handler PEIM which produces general handlers and hook them
   onto the PEI status code router.
 
-  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2020, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -45,13 +45,13 @@ StatusCodeHandlerPeiEntry (
   // If enable UseSerial, then initialize serial port.
   // if enable UseMemory, then initialize memory status code worker.
   //
-  if (FeaturePcdGet (PcdStatusCodeUseSerial)) {
+  if (PcdGetBool (PcdStatusCodeUseSerial)) {
     Status = SerialPortInitialize();
     ASSERT_EFI_ERROR (Status);
     Status = RscHandlerPpi->Register (SerialStatusCodeReportWorker);
     ASSERT_EFI_ERROR (Status);
   }
-  if (FeaturePcdGet (PcdStatusCodeUseMemory)) {
+  if (PcdGetBool (PcdStatusCodeUseMemory)) {
     Status = MemoryStatusCodeInitializeWorker ();
     ASSERT_EFI_ERROR (Status);
     Status = RscHandlerPpi->Register (MemoryStatusCodeReportWorker);
