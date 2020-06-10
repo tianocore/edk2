@@ -453,6 +453,12 @@ M: Jiewen Yao <jiewen.yao@intel.com>
 M: Jian J Wang <jian.j.wang@intel.com>
 R: Chao Zhang <chao.b.zhang@intel.com>
 
+SecurityPkg: Secure boot related modules
+F: SecurityPkg/Library/DxeImageVerificationLib/
+F: SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/
+F: SecurityPkg/Library/AuthVariableLib/
+R: Min Xu <min.m.xu@intel.com>
+
 SecurityPkg: Tcg related modules
 F: SecurityPkg/Tcg/
 R: Qi Zhang <qi1.zhang@intel.com>
