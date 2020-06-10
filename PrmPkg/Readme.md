@@ -118,6 +118,25 @@ maintained in PrmPkg. It is intended to only contain PRM infrastructure code and
 that infrastructure. The PrmPkg is meant to be used as-is by firmware that supports PRM. Any shortcomings that
 prevent the package from being used as-is should be addressed directly in PrmPkg.
 
+## PRM Information UEFI Application
+A UEFI application is provided in this package called "PrmInfo" that allows a user to display and test PRM
+modules on their system.
+
+[Link to application source code](PrmPkg/Application/PrmInfo).
+
+This application is intended to be helpful during PRM enabling by allowing the user to:
+  1. Confirm that their firmware port of the PRM infrastructure implemented in this package is functioning correctly.
+  2. Quickly get information about what PRM modules and handlers that are present on a given system.
+  3. Quickly test PRM handlers without booting into a full operating system.
+  4. Develop and exercise PRM handlers prior to the availability of an operating system that is PRM aware.
+
+Execute the application help command for detailed usage instructions and examples of how to use the application: \
+  ``PrmInfo -?``
+
+*Example Usage:*
+
+![](PrmPkg/Application/PrmInfo/PrmInfo_Usage_Example.gif)
+
 ## PRM Module
 
 > __*Note*__: You can find simple examples of PRM modules in the Samples directory of this package.
