@@ -10,12 +10,15 @@
 // The package level header files this module uses
 //
 #include <IndustryStandard/Q35MchIch9.h>
+#include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/HobLib.h>
 #include <Library/MemEncryptSevLib.h>
+#include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
 #include <PiPei.h>
 #include <Register/Amd/Cpuid.h>
+#include <Register/Amd/Msr.h>
 #include <Register/Cpuid.h>
 #include <Register/Intel/SmramSaveStateMap.h>
 
@@ -32,7 +35,10 @@ AmdSevEsInitialize (
   VOID
   )
 {
-  RETURN_STATUS     PcdStatus;
+  VOID              *GhcbBase;
+  PHYSICAL_ADDRESS  GhcbBasePa;
+  UINTN             GhcbPageCount, PageCount;
+  RETURN_STATUS     PcdStatus, DecryptStatus;
 
   if (!MemEncryptSevEsIsEnabled ()) {
     return;
@@ -40,6 +46,43 @@ AmdSevEsInitialize (
 
   PcdStatus = PcdSetBoolS (PcdSevEsIsEnabled, TRUE);
   ASSERT_RETURN_ERROR (PcdStatus);
+
+  //
+  // Allocate GHCB and per-CPU variable pages.
+  //
+  GhcbPageCount = mMaxCpuCount * 2;
+  GhcbBase = AllocatePages (GhcbPageCount);
+  ASSERT (GhcbBase != NULL);
+
+  GhcbBasePa = (PHYSICAL_ADDRESS)(UINTN) GhcbBase;
+
+  //
+  // Each vCPU gets two consecutive pages, the first is the GHCB and the
+  // second is the per-CPU variable page. Loop through the allocation and
+  // only clear the encryption mask for the GHCB pages.
+  //
+  for (PageCount = 0; PageCount < GhcbPageCount; PageCount += 2) {
+    DecryptStatus = MemEncryptSevClearPageEncMask (
+      0,
+      GhcbBasePa + EFI_PAGES_TO_SIZE (PageCount),
+      1,
+      TRUE
+      );
+    ASSERT_RETURN_ERROR (DecryptStatus);
+  }
+
+  ZeroMem (GhcbBase, EFI_PAGES_TO_SIZE (GhcbPageCount));
+
+  PcdStatus = PcdSet64S (PcdGhcbBase, GhcbBasePa);
+  ASSERT_RETURN_ERROR (PcdStatus);
+  PcdStatus = PcdSet64S (PcdGhcbSize, EFI_PAGES_TO_SIZE (GhcbPageCount));
+  ASSERT_RETURN_ERROR (PcdStatus);
+
+  DEBUG ((DEBUG_INFO,
+    "SEV-ES is enabled, %lu GHCB pages allocated starting at 0x%p\n",
+    (UINT64)GhcbPageCount, GhcbBase));
+
+  AsmWriteMsr64 (MSR_SEV_ES_GHCB, GhcbBasePa);
 }
 
 /**
