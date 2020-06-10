@@ -2,7 +2,7 @@
   Status Code Handler Driver which produces general handlers and hook them
   onto the SMM status code router.
 
-  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2020, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -28,14 +28,14 @@ InitializationDispatcherWorker (
   // If enable UseSerial, then initialize serial port.
   // if enable UseRuntimeMemory, then initialize runtime memory status code worker.
   //
-  if (FeaturePcdGet (PcdStatusCodeUseSerial)) {
+  if (PcdGetBool (PcdStatusCodeUseSerial)) {
     //
     // Call Serial Port Lib API to initialize serial port.
     //
     Status = SerialPortInitialize ();
     ASSERT_EFI_ERROR (Status);
   }
-  if (FeaturePcdGet (PcdStatusCodeUseMemory)) {
+  if (PcdGetBool (PcdStatusCodeUseMemory)) {
     Status = MemoryStatusCodeInitializeWorker ();
     ASSERT_EFI_ERROR (Status);
   }
@@ -73,10 +73,10 @@ StatusCodeHandlerSmmEntry (
   //
   InitializationDispatcherWorker ();
 
-  if (FeaturePcdGet (PcdStatusCodeUseSerial)) {
+  if (PcdGetBool (PcdStatusCodeUseSerial)) {
     mRscHandlerProtocol->Register (SerialStatusCodeReportWorker);
   }
-  if (FeaturePcdGet (PcdStatusCodeUseMemory)) {
+  if (PcdGetBool (PcdStatusCodeUseMemory)) {
     mRscHandlerProtocol->Register (MemoryStatusCodeReportWorker);
   }
 
