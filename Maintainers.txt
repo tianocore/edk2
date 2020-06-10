@@ -265,7 +265,6 @@ F: MdeModulePkg/*StatusCode*/
 F: MdeModulePkg/Application/DumpDynPcd/
 F: MdeModulePkg/Core/Dxe/
 F: MdeModulePkg/Core/DxeIplPeim/
-F: MdeModulePkg/Core/Pei/
 F: MdeModulePkg/Core/RuntimeDxe/
 F: MdeModulePkg/Include/*Mem*.h
 F: MdeModulePkg/Include/*Pcd*.h
@@ -346,6 +345,14 @@ F: MdeModulePkg/Include/*Smi*.h
 F: MdeModulePkg/Include/*Smm*.h
 R: Eric Dong <eric.dong@intel.com>
 R: Ray Ni <ray.ni@intel.com>
+
+MdeModulePkg: Pei Core
+F: MdeModulePkg/Core/Pei/
+R: Dandan Bi <dandan.bi@intel.com>
+R: Liming Gao <liming.gao@intel.com>
+R: Debkumar De <debkumar.de@intel.com>
+R: Harry Han <harry.han@intel.com>
+R: Catharine West <catharine.west@intel.com>
 
 MdeModulePkg: Reset modules
 F: MdeModulePkg/*Reset*/
