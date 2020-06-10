@@ -58,12 +58,10 @@
 [Protocols]
   gEfiRscHandlerProtocolGuid                    ## CONSUMES
 
-[FeaturePcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeReplayIn  ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial ## CONSUMES
-
 [Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeReplayIn  ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize |128| gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory   ## SOMETIMES_CONSUMES
 
 [Depex]

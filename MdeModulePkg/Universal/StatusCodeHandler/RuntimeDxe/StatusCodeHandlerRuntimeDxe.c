@@ -2,7 +2,7 @@
   Status Code Handler Driver which produces general handlers and hook them
   onto the DXE status code router.
 
-  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2020, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -29,7 +29,7 @@ UnregisterBootTimeHandlers (
   IN VOID             *Context
   )
 {
-  if (FeaturePcdGet (PcdStatusCodeUseSerial)) {
+  if (PcdGetBool (PcdStatusCodeUseSerial)) {
     mRscHandlerProtocol->Unregister (SerialStatusCodeReportWorker);
   }
 }
@@ -80,14 +80,14 @@ InitializationDispatcherWorker (
   // If enable UseSerial, then initialize serial port.
   // if enable UseRuntimeMemory, then initialize runtime memory status code worker.
   //
-  if (FeaturePcdGet (PcdStatusCodeUseSerial)) {
+  if (PcdGetBool (PcdStatusCodeUseSerial)) {
     //
     // Call Serial Port Lib API to initialize serial port.
     //
     Status = SerialPortInitialize ();
     ASSERT_EFI_ERROR (Status);
   }
-  if (FeaturePcdGet (PcdStatusCodeUseMemory)) {
+  if (PcdGetBool (PcdStatusCodeUseMemory)) {
     Status = RtMemoryStatusCodeInitializeWorker ();
     ASSERT_EFI_ERROR (Status);
   }
@@ -115,7 +115,7 @@ InitializationDispatcherWorker (
         //
         // Dispatch records to devices based on feature flag.
         //
-        if (FeaturePcdGet (PcdStatusCodeUseSerial)) {
+        if (PcdGetBool (PcdStatusCodeUseSerial)) {
           SerialStatusCodeReportWorker (
             Record[Index].CodeType,
             Record[Index].Value,
@@ -124,7 +124,7 @@ InitializationDispatcherWorker (
             NULL
             );
         }
-        if (FeaturePcdGet (PcdStatusCodeUseMemory)) {
+        if (PcdGetBool (PcdStatusCodeUseMemory)) {
           RtMemoryStatusCodeReportWorker (
             Record[Index].CodeType,
             Record[Index].Value,
@@ -171,10 +171,10 @@ StatusCodeHandlerRuntimeDxeEntry (
   //
   InitializationDispatcherWorker ();
 
-  if (FeaturePcdGet (PcdStatusCodeUseSerial)) {
+  if (PcdGetBool (PcdStatusCodeUseSerial)) {
     mRscHandlerProtocol->Register (SerialStatusCodeReportWorker, TPL_HIGH_LEVEL);
   }
-  if (FeaturePcdGet (PcdStatusCodeUseMemory)) {
+  if (PcdGetBool (PcdStatusCodeUseMemory)) {
     mRscHandlerProtocol->Register (RtMemoryStatusCodeReportWorker, TPL_HIGH_LEVEL);
   }
 
