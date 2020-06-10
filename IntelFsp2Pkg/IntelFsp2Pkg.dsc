@@ -1,7 +1,7 @@
 ## @file
 # Provides driver and definitions to build fsp.
 #
-# Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2014 - 2020, Intel Corporation. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -65,6 +65,7 @@
   IntelFsp2Pkg/FspSecCore/FspSecCoreT.inf
   IntelFsp2Pkg/FspSecCore/FspSecCoreM.inf
   IntelFsp2Pkg/FspSecCore/FspSecCoreS.inf
+  IntelFsp2Pkg/FspSecCore/Fsp22SecCoreS.inf
   IntelFsp2Pkg/FspNotifyPhase/FspNotifyPhasePeim.inf
 
 [PcdsFixedAtBuild.common]
