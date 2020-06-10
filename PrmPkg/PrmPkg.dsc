@@ -68,6 +68,7 @@
   # PRM Libraries
   #
   $(PLATFORM_PACKAGE)/Library/DxePrmContextBufferLib/DxePrmContextBufferLib.inf
+  $(PLATFORM_PACKAGE)/Samples/PrmSampleAcpiParameterBufferModule/Library/DxeAcpiParameterBufferModuleConfigLib/DxeAcpiParameterBufferModuleConfigLib.inf
   $(PLATFORM_PACKAGE)/Samples/PrmSampleContextBufferModule/Library/DxeContextBufferModuleConfigLib/DxeContextBufferModuleConfigLib.inf
   $(PLATFORM_PACKAGE)/Samples/PrmSampleHardwareAccessModule/Library/DxeHardwareAccessModuleConfigLib/DxeHardwareAccessModuleConfigLib.inf
 
@@ -76,6 +77,7 @@
   #
   $(PLATFORM_PACKAGE)/PrmConfigDxe/PrmConfigDxe.inf {
     <LibraryClasses>
+      NULL|$(PLATFORM_PACKAGE)/Samples/PrmSampleAcpiParameterBufferModule/Library/DxeAcpiParameterBufferModuleConfigLib/DxeAcpiParameterBufferModuleConfigLib.inf
       NULL|$(PLATFORM_PACKAGE)/Samples/PrmSampleContextBufferModule/Library/DxeContextBufferModuleConfigLib/DxeContextBufferModuleConfigLib.inf
   }
 
@@ -93,6 +95,7 @@
   # PRM Sample Modules
   #
   $(PLATFORM_PACKAGE)/Samples/PrmSamplePrintModule/PrmSamplePrintModule.inf
+  $(PLATFORM_PACKAGE)/Samples/PrmSampleAcpiParameterBufferModule/PrmSampleAcpiParameterBufferModule.inf
   $(PLATFORM_PACKAGE)/Samples/PrmSampleHardwareAccessModule/PrmSampleHardwareAccessModule.inf {
     <LibraryClasses>
       DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
