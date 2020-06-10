@@ -9,6 +9,18 @@
     "LicenseCheck": {
         "IgnoreFiles": []
     },
+    "EccCheck": {
+        ## Exception sample looks like below:
+        ## "ExceptionList": [
+        ##     "<ErrorID>", "<KeyWord>"
+        ## ]
+        "ExceptionList": [
+        ],
+        ## Both file path and directory path are accepted.
+        "IgnoreFiles": [
+            "Library/CmockaLib/cmocka"
+        ]
+    },
     ## options defined .pytool/Plugin/CompilerPlugin
     "CompilerPlugin": {
         "DscPath": "UnitTestFrameworkPkg.dsc"
