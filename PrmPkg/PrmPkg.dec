@@ -30,6 +30,7 @@
 
 [Guids]
   gPrmPkgTokenSpaceGuid = { 0x46f56acc, 0x600b, 0x450f, { 0xa5, 0x9c, 0x3a, 0x1a, 0x4a, 0xd4, 0x35, 0x3e }}
+  gPrmHiiGuid = { 0xee4cd885, 0xd104, 0x4056, { 0x84, 0xba, 0x46, 0x18, 0x82, 0xa7, 0x2a, 0x18 }}
 
 [LibraryClasses]
   ## @libraryclass Provides a general abstraction for PRM context buffer management
@@ -55,3 +56,12 @@
 
   ## Size in bytes of a PRM firmware volume
   gPrmPkgTokenSpaceGuid.PcdFlashFvPrmSize|0x00000000|UINT32|0x00000002
+
+  ## Print PRM handler execution time in PrmInfo
+  #
+  #  Provides an option to disable usage of a timer library to record PRM handler
+  #  execution time. In most cases, the platform should provide a valid TimerLib
+  #  instance that can be used when the application is built with that package to
+  #  report PRM handler execution time in the application. If such a TimerLib
+  #  instance is not available, set this PCD to FALSE in the package DSC file.
+  gPrmPkgTokenSpaceGuid.PcdPrmInfoPrintHandlerExecutionTime|TRUE|BOOLEAN|0x00000003
