@@ -181,6 +181,102 @@ GlobalPointerShouldBeChangeable (
   return UNIT_TEST_PASSED;
 }
 
+UNIT_TEST_STATUS
+EFIAPI
+DetectExpectedAssert (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  //
+  // This test passes because it directly triggers an ASSERT().
+  //
+  UT_EXPECT_ASSERT_FAILURE (ASSERT (FALSE), NULL);
+
+  //
+  // This test passes because DecimalToBcd() generates an ASSERT() if the
+  // value passed in is >= 100.  The expected ASSERT() is caught by the unit
+  // test framework and UT_EXPECT_ASSERT_FAILURE() returns without an error.
+  //
+  UT_EXPECT_ASSERT_FAILURE (DecimalToBcd8 (101), NULL);
+
+  return UNIT_TEST_PASSED;
+}
+
+UNIT_TEST_STATUS
+EFIAPI
+DetectNoAssertsWorker1 (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  UNIT_TEST_STATUS  Status;
+
+  //
+  // If ASSERT()s are enabled, then the following test case will not triggered
+  // an ASSERT() and UT_EXPECT_ASSERT_FAILURE() exits the function from the
+  // macro with status UNIT_TEST_ERROR_TEST_FAILED.
+  //
+  // If ASSERT()s are disabled, then UNIT_TEST_ERROR_TEST_FAILED() is ignored
+  // and Status is set to UNIT_TEST_SKIPPED.
+  //
+  // If ASSERT()s are enabled and this ASSERT() is incorrectly triggered, then
+  // UT_EXPECT_ASSERT_FAILURE() returns with Status set to UNIT_TEST_PASSED.
+  //
+  UT_EXPECT_ASSERT_FAILURE (ASSERT (TRUE), &Status);
+
+  return Status;
+}
+
+UNIT_TEST_STATUS
+EFIAPI
+DetectNoAssertsWorker2 (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  UNIT_TEST_STATUS  Status;
+
+  //
+  // If ASSERT()s are enabled, then the following test case will not triggered
+  // an ASSERT() and UT_EXPECT_ASSERT_FAILURE() exits the function from the
+  // macro with status UNIT_TEST_ERROR_TEST_FAILED.
+  //
+  // If ASSERT()s are disabled, then UNIT_TEST_ERROR_TEST_FAILED() is ignored
+  // and Status is set to UNIT_TEST_SKIPPED.
+  //
+  // If ASSERT()s are enabled and this ASSERT() is incorrectly triggered, then
+  // UT_EXPECT_ASSERT_FAILURE() returns with Status set to UNIT_TEST_PASSED.
+  //
+  // DecimalToBcd() only generates an ASSERT() if the value passed in is >= 100.
+  //
+  UT_EXPECT_ASSERT_FAILURE (DecimalToBcd8 (99), &Status);
+
+  return Status;
+}
+
+UNIT_TEST_STATUS
+EFIAPI
+DetectNoAsserts (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  UNIT_TEST_STATUS  Status;
+
+  //
+  // This call is expected to return UNIT_TEST_ERROR_TEST_FAILED or
+  // UNIT_TEST_SKIPPED.
+  //
+  Status = DetectNoAssertsWorker1 (Context);
+  UT_ASSERT_FALSE (Status == UNIT_TEST_PASSED);
+
+  //
+  // This call is expected to return UNIT_TEST_ERROR_TEST_FAILED or
+  // UNIT_TEST_SKIPPED.
+  //
+  Status = DetectNoAssertsWorker2 (Context);
+  UT_ASSERT_FALSE (Status == UNIT_TEST_PASSED);
+
+  return UNIT_TEST_PASSED;
+}
+
 /**
   Initialize the unit test framework, suite, and unit tests for the
   sample unit tests and run the unit tests.
@@ -199,6 +295,7 @@ UefiTestMain (
   UNIT_TEST_FRAMEWORK_HANDLE  Framework;
   UNIT_TEST_SUITE_HANDLE      SimpleMathTests;
   UNIT_TEST_SUITE_HANDLE      GlobalVarTests;
+  UNIT_TEST_SUITE_HANDLE      DebugAssertTests;
 
   Framework = NULL;
 
@@ -235,6 +332,18 @@ UefiTestMain (
   }
   AddTestCase (GlobalVarTests, "You should be able to change a global BOOLEAN", "Boolean", GlobalBooleanShouldBeChangeable, NULL, NULL, NULL);
   AddTestCase (GlobalVarTests, "You should be able to change a global pointer", "Pointer", GlobalPointerShouldBeChangeable, MakeSureThatPointerIsNull, ClearThePointer, NULL);
+
+  //
+  // Populate the DebugLib ASSERT() Unit Test Suite.
+  //
+  Status = CreateUnitTestSuite (&DebugAssertTests, Framework, "DebugLib ASSERT() Tests", "Sample.DebugLibAssert", NULL, NULL);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Failed in CreateUnitTestSuite for DebugAssertTests\n"));
+    Status = EFI_OUT_OF_RESOURCES;
+    goto EXIT;
+  }
+  AddTestCase (DebugAssertTests, "Detect Expected ASSERT()", "DetectExpectedAssert", DetectExpectedAssert, NULL, NULL, NULL);
+  AddTestCase (DebugAssertTests, "Detect no ASSERT() triggered", "DetectNoAsserts", DetectNoAsserts, NULL, NULL, NULL);
 
   //
   // Execute the tests.
