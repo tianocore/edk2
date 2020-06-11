@@ -1103,6 +1103,72 @@ AsmReadPmc (
 }
 
 /**
+  Sets up a monitor buffer that is used by AsmMwait().
+
+  Executes a MONITOR instruction with the register state specified by Eax, Ecx
+  and Edx. Returns Eax. This function is only available on IA-32 and X64.
+
+  @param  Eax The value to load into EAX or RAX before executing the MONITOR
+              instruction.
+  @param  Ecx The value to load into ECX or RCX before executing the MONITOR
+              instruction.
+  @param  Edx The value to load into EDX or RDX before executing the MONITOR
+              instruction.
+
+  @return Eax
+
+**/
+UINTN
+EFIAPI
+AsmMonitor (
+  IN      UINTN                     Eax,
+  IN      UINTN                     Ecx,
+  IN      UINTN                     Edx
+  )
+{
+  __asm__ __volatile__ (
+    "monitor"
+    :
+    : "a" (Eax),
+      "c" (Ecx),
+      "d" (Edx)
+    );
+
+  return Eax;
+}
+
+/**
+  Executes an MWAIT instruction.
+
+  Executes an MWAIT instruction with the register state specified by Eax and
+  Ecx. Returns Eax. This function is only available on IA-32 and X64.
+
+  @param  Eax The value to load into EAX or RAX before executing the MONITOR
+              instruction.
+  @param  Ecx The value to load into ECX or RCX before executing the MONITOR
+              instruction.
+
+  @return Eax
+
+**/
+UINTN
+EFIAPI
+AsmMwait (
+  IN      UINTN                     Eax,
+  IN      UINTN                     Ecx
+  )
+{
+  __asm__ __volatile__ (
+    "mwait"
+    :
+    : "a"  (Eax),
+      "c"  (Ecx)
+    );
+
+  return Eax;
+}
+
+/**
   Executes a WBINVD instruction.
 
   Executes a WBINVD instruction. This function is only available on IA-32 and
