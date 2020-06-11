@@ -25,7 +25,7 @@
   UnitTestFrameworkPkg/Test/UnitTest/Sample/SampleUnitTest/SampleUnitTestHost.inf
 
   #
-  # Build Libraries
+  # Build HOST_APPLICATION Libraries
   #
   UnitTestFrameworkPkg/Library/CmockaLib/CmockaLib.inf
   UnitTestFrameworkPkg/Library/Posix/DebugLibPosix/DebugLibPosix.inf

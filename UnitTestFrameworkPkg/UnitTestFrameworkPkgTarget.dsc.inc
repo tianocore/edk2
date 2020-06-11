@@ -29,6 +29,7 @@
   UnitTestLib|UnitTestFrameworkPkg/Library/UnitTestLib/UnitTestLib.inf
   UnitTestPersistenceLib|UnitTestFrameworkPkg/Library/UnitTestPersistenceLibNull/UnitTestPersistenceLibNull.inf
   UnitTestResultReportLib|UnitTestFrameworkPkg/Library/UnitTestResultReportLib/UnitTestResultReportLibDebugLib.inf
+  NULL|UnitTestFrameworkPkg/Library/UnitTestDebugAssertLib/UnitTestDebugAssertLib.inf
 
 [LibraryClasses.ARM, LibraryClasses.AARCH64]
   #
@@ -56,5 +57,6 @@
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x17
 
 [BuildOptions]
-  MSFT:*_*_*_CC_FLAGS = -D DISABLE_NEW_DEPRECATED_INTERFACES
-  GCC:*_*_*_CC_FLAGS  = -D DISABLE_NEW_DEPRECATED_INTERFACES
+  MSFT:*_*_*_CC_FLAGS  = -D DISABLE_NEW_DEPRECATED_INTERFACES -D EDKII_UNIT_TEST_FRAMEWORK_ENABLED
+  GCC:*_*_*_CC_FLAGS   = -D DISABLE_NEW_DEPRECATED_INTERFACES -D EDKII_UNIT_TEST_FRAMEWORK_ENABLED
+  XCODE:*_*_*_CC_FLAGS = -D DISABLE_NEW_DEPRECATED_INTERFACES -D EDKII_UNIT_TEST_FRAMEWORK_ENABLED
