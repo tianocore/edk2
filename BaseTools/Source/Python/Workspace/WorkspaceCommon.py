@@ -1,7 +1,7 @@
 ## @file
 # Common routines used by workspace
 #
-# Copyright (c) 2012 - 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2012 - 2020, Intel Corporation. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
@@ -100,7 +100,7 @@ def GetModuleLibInstances(Module, Platform, BuildDatabase, Arch, Target, Toolcha
     # If a module has a MODULE_TYPE of USER_DEFINED,
     # do not link in NULL library class instances from the global [LibraryClasses.*] sections.
     #
-    if Module.ModuleType != SUP_MODULE_USER_DEFINED and Module.ModuleType != SUP_MODULE_HOST_APPLICATION:
+    if Module.ModuleType != SUP_MODULE_USER_DEFINED:
         for LibraryClass in Platform.LibraryClasses.GetKeys():
             if LibraryClass.startswith("NULL") and Platform.LibraryClasses[LibraryClass, Module.ModuleType]:
                 Module.LibraryClasses[LibraryClass] = Platform.LibraryClasses[LibraryClass, Module.ModuleType]
