@@ -18,6 +18,9 @@
 
 !include UnitTestFrameworkPkg/UnitTestFrameworkPkgHost.dsc.inc
 
+[PcdsPatchableInModule]
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x17
+
 [Components]
   #
   # Build HOST_APPLICATION that tests the SampleUnitTest
