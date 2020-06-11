@@ -289,12 +289,38 @@ DebugPrintLevelEnabled (
   @param  Expression  Boolean expression that evaluated to FALSE
 
 **/
+#if defined (EDKII_UNIT_TEST_FRAMEWORK_ENABLED)
+/**
+  Unit test library replacement for DebugAssert() in DebugLib.
+
+  If FileName is NULL, then a <FileName> string of "(NULL) Filename" is printed.
+  If Description is NULL, then a <Description> string of "(NULL) Description" is printed.
+
+  @param  FileName     The pointer to the name of the source file that generated the assert condition.
+  @param  LineNumber   The line number in the source file that generated the assert condition
+  @param  Description  The pointer to the description of the assert condition.
+
+**/
+VOID
+EFIAPI
+UnitTestDebugAssert (
+  IN CONST CHAR8  *FileName,
+  IN UINTN        LineNumber,
+  IN CONST CHAR8  *Description
+  );
+
+#if defined(__clang__) && defined(__FILE_NAME__)
+#define _ASSERT(Expression)  UnitTestDebugAssert (__FILE_NAME__, __LINE__, #Expression)
+#else
+#define _ASSERT(Expression)  UnitTestDebugAssert (__FILE__, __LINE__, #Expression)
+#endif
+#else
 #if defined(__clang__) && defined(__FILE_NAME__)
 #define _ASSERT(Expression)  DebugAssert (__FILE_NAME__, __LINE__, #Expression)
 #else
 #define _ASSERT(Expression)  DebugAssert (__FILE__, __LINE__, #Expression)
 #endif
-
+#endif
 
 /**
   Internal worker macro that calls DebugPrint().
