@@ -442,6 +442,56 @@ SaveFrameworkState (
   }
 
 /**
+  This macro uses the framework assertion logic to check whether a function call
+  triggers an ASSERT() condition.  The BaseLib SetJump()/LongJump() services
+  are used to establish a safe return point when an ASSERT() is triggered.
+  If an ASSERT() is triggered, unit test execution continues and Status is set
+  to UNIT_TEST_PASSED.  Otherwise, a unit test case failure is raised and
+  Status is set to UNIT_TEST_ERROR_TEST_FAILED.
+
+  If ASSERT() macros are disabled, then the test case is skipped and a warning
+  message is added to the unit test log.  Status is set to UNIT_TEST_SKIPPED.
+
+  @param[in]  FunctionCall  Function call that is expected to trigger ASSERT().
+  @param[out] Status        Pointer to a UNIT_TEST_STATUS return value.  This
+                            is an optional parameter that may be NULL.
+**/
+#if defined (EDKII_UNIT_TEST_FRAMEWORK_ENABLED)
+  #include <Library/BaseLib.h>
+
+  ///
+  /// Pointer to jump buffer used with SetJump()/LongJump() to test if a
+  /// function under test generates an expected ASSERT() condition.
+  ///
+  extern BASE_LIBRARY_JUMP_BUFFER  *gUnitTestExpectAssertFailureJumpBuffer;
+
+  #define UT_EXPECT_ASSERT_FAILURE(FunctionCall, Status)               \
+    do {                                                               \
+      UNIT_TEST_STATUS          UnitTestJumpStatus;                    \
+      BASE_LIBRARY_JUMP_BUFFER  UnitTestJumpBuffer;                    \
+      UnitTestJumpStatus = UNIT_TEST_SKIPPED;                          \
+      if (DebugAssertEnabled ()) {                                     \
+        gUnitTestExpectAssertFailureJumpBuffer = &UnitTestJumpBuffer;  \
+        if (SetJump (gUnitTestExpectAssertFailureJumpBuffer) == 0) {   \
+          FunctionCall;                                                \
+          UnitTestJumpStatus = UNIT_TEST_ERROR_TEST_FAILED;            \
+        } else {                                                       \
+          UnitTestJumpStatus = UNIT_TEST_PASSED;                       \
+        }                                                              \
+        gUnitTestExpectAssertFailureJumpBuffer = NULL;                 \
+      }                                                                \
+      if (!UnitTestExpectAssertFailure (                               \
+             UnitTestJumpStatus,                                       \
+             __FUNCTION__, __LINE__, __FILE__,                         \
+             #FunctionCall, Status)) {                                 \
+        return UNIT_TEST_ERROR_TEST_FAILED;                            \
+      }                                                                \
+    } while (FALSE)
+#else
+  #define UT_EXPECT_ASSERT_FAILURE(FunctionCall, Status)  FunctionCall;
+#endif
+
+/**
   If Expression is TRUE, then TRUE is returned.
   If Expression is FALSE, then an assert is triggered and the location of the
   assert provided by FunctionName, LineNumber, FileName, and Description are
@@ -688,6 +738,46 @@ UnitTestAssertNotNull (
   IN UINTN        LineNumber,
   IN CONST CHAR8  *FileName,
   IN CONST CHAR8  *PointerName
+  );
+
+/**
+  If UnitTestStatus is UNIT_TEST_PASSED, then log an info message and return
+  TRUE because an ASSERT() was expected when FunctionCall was executed and an
+  ASSERT() was triggered. If UnitTestStatus is UNIT_TEST_SKIPPED, then log a
+  warning message and return TRUE because ASSERT() macros are disabled.  If
+  UnitTestStatus is UNIT_TEST_ERROR_TEST_FAILED, then log an error message and
+  return FALSE because an ASSERT() was expected when FunctionCall was executed,
+  but no ASSERT() conditions were triggered.  The log messages contain
+  FunctionName, LineNumber, and FileName strings to provide the location of the
+  UT_EXPECT_ASSERT_FAILURE() macro.
+
+  @param[in]  UnitTestStatus  The status from UT_EXPECT_ASSERT_FAILURE() that
+                              is either pass, skipped, or failed.
+  @param[in]  FunctionName    Null-terminated ASCII string of the function
+                              executing the UT_EXPECT_ASSERT_FAILURE() macro.
+  @param[in]  LineNumber      The source file line number of the the function
+                              executing the UT_EXPECT_ASSERT_FAILURE() macro.
+  @param[in]  FileName        Null-terminated ASCII string of the filename
+                              executing the UT_EXPECT_ASSERT_FAILURE() macro.
+  @param[in]  FunctionCall    Null-terminated ASCII string of the function call
+                              executed by the UT_EXPECT_ASSERT_FAILURE() macro.
+  @param[out] ResultStatus    Used to return the UnitTestStatus value to the
+                              caller of UT_EXPECT_ASSERT_FAILURE().  This is
+                              optional parameter that may be NULL.
+
+  @retval  TRUE   UnitTestStatus is UNIT_TEST_PASSED.
+  @retval  TRUE   UnitTestStatus is UNIT_TEST_SKIPPED.
+  @retval  FALSE  UnitTestStatus is UNIT_TEST_ERROR_TEST_FAILED.
+**/
+BOOLEAN
+EFIAPI
+UnitTestExpectAssertFailure (
+  IN  UNIT_TEST_STATUS  UnitTestStatus,
+  IN  CONST CHAR8       *FunctionName,
+  IN  UINTN             LineNumber,
+  IN  CONST CHAR8       *FileName,
+  IN  CONST CHAR8       *FunctionCall,
+  OUT UNIT_TEST_STATUS  *ResultStatus  OPTIONAL
   );
 
 /**
