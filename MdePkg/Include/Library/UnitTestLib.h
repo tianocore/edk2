@@ -10,6 +10,14 @@
 #ifndef __UNIT_TEST_LIB_H__
 #define __UNIT_TEST_LIB_H__
 
+#include <Library/BaseLib.h>
+
+///
+/// Pointer to jump buffer used with SetJump()/LongJump() to test if a function
+/// under test generates an expected ASSERT() condition.
+///
+extern BASE_LIBRARY_JUMP_BUFFER  *gUnitTestExpectAssertFailureJumpBuffer;
+
 ///
 /// Unit Test Status
 ///
@@ -440,6 +448,68 @@ SaveFrameworkState (
   if(!UnitTestAssertNotNull ((Pointer), __FUNCTION__, __LINE__, __FILE__, #Pointer)) { \
     return UNIT_TEST_ERROR_TEST_FAILED;                                              \
   }
+
+/**
+  This macro uses the framework assertion logic to check whether a function call
+  triggers an ASSERT() condition.  The BaseLib SetJump()/LongJump() services
+  are used to establish a safe return point when an ASSERT() is triggered.
+  If an ASSERT() is triggered, unit test execution continues and Status is set
+  to UNIT_TEST_PASSED.  Otherwise, a unit test case failure is raised and
+  Status is set to UNIT_TEST_ERROR_TEST_FAILED.
+
+  If ASSERT() macros are disabled, then the test case is skipped and a warning
+  message is added to the unit test log.  Status is set to UNIT_TEST_SKIPPED.
+
+  @param[in]  FunctionCall  Function call that is expected to trigger ASSERT().
+  @param[out] Status        Pointer to a UNIT_TEST_STATUS return value.  This
+                            is an optional parameter that may be NULL.
+**/
+#if defined (EDKII_UNIT_TEST_FRAMEWORK_ENABLED)
+  #define UT_EXPECT_ASSERT_FAILURE(FunctionCall, Status)                       \
+    if (DebugAssertEnabled ()) {                                               \
+      BASE_LIBRARY_JUMP_BUFFER  UnitTestJumpBuffer;                            \
+      gUnitTestExpectAssertFailureJumpBuffer = &UnitTestJumpBuffer;            \
+      if (SetJump (gUnitTestExpectAssertFailureJumpBuffer) == 0) {             \
+        FunctionCall;                                                          \
+        gUnitTestExpectAssertFailureJumpBuffer = NULL;                         \
+        UT_LOG_ERROR ("UT_EXPECT_ASSERT_FAILURE("#FunctionCall") did not ASSERT()\n");  \
+        if (Status != NULL) {                                                  \
+          *((UNIT_TEST_STATUS *)Status) = UNIT_TEST_ERROR_TEST_FAILED;         \
+        }                                                                      \
+        return UNIT_TEST_ERROR_TEST_FAILED;                                    \
+      }                                                                        \
+      gUnitTestExpectAssertFailureJumpBuffer = NULL;                           \
+      if (Status != NULL) {                                                    \
+        *((UNIT_TEST_STATUS *)Status) = UNIT_TEST_PASSED;                      \
+      }                                                                        \
+    } else {                                                                   \
+      UT_LOG_WARNING ("UT_EXPECT_ASSERT_FAILURE("#FunctionCall") disabled\n"); \
+      if (Status != NULL) {                                                    \
+        *((UNIT_TEST_STATUS *)Status) = UNIT_TEST_SKIPPED;                     \
+      }                                                                        \
+    }
+#else
+  #define UT_EXPECT_ASSERT_FAILURE(FunctionCall, Status)  FunctionCall;
+#endif
+
+/**
+  Unit test library replacement for DebugAssert() in DebugLib.
+
+  If FileName is NULL, then a <FileName> string of "(NULL) Filename" is printed.
+  If Description is NULL, then a <Description> string of "(NULL) Description" is printed.
+
+  @param  FileName     The pointer to the name of the source file that generated the assert condition.
+  @param  LineNumber   The line number in the source file that generated the assert condition
+  @param  Description  The pointer to the description of the assert condition.
+
+**/
+VOID
+EFIAPI
+UnitTestDebugAssert (
+  IN CONST CHAR8  *FileName,
+  IN UINTN        LineNumber,
+  IN CONST CHAR8  *Description
+  );
 
 /**
   If Expression is TRUE, then TRUE is returned.
