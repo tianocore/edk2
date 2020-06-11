@@ -53,21 +53,9 @@ CmockaUnitTestFunctionRunner (
     UnitTest->Result = UNIT_TEST_SKIPPED;
   } else {
     UnitTest->Result = UNIT_TEST_RUNNING;
-
     Framework->CurrentTest = UnitTest;
     UnitTest->Result = UnitTest->RunTest (UnitTest->Context);
     Framework->CurrentTest = NULL;
-
-    // Print out the log messages - This is a partial solution as it
-    // does not get the log into the XML.  Need cmocka changes to support
-    // stdout and stderr in their xml format
-    //
-    if (UnitTest->Log != NULL) {
-      print_message("UnitTest: %s - %s\n", UnitTest->Name, UnitTest->Description);
-      print_message("Log Output Start\n");
-      print_message("%s", UnitTest->Log);
-      print_message("Log Output End\n");
-    }
   }
 }
 
@@ -112,13 +100,24 @@ CmockaUnitTestTeardownFunctionRunner (
   Suite     = (UNIT_TEST_SUITE *)(UnitTest->ParentSuite);
   Framework = (UNIT_TEST_FRAMEWORK *)(Suite->ParentFramework);
 
-  if (UnitTest->CleanUp == NULL) {
-    return 0;
+  if (UnitTest->CleanUp != NULL) {
+    Framework->CurrentTest = UnitTest;
+    UnitTest->CleanUp (UnitTest->Context);
+    Framework->CurrentTest = NULL;
   }
 
-  Framework->CurrentTest = UnitTest;
-  UnitTest->CleanUp (UnitTest->Context);
-  Framework->CurrentTest = NULL;
+  //
+  // Print out the log messages - This is a partial solution as it
+  // does not get the log into the XML.  Need cmocka changes to support
+  // stdout and stderr in their xml format
+  //
+  if (UnitTest->Log != NULL) {
+    print_message("UnitTest: %s - %s\n", UnitTest->Name, UnitTest->Description);
+    print_message("Log Output Start\n");
+    print_message("%s", UnitTest->Log);
+    print_message("Log Output End\n");
+  }
+
   //
   // Return 0 for success.  Non-zero for error.
   //
