@@ -105,14 +105,14 @@ UnitTestAssertTrue (
   if (!Expression) {
     UnitTestLogFailure (
       FAILURETYPE_ASSERTTRUE,
-      "%a::%d Expression (%a) is not TRUE!\n",
-      FunctionName,
+      "%a:%d: Expression (%a) is not TRUE!\n",
+      FileName,
       LineNumber,
       Description
       );
     UT_LOG_ERROR (
-      "[ASSERT FAIL] %a::%d Expression (%a) is not TRUE!\n",
-      FunctionName,
+      "[ASSERT FAIL] %a:%d: Expression (%a) is not TRUE!\n",
+      FileName,
       LineNumber,
       Description
       );
@@ -151,14 +151,14 @@ UnitTestAssertFalse (
   if (Expression) {
     UnitTestLogFailure (
       FAILURETYPE_ASSERTFALSE,
-      "%a::%d Expression(%a) is not FALSE!\n",
-      FunctionName,
+      "%a:%d: Expression(%a) is not FALSE!\n",
+      FileName,
       LineNumber,
       Description
       );
     UT_LOG_ERROR (
-      "[ASSERT FAIL] %a::%d Expression (%a) is not FALSE!\n",
-      FunctionName,
+      "[ASSERT FAIL] %a:%d: Expression (%a) is not FALSE!\n",
+      FileName,
       LineNumber,
       Description
       );
@@ -197,15 +197,15 @@ UnitTestAssertNotEfiError (
   if (EFI_ERROR (Status)) {
     UnitTestLogFailure (
       FAILURETYPE_ASSERTNOTEFIERROR,
-      "%a::%d Status '%a' is EFI_ERROR (%r)!\n",
-      FunctionName,
+      "%a:%d: Status '%a' is EFI_ERROR (%r)!\n",
+      FileName,
       LineNumber,
       Description,
       Status
       );
     UT_LOG_ERROR (
-      "[ASSERT FAIL] %a::%d Status '%a' is EFI_ERROR (%r)!\n",
-      FunctionName,
+      "[ASSERT FAIL] %a:%d: Status '%a' is EFI_ERROR (%r)!\n",
+      FileName,
       LineNumber,
       Description,
       Status
@@ -250,8 +250,8 @@ UnitTestAssertEqual (
   if (ValueA != ValueB) {
     UnitTestLogFailure (
       FAILURETYPE_ASSERTEQUAL,
-      "%a::%d Value %a != %a (%d != %d)!\n",
-      FunctionName,
+      "%a:%d: Value %a != %a (%d != %d)!\n",
+      FileName,
       LineNumber,
       DescriptionA,
       DescriptionB,
@@ -259,8 +259,8 @@ UnitTestAssertEqual (
       ValueB
       );
     UT_LOG_ERROR (
-      "[ASSERT FAIL] %a::%d Value %a != %a (%d != %d)!\n",
-      FunctionName,
+      "[ASSERT FAIL] %a:%d: Value %a != %a (%d != %d)!\n",
+      FileName,
       LineNumber,
       DescriptionA,
       DescriptionB,
@@ -312,16 +312,16 @@ UnitTestAssertMemEqual (
   if (CompareMem(BufferA, BufferB, Length) != 0) {
     UnitTestLogFailure (
       FAILURETYPE_ASSERTEQUAL,
-      "%a::%d Memory at %a != %a for length %d bytes!\n",
-      FunctionName,
+      "%a:%d: Memory at %a != %a for length %d bytes!\n",
+      FileName,
       LineNumber,
       DescriptionA,
       DescriptionB,
       Length
       );
     UT_LOG_ERROR (
-      "[ASSERT FAIL] %a::%d Value %a != %a for length %d bytes!\n",
-      FunctionName,
+      "[ASSERT FAIL] %a:%d: Value %a != %a for length %d bytes!\n",
+      FileName,
       LineNumber,
       DescriptionA,
       DescriptionB,
@@ -368,8 +368,8 @@ UnitTestAssertNotEqual (
   if (ValueA == ValueB) {
     UnitTestLogFailure (
       FAILURETYPE_ASSERTNOTEQUAL,
-      "%a::%d Value %a == %a (%d == %d)!\n",
-      FunctionName,
+      "%a:%d: Value %a == %a (%d == %d)!\n",
+      FileName,
       LineNumber,
       DescriptionA,
       DescriptionB,
@@ -377,8 +377,8 @@ UnitTestAssertNotEqual (
       ValueB
       );
     UT_LOG_ERROR (
-      "[ASSERT FAIL] %a::%d Value %a == %a (%d == %d)!\n",
-      FunctionName,
+      "[ASSERT FAIL] %a:%d: Value %a == %a (%d == %d)!\n",
+      FileName,
       LineNumber,
       DescriptionA,
       DescriptionB,
@@ -423,16 +423,16 @@ UnitTestAssertStatusEqual (
   if (Status != Expected) {
     UnitTestLogFailure (
       FAILURETYPE_ASSERTSTATUSEQUAL,
-      "%a::%d Status '%a' is %r, should be %r!\n",
-      FunctionName,
+      "%a:%d: Status '%a' is %r, should be %r!\n",
+      FileName,
       LineNumber,
       Description,
       Status,
       Expected
       );
     UT_LOG_ERROR (
-      "[ASSERT FAIL] %a::%d Status '%a' is %r, should be %r!\n",
-      FunctionName,
+      "[ASSERT FAIL] %a:%d: Status '%a' is %r, should be %r!\n",
+      FileName,
       LineNumber,
       Description,
       Status,
@@ -475,14 +475,14 @@ UnitTestAssertNotNull (
   if (Pointer == NULL) {
     UnitTestLogFailure (
       FAILURETYPE_ASSERTNOTNULL,
-      "%a::%d Pointer (%a) is NULL!\n",
-      FunctionName,
+      "%a:%d: Pointer (%a) is NULL!\n",
+      FileName,
       LineNumber,
       PointerName
       );
     UT_LOG_ERROR (
-      "[ASSERT FAIL] %a::%d Pointer (%a) is NULL!\n",
-      FunctionName,
+      "[ASSERT FAIL] %a:%d: Pointer (%a) is NULL!\n",
+      FileName,
       LineNumber,
       PointerName
       );
