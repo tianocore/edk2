@@ -1,0 +1,31 @@
+## @file
+#  Unit Test Debug Assert Library
+#
+#  Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = UnitTestDebugAssertLib
+  MODULE_UNI_FILE                = UnitTestDebugAssertLib.uni
+  FILE_GUID                      = 9D53AD0D-5416-451F-A5BF-E5420051A99B
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64
+#
+
+[Sources]
+  UnitTestDebugAssertLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  UnitTestLib
