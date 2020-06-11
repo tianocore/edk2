@@ -15,6 +15,9 @@
 #ifndef HPET_REGISTER_H_
 #define HPET_REGISTER_H_
 
+#define HPET_BASE_ADDRESS 0xFED00000
+#define HPET_RANGE_LENGTH 0x1000
+
 ///
 /// HPET General Register Offsets
 ///

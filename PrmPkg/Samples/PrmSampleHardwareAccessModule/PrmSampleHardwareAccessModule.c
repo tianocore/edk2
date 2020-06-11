@@ -42,8 +42,6 @@
 // {8a0efdde-78d0-45f0-aea0-c28245c7e1db}
 #define MMIO_PRINT_HPET_PRM_HANDLER_GUID {0x8a0efdde, 0x78d0, 0x45f0, {0xae, 0xa0, 0xc2, 0x82, 0x45, 0xc7, 0xe1, 0xdb}}
 
-#define HPET_BASE_ADDRESS 0xFED00000
-
 //
 // BEGIN: MtrrLib internal library globals and function prototypes here for testing
 //
