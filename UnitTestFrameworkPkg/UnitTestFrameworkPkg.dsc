@@ -20,6 +20,9 @@
 
 !include UnitTestFrameworkPkg/UnitTestFrameworkPkgTarget.dsc.inc
 
+[PcdsPatchableInModule]
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x17
+
 [Components]
   UnitTestFrameworkPkg/Library/UnitTestLib/UnitTestLib.inf
   UnitTestFrameworkPkg/Library/UnitTestPersistenceLibNull/UnitTestPersistenceLibNull.inf

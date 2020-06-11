@@ -31,3 +31,6 @@
   DebugLib
   UnitTestLib
   PrintLib
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask
