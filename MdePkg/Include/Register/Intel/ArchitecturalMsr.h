@@ -6,7 +6,7 @@
   returned is a single 32-bit or 64-bit value, then a data structure is not
   provided for that MSR.
 
-  Copyright (c) 2016 - 2020, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2019, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Specification Reference:
@@ -208,61 +208,6 @@ typedef union {
   ///
   UINT64  Uint64;
 } MSR_IA32_APIC_BASE_REGISTER;
-
-
-/**
-  Used to select the mode for the Data Cache Unit (DCU). This MSR is only 
-  available when more then one DCU mode is selectable. The DCU_MODE MSR 
-  is shared at the core level and is only readable and writable when the
-  DCU Mode Select Support bit in MSR_PLATFORM_INFO indicates more than 
-  one DCU mode is available.
-
-  @param  ECX  MSR_DCU_MODE (0x00000031)
-  @param  EAX  Lower 32-bits of MSR value.
-               Described by the type MSR_DCU_MODE_REGISTER.
-  @param  EDX  Upper 32-bits of MSR value.
-               Described by the type MSR_DCU_MODE_REGISTER.
-
-  <b>Example usage</b>
-  @code
-  MSR_DCU_MODE_REGISTER  Msr;
-
-  Msr.Uint64 = AsmReadMsr64 (MSR_DCU_MODE);
-  AsmWriteMsr64 (MSR_DCU_MODE, Msr.Uint64);
-  @endcode
-**/
-#define MSR_DCU_MODE                           0x00000031
-
-/**
-  MSR information returned for MSR index #MSR_DCU_MODE
-**/
-typedef union {
-  ///
-  /// Individual bit fields
-  ///
-  struct {
-    ///
-    /// [Bit 0] DCU Mode Select (Read/Write Once):
-    ///
-    /// When read as 0 (default), the DCU Mode is 32-KB 8-way without ECC 
-    /// (Normal Mode). When read as 1, the BIOS has changed the DCU mode 
-    /// to 16-KB 4-way with ECC (Mirror Mode).
-    ///
-    /// If the DCU Mode is 0 and the first transition of the CR0.CD bit 
-    /// from 1 to 0 has not occurred by either thread in this core, then 
-    /// a write of 1 selects the DCU mode as 16-KB 4-way with ECC. After 
-    /// the first write, all further writes are ignored.
-    ///
-    UINT32  DcuModeSelect:1;
-    UINT32  Reserved1:31;
-    UINT32  Reserved2:32;
-
-  } Bits;
-  ///
-  /// All bit fields as a 64-bit value
-  ///
-  UINT64  Uint64;
-} MSR_DCU_MODE_REGISTER;
 
 
 /**
@@ -647,79 +592,6 @@ typedef struct {
 #define MSR_IA32_PMC6                            0x000000C7
 #define MSR_IA32_PMC7                            0x000000C8
 /// @}
-
-
-/**
-  Platform Information MSR contains read-only package-level 
-  capabilities information.
-
-  @param  ECX  MSR_PLATFORM_INFO (0x000000CE)
-  @param  EAX  Lower 32-bits of MSR value.
-               Described by the type MSR_PLATFORM_INFO_REGISTER.
-  @param  EDX  Upper 32-bits of MSR value.
-               Described by the type MSR_PLATFORM_INFO_REGISTER.
-
-  <b>Example usage</b>
-  @code
-  MSR_PLATFORM_INFO_REGISTER  Msr;
-
-  Msr.Uint64 = AsmReadMsr64 (MSR_PLATFORM_INFO);
-  AsmWriteMsr64 (MSR_PLATFORM_INFO, Msr.Uint64);
-  @endcode
-**/
-#define MSR_PLATFORM_INFO                0x000000CE
-
-/**
-  MSR information returned for MSR index #MSR_PLATFORM_INFO
-**/
-typedef union {
-  ///
-  /// Individual bit fields
-  ///
-  struct {
-    UINT32  Reserved1:8;
-    ///
-    /// [Bits 15:8] Package. Maximum Non-Turbo Ratio (R/O) See Table 2-25.
-    ///
-    UINT32  MaximumNon_TurboRatio:8;
-    UINT32  Reserved2:7;
-    ///
-    /// [Bit 23] Package. PPIN_CAP (R/O) See Table 2-25.
-    ///
-    UINT32  PPIN_CAP:1;
-    UINT32  Reserved3:2;
-    ///
-    /// [Bit 26] Package. DCU_MODE_SELECT_SUPPORT (R/O) See Table 2-25.
-    ///
-    UINT32  DcuModeSelectSupport:1;
-    UINT32  Reserved4:1;
-    ///
-    /// [Bit 28] Package. Programmable Ratio Limit for Turbo Mode (R/O) See
-    /// Table 2-25.
-    ///
-    UINT32  ProgrammableRatioLimit:1;
-    ///
-    /// [Bit 29] Package. Programmable TDP Limit for Turbo Mode (R/O) See
-    /// Table 2-25.
-    ///
-    UINT32  ProgrammableTDPLimit:1;
-    ///
-    /// [Bit 30] Package. Programmable TJ OFFSET (R/O) See Table 2-25.
-    ///
-    UINT32  ProgrammableTJOFFSET:1;
-    UINT32  Reserved5:1;
-    UINT32  Reserved6:8;
-    ///
-    /// [Bits 47:40] Package. Maximum Efficiency Ratio (R/O) See Table 2-25.
-    ///
-    UINT32  MaximumEfficiencyRatio:8;
-    UINT32  Reserved7:16;
-  } Bits;
-  ///
-  /// All bit fields as a 64-bit value
-  ///
-  UINT64  Uint64;
-} MSR_PLATFORM_INFO_REGISTER;
 
 
 /**
