@@ -14,6 +14,8 @@
 
 STATIC UNIT_TEST_FRAMEWORK_HANDLE  mFrameworkHandle = NULL;
 
+BASE_LIBRARY_JUMP_BUFFER  gUnitTestJumpBuffer;
+
 UNIT_TEST_FRAMEWORK_HANDLE
 GetActiveFrameworkHandle (
   VOID
@@ -75,7 +77,14 @@ RunTestSuite (
     // Next, if we're still running, make sure that our test prerequisites are in place.
     if (Test->Result == UNIT_TEST_PENDING && Test->Prerequisite != NULL) {
       DEBUG ((DEBUG_VERBOSE, "PREREQ\n"));
-      if (Test->Prerequisite (Test->Context) != UNIT_TEST_PASSED) {
+      if (SetJump (&gUnitTestJumpBuffer) == 0) {
+        if (Test->Prerequisite (Test->Context) != UNIT_TEST_PASSED) {
+          DEBUG ((DEBUG_ERROR, "Prerequisite Not Met\n"));
+          Test->Result = UNIT_TEST_ERROR_PREREQUISITE_NOT_MET;
+          ParentFramework->CurrentTest  = NULL;
+          continue;
+        }
+      } else {
         DEBUG ((DEBUG_ERROR, "Prerequisite Not Met\n"));
         Test->Result = UNIT_TEST_ERROR_PREREQUISITE_NOT_MET;
         ParentFramework->CurrentTest  = NULL;
@@ -88,14 +97,20 @@ RunTestSuite (
     // We set the status to UNIT_TEST_RUNNING in case the test needs to reboot
     // or quit. The UNIT_TEST_RUNNING state will allow the test to resume
     // but will prevent the Prerequisite from being dispatched a second time.
-    Test->Result = UNIT_TEST_RUNNING;
-    Test->Result = Test->RunTest (Test->Context);
+    if (SetJump (&gUnitTestJumpBuffer) == 0) {
+      Test->Result = UNIT_TEST_RUNNING;
+      Test->Result = Test->RunTest (Test->Context);
+    } else {
+      Test->Result = UNIT_TEST_ERROR_TEST_FAILED;
+    }
 
     //
     // Finally, clean everything up, if need be.
     if (Test->CleanUp != NULL) {
       DEBUG ((DEBUG_VERBOSE, "CLEANUP\n"));
-      Test->CleanUp (Test->Context);
+      if (SetJump (&gUnitTestJumpBuffer) == 0) {
+        Test->CleanUp (Test->Context);
+      }
     }
 
     //

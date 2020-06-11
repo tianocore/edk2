@@ -44,6 +44,7 @@ typedef UINT32 FAILURE_TYPE;
 #define FAILURETYPE_ASSERTNOTEFIERROR    (6)
 #define FAILURETYPE_ASSERTSTATUSEQUAL    (7)
 #define FAILURETYPE_ASSERTNOTNULL        (8)
+#define FAILURETYPE_EXPECTASSERT         (9)
 
 ///
 /// Unit Test context structure tracked by the unit test framework.
