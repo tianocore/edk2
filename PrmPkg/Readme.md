@@ -9,7 +9,7 @@ The `PrmPkg` maintained in this branch provides a single cohesive set of generic
 to be leveraged by platform firmware with minimal overhead to integrate PRM functionality in the firmware.
 
 ## **IMPORTANT NOTE**
-> The code provided  in this package and branch are for proof-of-concept purposes only. The code does not represent a
+> The code provided in this package and branch are for proof-of-concept purposes only. The code does not represent a
 formal design and is not validated at product quality. The development of this feature is shared in the edk2-staging
 branch to simplify collaboration by allowing direct code contributions and early feedback throughout its development.
 
@@ -119,6 +119,9 @@ that infrastructure. The PrmPkg is meant to be used as-is by firmware that suppo
 prevent the package from being used as-is should be addressed directly in PrmPkg.
 
 ## PRM Module
+
+> __*Note*__: You can find simple examples of PRM modules in the Samples directory of this package.
+> [Samples/Readme.md](PrmPkg/Samples/Readme.md) has more information.
 
 By default, the EDK II implementation of UEFI does not allow images with the subsystem type
 IMAGE_SUBSYSTEM_EFI_RUNTIME_DRIVER to be built with exports. 
