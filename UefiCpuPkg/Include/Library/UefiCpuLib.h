@@ -5,6 +5,7 @@
   to be UEFI specification compliant.
 
   Copyright (c) 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2020, AMD Inc. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -26,6 +27,19 @@
 VOID
 EFIAPI
 InitializeFloatingPointUnits (
+  VOID
+  );
+
+/**
+  Determine if the standard CPU signature is "AuthenticAMD".
+
+  @retval TRUE  The CPU signature matches.
+  @retval FALSE The CPU signature does not match.
+
+**/
+BOOLEAN
+EFIAPI
+StandardSignatureIsAuthenticAMD (
   VOID
   );
 
