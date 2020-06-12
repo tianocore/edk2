@@ -4,6 +4,7 @@
 #  The library routines are UEFI specification compliant.
 #
 #  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2020, AMD Inc. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -29,6 +30,12 @@
 [Sources.X64]
   X64/InitializeFpu.nasm
 
+[Sources]
+  BaseUefiCpuLib.c
+
 [Packages]
   MdePkg/MdePkg.dec
   UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseLib
