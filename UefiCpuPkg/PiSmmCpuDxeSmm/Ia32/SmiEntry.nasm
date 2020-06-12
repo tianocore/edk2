@@ -1,5 +1,6 @@
 ;------------------------------------------------------------------------------ ;
 ; Copyright (c) 2016 - 2019, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2020, AMD Incorporated. All rights reserved.<BR>
 ; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;
 ; Module Name:
@@ -59,6 +60,7 @@ global ASM_PFX(gPatchSmiStack)
 global ASM_PFX(gPatchSmbase)
 extern ASM_PFX(mXdSupported)
 global ASM_PFX(gPatchXdSupported)
+global ASM_PFX(gPatchMsrIa32MiscEnableSupported)
 extern ASM_PFX(gSmiHandlerIdtr)
 
 extern ASM_PFX(mCetSupported)
@@ -153,17 +155,30 @@ ASM_PFX(gPatchSmiCr3):
 ASM_PFX(gPatchXdSupported):
     cmp     al, 0
     jz      @SkipXd
+
+; If MSR_IA32_MISC_ENABLE is supported, clear XD Disable bit
+    mov     al, strict byte 1           ; source operand may be patched
+ASM_PFX(gPatchMsrIa32MiscEnableSupported):
+    cmp     al, 1
+    jz      MsrIa32MiscEnableSupported
+
+; MSR_IA32_MISC_ENABLE not supported
+    xor     edx, edx
+    push    edx                         ; don't try to restore the XD Disable bit just before RSM
+    jmp     EnableNxe
+
 ;
 ; Check XD disable bit
 ;
+MsrIa32MiscEnableSupported:
     mov     ecx, MSR_IA32_MISC_ENABLE
     rdmsr
     push    edx                        ; save MSR_IA32_MISC_ENABLE[63-32]
     test    edx, BIT2                  ; MSR_IA32_MISC_ENABLE[34]
-    jz      .5
+    jz      EnableNxe
     and     dx, 0xFFFB                 ; clear XD Disable bit if it is set
     wrmsr
-.5:
+EnableNxe:
     mov     ecx, MSR_EFER
     rdmsr
     or      ax, MSR_EFER_XD             ; enable NXE
