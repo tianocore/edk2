@@ -5,6 +5,7 @@
 #  where local APIC is disabled.
 #
 #  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2020, AMD Inc. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -37,6 +38,7 @@
   TimerLib
   IoLib
   PcdLib
+  UefiCpuLib
 
 [Pcd]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuInitIpiDelayInMicroSeconds  ## SOMETIMES_CONSUMES
