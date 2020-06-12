@@ -2,6 +2,7 @@
 SMM profile internal header file.
 
 Copyright (c) 2012 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2020, AMD Incorporated. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -13,6 +14,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/DxeServicesTableLib.h>
 #include <Library/CpuLib.h>
+#include <Library/UefiCpuLib.h>
 #include <IndustryStandard/Acpi.h>
 
 #include "SmmProfileArch.h"
@@ -99,6 +101,7 @@ extern SMM_S3_RESUME_STATE       *mSmmS3ResumeState;
 extern UINTN                     gSmiExceptionHandlers[];
 extern BOOLEAN                   mXdSupported;
 X86_ASSEMBLY_PATCH_LABEL         gPatchXdSupported;
+X86_ASSEMBLY_PATCH_LABEL         gPatchMsrIa32MiscEnableSupported;
 extern UINTN                     *mPFEntryCount;
 extern UINT64                    (*mLastPFEntryValue)[MAX_PF_ENTRY_COUNT];
 extern UINT64                    *(*mLastPFEntryPointer)[MAX_PF_ENTRY_COUNT];
