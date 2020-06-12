@@ -36,6 +36,14 @@
   #
   PrmContextBufferLib|Include/Library/PrmContextBufferLib.h
 
+  ## @libraryclass Provides functionality to discover PRM modules installed by platform firmware
+  #
+  PrmModuleDiscoveryLib|Include/Library/PrmModuleDiscoveryLib.h
+
+  ## @libraryclass Provides additional PE/COFF functionality needed to support the Platform Runtime Mechanism (PRM) loader driver.
+  #
+  PrmPeCoffLib|Include/Library/PrmPeCoffLib.h
+
 [Protocols]
   ## PRM Configuration Protocol
   #

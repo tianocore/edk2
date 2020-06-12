@@ -22,7 +22,6 @@
 
 [Sources]
   PrmAcpiTable.h
-  PrmLoader.h
   PrmLoaderDxe.c
 
 [Packages]
@@ -39,8 +38,9 @@
   DebugLib
   MemoryAllocationLib
   PcdLib
-  PeCoffLib
   PrmContextBufferLib
+  PrmModuleDiscoveryLib
+  PrmPeCoffLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
   UefiLib
@@ -54,7 +54,6 @@
 
 [Protocols]
   gEfiAcpiTableProtocolGuid
-  gEfiLoadedImageProtocolGuid
   gPrmConfigProtocolGuid
 
 [Depex]
