@@ -2,7 +2,7 @@
 Enable SMM profile.
 
 Copyright (c) 2012 - 2019, Intel Corporation. All rights reserved.<BR>
-Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
+Copyright (c) 2017 - 2020, AMD Incorporated. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -1014,6 +1014,13 @@ CheckFeatureSupported (
       //
       mXdSupported = FALSE;
       PatchInstructionX86 (gPatchXdSupported, mXdSupported, 1);
+    }
+
+    if (StandardSignatureIsAuthenticAMD ()) {
+      //
+      // AMD processors do not support MSR_IA32_MISC_ENABLE
+      //
+      PatchInstructionX86 (gPatchMsrIa32MiscEnableSupported, FALSE, 1);
     }
   }
 
