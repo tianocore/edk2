@@ -5,7 +5,7 @@
   which have xAPIC and x2APIC modes.
 
   Copyright (c) 2010 - 2019, Intel Corporation. All rights reserved.<BR>
-  Copyright (c) 2017, AMD Inc. All rights reserved.<BR>
+  Copyright (c) 2017 - 2020, AMD Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -22,32 +22,11 @@
 #include <Library/IoLib.h>
 #include <Library/TimerLib.h>
 #include <Library/PcdLib.h>
+#include <Library/UefiCpuLib.h>
 
 //
 // Library internal functions
 //
-
-/**
-  Determine if the standard CPU signature is "AuthenticAMD".
-
-  @retval TRUE  The CPU signature matches.
-  @retval FALSE The CPU signature does not match.
-
-**/
-BOOLEAN
-StandardSignatureIsAuthenticAMD (
-  VOID
-  )
-{
-  UINT32  RegEbx;
-  UINT32  RegEcx;
-  UINT32  RegEdx;
-
-  AsmCpuid (CPUID_SIGNATURE, NULL, &RegEbx, &RegEcx, &RegEdx);
-  return (RegEbx == CPUID_SIGNATURE_AUTHENTIC_AMD_EBX &&
-          RegEcx == CPUID_SIGNATURE_AUTHENTIC_AMD_ECX &&
-          RegEdx == CPUID_SIGNATURE_AUTHENTIC_AMD_EDX);
-}
 
 /**
   Determine if the CPU supports the Local APIC Base Address MSR.
