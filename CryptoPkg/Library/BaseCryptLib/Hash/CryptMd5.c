@@ -9,7 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "InternalCryptLib.h"
 #include <openssl/md5.h>
 
-
+#ifndef DISABLE_MD5_DEPRECATED_INTERFACES
 /**
   Retrieves the size, in bytes, of the context buffer required for MD5 hash operations.
 
@@ -223,3 +223,4 @@ Md5HashAll (
     return TRUE;
   }
 }
+#endif
