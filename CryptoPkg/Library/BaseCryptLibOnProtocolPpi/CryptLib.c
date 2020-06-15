@@ -99,6 +99,7 @@ CryptoServiceNotAvailable (
 //    One-Way Cryptographic Hash Primitives
 //=====================================================================================
 
+#ifndef DISABLE_MD5_DEPRECATED_INTERFACES
 /**
   Retrieves the size, in bytes, of the context buffer required for MD5 hash operations.
 
@@ -256,6 +257,7 @@ Md5HashAll (
 {
   CALL_CRYPTO_SERVICE (Md5HashAll, (Data, DataSize, HashValue), FALSE);
 }
+#endif
 
 /**
   Retrieves the size, in bytes, of the context buffer required for SHA-1 hash operations.
