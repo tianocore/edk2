@@ -243,6 +243,154 @@ DeprecatedCryptoServiceMd4HashAll (
   return BaseCryptLibServiceDeprecated ("Md4HashAll"), FALSE;
 }
 
+#ifdef DISABLE_MD5_DEPRECATED_INTERFACES
+/**
+  Retrieves the size, in bytes, of the context buffer required for MD5 hash operations.
+
+  If this interface is not supported, then return zero.
+
+  @retval  0   This interface is not supported.
+
+**/
+UINTN
+EFIAPI
+DeprecatedCryptoServiceMd5GetContextSize (
+  VOID
+  )
+{
+  return BaseCryptLibServiceDeprecated ("Md5GetContextSize"), 0;
+}
+
+/**
+  Initializes user-supplied memory pointed by Md5Context as MD5 hash context for
+  subsequent use.
+
+  If Md5Context is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[out]  Md5Context  Pointer to MD5 context being initialized.
+
+  @retval FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+DeprecatedCryptoServiceMd5Init (
+  OUT  VOID  *Md5Context
+  )
+{
+  return BaseCryptLibServiceDeprecated ("Md5Init"), FALSE;
+}
+
+/**
+  Makes a copy of an existing MD5 context.
+
+  If Md5Context is NULL, then return FALSE.
+  If NewMd5Context is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[in]  Md5Context     Pointer to MD5 context being copied.
+  @param[out] NewMd5Context  Pointer to new MD5 context.
+
+  @retval FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+DeprecatedCryptoServiceMd5Duplicate (
+  IN   CONST VOID  *Md5Context,
+  OUT  VOID        *NewMd5Context
+  )
+{
+  return BaseCryptLibServiceDeprecated ("Md5Init"), FALSE;
+}
+
+/**
+  Digests the input data and updates MD5 context.
+
+  This function performs MD5 digest on a data buffer of the specified size.
+  It can be called multiple times to compute the digest of long or discontinuous data streams.
+  MD5 context should be already correctly initialized by Md5Init(), and should not be finalized
+  by Md5Final(). Behavior with invalid context is undefined.
+
+  If Md5Context is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[in, out]  Md5Context  Pointer to the MD5 context.
+  @param[in]       Data        Pointer to the buffer containing the data to be hashed.
+  @param[in]       DataSize    Size of Data buffer in bytes.
+
+  @retval FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+DeprecatedCryptoServiceMd5Update (
+  IN OUT  VOID        *Md5Context,
+  IN      CONST VOID  *Data,
+  IN      UINTN       DataSize
+  )
+{
+  return BaseCryptLibServiceDeprecated ("Md5Init"), FALSE;
+}
+
+/**
+  Completes computation of the MD5 digest value.
+
+  This function completes MD5 hash computation and retrieves the digest value into
+  the specified memory. After this function has been called, the MD5 context cannot
+  be used again.
+  MD5 context should be already correctly initialized by Md5Init(), and should not be
+  finalized by Md5Final(). Behavior with invalid MD5 context is undefined.
+
+  If Md5Context is NULL, then return FALSE.
+  If HashValue is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[in, out]  Md5Context  Pointer to the MD5 context.
+  @param[out]      HashValue   Pointer to a buffer that receives the MD5 digest
+                               value (16 bytes).
+
+  @retval FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+DeprecatedCryptoServiceMd5Final (
+  IN OUT  VOID   *Md5Context,
+  OUT     UINT8  *HashValue
+  )
+{
+  return BaseCryptLibServiceDeprecated ("Md5Final"), FALSE;
+}
+
+/**
+  Computes the MD5 message digest of a input data buffer.
+
+  This function performs the MD5 message digest of a given data buffer, and places
+  the digest value into the specified memory.
+
+  If this interface is not supported, then return FALSE.
+
+  @param[in]   Data        Pointer to the buffer containing the data to be hashed.
+  @param[in]   DataSize    Size of Data buffer in bytes.
+  @param[out]  HashValue   Pointer to a buffer that receives the MD5 digest
+                           value (16 bytes).
+
+  @retval FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+DeprecatedCryptoServiceMd5HashAll (
+  IN   CONST VOID  *Data,
+  IN   UINTN       DataSize,
+  OUT  UINT8       *HashValue
+  )
+{
+  return BaseCryptLibServiceDeprecated ("Md5HashAll"), FALSE;
+}
+#else
 /**
   Retrieves the size, in bytes, of the context buffer required for MD5 hash operations.
 
@@ -400,6 +548,7 @@ CryptoServiceMd5HashAll (
 {
   return CALL_BASECRYPTLIB (Md5.Services.HashAll, Md5HashAll, (Data, DataSize, HashValue), FALSE);
 }
+#endif
 
 /**
   Retrieves the size, in bytes, of the context buffer required for SHA-1 hash operations.
@@ -4194,6 +4343,15 @@ const EDKII_CRYPTO_PROTOCOL mEdkiiCrypto = {
   DeprecatedCryptoServiceMd4Update,
   DeprecatedCryptoServiceMd4Final,
   DeprecatedCryptoServiceMd4HashAll,
+#ifdef DISABLE_MD5_DEPRECATED_INTERFACES
+  /// Md5 - deprecated and unsupported
+  DeprecatedCryptoServiceMd5GetContextSize,
+  DeprecatedCryptoServiceMd5Init,
+  DeprecatedCryptoServiceMd5Duplicate,
+  DeprecatedCryptoServiceMd5Update,
+  DeprecatedCryptoServiceMd5Final,
+  DeprecatedCryptoServiceMd5HashAll,
+#else
   /// Md5
   CryptoServiceMd5GetContextSize,
   CryptoServiceMd5Init,
@@ -4201,6 +4359,7 @@ const EDKII_CRYPTO_PROTOCOL mEdkiiCrypto = {
   CryptoServiceMd5Update,
   CryptoServiceMd5Final,
   CryptoServiceMd5HashAll,
+#endif
   /// Pkcs
   CryptoServicePkcs1v2Encrypt,
   CryptoServicePkcs5HashPassword,
