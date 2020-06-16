@@ -79,8 +79,6 @@ TimerInterruptHandler (
 
   OriginalTPL = gBS->RaiseTPL (TPL_HIGH_LEVEL);
 
-  mLegacy8259->EndOfInterrupt (mLegacy8259, Efi8259Irq0);
-
   if (mTimerNotifyFunction != NULL) {
     //
     // @bug : This does not handle missed timer interrupts
@@ -89,6 +87,9 @@ TimerInterruptHandler (
   }
 
   gBS->RestoreTPL (OriginalTPL);
+
+  DisableInterrupts ();
+  mLegacy8259->EndOfInterrupt (mLegacy8259, Efi8259Irq0);
 }
 
 /**
