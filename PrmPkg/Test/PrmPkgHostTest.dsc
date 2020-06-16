@@ -19,6 +19,7 @@
 !include UnitTestFrameworkPkg/UnitTestFrameworkPkgHost.dsc.inc
 
 [LibraryClasses]
+  PrmContextBufferLib|PrmPkg/Library/DxePrmContextBufferLib/DxePrmContextBufferLib.inf
   UefiBootServicesTableLib|PrmPkg/Test/UnitTest/Library/UefiBootServicesTableLibUnitTest/UefiBootServicesTableLibUnitTest.inf
 
 [Components]
@@ -26,3 +27,8 @@
   # Unit test helper libraries
   #
   PrmPkg/Test/UnitTest/Library/UefiBootServicesTableLibUnitTest/UefiBootServicesTableLibUnitTest.inf
+
+  #
+  # Unit test host applications
+  #
+  PrmPkg/Library/DxePrmContextBufferLib/UnitTest/DxePrmContextBufferLibUnitTestHost.inf

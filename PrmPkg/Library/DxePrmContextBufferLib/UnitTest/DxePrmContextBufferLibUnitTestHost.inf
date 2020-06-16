@@ -1,0 +1,46 @@
+## @file
+#  PRM Context Buffer Library Host-Based Unit Tests
+#
+#  Copyright (c) Microsoft Corporation
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = PrmContextBufferLibUnitTestHost
+  FILE_GUID                      = F1FB5F32-BDB5-4391-BD6D-979E90EE2DC3
+  MODULE_TYPE                    = HOST_APPLICATION
+  VERSION_STRING                 = 1.0
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64
+#
+
+[Sources]
+  DxePrmContextBufferLibUnitTest.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+  PrmPkg/PrmPkg.dec
+
+[Guids]
+  gZeroGuid
+
+[Protocols]
+  gPrmConfigProtocolGuid
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  PrintLib
+  PrmContextBufferLib
+  UefiBootServicesTableLib
+  UnitTestLib
