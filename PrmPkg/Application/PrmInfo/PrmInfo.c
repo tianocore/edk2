@@ -215,7 +215,7 @@ GatherPrmHandlerInfo (
     Status = GetModuleContextBuffers (
               ByModuleGuid,
               CurrentModuleGuid,
-              &CurrentModuleContextBuffers
+              (CONST PRM_MODULE_CONTEXT_BUFFERS **) &CurrentModuleContextBuffers
               );
     ASSERT (!EFI_ERROR (Status) || Status == EFI_NOT_FOUND);
     if (!EFI_ERROR (Status) && CurrentModuleContextBuffers != NULL) {
@@ -266,7 +266,7 @@ GatherPrmHandlerInfo (
       Status =  GetContextBuffer (
                   CurrentHandlerContext.Guid,
                   CurrentModuleContextBuffers,
-                  &CurrentContextBuffer
+                  (CONST PRM_CONTEXT_BUFFER **) &CurrentContextBuffer
                   );
       if (!EFI_ERROR (Status)) {
         CurrentHandlerContext.StaticDataBuffer = CurrentContextBuffer->StaticDataBuffer;
@@ -514,7 +514,7 @@ ParseParameterList (
   )
 {
   EFI_STATUS                            Status;
-  SHELL_STATUS                          ReturnStatus;
+  EFI_STATUS                            ReturnStatus;
   UINTN                                 ArgumentCount;
   EFI_GUID                              HandlerGuid;
   BOOLEAN                               PrintHandlerInfo;
