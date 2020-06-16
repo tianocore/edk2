@@ -550,6 +550,156 @@ CryptoServiceMd5HashAll (
 }
 #endif
 
+#ifdef DISABLE_SHA1_DEPRECATED_INTERFACES
+/**
+  Retrieves the size, in bytes, of the context buffer required for SHA-1 hash operations.
+
+  If this interface is not supported, then return zero.
+
+  @retval  0   This interface is not supported.
+
+**/
+UINTN
+EFIAPI
+DeprecatedCryptoServiceSha1GetContextSize (
+  VOID
+  )
+{
+  return BaseCryptLibServiceDeprecated ("Sha1GetContextSize"), 0;
+}
+
+/**
+  Initializes user-supplied memory pointed by Sha1Context as SHA-1 hash context for
+  subsequent use.
+
+  If Sha1Context is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[out]  Sha1Context  Pointer to SHA-1 context being initialized.
+
+  @retval TRUE   SHA-1 context initialization succeeded.
+  @retval FALSE  SHA-1 context initialization failed.
+  @retval FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+DeprecatedCryptoServiceSha1Init (
+  OUT  VOID  *Sha1Context
+  )
+{
+  return BaseCryptLibServiceDeprecated ("Sha1Init"), FALSE;
+}
+
+/**
+  Makes a copy of an existing SHA-1 context.
+
+  If Sha1Context is NULL, then return FALSE.
+  If NewSha1Context is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[in]  Sha1Context     Pointer to SHA-1 context being copied.
+  @param[out] NewSha1Context  Pointer to new SHA-1 context.
+
+  @retval FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+DeprecatedCryptoServiceSha1Duplicate (
+  IN   CONST VOID  *Sha1Context,
+  OUT  VOID        *NewSha1Context
+  )
+{
+  return BaseCryptLibServiceDeprecated ("Sha1Duplicate"), FALSE;
+}
+
+/**
+  Digests the input data and updates SHA-1 context.
+
+  This function performs SHA-1 digest on a data buffer of the specified size.
+  It can be called multiple times to compute the digest of long or discontinuous data streams.
+  SHA-1 context should be already correctly initialized by Sha1Init(), and should not be finalized
+  by Sha1Final(). Behavior with invalid context is undefined.
+
+  If Sha1Context is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[in, out]  Sha1Context  Pointer to the SHA-1 context.
+  @param[in]       Data         Pointer to the buffer containing the data to be hashed.
+  @param[in]       DataSize     Size of Data buffer in bytes.
+
+  @retval FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+DeprecatedCryptoServiceSha1Update (
+  IN OUT  VOID        *Sha1Context,
+  IN      CONST VOID  *Data,
+  IN      UINTN       DataSize
+  )
+{
+  return BaseCryptLibServiceDeprecated ("Sha1Update"), FALSE;
+}
+
+/**
+  Completes computation of the SHA-1 digest value.
+
+  This function completes SHA-1 hash computation and retrieves the digest value into
+  the specified memory. After this function has been called, the SHA-1 context cannot
+  be used again.
+  SHA-1 context should be already correctly initialized by Sha1Init(), and should not be
+  finalized by Sha1Final(). Behavior with invalid SHA-1 context is undefined.
+
+  If Sha1Context is NULL, then return FALSE.
+  If HashValue is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[in, out]  Sha1Context  Pointer to the SHA-1 context.
+  @param[out]      HashValue    Pointer to a buffer that receives the SHA-1 digest
+                                value (20 bytes).
+
+  @retval FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+DeprecatedCryptoServiceSha1Final (
+  IN OUT  VOID   *Sha1Context,
+  OUT     UINT8  *HashValue
+  )
+{
+  return BaseCryptLibServiceDeprecated ("Sha1Final"), FALSE;
+}
+
+/**
+  Computes the SHA-1 message digest of a input data buffer.
+
+  This function performs the SHA-1 message digest of a given data buffer, and places
+  the digest value into the specified memory.
+
+  If this interface is not supported, then return FALSE.
+
+  @param[in]   Data        Pointer to the buffer containing the data to be hashed.
+  @param[in]   DataSize    Size of Data buffer in bytes.
+  @param[out]  HashValue   Pointer to a buffer that receives the SHA-1 digest
+                           value (20 bytes).
+
+  @retval FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+DeprecatedCryptoServiceSha1HashAll (
+  IN   CONST VOID  *Data,
+  IN   UINTN       DataSize,
+  OUT  UINT8       *HashValue
+  )
+{
+  return BaseCryptLibServiceDeprecated ("Sha1HashAll"), FALSE;
+}
+#else
 /**
   Retrieves the size, in bytes, of the context buffer required for SHA-1 hash operations.
 
@@ -707,6 +857,7 @@ CryptoServiceSha1HashAll (
 {
   return CALL_BASECRYPTLIB (Sha1.Services.HashAll, Sha1HashAll, (Data, DataSize, HashValue), FALSE);
 }
+#endif
 
 /**
   Retrieves the size, in bytes, of the context buffer required for SHA-256 hash operations.
@@ -4394,6 +4545,15 @@ const EDKII_CRYPTO_PROTOCOL mEdkiiCrypto = {
   CryptoServiceRsaPkcs1Verify,
   CryptoServiceRsaGetPrivateKeyFromPem,
   CryptoServiceRsaGetPublicKeyFromX509,
+#ifdef DISABLE_SHA1_DEPRECATED_INTERFACES
+  /// Sha1 - deprecated and unsupported
+  DeprecatedCryptoServiceSha1GetContextSize,
+  DeprecatedCryptoServiceSha1Init,
+  DeprecatedCryptoServiceSha1Duplicate,
+  DeprecatedCryptoServiceSha1Update,
+  DeprecatedCryptoServiceSha1Final,
+  DeprecatedCryptoServiceSha1HashAll,
+#else
   /// Sha1
   CryptoServiceSha1GetContextSize,
   CryptoServiceSha1Init,
@@ -4401,6 +4561,7 @@ const EDKII_CRYPTO_PROTOCOL mEdkiiCrypto = {
   CryptoServiceSha1Update,
   CryptoServiceSha1Final,
   CryptoServiceSha1HashAll,
+#endif
   /// Sha256
   CryptoServiceSha256GetContextSize,
   CryptoServiceSha256Init,
