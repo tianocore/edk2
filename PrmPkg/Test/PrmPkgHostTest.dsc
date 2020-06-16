@@ -15,3 +15,14 @@
   SUPPORTED_ARCHITECTURES = IA32|X64
   BUILD_TARGETS           = NOOPT
   SKUID_IDENTIFIER        = DEFAULT
+
+!include UnitTestFrameworkPkg/UnitTestFrameworkPkgHost.dsc.inc
+
+[LibraryClasses]
+  UefiBootServicesTableLib|PrmPkg/Test/UnitTest/Library/UefiBootServicesTableLibUnitTest/UefiBootServicesTableLibUnitTest.inf
+
+[Components]
+  #
+  # Unit test helper libraries
+  #
+  PrmPkg/Test/UnitTest/Library/UefiBootServicesTableLibUnitTest/UefiBootServicesTableLibUnitTest.inf

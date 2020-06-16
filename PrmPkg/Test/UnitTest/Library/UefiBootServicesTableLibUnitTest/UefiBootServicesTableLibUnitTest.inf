@@ -1,0 +1,46 @@
+## @file
+# UEFI Boot Services Table Library for unit tests implementation.
+#
+# Copyright (c) Microsoft Corporation
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = UefiBootServicesTableLibUnitTest
+  MODULE_UNI_FILE                = UefiBootServicesTableLibTest.uni
+  FILE_GUID                      = 725E1CCD-07F1-4964-9A3E-9AA6DCC51DE6
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = UefiBootServicesTableLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER SMM_CORE
+
+  CONSTRUCTOR                    = UefiBootServicesTableLibUnitTestConstructor
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  UefiBootServicesTableLibUnitTest.h
+  UefiBootServicesTableLibUnitTest.c
+  UefiBootServicesTableLibUnitTestEventTimer.c
+  UefiBootServicesTableLibUnitTestImage.c
+  UefiBootServicesTableLibUnitTestMemory.c
+  UefiBootServicesTableLibUnitTestProtocol.h
+  UefiBootServicesTableLibUnitTestProtocol.c
+  UefiBootServicesTableLibUnitTestMisc.c
+  UefiBootServicesTableLibUnitTestTpl.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  UnitTestLib
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  TimerExtra.uni
