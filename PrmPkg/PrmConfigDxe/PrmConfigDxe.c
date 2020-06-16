@@ -361,10 +361,8 @@ PrmConfigVirtualAddressChangeEvent (
   @param[in]  Context         The pointer to the notification function's context,
                               which is implementation-dependent.
 
-  @retval EFI_SUCCESS         The function executed successfully
-
 **/
-EFI_STATUS
+VOID
 EFIAPI
 PrmConfigEndOfDxeNotification (
   IN  EFI_EVENT               Event,
@@ -446,8 +444,6 @@ PrmConfigEndOfDxeNotification (
     gBS->FreePool (HandleBuffer);
   }
   gBS->CloseEvent(Event);
-
-  return EFI_SUCCESS;
 }
 
 /**
@@ -476,7 +472,7 @@ PrmConfigEntryPoint (
   // Register a notification function to change memory attributes at end of DXE
   //
   Event = NULL;
-  Status = gBS->CreateEventEx(
+  Status = gBS->CreateEventEx (
                   EVT_NOTIFY_SIGNAL,
                   TPL_CALLBACK,
                   PrmConfigEndOfDxeNotification,

@@ -151,7 +151,7 @@ ProcessPrmModules (
     Status = GetModuleContextBuffers (
               ByModuleGuid,
               &CurrentModuleInfoStruct->Identifier,
-              &CurrentModuleContextBuffers
+              (CONST PRM_MODULE_CONTEXT_BUFFERS **) &CurrentModuleContextBuffers
               );
     ASSERT (!EFI_ERROR (Status) || Status == EFI_NOT_FOUND);
     if (!EFI_ERROR (Status) && CurrentModuleContextBuffers != NULL) {
@@ -177,7 +177,7 @@ ProcessPrmModules (
       Status =  GetContextBuffer (
                   &CurrentHandlerInfoStruct->Identifier,
                   CurrentModuleContextBuffers,
-                  &CurrentContextBuffer
+                  (CONST PRM_CONTEXT_BUFFER **) &CurrentContextBuffer
                   );
       if (!EFI_ERROR (Status)) {
         CurrentHandlerInfoStruct->StaticDataBuffer = (UINT64) (UINTN) CurrentContextBuffer->StaticDataBuffer;
@@ -286,10 +286,8 @@ PublishPrmAcpiTable (
   @param[in]  Context                     The pointer to the notification function's context,
                                           which is implementation-dependent.
 
-  @retval EFI_SUCCESS                     The function executed successfully
-
 **/
-EFI_STATUS
+VOID
 EFIAPI
 PrmLoaderEndOfDxeNotification (
   IN  EFI_EVENT                           Event,
@@ -314,8 +312,6 @@ PrmLoaderEndOfDxeNotification (
     FreePool (PrmAcpiDescriptionTable);
   }
   gBS->CloseEvent (Event);
-
-  return EFI_SUCCESS;
 }
 
 /**
