@@ -259,6 +259,7 @@ Md5HashAll (
 }
 #endif
 
+#ifndef DISABLE_SHA1_DEPRECATED_INTERFACES
 /**
   Retrieves the size, in bytes, of the context buffer required for SHA-1 hash operations.
 
@@ -416,6 +417,7 @@ Sha1HashAll (
 {
   CALL_CRYPTO_SERVICE (Sha1HashAll, (Data, DataSize, HashValue), FALSE);
 }
+#endif
 
 /**
   Retrieves the size, in bytes, of the context buffer required for SHA-256 hash operations.
