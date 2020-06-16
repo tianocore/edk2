@@ -1781,6 +1781,7 @@ EfiBootManagerBoot (
   EFI_EVENT                 LegacyBootEvent;
   EFI_INPUT_KEY             Key;
   UINTN                     Index;
+  UINT8                     *SecureBoot;
 
   if (BootOption == NULL) {
     return;
@@ -1917,12 +1918,31 @@ EfiBootManagerBoot (
       BmReportLoadFailure (EFI_SW_DXE_BS_EC_BOOT_OPTION_LOAD_ERROR, Status);
       BootOption->Status = Status;
 
-      if (gST->ConIn != NULL) {
+      if (gST->ConOut != NULL) {
         gST->ConOut->ClearScreen (gST->ConOut);
+
+        //
+        // When UEFI Secure Boot is enabled, unsigned modules won't load.
+        //
+        SecureBoot = NULL;
+        GetEfiGlobalVariable2 (EFI_SECURE_BOOT_MODE_NAME, (VOID**)&SecureBoot, NULL);
+        if ((SecureBoot != NULL) && (*SecureBoot == SECURE_BOOT_MODE_ENABLE)) {
+          AsciiPrint ("SecureBoot is enabled.\n");
+        } else {
+          AsciiPrint ("SecureBoot is disabled.\n");
+        }
+
+        if (SecureBoot != NULL) {
+          FreePool (SecureBoot);
+        }
+
         AsciiPrint (
-            "Boot Failed. %s\n"
+            "Booting '%s' failed due to '%r'.\n"
             "Press any key to continue...\n",
-            BootOption->Description);
+            BootOption->Description, BootOption->Status);
+
+      }
+      if (gST->ConIn != NULL) {
         Status = gBS->WaitForEvent (1, &gST->ConIn->WaitForKey, &Index);
         ASSERT_EFI_ERROR (Status);
         ASSERT (Index == 0);
