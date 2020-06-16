@@ -61,8 +61,6 @@ TimerInterruptHandler (
 
   OriginalTPL = gBS->RaiseTPL (TPL_HIGH_LEVEL);
 
-  SendApicEoi();
-
   if (mTimerNotifyFunction != NULL) {
     //
     // @bug : This does not handle missed timer interrupts
@@ -71,6 +69,9 @@ TimerInterruptHandler (
   }
 
   gBS->RestoreTPL (OriginalTPL);
+
+  DisableInterrupts ();
+  SendApicEoi ();
 }
 
 /**
