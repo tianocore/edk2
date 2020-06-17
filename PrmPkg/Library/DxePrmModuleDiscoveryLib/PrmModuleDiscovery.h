@@ -24,4 +24,16 @@ typedef struct {
 
 #pragma pack(pop)
 
+/**
+  Creates a new PRM Module Image Context linked list entry.
+
+  @retval PrmModuleImageContextListEntry  If successful, a pointer a PRM Module Image Context linked list entry
+                                          otherwise, NULL is returned.
+
+**/
+PRM_MODULE_IMAGE_CONTEXT_LIST_ENTRY *
+CreateNewPrmModuleImageContextListEntry (
+  VOID
+  );
+
 #endif
