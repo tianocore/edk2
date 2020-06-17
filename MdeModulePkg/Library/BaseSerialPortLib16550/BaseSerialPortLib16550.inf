@@ -2,6 +2,8 @@
 #  SerialPortLib instance for 16550 UART.
 #
 #  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2020, ARM Limited. All rights reserved.
+#
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -14,6 +16,7 @@
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.1
   LIBRARY_CLASS                  = SerialPortLib
+  CONSTRUCTOR                    = BaseSerialPortLib16550
 
 [Packages]
   MdePkg/MdePkg.dec
