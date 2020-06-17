@@ -225,8 +225,7 @@ DmaMap (
     }
 
     if (Map->Operation == MapOperationBusMasterRead) {
-      CopyMem (Map->BufferAddress, (VOID *)(UINTN)Map->HostAddress,
-        *NumberOfBytes);
+      CopyMem (Map->BufferAddress, (VOID *)(UINTN)HostAddress, *NumberOfBytes);
     }
     mCpu->FlushDataCache (mCpu, (UINTN)Map->BufferAddress, AllocSize,
             EfiCpuFlushTypeWriteBack);
