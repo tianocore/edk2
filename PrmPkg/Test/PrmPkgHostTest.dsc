@@ -19,7 +19,11 @@
 !include UnitTestFrameworkPkg/UnitTestFrameworkPkgHost.dsc.inc
 
 [LibraryClasses]
+  PeCoffExtraActionLib|MdePkg/Library/BasePeCoffExtraActionLibNull/BasePeCoffExtraActionLibNull.inf
+  PeCoffLib|MdePkg/Library/BasePeCoffLib/BasePeCoffLib.inf
   PrmContextBufferLib|PrmPkg/Library/DxePrmContextBufferLib/DxePrmContextBufferLib.inf
+  PrmModuleDiscoveryLib|PrmPkg/Library/DxePrmModuleDiscoveryLib/DxePrmModuleDiscoveryLib.inf
+  PrmPeCoffLib|PrmPkg/Library/DxePrmPeCoffLib/DxePrmPeCoffLib.inf
   UefiBootServicesTableLib|PrmPkg/Test/UnitTest/Library/UefiBootServicesTableLibUnitTest/UefiBootServicesTableLibUnitTest.inf
 
 [Components]
@@ -32,3 +36,4 @@
   # Unit test host applications
   #
   PrmPkg/Library/DxePrmContextBufferLib/UnitTest/DxePrmContextBufferLibUnitTestHost.inf
+  PrmPkg/Library/DxePrmModuleDiscoveryLib/UnitTest/DxePrmModuleDiscoveryLibUnitTestHost.inf
