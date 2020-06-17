@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2020, ARM Limited. All rights reserved.
 *
 *  SPDX-License-Identifier: BSD-2-Clause-Patent
 *
@@ -60,15 +60,15 @@ PrePiMain (
   //
   InvalidateDataCacheRange((VOID *)(UINTN)PcdGet64 (PcdFdBaseAddress), PcdGet32 (PcdFdSize));
 
-  // Initialize MMU and Memory HOBs (Resource Descriptor HOBs)
-  Status = MemoryPeim (UefiMemoryBase, FixedPcdGet32 (PcdSystemMemoryUefiRegionSize));
-  ASSERT_EFI_ERROR (Status);
-
   // Initialize the Serial Port
   SerialPortInitialize ();
   CharCount = AsciiSPrint (Buffer,sizeof (Buffer),"UEFI firmware (version %s built at %a on %a)\n\r",
     (CHAR16*)PcdGetPtr(PcdFirmwareVersionString), __TIME__, __DATE__);
   SerialPortWrite ((UINT8 *) Buffer, CharCount);
+
+  // Initialize MMU and Memory HOBs (Resource Descriptor HOBs)
+  Status = MemoryPeim (UefiMemoryBase, FixedPcdGet32 (PcdSystemMemoryUefiRegionSize));
+  ASSERT_EFI_ERROR (Status);
 
   // Create the Stacks HOB (reserve the memory for all stacks)
   StacksSize = PcdGet32 (PcdCPUCorePrimaryStackSize);
