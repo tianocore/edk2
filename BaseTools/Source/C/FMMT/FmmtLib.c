@@ -828,6 +828,7 @@ LibParseSection (
   CHAR8               *ToolInputFileName;
   CHAR8               *ToolOutputFileName;
   BOOLEAN              FirstInFlag;
+  BOOLEAN              HasUiSection;
 
   DataOffset                 = 0;
   GuidAttr                   = 0;
@@ -863,6 +864,7 @@ LibParseSection (
   EncapDataNeedUpdata        = TRUE;
   LargeHeaderOffset          = 0;
   FirstInFlag                = TRUE;
+  HasUiSection               = FALSE;
 
 
   while (ParsedLength < BufferLength) {
@@ -893,6 +895,7 @@ LibParseSection (
     case EFI_SECTION_FIRMWARE_VOLUME_IMAGE:
 
       EncapDataNeedUpdata = TRUE;
+      HasUiSection = TRUE;
 
       Level ++;
       NumberOfSections ++;
@@ -995,6 +998,7 @@ LibParseSection (
       NumberOfSections ++;
 
       EncapDataNeedUpdata = TRUE;
+      HasUiSection = TRUE;
       //
       // Put in encapsulate data information.
       //
@@ -1177,6 +1181,7 @@ LibParseSection (
       }
       NumberOfSections++;
       EncapDataNeedUpdata = TRUE;
+      HasUiSection = TRUE;
       //
       // Put in encapsulate data information.
       //
@@ -1606,6 +1611,7 @@ LibParseSection (
       break;
 
     case EFI_SECTION_USER_INTERFACE:
+      HasUiSection = TRUE;
       NumberOfSections ++;
       CurrentFv->FfsAttuibutes[*FfsCount].Level = Level;
 
@@ -1683,6 +1689,30 @@ LibParseSection (
     return EFI_SECTION_ERROR;
   }
 
+  if (ViewFlag && !HasUiSection) {
+    //  
+    //print FILE FFS GUID name
+    //
+    BlankChar = LibConstructBlankChar( CurrentFv->FvLevel * 2);
+    if (BlankChar == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+    
+    fprintf(stdout, "%sFile \"%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x\"\n", BlankChar, 
+                        CurrentFile->Name.Data1,
+                        CurrentFile->Name.Data2,
+                        CurrentFile->Name.Data3,
+                        CurrentFile->Name.Data4[0],
+                        CurrentFile->Name.Data4[1],
+                        CurrentFile->Name.Data4[2],
+                        CurrentFile->Name.Data4[3],
+                        CurrentFile->Name.Data4[4],
+                        CurrentFile->Name.Data4[5],
+                        CurrentFile->Name.Data4[6],
+                        CurrentFile->Name.Data4[7]
+                        );
+    free(BlankChar);
+  }
 
   return EFI_SUCCESS;
 }
@@ -1833,12 +1863,14 @@ LibGetFileInfo (
   BOOLEAN             EncapDataNeedUpdateFlag;
   BOOLEAN             IsGeneratedFfs;
   UINT32              FfsFileHeaderSize;
+  CHAR8               *BlankChar;
 
   Status = EFI_SUCCESS;
 
   LocalEncapData  = NULL;
   EncapDataNeedUpdateFlag = TRUE;
   IsGeneratedFfs   = FALSE;
+  BlankChar        = NULL;
 
   FfsFileHeaderSize = GetFfsHeaderLength  ((EFI_FFS_FILE_HEADER *) CurrentFile);
   FileLength        = GetFfsFileLength ((EFI_FFS_FILE_HEADER *) CurrentFile);
@@ -2015,6 +2047,30 @@ LibGetFileInfo (
       CurrentFv->FfsAttuibutes[*FfsCount].Level = Level;
       if (!ViewFlag){
         LibGenFfsFile(CurrentFile, CurrentFv, FvName, Level, FfsCount, ErasePolarity);
+      } else {
+        //
+        // print EFI_FV_FILETYPE_RAW GUID 
+        //
+        BlankChar = LibConstructBlankChar( CurrentFv->FvLevel * 2);
+        if (BlankChar == NULL) {
+          return EFI_OUT_OF_RESOURCES;
+        }
+    
+        fprintf(stdout, "%sFile \"%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x\"\n", BlankChar, 
+                        CurrentFile->Name.Data1,
+                        CurrentFile->Name.Data2,
+                        CurrentFile->Name.Data3,
+                        CurrentFile->Name.Data4[0],
+                        CurrentFile->Name.Data4[1],
+                        CurrentFile->Name.Data4[2],
+                        CurrentFile->Name.Data4[3],
+                        CurrentFile->Name.Data4[4],
+                        CurrentFile->Name.Data4[5],
+                        CurrentFile->Name.Data4[6],
+                        CurrentFile->Name.Data4[7]
+                        );
+        free(BlankChar);
+
       }
     } else if( CurrentFile->Type == EFI_FV_FILETYPE_FFS_PAD){
       //EFI_FV_FILETYPE_FFS_PAD
