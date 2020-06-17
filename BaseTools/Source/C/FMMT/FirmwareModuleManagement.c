@@ -2,7 +2,7 @@
 
  FMMT main routine.
 
-Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2019 - 2020, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -81,7 +81,7 @@ Usage (
   //
   // Command Line for Delete file from FV
   //
-  fprintf (stdout, "  -d <input-binary-file> <FV-id> <File-Name> [<FV-id> <File-Name> ...] <output-binary-file>\n\
+  fprintf (stdout, "  -d <input-binary-file> <FV-id> <File-Name|File-Guid> [<FV-id> <File-Name|File-Guid> ...] <output-binary-file>\n\
             Delete a file (or files) from the firmware volume in an FD binary\n");
 
   //
@@ -93,7 +93,7 @@ Usage (
   //
   // Command Line for Replace
   //
-  fprintf (stdout, "  -r <input-binary-file> <FV-id> <File-Name> <NewFilePath> [<FV-id> <File-Name> <NewFilePath> ...] <output-binary-file>\n\
+  fprintf (stdout, "  -r <input-binary-file> <FV-id> <File-Name|File-Guid> <NewFilePath> [<FV-id> <File-Name|File-Guid> <NewFilePath> ...] <output-binary-file>\n\
             The replace command combines the functionality of remove and add into a single operation.\n");
 
   fprintf (stdout, "\nNote:\n");
@@ -585,6 +585,7 @@ static UINT32 FindFile(FV_INFORMATION *FvInFd, UINT8 FvLevel, CHAR8 *File, UINT3
   CHAR16 *UIName;
   CHAR16 *FfsUIName;
   UINT32 FileNumber = 0;
+  EFI_GUID Guid;
 
   UIName = (CHAR16 *)malloc(_MAX_PATH);
   if (NULL == UIName) {
@@ -614,7 +615,18 @@ static UINT32 FindFile(FV_INFORMATION *FvInFd, UINT8 FvLevel, CHAR8 *File, UINT3
   }
   free(UIName);
   free(FfsUIName);
-
+  if (FileNumber == 0) {
+    StringToGuid(File, &Guid);
+    for (Index = 0; Index <= FvInFd->FfsNumbers; Index++) {
+      if (CompareGuid (&Guid, &FvInFd->FfsAttuibutes[Index].GuidName) == 0) {
+        FileNumber += 1;
+        *MatchIndex = Index;
+        if (FileNumber > 1) {
+          break;
+        }
+      }
+    }
+  }
   return FileNumber;
 }
 
@@ -722,6 +734,12 @@ ParseSection (
   SectionLength       = 0;
   ParsedLength        = GetFfsHeaderLength((EFI_FFS_FILE_HEADER *)InputFfs);
   FfsFileSize         = GetFfsFileLength((EFI_FFS_FILE_HEADER *)InputFfs);
+  //
+  //if RAW ffs, return FALSE
+  //
+  if (((EFI_FFS_FILE_HEADER*)InputFfs)->Type == EFI_FV_FILETYPE_RAW) {
+    return UISectionFlag;
+  }
 
   while (ParsedLength < FfsFileSize) {
     Ptr           = (UINT8 *)InputFfs + ParsedLength;
@@ -1091,7 +1109,7 @@ FmmtImageAdd(
         HasUISection = FALSE;
         HasUISection = ParseSection(InputFfs);
         if (!HasUISection) {
-            printf ("WARNING: The newly add file must have a user interface (UI) section, otherwise it cannot be deleted or replaced. \n");
+            printf ("WARNING: The newly add file not have a user interface (UI) section. \n");
         }
         if (NeedNewPath(FvInFd, FvId, 0, TRUE)) {
             do {
@@ -1848,7 +1866,7 @@ FmmtImageReplace (
         HasUISection = FALSE;
         HasUISection = ParseSection(InputFfs);
         if (!HasUISection) {
-            printf ("WARNING: The newly replace file must have a user interface (UI) section, otherwise it cannot be deleted or replaced. \n");
+            printf ("WARNING: The newly replace file not have a user interface (UI) section. \n");
         }
         if (FfsFoundFlag && NeedNewPath(FvInFd, FvId, Index, FALSE)) {
             do {
