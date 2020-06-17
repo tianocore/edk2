@@ -2,7 +2,7 @@
   This driver will report some MMIO/IO resources to dxe core, extract smbios and acpi
   tables from bootloader.
 
-  Copyright (c) 2014 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2020, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -101,6 +101,7 @@ BlDxeEntryPoint (
   EFI_HOB_GUID_TYPE          *GuidHob;
   SYSTEM_TABLE_INFO          *SystemTableInfo;
   EFI_PEI_GRAPHICS_INFO_HOB  *GfxInfo;
+  ACPI_BOARD_INFO            *AcpiBoardInfo;
 
   Status = EFI_SUCCESS;
   //
@@ -150,6 +151,16 @@ BlDxeEntryPoint (
     Status = PcdSet32S (PcdSetupVideoHorizontalResolution, GfxInfo->GraphicsMode.HorizontalResolution);
     ASSERT_EFI_ERROR (Status);
     Status = PcdSet32S (PcdSetupVideoVerticalResolution, GfxInfo->GraphicsMode.VerticalResolution);
+    ASSERT_EFI_ERROR (Status);
+  }
+
+  //
+  // Set PcdPciExpressBaseAddress by HOB info
+  //
+  GuidHob = GetFirstGuidHob (&gUefiAcpiBoardInfoGuid);
+  if (GuidHob != NULL) {
+    AcpiBoardInfo = (ACPI_BOARD_INFO *)GET_GUID_HOB_DATA (GuidHob);
+    Status = PcdSet64S (PcdPciExpressBaseAddress, AcpiBoardInfo->PcieBaseAddress);
     ASSERT_EFI_ERROR (Status);
   }
 
