@@ -87,7 +87,6 @@ GetNextPrmModuleEntry (
                                           otherwise, NULL is returned.
 
 **/
-STATIC
 PRM_MODULE_IMAGE_CONTEXT_LIST_ENTRY *
 CreateNewPrmModuleImageContextListEntry (
   VOID
