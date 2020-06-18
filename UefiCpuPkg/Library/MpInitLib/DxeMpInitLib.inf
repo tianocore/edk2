@@ -52,6 +52,7 @@
   DebugAgentLib
   SynchronizationLib
   PcdLib
+  VmgExitLib
 
 [Protocols]
   gEfiTimerArchProtocolGuid                     ## SOMETIMES_CONSUMES
@@ -71,4 +72,7 @@
   gUefiCpuPkgTokenSpaceGuid.PcdCpuApLoopMode                           ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuApTargetCstate                       ## SOMETIMES_CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuApStatusCheckIntervalInMicroSeconds  ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdSevEsIsEnabled                          ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaBase                       ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard                      ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdGhcbBase                           ## CONSUMES

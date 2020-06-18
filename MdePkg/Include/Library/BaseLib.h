@@ -7832,6 +7832,37 @@ AsmLfence (
   );
 
 /**
+  Executes a XGETBV instruction
+
+  Executes a XGETBV instruction. This function is only available on IA-32 and
+  x64.
+
+  @param[in] Index        Extended control register index
+
+  @return                 The current value of the extended control register
+**/
+UINT64
+EFIAPI
+AsmXGetBv (
+  IN UINT32  Index
+  );
+
+
+/**
+  Executes a VMGEXIT instruction (VMMCALL with a REP prefix)
+
+  Executes a VMGEXIT instruction. This function is only available on IA-32 and
+  x64.
+
+**/
+VOID
+EFIAPI
+AsmVmgExit (
+  VOID
+  );
+
+
+/**
   Patch the immediate operand of an IA32 or X64 instruction such that the byte,
   word, dword or qword operand is encoded at the end of the instruction's
   binary representation.

@@ -53,6 +53,9 @@
   ##
   MpInitLib|Include/Library/MpInitLib.h
 
+  ##  @libraryclass  Provides function to support VMGEXIT processing.
+  VmgExitLib|Include/Library/VmgExitLib.h
+
 [Guids]
   gUefiCpuPkgTokenSpaceGuid      = { 0xac05bf33, 0x995a, 0x4ed4, { 0xaa, 0xb8, 0xef, 0x7a, 0xe8, 0xf, 0x5c, 0xb0 }}
   gMsegSmramGuid                 = { 0x5802bce4, 0xeeee, 0x4e33, { 0xa1, 0x30, 0xeb, 0xad, 0x27, 0xf0, 0xe4, 0x39 }}
@@ -157,6 +160,14 @@
   ## Count of pre allocated SMM MP tokens per chunk.
   # @Prompt Specify the count of pre allocated SMM MP tokens per chunk.
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmMpTokenCountPerChunk|64|UINT32|0x30002002
+
+  ## Area of memory where the SEV-ES work area block lives.
+  # @Prompt Configure the SEV-ES work area base
+  gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaBase|0x0|UINT32|0x30002005
+
+  ## Size of teh area of memory where the SEV-ES work area block lives.
+  # @Prompt Configure the SEV-ES work area base
+  gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaSize|0x0|UINT32|0x30002006
 
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   ## This value is the CPU Local APIC base address, which aligns the address on a 4-KByte boundary.
@@ -369,6 +380,12 @@
   # @Prompt The processor trace output scheme used when processor trace is enabled.
   # @ValidRange  0x80000001 | 0 - 1
   gUefiCpuPkgTokenSpaceGuid.PcdCpuProcTraceOutputScheme|0x0|UINT8|0x60000015
+
+  ## This dynamic PCD indicates whether SEV-ES is enabled
+  #   TRUE  - SEV-ES is enabled
+  #   FALSE - SEV-ES is not enabled
+  # @Prompt SEV-ES Status
+  gUefiCpuPkgTokenSpaceGuid.PcdSevEsIsEnabled|FALSE|BOOLEAN|0x60000016
 
 [UserExtensions.TianoCore."ExtraFiles"]
   UefiCpuPkgExtra.uni

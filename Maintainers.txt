@@ -223,7 +223,7 @@ F: MdeModulePkg/Universal/Acpi/
 R: Dandan Bi <dandan.bi@intel.com>
 R: Liming Gao <liming.gao@intel.com>
 
-MdeModulePkg: ACPI modules related to S3
+MdeModulePkg: ACPI S3 modules
 F: MdeModulePkg/*LockBox*/
 F: MdeModulePkg/Include/*BootScript*.h
 F: MdeModulePkg/Include/*LockBox*.h
@@ -265,6 +265,7 @@ F: MdeModulePkg/*StatusCode*/
 F: MdeModulePkg/Application/DumpDynPcd/
 F: MdeModulePkg/Core/Dxe/
 F: MdeModulePkg/Core/DxeIplPeim/
+F: MdeModulePkg/Core/Pei/
 F: MdeModulePkg/Core/RuntimeDxe/
 F: MdeModulePkg/Include/*Mem*.h
 F: MdeModulePkg/Include/*Pcd*.h
@@ -346,14 +347,6 @@ F: MdeModulePkg/Include/*Smm*.h
 R: Eric Dong <eric.dong@intel.com>
 R: Ray Ni <ray.ni@intel.com>
 
-MdeModulePkg: Pei Core
-F: MdeModulePkg/Core/Pei/
-R: Dandan Bi <dandan.bi@intel.com>
-R: Liming Gao <liming.gao@intel.com>
-R: Debkumar De <debkumar.de@intel.com>
-R: Harry Han <harry.han@intel.com>
-R: Catharine West <catharine.west@intel.com>
-
 MdeModulePkg: Reset modules
 F: MdeModulePkg/*Reset*/
 F: MdeModulePkg/Include/*Reset*.h
@@ -396,25 +389,6 @@ M: Laszlo Ersek <lersek@redhat.com>
 M: Ard Biesheuvel <ard.biesheuvel@arm.com>
 S: Maintained
 
-OvmfPkg: CSM modules
-F: OvmfPkg/Csm/
-R: David Woodhouse <dwmw2@infradead.org>
-
-OvmfPkg: MptScsi and PVSCSI driver
-F: OvmfPkg/MptScsiDxe/
-F: OvmfPkg/PvScsiDxe/
-R: Liran Alon <liran.alon@oracle.com>
-R: Nikita Leshenko <nikita.leshchenko@oracle.com>
-
-OvmfPkg: TCG- and TPM2-related modules
-F: OvmfPkg/Include/IndustryStandard/QemuTpm.h
-F: OvmfPkg/Library/PlatformBootManagerLib/BdsPlatform.c
-F: OvmfPkg/Library/Tcg2PhysicalPresenceLib*/
-F: OvmfPkg/PlatformPei/ClearCache.c
-F: OvmfPkg/Tcg/
-R: Marc-André Lureau <marcandre.lureau@redhat.com>
-R: Stefan Berger <stefanb@linux.ibm.com>
-
 OvmfPkg: Xen-related modules
 F: OvmfPkg/AcpiPlatformDxe/Xen.c
 F: OvmfPkg/Include/Guid/XenBusRootDevice.h
@@ -448,6 +422,35 @@ F: OvmfPkg/XenTimerDxe/
 R: Anthony Perard <anthony.perard@citrix.com>
 R: Julien Grall <julien@xen.org>
 
+OvmfPkg: TCG- and TPM2-related modules
+F: OvmfPkg/Include/IndustryStandard/QemuTpm.h
+F: OvmfPkg/Library/PlatformBootManagerLib/BdsPlatform.c
+F: OvmfPkg/Library/Tcg2PhysicalPresenceLib*/
+F: OvmfPkg/PlatformPei/ClearCache.c
+F: OvmfPkg/Tcg/
+R: Marc-André Lureau <marcandre.lureau@redhat.com>
+R: Stefan Berger <stefanb@linux.ibm.com>
+
+OvmfPkg: CSM modules
+F: OvmfPkg/Csm/
+R: David Woodhouse <dwmw2@infradead.org>
+
+OvmfPkg: MptScsi and PVSCSI driver
+F: OvmfPkg/MptScsiDxe/
+F: OvmfPkg/PvScsiDxe/
+R: Liran Alon <liran.alon@oracle.com>
+R: Nikita Leshenko <nikita.leshchenko@oracle.com>
+
+OvmfPkg: SEV-related modules
+F: OvmfPkg/AmdSevDxe/
+F: OvmfPkg/Include/Library/MemEncryptSevLib.h
+F: OvmfPkg/IoMmuDxe/AmdSevIoMmu.*
+F: OvmfPkg/Library/BaseMemEncryptSevLib/
+F: OvmfPkg/Library/VmgExitLib/
+F: OvmfPkg/PlatformPei/AmdSev.c
+R: Tom Lendacky <thomas.lendacky@amd.com>
+R: Brijesh Singh <brijesh.singh@amd.com>
+
 PcAtChipsetPkg
 F: PcAtChipsetPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/PcAtChipsetPkg
@@ -459,17 +462,6 @@ W: https://github.com/tianocore/tianocore.github.io/wiki/SecurityPkg
 M: Jiewen Yao <jiewen.yao@intel.com>
 M: Jian J Wang <jian.j.wang@intel.com>
 R: Chao Zhang <chao.b.zhang@intel.com>
-
-SecurityPkg: Secure boot related modules
-F: SecurityPkg/Library/DxeImageVerificationLib/
-F: SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/
-F: SecurityPkg/Library/AuthVariableLib/
-R: Min Xu <min.m.xu@intel.com>
-
-SecurityPkg: Tcg related modules
-F: SecurityPkg/Tcg/
-R: Qi Zhang <qi1.zhang@intel.com>
-R: Rahul Kumar <rahul1.kumar@intel.com>
 
 ShellPkg
 F: ShellPkg/
@@ -488,27 +480,12 @@ F: SourceLevelDebugPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/SourceLevelDebugPkg
 M: Hao A Wu <hao.a.wu@intel.com>
 
-StandaloneMmPkg
-F: StandaloneMmPkg/
-M: Ard Biesheuvel <ard.biesheuvel@arm.com>
-M: Sami Mujawar <sami.mujawar@arm.com>
-M: Jiewen Yao <jiewen.yao@intel.com>
-R: Supreeth Venkatesh <supreeth.venkatesh@arm.com>
-
 UefiCpuPkg
 F: UefiCpuPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/UefiCpuPkg
 M: Eric Dong <eric.dong@intel.com>
 M: Ray Ni <ray.ni@intel.com>
 R: Laszlo Ersek <lersek@redhat.com>
-R: Rahul Kumar <rahul1.kumar@intel.com>
-
-UefiCpuPkg: Sec related modules
-F: UefiCpuPkg/SecCore/
-F: UefiCpuPkg/ResetVector/
-R: Debkumar De <debkumar.de@intel.com>
-R: Harry Han <harry.han@intel.com>
-R: Catharine West <catharine.west@intel.com>
 
 UefiPayloadPkg
 F: UefiPayloadPkg/
@@ -524,3 +501,10 @@ M: Michael D Kinney <michael.d.kinney@intel.com>
 R: Sean Brogan <sean.brogan@microsoft.com>
 R: Bret Barkelew <Bret.Barkelew@microsoft.com>
 S: Maintained
+
+StandaloneMmPkg
+F: StandaloneMmPkg/
+M: Ard Biesheuvel <ard.biesheuvel@arm.com>
+M: Sami Mujawar <sami.mujawar@arm.com>
+M: Jiewen Yao <jiewen.yao@intel.com>
+R: Supreeth Venkatesh <supreeth.venkatesh@arm.com>

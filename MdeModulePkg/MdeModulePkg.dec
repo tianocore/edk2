@@ -760,19 +760,6 @@
   # @Prompt Enable PCI bridge IO alignment probe.
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciBridgeIoAlignmentProbe|FALSE|BOOLEAN|0x0001004e
 
-  ## Indicates if StatusCode is reported via Serial port.<BR><BR>
-  #   TRUE  - Reports StatusCode via Serial port.<BR>
-  #   FALSE - Does not report StatusCode via Serial port.<BR>
-  # @Prompt Enable StatusCode via Serial port.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial|TRUE|BOOLEAN|0x00010022
-
-  ## Indicates if StatusCode is stored in memory.
-  #  The memory is boot time memory in PEI Phase and is runtime memory in DXE Phase.<BR><BR>
-  #   TRUE  - Stores StatusCode in memory.<BR>
-  #   FALSE - Does not store StatusCode in memory.<BR>
-  # @Prompt Enable StatusCode via memory.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory|FALSE|BOOLEAN|0x00010023
-
   ## Indicates if PEI phase StatusCode will be replayed in DXE phase.<BR><BR>
   #   TRUE  - Replays PEI phase StatusCode in DXE phased.<BR>
   #   FALSE - Does not replay PEI phase StatusCode in DXE phase.<BR>
@@ -2001,6 +1988,19 @@
   # @Prompt TCG Platform Firmware Profile revision.
   gEfiMdeModulePkgTokenSpaceGuid.PcdTcgPfpMeasurementRevision|0|UINT32|0x00010077
 
+  ## Indicates if StatusCode is reported via Serial port.<BR><BR>
+  #   TRUE  - Reports StatusCode via Serial port.<BR>
+  #   FALSE - Does not report StatusCode via Serial port.<BR>
+  # @Prompt Enable StatusCode via Serial port.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial|TRUE|BOOLEAN|0x00010022
+
+  ## Indicates if StatusCode is stored in memory.
+  #  The memory is boot time memory in PEI Phase and is runtime memory in DXE Phase.<BR><BR>
+  #   TRUE  - Stores StatusCode in memory.<BR>
+  #   FALSE - Does not store StatusCode in memory.<BR>
+  # @Prompt Enable StatusCode via memory.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory|FALSE|BOOLEAN|0x00010023
+
 [PcdsPatchableInModule]
   ## Specify memory size with page number for PEI code when
   #  Loading Module at Fixed Address feature is enabled.
@@ -2050,6 +2050,15 @@
   ## This dynamic PCD holds the information if there is any test key used by the platform.
   # @Prompt If there is any test key used by the platform.
   gEfiMdeModulePkgTokenSpaceGuid.PcdTestKeyUsed|FALSE|BOOLEAN|0x00030003
+
+  ## This dynamic PCD holds the base address of the GHCB pool allocation.
+  # @Prompt GHCB Pool Base Address
+  gEfiMdeModulePkgTokenSpaceGuid.PcdGhcbBase|0|UINT64|0x00030007
+
+  ## This dynamic PCD holds the total size of the GHCB pool allocation.
+  #  The amount of memory allocated for GHCBs is dependent on the number of APs.
+  # @Prompt GHCB Pool Size
+  gEfiMdeModulePkgTokenSpaceGuid.PcdGhcbSize|0|UINT64|0x00030008
 
 [PcdsDynamicEx]
   ## This dynamic PCD enables the default variable setting.

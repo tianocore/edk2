@@ -1763,3 +1763,48 @@ AsmFlushCacheLine (
 }
 
 
+/**
+  Executes a XGETBV instruction
+
+  Executes a XGETBV instruction. This function is only available on IA-32 and
+  x64.
+
+  @param[in] Index        Extended control register index
+
+  @return                 The current value of the extended control register
+**/
+UINT64
+EFIAPI
+AsmXGetBv (
+  IN UINT32 Index
+  )
+{
+  UINT64 Data;
+
+  __asm__ __volatile__ (
+    "xgetbv"
+    : "=A" (Data)
+    : "c"  (Index)
+    );
+
+  return Data;
+}
+
+
+/**
+  Executes a VMGEXIT instruction.
+
+  Executes a VMGEXIT instruction. This function is only available on IA-32 and
+  X64.
+
+**/
+VOID
+EFIAPI
+AsmVmgExit (
+  VOID
+  )
+{
+  __asm__ __volatile__ ("rep; vmmcall":::"memory");
+}
+
+
