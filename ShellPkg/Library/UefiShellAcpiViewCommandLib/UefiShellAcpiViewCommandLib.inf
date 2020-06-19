@@ -14,7 +14,7 @@
   FILE_GUID                      = FB5B305E-84F5-461F-940D-82D345757AFA
   MODULE_TYPE                    = UEFI_APPLICATION
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = NULL|UEFI_APPLICATION UEFI_DRIVER
+  LIBRARY_CLASS                  = AcpiViewCommandLib|UEFI_APPLICATION UEFI_DRIVER
   CONSTRUCTOR                    = UefiShellAcpiViewCommandLibConstructor
   DESTRUCTOR                     = UefiShellAcpiViewCommandLibDestructor
 
@@ -46,7 +46,6 @@
   Parsers/Ssdt/SsdtParser.c
   Parsers/Xsdt/XsdtParser.c
   UefiShellAcpiViewCommandLib.c
-  UefiShellAcpiViewCommandLib.h
   UefiShellAcpiViewCommandLib.uni
 
 [Sources.ARM, Sources.AARCH64]
