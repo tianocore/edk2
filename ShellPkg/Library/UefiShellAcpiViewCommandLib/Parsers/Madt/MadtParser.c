@@ -15,6 +15,7 @@
 #include <Library/UefiLib.h>
 #include "AcpiParser.h"
 #include "AcpiTableParser.h"
+#include "AcpiViewConfig.h"
 #include "MadtParser.h"
 
 // Local Variables
