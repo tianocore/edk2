@@ -19,15 +19,14 @@
   DESTRUCTOR                     = UefiShellAcpiViewCommandLibDestructor
 
 [Sources.common]
-  UefiShellAcpiViewCommandLib.uni
-  UefiShellAcpiViewCommandLib.c
-  UefiShellAcpiViewCommandLib.h
-  AcpiParser.h
-  AcpiTableParser.h
-  AcpiView.h
   AcpiParser.c
+  AcpiParser.h
   AcpiTableParser.c
+  AcpiTableParser.h
   AcpiView.c
+  AcpiView.h
+  AcpiViewConfig.c
+  AcpiViewConfig.h
   Parsers/Bgrt/BgrtParser.c
   Parsers/Dbg2/Dbg2Parser.c
   Parsers/Dsdt/DsdtParser.c
@@ -36,40 +35,43 @@
   Parsers/Gtdt/GtdtParser.c
   Parsers/Iort/IortParser.c
   Parsers/Madt/MadtParser.c
+  Parsers/Madt/MadtParser.h
   Parsers/Mcfg/McfgParser.c
   Parsers/Pptt/PpttParser.c
+  Parsers/Pptt/PpttParser.h
   Parsers/Rsdp/RsdpParser.c
   Parsers/Slit/SlitParser.c
   Parsers/Spcr/SpcrParser.c
   Parsers/Srat/SratParser.c
   Parsers/Ssdt/SsdtParser.c
   Parsers/Xsdt/XsdtParser.c
-  Parsers/Madt/MadtParser.h
-  Parsers/Pptt/PpttParser.h
+  UefiShellAcpiViewCommandLib.c
+  UefiShellAcpiViewCommandLib.h
+  UefiShellAcpiViewCommandLib.uni
 
 [Sources.ARM, Sources.AARCH64]
   Arm/SbbrValidator.h
   Arm/SbbrValidator.c
 
 [Packages]
+  MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
   ShellPkg/ShellPkg.dec
-  MdeModulePkg/MdeModulePkg.dec
 
 [LibraryClasses]
-  MemoryAllocationLib
   BaseLib
   BaseMemoryLib
   DebugLib
+  FileHandleLib
+  HiiLib
+  MemoryAllocationLib
+  PcdLib
+  PrintLib
   ShellCommandLib
   ShellLib
+  UefiBootServicesTableLib
   UefiLib
   UefiRuntimeServicesTableLib
-  UefiBootServicesTableLib
-  PcdLib
-  HiiLib
-  PrintLib
-  FileHandleLib
 
 
 [FixedPcd]

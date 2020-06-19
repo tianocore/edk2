@@ -20,6 +20,7 @@
 #include "AcpiParser.h"
 #include "AcpiTableParser.h"
 #include "AcpiView.h"
+#include "AcpiViewConfig.h"
 #include "UefiShellAcpiViewCommandLib.h"
 
 #if defined(MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
@@ -28,17 +29,8 @@
 
 EFI_HII_HANDLE gShellAcpiViewHiiHandle = NULL;
 
-// Report variables
-STATIC UINT32             mSelectedAcpiTable;
-STATIC CONST CHAR16*      mSelectedAcpiTableName;
-STATIC BOOLEAN            mSelectedAcpiTableFound;
-STATIC EREPORT_OPTION     mReportType;
 STATIC UINT32             mTableCount;
 STATIC UINT32             mBinTableCount;
-STATIC BOOLEAN            mConsistencyCheck;
-STATIC BOOLEAN            mColourHighlighting;
-STATIC BOOLEAN            mMandatoryTableValidate;
-STATIC UINTN              mMandatoryTableSpec;
 
 /**
   An array of acpiview command line parameters.
@@ -52,142 +44,6 @@ STATIC CONST SHELL_PARAM_ITEM ParamList[] = {
   {L"-r", TypeValue},
   {NULL, TypeMax}
 };
-
-/**
-  This function returns the colour highlighting status.
-
-  @retval TRUE if colour highlighting is enabled.
-**/
-BOOLEAN
-GetColourHighlighting (
-  VOID
-  )
-{
-  return mColourHighlighting;
-}
-
-/**
-  This function sets the colour highlighting status.
-
-  @param  Highlight       The Highlight status.
-
-**/
-VOID
-SetColourHighlighting (
-  BOOLEAN Highlight
-  )
-{
-  mColourHighlighting = Highlight;
-}
-
-/**
-  This function returns the consistency checking status.
-
-  @retval TRUE if consistency checking is enabled.
-**/
-BOOLEAN
-GetConsistencyChecking (
-  VOID
-  )
-{
-  return mConsistencyCheck;
-}
-
-/**
-  This function sets the consistency checking status.
-
-  @param  ConsistencyChecking   The consistency checking status.
-
-**/
-VOID
-SetConsistencyChecking (
-  BOOLEAN ConsistencyChecking
-  )
-{
-  mConsistencyCheck = ConsistencyChecking;
-}
-
-/**
-  This function returns the ACPI table requirements validation flag.
-
-  @retval TRUE if check for mandatory table presence should be performed.
-**/
-BOOLEAN
-GetMandatoryTableValidate (
-  VOID
-  )
-{
-  return mMandatoryTableValidate;
-}
-
-/**
-  This function sets the ACPI table requirements validation flag.
-
-  @param  Validate    Enable/Disable ACPI table requirements validation.
-**/
-VOID
-SetMandatoryTableValidate (
-  BOOLEAN Validate
-  )
-{
-  mMandatoryTableValidate = Validate;
-}
-
-/**
-  This function returns the identifier of specification to validate ACPI table
-  requirements against.
-
-  @return   ID of specification listing mandatory tables.
-**/
-UINTN
-GetMandatoryTableSpec (
-  VOID
-  )
-{
-  return mMandatoryTableSpec;
-}
-
-/**
-  This function sets the identifier of specification to validate ACPI table
-  requirements against.
-
-  @param  Spec      ID of specification listing mandatory tables.
-**/
-VOID
-SetMandatoryTableSpec (
-  UINTN Spec
-  )
-{
-  mMandatoryTableSpec = Spec;
-}
-
-/**
-  This function returns the report options.
-
-  @retval Returns the report option.
-**/
-STATIC
-EREPORT_OPTION
-GetReportOption (
-  VOID
-  )
-{
-  return mReportType;
-}
-
-/**
-  This function returns the selected ACPI table.
-
-  @retval Returns signature of the selected ACPI table.
-**/
-STATIC
-UINT32
-GetSelectedAcpiTable (
-  VOID
-  )
-{
-  return mSelectedAcpiTable;
-}
 
 /**
   This function dumps the ACPI table to a file.
@@ -205,19 +61,21 @@ DumpAcpiTableToFile (
   IN CONST UINTN   Length
   )
 {
-  EFI_STATUS         Status;
-  CHAR16             FileNameBuffer[MAX_FILE_NAME_LEN];
-  SHELL_FILE_HANDLE  DumpFileHandle;
-  UINTN              TransferBytes;
+  EFI_STATUS          Status;
+  CHAR16              FileNameBuffer[MAX_FILE_NAME_LEN];
+  SHELL_FILE_HANDLE   DumpFileHandle;
+  UINTN               TransferBytes;
+  SELECTED_ACPI_TABLE *SelectedTable;
 
   DumpFileHandle = NULL;
   TransferBytes = Length;
+  GetSelectedAcpiTable (&SelectedTable);
 
   UnicodeSPrint (
     FileNameBuffer,
     sizeof (FileNameBuffer),
     L".\\%s%04d.bin",
-    mSelectedAcpiTableName,
+    SelectedTable->Name,
     mBinTableCount++
     );
 
@@ -273,10 +131,11 @@ ProcessTableReportOptions (
   IN CONST UINT32  Length
   )
 {
-  UINTN   OriginalAttribute;
-  UINT8*  SignaturePtr;
-  BOOLEAN Log;
-  BOOLEAN HighLight;
+  UINTN                OriginalAttribute;
+  UINT8                *SignaturePtr;
+  BOOLEAN              Log;
+  BOOLEAN              HighLight;
+  SELECTED_ACPI_TABLE  *SelectedTable;
 
   //
   // set local variables to suppress incorrect compiler/analyzer warnings
@@ -285,15 +144,16 @@ ProcessTableReportOptions (
   SignaturePtr = (UINT8*)(UINTN)&Signature;
   Log = FALSE;
   HighLight = GetColourHighlighting ();
+  GetSelectedAcpiTable (&SelectedTable);
 
   switch (GetReportOption ()) {
     case ReportAll:
       Log = TRUE;
       break;
     case ReportSelected:
-      if (Signature == GetSelectedAcpiTable ()) {
+      if (Signature == SelectedTable->Type) {
         Log = TRUE;
-        mSelectedAcpiTableFound = TRUE;
+        SelectedTable->Found = TRUE;
       }
       break;
     case ReportTableList:
@@ -321,8 +181,8 @@ ProcessTableReportOptions (
         );
       break;
     case ReportDumpBinFile:
-      if (Signature == GetSelectedAcpiTable ()) {
-        mSelectedAcpiTableFound = TRUE;
+      if (Signature == SelectedTable->Type) {
+        SelectedTable->Found = TRUE;
         DumpAcpiTableToFile (TablePtr, Length);
       }
       break;
@@ -356,37 +216,7 @@ ProcessTableReportOptions (
   return Log;
 }
 
-/**
-  This function converts a string to ACPI table signature.
 
-  @param [in] Str   Pointer to the string to be converted to the
-                    ACPI table signature.
-
-  @retval The ACPI table signature.
-**/
-STATIC
-UINT32
-ConvertStrToAcpiSignature (
-  IN  CONST CHAR16* Str
-  )
-{
-  UINT8 Index;
-  CHAR8 Ptr[4];
-
-  ZeroMem (Ptr, sizeof (Ptr));
-  Index = 0;
-
-  // Convert to Upper case and convert to ASCII
-  while ((Index < 4) && (Str[Index] != 0)) {
-    if (Str[Index] >= L'a' && Str[Index] <= L'z') {
-      Ptr[Index] = (CHAR8)(Str[Index] - (L'a' - L'A'));
-    } else {
-      Ptr[Index] = (CHAR8)Str[Index];
-    }
-    Index++;
-  }
-  return *(UINT32*)Ptr;
-}
 
 /**
   This function iterates the configuration table entries in the
@@ -417,6 +247,7 @@ AcpiView (
   UINT8                    RsdpRevision;
   PARSE_ACPI_TABLE_PROC    RsdpParserProc;
   BOOLEAN                  Trace;
+  SELECTED_ACPI_TABLE      *SelectedTable;
 
   //
   // set local variables to suppress incorrect compiler/analyzer warnings
@@ -427,6 +258,9 @@ AcpiView (
   // Reset The error/warning counters
   ResetErrorCount ();
   ResetWarningCount ();
+
+  // Retrieve the user selection of ACPI table to process
+  GetSelectedAcpiTable (&SelectedTable);
 
   // Search the table for an entry that matches the ACPI Table Guid
   FoundAcpiTable = FALSE;
@@ -496,7 +330,7 @@ AcpiView (
   if (ReportTableList != ReportOption) {
     if (((ReportSelected == ReportOption)  ||
          (ReportDumpBinFile == ReportOption)) &&
-        (!mSelectedAcpiTableFound)) {
+        (!SelectedTable->Found)) {
       Print (L"\nRequested ACPI Table not found.\n");
     } else if (GetConsistencyChecking () &&
                (ReportDumpBinFile != ReportOption)) {
@@ -554,17 +388,12 @@ ShellCommandRunAcpiView (
   CHAR16*            ProblemParam;
   SHELL_FILE_HANDLE  TmpDumpFileHandle;
   CONST CHAR16*      MandatoryTableSpecStr;
+  CONST CHAR16       *SelectedTableName;
 
   // Set Defaults
-  mReportType = ReportAll;
   mTableCount = 0;
   mBinTableCount = 0;
-  mSelectedAcpiTable = 0;
-  mSelectedAcpiTableName = NULL;
-  mSelectedAcpiTableFound = FALSE;
-  mConsistencyCheck = TRUE;
-  mMandatoryTableValidate = FALSE;
-  mMandatoryTableSpec = 0;
+  AcpiConfigSetDefaults ();
 
   ShellStatus = SHELL_SUCCESS;
   Package = NULL;
@@ -671,25 +500,23 @@ ShellCommandRunAcpiView (
       }
 
       if (ShellCommandLineGetFlag (Package, L"-l")) {
-        mReportType = ReportTableList;
+        SetReportOption (ReportTableList);
       } else {
-        mSelectedAcpiTableName = ShellCommandLineGetValue (Package, L"-s");
-        if (mSelectedAcpiTableName != NULL) {
-          mSelectedAcpiTable = (UINT32)ConvertStrToAcpiSignature (
-                                         mSelectedAcpiTableName
-                                         );
-          mReportType = ReportSelected;
+        SelectedTableName = ShellCommandLineGetValue (Package, L"-s");
+        if (SelectedTableName != NULL) {
+          SelectAcpiTable (SelectedTableName);
+          SetReportOption (ReportSelected);
 
           if (ShellCommandLineGetFlag (Package, L"-d"))  {
             // Create a temporary file to check if the media is writable.
             CHAR16 FileNameBuffer[MAX_FILE_NAME_LEN];
-            mReportType = ReportDumpBinFile;
+            SetReportOption (ReportDumpBinFile);
 
             UnicodeSPrint (
               FileNameBuffer,
               sizeof (FileNameBuffer),
               L".\\%s%04d.tmp",
-              mSelectedAcpiTableName,
+              SelectedTableName,
               mBinTableCount
               );
 
