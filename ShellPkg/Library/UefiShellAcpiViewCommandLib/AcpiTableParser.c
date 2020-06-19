@@ -17,6 +17,7 @@
 #include "AcpiParser.h"
 #include "AcpiTableParser.h"
 #include "AcpiView.h"
+#include "AcpiViewConfig.h"
 
 #if defined(MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
 #include "Arm/SbbrValidator.h"

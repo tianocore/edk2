@@ -13,6 +13,7 @@
 #include <Library/UefiLib.h>
 #include "AcpiParser.h"
 #include "AcpiView.h"
+#include "AcpiViewConfig.h"
 #include "PpttParser.h"
 
 // Local variables
