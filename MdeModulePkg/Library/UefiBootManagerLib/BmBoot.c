@@ -2,7 +2,7 @@
   Library functions which relates with booting.
 
 Copyright (c) 2019, NVIDIA CORPORATION. All rights reserved.
-Copyright (c) 2011 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2020, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -1903,17 +1903,17 @@ EfiBootManagerBoot (
         gBS->UnloadImage (ImageHandle);
       }
       //
-      // Report Status Code with the failure status to indicate that the failure to load boot option
-      //
-      BmReportLoadFailure (EFI_SW_DXE_BS_EC_BOOT_OPTION_LOAD_ERROR, Status);
-      BootOption->Status = Status;
-      //
       // Destroy the RAM disk
       //
       if (RamDiskDevicePath != NULL) {
         BmDestroyRamDisk (RamDiskDevicePath);
         FreePool (RamDiskDevicePath);
       }
+      //
+      // Report Status Code with the failure status to indicate that the failure to load boot option
+      //
+      BmReportLoadFailure (EFI_SW_DXE_BS_EC_BOOT_OPTION_LOAD_ERROR, Status);
+      BootOption->Status = Status;
       return;
     }
   }
@@ -1982,13 +1982,6 @@ EfiBootManagerBoot (
   Status = gBS->StartImage (ImageHandle, &BootOption->ExitDataSize, &BootOption->ExitData);
   DEBUG ((DEBUG_INFO | DEBUG_LOAD, "Image Return Status = %r\n", Status));
   BootOption->Status = Status;
-  if (EFI_ERROR (Status)) {
-    //
-    // Report Status Code with the failure status to indicate that boot failure
-    //
-    BmReportLoadFailure (EFI_SW_DXE_BS_EC_BOOT_OPTION_FAILED, Status);
-  }
-  PERF_END_EX (gImageHandle, "BdsAttempt", NULL, 0, (UINT32) OptionNumber);
 
   //
   // Destroy the RAM disk
@@ -1997,6 +1990,15 @@ EfiBootManagerBoot (
     BmDestroyRamDisk (RamDiskDevicePath);
     FreePool (RamDiskDevicePath);
   }
+
+  if (EFI_ERROR (Status)) {
+    //
+    // Report Status Code with the failure status to indicate that boot failure
+    //
+    BmReportLoadFailure (EFI_SW_DXE_BS_EC_BOOT_OPTION_FAILED, Status);
+  }
+  PERF_END_EX (gImageHandle, "BdsAttempt", NULL, 0, (UINT32) OptionNumber);
+
 
   //
   // Clear the Watchdog Timer after the image returns
