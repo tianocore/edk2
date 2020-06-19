@@ -424,6 +424,10 @@ AcpiView (
   EfiConfigurationTable = NULL;
   OriginalAttribute = 0;
 
+  // Reset The error/warning counters
+  ResetErrorCount ();
+  ResetWarningCount ();
+
   // Search the table for an entry that matches the ACPI Table Guid
   FoundAcpiTable = FALSE;
   for (Index = 0; Index < SystemTable->NumberOfTableEntries; Index++) {
@@ -565,10 +569,6 @@ ShellCommandRunAcpiView (
   ShellStatus = SHELL_SUCCESS;
   Package = NULL;
   TmpDumpFileHandle = NULL;
-
-  // Reset The error/warning counters
-  ResetErrorCount ();
-  ResetWarningCount ();
 
   Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR (Status)) {
