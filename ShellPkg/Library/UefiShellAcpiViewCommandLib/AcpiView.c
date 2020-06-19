@@ -17,11 +17,11 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/AcpiViewCommandLib.h>
 #include "AcpiParser.h"
 #include "AcpiTableParser.h"
 #include "AcpiView.h"
 #include "AcpiViewConfig.h"
-#include "UefiShellAcpiViewCommandLib.h"
 
 #if defined(MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
 #include "Arm/SbbrValidator.h"

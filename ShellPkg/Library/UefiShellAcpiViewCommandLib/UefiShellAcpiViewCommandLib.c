@@ -16,13 +16,13 @@
 #include <Library/ShellLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>
+#include <Library/AcpiViewCommandLib.h>
 #include <Uefi.h>
 
 #include "AcpiParser.h"
 #include "AcpiTableParser.h"
 #include "AcpiView.h"
 #include "AcpiViewConfig.h"
-#include "UefiShellAcpiViewCommandLib.h"
 
 CONST CHAR16 gShellAcpiViewFileName[] = L"ShellCommand";
 EFI_HII_HANDLE gShellAcpiViewHiiHandle = NULL;

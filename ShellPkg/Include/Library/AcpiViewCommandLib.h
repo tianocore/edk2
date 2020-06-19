@@ -1,12 +1,13 @@
 /** @file
-  Header file for 'acpiview' Shell command functions.
+  Library providing 'acpiview' functionality to display and
+  validate installed ACPI tables.
 
   Copyright (c) 2016 - 2020, ARM Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef UEFI_SHELL_ACPIVIEW_COMMAND_LIB_H_
-#define UEFI_SHELL_ACPIVIEW_COMMAND_LIB_H_
+#ifndef ACPI_VIEW_COMMAND_LIB_H_
+#define ACPI_VIEW_COMMAND_LIB_H_
 
 /**
   Dump a buffer to a file. Print error message if a file cannot be created.
@@ -26,14 +27,14 @@ ShellDumpBufferToFile (
   );
 
 /**
-  Function for 'acpiview' command.
+  Display and validate ACPI tables.
 
   @param[in] ImageHandle  Handle to the Image (NULL if internal).
   @param[in] SystemTable  Pointer to the System Table (NULL if internal).
 
-  @retval SHELL_INVALID_PARAMETER The command line invocation could not be parsed
-  @retval SHELL_NOT_FOUND         The command failed
-  @retval SHELL_SUCCESS           The command was successful
+  @retval SHELL_INVALID_PARAMETER The command line invocation could not be parsed.
+  @retval SHELL_NOT_FOUND         The command failed.
+  @retval SHELL_SUCCESS           The command was successful.
 **/
 SHELL_STATUS
 EFIAPI
