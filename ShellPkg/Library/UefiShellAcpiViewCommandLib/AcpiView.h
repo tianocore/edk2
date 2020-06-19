@@ -64,7 +64,7 @@ GetWarningCount (
 
   @param [in] Signature The ACPI table Signature.
   @param [in] TablePtr  Pointer to the ACPI table data.
-  @param [in] Length    The length fo the ACPI table.
+  @param [in] Length    The length of the ACPI table.
 
   @retval Returns TRUE if the ACPI table should be traced.
 **/
@@ -73,6 +73,22 @@ ProcessTableReportOptions (
   IN CONST UINT32  Signature,
   IN CONST UINT8*  TablePtr,
   IN CONST UINT32  Length
+  );
+
+/**
+  This function iterates the configuration table entries in the
+  system table, retrieves the RSDP pointer and starts parsing the ACPI tables.
+
+  @param [in] SystemTable Pointer to the EFI system table.
+
+  @retval EFI_NOT_FOUND   The RSDP pointer was not found.
+  @retval EFI_UNSUPPORTED The RSDP version was less than 2.
+  @retval EFI_SUCCESS     The command was successful.
+**/
+EFI_STATUS
+EFIAPI
+AcpiView (
+  IN EFI_SYSTEM_TABLE* SystemTable
   );
 
 #endif // ACPIVIEW_H_
