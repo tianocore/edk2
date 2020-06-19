@@ -27,8 +27,6 @@
 #include "Arm/SbbrValidator.h"
 #endif
 
-EFI_HII_HANDLE gShellAcpiViewHiiHandle = NULL;
-
 STATIC UINT32             mTableCount;
 STATIC UINT32             mBinTableCount;
 
@@ -48,14 +46,10 @@ DumpAcpiTableToFile (
   IN CONST UINTN   Length
   )
 {
-  EFI_STATUS          Status;
   CHAR16              FileNameBuffer[MAX_FILE_NAME_LEN];
-  SHELL_FILE_HANDLE   DumpFileHandle;
   UINTN               TransferBytes;
   SELECTED_ACPI_TABLE *SelectedTable;
 
-  DumpFileHandle = NULL;
-  TransferBytes = Length;
   GetSelectedAcpiTable (&SelectedTable);
 
   UnicodeSPrint (
@@ -66,39 +60,9 @@ DumpAcpiTableToFile (
     mBinTableCount++
     );
 
-  Status = ShellOpenFileByName (
-             FileNameBuffer,
-             &DumpFileHandle,
-             EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE | EFI_FILE_MODE_CREATE,
-             0
-             );
-  if (EFI_ERROR (Status)) {
-    ShellPrintHiiEx (
-      -1,
-      -1,
-      NULL,
-      STRING_TOKEN (STR_GEN_READONLY_MEDIA),
-      gShellAcpiViewHiiHandle,
-      L"acpiview"
-      );
-    return FALSE;
-  }
-
   Print (L"Dumping ACPI table to : %s ... ", FileNameBuffer);
 
-  Status = ShellWriteFile (
-             DumpFileHandle,
-             &TransferBytes,
-             (VOID*)Ptr
-             );
-  if (EFI_ERROR (Status)) {
-    Print (L"ERROR: Failed to dump table to binary file.\n");
-    TransferBytes = 0;
-  } else {
-    Print (L"DONE.\n");
-  }
-
-  ShellCloseFile (&DumpFileHandle);
+  TransferBytes = ShellDumpBufferToFile (FileNameBuffer, Ptr, Length);
   return (Length == TransferBytes);
 }
 

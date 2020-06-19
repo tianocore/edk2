@@ -8,7 +8,22 @@
 #ifndef UEFI_SHELL_ACPIVIEW_COMMAND_LIB_H_
 #define UEFI_SHELL_ACPIVIEW_COMMAND_LIB_H_
 
-extern EFI_HII_HANDLE gShellAcpiViewHiiHandle;
+/**
+  Dump a buffer to a file. Print error message if a file cannot be created.
+
+  @param[in] FileName   The filename that shall be created to contain the buffer.
+  @param[in] Buffer     Pointer to buffer that shall be dumped.
+  @param[in] BufferSize The size of buffer to be dumped in bytes.
+
+  @return The number of bytes that were written
+**/
+UINTN
+EFIAPI
+ShellDumpBufferToFile (
+  IN CONST CHAR16* FileNameBuffer,
+  IN CONST VOID*   Buffer,
+  IN CONST UINTN   BufferSize
+  );
 
 /**
   Function for 'acpiview' command.
