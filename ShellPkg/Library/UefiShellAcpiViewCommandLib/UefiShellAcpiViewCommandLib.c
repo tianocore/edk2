@@ -25,6 +25,7 @@
 #include "UefiShellAcpiViewCommandLib.h"
 
 CONST CHAR16 gShellAcpiViewFileName[] = L"ShellCommand";
+EFI_HII_HANDLE gShellAcpiViewHiiHandle = NULL;
 
 /**
   An array of acpiview command line parameters.
@@ -96,6 +97,64 @@ RegisterAllParsers (
     }
   }
   return Status;
+}
+
+/**
+  Dump a buffer to a file. Print error message if a file cannot be created.
+
+  @param[in] FileName   The filename that shall be created to contain the buffer.
+  @param[in] Buffer     Pointer to buffer that shall be dumped.
+  @param[in] BufferSize The size of buffer to be dumped in bytes.
+
+  @return The number of bytes that were written
+**/
+UINTN
+EFIAPI
+ShellDumpBufferToFile (
+  IN CONST CHAR16* FileNameBuffer,
+  IN CONST VOID*   Buffer,
+  IN CONST UINTN   BufferSize
+  )
+{
+  EFI_STATUS          Status;
+  SHELL_FILE_HANDLE   DumpFileHandle;
+  UINTN               TransferBytes;
+
+  Status = ShellOpenFileByName (
+             FileNameBuffer,
+             &DumpFileHandle,
+             EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE | EFI_FILE_MODE_CREATE,
+             0
+             );
+
+  if (EFI_ERROR (Status)) {
+    ShellPrintHiiEx (
+      -1,
+      -1,
+      NULL,
+      STRING_TOKEN (STR_GEN_READONLY_MEDIA),
+      gShellAcpiViewHiiHandle,
+      L"acpiview"
+      );
+    return 0;
+  }
+
+  TransferBytes = BufferSize;
+  Status = ShellWriteFile (
+             DumpFileHandle,
+             &TransferBytes,
+             (VOID *) Buffer
+             );
+
+  if (EFI_ERROR (Status)) {
+    Print (L"ERROR: Failed to write binary file.\n");
+    TransferBytes = 0;
+  } else {
+    Print (L"DONE.\n");
+  }
+
+  ShellCloseFile (&DumpFileHandle);
+  return TransferBytes;
 }
 
 /**
