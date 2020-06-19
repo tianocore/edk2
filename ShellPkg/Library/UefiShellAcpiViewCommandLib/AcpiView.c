@@ -255,6 +255,10 @@ AcpiView (
   EfiConfigurationTable = NULL;
   OriginalAttribute = 0;
 
+  // Reset Table counts
+  mTableCount = 0;
+  mBinTableCount = 0;
+
   // Reset The error/warning counters
   ResetErrorCount ();
   ResetWarningCount ();
@@ -390,9 +394,7 @@ ShellCommandRunAcpiView (
   CONST CHAR16*      MandatoryTableSpecStr;
   CONST CHAR16       *SelectedTableName;
 
-  // Set Defaults
-  mTableCount = 0;
-  mBinTableCount = 0;
+  // Set configuration defaults
   AcpiConfigSetDefaults ();
 
   ShellStatus = SHELL_SUCCESS;
