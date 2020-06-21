@@ -9,6 +9,7 @@
 
 #include <Uefi.h>
 #include <IndustryStandard/ArmMmSvc.h>
+#include <IndustryStandard/ArmFfaSvc.h>
 
 #include <Library/ArmLib.h>
 #include <Library/ArmMmuLib.h>
