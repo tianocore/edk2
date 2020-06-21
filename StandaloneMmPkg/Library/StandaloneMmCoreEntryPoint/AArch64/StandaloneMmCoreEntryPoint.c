@@ -26,6 +26,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <IndustryStandard/ArmStdSmc.h>
 #include <IndustryStandard/ArmMmSvc.h>
+#include <IndustryStandard/ArmFfaSvc.h>
 
 #define SPM_MAJOR_VER_MASK        0xFFFF0000
 #define SPM_MINOR_VER_MASK        0x0000FFFF
