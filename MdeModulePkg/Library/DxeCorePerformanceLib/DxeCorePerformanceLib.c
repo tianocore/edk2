@@ -837,7 +837,7 @@ GetDeviceInfoFromHandleAndUpdateLength (
       ControllerNameStringSize = FPDT_MAX_PERF_RECORD_SIZE - (*Length) - 1;
     }
 
-    UnicodeStrToAsciiStrS(StringPtr, ComponentNameString, ControllerNameStringSize);
+    UnicodeStrnToAsciiStrS(StringPtr, ControllerNameStringSize - 1, ComponentNameString, ControllerNameStringSize, &ControllerNameStringSize);
 
     //
     // Add a space in the end of the ControllerName
@@ -879,7 +879,7 @@ GetDeviceInfoFromHandleAndUpdateLength (
         AsciiStringPtr = ComponentNameString;
       }
 
-      UnicodeStrToAsciiStrS(StringPtr, AsciiStringPtr, DevicePathStringSize);
+      UnicodeStrnToAsciiStrS(StringPtr, DevicePathStringSize - 1, AsciiStringPtr, DevicePathStringSize, &DevicePathStringSize);
       *Length += (UINT8)DevicePathStringSize;
       return EFI_SUCCESS;
     }
