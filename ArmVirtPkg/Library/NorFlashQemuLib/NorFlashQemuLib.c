@@ -86,6 +86,22 @@ NorFlashPlatformGetDevices (
       mNorFlashDevices[Num].BlockSize         = QEMU_NOR_BLOCK_SIZE;
       Num++;
     }
+
+    //
+    // UEFI takes ownership of the NOR flash, and exposes its functionality
+    // through the UEFI Runtime Services GetVariable, SetVariable, etc. This
+    // means we need to disable it in the device tree to prevent the OS from
+    // attaching its device driver as well.
+    // Note that this also hides other flash banks, but the only other flash
+    // bank we expect to encounter is the one that carries the UEFI executable
+    // code, which is not intended to be guest updatable, and is usually backed
+    // in a readonly manner by QEMU anyway.
+    //
+    Status = FdtClient->SetNodeProperty (FdtClient, Node, "status",
+                          "disabled", sizeof ("disabled"));
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_WARN, "Failed to set NOR flash status to 'disabled'\n"));
+    }
   }
 
   *NorFlashDescriptions = mNorFlashDevices;
