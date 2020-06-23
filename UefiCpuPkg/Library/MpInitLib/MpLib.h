@@ -255,7 +255,6 @@ struct _CPU_MP_DATA {
   CPU_EXCHANGE_ROLE_INFO         APInfo;
   MTRR_SETTINGS                  MtrrTable;
   UINT8                          ApLoopMode;
-  UINT8                          DcuMode;
   UINT8                          ApTargetCState;
   UINT16                         PmCodeSegment;
   CPU_AP_DATA                    *CpuData;
