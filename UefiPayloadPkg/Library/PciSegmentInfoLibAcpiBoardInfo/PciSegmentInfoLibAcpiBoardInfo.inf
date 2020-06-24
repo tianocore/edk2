@@ -1,0 +1,36 @@
+## @file
+#   PCI Segment Information Library that returns one segment whose
+#   segment base address is retrieved from AcpiBoardInfo HOB.
+#
+# Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PciSegmentInfoLibAcpiBoardInfo
+  FILE_GUID                      = 0EA82AA2-6C36-4FD5-BC90-FFA3ECB5E0CE
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PciSegmentInfoLib | DXE_DRIVER
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  PciSegmentInfoLibAcpiBoardInfo.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UefiPayloadPkg/UefiPayloadPkg.dec
+
+[LibraryClasses]
+  PcdLib
+  HobLib
+  DebugLib
