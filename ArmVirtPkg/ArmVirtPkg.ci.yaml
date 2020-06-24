@@ -5,6 +5,8 @@
 # used for code analysis.
 #
 # Copyright (c) Microsoft Corporation
+# Copyright (c) 2020, ARM Limited. All rights reserved.
+#
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 {
@@ -34,6 +36,7 @@
             "OvmfPkg/OvmfPkg.dec",
             "EmbeddedPkg/EmbeddedPkg.dec",
             "ArmPlatformPkg/ArmPlatformPkg.dec",
+            "PcAtChipsetPkg/PcAtChipsetPkg.dec",
             "SecurityPkg/SecurityPkg.dec",
             "ShellPkg/ShellPkg.dec"  #Is this ok?
         ],
