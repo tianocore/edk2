@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2017 - 2019, ARM Limited. All rights reserved.
+  Copyright (c) 2017 - 2020, ARM Limited. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -682,7 +682,7 @@ typedef struct CmArmProcHierarchyInfo {
   UINT32            NoOfPrivateResources;
   /// Token of the array which contains references to the resources private to
   /// this CM_ARM_PROC_HIERARCHY_INFO instance. This field is ignored if
-  /// the NoOfPrivateResources is 0, in which case it is recomended to set
+  /// the NoOfPrivateResources is 0, in which case it is recommended to set
   /// this field to CM_NULL_TOKEN.
   CM_OBJECT_TOKEN   PrivateResourcesArrayToken;
 } CM_ARM_PROC_HIERARCHY_INFO;
@@ -795,7 +795,7 @@ typedef struct CmArmDeviceHandlePci {
   /// PCI Bus Number - Max 256 busses (Bits 15:8 of BDF)
   UINT8  BusNumber;
 
-  /// PCI Device Mumber - Max 32 devices (Bits 7:3 of BDF)
+  /// PCI Device Number - Max 32 devices (Bits 7:3 of BDF)
   UINT8   DeviceNumber;
 
   /// PCI Function Number - Max 8 functions (Bits 2:0 of BDF)

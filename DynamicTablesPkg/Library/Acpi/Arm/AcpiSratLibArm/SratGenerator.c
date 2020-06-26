@@ -1,7 +1,7 @@
 /** @file
   SRAT Table Generator
 
-  Copyright (c) 2019, ARM Limited. All rights reserved.
+  Copyright (c) 2019 - 2020, ARM Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -101,7 +101,7 @@ GET_OBJECT_LIST (
 /** Return the PCI Device information in BDF format
 
     PCI Bus Number - Max 256 busses (Bits 15:8 of BDF)
-    PCI Device Mumber - Max 32 devices (Bits 7:3 of BDF)
+    PCI Device Number - Max 32 devices (Bits 7:3 of BDF)
     PCI Function Number - Max 8 functions (Bits 2:0 of BDF)
 
     @param [in]  DeviceHandlePci   Pointer to the PCI Device Handle.
