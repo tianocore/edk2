@@ -1,7 +1,7 @@
 /** @file
   DBG2 Table Generator
 
-  Copyright (c) 2017 - 2019, ARM Limited. All rights reserved.
+  Copyright (c) 2017 - 2020, ARM Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -323,7 +323,7 @@ BuildDbg2Table (
     Status = EFI_INVALID_PARAMETER;
     DEBUG ((
       DEBUG_ERROR,
-      "ERROR: DBG2: Uart port sybtype is invalid. PortSubtype = 0x%x\n",
+      "ERROR: DBG2: Uart port subtype is invalid. PortSubtype = 0x%x\n",
       SerialPortInfo->PortSubtype
       ));
     goto error_handler;

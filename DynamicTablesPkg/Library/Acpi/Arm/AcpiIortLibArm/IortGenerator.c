@@ -1,7 +1,7 @@
 /** @file
   IORT Table Generator
 
-  Copyright (c) 2017 - 2019, ARM Limited. All rights reserved.
+  Copyright (c) 2017 - 2020, ARM Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -1053,7 +1053,7 @@ AddRootComplexNodes (
 **/
 STATIC
 EFI_STATUS
-AddSmmuInterrruptArray (
+AddSmmuInterruptArray (
   IN      CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  * CONST CfgMgrProtocol,
   IN OUT        EFI_ACPI_6_0_IO_REMAPPING_SMMU_INT    *       InterruptArray,
   IN            UINT32                                        InterruptCount,
@@ -1199,7 +1199,7 @@ AddSmmuV1V2Nodes (
     SmmuNode->SMMU_NSgCfgIrptFlags = NodeList->SMMU_NSgCfgIrptFlags;
 
     // Add Context Interrupt Array
-    Status = AddSmmuInterrruptArray (
+    Status = AddSmmuInterruptArray (
                CfgMgrProtocol,
                ContextInterruptArray,
                SmmuNode->NumContextInterrupts,
@@ -1217,7 +1217,7 @@ AddSmmuV1V2Nodes (
     // Add PMU Interrupt Array
     if ((SmmuNode->NumPmuInterrupts > 0) &&
         (NodeList->PmuInterruptToken != CM_NULL_TOKEN)) {
-      Status = AddSmmuInterrruptArray (
+      Status = AddSmmuInterruptArray (
                  CfgMgrProtocol,
                  PmuInterruptArray,
                  SmmuNode->NumPmuInterrupts,
