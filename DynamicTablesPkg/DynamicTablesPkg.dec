@@ -1,7 +1,7 @@
 ## @file
 # dec file for Dynamic Tables Framework.
 #
-# Copyright (c) 2017 - 2018, ARM Limited. All rights reserved.<BR>
+# Copyright (c) 2017 - 2020, ARM Limited. All rights reserved.<BR>
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -16,8 +16,11 @@
 [Includes]
   Include
 
-[Protocols]
+[LibraryClasses]
+  ##  @libraryclass  Defines a set of helper methods.
+  TableHelperLib|Include/Library/TableHelperLib.h
 
+[Protocols]
   # Configuration Manager Protocol GUID
   gEdkiiConfigurationManagerProtocolGuid = { 0xd85a4835, 0x5a82, 0x4894, { 0xac, 0x2, 0x70, 0x6f, 0x43, 0xd5, 0x97, 0x8e } }
 
