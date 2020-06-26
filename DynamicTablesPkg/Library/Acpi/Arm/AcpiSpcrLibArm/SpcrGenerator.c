@@ -1,7 +1,7 @@
 /** @file
   SPCR Table Generator
 
-  Copyright (c) 2017 - 2019, ARM Limited. All rights reserved.
+  Copyright (c) 2017 - 2020, ARM Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -189,7 +189,7 @@ BuildSpcrTable (
     Status = EFI_INVALID_PARAMETER;
     DEBUG ((
       DEBUG_ERROR,
-      "ERROR: SPCR: Uart port sybtype is invalid. PortSubtype = 0x%x\n",
+      "ERROR: SPCR: Uart port subtype is invalid. PortSubtype = 0x%x\n",
       SerialPortInfo->PortSubtype
       ));
     goto error_handler;
@@ -224,7 +224,7 @@ BuildSpcrTable (
     Status = EFI_INVALID_PARAMETER;
     DEBUG ((
       DEBUG_ERROR,
-      "ERROR: SPCR: Invalid Port Sybtype (must be < 256). Status = %r\n",
+      "ERROR: SPCR: Invalid Port subtype (must be < 256). Status = %r\n",
       Status
       ));
     goto error_handler;
