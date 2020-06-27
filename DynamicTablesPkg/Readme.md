@@ -131,9 +131,80 @@ Ensure that the iASL compiler used for building *Dynamic Tables Framework* has t
 This feature was made available in the *ACPICA Compiler update
 [Version 20180508](https://www.acpica.org/node/156)*, dated 8 May 2018 (2018-05-08).
 
+
+Running CI builds locally
+-------------------------
+
+The TianoCore EDKII project has introduced Core CI infrastructure using TianoCore EDKII Tools PIP modules:
+
+   -  *[edk2-pytool-library](https://pypi.org/project/edk2-pytool-library)*
+
+   - *[edk2-pytool-extensions](https://pypi.org/project/edk2-pytool-extensions)*
+
+
+The instructions to setup the CI environment are in *'edk2\\.pytool\\Readme.md'*
+
+## Building DynamicTablesPkg with Pytools
+
+1. [Optional] Create a Python Virtual Environment - generally once per workspace
+
+    ```
+        python -m venv <name of virtual environment>
+
+        e.g. python -m venv edk2-ci
+    ```
+
+2. [Optional] Activate Virtual Environment - each time new shell/command window is opened
+
+    ```
+        <name of virtual environment>/Scripts/activate
+
+        e.g. On a windows host PC run:
+             edk2-ci\Scripts\activate.bat
+    ```
+3. Install Pytools - generally once per virtual env or whenever pip-requirements.txt changes
+
+    ```
+        pip install --upgrade -r pip-requirements.txt
+    ```
+
+4. Initialize & Update Submodules - only when submodules updated
+
+    ```
+        stuart_setup -c .pytool/CISettings.py TOOL_CHAIN_TAG=<TOOL_CHAIN_TAG> -a <TARGET_ARCH>
+
+        e.g. stuart_setup -c .pytool/CISettings.py TOOL_CHAIN_TAG=GCC5
+    ```
+
+5. Initialize & Update Dependencies - only as needed when ext_deps change
+
+    ```
+        stuart_update -c .pytool/CISettings.py TOOL_CHAIN_TAG=<TOOL_CHAIN_TAG> -a <TARGET_ARCH>
+
+        e.g. stuart_update -c .pytool/CISettings.py TOOL_CHAIN_TAG=GCC5
+    ```
+
+6. Compile the basetools if necessary - only when basetools C source files change
+
+    ```
+        python BaseTools/Edk2ToolsBuild.py -t <ToolChainTag>
+    ```
+
+7. Compile DynamicTablesPkg
+
+    ```
+        stuart_build-c .pytool/CISettings.py TOOL_CHAIN_TAG=<TOOL_CHAIN_TAG> -a <TARGET_ARCH>
+
+        e.g. stuart_ci_build -c .pytool/CISettings.py TOOL_CHAIN_TAG=GCC5 -p DynamicTablesPkg -a AARCH64 --verbose
+    ```
+
+    - use `stuart_build -c .pytool/CISettings.py -h` option to see help on additional options.
+
+
 Documentation
 -------------
 
 Refer to the following presentation from *UEFI Plugfest Seattle 2018*:
 
 [Dynamic Tables Framework: A Step Towards Automatic Generation of Advanced Configuration and Power Interface (ACPI) & System Management BIOS (SMBIOS) Tables](http://www.uefi.org/sites/default/files/resources/Arm_Dynamic%20Tables%20Framework%20A%20Step%20Towards%20Automatic%20Generation%20of%20Advanced%20Configuration%20and%20Power%20Interface%20%28ACPI%29%20%26%20System%20Management%20BIOS%20%28SMBIOS%29%20Tables%20_0.pdf)
+
