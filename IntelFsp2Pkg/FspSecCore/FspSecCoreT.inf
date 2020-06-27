@@ -25,7 +25,6 @@
 
 [Sources.IA32]
   Ia32/Stack.nasm
-  Ia32/InitializeFpu.nasm
   Ia32/FspApiEntryT.nasm
   Ia32/FspHelper.nasm
 
