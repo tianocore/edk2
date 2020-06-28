@@ -2,6 +2,7 @@
 #
 # Copyright (c) Microsoft Corporation.
 # Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+# Copyright (c) 2020, ARM Limited. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 import os
@@ -41,6 +42,7 @@ class Settings(CiBuildSettingsManager, UpdateSettingsManager, SetupSettingsManag
         These should be edk2 workspace relative paths '''
 
         return ("ArmVirtPkg",
+                "DynamicTablesPkg",
                 "EmulatorPkg",
                 "MdePkg",
                 "MdeModulePkg",

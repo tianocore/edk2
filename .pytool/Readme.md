@@ -8,7 +8,7 @@
 | ArmPlatformPkg       |
 | ArmVirtPkg           | SEE PACKAGE README | SEE PACKAGE README |
 | CryptoPkg            | :heavy_check_mark: | :heavy_check_mark: | Spell checking in audit mode
-| DynamicTablesPkg     |
+| DynamicTablesPkg     |                    | :heavy_check_mark: |
 | EmbeddedPkg          |
 | EmulatorPkg          | SEE PACKAGE README | SEE PACKAGE README | Spell checking in audit mode
 | FatPkg               | :heavy_check_mark: | :heavy_check_mark: |
