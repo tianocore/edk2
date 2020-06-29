@@ -1223,10 +1223,12 @@ EvacuateTempRam (
   EFI_FIRMWARE_VOLUME_HEADER    *FvHeader;
   EFI_FIRMWARE_VOLUME_HEADER    *ChildFvHeader;
   EFI_FIRMWARE_VOLUME_HEADER    *MigratedFvHeader;
+  EFI_FIRMWARE_VOLUME_HEADER    *RawDataFvHeader;
   EFI_FIRMWARE_VOLUME_HEADER    *MigratedChildFvHeader;
 
   PEI_CORE_FV_HANDLE            PeiCoreFvHandle;
   EFI_PEI_CORE_FV_LOCATION_PPI  *PeiCoreFvLocationPpi;
+  EDKII_MIGRATED_FV_INFO        MigratedFvInfo;
 
   ASSERT (Private->PeiMemoryInstalled);
 
@@ -1270,6 +1272,13 @@ EvacuateTempRam (
                   );
       ASSERT_EFI_ERROR (Status);
 
+      Status =  PeiServicesAllocatePages (
+                  EfiBootServicesCode,
+                  EFI_SIZE_TO_PAGES ((UINTN) FvHeader->FvLength),
+                  (EFI_PHYSICAL_ADDRESS *) &RawDataFvHeader
+                  );
+      ASSERT_EFI_ERROR (Status);
+
       DEBUG ((
         DEBUG_VERBOSE,
         "  Migrating FV[%d] from 0x%08X to 0x%08X\n",
@@ -1279,6 +1288,12 @@ EvacuateTempRam (
         ));
 
       CopyMem (MigratedFvHeader, FvHeader, (UINTN) FvHeader->FvLength);
+      CopyMem (RawDataFvHeader, MigratedFvHeader, (UINTN) FvHeader->FvLength);
+      MigratedFvInfo.FvOrgBase  = (UINT32) (UINTN) FvHeader;
+      MigratedFvInfo.FvNewBase  = (UINT32) (UINTN) MigratedFvHeader;
+      MigratedFvInfo.FvDataBase = (UINT32) (UINTN) RawDataFvHeader;
+      MigratedFvInfo.FvLength   = (UINT32) (UINTN) FvHeader->FvLength;
+      BuildGuidDataHob (&gEdkiiMigratedFvInfoGuid, &MigratedFvInfo, sizeof (MigratedFvInfo));
 
       //
       // Migrate any children for this FV now
