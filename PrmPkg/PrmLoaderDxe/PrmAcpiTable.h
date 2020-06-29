@@ -56,6 +56,9 @@ typedef struct {
 
 typedef struct {
   EFI_ACPI_DESCRIPTION_HEADER         Header;                     ///< Standard ACPI description header
+  GUID                                PrmPlatformGuid;            ///< A GUID that uniquely identifies this platform.
+                                                                  ///< Used to check for compatibility in PRM module
+                                                                  ///< runtime updates.
   UINT32                              PrmModuleInfoOffset;        ///< Offset in bytes from the beginning of this
                                                                   ///< structure to the PRM Module Info array
   UINT32                              PrmModuleInfoCount;         ///< Number of entries in the PRM Module Info array
