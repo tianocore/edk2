@@ -21,6 +21,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Guid/TcgEventHob.h>
 #include <Guid/MeasuredFvHob.h>
 #include <Guid/TpmInstance.h>
+#include <Guid/MigratedFvInfo.h>
 
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -536,6 +537,10 @@ MeasureFvImage (
   EDKII_PEI_FIRMWARE_VOLUME_INFO_PREHASHED_FV_PPI       *PrehashedFvPpi;
   HASH_INFO                                             *PreHashInfo;
   UINT32                                                HashAlgoMask;
+  EFI_PHYSICAL_ADDRESS                                  FvOrgBase;
+  EFI_PHYSICAL_ADDRESS                                  FvDataBase;
+  EFI_PEI_HOB_POINTERS                                  Hob;
+  EDKII_MIGRATED_FV_INFO                                *MigratedFvInfo;
 
   //
   // Check Excluded FV list
@@ -622,6 +627,26 @@ MeasureFvImage (
   } while (!EFI_ERROR(Status));
 
   //
+  // Search the matched migration FV info
+  //
+  FvOrgBase  = FvBase;
+  FvDataBase = FvBase;
+  Hob.Raw  = GetFirstGuidHob (&gEdkiiMigratedFvInfoGuid);
+  while (Hob.Raw != NULL) {
+    MigratedFvInfo = GET_GUID_HOB_DATA (Hob);
+    if ((MigratedFvInfo->FvNewBase == (UINT32) FvBase) && (MigratedFvInfo->FvLength == (UINT32) FvLength)) {
+      //
+      // Found the migrated FV info
+      //
+      FvOrgBase  = (EFI_PHYSICAL_ADDRESS) (UINTN) MigratedFvInfo->FvOrgBase;
+      FvDataBase = (EFI_PHYSICAL_ADDRESS) (UINTN) MigratedFvInfo->FvDataBase;
+      break;
+    }
+    Hob.Raw = GET_NEXT_HOB (Hob);
+    Hob.Raw = GetNextGuidHob (&gEdkiiMigratedFvInfoGuid, Hob.Raw);
+  }
+
+  //
   // Init the log event for FV measurement
   //
   if (PcdGet32(PcdTcgPfpMeasurementRevision) >= TCG_EfiSpecIDEventStruct_SPEC_ERRATA_TPM2_REV_105) {
@@ -631,13 +656,13 @@ MeasureFvImage (
     if (FvName != NULL) {
       AsciiSPrint ((CHAR8 *)FvBlob2.BlobDescription, sizeof(FvBlob2.BlobDescription), "Fv(%g)", FvName);
     }
-    FvBlob2.BlobBase      = FvBase;
+    FvBlob2.BlobBase      = FvOrgBase;
     FvBlob2.BlobLength    = FvLength;
     TcgEventHdr.EventType = EV_EFI_PLATFORM_FIRMWARE_BLOB2;
     TcgEventHdr.EventSize = sizeof (FvBlob2);
     EventData             = &FvBlob2;
   } else {
-    FvBlob.BlobBase       = FvBase;
+    FvBlob.BlobBase       = FvOrgBase;
     FvBlob.BlobLength     = FvLength;
     TcgEventHdr.PCRIndex  = 0;
     TcgEventHdr.EventType = EV_EFI_PLATFORM_FIRMWARE_BLOB;
@@ -672,7 +697,7 @@ MeasureFvImage (
     //
     Status = HashLogExtendEvent (
                0,
-               (UINT8*) (UINTN) FvBase, // HashData
+               (UINT8*) (UINTN) FvDataBase, // HashData
                (UINTN) FvLength,        // HashDataLen
                &TcgEventHdr,            // EventHdr
                EventData                // EventData
