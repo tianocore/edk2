@@ -6,7 +6,7 @@
 # register TemporaryRamDonePpi to call TempRamExit API, and register MemoryDiscoveredPpi
 # notify to call FspSiliconInit API.
 #
-#  Copyright (c) 2014 - 2019, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2014 - 2020, Intel Corporation. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -44,24 +44,30 @@
   PerformanceLib
   FspWrapperApiLib
   FspWrapperApiTestLib
+  FspMeasurementLib
 
 [Packages]
   MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
   UefiCpuPkg/UefiCpuPkg.dec
+  SecurityPkg/SecurityPkg.dec
   IntelFsp2Pkg/IntelFsp2Pkg.dec
   IntelFsp2WrapperPkg/IntelFsp2WrapperPkg.dec
 
 [Ppis]
-  gTopOfTemporaryRamPpiGuid             ## PRODUCES
-  gFspSiliconInitDonePpiGuid            ## PRODUCES
-  gEfiEndOfPeiSignalPpiGuid             ## PRODUCES
-  gEfiTemporaryRamDonePpiGuid           ## PRODUCES
-  gEfiPeiMemoryDiscoveredPpiGuid        ## NOTIFY
+  gTopOfTemporaryRamPpiGuid                              ## PRODUCES
+  gFspSiliconInitDonePpiGuid                             ## PRODUCES
+  gEfiEndOfPeiSignalPpiGuid                              ## PRODUCES
+  gEfiTemporaryRamDonePpiGuid                            ## PRODUCES
+  gEfiPeiMemoryDiscoveredPpiGuid                         ## NOTIFY
+  gEdkiiTcgPpiGuid                                       ## NOTIFY
+  gEfiPeiFirmwareVolumeInfoMeasurementExcludedPpiGuid    ## PRODUCES
 
 [Pcd]
-  gIntelFsp2WrapperTokenSpaceGuid.PcdFspsBaseAddress     ## CONSUMES
-  gIntelFsp2WrapperTokenSpaceGuid.PcdFspsUpdDataAddress  ## CONSUMES
-  gIntelFsp2WrapperTokenSpaceGuid.PcdFspModeSelection    ## CONSUMES
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspsBaseAddress       ## CONSUMES
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspsUpdDataAddress    ## CONSUMES
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspModeSelection      ## CONSUMES
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspMeasurementConfig  ## CONSUMES
 
 [Guids]
   gFspHobGuid                           ## CONSUMES ## HOB
@@ -71,4 +77,5 @@
   FspsWrapperPeim.c
 
 [Depex]
-  gEfiPeiMemoryDiscoveredPpiGuid
+  gEfiPeiMemoryDiscoveredPpiGuid AND
+  gPeiTpmInitializationDonePpiGuid
