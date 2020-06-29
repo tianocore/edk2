@@ -11,6 +11,7 @@
 
 #include "PrmAcpiTable.h"
 
+#include <Guid/ZeroGuid.h>
 #include <IndustryStandard/Acpi.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -52,6 +53,7 @@ ProcessPrmModules (
   OUT PRM_ACPI_DESCRIPTION_TABLE          **PrmAcpiDescriptionTable
   )
 {
+  EFI_GUID                                *PlatformGuid;
   EFI_IMAGE_EXPORT_DIRECTORY              *CurrentImageExportDirectory;
   PRM_MODULE_EXPORT_DESCRIPTOR_STRUCT     *CurrentExportDescriptorStruct;
   PRM_ACPI_DESCRIPTION_TABLE              *PrmAcpiTable;
@@ -79,6 +81,20 @@ ProcessPrmModules (
   }
   *PrmAcpiDescriptionTable = NULL;
 
+  PlatformGuid = (EFI_GUID *) PcdGetPtr (PcdPrmPlatformGuid);
+  //
+  // The platform should set PcdPrmPlatformGuid to a non-zero value
+  //
+  if (CompareGuid (PlatformGuid, &gZeroGuid)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "  %a %a: PcdPrmPlatformGuid must be set to a unique value in the platform DSC file.\n",
+      _DBGMSGID_,
+      __FUNCTION__
+      ));
+    ASSERT (!CompareGuid (PlatformGuid, &gZeroGuid));
+  }
+
   DEBUG ((DEBUG_INFO, "  %a %a: %d total PRM modules to process.\n", _DBGMSGID_, __FUNCTION__, mPrmModuleCount));
   DEBUG ((DEBUG_INFO, "  %a %a: %d total PRM handlers to process.\n", _DBGMSGID_, __FUNCTION__, mPrmHandlerCount));
 
@@ -102,6 +118,7 @@ ProcessPrmModules (
   PrmAcpiTable->Header.OemRevision      = PcdGet32 (PcdAcpiDefaultOemRevision);
   PrmAcpiTable->Header.CreatorId        = PcdGet32 (PcdAcpiDefaultCreatorId);
   PrmAcpiTable->Header.CreatorRevision  = PcdGet32 (PcdAcpiDefaultCreatorRevision);
+  CopyGuid (&PrmAcpiTable->PrmPlatformGuid, PlatformGuid);
   PrmAcpiTable->PrmModuleInfoOffset     = OFFSET_OF (PRM_ACPI_DESCRIPTION_TABLE, PrmModuleInfoStructure);
   PrmAcpiTable->PrmModuleInfoCount      = (UINT32) mPrmModuleCount;
 
