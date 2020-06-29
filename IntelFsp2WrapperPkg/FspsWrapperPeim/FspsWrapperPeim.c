@@ -3,7 +3,7 @@
   register TemporaryRamDonePpi to call TempRamExit API, and register MemoryDiscoveredPpi
   notify to call FspSiliconInit API.
 
-  Copyright (c) 2014 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2020, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -24,12 +24,15 @@
 #include <Library/TimerLib.h>
 #include <Library/PerformanceLib.h>
 #include <Library/FspWrapperApiLib.h>
+#include <Library/FspMeasurementLib.h>
 
 #include <Ppi/FspSiliconInitDone.h>
 #include <Ppi/EndOfPeiPhase.h>
 #include <Ppi/MemoryDiscovered.h>
 #include <Ppi/TemporaryRamDone.h>
 #include <Ppi/SecPlatformInformation.h>
+#include <Ppi/Tcg.h>
+#include <Ppi/FirmwareVolumeInfoMeasurementExcluded.h>
 #include <Library/FspWrapperApiTestLib.h>
 #include <FspEas.h>
 #include <FspStatusCode.h>
@@ -379,7 +382,25 @@ FspsWrapperInitDispatchMode (
   VOID
   )
 {
-  EFI_STATUS           Status;
+  EFI_STATUS                                            Status;
+  EFI_PEI_FIRMWARE_VOLUME_INFO_MEASUREMENT_EXCLUDED_PPI *MeasurementExcludedFvPpi;
+  EFI_PEI_PPI_DESCRIPTOR                                *MeasurementExcludedPpiList;
+
+  MeasurementExcludedFvPpi = AllocatePool (sizeof(*MeasurementExcludedFvPpi));
+  ASSERT(MeasurementExcludedFvPpi != NULL);
+  MeasurementExcludedFvPpi->Count = 1;
+  MeasurementExcludedFvPpi->Fv[0].FvBase = PcdGet32 (PcdFspsBaseAddress);
+  MeasurementExcludedFvPpi->Fv[0].FvLength = ((EFI_FIRMWARE_VOLUME_HEADER *) (UINTN) PcdGet32 (PcdFspsBaseAddress))->FvLength;
+
+  MeasurementExcludedPpiList = AllocatePool (sizeof(*MeasurementExcludedPpiList));
+  ASSERT(MeasurementExcludedPpiList != NULL);
+  MeasurementExcludedPpiList->Flags = EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST;
+  MeasurementExcludedPpiList->Guid  = &gEfiPeiFirmwareVolumeInfoMeasurementExcludedPpiGuid;
+  MeasurementExcludedPpiList->Ppi   = MeasurementExcludedFvPpi;
+
+  Status = PeiServicesInstallPpi (MeasurementExcludedPpiList);
+  ASSERT_EFI_ERROR (Status);
+
   //
   // FSP-S Wrapper running in Dispatch mode and reports FSP-S FV to PEI dispatcher.
   //
@@ -399,6 +420,62 @@ FspsWrapperInitDispatchMode (
 }
 
 /**
+  This function is called after TCG installed PPI.
+
+  @param[in] PeiServices    Pointer to PEI Services Table.
+  @param[in] NotifyDesc     Pointer to the descriptor for the Notification event that
+                            caused this function to execute.
+  @param[in] Ppi            Pointer to the PPI data associated with this function.
+
+  @retval EFI_STATUS        Always return EFI_SUCCESS
+**/
+EFI_STATUS
+EFIAPI
+TcgPpiNotify (
+  IN EFI_PEI_SERVICES          **PeiServices,
+  IN EFI_PEI_NOTIFY_DESCRIPTOR *NotifyDesc,
+  IN VOID                      *Ppi
+  );
+
+EFI_PEI_NOTIFY_DESCRIPTOR mTcgPpiNotifyDesc = {
+  (EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
+  &gEdkiiTcgPpiGuid,
+  TcgPpiNotify
+};
+
+/**
+  This function is called after TCG installed PPI.
+
+  @param[in] PeiServices    Pointer to PEI Services Table.
+  @param[in] NotifyDesc     Pointer to the descriptor for the Notification event that
+                            caused this function to execute.
+  @param[in] Ppi            Pointer to the PPI data associated with this function.
+
+  @retval EFI_STATUS        Always return EFI_SUCCESS
+**/
+EFI_STATUS
+EFIAPI
+TcgPpiNotify (
+  IN EFI_PEI_SERVICES          **PeiServices,
+  IN EFI_PEI_NOTIFY_DESCRIPTOR *NotifyDesc,
+  IN VOID                      *Ppi
+  )
+{
+  UINT32                    FspMeasureMask;
+
+  DEBUG ((DEBUG_INFO, "TcgPpiNotify FSPS\n"));
+
+  FspMeasureMask = PcdGet32 (PcdFspMeasurementConfig);
+
+  if ((FspMeasureMask & FSP_MEASURE_FSPS) != 0) {
+    MeasureFspFirmwareBlob (0, "FSPS", PcdGet32(PcdFspsBaseAddress),
+                            (UINT32)((EFI_FIRMWARE_VOLUME_HEADER *) (UINTN) PcdGet32 (PcdFspsBaseAddress))->FvLength);
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
   This is the entrypoint of PEIM.
 
   @param[in] FileHandle  Handle of the file being invoked.
@@ -413,7 +490,12 @@ FspsWrapperPeimEntryPoint (
   IN CONST EFI_PEI_SERVICES     **PeiServices
   )
 {
+  EFI_STATUS  Status;
+
   DEBUG ((DEBUG_INFO, "FspsWrapperPeimEntryPoint\n"));
+
+  Status = PeiServicesNotifyPpi (&mTcgPpiNotifyDesc);
+  ASSERT_EFI_ERROR (Status);
 
   if (PcdGet8 (PcdFspModeSelection) == 1) {
     FspsWrapperInitApiMode ();
