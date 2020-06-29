@@ -1,7 +1,7 @@
 #
 #  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 #  Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-#  Portions copyright (c) 2011 - 2019, ARM Ltd. All rights reserved.<BR>
+#  Portions copyright (c) 2011 - 2020, ARM Ltd. All rights reserved.<BR>
 #  Copyright (c) 2015, Hewlett-Packard Development Company, L.P.<BR>
 #  (C) Copyright 2020, Hewlett Packard Enterprise Development LP<BR>
 #  Copyright (c) Microsoft Corporation
@@ -1918,7 +1918,7 @@ NOOPT_*_*_OBJCOPY_ADDDEBUGFLAG     = --add-gnu-debuglink=$(DEBUG_DIR)/$(MODULE_N
 *_*_*_DTCPP_PATH                   = DEF(DTCPP_BIN)
 *_*_*_DTC_PATH                     = DEF(DTC_BIN)
 
-DEFINE GCC_ALL_CC_FLAGS            = -g -Os -fshort-wchar -fno-builtin -fno-strict-aliasing -Wall -Werror -Wno-array-bounds -include AutoGen.h -fno-common
+DEFINE GCC_ALL_CC_FLAGS            = -g -Os -fshort-wchar -fno-builtin -fno-strict-aliasing -Wall -Werror -Wpointer-arith -Wno-array-bounds -include AutoGen.h -fno-common
 DEFINE GCC_IA32_CC_FLAGS           = DEF(GCC_ALL_CC_FLAGS) -m32 -malign-double -freorder-blocks -freorder-blocks-and-partition -O2 -mno-stack-arg-probe
 DEFINE GCC_X64_CC_FLAGS            = DEF(GCC_ALL_CC_FLAGS) -mno-red-zone -Wno-address -mno-stack-arg-probe
 DEFINE GCC_ARM_CC_FLAGS            = DEF(GCC_ALL_CC_FLAGS) -mlittle-endian -mabi=aapcs -fno-short-enums -funsigned-char -ffunction-sections -fdata-sections -fomit-frame-pointer -Wno-address -mthumb -mfloat-abi=soft -fno-pic -fno-pie
