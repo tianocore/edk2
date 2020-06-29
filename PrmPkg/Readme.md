@@ -74,6 +74,18 @@ The following list are the currently defined build flags (if any) that may be pa
    This structure is passed as the context buffer to PRM handlers. The structure actually passed to PRM handlers is
    allocated and populated by the OS where it gets all the information to populate the context buffer from other structures.
 
+### PRM Platform GUID
+**IMPORTANT**
+
+A configuration item that requires user attention is the PRM platform GUID. Each platform that uses PRM must be
+uniquely identifiable so that various instances of a PRM module can target the correct platform in PRM module updates.
+
+To apply a unique platform GUID set the following PCD to a unique value in your platform DSC file.
+  ``gPrmPkgTokenSpaceGuid.PcdPrmPlatformGuid``
+
+The default value assigned in [PrmPkg.dec](PrmPkg/PrmPkg.dec) is zero. By design, this is an invalid value that will
+cause an ASSERT if it is not updated.
+
 ## Overview
 At a high-level, PRM can be viewed from three levels of granularity:
 
