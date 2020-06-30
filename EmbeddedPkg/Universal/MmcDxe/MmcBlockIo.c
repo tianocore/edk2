@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011-2015, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2020, ARM Limited. All rights reserved.
 *
 *  SPDX-License-Identifier: BSD-2-Clause-Patent
 *
@@ -149,7 +149,7 @@ MmcTransferBlock (
     if (MmcHostInstance->CardInfo.OCRData.AccessMode & SD_CARD_CAPACITY) {
       CmdArg = Lba;
     } else {
-      CmdArg = Lba * This->Media->BlockSize;
+      CmdArg = MultU64x32 (Lba, This->Media->BlockSize);
     }
   } else {
     //Set command argument based on the card access mode (Byte mode or Block mode)
@@ -157,7 +157,7 @@ MmcTransferBlock (
         MMC_OCR_ACCESS_SECTOR) {
       CmdArg = Lba;
     } else {
-      CmdArg = Lba * This->Media->BlockSize;
+      CmdArg = MultU64x32 (Lba, This->Media->BlockSize);
     }
   }
 

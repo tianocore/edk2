@@ -1,7 +1,7 @@
 /** @file
   Diagnostics Protocol implementation for the MMC DXE driver
 
-  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
+  Copyright (c) 2011-2020, ARM Limited. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -56,7 +56,7 @@ GenerateRandomBuffer (
   UINT64* Buffer64 = (UINT64*)Buffer;
 
   for (i = 0; i < (BufferSize >> 3); i++) {
-    *Buffer64 = i | (~i << 32);
+    *Buffer64 = i | LShiftU64 (~i, 32);
     Buffer64++;
   }
 }
@@ -227,7 +227,11 @@ MmcDriverDiagnosticsRunDiagnostics (
 
   // LBA=10 Size=BlockSize
   DiagnosticLog (L"MMC Driver Diagnostics - Test: Any Block\n");
-  Status = MmcReadWriteDataTest (MmcHostInstance, MmcHostInstance->BlockIo.Media->LastBlock >> 1, MmcHostInstance->BlockIo.Media->BlockSize);
+  Status = MmcReadWriteDataTest (
+             MmcHostInstance,
+             RShiftU64 (MmcHostInstance->BlockIo.Media->LastBlock, 1),
+             MmcHostInstance->BlockIo.Media->BlockSize
+             );
 
   // LBA=LastBlock Size=BlockSize
   DiagnosticLog (L"MMC Driver Diagnostics - Test: Last Block\n");
