@@ -4,6 +4,7 @@
 # template file used to build supported packages.
 #
 # Copyright (c) Microsoft Corporation.
+# Copyright (c) 2020, ARM Limited. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 
@@ -36,7 +37,7 @@ jobs:
         Build.Pkgs: 'PcAtChipsetPkg,ShellPkg'
         Build.Targets: 'DEBUG,RELEASE,NO-TARGET'
       TARGET_FMP_FAT_TEST:
-        Build.Pkgs: 'FmpDevicePkg,FatPkg,UnitTestFrameworkPkg'
+        Build.Pkgs: 'FmpDevicePkg,FatPkg,UnitTestFrameworkPkg,DynamicTablesPkg'
         Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
       TARGET_CRYPTO:
         Build.Pkgs: 'CryptoPkg'
