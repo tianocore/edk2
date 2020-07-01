@@ -3,6 +3,7 @@
 #
 #  Copyright (c) 2015 - 2020, Intel Corporation. All rights reserved.<BR>
 #  Copyright (C) 2020, Red Hat, Inc.<BR>
+#  Copyright (c) 2020, ARM Ltd. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -384,9 +385,14 @@ class GitDiffCheck:
                 self.is_newfile = False
                 self.force_crlf = True
                 self.force_notabs = True
-                if self.filename.endswith('.sh'):
+                if self.filename.endswith('.sh') or \
+                    self.filename.startswith('BaseTools/BinWrappers/PosixLike/') or \
+                    self.filename.startswith('BaseTools/Bin/CYGWIN_NT-5.1-i686/') or \
+                    self.filename == 'BaseTools/BuildEnv':
                     #
                     # Do not enforce CR/LF line endings for linux shell scripts.
+                    # Some linux shell scripts don't end with the ".sh" extension,
+                    # they are identified by their path.
                     #
                     self.force_crlf = False
                 if self.filename == '.gitmodules':
