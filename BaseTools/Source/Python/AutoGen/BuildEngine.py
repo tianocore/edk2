@@ -172,7 +172,7 @@ class FileBuildRule:
     def __str__(self):
         SourceString = ""
         SourceString += " %s %s %s" % (self.SourceFileType, " ".join(self.SourceFileExtList), self.ExtraSourceFileList)
-        DestString = ", ".join(self.DestFileList)
+        DestString = ", ".join([str(i) for i in self.DestFileList])
         CommandString = "\n\t".join(self.CommandList)
         return "%s : %s\n\t%s" % (DestString, SourceString, CommandString)
 
