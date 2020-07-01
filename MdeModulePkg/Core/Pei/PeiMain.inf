@@ -111,6 +111,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdShadowPeimOnS3Boot                      ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdShadowPeimOnBoot                        ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdInitValueInTempStack                    ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMigrateTemporaryRamFirmwareVolumes      ## CONSUMES
 
 # [BootMode]
 # S3_RESUME             ## SOMETIMES_CONSUMES

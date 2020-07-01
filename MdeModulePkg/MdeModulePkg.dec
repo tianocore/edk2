@@ -1223,6 +1223,11 @@
   # @Prompt Shadow Peim and PeiCore on boot
   gEfiMdeModulePkgTokenSpaceGuid.PcdShadowPeimOnBoot|TRUE|BOOLEAN|0x30001029
 
+  ## Indicate if to evacuate from temporary to permanent memory.
+  # TRUE - Evacuate from temporary memory
+  # FALSE - Keep the original behavior
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMigrateTemporaryRamFirmwareVolumes|TRUE|BOOLEAN|0x3000102A
+
   ## The mask is used to control memory profile behavior.<BR><BR>
   #  BIT0 - Enable UEFI memory profile.<BR>
   #  BIT1 - Enable SMRAM profile.<BR>

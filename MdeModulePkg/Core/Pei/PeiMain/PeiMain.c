@@ -419,8 +419,9 @@ PeiCore (
     }
   } else {
     if (
-      (!(PrivateData.HobList.HandoffInformationTable->BootMode == BOOT_ON_S3_RESUME) && PcdGetBool (PcdShadowPeimOnBoot)) ||
-      ((PrivateData.HobList.HandoffInformationTable->BootMode == BOOT_ON_S3_RESUME) && PcdGetBool (PcdShadowPeimOnS3Boot))
+      ((!(PrivateData.HobList.HandoffInformationTable->BootMode == BOOT_ON_S3_RESUME) && PcdGetBool (PcdShadowPeimOnBoot)) ||
+      ((PrivateData.HobList.HandoffInformationTable->BootMode == BOOT_ON_S3_RESUME) && PcdGetBool (PcdShadowPeimOnS3Boot))) &&
+      PcdGetBool (PcdMigrateTemporaryRamFirmwareVolumes)
       ) {
       DEBUG ((DEBUG_VERBOSE, "PPI lists before temporary RAM evacuation:\n"));
       DumpPpiList (&PrivateData);
