@@ -419,6 +419,7 @@
 
     <OutputFile>
         $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.aml
+        $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.amli
 
     <ExtraDependency>
         $(MAKE_FILE)
@@ -428,14 +429,24 @@
         "$(ASLPP)" $(DEPS_FLAGS) $(ASLPP_FLAGS) $(INC) /I${s_path} $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.i > $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iii
         Trim --source-code -l -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iiii $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iii 
         "$(ASL)" $(ASL_FLAGS) $(ASL_OUTFLAGS)${dst} $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iiii
-        -AmlToHex $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.aml
+        $(CP) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.aml $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.amli
 
     <Command.GCC>
         Trim --asl-file --asl-deps -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.i -i $(INC_LIST) ${src}
         "$(ASLPP)" $(DEPS_FLAGS) $(ASLPP_FLAGS) $(INC) -I${s_path} $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.i > $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iii
         Trim --source-code -l -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iiii $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iii 
         "$(ASL)" $(ASL_FLAGS) $(ASL_OUTFLAGS)${dst} $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iiii
-        -AmlToHex $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.aml
+        $(CP) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.aml $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.amli
+
+[Acpi-Machine-Language-File-to-C.DXE_DRIVER]
+    <InputFile>
+        ?.amli
+
+    <OutputFile>
+        ${s_path}(+)${s_base}.c
+
+    <Command>
+        -AmlToC ${src}
 
 [C-Code-File.AcpiTable]
     <InputFile>
