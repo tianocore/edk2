@@ -1054,6 +1054,12 @@ cleanlib:
                     TargetDict = {"target": self.PlaceMacro(T.Target.Path, self.Macros), "cmd": "\n\t".join(T.Commands),"deps": Deps}
                     self.BuildTargetList.append(self._BUILD_TARGET_TEMPLATE.Replace(TargetDict))
 
+                    # Add a Makefile rule for targets generating multiple files.
+                    # The main output is a prerequisite for the other output files.
+                    for i in T.Outputs[1:]:
+                        AnnexeTargetDict = {"target": self.PlaceMacro(i.Path, self.Macros), "cmd": "", "deps": self.PlaceMacro(T.Target.Path, self.Macros)}
+                        self.BuildTargetList.append(self._BUILD_TARGET_TEMPLATE.Replace(AnnexeTargetDict))
+
     def ParserCCodeFile(self, T, Type, CmdSumDict, CmdTargetDict, CmdCppDict, DependencyDict):
         if not CmdSumDict:
             for item in self._AutoGenObject.Targets[Type]:
