@@ -17,6 +17,11 @@
     0xBB25CF6F, 0xF1D4, 0x11D2, {0x9A, 0x0C, 0x00, 0x90, 0x27, 0x3F, 0xC1, 0xFD } \
   }
 
+#define EFI_SERIAL_TERMINAL_DEVICE_TYPE_GUID \
+  { \
+    0X6AD9A60F, 0X5815, 0X4C7C, { 0X8A, 0X10, 0X50, 0X53, 0XD2, 0XBF, 0X7A, 0X1B } \
+  }
+
 ///
 /// Protocol GUID defined in EFI1.1.
 ///
@@ -299,5 +304,6 @@ struct _EFI_SERIAL_IO_PROTOCOL {
 };
 
 extern EFI_GUID gEfiSerialIoProtocolGuid;
+extern EFI_GUID gEfiSerialTerminalDeviceTypeGuid;
 
 #endif
