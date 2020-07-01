@@ -860,7 +860,8 @@ class ModuleAutoGen(AutoGen):
         SubDirectory = os.path.join(self.OutputDir, File.SubDir)
         if not os.path.exists(SubDirectory):
             CreateDirectory(SubDirectory)
-        LastTarget = None
+        TargetList = set()
+        FinalTargetName = set()
         RuleChain = set()
         SourceList = [File]
         Index = 0
@@ -870,6 +871,9 @@ class ModuleAutoGen(AutoGen):
         self.BuildOption
 
         while Index < len(SourceList):
+            # Reset the FileType if not the first iteration.
+            if Index > 0:
+                FileType = TAB_UNKNOWN_FILE
             Source = SourceList[Index]
             Index = Index + 1
 
@@ -886,29 +890,25 @@ class ModuleAutoGen(AutoGen):
             elif Source.Ext in self.BuildRules:
                 RuleObject = self.BuildRules[Source.Ext]
             else:
-                # stop at no more rules
-                if LastTarget:
-                    self._FinalBuildTargetList.add(LastTarget)
-                break
+                # No more rule to apply: Source is a final target.
+                FinalTargetName.add(Source)
+                continue
 
             FileType = RuleObject.SourceFileType
             self._FileTypes[FileType].add(Source)
 
             # stop at STATIC_LIBRARY for library
             if self.IsLibrary and FileType == TAB_STATIC_LIBRARY:
-                if LastTarget:
-                    self._FinalBuildTargetList.add(LastTarget)
-                break
+                FinalTargetName.add(Source)
+                continue
 
             Target = RuleObject.Apply(Source, self.BuildRuleOrder)
             if not Target:
-                if LastTarget:
-                    self._FinalBuildTargetList.add(LastTarget)
-                break
-            elif not Target.Outputs:
-                # Only do build for target with outputs
-                self._FinalBuildTargetList.add(Target)
+                # No Target: Source is a final target.
+                FinalTargetName.add(Source)
+                continue
 
+            TargetList.add(Target)
             self._BuildTargets[FileType].add(Target)
 
             if not Source.IsBinary and Source == File:
@@ -916,12 +916,16 @@ class ModuleAutoGen(AutoGen):
 
             # to avoid cyclic rule
             if FileType in RuleChain:
-                break
+                EdkLogger.error("build", ERROR_STATEMENT, "Cyclic dependency detected while generating rule for %s" % str(Source))
 
             RuleChain.add(FileType)
             SourceList.extend(Target.Outputs)
-            LastTarget = Target
-            FileType = TAB_UNKNOWN_FILE
+
+        # For each final target name, retrieve the corresponding TargetDescBlock instance.
+        for FTargetName in FinalTargetName:
+            for Target in TargetList:
+                if FTargetName == Target.Target:
+                    self._FinalBuildTargetList.add(Target)
 
     @cached_property
     def Targets(self):
