@@ -60,5 +60,9 @@
   ## SOMETIMES_PRODUCES
   gEfiSecPlatformInformation2PpiGuid
 
+[Pcd]
+  ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMigrateTemporaryRamFirmwareVolumes
+
 [Depex]
   TRUE

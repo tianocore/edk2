@@ -363,10 +363,12 @@ SecMigrationPeiInitialize (
   IN CONST EFI_PEI_SERVICES  **PeiServices
   )
 {
-  EFI_STATUS  Status;
+  EFI_STATUS  Status = EFI_SUCCESS;
 
-  Status = PeiServicesInstallPpi (&mEdkiiRepublishSecPpiDescriptor);
-  ASSERT_EFI_ERROR (Status);
+  if (PcdGetBool (PcdMigrateTemporaryRamFirmwareVolumes)) {
+    Status = PeiServicesInstallPpi (&mEdkiiRepublishSecPpiDescriptor);
+    ASSERT_EFI_ERROR (Status);
+  }
 
   return Status;
 }
