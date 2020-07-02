@@ -96,9 +96,9 @@ typedef enum {
 #define EFI_MEMORY_SP               0x0000000000040000ULL
 //
 // If this flag is set, the memory region is capable of being
-// protected with the CPU?s memory cryptographic
+// protected with the CPU's memory cryptographic
 // capabilities. If this flag is clear, the memory region is not
-// capable of being protected with the CPU?s memory
+// capable of being protected with the CPU's memory
 // cryptographic capabilities or the CPU does not support CPU
 // memory cryptographic capabilities.
 //
@@ -108,6 +108,12 @@ typedef enum {
 // Runtime memory attribute
 //
 #define EFI_MEMORY_RUNTIME          0x8000000000000000ULL
+
+//
+// Attributes bitmasks, grouped by type
+//
+#define EFI_CACHE_ATTRIBUTE_MASK (EFI_MEMORY_UC | EFI_MEMORY_WC | EFI_MEMORY_WT | EFI_MEMORY_WB | EFI_MEMORY_UCE | EFI_MEMORY_WP)
+#define EFI_MEMORY_ATTRIBUTE_MASK (EFI_MEMORY_RP | EFI_MEMORY_XP | EFI_MEMORY_RO | EFI_MEMORY_SP | EFI_MEMORY_CPU_CRYPTO)
 
 ///
 /// Memory descriptor version number.
