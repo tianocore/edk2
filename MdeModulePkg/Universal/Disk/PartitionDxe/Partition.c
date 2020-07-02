@@ -1276,6 +1276,15 @@ PartitionInstallChildHandle (
   } else {
     FreePool (Private->DevicePath);
     FreePool (Private);
+
+    //
+    // if the Status == EFI_ALREADY_STARTED, it means the child handles
+    // are already installed. So return EFI_SUCCESS to avoid do the next
+    // partition type check.
+    //
+    if (Status == EFI_ALREADY_STARTED) {
+      Status = EFI_SUCCESS;
+    }
   }
 
   return Status;
