@@ -1,7 +1,7 @@
 ##  @file
 # Provides Shell 'acpiview' command functions
 #
-# Copyright (c) 2016 - 2020, ARM Limited. All rights reserved.<BR>
+# Copyright (c) 2016 - 2020, Arm Limited. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -37,6 +37,8 @@
   Parsers/Madt/MadtParser.c
   Parsers/Madt/MadtParser.h
   Parsers/Mcfg/McfgParser.c
+  Parsers/Pcct/PcctParser.c
+  Parsers/Pcct/PcctParser.h
   Parsers/Pptt/PpttParser.c
   Parsers/Pptt/PpttParser.h
   Parsers/Rsdp/RsdpParser.c

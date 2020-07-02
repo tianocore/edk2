@@ -1,7 +1,7 @@
 /** @file
   Main file for 'acpiview' Shell command function.
 
-  Copyright (c) 2016 - 2020, ARM Limited. All rights reserved.<BR>
+  Copyright (c) 2016 - 2020, Arm Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
@@ -57,6 +57,8 @@ ACPI_TABLE_PARSER ParserList[] = {
   {EFI_ACPI_6_2_MULTIPLE_APIC_DESCRIPTION_TABLE_SIGNATURE, ParseAcpiMadt},
   {EFI_ACPI_6_2_PCI_EXPRESS_MEMORY_MAPPED_CONFIGURATION_SPACE_BASE_ADDRESS_DESCRIPTION_TABLE_SIGNATURE,
    ParseAcpiMcfg},
+  {EFI_ACPI_6_2_PLATFORM_COMMUNICATIONS_CHANNEL_TABLE_SIGNATURE,
+   ParseAcpiPcct},
   {EFI_ACPI_6_2_PROCESSOR_PROPERTIES_TOPOLOGY_TABLE_STRUCTURE_SIGNATURE,
    ParseAcpiPptt},
   {RSDP_TABLE_INFO, ParseAcpiRsdp},
