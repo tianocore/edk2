@@ -35,13 +35,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #define PRESENT_MEMORY_ATTRIBUTES     (EFI_RESOURCE_ATTRIBUTE_PRESENT)
 
-#define EXCLUSIVE_MEMORY_ATTRIBUTES   (EFI_MEMORY_UC | EFI_MEMORY_WC | \
-                                       EFI_MEMORY_WT | EFI_MEMORY_WB | \
-                                       EFI_MEMORY_WP | EFI_MEMORY_UCE)
-
-#define NONEXCLUSIVE_MEMORY_ATTRIBUTES (EFI_MEMORY_XP | EFI_MEMORY_RP | \
-                                        EFI_MEMORY_RO)
-
 //
 // Module Variables
 //
@@ -665,7 +658,7 @@ ConverToCpuArchAttributes (
 {
   UINT64      CpuArchAttributes;
 
-  CpuArchAttributes = Attributes & NONEXCLUSIVE_MEMORY_ATTRIBUTES;
+  CpuArchAttributes = Attributes & EFI_MEMORY_ATTRIBUTE_MASK;
 
   if ( (Attributes & EFI_MEMORY_UC) == EFI_MEMORY_UC) {
     CpuArchAttributes |= EFI_MEMORY_UC;
@@ -951,7 +944,7 @@ CoreConvertSpace (
         // Keep original CPU arch attributes when caller just calls
         // SetMemorySpaceAttributes() with none CPU arch attributes (for example, RUNTIME).
         //
-        Attributes |= (Entry->Attributes & (EXCLUSIVE_MEMORY_ATTRIBUTES | NONEXCLUSIVE_MEMORY_ATTRIBUTES));
+        Attributes |= (Entry->Attributes & (EFI_CACHE_ATTRIBUTE_MASK | EFI_MEMORY_ATTRIBUTE_MASK));
       }
       Entry->Attributes = Attributes;
       break;
