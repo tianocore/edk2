@@ -39,12 +39,6 @@
 
 #define SMRAM_CAPABILITIES  (EFI_MEMORY_WB | EFI_MEMORY_UC)
 
-#define MEMORY_CACHE_ATTRIBUTES (EFI_MEMORY_UC | EFI_MEMORY_WC | \
-                                 EFI_MEMORY_WT | EFI_MEMORY_WB | \
-                                 EFI_MEMORY_WP | EFI_MEMORY_UCE)
-
-#define MEMORY_PAGE_ATTRIBUTES  (EFI_MEMORY_XP | EFI_MEMORY_RP | EFI_MEMORY_RO)
-
 //
 // Function prototypes from produced protocols
 //
@@ -1710,7 +1704,7 @@ SmmIplEntry (
     CpuArch = NULL;
     Status = gBS->LocateProtocol (&gEfiCpuArchProtocolGuid, NULL, (VOID **)&CpuArch);
     if (!EFI_ERROR (Status)) {
-      MemDesc.Attributes &= ~(MEMORY_CACHE_ATTRIBUTES | MEMORY_PAGE_ATTRIBUTES);
+      MemDesc.Attributes &= ~(EFI_CACHE_ATTRIBUTE_MASK | EFI_MEMORY_ATTRIBUTE_MASK);
       MemDesc.Attributes |= EFI_MEMORY_WB;
       Status = gDS->SetMemorySpaceAttributes (
                       mSmramCacheBase,
@@ -1727,7 +1721,7 @@ SmmIplEntry (
                &MemDesc
                );
         DEBUG ((DEBUG_INFO, "SMRAM attributes: %016lx\n", MemDesc.Attributes));
-        ASSERT ((MemDesc.Attributes & MEMORY_PAGE_ATTRIBUTES) == 0);
+        ASSERT ((MemDesc.Attributes & EFI_MEMORY_ATTRIBUTE_MASK) == 0);
       );
     }
     //
