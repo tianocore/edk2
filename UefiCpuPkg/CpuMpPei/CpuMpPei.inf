@@ -46,6 +46,9 @@
   BaseMemoryLib
   CpuLib
 
+[Guids]
+  gEdkiiMigratedFvInfoGuid                                             ## SOMETIMES_CONSUMES     ## HOB
+
 [Ppis]
   gEfiPeiMpServicesPpiGuid                      ## PRODUCES
   gEfiSecPlatformInformationPpiGuid             ## SOMETIMES_CONSUMES

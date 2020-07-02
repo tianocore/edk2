@@ -12,6 +12,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/MemoryAllocationLib.h>
 #include <Library/CpuLib.h>
 #include <Library/BaseLib.h>
+#include <Guid/MigratedFvInfo.h>
 
 #include "CpuMpPei.h"
 
@@ -605,6 +606,8 @@ MemoryDiscoveredPpiNotifyCallback (
   EFI_STATUS  Status;
   BOOLEAN     InitStackGuard;
   BOOLEAN     InterruptState;
+  EDKII_MIGRATED_FV_INFO *MigratedFvInfo;
+  EFI_PEI_HOB_POINTERS   Hob;
 
   InterruptState = SaveAndDisableInterrupts ();
   Status = MigrateGdt ();
@@ -617,9 +620,9 @@ MemoryDiscoveredPpiNotifyCallback (
   // the task switch (for the sake of stack switch).
   //
   InitStackGuard = FALSE;
-  if (IsIa32PaeSupported () && PcdGetBool (PcdCpuStackGuard)) {
+  if (IsIa32PaeSupported ()) {
     EnablePaging ();
-    InitStackGuard = TRUE;
+    InitStackGuard = PcdGetBool (PcdCpuStackGuard);
   }
 
   Status = InitializeCpuMpWorker ((CONST EFI_PEI_SERVICES **)PeiServices);
@@ -628,6 +631,16 @@ MemoryDiscoveredPpiNotifyCallback (
   if (InitStackGuard) {
     SetupStackGuardPage ();
   }
+
+  Hob.Raw  = GetFirstGuidHob (&gEdkiiMigratedFvInfoGuid);
+  while (Hob.Raw != NULL) {
+    MigratedFvInfo = GET_GUID_HOB_DATA (Hob);
+    ConvertMemoryPageAttributes (MigratedFvInfo->FvOrgBase, MigratedFvInfo->FvLength, 0);
+
+    Hob.Raw = GET_NEXT_HOB (Hob);
+    Hob.Raw = GetNextGuidHob (&gEdkiiMigratedFvInfoGuid, Hob.Raw);
+  }
+  CpuFlushTlb ();
 
   return Status;
 }
