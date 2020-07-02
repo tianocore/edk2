@@ -43,7 +43,8 @@
                                        EFI_MEMORY_WC  | \
                                        EFI_MEMORY_WT  | \
                                        EFI_MEMORY_WB  | \
-                                       EFI_MEMORY_UCE   \
+                                       EFI_MEMORY_UCE | \
+                                       EFI_MEMORY_WP    \
                                        )
 
 #define EFI_MEMORY_PAGETYPE_MASK      (EFI_MEMORY_RP  | \
