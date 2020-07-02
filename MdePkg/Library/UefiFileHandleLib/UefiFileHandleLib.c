@@ -969,6 +969,7 @@ FileHandleReadLine(
   UINTN       CharSize;
   UINTN       CountSoFar;
   UINTN       CrCount;
+  UINTN       OldSize;
   UINT64      OriginalFilePosition;
 
   if (Handle == NULL
@@ -1039,10 +1040,11 @@ FileHandleReadLine(
   // if we ran out of space tell when...
   //
   if ((CountSoFar+1-CrCount)*sizeof(CHAR16) > *Size){
+    OldSize = *Size;
     *Size = (CountSoFar+1-CrCount)*sizeof(CHAR16);
     if (!Truncate) {
-      if (Buffer != NULL && *Size != 0) {
-        ZeroMem(Buffer, *Size);
+      if (Buffer != NULL && OldSize != 0) {
+        ZeroMem(Buffer, OldSize);
       }
       FileHandleSetPosition(Handle, OriginalFilePosition);
       return (EFI_BUFFER_TOO_SMALL);
