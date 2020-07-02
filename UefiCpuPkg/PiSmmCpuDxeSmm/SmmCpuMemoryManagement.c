@@ -435,7 +435,7 @@ ConvertMemoryPageAttributes (
   EFI_PHYSICAL_ADDRESS              MaximumSupportMemAddress;
 
   ASSERT (Attributes != 0);
-  ASSERT ((Attributes & ~(EFI_MEMORY_RP | EFI_MEMORY_RO | EFI_MEMORY_XP)) == 0);
+  ASSERT ((Attributes & ~EFI_MEMORY_ATTRIBUTE_MASK) == 0);
 
   ASSERT ((BaseAddress & (SIZE_4KB - 1)) == 0);
   ASSERT ((Length & (SIZE_4KB - 1)) == 0);
