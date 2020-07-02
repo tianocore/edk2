@@ -20,6 +20,8 @@ import re
 import subprocess
 import sys
 
+import email.header
+
 class Verbose:
     SILENT, ONELINE, NORMAL = range(3)
     level = NORMAL
