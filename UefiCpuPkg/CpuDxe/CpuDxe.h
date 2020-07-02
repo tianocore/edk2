@@ -39,19 +39,6 @@
 #include <Guid/IdleLoopEvent.h>
 #include <Guid/VectorHandoffTable.h>
 
-#define EFI_MEMORY_CACHETYPE_MASK     (EFI_MEMORY_UC  | \
-                                       EFI_MEMORY_WC  | \
-                                       EFI_MEMORY_WT  | \
-                                       EFI_MEMORY_WB  | \
-                                       EFI_MEMORY_UCE | \
-                                       EFI_MEMORY_WP    \
-                                       )
-
-#define EFI_MEMORY_PAGETYPE_MASK      (EFI_MEMORY_RP  | \
-                                       EFI_MEMORY_XP  | \
-                                       EFI_MEMORY_RO    \
-                                       )
-
 #define HEAP_GUARD_NONSTOP_MODE       \
         ((PcdGet8 (PcdHeapGuardPropertyMask) & (BIT6|BIT4|BIT1|BIT0)) > BIT6)
 

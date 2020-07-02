@@ -717,7 +717,7 @@ ConvertMemoryPageAttributes (
     return RETURN_INVALID_PARAMETER;
   }
 
-  if ((Attributes & ~(EFI_MEMORY_RP | EFI_MEMORY_RO | EFI_MEMORY_XP)) != 0) {
+  if ((Attributes & ~EFI_MEMORY_ATTRIBUTE_MASK) != 0) {
     DEBUG ((DEBUG_ERROR, "Attributes(0x%lx) has unsupported bit\n", Attributes));
     return EFI_UNSUPPORTED;
   }
@@ -1018,9 +1018,9 @@ RefreshGcdMemoryAttributesFromPaging (
 
       Length = MIN (PageLength, MemorySpaceLength);
       if (Attributes != (MemorySpaceMap[Index].Attributes &
-                         EFI_MEMORY_PAGETYPE_MASK)) {
+                         EFI_MEMORY_ATTRIBUTE_MASK)) {
         NewAttributes = (MemorySpaceMap[Index].Attributes &
-                         ~EFI_MEMORY_PAGETYPE_MASK) | Attributes;
+                         ~EFI_MEMORY_ATTRIBUTE_MASK) | Attributes;
         Status = gDS->SetMemorySpaceAttributes (
                         BaseAddress,
                         Length,

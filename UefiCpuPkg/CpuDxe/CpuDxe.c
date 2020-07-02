@@ -10,9 +10,6 @@
 #include "CpuMp.h"
 #include "CpuPageTable.h"
 
-#define CACHE_ATTRIBUTE_MASK   (EFI_MEMORY_UC | EFI_MEMORY_WC | EFI_MEMORY_WT | EFI_MEMORY_WB | EFI_MEMORY_UCE | EFI_MEMORY_WP)
-#define MEMORY_ATTRIBUTE_MASK  (EFI_MEMORY_RP | EFI_MEMORY_XP | EFI_MEMORY_RO)
-
 //
 // Global Variables
 //
@@ -417,8 +414,8 @@ CpuSetMemoryAttributes (
     return EFI_SUCCESS;
   }
 
-  CacheAttributes = Attributes & CACHE_ATTRIBUTE_MASK;
-  MemoryAttributes = Attributes & MEMORY_ATTRIBUTE_MASK;
+  CacheAttributes = Attributes & EFI_CACHE_ATTRIBUTE_MASK;
+  MemoryAttributes = Attributes & EFI_MEMORY_ATTRIBUTE_MASK;
 
   if (Attributes != (CacheAttributes | MemoryAttributes)) {
     return EFI_INVALID_PARAMETER;
@@ -677,7 +674,7 @@ SetGcdMemorySpaceAttributes (
     gDS->SetMemorySpaceAttributes (
            RegionStart,
            RegionLength,
-           (MemorySpaceMap[Index].Attributes & ~EFI_MEMORY_CACHETYPE_MASK) | (MemorySpaceMap[Index].Capabilities & Attributes)
+           (MemorySpaceMap[Index].Attributes & ~EFI_CACHE_ATTRIBUTE_MASK) | (MemorySpaceMap[Index].Capabilities & Attributes)
            );
   }
 
@@ -754,7 +751,7 @@ RefreshMemoryAttributesFromMtrr (
     gDS->SetMemorySpaceAttributes (
            MemorySpaceMap[Index].BaseAddress,
            MemorySpaceMap[Index].Length,
-           (MemorySpaceMap[Index].Attributes & ~EFI_MEMORY_CACHETYPE_MASK) |
+           (MemorySpaceMap[Index].Attributes & ~EFI_CACHE_ATTRIBUTE_MASK) |
            (MemorySpaceMap[Index].Capabilities & DefaultAttributes)
            );
   }
