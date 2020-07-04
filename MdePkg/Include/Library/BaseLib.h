@@ -2966,11 +2966,10 @@ InitializeListHead (
 
 
 /**
-  Adds a node to the beginning of a doubly linked list, and returns the pointer
-  to the head node of the doubly linked list.
+  Adds a node to the beginning of a doubly linked list.
 
   Adds the node Entry at the beginning of the doubly linked list denoted by
-  ListHead, and returns ListHead.
+  ListHead.
 
   If ListHead is NULL, then ASSERT().
   If Entry is NULL, then ASSERT().
@@ -2984,10 +2983,8 @@ InitializeListHead (
   @param  Entry     A pointer to a node that is to be inserted at the beginning
                     of a doubly linked list.
 
-  @return ListHead
-
 **/
-LIST_ENTRY *
+VOID
 EFIAPI
 InsertHeadList (
   IN OUT  LIST_ENTRY                *ListHead,
@@ -2996,11 +2993,9 @@ InsertHeadList (
 
 
 /**
-  Adds a node to the end of a doubly linked list, and returns the pointer to
-  the head node of the doubly linked list.
+  Adds a node to the end of a doubly linked list.
 
-  Adds the node Entry to the end of the doubly linked list denoted by ListHead,
-  and returns ListHead.
+  Adds the node Entry to the end of the doubly linked list denoted by ListHead.
 
   If ListHead is NULL, then ASSERT().
   If Entry is NULL, then ASSERT().
@@ -3014,10 +3009,8 @@ InsertHeadList (
   @param  Entry     A pointer to a node that is to be added at the end of the
                     doubly linked list.
 
-  @return ListHead
-
 **/
-LIST_ENTRY *
+VOID
 EFIAPI
 InsertTailList (
   IN OUT  LIST_ENTRY                *ListHead,
