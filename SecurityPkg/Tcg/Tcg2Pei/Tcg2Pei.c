@@ -633,6 +633,7 @@ MeasureFvImage (
     }
     FvBlob2.BlobBase      = FvBase;
     FvBlob2.BlobLength    = FvLength;
+    TcgEventHdr.PCRIndex  = 0;
     TcgEventHdr.EventType = EV_EFI_PLATFORM_FIRMWARE_BLOB2;
     TcgEventHdr.EventSize = sizeof (FvBlob2);
     EventData             = &FvBlob2;
