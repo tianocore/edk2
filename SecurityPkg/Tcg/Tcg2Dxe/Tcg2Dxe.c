@@ -1589,7 +1589,7 @@ SetupEventLog (
         TcgEfiSpecIdEventStruct->platformClass = PcdGet8 (PcdTpmPlatformClass);
         TcgEfiSpecIdEventStruct->specVersionMajor = TCG_EfiSpecIDEventStruct_SPEC_VERSION_MAJOR_TPM2;
         TcgEfiSpecIdEventStruct->specVersionMinor = TCG_EfiSpecIDEventStruct_SPEC_VERSION_MINOR_TPM2;
-        TcgEfiSpecIdEventStruct->specErrata = TCG_EfiSpecIDEventStruct_SPEC_ERRATA_TPM2;
+        TcgEfiSpecIdEventStruct->specErrata = (UINT8)PcdGet32(PcdTcgPfpMeasurementRevision);
         TcgEfiSpecIdEventStruct->uintnSize = sizeof(UINTN)/sizeof(UINT32);
         NumberOfAlgorithms = 0;
         DigestSize = (TCG_EfiSpecIdEventAlgorithmSize *)((UINT8 *)TcgEfiSpecIdEventStruct + sizeof(*TcgEfiSpecIdEventStruct) + sizeof(NumberOfAlgorithms));
