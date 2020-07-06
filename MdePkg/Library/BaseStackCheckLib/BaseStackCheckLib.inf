@@ -36,5 +36,5 @@
   BaseLib
   DebugLib
 
-[FixedPcd]
+[Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask  ## CONSUMES
