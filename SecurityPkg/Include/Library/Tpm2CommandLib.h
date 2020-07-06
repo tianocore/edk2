@@ -791,6 +791,22 @@ Tpm2GetCapabilityAlgorithmSet (
   );
 
 /**
+  This function will query if the command is supported.
+
+  @param[In]  Command         TPM_CC command starts from TPM_CC_FIRST.
+  @param[out] IsCmdImpl       The command is supported or not.
+
+  @retval EFI_SUCCESS            Operation completed successfully.
+  @retval EFI_DEVICE_ERROR       The command was unsuccessful.
+**/
+EFI_STATUS
+EFIAPI
+Tpm2GetCapabilityIsCommandImplemented (
+  IN      TPM_CC      Command,
+  OUT     BOOLEAN     *IsCmdImpl
+  );
+
+/**
   This command is used to check to see if specific combinations of algorithm parameters are supported.
 
   @param[in]  Parameters              Algorithm parameters to be validated
