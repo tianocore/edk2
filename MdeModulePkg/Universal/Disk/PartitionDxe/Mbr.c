@@ -135,14 +135,17 @@ PartitionInstallMbrChildHandles (
   EFI_DEVICE_PATH_PROTOCOL     *LastDevicePathNode;
   UINT32                       BlockSize;
   UINT32                       MediaId;
-  EFI_LBA                      LastBlock;
+  EFI_LBA                      LastSector;
   EFI_PARTITION_INFO_PROTOCOL  PartitionInfo;
 
   Found           = EFI_NOT_FOUND;
 
-  BlockSize = BlockIo->Media->BlockSize;
-  MediaId   = BlockIo->Media->MediaId;
-  LastBlock = BlockIo->Media->LastBlock;
+  BlockSize   = BlockIo->Media->BlockSize;
+  MediaId     = BlockIo->Media->MediaId;
+  LastSector  = DivU64x32 (
+                  MultU64x32 (BlockIo->Media->LastBlock + 1, BlockSize),
+                  MBR_SIZE
+                  ) - 1;
 
   //
   // Ensure the block size can hold the MBR
@@ -167,7 +170,7 @@ PartitionInstallMbrChildHandles (
     Found = Status;
     goto Done;
   }
-  if (!PartitionValidMbr (Mbr, LastBlock)) {
+  if (!PartitionValidMbr (Mbr, LastSector)) {
     goto Done;
   }
   //
