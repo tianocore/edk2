@@ -114,7 +114,11 @@ PCCTS_H=../h
 #
 #   UNIX
 #
+ifeq ($(CXX), llvm)
+BUILD_CC?=$(CLANG_BIN)clang
+else
 BUILD_CC?=cc
+endif
 COPT=-O
 ANTLR=${BIN_DIR}/antlr
 DLG=${BIN_DIR}/dlg
