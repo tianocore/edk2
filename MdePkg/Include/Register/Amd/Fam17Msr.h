@@ -28,7 +28,7 @@
 **/
 typedef union {
   struct {
-    UINT64  Function:12;
+    UINT32  Function:12;
   } GhcbInfo;
 
   struct {
@@ -39,9 +39,9 @@ typedef union {
   } GhcbProtocol;
 
   struct {
-    UINT64  Function:12;
-    UINT64  ReasonCodeSet:4;
-    UINT64  ReasonCode:8;
+    UINT32  Function:12;
+    UINT32  ReasonCodeSet:4;
+    UINT32  ReasonCode:8;
   } GhcbTerminate;
 
   VOID    *Ghcb;
