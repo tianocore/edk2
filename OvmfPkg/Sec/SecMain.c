@@ -735,6 +735,7 @@ SevEsProtocolFailure (
   IN UINT8  ReasonCode
   )
 {
+#if 0
   MSR_SEV_ES_GHCB_REGISTER  Msr;
 
   //
@@ -747,6 +748,7 @@ SevEsProtocolFailure (
   AsmWriteMsr64 (MSR_SEV_ES_GHCB, Msr.GhcbPhysicalAddress);
 
   AsmVmgExit ();
+#endif
 
   ASSERT (FALSE);
   CpuDeadLoop ();
