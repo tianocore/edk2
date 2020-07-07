@@ -460,6 +460,12 @@ InstallSecureBootHook (
     DEBUG ((EFI_D_ERROR, "SecureBootSetup: already in User Mode\n"));
     return;
   }
+
+  if (Settings.SecureBootEnable != SECURE_BOOT_MODE_ENABLE) {
+    DEBUG ((EFI_D_ERROR, "SecureBootSetup: SecureBootEnable is disabled.\n"));
+    return;
+  }
+
   PrintSettings (&Settings);
 
   if (Settings.CustomMode != CUSTOM_SECURE_BOOT_MODE) {
