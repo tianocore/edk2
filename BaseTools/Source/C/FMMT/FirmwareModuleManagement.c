@@ -1178,6 +1178,7 @@ FmmtImageAdd(
                 memset (&FvInFd->FfsAttuibutes[EndId].GuidName, '\0', sizeof(EFI_GUID));
                 if (EndId > 0) {
                     FvInFd->FfsAttuibutes[EndId].FvLevel = FvInFd->FfsAttuibutes[EndId - 1].FvLevel;
+                    FvInFd->FfsAttuibutes[EndId].FvId    = FvInFd->FfsAttuibutes[EndId - 1].FvId;
                     FvInFd->FfsAttuibutes[EndId - 1].IsFvEnd = 0;
                 }
                 FvInFd->FfsAttuibutes[EndId].IsFvEnd = 1;
