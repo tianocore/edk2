@@ -90,8 +90,8 @@ AsmGetTemplateAddressMap (
 **/
 VOID
 ArchUpdateIdtEntry (
-  IN IA32_IDT_GATE_DESCRIPTOR        *IdtEntry,
-  IN UINTN                           InterruptHandler
+  OUT IA32_IDT_GATE_DESCRIPTOR       *IdtEntry,
+  IN  UINTN                          InterruptHandler
   );
 
 /**
