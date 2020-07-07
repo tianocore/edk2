@@ -206,6 +206,10 @@ typedef struct {
   //
   UINT8            Level;
   //
+  //Describe the belong to FV
+  //
+  UINT8           FvId;
+  //
   // If this FFS has no encapsulate section, this flag will set to True.
   //
   BOOLEAN          IsLeaf;
@@ -272,6 +276,7 @@ typedef struct __ENCAP_INFO_DATA{
 typedef struct _FFS_INFOMATION{
   CHAR8                      *FFSName;
   UINT32                     InFvId;
+  UINT8                      FvId;
   UINT8                      ParentLevel;
   BOOLEAN                    IsFFS;
   CHAR16                     UiName[_MAX_PATH];
@@ -301,6 +306,7 @@ typedef struct _FV_INFOMATION{
   UINT8                      MulFvLevel;
   CHAR8                      AlignmentStr[16];
   FFS_INFORMATION            *ChildFvFFS;
+  FFS_INFORMATION            *ChildGuid;
 } FV_INFORMATION;
 
 typedef struct _FIRMWARE_DEVICE {
