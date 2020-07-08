@@ -58,6 +58,7 @@
   gTpmErrorHobGuid                                                    ## SOMETIMES_PRODUCES     ## HOB
   gMeasuredFvHobGuid                                                  ## PRODUCES               ## HOB
   gEfiTpmDeviceInstanceTpm12Guid                                      ## PRODUCES               ## GUID       # TPM device identifier
+  gEdkiiMigratedFvInfoGuid                                            ## SOMETIMES_CONSUMES     ## HOB
 
 [Ppis]
   gPeiLockPhysicalPresencePpiGuid                                     ## SOMETIMES_CONSUMES     ## NOTIFY
