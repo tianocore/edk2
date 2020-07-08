@@ -1,0 +1,14 @@
+// @file
+// An instance of Timer Library for posix compliant hosts.
+//
+// A semi-functional instance of the Timer Library that can be used
+// for host based unit tests on posix compliant machines.
+//
+// Copyright (c) Microsoft Corporation.
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+
+#string STR_MODULE_ABSTRACT             #language en-US "Host instance of Timer Library"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "An instance of the Timer Library that can be used for host based unit tests."

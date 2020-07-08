@@ -1,0 +1,33 @@
+## @file
+#  An instance of Timer Library for posix compliant hosts.
+#
+#  A semi-functional instance of the Timer Library that can be used for
+#  host based testing as a functional timer library instance.
+#
+#  Copyright (c) Microsoft Corporation.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BaseTimerLibPosix
+  MODULE_UNI_FILE                = BaseTimerLibPosix.uni
+  FILE_GUID                      = a2a413b8-43c3-40cc-a298-be7a214d3564
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = TimerLib|HOST_APPLICATION
+#
+#  VALID_ARCHITECTURES           = HOST
+#
+
+[Sources]
+  TimerLibPosix.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  DebugLib
