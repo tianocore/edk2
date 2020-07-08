@@ -214,6 +214,12 @@
                                                                                        "TRUE  - Shadow PEIM on S3 boot path after memory is ready.<BR>\n"
                                                                                        "FALSE - Not shadow PEIM on S3 boot path after memory is ready.<BR>"
 
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdMigrateTemporaryRamFirmwareVolumes_HELP #language en-US "Enable the feature that evacuate temporary memory to permanent memory or not.<BR><BR>\n"
+                                                                                                      "It will allocate page to save the temporary PEIMs resided in NEM(or CAR) to the permanent memory and change all pointers pointed to the NEM(or CAR) to permanent memory.<BR><BR>\n"
+                                                                                                      "After then, there are no pointer pointed to NEM(or CAR) and TOCTOU volnerability can be avoid.<BR><BR>\n"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdMigrateTemporaryRamFirmwareVolumes_PROMPT #language en-US "Enable the feature that evacuate temporary memory to permanent memory or not"
+
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdAcpiDefaultOemId_PROMPT  #language en-US "Default OEM ID for ACPI table creation"
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdAcpiDefaultOemId_HELP  #language en-US "Default OEM ID for ACPI table creation, its length must be 0x6 bytes to follow ACPI specification."
