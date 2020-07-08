@@ -6,7 +6,11 @@
 ##
 {
     "CompilerPlugin": {
-        "DscPath": "CryptoPkg.dsc"
+        "DscPath": "CryptoPkg.dsc",
+    },
+    ## options defined .pytool/Plugin/HostUnitTestCompilerPlugin
+    "HostUnitTestCompilerPlugin": {
+        "DscPath": "Test/UnitTest/CryptoPkgHostUnitTest.dsc"
     },
     "CharEncodingCheck": {
         "IgnoreFiles": []

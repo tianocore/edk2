@@ -223,6 +223,32 @@
 #       generated for it, but the binary will not be put into any firmware volume.
 #
 ###################################################################################################
+[Components]
+  CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
+  CryptoPkg/Library/BaseCryptLib/UnitTestHostBaseCryptLib.inf
+  CryptoPkg/Test/UnitTest/Library/BaseCryptLib/TestBaseCryptLibUefiShell.inf {
+    <LibraryClasses>
+      PeimEntryPoint|MdePkg/Library/PeimEntryPoint/PeimEntryPoint.inf
+      UefiDriverEntryPoint|MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
+      UefiApplicationEntryPoint|MdePkg/Library/UefiApplicationEntryPoint/UefiApplicationEntryPoint.inf
+
+      BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
+      BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
+      DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
+      MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
+      PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
+      PeiServicesLib|MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
+      PerformanceLib|MdePkg/Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
+      PrintLib|MdePkg/Library/BasePrintLib/BasePrintLib.inf
+      UefiBootServicesTableLib|MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
+
+      UnitTestLib|UnitTestFrameworkPkg/Library/UnitTestLib/UnitTestLib.inf
+      UnitTestPersistenceLib|UnitTestFrameworkPkg/Library/UnitTestPersistenceLibNull/UnitTestPersistenceLibNull.inf
+      UnitTestResultReportLib|UnitTestFrameworkPkg/Library/UnitTestResultReportLib/UnitTestResultReportLibDebugLib.inf
+    <LibraryClasses.common.UEFI_APPLICATION>
+      UnitTestResultReportLib|UnitTestFrameworkPkg/Library/UnitTestResultReportLib/UnitTestResultReportLibConOut.inf
+  }
+
 !if $(CRYPTO_SERVICES) == PACKAGE
 [Components]
   CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
