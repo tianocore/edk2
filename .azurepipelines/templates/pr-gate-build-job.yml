@@ -40,7 +40,7 @@ jobs:
         Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
       TARGET_CRYPTO:
         Build.Pkgs: 'CryptoPkg'
-        Build.Targets: 'DEBUG,RELEASE,NO-TARGET'
+        Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
       TARGET_SECURITY:
         Build.Pkgs: 'SecurityPkg'
         Build.Targets: 'DEBUG,RELEASE,NO-TARGET'
