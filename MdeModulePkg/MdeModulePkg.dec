@@ -1220,6 +1220,15 @@
   # @Prompt Shadow Peim and PeiCore on boot
   gEfiMdeModulePkgTokenSpaceGuid.PcdShadowPeimOnBoot|TRUE|BOOLEAN|0x30001029
 
+  ## Enable the feature that evacuate temporary memory to permanent memory or not<BR><BR>
+  #  Set FALSE as default, if the developer need this feature to avoid this vulnerability, please
+  #  enable it to shadow all PEIMs no matter the behavior controled by PcdShadowPeimOnBoot or
+  #  PcdShadowPeimOnS3Boot<BR>
+  #  TRUE - Evacuate temporary memory, the actions include copy memory, convert PPI pointers and so on.<BR>
+  #  FALSE - Do nothing, for example, no copy memory, no convert PPI pointers and so on.<BR>
+  # @Prompt Evacuate temporary memory to permanent memory
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMigrateTemporaryRamFirmwareVolumes|FALSE|BOOLEAN|0x3000102A
+
   ## The mask is used to control memory profile behavior.<BR><BR>
   #  BIT0 - Enable UEFI memory profile.<BR>
   #  BIT1 - Enable SMRAM profile.<BR>
