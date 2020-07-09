@@ -387,7 +387,7 @@ Tcg2PhysicalPresenceLibConstructor (
 {
   EFI_STATUS  Status;
 
-  if (AsciiStrnCmp(PP_INF_VERSION_1_2, (CHAR8 *)PcdGetPtr(PcdTcgPhysicalPresenceInterfaceVer), sizeof(PP_INF_VERSION_1_2) - 1) <= 0) {
+  if (AsciiStrnCmp(PP_INF_VERSION_1_2, (CHAR8 *)PcdGetPtr(PcdTcgPhysicalPresenceInterfaceVer), sizeof(PP_INF_VERSION_1_2) - 1) >= 0) {
     mIsTcg2PPVerLowerThan_1_3 = TRUE;
   }
 
