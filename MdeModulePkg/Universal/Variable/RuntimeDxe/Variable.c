@@ -531,6 +531,7 @@ Reclaim (
   VOID                  *Point1;
   BOOLEAN               FoundAdded;
   EFI_STATUS            Status;
+  EFI_STATUS            DoneStatus;
   UINTN                 CommonVariableTotalSize;
   UINTN                 CommonUserVariableTotalSize;
   UINTN                 HwErrVariableTotalSize;
@@ -774,25 +775,30 @@ Reclaim (
   }
 
 Done:
+  DoneStatus = EFI_SUCCESS;
   if (IsVolatile || mVariableModuleGlobal->VariableGlobal.EmuNvMode) {
-    Status =  SynchronizeRuntimeVariableCache (
-                &mVariableModuleGlobal->VariableGlobal.VariableRuntimeCacheContext.VariableRuntimeVolatileCache,
-                0,
-                VariableStoreHeader->Size
-                );
-    ASSERT_EFI_ERROR (Status);
+    DoneStatus = SynchronizeRuntimeVariableCache (
+                   &mVariableModuleGlobal->VariableGlobal.VariableRuntimeCacheContext.VariableRuntimeVolatileCache,
+                   0,
+                   VariableStoreHeader->Size
+                   );
+    ASSERT_EFI_ERROR (DoneStatus);
     FreePool (ValidBuffer);
   } else {
     //
     // For NV variable reclaim, we use mNvVariableCache as the buffer, so copy the data back.
     //
     CopyMem (mNvVariableCache, (UINT8 *) (UINTN) VariableBase, VariableStoreHeader->Size);
-    Status =  SynchronizeRuntimeVariableCache (
-                &mVariableModuleGlobal->VariableGlobal.VariableRuntimeCacheContext.VariableRuntimeNvCache,
-                0,
-                VariableStoreHeader->Size
-                );
-    ASSERT_EFI_ERROR (Status);
+    DoneStatus = SynchronizeRuntimeVariableCache (
+                   &mVariableModuleGlobal->VariableGlobal.VariableRuntimeCacheContext.VariableRuntimeNvCache,
+                   0,
+                   VariableStoreHeader->Size
+                   );
+    ASSERT_EFI_ERROR (DoneStatus);
+  }
+
+  if (!EFI_ERROR (Status) && EFI_ERROR (DoneStatus)) {
+    Status = DoneStatus;
   }
 
   return Status;
