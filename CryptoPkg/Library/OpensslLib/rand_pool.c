@@ -7,7 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include "internal/rand_int.h"
+#include "crypto/rand.h"
 #include <openssl/aes.h>
 
 #include <Uefi.h>

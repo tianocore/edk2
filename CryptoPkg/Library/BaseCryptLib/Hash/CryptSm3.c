@@ -7,7 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include "InternalCryptLib.h"
-#include "internal/sm3.h"
+#include "crypto/sm3.h"
 
 /**
   Retrieves the size, in bytes, of the context buffer required for SM3 hash operations.
