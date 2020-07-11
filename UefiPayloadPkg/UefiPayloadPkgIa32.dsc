@@ -58,6 +58,9 @@
   DEFINE UART_DEFAULT_STOP_BITS       = 1
   DEFINE DEFAULT_TERMINAL_TYPE        = 0
 
+  # Enabling the serial terminal will slow down the boot menu redering!
+  DEFINE DISABLE_SERIAL_TERMINAL      = FALSE
+
   #
   #  typedef struct {
   #    UINT16  VendorId;          ///< Vendor ID to match the PCI device.  The value 0xFFFF terminates the list of entries.
@@ -503,7 +506,9 @@
   #
   MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatformDxe.inf
   MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitterDxe.inf
+!if $(DISABLE_SERIAL_TERMINAL) == FALSE
   MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsoleDxe.inf
+!endif
   MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
   UefiPayloadPkg/GraphicsOutputDxe/GraphicsOutputDxe.inf
 
