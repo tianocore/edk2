@@ -13,8 +13,10 @@
 #include "AcpiViewConfig.h"
 
 STATIC UINT32   gIndent;
-STATIC UINT32   mTableErrorCount;
-STATIC UINT32   mTableWarningCount;
+
+// Publicly accessible error and warning counters.
+UINT32   mTableErrorCount;
+UINT32   mTableWarningCount;
 
 STATIC ACPI_DESCRIPTION_HEADER_INFO AcpiHdrInfo;
 
@@ -24,54 +26,6 @@ STATIC ACPI_DESCRIPTION_HEADER_INFO AcpiHdrInfo;
 STATIC CONST ACPI_PARSER AcpiHeaderParser[] = {
   PARSE_ACPI_HEADER (&AcpiHdrInfo)
 };
-
-/**
-  This function resets the ACPI table error counter to Zero.
-**/
-VOID
-ResetErrorCount (
-  VOID
-  )
-{
-  mTableErrorCount = 0;
-}
-
-/**
-  This function returns the ACPI table error count.
-
-  @retval Returns the count of errors detected in the ACPI tables.
-**/
-UINT32
-GetErrorCount (
-  VOID
-  )
-{
-  return mTableErrorCount;
-}
-
-/**
-  This function resets the ACPI table warning counter to Zero.
-**/
-VOID
-ResetWarningCount (
-  VOID
-  )
-{
-  mTableWarningCount = 0;
-}
-
-/**
-  This function returns the ACPI table warning count.
-
-  @retval Returns the count of warning detected in the ACPI tables.
-**/
-UINT32
-GetWarningCount (
-  VOID
-  )
-{
-  return mTableWarningCount;
-}
 
 /**
   This function increments the ACPI table error counter.

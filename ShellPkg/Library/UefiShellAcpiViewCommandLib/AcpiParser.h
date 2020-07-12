@@ -16,6 +16,10 @@
 /// that allows us to process the log options.
 #define RSDP_TABLE_INFO  SIGNATURE_32('R', 'S', 'D', 'P')
 
+// Publicly accessible error and warning counters.
+extern UINT32   mTableErrorCount;
+extern UINT32   mTableWarningCount;
+
 /**
   This function increments the ACPI table error counter.
 **/

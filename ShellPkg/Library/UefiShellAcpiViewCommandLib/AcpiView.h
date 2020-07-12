@@ -24,42 +24,6 @@
 #define RSDP_LENGTH_OFFSET   20
 
 /**
-  This function resets the ACPI table error counter to Zero.
-**/
-VOID
-ResetErrorCount (
-  VOID
-  );
-
-/**
-  This function returns the ACPI table error count.
-
-  @retval Returns the count of errors detected in the ACPI tables.
-**/
-UINT32
-GetErrorCount (
-  VOID
-  );
-
-/**
-  This function resets the ACPI table warning counter to Zero.
-**/
-VOID
-ResetWarningCount (
-  VOID
-  );
-
-/**
-  This function returns the ACPI table warning count.
-
-  @retval Returns the count of warning detected in the ACPI tables.
-**/
-UINT32
-GetWarningCount (
-  VOID
-  );
-
-/**
   This function processes the table reporting options for the ACPI table.
 
   @param [in] Signature The ACPI table Signature.
