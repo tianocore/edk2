@@ -10,12 +10,8 @@
 
 #include "AcpiViewConfig.h"
 
-// Report variables
-STATIC BOOLEAN        mConsistencyCheck;
-STATIC BOOLEAN        mColourHighlighting;
-STATIC EREPORT_OPTION mReportType;
-STATIC BOOLEAN        mMandatoryTableValidate;
-STATIC UINTN          mMandatoryTableSpec;
+// Main configuration structure
+ACPI_VIEW_CONFIG mConfig;
 
 // User selection of which ACPI table should be checked
 SELECTED_ACPI_TABLE mSelectedAcpiTable;
@@ -25,17 +21,21 @@ SELECTED_ACPI_TABLE mSelectedAcpiTable;
 **/
 VOID
 EFIAPI
-AcpiConfigSetDefaults (
+AcpiViewConfigSetDefaults (
   VOID
   )
 {
-  mReportType = ReportAll;
+  // Generic defaults
+  mConfig.ReportType = ReportAll;
+  mConfig.ConsistencyCheck = TRUE;
+  mConfig.MandatoryTableValidate = FALSE;
+  mConfig.MandatoryTableSpec = 0;
+  mConfig.ColourHighlighting = FALSE;
+
+  // Unselect acpi table
   mSelectedAcpiTable.Type = 0;
   mSelectedAcpiTable.Name = NULL;
   mSelectedAcpiTable.Found = FALSE;
-  mConsistencyCheck = TRUE;
-  mMandatoryTableValidate = FALSE;
-  mMandatoryTableSpec = 0;
 }
 
 /**
@@ -79,7 +79,7 @@ ConvertStrToAcpiSignature (
 **/
 VOID
 EFIAPI
-SelectAcpiTable (
+AcpiViewConfigSelectTable (
   IN CONST CHAR16 *TableName
   )
 {
@@ -87,160 +87,4 @@ SelectAcpiTable (
 
   mSelectedAcpiTable.Name = TableName;
   mSelectedAcpiTable.Type = ConvertStrToAcpiSignature (mSelectedAcpiTable.Name);
-}
-
-/**
-  This function returns the selected ACPI table.
-
-  @param [out] SelectedAcpiTable Pointer that will contain the returned struct.
-**/
-VOID
-EFIAPI
-GetSelectedAcpiTable (
-  OUT SELECTED_ACPI_TABLE **SelectedAcpiTable
-  )
-{
-  *SelectedAcpiTable = &mSelectedAcpiTable;
-}
-
-/**
-  This function returns the colour highlighting status.
-
-  @retval TRUE Colour highlighting is enabled.
-**/
-BOOLEAN
-EFIAPI
-GetColourHighlighting (
-  VOID
-  )
-{
-  return mColourHighlighting;
-}
-
-/**
-  This function sets the colour highlighting status.
-
-  @param [in] Highlight The highlight status.
-**/
-VOID
-EFIAPI
-SetColourHighlighting (
-  BOOLEAN Highlight
-  )
-{
-  mColourHighlighting = Highlight;
-}
-
-/**
-  This function returns the consistency checking status.
-
-  @retval TRUE Consistency checking is enabled.
-**/
-BOOLEAN
-EFIAPI
-GetConsistencyChecking (
-  VOID
-  )
-{
-  return mConsistencyCheck;
-}
-
-/**
-  This function sets the consistency checking status.
-
-  @param [in] ConsistencyChecking   The consistency checking status.
-**/
-VOID
-EFIAPI
-SetConsistencyChecking (
-  BOOLEAN ConsistencyChecking
-  )
-{
-  mConsistencyCheck = ConsistencyChecking;
-}
-
-/**
-  This function returns the report options.
-
-  @return The current report option.
-**/
-EREPORT_OPTION
-EFIAPI
-GetReportOption (
-  VOID
-  )
-{
-  return mReportType;
-}
-
-/**
-  This function sets the report options.
-
-  @param [in] ReportType The report option to set.
-**/
-VOID
-EFIAPI
-SetReportOption (
-  EREPORT_OPTION ReportType
-  )
-{
-  mReportType = ReportType;
-}
-
-/**
-  This function returns the ACPI table requirements validation flag.
-
-  @retval TRUE Check for mandatory table presence should be performed.
-**/
-BOOLEAN
-EFIAPI
-GetMandatoryTableValidate (
-  VOID
-  )
-{
-  return mMandatoryTableValidate;
-}
-
-/**
-  This function sets the ACPI table requirements validation flag.
-
-  @param [in] Validate Enable/Disable ACPI table requirements validation.
-**/
-VOID
-EFIAPI
-SetMandatoryTableValidate (
-  BOOLEAN Validate
-  )
-{
-  mMandatoryTableValidate = Validate;
-}
-
-/**
-  This function returns the identifier of specification to validate ACPI table
-  requirements against.
-
-  @return ID of specification listing mandatory tables.
-**/
-UINTN
-EFIAPI
-GetMandatoryTableSpec (
-  VOID
-  )
-{
-  return mMandatoryTableSpec;
-}
-
-/**
-  This function sets the identifier of specification to validate ACPI table
-  requirements against.
-
-  @param [in] Spec ID of specification listing mandatory tables.
-**/
-VOID
-EFIAPI
-SetMandatoryTableSpec (
-  UINTN Spec
-  )
-{
-  mMandatoryTableSpec = Spec;
 }

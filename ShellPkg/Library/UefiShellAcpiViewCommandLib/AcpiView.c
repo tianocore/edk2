@@ -48,15 +48,12 @@ DumpAcpiTableToFile (
 {
   CHAR16              FileNameBuffer[MAX_FILE_NAME_LEN];
   UINTN               TransferBytes;
-  SELECTED_ACPI_TABLE *SelectedTable;
-
-  GetSelectedAcpiTable (&SelectedTable);
 
   UnicodeSPrint (
     FileNameBuffer,
     sizeof (FileNameBuffer),
     L".\\%s%04d.bin",
-    SelectedTable->Name,
+    mSelectedAcpiTable.Name,
     mBinTableCount++
     );
 
@@ -82,11 +79,9 @@ ProcessTableReportOptions (
   IN CONST UINT32  Length
   )
 {
-  UINTN                OriginalAttribute;
-  UINT8                *SignaturePtr;
-  BOOLEAN              Log;
-  BOOLEAN              HighLight;
-  SELECTED_ACPI_TABLE  *SelectedTable;
+  UINTN               OriginalAttribute;
+  UINT8               *SignaturePtr;
+  BOOLEAN             Log;
 
   //
   // set local variables to suppress incorrect compiler/analyzer warnings
@@ -94,22 +89,20 @@ ProcessTableReportOptions (
   OriginalAttribute = 0;
   SignaturePtr = (UINT8*)(UINTN)&Signature;
   Log = FALSE;
-  HighLight = GetColourHighlighting ();
-  GetSelectedAcpiTable (&SelectedTable);
 
-  switch (GetReportOption ()) {
+  switch (mConfig.ReportType) {
     case ReportAll:
       Log = TRUE;
       break;
     case ReportSelected:
-      if (Signature == SelectedTable->Type) {
+      if (Signature == mSelectedAcpiTable.Type) {
         Log = TRUE;
-        SelectedTable->Found = TRUE;
+        mSelectedAcpiTable.Found = TRUE;
       }
       break;
     case ReportTableList:
       if (mTableCount == 0) {
-        if (HighLight) {
+        if (mConfig.ColourHighlighting) {
           OriginalAttribute = gST->ConOut->Mode->Attribute;
           gST->ConOut->SetAttribute (
                          gST->ConOut,
@@ -118,7 +111,7 @@ ProcessTableReportOptions (
                          );
         }
         Print (L"\nInstalled Table(s):\n");
-        if (HighLight) {
+        if (mConfig.ColourHighlighting) {
           gST->ConOut->SetAttribute (gST->ConOut, OriginalAttribute);
         }
       }
@@ -132,8 +125,8 @@ ProcessTableReportOptions (
         );
       break;
     case ReportDumpBinFile:
-      if (Signature == SelectedTable->Type) {
-        SelectedTable->Found = TRUE;
+      if (Signature == mSelectedAcpiTable.Type) {
+        mSelectedAcpiTable.Found = TRUE;
         DumpAcpiTableToFile (TablePtr, Length);
       }
       break;
@@ -144,7 +137,7 @@ ProcessTableReportOptions (
   } // switch
 
   if (Log) {
-    if (HighLight) {
+    if (mConfig.ColourHighlighting) {
       OriginalAttribute = gST->ConOut->Mode->Attribute;
       gST->ConOut->SetAttribute (
                      gST->ConOut,
@@ -159,7 +152,7 @@ ProcessTableReportOptions (
       SignaturePtr[2],
       SignaturePtr[3]
       );
-    if (HighLight) {
+    if (mConfig.ColourHighlighting) {
       gST->ConOut->SetAttribute (gST->ConOut, OriginalAttribute);
     }
   }
@@ -191,18 +184,12 @@ AcpiView (
   BOOLEAN                  FoundAcpiTable;
   UINTN                    OriginalAttribute;
   UINTN                    PrintAttribute;
-  EREPORT_OPTION           ReportOption;
   UINT8*                   RsdpPtr;
   UINT32                   RsdpLength;
   UINT8                    RsdpRevision;
   PARSE_ACPI_TABLE_PROC    RsdpParserProc;
   BOOLEAN                  Trace;
-  SELECTED_ACPI_TABLE      *SelectedTable;
 
-  //
-  // set local variables to suppress incorrect compiler/analyzer warnings
-  //
-  EfiConfigurationTable = NULL;
   OriginalAttribute = 0;
 
   // Reset Table counts
@@ -212,9 +199,6 @@ AcpiView (
   // Reset The error/warning counters
   ResetErrorCount ();
   ResetWarningCount ();
-
-  // Retrieve the user selection of ACPI table to process
-  GetSelectedAcpiTable (&SelectedTable);
 
   // Search the table for an entry that matches the ACPI Table Guid
   FoundAcpiTable = FALSE;
@@ -241,7 +225,7 @@ AcpiView (
     }
 
 #if defined(MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
-    if (GetMandatoryTableValidate ()) {
+    if (mConfig.MandatoryTableValidate) {
       ArmSbbrResetTableCounts ();
     }
 #endif
@@ -275,24 +259,23 @@ AcpiView (
   }
 
 #if defined(MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
-  if (GetMandatoryTableValidate ()) {
-    ArmSbbrReqsValidate ((ARM_SBBR_VERSION)GetMandatoryTableSpec ());
+  if (mConfig.MandatoryTableValidate) {
+    ArmSbbrReqsValidate ((ARM_SBBR_VERSION) mConfig.MandatoryTableSpec);
   }
 #endif
 
-  ReportOption = GetReportOption ();
-  if (ReportTableList != ReportOption) {
-    if (((ReportSelected == ReportOption)  ||
-         (ReportDumpBinFile == ReportOption)) &&
-        (!SelectedTable->Found)) {
+  if (ReportTableList != mConfig.ReportType) {
+    if (((ReportSelected == mConfig.ReportType)  ||
+         (ReportDumpBinFile == mConfig.ReportType)) &&
+        (!mSelectedAcpiTable.Found)) {
       Print (L"\nRequested ACPI Table not found.\n");
-    } else if (GetConsistencyChecking () &&
-               (ReportDumpBinFile != ReportOption)) {
+    } else if (mConfig.ConsistencyCheck &&
+               (ReportDumpBinFile != mConfig.ReportType)) {
       OriginalAttribute = gST->ConOut->Mode->Attribute;
 
       Print (L"\nTable Statistics:\n");
 
-      if (GetColourHighlighting ()) {
+      if (mConfig.ColourHighlighting) {
         PrintAttribute = (GetErrorCount () > 0) ?
                             EFI_TEXT_ATTR (
                               EFI_RED,
@@ -303,7 +286,7 @@ AcpiView (
       }
       Print (L"\t%d Error(s)\n", GetErrorCount ());
 
-      if (GetColourHighlighting ()) {
+      if (mConfig.ColourHighlighting) {
         PrintAttribute = (GetWarningCount () > 0) ?
                             EFI_TEXT_ATTR (
                               EFI_RED,
@@ -315,7 +298,7 @@ AcpiView (
       }
       Print (L"\t%d Warning(s)\n", GetWarningCount ());
 
-      if (GetColourHighlighting ()) {
+      if (mConfig.ColourHighlighting) {
         gST->ConOut->SetAttribute (gST->ConOut, OriginalAttribute);
       }
     }
