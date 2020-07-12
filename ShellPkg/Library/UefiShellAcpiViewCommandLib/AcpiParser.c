@@ -13,8 +13,6 @@
 #include "AcpiViewConfig.h"
 #include "AcpiViewLog.h"
 
-STATIC UINT32   gIndent;
-
 STATIC ACPI_DESCRIPTION_HEADER_INFO AcpiHdrInfo;
 
 /**
@@ -387,34 +385,6 @@ Dump12Chars (
     Ptr[9],
     Ptr[10],
     Ptr[11]
-    );
-}
-
-/**
-  This function indents and prints the ACPI table Field Name.
-
-  @param [in] Indent      Number of spaces to add to the global table indent.
-                          The global table indent is 0 by default; however
-                          this value is updated on entry to the ParseAcpi()
-                          by adding the indent value provided to ParseAcpi()
-                          and restored back on exit.
-                          Therefore the total indent in the output is
-                          dependent on from where this function is called.
-  @param [in] FieldName   Pointer to the Field Name.
-**/
-VOID
-EFIAPI
-PrintFieldName (
-  IN UINT32         Indent,
-  IN CONST CHAR16*  FieldName
-)
-{
-  Print (
-    L"%*a%-*s : ",
-    gIndent + Indent,
-    "",
-    (OUTPUT_FIELD_COLUMN_WIDTH - gIndent - Indent),
-    FieldName
     );
 }
 
