@@ -14,6 +14,7 @@
 #include <Library/UefiLib.h>
 #include "AcpiParser.h"
 #include "AcpiTableParser.h"
+#include "AcpiViewLog.h"
 
 // Local variables
 STATIC ACPI_DESCRIPTION_HEADER_INFO AcpiHdrInfo;
@@ -37,15 +38,10 @@ ValidateInterruptType (
   UINT8 InterruptType;
 
   InterruptType = *Ptr;
-
-  if (InterruptType !=
-        EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_GIC) {
-    IncrementErrorCount ();
-    Print (
-      L"\nERROR: InterruptType = %d. This must be 8 on ARM Platforms",
-      InterruptType
-      );
-  }
+  AssertConstraint (
+    L"ARM",
+    InterruptType ==
+      EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_GIC);
 #endif
 }
 
@@ -68,14 +64,7 @@ ValidateIrq (
   UINT8 Irq;
 
   Irq = *Ptr;
-
-  if (Irq != 0) {
-    IncrementErrorCount ();
-    Print (
-      L"\nERROR: Irq = %d. This must be zero on ARM Platforms\n",
-      Irq
-      );
-  }
+  AssertConstraint (L"ARM", Irq == 0);
 #endif
 }
 
