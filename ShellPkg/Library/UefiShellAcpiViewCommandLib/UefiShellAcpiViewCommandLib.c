@@ -147,10 +147,8 @@ ShellDumpBufferToFile (
              );
 
   if (EFI_ERROR (Status)) {
-    Print (L"ERROR: Failed to write binary file.\n");
+    Print (L"acpiview: Failed to write binary file.\n");
     TransferBytes = 0;
-  } else {
-    Print (L"DONE.\n");
   }
 
   ShellCloseFile (&DumpFileHandle);
