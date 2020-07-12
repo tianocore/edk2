@@ -101,7 +101,7 @@ DeregisterParser (
 VOID
 EFIAPI
 ProcessAcpiTable (
-  IN UINT8* Ptr
+  IN VOID* Ptr
   );
 
 /**
