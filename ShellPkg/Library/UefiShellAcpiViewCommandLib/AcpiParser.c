@@ -137,7 +137,7 @@ VerifyChecksum (
   if (Log) {
     OriginalAttribute = gST->ConOut->Mode->Attribute;
     if (Checksum == 0) {
-      if (GetColourHighlighting ()) {
+      if (mConfig.ColourHighlighting) {
         gST->ConOut->SetAttribute (
                        gST->ConOut,
                        EFI_TEXT_ATTR (EFI_GREEN,
@@ -147,7 +147,7 @@ VerifyChecksum (
       Print (L"Table Checksum : OK\n\n");
     } else {
       IncrementErrorCount ();
-      if (GetColourHighlighting ()) {
+      if (mConfig.ColourHighlighting) {
         gST->ConOut->SetAttribute (
                        gST->ConOut,
                        EFI_TEXT_ATTR (EFI_RED,
@@ -156,7 +156,7 @@ VerifyChecksum (
       }
       Print (L"Table Checksum : FAILED (0x%X)\n\n", Checksum);
     }
-    if (GetColourHighlighting ()) {
+    if (mConfig.ColourHighlighting) {
       gST->ConOut->SetAttribute (gST->ConOut, OriginalAttribute);
     }
   }
@@ -507,7 +507,6 @@ ParseAcpi (
 {
   UINT32  Index;
   UINT32  Offset;
-  BOOLEAN HighLight;
   UINTN   OriginalAttribute;
 
   //
@@ -520,9 +519,8 @@ ParseAcpi (
   gIndent += Indent;
 
   if (Trace && (AsciiName != NULL)){
-    HighLight = GetColourHighlighting ();
 
-    if (HighLight) {
+    if (mConfig.ColourHighlighting) {
       OriginalAttribute = gST->ConOut->Mode->Attribute;
       gST->ConOut->SetAttribute (
                      gST->ConOut,
@@ -537,7 +535,7 @@ ParseAcpi (
       (OUTPUT_FIELD_COLUMN_WIDTH - gIndent),
       AsciiName
       );
-    if (HighLight) {
+    if (mConfig.ColourHighlighting) {
       gST->ConOut->SetAttribute (gST->ConOut, OriginalAttribute);
     }
   }
@@ -555,8 +553,7 @@ ParseAcpi (
       continue;
     }
 
-    if (GetConsistencyChecking () &&
-        (Offset != Parser[Index].Offset)) {
+    if (mConfig.ConsistencyCheck && (Offset != Parser[Index].Offset)) {
       IncrementErrorCount ();
       Print (
         L"\nERROR: %a: Offset Mismatch for %s\n"
@@ -599,8 +596,7 @@ ParseAcpi (
 
         // Validating only makes sense if we are tracing
         // the parsed table entries, to report by table name.
-        if (GetConsistencyChecking () &&
-            (Parser[Index].FieldValidator != NULL)) {
+        if (mConfig.ConsistencyCheck && (Parser[Index].FieldValidator != NULL)) {
           Parser[Index].FieldValidator (Ptr, Parser[Index].Context);
         }
       }

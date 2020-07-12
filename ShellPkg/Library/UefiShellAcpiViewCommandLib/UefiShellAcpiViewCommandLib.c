@@ -197,7 +197,7 @@ ShellCommandRunAcpiView (
   CONST CHAR16*      SelectedTableName;
 
   // Set configuration defaults
-  AcpiConfigSetDefaults ();
+  AcpiViewConfigSetDefaults ();
 
   ShellStatus = SHELL_SUCCESS;
   Package = NULL;
@@ -290,31 +290,31 @@ ShellCommandRunAcpiView (
         ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
       // Turn on colour highlighting if requested
-      SetColourHighlighting (ShellCommandLineGetFlag (Package, L"-h"));
+      mConfig.ColourHighlighting = ShellCommandLineGetFlag (Package, L"-h");
 
       // Surpress consistency checking if requested
-      SetConsistencyChecking (!ShellCommandLineGetFlag (Package, L"-q"));
+      mConfig.ConsistencyCheck = !ShellCommandLineGetFlag (Package, L"-q");
 
       // Evaluate the parameters for mandatory ACPI table presence checks
-      SetMandatoryTableValidate (ShellCommandLineGetFlag (Package, L"-r"));
+      mConfig.MandatoryTableValidate = ShellCommandLineGetFlag (Package, L"-r");
       MandatoryTableSpecStr = ShellCommandLineGetValue (Package, L"-r");
 
       if (MandatoryTableSpecStr != NULL) {
-        SetMandatoryTableSpec (ShellHexStrToUintn (MandatoryTableSpecStr));
+        mConfig.MandatoryTableSpec = ShellHexStrToUintn (MandatoryTableSpecStr);
       }
 
       if (ShellCommandLineGetFlag (Package, L"-l")) {
-        SetReportOption (ReportTableList);
+        mConfig.ReportType = ReportTableList;
       } else {
         SelectedTableName = ShellCommandLineGetValue (Package, L"-s");
         if (SelectedTableName != NULL) {
-          SelectAcpiTable (SelectedTableName);
-          SetReportOption (ReportSelected);
+          AcpiViewConfigSelectTable (SelectedTableName);
+          mConfig.ReportType = ReportSelected;
 
           if (ShellCommandLineGetFlag (Package, L"-d"))  {
             // Create a temporary file to check if the media is writable.
             CHAR16 FileNameBuffer[MAX_FILE_NAME_LEN];
-            SetReportOption (ReportDumpBinFile);
+            mConfig.ReportType = ReportDumpBinFile;
 
             UnicodeSPrint (
               FileNameBuffer,

@@ -9,96 +9,6 @@
 #define ACPI_VIEW_CONFIG_H_
 
 /**
-  This function returns the colour highlighting status.
-
-  @retval TRUE Colour highlighting is enabled.
-**/
-BOOLEAN
-EFIAPI
-GetColourHighlighting (
-  VOID
-  );
-
-/**
-  This function sets the colour highlighting status.
-
-  @param [in] Highlight The highlight status.
-**/
-VOID
-EFIAPI
-SetColourHighlighting (
-  BOOLEAN Highlight
-  );
-
-/**
-  This function returns the consistency checking status.
-
-  @retval TRUE Consistency checking is enabled.
-**/
-BOOLEAN
-EFIAPI
-GetConsistencyChecking (
-  VOID
-  );
-
-/**
-  This function sets the consistency checking status.
-
-  @param [in] ConsistencyChecking   The consistency checking status.
-**/
-VOID
-EFIAPI
-SetConsistencyChecking (
-  BOOLEAN ConsistencyChecking
-  );
-
-/**
-  This function returns the ACPI table requirements validation flag.
-
-  @retval TRUE Check for mandatory table presence should be performed.
-**/
-BOOLEAN
-EFIAPI
-GetMandatoryTableValidate (
-  VOID
-  );
-
-/**
-  This function sets the ACPI table requirements validation flag.
-
-  @param [in] Validate Enable/Disable ACPI table requirements validation.
-**/
-VOID
-EFIAPI
-SetMandatoryTableValidate (
-  BOOLEAN Validate
-  );
-
-/**
-  This function returns the identifier of specification to validate ACPI table
-  requirements against.
-
-  @return ID of specification listing mandatory tables.
-**/
-UINTN
-EFIAPI
-GetMandatoryTableSpec (
-  VOID
-  );
-
-/**
-  This function sets the identifier of specification to validate ACPI table
-  requirements against.
-
-  @param [in] Spec ID of specification listing mandatory tables.
-**/
-VOID
-EFIAPI
-SetMandatoryTableSpec (
-  UINTN Spec
-  );
-
-/**
   The EREPORT_OPTION enum describes ACPI table Reporting options.
 **/
 typedef enum {
@@ -108,28 +18,6 @@ typedef enum {
   ReportDumpBinFile,  ///< Dump selected table to a file.
   ReportMax,
 } EREPORT_OPTION;
-
-/**
-  This function returns the report options.
-
-  @return The current report option.
-**/
-EREPORT_OPTION
-EFIAPI
-GetReportOption (
-  VOID
-  );
-
-/**
-  This function sets the report options.
-
-  @param [in] ReportType The report option to set.
-**/
-VOID
-EFIAPI
-SetReportOption (
-  EREPORT_OPTION ReportType
-  );
 
 /**
   A structure holding the user selection detailing which
@@ -142,15 +30,15 @@ typedef struct {
 } SELECTED_ACPI_TABLE;
 
 /**
-  This function returns the selected ACPI table.
-
-  @param [out] SelectedAcpiTable Pointer that will contain the returned struct.
+  Configuration struct for the acpiview command.
 **/
-VOID
-EFIAPI
-GetSelectedAcpiTable (
-  OUT SELECTED_ACPI_TABLE** SelectedAcpiTable
-  );
+typedef struct {
+  BOOLEAN        ConsistencyCheck;            ///< Enable consistency checks when processing tables
+  BOOLEAN        ColourHighlighting;          ///< Enable UEFI shell colour codes in output
+  EREPORT_OPTION ReportType;                  ///< Type of report to create
+  BOOLEAN        MandatoryTableValidate;      ///< Validate presence of mandatory tables
+  UINTN          MandatoryTableSpec;          ///< Specification of which tables are mandatory
+} ACPI_VIEW_CONFIG;
 
 /**
   This function selects an ACPI table in current context.
@@ -161,8 +49,8 @@ GetSelectedAcpiTable (
 **/
 VOID
 EFIAPI
-SelectAcpiTable (
-  CONST CHAR16* TableName
+AcpiViewConfigSelectTable (
+  CONST CHAR16 *TableName
   );
 
 /**
@@ -170,8 +58,12 @@ SelectAcpiTable (
 **/
 VOID
 EFIAPI
-AcpiConfigSetDefaults (
+AcpiViewConfigSetDefaults (
   VOID
   );
 
+extern ACPI_VIEW_CONFIG    mConfig;
+extern SELECTED_ACPI_TABLE mSelectedAcpiTable;
+
 #endif // ACPI_VIEW_CONFIG_H_
+

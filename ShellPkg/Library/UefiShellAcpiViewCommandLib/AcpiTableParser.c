@@ -222,13 +222,13 @@ ProcessAcpiTable (
       return;
     }
 
-    if (GetConsistencyChecking ()) {
+    if (mConfig.ConsistencyCheck) {
       VerifyChecksum (TRUE, Ptr, *AcpiTableLength);
     }
   }
 
 #if defined(MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
-  if (GetMandatoryTableValidate ()) {
+  if (mConfig.MandatoryTableValidate) {
     ArmSbbrIncrementTableCount (*AcpiTableSignature);
   }
 #endif
