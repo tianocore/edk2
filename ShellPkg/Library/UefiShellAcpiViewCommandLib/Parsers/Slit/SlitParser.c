@@ -29,9 +29,11 @@ STATIC CONST ACPI_PARSER SlitParser[] = {
 };
 
 /**
-  Macro to get the value of a System Locality
+  Macro to get the value of a System Locality, simple
+  2D variable size array item retrieval
 **/
-#define SLIT_ELEMENT(Ptr, i, j) *(Ptr + (i * LocalityCount) + j)
+#define SLIT_ELEMENT(ArrayPtr, RowSize, Row, Column) \
+  *((ArrayPtr) + ((Row) * (RowSize)) + (Column))
 
 /**
   This function parses the ACPI SLIT table.
@@ -58,11 +60,11 @@ ParseAcpiSlit (
   )
 {
   UINT32 Offset;
-  UINT32 Count;
-  UINT32 Index;
+  UINT32 Index1;
+  UINT32 Index2;
   UINT32 LocalityCount;
-  UINT8* LocalityPtr;
-  CHAR16 Buffer[80];  // Used for AsciiName param of ParseAcpi
+  CHAR16 Buffer[256];
+  UINTN  StrLen;
 
   if (!Trace) {
     return;
@@ -80,11 +82,7 @@ ParseAcpiSlit (
   // Check if the values used to control the parsing logic have been
   // successfully read.
   if (SlitSystemLocalityCount == NULL) {
-    IncrementErrorCount ();
-    Print (
-      L"ERROR: Insufficient table length. AcpiTableLength = %d.\n",
-      AcpiTableLength
-      );
+    AcpiError (ACPI_ERROR_PARSE, L"Failed to parse the SLIT table");
     return;
   }
 
@@ -100,89 +98,65 @@ ParseAcpiSlit (
                 = 65535
                 = MAX_UINT16
   */
-  if (*SlitSystemLocalityCount > MAX_UINT16) {
-    IncrementErrorCount ();
-    Print (
-      L"ERROR: The Number of System Localities provided can't be represented " \
-        L"in the SLIT table. SlitSystemLocalityCount = %ld. " \
-        L"MaxLocalityCountAllowed = %d.\n",
-      *SlitSystemLocalityCount,
-      MAX_UINT16
-      );
+  if (AssertConstraint (L"ACPI", *SlitSystemLocalityCount <= MAX_UINT16)) {
     return;
   }
 
-  LocalityCount = (UINT32)*SlitSystemLocalityCount;
+  LocalityCount = (UINT32) *SlitSystemLocalityCount;
 
   // Make sure system localities fit in the table buffer provided
-  if (Offset + (LocalityCount * LocalityCount) > AcpiTableLength) {
-    IncrementErrorCount ();
-    Print (
-      L"ERROR: Invalid Number of System Localities. " \
-        L"SlitSystemLocalityCount = %ld. AcpiTableLength = %d.\n",
-      *SlitSystemLocalityCount,
-      AcpiTableLength
-      );
+  if (AssertMemberIntegrity (
+        Offset, (LocalityCount * LocalityCount), Ptr, AcpiTableLength)) {
     return;
   }
-
-  LocalityPtr = Ptr + Offset;
 
   // We only print the Localities if the count is less than 16
   // If the locality count is more than 16 then refer to the
   // raw data dump.
   if (LocalityCount < 16) {
-    UnicodeSPrint (
-      Buffer,
-      sizeof (Buffer),
-      L"Entry[0x%lx][0x%lx]",
-      LocalityCount,
-      LocalityCount
-      );
-    PrintFieldName (0, Buffer);
-    Print (L"\n");
-    Print (L"       ");
-    for (Index = 0; Index < LocalityCount; Index++) {
-      Print (L" (%3d) ", Index);
+    PrintFieldName (0, L"Entry[0x%lx][0x%lx]", LocalityCount, LocalityCount);
+    AcpiInfo (L"");
+    UnicodeSPrint (Buffer, sizeof (Buffer), L"       ");
+    for (Index1 = 0; Index1 < LocalityCount; Index1++) {
+      StrLen = StrnLenS (Buffer, sizeof (Buffer));
+      UnicodeSPrint (
+        Buffer + StrLen, sizeof (Buffer) - StrLen, L" (%3d) ", Index1);
     }
-    Print (L"\n");
-    for (Count = 0; Count< LocalityCount; Count++) {
-      Print (L" (%3d) ", Count);
-      for (Index = 0; Index < LocalityCount; Index++) {
-        Print (L"  %3d  ", SLIT_ELEMENT (LocalityPtr, Count, Index));
+    AcpiInfo (L"%s", Buffer);
+
+    for (Index1 = 0; Index1 < LocalityCount; Index1++) {
+      UnicodeSPrint (Buffer, sizeof (Buffer), L" (%3d) ", Index1);
+      for (Index2 = 0; Index2 < LocalityCount; Index2++) {
+        StrLen = StrnLenS (Buffer, sizeof (Buffer));
+        UnicodeSPrint (
+          Buffer + StrLen,
+          sizeof (Buffer) - StrLen,
+          L"  %3d  ",
+          SLIT_ELEMENT(Ptr + Offset, LocalityCount, Index1, Index2));
       }
-      Print (L"\n");
+      AcpiInfo (L"%s", Buffer);
     }
   }
 
   // Validate
-  for (Count = 0; Count < LocalityCount; Count++) {
-    for (Index = 0; Index < LocalityCount; Index++) {
-      // Element[x][x] must be equal to 10
-      if ((Count == Index) && (SLIT_ELEMENT (LocalityPtr, Count,Index) != 10)) {
-        IncrementErrorCount ();
-        Print (
-          L"ERROR: Diagonal Element[0x%lx][0x%lx] (%3d)."
-            L" Normalized Value is not 10\n",
-          Count,
-          Index,
-          SLIT_ELEMENT (LocalityPtr, Count, Index)
-          );
-      }
+  for (Index1 = 0; Index1 < LocalityCount; Index1++) {
+    // Element[x][x] must be equal to 10
+    if (SLIT_ELEMENT(Ptr + Offset, LocalityCount, Index1, Index1) != 10) {
+      AcpiError (
+        ACPI_ERROR_VALUE, L"SLIT Element[%d][%d] != 10", Index1, Index1);
+    }
+    for (Index2 = 0; Index2 < Index1; Index2++) {
       // Element[i][j] must be equal to Element[j][i]
-      if (SLIT_ELEMENT (LocalityPtr, Count, Index) !=
-          SLIT_ELEMENT (LocalityPtr, Index, Count)) {
-        IncrementErrorCount ();
-        Print (
-          L"ERROR: Relative distances for Element[0x%lx][0x%lx] (%3d) and \n"
-           L"Element[0x%lx][0x%lx] (%3d) do not match.\n",
-          Count,
-          Index,
-          SLIT_ELEMENT (LocalityPtr, Count, Index),
-          Index,
-          Count,
-          SLIT_ELEMENT (LocalityPtr, Index, Count)
-          );
+      if (
+        SLIT_ELEMENT(Ptr + Offset, LocalityCount, Index1, Index2) !=
+        SLIT_ELEMENT(Ptr + Offset, LocalityCount, Index2, Index1)) {
+        AcpiError (
+          ACPI_ERROR_VALUE,
+          L"SLIT Element[%d][%d] != SLIT Element[%d][%d]",
+          Index1,
+          Index2,
+          Index2,
+          Index1);
       }
     }
   }

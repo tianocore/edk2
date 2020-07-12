@@ -10,6 +10,7 @@
 
 #include <IndustryStandard/DebugPort2Table.h>
 #include <Library/UefiLib.h>
+#include <Library/BaseLib.h>
 #include "AcpiParser.h"
 #include "AcpiTableParser.h"
 #include "AcpiViewLog.h"
@@ -42,17 +43,10 @@ ValidateNameSpaceStrLen (
   IN VOID*  Context
   )
 {
-  UINT16 NameSpaceStrLen;
+  UINT16 NameSpaceStrLen = *(UINT16 *) Ptr;
 
-  NameSpaceStrLen = *(UINT16*)Ptr;
-
-  if (NameSpaceStrLen < 2) {
-    IncrementErrorCount ();
-    Print (
-      L"\nERROR: NamespaceString Length = %d. If no Namespace device exists, " \
-        L"NamespaceString[] must contain a period '.'",
-      NameSpaceStrLen
-      );
+  if (AssertConstraint (L"ACPI", NameSpaceStrLen > 1)) {
+    AcpiInfo (L"With no namespace, NamespaceString[] must be a period '.'");
   }
 }
 
@@ -133,76 +127,50 @@ DumpDbgDeviceInfo (
       (OEMDataOffset == NULL)         ||
       (BaseAddrRegOffset == NULL)     ||
       (AddrSizeOffset == NULL)) {
-    IncrementErrorCount ();
-    Print (
-      L"ERROR: Insufficient Debug Device Information Structure length. " \
-        L"Length = %d.\n",
-      Length
-      );
+    AcpiError (ACPI_ERROR_PARSE, L"Failed to parse DbgDevInfo Structure");
     return;
   }
 
   // GAS
-  Index = 0;
   Offset = *BaseAddrRegOffset;
-  while ((Index++ < *GasCount) &&
-         (Offset < Length)) {
-    PrintFieldName (4, L"BaseAddressRegister");
-    Offset += (UINT16)DumpGasStruct (
-                        Ptr + Offset,
-                        4,
-                        Length - Offset
-                        );
+  for (Index = 0; Index < *GasCount; Index++) {
+    if (AssertMemberIntegrity (Offset, 1, Ptr, Length)) {
+      break;
+    }
+
+    PrintFieldName (4, L"BaseAddressRegister[%d]", Index);
+    Offset += (UINT16)DumpGasStruct (Ptr + Offset, 4, Length - Offset);
   }
 
   // Make sure the array of address sizes corresponding to each GAS fit in the
   // Debug Device Information structure
-  if ((*AddrSizeOffset + (*GasCount * sizeof (UINT32))) > Length) {
-    IncrementErrorCount ();
-    Print (
-      L"ERROR: Invalid GAS count. GasCount = %d. RemainingBufferLength = %d. " \
-        L"Parsing of the Debug Device Information structure aborted.\n",
-      *GasCount,
-      Length - *AddrSizeOffset
-      );
+  if (AssertMemberIntegrity (
+        *AddrSizeOffset, *GasCount * sizeof (UINT32), Ptr, Length)) {
     return;
   }
 
   // Address Size
-  Index = 0;
   Offset = *AddrSizeOffset;
-  while ((Index++ < *GasCount) &&
-         (Offset < Length)) {
-    PrintFieldName (4, L"Address Size");
-    Print (L"0x%x\n", *((UINT32*)(Ptr + Offset)));
+  for (Index = 0; Index < *GasCount; Index++) {
+    if (AssertMemberIntegrity (Offset, 1, Ptr, Length)) {
+      break;
+    }
+    PrintFieldName (4, L"Address Size[%d]", Index);
+    AcpiInfo (L"0x%x", ReadUnaligned32 ((CONST UINT32 *)(Ptr + Offset)));
     Offset += sizeof (UINT32);
   }
 
   // NameSpace String
-  Index = 0;
-  Offset = *NameSpaceStringOffset;
   PrintFieldName (4, L"NameSpace String");
-  while ((Index++ < *NameSpaceStringLength) &&
-         (Offset < Length)) {
-    Print (L"%c", *(Ptr + Offset));
-    Offset++;
+  if (!AssertMemberIntegrity (
+        *NameSpaceStringOffset, *NameSpaceStringLength, Ptr, Length)) {
+    AcpiInfo (L"%-.*a", *NameSpaceStringLength - 1, Ptr + *NameSpaceStringOffset);
   }
-  Print (L"\n");
 
   // OEM Data
   if (*OEMDataOffset != 0) {
-    Index = 0;
-    Offset = *OEMDataOffset;
-    PrintFieldName (4, L"OEM Data");
-    while ((Index++ < *OEMDataLength) &&
-           (Offset < Length)) {
-      Print (L"%x ", *(Ptr + Offset));
-      if ((Index & 7) == 0) {
-        Print (L"\n%-*s   ", OUTPUT_FIELD_COLUMN_WIDTH, L"");
-      }
-      Offset++;
-    }
-    Print (L"\n");
+    AcpiInfo (L"OEM Data");
+    DumpRaw (Ptr + *OEMDataOffset, *OEMDataLength);
   }
 }
 
@@ -245,13 +213,8 @@ ParseAcpiDbg2 (
 
   // Check if the values used to control the parsing logic have been
   // successfully read.
-  if ((OffsetDbgDeviceInfo == NULL) ||
-      (NumberDbgDeviceInfo == NULL)) {
-    IncrementErrorCount ();
-    Print (
-      L"ERROR: Insufficient table length. AcpiTableLength = %d\n",
-      AcpiTableLength
-      );
+  if ((OffsetDbgDeviceInfo == NULL) || (NumberDbgDeviceInfo == NULL)) {
+    AcpiError (ACPI_ERROR_PARSE, L"Failed to parse DbgDevInfo array");
     return;
   }
 
@@ -259,7 +222,6 @@ ParseAcpiDbg2 (
   Index = 0;
 
   while (Index++ < *NumberDbgDeviceInfo) {
-
     // Parse the Debug Device Information Structure header to obtain Length
     ParseAcpi (
       FALSE,
@@ -273,31 +235,20 @@ ParseAcpiDbg2 (
     // Check if the values used to control the parsing logic have been
     // successfully read.
     if (DbgDevInfoLen == NULL) {
-      IncrementErrorCount ();
-      Print (
-        L"ERROR: Insufficient remaining table buffer length to read the " \
-          L"Debug Device Information structure's 'Length' field. " \
-          L"RemainingTableBufferLength = %d.\n",
-        AcpiTableLength - Offset
-        );
+      AcpiError (ACPI_ERROR_PARSE, L"Failed to parse DbgDevInfoLen");
       return;
     }
 
     // Validate Debug Device Information Structure length
-    if ((*DbgDevInfoLen == 0) ||
-        ((Offset + (*DbgDevInfoLen)) > AcpiTableLength)) {
-      IncrementErrorCount ();
-      Print (
-        L"ERROR: Invalid Debug Device Information Structure length. " \
-          L"Length = %d. Offset = %d. AcpiTableLength = %d.\n",
-        *DbgDevInfoLen,
-        Offset,
-        AcpiTableLength
-        );
+    if (AssertConstraint (L"ACPI", *DbgDevInfoLen > 0)) {
       return;
     }
 
-    DumpDbgDeviceInfo (Ptr + Offset, (*DbgDevInfoLen));
-    Offset += (*DbgDevInfoLen);
+    if (AssertMemberIntegrity (Offset, *DbgDevInfoLen, Ptr, AcpiTableLength)) {
+      return;
+    }
+
+    DumpDbgDeviceInfo (Ptr + Offset, *DbgDevInfoLen);
+    Offset += *DbgDevInfoLen;
   }
 }

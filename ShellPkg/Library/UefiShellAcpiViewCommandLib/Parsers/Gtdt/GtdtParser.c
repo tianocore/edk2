@@ -13,6 +13,7 @@
 #include "AcpiParser.h"
 #include "AcpiTableParser.h"
 #include "AcpiViewConfig.h"
+#include "AcpiViewLog.h"
 
 // "The number of GT Block Timers must be less than or equal to 8"
 #define GT_BLOCK_TIMER_COUNT_MAX 8
@@ -44,15 +45,7 @@ ValidateGtBlockTimerCount (
   UINT32 BlockTimerCount;
 
   BlockTimerCount = *(UINT32*)Ptr;
-
-  if (BlockTimerCount > GT_BLOCK_TIMER_COUNT_MAX) {
-    IncrementErrorCount ();
-    Print (
-      L"\nERROR: Timer Count = %d. Max Timer Count is %d.",
-      BlockTimerCount,
-      GT_BLOCK_TIMER_COUNT_MAX
-      );
-  }
+  AssertConstraint (L"ACPI", BlockTimerCount <= GT_BLOCK_TIMER_COUNT_MAX);
 }
 
 /**
@@ -70,18 +63,10 @@ ValidateGtFrameNumber (
   IN VOID*  Context
   )
 {
-  UINT8 FrameNumber;
+  UINT8 GTFrameNumber;
 
-  FrameNumber = *(UINT8*)Ptr;
-
-  if (FrameNumber >= GT_BLOCK_TIMER_COUNT_MAX) {
-    IncrementErrorCount ();
-    Print (
-      L"\nERROR: GT Frame Number = %d. GT Frame Number must be in range 0-%d.",
-      FrameNumber,
-      GT_BLOCK_TIMER_COUNT_MAX - 1
-      );
-  }
+  GTFrameNumber = *Ptr;
+  AssertConstraint (L"ACPI", GTFrameNumber < GT_BLOCK_TIMER_COUNT_MAX);
 }
 
 /**
@@ -194,11 +179,7 @@ DumpGTBlock (
   // successfully read.
   if ((GtBlockTimerCount == NULL) ||
       (GtBlockTimerOffset == NULL)) {
-    IncrementErrorCount ();
-    Print (
-      L"ERROR: Insufficient GT Block Structure length. Length = %d.\n",
-      Length
-      );
+    AcpiError (ACPI_ERROR_PARSE, L"Failed to parse GT Block Structure");
     return;
   }
 
@@ -270,7 +251,6 @@ ParseAcpiGtdt (
 {
   UINT32 Index;
   UINT32 Offset;
-  UINT8* TimerPtr;
 
   if (!Trace) {
     return;
@@ -287,17 +267,11 @@ ParseAcpiGtdt (
 
   // Check if the values used to control the parsing logic have been
   // successfully read.
-  if ((GtdtPlatformTimerCount == NULL) ||
-      (GtdtPlatformTimerOffset == NULL)) {
-    IncrementErrorCount ();
-    Print (
-      L"ERROR: Insufficient table length. AcpiTableLength = %d.\n",
-      AcpiTableLength
-      );
+  if ((GtdtPlatformTimerCount == NULL) || (GtdtPlatformTimerOffset == NULL)) {
+    AcpiError (ACPI_ERROR_PARSE, L"Corrupt Platform Timer Table");
     return;
   }
 
-  TimerPtr = Ptr + *GtdtPlatformTimerOffset;
   Offset = *GtdtPlatformTimerOffset;
   Index = 0;
 
@@ -310,55 +284,35 @@ ParseAcpiGtdt (
       FALSE,
       0,
       NULL,
-      TimerPtr,
+      Ptr + Offset,
       AcpiTableLength - Offset,
       PARSER_PARAMS (GtPlatformTimerHeaderParser)
       );
 
     // Check if the values used to control the parsing logic have been
     // successfully read.
-    if ((PlatformTimerType == NULL) ||
-        (PlatformTimerLength == NULL)) {
-      IncrementErrorCount ();
-      Print (
-        L"ERROR: Insufficient remaining table buffer length to read the " \
-          L"Platform Timer Structure header. Length = %d.\n",
-        AcpiTableLength - Offset
-        );
+    if ((PlatformTimerType == NULL) || (PlatformTimerLength == NULL)) {
+      AcpiError (ACPI_ERROR_PARSE, L"Corrupt Platform Timer Structure");
       return;
     }
 
     // Validate Platform Timer Structure length
-    if ((*PlatformTimerLength == 0) ||
-        ((Offset + (*PlatformTimerLength)) > AcpiTableLength)) {
-      IncrementErrorCount ();
-      Print (
-        L"ERROR: Invalid Platform Timer Structure length. " \
-          L"Length = %d. Offset = %d. AcpiTableLength = %d.\n",
-        *PlatformTimerLength,
-        Offset,
-        AcpiTableLength
-        );
+    if (AssertMemberIntegrity(Offset, *PlatformTimerLength, Ptr, AcpiTableLength)) {
       return;
     }
 
     switch (*PlatformTimerType) {
       case EFI_ACPI_6_3_GTDT_GT_BLOCK:
-        DumpGTBlock (TimerPtr, *PlatformTimerLength);
+        DumpGTBlock (Ptr + Offset, *PlatformTimerLength);
         break;
       case EFI_ACPI_6_3_GTDT_SBSA_GENERIC_WATCHDOG:
-        DumpWatchdogTimer (TimerPtr, *PlatformTimerLength);
+        DumpWatchdogTimer (Ptr + Offset, *PlatformTimerLength);
         break;
       default:
-        IncrementErrorCount ();
-        Print (
-          L"ERROR: Invalid Platform Timer Type = %d\n",
-          *PlatformTimerType
-          );
-        break;
-    } // switch
+        AcpiError (
+          ACPI_ERROR_VALUE, L"Platform Timer Type %d", *PlatformTimerType);
+      }
 
-    TimerPtr += *PlatformTimerLength;
     Offset += *PlatformTimerLength;
   } // while
 }

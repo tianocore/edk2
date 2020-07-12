@@ -14,6 +14,7 @@
 #include "AcpiParser.h"
 #include "AcpiView.h"
 #include "AcpiViewConfig.h"
+#include "AcpiViewLog.h"
 #include "PpttParser.h"
 #include "AcpiViewLog.h"
 
@@ -39,38 +40,21 @@ ValidateCacheNumberOfSets (
   IN VOID*  Context
   )
 {
-  UINT32 NumberOfSets;
-  NumberOfSets = *(UINT32*)Ptr;
+  UINT32 CacheNumberOfSets;
 
-  if (NumberOfSets == 0) {
-    IncrementErrorCount ();
-    Print (L"\nERROR: Cache number of sets must be greater than 0");
-    return;
-  }
+  CacheNumberOfSets = *(UINT32*) Ptr;
+  AssertConstraint (L"ACPI", CacheNumberOfSets != 0);
 
 #if defined(MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
-  if (NumberOfSets > PPTT_ARM_CCIDX_CACHE_NUMBER_OF_SETS_MAX) {
-    IncrementErrorCount ();
-    Print (
-      L"\nERROR: When ARMv8.3-CCIDX is implemented the maximum cache number of "
-        L"sets must be less than or equal to %d",
-      PPTT_ARM_CCIDX_CACHE_NUMBER_OF_SETS_MAX
-      );
+  if (AssertConstraint (
+        L"ARMv8.3-CCIDX",
+        CacheNumberOfSets <= PPTT_ARM_CCIDX_CACHE_NUMBER_OF_SETS_MAX)) {
     return;
   }
 
-  if (NumberOfSets > PPTT_ARM_CACHE_NUMBER_OF_SETS_MAX) {
-    IncrementWarningCount ();
-    Print (
-      L"\nWARNING: Without ARMv8.3-CCIDX, the maximum cache number of sets "
-        L"must be less than or equal to %d. Ignore this message if "
-        L"ARMv8.3-CCIDX is implemented",
-      PPTT_ARM_CACHE_NUMBER_OF_SETS_MAX
-      );
-    return;
-  }
+  WarnConstraint (
+    L"No-ARMv8.3-CCIDX", CacheNumberOfSets <= PPTT_ARM_CACHE_NUMBER_OF_SETS_MAX);
 #endif
-
 }
 
 /**
@@ -89,14 +73,10 @@ ValidateCacheAssociativity (
   IN VOID*  Context
   )
 {
-  UINT8 Associativity;
-  Associativity = *(UINT8*)Ptr;
+  UINT8 CacheAssociativity;
 
-  if (Associativity == 0) {
-    IncrementErrorCount ();
-    Print (L"\nERROR: Cache associativity must be greater than 0");
-    return;
-  }
+  CacheAssociativity = *Ptr;
+  AssertConstraint (L"ACPI", CacheAssociativity != 0);
 }
 
 /**
@@ -120,25 +100,15 @@ ValidateCacheLineSize (
   //   LineSize, bits [2:0]
   //     (Log2(Number of bytes in cache line)) - 4.
 
-  UINT16 LineSize;
-  LineSize = *(UINT16*)Ptr;
+  UINT16 CacheLineSize;
 
-  if ((LineSize < PPTT_ARM_CACHE_LINE_SIZE_MIN) ||
-      (LineSize > PPTT_ARM_CACHE_LINE_SIZE_MAX)) {
-    IncrementErrorCount ();
-    Print (
-      L"\nERROR: The cache line size must be between %d and %d bytes"
-        L" on ARM Platforms.",
-      PPTT_ARM_CACHE_LINE_SIZE_MIN,
-      PPTT_ARM_CACHE_LINE_SIZE_MAX
-      );
-    return;
-  }
+  CacheLineSize = *(UINT16 *) Ptr;
+  AssertConstraint (
+    L"ARM",
+    (CacheLineSize >= PPTT_ARM_CACHE_LINE_SIZE_MIN &&
+     CacheLineSize <= PPTT_ARM_CACHE_LINE_SIZE_MAX));
 
-  if ((LineSize & (LineSize - 1)) != 0) {
-    IncrementErrorCount ();
-    Print (L"\nERROR: The cache line size is not a power of 2.");
-  }
+  AssertConstraint (L"ARM", BitFieldCountOnes32 (CacheLineSize, 0, 15) == 1);
 #endif
 }
 
@@ -161,16 +131,9 @@ ValidateCacheAttributes (
   //            Version 6.2 Errata A, September 2017
   // Table 5-153: Cache Type Structure
   UINT8 Attributes;
-  Attributes = *(UINT8*)Ptr;
 
-  if ((Attributes & 0xE0) != 0) {
-    IncrementErrorCount ();
-    Print (
-      L"\nERROR: Attributes bits [7:5] are reserved and must be zero.",
-      Attributes
-      );
-    return;
-  }
+  Attributes = *(UINT8 *) Ptr;
+  AssertConstraint (L"ACPI", BitFieldCountOnes32 (Attributes, 5, 7) == 0);
 }
 
 /**
@@ -255,7 +218,6 @@ DumpProcessorHierarchyNodeStructure (
 {
   UINT32 Offset;
   UINT32 Index;
-  CHAR16 Buffer[OUTPUT_FIELD_COLUMN_WIDTH];
 
   Offset = ParseAcpi (
              TRUE,
@@ -268,48 +230,22 @@ DumpProcessorHierarchyNodeStructure (
 
   // Check if the values used to control the parsing logic have been
   // successfully read.
-  if (NumberOfPrivateResources == NULL) {
-    IncrementErrorCount ();
-    Print (
-      L"ERROR: Insufficient Processor Hierarchy Node length. Length = %d.\n",
-      Length
-      );
+  if(NumberOfPrivateResources == NULL) {
+    AcpiError (ACPI_ERROR_PARSE, L"Failed to parse processor hierarchy");
     return;
   }
-
-  // Make sure the Private Resource array lies inside this structure
-  if (Offset + (*NumberOfPrivateResources * sizeof (UINT32)) > Length) {
-    IncrementErrorCount ();
-    Print (
-      L"ERROR: Invalid Number of Private Resources. " \
-        L"PrivateResourceCount = %d. RemainingBufferLength = %d. " \
-        L"Parsing of this structure aborted.\n",
-      *NumberOfPrivateResources,
-      Length - Offset
-      );
-    return;
-  }
-
-  Index = 0;
 
   // Parse the specified number of private resource references or the Processor
   // Hierarchy Node length. Whichever is minimum.
-  while (Index < *NumberOfPrivateResources) {
-    UnicodeSPrint (
-      Buffer,
-      sizeof (Buffer),
-      L"Private resources [%d]",
-      Index
-      );
+  for (Index = 0; Index < *NumberOfPrivateResources; Index++) {
+    if (AssertMemberIntegrity (Offset, sizeof (UINT32), Ptr, Length)) {
+      return;
+    }
 
-    PrintFieldName (4, Buffer);
-    Print (
-      L"0x%x\n",
-      *((UINT32*)(Ptr + Offset))
-      );
+    PrintFieldName (4, L"Private resources [%d]", Index);
+    AcpiInfo (L"0x%x", *(UINT32 *) (Ptr + Offset));
 
     Offset += sizeof (UINT32);
-    Index++;
   }
 }
 
@@ -386,7 +322,6 @@ ParseAcpiPptt (
   )
 {
   UINT32 Offset;
-  UINT8* ProcessorTopologyStructurePtr;
 
   if (!Trace) {
     return;
@@ -401,15 +336,13 @@ ParseAcpiPptt (
              PARSER_PARAMS (PpttParser)
              );
 
-  ProcessorTopologyStructurePtr = Ptr + Offset;
-
   while (Offset < AcpiTableLength) {
     // Parse Processor Hierarchy Node Structure to obtain Type and Length.
     ParseAcpi (
       FALSE,
       0,
       NULL,
-      ProcessorTopologyStructurePtr,
+      Ptr + Offset,
       AcpiTableLength - Offset,
       PARSER_PARAMS (ProcessorTopologyStructureHeaderParser)
       );
@@ -418,62 +351,42 @@ ParseAcpiPptt (
     // successfully read.
     if ((ProcessorTopologyStructureType == NULL) ||
         (ProcessorTopologyStructureLength == NULL)) {
-      IncrementErrorCount ();
-      Print (
-        L"ERROR: Insufficient remaining table buffer length to read the " \
-          L"processor topology structure header. Length = %d.\n",
-        AcpiTableLength - Offset
-        );
+      AcpiError (ACPI_ERROR_PARSE, L"Failed to parse processor topology");
       return;
     }
 
     // Validate Processor Topology Structure length
-    if ((*ProcessorTopologyStructureLength == 0) ||
-        ((Offset + (*ProcessorTopologyStructureLength)) > AcpiTableLength)) {
-      IncrementErrorCount ();
-      Print (
-        L"ERROR: Invalid Processor Topology Structure length. " \
-          L"Length = %d. Offset = %d. AcpiTableLength = %d.\n",
-        *ProcessorTopologyStructureLength,
-        Offset,
-        AcpiTableLength
-        );
+    if (AssertMemberIntegrity (
+          Offset, *ProcessorTopologyStructureLength, Ptr, AcpiTableLength)) {
       return;
     }
 
     PrintFieldName (2, L"* Structure Offset *");
-    Print (L"0x%x\n", Offset);
+    AcpiInfo (L"0x%x", Offset);
 
     switch (*ProcessorTopologyStructureType) {
       case EFI_ACPI_6_2_PPTT_TYPE_PROCESSOR:
         DumpProcessorHierarchyNodeStructure (
-          ProcessorTopologyStructurePtr,
+          Ptr + Offset,
           *ProcessorTopologyStructureLength
           );
         break;
       case EFI_ACPI_6_2_PPTT_TYPE_CACHE:
         DumpCacheTypeStructure (
-          ProcessorTopologyStructurePtr,
+          Ptr + Offset,
           *ProcessorTopologyStructureLength
           );
         break;
       case EFI_ACPI_6_2_PPTT_TYPE_ID:
         DumpIDStructure (
-          ProcessorTopologyStructurePtr,
+          Ptr + Offset,
           *ProcessorTopologyStructureLength
           );
         break;
       default:
-        IncrementErrorCount ();
-        Print (
-          L"ERROR: Unknown processor topology structure:"
-            L" Type = %d, Length = %d\n",
-          *ProcessorTopologyStructureType,
-          *ProcessorTopologyStructureLength
-          );
+        AcpiError (ACPI_ERROR_VALUE, L"Unknown processor topology structure");
     }
 
-    ProcessorTopologyStructurePtr += *ProcessorTopologyStructureLength;
     Offset += *ProcessorTopologyStructureLength;
   } // while
 }

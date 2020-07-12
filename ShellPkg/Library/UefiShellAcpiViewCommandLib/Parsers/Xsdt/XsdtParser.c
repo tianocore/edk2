@@ -29,9 +29,7 @@ STATIC CONST ACPI_PARSER XsdtParser[] = {
 **/
 CONST ACPI_DESCRIPTION_HEADER_INFO *
 EFIAPI
-GetAcpiXsdtHeaderInfo (
-  VOID
-)
+GetAcpiXsdtHeaderInfo (VOID)
 {
   return &AcpiHdrInfo;
 }
@@ -55,87 +53,43 @@ ParseAcpiXsdt (
   IN UINT8   AcpiTableRevision
   )
 {
-  UINT32        Offset;
   UINT32        TableOffset;
-  UINT64*       TablePointer;
+  UINT64**      TablePointer;
   UINTN         EntryIndex;
-  CHAR16        Buffer[32];
 
-  Offset = ParseAcpi (
-             Trace,
-             0,
-             "XSDT",
-             Ptr,
-             AcpiTableLength,
-             PARSER_PARAMS (XsdtParser)
-             );
+  TableOffset = ParseAcpi (
+    Trace, 0, "XSDT", Ptr, AcpiTableLength, PARSER_PARAMS (XsdtParser));
 
-  TableOffset = Offset;
-
+  EntryIndex = 0;
   if (Trace) {
-    EntryIndex = 0;
-    TablePointer = (UINT64*)(Ptr + TableOffset);
-    while (Offset < AcpiTableLength) {
+    for (TablePointer = (UINT64 **)(Ptr + TableOffset);
+         (UINT8 *) TablePointer < Ptr + AcpiTableLength;
+         TablePointer++) {
+
       CONST UINT32* Signature;
       CONST UINT32* Length;
       CONST UINT8*  Revision;
 
-      if ((UINT64*)(UINTN)(*TablePointer) != NULL) {
-        UINT8*      SignaturePtr;
-
-        ParseAcpiHeader (
-          (UINT8*)(UINTN)(*TablePointer),
-          &Signature,
-          &Length,
-          &Revision
-          );
-
-        SignaturePtr = (UINT8*)Signature;
-
-        UnicodeSPrint (
-          Buffer,
-          sizeof (Buffer),
-          L"Entry[%d] - %c%c%c%c",
-          EntryIndex++,
-          SignaturePtr[0],
-          SignaturePtr[1],
-          SignaturePtr[2],
-          SignaturePtr[3]
-          );
+      if (*TablePointer != NULL) {
+        ParseAcpiHeader (*TablePointer, &Signature, &Length, &Revision);
+        PrintFieldName (2, L"Entry[%d] - %.4a", EntryIndex++, Signature);
+        AcpiInfo (L"0x%lx", *TablePointer);
       } else {
-        UnicodeSPrint (
-          Buffer,
-          sizeof (Buffer),
-          L"Entry[%d]",
-          EntryIndex++
-          );
+        PrintFieldName (2, L"Entry[%d]", EntryIndex++);
+        AcpiInfo (L"NULL");
+        AcpiError (ACPI_ERROR_VALUE, L"Invalid table entry");
       }
-
-      PrintFieldName (2, Buffer);
-      Print (L"0x%lx\n", *TablePointer);
-
-      // Validate the table pointers are not NULL
-      if ((UINT64*)(UINTN)(*TablePointer) == NULL) {
-        IncrementErrorCount ();
-        Print (
-          L"ERROR: Invalid table entry at 0x%lx, table address is 0x%lx\n",
-          TablePointer,
-          *TablePointer
-          );
-      }
-      Offset += sizeof (UINT64);
-      TablePointer++;
-    } // while
+    }
   }
 
   // Process the tables
-  Offset = TableOffset;
-  TablePointer = (UINT64*)(Ptr + TableOffset);
-  while (Offset < AcpiTableLength) {
-    if ((UINT64*)(UINTN)(*TablePointer) != NULL) {
-      ProcessAcpiTable ((UINT8*)(UINTN)(*TablePointer));
+  for (TablePointer = (UINT64 **)(Ptr + TableOffset);
+       (UINT8 *) TablePointer < Ptr + AcpiTableLength;
+       TablePointer++) {
+
+    if (*TablePointer != NULL) {
+      ProcessAcpiTable (*TablePointer);
     }
-    Offset += sizeof (UINT64);
-    TablePointer++;
-  } // while
+
+  }
 }

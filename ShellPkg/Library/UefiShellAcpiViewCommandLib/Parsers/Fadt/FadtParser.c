@@ -69,12 +69,10 @@ ValidateFirmwareCtrl (
 )
 {
 #if defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
-  if (*(UINT32*)Ptr != 0) {
-    IncrementErrorCount ();
-    Print (
-      L"\nERROR: Firmware Control must be zero for ARM platforms."
-    );
-  }
+  UINT32 FirmwareControl;
+
+  FirmwareControl = *(UINT32 *) Ptr;
+  AssertConstraint (L"ARM", FirmwareControl == 0);
 #endif
 }
 
@@ -94,12 +92,10 @@ ValidateXFirmwareCtrl (
 )
 {
 #if defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
-  if (*(UINT64*)Ptr != 0) {
-    IncrementErrorCount ();
-    Print (
-      L"\nERROR: X Firmware Control must be zero for ARM platforms."
-    );
-  }
+  UINT32 XFirmwareControl;
+
+  XFirmwareControl = *(UINT32 *) Ptr;
+  AssertConstraint (L"ARM", XFirmwareControl == 0);
 #endif
 }
 
@@ -119,12 +115,10 @@ ValidateFlags (
 )
 {
 #if defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
-  if (((*(UINT32*)Ptr) & HW_REDUCED_ACPI) == 0) {
-    IncrementErrorCount ();
-    Print (
-      L"\nERROR: HW_REDUCED_ACPI flag must be set for ARM platforms."
-    );
-  }
+  UINT32 Flags;
+
+  Flags = *(UINT32 *) Ptr;
+  AssertConstraint (L"ARM", Flags & HW_REDUCED_ACPI);
 #endif
 }
 
@@ -232,15 +226,13 @@ ParseAcpiFadt (
 
   if (Trace) {
     if (FadtMinorRevision != NULL) {
-      Print (L"\nSummary:\n");
+      AcpiInfo (L"Summary:");
       PrintFieldName (2, L"FADT Version");
-      Print (L"%d.%d\n",  *AcpiHdrInfo.Revision, *FadtMinorRevision);
+      AcpiInfo (L"%d.%d", *AcpiHdrInfo.Revision, *FadtMinorRevision);
     }
 
-    if (*GetAcpiXsdtHeaderInfo ()->OemTableId != *AcpiHdrInfo.OemTableId) {
-      IncrementErrorCount ();
-      Print (L"ERROR: OEM Table Id does not match with RSDT/XSDT.\n");
-    }
+    AssertConstraint (
+      L"ACPI", *GetAcpiXsdtHeaderInfo ()->OemTableId == *AcpiHdrInfo.OemTableId);
   }
 
   // If X_FIRMWARE_CTRL is not zero then use X_FIRMWARE_CTRL and ignore
@@ -257,9 +249,9 @@ ParseAcpiFadt (
     if ((Trace) &&
         (Flags != NULL) &&
         ((*Flags & EFI_ACPI_6_3_HW_REDUCED_ACPI) != EFI_ACPI_6_3_HW_REDUCED_ACPI)) {
-      IncrementErrorCount ();
-      Print (L"ERROR: No FACS table found, "
-               L"both X_FIRMWARE_CTRL and FIRMWARE_CTRL are zero.\n");
+      AcpiError (
+        ACPI_ERROR_CROSS,
+        L"No FACS table found, X_FIRMWARE_CTRL and FIRMWARE_CTRL are zero");
     }
   }
 
@@ -283,9 +275,7 @@ ParseAcpiFadt (
 
     Status = GetParser (FacsSignature, &FacsParserProc);
     if (EFI_ERROR (Status)) {
-      Print (
-        L"ERROR: No registered parser found for FACS.\n"
-        );
+      AcpiFatal (L"No registered parser found for FACS");
       return;
     }
 
@@ -309,8 +299,8 @@ ParseAcpiFadt (
       // The DSDT Table is mandatory for ARM systems
       // as the CPU information MUST be presented in
       // the DSDT.
-      IncrementErrorCount ();
-      Print (L"ERROR: Both X_DSDT and DSDT are invalid.\n");
+      AcpiError (
+        ACPI_ERROR_CROSS, L"(ARM) One of X_DSDT or DSDT must be valid!");
     }
 #endif
     return;

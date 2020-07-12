@@ -37,10 +37,10 @@ ValidateSratReserved (
   IN VOID*  Context
   )
 {
-  if (*(UINT32*)Ptr != 1) {
-    IncrementErrorCount ();
-    Print (L"\nERROR: Reserved should be 1 for backward compatibility.\n");
-  }
+  UINT32 Reserved;
+
+  Reserved = *(UINT32 *) Ptr;
+  AssertConstraint (L"Backwards-Compatibility", Reserved == 1);
 }
 
 /**
@@ -59,18 +59,10 @@ ValidateSratDeviceHandleType (
   IN VOID*  Context
   )
 {
-  UINT8   DeviceHandleType;
+  UINT8 DeviceHandleType;
 
   DeviceHandleType = *Ptr;
-
-  if (DeviceHandleType > EFI_ACPI_6_3_PCI_DEVICE_HANDLE) {
-    IncrementErrorCount ();
-    Print (
-      L"\nERROR: Invalid Device Handle Type: %d. Must be between 0 and %d.",
-      DeviceHandleType,
-      EFI_ACPI_6_3_PCI_DEVICE_HANDLE
-      );
-  }
+  AssertConstraint (L"ACPI", DeviceHandleType <= EFI_ACPI_6_3_PCI_DEVICE_HANDLE);
 }
 
 /**
@@ -87,9 +79,9 @@ DumpSratPciBdfNumber (
   IN UINT8*        Ptr
   )
 {
-  CHAR16 Buffer[OUTPUT_FIELD_COLUMN_WIDTH];
-
-  Print (L"\n");
+  UINT16 Bus;
+  UINT16 Device;
+  UINT16 Function;
 
   /*
     The PCI BDF Number subfields are printed in the order specified in the ACPI
@@ -102,43 +94,13 @@ DumpSratPciBdfNumber (
     +-----+------+------+
   */
 
+  Bus = BitFieldRead16(*(UINT16 *) Ptr, 0, 7);
+  Device = BitFieldRead16(*(UINT16 *) Ptr, 8, 10);
+  Function = BitFieldRead16(*(UINT16 *) Ptr, 11, 15);
+
   // Print PCI Bus Number (Bits 7:0 of Byte 2)
-  UnicodeSPrint (
-    Buffer,
-    sizeof (Buffer),
-    L"PCI Bus Number"
-    );
-  PrintFieldName (4, Buffer);
-  Print (
-    L"0x%x\n",
-    *Ptr
-    );
-
-  Ptr++;
-
-  // Print PCI Device Number (Bits 7:3 of Byte 3)
-  UnicodeSPrint (
-    Buffer,
-    sizeof (Buffer),
-    L"PCI Device Number"
-    );
-  PrintFieldName (4, Buffer);
-  Print (
-    L"0x%x\n",
-    (*Ptr & (BIT7 | BIT6 | BIT5 | BIT4 | BIT3)) >> 3
-    );
-
-  // PCI Function Number (Bits 2:0 of Byte 3)
-  UnicodeSPrint (
-    Buffer,
-    sizeof (Buffer),
-    L"PCI Function Number"
-    );
-  PrintFieldName (4, Buffer);
-  Print (
-    L"0x%x\n",
-    *Ptr & (BIT2 | BIT1 | BIT0)
-    );
+  PrintFieldName (4, L"PCI Bus:Device.Function");
+  AcpiInfo (L"%4X:%2X.%d", Bus, Device, Function);
 }
 
 /**
@@ -176,8 +138,7 @@ DumpSratDeviceHandle (
  )
 {
   if (SratDeviceHandleType == NULL) {
-    IncrementErrorCount ();
-    Print (L"\nERROR: Device Handle Type read incorrectly.\n");
+    AcpiError (ACPI_ERROR_PARSE, L"Failed to parse Device Handle");
     return;
   }
 
@@ -222,7 +183,7 @@ DumpSratApicProximity (
 
   ProximityDomain = Ptr[0] | (Ptr[1] << 8) | (Ptr[2] << 16);
 
-  Print (Format, ProximityDomain);
+  AcpiInfo ((CHAR16 *)Format, ProximityDomain);
 }
 
 /**
@@ -360,7 +321,6 @@ ParseAcpiSrat (
   )
 {
   UINT32 Offset;
-  UINT8* ResourcePtr;
   UINT32 GicCAffinityIndex;
   UINT32 GicITSAffinityIndex;
   UINT32 GenericInitiatorAffinityIndex;
@@ -389,155 +349,113 @@ ParseAcpiSrat (
              PARSER_PARAMS (SratParser)
              );
 
-  ResourcePtr = Ptr + Offset;
-
   while (Offset < AcpiTableLength) {
     ParseAcpi (
       FALSE,
       0,
       NULL,
-      ResourcePtr,
+      Ptr + Offset,
       AcpiTableLength - Offset,
       PARSER_PARAMS (SratResourceAllocationParser)
       );
 
     // Check if the values used to control the parsing logic have been
     // successfully read.
-    if ((SratRAType == NULL) ||
-        (SratRALength == NULL)) {
-      IncrementErrorCount ();
-      Print (
-        L"ERROR: Insufficient remaining table buffer length to read the " \
-          L"Static Resource Allocation structure header. Length = %d.\n",
-        AcpiTableLength - Offset
-        );
+    if ((SratRAType == NULL) || (SratRALength == NULL)) {
+      AcpiError (ACPI_ERROR_PARSE, L"Failed to parse SRAT header");
       return;
     }
 
     // Validate Static Resource Allocation Structure length
-    if ((*SratRALength == 0) ||
-        ((Offset + (*SratRALength)) > AcpiTableLength)) {
-      IncrementErrorCount ();
-      Print (
-        L"ERROR: Invalid Static Resource Allocation Structure length. " \
-          L"Length = %d. Offset = %d. AcpiTableLength = %d.\n",
-        *SratRALength,
-        Offset,
-        AcpiTableLength
-        );
+    if (AssertMemberIntegrity(Offset, *SratRALength, Ptr, AcpiTableLength)) {
       return;
     }
 
     switch (*SratRAType) {
       case EFI_ACPI_6_3_GICC_AFFINITY:
-        AsciiSPrint (
-          Buffer,
-          sizeof (Buffer),
-          "GICC Affinity Structure [%d]",
-          GicCAffinityIndex++
-          );
+        AcpiLog (
+          ACPI_ITEM, L"GICC Affinity Structure [%d]", GicCAffinityIndex++);
         ParseAcpi (
           TRUE,
           2,
           Buffer,
-          ResourcePtr,
+          Ptr + Offset,
           *SratRALength,
-          PARSER_PARAMS (SratGicCAffinityParser)
-          );
+          PARSER_PARAMS (SratGicCAffinityParser));
         break;
 
       case EFI_ACPI_6_3_GIC_ITS_AFFINITY:
-        AsciiSPrint (
-          Buffer,
-          sizeof (Buffer),
-          "GIC ITS Affinity Structure [%d]",
-          GicITSAffinityIndex++
-        );
+        AcpiLog (
+          ACPI_ITEM, L"GIC ITS Affinity Structure [%d]", GicITSAffinityIndex++);
         ParseAcpi (
           TRUE,
           2,
           Buffer,
-          ResourcePtr,
+          Ptr + Offset,
           *SratRALength,
-          PARSER_PARAMS (SratGicITSAffinityParser)
-          );
+          PARSER_PARAMS (SratGicITSAffinityParser));
         break;
 
       case EFI_ACPI_6_3_GENERIC_INITIATOR_AFFINITY:
-        AsciiSPrint (
-          Buffer,
-          sizeof (Buffer),
-          "Generic Initiator Affinity Structure [%d]",
-          GenericInitiatorAffinityIndex++
-        );
+        AcpiLog (
+          ACPI_ITEM,
+          L"Generic Initiator Affinity Structure [%d]",
+          GenericInitiatorAffinityIndex++);
         ParseAcpi (
           TRUE,
           2,
           Buffer,
-          ResourcePtr,
+          Ptr + Offset,
           *SratRALength,
-          PARSER_PARAMS (SratGenericInitiatorAffinityParser)
-        );
+          PARSER_PARAMS (SratGenericInitiatorAffinityParser));
         break;
 
       case EFI_ACPI_6_3_MEMORY_AFFINITY:
-        AsciiSPrint (
-          Buffer,
-          sizeof (Buffer),
-          "Memory Affinity Structure [%d]",
-          MemoryAffinityIndex++
-          );
+        AcpiLog (
+          ACPI_ITEM, L"Memory Affinity Structure [%d]", MemoryAffinityIndex++);
         ParseAcpi (
           TRUE,
           2,
           Buffer,
-          ResourcePtr,
+          Ptr + Offset,
           *SratRALength,
-          PARSER_PARAMS (SratMemAffinityParser)
-          );
+          PARSER_PARAMS (SratMemAffinityParser));
         break;
 
       case EFI_ACPI_6_3_PROCESSOR_LOCAL_APIC_SAPIC_AFFINITY:
-        AsciiSPrint (
-          Buffer,
-          sizeof (Buffer),
-          "APIC/SAPIC Affinity Structure [%d]",
-          ApicSapicAffinityIndex++
-          );
+        AcpiLog (
+          ACPI_ITEM,
+          L"APIC/SAPIC Affinity Structure [%d]",
+          ApicSapicAffinityIndex++);
         ParseAcpi (
           TRUE,
           2,
           Buffer,
-          ResourcePtr,
+          Ptr + Offset,
           *SratRALength,
-          PARSER_PARAMS (SratApciSapicAffinityParser)
-          );
+          PARSER_PARAMS (SratApciSapicAffinityParser));
         break;
 
       case EFI_ACPI_6_3_PROCESSOR_LOCAL_X2APIC_AFFINITY:
-        AsciiSPrint (
-          Buffer,
-          sizeof (Buffer),
-          "X2APIC Affinity Structure [%d]",
-          X2ApicAffinityIndex++
-          );
+        AcpiLog (
+          ACPI_ITEM, L"X2APIC Affinity Structure [%d]", X2ApicAffinityIndex++);
         ParseAcpi (
           TRUE,
           2,
           Buffer,
-          ResourcePtr,
+          Ptr + Offset,
           *SratRALength,
-          PARSER_PARAMS (SratX2ApciAffinityParser)
-          );
+          PARSER_PARAMS (SratX2ApciAffinityParser));
         break;
 
       default:
-        IncrementErrorCount ();
-        Print (L"ERROR: Unknown SRAT Affinity type = 0x%x\n", *SratRAType);
+        AcpiError (
+          ACPI_ERROR_VALUE,
+          L"Unknown SRAT Affinity type = 0x%x\n",
+          *SratRAType);
         break;
     }
 
-    ResourcePtr += (*SratRALength);
     Offset += (*SratRALength);
   }
 }

@@ -19,24 +19,6 @@
 #define RSDP_TABLE_INFO  SIGNATURE_32('R', 'S', 'D', 'P')
 
 /**
-  This function increments the ACPI table error counter.
-**/
-VOID
-EFIAPI
-IncrementErrorCount (
-  VOID
-  );
-
-/**
-  This function increments the ACPI table warning counter.
-**/
-VOID
-EFIAPI
-IncrementWarningCount (
-  VOID
-  );
-
-/**
   This function verifies the ACPI table checksum.
 
   This function verifies the checksum for the ACPI table and optionally

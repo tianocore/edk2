@@ -11,6 +11,7 @@
 #include <Library/UefiLib.h>
 #include "AcpiParser.h"
 #include "AcpiTableParser.h"
+#include "AcpiViewLog.h"
 
 // Local Variables
 STATIC CONST UINT64* XsdtAddress;
@@ -38,15 +39,8 @@ ValidateRsdtAddress (
   //     XsdtAddresss MUST be a valid, non-null, 64-bit value.
   UINT32 RsdtAddr;
 
-  RsdtAddr = *(UINT32*)Ptr;
-
-  if (RsdtAddr != 0) {
-    IncrementErrorCount ();
-    Print (
-      L"\nERROR: Rsdt Address = 0x%p. This must be NULL on ARM Platforms.",
-      RsdtAddr
-      );
-  }
+  RsdtAddr = *(UINT32 *) Ptr;
+  AssertConstraint (L"ARM", RsdtAddr == 0);
 #endif
 }
 
@@ -73,15 +67,8 @@ ValidateXsdtAddress (
   //     XsdtAddresss MUST be a valid, non-null, 64-bit value.
   UINT64 XsdtAddr;
 
-  XsdtAddr = *(UINT64*)Ptr;
-
-  if (XsdtAddr == 0) {
-    IncrementErrorCount ();
-    Print (
-      L"\nERROR: Xsdt Address = 0x%p. This must not be NULL on ARM Platforms.",
-      XsdtAddr
-      );
-  }
+  XsdtAddr = *(UINT64 *) Ptr;
+  AssertConstraint (L"ARM", XsdtAddr != 0);
 #endif
 }
 
@@ -141,12 +128,7 @@ ParseAcpiRsdp (
   // Check if the values used to control the parsing logic have been
   // successfully read.
   if (XsdtAddress == NULL) {
-    IncrementErrorCount ();
-    Print (
-      L"ERROR: Insufficient table length. AcpiTableLength = %d." \
-        L"RSDP parsing aborted.\n",
-      AcpiTableLength
-      );
+    AcpiError (ACPI_ERROR_PARSE, L"Failed to parse the RSDP table");
     return;
   }
 
@@ -154,11 +136,11 @@ ParseAcpiRsdp (
   // and does not parse the RSDT table. Platforms provide the
   // RSDT to enable compatibility with ACPI 1.0 operating systems.
   // Therefore the RSDT should not be used on ARM platforms.
-  if ((*XsdtAddress) == 0) {
-    IncrementErrorCount ();
-    Print (L"ERROR: XSDT Pointer is not set. RSDP parsing aborted.\n");
+  if (*XsdtAddress == 0) {
+    AcpiError (
+      ACPI_ERROR_VALUE, L"XSDT Pointer is not set. RSDP parsing aborted.");
     return;
   }
 
-  ProcessAcpiTable ((UINT8*)(UINTN)(*XsdtAddress));
+  ProcessAcpiTable ((VOID *)(UINTN) *XsdtAddress);
 }
