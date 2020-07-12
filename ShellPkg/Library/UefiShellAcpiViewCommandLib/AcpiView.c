@@ -197,8 +197,8 @@ AcpiView (
   mBinTableCount = 0;
 
   // Reset The error/warning counters
-  ResetErrorCount ();
-  ResetWarningCount ();
+  mTableErrorCount = 0;
+  mTableWarningCount = 0;
 
   // Search the table for an entry that matches the ACPI Table Guid
   FoundAcpiTable = FALSE;
@@ -276,7 +276,7 @@ AcpiView (
       Print (L"\nTable Statistics:\n");
 
       if (mConfig.ColourHighlighting) {
-        PrintAttribute = (GetErrorCount () > 0) ?
+        PrintAttribute = ((mTableErrorCount) > 0) ?
                             EFI_TEXT_ATTR (
                               EFI_RED,
                               ((OriginalAttribute&(BIT4|BIT5|BIT6))>>4)
@@ -284,10 +284,10 @@ AcpiView (
                             OriginalAttribute;
         gST->ConOut->SetAttribute (gST->ConOut, PrintAttribute);
       }
-      Print (L"\t%d Error(s)\n", GetErrorCount ());
+      Print (L"\t%d Error(s)\n", mTableErrorCount);
 
       if (mConfig.ColourHighlighting) {
-        PrintAttribute = (GetWarningCount () > 0) ?
+        PrintAttribute = (mTableWarningCount > 0) ?
                             EFI_TEXT_ATTR (
                               EFI_RED,
                               ((OriginalAttribute&(BIT4|BIT5|BIT6))>>4)
@@ -296,7 +296,7 @@ AcpiView (
 
         gST->ConOut->SetAttribute (gST->ConOut, PrintAttribute);
       }
-      Print (L"\t%d Warning(s)\n", GetWarningCount ());
+      Print (L"\t%d Warning(s)\n", mTableWarningCount);
 
       if (mConfig.ColourHighlighting) {
         gST->ConOut->SetAttribute (gST->ConOut, OriginalAttribute);
