@@ -8,6 +8,8 @@
 #ifndef ACPIPARSER_H_
 #define ACPIPARSER_H_
 
+#include "FieldFormatHelper.h"
+
 #define OUTPUT_FIELD_COLUMN_WIDTH  36
 
 /// The RSDP table signature is "RSD PTR " (8 bytes)
@@ -70,138 +72,6 @@ EFIAPI
 DumpRaw (
   IN UINT8* Ptr,
   IN UINT32 Length
-  );
-
-/**
-  This function traces 1 byte of datum as specified in the format string.
-
-  @param [in] Format  The format string for tracing the data.
-  @param [in] Ptr     Pointer to the start of the buffer.
-**/
-VOID
-EFIAPI
-DumpUint8 (
-  IN CONST CHAR16* Format,
-  IN UINT8*        Ptr
-  );
-
-/**
-  This function traces 2 bytes of data as specified in the format string.
-
-  @param [in] Format  The format string for tracing the data.
-  @param [in] Ptr     Pointer to the start of the buffer.
-**/
-VOID
-EFIAPI
-DumpUint16 (
-  IN CONST CHAR16* Format,
-  IN UINT8*        Ptr
-  );
-
-/**
-  This function traces 4 bytes of data as specified in the format string.
-
-  @param [in] Format  The format string for tracing the data.
-  @param [in] Ptr     Pointer to the start of the buffer.
-**/
-VOID
-EFIAPI
-DumpUint32 (
-  IN CONST CHAR16* Format,
-  IN UINT8*        Ptr
-  );
-
-/**
-  This function traces 8 bytes of data as specified by the format string.
-
-  @param [in] Format  The format string for tracing the data.
-  @param [in] Ptr     Pointer to the start of the buffer.
-**/
-VOID
-EFIAPI
-DumpUint64 (
-  IN CONST CHAR16* Format,
-  IN UINT8*        Ptr
-  );
-
-/**
-  This function traces 3 characters which can be optionally
-  formated using the format string if specified.
-
-  If no format string is specified the Format must be NULL.
-
-  @param [in] Format  Optional format string for tracing the data.
-  @param [in] Ptr     Pointer to the start of the buffer.
-**/
-VOID
-EFIAPI
-Dump3Chars (
-  IN CONST CHAR16* Format OPTIONAL,
-  IN UINT8*        Ptr
-  );
-
-/**
-  This function traces 4 characters which can be optionally
-  formated using the format string if specified.
-
-  If no format string is specified the Format must be NULL.
-
-  @param [in] Format  Optional format string for tracing the data.
-  @param [in] Ptr     Pointer to the start of the buffer.
-**/
-VOID
-EFIAPI
-Dump4Chars (
-  IN CONST CHAR16* Format OPTIONAL,
-  IN UINT8*        Ptr
-  );
-
-/**
-  This function traces 6 characters which can be optionally
-  formated using the format string if specified.
-
-  If no format string is specified the Format must be NULL.
-
-  @param [in] Format  Optional format string for tracing the data.
-  @param [in] Ptr     Pointer to the start of the buffer.
-**/
-VOID
-EFIAPI
-Dump6Chars (
-  IN CONST CHAR16* Format OPTIONAL,
-  IN UINT8*        Ptr
-  );
-
-/**
-  This function traces 8 characters which can be optionally
-  formated using the format string if specified.
-
-  If no format string is specified the Format must be NULL.
-
-  @param [in] Format  Optional format string for tracing the data.
-  @param [in] Ptr     Pointer to the start of the buffer.
-**/
-VOID
-EFIAPI
-Dump8Chars (
-  IN CONST CHAR16* Format OPTIONAL,
-  IN UINT8*        Ptr
-  );
-
-/**
-  This function traces 12 characters which can be optionally
-  formated using the format string if specified.
-
-  If no format string is specified the Format must be NULL.
-
-  @param [in] Format  Optional format string for tracing the data.
-  @param [in] Ptr     Pointer to the start of the buffer.
-**/
-VOID
-EFIAPI
-Dump12Chars (
-  IN CONST CHAR16* Format OPTIONAL,
-  IN       UINT8*  Ptr
   );
 
 /**
