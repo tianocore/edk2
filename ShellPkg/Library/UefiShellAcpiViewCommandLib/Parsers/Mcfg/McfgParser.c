@@ -12,6 +12,7 @@
 #include <Library/UefiLib.h>
 #include "AcpiParser.h"
 #include "AcpiTableParser.h"
+#include "AcpiViewLog.h"
 
 // Local variables
 STATIC ACPI_DESCRIPTION_HEADER_INFO AcpiHdrInfo;
@@ -57,8 +58,6 @@ ParseAcpiMcfg (
   )
 {
   UINT32 Offset;
-  UINT32 PciCfgOffset;
-  UINT8* PciCfgSpacePtr;
 
   if (!Trace) {
     return;
@@ -73,18 +72,14 @@ ParseAcpiMcfg (
              PARSER_PARAMS (McfgParser)
              );
 
-  PciCfgSpacePtr = Ptr + Offset;
-
   while (Offset < AcpiTableLength) {
-    PciCfgOffset = ParseAcpi (
+    Offset += ParseAcpi (
                      TRUE,
                      2,
                      "PCI Configuration Space",
-                     PciCfgSpacePtr,
+                     Ptr + Offset,
                      (AcpiTableLength - Offset),
                      PARSER_PARAMS (PciCfgSpaceBaseAddrParser)
                      );
-    PciCfgSpacePtr += PciCfgOffset;
-    Offset += PciCfgOffset;
   }
 }

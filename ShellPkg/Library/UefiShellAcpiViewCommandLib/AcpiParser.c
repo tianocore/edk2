@@ -26,31 +26,6 @@ STATIC CONST ACPI_PARSER AcpiHeaderParser[] = {
 };
 
 /**
-  This function increments the ACPI table error counter.
-**/
-VOID
-EFIAPI
-IncrementErrorCount (
-  VOID
-  )
-{
-  mTableErrorCount++;
-}
-
-/**
-  This function increments the ACPI table warning counter.
-**/
-VOID
-EFIAPI
-IncrementWarningCount (
-  VOID
-  )
-{
-  mTableWarningCount++;
-}
-
-
-/**
   This function verifies the ACPI table checksum.
 
   This function verifies the checksum for the ACPI table and optionally

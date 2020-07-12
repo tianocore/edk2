@@ -18,15 +18,16 @@
 #include <Library/DebugLib.h>
 #include <Library/UefiLib.h>
 #include "AcpiParser.h"
+#include "AcpiViewLog.h"
 #include "Arm/SbbrValidator.h"
 
 /**
   SBBR specification version strings
 **/
-STATIC CONST CHAR8* ArmSbbrVersions[ArmSbbrVersionMax] = {
-  "1.0",     // ArmSbbrVersion_1_0
-  "1.1",     // ArmSbbrVersion_1_1
-  "1.2"      // ArmSbbrVersion_1_2
+STATIC CONST CHAR16* ArmSbbrVersions[ArmSbbrVersionMax] = {
+  L"SBBR-v1.0",     // ArmSbbrVersion_1_0
+  L"SBBR-v1.1",     // ArmSbbrVersion_1_1
+  L"SBBR-v1.2"      // ArmSbbrVersion_1_2
 };
 
 /**
@@ -96,6 +97,16 @@ STATIC ACPI_TABLE_COUNTER ArmSbbrTableCounts[] = {
   {EFI_ACPI_6_3_PROCESSOR_PROPERTIES_TOPOLOGY_TABLE_STRUCTURE_SIGNATURE, 0}
 };
 
+STATIC_ASSERT (
+  ARRAY_SIZE (ArmSbbr10Mandatory) <= ARRAY_SIZE (ArmSbbrTableCounts),
+  "Incompatible mandatory array tables");
+STATIC_ASSERT (
+  ARRAY_SIZE (ArmSbbr11Mandatory) <= ARRAY_SIZE (ArmSbbrTableCounts),
+  "Incompatible mandatory array tables");
+STATIC_ASSERT (
+  ARRAY_SIZE (ArmSbbr12Mandatory) <= ARRAY_SIZE (ArmSbbrTableCounts),
+  "Incompatible mandatory array tables");
+
 /**
   Reset the platform ACPI table instance count for all SBBR-mandatory tables.
 **/
@@ -160,7 +171,6 @@ ArmSbbrReqsValidate (
   UINT32        Table;
   UINT32        Index;
   UINT32        MandatoryTable;
-  CONST UINT8*  SignaturePtr;
   BOOLEAN       IsArmSbbrViolated;
 
   if (Version >= ArmSbbrVersionMax) {
@@ -172,51 +182,30 @@ ArmSbbrReqsValidate (
   // Go through the list of mandatory tables for the input SBBR version
   for (Table = 0; Table < ArmSbbrReqs[Version].TableCount; Table++) {
     MandatoryTable = ArmSbbrReqs[Version].Tables[Table];
-    SignaturePtr = (CONST UINT8*)(UINTN)&MandatoryTable;
 
     // Locate the instance count for the table with the given signature
-    Index = 0;
-    while ((Index < ARRAY_SIZE (ArmSbbrTableCounts)) &&
-           (ArmSbbrTableCounts[Index].Signature != MandatoryTable)) {
-      Index++;
-    }
-
-    if (Index >= ARRAY_SIZE (ArmSbbrTableCounts)) {
-      IncrementErrorCount ();
-      Print (
-        L"\nERROR: SBBR v%a: Mandatory %c%c%c%c table's instance count not " \
-          L"found\n",
-        ArmSbbrVersions[Version],
-        SignaturePtr[0],
-        SignaturePtr[1],
-        SignaturePtr[2],
-        SignaturePtr[3]
-        );
-      return EFI_UNSUPPORTED;
+    for (Index = 0; Index < ARRAY_SIZE (ArmSbbrTableCounts); Index++) {
+      if (ArmSbbrTableCounts[Index].Signature == MandatoryTable) {
+        break;
+      }
     }
 
     if (ArmSbbrTableCounts[Index].Count == 0) {
       IsArmSbbrViolated = TRUE;
-      IncrementErrorCount ();
-      Print (
-        L"\nERROR: SBBR v%a: Mandatory %c%c%c%c table is missing",
+      AcpiError (
+        ACPI_ERROR_CROSS,
+        L"(%a) Mandatory %4a table is missing",
         ArmSbbrVersions[Version],
-        SignaturePtr[0],
-        SignaturePtr[1],
-        SignaturePtr[2],
-        SignaturePtr[3]
-        );
+        MandatoryTable);
     }
   }
 
   if (!IsArmSbbrViolated) {
-    Print (
-      L"\nINFO: SBBR v%a: All mandatory ACPI tables are installed",
-      ArmSbbrVersions[Version]
-      );
+    AcpiLog (
+      ACPI_GOOD,
+      L"(%a): Mandatory ACPI tables present",
+      ArmSbbrVersions[Version]);
   }
-
-  Print (L"\n");
 
   return IsArmSbbrViolated ? EFI_NOT_FOUND : EFI_SUCCESS;
 }
