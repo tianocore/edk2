@@ -11,12 +11,9 @@
 #include "AcpiParser.h"
 #include "AcpiView.h"
 #include "AcpiViewConfig.h"
+#include "AcpiViewLog.h"
 
 STATIC UINT32   gIndent;
-
-// Publicly accessible error and warning counters.
-UINT32   mTableErrorCount;
-UINT32   mTableWarningCount;
 
 STATIC ACPI_DESCRIPTION_HEADER_INFO AcpiHdrInfo;
 
