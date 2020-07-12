@@ -29,6 +29,7 @@
   AcpiViewConfig.h
   AcpiViewLog.h
   AcpiViewLog.c
+  FieldFormatHelper.h
   Parsers/Bgrt/BgrtParser.c
   Parsers/Dbg2/Dbg2Parser.c
   Parsers/Dsdt/DsdtParser.c
