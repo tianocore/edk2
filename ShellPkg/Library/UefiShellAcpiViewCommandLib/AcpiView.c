@@ -10,6 +10,8 @@
     - Arm Server Base Boot Requirements 1.2, September 2019
 **/
 
+#include <Guid/Acpi.h>
+
 #include <Library/PrintLib.h>
 #include <Library/UefiLib.h>
 #include <Library/ShellLib.h>
@@ -22,6 +24,7 @@
 #include "AcpiTableParser.h"
 #include "AcpiView.h"
 #include "AcpiViewConfig.h"
+#include "AcpiViewLog.h"
 
 #if defined(MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
 #include "Arm/SbbrValidator.h"
@@ -57,7 +60,7 @@ DumpAcpiTableToFile (
     mBinTableCount++
     );
 
-  Print (L"Dumping ACPI table to : %s ... ", FileNameBuffer);
+  AcpiInfo (L"Dumping ACPI table to : %s ... ", FileNameBuffer);
 
   TransferBytes = ShellDumpBufferToFile (FileNameBuffer, Ptr, Length);
   return (Length == TransferBytes);
@@ -79,15 +82,7 @@ ProcessTableReportOptions (
   IN CONST UINT32  Length
   )
 {
-  UINTN               OriginalAttribute;
-  UINT8               *SignaturePtr;
   BOOLEAN             Log;
-
-  //
-  // set local variables to suppress incorrect compiler/analyzer warnings
-  //
-  OriginalAttribute = 0;
-  SignaturePtr = (UINT8*)(UINTN)&Signature;
   Log = FALSE;
 
   switch (mConfig.ReportType) {
@@ -102,27 +97,9 @@ ProcessTableReportOptions (
       break;
     case ReportTableList:
       if (mTableCount == 0) {
-        if (mConfig.ColourHighlighting) {
-          OriginalAttribute = gST->ConOut->Mode->Attribute;
-          gST->ConOut->SetAttribute (
-                         gST->ConOut,
-                         EFI_TEXT_ATTR(EFI_CYAN,
-                           ((OriginalAttribute&(BIT4|BIT5|BIT6))>>4))
-                         );
-        }
-        Print (L"\nInstalled Table(s):\n");
-        if (mConfig.ColourHighlighting) {
-          gST->ConOut->SetAttribute (gST->ConOut, OriginalAttribute);
-        }
+        AcpiLog (ACPI_HIGHLIGHT, L"\nInstalled Table(s):");
       }
-      Print (
-        L"\t%4d. %c%c%c%c\n",
-        ++mTableCount,
-        SignaturePtr[0],
-        SignaturePtr[1],
-        SignaturePtr[2],
-        SignaturePtr[3]
-        );
+      AcpiInfo (L"\t%4d. %.*a", ++mTableCount, 4, &Signature);
       break;
     case ReportDumpBinFile:
       if (Signature == mSelectedAcpiTable.Type) {
@@ -137,30 +114,15 @@ ProcessTableReportOptions (
   } // switch
 
   if (Log) {
-    if (mConfig.ColourHighlighting) {
-      OriginalAttribute = gST->ConOut->Mode->Attribute;
-      gST->ConOut->SetAttribute (
-                     gST->ConOut,
-                     EFI_TEXT_ATTR(EFI_LIGHTBLUE,
-                       ((OriginalAttribute&(BIT4|BIT5|BIT6))>>4))
-                     );
-    }
-    Print (
-      L"\n\n --------------- %c%c%c%c Table --------------- \n\n",
-      SignaturePtr[0],
-      SignaturePtr[1],
-      SignaturePtr[2],
-      SignaturePtr[3]
-      );
-    if (mConfig.ColourHighlighting) {
-      gST->ConOut->SetAttribute (gST->ConOut, OriginalAttribute);
-    }
+    AcpiLog (
+      ACPI_HIGHLIGHT,
+      L"\n --------------- %.*a Table --------------- \n",
+      4,
+      &Signature);
   }
 
   return Log;
 }
-
-
 
 /**
   This function iterates the configuration table entries in the
@@ -181,16 +143,11 @@ AcpiView (
   EFI_STATUS               Status;
   UINTN                    Index;
   EFI_CONFIGURATION_TABLE* EfiConfigurationTable;
-  BOOLEAN                  FoundAcpiTable;
-  UINTN                    OriginalAttribute;
-  UINTN                    PrintAttribute;
   UINT8*                   RsdpPtr;
   UINT32                   RsdpLength;
   UINT8                    RsdpRevision;
   PARSE_ACPI_TABLE_PROC    RsdpParserProc;
   BOOLEAN                  Trace;
-
-  OriginalAttribute = 0;
 
   // Reset Table counts
   mTableCount = 0;
@@ -201,62 +158,48 @@ AcpiView (
   mTableWarningCount = 0;
 
   // Search the table for an entry that matches the ACPI Table Guid
-  FoundAcpiTable = FALSE;
+  EfiConfigurationTable = NULL;
   for (Index = 0; Index < SystemTable->NumberOfTableEntries; Index++) {
     if (CompareGuid (&gEfiAcpiTableGuid,
           &(SystemTable->ConfigurationTable[Index].VendorGuid))) {
       EfiConfigurationTable = &SystemTable->ConfigurationTable[Index];
-      FoundAcpiTable = TRUE;
       break;
     }
   }
 
-  if (FoundAcpiTable) {
-    RsdpPtr = (UINT8*)EfiConfigurationTable->VendorTable;
-
-    // The RSDP revision is 1 byte starting at offset 15
-    RsdpRevision = *(RsdpPtr + RSDP_REVISION_OFFSET);
-
-    if (RsdpRevision < 2) {
-      Print (
-        L"ERROR: RSDP version less than 2 is not supported.\n"
-        );
-      return EFI_UNSUPPORTED;
-    }
-
-#if defined(MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
-    if (mConfig.MandatoryTableValidate) {
-      ArmSbbrResetTableCounts ();
-    }
-#endif
-
-    // The RSDP length is 4 bytes starting at offset 20
-    RsdpLength = *(UINT32*)(RsdpPtr + RSDP_LENGTH_OFFSET);
-
-    Trace = ProcessTableReportOptions (RSDP_TABLE_INFO, RsdpPtr, RsdpLength);
-
-    Status = GetParser (RSDP_TABLE_INFO, &RsdpParserProc);
-    if (EFI_ERROR (Status)) {
-      Print (
-        L"ERROR: No registered parser found for RSDP.\n"
-        );
-      return Status;
-    }
-
-    RsdpParserProc (
-      Trace,
-      RsdpPtr,
-      RsdpLength,
-      RsdpRevision
-      );
-
-  } else {
-    IncrementErrorCount ();
-    Print (
-      L"ERROR: Failed to find ACPI Table Guid in System Configuration Table.\n"
-      );
+  if (!EfiConfigurationTable) {
+    AcpiFatal (L"No ACPI Table Guid in System Configuration Table.");
     return EFI_NOT_FOUND;
   }
+
+  RsdpPtr = (UINT8 *)EfiConfigurationTable->VendorTable;
+
+  // The RSDP revision is 1 byte starting at offset 15
+  RsdpRevision = *(RsdpPtr + RSDP_REVISION_OFFSET);
+
+  if (RsdpRevision < 2) {
+    AcpiFatal (L"RSDP version less than 2 is not supported.");
+    return EFI_UNSUPPORTED;
+  }
+
+#if defined(MDE_CPU_ARM) || defined(MDE_CPU_AARCH64)
+  if (mConfig.MandatoryTableValidate) {
+    ArmSbbrResetTableCounts();
+  }
+#endif
+
+  // The RSDP length is 4 bytes starting at offset 20
+  RsdpLength = *(UINT32 *)(RsdpPtr + RSDP_LENGTH_OFFSET);
+
+  Trace = ProcessTableReportOptions(RSDP_TABLE_INFO, RsdpPtr, RsdpLength);
+
+  Status = GetParser(RSDP_TABLE_INFO, &RsdpParserProc);
+  if (EFI_ERROR(Status)) {
+    AcpiFatal (L"No registered parser found for RSDP.");
+    return Status;
+  }
+
+  RsdpParserProc(Trace, RsdpPtr, RsdpLength, RsdpRevision);
 
 #if defined(MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
   if (mConfig.MandatoryTableValidate) {
@@ -264,44 +207,28 @@ AcpiView (
   }
 #endif
 
-  if (ReportTableList != mConfig.ReportType) {
-    if (((ReportSelected == mConfig.ReportType)  ||
-         (ReportDumpBinFile == mConfig.ReportType)) &&
-        (!mSelectedAcpiTable.Found)) {
-      Print (L"\nRequested ACPI Table not found.\n");
-    } else if (mConfig.ConsistencyCheck &&
-               (ReportDumpBinFile != mConfig.ReportType)) {
-      OriginalAttribute = gST->ConOut->Mode->Attribute;
-
-      Print (L"\nTable Statistics:\n");
-
-      if (mConfig.ColourHighlighting) {
-        PrintAttribute = ((mTableErrorCount) > 0) ?
-                            EFI_TEXT_ATTR (
-                              EFI_RED,
-                              ((OriginalAttribute&(BIT4|BIT5|BIT6))>>4)
-                              ) :
-                            OriginalAttribute;
-        gST->ConOut->SetAttribute (gST->ConOut, PrintAttribute);
-      }
-      Print (L"\t%d Error(s)\n", mTableErrorCount);
-
-      if (mConfig.ColourHighlighting) {
-        PrintAttribute = (mTableWarningCount > 0) ?
-                            EFI_TEXT_ATTR (
-                              EFI_RED,
-                              ((OriginalAttribute&(BIT4|BIT5|BIT6))>>4)
-                              ) :
-                            OriginalAttribute;
-
-        gST->ConOut->SetAttribute (gST->ConOut, PrintAttribute);
-      }
-      Print (L"\t%d Warning(s)\n", mTableWarningCount);
-
-      if (mConfig.ColourHighlighting) {
-        gST->ConOut->SetAttribute (gST->ConOut, OriginalAttribute);
-      }
+  if (mConfig.ReportType == ReportSelected ||
+      mConfig.ReportType == ReportDumpBinFile) {
+    if (!mSelectedAcpiTable.Found) {
+      AcpiFatal (L"Requested ACPI Table not found.");
+      return EFI_SUCCESS;
     }
   }
+
+  if (mConfig.ConsistencyCheck) {
+    if (mConfig.ReportType == ReportSelected ||
+        mConfig.ReportType == ReportAll) {
+      AcpiInfo (L"Table Statistics:");
+      AcpiLog (
+        mTableErrorCount ? ACPI_BAD : ACPI_GOOD,
+        L"\t%d Error(s)",
+        mTableErrorCount);
+      AcpiLog (
+        mTableWarningCount ? ACPI_BAD : ACPI_GOOD,
+        L"\t%d Warning(s)\n",
+        mTableWarningCount);
+    }
+  }
+
   return EFI_SUCCESS;
 }
