@@ -8,6 +8,9 @@
 #include <Uefi.h>
 #include <Library/UefiLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/PrintLib.h>
 #include "AcpiParser.h"
 #include "AcpiView.h"
 #include "AcpiViewConfig.h"
@@ -46,6 +49,7 @@ IncrementWarningCount (
   mTableWarningCount++;
 }
 
+
 /**
   This function verifies the ACPI table checksum.
 
@@ -69,12 +73,7 @@ VerifyChecksum (
 {
   UINTN ByteCount;
   UINT8 Checksum;
-  UINTN OriginalAttribute;
 
-  //
-  // set local variables to suppress incorrect compiler/analyzer warnings
-  //
-  OriginalAttribute = 0;
   ByteCount = 0;
   Checksum = 0;
 
@@ -84,29 +83,10 @@ VerifyChecksum (
   }
 
   if (Log) {
-    OriginalAttribute = gST->ConOut->Mode->Attribute;
     if (Checksum == 0) {
-      if (mConfig.ColourHighlighting) {
-        gST->ConOut->SetAttribute (
-                       gST->ConOut,
-                       EFI_TEXT_ATTR (EFI_GREEN,
-                         ((OriginalAttribute&(BIT4|BIT5|BIT6))>>4))
-                       );
-      }
-      Print (L"Table Checksum : OK\n\n");
+      AcpiLog (ACPI_GOOD, L"Table Checksum : OK\n");
     } else {
-      IncrementErrorCount ();
-      if (mConfig.ColourHighlighting) {
-        gST->ConOut->SetAttribute (
-                       gST->ConOut,
-                       EFI_TEXT_ATTR (EFI_RED,
-                         ((OriginalAttribute&(BIT4|BIT5|BIT6))>>4))
-                       );
-      }
-      Print (L"Table Checksum : FAILED (0x%X)\n\n", Checksum);
-    }
-    if (mConfig.ColourHighlighting) {
-      gST->ConOut->SetAttribute (gST->ConOut, OriginalAttribute);
+      AcpiError (ACPI_ERROR_CSUM, L"Table Checksum (0x%X != 0)\n", Checksum);
     }
   }
 
@@ -127,53 +107,101 @@ DumpRaw (
   )
 {
   UINTN ByteCount;
-  UINTN PartLineChars;
-  UINTN AsciiBufferIndex;
   CHAR8 AsciiBuffer[17];
+  CHAR8 HexBuffer[128];
+  CHAR8 *HexCursor;
 
   ByteCount = 0;
-  AsciiBufferIndex = 0;
 
-  Print (L"Address  : 0x%p\n", Ptr);
-  Print (L"Length   : %d\n", Length);
+  AcpiInfo (L"Address  : 0x%p", Ptr);
+  AcpiInfo (L"Length   : %d\n", Length);
 
   while (ByteCount < Length) {
-    if ((ByteCount & 0x0F) == 0) {
-      AsciiBuffer[AsciiBufferIndex] = '\0';
-      Print (L"  %a\n%08X : ", AsciiBuffer, ByteCount);
-      AsciiBufferIndex = 0;
-    } else if ((ByteCount & 0x07) == 0) {
-      Print (L"- ");
+
+    // Reset ascii and hex strings
+    if (ByteCount % 16 == 0) {
+      HexCursor = HexBuffer;
+      ZeroMem (AsciiBuffer, sizeof(AsciiBuffer));
+      ZeroMem (HexBuffer, sizeof(HexBuffer));
+    } else if (ByteCount % 8 == 0) {
+      HexCursor += AsciiSPrint (HexCursor, sizeof(HexBuffer), "- ");
     }
 
+    // Add hex couplet to hex buffer
+    HexCursor += AsciiSPrint (HexCursor, sizeof(HexBuffer), "%02X ", *Ptr);
+
+    // Add ascii letter to the ascii buffer
+    AsciiBuffer[ByteCount & 0xF] = '.';
     if ((*Ptr >= ' ') && (*Ptr < 0x7F)) {
-      AsciiBuffer[AsciiBufferIndex++] = *Ptr;
-    } else {
-      AsciiBuffer[AsciiBufferIndex++] = '.';
+      AsciiBuffer[ByteCount & 0xF] = *Ptr;
     }
 
-    Print (L"%02X ", *Ptr++);
+    // Print line with fixed width hex part
+    if (ByteCount % 16 == 15) {
+      AcpiInfo (L"%08X : %-.*a %a", ByteCount + 1, 46, HexBuffer, AsciiBuffer);
+    }
 
     ByteCount++;
+    Ptr++;
   }
 
-  // Justify the final line using spaces before printing
-  // the ASCII data.
-  PartLineChars = (Length & 0x0F);
-  if (PartLineChars != 0) {
-    PartLineChars = 48 - (PartLineChars * 3);
-    if ((Length & 0x0F) <= 8) {
-      PartLineChars += 2;
+    // Print the last line
+    if (ByteCount % 16 != 15) {
+      AcpiInfo (
+        L"%08X : %-*a %.*a",
+        (ByteCount + 16) & ~0xF,
+        46,
+        HexBuffer,
+        ByteCount & 0xF,
+        AsciiBuffer);
     }
-    while (PartLineChars > 0) {
-      Print (L" ");
-      PartLineChars--;
-    }
+}
+
+/**
+  Prints an arbitrary variable to screen using a given parser.
+  Also calls the internal validator if it exists.
+
+  @param[in] Parser The parser to use to print to screen
+  @param[in] Prt    Pointer to variable that should be printed
+**/
+STATIC
+VOID
+EFIAPI
+DumpAndValidate(
+  IN CONST ACPI_PARSER* Parser,
+  IN VOID* Ptr
+  )
+{
+  // if there is a Formatter function let the function handle
+  // the printing else if a Format is specified in the table use
+  // the Format for printing
+  PrintFieldName (2, Parser->NameStr);
+  if (Parser->PrintFormatter != NULL) {
+    Parser->PrintFormatter(Parser->Format, Ptr);
+  } else if (Parser->Format != NULL) {
+    switch (Parser->Length) {
+    case 1:
+      AcpiInfo (Parser->Format, *(UINT8 *)Ptr);
+      break;
+    case 2:
+      AcpiInfo (Parser->Format, ReadUnaligned16 ((CONST UINT16 *)Ptr));
+      break;
+    case 4:
+      AcpiInfo (Parser->Format, ReadUnaligned32 ((CONST UINT32 *)Ptr));
+      break;
+    case 8:
+      AcpiInfo (Parser->Format, ReadUnaligned64 ((CONST UINT64 *)Ptr));
+      break;
+    default:
+      AcpiLog (ACPI_BAD, L"<Parse Error>");
+    } // switch
   }
 
-  // Print ASCII data for the final line.
-  AsciiBuffer[AsciiBufferIndex] = '\0';
-  Print (L"  %a\n\n", AsciiBuffer);
+  // Validating only makes sense if we are tracing
+  // the parsed table entries, to report by table name.
+  if (mConfig.ConsistencyCheck && (Parser->FieldValidator != NULL)) {
+    Parser->FieldValidator(Ptr, Parser->Context);
+  }
 }
 
 /**
@@ -216,39 +244,25 @@ ParseAcpi (
 {
   UINT32  Index;
   UINT32  Offset;
-  UINTN   OriginalAttribute;
 
-  //
-  // set local variables to suppress incorrect compiler/analyzer warnings
-  //
-  OriginalAttribute = 0;
-  Offset = 0;
+  if (Length == 0) {
+    AcpiLog (
+      ACPI_WARN,
+      L"Will not parse zero-length buffer <%a>=%p",
+      AsciiName ? AsciiName : "Unknown Item",
+      Ptr);
+    return 0;
+  }
 
   // Increment the Indent
   gIndent += Indent;
 
   if (Trace && (AsciiName != NULL)){
-
-    if (mConfig.ColourHighlighting) {
-      OriginalAttribute = gST->ConOut->Mode->Attribute;
-      gST->ConOut->SetAttribute (
-                     gST->ConOut,
-                     EFI_TEXT_ATTR(EFI_YELLOW,
-                       ((OriginalAttribute&(BIT4|BIT5|BIT6))>>4))
-                     );
-    }
-    Print (
-      L"%*a%-*a :\n",
-      gIndent,
-      "",
-      (OUTPUT_FIELD_COLUMN_WIDTH - gIndent),
-      AsciiName
-      );
-    if (mConfig.ColourHighlighting) {
-      gST->ConOut->SetAttribute (gST->ConOut, OriginalAttribute);
-    }
+    AcpiLog (
+      ACPI_ITEM, L"%*.a%a", gIndent, "", AsciiName);
   }
 
+  Offset = 0;
   for (Index = 0; Index < ParserItems; Index++) {
     if ((Offset + Parser[Index].Length) > Length) {
 
@@ -263,10 +277,8 @@ ParseAcpi (
     }
 
     if (mConfig.ConsistencyCheck && (Offset != Parser[Index].Offset)) {
-      IncrementErrorCount ();
-      Print (
-        L"\nERROR: %a: Offset Mismatch for %s\n"
-          L"CurrentOffset = %d FieldOffset = %d\n",
+      AcpiError (ACPI_ERROR_PARSE,
+        L"%a: Offset Mismatch for %s (%d != %d)",
         AsciiName,
         Parser[Index].NameStr,
         Offset,
@@ -275,48 +287,13 @@ ParseAcpi (
     }
 
     if (Trace) {
-      // if there is a Formatter function let the function handle
-      // the printing else if a Format is specified in the table use
-      // the Format for printing
-      PrintFieldName (2, Parser[Index].NameStr);
-      if (Parser[Index].PrintFormatter != NULL) {
-        Parser[Index].PrintFormatter (Parser[Index].Format, Ptr);
-      } else if (Parser[Index].Format != NULL) {
-        switch (Parser[Index].Length) {
-          case 1:
-            DumpUint8 (Parser[Index].Format, Ptr);
-            break;
-          case 2:
-            DumpUint16 (Parser[Index].Format, Ptr);
-            break;
-          case 4:
-            DumpUint32 (Parser[Index].Format, Ptr);
-            break;
-          case 8:
-            DumpUint64 (Parser[Index].Format, Ptr);
-            break;
-          default:
-            Print (
-              L"\nERROR: %a: CANNOT PARSE THIS FIELD, Field Length = %d\n",
-              AsciiName,
-              Parser[Index].Length
-              );
-        } // switch
-
-        // Validating only makes sense if we are tracing
-        // the parsed table entries, to report by table name.
-        if (mConfig.ConsistencyCheck && (Parser[Index].FieldValidator != NULL)) {
-          Parser[Index].FieldValidator (Ptr, Parser[Index].Context);
-        }
-      }
-      Print (L"\n");
-    } // if (Trace)
-
-    if (Parser[Index].ItemPtr != NULL) {
-      *Parser[Index].ItemPtr = (VOID*)Ptr;
+      DumpAndValidate (&Parser[Index], &Ptr[Offset]);
     }
 
-    Ptr += Parser[Index].Length;
+    if (Parser[Index].ItemPtr != NULL) {
+      *Parser[Index].ItemPtr = Ptr + Offset;
+    }
+
     Offset += Parser[Index].Length;
   } // for
 
@@ -355,7 +332,7 @@ DumpGasStruct (
   IN UINT32        Length
   )
 {
-  Print (L"\n");
+  AcpiInfo(L"");
   return ParseAcpi (
            TRUE,
            Indent,
@@ -421,7 +398,7 @@ DumpAcpiHeader (
 UINT32
 EFIAPI
 ParseAcpiHeader (
-  IN  UINT8*         Ptr,
+  IN  VOID*         Ptr,
   OUT CONST UINT32** Signature,
   OUT CONST UINT32** Length,
   OUT CONST UINT8**  Revision

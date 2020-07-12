@@ -18,6 +18,7 @@
 #include "AcpiTableParser.h"
 #include "AcpiView.h"
 #include "AcpiViewConfig.h"
+#include "AcpiViewLog.h"
 
 #if defined(MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
 #include "Arm/SbbrValidator.h"
@@ -179,61 +180,43 @@ GetParser (
 VOID
 EFIAPI
 ProcessAcpiTable (
-  IN UINT8* Ptr
+  IN VOID* Ptr
   )
 {
   EFI_STATUS    Status;
   BOOLEAN       Trace;
-  CONST UINT32* AcpiTableSignature;
-  CONST UINT32* AcpiTableLength;
-  CONST UINT8*  AcpiTableRevision;
-  CONST UINT8*  SignaturePtr;
+  CONST UINT32* Signature;
+  CONST UINT32* Length;
+  CONST UINT8*  Revision;
   PARSE_ACPI_TABLE_PROC ParserProc;
 
-  ParseAcpiHeader (
-    Ptr,
-    &AcpiTableSignature,
-    &AcpiTableLength,
-    &AcpiTableRevision
-    );
+  ParseAcpiHeader (Ptr, &Signature, &Length, &Revision);
 
-  Trace = ProcessTableReportOptions (
-            *AcpiTableSignature,
-            Ptr,
-            *AcpiTableLength
-            );
+  Trace = ProcessTableReportOptions (*Signature, Ptr, *Length);
 
   if (Trace) {
-    DumpRaw (Ptr, *AcpiTableLength);
+    DumpRaw (Ptr, *Length);
 
     // Do not process the ACPI table any further if the table length read
     // is invalid. The ACPI table should at least contain the table header.
-    if (*AcpiTableLength < sizeof (EFI_ACPI_DESCRIPTION_HEADER)) {
-      SignaturePtr = (CONST UINT8*)AcpiTableSignature;
-      IncrementErrorCount ();
-      Print (
-        L"ERROR: Invalid %c%c%c%c table length. Length = %d\n",
-        SignaturePtr[0],
-        SignaturePtr[1],
-        SignaturePtr[2],
-        SignaturePtr[3],
-        *AcpiTableLength
-        );
+    if (*Length < sizeof (EFI_ACPI_DESCRIPTION_HEADER)) {
+      AcpiError (
+        ACPI_ERROR_LENGTH, L"Table %4a invalid length %d", Signature, *Length);
       return;
     }
 
     if (mConfig.ConsistencyCheck) {
-      VerifyChecksum (TRUE, Ptr, *AcpiTableLength);
+      VerifyChecksum (TRUE, Ptr, *Length);
     }
   }
 
 #if defined(MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
   if (mConfig.MandatoryTableValidate) {
-    ArmSbbrIncrementTableCount (*AcpiTableSignature);
+    ArmSbbrIncrementTableCount (*Signature);
   }
 #endif
 
-  Status = GetParser (*AcpiTableSignature, &ParserProc);
+  Status = GetParser (*Signature, &ParserProc);
   if (EFI_ERROR (Status)) {
     // No registered parser found, do default handling.
     if (Trace) {
@@ -242,10 +225,5 @@ ProcessAcpiTable (
     return;
   }
 
-  ParserProc (
-    Trace,
-    Ptr,
-    *AcpiTableLength,
-    *AcpiTableRevision
-    );
+  ParserProc (Trace, Ptr, *Length, *Revision);
 }
