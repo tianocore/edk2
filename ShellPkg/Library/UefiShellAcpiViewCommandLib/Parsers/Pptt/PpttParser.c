@@ -15,6 +15,7 @@
 #include "AcpiView.h"
 #include "AcpiViewConfig.h"
 #include "PpttParser.h"
+#include "AcpiViewLog.h"
 
 // Local variables
 STATIC CONST UINT8*  ProcessorTopologyStructureType;

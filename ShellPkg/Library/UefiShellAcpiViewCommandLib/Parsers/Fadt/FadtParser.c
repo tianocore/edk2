@@ -13,6 +13,7 @@
 #include "AcpiParser.h"
 #include "AcpiTableParser.h"
 #include "AcpiView.h"
+#include "AcpiViewLog.h"
 
 // Local variables
 STATIC CONST UINT32* DsdtAddress;

@@ -14,6 +14,7 @@
 #include "AcpiParser.h"
 #include "AcpiTableParser.h"
 #include "AcpiViewConfig.h"
+#include "AcpiViewLog.h"
 
 // Local variables
 STATIC ACPI_DESCRIPTION_HEADER_INFO AcpiHdrInfo;
