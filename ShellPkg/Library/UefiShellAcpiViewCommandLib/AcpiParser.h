@@ -205,25 +205,6 @@ Dump12Chars (
   );
 
 /**
-  This function indents and prints the ACPI table Field Name.
-
-  @param [in] Indent      Number of spaces to add to the global table
-                          indent. The global table indent is 0 by default;
-                          however this value is updated on entry to the
-                          ParseAcpi() by adding the indent value provided to
-                          ParseAcpi() and restored back on exit. Therefore
-                          the total indent in the output is dependent on from
-                          where this function is called.
-  @param [in] FieldName   Pointer to the Field Name.
-**/
-VOID
-EFIAPI
-PrintFieldName (
-  IN UINT32         Indent,
-  IN CONST CHAR16*  FieldName
-  );
-
-/**
   This function pointer is the template for customizing the trace output
 
   @param [in] Format  Format string for tracing the data as specified by

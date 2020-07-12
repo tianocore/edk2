@@ -40,6 +40,7 @@ typedef enum {
 // Publicly accessible error and warning counters.
 extern UINT32   mTableErrorCount;
 extern UINT32   mTableWarningCount;
+extern UINT32   gIndent;
 
 /**
   AcpiView output and logging function. Will log the event to
@@ -171,6 +172,26 @@ CheckConstraintInternal (
     !!(Constraint),                               \
     ACPI_WARN)
 
+/**
+  This function indents and prints the ACPI table Field Name.
+
+  @param [in] Indent      Number of spaces to add to the global table indent.
+                          The global table indent is 0 by default; however
+                          this value is updated on entry to the ParseAcpi()
+                          by adding the indent value provided to ParseAcpi()
+                          and restored back on exit.
+                          Therefore the total indent in the output is
+                          dependent on from where this function is called.
+  @param [in] FieldName   Pointer to the format string for field name.
+  @param [in] ...         Variable List parameters to format.
+**/
+VOID
+EFIAPI
+PrintFieldName (
+  IN UINT32         Indent,
+  IN CONST CHAR16*  FieldNameFormat,
+  ...
+  );
 
 // Maximum string size that can be printed
 #define MAX_OUTPUT_SIZE 256

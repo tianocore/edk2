@@ -12,6 +12,7 @@
 #include <Library/UefiLib.h>
 #include "AcpiParser.h"
 #include "AcpiTableParser.h"
+#include "AcpiViewLog.h"
 
 // Local variables pointing to the table fields
 STATIC CONST UINT32* OffsetDbgDeviceInfo;

@@ -14,6 +14,7 @@
 #include "AcpiParser.h"
 #include "AcpiTableParser.h"
 #include "AcpiViewConfig.h"
+#include "AcpiViewLog.h"
 
 // Local Variables
 STATIC CONST UINT8* SratRAType;

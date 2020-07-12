@@ -27,6 +27,7 @@ static const CHAR16* mErrorTypeDesc [ACPI_ERROR_MAX] = {
 // Publicly accessible error and warning counters.
 UINT32   mTableErrorCount;
 UINT32   mTableWarningCount;
+UINT32   gIndent;
 
 /**
   Change the attributes of the standard output console
@@ -335,4 +336,41 @@ CheckConstraintInternal (
 
   // Return TRUE if constraint was violated
   return !Constraint;
+}
+
+/**
+  This function indents and prints the ACPI table Field Name.
+
+  @param [in] Indent      Number of spaces to add to the global table indent.
+                          The global table indent is 0 by default; however
+                          this value is updated on entry to the ParseAcpi()
+                          by adding the indent value provided to ParseAcpi()
+                          and restored back on exit.
+                          Therefore the total indent in the output is
+                          dependent on from where this function is called.
+  @param [in] FieldName   Pointer to the format string for field name.
+  @param [in] ...         Variable List parameters to format.
+**/
+VOID
+EFIAPI
+PrintFieldName (
+  IN UINT32         Indent,
+  IN CONST CHAR16*  FieldNameFormat,
+  ...
+  )
+{
+  VA_LIST Marker;
+  CHAR16 Buffer[64];
+
+  VA_START(Marker, FieldNameFormat);
+  UnicodeVSPrint(Buffer, sizeof(Buffer), FieldNameFormat, Marker);
+  VA_END(Marker);
+
+  AcpiViewOutput (
+    L"%*a%-*s : ",
+    gIndent + Indent,
+    "",
+    (OUTPUT_FIELD_COLUMN_WIDTH - gIndent - Indent),
+    Buffer
+    );
 }
