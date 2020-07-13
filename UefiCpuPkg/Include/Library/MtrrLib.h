@@ -201,21 +201,6 @@ MtrrGetFixedMtrr (
 
 
 /**
-  This function sets fixed MTRRs
-
-  @param[in]   FixedSettings      A buffer holding fixed MTRRs content.
-
-  @return  The pointer of FixedSettings
-
-**/
-MTRR_FIXED_SETTINGS*
-EFIAPI
-MtrrSetFixedMtrr (
-  IN MTRR_FIXED_SETTINGS          *FixedSettings
-  );
-
-
-/**
   This function gets the content in all MTRRs (variable and fixed)
 
   @param[out]  MtrrSetting   A buffer to hold all MTRRs content.
