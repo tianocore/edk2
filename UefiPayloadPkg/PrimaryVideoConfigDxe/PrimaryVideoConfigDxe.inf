@@ -10,11 +10,11 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = SMBusConfigLoader
-  FILE_GUID                      = FCBA64FC-BC6B-4B8B-A0E2-D1EC78B8C01A
+  BASE_NAME                      = PrimaryVideoConfigDxe
+  FILE_GUID                      = 982d8d3b-9569-4184-bd30-6f7ae04c4b36
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  ENTRY_POINT                    = InstallSMBusConfigLoader
+  ENTRY_POINT                    = InstallPrimaryVideoConfigDxe
 
 #
 # The following information is for reference only and not required by the build tools.
@@ -23,8 +23,8 @@
 #
 
 [Sources.common]
-  SMBusConfigLoader.h
-  SMBusConfigLoader.c
+  PrimaryVideoConfigDxe.h
+  PrimaryVideoConfigDxe.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -35,19 +35,18 @@
 [Guids]
   gEfiBoardSettingsVariableGuid
   gEfiSecureBootEnableDisableGuid
-  gEfiGlobalVariableGuid
+  gEfiEventReadyToBootGuid
 
 [LibraryClasses]
   UefiDriverEntryPoint
   DebugLib
-  SmbusLib
+  DevicePathLib
   UefiRuntimeServicesTableLib
-  PciLib
+  BaseLib
 
 [Depex]
-  gEfiSmbusHcProtocolGuid AND
-  gEfiVariableArchProtocolGuid
+  AFTER gSMBUSConfigLoaderDxeFileGuid
 
 [Protocols]
-  gEfiSmbusHcProtocolGuid                       ## CONSUMES
-  gEfiVariableArchProtocolGuid                  ## CONSUMES
+  gEfiGraphicsOutputProtocolGuid                ## CONSUMES
+

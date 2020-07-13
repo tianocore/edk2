@@ -623,6 +623,8 @@
   #
   UefiPayloadPkg/SmbusDxe/SMBusi801Dxe.inf
   UefiPayloadPkg/SmbusConfigLoaderDxe/SMBusConfigLoader.inf
+  UefiPayloadPkg/PrimaryVideoConfigDxe/PrimaryVideoConfigDxe.inf
+
 
   #
   # Console Support

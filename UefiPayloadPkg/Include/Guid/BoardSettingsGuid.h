@@ -29,6 +29,15 @@ typedef struct {
   UINT8 PxeBootCapability;
 } BOARD_SETTINGS;
 
+#define PRIMARY_VIDEO_ASPEED 0
+#define PRIMARY_VIDEO_INTEL 1
+#define PRIMARY_VIDEO_SLOT1 2
+#define PRIMARY_VIDEO_SLOT2 3
+#define PRIMARY_VIDEO_SLOT3 4
+#define PRIMARY_VIDEO_SLOT4 5
+#define PRIMARY_VIDEO_SLOT5 6
+#define PRIMARY_VIDEO_SLOT6 7
+
 #pragma pack()
 
 #define BOARD_SETTINGS_NAME L"BoardSettings"

@@ -127,6 +127,7 @@ INF UefiPayloadPkg/BlSMMStoreDxe/BlSMMStoreDxe.inf
 #
 INF UefiPayloadPkg/SmbusDxe/SMBusi801Dxe.inf
 INF UefiPayloadPkg/SmbusConfigLoaderDxe/SMBusConfigLoader.inf
+INF UefiPayloadPkg/PrimaryVideoConfigDxe/PrimaryVideoConfigDxe.inf
 
 #
 # PCI Support
