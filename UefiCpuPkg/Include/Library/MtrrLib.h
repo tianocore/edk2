@@ -1,7 +1,7 @@
 /** @file
   MTRR setting library
 
-  Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2008 - 2020, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -182,21 +182,6 @@ MTRR_MEMORY_CACHE_TYPE
 EFIAPI
 MtrrGetMemoryAttribute (
   IN PHYSICAL_ADDRESS   Address
-  );
-
-
-/**
-  This function will get the raw value in variable MTRRs
-
-  @param[out]  VariableSettings   A buffer to hold variable MTRRs content.
-
-  @return The buffer point to MTRR_VARIABLE_SETTINGS in which holds the content of the variable MTRR
-
-**/
-MTRR_VARIABLE_SETTINGS*
-EFIAPI
-MtrrGetVariableMtrr (
-  OUT MTRR_VARIABLE_SETTINGS         *VariableSettings
   );
 
 
