@@ -2558,35 +2558,6 @@ MtrrSetVariableMtrrWorker (
   }
 }
 
-
-/**
-  This function sets variable MTRRs
-
-  @param[in]  VariableSettings   A buffer to hold variable MTRRs content.
-
-  @return The pointer of VariableSettings
-
-**/
-MTRR_VARIABLE_SETTINGS*
-EFIAPI
-MtrrSetVariableMtrr (
-  IN MTRR_VARIABLE_SETTINGS         *VariableSettings
-  )
-{
-  MTRR_CONTEXT  MtrrContext;
-
-  if (!IsMtrrSupported ()) {
-    return VariableSettings;
-  }
-
-  MtrrLibPreMtrrChange (&MtrrContext);
-  MtrrSetVariableMtrrWorker (VariableSettings);
-  MtrrLibPostMtrrChange (&MtrrContext);
-  MtrrDebugPrintAllMtrrs ();
-
-  return  VariableSettings;
-}
-
 /**
   Worker function setting fixed MTRRs
 

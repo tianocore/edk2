@@ -186,21 +186,6 @@ MtrrGetMemoryAttribute (
 
 
 /**
-  This function sets variable MTRRs
-
-  @param[in]  VariableSettings   A buffer to hold variable MTRRs content.
-
-  @return The pointer of VariableSettings
-
-**/
-MTRR_VARIABLE_SETTINGS*
-EFIAPI
-MtrrSetVariableMtrr (
-  IN MTRR_VARIABLE_SETTINGS         *VariableSettings
-  );
-
-
-/**
   This function gets the content in fixed MTRRs
 
   @param[out]  FixedSettings      A buffer to hold fixed MTRRs content.
