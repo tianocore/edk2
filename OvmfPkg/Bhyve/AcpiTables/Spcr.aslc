@@ -1,0 +1,63 @@
+/*
+ * Copyright (c) 2020, Rebecca Cran <rebecca@bsdio.com>
+ * Copyright (c) 2015, Nahanni Systems, Inc.
+ *
+ * SPDX-License-Identifier: BSD-2-Clause-Patent
+ */
+
+#include "Platform.h"
+
+#define EFI_ACPI_OEM_TABLE_ID     SIGNATURE_64('B','V','S','P','C','R',' ',' ')
+
+EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE SPCR = {
+  {
+    EFI_ACPI_2_0_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_SIGNATURE,
+    sizeof (EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE),
+    EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_REVISION,
+    0,                          // to make sum of entire table == 0
+    {EFI_ACPI_OEM_ID},          // OEMID is a 6 bytes long field
+    EFI_ACPI_OEM_TABLE_ID,      // OEM table identification(8 bytes long)
+    EFI_ACPI_OEM_REVISION,      // OEM revision number
+    EFI_ACPI_CREATOR_ID,        // ASL compiler vendor ID
+    EFI_ACPI_CREATOR_REVISION   // ASL compiler revision number
+  },
+  EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERFACE_TYPE_16550,
+  { 0 },                        // Reserved
+  {                             // BaseAddress
+    0x01,                       //   AddressSpaceId
+    0x08,                       //   RegisterBitWidth
+    0x00,                       //   RegisterBitOffset
+    0x00,                       //   Reserved
+    0x03F8                      //   Address (COM1)
+  },
+  EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_8259,
+  4,                            // Irq
+  0,                            // GlobalSystemInterrupt
+  EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_BAUD_RATE_115200,
+  EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_PARITY_NO_PARITY,
+  EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_STOP_BITS_1,
+  0x03,                         // FlowControl: RTS/CTS | DCD
+  EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_TERMINAL_TYPE_VT_UTF8,
+  0,                            // Language
+  0,                            // PciDeviceId
+  0,                            // PciVendorId
+  0,                            // PciBusNumber
+  0,                            // PciDeviceNumber
+  0,                            // PciFunctionNumber
+  0,                            // PciFlags
+  0,                            // PciSegment
+  0                             // Reserved
+};
+
+
+VOID *
+ReferenceAcpiTable (
+  VOID
+  )
+{
+  //
+  // Reference the table being generated to prevent the optimizer from removing the
+  // data structure from the exeutable
+  //
+  return (VOID*)&SPCR;
+}
