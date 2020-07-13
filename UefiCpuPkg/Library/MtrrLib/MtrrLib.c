@@ -2581,35 +2581,6 @@ MtrrSetFixedMtrrWorker (
 
 
 /**
-  This function sets fixed MTRRs
-
-  @param[in]  FixedSettings  A buffer to hold fixed MTRRs content.
-
-  @retval The pointer of FixedSettings
-
-**/
-MTRR_FIXED_SETTINGS*
-EFIAPI
-MtrrSetFixedMtrr (
-  IN MTRR_FIXED_SETTINGS          *FixedSettings
-  )
-{
-  MTRR_CONTEXT  MtrrContext;
-
-  if (!IsMtrrSupported ()) {
-    return FixedSettings;
-  }
-
-  MtrrLibPreMtrrChange (&MtrrContext);
-  MtrrSetFixedMtrrWorker (FixedSettings);
-  MtrrLibPostMtrrChange (&MtrrContext);
-  MtrrDebugPrintAllMtrrs ();
-
-  return FixedSettings;
-}
-
-
-/**
   This function gets the content in all MTRRs (variable and fixed)
 
   @param[out]  MtrrSetting  A buffer to hold all MTRRs content.
