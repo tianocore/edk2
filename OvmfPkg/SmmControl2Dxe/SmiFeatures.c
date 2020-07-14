@@ -9,6 +9,7 @@
 
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
+#include <Library/MemEncryptSevLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
 #include <Library/QemuFwCfgLib.h>
@@ -21,6 +22,12 @@
 // "etc/smi/supported-features" and "etc/smi/requested-features" fw_cfg files.
 //
 #define ICH9_LPC_SMI_F_BROADCAST BIT0
+//
+// The following bit value stands for "enable CPU hotplug, and inject an SMI
+// with control value ICH9_APM_CNT_CPU_HOTPLUG upon hotplug", in the
+// "etc/smi/supported-features" and "etc/smi/requested-features" fw_cfg files.
+//
+#define ICH9_LPC_SMI_F_CPU_HOTPLUG BIT1
 
 //
 // Provides a scratch buffer (allocated in EfiReservedMemoryType type memory)
@@ -67,6 +74,7 @@ NegotiateSmiFeatures (
   UINTN                SupportedFeaturesSize;
   UINTN                RequestedFeaturesSize;
   UINTN                FeaturesOkSize;
+  UINT64               RequestedFeaturesMask;
 
   //
   // Look up the fw_cfg files used for feature negotiation. The selector keys
@@ -104,9 +112,16 @@ NegotiateSmiFeatures (
   QemuFwCfgReadBytes (sizeof mSmiFeatures, &mSmiFeatures);
 
   //
-  // We want broadcast SMI and nothing else.
+  // We want broadcast SMI, SMI on CPU hotplug, and nothing else.
   //
-  mSmiFeatures &= ICH9_LPC_SMI_F_BROADCAST;
+  RequestedFeaturesMask = ICH9_LPC_SMI_F_BROADCAST;
+  if (!MemEncryptSevIsEnabled ()) {
+    //
+    // For now, we only support hotplug with SEV disabled.
+    //
+    RequestedFeaturesMask |= ICH9_LPC_SMI_F_CPU_HOTPLUG;
+  }
+  mSmiFeatures &= RequestedFeaturesMask;
   QemuFwCfgSelectItem (mRequestedFeaturesItem);
   QemuFwCfgWriteBytes (sizeof mSmiFeatures, &mSmiFeatures);
 
@@ -142,6 +157,13 @@ NegotiateSmiFeatures (
       goto FatalError;
     }
     DEBUG ((DEBUG_INFO, "%a: using SMI broadcast\n", __FUNCTION__));
+  }
+
+  if ((mSmiFeatures & ICH9_LPC_SMI_F_CPU_HOTPLUG) == 0) {
+    DEBUG ((DEBUG_INFO, "%a: CPU hotplug not negotiated\n", __FUNCTION__));
+  } else {
+    DEBUG ((DEBUG_INFO, "%a: CPU hotplug with SMI negotiated\n",
+      __FUNCTION__));
   }
 
   //

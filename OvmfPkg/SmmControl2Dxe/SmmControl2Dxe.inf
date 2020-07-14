@@ -46,6 +46,7 @@
   BaseLib
   DebugLib
   IoLib
+  MemEncryptSevLib
   MemoryAllocationLib
   PcdLib
   PciLib
