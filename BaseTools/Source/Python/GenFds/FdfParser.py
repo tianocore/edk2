@@ -18,7 +18,7 @@ from uuid import UUID
 
 from Common.BuildToolError import *
 from Common import EdkLogger
-from Common.Misc import PathClass, tdict, ProcessDuplicatedInf
+from Common.Misc import PathClass, tdict, ProcessDuplicatedInf, GuidStructureStringToGuidString
 from Common.StringUtils import NormPath, ReplaceMacro
 from Common import GlobalData
 from Common.Expression import *
@@ -1086,6 +1086,8 @@ class FdfParser:
         if not self._GetNextToken():
             return False
         if GlobalData.gGuidPattern.match(self._Token) is not None:
+            return True
+        elif self._Token in GlobalData.gGuidDict:
             return True
         else:
             self._UndoToken()
@@ -2248,6 +2250,8 @@ class FdfParser:
 
         if not self._GetNextGuid():
             raise Warning.Expected("GUID value", self.FileName, self.CurrentLineNumber)
+        if self._Token in GlobalData.gGuidDict:
+            self._Token = GuidStructureStringToGuidString(GlobalData.gGuidDict[self._Token]).upper()
 
         FvObj.FvNameGuid = self._Token
 
@@ -2459,6 +2463,8 @@ class FdfParser:
                 raise Warning.ExpectedEquals(self.FileName, self.CurrentLineNumber)
             if not self._GetNextGuid():
                 raise Warning.Expected("GUID value", self.FileName, self.CurrentLineNumber)
+            if self._Token in GlobalData.gGuidDict:
+                self._Token = GuidStructureStringToGuidString(GlobalData.gGuidDict[self._Token]).upper()
             FfsInfObj.OverrideGuid = self._Token
 
         if self._IsKeyword("RuleOverride"):
@@ -2550,6 +2556,8 @@ class FdfParser:
                     raise Warning.Expected("')'", self.FileName, self.CurrentLineNumber)
                 self._Token = 'PCD('+PcdPair[1]+TAB_SPLIT+PcdPair[0]+')'
 
+        if self._Token in GlobalData.gGuidDict:
+            self._Token = GuidStructureStringToGuidString(GlobalData.gGuidDict[self._Token]).upper()
         FfsFileObj.NameGuid = self._Token
 
         self._GetFilePart(FfsFileObj)
@@ -2980,6 +2988,8 @@ class FdfParser:
         elif self._IsKeyword("GUIDED"):
             GuidValue = None
             if self._GetNextGuid():
+                if self._Token in GlobalData.gGuidDict:
+                    self._Token = GuidStructureStringToGuidString(GlobalData.gGuidDict[self._Token]).upper()
                 GuidValue = self._Token
 
             AttribDict = self._GetGuidAttrib()
@@ -4049,6 +4059,8 @@ class FdfParser:
         elif self._IsKeyword("GUIDED"):
             GuidValue = None
             if self._GetNextGuid():
+                if self._Token in GlobalData.gGuidDict:
+                    self._Token = GuidStructureStringToGuidString(GlobalData.gGuidDict[self._Token]).upper()
                 GuidValue = self._Token
 
             if self._IsKeyword("$(NAMED_GUID)"):
