@@ -9,7 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "InternalCryptLib.h"
 #include <openssl/sha.h>
 
-#ifndef DISABLE_SHA1_DEPRECATED_INTERFACES
+
 /**
   Retrieves the size, in bytes, of the context buffer required for SHA-1 hash operations.
 
@@ -222,4 +222,3 @@ Sha1HashAll (
     return TRUE;
   }
 }
-#endif

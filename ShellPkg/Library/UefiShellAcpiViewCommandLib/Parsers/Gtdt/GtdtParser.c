@@ -12,7 +12,6 @@
 #include <Library/UefiLib.h>
 #include "AcpiParser.h"
 #include "AcpiTableParser.h"
-#include "AcpiViewConfig.h"
 
 // "The number of GT Block Timers must be less than or equal to 8"
 #define GT_BLOCK_TIMER_COUNT_MAX 8

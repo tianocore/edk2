@@ -21,7 +21,6 @@
 #include <Library/SerialPortLib.h>
 #include <Library/FspSwitchStackLib.h>
 #include <Library/FspCommonLib.h>
-#include <Library/UefiCpuLib.h>
 #include <FspEas.h>
 
 typedef VOID (*PEI_CORE_ENTRY) ( \
@@ -81,6 +80,20 @@ SecTemporaryRamSupport (
   IN UINTN                    CopySize
   );
 
+/**
+  Initializes floating point units for requirement of UEFI specification.
+
+  This function initializes floating-point control word to 0x027F (all exceptions
+  masked,double-precision, round-to-nearest) and multimedia-extensions control word
+  (if supported) to 0x1F80 (all exceptions masked, round-to-nearest, flush to zero
+  for masked underflow).
+
+**/
+VOID
+EFIAPI
+InitializeFloatingPointUnits (
+  VOID
+  );
 
 /**
 

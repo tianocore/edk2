@@ -10,7 +10,6 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include "AcpiParser.h"
 #include "AcpiView.h"
-#include "AcpiViewConfig.h"
 
 STATIC UINT32   gIndent;
 STATIC UINT32   mTableErrorCount;
