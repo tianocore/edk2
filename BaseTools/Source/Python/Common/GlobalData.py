@@ -29,6 +29,7 @@ gProcessingFile = ''
 gBuildingModule = ''
 gSkuids = []
 gDefaultStores = []
+gGuidDict = {}
 
 # definition for a MACRO name.  used to create regular expressions below.
 _MacroNamePattern = "[A-Z][A-Z0-9_]*"
