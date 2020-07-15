@@ -1,14 +1,8 @@
 /** @file
   Debug Port Library implementation based on usb3 debug port.
 
-  Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 #include "DebugCommunicationLibUsb3Internal.h"
@@ -41,7 +35,7 @@ XhcSyncTrsRing (
   TrsTrb = (TRB_TEMPLATE *)(UINTN) TrsRing->RingEnqueue;
 
   ASSERT (TrsTrb != NULL);
-  
+
   for (Index = 0; Index < TrsRing->TrbNumber; Index++) {
     if (TrsTrb->CycleBit != (TrsRing->RingPCS & BIT0)) {
       break;
@@ -145,11 +139,9 @@ XhcCheckNewEvent (
   )
 {
   EFI_STATUS          Status;
-  TRB_TEMPLATE        *EvtTrb;
 
   ASSERT (EvtRing != NULL);
 
-  EvtTrb     = (TRB_TEMPLATE *)(UINTN) EvtRing->EventRingDequeue;
   *NewEvtTrb = (TRB_TEMPLATE *)(UINTN) EvtRing->EventRingDequeue;
 
   if (EvtRing->EventRingDequeue == EvtRing->EventRingEnqueue) {
@@ -160,7 +152,7 @@ XhcCheckNewEvent (
 
   EvtRing->EventRingDequeue += sizeof (TRB_TEMPLATE);
   //
-  // If the dequeue pointer is beyond the ring, then roll-back it to the begining of the ring.
+  // If the dequeue pointer is beyond the ring, then roll-back it to the beginning of the ring.
   //
   if ((UINTN)EvtRing->EventRingDequeue >= ((UINTN) EvtRing->EventRingSeg0 + sizeof (TRB_TEMPLATE) * EvtRing->TrbNumber)) {
     EvtRing->EventRingDequeue = EvtRing->EventRingSeg0;
@@ -187,9 +179,9 @@ IsTrbInTrsRing (
 {
   TRB_TEMPLATE  *CheckedTrb;
   UINTN         Index;
-  
+
   CheckedTrb = (TRB_TEMPLATE *)(UINTN) Ring->RingSeg0;
-  
+
   ASSERT (Ring->TrbNumber == TR_RING_TRB_NUMBER);
 
   for (Index = 0; Index < Ring->TrbNumber; Index++) {
@@ -224,7 +216,7 @@ XhcCheckUrbResult (
   UINT64                  XhcDequeue;
   UINT32                  High;
   UINT32                  Low;
-  
+
   ASSERT ((Handle != NULL) && (Urb != NULL));
 
   if (Urb->Finished) {
@@ -232,12 +224,12 @@ XhcCheckUrbResult (
   }
 
   EvtTrb = NULL;
-  
+
   //
   // Traverse the event ring to find out all new events from the previous check.
   //
   XhcSyncEventRing (Handle, &Handle->EventRing);
-  
+
   for (Index = 0; Index < Handle->EventRing.TrbNumber; Index++) {
 
     Status = XhcCheckNewEvent (Handle, &Handle->EventRing, ((TRB_TEMPLATE **)&EvtTrb));
@@ -247,13 +239,13 @@ XhcCheckUrbResult (
       //
       goto EXIT;
     }
-    
+
     if ((EvtTrb->Type != TRB_TYPE_COMMAND_COMPLT_EVENT) && (EvtTrb->Type != TRB_TYPE_TRANS_EVENT)) {
       continue;
     }
-    
+
     TRBPtr = (TRB_TEMPLATE *)(UINTN)(EvtTrb->TRBPtrLo | LShiftU64 ((UINT64) EvtTrb->TRBPtrHi, 32));
-    
+
     if (IsTrbInTrsRing ((TRANSFER_RING *)(UINTN)(Urb->Ring), TRBPtr)) {
       CheckedUrb = Urb;
     } else if (IsTrbInTrsRing ((TRANSFER_RING *)(UINTN)(Handle->UrbIn.Ring), TRBPtr)) {
@@ -271,7 +263,7 @@ XhcCheckUrbResult (
     } else {
       continue;
     }
-    
+
     if ((EvtTrb->Completecode == TRB_COMPLETION_SHORT_PACKET) ||
         (EvtTrb->Completecode == TRB_COMPLETION_SUCCESS)) {
       //
@@ -328,9 +320,9 @@ XhcRingDoorBell (
 
   //
   // 7.6.8.2 DCDB Register
-  //  
+  //
   Dcdb = (Urb->Direction == EfiUsbDataIn) ? 0x100 : 0x0;
-  
+
   XhcWriteDebugReg (
     Handle,
     XHC_DC_DCDB,
@@ -380,7 +372,7 @@ XhcExecTransfer (
     // If time out occurs.
     //
     Urb->Result |= EFI_USB_ERR_TIMEOUT;
-  } 
+  }
   //
   // If URB transfer is error, restore transfer ring to original value before URB transfer
   // This will make the current transfer TRB is always at the latest unused one in transfer ring.
@@ -427,7 +419,7 @@ XhcCreateTransferTrb (
   } else {
     EPRing = &Handle->TransferRingOut;
   }
-  
+
   Urb->Ring = (EFI_PHYSICAL_ADDRESS)(UINTN) EPRing;
   XhcSyncTrsRing (Handle, EPRing);
 
@@ -441,12 +433,12 @@ XhcCreateTransferTrb (
   Trb->TrbNormal.ISP       = 1;
   Trb->TrbNormal.IOC       = 1;
   Trb->TrbNormal.Type      = TRB_TYPE_NORMAL;
-  
+
   //
   // Update the cycle bit to indicate this TRB has been consumed.
   //
   Trb->TrbNormal.CycleBit = EPRing->RingPCS & BIT0;
-  
+
   return EFI_SUCCESS;
 }
 
@@ -472,7 +464,7 @@ XhcCreateUrb (
   EFI_STATUS                    Status;
   URB                           *Urb;
   EFI_PHYSICAL_ADDRESS          UrbData;
-  
+
   if (Direction == EfiUsbDataIn) {
     Urb = &Handle->UrbIn;
   } else {
@@ -480,17 +472,17 @@ XhcCreateUrb (
   }
 
   UrbData  = Urb->Data;
-  
+
   ZeroMem (Urb, sizeof (URB));
   Urb->Direction = Direction;
-  
+
   //
   // Allocate memory to move data from CAR or SMRAM to normal memory
   // to make XHCI DMA successfully
   // re-use the pre-allocate buffer in PEI to avoid DXE memory service or gBS are not ready
   //
   Urb->Data  = UrbData;
-  
+
   if (Direction == EfiUsbDataIn) {
     //
     // Do not break URB data in buffer as it may contain the data which were just put in via DMA by XHC
@@ -504,7 +496,7 @@ XhcCreateUrb (
     CopyMem ((VOID*)(UINTN) Urb->Data, Data, DataLen);
     Urb->DataLen  = (UINT32) DataLen;
   }
-  
+
   Status = XhcCreateTransferTrb (Handle, Urb);
   ASSERT_EFI_ERROR (Status);
 
@@ -518,7 +510,7 @@ XhcCreateUrb (
   @param  Direction             The direction of data transfer.
   @param  Data                  Array of pointers to the buffers of data to transmit
                                 from or receive into.
-  @param  DataLength            The lenght of the data buffer.
+  @param  DataLength            The length of the data buffer.
   @param  Timeout               Indicates the maximum time, in microsecond, which
                                 the transfer is allowed to complete.
 
@@ -541,7 +533,7 @@ XhcDataTransfer (
 {
   URB                     *Urb;
   EFI_STATUS              Status;
-  
+
   //
   // Validate the parameters
   //
@@ -558,13 +550,20 @@ XhcDataTransfer (
 
   XhcExecTransfer (Handle, Urb, Timeout);
 
+  //
+  // Make sure the data received from HW can fit in the received buffer.
+  //
+  if (Urb->Completed > *DataLength) {
+    return EFI_DEVICE_ERROR;
+  }
+
   *DataLength     = Urb->Completed;
 
   Status = EFI_TIMEOUT;
   if (Urb->Result == EFI_USB_NOERROR) {
     Status = EFI_SUCCESS;
   }
-  
+
   if (Direction == EfiUsbDataIn) {
     //
     // Move data from internal buffer to outside buffer (outside buffer may be in SMRAM...)

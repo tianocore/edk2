@@ -2,14 +2,8 @@
   NvmExpressDxe driver is used to manage non-volatile memory subsystem which follows
   NVM Express specification.
 
-  Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2013 - 2017, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -250,7 +244,7 @@ EnumerateNvmeDevNamespace (
                       );
       if(EFI_ERROR(Status)) {
         gBS->UninstallMultipleProtocolInterfaces (
-               &Device->DeviceHandle,
+               Device->DeviceHandle,
                &gEfiDevicePathProtocolGuid,
                Device->DevicePath,
                &gEfiBlockIoProtocolGuid,
@@ -548,6 +542,7 @@ ProcessAsyncTaskList (
   QueueId    = 2;
   Cq         = Private->CqBuffer[QueueId] + Private->CqHdbl[QueueId].Cqh;
   HasNewItem = FALSE;
+  PciIo      = Private->PciIo;
 
   //
   // Submit asynchronous subtasks to the NVMe Submission Queue
@@ -644,6 +639,26 @@ ProcessAsyncTaskList (
           sizeof(EFI_NVM_EXPRESS_COMPLETION)
           );
 
+        //
+        // Free the resources allocated before cmd submission
+        //
+        if (AsyncRequest->MapData != NULL) {
+          PciIo->Unmap (PciIo, AsyncRequest->MapData);
+        }
+        if (AsyncRequest->MapMeta != NULL) {
+          PciIo->Unmap (PciIo, AsyncRequest->MapMeta);
+        }
+        if (AsyncRequest->MapPrpList != NULL) {
+          PciIo->Unmap (PciIo, AsyncRequest->MapPrpList);
+        }
+        if (AsyncRequest->PrpListHost != NULL) {
+          PciIo->FreeBuffer (
+                   PciIo,
+                   AsyncRequest->PrpListNo,
+                   AsyncRequest->PrpListHost
+                   );
+        }
+
         RemoveEntryList (Link);
         gBS->SignalEvent (AsyncRequest->CallerEvent);
         FreePool (AsyncRequest);
@@ -657,7 +672,7 @@ ProcessAsyncTaskList (
     }
 
     Private->CqHdbl[QueueId].Cqh++;
-    if (Private->CqHdbl[QueueId].Cqh > NVME_ASYNC_CCQ_SIZE) {
+    if (Private->CqHdbl[QueueId].Cqh > MIN (NVME_ASYNC_CCQ_SIZE, Private->Cap.Mqes)) {
       Private->CqHdbl[QueueId].Cqh = 0;
       Private->Pt[QueueId] ^= 1;
     }
@@ -666,7 +681,6 @@ ProcessAsyncTaskList (
   }
 
   if (HasNewItem) {
-    PciIo = Private->PciIo;
     Data  = ReadUnaligned32 ((UINT32*)&Private->CqHdbl[QueueId]);
     PciIo->Mem.Write (
                  PciIo,
@@ -1026,6 +1040,8 @@ NvmExpressDriverBindingStart (
     if (EFI_ERROR (Status)) {
       goto Exit;
     }
+
+    NvmeRegisterShutdownNotification ();
   } else {
     Status = gBS->OpenProtocol (
                     Controller,
@@ -1219,6 +1235,9 @@ NvmExpressDriverBindingStop (
           This->DriverBindingHandle,
           Controller
           );
+
+    NvmeUnregisterShutdownNotification ();
+
     return EFI_SUCCESS;
   }
 

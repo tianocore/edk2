@@ -1,13 +1,7 @@
 #
 #  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
 #
-#  This program and the accompanying materials
-#  are licensed and made available under the terms and conditions of the BSD License
-#  which accompanies this distribution.  The full text of the license may be found at
-#  http://opensource.org/licenses/bsd-license.php
-#
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
 from arm_ds.debugger_v1 import DebugException
@@ -87,7 +81,7 @@ class EfiSectionTE:
             filename = self.base_te + debug_rva + 0xc
         else:
             filename = self.base_te + debug_rva + 0x10
-        filename = struct.unpack("200s", self.ec.getMemoryService().read(filename, 200, 32))[0]
+        filename = struct.unpack("400s", self.ec.getMemoryService().read(filename, 400, 32))[0]
         return filename[0:string.find(filename,'\0')]
 
     def get_debug_elfbase(self):
@@ -125,7 +119,7 @@ class EfiSectionPE32:
             filename = self.base_pe32 + debug_rva + 0xc
         else:
             filename = self.base_pe32 + debug_rva + 0x10
-        filename = struct.unpack("200s", self.ec.getMemoryService().read(str(filename), 200, 32))[0]
+        filename = struct.unpack("400s", self.ec.getMemoryService().read(str(filename), 400, 32))[0]
         return filename[0:string.find(filename,'\0')]
 
     def get_debug_elfbase(self):
@@ -160,7 +154,7 @@ class EfiSectionPE64:
             filename = self.base_pe64 + debug_rva + 0xc
         else:
             filename = self.base_pe64 + debug_rva + 0x10
-        filename = struct.unpack("200s", self.ec.getMemoryService().read(str(filename), 200, 32))[0]
+        filename = struct.unpack("400s", self.ec.getMemoryService().read(str(filename), 400, 32))[0]
         return filename[0:string.find(filename,'\0')]
 
     def get_debug_elfbase(self):

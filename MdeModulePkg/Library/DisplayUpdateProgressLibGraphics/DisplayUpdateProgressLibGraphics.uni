@@ -1,0 +1,13 @@
+// /** @file
+//  Provides services to display completion progress of a firmware update on a
+//  graphical console that supports the Graphics Output Protocol.
+//
+// Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+#string STR_MODULE_ABSTRACT     #language en-US  "Provides services to display completion progress of a firmware update on a graphical console that supports the Graphics Output Protocol."
+
+#string STR_MODULE_DESCRIPTION  #language en-US  "Provides services to display completion progress of a firmware update on a graphical console that supports the Graphics Output Protocol."

@@ -3,13 +3,7 @@
 
   Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -62,11 +56,20 @@ VOID
   VOID                      *Context
   );
 
+typedef struct _IP6_OPTION_HEADER {
+  UINT8                     Type;
+  UINT8                     Length;
+} IP6_OPTION_HEADER;
+
+STATIC_ASSERT (sizeof (IP6_OPTION_HEADER) == 2, "IP6_OPTION_HEADER is expected to be exactly 2 bytes long.");
+
 typedef struct _IP6_ETHE_ADDR_OPTION {
   UINT8                     Type;
   UINT8                     Length;
   UINT8                     EtherAddr[6];
 } IP6_ETHER_ADDR_OPTION;
+
+STATIC_ASSERT (sizeof (IP6_ETHER_ADDR_OPTION) == 8, "IP6_ETHER_ADDR_OPTION is expected to be exactly 8 bytes long.");
 
 typedef struct _IP6_MTU_OPTION {
   UINT8                     Type;
@@ -74,6 +77,8 @@ typedef struct _IP6_MTU_OPTION {
   UINT16                    Reserved;
   UINT32                    Mtu;
 } IP6_MTU_OPTION;
+
+STATIC_ASSERT (sizeof (IP6_MTU_OPTION) == 8, "IP6_MTU_OPTION is expected to be exactly 8 bytes long.");
 
 typedef struct _IP6_PREFIX_INFO_OPTION {
   UINT8                     Type;
@@ -85,6 +90,8 @@ typedef struct _IP6_PREFIX_INFO_OPTION {
   UINT32                    Reserved2;
   EFI_IPv6_ADDRESS          Prefix;
 } IP6_PREFIX_INFO_OPTION;
+
+STATIC_ASSERT (sizeof (IP6_PREFIX_INFO_OPTION) == 32, "IP6_PREFIX_INFO_OPTION is expected to be exactly 32 bytes long.");
 
 typedef
 VOID
@@ -593,7 +600,7 @@ Ip6ProcessRouterAdvertise (
                                  the IP head removed.
 
   @retval EFI_INVALID_PARAMETER  The parameter is invalid.
-  @retval EFI_OUT_OF_RESOURCES   Insuffcient resources to complete the
+  @retval EFI_OUT_OF_RESOURCES   Insufficient resources to complete the
                                  operation.
   @retval EFI_SUCCESS            Successfully updated the route caches.
 
@@ -711,7 +718,7 @@ Ip6NdFasterTimerTicking (
 
 /**
   The heartbeat timer of ND module in 1 second. This time routine handles following
-  things: 1) maitain default router list; 2) maintain prefix options;
+  things: 1) maintain default router list; 2) maintain prefix options;
   3) maintain route caches.
 
   @param[in]  IpSb              The IP6 service binding instance.

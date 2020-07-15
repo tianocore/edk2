@@ -1,14 +1,8 @@
 /** @file
   Definitions to install Multiple Processor PPI.
 
-  Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2015 - 2019, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -21,6 +15,7 @@
 #include <Ppi/SecPlatformInformation.h>
 #include <Ppi/SecPlatformInformation2.h>
 #include <Ppi/EndOfPeiPhase.h>
+#include <Ppi/MpServices2.h>
 
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
@@ -271,7 +266,7 @@ PeiStartupThisAP (
   @retval EFI_UNSUPPORTED         Switching the BSP cannot be completed prior to this
                                   service returning.
   @retval EFI_UNSUPPORTED         Switching the BSP is not supported.
-  @retval EFI_SUCCESS             The calling processor is an AP.
+  @retval EFI_DEVICE_ERROR        The calling processor is an AP.
   @retval EFI_NOT_FOUND           The processor with the handle specified by
                                   ProcessorNumber does not exist.
   @retval EFI_INVALID_PARAMETER   ProcessorNumber specifies the current BSP or a disabled
@@ -401,5 +396,42 @@ SecPlatformInformation2 (
   IN OUT UINT64                               *StructureSize,
      OUT EFI_SEC_PLATFORM_INFORMATION_RECORD2 *PlatformInformationRecord2
   );
+
+/**
+  Initializes MP and exceptions handlers.
+
+  @param  PeiServices                The pointer to the PEI Services Table.
+
+  @retval EFI_SUCCESS     MP was successfully initialized.
+  @retval others          Error occurred in MP initialization.
+
+**/
+EFI_STATUS
+InitializeCpuMpWorker (
+  IN CONST EFI_PEI_SERVICES     **PeiServices
+  );
+
+/**
+  Enabl/setup stack guard for each processor if PcdCpuStackGuard is set to TRUE.
+
+  Doing this in the memory-discovered callback is to make sure the Stack Guard
+  feature to cover as most PEI code as possible.
+
+  @param[in] PeiServices          General purpose services available to every PEIM.
+  @param[in] NotifyDescriptor     The notification structure this PEIM registered on install.
+  @param[in] Ppi                  The memory discovered PPI.  Not used.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval others                  There's error in MP initialization.
+**/
+EFI_STATUS
+EFIAPI
+MemoryDiscoveredPpiNotifyCallback (
+  IN EFI_PEI_SERVICES           **PeiServices,
+  IN EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDescriptor,
+  IN VOID                       *Ppi
+  );
+
+extern EFI_PEI_NOTIFY_DESCRIPTOR  mPostMemNotifyList[];
 
 #endif

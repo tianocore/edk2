@@ -1,14 +1,8 @@
 /** @file
   Implement TPM2 help.
 
-Copyright (c) 2013 - 2017, Intel Corporation. All rights reserved. <BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved. <BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -97,7 +91,7 @@ CopyAuthSessionCommand (
   UINT8  *Buffer;
 
   Buffer = (UINT8 *)AuthSessionOut;
-  
+
   //
   // Add in Auth session
   //
@@ -150,7 +144,8 @@ CopyAuthSessionCommand (
   @param [in]  AuthSessionIn   Input AuthSession data in TPM2 response buffer
   @param [out] AuthSessionOut  Output AuthSession data
 
-  @return AuthSession size
+  @return 0    copy failed
+          else AuthSession size
 **/
 UINT32
 EFIAPI
@@ -171,6 +166,10 @@ CopyAuthSessionResponse (
   // nonce
   AuthSessionOut->nonce.size = SwapBytes16 (ReadUnaligned16 ((UINT16 *)Buffer));
   Buffer += sizeof(UINT16);
+  if (AuthSessionOut->nonce.size > sizeof(TPMU_HA)) {
+    DEBUG ((DEBUG_ERROR, "CopyAuthSessionResponse - nonce.size error %x\n", AuthSessionOut->nonce.size));
+    return 0;
+  }
 
   CopyMem (AuthSessionOut->nonce.buffer, Buffer, AuthSessionOut->nonce.size);
   Buffer += AuthSessionOut->nonce.size;
@@ -182,6 +181,10 @@ CopyAuthSessionResponse (
   // hmac
   AuthSessionOut->hmac.size = SwapBytes16 (ReadUnaligned16 ((UINT16 *)Buffer));
   Buffer += sizeof(UINT16);
+  if (AuthSessionOut->hmac.size > sizeof(TPMU_HA)) {
+    DEBUG ((DEBUG_ERROR, "CopyAuthSessionResponse - hmac.size error %x\n", AuthSessionOut->hmac.size));
+    return 0;
+  }
 
   CopyMem (AuthSessionOut->hmac.buffer, Buffer, AuthSessionOut->hmac.size);
   Buffer += AuthSessionOut->hmac.size;

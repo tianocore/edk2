@@ -4,13 +4,7 @@
   Copyright (c) 2008 - 2015, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -57,7 +51,7 @@ TemporaryRamMigration (
 
 //
 //
-//  
+//
 EFI_PEI_TEMPORARY_RAM_SUPPORT_PPI mTemporaryRamSupportPpi = {
   TemporaryRamMigration
 };
@@ -80,7 +74,7 @@ IA32_IDT_GATE_DESCRIPTOR  mIdtEntryTemplate = {
     0x0,                                 // Reserved_0
     IA32_IDT_GATE_TYPE_INTERRUPT_32,     // GateType
     0xffff                               // OffsetHigh
-  }    
+  }
 };
 
 /**
@@ -262,7 +256,7 @@ FindFfsFileAndSection (
   EFI_PHYSICAL_ADDRESS        EndOfFile;
 
   if (Fv->Signature != EFI_FVH_SIGNATURE) {
-    DEBUG ((EFI_D_ERROR, "FV at %p does not have FV header signature\n", Fv));
+    DEBUG ((DEBUG_ERROR, "FV at %p does not have FV header signature\n", Fv));
     return EFI_VOLUME_CORRUPTED;
   }
 
@@ -280,7 +274,7 @@ FindFfsFileAndSection (
     }
 
     File = (EFI_FFS_FILE_HEADER*)(UINTN) CurrentAddress;
-    Size = *(UINT32*) File->Size & 0xffffff;
+    Size = FFS_FILE_SIZE (File);
     if (Size < (sizeof (*File) + sizeof (EFI_COMMON_SECTION_HEADER))) {
       return EFI_VOLUME_CORRUPTED;
     }
@@ -348,7 +342,7 @@ DecompressMemFvs (
              (EFI_COMMON_SECTION_HEADER**) &Section
              );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Unable to find GUID defined section\n"));
+    DEBUG ((DEBUG_ERROR, "Unable to find GUID defined section\n"));
     return Status;
   }
 
@@ -359,14 +353,14 @@ DecompressMemFvs (
              &SectionAttribute
              );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Unable to GetInfo for GUIDed section\n"));
+    DEBUG ((DEBUG_ERROR, "Unable to GetInfo for GUIDed section\n"));
     return Status;
   }
 
   OutputBuffer = (VOID*) ((UINT8*)(UINTN) PcdGet32 (PcdOvmfDxeMemFvBase) + SIZE_1MB);
   ScratchBuffer = ALIGN_POINTER ((UINT8*) OutputBuffer + OutputBufferSize, SIZE_1MB);
 
-  DEBUG ((EFI_D_VERBOSE, "%a: OutputBuffer@%p+0x%x ScratchBuffer@%p+0x%x "
+  DEBUG ((DEBUG_VERBOSE, "%a: OutputBuffer@%p+0x%x ScratchBuffer@%p+0x%x "
     "PcdOvmfDecompressionScratchEnd=0x%x\n", __FUNCTION__, OutputBuffer,
     OutputBufferSize, ScratchBuffer, ScratchBufferSize,
     PcdGet32 (PcdOvmfDecompressionScratchEnd)));
@@ -380,7 +374,7 @@ DecompressMemFvs (
              &AuthenticationStatus
              );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Error during GUID section decode\n"));
+    DEBUG ((DEBUG_ERROR, "Error during GUID section decode\n"));
     return Status;
   }
 
@@ -392,7 +386,7 @@ DecompressMemFvs (
              &FvSection
              );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Unable to find PEI FV section\n"));
+    DEBUG ((DEBUG_ERROR, "Unable to find PEI FV section\n"));
     return Status;
   }
 
@@ -404,7 +398,7 @@ DecompressMemFvs (
   CopyMem (PeiMemFv, (VOID*) (FvSection + 1), PcdGet32 (PcdOvmfPeiMemFvSize));
 
   if (PeiMemFv->Signature != EFI_FVH_SIGNATURE) {
-    DEBUG ((EFI_D_ERROR, "Extracted FV at %p does not have FV header signature\n", PeiMemFv));
+    DEBUG ((DEBUG_ERROR, "Extracted FV at %p does not have FV header signature\n", PeiMemFv));
     CpuDeadLoop ();
     return EFI_VOLUME_CORRUPTED;
   }
@@ -417,7 +411,7 @@ DecompressMemFvs (
              &FvSection
              );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Unable to find DXE FV section\n"));
+    DEBUG ((DEBUG_ERROR, "Unable to find DXE FV section\n"));
     return Status;
   }
 
@@ -437,7 +431,7 @@ DecompressMemFvs (
   CopyMem (DxeMemFv, (VOID*) ((UINTN)FvSection + FvHeaderSize), PcdGet32 (PcdOvmfDxeMemFvSize));
 
   if (DxeMemFv->Signature != EFI_FVH_SIGNATURE) {
-    DEBUG ((EFI_D_ERROR, "Extracted FV at %p does not have FV header signature\n", DxeMemFv));
+    DEBUG ((DEBUG_ERROR, "Extracted FV at %p does not have FV header signature\n", DxeMemFv));
     CpuDeadLoop ();
     return EFI_VOLUME_CORRUPTED;
   }
@@ -480,7 +474,7 @@ FindPeiCoreImageBaseInFv (
                &Section
                );
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "Unable to find PEI Core image\n"));
+      DEBUG ((DEBUG_ERROR, "Unable to find PEI Core image\n"));
       return Status;
     }
   }
@@ -560,14 +554,14 @@ FindPeiCoreImageBase (
     // A malicious runtime OS may have injected something into our previously
     // decoded PEI FV, but we don't care about that unless SMM/SMRAM is required.
     //
-    DEBUG ((EFI_D_VERBOSE, "SEC: S3 resume\n"));
+    DEBUG ((DEBUG_VERBOSE, "SEC: S3 resume\n"));
     GetS3ResumePeiFv (BootFv);
   } else {
     //
     // We're either not resuming, or resuming "securely" -- we'll decompress
     // both PEI FV and DXE FV from pristine flash.
     //
-    DEBUG ((EFI_D_VERBOSE, "SEC: %a\n",
+    DEBUG ((DEBUG_VERBOSE, "SEC: %a\n",
       S3Resume ? "S3 resume (with PEI decompression)" : "Normal boot"));
     FindMainFv (BootFv);
 
@@ -611,7 +605,7 @@ FindImageBase (
     }
 
     File = (EFI_FFS_FILE_HEADER*)(UINTN) CurrentAddress;
-    Size = *(UINT32*) File->Size & 0xffffff;
+    Size = FFS_FILE_SIZE (File);
     if (Size < sizeof (*File)) {
       return EFI_NOT_FOUND;
     }
@@ -636,7 +630,7 @@ FindImageBase (
       CurrentAddress = (EndOfSection + 3) & 0xfffffffffffffffcULL;
       Section = (EFI_COMMON_SECTION_HEADER*)(UINTN) CurrentAddress;
 
-      Size = *(UINT32*) Section->Size & 0xffffff;
+      Size = SECTION_SIZE (Section);
       if (Size < sizeof (*Section)) {
         return EFI_NOT_FOUND;
       }
@@ -691,7 +685,7 @@ FindAndReportEntryPoints (
   ASSERT_EFI_ERROR (Status);
 
   FindPeiCoreImageBase (BootFirmwareVolumePtr, &PeiCoreImageBase);
-  
+
   ZeroMem ((VOID *) &ImageContext, sizeof (PE_COFF_LOADER_IMAGE_CONTEXT));
   //
   // Report SEC Core debug information when remote debug is enabled
@@ -745,7 +739,7 @@ SecCoreStartupWithStack (
 
   ProcessLibraryConstructorList (NULL, NULL);
 
-  DEBUG ((EFI_D_INFO,
+  DEBUG ((DEBUG_INFO,
     "SecCoreStartupWithStack(0x%x, 0x%x)\n",
     (UINT32)(UINTN)BootFv,
     (UINT32)(UINTN)TopOfCurrentStack
@@ -759,7 +753,7 @@ SecCoreStartupWithStack (
 
   //
   // Initialize IDT
-  //  
+  //
   IdtTableInStack.PeiService = NULL;
   for (Index = 0; Index < SEC_IDT_ENTRY_COUNT; Index ++) {
     CopyMem (&IdtTableInStack.IdtTable[Index], &mIdtEntryTemplate, sizeof (mIdtEntryTemplate));
@@ -820,13 +814,13 @@ SecCoreStartupWithStack (
   //
   InitializeApicTimer (0, MAX_UINT32, TRUE, 5);
   DisableApicTimerInterrupt ();
-  
+
   //
   // Initialize Debug Agent to support source level debug in SEC/PEI phases before memory ready.
   //
   InitializeDebugAgent (DEBUG_AGENT_INIT_PREMEM_SEC, &SecCoreData, SecStartupPhase2);
 }
-  
+
 /**
   Caller provided function to be invoked at the end of InitializeDebugAgent().
 
@@ -846,9 +840,9 @@ SecStartupPhase2(
   EFI_SEC_PEI_HAND_OFF        *SecCoreData;
   EFI_FIRMWARE_VOLUME_HEADER  *BootFv;
   EFI_PEI_CORE_ENTRY_POINT    PeiCoreEntryPoint;
-  
+
   SecCoreData = (EFI_SEC_PEI_HAND_OFF *) Context;
-  
+
   //
   // Find PEI Core entry point. It will report SEC and Pei Core debug information if remote debug
   // is enabled.
@@ -862,7 +856,7 @@ SecStartupPhase2(
   // Transfer the control to the PEI core
   //
   (*PeiCoreEntryPoint) (SecCoreData, (EFI_PEI_PPI_DESCRIPTOR *)&mPrivateDispatchTable);
-  
+
   //
   // If we get here then the PEI Core returned, which is not recoverable.
   //
@@ -887,23 +881,23 @@ TemporaryRamMigration (
   DEBUG_AGENT_CONTEXT_POSTMEM_SEC  DebugAgentContext;
   BOOLEAN                          OldStatus;
   BASE_LIBRARY_JUMP_BUFFER         JumpBuffer;
-  
-  DEBUG ((EFI_D_INFO,
+
+  DEBUG ((DEBUG_INFO,
     "TemporaryRamMigration(0x%Lx, 0x%Lx, 0x%Lx)\n",
     TemporaryMemoryBase,
     PermanentMemoryBase,
     (UINT64)CopySize
     ));
-  
+
   OldHeap = (VOID*)(UINTN)TemporaryMemoryBase;
   NewHeap = (VOID*)((UINTN)PermanentMemoryBase + (CopySize >> 1));
-  
+
   OldStack = (VOID*)((UINTN)TemporaryMemoryBase + (CopySize >> 1));
   NewStack = (VOID*)(UINTN)PermanentMemoryBase;
 
   DebugAgentContext.HeapMigrateOffset = (UINTN)NewHeap - (UINTN)OldHeap;
   DebugAgentContext.StackMigrateOffset = (UINTN)NewStack - (UINTN)OldStack;
-  
+
   OldStatus = SaveAndSetDebugTimerInterrupt (FALSE);
   InitializeDebugAgent (DEBUG_AGENT_INIT_POSTMEM_SEC, (VOID *) &DebugAgentContext, NULL);
 
@@ -916,7 +910,7 @@ TemporaryRamMigration (
   // Migrate Stack
   //
   CopyMem (NewStack, OldStack, CopySize >> 1);
-  
+
   //
   // Rebase IDT table in permanent memory
   //
@@ -927,14 +921,16 @@ TemporaryRamMigration (
 
   //
   // Use SetJump()/LongJump() to switch to a new stack.
-  // 
+  //
   if (SetJump (&JumpBuffer) == 0) {
 #if defined (MDE_CPU_IA32)
     JumpBuffer.Esp = JumpBuffer.Esp + DebugAgentContext.StackMigrateOffset;
-#endif    
+    JumpBuffer.Ebp = JumpBuffer.Ebp + DebugAgentContext.StackMigrateOffset;
+#endif
 #if defined (MDE_CPU_X64)
     JumpBuffer.Rsp = JumpBuffer.Rsp + DebugAgentContext.StackMigrateOffset;
-#endif    
+    JumpBuffer.Rbp = JumpBuffer.Rbp + DebugAgentContext.StackMigrateOffset;
+#endif
     LongJump (&JumpBuffer, (UINTN)-1);
   }
 

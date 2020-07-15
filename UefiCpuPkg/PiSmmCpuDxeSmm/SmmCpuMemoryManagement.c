@@ -1,20 +1,18 @@
 /** @file
 
-Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2016 - 2019, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include "PiSmmCpuDxeSmm.h"
 
-#define NEXT_MEMORY_DESCRIPTOR(MemoryDescriptor, Size) \
-  ((EFI_MEMORY_DESCRIPTOR *)((UINT8 *)(MemoryDescriptor) + (Size)))
+//
+// attributes for reserved memory before it is promoted to system memory
+//
+#define EFI_MEMORY_PRESENT      0x0100000000000000ULL
+#define EFI_MEMORY_INITIALIZED  0x0200000000000000ULL
+#define EFI_MEMORY_TESTED       0x0400000000000000ULL
 
 #define PREVIOUS_MEMORY_DESCRIPTOR(MemoryDescriptor, Size) \
   ((EFI_MEMORY_DESCRIPTOR *)((UINT8 *)(MemoryDescriptor) - (Size)))
@@ -23,11 +21,33 @@ EFI_MEMORY_DESCRIPTOR *mUefiMemoryMap;
 UINTN                 mUefiMemoryMapSize;
 UINTN                 mUefiDescriptorSize;
 
+EFI_GCD_MEMORY_SPACE_DESCRIPTOR   *mGcdMemSpace       = NULL;
+UINTN                             mGcdMemNumberOfDesc = 0;
+
+EFI_MEMORY_ATTRIBUTES_TABLE  *mUefiMemoryAttributesTable = NULL;
+
 PAGE_ATTRIBUTE_TABLE mPageAttributeTable[] = {
   {Page4K,  SIZE_4KB, PAGING_4K_ADDRESS_MASK_64},
   {Page2M,  SIZE_2MB, PAGING_2M_ADDRESS_MASK_64},
   {Page1G,  SIZE_1GB, PAGING_1G_ADDRESS_MASK_64},
 };
+
+UINTN  mInternalGr3;
+
+/**
+  Set the internal page table base address.
+  If it is non zero, further MemoryAttribute modification will be on this page table.
+  If it is zero, further MemoryAttribute modification will be on real page table.
+
+  @param Cr3 page table base.
+**/
+VOID
+SetPageTableBase (
+  IN UINTN   Cr3
+  )
+{
+  mInternalGr3 = Cr3;
+}
 
 /**
   Return page table base.
@@ -39,6 +59,9 @@ GetPageTableBase (
   VOID
   )
 {
+  if (mInternalGr3 != 0) {
+    return mInternalGr3;
+  }
   return (AsmReadCr3 () & PAGING_4K_ADDRESS_MASK_64);
 }
 
@@ -102,18 +125,36 @@ GetPageTableEntry (
   UINTN                 Index2;
   UINTN                 Index3;
   UINTN                 Index4;
+  UINTN                 Index5;
   UINT64                *L1PageTable;
   UINT64                *L2PageTable;
   UINT64                *L3PageTable;
   UINT64                *L4PageTable;
+  UINT64                *L5PageTable;
+  IA32_CR4              Cr4;
+  BOOLEAN               Enable5LevelPaging;
 
+  Index5 = ((UINTN)RShiftU64 (Address, 48)) & PAGING_PAE_INDEX_MASK;
   Index4 = ((UINTN)RShiftU64 (Address, 39)) & PAGING_PAE_INDEX_MASK;
   Index3 = ((UINTN)Address >> 30) & PAGING_PAE_INDEX_MASK;
   Index2 = ((UINTN)Address >> 21) & PAGING_PAE_INDEX_MASK;
   Index1 = ((UINTN)Address >> 12) & PAGING_PAE_INDEX_MASK;
 
+  Cr4.UintN = AsmReadCr4 ();
+  Enable5LevelPaging = (BOOLEAN) (Cr4.Bits.LA57 == 1);
+
   if (sizeof(UINTN) == sizeof(UINT64)) {
-    L4PageTable = (UINT64 *)GetPageTableBase ();
+    if (Enable5LevelPaging) {
+      L5PageTable = (UINT64 *)GetPageTableBase ();
+      if (L5PageTable[Index5] == 0) {
+        *PageAttribute = PageNone;
+        return NULL;
+      }
+
+      L4PageTable = (UINT64 *)(UINTN)(L5PageTable[Index5] & ~mAddressEncMask & PAGING_4K_ADDRESS_MASK_64);
+    } else {
+      L4PageTable = (UINT64 *)GetPageTableBase ();
+    }
     if (L4PageTable[Index4] == 0) {
       *PageAttribute = PageNone;
       return NULL;
@@ -211,6 +252,17 @@ ConvertPageEntryAttribute (
   if ((Attributes & EFI_MEMORY_RO) != 0) {
     if (IsSet) {
       NewPageEntry &= ~(UINT64)IA32_PG_RW;
+      if (mInternalGr3 != 0) {
+        // Environment setup
+        // ReadOnly page need set Dirty bit for shadow stack
+        NewPageEntry |= IA32_PG_D;
+        // Clear user bit for supervisor shadow stack
+        NewPageEntry &= ~(UINT64)IA32_PG_U;
+      } else {
+        // Runtime update
+        // Clear dirty bit for non shadow stack, to protect RO page.
+        NewPageEntry &= ~(UINT64)IA32_PG_D;
+      }
     } else {
       NewPageEntry |= IA32_PG_RW;
     }
@@ -380,6 +432,7 @@ ConvertMemoryPageAttributes (
   PAGE_ATTRIBUTE                    SplitAttribute;
   RETURN_STATUS                     Status;
   BOOLEAN                           IsEntryModified;
+  EFI_PHYSICAL_ADDRESS              MaximumSupportMemAddress;
 
   ASSERT (Attributes != 0);
   ASSERT ((Attributes & ~(EFI_MEMORY_RP | EFI_MEMORY_RO | EFI_MEMORY_XP)) == 0);
@@ -389,6 +442,17 @@ ConvertMemoryPageAttributes (
 
   if (Length == 0) {
     return RETURN_INVALID_PARAMETER;
+  }
+
+  MaximumSupportMemAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)(LShiftU64 (1, mPhysicalAddressBits) - 1);
+  if (BaseAddress > MaximumSupportMemAddress) {
+    return RETURN_UNSUPPORTED;
+  }
+  if (Length > MaximumSupportMemAddress) {
+    return RETURN_UNSUPPORTED;
+  }
+  if ((Length != 0) && (BaseAddress > MaximumSupportMemAddress - (Length - 1))) {
+    return RETURN_UNSUPPORTED;
   }
 
 //  DEBUG ((DEBUG_ERROR, "ConvertMemoryPageAttributes(%x) - %016lx, %016lx, %02lx\n", IsSet, BaseAddress, Length, Attributes));
@@ -401,7 +465,7 @@ ConvertMemoryPageAttributes (
   }
 
   //
-  // Below logic is to check 2M/4K page to make sure we donot waist memory.
+  // Below logic is to check 2M/4K page to make sure we do not waste memory.
   //
   while (Length != 0) {
     PageEntry = GetPageTableEntry (BaseAddress, &PageAttribute);
@@ -540,12 +604,12 @@ SmmSetMemoryAttributesEx (
                                 BaseAddress and Length cannot be modified.
   @retval EFI_INVALID_PARAMETER Length is zero.
                                 Attributes specified an illegal combination of attributes that
-                                cannot be set together.
+                                cannot be cleared together.
   @retval EFI_OUT_OF_RESOURCES  There are not enough system resources to modify the attributes of
                                 the memory resource range.
   @retval EFI_UNSUPPORTED       The processor does not support one or more bytes of the memory
                                 resource range specified by BaseAddress and Length.
-                                The bit mask of attributes is not support for the memory resource
+                                The bit mask of attributes is not supported for the memory resource
                                 range specified by BaseAddress and Length.
 
 **/
@@ -592,7 +656,7 @@ SmmClearMemoryAttributesEx (
                                 the memory resource range.
   @retval EFI_UNSUPPORTED       The processor does not support one or more bytes of the memory
                                 resource range specified by BaseAddress and Length.
-                                The bit mask of attributes is not support for the memory resource
+                                The bit mask of attributes is not supported for the memory resource
                                 range specified by BaseAddress and Length.
 
 **/
@@ -620,12 +684,12 @@ SmmSetMemoryAttributes (
                                 BaseAddress and Length cannot be modified.
   @retval EFI_INVALID_PARAMETER Length is zero.
                                 Attributes specified an illegal combination of attributes that
-                                cannot be set together.
+                                cannot be cleared together.
   @retval EFI_OUT_OF_RESOURCES  There are not enough system resources to modify the attributes of
                                 the memory resource range.
   @retval EFI_UNSUPPORTED       The processor does not support one or more bytes of the memory
                                 resource range specified by BaseAddress and Length.
-                                The bit mask of attributes is not support for the memory resource
+                                The bit mask of attributes is not supported for the memory resource
                                 range specified by BaseAddress and Length.
 
 **/
@@ -640,7 +704,59 @@ SmmClearMemoryAttributes (
   return SmmClearMemoryAttributesEx (BaseAddress, Length, Attributes, NULL);
 }
 
+/**
+  Set ShadowStack memory.
 
+  @param[in]  Cr3              The page table base address.
+  @param[in]  BaseAddress      The physical address that is the start address of a memory region.
+  @param[in]  Length           The size in bytes of the memory region.
+
+  @retval EFI_SUCCESS           The shadow stack memory is set.
+**/
+EFI_STATUS
+SetShadowStack (
+  IN  UINTN                                      Cr3,
+  IN  EFI_PHYSICAL_ADDRESS                       BaseAddress,
+  IN  UINT64                                     Length
+  )
+{
+  EFI_STATUS  Status;
+
+  SetPageTableBase (Cr3);
+
+  Status = SmmSetMemoryAttributes (BaseAddress, Length, EFI_MEMORY_RO);
+
+  SetPageTableBase (0);
+
+  return Status;
+}
+
+/**
+  Set not present memory.
+
+  @param[in]  Cr3              The page table base address.
+  @param[in]  BaseAddress      The physical address that is the start address of a memory region.
+  @param[in]  Length           The size in bytes of the memory region.
+
+  @retval EFI_SUCCESS           The not present memory is set.
+**/
+EFI_STATUS
+SetNotPresentPage (
+  IN  UINTN                                      Cr3,
+  IN  EFI_PHYSICAL_ADDRESS                       BaseAddress,
+  IN  UINT64                                     Length
+  )
+{
+  EFI_STATUS  Status;
+
+  SetPageTableBase (Cr3);
+
+  Status = SmmSetMemoryAttributes (BaseAddress, Length, EFI_MEMORY_RP);
+
+  SetPageTableBase (0);
+
+  return Status;
+}
 
 /**
   Retrieves a pointer to the system configuration table from the SMM System Table
@@ -752,6 +868,52 @@ PatchSmmSaveStateMap (
   SmmSetMemoryAttributes (
     mCpuHotPlugData.SmBase[mMaxNumberOfCpus - 1] + SMM_HANDLER_OFFSET + TileCodeSize,
     SIZE_32KB - TileCodeSize,
+    EFI_MEMORY_XP
+    );
+}
+
+/**
+  This function sets GDT/IDT buffer to be RO and XP.
+**/
+VOID
+PatchGdtIdtMap (
+  VOID
+  )
+{
+  EFI_PHYSICAL_ADDRESS       BaseAddress;
+  UINTN                      Size;
+
+  //
+  // GDT
+  //
+  DEBUG ((DEBUG_INFO, "PatchGdtIdtMap - GDT:\n"));
+
+  BaseAddress = mGdtBuffer;
+  Size = ALIGN_VALUE(mGdtBufferSize, SIZE_4KB);
+  //
+  // The range should have been set to RO
+  // if it is allocated with EfiRuntimeServicesCode.
+  //
+  SmmSetMemoryAttributes (
+    BaseAddress,
+    Size,
+    EFI_MEMORY_XP
+    );
+
+  //
+  // IDT
+  //
+  DEBUG ((DEBUG_INFO, "PatchGdtIdtMap - IDT:\n"));
+
+  BaseAddress = gcSmiIdtr.Base;
+  Size = ALIGN_VALUE(gcSmiIdtr.Limit + 1, SIZE_4KB);
+  //
+  // The range should have been set to RO
+  // if it is allocated with EfiRuntimeServicesCode.
+  //
+  SmmSetMemoryAttributes (
+    BaseAddress,
+    Size,
     EFI_MEMORY_XP
     );
 }
@@ -903,7 +1065,7 @@ IsUefiPageNotPresent (
 }
 
 /**
-  Merge continous memory map entries whose type is
+  Merge continuous memory map entries whose type is
   EfiLoaderCode/Data, EfiBootServicesCode/Data, EfiConventionalMemory,
   EfiUnusableMemory, EfiACPIReclaimMemory, because the memory described by
   these entries will be set as NOT present in SMM page table.
@@ -965,6 +1127,80 @@ MergeMemoryMapForNotPresentEntry (
 }
 
 /**
+  This function caches the GCD memory map information.
+**/
+VOID
+GetGcdMemoryMap (
+  VOID
+  )
+{
+  UINTN                            NumberOfDescriptors;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR  *MemSpaceMap;
+  EFI_STATUS                       Status;
+  UINTN                            Index;
+
+  Status = gDS->GetMemorySpaceMap (&NumberOfDescriptors, &MemSpaceMap);
+  if (EFI_ERROR (Status)) {
+    return ;
+  }
+
+  mGcdMemNumberOfDesc = 0;
+  for (Index = 0; Index < NumberOfDescriptors; Index++) {
+    if (MemSpaceMap[Index].GcdMemoryType == EfiGcdMemoryTypeReserved &&
+        (MemSpaceMap[Index].Capabilities & (EFI_MEMORY_PRESENT | EFI_MEMORY_INITIALIZED | EFI_MEMORY_TESTED)) ==
+          (EFI_MEMORY_PRESENT | EFI_MEMORY_INITIALIZED)
+          ) {
+      mGcdMemNumberOfDesc++;
+    }
+  }
+
+  mGcdMemSpace = AllocateZeroPool (mGcdMemNumberOfDesc * sizeof (EFI_GCD_MEMORY_SPACE_DESCRIPTOR));
+  ASSERT (mGcdMemSpace != NULL);
+  if (mGcdMemSpace == NULL) {
+    mGcdMemNumberOfDesc = 0;
+    gBS->FreePool (MemSpaceMap);
+    return ;
+  }
+
+  mGcdMemNumberOfDesc = 0;
+  for (Index = 0; Index < NumberOfDescriptors; Index++) {
+    if (MemSpaceMap[Index].GcdMemoryType == EfiGcdMemoryTypeReserved &&
+        (MemSpaceMap[Index].Capabilities & (EFI_MEMORY_PRESENT | EFI_MEMORY_INITIALIZED | EFI_MEMORY_TESTED)) ==
+          (EFI_MEMORY_PRESENT | EFI_MEMORY_INITIALIZED)
+          ) {
+      CopyMem (
+        &mGcdMemSpace[mGcdMemNumberOfDesc],
+        &MemSpaceMap[Index],
+        sizeof(EFI_GCD_MEMORY_SPACE_DESCRIPTOR)
+        );
+      mGcdMemNumberOfDesc++;
+    }
+  }
+
+  gBS->FreePool (MemSpaceMap);
+}
+
+/**
+  Get UEFI MemoryAttributesTable.
+**/
+VOID
+GetUefiMemoryAttributesTable (
+  VOID
+  )
+{
+  EFI_STATUS                   Status;
+  EFI_MEMORY_ATTRIBUTES_TABLE  *MemoryAttributesTable;
+  UINTN                        MemoryAttributesTableSize;
+
+  Status = EfiGetSystemConfigurationTable (&gEfiMemoryAttributesTableGuid, (VOID **)&MemoryAttributesTable);
+  if (!EFI_ERROR (Status) && (MemoryAttributesTable != NULL)) {
+    MemoryAttributesTableSize = sizeof(EFI_MEMORY_ATTRIBUTES_TABLE) + MemoryAttributesTable->DescriptorSize * MemoryAttributesTable->NumberOfEntries;
+    mUefiMemoryAttributesTable = AllocateCopyPool (MemoryAttributesTableSize, MemoryAttributesTable);
+    ASSERT (mUefiMemoryAttributesTable != NULL);
+  }
+}
+
+/**
   This function caches the UEFI memory map information.
 **/
 VOID
@@ -1023,6 +1259,16 @@ GetUefiMemoryMap (
   ASSERT (mUefiMemoryMap != NULL);
 
   gBS->FreePool (MemoryMap);
+
+  //
+  // Get additional information from GCD memory map.
+  //
+  GetGcdMemoryMap ();
+
+  //
+  // Get UEFI memory attributes table.
+  //
+  GetUefiMemoryAttributesTable ();
 }
 
 /**
@@ -1037,33 +1283,89 @@ SetUefiMemMapAttributes (
   VOID
   )
 {
+  EFI_STATUS            Status;
   EFI_MEMORY_DESCRIPTOR *MemoryMap;
   UINTN                 MemoryMapEntryCount;
   UINTN                 Index;
+  EFI_MEMORY_DESCRIPTOR *Entry;
 
   DEBUG ((DEBUG_INFO, "SetUefiMemMapAttributes\n"));
 
-  if (mUefiMemoryMap == NULL) {
-    DEBUG ((DEBUG_INFO, "UefiMemoryMap - NULL\n"));
-    return ;
-  }
-
-  MemoryMapEntryCount = mUefiMemoryMapSize/mUefiDescriptorSize;
-  MemoryMap = mUefiMemoryMap;
-  for (Index = 0; Index < MemoryMapEntryCount; Index++) {
-    if (IsUefiPageNotPresent(MemoryMap)) {
-      DEBUG ((DEBUG_INFO, "UefiMemory protection: 0x%lx - 0x%lx\n", MemoryMap->PhysicalStart, MemoryMap->PhysicalStart + (UINT64)EFI_PAGES_TO_SIZE((UINTN)MemoryMap->NumberOfPages)));
-      SmmSetMemoryAttributes (
-        MemoryMap->PhysicalStart,
-        EFI_PAGES_TO_SIZE((UINTN)MemoryMap->NumberOfPages),
-        EFI_MEMORY_RP
-        );
+  if (mUefiMemoryMap != NULL) {
+    MemoryMapEntryCount = mUefiMemoryMapSize/mUefiDescriptorSize;
+    MemoryMap = mUefiMemoryMap;
+    for (Index = 0; Index < MemoryMapEntryCount; Index++) {
+      if (IsUefiPageNotPresent(MemoryMap)) {
+        Status = SmmSetMemoryAttributes (
+                   MemoryMap->PhysicalStart,
+                   EFI_PAGES_TO_SIZE((UINTN)MemoryMap->NumberOfPages),
+                   EFI_MEMORY_RP
+                   );
+        DEBUG ((
+          DEBUG_INFO,
+          "UefiMemory protection: 0x%lx - 0x%lx %r\n",
+          MemoryMap->PhysicalStart,
+          MemoryMap->PhysicalStart + (UINT64)EFI_PAGES_TO_SIZE((UINTN)MemoryMap->NumberOfPages),
+          Status
+          ));
+      }
+      MemoryMap = NEXT_MEMORY_DESCRIPTOR(MemoryMap, mUefiDescriptorSize);
     }
-    MemoryMap = NEXT_MEMORY_DESCRIPTOR(MemoryMap, mUefiDescriptorSize);
   }
+  //
+  // Do not free mUefiMemoryMap, it will be checked in IsSmmCommBufferForbiddenAddress().
+  //
 
   //
-  // Do free mUefiMemoryMap, it will be checked in IsSmmCommBufferForbiddenAddress().
+  // Set untested memory as not present.
+  //
+  if (mGcdMemSpace != NULL) {
+    for (Index = 0; Index < mGcdMemNumberOfDesc; Index++) {
+      Status = SmmSetMemoryAttributes (
+                 mGcdMemSpace[Index].BaseAddress,
+                 mGcdMemSpace[Index].Length,
+                 EFI_MEMORY_RP
+                 );
+      DEBUG ((
+        DEBUG_INFO,
+        "GcdMemory protection: 0x%lx - 0x%lx %r\n",
+        mGcdMemSpace[Index].BaseAddress,
+        mGcdMemSpace[Index].BaseAddress + mGcdMemSpace[Index].Length,
+        Status
+        ));
+    }
+  }
+  //
+  // Do not free mGcdMemSpace, it will be checked in IsSmmCommBufferForbiddenAddress().
+  //
+
+  //
+  // Set UEFI runtime memory with EFI_MEMORY_RO as not present.
+  //
+  if (mUefiMemoryAttributesTable != NULL) {
+    Entry = (EFI_MEMORY_DESCRIPTOR *)(mUefiMemoryAttributesTable + 1);
+    for (Index = 0; Index < mUefiMemoryAttributesTable->NumberOfEntries; Index++) {
+      if (Entry->Type == EfiRuntimeServicesCode || Entry->Type == EfiRuntimeServicesData) {
+        if ((Entry->Attribute & EFI_MEMORY_RO) != 0) {
+          Status = SmmSetMemoryAttributes (
+                     Entry->PhysicalStart,
+                     EFI_PAGES_TO_SIZE((UINTN)Entry->NumberOfPages),
+                     EFI_MEMORY_RP
+                     );
+          DEBUG ((
+            DEBUG_INFO,
+            "UefiMemoryAttribute protection: 0x%lx - 0x%lx %r\n",
+            Entry->PhysicalStart,
+            Entry->PhysicalStart + (UINT64)EFI_PAGES_TO_SIZE((UINTN)Entry->NumberOfPages),
+            Status
+            ));
+        }
+      }
+      Entry = NEXT_MEMORY_DESCRIPTOR (Entry, mUefiMemoryAttributesTable->DescriptorSize);
+    }
+  }
+  //
+  // Do not free mUefiMemoryAttributesTable, it will be checked in IsSmmCommBufferForbiddenAddress().
   //
 }
 
@@ -1083,21 +1385,204 @@ IsSmmCommBufferForbiddenAddress (
   EFI_MEMORY_DESCRIPTOR *MemoryMap;
   UINTN                 MemoryMapEntryCount;
   UINTN                 Index;
+  EFI_MEMORY_DESCRIPTOR *Entry;
 
-  if (mUefiMemoryMap == NULL) {
-    return FALSE;
+  if (mUefiMemoryMap != NULL) {
+    MemoryMap = mUefiMemoryMap;
+    MemoryMapEntryCount = mUefiMemoryMapSize/mUefiDescriptorSize;
+    for (Index = 0; Index < MemoryMapEntryCount; Index++) {
+      if (IsUefiPageNotPresent (MemoryMap)) {
+        if ((Address >= MemoryMap->PhysicalStart) &&
+            (Address < MemoryMap->PhysicalStart + EFI_PAGES_TO_SIZE((UINTN)MemoryMap->NumberOfPages)) ) {
+          return TRUE;
+        }
+      }
+      MemoryMap = NEXT_MEMORY_DESCRIPTOR(MemoryMap, mUefiDescriptorSize);
+    }
   }
 
-  MemoryMap = mUefiMemoryMap;
-  MemoryMapEntryCount = mUefiMemoryMapSize/mUefiDescriptorSize;
-  for (Index = 0; Index < MemoryMapEntryCount; Index++) {
-    if (IsUefiPageNotPresent (MemoryMap)) {
-      if ((Address >= MemoryMap->PhysicalStart) &&
-          (Address < MemoryMap->PhysicalStart + EFI_PAGES_TO_SIZE((UINTN)MemoryMap->NumberOfPages)) ) {
+  if (mGcdMemSpace != NULL) {
+    for (Index = 0; Index < mGcdMemNumberOfDesc; Index++) {
+      if ((Address >= mGcdMemSpace[Index].BaseAddress) &&
+          (Address < mGcdMemSpace[Index].BaseAddress + mGcdMemSpace[Index].Length) ) {
         return TRUE;
       }
     }
-    MemoryMap = NEXT_MEMORY_DESCRIPTOR(MemoryMap, mUefiDescriptorSize);
+  }
+
+  if (mUefiMemoryAttributesTable != NULL) {
+    Entry = (EFI_MEMORY_DESCRIPTOR *)(mUefiMemoryAttributesTable + 1);
+    for (Index = 0; Index < mUefiMemoryAttributesTable->NumberOfEntries; Index++) {
+      if (Entry->Type == EfiRuntimeServicesCode || Entry->Type == EfiRuntimeServicesData) {
+        if ((Entry->Attribute & EFI_MEMORY_RO) != 0) {
+          if ((Address >= Entry->PhysicalStart) &&
+              (Address < Entry->PhysicalStart + LShiftU64 (Entry->NumberOfPages, EFI_PAGE_SHIFT))) {
+            return TRUE;
+          }
+          Entry = NEXT_MEMORY_DESCRIPTOR (Entry, mUefiMemoryAttributesTable->DescriptorSize);
+        }
+      }
+    }
   }
   return FALSE;
 }
+
+/**
+  This function set given attributes of the memory region specified by
+  BaseAddress and Length.
+
+  @param  This              The EDKII_SMM_MEMORY_ATTRIBUTE_PROTOCOL instance.
+  @param  BaseAddress       The physical address that is the start address of
+                            a memory region.
+  @param  Length            The size in bytes of the memory region.
+  @param  Attributes        The bit mask of attributes to set for the memory
+                            region.
+
+  @retval EFI_SUCCESS           The attributes were set for the memory region.
+  @retval EFI_INVALID_PARAMETER Length is zero.
+                                Attributes specified an illegal combination of
+                                attributes that cannot be set together.
+  @retval EFI_UNSUPPORTED       The processor does not support one or more
+                                bytes of the memory resource range specified
+                                by BaseAddress and Length.
+                                The bit mask of attributes is not supported for
+                                the memory resource range specified by
+                                BaseAddress and Length.
+
+**/
+EFI_STATUS
+EFIAPI
+EdkiiSmmSetMemoryAttributes (
+  IN  EDKII_SMM_MEMORY_ATTRIBUTE_PROTOCOL   *This,
+  IN  EFI_PHYSICAL_ADDRESS                  BaseAddress,
+  IN  UINT64                                Length,
+  IN  UINT64                                Attributes
+  )
+{
+  return SmmSetMemoryAttributes (BaseAddress, Length, Attributes);
+}
+
+/**
+  This function clears given attributes of the memory region specified by
+  BaseAddress and Length.
+
+  @param  This              The EDKII_SMM_MEMORY_ATTRIBUTE_PROTOCOL instance.
+  @param  BaseAddress       The physical address that is the start address of
+                            a memory region.
+  @param  Length            The size in bytes of the memory region.
+  @param  Attributes        The bit mask of attributes to clear for the memory
+                            region.
+
+  @retval EFI_SUCCESS           The attributes were cleared for the memory region.
+  @retval EFI_INVALID_PARAMETER Length is zero.
+                                Attributes specified an illegal combination of
+                                attributes that cannot be cleared together.
+  @retval EFI_UNSUPPORTED       The processor does not support one or more
+                                bytes of the memory resource range specified
+                                by BaseAddress and Length.
+                                The bit mask of attributes is not supported for
+                                the memory resource range specified by
+                                BaseAddress and Length.
+
+**/
+EFI_STATUS
+EFIAPI
+EdkiiSmmClearMemoryAttributes (
+  IN  EDKII_SMM_MEMORY_ATTRIBUTE_PROTOCOL   *This,
+  IN  EFI_PHYSICAL_ADDRESS                  BaseAddress,
+  IN  UINT64                                Length,
+  IN  UINT64                                Attributes
+  )
+{
+  return SmmClearMemoryAttributes (BaseAddress, Length, Attributes);
+}
+
+/**
+  This function retrieves the attributes of the memory region specified by
+  BaseAddress and Length. If different attributes are got from different part
+  of the memory region, EFI_NO_MAPPING will be returned.
+
+  @param  This              The EDKII_SMM_MEMORY_ATTRIBUTE_PROTOCOL instance.
+  @param  BaseAddress       The physical address that is the start address of
+                            a memory region.
+  @param  Length            The size in bytes of the memory region.
+  @param  Attributes        Pointer to attributes returned.
+
+  @retval EFI_SUCCESS           The attributes got for the memory region.
+  @retval EFI_INVALID_PARAMETER Length is zero.
+                                Attributes is NULL.
+  @retval EFI_NO_MAPPING        Attributes are not consistent cross the memory
+                                region.
+  @retval EFI_UNSUPPORTED       The processor does not support one or more
+                                bytes of the memory resource range specified
+                                by BaseAddress and Length.
+
+**/
+EFI_STATUS
+EFIAPI
+EdkiiSmmGetMemoryAttributes (
+  IN  EDKII_SMM_MEMORY_ATTRIBUTE_PROTOCOL   *This,
+  IN  EFI_PHYSICAL_ADDRESS                  BaseAddress,
+  IN  UINT64                                Length,
+  OUT UINT64                                *Attributes
+  )
+{
+  EFI_PHYSICAL_ADDRESS  Address;
+  UINT64                *PageEntry;
+  UINT64                MemAttr;
+  PAGE_ATTRIBUTE        PageAttr;
+  INT64                 Size;
+
+  if (Length < SIZE_4KB || Attributes == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Size = (INT64)Length;
+  MemAttr = (UINT64)-1;
+
+  do {
+
+    PageEntry = GetPageTableEntry (BaseAddress, &PageAttr);
+    if (PageEntry == NULL || PageAttr == PageNone) {
+      return EFI_UNSUPPORTED;
+    }
+
+    //
+    // If the memory range is cross page table boundary, make sure they
+    // share the same attribute. Return EFI_NO_MAPPING if not.
+    //
+    *Attributes = GetAttributesFromPageEntry (PageEntry);
+    if (MemAttr != (UINT64)-1 && *Attributes != MemAttr) {
+      return EFI_NO_MAPPING;
+    }
+
+    switch (PageAttr) {
+    case Page4K:
+      Address     = *PageEntry & ~mAddressEncMask & PAGING_4K_ADDRESS_MASK_64;
+      Size        -= (SIZE_4KB - (BaseAddress - Address));
+      BaseAddress += (SIZE_4KB - (BaseAddress - Address));
+      break;
+
+    case Page2M:
+      Address     = *PageEntry & ~mAddressEncMask & PAGING_2M_ADDRESS_MASK_64;
+      Size        -= SIZE_2MB - (BaseAddress - Address);
+      BaseAddress += SIZE_2MB - (BaseAddress - Address);
+      break;
+
+    case Page1G:
+      Address     = *PageEntry & ~mAddressEncMask & PAGING_1G_ADDRESS_MASK_64;
+      Size        -= SIZE_1GB - (BaseAddress - Address);
+      BaseAddress += SIZE_1GB - (BaseAddress - Address);
+      break;
+
+    default:
+      return EFI_UNSUPPORTED;
+    }
+
+    MemAttr = *Attributes;
+
+  } while (Size > 0);
+
+  return EFI_SUCCESS;
+}
+

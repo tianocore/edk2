@@ -1,14 +1,8 @@
 /** @file
   FormDiplay protocol to show Form
 
-Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
-The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                            
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -28,6 +22,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/FormBrowserEx2.h>
 #include <Protocol/SimpleTextIn.h>
 #include <Protocol/DisplayProtocol.h>
+#include <Protocol/HiiPopup.h>
 
 #include <Guid/MdeModuleHii.h>
 
@@ -41,6 +36,17 @@ extern FORM_DISPLAY_ENGINE_FORM      *gFormData;
 extern EFI_HII_HANDLE                gHiiHandle;
 extern UINT16                        gDirection;
 extern LIST_ENTRY                    gMenuOption;
+extern CHAR16                        *gConfirmOptYes;
+extern CHAR16                        *gConfirmOptNo;
+extern CHAR16                        *gConfirmOptOk;
+extern CHAR16                        *gConfirmOptCancel;
+extern CHAR16                        *gYesOption;
+extern CHAR16                        *gNoOption;
+extern CHAR16                        *gOkOption;
+extern CHAR16                        *gCancelOption;
+extern CHAR16                        *gErrorPopup;
+extern CHAR16                        *gWarningPopup;
+extern CHAR16                        *gInfoPopup;
 
 //
 // Browser Global Strings
@@ -139,6 +145,7 @@ typedef struct {
   // Produced protocol
   //
   EDKII_FORM_DISPLAY_ENGINE_PROTOCOL FromDisplayProt;
+  EFI_HII_POPUP_PROTOCOL             HiiPopup;
 } FORM_DISPLAY_DRIVER_PRIVATE_DATA;
 
 
@@ -200,22 +207,22 @@ typedef struct {
 typedef struct {
   EFI_HII_HANDLE     HiiHandle;
   UINT16             FormId;
-  
+
   //
   // Info for the highlight question.
   // HLT means highlight
   //
   // If one statement has questionid, save questionid info to find the question.
-  // If one statement not has questionid info, save the opcode info to find the 
+  // If one statement not has questionid info, save the opcode info to find the
   // statement. If more than one statement has same opcode in one form(just like
-  // empty subtitle info may has more than one info one form), also use Index 
+  // empty subtitle info may has more than one info one form), also use Index
   // info to find the statement.
   //
   EFI_QUESTION_ID    HLTQuestionId;
   EFI_IFR_OP_HEADER  *HLTOpCode;
   UINTN              HLTIndex;
   UINTN              HLTSequence;
-  
+
   //
   // Info for the top of screen question.
   // TOS means Top Of Screen
@@ -272,6 +279,60 @@ typedef struct {
 
 #define MENU_OPTION_FROM_LINK(a)  CR (a, UI_MENU_OPTION, Link, UI_MENU_OPTION_SIGNATURE)
 
+#define USER_SELECTABLE_OPTION_OK_WIDTH           StrLen (gOkOption)
+#define USER_SELECTABLE_OPTION_OK_CAL_WIDTH       (StrLen (gOkOption) + StrLen (gCancelOption))
+#define USER_SELECTABLE_OPTION_YES_NO_WIDTH       (StrLen (gYesOption) + StrLen (gNoOption))
+#define USER_SELECTABLE_OPTION_YES_NO_CAL_WIDTH   (StrLen (gYesOption) + StrLen (gNoOption) + StrLen (gCancelOption))
+
+#define USER_SELECTABLE_OPTION_SKIP_WIDTH  2
+
+//
+// +-------------------------------------------+ // POPUP_BORDER                        }
+// |            ERROR/WARNING/INFO             | // POPUP_STYLE_STRING_HEIGHT           } POPUP_HEADER_HEIGHT
+// |-------------------------------------------| // POPUP_EMPTY_LINE_HEIGHT             }
+// |             popup messages                |
+// |                                           | // POPUP_EMPTY_LINE_HEIGHT             }
+// |         user selectable options           | // POPUP_USER_SELECTABLE_OPTION_HEIGHT } POPUP_FOOTER_HEIGHT
+// +-------------------------------------------+ // POPUP_BORDER                        }
+//
+#define POPUP_BORDER  1
+#define POPUP_EMPTY_LINE_HEIGHT  1
+#define POPUP_STYLE_STRING_HEIGHT  1
+#define POPUP_USER_SELECTABLE_OPTION_HEIGHT  1
+
+#define POPUP_HEADER_HEIGHT  (POPUP_BORDER + POPUP_STYLE_STRING_HEIGHT + POPUP_EMPTY_LINE_HEIGHT)
+#define POPUP_FOOTER_HEIGHT  (POPUP_EMPTY_LINE_HEIGHT + POPUP_USER_SELECTABLE_OPTION_HEIGHT + POPUP_BORDER)
+
+#define USER_SELECTABLE_OPTION_SIGNATURE  SIGNATURE_32 ('u', 's', 's', 'o')
+
+typedef struct {
+  UINTN                   Signature;
+  LIST_ENTRY              Link;
+  EFI_HII_POPUP_SELECTION OptionType;
+  CHAR16                  *OptionString;
+  //
+  // Display item sequence for user select options
+  //  Ok:        Ok
+  //  Sequence:  0
+  //
+  //  Ok/Cancel:   Ok : Cancel
+  //  Sequence:    0      1
+  //
+  //  Yes/No:      Yes : No
+  //  Sequence:     0    1
+  //
+  //  Yes/No/Cancel: Yes : No: Cancel
+  //  Sequence:       0    1    2
+  //
+  UINTN                   Sequence;
+  UINTN                   OptionRow;
+  UINTN                   OptionCol;
+  UINTN                   MaxSequence;
+  UINTN                   MinSequence;
+} USER_SELECTABLE_OPTION;
+
+#define SELECTABLE_OPTION_FROM_LINK(a)  CR (a, USER_SELECTABLE_OPTION, Link, USER_SELECTABLE_OPTION_SIGNATURE)
+
 /**
   Print Question Value according to it's storage width and display attributes.
 
@@ -323,7 +384,7 @@ GetArrayData (
   IN UINT8                    Type,
   IN UINTN                    Index
   );
-  
+
 /**
   Search an Option of a Question by its value.
 
@@ -395,7 +456,7 @@ CreateMultiStringPopUp (
   @param  Index                  Where in InputString to start the copy process
   @param  OutputString           Buffer to copy the string into
 
-  @return Returns the number of CHAR16 characters that were copied into the OutputString 
+  @return Returns the number of CHAR16 characters that were copied into the OutputString
   buffer, include extra glyph info and '\0' info.
 
 **/
@@ -423,7 +484,7 @@ GetToken (
   IN  EFI_STRING_ID                Token,
   IN  EFI_HII_HANDLE               HiiHandle
   );
-  
+
 /**
   Count the storage space of a Unicode string.
 
@@ -492,7 +553,7 @@ CreateSharedPopUp (
   IN  UINTN                       NumberOfLines,
   IN  VA_LIST                     Marker
   );
-  
+
 /**
   Wait for a key to be pressed by user.
 
@@ -575,14 +636,14 @@ SetUnicodeMem (
 
 /**
   Display one form, and return user input.
-  
+
   @param FormData                Form Data to be shown.
   @param UserInputData           User input data.
-  
+
   @retval EFI_SUCCESS            Form Data is shown, and user input is got.
 **/
 EFI_STATUS
-EFIAPI 
+EFIAPI
 FormDisplay (
   IN  FORM_DISPLAY_ENGINE_FORM  *FormData,
   OUT USER_INPUT                *UserInputData
@@ -592,7 +653,7 @@ FormDisplay (
   Clear Screen to the initial state.
 **/
 VOID
-EFIAPI 
+EFIAPI
 DriverClearDisplayPage (
   VOID
   );
@@ -602,7 +663,7 @@ DriverClearDisplayPage (
 
 **/
 VOID
-EFIAPI 
+EFIAPI
 ExitDisplay (
   VOID
   );
@@ -648,6 +709,33 @@ UpdateHighlightMenuInfo (
   IN  LIST_ENTRY                      *Highlight,
   IN  LIST_ENTRY                      *TopOfScreen,
   IN  UINTN                           SkipValue
+  );
+
+/**
+  Displays a popup window.
+
+  @param  This           A pointer to the EFI_HII_POPUP_PROTOCOL instance.
+  @param  PopupStyle     Popup style to use.
+  @param  PopupType      Type of the popup to display.
+  @param  HiiHandle      HII handle of the string pack containing Message
+  @param  Message        A message to display in the popup box.
+  @param  UserSelection  User selection.
+
+  @retval EFI_SUCCESS            The popup box was successfully displayed.
+  @retval EFI_INVALID_PARAMETER  HiiHandle and Message do not define a valid HII string.
+  @retval EFI_INVALID_PARAMETER  PopupType is not one of the values defined by this specification.
+  @retval EFI_OUT_OF_RESOURCES   There are not enough resources available to display the popup box.
+
+**/
+EFI_STATUS
+EFIAPI
+CreatePopup (
+  IN  EFI_HII_POPUP_PROTOCOL  *This,
+  IN  EFI_HII_POPUP_STYLE     PopupStyle,
+  IN  EFI_HII_POPUP_TYPE      PopupType,
+  IN  EFI_HII_HANDLE          HiiHandle,
+  IN  EFI_STRING_ID           Message,
+  OUT EFI_HII_POPUP_SELECTION *UserSelection OPTIONAL
   );
 
 #endif

@@ -1,14 +1,8 @@
 /** @file
   EFI PEI Core PPI services
-  
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -16,23 +10,104 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 /**
 
-  Initialize PPI services.
+  Migrate Pointer from the temporary memory to PEI installed memory.
 
-  @param PrivateData     Pointer to the PEI Core data.
-  @param OldCoreData     Pointer to old PEI Core data. 
-                         NULL if being run in non-permament memory mode.
+  @param Pointer         Pointer to the Pointer needs to be converted.
+  @param TempBottom      Base of old temporary memory
+  @param TempTop         Top of old temporary memory
+  @param Offset          Offset of new memory to old temporary memory.
+  @param OffsetPositive  Positive flag of Offset value.
 
 **/
 VOID
-InitializePpiServices (
-  IN PEI_CORE_INSTANCE *PrivateData,
-  IN PEI_CORE_INSTANCE *OldCoreData
+ConvertPointer (
+  IN OUT VOID              **Pointer,
+  IN UINTN                 TempBottom,
+  IN UINTN                 TempTop,
+  IN UINTN                 Offset,
+  IN BOOLEAN               OffsetPositive
   )
 {
-  if (OldCoreData == NULL) {
-    PrivateData->PpiData.NotifyListEnd = PcdGet32 (PcdPeiCoreMaxPpiSupported)-1;
-    PrivateData->PpiData.DispatchListEnd = PcdGet32 (PcdPeiCoreMaxPpiSupported)-1;
-    PrivateData->PpiData.LastDispatchedNotify = PcdGet32 (PcdPeiCoreMaxPpiSupported)-1;
+  if (((UINTN) *Pointer < TempTop) &&
+    ((UINTN) *Pointer >= TempBottom)) {
+    if (OffsetPositive) {
+      *Pointer = (VOID *) ((UINTN) *Pointer + Offset);
+    } else {
+      *Pointer = (VOID *) ((UINTN) *Pointer - Offset);
+    }
+  }
+}
+
+/**
+
+  Migrate Pointer in ranges of the temporary memory to PEI installed memory.
+
+  @param SecCoreData     Points to a data structure containing SEC to PEI handoff data, such as the size
+                         and location of temporary RAM, the stack location and the BFV location.
+  @param PrivateData     Pointer to PeiCore's private data structure.
+  @param Pointer         Pointer to the Pointer needs to be converted.
+
+**/
+VOID
+ConvertPointerInRanges (
+  IN CONST EFI_SEC_PEI_HAND_OFF  *SecCoreData,
+  IN PEI_CORE_INSTANCE           *PrivateData,
+  IN OUT VOID                    **Pointer
+  )
+{
+  UINT8                 IndexHole;
+
+  if (PrivateData->MemoryPages.Size != 0) {
+    //
+    // Convert PPI pointer in old memory pages
+    // It needs to be done before Convert PPI pointer in old Heap
+    //
+    ConvertPointer (
+      Pointer,
+      (UINTN)PrivateData->MemoryPages.Base,
+      (UINTN)PrivateData->MemoryPages.Base + PrivateData->MemoryPages.Size,
+      PrivateData->MemoryPages.Offset,
+      PrivateData->MemoryPages.OffsetPositive
+      );
+  }
+
+  //
+  // Convert PPI pointer in old Heap
+  //
+  ConvertPointer (
+    Pointer,
+    (UINTN)SecCoreData->PeiTemporaryRamBase,
+    (UINTN)SecCoreData->PeiTemporaryRamBase + SecCoreData->PeiTemporaryRamSize,
+    PrivateData->HeapOffset,
+    PrivateData->HeapOffsetPositive
+    );
+
+  //
+  // Convert PPI pointer in old Stack
+  //
+  ConvertPointer (
+    Pointer,
+    (UINTN)SecCoreData->StackBase,
+    (UINTN)SecCoreData->StackBase + SecCoreData->StackSize,
+    PrivateData->StackOffset,
+    PrivateData->StackOffsetPositive
+    );
+
+  //
+  // Convert PPI pointer in old TempRam Hole
+  //
+  for (IndexHole = 0; IndexHole < HOLE_MAX_NUMBER; IndexHole ++) {
+    if (PrivateData->HoleData[IndexHole].Size == 0) {
+      continue;
+    }
+
+    ConvertPointer (
+      Pointer,
+      (UINTN)PrivateData->HoleData[IndexHole].Base,
+      (UINTN)PrivateData->HoleData[IndexHole].Base + PrivateData->HoleData[IndexHole].Size,
+      PrivateData->HoleData[IndexHole].Offset,
+      PrivateData->HoleData[IndexHole].OffsetPositive
+      );
   }
 }
 
@@ -40,72 +115,43 @@ InitializePpiServices (
 
   Migrate Single PPI Pointer from the temporary memory to PEI installed memory.
 
+  @param SecCoreData     Points to a data structure containing SEC to PEI handoff data, such as the size
+                         and location of temporary RAM, the stack location and the BFV location.
+  @param PrivateData     Pointer to PeiCore's private data structure.
   @param PpiPointer      Pointer to Ppi
-  @param TempBottom      Base of old temporary memory
-  @param TempTop         Top of old temporary memory
-  @param Offset          Offset of new memory to old temporary memory.
-  @param OffsetPositive  Positive flag of Offset value. 
 
 **/
 VOID
 ConvertSinglePpiPointer (
-  IN PEI_PPI_LIST_POINTERS *PpiPointer,
-  IN UINTN                 TempBottom,
-  IN UINTN                 TempTop,
-  IN UINTN                 Offset,
-  IN BOOLEAN               OffsetPositive
+  IN CONST EFI_SEC_PEI_HAND_OFF  *SecCoreData,
+  IN PEI_CORE_INSTANCE           *PrivateData,
+  IN PEI_PPI_LIST_POINTERS       *PpiPointer
   )
 {
-  if (((UINTN)PpiPointer->Raw < TempTop) &&
-      ((UINTN)PpiPointer->Raw >= TempBottom)) {
-    //
-    // Convert the pointer to the PPI descriptor from the old TempRam
-    // to the relocated physical memory.
-    //
-    if (OffsetPositive) {
-      PpiPointer->Raw = (VOID *) ((UINTN)PpiPointer->Raw + Offset);
-    } else {
-      PpiPointer->Raw = (VOID *) ((UINTN)PpiPointer->Raw - Offset);
-    }
-
-    //
-    // Only when the PEIM descriptor is in the old TempRam should it be necessary
-    // to try to convert the pointers in the PEIM descriptor
-    //
-
-    if (((UINTN)PpiPointer->Ppi->Guid < TempTop) &&
-        ((UINTN)PpiPointer->Ppi->Guid >= TempBottom)) {
-      //
-      // Convert the pointer to the GUID in the PPI or NOTIFY descriptor
-      // from the old TempRam to the relocated physical memory.
-      //
-      if (OffsetPositive) {
-        PpiPointer->Ppi->Guid = (VOID *) ((UINTN)PpiPointer->Ppi->Guid + Offset);
-      } else {
-        PpiPointer->Ppi->Guid = (VOID *) ((UINTN)PpiPointer->Ppi->Guid - Offset);
-      }
-    }
-
-    //
-    // Convert the pointer to the PPI interface structure in the PPI descriptor
-    // from the old TempRam to the relocated physical memory.
-    //
-    if ((UINTN)PpiPointer->Ppi->Ppi < TempTop &&
-        (UINTN)PpiPointer->Ppi->Ppi >= TempBottom) {
-      if (OffsetPositive) {
-        PpiPointer->Ppi->Ppi = (VOID *) ((UINTN)PpiPointer->Ppi->Ppi + Offset);
-      } else {
-        PpiPointer->Ppi->Ppi = (VOID *) ((UINTN)PpiPointer->Ppi->Ppi - Offset);
-      }
-    }
-  }
+  //
+  // 1. Convert the pointer to the PPI descriptor from the old TempRam
+  //    to the relocated physical memory.
+  // It (for the pointer to the PPI descriptor) needs to be done before 2 (for
+  // the pointer to the GUID) and 3 (for the pointer to the PPI interface structure).
+  //
+  ConvertPointerInRanges (SecCoreData, PrivateData, &PpiPointer->Raw);
+  //
+  // 2. Convert the pointer to the GUID in the PPI or NOTIFY descriptor
+  //    from the old TempRam to the relocated physical memory.
+  //
+  ConvertPointerInRanges (SecCoreData, PrivateData, (VOID **) &PpiPointer->Ppi->Guid);
+  //
+  // 3. Convert the pointer to the PPI interface structure in the PPI descriptor
+  //    from the old TempRam to the relocated physical memory.
+  //
+  ConvertPointerInRanges (SecCoreData, PrivateData, (VOID **) &PpiPointer->Ppi->Ppi);
 }
 
 /**
 
-  Migrate PPI Pointers from the temporary memory stack to PEI installed memory.
+  Migrate PPI Pointers from the temporary memory to PEI installed memory.
 
-  @param SecCoreData     Points to a data structure containing SEC to PEI handoff data, such as the size 
+  @param SecCoreData     Points to a data structure containing SEC to PEI handoff data, such as the size
                          and location of temporary RAM, the stack location and the BFV location.
   @param PrivateData     Pointer to PeiCore's private data structure.
 
@@ -117,55 +163,158 @@ ConvertPpiPointers (
   )
 {
   UINT8                 Index;
-  UINT8                 IndexHole;
 
-  for (Index = 0; Index < PcdGet32 (PcdPeiCoreMaxPpiSupported); Index++) {
-    if (Index < PrivateData->PpiData.PpiListEnd || Index > PrivateData->PpiData.NotifyListEnd) {
-      //
-      // Convert PPI pointer in old Heap
-      //
-      ConvertSinglePpiPointer (
-        &PrivateData->PpiData.PpiListPtrs[Index],
-        (UINTN)SecCoreData->PeiTemporaryRamBase,
-        (UINTN)SecCoreData->PeiTemporaryRamBase + SecCoreData->PeiTemporaryRamSize,
-        PrivateData->HeapOffset,
-        PrivateData->HeapOffsetPositive
-        );
-        
-      //
-      // Convert PPI pointer in old Stack
-      //
-      ConvertSinglePpiPointer (
-        &PrivateData->PpiData.PpiListPtrs[Index],
-        (UINTN)SecCoreData->StackBase,
-        (UINTN)SecCoreData->StackBase + SecCoreData->StackSize,
-        PrivateData->StackOffset,
-        PrivateData->StackOffsetPositive
-        );
-        
-      //
-      // Convert PPI pointer in old TempRam Hole
-      //
-      for (IndexHole = 0; IndexHole < HOLE_MAX_NUMBER; IndexHole ++) {
-        if (PrivateData->HoleData[IndexHole].Size == 0) {
-          continue;
-        }
-        
-        ConvertSinglePpiPointer (
-          &PrivateData->PpiData.PpiListPtrs[Index],
-          (UINTN)PrivateData->HoleData[IndexHole].Base,
-          (UINTN)PrivateData->HoleData[IndexHole].Base + PrivateData->HoleData[IndexHole].Size,
-          PrivateData->HoleData[IndexHole].Offset,
-          PrivateData->HoleData[IndexHole].OffsetPositive
-          );
-      }
-    }
+  //
+  // Convert normal PPIs.
+  //
+  for (Index = 0; Index < PrivateData->PpiData.PpiList.CurrentCount; Index++) {
+    ConvertSinglePpiPointer (
+      SecCoreData,
+      PrivateData,
+      &PrivateData->PpiData.PpiList.PpiPtrs[Index]
+      );
+  }
+
+  //
+  // Convert Callback Notification PPIs.
+  //
+  for (Index = 0; Index < PrivateData->PpiData.CallbackNotifyList.CurrentCount; Index++) {
+    ConvertSinglePpiPointer (
+      SecCoreData,
+      PrivateData,
+      &PrivateData->PpiData.CallbackNotifyList.NotifyPtrs[Index]
+      );
+  }
+
+  //
+  // Convert Dispatch Notification PPIs.
+  //
+  for (Index = 0; Index < PrivateData->PpiData.DispatchNotifyList.CurrentCount; Index++) {
+    ConvertSinglePpiPointer (
+      SecCoreData,
+      PrivateData,
+      &PrivateData->PpiData.DispatchNotifyList.NotifyPtrs[Index]
+      );
   }
 }
 
 /**
 
-  This function installs an interface in the PEI PPI database by GUID. 
+  This function installs an interface in the PEI PPI database by GUID.
+  The purpose of the service is to publish an interface that other parties
+  can use to call additional PEIMs.
+
+  @param PeiServices                An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
+  @param PpiList                    Pointer to a list of PEI PPI Descriptors.
+  @param Single                     TRUE if only single entry in the PpiList.
+                                    FALSE if the PpiList is ended with an entry which has the
+                                    EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST flag set in its Flags field.
+
+  @retval EFI_SUCCESS              if all PPIs in PpiList are successfully installed.
+  @retval EFI_INVALID_PARAMETER    if PpiList is NULL pointer
+                                   if any PPI in PpiList is not valid
+  @retval EFI_OUT_OF_RESOURCES     if there is no more memory resource to install PPI
+
+**/
+EFI_STATUS
+InternalPeiInstallPpi (
+  IN CONST EFI_PEI_SERVICES        **PeiServices,
+  IN CONST EFI_PEI_PPI_DESCRIPTOR  *PpiList,
+  IN BOOLEAN                       Single
+  )
+{
+  PEI_CORE_INSTANCE     *PrivateData;
+  PEI_PPI_LIST          *PpiListPointer;
+  UINTN                 Index;
+  UINTN                 LastCount;
+  VOID                  *TempPtr;
+
+  if (PpiList == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  PrivateData = PEI_CORE_INSTANCE_FROM_PS_THIS(PeiServices);
+
+  PpiListPointer = &PrivateData->PpiData.PpiList;
+  Index = PpiListPointer->CurrentCount;
+  LastCount = Index;
+
+  //
+  // This is loop installs all PPI descriptors in the PpiList.  It is terminated
+  // by the EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST being set in the last
+  // EFI_PEI_PPI_DESCRIPTOR in the list.
+  //
+
+  for (;;) {
+    //
+    // Check if it is a valid PPI.
+    // If not, rollback list to exclude all in this list.
+    // Try to indicate which item failed.
+    //
+    if ((PpiList->Flags & EFI_PEI_PPI_DESCRIPTOR_PPI) == 0) {
+      PpiListPointer->CurrentCount = LastCount;
+      DEBUG((EFI_D_ERROR, "ERROR -> InstallPpi: %g %p\n", PpiList->Guid, PpiList->Ppi));
+      return  EFI_INVALID_PARAMETER;
+    }
+
+    if (Index >= PpiListPointer->MaxCount) {
+      //
+      // Run out of room, grow the buffer.
+      //
+      TempPtr = AllocateZeroPool (
+                  sizeof (PEI_PPI_LIST_POINTERS) * (PpiListPointer->MaxCount + PPI_GROWTH_STEP)
+                  );
+      ASSERT (TempPtr != NULL);
+      CopyMem (
+        TempPtr,
+        PpiListPointer->PpiPtrs,
+        sizeof (PEI_PPI_LIST_POINTERS) * PpiListPointer->MaxCount
+        );
+      PpiListPointer->PpiPtrs = TempPtr;
+      PpiListPointer->MaxCount = PpiListPointer->MaxCount + PPI_GROWTH_STEP;
+    }
+
+    DEBUG((EFI_D_INFO, "Install PPI: %g\n", PpiList->Guid));
+    PpiListPointer->PpiPtrs[Index].Ppi = (EFI_PEI_PPI_DESCRIPTOR *) PpiList;
+    Index++;
+    PpiListPointer->CurrentCount++;
+
+    if (Single) {
+      //
+      // Only single entry in the PpiList.
+      //
+      break;
+    } else if ((PpiList->Flags & EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST) ==
+               EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST) {
+      //
+      // Continue until the end of the PPI List.
+      //
+      break;
+    }
+    //
+    // Go to the next descriptor.
+    //
+    PpiList++;
+  }
+
+  //
+  // Process any callback level notifies for newly installed PPIs.
+  //
+  ProcessNotify (
+    PrivateData,
+    EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK,
+    LastCount,
+    PpiListPointer->CurrentCount,
+    0,
+    PrivateData->PpiData.CallbackNotifyList.CurrentCount
+    );
+
+  return EFI_SUCCESS;
+}
+
+/**
+
+  This function installs an interface in the PEI PPI database by GUID.
   The purpose of the service is to publish an interface that other parties
   can use to call additional PEIMs.
 
@@ -185,82 +334,14 @@ PeiInstallPpi (
   IN CONST EFI_PEI_PPI_DESCRIPTOR  *PpiList
   )
 {
-  PEI_CORE_INSTANCE *PrivateData;
-  INTN              Index;
-  INTN              LastCallbackInstall;
-
-
-  if (PpiList == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  PrivateData = PEI_CORE_INSTANCE_FROM_PS_THIS(PeiServices);
-
-  Index = PrivateData->PpiData.PpiListEnd;
-  LastCallbackInstall = Index;
-
-  //
-  // This is loop installs all PPI descriptors in the PpiList.  It is terminated
-  // by the EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST being set in the last
-  // EFI_PEI_PPI_DESCRIPTOR in the list.
-  //
-
-  for (;;) {
-    //
-    // Since PpiData is used for NotifyList and PpiList, max resource
-    // is reached if the Install reaches the NotifyList
-    // PcdPeiCoreMaxPpiSupported can be set to a larger value in DSC to satisfy more PPI requirement.
-    //
-    if (Index == PrivateData->PpiData.NotifyListEnd + 1) {
-      return  EFI_OUT_OF_RESOURCES;
-    }
-    //
-    // Check if it is a valid PPI.
-    // If not, rollback list to exclude all in this list.
-    // Try to indicate which item failed.
-    //
-    if ((PpiList->Flags & EFI_PEI_PPI_DESCRIPTOR_PPI) == 0) {
-      PrivateData->PpiData.PpiListEnd = LastCallbackInstall;
-      DEBUG((EFI_D_ERROR, "ERROR -> InstallPpi: %g %p\n", PpiList->Guid, PpiList->Ppi));
-      return  EFI_INVALID_PARAMETER;
-    }
-
-    DEBUG((EFI_D_INFO, "Install PPI: %g\n", PpiList->Guid));
-    PrivateData->PpiData.PpiListPtrs[Index].Ppi = (EFI_PEI_PPI_DESCRIPTOR*) PpiList;
-    PrivateData->PpiData.PpiListEnd++;
-
-    //
-    // Continue until the end of the PPI List.
-    //
-    if ((PpiList->Flags & EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST) ==
-        EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST) {
-      break;
-    }
-    PpiList++;
-    Index++;
-  }
-
-  //
-  // Dispatch any callback level notifies for newly installed PPIs.
-  //
-  DispatchNotify (
-    PrivateData,
-    EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK,
-    LastCallbackInstall,
-    PrivateData->PpiData.PpiListEnd,
-    PrivateData->PpiData.DispatchListEnd,
-    PrivateData->PpiData.NotifyListEnd
-    );
-
-
-  return EFI_SUCCESS;
+  return InternalPeiInstallPpi (PeiServices, PpiList, FALSE);
 }
 
 /**
 
-  This function reinstalls an interface in the PEI PPI database by GUID. 
-  The purpose of the service is to publish an interface that other parties can 
-  use to replace an interface of the same name in the protocol database with a 
+  This function reinstalls an interface in the PEI PPI database by GUID.
+  The purpose of the service is to publish an interface that other parties can
+  use to replace an interface of the same name in the protocol database with a
   different interface.
 
   @param PeiServices            An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
@@ -282,7 +363,7 @@ PeiReInstallPpi (
   )
 {
   PEI_CORE_INSTANCE   *PrivateData;
-  INTN                Index;
+  UINTN               Index;
 
 
   if ((OldPpi == NULL) || (NewPpi == NULL)) {
@@ -299,34 +380,32 @@ PeiReInstallPpi (
   // Find the old PPI instance in the database.  If we can not find it,
   // return the EFI_NOT_FOUND error.
   //
-  for (Index = 0; Index < PrivateData->PpiData.PpiListEnd; Index++) {
-    if (OldPpi == PrivateData->PpiData.PpiListPtrs[Index].Ppi) {
+  for (Index = 0; Index < PrivateData->PpiData.PpiList.CurrentCount; Index++) {
+    if (OldPpi == PrivateData->PpiData.PpiList.PpiPtrs[Index].Ppi) {
       break;
     }
   }
-  if (Index == PrivateData->PpiData.PpiListEnd) {
+  if (Index == PrivateData->PpiData.PpiList.CurrentCount) {
     return EFI_NOT_FOUND;
   }
 
   //
-  // Remove the old PPI from the database, add the new one.
+  // Replace the old PPI with the new one.
   //
   DEBUG((EFI_D_INFO, "Reinstall PPI: %g\n", NewPpi->Guid));
-  ASSERT (Index < (INTN)(PcdGet32 (PcdPeiCoreMaxPpiSupported)));
-  PrivateData->PpiData.PpiListPtrs[Index].Ppi = (EFI_PEI_PPI_DESCRIPTOR *) NewPpi;
+  PrivateData->PpiData.PpiList.PpiPtrs[Index].Ppi = (EFI_PEI_PPI_DESCRIPTOR *) NewPpi;
 
   //
-  // Dispatch any callback level notifies for the newly installed PPI.
+  // Process any callback level notifies for the newly installed PPI.
   //
-  DispatchNotify (
+  ProcessNotify (
     PrivateData,
     EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK,
     Index,
     Index+1,
-    PrivateData->PpiData.DispatchListEnd,
-    PrivateData->PpiData.NotifyListEnd
+    0,
+    PrivateData->PpiData.CallbackNotifyList.CurrentCount
     );
-
 
   return EFI_SUCCESS;
 }
@@ -357,10 +436,10 @@ PeiLocatePpi (
   IN OUT VOID                      **Ppi
   )
 {
-  PEI_CORE_INSTANCE   *PrivateData;
-  INTN                Index;
-  EFI_GUID            *CheckGuid;
-  EFI_PEI_PPI_DESCRIPTOR  *TempPtr;
+  PEI_CORE_INSTANCE         *PrivateData;
+  UINTN                     Index;
+  EFI_GUID                  *CheckGuid;
+  EFI_PEI_PPI_DESCRIPTOR    *TempPtr;
 
 
   PrivateData = PEI_CORE_INSTANCE_FROM_PS_THIS(PeiServices);
@@ -368,8 +447,8 @@ PeiLocatePpi (
   //
   // Search the data base for the matching instance of the GUIDed PPI.
   //
-  for (Index = 0; Index < PrivateData->PpiData.PpiListEnd; Index++) {
-    TempPtr = PrivateData->PpiData.PpiListPtrs[Index].Ppi;
+  for (Index = 0; Index < PrivateData->PpiData.PpiList.CurrentCount; Index++) {
+    TempPtr = PrivateData->PpiData.PpiList.PpiPtrs[Index].Ppi;
     CheckGuid = TempPtr->Guid;
 
     //
@@ -403,34 +482,36 @@ PeiLocatePpi (
 
 /**
 
-  This function installs a notification service to be called back when a given 
-  interface is installed or reinstalled. The purpose of the service is to publish 
+  This function installs a notification service to be called back when a given
+  interface is installed or reinstalled. The purpose of the service is to publish
   an interface that other parties can use to call additional PPIs that may materialize later.
 
   @param PeiServices        An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param NotifyList         Pointer to list of Descriptors to notify upon.
+  @param Single             TRUE if only single entry in the NotifyList.
+                            FALSE if the NotifyList is ended with an entry which has the
+                            EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST flag set in its Flags field.
 
   @retval EFI_SUCCESS           if successful
   @retval EFI_OUT_OF_RESOURCES  if no space in the database
-  @retval EFI_INVALID_PARAMETER if not a good decriptor
+  @retval EFI_INVALID_PARAMETER if not a good descriptor
 
 **/
 EFI_STATUS
-EFIAPI
-PeiNotifyPpi (
+InternalPeiNotifyPpi (
   IN CONST EFI_PEI_SERVICES           **PeiServices,
-  IN CONST EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyList
+  IN CONST EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyList,
+  IN BOOLEAN                          Single
   )
 {
-  PEI_CORE_INSTANCE                *PrivateData;
-  INTN                             Index;
-  INTN                             NotifyIndex;
-  INTN                             LastCallbackNotify;
-  EFI_PEI_NOTIFY_DESCRIPTOR        *NotifyPtr;
-  UINTN                            NotifyDispatchCount;
-
-
-  NotifyDispatchCount = 0;
+  PEI_CORE_INSTANCE         *PrivateData;
+  PEI_CALLBACK_NOTIFY_LIST  *CallbackNotifyListPointer;
+  UINTN                     CallbackNotifyIndex;
+  UINTN                     LastCallbackNotifyCount;
+  PEI_DISPATCH_NOTIFY_LIST  *DispatchNotifyListPointer;
+  UINTN                     DispatchNotifyIndex;
+  UINTN                     LastDispatchNotifyCount;
+  VOID                      *TempPtr;
 
   if (NotifyList == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -438,8 +519,13 @@ PeiNotifyPpi (
 
   PrivateData = PEI_CORE_INSTANCE_FROM_PS_THIS(PeiServices);
 
-  Index = PrivateData->PpiData.NotifyListEnd;
-  LastCallbackNotify = Index;
+  CallbackNotifyListPointer = &PrivateData->PpiData.CallbackNotifyList;
+  CallbackNotifyIndex = CallbackNotifyListPointer->CurrentCount;
+  LastCallbackNotifyCount = CallbackNotifyIndex;
+
+  DispatchNotifyListPointer = &PrivateData->PpiData.DispatchNotifyList;
+  DispatchNotifyIndex = DispatchNotifyListPointer->CurrentCount;
+  LastDispatchNotifyCount = DispatchNotifyIndex;
 
   //
   // This is loop installs all Notify descriptors in the NotifyList.  It is
@@ -449,76 +535,115 @@ PeiNotifyPpi (
 
   for (;;) {
     //
-    // Since PpiData is used for NotifyList and InstallList, max resource
-    // is reached if the Install reaches the PpiList
-    // PcdPeiCoreMaxPpiSupported can be set to a larger value in DSC to satisfy more Notify PPIs requirement.
-    //
-    if (Index == PrivateData->PpiData.PpiListEnd - 1) {
-      return  EFI_OUT_OF_RESOURCES;
-    }
-
-    //
     // If some of the PPI data is invalid restore original Notify PPI database value
     //
     if ((NotifyList->Flags & EFI_PEI_PPI_DESCRIPTOR_NOTIFY_TYPES) == 0) {
-        PrivateData->PpiData.NotifyListEnd = LastCallbackNotify;
-        DEBUG((EFI_D_ERROR, "ERROR -> InstallNotify: %g %p\n", NotifyList->Guid, NotifyList->Notify));
+        CallbackNotifyListPointer->CurrentCount = LastCallbackNotifyCount;
+        DispatchNotifyListPointer->CurrentCount = LastDispatchNotifyCount;
+        DEBUG((DEBUG_ERROR, "ERROR -> NotifyPpi: %g %p\n", NotifyList->Guid, NotifyList->Notify));
       return  EFI_INVALID_PARAMETER;
     }
 
-    if ((NotifyList->Flags & EFI_PEI_PPI_DESCRIPTOR_NOTIFY_DISPATCH) != 0) {
-      NotifyDispatchCount ++;
+    if ((NotifyList->Flags & EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK) != 0) {
+      if (CallbackNotifyIndex >= CallbackNotifyListPointer->MaxCount) {
+        //
+        // Run out of room, grow the buffer.
+        //
+        TempPtr = AllocateZeroPool (
+                    sizeof (PEI_PPI_LIST_POINTERS) * (CallbackNotifyListPointer->MaxCount + CALLBACK_NOTIFY_GROWTH_STEP)
+                    );
+        ASSERT (TempPtr != NULL);
+        CopyMem (
+          TempPtr,
+          CallbackNotifyListPointer->NotifyPtrs,
+          sizeof (PEI_PPI_LIST_POINTERS) * CallbackNotifyListPointer->MaxCount
+          );
+        CallbackNotifyListPointer->NotifyPtrs = TempPtr;
+        CallbackNotifyListPointer->MaxCount = CallbackNotifyListPointer->MaxCount + CALLBACK_NOTIFY_GROWTH_STEP;
+      }
+      CallbackNotifyListPointer->NotifyPtrs[CallbackNotifyIndex].Notify = (EFI_PEI_NOTIFY_DESCRIPTOR *) NotifyList;
+      CallbackNotifyIndex++;
+      CallbackNotifyListPointer->CurrentCount++;
+    } else {
+      if (DispatchNotifyIndex >= DispatchNotifyListPointer->MaxCount) {
+        //
+        // Run out of room, grow the buffer.
+        //
+        TempPtr = AllocateZeroPool (
+                    sizeof (PEI_PPI_LIST_POINTERS) * (DispatchNotifyListPointer->MaxCount + DISPATCH_NOTIFY_GROWTH_STEP)
+                    );
+        ASSERT (TempPtr != NULL);
+        CopyMem (
+          TempPtr,
+          DispatchNotifyListPointer->NotifyPtrs,
+          sizeof (PEI_PPI_LIST_POINTERS) * DispatchNotifyListPointer->MaxCount
+          );
+        DispatchNotifyListPointer->NotifyPtrs = TempPtr;
+        DispatchNotifyListPointer->MaxCount = DispatchNotifyListPointer->MaxCount + DISPATCH_NOTIFY_GROWTH_STEP;
+      }
+      DispatchNotifyListPointer->NotifyPtrs[DispatchNotifyIndex].Notify = (EFI_PEI_NOTIFY_DESCRIPTOR *) NotifyList;
+      DispatchNotifyIndex++;
+      DispatchNotifyListPointer->CurrentCount++;
     }
 
-    PrivateData->PpiData.PpiListPtrs[Index].Notify = (EFI_PEI_NOTIFY_DESCRIPTOR *) NotifyList;
-
-    PrivateData->PpiData.NotifyListEnd--;
     DEBUG((EFI_D_INFO, "Register PPI Notify: %g\n", NotifyList->Guid));
-    if ((NotifyList->Flags & EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST) ==
-        EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST) {
+
+    if (Single) {
+      //
+      // Only single entry in the NotifyList.
+      //
+      break;
+    } else if ((NotifyList->Flags & EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST) ==
+               EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST) {
+      //
+      // Continue until the end of the Notify List.
+      //
       break;
     }
     //
-    // Go the next descriptor. Remember the NotifyList moves down.
+    // Go to the next descriptor.
     //
     NotifyList++;
-    Index--;
   }
 
   //
-  // If there is Dispatch Notify PPI installed put them on the bottom
+  // Process any callback level notifies for all previously installed PPIs.
   //
-  if (NotifyDispatchCount > 0) {
-    for (NotifyIndex = LastCallbackNotify; NotifyIndex > PrivateData->PpiData.NotifyListEnd; NotifyIndex--) {
-      if ((PrivateData->PpiData.PpiListPtrs[NotifyIndex].Notify->Flags & EFI_PEI_PPI_DESCRIPTOR_NOTIFY_DISPATCH) != 0) {
-        NotifyPtr = PrivateData->PpiData.PpiListPtrs[NotifyIndex].Notify;
-
-        for (Index = NotifyIndex; Index < PrivateData->PpiData.DispatchListEnd; Index++){
-          PrivateData->PpiData.PpiListPtrs[Index].Notify = PrivateData->PpiData.PpiListPtrs[Index + 1].Notify;
-        }
-        PrivateData->PpiData.PpiListPtrs[Index].Notify = NotifyPtr;
-        PrivateData->PpiData.DispatchListEnd--;
-      }
-    }
-
-    LastCallbackNotify -= NotifyDispatchCount;
-  }
-
-  //
-  // Dispatch any callback level notifies for all previously installed PPIs.
-  //
-  DispatchNotify (
+  ProcessNotify (
     PrivateData,
     EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK,
     0,
-    PrivateData->PpiData.PpiListEnd,
-    LastCallbackNotify,
-    PrivateData->PpiData.NotifyListEnd
+    PrivateData->PpiData.PpiList.CurrentCount,
+    LastCallbackNotifyCount,
+    CallbackNotifyListPointer->CurrentCount
     );
 
   return  EFI_SUCCESS;
 }
 
+/**
+
+  This function installs a notification service to be called back when a given
+  interface is installed or reinstalled. The purpose of the service is to publish
+  an interface that other parties can use to call additional PPIs that may materialize later.
+
+  @param PeiServices        An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
+  @param NotifyList         Pointer to list of Descriptors to notify upon.
+
+  @retval EFI_SUCCESS           if successful
+  @retval EFI_OUT_OF_RESOURCES  if no space in the database
+  @retval EFI_INVALID_PARAMETER if not a good descriptor
+
+**/
+EFI_STATUS
+EFIAPI
+PeiNotifyPpi (
+  IN CONST EFI_PEI_SERVICES           **PeiServices,
+  IN CONST EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyList
+  )
+{
+  return InternalPeiNotifyPpi (PeiServices, NotifyList, FALSE);
+}
 
 /**
 
@@ -528,55 +653,56 @@ PeiNotifyPpi (
 
 **/
 VOID
-ProcessNotifyList (
+ProcessDispatchNotifyList (
   IN PEI_CORE_INSTANCE  *PrivateData
   )
 {
-  INTN                    TempValue;
+  UINTN                 TempValue;
 
   while (TRUE) {
     //
     // Check if the PEIM that was just dispatched resulted in any
     // Notifies getting installed.  If so, go process any dispatch
-    // level Notifies that match the previouly installed PPIs.
-    // Use "while" instead of "if" since DispatchNotify can modify
-    // DispatchListEnd (with NotifyPpi) so we have to iterate until the same.
+    // level Notifies that match the previously installed PPIs.
+    // Use "while" instead of "if" since ProcessNotify can modify
+    // DispatchNotifyList.CurrentCount (with NotifyPpi) so we have
+    // to iterate until the same.
     //
-    while (PrivateData->PpiData.LastDispatchedNotify != PrivateData->PpiData.DispatchListEnd) {
-      TempValue = PrivateData->PpiData.DispatchListEnd;
-      DispatchNotify (
+    while (PrivateData->PpiData.DispatchNotifyList.LastDispatchedCount != PrivateData->PpiData.DispatchNotifyList.CurrentCount) {
+      TempValue = PrivateData->PpiData.DispatchNotifyList.CurrentCount;
+      ProcessNotify (
         PrivateData,
         EFI_PEI_PPI_DESCRIPTOR_NOTIFY_DISPATCH,
         0,
-        PrivateData->PpiData.LastDispatchedInstall,
-        PrivateData->PpiData.LastDispatchedNotify,
-        PrivateData->PpiData.DispatchListEnd
+        PrivateData->PpiData.PpiList.LastDispatchedCount,
+        PrivateData->PpiData.DispatchNotifyList.LastDispatchedCount,
+        PrivateData->PpiData.DispatchNotifyList.CurrentCount
         );
-      PrivateData->PpiData.LastDispatchedNotify = TempValue;
+      PrivateData->PpiData.DispatchNotifyList.LastDispatchedCount = TempValue;
     }
-
 
     //
     // Check if the PEIM that was just dispatched resulted in any
     // PPIs getting installed.  If so, go process any dispatch
     // level Notifies that match the installed PPIs.
-    // Use "while" instead of "if" since DispatchNotify can modify
-    // PpiListEnd (with InstallPpi) so we have to iterate until the same.
+    // Use "while" instead of "if" since ProcessNotify can modify
+    // PpiList.CurrentCount (with InstallPpi) so we have to iterate
+    // until the same.
     //
-    while (PrivateData->PpiData.LastDispatchedInstall != PrivateData->PpiData.PpiListEnd) {
-      TempValue = PrivateData->PpiData.PpiListEnd;
-      DispatchNotify (
+    while (PrivateData->PpiData.PpiList.LastDispatchedCount != PrivateData->PpiData.PpiList.CurrentCount) {
+      TempValue = PrivateData->PpiData.PpiList.CurrentCount;
+      ProcessNotify (
         PrivateData,
         EFI_PEI_PPI_DESCRIPTOR_NOTIFY_DISPATCH,
-        PrivateData->PpiData.LastDispatchedInstall,
-        PrivateData->PpiData.PpiListEnd,
-        PcdGet32 (PcdPeiCoreMaxPpiSupported)-1,
-        PrivateData->PpiData.DispatchListEnd
+        PrivateData->PpiData.PpiList.LastDispatchedCount,
+        PrivateData->PpiData.PpiList.CurrentCount,
+        0,
+        PrivateData->PpiData.DispatchNotifyList.LastDispatchedCount
         );
-      PrivateData->PpiData.LastDispatchedInstall = TempValue;
+      PrivateData->PpiData.PpiList.LastDispatchedCount = TempValue;
     }
 
-    if (PrivateData->PpiData.LastDispatchedNotify == PrivateData->PpiData.DispatchListEnd) {
+    if (PrivateData->PpiData.DispatchNotifyList.LastDispatchedCount == PrivateData->PpiData.DispatchNotifyList.CurrentCount) {
       break;
     }
   }
@@ -585,7 +711,7 @@ ProcessNotifyList (
 
 /**
 
-  Dispatch notifications.
+  Process notifications.
 
   @param PrivateData        PeiCore's private data structure
   @param NotifyType         Type of notify to fire.
@@ -596,7 +722,7 @@ ProcessNotifyList (
 
 **/
 VOID
-DispatchNotify (
+ProcessNotify (
   IN PEI_CORE_INSTANCE  *PrivateData,
   IN UINTN               NotifyType,
   IN INTN                InstallStartIndex,
@@ -605,22 +731,23 @@ DispatchNotify (
   IN INTN                NotifyStopIndex
   )
 {
-  INTN                   Index1;
-  INTN                   Index2;
-  EFI_GUID                *SearchGuid;
-  EFI_GUID                *CheckGuid;
-  EFI_PEI_NOTIFY_DESCRIPTOR   *NotifyDescriptor;
+  INTN                          Index1;
+  INTN                          Index2;
+  EFI_GUID                      *SearchGuid;
+  EFI_GUID                      *CheckGuid;
+  EFI_PEI_NOTIFY_DESCRIPTOR     *NotifyDescriptor;
 
-  //
-  // Remember that Installs moves up and Notifies moves down.
-  //
-  for (Index1 = NotifyStartIndex; Index1 > NotifyStopIndex; Index1--) {
-    NotifyDescriptor = PrivateData->PpiData.PpiListPtrs[Index1].Notify;
+  for (Index1 = NotifyStartIndex; Index1 < NotifyStopIndex; Index1++) {
+    if (NotifyType == EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK) {
+      NotifyDescriptor = PrivateData->PpiData.CallbackNotifyList.NotifyPtrs[Index1].Notify;
+    } else {
+      NotifyDescriptor = PrivateData->PpiData.DispatchNotifyList.NotifyPtrs[Index1].Notify;
+    }
 
     CheckGuid = NotifyDescriptor->Guid;
 
     for (Index2 = InstallStartIndex; Index2 < InstallStopIndex; Index2++) {
-      SearchGuid = PrivateData->PpiData.PpiListPtrs[Index2].Ppi->Guid;
+      SearchGuid = PrivateData->PpiData.PpiList.PpiPtrs[Index2].Ppi->Guid;
       //
       // Don't use CompareGuid function here for performance reasons.
       // Instead we compare the GUID as INT32 at a time and branch
@@ -637,9 +764,68 @@ DispatchNotify (
         NotifyDescriptor->Notify (
                             (EFI_PEI_SERVICES **) GetPeiServicesTablePointer (),
                             NotifyDescriptor,
-                            (PrivateData->PpiData.PpiListPtrs[Index2].Ppi)->Ppi
+                            (PrivateData->PpiData.PpiList.PpiPtrs[Index2].Ppi)->Ppi
                             );
       }
+    }
+  }
+}
+
+/**
+  Process PpiList from SEC phase.
+
+  @param PeiServices    An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
+  @param PpiList        Points to a list of one or more PPI descriptors to be installed initially by the PEI core.
+                        These PPI's will be installed and/or immediately signaled if they are notification type.
+
+**/
+VOID
+ProcessPpiListFromSec (
+  IN CONST EFI_PEI_SERVICES         **PeiServices,
+  IN CONST EFI_PEI_PPI_DESCRIPTOR   *PpiList
+  )
+{
+  EFI_STATUS                Status;
+  EFI_SEC_HOB_DATA_PPI      *SecHobDataPpi;
+  EFI_HOB_GENERIC_HEADER    *SecHobList;
+
+  for (;;) {
+    if ((PpiList->Flags & EFI_PEI_PPI_DESCRIPTOR_NOTIFY_TYPES) != 0) {
+      //
+      // It is a notification PPI.
+      //
+      Status = InternalPeiNotifyPpi (PeiServices, (CONST EFI_PEI_NOTIFY_DESCRIPTOR *) PpiList, TRUE);
+      ASSERT_EFI_ERROR (Status);
+    } else {
+      //
+      // It is a normal PPI.
+      //
+      Status = InternalPeiInstallPpi (PeiServices, PpiList, TRUE);
+      ASSERT_EFI_ERROR (Status);
+    }
+
+    if ((PpiList->Flags & EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST) == EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST) {
+      //
+      // Continue until the end of the PPI List.
+      //
+      break;
+    }
+
+    PpiList++;
+  }
+
+  //
+  // If the EFI_SEC_HOB_DATA_PPI is in the list of PPIs passed to the PEI entry point,
+  // the PEI Foundation will call the GetHobs() member function and install all HOBs
+  // returned into the HOB list. It does this after installing all PPIs passed from SEC
+  // into the PPI database and before dispatching any PEIMs.
+  //
+  Status = PeiLocatePpi (PeiServices, &gEfiSecHobDataPpiGuid, 0, NULL, (VOID **) &SecHobDataPpi);
+  if (!EFI_ERROR (Status)) {
+    Status = SecHobDataPpi->GetHobs (SecHobDataPpi, &SecHobList);
+    if (!EFI_ERROR (Status)) {
+      Status = PeiInstallSecHobData (PeiServices, SecHobList);
+      ASSERT_EFI_ERROR (Status);
     }
   }
 }

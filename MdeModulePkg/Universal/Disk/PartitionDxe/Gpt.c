@@ -13,14 +13,9 @@
   PartitionValidGptTable(), PartitionCheckGptEntry() routine will accept disk
   partition content and validate the GPT table and GPT entry.
 
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2018 Qualcomm Datacenter Technologies, Inc.
+Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -100,7 +95,7 @@ PartitionRestoreGptTable (
 
   @param[in]    PartHeader    Partition table header structure
   @param[in]    PartEntry     The partition entry array
-  @param[out]   PEntryStatus  the partition entry status array 
+  @param[out]   PEntryStatus  the partition entry status array
                               recording the status of each partition
 
 **/
@@ -205,19 +200,20 @@ PartitionInstallGptChildHandles (
   IN  EFI_DEVICE_PATH_PROTOCOL     *DevicePath
   )
 {
-  EFI_STATUS                  Status;
-  UINT32                      BlockSize;
-  EFI_LBA                     LastBlock;
-  MASTER_BOOT_RECORD          *ProtectiveMbr;
-  EFI_PARTITION_TABLE_HEADER  *PrimaryHeader;
-  EFI_PARTITION_TABLE_HEADER  *BackupHeader;
-  EFI_PARTITION_ENTRY         *PartEntry;
-  EFI_PARTITION_ENTRY         *Entry;
-  EFI_PARTITION_ENTRY_STATUS  *PEntryStatus;
-  UINTN                       Index;
-  EFI_STATUS                  GptValidStatus;
-  HARDDRIVE_DEVICE_PATH       HdDev;
-  UINT32                      MediaId;
+  EFI_STATUS                   Status;
+  UINT32                       BlockSize;
+  EFI_LBA                      LastBlock;
+  MASTER_BOOT_RECORD           *ProtectiveMbr;
+  EFI_PARTITION_TABLE_HEADER   *PrimaryHeader;
+  EFI_PARTITION_TABLE_HEADER   *BackupHeader;
+  EFI_PARTITION_ENTRY          *PartEntry;
+  EFI_PARTITION_ENTRY          *Entry;
+  EFI_PARTITION_ENTRY_STATUS   *PEntryStatus;
+  UINTN                        Index;
+  EFI_STATUS                   GptValidStatus;
+  HARDDRIVE_DEVICE_PATH        HdDev;
+  UINT32                       MediaId;
+  EFI_PARTITION_INFO_PROTOCOL  PartitionInfo;
 
   ProtectiveMbr = NULL;
   PrimaryHeader = NULL;
@@ -233,6 +229,13 @@ PartitionInstallGptChildHandles (
   DEBUG ((EFI_D_INFO, " LastBlock : %lx \n", LastBlock));
 
   GptValidStatus = EFI_NOT_FOUND;
+
+  //
+  // Ensure the block size can hold the MBR
+  //
+  if (BlockSize < sizeof (MASTER_BOOT_RECORD)) {
+    return EFI_NOT_FOUND;
+  }
 
   //
   // Allocate a buffer for the Protective MBR
@@ -380,16 +383,24 @@ PartitionInstallGptChildHandles (
     }
 
     ZeroMem (&HdDev, sizeof (HdDev));
-    HdDev.Header.Type     = MEDIA_DEVICE_PATH;
-    HdDev.Header.SubType  = MEDIA_HARDDRIVE_DP;
+    HdDev.Header.Type      = MEDIA_DEVICE_PATH;
+    HdDev.Header.SubType   = MEDIA_HARDDRIVE_DP;
     SetDevicePathNodeLength (&HdDev.Header, sizeof (HdDev));
 
-    HdDev.PartitionNumber = (UINT32) Index + 1;
-    HdDev.MBRType         = MBR_TYPE_EFI_PARTITION_TABLE_HEADER;
-    HdDev.SignatureType   = SIGNATURE_TYPE_GUID;
-    HdDev.PartitionStart  = Entry->StartingLBA;
-    HdDev.PartitionSize   = Entry->EndingLBA - Entry->StartingLBA + 1;
+    HdDev.PartitionNumber  = (UINT32) Index + 1;
+    HdDev.MBRType          = MBR_TYPE_EFI_PARTITION_TABLE_HEADER;
+    HdDev.SignatureType    = SIGNATURE_TYPE_GUID;
+    HdDev.PartitionStart   = Entry->StartingLBA;
+    HdDev.PartitionSize    = Entry->EndingLBA - Entry->StartingLBA + 1;
     CopyMem (HdDev.Signature, &Entry->UniquePartitionGUID, sizeof (EFI_GUID));
+
+    ZeroMem (&PartitionInfo, sizeof (EFI_PARTITION_INFO_PROTOCOL));
+    PartitionInfo.Revision = EFI_PARTITION_INFO_PROTOCOL_REVISION;
+    PartitionInfo.Type     = PARTITION_TYPE_GPT;
+    if (CompareGuid (&Entry->PartitionTypeGUID, &gEfiPartTypeSystemPartGuid)) {
+      PartitionInfo.System = 1;
+    }
+    CopyMem (&PartitionInfo.Info.Gpt, Entry, sizeof (EFI_PARTITION_ENTRY));
 
     DEBUG ((EFI_D_INFO, " Index : %d\n", (UINT32) Index));
     DEBUG ((EFI_D_INFO, " Start LBA : %lx\n", (UINT64) HdDev.PartitionStart));
@@ -407,10 +418,11 @@ PartitionInstallGptChildHandles (
                BlockIo2,
                DevicePath,
                (EFI_DEVICE_PATH_PROTOCOL *) &HdDev,
+               &PartitionInfo,
                Entry->StartingLBA,
                Entry->EndingLBA,
                BlockSize,
-               CompareGuid(&Entry->PartitionTypeGUID, &gEfiPartTypeSystemPartGuid)
+               &Entry->PartitionTypeGUID
                );
   }
 
@@ -687,7 +699,7 @@ Done:
 
   @param[in]    PartHeader    Partition table header structure
   @param[in]    PartEntry     The partition entry array
-  @param[out]   PEntryStatus  the partition entry status array 
+  @param[out]   PEntryStatus  the partition entry status array
                               recording the status of each partition
 
 **/
@@ -725,7 +737,7 @@ PartitionCheckGptEntry (
 
     if ((Entry->Attributes & BIT1) != 0) {
       //
-      // If Bit 1 is set, this indicate that this is an OS specific GUID partition. 
+      // If Bit 1 is set, this indicate that this is an OS specific GUID partition.
       //
       PEntryStatus[Index1].OsSpecific = TRUE;
     }

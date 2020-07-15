@@ -12,15 +12,9 @@
   from the UEFI shell. It is entirely read-only.
 
 Copyright (c) 2014, ARM Limited. All rights reserved.
-Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
 
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -562,7 +556,8 @@ FvSimpleFileSystemOpen (
       // No, there was no extension. So add one and search again for the file
       // NewFileNameLength = FileNameLength + 1 + 4 = (Number of non-null character) + (file extension) + (a null character)
       NewFileNameLength = FileNameLength + 1 + 4;
-      FileNameWithExtension = AllocateCopyPool (NewFileNameLength * 2, FileName);
+      FileNameWithExtension = AllocatePool (NewFileNameLength * 2);
+      StrCpyS (FileNameWithExtension, NewFileNameLength, FileName);
       StrCatS (FileNameWithExtension, NewFileNameLength, L".EFI");
 
       for (FvFileInfoLink = GetFirstNode (&Instance->FileInfoHead);
@@ -703,6 +698,7 @@ FvSimpleFileSystemRead (
 
     Status = FvFsReadFile (File->Instance->FvProtocol, File->FvFileInfo, &FileSize, &FileBuffer);
     if (EFI_ERROR (Status)) {
+      FreePool (FileBuffer);
       return EFI_DEVICE_ERROR;
     }
 
@@ -712,6 +708,8 @@ FvSimpleFileSystemRead (
 
     CopyMem (Buffer, (UINT8*)FileBuffer + File->Position, *BufferSize);
     File->Position += *BufferSize;
+
+    FreePool (FileBuffer);
 
     return EFI_SUCCESS;
   }
@@ -825,7 +823,7 @@ FvSimpleFileSystemSetPosition (
     // Reset directory position to first entry
     //
     if (File->DirReadNext) {
-      File->DirReadNext = FVFS_GET_FIRST_FILE_INFO (Instance); 
+      File->DirReadNext = FVFS_GET_FIRST_FILE_INFO (Instance);
     }
   } else if (Position == 0xFFFFFFFFFFFFFFFFull) {
     File->Position = File->FvFileInfo->FileInfo.FileSize;
@@ -941,9 +939,9 @@ FvSimpleFileSystemGetInfo (
     FsInfoOut = (EFI_FILE_SYSTEM_INFO *) Buffer;
 
     CopyMem (FsInfoOut, &mFsInfoTemplate, sizeof (EFI_FILE_SYSTEM_INFO));
-    Status = StrnCpyS ( FsInfoOut->VolumeLabel, 
-                        (*BufferSize - OFFSET_OF (EFI_FILE_SYSTEM_INFO, VolumeLabel)) / sizeof (CHAR16), 
-                        Instance->VolumeLabel, 
+    Status = StrnCpyS ( FsInfoOut->VolumeLabel,
+                        (*BufferSize - OFFSET_OF (EFI_FILE_SYSTEM_INFO, VolumeLabel)) / sizeof (CHAR16),
+                        Instance->VolumeLabel,
                         StrLen (Instance->VolumeLabel)
                         );
     ASSERT_EFI_ERROR (Status);
@@ -966,9 +964,9 @@ FvSimpleFileSystemGetInfo (
     }
 
     FsVolumeLabel = (EFI_FILE_SYSTEM_VOLUME_LABEL*) Buffer;
-    Status        = StrnCpyS (FsVolumeLabel->VolumeLabel, 
+    Status        = StrnCpyS (FsVolumeLabel->VolumeLabel,
                               (*BufferSize - OFFSET_OF (EFI_FILE_SYSTEM_VOLUME_LABEL, VolumeLabel)) / sizeof (CHAR16),
-                              Instance->VolumeLabel, 
+                              Instance->VolumeLabel,
                               StrLen (Instance->VolumeLabel)
                               );
     ASSERT_EFI_ERROR (Status);
@@ -1021,7 +1019,7 @@ FvSimpleFileSystemSetInfo (
   IN VOID                     *Buffer
   )
 {
-  if (CompareGuid (InformationType, &gEfiFileSystemInfoGuid) || 
+  if (CompareGuid (InformationType, &gEfiFileSystemInfoGuid) ||
       CompareGuid (InformationType, &gEfiFileInfoGuid) ||
       CompareGuid (InformationType, &gEfiFileSystemVolumeLabelInfoIdGuid)) {
     return EFI_WRITE_PROTECTED;

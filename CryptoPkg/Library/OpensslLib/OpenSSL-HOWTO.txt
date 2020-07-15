@@ -1,0 +1,39 @@
+
+=============================================================================
+                             Introduction
+=============================================================================
+  OpenSSL is a well-known open source implementation of SSL/TLS protocols.
+The core library implements the cryptographic and SSL/TLS functions and
+also provides various utility functions. The OpenSSL library is widely used
+in variety of security products development as base crypto provider.
+(See http://www.openssl.org/ for more information about OpenSSL).
+  UEFI (Unified Extensible Firmware Interface) is a specification detailing
+the interfaces between OS and platform firmware. Several security features
+were introduced (e.g. Authenticated Variable Service, Driver Signing, etc)
+from UEFI 2.2 (http://www.uefi.org/). These security features highly depend
+on the cryptography.
+  This HOWTO documents OpenSSL building under UEFI/EDKII environment.
+
+=============================================================================
+                             OpenSSL-Version
+=============================================================================
+  EDKII supports building with the latest release of OpenSSL.
+  NOTE: Only latest release version was fully validated.
+        And no guarantees on build & functionality if using other versions.
+
+=============================================================================
+                      HOW to Install OpenSSL for UEFI Building
+=============================================================================
+  OpenSSL repository was added as one submodule of EDKII project. Please
+refer to edk2/Readme.md for how to clone the code.
+
+=============================================================================
+                      About process_files.pl
+=============================================================================
+  "process_files.pl" is one Perl script which runs the OpenSSL Configure,
+then processes the resulting file list into our local OpensslLib.inf and
+OpensslLibCrypto.inf.
+  This only needs to be done once by the maintainer / developer when
+updating to a new version of OpenSSL (or changing options, etc.).
+Normal users do not need do this, since the results are already stored in
+the EDKII git repository for them.

@@ -2,15 +2,11 @@
   Implementation functions and structures for var check uefi library.
 
 Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
+
+#include <Uefi/UefiBaseType.h>
 
 #include <Library/VarCheckLib.h>
 #include <Library/BaseLib.h>
@@ -921,21 +917,17 @@ VariablePropertySetUefiDefined (
   Constructor function of VarCheckUefiLib to set property and
   register SetVariable check handler for UEFI defined variables.
 
-  @param[in] ImageHandle    The firmware allocated handle for the EFI image.
-  @param[in] SystemTable    A pointer to the EFI System Table.
-
   @retval EFI_SUCCESS       The constructor executed correctly.
 
 **/
-EFI_STATUS
+RETURN_STATUS
 EFIAPI
 VarCheckUefiLibNullClassConstructor (
-  IN EFI_HANDLE             ImageHandle,
-  IN EFI_SYSTEM_TABLE       *SystemTable
+  VOID
   )
 {
   VariablePropertySetUefiDefined ();
   VarCheckLibRegisterSetVariableCheckHandler (SetVariableCheckHandlerUefiDefined);
 
-  return EFI_SUCCESS;
+  return RETURN_SUCCESS;
 }

@@ -1,14 +1,8 @@
 /** @file
   SCSI disk driver that layers on every SCSI IO protocol in the system.
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -79,9 +73,9 @@ FreeAlignedBuffer (
 
   The user code starts with this function.
 
-  @param  ImageHandle    The firmware allocated handle for the EFI image.  
+  @param  ImageHandle    The firmware allocated handle for the EFI image.
   @param  SystemTable    A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS       The entry point is executed successfully.
   @retval other             Some error occurs when executing this entry point.
 
@@ -157,7 +151,9 @@ ScsiDiskDriverBindingSupported (
 
   Status = ScsiIo->GetDeviceType (ScsiIo, &DeviceType);
   if (!EFI_ERROR (Status)) {
-    if ((DeviceType == EFI_SCSI_TYPE_DISK) || (DeviceType == EFI_SCSI_TYPE_CDROM)) {
+    if ((DeviceType == EFI_SCSI_TYPE_DISK) ||
+        (DeviceType == EFI_SCSI_TYPE_CDROM) ||
+        (DeviceType == EFI_SCSI_TYPE_WLUN)) {
       Status = EFI_SUCCESS;
     } else {
       Status = EFI_UNSUPPORTED;
@@ -244,6 +240,8 @@ ScsiDiskDriverBindingStart (
   ScsiDiskDevice->BlkIo2.ReadBlocksEx               = ScsiDiskReadBlocksEx;
   ScsiDiskDevice->BlkIo2.WriteBlocksEx              = ScsiDiskWriteBlocksEx;
   ScsiDiskDevice->BlkIo2.FlushBlocksEx              = ScsiDiskFlushBlocksEx;
+  ScsiDiskDevice->StorageSecurity.ReceiveData       = ScsiDiskReceiveData;
+  ScsiDiskDevice->StorageSecurity.SendData          = ScsiDiskSendData;
   ScsiDiskDevice->EraseBlock.Revision               = EFI_ERASE_BLOCK_PROTOCOL_REVISION;
   ScsiDiskDevice->EraseBlock.EraseLengthGranularity = 1;
   ScsiDiskDevice->EraseBlock.EraseBlocks            = ScsiDiskEraseBlocks;
@@ -262,6 +260,10 @@ ScsiDiskDriverBindingStart (
   case EFI_SCSI_TYPE_CDROM:
     ScsiDiskDevice->BlkIo.Media->BlockSize = 0x800;
     ScsiDiskDevice->BlkIo.Media->ReadOnly  = TRUE;
+    MustReadCapacity = FALSE;
+    break;
+
+  case EFI_SCSI_TYPE_WLUN:
     MustReadCapacity = FALSE;
     break;
   }
@@ -315,8 +317,8 @@ ScsiDiskDriverBindingStart (
     // Determine if Block IO & Block IO2 should be produced on this controller
     // handle
     //
-    if (DetermineInstallBlockIo(Controller)) {
-      InitializeInstallDiskInfo(ScsiDiskDevice, Controller);
+    if (DetermineInstallBlockIo (Controller)) {
+      InitializeInstallDiskInfo (ScsiDiskDevice, Controller);
       Status = gBS->InstallMultipleProtocolInterfaces (
                       &Controller,
                       &gEfiBlockIoProtocolGuid,
@@ -327,16 +329,27 @@ ScsiDiskDriverBindingStart (
                       &ScsiDiskDevice->DiskInfo,
                       NULL
                       );
-      if (!EFI_ERROR(Status)) {
-        if (DetermineInstallEraseBlock(ScsiDiskDevice, Controller)) {
+      if (!EFI_ERROR (Status)) {
+        if (DetermineInstallEraseBlock (ScsiDiskDevice, Controller)) {
           Status = gBS->InstallProtocolInterface (
                           &Controller,
                           &gEfiEraseBlockProtocolGuid,
                           EFI_NATIVE_INTERFACE,
                           &ScsiDiskDevice->EraseBlock
                           );
-          if (EFI_ERROR(Status)) {
-            DEBUG ((EFI_D_ERROR, "ScsiDisk: Failed to install the Erase Block Protocol! Status = %r\n", Status));
+          if (EFI_ERROR (Status)) {
+            DEBUG ((DEBUG_ERROR, "ScsiDisk: Failed to install the Erase Block Protocol! Status = %r\n", Status));
+          }
+        }
+        if (DetermineInstallStorageSecurity (ScsiDiskDevice, Controller)) {
+          Status = gBS->InstallProtocolInterface (
+                          &Controller,
+                          &gEfiStorageSecurityCommandProtocolGuid,
+                          EFI_NATIVE_INTERFACE,
+                          &ScsiDiskDevice->StorageSecurity
+                          );
+          if (EFI_ERROR (Status)) {
+            DEBUG ((DEBUG_ERROR, "ScsiDisk: Failed to install the Storage Security Command Protocol! Status = %r\n", Status));
           }
         }
         ScsiDiskDevice->ControllerNameTable = NULL;
@@ -356,7 +369,7 @@ ScsiDiskDriverBindingStart (
           );
         return EFI_SUCCESS;
       }
-    } 
+    }
   }
 
   gBS->FreePool (ScsiDiskDevice->SenseData);
@@ -368,7 +381,7 @@ ScsiDiskDriverBindingStart (
          Controller
          );
   return Status;
-  
+
 }
 
 
@@ -380,7 +393,7 @@ ScsiDiskDriverBindingStart (
   restrictions for this service. DisconnectController() must follow these
   calling restrictions. If any other agent wishes to call Stop() it must
   also follow these calling restrictions.
-  
+
   @param  This              Protocol instance pointer.
   @param  ControllerHandle  Handle of device to stop driver on
   @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
@@ -568,6 +581,7 @@ ScsiDiskReadBlocks (
   MediaChange    = FALSE;
   OldTpl         = gBS->RaiseTPL (TPL_CALLBACK);
   ScsiDiskDevice = SCSI_DISK_DEV_FROM_BLKIO (This);
+  Media          = ScsiDiskDevice->BlkIo.Media;
 
   if (!IS_DEVICE_FIXED(ScsiDiskDevice)) {
 
@@ -590,7 +604,7 @@ ScsiDiskReadBlocks (
              &ScsiDiskDevice->BlkIo2,
              &ScsiDiskDevice->BlkIo2
              );
-      if (DetermineInstallEraseBlock(ScsiDiskDevice, ScsiDiskDevice->Handle)) {
+      if (DetermineInstallEraseBlock (ScsiDiskDevice, ScsiDiskDevice->Handle)) {
         gBS->ReinstallProtocolInterface (
                ScsiDiskDevice->Handle,
                &gEfiEraseBlockProtocolGuid,
@@ -598,15 +612,31 @@ ScsiDiskReadBlocks (
                &ScsiDiskDevice->EraseBlock
                );
       }
-      Status = EFI_MEDIA_CHANGED;
+      if (DetermineInstallStorageSecurity (ScsiDiskDevice, ScsiDiskDevice->Handle)) {
+        gBS->ReinstallProtocolInterface (
+                ScsiDiskDevice->Handle,
+                &gEfiStorageSecurityCommandProtocolGuid,
+                &ScsiDiskDevice->StorageSecurity,
+                &ScsiDiskDevice->StorageSecurity
+                );
+      }
+      if (Media->MediaPresent) {
+        Status = EFI_MEDIA_CHANGED;
+      } else {
+        Status = EFI_NO_MEDIA;
+      }
       goto Done;
     }
   }
   //
   // Get the intrinsic block size
   //
-  Media           = ScsiDiskDevice->BlkIo.Media;
   BlockSize       = Media->BlockSize;
+
+  if (BlockSize == 0) {
+    Status = EFI_DEVICE_ERROR;
+    goto Done;
+  }
 
   NumberOfBlocks  = BufferSize / BlockSize;
 
@@ -674,7 +704,7 @@ Done:
   @retval EFI_WRITE_PROTECTED   The device can not be written to.
   @retval EFI_DEVICE_ERROR      Fail to detect media.
   @retval EFI_NO_MEDIA          Media is not present.
-  @retval EFI_MEDIA_CHNAGED     Media has changed.
+  @retval EFI_MEDIA_CHANGED     Media has changed.
   @retval EFI_BAD_BUFFER_SIZE   The Buffer was not a multiple of the block size of the device.
   @retval EFI_INVALID_PARAMETER Invalid parameter passed in.
 
@@ -700,6 +730,7 @@ ScsiDiskWriteBlocks (
   MediaChange    = FALSE;
   OldTpl         = gBS->RaiseTPL (TPL_CALLBACK);
   ScsiDiskDevice = SCSI_DISK_DEV_FROM_BLKIO (This);
+  Media          = ScsiDiskDevice->BlkIo.Media;
 
   if (!IS_DEVICE_FIXED(ScsiDiskDevice)) {
 
@@ -722,7 +753,7 @@ ScsiDiskWriteBlocks (
              &ScsiDiskDevice->BlkIo2,
              &ScsiDiskDevice->BlkIo2
              );
-      if (DetermineInstallEraseBlock(ScsiDiskDevice, ScsiDiskDevice->Handle)) {
+      if (DetermineInstallEraseBlock (ScsiDiskDevice, ScsiDiskDevice->Handle)) {
         gBS->ReinstallProtocolInterface (
                ScsiDiskDevice->Handle,
                &gEfiEraseBlockProtocolGuid,
@@ -730,15 +761,31 @@ ScsiDiskWriteBlocks (
                &ScsiDiskDevice->EraseBlock
                );
       }
-      Status = EFI_MEDIA_CHANGED;
+      if (DetermineInstallStorageSecurity (ScsiDiskDevice, ScsiDiskDevice->Handle)) {
+        gBS->ReinstallProtocolInterface (
+                ScsiDiskDevice->Handle,
+                &gEfiStorageSecurityCommandProtocolGuid,
+                &ScsiDiskDevice->StorageSecurity,
+                &ScsiDiskDevice->StorageSecurity
+                );
+      }
+      if (Media->MediaPresent) {
+        Status = EFI_MEDIA_CHANGED;
+      } else {
+        Status = EFI_NO_MEDIA;
+      }
       goto Done;
     }
   }
   //
   // Get the intrinsic block size
   //
-  Media           = ScsiDiskDevice->BlkIo.Media;
   BlockSize       = Media->BlockSize;
+
+  if (BlockSize == 0) {
+    Status = EFI_DEVICE_ERROR;
+    goto Done;
+  }
 
   NumberOfBlocks  = BufferSize / BlockSize;
 
@@ -922,6 +969,7 @@ ScsiDiskReadBlocksEx (
   MediaChange    = FALSE;
   OldTpl         = gBS->RaiseTPL (TPL_CALLBACK);
   ScsiDiskDevice = SCSI_DISK_DEV_FROM_BLKIO2 (This);
+  Media          = ScsiDiskDevice->BlkIo.Media;
 
   if (!IS_DEVICE_FIXED(ScsiDiskDevice)) {
 
@@ -944,7 +992,7 @@ ScsiDiskReadBlocksEx (
              &ScsiDiskDevice->BlkIo2,
              &ScsiDiskDevice->BlkIo2
              );
-      if (DetermineInstallEraseBlock(ScsiDiskDevice, ScsiDiskDevice->Handle)) {
+      if (DetermineInstallEraseBlock (ScsiDiskDevice, ScsiDiskDevice->Handle)) {
         gBS->ReinstallProtocolInterface (
                ScsiDiskDevice->Handle,
                &gEfiEraseBlockProtocolGuid,
@@ -952,15 +1000,31 @@ ScsiDiskReadBlocksEx (
                &ScsiDiskDevice->EraseBlock
                );
       }
-      Status = EFI_MEDIA_CHANGED;
+      if (DetermineInstallStorageSecurity (ScsiDiskDevice, ScsiDiskDevice->Handle)) {
+        gBS->ReinstallProtocolInterface (
+                ScsiDiskDevice->Handle,
+                &gEfiStorageSecurityCommandProtocolGuid,
+                &ScsiDiskDevice->StorageSecurity,
+                &ScsiDiskDevice->StorageSecurity
+                );
+      }
+      if (Media->MediaPresent) {
+        Status = EFI_MEDIA_CHANGED;
+      } else {
+        Status = EFI_NO_MEDIA;
+      }
       goto Done;
     }
   }
   //
   // Get the intrinsic block size
   //
-  Media           = ScsiDiskDevice->BlkIo2.Media;
   BlockSize       = Media->BlockSize;
+
+  if (BlockSize == 0) {
+    Status = EFI_DEVICE_ERROR;
+    goto Done;
+  }
 
   NumberOfBlocks  = BufferSize / BlockSize;
 
@@ -1081,6 +1145,7 @@ ScsiDiskWriteBlocksEx (
   MediaChange    = FALSE;
   OldTpl         = gBS->RaiseTPL (TPL_CALLBACK);
   ScsiDiskDevice = SCSI_DISK_DEV_FROM_BLKIO2 (This);
+  Media          = ScsiDiskDevice->BlkIo.Media;
 
   if (!IS_DEVICE_FIXED(ScsiDiskDevice)) {
 
@@ -1103,7 +1168,7 @@ ScsiDiskWriteBlocksEx (
              &ScsiDiskDevice->BlkIo2,
              &ScsiDiskDevice->BlkIo2
              );
-      if (DetermineInstallEraseBlock(ScsiDiskDevice, ScsiDiskDevice->Handle)) {
+      if (DetermineInstallEraseBlock (ScsiDiskDevice, ScsiDiskDevice->Handle)) {
         gBS->ReinstallProtocolInterface (
                ScsiDiskDevice->Handle,
                &gEfiEraseBlockProtocolGuid,
@@ -1111,15 +1176,31 @@ ScsiDiskWriteBlocksEx (
                &ScsiDiskDevice->EraseBlock
                );
       }
-      Status = EFI_MEDIA_CHANGED;
+      if (DetermineInstallStorageSecurity (ScsiDiskDevice, ScsiDiskDevice->Handle)) {
+        gBS->ReinstallProtocolInterface (
+                ScsiDiskDevice->Handle,
+                &gEfiStorageSecurityCommandProtocolGuid,
+                &ScsiDiskDevice->StorageSecurity,
+                &ScsiDiskDevice->StorageSecurity
+                );
+      }
+      if (Media->MediaPresent) {
+        Status = EFI_MEDIA_CHANGED;
+      } else {
+        Status = EFI_NO_MEDIA;
+      }
       goto Done;
     }
   }
   //
   // Get the intrinsic block size
   //
-  Media           = ScsiDiskDevice->BlkIo2.Media;
   BlockSize       = Media->BlockSize;
+
+  if (BlockSize == 0) {
+    Status = EFI_DEVICE_ERROR;
+    goto Done;
+  }
 
   NumberOfBlocks  = BufferSize / BlockSize;
 
@@ -1230,6 +1311,7 @@ ScsiDiskFlushBlocksEx (
   MediaChange    = FALSE;
   OldTpl         = gBS->RaiseTPL (TPL_CALLBACK);
   ScsiDiskDevice = SCSI_DISK_DEV_FROM_BLKIO2 (This);
+  Media          = ScsiDiskDevice->BlkIo.Media;
 
   if (!IS_DEVICE_FIXED(ScsiDiskDevice)) {
 
@@ -1252,7 +1334,7 @@ ScsiDiskFlushBlocksEx (
              &ScsiDiskDevice->BlkIo2,
              &ScsiDiskDevice->BlkIo2
              );
-      if (DetermineInstallEraseBlock(ScsiDiskDevice, ScsiDiskDevice->Handle)) {
+      if (DetermineInstallEraseBlock (ScsiDiskDevice, ScsiDiskDevice->Handle)) {
         gBS->ReinstallProtocolInterface (
                ScsiDiskDevice->Handle,
                &gEfiEraseBlockProtocolGuid,
@@ -1260,12 +1342,22 @@ ScsiDiskFlushBlocksEx (
                &ScsiDiskDevice->EraseBlock
                );
       }
-      Status = EFI_MEDIA_CHANGED;
+      if (DetermineInstallStorageSecurity (ScsiDiskDevice, ScsiDiskDevice->Handle)) {
+        gBS->ReinstallProtocolInterface (
+                ScsiDiskDevice->Handle,
+                &gEfiStorageSecurityCommandProtocolGuid,
+                &ScsiDiskDevice->StorageSecurity,
+                &ScsiDiskDevice->StorageSecurity
+                );
+      }
+      if (Media->MediaPresent) {
+        Status = EFI_MEDIA_CHANGED;
+      } else {
+        Status = EFI_NO_MEDIA;
+      }
       goto Done;
     }
   }
-
-  Media = ScsiDiskDevice->BlkIo2.Media;
 
   if (!(Media->MediaPresent)) {
     Status = EFI_NO_MEDIA;
@@ -1631,13 +1723,21 @@ ScsiDiskEraseBlocks (
              &ScsiDiskDevice->BlkIo2,
              &ScsiDiskDevice->BlkIo2
              );
-      if (DetermineInstallEraseBlock(ScsiDiskDevice, ScsiDiskDevice->Handle)) {
+      if (DetermineInstallEraseBlock (ScsiDiskDevice, ScsiDiskDevice->Handle)) {
         gBS->ReinstallProtocolInterface (
                ScsiDiskDevice->Handle,
                &gEfiEraseBlockProtocolGuid,
                &ScsiDiskDevice->EraseBlock,
                &ScsiDiskDevice->EraseBlock
                );
+      }
+      if (DetermineInstallStorageSecurity (ScsiDiskDevice, ScsiDiskDevice->Handle)) {
+        gBS->ReinstallProtocolInterface (
+                ScsiDiskDevice->Handle,
+                &gEfiStorageSecurityCommandProtocolGuid,
+                &ScsiDiskDevice->StorageSecurity,
+                &ScsiDiskDevice->StorageSecurity
+                );
       }
       Status = EFI_MEDIA_CHANGED;
       goto Done;
@@ -1695,13 +1795,438 @@ Done:
   return Status;
 }
 
+/**
+  Send a security protocol command to a device that receives data and/or the result
+  of one or more commands sent by SendData.
+
+  The ReceiveData function sends a security protocol command to the given MediaId.
+  The security protocol command sent is defined by SecurityProtocolId and contains
+  the security protocol specific data SecurityProtocolSpecificData. The function
+  returns the data from the security protocol command in PayloadBuffer.
+
+  For devices supporting the SCSI command set, the security protocol command is sent
+  using the SECURITY PROTOCOL IN command defined in SPC-4.
+
+  If PayloadBufferSize is too small to store the available data from the security
+  protocol command, the function shall copy PayloadBufferSize bytes into the
+  PayloadBuffer and return EFI_WARN_BUFFER_TOO_SMALL.
+
+  If PayloadBuffer or PayloadTransferSize is NULL and PayloadBufferSize is non-zero,
+  the function shall return EFI_INVALID_PARAMETER.
+
+  If the given MediaId does not support security protocol commands, the function shall
+  return EFI_UNSUPPORTED. If there is no media in the device, the function returns
+  EFI_NO_MEDIA. If the MediaId is not the ID for the current media in the device,
+  the function returns EFI_MEDIA_CHANGED.
+
+  If the security protocol fails to complete within the Timeout period, the function
+  shall return EFI_TIMEOUT.
+
+  If the security protocol command completes without an error, the function shall
+  return EFI_SUCCESS. If the security protocol command completes with an error, the
+  function shall return EFI_DEVICE_ERROR.
+
+  @param  This                         Indicates a pointer to the calling context.
+  @param  MediaId                      ID of the medium to receive data from.
+  @param  Timeout                      The timeout, in 100ns units, to use for the execution
+                                       of the security protocol command. A Timeout value of 0
+                                       means that this function will wait indefinitely for the
+                                       security protocol command to execute. If Timeout is greater
+                                       than zero, then this function will return EFI_TIMEOUT if the
+                                       time required to execute the receive data command is greater than Timeout.
+  @param  SecurityProtocolId           The value of the "Security Protocol" parameter of
+                                       the security protocol command to be sent.
+  @param  SecurityProtocolSpecificData The value of the "Security Protocol Specific" parameter
+                                       of the security protocol command to be sent.
+  @param  PayloadBufferSize            Size in bytes of the payload data buffer.
+  @param  PayloadBuffer                A pointer to a destination buffer to store the security
+                                       protocol command specific payload data for the security
+                                       protocol command. The caller is responsible for having
+                                       either implicit or explicit ownership of the buffer.
+  @param  PayloadTransferSize          A pointer to a buffer to store the size in bytes of the
+                                       data written to the payload data buffer.
+
+  @retval EFI_SUCCESS                  The security protocol command completed successfully.
+  @retval EFI_WARN_BUFFER_TOO_SMALL    The PayloadBufferSize was too small to store the available
+                                       data from the device. The PayloadBuffer contains the truncated data.
+  @retval EFI_UNSUPPORTED              The given MediaId does not support security protocol commands.
+  @retval EFI_DEVICE_ERROR             The security protocol command completed with an error.
+  @retval EFI_NO_MEDIA                 There is no media in the device.
+  @retval EFI_MEDIA_CHANGED            The MediaId is not for the current media.
+  @retval EFI_INVALID_PARAMETER        The PayloadBuffer or PayloadTransferSize is NULL and
+                                       PayloadBufferSize is non-zero.
+  @retval EFI_TIMEOUT                  A timeout occurred while waiting for the security
+                                       protocol command to execute.
+
+**/
+EFI_STATUS
+EFIAPI
+ScsiDiskReceiveData (
+  IN EFI_STORAGE_SECURITY_COMMAND_PROTOCOL    *This,
+  IN UINT32                                   MediaId   OPTIONAL,
+  IN UINT64                                   Timeout,
+  IN UINT8                                    SecurityProtocolId,
+  IN UINT16                                   SecurityProtocolSpecificData,
+  IN UINTN                                    PayloadBufferSize,
+  OUT VOID                                    *PayloadBuffer,
+  OUT UINTN                                   *PayloadTransferSize
+  )
+{
+  SCSI_DISK_DEV       *ScsiDiskDevice;
+  EFI_BLOCK_IO_MEDIA  *Media;
+  EFI_STATUS          Status;
+  BOOLEAN             MediaChange;
+  EFI_TPL             OldTpl;
+  UINT8               SenseDataLength;
+  UINT8               HostAdapterStatus;
+  UINT8               TargetStatus;
+  VOID                *AlignedBuffer;
+  BOOLEAN             AlignedBufferAllocated;
+
+  AlignedBuffer           = NULL;
+  MediaChange             = FALSE;
+  AlignedBufferAllocated  = FALSE;
+  OldTpl                  = gBS->RaiseTPL (TPL_CALLBACK);
+  ScsiDiskDevice          = SCSI_DISK_DEV_FROM_STORSEC (This);
+  Media                   = ScsiDiskDevice->BlkIo.Media;
+
+  SenseDataLength = (UINT8) (ScsiDiskDevice->SenseDataNumber * sizeof (EFI_SCSI_SENSE_DATA));
+
+  if (!IS_DEVICE_FIXED (ScsiDiskDevice)) {
+    Status = ScsiDiskDetectMedia (ScsiDiskDevice, FALSE, &MediaChange);
+    if (EFI_ERROR (Status)) {
+      Status = EFI_DEVICE_ERROR;
+      goto Done;
+    }
+
+    if (MediaChange) {
+      gBS->ReinstallProtocolInterface (
+            ScsiDiskDevice->Handle,
+            &gEfiBlockIoProtocolGuid,
+            &ScsiDiskDevice->BlkIo,
+            &ScsiDiskDevice->BlkIo
+            );
+      gBS->ReinstallProtocolInterface (
+             ScsiDiskDevice->Handle,
+             &gEfiBlockIo2ProtocolGuid,
+             &ScsiDiskDevice->BlkIo2,
+             &ScsiDiskDevice->BlkIo2
+             );
+      if (DetermineInstallEraseBlock (ScsiDiskDevice, ScsiDiskDevice->Handle)) {
+        gBS->ReinstallProtocolInterface (
+               ScsiDiskDevice->Handle,
+               &gEfiEraseBlockProtocolGuid,
+               &ScsiDiskDevice->EraseBlock,
+               &ScsiDiskDevice->EraseBlock
+               );
+      }
+      if (DetermineInstallStorageSecurity (ScsiDiskDevice, ScsiDiskDevice->Handle)) {
+        gBS->ReinstallProtocolInterface (
+                ScsiDiskDevice->Handle,
+                &gEfiStorageSecurityCommandProtocolGuid,
+                &ScsiDiskDevice->StorageSecurity,
+                &ScsiDiskDevice->StorageSecurity
+                );
+      }
+      if (Media->MediaPresent) {
+        Status = EFI_MEDIA_CHANGED;
+      } else {
+        Status = EFI_NO_MEDIA;
+      }
+      goto Done;
+    }
+  }
+
+  //
+  // Validate Media
+  //
+  if (!(Media->MediaPresent)) {
+    Status = EFI_NO_MEDIA;
+    goto Done;
+  }
+
+  if ((MediaId != 0) && (MediaId != Media->MediaId)) {
+    Status = EFI_MEDIA_CHANGED;
+    goto Done;
+  }
+
+  if (PayloadBufferSize != 0) {
+    if ((PayloadBuffer == NULL) || (PayloadTransferSize == NULL)) {
+      Status = EFI_INVALID_PARAMETER;
+      goto Done;
+    }
+
+    if ((ScsiDiskDevice->ScsiIo->IoAlign > 1) && !IS_ALIGNED (PayloadBuffer, ScsiDiskDevice->ScsiIo->IoAlign)) {
+      AlignedBuffer = AllocateAlignedBuffer (ScsiDiskDevice, PayloadBufferSize);
+      if (AlignedBuffer == NULL) {
+        Status = EFI_OUT_OF_RESOURCES;
+        goto Done;
+      }
+      ZeroMem (AlignedBuffer, PayloadBufferSize);
+      AlignedBufferAllocated = TRUE;
+    } else {
+      AlignedBuffer = PayloadBuffer;
+    }
+  }
+
+  Status = ScsiSecurityProtocolInCommand (
+            ScsiDiskDevice->ScsiIo,
+            Timeout,
+            ScsiDiskDevice->SenseData,
+            &SenseDataLength,
+            &HostAdapterStatus,
+            &TargetStatus,
+            SecurityProtocolId,
+            SecurityProtocolSpecificData,
+            FALSE,
+            PayloadBufferSize,
+            AlignedBuffer,
+            PayloadTransferSize
+          );
+  if (EFI_ERROR (Status)) {
+    goto Done;
+  }
+
+  if (AlignedBufferAllocated) {
+    CopyMem (PayloadBuffer, AlignedBuffer, PayloadBufferSize);
+  }
+
+  if (PayloadBufferSize < *PayloadTransferSize) {
+    Status = EFI_WARN_BUFFER_TOO_SMALL;
+    goto Done;
+  }
+
+  Status = CheckHostAdapterStatus (HostAdapterStatus);
+  if (EFI_ERROR (Status)) {
+    goto Done;
+  }
+
+  Status = CheckTargetStatus (TargetStatus);
+  if (EFI_ERROR (Status)) {
+    goto Done;
+  }
+
+Done:
+  if (AlignedBufferAllocated) {
+    ZeroMem (AlignedBuffer, PayloadBufferSize);
+    FreeAlignedBuffer (AlignedBuffer, PayloadBufferSize);
+  }
+  gBS->RestoreTPL (OldTpl);
+  return Status;
+}
+
+/**
+  Send a security protocol command to a device.
+
+  The SendData function sends a security protocol command containing the payload
+  PayloadBuffer to the given MediaId. The security protocol command sent is
+  defined by SecurityProtocolId and contains the security protocol specific data
+  SecurityProtocolSpecificData. If the underlying protocol command requires a
+  specific padding for the command payload, the SendData function shall add padding
+  bytes to the command payload to satisfy the padding requirements.
+
+  For devices supporting the SCSI command set, the security protocol command is sent
+  using the SECURITY PROTOCOL OUT command defined in SPC-4.
+
+  If PayloadBuffer is NULL and PayloadBufferSize is non-zero, the function shall
+  return EFI_INVALID_PARAMETER.
+
+  If the given MediaId does not support security protocol commands, the function
+  shall return EFI_UNSUPPORTED. If there is no media in the device, the function
+  returns EFI_NO_MEDIA. If the MediaId is not the ID for the current media in the
+  device, the function returns EFI_MEDIA_CHANGED.
+
+  If the security protocol fails to complete within the Timeout period, the function
+  shall return EFI_TIMEOUT.
+
+  If the security protocol command completes without an error, the function shall return
+  EFI_SUCCESS. If the security protocol command completes with an error, the function
+  shall return EFI_DEVICE_ERROR.
+
+  @param  This                         Indicates a pointer to the calling context.
+  @param  MediaId                      ID of the medium to receive data from.
+  @param  Timeout                      The timeout, in 100ns units, to use for the execution
+                                       of the security protocol command. A Timeout value of 0
+                                       means that this function will wait indefinitely for the
+                                       security protocol command to execute. If Timeout is greater
+                                       than zero, then this function will return EFI_TIMEOUT if the
+                                       time required to execute the receive data command is greater than Timeout.
+  @param  SecurityProtocolId           The value of the "Security Protocol" parameter of
+                                       the security protocol command to be sent.
+  @param  SecurityProtocolSpecificData The value of the "Security Protocol Specific" parameter
+                                       of the security protocol command to be sent.
+  @param  PayloadBufferSize            Size in bytes of the payload data buffer.
+  @param  PayloadBuffer                A pointer to a destination buffer to store the security
+                                       protocol command specific payload data for the security
+                                       protocol command.
+
+  @retval EFI_SUCCESS                  The security protocol command completed successfully.
+  @retval EFI_UNSUPPORTED              The given MediaId does not support security protocol commands.
+  @retval EFI_DEVICE_ERROR             The security protocol command completed with an error.
+  @retval EFI_NO_MEDIA                 There is no media in the device.
+  @retval EFI_MEDIA_CHANGED            The MediaId is not for the current media.
+  @retval EFI_INVALID_PARAMETER        The PayloadBuffer is NULL and PayloadBufferSize is non-zero.
+  @retval EFI_TIMEOUT                  A timeout occurred while waiting for the security
+                                       protocol command to execute.
+
+**/
+EFI_STATUS
+EFIAPI
+ScsiDiskSendData (
+  IN EFI_STORAGE_SECURITY_COMMAND_PROTOCOL    *This,
+  IN UINT32                                   MediaId   OPTIONAL,
+  IN UINT64                                   Timeout,
+  IN UINT8                                    SecurityProtocolId,
+  IN UINT16                                   SecurityProtocolSpecificData,
+  IN UINTN                                    PayloadBufferSize,
+  OUT VOID                                    *PayloadBuffer
+  )
+{
+  SCSI_DISK_DEV       *ScsiDiskDevice;
+  EFI_BLOCK_IO_MEDIA  *Media;
+  EFI_STATUS          Status;
+  BOOLEAN             MediaChange;
+  EFI_TPL             OldTpl;
+  UINT8               SenseDataLength;
+  UINT8               HostAdapterStatus;
+  UINT8               TargetStatus;
+  VOID                *AlignedBuffer;
+  BOOLEAN             AlignedBufferAllocated;
+
+  AlignedBuffer           = NULL;
+  MediaChange             = FALSE;
+  AlignedBufferAllocated  = FALSE;
+  OldTpl                  = gBS->RaiseTPL (TPL_CALLBACK);
+  ScsiDiskDevice          = SCSI_DISK_DEV_FROM_STORSEC (This);
+  Media                   = ScsiDiskDevice->BlkIo.Media;
+
+  SenseDataLength = (UINT8) (ScsiDiskDevice->SenseDataNumber * sizeof (EFI_SCSI_SENSE_DATA));
+
+  if (!IS_DEVICE_FIXED (ScsiDiskDevice)) {
+    Status = ScsiDiskDetectMedia (ScsiDiskDevice, FALSE, &MediaChange);
+    if (EFI_ERROR (Status)) {
+      Status = EFI_DEVICE_ERROR;
+      goto Done;
+    }
+
+    if (MediaChange) {
+      gBS->ReinstallProtocolInterface (
+            ScsiDiskDevice->Handle,
+            &gEfiBlockIoProtocolGuid,
+            &ScsiDiskDevice->BlkIo,
+            &ScsiDiskDevice->BlkIo
+            );
+      gBS->ReinstallProtocolInterface (
+             ScsiDiskDevice->Handle,
+             &gEfiBlockIo2ProtocolGuid,
+             &ScsiDiskDevice->BlkIo2,
+             &ScsiDiskDevice->BlkIo2
+             );
+      if (DetermineInstallEraseBlock (ScsiDiskDevice, ScsiDiskDevice->Handle)) {
+        gBS->ReinstallProtocolInterface (
+               ScsiDiskDevice->Handle,
+               &gEfiEraseBlockProtocolGuid,
+               &ScsiDiskDevice->EraseBlock,
+               &ScsiDiskDevice->EraseBlock
+               );
+      }
+      if (DetermineInstallStorageSecurity (ScsiDiskDevice, ScsiDiskDevice->Handle)) {
+        gBS->ReinstallProtocolInterface (
+                ScsiDiskDevice->Handle,
+                &gEfiStorageSecurityCommandProtocolGuid,
+                &ScsiDiskDevice->StorageSecurity,
+                &ScsiDiskDevice->StorageSecurity
+                );
+      }
+      if (Media->MediaPresent) {
+        Status = EFI_MEDIA_CHANGED;
+      } else {
+        Status = EFI_NO_MEDIA;
+      }
+      goto Done;
+    }
+  }
+
+  //
+  // Validate Media
+  //
+  if (!(Media->MediaPresent)) {
+    Status = EFI_NO_MEDIA;
+    goto Done;
+  }
+
+  if ((MediaId != 0) && (MediaId != Media->MediaId)) {
+    Status = EFI_MEDIA_CHANGED;
+    goto Done;
+  }
+
+  if (Media->ReadOnly) {
+    Status = EFI_WRITE_PROTECTED;
+    goto Done;
+  }
+
+  if (PayloadBufferSize != 0) {
+    if (PayloadBuffer == NULL) {
+      Status = EFI_INVALID_PARAMETER;
+      goto Done;
+    }
+
+    if ((ScsiDiskDevice->ScsiIo->IoAlign > 1) && !IS_ALIGNED (PayloadBuffer, ScsiDiskDevice->ScsiIo->IoAlign)) {
+      AlignedBuffer = AllocateAlignedBuffer (ScsiDiskDevice, PayloadBufferSize);
+      if (AlignedBuffer == NULL) {
+        Status = EFI_OUT_OF_RESOURCES;
+        goto Done;
+      }
+      CopyMem (AlignedBuffer, PayloadBuffer, PayloadBufferSize);
+      AlignedBufferAllocated = TRUE;
+    } else {
+      AlignedBuffer = PayloadBuffer;
+    }
+  }
+
+  Status = ScsiSecurityProtocolOutCommand (
+            ScsiDiskDevice->ScsiIo,
+            Timeout,
+            ScsiDiskDevice->SenseData,
+            &SenseDataLength,
+            &HostAdapterStatus,
+            &TargetStatus,
+            SecurityProtocolId,
+            SecurityProtocolSpecificData,
+            FALSE,
+            PayloadBufferSize,
+            AlignedBuffer
+          );
+  if (EFI_ERROR (Status)) {
+    goto Done;
+  }
+
+  Status = CheckHostAdapterStatus (HostAdapterStatus);
+  if (EFI_ERROR (Status)) {
+    goto Done;
+  }
+
+  Status = CheckTargetStatus (TargetStatus);
+  if (EFI_ERROR (Status)) {
+    goto Done;
+  }
+
+Done:
+  if (AlignedBufferAllocated) {
+    ZeroMem (AlignedBuffer, PayloadBufferSize);
+    FreeAlignedBuffer (AlignedBuffer, PayloadBufferSize);
+  }
+  gBS->RestoreTPL (OldTpl);
+  return Status;
+}
+
 
 /**
   Detect Device and read out capacity ,if error occurs, parse the sense key.
 
   @param  ScsiDiskDevice    The pointer of SCSI_DISK_DEV
   @param  MustReadCapacity  The flag about reading device capacity
-  @param  MediaChange       The pointer of flag indicates if media has changed 
+  @param  MediaChange       The pointer of flag indicates if media has changed
 
   @retval EFI_DEVICE_ERROR  Indicates that error occurs
   @retval EFI_SUCCESS       Successfully to detect media
@@ -1800,6 +2325,15 @@ ScsiDiskDetectMedia (
   }
 
   //
+  // READ_CAPACITY command is not supported by any of the UFS WLUNs.
+  //
+  if (ScsiDiskDevice->DeviceType == EFI_SCSI_TYPE_WLUN) {
+    NeedReadCapacity = FALSE;
+    MustReadCapacity = FALSE;
+    ScsiDiskDevice->BlkIo.Media->MediaPresent = TRUE;
+  }
+
+  //
   // either NeedReadCapacity is TRUE, or MustReadCapacity is TRUE,
   // retrieve capacity via Read Capacity command
   //
@@ -1836,7 +2370,7 @@ ScsiDiskDetectMedia (
         } else {
           break;
         }
-      } else {   
+      } else {
         Retry++;
         if (!NeedRetry || (Retry >= MaxRetry)) {
           goto EXIT;
@@ -2040,7 +2574,7 @@ ScsiDiskInquiryDevice (
                      EFI_SCSI_PAGE_CODE_BLOCK_LIMITS_VPD
                      );
           if (!EFI_ERROR (Status)) {
-            ScsiDiskDevice->BlkIo.Media->OptimalTransferLengthGranularity = 
+            ScsiDiskDevice->BlkIo.Media->OptimalTransferLengthGranularity =
               (BlockLimits->OptimalTransferLengthGranularity2 << 8) |
                BlockLimits->OptimalTransferLengthGranularity1;
 
@@ -2092,7 +2626,7 @@ ScsiDiskInquiryDevice (
   } else if (Status == EFI_NOT_READY) {
     *NeedRetry = TRUE;
     return EFI_DEVICE_ERROR;
- 
+
   } else if ((Status == EFI_INVALID_PARAMETER) || (Status == EFI_UNSUPPORTED)) {
     *NeedRetry = FALSE;
     return EFI_DEVICE_ERROR;
@@ -2128,7 +2662,7 @@ ScsiDiskInquiryDevice (
     *NeedRetry = FALSE;
     return EFI_DEVICE_ERROR;
   }
-  
+
   //
   // if goes here, meant ScsiInquiryCommand() failed.
   // if ScsiDiskRequestSenseKeys() succeeds at last,
@@ -2284,7 +2818,7 @@ ScsiDiskTestUnitReady (
 
   @param  ScsiDiskDevice     The pointer of SCSI_DISK_DEV
   @param  SenseData          The pointer of EFI_SCSI_SENSE_DATA
-  @param  NumberOfSenseKeys  The number of sense key  
+  @param  NumberOfSenseKeys  The number of sense key
   @param  Action             The pointer of action which indicates what is need to do next
 
   @retval EFI_DEVICE_ERROR   Indicates that error occurs
@@ -2425,7 +2959,7 @@ ScsiDiskReadCapacity (
   *NeedRetry          = FALSE;
 
   //
-  // submit Read Capacity(10) Command. If it returns capacity of FFFFFFFFh, 
+  // submit Read Capacity(10) Command. If it returns capacity of FFFFFFFFh,
   // 16 byte command should be used to access large hard disk >2TB
   //
   CommandStatus = ScsiReadCapacityCommand (
@@ -2489,12 +3023,12 @@ ScsiDiskReadCapacity (
    // go ahead to check HostAdapterStatus and TargetStatus
    // (EFI_TIMEOUT, EFI_DEVICE_ERROR, EFI_WARN_BUFFER_TOO_SMALL)
    //
- 
+
    Status = CheckHostAdapterStatus (HostAdapterStatus);
    if ((Status == EFI_TIMEOUT) || (Status == EFI_NOT_READY)) {
      *NeedRetry = TRUE;
      return EFI_DEVICE_ERROR;
- 
+
    } else if (Status == EFI_DEVICE_ERROR) {
     //
     // reset the scsi channel
@@ -2517,7 +3051,7 @@ ScsiDiskReadCapacity (
     *NeedRetry = FALSE;
     return EFI_DEVICE_ERROR;
   }
-  
+
   //
   // if goes here, meant ScsiReadCapacityCommand() failed.
   // if ScsiDiskRequestSenseKeys() succeeds at last,
@@ -2597,7 +3131,7 @@ CheckHostAdapterStatus (
   @param  TargetStatus  Target status
 
   @retval EFI_NOT_READY       Device is NOT ready.
-  @retval EFI_DEVICE_ERROR 
+  @retval EFI_DEVICE_ERROR
   @retval EFI_SUCCESS
 
 **/
@@ -2632,7 +3166,7 @@ CheckTargetStatus (
 
   When encountering error during the process, if retrieve sense keys before
   error encountered, it returns the sense keys with return status set to EFI_SUCCESS,
-  and NeedRetry set to FALSE; otherwize, return the proper return status.
+  and NeedRetry set to FALSE; otherwise, return the proper return status.
 
   @param  ScsiDiskDevice     The pointer of SCSI_DISK_DEV
   @param  NeedRetry          The pointer of flag indicates if need a retry
@@ -2689,20 +3223,20 @@ ScsiDiskRequestSenseKeys (
               );
      if ((Status == EFI_SUCCESS) || (Status == EFI_WARN_BUFFER_TOO_SMALL)) {
         FallStatus = EFI_SUCCESS;
-  
+
      } else if ((Status == EFI_TIMEOUT) || (Status == EFI_NOT_READY)) {
        *NeedRetry  = TRUE;
        FallStatus  = EFI_DEVICE_ERROR;
- 
+
      } else if ((Status == EFI_INVALID_PARAMETER) || (Status == EFI_UNSUPPORTED)) {
        *NeedRetry  = FALSE;
        FallStatus  = EFI_DEVICE_ERROR;
- 
+
      } else if (Status == EFI_DEVICE_ERROR) {
         if (AskResetIfError) {
           ScsiDiskDevice->ScsiIo->ResetDevice (ScsiDiskDevice->ScsiIo);
         }
-  
+
         FallStatus = EFI_DEVICE_ERROR;
     }
 
@@ -2724,7 +3258,7 @@ ScsiDiskRequestSenseKeys (
     // no more sense key or number of sense keys exceeds predefined,
     // skip the loop.
     //
-    if ((PtrSenseData->Sense_Key == EFI_SCSI_SK_NO_SENSE) || 
+    if ((PtrSenseData->Sense_Key == EFI_SCSI_SK_NO_SENSE) ||
         (*NumberOfSenseKeys == ScsiDiskDevice->SenseDataNumber)) {
       SenseReq = FALSE;
     }
@@ -2754,13 +3288,13 @@ GetMediaInfo (
   UINT8       *Ptr;
 
   if (!ScsiDiskDevice->Cdb16Byte) {
-    ScsiDiskDevice->BlkIo.Media->LastBlock =  (Capacity10->LastLba3 << 24) |
+    ScsiDiskDevice->BlkIo.Media->LastBlock =  ((UINT32) Capacity10->LastLba3 << 24) |
                                               (Capacity10->LastLba2 << 16) |
                                               (Capacity10->LastLba1 << 8)  |
                                                Capacity10->LastLba0;
-  
+
     ScsiDiskDevice->BlkIo.Media->BlockSize = (Capacity10->BlockSize3 << 24) |
-                                             (Capacity10->BlockSize2 << 16) | 
+                                             (Capacity10->BlockSize2 << 16) |
                                              (Capacity10->BlockSize1 << 8)  |
                                               Capacity10->BlockSize0;
     ScsiDiskDevice->BlkIo.Media->LowestAlignedLba               = 0;
@@ -2780,7 +3314,7 @@ GetMediaInfo (
     *Ptr   = Capacity16->LastLba7;
 
     ScsiDiskDevice->BlkIo.Media->BlockSize = (Capacity16->BlockSize3 << 24) |
-                                             (Capacity16->BlockSize2 << 16) | 
+                                             (Capacity16->BlockSize2 << 16) |
                                              (Capacity16->BlockSize1 << 8)  |
                                               Capacity16->BlockSize0;
 
@@ -2851,7 +3385,7 @@ ScsiDiskReadSectors (
 
   BlocksRemaining   = NumberOfBlocks;
   BlockSize         = ScsiDiskDevice->BlkIo.Media->BlockSize;
-  
+
   //
   // limit the data bytes that can be transferred by one Read(10) or Read(16) Command
   //
@@ -2904,7 +3438,7 @@ ScsiDiskReadSectors (
     // As ScsiDisk and ScsiBus driver are used to manage SCSI or ATAPI devices, we have to use
     // the lowest transfer rate to calculate the possible maximum timeout value for each operation.
     // From the above table, we could know 2.1Mbytes per second is lowest one.
-    // The timout value is rounded up to nearest integar and here an additional 30s is added
+    // The timeout value is rounded up to nearest integer and here an additional 30s is added
     // to follow ATA spec in which it mentioned that the device may take up to 30s to respond
     // commands in the Standby/Idle mode.
     //
@@ -2948,7 +3482,7 @@ ScsiDiskReadSectors (
       // it is invalid to request more sectors in the CDB than the entire
       // transfer (ie. ByteCount) can carry.
       //
-      // In addition, ByteCount is only expected to go down, or stay unchaged.
+      // In addition, ByteCount is only expected to go down, or stay unchanged.
       // Therefore we don't need to update Timeout: the original timeout should
       // accommodate shorter transfers too.
       //
@@ -3069,7 +3603,7 @@ ScsiDiskWriteSectors (
     // As ScsiDisk and ScsiBus driver are used to manage SCSI or ATAPI devices, we have to use
     // the lowest transfer rate to calculate the possible maximum timeout value for each operation.
     // From the above table, we could know 2.1Mbytes per second is lowest one.
-    // The timout value is rounded up to nearest integar and here an additional 30s is added
+    // The timeout value is rounded up to nearest integer and here an additional 30s is added
     // to follow ATA spec in which it mentioned that the device may take up to 30s to respond
     // commands in the Standby/Idle mode.
     //
@@ -3095,7 +3629,7 @@ ScsiDiskWriteSectors (
                   &ByteCount,
                   Lba,
                   SectorCount
-                  );         
+                  );
         }
       if (!EFI_ERROR (Status)) {
         break;
@@ -3112,7 +3646,7 @@ ScsiDiskWriteSectors (
       // it is invalid to request more sectors in the CDB than the entire
       // transfer (ie. ByteCount) can carry.
       //
-      // In addition, ByteCount is only expected to go down, or stay unchaged.
+      // In addition, ByteCount is only expected to go down, or stay unchanged.
       // Therefore we don't need to update Timeout: the original timeout should
       // accommodate shorter transfers too.
       //
@@ -3253,7 +3787,7 @@ ScsiDiskAsyncReadSectors (
     // we have to use the lowest transfer rate to calculate the possible
     // maximum timeout value for each operation.
     // From the above table, we could know 2.1Mbytes per second is lowest one.
-    // The timout value is rounded up to nearest integar and here an additional
+    // The timeout value is rounded up to nearest integer and here an additional
     // 30s is added to follow ATA spec in which it mentioned that the device
     // may take up to 30s to respond commands in the Standby/Idle mode.
     //
@@ -3470,7 +4004,7 @@ ScsiDiskAsyncWriteSectors (
     // we have to use the lowest transfer rate to calculate the possible
     // maximum timeout value for each operation.
     // From the above table, we could know 2.1Mbytes per second is lowest one.
-    // The timout value is rounded up to nearest integar and here an additional
+    // The timeout value is rounded up to nearest integer and here an additional
     // 30s is added to follow ATA spec in which it mentioned that the device
     // may take up to 30s to respond commands in the Standby/Idle mode.
     //
@@ -3609,10 +4143,10 @@ ScsiDiskRead10 (
   UINTN       Action;
 
   //
-  // Implement a backoff algorithem to resolve some compatibility issues that
+  // Implement a backoff algorithm to resolve some compatibility issues that
   // some SCSI targets or ATAPI devices couldn't correctly response reading/writing
   // big data in a single operation.
-  // This algorithem will at first try to execute original request. If the request fails
+  // This algorithm will at first try to execute original request. If the request fails
   // with media error sense data or else, it will reduce the transfer length to half and
   // try again till the operation succeeds or fails with one sector transfer length.
   //
@@ -3734,10 +4268,10 @@ ScsiDiskWrite10 (
   UINTN       Action;
 
   //
-  // Implement a backoff algorithem to resolve some compatibility issues that
+  // Implement a backoff algorithm to resolve some compatibility issues that
   // some SCSI targets or ATAPI devices couldn't correctly response reading/writing
   // big data in a single operation.
-  // This algorithem will at first try to execute original request. If the request fails
+  // This algorithm will at first try to execute original request. If the request fails
   // with media error sense data or else, it will reduce the transfer length to half and
   // try again till the operation succeeds or fails with one sector transfer length.
   //
@@ -3857,10 +4391,10 @@ ScsiDiskRead16 (
   UINTN       Action;
 
   //
-  // Implement a backoff algorithem to resolve some compatibility issues that
+  // Implement a backoff algorithm to resolve some compatibility issues that
   // some SCSI targets or ATAPI devices couldn't correctly response reading/writing
   // big data in a single operation.
-  // This algorithem will at first try to execute original request. If the request fails
+  // This algorithm will at first try to execute original request. If the request fails
   // with media error sense data or else, it will reduce the transfer length to half and
   // try again till the operation succeeds or fails with one sector transfer length.
   //
@@ -3981,10 +4515,10 @@ ScsiDiskWrite16 (
   UINTN       Action;
 
   //
-  // Implement a backoff algorithem to resolve some compatibility issues that
+  // Implement a backoff algorithm to resolve some compatibility issues that
   // some SCSI targets or ATAPI devices couldn't correctly response reading/writing
   // big data in a single operation.
-  // This algorithem will at first try to execute original request. If the request fails
+  // This algorithm will at first try to execute original request. If the request fails
   // with media error sense data or else, it will reduce the transfer length to half and
   // try again till the operation succeeds or fails with one sector transfer length.
   //
@@ -4975,7 +5509,7 @@ ScsiDiskIsHardwareError (
   SensePtr  = SenseData;
 
   for (Index = 0; Index < SenseCounts; Index++) {
-    
+
     //
     // Sense Key is EFI_SCSI_SK_HARDWARE_ERROR (0x4)
     //
@@ -5052,7 +5586,7 @@ ScsiDiskIsResetBefore (
   SensePtr      = SenseData;
 
   for (Index = 0; Index < SenseCounts; Index++) {
-    
+
     //
     // Sense Key is EFI_SCSI_SK_UNIT_ATTENTION (0x6)
     // Additional Sense Code is EFI_SCSI_ASC_RESET (0x29)
@@ -5073,7 +5607,7 @@ ScsiDiskIsResetBefore (
 
   @param  SenseData    The pointer of EFI_SCSI_SENSE_DATA
   @param  SenseCounts  The number of sense key
-  @param  RetryLater   The flag means if need a retry 
+  @param  RetryLater   The flag means if need a retry
 
   @retval TRUE  Drive is ready.
   @retval FALSE Drive is NOT ready.
@@ -5168,7 +5702,7 @@ ScsiDiskHaveSenseKey (
   SensePtr = SenseData;
 
   for (Index = 0; Index < SenseCounts; Index++) {
-    
+
     //
     // Sense Key is SK_NO_SENSE (0x0)
     //
@@ -5215,18 +5749,18 @@ ReleaseScsiDiskDeviceResources (
 
 /**
   Determine if Block Io & Block Io2 should be produced.
-  
+
 
   @param  ChildHandle  Child Handle to retrieve Parent information.
-  
+
   @retval  TRUE    Should produce Block Io & Block Io2.
   @retval  FALSE   Should not produce Block Io & Block Io2.
 
-**/  
+**/
 BOOLEAN
 DetermineInstallBlockIo (
   IN  EFI_HANDLE      ChildHandle
-  )  
+  )
 {
   EFI_SCSI_PASS_THRU_PROTOCOL           *ScsiPassThru;
   EFI_EXT_SCSI_PASS_THRU_PROTOCOL       *ExtScsiPassThru;
@@ -5252,7 +5786,7 @@ DetermineInstallBlockIo (
       return TRUE;
     }
   }
-  
+
   return FALSE;
 }
 
@@ -5261,23 +5795,23 @@ DetermineInstallBlockIo (
   specified by ProtocolGuid is present on a ControllerHandle and opened by
   ChildHandle with an attribute of EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER.
   If the ControllerHandle is found, then the protocol specified by ProtocolGuid
-  will be opened on it.  
-  
+  will be opened on it.
+
 
   @param  ProtocolGuid   ProtocolGuid pointer.
   @param  ChildHandle    Child Handle to retrieve Parent information.
-  
-**/ 
+
+**/
 VOID *
 EFIAPI
 GetParentProtocol (
   IN  EFI_GUID                          *ProtocolGuid,
   IN  EFI_HANDLE                        ChildHandle
-  ) 
+  )
 {
   UINTN                                 Index;
   UINTN                                 HandleCount;
-  VOID                                  *Interface;  
+  VOID                                  *Interface;
   EFI_STATUS                            Status;
   EFI_HANDLE                            *HandleBuffer;
 
@@ -5297,7 +5831,7 @@ GetParentProtocol (
   }
 
   //
-  // Iterate to find who is parent handle that is opened with ProtocolGuid by ChildHandle 
+  // Iterate to find who is parent handle that is opened with ProtocolGuid by ChildHandle
   //
   for (Index = 0; Index < HandleCount; Index++) {
     Status = EfiTestChildHandle (HandleBuffer[Index], ChildHandle, ProtocolGuid);
@@ -5312,7 +5846,7 @@ GetParentProtocol (
 
   gBS->FreePool (HandleBuffer);
   return NULL;
-} 
+}
 
 /**
   Determine if EFI Erase Block Protocol should be produced.
@@ -5344,6 +5878,14 @@ DetermineInstallEraseBlock (
   UfsDevice      = FALSE;
   RetVal         = TRUE;
   CapacityData16 = NULL;
+
+  //
+  // UNMAP command is not supported by any of the UFS WLUNs.
+  //
+  if (ScsiDiskDevice->DeviceType == EFI_SCSI_TYPE_WLUN) {
+    RetVal = FALSE;
+    goto Done;
+  }
 
   Status = gBS->HandleProtocol (
                   ChildHandle,
@@ -5448,8 +5990,67 @@ Done:
 }
 
 /**
+  Determine if EFI Storage Security Command Protocol should be produced.
+
+  @param   ScsiDiskDevice    The pointer of SCSI_DISK_DEV.
+  @param   ChildHandle       Handle of device.
+
+  @retval  TRUE    Should produce EFI Storage Security Command Protocol.
+  @retval  FALSE   Should not produce EFI Storage Security Command Protocol.
+
+**/
+BOOLEAN
+DetermineInstallStorageSecurity (
+  IN  SCSI_DISK_DEV          *ScsiDiskDevice,
+  IN  EFI_HANDLE             ChildHandle
+  )
+{
+  EFI_STATUS                      Status;
+  UFS_DEVICE_PATH                 *UfsDevice;
+  BOOLEAN                         RetVal;
+  EFI_DEVICE_PATH_PROTOCOL        *DevicePathNode;
+
+  UfsDevice      = NULL;
+  RetVal         = TRUE;
+
+  Status = gBS->HandleProtocol (
+                  ChildHandle,
+                  &gEfiDevicePathProtocolGuid,
+                  (VOID **) &DevicePathNode
+                  );
+  //
+  // Device Path protocol must be installed on the device handle.
+  //
+  ASSERT_EFI_ERROR (Status);
+
+  while (!IsDevicePathEndType (DevicePathNode)) {
+    //
+    // For now, only support Storage Security Command Protocol on UFS devices.
+    //
+    if ((DevicePathNode->Type == MESSAGING_DEVICE_PATH) &&
+        (DevicePathNode->SubType == MSG_UFS_DP)) {
+      UfsDevice = (UFS_DEVICE_PATH *) DevicePathNode;
+      break;
+    }
+
+    DevicePathNode = NextDevicePathNode (DevicePathNode);
+  }
+  if (UfsDevice == NULL) {
+    RetVal = FALSE;
+    goto Done;
+  }
+
+  if (UfsDevice->Lun != UFS_WLUN_RPMB) {
+    RetVal = FALSE;
+  }
+
+Done:
+  return RetVal;
+}
+
+/**
   Provides inquiry information for the controller type.
-  
+
   This function is used by the IDE bus driver to get inquiry data.  Data format
   of Identify data is defined by the Interface GUID.
 
@@ -5458,9 +6059,9 @@ Done:
   @param[in, out] InquiryDataSize   Pointer to the value for the inquiry data size.
 
   @retval EFI_SUCCESS            The command was accepted without any errors.
-  @retval EFI_NOT_FOUND          Device does not support this data class 
-  @retval EFI_DEVICE_ERROR       Error reading InquiryData from device 
-  @retval EFI_BUFFER_TOO_SMALL   InquiryDataSize not big enough 
+  @retval EFI_NOT_FOUND          Device does not support this data class
+  @retval EFI_DEVICE_ERROR       Error reading InquiryData from device
+  @retval EFI_BUFFER_TOO_SMALL   InquiryDataSize not big enough
 
 **/
 EFI_STATUS
@@ -5492,16 +6093,16 @@ ScsiDiskInfoInquiry (
   This function is used by the IDE bus driver to get identify data.  Data format
   of Identify data is defined by the Interface GUID.
 
-  @param[in]      This              Pointer to the EFI_DISK_INFO_PROTOCOL 
+  @param[in]      This              Pointer to the EFI_DISK_INFO_PROTOCOL
                                     instance.
   @param[in, out] IdentifyData      Pointer to a buffer for the identify data.
   @param[in, out] IdentifyDataSize  Pointer to the value for the identify data
                                     size.
 
   @retval EFI_SUCCESS            The command was accepted without any errors.
-  @retval EFI_NOT_FOUND          Device does not support this data class 
-  @retval EFI_DEVICE_ERROR       Error reading IdentifyData from device 
-  @retval EFI_BUFFER_TOO_SMALL   IdentifyDataSize not big enough 
+  @retval EFI_NOT_FOUND          Device does not support this data class
+  @retval EFI_DEVICE_ERROR       Error reading IdentifyData from device
+  @retval EFI_BUFFER_TOO_SMALL   IdentifyDataSize not big enough
 
 **/
 EFI_STATUS
@@ -5517,7 +6118,7 @@ ScsiDiskInfoIdentify (
 
   if (CompareGuid (&This->Interface, &gEfiDiskInfoScsiInterfaceGuid) || CompareGuid (&This->Interface, &gEfiDiskInfoUfsInterfaceGuid)) {
     //
-    // Physical SCSI bus does not support this data class. 
+    // Physical SCSI bus does not support this data class.
     //
     return EFI_NOT_FOUND;
   }
@@ -5535,8 +6136,8 @@ ScsiDiskInfoIdentify (
 
 /**
   Provides sense data information for the controller type.
-  
-  This function is used by the IDE bus driver to get sense data. 
+
+  This function is used by the IDE bus driver to get sense data.
   Data format of Sense data is defined by the Interface GUID.
 
   @param[in]      This              Pointer to the EFI_DISK_INFO_PROTOCOL instance.
@@ -5566,7 +6167,7 @@ ScsiDiskInfoSenseData (
 /**
   This function is used by the IDE bus driver to get controller information.
 
-  @param[in]  This         Pointer to the EFI_DISK_INFO_PROTOCOL instance. 
+  @param[in]  This         Pointer to the EFI_DISK_INFO_PROTOCOL instance.
   @param[out] IdeChannel   Pointer to the Ide Channel number.  Primary or secondary.
   @param[out] IdeDevice    Pointer to the Ide Device number.  Master or slave.
 
@@ -5607,11 +6208,11 @@ ScsiDiskInfoWhichIde (
   via SCSI Request Packet.
 
   @param  ScsiDiskDevice  The pointer of SCSI_DISK_DEV
-  
+
   @retval EFI_SUCCESS     The ATAPI device identify data were retrieved successfully.
   @retval others          Some error occurred during the identification that ATAPI device.
 
-**/  
+**/
 EFI_STATUS
 AtapiIdentifyDevice (
   IN OUT SCSI_DISK_DEV   *ScsiDiskDevice
@@ -5647,8 +6248,8 @@ AtapiIdentifyDevice (
 
   @param  ScsiDiskDevice  The pointer of SCSI_DISK_DEV.
   @param  ChildHandle     Child handle to install DiskInfo protocol.
-  
-**/  
+
+**/
 VOID
 InitializeInstallDiskInfo (
   IN  SCSI_DISK_DEV   *ScsiDiskDevice,
@@ -5664,7 +6265,7 @@ InitializeInstallDiskInfo (
 
   Status = gBS->HandleProtocol (ChildHandle, &gEfiDevicePathProtocolGuid, (VOID **) &DevicePathNode);
   //
-  // Device Path protocol must be installed on the device handle. 
+  // Device Path protocol must be installed on the device handle.
   //
   ASSERT_EFI_ERROR (Status);
   //
@@ -5696,7 +6297,7 @@ InitializeInstallDiskInfo (
             ScsiDiskDevice->Channel = AtapiDevicePath->PrimarySecondary;
             ScsiDiskDevice->Device = AtapiDevicePath->SlaveMaster;
             //
-            // Update the DiskInfo.Interface to IDE interface GUID for the physical ATAPI device. 
+            // Update the DiskInfo.Interface to IDE interface GUID for the physical ATAPI device.
             //
             CopyGuid (&ScsiDiskDevice->DiskInfo.Interface, &gEfiDiskInfoIdeInterfaceGuid);
           } else {
@@ -5707,7 +6308,7 @@ InitializeInstallDiskInfo (
             ScsiDiskDevice->Channel = SataDevicePath->HBAPortNumber;
             ScsiDiskDevice->Device = SataDevicePath->PortMultiplierPortNumber;
             //
-            // Update the DiskInfo.Interface to AHCI interface GUID for the physical AHCI device. 
+            // Update the DiskInfo.Interface to AHCI interface GUID for the physical AHCI device.
             //
             CopyGuid (&ScsiDiskDevice->DiskInfo.Interface, &gEfiDiskInfoAhciInterfaceGuid);
           }

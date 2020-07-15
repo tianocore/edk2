@@ -3,13 +3,7 @@
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -101,7 +95,7 @@ FfsFindSectionData (
 **/
 EFI_STATUS
 EFIAPI
-FfsFindByName (
+FfsFindFileByName (
   IN CONST  EFI_GUID            *FileName,
   IN CONST  EFI_PEI_FV_HANDLE   VolumeHandle,
   OUT       EFI_PEI_FILE_HANDLE *FileHandle
@@ -177,7 +171,7 @@ FfsProcessFvFile (
   Search through every FV until you find a file of type FileType
 
   @param FileType        File handle of a Fv type file.
-  @param Volumehandle    On succes Volume Handle of the match
+  @param Volumehandle    On success Volume Handle of the match
   @param FileHandle      On success File Handle of the match
 
   @retval EFI_NOT_FOUND  FV image can't be found.
@@ -273,24 +267,6 @@ HobConstructor (
   IN VOID   *EfiFreeMemoryBottom,
   IN VOID   *EfiFreeMemoryTop
   );
-
-/**
-  Retrieves the magic value from the PE/COFF header.
-
-  @param  Hdr             The buffer in which to return the PE32, PE32+, or TE header.
-
-  @return EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC - Image is PE32
-  @return EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC - Image is PE32+
-
-**/
-VOID
-CreateHobList (
-  IN VOID   *MemoryBegin,
-  IN UINTN  MemoryLength,
-  IN VOID   *HobBase,
-  IN VOID   *StackBase
-  );
-
 
 /**
   This service enables PEIMs to create various types of HOBs.
@@ -516,7 +492,7 @@ BuildFvHob (
   );
 
 /**
-  Builds a Firmware Volume HOB and a resrouce descriptor hob
+  Builds a Firmware Volume HOB and a resource descriptor hob
 
   This function builds a Firmware Volume HOB.
   It can only be invoked during PEI phase;
@@ -778,12 +754,5 @@ EFIAPI
 DecompressFirstFv (
   VOID
   );
-
-VOID
-EFIAPI
-AddDxeCoreReportStatusCodeCallback (
-  VOID
-  );
-
 
 #endif

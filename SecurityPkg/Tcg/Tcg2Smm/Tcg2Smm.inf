@@ -1,21 +1,28 @@
 ## @file
-#  Provides ACPI metholds for TPM 2.0 support
+#  Provides ACPI methods for TPM 2.0 support
 #
-#  This driver implements TPM 2.0 definition block in ACPI table and 
-#  registers SMI callback functions for Tcg2 physical presence and 
+#  Spec Compliance Info:
+#     "TCG ACPI Specification Version 1.2 Revision 8"
+#     "Physical Presence Interface Specification Version 1.30 Revision 00.52"
+#       along with
+#     "Errata Version 0.4 for TCG PC Client Platform Physical Presence Interface Specification"
+#     "Platform Reset Attack Mitigation Specification Version 1.00"
+#    TPM2.0 ACPI device object
+#     "TCG PC Client Platform Firmware Profile Specification for TPM Family 2.0 Level 00 Revision 1.03 v51"
+#       along with
+#     "Errata for PC Client Specific Platform Firmware Profile Specification Version 1.0 Revision 1.03"
+#
+#  This driver implements TPM 2.0 definition block in ACPI table and
+#  registers SMI callback functions for Tcg2 physical presence and
 #  MemoryClear to handle the requests from ACPI method.
 #
 #  Caution: This module requires additional review when modified.
 #  This driver will have external input - variable and ACPINvs data in SMM mode.
 #  This external input must be validated carefully to avoid security issue.
 #
-# Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
-# This program and the accompanying materials
-# are licensed and made available under the terms and conditions of the BSD License
-# which accompanies this distribution. The full text of the license may be found at
-# http://opensource.org/licenses/bsd-license.php
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# Copyright (c) 2015 - 2019, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) Microsoft Corporation.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
 
@@ -50,19 +57,22 @@
   TpmMeasurementLib
   Tpm2CommandLib
   Tcg2PhysicalPresenceLib
-  IoLib
+  PcdLib
 
 [Guids]
   ## SOMETIMES_PRODUCES ## Variable:L"MemoryOverwriteRequestControl"
-  ## SOMETIMES_CONSUMES ## Variable:L"MemoryOverwriteRequestControl"  
+  ## SOMETIMES_CONSUMES ## Variable:L"MemoryOverwriteRequestControl"
   gEfiMemoryOverwriteControlDataGuid
-  
+
   gEfiTpmDeviceInstanceTpm20DtpmGuid                            ## PRODUCES           ## GUID       # TPM device identifier
 
 [Protocols]
   gEfiSmmSwDispatch2ProtocolGuid                                ## CONSUMES
   gEfiSmmVariableProtocolGuid                                   ## CONSUMES
   gEfiAcpiTableProtocolGuid                                     ## CONSUMES
+
+[FixedPcd]
+  gEfiSecurityPkgTokenSpaceGuid.PcdSmiCommandIoPort             ## CONSUMES
 
 [Pcd]
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid              ## CONSUMES
@@ -75,6 +85,11 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdTcgPhysicalPresenceInterfaceVer  ## CONSUMES
   gEfiSecurityPkgTokenSpaceGuid.PcdTpm2AcpiTableRev                 ## CONSUMES
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmPlatformClass                 ## SOMETIMES_CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2CurrentIrqNum            ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2PossibleIrqNumBuf        ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdActiveTpmInterfaceType       ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2AcpiTableLaml            ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2AcpiTableLasa            ## CONSUMES
 
 [Depex]
   gEfiAcpiTableProtocolGuid AND

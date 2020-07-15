@@ -1,15 +1,9 @@
 /** @file
   The DriverEntryPoint for TlsAuthConfigDxe driver.
 
-  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -24,7 +18,7 @@
   @retval EFI_INVALID_PARAMETER ImageHandle is not a valid image handle.
 
 **/
-EFI_STATUS 
+EFI_STATUS
 EFIAPI
 TlsAuthConfigDxeUnload (
   IN EFI_HANDLE  ImageHandle
@@ -37,20 +31,20 @@ TlsAuthConfigDxeUnload (
                   ImageHandle,
                   &gEfiCallerIdGuid,
                   (VOID **) &PrivateData
-                  );  
+                  );
   if (EFI_ERROR (Status)) {
-    return Status;  
+    return Status;
   }
-  
+
   ASSERT (PrivateData->Signature == TLS_AUTH_CONFIG_PRIVATE_DATA_SIGNATURE);
 
   gBS->UninstallMultipleProtocolInterfaces (
-         &ImageHandle,
+         ImageHandle,
          &gEfiCallerIdGuid,
          PrivateData,
          NULL
          );
-  
+
   TlsAuthConfigFormUnload (PrivateData);
 
   return EFI_SUCCESS;
@@ -79,7 +73,7 @@ TlsAuthConfigDxeDriverEntryPoint (
   TLS_AUTH_CONFIG_PRIVATE_DATA   *PrivateData;
 
   PrivateData = NULL;
-  
+
   //
   // If already started, return.
   //
@@ -113,7 +107,7 @@ TlsAuthConfigDxeDriverEntryPoint (
 
   //
   // Install private GUID.
-  //    
+  //
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &ImageHandle,
                   &gEfiCallerIdGuid,
@@ -123,12 +117,11 @@ TlsAuthConfigDxeDriverEntryPoint (
   if (EFI_ERROR (Status)) {
     goto ON_ERROR;
   }
-  
+
   return EFI_SUCCESS;
 
 ON_ERROR:
   TlsAuthConfigFormUnload (PrivateData);
-  FreePool (PrivateData);
 
   return Status;
 }

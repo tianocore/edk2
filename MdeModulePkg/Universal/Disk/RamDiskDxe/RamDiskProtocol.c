@@ -1,15 +1,10 @@
 /** @file
   The realization of EFI_RAM_DISK_PROTOCOL.
 
-  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2019, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) Microsoft Corporation.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -613,7 +608,8 @@ RamDiskRegister (
   //
   // Add check to prevent data read across the memory boundary
   //
-  if (RamDiskBase + RamDiskSize > ((UINTN) -1) - RAM_DISK_BLOCK_SIZE + 1) {
+  if ((RamDiskSize > MAX_UINTN) ||
+      (RamDiskBase > MAX_UINTN - RamDiskSize + 1)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -667,7 +663,7 @@ RamDiskRegister (
   if (!IsListEmpty(&RegisteredRamDisks)) {
     DevicePathSize = GetDevicePathSize (PrivateData->DevicePath);
 
-    EFI_LIST_FOR_EACH (Entry, &RegisteredRamDisks) {
+    BASE_LIST_FOR_EACH (Entry, &RegisteredRamDisks) {
       RegisteredPrivateData = RAM_DISK_PRIVATE_FROM_THIS (Entry);
       if (DevicePathSize == GetDevicePathSize (RegisteredPrivateData->DevicePath)) {
         //
@@ -802,7 +798,7 @@ RamDiskUnregister (
   EndingAddr     = ReadUnaligned64 ((UINT64 *) &(RamDiskDevNode->EndingAddr[0]));
 
   if (!IsListEmpty(&RegisteredRamDisks)) {
-    EFI_LIST_FOR_EACH_SAFE (Entry, NextEntry, &RegisteredRamDisks) {
+    BASE_LIST_FOR_EACH_SAFE (Entry, NextEntry, &RegisteredRamDisks) {
       PrivateData = RAM_DISK_PRIVATE_FROM_THIS (Entry);
 
       //

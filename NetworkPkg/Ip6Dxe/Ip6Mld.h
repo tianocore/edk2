@@ -3,13 +3,7 @@
 
   Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -130,7 +124,7 @@ Ip6LeaveGroup (
 
   @retval EFI_ALREADY_STARTED   Wants to join the group, but is already a member of it.
   @retval EFI_OUT_OF_RESOURCES  Failed to allocate some resources.
-  @retval EFI_DEVICE_ERROR      Failed to set the group configuraton.
+  @retval EFI_DEVICE_ERROR      Failed to set the group configuration.
   @retval EFI_SUCCESS           Successfully updated the group setting.
   @retval EFI_NOT_FOUND         Tried to leave a group of whom it isn't a member.
 

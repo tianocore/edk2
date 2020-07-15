@@ -1,0 +1,38 @@
+#/** @file
+#
+#  Component description file for ArmMaliDp module
+#
+#  Copyright (c) 2017-2018, Arm Limited. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010019
+  BASE_NAME                      = ArmMaliDp
+  FILE_GUID                      = E724AAF7-19E2-40A3-BAE1-D82A7C8B7A76
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = LcdHwLib
+
+[Sources.common]
+  ArmMaliDp.h
+  ArmMaliDp.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  IoLib
+  LcdPlatformLib
+  UefiLib
+
+[FixedPcd]
+  gArmPlatformTokenSpaceGuid.PcdArmMaliDpBase
+

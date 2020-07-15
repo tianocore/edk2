@@ -16,22 +16,16 @@
   never removed. Such design ensures sytem function well during none console
   device situation.
 
-Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include "ConSplitter.h"
 
 //
-// Identify if ConIn is connected in PcdConInConnectOnDemand enabled mode. 
+// Identify if ConIn is connected in PcdConInConnectOnDemand enabled mode.
 // default not connect
 //
 BOOLEAN  mConInIsConnect = FALSE;
@@ -67,6 +61,8 @@ GLOBAL_REMOVE_IF_UNREFERENCED TEXT_IN_SPLITTER_PRIVATE_DATA  mConIn = {
     (LIST_ENTRY *) NULL,
     (LIST_ENTRY *) NULL
   },
+  (EFI_KEY_DATA *) NULL,
+  0,
   0,
   FALSE,
 
@@ -184,7 +180,8 @@ GLOBAL_REMOVE_IF_UNREFERENCED TEXT_OUT_SPLITTER_PRIVATE_DATA mConOut = {
   0,
   (TEXT_OUT_SPLITTER_QUERY_DATA *) NULL,
   0,
-  (INT32 *) NULL
+  (INT32 *) NULL,
+  FALSE
 };
 
 //
@@ -239,7 +236,8 @@ GLOBAL_REMOVE_IF_UNREFERENCED TEXT_OUT_SPLITTER_PRIVATE_DATA mStdErr = {
   0,
   (TEXT_OUT_SPLITTER_QUERY_DATA *) NULL,
   0,
-  (INT32 *) NULL
+  (INT32 *) NULL,
+  FALSE
 };
 
 //
@@ -565,7 +563,7 @@ ConSplitterDriverEntry(
                     &mStdErr.TextOut,
                     NULL
                     );
-    if (!EFI_ERROR (Status)) {  
+    if (!EFI_ERROR (Status)) {
       //
       // Update the EFI System Table with new virtual console
       // and update the pointer to Text Output protocol.
@@ -574,7 +572,7 @@ ConSplitterDriverEntry(
       gST->StdErr               = &mStdErr.TextOut;
     }
   }
-  
+
   //
   // Update the CRC32 in the EFI System Table header
   //
@@ -606,6 +604,7 @@ ConSplitterTextInConstructor (
   )
 {
   EFI_STATUS  Status;
+  UINTN       TextInExListCount;
 
   //
   // Allocate buffer for Simple Text Input device
@@ -630,6 +629,19 @@ ConSplitterTextInConstructor (
                   &ConInPrivate->TextIn.WaitForKey
                   );
   ASSERT_EFI_ERROR (Status);
+
+  //
+  // Allocate buffer for KeyQueue
+  //
+  TextInExListCount = ConInPrivate->TextInExListCount;
+  Status = ConSplitterGrowBuffer (
+             sizeof (EFI_KEY_DATA),
+             &TextInExListCount,
+             (VOID **) &ConInPrivate->KeyQueue
+             );
+  if (EFI_ERROR (Status)) {
+    return EFI_OUT_OF_RESOURCES;
+  }
 
   //
   // Allocate buffer for Simple Text Input Ex device
@@ -1968,6 +1980,17 @@ ConSplitterTextInExAddDevice (
         return EFI_OUT_OF_RESOURCES;
       }
     }
+
+    TextInExListCount = Private->TextInExListCount;
+    Status = ConSplitterGrowBuffer (
+               sizeof (EFI_KEY_DATA),
+               &TextInExListCount,
+               (VOID **) &Private->KeyQueue
+               );
+    if (EFI_ERROR (Status)) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+
     Status = ConSplitterGrowBuffer (
               sizeof (EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *),
               &Private->TextInExListCount,
@@ -2271,7 +2294,7 @@ ConSplitterGrowMapTable (
     Size        = Private->CurrentNumberOfConsoles * sizeof (INT32);
     Index       = 0;
     SrcAddress  = OldTextOutModeMap;
-    NewStepSize = NewSize / sizeof(INT32);    
+    NewStepSize = NewSize / sizeof(INT32);
     // If Private->CurrentNumberOfConsoles is not zero and OldTextOutModeMap
     // is not NULL, it indicates that the original TextOutModeMap is not enough
     // for the new console devices and has been enlarged by CONSOLE_SPLITTER_ALLOC_UNIT columns.
@@ -2945,7 +2968,7 @@ Done:
   //
   // Force GraphicsOutput mode to be set,
   //
-  
+
   Mode = &Private->GraphicsOutputModeBuffer[CurrentIndex];
   if ((GraphicsOutput != NULL) &&
       (Mode->HorizontalResolution == CurrentGraphicsOutputMode->Info->HorizontalResolution) &&
@@ -3024,7 +3047,7 @@ ConsplitterSetConsoleOutMode (
   MaxMode      = (UINTN) (TextOut->Mode->MaxMode);
 
   MaxModeInfo.Column = 0;
-  MaxModeInfo.Row    = 0; 
+  MaxModeInfo.Row    = 0;
   ModeInfo.Column    = PcdGet32 (PcdConOutColumn);
   ModeInfo.Row       = PcdGet32 (PcdConOutRow);
 
@@ -3111,8 +3134,9 @@ ConSplitterTextOutAddDevice (
   EFI_GRAPHICS_OUTPUT_MODE_INFORMATION *Info;
   EFI_STATUS                           DeviceStatus;
 
-  Status                = EFI_SUCCESS;
-  CurrentNumOfConsoles  = Private->CurrentNumberOfConsoles;
+  Status                      = EFI_SUCCESS;
+  CurrentNumOfConsoles        = Private->CurrentNumberOfConsoles;
+  Private->AddingConOutDevice = TRUE;
 
   //
   // If the Text Out List is full, enlarge it by calling ConSplitterGrowBuffer().
@@ -3164,7 +3188,7 @@ ConSplitterTextOutAddDevice (
 
   DeviceStatus = EFI_DEVICE_ERROR;
   Status       = EFI_DEVICE_ERROR;
-  
+
   //
   // This device display mode will be added into Graphics Ouput modes.
   //
@@ -3269,6 +3293,8 @@ ConSplitterTextOutAddDevice (
   //
   ConsplitterSetConsoleOutMode (Private);
 
+  Private->AddingConOutDevice = FALSE;
+
   return Status;
 }
 
@@ -3334,7 +3360,7 @@ ConSplitterTextOutDeleteDevice (
                       Private->VirtualHandle,
                       &gEfiUgaDrawProtocolGuid,
                       &Private->UgaDraw
-                      );      
+                      );
     } else if (!FeaturePcdGet (PcdConOutUgaSupport)) {
       Status = gBS->UninstallProtocolInterface (
                       Private->VirtualHandle,
@@ -3445,11 +3471,46 @@ ConSplitterTextInReset (
 
   if (!EFI_ERROR (ReturnStatus)) {
     ToggleStateSyncReInitialization (Private);
+    //
+    // Empty the key queue.
+    //
+    Private->CurrentNumberOfKeys = 0;
   }
 
   return ReturnStatus;
 }
 
+/**
+  Dequeue the saved key from internal key queue.
+
+  @param  Private                  Protocol instance pointer.
+  @param  KeyData                  A pointer to a buffer that is filled in with the
+                                   keystroke state data for the key that was
+                                   pressed.
+  @retval EFI_NOT_FOUND            Queue is empty.
+  @retval EFI_SUCCESS              First key is dequeued and returned.
+**/
+EFI_STATUS
+ConSplitterTextInExDequeueKey (
+  IN  TEXT_IN_SPLITTER_PRIVATE_DATA   *Private,
+  OUT EFI_KEY_DATA                    *KeyData
+  )
+{
+  if (Private->CurrentNumberOfKeys == 0) {
+    return EFI_NOT_FOUND;
+  }
+  //
+  // Return the first saved key.
+  //
+  CopyMem (KeyData, &Private->KeyQueue[0], sizeof (EFI_KEY_DATA));
+  Private->CurrentNumberOfKeys--;
+  CopyMem (
+    &Private->KeyQueue[0],
+    &Private->KeyQueue[1],
+    Private->CurrentNumberOfKeys * sizeof (EFI_KEY_DATA)
+    );
+  return EFI_SUCCESS;
+}
 
 /**
   Reads the next keystroke from the input device. The WaitForKey Event can
@@ -3473,7 +3534,21 @@ ConSplitterTextInPrivateReadKeyStroke (
 {
   EFI_STATUS    Status;
   UINTN         Index;
-  EFI_INPUT_KEY CurrentKey;
+  EFI_KEY_DATA  KeyData;
+
+  //
+  // Return the first saved non-NULL key.
+  //
+  while (TRUE) {
+    Status = ConSplitterTextInExDequeueKey (Private, &KeyData);
+    if (EFI_ERROR (Status)) {
+      break;
+    }
+    if ((KeyData.Key.ScanCode != CHAR_NULL) || (KeyData.Key.UnicodeChar != SCAN_NULL)) {
+      CopyMem (Key, &KeyData.Key, sizeof (EFI_INPUT_KEY));
+      return Status;
+    }
+  }
 
   Key->UnicodeChar  = 0;
   Key->ScanCode     = SCAN_NULL;
@@ -3486,15 +3561,15 @@ ConSplitterTextInPrivateReadKeyStroke (
   for (Index = 0; Index < Private->CurrentNumberOfConsoles;) {
     Status = Private->TextInList[Index]->ReadKeyStroke (
                                           Private->TextInList[Index],
-                                          &CurrentKey
+                                          &KeyData.Key
                                           );
     if (!EFI_ERROR (Status)) {
       //
       // If it is not partial keystorke, return the key. Otherwise, continue
       // to read key from THIS physical console input device.
       //
-      if ((CurrentKey.ScanCode != CHAR_NULL) || (CurrentKey.UnicodeChar != SCAN_NULL)) {
-        *Key = CurrentKey;
+      if ((KeyData.Key.ScanCode != CHAR_NULL) || (KeyData.Key.UnicodeChar != SCAN_NULL)) {
+        CopyMem (Key, &KeyData.Key, sizeof (EFI_INPUT_KEY));
         return Status;
       }
     } else {
@@ -3540,7 +3615,7 @@ ConSplitterTextInReadKeyStroke (
   // Signal ConnectConIn event on first call in Lazy ConIn mode
   //
   if (!mConInIsConnect && PcdGetBool (PcdConInConnectOnDemand)) {
-    DEBUG ((EFI_D_INFO, "Connect ConIn in first ReadKeyStoke in Lazy ConIn mode.\n"));    
+    DEBUG ((EFI_D_INFO, "Connect ConIn in first ReadKeyStoke in Lazy ConIn mode.\n"));
     gBS->SignalEvent (Private->ConnectConInEvent);
     mConInIsConnect = TRUE;
   }
@@ -3681,6 +3756,10 @@ ConSplitterTextInResetEx (
 
   if (!EFI_ERROR (ReturnStatus)) {
     ToggleStateSyncReInitialization (Private);
+    //
+    // Empty the key queue.
+    //
+    Private->CurrentNumberOfKeys = 0;
   }
 
   return ReturnStatus;
@@ -3714,6 +3793,7 @@ ConSplitterTextInReadKeyStrokeEx (
   TEXT_IN_SPLITTER_PRIVATE_DATA *Private;
   EFI_STATUS                    Status;
   UINTN                         Index;
+  EFI_KEY_STATE                 KeyState;
   EFI_KEY_DATA                  CurrentKeyData;
 
 
@@ -3725,48 +3805,91 @@ ConSplitterTextInReadKeyStrokeEx (
 
   Private->KeyEventSignalState = FALSE;
 
-  KeyData->Key.UnicodeChar  = 0;
-  KeyData->Key.ScanCode     = SCAN_NULL;
-
   //
   // Signal ConnectConIn event on first call in Lazy ConIn mode
   //
   if (!mConInIsConnect && PcdGetBool (PcdConInConnectOnDemand)) {
-    DEBUG ((EFI_D_INFO, "Connect ConIn in first ReadKeyStoke in Lazy ConIn mode.\n"));    
+    DEBUG ((EFI_D_INFO, "Connect ConIn in first ReadKeyStoke in Lazy ConIn mode.\n"));
     gBS->SignalEvent (Private->ConnectConInEvent);
     mConInIsConnect = TRUE;
   }
 
   //
-  // if no physical console input device exists, return EFI_NOT_READY;
-  // if any physical console input device has key input,
-  // return the key and EFI_SUCCESS.
+  // Return the first saved key.
   //
-  for (Index = 0; Index < Private->CurrentNumberOfExConsoles;) {
+  Status = ConSplitterTextInExDequeueKey (Private, KeyData);
+  if (!EFI_ERROR (Status)) {
+    return Status;
+  }
+  ASSERT (Private->CurrentNumberOfKeys == 0);
+
+  ZeroMem (&KeyState, sizeof (KeyState));
+
+  //
+  // Iterate through all physical consoles to get key state.
+  // Some physical consoles may return valid key.
+  // Queue the valid keys.
+  //
+  for (Index = 0; Index < Private->CurrentNumberOfExConsoles; Index++) {
+    ZeroMem (&CurrentKeyData, sizeof (EFI_KEY_DATA));
     Status = Private->TextInExList[Index]->ReadKeyStrokeEx (
-                                          Private->TextInExList[Index],
-                                          &CurrentKeyData
-                                          );
+                                             Private->TextInExList[Index],
+                                             &CurrentKeyData
+                                             );
+    if (EFI_ERROR (Status) && (Status != EFI_NOT_READY)) {
+      continue;
+    }
+
+    //
+    // Consolidate the key state from all physical consoles.
+    //
+    if ((CurrentKeyData.KeyState.KeyShiftState & EFI_SHIFT_STATE_VALID) != 0) {
+      KeyState.KeyShiftState |= CurrentKeyData.KeyState.KeyShiftState;
+    }
+    if ((CurrentKeyData.KeyState.KeyToggleState & EFI_TOGGLE_STATE_VALID) != 0) {
+      KeyState.KeyToggleState |= CurrentKeyData.KeyState.KeyToggleState;
+    }
+
     if (!EFI_ERROR (Status)) {
       //
       // If virtual KeyState has been required to be exposed, or it is not
-      // partial keystorke, return the key. Otherwise, continue to read key
-      // from THIS physical console input device.
+      // partial keystorke, queue the key.
+      // It's possible that user presses at multiple keyboards at the same moment,
+      // Private->KeyQueue[] are the storage to save all the keys.
       //
       if ((Private->VirtualKeyStateExported) ||
           (CurrentKeyData.Key.ScanCode != CHAR_NULL) ||
           (CurrentKeyData.Key.UnicodeChar != SCAN_NULL)) {
-        CopyMem (KeyData, &CurrentKeyData, sizeof (CurrentKeyData));
-        return Status;
+        CopyMem (
+          &Private->KeyQueue[Private->CurrentNumberOfKeys],
+          &CurrentKeyData,
+          sizeof (EFI_KEY_DATA)
+          );
+        Private->CurrentNumberOfKeys++;
       }
-    } else {
-      //
-      // Continue to read key from NEXT physical console input device.
-      //
-      Index++;
     }
   }
 
+  //
+  // Consolidate the key state for all keys in Private->KeyQueue[]
+  //
+  for (Index = 0; Index < Private->CurrentNumberOfKeys; Index++) {
+    CopyMem (&Private->KeyQueue[Index].KeyState, &KeyState, sizeof (EFI_KEY_STATE));
+  }
+
+  //
+  // Return the first saved key.
+  //
+  Status = ConSplitterTextInExDequeueKey (Private, KeyData);
+  if (!EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Always return the key state even there is no key pressed.
+  //
+  ZeroMem (&KeyData->Key, sizeof (KeyData->Key));
+  CopyMem (&KeyData->KeyState, &KeyState, sizeof (KeyData->KeyState));
   return EFI_NOT_READY;
 }
 
@@ -3842,11 +3965,14 @@ ConSplitterTextInSetState (
   Register a notification function for a particular keystroke for the input device.
 
   @param  This                     Protocol instance pointer.
-  @param  KeyData                  A pointer to a buffer that is filled in with the
-                                   keystroke information data for the key that was
-                                   pressed.
+  @param  KeyData                  A pointer to a buffer that is filled in with
+                                   the keystroke information for the key that was
+                                   pressed. If KeyData.Key, KeyData.KeyState.KeyToggleState
+                                   and KeyData.KeyState.KeyShiftState are 0, then any incomplete
+                                   keystroke will trigger a notification of the KeyNotificationFunction.
   @param  KeyNotificationFunction  Points to the function to be called when the key
-                                   sequence is typed specified by KeyData.
+                                   sequence is typed specified by KeyData. This notification function
+                                   should be called at <=TPL_CALLBACK.
   @param  NotifyHandle             Points to the unique handle assigned to the
                                    registered notification.
 
@@ -3900,7 +4026,7 @@ ConSplitterTextInRegisterKeyNotify (
   if (NewNotify == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
-  NewNotify->NotifyHandleList = (EFI_HANDLE *) AllocateZeroPool (sizeof (EFI_HANDLE) *  Private->TextInExListCount);
+  NewNotify->NotifyHandleList = (VOID **) AllocateZeroPool (sizeof (VOID *) *  Private->TextInExListCount);
   if (NewNotify->NotifyHandleList == NULL) {
     gBS->FreePool (NewNotify);
     return EFI_OUT_OF_RESOURCES;
@@ -4515,7 +4641,7 @@ ConSplitterTextOutOutputString (
     Private->TextOutMode.CursorRow    = Private->TextOutList[0].TextOut->Mode->CursorRow;
   } else {
     //
-    // When there is no real console devices in system, 
+    // When there is no real console devices in system,
     // update cursor position for the virtual device in consplitter.
     //
     Private->TextOut.QueryMode (
@@ -4523,28 +4649,28 @@ ConSplitterTextOutOutputString (
                        Private->TextOutMode.Mode,
                        &MaxColumn,
                        &MaxRow
-                       );    
+                       );
     for (; *WString != CHAR_NULL; WString++) {
       switch (*WString) {
       case CHAR_BACKSPACE:
         if (Private->TextOutMode.CursorColumn == 0 && Private->TextOutMode.CursorRow > 0) {
           Private->TextOutMode.CursorRow--;
-          Private->TextOutMode.CursorColumn = (INT32) (MaxColumn - 1);          
+          Private->TextOutMode.CursorColumn = (INT32) (MaxColumn - 1);
         } else if (Private->TextOutMode.CursorColumn > 0) {
           Private->TextOutMode.CursorColumn--;
         }
         break;
-      
+
       case CHAR_LINEFEED:
         if (Private->TextOutMode.CursorRow < (INT32) (MaxRow - 1)) {
           Private->TextOutMode.CursorRow++;
         }
         break;
-      
+
       case CHAR_CARRIAGE_RETURN:
         Private->TextOutMode.CursorColumn = 0;
         break;
-      
+
       default:
         if (Private->TextOutMode.CursorColumn < (INT32) (MaxColumn - 1)) {
           Private->TextOutMode.CursorColumn++;
@@ -4728,12 +4854,18 @@ ConSplitterTextOutSetMode (
   //
   TextOutModeMap = Private->TextOutModeMap + Private->TextOutListCount * ModeNumber;
   for (Index = 0, ReturnStatus = EFI_SUCCESS; Index < Private->CurrentNumberOfConsoles; Index++) {
-    Status = Private->TextOutList[Index].TextOut->SetMode (
-                                                    Private->TextOutList[Index].TextOut,
-                                                    TextOutModeMap[Index]
-                                                    );
-    if (EFI_ERROR (Status)) {
-      ReturnStatus = Status;
+    //
+    // While adding a console out device do not set same mode again for the same device.
+    //
+    if ((!Private->AddingConOutDevice) ||
+        (TextOutModeMap[Index] != Private->TextOutList[Index].TextOut->Mode->Mode)) {
+      Status = Private->TextOutList[Index].TextOut->SetMode (
+                                                      Private->TextOutList[Index].TextOut,
+                                                      TextOutModeMap[Index]
+                                                      );
+      if (EFI_ERROR (Status)) {
+        ReturnStatus = Status;
+      }
     }
   }
 

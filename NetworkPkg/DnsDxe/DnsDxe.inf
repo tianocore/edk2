@@ -1,15 +1,9 @@
 ## @file
 # Implementation of EFI_DNS4_PROTOCOL and EFI_DNS6_PROTOCOL interfaces.
 #
-# Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
 #
-#  This program and the accompanying materials
-#  are licensed and made available under the terms and conditions of the BSD License
-#  which accompanies this distribution. The full text of the license may be found at
-#  http://opensource.org/licenses/bsd-license.php
-#
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 #
 ##
@@ -26,7 +20,7 @@
 
 [Packages]
   MdePkg/MdePkg.dec
-  MdeModulePkg/MdeModulePkg.dec
+  NetworkPkg/NetworkPkg.dec
 
 [Sources]
   ComponentName.c
@@ -37,8 +31,8 @@
   DnsProtocol.c
   DnsDhcp.h
   DnsDhcp.c
-  
-  
+
+
 [LibraryClasses]
   BaseLib
   UefiLib
@@ -52,7 +46,7 @@
   DpcLib
   PrintLib
   UdpIoLib
-  
+
 
 [Protocols]
   gEfiDns4ServiceBindingProtocolGuid              ## BY_START
@@ -64,7 +58,7 @@
   gEfiIp4Config2ProtocolGuid                      ## SOMETIMES_CONSUMES
   gEfiManagedNetworkServiceBindingProtocolGuid    ## SOMETIMES_CONSUMES
   gEfiManagedNetworkProtocolGuid                  ## SOMETIMES_CONSUMES
-  
+
   gEfiDns6ServiceBindingProtocolGuid              ## BY_START
   gEfiDns6ProtocolGuid                            ## BY_START
   gEfiUdp6ServiceBindingProtocolGuid              ## TO_START

@@ -1,15 +1,9 @@
 /** @file
   Implementation of EFI TLS Protocol Interfaces.
 
-  Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -38,6 +32,7 @@ EFI_TLS_PROTOCOL  mTlsProtocol = {
                                   This is NULL.
                                   Data is NULL.
                                   DataSize is 0.
+                                  DataSize is invalid for DataType.
   @retval EFI_UNSUPPORTED         The DataType is unsupported.
   @retval EFI_ACCESS_DENIED       If the DataType is one of below:
                                   EfiTlsClientRandom
@@ -59,12 +54,18 @@ TlsSetSessionData (
   EFI_STATUS                Status;
   TLS_INSTANCE              *Instance;
   UINT16                    *CipherId;
+  CONST EFI_TLS_CIPHER      *TlsCipherList;
+  UINTN                     CipherCount;
+  CONST EFI_TLS_VERIFY_HOST *TlsVerifyHost;
+  EFI_TLS_VERIFY            VerifyMethod;
+  UINTN                     VerifyMethodSize;
   UINTN                     Index;
 
   EFI_TPL                   OldTpl;
 
-  Status = EFI_SUCCESS;
-  CipherId = NULL;
+  Status           = EFI_SUCCESS;
+  CipherId         = NULL;
+  VerifyMethodSize = sizeof (EFI_TLS_VERIFY);
 
   if (This == NULL || Data == NULL || DataSize == 0) {
     return EFI_INVALID_PARAMETER;
@@ -100,17 +101,25 @@ TlsSetSessionData (
     Status = TlsSetConnectionEnd (Instance->TlsConn, *((EFI_TLS_CONNECTION_END *) Data));
     break;
   case EfiTlsCipherList:
+    if (DataSize % sizeof (EFI_TLS_CIPHER) != 0) {
+      Status = EFI_INVALID_PARAMETER;
+      goto ON_EXIT;
+    }
+
     CipherId = AllocatePool (DataSize);
     if (CipherId == NULL) {
       Status = EFI_OUT_OF_RESOURCES;
       goto ON_EXIT;
     }
 
-    for (Index = 0; Index < DataSize / sizeof (EFI_TLS_CIPHER); Index++) {
-      *(CipherId +Index) = HTONS (*(((UINT16 *) Data) + Index));
+    TlsCipherList = (CONST EFI_TLS_CIPHER *) Data;
+    CipherCount = DataSize / sizeof (EFI_TLS_CIPHER);
+    for (Index = 0; Index < CipherCount; Index++) {
+      CipherId[Index] = ((TlsCipherList[Index].Data1 << 8) |
+                         TlsCipherList[Index].Data2);
     }
 
-    Status = TlsSetCipherList (Instance->TlsConn, CipherId, DataSize / sizeof (EFI_TLS_CIPHER));
+    Status = TlsSetCipherList (Instance->TlsConn, CipherId, CipherCount);
 
     FreePool (CipherId);
     break;
@@ -143,6 +152,40 @@ TlsSetSessionData (
     }
 
     TlsSetVerify (Instance->TlsConn, *((UINT32 *) Data));
+    break;
+  case EfiTlsVerifyHost:
+    if (DataSize != sizeof (EFI_TLS_VERIFY_HOST)) {
+      Status = EFI_INVALID_PARAMETER;
+      goto ON_EXIT;
+    }
+
+    TlsVerifyHost = (CONST EFI_TLS_VERIFY_HOST *) Data;
+
+    if ((TlsVerifyHost->Flags & EFI_TLS_VERIFY_FLAG_ALWAYS_CHECK_SUBJECT) != 0 &&
+        (TlsVerifyHost->Flags & EFI_TLS_VERIFY_FLAG_NEVER_CHECK_SUBJECT) != 0) {
+      Status = EFI_INVALID_PARAMETER;
+      goto ON_EXIT;
+    }
+
+    if ((TlsVerifyHost->Flags & EFI_TLS_VERIFY_FLAG_NO_WILDCARDS) != 0 &&
+        ((TlsVerifyHost->Flags & EFI_TLS_VERIFY_FLAG_NO_PARTIAL_WILDCARDS) != 0 ||
+         (TlsVerifyHost->Flags & EFI_TLS_VERIFY_FLAG_MULTI_LABEL_WILDCARDS) != 0)) {
+      Status = EFI_INVALID_PARAMETER;
+      goto ON_EXIT;
+    }
+
+    Status = This->GetSessionData (This, EfiTlsVerifyMethod, &VerifyMethod, &VerifyMethodSize);
+    if (EFI_ERROR (Status)) {
+      goto ON_EXIT;
+    }
+
+    if ((VerifyMethod & EFI_TLS_VERIFY_PEER) == 0) {
+      Status = EFI_INVALID_PARAMETER;
+      goto ON_EXIT;
+    }
+
+    Status = TlsSetVerifyHost (Instance->TlsConn, TlsVerifyHost->Flags, TlsVerifyHost->HostName);
+
     break;
   case EfiTlsSessionID:
     if (DataSize != sizeof (EFI_TLS_SESSION_ID)) {
@@ -630,3 +673,4 @@ ON_EXIT:
   gBS->RestoreTPL (OldTpl);
   return Status;
 }
+

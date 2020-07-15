@@ -1,15 +1,9 @@
 /** @file
   Support functions implementation for UefiPxeBc Driver.
 
-  Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -17,7 +11,7 @@
 
 
 /**
-  Flush the previous configration using the new station Ip address.
+  Flush the previous configuration using the new station Ip address.
 
   @param[in]   Private        The pointer to the PxeBc private data.
   @param[in]   StationIp      The pointer to the station Ip address.
@@ -30,20 +24,22 @@
 EFI_STATUS
 PxeBcFlushStationIp (
   PXEBC_PRIVATE_DATA       *Private,
-  EFI_IP_ADDRESS           *StationIp,
+  EFI_IP_ADDRESS           *StationIp,     OPTIONAL
   EFI_IP_ADDRESS           *SubnetMask     OPTIONAL
   )
 {
   EFI_PXE_BASE_CODE_MODE   *Mode;
   EFI_STATUS               Status;
-
-  ASSERT (StationIp != NULL);
+  EFI_ARP_CONFIG_DATA      ArpConfigData;
 
   Mode   = Private->PxeBc.Mode;
   Status = EFI_SUCCESS;
+  ZeroMem (&ArpConfigData, sizeof (EFI_ARP_CONFIG_DATA));
 
-  if (Mode->UsingIpv6) {
-
+  if (Mode->UsingIpv6 && StationIp != NULL) {
+    //
+    // Overwrite Udp6CfgData/Ip6CfgData StationAddress.
+    //
     CopyMem (&Private->Udp6CfgData.StationAddress, StationIp, sizeof (EFI_IPv6_ADDRESS));
     CopyMem (&Private->Ip6CfgData.StationAddress, StationIp, sizeof (EFI_IPv6_ADDRESS));
 
@@ -60,24 +56,56 @@ PxeBcFlushStationIp (
 
     Status = Private->Ip6->Receive (Private->Ip6, &Private->Icmp6Token);
   } else {
-    ASSERT (SubnetMask != NULL);
-    CopyMem (&Private->Udp4CfgData.StationAddress, StationIp, sizeof (EFI_IPv4_ADDRESS));
-    CopyMem (&Private->Udp4CfgData.SubnetMask, SubnetMask, sizeof (EFI_IPv4_ADDRESS));
-    CopyMem (&Private->Ip4CfgData.StationAddress, StationIp, sizeof (EFI_IPv4_ADDRESS));
-    CopyMem (&Private->Ip4CfgData.SubnetMask, SubnetMask, sizeof (EFI_IPv4_ADDRESS));
+    if (StationIp != NULL) {
+      //
+      // Reconfigure the ARP instance with station Ip address.
+      //
+      ArpConfigData.SwAddressType   = 0x0800;
+      ArpConfigData.SwAddressLength = (UINT8) sizeof (EFI_IPv4_ADDRESS);
+      ArpConfigData.StationAddress = StationIp;
 
-    //
-    // Reconfigure the Ip4 instance to capture background ICMP packets with new station Ip address.
-    //
-    Private->Ip4->Cancel (Private->Ip4, &Private->IcmpToken);
-    Private->Ip4->Configure (Private->Ip4, NULL);
+      Private->Arp->Configure (Private->Arp, NULL);
+      Private->Arp->Configure (Private->Arp, &ArpConfigData);
 
-    Status = Private->Ip4->Configure (Private->Ip4, &Private->Ip4CfgData);
-    if (EFI_ERROR (Status)) {
-      goto ON_EXIT;
+      //
+      // Overwrite Udp4CfgData/Ip4CfgData StationAddress.
+      //
+      CopyMem (&Private->Udp4CfgData.StationAddress, StationIp, sizeof (EFI_IPv4_ADDRESS));
+      CopyMem (&Private->Ip4CfgData.StationAddress, StationIp, sizeof (EFI_IPv4_ADDRESS));
     }
 
-    Status = Private->Ip4->Receive (Private->Ip4, &Private->IcmpToken);
+    if (SubnetMask != NULL) {
+      //
+      // Overwrite Udp4CfgData/Ip4CfgData SubnetMask.
+      //
+      CopyMem (&Private->Udp4CfgData.SubnetMask, SubnetMask, sizeof (EFI_IPv4_ADDRESS));
+      CopyMem (&Private->Ip4CfgData.SubnetMask, SubnetMask, sizeof (EFI_IPv4_ADDRESS));
+    }
+
+    if (StationIp != NULL && SubnetMask != NULL) {
+      //
+      // Updated the route table.
+      //
+      Mode->RouteTableEntries                = 1;
+      Mode->RouteTable[0].IpAddr.Addr[0]     = StationIp->Addr[0] & SubnetMask->Addr[0];
+      Mode->RouteTable[0].SubnetMask.Addr[0] = SubnetMask->Addr[0];
+      Mode->RouteTable[0].GwAddr.Addr[0]     = 0;
+    }
+
+    if (StationIp != NULL || SubnetMask != NULL) {
+      //
+      // Reconfigure the Ip4 instance to capture background ICMP packets with new station Ip address.
+      //
+      Private->Ip4->Cancel (Private->Ip4, &Private->IcmpToken);
+      Private->Ip4->Configure (Private->Ip4, NULL);
+
+      Status = Private->Ip4->Configure (Private->Ip4, &Private->Ip4CfgData);
+      if (EFI_ERROR (Status)) {
+        goto ON_EXIT;
+      }
+
+      Status = Private->Ip4->Receive (Private->Ip4, &Private->IcmpToken);
+    }
   }
 
 ON_EXIT:
@@ -108,7 +136,7 @@ PxeBcCommonNotify (
 
   @param  Mode           The pointer to EFI_PXE_BASE_CODE_MODE.
   @param  Ip4Addr        The Ip4 address for resolution.
-  @param  MacAddress     The resoluted MAC address if the resolution is successful.
+  @param  MacAddress     The resolved MAC address if the resolution is successful.
                          The value is undefined if the resolution fails.
 
   @retval TRUE           Found an matched entry.
@@ -253,8 +281,7 @@ PxeBcIcmpErrorDpcHandle (
     //
     // The return status should be recognized as EFI_ICMP_ERROR.
     //
-    gBS->SignalEvent (RxData->RecycleSignal);
-    goto ON_EXIT;
+    goto ON_RECYCLE;
   }
 
   if (EFI_IP4 (RxData->Header->SourceAddress) != 0 &&
@@ -264,25 +291,20 @@ PxeBcIcmpErrorDpcHandle (
     //
     // The source address of the received packet should be a valid unicast address.
     //
-    gBS->SignalEvent (RxData->RecycleSignal);
-    goto ON_EXIT;
+    goto ON_RECYCLE;
   }
 
   if (!EFI_IP4_EQUAL (&RxData->Header->DestinationAddress, &Mode->StationIp.v4)) {
     //
     // The destination address of the received packet should be equal to the host address.
     //
-    gBS->SignalEvent (RxData->RecycleSignal);
-    goto ON_EXIT;
+    goto ON_RECYCLE;
   }
 
-  if (RxData->Header->Protocol != EFI_IP_PROTO_ICMP) {
-    //
-    // The protocol value in the header of the receveid packet should be EFI_IP_PROTO_ICMP.
-    //
-    gBS->SignalEvent (RxData->RecycleSignal);
-    goto ON_EXIT;
-  }
+  //
+  // The protocol has been configured to only receive ICMP packet.
+  //
+  ASSERT (RxData->Header->Protocol == EFI_IP_PROTO_ICMP);
 
   Type = *((UINT8 *) RxData->FragmentTable[0].FragmentBuffer);
 
@@ -294,8 +316,7 @@ PxeBcIcmpErrorDpcHandle (
     //
     // The type of the receveid ICMP message should be ICMP_ERROR_MESSAGE.
     //
-    gBS->SignalEvent (RxData->RecycleSignal);
-    goto ON_EXIT;
+    goto ON_RECYCLE;
   }
 
   //
@@ -321,6 +342,9 @@ PxeBcIcmpErrorDpcHandle (
     }
     IcmpError += CopiedLen;
   }
+
+ON_RECYCLE:
+  gBS->SignalEvent (RxData->RecycleSignal);
 
 ON_EXIT:
   Private->IcmpToken.Status = EFI_NOT_READY;
@@ -391,16 +415,14 @@ PxeBcIcmp6ErrorDpcHandle (
     //
     // The return status should be recognized as EFI_ICMP_ERROR.
     //
-    gBS->SignalEvent (RxData->RecycleSignal);
-    goto ON_EXIT;
+    goto ON_RECYCLE;
   }
 
   if (!NetIp6IsValidUnicast (&RxData->Header->SourceAddress)) {
     //
     // The source address of the received packet should be a valid unicast address.
     //
-    gBS->SignalEvent (RxData->RecycleSignal);
-    goto ON_EXIT;
+    goto ON_RECYCLE;
   }
 
   if (!NetIp6IsUnspecifiedAddr (&Mode->StationIp.v6) &&
@@ -408,29 +430,24 @@ PxeBcIcmp6ErrorDpcHandle (
     //
     // The destination address of the received packet should be equal to the host address.
     //
-    gBS->SignalEvent (RxData->RecycleSignal);
-    goto ON_EXIT;
+    goto ON_RECYCLE;
   }
 
-  if (RxData->Header->NextHeader != IP6_ICMP) {
-    //
-    // The nextheader in the header of the receveid packet should be IP6_ICMP.
-    //
-    gBS->SignalEvent (RxData->RecycleSignal);
-    goto ON_EXIT;
-  }
+  //
+  // The protocol has been configured to only receive ICMP packet.
+  //
+  ASSERT (RxData->Header->NextHeader == IP6_ICMP);
 
   Type = *((UINT8 *) RxData->FragmentTable[0].FragmentBuffer);
 
   if (Type != ICMP_V6_DEST_UNREACHABLE &&
       Type != ICMP_V6_PACKET_TOO_BIG &&
-      Type != ICMP_V6_PACKET_TOO_BIG &&
+      Type != ICMP_V6_TIME_EXCEEDED &&
       Type != ICMP_V6_PARAMETER_PROBLEM) {
     //
     // The type of the receveid packet should be an ICMP6 error message.
     //
-    gBS->SignalEvent (RxData->RecycleSignal);
-    goto ON_EXIT;
+    goto ON_RECYCLE;
   }
 
   //
@@ -456,6 +473,9 @@ PxeBcIcmp6ErrorDpcHandle (
     }
     Icmp6Error += CopiedLen;
   }
+
+ON_RECYCLE:
+  gBS->SignalEvent (RxData->RecycleSignal);
 
 ON_EXIT:
   Private->Icmp6Token.Status = EFI_NOT_READY;
@@ -491,7 +511,7 @@ PxeBcIcmp6ErrorUpdate (
   @param[in, out]  SrcPort              The pointer to the source port.
   @param[in]       DoNotFragment        If TRUE, fragment is not enabled.
                                         Otherwise, fragment is enabled.
-  @param[in]       Ttl                  The time to live field of the IP header. 
+  @param[in]       Ttl                  The time to live field of the IP header.
   @param[in]       ToS                  The type of service field of the IP header.
 
   @retval          EFI_SUCCESS          Successfully configured this instance.
@@ -1156,7 +1176,7 @@ PxeBcUdp4Read (
          Token->Status == EFI_NOT_READY &&
          EFI_ERROR (gBS->CheckEvent (TimeoutEvent))) {
     //
-    // Poll the token utill reply/ICMPv6 error message received or timeout.
+    // Poll the token until reply/ICMPv6 error message received or timeout.
     //
     Udp4->Poll (Udp4);
     if (Token->Status == EFI_ICMP_ERROR ||
@@ -1260,7 +1280,7 @@ PxeBcUdp6Read (
          Token->Status == EFI_NOT_READY &&
          EFI_ERROR (gBS->CheckEvent (TimeoutEvent))) {
     //
-    // Poll the token utill reply/ICMPv6 error message received or timeout.
+    // Poll the token until reply/ICMPv6 error message received or timeout.
     //
     Udp6->Poll (Udp6);
     if (Token->Status == EFI_ICMP_ERROR ||
@@ -1484,14 +1504,14 @@ CalcElapsedTime (
   //
   ZeroMem (&Time, sizeof (EFI_TIME));
   gRT->GetTime (&Time, NULL);
-  CurrentStamp = (UINT64)
-    (
-      ((((((Time.Year - 1900) * 360 +
-       (Time.Month - 1)) * 30 +
-       (Time.Day - 1)) * 24 + Time.Hour) * 60 +
-       Time.Minute) * 60 + Time.Second) * 100
-       + DivU64x32(Time.Nanosecond, 10000000)
-    );
+  CurrentStamp = MultU64x32 (
+                   ((((UINT32)(Time.Year - 1900) * 360 + (Time.Month - 1) * 30 + (Time.Day - 1)) * 24 + Time.Hour) * 60 + Time.Minute) * 60 + Time.Second,
+                   100
+                   ) +
+                 DivU64x32 (
+                   Time.Nanosecond,
+                   10000000
+                   );
 
   //
   // Sentinel value of 0 means that this is the first DHCP packet that we are

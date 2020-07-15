@@ -1,13 +1,7 @@
 /** @file
 
   Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -250,7 +244,7 @@ EmmcPeimHcInitHost (
   Refer to EMMC Electrical Standard Spec 5.1 Section 6.10.4 for details.
 
   @param[in] Slot           The slot number of the Emmc card to send the command to.
-  @param[in] Access         The access mode of SWTICH command.
+  @param[in] Access         The access mode of SWITCH command.
   @param[in] Index          The offset of the field to be access.
   @param[in] Value          The value to be set to the specified field of EXT_CSD register.
   @param[in] CmdSet         The value of CmdSet field of EXT_CSD register.

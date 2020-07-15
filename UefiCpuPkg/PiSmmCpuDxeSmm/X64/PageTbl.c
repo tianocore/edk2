@@ -1,16 +1,10 @@
 /** @file
 Page Fault (#PF) handler for X64 processors
 
-Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2019, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -21,8 +15,27 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 LIST_ENTRY                          mPagePool = INITIALIZE_LIST_HEAD_VARIABLE (mPagePool);
 BOOLEAN                             m1GPageTableSupport = FALSE;
-UINT8                               mPhysicalAddressBits;
-BOOLEAN                             mCpuSmmStaticPageTable;
+BOOLEAN                             mCpuSmmRestrictedMemoryAccess;
+BOOLEAN                             m5LevelPagingNeeded;
+X86_ASSEMBLY_PATCH_LABEL            gPatch5LevelPagingNeeded;
+
+/**
+  Disable CET.
+**/
+VOID
+EFIAPI
+DisableCet (
+  VOID
+  );
+
+/**
+  Enable CET.
+**/
+VOID
+EFIAPI
+EnableCet (
+  VOID
+  );
 
 /**
   Check if 1-GByte pages is supported by processor or not.
@@ -47,6 +60,48 @@ Is1GPageSupport (
     }
   }
   return FALSE;
+}
+
+/**
+  The routine returns TRUE when CPU supports it (CPUID[7,0].ECX.BIT[16] is set) and
+  the max physical address bits is bigger than 48. Because 4-level paging can support
+  to address physical address up to 2^48 - 1, there is no need to enable 5-level paging
+  with max physical address bits <= 48.
+
+  @retval TRUE  5-level paging enabling is needed.
+  @retval FALSE 5-level paging enabling is not needed.
+**/
+BOOLEAN
+Is5LevelPagingNeeded (
+  VOID
+  )
+{
+  CPUID_VIR_PHY_ADDRESS_SIZE_EAX              VirPhyAddressSize;
+  CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS_ECX ExtFeatureEcx;
+  UINT32                                      MaxExtendedFunctionId;
+
+  AsmCpuid (CPUID_EXTENDED_FUNCTION, &MaxExtendedFunctionId, NULL, NULL, NULL);
+  if (MaxExtendedFunctionId >= CPUID_VIR_PHY_ADDRESS_SIZE) {
+    AsmCpuid (CPUID_VIR_PHY_ADDRESS_SIZE, &VirPhyAddressSize.Uint32, NULL, NULL, NULL);
+  } else {
+    VirPhyAddressSize.Bits.PhysicalAddressBits = 36;
+  }
+  AsmCpuidEx (
+    CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS,
+    CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS_SUB_LEAF_INFO,
+    NULL, NULL, &ExtFeatureEcx.Uint32, NULL
+    );
+  DEBUG ((
+    DEBUG_INFO, "PhysicalAddressBits = %d, 5LPageTable = %d.\n",
+    VirPhyAddressSize.Bits.PhysicalAddressBits, ExtFeatureEcx.Bits.FiveLevelPage
+    ));
+
+  if (VirPhyAddressSize.Bits.PhysicalAddressBits > 4 * 9 + 12) {
+    ASSERT (ExtFeatureEcx.Bits.FiveLevelPage == 1);
+    return TRUE;
+  } else {
+    return FALSE;
+  }
 }
 
 /**
@@ -119,14 +174,6 @@ CalculateMaximumSupportAddress (
       PhysicalAddressBits = 36;
     }
   }
-
-  //
-  // IA-32e paging translates 48-bit linear addresses to 52-bit physical addresses.
-  //
-  ASSERT (PhysicalAddressBits <= 52);
-  if (PhysicalAddressBits > 48) {
-    PhysicalAddressBits = 48;
-  }
   return PhysicalAddressBits;
 }
 
@@ -141,24 +188,44 @@ SetStaticPageTable (
   )
 {
   UINT64                                        PageAddress;
+  UINTN                                         NumberOfPml5EntriesNeeded;
   UINTN                                         NumberOfPml4EntriesNeeded;
   UINTN                                         NumberOfPdpEntriesNeeded;
+  UINTN                                         IndexOfPml5Entries;
   UINTN                                         IndexOfPml4Entries;
   UINTN                                         IndexOfPdpEntries;
   UINTN                                         IndexOfPageDirectoryEntries;
+  UINT64                                        *PageMapLevel5Entry;
   UINT64                                        *PageMapLevel4Entry;
   UINT64                                        *PageMap;
   UINT64                                        *PageDirectoryPointerEntry;
   UINT64                                        *PageDirectory1GEntry;
   UINT64                                        *PageDirectoryEntry;
 
-  if (mPhysicalAddressBits <= 39 ) {
-    NumberOfPml4EntriesNeeded = 1;
-    NumberOfPdpEntriesNeeded = (UINT32)LShiftU64 (1, (mPhysicalAddressBits - 30));
-  } else {
-    NumberOfPml4EntriesNeeded = (UINT32)LShiftU64 (1, (mPhysicalAddressBits - 39));
-    NumberOfPdpEntriesNeeded = 512;
+  //
+  // IA-32e paging translates 48-bit linear addresses to 52-bit physical addresses
+  //  when 5-Level Paging is disabled.
+  //
+  ASSERT (mPhysicalAddressBits <= 52);
+  if (!m5LevelPagingNeeded && mPhysicalAddressBits > 48) {
+    mPhysicalAddressBits = 48;
   }
+
+  NumberOfPml5EntriesNeeded = 1;
+  if (mPhysicalAddressBits > 48) {
+    NumberOfPml5EntriesNeeded = (UINTN) LShiftU64 (1, mPhysicalAddressBits - 48);
+    mPhysicalAddressBits = 48;
+  }
+
+  NumberOfPml4EntriesNeeded = 1;
+  if (mPhysicalAddressBits > 39) {
+    NumberOfPml4EntriesNeeded = (UINTN) LShiftU64 (1, mPhysicalAddressBits - 39);
+    mPhysicalAddressBits = 39;
+  }
+
+  NumberOfPdpEntriesNeeded = 1;
+  ASSERT (mPhysicalAddressBits > 30);
+  NumberOfPdpEntriesNeeded = (UINTN) LShiftU64 (1, mPhysicalAddressBits - 30);
 
   //
   // By architecture only one PageMapLevel4 exists - so lets allocate storage for it.
@@ -166,64 +233,92 @@ SetStaticPageTable (
   PageMap         = (VOID *) PageTable;
 
   PageMapLevel4Entry = PageMap;
+  PageMapLevel5Entry = NULL;
+  if (m5LevelPagingNeeded) {
+    //
+    // By architecture only one PageMapLevel5 exists - so lets allocate storage for it.
+    //
+    PageMapLevel5Entry = PageMap;
+  }
   PageAddress        = 0;
-  for (IndexOfPml4Entries = 0; IndexOfPml4Entries < NumberOfPml4EntriesNeeded; IndexOfPml4Entries++, PageMapLevel4Entry++) {
-    //
-    // Each PML4 entry points to a page of Page Directory Pointer entries.
-    //
-    PageDirectoryPointerEntry = (UINT64 *) ((*PageMapLevel4Entry) & ~mAddressEncMask & gPhyMask);
-    if (PageDirectoryPointerEntry == NULL) {
-      PageDirectoryPointerEntry = AllocatePageTableMemory (1);
-      ASSERT(PageDirectoryPointerEntry != NULL);
-      ZeroMem (PageDirectoryPointerEntry, EFI_PAGES_TO_SIZE(1));
 
-      *PageMapLevel4Entry = (UINT64)(UINTN)PageDirectoryPointerEntry | mAddressEncMask | PAGE_ATTRIBUTE_BITS;
+  for ( IndexOfPml5Entries = 0
+      ; IndexOfPml5Entries < NumberOfPml5EntriesNeeded
+      ; IndexOfPml5Entries++, PageMapLevel5Entry++) {
+    //
+    // Each PML5 entry points to a page of PML4 entires.
+    // So lets allocate space for them and fill them in in the IndexOfPml4Entries loop.
+    // When 5-Level Paging is disabled, below allocation happens only once.
+    //
+    if (m5LevelPagingNeeded) {
+      PageMapLevel4Entry = (UINT64 *) ((*PageMapLevel5Entry) & ~mAddressEncMask & gPhyMask);
+      if (PageMapLevel4Entry == NULL) {
+        PageMapLevel4Entry = AllocatePageTableMemory (1);
+        ASSERT(PageMapLevel4Entry != NULL);
+        ZeroMem (PageMapLevel4Entry, EFI_PAGES_TO_SIZE(1));
+
+        *PageMapLevel5Entry = (UINT64)(UINTN)PageMapLevel4Entry | mAddressEncMask | PAGE_ATTRIBUTE_BITS;
+      }
     }
 
-    if (m1GPageTableSupport) {
-      PageDirectory1GEntry = PageDirectoryPointerEntry;
-      for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectory1GEntry++, PageAddress += SIZE_1GB) {
-        if (IndexOfPml4Entries == 0 && IndexOfPageDirectoryEntries < 4) {
-          //
-          // Skip the < 4G entries
-          //
-          continue;
-        }
-        //
-        // Fill in the Page Directory entries
-        //
-        *PageDirectory1GEntry = PageAddress | mAddressEncMask | IA32_PG_PS | PAGE_ATTRIBUTE_BITS;
+    for (IndexOfPml4Entries = 0; IndexOfPml4Entries < (NumberOfPml5EntriesNeeded == 1 ? NumberOfPml4EntriesNeeded : 512); IndexOfPml4Entries++, PageMapLevel4Entry++) {
+      //
+      // Each PML4 entry points to a page of Page Directory Pointer entries.
+      //
+      PageDirectoryPointerEntry = (UINT64 *) ((*PageMapLevel4Entry) & ~mAddressEncMask & gPhyMask);
+      if (PageDirectoryPointerEntry == NULL) {
+        PageDirectoryPointerEntry = AllocatePageTableMemory (1);
+        ASSERT(PageDirectoryPointerEntry != NULL);
+        ZeroMem (PageDirectoryPointerEntry, EFI_PAGES_TO_SIZE(1));
+
+        *PageMapLevel4Entry = (UINT64)(UINTN)PageDirectoryPointerEntry | mAddressEncMask | PAGE_ATTRIBUTE_BITS;
       }
-    } else {
-      PageAddress = BASE_4GB;
-      for (IndexOfPdpEntries = 0; IndexOfPdpEntries < NumberOfPdpEntriesNeeded; IndexOfPdpEntries++, PageDirectoryPointerEntry++) {
-        if (IndexOfPml4Entries == 0 && IndexOfPdpEntries < 4) {
-          //
-          // Skip the < 4G entries
-          //
-          continue;
-        }
-        //
-        // Each Directory Pointer entries points to a page of Page Directory entires.
-        // So allocate space for them and fill them in in the IndexOfPageDirectoryEntries loop.
-        //
-        PageDirectoryEntry = (UINT64 *) ((*PageDirectoryPointerEntry) & ~mAddressEncMask & gPhyMask);
-        if (PageDirectoryEntry == NULL) {
-          PageDirectoryEntry = AllocatePageTableMemory (1);
-          ASSERT(PageDirectoryEntry != NULL);
-          ZeroMem (PageDirectoryEntry, EFI_PAGES_TO_SIZE(1));
 
-          //
-          // Fill in a Page Directory Pointer Entries
-          //
-          *PageDirectoryPointerEntry = (UINT64)(UINTN)PageDirectoryEntry | mAddressEncMask | PAGE_ATTRIBUTE_BITS;
-        }
-
-        for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectoryEntry++, PageAddress += SIZE_2MB) {
+      if (m1GPageTableSupport) {
+        PageDirectory1GEntry = PageDirectoryPointerEntry;
+        for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectory1GEntry++, PageAddress += SIZE_1GB) {
+          if (IndexOfPml4Entries == 0 && IndexOfPageDirectoryEntries < 4) {
+            //
+            // Skip the < 4G entries
+            //
+            continue;
+          }
           //
           // Fill in the Page Directory entries
           //
-          *PageDirectoryEntry = PageAddress | mAddressEncMask | IA32_PG_PS | PAGE_ATTRIBUTE_BITS;
+          *PageDirectory1GEntry = PageAddress | mAddressEncMask | IA32_PG_PS | PAGE_ATTRIBUTE_BITS;
+        }
+      } else {
+        PageAddress = BASE_4GB;
+        for (IndexOfPdpEntries = 0; IndexOfPdpEntries < (NumberOfPml4EntriesNeeded == 1 ? NumberOfPdpEntriesNeeded : 512); IndexOfPdpEntries++, PageDirectoryPointerEntry++) {
+          if (IndexOfPml4Entries == 0 && IndexOfPdpEntries < 4) {
+            //
+            // Skip the < 4G entries
+            //
+            continue;
+          }
+          //
+          // Each Directory Pointer entries points to a page of Page Directory entires.
+          // So allocate space for them and fill them in in the IndexOfPageDirectoryEntries loop.
+          //
+          PageDirectoryEntry = (UINT64 *) ((*PageDirectoryPointerEntry) & ~mAddressEncMask & gPhyMask);
+          if (PageDirectoryEntry == NULL) {
+            PageDirectoryEntry = AllocatePageTableMemory (1);
+            ASSERT(PageDirectoryEntry != NULL);
+            ZeroMem (PageDirectoryEntry, EFI_PAGES_TO_SIZE(1));
+
+            //
+            // Fill in a Page Directory Pointer Entries
+            //
+            *PageDirectoryPointerEntry = (UINT64)(UINTN)PageDirectoryEntry | mAddressEncMask | PAGE_ATTRIBUTE_BITS;
+          }
+
+          for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectoryEntry++, PageAddress += SIZE_2MB) {
+            //
+            // Fill in the Page Directory entries
+            //
+            *PageDirectoryEntry = PageAddress | mAddressEncMask | IA32_PG_PS | PAGE_ATTRIBUTE_BITS;
+          }
         }
       }
     }
@@ -248,19 +343,23 @@ SmmInitPageTable (
   UINTN                             PageFaultHandlerHookAddress;
   IA32_IDT_GATE_DESCRIPTOR          *IdtEntry;
   EFI_STATUS                        Status;
+  UINT64                            *Pml4Entry;
+  UINT64                            *Pml5Entry;
 
   //
   // Initialize spin lock
   //
   InitializeSpinLock (mPFLock);
 
-  mCpuSmmStaticPageTable = PcdGetBool (PcdCpuSmmStaticPageTable);
-  m1GPageTableSupport = Is1GPageSupport ();
-  DEBUG ((DEBUG_INFO, "1GPageTableSupport - 0x%x\n", m1GPageTableSupport));
-  DEBUG ((DEBUG_INFO, "PcdCpuSmmStaticPageTable - 0x%x\n", mCpuSmmStaticPageTable));
-
-  mPhysicalAddressBits = CalculateMaximumSupportAddress ();
-  DEBUG ((DEBUG_INFO, "PhysicalAddressBits - 0x%x\n", mPhysicalAddressBits));
+  mCpuSmmRestrictedMemoryAccess = PcdGetBool (PcdCpuSmmRestrictedMemoryAccess);
+  m1GPageTableSupport           = Is1GPageSupport ();
+  m5LevelPagingNeeded           = Is5LevelPagingNeeded ();
+  mPhysicalAddressBits          = CalculateMaximumSupportAddress ();
+  PatchInstructionX86 (gPatch5LevelPagingNeeded, m5LevelPagingNeeded, 1);
+  DEBUG ((DEBUG_INFO, "5LevelPaging Needed             - %d\n", m5LevelPagingNeeded));
+  DEBUG ((DEBUG_INFO, "1GPageTable Support             - %d\n", m1GPageTableSupport));
+  DEBUG ((DEBUG_INFO, "PcdCpuSmmRestrictedMemoryAccess - %d\n", mCpuSmmRestrictedMemoryAccess));
+  DEBUG ((DEBUG_INFO, "PhysicalAddressBits             - %d\n", mPhysicalAddressBits));
   //
   // Generate PAE page table for the first 4GB memory space
   //
@@ -277,17 +376,37 @@ SmmInitPageTable (
   //
   // Fill Page-Table-Level4 (PML4) entry
   //
-  PTEntry = (UINT64*)AllocatePageTableMemory (1);
-  ASSERT (PTEntry != NULL);
-  *PTEntry = Pages | mAddressEncMask | PAGE_ATTRIBUTE_BITS;
-  ZeroMem (PTEntry + 1, EFI_PAGE_SIZE - sizeof (*PTEntry));
+  Pml4Entry = (UINT64*)AllocatePageTableMemory (1);
+  ASSERT (Pml4Entry != NULL);
+  *Pml4Entry = Pages | mAddressEncMask | PAGE_ATTRIBUTE_BITS;
+  ZeroMem (Pml4Entry + 1, EFI_PAGE_SIZE - sizeof (*Pml4Entry));
 
   //
   // Set sub-entries number
   //
-  SetSubEntriesNum (PTEntry, 3);
+  SetSubEntriesNum (Pml4Entry, 3);
+  PTEntry = Pml4Entry;
 
-  if (mCpuSmmStaticPageTable) {
+  if (m5LevelPagingNeeded) {
+    //
+    // Fill PML5 entry
+    //
+    Pml5Entry = (UINT64*)AllocatePageTableMemory (1);
+    ASSERT (Pml5Entry != NULL);
+    *Pml5Entry = (UINTN) Pml4Entry | mAddressEncMask | PAGE_ATTRIBUTE_BITS;
+    ZeroMem (Pml5Entry + 1, EFI_PAGE_SIZE - sizeof (*Pml5Entry));
+    //
+    // Set sub-entries number
+    //
+    SetSubEntriesNum (Pml5Entry, 1);
+    PTEntry = Pml5Entry;
+  }
+
+  if (mCpuSmmRestrictedMemoryAccess) {
+    //
+    // When access to non-SMRAM memory is restricted, create page table
+    // that covers all memory space.
+    //
     SetStaticPageTable ((UINTN)PTEntry);
   } else {
     //
@@ -301,7 +420,9 @@ SmmInitPageTable (
     }
   }
 
-  if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
+  if (FeaturePcdGet (PcdCpuSmmProfileEnable) ||
+      HEAP_GUARD_NONSTOP_MODE ||
+      NULL_DETECTION_NONSTOP_MODE) {
     //
     // Set own Page Fault entry instead of the default one, because SMM Profile
     // feature depends on IRET instruction to do Single Step
@@ -331,7 +452,7 @@ SmmInitPageTable (
   }
 
   //
-  // Return the address of PML4 (to set CR3)
+  // Return the address of PML4/PML5 (to set CR3)
   //
   return (UINT32)(UINTN)PTEntry;
 }
@@ -423,12 +544,16 @@ ReclaimPages (
   VOID
   )
 {
+  UINT64                       Pml5Entry;
+  UINT64                       *Pml5;
   UINT64                       *Pml4;
   UINT64                       *Pdpt;
   UINT64                       *Pdt;
+  UINTN                        Pml5Index;
   UINTN                        Pml4Index;
   UINTN                        PdptIndex;
   UINTN                        PdtIndex;
+  UINTN                        MinPml5;
   UINTN                        MinPml4;
   UINTN                        MinPdpt;
   UINTN                        MinPdt;
@@ -438,120 +563,165 @@ ReclaimPages (
   BOOLEAN                      PML4EIgnore;
   BOOLEAN                      PDPTEIgnore;
   UINT64                       *ReleasePageAddress;
+  IA32_CR4                     Cr4;
+  BOOLEAN                      Enable5LevelPaging;
+  UINT64                       PFAddress;
+  UINT64                       PFAddressPml5Index;
+  UINT64                       PFAddressPml4Index;
+  UINT64                       PFAddressPdptIndex;
+  UINT64                       PFAddressPdtIndex;
 
   Pml4 = NULL;
   Pdpt = NULL;
   Pdt  = NULL;
   MinAcc  = (UINT64)-1;
   MinPml4 = (UINTN)-1;
+  MinPml5 = (UINTN)-1;
   MinPdpt = (UINTN)-1;
   MinPdt  = (UINTN)-1;
   Acc     = 0;
   ReleasePageAddress = 0;
+  PFAddress = AsmReadCr2 ();
+  PFAddressPml5Index = BitFieldRead64 (PFAddress, 48, 48 + 8);
+  PFAddressPml4Index = BitFieldRead64 (PFAddress, 39, 39 + 8);
+  PFAddressPdptIndex = BitFieldRead64 (PFAddress, 30, 30 + 8);
+  PFAddressPdtIndex = BitFieldRead64 (PFAddress, 21, 21 + 8);
+
+  Cr4.UintN = AsmReadCr4 ();
+  Enable5LevelPaging = (BOOLEAN) (Cr4.Bits.LA57 == 1);
+  Pml5 = (UINT64*)(UINTN)(AsmReadCr3 () & gPhyMask);
+
+  if (!Enable5LevelPaging) {
+    //
+    // Create one fake PML5 entry for 4-Level Paging
+    // so that the page table parsing logic only handles 5-Level page structure.
+    //
+    Pml5Entry = (UINTN) Pml5 | IA32_PG_P;
+    Pml5 = &Pml5Entry;
+  }
 
   //
   // First, find the leaf entry has the smallest access record value
   //
-  Pml4 = (UINT64*)(UINTN)(AsmReadCr3 () & gPhyMask);
-  for (Pml4Index = 0; Pml4Index < EFI_PAGE_SIZE / sizeof (*Pml4); Pml4Index++) {
-    if ((Pml4[Pml4Index] & IA32_PG_P) == 0 || (Pml4[Pml4Index] & IA32_PG_PMNT) != 0) {
+  for (Pml5Index = 0; Pml5Index < (Enable5LevelPaging ? (EFI_PAGE_SIZE / sizeof (*Pml4)) : 1); Pml5Index++) {
+    if ((Pml5[Pml5Index] & IA32_PG_P) == 0 || (Pml5[Pml5Index] & IA32_PG_PMNT) != 0) {
       //
-      // If the PML4 entry is not present or is masked, skip it
+      // If the PML5 entry is not present or is masked, skip it
       //
       continue;
     }
-    Pdpt = (UINT64*)(UINTN)(Pml4[Pml4Index] & ~mAddressEncMask & gPhyMask);
-    PML4EIgnore = FALSE;
-    for (PdptIndex = 0; PdptIndex < EFI_PAGE_SIZE / sizeof (*Pdpt); PdptIndex++) {
-      if ((Pdpt[PdptIndex] & IA32_PG_P) == 0 || (Pdpt[PdptIndex] & IA32_PG_PMNT) != 0) {
+    Pml4 = (UINT64*)(UINTN)(Pml5[Pml5Index] & gPhyMask);
+    for (Pml4Index = 0; Pml4Index < EFI_PAGE_SIZE / sizeof (*Pml4); Pml4Index++) {
+      if ((Pml4[Pml4Index] & IA32_PG_P) == 0 || (Pml4[Pml4Index] & IA32_PG_PMNT) != 0) {
         //
-        // If the PDPT entry is not present or is masked, skip it
+        // If the PML4 entry is not present or is masked, skip it
         //
-        if ((Pdpt[PdptIndex] & IA32_PG_PMNT) != 0) {
-          //
-          // If the PDPT entry is masked, we will ignore checking the PML4 entry
-          //
-          PML4EIgnore = TRUE;
-        }
         continue;
       }
-      if ((Pdpt[PdptIndex] & IA32_PG_PS) == 0) {
-        //
-        // It's not 1-GByte pages entry, it should be a PDPT entry,
-        // we will not check PML4 entry more
-        //
-        PML4EIgnore = TRUE;
-        Pdt =  (UINT64*)(UINTN)(Pdpt[PdptIndex] & ~mAddressEncMask & gPhyMask);
-        PDPTEIgnore = FALSE;
-        for (PdtIndex = 0; PdtIndex < EFI_PAGE_SIZE / sizeof(*Pdt); PdtIndex++) {
-          if ((Pdt[PdtIndex] & IA32_PG_P) == 0 || (Pdt[PdtIndex] & IA32_PG_PMNT) != 0) {
+      Pdpt = (UINT64*)(UINTN)(Pml4[Pml4Index] & ~mAddressEncMask & gPhyMask);
+      PML4EIgnore = FALSE;
+      for (PdptIndex = 0; PdptIndex < EFI_PAGE_SIZE / sizeof (*Pdpt); PdptIndex++) {
+        if ((Pdpt[PdptIndex] & IA32_PG_P) == 0 || (Pdpt[PdptIndex] & IA32_PG_PMNT) != 0) {
+          //
+          // If the PDPT entry is not present or is masked, skip it
+          //
+          if ((Pdpt[PdptIndex] & IA32_PG_PMNT) != 0) {
             //
-            // If the PD entry is not present or is masked, skip it
+            // If the PDPT entry is masked, we will ignore checking the PML4 entry
             //
-            if ((Pdt[PdtIndex] & IA32_PG_PMNT) != 0) {
+            PML4EIgnore = TRUE;
+          }
+          continue;
+        }
+        if ((Pdpt[PdptIndex] & IA32_PG_PS) == 0) {
+          //
+          // It's not 1-GByte pages entry, it should be a PDPT entry,
+          // we will not check PML4 entry more
+          //
+          PML4EIgnore = TRUE;
+          Pdt = (UINT64*)(UINTN)(Pdpt[PdptIndex] & ~mAddressEncMask & gPhyMask);
+          PDPTEIgnore = FALSE;
+          for (PdtIndex = 0; PdtIndex < EFI_PAGE_SIZE / sizeof(*Pdt); PdtIndex++) {
+            if ((Pdt[PdtIndex] & IA32_PG_P) == 0 || (Pdt[PdtIndex] & IA32_PG_PMNT) != 0) {
               //
-              // If the PD entry is masked, we will not PDPT entry more
+              // If the PD entry is not present or is masked, skip it
+              //
+              if ((Pdt[PdtIndex] & IA32_PG_PMNT) != 0) {
+                //
+                // If the PD entry is masked, we will not PDPT entry more
+                //
+                PDPTEIgnore = TRUE;
+              }
+              continue;
+            }
+            if ((Pdt[PdtIndex] & IA32_PG_PS) == 0) {
+              //
+              // It's not 2 MByte page table entry, it should be PD entry
+              // we will find the entry has the smallest access record value
               //
               PDPTEIgnore = TRUE;
+              if (PdtIndex != PFAddressPdtIndex || PdptIndex != PFAddressPdptIndex ||
+                  Pml4Index != PFAddressPml4Index || Pml5Index != PFAddressPml5Index) {
+                Acc = GetAndUpdateAccNum (Pdt + PdtIndex);
+                if (Acc < MinAcc) {
+                  //
+                  // If the PD entry has the smallest access record value,
+                  // save the Page address to be released
+                  //
+                  MinAcc  = Acc;
+                  MinPml5 = Pml5Index;
+                  MinPml4 = Pml4Index;
+                  MinPdpt = PdptIndex;
+                  MinPdt  = PdtIndex;
+                  ReleasePageAddress = Pdt + PdtIndex;
+                }
+              }
             }
-            continue;
           }
-          if ((Pdt[PdtIndex] & IA32_PG_PS) == 0) {
+          if (!PDPTEIgnore) {
             //
-            // It's not 2 MByte page table entry, it should be PD entry
-            // we will find the entry has the smallest access record value
+            // If this PDPT entry has no PDT entries pointer to 4 KByte pages,
+            // it should only has the entries point to 2 MByte Pages
             //
-            PDPTEIgnore = TRUE;
-            Acc = GetAndUpdateAccNum (Pdt + PdtIndex);
-            if (Acc < MinAcc) {
-              //
-              // If the PD entry has the smallest access record value,
-              // save the Page address to be released
-              //
-              MinAcc  = Acc;
-              MinPml4 = Pml4Index;
-              MinPdpt = PdptIndex;
-              MinPdt  = PdtIndex;
-              ReleasePageAddress = Pdt + PdtIndex;
+            if (PdptIndex != PFAddressPdptIndex || Pml4Index != PFAddressPml4Index ||
+                Pml5Index != PFAddressPml5Index) {
+              Acc = GetAndUpdateAccNum (Pdpt + PdptIndex);
+              if (Acc < MinAcc) {
+                //
+                // If the PDPT entry has the smallest access record value,
+                // save the Page address to be released
+                //
+                MinAcc  = Acc;
+                MinPml5 = Pml5Index;
+                MinPml4 = Pml4Index;
+                MinPdpt = PdptIndex;
+                MinPdt  = (UINTN)-1;
+                ReleasePageAddress = Pdpt + PdptIndex;
+              }
             }
           }
         }
-        if (!PDPTEIgnore) {
-          //
-          // If this PDPT entry has no PDT entries pointer to 4 KByte pages,
-          // it should only has the entries point to 2 MByte Pages
-          //
-          Acc = GetAndUpdateAccNum (Pdpt + PdptIndex);
+      }
+      if (!PML4EIgnore) {
+        //
+        // If PML4 entry has no the PDPT entry pointer to 2 MByte pages,
+        // it should only has the entries point to 1 GByte Pages
+        //
+        if (Pml4Index != PFAddressPml4Index || Pml5Index != PFAddressPml5Index) {
+          Acc = GetAndUpdateAccNum (Pml4 + Pml4Index);
           if (Acc < MinAcc) {
             //
-            // If the PDPT entry has the smallest access record value,
+            // If the PML4 entry has the smallest access record value,
             // save the Page address to be released
             //
             MinAcc  = Acc;
+            MinPml5 = Pml5Index;
             MinPml4 = Pml4Index;
-            MinPdpt = PdptIndex;
+            MinPdpt = (UINTN)-1;
             MinPdt  = (UINTN)-1;
-            ReleasePageAddress = Pdpt + PdptIndex;
+            ReleasePageAddress = Pml4 + Pml4Index;
           }
         }
-      }
-    }
-    if (!PML4EIgnore) {
-      //
-      // If PML4 entry has no the PDPT entry pointer to 2 MByte pages,
-      // it should only has the entries point to 1 GByte Pages
-      //
-      Acc = GetAndUpdateAccNum (Pml4 + Pml4Index);
-      if (Acc < MinAcc) {
-        //
-        // If the PML4 entry has the smallest access record value,
-        // save the Page address to be released
-        //
-        MinAcc  = Acc;
-        MinPml4 = Pml4Index;
-        MinPdpt = (UINTN)-1;
-        MinPdt  = (UINTN)-1;
-        ReleasePageAddress = Pml4 + Pml4Index;
       }
     }
   }
@@ -575,9 +745,11 @@ ReclaimPages (
       //
       // If 4 KByte Page Table is released, check the PDPT entry
       //
+      Pml4 = (UINT64 *) (UINTN) (Pml5[MinPml5] & gPhyMask);
       Pdpt = (UINT64*)(UINTN)(Pml4[MinPml4] & ~mAddressEncMask & gPhyMask);
       SubEntriesNum = GetSubEntriesNum(Pdpt + MinPdpt);
-      if (SubEntriesNum == 0) {
+      if (SubEntriesNum == 0 &&
+          (MinPdpt != PFAddressPdptIndex || MinPml4 != PFAddressPml4Index || MinPml5 != PFAddressPml5Index)) {
         //
         // Release the empty Page Directory table if there was no more 4 KByte Page Table entry
         // clear the Page directory entry
@@ -593,7 +765,7 @@ ReclaimPages (
       //
       // Update the sub-entries filed in PDPT entry and exit
       //
-      SetSubEntriesNum (Pdpt + MinPdpt, SubEntriesNum - 1);
+      SetSubEntriesNum (Pdpt + MinPdpt, (SubEntriesNum - 1) & 0x1FF);
       break;
     }
     if (MinPdpt != (UINTN)-1) {
@@ -601,7 +773,7 @@ ReclaimPages (
       // One 2MB Page Table is released or Page Directory table is released, check the PML4 entry
       //
       SubEntriesNum = GetSubEntriesNum (Pml4 + MinPml4);
-      if (SubEntriesNum == 0) {
+      if (SubEntriesNum == 0 && (MinPml4 != PFAddressPml4Index || MinPml5 != PFAddressPml5Index)) {
         //
         // Release the empty PML4 table if there was no more 1G KByte Page Table entry
         // clear the Page directory entry
@@ -614,7 +786,7 @@ ReclaimPages (
       //
       // Update the sub-entries filed in PML4 entry and exit
       //
-      SetSubEntriesNum (Pml4 + MinPml4, SubEntriesNum - 1);
+      SetSubEntriesNum (Pml4 + MinPml4, (SubEntriesNum - 1) & 0x1FF);
       break;
     }
     //
@@ -666,7 +838,7 @@ SmiDefaultPFHandler (
   )
 {
   UINT64                            *PageTable;
-  UINT64                            *Pml4;
+  UINT64                            *PageTableTop;
   UINT64                            PFAddress;
   UINTN                             StartBit;
   UINTN                             EndBit;
@@ -677,6 +849,8 @@ SmiDefaultPFHandler (
   UINTN                             PageAttribute;
   EFI_STATUS                        Status;
   UINT64                            *UpperEntry;
+  BOOLEAN                           Enable5LevelPaging;
+  IA32_CR4                          Cr4;
 
   //
   // Set default SMM page attribute
@@ -686,8 +860,11 @@ SmiDefaultPFHandler (
   PageAttribute = 0;
 
   EndBit = 0;
-  Pml4 = (UINT64*)(AsmReadCr3 () & gPhyMask);
+  PageTableTop = (UINT64*)(AsmReadCr3 () & gPhyMask);
   PFAddress = AsmReadCr2 ();
+
+  Cr4.UintN = AsmReadCr4 ();
+  Enable5LevelPaging = (BOOLEAN) (Cr4.Bits.LA57 != 0);
 
   Status = GetPlatformPageTableAttribute (PFAddress, &PageSize, &NumOfPages, &PageAttribute);
   //
@@ -742,9 +919,9 @@ SmiDefaultPFHandler (
   }
 
   for (Index = 0; Index < NumOfPages; Index++) {
-    PageTable  = Pml4;
+    PageTable  = PageTableTop;
     UpperEntry = NULL;
-    for (StartBit = 39; StartBit > EndBit; StartBit -= 9) {
+    for (StartBit = Enable5LevelPaging ? 48 : 39; StartBit > EndBit; StartBit -= 9) {
       PTIndex = BitFieldRead64 (PFAddress, StartBit, StartBit + 8);
       if ((PageTable[PTIndex] & IA32_PG_P) == 0) {
         //
@@ -782,7 +959,7 @@ SmiDefaultPFHandler (
     PageTable[PTIndex] = ((PFAddress | mAddressEncMask) & gPhyMask & ~((1ull << EndBit) - 1)) |
                          PageAttribute | IA32_PG_A | PAGE_ATTRIBUTE_BITS;
     if (UpperEntry != NULL) {
-      SetSubEntriesNum (UpperEntry, GetSubEntriesNum (UpperEntry) + 1);
+      SetSubEntriesNum (UpperEntry, (GetSubEntriesNum (UpperEntry) + 1) & 0x1FF);
     }
     //
     // Get the next page address if we need to create more page tables
@@ -802,8 +979,8 @@ SmiDefaultPFHandler (
 VOID
 EFIAPI
 SmiPFHandler (
-    IN EFI_EXCEPTION_TYPE   InterruptType,
-    IN EFI_SYSTEM_CONTEXT   SystemContext
+  IN EFI_EXCEPTION_TYPE   InterruptType,
+  IN EFI_SYSTEM_CONTEXT   SystemContext
   )
 {
   UINTN             PFAddress;
@@ -816,9 +993,11 @@ SmiPFHandler (
 
   PFAddress = AsmReadCr2 ();
 
-  if (mCpuSmmStaticPageTable && (PFAddress >= LShiftU64 (1, (mPhysicalAddressBits - 1)))) {
+  if (mCpuSmmRestrictedMemoryAccess && (PFAddress >= LShiftU64 (1, (mPhysicalAddressBits - 1)))) {
+    DumpCpuContext (InterruptType, SystemContext);
     DEBUG ((DEBUG_ERROR, "Do not support address 0x%lx by processor!\n", PFAddress));
     CpuDeadLoop ();
+    goto Exit;
   }
 
   //
@@ -827,6 +1006,7 @@ SmiPFHandler (
   //
   if ((PFAddress >= mCpuHotPlugData.SmrrBase) &&
       (PFAddress < (mCpuHotPlugData.SmrrBase + mCpuHotPlugData.SmrrSize))) {
+    DumpCpuContext (InterruptType, SystemContext);
     CpuIndex = GetCpuIndex ();
     GuardPageAddress = (mSmmStackArrayBase + EFI_PAGE_SIZE + CpuIndex * mSmmStackSize);
     if ((FeaturePcdGet (PcdCpuSmmStackGuard)) &&
@@ -834,15 +1014,6 @@ SmiPFHandler (
         (PFAddress < (GuardPageAddress + EFI_PAGE_SIZE))) {
       DEBUG ((DEBUG_ERROR, "SMM stack overflow!\n"));
     } else {
-      DEBUG ((DEBUG_ERROR, "SMM exception data - 0x%lx(", SystemContext.SystemContextX64->ExceptionData));
-      DEBUG ((DEBUG_ERROR, "I:%x, R:%x, U:%x, W:%x, P:%x",
-        (SystemContext.SystemContextX64->ExceptionData & IA32_PF_EC_ID) != 0,
-        (SystemContext.SystemContextX64->ExceptionData & IA32_PF_EC_RSVD) != 0,
-        (SystemContext.SystemContextX64->ExceptionData & IA32_PF_EC_US) != 0,
-        (SystemContext.SystemContextX64->ExceptionData & IA32_PF_EC_WR) != 0,
-        (SystemContext.SystemContextX64->ExceptionData & IA32_PF_EC_P) != 0
-        ));
-      DEBUG ((DEBUG_ERROR, ")\n"));
       if ((SystemContext.SystemContextX64->ExceptionData & IA32_PF_EC_ID) != 0) {
         DEBUG ((DEBUG_ERROR, "SMM exception at execution (0x%lx)\n", PFAddress));
         DEBUG_CODE (
@@ -854,28 +1025,59 @@ SmiPFHandler (
           DumpModuleInfoByIp ((UINTN)SystemContext.SystemContextX64->Rip);
         );
       }
+
+      if (HEAP_GUARD_NONSTOP_MODE) {
+        GuardPagePFHandler (SystemContext.SystemContextX64->ExceptionData);
+        goto Exit;
+      }
     }
     CpuDeadLoop ();
+    goto Exit;
   }
 
   //
-  // If a page fault occurs in SMM range
+  // If a page fault occurs in non-SMRAM range.
   //
   if ((PFAddress < mCpuHotPlugData.SmrrBase) ||
       (PFAddress >= mCpuHotPlugData.SmrrBase + mCpuHotPlugData.SmrrSize)) {
     if ((SystemContext.SystemContextX64->ExceptionData & IA32_PF_EC_ID) != 0) {
+      DumpCpuContext (InterruptType, SystemContext);
       DEBUG ((DEBUG_ERROR, "Code executed on IP(0x%lx) out of SMM range after SMM is locked!\n", PFAddress));
       DEBUG_CODE (
         DumpModuleInfoByIp (*(UINTN *)(UINTN)SystemContext.SystemContextX64->Rsp);
       );
       CpuDeadLoop ();
+      goto Exit;
     }
-    if (IsSmmCommBufferForbiddenAddress (PFAddress)) {
+
+    //
+    // If NULL pointer was just accessed
+    //
+    if ((PcdGet8 (PcdNullPointerDetectionPropertyMask) & BIT1) != 0 &&
+        (PFAddress < EFI_PAGE_SIZE)) {
+      DumpCpuContext (InterruptType, SystemContext);
+      DEBUG ((DEBUG_ERROR, "!!! NULL pointer access !!!\n"));
+      DEBUG_CODE (
+        DumpModuleInfoByIp ((UINTN)SystemContext.SystemContextX64->Rip);
+      );
+
+      if (NULL_DETECTION_NONSTOP_MODE) {
+        GuardPagePFHandler (SystemContext.SystemContextX64->ExceptionData);
+        goto Exit;
+      }
+
+      CpuDeadLoop ();
+      goto Exit;
+    }
+
+    if (mCpuSmmRestrictedMemoryAccess && IsSmmCommBufferForbiddenAddress (PFAddress)) {
+      DumpCpuContext (InterruptType, SystemContext);
       DEBUG ((DEBUG_ERROR, "Access SMM communication forbidden address (0x%lx)!\n", PFAddress));
       DEBUG_CODE (
         DumpModuleInfoByIp ((UINTN)SystemContext.SystemContextX64->Rip);
       );
       CpuDeadLoop ();
+      goto Exit;
     }
   }
 
@@ -888,6 +1090,7 @@ SmiPFHandler (
     SmiDefaultPFHandler ();
   }
 
+Exit:
   ReleaseSpinLock (mPFLock);
 }
 
@@ -902,14 +1105,42 @@ SetPageTableAttributes (
   UINTN                 Index2;
   UINTN                 Index3;
   UINTN                 Index4;
+  UINTN                 Index5;
   UINT64                *L1PageTable;
   UINT64                *L2PageTable;
   UINT64                *L3PageTable;
   UINT64                *L4PageTable;
+  UINT64                *L5PageTable;
   BOOLEAN               IsSplitted;
   BOOLEAN               PageTableSplitted;
+  BOOLEAN               CetEnabled;
+  IA32_CR4              Cr4;
+  BOOLEAN               Enable5LevelPaging;
 
-  if (!mCpuSmmStaticPageTable) {
+  Cr4.UintN = AsmReadCr4 ();
+  Enable5LevelPaging = (BOOLEAN) (Cr4.Bits.LA57 == 1);
+
+  //
+  // Don't mark page table memory as read-only if
+  //  - no restriction on access to non-SMRAM memory; or
+  //  - SMM heap guard feature enabled; or
+  //      BIT2: SMM page guard enabled
+  //      BIT3: SMM pool guard enabled
+  //  - SMM profile feature enabled
+  //
+  if (!mCpuSmmRestrictedMemoryAccess ||
+      ((PcdGet8 (PcdHeapGuardPropertyMask) & (BIT3 | BIT2)) != 0) ||
+      FeaturePcdGet (PcdCpuSmmProfileEnable)) {
+    //
+    // Restriction on access to non-SMRAM memory and heap guard could not be enabled at the same time.
+    //
+    ASSERT (!(mCpuSmmRestrictedMemoryAccess &&
+              (PcdGet8 (PcdHeapGuardPropertyMask) & (BIT3 | BIT2)) != 0));
+
+    //
+    // Restriction on access to non-SMRAM memory and SMM profile could not be enabled at the same time.
+    //
+    ASSERT (!(mCpuSmmRestrictedMemoryAccess && FeaturePcdGet (PcdCpuSmmProfileEnable)));
     return ;
   }
 
@@ -919,49 +1150,71 @@ SetPageTableAttributes (
   // Disable write protection, because we need mark page table to be write protected.
   // We need *write* page table memory, to mark itself to be *read only*.
   //
+  CetEnabled = ((AsmReadCr4() & CR4_CET_ENABLE) != 0) ? TRUE : FALSE;
+  if (CetEnabled) {
+    //
+    // CET must be disabled if WP is disabled.
+    //
+    DisableCet();
+  }
   AsmWriteCr0 (AsmReadCr0() & ~CR0_WP);
 
   do {
     DEBUG ((DEBUG_INFO, "Start...\n"));
     PageTableSplitted = FALSE;
+    L5PageTable = NULL;
+    if (Enable5LevelPaging) {
+      L5PageTable = (UINT64 *)GetPageTableBase ();
+      SmmSetMemoryAttributesEx ((EFI_PHYSICAL_ADDRESS)(UINTN)L5PageTable, SIZE_4KB, EFI_MEMORY_RO, &IsSplitted);
+      PageTableSplitted = (PageTableSplitted || IsSplitted);
+    }
 
-    L4PageTable = (UINT64 *)GetPageTableBase ();
-    SmmSetMemoryAttributesEx ((EFI_PHYSICAL_ADDRESS)(UINTN)L4PageTable, SIZE_4KB, EFI_MEMORY_RO, &IsSplitted);
-    PageTableSplitted = (PageTableSplitted || IsSplitted);
-
-    for (Index4 = 0; Index4 < SIZE_4KB/sizeof(UINT64); Index4++) {
-      L3PageTable = (UINT64 *)(UINTN)(L4PageTable[Index4] & ~mAddressEncMask & PAGING_4K_ADDRESS_MASK_64);
-      if (L3PageTable == NULL) {
-        continue;
+    for (Index5 = 0; Index5 < (Enable5LevelPaging ? SIZE_4KB/sizeof(UINT64) : 1); Index5++) {
+      if (Enable5LevelPaging) {
+        L4PageTable = (UINT64 *)(UINTN)(L5PageTable[Index5] & ~mAddressEncMask & PAGING_4K_ADDRESS_MASK_64);
+        if (L4PageTable == NULL) {
+          continue;
+        }
+      } else {
+        L4PageTable = (UINT64 *)GetPageTableBase ();
       }
-
-      SmmSetMemoryAttributesEx ((EFI_PHYSICAL_ADDRESS)(UINTN)L3PageTable, SIZE_4KB, EFI_MEMORY_RO, &IsSplitted);
+      SmmSetMemoryAttributesEx ((EFI_PHYSICAL_ADDRESS)(UINTN)L4PageTable, SIZE_4KB, EFI_MEMORY_RO, &IsSplitted);
       PageTableSplitted = (PageTableSplitted || IsSplitted);
 
-      for (Index3 = 0; Index3 < SIZE_4KB/sizeof(UINT64); Index3++) {
-        if ((L3PageTable[Index3] & IA32_PG_PS) != 0) {
-          // 1G
-          continue;
-        }
-        L2PageTable = (UINT64 *)(UINTN)(L3PageTable[Index3] & ~mAddressEncMask & PAGING_4K_ADDRESS_MASK_64);
-        if (L2PageTable == NULL) {
+      for (Index4 = 0; Index4 < SIZE_4KB/sizeof(UINT64); Index4++) {
+        L3PageTable = (UINT64 *)(UINTN)(L4PageTable[Index4] & ~mAddressEncMask & PAGING_4K_ADDRESS_MASK_64);
+        if (L3PageTable == NULL) {
           continue;
         }
 
-        SmmSetMemoryAttributesEx ((EFI_PHYSICAL_ADDRESS)(UINTN)L2PageTable, SIZE_4KB, EFI_MEMORY_RO, &IsSplitted);
+        SmmSetMemoryAttributesEx ((EFI_PHYSICAL_ADDRESS)(UINTN)L3PageTable, SIZE_4KB, EFI_MEMORY_RO, &IsSplitted);
         PageTableSplitted = (PageTableSplitted || IsSplitted);
 
-        for (Index2 = 0; Index2 < SIZE_4KB/sizeof(UINT64); Index2++) {
-          if ((L2PageTable[Index2] & IA32_PG_PS) != 0) {
-            // 2M
+        for (Index3 = 0; Index3 < SIZE_4KB/sizeof(UINT64); Index3++) {
+          if ((L3PageTable[Index3] & IA32_PG_PS) != 0) {
+            // 1G
             continue;
           }
-          L1PageTable = (UINT64 *)(UINTN)(L2PageTable[Index2] & ~mAddressEncMask & PAGING_4K_ADDRESS_MASK_64);
-          if (L1PageTable == NULL) {
+          L2PageTable = (UINT64 *)(UINTN)(L3PageTable[Index3] & ~mAddressEncMask & PAGING_4K_ADDRESS_MASK_64);
+          if (L2PageTable == NULL) {
             continue;
           }
-          SmmSetMemoryAttributesEx ((EFI_PHYSICAL_ADDRESS)(UINTN)L1PageTable, SIZE_4KB, EFI_MEMORY_RO, &IsSplitted);
+
+          SmmSetMemoryAttributesEx ((EFI_PHYSICAL_ADDRESS)(UINTN)L2PageTable, SIZE_4KB, EFI_MEMORY_RO, &IsSplitted);
           PageTableSplitted = (PageTableSplitted || IsSplitted);
+
+          for (Index2 = 0; Index2 < SIZE_4KB/sizeof(UINT64); Index2++) {
+            if ((L2PageTable[Index2] & IA32_PG_PS) != 0) {
+              // 2M
+              continue;
+            }
+            L1PageTable = (UINT64 *)(UINTN)(L2PageTable[Index2] & ~mAddressEncMask & PAGING_4K_ADDRESS_MASK_64);
+            if (L1PageTable == NULL) {
+              continue;
+            }
+            SmmSetMemoryAttributesEx ((EFI_PHYSICAL_ADDRESS)(UINTN)L1PageTable, SIZE_4KB, EFI_MEMORY_RO, &IsSplitted);
+            PageTableSplitted = (PageTableSplitted || IsSplitted);
+          }
         }
       }
     }
@@ -971,6 +1224,62 @@ SetPageTableAttributes (
   // Enable write protection, after page table updated.
   //
   AsmWriteCr0 (AsmReadCr0() | CR0_WP);
+  if (CetEnabled) {
+    //
+    // re-enable CET.
+    //
+    EnableCet();
+  }
 
   return ;
+}
+
+/**
+  This function reads CR2 register when on-demand paging is enabled.
+
+  @param[out]  *Cr2  Pointer to variable to hold CR2 register value.
+**/
+VOID
+SaveCr2 (
+  OUT UINTN  *Cr2
+  )
+{
+  if (!mCpuSmmRestrictedMemoryAccess) {
+    //
+    // On-demand paging is enabled when access to non-SMRAM is not restricted.
+    //
+    *Cr2 = AsmReadCr2 ();
+  }
+}
+
+/**
+  This function restores CR2 register when on-demand paging is enabled.
+
+  @param[in]  Cr2  Value to write into CR2 register.
+**/
+VOID
+RestoreCr2 (
+  IN UINTN  Cr2
+  )
+{
+  if (!mCpuSmmRestrictedMemoryAccess) {
+    //
+    // On-demand paging is enabled when access to non-SMRAM is not restricted.
+    //
+    AsmWriteCr2 (Cr2);
+  }
+}
+
+/**
+  Return whether access to non-SMRAM is restricted.
+
+  @retval TRUE  Access to non-SMRAM is restricted.
+  @retval FALSE Access to non-SMRAM is not restricted.
+**/
+BOOLEAN
+IsRestrictedMemoryAccess (
+  VOID
+  )
+{
+  return mCpuSmmRestrictedMemoryAccess;
 }

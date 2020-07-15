@@ -4,14 +4,8 @@
   This file defines common data structures, macro definitions and some module
   internal function header files.
 
-  Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -26,6 +20,7 @@
 #include <Protocol/BlockIo2.h>
 #include <Protocol/StorageSecurityCommand.h>
 #include <Protocol/EraseBlock.h>
+#include <Protocol/DiskInfo.h>
 
 #include <Protocol/DevicePath.h>
 
@@ -40,6 +35,8 @@
 #include <Library/UefiRuntimeServicesTableLib.h>
 
 #include "EmmcBlockIo.h"
+#include "EmmcDiskInfo.h"
+
 //
 // Global Variables
 //
@@ -60,6 +57,9 @@ extern EFI_COMPONENT_NAME2_PROTOCOL     gEmmcDxeComponentName2;
 
 #define EMMC_PARTITION_DATA_FROM_ERASEBLK(a) \
     CR(a, EMMC_PARTITION, EraseBlock, EMMC_PARTITION_SIGNATURE)
+
+#define EMMC_PARTITION_DATA_FROM_DISKINFO(a) \
+    CR(a, EMMC_PARTITION, DiskInfo, EMMC_PARTITION_SIGNATURE)
 
 //
 // Take 2.5 seconds as generic time out value, 1 microsecond as unit.
@@ -102,6 +102,7 @@ typedef struct {
   EFI_BLOCK_IO_MEDIA                    BlockMedia;
   EFI_STORAGE_SECURITY_COMMAND_PROTOCOL StorageSecurity;
   EFI_ERASE_BLOCK_PROTOCOL              EraseBlock;
+  EFI_DISK_INFO_PROTOCOL                DiskInfo;
 
   LIST_ENTRY                            Queue;
 
@@ -234,7 +235,7 @@ EmmcDxeDriverBindingSupported (
   @retval EFI_SUCCESS              The device was started.
   @retval EFI_DEVICE_ERROR         The device could not be started due to a device error.Currently not implemented.
   @retval EFI_OUT_OF_RESOURCES     The request could not be completed due to a lack of resources.
-  @retval Others                   The driver failded to start the device.
+  @retval Others                   The driver failed to start the device.
 
 **/
 EFI_STATUS

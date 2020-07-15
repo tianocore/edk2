@@ -1,15 +1,9 @@
 ## @file
 # This file is for installed package information database operations
 #
-# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
-# This program and the accompanying materials are licensed and made available 
-# under the terms and conditions of the BSD License which accompanies this 
-# distribution. The full text of the license may be found at 
-# http://opensource.org/licenses/bsd-license.php
-#
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
 '''
@@ -33,8 +27,8 @@ import platform as pf
 #
 # This class represents the installed package information database
 # Add/Remove/Get installed distribution package information here.
-# 
-# 
+#
+#
 # @param object:      Inherited from object class
 # @param DbPath:      A string for the path of the database
 #
@@ -44,7 +38,7 @@ class IpiDatabase(object):
         Dir = os.path.dirname(DbPath)
         if not os.path.isdir(Dir):
             os.mkdir(Dir)
-        self.Conn = sqlite3.connect(DbPath, isolation_level='DEFERRED')
+        self.Conn = sqlite3.connect(u''.join(DbPath), isolation_level='DEFERRED')
         self.Conn.execute("PRAGMA page_size=4096")
         self.Conn.execute("PRAGMA synchronous=OFF")
         self.Cur = self.Conn.cursor()
@@ -71,16 +65,16 @@ class IpiDatabase(object):
                 SqlCommand = """
                 create table %s (
                 Dummy TEXT NOT NULL,
-                PRIMARY KEY (Dummy)                                               
+                PRIMARY KEY (Dummy)
                 )""" % self.DummyTable
                 self.Cur.execute(SqlCommand)
                 self.Conn.commit()
             except sqlite3.OperationalError:
-                Logger.Error("UPT", 
-                             UPT_ALREADY_RUNNING_ERROR, 
+                Logger.Error("UPT",
+                             UPT_ALREADY_RUNNING_ERROR,
                              ST.ERR_UPT_ALREADY_RUNNING_ERROR
                              )
-        
+
         #
         # Create new table
         #
@@ -89,12 +83,12 @@ class IpiDatabase(object):
         DpGuid TEXT NOT NULL,DpVersion TEXT NOT NULL,
         InstallTime REAL NOT NULL,
         NewPkgFileName TEXT NOT NULL,
-        PkgFileName TEXT NOT NULL,                                               
+        PkgFileName TEXT NOT NULL,
         RePackage TEXT NOT NULL,
-        PRIMARY KEY (DpGuid, DpVersion)                                               
+        PRIMARY KEY (DpGuid, DpVersion)
         )""" % self.DpTable
         self.Cur.execute(SqlCommand)
-        
+
         SqlCommand = """
         create table IF NOT EXISTS %s (
         FilePath TEXT NOT NULL,
@@ -104,7 +98,7 @@ class IpiDatabase(object):
         PRIMARY KEY (FilePath)
         )""" % self.DpFileListTable
         self.Cur.execute(SqlCommand)
-        
+
         SqlCommand = """
         create table IF NOT EXISTS %s (
         PackageGuid TEXT NOT NULL,
@@ -116,7 +110,7 @@ class IpiDatabase(object):
         PRIMARY KEY (PackageGuid, PackageVersion, InstallPath)
         )""" % self.PkgTable
         self.Cur.execute(SqlCommand)
-                
+
         SqlCommand = """
         create table IF NOT EXISTS %s (
         ModuleGuid TEXT NOT NULL,
@@ -129,7 +123,7 @@ class IpiDatabase(object):
         PRIMARY KEY (ModuleGuid, ModuleVersion, ModuleName, InstallPath)
         )""" % self.ModInPkgTable
         self.Cur.execute(SqlCommand)
-        
+
         SqlCommand = """
         create table IF NOT EXISTS %s (
         ModuleGuid TEXT NOT NULL,
@@ -142,7 +136,7 @@ class IpiDatabase(object):
         PRIMARY KEY (ModuleGuid, ModuleVersion, ModuleName, InstallPath)
         )""" % self.StandaloneModTable
         self.Cur.execute(SqlCommand)
-        
+
         SqlCommand = """
         create table IF NOT EXISTS %s (
         ModuleGuid TEXT NOT NULL,
@@ -153,9 +147,9 @@ class IpiDatabase(object):
         DepexVersion TEXT
         )""" % self.ModDepexTable
         self.Cur.execute(SqlCommand)
-        
+
         self.Conn.commit()
-        
+
         Logger.Verbose(ST.MSG_INIT_IPI_FINISH)
 
     def RollBack(self):
@@ -199,7 +193,7 @@ class IpiDatabase(object):
                     self._AddDpFilePathList(DpObj.Header.GetGuid(), \
                                             DpObj.Header.GetVersion(), FilePath, \
                                             Md5Sum)
-    
+
             for ModKey in DpObj.ModuleSurfaceArea.keys():
                 ModGuid = ModKey[0]
                 ModVersion = ModKey[1]
@@ -219,18 +213,18 @@ class IpiDatabase(object):
                     self._AddDpFilePathList(DpObj.Header.GetGuid(), \
                                             DpObj.Header.GetVersion(), \
                                             Path, Md5Sum)
-    
+
             #
             # add tool/misc files
             #
             for (Path, Md5Sum) in DpObj.FileList:
                 self._AddDpFilePathList(DpObj.Header.GetGuid(), \
                                         DpObj.Header.GetVersion(), Path, Md5Sum)
-                                    
+
             self._AddDp(DpObj.Header.GetGuid(), DpObj.Header.GetVersion(), \
                         NewDpPkgFileName, DpPkgFileName, RePackage)
-    
-        except sqlite3.IntegrityError, DetailMsg:
+
+        except sqlite3.IntegrityError as DetailMsg:
             Logger.Error("UPT",
                          UPT_DB_UPDATE_ERROR,
                          ST.ERR_UPT_DB_UPDATE_ERROR,
@@ -239,21 +233,21 @@ class IpiDatabase(object):
 
     ## Add a distribution install information
     #
-    # @param Guid         Guid of the distribution package  
-    # @param Version      Version of the distribution package  
+    # @param Guid         Guid of the distribution package
+    # @param Version      Version of the distribution package
     # @param NewDpFileName the saved filename of distribution package file
     # @param DistributionFileName the filename of distribution package file
     #
     def _AddDp(self, Guid, Version, NewDpFileName, DistributionFileName, \
                RePackage):
-        
-        if Version == None or len(Version.strip()) == 0:
+
+        if Version is None or len(Version.strip()) == 0:
             Version = 'N/A'
-        
+
         #
         # Add newly installed DP information to DB.
         #
-        if NewDpFileName == None or len(NewDpFileName.strip()) == 0:
+        if NewDpFileName is None or len(NewDpFileName.strip()) == 0:
             PkgFileName = 'N/A'
         else:
             PkgFileName = NewDpFileName
@@ -264,10 +258,10 @@ class IpiDatabase(object):
          DistributionFileName, str(RePackage).upper())
         self.Cur.execute(SqlCommand)
 
-        
+
     ## Add a file list from DP
     #
-    # @param DpGuid: A DpGuid 
+    # @param DpGuid: A DpGuid
     # @param DpVersion: A DpVersion
     # @param Path: A Path
     # @param Path: A Md5Sum
@@ -284,26 +278,26 @@ class IpiDatabase(object):
         (self.DpFileListTable, Path, DpGuid, DpVersion, Md5Sum)
 
         self.Cur.execute(SqlCommand)
-            
+
     ## Add a package install information
     #
-    # @param Guid: A package guid 
+    # @param Guid: A package guid
     # @param Version: A package version
-    # @param DpGuid: A DpGuid 
+    # @param DpGuid: A DpGuid
     # @param DpVersion: A DpVersion
     # @param Path: A Path
     #
     def _AddPackage(self, Guid, Version, DpGuid=None, DpVersion=None, Path=''):
-        
-        if Version == None or len(Version.strip()) == 0:
+
+        if Version is None or len(Version.strip()) == 0:
             Version = 'N/A'
-        
-        if DpGuid == None or len(DpGuid.strip()) == 0:
+
+        if DpGuid is None or len(DpGuid.strip()) == 0:
             DpGuid = 'N/A'
-        
-        if DpVersion == None or len(DpVersion.strip()) == 0:
+
+        if DpVersion is None or len(DpVersion.strip()) == 0:
             DpVersion = 'N/A'
-        
+
         #
         # Add newly installed package information to DB.
         #
@@ -312,10 +306,10 @@ class IpiDatabase(object):
         """insert into %s values('%s', '%s', %s, '%s', '%s', '%s')""" % \
         (self.PkgTable, Guid, Version, CurrentTime, DpGuid, DpVersion, Path)
         self.Cur.execute(SqlCommand)
-        
+
     ## Add a module that from a package install information
     #
-    # @param Guid:    Module Guid 
+    # @param Guid:    Module Guid
     # @param Version: Module version
     # @param Name:    Module Name
     # @param PkgGuid: Package Guid
@@ -324,21 +318,21 @@ class IpiDatabase(object):
     #
     def _AddModuleInPackage(self, Guid, Version, Name, PkgGuid=None, \
                             PkgVersion=None, Path=''):
-        
-        if Version == None or len(Version.strip()) == 0:
+
+        if Version is None or len(Version.strip()) == 0:
             Version = 'N/A'
-        
-        if PkgGuid == None or len(PkgGuid.strip()) == 0:
+
+        if PkgGuid is None or len(PkgGuid.strip()) == 0:
             PkgGuid = 'N/A'
-        
-        if PkgVersion == None or len(PkgVersion.strip()) == 0:
+
+        if PkgVersion is None or len(PkgVersion.strip()) == 0:
             PkgVersion = 'N/A'
-            
+
         if os.name == 'posix':
             Path = Path.replace('\\', os.sep)
         else:
             Path = Path.replace('/', os.sep)
-        
+
         #
         # Add module from package information to DB.
         #
@@ -348,7 +342,7 @@ class IpiDatabase(object):
         (self.ModInPkgTable, Guid, Version, Name, CurrentTime, PkgGuid, PkgVersion, \
          Path)
         self.Cur.execute(SqlCommand)
-    
+
     ## Add a module that is standalone install information
     #
     # @param Guid: a module Guid
@@ -360,16 +354,16 @@ class IpiDatabase(object):
     #
     def _AddStandaloneModule(self, Guid, Version, Name, DpGuid=None, \
                              DpVersion=None, Path=''):
-        
-        if Version == None or len(Version.strip()) == 0:
+
+        if Version is None or len(Version.strip()) == 0:
             Version = 'N/A'
-        
-        if DpGuid == None or len(DpGuid.strip()) == 0:
+
+        if DpGuid is None or len(DpGuid.strip()) == 0:
             DpGuid = 'N/A'
-        
-        if DpVersion == None or len(DpVersion.strip()) == 0:
+
+        if DpVersion is None or len(DpVersion.strip()) == 0:
             DpVersion = 'N/A'
-        
+
         #
         # Add module standalone information to DB.
         #
@@ -379,7 +373,7 @@ class IpiDatabase(object):
         (self.StandaloneModTable, Guid, Version, Name, CurrentTime, DpGuid, \
          DpVersion, Path)
         self.Cur.execute(SqlCommand)
-    
+
     ## Add a module depex
     #
     # @param Guid: a module Guid
@@ -390,49 +384,49 @@ class IpiDatabase(object):
     #
     def _AddModuleDepex(self, Guid, Version, Name, Path, DepexGuid=None, \
                         DepexVersion=None):
-                
-        if DepexGuid == None or len(DepexGuid.strip()) == 0:
+
+        if DepexGuid is None or len(DepexGuid.strip()) == 0:
             DepexGuid = 'N/A'
-        
-        if DepexVersion == None or len(DepexVersion.strip()) == 0:
+
+        if DepexVersion is None or len(DepexVersion.strip()) == 0:
             DepexVersion = 'N/A'
-            
+
         if os.name == 'posix':
             Path = Path.replace('\\', os.sep)
         else:
             Path = Path.replace('/', os.sep)
-        
+
         #
         # Add module depex information to DB.
         #
         SqlCommand = """insert into %s values('%s', '%s', '%s', '%s', '%s', '%s')"""\
          % (self.ModDepexTable, Guid, Version, Name, Path, DepexGuid, DepexVersion)
         self.Cur.execute(SqlCommand)
-        
-    ## Remove a distribution install information, if no version specified, 
+
+    ## Remove a distribution install information, if no version specified,
     # remove all DPs with this Guid.
     #
-    # @param DpGuid: guid of dpex 
+    # @param DpGuid: guid of dpex
     # @param DpVersion: version of dpex
     #
     def RemoveDpObj(self, DpGuid, DpVersion):
-        
+
         PkgList = self.GetPackageListFromDp(DpGuid, DpVersion)
         #
         # delete from ModDepex the standalone module's dependency
         #
         SqlCommand = \
-        """delete from ModDepexInfo where ModDepexInfo.ModuleGuid in 
-        (select ModuleGuid from StandaloneModInfo as B where B.DpGuid = '%s' 
+        """delete from ModDepexInfo where ModDepexInfo.ModuleGuid in
+        (select ModuleGuid from StandaloneModInfo as B where B.DpGuid = '%s'
         and B.DpVersion = '%s')
         and ModDepexInfo.ModuleVersion in
-        (select ModuleVersion from StandaloneModInfo as B 
+        (select ModuleVersion from StandaloneModInfo as B
         where B.DpGuid = '%s' and B.DpVersion = '%s')
         and ModDepexInfo.ModuleName in
-        (select ModuleName from StandaloneModInfo as B 
+        (select ModuleName from StandaloneModInfo as B
         where B.DpGuid = '%s' and B.DpVersion = '%s')
         and ModDepexInfo.InstallPath in
-        (select InstallPath from StandaloneModInfo as B 
+        (select InstallPath from StandaloneModInfo as B
         where B.DpGuid = '%s' and B.DpVersion = '%s') """ % \
         (DpGuid, DpVersion, DpGuid, DpVersion, DpGuid, DpVersion, DpGuid, DpVersion)
 
@@ -443,24 +437,24 @@ class IpiDatabase(object):
         for Pkg in PkgList:
 
             SqlCommand = \
-            """delete from ModDepexInfo where ModDepexInfo.ModuleGuid in 
-            (select ModuleGuid from ModInPkgInfo 
-            where ModInPkgInfo.PackageGuid ='%s' and 
+            """delete from ModDepexInfo where ModDepexInfo.ModuleGuid in
+            (select ModuleGuid from ModInPkgInfo
+            where ModInPkgInfo.PackageGuid ='%s' and
             ModInPkgInfo.PackageVersion = '%s')
             and ModDepexInfo.ModuleVersion in
-            (select ModuleVersion from ModInPkgInfo 
-            where ModInPkgInfo.PackageGuid ='%s' and 
+            (select ModuleVersion from ModInPkgInfo
+            where ModInPkgInfo.PackageGuid ='%s' and
             ModInPkgInfo.PackageVersion = '%s')
             and ModDepexInfo.ModuleName in
-            (select ModuleName from ModInPkgInfo 
-            where ModInPkgInfo.PackageGuid ='%s' and 
+            (select ModuleName from ModInPkgInfo
+            where ModInPkgInfo.PackageGuid ='%s' and
             ModInPkgInfo.PackageVersion = '%s')
             and ModDepexInfo.InstallPath in
-            (select InstallPath from ModInPkgInfo where 
-            ModInPkgInfo.PackageGuid ='%s' 
+            (select InstallPath from ModInPkgInfo where
+            ModInPkgInfo.PackageGuid ='%s'
             and ModInPkgInfo.PackageVersion = '%s')""" \
-                            % (Pkg[0], Pkg[1], Pkg[0], Pkg[1], Pkg[0], Pkg[1],Pkg[0], Pkg[1])
-            
+                            % (Pkg[0], Pkg[1], Pkg[0], Pkg[1], Pkg[0], Pkg[1], Pkg[0], Pkg[1])
+
             self.Cur.execute(SqlCommand)
         #
         # delete the standalone module
@@ -474,7 +468,7 @@ class IpiDatabase(object):
         #
         for Pkg in PkgList:
             SqlCommand = \
-            """delete from %s where %s.PackageGuid ='%s' 
+            """delete from %s where %s.PackageGuid ='%s'
             and %s.PackageVersion = '%s'""" % \
             (self.ModInPkgTable, self.ModInPkgTable, Pkg[0], \
              self.ModInPkgTable, Pkg[1])
@@ -493,31 +487,31 @@ class IpiDatabase(object):
         """delete from %s where DpGuid ='%s' and DpVersion = '%s'""" % \
         (self.DpFileListTable, DpGuid, DpVersion)
         self.Cur.execute(SqlCommand)
-        #    
+        #
         # delete DP
         #
         SqlCommand = \
         """delete from %s where DpGuid ='%s' and DpVersion = '%s'""" % \
         (self.DpTable, DpGuid, DpVersion)
         self.Cur.execute(SqlCommand)
-        
+
         #self.Conn.commit()
-        
+
     ## Get a list of distribution install information.
     #
-    # @param Guid: distribution package guid  
-    # @param Version: distribution package version 
+    # @param Guid: distribution package guid
+    # @param Version: distribution package version
     #
     def GetDp(self, Guid, Version):
-        
-        if Version == None or len(Version.strip()) == 0:
+
+        if Version is None or len(Version.strip()) == 0:
             Version = 'N/A'
             Logger.Verbose(ST.MSG_GET_DP_INSTALL_LIST)
             (DpGuid, DpVersion) = (Guid, Version)
             SqlCommand = """select * from %s where DpGuid ='%s'""" % \
             (self.DpTable, DpGuid)
             self.Cur.execute(SqlCommand)
-        
+
         else:
             Logger.Verbose(ST.MSG_GET_DP_INSTALL_INFO_START)
             (DpGuid, DpVersion) = (Guid, Version)
@@ -533,14 +527,14 @@ class IpiDatabase(object):
             InstallTime = DpInfo[2]
             PkgFileName = DpInfo[3]
             DpList.append((DpGuid, DpVersion, InstallTime, PkgFileName))
-            
-        Logger.Verbose(ST.MSG_GET_DP_INSTALL_INFO_FINISH)    
+
+        Logger.Verbose(ST.MSG_GET_DP_INSTALL_INFO_FINISH)
         return DpList
-    
+
     ## Get a list of distribution install dirs
     #
-    # @param Guid: distribution package guid 
-    # @param Version: distribution package version 
+    # @param Guid: distribution package guid
+    # @param Version: distribution package version
     #
     def GetDpInstallDirList(self, Guid, Version):
         SqlCommand = """select InstallPath from PkgInfo where DpGuid = '%s' and DpVersion = '%s'""" % (Guid, Version)
@@ -562,11 +556,11 @@ class IpiDatabase(object):
 
     ## Get a list of distribution install file path information.
     #
-    # @param Guid: distribution package guid 
-    # @param Version: distribution package version 
+    # @param Guid: distribution package guid
+    # @param Version: distribution package version
     #
     def GetDpFileList(self, Guid, Version):
-        
+
         (DpGuid, DpVersion) = (Guid, Version)
         SqlCommand = \
         """select * from %s where DpGuid ='%s' and DpVersion = '%s'""" % \
@@ -578,7 +572,7 @@ class IpiDatabase(object):
             Path = Result[0]
             Md5Sum = Result[3]
             PathList.append((os.path.join(self.Workspace, Path), Md5Sum))
-        
+
         return PathList
 
     ## Get files' repackage attribute if present that are installed into current workspace
@@ -588,12 +582,12 @@ class IpiDatabase(object):
     def GetRePkgDict(self):
         SqlCommand = """select * from %s """ % (self.DpTable)
         self.Cur.execute(SqlCommand)
-        
+
         DpInfoList = []
         for Result in self.Cur:
             DpInfoList.append(Result)
 
-        FileDict = {}        
+        FileDict = {}
         for Result in DpInfoList:
             DpGuid = Result[0]
             DpVersion = Result[1]
@@ -606,50 +600,50 @@ class IpiDatabase(object):
             for FileInfo in self.GetDpFileList(DpGuid, DpVersion):
                 PathInfo = FileInfo[0]
                 FileDict[PathInfo] = DpGuid, DpVersion, NewDpFileName, RePackage
-                
+
         return FileDict
-    
+
     ## Get (Guid, Version) from distribution file name information.
     #
-    # @param DistributionFile: Distribution File  
+    # @param DistributionFile: Distribution File
     #
     def GetDpByName(self, DistributionFile):
-        SqlCommand = """select * from %s where NewPkgFileName like '%s'""" % \
-        (self.DpTable, '%' + DistributionFile)
+        SqlCommand = """select * from %s where NewPkgFileName = '%s'""" % \
+        (self.DpTable, DistributionFile)
         self.Cur.execute(SqlCommand)
 
         for Result in self.Cur:
             DpGuid = Result[0]
             DpVersion = Result[1]
             NewDpFileName = Result[3]
-   
+
             return (DpGuid, DpVersion, NewDpFileName)
         else:
             return (None, None, None)
-        
+
     ## Get a list of package information.
     #
-    # @param Guid: package guid  
+    # @param Guid: package guid
     # @param Version: package version
     #
     def GetPackage(self, Guid, Version, DpGuid='', DpVersion=''):
-        
+
         if DpVersion == '' or DpGuid == '':
 
             (PackageGuid, PackageVersion) = (Guid, Version)
-            SqlCommand = """select * from %s where PackageGuid ='%s' 
+            SqlCommand = """select * from %s where PackageGuid ='%s'
             and PackageVersion = '%s'""" % (self.PkgTable, PackageGuid, \
                                             PackageVersion)
             self.Cur.execute(SqlCommand)
-        
-        elif Version == None or len(Version.strip()) == 0:
-            
+
+        elif Version is None or len(Version.strip()) == 0:
+
             SqlCommand = """select * from %s where PackageGuid ='%s'""" % \
             (self.PkgTable, Guid)
             self.Cur.execute(SqlCommand)
         else:
             (PackageGuid, PackageVersion) = (Guid, Version)
-            SqlCommand = """select * from %s where PackageGuid ='%s' and 
+            SqlCommand = """select * from %s where PackageGuid ='%s' and
             PackageVersion = '%s'
                             and DpGuid = '%s' and DpVersion = '%s'""" % \
                             (self.PkgTable, PackageGuid, PackageVersion, \
@@ -664,10 +658,10 @@ class IpiDatabase(object):
             InstallPath = PkgInfo[5]
             PkgList.append((PkgGuid, PkgVersion, InstallTime, DpGuid, \
                             DpVersion, InstallPath))
-        
+
         return PkgList
- 
-       
+
+
     ## Get a list of module in package information.
     #
     # @param Guid: A module guid
@@ -676,15 +670,15 @@ class IpiDatabase(object):
     def GetModInPackage(self, Guid, Version, Name, Path, PkgGuid='', PkgVersion=''):
         (ModuleGuid, ModuleVersion, ModuleName, InstallPath) = (Guid, Version, Name, Path)
         if PkgVersion == '' or PkgGuid == '':
-            SqlCommand = """select * from %s where ModuleGuid ='%s' and 
-            ModuleVersion = '%s' and InstallPath = '%s' 
+            SqlCommand = """select * from %s where ModuleGuid ='%s' and
+            ModuleVersion = '%s' and InstallPath = '%s'
             and ModuleName = '%s'""" % (self.ModInPkgTable, ModuleGuid, \
                                        ModuleVersion, InstallPath, ModuleName)
             self.Cur.execute(SqlCommand)
         else:
-            SqlCommand = """select * from %s where ModuleGuid ='%s' and 
-            ModuleVersion = '%s' and InstallPath = '%s' 
-            and ModuleName = '%s' and PackageGuid ='%s' 
+            SqlCommand = """select * from %s where ModuleGuid ='%s' and
+            ModuleVersion = '%s' and InstallPath = '%s'
+            and ModuleName = '%s' and PackageGuid ='%s'
             and PackageVersion = '%s'
                             """ % (self.ModInPkgTable, ModuleGuid, \
                                    ModuleVersion, InstallPath, ModuleName, PkgGuid, PkgVersion)
@@ -698,26 +692,26 @@ class IpiDatabase(object):
             InstallPath = ModInfo[5]
             ModList.append((ModGuid, ModVersion, InstallTime, PkgGuid, \
                             PkgVersion, InstallPath))
-        
+
         return ModList
-    
+
     ## Get a list of module standalone.
     #
-    # @param Guid: A module guid 
-    # @param Version: A module version 
+    # @param Guid: A module guid
+    # @param Version: A module version
     #
     def GetStandaloneModule(self, Guid, Version, Name, Path, DpGuid='', DpVersion=''):
         (ModuleGuid, ModuleVersion, ModuleName, InstallPath) = (Guid, Version, Name, Path)
         if DpGuid == '':
-            SqlCommand = """select * from %s where ModuleGuid ='%s' and 
-            ModuleVersion = '%s' and InstallPath = '%s' 
+            SqlCommand = """select * from %s where ModuleGuid ='%s' and
+            ModuleVersion = '%s' and InstallPath = '%s'
             and ModuleName = '%s'""" % (self.StandaloneModTable, ModuleGuid, \
                                        ModuleVersion, InstallPath, ModuleName)
             self.Cur.execute(SqlCommand)
-        
+
         else:
-            SqlCommand = """select * from %s where ModuleGuid ='%s' and 
-            ModuleVersion = '%s' and InstallPath = '%s' and ModuleName = '%s' and DpGuid ='%s' and DpVersion = '%s' 
+            SqlCommand = """select * from %s where ModuleGuid ='%s' and
+            ModuleVersion = '%s' and InstallPath = '%s' and ModuleName = '%s' and DpGuid ='%s' and DpVersion = '%s'
                             """ % (self.StandaloneModTable, ModuleGuid, \
                                    ModuleVersion, ModuleName, InstallPath, DpGuid, DpVersion)
             self.Cur.execute(SqlCommand)
@@ -730,18 +724,18 @@ class IpiDatabase(object):
             InstallPath = ModInfo[5]
             ModList.append((ModGuid, ModVersion, InstallTime, DpGuid, \
                             DpVersion, InstallPath))
-        
+
         return ModList
-    
+
     ## Get a list of module information that comes from DP.
     #
-    # @param DpGuid: A Distrabution Guid 
-    # @param DpVersion: A Distrabution version  
+    # @param DpGuid: A Distribution Guid
+    # @param DpVersion: A Distribution version
     #
     def GetSModInsPathListFromDp(self, DpGuid, DpVersion):
 
         PathList = []
-        SqlCommand = """select InstallPath from %s where DpGuid ='%s' 
+        SqlCommand = """select InstallPath from %s where DpGuid ='%s'
         and DpVersion = '%s'
                         """ % (self.StandaloneModTable, DpGuid, DpVersion)
         self.Cur.execute(SqlCommand)
@@ -749,17 +743,17 @@ class IpiDatabase(object):
         for Result in self.Cur:
             InstallPath = Result[0]
             PathList.append(InstallPath)
-        
+
         return PathList
-    
+
     ## Get a list of package information.
     #
-    # @param DpGuid: A Distrabution Guid 
-    # @param DpVersion: A Distrabution version 
+    # @param DpGuid: A Distribution Guid
+    # @param DpVersion: A Distribution version
     #
     def GetPackageListFromDp(self, DpGuid, DpVersion):
 
-        SqlCommand = """select * from %s where DpGuid ='%s' and 
+        SqlCommand = """select * from %s where DpGuid ='%s' and
         DpVersion = '%s' """ % (self.PkgTable, DpGuid, DpVersion)
         self.Cur.execute(SqlCommand)
 
@@ -769,31 +763,31 @@ class IpiDatabase(object):
             PkgVersion = PkgInfo[1]
             InstallPath = PkgInfo[5]
             PkgList.append((PkgGuid, PkgVersion, InstallPath))
-        
+
         return PkgList
-    
+
     ## Get a list of modules that depends on package information from a DP.
     #
-    # @param DpGuid: A Distrabution Guid 
-    # @param DpVersion: A Distrabution version 
+    # @param DpGuid: A Distribution Guid
+    # @param DpVersion: A Distribution version
     #
     def GetDpDependentModuleList(self, DpGuid, DpVersion):
-        
+
         ModList = []
         PkgList = self.GetPackageListFromDp(DpGuid, DpVersion)
         if len(PkgList) > 0:
             return ModList
-        
+
         for Pkg in PkgList:
             #
-            # get all in-package modules that depends on current 
-            # Pkg (Guid match, Version match or NA) but not belong to 
+            # get all in-package modules that depends on current
+            # Pkg (Guid match, Version match or NA) but not belong to
             # current Pkg
             #
-            SqlCommand = """select t1.ModuleGuid, t1.ModuleVersion, 
-            t1.InstallPath from %s as t1, %s as t2 where 
-            t1.ModuleGuid = t2.ModuleGuid and 
-            t1.ModuleVersion = t2.ModuleVersion and t2.DepexGuid ='%s' 
+            SqlCommand = """select t1.ModuleGuid, t1.ModuleVersion,
+            t1.InstallPath from %s as t1, %s as t2 where
+            t1.ModuleGuid = t2.ModuleGuid and
+            t1.ModuleVersion = t2.ModuleVersion and t2.DepexGuid ='%s'
             and (t2.DepexVersion = '%s' or t2.DepexVersion = 'N/A') and
             t1.PackageGuid != '%s' and t1.PackageVersion != '%s'
                         """ % (self.ModInPkgTable, \
@@ -807,13 +801,13 @@ class IpiDatabase(object):
                 ModList.append((ModGuid, ModVersion, InstallPath))
 
             #
-            # get all modules from standalone modules that depends on current 
+            # get all modules from standalone modules that depends on current
             #Pkg (Guid match, Version match or NA) but not in current dp
             #
             SqlCommand = \
-            """select t1.ModuleGuid, t1.ModuleVersion, t1.InstallPath 
-            from %s as t1, %s as t2 where t1.ModuleGuid = t2.ModuleGuid and 
-            t1.ModuleVersion = t2.ModuleVersion and t2.DepexGuid ='%s' 
+            """select t1.ModuleGuid, t1.ModuleVersion, t1.InstallPath
+            from %s as t1, %s as t2 where t1.ModuleGuid = t2.ModuleGuid and
+            t1.ModuleVersion = t2.ModuleVersion and t2.DepexGuid ='%s'
             and (t2.DepexVersion = '%s' or t2.DepexVersion = 'N/A') and
                             t1.DpGuid != '%s' and t1.DpVersion != '%s'
                         """ % \
@@ -825,75 +819,75 @@ class IpiDatabase(object):
                 ModVersion = ModInfo[1]
                 InstallPath = ModInfo[2]
                 ModList.append((ModGuid, ModVersion, InstallPath))
-        
-        
+
+
         return ModList
 
     ## Get Dp's list of modules.
     #
-    # @param DpGuid: A Distrabution Guid 
-    # @param DpVersion: A Distrabution version 
+    # @param DpGuid: A Distribution Guid
+    # @param DpVersion: A Distribution version
     #
-    def GetDpModuleList(self, DpGuid, DpVersion):      
+    def GetDpModuleList(self, DpGuid, DpVersion):
         ModList = []
         #
         # get Dp module list from the DpFileList table
         #
-        SqlCommand = """select FilePath 
+        SqlCommand = """select FilePath
                         from %s
-                        where DpGuid = '%s' and DpVersion = '%s' and 
+                        where DpGuid = '%s' and DpVersion = '%s' and
                         FilePath like '%%.inf'
                     """ % (self.DpFileListTable, DpGuid, DpVersion)
         self.Cur.execute(SqlCommand)
         for ModuleInfo in self.Cur:
             FilePath = ModuleInfo[0]
             ModList.append(os.path.join(self.Workspace, FilePath))
-            
-        return ModList        
 
-        
+        return ModList
+
+
     ## Get a module depex
     #
-    # @param DpGuid: A module Guid 
-    # @param DpVersion: A module version 
+    # @param DpGuid: A module Guid
+    # @param DpVersion: A module version
     # @param Path:
     #
     def GetModuleDepex(self, Guid, Version, Path):
-                
+
         #
         # Get module depex information to DB.
         #
-        SqlCommand = """select * from %s where ModuleGuid ='%s' and 
+        SqlCommand = """select * from %s where ModuleGuid ='%s' and
         ModuleVersion = '%s' and InstallPath ='%s'
                             """ % (self.ModDepexTable, Guid, Version, Path)
         self.Cur.execute(SqlCommand)
 
-        
+
         DepexList = []
         for DepInfo in self.Cur:
             DepexGuid = DepInfo[3]
             DepexVersion = DepInfo[4]
             DepexList.append((DepexGuid, DepexVersion))
-        
+
         return DepexList
- 
+
     ## Inventory the distribution installed to current workspace
     #
     # Inventory the distribution installed to current workspace
-    #   
+    #
     def InventoryDistInstalled(self):
         SqlCommand = """select * from %s """ % (self.DpTable)
         self.Cur.execute(SqlCommand)
-        
+
         DpInfoList = []
         for Result in self.Cur:
             DpGuid = Result[0]
             DpVersion = Result[1]
             DpAliasName = Result[3]
-            DpFileName = Result[4]            
+            DpFileName = Result[4]
             DpInfoList.append((DpGuid, DpVersion, DpFileName, DpAliasName))
-        
-        return DpInfoList     
+
+        return DpInfoList
 
     ## Close entire database
     #
@@ -904,25 +898,25 @@ class IpiDatabase(object):
         # drop the dummy table
         #
         SqlCommand = """
-        drop table IF EXISTS %s 
+        drop table IF EXISTS %s
         """ % self.DummyTable
         self.Cur.execute(SqlCommand)
         self.Conn.commit()
-        
+
         self.Cur.close()
         self.Conn.close()
 
     ## Convert To Sql String
     #
     # 1. Replace "'" with "''" in each item of StringList
-    # 
+    #
     # @param StringList:  A list for strings to be converted
     #
     def __ConvertToSqlString(self, StringList):
         if self.DpTable:
             pass
-        return map(lambda s: s.replace("'", "''") , StringList)
+        return list(map(lambda s: s.replace("'", "''"), StringList))
 
 
 
-    
+

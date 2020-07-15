@@ -1,17 +1,11 @@
 /** @file
   Main file for Help shell level 3 function.
 
-  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved. <BR>
   Copyright (c) 2014, ARM Limited. All rights reserved. <BR>
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -27,7 +21,7 @@
 
    the resultant list is a double NULL terminated list of NULL terminated strings.
 
-   upon successful return the memory must be caller freed (unless passed back in 
+   upon successful return the memory must be caller freed (unless passed back in
    via a loop where it will get reallocated).
 
    @param[in,out] DestList    double pointer to the list. may be NULL.
@@ -38,7 +32,7 @@
 **/
 EFI_STATUS
 LexicalInsertIntoList(
-  IN OUT   CHAR16 **DestList, 
+  IN OUT   CHAR16 **DestList,
   IN OUT   UINTN  *DestSize,
   IN CONST CHAR16 *Item
   )
@@ -116,7 +110,7 @@ LexicalInsertIntoList(
 **/
 EFI_STATUS
 CopyListOfCommandNames(
-  IN OUT   CHAR16       **DestList, 
+  IN OUT   CHAR16       **DestList,
   IN OUT   UINTN        *DestSize,
   IN CONST COMMAND_LIST *SourceList
   )
@@ -146,7 +140,7 @@ CopyListOfCommandNames(
 STATIC
 EFI_STATUS
 CopyListOfCommandNamesWithDynamic(
-  IN OUT  CHAR16** DestList, 
+  IN OUT  CHAR16** DestList,
   IN OUT  UINTN    *DestSize
   )
 {
@@ -325,7 +319,7 @@ ShellCommandRunHelp (
   Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR(Status)) {
     if (Status == EFI_VOLUME_CORRUPTED && ProblemParam != NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel3HiiHandle, L"help", ProblemParam);  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel3HiiHandle, L"help", ProblemParam);
       FreePool(ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -339,10 +333,10 @@ ShellCommandRunHelp (
       &&ShellCommandLineGetFlag(Package, L"-section")
       &&(ShellCommandLineGetFlag(Package, L"-verbose") || ShellCommandLineGetFlag(Package, L"-v"))
      ){
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_CON), gShellLevel3HiiHandle, L"help");  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_CON), gShellLevel3HiiHandle, L"help");
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else if (ShellCommandLineGetRawValue(Package, 2) != NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel3HiiHandle, L"help");  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel3HiiHandle, L"help");
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
       //
@@ -396,8 +390,8 @@ ShellCommandRunHelp (
         CopyListOfCommandNames(&SortedCommandList, &SortedCommandListSize, ShellCommandGetCommandList(TRUE));
         CopyListOfCommandNamesWithDynamic(&SortedCommandList, &SortedCommandListSize);
 
-        for (CurrentCommand = SortedCommandList 
-          ; CurrentCommand != NULL && *CurrentCommand != CHAR_NULL && CurrentCommand < SortedCommandList + SortedCommandListSize/sizeof(CHAR16)
+        for (CurrentCommand = SortedCommandList
+          ; CurrentCommand != NULL && CurrentCommand < SortedCommandList + SortedCommandListSize/sizeof(CHAR16) && *CurrentCommand != CHAR_NULL
           ; CurrentCommand += StrLen(CurrentCommand) + 1
           ) {
           //
@@ -405,7 +399,7 @@ ShellCommandRunHelp (
           //
           if (ShellGetExecutionBreakFlag ()) {
             break;
-          } 
+          }
 
           if ((gUnicodeCollation->MetaiMatch(gUnicodeCollation, (CHAR16*)CurrentCommand, CommandToGetHelpOn)) ||
              (gEfiShellProtocol->GetAlias(CommandToGetHelpOn, NULL) != NULL && (gUnicodeCollation->MetaiMatch(gUnicodeCollation, (CHAR16*)CurrentCommand, (CHAR16*)(gEfiShellProtocol->GetAlias(CommandToGetHelpOn, NULL)))))) {

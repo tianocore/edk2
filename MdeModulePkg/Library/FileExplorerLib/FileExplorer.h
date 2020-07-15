@@ -1,14 +1,8 @@
 /** @file
    File explorer lib.
 
-Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #ifndef _FILE_EXPLORER_H_
@@ -50,6 +44,8 @@ typedef struct {
   VENDOR_DEVICE_PATH             VendorDevicePath;
   EFI_DEVICE_PATH_PROTOCOL       End;
 } HII_VENDOR_DEVICE_PATH;
+
+#pragma pack()
 
 typedef struct {
   EFI_HANDLE                        DeviceHandle;
@@ -99,8 +95,6 @@ typedef struct {
 } FILE_EXPLORER_CALLBACK_DATA;
 
 #define FILE_EXPLORER_PRIVATE_FROM_THIS(a)  CR (a, FILE_EXPLORER_CALLBACK_DATA, FeConfigAccess, FILE_EXPLORER_CALLBACK_DATA_SIGNATURE)
-
-#pragma pack()
 
 extern UINT8    FileExplorerVfrBin[];
 
@@ -226,8 +220,8 @@ EFI_STATUS
 LibUpdateFileExplorer (
   IN UINT16                       KeyValue
   );
-  
-  
+
+
 /**
   Get the device path info saved in the menu structure.
 
@@ -239,4 +233,4 @@ LibGetDevicePath (
   IN UINT16                       KeyValue
   );
 
-#endif 
+#endif

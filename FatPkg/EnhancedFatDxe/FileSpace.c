@@ -2,13 +2,7 @@
   Routines dealing with disk spaces and FAT table entries.
 
 Copyright (c) 2005 - 2013, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available
-under the terms and conditions of the BSD License which accompanies this
-distribution. The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 
 
@@ -135,7 +129,7 @@ FatGetFatEntry (
   @param  Index                 - The index of the FAT entry of the volume.
   @param  Value                 - The new value of the FAT entry.
 
-  @retval EFI_SUCCESS           - Set the new FAT entry value sucessfully.
+  @retval EFI_SUCCESS           - Set the new FAT entry value successfully.
   @retval EFI_VOLUME_CORRUPTED  - The FAT type of the volume is error.
   @return other                 - An error occurred when operation the FAT entries.
 
@@ -229,7 +223,7 @@ FatSetFatEntry (
 
 /**
 
-  Free the cluster clain.
+  Free the cluster chain.
 
   @param  Volume                - FAT file system volume.
   @param  Cluster               - The first cluster of cluster chain.
@@ -349,7 +343,7 @@ FatSizeToClusters (
 
   @param  OFile                 - The open file.
 
-  @retval EFI_SUCCESS           - Shrinked sucessfully.
+  @retval EFI_SUCCESS           - Shrinked successfully.
   @retval EFI_VOLUME_CORRUPTED  - There are errors in the file's clusters.
 
 **/
@@ -422,7 +416,7 @@ FatShrinkEof (
   @param  OFile                 - The open file.
   @param  NewSizeInBytes        - The new size in bytes of the open file.
 
-  @retval EFI_SUCCESS           - The file is grown sucessfully.
+  @retval EFI_SUCCESS           - The file is grown successfully.
   @retval EFI_UNSUPPORTED       - The file size is larger than 4GB.
   @retval EFI_VOLUME_CORRUPTED  - There are errors in the files' clusters.
   @retval EFI_VOLUME_FULL       - The volume is full and can not grow the file.
@@ -467,7 +461,7 @@ FatGrowEof (
       ClusterCount  = 0;
 
       while (!FAT_END_OF_FAT_CHAIN (Cluster)) {
-        if (Cluster == FAT_CLUSTER_FREE || Cluster >= FAT_CLUSTER_SPECIAL) {
+        if (Cluster < FAT_MIN_CLUSTER || Cluster > Volume->MaxCluster + 1) {
 
           DEBUG (
             (EFI_D_INIT | EFI_D_ERROR,
@@ -509,6 +503,11 @@ FatGrowEof (
         goto Done;
       }
 
+      if (NewCluster < FAT_MIN_CLUSTER || NewCluster > Volume->MaxCluster + 1) {
+        Status = EFI_VOLUME_CORRUPTED;
+        goto Done;
+      }
+
       if (LastCluster != 0) {
         FatSetFatEntry (Volume, LastCluster, NewCluster);
       } else {
@@ -518,12 +517,21 @@ FatGrowEof (
 
       LastCluster = NewCluster;
       CurSize += 1;
+
+      //
+      // Terminate the cluster list
+      //
+      // Note that we must do this EVERY time we allocate a cluster, because
+      // FatAllocateCluster scans the FAT looking for a free cluster and
+      // "LastCluster" is no longer free!  Usually, FatAllocateCluster will
+      // start looking with the cluster after "LastCluster"; however, when
+      // there is only one free cluster left, it will find "LastCluster"
+      // a second time.  There are other, less predictable scenarios
+      // where this could happen, as well.
+      //
+      FatSetFatEntry (Volume, LastCluster, (UINTN) FAT_CLUSTER_LAST);
+      OFile->FileLastCluster = LastCluster;
     }
-    //
-    // Terminate the cluster list
-    //
-    FatSetFatEntry (Volume, LastCluster, (UINTN) FAT_CLUSTER_LAST);
-    OFile->FileLastCluster = LastCluster;
   }
 
   OFile->FileSize = (UINTN) NewSizeInBytes;
@@ -567,8 +575,8 @@ FatOFilePosition (
   ASSERT_VOLUME_LOCKED (Volume);
 
   //
-  // If this is the fixed root dir, then compute it's position
-  // from it's fixed info in the fat bpb
+  // If this is the fixed root dir, then compute its position
+  // from its fixed info in the fat bpb
   //
   if (OFile->IsFixedRootDir) {
     OFile->PosDisk  = Volume->RootPos + Position;
@@ -603,7 +611,7 @@ FatOFilePosition (
       Cluster = FatGetFatEntry (Volume, Cluster);
     }
 
-    if (Cluster < FAT_MIN_CLUSTER) {
+    if (Cluster < FAT_MIN_CLUSTER || Cluster > Volume->MaxCluster + 1) {
       return EFI_VOLUME_CORRUPTED;
     }
 

@@ -1,15 +1,9 @@
 /** @file
   SSL/TLS Initialization Library Wrapper Implementation over OpenSSL.
 
-Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -22,30 +16,34 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   by SSL/TLS, and initializes the readable error messages.
   This function must be called before any other action takes places.
 
+  @retval TRUE   The OpenSSL library has been initialized.
+  @retval FALSE  Failed to initialize the OpenSSL library.
+
 **/
-VOID
+BOOLEAN
 EFIAPI
 TlsInitialize (
   VOID
   )
 {
+  INTN            Ret;
+
   //
   // Performs initialization of crypto and ssl library, and loads required
   // algorithms.
   //
-  SSL_library_init ();
-
-  //
-  // Loads error strings from both crypto and ssl library.
-  //
-  SSL_load_error_strings ();
-
-  /// OpenSSL_add_all_algorithms();
+  Ret = OPENSSL_init_ssl (
+          OPENSSL_INIT_LOAD_SSL_STRINGS | OPENSSL_INIT_LOAD_CRYPTO_STRINGS,
+          NULL
+          );
+  if (Ret != 1) {
+    return FALSE;
+  }
 
   //
   // Initialize the pseudorandom number generator.
   //
-  RandomSeed (NULL, 0);
+  return RandomSeed (NULL, 0);
 }
 
 /**
@@ -103,34 +101,10 @@ TlsCtxNew (
   SSL_CTX_set_options (TlsCtx, SSL_OP_NO_SSLv3);
 
   //
-  // Treat as minimum accepted versions.  Client can use higher
-  // TLS version if server supports it
+  // Treat as minimum accepted versions by setting the minimal bound.
+  // Client can use higher TLS version if server supports it
   //
-  switch (ProtoVersion) {
-  case TLS1_VERSION:
-    //
-    // TLS 1.0
-    //
-    break;
-  case TLS1_1_VERSION:
-    //
-    // TLS 1.1
-    //
-    SSL_CTX_set_options (TlsCtx, SSL_OP_NO_TLSv1);
-    break;
-  case TLS1_2_VERSION:
-    //
-    // TLS 1.2
-    //
-    SSL_CTX_set_options (TlsCtx, SSL_OP_NO_TLSv1);
-    SSL_CTX_set_options (TlsCtx, SSL_OP_NO_TLSv1_1);
-    break;
-  default:
-    //
-    // Unsupported TLS/SSL Protocol Version.
-    //
-    break;
-  }
+  SSL_CTX_set_min_proto_version (TlsCtx, ProtoVersion);
 
   return (VOID *) TlsCtx;
 }
@@ -158,18 +132,10 @@ TlsFree (
   }
 
   //
-  // Free the internal TLS and BIO objects.
+  // Free the internal TLS and related BIO objects.
   //
   if (TlsConn->Ssl != NULL) {
     SSL_free (TlsConn->Ssl);
-  }
-
-  if (TlsConn->InBio != NULL) {
-    BIO_free (TlsConn->InBio);
-  }
-
-  if (TlsConn->OutBio != NULL) {
-    BIO_free (TlsConn->OutBio);
   }
 
   OPENSSL_free (Tls);
@@ -218,6 +184,11 @@ TlsNew (
     TlsFree ((VOID *) TlsConn);
     return NULL;
   }
+
+  //
+  // This retains compatibility with previous version of OpenSSL.
+  //
+  SSL_set_security_level (TlsConn->Ssl, 0);
 
   //
   // Initialize the created SSL Object
@@ -289,3 +260,4 @@ TlsNew (
     );
   return (VOID *) TlsConn;
 }
+

@@ -210,7 +210,7 @@ List of Implemented Fixes and Changes for Maintenance Releases of PCCTS
 
     Sorcerer generated code may contain many calls to _t->type() in a
     single statement.  This change introduces a temporary variable
-    to eliminate unnnecesary function calls.
+    to eliminate unnecesary function calls.
 
     Change implemented by Tom Molteno (tim videoscript.com).
 
@@ -525,11 +525,11 @@ List of Implemented Fixes and Changes for Maintenance Releases of PCCTS
 #275. (Changed in MR23) Addition of -nopurify option to antlr
 
     A long time ago the PURIFY macro was introduced to initialize
-    return value arguments and get rid of annying messages from program
-    that checked for unitialized variables.
+    return value arguments and get rid of annoying messages from program
+    that checked for uninitialized variables.
 
     This has caused significant annoyance for C++ users that had
-    classes with virtual functions or non-trivial contructors because
+    classes with virtual functions or non-trivial constructors because
     it would zero the object, including the pointer to the virtual
     function table.  This could be defeated by redefining
     the PURIFY macro to be empty, but it was a constant surprise to
@@ -656,12 +656,12 @@ List of Implemented Fixes and Changes for Maintenance Releases of PCCTS
 #266. (Changed in MR23) virtual function printMessage()
 
     Bill Menees (bill.menees gogallagher.com) has completed the
-    tedious taks of replacing all calls to fprintf() with calls
+    tedious tasks of replacing all calls to fprintf() with calls
     to the virtual function printMessage().  For classes which
     have a pointer to the parser it forwards the printMessage()
     call to the parser's printMessage() routine.
 
-    This should make it significanly easier to redirect pccts
+    This should make it significantly easier to redirect pccts
     error and warning messages.
 
 #265. (Changed in MR23) Remove "labase++" in C++ mode
@@ -1253,7 +1253,7 @@ List of Implemented Fixes and Changes for Maintenance Releases of PCCTS
 
 #228. (Changed in MR20) dlg crashes on "()"
 
-    The following token defintion will cause DLG to crash.
+    The following token definition will cause DLG to crash.
 
         #token "()"
 
@@ -1747,7 +1747,7 @@ List of Implemented Fixes and Changes for Maintenance Releases of PCCTS
 
 #195. (Changed in MR14) #line directive not at column 1
 
-      Under certain circunstances a predicate test could generate
+      Under certain circumstances a predicate test could generate
       a #line directive which was not at column 1.
 
       Reported with fix by David Kågedal  (davidk lysator.liu.se)
@@ -2319,7 +2319,7 @@ List of Implemented Fixes and Changes for Maintenance Releases of PCCTS
 #164. (Changed in MR13) Unused variable _astp
 
       For many compilations, we have lived with warnings about
-      the unused variable _astp.  It turns out that this varible
+      the unused variable _astp.  It turns out that this variable
       can *never* be used because the code which references it was
       commented out.
 

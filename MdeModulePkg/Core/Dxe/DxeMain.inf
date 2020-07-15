@@ -2,16 +2,10 @@
 #  This is core module in DXE phase.
 #
 #  It provides an implementation of DXE Core that is compliant with DXE CIS.
-#  
-#  Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
-#  This program and the accompanying materials
-#  are licensed and made available under the terms and conditions of the BSD License
-#  which accompanies this distribution.  The full text of the license may be found at
-#  http://opensource.org/licenses/bsd-license.php
-#  
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-#  
+#
+#  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
 ##
 
 [Defines]
@@ -28,7 +22,7 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC (EBC is for build only)
+#  VALID_ARCHITECTURES           = IA32 X64 EBC (EBC is for build only)
 #
 
 [Sources]
@@ -40,7 +34,6 @@
   Misc/Stall.c
   Misc/SetWatchdogTimer.c
   Misc/InstallConfigurationTable.c
-  Misc/PropertiesTable.c
   Misc/MemoryAttributesTable.c
   Misc/MemoryProtection.c
   Library/Library.c
@@ -56,6 +49,8 @@
   Mem/MemData.c
   Mem/Imem.h
   Mem/MemoryProfileRecord.c
+  Mem/HeapGuard.c
+  Mem/HeapGuard.h
   FwVolBlock/FwVolBlock.c
   FwVolBlock/FwVolBlock.h
   FwVol/FwVolWrite.c
@@ -95,7 +90,6 @@
   UefiBootServicesTableLib
   DevicePathLib
   ReportStatusCodeLib
-  TimerLib
   DxeServicesLib
   DebugAgentLib
   CpuExceptionHandlerLib
@@ -107,7 +101,7 @@
   ## CONSUMES   ## Event
   ## PRODUCES   ## Event
   gEfiEventExitBootServicesGuid
-  gEfiHobMemoryAllocModuleGuid                  ## CONSUMES             ## HOB
+  gEfiHobMemoryAllocModuleGuid                  ## SOMETIMES_CONSUMES   ## HOB
   gEfiFirmwareFileSystem2Guid                   ## CONSUMES             ## GUID # Used to compare with FV's file system guid and get the FV's file system format
   gEfiFirmwareFileSystem3Guid                   ## CONSUMES             ## GUID # Used to compare with FV's file system guid and get the FV's file system format
   gAprioriGuid                                  ## SOMETIMES_CONSUMES   ## File
@@ -125,9 +119,9 @@
   gEventExitBootServicesFailedGuid              ## SOMETIMES_PRODUCES   ## Event
   gEfiVectorHandoffTableGuid                    ## SOMETIMES_PRODUCES   ## SystemTable
   gEdkiiMemoryProfileGuid                       ## SOMETIMES_PRODUCES   ## GUID # Install protocol
-  gEfiPropertiesTableGuid                       ## SOMETIMES_PRODUCES   ## SystemTable
   gEfiMemoryAttributesTableGuid                 ## SOMETIMES_PRODUCES   ## SystemTable
   gEfiEndOfDxeEventGroupGuid                    ## SOMETIMES_CONSUMES   ## Event
+  gEfiHobMemoryAllocStackGuid                   ## SOMETIMES_CONSUMES   ## SystemTable
 
 [Ppis]
   gEfiVectorHandoffInfoPpiGuid                  ## UNDEFINED # HOB
@@ -136,7 +130,6 @@
   ## PRODUCES
   ## SOMETIMES_CONSUMES
   gEfiDecompressProtocolGuid
-  gEfiLoadPeImageProtocolGuid                   ## SOMETIMES_PRODUCES   # Produces when PcdFrameworkCompatibilitySupport is set
   gEfiSimpleFileSystemProtocolGuid              ## SOMETIMES_CONSUMES
   gEfiLoadFileProtocolGuid                      ## SOMETIMES_CONSUMES
   gEfiLoadFile2ProtocolGuid                     ## SOMETIMES_CONSUMES
@@ -158,9 +151,8 @@
   gEfiLoadedImageProtocolGuid                   ## PRODUCES
   gEfiLoadedImageDevicePathProtocolGuid         ## PRODUCES
   gEfiHiiPackageListProtocolGuid                ## SOMETIMES_PRODUCES
-  gEfiEbcProtocolGuid                           ## SOMETIMES_CONSUMES
   gEfiSmmBase2ProtocolGuid                      ## SOMETIMES_CONSUMES
-  gEfiBlockIoProtocolGuid                       ## SOMETIMES_CONSUMES
+  gEdkiiPeCoffImageEmulatorProtocolGuid         ## SOMETIMES_CONSUMES
 
   # Arch Protocols
   gEfiBdsArchProtocolGuid                       ## CONSUMES
@@ -178,9 +170,6 @@
   gEfiCapsuleArchProtocolGuid                   ## CONSUMES
   gEfiWatchdogTimerArchProtocolGuid             ## CONSUMES
 
-[FeaturePcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFrameworkCompatibilitySupport	   ## CONSUMES
-
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdLoadFixAddressBootTimeCodePageNumber    ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdLoadFixAddressRuntimeCodePageNumber     ## SOMETIMES_CONSUMES
@@ -189,9 +178,13 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdMemoryProfileMemoryType                 ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdMemoryProfilePropertyMask               ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdMemoryProfileDriverPath                 ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPropertiesTableEnable                   ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdImageProtectionPolicy                   ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeNxMemoryProtectionPolicy             ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdNullPointerDetectionPropertyMask        ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHeapGuardPageType                       ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHeapGuardPoolType                       ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHeapGuardPropertyMask                   ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard                           ## CONSUMES
 
 # [Hob]
 # RESOURCE_DESCRIPTOR   ## CONSUMES

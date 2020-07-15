@@ -6,13 +6,7 @@
 
   Copyright (C) 2014, Citrix Ltd.
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -58,7 +52,7 @@ EFI_BLOCK_IO_PROTOCOL  gXenPvBlkDxeBlockIo = {
 /**
   Read/Write BufferSize bytes from Lba into Buffer.
 
-  This function is commun to XenPvBlkDxeBlockIoReadBlocks and
+  This function is common to XenPvBlkDxeBlockIoReadBlocks and
   XenPvBlkDxeBlockIoWriteBlocks.
 
   @param  This       Indicates a pointer to the calling context.
@@ -95,14 +89,14 @@ XenPvBlkDxeBlockIoReadWriteBlocks (
   }
 
   if (BufferSize % Media->BlockSize != 0) {
-    DEBUG ((EFI_D_ERROR, "XenPvBlkDxe: Bad buffer size: 0x%Lx\n",
+    DEBUG ((DEBUG_ERROR, "XenPvBlkDxe: Bad buffer size: 0x%Lx\n",
       (UINT64)BufferSize));
     return EFI_BAD_BUFFER_SIZE;
   }
 
   if (Lba > Media->LastBlock ||
       (BufferSize / Media->BlockSize) - 1 > Media->LastBlock - Lba) {
-    DEBUG ((EFI_D_ERROR,
+    DEBUG ((DEBUG_ERROR,
       "XenPvBlkDxe: %a with invalid LBA: 0x%Lx, size: 0x%Lx\n",
       IsWrite ? "Write" : "Read", Lba, (UINT64)BufferSize));
     return EFI_INVALID_PARAMETER;
@@ -156,7 +150,7 @@ XenPvBlkDxeBlockIoReadWriteBlocks (
     Sector += IoData.Size / 512;
     Status = XenPvBlockIo (&IoData, IsWrite);
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "XenPvBlkDxe: Error during %a operation.\n",
+      DEBUG ((DEBUG_ERROR, "XenPvBlkDxe: Error during %a operation.\n",
               IsWrite ? "write" : "read"));
       return Status;
     }
@@ -178,7 +172,7 @@ XenPvBlkDxeBlockIoReadWriteBlocks (
   @retval EFI_SUCCESS           The data was read correctly from the device.
   @retval EFI_DEVICE_ERROR      The device reported an error while performing the read.
   @retval EFI_NO_MEDIA          There is no media in the device.
-  @retval EFI_MEDIA_CHANGED     The MediaId does not matched the current device.
+  @retval EFI_MEDIA_CHANGED     The MediaId does not match the current device.
   @retval EFI_BAD_BUFFER_SIZE   The Buffer was not a multiple of the block size of the device.
   @retval EFI_INVALID_PARAMETER The read request contains LBAs that are not valid,
                                 or the buffer is not on proper alignment.
@@ -212,7 +206,7 @@ XenPvBlkDxeBlockIoReadBlocks (
   @retval EFI_WRITE_PROTECTED   The device can not be written to.
   @retval EFI_DEVICE_ERROR      The device reported an error while performing the write.
   @retval EFI_NO_MEDIA          There is no media in the device.
-  @retval EFI_MEDIA_CHNAGED     The MediaId does not matched the current device.
+  @retval EFI_MEDIA_CHANGED     The MediaId does not match the current device.
   @retval EFI_BAD_BUFFER_SIZE   The Buffer was not a multiple of the block size of the device.
   @retval EFI_INVALID_PARAMETER The write request contains LBAs that are not valid,
                                 or the buffer is not on proper alignment.
@@ -238,7 +232,7 @@ XenPvBlkDxeBlockIoWriteBlocks (
   @param  This              Indicates a pointer to the calling context.
 
   @retval EFI_SUCCESS       All outstanding data was written to the device
-  @retval EFI_DEVICE_ERROR  The device reported an error while writting back the data
+  @retval EFI_DEVICE_ERROR  The device reported an error while writing back the data
   @retval EFI_NO_MEDIA      There is no media in the device.
 
 **/

@@ -1,15 +1,9 @@
 /** @file
   Udp6 driver's whole implementation.
 
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -57,6 +51,9 @@ Udp6FindInstanceByPort (
   interface. It's called to signal the udp TxToken when the IpIo layer completes
   transmitting of the udp datagram.
 
+  If Context is NULL, then ASSERT().
+  If NotifyData is NULL, then ASSERT().
+
   @param[in]  Status            The completion status of the output udp datagram.
   @param[in]  Context           Pointer to the context data.
   @param[in]  Sender            Specify a EFI_IP6_PROTOCOL for sending.
@@ -74,6 +71,10 @@ Udp6DgramSent (
 
 /**
   This function processes the received datagram passed up by the IpIo layer.
+
+  If NetSession is NULL, then ASSERT().
+  If Packet is NULL, then ASSERT().
+  If Context is NULL, then ASSERT().
 
   @param[in]  Status            The status of this udp datagram.
   @param[in]  IcmpError         The IcmpError code, only available when Status is
@@ -95,7 +96,7 @@ Udp6DgramRcvd (
   );
 
 /**
-  This function cancle the token specified by Arg in the Map.
+  This function cancel the token specified by Arg in the Map.
 
   @param[in]  Map             Pointer to the NET_MAP.
   @param[in]  Item            Pointer to the NET_MAP_ITEM.
@@ -158,7 +159,8 @@ Udp6RecycleRxDataWrap (
   @param[in]  RxData             Pointer to the EFI_UDP6_RECEIVE_DATA of this
                                  datagram.
 
-  @return Pointer to the structure wrapping the RxData and the Packet.
+  @return Pointer to the structure wrapping the RxData and the Packet. NULL will
+          be returned if any error occurs.
 
 **/
 UDP6_RXDATA_WRAP *
@@ -364,7 +366,7 @@ ON_ERROR:
 
   IpIoDestroy (Udp6Service->IpIo);
   Udp6Service->IpIo = NULL;
-  
+
   return Status;
 }
 
@@ -390,7 +392,7 @@ Udp6CleanService (
   //
   IpIoDestroy (Udp6Service->IpIo);
   Udp6Service->IpIo = NULL;
-  
+
   ZeroMem (Udp6Service, sizeof (UDP6_SERVICE_DATA));
 }
 
@@ -456,7 +458,7 @@ Udp6CheckTimeout (
 
 
 /**
-  This function intializes the new created udp instance.
+  This function initializes the new created udp instance.
 
   @param[in]       Udp6Service      Pointer to the UDP6_SERVICE_DATA.
   @param[in, out]  Instance         Pointer to the un-initialized UDP6_INSTANCE_DATA.
@@ -573,7 +575,7 @@ Udp6FindInstanceByPort (
 
 /**
   This function tries to bind the udp instance according to the configured port
-  allocation stragety.
+  allocation strategy.
 
   @param[in]  InstanceList       Pointer to the head of the list linking the udp
                                  instances.
@@ -830,7 +832,7 @@ Udp6ValidateTxToken (
 
     if ((UdpSessionData->DestinationPort == 0) && (ConfigData->RemotePort == 0)) {
       //
-      // Ambiguous; no avalaible DestinationPort for this token.
+      // Ambiguous; no available DestinationPort for this token.
       //
       return EFI_INVALID_PARAMETER;
     }
@@ -839,7 +841,7 @@ Udp6ValidateTxToken (
         NetIp6IsUnspecifiedAddr (&ConfigData->RemoteAddress)
         ) {
       //
-      // The DestinationAddress is not specificed.
+      // The DestinationAddress is not specified.
       //
       return EFI_INVALID_PARAMETER;
     }
@@ -913,7 +915,7 @@ Udp6TokenExist (
   pseudo HeadSum to reduce some overhead.
 
   @param[in]  Packet           Pointer to the NET_BUF contains the udp datagram.
-  @param[in]  HeadSum          Checksum of the pseudo header, execpt the length
+  @param[in]  HeadSum          Checksum of the pseudo header, except the length
                                field.
 
   @return The 16-bit checksum of this udp datagram.
@@ -976,6 +978,9 @@ Udp6RemoveToken (
   interface. It's called to signal the udp TxToken when IpIo layer completes the
   transmitting of the udp datagram.
 
+  If Context is NULL, then ASSERT().
+  If NotifyData is NULL, then ASSERT().
+
   @param[in]  Status            The completion status of the output udp datagram.
   @param[in]  Context           Pointer to the context data.
   @param[in]  Sender            Specify a EFI_IP6_PROTOCOL for sending.
@@ -994,6 +999,8 @@ Udp6DgramSent (
   UDP6_INSTANCE_DATA         *Instance;
   EFI_UDP6_COMPLETION_TOKEN  *Token;
 
+  ASSERT (Context != NULL && NotifyData != NULL);
+
   Instance = (UDP6_INSTANCE_DATA *) Context;
   Token    = (EFI_UDP6_COMPLETION_TOKEN *) NotifyData;
 
@@ -1010,6 +1017,10 @@ Udp6DgramSent (
 
 /**
   This function processes the received datagram passed up by the IpIo layer.
+
+  If NetSession is NULL, then ASSERT().
+  If Packet is NULL, then ASSERT().
+  If Context is NULL, then ASSERT().
 
   @param[in]  Status            The status of this udp datagram.
   @param[in]  IcmpError         The IcmpError code, only available when Status is
@@ -1030,6 +1041,7 @@ Udp6DgramRcvd (
   IN VOID                  *Context
   )
 {
+  ASSERT (NetSession != NULL && Packet != NULL && Context != NULL);
   NET_CHECK_SIGNATURE (Packet, NET_BUF_SIGNATURE);
 
   //
@@ -1111,7 +1123,7 @@ Udp6LeaveGroup (
 
 
 /**
-  This function cancle the token specified by Arg in the Map.
+  This function cancel the token specified by Arg in the Map.
 
   @param[in]  Map             Pointer to the NET_MAP.
   @param[in]  Item            Pointer to the NET_MAP_ITEM.
@@ -1264,7 +1276,7 @@ Udp6InstanceCancelToken (
                                  from the received udp datagram.
 
   @retval TRUE     The udp datagram matches the receiving requirements of the Instance.
-  @retval FALSE    The udp datagram does not matche the receiving requirements of the Instance.
+  @retval FALSE    The udp datagram does not match the receiving requirements of the Instance.
 
 **/
 BOOLEAN
@@ -1374,7 +1386,8 @@ Udp6RecycleRxDataWrap (
   @param[in]  RxData             Pointer to the EFI_UDP6_RECEIVE_DATA of this
                                  datagram.
 
-  @return Pointer to the structure wrapping the RxData and the Packet.
+  @return Pointer to the structure wrapping the RxData and the Packet. NULL will
+          be returned if any error occurs.
 
 **/
 UDP6_RXDATA_WRAP *
@@ -1598,16 +1611,20 @@ Udp6Demultiplex (
   EFI_UDP6_SESSION_DATA  *Udp6Session;
   UINTN                  Enqueued;
 
-  if (Packet->TotalSize < sizeof (EFI_UDP_HEADER)) {
+  if (Packet->TotalSize < UDP6_HEADER_SIZE) {
     NetbufFree (Packet);
     return;
   }
-  
+
   //
   // Get the datagram header from the packet buffer.
   //
   Udp6Header = (EFI_UDP_HEADER *) NetbufGetByte (Packet, 0, NULL);
   ASSERT (Udp6Header != NULL);
+  if (Udp6Header == NULL) {
+    NetbufFree (Packet);
+    return;
+  }
 
   if (Udp6Header->Checksum != 0) {
     //
@@ -1718,6 +1735,9 @@ Udp6SendPortUnreach (
   //
   Ip6ModeData = AllocateZeroPool (sizeof (EFI_IP6_MODE_DATA));
   ASSERT (Ip6ModeData != NULL);
+  if (Ip6ModeData == NULL) {
+    goto EXIT;
+  }
 
   //
   // If not finding the related IpSender use the default IpIo to send out
@@ -1766,6 +1786,9 @@ Udp6SendPortUnreach (
   //
   IcmpErrHdr = (IP6_ICMP_ERROR_HEAD *) NetbufAllocSpace (Packet, Len, FALSE);
   ASSERT (IcmpErrHdr != NULL);
+  if (IcmpErrHdr == NULL) {
+    goto EXIT;
+  }
 
   //
   // Set the required fields for the icmp port unreachable message.
@@ -1791,7 +1814,7 @@ Udp6SendPortUnreach (
     );
 
   //
-  // Set the checksum as zero, and IP6 driver will calcuate it with pseudo header.
+  // Set the checksum as zero, and IP6 driver will calculate it with pseudo header.
   //
   IcmpErrHdr->Head.Checksum = 0;
 
@@ -1840,13 +1863,17 @@ Udp6IcmpHandler (
   LIST_ENTRY             *Entry;
   UDP6_INSTANCE_DATA     *Instance;
 
-  if (Packet->TotalSize < sizeof (EFI_UDP_HEADER)) {
+  if (Packet->TotalSize < UDP6_HEADER_SIZE) {
     NetbufFree (Packet);
     return;
   }
-  
+
   Udp6Header = (EFI_UDP_HEADER *) NetbufGetByte (Packet, 0, NULL);
   ASSERT (Udp6Header != NULL);
+  if (Udp6Header == NULL) {
+    NetbufFree (Packet);
+    return;
+  }
 
   IP6_COPY_ADDRESS (&Udp6Session.SourceAddress, &NetSession->Source);
   IP6_COPY_ADDRESS (&Udp6Session.DestinationAddress, &NetSession->Dest);
@@ -1942,7 +1969,7 @@ Udp6NetVectorExtFree (
   IN VOID  *Context
   )
 {
-} 
+}
 
 /**
   Find the key in the netmap.

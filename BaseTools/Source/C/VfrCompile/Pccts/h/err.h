@@ -649,7 +649,7 @@ _inf_zzgettok()
 /* allocate default size text,token and line arrays;
  * then, read all of the input reallocing the arrays as needed.
  * Once the number of total tokens is known, the LATEXT(i) array (zzinf_text)
- * is allocated and it's pointers are set to the tokens in zzinf_text_buffer.
+ * is allocated and its pointers are set to the tokens in zzinf_text_buffer.
  */
 void
 #ifdef __USE_PROTOS

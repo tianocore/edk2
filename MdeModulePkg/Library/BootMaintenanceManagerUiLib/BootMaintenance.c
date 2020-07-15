@@ -1,14 +1,8 @@
 /** @file
 The functions for Boot Maintainence Main menu.
 
-Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2004 - 2019, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -61,7 +55,7 @@ HII_VENDOR_DEVICE_PATH  mBmmHiiVendorDevicePath = {
   {
     END_DEVICE_PATH_TYPE,
     END_ENTIRE_DEVICE_PATH_SUBTYPE,
-    { 
+    {
       (UINT8) (END_DEVICE_PATH_LENGTH),
       (UINT8) ((END_DEVICE_PATH_LENGTH) >> 8)
     }
@@ -118,9 +112,9 @@ CustomizeMenus (
 
 /**
   This function will change video resolution and text mode
-  according to defined setup mode or defined boot mode  
+  according to defined setup mode or defined boot mode
 
-  @param  IsSetupMode   Indicate mode is changed to setup mode or boot mode. 
+  @param  IsSetupMode   Indicate mode is changed to setup mode or boot mode.
 
   @retval  EFI_SUCCESS  Mode is changed successfully.
   @retval  Others       Mode failed to be changed.
@@ -147,13 +141,13 @@ BmmSetConsoleMode (
   EFI_STATUS                            Status;
   UINTN                                 Index;
   UINTN                                 CurrentColumn;
-  UINTN                                 CurrentRow;  
+  UINTN                                 CurrentRow;
 
   MaxGopMode  = 0;
   MaxTextMode = 0;
 
   //
-  // Get current video resolution and text mode 
+  // Get current video resolution and text mode
   //
   Status = gBS->HandleProtocol (
                   gST->ConsoleOutHandle,
@@ -171,7 +165,7 @@ BmmSetConsoleMode (
                   );
   if (EFI_ERROR (Status)) {
     SimpleTextOut = NULL;
-  }  
+  }
 
   if ((GraphicsOutput == NULL) || (SimpleTextOut == NULL)) {
     return EFI_UNSUPPORTED;
@@ -192,12 +186,12 @@ BmmSetConsoleMode (
     NewHorizontalResolution = mBmmBootHorizontalResolution;
     NewVerticalResolution   = mBmmBootVerticalResolution;
     NewColumns              = mBmmBootTextModeColumn;
-    NewRows                 = mBmmBootTextModeRow;   
+    NewRows                 = mBmmBootTextModeRow;
   }
 
   if (GraphicsOutput != NULL) {
     MaxGopMode  = GraphicsOutput->Mode->MaxMode;
-  } 
+  }
 
   if (SimpleTextOut != NULL) {
     MaxTextMode = SimpleTextOut->Mode->MaxMode;
@@ -743,7 +737,7 @@ BootMaintExtractConfig (
 
   @param[in]  This                Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
   @param[in]  Configuration       A null-terminated Unicode string in
-                                  <ConfigString> format.   
+                                  <ConfigString> format.
   @param[out] Progress            A pointer to a string filled in with the
                                   offset of the most recent '&' before the
                                   first failing name / value pair (or the
@@ -753,7 +747,7 @@ BootMaintExtractConfig (
                                   successful.
 
   @retval EFI_SUCCESS             The results have been distributed or are
-                                  awaiting distribution.  
+                                  awaiting distribution.
   @retval EFI_OUT_OF_RESOURCES    Not enough memory to store the
                                   parts of the results that must be
                                   stored awaiting possible future
@@ -802,15 +796,15 @@ BootMaintRouteConfig (
   }
 
   Status = gBS->LocateProtocol (
-                  &gEfiHiiConfigRoutingProtocolGuid, 
-                  NULL, 
+                  &gEfiHiiConfigRoutingProtocolGuid,
+                  NULL,
                   (VOID **)&ConfigRouting
                   );
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  Private = BMM_CALLBACK_DATA_FROM_THIS (This);  
+  Private = BMM_CALLBACK_DATA_FROM_THIS (This);
   //
   // Get Buffer Storage data from EFI variable
   //
@@ -828,15 +822,15 @@ BootMaintRouteConfig (
                             &BufferSize,
                             Progress
                             );
-  ASSERT_EFI_ERROR (Status);    
+  ASSERT_EFI_ERROR (Status);
   //
-  // Compare new and old BMM configuration data and only do action for modified item to 
+  // Compare new and old BMM configuration data and only do action for modified item to
   // avoid setting unnecessary non-volatile variable
   //
 
   //
   // Check data which located in BMM main page and save the settings if need
-  //         
+  //
   if (CompareMem (&NewBmmData->BootNext, &OldBmmData->BootNext, sizeof (NewBmmData->BootNext)) != 0) {
     Status = Var_UpdateBootNext (Private);
     if (EFI_ERROR (Status)) {
@@ -847,10 +841,10 @@ BootMaintRouteConfig (
 
   //
   // Check data which located in Boot Options Menu and save the settings if need
-  //      
-  if (CompareMem (NewBmmData->BootOptionDel, OldBmmData->BootOptionDel, sizeof (NewBmmData->BootOptionDel)) != 0) {  
-    for (Index = 0; 
-         ((Index < BootOptionMenu.MenuNumber) && (Index < (sizeof (NewBmmData->BootOptionDel) / sizeof (NewBmmData->BootOptionDel[0])))); 
+  //
+  if (CompareMem (NewBmmData->BootOptionDel, OldBmmData->BootOptionDel, sizeof (NewBmmData->BootOptionDel)) != 0) {
+    for (Index = 0;
+         ((Index < BootOptionMenu.MenuNumber) && (Index < (sizeof (NewBmmData->BootOptionDel) / sizeof (NewBmmData->BootOptionDel[0]))));
          Index ++) {
       NewMenuEntry            = BOpt_GetMenuEntry (&BootOptionMenu, Index);
       NewLoadContext          = (BM_LOAD_CONTEXT *) NewMenuEntry->VariableContext;
@@ -891,10 +885,10 @@ BootMaintRouteConfig (
 
   //
   // Check data which located in Driver Options Menu and save the settings if need
-  //              
-  if (CompareMem (NewBmmData->DriverOptionDel, OldBmmData->DriverOptionDel, sizeof (NewBmmData->DriverOptionDel)) != 0) {       
-    for (Index = 0; 
-         ((Index < DriverOptionMenu.MenuNumber) && (Index < (sizeof (NewBmmData->DriverOptionDel) / sizeof (NewBmmData->DriverOptionDel[0])))); 
+  //
+  if (CompareMem (NewBmmData->DriverOptionDel, OldBmmData->DriverOptionDel, sizeof (NewBmmData->DriverOptionDel)) != 0) {
+    for (Index = 0;
+         ((Index < DriverOptionMenu.MenuNumber) && (Index < (sizeof (NewBmmData->DriverOptionDel) / sizeof (NewBmmData->DriverOptionDel[0]))));
          Index++) {
       NewMenuEntry            = BOpt_GetMenuEntry (&DriverOptionMenu, Index);
       NewLoadContext          = (BM_LOAD_CONTEXT *) NewMenuEntry->VariableContext;
@@ -909,7 +903,7 @@ BootMaintRouteConfig (
     }
   }
 
-  if (CompareMem (NewBmmData->DriverOptionOrder, OldBmmData->DriverOptionOrder, sizeof (NewBmmData->DriverOptionOrder)) != 0) {  
+  if (CompareMem (NewBmmData->DriverOptionOrder, OldBmmData->DriverOptionOrder, sizeof (NewBmmData->DriverOptionOrder)) != 0) {
     Status = Var_UpdateDriverOrder (Private);
     if (EFI_ERROR (Status)) {
       Offset = OFFSET_OF (BMM_FAKE_NV_DATA, DriverOptionOrder);
@@ -1111,6 +1105,7 @@ BootMaintCallback (
         // 2. Re-scan the BootOption menus (including the legacy boot option).
         //
         CustomizeMenus ();
+        EfiBootManagerRefreshAllBootOption ();
         BOpt_GetBootOptions (Private);
         mFirstEnterBMMForm = TRUE;
       }
@@ -1127,14 +1122,14 @@ BootMaintCallback (
     if (Value == NULL) {
       return EFI_INVALID_PARAMETER;
     }
-    
+
     UpdatePageId (Private, QuestionId);
 
     if (QuestionId < FILE_OPTION_OFFSET) {
       if (QuestionId < CONFIG_OPTION_OFFSET) {
         switch (QuestionId) {
         case FORM_BOOT_ADD_ID:
-          // Leave BMM and enter FileExplorer. 
+          // Leave BMM and enter FileExplorer.
           ChooseFile (NULL, L".efi", CreateBootOptionFromFile, &File);
           break;
 
@@ -1212,7 +1207,7 @@ BootMaintCallback (
     if ((Value == NULL) || (ActionRequest == NULL)) {
       return EFI_INVALID_PARAMETER;
     }
-   
+
     if (QuestionId == KEY_VALUE_SAVE_AND_EXIT_BOOT) {
       CleanUselessBeforeSubmit (Private);
       CurrentFakeNVMap->BootOptionChanged = FALSE;
@@ -1246,7 +1241,7 @@ BootMaintCallback (
       CurrentFakeNVMap->BootOptionChanged = TRUE;
     } else if (QuestionId == KEY_VALUE_DRIVER_DESCRIPTION || QuestionId == KEY_VALUE_DRIVER_OPTION) {
       CurrentFakeNVMap->DriverOptionChanged = TRUE;
-    } 
+    }
 
     if ((QuestionId >= BOOT_OPTION_DEL_QUESTION_ID) && (QuestionId < BOOT_OPTION_DEL_QUESTION_ID + MAX_MENU_NUMBER)) {
       if (Value->b){
@@ -1302,7 +1297,7 @@ BootMaintCallback (
     } else if ((QuestionId >= CON_OUT_DEVICE_QUESTION_ID) && (QuestionId < CON_OUT_DEVICE_QUESTION_ID + MAX_MENU_NUMBER)) {
       UpdateConsoleContent (L"ConOut", CurrentFakeNVMap);
     } else if ((QuestionId >= CON_ERR_DEVICE_QUESTION_ID) && (QuestionId < CON_ERR_DEVICE_QUESTION_ID + MAX_MENU_NUMBER)) {
-      UpdateConsoleContent (L"ConErr", CurrentFakeNVMap);
+      UpdateConsoleContent (L"ErrOut", CurrentFakeNVMap);
     }
   }
 
@@ -1690,8 +1685,6 @@ BootMaintenanceManagerUiLibConstructor (
   Status = gBS->LocateProtocol (&gEfiFormBrowser2ProtocolGuid, NULL, (VOID **) &mBmmCallbackInfo->FormBrowser2);
   ASSERT_EFI_ERROR (Status);
 
-  EfiBootManagerRefreshAllBootOption ();
-
   //
   // Create LoadOption in BmmCallbackInfo for Driver Callback
   //
@@ -1719,7 +1712,7 @@ BootMaintenanceManagerUiLibConstructor (
 
   CreateUpdateData();
   //
-  // Update boot maintenance manager page 
+  // Update boot maintenance manager page
   //
   InitializeBmmConfig(mBmmCallbackInfo);
 
@@ -1770,6 +1763,7 @@ BootMaintenanceManagerUiLibDestructor (
          );
 
   FreePool (mBmmCallbackInfo->LoadContext);
+  mBmmCallbackInfo->BmmDriverHandle = NULL;
 
   return EFI_SUCCESS;
 }

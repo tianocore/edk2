@@ -1,0 +1,43 @@
+///** @file
+//
+//    String definitions for Legacy Boot Maintainece Ui.
+//
+//  Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
+//  SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+//**/
+
+/=#
+
+#langdef   en-US "English"
+#langdef   fr-FR "Français"
+
+#string STR_LEGACY_BOOT_PROMPT         #language en-US  "Legacy Boot Options Menu"
+                                       #language fr-FR  "Legacy Boot Options Menu"
+#string STR_LEGACY_BOOT_HELP           #language en-US  "Manager legacy boot options in this driver."
+                                       #language fr-FR  "Manager legacy boot options in this driver."
+#string STR_FORM_FLOPPY_BOOT_TITLE     #language en-US  "Set Legacy Floppy Driver Order"
+                                       #language fr-FR  "Set Legacy Floppy Driver Order"
+#string STR_FORM_FLOPPY_BOOT_HELP      #language en-US  "Set Legacy Floppy Driver Order."
+                                       #language fr-FR  "Set Legacy Floppy Driver Order."
+#string STR_FORM_HARDDISK_BOOT_TITLE   #language en-US  "Set Legacy HARDDISK Driver Order"
+                                       #language fr-FR  "Set Legacy HARDDISK Driver Order"
+#string STR_FORM_HARDDISK_BOOT_HELP    #language en-US  "Set Legacy HARDDISK Driver Order."
+                                       #language fr-FR  "Set Legacy HARDDISK Driver Order."
+#string STR_FORM_CDROM_BOOT_TITLE      #language en-US  "Set Legacy CDROM Driver Order"
+                                       #language fr-FR  "Set Legacy CDROM Driver Order"
+#string STR_FORM_CDROM_BOOT_HELP       #language en-US  "Set Legacy CDROM Driver Order."
+                                       #language fr-FR  "Set Legacy CDROM Driver Order."
+#string STR_FORM_NET_BOOT_TITLE        #language en-US  "Set Legacy NET Driver Order"
+                                       #language fr-FR  "Set Legacy NET Driver Order"
+#string STR_FORM_NET_BOOT_HELP         #language en-US  "Set Legacy NET Driver Order."
+                                       #language fr-FR  "Set Legacy NET Driver Order."
+#string STR_FORM_BEV_BOOT_TITLE        #language en-US  "Set Legacy BEV Driver Order"
+                                       #language fr-FR  "Set Legacy BEV Driver Order"
+#string STR_FORM_BEV_BOOT_HELP         #language en-US  "Set Legacy BEV Driver Order."
+                                       #language fr-FR  "Set Legacy BEV Driver Order."
+#string STR_ORDER_CHANGE_PROMPT        #language en-US  "Change Driver Boot Order."
+                                       #language fr-FR  "Change Driver Boot Order."
+#string STR_DISABLE_LEGACY_DEVICE      #language en-US  "Disabled"
+                                       #language fr-FR  "Disabled"
+

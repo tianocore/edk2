@@ -1,16 +1,10 @@
 /** @file
 Private Header file for Usb Host Controller PEIM
 
-Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
-  
-This program and the accompanying materials
-are licensed and made available under the terms and conditions
-of the BSD License which accompanies this distribution.  The
-full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) Microsoft Corporation.<BR>
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -21,7 +15,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Ppi/UsbController.h>
 #include <Ppi/Usb2HostController.h>
+#include <Ppi/IoMmu.h>
+#include <Ppi/EndOfPeiPhase.h>
 
+#include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PeimEntryPoint.h>
 #include <Library/PeiServicesLib.h>
@@ -65,20 +62,6 @@ typedef struct _PEI_USB2_HC_DEV PEI_USB2_HC_DEV;
 //
 #define EHC_SYNC_POLL_INTERVAL       (6 * EHC_1_MILLISECOND)
 
-//
-//Iterate through the double linked list. NOT delete safe
-//
-#define EFI_LIST_FOR_EACH(Entry, ListHead)    \
-  for(Entry = (ListHead)->ForwardLink; Entry != (ListHead); Entry = Entry->ForwardLink)
-
-//
-//Iterate through the double linked list. This is delete-safe.
-//Don't touch NextEntry
-//
-#define EFI_LIST_FOR_EACH_SAFE(Entry, NextEntry, ListHead)            \
-  for(Entry = (ListHead)->ForwardLink, NextEntry = Entry->ForwardLink;\
-      Entry != (ListHead); Entry = NextEntry, NextEntry = Entry->ForwardLink)
-
 #define EFI_LIST_CONTAINER(Entry, Type, Field) BASE_CR(Entry, Type, Field)
 
 
@@ -94,7 +77,13 @@ typedef struct _PEI_USB2_HC_DEV PEI_USB2_HC_DEV;
 struct _PEI_USB2_HC_DEV {
   UINTN                               Signature;
   PEI_USB2_HOST_CONTROLLER_PPI        Usb2HostControllerPpi;
-  EFI_PEI_PPI_DESCRIPTOR              PpiDescriptor;                    
+  EDKII_IOMMU_PPI                     *IoMmu;
+  EFI_PEI_PPI_DESCRIPTOR              PpiDescriptor;
+  //
+  // EndOfPei callback is used to stop the EHC DMA operation
+  // after exit PEI phase.
+  //
+  EFI_PEI_NOTIFY_DESCRIPTOR           EndOfPeiNotifyList;
   UINT32                              UsbHostControllerBaseAddress;
   PEI_URB                             *Urb;
   USBHC_MEM_POOL                      *MemPool;
@@ -110,21 +99,20 @@ struct _PEI_USB2_HC_DEV {
   //
   PEI_EHC_QTD                         *ShortReadStop;
   EFI_EVENT                           PollTimer;
-  
+
   //
-  // Asynchronous(bulk and control) transfer schedule data: 
+  // Asynchronous(bulk and control) transfer schedule data:
   // ReclaimHead is used as the head of the asynchronous transfer
-  // list. It acts as the reclamation header. 
+  // list. It acts as the reclamation header.
   //
   PEI_EHC_QH                          *ReclaimHead;
-  
+
   //
   // Periodic (interrupt) transfer schedule data:
   //
-  VOID                                *PeriodFrame;     // Mapped as common buffer 
-  VOID                                *PeriodFrameHost;
+  VOID                                *PeriodFrame;     // Mapped as common buffer
   VOID                                *PeriodFrameMap;
-                                      
+
   PEI_EHC_QH                          *PeriodOne;
   EFI_LIST_ENTRY                      AsyncIntTransfers;
 
@@ -138,6 +126,7 @@ struct _PEI_USB2_HC_DEV {
 };
 
 #define PEI_RECOVERY_USB_EHC_DEV_FROM_EHCI_THIS(a)  CR (a, PEI_USB2_HC_DEV, Usb2HostControllerPpi, USB2_HC_DEV_SIGNATURE)
+#define PEI_RECOVERY_USB_EHC_DEV_FROM_THIS_NOTIFY(a) CR (a, PEI_USB2_HC_DEV, EndOfPeiNotifyList, USB2_HC_DEV_SIGNATURE)
 
 /**
   @param  EhcDev                 EHCI Device.
@@ -148,14 +137,14 @@ struct _PEI_USB2_HC_DEV {
 **/
 EFI_STATUS
 InitializeUsbHC (
-  IN PEI_USB2_HC_DEV      *EhcDev  
+  IN PEI_USB2_HC_DEV      *EhcDev
   );
 
 /**
   Initialize the memory management pool for the host controller.
-  
+
   @param  Ehc                   The EHCI device.
-  @param  Check4G               Whether the host controller requires allocated memory 
+  @param  Check4G               Whether the host controller requires allocated memory
                                 from one 4G address space.
   @param  Which4G               The 4G memory area each memory allocated should be from.
 
@@ -170,10 +159,11 @@ UsbHcInitMemPool (
   IN UINT32               Which4G
   )
 ;
-            
+
 /**
   Release the memory management pool.
-  
+
+  @param  Ehc                   The EHCI device.
   @param  Pool                  The USB memory pool to free.
 
   @retval EFI_DEVICE_ERROR      Fail to free the memory pool.
@@ -182,6 +172,7 @@ UsbHcInitMemPool (
 **/
 EFI_STATUS
 UsbHcFreeMemPool (
+  IN PEI_USB2_HC_DEV      *Ehc,
   IN USBHC_MEM_POOL       *Pool
   )
 ;
@@ -189,7 +180,7 @@ UsbHcFreeMemPool (
 /**
   Allocate some memory from the host controller's memory pool
   which can be used to communicate with host controller.
-  
+
   @param  Ehc       The EHCI device.
   @param  Pool      The host controller's memory pool.
   @param  Size      Size of the memory to allocate.
@@ -208,6 +199,7 @@ UsbHcAllocateMem (
 /**
   Free the allocated memory back to the memory pool.
 
+  @param  Ehc            The EHCI device.
   @param  Pool           The memory pool of the host controller.
   @param  Mem            The memory to free.
   @param  Size           The size of the memory to free.
@@ -215,10 +207,110 @@ UsbHcAllocateMem (
 **/
 VOID
 UsbHcFreeMem (
+  IN PEI_USB2_HC_DEV      *Ehc,
   IN USBHC_MEM_POOL       *Pool,
   IN VOID                 *Mem,
   IN UINTN                Size
   )
 ;
+
+/**
+  Provides the controller-specific addresses required to access system memory from a
+  DMA bus master.
+
+  @param IoMmu                  Pointer to IOMMU PPI.
+  @param Operation              Indicates if the bus master is going to read or write to system memory.
+  @param HostAddress            The system memory address to map to the PCI controller.
+  @param NumberOfBytes          On input the number of bytes to map. On output the number of bytes
+                                that were mapped.
+  @param DeviceAddress          The resulting map address for the bus master PCI controller to use to
+                                access the hosts HostAddress.
+  @param Mapping                A resulting value to pass to Unmap().
+
+  @retval EFI_SUCCESS           The range was mapped for the returned NumberOfBytes.
+  @retval EFI_UNSUPPORTED       The HostAddress cannot be mapped as a common buffer.
+  @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
+  @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a lack of resources.
+  @retval EFI_DEVICE_ERROR      The system hardware could not map the requested address.
+
+**/
+EFI_STATUS
+IoMmuMap (
+  IN EDKII_IOMMU_PPI        *IoMmu,
+  IN EDKII_IOMMU_OPERATION  Operation,
+  IN VOID                   *HostAddress,
+  IN OUT UINTN              *NumberOfBytes,
+  OUT EFI_PHYSICAL_ADDRESS  *DeviceAddress,
+  OUT VOID                  **Mapping
+  );
+
+/**
+  Completes the Map() operation and releases any corresponding resources.
+
+  @param IoMmu              Pointer to IOMMU PPI.
+  @param Mapping            The mapping value returned from Map().
+
+**/
+VOID
+IoMmuUnmap (
+  IN EDKII_IOMMU_PPI        *IoMmu,
+  IN VOID                  *Mapping
+  );
+
+/**
+  Allocates pages that are suitable for an OperationBusMasterCommonBuffer or
+  OperationBusMasterCommonBuffer64 mapping.
+
+  @param IoMmu                  Pointer to IOMMU PPI.
+  @param Pages                  The number of pages to allocate.
+  @param HostAddress            A pointer to store the base system memory address of the
+                                allocated range.
+  @param DeviceAddress          The resulting map address for the bus master PCI controller to use to
+                                access the hosts HostAddress.
+  @param Mapping                A resulting value to pass to Unmap().
+
+  @retval EFI_SUCCESS           The requested memory pages were allocated.
+  @retval EFI_UNSUPPORTED       Attributes is unsupported. The only legal attribute bits are
+                                MEMORY_WRITE_COMBINE and MEMORY_CACHED.
+  @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
+  @retval EFI_OUT_OF_RESOURCES  The memory pages could not be allocated.
+
+**/
+EFI_STATUS
+IoMmuAllocateBuffer (
+  IN EDKII_IOMMU_PPI        *IoMmu,
+  IN UINTN                  Pages,
+  OUT VOID                  **HostAddress,
+  OUT EFI_PHYSICAL_ADDRESS  *DeviceAddress,
+  OUT VOID                  **Mapping
+  );
+
+/**
+  Frees memory that was allocated with AllocateBuffer().
+
+  @param IoMmu              Pointer to IOMMU PPI.
+  @param Pages              The number of pages to free.
+  @param HostAddress        The base system memory address of the allocated range.
+  @param Mapping            The mapping value returned from Map().
+
+**/
+VOID
+IoMmuFreeBuffer (
+  IN EDKII_IOMMU_PPI        *IoMmu,
+  IN UINTN                  Pages,
+  IN VOID                   *HostAddress,
+  IN VOID                   *Mapping
+  );
+
+/**
+  Initialize IOMMU.
+
+  @param IoMmu              Pointer to pointer to IOMMU PPI.
+
+**/
+VOID
+IoMmuInit (
+  OUT EDKII_IOMMU_PPI       **IoMmu
+  );
 
 #endif

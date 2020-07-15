@@ -1,14 +1,8 @@
 /** @file
   Basic TIS (TPM Interface Specification) functions.
 
-Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials 
-are licensed and made available under the terms and conditions of the BSD License 
-which accompanies this distribution.  The full text of the license may be found at 
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, 
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -28,7 +22,7 @@ TisPcPresenceCheck (
   )
 {
   UINT8                             RegRead;
-  
+
   RegRead = MmioRead8 ((UINTN)&TisReg->Access);
   return (BOOLEAN)(RegRead != (UINT8)-1);
 }
@@ -66,11 +60,11 @@ TisPcWaitRegisterBits (
 }
 
 /**
-  Get BurstCount by reading the burstCount field of a TIS regiger 
+  Get BurstCount by reading the burstCount field of a TIS register
   in the time of default TIS_TIMEOUT_D.
 
   @param[in]  TisReg                Pointer to TIS register.
-  @param[out] BurstCount            Pointer to a buffer to store the got BurstConut.
+  @param[out] BurstCount            Pointer to a buffer to store the got BurstCount.
 
   @retval     EFI_SUCCESS           Get BurstCount.
   @retval     EFI_INVALID_PARAMETER TisReg is NULL or BurstCount is NULL.
@@ -111,7 +105,7 @@ TisPcReadBurstCount (
 }
 
 /**
-  Set TPM chip to ready state by sending ready command TIS_PC_STS_READY 
+  Set TPM chip to ready state by sending ready command TIS_PC_STS_READY
   to Status Register in time.
 
   @param[in] TisReg                Pointer to TIS register.
@@ -143,7 +137,7 @@ TisPcPrepareCommand (
 }
 
 /**
-  Get the control of TPM chip by sending requestUse command TIS_PC_ACC_RQUUSE 
+  Get the control of TPM chip by sending requestUse command TIS_PC_ACC_RQUUSE
   to ACCESS Register in the time of default TIS_TIMEOUT_A.
 
   @param[in] TisReg                Pointer to TIS register.
@@ -160,11 +154,11 @@ TisPcRequestUseTpm (
   )
 {
   EFI_STATUS                        Status;
-  
+
   if (TisReg == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   if (!TisPcPresenceCheck (TisReg)) {
     return EFI_NOT_FOUND;
   }

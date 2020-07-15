@@ -1,14 +1,8 @@
 /** @file
   EFI PEI Core Security services
-  
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+
+Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -26,7 +20,7 @@ EFI_PEI_NOTIFY_DESCRIPTOR mNotifyList = {
 
   @param PeiServices     An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param OldCoreData     Pointer to the old core data.
-                         NULL if being run in non-permament memory mode.
+                         NULL if being run in non-permanent memory mode.
 
 **/
 VOID
@@ -45,7 +39,7 @@ InitializeSecurityServices (
 
   Provide a callback for when the security PPI is installed.
   This routine will cache installed security PPI into PeiCore's private data.
-  
+
   @param PeiServices        An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param NotifyDescriptor   The descriptor for the notification event.
   @param Ppi                Pointer to the PPI in question.
@@ -67,7 +61,7 @@ SecurityPpiNotifyCallback (
   // Get PEI Core private data
   //
   PrivateData = PEI_CORE_INSTANCE_FROM_PS_THIS (PeiServices);
-  
+
   //
   // If there isn't a security PPI installed, use the one from notification
   //
@@ -82,7 +76,7 @@ SecurityPpiNotifyCallback (
 
   @param PrivateData     PeiCore's private data structure
   @param VolumeHandle    Handle of FV
-  @param FileHandle      Handle of PEIM's ffs
+  @param FileHandle      Handle of PEIM's FFS
   @param AuthenticationStatus Authentication status
 
   @retval EFI_SUCCESS              Image is OK
@@ -98,7 +92,7 @@ VerifyPeim (
   )
 {
   EFI_STATUS                      Status;
-  BOOLEAN                         DeferExection;
+  BOOLEAN                         DeferExecution;
 
   Status = EFI_NOT_FOUND;
   if (PrivateData->PrivateSecurityPpi == NULL) {
@@ -120,9 +114,9 @@ VerifyPeim (
                                                 AuthenticationStatus,
                                                 VolumeHandle,
                                                 FileHandle,
-                                                &DeferExection
+                                                &DeferExecution
                                                 );
-    if (DeferExection) {
+    if (DeferExecution) {
       Status = EFI_SECURITY_VIOLATION;
     }
   }

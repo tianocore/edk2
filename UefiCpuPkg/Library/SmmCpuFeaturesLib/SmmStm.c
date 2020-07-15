@@ -1,14 +1,8 @@
 /** @file
   SMM STM support functions
 
-  Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -21,9 +15,9 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/SmmServicesTableLib.h>
 #include <Library/TpmMeasurementLib.h>
-#include <Register/Cpuid.h>
-#include <Register/ArchitecturalMsr.h>
-#include <Register/SmramSaveStateMap.h>
+#include <Register/Intel/Cpuid.h>
+#include <Register/Intel/ArchitecturalMsr.h>
+#include <Register/Intel/SmramSaveStateMap.h>
 
 #include <Protocol/MpService.h>
 
@@ -116,7 +110,6 @@ UINTN  mMsegSize = 0;
 
 BOOLEAN  mStmConfigurationTableInitialized = FALSE;
 
-
 /**
   The constructor function
 
@@ -137,6 +130,11 @@ SmmCpuFeaturesLibStmConstructor (
   CPUID_VERSION_INFO_ECX  RegEcx;
   EFI_HOB_GUID_TYPE       *GuidHob;
   EFI_SMRAM_DESCRIPTOR    *SmramDescriptor;
+
+  //
+  // Initialize address fixup
+  //
+  SmmCpuFeaturesLibStmSmiEntryFixupAddress ();
 
   //
   // Call the common constructor function
@@ -326,8 +324,8 @@ SmmCpuFeaturesInstallSmiHandler (
   Psd->SmmSmiHandlerRsp = (UINTN)SmiStack + StackSize - sizeof(UINTN);
   Psd->SmmCr3           = Cr3;
 
-  DEBUG((DEBUG_ERROR, "CpuSmmStmExceptionStackSize - %x\n", PcdGet32(PcdCpuSmmStmExceptionStackSize)));
-  DEBUG((DEBUG_ERROR, "Pages - %x\n", EFI_SIZE_TO_PAGES(PcdGet32(PcdCpuSmmStmExceptionStackSize))));
+  DEBUG((DEBUG_INFO, "CpuSmmStmExceptionStackSize - %x\n", PcdGet32(PcdCpuSmmStmExceptionStackSize)));
+  DEBUG((DEBUG_INFO, "Pages - %x\n", EFI_SIZE_TO_PAGES(PcdGet32(PcdCpuSmmStmExceptionStackSize))));
   Psd->StmProtectionExceptionHandler.SpeRsp = (UINT64)(UINTN)AllocatePages (EFI_SIZE_TO_PAGES (PcdGet32 (PcdCpuSmmStmExceptionStackSize)));
   Psd->StmProtectionExceptionHandler.SpeRsp += EFI_PAGES_TO_SIZE (EFI_SIZE_TO_PAGES (PcdGet32 (PcdCpuSmmStmExceptionStackSize)));
 
@@ -735,7 +733,7 @@ ValidateResource (
   Resource = ResourceList;
 
   for (Index = 0; Index < Count; Index++) {
-    DEBUG ((DEBUG_ERROR, "ValidateResource (%d) - RscType(%x)\n", Index, Resource->Header.RscType));
+    DEBUG ((DEBUG_INFO, "ValidateResource (%d) - RscType(%x)\n", Index, Resource->Header.RscType));
     //
     // Validate resource.
     //
@@ -782,7 +780,7 @@ ValidateResource (
         break;
 
       case PCI_CFG_RANGE:
-        DEBUG ((DEBUG_ERROR, "ValidateResource - PCI (0x%02x, 0x%08x, 0x%02x, 0x%02x)\n", Resource->PciCfg.OriginatingBusNumber, Resource->PciCfg.LastNodeIndex, Resource->PciCfg.PciDevicePath[0].PciDevice, Resource->PciCfg.PciDevicePath[0].PciFunction));
+        DEBUG ((DEBUG_INFO, "ValidateResource - PCI (0x%02x, 0x%08x, 0x%02x, 0x%02x)\n", Resource->PciCfg.OriginatingBusNumber, Resource->PciCfg.LastNodeIndex, Resource->PciCfg.PciDevicePath[0].PciDevice, Resource->PciCfg.PciDevicePath[0].PciFunction));
         if (Resource->Header.Length != sizeof (STM_RSC_PCI_CFG_DESC) + (sizeof(STM_PCI_DEVICE_PATH_NODE) * Resource->PciCfg.LastNodeIndex)) {
           return FALSE;
         }
@@ -915,7 +913,7 @@ AddPiResource (
     }
 
     //
-    // Copy EndResource for intialization
+    // Copy EndResource for initialization
     //
     mStmResourcesPtr = (UINT8 *)(UINTN)NewResource;
     mStmResourceTotalSize = NewResourceSize;
@@ -1238,7 +1236,7 @@ LoadMonitor (
 /**
   This function return BIOS STM resource.
   Produced by SmmStm.
-  Comsumed by SmmMpService when Init.
+  Consumed by SmmMpService when Init.
 
   @return BIOS STM resource
 

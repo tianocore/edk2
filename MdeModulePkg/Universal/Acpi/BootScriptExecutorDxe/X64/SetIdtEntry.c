@@ -3,17 +3,11 @@
 
   Set a IDT entry for interrupt vector 3 for debug purpose for x64 platform
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
 
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 #include "ScriptExecute.h"
@@ -117,7 +111,7 @@ IsLongModeWakingVector (
   if (Facs->XFirmwareWakingVector != 0) {
     if ((Facs->Version == EFI_ACPI_4_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_VERSION) &&
         ((Facs->Flags & EFI_ACPI_4_0_64BIT_WAKE_SUPPORTED_F) != 0) &&
-        ((Facs->Flags & EFI_ACPI_4_0_OSPM_64BIT_WAKE__F) != 0)) {
+        ((Facs->OspmFlags & EFI_ACPI_4_0_OSPM_64BIT_WAKE__F) != 0)) {
       // Both BIOS and OS wants 64bit vector
       if (FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
         return TRUE;
@@ -218,7 +212,7 @@ AcquirePage (
 
 /**
   The page fault handler that on-demand read >4G memory/MMIO.
-  
+
   @retval TRUE     The page fault is correctly handled.
   @retval FALSE    The page fault is not handled and is passed through to original handler.
 
@@ -234,7 +228,7 @@ PageFaultHandler (
   UINTN          PTIndex;
 
   PFAddress = AsmReadCr2 ();
-  DEBUG ((EFI_D_ERROR, "BootScript - PageFaultHandler: Cr2 - %lx\n", PFAddress));
+  DEBUG ((DEBUG_INFO, "BootScript - PageFaultHandler: Cr2 - %lx\n", PFAddress));
 
   if (PFAddress >= mPhyMask + SIZE_4KB) {
     return FALSE;

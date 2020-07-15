@@ -1,14 +1,8 @@
 /** @file
   The module entry point for Tcg2 configuration module.
 
-Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials 
-are licensed and made available under the terms and conditions of the BSD License 
-which accompanies this distribution.  The full text of the license may be found at 
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, 
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -246,7 +240,7 @@ InitializeTcg2VersionInfo (
 
   @retval EFI_ALREADY_STARTED    The driver already exists in system.
   @retval EFI_OUT_OF_RESOURCES   Fail to execute entry point due to lack of resources.
-  @retval EFI_SUCCES             All the related protocols are installed on the driver.
+  @retval EFI_SUCCESS            All the related protocols are installed on the driver.
   @retval Others                 Fail to install protocols as indicated.
 
 **/
@@ -277,7 +271,7 @@ Tcg2ConfigDriverEntryPoint (
   if (!EFI_ERROR (Status)) {
     return EFI_ALREADY_STARTED;
   }
-  
+
   //
   // Create a private data structure.
   //
@@ -286,7 +280,7 @@ Tcg2ConfigDriverEntryPoint (
   mTcg2ConfigPrivateDate = PrivateData;
   //
   // Install private GUID.
-  //    
+  //
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &ImageHandle,
                   &gEfiCallerIdGuid,
@@ -398,7 +392,7 @@ Tcg2ConfigDriverEntryPoint (
                                      );
     ASSERT_EFI_ERROR (Status);
   }
-  
+
   //
   // Install Tcg2 configuration form
   //
@@ -414,8 +408,8 @@ Tcg2ConfigDriverEntryPoint (
 ErrorExit:
   if (PrivateData != NULL) {
     UninstallTcg2ConfigForm (PrivateData);
-  }  
-  
+  }
+
   return Status;
 }
 
@@ -441,20 +435,20 @@ Tcg2ConfigDriverUnload (
                   ImageHandle,
                   &gEfiCallerIdGuid,
                   (VOID **) &PrivateData
-                  );  
+                  );
   if (EFI_ERROR (Status)) {
-    return Status;  
+    return Status;
   }
-  
+
   ASSERT (PrivateData->Signature == TCG2_CONFIG_PRIVATE_DATA_SIGNATURE);
 
   gBS->UninstallMultipleProtocolInterfaces (
-         &ImageHandle,
+         ImageHandle,
          &gEfiCallerIdGuid,
          PrivateData,
          NULL
          );
-  
+
   UninstallTcg2ConfigForm (PrivateData);
 
   return EFI_SUCCESS;

@@ -1,0 +1,44 @@
+## @file
+# Memory Allocation Library instance dedicated to MM Core.
+# The implementation borrows the MM Core Memory Allocation services as the primitive
+# for memory allocation instead of using MM System Table servces in an indirect way.
+# It is assumed that this library instance must be linked with MM Core in this package.
+#
+# Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2016 - 2018, ARM Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = MemoryAllocationLib
+  FILE_GUID                      = DCDCBE1D-E760-4E1D-85B4-96E3F0439C41
+  MODULE_TYPE                    = MM_CORE_STANDALONE
+  VERSION_STRING                 = 1.0
+  PI_SPECIFICATION_VERSION       = 0x00010032
+  LIBRARY_CLASS                  = MemoryAllocationLib|MM_CORE_STANDALONE
+  CONSTRUCTOR                    = MemoryAllocationLibConstructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  StandaloneMmCoreMemoryAllocationLib.c
+  StandaloneMmCoreMemoryAllocationServices.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  StandaloneMmPkg/StandaloneMmPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  HobLib
+
+[Guids]
+  gEfiMmPeiMmramMemoryReserveGuid

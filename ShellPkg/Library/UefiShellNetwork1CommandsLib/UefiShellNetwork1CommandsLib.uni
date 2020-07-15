@@ -1,14 +1,9 @@
 // /**
 //
 // (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
-// Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved. <BR>
-// This program and the accompanying materials
-// are licensed and made available under the terms and conditions of the BSD License
-// which accompanies this distribution. The full text of the license may be found at
-// http://opensource.org/licenses/bsd-license.php
-//
-// THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-// WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+// Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved. <BR>
+// (C) Copyright 2017 Hewlett Packard Enterprise Development LP<BR>
+// SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Module Name:
 //
@@ -49,6 +44,7 @@
 #string STR_PING_CONFIG              #language en-US "Config %r\r\n"
 #string STR_PING_GETMODE             #language en-US "GetModeData %r\r\n"
 #string STR_PING_GETDATA             #language en-US "GetData %r\r\n"
+#string STR_PING_RECEIVE             #language en-US "Receive %r\r\n"
 #string STR_PING_SEND_REQUEST        #language en-US "Echo request sequence %d did not complete successfully.\r\n"
 #string STR_PING_NOSOURCE_INDO       #language en-US "There are no sources in %s's multicast domain.\r\n"
 #string STR_PING_NETWORK_ERROR       #language en-US "%H%s%N: Network function failed with %r\r\n"
@@ -71,7 +67,7 @@
 #string STR_IFCONFIG_CONFLICT_COMMAND         #language en-US    "Conflict commands. Bad command %H%s%N is skipped.\n"
 #string STR_IFCONFIG_UNKNOWN_COMMAND          #language en-US    "Unknown commands. Bad command %H%s%N is skipped.\n"
 #string STR_IFCONFIG_SET_ADDR_FAILED          #language en-US    "Failed to set address.\n"
-#string STR_IFCONFIG_ROUTES_SIZE              #language en-US  	 "\n%H  Routes (%d entries):\n"
+#string STR_IFCONFIG_ROUTES_SIZE              #language en-US     "\n%H  Routes (%d entries):\n"
 #string STR_IFCONFIG_ROUTES_ENTRY_INDEX       #language en-US    "%H    Entry[%d]\n"
 #string STR_IFCONFIG_SHOW_IP_ADDR             #language en-US    "%12s: %N%d.%d.%d.%d\n"
 #string STR_IFCONFIG_INFO_NEWLINE             #language en-US    "\n"
@@ -150,14 +146,14 @@
 ".SH DESCRIPTION\r\n"
 " \r\n"
 "NOTES:\r\n"
-"  1. This command modifies the default IP address for the UEFI IP4\r\n"
+"  1. This command modifies the default IP address for the UEFI IPv4\r\n"
 "     network stack.\r\n"
 "  2. Use '-r' to renew configuration of interface and set dhcp policy.\r\n"
 "  3. Use '-l' to list the DNS and other address related settings for all\r\n"
 "     interfaces or the specified interface.\r\n"
 "  4. Use '-s <Name> static <IP> <SubnetMask> <GatewayMask>' with \r\n"
-"     static IP4 address configuration for specified interface.\r\n"
-"  5. Use '-s <Name> dhcp' for DHCP4 to request the IP4 address\r\n"
+"     static IPv4 address configuration for specified interface.\r\n"
+"  5. Use '-s <Name> dhcp' for DHCPv4 to request the IPv4 address\r\n"
 "     configuration dynamically for specified interface.\r\n"
 "  6. Use '-s <Name> dns <IP>' must under manual policy.\r\n"
 ".SH EXAMPLES\r\n"
@@ -166,7 +162,7 @@
 "  * To list the configuration for the eth0 interface:\r\n"
 "    fs0:\> ifconfig -l eth0\r\n"
 " \r\n"
-"  * To use DHCP4 to request the IPv4 address configuration dynamically for the\r\n"
+"  * To use DHCPv4 to request the IPv4 address configuration dynamically for the\r\n"
 "    eth0 interface:\r\n"
 "    fs0:\> ifconfig -s eth0 dhcp\r\n"
 " \r\n"
@@ -175,6 +171,6 @@
 " \r\n"
 "  * To configure DNS server address for the eth0 interface:\r\n"
 "    fs0:\> ifconfig -s eth0 dns 192.168.0.8 192.168.0.9\r\n"
-                                                                  
+
 
 

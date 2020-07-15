@@ -1,14 +1,8 @@
 /** @file
 Define some data used for Boot Maint
 
-Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2004 - 2019, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -22,12 +16,16 @@ EFI_IFR_GUID_LABEL  *mEndLabel = NULL;
 ///
 /// Terminal type string token storage
 ///
-UINT16              TerminalType[] = {
+UINT16              TerminalType[9] = {
   STRING_TOKEN(STR_COM_TYPE_0),
   STRING_TOKEN(STR_COM_TYPE_1),
   STRING_TOKEN(STR_COM_TYPE_2),
   STRING_TOKEN(STR_COM_TYPE_3),
   STRING_TOKEN(STR_COM_TYPE_4),
+  STRING_TOKEN(STR_COM_TYPE_5),
+  STRING_TOKEN(STR_COM_TYPE_6),
+  STRING_TOKEN(STR_COM_TYPE_7),
+  STRING_TOKEN(STR_COM_TYPE_8),
 };
 
 ///
@@ -254,10 +252,14 @@ COM_ATTR            StopBitsList[3] = {
 ///
 /// Guid for messaging path, used in Serial port setting.
 ///
-EFI_GUID            TerminalTypeGuid[] = {
+EFI_GUID            TerminalTypeGuid[9] = {
   DEVICE_PATH_MESSAGING_PC_ANSI,
   DEVICE_PATH_MESSAGING_VT_100,
   DEVICE_PATH_MESSAGING_VT_100_PLUS,
   DEVICE_PATH_MESSAGING_VT_UTF8,
-  EFI_TTY_TERM_GUID
+  EFI_TTY_TERM_GUID,
+  EDKII_LINUX_TERM_GUID,
+  EDKII_XTERM_R6_GUID,
+  EDKII_VT400_GUID,
+  EDKII_SCO_TERM_GUID
 };

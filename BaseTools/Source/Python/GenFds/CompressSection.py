@@ -1,26 +1,22 @@
 ## @file
 # process compress section generation
 #
-#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
 #
-#  This program and the accompanying materials
-#  are licensed and made available under the terms and conditions of the BSD License
-#  which accompanies this distribution.  The full text of the license may be found at
-#  http://opensource.org/licenses/bsd-license.php
-#
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
 ##
 # Import Modules
 #
-from Ffs import Ffs
-import Section
+from __future__ import absolute_import
+from .Ffs import SectionSuffix
+from . import Section
 import subprocess
 import Common.LongFilePathOs as os
-from GenFdsGlobalVariable import GenFdsGlobalVariable
+from .GenFdsGlobalVariable import GenFdsGlobalVariable
 from CommonDataClass.FdfClass import CompressSectionClassObject
+from Common.DataType import *
 
 ## generate compress section
 #
@@ -53,33 +49,46 @@ class CompressSection (CompressSectionClassObject) :
     #   @param  Dict        dictionary contains macro and its value
     #   @retval tuple       (Generated file name, section alignment)
     #
-    def GenSection(self, OutputPath, ModuleName, SecNum, KeyStringList, FfsInf = None, Dict = {}):
+    def GenSection(self, OutputPath, ModuleName, SecNum, KeyStringList, FfsInf = None, Dict = None, IsMakefile = False):
 
-        if FfsInf != None:
+        if FfsInf is not None:
             self.CompType = FfsInf.__ExtendMacro__(self.CompType)
             self.Alignment = FfsInf.__ExtendMacro__(self.Alignment)
 
         SectFiles = tuple()
+        SectAlign = []
         Index = 0
+        MaxAlign = None
+        if Dict is None:
+            Dict = {}
         for Sect in self.SectionList:
             Index = Index + 1
             SecIndex = '%s.%d' %(SecNum, Index)
-            ReturnSectList, AlignValue = Sect.GenSection(OutputPath, ModuleName, SecIndex, KeyStringList, FfsInf, Dict)
+            ReturnSectList, AlignValue = Sect.GenSection(OutputPath, ModuleName, SecIndex, KeyStringList, FfsInf, Dict, IsMakefile=IsMakefile)
+            if AlignValue is not None:
+                if MaxAlign is None:
+                    MaxAlign = AlignValue
+                if GenFdsGlobalVariable.GetAlignment (AlignValue) > GenFdsGlobalVariable.GetAlignment (MaxAlign):
+                    MaxAlign = AlignValue
             if ReturnSectList != []:
+                if AlignValue is None:
+                    AlignValue = "1"
                 for FileData in ReturnSectList:
-                   SectFiles += (FileData,)
-
+                    SectFiles += (FileData,)
+                    SectAlign.append(AlignValue)
 
         OutputFile = OutputPath + \
                      os.sep     + \
                      ModuleName + \
-                     'SEC'      + \
+                     SUP_MODULE_SEC      + \
                      SecNum     + \
-                     Ffs.SectionSuffix['COMPRESS']
+                     SectionSuffix['COMPRESS']
         OutputFile = os.path.normpath(OutputFile)
+        DummyFile = OutputFile + '.dummy'
+        GenFdsGlobalVariable.GenerateSection(DummyFile, SectFiles, InputAlign=SectAlign, IsMakefile=IsMakefile)
 
-        GenFdsGlobalVariable.GenerateSection(OutputFile, SectFiles, Section.Section.SectionType['COMPRESS'],
-                                             CompressionType=self.CompTypeDict[self.CompType])
+        GenFdsGlobalVariable.GenerateSection(OutputFile, [DummyFile], Section.Section.SectionType['COMPRESS'],
+                                             CompressionType=self.CompTypeDict[self.CompType], IsMakefile=IsMakefile)
         OutputFileList = []
         OutputFileList.append(OutputFile)
         return OutputFileList, self.Alignment

@@ -1,0 +1,13 @@
+## @file
+# CiBuildPlugin used to check all infs within a package
+# to confirm the packagesdependency are on the configured list of acceptable
+# dependencies.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+{
+  "scope": "cibuild",
+  "name": "Dependency Check Test",
+  "module": "DependencyCheck"
+}

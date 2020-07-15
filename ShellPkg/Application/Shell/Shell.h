@@ -2,14 +2,8 @@
   function definitions for internal to shell functions.
 
   (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -63,8 +57,8 @@ extern CONST CHAR16 mNoNestingFalse[];
 
 typedef struct {
   LIST_ENTRY        Link;           ///< Standard linked list handler.
-  SHELL_FILE_HANDLE *SplitStdOut;   ///< ConsoleOut for use in the split.
-  SHELL_FILE_HANDLE *SplitStdIn;    ///< ConsoleIn for use in the split.
+  SHELL_FILE_HANDLE SplitStdOut;    ///< ConsoleOut for use in the split.
+  SHELL_FILE_HANDLE SplitStdIn;     ///< ConsoleIn for use in the split.
 } SPLIT_LIST;
 
 typedef struct {
@@ -141,7 +135,7 @@ typedef struct {
 extern SHELL_INFO ShellInfoObject;
 
 /**
-  Converts the command line to it's post-processed form.  this replaces variables and alias' per UEFI Shell spec.
+  Converts the command line to its post-processed form.  this replaces variables and alias' per UEFI Shell spec.
 
   @param[in,out] CmdLine        pointer to the command line to update
 
@@ -294,7 +288,7 @@ RunCommand(
 /**
   Function will process and run a command line.
 
-  This will determine if the command line represents an internal shell 
+  This will determine if the command line represents an internal shell
   command or dispatch an external application.
 
   @param[in] CmdLine      The command line to parse.
@@ -309,19 +303,6 @@ RunShellCommand(
   OUT EFI_STATUS    *CommandStatus
   );
 
-/**
-  Function determines if the CommandName COULD be a valid command.  It does not determine whether
-  this is a valid command.  It only checks for invalid characters.
-
-  @param[in] CommandName    The name to check
-
-  @retval TRUE              CommandName could be a command name
-  @retval FALSE             CommandName could not be a valid command name
-**/
-BOOLEAN
-IsValidCommandName(
-  IN CONST CHAR16     *CommandName
-  );
 
 /**
   Function to process a NSH script file via SHELL_FILE_HANDLE.
@@ -383,8 +364,8 @@ TrimSpaces(
   );
 
 /**
-  
-  Create a new buffer list and stores the old one to OldBufferList  
+
+  Create a new buffer list and stores the old one to OldBufferList
 
   @param OldBufferList   The temporary list head used to store the nodes in BufferToFreeList.
 **/

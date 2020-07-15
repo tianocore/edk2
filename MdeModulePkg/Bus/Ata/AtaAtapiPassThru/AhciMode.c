@@ -1,15 +1,9 @@
 /** @file
   The file for AHCI mode of ATA host controller.
 
-  Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -225,7 +219,7 @@ AhciWaitMemSet (
 
   do {
     //
-    // Access sytem memory to see if the value is the tested one.
+    // Access system memory to see if the value is the tested one.
     //
     // The system memory pointed by Address will be updated by the
     // SATA Host Controller, "volatile" is introduced to prevent
@@ -294,41 +288,6 @@ AhciCheckMemSet (
   }
 }
 
-/**
-  Check if the device is still on port. It also checks if the AHCI controller
-  supports the address and data count will be transferred.
-
-  @param  PciIo            The PCI IO protocol instance.
-  @param  Port             The number of port.
-
-  @retval EFI_SUCCESS      The device is attached to port and the transfer data is
-                           supported by AHCI controller.
-  @retval EFI_UNSUPPORTED  The transfer address and count is not supported by AHCI
-                           controller.
-  @retval EFI_NOT_READY    The physical communication between AHCI controller and device
-                           is not ready.
-
-**/
-EFI_STATUS
-EFIAPI
-AhciCheckDeviceStatus (
-  IN  EFI_PCI_IO_PROTOCOL    *PciIo,
-  IN  UINT8                  Port
-  )
-{
-  UINT32      Data;
-  UINT32      Offset;
-
-  Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_SSTS;
-
-  Data   = AhciReadReg (PciIo, Offset) & EFI_AHCI_PORT_SSTS_DET_MASK;
-
-  if (Data == EFI_AHCI_PORT_SSTS_DET_PCE) {
-    return EFI_SUCCESS;
-  }
-
-  return EFI_NOT_READY;
-}
 
 /**
 
@@ -622,7 +581,7 @@ AhciBuildCommand (
 }
 
 /**
-  Buid a command FIS.
+  Build a command FIS.
 
   @param  CmdFis            A pointer to the EFI_AHCI_COMMAND_FIS data structure.
   @param  AtaCommandBlock   A pointer to the AhciBuildCommandFis data structure.
@@ -820,7 +779,7 @@ AhciPioTransfer (
         Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_TFD;
         PortTfd = AhciReadReg (PciIo, (UINT32) Offset);
         //
-        // PxTFD will be updated if there is a D2H or SetupFIS received. 
+        // PxTFD will be updated if there is a D2H or SetupFIS received.
         //
         if ((PortTfd & EFI_AHCI_PORT_TFD_ERR) != 0) {
           Status = EFI_DEVICE_ERROR;
@@ -1038,7 +997,7 @@ AhciDmaTransfer (
   }
 
   //
-  // Wait for command compelte
+  // Wait for command complete
   //
   FisBaseAddr = (UINTN)AhciRegisters->AhciRFis + Port * sizeof (EFI_AHCI_RECEIVED_FIS);
   Offset      = FisBaseAddr + EFI_AHCI_D2H_FIS_OFFSET;
@@ -1361,75 +1320,6 @@ AhciStartCommand (
   return EFI_SUCCESS;
 }
 
-/**
-  Do AHCI port reset.
-
-  @param  PciIo              The PCI IO protocol instance.
-  @param  Port               The number of port.
-  @param  Timeout            The timeout value of reset, uses 100ns as a unit.
-
-  @retval EFI_DEVICE_ERROR   The port reset unsuccessfully
-  @retval EFI_TIMEOUT        The reset operation is time out.
-  @retval EFI_SUCCESS        The port reset successfully.
-
-**/
-EFI_STATUS
-EFIAPI
-AhciPortReset (
-  IN  EFI_PCI_IO_PROTOCOL       *PciIo,
-  IN  UINT8                     Port,
-  IN  UINT64                    Timeout
-  )
-{
-  EFI_STATUS      Status;
-  UINT32          Offset;
-
-  AhciClearPortStatus (PciIo, Port);
-
-  AhciStopCommand (PciIo, Port, Timeout);
-
-  AhciDisableFisReceive (PciIo, Port, Timeout);
-
-  AhciEnableFisReceive (PciIo, Port, Timeout);
-
-  Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_SCTL;
-
-  AhciOrReg (PciIo, Offset, EFI_AHCI_PORT_SCTL_DET_INIT);
-
-  //
-  // wait 5 millisecond before de-assert DET
-  //
-  MicroSecondDelay (5000);
-
-  AhciAndReg (PciIo, Offset, (UINT32)EFI_AHCI_PORT_SCTL_MASK);
-
-  //
-  // wait 5 millisecond before de-assert DET
-  //
-  MicroSecondDelay (5000);
-
-  //
-  // Wait for communication to be re-established
-  //
-  Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_SSTS;
-  Status = AhciWaitMmioSet (
-             PciIo,
-             Offset,
-             EFI_AHCI_PORT_SSTS_DET_MASK,
-             EFI_AHCI_PORT_SSTS_DET_PCE,
-             Timeout
-             );
-
-  if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Port %d COMRESET failed: %r\n", Port, Status));
-    return Status;
-  }
-
-  Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_SERR;
-  AhciOrReg (PciIo, Offset, EFI_AHCI_PORT_ERR_CLEAR);
-
-  return EFI_SUCCESS;
-}
 
 /**
   Do AHCI HBA reset.
@@ -1826,6 +1716,7 @@ AhciIdentifyPacket (
   @param  PortMultiplier      The port multiplier port number.
   @param  Feature             The data to send Feature register.
   @param  FeatureSpecificData The specific data for SET FEATURE cmd.
+  @param  Timeout             The timeout value of SET FEATURE cmd, uses 100ns as a unit.
 
   @retval EFI_DEVICE_ERROR    The cmd abort with error occurs.
   @retval EFI_TIMEOUT         The operation is time out.
@@ -1841,7 +1732,8 @@ AhciDeviceSetFeature (
   IN UINT8                  Port,
   IN UINT8                  PortMultiplier,
   IN UINT16                 Feature,
-  IN UINT32                 FeatureSpecificData
+  IN UINT32                 FeatureSpecificData,
+  IN UINT64                 Timeout
   )
 {
   EFI_STATUS               Status;
@@ -1868,7 +1760,7 @@ AhciDeviceSetFeature (
              0,
              &AtaCommandBlock,
              &AtaStatusBlock,
-             ATA_ATAPI_TIMEOUT,
+             Timeout,
              NULL
              );
 
@@ -2008,10 +1900,10 @@ AhciCreateTransferDescriptor (
   //
   MaxCommandSlotNumber = (UINT8) (((Capability & 0x1F00) >> 8) + 1);
   Support64Bit         = (BOOLEAN) (((Capability & BIT31) != 0) ? TRUE : FALSE);
-  
+
   PortImplementBitMap  = AhciReadReg(PciIo, EFI_AHCI_PI_OFFSET);
   //
-  // Get the highest bit of implemented ports which decides how many bytes are allocated for recived FIS.
+  // Get the highest bit of implemented ports which decides how many bytes are allocated for received FIS.
   //
   MaxPortNumber        = (UINT8)(UINTN)(HighBitSet32(PortImplementBitMap) + 1);
   if (MaxPortNumber == 0) {
@@ -2066,7 +1958,7 @@ AhciCreateTransferDescriptor (
 
   //
   // Allocate memory for command list
-  // Note that the implemenation is a single task model which only use a command list for all ports.
+  // Note that the implementation is a single task model which only use a command list for all ports.
   //
   Buffer = NULL;
   MaxCommandListSize = MaxCommandSlotNumber * sizeof (EFI_AHCI_COMMAND_LIST);
@@ -2217,6 +2109,343 @@ Error6:
 }
 
 /**
+  Read logs from SATA device.
+
+  @param  PciIo               The PCI IO protocol instance.
+  @param  AhciRegisters       The pointer to the EFI_AHCI_REGISTERS.
+  @param  Port                The number of port.
+  @param  PortMultiplier      The multiplier of port.
+  @param  Buffer              The data buffer to store SATA logs.
+  @param  LogNumber           The address of the log.
+  @param  PageNumber          The page number of the log.
+
+  @retval EFI_INVALID_PARAMETER  PciIo, AhciRegisters or Buffer is NULL.
+  @retval others                 Return status of AhciPioTransfer().
+**/
+EFI_STATUS
+AhciReadLogExt (
+  IN EFI_PCI_IO_PROTOCOL       *PciIo,
+  IN EFI_AHCI_REGISTERS        *AhciRegisters,
+  IN UINT8                     Port,
+  IN UINT8                     PortMultiplier,
+  IN OUT UINT8                 *Buffer,
+  IN UINT8                     LogNumber,
+  IN UINT8                     PageNumber
+  )
+{
+  EFI_ATA_COMMAND_BLOCK        AtaCommandBlock;
+  EFI_ATA_STATUS_BLOCK         AtaStatusBlock;
+
+  if (PciIo == NULL || AhciRegisters == NULL || Buffer == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  ///
+  /// Read log from device
+  ///
+  ZeroMem (&AtaCommandBlock, sizeof (EFI_ATA_COMMAND_BLOCK));
+  ZeroMem (&AtaStatusBlock, sizeof (EFI_ATA_STATUS_BLOCK));
+  ZeroMem (Buffer, 512);
+
+  AtaCommandBlock.AtaCommand      = ATA_CMD_READ_LOG_EXT;
+  AtaCommandBlock.AtaSectorCount  = 1;
+  AtaCommandBlock.AtaSectorNumber = LogNumber;
+  AtaCommandBlock.AtaCylinderLow  = PageNumber;
+
+  return AhciPioTransfer (
+           PciIo,
+           AhciRegisters,
+           Port,
+           PortMultiplier,
+           NULL,
+           0,
+           TRUE,
+           &AtaCommandBlock,
+           &AtaStatusBlock,
+           Buffer,
+           512,
+           ATA_ATAPI_TIMEOUT,
+           NULL
+           );
+}
+
+/**
+  Enable DEVSLP of the disk if supported.
+
+  @param  PciIo               The PCI IO protocol instance.
+  @param  AhciRegisters       The pointer to the EFI_AHCI_REGISTERS.
+  @param  Port                The number of port.
+  @param  PortMultiplier      The multiplier of port.
+  @param  IdentifyData        A pointer to data buffer which is used to contain IDENTIFY data.
+
+  @retval EFI_SUCCESS         The DEVSLP is enabled per policy successfully.
+  @retval EFI_UNSUPPORTED     The DEVSLP isn't supported by the controller/device and policy requires to enable it.
+**/
+EFI_STATUS
+AhciEnableDevSlp (
+  IN EFI_PCI_IO_PROTOCOL           *PciIo,
+  IN EFI_AHCI_REGISTERS            *AhciRegisters,
+  IN UINT8                         Port,
+  IN UINT8                         PortMultiplier,
+  IN EFI_IDENTIFY_DATA             *IdentifyData
+  )
+{
+  EFI_STATUS               Status;
+  UINT32                   Offset;
+  UINT32                   Capability2;
+  UINT8                    LogData[512];
+  DEVSLP_TIMING_VARIABLES  DevSlpTiming;
+  UINT32                   PortCmd;
+  UINT32                   PortDevSlp;
+
+  if (mAtaAtapiPolicy->DeviceSleepEnable != 1) {
+    return EFI_SUCCESS;
+  }
+
+  //
+  // Do not enable DevSlp if DevSlp is not supported.
+  //
+  Capability2 = AhciReadReg (PciIo, AHCI_CAPABILITY2_OFFSET);
+  DEBUG ((DEBUG_INFO, "AHCI CAPABILITY2 = %08x\n", Capability2));
+  if ((Capability2 & AHCI_CAP2_SDS) == 0) {
+    return EFI_UNSUPPORTED;
+  }
+
+  //
+  // Do not enable DevSlp if DevSlp is not present
+  // Do not enable DevSlp if Hot Plug or Mechanical Presence Switch is supported
+  //
+  Offset     = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH;
+  PortCmd    = AhciReadReg (PciIo, Offset + EFI_AHCI_PORT_CMD);
+  PortDevSlp = AhciReadReg (PciIo, Offset + AHCI_PORT_DEVSLP);
+  DEBUG ((DEBUG_INFO, "Port CMD/DEVSLP = %08x / %08x\n", PortCmd, PortDevSlp));
+  if (((PortDevSlp & AHCI_PORT_DEVSLP_DSP) == 0) ||
+      ((PortCmd & (EFI_AHCI_PORT_CMD_HPCP | EFI_AHCI_PORT_CMD_MPSP)) != 0)
+     ) {
+    return EFI_UNSUPPORTED;
+  }
+
+  //
+  // Do not enable DevSlp if the device doesn't support DevSlp
+  //
+  DEBUG ((DEBUG_INFO, "IDENTIFY DEVICE: [77] = %04x, [78] = %04x, [79] = %04x\n",
+          IdentifyData->AtaData.reserved_77,
+          IdentifyData->AtaData.serial_ata_features_supported, IdentifyData->AtaData.serial_ata_features_enabled));
+  if ((IdentifyData->AtaData.serial_ata_features_supported & BIT8) == 0) {
+    DEBUG ((DEBUG_INFO, "DevSlp feature is not supported for device at port [%d] PortMultiplier [%d]!\n",
+            Port, PortMultiplier));
+    return EFI_UNSUPPORTED;
+  }
+
+  //
+  // Enable DevSlp when it is not enabled.
+  //
+  if ((IdentifyData->AtaData.serial_ata_features_enabled & BIT8) != 0) {
+    Status = AhciDeviceSetFeature (
+      PciIo, AhciRegisters, Port, 0, ATA_SUB_CMD_ENABLE_SATA_FEATURE, 0x09, ATA_ATAPI_TIMEOUT
+    );
+    DEBUG ((DEBUG_INFO, "DevSlp set feature for device at port [%d] PortMultiplier [%d] - %r\n",
+            Port, PortMultiplier, Status));
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
+
+  Status = AhciReadLogExt(PciIo, AhciRegisters, Port, PortMultiplier, LogData, 0x30, 0x08);
+
+  //
+  // Clear PxCMD.ST and PxDEVSLP.ADSE before updating PxDEVSLP.DITO and PxDEVSLP.MDAT.
+  //
+  AhciWriteReg (PciIo, Offset + EFI_AHCI_PORT_CMD, PortCmd & ~EFI_AHCI_PORT_CMD_ST);
+  PortDevSlp &= ~AHCI_PORT_DEVSLP_ADSE;
+  AhciWriteReg (PciIo, Offset + AHCI_PORT_DEVSLP, PortDevSlp);
+
+  //
+  // Set PxDEVSLP.DETO and PxDEVSLP.MDAT to 0.
+  //
+  PortDevSlp &= ~AHCI_PORT_DEVSLP_DETO_MASK;
+  PortDevSlp &= ~AHCI_PORT_DEVSLP_MDAT_MASK;
+  AhciWriteReg (PciIo, Offset + AHCI_PORT_DEVSLP, PortDevSlp);
+  DEBUG ((DEBUG_INFO, "Read Log Ext at port [%d] PortMultiplier [%d] - %r\n", Port, PortMultiplier, Status));
+  if (EFI_ERROR (Status)) {
+    //
+    // Assume DEVSLP TIMING VARIABLES is not supported if the Identify Device Data log (30h, 8) fails
+    //
+    ZeroMem (&DevSlpTiming, sizeof (DevSlpTiming));
+  } else {
+    CopyMem (&DevSlpTiming, &LogData[48], sizeof (DevSlpTiming));
+    DEBUG ((DEBUG_INFO, "DevSlpTiming: Supported(%d), Deto(%d), Madt(%d)\n",
+            DevSlpTiming.Supported, DevSlpTiming.Deto, DevSlpTiming.Madt));
+  }
+
+  //
+  // Use 20ms as default DETO when DEVSLP TIMING VARIABLES is not supported or the DETO is 0.
+  //
+  if ((DevSlpTiming.Supported == 0) || (DevSlpTiming.Deto == 0)) {
+    DevSlpTiming.Deto = 20;
+  }
+
+  //
+  // Use 10ms as default MADT when DEVSLP TIMING VARIABLES is not supported or the MADT is 0.
+  //
+  if ((DevSlpTiming.Supported == 0) || (DevSlpTiming.Madt == 0)) {
+    DevSlpTiming.Madt = 10;
+  }
+
+  PortDevSlp |= DevSlpTiming.Deto << 2;
+  PortDevSlp |= DevSlpTiming.Madt << 10;
+  AhciOrReg (PciIo, Offset + AHCI_PORT_DEVSLP, PortDevSlp);
+
+  if (mAtaAtapiPolicy->AggressiveDeviceSleepEnable == 1) {
+    if ((Capability2 & AHCI_CAP2_SADM) != 0) {
+      PortDevSlp &= ~AHCI_PORT_DEVSLP_DITO_MASK;
+      PortDevSlp |= (625 << 15);
+      AhciWriteReg (PciIo, Offset + AHCI_PORT_DEVSLP, PortDevSlp);
+
+      PortDevSlp |= AHCI_PORT_DEVSLP_ADSE;
+      AhciWriteReg (PciIo, Offset + AHCI_PORT_DEVSLP, PortDevSlp);
+    }
+  }
+
+
+  AhciWriteReg (PciIo, Offset + EFI_AHCI_PORT_CMD, PortCmd);
+
+  DEBUG ((DEBUG_INFO, "Enabled DevSlp feature at port [%d] PortMultiplier [%d], Port CMD/DEVSLP = %08x / %08x\n",
+          Port, PortMultiplier, PortCmd, PortDevSlp));
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Spin-up disk if IDD was incomplete or PUIS feature is enabled
+
+  @param  PciIo               The PCI IO protocol instance.
+  @param  AhciRegisters       The pointer to the EFI_AHCI_REGISTERS.
+  @param  Port                The number of port.
+  @param  PortMultiplier      The multiplier of port.
+  @param  IdentifyData        A pointer to data buffer which is used to contain IDENTIFY data.
+
+**/
+EFI_STATUS
+AhciSpinUpDisk (
+  IN EFI_PCI_IO_PROTOCOL           *PciIo,
+  IN EFI_AHCI_REGISTERS            *AhciRegisters,
+  IN UINT8                         Port,
+  IN UINT8                         PortMultiplier,
+  IN OUT EFI_IDENTIFY_DATA         *IdentifyData
+  )
+{
+  EFI_STATUS               Status;
+  EFI_ATA_COMMAND_BLOCK    AtaCommandBlock;
+  EFI_ATA_STATUS_BLOCK     AtaStatusBlock;
+  UINT8                    Buffer[512];
+
+  if (IdentifyData->AtaData.specific_config == ATA_SPINUP_CFG_REQUIRED_IDD_INCOMPLETE) {
+    //
+    // Use SET_FEATURE subcommand to spin up the device.
+    //
+    Status = AhciDeviceSetFeature (
+               PciIo, AhciRegisters, Port, PortMultiplier,
+               ATA_SUB_CMD_PUIS_SET_DEVICE_SPINUP, 0x00, ATA_SPINUP_TIMEOUT
+               );
+    DEBUG ((DEBUG_INFO, "CMD_PUIS_SET_DEVICE_SPINUP for device at port [%d] PortMultiplier [%d] - %r!\n",
+            Port, PortMultiplier, Status));
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  } else {
+    ASSERT (IdentifyData->AtaData.specific_config == ATA_SPINUP_CFG_NOT_REQUIRED_IDD_INCOMPLETE);
+
+    //
+    // Use READ_SECTORS to spin up the device if SpinUp SET FEATURE subcommand is not supported
+    //
+    ZeroMem (&AtaCommandBlock, sizeof (EFI_ATA_COMMAND_BLOCK));
+    ZeroMem (&AtaStatusBlock, sizeof (EFI_ATA_STATUS_BLOCK));
+    //
+    // Perform READ SECTORS PIO Data-In command to Read LBA 0
+    //
+    AtaCommandBlock.AtaCommand      = ATA_CMD_READ_SECTORS;
+    AtaCommandBlock.AtaSectorCount  = 0x1;
+
+    Status = AhciPioTransfer (
+               PciIo,
+               AhciRegisters,
+               Port,
+               PortMultiplier,
+               NULL,
+               0,
+               TRUE,
+               &AtaCommandBlock,
+               &AtaStatusBlock,
+               &Buffer,
+               sizeof (Buffer),
+               ATA_SPINUP_TIMEOUT,
+               NULL
+               );
+    DEBUG ((DEBUG_INFO, "Read LBA 0 for device at port [%d] PortMultiplier [%d] - %r!\n",
+            Port, PortMultiplier, Status));
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
+
+  //
+  // Read the complete IDENTIFY DEVICE data.
+  //
+  ZeroMem (IdentifyData, sizeof (*IdentifyData));
+  Status = AhciIdentify (PciIo, AhciRegisters, Port, PortMultiplier, IdentifyData);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Read IDD failed for device at port [%d] PortMultiplier [%d] - %r!\n",
+            Port, PortMultiplier, Status));
+    return Status;
+  }
+
+  DEBUG ((DEBUG_INFO, "IDENTIFY DEVICE: [0] = %016x, [2] = %016x, [83] = %016x, [86] = %016x\n",
+          IdentifyData->AtaData.config, IdentifyData->AtaData.specific_config,
+          IdentifyData->AtaData.command_set_supported_83, IdentifyData->AtaData.command_set_feature_enb_86));
+  //
+  // Check if IDD is incomplete
+  //
+  if ((IdentifyData->AtaData.config & BIT2) != 0) {
+    return EFI_DEVICE_ERROR;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Enable/disable/skip PUIS of the disk according to policy.
+
+  @param  PciIo               The PCI IO protocol instance.
+  @param  AhciRegisters       The pointer to the EFI_AHCI_REGISTERS.
+  @param  Port                The number of port.
+  @param  PortMultiplier      The multiplier of port.
+
+**/
+EFI_STATUS
+AhciPuisEnable (
+  IN EFI_PCI_IO_PROTOCOL           *PciIo,
+  IN EFI_AHCI_REGISTERS            *AhciRegisters,
+  IN UINT8                         Port,
+  IN UINT8                         PortMultiplier
+  )
+{
+  EFI_STATUS                       Status;
+
+  Status = EFI_SUCCESS;
+  if (mAtaAtapiPolicy->PuisEnable == 0) {
+    Status = AhciDeviceSetFeature (PciIo, AhciRegisters, Port, PortMultiplier, ATA_SUB_CMD_DISABLE_PUIS, 0x00, ATA_ATAPI_TIMEOUT);
+  } else if (mAtaAtapiPolicy->PuisEnable == 1) {
+    Status = AhciDeviceSetFeature (PciIo, AhciRegisters, Port, PortMultiplier, ATA_SUB_CMD_ENABLE_PUIS, 0x00, ATA_ATAPI_TIMEOUT);
+  }
+  DEBUG ((DEBUG_INFO, "%a PUIS feature at port [%d] PortMultiplier [%d] - %r!\n",
+    (mAtaAtapiPolicy->PuisEnable == 0) ? "Disable" : (
+    (mAtaAtapiPolicy->PuisEnable == 1) ? "Enable" : "Skip"
+      ), Port, PortMultiplier, Status));
+  return Status;
+}
+
+/**
   Initialize ATA host controller at AHCI mode.
 
   The function is designed to initialize ATA host controller.
@@ -2314,7 +2543,7 @@ AhciModeInitialization (
   }
 
   for (Port = 0; Port < EFI_AHCI_MAX_PORTS; Port ++) {
-    if ((PortImplementBitMap & (BIT0 << Port)) != 0) {
+    if ((PortImplementBitMap & (((UINT32)BIT0) << Port)) != 0) {
       //
       // According to AHCI spec, MaxPortNumber should be equal or greater than the number of implemented ports.
       //
@@ -2376,8 +2605,7 @@ AhciModeInitialization (
       AhciOrReg (PciIo, Offset, EFI_AHCI_PORT_CMD_FRE);
 
       //
-      // Wait no longer than 10 ms to wait the Phy to detect the presence of a device.
-      // It's the requirment from SATA1.0a spec section 5.2.
+      // Wait for the Phy to detect the presence of a device.
       //
       PhyDetectDelay = EFI_AHCI_BUS_PHY_DETECT_TIMEOUT;
       Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_SSTS;
@@ -2459,11 +2687,33 @@ AhciModeInitialization (
           continue;
         }
 
+        DEBUG ((
+          DEBUG_INFO, "IDENTIFY DEVICE: [0] = %016x, [2] = %016x, [83] = %016x, [86] = %016x\n",
+          Buffer.AtaData.config, Buffer.AtaData.specific_config,
+          Buffer.AtaData.command_set_supported_83, Buffer.AtaData.command_set_feature_enb_86
+          ));
+        if ((Buffer.AtaData.config & BIT2) != 0) {
+          //
+          // SpinUp disk if device reported incomplete IDENTIFY DEVICE.
+          //
+          Status = AhciSpinUpDisk (
+                     PciIo,
+                     AhciRegisters,
+                     Port,
+                     0,
+                     &Buffer
+                     );
+          if (EFI_ERROR (Status)) {
+            DEBUG ((DEBUG_ERROR, "Spin up standby device failed - %r\n", Status));
+            continue;
+          }
+        }
+
         DeviceType = EfiIdeHarddisk;
       } else {
         continue;
       }
-      DEBUG ((EFI_D_INFO, "port [%d] port mulitplier [%d] has a [%a]\n",
+      DEBUG ((DEBUG_INFO, "port [%d] port multitplier [%d] has a [%a]\n",
               Port, 0, DeviceType == EfiIdeCdrom ? "cdrom" : "harddisk"));
 
       //
@@ -2511,7 +2761,7 @@ AhciModeInitialization (
       TransferMode.ModeNumber = (UINT8) (SupportedModes->PioMode.Mode);
 
       //
-      // Set supported DMA mode on this IDE device. Note that UDMA & MDMA cann't
+      // Set supported DMA mode on this IDE device. Note that UDMA & MDMA can't
       // be set together. Only one DMA mode can be set to a device. If setting
       // DMA mode operation fails, we can continue moving on because we only use
       // PIO mode at boot time. DMA modes are used by certain kind of OS booting
@@ -2524,7 +2774,7 @@ AhciModeInitialization (
         TransferMode.ModeNumber = (UINT8) SupportedModes->MultiWordDmaMode.Mode;
       }
 
-      Status = AhciDeviceSetFeature (PciIo, AhciRegisters, Port, 0, 0x03, (UINT32)(*(UINT8 *)&TransferMode));
+      Status = AhciDeviceSetFeature (PciIo, AhciRegisters, Port, 0, 0x03, (UINT32)(*(UINT8 *)&TransferMode), ATA_ATAPI_TIMEOUT);
       if (EFI_ERROR (Status)) {
         DEBUG ((EFI_D_ERROR, "Set transfer Mode Fail, Status = %r\n", Status));
         continue;
@@ -2536,6 +2786,29 @@ AhciModeInitialization (
       CreateNewDeviceInfo (Instance, Port, 0xFFFF, DeviceType, &Buffer);
       if (DeviceType == EfiIdeHarddisk) {
         REPORT_STATUS_CODE (EFI_PROGRESS_CODE, (EFI_PERIPHERAL_FIXED_MEDIA | EFI_P_PC_ENABLE));
+        AhciEnableDevSlp (
+          PciIo,
+          AhciRegisters,
+          Port,
+          0,
+          &Buffer
+          );
+      }
+
+      //
+      // Enable/disable PUIS according to policy setting if PUIS is capable (Word[83].BIT5 is set).
+      //
+      if ((Buffer.AtaData.command_set_supported_83 & BIT5) != 0) {
+        Status = AhciPuisEnable (
+                   PciIo,
+                   AhciRegisters,
+                   Port,
+                   0
+                   );
+        if (EFI_ERROR (Status)) {
+          DEBUG ((DEBUG_ERROR, "PUIS enable/disable failed, Status = %r\n", Status));
+          continue;
+        }
       }
     }
   }

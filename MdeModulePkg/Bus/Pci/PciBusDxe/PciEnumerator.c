@@ -1,15 +1,9 @@
 /** @file
   PCI eunmeration implementation on entire PCI bus system for PCI Bus module.
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -19,7 +13,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   This routine is used to enumerate entire pci bus system
   in a given platform.
 
-  @param Controller  Parent controller handle.
+  @param Controller          Parent controller handle.
+  @param HostBridgeHandle    Host bridge handle.
 
   @retval EFI_SUCCESS    PCI enumeration finished successfully.
   @retval other          Some error occurred when enumerating the pci bus system.
@@ -27,41 +22,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 EFI_STATUS
 PciEnumerator (
-  IN EFI_HANDLE                    Controller
+  IN EFI_HANDLE                    Controller,
+  IN EFI_HANDLE                    HostBridgeHandle
   )
 {
-  EFI_HANDLE                                        HostBridgeHandle;
   EFI_STATUS                                        Status;
   EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL  *PciResAlloc;
-  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL                   *PciRootBridgeIo;
-
-  //
-  // If PCI bus has already done the full enumeration, never do it again
-  //
-  if (!gFullEnumeration) {
-    return PciEnumeratorLight (Controller);
-  }
-
-  //
-  // Get the rootbridge Io protocol to find the host bridge handle
-  //
-  Status = gBS->OpenProtocol (
-                  Controller,
-                  &gEfiPciRootBridgeIoProtocolGuid,
-                  (VOID **) &PciRootBridgeIo,
-                  gPciBusDriverBinding.DriverBindingHandle,
-                  Controller,
-                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
-                  );
-
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  //
-  // Get the host bridge handle
-  //
-  HostBridgeHandle = PciRootBridgeIo->ParentHandle;
 
   //
   // Get the pci host bridge resource allocation protocol
@@ -128,18 +94,6 @@ PciEnumerator (
   // Process attributes for devices on this host bridge
   //
   Status = PciHostBridgeDeviceAttribute (PciResAlloc);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  gFullEnumeration = FALSE;
-
-  Status = gBS->InstallProtocolInterface (
-                  &HostBridgeHandle,
-                  &gEfiPciEnumerationCompleteProtocolGuid,
-                  EFI_NATIVE_INTERFACE,
-                  NULL
-                  );
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -227,7 +181,7 @@ PciRootBridgeEnumerator (
       AddrRangeMin = Configuration1->AddrRangeMin;
       Configuration1->AddrRangeMin = Configuration2->AddrRangeMin;
       Configuration2->AddrRangeMin = AddrRangeMin;
-      
+
       AddrLen = Configuration1->AddrLen;
       Configuration1->AddrLen = Configuration2->AddrLen;
       Configuration2->AddrLen = AddrLen;
@@ -274,7 +228,7 @@ PciRootBridgeEnumerator (
   Status = PciAllocateBusNumber (RootBridgeDev, SubBusNumber, PaddedBusRange, &SubBusNumber);
   if (EFI_ERROR (Status)) {
     return Status;
-  }  
+  }
 
   //
   // Find the bus range which contains the higest bus number, then returns the number of buses
@@ -292,7 +246,7 @@ PciRootBridgeEnumerator (
   Configuration++;
   Desc = Configuration->Desc;
   Configuration->Desc = ACPI_END_TAG_DESCRIPTOR;
-  
+
   //
   // Set bus number
   //
@@ -307,7 +261,7 @@ PciRootBridgeEnumerator (
   //
   Configuration->Desc = Desc;
   (Configuration - 1)->AddrLen = AddrLen;
-  
+
   return Status;
 }
 
@@ -568,15 +522,15 @@ DetermineRootBridgeAttributes (
   @return Max size of option rom needed.
 
 **/
-UINT64
+UINT32
 GetMaxOptionRomSize (
   IN PCI_IO_DEVICE   *Bridge
   )
 {
   LIST_ENTRY      *CurrentLink;
   PCI_IO_DEVICE   *Temp;
-  UINT64          MaxOptionRomSize;
-  UINT64          TempOptionRomSize;
+  UINT32          MaxOptionRomSize;
+  UINT32          TempOptionRomSize;
 
   MaxOptionRomSize = 0;
 
@@ -1852,7 +1806,7 @@ NotifyPhase (
                             Phase,
                             ChipsetEntry
                             );
-  }  
+  }
 
   Status = PciResAlloc->NotifyPhase (
                           PciResAlloc,
@@ -2083,7 +2037,7 @@ PciHotPlugRequestNotify (
       return EFI_INVALID_PARAMETER;
     }
   }
-  
+
   Status = gBS->OpenProtocol (
                   Controller,
                   &gEfiPciIoProtocolGuid,

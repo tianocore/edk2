@@ -1,16 +1,10 @@
 /** @file
-  Driver Binding functions implementationfor for UefiPxeBc Driver.
+  Driver Binding functions implementation for UefiPxeBc Driver.
 
   (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2019, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -254,8 +248,9 @@ PxeBcDestroyIp4Children (
            &Private->PxeBc,
            NULL
            );
+    FreePool (Private->Ip4Nic->DevicePath);
 
-    if (Private->Snp != NULL) { 
+    if (Private->Snp != NULL) {
       //
       // Close SNP from the child virtual handle
       //
@@ -265,7 +260,7 @@ PxeBcDestroyIp4Children (
              This->DriverBindingHandle,
              Private->Ip4Nic->Controller
              );
-             
+
       gBS->UninstallProtocolInterface (
              Private->Ip4Nic->Controller,
              &gEfiSimpleNetworkProtocolGuid,
@@ -414,6 +409,8 @@ PxeBcDestroyIp6Children (
            &Private->PxeBc,
            NULL
            );
+    FreePool (Private->Ip6Nic->DevicePath);
+
     if (Private->Snp != NULL) {
       //
       // Close SNP from the child virtual handle
@@ -486,7 +483,7 @@ PxeBcCheckIpv6Support (
 
   //
   // Get the NIC handle by SNP protocol.
-  //  
+  //
   Handle = NetLibGetSnpHandle (ControllerHandle, NULL);
   if (Handle == NULL) {
     return EFI_NOT_FOUND;
@@ -532,7 +529,7 @@ PxeBcCheckIpv6Support (
   if (EFI_ERROR (Status) || InfoBlock == NULL) {
     FreePool (InfoBlock);
     return EFI_NOT_FOUND;
-  }  
+  }
 
   *Ipv6Support = ((EFI_ADAPTER_INFO_UNDI_IPV6_SUPPORT *) InfoBlock)->Ipv6Support;
   FreePool (InfoBlock);
@@ -811,7 +808,7 @@ PxeBcCreateIp4Children (
     }
 
     //
-    // Open SNP on the child handle BY_DRIVER. It will prevent any additionally 
+    // Open SNP on the child handle BY_DRIVER|EXCLUSIVE. It will prevent any additionally
     // layering to perform the experiment.
     //
     Status = gBS->OpenProtocol (
@@ -820,7 +817,7 @@ PxeBcCreateIp4Children (
                     (VOID **) &Snp,
                     This->DriverBindingHandle,
                     Private->Ip4Nic->Controller,
-                    EFI_OPEN_PROTOCOL_BY_DRIVER
+                    EFI_OPEN_PROTOCOL_BY_DRIVER|EFI_OPEN_PROTOCOL_EXCLUSIVE
                     );
     if (EFI_ERROR (Status)) {
       goto ON_ERROR;
@@ -948,7 +945,7 @@ PxeBcCreateIp6Children (
   if (Private->Snp != NULL) {
     for (Index = 0; Index < Private->Snp->Mode->HwAddressSize; Index++) {
       Private->IaId |= (Private->Snp->Mode->CurrentAddress.Addr[Index] << ((Index << 3) & 31));
-    }  
+    }
   }
 
   //
@@ -1137,7 +1134,7 @@ PxeBcCreateIp6Children (
   if (EFI_ERROR (Status)) {
     goto ON_ERROR;
   }
-  
+
   if (Private->Snp != NULL) {
     //
     // Install SNP protocol on purpose is for some OS loader backward
@@ -1154,7 +1151,7 @@ PxeBcCreateIp6Children (
     }
 
     //
-    // Open SNP on the child handle BY_DRIVER. It will prevent any additionally 
+    // Open SNP on the child handle BY_DRIVER|EXCLUSIVE. It will prevent any additionally
     // layering to perform the experiment.
     //
     Status = gBS->OpenProtocol (
@@ -1163,7 +1160,7 @@ PxeBcCreateIp6Children (
                     (VOID **) &Snp,
                     This->DriverBindingHandle,
                     Private->Ip6Nic->Controller,
-                    EFI_OPEN_PROTOCOL_BY_DRIVER
+                    EFI_OPEN_PROTOCOL_BY_DRIVER|EFI_OPEN_PROTOCOL_EXCLUSIVE
                     );
     if (EFI_ERROR (Status)) {
       goto ON_ERROR;
@@ -1187,7 +1184,7 @@ PxeBcCreateIp6Children (
   }
 
   //
-  // Set IPv6 avaiable flag and set default configure data for
+  // Set IPv6 available flag and set default configure data for
   // Udp6Read and Ip6 instance.
   //
   Status = PxeBcCheckIpv6Support (ControllerHandle, Private, &Private->Mode.Ipv6Available);
@@ -1245,6 +1242,10 @@ PxeBcDriverEntryPoint (
 {
   EFI_STATUS  Status;
 
+  if ((PcdGet8(PcdIPv4PXESupport) == PXE_DISABLED) && (PcdGet8(PcdIPv6PXESupport) == PXE_DISABLED)) {
+    return EFI_UNSUPPORTED;
+  }
+
   Status = EfiLibInstallDriverBindingComponentName2 (
              ImageHandle,
              SystemTable,
@@ -1266,16 +1267,11 @@ PxeBcDriverEntryPoint (
              &gPxeBcComponentName2
              );
   if (EFI_ERROR (Status)) {
-    gBS->UninstallMultipleProtocolInterfaces (
-           ImageHandle,
-           &gEfiDriverBindingProtocolGuid,
-           &gPxeBcIp4DriverBinding,
-           &gEfiComponentName2ProtocolGuid,
-           &gPxeBcComponentName2,
-           &gEfiComponentNameProtocolGuid,
-           &gPxeBcComponentName,
-           NULL
-           );
+    EfiLibUninstallDriverBindingComponentName2 (
+      &gPxeBcIp4DriverBinding,
+      &gPxeBcComponentName,
+      &gPxeBcComponentName2
+      );
   }
 
   return Status;
@@ -1290,7 +1286,7 @@ PxeBcDriverEntryPoint (
   @param[in]  RemainingDevicePath Optional parameter used to pick a specific child
                                   device to be started.
   @param[in]  IpVersion           IP_VERSION_4 or IP_VERSION_6.
-  
+
   @retval EFI_SUCCESS         This driver supports this device.
   @retval EFI_UNSUPPORTED     This driver does not support this device.
 
@@ -1307,11 +1303,17 @@ PxeBcSupported (
   EFI_STATUS                      Status;
   EFI_GUID                        *DhcpServiceBindingGuid;
   EFI_GUID                        *MtftpServiceBindingGuid;
-  
+
   if (IpVersion == IP_VERSION_4) {
+    if (PcdGet8(PcdIPv4PXESupport) == PXE_DISABLED) {
+      return EFI_UNSUPPORTED;
+    }
     DhcpServiceBindingGuid  = &gEfiDhcp4ServiceBindingProtocolGuid;
     MtftpServiceBindingGuid = &gEfiMtftp4ServiceBindingProtocolGuid;
   } else {
+    if (PcdGet8(PcdIPv6PXESupport) == PXE_DISABLED) {
+      return EFI_UNSUPPORTED;
+    }
     DhcpServiceBindingGuid  = &gEfiDhcp6ServiceBindingProtocolGuid;
     MtftpServiceBindingGuid = &gEfiMtftp6ServiceBindingProtocolGuid;
   }
@@ -1450,7 +1452,7 @@ PxeBcStart (
 
     //
     // Install PxeBaseCodePrivate protocol onto the real NIC handler.
-    // PxeBaseCodePrivate protocol is only used to keep the relationship between 
+    // PxeBaseCodePrivate protocol is only used to keep the relationship between
     // NIC handle and virtual child handles.
     // gEfiCallerIdGuid will be used as its protocol guid.
     //
@@ -1467,7 +1469,7 @@ PxeBcStart (
     //
     // Try to locate SNP protocol.
     //
-    NetLibGetSnpHandle(ControllerHandle, &Private->Snp);    
+    NetLibGetSnpHandle(ControllerHandle, &Private->Snp);
   }
 
   if (IpVersion == IP_VERSION_4) {

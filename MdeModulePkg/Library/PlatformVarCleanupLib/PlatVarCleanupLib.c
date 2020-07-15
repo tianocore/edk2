@@ -2,13 +2,7 @@
   Sample platform variable cleanup library implementation.
 
 Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -615,7 +609,11 @@ VariableCleanupHiiExtractConfig (
     // Allocate and fill a buffer large enough to hold the <ConfigHdr> template
     // followed by "&OFFSET=0&WIDTH=WWWWWWWWWWWWWWWW" followed by a Null-terminator.
     //
-    ConfigRequestHdr = HiiConstructConfigHdr (&mVariableCleanupHiiGuid, mVarStoreName, Private->HiiHandle);
+    ConfigRequestHdr = HiiConstructConfigHdr (
+                         &mVariableCleanupHiiGuid,
+                         mVarStoreName,
+                         Private->DriverHandle
+                         );
     Size = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
     ConfigRequest = AllocateZeroPool (Size);
     ASSERT (ConfigRequest != NULL);
@@ -1187,6 +1185,7 @@ Done:
 VAR_ERROR_FLAG
 EFIAPI
 GetLastBootVarErrorFlag (
+  VOID
   )
 {
   return mLastVarErrorFlag;

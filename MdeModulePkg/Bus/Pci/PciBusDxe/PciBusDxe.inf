@@ -2,14 +2,9 @@
 #  The PCI bus driver will probe all PCI devices and allocate MMIO and IO space for these devices.
 #  Please use PCD feature flag PcdPciBusHotplugDeviceSupport to enable hot plug supporting.
 #
-#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 #
-#  This program and the accompanying materials
-#  are licensed and made available under the terms and conditions of the BSD License
-#  which accompanies this distribution. The full text of the license may be found at
-#  http://opensource.org/licenses/bsd-license.php
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 #
 ##
@@ -26,7 +21,7 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC ARM AARCH64
+#  VALID_ARCHITECTURES           = IA32 X64 EBC ARM AARCH64
 #
 #  DRIVER_BINDING                =  gPciBusDriverBinding
 #  COMPONENT_NAME                =  gPciBusComponentName
@@ -78,7 +73,6 @@
   BaseLib
   UefiDriverEntryPoint
   DebugLib
-  PeCoffLib
 
 [Protocols]
   gEfiPciHotPlugRequestProtocolGuid               ## SOMETIMES_PRODUCES
@@ -90,11 +84,15 @@
   gEfiPciHotPlugInitProtocolGuid                  ## SOMETIMES_CONSUMES
   gEfiPciHostBridgeResourceAllocationProtocolGuid ## TO_START
   gEfiPciPlatformProtocolGuid                     ## SOMETIMES_CONSUMES
-  gEfiPciOverrideProtocolGuid                     ## SOMETIMES_CONSUMES 
-  gEfiPciEnumerationCompleteProtocolGuid          ## PRODUCES 
+  gEfiPciOverrideProtocolGuid                     ## SOMETIMES_CONSUMES
+  gEfiPciEnumerationCompleteProtocolGuid          ## PRODUCES
   gEfiPciRootBridgeIoProtocolGuid                 ## TO_START
   gEfiIncompatiblePciDeviceSupportProtocolGuid    ## SOMETIMES_CONSUMES
   gEfiLoadFile2ProtocolGuid                       ## SOMETIMES_PRODUCES
+  gEdkiiIoMmuProtocolGuid                         ## SOMETIMES_CONSUMES
+  gEdkiiDeviceSecurityProtocolGuid                ## SOMETIMES_CONSUMES
+  gEdkiiDeviceIdentifierTypePciGuid               ## SOMETIMES_CONSUMES
+  gEfiLoadedImageDevicePathProtocolGuid           ## CONSUMES
 
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciBusHotplugDeviceSupport      ## CONSUMES

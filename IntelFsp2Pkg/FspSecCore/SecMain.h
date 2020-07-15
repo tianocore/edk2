@@ -1,13 +1,7 @@
 /** @file
 
-  Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2014 - 2019, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -27,9 +21,8 @@
 #include <Library/SerialPortLib.h>
 #include <Library/FspSwitchStackLib.h>
 #include <Library/FspCommonLib.h>
+#include <Library/UefiCpuLib.h>
 #include <FspEas.h>
-
-#define SEC_IDT_ENTRY_COUNT    34
 
 typedef VOID (*PEI_CORE_ENTRY) ( \
   IN CONST  EFI_SEC_PEI_HAND_OFF    *SecCoreData, \
@@ -37,8 +30,14 @@ typedef VOID (*PEI_CORE_ENTRY) ( \
 );
 
 typedef struct _SEC_IDT_TABLE {
-  EFI_PEI_SERVICES  *PeiService;
-  UINT64            IdtTable[SEC_IDT_ENTRY_COUNT];
+  //
+  // Reserved 8 bytes preceding IDT to store EFI_PEI_SERVICES**, since IDT base
+  // address should be 8-byte alignment.
+  // Note: For IA32, only the 4 bytes immediately preceding IDT is used to store
+  // EFI_PEI_SERVICES**
+  //
+  UINT64            PeiService;
+  UINT64            IdtTable[FixedPcdGet8 (PcdFspMaxInterruptSupported)];
 } SEC_IDT_TABLE;
 
 /**
@@ -82,20 +81,6 @@ SecTemporaryRamSupport (
   IN UINTN                    CopySize
   );
 
-/**
-  Initializes floating point units for requirement of UEFI specification.
-
-  This function initializes floating-point control word to 0x027F (all exceptions
-  masked,double-precision, round-to-nearest) and multimedia-extensions control word
-  (if supported) to 0x1F80 (all exceptions masked, round-to-nearest, flush to zero
-  for masked underflow).
-
-**/
-VOID
-EFIAPI
-InitializeFloatingPointUnits (
-  VOID
-  );
 
 /**
 
@@ -134,6 +119,19 @@ SecStartup (
 VOID
 EFIAPI
 ProcessLibraryConstructorList (
+  VOID
+  );
+
+/**
+
+  Return value of esp.
+
+  @return  value of esp.
+
+**/
+UINT32
+EFIAPI
+AsmReadEsp (
   VOID
   );
 

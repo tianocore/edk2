@@ -1,14 +1,8 @@
 /** @file
   PTP (Platform TPM Profile) CRB (Command Response Buffer) interface used by dTPM2.0 library.
 
-Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -25,13 +19,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <IndustryStandard/TpmPtp.h>
 #include <IndustryStandard/TpmTis.h>
 
-typedef enum {
-  PtpInterfaceTis,
-  PtpInterfaceFifo,
-  PtpInterfaceCrb,
-  PtpInterfaceMax,
-} PTP_INTERFACE_TYPE;
-
 //
 // Execution of the command may take from several seconds to minutes for certain
 // commands, such as key generation.
@@ -39,7 +26,7 @@ typedef enum {
 #define PTP_TIMEOUT_MAX             (90000 * 1000)  // 90s
 
 //
-// Max TPM command/reponse length
+// Max TPM command/response length
 //
 #define TPMCMDBUFLENGTH             0x500
 
@@ -181,10 +168,30 @@ PtpCrbTpmCommand (
     }
     DEBUG ((EFI_D_VERBOSE, "\n"));
   );
-  TpmOutSize = 0;
+  TpmOutSize         = 0;
 
   //
   // STEP 0:
+  // if CapCRbIdelByPass == 0, enforce Idle state before sending command
+  //
+  if (PcdGet8(PcdCRBIdleByPass) == 0 && (MmioRead32((UINTN)&CrbReg->CrbControlStatus) & PTP_CRB_CONTROL_AREA_STATUS_TPM_IDLE) == 0){
+    Status = PtpCrbWaitRegisterBits (
+              &CrbReg->CrbControlStatus,
+              PTP_CRB_CONTROL_AREA_STATUS_TPM_IDLE,
+              0,
+              PTP_TIMEOUT_C
+              );
+    if (EFI_ERROR (Status)) {
+      //
+      // Try to goIdle to recover TPM
+      //
+      Status = EFI_DEVICE_ERROR;
+      goto GoIdle_Exit;
+    }
+  }
+
+  //
+  // STEP 1:
   // Ready is any time the TPM is ready to receive a command, following a write
   // of 1 by software to Request.cmdReady, as indicated by the Status field
   // being cleared to 0.
@@ -198,7 +205,7 @@ PtpCrbTpmCommand (
              );
   if (EFI_ERROR (Status)) {
     Status = EFI_DEVICE_ERROR;
-    goto Exit;
+    goto GoIdle_Exit;
   }
   Status = PtpCrbWaitRegisterBits (
              &CrbReg->CrbControlStatus,
@@ -208,11 +215,11 @@ PtpCrbTpmCommand (
              );
   if (EFI_ERROR (Status)) {
     Status = EFI_DEVICE_ERROR;
-    goto Exit;
+    goto GoIdle_Exit;
   }
 
   //
-  // STEP 1:
+  // STEP 2:
   // Command Reception occurs following a Ready state between the write of the
   // first byte of a command to the Command Buffer and the receipt of a write
   // of 1 to Start.
@@ -228,7 +235,7 @@ PtpCrbTpmCommand (
   MmioWrite32 ((UINTN)&CrbReg->CrbControlResponseSize, sizeof(CrbReg->CrbDataBuffer));
 
   //
-  // STEP 2:
+  // STEP 3:
   // Command Execution occurs after receipt of a 1 to Start and the TPM
   // clearing Start to 0.
   //
@@ -240,12 +247,30 @@ PtpCrbTpmCommand (
              PTP_TIMEOUT_MAX
              );
   if (EFI_ERROR (Status)) {
-    Status = EFI_DEVICE_ERROR;
-    goto Exit;
+    //
+    // Command Completion check timeout. Cancel the currently executing command by writing TPM_CRB_CTRL_CANCEL,
+    // Expect TPM_RC_CANCELLED or successfully completed response.
+    //
+    MmioWrite32((UINTN)&CrbReg->CrbControlCancel, PTP_CRB_CONTROL_CANCEL);
+    Status = PtpCrbWaitRegisterBits (
+               &CrbReg->CrbControlStart,
+               0,
+               PTP_CRB_CONTROL_START,
+               PTP_TIMEOUT_B
+               );
+    MmioWrite32((UINTN)&CrbReg->CrbControlCancel, 0);
+
+    if (EFI_ERROR(Status)) {
+      //
+      // Still in Command Execution state. Try to goIdle, the behavior is agnostic.
+      //
+      Status = EFI_DEVICE_ERROR;
+      goto GoIdle_Exit;
+    }
   }
 
   //
-  // STEP 3:
+  // STEP 4:
   // Command Completion occurs after completion of a command (indicated by the
   // TPM clearing TPM_CRB_CTRL_Start_x to 0) and before a write of a 1 by the
   // software to Request.goIdle.
@@ -265,21 +290,24 @@ PtpCrbTpmCommand (
     DEBUG ((EFI_D_VERBOSE, "\n"));
   );
   //
-  // Check the reponse data header (tag, parasize and returncode)
+  // Check the response data header (tag, parasize and returncode)
   //
   CopyMem (&Data16, BufferOut, sizeof (UINT16));
   // TPM2 should not use this RSP_COMMAND
   if (SwapBytes16 (Data16) == TPM_ST_RSP_COMMAND) {
     DEBUG ((EFI_D_ERROR, "TPM2: TPM_ST_RSP error - %x\n", TPM_ST_RSP_COMMAND));
     Status = EFI_UNSUPPORTED;
-    goto Exit;
+    goto GoIdle_Exit;
   }
 
   CopyMem (&Data32, (BufferOut + 2), sizeof (UINT32));
   TpmOutSize  = SwapBytes32 (Data32);
   if (*SizeOut < TpmOutSize) {
+    //
+    // Command completed, but buffer is not enough
+    //
     Status = EFI_BUFFER_TOO_SMALL;
-    goto Exit;
+    goto GoReady_Exit;
   }
   *SizeOut = TpmOutSize;
   //
@@ -288,7 +316,7 @@ PtpCrbTpmCommand (
   for (Index = sizeof (TPM2_RESPONSE_HEADER); Index < TpmOutSize; Index++) {
     BufferOut[Index] = MmioRead8 ((UINTN)&CrbReg->CrbDataBuffer[Index]);
   }
-Exit:
+
   DEBUG_CODE (
     DEBUG ((EFI_D_VERBOSE, "PtpCrbTpmCommand Receive - "));
     for (Index = 0; Index < TpmOutSize; Index++) {
@@ -297,11 +325,40 @@ Exit:
     DEBUG ((EFI_D_VERBOSE, "\n"));
   );
 
+GoReady_Exit:
   //
-  // STEP 4:
-  // Idle is any time TPM_CRB_CTRL_STS_x.Status.goIdle is 1.
+  // Goto Ready State if command is completed successfully and TPM support IdleBypass
+  // If not supported. flow down to GoIdle
+  //
+  if (PcdGet8(PcdCRBIdleByPass) == 1) {
+    MmioWrite32((UINTN)&CrbReg->CrbControlRequest, PTP_CRB_CONTROL_AREA_REQUEST_COMMAND_READY);
+    return Status;
+  }
+
+  //
+  // Do not wait for state transition for TIMEOUT_C
+  // This function will try to wait 2 TIMEOUT_C at the beginning in next call.
+  //
+GoIdle_Exit:
+
+  //
+  //  Return to Idle state by setting TPM_CRB_CTRL_STS_x.Status.goIdle to 1.
   //
   MmioWrite32((UINTN)&CrbReg->CrbControlRequest, PTP_CRB_CONTROL_AREA_REQUEST_GO_IDLE);
+
+  //
+  // Only enforce Idle state transition if execution fails when CRBIdleBypass==1
+  // Leave regular Idle delay at the beginning of next command execution
+  //
+  if (PcdGet8(PcdCRBIdleByPass) == 1){
+    Status = PtpCrbWaitRegisterBits (
+               &CrbReg->CrbControlStatus,
+               PTP_CRB_CONTROL_AREA_STATUS_TPM_IDLE,
+               0,
+               PTP_TIMEOUT_C
+               );
+  }
+
   return Status;
 }
 
@@ -352,7 +409,7 @@ TisPcRequestUseTpm (
 
   @return PTP interface type.
 **/
-PTP_INTERFACE_TYPE
+TPM2_PTP_INTERFACE_TYPE
 Tpm2GetPtpInterface (
   IN VOID *Register
   )
@@ -361,7 +418,7 @@ Tpm2GetPtpInterface (
   PTP_FIFO_INTERFACE_CAPABILITY InterfaceCapability;
 
   if (!Tpm2IsPtpPresence (Register)) {
-    return PtpInterfaceMax;
+    return Tpm2PtpInterfaceMax;
   }
   //
   // Check interface id
@@ -372,15 +429,37 @@ Tpm2GetPtpInterface (
   if ((InterfaceId.Bits.InterfaceType == PTP_INTERFACE_IDENTIFIER_INTERFACE_TYPE_CRB) &&
       (InterfaceId.Bits.InterfaceVersion == PTP_INTERFACE_IDENTIFIER_INTERFACE_VERSION_CRB) &&
       (InterfaceId.Bits.CapCRB != 0)) {
-    return PtpInterfaceCrb;
+    return Tpm2PtpInterfaceCrb;
   }
   if ((InterfaceId.Bits.InterfaceType == PTP_INTERFACE_IDENTIFIER_INTERFACE_TYPE_FIFO) &&
       (InterfaceId.Bits.InterfaceVersion == PTP_INTERFACE_IDENTIFIER_INTERFACE_VERSION_FIFO) &&
       (InterfaceId.Bits.CapFIFO != 0) &&
       (InterfaceCapability.Bits.InterfaceVersion == INTERFACE_CAPABILITY_INTERFACE_VERSION_PTP)) {
-    return PtpInterfaceFifo;
+    return Tpm2PtpInterfaceFifo;
   }
-  return PtpInterfaceTis;
+  return Tpm2PtpInterfaceTis;
+}
+
+/**
+  Return PTP CRB interface IdleByPass state.
+
+  @param[in] Register                Pointer to PTP register.
+
+  @return PTP CRB interface IdleByPass state.
+**/
+UINT8
+Tpm2GetIdleByPass (
+  IN VOID *Register
+  )
+{
+  PTP_CRB_INTERFACE_IDENTIFIER  InterfaceId;
+
+  //
+  // Check interface id
+  //
+  InterfaceId.Uint32 = MmioRead32 ((UINTN)&((PTP_CRB_REGISTERS *)Register)->InterfaceId);
+
+  return (UINT8)(InterfaceId.Bits.CapCRBIdleBypass);
 }
 
 /**
@@ -399,7 +478,7 @@ DumpPtpInfo (
   UINT16                        Vid;
   UINT16                        Did;
   UINT8                         Rid;
-  PTP_INTERFACE_TYPE            PtpInterface;
+  TPM2_PTP_INTERFACE_TYPE       PtpInterface;
 
   if (!Tpm2IsPtpPresence (Register)) {
     return ;
@@ -440,16 +519,16 @@ DumpPtpInfo (
   Vid = 0xFFFF;
   Did = 0xFFFF;
   Rid = 0xFF;
-  PtpInterface = Tpm2GetPtpInterface (Register);
+  PtpInterface = PcdGet8(PcdActiveTpmInterfaceType);
   DEBUG ((EFI_D_INFO, "PtpInterface - %x\n", PtpInterface));
   switch (PtpInterface) {
-  case PtpInterfaceCrb:
+  case Tpm2PtpInterfaceCrb:
     Vid = MmioRead16 ((UINTN)&((PTP_CRB_REGISTERS *)Register)->Vid);
     Did = MmioRead16 ((UINTN)&((PTP_CRB_REGISTERS *)Register)->Did);
     Rid = (UINT8)InterfaceId.Bits.Rid;
     break;
-  case PtpInterfaceFifo:
-  case PtpInterfaceTis:
+  case Tpm2PtpInterfaceFifo:
+  case Tpm2PtpInterfaceTis:
     Vid = MmioRead16 ((UINTN)&((PTP_FIFO_REGISTERS *)Register)->Vid);
     Did = MmioRead16 ((UINTN)&((PTP_FIFO_REGISTERS *)Register)->Did);
     Rid = MmioRead8 ((UINTN)&((PTP_FIFO_REGISTERS *)Register)->Rid);
@@ -483,11 +562,11 @@ DTpm2SubmitCommand (
   IN UINT8             *OutputParameterBlock
   )
 {
-  PTP_INTERFACE_TYPE  PtpInterface;
+  TPM2_PTP_INTERFACE_TYPE  PtpInterface;
 
-  PtpInterface = Tpm2GetPtpInterface ((VOID *) (UINTN) PcdGet64 (PcdTpmBaseAddress));
+  PtpInterface = PcdGet8(PcdActiveTpmInterfaceType);
   switch (PtpInterface) {
-  case PtpInterfaceCrb:
+  case Tpm2PtpInterfaceCrb:
     return PtpCrbTpmCommand (
            (PTP_CRB_REGISTERS_PTR) (UINTN) PcdGet64 (PcdTpmBaseAddress),
            InputParameterBlock,
@@ -495,8 +574,8 @@ DTpm2SubmitCommand (
            OutputParameterBlock,
            OutputParameterBlockSize
            );
-  case PtpInterfaceFifo:
-  case PtpInterfaceTis:
+  case Tpm2PtpInterfaceFifo:
+  case Tpm2PtpInterfaceTis:
     return Tpm2TisTpmCommand (
            (TIS_PC_REGISTERS_PTR) (UINTN) PcdGet64 (PcdTpmBaseAddress),
            InputParameterBlock,
@@ -522,14 +601,14 @@ DTpm2RequestUseTpm (
   VOID
   )
 {
-  PTP_INTERFACE_TYPE  PtpInterface;
+  TPM2_PTP_INTERFACE_TYPE  PtpInterface;
 
-  PtpInterface = Tpm2GetPtpInterface ((VOID *) (UINTN) PcdGet64 (PcdTpmBaseAddress));
+  PtpInterface = PcdGet8(PcdActiveTpmInterfaceType);
   switch (PtpInterface) {
-  case PtpInterfaceCrb:
+  case Tpm2PtpInterfaceCrb:
     return PtpCrbRequestUseTpm ((PTP_CRB_REGISTERS_PTR) (UINTN) PcdGet64 (PcdTpmBaseAddress));
-  case PtpInterfaceFifo:
-  case PtpInterfaceTis:
+  case Tpm2PtpInterfaceFifo:
+  case Tpm2PtpInterfaceTis:
     return TisPcRequestUseTpm ((TIS_PC_REGISTERS_PTR) (UINTN) PcdGet64 (PcdTpmBaseAddress));
   default:
     return EFI_NOT_FOUND;

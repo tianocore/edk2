@@ -1,15 +1,9 @@
 /** @file
   The implementation of common functions shared by IP6 driver.
 
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -220,7 +214,7 @@ Ip6CreateLinkLocalAddr (
   }
 
   //
-  // Get the interface id if it is manully configured.
+  // Get the interface id if it is manually configured.
   //
   Ip6Config = &IpSb->Ip6ConfigInstance.Ip6Config;
   DataSize  = sizeof (EFI_IP6_CONFIG_INTERFACE_ID);
@@ -330,7 +324,7 @@ Ip6AddAddr (
 
 /**
   Callback function which provided by user to remove one node in NetDestroyLinkList process.
-  
+
   @param[in]    Entry           The entry to be removed.
   @param[in]    Context         Pointer to the callback context corresponds to the Context in NetDestroyLinkList.
 
@@ -348,7 +342,7 @@ Ip6DestroyChildEntryByAddr (
   IP6_PROTOCOL                  *Instance;
   EFI_SERVICE_BINDING_PROTOCOL  *ServiceBinding;
   EFI_IPv6_ADDRESS              *Address;
-  
+
   Instance = NET_LIST_USER_STRUCT_S (Entry, IP6_PROTOCOL, Link, IP6_PROTOCOL_SIGNATURE);
   ServiceBinding = ((IP6_DESTROY_CHILD_BY_ADDR_CALLBACK_CONTEXT*) Context)->ServiceBinding;
   Address = ((IP6_DESTROY_CHILD_BY_ADDR_CALLBACK_CONTEXT*) Context)->Address;
@@ -356,7 +350,7 @@ Ip6DestroyChildEntryByAddr (
   if ((Instance->State == IP6_STATE_CONFIGED) && EFI_IP6_EQUAL (&Instance->ConfigData.StationAddress, Address)) {
     return ServiceBinding->DestroyChild (ServiceBinding, Instance->Handle);
   }
-  
+
   return EFI_SUCCESS;
 }
 

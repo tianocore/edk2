@@ -1,50 +1,12 @@
 /** @file
   A shell application that triggers capsule update process.
 
-  Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2016 - 2019, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include <Uefi.h>
-#include <Library/BaseLib.h>
-#include <Library/DebugLib.h>
-#include <Library/BaseMemoryLib.h>
-#include <Library/MemoryAllocationLib.h>
-#include <Library/UefiBootServicesTableLib.h>
-#include <Library/UefiRuntimeServicesTableLib.h>
-#include <Library/UefiLib.h>
-#include <Library/PrintLib.h>
-#include <Protocol/LoadedImage.h>
-#include <Protocol/SimpleFileSystem.h>
-#include <Protocol/GraphicsOutput.h>
-#include <Guid/FileInfo.h>
-#include <Guid/Gpt.h>
-#include <Guid/GlobalVariable.h>
-#include <Guid/CapsuleReport.h>
-#include <Guid/SystemResourceTable.h>
-#include <Guid/FmpCapsule.h>
-#include <IndustryStandard/WindowsUxCapsule.h>
-
-#define CAPSULE_HEADER_SIZE  0x20
-
-#define NESTED_CAPSULE_HEADER_SIZE  SIZE_4KB
-#define SYSTEM_FIRMWARE_FLAG 0x50000
-#define DEVICE_FIRMWARE_FLAG 0x78010
-
-#define MAJOR_VERSION   1
-#define MINOR_VERSION   0
-
-#define MAX_CAPSULE_NUM 10
-
-extern UINTN  Argc;
-extern CHAR16 **Argv;
+#include "CapsuleApp.h"
 
 //
 // Define how many block descriptors we want to test with.
@@ -52,106 +14,6 @@ extern CHAR16 **Argv;
 UINTN  NumberOfDescriptors = 1;
 UINTN  CapsuleFirstIndex;
 UINTN  CapsuleLastIndex;
-
-/**
-  Dump capsule information
-
-  @param[in] CapsuleName  The name of the capsule image.
-
-  @retval EFI_SUCCESS            The capsule information is dumped.
-  @retval EFI_UNSUPPORTED        Input parameter is not valid.
-**/
-EFI_STATUS
-DumpCapsule (
-  IN CHAR16                                        *CapsuleName
-  );
-
-/**
-  Dump capsule status variable.
-
-  @retval EFI_SUCCESS            The capsule status variable is dumped.
-  @retval EFI_UNSUPPORTED        Input parameter is not valid.
-**/
-EFI_STATUS
-DmpCapsuleStatusVariable (
-  VOID
-  );
-
-/**
-  Dump FMP protocol info.
-**/
-VOID
-DumpFmpData (
-  VOID
-  );
-
-/**
-  Dump FMP image data.
-
-  @param[in]  ImageTypeId   The ImageTypeId of the FMP image.
-                            It is used to identify the FMP protocol.
-  @param[in]  ImageIndex    The ImageIndex of the FMP image.
-                            It is the input parameter for FMP->GetImage().
-  @param[in]  ImageName     The file name to hold the output FMP image.
-**/
-VOID
-DumpFmpImage (
-  IN EFI_GUID  *ImageTypeId,
-  IN UINTN     ImageIndex,
-  IN CHAR16    *ImageName
-  );
-
-/**
-  Dump ESRT info.
-**/
-VOID
-DumpEsrtData (
-  VOID
-  );
-
-/**
-  Read a file.
-
-  @param[in]  FileName        The file to be read.
-  @param[out] BufferSize      The file buffer size
-  @param[out] Buffer          The file buffer
-
-  @retval EFI_SUCCESS    Read file successfully
-  @retval EFI_NOT_FOUND  File not found
-**/
-EFI_STATUS
-ReadFileToBuffer (
-  IN  CHAR16                               *FileName,
-  OUT UINTN                                *BufferSize,
-  OUT VOID                                 **Buffer
-  );
-
-/**
-  Write a file.
-
-  @param[in] FileName        The file to be written.
-  @param[in] BufferSize      The file buffer size
-  @param[in] Buffer          The file buffer
-
-  @retval EFI_SUCCESS    Write file successfully
-**/
-EFI_STATUS
-WriteFileFromBuffer (
-  IN  CHAR16                               *FileName,
-  IN  UINTN                                BufferSize,
-  IN  VOID                                 *Buffer
-  );
-
-/**
-
-  This function parse application ARG.
-
-  @return Status
-**/
-EFI_STATUS
-GetArg (
-  VOID
-  );
 
 /**
   Create UX capsule.
@@ -174,20 +36,26 @@ CreateBmpFmp (
   EFI_DISPLAY_CAPSULE                           *DisplayCapsule;
   EFI_STATUS                                    Status;
   EFI_GRAPHICS_OUTPUT_PROTOCOL                  *Gop;
+  EFI_GRAPHICS_OUTPUT_MODE_INFORMATION          *Info;
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL                 *GopBlt;
+  UINTN                                         GopBltSize;
+  UINTN                                         Height;
+  UINTN                                         Width;
 
   Status = gBS->LocateProtocol(&gEfiGraphicsOutputProtocolGuid, NULL, (VOID **)&Gop);
   if (EFI_ERROR(Status)) {
     Print(L"CapsuleApp: NO GOP is found.\n");
     return EFI_UNSUPPORTED;
   }
+  Info = Gop->Mode->Info;
   Print(L"Current GOP: Mode - %d, ", Gop->Mode->Mode);
-  Print(L"HorizontalResolution - %d, ", Gop->Mode->Info->HorizontalResolution);
-  Print(L"VerticalResolution - %d\n", Gop->Mode->Info->VerticalResolution);
+  Print(L"HorizontalResolution - %d, ", Info->HorizontalResolution);
+  Print(L"VerticalResolution - %d\n", Info->VerticalResolution);
   // HorizontalResolution >= BMP_IMAGE_HEADER.PixelWidth
   // VerticalResolution   >= BMP_IMAGE_HEADER.PixelHeight
 
   if (Argc != 5) {
-    Print(L"CapsuleApp: Invalid Parameter.\n");
+    Print(L"CapsuleApp: Incorrect parameter count.\n");
     return EFI_UNSUPPORTED;
   }
 
@@ -205,6 +73,35 @@ CreateBmpFmp (
   Status = ReadFileToBuffer(BmpName, &FileSize, &BmpBuffer);
   if (EFI_ERROR(Status)) {
     Print(L"CapsuleApp: BMP image (%s) is not found.\n", BmpName);
+    goto Done;
+  }
+
+  GopBlt = NULL;
+  Status = TranslateBmpToGopBlt (
+             BmpBuffer,
+             FileSize,
+             &GopBlt,
+             &GopBltSize,
+             &Height,
+             &Width
+             );
+  if (EFI_ERROR(Status)) {
+    Print(L"CapsuleApp: BMP image (%s) is not valid.\n", BmpName);
+    goto Done;
+  }
+  if (GopBlt != NULL) {
+    FreePool (GopBlt);
+  }
+  Print(L"BMP image (%s), Width - %d, Height - %d\n", BmpName, Width, Height);
+
+  if (Height > Info->VerticalResolution) {
+    Status = EFI_INVALID_PARAMETER;
+    Print(L"CapsuleApp: BMP image (%s) height is larger than current resolution.\n", BmpName);
+    goto Done;
+  }
+  if (Width > Info->HorizontalResolution) {
+    Status = EFI_INVALID_PARAMETER;
+    Print(L"CapsuleApp: BMP image (%s) width is larger than current resolution.\n", BmpName);
     goto Done;
   }
 
@@ -227,8 +124,27 @@ CreateBmpFmp (
   DisplayCapsule->ImagePayload.ImageType = 0; // BMP
   DisplayCapsule->ImagePayload.Reserved = 0;
   DisplayCapsule->ImagePayload.Mode = Gop->Mode->Mode;
-  DisplayCapsule->ImagePayload.OffsetX = 0;
-  DisplayCapsule->ImagePayload.OffsetY = 0;
+
+  //
+  // Center the bitmap horizontally
+  //
+  DisplayCapsule->ImagePayload.OffsetX = (UINT32)((Info->HorizontalResolution - Width) / 2);
+
+  //
+  // Put bitmap 3/4 down the display.  If bitmap is too tall, then align bottom
+  // of bitmap at bottom of display.
+  //
+  DisplayCapsule->ImagePayload.OffsetY =
+    MIN (
+      (UINT32)(Info->VerticalResolution - Height),
+      (UINT32)(((3 * Info->VerticalResolution) - (2 * Height)) / 4)
+      );
+
+  Print(L"BMP image (%s), OffsetX - %d, OffsetY - %d\n",
+    BmpName,
+    DisplayCapsule->ImagePayload.OffsetX,
+    DisplayCapsule->ImagePayload.OffsetY
+    );
 
   CopyMem((DisplayCapsule + 1), BmpBuffer, FileSize);
 
@@ -309,6 +225,60 @@ GetEsrtFwType (
 }
 
 /**
+  Validate if it is valid capsule header
+
+  This function assumes the caller provided correct CapsuleHeader pointer
+  and CapsuleSize.
+
+  This function validates the fields in EFI_CAPSULE_HEADER.
+
+  @param[in] CapsuleHeader  Points to a capsule header.
+  @param[in] CapsuleSize    Size of the whole capsule image.
+
+**/
+BOOLEAN
+IsValidCapsuleHeader (
+  IN EFI_CAPSULE_HEADER     *CapsuleHeader,
+  IN UINT64                 CapsuleSize
+  )
+{
+  if (CapsuleSize < sizeof (EFI_CAPSULE_HEADER)) {
+    return FALSE;
+  }
+  if (CapsuleHeader->CapsuleImageSize != CapsuleSize) {
+    return FALSE;
+  }
+  if (CapsuleHeader->HeaderSize > CapsuleHeader->CapsuleImageSize) {
+    return FALSE;
+  }
+  if (CapsuleHeader->HeaderSize < sizeof (EFI_CAPSULE_HEADER)) {
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+/**
+  Return if this CapsuleGuid is a FMP capsule GUID or not.
+
+  @param[in] CapsuleGuid A pointer to EFI_GUID
+
+  @retval TRUE  It is a FMP capsule GUID.
+  @retval FALSE It is not a FMP capsule GUID.
+**/
+BOOLEAN
+IsFmpCapsuleGuid (
+  IN EFI_GUID  *CapsuleGuid
+  )
+{
+  if (CompareGuid(&gEfiFmpCapsuleGuid, CapsuleGuid)) {
+    return TRUE;
+  }
+
+  return FALSE;
+}
+
+/**
   Append a capsule header on top of current image.
   This function follows Windows UEFI Firmware Update Platform document.
 
@@ -333,7 +303,7 @@ CreateNestedFmp (
   EFI_STATUS                                    Status;
 
   if (Argc != 5) {
-    Print(L"CapsuleApp: Invalid Parameter.\n");
+    Print(L"CapsuleApp: Incorrect parameter count.\n");
     return EFI_UNSUPPORTED;
   }
 
@@ -353,15 +323,28 @@ CreateNestedFmp (
     Print(L"CapsuleApp: Capsule image (%s) is not found.\n", CapsuleName);
     goto Done;
   }
+  if (!IsValidCapsuleHeader (CapsuleBuffer, FileSize)) {
+    Print(L"CapsuleApp: Capsule image (%s) is not a valid capsule.\n", CapsuleName);
+    Status = EFI_INVALID_PARAMETER;
+    goto Done;
+  }
+
+  if (!IsFmpCapsuleGuid (&((EFI_CAPSULE_HEADER *) CapsuleBuffer)->CapsuleGuid)) {
+    Print(L"CapsuleApp: Capsule image (%s) is not a FMP capsule.\n", CapsuleName);
+    Status = EFI_INVALID_PARAMETER;
+    goto Done;
+  }
 
   ImageTypeId = GetCapsuleImageTypeId(CapsuleBuffer);
   if (ImageTypeId == NULL) {
     Print(L"CapsuleApp: Capsule ImageTypeId is not found.\n");
+    Status = EFI_INVALID_PARAMETER;
     goto Done;
   }
   FwType = GetEsrtFwType(ImageTypeId);
   if ((FwType != ESRT_FW_TYPE_SYSTEMFIRMWARE) && (FwType != ESRT_FW_TYPE_DEVICEFIRMWARE)) {
     Print(L"CapsuleApp: Capsule FwType is invalid.\n");
+    Status = EFI_INVALID_PARAMETER;
     goto Done;
   }
 
@@ -377,7 +360,7 @@ CreateNestedFmp (
   ZeroMem(NestedCapsuleHeader, NESTED_CAPSULE_HEADER_SIZE);
   CopyGuid(&NestedCapsuleHeader->CapsuleGuid, ImageTypeId);
   NestedCapsuleHeader->HeaderSize = NESTED_CAPSULE_HEADER_SIZE;
-  NestedCapsuleHeader->Flags = (FwType == ESRT_FW_TYPE_DEVICEFIRMWARE) ? SYSTEM_FIRMWARE_FLAG : DEVICE_FIRMWARE_FLAG;
+  NestedCapsuleHeader->Flags = (FwType == ESRT_FW_TYPE_SYSTEMFIRMWARE) ? SYSTEM_FIRMWARE_FLAG : DEVICE_FIRMWARE_FLAG;
   NestedCapsuleHeader->CapsuleImageSize = (UINT32)FullCapsuleBufferSize;
 
   CopyMem((UINT8 *)NestedCapsuleHeader + NestedCapsuleHeader->HeaderSize, CapsuleBuffer, FileSize);
@@ -412,11 +395,13 @@ ClearCapsuleStatusVariable (
   UINT32                              Index;
   CHAR16                              CapsuleVarName[20];
   CHAR16                              *TempVarName;
+  BOOLEAN                             Found;
 
   StrCpyS (CapsuleVarName, sizeof(CapsuleVarName)/sizeof(CapsuleVarName[0]), L"Capsule");
   TempVarName = CapsuleVarName + StrLen (CapsuleVarName);
   Index = 0;
 
+  Found = FALSE;
   while (TRUE) {
     UnicodeSPrint (TempVarName, 5 * sizeof(CHAR16), L"%04x", Index);
 
@@ -427,17 +412,24 @@ ClearCapsuleStatusVariable (
                     0,
                     (VOID *)NULL
                     );
-    if (EFI_ERROR(Status)) {
+    if (Status == EFI_NOT_FOUND) {
       //
-      // There is no capsule variables, quit
+      // There is no more capsule variables, quit
       //
       break;
     }
+    Found = TRUE;
+
+    Print (L"Clear %s %r\n", CapsuleVarName, Status);
 
     Index++;
     if (Index > 0xFFFF) {
       break;
     }
+  }
+
+  if (!Found) {
+    Print (L"No any Capsule#### variable found\n");
   }
 
   return EFI_SUCCESS;
@@ -498,11 +490,11 @@ BuildGatherList (
       goto ERREXIT;
     } else {
       Print (L"CapsuleApp: creating capsule descriptors at 0x%X\n", (UINTN) BlockDescriptors1);
-      Print (L"CapsuleApp: capsule data starts          at 0x%X with size 0x%X\n", (UINTN) CapsuleBuffer, FileSize);
+      Print (L"CapsuleApp: capsule data starts          at 0x%X with size 0x%X\n", (UINTN) CapsuleBuffer[Index], FileSize[Index]);
     }
 
     //
-    // Record descirptor header
+    // Record descriptor header
     //
     if (Index == 0) {
       BlockDescriptorsHeader = BlockDescriptors1;
@@ -654,7 +646,7 @@ CleanGatherList (
         break;
       }
 
-      TempBlockPtr2 = (VOID *) ((UINTN) TempBlockPtr->Union.ContinuationPointer);
+      TempBlockPtr2 = (VOID *) ((UINTN) TempBlockPtr[Index].Union.ContinuationPointer);
       FreePool(TempBlockPtr1);
       TempBlockPtr1 = TempBlockPtr2;
     }
@@ -670,29 +662,41 @@ PrintUsage (
   )
 {
   Print(L"CapsuleApp:  usage\n");
-  Print(L"  CapsuleApp <Capsule...>\n");
+  Print(L"  CapsuleApp <Capsule...> [-NR] [-OD [FSx]]\n");
   Print(L"  CapsuleApp -S\n");
   Print(L"  CapsuleApp -C\n");
   Print(L"  CapsuleApp -P\n");
   Print(L"  CapsuleApp -E\n");
+  Print(L"  CapsuleApp -L\n");
+  Print(L"  CapsuleApp -L INFO\n");
+  Print(L"  CapsuleApp -F\n");
   Print(L"  CapsuleApp -G <BMP> -O <Capsule>\n");
   Print(L"  CapsuleApp -N <Capsule> -O <NestedCapsule>\n");
   Print(L"  CapsuleApp -D <Capsule>\n");
   Print(L"  CapsuleApp -P GET <ImageTypeId> <Index> -O <FileName>\n");
   Print(L"Parameter:\n");
+  Print(L"  -NR: No reset will be triggered for the capsule\n");
+  Print(L"       with CAPSULE_FLAGS_PERSIST_ACROSS_RESET and without CAPSULE_FLAGS_INITIATE_RESET.\n");
+  Print(L"  -OD: Delivery of Capsules via file on Mass Storage device.\n");
   Print(L"  -S:  Dump capsule report variable (EFI_CAPSULE_REPORT_GUID),\n");
   Print(L"       which is defined in UEFI specification.\n");
-  Print(L"  -C:  Clear capsule report variable (EFI_CAPSULE_RPORT_GUID),\n");
+  Print(L"  -C:  Clear capsule report variable (EFI_CAPSULE_REPORT_GUID),\n");
   Print(L"       which is defined in UEFI specification.\n");
-  Print(L"  -P:  Dump UEFI FMP protocol info.\n");
+  Print(L"  -P:  Dump UEFI FMP protocol info, or get image with specified\n");
+  Print(L"       ImageTypeId and Index (decimal format) to a file if 'GET'\n");
+  Print(L"       option is used.\n");
   Print(L"  -E:  Dump UEFI ESRT table info.\n");
-  Print(L"  -G:  Convert a BMP file to be a UX capsule,\n");
+  Print(L"  -L:  Dump provisioned capsule image information.\n");
+  Print(L"  -F:  Dump all EFI System Partition.\n");
+  Print(L"  -G:  Convert a BMP file to be an UX capsule,\n");
   Print(L"       according to Windows Firmware Update document\n");
-  Print(L"  -N:  Append a Capsule Header to an existing capsule image,\n");
+  Print(L"  -N:  Append a Capsule Header to an existing FMP capsule image\n");
+  Print(L"       with its ImageTypeId supported by the system,\n");
   Print(L"       according to Windows Firmware Update document\n");
   Print(L"  -O:  Output new Capsule file name\n");
-  Print(L"  -D:  Dump Capsule image header information and FMP header information,\n");
-  Print(L"       if it is an FMP capsule.\n");
+  Print(L"  -D:  Dump Capsule image header information, image payload\n");
+  Print(L"       information if it is an UX capsule and FMP header\n");
+  Print(L"       information if it is a FMP capsule.\n");
 }
 
 /**
@@ -702,7 +706,8 @@ PrintUsage (
   @param[in]  SystemTable     The system table.
 
   @retval EFI_SUCCESS            Command completed successfully.
-  @retval EFI_INVALID_PARAMETER  Command usage error.
+  @retval EFI_UNSUPPORTED        Command usage unsupported.
+  @retval EFI_INVALID_PARAMETER  Command usage invalid.
   @retval EFI_NOT_FOUND          The input file can't be found.
 **/
 EFI_STATUS
@@ -714,16 +719,28 @@ UefiMain (
 {
   EFI_STATUS                    Status;
   RETURN_STATUS                 RStatus;
-  UINTN                         FileSize[MAX_CAPSULE_NUM];
+  UINTN                         CapsuleBufferSize[MAX_CAPSULE_NUM];
   VOID                          *CapsuleBuffer[MAX_CAPSULE_NUM];
   EFI_CAPSULE_BLOCK_DESCRIPTOR  *BlockDescriptors;
-  EFI_CAPSULE_HEADER             *CapsuleHeaderArray[MAX_CAPSULE_NUM + 1];
-  UINT64                         MaxCapsuleSize;
-  EFI_RESET_TYPE                 ResetType;
-  BOOLEAN                        NeedReset;
-  CHAR16                         *CapsuleName;
-  UINTN                          CapsuleNum;
-  UINTN                          Index;
+  EFI_CAPSULE_HEADER            *CapsuleHeaderArray[MAX_CAPSULE_NUM + 1];
+  UINT64                        MaxCapsuleSize;
+  EFI_RESET_TYPE                ResetType;
+  BOOLEAN                       NeedReset;
+  BOOLEAN                       NoReset;
+  BOOLEAN                       CapsuleOnDisk;
+  CHAR16                        *CapsuleName;
+  CHAR16                        *CapsuleNames[MAX_CAPSULE_NUM];
+  CHAR16                        *MapFsStr;
+  UINTN                         CapsuleNum;
+  UINTN                         Index;
+  UINTN                         ParaOdIndex;
+  UINTN                         ParaNrIndex;
+  EFI_GUID                      ImageTypeId;
+  UINTN                         ImageIndex;
+
+  BlockDescriptors  = NULL;
+  MapFsStr          = NULL;
+  CapsuleNum        = 0;
 
   Status = GetArg();
   if (EFI_ERROR(Status)) {
@@ -732,9 +749,13 @@ UefiMain (
   }
   if (Argc < 2) {
     PrintUsage();
-    return EFI_INVALID_PARAMETER;
+    return EFI_UNSUPPORTED;
   }
   if (StrCmp(Argv[1], L"-D") == 0) {
+    if (Argc != 3) {
+      Print(L"CapsuleApp: Incorrect parameter count.\n");
+      return EFI_UNSUPPORTED;
+    }
     Status = DumpCapsule(Argv[2]);
     return Status;
   }
@@ -747,7 +768,7 @@ UefiMain (
     return Status;
   }
   if (StrCmp(Argv[1], L"-S") == 0) {
-    Status = DmpCapsuleStatusVariable();
+    Status = DumpCapsuleStatusVariable();
     return EFI_SUCCESS;
   }
   if (StrCmp(Argv[1], L"-C") == 0) {
@@ -759,9 +780,15 @@ UefiMain (
       DumpFmpData();
     }
     if (Argc >= 3) {
-      if (StrCmp(Argv[2], L"GET") == 0) {
-        EFI_GUID  ImageTypeId;
-        UINTN     ImageIndex;
+      if (StrCmp(Argv[2], L"GET") != 0) {
+        Print(L"CapsuleApp: Unrecognized option(%s).\n", Argv[2]);
+        return EFI_UNSUPPORTED;
+      } else {
+        if (Argc != 7) {
+          Print(L"CapsuleApp: Incorrect parameter count.\n");
+          return EFI_UNSUPPORTED;
+        }
+
         //
         // FMP->GetImage()
         //
@@ -771,19 +798,91 @@ UefiMain (
           return EFI_INVALID_PARAMETER;
         }
         ImageIndex = StrDecimalToUintn(Argv[4]);
-        if (StrCmp(Argv[5], L"-O") == 0) {
-          DumpFmpImage(&ImageTypeId, ImageIndex, Argv[6]);
+        if (StrCmp(Argv[5], L"-O") != 0) {
+          Print(L"CapsuleApp: NO output file name.\n");
+          return EFI_UNSUPPORTED;
         }
+        DumpFmpImage(&ImageTypeId, ImageIndex, Argv[6]);
       }
     }
     return EFI_SUCCESS;
   }
+
   if (StrCmp(Argv[1], L"-E") == 0) {
     DumpEsrtData();
     return EFI_SUCCESS;
   }
+
+  if (StrCmp(Argv[1], L"-L") == 0) {
+    if (Argc >= 3 && StrCmp(Argv[2], L"INFO") == 0) {
+      DumpProvisionedCapsule(TRUE);
+    } else {
+      DumpProvisionedCapsule(FALSE);
+    }
+    return EFI_SUCCESS;
+  }
+
+  if (StrCmp(Argv[1], L"-F") == 0) {
+    DumpAllEfiSysPartition();
+    return EFI_SUCCESS;
+  }
+
+  if (Argv[1][0] == L'-') {
+    Print(L"CapsuleApp: Unrecognized option(%s).\n", Argv[1]);
+    return EFI_UNSUPPORTED;
+  }
+
   CapsuleFirstIndex = 1;
-  CapsuleLastIndex = Argc - 1;
+  NoReset = FALSE;
+  CapsuleOnDisk = FALSE;
+  ParaOdIndex = 0;
+  ParaNrIndex = 0;
+
+  for (Index = 1; Index < Argc; Index++) {
+    if (StrCmp(Argv[Index], L"-OD") == 0) {
+      ParaOdIndex = Index;
+      CapsuleOnDisk = TRUE;
+    } else if (StrCmp(Argv[Index], L"-NR") == 0) {
+      ParaNrIndex = Index;
+      NoReset = TRUE;
+    }
+  }
+
+  if (ParaOdIndex > ParaNrIndex) {
+    if (ParaNrIndex != 0) {
+      CapsuleLastIndex = ParaNrIndex - 1;
+    } else {
+      CapsuleLastIndex = ParaOdIndex - 1;
+    }
+
+    if (ParaOdIndex == Argc -1) {
+      MapFsStr = NULL;
+    } else if (ParaOdIndex == Argc - 2) {
+      MapFsStr = Argv[Argc-1];
+    } else {
+      Print (L"CapsuleApp: Cannot specify more than one FS mapping!\n");
+      Status = EFI_INVALID_PARAMETER;
+      goto Done;
+    }
+  } else if (ParaOdIndex < ParaNrIndex) {
+    if (ParaOdIndex != 0) {
+      CapsuleLastIndex = ParaOdIndex - 1;
+      if (ParaOdIndex == ParaNrIndex - 1) {
+        MapFsStr = NULL;
+      } else if (ParaOdIndex == ParaNrIndex - 2) {
+        MapFsStr = Argv[ParaOdIndex + 1];
+      } else {
+        Print (L"CapsuleApp: Cannot specify more than one FS mapping!\n");
+        Status = EFI_INVALID_PARAMETER;
+        goto Done;
+      }
+    } else {
+      CapsuleLastIndex = ParaNrIndex - 1;
+    }
+  } else {
+    CapsuleLastIndex = Argc - 1;
+  }
+
   CapsuleNum = CapsuleLastIndex - CapsuleFirstIndex + 1;
 
   if (CapsuleFirstIndex > CapsuleLastIndex) {
@@ -796,22 +895,27 @@ UefiMain (
   }
 
   ZeroMem(&CapsuleBuffer, sizeof(CapsuleBuffer));
-  ZeroMem(&FileSize, sizeof(FileSize));
+  ZeroMem(&CapsuleBufferSize, sizeof(CapsuleBufferSize));
   BlockDescriptors = NULL;
 
   for (Index = 0; Index < CapsuleNum; Index++) {
     CapsuleName = Argv[CapsuleFirstIndex + Index];
-    Status = ReadFileToBuffer(CapsuleName, &FileSize[Index], &CapsuleBuffer[Index]);
+    Status = ReadFileToBuffer(CapsuleName, &CapsuleBufferSize[Index], &CapsuleBuffer[Index]);
     if (EFI_ERROR(Status)) {
       Print(L"CapsuleApp: capsule image (%s) is not found.\n", CapsuleName);
       goto Done;
     }
+    if (!IsValidCapsuleHeader (CapsuleBuffer[Index], CapsuleBufferSize[Index])) {
+      Print(L"CapsuleApp: Capsule image (%s) is not a valid capsule.\n", CapsuleName);
+      return EFI_INVALID_PARAMETER;
+    }
+    CapsuleNames[Index] = CapsuleName;
   }
 
   //
   // Every capsule use 2 descriptor 1 for data 1 for end
   //
-  Status = BuildGatherList(CapsuleBuffer, FileSize, CapsuleNum, &BlockDescriptors);
+  Status = BuildGatherList(CapsuleBuffer, CapsuleBufferSize, CapsuleNum, &BlockDescriptors);
   if (EFI_ERROR(Status)) {
     goto Done;
   }
@@ -838,10 +942,27 @@ UefiMain (
   }
 
   for (Index = 0; Index < CapsuleNum; Index++) {
-    if (FileSize[Index] > MaxCapsuleSize) {
+    if (CapsuleBufferSize[Index] > MaxCapsuleSize) {
       Print (L"CapsuleApp: capsule is too large to update, %ld is allowed\n", MaxCapsuleSize);
       Status = EFI_UNSUPPORTED;
       goto Done;
+    }
+  }
+
+  //
+  // Check whether is capsule on disk.
+  //
+  if (CapsuleOnDisk) {
+    Status = ProcessCapsuleOnDisk (CapsuleBuffer, CapsuleBufferSize, CapsuleNames, MapFsStr, CapsuleNum);
+    if (Status != EFI_SUCCESS) {
+      Print (L"CapsuleApp: failed to update capsule - %r\n", Status);
+      goto Done;
+    } else {
+      if (!NoReset) {
+        gRT->ResetSystem (ResetType, EFI_SUCCESS, 0, NULL);
+      } else {
+        goto Done;
+      }
     }
   }
 
@@ -855,10 +976,19 @@ UefiMain (
       goto Done;
     }
     //
-    // For capsule who has reset flag, after calling UpdateCapsule service,triger a
-    // system reset to process capsule persist across a system reset.
+    // For capsule with CAPSULE_FLAGS_PERSIST_ACROSS_RESET + CAPSULE_FLAGS_INITIATE_RESET,
+    // a system reset should have been triggered by gRT->UpdateCapsule() calling above.
     //
-    gRT->ResetSystem (ResetType, EFI_SUCCESS, 0, NULL);
+    // For capsule with CAPSULE_FLAGS_PERSIST_ACROSS_RESET and without CAPSULE_FLAGS_INITIATE_RESET,
+    // check if -NR (no-reset) has been specified or not.
+    //
+    if (!NoReset) {
+      //
+      // For capsule who has reset flag and no -NR (no-reset) has been specified, after calling UpdateCapsule service,
+      // trigger a system reset to process capsule persist across a system reset.
+      //
+      gRT->ResetSystem (ResetType, EFI_SUCCESS, 0, NULL);
+    }
   } else {
     //
     // For capsule who has no reset flag, only call UpdateCapsule Service without a

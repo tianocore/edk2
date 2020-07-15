@@ -4,13 +4,7 @@
 # Copyright (c) 2011 - 2014, ARM Limited. All rights reserved.
 # Copyright (c) 2016, Linaro Limited. All rights reserved.
 #
-# This program and the accompanying materials
-# are licensed and made available under the terms and conditions of the BSD License
-# which accompanies this distribution.  The full text of the license may be found at
-# http://opensource.org/licenses/bsd-license.php
-#
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 #------------------------------------------------------------------------------
 
@@ -29,7 +23,7 @@
 
 
 ASM_FUNC(ArmIsMpCore)
-  mrs   x0, mpidr_el1         // Read EL1 Mutliprocessor Affinty Reg (MPIDR)
+  mrs   x0, mpidr_el1         // Read EL1 Multiprocessor Affinty Reg (MPIDR)
   and   x0, x0, #MPIDR_U_MASK // U Bit clear, the processor is part of a multiprocessor system
   lsr   x0, x0, #MPIDR_U_BIT
   eor   x0, x0, #1

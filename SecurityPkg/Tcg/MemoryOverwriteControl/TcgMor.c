@@ -1,18 +1,12 @@
 /** @file
   TCG MOR (Memory Overwrite Request) Control Driver.
 
-  This driver initilize MemoryOverwriteRequestControl variable. It 
+  This driver initialize MemoryOverwriteRequestControl variable. It
   will clear MOR_CLEAR_MEMORY_BIT bit if it is set. It will also do TPer Reset for
   those encrypted drives through EFI_STORAGE_SECURITY_COMMAND_PROTOCOL at EndOfDxe.
 
-Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials 
-are licensed and made available under the terms and conditions of the BSD License 
-which accompanies this distribution.  The full text of the license may be found at 
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, 
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -22,8 +16,6 @@ UINT8    mMorControl;
 
 /**
   Ready to Boot Event notification handler.
-
-  Sequence of OS boot events is measured in this event notification handler.
 
   @param[in]  Event     Event whose notification function is being invoked
   @param[in]  Context   Pointer to the notification function's context
@@ -38,7 +30,7 @@ OnReadyToBoot (
 {
   EFI_STATUS  Status;
   UINTN       DataSize;
-  
+
   if (MOR_CLEAR_MEMORY_VALUE (mMorControl) == 0x0) {
     //
     // MorControl is expected, directly return to avoid unnecessary variable operation
@@ -49,14 +41,14 @@ OnReadyToBoot (
   // Clear MOR_CLEAR_MEMORY_BIT
   //
   DEBUG ((EFI_D_INFO, "TcgMor: Clear MorClearMemory bit\n"));
-  mMorControl &= 0xFE;  
+  mMorControl &= 0xFE;
 
   DataSize = sizeof (mMorControl);
   Status   = gRT->SetVariable (
-               MEMORY_OVERWRITE_REQUEST_VARIABLE_NAME, 
-               &gEfiMemoryOverwriteControlDataGuid, 
+               MEMORY_OVERWRITE_REQUEST_VARIABLE_NAME,
+               &gEfiMemoryOverwriteControlDataGuid,
                EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-               DataSize, 
+               DataSize,
                &mMorControl
                );
   if (EFI_ERROR (Status)) {
@@ -69,7 +61,7 @@ OnReadyToBoot (
   Typically, there are 2 mechanism for resetting eDrive. They are:
   1. TPer Reset through IEEE 1667 protocol.
   2. TPer Reset through native TCG protocol.
-  This routine will detect what protocol the attached eDrive comform to, TCG or
+  This routine will detect what protocol the attached eDrive conform to, TCG or
   IEEE 1667 protocol. Then send out TPer Reset command separately.
 
   @param[in] Ssp      The pointer to EFI_STORAGE_SECURITY_COMMAND_PROTOCOL instance.
@@ -117,7 +109,7 @@ InitiateTPerReset (
                   MediaId,
                   100000000,                    // Timeout 10-sec
                   0,                            // SecurityProtocol
-                  0,                            // SecurityProtocolSpecifcData
+                  0,                            // SecurityProtocolSpecificData
                   Len,                          // PayloadBufferSize,
                   Buffer,                       // PayloadBuffer
                   &XferSize
@@ -153,7 +145,7 @@ InitiateTPerReset (
                   MediaId,
                   100000000,                    // Timeout 10-sec
                   0,                            // SecurityProtocol
-                  0,                            // SecurityProtocolSpecifcData
+                  0,                            // SecurityProtocolSpecificData
                   Len,                          // PayloadBufferSize,
                   Buffer,                       // PayloadBuffer
                   &XferSize
@@ -205,7 +197,7 @@ InitiateTPerReset (
                     MediaId,
                     100000000,                    // Timeout 10-sec
                     SECURITY_PROTOCOL_TCG,        // SecurityProtocol
-                    0x0400,                       // SecurityProtocolSpecifcData
+                    0x0400,                       // SecurityProtocolSpecificData
                     512,                          // PayloadBufferSize,
                     Buffer                        // PayloadBuffer
                     );
@@ -233,9 +225,6 @@ Exit:
 
 /**
   Notification function of END_OF_DXE.
-
-  This is a notification function registered on END_OF_DXE event.
-  It is to get VarCheckPcdBin.
 
   @param[in] Event      Event whose notification function is being invoked.
   @param[in] Context    Pointer to the notification function's context.
@@ -299,6 +288,8 @@ TPerResetAtEndOfDxe (
 
     InitiateTPerReset (Ssp, BlockIo->Media->MediaId);
   }
+
+  FreePool (HandleBuffer);
 }
 
 /**
@@ -307,7 +298,7 @@ TPerResetAtEndOfDxe (
   @param[in] ImageHandle  Image handle of this driver.
   @param[in] SystemTable  A Pointer to the EFI System Table.
 
-  @retval EFI_SUCEESS     
+  @retval EFI_SUCCESS
   @return Others          Some error occurs.
 **/
 EFI_STATUS
@@ -327,10 +318,10 @@ MorDriverEntryPoint (
 
   DataSize = sizeof (mMorControl);
   Status = gRT->GetVariable (
-                  MEMORY_OVERWRITE_REQUEST_VARIABLE_NAME, 
-                  &gEfiMemoryOverwriteControlDataGuid, 
-                  NULL, 
-                  &DataSize, 
+                  MEMORY_OVERWRITE_REQUEST_VARIABLE_NAME,
+                  &gEfiMemoryOverwriteControlDataGuid,
+                  NULL,
+                  &DataSize,
                   &mMorControl
                   );
   if (EFI_ERROR (Status)) {
@@ -339,10 +330,10 @@ MorDriverEntryPoint (
     //
     mMorControl = 0;
     Status = gRT->SetVariable (
-                    MEMORY_OVERWRITE_REQUEST_VARIABLE_NAME, 
-                    &gEfiMemoryOverwriteControlDataGuid, 
+                    MEMORY_OVERWRITE_REQUEST_VARIABLE_NAME,
+                    &gEfiMemoryOverwriteControlDataGuid,
                     EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-                    DataSize, 
+                    DataSize,
                     &mMorControl
                     );
     DEBUG ((EFI_D_INFO, "TcgMor: Create MOR variable! Status = %r\n", Status));
@@ -350,7 +341,7 @@ MorDriverEntryPoint (
     //
     // Create a Ready To Boot Event and Clear the MorControl bit in the call back function.
     //
-    DEBUG ((EFI_D_INFO, "TcgMor: Create ReadyToBoot Event for MorControl Bit cleanning!\n"));
+    DEBUG ((DEBUG_INFO, "TcgMor: Create ReadyToBoot Event for MorControl Bit cleaning!\n"));
     Status = EfiCreateEventReadyToBootEx (
                TPL_CALLBACK,
                OnReadyToBoot,

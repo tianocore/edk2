@@ -2,14 +2,8 @@
 
   Routine procedures for memory allocate/free.
 
-Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -598,23 +592,23 @@ UsbHcFreeMem (
   return ;
 }
 
-/**  
+/**
   Allocates pages at a specified alignment that are suitable for an EfiPciIoOperationBusMasterCommonBuffer mapping.
-  
+
   If Alignment is not a power of two and Alignment is not zero, then ASSERT().
 
   @param  PciIo                 The PciIo that can be used to access the host controller.
   @param  Pages                 The number of pages to allocate.
   @param  Alignment             The requested alignment of the allocation.  Must be a power of two.
   @param  HostAddress           The system memory address to map to the PCI controller.
-  @param  DeviceAddress         The resulting map address for the bus master PCI controller to 
+  @param  DeviceAddress         The resulting map address for the bus master PCI controller to
                                 use to access the hosts HostAddress.
   @param  Mapping               A resulting value to pass to Unmap().
 
   @retval EFI_SUCCESS           Success to allocate aligned pages.
   @retval EFI_INVALID_PARAMETER Pages or Alignment is not valid.
   @retval EFI_OUT_OF_RESOURCES  Do not have enough resources to allocate memory.
-  
+
 
 **/
 EFI_STATUS
@@ -639,11 +633,11 @@ UsbHcAllocateAlignedPages (
   // Alignment must be a power of two or zero.
   //
   ASSERT ((Alignment & (Alignment - 1)) == 0);
-  
+
   if ((Alignment & (Alignment - 1)) != 0) {
     return EFI_INVALID_PARAMETER;
   }
- 
+
   if (Pages == 0) {
     return EFI_INVALID_PARAMETER;
   }
@@ -657,15 +651,15 @@ UsbHcAllocateAlignedPages (
     // Make sure that Pages plus EFI_SIZE_TO_PAGES (Alignment) does not overflow.
     //
     ASSERT (RealPages > Pages);
- 
+
     Status = PciIo->AllocateBuffer (
                       PciIo,
                       AllocateAnyPages,
                       EfiBootServicesData,
-                      Pages,
+                      RealPages,
                       &Memory,
                       0
-                      );    
+                      );
     if (EFI_ERROR (Status)) {
       return EFI_OUT_OF_RESOURCES;
     }
@@ -719,7 +713,7 @@ UsbHcAllocateAlignedPages (
     Status = PciIo->FreeBuffer (PciIo, Pages, (VOID *) AlignedMemory);
     return EFI_OUT_OF_RESOURCES;
   }
-  
+
   *HostAddress = (VOID *) AlignedMemory;
 
   return EFI_SUCCESS;
@@ -727,7 +721,7 @@ UsbHcAllocateAlignedPages (
 
 /**
   Frees memory that was allocated with UsbHcAllocateAlignedPages().
-  
+
   @param  PciIo                 The PciIo that can be used to access the host controller.
   @param  HostAddress           The system memory address to map to the PCI controller.
   @param  Pages                 The number of 4 KB pages to free.
@@ -743,9 +737,9 @@ UsbHcFreeAlignedPages (
   )
 {
   EFI_STATUS      Status;
-  
+
   ASSERT (Pages != 0);
-  
+
   Status = PciIo->Unmap (PciIo, Mapping);
   ASSERT_EFI_ERROR (Status);
 
@@ -753,6 +747,6 @@ UsbHcFreeAlignedPages (
                     PciIo,
                     Pages,
                     HostAddress
-                    );     
+                    );
   ASSERT_EFI_ERROR (Status);
 }

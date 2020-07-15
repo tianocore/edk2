@@ -1,14 +1,8 @@
 /** @file
 Calculate Crc32 value and Verify Crc32 value for input data.
 
-Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -27,7 +21,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #define CRC32_NULL              0
 #define CRC32_ENCODE            1
-#define CRC32_DECODE            2 
+#define CRC32_DECODE            2
 
 VOID
 Version (
@@ -76,11 +70,11 @@ Returns:
   // Summary usage
   //
   fprintf (stdout, "Usage: GenCrc32 -e|-d [options] <input_file>\n\n");
-  
+
   //
   // Copyright declaration
-  // 
-  fprintf (stdout, "Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.\n\n");
+  //
+  fprintf (stdout, "Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.\n\n");
 
   //
   // Details Option
@@ -100,7 +94,7 @@ Returns:
   fprintf (stdout, "  -o OUTPUT_FILENAME, --output OUTPUT_FILENAME\n\
                         Output file name\n");
   fprintf (stdout, "  --sfo                 Reserved for future use\n");
-  
+
 }
 
 int
@@ -135,7 +129,7 @@ Returns:
   UINT32                  Crc32Value;
   FILE                    *InFile;
   FILE                    *OutFile;
-  
+
   //
   // Init local variables
   //
@@ -165,12 +159,12 @@ Returns:
 
   if ((stricmp (argv[0], "-h") == 0) || (stricmp (argv[0], "--help") == 0)) {
     Usage ();
-    return STATUS_SUCCESS;    
+    return STATUS_SUCCESS;
   }
 
   if (stricmp (argv[0], "--version") == 0) {
     Version ();
-    return STATUS_SUCCESS;    
+    return STATUS_SUCCESS;
   }
 
   while (argc > 0) {
@@ -182,21 +176,21 @@ Returns:
       OutputFileName = argv[1];
       argc -= 2;
       argv += 2;
-      continue; 
+      continue;
     }
 
     if ((stricmp (argv[0], "-e") == 0) || (stricmp (argv[0], "--encode") == 0)) {
       FileAction     = CRC32_ENCODE;
       argc --;
       argv ++;
-      continue; 
+      continue;
     }
 
     if ((stricmp (argv[0], "-d") == 0) || (stricmp (argv[0], "--decode") == 0)) {
       FileAction     = CRC32_DECODE;
       argc --;
       argv ++;
-      continue; 
+      continue;
     }
 
     if ((stricmp (argv[0], "-v") == 0) || (stricmp (argv[0], "--verbose") == 0)) {
@@ -246,7 +240,7 @@ Returns:
   }
 
   VerboseMsg ("%s tool start.", UTILITY_NAME);
-  
+
   //
   // Check Input parameters
   //
@@ -258,7 +252,7 @@ Returns:
   } else if (FileAction == CRC32_DECODE) {
     VerboseMsg ("File will be decoded by Crc32");
   }
-  
+
   if (InputFileName == NULL) {
     Error (NULL, 0, 1001, "Missing option", "Input files are not specified");
     goto Finish;
@@ -272,7 +266,7 @@ Returns:
   } else {
     VerboseMsg ("Output file name is %s", OutputFileName);
   }
-  
+
   //
   // Open Input file and read file data.
   //
@@ -285,18 +279,18 @@ Returns:
   fseek (InFile, 0, SEEK_END);
   FileSize = ftell (InFile);
   fseek (InFile, 0, SEEK_SET);
-  
+
   FileBuffer = (UINT8 *) malloc (FileSize);
   if (FileBuffer == NULL) {
-    Error (NULL, 0, 4001, "Resource", "memory cannot be allcoated!");
+    Error (NULL, 0, 4001, "Resource", "memory cannot be allocated!");
     fclose (InFile);
     goto Finish;
   }
-  
+
   fread (FileBuffer, 1, FileSize, InFile);
   fclose (InFile);
   VerboseMsg ("the size of the input file is %u bytes", (unsigned) FileSize);
-  
+
   //
   // Open output file
   //
@@ -305,7 +299,7 @@ Returns:
     Error (NULL, 0, 0001, "Error opening file", OutputFileName);
     goto Finish;
   }
-  
+
   //
   // Calculate Crc32 value
   //
@@ -326,6 +320,10 @@ Returns:
     //
     // Verify Crc32 Value
     //
+    if (FileSize < sizeof (UINT32)) {
+      Error (NULL, 0, 3000, "Invalid", "Input file is invalid!");
+      goto Finish;
+    }
     Status = CalculateCrc32 (FileBuffer + sizeof (UINT32), FileSize - sizeof (UINT32), &Crc32Value);
     if (Status != EFI_SUCCESS) {
       Error (NULL, 0, 3000, "Invalid", "Calculate CRC32 value failed!");
@@ -348,16 +346,16 @@ Finish:
   if (FileBuffer != NULL) {
     free (FileBuffer);
   }
-  
+
   if (OutFile != NULL) {
     fclose (OutFile);
   }
-  
+
   VerboseMsg ("%s tool done with return code is 0x%x.", UTILITY_NAME, GetUtilityStatus ());
 
   return GetUtilityStatus ();
 }
 
-  
-  
-  
+
+
+

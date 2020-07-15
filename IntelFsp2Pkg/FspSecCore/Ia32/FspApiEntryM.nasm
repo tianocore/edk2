@@ -1,14 +1,8 @@
 ;; @file
 ;  Provide FSP API entry points.
 ;
-; Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
-; This program and the accompanying materials
-; are licensed and made available under the terms and conditions of the BSD License
-; which accompanies this distribution.  The full text of the license may be found at
-; http://opensource.org/licenses/bsd-license.php.
-;
-; THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-; WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+; Copyright (c) 2016 - 2019, Intel Corporation. All rights reserved.<BR>
+; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;;
 
     SECTION .text
@@ -19,6 +13,7 @@
 extern   ASM_PFX(PcdGet32(PcdTemporaryRamBase))
 extern   ASM_PFX(PcdGet32(PcdTemporaryRamSize))
 extern   ASM_PFX(PcdGet32(PcdFspTemporaryRamSize))
+extern   ASM_PFX(PcdGet8 (PcdFspHeapSizePercentage))
 
 struc FSPM_UPD_COMMON
     ; FSP_UPD_HEADER {
@@ -116,10 +111,10 @@ ASM_PFX(FspApiCommonContinue):
   sidt    [esp]
 
 
-  ;  Get Stackbase and StackSize from FSPM_UPD Param 
-  mov    edx, [esp + API_PARAM1_OFFSET] 
+  ;  Get Stackbase and StackSize from FSPM_UPD Param
+  mov    edx, [esp + API_PARAM1_OFFSET]
   cmp    edx, 0
-  jnz    FspStackSetup  
+  jnz    FspStackSetup
 
   ; Get UPD default values if FspmUpdDataPtr (ApiParam1) is null
   push   eax
@@ -127,16 +122,56 @@ ASM_PFX(FspApiCommonContinue):
   mov    edx, [eax + FSP_HEADER_IMGBASE_OFFSET]
   add    edx, [eax + FSP_HEADER_CFGREG_OFFSET]
   pop    eax
-  
-  FspStackSetup:
+
+FspStackSetup:
+  ;
+  ; StackBase = temp memory base, StackSize = temp memory size
+  ;
   mov    edi, [edx + FSPM_UPD_COMMON.StackBase]
   mov    ecx, [edx + FSPM_UPD_COMMON.StackSize]
+
+  ;
+  ; Keep using bootloader stack if heap size % is 0
+  ;
+  mov    bl, BYTE [ASM_PFX(PcdGet8 (PcdFspHeapSizePercentage))]
+  cmp    bl, 0
+  jz     SkipStackSwitch
+
+  ;
+  ; Set up a dedicated temp ram stack for FSP if FSP heap size % doesn't equal 0
+  ;
   add    edi, ecx
   ;
-  ; Setup new FSP stack
+  ; Switch to new FSP stack
   ;
-  xchg    edi, esp                                ; Exchange edi and esp, edi will be assigned to the current esp pointer and esp will be Stack base + Stack size
-  mov     ebx, esp                                ; Put Stack base + Stack size in ebx
+  xchg   edi, esp                                ; Exchange edi and esp, edi will be assigned to the current esp pointer and esp will be Stack base + Stack size
+
+SkipStackSwitch:
+  ;
+  ; If heap size % is 0:
+  ;   EDI is FSPM_UPD_COMMON.StackBase and will hold ESP later (boot loader stack pointer)
+  ;   ECX is FSPM_UPD_COMMON.StackSize
+  ;   ESP is boot loader stack pointer (no stack switch)
+  ;   BL  is 0 to indicate no stack switch (EBX will hold FSPM_UPD_COMMON.StackBase later)
+  ;
+  ; If heap size % is not 0
+  ;   EDI is boot loader stack pointer
+  ;   ECX is FSPM_UPD_COMMON.StackSize
+  ;   ESP is new stack (FSPM_UPD_COMMON.StackBase + FSPM_UPD_COMMON.StackSize)
+  ;   BL  is NOT 0 to indicate stack has switched
+  ;
+  cmp    bl, 0
+  jnz    StackHasBeenSwitched
+
+  mov    ebx, edi                                ; Put FSPM_UPD_COMMON.StackBase to ebx as temp memory base
+  mov    edi, esp                                ; Put boot loader stack pointer to edi
+  jmp    StackSetupDone
+
+StackHasBeenSwitched:
+  mov    ebx, esp                                ; Put Stack base + Stack size in ebx
+  sub    ebx, ecx                                ; Stack base + Stack size - Stack size as temp memory base
+
+StackSetupDone:
 
   ;
   ; Pass the API Idx to SecStartup
@@ -159,9 +194,9 @@ ASM_PFX(FspApiCommonContinue):
 
   ;
   ; Pass BFV into the PEI Core
-  ; It uses relative address to calucate the actual boot FV base
+  ; It uses relative address to calculate the actual boot FV base
   ; For FSP implementation with single FV, PcdFspBootFirmwareVolumeBase and
-  ; PcdFspAreaBaseAddress are the same. For FSP with mulitple FVs,
+  ; PcdFspAreaBaseAddress are the same. For FSP with multiple FVs,
   ; they are different. The code below can handle both cases.
   ;
   call    ASM_PFX(AsmGetFspBaseAddress)
@@ -170,7 +205,6 @@ ASM_PFX(FspApiCommonContinue):
   ;
   ; Pass stack base and size into the PEI Core
   ;
-  sub     ebx, ecx            ; Stack base + Stack size - Stack size
   push    ebx
   push    ecx
 
@@ -193,6 +227,17 @@ global ASM_PFX(AsmGetPeiCoreOffset)
 ASM_PFX(AsmGetPeiCoreOffset):
    mov   eax, dword [ASM_PFX(FspPeiCoreEntryOff)]
    ret
+
+;----------------------------------------------------------------------------
+; TempRamInit API
+;
+; Empty function for WHOLEARCHIVE build option
+;
+;----------------------------------------------------------------------------
+global ASM_PFX(TempRamInitApi)
+ASM_PFX(TempRamInitApi):
+  jmp $
+  ret
 
 ;----------------------------------------------------------------------------
 ; Module Entrypoint API

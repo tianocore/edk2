@@ -1,0 +1,50 @@
+## @file
+# This Package provides all definitions (including functions, MACROs,
+# structures library classes, and PCDs) and libraries instances, which are used
+# to support unit testing and interface testing.
+#
+# Copyright (c) Microsoft Corporation.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  DEC_SPECIFICATION = 0x00010005
+  PACKAGE_NAME      = UnitTestFrameworkPkg
+  PACKAGE_UNI_FILE  = UnitTestFrameworkPkg.uni
+  PACKAGE_GUID      = 4A70C4A0-D72C-4D3F-9943-BE7C41C50BA3
+  PACKAGE_VERSION   = 1.00
+
+[Includes]
+  Library/CmockaLib/cmocka/include
+
+[Includes.Common.Private]
+  PrivateInclude
+  Library/CmockaLib/cmocka/include/cmockery
+
+[LibraryClasses.Common.Private]
+  ## @libraryclass Allows save and restore unit test internal state
+  #
+  UnitTestPersistenceLib|PrivateInclude/Library/UnitTestPersistenceLib.h
+
+  ## @libraryclass Provides a unit test result report
+  #
+  UnitTestResultReportLib|PrivateInclude/Library/UnitTestResultReportLib.h
+
+  ## @libraryclass Provides boot-option routines useful in shell-based tests.
+  #
+  UnitTestBootLib|PrivateInclude/Library/UnitTestBootLib.h
+
+[Guids]
+  gUnitTestFrameworkPkgTokenSpaceGuid = { 0x833d3aba, 0x39b4, 0x43a2, { 0xb9, 0x30, 0x7a, 0x34, 0x53, 0x39, 0x31, 0xb3 } }
+
+[PcdsFixedAtBuild]
+  ## This flag is used to control build time optimization based on unit test
+  #  log level.  The default value is 0xFFFFFFFF to enable all unit test log
+  #  messages.
+  #  BIT0 - Error unit test log messages.<BR>
+  #  BIT1 - Warning unit test log messages.<BR>
+  #  BIT2 - Informational unit test log messages.<BR>
+  #  BIT3 - Verbose unit test log messages.<BR>
+  # @Prompt  Unit Test Log Message Level
+  gUnitTestFrameworkPkgTokenSpaceGuid.PcdUnitTestLogLevel|0xFFFFFFFF|UINT32|0x00000001

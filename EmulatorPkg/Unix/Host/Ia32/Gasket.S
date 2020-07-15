@@ -7,13 +7,7 @@
 # the code common.
 #
 # Copyright (c) 2008 - 2011, Apple Inc. All rights reserved.<BR>
-# This program and the accompanying materials
-# are licensed and made available under the terms and conditions of the BSD License
-# which accompanies this distribution.  The full text of the license may be found at
-# http://opensource.org/licenses/bsd-license.php
-#
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 #------------------------------------------------------------------------------
 
@@ -156,12 +150,12 @@ ASM_PFX(GasketSecSetTimer):
   movl  %esp, %ebp
   subl  $40, %esp      // sub extra 16 from the stack for alignment
   and   $-16, %esp    // stack needs to end in 0xFFFFFFF0 before call
-  movl	16(%ebp), %eax
-	movl	%eax, 8(%esp)
-	movl	8(%ebp), %eax
-	movl	12(%ebp), %edx
-	movl	%edx, 4(%esp)
-	movl	%eax, (%esp)
+  movl  16(%ebp), %eax
+  movl  %eax, 8(%esp)
+  movl  8(%ebp), %eax
+  movl  12(%ebp), %edx
+  movl  %edx, 4(%esp)
+  movl  %eax, (%esp)
 
   call  ASM_PFX(SecSetTimer)
 
@@ -226,10 +220,10 @@ ASM_PFX(GasketSecSleep):
   movl  %esp, %ebp
   subl  $24, %esp      // sub extra 16 from the stack for alignment
   and   $-16, %esp    // stack needs to end in 0xFFFFFFF0 before call
-	movl	8(%ebp), %eax
-	movl	12(%ebp), %ecx
-	movl	%ecx, 4(%esp)
-	movl	%eax, (%esp)
+  movl  8(%ebp), %eax
+  movl  12(%ebp), %ecx
+  movl  %ecx, 4(%esp)
+  movl  %eax, (%esp)
 
   call  ASM_PFX(SecSleep)
 
@@ -299,18 +293,18 @@ ASM_PFX(GasketSecSetTime):
 
 ASM_GLOBAL ASM_PFX(GasketSecGetNextProtocol)
 ASM_PFX(GasketSecGetNextProtocol):
-	pushl	%ebp
-	movl	%esp, %ebp
+  pushl  %ebp
+  movl  %esp, %ebp
   subl  $40, %esp      // sub extra 16 from the stack for alignment
   and   $-16, %esp    // stack needs to end in 0xFFFFFFF0 before call
-	movl	20(%ebp), %eax
-	movl	%eax, 12(%esp)
-	movl	16(%ebp), %eax
-	movl	%eax, 8(%esp)
-	movl	12(%ebp), %eax
-	movl	%eax, 4(%esp)
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
+  movl  20(%ebp), %eax
+  movl  %eax, 12(%esp)
+  movl  16(%ebp), %eax
+  movl  %eax, 8(%esp)
+  movl  12(%ebp), %eax
+  movl  %eax, 4(%esp)
+  movl  8(%ebp), %eax
+  movl  %eax, (%esp)
 
   call    ASM_PFX(SecGetNextProtocol)
 
@@ -382,18 +376,18 @@ ASM_PFX(GasketSecEmuThunkAddress):
 
 ASM_GLOBAL ASM_PFX(GasketX11Size)
 ASM_PFX(GasketX11Size):
-	pushl	%ebp
-	movl	%esp, %ebp
+  pushl  %ebp
+  movl  %esp, %ebp
   subl  $40, %esp      // sub extra 16 from the stack for alignment
   and   $-16, %esp    // stack needs to end in 0xFFFFFFF0 before call
-	movl	20(%ebp), %eax
-	movl	%eax, 12(%esp)
-	movl	16(%ebp), %eax
-	movl	%eax, 8(%esp)
-	movl	12(%ebp), %eax
-	movl	%eax, 4(%esp)
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
+  movl  20(%ebp), %eax
+  movl  %eax, 12(%esp)
+  movl  16(%ebp), %eax
+  movl  %eax, 8(%esp)
+  movl  12(%ebp), %eax
+  movl  %eax, 4(%esp)
+  movl  8(%ebp), %eax
+  movl  %eax, (%esp)
 
   call    ASM_PFX(X11Size)
 
@@ -451,18 +445,18 @@ ASM_PFX(GasketX11KeySetState):
 
 ASM_GLOBAL ASM_PFX(GasketX11RegisterKeyNotify)
 ASM_PFX(GasketX11RegisterKeyNotify):
-	pushl	%ebp
-	movl	%esp, %ebp
+  pushl  %ebp
+  movl  %esp, %ebp
   subl  $40, %esp      // sub extra 16 from the stack for alignment
   and   $-16, %esp    // stack needs to end in 0xFFFFFFF0 before call
-	movl	20(%ebp), %eax
-	movl	%eax, 12(%esp)
-	movl	16(%ebp), %eax
-	movl	%eax, 8(%esp)
-	movl	12(%ebp), %eax
-	movl	%eax, 4(%esp)
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
+  movl  20(%ebp), %eax
+  movl  %eax, 12(%esp)
+  movl  16(%ebp), %eax
+  movl  %eax, 8(%esp)
+  movl  12(%ebp), %eax
+  movl  %eax, 4(%esp)
+  movl  8(%ebp), %eax
+  movl  %eax, (%esp)
 
   call    ASM_PFX(X11RegisterKeyNotify)
 
@@ -472,18 +466,18 @@ ASM_PFX(GasketX11RegisterKeyNotify):
 
 ASM_GLOBAL ASM_PFX(GasketX11Blt)
 ASM_PFX(GasketX11Blt):
-	pushl	%ebp
-	movl	%esp, %ebp
+  pushl  %ebp
+  movl  %esp, %ebp
   subl  $40, %esp      // sub extra 16 from the stack for alignment
   and   $-16, %esp    // stack needs to end in 0xFFFFFFF0 before call
-	movl	20(%ebp), %eax
-	movl	%eax, 12(%esp)
-	movl	16(%ebp), %eax
-	movl	%eax, 8(%esp)
-	movl	12(%ebp), %eax
-	movl	%eax, 4(%esp)
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
+  movl  20(%ebp), %eax
+  movl  %eax, 12(%esp)
+  movl  16(%ebp), %eax
+  movl  %eax, 8(%esp)
+  movl  12(%ebp), %eax
+  movl  %eax, 4(%esp)
+  movl  8(%ebp), %eax
+  movl  %eax, (%esp)
 
   call    ASM_PFX(X11Blt)
 
@@ -631,18 +625,18 @@ ASM_PFX(GasketPthreadMutexDestroy):
 
 ASM_GLOBAL ASM_PFX(GasketPthreadCreate)
 ASM_PFX(GasketPthreadCreate):
-	pushl	%ebp
-	movl	%esp, %ebp
+  pushl  %ebp
+  movl  %esp, %ebp
   subl  $40, %esp      // sub extra 16 from the stack for alignment
   and   $-16, %esp    // stack needs to end in 0xFFFFFFF0 before call
-	movl	20(%ebp), %eax
-	movl	%eax, 12(%esp)
-	movl	16(%ebp), %eax
-	movl	%eax, 8(%esp)
-	movl	12(%ebp), %eax
-	movl	%eax, 4(%esp)
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
+  movl  20(%ebp), %eax
+  movl  %eax, 12(%esp)
+  movl  16(%ebp), %eax
+  movl  %eax, 8(%esp)
+  movl  12(%ebp), %eax
+  movl  %eax, 4(%esp)
+  movl  8(%ebp), %eax
+  movl  %eax, (%esp)
 
   call    ASM_PFX(PthreadCreate)
 
@@ -721,17 +715,17 @@ ASM_PFX(GasketPthreadClose):
 //   );
 ASM_GLOBAL ASM_PFX(ReverseGasketUint64)
 ASM_PFX(ReverseGasketUint64):
-	pushl	%ebp
-	movl	%esp, %ebp
-	subl	$8, %esp
-	movl	16(%ebp), %eax
-	movl	%eax, 4(%esp)
-	movl	12(%ebp), %eax
-	movl	%eax, (%esp)
-	calll	*8(%ebp)
-	addl	$8, %esp
-	popl	%ebp
-	ret
+  pushl  %ebp
+  movl  %esp, %ebp
+  subl  $8, %esp
+  movl  16(%ebp), %eax
+  movl  %eax, 4(%esp)
+  movl  12(%ebp), %eax
+  movl  %eax, (%esp)
+  calll  *8(%ebp)
+  addl  $8, %esp
+  popl  %ebp
+  ret
 
 
 
@@ -746,35 +740,35 @@ ASM_PFX(ReverseGasketUint64):
 //   );
 ASM_GLOBAL ASM_PFX(ReverseGasketUint64Uint64)
 ASM_PFX(ReverseGasketUint64Uint64):
-	pushl	%ebp
-	movl	%esp, %ebp
-	subl	$24, %esp
-	movl	24(%ebp), %eax
-	movl	%eax, 12(%esp)
-	movl	20(%ebp), %eax
-	movl	%eax, 8(%esp)
-	movl	16(%ebp), %eax
-	movl	%eax, 4(%esp)
-	movl	12(%ebp), %eax
-	movl	%eax, (%esp)
-	calll	*8(%ebp)
-	addl	$24, %esp
-	popl	%ebp
-	ret
+  pushl  %ebp
+  movl  %esp, %ebp
+  subl  $24, %esp
+  movl  24(%ebp), %eax
+  movl  %eax, 12(%esp)
+  movl  20(%ebp), %eax
+  movl  %eax, 8(%esp)
+  movl  16(%ebp), %eax
+  movl  %eax, 4(%esp)
+  movl  12(%ebp), %eax
+  movl  %eax, (%esp)
+  calll  *8(%ebp)
+  addl  $24, %esp
+  popl  %ebp
+  ret
 
 
 ASM_GLOBAL ASM_PFX(GasketSecUnixPeiAutoScan)
 ASM_PFX(GasketSecUnixPeiAutoScan):
-	pushl	%ebp
-	movl	%esp, %ebp
+  pushl  %ebp
+  movl  %esp, %ebp
   subl  $40, %esp      // sub extra 16 from the stack for alignment
   and   $-16, %esp    // stack needs to end in 0xFFFFFFF0 before call
-	movl	16(%ebp), %eax
-	movl	%eax, 8(%esp)
-	movl	12(%ebp), %eax
-	movl	%eax, 4(%esp)
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
+  movl  16(%ebp), %eax
+  movl  %eax, 8(%esp)
+  movl  12(%ebp), %eax
+  movl  %eax, 4(%esp)
+  movl  8(%ebp), %eax
+  movl  %eax, (%esp)
 
   call    ASM_PFX(SecUnixPeiAutoScan)
 
@@ -784,18 +778,18 @@ ASM_PFX(GasketSecUnixPeiAutoScan):
 
 ASM_GLOBAL ASM_PFX(GasketSecUnixFdAddress)
 ASM_PFX(GasketSecUnixFdAddress):
-	pushl	%ebp
-	movl	%esp, %ebp
+  pushl  %ebp
+  movl  %esp, %ebp
   subl  $40, %esp      // sub extra 16 from the stack for alignment
   and   $-16, %esp    // stack needs to end in 0xFFFFFFF0 before call
-	movl	20(%ebp), %eax
-	movl	%eax, 12(%esp)
-	movl	16(%ebp), %eax
-	movl	%eax, 8(%esp)
-	movl	12(%ebp), %eax
-	movl	%eax, 4(%esp)
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
+  movl  20(%ebp), %eax
+  movl  %eax, 12(%esp)
+  movl  16(%ebp), %eax
+  movl  %eax, 8(%esp)
+  movl  12(%ebp), %eax
+  movl  %eax, 4(%esp)
+  movl  8(%ebp), %eax
+  movl  %eax, (%esp)
 
   call    ASM_PFX(SecUnixFdAddress)
 
@@ -807,18 +801,18 @@ ASM_PFX(GasketSecUnixFdAddress):
 
 ASM_GLOBAL ASM_PFX(GasketPosixOpenVolume)
 ASM_PFX(GasketPosixOpenVolume):
-	pushl	%ebp
-	movl	%esp, %ebp
+  pushl  %ebp
+  movl  %esp, %ebp
   subl  $40, %esp      // sub extra 16 from the stack for alignment
   and   $-16, %esp    // stack needs to end in 0xFFFFFFF0 before call
-	movl	20(%ebp), %eax
-	movl	%eax, 12(%esp)
-	movl	16(%ebp), %eax
-	movl	%eax, 8(%esp)
-	movl	12(%ebp), %eax
-	movl	%eax, 4(%esp)
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
+  movl  20(%ebp), %eax
+  movl  %eax, 12(%esp)
+  movl  16(%ebp), %eax
+  movl  %eax, 8(%esp)
+  movl  12(%ebp), %eax
+  movl  %eax, 4(%esp)
+  movl  8(%ebp), %eax
+  movl  %eax, (%esp)
 
   call    ASM_PFX(PosixOpenVolume)
 
@@ -828,24 +822,24 @@ ASM_PFX(GasketPosixOpenVolume):
 
 ASM_GLOBAL ASM_PFX(GasketPosixFileOpen)
 ASM_PFX(GasketPosixFileOpen):
-	pushl	%ebp
-	movl	%esp, %ebp
+  pushl  %ebp
+  movl  %esp, %ebp
   subl  $56, %esp      // sub extra 16 from the stack for alignment
   and   $-16, %esp    // stack needs to end in 0xFFFFFFF0 before call
-	movl	28(%ebp), %eax
-	movl	32(%ebp), %ecx
-	movl	%ecx, 24(%esp)
-	movl	%eax, 20(%esp)
-	movl	20(%ebp), %eax
-	movl	24(%ebp), %ecx
-	movl	%ecx, 16(%esp)
-	movl	%eax, 12(%esp)
-	movl	16(%ebp), %eax
-	movl	%eax, 8(%esp)
-	movl	12(%ebp), %eax
-	movl	%eax, 4(%esp)
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
+  movl  28(%ebp), %eax
+  movl  32(%ebp), %ecx
+  movl  %ecx, 24(%esp)
+  movl  %eax, 20(%esp)
+  movl  20(%ebp), %eax
+  movl  24(%ebp), %ecx
+  movl  %ecx, 16(%esp)
+  movl  %eax, 12(%esp)
+  movl  16(%ebp), %eax
+  movl  %eax, 8(%esp)
+  movl  12(%ebp), %eax
+  movl  %eax, 4(%esp)
+  movl  8(%ebp), %eax
+  movl  %eax, (%esp)
 
   call    ASM_PFX(PosixFileOpen)
 
@@ -885,16 +879,16 @@ ASM_PFX(GasketPosixFileDelete):
 
 ASM_GLOBAL ASM_PFX(GasketPosixFileRead)
 ASM_PFX(GasketPosixFileRead):
-	pushl	%ebp
-	movl	%esp, %ebp
+  pushl  %ebp
+  movl  %esp, %ebp
   subl  $40, %esp      // sub extra 16 from the stack for alignment
   and   $-16, %esp    // stack needs to end in 0xFFFFFFF0 before call
-	movl	16(%ebp), %eax
-	movl	%eax, 8(%esp)
-	movl	12(%ebp), %eax
-	movl	%eax, 4(%esp)
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
+  movl  16(%ebp), %eax
+  movl  %eax, 8(%esp)
+  movl  12(%ebp), %eax
+  movl  %eax, 4(%esp)
+  movl  8(%ebp), %eax
+  movl  %eax, (%esp)
 
   call    ASM_PFX(PosixFileRead)
 
@@ -904,16 +898,16 @@ ASM_PFX(GasketPosixFileRead):
 
 ASM_GLOBAL ASM_PFX(GasketPosixFileWrite)
 ASM_PFX(GasketPosixFileWrite):
-	pushl	%ebp
-	movl	%esp, %ebp
+  pushl  %ebp
+  movl  %esp, %ebp
   subl  $40, %esp      // sub extra 16 from the stack for alignment
   and   $-16, %esp    // stack needs to end in 0xFFFFFFF0 before call
-	movl	16(%ebp), %eax
-	movl	%eax, 8(%esp)
-	movl	12(%ebp), %eax
-	movl	%eax, 4(%esp)
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
+  movl  16(%ebp), %eax
+  movl  %eax, 8(%esp)
+  movl  12(%ebp), %eax
+  movl  %eax, 4(%esp)
+  movl  8(%ebp), %eax
+  movl  %eax, (%esp)
 
   call    ASM_PFX(PosixFileWrite)
 
@@ -927,12 +921,12 @@ ASM_PFX(GasketPosixFileSetPossition):
   movl  %esp, %ebp
   subl  $40, %esp      // sub extra 16 from the stack for alignment
   and   $-16, %esp    // stack needs to end in 0xFFFFFFF0 before call
-	movl	12(%ebp), %eax
-	movl	16(%ebp), %ecx
-	movl	%ecx, 8(%esp)
-	movl	%eax, 4(%esp)
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
+  movl  12(%ebp), %eax
+  movl  16(%ebp), %ecx
+  movl  %ecx, 8(%esp)
+  movl  %eax, 4(%esp)
+  movl  8(%ebp), %eax
+  movl  %eax, (%esp)
 
   call    ASM_PFX(PosixFileSetPossition)
 
@@ -959,18 +953,18 @@ ASM_PFX(GasketPosixFileGetPossition):
 
 ASM_GLOBAL ASM_PFX(GasketPosixFileGetInfo)
 ASM_PFX(GasketPosixFileGetInfo):
-	pushl	%ebp
-	movl	%esp, %ebp
+  pushl  %ebp
+  movl  %esp, %ebp
   subl  $40, %esp      // sub extra 16 from the stack for alignment
   and   $-16, %esp    // stack needs to end in 0xFFFFFFF0 before call
-	movl	20(%ebp), %eax
-	movl	%eax, 12(%esp)
-	movl	16(%ebp), %eax
-	movl	%eax, 8(%esp)
-	movl	12(%ebp), %eax
-	movl	%eax, 4(%esp)
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
+  movl  20(%ebp), %eax
+  movl  %eax, 12(%esp)
+  movl  16(%ebp), %eax
+  movl  %eax, 8(%esp)
+  movl  12(%ebp), %eax
+  movl  %eax, 4(%esp)
+  movl  8(%ebp), %eax
+  movl  %eax, (%esp)
 
   call    ASM_PFX(PosixFileGetInfo)
 
@@ -980,18 +974,18 @@ ASM_PFX(GasketPosixFileGetInfo):
 
 ASM_GLOBAL ASM_PFX(GasketPosixFileSetInfo)
 ASM_PFX(GasketPosixFileSetInfo):
-	pushl	%ebp
-	movl	%esp, %ebp
+  pushl  %ebp
+  movl  %esp, %ebp
   subl  $40, %esp      // sub extra 16 from the stack for alignment
   and   $-16, %esp    // stack needs to end in 0xFFFFFFF0 before call
-	movl	20(%ebp), %eax
-	movl	%eax, 12(%esp)
-	movl	16(%ebp), %eax
-	movl	%eax, 8(%esp)
-	movl	12(%ebp), %eax
-	movl	%eax, 4(%esp)
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
+  movl  20(%ebp), %eax
+  movl  %eax, 12(%esp)
+  movl  16(%ebp), %eax
+  movl  %eax, 8(%esp)
+  movl  12(%ebp), %eax
+  movl  %eax, 4(%esp)
+  movl  8(%ebp), %eax
+  movl  %eax, (%esp)
 
   call    ASM_PFX(PosixFileSetInfo)
 
@@ -1062,24 +1056,24 @@ ASM_PFX(GasketEmuBlockIoReset):
 
 ASM_GLOBAL ASM_PFX(GasketEmuBlockIoReadBlocks)
 ASM_PFX(GasketEmuBlockIoReadBlocks):
-	pushl	%ebp
-	movl	%esp, %ebp
+  pushl  %ebp
+  movl  %esp, %ebp
   subl  $56, %esp      // sub extra 16 from the stack for alignment
   and   $-16, %esp    // stack needs to end in 0xFFFFFFF0 before call
-	movl	32(%ebp), %eax
-	movl	%eax, 24(%esp)
-	movl	28(%ebp), %eax
-	movl	%eax, 20(%esp)
-	movl	24(%ebp), %eax
-	movl	%eax, 16(%esp)
-	movl	16(%ebp), %eax
-	movl	20(%ebp), %edx
-	movl	%edx, 12(%esp)
-	movl	%eax, 8(%esp)
-	movl	12(%ebp), %eax
-	movl	%eax, 4(%esp)
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
+  movl  32(%ebp), %eax
+  movl  %eax, 24(%esp)
+  movl  28(%ebp), %eax
+  movl  %eax, 20(%esp)
+  movl  24(%ebp), %eax
+  movl  %eax, 16(%esp)
+  movl  16(%ebp), %eax
+  movl  20(%ebp), %edx
+  movl  %edx, 12(%esp)
+  movl  %eax, 8(%esp)
+  movl  12(%ebp), %eax
+  movl  %eax, 4(%esp)
+  movl  8(%ebp), %eax
+  movl  %eax, (%esp)
 
   call    ASM_PFX(EmuBlockIoReadBlocks)
 
@@ -1089,24 +1083,24 @@ ASM_PFX(GasketEmuBlockIoReadBlocks):
 
 ASM_GLOBAL ASM_PFX(GasketEmuBlockIoWriteBlocks)
 ASM_PFX(GasketEmuBlockIoWriteBlocks):
-	pushl	%ebp
-	movl	%esp, %ebp
+  pushl  %ebp
+  movl  %esp, %ebp
   subl  $56, %esp      // sub extra 16 from the stack for alignment
   and   $-16, %esp    // stack needs to end in 0xFFFFFFF0 before call
-	movl	32(%ebp), %eax
-	movl	%eax, 24(%esp)
-	movl	28(%ebp), %eax
-	movl	%eax, 20(%esp)
-	movl	24(%ebp), %eax
-	movl	%eax, 16(%esp)
-	movl	16(%ebp), %eax
-	movl	20(%ebp), %edx
-	movl	%edx, 12(%esp)
-	movl	%eax, 8(%esp)
-	movl	12(%ebp), %eax
-	movl	%eax, 4(%esp)
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
+  movl  32(%ebp), %eax
+  movl  %eax, 24(%esp)
+  movl  28(%ebp), %eax
+  movl  %eax, 20(%esp)
+  movl  24(%ebp), %eax
+  movl  %eax, 16(%esp)
+  movl  16(%ebp), %eax
+  movl  20(%ebp), %edx
+  movl  %edx, 12(%esp)
+  movl  %eax, 8(%esp)
+  movl  12(%ebp), %eax
+  movl  %eax, 4(%esp)
+  movl  8(%ebp), %eax
+  movl  %eax, (%esp)
 
   call    ASM_PFX(EmuBlockIoWriteBlocks)
 
@@ -1228,16 +1222,16 @@ ASM_PFX(GasketSnpStop):
 
 ASM_GLOBAL ASM_PFX(GasketSnpInitialize)
 ASM_PFX(GasketSnpInitialize):
-	pushl	%ebp
-	movl	%esp, %ebp
+  pushl  %ebp
+  movl  %esp, %ebp
   subl  $40, %esp      // sub extra 16 from the stack for alignment
   and   $-16, %esp    // stack needs to end in 0xFFFFFFF0 before call
-	movl	16(%ebp), %eax
-	movl	%eax, 8(%esp)
-	movl	12(%ebp), %eax
-	movl	%eax, 4(%esp)
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
+  movl  16(%ebp), %eax
+  movl  %eax, 8(%esp)
+  movl  12(%ebp), %eax
+  movl  %eax, 4(%esp)
+  movl  8(%ebp), %eax
+  movl  %eax, (%esp)
 
   call    ASM_PFX(EmuSnpInitialize)
 
@@ -1279,22 +1273,22 @@ ASM_PFX(GasketSnpShutdown):
 
 ASM_GLOBAL ASM_PFX(GasketSnpReceiveFilters)
 ASM_PFX(GasketSnpReceiveFilters):
-	pushl	%ebp
-	movl	%esp, %ebp
+  pushl  %ebp
+  movl  %esp, %ebp
   subl  $40, %esp      // sub extra 16 from the stack for alignment
   and   $-16, %esp    // stack needs to end in 0xFFFFFFF0 before call
-	movl	28(%ebp), %eax
-	movl	%eax, 20(%esp)
-	movl	24(%ebp), %eax
-	movl	%eax, 16(%esp)
-	movl	20(%ebp), %eax
-	movl	%eax, 12(%esp)
-	movl	16(%ebp), %eax
-	movl	%eax, 8(%esp)
-	movl	12(%ebp), %eax
-	movl	%eax, 4(%esp)
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
+  movl  28(%ebp), %eax
+  movl  %eax, 20(%esp)
+  movl  24(%ebp), %eax
+  movl  %eax, 16(%esp)
+  movl  20(%ebp), %eax
+  movl  %eax, 12(%esp)
+  movl  16(%ebp), %eax
+  movl  %eax, 8(%esp)
+  movl  12(%ebp), %eax
+  movl  %eax, 4(%esp)
+  movl  8(%ebp), %eax
+  movl  %eax, (%esp)
 
   call    ASM_PFX(EmuSnpReceiveFilters)
 
@@ -1304,16 +1298,16 @@ ASM_PFX(GasketSnpReceiveFilters):
 
 ASM_GLOBAL ASM_PFX(GasketSnpStationAddress)
 ASM_PFX(GasketSnpStationAddress):
-	pushl	%ebp
-	movl	%esp, %ebp
+  pushl  %ebp
+  movl  %esp, %ebp
   subl  $40, %esp      // sub extra 16 from the stack for alignment
   and   $-16, %esp    // stack needs to end in 0xFFFFFFF0 before call
-	movl	16(%ebp), %eax
-	movl	%eax, 8(%esp)
-	movl	12(%ebp), %eax
-	movl	%eax, 4(%esp)
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
+  movl  16(%ebp), %eax
+  movl  %eax, 8(%esp)
+  movl  12(%ebp), %eax
+  movl  %eax, 4(%esp)
+  movl  8(%ebp), %eax
+  movl  %eax, (%esp)
 
   leave
   ret
@@ -1322,18 +1316,18 @@ ASM_PFX(GasketSnpStationAddress):
 
 ASM_GLOBAL ASM_PFX(GasketSnpStatistics)
 ASM_PFX(GasketSnpStatistics):
-	pushl	%ebp
-	movl	%esp, %ebp
+  pushl  %ebp
+  movl  %esp, %ebp
   subl  $40, %esp      // sub extra 16 from the stack for alignment
   and   $-16, %esp    // stack needs to end in 0xFFFFFFF0 before call
-	movl	20(%ebp), %eax
-	movl	%eax, 12(%esp)
-	movl	16(%ebp), %eax
-	movl	%eax, 8(%esp)
-	movl	12(%ebp), %eax
-	movl	%eax, 4(%esp)
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
+  movl  20(%ebp), %eax
+  movl  %eax, 12(%esp)
+  movl  16(%ebp), %eax
+  movl  %eax, 8(%esp)
+  movl  12(%ebp), %eax
+  movl  %eax, 4(%esp)
+  movl  8(%ebp), %eax
+  movl  %eax, (%esp)
 
   call    ASM_PFX(EmuSnpStatistics)
 
@@ -1343,18 +1337,18 @@ ASM_PFX(GasketSnpStatistics):
 
 ASM_GLOBAL ASM_PFX(GasketSnpMCastIpToMac)
 ASM_PFX(GasketSnpMCastIpToMac):
-	pushl	%ebp
-	movl	%esp, %ebp
+  pushl  %ebp
+  movl  %esp, %ebp
   subl  $40, %esp      // sub extra 16 from the stack for alignment
   and   $-16, %esp    // stack needs to end in 0xFFFFFFF0 before call
-	movl	20(%ebp), %eax
-	movl	%eax, 12(%esp)
-	movl	16(%ebp), %eax
-	movl	%eax, 8(%esp)
-	movl	12(%ebp), %eax
-	movl	%eax, 4(%esp)
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
+  movl  20(%ebp), %eax
+  movl  %eax, 12(%esp)
+  movl  16(%ebp), %eax
+  movl  %eax, 8(%esp)
+  movl  12(%ebp), %eax
+  movl  %eax, 4(%esp)
+  movl  8(%ebp), %eax
+  movl  %eax, (%esp)
 
   call    ASM_PFX(EmuSnpMCastIpToMac)
 
@@ -1364,20 +1358,20 @@ ASM_PFX(GasketSnpMCastIpToMac):
 
 ASM_GLOBAL ASM_PFX(GasketSnpNvData)
 ASM_PFX(GasketSnpNvData):
-	pushl	%ebp
-	movl	%esp, %ebp
+  pushl  %ebp
+  movl  %esp, %ebp
   subl  $40, %esp      // sub extra 16 from the stack for alignment
   and   $-16, %esp    // stack needs to end in 0xFFFFFFF0 before call
-	movl	24(%ebp), %eax
-	movl	%eax, 16(%esp)
-	movl	20(%ebp), %eax
-	movl	%eax, 12(%esp)
-	movl	16(%ebp), %eax
-	movl	%eax, 8(%esp)
-	movl	12(%ebp), %eax
-	movl	%eax, 4(%esp)
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
+  movl  24(%ebp), %eax
+  movl  %eax, 16(%esp)
+  movl  20(%ebp), %eax
+  movl  %eax, 12(%esp)
+  movl  16(%ebp), %eax
+  movl  %eax, 8(%esp)
+  movl  12(%ebp), %eax
+  movl  %eax, 4(%esp)
+  movl  8(%ebp), %eax
+  movl  %eax, (%esp)
 
   call    ASM_PFX(EmuSnpNvData)
 
@@ -1387,16 +1381,16 @@ ASM_PFX(GasketSnpNvData):
 
 ASM_GLOBAL ASM_PFX(GasketSnpGetStatus)
 ASM_PFX(GasketSnpGetStatus):
-	pushl	%ebp
-	movl	%esp, %ebp
+  pushl  %ebp
+  movl  %esp, %ebp
   subl  $40, %esp      // sub extra 16 from the stack for alignment
   and   $-16, %esp    // stack needs to end in 0xFFFFFFF0 before call
-	movl	16(%ebp), %eax
-	movl	%eax, 8(%esp)
-	movl	12(%ebp), %eax
-	movl	%eax, 4(%esp)
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
+  movl  16(%ebp), %eax
+  movl  %eax, 8(%esp)
+  movl  12(%ebp), %eax
+  movl  %eax, 4(%esp)
+  movl  8(%ebp), %eax
+  movl  %eax, (%esp)
 
   call    ASM_PFX(EmuSnpGetStatus)
 
@@ -1407,24 +1401,24 @@ ASM_PFX(GasketSnpGetStatus):
 
 ASM_GLOBAL ASM_PFX(GasketSnpTransmit)
 ASM_PFX(GasketSnpTransmit):
-	pushl	%ebp
-	movl	%esp, %ebp
+  pushl  %ebp
+  movl  %esp, %ebp
   subl  $56, %esp      // sub extra 16 from the stack for alignment
   and   $-16, %esp    // stack needs to end in 0xFFFFFFF0 before call
-	movl	32(%ebp), %eax
-	movl	%eax, 24(%esp)
-	movl	28(%ebp), %eax
-	movl	%eax, 20(%esp)
-	movl	24(%ebp), %eax
-	movl	%eax, 16(%esp)
-	movl	20(%ebp), %eax
-	movl	%eax, 12(%esp)
-	movl	16(%ebp), %eax
-	movl	%eax, 8(%esp)
-	movl	12(%ebp), %eax
-	movl	%eax, 4(%esp)
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
+  movl  32(%ebp), %eax
+  movl  %eax, 24(%esp)
+  movl  28(%ebp), %eax
+  movl  %eax, 20(%esp)
+  movl  24(%ebp), %eax
+  movl  %eax, 16(%esp)
+  movl  20(%ebp), %eax
+  movl  %eax, 12(%esp)
+  movl  16(%ebp), %eax
+  movl  %eax, 8(%esp)
+  movl  12(%ebp), %eax
+  movl  %eax, 4(%esp)
+  movl  8(%ebp), %eax
+  movl  %eax, (%esp)
 
   call    ASM_PFX(EmuSnpTransmit)
 
@@ -1435,24 +1429,24 @@ ASM_PFX(GasketSnpTransmit):
 
 ASM_GLOBAL ASM_PFX(GasketSnpReceive)
 ASM_PFX(GasketSnpReceive):
-	pushl	%ebp
-	movl	%esp, %ebp
+  pushl  %ebp
+  movl  %esp, %ebp
   subl  $56, %esp      // sub extra 16 from the stack for alignment
   and   $-16, %esp    // stack needs to end in 0xFFFFFFF0 before call
-	movl	32(%ebp), %eax
-	movl	%eax, 24(%esp)
-	movl	28(%ebp), %eax
-	movl	%eax, 20(%esp)
-	movl	24(%ebp), %eax
-	movl	%eax, 16(%esp)
-	movl	20(%ebp), %eax
-	movl	%eax, 12(%esp)
-	movl	16(%ebp), %eax
-	movl	%eax, 8(%esp)
-	movl	12(%ebp), %eax
-	movl	%eax, 4(%esp)
-	movl	8(%ebp), %eax
-	movl	%eax, (%esp)
+  movl  32(%ebp), %eax
+  movl  %eax, 24(%esp)
+  movl  28(%ebp), %eax
+  movl  %eax, 20(%esp)
+  movl  24(%ebp), %eax
+  movl  %eax, 16(%esp)
+  movl  20(%ebp), %eax
+  movl  %eax, 12(%esp)
+  movl  16(%ebp), %eax
+  movl  %eax, 8(%esp)
+  movl  12(%ebp), %eax
+  movl  %eax, 4(%esp)
+  movl  8(%ebp), %eax
+  movl  %eax, (%esp)
 
   call    ASM_PFX(EmuSnpReceive)
 

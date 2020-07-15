@@ -1,0 +1,29 @@
+## @file
+# Library to support printing out the unit test report to a UEFI console
+#
+# Copyright (c) Microsoft Corporation.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION     = 0x00010017
+  BASE_NAME       = UnitTestResultReportLibConOut
+  MODULE_UNI_FILE = UnitTestResultReportLibConOut.uni
+  FILE_GUID       = C659641D-BA1F-4B58-946E-B1E1103903F9
+  VERSION_STRING  = 1.0
+  MODULE_TYPE     = UEFI_DRIVER
+  LIBRARY_CLASS   = UnitTestResultReportLib
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  UefiBootServicesTableLib
+  PrintLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+
+[Sources]
+  UnitTestResultReportLib.c
+  UnitTestResultReportLibConOut.c

@@ -2,13 +2,7 @@
 
   Copyright (c) 2014, ARM Ltd. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -42,7 +36,7 @@ EFI_STATUS
 
 /*
   To be called when Fastboot is finished and we aren't rebooting or booting an
-  image. Undo initialisation, free resrouces.
+  image. Undo initialisation, free resources.
 */
 typedef
 VOID
@@ -55,7 +49,7 @@ VOID
   PartitionName, with the image pointed to by Buffer, whose size is BufferSize.
 
   @param[in] PartitionName  Null-terminated name of partition to write.
-  @param[in] BufferSize     Size of Buffer in byets.
+  @param[in] BufferSize     Size of Buffer in bytes.
   @param[in] Buffer         Data to write to partition.
 
   @retval EFI_NOT_FOUND     No such partition.

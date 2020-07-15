@@ -1,0 +1,11 @@
+## @file
+# CiBuildPlugin used to check guid uniqueness
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+{
+  "scope": "cibuild",
+  "name": "Guid Check Test",
+  "module": "GuidCheck"
+}

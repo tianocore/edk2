@@ -1,0 +1,55 @@
+#/** @file
+#
+#  DXE MM Communicate driver
+#
+#  Copyright (c) 2016 - 2019, ARM Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = ArmMmCommunication
+  FILE_GUID                      = 09EE81D3-F15E-43F4-85B4-CB9873DA5D6B
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = MmCommunication2Initialize
+
+#
+# The following is for reference only and not required by
+# build tools
+#
+# VALID_ARCHITECTURES            = AARCH64
+#
+
+[Sources.AARCH64]
+  MmCommunication.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  ArmLib
+  ArmSmcLib
+  BaseMemoryLib
+  DebugLib
+  DxeServicesTableLib
+  HobLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gEfiMmCommunication2ProtocolGuid              ## PRODUCES
+
+[Guids]
+  gEfiEndOfDxeEventGroupGuid
+  gEfiEventExitBootServicesGuid
+  gEfiEventReadyToBootGuid
+
+[Pcd.common]
+  gArmTokenSpaceGuid.PcdMmBufferBase
+  gArmTokenSpaceGuid.PcdMmBufferSize
+
+[Depex]
+  gEfiCpuArchProtocolGuid

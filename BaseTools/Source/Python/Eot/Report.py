@@ -1,21 +1,16 @@
 ## @file
 # This file is used to create report for Eot tool
 #
-# Copyright (c) 2008 - 2014, Intel Corporation. All rights reserved.<BR>
-# This program and the accompanying materials
-# are licensed and made available under the terms and conditions of the BSD License
-# which accompanies this distribution.  The full text of the license may be found at
-# http://opensource.org/licenses/bsd-license.php
-#
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
 ##
 # Import Modules
 #
+from __future__ import absolute_import
 import Common.LongFilePathOs as os
-import EotGlobalData
+from . import EotGlobalData
 from Common.LongFilePathSupport import OpenLongFilePath as open
 
 ## Report() class
@@ -76,7 +71,7 @@ class Report(object):
     def GenerateUnDispatchedList(self):
         FvObj = self.FvObj
         EotGlobalData.gOP_UN_DISPATCHED.write('%s\n' % FvObj.Name)
-        for Item in FvObj.UnDispatchedFfsDict:
+        for Item in FvObj.UnDispatchedFfsDict.keys():
             EotGlobalData.gOP_UN_DISPATCHED.write('%s\n' % FvObj.UnDispatchedFfsDict[Item])
 
     ## GenerateFv() method
@@ -111,7 +106,7 @@ class Report(object):
         self.WriteLn(Content)
 
         EotGlobalData.gOP_DISPATCH_ORDER.write('Dispatched:\n')
-        for FfsId in FvObj.OrderedFfsDict:
+        for FfsId in FvObj.OrderedFfsDict.keys():
             self.GenerateFfs(FvObj.OrderedFfsDict[FfsId])
         Content = """     </table></td>
   </tr>"""
@@ -124,7 +119,7 @@ class Report(object):
         self.WriteLn(Content)
 
         EotGlobalData.gOP_DISPATCH_ORDER.write('\nUnDispatched:\n')
-        for FfsId in FvObj.UnDispatchedFfsDict:
+        for FfsId in FvObj.UnDispatchedFfsDict.keys():
             self.GenerateFfs(FvObj.UnDispatchedFfsDict[FfsId])
         Content = """     </table></td>
   </tr>"""
@@ -234,7 +229,7 @@ class Report(object):
     #
     def GenerateFfs(self, FfsObj):
         self.FfsIndex = self.FfsIndex + 1
-        if FfsObj != None and FfsObj.Type in [0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0xA]:
+        if FfsObj is not None and FfsObj.Type in [0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0xA]:
             FfsGuid = FfsObj.Guid
             FfsOffset = FfsObj._OFF_
             FfsName = 'Unknown-Module'
@@ -276,13 +271,13 @@ class Report(object):
       </tr>
       <tr id='Ffs%s' style='display:none;'>
         <td colspan="4"><table width="100%%"  border="1">""" % (self.FfsIndex, self.FfsIndex, self.FfsIndex, FfsPath, FfsName, FfsGuid, FfsOffset, FfsType, self.FfsIndex)
-            
+
             if self.DispatchList:
                 if FfsObj.Type in [0x04, 0x06]:
                     self.DispatchList.write("%s %s %s %s\n" % (FfsGuid, "P", FfsName, FfsPath))
                 if FfsObj.Type in [0x05, 0x07, 0x08, 0x0A]:
                     self.DispatchList.write("%s %s %s %s\n" % (FfsGuid, "D", FfsName, FfsPath))
-               
+
             self.WriteLn(Content)
 
             EotGlobalData.gOP_DISPATCH_ORDER.write('%s\n' %FfsName)
@@ -331,7 +326,7 @@ class Report(object):
                 Content = """            </table></td>
           </tr>"""
                 self.WriteLn(Content)
-            #End of Consumed Ppi/Portocol
+            #End of Consumed Ppi/Protocol
 
             # Find Produced Ppi/Protocol
             SqlCommand = """select ModuleName, ItemType, GuidName, GuidValue, GuidMacro from Report

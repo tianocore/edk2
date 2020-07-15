@@ -3,13 +3,7 @@
 
   Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -52,7 +46,7 @@ TcpInitTcbLocal (
   Initialize the peer related members.
 
   @param[in, out]  Tcb    Pointer to the TCP_CB of this TCP instance.
-  @param[in]       Seg    Pointer to the segment that contains the peer's intial information.
+  @param[in]       Seg    Pointer to the segment that contains the peer's initial information.
   @param[in]       Opt    Pointer to the options announced by the peer.
 
 **/
@@ -674,7 +668,7 @@ Tcp6RefreshNeighbor (
 //
 
 /**
-  The procotol handler provided to the socket layer, used to
+  The protocol handler provided to the socket layer, used to
   dispatch the socket level requests by calling the corresponding
   TCP layer functions.
 

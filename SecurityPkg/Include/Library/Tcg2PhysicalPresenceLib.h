@@ -2,14 +2,8 @@
   This library is intended to be used by BDS modules.
   This library will execute TPM2 request.
 
-Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials 
-are licensed and made available under the terms and conditions of the BSD License 
-which accompanies this distribution.  The full text of the license may be found at 
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, 
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2015 - 2020, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -35,8 +29,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // UEFI TCG2 library definition bit of the BIOS Information Flags
 //
-#define TCG2_BIOS_INFORMATION_FLAG_HIERACHY_CONTROL_STORAGE_DISABLE      BIT8
-#define TCG2_BIOS_INFORMATION_FLAG_HIERACHY_CONTROL_ENDORSEMENT_DISABLE  BIT9
+#define TCG2_BIOS_INFORMATION_FLAG_HIERARCHY_CONTROL_STORAGE_DISABLE      BIT8
+#define TCG2_BIOS_INFORMATION_FLAG_HIERARCHY_CONTROL_ENDORSEMENT_DISABLE  BIT9
 
 //
 // UEFI TCG2 library definition bit of the BIOS Storage Management Flags
@@ -45,30 +39,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define TCG2_BIOS_STORAGE_MANAGEMENT_FLAG_PP_REQUIRED_FOR_DISABLE_BLOCK_SID  BIT17
 #define TCG2_BIOS_STORAGE_MANAGEMENT_FLAG_ENABLE_BLOCK_SID                   BIT18
 
-//
-// Default value
-//
-#define TCG2_BIOS_TPM_MANAGEMENT_FLAG_DEFAULT  (TCG2_BIOS_TPM_MANAGEMENT_FLAG_PP_REQUIRED_FOR_TURN_OFF | \
-                                                TCG2_BIOS_TPM_MANAGEMENT_FLAG_PP_REQUIRED_FOR_CLEAR | \
-                                                TCG2_BIOS_TPM_MANAGEMENT_FLAG_PP_REQUIRED_FOR_CHANGE_EPS | \
-                                                TCG2_BIOS_TPM_MANAGEMENT_FLAG_PP_REQUIRED_FOR_CHANGE_PCRS)
-
-//
-// Default value
-//
-#define TCG2_BIOS_STORAGE_MANAGEMENT_FLAG_DEFAULT (TCG2_BIOS_STORAGE_MANAGEMENT_FLAG_PP_REQUIRED_FOR_ENABLE_BLOCK_SID | \
-                                                   TCG2_BIOS_STORAGE_MANAGEMENT_FLAG_PP_REQUIRED_FOR_DISABLE_BLOCK_SID)
-
 /**
   Check and execute the pending TPM request.
 
-  The TPM request may come from OS or BIOS. This API will display request information and wait 
+  The TPM request may come from OS or BIOS. This API will display request information and wait
   for user confirmation if TPM request exists. The TPM request will be sent to TPM device after
-  the TPM request is confirmed, and one or more reset may be required to make TPM request to 
+  the TPM request is confirmed, and one or more reset may be required to make TPM request to
   take effect.
-  
+
   This API should be invoked after console in and console out are all ready as they are required
-  to display request information and get user input to confirm the request.  
+  to display request information and get user input to confirm the request.
 
   @param  PlatformAuth                   platform auth value. NULL means no platform auth change.
 **/
@@ -83,7 +63,7 @@ Tcg2PhysicalPresenceLibProcessRequest (
 
   The TPM request may come from OS. This API will check if TPM request exists and need user
   input to confirmation.
-  
+
   @retval    TRUE        TPM needs input to confirm user physical presence.
   @retval    FALSE       TPM doesn't need input to confirm user physical presence.
 
@@ -173,7 +153,7 @@ Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunction (
   This API should be invoked in OS runtime phase to interface with ACPI method.
 
   Caution: This function may receive untrusted input.
-  
+
   @param[in]      OperationRequest TPM physical presence operation request.
 
   @return Return Code for Get User Confirmation Status for Operation.

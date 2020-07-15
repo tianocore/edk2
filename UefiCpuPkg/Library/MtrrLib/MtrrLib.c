@@ -1,22 +1,18 @@
 /** @file
   MTRR setting library
 
-  @par Note: 
+  @par Note:
     Most of services in this library instance are suggested to be invoked by BSP only,
     except for MtrrSetAllMtrrs() which is used to sync BSP's MTRR setting to APs.
 
-  Copyright (c) 2008 - 2016, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2008 - 2020, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include <Base.h>
+#include <Uefi.h>
+#include <Register/Intel/Cpuid.h>
+#include <Register/Intel/Msr.h>
 
 #include <Library/MtrrLib.h>
 #include <Library/BaseLib.h>
@@ -26,6 +22,12 @@
 
 #define OR_SEED      0x0101010101010101ull
 #define CLEAR_SEED   0xFFFFFFFFFFFFFFFFull
+#define MAX_WEIGHT   MAX_UINT8
+#define SCRATCH_BUFFER_SIZE           (4 * SIZE_4KB)
+#define MTRR_LIB_ASSERT_ALIGNED(B, L) ASSERT ((B & ~(L - 1)) == B);
+
+#define M(x,y) ((x) * VertexCount + (y))
+#define O(x,y) ((y) * VertexCount + (x))
 
 //
 // Context to save and restore when MTRRs are programmed
@@ -35,62 +37,76 @@ typedef struct {
   BOOLEAN  InterruptState;
 } MTRR_CONTEXT;
 
+typedef struct {
+  UINT64                 Address;
+  UINT64                 Alignment;
+  UINT64                 Length;
+  MTRR_MEMORY_CACHE_TYPE Type : 7;
+
+  //
+  // Temprary use for calculating the best MTRR settings.
+  //
+  BOOLEAN                Visited : 1;
+  UINT8                  Weight;
+  UINT16                 Previous;
+} MTRR_LIB_ADDRESS;
+
 //
 // This table defines the offset, base and length of the fixed MTRRs
 //
 CONST FIXED_MTRR  mMtrrLibFixedMtrrTable[] = {
   {
-    MTRR_LIB_IA32_MTRR_FIX64K_00000,
+    MSR_IA32_MTRR_FIX64K_00000,
     0,
     SIZE_64KB
   },
   {
-    MTRR_LIB_IA32_MTRR_FIX16K_80000,
+    MSR_IA32_MTRR_FIX16K_80000,
     0x80000,
     SIZE_16KB
   },
   {
-    MTRR_LIB_IA32_MTRR_FIX16K_A0000,
+    MSR_IA32_MTRR_FIX16K_A0000,
     0xA0000,
     SIZE_16KB
   },
   {
-    MTRR_LIB_IA32_MTRR_FIX4K_C0000,
+    MSR_IA32_MTRR_FIX4K_C0000,
     0xC0000,
     SIZE_4KB
   },
   {
-    MTRR_LIB_IA32_MTRR_FIX4K_C8000,
+    MSR_IA32_MTRR_FIX4K_C8000,
     0xC8000,
     SIZE_4KB
   },
   {
-    MTRR_LIB_IA32_MTRR_FIX4K_D0000,
+    MSR_IA32_MTRR_FIX4K_D0000,
     0xD0000,
     SIZE_4KB
   },
   {
-    MTRR_LIB_IA32_MTRR_FIX4K_D8000,
+    MSR_IA32_MTRR_FIX4K_D8000,
     0xD8000,
     SIZE_4KB
   },
   {
-    MTRR_LIB_IA32_MTRR_FIX4K_E0000,
+    MSR_IA32_MTRR_FIX4K_E0000,
     0xE0000,
     SIZE_4KB
   },
   {
-    MTRR_LIB_IA32_MTRR_FIX4K_E8000,
+    MSR_IA32_MTRR_FIX4K_E8000,
     0xE8000,
     SIZE_4KB
   },
   {
-    MTRR_LIB_IA32_MTRR_FIX4K_F0000,
+    MSR_IA32_MTRR_FIX4K_F0000,
     0xF0000,
     SIZE_4KB
   },
   {
-    MTRR_LIB_IA32_MTRR_FIX4K_F8000,
+    MSR_IA32_MTRR_FIX4K_F8000,
     0xF8000,
     SIZE_4KB
   }
@@ -110,6 +126,21 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8 *mMtrrMemoryCacheTypeShortName[] = {
   "R*"   // Invalid
 };
 
+
+/**
+  Worker function prints all MTRRs for debugging.
+
+  If MtrrSetting is not NULL, print MTRR settings from input MTRR
+  settings buffer.
+  If MtrrSetting is NULL, print MTRR settings from MTRRs.
+
+  @param  MtrrSetting    A buffer holding all MTRRs content.
+**/
+VOID
+MtrrDebugPrintAllMtrrsWorker (
+  IN MTRR_SETTINGS    *MtrrSetting
+  );
+
 /**
   Worker function returns the variable MTRR count for the CPU.
 
@@ -121,11 +152,11 @@ GetVariableMtrrCountWorker (
   VOID
   )
 {
-  UINT32  VariableMtrrCount;
+  MSR_IA32_MTRRCAP_REGISTER MtrrCap;
 
-  VariableMtrrCount = (UINT32)(AsmReadMsr64 (MTRR_LIB_IA32_MTRR_CAP) & MTRR_LIB_IA32_MTRR_CAP_VCNT_MASK);
-  ASSERT (VariableMtrrCount <= MTRR_NUMBER_OF_VARIABLE_MTRR);
-  return VariableMtrrCount;
+  MtrrCap.Uint64 = AsmReadMsr64 (MSR_IA32_MTRRCAP);
+  ASSERT (MtrrCap.Bits.VCNT <= ARRAY_SIZE (((MTRR_VARIABLE_SETTINGS *) 0)->Mtrr));
+  return MtrrCap.Bits.VCNT;
 }
 
 /**
@@ -204,11 +235,15 @@ MtrrGetDefaultMemoryTypeWorker (
   IN MTRR_SETTINGS      *MtrrSetting
   )
 {
+  MSR_IA32_MTRR_DEF_TYPE_REGISTER DefType;
+
   if (MtrrSetting == NULL) {
-    return (MTRR_MEMORY_CACHE_TYPE) (AsmReadMsr64 (MTRR_LIB_IA32_MTRR_DEF_TYPE) & 0x7);
+    DefType.Uint64 = AsmReadMsr64 (MSR_IA32_MTRR_DEF_TYPE);
   } else {
-    return (MTRR_MEMORY_CACHE_TYPE) (MtrrSetting->MtrrDefType & 0x7);
+    DefType.Uint64 = MtrrSetting->MtrrDefType;
   }
+
+  return (MTRR_MEMORY_CACHE_TYPE) DefType.Bits.Type;
 }
 
 
@@ -240,10 +275,11 @@ MtrrGetDefaultMemoryType (
 
 **/
 VOID
-PreMtrrChange (
+MtrrLibPreMtrrChange (
   OUT MTRR_CONTEXT  *MtrrContext
   )
 {
+  MSR_IA32_MTRR_DEF_TYPE_REGISTER  DefType;
   //
   // Disable interrupts and save current interrupt state
   //
@@ -268,7 +304,9 @@ PreMtrrChange (
   //
   // Disable MTRRs
   //
-  AsmMsrBitFieldWrite64 (MTRR_LIB_IA32_MTRR_DEF_TYPE, 10, 11, 0);
+  DefType.Uint64 = AsmReadMsr64 (MSR_IA32_MTRR_DEF_TYPE);
+  DefType.Bits.E = 0;
+  AsmWriteMsr64 (MSR_IA32_MTRR_DEF_TYPE, DefType.Uint64);
 }
 
 /**
@@ -281,7 +319,7 @@ PreMtrrChange (
 
 **/
 VOID
-PostMtrrChangeEnableCache (
+MtrrLibPostMtrrChangeEnableCache (
   IN MTRR_CONTEXT  *MtrrContext
   )
 {
@@ -316,16 +354,20 @@ PostMtrrChangeEnableCache (
 
 **/
 VOID
-PostMtrrChange (
+MtrrLibPostMtrrChange (
   IN MTRR_CONTEXT  *MtrrContext
   )
 {
+  MSR_IA32_MTRR_DEF_TYPE_REGISTER  DefType;
   //
   // Enable Cache MTRR
   //
-  AsmMsrBitFieldWrite64 (MTRR_LIB_IA32_MTRR_DEF_TYPE, 10, 11, 3);
+  DefType.Uint64 = AsmReadMsr64 (MSR_IA32_MTRR_DEF_TYPE);
+  DefType.Bits.E = 1;
+  DefType.Bits.FE = 1;
+  AsmWriteMsr64 (MSR_IA32_MTRR_DEF_TYPE, DefType.Uint64);
 
-  PostMtrrChangeEnableCache (MtrrContext);
+  MtrrLibPostMtrrChangeEnableCache (MtrrContext);
 }
 
 /**
@@ -397,14 +439,14 @@ MtrrGetVariableMtrrWorker (
 {
   UINT32  Index;
 
-  ASSERT (VariableMtrrCount <= MTRR_NUMBER_OF_VARIABLE_MTRR);
+  ASSERT (VariableMtrrCount <= ARRAY_SIZE (VariableSettings->Mtrr));
 
   for (Index = 0; Index < VariableMtrrCount; Index++) {
     if (MtrrSetting == NULL) {
       VariableSettings->Mtrr[Index].Base =
-        AsmReadMsr64 (MTRR_LIB_IA32_VARIABLE_MTRR_BASE + (Index << 1));
+        AsmReadMsr64 (MSR_IA32_MTRR_PHYSBASE0 + (Index << 1));
       VariableSettings->Mtrr[Index].Mask =
-        AsmReadMsr64 (MTRR_LIB_IA32_VARIABLE_MTRR_BASE + (Index << 1) + 1);
+        AsmReadMsr64 (MSR_IA32_MTRR_PHYSMASK0 + (Index << 1));
     } else {
       VariableSettings->Mtrr[Index].Base = MtrrSetting->Variables.Mtrr[Index].Base;
       VariableSettings->Mtrr[Index].Mask = MtrrSetting->Variables.Mtrr[Index].Mask;
@@ -415,40 +457,15 @@ MtrrGetVariableMtrrWorker (
 }
 
 /**
-  This function will get the raw value in variable MTRRs
-
-  @param[out]  VariableSettings   A buffer to hold variable MTRRs content.
-
-  @return The VariableSettings input pointer
-
-**/
-MTRR_VARIABLE_SETTINGS*
-EFIAPI
-MtrrGetVariableMtrr (
-  OUT MTRR_VARIABLE_SETTINGS         *VariableSettings
-  )
-{
-  if (!IsMtrrSupported ()) {
-    return VariableSettings;
-  }
-
-  return MtrrGetVariableMtrrWorker (
-           NULL,
-           GetVariableMtrrCountWorker (),
-           VariableSettings
-           );
-}
-
-/**
   Programs fixed MTRRs registers.
 
-  @param[in]      MemoryCacheType  The memory type to set.
+  @param[in]      Type             The memory type to set.
   @param[in, out] Base             The base address of memory range.
   @param[in, out] Length           The length of memory range.
-  @param[in, out] LastMsrNum       On input, the last index of the fixed MTRR MSR to program.
+  @param[in, out] LastMsrIndex     On input, the last index of the fixed MTRR MSR to program.
                                    On return, the current index of the fixed MTRR MSR to program.
-  @param[out]     ReturnClearMask  The bits to clear in the fixed MTRR MSR.
-  @param[out]     ReturnOrMask     The bits to set in the fixed MTRR MSR.
+  @param[out]     ClearMask        The bits to clear in the fixed MTRR MSR.
+  @param[out]     OrMask           The bits to set in the fixed MTRR MSR.
 
   @retval RETURN_SUCCESS      The cache type was updated successfully
   @retval RETURN_UNSUPPORTED  The requested range or cache type was invalid
@@ -456,31 +473,29 @@ MtrrGetVariableMtrr (
 
 **/
 RETURN_STATUS
-ProgramFixedMtrr (
-  IN     UINT64               MemoryCacheType,
-  IN OUT UINT64               *Base,
-  IN OUT UINT64               *Length,
-  IN OUT UINT32               *LastMsrNum,
-  OUT    UINT64               *ReturnClearMask,
-  OUT    UINT64               *ReturnOrMask
+MtrrLibProgramFixedMtrr (
+  IN     MTRR_MEMORY_CACHE_TYPE  Type,
+  IN OUT UINT64                  *Base,
+  IN OUT UINT64                  *Length,
+  IN OUT UINT32                  *LastMsrIndex,
+  OUT    UINT64                  *ClearMask,
+  OUT    UINT64                  *OrMask
   )
 {
-  UINT32  MsrNum;
+  UINT32  MsrIndex;
   UINT32  LeftByteShift;
   UINT32  RightByteShift;
-  UINT64  OrMask;
-  UINT64  ClearMask;
   UINT64  SubLength;
 
   //
   // Find the fixed MTRR index to be programmed
   //
-  for (MsrNum = *LastMsrNum + 1; MsrNum < MTRR_NUMBER_OF_FIXED_MTRR; MsrNum++) {
-    if ((*Base >= mMtrrLibFixedMtrrTable[MsrNum].BaseAddress) &&
+  for (MsrIndex = *LastMsrIndex + 1; MsrIndex < ARRAY_SIZE (mMtrrLibFixedMtrrTable); MsrIndex++) {
+    if ((*Base >= mMtrrLibFixedMtrrTable[MsrIndex].BaseAddress) &&
         (*Base <
             (
-              mMtrrLibFixedMtrrTable[MsrNum].BaseAddress +
-              (8 * mMtrrLibFixedMtrrTable[MsrNum].Length)
+              mMtrrLibFixedMtrrTable[MsrIndex].BaseAddress +
+              (8 * mMtrrLibFixedMtrrTable[MsrIndex].Length)
             )
           )
         ) {
@@ -488,65 +503,63 @@ ProgramFixedMtrr (
     }
   }
 
-  if (MsrNum >= MTRR_NUMBER_OF_FIXED_MTRR) {
-    return RETURN_UNSUPPORTED;
-  }
+  ASSERT (MsrIndex != ARRAY_SIZE (mMtrrLibFixedMtrrTable));
 
   //
   // Find the begin offset in fixed MTRR and calculate byte offset of left shift
   //
-  LeftByteShift = ((UINT32)*Base - mMtrrLibFixedMtrrTable[MsrNum].BaseAddress)
-               / mMtrrLibFixedMtrrTable[MsrNum].Length;
-
-  if (LeftByteShift >= 8) {
+  if ((((UINT32)*Base - mMtrrLibFixedMtrrTable[MsrIndex].BaseAddress) % mMtrrLibFixedMtrrTable[MsrIndex].Length) != 0) {
+    //
+    // Base address should be aligned to the begin of a certain Fixed MTRR range.
+    //
     return RETURN_UNSUPPORTED;
   }
+  LeftByteShift = ((UINT32)*Base - mMtrrLibFixedMtrrTable[MsrIndex].BaseAddress) / mMtrrLibFixedMtrrTable[MsrIndex].Length;
+  ASSERT (LeftByteShift < 8);
 
   //
   // Find the end offset in fixed MTRR and calculate byte offset of right shift
   //
-  SubLength = mMtrrLibFixedMtrrTable[MsrNum].Length * (8 - LeftByteShift);
+  SubLength = mMtrrLibFixedMtrrTable[MsrIndex].Length * (8 - LeftByteShift);
   if (*Length >= SubLength) {
     RightByteShift = 0;
   } else {
-    RightByteShift = 8 - LeftByteShift -
-                (UINT32)(*Length) / mMtrrLibFixedMtrrTable[MsrNum].Length;
-    if ((LeftByteShift >= 8) ||
-        (((UINT32)(*Length) % mMtrrLibFixedMtrrTable[MsrNum].Length) != 0)
-        ) {
+    if (((UINT32)(*Length) % mMtrrLibFixedMtrrTable[MsrIndex].Length) != 0) {
+      //
+      // Length should be aligned to the end of a certain Fixed MTRR range.
+      //
       return RETURN_UNSUPPORTED;
     }
+    RightByteShift = 8 - LeftByteShift - (UINT32)(*Length) / mMtrrLibFixedMtrrTable[MsrIndex].Length;
     //
     // Update SubLength by actual length
     //
     SubLength = *Length;
   }
 
-  ClearMask = CLEAR_SEED;
-  OrMask    = MultU64x32 (OR_SEED, (UINT32)MemoryCacheType);
+  *ClearMask = CLEAR_SEED;
+  *OrMask    = MultU64x32 (OR_SEED, (UINT32) Type);
 
   if (LeftByteShift != 0) {
     //
     // Clear the low bits by LeftByteShift
     //
-    ClearMask &= LShiftU64 (ClearMask, LeftByteShift * 8);
-    OrMask    &= LShiftU64 (OrMask, LeftByteShift * 8);
+    *ClearMask &= LShiftU64 (*ClearMask, LeftByteShift * 8);
+    *OrMask    &= LShiftU64 (*OrMask,    LeftByteShift * 8);
   }
 
   if (RightByteShift != 0) {
     //
     // Clear the high bits by RightByteShift
     //
-    ClearMask &= RShiftU64 (ClearMask, RightByteShift * 8);
-    OrMask    &= RShiftU64 (OrMask, RightByteShift * 8);
+    *ClearMask &= RShiftU64 (*ClearMask, RightByteShift * 8);
+    *OrMask    &= RShiftU64 (*OrMask,    RightByteShift * 8);
   }
 
   *Length -= SubLength;
   *Base   += SubLength;
 
-  *LastMsrNum      = MsrNum;
-  *ReturnClearMask = ClearMask;
-  *ReturnOrMask    = OrMask;
+  *LastMsrIndex    = MsrIndex;
 
   return RETURN_SUCCESS;
 }
@@ -558,20 +571,19 @@ ProgramFixedMtrr (
   This function shadows the content of variable MTRRs into an
   internal array: VariableMtrr.
 
-  @param[in]   VariableSettings           The variable MTRR values to shadow
-  @param[in]   FirmwareVariableMtrrCount  The number of variable MTRRs available to firmware
-  @param[in]   MtrrValidBitsMask          The mask for the valid bit of the MTRR
-  @param[in]   MtrrValidAddressMask       The valid address mask for MTRR
-  @param[out]  VariableMtrr               The array to shadow variable MTRRs content
+  @param[in]   VariableSettings      The variable MTRR values to shadow
+  @param[in]   VariableMtrrCount     The number of variable MTRRs
+  @param[in]   MtrrValidBitsMask     The mask for the valid bit of the MTRR
+  @param[in]   MtrrValidAddressMask  The valid address mask for MTRR
+  @param[out]  VariableMtrr          The array to shadow variable MTRRs content
 
-  @return                       The return value of this parameter indicates the
-                                number of MTRRs which has been used.
+  @return      Number of MTRRs which has been used.
 
 **/
 UINT32
 MtrrGetMemoryAttributeInVariableMtrrWorker (
   IN  MTRR_VARIABLE_SETTINGS  *VariableSettings,
-  IN  UINTN                   FirmwareVariableMtrrCount,
+  IN  UINTN                   VariableMtrrCount,
   IN  UINT64                  MtrrValidBitsMask,
   IN  UINT64                  MtrrValidAddressMask,
   OUT VARIABLE_MTRR           *VariableMtrr
@@ -580,12 +592,13 @@ MtrrGetMemoryAttributeInVariableMtrrWorker (
   UINTN   Index;
   UINT32  UsedMtrr;
 
-  ZeroMem (VariableMtrr, sizeof (VARIABLE_MTRR) * MTRR_NUMBER_OF_VARIABLE_MTRR);
-  for (Index = 0, UsedMtrr = 0; Index < FirmwareVariableMtrrCount; Index++) {
-    if ((VariableSettings->Mtrr[Index].Mask & MTRR_LIB_CACHE_MTRR_ENABLED) != 0) {
+  ZeroMem (VariableMtrr, sizeof (VARIABLE_MTRR) * ARRAY_SIZE (VariableSettings->Mtrr));
+  for (Index = 0, UsedMtrr = 0; Index < VariableMtrrCount; Index++) {
+    if (((MSR_IA32_MTRR_PHYSMASK_REGISTER *) &VariableSettings->Mtrr[Index].Mask)->Bits.V != 0) {
       VariableMtrr[Index].Msr         = (UINT32)Index;
       VariableMtrr[Index].BaseAddress = (VariableSettings->Mtrr[Index].Base & MtrrValidAddressMask);
-      VariableMtrr[Index].Length      = ((~(VariableSettings->Mtrr[Index].Mask & MtrrValidAddressMask)) & MtrrValidBitsMask) + 1;
+      VariableMtrr[Index].Length      =
+        ((~(VariableSettings->Mtrr[Index].Mask & MtrrValidAddressMask)) & MtrrValidBitsMask) + 1;
       VariableMtrr[Index].Type        = (VariableSettings->Mtrr[Index].Base & 0x0ff);
       VariableMtrr[Index].Valid       = TRUE;
       VariableMtrr[Index].Used        = TRUE;
@@ -595,6 +608,44 @@ MtrrGetMemoryAttributeInVariableMtrrWorker (
   return UsedMtrr;
 }
 
+/**
+  Convert variable MTRRs to a RAW MTRR_MEMORY_RANGE array.
+  One MTRR_MEMORY_RANGE element is created for each MTRR setting.
+  The routine doesn't remove the overlap or combine the near-by region.
+
+  @param[in]   VariableSettings      The variable MTRR values to shadow
+  @param[in]   VariableMtrrCount     The number of variable MTRRs
+  @param[in]   MtrrValidBitsMask     The mask for the valid bit of the MTRR
+  @param[in]   MtrrValidAddressMask  The valid address mask for MTRR
+  @param[out]  VariableMtrr          The array to shadow variable MTRRs content
+
+  @return      Number of MTRRs which has been used.
+
+**/
+UINT32
+MtrrLibGetRawVariableRanges (
+  IN  MTRR_VARIABLE_SETTINGS  *VariableSettings,
+  IN  UINTN                   VariableMtrrCount,
+  IN  UINT64                  MtrrValidBitsMask,
+  IN  UINT64                  MtrrValidAddressMask,
+  OUT MTRR_MEMORY_RANGE       *VariableMtrr
+  )
+{
+  UINTN   Index;
+  UINT32  UsedMtrr;
+
+  ZeroMem (VariableMtrr, sizeof (MTRR_MEMORY_RANGE) * ARRAY_SIZE (VariableSettings->Mtrr));
+  for (Index = 0, UsedMtrr = 0; Index < VariableMtrrCount; Index++) {
+    if (((MSR_IA32_MTRR_PHYSMASK_REGISTER *) &VariableSettings->Mtrr[Index].Mask)->Bits.V != 0) {
+      VariableMtrr[Index].BaseAddress = (VariableSettings->Mtrr[Index].Base & MtrrValidAddressMask);
+      VariableMtrr[Index].Length      =
+        ((~(VariableSettings->Mtrr[Index].Mask & MtrrValidAddressMask)) & MtrrValidBitsMask) + 1;
+      VariableMtrr[Index].Type        = (MTRR_MEMORY_CACHE_TYPE)(VariableSettings->Mtrr[Index].Base & 0x0ff);
+      UsedMtrr++;
+    }
+  }
+  return UsedMtrr;
+}
 
 /**
   Gets the attribute of variable MTRRs.
@@ -639,401 +690,50 @@ MtrrGetMemoryAttributeInVariableMtrr (
            );
 }
 
-
 /**
-  Checks overlap between given memory range and MTRRs.
+  Return the biggest alignment (lowest set bit) of address.
+  The function is equivalent to: 1 << LowBitSet64 (Address).
 
-  @param[in]  FirmwareVariableMtrrCount  The number of variable MTRRs available
-                                         to firmware.
-  @param[in]  Start                      The start address of memory range.
-  @param[in]  End                        The end address of memory range.
-  @param[in]  VariableMtrr               The array to shadow variable MTRRs content
+  @param Address    The address to return the alignment.
+  @param Alignment0 The alignment to return when Address is 0.
 
-  @retval TRUE             Overlap exists.
-  @retval FALSE            No overlap.
-
-**/
-BOOLEAN
-CheckMemoryAttributeOverlap (
-  IN UINTN             FirmwareVariableMtrrCount,
-  IN PHYSICAL_ADDRESS  Start,
-  IN PHYSICAL_ADDRESS  End,
-  IN VARIABLE_MTRR     *VariableMtrr
-  )
-{
-  UINT32  Index;
-
-  for (Index = 0; Index < FirmwareVariableMtrrCount; Index++) {
-    if (
-         VariableMtrr[Index].Valid &&
-         !(
-           (Start > (VariableMtrr[Index].BaseAddress +
-                     VariableMtrr[Index].Length - 1)
-           ) ||
-           (End < VariableMtrr[Index].BaseAddress)
-         )
-       ) {
-      return TRUE;
-    }
-  }
-
-  return FALSE;
-}
-
-
-/**
-  Marks a variable MTRR as non-valid.
-
-  @param[in]   Index         The index of the array VariableMtrr to be invalidated
-  @param[in]   VariableMtrr  The array to shadow variable MTRRs content
-  @param[out]  UsedMtrr      The number of MTRRs which has already been used
-
-**/
-VOID
-InvalidateShadowMtrr (
-  IN   UINTN              Index,
-  IN   VARIABLE_MTRR      *VariableMtrr,
-  OUT  UINT32             *UsedMtrr
-  )
-{
-  VariableMtrr[Index].Valid = FALSE;
-  *UsedMtrr = *UsedMtrr - 1;
-}
-
-
-/**
-  Combines memory attributes.
-
-  If overlap exists between given memory range and MTRRs, try to combine them.
-
-  @param[in]       FirmwareVariableMtrrCount  The number of variable MTRRs
-                                              available to firmware.
-  @param[in]       Attributes                 The memory type to set.
-  @param[in, out]  Base                       The base address of memory range.
-  @param[in, out]  Length                     The length of memory range.
-  @param[in]       VariableMtrr               The array to shadow variable MTRRs content
-  @param[in, out]  UsedMtrr                   The number of MTRRs which has already been used
-  @param[out]      OverwriteExistingMtrr      Returns whether an existing MTRR was used
-
-  @retval EFI_SUCCESS            Memory region successfully combined.
-  @retval EFI_ACCESS_DENIED      Memory region cannot be combined.
-
-**/
-RETURN_STATUS
-CombineMemoryAttribute (
-  IN     UINT32             FirmwareVariableMtrrCount,
-  IN     UINT64             Attributes,
-  IN OUT UINT64             *Base,
-  IN OUT UINT64             *Length,
-  IN     VARIABLE_MTRR      *VariableMtrr,
-  IN OUT UINT32             *UsedMtrr,
-  OUT    BOOLEAN            *OverwriteExistingMtrr
-  )
-{
-  UINT32  Index;
-  UINT64  CombineStart;
-  UINT64  CombineEnd;
-  UINT64  MtrrEnd;
-  UINT64  EndAddress;
-  BOOLEAN CoveredByExistingMtrr;
-
-  *OverwriteExistingMtrr = FALSE;
-  CoveredByExistingMtrr = FALSE;
-  EndAddress = *Base +*Length - 1;
-
-  for (Index = 0; Index < FirmwareVariableMtrrCount; Index++) {
-
-    MtrrEnd = VariableMtrr[Index].BaseAddress + VariableMtrr[Index].Length - 1;
-    if (
-         !VariableMtrr[Index].Valid ||
-         (
-           *Base > (MtrrEnd) ||
-           (EndAddress < VariableMtrr[Index].BaseAddress)
-         )
-       ) {
-      continue;
-    }
-
-    //
-    // Combine same attribute MTRR range
-    //
-    if (Attributes == VariableMtrr[Index].Type) {
-      //
-      // if the MTRR range contain the request range, set a flag, then continue to
-      // invalidate any MTRR of the same request range with higher priority cache type.
-      //
-      if (VariableMtrr[Index].BaseAddress <= *Base && MtrrEnd >= EndAddress) {
-        CoveredByExistingMtrr = TRUE;
-        continue;
-      }
-      //
-      // invalid this MTRR, and program the combine range
-      //
-      CombineStart  =
-        (*Base) < VariableMtrr[Index].BaseAddress ?
-          (*Base) :
-          VariableMtrr[Index].BaseAddress;
-      CombineEnd    = EndAddress > MtrrEnd ? EndAddress : MtrrEnd;
-
-      //
-      // Record the MTRR usage status in VariableMtrr array.
-      //
-      InvalidateShadowMtrr (Index, VariableMtrr, UsedMtrr);
-      *Base       = CombineStart;
-      *Length     = CombineEnd - CombineStart + 1;
-      EndAddress  = CombineEnd;
-      *OverwriteExistingMtrr = TRUE;
-      continue;
-    } else {
-      //
-      // The cache type is different, but the range is convered by one MTRR
-      //
-      if (VariableMtrr[Index].BaseAddress == *Base && MtrrEnd == EndAddress) {
-        InvalidateShadowMtrr (Index, VariableMtrr, UsedMtrr);
-        continue;
-      }
-
-    }
-
-    if ((Attributes== MTRR_CACHE_WRITE_THROUGH &&
-         VariableMtrr[Index].Type == MTRR_CACHE_WRITE_BACK) ||
-        (Attributes == MTRR_CACHE_WRITE_BACK &&
-         VariableMtrr[Index].Type == MTRR_CACHE_WRITE_THROUGH) ||
-        (Attributes == MTRR_CACHE_UNCACHEABLE) ||
-        (VariableMtrr[Index].Type == MTRR_CACHE_UNCACHEABLE)
-     ) {
-      *OverwriteExistingMtrr = TRUE;
-      continue;
-    }
-    //
-    // Other type memory overlap is invalid
-    //
-    return RETURN_ACCESS_DENIED;
-  }
-
-  if (CoveredByExistingMtrr) {
-    *Length = 0;
-  }
-
-  return RETURN_SUCCESS;
-}
-
-
-/**
-  Calculates the maximum value which is a power of 2, but less the MemoryLength.
-
-  @param[in]  MemoryLength        The number to pass in.
-
-  @return The maximum value which is align to power of 2 and less the MemoryLength
-
+  @return The least alignment of the Address.
 **/
 UINT64
-Power2MaxMemory (
-  IN UINT64                     MemoryLength
-  )
+MtrrLibBiggestAlignment (
+  UINT64    Address,
+  UINT64    Alignment0
+)
 {
-  UINT64  Result;
-
-  if (RShiftU64 (MemoryLength, 32) != 0) {
-    Result = LShiftU64 (
-               (UINT64) GetPowerOfTwo32 (
-                          (UINT32) RShiftU64 (MemoryLength, 32)
-                          ),
-               32
-               );
-  } else {
-    Result = (UINT64) GetPowerOfTwo32 ((UINT32) MemoryLength);
+  if (Address == 0) {
+    return Alignment0;
   }
 
-  return Result;
+  return Address & ((~Address) + 1);
 }
 
-
 /**
-  Determines the MTRR numbers used to program a memory range.
+  Return whether the left MTRR type precedes the right MTRR type.
 
-  This function first checks the alignment of the base address.
-  If the alignment of the base address <= Length, cover the memory range
- (BaseAddress, alignment) by a MTRR, then BaseAddress += alignment and
-  Length -= alignment. Repeat the step until alignment > Length.
+  The MTRR type precedence rules are:
+    1. UC precedes any other type
+    2. WT precedes WB
+  For further details, please refer the IA32 Software Developer's Manual,
+  Volume 3, Section "MTRR Precedences".
 
-  Then this function determines which direction of programming the variable
-  MTRRs for the remaining length will use fewer MTRRs.
+  @param Left  The left MTRR type.
+  @param Right The right MTRR type.
 
-  @param[in]  BaseAddress Length of Memory to program MTRR
-  @param[in]  Length      Length of Memory to program MTRR
-  @param[in]  MtrrNumber  Pointer to the number of necessary MTRRs
-
-  @retval TRUE        Positive direction is better.
-          FALSE       Negative direction is better.
-
+  @retval TRUE  Left precedes Right.
+  @retval FALSE Left doesn't precede Right.
 **/
 BOOLEAN
-GetMtrrNumberAndDirection (
-  IN UINT64      BaseAddress,
-  IN UINT64      Length,
-  IN UINTN       *MtrrNumber
-  )
+MtrrLibTypeLeftPrecedeRight (
+  IN MTRR_MEMORY_CACHE_TYPE  Left,
+  IN MTRR_MEMORY_CACHE_TYPE  Right
+)
 {
-  UINT64  TempQword;
-  UINT64  Alignment;
-  UINT32  Positive;
-  UINT32  Subtractive;
-
-  *MtrrNumber = 0;
-
-  if (BaseAddress != 0) {
-    do {
-      //
-      // Calculate the alignment of the base address.
-      //
-      Alignment = LShiftU64 (1, (UINTN)LowBitSet64 (BaseAddress));
-
-      if (Alignment > Length) {
-        break;
-      }
-
-      (*MtrrNumber)++;
-      BaseAddress += Alignment;
-      Length -= Alignment;
-    } while (TRUE);
-
-    if (Length == 0) {
-      return TRUE;
-    }
-  }
-
-  TempQword   = Length;
-  Positive    = 0;
-  Subtractive = 0;
-
-  do {
-    TempQword -= Power2MaxMemory (TempQword);
-    Positive++;
-  } while (TempQword != 0);
-
-  TempQword = Power2MaxMemory (LShiftU64 (Length, 1)) - Length;
-  Subtractive++;
-  do {
-    TempQword -= Power2MaxMemory (TempQword);
-    Subtractive++;
-  } while (TempQword != 0);
-
-  if (Positive <= Subtractive) {
-    *MtrrNumber += Positive;
-    return TRUE;
-  } else {
-    *MtrrNumber += Subtractive;
-    return FALSE;
-  }
-}
-
-/**
-  Invalid variable MTRRs according to the value in the shadow array.
-
-  This function programs MTRRs according to the values specified
-  in the shadow array.
-
-  @param[in, out]  VariableSettings   Variable MTRR settings
-  @param[in]       VariableMtrrCount  Number of variable MTRRs
-  @param[in, out]  VariableMtrr       Shadow of variable MTRR contents
-
-**/
-VOID
-InvalidateMtrr (
-  IN OUT MTRR_VARIABLE_SETTINGS  *VariableSettings,
-  IN     UINTN                   VariableMtrrCount,
-  IN OUT VARIABLE_MTRR           *VariableMtrr
-  )
-{
-  UINTN         Index;
-
-  for (Index = 0; Index < VariableMtrrCount; Index++) {
-    if (!VariableMtrr[Index].Valid && VariableMtrr[Index].Used) {
-       VariableSettings->Mtrr[Index].Base = 0;
-       VariableSettings->Mtrr[Index].Mask = 0;
-       VariableMtrr[Index].Used = FALSE;
-    }
-  }
-}
-
-
-/**
-  Programs variable MTRRs
-
-  This function programs variable MTRRs
-
-  @param[in, out]  VariableSettings      Variable MTRR settings.
-  @param[in]       MtrrNumber            Index of MTRR to program.
-  @param[in]       BaseAddress           Base address of memory region.
-  @param[in]       Length                Length of memory region.
-  @param[in]       MemoryCacheType       Memory type to set.
-  @param[in]       MtrrValidAddressMask  The valid address mask for MTRR
-
-**/
-VOID
-ProgramVariableMtrr (
-  IN OUT MTRR_VARIABLE_SETTINGS  *VariableSettings,
-  IN     UINTN                   MtrrNumber,
-  IN     PHYSICAL_ADDRESS        BaseAddress,
-  IN     UINT64                  Length,
-  IN     UINT64                  MemoryCacheType,
-  IN     UINT64                  MtrrValidAddressMask
-  )
-{
-  UINT64        TempQword;
-
-  //
-  // MTRR Physical Base
-  //
-  TempQword = (BaseAddress & MtrrValidAddressMask) | MemoryCacheType;
-  VariableSettings->Mtrr[MtrrNumber].Base = TempQword;
-
-  //
-  // MTRR Physical Mask
-  //
-  TempQword = ~(Length - 1);
-  VariableSettings->Mtrr[MtrrNumber].Mask = (TempQword & MtrrValidAddressMask) | MTRR_LIB_CACHE_MTRR_ENABLED;
-}
-
-
-/**
-  Converts the Memory attribute value to MTRR_MEMORY_CACHE_TYPE.
-
-  If MtrrSetting is not NULL, gets the default memory attribute from input
-  MTRR settings buffer.
-  If MtrrSetting is NULL, gets the default memory attribute from MSR.
-
-  @param[in]  MtrrSetting        A buffer holding all MTRRs content.
-  @param[in]  MtrrType           MTRR memory type
-
-  @return The enum item in MTRR_MEMORY_CACHE_TYPE
-
-**/
-MTRR_MEMORY_CACHE_TYPE
-GetMemoryCacheTypeFromMtrrType (
-  IN MTRR_SETTINGS         *MtrrSetting,
-  IN UINT64                MtrrType
-  )
-{
-  switch (MtrrType) {
-  case MTRR_CACHE_UNCACHEABLE:
-    return CacheUncacheable;
-  case MTRR_CACHE_WRITE_COMBINING:
-    return CacheWriteCombining;
-  case MTRR_CACHE_WRITE_THROUGH:
-    return CacheWriteThrough;
-  case MTRR_CACHE_WRITE_PROTECTED:
-    return CacheWriteProtected;
-  case MTRR_CACHE_WRITE_BACK:
-    return CacheWriteBack;
-  default:
-    //
-    // MtrrType is MTRR_CACHE_INVALID_TYPE, that means
-    // no MTRR covers the range
-    //
-    return MtrrGetDefaultMemoryTypeWorker (MtrrSetting);
-  }
+  return (BOOLEAN) (Left == CacheUncacheable || (Left == CacheWriteThrough && Right == CacheWriteBack));
 }
 
 /**
@@ -1051,22 +751,20 @@ MtrrLibInitializeMtrrMask (
   OUT UINT64 *MtrrValidAddressMask
   )
 {
-  UINT32  RegEax;
-  UINT8   PhysicalAddressBits;
+  UINT32                          MaxExtendedFunction;
+  CPUID_VIR_PHY_ADDRESS_SIZE_EAX  VirPhyAddressSize;
 
-  AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
 
-  if (RegEax >= 0x80000008) {
-    AsmCpuid (0x80000008, &RegEax, NULL, NULL, NULL);
+  AsmCpuid (CPUID_EXTENDED_FUNCTION, &MaxExtendedFunction, NULL, NULL, NULL);
 
-    PhysicalAddressBits = (UINT8) RegEax;
-
-    *MtrrValidBitsMask    = LShiftU64 (1, PhysicalAddressBits) - 1;
-    *MtrrValidAddressMask = *MtrrValidBitsMask & 0xfffffffffffff000ULL;
+  if (MaxExtendedFunction >= CPUID_VIR_PHY_ADDRESS_SIZE) {
+    AsmCpuid (CPUID_VIR_PHY_ADDRESS_SIZE, &VirPhyAddressSize.Uint32, NULL, NULL, NULL);
   } else {
-    *MtrrValidBitsMask    = MTRR_LIB_MSR_VALID_MASK;
-    *MtrrValidAddressMask = MTRR_LIB_CACHE_VALID_ADDRESS;
+    VirPhyAddressSize.Bits.PhysicalAddressBits = 36;
   }
+
+  *MtrrValidBitsMask = LShiftU64 (1, VirPhyAddressSize.Bits.PhysicalAddressBits) - 1;
+  *MtrrValidAddressMask = *MtrrValidBitsMask & 0xfffffffffffff000ULL;
 }
 
 
@@ -1074,71 +772,34 @@ MtrrLibInitializeMtrrMask (
   Determines the real attribute of a memory range.
 
   This function is to arbitrate the real attribute of the memory when
-  there are 2 MTRRs covers the same memory range.  For further details,
+  there are 2 MTRRs covers the same memory range. For further details,
   please refer the IA32 Software Developer's Manual, Volume 3,
-  Section 10.11.4.1.
+  Section "MTRR Precedences".
 
   @param[in]  MtrrType1    The first kind of Memory type
   @param[in]  MtrrType2    The second kind of memory type
 
 **/
-UINT64
-MtrrPrecedence (
-  IN UINT64    MtrrType1,
-  IN UINT64    MtrrType2
+MTRR_MEMORY_CACHE_TYPE
+MtrrLibPrecedence (
+  IN MTRR_MEMORY_CACHE_TYPE    MtrrType1,
+  IN MTRR_MEMORY_CACHE_TYPE    MtrrType2
   )
 {
-  UINT64 MtrrType;
-
-  MtrrType = MTRR_CACHE_INVALID_TYPE;
-  switch (MtrrType1) {
-  case MTRR_CACHE_UNCACHEABLE:
-    MtrrType = MTRR_CACHE_UNCACHEABLE;
-    break;
-  case MTRR_CACHE_WRITE_COMBINING:
-    if (
-         MtrrType2==MTRR_CACHE_WRITE_COMBINING ||
-         MtrrType2==MTRR_CACHE_UNCACHEABLE
-       ) {
-      MtrrType = MtrrType2;
-    }
-    break;
-  case MTRR_CACHE_WRITE_THROUGH:
-    if (
-         MtrrType2==MTRR_CACHE_WRITE_THROUGH ||
-         MtrrType2==MTRR_CACHE_WRITE_BACK
-       ) {
-      MtrrType = MTRR_CACHE_WRITE_THROUGH;
-    } else if(MtrrType2==MTRR_CACHE_UNCACHEABLE) {
-      MtrrType = MTRR_CACHE_UNCACHEABLE;
-    }
-    break;
-  case MTRR_CACHE_WRITE_PROTECTED:
-    if (MtrrType2 == MTRR_CACHE_WRITE_PROTECTED ||
-        MtrrType2 == MTRR_CACHE_UNCACHEABLE) {
-      MtrrType = MtrrType2;
-    }
-    break;
-  case MTRR_CACHE_WRITE_BACK:
-    if (
-         MtrrType2== MTRR_CACHE_UNCACHEABLE ||
-         MtrrType2==MTRR_CACHE_WRITE_THROUGH ||
-         MtrrType2== MTRR_CACHE_WRITE_BACK
-       ) {
-      MtrrType = MtrrType2;
-    }
-    break;
-  case MTRR_CACHE_INVALID_TYPE:
-    MtrrType = MtrrType2;
-    break;
-  default:
-    break;
+  if (MtrrType1 == MtrrType2) {
+    return MtrrType1;
   }
 
-  if (MtrrType2 == MTRR_CACHE_INVALID_TYPE) {
-    MtrrType = MtrrType1;
+  ASSERT (
+    MtrrLibTypeLeftPrecedeRight (MtrrType1, MtrrType2) ||
+    MtrrLibTypeLeftPrecedeRight (MtrrType2, MtrrType1)
+  );
+
+  if (MtrrLibTypeLeftPrecedeRight (MtrrType1, MtrrType2)) {
+    return MtrrType1;
+  } else {
+    return MtrrType2;
   }
-  return MtrrType;
 }
 
 /**
@@ -1160,29 +821,27 @@ MtrrGetMemoryAttributeByAddressWorker (
   IN PHYSICAL_ADDRESS   Address
   )
 {
-  UINT64                  TempQword;
-  UINTN                   Index;
-  UINTN                   SubIndex;
-  UINT64                  MtrrType;
-  UINT64                  TempMtrrType;
-  MTRR_MEMORY_CACHE_TYPE  CacheType;
-  VARIABLE_MTRR           VariableMtrr[MTRR_NUMBER_OF_VARIABLE_MTRR];
-  UINT64                  MtrrValidBitsMask;
-  UINT64                  MtrrValidAddressMask;
-  UINTN                   VariableMtrrCount;
-  MTRR_VARIABLE_SETTINGS  VariableSettings;
+  MSR_IA32_MTRR_DEF_TYPE_REGISTER DefType;
+  UINT64                          FixedMtrr;
+  UINTN                           Index;
+  UINTN                           SubIndex;
+  MTRR_MEMORY_CACHE_TYPE          MtrrType;
+  MTRR_MEMORY_RANGE               VariableMtrr[ARRAY_SIZE (MtrrSetting->Variables.Mtrr)];
+  UINT64                          MtrrValidBitsMask;
+  UINT64                          MtrrValidAddressMask;
+  UINT32                          VariableMtrrCount;
+  MTRR_VARIABLE_SETTINGS          VariableSettings;
 
   //
   // Check if MTRR is enabled, if not, return UC as attribute
   //
   if (MtrrSetting == NULL) {
-    TempQword = AsmReadMsr64 (MTRR_LIB_IA32_MTRR_DEF_TYPE);
+    DefType.Uint64 = AsmReadMsr64 (MSR_IA32_MTRR_DEF_TYPE);
   } else {
-    TempQword = MtrrSetting->MtrrDefType;
+    DefType.Uint64 = MtrrSetting->MtrrDefType;
   }
-  MtrrType = MTRR_CACHE_INVALID_TYPE;
 
-  if ((TempQword & MTRR_LIB_CACHE_MTRR_ENABLED) == 0) {
+  if (DefType.Bits.E == 0) {
     return CacheUncacheable;
   }
 
@@ -1190,65 +849,66 @@ MtrrGetMemoryAttributeByAddressWorker (
   // If address is less than 1M, then try to go through the fixed MTRR
   //
   if (Address < BASE_1MB) {
-    if ((TempQword & MTRR_LIB_CACHE_FIXED_MTRR_ENABLED) != 0) {
+    if (DefType.Bits.FE != 0) {
       //
       // Go through the fixed MTRR
       //
       for (Index = 0; Index < MTRR_NUMBER_OF_FIXED_MTRR; Index++) {
-         if (Address >= mMtrrLibFixedMtrrTable[Index].BaseAddress &&
-             Address  < (
-                          mMtrrLibFixedMtrrTable[Index].BaseAddress +
-                          (mMtrrLibFixedMtrrTable[Index].Length * 8)
-                        )
-            ) {
-           SubIndex =
-             ((UINTN)Address - mMtrrLibFixedMtrrTable[Index].BaseAddress) /
-               mMtrrLibFixedMtrrTable[Index].Length;
-           if (MtrrSetting == NULL) {
-             TempQword = AsmReadMsr64 (mMtrrLibFixedMtrrTable[Index].Msr);
-           } else {
-             TempQword = MtrrSetting->Fixed.Mtrr[Index];
-           }
-           MtrrType =  RShiftU64 (TempQword, SubIndex * 8) & 0xFF;
-           return GetMemoryCacheTypeFromMtrrType (MtrrSetting, MtrrType);
-         }
+        if (Address >= mMtrrLibFixedMtrrTable[Index].BaseAddress &&
+            Address < mMtrrLibFixedMtrrTable[Index].BaseAddress +
+            (mMtrrLibFixedMtrrTable[Index].Length * 8)) {
+          SubIndex =
+            ((UINTN) Address - mMtrrLibFixedMtrrTable[Index].BaseAddress) /
+            mMtrrLibFixedMtrrTable[Index].Length;
+          if (MtrrSetting == NULL) {
+            FixedMtrr = AsmReadMsr64 (mMtrrLibFixedMtrrTable[Index].Msr);
+          } else {
+            FixedMtrr = MtrrSetting->Fixed.Mtrr[Index];
+          }
+          return (MTRR_MEMORY_CACHE_TYPE) (RShiftU64 (FixedMtrr, SubIndex * 8) & 0xFF);
+        }
       }
     }
   }
-  MtrrLibInitializeMtrrMask(&MtrrValidBitsMask, &MtrrValidAddressMask);
 
-  MtrrGetVariableMtrrWorker (
-    MtrrSetting,
-    GetVariableMtrrCountWorker (),
-    &VariableSettings
-    );
+  VariableMtrrCount = GetVariableMtrrCountWorker ();
+  ASSERT (VariableMtrrCount <= ARRAY_SIZE (MtrrSetting->Variables.Mtrr));
+  MtrrGetVariableMtrrWorker (MtrrSetting, VariableMtrrCount, &VariableSettings);
 
-  MtrrGetMemoryAttributeInVariableMtrrWorker (
-           &VariableSettings,
-           GetFirmwareVariableMtrrCountWorker (),
-           MtrrValidBitsMask,
-           MtrrValidAddressMask,
-           VariableMtrr
-           );
+  MtrrLibInitializeMtrrMask (&MtrrValidBitsMask, &MtrrValidAddressMask);
+  MtrrLibGetRawVariableRanges (
+    &VariableSettings,
+    VariableMtrrCount,
+    MtrrValidBitsMask,
+    MtrrValidAddressMask,
+    VariableMtrr
+  );
 
   //
   // Go through the variable MTRR
   //
-  VariableMtrrCount = GetVariableMtrrCountWorker ();
-  ASSERT (VariableMtrrCount <= MTRR_NUMBER_OF_VARIABLE_MTRR);
-
+  MtrrType = CacheInvalid;
   for (Index = 0; Index < VariableMtrrCount; Index++) {
-    if (VariableMtrr[Index].Valid) {
+    if (VariableMtrr[Index].Length != 0) {
       if (Address >= VariableMtrr[Index].BaseAddress &&
-          Address < VariableMtrr[Index].BaseAddress+VariableMtrr[Index].Length) {
-        TempMtrrType = VariableMtrr[Index].Type;
-        MtrrType = MtrrPrecedence (MtrrType, TempMtrrType);
+          Address < VariableMtrr[Index].BaseAddress + VariableMtrr[Index].Length) {
+        if (MtrrType == CacheInvalid) {
+          MtrrType = (MTRR_MEMORY_CACHE_TYPE) VariableMtrr[Index].Type;
+        } else {
+          MtrrType = MtrrLibPrecedence (MtrrType, (MTRR_MEMORY_CACHE_TYPE) VariableMtrr[Index].Type);
+        }
       }
     }
   }
-  CacheType = GetMemoryCacheTypeFromMtrrType (MtrrSetting, MtrrType);
 
-  return CacheType;
+  //
+  // If there is no MTRR which covers the Address, use the default MTRR type.
+  //
+  if (MtrrType == CacheInvalid) {
+    MtrrType = (MTRR_MEMORY_CACHE_TYPE) DefType.Bits.Type;
+  }
+
+  return MtrrType;
 }
 
 
@@ -1276,606 +936,1504 @@ MtrrGetMemoryAttribute (
 }
 
 /**
-  Worker function prints all MTRRs for debugging.
+  Update the Ranges array to change the specified range identified by
+  BaseAddress and Length to Type.
 
-  If MtrrSetting is not NULL, print MTRR settings from from input MTRR
-  settings buffer.
-  If MtrrSetting is NULL, print MTRR settings from MTRRs.
+  @param Ranges      Array holding memory type settings for all memory regions.
+  @param Capacity    The maximum count of memory ranges the array can hold.
+  @param Count       Return the new memory range count in the array.
+  @param BaseAddress The base address of the memory range to change type.
+  @param Length      The length of the memory range to change type.
+  @param Type        The new type of the specified memory range.
 
-  @param  MtrrSetting    A buffer holding all MTRRs content.
-**/
-VOID
-MtrrDebugPrintAllMtrrsWorker (
-  IN MTRR_SETTINGS    *MtrrSetting
-  )
-{
-  DEBUG_CODE (
-    MTRR_SETTINGS  LocalMtrrs;
-    MTRR_SETTINGS  *Mtrrs;
-    UINTN          Index;
-    UINTN          Index1;
-    UINTN          VariableMtrrCount;
-    UINT64         Base;
-    UINT64         Limit;
-    UINT64         MtrrBase;
-    UINT64         MtrrLimit;
-    UINT64         RangeBase;
-    UINT64         RangeLimit;
-    UINT64         NoRangeBase;
-    UINT64         NoRangeLimit;
-    UINT32         RegEax;
-    UINTN          MemoryType;
-    UINTN          PreviousMemoryType;
-    BOOLEAN        Found;
-
-    if (!IsMtrrSupported ()) {
-      return;
-    }
-
-    DEBUG((DEBUG_CACHE, "MTRR Settings\n"));
-    DEBUG((DEBUG_CACHE, "=============\n"));
-
-    if (MtrrSetting != NULL) {
-      Mtrrs = MtrrSetting;
-    } else {
-      MtrrGetAllMtrrs (&LocalMtrrs);
-      Mtrrs = &LocalMtrrs;
-    }
-
-    DEBUG((DEBUG_CACHE, "MTRR Default Type: %016lx\n", Mtrrs->MtrrDefType));
-    for (Index = 0; Index < MTRR_NUMBER_OF_FIXED_MTRR; Index++) {
-      DEBUG((DEBUG_CACHE, "Fixed MTRR[%02d]   : %016lx\n", Index, Mtrrs->Fixed.Mtrr[Index]));
-    }
-
-    VariableMtrrCount = GetVariableMtrrCount ();
-    for (Index = 0; Index < VariableMtrrCount; Index++) {
-      DEBUG((DEBUG_CACHE, "Variable MTRR[%02d]: Base=%016lx Mask=%016lx\n",
-        Index,
-        Mtrrs->Variables.Mtrr[Index].Base,
-        Mtrrs->Variables.Mtrr[Index].Mask
-        ));
-    }
-    DEBUG((DEBUG_CACHE, "\n"));
-    DEBUG((DEBUG_CACHE, "MTRR Ranges\n"));
-    DEBUG((DEBUG_CACHE, "====================================\n"));
-
-    Base = 0;
-    PreviousMemoryType = MTRR_CACHE_INVALID_TYPE;
-    for (Index = 0; Index < MTRR_NUMBER_OF_FIXED_MTRR; Index++) {
-      Base = mMtrrLibFixedMtrrTable[Index].BaseAddress;
-      for (Index1 = 0; Index1 < 8; Index1++) {
-      MemoryType = (UINTN)(RShiftU64 (Mtrrs->Fixed.Mtrr[Index], Index1 * 8) & 0xff);
-        if (MemoryType > CacheWriteBack) {
-          MemoryType = MTRR_CACHE_INVALID_TYPE;
-        }
-        if (MemoryType != PreviousMemoryType) {
-          if (PreviousMemoryType != MTRR_CACHE_INVALID_TYPE) {
-            DEBUG((DEBUG_CACHE, "%016lx\n", Base - 1));
-          }
-          PreviousMemoryType = MemoryType;
-          DEBUG((DEBUG_CACHE, "%a:%016lx-", mMtrrMemoryCacheTypeShortName[MemoryType], Base));
-        }
-        Base += mMtrrLibFixedMtrrTable[Index].Length;
-      }
-    }
-    DEBUG((DEBUG_CACHE, "%016lx\n", Base - 1));
-
-    VariableMtrrCount = GetVariableMtrrCount ();
-
-    Limit        = BIT36 - 1;
-    AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
-    if (RegEax >= 0x80000008) {
-      AsmCpuid (0x80000008, &RegEax, NULL, NULL, NULL);
-      Limit = LShiftU64 (1, RegEax & 0xff) - 1;
-    }
-    Base = BASE_1MB;
-    PreviousMemoryType = MTRR_CACHE_INVALID_TYPE;
-    do {
-      MemoryType = MtrrGetMemoryAttributeByAddressWorker (Mtrrs, Base);
-      if (MemoryType > CacheWriteBack) {
-        MemoryType = MTRR_CACHE_INVALID_TYPE;
-      }
-
-      if (MemoryType != PreviousMemoryType) {
-        if (PreviousMemoryType != MTRR_CACHE_INVALID_TYPE) {
-          DEBUG((DEBUG_CACHE, "%016lx\n", Base - 1));
-        }
-        PreviousMemoryType = MemoryType;
-        DEBUG((DEBUG_CACHE, "%a:%016lx-", mMtrrMemoryCacheTypeShortName[MemoryType], Base));
-      }
-
-      RangeBase    = BASE_1MB;
-      NoRangeBase  = BASE_1MB;
-      RangeLimit   = Limit;
-      NoRangeLimit = Limit;
-
-      for (Index = 0, Found = FALSE; Index < VariableMtrrCount; Index++) {
-        if ((Mtrrs->Variables.Mtrr[Index].Mask & BIT11) == 0) {
-          //
-          // If mask is not valid, then do not display range
-          //
-          continue;
-        }
-        MtrrBase  = (Mtrrs->Variables.Mtrr[Index].Base & (~(SIZE_4KB - 1)));
-        MtrrLimit = MtrrBase + ((~(Mtrrs->Variables.Mtrr[Index].Mask & (~(SIZE_4KB - 1)))) & Limit);
-
-        if (Base >= MtrrBase && Base < MtrrLimit) {
-          Found = TRUE;
-        }
-
-        if (Base >= MtrrBase && MtrrBase > RangeBase) {
-          RangeBase = MtrrBase;
-        }
-        if (Base > MtrrLimit && MtrrLimit > RangeBase) {
-          RangeBase = MtrrLimit + 1;
-        }
-        if (Base < MtrrBase && MtrrBase < RangeLimit) {
-          RangeLimit = MtrrBase - 1;
-        }
-        if (Base < MtrrLimit && MtrrLimit <= RangeLimit) {
-          RangeLimit = MtrrLimit;
-        }
-
-        if (Base > MtrrLimit && NoRangeBase < MtrrLimit) {
-          NoRangeBase = MtrrLimit + 1;
-        }
-        if (Base < MtrrBase && NoRangeLimit > MtrrBase) {
-          NoRangeLimit = MtrrBase - 1;
-        }
-      }
-
-      if (Found) {
-        Base = RangeLimit + 1;
-      } else {
-        Base = NoRangeLimit + 1;
-      }
-    } while (Base < Limit);
-    DEBUG((DEBUG_CACHE, "%016lx\n\n", Base - 1));
-  );
-}
-
-
-/**
-  This function prints all MTRRs for debugging.
-**/
-VOID
-EFIAPI
-MtrrDebugPrintAllMtrrs (
-  VOID
-  )
-{
-  MtrrDebugPrintAllMtrrsWorker (NULL);
-}
-
-
-/**
-  Worker function attempts to set the attributes for a memory range.
-
-  If MtrrSettings is not NULL, set the attributes into the input MTRR
-  settings buffer.
-  If MtrrSettings is NULL, set the attributes into MTRRs registers.
-
-  @param[in, out]  MtrrSetting       A buffer holding all MTRRs content.
-  @param[in]       BaseAddress       The physical address that is the start
-                                     address of a memory region.
-  @param[in]       Length            The size in bytes of the memory region.
-  @param[in]       Attribute         The bit mask of attributes to set for the
-                                     memory region.
-
-  @retval RETURN_SUCCESS            The attributes were set for the memory
-                                    region.
-  @retval RETURN_INVALID_PARAMETER  Length is zero.
-  @retval RETURN_UNSUPPORTED        The processor does not support one or
-                                    more bytes of the memory resource range
-                                    specified by BaseAddress and Length.
-  @retval RETURN_UNSUPPORTED        The bit mask of attributes is not support
-                                    for the memory resource range specified
-                                    by BaseAddress and Length.
-  @retval RETURN_ACCESS_DENIED      The attributes for the memory resource
-                                    range specified by BaseAddress and Length
-                                    cannot be modified.
-  @retval RETURN_OUT_OF_RESOURCES   There are not enough system resources to
-                                    modify the attributes of the memory
-                                    resource range.
-
+  @retval RETURN_SUCCESS          The type of the specified memory range is
+                                  changed successfully.
+  @retval RETURN_ALREADY_STARTED  The type of the specified memory range equals
+                                  to the desired type.
+  @retval RETURN_OUT_OF_RESOURCES The new type set causes the count of memory
+                                  range exceeds capacity.
 **/
 RETURN_STATUS
-MtrrSetMemoryAttributeWorker (
-  IN OUT MTRR_SETTINGS           *MtrrSetting,
-  IN PHYSICAL_ADDRESS            BaseAddress,
-  IN UINT64                      Length,
-  IN MTRR_MEMORY_CACHE_TYPE      Attribute
+MtrrLibSetMemoryType (
+  IN MTRR_MEMORY_RANGE             *Ranges,
+  IN UINTN                         Capacity,
+  IN OUT UINTN                     *Count,
+  IN UINT64                        BaseAddress,
+  IN UINT64                        Length,
+  IN MTRR_MEMORY_CACHE_TYPE        Type
   )
 {
-  UINT64                    TempQword;
-  RETURN_STATUS             Status;
-  UINT64                    MemoryType;
-  UINT64                    Alignment;
-  BOOLEAN                   OverLap;
-  BOOLEAN                   Positive;
-  UINT32                    MsrNum;
-  UINTN                     MtrrNumber;
-  VARIABLE_MTRR             VariableMtrr[MTRR_NUMBER_OF_VARIABLE_MTRR];
-  UINT32                    UsedMtrr;
-  UINT64                    MtrrValidBitsMask;
-  UINT64                    MtrrValidAddressMask;
-  BOOLEAN                   OverwriteExistingMtrr;
-  UINT32                    FirmwareVariableMtrrCount;
-  MTRR_CONTEXT              MtrrContext;
-  BOOLEAN                   MtrrContextValid;
-  BOOLEAN                   FixedSettingsValid[MTRR_NUMBER_OF_FIXED_MTRR];
-  BOOLEAN                   FixedSettingsModified[MTRR_NUMBER_OF_FIXED_MTRR];
-  MTRR_FIXED_SETTINGS       WorkingFixedSettings;
-  UINT32                    VariableMtrrCount;
-  MTRR_VARIABLE_SETTINGS    OriginalVariableSettings;
-  BOOLEAN                   ProgramVariableSettings;
-  MTRR_VARIABLE_SETTINGS    WorkingVariableSettings;
-  UINT32                    Index;
-  UINT64                    ClearMask;
-  UINT64                    OrMask;
-  UINT64                    NewValue;
-  MTRR_VARIABLE_SETTINGS    *VariableSettings;
+  UINTN                            Index;
+  UINT64                           Limit;
+  UINT64                           LengthLeft;
+  UINT64                           LengthRight;
+  UINTN                            StartIndex;
+  UINTN                            EndIndex;
+  UINTN                            DeltaCount;
 
-  MtrrContextValid  = FALSE;
-  VariableMtrrCount = 0;
-  ZeroMem (&WorkingFixedSettings, sizeof (WorkingFixedSettings));
-  for (Index = 0; Index < MTRR_NUMBER_OF_FIXED_MTRR; Index++) {
-    FixedSettingsValid[Index]    = FALSE;
-    FixedSettingsModified[Index] = FALSE;
-  }
-  ProgramVariableSettings = FALSE;
-
-  if (!IsMtrrSupported ()) {
-    Status = RETURN_UNSUPPORTED;
-    goto Done;
-  }
-
-  MtrrLibInitializeMtrrMask (&MtrrValidBitsMask, &MtrrValidAddressMask);
-
-  TempQword = 0;
-  MemoryType = (UINT64)Attribute;
-  OverwriteExistingMtrr = FALSE;
-
-  //
-  // Check for an invalid parameter
-  //
-  if (Length == 0) {
-    Status = RETURN_INVALID_PARAMETER;
-    goto Done;
-  }
-
-  if (
-       (BaseAddress & ~MtrrValidAddressMask) != 0 ||
-       (Length & ~MtrrValidAddressMask) != 0
-     ) {
-    Status = RETURN_UNSUPPORTED;
-    goto Done;
-  }
-
-  //
-  // Check if Fixed MTRR
-  //
-  Status = RETURN_SUCCESS;
-  if (BaseAddress < BASE_1MB) {
-    MsrNum = (UINT32)-1;
-    while ((BaseAddress < BASE_1MB) && (Length > 0) && Status == RETURN_SUCCESS) {
-      Status = ProgramFixedMtrr (MemoryType, &BaseAddress, &Length, &MsrNum, &ClearMask, &OrMask);
-      if (RETURN_ERROR (Status)) {
-        goto Done;
-      }
-      if (MtrrSetting != NULL) {
-        MtrrSetting->Fixed.Mtrr[MsrNum] = (MtrrSetting->Fixed.Mtrr[MsrNum] & ~ClearMask) | OrMask;
-        MtrrSetting->MtrrDefType |= MTRR_LIB_CACHE_FIXED_MTRR_ENABLED;
-      } else {
-        if (!FixedSettingsValid[MsrNum]) {
-          WorkingFixedSettings.Mtrr[MsrNum] = AsmReadMsr64 (mMtrrLibFixedMtrrTable[MsrNum].Msr);
-          FixedSettingsValid[MsrNum] = TRUE;
-        }
-        NewValue = (WorkingFixedSettings.Mtrr[MsrNum] & ~ClearMask) | OrMask;
-        if (WorkingFixedSettings.Mtrr[MsrNum] != NewValue) {
-          WorkingFixedSettings.Mtrr[MsrNum] = NewValue;
-          FixedSettingsModified[MsrNum] = TRUE;
-        }
-      }
+  LengthRight = 0;
+  LengthLeft  = 0;
+  Limit = BaseAddress + Length;
+  StartIndex = *Count;
+  EndIndex = *Count;
+  for (Index = 0; Index < *Count; Index++) {
+    if ((StartIndex == *Count) &&
+        (Ranges[Index].BaseAddress <= BaseAddress) &&
+        (BaseAddress < Ranges[Index].BaseAddress + Ranges[Index].Length)) {
+      StartIndex = Index;
+      LengthLeft = BaseAddress - Ranges[Index].BaseAddress;
     }
 
-    if (Length == 0) {
-      //
-      // A Length of 0 can only make sense for fixed MTTR ranges.
-      // Since we just handled the fixed MTRRs, we can skip the
-      // variable MTRR section.
-      //
-      goto Done;
-    }
-  }
-
-  //
-  // Since memory ranges below 1MB will be overridden by the fixed MTRRs,
-  // we can set the base to 0 to save variable MTRRs.
-  //
-  if (BaseAddress == BASE_1MB) {
-    BaseAddress = 0;
-    Length += SIZE_1MB;
-  }
-
-  //
-  // Read all variable MTRRs
-  //
-  VariableMtrrCount = GetVariableMtrrCountWorker ();
-  FirmwareVariableMtrrCount = GetFirmwareVariableMtrrCountWorker ();
-  if (MtrrSetting != NULL) {
-    VariableSettings = &MtrrSetting->Variables;
-  } else {
-    MtrrGetVariableMtrrWorker (NULL, VariableMtrrCount, &OriginalVariableSettings);
-    CopyMem (&WorkingVariableSettings, &OriginalVariableSettings, sizeof (WorkingVariableSettings));
-    ProgramVariableSettings = TRUE;
-    VariableSettings = &WorkingVariableSettings;
-  }
-
-  //
-  // Check for overlap
-  //
-  UsedMtrr = MtrrGetMemoryAttributeInVariableMtrrWorker (
-               VariableSettings,
-               FirmwareVariableMtrrCount,
-               MtrrValidBitsMask,
-               MtrrValidAddressMask,
-               VariableMtrr
-               );
-  OverLap = CheckMemoryAttributeOverlap (
-              FirmwareVariableMtrrCount,
-              BaseAddress,
-              BaseAddress + Length - 1,
-              VariableMtrr
-              );
-  if (OverLap) {
-    Status = CombineMemoryAttribute (
-               FirmwareVariableMtrrCount,
-               MemoryType,
-               &BaseAddress,
-               &Length,
-               VariableMtrr,
-               &UsedMtrr,
-               &OverwriteExistingMtrr
-               );
-    if (RETURN_ERROR (Status)) {
-      goto Done;
-    }
-
-    if (Length == 0) {
-      //
-      // Combined successfully, invalidate the now-unused MTRRs
-      //
-      InvalidateMtrr (VariableSettings, VariableMtrrCount, VariableMtrr);
-      Status = RETURN_SUCCESS;
-      goto Done;
-    }
-  }
-
-  //
-  // The memory type is the same with the type specified by
-  // MTRR_LIB_IA32_MTRR_DEF_TYPE.
-  //
-  if ((!OverwriteExistingMtrr) && (Attribute == MtrrGetDefaultMemoryTypeWorker (MtrrSetting))) {
-    //
-    // Invalidate the now-unused MTRRs
-    //
-    InvalidateMtrr (VariableSettings, VariableMtrrCount, VariableMtrr);
-    goto Done;
-  }
-
-  Positive = GetMtrrNumberAndDirection (BaseAddress, Length, &MtrrNumber);
-
-  if ((UsedMtrr + MtrrNumber) > FirmwareVariableMtrrCount) {
-    Status = RETURN_OUT_OF_RESOURCES;
-    goto Done;
-  }
-
-  //
-  // Invalidate the now-unused MTRRs
-  //
-  InvalidateMtrr (VariableSettings, VariableMtrrCount, VariableMtrr);
-
-  //
-  // Find first unused MTRR
-  //
-  for (MsrNum = 0; MsrNum < VariableMtrrCount; MsrNum++) {
-    if ((VariableSettings->Mtrr[MsrNum].Mask & MTRR_LIB_CACHE_MTRR_ENABLED) == 0) {
+    if ((EndIndex == *Count) &&
+        (Ranges[Index].BaseAddress < Limit) &&
+        (Limit <= Ranges[Index].BaseAddress + Ranges[Index].Length)) {
+      EndIndex = Index;
+      LengthRight = Ranges[Index].BaseAddress + Ranges[Index].Length - Limit;
       break;
     }
   }
 
-  if (BaseAddress != 0) {
-    do {
-      //
-      // Calculate the alignment of the base address.
-      //
-      Alignment = LShiftU64 (1, (UINTN)LowBitSet64 (BaseAddress));
+  ASSERT (StartIndex != *Count && EndIndex != *Count);
+  if (StartIndex == EndIndex && Ranges[StartIndex].Type == Type) {
+    return RETURN_ALREADY_STARTED;
+  }
 
-      if (Alignment > Length) {
-        break;
+  //
+  // The type change may cause merging with previous range or next range.
+  // Update the StartIndex, EndIndex, BaseAddress, Length so that following
+  // logic doesn't need to consider merging.
+  //
+  if (StartIndex != 0) {
+    if (LengthLeft == 0 && Ranges[StartIndex - 1].Type == Type) {
+      StartIndex--;
+      Length += Ranges[StartIndex].Length;
+      BaseAddress -= Ranges[StartIndex].Length;
+    }
+  }
+  if (EndIndex != (*Count) - 1) {
+    if (LengthRight == 0 && Ranges[EndIndex + 1].Type == Type) {
+      EndIndex++;
+      Length += Ranges[EndIndex].Length;
+    }
+  }
+
+  //
+  // |- 0 -|- 1 -|- 2 -|- 3 -| StartIndex EndIndex DeltaCount  Count (Count = 4)
+  //   |++++++++++++++++++|    0          3         1=3-0-2    3
+  //   |+++++++|               0          1        -1=1-0-2    5
+  //   |+|                     0          0        -2=0-0-2    6
+  // |+++|                     0          0        -1=0-0-2+1  5
+  //
+  //
+  DeltaCount = EndIndex - StartIndex - 2;
+  if (LengthLeft == 0) {
+    DeltaCount++;
+  }
+  if (LengthRight == 0) {
+    DeltaCount++;
+  }
+  if (*Count - DeltaCount > Capacity) {
+    return RETURN_OUT_OF_RESOURCES;
+  }
+
+  //
+  // Reserve (-DeltaCount) space
+  //
+  CopyMem (&Ranges[EndIndex + 1 - DeltaCount], &Ranges[EndIndex + 1], (*Count - EndIndex - 1) * sizeof (Ranges[0]));
+  *Count -= DeltaCount;
+
+  if (LengthLeft != 0) {
+    Ranges[StartIndex].Length = LengthLeft;
+    StartIndex++;
+  }
+  if (LengthRight != 0) {
+    Ranges[EndIndex - DeltaCount].BaseAddress = BaseAddress + Length;
+    Ranges[EndIndex - DeltaCount].Length = LengthRight;
+    Ranges[EndIndex - DeltaCount].Type = Ranges[EndIndex].Type;
+  }
+  Ranges[StartIndex].BaseAddress = BaseAddress;
+  Ranges[StartIndex].Length = Length;
+  Ranges[StartIndex].Type = Type;
+  return RETURN_SUCCESS;
+}
+
+/**
+  Return the number of memory types in range [BaseAddress, BaseAddress + Length).
+
+  @param Ranges      Array holding memory type settings for all memory regions.
+  @param RangeCount  The count of memory ranges the array holds.
+  @param BaseAddress Base address.
+  @param Length      Length.
+  @param Types       Return bit mask to indicate all memory types in the specified range.
+
+  @retval  Number of memory types.
+**/
+UINT8
+MtrrLibGetNumberOfTypes (
+  IN CONST MTRR_MEMORY_RANGE     *Ranges,
+  IN UINTN                       RangeCount,
+  IN UINT64                      BaseAddress,
+  IN UINT64                      Length,
+  IN OUT UINT8                   *Types  OPTIONAL
+  )
+{
+  UINTN                          Index;
+  UINT8                          TypeCount;
+  UINT8                          LocalTypes;
+
+  TypeCount = 0;
+  LocalTypes = 0;
+  for (Index = 0; Index < RangeCount; Index++) {
+    if ((Ranges[Index].BaseAddress <= BaseAddress) &&
+        (BaseAddress < Ranges[Index].BaseAddress + Ranges[Index].Length)
+        ) {
+      if ((LocalTypes & (1 << Ranges[Index].Type)) == 0) {
+        LocalTypes |= (UINT8)(1 << Ranges[Index].Type);
+        TypeCount++;
       }
 
+      if (BaseAddress + Length > Ranges[Index].BaseAddress + Ranges[Index].Length) {
+        Length -= Ranges[Index].BaseAddress + Ranges[Index].Length - BaseAddress;
+        BaseAddress = Ranges[Index].BaseAddress + Ranges[Index].Length;
+      } else {
+        break;
+      }
+    }
+  }
+
+  if (Types != NULL) {
+    *Types = LocalTypes;
+  }
+  return TypeCount;
+}
+
+/**
+  Calculate the least MTRR number from vertex Start to Stop and update
+  the Previous of all vertices from Start to Stop is updated to reflect
+  how the memory range is covered by MTRR.
+
+  @param VertexCount     The count of vertices in the graph.
+  @param Vertices        Array holding all vertices.
+  @param Weight          2-dimention array holding weights between vertices.
+  @param Start           Start vertex.
+  @param Stop            Stop vertex.
+  @param IncludeOptional TRUE to count the optional weight.
+**/
+VOID
+MtrrLibCalculateLeastMtrrs (
+  IN UINT16                      VertexCount,
+  IN MTRR_LIB_ADDRESS            *Vertices,
+  IN OUT CONST UINT8             *Weight,
+  IN UINT16                      Start,
+  IN UINT16                      Stop,
+  IN BOOLEAN                     IncludeOptional
+  )
+{
+  UINT16                         Index;
+  UINT8                          MinWeight;
+  UINT16                         MinI;
+  UINT8                          Mandatory;
+  UINT8                          Optional;
+
+  for (Index = Start; Index <= Stop; Index++) {
+    Vertices[Index].Visited = FALSE;
+    Mandatory = Weight[M(Start,Index)];
+    Vertices[Index].Weight = Mandatory;
+    if (Mandatory != MAX_WEIGHT) {
+      Optional = IncludeOptional ? Weight[O(Start, Index)] : 0;
+      Vertices[Index].Weight += Optional;
+      ASSERT (Vertices[Index].Weight >= Optional);
+    }
+  }
+
+  MinI = Start;
+  MinWeight = 0;
+  while (!Vertices[Stop].Visited) {
+    //
+    // Update the weight from the shortest vertex to other unvisited vertices
+    //
+    for (Index = Start + 1; Index <= Stop; Index++) {
+      if (!Vertices[Index].Visited) {
+        Mandatory = Weight[M(MinI, Index)];
+        if (Mandatory != MAX_WEIGHT) {
+          Optional = IncludeOptional ? Weight[O(MinI, Index)] : 0;
+          if (MinWeight + Mandatory + Optional <= Vertices[Index].Weight) {
+            Vertices[Index].Weight   = MinWeight + Mandatory + Optional;
+            Vertices[Index].Previous = MinI; // Previous is Start based.
+          }
+        }
+      }
+    }
+
+    //
+    // Find the shortest vertex from Start
+    //
+    MinI      = VertexCount;
+    MinWeight = MAX_WEIGHT;
+    for (Index = Start + 1; Index <= Stop; Index++) {
+      if (!Vertices[Index].Visited && MinWeight > Vertices[Index].Weight) {
+        MinI      = Index;
+        MinWeight = Vertices[Index].Weight;
+      }
+    }
+
+    //
+    // Mark the shortest vertex from Start as visited
+    //
+    Vertices[MinI].Visited = TRUE;
+  }
+}
+
+/**
+  Append the MTRR setting to MTRR setting array.
+
+  @param Mtrrs        Array holding all MTRR settings.
+  @param MtrrCapacity Capacity of the MTRR array.
+  @param MtrrCount    The count of MTRR settings in array.
+  @param BaseAddress  Base address.
+  @param Length       Length.
+  @param Type         Memory type.
+
+  @retval RETURN_SUCCESS          MTRR setting is appended to array.
+  @retval RETURN_OUT_OF_RESOURCES Array is full.
+**/
+RETURN_STATUS
+MtrrLibAppendVariableMtrr (
+  IN OUT MTRR_MEMORY_RANGE       *Mtrrs,
+  IN     UINT32                  MtrrCapacity,
+  IN OUT UINT32                  *MtrrCount,
+  IN     UINT64                  BaseAddress,
+  IN     UINT64                  Length,
+  IN     MTRR_MEMORY_CACHE_TYPE  Type
+  )
+{
+  if (*MtrrCount == MtrrCapacity) {
+    return RETURN_OUT_OF_RESOURCES;
+  }
+
+  Mtrrs[*MtrrCount].BaseAddress = BaseAddress;
+  Mtrrs[*MtrrCount].Length      = Length;
+  Mtrrs[*MtrrCount].Type        = Type;
+  (*MtrrCount)++;
+  return RETURN_SUCCESS;
+}
+
+/**
+  Return the memory type that has the least precedence.
+
+  @param TypeBits  Bit mask of memory type.
+
+  @retval  Memory type that has the least precedence.
+**/
+MTRR_MEMORY_CACHE_TYPE
+MtrrLibLowestType (
+  IN      UINT8                    TypeBits
+)
+{
+  INT8                             Type;
+
+  ASSERT (TypeBits != 0);
+  for (Type = 7; (INT8)TypeBits > 0; Type--, TypeBits <<= 1);
+  return (MTRR_MEMORY_CACHE_TYPE)Type;
+}
+
+/**
+  Return TRUE when the Operand is exactly power of 2.
+
+  @retval TRUE  Operand is exactly power of 2.
+  @retval FALSE Operand is not power of 2.
+**/
+BOOLEAN
+MtrrLibIsPowerOfTwo (
+  IN     UINT64                  Operand
+)
+{
+  ASSERT (Operand != 0);
+  return (BOOLEAN) ((Operand & (Operand - 1)) == 0);
+}
+
+/**
+  Calculate the subtractive path from vertex Start to Stop.
+
+  @param DefaultType  Default memory type.
+  @param A0           Alignment to use when base address is 0.
+  @param Ranges       Array holding memory type settings for all memory regions.
+  @param RangeCount   The count of memory ranges the array holds.
+  @param VertexCount  The count of vertices in the graph.
+  @param Vertices     Array holding all vertices.
+  @param Weight       2-dimention array holding weights between vertices.
+  @param Start        Start vertex.
+  @param Stop         Stop vertex.
+  @param Types        Type bit mask of memory range from Start to Stop.
+  @param TypeCount    Number of different memory types from Start to Stop.
+  @param Mtrrs        Array holding all MTRR settings.
+  @param MtrrCapacity Capacity of the MTRR array.
+  @param MtrrCount    The count of MTRR settings in array.
+
+  @retval RETURN_SUCCESS          The subtractive path is calculated successfully.
+  @retval RETURN_OUT_OF_RESOURCES The MTRR setting array is full.
+
+**/
+RETURN_STATUS
+MtrrLibCalculateSubtractivePath (
+  IN MTRR_MEMORY_CACHE_TYPE      DefaultType,
+  IN UINT64                      A0,
+  IN CONST MTRR_MEMORY_RANGE     *Ranges,
+  IN UINTN                       RangeCount,
+  IN UINT16                      VertexCount,
+  IN MTRR_LIB_ADDRESS            *Vertices,
+  IN OUT UINT8                   *Weight,
+  IN UINT16                      Start,
+  IN UINT16                      Stop,
+  IN UINT8                       Types,
+  IN UINT8                       TypeCount,
+  IN OUT MTRR_MEMORY_RANGE       *Mtrrs,       OPTIONAL
+  IN UINT32                      MtrrCapacity, OPTIONAL
+  IN OUT UINT32                  *MtrrCount    OPTIONAL
+  )
+{
+  RETURN_STATUS                  Status;
+  UINT64                         Base;
+  UINT64                         Length;
+  UINT8                          PrecedentTypes;
+  UINTN                          Index;
+  UINT64                         HBase;
+  UINT64                         HLength;
+  UINT64                         SubLength;
+  UINT16                         SubStart;
+  UINT16                         SubStop;
+  UINT16                         Cur;
+  UINT16                         Pre;
+  MTRR_MEMORY_CACHE_TYPE         LowestType;
+  MTRR_MEMORY_CACHE_TYPE         LowestPrecedentType;
+
+  Base   = Vertices[Start].Address;
+  Length = Vertices[Stop].Address - Base;
+
+  LowestType = MtrrLibLowestType (Types);
+
+  //
+  // Clear the lowest type (highest bit) to get the precedent types
+  //
+  PrecedentTypes = ~(1 << LowestType) & Types;
+  LowestPrecedentType = MtrrLibLowestType (PrecedentTypes);
+
+  if (Mtrrs == NULL) {
+    Weight[M(Start, Stop)] = ((LowestType == DefaultType) ? 0 : 1);
+    Weight[O(Start, Stop)] = ((LowestType == DefaultType) ? 1 : 0);
+  }
+
+  // Add all high level ranges
+  HBase = MAX_UINT64;
+  HLength = 0;
+  for (Index = 0; Index < RangeCount; Index++) {
+    if (Length == 0) {
+      break;
+    }
+    if ((Base < Ranges[Index].BaseAddress) || (Ranges[Index].BaseAddress + Ranges[Index].Length <= Base)) {
+      continue;
+    }
+
+    //
+    // Base is in the Range[Index]
+    //
+    if (Base + Length > Ranges[Index].BaseAddress + Ranges[Index].Length) {
+      SubLength = Ranges[Index].BaseAddress + Ranges[Index].Length - Base;
+    } else {
+      SubLength = Length;
+    }
+    if (((1 << Ranges[Index].Type) & PrecedentTypes) != 0) {
       //
-      // Find unused MTRR
+      // Meet a range whose types take precedence.
+      // Update the [HBase, HBase + HLength) to include the range,
+      // [HBase, HBase + HLength) may contain sub ranges with 2 different types, and both take precedence.
       //
-      for (; MsrNum < VariableMtrrCount; MsrNum++) {
-        if ((VariableSettings->Mtrr[MsrNum].Mask & MTRR_LIB_CACHE_MTRR_ENABLED) == 0) {
+      if (HBase == MAX_UINT64) {
+        HBase = Base;
+      }
+      HLength += SubLength;
+    }
+
+    Base += SubLength;
+    Length -= SubLength;
+
+    if (HLength == 0) {
+      continue;
+    }
+
+    if ((Ranges[Index].Type == LowestType) || (Length == 0)) { // meet low type or end
+
+      //
+      // Add the MTRRs for each high priority type range
+      // the range[HBase, HBase + HLength) contains only two types.
+      // We might use positive or subtractive, depending on which way uses less MTRR
+      //
+      for (SubStart = Start; SubStart <= Stop; SubStart++) {
+        if (Vertices[SubStart].Address == HBase) {
           break;
         }
       }
 
-      ProgramVariableMtrr (
-        VariableSettings,
-        MsrNum,
-        BaseAddress,
-        Alignment,
-        MemoryType,
-        MtrrValidAddressMask
-        );
-      BaseAddress += Alignment;
-      Length -= Alignment;
-    } while (TRUE);
-
-    if (Length == 0) {
-      goto Done;
-    }
-  }
-
-  TempQword = Length;
-
-  if (!Positive) {
-    Length = Power2MaxMemory (LShiftU64 (TempQword, 1));
-
-    //
-    // Find unused MTRR
-    //
-    for (; MsrNum < VariableMtrrCount; MsrNum++) {
-      if ((VariableSettings->Mtrr[MsrNum].Mask & MTRR_LIB_CACHE_MTRR_ENABLED) == 0) {
-        break;
-      }
-    }
-
-    ProgramVariableMtrr (
-      VariableSettings,
-      MsrNum,
-      BaseAddress,
-      Length,
-      MemoryType,
-      MtrrValidAddressMask
-      );
-    BaseAddress += Length;
-    TempQword   = Length - TempQword;
-    MemoryType  = MTRR_CACHE_UNCACHEABLE;
-  }
-
-  do {
-    //
-    // Find unused MTRR
-    //
-    for (; MsrNum < VariableMtrrCount; MsrNum++) {
-      if ((VariableSettings->Mtrr[MsrNum].Mask & MTRR_LIB_CACHE_MTRR_ENABLED) == 0) {
-        break;
-      }
-    }
-
-    Length = Power2MaxMemory (TempQword);
-    if (!Positive) {
-      BaseAddress -= Length;
-    }
-
-    ProgramVariableMtrr (
-      VariableSettings,
-      MsrNum,
-      BaseAddress,
-      Length,
-      MemoryType,
-      MtrrValidAddressMask
-      );
-
-    if (Positive) {
-      BaseAddress += Length;
-    }
-    TempQword -= Length;
-
-  } while (TempQword > 0);
-
-Done:
-
-  //
-  // Write fixed MTRRs that have been modified
-  //
-  for (Index = 0; Index < MTRR_NUMBER_OF_FIXED_MTRR; Index++) {
-    if (FixedSettingsModified[Index]) {
-      if (!MtrrContextValid) {
-        PreMtrrChange (&MtrrContext);
-        MtrrContextValid = TRUE;
-      }
-      AsmWriteMsr64 (
-        mMtrrLibFixedMtrrTable[Index].Msr,
-        WorkingFixedSettings.Mtrr[Index]
-        );
-    }
-  }
-
-  //
-  // Write variable MTRRs
-  //
-  if (ProgramVariableSettings) {
-    for (Index = 0; Index < VariableMtrrCount; Index++) {
-      if (WorkingVariableSettings.Mtrr[Index].Base != OriginalVariableSettings.Mtrr[Index].Base ||
-          WorkingVariableSettings.Mtrr[Index].Mask != OriginalVariableSettings.Mtrr[Index].Mask    ) {
-        if (!MtrrContextValid) {
-          PreMtrrChange (&MtrrContext);
-          MtrrContextValid = TRUE;
+      for (SubStop = SubStart; SubStop <= Stop; SubStop++) {
+        if (Vertices[SubStop].Address == HBase + HLength) {
+          break;
         }
-        AsmWriteMsr64 (
-          MTRR_LIB_IA32_VARIABLE_MTRR_BASE + (Index << 1),
-          WorkingVariableSettings.Mtrr[Index].Base
-          );
-        AsmWriteMsr64 (
-          MTRR_LIB_IA32_VARIABLE_MTRR_BASE + (Index << 1) + 1,
-          WorkingVariableSettings.Mtrr[Index].Mask
-          );
       }
+      ASSERT (Vertices[SubStart].Address == HBase);
+      ASSERT (Vertices[SubStop].Address == HBase + HLength);
+
+      if ((TypeCount == 2) || (SubStart == SubStop - 1)) {
+        //
+        // add subtractive MTRRs for [HBase, HBase + HLength)
+        // [HBase, HBase + HLength) contains only one type.
+        // while - loop is to split the range to MTRR - compliant aligned range.
+        //
+        if (Mtrrs == NULL) {
+          Weight[M (Start, Stop)] += (UINT8)(SubStop - SubStart);
+        } else {
+          while (SubStart != SubStop) {
+            Status = MtrrLibAppendVariableMtrr (
+              Mtrrs, MtrrCapacity, MtrrCount,
+              Vertices[SubStart].Address, Vertices[SubStart].Length, Vertices[SubStart].Type
+            );
+            if (RETURN_ERROR (Status)) {
+              return Status;
+            }
+            SubStart++;
+          }
+        }
+      } else {
+        ASSERT (TypeCount == 3);
+        MtrrLibCalculateLeastMtrrs (VertexCount, Vertices, Weight, SubStart, SubStop, TRUE);
+
+        if (Mtrrs == NULL) {
+          Weight[M (Start, Stop)] += Vertices[SubStop].Weight;
+        } else {
+          // When we need to collect the optimal path from SubStart to SubStop
+          while (SubStop != SubStart) {
+            Cur = SubStop;
+            Pre = Vertices[Cur].Previous;
+            SubStop = Pre;
+
+            if (Weight[M (Pre, Cur)] + Weight[O (Pre, Cur)] != 0) {
+              Status = MtrrLibAppendVariableMtrr (
+                Mtrrs, MtrrCapacity, MtrrCount,
+                Vertices[Pre].Address, Vertices[Cur].Address - Vertices[Pre].Address,
+                (Pre != Cur - 1) ? LowestPrecedentType : Vertices[Pre].Type
+              );
+              if (RETURN_ERROR (Status)) {
+                return Status;
+              }
+            }
+            if (Pre != Cur - 1) {
+              Status = MtrrLibCalculateSubtractivePath (
+                DefaultType, A0,
+                Ranges, RangeCount,
+                VertexCount, Vertices, Weight,
+                Pre, Cur, PrecedentTypes, 2,
+                Mtrrs, MtrrCapacity, MtrrCount
+              );
+              if (RETURN_ERROR (Status)) {
+                return Status;
+              }
+            }
+          }
+        }
+
+      }
+      //
+      // Reset HBase, HLength
+      //
+      HBase = MAX_UINT64;
+      HLength = 0;
     }
   }
-  if (MtrrContextValid) {
-    PostMtrrChange (&MtrrContext);
-  }
-
-  DEBUG((DEBUG_CACHE, "  Status = %r\n", Status));
-  if (!RETURN_ERROR (Status)) {
-    if (MtrrSetting != NULL) {
-      MtrrSetting->MtrrDefType |= MTRR_LIB_CACHE_MTRR_ENABLED;
-    }
-    MtrrDebugPrintAllMtrrsWorker (MtrrSetting);
-  }
-
-  return Status;
+  return RETURN_SUCCESS;
 }
 
 /**
-  This function attempts to set the attributes for a memory range.
+  Calculate MTRR settings to cover the specified memory ranges.
 
-  @param[in]  BaseAddress        The physical address that is the start
-                                 address of a memory region.
-  @param[in]  Length             The size in bytes of the memory region.
-  @param[in]  Attributes         The bit mask of attributes to set for the
-                                 memory region.
+  @param DefaultType  Default memory type.
+  @param A0           Alignment to use when base address is 0.
+  @param Ranges       Memory range array holding the memory type
+                      settings for all memory address.
+  @param RangeCount   Count of memory ranges.
+  @param Scratch      A temporary scratch buffer that is used to perform the calculation.
+                      This is an optional parameter that may be NULL.
+  @param ScratchSize  Pointer to the size in bytes of the scratch buffer.
+                      It may be updated to the actual required size when the calculation
+                      needs more scratch buffer.
+  @param Mtrrs        Array holding all MTRR settings.
+  @param MtrrCapacity Capacity of the MTRR array.
+  @param MtrrCount    The count of MTRR settings in array.
 
-  @retval RETURN_SUCCESS            The attributes were set for the memory
-                                    region.
-  @retval RETURN_INVALID_PARAMETER  Length is zero.
-  @retval RETURN_UNSUPPORTED        The processor does not support one or
-                                    more bytes of the memory resource range
-                                    specified by BaseAddress and Length.
-  @retval RETURN_UNSUPPORTED        The bit mask of attributes is not support
-                                    for the memory resource range specified
-                                    by BaseAddress and Length.
-  @retval RETURN_ACCESS_DENIED      The attributes for the memory resource
-                                    range specified by BaseAddress and Length
-                                    cannot be modified.
-  @retval RETURN_OUT_OF_RESOURCES   There are not enough system resources to
-                                    modify the attributes of the memory
-                                    resource range.
+  @retval RETURN_SUCCESS          Variable MTRRs are allocated successfully.
+  @retval RETURN_OUT_OF_RESOURCES Count of variable MTRRs exceeds capacity.
+  @retval RETURN_BUFFER_TOO_SMALL The scratch buffer is too small for MTRR calculation.
+**/
+RETURN_STATUS
+MtrrLibCalculateMtrrs (
+  IN MTRR_MEMORY_CACHE_TYPE  DefaultType,
+  IN UINT64                  A0,
+  IN CONST MTRR_MEMORY_RANGE *Ranges,
+  IN UINTN                   RangeCount,
+  IN VOID                    *Scratch,
+  IN OUT UINTN               *ScratchSize,
+  IN OUT MTRR_MEMORY_RANGE   *Mtrrs,
+  IN UINT32                  MtrrCapacity,
+  IN OUT UINT32              *MtrrCount
+  )
+{
+  UINT64                    Base0;
+  UINT64                    Base1;
+  UINTN                     Index;
+  UINT64                    Base;
+  UINT64                    Length;
+  UINT64                    Alignment;
+  UINT64                    SubLength;
+  MTRR_LIB_ADDRESS          *Vertices;
+  UINT8                     *Weight;
+  UINT32                    VertexIndex;
+  UINT32                    VertexCount;
+  UINTN                     RequiredScratchSize;
+  UINT8                     TypeCount;
+  UINT16                    Start;
+  UINT16                    Stop;
+  UINT8                     Type;
+  RETURN_STATUS             Status;
 
+  Base0 = Ranges[0].BaseAddress;
+  Base1 = Ranges[RangeCount - 1].BaseAddress + Ranges[RangeCount - 1].Length;
+  MTRR_LIB_ASSERT_ALIGNED (Base0, Base1 - Base0);
+
+  //
+  // Count the number of vertices.
+  //
+  Vertices = (MTRR_LIB_ADDRESS*)Scratch;
+  for (VertexIndex = 0, Index = 0; Index < RangeCount; Index++) {
+    Base = Ranges[Index].BaseAddress;
+    Length = Ranges[Index].Length;
+    while (Length != 0) {
+      Alignment = MtrrLibBiggestAlignment (Base, A0);
+      SubLength = Alignment;
+      if (SubLength > Length) {
+        SubLength = GetPowerOfTwo64 (Length);
+      }
+      if (VertexIndex < *ScratchSize / sizeof (*Vertices)) {
+        Vertices[VertexIndex].Address   = Base;
+        Vertices[VertexIndex].Alignment = Alignment;
+        Vertices[VertexIndex].Type      = Ranges[Index].Type;
+        Vertices[VertexIndex].Length    = SubLength;
+      }
+      Base   += SubLength;
+      Length -= SubLength;
+      VertexIndex++;
+    }
+  }
+  //
+  // Vertices[VertexIndex] = Base1, so whole vertex count is (VertexIndex + 1).
+  //
+  VertexCount = VertexIndex + 1;
+  DEBUG ((
+    DEBUG_CACHE, "  Count of vertices (%016llx - %016llx) = %d\n",
+    Ranges[0].BaseAddress, Ranges[RangeCount - 1].BaseAddress + Ranges[RangeCount - 1].Length, VertexCount
+    ));
+  ASSERT (VertexCount < MAX_UINT16);
+
+  RequiredScratchSize = VertexCount * sizeof (*Vertices) + VertexCount * VertexCount * sizeof (*Weight);
+  if (*ScratchSize < RequiredScratchSize) {
+    *ScratchSize = RequiredScratchSize;
+    return RETURN_BUFFER_TOO_SMALL;
+  }
+  Vertices[VertexCount - 1].Address = Base1;
+
+  Weight = (UINT8 *) &Vertices[VertexCount];
+  for (VertexIndex = 0; VertexIndex < VertexCount; VertexIndex++) {
+    //
+    // Set optional weight between vertices and self->self to 0
+    //
+    SetMem (&Weight[M(VertexIndex, 0)], VertexIndex + 1, 0);
+    //
+    // Set mandatory weight between vertices to MAX_WEIGHT
+    //
+    SetMem (&Weight[M (VertexIndex, VertexIndex + 1)], VertexCount - VertexIndex - 1, MAX_WEIGHT);
+
+    // Final result looks like:
+    //   00 FF FF FF
+    //   00 00 FF FF
+    //   00 00 00 FF
+    //   00 00 00 00
+  }
+
+  //
+  // Set mandatory weight and optional weight for adjacent vertices
+  //
+  for (VertexIndex = 0; VertexIndex < VertexCount - 1; VertexIndex++) {
+    if (Vertices[VertexIndex].Type != DefaultType) {
+      Weight[M (VertexIndex, VertexIndex + 1)] = 1;
+      Weight[O (VertexIndex, VertexIndex + 1)] = 0;
+    } else {
+      Weight[M (VertexIndex, VertexIndex + 1)] = 0;
+      Weight[O (VertexIndex, VertexIndex + 1)] = 1;
+    }
+  }
+
+  for (TypeCount = 2; TypeCount <= 3; TypeCount++) {
+    for (Start = 0; Start < VertexCount; Start++) {
+      for (Stop = Start + 2; Stop < VertexCount; Stop++) {
+        ASSERT (Vertices[Stop].Address > Vertices[Start].Address);
+        Length = Vertices[Stop].Address - Vertices[Start].Address;
+        if (Length > Vertices[Start].Alignment) {
+          //
+          // Pickup a new Start when [Start, Stop) cannot be described by one MTRR.
+          //
+          break;
+        }
+        if ((Weight[M(Start, Stop)] == MAX_WEIGHT) && MtrrLibIsPowerOfTwo (Length)) {
+          if (MtrrLibGetNumberOfTypes (
+                Ranges, RangeCount, Vertices[Start].Address, Vertices[Stop].Address - Vertices[Start].Address, &Type
+                ) == TypeCount) {
+            //
+            // Update the Weight[Start, Stop] using subtractive path.
+            //
+            MtrrLibCalculateSubtractivePath (
+              DefaultType, A0,
+              Ranges, RangeCount,
+              (UINT16)VertexCount, Vertices, Weight,
+              Start, Stop, Type, TypeCount,
+              NULL, 0, NULL
+              );
+          } else if (TypeCount == 2) {
+            //
+            // Pick up a new Start when we expect 2-type range, but 3-type range is met.
+            // Because no matter how Stop is increased, we always meet 3-type range.
+            //
+            break;
+          }
+        }
+      }
+    }
+  }
+
+  Status = RETURN_SUCCESS;
+  MtrrLibCalculateLeastMtrrs ((UINT16) VertexCount, Vertices, Weight, 0, (UINT16) VertexCount - 1, FALSE);
+  Stop = (UINT16) VertexCount - 1;
+  while (Stop != 0) {
+    Start = Vertices[Stop].Previous;
+    TypeCount = MAX_UINT8;
+    Type = 0;
+    if (Weight[M(Start, Stop)] != 0) {
+      TypeCount = MtrrLibGetNumberOfTypes (Ranges, RangeCount, Vertices[Start].Address, Vertices[Stop].Address - Vertices[Start].Address, &Type);
+      Status = MtrrLibAppendVariableMtrr (
+        Mtrrs, MtrrCapacity, MtrrCount,
+        Vertices[Start].Address, Vertices[Stop].Address - Vertices[Start].Address,
+        MtrrLibLowestType (Type)
+        );
+      if (RETURN_ERROR (Status)) {
+        break;
+      }
+    }
+
+    if (Start != Stop - 1) {
+      //
+      // substractive path
+      //
+      if (TypeCount == MAX_UINT8) {
+        TypeCount = MtrrLibGetNumberOfTypes (
+                      Ranges, RangeCount, Vertices[Start].Address, Vertices[Stop].Address - Vertices[Start].Address, &Type
+                      );
+      }
+      Status = MtrrLibCalculateSubtractivePath (
+                 DefaultType, A0,
+                 Ranges, RangeCount,
+                 (UINT16) VertexCount, Vertices, Weight, Start, Stop,
+                 Type, TypeCount,
+                 Mtrrs, MtrrCapacity, MtrrCount
+                 );
+      if (RETURN_ERROR (Status)) {
+        break;
+      }
+    }
+    Stop = Start;
+  }
+  return Status;
+}
+
+
+/**
+  Apply the fixed MTRR settings to memory range array.
+
+  @param Fixed             The fixed MTRR settings.
+  @param Ranges            Return the memory range array holding memory type
+                           settings for all memory address.
+  @param RangeCapacity     The capacity of memory range array.
+  @param RangeCount        Return the count of memory range.
+
+  @retval RETURN_SUCCESS          The memory range array is returned successfully.
+  @retval RETURN_OUT_OF_RESOURCES The count of memory ranges exceeds capacity.
+**/
+RETURN_STATUS
+MtrrLibApplyFixedMtrrs (
+  IN     MTRR_FIXED_SETTINGS  *Fixed,
+  IN OUT MTRR_MEMORY_RANGE    *Ranges,
+  IN     UINTN                RangeCapacity,
+  IN OUT UINTN                *RangeCount
+  )
+{
+  RETURN_STATUS               Status;
+  UINTN                       MsrIndex;
+  UINTN                       Index;
+  MTRR_MEMORY_CACHE_TYPE      MemoryType;
+  UINT64                      Base;
+
+  Base = 0;
+  for (MsrIndex = 0; MsrIndex < ARRAY_SIZE (mMtrrLibFixedMtrrTable); MsrIndex++) {
+    ASSERT (Base == mMtrrLibFixedMtrrTable[MsrIndex].BaseAddress);
+    for (Index = 0; Index < sizeof (UINT64); Index++) {
+      MemoryType = (MTRR_MEMORY_CACHE_TYPE)((UINT8 *)(&Fixed->Mtrr[MsrIndex]))[Index];
+      Status = MtrrLibSetMemoryType (
+                 Ranges, RangeCapacity, RangeCount, Base, mMtrrLibFixedMtrrTable[MsrIndex].Length, MemoryType
+                 );
+      if (Status == RETURN_OUT_OF_RESOURCES) {
+        return Status;
+      }
+      Base += mMtrrLibFixedMtrrTable[MsrIndex].Length;
+    }
+  }
+  ASSERT (Base == BASE_1MB);
+  return RETURN_SUCCESS;
+}
+
+/**
+  Apply the variable MTRR settings to memory range array.
+
+  @param VariableMtrr      The variable MTRR array.
+  @param VariableMtrrCount The count of variable MTRRs.
+  @param Ranges            Return the memory range array with new MTRR settings applied.
+  @param RangeCapacity     The capacity of memory range array.
+  @param RangeCount        Return the count of memory range.
+
+  @retval RETURN_SUCCESS          The memory range array is returned successfully.
+  @retval RETURN_OUT_OF_RESOURCES The count of memory ranges exceeds capacity.
+**/
+RETURN_STATUS
+MtrrLibApplyVariableMtrrs (
+  IN     CONST MTRR_MEMORY_RANGE *VariableMtrr,
+  IN     UINT32                  VariableMtrrCount,
+  IN OUT MTRR_MEMORY_RANGE       *Ranges,
+  IN     UINTN                   RangeCapacity,
+  IN OUT UINTN                   *RangeCount
+  )
+{
+  RETURN_STATUS                  Status;
+  UINTN                          Index;
+
+  //
+  // WT > WB
+  // UC > *
+  // UC > * (except WB, UC) > WB
+  //
+
+  //
+  // 1. Set WB
+  //
+  for (Index = 0; Index < VariableMtrrCount; Index++) {
+    if ((VariableMtrr[Index].Length != 0) && (VariableMtrr[Index].Type == CacheWriteBack)) {
+      Status = MtrrLibSetMemoryType (
+        Ranges, RangeCapacity, RangeCount,
+        VariableMtrr[Index].BaseAddress, VariableMtrr[Index].Length, VariableMtrr[Index].Type
+      );
+      if (Status == RETURN_OUT_OF_RESOURCES) {
+        return Status;
+      }
+    }
+  }
+
+  //
+  // 2. Set other types than WB or UC
+  //
+  for (Index = 0; Index < VariableMtrrCount; Index++) {
+    if ((VariableMtrr[Index].Length != 0) &&
+        (VariableMtrr[Index].Type != CacheWriteBack) && (VariableMtrr[Index].Type != CacheUncacheable)) {
+      Status = MtrrLibSetMemoryType (
+                 Ranges, RangeCapacity, RangeCount,
+                 VariableMtrr[Index].BaseAddress, VariableMtrr[Index].Length, VariableMtrr[Index].Type
+                 );
+      if (Status == RETURN_OUT_OF_RESOURCES) {
+        return Status;
+      }
+    }
+  }
+
+  //
+  // 3. Set UC
+  //
+  for (Index = 0; Index < VariableMtrrCount; Index++) {
+    if (VariableMtrr[Index].Length != 0 && VariableMtrr[Index].Type == CacheUncacheable) {
+      Status = MtrrLibSetMemoryType (
+                 Ranges, RangeCapacity, RangeCount,
+                 VariableMtrr[Index].BaseAddress, VariableMtrr[Index].Length, VariableMtrr[Index].Type
+                 );
+      if (Status == RETURN_OUT_OF_RESOURCES) {
+        return Status;
+      }
+    }
+  }
+  return RETURN_SUCCESS;
+}
+
+/**
+  Return the memory type bit mask that's compatible to first type in the Ranges.
+
+  @param Ranges     Memory range array holding the memory type
+                    settings for all memory address.
+  @param RangeCount Count of memory ranges.
+
+  @return Compatible memory type bit mask.
+**/
+UINT8
+MtrrLibGetCompatibleTypes (
+  IN CONST MTRR_MEMORY_RANGE *Ranges,
+  IN UINTN                   RangeCount
+  )
+{
+  ASSERT (RangeCount != 0);
+
+  switch (Ranges[0].Type) {
+  case CacheWriteBack:
+  case CacheWriteThrough:
+    return (1 << CacheWriteBack) | (1 << CacheWriteThrough) | (1 << CacheUncacheable);
+    break;
+
+  case CacheWriteCombining:
+  case CacheWriteProtected:
+    return (1 << Ranges[0].Type) | (1 << CacheUncacheable);
+    break;
+
+  case CacheUncacheable:
+    if (RangeCount == 1) {
+      return (1 << CacheUncacheable);
+    }
+    return MtrrLibGetCompatibleTypes (&Ranges[1], RangeCount - 1);
+    break;
+
+  case CacheInvalid:
+  default:
+    ASSERT (FALSE);
+    break;
+  }
+  return 0;
+}
+
+/**
+  Overwrite the destination MTRR settings with the source MTRR settings.
+  This routine is to make sure the modification to destination MTRR settings
+  is as small as possible.
+
+  @param DstMtrrs     Destination MTRR settings.
+  @param DstMtrrCount Count of destination MTRR settings.
+  @param SrcMtrrs     Source MTRR settings.
+  @param SrcMtrrCount Count of source MTRR settings.
+  @param Modified     Flag array to indicate which destination MTRR setting is modified.
+**/
+VOID
+MtrrLibMergeVariableMtrr (
+  MTRR_MEMORY_RANGE *DstMtrrs,
+  UINT32            DstMtrrCount,
+  MTRR_MEMORY_RANGE *SrcMtrrs,
+  UINT32            SrcMtrrCount,
+  BOOLEAN           *Modified
+  )
+{
+  UINT32          DstIndex;
+  UINT32          SrcIndex;
+
+  ASSERT (SrcMtrrCount <= DstMtrrCount);
+
+  for (DstIndex = 0; DstIndex < DstMtrrCount; DstIndex++) {
+    Modified[DstIndex] = FALSE;
+
+    if (DstMtrrs[DstIndex].Length == 0) {
+      continue;
+    }
+    for (SrcIndex = 0; SrcIndex < SrcMtrrCount; SrcIndex++) {
+      if (DstMtrrs[DstIndex].BaseAddress == SrcMtrrs[SrcIndex].BaseAddress &&
+        DstMtrrs[DstIndex].Length == SrcMtrrs[SrcIndex].Length &&
+        DstMtrrs[DstIndex].Type == SrcMtrrs[SrcIndex].Type) {
+        break;
+      }
+    }
+
+    if (SrcIndex == SrcMtrrCount) {
+      //
+      // Remove the one from DstMtrrs which is not in SrcMtrrs
+      //
+      DstMtrrs[DstIndex].Length = 0;
+      Modified[DstIndex] = TRUE;
+    } else {
+      //
+      // Remove the one from SrcMtrrs which is also in DstMtrrs
+      //
+      SrcMtrrs[SrcIndex].Length = 0;
+    }
+  }
+
+  //
+  // Now valid MTRR only exists in either DstMtrrs or SrcMtrrs.
+  // Merge MTRRs from SrcMtrrs to DstMtrrs
+  //
+  DstIndex = 0;
+  for (SrcIndex = 0; SrcIndex < SrcMtrrCount; SrcIndex++) {
+    if (SrcMtrrs[SrcIndex].Length != 0) {
+
+      //
+      // Find the empty slot in DstMtrrs
+      //
+      while (DstIndex < DstMtrrCount) {
+        if (DstMtrrs[DstIndex].Length == 0) {
+          break;
+        }
+        DstIndex++;
+      }
+      ASSERT (DstIndex < DstMtrrCount);
+      CopyMem (&DstMtrrs[DstIndex], &SrcMtrrs[SrcIndex], sizeof (SrcMtrrs[0]));
+      Modified[DstIndex] = TRUE;
+    }
+  }
+}
+
+/**
+  Calculate the variable MTRR settings for all memory ranges.
+
+  @param DefaultType          Default memory type.
+  @param A0                   Alignment to use when base address is 0.
+  @param Ranges               Memory range array holding the memory type
+                              settings for all memory address.
+  @param RangeCount           Count of memory ranges.
+  @param Scratch              Scratch buffer to be used in MTRR calculation.
+  @param ScratchSize          Pointer to the size of scratch buffer.
+  @param VariableMtrr         Array holding all MTRR settings.
+  @param VariableMtrrCapacity Capacity of the MTRR array.
+  @param VariableMtrrCount    The count of MTRR settings in array.
+
+  @retval RETURN_SUCCESS          Variable MTRRs are allocated successfully.
+  @retval RETURN_OUT_OF_RESOURCES Count of variable MTRRs exceeds capacity.
+  @retval RETURN_BUFFER_TOO_SMALL The scratch buffer is too small for MTRR calculation.
+                                  The required scratch buffer size is returned through ScratchSize.
+**/
+RETURN_STATUS
+MtrrLibSetMemoryRanges (
+  IN MTRR_MEMORY_CACHE_TYPE DefaultType,
+  IN UINT64                 A0,
+  IN MTRR_MEMORY_RANGE      *Ranges,
+  IN UINTN                  RangeCount,
+  IN VOID                   *Scratch,
+  IN OUT UINTN              *ScratchSize,
+  OUT MTRR_MEMORY_RANGE     *VariableMtrr,
+  IN UINT32                 VariableMtrrCapacity,
+  OUT UINT32                *VariableMtrrCount
+  )
+{
+  RETURN_STATUS             Status;
+  UINT32                    Index;
+  UINT64                    Base0;
+  UINT64                    Base1;
+  UINT64                    Alignment;
+  UINT8                     CompatibleTypes;
+  UINT64                    Length;
+  UINT32                    End;
+  UINTN                     ActualScratchSize;
+  UINTN                     BiggestScratchSize;
+
+  *VariableMtrrCount = 0;
+
+  //
+  // Since the whole ranges need multiple calls of MtrrLibCalculateMtrrs().
+  // Each call needs different scratch buffer size.
+  // When the provided scratch buffer size is not sufficient in any call,
+  // set the GetActualScratchSize to TRUE, and following calls will only
+  // calculate the actual scratch size for the caller.
+  //
+  BiggestScratchSize = 0;
+
+  for (Index = 0; Index < RangeCount;) {
+    Base0 = Ranges[Index].BaseAddress;
+
+    //
+    // Full step is optimal
+    //
+    while (Index < RangeCount) {
+      ASSERT (Ranges[Index].BaseAddress == Base0);
+      Alignment = MtrrLibBiggestAlignment (Base0, A0);
+      while (Base0 + Alignment <= Ranges[Index].BaseAddress + Ranges[Index].Length) {
+        if ((BiggestScratchSize <= *ScratchSize) && (Ranges[Index].Type != DefaultType)) {
+          Status = MtrrLibAppendVariableMtrr (
+            VariableMtrr, VariableMtrrCapacity, VariableMtrrCount,
+            Base0, Alignment, Ranges[Index].Type
+            );
+          if (RETURN_ERROR (Status)) {
+            return Status;
+          }
+        }
+        Base0 += Alignment;
+        Alignment = MtrrLibBiggestAlignment (Base0, A0);
+      }
+
+      //
+      // Remove the above range from Ranges[Index]
+      //
+      Ranges[Index].Length -= Base0 - Ranges[Index].BaseAddress;
+      Ranges[Index].BaseAddress = Base0;
+      if (Ranges[Index].Length != 0) {
+        break;
+      } else {
+        Index++;
+      }
+    }
+
+    if (Index == RangeCount) {
+      break;
+    }
+
+    //
+    // Find continous ranges [Base0, Base1) which could be combined by MTRR.
+    // Per SDM, the compatible types between[B0, B1) are:
+    //   UC, *
+    //   WB, WT
+    //   UC, WB, WT
+    //
+    CompatibleTypes = MtrrLibGetCompatibleTypes (&Ranges[Index], RangeCount - Index);
+
+    End = Index; // End points to last one that matches the CompatibleTypes.
+    while (End + 1 < RangeCount) {
+      if (((1 << Ranges[End + 1].Type) & CompatibleTypes) == 0) {
+        break;
+      }
+      End++;
+    }
+    Alignment = MtrrLibBiggestAlignment (Base0, A0);
+    Length    = GetPowerOfTwo64 (Ranges[End].BaseAddress + Ranges[End].Length - Base0);
+    Base1     = Base0 + MIN (Alignment, Length);
+
+    //
+    // Base1 may not in Ranges[End]. Update End to the range Base1 belongs to.
+    //
+    End = Index;
+    while (End + 1 < RangeCount) {
+      if (Base1 <= Ranges[End + 1].BaseAddress) {
+        break;
+      }
+      End++;
+    }
+
+    Length = Ranges[End].Length;
+    Ranges[End].Length = Base1 - Ranges[End].BaseAddress;
+    ActualScratchSize  = *ScratchSize;
+    Status = MtrrLibCalculateMtrrs (
+               DefaultType, A0,
+               &Ranges[Index], End + 1 - Index,
+               Scratch, &ActualScratchSize,
+               VariableMtrr, VariableMtrrCapacity, VariableMtrrCount
+               );
+    if (Status == RETURN_BUFFER_TOO_SMALL) {
+      BiggestScratchSize = MAX (BiggestScratchSize, ActualScratchSize);
+      //
+      // Ignore this error, because we need to calculate the biggest
+      // scratch buffer size.
+      //
+      Status = RETURN_SUCCESS;
+    }
+    if (RETURN_ERROR (Status)) {
+      return Status;
+    }
+
+    if (Length != Ranges[End].Length) {
+      Ranges[End].BaseAddress = Base1;
+      Ranges[End].Length = Length - Ranges[End].Length;
+      Index = End;
+    } else {
+      Index = End + 1;
+    }
+  }
+
+  if (*ScratchSize < BiggestScratchSize) {
+    *ScratchSize = BiggestScratchSize;
+    return RETURN_BUFFER_TOO_SMALL;
+  }
+  return RETURN_SUCCESS;
+}
+
+/**
+  Set the below-1MB memory attribute to fixed MTRR buffer.
+  Modified flag array indicates which fixed MTRR is modified.
+
+  @param [in, out] ClearMasks    The bits (when set) to clear in the fixed MTRR MSR.
+  @param [in, out] OrMasks       The bits to set in the fixed MTRR MSR.
+  @param [in]      BaseAddress   Base address.
+  @param [in]      Length        Length.
+  @param [in]      Type          Memory type.
+
+  @retval RETURN_SUCCESS      The memory attribute is set successfully.
+  @retval RETURN_UNSUPPORTED  The requested range or cache type was invalid
+                              for the fixed MTRRs.
+**/
+RETURN_STATUS
+MtrrLibSetBelow1MBMemoryAttribute (
+  IN OUT UINT64                  *ClearMasks,
+  IN OUT UINT64                  *OrMasks,
+  IN PHYSICAL_ADDRESS            BaseAddress,
+  IN UINT64                      Length,
+  IN MTRR_MEMORY_CACHE_TYPE      Type
+  )
+{
+  RETURN_STATUS             Status;
+  UINT32                    MsrIndex;
+  UINT64                    ClearMask;
+  UINT64                    OrMask;
+
+  ASSERT (BaseAddress < BASE_1MB);
+
+  MsrIndex = (UINT32)-1;
+  while ((BaseAddress < BASE_1MB) && (Length != 0)) {
+    Status = MtrrLibProgramFixedMtrr (Type, &BaseAddress, &Length, &MsrIndex, &ClearMask, &OrMask);
+    if (RETURN_ERROR (Status)) {
+      return Status;
+    }
+    ClearMasks[MsrIndex] = ClearMasks[MsrIndex] | ClearMask;
+    OrMasks[MsrIndex]    = (OrMasks[MsrIndex] & ~ClearMask) | OrMask;
+  }
+  return RETURN_SUCCESS;
+}
+
+/**
+  This function attempts to set the attributes into MTRR setting buffer for multiple memory ranges.
+
+  @param[in, out]  MtrrSetting  MTRR setting buffer to be set.
+  @param[in]       Scratch      A temporary scratch buffer that is used to perform the calculation.
+  @param[in, out]  ScratchSize  Pointer to the size in bytes of the scratch buffer.
+                                It may be updated to the actual required size when the calculation
+                                needs more scratch buffer.
+  @param[in]       Ranges       Pointer to an array of MTRR_MEMORY_RANGE.
+                                When range overlap happens, the last one takes higher priority.
+                                When the function returns, either all the attributes are set successfully,
+                                or none of them is set.
+  @param[in]       RangeCount   Count of MTRR_MEMORY_RANGE.
+
+  @retval RETURN_SUCCESS            The attributes were set for all the memory ranges.
+  @retval RETURN_INVALID_PARAMETER  Length in any range is zero.
+  @retval RETURN_UNSUPPORTED        The processor does not support one or more bytes of the
+                                    memory resource range specified by BaseAddress and Length in any range.
+  @retval RETURN_UNSUPPORTED        The bit mask of attributes is not support for the memory resource
+                                    range specified by BaseAddress and Length in any range.
+  @retval RETURN_OUT_OF_RESOURCES   There are not enough system resources to modify the attributes of
+                                    the memory resource ranges.
+  @retval RETURN_ACCESS_DENIED      The attributes for the memory resource range specified by
+                                    BaseAddress and Length cannot be modified.
+  @retval RETURN_BUFFER_TOO_SMALL   The scratch buffer is too small for MTRR calculation.
 **/
 RETURN_STATUS
 EFIAPI
-MtrrSetMemoryAttribute (
-  IN PHYSICAL_ADDRESS        BaseAddress,
-  IN UINT64                  Length,
-  IN MTRR_MEMORY_CACHE_TYPE  Attribute
+MtrrSetMemoryAttributesInMtrrSettings (
+  IN OUT MTRR_SETTINGS           *MtrrSetting,
+  IN     VOID                    *Scratch,
+  IN OUT UINTN                   *ScratchSize,
+  IN     CONST MTRR_MEMORY_RANGE *Ranges,
+  IN     UINTN                   RangeCount
   )
 {
-  DEBUG((DEBUG_CACHE, "MtrrSetMemoryAttribute() %a:%016lx-%016lx\n", mMtrrMemoryCacheTypeShortName[Attribute], BaseAddress, Length));
-  return MtrrSetMemoryAttributeWorker (
-           NULL,
-           BaseAddress,
-           Length,
-           Attribute
-           );
+  RETURN_STATUS             Status;
+  UINT32                    Index;
+  UINT64                    BaseAddress;
+  UINT64                    Length;
+  BOOLEAN                   Above1MbExist;
+
+  UINT64                    MtrrValidBitsMask;
+  UINT64                    MtrrValidAddressMask;
+  MTRR_MEMORY_CACHE_TYPE    DefaultType;
+  MTRR_VARIABLE_SETTINGS    VariableSettings;
+  MTRR_MEMORY_RANGE         WorkingRanges[2 * ARRAY_SIZE (MtrrSetting->Variables.Mtrr) + 2];
+  UINTN                     WorkingRangeCount;
+  BOOLEAN                   Modified;
+  MTRR_VARIABLE_SETTING     VariableSetting;
+  UINT32                    OriginalVariableMtrrCount;
+  UINT32                    FirmwareVariableMtrrCount;
+  UINT32                    WorkingVariableMtrrCount;
+  MTRR_MEMORY_RANGE         OriginalVariableMtrr[ARRAY_SIZE (MtrrSetting->Variables.Mtrr)];
+  MTRR_MEMORY_RANGE         WorkingVariableMtrr[ARRAY_SIZE (MtrrSetting->Variables.Mtrr)];
+  BOOLEAN                   VariableSettingModified[ARRAY_SIZE (MtrrSetting->Variables.Mtrr)];
+
+  UINT64                    ClearMasks[ARRAY_SIZE (mMtrrLibFixedMtrrTable)];
+  UINT64                    OrMasks[ARRAY_SIZE (mMtrrLibFixedMtrrTable)];
+
+  MTRR_CONTEXT              MtrrContext;
+  BOOLEAN                   MtrrContextValid;
+
+  Status = RETURN_SUCCESS;
+  MtrrLibInitializeMtrrMask (&MtrrValidBitsMask, &MtrrValidAddressMask);
+
+  //
+  // TRUE indicating the accordingly Variable setting needs modificaiton in OriginalVariableMtrr.
+  //
+  SetMem (VariableSettingModified, ARRAY_SIZE (VariableSettingModified), FALSE);
+
+  //
+  // TRUE indicating the caller requests to set variable MTRRs.
+  //
+  Above1MbExist             = FALSE;
+  OriginalVariableMtrrCount = 0;
+
+  //
+  // 0. Dump the requests.
+  //
+  DEBUG_CODE (
+    DEBUG ((DEBUG_CACHE, "Mtrr: Set Mem Attribute to %a, ScratchSize = %x%a",
+            (MtrrSetting == NULL) ? "Hardware" : "Buffer", *ScratchSize,
+            (RangeCount <= 1) ? "," : "\n"
+            ));
+    for (Index = 0; Index < RangeCount; Index++) {
+      DEBUG ((DEBUG_CACHE, " %a: [%016lx, %016lx)\n",
+              mMtrrMemoryCacheTypeShortName[MIN (Ranges[Index].Type, CacheInvalid)],
+              Ranges[Index].BaseAddress, Ranges[Index].BaseAddress + Ranges[Index].Length
+              ));
+    }
+  );
+
+  //
+  // 1. Validate the parameters.
+  //
+  if (!IsMtrrSupported ()) {
+    Status = RETURN_UNSUPPORTED;
+    goto Exit;
+  }
+
+  for (Index = 0; Index < RangeCount; Index++) {
+    if (Ranges[Index].Length == 0) {
+      Status = RETURN_INVALID_PARAMETER;
+      goto Exit;
+    }
+    if (((Ranges[Index].BaseAddress & ~MtrrValidAddressMask) != 0) ||
+        ((((Ranges[Index].BaseAddress + Ranges[Index].Length) & ~MtrrValidAddressMask) != 0) &&
+          (Ranges[Index].BaseAddress + Ranges[Index].Length) != MtrrValidBitsMask + 1)
+        ) {
+      //
+      // Either the BaseAddress or the Limit doesn't follow the alignment requirement.
+      // Note: It's still valid if Limit doesn't follow the alignment requirement but equals to MAX Address.
+      //
+      Status = RETURN_UNSUPPORTED;
+      goto Exit;
+    }
+    if ((Ranges[Index].Type != CacheUncacheable) &&
+        (Ranges[Index].Type != CacheWriteCombining) &&
+        (Ranges[Index].Type != CacheWriteThrough) &&
+        (Ranges[Index].Type != CacheWriteProtected) &&
+        (Ranges[Index].Type != CacheWriteBack)) {
+      Status = RETURN_INVALID_PARAMETER;
+      goto Exit;
+    }
+    if (Ranges[Index].BaseAddress + Ranges[Index].Length > BASE_1MB) {
+      Above1MbExist = TRUE;
+    }
+  }
+
+  //
+  // 2. Apply the above-1MB memory attribute settings.
+  //
+  if (Above1MbExist) {
+    //
+    // 2.1. Read all variable MTRRs and convert to Ranges.
+    //
+    OriginalVariableMtrrCount = GetVariableMtrrCountWorker ();
+    MtrrGetVariableMtrrWorker (MtrrSetting, OriginalVariableMtrrCount, &VariableSettings);
+    MtrrLibGetRawVariableRanges (
+      &VariableSettings, OriginalVariableMtrrCount,
+      MtrrValidBitsMask, MtrrValidAddressMask, OriginalVariableMtrr
+      );
+
+    DefaultType = MtrrGetDefaultMemoryTypeWorker (MtrrSetting);
+    WorkingRangeCount = 1;
+    WorkingRanges[0].BaseAddress = 0;
+    WorkingRanges[0].Length      = MtrrValidBitsMask + 1;
+    WorkingRanges[0].Type        = DefaultType;
+
+    Status = MtrrLibApplyVariableMtrrs (
+               OriginalVariableMtrr, OriginalVariableMtrrCount,
+               WorkingRanges, ARRAY_SIZE (WorkingRanges), &WorkingRangeCount);
+    ASSERT_RETURN_ERROR (Status);
+
+    ASSERT (OriginalVariableMtrrCount >= PcdGet32 (PcdCpuNumberOfReservedVariableMtrrs));
+    FirmwareVariableMtrrCount = OriginalVariableMtrrCount - PcdGet32 (PcdCpuNumberOfReservedVariableMtrrs);
+    ASSERT (WorkingRangeCount <= 2 * FirmwareVariableMtrrCount + 1);
+
+    //
+    // 2.2. Force [0, 1M) to UC, so that it doesn't impact subtraction algorithm.
+    //
+    Status = MtrrLibSetMemoryType (
+               WorkingRanges, ARRAY_SIZE (WorkingRanges), &WorkingRangeCount,
+               0, SIZE_1MB, CacheUncacheable
+               );
+    ASSERT (Status != RETURN_OUT_OF_RESOURCES);
+
+    //
+    // 2.3. Apply the new memory attribute settings to Ranges.
+    //
+    Modified = FALSE;
+    for (Index = 0; Index < RangeCount; Index++) {
+      BaseAddress = Ranges[Index].BaseAddress;
+      Length = Ranges[Index].Length;
+      if (BaseAddress < BASE_1MB) {
+        if (Length <= BASE_1MB - BaseAddress) {
+          continue;
+        }
+        Length -= BASE_1MB - BaseAddress;
+        BaseAddress = BASE_1MB;
+      }
+      Status = MtrrLibSetMemoryType (
+                 WorkingRanges, ARRAY_SIZE (WorkingRanges), &WorkingRangeCount,
+                 BaseAddress, Length, Ranges[Index].Type
+                 );
+      if (Status == RETURN_ALREADY_STARTED) {
+        Status = RETURN_SUCCESS;
+      } else if (Status == RETURN_OUT_OF_RESOURCES) {
+        goto Exit;
+      } else {
+        ASSERT_RETURN_ERROR (Status);
+        Modified = TRUE;
+      }
+    }
+
+    if (Modified) {
+      //
+      // 2.4. Calculate the Variable MTRR settings based on the Ranges.
+      //      Buffer Too Small may be returned if the scratch buffer size is insufficient.
+      //
+      Status = MtrrLibSetMemoryRanges (
+                 DefaultType, LShiftU64 (1, (UINTN)HighBitSet64 (MtrrValidBitsMask)), WorkingRanges, WorkingRangeCount,
+                 Scratch, ScratchSize,
+                 WorkingVariableMtrr, FirmwareVariableMtrrCount + 1, &WorkingVariableMtrrCount
+                 );
+      if (RETURN_ERROR (Status)) {
+        goto Exit;
+      }
+
+      //
+      // 2.5. Remove the [0, 1MB) MTRR if it still exists (not merged with other range)
+      //
+      for (Index = 0; Index < WorkingVariableMtrrCount; Index++) {
+        if (WorkingVariableMtrr[Index].BaseAddress == 0 && WorkingVariableMtrr[Index].Length == SIZE_1MB) {
+          ASSERT (WorkingVariableMtrr[Index].Type == CacheUncacheable);
+          WorkingVariableMtrrCount--;
+          CopyMem (
+            &WorkingVariableMtrr[Index], &WorkingVariableMtrr[Index + 1],
+            (WorkingVariableMtrrCount - Index) * sizeof (WorkingVariableMtrr[0])
+            );
+          break;
+        }
+      }
+
+      if (WorkingVariableMtrrCount > FirmwareVariableMtrrCount) {
+        Status = RETURN_OUT_OF_RESOURCES;
+        goto Exit;
+      }
+
+      //
+      // 2.6. Merge the WorkingVariableMtrr to OriginalVariableMtrr
+      //      Make sure least modification is made to OriginalVariableMtrr.
+      //
+      MtrrLibMergeVariableMtrr (
+        OriginalVariableMtrr, OriginalVariableMtrrCount,
+        WorkingVariableMtrr, WorkingVariableMtrrCount,
+        VariableSettingModified
+      );
+    }
+  }
+
+  //
+  // 3. Apply the below-1MB memory attribute settings.
+  //
+  // (Value & ~0 | 0) still equals to (Value)
+  //
+  ZeroMem (ClearMasks, sizeof (ClearMasks));
+  ZeroMem (OrMasks, sizeof (OrMasks));
+  for (Index = 0; Index < RangeCount; Index++) {
+    if (Ranges[Index].BaseAddress >= BASE_1MB) {
+      continue;
+    }
+
+    Status = MtrrLibSetBelow1MBMemoryAttribute (
+               ClearMasks, OrMasks,
+               Ranges[Index].BaseAddress, Ranges[Index].Length, Ranges[Index].Type
+               );
+    if (RETURN_ERROR (Status)) {
+      goto Exit;
+    }
+  }
+
+  MtrrContextValid = FALSE;
+  //
+  // 4. Write fixed MTRRs that have been modified
+  //
+  for (Index = 0; Index < ARRAY_SIZE (ClearMasks); Index++) {
+    if (ClearMasks[Index] != 0) {
+      if (MtrrSetting != NULL) {
+        MtrrSetting->Fixed.Mtrr[Index] = (MtrrSetting->Fixed.Mtrr[Index] & ~ClearMasks[Index]) | OrMasks[Index];
+      } else {
+        if (!MtrrContextValid) {
+          MtrrLibPreMtrrChange (&MtrrContext);
+          MtrrContextValid = TRUE;
+        }
+        AsmMsrAndThenOr64 (mMtrrLibFixedMtrrTable[Index].Msr, ~ClearMasks[Index], OrMasks[Index]);
+      }
+    }
+  }
+
+  //
+  // 5. Write variable MTRRs that have been modified
+  //
+  for (Index = 0; Index < OriginalVariableMtrrCount; Index++) {
+    if (VariableSettingModified[Index]) {
+      if (OriginalVariableMtrr[Index].Length != 0) {
+        VariableSetting.Base = (OriginalVariableMtrr[Index].BaseAddress & MtrrValidAddressMask)
+                             | (UINT8)OriginalVariableMtrr[Index].Type;
+        VariableSetting.Mask = ((~(OriginalVariableMtrr[Index].Length - 1)) & MtrrValidAddressMask) | BIT11;
+      } else {
+        VariableSetting.Base = 0;
+        VariableSetting.Mask = 0;
+      }
+      if (MtrrSetting != NULL) {
+        CopyMem (&MtrrSetting->Variables.Mtrr[Index], &VariableSetting, sizeof (VariableSetting));
+      } else {
+        if (!MtrrContextValid) {
+          MtrrLibPreMtrrChange (&MtrrContext);
+          MtrrContextValid = TRUE;
+        }
+        AsmWriteMsr64 (
+          MSR_IA32_MTRR_PHYSBASE0 + (Index << 1),
+          VariableSetting.Base
+        );
+        AsmWriteMsr64 (
+          MSR_IA32_MTRR_PHYSMASK0 + (Index << 1),
+          VariableSetting.Mask
+        );
+      }
+    }
+  }
+
+  if (MtrrSetting != NULL) {
+    ((MSR_IA32_MTRR_DEF_TYPE_REGISTER *)&MtrrSetting->MtrrDefType)->Bits.E = 1;
+    ((MSR_IA32_MTRR_DEF_TYPE_REGISTER *)&MtrrSetting->MtrrDefType)->Bits.FE = 1;
+  } else {
+    if (MtrrContextValid) {
+      MtrrLibPostMtrrChange (&MtrrContext);
+    }
+  }
+
+Exit:
+  DEBUG ((DEBUG_CACHE, "  Result = %r\n", Status));
+  if (!RETURN_ERROR (Status)) {
+    MtrrDebugPrintAllMtrrsWorker (MtrrSetting);
+  }
+  return Status;
 }
 
 /**
@@ -1883,12 +2441,12 @@ MtrrSetMemoryAttribute (
 
   @param[in, out]  MtrrSetting  MTRR setting buffer to be set.
   @param[in]       BaseAddress  The physical address that is the start address
-                                of a memory region.
-  @param[in]       Length       The size in bytes of the memory region.
+                                of a memory range.
+  @param[in]       Length       The size in bytes of the memory range.
   @param[in]       Attribute    The bit mask of attributes to set for the
-                                memory region.
+                                memory range.
 
-  @retval RETURN_SUCCESS            The attributes were set for the memory region.
+  @retval RETURN_SUCCESS            The attributes were set for the memory range.
   @retval RETURN_INVALID_PARAMETER  Length is zero.
   @retval RETURN_UNSUPPORTED        The processor does not support one or more bytes of the
                                     memory resource range specified by BaseAddress and Length.
@@ -1898,7 +2456,14 @@ MtrrSetMemoryAttribute (
                                     BaseAddress and Length cannot be modified.
   @retval RETURN_OUT_OF_RESOURCES   There are not enough system resources to modify the attributes of
                                     the memory resource range.
-
+                                    Multiple memory range attributes setting by calling this API multiple
+                                    times may fail with status RETURN_OUT_OF_RESOURCES. It may not mean
+                                    the number of CPU MTRRs are too small to set such memory attributes.
+                                    Pass the multiple memory range attributes to one call of
+                                    MtrrSetMemoryAttributesInMtrrSettings() may succeed.
+  @retval RETURN_BUFFER_TOO_SMALL   The fixed internal scratch buffer is too small for MTRR calculation.
+                                    Caller should use MtrrSetMemoryAttributesInMtrrSettings() to specify
+                                    external scratch buffer.
 **/
 RETURN_STATUS
 EFIAPI
@@ -1909,13 +2474,59 @@ MtrrSetMemoryAttributeInMtrrSettings (
   IN MTRR_MEMORY_CACHE_TYPE  Attribute
   )
 {
-  DEBUG((DEBUG_CACHE, "MtrrSetMemoryAttributeMtrrSettings(%p) %a:%016lx-%016lx\n", MtrrSetting, mMtrrMemoryCacheTypeShortName[Attribute], BaseAddress, Length));
-  return MtrrSetMemoryAttributeWorker (
-           MtrrSetting,
-           BaseAddress,
-           Length,
-           Attribute
-           );
+  UINT8                      Scratch[SCRATCH_BUFFER_SIZE];
+  UINTN                      ScratchSize;
+  MTRR_MEMORY_RANGE          Range;
+
+  Range.BaseAddress = BaseAddress;
+  Range.Length      = Length;
+  Range.Type        = Attribute;
+  ScratchSize = sizeof (Scratch);
+  return MtrrSetMemoryAttributesInMtrrSettings (MtrrSetting, Scratch, &ScratchSize, &Range, 1);
+}
+
+/**
+  This function attempts to set the attributes for a memory range.
+
+  @param[in]  BaseAddress        The physical address that is the start
+                                 address of a memory range.
+  @param[in]  Length             The size in bytes of the memory range.
+  @param[in]  Attributes         The bit mask of attributes to set for the
+                                 memory range.
+
+  @retval RETURN_SUCCESS            The attributes were set for the memory
+                                    range.
+  @retval RETURN_INVALID_PARAMETER  Length is zero.
+  @retval RETURN_UNSUPPORTED        The processor does not support one or
+                                    more bytes of the memory resource range
+                                    specified by BaseAddress and Length.
+  @retval RETURN_UNSUPPORTED        The bit mask of attributes is not support
+                                    for the memory resource range specified
+                                    by BaseAddress and Length.
+  @retval RETURN_ACCESS_DENIED      The attributes for the memory resource
+                                    range specified by BaseAddress and Length
+                                    cannot be modified.
+  @retval RETURN_OUT_OF_RESOURCES   There are not enough system resources to
+                                    modify the attributes of the memory
+                                    resource range.
+                                    Multiple memory range attributes setting by calling this API multiple
+                                    times may fail with status RETURN_OUT_OF_RESOURCES. It may not mean
+                                    the number of CPU MTRRs are too small to set such memory attributes.
+                                    Pass the multiple memory range attributes to one call of
+                                    MtrrSetMemoryAttributesInMtrrSettings() may succeed.
+  @retval RETURN_BUFFER_TOO_SMALL   The fixed internal scratch buffer is too small for MTRR calculation.
+                                    Caller should use MtrrSetMemoryAttributesInMtrrSettings() to specify
+                                    external scratch buffer.
+**/
+RETURN_STATUS
+EFIAPI
+MtrrSetMemoryAttribute (
+  IN PHYSICAL_ADDRESS        BaseAddress,
+  IN UINT64                  Length,
+  IN MTRR_MEMORY_CACHE_TYPE  Attribute
+  )
+{
+  return MtrrSetMemoryAttributeInMtrrSettings (NULL, BaseAddress, Length, Attribute);
 }
 
 /**
@@ -1933,47 +2544,18 @@ MtrrSetVariableMtrrWorker (
   UINT32  VariableMtrrCount;
 
   VariableMtrrCount = GetVariableMtrrCountWorker ();
-  ASSERT (VariableMtrrCount <= MTRR_NUMBER_OF_VARIABLE_MTRR);
+  ASSERT (VariableMtrrCount <= ARRAY_SIZE (VariableSettings->Mtrr));
 
   for (Index = 0; Index < VariableMtrrCount; Index++) {
     AsmWriteMsr64 (
-      MTRR_LIB_IA32_VARIABLE_MTRR_BASE + (Index << 1),
+      MSR_IA32_MTRR_PHYSBASE0 + (Index << 1),
       VariableSettings->Mtrr[Index].Base
       );
     AsmWriteMsr64 (
-      MTRR_LIB_IA32_VARIABLE_MTRR_BASE + (Index << 1) + 1,
+      MSR_IA32_MTRR_PHYSMASK0 + (Index << 1),
       VariableSettings->Mtrr[Index].Mask
       );
   }
-}
-
-
-/**
-  This function sets variable MTRRs
-
-  @param[in]  VariableSettings   A buffer to hold variable MTRRs content.
-
-  @return The pointer of VariableSettings
-
-**/
-MTRR_VARIABLE_SETTINGS*
-EFIAPI
-MtrrSetVariableMtrr (
-  IN MTRR_VARIABLE_SETTINGS         *VariableSettings
-  )
-{
-  MTRR_CONTEXT  MtrrContext;
-
-  if (!IsMtrrSupported ()) {
-    return VariableSettings;
-  }
-
-  PreMtrrChange (&MtrrContext);
-  MtrrSetVariableMtrrWorker (VariableSettings);
-  PostMtrrChange (&MtrrContext);
-  MtrrDebugPrintAllMtrrs ();
-
-  return  VariableSettings;
 }
 
 /**
@@ -1995,35 +2577,6 @@ MtrrSetFixedMtrrWorker (
        FixedSettings->Mtrr[Index]
        );
   }
-}
-
-
-/**
-  This function sets fixed MTRRs
-
-  @param[in]  FixedSettings  A buffer to hold fixed MTRRs content.
-
-  @retval The pointer of FixedSettings
-
-**/
-MTRR_FIXED_SETTINGS*
-EFIAPI
-MtrrSetFixedMtrr (
-  IN MTRR_FIXED_SETTINGS          *FixedSettings
-  )
-{
-  MTRR_CONTEXT  MtrrContext;
-
-  if (!IsMtrrSupported ()) {
-    return FixedSettings;
-  }
-
-  PreMtrrChange (&MtrrContext);
-  MtrrSetFixedMtrrWorker (FixedSettings);
-  PostMtrrChange (&MtrrContext);
-  MtrrDebugPrintAllMtrrs ();
-
-  return FixedSettings;
 }
 
 
@@ -2062,7 +2615,7 @@ MtrrGetAllMtrrs (
   //
   // Get MTRR_DEF_TYPE value
   //
-  MtrrSetting->MtrrDefType = AsmReadMsr64 (MTRR_LIB_IA32_MTRR_DEF_TYPE);
+  MtrrSetting->MtrrDefType = AsmReadMsr64 (MSR_IA32_MTRR_DEF_TYPE);
 
   return MtrrSetting;
 }
@@ -2088,7 +2641,7 @@ MtrrSetAllMtrrs (
     return MtrrSetting;
   }
 
-  PreMtrrChange (&MtrrContext);
+  MtrrLibPreMtrrChange (&MtrrContext);
 
   //
   // Set fixed MTRRs
@@ -2103,9 +2656,9 @@ MtrrSetAllMtrrs (
   //
   // Set MTRR_DEF_TYPE value
   //
-  AsmWriteMsr64 (MTRR_LIB_IA32_MTRR_DEF_TYPE, MtrrSetting->MtrrDefType);
+  AsmWriteMsr64 (MSR_IA32_MTRR_DEF_TYPE, MtrrSetting->MtrrDefType);
 
-  PostMtrrChangeEnableCache (&MtrrContext);
+  MtrrLibPostMtrrChangeEnableCache (&MtrrContext);
 
   return MtrrSetting;
 }
@@ -2124,26 +2677,139 @@ IsMtrrSupported (
   VOID
   )
 {
-  UINT32  RegEdx;
-  UINT64  MtrrCap;
+  CPUID_VERSION_INFO_EDX    Edx;
+  MSR_IA32_MTRRCAP_REGISTER MtrrCap;
 
   //
   // Check CPUID(1).EDX[12] for MTRR capability
   //
-  AsmCpuid (1, NULL, NULL, NULL, &RegEdx);
-  if (BitFieldRead32 (RegEdx, 12, 12) == 0) {
+  AsmCpuid (CPUID_VERSION_INFO, NULL, NULL, NULL, &Edx.Uint32);
+  if (Edx.Bits.MTRR == 0) {
     return FALSE;
   }
 
   //
-  // Check IA32_MTRRCAP.[0..7] for number of variable MTRRs and IA32_MTRRCAP[8] for
-  // fixed MTRRs existence. If number of variable MTRRs is zero, or fixed MTRRs do not
+  // Check number of variable MTRRs and fixed MTRRs existence.
+  // If number of variable MTRRs is zero, or fixed MTRRs do not
   // exist, return false.
   //
-  MtrrCap = AsmReadMsr64 (MTRR_LIB_IA32_MTRR_CAP);
-  if  ((BitFieldRead64 (MtrrCap, 0, 7) == 0) || (BitFieldRead64 (MtrrCap, 8, 8) == 0)) {
+  MtrrCap.Uint64 = AsmReadMsr64 (MSR_IA32_MTRRCAP);
+  if ((MtrrCap.Bits.VCNT == 0) || (MtrrCap.Bits.FIX == 0)) {
     return FALSE;
   }
-
   return TRUE;
+}
+
+
+/**
+  Worker function prints all MTRRs for debugging.
+
+  If MtrrSetting is not NULL, print MTRR settings from input MTRR
+  settings buffer.
+  If MtrrSetting is NULL, print MTRR settings from MTRRs.
+
+  @param  MtrrSetting    A buffer holding all MTRRs content.
+**/
+VOID
+MtrrDebugPrintAllMtrrsWorker (
+  IN MTRR_SETTINGS    *MtrrSetting
+  )
+{
+  DEBUG_CODE (
+    MTRR_SETTINGS     LocalMtrrs;
+    MTRR_SETTINGS     *Mtrrs;
+    UINTN             Index;
+    UINTN             RangeCount;
+    UINT64            MtrrValidBitsMask;
+    UINT64            MtrrValidAddressMask;
+    UINT32            VariableMtrrCount;
+    BOOLEAN           ContainVariableMtrr;
+    MTRR_MEMORY_RANGE Ranges[
+      ARRAY_SIZE (mMtrrLibFixedMtrrTable) * sizeof (UINT64) + 2 * ARRAY_SIZE (Mtrrs->Variables.Mtrr) + 1
+      ];
+    MTRR_MEMORY_RANGE RawVariableRanges[ARRAY_SIZE (Mtrrs->Variables.Mtrr)];
+
+    if (!IsMtrrSupported ()) {
+      return;
+    }
+
+    VariableMtrrCount = GetVariableMtrrCountWorker ();
+
+    if (MtrrSetting != NULL) {
+      Mtrrs = MtrrSetting;
+    } else {
+      MtrrGetAllMtrrs (&LocalMtrrs);
+      Mtrrs = &LocalMtrrs;
+    }
+
+    //
+    // Dump RAW MTRR contents
+    //
+    DEBUG ((DEBUG_CACHE, "MTRR Settings:\n"));
+    DEBUG ((DEBUG_CACHE, "=============\n"));
+    DEBUG ((DEBUG_CACHE, "MTRR Default Type: %016lx\n", Mtrrs->MtrrDefType));
+    for (Index = 0; Index < ARRAY_SIZE (mMtrrLibFixedMtrrTable); Index++) {
+      DEBUG ((DEBUG_CACHE, "Fixed MTRR[%02d]   : %016lx\n", Index, Mtrrs->Fixed.Mtrr[Index]));
+    }
+    ContainVariableMtrr = FALSE;
+    for (Index = 0; Index < VariableMtrrCount; Index++) {
+      if ((Mtrrs->Variables.Mtrr[Index].Mask & BIT11) == 0) {
+        //
+        // If mask is not valid, then do not display range
+        //
+        continue;
+      }
+      ContainVariableMtrr = TRUE;
+      DEBUG ((DEBUG_CACHE, "Variable MTRR[%02d]: Base=%016lx Mask=%016lx\n",
+        Index,
+        Mtrrs->Variables.Mtrr[Index].Base,
+        Mtrrs->Variables.Mtrr[Index].Mask
+        ));
+    }
+    if (!ContainVariableMtrr) {
+      DEBUG ((DEBUG_CACHE, "Variable MTRR    : None.\n"));
+    }
+    DEBUG((DEBUG_CACHE, "\n"));
+
+    //
+    // Dump MTRR setting in ranges
+    //
+    DEBUG((DEBUG_CACHE, "Memory Ranges:\n"));
+    DEBUG((DEBUG_CACHE, "====================================\n"));
+    MtrrLibInitializeMtrrMask (&MtrrValidBitsMask, &MtrrValidAddressMask);
+    Ranges[0].BaseAddress = 0;
+    Ranges[0].Length      = MtrrValidBitsMask + 1;
+    Ranges[0].Type        = MtrrGetDefaultMemoryTypeWorker (Mtrrs);
+    RangeCount = 1;
+
+    MtrrLibGetRawVariableRanges (
+      &Mtrrs->Variables, VariableMtrrCount,
+      MtrrValidBitsMask, MtrrValidAddressMask, RawVariableRanges
+      );
+    MtrrLibApplyVariableMtrrs (
+      RawVariableRanges, VariableMtrrCount,
+      Ranges, ARRAY_SIZE (Ranges), &RangeCount
+      );
+
+    MtrrLibApplyFixedMtrrs (&Mtrrs->Fixed, Ranges, ARRAY_SIZE (Ranges), &RangeCount);
+
+    for (Index = 0; Index < RangeCount; Index++) {
+      DEBUG ((DEBUG_CACHE, "%a:%016lx-%016lx\n",
+        mMtrrMemoryCacheTypeShortName[Ranges[Index].Type],
+        Ranges[Index].BaseAddress, Ranges[Index].BaseAddress + Ranges[Index].Length - 1
+        ));
+    }
+  );
+}
+
+/**
+  This function prints all MTRRs for debugging.
+**/
+VOID
+EFIAPI
+MtrrDebugPrintAllMtrrs (
+  VOID
+  )
+{
+  MtrrDebugPrintAllMtrrsWorker (NULL);
 }

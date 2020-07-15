@@ -1,16 +1,10 @@
 ## @file
-# This file is used to define class objects of INF file [Guids] section. 
-# It will consumed by InfParser. 
+# This file is used to define class objects of INF file [Guids] section.
+# It will consumed by InfParser.
 #
-# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
-# This program and the accompanying materials are licensed and made available 
-# under the terms and conditions of the BSD License which accompanies this 
-# distribution. The full text of the license may be found at 
-# http://opensource.org/licenses/bsd-license.php
-#
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
 
 '''
 InfGuidObject
@@ -18,10 +12,10 @@ InfGuidObject
 
 from Library.ParserValidate import IsValidCVariableName
 from Library.CommentParsing import ParseComment
-from Library.ExpressionValidate import IsValidFeatureFlagExp 
-                               
+from Library.ExpressionValidate import IsValidFeatureFlagExp
+
 from Library.Misc import Sdict
-from Library import DataType as DT                 
+from Library import DataType as DT
 import Logger.Log as Logger
 from Logger import ToolError
 from Logger import StringTable as ST
@@ -29,7 +23,7 @@ from Logger import StringTable as ST
 class InfGuidItemCommentContent():
     def __init__(self):
         #
-        # ## SOMETIMES_CONSUMES ## Variable:L"MemoryTypeInformation"  
+        # ## SOMETIMES_CONSUMES ## Variable:L"MemoryTypeInformation"
         # TailString.
         #
         #
@@ -48,27 +42,27 @@ class InfGuidItemCommentContent():
         # TailString
         #
         self.HelpStringItem = ''
-        
+
     def SetUsageItem(self, UsageItem):
         self.UsageItem = UsageItem
     def GetUsageItem(self):
         return self.UsageItem
-    
+
     def SetGuidTypeItem(self, GuidTypeItem):
         self.GuidTypeItem = GuidTypeItem
     def GetGuidTypeItem(self):
         return self.GuidTypeItem
-    
+
     def SetVariableNameItem(self, VariableNameItem):
         self.VariableNameItem = VariableNameItem
     def GetVariableNameItem(self):
         return self.VariableNameItem
-    
+
     def SetHelpStringItem(self, HelpStringItem):
         self.HelpStringItem = HelpStringItem
     def GetHelpStringItem(self):
         return self.HelpStringItem
-    
+
 class InfGuidItem():
     def __init__(self):
         self.Name = ''
@@ -78,22 +72,22 @@ class InfGuidItem():
         #
         self.CommentList = []
         self.SupArchList = []
-    
+
     def SetName(self, Name):
         self.Name = Name
     def GetName(self):
         return self.Name
-    
+
     def SetFeatureFlagExp(self, FeatureFlagExp):
         self.FeatureFlagExp = FeatureFlagExp
     def GetFeatureFlagExp(self):
         return self.FeatureFlagExp
-   
+
     def SetCommentList(self, CommentList):
         self.CommentList = CommentList
     def GetCommentList(self):
         return self.CommentList
-    
+
     def SetSupArchList(self, SupArchList):
         self.SupArchList = SupArchList
     def GetSupArchList(self):
@@ -107,7 +101,7 @@ def ParseGuidComment(CommentsList, InfGuidItemObj):
     #
     # Get/Set Usage and HelpString
     #
-    if CommentsList != None and len(CommentsList) != 0 :
+    if CommentsList is not None and len(CommentsList) != 0 :
         CommentInsList = []
         PreUsage = None
         PreGuidType = None
@@ -120,17 +114,17 @@ def ParseGuidComment(CommentsList, InfGuidItemObj):
             CommentItemGuidType, \
             CommentItemVarString, \
             CommentItemHelpText = \
-                    ParseComment(CommentItem, 
-                                 DT.ALL_USAGE_TOKENS, 
-                                 DT.GUID_TYPE_TOKENS, 
-                                 [], 
+                    ParseComment(CommentItem,
+                                 DT.ALL_USAGE_TOKENS,
+                                 DT.GUID_TYPE_TOKENS,
+                                 [],
                                  True)
-            
-            if CommentItemHelpText == None:
+
+            if CommentItemHelpText is None:
                 CommentItemHelpText = ''
                 if Count == len(CommentsList) and CommentItemUsage == CommentItemGuidType == DT.ITEM_UNDEFINED:
                     CommentItemHelpText = DT.END_OF_LINE
-                
+
             if Count == len(CommentsList):
                 if BlockFlag == 1 or BlockFlag == 2:
                     if CommentItemUsage == CommentItemGuidType == DT.ITEM_UNDEFINED:
@@ -138,7 +132,7 @@ def ParseGuidComment(CommentsList, InfGuidItemObj):
                     else:
                         BlockFlag = 3
                 if BlockFlag == -1:
-                    BlockFlag = 4  
+                    BlockFlag = 4
             if BlockFlag == -1 or BlockFlag == 1 or BlockFlag == 2:
                 if CommentItemUsage == CommentItemGuidType == DT.ITEM_UNDEFINED:
                     if BlockFlag == -1:
@@ -150,15 +144,15 @@ def ParseGuidComment(CommentsList, InfGuidItemObj):
                         BlockFlag = 3
                     elif BlockFlag == -1:
                         BlockFlag = 4
-                                                                              
+
             #
             # Combine two comment line if they are generic comment
-            #   
+            #
             if CommentItemUsage == CommentItemGuidType == PreUsage == PreGuidType == DT.ITEM_UNDEFINED:
                 CommentItemHelpText = PreHelpText + DT.END_OF_LINE + CommentItemHelpText
                 PreHelpText = CommentItemHelpText
-                
-            if BlockFlag == 4:     
+
+            if BlockFlag == 4:
                 CommentItemIns = InfGuidItemCommentContent()
                 CommentItemIns.SetUsageItem(CommentItemUsage)
                 CommentItemIns.SetGuidTypeItem(CommentItemGuidType)
@@ -167,16 +161,16 @@ def ParseGuidComment(CommentsList, InfGuidItemObj):
                     CommentItemHelpText = CommentItemHelpText.strip(DT.END_OF_LINE)
                 CommentItemIns.SetHelpStringItem(CommentItemHelpText)
                 CommentInsList.append(CommentItemIns)
-                
+
                 BlockFlag = -1
                 PreUsage = None
                 PreGuidType = None
                 PreHelpText = ''
-                
+
             elif BlockFlag == 3:
                 #
                 # Add previous help string
-                # 
+                #
                 CommentItemIns = InfGuidItemCommentContent()
                 CommentItemIns.SetUsageItem(DT.ITEM_UNDEFINED)
                 CommentItemIns.SetGuidTypeItem(DT.ITEM_UNDEFINED)
@@ -195,17 +189,17 @@ def ParseGuidComment(CommentsList, InfGuidItemObj):
                     CommentItemHelpText = CommentItemHelpText.strip(DT.END_OF_LINE)
                 CommentItemIns.SetHelpStringItem(CommentItemHelpText)
                 CommentInsList.append(CommentItemIns)
-                
+
                 BlockFlag = -1
                 PreUsage = None
                 PreGuidType = None
-                PreHelpText = ''    
-                                                                                
+                PreHelpText = ''
+
             else:
                 PreUsage = CommentItemUsage
                 PreGuidType = CommentItemGuidType
                 PreHelpText = CommentItemHelpText
-                          
+
         InfGuidItemObj.SetCommentList(CommentInsList)
     else:
         #
@@ -215,7 +209,7 @@ def ParseGuidComment(CommentsList, InfGuidItemObj):
         CommentItemIns.SetUsageItem(DT.ITEM_UNDEFINED)
         CommentItemIns.SetGuidTypeItem(DT.ITEM_UNDEFINED)
         InfGuidItemObj.SetCommentList([CommentItemIns])
-    
+
     return InfGuidItemObj
 
 ## InfGuidObject
@@ -229,18 +223,18 @@ class InfGuidObject():
         # Macro defined in this section should be only used in this section.
         #
         self.Macros = {}
-    
+
     def SetGuid(self, GuidList, Arch = None):
         __SupportArchList = []
         for ArchItem in Arch:
             #
             # Validate Arch
-            #            
-            if (ArchItem == '' or ArchItem == None):
-                ArchItem = 'COMMON'  
-            
+            #
+            if (ArchItem == '' or ArchItem is None):
+                ArchItem = 'COMMON'
+
             __SupportArchList.append(ArchItem)
-            
+
         for Item in GuidList:
             #
             # Get Comment content of this protocol
@@ -250,77 +244,77 @@ class InfGuidObject():
                 CommentsList = Item[1]
             CurrentLineOfItem = Item[2]
             Item = Item[0]
-            InfGuidItemObj = InfGuidItem()                
+            InfGuidItemObj = InfGuidItem()
             if len(Item) >= 1 and len(Item) <= 2:
                 #
                 # Only GuildName contained
                 #
                 if not IsValidCVariableName(Item[0]):
-                    Logger.Error("InfParser", 
-                                 ToolError.FORMAT_INVALID, 
+                    Logger.Error("InfParser",
+                                 ToolError.FORMAT_INVALID,
                                  ST.ERR_INF_PARSER_INVALID_CNAME%(Item[0]),
-                                 File=CurrentLineOfItem[2], 
-                                 Line=CurrentLineOfItem[1], 
+                                 File=CurrentLineOfItem[2],
+                                 Line=CurrentLineOfItem[1],
                                  ExtraData=CurrentLineOfItem[0])
                 if (Item[0] != ''):
                     InfGuidItemObj.SetName(Item[0])
                 else:
-                    Logger.Error("InfParser", 
-                                 ToolError.FORMAT_INVALID, 
+                    Logger.Error("InfParser",
+                                 ToolError.FORMAT_INVALID,
                                  ST.ERR_INF_PARSER_CNAME_MISSING,
-                                 File=CurrentLineOfItem[2], 
-                                 Line=CurrentLineOfItem[1], 
+                                 File=CurrentLineOfItem[2],
+                                 Line=CurrentLineOfItem[1],
                                  ExtraData=CurrentLineOfItem[0])
             if len(Item) == 2:
                 #
                 # Contained CName and Feature Flag Express
                 # <statements>           ::=  <CName> ["|" <FeatureFlagExpress>]
-                # For GUID entry. 
+                # For GUID entry.
                 #
                 if Item[1].strip() == '':
-                    Logger.Error("InfParser", 
-                                 ToolError.FORMAT_INVALID, 
+                    Logger.Error("InfParser",
+                                 ToolError.FORMAT_INVALID,
                                  ST.ERR_INF_PARSER_FEATURE_FLAG_EXP_MISSING,
-                                 File=CurrentLineOfItem[2], 
-                                 Line=CurrentLineOfItem[1], 
+                                 File=CurrentLineOfItem[2],
+                                 Line=CurrentLineOfItem[1],
                                  ExtraData=CurrentLineOfItem[0])
                 #
-                # Validate Feature Flag Express   
+                # Validate Feature Flag Express
                 #
                 FeatureFlagRtv = IsValidFeatureFlagExp(Item[1].strip())
                 if not FeatureFlagRtv[0]:
-                    Logger.Error("InfParser", 
+                    Logger.Error("InfParser",
                                  ToolError.FORMAT_INVALID,
                                  ST.ERR_INF_PARSER_FEATURE_FLAG_EXP_SYNTAX_INVLID%(FeatureFlagRtv[1]),
-                                 File=CurrentLineOfItem[2], 
-                                 Line=CurrentLineOfItem[1], 
+                                 File=CurrentLineOfItem[2],
+                                 Line=CurrentLineOfItem[1],
                                  ExtraData=CurrentLineOfItem[0])
                 InfGuidItemObj.SetFeatureFlagExp(Item[1])
             if len(Item) != 1 and len(Item) != 2:
                 #
-                # Invalid format of GUID statement 
+                # Invalid format of GUID statement
                 #
-                Logger.Error("InfParser", 
+                Logger.Error("InfParser",
                              ToolError.FORMAT_INVALID,
                              ST.ERR_INF_PARSER_GUID_PPI_PROTOCOL_SECTION_CONTENT_ERROR,
-                             File=CurrentLineOfItem[2], 
-                             Line=CurrentLineOfItem[1], 
+                             File=CurrentLineOfItem[2],
+                             Line=CurrentLineOfItem[1],
                              ExtraData=CurrentLineOfItem[0])
-             
+
             InfGuidItemObj = ParseGuidComment(CommentsList, InfGuidItemObj)
             InfGuidItemObj.SetSupArchList(__SupportArchList)
-            
+
             #
             # Determine GUID name duplicate. Follow below rule:
             #
-            # A GUID must not be duplicated within a [Guids] section. 
-            # A GUID may appear in multiple architectural [Guids] 
-            # sections. A GUID listed in an architectural [Guids] 
-            # section must not be listed in the common architectural 
+            # A GUID must not be duplicated within a [Guids] section.
+            # A GUID may appear in multiple architectural [Guids]
+            # sections. A GUID listed in an architectural [Guids]
+            # section must not be listed in the common architectural
             # [Guids] section.
-            # 
+            #
             # NOTE: This check will not report error now.
-            # 
+            #
             for Item in self.Guids:
                 if Item.GetName() == InfGuidItemObj.GetName():
                     ItemSupArchList = Item.GetSupArchList()
@@ -337,17 +331,17 @@ class InfGuidObject():
                                 # ST.ERR_INF_PARSER_ITEM_DUPLICATE_COMMON
                                 #
                                 pass
-                                                
-            if self.Guids.has_key((InfGuidItemObj)):           
-                GuidList = self.Guids[InfGuidItemObj]                 
+
+            if (InfGuidItemObj) in self.Guids:
+                GuidList = self.Guids[InfGuidItemObj]
                 GuidList.append(InfGuidItemObj)
                 self.Guids[InfGuidItemObj] = GuidList
             else:
                 GuidList = []
                 GuidList.append(InfGuidItemObj)
                 self.Guids[InfGuidItemObj] = GuidList
-                
+
         return True
-    
+
     def GetGuid(self):
         return self.Guids

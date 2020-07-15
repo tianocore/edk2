@@ -4,13 +4,7 @@
   Copyright (C) 2016, Red Hat, Inc.
   Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials are licensed and made available
-  under the terms and conditions of the BSD License which accompanies this
-  distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT
-  WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 #include <PiDxe.h>
@@ -158,13 +152,13 @@ InitRootBridge (
   DevicePath = AllocateCopyPool (sizeof mRootBridgeDevicePathTemplate,
                  &mRootBridgeDevicePathTemplate);
   if (DevicePath == NULL) {
-    DEBUG ((EFI_D_ERROR, "%a: %r\n", __FUNCTION__, EFI_OUT_OF_RESOURCES));
+    DEBUG ((DEBUG_ERROR, "%a: %r\n", __FUNCTION__, EFI_OUT_OF_RESOURCES));
     return EFI_OUT_OF_RESOURCES;
   }
   DevicePath->AcpiDevicePath.UID = RootBusNumber;
   RootBus->DevicePath = (EFI_DEVICE_PATH_PROTOCOL *)DevicePath;
 
-  DEBUG ((EFI_D_INFO,
+  DEBUG ((DEBUG_INFO,
     "%a: populated root bus %d, with room for %d subordinate bus(es)\n",
     __FUNCTION__, RootBusNumber, MaxSubBusNumber - RootBusNumber));
   return EFI_SUCCESS;
@@ -221,6 +215,10 @@ PciHostBridgeGetRootBridges (
     return ScanForRootBridges (Count);
   }
 
+  ZeroMem (&Io, sizeof (Io));
+  ZeroMem (&Mem, sizeof (Mem));
+  ZeroMem (&MemAbove4G, sizeof (MemAbove4G));
+
   Attributes = EFI_PCI_ATTRIBUTE_IDE_PRIMARY_IO |
     EFI_PCI_ATTRIBUTE_IDE_SECONDARY_IO |
     EFI_PCI_ATTRIBUTE_ISA_IO_16 |
@@ -258,11 +256,11 @@ PciHostBridgeGetRootBridges (
     QemuFwCfgReadBytes (FwCfgSize, &ExtraRootBridges);
 
     if (ExtraRootBridges > PCI_MAX_BUS) {
-      DEBUG ((EFI_D_ERROR, "%a: invalid count of extra root buses (%Lu) "
+      DEBUG ((DEBUG_ERROR, "%a: invalid count of extra root buses (%Lu) "
         "reported by QEMU\n", __FUNCTION__, ExtraRootBridges));
       return NULL;
     }
-    DEBUG ((EFI_D_INFO, "%a: %Lu extra root buses reported by QEMU\n",
+    DEBUG ((DEBUG_INFO, "%a: %Lu extra root buses reported by QEMU\n",
       __FUNCTION__, ExtraRootBridges));
   }
 
@@ -271,7 +269,7 @@ PciHostBridgeGetRootBridges (
   //
   Bridges = AllocatePool ((1 + (UINTN)ExtraRootBridges) * sizeof *Bridges);
   if (Bridges == NULL) {
-    DEBUG ((EFI_D_ERROR, "%a: %r\n", __FUNCTION__, EFI_OUT_OF_RESOURCES));
+    DEBUG ((DEBUG_ERROR, "%a: %r\n", __FUNCTION__, EFI_OUT_OF_RESOURCES));
     return NULL;
   }
   Initialized = 0;
@@ -411,22 +409,22 @@ PciHostBridgeResourceConflict (
 {
   EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *Descriptor;
   UINTN                             RootBridgeIndex;
-  DEBUG ((EFI_D_ERROR, "PciHostBridge: Resource conflict happens!\n"));
+  DEBUG ((DEBUG_ERROR, "PciHostBridge: Resource conflict happens!\n"));
 
   RootBridgeIndex = 0;
   Descriptor = (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *) Configuration;
   while (Descriptor->Desc == ACPI_ADDRESS_SPACE_DESCRIPTOR) {
-    DEBUG ((EFI_D_ERROR, "RootBridge[%d]:\n", RootBridgeIndex++));
+    DEBUG ((DEBUG_ERROR, "RootBridge[%d]:\n", RootBridgeIndex++));
     for (; Descriptor->Desc == ACPI_ADDRESS_SPACE_DESCRIPTOR; Descriptor++) {
       ASSERT (Descriptor->ResType <
               ARRAY_SIZE (mPciHostBridgeLibAcpiAddressSpaceTypeStr)
               );
-      DEBUG ((EFI_D_ERROR, " %s: Length/Alignment = 0x%lx / 0x%lx\n",
+      DEBUG ((DEBUG_ERROR, " %s: Length/Alignment = 0x%lx / 0x%lx\n",
               mPciHostBridgeLibAcpiAddressSpaceTypeStr[Descriptor->ResType],
               Descriptor->AddrLen, Descriptor->AddrRangeMax
               ));
       if (Descriptor->ResType == ACPI_ADDRESS_SPACE_TYPE_MEM) {
-        DEBUG ((EFI_D_ERROR, "     Granularity/SpecificFlag = %ld / %02x%s\n",
+        DEBUG ((DEBUG_ERROR, "     Granularity/SpecificFlag = %ld / %02x%s\n",
                 Descriptor->AddrSpaceGranularity, Descriptor->SpecificFlag,
                 ((Descriptor->SpecificFlag &
                   EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_CACHEABLE_PREFETCHABLE

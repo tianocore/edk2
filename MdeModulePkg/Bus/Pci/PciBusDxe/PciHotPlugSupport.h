@@ -1,14 +1,8 @@
 /** @file
   PCI Hot Plug support functions declaration for PCI Bus module.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -31,7 +25,7 @@ typedef struct {
 } ROOT_HPC_DATA;
 
 //
-// Reference of some global variabes
+// Reference of some global variables
 //
 extern EFI_PCI_HOT_PLUG_INIT_PROTOCOL *gPciHotPlugInit;
 extern EFI_HPC_LOCATION               *gPciRootHpcPool;
@@ -52,7 +46,7 @@ PciHPCInitialized (
   );
 
 /**
-  Compare two device pathes to check if they are exactly same.
+  Compare two device paths to check if they are exactly same.
 
   @param DevicePath1    A pointer to the first device path data structure.
   @param DevicePath2    A pointer to the second device path data structure.
@@ -75,7 +69,7 @@ EfiCompareDevicePath (
   private data structure.
 
   @retval EFI_SUCCESS           They are same.
-  @retval EFI_UNSUPPORTED       No PCI Hot Plug controler on the platform.
+  @retval EFI_UNSUPPORTED       No PCI Hot Plug controller on the platform.
   @retval EFI_OUT_OF_RESOURCES  No memory to constructor root hot plug private
                                 data structure.
 
@@ -104,7 +98,7 @@ IsPciHotPlugBus (
 
   @param HpbDevicePath  A pointer to device path data structure to be tested.
   @param HpIndex        If HpIndex is not NULL, return the index of root hot
-                        plug in global array when TRUE is retuned.
+                        plug in global array when TRUE is returned.
 
   @retval TRUE          The device path is for root pci hot plug bus.
   @retval FALSE         The device path is not for root pci hot plug bus.
@@ -121,7 +115,7 @@ IsRootPciHotPlugBus (
 
   @param HpcDevicePath  A pointer to device path data structure to be tested.
   @param HpIndex        If HpIndex is not NULL, return the index of root hot
-                        plug in global array when TRUE is retuned.
+                        plug in global array when TRUE is returned.
 
   @retval TRUE          The device path is for root pci hot plug controller.
   @retval FALSE         The device path is not for root pci hot plug controller.
@@ -137,9 +131,9 @@ IsRootPciHotPlugController (
   Creating event object for PCI Hot Plug controller.
 
   @param  HpIndex   Index of hot plug device in global array.
-  @param  Event     The retuned event that invoke this function.
+  @param  Event     The returned event that invoke this function.
 
-  @return Status of create event invoken.
+  @return Status of create event.
 
 **/
 EFI_STATUS
@@ -188,7 +182,7 @@ IsSHPC (
 
   @param[in] PciIoDevice  The device being checked.
 
-  @retval TRUE   PciIoDevice is a PCIe port that accepts a hotplugged device.
+  @retval TRUE   PciIoDevice is a PCIe port that accepts a hot-plugged device.
   @retval FALSE  Otherwise.
 
 **/

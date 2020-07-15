@@ -1,14 +1,8 @@
 /** @file
   Provides Set/Get time operations.
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -114,7 +108,7 @@ PcRtcEfiSetWakeupTime (
 /**
   The user Entry Point for PcRTC module.
 
-  This is the entrhy point for PcRTC module. It installs the UEFI runtime service
+  This is the entry point for PcRTC module. It installs the UEFI runtime service
   including GetTime(),SetTime(),GetWakeupTime(),and SetWakeupTime().
 
   @param  ImageHandle    The firmware allocated handle for the EFI image.
@@ -139,7 +133,7 @@ InitializePcRtc (
 
   Status = PcRtcInit (&mModuleGlobal);
   ASSERT_EFI_ERROR (Status);
-  
+
   Status = gBS->CreateEventEx (
                   EVT_NOTIFY_SIGNAL,
                   TPL_CALLBACK,
@@ -149,7 +143,7 @@ InitializePcRtc (
                   &Event
                   );
   ASSERT_EFI_ERROR (Status);
-  
+
   Status = gBS->CreateEventEx (
                   EVT_NOTIFY_SIGNAL,
                   TPL_CALLBACK,

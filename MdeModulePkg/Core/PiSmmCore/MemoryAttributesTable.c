@@ -2,13 +2,7 @@
   PI SMM MemoryAttributes support
 
 Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -114,34 +108,6 @@ EfiSizeToPages (
   return RShiftU64 (Size, EFI_PAGE_SHIFT) + ((((UINTN)Size) & EFI_PAGE_MASK) ? 1 : 0);
 }
 
-/**
-  Check the consistency of Smm memory attributes table.
-
-  @param[in] MemoryAttributesTable  PI SMM memory attributes table
-**/
-VOID
-SmmMemoryAttributesTableConsistencyCheck (
-  IN EDKII_PI_SMM_MEMORY_ATTRIBUTES_TABLE *MemoryAttributesTable
-  )
-{
-  EFI_MEMORY_DESCRIPTOR                     *MemoryMap;
-  UINTN                                     MemoryMapEntryCount;
-  UINTN                                     DescriptorSize;
-  UINTN                                     Index;
-  UINT64                                    Address;
-
-  Address = 0;
-  MemoryMapEntryCount = MemoryAttributesTable->NumberOfEntries;
-  DescriptorSize = MemoryAttributesTable->DescriptorSize;
-  MemoryMap = (EFI_MEMORY_DESCRIPTOR *)(MemoryAttributesTable + 1);
-  for (Index = 0; Index < MemoryMapEntryCount; Index++) {
-    if (Address != 0) {
-      ASSERT (Address == MemoryMap->PhysicalStart);
-    }
-    Address = MemoryMap->PhysicalStart + EfiPagesToSize(MemoryMap->NumberOfPages);
-    MemoryMap = NEXT_MEMORY_DESCRIPTOR(MemoryMap, DescriptorSize);
-  }
-}
 
 /**
   Sort memory map entries based upon PhysicalStart, from low to high.
@@ -186,7 +152,7 @@ SortMemoryMap (
 }
 
 /**
-  Merge continous memory map entries whose have same attributes.
+  Merge continuous memory map entries whose have same attributes.
 
   @param[in, out]  MemoryMap              A pointer to the buffer in which firmware places
                                           the current memory map.
@@ -334,7 +300,7 @@ GetImageRecordByAddress (
   @param[in]       ImageRecord            An image record whose [ImageBase, ImageSize] covered
                                           by old memory map entry.
   @param[in, out]  NewRecord              A pointer to several new memory map entries.
-                                          The caller gurantee the buffer size be 1 +
+                                          The caller guarantee the buffer size be 1 +
                                           (SplitRecordCount * DescriptorSize) calculated
                                           below.
   @param[in]       OldRecord              A pointer to one old memory map entry.
@@ -484,7 +450,7 @@ GetMaxSplitRecordCount (
 
   @param[in]       OldRecord              A pointer to one old memory map entry.
   @param[in, out]  NewRecord              A pointer to several new memory map entries.
-                                          The caller gurantee the buffer size be 1 +
+                                          The caller guarantee the buffer size be 1 +
                                           (SplitRecordCount * DescriptorSize) calculated
                                           below.
   @param[in]       MaxSplitRecordCount    The max number of splitted entries
@@ -701,7 +667,7 @@ SplitTable (
   This function for GetMemoryMap() with memory attributes table.
 
   It calls original GetMemoryMap() to get the original memory map information. Then
-  plus the additional memory map entries for PE Code/Data seperation.
+  plus the additional memory map entries for PE Code/Data separation.
 
   @param[in, out]  MemoryMapSize          A pointer to the size, in bytes, of the
                                           MemoryMap buffer. On input, this is the size of
@@ -1060,7 +1026,6 @@ SmmInsertImageRecord (
   IMAGE_PROPERTIES_RECORD              *ImageRecord;
   CHAR8                                *PdbPointer;
   IMAGE_PROPERTIES_RECORD_CODE_SECTION *ImageRecordCodeSection;
-  UINT16                               Magic;
 
   DEBUG ((DEBUG_VERBOSE, "SMM InsertImageRecord - 0x%x\n", DriverEntry));
   DEBUG ((DEBUG_VERBOSE, "SMM InsertImageRecord - 0x%016lx - 0x%08x\n", DriverEntry->ImageBuffer, DriverEntry->NumberOfPage));
@@ -1104,21 +1069,7 @@ SmmInsertImageRecord (
   //
   // Get SectionAlignment
   //
-  if (Hdr.Pe32->FileHeader.Machine == IMAGE_FILE_MACHINE_IA64 && Hdr.Pe32->OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
-    //
-    // NOTE: Some versions of Linux ELILO for Itanium have an incorrect magic value
-    //       in the PE/COFF Header. If the MachineType is Itanium(IA64) and the
-    //       Magic value in the OptionalHeader is EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC
-    //       then override the magic value to EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC
-    //
-    Magic = EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC;
-  } else {
-    //
-    // Get the magic value from the PE/COFF Optional Header
-    //
-    Magic = Hdr.Pe32->OptionalHeader.Magic;
-  }
-  if (Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
+  if (Hdr.Pe32->OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
     SectionAlignment  = Hdr.Pe32->OptionalHeader.SectionAlignment;
   } else {
     SectionAlignment  = Hdr.Pe32Plus->OptionalHeader.SectionAlignment;
@@ -1214,95 +1165,16 @@ SmmInsertImageRecord (
   InsertTailList (&mImagePropertiesPrivateData.ImageRecordList, &ImageRecord->Link);
   mImagePropertiesPrivateData.ImageRecordCount++;
 
-  SortImageRecord ();
-
   if (mImagePropertiesPrivateData.CodeSegmentCountMax < ImageRecord->CodeSegmentCount) {
     mImagePropertiesPrivateData.CodeSegmentCountMax = ImageRecord->CodeSegmentCount;
   }
+
+  SortImageRecord ();
 
 Finish:
   return ;
 }
 
-/**
-  Find image record according to image base and size.
-
-  @param[in]  ImageBase    Base of PE image
-  @param[in]  ImageSize    Size of PE image
-
-  @return image record
-**/
-STATIC
-IMAGE_PROPERTIES_RECORD *
-FindImageRecord (
-  IN EFI_PHYSICAL_ADDRESS  ImageBase,
-  IN UINT64                ImageSize
-  )
-{
-  IMAGE_PROPERTIES_RECORD    *ImageRecord;
-  LIST_ENTRY                 *ImageRecordLink;
-  LIST_ENTRY                 *ImageRecordList;
-
-  ImageRecordList = &mImagePropertiesPrivateData.ImageRecordList;
-
-  for (ImageRecordLink = ImageRecordList->ForwardLink;
-       ImageRecordLink != ImageRecordList;
-       ImageRecordLink = ImageRecordLink->ForwardLink) {
-    ImageRecord = CR (
-                    ImageRecordLink,
-                    IMAGE_PROPERTIES_RECORD,
-                    Link,
-                    IMAGE_PROPERTIES_RECORD_SIGNATURE
-                    );
-
-    if ((ImageBase == ImageRecord->ImageBase) &&
-        (ImageSize == ImageRecord->ImageSize)) {
-      return ImageRecord;
-    }
-  }
-
-  return NULL;
-}
-
-/**
-  Remove Image record.
-
-  @param[in]  DriverEntry    Driver information
-**/
-VOID
-SmmRemoveImageRecord (
-  IN EFI_SMM_DRIVER_ENTRY  *DriverEntry
-  )
-{
-  IMAGE_PROPERTIES_RECORD              *ImageRecord;
-  LIST_ENTRY                           *CodeSegmentListHead;
-  IMAGE_PROPERTIES_RECORD_CODE_SECTION *ImageRecordCodeSection;
-
-  DEBUG ((DEBUG_VERBOSE, "SMM RemoveImageRecord - 0x%x\n", DriverEntry));
-  DEBUG ((DEBUG_VERBOSE, "SMM RemoveImageRecord - 0x%016lx - 0x%016lx\n", DriverEntry->ImageBuffer, DriverEntry->NumberOfPage));
-
-  ImageRecord = FindImageRecord (DriverEntry->ImageBuffer, EfiPagesToSize(DriverEntry->NumberOfPage));
-  if (ImageRecord == NULL) {
-    DEBUG ((DEBUG_ERROR, "SMM !!!!!!!! ImageRecord not found !!!!!!!!\n"));
-    return ;
-  }
-
-  CodeSegmentListHead = &ImageRecord->CodeSegmentList;
-  while (!IsListEmpty (CodeSegmentListHead)) {
-    ImageRecordCodeSection = CR (
-                               CodeSegmentListHead->ForwardLink,
-                               IMAGE_PROPERTIES_RECORD_CODE_SECTION,
-                               Link,
-                               IMAGE_PROPERTIES_RECORD_CODE_SECTION_SIGNATURE
-                               );
-    RemoveEntryList (&ImageRecordCodeSection->Link);
-    FreePool (ImageRecordCodeSection);
-  }
-
-  RemoveEntryList (&ImageRecord->Link);
-  FreePool (ImageRecord);
-  mImagePropertiesPrivateData.ImageRecordCount--;
-}
 
 /**
   Publish MemoryAttributesTable to SMM configuration table.
@@ -1386,30 +1258,6 @@ PublishMemoryAttributesTable (
   ASSERT_EFI_ERROR (Status);
 }
 
-/**
-  This function returns if image is inside SMRAM.
-
-  @param[in] LoadedImage LoadedImage protocol instance for an image.
-
-  @retval TRUE  the image is inside SMRAM.
-  @retval FALSE the image is outside SMRAM.
-**/
-BOOLEAN
-IsImageInsideSmram (
-  IN EFI_LOADED_IMAGE_PROTOCOL   *LoadedImage
-  )
-{
-  UINTN  Index;
-
-  for (Index = 0; Index < mFullSmramRangeCount; Index++) {
-    if ((mFullSmramRanges[Index].PhysicalStart <= (UINTN)LoadedImage->ImageBase)&&
-        (mFullSmramRanges[Index].PhysicalStart + mFullSmramRanges[Index].PhysicalSize >= (UINTN)LoadedImage->ImageBase + LoadedImage->ImageSize)) {
-      return TRUE;
-    }
-  }
-
-  return FALSE;
-}
 
 /**
   This function installs all SMM image record information.

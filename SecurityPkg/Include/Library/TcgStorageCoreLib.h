@@ -1,14 +1,13 @@
 /** @file
   Public API for the Tcg Core library to perform the lowest level TCG Data encoding.
 
-Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+  (TCG Storage Architecture Core Specification, Version 2.01, Revision 1.00,
+  https://trustedcomputinggroup.org/tcg-storage-architecture-core-specification/)
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Check http://trustedcomputinggroup.org for latest specification updates.
+
+Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -21,21 +20,21 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   {                                                                              \
     TCG_RESULT ret = (arg);                                                      \
     if (ret != TcgResultSuccess) {                                               \
-      DEBUG ((DEBUG_INFO, "ERROR_CHECK failed at %s:%u\n", __FILE__, __LINE__)); \
+      DEBUG ((DEBUG_INFO, "ERROR_CHECK failed at %a:%u\n", __FILE__, __LINE__)); \
       return ret;                                                                \
     }                                                                            \
   }
 
 #define METHOD_STATUS_ERROR_CHECK(arg, failRet)                                                  \
   if ((arg) != TCG_METHOD_STATUS_CODE_SUCCESS) {                                                 \
-    DEBUG ((DEBUG_INFO, "Method Status error: 0x%02X (%s)\n", arg, TcgMethodStatusString(arg))); \
+    DEBUG ((DEBUG_INFO, "Method Status error: 0x%02X (%a)\n", arg, TcgMethodStatusString(arg))); \
     return (failRet);                                                                            \
   }
 
 #define NULL_CHECK(arg)                                                                   \
   do {                                                                                    \
     if ((arg) == NULL) {                                                                  \
-      DEBUG ((DEBUG_INFO, "NULL_CHECK(%s) failed at %s:%u\n", #arg, __FILE__, __LINE__)); \
+      DEBUG ((DEBUG_INFO, "NULL_CHECK(%a) failed at %a:%u\n", #arg, __FILE__, __LINE__)); \
       return TcgResultFailureNullPointer;                                                 \
     }                                                                                     \
   } while (0)
@@ -589,7 +588,7 @@ TcgAddEndTransaction(
   );
 
 /**
-  Initial the tcg parse stucture.
+  Initial the tcg parse structure.
 
   @param    ParseStruct    Input parse structure.
   @param    Buffer         Input buffer data.
@@ -697,7 +696,7 @@ TcgGetTokenUINT64(
   Get next specify value.
 
   @param    ParseStruct   Input parse structure.
-  @param    Value         Return vlaue.
+  @param    Value         Return value.
 
   @retval   return the action result.
 
@@ -714,7 +713,7 @@ TcgGetNextUINT8(
   Get next specify value.
 
   @param    ParseStruct   Input parse structure.
-  @param    Value         Return vlaue.
+  @param    Value         Return value.
 
   @retval   return the action result.
 
@@ -730,7 +729,7 @@ TcgGetNextUINT16(
   Get next specify value.
 
   @param    ParseStruct   Input parse structure.
-  @param    Value         Return vlaue.
+  @param    Value         Return value.
 
   @retval   return the action result.
 
@@ -746,7 +745,7 @@ TcgGetNextUINT32(
   Get next specify value.
 
   @param    ParseStruct   Input parse structure.
-  @param    Value         Return vlaue.
+  @param    Value         Return value.
 
   @retval   return the action result.
 
@@ -762,7 +761,7 @@ TcgGetNextUINT64(
   Get next specify value.
 
   @param    ParseStruct   Input parse structure.
-  @param    Value         Return vlaue.
+  @param    Value         Return value.
 
   @retval   return the action result.
 
@@ -1219,7 +1218,7 @@ TcgParseSyncSession(
   @param     HostSession       Host session data.
   @param     AceRow            Ace row info.
   @param     Authority1        Authority 1 info.
-  @param     LogicalOperator   Logiccal operator info.
+  @param     LogicalOperator   Logical operator info.
   @param     Authority2        Authority 2 info.
 
   @retval    Return the action result.
@@ -1262,7 +1261,7 @@ TcgEnumLevel0Discovery(
   Get Feature code from the header.
 
   @param     DiscoveryHeader    The discovery header.
-  @param     FeatureCode        reutrn the Feature code.
+  @param     FeatureCode        return the Feature code.
   @param     FeatureSize        return the Feature size.
 
   @retval    return the Feature code data.

@@ -1,5 +1,0 @@
-The following devices have been confirmed to work with the USB Serial Driver:
-
-Brand        Model Name        Product Name          Vendor ID    Device ID
-Gearmo       USA_FTDI-36       USB to RS-232         0x0403       0x6001
-Sabrent      CB-FTDI                                 0x0403       0x6001

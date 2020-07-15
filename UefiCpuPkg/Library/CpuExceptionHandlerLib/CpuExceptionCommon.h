@@ -1,14 +1,8 @@
 /** @file
   Common header file for CPU Exception Handler Library.
 
-  Copyright (c) 2012 - 2016, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2012 - 2019, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -24,17 +18,36 @@
 #include <Library/PeCoffGetEntryPointLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/SynchronizationLib.h>
+#include <Library/CpuExceptionHandlerLib.h>
 
 #define  CPU_EXCEPTION_NUM          32
 #define  CPU_INTERRUPT_NUM         256
 #define  HOOKAFTER_STUB_SIZE        16
 
+//
+// Exception Error Code of Page-Fault Exception
+//
+#define IA32_PF_EC_P                BIT0
+#define IA32_PF_EC_WR               BIT1
+#define IA32_PF_EC_US               BIT2
+#define IA32_PF_EC_RSVD             BIT3
+#define IA32_PF_EC_ID               BIT4
+#define IA32_PF_EC_PK               BIT5
+#define IA32_PF_EC_SS               BIT6
+#define IA32_PF_EC_SGX              BIT15
+
 #include "ArchInterruptDefs.h"
 
-#define CPU_EXCEPTION_HANDLER_LIB_HOB_GUID \
-  { \
-    0xb21d9148, 0x9211, 0x4d8f, { 0xad, 0xd3, 0x66, 0xb1, 0x89, 0xc9, 0x2c, 0x83 } \
-  }
+#define CPU_STACK_SWITCH_EXCEPTION_NUMBER \
+  FixedPcdGetSize (PcdCpuStackSwitchExceptionList)
+
+#define CPU_STACK_SWITCH_EXCEPTION_LIST \
+  FixedPcdGetPtr (PcdCpuStackSwitchExceptionList)
+
+#define CPU_KNOWN_GOOD_STACK_SIZE \
+  FixedPcdGet32 (PcdCpuKnownGoodStackSize)
+
+#define CPU_TSS_GDT_SIZE (SIZE_2KB + CPU_TSS_DESC_SIZE + CPU_TSS_SIZE)
 
 //
 // Record exception handler information
@@ -53,7 +66,6 @@ typedef struct {
 } EXCEPTION_HANDLER_DATA;
 
 extern CONST UINT32                mErrorCodeFlag;
-extern CONST UINTN                 mImageAlignSize;
 extern CONST UINTN                 mDoFarReturnFlag;
 
 /**
@@ -97,7 +109,7 @@ ArchGetIdtHandler (
   Prints a message to the serial port.
 
   @param  Format      Format string for the message to print.
-  @param  ...         Variable argument list whose contents are accessed 
+  @param  ...         Variable argument list whose contents are accessed
                       based on the format string specified by Format.
 
 **/
@@ -110,17 +122,13 @@ InternalPrintMessage (
 
 /**
   Find and display image base address and return image base and its entry point.
-  
+
   @param CurrentEip      Current instruction pointer.
-  @param EntryPoint      Return module entry point if module header is found.
-  
-  @return !0     Image base address.
-  @return 0      Image header cannot be found.
+
 **/
-UINTN 
-FindModuleImageBase (
-  IN  UINTN              CurrentEip,
-  OUT UINTN              *EntryPoint
+VOID
+DumpModuleImageInfo (
+  IN  UINTN              CurrentEip
   );
 
 /**
@@ -130,7 +138,7 @@ FindModuleImageBase (
   @param SystemContext  Pointer to EFI_SYSTEM_CONTEXT.
 **/
 VOID
-DumpCpuContent (
+DumpImageAndCpuContent (
   IN EFI_EXCEPTION_TYPE   ExceptionType,
   IN EFI_SYSTEM_CONTEXT   SystemContext
   );
@@ -140,8 +148,8 @@ DumpCpuContent (
 
   @param[in]      VectorInfo            Pointer to reserved vector list.
   @param[in, out] ExceptionHandlerData  Pointer to exception handler data.
-  
-  @retval EFI_SUCCESS           CPU Exception Entries have been successfully initialized 
+
+  @retval EFI_SUCCESS           CPU Exception Entries have been successfully initialized
                                 with default exception handlers.
   @retval EFI_INVALID_PARAMETER VectorInfo includes the invalid content if VectorInfo is not NULL.
   @retval EFI_UNSUPPORTED       This function is not supported.
@@ -223,7 +231,7 @@ ArchRestoreExceptionContext (
 
 /**
   Fix up the vector number and function address in the vector code.
- 
+
   @param[in] NewVectorAddr   New vector handler address.
   @param[in] VectorNum       Index of vector.
   @param[in] OldVectorAddr   Old vector handler address.
@@ -239,11 +247,11 @@ AsmVectorNumFixup (
 
 /**
   Read and save reserved vector information
-  
+
   @param[in]  VectorInfo        Pointer to reserved vector list.
   @param[out] ReservedVector    Pointer to reserved vector data buffer.
   @param[in]  VectorCount       Vector number to be updated.
-  
+
   @return EFI_SUCCESS           Read and save vector info successfully.
   @retval EFI_INVALID_PARAMETER VectorInfo includes the invalid content if VectorInfo is not NULL.
 
@@ -276,9 +284,37 @@ GetExceptionNameStr (
 **/
 VOID
 CommonExceptionHandlerWorker (
-  IN EFI_EXCEPTION_TYPE          ExceptionType, 
+  IN EFI_EXCEPTION_TYPE          ExceptionType,
   IN EFI_SYSTEM_CONTEXT          SystemContext,
   IN EXCEPTION_HANDLER_DATA      *ExceptionHandlerData
+  );
+
+/**
+  Setup separate stack for specific exceptions.
+
+  @param[in] StackSwitchData      Pointer to data required for setuping up
+                                  stack switch.
+
+  @retval EFI_SUCCESS             The exceptions have been successfully
+                                  initialized with new stack.
+  @retval EFI_INVALID_PARAMETER   StackSwitchData contains invalid content.
+**/
+EFI_STATUS
+ArchSetupExceptionStack (
+  IN CPU_EXCEPTION_INIT_DATA        *StackSwitchData
+  );
+
+/**
+  Return address map of exception handler template so that C code can generate
+  exception tables. The template is only for exceptions using task gate instead
+  of interrupt gate.
+
+  @param AddressMap  Pointer to a buffer where the address map is returned.
+**/
+VOID
+EFIAPI
+AsmGetTssTemplateMap (
+  OUT EXCEPTION_HANDLER_TEMPLATE_MAP  *AddressMap
   );
 
 #endif

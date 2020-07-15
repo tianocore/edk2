@@ -1,31 +1,26 @@
 ## @file
 # This file is used to create/update/query/erase table for ECC reports
 #
-# Copyright (c) 2008 - 2015, Intel Corporation. All rights reserved.<BR>
-# This program and the accompanying materials
-# are licensed and made available under the terms and conditions of the BSD License
-# which accompanies this distribution.  The full text of the license may be found at
-# http://opensource.org/licenses/bsd-license.php
-#
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
 ##
 # Import Modules
 #
+from __future__ import absolute_import
 import Common.EdkLogger as EdkLogger
 import Common.LongFilePathOs as os, time
-from Table import Table
-from Common.String import ConvertToSqlString2
-import EccToolError as EccToolError
-import EccGlobalData as EccGlobalData
+from Table.Table import Table
+from Common.StringUtils import ConvertToSqlString2
+import Ecc.EccToolError as EccToolError
+import Ecc.EccGlobalData as EccGlobalData
 from Common.LongFilePathSupport import OpenLongFilePath as open
 
 ## TableReport
 #
 # This class defined a table used for data model
-# 
+#
 # @param object:       Inherited from object class
 #
 #
@@ -33,7 +28,7 @@ class TableReport(Table):
     def __init__(self, Cursor):
         Table.__init__(self, Cursor)
         self.Table = 'Report'
-    
+
     ## Create table
     #
     # Create table report
@@ -78,7 +73,7 @@ class TableReport(Table):
 
     ## Query table
     #
-    # @retval:       A recordSet of all found records 
+    # @retval:       A recordSet of all found records
     #
     def Query(self):
         SqlCommand = """select ID, ErrorID, OtherMsg, BelongsToTable, BelongsToItem, Corrected from %s

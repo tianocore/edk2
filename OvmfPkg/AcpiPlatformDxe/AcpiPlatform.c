@@ -2,13 +2,7 @@
   OVMF ACPI Platform Driver
 
   Copyright (c) 2008 - 2012, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -130,7 +124,7 @@ LocateFvInstanceWithTables (
 
 
 /**
-  Find ACPI tables in an FV and install them. 
+  Find ACPI tables in an FV and install them.
 
   This is now a fall-back path. Normally, we will search for tables provided
   by the VMM first.
@@ -138,7 +132,7 @@ LocateFvInstanceWithTables (
   If that fails, we use this function to load the ACPI tables from an FV. The
   sources for the FV based tables is located under OvmfPkg/AcpiTables.
 
-  @param  AcpiTable     Protocol instance pointer    
+  @param  AcpiTable     Protocol instance pointer
 
 **/
 EFI_STATUS
@@ -168,12 +162,19 @@ InstallOvmfFvTables (
   }
 
   //
+  // set FwVol (and use an ASSERT() below) to suppress incorrect
+  // compiler/analyzer warnings
+  //
+  FwVol = NULL;
+  //
   // Locate the firmware volume protocol
   //
   Status = LocateFvInstanceWithTables (&FwVol);
   if (EFI_ERROR (Status)) {
     return EFI_ABORTED;
   }
+  ASSERT (FwVol != NULL);
+
   //
   // Read tables from the storage file.
   //

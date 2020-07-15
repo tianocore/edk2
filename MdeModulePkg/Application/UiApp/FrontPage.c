@@ -2,13 +2,8 @@
   FrontPage routines to handle the callbacks and browser calls
 
 Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+(C) Copyright 2018 Hewlett Packard Enterprise Development LP<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -19,7 +14,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 EFI_GUID   mFrontPageGuid      = FRONT_PAGE_FORMSET_GUID;
 
-BOOLEAN   mFeaturerSwitch = TRUE;
 BOOLEAN   mResetRequired  = FALSE;
 
 EFI_FORM_BROWSER2_PROTOCOL      *gFormBrowser2;
@@ -151,6 +145,8 @@ FakeRouteConfig (
   if (Configuration == NULL || Progress == NULL) {
     return EFI_INVALID_PARAMETER;
   }
+
+  *Progress = Configuration;
 
   return EFI_NOT_FOUND;
 }
@@ -1039,34 +1035,7 @@ UiEntry (
 //
 
 
-/**
-  Enable the setup browser reset reminder feature.
-  This routine is used in platform tip. If the platform policy need the feature, use the routine to enable it.
 
-**/
-VOID
-EFIAPI
-EnableResetReminderFeature (
-  VOID
-  )
-{
-  mFeaturerSwitch = TRUE;
-}
-
-
-/**
-  Disable the setup browser reset reminder feature.
-  This routine is used in platform tip. If the platform policy do not want the feature, use the routine to disable it.
-
-**/
-VOID
-EFIAPI
-DisableResetReminderFeature (
-  VOID
-  )
-{
-  mFeaturerSwitch = FALSE;
-}
 
 
 /**
@@ -1084,33 +1053,7 @@ EnableResetRequired (
 }
 
 
-/**
-  Record the info that  no reset is required.
-  A  module boolean variable is used to record whether a reset is required.
 
-**/
-VOID
-EFIAPI
-DisableResetRequired (
-  VOID
-  )
-{
-  mResetRequired = FALSE;
-}
-
-
-/**
-  Check whether platform policy enable the reset reminder feature. The default is enabled.
-
-**/
-BOOLEAN
-EFIAPI
-IsResetReminderFeatureEnable (
-  VOID
-  )
-{
-  return mFeaturerSwitch;
-}
 
 
 /**
@@ -1143,31 +1086,28 @@ SetupResetReminder (
   CHAR16                        *StringBuffer1;
   CHAR16                        *StringBuffer2;
 
-
   //
   //check any reset required change is applied? if yes, reset system
   //
-  if (IsResetReminderFeatureEnable ()) {
-    if (IsResetRequired ()) {
+  if (IsResetRequired ()) {
 
-      StringBuffer1 = AllocateZeroPool (MAX_STRING_LEN * sizeof (CHAR16));
-      ASSERT (StringBuffer1 != NULL);
-      StringBuffer2 = AllocateZeroPool (MAX_STRING_LEN * sizeof (CHAR16));
-      ASSERT (StringBuffer2 != NULL);
-      StrCpyS (StringBuffer1, MAX_STRING_LEN, L"Configuration changed. Reset to apply it Now.");
-      StrCpyS (StringBuffer2, MAX_STRING_LEN, L"Press ENTER to reset");
-      //
-      // Popup a menu to notice user
-      //
-      do {
-        CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, StringBuffer1, StringBuffer2, NULL);
-      } while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
+    StringBuffer1 = AllocateZeroPool (MAX_STRING_LEN * sizeof (CHAR16));
+    ASSERT (StringBuffer1 != NULL);
+    StringBuffer2 = AllocateZeroPool (MAX_STRING_LEN * sizeof (CHAR16));
+    ASSERT (StringBuffer2 != NULL);
+    StrCpyS (StringBuffer1, MAX_STRING_LEN, L"Configuration changed. Reset to apply it Now.");
+    StrCpyS (StringBuffer2, MAX_STRING_LEN, L"Press ENTER to reset");
+    //
+    // Popup a menu to notice user
+    //
+    do {
+      CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, StringBuffer1, StringBuffer2, NULL);
+    } while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
 
-      FreePool (StringBuffer1);
-      FreePool (StringBuffer2);
+    FreePool (StringBuffer1);
+    FreePool (StringBuffer2);
 
-      gRT->ResetSystem (EfiResetCold, EFI_SUCCESS, 0, NULL);
-    }
+    gRT->ResetSystem (EfiResetCold, EFI_SUCCESS, 0, NULL);
   }
 }
 

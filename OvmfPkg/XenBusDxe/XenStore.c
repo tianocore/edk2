@@ -35,23 +35,7 @@
   This file may be distributed separately from the Linux kernel, or
   incorporated into other software packages, subject to the following license:
 
-  Permission is hereby granted, free of charge, to any person obtaining a copy
-  of this source file (the "Software"), to deal in the Software without
-  restriction, including without limitation the rights to use, copy, modify,
-  merge, publish, distribute, sublicense, and/or sell copies of the Software,
-  and to permit persons to whom the Software is furnished to do so, subject to
-  the following conditions:
-
-  The above copyright notice and this permission notice shall be included in
-  all copies or substantial portions of the Software.
-
-  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
-  IN THE SOFTWARE.
+  SPDX-License-Identifier: MIT
 **/
 
 #include "XenStore.h"
@@ -154,7 +138,7 @@ typedef struct {
    */
   LIST_ENTRY WatchEvents;
 
-  /** Lock protecting the watch calback list. */
+  /** Lock protecting the watch callback list. */
   EFI_LOCK WatchEventsLock;
 
   /**
@@ -483,7 +467,7 @@ XenStoreWriteStore (
       Status = XenStoreWaitForEvent (xs.EventChannelEvent,
                                      EFI_TIMER_PERIOD_SECONDS (1));
       if (Status == EFI_TIMEOUT) {
-        DEBUG ((EFI_D_WARN, "XenStore Write, waiting for a ring event.\n"));
+        DEBUG ((DEBUG_WARN, "XenStore Write, waiting for a ring event.\n"));
       }
       continue;
     }
@@ -562,7 +546,7 @@ XenStoreReadStore (
       Status = XenStoreWaitForEvent (xs.EventChannelEvent,
                                      EFI_TIMER_PERIOD_SECONDS (1));
       if (Status == EFI_TIMEOUT) {
-        DEBUG ((EFI_D_WARN, "XenStore Read, waiting for a ring event.\n"));
+        DEBUG ((DEBUG_WARN, "XenStore Read, waiting for a ring event.\n"));
       }
       continue;
     }
@@ -633,7 +617,7 @@ XenStoreProcessMessage (
   Status = XenStoreReadStore (&Message->Header, sizeof (Message->Header));
   if (Status != XENSTORE_STATUS_SUCCESS) {
     FreePool (Message);
-    DEBUG ((EFI_D_ERROR, "XenStore: Error read store (%d)\n", Status));
+    DEBUG ((DEBUG_ERROR, "XenStore: Error read store (%d)\n", Status));
     return Status;
   }
 
@@ -642,7 +626,7 @@ XenStoreProcessMessage (
   if (Status != XENSTORE_STATUS_SUCCESS) {
     FreePool (Body);
     FreePool (Message);
-    DEBUG ((EFI_D_ERROR, "XenStore: Error read store (%d)\n", Status));
+    DEBUG ((DEBUG_ERROR, "XenStore: Error read store (%d)\n", Status));
     return Status;
   }
   Body[Message->Header.len] = '\0';
@@ -654,14 +638,14 @@ XenStoreProcessMessage (
     EfiAcquireLock (&xs.RegisteredWatchesLock);
     Message->u.Watch.Handle =
       XenStoreFindWatch (Message->u.Watch.Vector[XS_WATCH_TOKEN]);
-    DEBUG ((EFI_D_INFO, "XenStore: Watch event %a\n",
+    DEBUG ((DEBUG_INFO, "XenStore: Watch event %a\n",
             Message->u.Watch.Vector[XS_WATCH_TOKEN]));
     if (Message->u.Watch.Handle != NULL) {
       EfiAcquireLock (&xs.WatchEventsLock);
       InsertHeadList (&xs.WatchEvents, &Message->Link);
       EfiReleaseLock (&xs.WatchEventsLock);
     } else {
-      DEBUG ((EFI_D_WARN, "XenStore: Watch handle %a not found\n",
+      DEBUG ((DEBUG_WARN, "XenStore: Watch handle %a not found\n",
               Message->u.Watch.Vector[XS_WATCH_TOKEN]));
       FreePool((VOID*)Message->u.Watch.Vector);
       FreePool(Message);
@@ -727,7 +711,7 @@ XenStoreGetError (
       return gXenStoreErrors[Index].Status;
     }
   }
-  DEBUG ((EFI_D_WARN, "XenStore gave unknown error %a\n", ErrorStr));
+  DEBUG ((DEBUG_WARN, "XenStore gave unknown error %a\n", ErrorStr));
   return XENSTORE_STATUS_EINVAL;
 }
 
@@ -754,7 +738,7 @@ XenStoreReadReply (
     XENSTORE_STATUS Status;
     Status = XenStoreProcessMessage ();
     if (Status != XENSTORE_STATUS_SUCCESS && Status != XENSTORE_STATUS_EAGAIN) {
-      DEBUG ((EFI_D_ERROR, "XenStore, error while reading the ring (%d).",
+      DEBUG ((DEBUG_ERROR, "XenStore, error while reading the ring (%d).",
               Status));
       return Status;
     }
@@ -777,7 +761,7 @@ XenStoreReadReply (
 }
 
 /**
-  Send a message with an optionally muti-part body to the XenStore service.
+  Send a message with an optionally multi-part body to the XenStore service.
 
   @param Transaction    The transaction to use for this request.
   @param RequestType    The type of message to send.
@@ -819,14 +803,14 @@ XenStoreTalkv (
 
   Status = XenStoreWriteStore (&Message, sizeof (Message));
   if (Status != XENSTORE_STATUS_SUCCESS) {
-    DEBUG ((EFI_D_ERROR, "XenStoreTalkv failed %d\n", Status));
+    DEBUG ((DEBUG_ERROR, "XenStoreTalkv failed %d\n", Status));
     goto Error;
   }
 
   for (Index = 0; Index < NumRequests; Index++) {
     Status = XenStoreWriteStore (WriteRequest[Index].Data, WriteRequest[Index].Len);
     if (Status != XENSTORE_STATUS_SUCCESS) {
-      DEBUG ((EFI_D_ERROR, "XenStoreTalkv failed %d\n", Status));
+      DEBUG ((DEBUG_ERROR, "XenStoreTalkv failed %d\n", Status));
       goto Error;
     }
   }
@@ -1022,7 +1006,7 @@ XenStoreInitComms (
   while (XenStore->rsp_prod != XenStore->rsp_cons) {
     Status = gBS->CheckEvent (TimerEvent);
     if (!EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_WARN, "XENSTORE response ring is not quiescent "
+      DEBUG ((DEBUG_WARN, "XENSTORE response ring is not quiescent "
               "(%08x:%08x): fixing up\n",
               XenStore->rsp_cons, XenStore->rsp_prod));
       XenStore->rsp_cons = XenStore->rsp_prod;
@@ -1062,7 +1046,7 @@ XenStoreInit (
   xs.EventChannel = (evtchn_port_t)XenHypercallHvmGetParam (HVM_PARAM_STORE_EVTCHN);
   XenStoreGpfn = (UINTN)XenHypercallHvmGetParam (HVM_PARAM_STORE_PFN);
   xs.XenStore = (VOID *) (XenStoreGpfn << EFI_PAGE_SHIFT);
-  DEBUG ((EFI_D_INFO, "XenBusInit: XenBus rings @%p, event channel %x\n",
+  DEBUG ((DEBUG_INFO, "XenBusInit: XenBus rings @%p, event channel %x\n",
           xs.XenStore, xs.EventChannel));
 
   InitializeListHead (&xs.ReplyList);
@@ -1092,7 +1076,7 @@ XenStoreDeinit (
   if (!IsListEmpty (&xs.RegisteredWatches)) {
     XENSTORE_WATCH *Watch;
     LIST_ENTRY *Entry;
-    DEBUG ((EFI_D_WARN, "XenStore: RegisteredWatches is not empty, cleaning up..."));
+    DEBUG ((DEBUG_WARN, "XenStore: RegisteredWatches is not empty, cleaning up..."));
     Entry = GetFirstNode (&xs.RegisteredWatches);
     while (!IsNull (&xs.RegisteredWatches, Entry)) {
       Watch = XENSTORE_WATCH_FROM_LINK (Entry);
@@ -1108,7 +1092,7 @@ XenStoreDeinit (
   //
   if (!IsListEmpty (&xs.WatchEvents)) {
     LIST_ENTRY *Entry;
-    DEBUG ((EFI_D_WARN, "XenStore: WatchEvents is not empty, cleaning up..."));
+    DEBUG ((DEBUG_WARN, "XenStore: WatchEvents is not empty, cleaning up..."));
     Entry = GetFirstNode (&xs.WatchEvents);
     while (!IsNull (&xs.WatchEvents, Entry)) {
       XENSTORE_MESSAGE *Message = XENSTORE_MESSAGE_FROM_LINK (Entry);

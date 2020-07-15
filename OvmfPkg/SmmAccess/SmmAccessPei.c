@@ -13,13 +13,7 @@
   Copyright (C) 2013, 2015, Red Hat, Inc.<BR>
   Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials are licensed and made available
-  under the terms and conditions of the BSD License which accompanies this
-  distribution. The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT
-  WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -264,7 +258,7 @@ SmmAccessPeiEntryPoint (
   //
   HostBridgeDevId = PciRead16 (OVMF_HOSTBRIDGE_DID);
   if (HostBridgeDevId != INTEL_Q35_MCH_DEVICE_ID) {
-    DEBUG ((EFI_D_ERROR, "%a: no SMRAM with host bridge DID=0x%04x; only "
+    DEBUG ((DEBUG_ERROR, "%a: no SMRAM with host bridge DID=0x%04x; only "
       "DID=0x%04x (Q35) is supported\n", __FUNCTION__, HostBridgeDevId,
       INTEL_Q35_MCH_DEVICE_ID));
     goto WrongConfig;
@@ -280,7 +274,7 @@ SmmAccessPeiEntryPoint (
   EsmramcVal = PciRead8 (DRAMC_REGISTER_Q35 (MCH_ESMRAMC));
   RegMask8 = MCH_ESMRAMC_SM_CACHE | MCH_ESMRAMC_SM_L1 | MCH_ESMRAMC_SM_L2;
   if ((EsmramcVal & RegMask8) != RegMask8) {
-    DEBUG ((EFI_D_ERROR, "%a: this Q35 implementation lacks SMRAM\n",
+    DEBUG ((DEBUG_ERROR, "%a: this Q35 implementation lacks SMRAM\n",
       __FUNCTION__));
     goto WrongConfig;
   }
@@ -318,8 +312,9 @@ SmmAccessPeiEntryPoint (
   //
   // Set TSEG Memory Base.
   //
+  InitQ35TsegMbytes ();
   PciWrite32 (DRAMC_REGISTER_Q35 (MCH_TSEGMB),
-    (TopOfLowRamMb - FixedPcdGet8 (PcdQ35TsegMbytes)) << MCH_TSEGMB_MB_SHIFT);
+    (TopOfLowRamMb - mQ35TsegMbytes) << MCH_TSEGMB_MB_SHIFT);
 
   //
   // Set TSEG size, and disable TSEG visibility outside of SMM. Note that the
@@ -327,9 +322,10 @@ SmmAccessPeiEntryPoint (
   // *restricted* to SMM.
   //
   EsmramcVal &= ~(UINT32)MCH_ESMRAMC_TSEG_MASK;
-  EsmramcVal |= FixedPcdGet8 (PcdQ35TsegMbytes) == 8 ? MCH_ESMRAMC_TSEG_8MB :
-                FixedPcdGet8 (PcdQ35TsegMbytes) == 2 ? MCH_ESMRAMC_TSEG_2MB :
-                MCH_ESMRAMC_TSEG_1MB;
+  EsmramcVal |= mQ35TsegMbytes == 8 ? MCH_ESMRAMC_TSEG_8MB :
+                mQ35TsegMbytes == 2 ? MCH_ESMRAMC_TSEG_2MB :
+                mQ35TsegMbytes == 1 ? MCH_ESMRAMC_TSEG_1MB :
+                MCH_ESMRAMC_TSEG_EXT;
   EsmramcVal |= MCH_ESMRAMC_T_EN;
   PciWrite8 (DRAMC_REGISTER_Q35 (MCH_ESMRAMC), EsmramcVal);
 
@@ -355,12 +351,12 @@ SmmAccessPeiEntryPoint (
     UINTN Idx;
 
     Count = SmramMapSize / sizeof SmramMap[0];
-    DEBUG ((EFI_D_VERBOSE, "%a: SMRAM map follows, %d entries\n", __FUNCTION__,
+    DEBUG ((DEBUG_VERBOSE, "%a: SMRAM map follows, %d entries\n", __FUNCTION__,
       (INT32)Count));
-    DEBUG ((EFI_D_VERBOSE, "% 20a % 20a % 20a % 20a\n", "PhysicalStart(0x)",
+    DEBUG ((DEBUG_VERBOSE, "% 20a % 20a % 20a % 20a\n", "PhysicalStart(0x)",
       "PhysicalSize(0x)", "CpuStart(0x)", "RegionState(0x)"));
     for (Idx = 0; Idx < Count; ++Idx) {
-      DEBUG ((EFI_D_VERBOSE, "% 20Lx % 20Lx % 20Lx % 20Lx\n",
+      DEBUG ((DEBUG_VERBOSE, "% 20Lx % 20Lx % 20Lx % 20Lx\n",
         SmramMap[Idx].PhysicalStart, SmramMap[Idx].PhysicalSize,
         SmramMap[Idx].CpuStart, SmramMap[Idx].RegionState));
     }
@@ -375,6 +371,12 @@ SmmAccessPeiEntryPoint (
 
   CopyMem (GuidHob, &SmramMap[DescIdxSmmS3ResumeState],
     sizeof SmramMap[DescIdxSmmS3ResumeState]);
+
+  //
+  // SmramAccessLock() depends on "mQ35SmramAtDefaultSmbase"; init the latter
+  // just before exposing the former via PEI_SMM_ACCESS_PPI.Lock().
+  //
+  InitQ35SmramAtDefaultSmbase ();
 
   //
   // We're done. The next step should succeed, but even if it fails, we can't

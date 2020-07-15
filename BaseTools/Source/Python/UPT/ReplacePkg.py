@@ -1,15 +1,9 @@
 ## @file
 # Replace distribution package.
 #
-# Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
 #
-# This program and the accompanying materials are licensed and made available 
-# under the terms and conditions of the BSD License which accompanies this 
-# distribution. The full text of the license may be found at 
-# http://opensource.org/licenses/bsd-license.php
-#
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 """
 Replace a distribution package
@@ -51,27 +45,27 @@ def Main(Options = None):
         WorkspaceDir = GlobalData.gWORKSPACE
         Dep = DependencyRules(DataBase)
         DistPkg, ContentZipFile, DpPkgFileName, DistFile = UnZipDp(WorkspaceDir, Options.PackFileToReplace)
-        
+
         StoredDistFile, OrigDpGuid, OrigDpVersion = GetInstalledDpInfo(Options.PackFileToBeReplaced, \
                                                                        Dep, DataBase, WorkspaceDir)
-        
+
         #
         # check dependency
         #
         CheckReplaceDpx(Dep, DistPkg, OrigDpGuid, OrigDpVersion)
-        
+
         #
         # Remove the old distribution
         #
         RemoveDist(OrigDpGuid, OrigDpVersion, StoredDistFile, DataBase, WorkspaceDir, Options.Yes)
-        
+
         #
         # Install the new distribution
         #
         InstallDp(DistPkg, DpPkgFileName, ContentZipFile, Options, Dep, WorkspaceDir, DataBase)
         ReturnCode = 0
-        
-    except FatalError, XExcept:
+
+    except FatalError as XExcept:
         ReturnCode = XExcept.args[0]
         if Logger.GetLevel() <= Logger.DEBUG_9:
             Logger.Quiet(ST.MSG_PYTHON_ON % (python_version(),
@@ -87,7 +81,7 @@ def Main(Options = None):
                     "\nReplacePkg",
                     CODE_ERROR,
                     ST.ERR_UNKNOWN_FATAL_REPLACE_ERR % (Options.PackFileToReplace, Options.PackFileToBeReplaced),
-                    ExtraData=ST.MSG_SEARCH_FOR_HELP,
+                    ExtraData=ST.MSG_SEARCH_FOR_HELP % ST.MSG_EDKII_MAIL_ADDR,
                     RaiseError=False
                     )
         Logger.Quiet(ST.MSG_PYTHON_ON % (python_version(),
@@ -99,14 +93,14 @@ def Main(Options = None):
             DistFile.Close()
         if ContentZipFile:
             ContentZipFile.Close()
-        if GlobalData.gUNPACK_DIR:
-            rmtree(GlobalData.gUNPACK_DIR)
-            GlobalData.gUNPACK_DIR = None
-        Logger.Quiet(ST.MSG_REMOVE_TEMP_FILE_DONE)        
+        for TempDir in GlobalData.gUNPACK_DIR:
+            rmtree(TempDir)
+        GlobalData.gUNPACK_DIR = []
+        Logger.Quiet(ST.MSG_REMOVE_TEMP_FILE_DONE)
 
     if ReturnCode == 0:
         Logger.Quiet(ST.MSG_FINISH)
-    
+
     return ReturnCode
 
 def CheckReplaceDpx(Dep, DistPkg, OrigDpGuid, OrigDpVersion):
@@ -125,18 +119,18 @@ def CheckReplaceDpx(Dep, DistPkg, OrigDpGuid, OrigDpVersion):
         if Dep.CheckDpExists(DistPkg.Header.GetGuid(), DistPkg.Header.GetVersion()):
             Logger.Error("\nReplacePkg", UPT_ALREADY_INSTALLED_ERROR,
                 ST.WRN_DIST_PKG_INSTALLED,
-                ExtraData=ST.MSG_REPLACE_ALREADY_INSTALLED_DP)    
+                ExtraData=ST.MSG_REPLACE_ALREADY_INSTALLED_DP)
 
     #
     # check whether the original distribution could be replaced by new distribution
-    #    
+    #
     Logger.Verbose(ST.MSG_CHECK_DP_FOR_REPLACE%(NewDpInfo, OrigDpInfo))
     DepInfoResult = Dep.CheckDpDepexForReplace(OrigDpGuid, OrigDpVersion, NewDpPkgList)
     Replaceable = DepInfoResult[0]
     if not Replaceable:
         Logger.Error("\nReplacePkg", UNKNOWN_ERROR,
             ST.ERR_PACKAGE_NOT_MATCH_DEPENDENCY)
-    
+
     #
     # check whether new distribution could be installed by dependency rule
     #

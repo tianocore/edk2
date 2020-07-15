@@ -117,7 +117,7 @@ typedef struct {
 extern char	program[];	/* tells what program this is */
 extern char	version[];	/* tells what version this is */
 extern char	*file_str[];	/* file names being used */
-extern int	err_found;	/* flag to indicate error occured */
+extern int	err_found;	/* flag to indicate error occurred */
 extern int	action_no;	/* last action function printed */
 extern int	func_action;	/* should actions be turned into functions?*/
 extern set	used_chars;	/* used to label trans. arcs */
@@ -129,7 +129,7 @@ extern int	comp_level;	/* what compression level to use */
 extern int	interactive;	/* interactive scanner (avoid lookahead)*/
 extern int	mode_counter;	/* keeps track of the number of %%name */
 extern int	dfa_basep[];	/* start of each group of dfa */
-extern int	dfa_class_nop[];/* number of transistion arcs in */
+extern int	dfa_class_nop[];/* number of transition arcs in */
 				/* each dfa in each mode */
 extern int	nfa_allocated;
 extern int	dfa_allocated;

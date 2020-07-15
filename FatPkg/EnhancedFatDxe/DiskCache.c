@@ -2,13 +2,7 @@
   Cache implementation for EFI FAT File system driver.
 
 Copyright (c) 2005 - 2013, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available
-under the terms and conditions of the BSD License which accompanies this
-distribution. The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -22,7 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   are older than the contents in disk, so they are invalid; just mark them invalid.
 
   When this function is called by read command, if any entry in this range
-  is dirty, it means that the relative info directly readed from media is older than
+  is dirty, it means that the relative info directly read from media is older than
   than the info in the cache; So need to update the relative info in the Buffer.
 
   @param  Volume                - FAT file system volume.

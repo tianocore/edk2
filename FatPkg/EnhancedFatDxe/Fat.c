@@ -2,13 +2,7 @@
   Fat File System driver routines that support EFI driver model.
 
 Copyright (c) 2005 - 2014, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available
-under the terms and conditions of the BSD License which accompanies this
-distribution. The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -423,7 +417,7 @@ FatDriverBindingStart (
   Status = FatAllocateVolume (ControllerHandle, DiskIo, DiskIo2, BlockIo);
 
   //
-  // When the media changes on a device it will Reinstall the BlockIo interaface.
+  // When the media changes on a device it will Reinstall the BlockIo interface.
   // This will cause a call to our Stop(), and a subsequent reentrant call to our
   // Start() successfully. We should leave the device open when this happen.
   //

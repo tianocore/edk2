@@ -1,15 +1,9 @@
 // /**
 //
-// Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 // (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
-// (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
-// This program and the accompanying materials
-// are licensed and made available under the terms and conditions of the BSD License
-// which accompanies this distribution. The full text of the license may be found at
-// http://opensource.org/licenses/bsd-license.php
-//
-// THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-// WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+// (C) Copyright 2016 - 2019 Hewlett Packard Enterprise Development LP<BR>
+// SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Module Name:
 //
@@ -32,6 +26,7 @@
 
 #string STR_GEN_PROBLEM           #language en-US "%H%s%N: Unknown flag - '%H%s%N'\r\n"
 #string STR_GEN_PROBLEM_VAL       #language en-US "%H%s%N: Bad value - '%H%s%N' for flag - '%H%s%N'\r\n"
+#string STR_GEN_DUPLICATE         #language en-US "%H%s%N: Duplicate flag - '%H%s%N'\r\n"
 #string STR_GEN_NO_VALUE          #language en-US "%H%s%N: Missing argument for flag - '%H%s%N'\r\n"
 #string STR_GEN_TOO_FEW           #language en-US "%H%s%N: Too few arguments.\r\n"
 #string STR_GEN_TOO_MANY          #language en-US "%H%s%N: Too many arguments.\r\n"
@@ -79,6 +74,7 @@
 #string STR_MEMMAP_GET_FAILED     #language en-US "%H%s%N: Unable to get memory map\r\n"
 #string STR_MEMMAP_LIST_HEAD      #language en-US "Type       Start            End              # Pages          Attributes\r\n"
 #string STR_MEMMAP_LIST_ITEM      #language en-US "% -10s %016LX-%016LX %016LX %016LX\r\n"
+#string STR_MEMMAP_LIST_ITEM_OTHER #language en-US "%08x   %016LX-%016LX %016LX %016LX\r\n"
 #string STR_MEMMAP_LIST_SUMM      #language en-US " \r\n"
                                                   "  Reserved  : %,14ld Pages (%,ld Bytes)\r\n"
                                                   "  LoaderCode: %,14ld Pages (%,ld Bytes)\r\n"
@@ -94,7 +90,8 @@
                                                   "  PalCode   : %,14ld Pages (%,ld Bytes)\r\n"
                                                   "  Available : %,14ld Pages (%,ld Bytes)\r\n"
                                                   "  Persistent: %,14ld Pages (%,ld Bytes)\r\n"
-                                                  "              -------------- \r\n"
+#string STR_MEMMAP_LIST_SUMM_OTHER #language en-US    "  %08x  : %,14ld Pages (%,ld Bytes)\r\n"
+#string STR_MEMMAP_LIST_SUMM2     #language en-US "              -------------- \r\n"
                                                   "Total Memory: %,14ld MB (%,ld Bytes)\r\n"
 #string STR_MEMMAP_LIST_ITEM_SFO  #language en-US "MemoryMap,"%s","%LX","%LX","%LX","%LX"\r\n"
 #string STR_MEMMAP_LIST_SUMM_SFO  #language en-US "MemoryMapSummary,"%Ld","%Ld","%Ld","%Ld","%Ld","%Ld","%Ld","%Ld","%Ld","%Ld","%Ld","%Ld","%Ld","%Ld","%Ld","%Ld"\r\n"
@@ -125,7 +122,6 @@
 
 #string STR_MM_NOT_ALIGNED        #language en-US "%H%s%N: Address parameter %016LX is not aligned.\r\n"
 #string STR_MM_PCIE_ADDRESS_RANGE #language en-US "%H%s%N: Address parameter %016LX is not a valid PCI/PCIE address.\r\n"
-#string STR_MM_IO_ADDRESS_RANGE   #language en-US "%H%s%N: IO address out of range 0 - 0xFFFF\r\n"
 #string STR_MM_MMIO               #language en-US "%HMMIO%N"
 #string STR_MM_IO                 #language en-US "%HIO%N"
 #string STR_MM_PCI                #language en-US "%HPCI%N"
@@ -133,7 +129,6 @@
 #string STR_MM_PCIE               #language en-US "%HPCIE%N"
 #string STR_MM_ADDRESS            #language en-US "  0x%016lx : "
 #string STR_MM_BUF                #language en-US "0x%0*lx"
-#string STR_MM_ADDRESS_RANGE2     #language en-US "%H%s%N: IO address out of range\r\n"
 #string STR_MM_ERROR              #language en-US "%H%s%N: Input had incorrect format\r\n"
 
 #string STR_SETVAR_PRINT          #language en-US "%g - %s - %04x Bytes\r\n"
@@ -382,6 +377,7 @@
 #string STR_DMPSTORE_LOAD_GEN_FAIL     #language en-US "%H%s%N: Failed to set variable %H%s%N: %r.\r\n"
 #string STR_DMPSTORE_LOAD_BAD_FILE     #language en-US "%H%s%N: Incorrect file format.\r\n"
 #string STR_DMPSTORE_HEADER_LINE       #language en-US "Variable %H%s%N '%H%g%N:%H%s%N' DataSize = 0x%02x\r\n"
+#string STR_DMPSTORE_HEADER_LINE2      #language en-US "Variable %H%s%N '%H%s%N:%H%s%N' DataSize = 0x%02x\r\n"
 #string STR_DMPSTORE_DELETE_LINE       #language en-US "Delete variable '%H%g%N:%H%s%N': %r\r\n"
 #string STR_DMPSTORE_NO_VAR_FOUND      #language en-US "%H%s%N: No matching variables found.\r\n"
 #string STR_DMPSTORE_NO_VAR_FOUND_SFO  #language en-US "VariableInfo,\"\",\"\",\"\",\"\",\"\"\r\n"
@@ -614,21 +610,21 @@
 "MM Address [Value] [-w 1|2|4|8] [-MEM | -MMIO | -IO | -PCI | -PCIE] [-n]\r\n"
 ".SH OPTIONS\r\n"
 " \r\n"
-"  Address - Specifies a starting address.\r\n"
-"  Value   - Specifies the value to write.\r\n"
+"  Address - Starting address in hexadecimal format.\r\n"
+"  Value   - The value to write in hexadecimal format.\r\n"
 "  -MEM    - Memory Address type\r\n"
 "  -MMIO   - Memory Mapped IO Address type\r\n"
 "  -IO     - IO Address type\r\n"
 "  -PCI    - PCI Configuration Space Address type:\r\n"
-"            Address format: 0x000000ssbbddffrr\r\n"
-"              ss   - Segment\r\n"
+"            Address format: ssssbbddffrr\r\n"
+"              ssss - Segment\r\n"
 "              bb   - Bus\r\n"
 "              dd   - Device\r\n"
 "              ff   - Function\r\n"
 "              rr   - Register\r\n"
 "  -PCIE   - PCIE Configuration Space Address type:\r\n"
-"            Address format: 0x00000ssbbddffrrr\r\n"
-"              ss   - Segment\r\n"
+"            Address format: ssssbbddffrrr\r\n"
+"              ssss - Segment\r\n"
 "              bb   - Bus\r\n"
 "              dd   - Device\r\n"
 "              ff   - Function\r\n"
@@ -653,7 +649,7 @@
 "      follow the PCI Configuration Space Address format above. The 'PCI'\r\n"
 "      command can be used to determine the address for a specified device.\r\n"
 "      It is listed in the PCI configuration space dump information in the\r\n"
-"      following format: "[EFI 0x000000ssbbddffxx]".\r\n"
+"      following format: "[EFI ssbbddffxx]".\r\n"
 "  5.  If the PCIE address type is specified, the 'Address' parameter must\r\n"
 "      follow the PCIE Configuration Space Address format above.\r\n"
 "  6.  In interactive mode, type a hex value to modify, 'q' or '.' to exit.\r\n"
@@ -709,8 +705,8 @@
 "    IO  0x0000000000000086 : 0xFF >\r\n"
 "    IO  0x0000000000000087 : 0x00 > q\r\n"
 " \r\n"
-"  * To display PCI configuration space, ss=00, bb=00, dd=00, ff=00, rr=00:\r\n"
-"    Shell> mm 0000000000 -PCI\r\n"
+"  * To display PCI configuration space, ss=0000, bb=00, dd=00, ff=00, rr=00:\r\n"
+"    Shell> mm 000000000000 -PCI\r\n"
 "    PCI  0x0000000000000000 : 0x86 >\r\n"
 "    PCI  0x0000000000000001 : 0x80 >\r\n"
 "    PCI  0x0000000000000002 : 0x30 >\r\n"
@@ -719,8 +715,8 @@
 "    PCI  0x0000000000000005 : 0x00 > q\r\n"
 "    These contents can also be displayed by 'PCI 00 00 00'.\r\n"
 " \r\n"
-"  * To display PCIE configuration space, ss=00, bb=06, dd=00, ff=00, rrr=000:\r\n"
-"    Shell> mm 00060000000 -PCIE\r\n"
+"  * To display PCIE configuration space, ss=0000, bb=06, dd=00, ff=00, rrr=000:\r\n"
+"    Shell> mm 0000060000000 -PCIE\r\n"
 "    PCIE  0x0000000060000000 : 0xAB >\r\n"
 "    PCIE  0x0000000060000001 : 0x11 >\r\n"
 "    PCIE  0x0000000060000002 : 0x61 >\r\n"
@@ -980,6 +976,7 @@
 "       41 - Onboard Devices Extended Information\r\n"
 "       42 - Management Controller Host Interface\r\n"
 "       43 - TPM Device\r\n"
+"       44 - Processor Additional Information\r\n"
 "  2. Enter the SmbiosHandle parameter in hexadecimal format.\r\n"
 "     Do not use the '0x' prefix format for hexadecimal values.\r\n"
 "  3. Internal commands:\r\n"
@@ -1039,7 +1036,7 @@
 "  2. The variable value is printed as a hexadecimal dump.\r\n"
 "  3. Option -d is used to delete variables. Option -s and -l are used to save\r\n"
 "     and load variables to and from a file. The variable name can be specified\r\n"
-"     when using these flags so that the operation only takes effect on\r\n" 
+"     when using these flags so that the operation only takes effect on\r\n"
 "     that variable.\r\n"
 ".SH EXAMPLES\r\n"
 " \r\n"

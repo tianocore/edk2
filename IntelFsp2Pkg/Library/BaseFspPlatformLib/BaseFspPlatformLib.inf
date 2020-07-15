@@ -3,12 +3,7 @@
 #
 #  Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
 #
-#  This program and the accompanying materials
-#  are licensed and made available under the terms and conditions of the BSD License
-#  which accompanies this distribution. The full text of the license may be found at
-#  http://opensource.org/licenses/bsd-license.php.
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
 
@@ -35,12 +30,6 @@
   PerformanceLib
   ReportStatusCodeLib
 
-[Pcd]
-  gIntelFsp2PkgTokenSpaceGuid.PcdGlobalDataPointerAddress    ## CONSUMES
-  gIntelFsp2PkgTokenSpaceGuid.PcdTemporaryRamBase            ## CONSUMES
-  gIntelFsp2PkgTokenSpaceGuid.PcdTemporaryRamSize            ## CONSUMES
-  gIntelFsp2PkgTokenSpaceGuid.PcdFspTemporaryRamSize         ## CONSUMES
-
 [Guids]
   gFspPerformanceDataGuid                                   ## CONSUMES ## GUID
   gFspEventEndOfFirmwareGuid                                ## PRODUCES ## GUID
@@ -49,6 +38,3 @@
 [Protocols]
   gEfiPciEnumerationCompleteProtocolGuid                    ## CONSUMES
 
-[FixedPcd]
-  gIntelFsp2PkgTokenSpaceGuid.PcdFspMaxPatchEntry        ## CONSUMES
-  gIntelFsp2PkgTokenSpaceGuid.PcdFspMaxPerfEntry         ## CONSUMES

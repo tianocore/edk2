@@ -1,14 +1,8 @@
 /** @file
   This is service binding for Hash driver.
 
-Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under
-the terms and conditions of the BSD License that accompanies this distribution.
-The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -28,7 +22,7 @@ EFI_SERVICE_BINDING_PROTOCOL    mHash2ServiceBindingProtocol = {
                                      it is not NULL, then the I/O services are added
                                      to the existing child handle.
 
-  @retval EFI_SUCCES                 The protocol was added to ChildHandle.
+  @retval EFI_SUCCESS                The protocol was added to ChildHandle.
   @retval EFI_INVALID_PARAMETER      ChildHandle is NULL.
   @retval EFI_OUT_OF_RESOURCES       There are not enough resources available to
                                      create the child.
@@ -105,7 +99,7 @@ Hash2ServiceBindingCreateChild (
                                  instance.
   @param[in]  ChildHandle        Handle of the child to destroy.
 
-  @retval EFI_SUCCES             The protocol was removed from ChildHandle.
+  @retval EFI_SUCCESS            The protocol was removed from ChildHandle.
   @retval EFI_UNSUPPORTED        ChildHandle does not support the protocol that
                                  is being removed.
   @retval EFI_INVALID_PARAMETER  ChildHandle is NULL.
@@ -199,7 +193,7 @@ Hash2ServiceBindingDestroyChild (
   @param[in]  ImageHandle  The image handle of the driver.
   @param[in]  SystemTable  The system table.
 
-  @retval EFI_SUCCES       The service binding protocols is successfully installed.
+  @retval EFI_SUCCESS      The service binding protocols is successfully installed.
   @retval Others           Other errors as indicated.
 
 **/

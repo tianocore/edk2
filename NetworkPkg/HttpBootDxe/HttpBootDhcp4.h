@@ -1,14 +1,9 @@
 /** @file
   Functions declaration related with DHCPv4 for HTTP boot driver.
 
-Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
-The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                          
-    
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -28,7 +23,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define HTTP_BOOT_DHCP4_OVERLOAD_SERVER_NAME   2
 
 ///
-/// HTTP Tag definition that identifies the processor 
+/// HTTP Tag definition that identifies the processor
 /// and programming environment of the client system.
 /// These identifiers are defined by IETF:
 /// http://www.ietf.org/assignments/dhcpv6-parameters/dhcpv6-parameters.xml
@@ -41,13 +36,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define EFI_HTTP_BOOT_CLIENT_SYSTEM_ARCHITECTURE    HTTP_CLIENT_ARCH_ARM
 #elif defined (MDE_CPU_AARCH64)
 #define EFI_HTTP_BOOT_CLIENT_SYSTEM_ARCHITECTURE    HTTP_CLIENT_ARCH_AARCH64
+#elif defined (MDE_CPU_RISCV64)
+#define EFI_HTTP_BOOT_CLIENT_SYSTEM_ARCHITECTURE    HTTP_CLIENT_ARCH_RISCV64
 #elif defined (MDE_CPU_EBC)
 #define EFI_HTTP_BOOT_CLIENT_SYSTEM_ARCHITECTURE    HTTP_CLIENT_ARCH_EBC
 #endif
 
 /// DHCP offer types among HTTP boot.
 /// Dhcp4 and Dhcp6 share this definition, and corresponding
-/// relatioinship is as follows:
+/// relationship is as follows:
 ///   Dhcp4Discover <> Dhcp6Solicit
 ///   Dhcp4Offer    <> Dhcp6Advertise
 ///   Dhcp4Request  <> Dhcp6Request
@@ -236,7 +233,7 @@ HttpBootDhcp4Dora (
 
 /**
   This function will register the default DNS addresses to the network device.
-  
+
   @param[in]  Private             The pointer to HTTP_BOOT_PRIVATE_DATA.
   @param[in]  DataLength          Size of the buffer pointed to by DnsServerData in bytes.
   @param[in]  DnsServerData       Point a list of DNS server address in an array

@@ -1,14 +1,8 @@
 /** @file
   STM service protocol definition
 
-  Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2015 - 2019, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -16,7 +10,7 @@
 #define _SM_MONITOR_INIT_PROTOCOL_H_
 
 #include <PiSmm.h>
-#include <Register/StmApi.h>
+#include <Register/Intel/StmApi.h>
 
 #define EFI_SM_MONITOR_INIT_PROTOCOL_GUID \
     { 0x228f344d, 0xb3de, 0x43bb, 0xa4, 0xd7, 0xea, 0x20, 0xb, 0x1b, 0x14, 0x82}

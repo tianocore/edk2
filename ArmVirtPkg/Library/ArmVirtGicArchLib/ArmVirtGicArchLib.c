@@ -3,13 +3,7 @@
 
   Copyright (c) 2015 - 2016, Linaro Ltd. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -116,7 +110,12 @@ ArmVirtGicArchLibConstructor (
     break;
 
   case 2:
-    ASSERT (RegSize == 32);
+    //
+    // When the GICv2 is emulated with virtualization=on, it adds a virtual
+    // set of control registers. This means the register property can be
+    // either 32 or 64 bytes in size.
+    //
+    ASSERT ((RegSize == 32) || (RegSize == 64));
 
     DistBase = SwapBytes64 (Reg[0]);
     CpuBase  = SwapBytes64 (Reg[2]);

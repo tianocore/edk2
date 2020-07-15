@@ -3,15 +3,9 @@
 
   Abstraction of a very simple graphics device.
 
-  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials are licensed and made available
-  under the terms and conditions of the BSD License which accompanies this
-  distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -99,33 +93,33 @@ typedef enum {
 
     The following table defines actions for BltOperations:
 
-    <B>EfiUgaVideoFill</B> - Write data from the  BltBuffer pixel (SourceX, SourceY) 
-      directly to every pixel of the video display rectangle 
-      (DestinationX, DestinationY) (DestinationX + Width, DestinationY + Height). 
+    <B>EfiUgaVideoFill</B> - Write data from the  BltBuffer pixel (SourceX, SourceY)
+      directly to every pixel of the video display rectangle
+      (DestinationX, DestinationY) (DestinationX + Width, DestinationY + Height).
       Only one pixel will be used from the BltBuffer. Delta is NOT used.
 
-    <B>EfiUgaVideoToBltBuffer</B> - Read data from the video display rectangle 
-      (SourceX, SourceY) (SourceX + Width, SourceY + Height) and place it in 
-      the BltBuffer rectangle (DestinationX, DestinationY ) 
-      (DestinationX + Width, DestinationY + Height). If DestinationX or 
-      DestinationY is not zero then Delta must be set to the length in bytes 
+    <B>EfiUgaVideoToBltBuffer</B> - Read data from the video display rectangle
+      (SourceX, SourceY) (SourceX + Width, SourceY + Height) and place it in
+      the BltBuffer rectangle (DestinationX, DestinationY )
+      (DestinationX + Width, DestinationY + Height). If DestinationX or
+      DestinationY is not zero then Delta must be set to the length in bytes
       of a row in the BltBuffer.
 
-    <B>EfiUgaBltBufferToVideo</B> - Write data from the  BltBuffer rectangle 
-      (SourceX, SourceY) (SourceX + Width, SourceY + Height) directly to the 
-      video display rectangle (DestinationX, DestinationY) 
-      (DestinationX + Width, DestinationY + Height). If SourceX or SourceY is 
-      not zero then Delta must be set to the length in bytes of a row in the 
+    <B>EfiUgaBltBufferToVideo</B> - Write data from the  BltBuffer rectangle
+      (SourceX, SourceY) (SourceX + Width, SourceY + Height) directly to the
+      video display rectangle (DestinationX, DestinationY)
+      (DestinationX + Width, DestinationY + Height). If SourceX or SourceY is
+      not zero then Delta must be set to the length in bytes of a row in the
       BltBuffer.
 
     <B>EfiUgaVideoToVideo</B> - Copy from the video display rectangle (SourceX, SourceY)
-     (SourceX + Width, SourceY + Height) .to the video display rectangle 
-     (DestinationX, DestinationY) (DestinationX + Width, DestinationY + Height). 
+     (SourceX + Width, SourceY + Height) .to the video display rectangle
+     (DestinationX, DestinationY) (DestinationX + Width, DestinationY + Height).
      The BltBuffer and Delta  are not used in this mode.
 
 
     @param[in] This          - Protocol instance pointer.
-    @param[in] BltBuffer     - Buffer containing data to blit into video buffer. This 
+    @param[in] BltBuffer     - Buffer containing data to blit into video buffer. This
                                buffer has a size of Width*Height*sizeof(EFI_UGA_PIXEL)
     @param[in] BltOperation  - Operation to perform on BlitBuffer and video memory
     @param[in] SourceX       - X coordinate of source for the BltBuffer.
@@ -133,12 +127,12 @@ typedef enum {
     @param[in] DestinationX  - X coordinate of destination for the BltBuffer.
     @param[in] DestinationY  - Y coordinate of destination for the BltBuffer.
     @param[in] Width         - Width of rectangle in BltBuffer in pixels.
-    @param[in] Height        - Hight of rectangle in BltBuffer in pixels.
+    @param[in] Height        - Height of rectangle in BltBuffer in pixels.
     @param[in] Delta         - OPTIONAL
-  
+
     @retval EFI_SUCCESS           - The Blt operation completed.
     @retval EFI_INVALID_PARAMETER - BltOperation is not valid.
-    @retval EFI_DEVICE_ERROR      - A hardware error occured writting to the video buffer.
+    @retval EFI_DEVICE_ERROR      - A hardware error occurred writing to the video buffer.
 
 --*/
 typedef

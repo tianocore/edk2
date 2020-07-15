@@ -4,13 +4,7 @@
 
   Copyright (C) 2016, Red Hat, Inc.
 
-  This program and the accompanying materials are licensed and made available
-  under the terms and conditions of the BSD License which accompanies this
-  distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT
-  WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include <Library/MemoryAllocationLib.h>
@@ -75,14 +69,14 @@ EnablePciDecoding (
   }
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_WARN, "%a: LocateHandleBuffer(): %r\n", __FUNCTION__,
+    DEBUG ((DEBUG_WARN, "%a: LocateHandleBuffer(): %r\n", __FUNCTION__,
       Status));
     return;
   }
 
   OrigAttrs = AllocatePool (NoHandles * sizeof *OrigAttrs);
   if (OrigAttrs == NULL) {
-    DEBUG ((EFI_D_WARN, "%a: AllocatePool(): out of resources\n",
+    DEBUG ((DEBUG_WARN, "%a: AllocatePool(): out of resources\n",
       __FUNCTION__));
     goto FreeHandles;
   }
@@ -105,7 +99,7 @@ EnablePciDecoding (
     Status = PciIo->Attributes (PciIo, EfiPciIoAttributeOperationGet, 0,
                       &OrigAttrs[Idx].PciAttributes);
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_WARN, "%a: EfiPciIoAttributeOperationGet: %r\n",
+      DEBUG ((DEBUG_WARN, "%a: EfiPciIoAttributeOperationGet: %r\n",
         __FUNCTION__, Status));
       goto RestoreAttributes;
     }
@@ -116,7 +110,7 @@ EnablePciDecoding (
     Status = PciIo->Attributes (PciIo, EfiPciIoAttributeOperationSupported, 0,
                       &Attributes);
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_WARN, "%a: EfiPciIoAttributeOperationSupported: %r\n",
+      DEBUG ((DEBUG_WARN, "%a: EfiPciIoAttributeOperationSupported: %r\n",
         __FUNCTION__, Status));
       goto RestoreAttributes;
     }
@@ -128,7 +122,7 @@ EnablePciDecoding (
     Status = PciIo->Attributes (PciIo, EfiPciIoAttributeOperationEnable,
                       Attributes, NULL);
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_WARN, "%a: EfiPciIoAttributeOperationEnable: %r\n",
+      DEBUG ((DEBUG_WARN, "%a: EfiPciIoAttributeOperationEnable: %r\n",
         __FUNCTION__, Status));
       goto RestoreAttributes;
     }

@@ -1,15 +1,9 @@
 /** @file
-  Definition for IP6 pesudo interface structure.
+  Definition for IP6 pseudo interface structure.
 
   Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -209,7 +203,7 @@ Ip6OnFrameReceived (
 
   @retval EFI_ALREADY_STARTED   There is already a pending receive request.
   @retval EFI_OUT_OF_RESOURCES  Failed to allocate resources to receive.
-  @retval EFI_SUCCESS           The recieve request has been started.
+  @retval EFI_SUCCESS           The receive request has been started.
 
 **/
 EFI_STATUS

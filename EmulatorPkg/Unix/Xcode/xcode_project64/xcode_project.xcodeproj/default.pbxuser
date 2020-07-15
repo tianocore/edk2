@@ -180,7 +180,7 @@
 	};
 	BA11A11E0FB10E2200D06FEC /* XCBreakpointCommandAction */ = {
 		isa = XCBreakpointCommandAction;
-		command = "set gInXcode=1\nsource ../../../../EmulatorPkg/Unix/GdbRun";
+		command = "set gInXcode=1\nsource ../../../../EmulatorPkg/Unix/GdbRun.sh";
 		fallbackIsa = XCBreakpointAction;
 		logCommand = 0;
 		useDebuggerSideImplementation = 1;

@@ -1,0 +1,17 @@
+// /** @file
+// This module provides one way to configurate VALN setting.
+//
+// This module produces EFI HII Configuration Access Protocol to provide one way to
+// configurate VALN setting
+//
+// Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Provides a way to configure VLAN settings"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This module produces EFI HII Configuration Access Protocol to provide a way to configure VLAN settings."
+

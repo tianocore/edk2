@@ -5,13 +5,7 @@
   Copyright (C) 2014, Red Hat, Inc.
   Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials are licensed and made available
-  under the terms and conditions of the BSD License which accompanies this
-  distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT
-  WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include <Library/BaseLib.h>
@@ -234,7 +228,7 @@ ExtractConfig (
   MAIN_FORM_STATE MainFormState;
   EFI_STATUS      Status;
 
-  DEBUG ((EFI_D_VERBOSE, "%a: Request=\"%s\"\n", __FUNCTION__, Request));
+  DEBUG ((DEBUG_VERBOSE, "%a: Request=\"%s\"\n", __FUNCTION__, Request));
 
   Status = PlatformConfigToFormState (&MainFormState);
   if (EFI_ERROR (Status)) {
@@ -249,10 +243,10 @@ ExtractConfig (
                                 (VOID *) &MainFormState, sizeof MainFormState,
                                 Results, Progress);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "%a: BlockToConfig(): %r, Progress=\"%s\"\n",
+    DEBUG ((DEBUG_ERROR, "%a: BlockToConfig(): %r, Progress=\"%s\"\n",
       __FUNCTION__, Status, (Status == EFI_DEVICE_ERROR) ? NULL : *Progress));
   } else {
-    DEBUG ((EFI_D_VERBOSE, "%a: Results=\"%s\"\n", __FUNCTION__, *Results));
+    DEBUG ((DEBUG_VERBOSE, "%a: Results=\"%s\"\n", __FUNCTION__, *Results));
   }
   return Status;
 }
@@ -327,7 +321,7 @@ RouteConfig (
   UINTN           BlockSize;
   EFI_STATUS      Status;
 
-  DEBUG ((EFI_D_VERBOSE, "%a: Configuration=\"%s\"\n", __FUNCTION__,
+  DEBUG ((DEBUG_VERBOSE, "%a: Configuration=\"%s\"\n", __FUNCTION__,
     Configuration));
 
   //
@@ -349,7 +343,7 @@ RouteConfig (
   Status = gHiiConfigRouting->ConfigToBlock (gHiiConfigRouting, Configuration,
                                 (VOID *) &MainFormState, &BlockSize, Progress);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "%a: ConfigToBlock(): %r, Progress=\"%s\"\n",
+    DEBUG ((DEBUG_ERROR, "%a: ConfigToBlock(): %r, Progress=\"%s\"\n",
       __FUNCTION__, Status,
       (Status == EFI_BUFFER_TOO_SMALL) ? NULL : *Progress));
     return Status;
@@ -378,7 +372,7 @@ Callback (
   OUT    EFI_BROWSER_ACTION_REQUEST             *ActionRequest
   )
 {
-  DEBUG ((EFI_D_VERBOSE, "%a: Action=0x%Lx QuestionId=%d Type=%d\n",
+  DEBUG ((DEBUG_VERBOSE, "%a: Action=0x%Lx QuestionId=%d Type=%d\n",
     __FUNCTION__, (UINT64) Action, QuestionId, Type));
 
   if (Action != EFI_BROWSER_ACTION_CHANGED) {
@@ -492,7 +486,7 @@ STATIC
 EFI_STATUS
 EFIAPI
 CreateResolutionOptions (
-  IN  EFI_HII_HANDLE  *PackageList,
+  IN  EFI_HII_HANDLE  PackageList,
   OUT VOID            **OpCodeBuffer,
   IN  UINTN           NumGopModes,
   IN  GOP_MODE        *GopModes
@@ -553,7 +547,7 @@ STATIC
 EFI_STATUS
 EFIAPI
 PopulateForm (
-  IN  EFI_HII_HANDLE  *PackageList,
+  IN  EFI_HII_HANDLE  PackageList,
   IN  EFI_GUID        *FormSetGuid,
   IN  EFI_FORM_ID     FormId,
   IN  UINTN           NumGopModes,
@@ -667,7 +661,7 @@ ExecutePlatformConfig (
 
   Status = PlatformConfigLoad (&PlatformConfig, &OptionalElements);
   if (EFI_ERROR (Status)) {
-    DEBUG (((Status == EFI_NOT_FOUND) ? EFI_D_VERBOSE : EFI_D_ERROR,
+    DEBUG (((Status == EFI_NOT_FOUND) ? DEBUG_VERBOSE : DEBUG_ERROR,
       "%a: failed to load platform config: %r\n", __FUNCTION__, Status));
     return Status;
   }

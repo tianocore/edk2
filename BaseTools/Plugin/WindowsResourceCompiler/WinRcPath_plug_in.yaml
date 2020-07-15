@@ -1,0 +1,13 @@
+## @file
+# Build Plugin used to set the path to rc.exe on windows.
+# The plugin is able to use python to locate the tool as to avoid
+# hard-coding the path
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+{
+  "scope": "global-win",
+  "name": "Windows RC Path Support",
+  "module": "WinRcPath"
+}

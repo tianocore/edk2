@@ -5,14 +5,7 @@
 #  Copyright (c) 2014, ARM Ltd. All rights reserved.<BR>
 #  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #
-#  This program and the accompanying materials are licensed and made available
-#  under the terms and conditions of the BSD License which accompanies this
-#  distribution. The full text of the license may be found at
-#  http://opensource.org/licenses/bsd-license.php
-#
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR
-#  IMPLIED.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
 
@@ -32,14 +25,15 @@
 
 [Sources]
   PlatformBm.c
+  PlatformBm.h
   QemuKernel.c
 
 [Packages]
-  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
+  ArmVirtPkg/ArmVirtPkg.dec
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
   OvmfPkg/OvmfPkg.dec
-  ArmVirtPkg/ArmVirtPkg.dec
+  ShellPkg/ShellPkg.dec
 
 [LibraryClasses]
   BaseLib
@@ -49,16 +43,16 @@
   DevicePathLib
   MemoryAllocationLib
   PcdLib
-  PrintLib
+  PlatformBmPrintScLib
   QemuBootOrderLib
-  QemuFwCfgLib
+  QemuLoadImageLib
+  ReportStatusCodeLib
   UefiBootManagerLib
   UefiBootServicesTableLib
   UefiLib
   UefiRuntimeServicesTableLib
 
 [FixedPcd]
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdShellFile
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity
@@ -69,16 +63,13 @@
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut
 
 [Guids]
-  gEfiFileInfoGuid
-  gEfiFileSystemInfoGuid
-  gEfiFileSystemVolumeLabelInfoIdGuid
   gEfiEndOfDxeEventGroupGuid
+  gEfiGlobalVariableGuid
   gRootBridgesConnectedEventGroupGuid
+  gUefiShellFileGuid
 
 [Protocols]
-  gEfiDevicePathProtocolGuid
   gEfiFirmwareVolume2ProtocolGuid
   gEfiGraphicsOutputProtocolGuid
-  gEfiLoadedImageProtocolGuid
   gEfiPciRootBridgeIoProtocolGuid
-  gEfiSimpleFileSystemProtocolGuid
+  gVirtioDeviceProtocolGuid

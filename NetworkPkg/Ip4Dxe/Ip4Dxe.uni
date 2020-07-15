@@ -1,0 +1,19 @@
+// /** @file
+// This module produces EFI IPv4 Protocol and EFI IPv4 Service Binding Protocol.
+//
+// This module produces EFI IPv4 Protocol upon EFI MNP Protocol and EFI ARP Protocol,
+// to provide basic network IPv4 packet I/O services, which includes support for a
+// subset of the Internet Control Message Protocol (ICMP) and may include support for
+// the Internet Group Management Protocol (IGMP).
+//
+// Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Produces EFI IPv4 Protocol and EFI IPv4 Service Binding Protocol"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This module produces EFI IPv4 Protocol upon EFI MNP Protocol and EFI ARP Protocol to provide basic network IPv4 packet I/O services, which includes support for a subset of the Internet Control Message Protocol (ICMP), and may include support for the Internet Group Management Protocol (IGMP)."
+

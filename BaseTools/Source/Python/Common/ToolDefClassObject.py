@@ -1,32 +1,31 @@
 ## @file
 # This file is used to define each component of tools_def.txt file
 #
-# Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
-# This program and the accompanying materials
-# are licensed and made available under the terms and conditions of the BSD License
-# which accompanies this distribution.  The full text of the license may be found at
-# http://opensource.org/licenses/bsd-license.php
-#
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# Copyright (c) 2007 - 2019, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
 ##
 # Import Modules
 #
+from __future__ import absolute_import
 import Common.LongFilePathOs as os
 import re
-import EdkLogger
+from . import EdkLogger
 
-from Dictionary import *
-from BuildToolError import *
-from TargetTxtClassObject import *
+from .BuildToolError import *
+from Common.TargetTxtClassObject import TargetTxtDict
 from Common.LongFilePathSupport import OpenLongFilePath as open
 from Common.Misc import PathClass
-from Common.String import NormPath
+from Common.StringUtils import NormPath
 import Common.GlobalData as GlobalData
 from Common import GlobalData
 from Common.MultipleWorkspace import MultipleWorkspace as mws
+from .DataType import TAB_TOD_DEFINES_TARGET, TAB_TOD_DEFINES_TOOL_CHAIN_TAG,\
+                     TAB_TOD_DEFINES_TARGET_ARCH, TAB_TOD_DEFINES_COMMAND_TYPE\
+                     , TAB_TOD_DEFINES_FAMILY, TAB_TOD_DEFINES_BUILDRULEFAMILY,\
+                     TAB_STAR, TAB_TAT_DEFINES_TOOL_CHAIN_CONF
+
 
 ##
 # Static variables used for pattern
@@ -53,7 +52,7 @@ class ToolDefClassObject(object):
         for Env in os.environ:
             self.MacroDictionary["ENV(%s)" % Env] = os.environ[Env]
 
-        if FileName != None:
+        if FileName is not None:
             self.LoadToolDefFile(FileName)
 
     ## LoadToolDefFile
@@ -89,15 +88,16 @@ class ToolDefClassObject(object):
 
         KeyList = [TAB_TOD_DEFINES_TARGET, TAB_TOD_DEFINES_TOOL_CHAIN_TAG, TAB_TOD_DEFINES_TARGET_ARCH, TAB_TOD_DEFINES_COMMAND_TYPE]
         for Index in range(3, -1, -1):
-            for Key in dict(self.ToolsDefTxtDictionary):
+            # make a copy of the keys to enumerate over to prevent issues when
+            # adding/removing items from the original dict.
+            for Key in list(self.ToolsDefTxtDictionary.keys()):
                 List = Key.split('_')
-                if List[Index] == '*':
+                if List[Index] == TAB_STAR:
                     for String in self.ToolsDefTxtDatabase[KeyList[Index]]:
                         List[Index] = String
                         NewKey = '%s_%s_%s_%s_%s' % tuple(List)
                         if NewKey not in self.ToolsDefTxtDictionary:
                             self.ToolsDefTxtDictionary[NewKey] = self.ToolsDefTxtDictionary[Key]
-                        continue
                     del self.ToolsDefTxtDictionary[Key]
                 elif List[Index] not in self.ToolsDefTxtDatabase[KeyList[Index]]:
                     del self.ToolsDefTxtDictionary[Key]
@@ -105,7 +105,7 @@ class ToolDefClassObject(object):
 
     ## IncludeToolDefFile
     #
-    # Load target.txt file and parse it as if it's contents were inside the main file
+    # Load target.txt file and parse it as if its contents were inside the main file
     #
     # @param Filename:  Input value for full path of tools_def.txt
     #
@@ -154,7 +154,7 @@ class ToolDefClassObject(object):
                             if ErrorCode != 0:
                                 EdkLogger.error("tools_def.txt parser", FILE_NOT_FOUND, ExtraData=IncFile)
 
-                    if type(IncFileTmp) is PathClass:
+                    if isinstance(IncFileTmp, PathClass):
                         IncFile = IncFileTmp.Path
                     else:
                         IncFile = IncFileTmp
@@ -197,20 +197,20 @@ class ToolDefClassObject(object):
             if len(List) != 5:
                 EdkLogger.verbose("Line %d: Not a valid name of definition: %s" % ((Index + 1), Name))
                 continue
-            elif List[4] == '*':
+            elif List[4] == TAB_STAR:
                 EdkLogger.verbose("Line %d: '*' is not allowed in last field: %s" % ((Index + 1), Name))
                 continue
             else:
                 self.ToolsDefTxtDictionary[Name] = Value
-                if List[0] != '*':
+                if List[0] != TAB_STAR:
                     self.ToolsDefTxtDatabase[TAB_TOD_DEFINES_TARGET] += [List[0]]
-                if List[1] != '*':
+                if List[1] != TAB_STAR:
                     self.ToolsDefTxtDatabase[TAB_TOD_DEFINES_TOOL_CHAIN_TAG] += [List[1]]
-                if List[2] != '*':
+                if List[2] != TAB_STAR:
                     self.ToolsDefTxtDatabase[TAB_TOD_DEFINES_TARGET_ARCH] += [List[2]]
-                if List[3] != '*':
+                if List[3] != TAB_STAR:
                     self.ToolsDefTxtDatabase[TAB_TOD_DEFINES_COMMAND_TYPE] += [List[3]]
-                if List[4] == TAB_TOD_DEFINES_FAMILY and List[2] == '*' and List[3] == '*':
+                if List[4] == TAB_TOD_DEFINES_FAMILY and List[2] == TAB_STAR and List[3] == TAB_STAR:
                     if TAB_TOD_DEFINES_FAMILY not in self.ToolsDefTxtDatabase:
                         self.ToolsDefTxtDatabase[TAB_TOD_DEFINES_FAMILY] = {}
                         self.ToolsDefTxtDatabase[TAB_TOD_DEFINES_FAMILY][List[1]] = Value
@@ -221,7 +221,7 @@ class ToolDefClassObject(object):
                         self.ToolsDefTxtDatabase[TAB_TOD_DEFINES_BUILDRULEFAMILY][List[1]] = Value
                     elif self.ToolsDefTxtDatabase[TAB_TOD_DEFINES_FAMILY][List[1]] != Value:
                         EdkLogger.verbose("Line %d: No override allowed for the family of a tool chain: %s" % ((Index + 1), Name))
-                if List[4] == TAB_TOD_DEFINES_BUILDRULEFAMILY and List[2] == '*' and List[3] == '*':
+                if List[4] == TAB_TOD_DEFINES_BUILDRULEFAMILY and List[2] == TAB_STAR and List[3] == TAB_STAR:
                     if TAB_TOD_DEFINES_BUILDRULEFAMILY not in self.ToolsDefTxtDatabase \
                        or List[1] not in self.ToolsDefTxtDatabase[TAB_TOD_DEFINES_FAMILY]:
                         EdkLogger.verbose("Line %d: The family is not specified, but BuildRuleFamily is specified for the tool chain: %s" % ((Index + 1), Name))
@@ -246,7 +246,6 @@ class ToolDefClassObject(object):
                     Value = Value.replace(Ref, self.MacroDictionary[Ref])
                 else:
                     Value = Value.replace(Ref, self.MacroDictionary[Ref.upper()])
-
         MacroReference = gMacroRefPattern.findall(Value)
         for Ref in MacroReference:
             if Ref not in self.MacroDictionary:
@@ -263,18 +262,40 @@ class ToolDefClassObject(object):
 #
 # @retval ToolDef An instance of ToolDefClassObject() with loaded tools_def.txt
 #
-def ToolDefDict(ConfDir):
-    Target = TargetTxtDict(ConfDir)
-    ToolDef = ToolDefClassObject()
-    if DataType.TAB_TAT_DEFINES_TOOL_CHAIN_CONF in Target.TargetTxtDictionary:
-        ToolsDefFile = Target.TargetTxtDictionary[DataType.TAB_TAT_DEFINES_TOOL_CHAIN_CONF]
-        if ToolsDefFile:
-            ToolDef.LoadToolDefFile(os.path.normpath(ToolsDefFile))
+
+
+class ToolDefDict():
+
+    def __new__(cls, ConfDir, *args, **kw):
+        if not hasattr(cls, '_instance'):
+            orig = super(ToolDefDict, cls)
+            cls._instance = orig.__new__(cls, *args, **kw)
+        return cls._instance
+
+    def __init__(self, ConfDir):
+        self.ConfDir = ConfDir
+        if not hasattr(self, 'ToolDef'):
+            self._ToolDef = None
+
+    @property
+    def ToolDef(self):
+        if not self._ToolDef:
+            self._GetToolDef()
+        return self._ToolDef
+
+    def _GetToolDef(self):
+        TargetObj = TargetTxtDict()
+        Target = TargetObj.Target
+        ToolDef = ToolDefClassObject()
+        if TAB_TAT_DEFINES_TOOL_CHAIN_CONF in Target.TargetTxtDictionary:
+            ToolsDefFile = Target.TargetTxtDictionary[TAB_TAT_DEFINES_TOOL_CHAIN_CONF]
+            if ToolsDefFile:
+                ToolDef.LoadToolDefFile(os.path.normpath(ToolsDefFile))
+            else:
+                ToolDef.LoadToolDefFile(os.path.normpath(os.path.join(self.ConfDir, gDefaultToolsDefFile)))
         else:
-            ToolDef.LoadToolDefFile(os.path.normpath(os.path.join(ConfDir, gDefaultToolsDefFile)))
-    else:
-        ToolDef.LoadToolDefFile(os.path.normpath(os.path.join(ConfDir, gDefaultToolsDefFile)))
-    return ToolDef
+            ToolDef.LoadToolDefFile(os.path.normpath(os.path.join(self.ConfDir, gDefaultToolsDefFile)))
+        self._ToolDef = ToolDef
 
 ##
 #

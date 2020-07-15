@@ -3,13 +3,7 @@
   This library class defines a set of interfaces to customize Ui module
 
 Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under
-the terms and conditions of the BSD License that accompanies this distribution.
-The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 #include <Uefi.h>
@@ -560,7 +554,7 @@ RequiredDriver (
 
   @param    HiiHandle           The hii handle for the Uiapp driver.
   @param    ClassGuid           The class guid for the driver which is the target.
-  @param    SpecialHandlerFn    The pointer to the specail handler function, if any.
+  @param    SpecialHandlerFn    The pointer to the special handler function, if any.
   @param    StartOpCodeHandle   The opcode handle to save the new opcode.
 
   @retval   EFI_SUCCESS         Search the driver success
@@ -639,9 +633,13 @@ UiListThirdPartyDrivers (
 
     Count++;
     if (Count >= CurrentSize) {
-      DriverListPtr = AllocateCopyPool ((Count + UI_HII_DRIVER_LIST_SIZE) * sizeof (UI_HII_DRIVER_INSTANCE), gHiiDriverList);
+      DriverListPtr = ReallocatePool (
+                        CurrentSize * sizeof (UI_HII_DRIVER_INSTANCE),
+                        (Count + UI_HII_DRIVER_LIST_SIZE)
+                          * sizeof (UI_HII_DRIVER_INSTANCE),
+                        gHiiDriverList
+                        );
       ASSERT (DriverListPtr != NULL);
-      FreePool (gHiiDriverList);
       gHiiDriverList = DriverListPtr;
       CurrentSize += UI_HII_DRIVER_LIST_SIZE;
     }

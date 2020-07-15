@@ -1,0 +1,30 @@
+// /** @file
+//   String definitions for Ip4Config2 formset
+
+// Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+//**/
+
+
+/=#
+
+#langdef en-US "English"
+
+#string STR_IP4_CONFIG2_FORM_TITLE    #language en-US "IPv4 Network Configuration"
+#string STR_IP4_CONFIG2_FORM_HELP     #language en-US "Configure network parameters."
+#string STR_IP4_DEVICE_FORM_TITLE     #language en-US ""
+#string STR_IP4_DEVICE_FORM_HELP      #language en-US ""
+#string STR_IP4_CONFIGURE             #language en-US "Configured"
+#string STR_IP4_CONFIGURE_HELP        #language en-US "Indicate whether network address configured successfully or not."
+#string STR_IP4_ENABLE_DHCP           #language en-US "Enable DHCP"
+#string STR_IP4_LOCAL_IP_ADDRESS      #language en-US "Local IP Address"
+#string STR_IP4_IP_ADDRESS_HELP       #language en-US "Enter IP address in dotted-decimal notation. Example: 192.168.10.12\r\n"
+#string STR_IP4_LOCAL_MASK            #language en-US "Local NetMask"
+#string STR_IP4_MASK_HELP             #language en-US "Enter NetMask in dotted-decimal notation. Example: 255.255.255.0\r\n"
+#string STR_IP4_LOCAL_GATEWAY         #language en-US "Local Gateway"
+#string STR_IP4_GATEWAY_HELP          #language en-US "Enter Gateway in dotted-decimal notation. Example: 192.168.10.1\r\n"
+#string STR_IP4_LOCAL_DNS             #language en-US "Local DNS Servers"
+#string STR_IP4_DNS_HELP              #language en-US "Enter DNS Servers in dotted-decimal notation. Example: 192.168.10.8 192.168.10.9\r\n"
+#string STR_SAVE_CHANGES              #language en-US "Save Changes and Exit"
+#string STR_NULL                      #language en-US ""

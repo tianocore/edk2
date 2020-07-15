@@ -2,14 +2,8 @@
 
     Manage Usb Descriptor List
 
-Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -177,6 +171,18 @@ UsbCreateDesc (
     DescLen = sizeof (EFI_USB_ENDPOINT_DESCRIPTOR);
     CtrlLen = sizeof (USB_ENDPOINT_DESC);
     break;
+
+  default:
+    ASSERT (FALSE);
+    return NULL;
+  }
+
+  //
+  // Total length is too small that cannot hold the single descriptor header plus data.
+  //
+  if (Len <= sizeof (USB_DESC_HEAD)) {
+    DEBUG ((DEBUG_ERROR, "UsbCreateDesc: met mal-format descriptor, total length = %d!\n", Len));
+    return NULL;
   }
 
   //
@@ -184,24 +190,44 @@ UsbCreateDesc (
   // format. Skip the descriptor that isn't of this Type
   //
   Offset = 0;
-  Head   = (USB_DESC_HEAD*)DescBuf;
+  Head   = (USB_DESC_HEAD *)DescBuf;
+  while (Offset < Len - sizeof (USB_DESC_HEAD)) {
+    //
+    // Above condition make sure Head->Len and Head->Type are safe to access
+    //
+    Head = (USB_DESC_HEAD *)&DescBuf[Offset];
 
-  while ((Offset < Len) && (Head->Type != Type)) {
-    Offset += Head->Len;
-    if (Len <= Offset) {
-      DEBUG (( EFI_D_ERROR, "UsbCreateDesc: met mal-format descriptor, Beyond boundary!\n"));
+    if (Head->Len == 0) {
+      DEBUG ((DEBUG_ERROR, "UsbCreateDesc: met mal-format descriptor, Head->Len = 0!\n"));
       return NULL;
     }
-    Head    = (USB_DESC_HEAD*)(DescBuf + Offset);
-    if (Head->Len == 0) {
-      DEBUG (( EFI_D_ERROR, "UsbCreateDesc: met mal-format descriptor, Head->Len = 0!\n"));
+
+    //
+    // Make sure no overflow when adding Head->Len to Offset.
+    //
+    if (Head->Len > MAX_UINTN - Offset) {
+      DEBUG ((DEBUG_ERROR, "UsbCreateDesc: met mal-format descriptor, Head->Len = %d!\n", Head->Len));
       return NULL;
+    }
+
+    Offset += Head->Len;
+
+    if (Head->Type == Type) {
+      break;
     }
   }
 
-  if ((Len <= Offset)      || (Len < Offset + Head->Len) ||
-      (Head->Type != Type) || (Head->Len < DescLen)) {
-    DEBUG (( EFI_D_ERROR, "UsbCreateDesc: met mal-format descriptor\n"));
+  //
+  // Head->Len is invalid resulting data beyond boundary, or
+  // Descriptor cannot be found: No such type.
+  //
+  if (Len < Offset) {
+    DEBUG ((DEBUG_ERROR, "UsbCreateDesc: met mal-format descriptor, Offset/Len = %d/%d!\n", Offset, Len));
+    return NULL;
+  }
+
+  if ((Head->Type != Type) || (Head->Len < DescLen)) {
+    DEBUG ((DEBUG_ERROR, "UsbCreateDesc: descriptor cannot be found, Header(T/L) = %d/%d!\n", Head->Type, Head->Len));
     return NULL;
   }
 
@@ -212,7 +238,7 @@ UsbCreateDesc (
 
   CopyMem (Desc, Head, (UINTN) DescLen);
 
-  *Consumed = Offset + Head->Len;
+  *Consumed = Offset;
 
   return Desc;
 }
@@ -361,7 +387,7 @@ UsbParseConfigDesc (
   Len     -= Consumed;
 
   //
-  // Make allowances for devices that return extra data at the 
+  // Make allowances for devices that return extra data at the
   // end of their config descriptors
   //
   while (Len >= sizeof (EFI_USB_INTERFACE_DESCRIPTOR)) {
@@ -372,7 +398,7 @@ UsbParseConfigDesc (
       break;
 
     } else if (Setting->Desc.InterfaceNumber >= NumIf) {
-      DEBUG (( EFI_D_ERROR, "UsbParseConfigDesc: mal-formated interface descriptor\n"));
+      DEBUG (( DEBUG_ERROR, "UsbParseConfigDesc: malformatted interface descriptor\n"));
 
       UsbFreeInterfaceDesc (Setting);
       goto ON_ERROR;
@@ -624,7 +650,13 @@ UsbGetOneString (
   //
   Status = UsbCtrlGetDesc (UsbDev, USB_DESC_TYPE_STRING, Index, LangId, &Desc, 2);
 
-  if (EFI_ERROR (Status)) {
+  //
+  // Reject if Length even cannot cover itself, or odd because Unicode string byte length should be even.
+  //
+  if (EFI_ERROR (Status) ||
+      (Desc.Length < OFFSET_OF (EFI_USB_STRING_DESCRIPTOR, Length) + sizeof (Desc.Length)) ||
+      (Desc.Length % 2 != 0)
+    ) {
     return NULL;
   }
 
@@ -689,7 +721,7 @@ UsbBuildLangTable (
 
   Max   = (Desc->Length - 2) / 2;
   Max   = MIN(Max, USB_MAX_LANG_ID);
-  
+
   Point = Desc->String;
   for (Index = 0; Index < Max; Index++) {
     UsbDev->LangId[Index] = *Point;
@@ -740,6 +772,13 @@ UsbGetOneConfig (
   }
 
   DEBUG (( EFI_D_INFO, "UsbGetOneConfig: total length is %d\n", Desc.TotalLength));
+
+  //
+  // Reject if TotalLength even cannot cover itself.
+  //
+  if (Desc.TotalLength < OFFSET_OF (EFI_USB_CONFIG_DESCRIPTOR, TotalLength) + sizeof (Desc.TotalLength)) {
+    return NULL;
+  }
 
   Buf = AllocateZeroPool (Desc.TotalLength);
 

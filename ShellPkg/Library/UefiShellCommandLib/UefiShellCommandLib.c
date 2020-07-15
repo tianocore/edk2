@@ -1,17 +1,11 @@
 /** @file
   Provides interface to shell internal functions for shell commands.
 
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -53,7 +47,7 @@ STATIC CONST CHAR8 Hex[] = {
 // global variables required by library class.
 EFI_UNICODE_COLLATION_PROTOCOL    *gUnicodeCollation            = NULL;
 SHELL_MAP_LIST                    gShellMapList;
-SHELL_MAP_LIST                    *gShellCurDir                 = NULL;
+SHELL_MAP_LIST                    *gShellCurMapping             = NULL;
 
 CONST CHAR16* SupportLevel[] = {
   L"Minimal",
@@ -72,14 +66,82 @@ CommandInit(
   VOID
   )
 {
-  EFI_STATUS Status;
+  UINTN                           NumHandles;
+  EFI_HANDLE                      *Handles;
+  EFI_UNICODE_COLLATION_PROTOCOL  *Uc;
+  CHAR8                           *BestLanguage;
+  UINTN                           Index;
+  EFI_STATUS                      Status;
+  CHAR8                           *PlatformLang;
+
   if (gUnicodeCollation == NULL) {
-    Status = gBS->LocateProtocol(&gEfiUnicodeCollation2ProtocolGuid, NULL, (VOID**)&gUnicodeCollation);
-    if (EFI_ERROR(Status)) {
-      return (EFI_DEVICE_ERROR);
+
+    GetEfiGlobalVariable2 (EFI_PLATFORM_LANG_VARIABLE_NAME, (VOID**)&PlatformLang, NULL);
+
+    Status = gBS->LocateHandleBuffer (
+                    ByProtocol,
+                    &gEfiUnicodeCollation2ProtocolGuid,
+                    NULL,
+                    &NumHandles,
+                    &Handles
+                    );
+    if (EFI_ERROR (Status)) {
+      NumHandles = 0;
+      Handles    = NULL;
+    }
+    for (Index = 0; Index < NumHandles; Index++) {
+      //
+      // Open Unicode Collation Protocol
+      //
+      Status = gBS->OpenProtocol (
+                      Handles[Index],
+                      &gEfiUnicodeCollation2ProtocolGuid,
+                      (VOID **) &Uc,
+                      gImageHandle,
+                      NULL,
+                      EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                      );
+      if (EFI_ERROR (Status)) {
+        continue;
+      }
+
+      //
+      // Without clue provided use the first Unicode Collation2 protocol.
+      // This may happen when PlatformLang is NULL or when no installed Unicode
+      // Collation2 protocol instance supports PlatformLang.
+      //
+      if (gUnicodeCollation == NULL) {
+        gUnicodeCollation = Uc;
+      }
+      if (PlatformLang == NULL) {
+        break;
+      }
+
+      //
+      // Find the best matching matching language from the supported languages
+      // of Unicode Collation2 protocol.
+      //
+      BestLanguage = GetBestLanguage (
+                       Uc->SupportedLanguages,
+                       FALSE,
+                       PlatformLang,
+                       NULL
+                       );
+      if (BestLanguage != NULL) {
+        FreePool (BestLanguage);
+        gUnicodeCollation = Uc;
+        break;
+      }
+    }
+    if (Handles != NULL) {
+      FreePool (Handles);
+    }
+    if (PlatformLang != NULL) {
+      FreePool (PlatformLang);
     }
   }
-  return (EFI_SUCCESS);
+
+  return (gUnicodeCollation == NULL) ? EFI_UNSUPPORTED : EFI_SUCCESS;
 }
 
 /**
@@ -112,11 +174,9 @@ ShellCommandLibConstructor (
   mProfileListSize  = 0;
   mProfileList      = NULL;
 
-  if (gUnicodeCollation == NULL) {
-    Status = gBS->LocateProtocol(&gEfiUnicodeCollation2ProtocolGuid, NULL, (VOID**)&gUnicodeCollation);
-    if (EFI_ERROR(Status)) {
-      return (EFI_DEVICE_ERROR);
-    }
+  Status = CommandInit ();
+  if (EFI_ERROR (Status)) {
+    return EFI_DEVICE_ERROR;
   }
 
   return (RETURN_SUCCESS);
@@ -229,7 +289,7 @@ ShellCommandLibDestructor (
   }
 
   gUnicodeCollation            = NULL;
-  gShellCurDir                 = NULL;
+  gShellCurMapping             = NULL;
 
   return (RETURN_SUCCESS);
 }
@@ -257,7 +317,7 @@ ShellCommandFindDynamicCommand (
     //
     // not found or out of resources
     //
-    return NULL; 
+    return NULL;
   }
 
   for (NextCommand = CommandHandleList; *NextCommand != NULL; NextCommand++) {
@@ -274,7 +334,7 @@ ShellCommandFindDynamicCommand (
     if (gUnicodeCollation->StriColl(
           gUnicodeCollation,
           (CHAR16*)CommandString,
-          (CHAR16*)DynamicCommand->CommandName) == 0 
+          (CHAR16*)DynamicCommand->CommandName) == 0
           ){
         FreePool(CommandHandleList);
         return (DynamicCommand);
@@ -375,7 +435,7 @@ ShellCommandGetDynamicCommandHelp(
   //
   // TODO: how to get proper language?
   //
-  return DynamicCommand->GetHelp(DynamicCommand, "en"); 
+  return DynamicCommand->GetHelp(DynamicCommand, "en");
 }
 
 /**
@@ -498,7 +558,7 @@ ShellCommandRegisterCommandName (
   IN        UINT32                      ShellMinSupportLevel,
   IN CONST  CHAR16                      *ProfileName,
   IN CONST  BOOLEAN                     CanAffectLE,
-  IN CONST  EFI_HANDLE                  HiiHandle,
+  IN CONST  EFI_HII_HANDLE              HiiHandle,
   IN CONST  EFI_STRING_ID               ManFormatHelp
   )
 {
@@ -793,7 +853,7 @@ ShellCommandRegisterAlias (
 {
   ALIAS_LIST *Node;
   ALIAS_LIST *CommandAlias;
-  ALIAS_LIST *PrevCommandAlias; 
+  ALIAS_LIST *PrevCommandAlias;
   INTN       LexicalMatchValue;
 
   //
@@ -842,7 +902,7 @@ ShellCommandRegisterAlias (
     //
     // Swap PrevCommandAlias and CommandAlias list entry if PrevCommandAlias list entry
     // is alphabetically greater than CommandAlias list entry
-    // 
+    //
     if (LexicalMatchValue > 0) {
       CommandAlias = (ALIAS_LIST *) SwapListEntries (&PrevCommandAlias->Link, &CommandAlias->Link);
     } else if (LexicalMatchValue < 0) {
@@ -1268,7 +1328,14 @@ ShellCommandCreateInitialMappingsAndPaths(
   CHAR16                    *NewConsistName;
   EFI_DEVICE_PATH_PROTOCOL  **ConsistMappingTable;
   SHELL_MAP_LIST            *MapListNode;
+  CONST CHAR16              *CurDir;
+  CHAR16                    *SplitCurDir;
+  CHAR16                    *MapName;
+  SHELL_MAP_LIST            *MapListItem;
 
+  SplitCurDir = NULL;
+  MapName     = NULL;
+  MapListItem = NULL;
   HandleList  = NULL;
 
   //
@@ -1354,6 +1421,33 @@ ShellCommandCreateInitialMappingsAndPaths(
     SHELL_FREE_NON_NULL(DevicePathList);
 
     HandleList = NULL;
+
+    //
+    //gShellCurMapping point to node of current file system in the gShellMapList. When reset all mappings,
+    //all nodes in the gShellMapList will be free. Then gShellCurMapping will be a dangling pointer, So,
+    //after created new mappings, we should reset the gShellCurMapping pointer back to node of current file system.
+    //
+    if (gShellCurMapping != NULL) {
+      gShellCurMapping = NULL;
+      CurDir = gEfiShellProtocol->GetEnv(L"cwd");
+      if (CurDir != NULL) {
+        MapName = AllocateCopyPool (StrSize(CurDir), CurDir);
+        if (MapName == NULL) {
+          return EFI_OUT_OF_RESOURCES;
+        }
+        SplitCurDir = StrStr (MapName, L":");
+        if (SplitCurDir == NULL) {
+          SHELL_FREE_NON_NULL (MapName);
+          return EFI_UNSUPPORTED;
+        }
+        *(SplitCurDir + 1) = CHAR_NULL;
+        MapListItem = ShellCommandFindMapItem (MapName);
+        if (MapListItem != NULL) {
+          gShellCurMapping = MapListItem;
+        }
+        SHELL_FREE_NON_NULL (MapName);
+      }
+    }
   } else {
     Count = (UINTN)-1;
   }
@@ -1745,7 +1839,7 @@ DumpHex (
       Val[Index * 3 + 0]  = Hex[TempByte >> 4];
       Val[Index * 3 + 1]  = Hex[TempByte & 0xF];
       Val[Index * 3 + 2]  = (CHAR8) ((Index == 7) ? '-' : ' ');
-      Str[Index]          = (CHAR8) ((TempByte < ' ' || TempByte > 'z') ? '.' : TempByte);
+      Str[Index]          = (CHAR8) ((TempByte < ' ' || TempByte > '~') ? '.' : TempByte);
     }
 
     Val[Index * 3]  = 0;

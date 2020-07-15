@@ -1,13 +1,7 @@
 /** @file
 
   Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -929,7 +923,7 @@ BuildAdmaDescTable (
   UINT64                    Remaining;
   UINT32                    Address;
 
-  Data    = (EFI_PHYSICAL_ADDRESS)(UINTN)Trb->Data;
+  Data    = Trb->DataPhy;
   DataLen = Trb->DataLen;
   //
   // Only support 32bit ADMA Descriptor Table
@@ -998,6 +992,8 @@ EmmcPeimCreateTrb (
   EMMC_TRB                      *Trb;
   EFI_STATUS                    Status;
   EMMC_HC_SLOT_CAP              Capability;
+  EDKII_IOMMU_OPERATION         MapOp;
+  UINTN                         MapLength;
 
   //
   // Calculate a divisor for SD clock frequency
@@ -1007,7 +1003,7 @@ EmmcPeimCreateTrb (
     return NULL;
   }
 
-  Trb = EmmcPeimAllocateMem (Slot->Private->Pool, sizeof (EMMC_TRB));
+  Trb = AllocateZeroPool (sizeof (EMMC_TRB));
   if (Trb == NULL) {
     return NULL;
   }
@@ -1039,6 +1035,22 @@ EmmcPeimCreateTrb (
   if (Packet->EmmcCmdBlk->CommandIndex == EMMC_SEND_TUNING_BLOCK) {
     Trb->Mode = EmmcPioMode;
   } else {
+    if (Trb->Read) {
+      MapOp = EdkiiIoMmuOperationBusMasterWrite;
+    } else {
+      MapOp = EdkiiIoMmuOperationBusMasterRead;
+    }
+
+    if (Trb->DataLen != 0) {
+      MapLength = Trb->DataLen;
+      Status = IoMmuMap (MapOp, Trb->Data, &MapLength, &Trb->DataPhy, &Trb->DataMap);
+
+      if (EFI_ERROR (Status) || (MapLength != Trb->DataLen)) {
+        DEBUG ((DEBUG_ERROR, "EmmcPeimCreateTrb: Fail to map data buffer.\n"));
+        goto Error;
+      }
+    }
+
     if (Trb->DataLen == 0) {
       Trb->Mode = EmmcNoData;
     } else if (Capability.Adma2 != 0) {
@@ -1071,12 +1083,16 @@ EmmcPeimFreeTrb (
   IN EMMC_TRB           *Trb
   )
 {
+  if ((Trb != NULL) && (Trb->DataMap != NULL)) {
+    IoMmuUnmap (Trb->DataMap);
+  }
+
   if ((Trb != NULL) && (Trb->AdmaDesc != NULL)) {
     EmmcPeimFreeMem (Trb->Slot->Private->Pool, Trb->AdmaDesc, Trb->AdmaDescSize);
   }
 
   if (Trb != NULL) {
-    EmmcPeimFreeMem (Trb->Slot->Private->Pool, Trb, sizeof (EMMC_TRB));
+    FreePool (Trb);
   }
   return;
 }
@@ -1241,11 +1257,11 @@ EmmcPeimExecTrb (
   EmmcPeimHcLedOnOff (Bar, TRUE);
 
   if (Trb->Mode == EmmcSdmaMode) {
-    if ((UINT64)(UINTN)Trb->Data >= 0x100000000ul) {
+    if ((UINT64)(UINTN)Trb->DataPhy >= 0x100000000ul) {
       return EFI_INVALID_PARAMETER;
     }
 
-    SdmaAddr = (UINT32)(UINTN)Trb->Data;
+    SdmaAddr = (UINT32)(UINTN)Trb->DataPhy;
     Status   = EmmcPeimHcRwMmio (Bar + EMMC_HC_SDMA_ADDR, FALSE, sizeof (SdmaAddr), &SdmaAddr);
     if (EFI_ERROR (Status)) {
       return Status;
@@ -1274,7 +1290,7 @@ EmmcPeimExecTrb (
   BlkCount = 0;
   if (Trb->Mode != EmmcNoData) {
     //
-    // Calcuate Block Count.
+    // Calculate Block Count.
     //
     BlkCount = (UINT16)(Trb->DataLen / Trb->BlockSize);
   }
@@ -1480,7 +1496,7 @@ EmmcPeimCheckTrbResult (
     //
     // Update SDMA Address register.
     //
-    SdmaAddr = EMMC_SDMA_ROUND_UP ((UINT32)(UINTN)Trb->Data, EMMC_SDMA_BOUNDARY);
+    SdmaAddr = EMMC_SDMA_ROUND_UP ((UINT32)(UINTN)Trb->DataPhy, EMMC_SDMA_BOUNDARY);
     Status   = EmmcPeimHcRwMmio (
                  Bar + EMMC_HC_SDMA_ADDR,
                  FALSE,
@@ -1490,7 +1506,7 @@ EmmcPeimCheckTrbResult (
     if (EFI_ERROR (Status)) {
       goto Done;
     }
-    Trb->Data = (VOID*)(UINTN)SdmaAddr;
+    Trb->DataPhy = (UINT32)(UINTN)SdmaAddr;
   }
 
   if ((Packet->EmmcCmdBlk->CommandType != EmmcCommandTypeAdtc) &&
@@ -2001,7 +2017,7 @@ EmmcPeimGetExtCsd (
   Refer to EMMC Electrical Standard Spec 5.1 Section 6.10.4 for details.
 
   @param[in] Slot           The slot number of the Emmc card to send the command to.
-  @param[in] Access         The access mode of SWTICH command.
+  @param[in] Access         The access mode of SWITCH command.
   @param[in] Index          The offset of the field to be access.
   @param[in] Value          The value to be set to the specified field of EXT_CSD register.
   @param[in] CmdSet         The value of CmdSet field of EXT_CSD register.
@@ -2257,7 +2273,7 @@ EmmcPeimSendTuningBlk (
 }
 
 /**
-  Tunning the clock to get HS200 optimal sampling point.
+  Tuning the clock to get HS200 optimal sampling point.
 
   Command SEND_TUNING_BLOCK may be sent up to 40 times until the host finishes the
   tuning procedure.
@@ -2493,7 +2509,7 @@ EmmcPeimSwitchToHighSpeed (
     return Status;
   }
   //
-  // Set to Hight Speed timing
+  // Set to High Speed timing
   //
   HostCtrl1 = BIT2;
   Status = EmmcPeimHcOrMmio (Slot->EmmcHcBase + EMMC_HC_HOST_CTRL1, sizeof (HostCtrl1), &HostCtrl1);
@@ -2642,7 +2658,7 @@ EmmcPeimSwitchToHS400 (
     return Status;
   }
   //
-  // Set to Hight Speed timing and set the clock frequency to a value less than 52MHz.
+  // Set to High Speed timing and set the clock frequency to a value less than 52MHz.
   //
   HsTiming = 1;
   Status = EmmcPeimSwitchClockFreq (Slot, Rca, HsTiming, 52);
@@ -2736,7 +2752,7 @@ EmmcPeimSetBusMode (
     BusWidth = 4;
   }
   //
-  // Get Deivce_Type from EXT_CSD register.
+  // Get Device_Type from EXT_CSD register.
   //
   Status = EmmcPeimGetExtCsd (Slot, &Slot->ExtCsd);
   if (EFI_ERROR (Status)) {

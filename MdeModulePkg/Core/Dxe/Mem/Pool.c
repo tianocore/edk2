@@ -1,19 +1,14 @@
 /** @file
   UEFI Memory pool management functions.
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include "DxeMain.h"
 #include "Imem.h"
+#include "HeapGuard.h"
 
 STATIC EFI_LOCK mPoolMemoryLock = EFI_INITIALIZE_LOCK_VARIABLE (TPL_NOTIFY);
 
@@ -25,7 +20,8 @@ typedef struct {
 } POOL_FREE;
 
 
-#define POOL_HEAD_SIGNATURE   SIGNATURE_32('p','h','d','0')
+#define POOL_HEAD_SIGNATURE       SIGNATURE_32('p','h','d','0')
+#define POOLPAGE_HEAD_SIGNATURE   SIGNATURE_32('p','h','d','1')
 typedef struct {
   UINT32          Signature;
   UINT32          Reserved;
@@ -169,7 +165,7 @@ LookupPoolHead (
       }
     }
 
-    Pool = CoreAllocatePoolI (EfiBootServicesData, sizeof (POOL));
+    Pool = CoreAllocatePoolI (EfiBootServicesData, sizeof (POOL), FALSE);
     if (Pool == NULL) {
       return NULL;
     }
@@ -214,7 +210,8 @@ CoreInternalAllocatePool (
   OUT VOID            **Buffer
   )
 {
-  EFI_STATUS    Status;
+  EFI_STATUS            Status;
+  BOOLEAN               NeedGuard;
 
   //
   // If it's not a valid type, fail it
@@ -238,6 +235,8 @@ CoreInternalAllocatePool (
     return EFI_OUT_OF_RESOURCES;
   }
 
+  NeedGuard = IsPoolTypeToGuard (PoolType) && !mOnGuarding;
+
   //
   // Acquire the memory lock and make the allocation
   //
@@ -246,7 +245,7 @@ CoreInternalAllocatePool (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  *Buffer = CoreAllocatePoolI (PoolType, Size);
+  *Buffer = CoreAllocatePoolI (PoolType, Size, NeedGuard);
   CoreReleaseLock (&mPoolMemoryLock);
   return (*Buffer != NULL) ? EFI_SUCCESS : EFI_OUT_OF_RESOURCES;
 }
@@ -298,6 +297,7 @@ CoreAllocatePool (
   @param  PoolType               The type of memory for the new pool pages
   @param  NoPages                No of pages to allocate
   @param  Granularity            Bits to align.
+  @param  NeedGuard              Flag to indicate Guard page is needed or not
 
   @return The allocated memory, or NULL
 
@@ -307,7 +307,8 @@ VOID *
 CoreAllocatePoolPagesI (
   IN EFI_MEMORY_TYPE    PoolType,
   IN UINTN              NoPages,
-  IN UINTN              Granularity
+  IN UINTN              Granularity,
+  IN BOOLEAN            NeedGuard
   )
 {
   VOID        *Buffer;
@@ -318,11 +319,14 @@ CoreAllocatePoolPagesI (
     return NULL;
   }
 
-  Buffer = CoreAllocatePoolPages (PoolType, NoPages, Granularity);
+  Buffer = CoreAllocatePoolPages (PoolType, NoPages, Granularity, NeedGuard);
   CoreReleaseMemoryLock ();
 
   if (Buffer != NULL) {
-    ApplyMemoryProtectionPolicy (EfiConventionalMemory, PoolType,
+    if (NeedGuard) {
+      SetGuardForMemory ((EFI_PHYSICAL_ADDRESS)(UINTN)Buffer, NoPages);
+    }
+    ApplyMemoryProtectionPolicy(EfiConventionalMemory, PoolType,
       (EFI_PHYSICAL_ADDRESS)(UINTN)Buffer, EFI_PAGES_TO_SIZE (NoPages));
   }
   return Buffer;
@@ -334,6 +338,7 @@ CoreAllocatePoolPagesI (
 
   @param  PoolType               Type of pool to allocate
   @param  Size                   The amount of pool to allocate
+  @param  NeedGuard              Flag to indicate Guard page is needed or not
 
   @return The allocate pool, or NULL
 
@@ -341,7 +346,8 @@ CoreAllocatePoolPagesI (
 VOID *
 CoreAllocatePoolI (
   IN EFI_MEMORY_TYPE  PoolType,
-  IN UINTN            Size
+  IN UINTN            Size,
+  IN BOOLEAN          NeedGuard
   )
 {
   POOL        *Pool;
@@ -355,6 +361,8 @@ CoreAllocatePoolI (
   UINTN       Offset, MaxOffset;
   UINTN       NoPages;
   UINTN       Granularity;
+  BOOLEAN     HasPoolTail;
+  BOOLEAN     PageAsPool;
 
   ASSERT_LOCKED (&mPoolMemoryLock);
 
@@ -371,6 +379,10 @@ CoreAllocatePoolI (
   //
   // Adjust the size by the pool header & tail overhead
   //
+
+  HasPoolTail  = !(NeedGuard &&
+                   ((PcdGet8 (PcdHeapGuardPropertyMask) & BIT7) == 0));
+  PageAsPool = (IsHeapGuardEnabled (GUARD_HEAP_TYPE_FREED) && !mOnGuarding);
 
   //
   // Adjusting the Size to be of proper alignment so that
@@ -391,10 +403,16 @@ CoreAllocatePoolI (
   // If allocation is over max size, just allocate pages for the request
   // (slow)
   //
-  if (Index >= SIZE_TO_LIST (Granularity)) {
-    NoPages = EFI_SIZE_TO_PAGES(Size) + EFI_SIZE_TO_PAGES (Granularity) - 1;
+  if (Index >= SIZE_TO_LIST (Granularity) || NeedGuard || PageAsPool) {
+    if (!HasPoolTail) {
+      Size -= sizeof (POOL_TAIL);
+    }
+    NoPages = EFI_SIZE_TO_PAGES (Size) + EFI_SIZE_TO_PAGES (Granularity) - 1;
     NoPages &= ~(UINTN)(EFI_SIZE_TO_PAGES (Granularity) - 1);
-    Head = CoreAllocatePoolPagesI (PoolType, NoPages, Granularity);
+    Head = CoreAllocatePoolPagesI (PoolType, NoPages, Granularity, NeedGuard);
+    if (NeedGuard) {
+      Head = AdjustPoolHeadA ((EFI_PHYSICAL_ADDRESS)(UINTN)Head, NoPages, Size);
+    }
     goto Done;
   }
 
@@ -422,7 +440,8 @@ CoreAllocatePoolI (
     //
     // Get another page
     //
-    NewPage = CoreAllocatePoolPagesI (PoolType, EFI_SIZE_TO_PAGES (Granularity), Granularity);
+    NewPage = CoreAllocatePoolPagesI (PoolType, EFI_SIZE_TO_PAGES (Granularity),
+                                      Granularity, NeedGuard);
     if (NewPage == NULL) {
       goto Done;
     }
@@ -469,29 +488,38 @@ Done:
   if (Head != NULL) {
 
     //
+    // Account the allocation
+    //
+    Pool->Used += Size;
+
+    //
     // If we have a pool buffer, fill in the header & tail info
     //
-    Head->Signature = POOL_HEAD_SIGNATURE;
+    Head->Signature = (PageAsPool) ? POOLPAGE_HEAD_SIGNATURE : POOL_HEAD_SIGNATURE;
     Head->Size      = Size;
     Head->Type      = (EFI_MEMORY_TYPE) PoolType;
-    Tail            = HEAD_TO_TAIL (Head);
-    Tail->Signature = POOL_TAIL_SIGNATURE;
-    Tail->Size      = Size;
     Buffer          = Head->Data;
-    DEBUG_CLEAR_MEMORY (Buffer, Size - POOL_OVERHEAD);
+
+    if (HasPoolTail) {
+      Tail            = HEAD_TO_TAIL (Head);
+      Tail->Signature = POOL_TAIL_SIGNATURE;
+      Tail->Size      = Size;
+
+      Size -= POOL_OVERHEAD;
+    } else {
+      Size -= SIZE_OF_POOL_HEAD;
+    }
+
+    DEBUG_CLEAR_MEMORY (Buffer, Size);
 
     DEBUG ((
       DEBUG_POOL,
       "AllocatePoolI: Type %x, Addr %p (len %lx) %,ld\n", PoolType,
       Buffer,
-      (UINT64)(Size - POOL_OVERHEAD),
+      (UINT64)Size,
       (UINT64) Pool->Used
       ));
 
-    //
-    // Account the allocation
-    //
-    Pool->Used += Size;
 
   } else {
     DEBUG ((DEBUG_ERROR | DEBUG_POOL, "AllocatePool: failed to allocate %ld bytes\n", (UINT64) Size));
@@ -584,8 +612,45 @@ CoreFreePoolPagesI (
   CoreFreePoolPages (Memory, NoPages);
   CoreReleaseMemoryLock ();
 
+  GuardFreedPagesChecked (Memory, NoPages);
   ApplyMemoryProtectionPolicy (PoolType, EfiConventionalMemory,
     (EFI_PHYSICAL_ADDRESS)(UINTN)Memory, EFI_PAGES_TO_SIZE (NoPages));
+}
+
+/**
+  Internal function.  Frees guarded pool pages.
+
+  @param  PoolType               The type of memory for the pool pages
+  @param  Memory                 The base address to free
+  @param  NoPages                The number of pages to free
+
+**/
+STATIC
+VOID
+CoreFreePoolPagesWithGuard (
+  IN EFI_MEMORY_TYPE        PoolType,
+  IN EFI_PHYSICAL_ADDRESS   Memory,
+  IN UINTN                  NoPages
+  )
+{
+  EFI_PHYSICAL_ADDRESS    MemoryGuarded;
+  UINTN                   NoPagesGuarded;
+
+  MemoryGuarded  = Memory;
+  NoPagesGuarded = NoPages;
+
+  AdjustMemoryF (&Memory, &NoPages);
+  //
+  // It's safe to unset Guard page inside memory lock because there should
+  // be no memory allocation occurred in updating memory page attribute at
+  // this point. And unsetting Guard page before free will prevent Guard
+  // page just freed back to pool from being allocated right away before
+  // marking it usable (from non-present to present).
+  //
+  UnsetGuardForMemory (MemoryGuarded, NoPagesGuarded);
+  if (NoPages > 0) {
+    CoreFreePoolPagesI (PoolType, Memory, NoPages);
+  }
 }
 
 /**
@@ -616,35 +681,50 @@ CoreFreePoolI (
   UINTN       Offset;
   BOOLEAN     AllFree;
   UINTN       Granularity;
+  BOOLEAN     IsGuarded;
+  BOOLEAN     HasPoolTail;
+  BOOLEAN     PageAsPool;
 
   ASSERT(Buffer != NULL);
   //
   // Get the head & tail of the pool entry
   //
-  Head = CR (Buffer, POOL_HEAD, Data, POOL_HEAD_SIGNATURE);
+  Head = BASE_CR (Buffer, POOL_HEAD, Data);
   ASSERT(Head != NULL);
 
-  if (Head->Signature != POOL_HEAD_SIGNATURE) {
+  if (Head->Signature != POOL_HEAD_SIGNATURE &&
+      Head->Signature != POOLPAGE_HEAD_SIGNATURE) {
+    ASSERT (Head->Signature == POOL_HEAD_SIGNATURE ||
+            Head->Signature == POOLPAGE_HEAD_SIGNATURE);
     return EFI_INVALID_PARAMETER;
   }
 
-  Tail = HEAD_TO_TAIL (Head);
-  ASSERT(Tail != NULL);
+  IsGuarded   = IsPoolTypeToGuard (Head->Type) &&
+                IsMemoryGuarded ((EFI_PHYSICAL_ADDRESS)(UINTN)Head);
+  HasPoolTail = !(IsGuarded &&
+                  ((PcdGet8 (PcdHeapGuardPropertyMask) & BIT7) == 0));
+  PageAsPool = (Head->Signature == POOLPAGE_HEAD_SIGNATURE);
 
-  //
-  // Debug
-  //
-  ASSERT (Tail->Signature == POOL_TAIL_SIGNATURE);
-  ASSERT (Head->Size == Tail->Size);
+  if (HasPoolTail) {
+    Tail = HEAD_TO_TAIL (Head);
+    ASSERT (Tail != NULL);
+
+    //
+    // Debug
+    //
+    ASSERT (Tail->Signature == POOL_TAIL_SIGNATURE);
+    ASSERT (Head->Size == Tail->Size);
+
+    if (Tail->Signature != POOL_TAIL_SIGNATURE) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    if (Head->Size != Tail->Size) {
+      return EFI_INVALID_PARAMETER;
+    }
+  }
+
   ASSERT_LOCKED (&mPoolMemoryLock);
-
-  if (Tail->Signature != POOL_TAIL_SIGNATURE) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  if (Head->Size != Tail->Size) {
-    return EFI_INVALID_PARAMETER;
-  }
 
   //
   // Determine the pool type and account for it
@@ -680,14 +760,27 @@ CoreFreePoolI (
   //
   // If it's not on the list, it must be pool pages
   //
-  if (Index >= SIZE_TO_LIST (Granularity)) {
+  if (Index >= SIZE_TO_LIST (Granularity) || IsGuarded || PageAsPool) {
 
     //
     // Return the memory pages back to free memory
     //
-    NoPages = EFI_SIZE_TO_PAGES(Size) + EFI_SIZE_TO_PAGES (Granularity) - 1;
+    NoPages = EFI_SIZE_TO_PAGES (Size) + EFI_SIZE_TO_PAGES (Granularity) - 1;
     NoPages &= ~(UINTN)(EFI_SIZE_TO_PAGES (Granularity) - 1);
-    CoreFreePoolPagesI (Pool->MemoryType, (EFI_PHYSICAL_ADDRESS) (UINTN) Head, NoPages);
+    if (IsGuarded) {
+      Head = AdjustPoolHeadF ((EFI_PHYSICAL_ADDRESS)(UINTN)Head);
+      CoreFreePoolPagesWithGuard (
+        Pool->MemoryType,
+        (EFI_PHYSICAL_ADDRESS)(UINTN)Head,
+        NoPages
+        );
+    } else {
+      CoreFreePoolPagesI (
+        Pool->MemoryType,
+        (EFI_PHYSICAL_ADDRESS)(UINTN)Head,
+        NoPages
+        );
+    }
 
   } else {
 

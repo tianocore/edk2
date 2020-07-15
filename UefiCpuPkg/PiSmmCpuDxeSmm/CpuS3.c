@@ -1,19 +1,14 @@
 /** @file
 Code for Processor S3 restoration
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include "PiSmmCpuDxeSmm.h"
 
+#pragma pack(1)
 typedef struct {
   UINTN             Lock;
   VOID              *StackStart;
@@ -23,7 +18,9 @@ typedef struct {
   IA32_DESCRIPTOR   IdtrProfile;
   UINT32            BufferStart;
   UINT32            Cr3;
+  UINTN             InitializeFloatingPointUnitsAddress;
 } MP_CPU_EXCHANGE_INFO;
+#pragma pack()
 
 typedef struct {
   UINT8 *RendezvousFunnelAddress;
@@ -35,9 +32,20 @@ typedef struct {
 } MP_ASSEMBLY_ADDRESS_MAP;
 
 //
-// Spin lock used to serialize MemoryMapped operation
+// Flags used when program the register.
 //
-SPIN_LOCK                *mMemoryMappedLock = NULL;
+typedef struct {
+  volatile UINTN           MemoryMappedLock;        // Spinlock used to program mmio
+  volatile UINT32          *CoreSemaphoreCount;     // Semaphore container used to program
+                                                    // core level semaphore.
+  volatile UINT32          *PackageSemaphoreCount;  // Semaphore container used to program
+                                                    // package level semaphore.
+} PROGRAM_CPU_REGISTER_FLAGS;
+
+//
+// Signal that SMM BASE relocation is complete.
+//
+volatile BOOLEAN         mInitApsAfterSmmBaseReloc;
 
 /**
   Get starting address and size of the rendezvous entry for APs.
@@ -54,16 +62,11 @@ AsmGetAddressMap (
 #define LEGACY_REGION_SIZE    (2 * 0x1000)
 #define LEGACY_REGION_BASE    (0xA0000 - LEGACY_REGION_SIZE)
 
+PROGRAM_CPU_REGISTER_FLAGS   mCpuFlags;
 ACPI_CPU_DATA                mAcpiCpuData;
 volatile UINT32              mNumberToFinish;
 MP_CPU_EXCHANGE_INFO         *mExchangeInfo;
 BOOLEAN                      mRestoreSmmConfigurationInS3 = FALSE;
-VOID                         *mGdtForAp = NULL;
-VOID                         *mIdtForAp = NULL;
-VOID                         *mMachineCheckHandlerForAp = NULL;
-MP_MSR_LOCK                  *mMsrSpinLocks = NULL;
-UINTN                        mMsrSpinLockCount;
-UINTN                        mMsrCount = 0;
 
 //
 // S3 boot flag
@@ -85,89 +88,6 @@ UINT8                        mApHltLoopCodeTemplate[] = {
                                0xF4,                    // hlt
                                0xEB, 0xFC               // jmp $-2
                                };
-
-/**
-  Get MSR spin lock by MSR index.
-
-  @param  MsrIndex       MSR index value.
-
-  @return Pointer to MSR spin lock.
-
-**/
-SPIN_LOCK *
-GetMsrSpinLockByIndex (
-  IN UINT32      MsrIndex
-  )
-{
-  UINTN     Index;
-  for (Index = 0; Index < mMsrCount; Index++) {
-    if (MsrIndex == mMsrSpinLocks[Index].MsrIndex) {
-      return mMsrSpinLocks[Index].SpinLock;
-    }
-  }
-  return NULL;
-}
-
-/**
-  Initialize MSR spin lock by MSR index.
-
-  @param  MsrIndex       MSR index value.
-
-**/
-VOID
-InitMsrSpinLockByIndex (
-  IN UINT32      MsrIndex
-  )
-{
-  UINTN    MsrSpinLockCount;
-  UINTN    NewMsrSpinLockCount;
-  UINTN    Index;
-  UINTN    AddedSize;
-
-  if (mMsrSpinLocks == NULL) {
-    MsrSpinLockCount = mSmmCpuSemaphores.SemaphoreMsr.AvailableCounter;
-    mMsrSpinLocks = (MP_MSR_LOCK *) AllocatePool (sizeof (MP_MSR_LOCK) * MsrSpinLockCount);
-    ASSERT (mMsrSpinLocks != NULL);
-    for (Index = 0; Index < MsrSpinLockCount; Index++) {
-      mMsrSpinLocks[Index].SpinLock =
-       (SPIN_LOCK *)((UINTN)mSmmCpuSemaphores.SemaphoreMsr.Msr + Index * mSemaphoreSize);
-      mMsrSpinLocks[Index].MsrIndex = (UINT32)-1;
-    }
-    mMsrSpinLockCount = MsrSpinLockCount;
-    mSmmCpuSemaphores.SemaphoreMsr.AvailableCounter = 0;
-  }
-  if (GetMsrSpinLockByIndex (MsrIndex) == NULL) {
-    //
-    // Initialize spin lock for MSR programming
-    //
-    mMsrSpinLocks[mMsrCount].MsrIndex = MsrIndex;
-    InitializeSpinLock (mMsrSpinLocks[mMsrCount].SpinLock);
-    mMsrCount ++;
-    if (mMsrCount == mMsrSpinLockCount) {
-      //
-      // If MSR spin lock buffer is full, enlarge it
-      //
-      AddedSize = SIZE_4KB;
-      mSmmCpuSemaphores.SemaphoreMsr.Msr =
-                        AllocatePages (EFI_SIZE_TO_PAGES(AddedSize));
-      ASSERT (mSmmCpuSemaphores.SemaphoreMsr.Msr != NULL);
-      NewMsrSpinLockCount = mMsrSpinLockCount + AddedSize / mSemaphoreSize;
-      mMsrSpinLocks = ReallocatePool (
-                        sizeof (MP_MSR_LOCK) * mMsrSpinLockCount,
-                        sizeof (MP_MSR_LOCK) * NewMsrSpinLockCount,
-                        mMsrSpinLocks
-                        );
-      ASSERT (mMsrSpinLocks != NULL);
-      mMsrSpinLockCount = NewMsrSpinLockCount;
-      for (Index = mMsrCount; Index < mMsrSpinLockCount; Index++) {
-        mMsrSpinLocks[Index].SpinLock =
-                 (SPIN_LOCK *)((UINTN)mSmmCpuSemaphores.SemaphoreMsr.Msr +
-                 (Index - mMsrCount)  * mSemaphoreSize);
-        mMsrSpinLocks[Index].MsrIndex = (UINT32)-1;
-      }
-    }
-  }
-}
 
 /**
   Sync up the MTRR values for all processors.
@@ -199,28 +119,139 @@ Returns:
 }
 
 /**
-  Programs registers for the calling processor.
+  Increment semaphore by 1.
 
-  This function programs registers for the calling processor.
-
-  @param  RegisterTable Pointer to register table of the running processor.
+  @param      Sem            IN:  32-bit unsigned integer
 
 **/
 VOID
-SetProcessorRegister (
-  IN CPU_REGISTER_TABLE        *RegisterTable
+S3ReleaseSemaphore (
+  IN OUT  volatile UINT32           *Sem
+  )
+{
+  InterlockedIncrement (Sem);
+}
+
+/**
+  Decrement the semaphore by 1 if it is not zero.
+
+  Performs an atomic decrement operation for semaphore.
+  The compare exchange operation must be performed using
+  MP safe mechanisms.
+
+  @param      Sem            IN:  32-bit unsigned integer
+
+**/
+VOID
+S3WaitForSemaphore (
+  IN OUT  volatile UINT32           *Sem
+  )
+{
+  UINT32  Value;
+
+  do {
+    Value = *Sem;
+  } while (Value == 0 ||
+           InterlockedCompareExchange32 (
+             Sem,
+             Value,
+             Value - 1
+             ) != Value);
+}
+
+/**
+  Read / write CR value.
+
+  @param[in]      CrIndex         The CR index which need to read/write.
+  @param[in]      Read            Read or write. TRUE is read.
+  @param[in,out]  CrValue         CR value.
+
+  @retval    EFI_SUCCESS means read/write success, else return EFI_UNSUPPORTED.
+**/
+UINTN
+ReadWriteCr (
+  IN     UINT32       CrIndex,
+  IN     BOOLEAN      Read,
+  IN OUT UINTN        *CrValue
+  )
+{
+  switch (CrIndex) {
+  case 0:
+    if (Read) {
+      *CrValue = AsmReadCr0 ();
+    } else {
+      AsmWriteCr0 (*CrValue);
+    }
+    break;
+  case 2:
+    if (Read) {
+      *CrValue = AsmReadCr2 ();
+    } else {
+      AsmWriteCr2 (*CrValue);
+    }
+    break;
+  case 3:
+    if (Read) {
+      *CrValue = AsmReadCr3 ();
+    } else {
+      AsmWriteCr3 (*CrValue);
+    }
+    break;
+  case 4:
+    if (Read) {
+      *CrValue = AsmReadCr4 ();
+    } else {
+      AsmWriteCr4 (*CrValue);
+    }
+    break;
+  default:
+    return EFI_UNSUPPORTED;;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Initialize the CPU registers from a register table.
+
+  @param[in]  RegisterTable         The register table for this AP.
+  @param[in]  ApLocation            AP location info for this ap.
+  @param[in]  CpuStatus             CPU status info for this CPU.
+  @param[in]  CpuFlags              Flags data structure used when program the register.
+
+  @note This service could be called by BSP/APs.
+**/
+VOID
+ProgramProcessorRegister (
+  IN CPU_REGISTER_TABLE           *RegisterTable,
+  IN EFI_CPU_PHYSICAL_LOCATION    *ApLocation,
+  IN CPU_STATUS_INFORMATION       *CpuStatus,
+  IN PROGRAM_CPU_REGISTER_FLAGS   *CpuFlags
   )
 {
   CPU_REGISTER_TABLE_ENTRY  *RegisterTableEntry;
   UINTN                     Index;
   UINTN                     Value;
-  SPIN_LOCK                 *MsrSpinLock;
+  CPU_REGISTER_TABLE_ENTRY  *RegisterTableEntryHead;
+  volatile UINT32           *SemaphorePtr;
+  UINT32                    FirstThread;
+  UINT32                    PackageThreadsCount;
+  UINT32                    CurrentThread;
+  UINTN                     ProcessorIndex;
+  UINTN                     ValidThreadCount;
+  UINT32                    *ValidCoreCountPerPackage;
+  EFI_STATUS                Status;
+  UINT64                    CurrentValue;
 
   //
   // Traverse Register Table of this logical processor
   //
-  RegisterTableEntry = (CPU_REGISTER_TABLE_ENTRY *) (UINTN) RegisterTable->RegisterTableEntry;
-  for (Index = 0; Index < RegisterTable->TableLength; Index++, RegisterTableEntry++) {
+  RegisterTableEntryHead = (CPU_REGISTER_TABLE_ENTRY *) (UINTN) RegisterTable->RegisterTableEntry;
+
+  for (Index = 0; Index < RegisterTable->TableLength; Index++) {
+
+    RegisterTableEntry = &RegisterTableEntryHead[Index];
+
     //
     // Check the type of specified register
     //
@@ -229,55 +260,50 @@ SetProcessorRegister (
     // The specified register is Control Register
     //
     case ControlRegister:
-      switch (RegisterTableEntry->Index) {
-      case 0:
-        Value = AsmReadCr0 ();
-        Value = (UINTN) BitFieldWrite64 (
-                          Value,
-                          RegisterTableEntry->ValidBitStart,
-                          RegisterTableEntry->ValidBitStart + RegisterTableEntry->ValidBitLength - 1,
-                          (UINTN) RegisterTableEntry->Value
-                          );
-        AsmWriteCr0 (Value);
-        break;
-      case 2:
-        Value = AsmReadCr2 ();
-        Value = (UINTN) BitFieldWrite64 (
-                          Value,
-                          RegisterTableEntry->ValidBitStart,
-                          RegisterTableEntry->ValidBitStart + RegisterTableEntry->ValidBitLength - 1,
-                          (UINTN) RegisterTableEntry->Value
-                          );
-        AsmWriteCr2 (Value);
-        break;
-      case 3:
-        Value = AsmReadCr3 ();
-        Value = (UINTN) BitFieldWrite64 (
-                          Value,
-                          RegisterTableEntry->ValidBitStart,
-                          RegisterTableEntry->ValidBitStart + RegisterTableEntry->ValidBitLength - 1,
-                          (UINTN) RegisterTableEntry->Value
-                          );
-        AsmWriteCr3 (Value);
-        break;
-      case 4:
-        Value = AsmReadCr4 ();
-        Value = (UINTN) BitFieldWrite64 (
-                          Value,
-                          RegisterTableEntry->ValidBitStart,
-                          RegisterTableEntry->ValidBitStart + RegisterTableEntry->ValidBitLength - 1,
-                          (UINTN) RegisterTableEntry->Value
-                          );
-        AsmWriteCr4 (Value);
-        break;
-      default:
+      Status = ReadWriteCr (RegisterTableEntry->Index, TRUE, &Value);
+      if (EFI_ERROR (Status)) {
         break;
       }
+      if (RegisterTableEntry->TestThenWrite) {
+        CurrentValue = BitFieldRead64 (
+                         Value,
+                         RegisterTableEntry->ValidBitStart,
+                         RegisterTableEntry->ValidBitStart + RegisterTableEntry->ValidBitLength - 1
+                         );
+        if (CurrentValue == RegisterTableEntry->Value) {
+          break;
+        }
+      }
+      Value = (UINTN) BitFieldWrite64 (
+                        Value,
+                        RegisterTableEntry->ValidBitStart,
+                        RegisterTableEntry->ValidBitStart + RegisterTableEntry->ValidBitLength - 1,
+                        RegisterTableEntry->Value
+                        );
+      ReadWriteCr (RegisterTableEntry->Index, FALSE, &Value);
       break;
     //
     // The specified register is Model Specific Register
     //
     case Msr:
+      if (RegisterTableEntry->TestThenWrite) {
+        Value = (UINTN)AsmReadMsr64 (RegisterTableEntry->Index);
+        if (RegisterTableEntry->ValidBitLength >= 64) {
+          if (Value == RegisterTableEntry->Value) {
+            break;
+          }
+        } else {
+          CurrentValue = BitFieldRead64 (
+                           Value,
+                           RegisterTableEntry->ValidBitStart,
+                           RegisterTableEntry->ValidBitStart + RegisterTableEntry->ValidBitLength - 1
+                           );
+          if (CurrentValue == RegisterTableEntry->Value) {
+            break;
+          }
+        }
+      }
+
       //
       // If this function is called to restore register setting after INIT signal,
       // there is no need to restore MSRs in register table.
@@ -292,12 +318,6 @@ SetProcessorRegister (
           );
       } else {
         //
-        // Get lock to avoid Package/Core scope MSRs programming issue in parallel execution mode
-        // to make sure MSR read/write operation is atomic.
-        //
-        MsrSpinLock = GetMsrSpinLockByIndex (RegisterTableEntry->Index);
-        AcquireSpinLock (MsrSpinLock);
-        //
         // Set the bit section according to bit start and length
         //
         AsmMsrBitFieldWrite64 (
@@ -306,21 +326,20 @@ SetProcessorRegister (
           RegisterTableEntry->ValidBitStart + RegisterTableEntry->ValidBitLength - 1,
           RegisterTableEntry->Value
           );
-        ReleaseSpinLock (MsrSpinLock);
       }
       break;
     //
     // MemoryMapped operations
     //
     case MemoryMapped:
-      AcquireSpinLock (mMemoryMappedLock);
+      AcquireSpinLock (&CpuFlags->MemoryMappedLock);
       MmioBitFieldWrite32 (
-        RegisterTableEntry->Index,
+        (UINTN)(RegisterTableEntry->Index | LShiftU64 (RegisterTableEntry->HighIndex, 32)),
         RegisterTableEntry->ValidBitStart,
         RegisterTableEntry->ValidBitStart + RegisterTableEntry->ValidBitLength - 1,
         (UINT32)RegisterTableEntry->Value
         );
-      ReleaseSpinLock (mMemoryMappedLock);
+      ReleaseSpinLock (&CpuFlags->MemoryMappedLock);
       break;
     //
     // Enable or disable cache
@@ -336,6 +355,97 @@ SetProcessorRegister (
       }
       break;
 
+    case Semaphore:
+      // Semaphore works logic like below:
+      //
+      //  V(x) = LibReleaseSemaphore (Semaphore[FirstThread + x]);
+      //  P(x) = LibWaitForSemaphore (Semaphore[FirstThread + x]);
+      //
+      //  All threads (T0...Tn) waits in P() line and continues running
+      //  together.
+      //
+      //
+      //  T0             T1            ...           Tn
+      //
+      //  V(0...n)       V(0...n)      ...           V(0...n)
+      //  n * P(0)       n * P(1)      ...           n * P(n)
+      //
+      ASSERT (
+        (ApLocation != NULL) &&
+        (CpuStatus->ValidCoreCountPerPackage != 0) &&
+        (CpuFlags->CoreSemaphoreCount != NULL) &&
+        (CpuFlags->PackageSemaphoreCount != NULL)
+        );
+      switch (RegisterTableEntry->Value) {
+      case CoreDepType:
+        SemaphorePtr = CpuFlags->CoreSemaphoreCount;
+        //
+        // Get Offset info for the first thread in the core which current thread belongs to.
+        //
+        FirstThread = (ApLocation->Package * CpuStatus->MaxCoreCount + ApLocation->Core) * CpuStatus->MaxThreadCount;
+        CurrentThread = FirstThread + ApLocation->Thread;
+        //
+        // First Notify all threads in current Core that this thread has ready.
+        //
+        for (ProcessorIndex = 0; ProcessorIndex < CpuStatus->MaxThreadCount; ProcessorIndex ++) {
+          S3ReleaseSemaphore (&SemaphorePtr[FirstThread + ProcessorIndex]);
+        }
+        //
+        // Second, check whether all valid threads in current core have ready.
+        //
+        for (ProcessorIndex = 0; ProcessorIndex < CpuStatus->MaxThreadCount; ProcessorIndex ++) {
+          S3WaitForSemaphore (&SemaphorePtr[CurrentThread]);
+        }
+        break;
+
+      case PackageDepType:
+        SemaphorePtr = CpuFlags->PackageSemaphoreCount;
+        ValidCoreCountPerPackage = (UINT32 *)(UINTN)CpuStatus->ValidCoreCountPerPackage;
+        //
+        // Get Offset info for the first thread in the package which current thread belongs to.
+        //
+        FirstThread = ApLocation->Package * CpuStatus->MaxCoreCount * CpuStatus->MaxThreadCount;
+        //
+        // Get the possible threads count for current package.
+        //
+        PackageThreadsCount = CpuStatus->MaxThreadCount * CpuStatus->MaxCoreCount;
+        CurrentThread = FirstThread + CpuStatus->MaxThreadCount * ApLocation->Core + ApLocation->Thread;
+        //
+        // Get the valid thread count for current package.
+        //
+        ValidThreadCount = CpuStatus->MaxThreadCount * ValidCoreCountPerPackage[ApLocation->Package];
+
+        //
+        // Different packages may have different valid cores in them. If driver maintail clearly
+        // cores number in different packages, the logic will be much complicated.
+        // Here driver just simply records the max core number in all packages and use it as expect
+        // core number for all packages.
+        // In below two steps logic, first current thread will Release semaphore for each thread
+        // in current package. Maybe some threads are not valid in this package, but driver don't
+        // care. Second, driver will let current thread wait semaphore for all valid threads in
+        // current package. Because only the valid threads will do release semaphore for this
+        // thread, driver here only need to wait the valid thread count.
+        //
+
+        //
+        // First Notify all threads in current package that this thread has ready.
+        //
+        for (ProcessorIndex = 0; ProcessorIndex < PackageThreadsCount ; ProcessorIndex ++) {
+          S3ReleaseSemaphore (&SemaphorePtr[FirstThread + ProcessorIndex]);
+        }
+        //
+        // Second, check whether all valid threads in current package have ready.
+        //
+        for (ProcessorIndex = 0; ProcessorIndex < ValidThreadCount; ProcessorIndex ++) {
+          S3WaitForSemaphore (&SemaphorePtr[CurrentThread]);
+        }
+        break;
+
+      default:
+        break;
+      }
+      break;
+
     default:
       break;
     }
@@ -343,62 +453,89 @@ SetProcessorRegister (
 }
 
 /**
-  AP initialization before SMBASE relocation in the S3 boot path.
+
+  Set Processor register for one AP.
+
+  @param     PreSmmRegisterTable     Use pre Smm register table or register table.
+
 **/
 VOID
-EarlyMPRendezvousProcedure (
-  VOID
+SetRegister (
+  IN BOOLEAN                 PreSmmRegisterTable
   )
 {
-  CPU_REGISTER_TABLE         *RegisterTableList;
-  UINT32                     InitApicId;
-  UINTN                      Index;
+  CPU_REGISTER_TABLE        *RegisterTable;
+  CPU_REGISTER_TABLE        *RegisterTables;
+  UINT32                    InitApicId;
+  UINTN                     ProcIndex;
+  UINTN                     Index;
 
-  LoadMtrrData (mAcpiCpuData.MtrrTable);
+  if (PreSmmRegisterTable) {
+    RegisterTables = (CPU_REGISTER_TABLE *)(UINTN)mAcpiCpuData.PreSmmInitRegisterTable;
+  } else {
+    RegisterTables = (CPU_REGISTER_TABLE *)(UINTN)mAcpiCpuData.RegisterTable;
+  }
 
-  //
-  // Find processor number for this CPU.
-  //
-  RegisterTableList = (CPU_REGISTER_TABLE *) (UINTN) mAcpiCpuData.PreSmmInitRegisterTable;
   InitApicId = GetInitialApicId ();
+  RegisterTable = NULL;
+  ProcIndex = (UINTN)-1;
   for (Index = 0; Index < mAcpiCpuData.NumberOfCpus; Index++) {
-    if (RegisterTableList[Index].InitialApicId == InitApicId) {
-      SetProcessorRegister (&RegisterTableList[Index]);
+    if (RegisterTables[Index].InitialApicId == InitApicId) {
+      RegisterTable = &RegisterTables[Index];
+      ProcIndex = Index;
       break;
     }
   }
+  ASSERT (RegisterTable != NULL);
+
+  if (mAcpiCpuData.ApLocation != 0) {
+    ProgramProcessorRegister (
+      RegisterTable,
+      (EFI_CPU_PHYSICAL_LOCATION *)(UINTN)mAcpiCpuData.ApLocation + ProcIndex,
+      &mAcpiCpuData.CpuStatus,
+      &mCpuFlags
+      );
+  } else {
+    ProgramProcessorRegister (
+      RegisterTable,
+      NULL,
+      &mAcpiCpuData.CpuStatus,
+      &mCpuFlags
+      );
+  }
+}
+
+/**
+  AP initialization before then after SMBASE relocation in the S3 boot path.
+**/
+VOID
+InitializeAp (
+  VOID
+  )
+{
+  UINTN                      TopOfStack;
+  UINT8                      Stack[128];
+
+  LoadMtrrData (mAcpiCpuData.MtrrTable);
+
+  SetRegister (TRUE);
 
   //
   // Count down the number with lock mechanism.
   //
   InterlockedDecrement (&mNumberToFinish);
-}
 
-/**
-  AP initialization after SMBASE relocation in the S3 boot path.
-**/
-VOID
-MPRendezvousProcedure (
-  VOID
-  )
-{
-  CPU_REGISTER_TABLE         *RegisterTableList;
-  UINT32                     InitApicId;
-  UINTN                      Index;
-  UINTN                      TopOfStack;
-  UINT8                      Stack[128];
+  //
+  // Wait for BSP to signal SMM Base relocation done.
+  //
+  while (!mInitApsAfterSmmBaseReloc) {
+    CpuPause ();
+  }
 
   ProgramVirtualWireMode ();
   DisableLvtInterrupts ();
 
-  RegisterTableList = (CPU_REGISTER_TABLE *) (UINTN) mAcpiCpuData.RegisterTable;
-  InitApicId = GetInitialApicId ();
-  for (Index = 0; Index < mAcpiCpuData.NumberOfCpus; Index++) {
-    if (RegisterTableList[Index].InitialApicId == InitApicId) {
-      SetProcessorRegister (&RegisterTableList[Index]);
-      break;
-    }
-  }
+  SetRegister (FALSE);
 
   //
   // Place AP into the safe code, count down the number with lock mechanism in the safe code.
@@ -452,17 +589,11 @@ PrepareApStartupVector (
   CopyMem ((VOID *) (UINTN) &mExchangeInfo->GdtrProfile, (VOID *) (UINTN) mAcpiCpuData.GdtrProfile, sizeof (IA32_DESCRIPTOR));
   CopyMem ((VOID *) (UINTN) &mExchangeInfo->IdtrProfile, (VOID *) (UINTN) mAcpiCpuData.IdtrProfile, sizeof (IA32_DESCRIPTOR));
 
-  //
-  // Copy AP's GDT, IDT and Machine Check handler from SMRAM to ACPI NVS memory
-  //
-  CopyMem ((VOID *) mExchangeInfo->GdtrProfile.Base, mGdtForAp, mExchangeInfo->GdtrProfile.Limit + 1);
-  CopyMem ((VOID *) mExchangeInfo->IdtrProfile.Base, mIdtForAp, mExchangeInfo->IdtrProfile.Limit + 1);
-  CopyMem ((VOID *)(UINTN) mAcpiCpuData.ApMachineCheckHandlerBase, mMachineCheckHandlerForAp, mAcpiCpuData.ApMachineCheckHandlerSize);
-
   mExchangeInfo->StackStart  = (VOID *) (UINTN) mAcpiCpuData.StackAddress;
   mExchangeInfo->StackSize   = mAcpiCpuData.StackSize;
   mExchangeInfo->BufferStart = (UINT32) StartupVector;
   mExchangeInfo->Cr3         = (UINT32) (AsmReadCr3 ());
+  mExchangeInfo->InitializeFloatingPointUnitsAddress = (UINTN)InitializeFloatingPointUnits;
 }
 
 /**
@@ -473,34 +604,30 @@ PrepareApStartupVector (
 
 **/
 VOID
-EarlyInitializeCpu (
+InitializeCpuBeforeRebase (
   VOID
   )
 {
-  CPU_REGISTER_TABLE         *RegisterTableList;
-  UINT32                     InitApicId;
-  UINTN                      Index;
-
   LoadMtrrData (mAcpiCpuData.MtrrTable);
 
-  //
-  // Find processor number for this CPU.
-  //
-  RegisterTableList = (CPU_REGISTER_TABLE *) (UINTN) mAcpiCpuData.PreSmmInitRegisterTable;
-  InitApicId = GetInitialApicId ();
-  for (Index = 0; Index < mAcpiCpuData.NumberOfCpus; Index++) {
-    if (RegisterTableList[Index].InitialApicId == InitApicId) {
-      SetProcessorRegister (&RegisterTableList[Index]);
-      break;
-    }
-  }
+  SetRegister (TRUE);
 
   ProgramVirtualWireMode ();
 
   PrepareApStartupVector (mAcpiCpuData.StartupVector);
 
-  mNumberToFinish = mAcpiCpuData.NumberOfCpus - 1;
-  mExchangeInfo->ApFunction  = (VOID *) (UINTN) EarlyMPRendezvousProcedure;
+  if (FeaturePcdGet (PcdCpuHotPlugSupport)) {
+    ASSERT (mNumberOfCpus <= mAcpiCpuData.NumberOfCpus);
+  } else {
+    ASSERT (mNumberOfCpus == mAcpiCpuData.NumberOfCpus);
+  }
+  mNumberToFinish = (UINT32)(mNumberOfCpus - 1);
+  mExchangeInfo->ApFunction  = (VOID *) (UINTN) InitializeAp;
+
+  //
+  // Execute code for before SmmBaseReloc. Note: This flag is maintained across S3 boots.
+  //
+  mInitApsAfterSmmBaseReloc = FALSE;
 
   //
   // Send INIT IPI - SIPI to all APs
@@ -520,35 +647,32 @@ EarlyInitializeCpu (
 
 **/
 VOID
-InitializeCpu (
+InitializeCpuAfterRebase (
   VOID
   )
 {
-  CPU_REGISTER_TABLE         *RegisterTableList;
-  UINT32                     InitApicId;
-  UINTN                      Index;
-
-  RegisterTableList = (CPU_REGISTER_TABLE *) (UINTN) mAcpiCpuData.RegisterTable;
-  InitApicId = GetInitialApicId ();
-  for (Index = 0; Index < mAcpiCpuData.NumberOfCpus; Index++) {
-    if (RegisterTableList[Index].InitialApicId == InitApicId) {
-      SetProcessorRegister (&RegisterTableList[Index]);
-      break;
-    }
+  if (FeaturePcdGet (PcdCpuHotPlugSupport)) {
+    ASSERT (mNumberOfCpus <= mAcpiCpuData.NumberOfCpus);
+  } else {
+    ASSERT (mNumberOfCpus == mAcpiCpuData.NumberOfCpus);
   }
-
-  mNumberToFinish = mAcpiCpuData.NumberOfCpus - 1;
-  //
-  // StackStart was updated when APs were waken up in EarlyInitializeCpu.
-  // Re-initialize StackAddress to original beginning address.
-  //
-  mExchangeInfo->StackStart  = (VOID *) (UINTN) mAcpiCpuData.StackAddress;
-  mExchangeInfo->ApFunction  = (VOID *) (UINTN) MPRendezvousProcedure;
+  mNumberToFinish = (UINT32)(mNumberOfCpus - 1);
 
   //
-  // Send INIT IPI - SIPI to all APs
+  // Signal that SMM base relocation is complete and to continue initialization for all APs.
   //
-  SendInitSipiSipiAllExcludingSelf ((UINT32)mAcpiCpuData.StartupVector);
+  mInitApsAfterSmmBaseReloc = TRUE;
+
+  //
+  // Must begin set register after all APs have continue their initialization.
+  // This is a requirement to support semaphore mechanism in register table.
+  // Because if semaphore's dependence type is package type, semaphore will wait
+  // for all Aps in one package finishing their tasks before set next register
+  // for all APs. If the Aps not begin its task during BSP doing its task, the
+  // BSP thread will hang because it is waiting for other Aps in the same
+  // package finishing their task.
+  //
+  SetRegister (FALSE);
 
   while (mNumberToFinish > 0) {
     CpuPause ();
@@ -613,8 +737,6 @@ SmmRestoreCpu (
 
   mSmmS3Flag = TRUE;
 
-  InitializeSpinLock (mMemoryMappedLock);
-
   //
   // See if there is enough context to resume PEI Phase
   //
@@ -659,7 +781,7 @@ SmmRestoreCpu (
     //
     // First time microcode load and restore MTRRs
     //
-    EarlyInitializeCpu ();
+    InitializeCpuBeforeRebase ();
   }
 
   //
@@ -674,7 +796,7 @@ SmmRestoreCpu (
     //
     // Restore MSRs for BSP and all APs
     //
-    InitializeCpu ();
+    InitializeCpuAfterRebase ();
   }
 
   //
@@ -753,7 +875,15 @@ InitSmmS3ResumeState (
   }
 
   GuidHob = GetFirstGuidHob (&gEfiAcpiVariableGuid);
-  if (GuidHob != NULL) {
+  if (GuidHob == NULL) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "ERROR:%a(): HOB(gEfiAcpiVariableGuid=%g) needed by S3 resume doesn't exist!\n",
+      __FUNCTION__,
+      &gEfiAcpiVariableGuid
+    ));
+    CpuDeadLoop ();
+  } else {
     SmramDescriptor = (EFI_SMRAM_DESCRIPTOR *) GET_GUID_HOB_DATA (GuidHob);
 
     DEBUG ((EFI_D_INFO, "SMM S3 SMRAM Structure = %x\n", SmramDescriptor));
@@ -773,9 +903,9 @@ InitSmmS3ResumeState (
       SmmS3ResumeState->SmmS3StackSize = 0;
     }
 
-    SmmS3ResumeState->SmmS3Cr0 = gSmmCr0;
+    SmmS3ResumeState->SmmS3Cr0 = mSmmCr0;
     SmmS3ResumeState->SmmS3Cr3 = Cr3;
-    SmmS3ResumeState->SmmS3Cr4 = gSmmCr4;
+    SmmS3ResumeState->SmmS3Cr4 = mSmmCr4;
 
     if (sizeof (UINTN) == sizeof (UINT64)) {
       SmmS3ResumeState->Signature = SMM_S3_RESUME_SMM_64;
@@ -783,12 +913,12 @@ InitSmmS3ResumeState (
     if (sizeof (UINTN) == sizeof (UINT32)) {
       SmmS3ResumeState->Signature = SMM_S3_RESUME_SMM_32;
     }
-  }
 
-  //
-  // Patch SmmS3ResumeState->SmmS3Cr3
-  //
-  InitSmmS3Cr3 ();
+    //
+    // Patch SmmS3ResumeState->SmmS3Cr3
+    //
+    InitSmmS3Cr3 ();
+  }
 
   //
   // Allocate safe memory in ACPI NVS for AP to execute hlt loop in
@@ -821,25 +951,17 @@ CopyRegisterTable (
   )
 {
   UINTN                      Index;
-  UINTN                      Index1;
   CPU_REGISTER_TABLE_ENTRY   *RegisterTableEntry;
 
   CopyMem (DestinationRegisterTableList, SourceRegisterTableList, NumberOfCpus * sizeof (CPU_REGISTER_TABLE));
   for (Index = 0; Index < NumberOfCpus; Index++) {
-    DestinationRegisterTableList[Index].RegisterTableEntry = AllocatePool (DestinationRegisterTableList[Index].AllocatedSize);
-    ASSERT (DestinationRegisterTableList[Index].RegisterTableEntry != NULL);
-    CopyMem (DestinationRegisterTableList[Index].RegisterTableEntry, SourceRegisterTableList[Index].RegisterTableEntry, DestinationRegisterTableList[Index].AllocatedSize);
-    //
-    // Go though all MSRs in register table to initialize MSR spin lock
-    //
-    RegisterTableEntry = DestinationRegisterTableList[Index].RegisterTableEntry;
-    for (Index1 = 0; Index1 < DestinationRegisterTableList[Index].TableLength; Index1++, RegisterTableEntry++) {
-      if ((RegisterTableEntry->RegisterType == Msr) && (RegisterTableEntry->ValidBitLength < 64)) {
-        //
-        // Initialize MSR spin lock only for those MSRs need bit field writing
-        //
-        InitMsrSpinLockByIndex (RegisterTableEntry->Index);
-      }
+    if (DestinationRegisterTableList[Index].AllocatedSize != 0) {
+      RegisterTableEntry = AllocateCopyPool (
+        DestinationRegisterTableList[Index].AllocatedSize,
+        (VOID *)(UINTN)SourceRegisterTableList[Index].RegisterTableEntry
+        );
+      ASSERT (RegisterTableEntry != NULL);
+      DestinationRegisterTableList[Index].RegisterTableEntry = (EFI_PHYSICAL_ADDRESS)(UINTN)RegisterTableEntry;
     }
   }
 }
@@ -856,6 +978,10 @@ GetAcpiCpuData (
   ACPI_CPU_DATA              *AcpiCpuData;
   IA32_DESCRIPTOR            *Gdtr;
   IA32_DESCRIPTOR            *Idtr;
+  VOID                       *GdtForAp;
+  VOID                       *IdtForAp;
+  VOID                       *MachineCheckHandlerForAp;
+  CPU_STATUS_INFORMATION     *CpuStatus;
 
   if (!mAcpiS3Enable) {
     return;
@@ -918,14 +1044,48 @@ GetAcpiCpuData (
   Gdtr = (IA32_DESCRIPTOR *)(UINTN)mAcpiCpuData.GdtrProfile;
   Idtr = (IA32_DESCRIPTOR *)(UINTN)mAcpiCpuData.IdtrProfile;
 
-  mGdtForAp = AllocatePool ((Gdtr->Limit + 1) + (Idtr->Limit + 1) +  mAcpiCpuData.ApMachineCheckHandlerSize);
-  ASSERT (mGdtForAp != NULL);
-  mIdtForAp = (VOID *) ((UINTN)mGdtForAp + (Gdtr->Limit + 1));
-  mMachineCheckHandlerForAp = (VOID *) ((UINTN)mIdtForAp + (Idtr->Limit + 1));
+  GdtForAp = AllocatePool ((Gdtr->Limit + 1) + (Idtr->Limit + 1) +  mAcpiCpuData.ApMachineCheckHandlerSize);
+  ASSERT (GdtForAp != NULL);
+  IdtForAp = (VOID *) ((UINTN)GdtForAp + (Gdtr->Limit + 1));
+  MachineCheckHandlerForAp = (VOID *) ((UINTN)IdtForAp + (Idtr->Limit + 1));
 
-  CopyMem (mGdtForAp, (VOID *)Gdtr->Base, Gdtr->Limit + 1);
-  CopyMem (mIdtForAp, (VOID *)Idtr->Base, Idtr->Limit + 1);
-  CopyMem (mMachineCheckHandlerForAp, (VOID *)(UINTN)mAcpiCpuData.ApMachineCheckHandlerBase, mAcpiCpuData.ApMachineCheckHandlerSize);
+  CopyMem (GdtForAp, (VOID *)Gdtr->Base, Gdtr->Limit + 1);
+  CopyMem (IdtForAp, (VOID *)Idtr->Base, Idtr->Limit + 1);
+  CopyMem (MachineCheckHandlerForAp, (VOID *)(UINTN)mAcpiCpuData.ApMachineCheckHandlerBase, mAcpiCpuData.ApMachineCheckHandlerSize);
+
+  Gdtr->Base = (UINTN)GdtForAp;
+  Idtr->Base = (UINTN)IdtForAp;
+  mAcpiCpuData.ApMachineCheckHandlerBase = (EFI_PHYSICAL_ADDRESS)(UINTN)MachineCheckHandlerForAp;
+
+  CpuStatus = &mAcpiCpuData.CpuStatus;
+  CopyMem (CpuStatus, &AcpiCpuData->CpuStatus, sizeof (CPU_STATUS_INFORMATION));
+  if (AcpiCpuData->CpuStatus.ValidCoreCountPerPackage != 0) {
+    CpuStatus->ValidCoreCountPerPackage = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocateCopyPool (
+                                            sizeof (UINT32) * CpuStatus->PackageCount,
+                                            (UINT32 *)(UINTN)AcpiCpuData->CpuStatus.ValidCoreCountPerPackage
+                                            );
+    ASSERT (CpuStatus->ValidCoreCountPerPackage != 0);
+  }
+  if (AcpiCpuData->ApLocation != 0) {
+    mAcpiCpuData.ApLocation = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocateCopyPool (
+                                mAcpiCpuData.NumberOfCpus * sizeof (EFI_CPU_PHYSICAL_LOCATION),
+                                (EFI_CPU_PHYSICAL_LOCATION *)(UINTN)AcpiCpuData->ApLocation
+                                );
+    ASSERT (mAcpiCpuData.ApLocation != 0);
+  }
+  if (CpuStatus->PackageCount != 0) {
+    mCpuFlags.CoreSemaphoreCount = AllocateZeroPool (
+                                     sizeof (UINT32) * CpuStatus->PackageCount *
+                                     CpuStatus->MaxCoreCount * CpuStatus->MaxThreadCount
+                                     );
+    ASSERT (mCpuFlags.CoreSemaphoreCount != NULL);
+    mCpuFlags.PackageSemaphoreCount = AllocateZeroPool (
+                                        sizeof (UINT32) * CpuStatus->PackageCount *
+                                        CpuStatus->MaxCoreCount * CpuStatus->MaxThreadCount
+                                        );
+    ASSERT (mCpuFlags.PackageSemaphoreCount != NULL);
+  }
+  InitializeSpinLock((SPIN_LOCK*) &mCpuFlags.MemoryMappedLock);
 }
 
 /**

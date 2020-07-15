@@ -1,18 +1,12 @@
 ;------------------------------------------------------------------------------
 ;*
-;*   Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
-;*   This program and the accompanying materials
-;*   are licensed and made available under the terms and conditions of the BSD License
-;*   which accompanies this distribution.  The full text of the license may be found at
-;*   http://opensource.org/licenses/bsd-license.php
-;*
-;*   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-;*   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+;*   Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+;*   SPDX-License-Identifier: BSD-2-Clause-Patent
 ;*
 ;*
 ;------------------------------------------------------------------------------
 
-    SECTION .rdata
+    SECTION .rodata
 ;
 ; Float control word initial value:
 ; all exceptions masked, double-extended-precision, round-to-nearest
@@ -41,10 +35,7 @@ ASM_PFX(InitializeFloatingPointUnits):
     ;
     ; Initialize floating point units
     ;
-    ; The following opcodes stand for instruction 'finit'
-    ; to be supported by some 64-bit assemblers
-    ;
-    DB      0x9B, 0xDB, 0xE3
+    finit
     fldcw   [mFpuControlWord]
 
     ;

@@ -1,14 +1,8 @@
 /** @file
   The boot manager reference implementation
 
-Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under
-the terms and conditions of the BSD License that accompanies this distribution.
-The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -62,7 +56,7 @@ HII_VENDOR_DEVICE_PATH  mBootManagerHiiVendorDevicePath = {
   {
     END_DEVICE_PATH_TYPE,
     END_ENTIRE_DEVICE_PATH_SUBTYPE,
-    { 
+    {
       (UINT8) (END_DEVICE_PATH_LENGTH),
       (UINT8) ((END_DEVICE_PATH_LENGTH) >> 8)
     }
@@ -82,9 +76,9 @@ BOOT_MANAGER_CALLBACK_DATA  gBootManagerPrivate = {
 
 /**
   This function will change video resolution and text mode
-  according to defined setup mode or defined boot mode  
+  according to defined setup mode or defined boot mode
 
-  @param  IsSetupMode   Indicate mode is changed to setup mode or boot mode. 
+  @param  IsSetupMode   Indicate mode is changed to setup mode or boot mode.
 
   @retval  EFI_SUCCESS  Mode is changed successfully.
   @retval  Others             Mode failed to be changed.
@@ -111,13 +105,13 @@ BmSetConsoleMode (
   EFI_STATUS                            Status;
   UINTN                                 Index;
   UINTN                                 CurrentColumn;
-  UINTN                                 CurrentRow;  
+  UINTN                                 CurrentRow;
 
   MaxGopMode  = 0;
   MaxTextMode = 0;
 
   //
-  // Get current video resolution and text mode 
+  // Get current video resolution and text mode
   //
   Status = gBS->HandleProtocol (
                   gST->ConsoleOutHandle,
@@ -156,7 +150,7 @@ BmSetConsoleMode (
     NewHorizontalResolution = mBmBootHorizontalResolution;
     NewVerticalResolution   = mBmBootVerticalResolution;
     NewColumns              = mBmBootTextModeColumn;
-    NewRows                 = mBmBootTextModeRow;   
+    NewRows                 = mBmBootTextModeRow;
   }
 
   if (GraphicsOutput != NULL) {
@@ -294,9 +288,53 @@ BmSetConsoleMode (
 }
 
 /**
+
+  Check whether a reset is needed,if reset is needed, Popup a menu to notice user.
+
+**/
+VOID
+BmSetupResetReminder (
+  VOID
+  )
+{
+  EFI_INPUT_KEY                 Key;
+  CHAR16                        *StringBuffer1;
+  CHAR16                        *StringBuffer2;
+  EFI_STATUS                    Status;
+  EDKII_FORM_BROWSER_EXTENSION2_PROTOCOL *FormBrowserEx2;
+
+  //
+  // Use BrowserEx2 protocol to check whether reset is required.
+  //
+  Status = gBS->LocateProtocol (&gEdkiiFormBrowserEx2ProtocolGuid, NULL, (VOID **) &FormBrowserEx2);
+  //
+  //check any reset required change is applied? if yes, reset system
+  //
+  if (!EFI_ERROR(Status) && FormBrowserEx2->IsResetRequired ()) {
+    StringBuffer1 = AllocateZeroPool (MAX_STRING_LEN * sizeof (CHAR16));
+    ASSERT (StringBuffer1 != NULL);
+    StringBuffer2 = AllocateZeroPool (MAX_STRING_LEN * sizeof (CHAR16));
+    ASSERT (StringBuffer2 != NULL);
+    StrCpyS (StringBuffer1, MAX_STRING_LEN, L"Configuration changed. Reset to apply it Now.");
+    StrCpyS (StringBuffer2, MAX_STRING_LEN, L"Press ENTER to reset");
+    //
+    // Popup a menu to notice user
+    //
+    do {
+      CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, StringBuffer1, StringBuffer2, NULL);
+    } while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
+
+    FreePool (StringBuffer1);
+    FreePool (StringBuffer2);
+
+    gRT->ResetSystem (EfiResetCold, EFI_SUCCESS, 0, NULL);
+  }
+}
+
+/**
   Group the legacy boot options in the BootOption.
 
-  The routine assumes the boot options in the beginning that covers all the device 
+  The routine assumes the boot options in the beginning that covers all the device
   types are ordered properly and re-position the following boot options just after
   the corresponding boot options with the same device type.
   For example:
@@ -422,7 +460,7 @@ BmDevicePathToStr (
   This function invokes Boot Manager. It then enumerate all boot options. If
   a boot option from the Boot Manager page is selected, Boot Manager will boot
   from this boot option.
-  
+
 **/
 VOID
 UpdateBootManager (
@@ -497,9 +535,9 @@ UpdateBootManager (
     mKeyInput++;
 
     //
-    // Don't display the hidden/inactive boot option
+    // Don't display hidden boot options, but retain inactive ones.
     //
-    if (((BootOption[Index].Attributes & LOAD_OPTION_HIDDEN) != 0) || ((BootOption[Index].Attributes & LOAD_OPTION_ACTIVE) == 0)) {
+    if ((BootOption[Index].Attributes & LOAD_OPTION_HIDDEN) != 0) {
       continue;
     }
 
@@ -515,7 +553,7 @@ UpdateBootManager (
       NeedEndOp = FALSE;
       HiiCreateEndOpCode (StartOpCodeHandle);
     }
-    
+
     if (IsLegacyOption && DeviceType != ((BBS_BBS_DEVICE_PATH *) BootOption[Index].FilePath)->DeviceType) {
       if (NeedEndOp) {
         HiiCreateEndOpCode (StartOpCodeHandle);
@@ -780,6 +818,11 @@ BootManagerCallback (
   //
   gST->ConOut->SetAttribute (gST->ConOut, EFI_TEXT_ATTR (EFI_LIGHTGRAY, EFI_BLACK));
   gST->ConOut->ClearScreen (gST->ConOut);
+
+  //
+  //check any reset required change is applied? if yes, reset system
+  //
+  BmSetupResetReminder ();
 
   //
   // parse the selected option

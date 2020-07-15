@@ -1,0 +1,21 @@
+## @file
+# Download GCC AARCH64 compiler from Linaro's release site
+# Set shell variable GCC5_AARCH64_INSTALL to this folder
+#
+# This is only downloaded when a build activates scope gcc_aarch64_linux
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+{
+  "scope": "gcc_aarch64_linux",
+  "type": "web",
+  "name": "gcc_aarch64_linux",
+  "source": "http://releases.linaro.org/components/toolchain/binaries/7.4-2019.02/aarch64-linux-gnu/gcc-linaro-7.4.1-2019.02-x86_64_aarch64-linux-gnu.tar.xz",
+  "version": "7.4.1",
+  "sha256": "27f1dc2c491ed61ae8f0d4b0c11de59cd2f7dd9c94761ee7153006fcac1bf9ab",
+  "compression_type": "tar",
+  "internal_path": "/gcc-linaro-7.4.1-2019.02-x86_64_aarch64-linux-gnu/",
+  "flags": ["set_shell_var", ],
+  "var_name": "GCC5_AARCH64_INSTALL"
+}

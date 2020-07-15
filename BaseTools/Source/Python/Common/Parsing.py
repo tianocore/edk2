@@ -1,22 +1,17 @@
 ## @file
 # This file is used to define common parsing related functions used in parsing INF/DEC/DSC process
 #
-# Copyright (c) 2008 - 2014, Intel Corporation. All rights reserved.<BR>
-# This program and the accompanying materials
-# are licensed and made available under the terms and conditions of the BSD License
-# which accompanies this distribution.  The full text of the license may be found at
-# http://opensource.org/licenses/bsd-license.php
-#
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
 ##
 # Import Modules
 #
-from String import *
+from __future__ import absolute_import
+from .StringUtils import *
 from CommonDataClass.DataClass import *
-from DataType import *
+from .DataType import *
 
 ## ParseDefineMacro
 #
@@ -35,18 +30,16 @@ def ParseDefineMacro2(Table, RecordSets, GlobalMacro):
         Macros[Record[0]] = Record[1]
 
     #
-    # Overrided by Global Macros
+    # Overridden by Global Macros
     #
-    for Key in GlobalMacro.keys():
-        Macros[Key] = GlobalMacro[Key]
+    Macros.update(GlobalMacro)
 
     #
     # Replace the Macros
     #
-    for Key in RecordSets.keys():
-        if RecordSets[Key] != []:
-            for Item in RecordSets[Key]:
-                Item[0] = ReplaceMacro(Item[0], Macros)
+    for Value in (v for v in RecordSets.values() if v):
+        for Item in Value:
+            Item[0] = ReplaceMacro(Item[0], Macros)
 
 ## ParseDefineMacro
 #
@@ -77,10 +70,9 @@ def ParseDefineMacro(Table, GlobalMacro):
         Macros[Record[0]] = Record[1]
 
     #
-    # Overrided by Global Macros
+    # Overridden by Global Macros
     #
-    for Key in GlobalMacro.keys():
-        Macros[Key] = GlobalMacro[Key]
+    Macros.update(GlobalMacro)
 
     #
     # Found all defined macro and replaced
@@ -299,7 +291,7 @@ def GetLibraryClassOfInf(Item, ContainerFile, WorkspaceDir, LineNo = -1):
 #
 def CheckPcdTokenInfo(TokenInfoString, Section, File, LineNo = -1):
     Format = '<TokenSpaceGuidCName>.<PcdCName>'
-    if TokenInfoString != '' and TokenInfoString != None:
+    if TokenInfoString != '' and TokenInfoString is not None:
         TokenInfoList = GetSplitValueList(TokenInfoString, TAB_SPLIT)
         if len(TokenInfoList) == 2:
             return True
@@ -550,7 +542,7 @@ def GetComponents(Lines, Key, KeyValues, CommentCharacter):
     LineList = Lines.split('\n')
     for Line in LineList:
         Line = CleanString(Line, CommentCharacter)
-        if Line == None or Line == '':
+        if Line is None or Line == '':
             continue
 
         if findBlock == False:
@@ -832,7 +824,7 @@ def InsertSectionItems(Model, CurrentSection, SectionItemList, ArchList, ThirdLi
 # @param Table:            The Table to be inserted
 # @param FileID:           The ID of belonging file
 # @param Filename:         The name of belonging file
-# @param CurrentSection:   The name of currect section
+# @param CurrentSection:   The name of current section
 # @param SectionItemList:  A list of items of the section
 # @param ArchList:         A list of arches
 # @param ThirdList:        A list of third parameters, ModuleType for LibraryClass and SkuId for Dynamic Pcds

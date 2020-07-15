@@ -1,0 +1,30 @@
+## @file
+#  Null instance of FmpDependencyCheckLib as an option to skip the dependency
+#  check when updating the firmware image of a FMP device.
+#
+#  Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION     = 0x00010005
+  BASE_NAME       = FmpDependencyCheckLibNull
+  MODULE_UNI_FILE = FmpDependencyCheckLibNull.uni
+  FILE_GUID       = D63F3166-9CBC-4AC2-8F23-8818E42EA2BD
+  MODULE_TYPE     = DXE_DRIVER
+  VERSION_STRING  = 1.0
+  LIBRARY_CLASS   = FmpDependencyCheckLib|DXE_DRIVER UEFI_DRIVER UEFI_APPLICATION
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64
+#
+
+[Sources]
+  FmpDependencyCheckLibNull.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  FmpDevicePkg/FmpDevicePkg.dec

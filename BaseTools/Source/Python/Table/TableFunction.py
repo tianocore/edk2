@@ -1,43 +1,38 @@
 ## @file
 # This file is used to create/update/query/erase table for functions
 #
-# Copyright (c) 2008, Intel Corporation. All rights reserved.<BR>
-# This program and the accompanying materials
-# are licensed and made available under the terms and conditions of the BSD License
-# which accompanies this distribution.  The full text of the license may be found at
-# http://opensource.org/licenses/bsd-license.php
-#
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
 ##
 # Import Modules
 #
+from __future__ import absolute_import
 import Common.EdkLogger as EdkLogger
-from Table import Table
-from Common.String import ConvertToSqlString
+from Table.Table import Table
+from Common.StringUtils import ConvertToSqlString
 
 ## TableFunction
 #
 # This class defined a table used for function
-# 
+#
 # @param Table:       Inherited from Table class
 #
 class TableFunction(Table):
     def __init__(self, Cursor):
         Table.__init__(self, Cursor)
         self.Table = 'Function'
-    
+
     ## Create table
     #
     # Create table Function
     #
     # @param ID:                  ID of a Function
     # @param Header:              Header of a Function
-    # @param Modifier:            Modifier of a Function 
+    # @param Modifier:            Modifier of a Function
     # @param Name:                Name of a Function
-    # @param ReturnStatement:     ReturnStatement of a Funciont
+    # @param ReturnStatement:     ReturnStatement of a Function
     # @param StartLine:           StartLine of a Function
     # @param StartColumn:         StartColumn of a Function
     # @param EndLine:             EndLine of a Function
@@ -72,9 +67,9 @@ class TableFunction(Table):
     #
     # @param ID:                  ID of a Function
     # @param Header:              Header of a Function
-    # @param Modifier:            Modifier of a Function 
+    # @param Modifier:            Modifier of a Function
     # @param Name:                Name of a Function
-    # @param ReturnStatement:     ReturnStatement of a Funciont
+    # @param ReturnStatement:     ReturnStatement of a Function
     # @param StartLine:           StartLine of a Function
     # @param StartColumn:         StartColumn of a Function
     # @param EndLine:             EndLine of a Function

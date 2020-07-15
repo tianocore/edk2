@@ -1350,7 +1350,7 @@
       the variable [zz]traceOptionValueDefault is set to 0 or 1.  When
       the parser is initialized or [zz]traceReset() is called the
       value of [zz]traceOptionValueDefault is copied to [zz]traceOptionValue.
-      The value of [zz]traceGuessOptionValue is always initialzed to 1,
+      The value of [zz]traceGuessOptionValue is always initialized to 1,
       but, as noted earlier, nothing will be reported unless
       [zz]traceOptionValue is also positive.
 
@@ -1766,7 +1766,7 @@
         This is especially important for predicates formed by rules
         like the following:
 
-            uppperCaseVowel : <<isUpperCase(LATEXT(1))>>?  vowel;
+            upperCaseVowel  : <<isUpperCase(LATEXT(1))>>?  vowel;
             vowel:          : <<isVowel(LATEXT(1))>>? LETTERS;
 
         These predicates are combined using AND since both must be
@@ -1928,7 +1928,7 @@
             parse by "falling through".  The parse can still be easily
             resumed in other ways, but not in the most natural fashion.
 
-            This results in an inconsistentcy between named exception
+            This results in an inconsistency between named exception
             handlers and exception handlers for alternatives.  When
             an exception handler for an alternative "falls through"
             it goes to the nextmost outer handler - not the "normal
@@ -1990,7 +1990,7 @@
         The reason for "Normal Action" is that the normal flow of the
         program after a user-written exception handler is to "drop through".
         In the case of an exception handler for a rule this results in
-        the exection of a "return" statement.  In the case of an
+        the execution of a "return" statement.  In the case of an
         exception handler attached to an alternative, rule, or token
         this is the code that would have executed had there been no
         exception.

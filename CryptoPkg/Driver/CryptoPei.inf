@@ -1,0 +1,51 @@
+## @file
+#  Produces the EDK II Crypto PPI using the library services from BaseCryptLib
+#  and TlsLib.  PcdCryptoServiceFamilyEnable is used to enable the subset of
+#  available services.  If this PEIM is dispatched before memory is discovered,
+#  the RegisterForShadow() feature is used to reload this PEIM into memory after
+#  memory is discovered.
+#
+#  Copyright (C) Microsoft Corporation. All rights reserved.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = CryptoPei
+  MODULE_UNI_FILE                = Crypto.uni
+  FILE_GUID                      = 0D1CE46B-72D9-4BA7-95DA-23511865E661
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = CryptoPeiEntry
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64
+#
+
+[Sources]
+  Crypto.c
+  CryptoPei.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  CryptoPkg/CryptoPkg.dec
+
+[LibraryClasses]
+  PeimEntryPoint
+  PeiServicesLib
+  DebugLib
+  BaseCryptLib
+  TlsLib
+
+[Ppis]
+  gEfiPeiMemoryDiscoveredPpiGuid  ## CONSUMES
+  gEdkiiCryptoPpiGuid             ## PRODUCES
+
+[Pcd]
+  gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable  ## CONSUMES
+
+[Depex]
+  TRUE

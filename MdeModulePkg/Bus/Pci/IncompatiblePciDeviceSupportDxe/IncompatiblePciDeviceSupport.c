@@ -1,18 +1,12 @@
 /** @file
   This module is one template module for Incompatible PCI Device Support protocol.
   It includes one incompatible pci devices list template.
-  
+
   Incompatible PCI Device Support protocol allows the PCI bus driver to support
   resource allocation for some PCI devices that do not comply with the PCI Specification.
 
-Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -68,7 +62,7 @@ typedef struct {
                                 the configuration requirement.
 
   @retval EFI_SUCCESS           Successfully got ACPI resource for specified PCI device.
-  @retval EFI_INVALID_PARAMETER Configuration is NULL. 
+  @retval EFI_INVALID_PARAMETER Configuration is NULL.
   @retval EFI_OUT_OF_RESOURCES  No memory available.
   @retval EFI_UNSUPPORTED       The specified PCI device wasn't supported.
 
@@ -233,7 +227,7 @@ IncompatiblePciDeviceSupportEntryPoint (
                                 the configuration requirement.
 
   @retval EFI_SUCCESS           Successfully got ACPI resource for specified PCI device.
-  @retval EFI_INVALID_PARAMETER Configuration is NULL. 
+  @retval EFI_INVALID_PARAMETER Configuration is NULL.
   @retval EFI_OUT_OF_RESOURCES  No memory available.
   @retval EFI_UNSUPPORTED       The specified PCI device wasn't supported.
 
@@ -344,7 +338,7 @@ PCheckDevice (
         Dsc = (EFI_PCI_RESOUCE_DESCRIPTOR *) (ListPtr + 1);
 
         AcpiPtr->Desc = ACPI_ADDRESS_SPACE_DESCRIPTOR;
-        AcpiPtr->Len = (UINT16) sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR);
+        AcpiPtr->Len = (UINT16) sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) - 3;
         AcpiPtr->ResType = (UINT8) Dsc->ResType;
         AcpiPtr->GenFlag = (UINT8) Dsc->GenFlag;
         AcpiPtr->SpecificFlag = (UINT8) Dsc->SpecificFlag;

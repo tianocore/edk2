@@ -1,14 +1,8 @@
 /** @file
   Locate handle functions
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials are licensed and made available 
-  under the terms and conditions of the BSD License which accompanies this 
-  distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -40,7 +34,7 @@ IHANDLE *
 /**
   Routine to get the next Handle, when you are searching for all handles.
 
-  @param  Position               Information about which Handle to seach for.
+  @param  Position               Information about which Handle to search for.
   @param  Interface              Return the interface structure for the matching
                                  protocol.
 
@@ -76,7 +70,7 @@ SmmGetNextLocateAllHandles (
   Routine to get the next Handle, when you are searching for register protocol
   notifies.
 
-  @param  Position               Information about which Handle to seach for.
+  @param  Position               Information about which Handle to search for.
   @param  Interface              Return the interface structure for the matching
                                  protocol.
 
@@ -122,7 +116,7 @@ SmmGetNextLocateByRegisterNotify (
 /**
   Routine to get the next Handle, when you are searching for a given protocol.
 
-  @param  Position               Information about which Handle to seach for.
+  @param  Position               Information about which Handle to search for.
   @param  Interface              Return the interface structure for the matching
                                  protocol.
 
@@ -179,7 +173,7 @@ SmmGetNextLocateByProtocol (
 /**
   Return the first Protocol Interface that matches the Protocol GUID. If
   Registration is pasased in return a Protocol Instance that was just add
-  to the system. If Retistration is NULL return the first Protocol Interface
+  to the system. If Registration is NULL return the first Protocol Interface
   you find.
 
   @param  Protocol               The protocol to search for
@@ -205,12 +199,8 @@ SmmLocateProtocol (
   PROTOCOL_NOTIFY         *ProtNotify;
   IHANDLE                 *Handle;
 
-  if (Interface == NULL) {
+  if ((Interface == NULL) || (Protocol == NULL)) {
     return EFI_INVALID_PARAMETER;
-  }
-
-  if (Protocol == NULL) {
-    return EFI_NOT_FOUND;
   }
 
   *Interface = NULL;

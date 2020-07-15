@@ -4,13 +4,7 @@
 # Copyright (c) 2011 - 2016, ARM Limited. All rights reserved.
 # Copyright (c) 2016, Linaro Limited. All rights reserved.
 #
-# This program and the accompanying materials
-# are licensed and made available under the terms and conditions of the BSD License
-# which accompanies this distribution.  The full text of the license may be found at
-# http://opensource.org/licenses/bsd-license.php
-#
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 #------------------------------------------------------------------------------
 
@@ -100,8 +94,6 @@ ASM_FUNC(ArmGetTTBR0BaseAddress)
 //  IN VOID  *MVA                    // R1
 //  );
 ASM_FUNC(ArmUpdateTranslationTableEntry)
-  mcr     p15,0,R0,c7,c14,1     @ DCCIMVAC Clean data cache by MVA
-  dsb
   mcr     p15,0,R1,c8,c7,1      @ TLBIMVA TLB Invalidate MVA
   mcr     p15,0,R9,c7,c5,6      @ BPIALL Invalidate Branch predictor array. R9 == NoOp
   dsb
@@ -153,6 +145,10 @@ ASM_FUNC(ArmReadSctlr)
   mrc     p15, 0, r0, c1, c0, 0      @ Read SCTLR into R0 (Read control register configuration data)
   bx      lr
 
+ASM_FUNC(ArmWriteSctlr)
+  mcr     p15, 0, r0, c1, c0, 0
+  bx      lr
+
 ASM_FUNC(ArmReadCpuActlr)
   mrc     p15, 0, r0, c1, c0, 1
   bx      lr
@@ -161,6 +157,14 @@ ASM_FUNC(ArmWriteCpuActlr)
   mcr     p15, 0, r0, c1, c0, 1
   dsb
   isb
+  bx      lr
+
+ASM_FUNC (ArmGetPhysicalAddressBits)
+  mrc     p15, 0, r0, c0, c1, 4   // MMFR0
+  and     r0, r0, #0xf            // VMSA [3:0]
+  cmp     r0, #5                  // >= 5 implies LPAE support
+  movlt   r0, #32                 // 32 bits if no LPAE
+  movge   r0, #40                 // 40 bits if LPAE
   bx      lr
 
 ASM_FUNCTION_REMOVE_IF_UNREFERENCED

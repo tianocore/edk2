@@ -1,14 +1,8 @@
 ## @file
-# Standardized Error Hanlding infrastructures.
+# Standardized Error Handling infrastructures.
 #
-# Copyright (c) 2008 - 2016, Intel Corporation. All rights reserved.<BR>
-# This program and the accompanying materials
-# are licensed and made available under the terms and conditions of the BSD License
-# which accompanies this distribution.  The full text of the license may be found at
-# http://opensource.org/licenses/bsd-license.php
-#
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
 ERROR_GENERAL_CHECK_ALL = 1000
@@ -22,6 +16,8 @@ ERROR_GENERAL_CHECK_FILE_EXISTENCE = 1007
 ERROR_GENERAL_CHECK_NON_ACSII = 1008
 ERROR_GENERAL_CHECK_UNI = 1009
 ERROR_GENERAL_CHECK_UNI_HELP_INFO = 1010
+ERROR_GENERAL_CHECK_INVALID_LINE_ENDING = 1011
+ERROR_GENERAL_CHECK_TRAILING_WHITE_SPACE_LINE = 1012
 
 ERROR_SPACE_CHECK_ALL = 2000
 
@@ -105,9 +101,11 @@ ERROR_META_DATA_FILE_CHECK_LIBRARY_NOT_DEFINED = 10022
 
 ERROR_SPELLING_CHECK_ALL = 11000
 
+ERROR_SMM_COMM_PARA_CHECK_BUFFER_TYPE = 12001
+
 gEccErrorMessage = {
     ERROR_GENERAL_CHECK_ALL : "",
-    ERROR_GENERAL_CHECK_NO_TAB : "'TAB' character is not allowed in source code, please replace each 'TAB' with two spaces",
+    ERROR_GENERAL_CHECK_NO_TAB : "'TAB' character is not allowed in source code, please replace each 'TAB' with two spaces.",
     ERROR_GENERAL_CHECK_INDENTATION : "Indentation does not follow coding style",
     ERROR_GENERAL_CHECK_LINE : "The width of each line does not follow coding style",
     ERROR_GENERAL_CHECK_NO_ASM : "There should be no use of _asm in the source file",
@@ -117,6 +115,8 @@ gEccErrorMessage = {
     ERROR_GENERAL_CHECK_NON_ACSII : "File has invalid Non-ACSII char",
     ERROR_GENERAL_CHECK_UNI : "File is not a valid UTF-16 UNI file",
     ERROR_GENERAL_CHECK_UNI_HELP_INFO : "UNI file that is associated by INF or DEC file need define the prompt and help information.",
+    ERROR_GENERAL_CHECK_INVALID_LINE_ENDING : "Only CRLF (Carriage Return Line Feed) is allowed to line ending.",
+    ERROR_GENERAL_CHECK_TRAILING_WHITE_SPACE_LINE : "There should be no trailing white space in one line.",
 
     ERROR_SPACE_CHECK_ALL : "",
 
@@ -146,10 +146,10 @@ gEccErrorMessage = {
     ERROR_INCLUDE_FILE_CHECK_IFNDEF_STATEMENT_2 : "The #ifndef must be the first line of code following the file header comment",
     ERROR_INCLUDE_FILE_CHECK_IFNDEF_STATEMENT_3 : "The #endif must appear on the last line in the file",
     ERROR_INCLUDE_FILE_CHECK_DATA : "Include files should contain only public or only private data and cannot contain code or define data variables",
-    ERROR_INCLUDE_FILE_CHECK_NAME : "No permission for the inlcude file with same names",
+    ERROR_INCLUDE_FILE_CHECK_NAME : "No permission for the include file with same names",
 
     ERROR_DECLARATION_DATA_TYPE_CHECK_ALL : "",
-    ERROR_DECLARATION_DATA_TYPE_CHECK_NO_USE_C_TYPE : "There should be no use of int, unsigned, char, void, static, long in any .c, .h or .asl files",
+    ERROR_DECLARATION_DATA_TYPE_CHECK_NO_USE_C_TYPE : "There should be no use of int, unsigned, char, void, long in any .c, .h or .asl files",
     ERROR_DECLARATION_DATA_TYPE_CHECK_IN_OUT_MODIFIER : """The modifiers IN, OUT, OPTIONAL, and UNALIGNED should be used only to qualify arguments to a function and should not appear in a data type declaration""",
     ERROR_DECLARATION_DATA_TYPE_CHECK_EFI_API_MODIFIER : "The EFIAPI modifier should be used at the entry of drivers, events, and member functions of protocols",
     ERROR_DECLARATION_DATA_TYPE_CHECK_ENUMERATED_TYPE : "Enumerated Type should have a 'typedef' and the name must be in capital letters",
@@ -198,5 +198,7 @@ gEccErrorMessage = {
     ERROR_META_DATA_FILE_CHECK_FORMAT_PCD : "Wrong Pcd Format used in Module file",
     ERROR_META_DATA_FILE_CHECK_LIBRARY_NOT_DEFINED : "Not defined LibraryClass used in the Module file.",
     ERROR_SPELLING_CHECK_ALL : "",
+
+    ERROR_SMM_COMM_PARA_CHECK_BUFFER_TYPE : "SMM communication function may use wrong parameter type",
     }
 

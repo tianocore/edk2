@@ -5,18 +5,11 @@
 
   Copyright (C) 2012-2014, Red Hat, Inc.
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include "AcpiPlatform.h"
-#include "QemuLoader.h"
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/QemuFwCfgLib.h>
@@ -144,7 +137,7 @@ QemuInstallAcpiMadtTable (
   ++Iso;
 
   //
-  // Set Level-tiggered, Active High for all possible PCI link targets.
+  // Set Level-triggered, Active High for all possible PCI link targets.
   //
   for (Loop = 0; Loop < 16; ++Loop) {
     if ((PcdGet16 (Pcd8259LegacyModeEdgeLevel) & (1 << Loop)) == 0) {
@@ -155,7 +148,7 @@ QemuInstallAcpiMadtTable (
     Iso->Bus                         = 0x00; // ISA
     Iso->Source                      = (UINT8) Loop;
     Iso->GlobalSystemInterruptVector = (UINT32) Loop;
-    Iso->Flags                       = 0x000D; // Level-tiggered, Active High
+    Iso->Flags                       = 0x000D; // Level-triggered, Active High
     ++Iso;
   }
   ASSERT (

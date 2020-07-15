@@ -1,0 +1,73 @@
+## @file
+#  The NvmExpressPei driver is used to manage non-volatile memory subsystem
+#  which follows NVM Express specification at PEI phase.
+#
+#  Copyright (c) 2018 - 2019, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = NvmExpressPei
+  MODULE_UNI_FILE                = NvmExpressPei.uni
+  FILE_GUID                      = 94813714-E10A-4798-9909-8C904F66B4D9
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = NvmExpressPeimEntry
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  DevicePath.c
+  DmaMem.c
+  NvmExpressPei.c
+  NvmExpressPei.h
+  NvmExpressPeiBlockIo.c
+  NvmExpressPeiBlockIo.h
+  NvmExpressPeiHci.c
+  NvmExpressPeiHci.h
+  NvmExpressPeiPassThru.c
+  NvmExpressPeiPassThru.h
+  NvmExpressPeiS3.c
+  NvmExpressPeiStorageSecurity.c
+  NvmExpressPeiStorageSecurity.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  DebugLib
+  PeiServicesLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  IoLib
+  TimerLib
+  LockBoxLib
+  PeimEntryPoint
+
+[Ppis]
+  gEdkiiPeiNvmExpressHostControllerPpiGuid       ## CONSUMES
+  gEdkiiIoMmuPpiGuid                             ## CONSUMES
+  gEfiEndOfPeiSignalPpiGuid                      ## CONSUMES
+  gEdkiiPeiNvmExpressPassThruPpiGuid             ## SOMETIMES_PRODUCES
+  gEfiPeiVirtualBlockIoPpiGuid                   ## SOMETIMES_PRODUCES
+  gEfiPeiVirtualBlockIo2PpiGuid                  ## SOMETIMES_PRODUCES
+  gEdkiiPeiStorageSecurityCommandPpiGuid         ## SOMETIMES_PRODUCES
+
+[Guids]
+  gS3StorageDeviceInitListGuid                   ## SOMETIMES_CONSUMES ## UNDEFINED
+
+[Depex]
+  gEfiPeiMemoryDiscoveredPpiGuid AND
+  gEdkiiPeiNvmExpressHostControllerPpiGuid AND
+  gEfiPeiMasterBootModePpiGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  NvmExpressPeiExtra.uni

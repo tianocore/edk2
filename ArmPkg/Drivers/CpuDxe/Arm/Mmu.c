@@ -5,13 +5,7 @@ Portions copyright (c) 2010, Apple Inc. All rights reserved.<BR>
 Portions copyright (c) 2013, ARM Ltd. All rights reserved.<BR>
 Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
 
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 
 --*/
@@ -240,7 +234,7 @@ SyncCacheConfig (
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR     *MemorySpaceMap;
 
 
-  DEBUG ((EFI_D_PAGE, "SyncCacheConfig()\n"));
+  DEBUG ((DEBUG_PAGE, "SyncCacheConfig()\n"));
 
   // This code assumes MMU is enabled and filed with section translations
   ASSERT (ArmMmuEnabled ());
@@ -457,6 +451,9 @@ GetMemoryRegion (
 
   // Get the section at the given index
   SectionDescriptor = FirstLevelTable[TableIndex];
+  if (!SectionDescriptor) {
+    return EFI_NOT_FOUND;
+  }
 
   // If 'BaseAddress' belongs to the section then round it to the section boundary
   if (((SectionDescriptor & TT_DESCRIPTOR_SECTION_TYPE_MASK) == TT_DESCRIPTOR_SECTION_TYPE_SECTION) ||

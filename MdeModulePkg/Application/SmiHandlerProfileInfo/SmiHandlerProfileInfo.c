@@ -2,13 +2,7 @@
   Shell application to dump SMI handler profile information.
 
 Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -22,7 +16,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/PrintLib.h>
 #include <Library/UefiLib.h>
 #include <Library/DevicePathLib.h>
-#include <Library/PeCoffGetEntryPointLib.h>
 #include <Library/DxeServicesLib.h>
 #include <Protocol/SmmCommunication.h>
 #include <Guid/PiSmmCommunicationRegionTable.h>
@@ -266,8 +259,8 @@ GetDriverNameString (
   //
   // Method 1: Get the name string from image PDB
   //
-  if (ImageStruct->Header.Length > sizeof (SMM_CORE_IMAGE_DATABASE_STRUCTURE)) {
-    GetShortPdbFileName ((CHAR8 *) (ImageStruct + 1), mNameString);
+  if (ImageStruct->PdbStringOffset != 0) {
+    GetShortPdbFileName ((CHAR8 *) ((UINTN) ImageStruct + ImageStruct->PdbStringOffset), mNameString);
     return mNameString;
   }
 
@@ -348,15 +341,17 @@ DumpSmmLoadedImage(
     if (ImageStruct->Header.Signature == SMM_CORE_IMAGE_DATABASE_SIGNATURE) {
       NameString = GetDriverNameString (ImageStruct);
       Print(L"  <Image Name=\"%a\"", NameString);
-      Print(L" Base=\"0x%x\" Size=\"0x%x\"", ImageStruct->ImageBase, ImageStruct->ImageSize);
+      Print(L" Base=\"0x%lx\" Size=\"0x%lx\"", ImageStruct->ImageBase, ImageStruct->ImageSize);
       if (ImageStruct->EntryPoint != 0) {
-        Print(L" EntryPoint=\"0x%x\"", ImageStruct->EntryPoint);
+        Print(L" EntryPoint=\"0x%lx\"", ImageStruct->EntryPoint);
       }
       Print(L" FvFile=\"%g\"", &ImageStruct->FileGuid);
       Print(L" RefId=\"0x%x\"", ImageStruct->ImageRef);
       Print(L">\n");
-      PdbString = (CHAR8 *)((UINTN)ImageStruct + ImageStruct->PdbStringOffset);
-      Print(L"    <Pdb>%a</Pdb>\n", PdbString);
+      if (ImageStruct->PdbStringOffset != 0) {
+        PdbString = (CHAR8 *)((UINTN)ImageStruct + ImageStruct->PdbStringOffset);
+        Print(L"    <Pdb>%a</Pdb>\n", PdbString);
+      }
       Print(L"  </Image>\n");
     }
 
@@ -387,7 +382,7 @@ SxTypeToString (
   IN EFI_SLEEP_TYPE  Type
   )
 {
-  if (Type >= 0 && Type <= ARRAY_SIZE(mSxTypeString)) {
+  if (Type >= 0 && Type < ARRAY_SIZE(mSxTypeString)) {
     return mSxTypeString[Type];
   } else {
     AsciiSPrint (mNameString, sizeof(mNameString), "0x%x", Type);
@@ -412,7 +407,7 @@ SxPhaseToString (
   IN EFI_SLEEP_PHASE Phase
   )
 {
-  if (Phase >= 0 && Phase <= ARRAY_SIZE(mSxPhaseString)) {
+  if (Phase >= 0 && Phase < ARRAY_SIZE(mSxPhaseString)) {
     return mSxPhaseString[Phase];
   } else {
     AsciiSPrint (mNameString, sizeof(mNameString), "0x%x", Phase);
@@ -437,7 +432,7 @@ PowerButtonPhaseToString (
   IN EFI_POWER_BUTTON_PHASE  Phase
   )
 {
-  if (Phase >= 0 && Phase <= ARRAY_SIZE(mPowerButtonPhaseString)) {
+  if (Phase >= 0 && Phase < ARRAY_SIZE(mPowerButtonPhaseString)) {
     return mPowerButtonPhaseString[Phase];
   } else {
     AsciiSPrint (mNameString, sizeof(mNameString), "0x%x", Phase);
@@ -462,7 +457,7 @@ StandbyButtonPhaseToString (
   IN EFI_STANDBY_BUTTON_PHASE  Phase
   )
 {
-  if (Phase >= 0 && Phase <= ARRAY_SIZE(mStandbyButtonPhaseString)) {
+  if (Phase >= 0 && Phase < ARRAY_SIZE(mStandbyButtonPhaseString)) {
     return mStandbyButtonPhaseString[Phase];
   } else {
     AsciiSPrint (mNameString, sizeof(mNameString), "0x%x", Phase);
@@ -488,7 +483,7 @@ IoTrapTypeToString (
   IN EFI_SMM_IO_TRAP_DISPATCH_TYPE  Type
   )
 {
-  if (Type >= 0 && Type <= ARRAY_SIZE(mIoTrapTypeString)) {
+  if (Type >= 0 && Type < ARRAY_SIZE(mIoTrapTypeString)) {
     return mIoTrapTypeString[Type];
   } else {
     AsciiSPrint (mNameString, sizeof(mNameString), "0x%x", Type);
@@ -513,7 +508,7 @@ UsbTypeToString (
   IN EFI_USB_SMI_TYPE          Type
   )
 {
-  if (Type >= 0 && Type <= ARRAY_SIZE(mUsbTypeString)) {
+  if (Type >= 0 && Type < ARRAY_SIZE(mUsbTypeString)) {
     return mUsbTypeString[Type];
   } else {
     AsciiSPrint (mNameString, sizeof(mNameString), "0x%x", Type);
@@ -535,8 +530,10 @@ DumpSmiChildContext (
   IN UINTN      ContextSize
   )
 {
+  CHAR16        *Str;
+
   if (CompareGuid (HandlerType, &gEfiSmmSwDispatch2ProtocolGuid)) {
-    Print(L" SwSmi=\"0x%x\"", ((EFI_SMM_SW_REGISTER_CONTEXT *)Context)->SwSmiInputValue);
+    Print(L" SwSmi=\"0x%lx\"", ((SMI_HANDLER_PROFILE_SW_REGISTER_CONTEXT *)Context)->SwSmiInputValue);
   } else if (CompareGuid (HandlerType, &gEfiSmmSxDispatch2ProtocolGuid)) {
     Print(L" SxType=\"%a\"", SxTypeToString(((EFI_SMM_SX_REGISTER_CONTEXT *)Context)->Type));
     Print(L" SxPhase=\"%a\"", SxPhaseToString(((EFI_SMM_SX_REGISTER_CONTEXT *)Context)->Phase));
@@ -555,7 +552,11 @@ DumpSmiChildContext (
     Print(L" IoTrapType=\"%a\"", IoTrapTypeToString(((EFI_SMM_IO_TRAP_REGISTER_CONTEXT *)Context)->Type));
   } else if (CompareGuid (HandlerType, &gEfiSmmUsbDispatch2ProtocolGuid)) {
     Print(L" UsbType=\"0x%x\"", UsbTypeToString(((SMI_HANDLER_PROFILE_USB_REGISTER_CONTEXT *)Context)->Type));
-    Print(L" UsbDevicePath=\"%s\"", ConvertDevicePathToText((EFI_DEVICE_PATH_PROTOCOL *)(((SMI_HANDLER_PROFILE_USB_REGISTER_CONTEXT *)Context) + 1), TRUE, TRUE));
+    Str = ConvertDevicePathToText((EFI_DEVICE_PATH_PROTOCOL *)(((SMI_HANDLER_PROFILE_USB_REGISTER_CONTEXT *)Context) + 1), TRUE, TRUE);
+    Print(L" UsbDevicePath=\"%s\"", Str);
+    if (Str != NULL) {
+      FreePool (Str);
+    }
   } else {
     Print(L" Context=\"");
     InternalDumpData (Context, ContextSize);
@@ -601,14 +602,14 @@ DumpSmiHandler(
           Print(L"      <Pdb>%a</Pdb>\n", (UINT8 *)ImageStruct + ImageStruct->PdbStringOffset);
         }
         Print(L"      </Module>\n");
-        Print(L"      <Handler Address=\"0x%x\">\n", SmiHandlerStruct->Handler);
+        Print(L"      <Handler Address=\"0x%lx\">\n", SmiHandlerStruct->Handler);
         if (ImageStruct != NULL) {
-          Print(L"         <RVA>0x%x</RVA>\n", SmiHandlerStruct->Handler - ImageStruct->ImageBase);
+          Print(L"         <RVA>0x%x</RVA>\n", (UINTN) (SmiHandlerStruct->Handler - ImageStruct->ImageBase));
         }
         Print(L"      </Handler>\n", SmiHandlerStruct->Handler);
-        Print(L"      <Caller Address=\"0x%x\">\n", SmiHandlerStruct->CallerAddr);
+        Print(L"      <Caller Address=\"0x%lx\">\n", SmiHandlerStruct->CallerAddr);
         if (ImageStruct != NULL) {
-          Print(L"         <RVA>0x%x</RVA>\n", SmiHandlerStruct->CallerAddr - ImageStruct->ImageBase);
+          Print(L"         <RVA>0x%x</RVA>\n", (UINTN) (SmiHandlerStruct->CallerAddr - ImageStruct->ImageBase));
         }
         Print(L"      </Caller>\n", SmiHandlerStruct->Handler);
         SmiHandlerStruct = (VOID *)((UINTN)SmiHandlerStruct + SmiHandlerStruct->Length);

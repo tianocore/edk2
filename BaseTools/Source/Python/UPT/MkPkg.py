@@ -1,15 +1,9 @@
 ## @file
 # Install distribution package.
 #
-# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
-# This program and the accompanying materials are licensed and made available 
-# under the terms and conditions of the BSD License which accompanies this 
-# distribution. The full text of the license may be found at 
-# http://opensource.org/licenses/bsd-license.php
-#
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
 '''
@@ -27,7 +21,7 @@ from sys import stdin
 from sys import platform
 from traceback import format_exc
 from platform import python_version
-import md5
+from hashlib import md5
 from time import strftime
 from time import localtime
 from uuid import uuid4
@@ -55,7 +49,7 @@ from Common.MultipleWorkspace import MultipleWorkspace as mws
 ## CheckForExistingDp
 #
 # Check if there is a same name DP file existing
-# @param Path: The path to be checked 
+# @param Path: The path to be checked
 #
 def CheckForExistingDp(Path):
     if os.path.exists(Path):
@@ -73,10 +67,10 @@ def CheckForExistingDp(Path):
 #
 #
 def Main(Options = None):
-    if Options == None:
+    if Options is None:
         Logger.Error("\nMkPkg", OPTION_UNKNOWN_ERROR, ST.ERR_OPTION_NOT_FOUND)
     try:
-        DataBase = GlobalData.gDB        
+        DataBase = GlobalData.gDB
         ContentFileClosed = True
         WorkspaceDir = GlobalData.gWORKSPACE
 
@@ -85,7 +79,7 @@ def Main(Options = None):
         #
         if not Options.PackFileToCreate:
             Logger.Error("\nMkPkg", OPTION_UNKNOWN_ERROR, ST.ERR_OPTION_NOT_FOUND)
-        
+
         #
         # Handle if the distribution package file already exists
         #
@@ -95,7 +89,7 @@ def Main(Options = None):
         # Check package file existing and valid
         #
         CheckFileList('.DEC', Options.PackageFileList, ST.ERR_INVALID_PACKAGE_NAME, ST.ERR_INVALID_PACKAGE_PATH)
-        #            
+        #
         # Check module file existing and valid
         #
         CheckFileList('.INF', Options.ModuleFileList, ST.ERR_INVALID_MODULE_NAME, ST.ERR_INVALID_MODULE_PATH)
@@ -104,10 +98,10 @@ def Main(Options = None):
         # Get list of files that installed with RePackage attribute available
         #
         RePkgDict = DataBase.GetRePkgDict()
-              
-        ContentFile = PackageFile(GlobalData.gCONTENT_FILE, "w")       
+
+        ContentFile = PackageFile(GlobalData.gCONTENT_FILE, "w")
         ContentFileClosed = False
-        
+
         #
         # Add temp distribution header
         #
@@ -118,7 +112,7 @@ def Main(Options = None):
 
             #
             # add distribution level tool/misc files
-            # before pack, current dir should be workspace dir, else the full 
+            # before pack, current dir should be workspace dir, else the full
             # path will be in the pack file
             #
             Cwd = getcwd()
@@ -132,8 +126,8 @@ def Main(Options = None):
                 FileList += MiscObject.GetFileList()
             for FileObject in FileList:
                 #
-                # If you have unicode file names, please convert them to byte 
-                # strings in your desired encoding before passing them to 
+                # If you have unicode file names, please convert them to byte
+                # strings in your desired encoding before passing them to
                 # write().
                 #
                 FromFile = os.path.normpath(FileObject.GetURI()).encode('utf_8')
@@ -151,8 +145,8 @@ def Main(Options = None):
                         DistPkg.Header.RePackage = True
                 ContentFile.PackFile(FromFile)
             chdir(Cwd)
-        
-        #    
+
+        #
         # Add init dp information
         #
         else:
@@ -160,14 +154,14 @@ def Main(Options = None):
             DistPkg.Header.Name = 'Distribution Package'
             DistPkg.Header.Guid = str(uuid4())
             DistPkg.Header.Version = '1.0'
-            
+
         DistPkg.GetDistributionPackage(WorkspaceDir, Options.PackageFileList, \
                                        Options.ModuleFileList)
         FileList, MetaDataFileList = DistPkg.GetDistributionFileList()
         for File in FileList + MetaDataFileList:
             FileFullPath = os.path.normpath(os.path.join(WorkspaceDir, File))
             #
-            # check whether file was included in a distribution that can not 
+            # check whether file was included in a distribution that can not
             # be repackaged
             #
             if FileFullPath in RePkgDict:
@@ -182,26 +176,26 @@ def Main(Options = None):
                                  )
                 else:
                     DistPkg.Header.RePackage = True
-          
+
         Cwd = getcwd()
         chdir(WorkspaceDir)
         ContentFile.PackFiles(FileList)
         chdir(Cwd)
-        
-        Logger.Verbose(ST.MSG_COMPRESS_DISTRIBUTION_PKG) 
-        
+
+        Logger.Verbose(ST.MSG_COMPRESS_DISTRIBUTION_PKG)
+
         ContentFile.Close()
         ContentFileClosed = True
-        
+
         #
-        # Add Md5Sigature
+        # Add Md5Signature
         #
-        DistPkg.Header.Signature = md5.new(open(str(ContentFile), 'rb').read()).hexdigest()
+        DistPkg.Header.Signature = md5(open(str(ContentFile), 'rb').read()).hexdigest()
         #
         # Add current Date
         #
         DistPkg.Header.Date = str(strftime("%Y-%m-%dT%H:%M:%S", localtime()))
-        
+
         #
         # Finish final dp file
         #
@@ -213,8 +207,8 @@ def Main(Options = None):
         Logger.Quiet(ST.MSG_FINISH)
         ReturnCode = 0
 
-    except FatalError, XExcept:
-        ReturnCode = XExcept.args[0]        
+    except FatalError as XExcept:
+        ReturnCode = XExcept.args[0]
         if Logger.GetLevel() <= Logger.DEBUG_9:
             Logger.Quiet(ST.MSG_PYTHON_ON % \
                          (python_version(), platform) + format_exc())
@@ -231,7 +225,7 @@ def Main(Options = None):
                     CODE_ERROR,
                     ST.ERR_UNKNOWN_FATAL_CREATING_ERR % \
                     Options.PackFileToCreate,
-                    ExtraData=ST.MSG_SEARCH_FOR_HELP,
+                    ExtraData=ST.MSG_SEARCH_FOR_HELP % ST.MSG_EDKII_MAIL_ADDR,
                     RaiseError=False
                     )
         Logger.Quiet(ST.MSG_PYTHON_ON % \
@@ -247,7 +241,7 @@ def Main(Options = None):
 
 
 ## CheckFileList
-# 
+#
 # @param QualifiedExt:             QualifiedExt
 # @param FileList:                 FileList
 # @param ErrorStringExt:           ErrorStringExt
@@ -263,7 +257,7 @@ def CheckFileList(QualifiedExt, FileList, ErrorStringExt, ErrorStringFullPath):
         if Ext.upper() != QualifiedExt.upper():
             Logger.Error("\nMkPkg", OPTION_VALUE_INVALID, \
                          ErrorStringExt % Item)
-        
+
         Item = os.path.normpath(Item)
         Path = mws.join(WorkspaceDir, Item)
         if not os.path.exists(Path):
@@ -274,7 +268,7 @@ def CheckFileList(QualifiedExt, FileList, ErrorStringExt, ErrorStringFullPath):
         elif not IsValidPath(Item, WorkspaceDir):
             Logger.Error("\nMkPkg", OPTION_VALUE_INVALID, \
                          ErrorStringExt % Item)
-        
+
         if not os.path.split(Item)[0]:
             Logger.Error("\nMkPkg", OPTION_VALUE_INVALID, \
                          ST.ERR_INVALID_METAFILE_PATH % Item)

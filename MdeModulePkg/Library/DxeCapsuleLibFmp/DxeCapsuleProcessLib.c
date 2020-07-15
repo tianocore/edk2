@@ -9,19 +9,14 @@
   ProcessCapsules(), ProcessTheseCapsules() will receive untrusted
   input and do basic validation.
 
-  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2016 - 2019, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include <PiDxe.h>
 #include <Protocol/EsrtManagement.h>
+#include <Protocol/FirmwareManagementProgress.h>
 
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
@@ -34,8 +29,11 @@
 #include <Library/HobLib.h>
 #include <Library/ReportStatusCodeLib.h>
 #include <Library/CapsuleLib.h>
+#include <Library/DisplayUpdateProgressLib.h>
 
 #include <IndustryStandard/WindowsUxCapsule.h>
+
+extern EDKII_FIRMWARE_MANAGEMENT_PROGRESS_PROTOCOL  *mFmpProgress;
 
 /**
   Return if this FMP is a system FMP or a device FMP, based upon CapsuleHeader.
@@ -94,12 +92,121 @@ IsValidCapsuleHeader (
   IN UINT64              CapsuleSize
   );
 
+/**
+  Return if this capsule is a capsule name capsule, based upon CapsuleHeader.
+
+  @param[in] CapsuleHeader A pointer to EFI_CAPSULE_HEADER
+
+  @retval TRUE  It is a capsule name capsule.
+  @retval FALSE It is not a capsule name capsule.
+**/
+BOOLEAN
+IsCapsuleNameCapsule (
+  IN EFI_CAPSULE_HEADER         *CapsuleHeader
+  );
+
+/**
+  Check the integrity of the capsule name capsule.
+  If the capsule is vaild, return the physical address of each capsule name string.
+
+  @param[in]  CapsuleHeader   Pointer to the capsule header of a capsule name capsule.
+  @param[out] CapsuleNameNum  Number of capsule name.
+
+  @retval NULL                Capsule name capsule is not valid.
+  @retval CapsuleNameBuf      Array of capsule name physical address.
+
+**/
+EFI_PHYSICAL_ADDRESS *
+ValidateCapsuleNameCapsuleIntegrity (
+  IN  EFI_CAPSULE_HEADER            *CapsuleHeader,
+  OUT UINTN                         *CapsuleNameNum
+  );
+
 extern BOOLEAN                   mDxeCapsuleLibEndOfDxe;
-BOOLEAN                          mNeedReset;
+BOOLEAN                          mNeedReset = FALSE;
 
 VOID                        **mCapsulePtr;
+CHAR16                      **mCapsuleNamePtr;
 EFI_STATUS                  *mCapsuleStatusArray;
 UINT32                      mCapsuleTotalNumber;
+
+/**
+  The firmware implements to process the capsule image.
+
+  Caution: This function may receive untrusted input.
+
+  @param[in]  CapsuleHeader         Points to a capsule header.
+  @param[in]  CapFileName           Capsule file name.
+  @param[out] ResetRequired         Indicates whether reset is required or not.
+
+  @retval EFI_SUCESS            Process Capsule Image successfully.
+  @retval EFI_UNSUPPORTED       Capsule image is not supported by the firmware.
+  @retval EFI_VOLUME_CORRUPTED  FV volume in the capsule is corrupted.
+  @retval EFI_OUT_OF_RESOURCES  Not enough memory.
+**/
+EFI_STATUS
+EFIAPI
+ProcessThisCapsuleImage (
+  IN EFI_CAPSULE_HEADER  *CapsuleHeader,
+  IN CHAR16              *CapFileName,  OPTIONAL
+  OUT BOOLEAN            *ResetRequired OPTIONAL
+  );
+
+/**
+  Function indicate the current completion progress of the firmware
+  update. Platform may override with own specific progress function.
+
+  @param[in]  Completion  A value between 1 and 100 indicating the current
+                          completion progress of the firmware update
+
+  @retval EFI_SUCESS             The capsule update progress was updated.
+  @retval EFI_INVALID_PARAMETER  Completion is greater than 100%.
+**/
+EFI_STATUS
+EFIAPI
+UpdateImageProgress (
+  IN UINTN  Completion
+  )
+{
+  EFI_STATUS                           Status;
+  UINTN                                Seconds;
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL_UNION  *Color;
+
+  DEBUG((DEBUG_INFO, "Update Progress - %d%%\n", Completion));
+
+  if (Completion > 100) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Use a default timeout of 5 minutes if there is not FMP Progress Protocol.
+  //
+  Seconds = 5 * 60;
+  Color   = NULL;
+  if (mFmpProgress != NULL) {
+    Seconds = mFmpProgress->WatchdogSeconds;
+    Color   = &mFmpProgress->ProgressBarForegroundColor;
+  }
+
+  //
+  // Cancel the watchdog timer
+  //
+  gBS->SetWatchdogTimer (0, 0x0000, 0, NULL);
+
+  if (Completion != 100) {
+    //
+    // Arm the watchdog timer from PCD setting
+    //
+    if (Seconds != 0) {
+      DEBUG ((DEBUG_VERBOSE, "Arm watchdog timer %d seconds\n", Seconds));
+      gBS->SetWatchdogTimer (Seconds, 0x0000, 0, NULL);
+    }
+  }
+
+  Status = DisplayUpdateProgress (Completion, Color);
+
+  return Status;
+}
 
 /**
   This function initializes the mCapsulePtr, mCapsuleStatusArray and mCapsuleTotalNumber.
@@ -111,6 +218,18 @@ InitCapsulePtr (
 {
   EFI_PEI_HOB_POINTERS        HobPointer;
   UINTN                       Index;
+  UINTN                       Index2;
+  UINTN                       Index3;
+  UINTN                       CapsuleNameNumber;
+  UINTN                       CapsuleNameTotalNumber;
+  UINTN                       CapsuleNameCapsuleTotalNumber;
+  VOID                        **CapsuleNameCapsulePtr;
+  EFI_PHYSICAL_ADDRESS        *CapsuleNameAddress;
+
+  CapsuleNameNumber             = 0;
+  CapsuleNameTotalNumber        = 0;
+  CapsuleNameCapsuleTotalNumber = 0;
+  CapsuleNameCapsulePtr         = NULL;
 
   //
   // Find all capsule images from hob
@@ -120,7 +239,11 @@ InitCapsulePtr (
     if (!IsValidCapsuleHeader((VOID *)(UINTN)HobPointer.Capsule->BaseAddress, HobPointer.Capsule->Length)) {
       HobPointer.Header->HobType = EFI_HOB_TYPE_UNUSED; // Mark this hob as invalid
     } else {
-      mCapsuleTotalNumber++;
+      if (IsCapsuleNameCapsule((VOID *)(UINTN)HobPointer.Capsule->BaseAddress)) {
+        CapsuleNameCapsuleTotalNumber++;
+      } else {
+        mCapsuleTotalNumber++;
+      }
     }
     HobPointer.Raw = GET_NEXT_HOB (HobPointer);
   }
@@ -150,15 +273,68 @@ InitCapsulePtr (
   }
   SetMemN (mCapsuleStatusArray, sizeof (EFI_STATUS) * mCapsuleTotalNumber, EFI_NOT_READY);
 
+  CapsuleNameCapsulePtr =  (VOID **) AllocateZeroPool (sizeof (VOID *) * CapsuleNameCapsuleTotalNumber);
+  if (CapsuleNameCapsulePtr == NULL) {
+    DEBUG ((DEBUG_ERROR, "Allocate CapsuleNameCapsulePtr fail!\n"));
+    FreePool (mCapsulePtr);
+    FreePool (mCapsuleStatusArray);
+    mCapsulePtr         = NULL;
+    mCapsuleStatusArray = NULL;
+    mCapsuleTotalNumber = 0;
+    return ;
+  }
+
   //
   // Find all capsule images from hob
   //
   HobPointer.Raw = GetHobList ();
-  Index = 0;
+  Index  = 0;
+  Index2 = 0;
   while ((HobPointer.Raw = GetNextHob (EFI_HOB_TYPE_UEFI_CAPSULE, HobPointer.Raw)) != NULL) {
-    mCapsulePtr [Index++] = (VOID *) (UINTN) HobPointer.Capsule->BaseAddress;
+    if (IsCapsuleNameCapsule ((VOID *) (UINTN) HobPointer.Capsule->BaseAddress)) {
+      CapsuleNameCapsulePtr [Index2++] = (VOID *) (UINTN) HobPointer.Capsule->BaseAddress;
+    } else {
+      mCapsulePtr [Index++] = (VOID *) (UINTN) HobPointer.Capsule->BaseAddress;
+    }
     HobPointer.Raw = GET_NEXT_HOB (HobPointer);
   }
+
+  //
+  // Find Capsule On Disk Names
+  //
+  for (Index = 0; Index < CapsuleNameCapsuleTotalNumber; Index ++) {
+    CapsuleNameAddress = ValidateCapsuleNameCapsuleIntegrity (CapsuleNameCapsulePtr[Index], &CapsuleNameNumber);
+    if (CapsuleNameAddress != NULL ) {
+      CapsuleNameTotalNumber += CapsuleNameNumber;
+    }
+  }
+
+  if (CapsuleNameTotalNumber == mCapsuleTotalNumber) {
+    mCapsuleNamePtr = (CHAR16 **) AllocateZeroPool (sizeof (CHAR16 *) * mCapsuleTotalNumber);
+    if (mCapsuleNamePtr == NULL) {
+      DEBUG ((DEBUG_ERROR, "Allocate mCapsuleNamePtr fail!\n"));
+      FreePool (mCapsulePtr);
+      FreePool (mCapsuleStatusArray);
+      FreePool (CapsuleNameCapsulePtr);
+      mCapsulePtr         = NULL;
+      mCapsuleStatusArray = NULL;
+      mCapsuleTotalNumber = 0;
+      return ;
+    }
+
+    for (Index = 0, Index3 = 0; Index < CapsuleNameCapsuleTotalNumber; Index ++) {
+      CapsuleNameAddress = ValidateCapsuleNameCapsuleIntegrity (CapsuleNameCapsulePtr[Index], &CapsuleNameNumber);
+      if (CapsuleNameAddress != NULL ) {
+        for (Index2 = 0; Index2 < CapsuleNameNumber; Index2 ++) {
+          mCapsuleNamePtr[Index3 ++] = (CHAR16 *)(UINTN) CapsuleNameAddress[Index2];
+        }
+      }
+    }
+  } else {
+    mCapsuleNamePtr = NULL;
+  }
+
+  FreePool (CapsuleNameCapsulePtr);
 }
 
 /**
@@ -319,9 +495,10 @@ ProcessTheseCapsules (
   EFI_STATUS                  Status;
   EFI_CAPSULE_HEADER          *CapsuleHeader;
   UINT32                      Index;
-  BOOLEAN                     DisplayCapsuleExist;
   ESRT_MANAGEMENT_PROTOCOL    *EsrtManagement;
   UINT16                      EmbeddedDriverCount;
+  BOOLEAN                     ResetRequired;
+  CHAR16                      *CapsuleName;
 
   REPORT_STATUS_CODE(EFI_PROGRESS_CODE, (EFI_SOFTWARE | PcdGet32(PcdStatusCodeSubClassCapsule) | PcdGet32(PcdCapsuleStatusCodeProcessCapsulesBegin)));
 
@@ -334,6 +511,7 @@ ProcessTheseCapsules (
     // We didn't find a hob, so had no errors.
     //
     DEBUG ((DEBUG_ERROR, "We can not find capsule data in capsule update boot mode.\n"));
+    mNeedReset = TRUE;
     return EFI_SUCCESS;
   }
 
@@ -354,26 +532,20 @@ ProcessTheseCapsules (
   //
   // If Windows UX capsule exist, process it first
   //
-  DisplayCapsuleExist = FALSE;
   for (Index = 0; Index < mCapsuleTotalNumber; Index++) {
     CapsuleHeader = (EFI_CAPSULE_HEADER*) mCapsulePtr [Index];
+    CapsuleName = (mCapsuleNamePtr == NULL) ? NULL : mCapsuleNamePtr[Index];
     if (CompareGuid (&CapsuleHeader->CapsuleGuid, &gWindowsUxCapsuleGuid)) {
-      DEBUG ((DEBUG_INFO, "ProcessCapsuleImage (Ux) - 0x%x\n", CapsuleHeader));
-      DisplayCapsuleExist = TRUE;
+      DEBUG ((DEBUG_INFO, "ProcessThisCapsuleImage (Ux) - 0x%x\n", CapsuleHeader));
       DEBUG ((DEBUG_INFO, "Display logo capsule is found.\n"));
-      Status = ProcessCapsuleImage (CapsuleHeader);
+      Status = ProcessThisCapsuleImage (CapsuleHeader, CapsuleName, NULL);
       mCapsuleStatusArray [Index] = EFI_SUCCESS;
-      DEBUG((DEBUG_INFO, "ProcessCapsuleImage (Ux) - %r\n", Status));
+      DEBUG((DEBUG_INFO, "ProcessThisCapsuleImage (Ux) - %r\n", Status));
       break;
     }
   }
 
-  if (!DisplayCapsuleExist) {
-    //
-    // Display Capsule not found. Display the default string.
-    //
-    Print (L"Updating the firmware ......\r\n");
-  }
+  DEBUG ((DEBUG_INFO, "Updating the firmware ......\n"));
 
   //
   // All capsules left are recognized by platform.
@@ -384,6 +556,7 @@ ProcessTheseCapsules (
       continue;
     }
     CapsuleHeader = (EFI_CAPSULE_HEADER*) mCapsulePtr [Index];
+    CapsuleName = (mCapsuleNamePtr == NULL) ? NULL : mCapsuleNamePtr[Index];
     if (!CompareGuid (&CapsuleHeader->CapsuleGuid, &gWindowsUxCapsuleGuid)) {
       //
       // Call capsule library to process capsule image.
@@ -402,22 +575,22 @@ ProcessTheseCapsules (
       }
 
       if ((!FirstRound) || (EmbeddedDriverCount == 0)) {
-        DEBUG((DEBUG_INFO, "ProcessCapsuleImage - 0x%x\n", CapsuleHeader));
-        Status = ProcessCapsuleImage (CapsuleHeader);
+        DEBUG((DEBUG_INFO, "ProcessThisCapsuleImage - 0x%x\n", CapsuleHeader));
+        ResetRequired = FALSE;
+        Status = ProcessThisCapsuleImage (CapsuleHeader, CapsuleName, &ResetRequired);
         mCapsuleStatusArray [Index] = Status;
-        DEBUG((DEBUG_INFO, "ProcessCapsuleImage - %r\n", Status));
+        DEBUG((DEBUG_INFO, "ProcessThisCapsuleImage - %r\n", Status));
 
         if (Status != EFI_NOT_READY) {
           if (EFI_ERROR(Status)) {
             REPORT_STATUS_CODE(EFI_ERROR_CODE, (EFI_SOFTWARE | PcdGet32(PcdStatusCodeSubClassCapsule) | PcdGet32(PcdCapsuleStatusCodeUpdateFirmwareFailed)));
             DEBUG ((DEBUG_ERROR, "Capsule process failed!\n"));
-            Print (L"Firmware update failed...\r\n");
           } else {
             REPORT_STATUS_CODE(EFI_PROGRESS_CODE, (EFI_SOFTWARE | PcdGet32(PcdStatusCodeSubClassCapsule) | PcdGet32(PcdCapsuleStatusCodeUpdateFirmwareSuccess)));
           }
 
-          if ((CapsuleHeader->Flags & PcdGet16(PcdSystemRebootAfterCapsuleProcessFlag)) != 0 ||
-              IsFmpCapsule(CapsuleHeader)) {
+          mNeedReset |= ResetRequired;
+          if ((CapsuleHeader->Flags & PcdGet16(PcdSystemRebootAfterCapsuleProcessFlag)) != 0) {
             mNeedReset = TRUE;
           }
         }
@@ -447,18 +620,9 @@ DoResetSystem (
   VOID
   )
 {
-  UINTN                         Index;
-
-  REPORT_STATUS_CODE(EFI_PROGRESS_CODE, (EFI_SOFTWARE | PcdGet32(PcdStatusCodeSubClassCapsule) | PcdGet32(PcdCapsuleStatusCodeResettingSystem)));
-
-  Print(L"Capsule Request Cold Reboot.\n");
   DEBUG((DEBUG_INFO, "Capsule Request Cold Reboot."));
 
-  for (Index = 5; Index > 0; Index--) {
-    Print(L"\rResetting system in %d seconds ...", Index);
-    DEBUG((DEBUG_INFO, "\rResetting system in %d seconds ...", Index));
-    gBS->Stall(1000000);
-  }
+  REPORT_STATUS_CODE(EFI_PROGRESS_CODE, (EFI_SOFTWARE | PcdGet32(PcdStatusCodeSubClassCapsule) | PcdGet32(PcdCapsuleStatusCodeResettingSystem)));
 
   gRT->ResetSystem(EfiResetCold, EFI_SUCCESS, 0, NULL);
 
@@ -472,7 +636,8 @@ DoResetSystem (
   Caution: This function may receive untrusted input.
 
   The capsules reported in EFI_HOB_UEFI_CAPSULE are processed.
-  If there is no EFI_HOB_UEFI_CAPSULE, this routine does nothing.
+  If there is no EFI_HOB_UEFI_CAPSULE, it means error occurs, force reset to
+  normal boot path.
 
   This routine should be called twice in BDS.
   1) The first call must be before EndOfDxe. The system capsules is processed.

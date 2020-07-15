@@ -3,15 +3,9 @@
 //
 // This package provides network modules that conform to UEFI 2.4 specification.
 //
-// Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2009 - 2019, Intel Corporation. All rights reserved.<BR>
 //
-// This program and the accompanying materials are licensed and made available under
-// the terms and conditions of the BSD License which accompanies this distribution.
-// The full text of the license may be found at
-// http://opensource.org/licenses/bsd-license.php
-// 
-// THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-// WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+// SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // **/
 
@@ -55,11 +49,24 @@
                                                                                        "TRUE  - HTTP connections are allowed.\n"
                                                                                        "FALSE - HTTP connections are denied."
 
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdPxeTftpWindowSize_PROMPT  #language en-US "This setting is to specify the MTFTP windowsize used by UEFI PXE driver."
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdPxeTftpWindowSize_HELP  #language en-US "Specify MTFTP windowsize used by UEFI PXE driver.\n"
+                                                                                    "A value of 0 indicates the default value of windowsize(1).\n"
+                                                                                    "A non-zero value will be used as windowsize."
+
 #string STR_gEfiNetworkPkgTokenSpaceGuid_PcdIpsecCertificateEnabled_PROMPT  #language en-US "Enable IPsec IKEv2 Certificate Authentication."
 
 #string STR_gEfiNetworkPkgTokenSpaceGuid_PcdIpsecCertificateEnabled_HELP  #language en-US "Indicates if the IPsec IKEv2 Certificate Authentication feature is enabled or not.<BR><BR>\n"
                                                                                           "TRUE  - Certificate Authentication feature is enabled.<BR>\n"
                                                                                           "FALSE - Does not support Certificate Authentication.<BR>"
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdSnpCreateExitBootServicesEvent_PROMPT  #language en-US "Indicates whether SnpDxe creates event for ExitBootServices() call."
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdSnpCreateExitBootServicesEvent_HELP  #language en-US "Indicates whether SnpDxe driver will create an event that will be notified<BR><BR>\n"
+                                                                                                 "upon gBS->ExitBootServices() call.<BR>\n"
+                                                                                                 "TRUE - Event being triggered upon ExitBootServices call will be created<BR>\n"
+                                                                                                 "FALSE - Event being triggered upon ExitBootServices call will NOT be created<BR>"
 
 #string STR_gEfiNetworkPkgTokenSpaceGuid_PcdDhcp6UidType_PROMPT  #language en-US "Type Value of Dhcp6 Unique Identifier (DUID)."
 
@@ -80,3 +87,21 @@
                                                                                             "0x10 = Stop UEFI iSCSI if iSCSI HBA adapter supports multipath I/O for iSCSI boot.\n"
                                                                                             "0x20 = Stop UEFI iSCSI if iSCSI HBA adapter is currently configured to boot from iSCSI IPv4 targets.\n"
                                                                                             "0x40 = Stop UEFI iSCSI if iSCSI HBA adapter is currently configured to boot from iSCSI IPv6 targets."
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdIPv4PXESupport_PROMPT  #language en-US "Enable IPV4 PXE Function."
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdIPv4PXESupport_HELP  #language en-US "Indicates IPV4 PXE Function is enabled or not.\n"
+                                                                                 "A value of 0 indicates the IPV4 PXE Function is disabled.\n"
+                                                                                 "A value of 1 indicates the IPV4 PXE Function is enabled."
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdIPv6PXESupport_PROMPT  #language en-US "Enable IPV6 PXE Function."
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdIPv6PXESupport_HELP  #language en-US "Indicates IPV6 PXE Function is enabled or not.\n"
+                                                                                 "A value of 0 indicates the IPV6 PXE Function is disabled.\n"
+                                                                                 "A value of 1 indicates the IPV6 PXE Function is enabled."
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdTftpBlockSize_PROMPT  #language en-US "TFTP block size"
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdTftpBlockSize_HELP  #language en-US "This setting can override the default TFTP block size. A value of 0 computes "
+                                                                                  "the default from MTU information. A non-zero value will be used as block size "
+                                                                                  "in bytes."

@@ -1,16 +1,10 @@
 /** @file
-  Defines the HOB GUID used to pass a TCG_PCR_EVENT or TCG_PCR_EVENT2 from a TPM PEIM to 
-  a TPM DXE Driver. A GUIDed HOB is generated for each measurement 
+  Defines the HOB GUID used to pass a TCG_PCR_EVENT or TCG_PCR_EVENT2 from a TPM PEIM to
+  a TPM DXE Driver. A GUIDed HOB is generated for each measurement
   made in the PEI Phase.
-    
-Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials 
-are licensed and made available under the terms and conditions of the BSD License 
-which accompanies this distribution.  The full text of the license may be found at 
-http://opensource.org/licenses/bsd-license.php
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, 
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -54,5 +48,16 @@ extern EFI_GUID gTpmErrorHobGuid;
   }
 
 extern EFI_GUID gTpm2StartupLocalityHobGuid;
+
+///
+/// The Global ID of a GUIDed HOB used to record TCG 800-155 PlatformId Event.
+/// HOB payload is the whole TCG_Sp800_155_PlatformId_Event2 according to TCG 800-155 PlatformId Event.
+///
+#define EFI_TCG_800_155_PLATFORM_ID_EVENT_HOB_GUID \
+  { \
+    0xe2c3bc69, 0x615c, 0x4b5b, { 0x8e, 0x5c, 0xa0, 0x33, 0xa9, 0xc2, 0x5e, 0xd6 } \
+  }
+
+extern EFI_GUID gTcg800155PlatformIdEventHobGuid;
 
 #endif

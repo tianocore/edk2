@@ -2,20 +2,85 @@
 PEIM to produce gPeiUsbHostControllerPpiGuid based on gPeiUsbControllerPpiGuid
 which is used to enable recovery function from USB Drivers.
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved. <BR>
-  
-This program and the accompanying materials
-are licensed and made available under the terms and conditions
-of the BSD License which accompanies this distribution.  The
-full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved. <BR>
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include "UhcPeim.h"
+
+/**
+  Stop the host controller.
+
+  @param  Uhc           The UHCI device.
+  @param  Timeout       Max time allowed.
+
+  @retval EFI_SUCCESS   The host controller is stopped.
+  @retval EFI_TIMEOUT   Failed to stop the host controller.
+
+**/
+EFI_STATUS
+UhciStopHc (
+  IN USB_UHC_DEV        *Uhc,
+  IN UINTN              Timeout
+  )
+{
+  UINT16                CommandContent;
+  UINT16                UsbSts;
+  UINTN                 Index;
+
+  CommandContent = USBReadPortW (Uhc, Uhc->UsbHostControllerBaseAddress + USBCMD);
+  CommandContent &= USBCMD_RS;
+  USBWritePortW (Uhc, Uhc->UsbHostControllerBaseAddress + USBCMD, CommandContent);
+
+  //
+  // ensure the HC is in halt status after send the stop command
+  // Timeout is in us unit.
+  //
+  for (Index = 0; Index < (Timeout / 50) + 1; Index++) {
+    UsbSts = USBReadPortW (Uhc, Uhc->UsbHostControllerBaseAddress + USBSTS);
+
+    if ((UsbSts & USBSTS_HCH) == USBSTS_HCH) {
+      return EFI_SUCCESS;
+    }
+
+    MicroSecondDelay (50);
+  }
+
+  return EFI_TIMEOUT;
+}
+
+/**
+  One notified function to stop the Host Controller at the end of PEI
+
+  @param[in]  PeiServices        Pointer to PEI Services Table.
+  @param[in]  NotifyDescriptor   Pointer to the descriptor for the Notification event that
+                                 caused this function to execute.
+  @param[in]  Ppi                Pointer to the PPI data associated with this function.
+
+  @retval     EFI_SUCCESS  The function completes successfully
+  @retval     others
+**/
+EFI_STATUS
+EFIAPI
+UhcEndOfPei (
+  IN EFI_PEI_SERVICES           **PeiServices,
+  IN EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDescriptor,
+  IN VOID                       *Ppi
+  )
+{
+  USB_UHC_DEV   *Uhc;
+
+  Uhc = PEI_RECOVERY_USB_UHC_DEV_FROM_THIS_NOTIFY (NotifyDescriptor);
+
+  //
+  // Stop the Host Controller
+  //
+  UhciStopHc (Uhc, 1000 * 1000);
+
+  return EFI_SUCCESS;
+}
 
 /**
   Initializes Usb Host Controller.
@@ -98,6 +163,7 @@ UhcPeimEntry (
 
     UhcDev = (USB_UHC_DEV *) ((UINTN) TempPtr);
     UhcDev->Signature   = USB_UHC_DEV_SIGNATURE;
+    IoMmuInit (&UhcDev->IoMmu);
     UhcDev->UsbHostControllerBaseAddress = (UINT32) BaseAddress;
 
     //
@@ -133,6 +199,12 @@ UhcPeimEntry (
       continue;
     }
 
+    UhcDev->EndOfPeiNotifyList.Flags = (EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST);
+    UhcDev->EndOfPeiNotifyList.Guid = &gEfiEndOfPeiSignalPpiGuid;
+    UhcDev->EndOfPeiNotifyList.Notify = UhcEndOfPei;
+
+    PeiServicesNotifyPpi (&UhcDev->EndOfPeiNotifyList);
+
     Index++;
   }
 
@@ -141,12 +213,12 @@ UhcPeimEntry (
 
 /**
   Submits control transfer to a target USB device.
-  
+
   @param  PeiServices            The pointer of EFI_PEI_SERVICES.
   @param  This                   The pointer of PEI_USB_HOST_CONTROLLER_PPI.
   @param  DeviceAddress          The target device address.
   @param  DeviceSpeed            Target device speed.
-  @param  MaximumPacketLength    Maximum packet size the default control transfer 
+  @param  MaximumPacketLength    Maximum packet size the default control transfer
                                  endpoint is capable of sending or receiving.
   @param  Request                USB device request to send.
   @param  TransferDirection      Specifies the data direction for the data stage.
@@ -190,15 +262,19 @@ UhcControlTransfer (
   TD_STRUCT   *PtrStatusTD;
   EFI_STATUS  Status;
   UINT32      DataLen;
-  UINT8       *PtrDataSource;
-  UINT8       *Ptr;
   UINT8       DataToggle;
+  UINT8       *RequestPhy;
+  VOID        *RequestMap;
+  UINT8       *DataPhy;
+  VOID        *DataMap;
 
   UhcDev      = PEI_RECOVERY_USB_UHC_DEV_FROM_UHCI_THIS (This);
 
   StatusReg   = UhcDev->UsbHostControllerBaseAddress + USBSTS;
 
   PktID       = INPUT_PACKET_ID;
+
+  RequestMap  = NULL;
 
   if (Request == NULL || TransferResult == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -217,6 +293,24 @@ UhcControlTransfer (
   ClearStatusReg (UhcDev, StatusReg);
 
   //
+  // Map the Request and data for bus master access,
+  // then create a list of TD for this transfer
+  //
+  Status = UhciMapUserRequest (UhcDev, Request, &RequestPhy, &RequestMap);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = UhciMapUserData (UhcDev, TransferDirection, Data, DataLength, &PktID, &DataPhy, &DataMap);
+
+  if (EFI_ERROR (Status)) {
+    if (RequestMap != NULL) {
+      IoMmuUnmap (UhcDev->IoMmu, RequestMap);
+    }
+    return Status;
+  }
+
+  //
   // generate Setup Stage TD
   //
 
@@ -228,6 +322,7 @@ UhcControlTransfer (
     0,
     DeviceSpeed,
     (UINT8 *) Request,
+    RequestPhy,
     (UINT8) sizeof (EFI_USB_DEVICE_REQUEST),
     &PtrSetupTD
     );
@@ -242,38 +337,11 @@ UhcControlTransfer (
   //
   //  Data Stage of Control Transfer
   //
-  switch (TransferDirection) {
 
-  case EfiUsbDataIn:
-    PktID         = INPUT_PACKET_ID;
-    PtrDataSource = Data;
-    DataLen       = (UINT32) *DataLength;
-    Ptr           = PtrDataSource;
-    break;
-
-  case EfiUsbDataOut:
-    PktID         = OUTPUT_PACKET_ID;
-    PtrDataSource = Data;
-    DataLen       = (UINT32) *DataLength;
-    Ptr           = PtrDataSource;
-    break;
-
-  //
-  // no data stage
-  //
-  case EfiUsbNoData:
-    if (*DataLength != 0) {
-      return EFI_INVALID_PARAMETER;
-    }
-
-    PktID         = OUTPUT_PACKET_ID;
-    PtrDataSource = NULL;
-    DataLen       = 0;
-    Ptr           = NULL;
-    break;
-
-  default:
-    return EFI_INVALID_PARAMETER;
+  if (TransferDirection == EfiUsbNoData) {
+    DataLen = 0;
+  } else {
+    DataLen = (UINT32) *DataLength;
   }
 
   DataToggle  = 1;
@@ -297,7 +365,8 @@ UhcControlTransfer (
       UhcDev,
       DeviceAddress,
       0,
-      Ptr,
+      Data,
+      DataPhy,
       PacketSize,
       PktID,
       DataToggle,
@@ -312,7 +381,8 @@ UhcControlTransfer (
     PtrPreTD = PtrTD;
 
     DataToggle ^= 1;
-    Ptr += PacketSize;
+    Data = (VOID *) ((UINT8 *) Data + PacketSize);
+    DataPhy += PacketSize;
     DataLen -= PacketSize;
   }
 
@@ -365,31 +435,36 @@ UhcControlTransfer (
   // if has errors that cause host controller halt, then return EFI_DEVICE_ERROR directly.
   //
   if (!IsStatusOK (UhcDev, StatusReg)) {
-
-    ClearStatusReg (UhcDev, StatusReg);
     *TransferResult |= EFI_USB_ERR_SYSTEM;
-    return EFI_DEVICE_ERROR;
+    Status = EFI_DEVICE_ERROR;
   }
 
   ClearStatusReg (UhcDev, StatusReg);
+
+  if (DataMap != NULL) {
+    IoMmuUnmap (UhcDev->IoMmu, DataMap);
+  }
+  if (RequestMap != NULL) {
+    IoMmuUnmap (UhcDev->IoMmu, RequestMap);
+  }
 
   return Status;
 }
 
 /**
   Submits bulk transfer to a bulk endpoint of a USB device.
-  
+
   @param  PeiServices           The pointer of EFI_PEI_SERVICES.
   @param  This                  The pointer of PEI_USB_HOST_CONTROLLER_PPI.
   @param  DeviceAddress         Target device address.
   @param  EndPointAddress       Endpoint number and its direction in bit 7.
-  @param  MaximumPacketLength   Maximum packet size the endpoint is capable of 
+  @param  MaximumPacketLength   Maximum packet size the endpoint is capable of
                                 sending or receiving.
-  @param  Data                  Array of pointers to the buffers of data to transmit 
+  @param  Data                  Array of pointers to the buffers of data to transmit
                                 from or receive into.
   @param  DataLength            The lenght of the data buffer.
   @param  DataToggle            On input, the initial data toggle for the transfer;
-                                On output, it is updated to to next data toggle to use of 
+                                On output, it is updated to to next data toggle to use of
                                 the subsequent bulk transfer.
   @param  TimeOut               Indicates the maximum time, in millisecond, which the
                                 transfer is allowed to complete.
@@ -431,8 +506,6 @@ UhcBulkTransfer (
   TD_STRUCT               *PtrPreTD;
 
   UINT8                   PktID;
-  UINT8                   *PtrDataSource;
-  UINT8                   *Ptr;
 
   BOOLEAN                 IsFirstTD;
 
@@ -443,6 +516,9 @@ UhcBulkTransfer (
   BOOLEAN                 ShortPacketEnable;
 
   UINT16                  CommandContent;
+
+  UINT8                   *DataPhy;
+  VOID                    *DataMap;
 
   UhcDev = PEI_RECOVERY_USB_UHC_DEV_FROM_UHCI_THIS (This);
 
@@ -467,7 +543,6 @@ UhcBulkTransfer (
   PtrFirstTD        = NULL;
   PtrPreTD          = NULL;
   DataLen           = 0;
-  Ptr               = NULL;
 
   ShortPacketEnable = FALSE;
 
@@ -495,32 +570,23 @@ UhcBulkTransfer (
 
   ClearStatusReg (UhcDev, StatusReg);
 
+  //
+  // Map the source data buffer for bus master access,
+  // then create a list of TDs
+  //
   if ((EndPointAddress & 0x80) != 0) {
     TransferDirection = EfiUsbDataIn;
   } else {
     TransferDirection = EfiUsbDataOut;
   }
 
-  switch (TransferDirection) {
+  Status = UhciMapUserData (UhcDev, TransferDirection, Data, DataLength, &PktID, &DataPhy, &DataMap);
 
-  case EfiUsbDataIn:
-    ShortPacketEnable = TRUE;
-    PktID             = INPUT_PACKET_ID;
-    PtrDataSource     = Data;
-    DataLen           = (UINT32) *DataLength;
-    Ptr               = PtrDataSource;
-    break;
-
-  case EfiUsbDataOut:
-    PktID         = OUTPUT_PACKET_ID;
-    PtrDataSource = Data;
-    DataLen       = (UINT32) *DataLength;
-    Ptr           = PtrDataSource;
-    break;
-
-  default:
-    break;
+  if (EFI_ERROR (Status)) {
+    return Status;
   }
+
+  DataLen = (UINT32) *DataLength;
 
   PtrQH = UhcDev->BulkQH;
 
@@ -540,7 +606,8 @@ UhcBulkTransfer (
       UhcDev,
       DeviceAddress,
       EndPointAddress,
-      Ptr,
+      Data,
+      DataPhy,
       PacketSize,
       PktID,
       *DataToggle,
@@ -570,7 +637,8 @@ UhcBulkTransfer (
     PtrPreTD = PtrTD;
 
     *DataToggle ^= 1;
-    Ptr += PacketSize;
+    Data = (VOID *) ((UINT8 *) Data + PacketSize);
+    DataPhy += PacketSize;
     DataLen -= PacketSize;
   }
   //
@@ -604,13 +672,15 @@ UhcBulkTransfer (
   // if has errors that cause host controller halt, then return EFI_DEVICE_ERROR directly.
   //
   if (!IsStatusOK (UhcDev, StatusReg)) {
-
-    ClearStatusReg (UhcDev, StatusReg);
     *TransferResult |= EFI_USB_ERR_SYSTEM;
-    return EFI_DEVICE_ERROR;
+    Status = EFI_DEVICE_ERROR;
   }
 
   ClearStatusReg (UhcDev, StatusReg);
+
+  if (DataMap != NULL) {
+    IoMmuUnmap (UhcDev->IoMmu, DataMap);
+  }
 
   return Status;
 }
@@ -619,10 +689,10 @@ UhcBulkTransfer (
   Retrieves the number of root hub ports.
 
   @param[in]  PeiServices   The pointer to the PEI Services Table.
-  @param[in]  This          The pointer to this instance of the 
+  @param[in]  This          The pointer to this instance of the
                             PEI_USB_HOST_CONTROLLER_PPI.
-  @param[out] PortNumber    The pointer to the number of the root hub ports.                                
-                                
+  @param[out] PortNumber    The pointer to the number of the root hub ports.
+
   @retval EFI_SUCCESS           The port number was retrieved successfully.
   @retval EFI_INVALID_PARAMETER PortNumber is NULL.
 
@@ -664,10 +734,10 @@ UhcGetRootHubPortNumber (
 
 /**
   Retrieves the current status of a USB root hub port.
-  
+
   @param  PeiServices            The pointer of EFI_PEI_SERVICES.
   @param  This                   The pointer of PEI_USB_HOST_CONTROLLER_PPI.
-  @param  PortNumber             The root hub port to retrieve the state from.  
+  @param  PortNumber             The root hub port to retrieve the state from.
   @param  PortStatus             Variable to receive the port state.
 
   @retval EFI_SUCCESS            The status of the USB root hub port specified.
@@ -757,7 +827,7 @@ UhcGetRootHubPortStatus (
 
 /**
   Sets a feature for the specified root hub port.
-  
+
   @param  PeiServices           The pointer of EFI_PEI_SERVICES
   @param  This                  The pointer of PEI_USB_HOST_CONTROLLER_PPI
   @param  PortNumber            Root hub port to set.
@@ -833,7 +903,7 @@ UhcSetRootHubPortFeature (
 
 /**
   Clears a feature for the specified root hub port.
-  
+
   @param  PeiServices           The pointer of EFI_PEI_SERVICES.
   @param  This                  The pointer of PEI_USB_HOST_CONTROLLER_PPI.
   @param  PortNumber            Specifies the root hub port whose feature
@@ -841,7 +911,7 @@ UhcSetRootHubPortFeature (
   @param  PortFeature           Indicates the feature selector associated with the
                                 feature clear request.
 
-  @retval EFI_SUCCESS            The feature specified by PortFeature was cleared 
+  @retval EFI_SUCCESS            The feature specified by PortFeature was cleared
                                  for the USB root hub port specified by PortNumber.
   @retval EFI_INVALID_PARAMETER  PortNumber is invalid or PortFeature is invalid.
 
@@ -1056,7 +1126,7 @@ CreateFrameList (
   ASSERT (UhcDev->BulkQH != NULL);
 
   //
-  //Set the corresponding QH pointer 
+  //Set the corresponding QH pointer
   //
   SetQHHorizontalLinkPtr(UhcDev->ConfigQH, UhcDev->BulkQH);
   SetQHHorizontalQHorTDSelect (UhcDev->ConfigQH, TRUE);
@@ -1079,7 +1149,7 @@ CreateFrameList (
 
 /**
   Read a 16bit width data from Uhc HC IO space register.
-  
+
   @param  UhcDev  The UHCI device.
   @param  Port    The IO space address of the register.
 
@@ -1097,7 +1167,7 @@ USBReadPortW (
 
 /**
   Write a 16bit width data into Uhc HC IO space register.
-  
+
   @param  UhcDev  The UHCI device.
   @param  Port    The IO space address of the register.
   @param  Data    The data written into the register.
@@ -1115,7 +1185,7 @@ USBWritePortW (
 
 /**
   Write a 32bit width data into Uhc HC IO space register.
-  
+
   @param  UhcDev  The UHCI device.
   @param  Port    The IO space address of the register.
   @param  Data    The data written into the register.
@@ -1133,7 +1203,7 @@ USBWritePortDW (
 
 /**
   Clear the content of UHCI's Status Register.
-  
+
   @param  UhcDev       The UHCI device.
   @param  StatusAddr   The IO space address of the register.
 
@@ -1177,26 +1247,7 @@ IsStatusOK (
   }
 }
 
-/**
-  Get Current Frame Number.
 
-  @param  UhcDev          The UHCI device.
-  @param  FrameNumberAddr The address of frame list register.
-
-  @retval The content of the frame list register.
-
-**/
-UINT16
-GetCurrentFrameNumber (
-  IN USB_UHC_DEV   *UhcDev,
-  IN UINT32        FrameNumberAddr
-  )
-{
-  //
-  // Gets value in the USB frame number register.
-  //
-  return (UINT16) (USBReadPortW (UhcDev, FrameNumberAddr) & 0x03FF);
-}
 
 /**
   Set Frame List Base Address.
@@ -1274,25 +1325,7 @@ SetQHHorizontalLinkPtr (
   PtrQH->QueueHead.QHHorizontalPtr = (UINT32) (UINTN) PtrNext >> 4;
 }
 
-/**
-  Get the horizontal link pointer in QH.
 
-  @param  PtrQH     Place to store QH_STRUCT pointer.
-
-  @retval The horizontal link pointer in QH.
-
-**/
-VOID *
-GetQHHorizontalLinkPtr (
-  IN QH_STRUCT  *PtrQH
-  )
-{
-  //
-  // Restore the 28bit address to 32bit address
-  // (take 32bit address as an example)
-  //
-  return (VOID *) (UINTN) ((PtrQH->QueueHead.QHHorizontalPtr) << 4);
-}
 
 /**
   Set a QH or TD horizontally to be connected with a specific QH.
@@ -1395,25 +1428,7 @@ SetQHVerticalValidorInvalid (
   PtrQH->QueueHead.QHVerticalTerminate = IsValid ? 0 : 1;
 }
 
-/**
-  Get the vertical validor bit in QH.
 
-  @param  PtrQH      Place to store QH_STRUCT pointer.
-
-  @retval The vertical linker is valid or not.
-
-**/
-BOOLEAN
-GetQHHorizontalValidorInvalid (
-  IN QH_STRUCT  *PtrQH
-  )
-{
-  //
-  // If TRUE, meaning the Horizontal Link Pointer field is valid,
-  // else, the field is invalid.
-  //
-  return (BOOLEAN) (!(PtrQH->QueueHead.QHHorizontalTerminate));
-}
 
 /**
   Allocate TD or QH Struct.
@@ -1492,7 +1507,8 @@ CreateTD (
   @param  DevAddr      Device address.
   @param  Endpoint     Endpoint number.
   @param  DeviceSpeed  Device Speed.
-  @param  DevRequest   Device reuquest.
+  @param  DevRequest   CPU memory address of request structure buffer to transfer.
+  @param  RequestPhy   PCI memory address of request structure buffer to transfer.
   @param  RequestLen   Request length.
   @param  PtrTD        TD_STRUCT generated.
 
@@ -1507,6 +1523,7 @@ GenSetupStageTD (
   IN  UINT8           Endpoint,
   IN  UINT8           DeviceSpeed,
   IN  UINT8           *DevRequest,
+  IN  UINT8           *RequestPhy,
   IN  UINT8           RequestLen,
   OUT TD_STRUCT       **PtrTD
   )
@@ -1583,7 +1600,11 @@ GenSetupStageTD (
 
   TdStruct->PtrTDBuffer      = (UINT8 *) DevRequest;
   TdStruct->TDBufferLength = RequestLen;
-  SetTDDataBuffer (TdStruct);
+  //
+  // Set the beginning address of the buffer that will be used
+  // during the transaction.
+  //
+  TdStruct->TDData.TDBufferPtr = (UINT32) (UINTN) RequestPhy;
 
   *PtrTD = TdStruct;
 
@@ -1596,7 +1617,8 @@ GenSetupStageTD (
   @param  UhcDev       The UHCI device.
   @param  DevAddr      Device address.
   @param  Endpoint     Endpoint number.
-  @param  PtrData      Data buffer.
+  @param  PtrData      CPU memory address of user data buffer to transfer.
+  @param  DataPhy      PCI memory address of user data buffer to transfer.
   @param  Len          Data length.
   @param  PktID        PacketID.
   @param  Toggle       Data toggle value.
@@ -1613,6 +1635,7 @@ GenDataTD (
   IN  UINT8           DevAddr,
   IN  UINT8           Endpoint,
   IN  UINT8           *PtrData,
+  IN  UINT8           *DataPhy,
   IN  UINT8           Len,
   IN  UINT8           PktID,
   IN  UINT8           Toggle,
@@ -1700,7 +1723,11 @@ GenDataTD (
 
   TdStruct->PtrTDBuffer      = (UINT8 *) PtrData;
   TdStruct->TDBufferLength = Len;
-  SetTDDataBuffer (TdStruct);
+  //
+  // Set the beginning address of the buffer that will be used
+  // during the transaction.
+  //
+  TdStruct->TDData.TDBufferPtr = (UINT32) (UINTN) DataPhy;
 
   *PtrTD = TdStruct;
 
@@ -1803,7 +1830,11 @@ CreateStatusTD (
 
   PtrTDStruct->PtrTDBuffer      = NULL;
   PtrTDStruct->TDBufferLength = 0;
-  SetTDDataBuffer (PtrTDStruct);
+  //
+  // Set the beginning address of the buffer that will be used
+  // during the transaction.
+  //
+  PtrTDStruct->TDData.TDBufferPtr = 0;
 
   *PtrTD = PtrTDStruct;
 
@@ -1909,26 +1940,7 @@ GetTDLinkPtr (
   return (VOID *) (UINTN) ((PtrTDStruct->TDData.TDLinkPtr) << 4);
 }
 
-/**
-  Get the information about whether the Link Pointer field pointing to
-  a QH or a TD.
 
-  @param  PtrTDStruct     Place to store TD_STRUCT pointer.
-
-  @retval whether the Link Pointer field pointing to a QH or a TD.
-
-**/
-BOOLEAN
-IsTDLinkPtrQHOrTD (
-  IN  TD_STRUCT *PtrTDStruct
-  )
-{
-  //
-  // Get the information about whether the Link Pointer field pointing to
-  // a QH or a TD.
-  //
-  return (BOOLEAN) (PtrTDStruct->TDData.TDLinkPtrQSelect);
-}
 
 /**
   Enable/Disable short packet detection mechanism.
@@ -2171,25 +2183,6 @@ SetTDTokenPacketID (
   // Set the Packet Identification to be used for this transaction.
   //
   PtrTDStruct->TDData.TDTokenPID = PacketID;
-}
-
-/**
-  Set the beginning address of the data buffer that will be used
-  during the transaction.
-
-  @param  PtrTDStruct   Place to store TD_STRUCT pointer.
-
-**/
-VOID
-SetTDDataBuffer (
-  IN  TD_STRUCT *PtrTDStruct
-  )
-{
-  //
-  // Set the beginning address of the data buffer that will be used
-  // during the transaction.
-  //
-  PtrTDStruct->TDData.TDBufferPtr = (UINT32) (UINTN) (PtrTDStruct->PtrTDBuffer);
 }
 
 /**
@@ -2773,25 +2766,29 @@ CreateMemoryBlock (
   )
 {
   EFI_STATUS            Status;
-  EFI_PHYSICAL_ADDRESS  TempPtr;
+  UINT8                 *TempPtr;
   UINTN                 MemPages;
   UINT8                 *Ptr;
+  VOID                  *Mapping;
+  EFI_PHYSICAL_ADDRESS  MappedAddr;
 
   //
   // Memory Block uses MemoryBlockSizeInPages pages,
   // memory management header and bit array use 1 page
   //
   MemPages = MemoryBlockSizeInPages + 1;
-  Status = PeiServicesAllocatePages (
-             EfiBootServicesData,
+  Status = IoMmuAllocateBuffer (
+             UhcDev->IoMmu,
              MemPages,
-             &TempPtr
+             (VOID **) &TempPtr,
+             &MappedAddr,
+             &Mapping
              );
-  if (EFI_ERROR (Status)) {
-    return Status;
+  if (EFI_ERROR (Status) || (TempPtr == NULL)) {
+    return EFI_OUT_OF_RESOURCES;
   }
 
-  Ptr = (UINT8 *) ((UINTN) TempPtr);
+  Ptr = TempPtr;
 
   ZeroMem (Ptr, MemPages * EFI_PAGE_SIZE);
 
@@ -2810,7 +2807,7 @@ CreateMemoryBlock (
   //
   // Memory block initial address
   //
-  Ptr = (UINT8 *) ((UINTN) TempPtr);
+  Ptr = TempPtr;
   Ptr += EFI_PAGE_SIZE;
   (*MemoryHeader)->MemoryBlockPtr = Ptr;
   //
@@ -3163,57 +3160,138 @@ InsertMemoryHeaderToList (
   }
 }
 
+
+
+
+
 /**
-  Judge the memory block in the memory header is empty or not.
+  Map address of request structure buffer.
 
-  @param  MemoryHeaderPtr   A pointer to the memory header list.
+  @param  Uhc                The UHCI device.
+  @param  Request            The user request buffer.
+  @param  MappedAddr         Mapped address of request.
+  @param  Map                Identificaion of this mapping to return.
 
-  @retval Whether the memory block in the memory header is empty or not.
+  @return EFI_SUCCESS        Success.
+  @return EFI_DEVICE_ERROR   Fail to map the user request.
 
 **/
-BOOLEAN
-IsMemoryBlockEmptied (
-  IN MEMORY_MANAGE_HEADER  *MemoryHeaderPtr
+EFI_STATUS
+UhciMapUserRequest (
+  IN  USB_UHC_DEV         *Uhc,
+  IN  OUT VOID            *Request,
+  OUT UINT8               **MappedAddr,
+  OUT VOID                **Map
   )
 {
-  UINTN Index;
+  EFI_STATUS            Status;
+  UINTN                 Len;
+  EFI_PHYSICAL_ADDRESS  PhyAddr;
 
-  for (Index = 0; Index < MemoryHeaderPtr->BitArraySizeInBytes; Index++) {
-    if (MemoryHeaderPtr->BitArrayPtr[Index] != 0) {
-      return FALSE;
-    }
+  Len    = sizeof (EFI_USB_DEVICE_REQUEST);
+  Status = IoMmuMap (
+             Uhc->IoMmu,
+             EdkiiIoMmuOperationBusMasterRead,
+             Request,
+             &Len,
+             &PhyAddr,
+             Map
+             );
+
+  if (!EFI_ERROR (Status)) {
+    *MappedAddr = (UINT8 *) (UINTN) PhyAddr;
   }
 
-  return TRUE;
+  return Status;
 }
 
 /**
-  remove a memory header from list.
+  Map address of user data buffer.
 
-  @param  FirstMemoryHeader   A pointer to the memory header list.
-  @param  FreeMemoryHeader    A memory header to be removed into the list.
+  @param  Uhc                The UHCI device.
+  @param  Direction          Direction of the data transfer.
+  @param  Data               The user data buffer.
+  @param  Len                Length of the user data.
+  @param  PktId              Packet identificaion.
+  @param  MappedAddr         Mapped address to return.
+  @param  Map                Identificaion of this mapping to return.
+
+  @return EFI_SUCCESS        Success.
+  @return EFI_DEVICE_ERROR   Fail to map the user data.
 
 **/
-VOID
-DelinkMemoryBlock (
-  IN MEMORY_MANAGE_HEADER    *FirstMemoryHeader,
-  IN MEMORY_MANAGE_HEADER    *FreeMemoryHeader
+EFI_STATUS
+UhciMapUserData (
+  IN  USB_UHC_DEV             *Uhc,
+  IN  EFI_USB_DATA_DIRECTION  Direction,
+  IN  VOID                    *Data,
+  IN  OUT UINTN               *Len,
+  OUT UINT8                   *PktId,
+  OUT UINT8                   **MappedAddr,
+  OUT VOID                    **Map
   )
 {
-  MEMORY_MANAGE_HEADER  *TempHeaderPtr;
+  EFI_STATUS            Status;
+  EFI_PHYSICAL_ADDRESS  PhyAddr;
 
-  if ((FirstMemoryHeader == NULL) || (FreeMemoryHeader == NULL)) {
-    return ;
-  }
+  Status = EFI_SUCCESS;
 
-  for (TempHeaderPtr = FirstMemoryHeader; TempHeaderPtr != NULL; TempHeaderPtr = TempHeaderPtr->Next) {
+  switch (Direction) {
+  case EfiUsbDataIn:
+    //
+    // BusMasterWrite means cpu read
+    //
+    *PktId = INPUT_PACKET_ID;
+    Status = IoMmuMap (
+               Uhc->IoMmu,
+               EdkiiIoMmuOperationBusMasterWrite,
+               Data,
+               Len,
+               &PhyAddr,
+               Map
+               );
 
-    if (TempHeaderPtr->Next == FreeMemoryHeader) {
-      //
-      // Link the before and after
-      //
-      TempHeaderPtr->Next = FreeMemoryHeader->Next;
-      break;
+    if (EFI_ERROR (Status)) {
+      goto EXIT;
     }
+
+    *MappedAddr = (UINT8 *) (UINTN) PhyAddr;
+    break;
+
+  case EfiUsbDataOut:
+    *PktId = OUTPUT_PACKET_ID;
+    Status = IoMmuMap (
+               Uhc->IoMmu,
+               EdkiiIoMmuOperationBusMasterRead,
+               Data,
+               Len,
+               &PhyAddr,
+               Map
+               );
+
+    if (EFI_ERROR (Status)) {
+      goto EXIT;
+    }
+
+    *MappedAddr = (UINT8 *) (UINTN) PhyAddr;
+    break;
+
+  case EfiUsbNoData:
+    if ((Len != NULL) && (*Len != 0)) {
+      Status    = EFI_INVALID_PARAMETER;
+      goto EXIT;
+    }
+
+    *PktId      = OUTPUT_PACKET_ID;
+    *MappedAddr = NULL;
+    *Map        = NULL;
+    break;
+
+  default:
+    Status      = EFI_INVALID_PARAMETER;
   }
+
+EXIT:
+  return Status;
 }
+

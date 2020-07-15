@@ -1,21 +1,20 @@
 /** @file
   This driver is used to manage SD/MMC PCI host controllers which are compliance
-  with SD Host Controller Simplified Specification version 3.00.
+  with SD Host Controller Simplified Specification version 3.00 plus the 64-bit
+  System Addressing support in SD Host Controller Simplified Specification version
+  4.20.
 
   It would expose EFI_SD_MMC_PASS_THRU_PROTOCOL for upper layer use.
 
-  Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2018-2019, NVIDIA CORPORATION. All rights reserved.
+  Copyright (c) 2015 - 2020, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include "SdMmcPciHcDxe.h"
+
+EDKII_SD_MMC_OVERRIDE           *mOverride;
 
 //
 // Driver Global Variables
@@ -28,6 +27,11 @@ EFI_DRIVER_BINDING_PROTOCOL gSdMmcPciHcDriverBinding = {
   NULL,
   NULL
 };
+
+#define SLOT_INIT_TEMPLATE {0, UnknownSlot, 0, 0, 0, 0, \
+                               {EDKII_SD_MMC_BUS_WIDTH_IGNORE,\
+                               EDKII_SD_MMC_CLOCK_FREQ_IGNORE,\
+                               {EDKII_SD_MMC_DRIVER_STRENGTH_IGNORE}}}
 
 //
 // Template for SD/MMC host controller private data.
@@ -51,8 +55,12 @@ SD_MMC_HC_PRIVATE_DATA gSdMmcPciHcTemplate = {
                                     // Queue
   INITIALIZE_LIST_HEAD_VARIABLE (gSdMmcPciHcTemplate.Queue),
   {                                 // Slot
-    {0, UnknownSlot, 0, 0, 0}, {0, UnknownSlot, 0, 0, 0}, {0, UnknownSlot, 0, 0, 0},
-    {0, UnknownSlot, 0, 0, 0}, {0, UnknownSlot, 0, 0, 0}, {0, UnknownSlot, 0, 0, 0}
+    SLOT_INIT_TEMPLATE,
+    SLOT_INIT_TEMPLATE,
+    SLOT_INIT_TEMPLATE,
+    SLOT_INIT_TEMPLATE,
+    SLOT_INIT_TEMPLATE,
+    SLOT_INIT_TEMPLATE
   },
   {                                 // Capability
     {0},
@@ -60,7 +68,9 @@ SD_MMC_HC_PRIVATE_DATA gSdMmcPciHcTemplate = {
   {                                 // MaxCurrent
     0,
   },
-  0                                 // ControllerVersion
+  {
+    0                               // ControllerVersion
+  }
 };
 
 SD_DEVICE_PATH    mSdDpTemplate = {
@@ -201,8 +211,10 @@ Done:
       gBS->SignalEvent (TrbEvent);
       return;
     }
-  }
-  if ((Trb != NULL) && (Status != EFI_NOT_READY)) {
+  } else if ((Trb != NULL) && (Status == EFI_CRC_ERROR) && (Trb->Retries > 0)) {
+    Trb->Retries--;
+    Trb->Started = FALSE;
+  } else if ((Trb != NULL)) {
     RemoveEntryList (Link);
     Trb->Packet->TransactionStatus = Status;
     TrbEvent = Trb->Event;
@@ -281,14 +293,14 @@ SdMmcPciHcEnumerateDevice (
         //
         // Reset the specified slot of the SD/MMC Pci Host Controller
         //
-        Status = SdMmcHcReset (Private->PciIo, Slot);
+        Status = SdMmcHcReset (Private, Slot);
         if (EFI_ERROR (Status)) {
           continue;
         }
         //
         // Reinitialize slot and restart identification process for the new attached device
         //
-        Status = SdMmcHcInitHost (Private->PciIo, Slot, Private->Capability[Slot]);
+        Status = SdMmcHcInitHost (Private, Slot);
         if (EFI_ERROR (Status)) {
           continue;
         }
@@ -327,6 +339,7 @@ SdMmcPciHcEnumerateDevice (
 
   return;
 }
+
 /**
   Tests to see if this driver supports a given controller. If a child device is provided,
   it further tests to see if this driver supports creating a handle for the specified child device.
@@ -601,17 +614,86 @@ SdMmcPciHcDriverBindingStart (
     goto Done;
   }
 
+  //
+  // Attempt to locate the singleton instance of the SD/MMC override protocol,
+  // which implements platform specific workarounds for non-standard SDHCI
+  // implementations.
+  //
+  if (mOverride == NULL) {
+    Status = gBS->LocateProtocol (&gEdkiiSdMmcOverrideProtocolGuid, NULL,
+                    (VOID **)&mOverride);
+    if (!EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_INFO, "%a: found SD/MMC override protocol\n",
+        __FUNCTION__));
+    }
+  }
+
   Support64BitDma = TRUE;
   for (Slot = FirstBar; Slot < (FirstBar + SlotNum); Slot++) {
     Private->Slot[Slot].Enable = TRUE;
+    //
+    // Get SD/MMC Pci Host Controller Version
+    //
+    Status = SdMmcHcGetControllerVersion (PciIo, Slot, &Private->ControllerVersion[Slot]);
+    if (EFI_ERROR (Status)) {
+      continue;
+    }
 
     Status = SdMmcHcGetCapability (PciIo, Slot, &Private->Capability[Slot]);
     if (EFI_ERROR (Status)) {
       continue;
     }
-    DumpCapabilityReg (Slot, &Private->Capability[Slot]);
 
-    Support64BitDma &= Private->Capability[Slot].SysBus64;
+    Private->BaseClkFreq[Slot] = Private->Capability[Slot].BaseClkFreq;
+
+    if (mOverride != NULL) {
+      if (mOverride->Capability != NULL) {
+        Status = mOverride->Capability (
+                              Controller,
+                              Slot,
+                              &Private->Capability[Slot],
+                              &Private->BaseClkFreq[Slot]
+                              );
+        if (EFI_ERROR (Status)) {
+          DEBUG ((DEBUG_WARN, "%a: Failed to override capability - %r\n",
+            __FUNCTION__, Status));
+          continue;
+        }
+      }
+
+      if (mOverride->NotifyPhase != NULL) {
+        Status = mOverride->NotifyPhase (
+                              Controller,
+                              Slot,
+                              EdkiiSdMmcGetOperatingParam,
+                              (VOID*)&Private->Slot[Slot].OperatingParameters
+                              );
+        if (EFI_ERROR (Status)) {
+          DEBUG ((DEBUG_WARN, "%a: Failed to get operating parameters, using defaults\n", __FUNCTION__));
+        }
+      }
+    }
+
+    DumpCapabilityReg (Slot, &Private->Capability[Slot]);
+    DEBUG ((
+      DEBUG_INFO,
+      "Slot[%d] Base Clock Frequency: %dMHz\n",
+      Slot,
+      Private->BaseClkFreq[Slot]
+      ));
+
+    //
+    // If any of the slots does not support 64b system bus
+    // do not enable 64b DMA in the PCI layer.
+    //
+    if ((Private->ControllerVersion[Slot] == SD_MMC_HC_CTRL_VER_300 &&
+         Private->Capability[Slot].SysBus64V3 == 0) ||
+        (Private->ControllerVersion[Slot] == SD_MMC_HC_CTRL_VER_400 &&
+         Private->Capability[Slot].SysBus64V3 == 0) ||
+        (Private->ControllerVersion[Slot] >= SD_MMC_HC_CTRL_VER_410 &&
+         Private->Capability[Slot].SysBus64V4 == 0)) {
+      Support64BitDma = FALSE;
+    }
 
     Status = SdMmcHcGetMaxCurrent (PciIo, Slot, &Private->MaxCurrent[Slot]);
     if (EFI_ERROR (Status)) {
@@ -627,22 +709,28 @@ SdMmcPciHcDriverBindingStart (
     //
     // Reset the specified slot of the SD/MMC Pci Host Controller
     //
-    Status = SdMmcHcReset (PciIo, Slot);
+    Status = SdMmcHcReset (Private, Slot);
     if (EFI_ERROR (Status)) {
       continue;
     }
     //
     // Check whether there is a SD/MMC card attached
     //
-    Status = SdMmcHcCardDetect (PciIo, Slot, &MediaPresent);
-    if (EFI_ERROR (Status) && (Status != EFI_MEDIA_CHANGED)) {
-      continue;
-    } else if (!MediaPresent) {
-      DEBUG ((DEBUG_INFO, "SdMmcHcCardDetect: No device attached in Slot[%d]!!!\n", Slot));
-      continue;
+    if (Private->Slot[Slot].SlotType == RemovableSlot) {
+      Status = SdMmcHcCardDetect (PciIo, Slot, &MediaPresent);
+      if (EFI_ERROR (Status) && (Status != EFI_MEDIA_CHANGED)) {
+        continue;
+      } else if (!MediaPresent) {
+        DEBUG ((
+          DEBUG_INFO,
+          "SdMmcHcCardDetect: No device attached in Slot[%d]!!!\n",
+          Slot
+          ));
+        continue;
+      }
     }
 
-    Status = SdMmcHcInitHost (PciIo, Slot, Private->Capability[Slot]);
+    Status = SdMmcHcInitHost (Private, Slot);
     if (EFI_ERROR (Status)) {
       continue;
     }
@@ -889,6 +977,58 @@ SdMmcPciHcDriverBindingStop (
 }
 
 /**
+  Execute TRB synchronously.
+
+  @param[in] Private  Pointer to driver private data.
+  @param[in] Trb      Pointer to TRB to execute.
+
+  @retval EFI_SUCCESS  TRB executed successfully.
+  @retval Other        TRB failed.
+**/
+EFI_STATUS
+SdMmcPassThruExecSyncTrb (
+  IN SD_MMC_HC_PRIVATE_DATA  *Private,
+  IN SD_MMC_HC_TRB           *Trb
+  )
+{
+  EFI_STATUS  Status;
+  EFI_TPL     OldTpl;
+
+  //
+  // Wait async I/O list is empty before execute sync I/O operation.
+  //
+  while (TRUE) {
+    OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
+    if (IsListEmpty (&Private->Queue)) {
+      gBS->RestoreTPL (OldTpl);
+      break;
+    }
+    gBS->RestoreTPL (OldTpl);
+  }
+
+  while (Trb->Retries) {
+    Status = SdMmcWaitTrbEnv (Private, Trb);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    Status = SdMmcExecTrb (Private, Trb);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    Status = SdMmcWaitTrbResult (Private, Trb);
+    if (Status == EFI_CRC_ERROR) {
+      Trb->Retries--;
+    } else {
+      return Status;
+    }
+  }
+
+  return Status;
+}
+
+/**
   Sends SD command to an SD card that is attached to the SD controller.
 
   The PassThru() function sends the SD command specified by Packet to the SD card
@@ -937,7 +1077,6 @@ SdMmcPassThruPassThru (
   EFI_STATUS                      Status;
   SD_MMC_HC_PRIVATE_DATA          *Private;
   SD_MMC_HC_TRB                   *Trb;
-  EFI_TPL                         OldTpl;
 
   if ((This == NULL) || (Packet == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -980,41 +1119,9 @@ SdMmcPassThruPassThru (
     return EFI_SUCCESS;
   }
 
-  //
-  // Wait async I/O list is empty before execute sync I/O operation.
-  //
-  while (TRUE) {
-    OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
-    if (IsListEmpty (&Private->Queue)) {
-      gBS->RestoreTPL (OldTpl);
-      break;
-    }
-    gBS->RestoreTPL (OldTpl);
-  }
+  Status = SdMmcPassThruExecSyncTrb (Private, Trb);
 
-  Status = SdMmcWaitTrbEnv (Private, Trb);
-  if (EFI_ERROR (Status)) {
-    goto Done;
-  }
-
-  Status = SdMmcExecTrb (Private, Trb);
-  if (EFI_ERROR (Status)) {
-    goto Done;
-  }
-
-  Status = SdMmcWaitTrbResult (Private, Trb);
-  if (EFI_ERROR (Status)) {
-    goto Done;
-  }
-
-Done:
-  if ((Trb != NULL) && (Trb->AdmaDesc != NULL)) {
-    FreePages (Trb->AdmaDesc, Trb->AdmaPages);
-  }
-
-  if (Trb != NULL) {
-    FreePool (Trb);
-  }
+  SdMmcFreeTrb (Trb);
 
   return Status;
 }

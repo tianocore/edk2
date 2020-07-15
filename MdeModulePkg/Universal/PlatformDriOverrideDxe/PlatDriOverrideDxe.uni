@@ -4,11 +4,11 @@
 // It doesn't install again if this protocol exists.
 // It only implements one interface GetDriver of PLATFORM_DRIVER_OVERRIDE_PROTOCOL protocol
 // and doesn't support other two interfaces GetDriverPath, DriverLoaded.
-// 
+//
 // This driver also offers an UI interface in device manager to let user configure
 // platform override protocol to override the default algorithm for matching
 // drivers to controllers.
-// 
+//
 // The main flow:
 // 1. It dynamicly locate all controller device path.
 // 2. It dynamicly locate all drivers which support binding protocol.
@@ -16,18 +16,12 @@
 // mapping between drivers to controllers.
 // 4. It save all the mapping info in NV variables for the following boot,
 // which will be consumed by GetDriver API of the produced the platform override protocol.
-// 
+//
 // Caution: This module is a sample implementation for the test purpose.
 //
-// Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 //
-// This program and the accompanying materials
-// are licensed and made available under the terms and conditions of the BSD License
-// which accompanies this distribution. The full text of the license may be found at
-// http://opensource.org/licenses/bsd-license.php
-// 
-// THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-// WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+// SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // **/
 

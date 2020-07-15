@@ -1,27 +1,22 @@
 ## @file
 # This file is used to create/update/query/erase table for Identifiers
 #
-# Copyright (c) 2008, Intel Corporation. All rights reserved.<BR>
-# This program and the accompanying materials
-# are licensed and made available under the terms and conditions of the BSD License
-# which accompanies this distribution.  The full text of the license may be found at
-# http://opensource.org/licenses/bsd-license.php
-#
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
 ##
 # Import Modules
 #
+from __future__ import absolute_import
 import Common.EdkLogger as EdkLogger
-from Common.String import ConvertToSqlString
-from Table import Table
+from Common.StringUtils import ConvertToSqlString
+from Table.Table import Table
 
 ## TableIdentifier
 #
 # This class defined a table used for Identifier
-# 
+#
 # @param object:       Inherited from object class
 #
 #
@@ -29,7 +24,7 @@ class TableIdentifier(Table):
     def __init__(self, Cursor):
         Table.__init__(self, Cursor)
         self.Table = 'Identifier'
-    
+
     ## Create table
     #
     # Create table Identifier

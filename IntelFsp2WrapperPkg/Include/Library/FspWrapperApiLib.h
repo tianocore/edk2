@@ -2,13 +2,7 @@
   Provide FSP wrapper API related function.
 
   Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -46,7 +40,7 @@ CallFspNotifyPhase (
 /**
   Call FSP API - FspMemoryInit.
 
-  @param[in]  FspmUpdDataPtr          Pointer to the FSPM_UPD data sructure.
+  @param[in]  FspmUpdDataPtr          Pointer to the FSPM_UPD data structure.
   @param[out] HobListPtr              Pointer to receive the address of the HOB list.
 
   @return EFI status returned by FspMemoryInit API.

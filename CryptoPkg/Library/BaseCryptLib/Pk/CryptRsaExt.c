@@ -7,14 +7,8 @@
   3) RsaCheckKey
   4) RsaPkcs1Sign
 
-Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2009 - 2020, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -74,6 +68,7 @@ RsaGetKey (
   RsaKey  = (RSA *) RsaContext;
   Size    = *BnSize;
   *BnSize = 0;
+  BnKey   = NULL;
 
   switch (KeyTag) {
 
@@ -81,83 +76,63 @@ RsaGetKey (
   // RSA Public Modulus (N)
   //
   case RsaKeyN:
-    if (RsaKey->n == NULL) {
-      return TRUE;
-    }
-    BnKey = RsaKey->n;
+    RSA_get0_key (RsaKey, (const BIGNUM **)&BnKey, NULL, NULL);
     break;
 
   //
   // RSA Public Exponent (e)
   //
   case RsaKeyE:
-    if (RsaKey->e == NULL) {
-      return TRUE;
-    }
-    BnKey = RsaKey->e;
+    RSA_get0_key (RsaKey, NULL, (const BIGNUM **)&BnKey, NULL);
     break;
 
   //
   // RSA Private Exponent (d)
   //
   case RsaKeyD:
-    if (RsaKey->d == NULL) {
-      return TRUE;
-    }
-    BnKey = RsaKey->d;
+    RSA_get0_key (RsaKey, NULL, NULL, (const BIGNUM **)&BnKey);
     break;
 
   //
   // RSA Secret Prime Factor of Modulus (p)
   //
   case RsaKeyP:
-    if (RsaKey->p == NULL) {
-      return TRUE;
-    }
-    BnKey = RsaKey->p;
+    RSA_get0_factors (RsaKey, (const BIGNUM **)&BnKey, NULL);
     break;
 
   //
   // RSA Secret Prime Factor of Modules (q)
   //
   case RsaKeyQ:
-    if (RsaKey->q == NULL) {
-      return TRUE;
-    }
-    BnKey = RsaKey->q;
+    RSA_get0_factors (RsaKey, NULL, (const BIGNUM **)&BnKey);
     break;
 
   //
   // p's CRT Exponent (== d mod (p - 1))
   //
   case RsaKeyDp:
-    if (RsaKey->dmp1 == NULL) {
-      return TRUE;
-    }
-    BnKey = RsaKey->dmp1;
+    RSA_get0_crt_params (RsaKey, (const BIGNUM **)&BnKey, NULL, NULL);
     break;
 
   //
   // q's CRT Exponent (== d mod (q - 1))
   //
   case RsaKeyDq:
-    if (RsaKey->dmq1 == NULL) {
-      return TRUE;
-    }
-    BnKey = RsaKey->dmq1;
+    RSA_get0_crt_params (RsaKey, NULL, (const BIGNUM **)&BnKey, NULL);
     break;
 
   //
   // The CRT Coefficient (== 1/q mod p)
   //
   case RsaKeyQInv:
-    if (RsaKey->iqmp == NULL) {
-      return TRUE;
-    }
-    BnKey = RsaKey->iqmp;
+    RSA_get0_crt_params (RsaKey, NULL, NULL, (const BIGNUM **)&BnKey);
     break;
 
   default:
+    return FALSE;
+  }
+
+  if (BnKey == NULL) {
     return FALSE;
   }
 
@@ -170,10 +145,11 @@ RsaGetKey (
   }
 
   if (BigNumber == NULL) {
-    return FALSE;
+    *BnSize = Size;
+    return TRUE;
   }
   *BnSize = BN_bn2bin (BnKey, BigNumber) ;
-  
+
   return TRUE;
 }
 
@@ -192,7 +168,7 @@ RsaGetKey (
   @param[in, out]  RsaContext           Pointer to RSA context being set.
   @param[in]       ModulusLength        Length of RSA modulus N in bits.
   @param[in]       PublicExponent       Pointer to RSA public exponent.
-  @param[in]       PublicExponentSize   Size of RSA public exponent buffer in bytes. 
+  @param[in]       PublicExponentSize   Size of RSA public exponent buffer in bytes.
 
   @retval  TRUE   RSA key component was generated successfully.
   @retval  FALSE  Invalid RSA key component tag.
@@ -216,14 +192,14 @@ RsaGenerateKey (
   if (RsaContext == NULL || ModulusLength > INT_MAX || PublicExponentSize > INT_MAX) {
     return FALSE;
   }
-  
+
   KeyE = BN_new ();
   if (KeyE == NULL) {
     return FALSE;
   }
 
   RetVal = FALSE;
-  
+
   if (PublicExponent == NULL) {
     if (BN_set_word (KeyE, 0x10001) == 0) {
       goto _Exit;
@@ -244,7 +220,7 @@ _Exit:
 }
 
 /**
-  Validates key components of RSA context. 
+  Validates key components of RSA context.
   NOTE: This function performs integrity checks on all the RSA key material, so
         the RSA key structure must contain all the private key data.
 
@@ -276,7 +252,7 @@ RsaCheckKey (
   if (RsaContext == NULL) {
     return FALSE;
   }
-  
+
   if  (RSA_check_key ((RSA *) RsaContext) != 1) {
     Reason = ERR_GET_REASON (ERR_peek_last_error ());
     if (Reason == RSA_R_P_NOT_PRIME ||
@@ -300,7 +276,7 @@ RsaCheckKey (
 
   If RsaContext is NULL, then return FALSE.
   If MessageHash is NULL, then return FALSE.
-  If HashSize is not equal to the size of MD5, SHA-1 or SHA-256 digest, then return FALSE.
+  If HashSize is not equal to the size of MD5, SHA-1, SHA-256, SHA-384 or SHA-512 digest, then return FALSE.
   If SigSize is large enough but Signature is NULL, then return FALSE.
 
   @param[in]       RsaContext   Pointer to RSA context for signature generation.
@@ -337,37 +313,45 @@ RsaPkcs1Sign (
   }
 
   Rsa = (RSA *) RsaContext;
-  Size = BN_num_bytes (Rsa->n);
+  Size = RSA_size (Rsa);
 
   if (*SigSize < Size) {
     *SigSize = Size;
     return FALSE;
   }
-  
+
   if (Signature == NULL) {
     return FALSE;
   }
-  
+
   //
   // Determine the message digest algorithm according to digest size.
-  //   Only MD5, SHA-1 or SHA-256 algorithm is supported. 
+  //   Only MD5, SHA-1, SHA-256, SHA-384 or SHA-512 algorithm is supported.
   //
   switch (HashSize) {
   case MD5_DIGEST_SIZE:
     DigestType = NID_md5;
     break;
-    
+
   case SHA1_DIGEST_SIZE:
     DigestType = NID_sha1;
     break;
-    
+
   case SHA256_DIGEST_SIZE:
     DigestType = NID_sha256;
     break;
 
+  case SHA384_DIGEST_SIZE:
+    DigestType = NID_sha384;
+    break;
+
+  case SHA512_DIGEST_SIZE:
+    DigestType = NID_sha512;
+    break;
+
   default:
     return FALSE;
-  }  
+  }
 
   return (BOOLEAN) RSA_sign (
                      DigestType,

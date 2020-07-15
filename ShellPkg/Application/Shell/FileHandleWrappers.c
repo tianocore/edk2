@@ -3,15 +3,9 @@
   StdIn, StdOut, StdErr, etc...).
 
   Copyright 2016 Dell Inc.
-  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2013 Hewlett-Packard Development Company, L.P.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -21,14 +15,14 @@
 #define MEM_WRITE_REALLOC_OVERHEAD 1024
 
 /**
-  File style interface for console (Open).  
-  
+  File style interface for console (Open).
+
   @param[in] This       Ignored.
   @param[out] NewHandle Ignored.
   @param[in] FileName   Ignored.
   @param[in] OpenMode   Ignored.
   @param[in] Attributes Ignored.
-  
+
   @retval EFI_NOT_FOUND
 **/
 EFI_STATUS
@@ -46,9 +40,9 @@ FileInterfaceOpenNotFound(
 
 /**
   File style interface for console (Close, Delete, & Flush)
-  
+
   @param[in] This       Ignored.
-  
+
   @retval EFI_SUCCESS
 **/
 EFI_STATUS
@@ -65,7 +59,7 @@ FileInterfaceNopGeneric(
 
   @param[in] This       Ignored.
   @param[out] Position  Ignored.
-  
+
   @retval EFI_UNSUPPORTED
 **/
 EFI_STATUS
@@ -80,10 +74,10 @@ FileInterfaceNopGetPosition(
 
 /**
   File style interface for console (SetPosition).
-  
+
   @param[in] This       Ignored.
   @param[in] Position   Ignored.
-  
+
   @retval EFI_UNSUPPORTED
 **/
 EFI_STATUS
@@ -98,12 +92,12 @@ FileInterfaceNopSetPosition(
 
 /**
   File style interface for console (GetInfo).
-  
+
   @param[in] This              Ignored.
   @param[in] InformationType   Ignored.
   @param[in, out] BufferSize   Ignored.
   @param[out] Buffer           Ignored.
-  
+
   @retval EFI_UNSUPPORTED
 **/
 EFI_STATUS
@@ -120,12 +114,12 @@ FileInterfaceNopGetInfo(
 
 /**
   File style interface for console (SetInfo).
-  
+
   @param[in] This       Ignored.
   @param[in] InformationType   Ignored.
   @param[in] BufferSize Ignored.
   @param[in] Buffer     Ignored.
-  
+
   @retval EFI_UNSUPPORTED
 **/
 EFI_STATUS
@@ -144,11 +138,11 @@ FileInterfaceNopSetInfo(
   File style interface for StdOut (Write).
 
   Writes data to the screen.
-  
+
   @param[in] This              The pointer to the EFI_FILE_PROTOCOL object.
   @param[in, out] BufferSize   Size in bytes of Buffer.
   @param[in] Buffer            The pointer to the buffer to write.
-  
+
   @retval EFI_UNSUPPORTED No output console is supported.
   @return A return value from gST->ConOut->OutputString.
 **/
@@ -171,11 +165,11 @@ FileInterfaceStdOutWrite(
 
 /**
   File style interface for StdIn (Write).
-  
+
   @param[in] This            Ignored.
   @param[in, out] BufferSize Ignored.
   @param[in] Buffer          Ignored.
-  
+
   @retval EFI_UNSUPPORTED
 **/
 EFI_STATUS
@@ -193,11 +187,11 @@ FileInterfaceStdInWrite(
   File style interface for console StdErr (Write).
 
   Writes error to the error output.
-  
+
   @param[in] This              The pointer to the EFI_FILE_PROTOCOL object.
   @param[in, out] BufferSize   Size in bytes of Buffer.
   @param[in] Buffer            The pointer to the buffer to write.
-  
+
   @return A return value from gST->StdErr->OutputString.
 **/
 EFI_STATUS
@@ -213,11 +207,11 @@ FileInterfaceStdErrWrite(
 
 /**
   File style interface for console StdOut (Read).
-  
+
   @param[in] This              Ignored.
   @param[in, out] BufferSize   Ignored.
   @param[out] Buffer           Ignored.
-  
+
   @retval EFI_UNSUPPORTED
 **/
 EFI_STATUS
@@ -233,11 +227,11 @@ FileInterfaceStdOutRead(
 
 /**
   File style interface for console StdErr (Read).
-  
+
   @param[in] This              Ignored.
   @param[in, out] BufferSize   Ignored.
   @param[out] Buffer           Ignored.
-  
+
   @retval EFI_UNSUPPORTED Always.
 **/
 EFI_STATUS
@@ -253,11 +247,11 @@ FileInterfaceStdErrRead(
 
 /**
   File style interface for NUL file (Read).
-  
+
   @param[in] This              Ignored.
   @param[in, out] BufferSize   Poiner to 0 upon return.
   @param[out] Buffer           Ignored.
-  
+
   @retval EFI_SUCCESS Always.
 **/
 EFI_STATUS
@@ -274,11 +268,11 @@ FileInterfaceNulRead(
 
 /**
   File style interface for NUL file (Write).
-  
+
   @param[in] This              Ignored.
   @param[in, out] BufferSize   Ignored.
   @param[in] Buffer            Ignored.
-  
+
   @retval EFI_SUCCESS
 **/
 EFI_STATUS
@@ -304,7 +298,7 @@ FileInterfaceNulWrite(
 EFI_STATUS
 CreateTabCompletionList (
   IN CONST CHAR16             *InputString,
-  IN CONST UINTN              StringLen, 
+  IN CONST UINTN              StringLen,
   IN CONST UINTN              BufferSize,
   IN OUT EFI_SHELL_FILE_INFO  **TabCompletionList,
   IN OUT   UINTN              *TabUpdatePos
@@ -523,7 +517,7 @@ FileInterfaceStdInRead(
   gST->ConOut->QueryMode (gST->ConOut, gST->ConOut->Mode->Mode, &TotalColumn, &TotalRow);
 
   //
-  // Limit the line length to the buffer size or the minimun size of the
+  // Limit the line length to the buffer size or the minimum size of the
   // screen. (The smaller takes effect)
   //
   MaxStr = TotalColumn * (TotalRow - 1) - StartColumn;
@@ -871,7 +865,7 @@ FileInterfaceStdInRead(
       //
       if (Key.UnicodeChar != CHAR_BACKSPACE && !(Key.UnicodeChar == 0 && Key.ScanCode == SCAN_DELETE)) {
         //
-        // Calulate row and column of the tail of current string
+        // Calculate row and column of the tail of current string
         //
         TailRow     = Row + (StringLen - StringCurPos + Column + OutputLength) / TotalColumn;
         TailColumn  = (StringLen - StringCurPos + Column + OutputLength) % TotalColumn;
@@ -938,7 +932,7 @@ FileInterfaceStdInRead(
 }
 
 //
-// FILE sytle interfaces for StdIn/StdOut/StdErr
+// FILE style interfaces for StdIn/StdOut/StdErr
 //
 EFI_FILE_PROTOCOL FileInterfaceStdIn = {
   EFI_FILE_REVISION,
@@ -1025,9 +1019,9 @@ typedef struct {
   File style interface for Environment Variable (Close).
 
   Frees the memory for this object.
-  
+
   @param[in] This       The pointer to the EFI_FILE_PROTOCOL object.
-  
+
   @retval EFI_SUCCESS
 **/
 EFI_STATUS
@@ -1043,8 +1037,8 @@ FileInterfaceEnvClose(
   UINTN       TotalSize;
 
   //
-  // Most if not all UEFI commands will have an '\r\n' at the end of any output. 
-  // Since the output was redirected to a variable, it does not make sense to 
+  // Most if not all UEFI commands will have an '\r\n' at the end of any output.
+  // Since the output was redirected to a variable, it does not make sense to
   // keep this.  So, before closing, strip the trailing '\r\n' from the variable
   // if it exists.
   //
@@ -1063,19 +1057,19 @@ FileInterfaceEnvClose(
     NewBuffer = AllocateZeroPool (TotalSize);
     if (NewBuffer == NULL) {
       return EFI_OUT_OF_RESOURCES;
-    }  
+    }
     Status = SHELL_GET_ENVIRONMENT_VARIABLE(((EFI_FILE_PROTOCOL_ENVIRONMENT*)This)->Name, &NewSize, NewBuffer);
   }
-  
+
   if (!EFI_ERROR(Status) && NewBuffer != NULL) {
-    
+
     if (TotalSize / sizeof (CHAR16) >= 3) {
       if ( (((CHAR16*)NewBuffer)[TotalSize / sizeof (CHAR16) - 2] == CHAR_LINEFEED) &&
            (((CHAR16*)NewBuffer)[TotalSize / sizeof (CHAR16) - 3] == CHAR_CARRIAGE_RETURN)
          ) {
         ((CHAR16*)NewBuffer)[TotalSize / sizeof (CHAR16) - 3] = CHAR_NULL;
         //
-        // If the NewBuffer end with \r\n\0, We will repace '\r' by '\0' and then update TotalSize.
+        // If the NewBuffer end with \r\n\0, We will replace '\r' by '\0' and then update TotalSize.
         //
         TotalSize -= sizeof(CHAR16) * 2;
       }
@@ -1112,8 +1106,8 @@ FileInterfaceEnvClose(
         }
       }
     }
-  } 
-  
+  }
+
   SHELL_FREE_NON_NULL(NewBuffer);
   FreePool((EFI_FILE_PROTOCOL_ENVIRONMENT*)This);
   return (Status);
@@ -1121,9 +1115,9 @@ FileInterfaceEnvClose(
 
 /**
   File style interface for Environment Variable (Delete).
-  
+
   @param[in] This       The pointer to the EFI_FILE_PROTOCOL object.
-  
+
   @retval The return value from FileInterfaceEnvClose().
 **/
 EFI_STATUS
@@ -1138,35 +1132,55 @@ FileInterfaceEnvDelete(
 
 /**
   File style interface for Environment Variable (Read).
-  
+
   @param[in] This              The pointer to the EFI_FILE_PROTOCOL object.
   @param[in, out] BufferSize   Size in bytes of Buffer.
   @param[out] Buffer           The pointer to the buffer to fill.
-  
+
   @retval EFI_SUCCESS   The data was read.
 **/
 EFI_STATUS
 EFIAPI
 FileInterfaceEnvRead(
-  IN EFI_FILE_PROTOCOL *This,
-  IN OUT UINTN *BufferSize,
-  OUT VOID *Buffer
+  IN     EFI_FILE_PROTOCOL *This,
+  IN OUT UINTN             *BufferSize,
+  OUT    VOID              *Buffer
   )
 {
-  return (SHELL_GET_ENVIRONMENT_VARIABLE(
-    ((EFI_FILE_PROTOCOL_ENVIRONMENT*)This)->Name,
-    BufferSize,
-    Buffer));
+  EFI_STATUS     Status;
+
+  *BufferSize = *BufferSize / sizeof (CHAR16) * sizeof (CHAR16);
+  if (*BufferSize != 0) {
+    //
+    // Make sure the first unicode character is \xFEFF
+    //
+    *(CHAR16 *)Buffer = gUnicodeFileTag;
+    Buffer            = (CHAR16 *)Buffer + 1;
+    *BufferSize      -= sizeof (gUnicodeFileTag);
+  }
+
+  Status = SHELL_GET_ENVIRONMENT_VARIABLE (
+             ((EFI_FILE_PROTOCOL_ENVIRONMENT*)This)->Name,
+             BufferSize,
+             Buffer
+             );
+  if (!EFI_ERROR (Status) || (Status == EFI_BUFFER_TOO_SMALL)) {
+    //
+    // BufferSize is valid and needs update when Status is Success or BufferTooSmall.
+    //
+    *BufferSize += sizeof (gUnicodeFileTag);
+  }
+  return Status;
 }
 
 /**
   File style interface for Volatile Environment Variable (Write).
   This function also caches the environment variable into gShellEnvVarList.
-  
+
   @param[in] This              The pointer to the EFI_FILE_PROTOCOL object.
   @param[in, out] BufferSize   Size in bytes of Buffer.
   @param[in] Buffer            The pointer to the buffer to write.
-  
+
   @retval EFI_SUCCESS             The data was successfully write to variable.
   @retval SHELL_OUT_OF_RESOURCES  A memory allocation failed.
 **/
@@ -1239,11 +1253,11 @@ FileInterfaceEnvVolWrite(
 /**
   File style interface for Non Volatile Environment Variable (Write).
   This function also caches the environment variable into gShellEnvVarList.
-  
+
   @param[in] This              The pointer to the EFI_FILE_PROTOCOL object.
   @param[in, out] BufferSize   Size in bytes of Buffer.
   @param[in] Buffer            The pointer to the buffer to write.
-  
+
   @retval EFI_SUCCESS             The data was successfully write to variable.
   @retval SHELL_OUT_OF_RESOURCES  A memory allocation failed.
 **/
@@ -1362,7 +1376,7 @@ CreateFileInterfaceEnv(
   EnvFileInterface->Flush       = FileInterfaceNopGeneric;
   EnvFileInterface->Delete      = FileInterfaceEnvDelete;
   EnvFileInterface->Read        = FileInterfaceEnvRead;
-  
+
   CopyMem(EnvFileInterface->Name, EnvName, EnvNameSize);
 
   //
@@ -1513,10 +1527,10 @@ typedef struct {
 
 /**
   File style interface for Mem (SetPosition).
-  
+
   @param[in] This       The pointer to the EFI_FILE_PROTOCOL object.
   @param[out] Position  The position to set.
-  
+
   @retval EFI_SUCCESS             The position was successfully changed.
   @retval EFI_INVALID_PARAMETER   The Position was invalid.
 **/
@@ -1537,12 +1551,12 @@ FileInterfaceMemSetPosition(
 
 /**
   File style interface for Mem (GetPosition).
-  
+
   @param[in] This       The pointer to the EFI_FILE_PROTOCOL object.
   @param[out] Position  The pointer to the position.
-  
+
   @retval EFI_SUCCESS   The position was retrieved.
-**/ 
+**/
 EFI_STATUS
 EFIAPI
 FileInterfaceMemGetPosition(
@@ -1555,12 +1569,60 @@ FileInterfaceMemGetPosition(
 }
 
 /**
+  File style interface for Mem (GetInfo).
+
+  @param  This            Protocol instance pointer.
+  @param  InformationType Type of information to return in Buffer.
+  @param  BufferSize      On input size of buffer, on output amount of data in buffer.
+  @param  Buffer          The buffer to return data.
+
+  @retval EFI_SUCCESS          Data was returned.
+  @retval EFI_UNSUPPORT        InformationType is not supported.
+  @retval EFI_NO_MEDIA         The device has no media.
+  @retval EFI_DEVICE_ERROR     The device reported an error.
+  @retval EFI_VOLUME_CORRUPTED The file system structures are corrupted.
+  @retval EFI_WRITE_PROTECTED  The device is write protected.
+  @retval EFI_ACCESS_DENIED    The file was open for read only.
+  @retval EFI_BUFFER_TOO_SMALL Buffer was too small; required size returned in BufferSize.
+
+**/
+EFI_STATUS
+EFIAPI
+FileInterfaceMemGetInfo(
+  IN EFI_FILE_PROTOCOL        *This,
+  IN EFI_GUID                 *InformationType,
+  IN OUT UINTN                *BufferSize,
+  OUT VOID                    *Buffer
+  )
+{
+  EFI_FILE_INFO               *FileInfo;
+
+  if (CompareGuid (InformationType, &gEfiFileInfoGuid)) {
+    if (*BufferSize < sizeof (EFI_FILE_INFO)) {
+      *BufferSize = sizeof (EFI_FILE_INFO);
+      return EFI_BUFFER_TOO_SMALL;
+    }
+    if (Buffer == NULL) {
+      return EFI_INVALID_PARAMETER;
+    }
+    FileInfo = (EFI_FILE_INFO *)Buffer;
+    FileInfo->Size = sizeof (*FileInfo);
+    ZeroMem (FileInfo, sizeof (*FileInfo));
+    FileInfo->FileSize = ((EFI_FILE_PROTOCOL_MEM*)This)->FileSize;
+    FileInfo->PhysicalSize = FileInfo->FileSize;
+    return EFI_SUCCESS;
+  }
+
+  return EFI_UNSUPPORTED;
+}
+
+/**
   File style interface for Mem (Write).
-  
+
   @param[in] This              The pointer to the EFI_FILE_PROTOCOL object.
   @param[in, out] BufferSize   Size in bytes of Buffer.
   @param[in] Buffer            The pointer to the buffer to write.
-  
+
   @retval EFI_OUT_OF_RESOURCES The operation failed due to lack of resources.
   @retval EFI_SUCCESS          The data was written.
 **/
@@ -1582,6 +1644,9 @@ FileInterfaceMemWrite(
     //
     if ((UINTN)(MemFile->Position + (*BufferSize)) > (UINTN)(MemFile->BufferSize)) {
       MemFile->Buffer = ReallocatePool((UINTN)(MemFile->BufferSize), (UINTN)(MemFile->BufferSize) + (*BufferSize) + MEM_WRITE_REALLOC_OVERHEAD, MemFile->Buffer);
+      if (MemFile->Buffer == NULL){
+        return EFI_OUT_OF_RESOURCES;
+      }
       MemFile->BufferSize += (*BufferSize) + MEM_WRITE_REALLOC_OVERHEAD;
     }
     CopyMem(((UINT8*)MemFile->Buffer) + MemFile->Position, Buffer, *BufferSize);
@@ -1599,6 +1664,10 @@ FileInterfaceMemWrite(
     AsciiSPrint(AsciiBuffer, *BufferSize, "%S", Buffer);
     if ((UINTN)(MemFile->Position + AsciiStrSize(AsciiBuffer)) > (UINTN)(MemFile->BufferSize)) {
       MemFile->Buffer = ReallocatePool((UINTN)(MemFile->BufferSize), (UINTN)(MemFile->BufferSize) + AsciiStrSize(AsciiBuffer) + MEM_WRITE_REALLOC_OVERHEAD, MemFile->Buffer);
+      if (MemFile->Buffer == NULL){
+        FreePool(AsciiBuffer);
+        return EFI_OUT_OF_RESOURCES;
+      }
       MemFile->BufferSize += AsciiStrSize(AsciiBuffer) + MEM_WRITE_REALLOC_OVERHEAD;
     }
     CopyMem(((UINT8*)MemFile->Buffer) + MemFile->Position, AsciiBuffer, AsciiStrSize(AsciiBuffer));
@@ -1611,11 +1680,11 @@ FileInterfaceMemWrite(
 
 /**
   File style interface for Mem (Read).
-  
+
   @param[in] This              The pointer to the EFI_FILE_PROTOCOL object.
   @param[in, out] BufferSize   Size in bytes of Buffer.
   @param[in] Buffer            The pointer to the buffer to fill.
-  
+
   @retval EFI_SUCCESS   The data was read.
 **/
 EFI_STATUS
@@ -1641,11 +1710,11 @@ FileInterfaceMemRead(
   File style interface for Mem (Close).
 
   Frees all memory associated with this object.
-  
+
   @param[in] This       The pointer to the EFI_FILE_PROTOCOL object.
-  
+
   @retval EFI_SUCCESS   The 'file' was closed.
-**/ 
+**/
 EFI_STATUS
 EFIAPI
 FileInterfaceMemClose(
@@ -1689,7 +1758,7 @@ CreateFileInterfaceMem(
   FileInterface->Close       = FileInterfaceMemClose;
   FileInterface->GetPosition = FileInterfaceMemGetPosition;
   FileInterface->SetPosition = FileInterfaceMemSetPosition;
-  FileInterface->GetInfo     = FileInterfaceNopGetInfo;
+  FileInterface->GetInfo     = FileInterfaceMemGetInfo;
   FileInterface->SetInfo     = FileInterfaceNopSetInfo;
   FileInterface->Flush       = FileInterfaceNopGeneric;
   FileInterface->Delete      = FileInterfaceNopGeneric;
@@ -1736,7 +1805,7 @@ typedef struct {
 
   @param  This            Protocol instance pointer.
   @param  Position        Byte position from the start of the file.
-                          
+
   @retval EFI_SUCCESS     Data was written.
   @retval EFI_UNSUPPORTED Seek request for non-zero is not valid on open.
 
@@ -1756,7 +1825,7 @@ FileInterfaceFileSetPosition(
 
   @param  This            Protocol instance pointer.
   @param  Position        Byte position from the start of the file.
-                          
+
   @retval EFI_SUCCESS     Data was written.
   @retval EFI_UNSUPPORTED Seek request for non-zero is not valid on open..
 
@@ -1876,42 +1945,58 @@ FileInterfaceFileRead(
   OUT VOID                    *Buffer
   )
 {
+  EFI_STATUS  Status;
+  UINT64      Position;
   CHAR8       *AsciiStrBuffer;
   CHAR16      *UscStrBuffer;
   UINTN       Size;
-  UINTN       CharNum;
-  EFI_STATUS  Status;
   if (((EFI_FILE_PROTOCOL_FILE*)This)->Unicode) {
     //
     // Unicode
+    // There might be different file tag for the Unicode file. We cannot unconditionally insert the \xFEFF.
+    // So we choose to leave the file content as is.
     //
     return (((EFI_FILE_PROTOCOL_FILE*)This)->Orig->Read(((EFI_FILE_PROTOCOL_FILE*)This)->Orig, BufferSize, Buffer));
   } else {
     //
     // Ascii
     //
-    Size  = (*BufferSize) / sizeof(CHAR16);
-    AsciiStrBuffer = AllocateZeroPool(Size + sizeof(CHAR8));
+    *BufferSize = *BufferSize / sizeof (CHAR16) * sizeof (CHAR16);
+    if (*BufferSize == 0) {
+      return EFI_SUCCESS;
+    }
+    Status = ((EFI_FILE_PROTOCOL_FILE*)This)->Orig->GetPosition (((EFI_FILE_PROTOCOL_FILE*)This)->Orig, &Position);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+    if (Position == 0) {
+      //
+      // First two bytes in Buffer is for the Unicode file tag.
+      //
+      *(CHAR16 *)Buffer = gUnicodeFileTag;
+      Buffer = (CHAR16 *)Buffer + 1;
+      Size   = *BufferSize / sizeof (CHAR16) - 1;
+    } else {
+      Size   = *BufferSize / sizeof (CHAR16);
+    }
+    AsciiStrBuffer = AllocateZeroPool (Size + 1);
     if (AsciiStrBuffer == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
-    UscStrBuffer = AllocateZeroPool(*BufferSize + sizeof(CHAR16));
+    UscStrBuffer = AllocateZeroPool ((Size + 1) * sizeof(CHAR16));
     if (UscStrBuffer== NULL) {
       SHELL_FREE_NON_NULL(AsciiStrBuffer);
       return EFI_OUT_OF_RESOURCES;
     }
-    Status = (((EFI_FILE_PROTOCOL_FILE*)This)->Orig->Read(((EFI_FILE_PROTOCOL_FILE*)This)->Orig, &Size, AsciiStrBuffer));
+    Status = ((EFI_FILE_PROTOCOL_FILE*)This)->Orig->Read (((EFI_FILE_PROTOCOL_FILE*)This)->Orig, &Size, AsciiStrBuffer);
     if (!EFI_ERROR(Status)) {
-      CharNum = UnicodeSPrint(UscStrBuffer, *BufferSize + sizeof(CHAR16), L"%a", AsciiStrBuffer);
-      if (CharNum == Size) {
-        CopyMem (Buffer, UscStrBuffer, *BufferSize);
-      } else {
-        Status = EFI_UNSUPPORTED;
-      }
+      AsciiStrToUnicodeStrS (AsciiStrBuffer, UscStrBuffer, Size + 1);
+      *BufferSize = Size * sizeof (CHAR16);
+      CopyMem (Buffer, UscStrBuffer, *BufferSize);
     }
-    SHELL_FREE_NON_NULL(AsciiStrBuffer);
-    SHELL_FREE_NON_NULL(UscStrBuffer);
-    return (Status);
+    SHELL_FREE_NON_NULL (AsciiStrBuffer);
+    SHELL_FREE_NON_NULL (UscStrBuffer);
+    return Status;
   }
 }
 
@@ -1951,7 +2036,7 @@ FileInterfaceFileOpen (
   Close and delete the file handle.
 
   @param  This                     Protocol instance pointer.
-                                   
+
   @retval EFI_SUCCESS              The device was opened.
   @retval EFI_WARN_DELETE_FAILURE  The handle was closed but the file was not deleted.
 
@@ -1970,9 +2055,9 @@ FileInterfaceFileDelete(
 
 /**
   File style interface for File (Close).
-  
+
   @param[in] This       The pointer to the EFI_FILE_PROTOCOL object.
-  
+
   @retval EFI_SUCCESS   The file was closed.
 **/
 EFI_STATUS
@@ -1990,13 +2075,13 @@ FileInterfaceFileClose(
 /**
   File style interface for File (Write).
 
-  If the file was opened with ASCII mode the data will be processed through 
+  If the file was opened with ASCII mode the data will be processed through
   AsciiSPrint before writing.
-  
+
   @param[in] This              The pointer to the EFI_FILE_PROTOCOL object.
   @param[in, out] BufferSize   Size in bytes of Buffer.
   @param[in] Buffer            The pointer to the buffer to write.
-  
+
   @retval EFI_SUCCESS   The data was written.
 **/
 EFI_STATUS
@@ -2033,10 +2118,10 @@ FileInterfaceFileWrite(
 
   This will create a new EFI_FILE_PROTOCOL identical to the Templace
   except that the new one has Unicode and Ascii knowledge.
-  
+
   @param[in] Template   A pointer to the EFI_FILE_PROTOCOL object.
   @param[in] Unicode    TRUE for UCS-2, FALSE for ASCII.
-  
+
   @return a new EFI_FILE_PROTOCOL object to be used instead of the template.
 **/
 EFI_FILE_PROTOCOL*

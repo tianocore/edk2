@@ -1,15 +1,9 @@
 @REM @file
-@REM This script will exec LzmaCompress tool with --f86 option that enables 
+@REM This script will exec LzmaCompress tool with --f86 option that enables
 @REM converter for x86 code.
 @REM
-@REM Copyright (c) 2012 - 2014, Intel Corporation. All rights reserved.<BR>
-@REM This program and the accompanying materials
-@REM are licensed and made available under the terms and conditions of the BSD License
-@REM which accompanies this distribution.  The full text of the license may be found at
-@REM http://opensource.org/licenses/bsd-license.php
-@REM
-@REM THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-@REM WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+@REM Copyright (c) 2012 - 2018, Intel Corporation. All rights reserved.<BR>
+@REM SPDX-License-Identifier: BSD-2-Clause-Patent
 @REM
 
 @echo off

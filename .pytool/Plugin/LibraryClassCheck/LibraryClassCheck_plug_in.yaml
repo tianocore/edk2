@@ -1,0 +1,11 @@
+## @file
+# CiBuildPlugin used to check that all library classes are declared correctly in dec file
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+{
+  "scope": "cibuild",
+  "name": "Library Class Check Test",
+  "module": "LibraryClassCheck"
+}

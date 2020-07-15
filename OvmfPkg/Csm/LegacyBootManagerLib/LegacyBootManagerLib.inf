@@ -1,0 +1,57 @@
+## @file
+#  Legacy Boot Manager module is library for BDS phase.
+#
+#  Copyright (c) 2011 - 2019, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = LegacyBootManagerLib
+  MODULE_UNI_FILE                = LegacyBootManagerLib.uni
+  FILE_GUID                      = D1BBB810-6A9E-40E0-87CB-65EAD2AA2A09
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL|DXE_DRIVER UEFI_APPLICATION
+  CONSTRUCTOR                    = LegacyBootManagerLibConstructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  LegacyBm.c
+  InternalLegacyBm.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  DevicePathLib
+  MemoryAllocationLib
+  UefiLib
+  DebugLib
+  PrintLib
+  PerformanceLib
+  UefiBootManagerLib
+
+[Guids]
+  gEfiGlobalVariableGuid                        ## SOMETIMES_PRODUCES ## Variable:L"Boot####" (Boot option variable)
+                                                ## SOMETIMES_CONSUMES ## Variable:L"BootOrder" (The boot option array)
+  gEfiLegacyDevOrderVariableGuid
+
+[Protocols]
+  gEfiLegacyBiosProtocolGuid                    ## SOMETIMES_CONSUMES
+
+[FeaturePcd]
+
+[Pcd]

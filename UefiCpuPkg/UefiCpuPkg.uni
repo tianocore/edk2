@@ -3,15 +3,9 @@
 //
 // This Package provides UEFI compatible CPU modules and libraries.
 //
-// Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2007 - 2020, Intel Corporation. All rights reserved.<BR>
 //
-// This program and the accompanying materials are licensed and made available under
-// the terms and conditions of the BSD License which accompanies this distribution.
-// The full text of the license may be found at
-// http://opensource.org/licenses/bsd-license.php
-//
-// THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-// WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+// SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // **/
 
@@ -43,6 +37,10 @@
 
 #string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuApInitTimeOutInMicroSeconds_HELP  #language en-US "Specifies timeout value in microseconds for the BSP to detect all APs for the first time."
 
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuBootLogicalProcessorNumber_PROMPT  #language en-US "Number of Logical Processors available after platform reset."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuBootLogicalProcessorNumber_HELP  #language en-US "Specifies the number of Logical Processors that are available in the preboot environment after platform reset, including BSP and APs."
+
 #string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuMicrocodePatchAddress_PROMPT  #language en-US "Microcode Region base address."
 
 #string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuMicrocodePatchAddress_HELP  #language en-US "Specifies the base address of the first microcode Patch in the microcode Region."
@@ -53,7 +51,10 @@
 
 #string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuSmmProfileEnable_PROMPT  #language en-US "Enable SMM Profile"
 
-#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuSmmProfileEnable_HELP  #language en-US "Indicates if SMM Profile will be enabled. If enabled, instruction executions in and data accesses to memory outside of SMRAM will be logged. This PCD is only for validation purpose. It should be set to false in production.<BR><BR>\n"
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuSmmProfileEnable_HELP  #language en-US "Indicates if SMM Profile will be enabled.\n"
+                                                                                   "If enabled, instruction executions in and data accesses to memory outside of SMRAM will be logged.\n"
+                                                                                   "It could not be enabled at the same time with SMM static page table feature (PcdCpuSmmStaticPageTable).\n"
+                                                                                   "This PCD is only for validation purpose. It should be set to false in production.<BR><BR>\n"
                                                                                    "TRUE  - SMM Profile will be enabled.<BR>\n"
                                                                                    "FALSE - SMM Profile will be disabled.<BR>"
 
@@ -111,6 +112,10 @@
 
 #string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuSmmStackSize_HELP  #language en-US "Specifies stack size in bytes for each processor in SMM."
 
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuSmmShadowStackSize_PROMPT   #language en-US "Processor shadow stack size in SMM."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuSmmShadowStackSize_HELP   #language en-US "Specifies shadow stack size in bytes for each processor in SMM."
+
 #string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuSmmApSyncTimeout_PROMPT  #language en-US "AP synchronization timeout value in SMM"
 
 #string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuSmmApSyncTimeout_HELP  #language en-US "Specifies timeout value in microseconds for the BSP in SMM to wait for all APs to come into SMM."
@@ -150,8 +155,11 @@
 #string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuSmmStaticPageTable_PROMPT  #language en-US "Use static page table for all memory in SMM."
 
 #string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuSmmStaticPageTable_HELP  #language en-US "Indicates if SMM uses static page table.\n"
-                                                                                     "If enabled, SMM will not use on-demand paging. SMM will build static page table for all memory.<BR><BR>\n"
-                                                                                     "This flag only impacts X64 build, because SMM alway builds static page table for IA32.\n"
+                                                                                     "If enabled, SMM will not use on-demand paging. SMM will build static page table for all memory.\n"
+                                                                                     "This flag only impacts X64 build, because SMM always builds static page table for IA32.\n"
+                                                                                     "It could not be enabled at the same time with SMM profile feature (PcdCpuSmmProfileEnable).\n"
+                                                                                     "It could not be enabled also at the same time with heap guard feature for SMM\n"
+                                                                                     "(PcdHeapGuardPropertyMask in MdeModulePkg).<BR><BR>\n"
                                                                                      "TRUE  - SMM uses static page table for all memory.<BR>\n"
                                                                                      "FALSE - SMM uses static page table for below 4G memory and use on-demand paging for above 4G memory.<BR>"
 
@@ -163,3 +171,110 @@
 
 #string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuMsegSize_HELP  #language en-US "Specifies buffer size in bytes of MSEG. The value should be a multiple of 4KB."
 
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuFeaturesSupport_PROMPT  #language en-US "Supported CPU features."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuFeaturesSupport_HELP  #language en-US "Specifies the supported CPU features bit in array."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuFeaturesInitAfterSmmRelocation_PROMPT  #language en-US "If CPU features will be initialized after SMM relocation."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuFeaturesInitAfterSmmRelocation_HELP  #language en-US "Specifies if CPU features will be initialized after SMM relocation."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuFeaturesInitOnS3Resume_PROMPT  #language en-US "If CPU features will be initialized during S3 resume."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuFeaturesInitOnS3Resume_HELP  #language en-US "Specifies if CPU features will be initialized during S3 resume."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuFeaturesUserConfiguration_PROMPT  #language en-US "User settings for enabling/disabling processor features."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuFeaturesUserConfiguration_HELP  #language en-US "Specifies user's desired settings for enabling/disabling processor features."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuClockModulationDutyCycle_PROMPT  #language en-US "The encoded values for target duty cycle modulation."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuClockModulationDutyCycle_HELP  #language en-US "Specifies the On-demand clock modulation duty cycle when ACPI feature is enabled."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdIsPowerOnReset_PROMPT  #language en-US "Current boot is a power-on reset."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdIsPowerOnReset_HELP  #language en-US "Indicates if the current boot is a power-on reset."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuSmmRestrictedMemoryAccess_PROMPT  #language en-US "Access to non-SMRAM memory is restricted to reserved, runtime and ACPI NVS type after SmmReadyToLock."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuSmmRestrictedMemoryAccess_HELP  #language en-US "Indicate access to non-SMRAM memory is restricted to reserved, runtime and ACPI NVS type after SmmReadyToLock.<BR><BR>\n"
+                                                                                            "MMIO access is always allowed regardless of the value of this PCD.<BR>\n"
+                                                                                            "Loose of such restriction is only required by RAS components in X64 platforms.<BR>\n"
+                                                                                            "The PCD value is considered as constantly TRUE in IA32 platforms.<BR>\n"
+                                                                                            "When the PCD value is TRUE, page table is initialized to cover all memory spaces<BR>\n"
+                                                                                            "and the memory occupied by page table is protected by page table itself as read-only.<BR>\n"
+                                                                                            "In X64 build, it cannot be enabled at the same time with SMM profile feature (PcdCpuSmmProfileEnable).<BR>\n"
+                                                                                            "In X64 build, it could not be enabled also at the same time with heap guard feature for SMM<BR>\n"
+                                                                                            "(PcdHeapGuardPropertyMask in MdeModulePkg).<BR>\n"
+                                                                                            "In IA32 build, page table memory is not marked as read-only when either SMM profile feature (PcdCpuSmmProfileEnable)<BR>\n"
+                                                                                            "or heap guard feature for SMM (PcdHeapGuardPropertyMask in MdeModulePkg) is enabled.<BR>\n"
+                                                                                            "TRUE  - Access to non-SMRAM memory is restricted to reserved, runtime and ACPI NVS type after SmmReadyToLock.<BR>\n"
+                                                                                            "FALSE - Access to any type of non-SMRAM memory after SmmReadyToLock is allowed.<BR>"
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuFeaturesCapability_PROMPT  #language en-US "Processor feature capabilities."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuFeaturesCapability_HELP  #language en-US "Indicates processor feature capabilities, each bit corresponding to a specific feature."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuFeaturesSetting_PROMPT  #language en-US "Actual processor feature settings."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuFeaturesSetting_HELP  #language en-US "Specifies actual settings for processor features, each bit corresponding to a specific feature."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuProcTraceMemSize_PROMPT  #language en-US "Memory size used by Processor Trace feature."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuProcTraceMemSize_HELP  #language en-US "User input the size of memory required when CPU processor trace is enabled.<BR><BR>\n"
+                                                                                   "Processor trace is enabled through set BIT44(CPU_FEATURE_PROC_TRACE) in PcdCpuFeaturesSetting.<BR><BR>\n"
+                                                                                   "This PCD is ignored if CPU processor trace is disabled.<BR><BR>\n"
+                                                                                   "Default value is 0x00 which means 4KB of memory is allocated if CPU processor trace is enabled.<BR>\n"
+                                                                                   "0x0  -  4K.<BR>\n"
+                                                                                   "0x1  -  8K.<BR>\n"
+                                                                                   "0x2  -  16K.<BR>\n"
+                                                                                   "0x3  -  32K.<BR>\n"
+                                                                                   "0x4  -  64K.<BR>\n"
+                                                                                   "0x5  -  128K.<BR>\n"
+                                                                                   "0x6  -  256K.<BR>\n"
+                                                                                   "0x7  -  512K.<BR>\n"
+                                                                                   "0x8  -  1M.<BR>\n"
+                                                                                   "0x9  -  2M.<BR>\n"
+                                                                                   "0xA  -  4M.<BR>\n"
+                                                                                   "0xB  -  8M.<BR>\n"
+                                                                                   "0xC  -  16M.<BR>\n"
+                                                                                   "0xD  -  32M.<BR>\n"
+                                                                                   "0xE  -  64M.<BR>\n"
+                                                                                   "0xF  -  128M.<BR>\n"
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuProcTraceOutputScheme_PROMPT  #language en-US "Processor Trace output scheme type."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuProcTraceOutputScheme_HELP  #language en-US "User input the processor trace output scheme when CPU processor trace is enabled.<BR><BR>\n"
+                                                                                        "Processor trace is enabled through set BIT44(CPU_FEATURE_PROC_TRACE) in PcdCpuFeaturesSetting.<BR><BR>\n"
+                                                                                        "This PCD is ignored if CPU processor trace is disabled.<BR><BR>\n"
+                                                                                        "Default value is 0 which means single range output scheme will be used if CPU processor trace is enabled.<BR>\n"
+                                                                                        "0 - Single Range output scheme.<BR>\n"
+                                                                                        "1 - ToPA(Table of physical address) scheme.<BR>\n"
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuStackSwitchExceptionList_PROMPT  #language en-US "Specify exception vectors which need switching stack."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuStackSwitchExceptionList_HELP  #language en-US "List of exception vectors which need switching stack.\n"
+                                                                                           "This PCD will only take into effect if PcdCpuStackGuard is enabled.n"
+                                                                                           "By default exception #DD(8), #PF(14) are supported.n"
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuKnownGoodStackSize_PROMPT  #language en-US "Specify size of good stack of exception which need switching stack."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuKnownGoodStackSize_HELP  #language en-US "Size of good stack for an exception.\n"
+                                                                                     "This PCD will only take into effect if PcdCpuStackGuard is enabled.\n"
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuCoreCrystalClockFrequency_PROMPT  #language en-US "Specifies CPUID Leaf 0x15 Time Stamp Counter and Nominal Core Crystal Clock Frequency."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuCoreCrystalClockFrequency_HELP  #language en-US "Specifies CPUID Leaf 0x15 Time Stamp Counter and Nominal Core Crystal Clock Frequency.<BR><BR>\n"
+                                                                                            "TSC Frequency = ECX (core crystal clock frequency) * EBX/EAX.<BR><BR>\n"
+                                                                                            "This PCD is the nominal frequency of the core crystal clock in Hz as is CPUID Leaf 0x15:ECX.<BR><BR>\n"
+                                                                                            "Default value is 24000000 for 6th and 7th generation Intel Core processors and Intel Xeon W Processor Family.<BR>\n"
+                                                                                            "25000000  -  Intel Xeon Processor Scalable Family with CPUID signature 06_55H(25MHz).<BR>\n"
+                                                                                            "24000000  -  6th and 7th generation Intel Core processors and Intel Xeon W Processor Family(24MHz).<BR>\n"
+                                                                                            "19200000  -  Intel Atom processors based on Goldmont Microarchitecture with CPUID signature 06_5CH(19.2MHz).<BR>\n"
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuSmmMpTokenCountPerChunk_PROMPT  #language en-US "Specify the count of pre allocated SMM MP tokens per chunk.\n"
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuSmmMpTokenCountPerChunk_HELP    #language en-US "This value used to specify the count of pre allocated SMM MP tokens per chunk.\n"
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuApStatusCheckIntervalInMicroSeconds_PROMPT  #language en-US "Periodic interval value in microseconds for AP status check in DXE.\n"
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuApStatusCheckIntervalInMicroSeconds_HELP    #language en-US "Periodic interval value in microseconds for the status check of APs for StartupAllAPs() and StartupThisAP() executed in non-blocking mode in DXE phase.\n"

@@ -1,16 +1,11 @@
 ## @file
 # This file contain unit test for DecParser
 #
-# Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
-# This program and the accompanying materials are licensed and made available 
-# under the terms and conditions of the BSD License which accompanies this 
-# distribution. The full text of the license may be found at 
-# http://opensource.org/licenses/bsd-license.php
-#
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
 
+from __future__ import print_function
 import os
 import unittest
 
@@ -27,19 +22,19 @@ from Library.ParserValidate import IsValidCFormatGuid
 #
 def TestToolFuncs():
     assert IsValidCArray('{0x1, 0x23}')
-    
+
     # Empty after comma
     assert not IsValidCArray('{0x1, 0x23, }')
-    
+
     # 0x2345 too long
     assert not IsValidCArray('{0x1, 0x2345}')
-    
+
     # Must end with '}'
     assert not IsValidCArray('{0x1, 0x23, ')
-    
+
     # Whitespace between numbers
     assert not IsValidCArray('{0x1, 0x2 3, }')
-    
+
     assert IsValidPcdDatum('VOID*', '"test"')[0]
     assert IsValidPcdDatum('VOID*', 'L"test"')[0]
     assert IsValidPcdDatum('BOOLEAN', 'TRUE')[0]
@@ -47,10 +42,10 @@ def TestToolFuncs():
     assert IsValidPcdDatum('BOOLEAN', '0')[0]
     assert IsValidPcdDatum('BOOLEAN', '1')[0]
     assert IsValidPcdDatum('UINT8', '0xab')[0]
-    
+
     assert not IsValidPcdDatum('UNKNOWNTYPE', '0xabc')[0]
-    assert not IsValidPcdDatum('UINT8', 'not number')[0]   
-    
+    assert not IsValidPcdDatum('UINT8', 'not number')[0]
+
     assert( IsValidCFormatGuid('{ 0xfa0b1735 , 0x87a0, 0x4193, {0xb2, 0x66 , 0x53, 0x8c , 0x38, 0xaf, 0x48, 0xce }}'))
     assert( not IsValidCFormatGuid('{ 0xfa0b1735 , 0x87a0, 0x4193, {0xb2, 0x66 , 0x53, 0x8c , 0x38, 0xaf, 0x48, 0xce }} 0xaa'))
 
@@ -59,19 +54,19 @@ def TestTemplate(TestString, TestFunc):
     Path = os.path.normpath(Path)
     try:
         f = open(Path, 'w')
-        
+
         # Write test string to file
         f.write(TestString)
-        
+
         # Close file
         f.close()
     except:
-        print 'Can not create temporary file [%s]!' % Path
+        print('Can not create temporary file [%s]!' % Path)
         exit(-1)
 
     # Call test function to test
     Ret = TestFunc(Path, TestString)
-    
+
     # Test done, remove temporary file
     os.remove(Path)
     return Ret
@@ -111,13 +106,13 @@ def TestDecDefine():
     assert DefObj.GetPackageName() == 'MdePkg'
     assert DefObj.GetPackageGuid() == '1E73767F-8F52-4603-AEB4-F29B510B6766'
     assert DefObj.GetPackageVersion() == '1.02'
-    
+
     TestString = '''
     [Defines]
       UNKNOW_KEY              = 0x00010005 # A unknown key
     '''
     assert TestTemplate(TestString, TestError)
-    
+
     TestString = '''
     [Defines]
       PACKAGE_GUID                   = F-8F52-4603-AEB4-F29B510B6766 # Error GUID
@@ -137,24 +132,24 @@ def TestDecInclude():
     [Includes.IA32]
       Include/Ia32
     '''
-    
+
     # Create directory in current directory
     try:
         os.makedirs('Include/Ia32')
     except:
         pass
     Parser = TestTemplate(TestString, TestOK)
-    
+
     IncObj = Parser.GetIncludeSectionObject()
     Items = IncObj.GetIncludes()
     assert len(Items) == 1
     assert Items[0].File == 'Include'
-    
+
     Items = IncObj.GetIncludes('IA32')
     assert len(Items) == 1
     # normpath is called in DEC parser so '/' is converted to '\'
     assert Items[0].File == 'Include\\Ia32'
-    
+
     TestString = '''
     [Defines]
       DEC_SPECIFICATION              = 0x00010005
@@ -165,7 +160,7 @@ def TestDecInclude():
       Include_not_exist  # directory does not exist
     '''
     assert TestTemplate(TestString, TestError)
-    
+
     os.removedirs('Include/Ia32')
 
 def TestDecGuidPpiProtocol():
@@ -195,14 +190,14 @@ def TestDecGuidPpiProtocol():
     assert len(Items) == 1
     assert Items[0].GuidCName == 'gEfiGlobalVariableGuid'
     assert Items[0].GuidCValue == '{ 0x8BE4DF61, 0x93CA, 0x11D2, { 0xAA, 0x0D, 0x00, 0xE0, 0x98, 0x03, 0x2B, 0x8C }}'
-    
+
     Obj = Parser.GetProtocolSectionObject()
     Items = Obj.GetProtocols()
     assert Obj.GetSectionName() == 'Protocols'.upper()
     assert len(Items) == 1
     assert Items[0].GuidCName == 'gEfiBdsArchProtocolGuid'
     assert Items[0].GuidCValue == '{ 0x665E3FF6, 0x46CC, 0x11D4, { 0x9A, 0x38, 0x00, 0x90, 0x27, 0x3F, 0xC1, 0x4D }}'
-    
+
     Obj = Parser.GetPpiSectionObject()
     Items = Obj.GetPpis()
     assert Obj.GetSectionName() == 'Ppis'.upper()
@@ -220,19 +215,19 @@ def TestDecPcd():
     [PcdsFeatureFlag]
       ## If TRUE, the component name protocol will not be installed.
       gEfiMdePkgTokenSpaceGuid.PcdComponentNameDisable|FALSE|BOOLEAN|0x0000000d
-      
+
     [PcdsFixedAtBuild]
       ## Indicates the maximum length of unicode string
       gEfiMdePkgTokenSpaceGuid.PcdMaximumUnicodeStringLength|1000000|UINT32|0x00000001
-      
+
     [PcdsFixedAtBuild.IPF]
       ## The base address of IO port space for IA64 arch
       gEfiMdePkgTokenSpaceGuid.PcdIoBlockBaseAddressForIpf|0x0ffffc000000|UINT64|0x0000000f
-      
+
     [PcdsFixedAtBuild,PcdsPatchableInModule]
       ## This flag is used to control the printout of DebugLib
       gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000|UINT32|0x00000006
-      
+
     [PcdsFixedAtBuild,PcdsPatchableInModule,PcdsDynamic]
       ## This value is used to set the base address of pci express hierarchy
       gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0xE0000000|UINT64|0x0000000a
@@ -246,7 +241,7 @@ def TestDecPcd():
     assert Items[0].DefaultValue == 'FALSE'
     assert Items[0].DatumType == 'BOOLEAN'
     assert Items[0].TokenValue == '0x0000000d'
-    
+
     Items = Obj.GetPcdsByType('PcdsFixedAtBuild')
     assert len(Items) == 4
     assert len(Obj.GetPcdsByType('PcdsPatchableInModule')) == 2
@@ -279,6 +274,6 @@ if __name__ == '__main__':
     unittest.FunctionTestCase(TestDecPcd).runTest()
     unittest.FunctionTestCase(TestDecUserExtension).runTest()
 
-    print 'All tests passed...'
+    print('All tests passed...')
 
 

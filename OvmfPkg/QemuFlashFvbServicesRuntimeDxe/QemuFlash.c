@@ -3,13 +3,7 @@
 
   Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials are licensed and made available
-  under the terms and conditions of the BSD License which accompanies this
-  distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -80,35 +74,35 @@ QemuFlashDetected (
   }
 
   if (Offset >= mFdBlockSize) {
-    DEBUG ((EFI_D_INFO, "QEMU Flash: Failed to find probe location\n"));
+    DEBUG ((DEBUG_INFO, "QEMU Flash: Failed to find probe location\n"));
     return FALSE;
   }
 
-  DEBUG ((EFI_D_INFO, "QEMU Flash: Attempting flash detection at %p\n", Ptr));
+  DEBUG ((DEBUG_INFO, "QEMU Flash: Attempting flash detection at %p\n", Ptr));
 
   OriginalUint8 = *Ptr;
   *Ptr = CLEAR_STATUS_CMD;
   ProbeUint8 = *Ptr;
   if (OriginalUint8 != CLEAR_STATUS_CMD &&
       ProbeUint8 == CLEAR_STATUS_CMD) {
-    DEBUG ((EFI_D_INFO, "QemuFlashDetected => FD behaves as RAM\n"));
+    DEBUG ((DEBUG_INFO, "QemuFlashDetected => FD behaves as RAM\n"));
     *Ptr = OriginalUint8;
   } else {
     *Ptr = READ_STATUS_CMD;
     ProbeUint8 = *Ptr;
     if (ProbeUint8 == OriginalUint8) {
-      DEBUG ((EFI_D_INFO, "QemuFlashDetected => FD behaves as ROM\n"));
+      DEBUG ((DEBUG_INFO, "QemuFlashDetected => FD behaves as ROM\n"));
     } else if (ProbeUint8 == READ_STATUS_CMD) {
-      DEBUG ((EFI_D_INFO, "QemuFlashDetected => FD behaves as RAM\n"));
+      DEBUG ((DEBUG_INFO, "QemuFlashDetected => FD behaves as RAM\n"));
       *Ptr = OriginalUint8;
     } else if (ProbeUint8 == CLEARED_ARRAY_STATUS) {
-      DEBUG ((EFI_D_INFO, "QemuFlashDetected => FD behaves as FLASH\n"));
+      DEBUG ((DEBUG_INFO, "QemuFlashDetected => FD behaves as FLASH\n"));
       FlashDetected = TRUE;
       *Ptr = READ_ARRAY_CMD;
     }
   }
 
-  DEBUG ((EFI_D_INFO, "QemuFlashDetected => %a\n",
+  DEBUG ((DEBUG_INFO, "QemuFlashDetected => %a\n",
                       FlashDetected ? "Yes" : "No"));
   return FlashDetected;
 }
@@ -243,6 +237,15 @@ QemuFlashInitialize (
   mFdBlockSize = PcdGet32 (PcdOvmfFirmwareBlockSize);
   ASSERT(PcdGet32 (PcdOvmfFirmwareFdSize) % mFdBlockSize == 0);
   mFdBlockCount = PcdGet32 (PcdOvmfFirmwareFdSize) / mFdBlockSize;
+
+  //
+  // execute module specific hooks before probing the flash
+  //
+  QemuFlashBeforeProbe (
+    (EFI_PHYSICAL_ADDRESS)(UINTN) mFlashBase,
+    mFdBlockSize,
+    mFdBlockCount
+    );
 
   if (!QemuFlashDetected ()) {
     ASSERT (!FeaturePcdGet (PcdSmmSmramRequire));

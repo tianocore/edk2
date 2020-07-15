@@ -4,13 +4,7 @@
 
   Copyright (C) 2012-2014, Red Hat, Inc.
 
-  This program and the accompanying materials are licensed and made available
-  under the terms and conditions of the BSD License which accompanies this
-  distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT
-  WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #ifndef __QEMU_BOOT_ORDER_LIB_H__
@@ -18,6 +12,41 @@
 
 #include <Uefi/UefiBaseType.h>
 #include <Base.h>
+
+
+/**
+  Connect devices based on the boot order retrieved from QEMU.
+
+  Attempt to retrieve the "bootorder" fw_cfg file from QEMU. Translate the
+  OpenFirmware device paths therein to UEFI device path fragments. Connect the
+  devices identified by the UEFI devpath prefixes as narrowly as possible, then
+  connect all their child devices, recursively.
+
+  If this function fails, then platform BDS should fall back to
+  EfiBootManagerConnectAll(), or some other method for connecting any expected
+  boot devices.
+
+  @retval RETURN_SUCCESS            The "bootorder" fw_cfg file has been
+                                    parsed, and the referenced device-subtrees
+                                    have been connected.
+
+  @retval RETURN_UNSUPPORTED        QEMU's fw_cfg is not supported.
+
+  @retval RETURN_NOT_FOUND          Empty or nonexistent "bootorder" fw_cfg
+                                    file.
+
+  @retval RETURN_INVALID_PARAMETER  Parse error in the "bootorder" fw_cfg file.
+
+  @retval RETURN_OUT_OF_RESOURCES   Memory allocation failed.
+
+  @return                           Error statuses propagated from underlying
+                                    functions.
+**/
+RETURN_STATUS
+EFIAPI
+ConnectDevicesFromQemu (
+  VOID
+  );
 
 
 /**
@@ -29,8 +58,8 @@
   translated fragments against the current list of boot options, and rewrite
   the BootOrder NvVar so that it corresponds to the order described in fw_cfg.
 
-  Platform BDS should call this function after EfiBootManagerConnectAll () and
-  EfiBootManagerRefreshAllBootOption () return.
+  Platform BDS should call this function after connecting any expected boot
+  devices and calling EfiBootManagerRefreshAllBootOption ().
 
   @retval RETURN_SUCCESS            BootOrder NvVar rewritten.
 
@@ -49,6 +78,7 @@
 
 **/
 RETURN_STATUS
+EFIAPI
 SetBootOrderFromQemu (
   VOID
   );
@@ -61,6 +91,7 @@ SetBootOrderFromQemu (
   @return  The TimeoutDefault argument for PlatformBdsEnterFrontPage().
 **/
 UINT16
+EFIAPI
 GetFrontPageTimeoutFromQemu (
   VOID
   );

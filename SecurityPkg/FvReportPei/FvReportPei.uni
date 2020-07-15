@@ -1,0 +1,14 @@
+// /** @file
+// FV Verify/Report PEI Driver.
+//
+// Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "This module verifies and reports FVs."
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This module verifies FVs' digest passed through gEdkiiPeiFirmwareVolumeInfoStoredHashFvPpiGuid, "
+                                                        "and installs gEdkiiPeiFirmwareVolumeInfoPrehashedFvPpiGuid, gEfiPeiFirmwareVolumeInfoPpiGuid and/or FV HOB if passed."
+

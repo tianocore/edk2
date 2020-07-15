@@ -1,0 +1,57 @@
+## @file
+# Publishes ESRT table from Firmware Management Protocol instances
+#
+# Copyright (c) 2016, Microsoft Corporation
+# Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
+#
+# All rights reserved.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION     = 0x00010005
+  BASE_NAME       = EsrtFmpDxe
+  MODULE_UNI_FILE = EsrtFmpDxe.uni
+  FILE_GUID       = FF626DA9-17EE-4949-A8B8-B10FA0044E9F
+  MODULE_TYPE     = DXE_DRIVER
+  VERSION_STRING  = 1.0
+  ENTRY_POINT     = EsrtFmpEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  EsrtFmp.c
+  EsrtFmpDebugPrint.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  BaseLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  UefiLib
+  UefiBootServicesTableLib
+  DebugLib
+  PcdLib
+
+[Protocols]
+  gEfiFirmwareManagementProtocolGuid  ## CONSUMES
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSystemFmpCapsuleImageTypeIdGuid  ## CONSUMES
+
+[Guids]
+  gEfiSystemResourceTableGuid  ## PRODUCES
+
+[Depex]
+  TRUE
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  EsrtFmpDxeExtra.uni

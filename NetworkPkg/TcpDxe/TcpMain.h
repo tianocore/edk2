@@ -4,13 +4,7 @@
 
   Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -236,7 +230,7 @@ Tcp4Connect (
   @retval EFI_SUCCESS              The listen token has been queued successfully.
   @retval EFI_NOT_STARTED          The EFI_TCP4_PROTOCOL instance hasn't been
                                    configured.
-  @retval EFI_ACCESS_DENIED        The instatnce is not a passive one or it is not
+  @retval EFI_ACCESS_DENIED        The instance is not a passive one or it is not
                                    in Tcp4StateListen state, or a same listen token
                                    has already existed in the listen token queue of
                                    this TCP instance.
@@ -571,7 +565,7 @@ Tcp6Connect (
   @retval EFI_INVALID_PARAMETER  One or more of the following are TRUE:
                                  - This is NULL.
                                  - ListenToken is NULL.
-                                 - ListentToken->CompletionToken.Event is NULL.
+                                 - ListenToken->CompletionToken.Event is NULL.
   @retval EFI_OUT_OF_RESOURCES   Could not allocate enough resources to finish the operation.
   @retval EFI_DEVICE_ERROR       Any unexpected error not belonging to the error
                                  categories given above.

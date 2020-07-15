@@ -1,17 +1,10 @@
 ## @file
 # GNU/Linux makefile for 'VfrCompile' module build.
 #
-# Copyright (c) 2008 - 2016, Intel Corporation. All rights reserved.<BR>
-# This program and the accompanying materials
-# are licensed and made available under the terms and conditions of the BSD License
-# which accompanies this distribution.  The full text of the license may be found at
-# http://opensource.org/licenses/bsd-license.php
-#
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
-ARCH ?= IA32
 MAKEROOT ?= ..
 
 APPNAME = VfrCompile
@@ -26,6 +19,12 @@ OBJECTS = AParser.o DLexerBase.o ATokenBuffer.o EfiVfrParser.o VfrLexer.o VfrSyn
 
 VFR_CPPFLAGS = -DPCCTS_USE_NAMESPACE_STD $(BUILD_CPPFLAGS)
 
+# keep BUILD_OPTFLAGS last
+VFR_CXXFLAGS = $(BUILD_OPTFLAGS)
+
+# keep EXTRA_LDFLAGS last
+VFR_LFLAGS = $(EXTRA_LDFLAGS)
+
 LINKER = $(BUILD_CXX)
 
 EXTRA_CLEAN_OBJECTS = EfiVfrParser.cpp EfiVfrParser.h VfrParser.dlg VfrTokens.h VfrLexer.cpp VfrLexer.h VfrSyntax.cpp tokens.h
@@ -37,10 +36,10 @@ include $(MAKEROOT)/Makefiles/header.makefile
 APPLICATION = $(MAKEROOT)/bin/$(APPNAME)
 
 .PHONY:all
-all: $(MAKEROOT)/bin $(APPLICATION) 
+all: $(MAKEROOT)/bin $(APPLICATION)
 
-$(APPLICATION): $(OBJECTS) 
-	$(LINKER) -o $(APPLICATION) $(LFLAGS) $(OBJECTS) -L$(MAKEROOT)/libs $(LIBS)
+$(APPLICATION): $(OBJECTS)
+	$(LINKER) -o $(APPLICATION) $(VFR_LFLAGS) $(OBJECTS) -L$(MAKEROOT)/libs $(LIBS)
 
 VfrCompiler.o: ../Include/Common/BuildVersion.h
 
@@ -59,17 +58,17 @@ Pccts/dlg/dlg:
 	BIN_DIR='.' $(MAKE) -C Pccts/dlg
 
 ATokenBuffer.o: Pccts/h/ATokenBuffer.cpp
-	$(BUILD_CXX) -c $(VFR_CPPFLAGS) $(INC) $? -o $@
+	$(BUILD_CXX) -c $(VFR_CPPFLAGS) $(INC) $(VFR_CXXFLAGS) $? -o $@
 
 DLexerBase.o: Pccts/h/DLexerBase.cpp
-	$(BUILD_CXX) -c $(VFR_CPPFLAGS) $(INC) $? -o $@
+	$(BUILD_CXX) -c $(VFR_CPPFLAGS) $(INC) $(VFR_CXXFLAGS) $? -o $@
 
 AParser.o: Pccts/h/AParser.cpp
-	$(BUILD_CXX) -c $(VFR_CPPFLAGS) $(INC) $? -o $@
+	$(BUILD_CXX) -c $(VFR_CPPFLAGS) $(INC) $(VFR_CXXFLAGS) $? -o $@
 
 VfrSyntax.o: VfrSyntax.cpp
-	$(BUILD_CXX) -c $(VFR_CPPFLAGS) $(INC) $? -o $@
-	
+	$(BUILD_CXX) -c $(VFR_CPPFLAGS) $(INC) $(VFR_CXXFLAGS) $? -o $@
+
 clean: localClean
 
 localClean:

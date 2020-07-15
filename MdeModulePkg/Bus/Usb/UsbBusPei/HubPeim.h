@@ -1,16 +1,9 @@
 /** @file
 Constants definitions for Usb Hub Peim
 
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
-  
-This program and the accompanying materials
-are licensed and made available under the terms and conditions
-of the BSD License which accompanies this distribution.  The
-full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -85,7 +78,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define MAXBYTES  8
 #pragma pack(1)
 //
-// Hub descriptor, the last two fields are of variable lenght.
+// Hub descriptor, the last two fields are of variable length.
 //
 typedef struct {
   UINT8 Length;
@@ -145,24 +138,6 @@ PeiHubSetPortFeature (
   IN  UINT8                 Value
   );
 
-/**
-  Set specified feature to a given hub.
-
-  @param  PeiServices   General-purpose services that are available to every PEIM.
-  @param  UsbIoPpi      Indicates the PEI_USB_IO_PPI instance.
-  @param  Value         New feature value.
-
-  @retval EFI_SUCCESS       Port feature is set successfully.
-  @retval EFI_DEVICE_ERROR  Cannot set the port feature due to a hardware error.
-  @retval Others            Other failure occurs.
-
-**/
-EFI_STATUS
-PeiHubSetHubFeature (
-  IN EFI_PEI_SERVICES       **PeiServices,
-  IN PEI_USB_IO_PPI         *UsbIoPpi,
-  IN  UINT8                 Value
-  );
 
 /**
   Get a given hub status.
@@ -227,6 +202,7 @@ PeiHubClearHubFeature (
   Get a given hub descriptor.
 
   @param  PeiServices    General-purpose services that are available to every PEIM.
+  @param  PeiUsbDevice   Indicates the hub controller device.
   @param  UsbIoPpi       Indicates the PEI_USB_IO_PPI instance.
   @param  DescriptorSize The length of Hub Descriptor buffer.
   @param  HubDescriptor  Caller allocated buffer to store the hub descriptor if
@@ -240,6 +216,7 @@ PeiHubClearHubFeature (
 EFI_STATUS
 PeiGetHubDescriptor (
   IN EFI_PEI_SERVICES         **PeiServices,
+  IN PEI_USB_DEVICE           *PeiUsbDevice,
   IN PEI_USB_IO_PPI           *UsbIoPpi,
   IN UINTN                    DescriptorSize,
   OUT EFI_USB_HUB_DESCRIPTOR  *HubDescriptor

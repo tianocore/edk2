@@ -2,14 +2,8 @@
   Main file for DrvCfg shell Driver1 function.
 
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -183,7 +177,7 @@ ConfigToFile(
       STRING_TOKEN(STR_GEN_FILE_OPEN_FAIL),
       gShellDriver1HiiHandle,
       L"drvcfg",
-      FileName, 
+      FileName,
       Status);
     return (SHELL_DEVICE_ERROR);
   }
@@ -199,13 +193,13 @@ ConfigToFile(
 
   if (EFI_ERROR(Status) || HiiDatabase == NULL) {
     ShellPrintHiiEx(
-      -1, 
-      -1, 
+      -1,
+      -1,
       NULL,
-      STRING_TOKEN(STR_GEN_PROTOCOL_NF), 
+      STRING_TOKEN(STR_GEN_PROTOCOL_NF),
       gShellDriver1HiiHandle,
       L"drvcfg",
-      L"EfiHiiDatabaseProtocol", 
+      L"EfiHiiDatabaseProtocol",
       &gEfiHiiDatabaseProtocolGuid);
     ShellCloseFile(&FileHandle);
     return (SHELL_NOT_FOUND);
@@ -215,16 +209,16 @@ ConfigToFile(
   Status = ConvertHandleToHiiHandle(Handle, &HiiHandle, HiiDatabase);
   if (EFI_ERROR(Status)) {
     ShellPrintHiiEx(
-      -1, 
-      -1, 
-      NULL, 
-      STRING_TOKEN(STR_GEN_HANDLE_NOT), 
+      -1,
+      -1,
+      NULL,
+      STRING_TOKEN(STR_GEN_HANDLE_NOT),
       gShellDriver1HiiHandle,
       L"drvcfg",
-      ConvertHandleToHandleIndex(Handle), 
+      ConvertHandleToHandleIndex(Handle),
       L"Device");
     ShellCloseFile(&FileHandle);
-    return (SHELL_DEVICE_ERROR);   
+    return (SHELL_DEVICE_ERROR);
   }
 
   Status = HiiDatabase->ExportPackageLists(HiiDatabase, HiiHandle, &MainBufferSize, MainBuffer);
@@ -240,20 +234,20 @@ ConfigToFile(
 
   if (EFI_ERROR(Status)) {
     ShellPrintHiiEx(
-      -1, 
+      -1,
       -1,
       NULL,
-      STRING_TOKEN(STR_FILE_WRITE_FAIL), 
+      STRING_TOKEN(STR_FILE_WRITE_FAIL),
       gShellDriver1HiiHandle,
       L"drvcfg",
       FileName);
-    return (SHELL_DEVICE_ERROR);   
+    return (SHELL_DEVICE_ERROR);
   }
   ShellPrintHiiEx(
-    -1, 
+    -1,
     -1,
     NULL,
-    STRING_TOKEN(STR_DRVCFG_COMP), 
+    STRING_TOKEN(STR_DRVCFG_COMP),
     gShellDriver1HiiHandle);
 
   return (SHELL_SUCCESS);
@@ -296,9 +290,9 @@ ConfigFromFile(
       -1,
       NULL,
       STRING_TOKEN(STR_GEN_FILE_OPEN_FAIL),
-      gShellDriver1HiiHandle, 
+      gShellDriver1HiiHandle,
       L"drvcfg",
-      FileName, 
+      FileName,
       Status);
     return (SHELL_DEVICE_ERROR);
   }
@@ -314,13 +308,13 @@ ConfigFromFile(
 
   if (EFI_ERROR(Status) || HiiDatabase == NULL) {
     ShellPrintHiiEx(
-      -1, 
-      -1, 
+      -1,
+      -1,
       NULL,
-      STRING_TOKEN(STR_GEN_PROTOCOL_NF), 
-      gShellDriver1HiiHandle, 
+      STRING_TOKEN(STR_GEN_PROTOCOL_NF),
+      gShellDriver1HiiHandle,
       L"drvcfg",
-      L"EfiHiiDatabaseProtocol", 
+      L"EfiHiiDatabaseProtocol",
       &gEfiHiiDatabaseProtocolGuid);
     ShellCloseFile(&FileHandle);
     return (SHELL_NOT_FOUND);
@@ -330,42 +324,42 @@ ConfigFromFile(
   MainBufferSize = (UINTN)Temp;
   if (EFI_ERROR(Status)) {
     ShellPrintHiiEx(
-      -1, 
-      -1, 
-      NULL, 
-      STRING_TOKEN(STR_FILE_READ_FAIL), 
+      -1,
+      -1,
+      NULL,
+      STRING_TOKEN(STR_FILE_READ_FAIL),
       gShellDriver1HiiHandle,
       L"drvcfg",
       FileName);
 
     ShellCloseFile(&FileHandle);
-    return (SHELL_DEVICE_ERROR);   
+    return (SHELL_DEVICE_ERROR);
   }
-  MainBuffer = AllocateZeroPool((UINTN)MainBufferSize);  
+  MainBuffer = AllocateZeroPool((UINTN)MainBufferSize);
   if (EFI_ERROR(Status)) {
     ShellPrintHiiEx(
-      -1, 
-      -1, 
-      NULL, 
-      STRING_TOKEN(STR_GEN_OUT_MEM), 
+      -1,
+      -1,
+      NULL,
+      STRING_TOKEN(STR_GEN_OUT_MEM),
       gShellDriver1HiiHandle, L"drvcfg");
     ShellCloseFile(&FileHandle);
-    return (SHELL_DEVICE_ERROR);   
+    return (SHELL_DEVICE_ERROR);
   }
   Status = ShellReadFile(FileHandle, &MainBufferSize, MainBuffer);
   if (EFI_ERROR(Status)) {
     ShellPrintHiiEx(
-      -1, 
-      -1, 
-      NULL, 
-      STRING_TOKEN(STR_FILE_READ_FAIL), 
-      gShellDriver1HiiHandle, 
+      -1,
+      -1,
+      NULL,
+      STRING_TOKEN(STR_FILE_READ_FAIL),
+      gShellDriver1HiiHandle,
       L"drvcfg",
       FileName);
 
     ShellCloseFile(&FileHandle);
     SHELL_FREE_NON_NULL(MainBuffer);
-    return (SHELL_DEVICE_ERROR);   
+    return (SHELL_DEVICE_ERROR);
   }
 
   ShellCloseFile(&FileHandle);
@@ -378,28 +372,28 @@ ConfigFromFile(
     Status = ConvertHandleToHiiHandle(Handle, &HiiHandle, HiiDatabase);
     if (EFI_ERROR(Status)) {
       ShellPrintHiiEx(
-        -1, 
-        -1, 
-        NULL, 
-        STRING_TOKEN(STR_GEN_HANDLE_NOT), 
+        -1,
+        -1,
+        NULL,
+        STRING_TOKEN(STR_GEN_HANDLE_NOT),
         gShellDriver1HiiHandle, L"drvcfg",
-        ConvertHandleToHandleIndex(Handle), 
+        ConvertHandleToHandleIndex(Handle),
         L"Device");
       ShellCloseFile(&FileHandle);
-      return (SHELL_DEVICE_ERROR);   
+      return (SHELL_DEVICE_ERROR);
     }
     Status = HiiDatabase->UpdatePackageList(HiiDatabase, HiiHandle, MainBuffer);
     if (EFI_ERROR(Status)) {
       ShellPrintHiiEx(
-        -1, 
-        -1, 
-        NULL, 
+        -1,
+        -1,
+        NULL,
         STRING_TOKEN(STR_GEN_UEFI_FUNC_WARN),
         gShellDriver1HiiHandle,
         L"drvcfg",
-        L"HiiDatabase->UpdatePackageList", 
+        L"HiiDatabase->UpdatePackageList",
         Status);
-      return (SHELL_DEVICE_ERROR);   
+      return (SHELL_DEVICE_ERROR);
     }
   } else {
     //
@@ -421,24 +415,24 @@ ConfigFromFile(
                 //
                 TempDevPathString = ConvertDevicePathToText((EFI_DEVICE_PATH_PROTOCOL*)(((CHAR8*)PackageHeader) + sizeof(EFI_HII_PACKAGE_HEADER)), TRUE, TRUE);
                 ShellPrintHiiEx(
-                  -1, 
-                  -1, 
-                  NULL, 
-                  STRING_TOKEN(STR_DRVCFG_IN_FILE_NF), 
-                  gShellDriver1HiiHandle, 
+                  -1,
+                  -1,
+                  NULL,
+                  STRING_TOKEN(STR_DRVCFG_IN_FILE_NF),
+                  gShellDriver1HiiHandle,
                   TempDevPathString);
                 SHELL_FREE_NON_NULL(TempDevPathString);
              } else {
                 Status = HiiDatabase->UpdatePackageList(HiiDatabase, HiiHandle, PackageListHeader);
                 if (EFI_ERROR(Status)) {
                   ShellPrintHiiEx(
-                    -1, 
-                    -1, 
-                    NULL, 
+                    -1,
+                    -1,
+                    NULL,
                     STRING_TOKEN(STR_GEN_UEFI_FUNC_WARN),
-                    gShellDriver1HiiHandle, 
+                    gShellDriver1HiiHandle,
                     L"drvcfg",
-                    L"HiiDatabase->UpdatePackageList", 
+                    L"HiiDatabase->UpdatePackageList",
                     Status);
                   return (SHELL_DEVICE_ERROR);
                 } else {
@@ -446,14 +440,14 @@ ConfigFromFile(
                   gBS->LocateDevicePath(&gEfiHiiConfigAccessProtocolGuid, &DevPath, &Handle);
                   HandleIndex = ConvertHandleToHandleIndex(Handle);
                   ShellPrintHiiEx(
-                    -1, 
-                    -1, 
-                    NULL, 
-                    STRING_TOKEN(STR_DRVCFG_DONE_HII), 
-                    gShellDriver1HiiHandle, 
+                    -1,
+                    -1,
+                    NULL,
+                    STRING_TOKEN(STR_DRVCFG_DONE_HII),
+                    gShellDriver1HiiHandle,
                     HandleIndex);
                 }
-              }              
+              }
             }
         }
     }
@@ -463,10 +457,10 @@ ConfigFromFile(
 
 
   ShellPrintHiiEx(
-    -1, 
+    -1,
     -1,
     NULL,
-    STRING_TOKEN(STR_DRVCFG_COMP), 
+    STRING_TOKEN(STR_DRVCFG_COMP),
     gShellDriver1HiiHandle);
   return (SHELL_SUCCESS);
 }
@@ -593,22 +587,22 @@ PreHiiDrvCfg (
       -1,
       -1,
       NULL,
-      STRING_TOKEN (STR_DRVCFG_FORCE_D), 
-      gShellDriver1HiiHandle, 
+      STRING_TOKEN (STR_DRVCFG_FORCE_D),
+      gShellDriver1HiiHandle,
       DefaultType);
   } else if (ValidateOptions) {
     ShellPrintHiiEx(
       -1,
       -1,
       NULL,
-      STRING_TOKEN (STR_DRVCFG_VALIDATE), 
+      STRING_TOKEN (STR_DRVCFG_VALIDATE),
       gShellDriver1HiiHandle);
   } else if (SetOptions) {
     ShellPrintHiiEx(
       -1,
       -1,
       NULL,
-      STRING_TOKEN (STR_DRVCFG_SET), 
+      STRING_TOKEN (STR_DRVCFG_SET),
       gShellDriver1HiiHandle);
   }
 
@@ -619,8 +613,8 @@ PreHiiDrvCfg (
       goto Done;
     }
     for (
-      HandleBuffer = DriverImageHandleBuffer, DriverImageHandleCount = 0 
-      ; HandleBuffer != NULL && *HandleBuffer != NULL 
+      HandleBuffer = DriverImageHandleBuffer, DriverImageHandleCount = 0
+      ; HandleBuffer != NULL && *HandleBuffer != NULL
       ; HandleBuffer++,DriverImageHandleCount++);
   } else {
     DriverImageHandleCount = 1;
@@ -666,7 +660,7 @@ PreHiiDrvCfg (
       ShellStatus = SHELL_UNSUPPORTED;
       continue;
     }
-    
+
     BestLanguage = GetBestLanguage (
                           DriverConfiguration->SupportedLanguages,
                           Iso639Language,
@@ -725,7 +719,7 @@ PreHiiDrvCfg (
           -1,
           -1,
           NULL,
-          STRING_TOKEN (STR_DRVCFG_OPTIONS_SET), 
+          STRING_TOKEN (STR_DRVCFG_OPTIONS_SET),
           gShellDriver1HiiHandle);
         for (LoopCounter = 0; LoopCounter < HandleCount; LoopCounter++) {
           if ((HandleType[LoopCounter] & HR_CONTROLLER_HANDLE) == HR_CONTROLLER_HANDLE) {
@@ -742,8 +736,8 @@ PreHiiDrvCfg (
           -1,
           -1,
           NULL,
-          STRING_TOKEN (STR_DRVCFG_NOT_SET), 
-          gShellDriver1HiiHandle, 
+          STRING_TOKEN (STR_DRVCFG_NOT_SET),
+          gShellDriver1HiiHandle,
           Status);
       }
       continue;
@@ -784,7 +778,7 @@ PreHiiDrvCfg (
               -1,
               -1,
               NULL,
-              STRING_TOKEN (STR_DRVCFG_DEF_FORCED), 
+              STRING_TOKEN (STR_DRVCFG_DEF_FORCED),
               gShellDriver1HiiHandle);
             ShellCmdDriverConfigurationProcessActionRequired (
               DriverImageHandleBuffer[OuterLoopCounter],
@@ -797,8 +791,8 @@ PreHiiDrvCfg (
               -1,
               -1,
               NULL,
-              STRING_TOKEN (STR_DRVCFG_FORCE_FAILED), 
-              gShellDriver1HiiHandle, 
+              STRING_TOKEN (STR_DRVCFG_FORCE_FAILED),
+              gShellDriver1HiiHandle,
               Status);
            ShellStatus = SHELL_DEVICE_ERROR;
          }
@@ -814,15 +808,15 @@ PreHiiDrvCfg (
               -1,
               -1,
               NULL,
-              STRING_TOKEN (STR_DRVCFG_OPTIONS_VALID), 
+              STRING_TOKEN (STR_DRVCFG_OPTIONS_VALID),
               gShellDriver1HiiHandle);
           } else {
             ShellPrintHiiEx(
               -1,
               -1,
               NULL,
-              STRING_TOKEN (STR_DRVCFG_OPTIONS_INV), 
-              gShellDriver1HiiHandle, 
+              STRING_TOKEN (STR_DRVCFG_OPTIONS_INV),
+              gShellDriver1HiiHandle,
               Status);
             ShellStatus = SHELL_DEVICE_ERROR;
           }
@@ -853,7 +847,7 @@ PreHiiDrvCfg (
               -1,
               -1,
               NULL,
-              STRING_TOKEN (STR_DRVCFG_OPTIONS_SET), 
+              STRING_TOKEN (STR_DRVCFG_OPTIONS_SET),
               gShellDriver1HiiHandle);
 
             ShellCmdDriverConfigurationProcessActionRequired (
@@ -868,8 +862,8 @@ PreHiiDrvCfg (
               -1,
               -1,
               NULL,
-              STRING_TOKEN (STR_DRVCFG_NOT_SET), 
-              gShellDriver1HiiHandle, 
+              STRING_TOKEN (STR_DRVCFG_NOT_SET),
+              gShellDriver1HiiHandle,
               Status);
             ShellStatus = SHELL_DEVICE_ERROR;
           }
@@ -931,7 +925,7 @@ PreHiiDrvCfg (
               -1,
               -1,
               NULL,
-              STRING_TOKEN (STR_DRVCFG_DEF_FORCED), 
+              STRING_TOKEN (STR_DRVCFG_DEF_FORCED),
               gShellDriver1HiiHandle);
 
             ShellCmdDriverConfigurationProcessActionRequired (
@@ -946,8 +940,8 @@ PreHiiDrvCfg (
               -1,
               -1,
               NULL,
-              STRING_TOKEN (STR_DRVCFG_FORCE_FAILED), 
-              gShellDriver1HiiHandle, 
+              STRING_TOKEN (STR_DRVCFG_FORCE_FAILED),
+              gShellDriver1HiiHandle,
               Status);
             ShellStatus = SHELL_DEVICE_ERROR;
           }
@@ -963,15 +957,15 @@ PreHiiDrvCfg (
               -1,
               -1,
               NULL,
-              STRING_TOKEN (STR_DRVCFG_OPTIONS_VALID), 
+              STRING_TOKEN (STR_DRVCFG_OPTIONS_VALID),
               gShellDriver1HiiHandle);
           } else {
             ShellPrintHiiEx(
               -1,
               -1,
               NULL,
-              STRING_TOKEN (STR_DRVCFG_OPTIONS_INV), 
-              gShellDriver1HiiHandle, 
+              STRING_TOKEN (STR_DRVCFG_OPTIONS_INV),
+              gShellDriver1HiiHandle,
               Status);
             ShellStatus = SHELL_DEVICE_ERROR;
           }
@@ -1004,7 +998,7 @@ PreHiiDrvCfg (
               -1,
               -1,
               NULL,
-              STRING_TOKEN (STR_DRVCFG_OPTIONS_SET), 
+              STRING_TOKEN (STR_DRVCFG_OPTIONS_SET),
               gShellDriver1HiiHandle);
 
             ShellCmdDriverConfigurationProcessActionRequired (
@@ -1019,8 +1013,8 @@ PreHiiDrvCfg (
               -1,
               -1,
               NULL,
-              STRING_TOKEN (STR_DRVCFG_NOT_SET), 
-              gShellDriver1HiiHandle, 
+              STRING_TOKEN (STR_DRVCFG_NOT_SET),
+              gShellDriver1HiiHandle,
               Status);
             ShellStatus = SHELL_DEVICE_ERROR;
           }
@@ -1081,11 +1075,11 @@ PrintConfigInfoOnAll(
       Found = TRUE;
       Index2 = *CurrentHandle == NULL ? 0 : ConvertHandleToHandleIndex(*CurrentHandle);
       ShellPrintHiiEx(
-        -1, 
-        -1, 
-        NULL, 
-        STRING_TOKEN (STR_DRVCFG_LINE_HII), 
-        gShellDriver1HiiHandle, 
+        -1,
+        -1,
+        NULL,
+        STRING_TOKEN (STR_DRVCFG_LINE_HII),
+        gShellDriver1HiiHandle,
         Index2
         );
     }
@@ -1203,7 +1197,7 @@ ShellCommandRunDrvCfg (
         ASSERT(FALSE);
       }
     }
-  } 
+  }
   if (ShellStatus == SHELL_SUCCESS) {
     if (ShellCommandLineGetCount(Package) > 4) {
       ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDriver1HiiHandle, L"drvcfg");
@@ -1236,24 +1230,24 @@ ShellCommandRunDrvCfg (
     }
 
     if (InFromFile && EFI_ERROR(ShellFileExists(FileName))) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_FIND_FAIL), gShellDriver1HiiHandle, L"drvcfg", FileName);  
-      ShellStatus = SHELL_INVALID_PARAMETER;
-      goto Done;      
-    }
-    if (OutToFile && !EFI_ERROR(ShellFileExists(FileName))) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_EXIST), gShellDriver1HiiHandle, L"drvcfg", FileName);  
-      ShellStatus = SHELL_INVALID_PARAMETER;
-      goto Done;      
-    }
-    if (Force && ForceTypeString == NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_VALUE), gShellDriver1HiiHandle, L"drvcfg", L"-f");  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_FIND_FAIL), gShellDriver1HiiHandle, L"drvcfg", FileName);
       ShellStatus = SHELL_INVALID_PARAMETER;
       goto Done;
-    } 
+    }
+    if (OutToFile && !EFI_ERROR(ShellFileExists(FileName))) {
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_EXIST), gShellDriver1HiiHandle, L"drvcfg", FileName);
+      ShellStatus = SHELL_INVALID_PARAMETER;
+      goto Done;
+    }
+    if (Force && ForceTypeString == NULL) {
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_VALUE), gShellDriver1HiiHandle, L"drvcfg", L"-f");
+      ShellStatus = SHELL_INVALID_PARAMETER;
+      goto Done;
+    }
     if (Force) {
       Status = ShellConvertStringToUint64(ForceTypeString, &Intermediate, FALSE, FALSE);
       if (EFI_ERROR(Status)) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM_VAL), gShellDriver1HiiHandle, L"drvcfg", ForceTypeString, L"-f");  
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM_VAL), gShellDriver1HiiHandle, L"drvcfg", ForceTypeString, L"-f");
         ShellStatus = SHELL_INVALID_PARAMETER;
         goto Done;
       }
@@ -1266,7 +1260,7 @@ ShellCommandRunDrvCfg (
     if (HandleIndex1 != NULL && !EFI_ERROR(ShellConvertStringToUint64(HandleIndex1, &Intermediate, TRUE, FALSE))) {
       Handle1 = ConvertHandleIndexToHandle((UINTN)Intermediate);
       if (Handle1 == NULL || (UINT64)(UINTN)Intermediate != Intermediate) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, L"drvcfg", HandleIndex1);  
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, L"drvcfg", HandleIndex1);
         ShellStatus = SHELL_INVALID_PARAMETER;
         goto Done;
       }
@@ -1276,7 +1270,7 @@ ShellCommandRunDrvCfg (
     if (HandleIndex2 != NULL && !EFI_ERROR(ShellConvertStringToUint64(HandleIndex2, &Intermediate, TRUE, FALSE))) {
       Handle2 = ConvertHandleIndexToHandle((UINTN)Intermediate);
       if (Handle2 == NULL || (UINT64)(UINTN)Intermediate != Intermediate) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, L"drvcfg", HandleIndex2);  
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, L"drvcfg", HandleIndex2);
         ShellStatus = SHELL_INVALID_PARAMETER;
         goto Done;
       }
@@ -1286,7 +1280,7 @@ ShellCommandRunDrvCfg (
     if (HandleIndex3 != NULL && !EFI_ERROR(ShellConvertStringToUint64(HandleIndex3, &Intermediate, TRUE, FALSE))) {
       Handle3 = ConvertHandleIndexToHandle((UINTN)Intermediate);
       if (Handle3 == NULL || (UINT64)(UINTN)Intermediate != Intermediate) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, L"drvcfg", HandleIndex3);  
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, L"drvcfg", HandleIndex3);
         ShellStatus = SHELL_INVALID_PARAMETER;
         goto Done;
       }
@@ -1294,42 +1288,42 @@ ShellCommandRunDrvCfg (
 
     if ((InFromFile || OutToFile) && (FileName == NULL)) {
       if (FileName == NULL) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_VALUE), gShellDriver1HiiHandle, L"drvcfg",  InFromFile?L"-i":L"-o");  
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_VALUE), gShellDriver1HiiHandle, L"drvcfg",  InFromFile?L"-i":L"-o");
       } else {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_HANDLE_REQ), gShellDriver1HiiHandle, L"drvcfg");  
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_HANDLE_REQ), gShellDriver1HiiHandle, L"drvcfg");
       }
       ShellStatus = SHELL_INVALID_PARAMETER;
       goto Done;
     }
     if (!UseHii && (InFromFile || OutToFile)) {
       if (InFromFile) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDriver1HiiHandle, L"drvcfg", L"-i");  
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDriver1HiiHandle, L"drvcfg", L"-i");
         ShellStatus = SHELL_INVALID_PARAMETER;
         goto Done;
-      } 
+      }
       if (OutToFile) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDriver1HiiHandle, L"drvcfg", L"-o");  
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDriver1HiiHandle, L"drvcfg", L"-o");
         ShellStatus = SHELL_INVALID_PARAMETER;
         goto Done;
       }
     }
     if (Validate && Force) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_CONFLICT), gShellDriver1HiiHandle, L"drvcfg", L"-v", L"-f");  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_CONFLICT), gShellDriver1HiiHandle, L"drvcfg", L"-v", L"-f");
       ShellStatus = SHELL_INVALID_PARAMETER;
       goto Done;
-    } 
+    }
     if (Validate && Set) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_CONFLICT), gShellDriver1HiiHandle, L"drvcfg", L"-v", L"-s");  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_CONFLICT), gShellDriver1HiiHandle, L"drvcfg", L"-v", L"-s");
       ShellStatus = SHELL_INVALID_PARAMETER;
       goto Done;
-    } 
+    }
     if (Set && Force) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_CONFLICT), gShellDriver1HiiHandle, L"drvcfg", L"-s", L"-f");  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_CONFLICT), gShellDriver1HiiHandle, L"drvcfg", L"-s", L"-f");
       ShellStatus = SHELL_INVALID_PARAMETER;
       goto Done;
     }
     if (OutToFile && InFromFile) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_CONFLICT), gShellDriver1HiiHandle, L"drvcfg", L"-i", L"-o");  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_CONFLICT), gShellDriver1HiiHandle, L"drvcfg", L"-i", L"-o");
       ShellStatus = SHELL_INVALID_PARAMETER;
       goto Done;
     }
@@ -1365,11 +1359,11 @@ ShellCommandRunDrvCfg (
       } else {
         if (!EFI_ERROR(gBS->OpenProtocol(Handle1, &gEfiHiiConfigAccessProtocolGuid, NULL, gImageHandle, NULL, EFI_OPEN_PROTOCOL_TEST_PROTOCOL))) {
           ShellPrintHiiEx(
-            -1, 
-            -1, 
-            NULL, 
-            STRING_TOKEN (STR_DRVCFG_LINE_HII), 
-            gShellDriver1HiiHandle, 
+            -1,
+            -1,
+            NULL,
+            STRING_TOKEN (STR_DRVCFG_LINE_HII),
+            gShellDriver1HiiHandle,
             ConvertHandleToHandleIndex(Handle1)
             );
           goto Done;
@@ -1399,7 +1393,7 @@ ShellCommandRunDrvCfg (
         -1,
         NULL,
         STRING_TOKEN (STR_DRVCFG_NOT_SUPPORT),
-        gShellDriver1HiiHandle, 
+        gShellDriver1HiiHandle,
         ConvertHandleToHandleIndex(Handle1)
         );
     }

@@ -1,23 +1,17 @@
 /** @file
   This file declares GUIDed section extraction protocol.
 
-  This interface provides a means of decoding a GUID defined encapsulation 
+  This interface provides a means of decoding a GUID defined encapsulation
   section. There may be multiple different GUIDs associated with the GUIDed
   section extraction protocol. That is, all instances of the GUIDed section
   extraction protocol must have the same interface structure.
-  
+
   @par Revision Reference: PI
   Version 1.00.
-  
-  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials are licensed and made available
-  under the terms and conditions of the BSD License which accompanies this
-  distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -25,7 +19,7 @@
 #define __EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL_H__
 
 //
-// Forward reference for pure ANSI compatability
+// Forward reference for pure ANSI compatibility
 
 typedef struct _EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL;
 
@@ -56,10 +50,10 @@ typedef struct _EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL EFI_GUIDED_SECTION_EXTRAC
   EFI_TPL above TPL_NOTIFY is undefined. Type EFI_TPL is
   defined in RaiseTPL() in the UEFI 2.0 specification.
 
-  
+
   @param This   Indicates the
                 EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL instance.
-  
+
   @param InputSection Buffer containing the input GUIDed section
                       to be processed. OutputBuffer OutputBuffer
                       is allocated from boot services pool
@@ -124,7 +118,7 @@ EFI_STATUS
 
 
 /**
-  
+
   Takes the GUIDed section as input and produces the section
   stream data. See the ExtractSection() function description.
 

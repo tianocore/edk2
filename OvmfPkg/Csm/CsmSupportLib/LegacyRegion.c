@@ -3,13 +3,7 @@
 
   Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials are
-  licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -52,35 +46,35 @@ STATIC LEGACY_MEMORY_SECTION_INFO   mSectionArray[] = {
 };
 
 STATIC PAM_REGISTER_VALUE  mRegisterValues440[] = {
-  {REG_PAM1_OFFSET_440, 0x01, 0x02},
-  {REG_PAM1_OFFSET_440, 0x10, 0x20},
-  {REG_PAM2_OFFSET_440, 0x01, 0x02},
-  {REG_PAM2_OFFSET_440, 0x10, 0x20},
-  {REG_PAM3_OFFSET_440, 0x01, 0x02},
-  {REG_PAM3_OFFSET_440, 0x10, 0x20},
-  {REG_PAM4_OFFSET_440, 0x01, 0x02},
-  {REG_PAM4_OFFSET_440, 0x10, 0x20},
-  {REG_PAM5_OFFSET_440, 0x01, 0x02},
-  {REG_PAM5_OFFSET_440, 0x10, 0x20},
-  {REG_PAM6_OFFSET_440, 0x01, 0x02},
-  {REG_PAM6_OFFSET_440, 0x10, 0x20},
-  {REG_PAM0_OFFSET_440, 0x10, 0x20}
+  {PMC_REGISTER_PIIX4 (PIIX4_PAM1), 0x01, 0x02},
+  {PMC_REGISTER_PIIX4 (PIIX4_PAM1), 0x10, 0x20},
+  {PMC_REGISTER_PIIX4 (PIIX4_PAM2), 0x01, 0x02},
+  {PMC_REGISTER_PIIX4 (PIIX4_PAM2), 0x10, 0x20},
+  {PMC_REGISTER_PIIX4 (PIIX4_PAM3), 0x01, 0x02},
+  {PMC_REGISTER_PIIX4 (PIIX4_PAM3), 0x10, 0x20},
+  {PMC_REGISTER_PIIX4 (PIIX4_PAM4), 0x01, 0x02},
+  {PMC_REGISTER_PIIX4 (PIIX4_PAM4), 0x10, 0x20},
+  {PMC_REGISTER_PIIX4 (PIIX4_PAM5), 0x01, 0x02},
+  {PMC_REGISTER_PIIX4 (PIIX4_PAM5), 0x10, 0x20},
+  {PMC_REGISTER_PIIX4 (PIIX4_PAM6), 0x01, 0x02},
+  {PMC_REGISTER_PIIX4 (PIIX4_PAM6), 0x10, 0x20},
+  {PMC_REGISTER_PIIX4 (PIIX4_PAM0), 0x10, 0x20}
 };
 
 STATIC PAM_REGISTER_VALUE  mRegisterValuesQ35[] = {
-  {REG_PAM1_OFFSET_Q35, 0x01, 0x02},
-  {REG_PAM1_OFFSET_Q35, 0x10, 0x20},
-  {REG_PAM2_OFFSET_Q35, 0x01, 0x02},
-  {REG_PAM2_OFFSET_Q35, 0x10, 0x20},
-  {REG_PAM3_OFFSET_Q35, 0x01, 0x02},
-  {REG_PAM3_OFFSET_Q35, 0x10, 0x20},
-  {REG_PAM4_OFFSET_Q35, 0x01, 0x02},
-  {REG_PAM4_OFFSET_Q35, 0x10, 0x20},
-  {REG_PAM5_OFFSET_Q35, 0x01, 0x02},
-  {REG_PAM5_OFFSET_Q35, 0x10, 0x20},
-  {REG_PAM6_OFFSET_Q35, 0x01, 0x02},
-  {REG_PAM6_OFFSET_Q35, 0x10, 0x20},
-  {REG_PAM0_OFFSET_Q35, 0x10, 0x20}
+  {DRAMC_REGISTER_Q35 (MCH_PAM1), 0x01, 0x02},
+  {DRAMC_REGISTER_Q35 (MCH_PAM1), 0x10, 0x20},
+  {DRAMC_REGISTER_Q35 (MCH_PAM2), 0x01, 0x02},
+  {DRAMC_REGISTER_Q35 (MCH_PAM2), 0x10, 0x20},
+  {DRAMC_REGISTER_Q35 (MCH_PAM3), 0x01, 0x02},
+  {DRAMC_REGISTER_Q35 (MCH_PAM3), 0x10, 0x20},
+  {DRAMC_REGISTER_Q35 (MCH_PAM4), 0x01, 0x02},
+  {DRAMC_REGISTER_Q35 (MCH_PAM4), 0x10, 0x20},
+  {DRAMC_REGISTER_Q35 (MCH_PAM5), 0x01, 0x02},
+  {DRAMC_REGISTER_Q35 (MCH_PAM5), 0x10, 0x20},
+  {DRAMC_REGISTER_Q35 (MCH_PAM6), 0x01, 0x02},
+  {DRAMC_REGISTER_Q35 (MCH_PAM6), 0x10, 0x20},
+  {DRAMC_REGISTER_Q35 (MCH_PAM0), 0x10, 0x20}
 };
 
 STATIC PAM_REGISTER_VALUE *mRegisterValues;
@@ -145,12 +139,12 @@ LegacyRegionManipulationInternal (
     if (ReadEnable != NULL) {
       if (*ReadEnable) {
         PciOr8 (
-          PCI_LIB_ADDRESS(PAM_PCI_BUS, PAM_PCI_DEV, PAM_PCI_FUNC, mRegisterValues[Index].PAMRegOffset),
+          mRegisterValues[Index].PAMRegPciLibAddress,
           mRegisterValues[Index].ReadEnableData
           );
       } else {
         PciAnd8 (
-          PCI_LIB_ADDRESS(PAM_PCI_BUS, PAM_PCI_DEV, PAM_PCI_FUNC, mRegisterValues[Index].PAMRegOffset),
+          mRegisterValues[Index].PAMRegPciLibAddress,
           (UINT8) (~mRegisterValues[Index].ReadEnableData)
           );
       }
@@ -158,12 +152,12 @@ LegacyRegionManipulationInternal (
     if (WriteEnable != NULL) {
       if (*WriteEnable) {
         PciOr8 (
-          PCI_LIB_ADDRESS(PAM_PCI_BUS, PAM_PCI_DEV, PAM_PCI_FUNC, mRegisterValues[Index].PAMRegOffset),
+          mRegisterValues[Index].PAMRegPciLibAddress,
           mRegisterValues[Index].WriteEnableData
           );
       } else {
         PciAnd8 (
-          PCI_LIB_ADDRESS(PAM_PCI_BUS, PAM_PCI_DEV, PAM_PCI_FUNC, mRegisterValues[Index].PAMRegOffset),
+          mRegisterValues[Index].PAMRegPciLibAddress,
           (UINT8) (~mRegisterValues[Index].WriteEnableData)
           );
       }
@@ -204,7 +198,7 @@ LegacyRegionGetInfoInternal (
   //
   *DescriptorCount = sizeof(mSectionArray) / sizeof (mSectionArray[0]);
   for (Index = 0; Index < *DescriptorCount; Index++) {
-    PamValue = PciRead8 (PCI_LIB_ADDRESS(PAM_PCI_BUS, PAM_PCI_DEV, PAM_PCI_FUNC, mRegisterValues[Index].PAMRegOffset));
+    PamValue = PciRead8 (mRegisterValues[Index].PAMRegPciLibAddress);
     mSectionArray[Index].ReadEnabled = FALSE;
     if ((PamValue & mRegisterValues[Index].ReadEnableData) != 0) {
       mSectionArray[Index].ReadEnabled = TRUE;
@@ -483,7 +477,7 @@ LegacyRegionInit (
     mRegisterValues = mRegisterValuesQ35;
     break;
   default:
-    DEBUG ((EFI_D_ERROR, "%a: Unknown Host Bridge Device ID: 0x%04x\n",
+    DEBUG ((DEBUG_ERROR, "%a: Unknown Host Bridge Device ID: 0x%04x\n",
             __FUNCTION__, HostBridgeDevId));
     ASSERT (FALSE);
     return RETURN_UNSUPPORTED;

@@ -1,12 +1,6 @@
 ;------------------------------------------------------------------------------ ;
-; Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
-; This program and the accompanying materials
-; are licensed and made available under the terms and conditions of the BSD License
-; which accompanies this distribution.  The full text of the license may be found at
-; http://opensource.org/licenses/bsd-license.php.
-;
-; THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-; WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+; Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
+; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;
 ; Module Name:
 ;
@@ -18,8 +12,10 @@
 ;
 ;-------------------------------------------------------------------------------
 
+%include "StuffRsbNasm.inc"
+
 ;
-; Variables referrenced by C code
+; Variables referenced by C code
 ;
 
 %define MSR_IA32_MISC_ENABLE 0x1A0
@@ -61,6 +57,11 @@ global ASM_PFX(gcStmSmiHandlerTemplate)
 global ASM_PFX(gcStmSmiHandlerSize)
 global ASM_PFX(gcStmSmiHandlerOffset)
 
+ASM_PFX(gStmSmbase)      EQU StmSmbasePatch - 4
+ASM_PFX(gStmSmiStack)    EQU StmSmiStackPatch - 4
+ASM_PFX(gStmSmiCr3)      EQU StmSmiCr3Patch - 4
+ASM_PFX(gStmXdSupported) EQU StmXdSupportedPatch - 1
+
     DEFAULT REL
     SECTION .text
 
@@ -76,8 +77,8 @@ _StmSmiEntryPoint:
 o32 lgdt    [cs:bx]                       ; lgdt fword ptr cs:[bx]
     mov     ax, PROTECT_MODE_CS
     mov     [cs:bx-0x2],ax
-    DB      0x66, 0xbf                   ; mov edi, SMBASE
-ASM_PFX(gStmSmbase): DD 0
+o32 mov     edi, strict dword 0
+StmSmbasePatch:
     lea     eax, [edi + (@ProtectedMode - _StmSmiEntryPoint) + 0x8000]
     mov     [cs:bx-0x6],eax
     mov     ebx, cr0
@@ -97,14 +98,14 @@ o16 mov     es, ax
 o16 mov     fs, ax
 o16 mov     gs, ax
 o16 mov     ss, ax
-    DB      0xbc                   ; mov esp, imm32
-ASM_PFX(gStmSmiStack): DD 0
+    mov     esp, strict dword 0
+StmSmiStackPatch:
     jmp     ProtFlatMode
 
 BITS 64
 ProtFlatMode:
-    DB      0xb8                        ; mov eax, offset gStmSmiCr3
-ASM_PFX(gStmSmiCr3): DD 0
+    mov     eax, strict dword 0
+StmSmiCr3Patch:
     mov     cr3, rax
     mov     eax, 0x668                   ; as cr4.PGE is not set here, refresh cr3
     mov     cr4, rax                    ; in PreModifyMtrrs() to flush TLB.
@@ -119,8 +120,8 @@ ASM_PFX(gStmSmiCr3): DD 0
     ltr     ax
 
 ; enable NXE if supported
-    DB      0xb0                        ; mov al, imm8
-ASM_PFX(gStmXdSupported):     DB      1
+    mov al, strict byte 1
+StmXdSupportedPatch:
     cmp     al, 0
     jz      @SkipXd
 ;
@@ -159,7 +160,8 @@ Base:
     mov     cr0, rbx
     retf
 @LongMode:                              ; long mode (64-bit code) starts here
-    mov     rax, ASM_PFX(gStmSmiHandlerIdtr)
+    mov     rax, strict qword 0         ;  mov     rax, ASM_PFX(gStmSmiHandlerIdtr)
+StmSmiEntrySmiHandlerIdtrAbsAddr:
     lidt    [rax]
     lea     ebx, [rdi + DSC_OFFSET]
     mov     ax, [rbx + DSC_DS]
@@ -170,7 +172,9 @@ Base:
     mov     gs, eax
     mov     ax, [rbx + DSC_SS]
     mov     ss, eax
-
+    mov     rax, strict qword 0           ;   mov     rax, CommonHandler
+StmSmiEntryCommonHandlerAbsAddr:
+    jmp     rax
 CommonHandler:
     mov     rbx, [rsp + 0x08]             ; rbx <- CpuIndex
 
@@ -178,34 +182,29 @@ CommonHandler:
     ; Save FP registers
     ;
     sub     rsp, 0x200
-    DB      0x48                         ; FXSAVE64
-    fxsave  [rsp]
+    fxsave64 [rsp]
 
     add     rsp, -0x20
 
     mov     rcx, rbx
-    mov     rax, CpuSmmDebugEntry
-    call    rax
+    call    ASM_PFX(CpuSmmDebugEntry)
 
     mov     rcx, rbx
-    mov     rax, SmiRendezvous          ; rax <- absolute addr of SmiRedezvous
-    call    rax
+    call    ASM_PFX(SmiRendezvous)
 
     mov     rcx, rbx
-    mov     rax, CpuSmmDebugExit
-    call    rax
+    call    ASM_PFX(CpuSmmDebugExit)
 
     add     rsp, 0x20
 
     ;
     ; Restore FP registers
     ;
-    DB      0x48                         ; FXRSTOR64
-    fxrstor [rsp]
+    fxrstor64 [rsp]
 
     add     rsp, 0x200
 
-    mov     rax, ASM_PFX(gStmXdSupported)
+    lea     rax, [ASM_PFX(gStmXdSupported)]
     mov     al, [rax]
     cmp     al, 0
     jz      .1
@@ -218,6 +217,7 @@ CommonHandler:
     wrmsr
 
 .1:
+    StuffRsb64
     rsm
 
 _StmSmiHandler:
@@ -225,7 +225,7 @@ _StmSmiHandler:
 ; Check XD disable bit
 ;
     xor     r8, r8
-    mov     rax, ASM_PFX(gStmXdSupported)
+    lea     rax, [ASM_PFX(gStmXdSupported)]
     mov     al, [rax]
     cmp     al, 0
     jz      @StmXdDone
@@ -246,8 +246,8 @@ _StmSmiHandler:
 
     ; below step is needed, because STM does not run above code.
     ; we have to run below code to set IDT/CR0/CR4
-
-    mov     rax, ASM_PFX(gStmSmiHandlerIdtr)
+    mov     rax, strict qword 0        ;  mov     rax, ASM_PFX(gStmSmiHandlerIdtr)
+StmSmiHandlerIdtrAbsAddr:
     lidt    [rax]
 
     mov     rax, cr0
@@ -261,3 +261,16 @@ _StmSmiHandler:
 
 ASM_PFX(gcStmSmiHandlerSize)   : DW      $ - _StmSmiEntryPoint
 ASM_PFX(gcStmSmiHandlerOffset) : DW      _StmSmiHandler - _StmSmiEntryPoint
+
+global ASM_PFX(SmmCpuFeaturesLibStmSmiEntryFixupAddress)
+ASM_PFX(SmmCpuFeaturesLibStmSmiEntryFixupAddress):
+    lea    rax, [ASM_PFX(gStmSmiHandlerIdtr)]
+    lea    rcx, [StmSmiEntrySmiHandlerIdtrAbsAddr]
+    mov    qword [rcx - 8], rax
+    lea    rcx, [StmSmiHandlerIdtrAbsAddr]
+    mov    qword [rcx - 8], rax
+
+    lea    rax, [CommonHandler]
+    lea    rcx, [StmSmiEntryCommonHandlerAbsAddr]
+    mov    qword [rcx - 8], rax
+    ret

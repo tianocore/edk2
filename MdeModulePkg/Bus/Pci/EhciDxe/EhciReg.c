@@ -3,13 +3,7 @@
   The EHCI register operation routines.
 
 Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -65,7 +59,7 @@ EhcReadCapRegister (
 **/
 UINT32
 EhcReadDbgRegister (
-  IN  USB2_HC_DEV         *Ehc,
+  IN  CONST USB2_HC_DEV   *Ehc,
   IN  UINT32              Offset
   )
 {
@@ -87,6 +81,59 @@ EhcReadDbgRegister (
   }
 
   return Data;
+}
+
+
+/**
+  Check whether the host controller has an in-use debug port.
+
+  @param[in] Ehc         The Enhanced Host Controller to query.
+
+  @param[in] PortNumber  If PortNumber is not NULL, then query whether
+                         PortNumber is an in-use debug port on Ehc. (PortNumber
+                         is taken in UEFI notation, i.e., zero-based.)
+                         Otherwise, query whether Ehc has any in-use debug
+                         port.
+
+  @retval TRUE   PortNumber is an in-use debug port on Ehc (if PortNumber is
+                 not NULL), or some port on Ehc is an in-use debug port
+                 (otherwise).
+
+  @retval FALSE  PortNumber is not an in-use debug port on Ehc (if PortNumber
+                 is not NULL), or no port on Ehc is an in-use debug port
+                 (otherwise).
+**/
+BOOLEAN
+EhcIsDebugPortInUse (
+  IN CONST USB2_HC_DEV *Ehc,
+  IN CONST UINT8       *PortNumber OPTIONAL
+  )
+{
+  UINT32 State;
+
+  if (Ehc->DebugPortNum == 0) {
+    //
+    // The host controller has no debug port.
+    //
+    return FALSE;
+  }
+
+  //
+  // The Debug Port Number field in HCSPARAMS is one-based.
+  //
+  if (PortNumber != NULL && *PortNumber != Ehc->DebugPortNum - 1) {
+    //
+    // The caller specified a port, but it's not the debug port of the host
+    // controller.
+    //
+    return FALSE;
+  }
+
+  //
+  // Deduce usage from the Control Register.
+  //
+  State = EhcReadDbgRegister(Ehc, 0);
+  return (State & USB_DEBUG_PORT_IN_USE_MASK) == USB_DEBUG_PORT_IN_USE_MASK;
 }
 
 
@@ -372,29 +419,7 @@ EhcEnablePeriodSchd (
 }
 
 
-/**
-  Disable periodic schedule.
 
-  @param  Ehc               The EHCI device.
-  @param  Timeout           Time to wait before abort (in millisecond, ms).
-
-  @retval EFI_SUCCESS       Periodic schedule is disabled.
-  @retval EFI_DEVICE_ERROR  Fail to disable periodic schedule.
-
-**/
-EFI_STATUS
-EhcDisablePeriodSchd (
-  IN USB2_HC_DEV          *Ehc,
-  IN UINT32               Timeout
-  )
-{
-  EFI_STATUS              Status;
-
-  EhcClearOpRegBit (Ehc, EHC_USBCMD_OFFSET, USBCMD_ENABLE_PERIOD);
-
-  Status = EhcWaitOpRegBit (Ehc, EHC_USBSTS_OFFSET, USBSTS_PERIOD_ENABLED, FALSE, Timeout);
-  return Status;
-}
 
 
 
@@ -424,29 +449,7 @@ EhcEnableAsyncSchd (
 
 
 
-/**
-  Disable asynchrounous schedule.
 
-  @param  Ehc          The EHCI device.
-  @param  Timeout      Time to wait before abort (in millisecond, ms).
-
-  @retval EFI_SUCCESS  The asynchronous schedule is disabled.
-  @return Others       Failed to disable the asynchronous schedule.
-
-**/
-EFI_STATUS
-EhcDisableAsyncSchd (
-  IN USB2_HC_DEV          *Ehc,
-  IN UINT32               Timeout
-  )
-{
-  EFI_STATUS  Status;
-
-  EhcClearOpRegBit (Ehc, EHC_USBCMD_OFFSET, USBCMD_ENABLE_ASYNC);
-
-  Status = EhcWaitOpRegBit (Ehc, EHC_USBSTS_OFFSET, USBSTS_ASYNC_ENABLED, FALSE, Timeout);
-  return Status;
-}
 
 
 

@@ -3,14 +3,8 @@
   this utility will print out the statistics information. You can use console
   redirection to capture the data.
 
-  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -26,10 +20,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/VariableFormat.h>
 #include <Guid/SmmVariableCommon.h>
 #include <Guid/PiSmmCommunicationRegionTable.h>
-#include <Protocol/SmmCommunication.h>
+#include <Protocol/MmCommunication2.h>
 #include <Protocol/SmmVariable.h>
 
-EFI_SMM_COMMUNICATION_PROTOCOL  *mSmmCommunication = NULL;
+EFI_MM_COMMUNICATION2_PROTOCOL  *mMmCommunication2 = NULL;
 
 /**
   This function get the variable statistics data from SMM variable driver.
@@ -47,7 +41,7 @@ EFI_SMM_COMMUNICATION_PROTOCOL  *mSmmCommunication = NULL;
 EFI_STATUS
 EFIAPI
 GetVariableStatisticsData (
-  IN OUT  EFI_SMM_COMMUNICATE_HEADER  *SmmCommunicateHeader,
+  IN OUT  EFI_MM_COMMUNICATE_HEADER   *SmmCommunicateHeader,
   IN OUT  UINTN                       *SmmCommunicateSize
   )
 {
@@ -55,12 +49,15 @@ GetVariableStatisticsData (
   SMM_VARIABLE_COMMUNICATE_HEADER     *SmmVariableFunctionHeader;
 
   CopyGuid (&SmmCommunicateHeader->HeaderGuid, &gEfiSmmVariableProtocolGuid);
-  SmmCommunicateHeader->MessageLength = *SmmCommunicateSize - OFFSET_OF (EFI_SMM_COMMUNICATE_HEADER, Data);
+  SmmCommunicateHeader->MessageLength = *SmmCommunicateSize - OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data);
 
   SmmVariableFunctionHeader = (SMM_VARIABLE_COMMUNICATE_HEADER *) &SmmCommunicateHeader->Data[0];
   SmmVariableFunctionHeader->Function = SMM_VARIABLE_FUNCTION_GET_STATISTICS;
 
-  Status = mSmmCommunication->Communicate (mSmmCommunication, SmmCommunicateHeader, SmmCommunicateSize);
+  Status = mMmCommunication2->Communicate (mMmCommunication2,
+                                           SmmCommunicateHeader,
+                                           SmmCommunicateHeader,
+                                           SmmCommunicateSize);
   ASSERT_EFI_ERROR (Status);
 
   Status = SmmVariableFunctionHeader->ReturnStatus;
@@ -82,7 +79,7 @@ PrintInfoFromSmm (
 {
   EFI_STATUS                                     Status;
   VARIABLE_INFO_ENTRY                            *VariableInfo;
-  EFI_SMM_COMMUNICATE_HEADER                     *CommBuffer;
+  EFI_MM_COMMUNICATE_HEADER                      *CommBuffer;
   UINTN                                          RealCommSize;
   UINTN                                          CommSize;
   SMM_VARIABLE_COMMUNICATE_HEADER                *FunctionHeader;
@@ -98,7 +95,7 @@ PrintInfoFromSmm (
     return Status;
   }
 
-  Status = gBS->LocateProtocol (&gEfiSmmCommunicationProtocolGuid, NULL, (VOID **) &mSmmCommunication);
+  Status = gBS->LocateProtocol (&gEfiMmCommunication2ProtocolGuid, NULL, (VOID **) &mMmCommunication2);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -123,7 +120,7 @@ PrintInfoFromSmm (
         if (Size > MaxSize) {
           MaxSize = Size;
           RealCommSize = MaxSize;
-          CommBuffer = (EFI_SMM_COMMUNICATE_HEADER *) (UINTN) Entry->PhysicalStart;
+          CommBuffer = (EFI_MM_COMMUNICATE_HEADER *) (UINTN) Entry->PhysicalStart;
         }
       }
     }
@@ -132,7 +129,7 @@ PrintInfoFromSmm (
   ASSERT (CommBuffer != NULL);
   ZeroMem (CommBuffer, RealCommSize);
 
-  Print (L"Non-Volatile SMM Variables:\n");
+  Print (L"SMM Driver Non-Volatile Variables:\n");
   do {
     CommSize = RealCommSize;
     Status = GetVariableStatisticsData (CommBuffer, &CommSize);
@@ -161,7 +158,7 @@ PrintInfoFromSmm (
     }
   } while (TRUE);
 
-  Print (L"Volatile SMM Variables:\n");
+  Print (L"SMM Driver Volatile Variables:\n");
   ZeroMem (CommBuffer, RealCommSize);
   do {
     CommSize = RealCommSize;
@@ -213,24 +210,18 @@ UefiMain (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS            Status;
+  EFI_STATUS            RuntimeDxeStatus;
+  EFI_STATUS            SmmStatus;
   VARIABLE_INFO_ENTRY   *VariableInfo;
   VARIABLE_INFO_ENTRY   *Entry;
 
-  Status = EfiGetSystemConfigurationTable (&gEfiVariableGuid, (VOID **)&Entry);
-  if (EFI_ERROR (Status) || (Entry == NULL)) {
-    Status = EfiGetSystemConfigurationTable (&gEfiAuthenticatedVariableGuid, (VOID **)&Entry);
+  RuntimeDxeStatus = EfiGetSystemConfigurationTable (&gEfiVariableGuid, (VOID **) &Entry);
+  if (EFI_ERROR (RuntimeDxeStatus) || (Entry == NULL)) {
+    RuntimeDxeStatus = EfiGetSystemConfigurationTable (&gEfiAuthenticatedVariableGuid, (VOID **) &Entry);
   }
 
-  if (EFI_ERROR (Status) || (Entry == NULL)) {
-    Status = PrintInfoFromSmm ();
-    if (!EFI_ERROR (Status)) {
-      return Status;
-    }
-  }
-
-  if (!EFI_ERROR (Status) && (Entry != NULL)) {
-    Print (L"Non-Volatile EFI Variables:\n");
+  if (!EFI_ERROR (RuntimeDxeStatus) && (Entry != NULL)) {
+    Print (L"Runtime DXE Driver Non-Volatile EFI Variables:\n");
     VariableInfo = Entry;
     do {
       if (!VariableInfo->Volatile) {
@@ -248,7 +239,7 @@ UefiMain (
       VariableInfo = VariableInfo->Next;
     } while (VariableInfo != NULL);
 
-    Print (L"Volatile EFI Variables:\n");
+    Print (L"Runtime DXE Driver Volatile EFI Variables:\n");
     VariableInfo = Entry;
     do {
       if (VariableInfo->Volatile) {
@@ -264,14 +255,19 @@ UefiMain (
       }
       VariableInfo = VariableInfo->Next;
     } while (VariableInfo != NULL);
+  }
 
-  } else {
+  SmmStatus = PrintInfoFromSmm ();
+
+  if (EFI_ERROR (RuntimeDxeStatus) && EFI_ERROR (SmmStatus)) {
     Print (L"Warning: Variable Dxe/Smm driver doesn't enable the feature of statistical information!\n");
     Print (L"If you want to see this info, please:\n");
     Print (L"  1. Set PcdVariableCollectStatistics as TRUE\n");
     Print (L"  2. Rebuild Variable Dxe/Smm driver\n");
     Print (L"  3. Run \"VariableInfo\" cmd again\n");
+
+    return EFI_NOT_FOUND;
   }
 
-  return Status;
+  return EFI_SUCCESS;
 }

@@ -1,23 +1,18 @@
 ## @file
 # This file is used to define common parser functions for meta-data
 #
-# Copyright (c) 2008 - 2014, Intel Corporation. All rights reserved.<BR>
-# This program and the accompanying materials
-# are licensed and made available under the terms and conditions of the BSD License
-# which accompanies this distribution.  The full text of the license may be found at
-# http://opensource.org/licenses/bsd-license.php
-#
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
+from __future__ import absolute_import
 import Common.LongFilePathOs as os
 from CommonDataClass.DataClass import *
-from EccToolError import *
+from Ecc.EccToolError import *
 from Common.MultipleWorkspace import MultipleWorkspace as mws
-import EccGlobalData
+from Ecc import EccGlobalData
 import re
-## Get the inlcude path list for a source file
+## Get the include path list for a source file
 #
 # 1. Find the source file belongs to which inf file
 # 2. Find the inf's package
@@ -87,16 +82,16 @@ def GetTableList(FileModelList, Table, Db):
 # @param FileName:      FileName of the comment
 #
 def ParseHeaderCommentSection(CommentList, FileName = None):
-    
+
     Abstract = ''
     Description = ''
     Copyright = ''
     License = ''
     EndOfLine = "\n"
     STR_HEADER_COMMENT_START = "@file"
-    
+
     #
-    # used to indicate the state of processing header comment section of dec, 
+    # used to indicate the state of processing header comment section of dec,
     # inf files
     #
     HEADER_COMMENT_NOT_STARTED = -1
@@ -112,16 +107,16 @@ def ParseHeaderCommentSection(CommentList, FileName = None):
     #
     Last = 0
     HeaderCommentStage = HEADER_COMMENT_NOT_STARTED
-    for Index in xrange(len(CommentList)-1, 0, -1):
+    for Index in range(len(CommentList) - 1, 0, -1):
         Line = CommentList[Index][0]
         if _IsCopyrightLine(Line):
             Last = Index
             break
-    
+
     for Item in CommentList:
         Line = Item[0]
         LineNo = Item[1]
-        
+
         if not Line.startswith('#') and Line:
             SqlStatement = """ select ID from File where FullPath like '%s'""" % FileName
             ResultSet = EccGlobalData.gDb.TblFile.Exec(SqlStatement)
@@ -131,14 +126,14 @@ def ParseHeaderCommentSection(CommentList, FileName = None):
         Comment = CleanString2(Line)[1]
         Comment = Comment.strip()
         #
-        # if there are blank lines between License or Description, keep them as they would be 
+        # if there are blank lines between License or Description, keep them as they would be
         # indication of different block; or in the position that Abstract should be, also keep it
         # as it indicates that no abstract
         #
         if not Comment and HeaderCommentStage not in [HEADER_COMMENT_LICENSE, \
                                                       HEADER_COMMENT_DESCRIPTION, HEADER_COMMENT_ABSTRACT]:
             continue
-        
+
         if HeaderCommentStage == HEADER_COMMENT_NOT_STARTED:
             if Comment.startswith(STR_HEADER_COMMENT_START):
                 HeaderCommentStage = HEADER_COMMENT_ABSTRACT
@@ -152,39 +147,39 @@ def ParseHeaderCommentSection(CommentList, FileName = None):
                 if not Comment:
                     Abstract = ''
                     HeaderCommentStage = HEADER_COMMENT_DESCRIPTION
-                elif _IsCopyrightLine(Comment):                    
+                elif _IsCopyrightLine(Comment):
                     Copyright += Comment + EndOfLine
                     HeaderCommentStage = HEADER_COMMENT_COPYRIGHT
-                else:                    
+                else:
                     Abstract += Comment + EndOfLine
                     HeaderCommentStage = HEADER_COMMENT_DESCRIPTION
             elif HeaderCommentStage == HEADER_COMMENT_DESCRIPTION:
                 #
                 # in case there is no description
-                #                
-                if _IsCopyrightLine(Comment):                    
+                #
+                if _IsCopyrightLine(Comment):
                     Copyright += Comment + EndOfLine
                     HeaderCommentStage = HEADER_COMMENT_COPYRIGHT
                 else:
-                    Description += Comment + EndOfLine                
+                    Description += Comment + EndOfLine
             elif HeaderCommentStage == HEADER_COMMENT_COPYRIGHT:
-                if _IsCopyrightLine(Comment):                    
+                if _IsCopyrightLine(Comment):
                     Copyright += Comment + EndOfLine
                 else:
                     #
                     # Contents after copyright line are license, those non-copyright lines in between
-                    # copyright line will be discarded 
+                    # copyright line will be discarded
                     #
                     if LineNo > Last:
                         if License:
                             License += EndOfLine
                         License += Comment + EndOfLine
-                        HeaderCommentStage = HEADER_COMMENT_LICENSE                
+                        HeaderCommentStage = HEADER_COMMENT_LICENSE
             else:
                 if not Comment and not License:
                     continue
                 License += Comment + EndOfLine
-    
+
     if not Copyright.strip():
         SqlStatement = """ select ID from File where FullPath like '%s'""" % FileName
         ResultSet = EccGlobalData.gDb.TblFile.Exec(SqlStatement)
@@ -198,19 +193,19 @@ def ParseHeaderCommentSection(CommentList, FileName = None):
         for Result in ResultSet:
             Msg = 'Header comment section must have license information'
             EccGlobalData.gDb.TblReport.Insert(ERROR_DOXYGEN_CHECK_FILE_HEADER, Msg, "File", Result[0])
-                       
+
     if not Abstract.strip() or Abstract.find('Component description file') > -1:
         SqlStatement = """ select ID from File where FullPath like '%s'""" % FileName
         ResultSet = EccGlobalData.gDb.TblFile.Exec(SqlStatement)
         for Result in ResultSet:
             Msg = 'Header comment section must have Abstract information.'
             EccGlobalData.gDb.TblReport.Insert(ERROR_DOXYGEN_CHECK_FILE_HEADER, Msg, "File", Result[0])
-                     
+
     return Abstract.strip(), Description.strip(), Copyright.strip(), License.strip()
 
 ## _IsCopyrightLine
-# check whether current line is copyright line, the criteria is whether there is case insensitive keyword "Copyright" 
-# followed by zero or more white space characters followed by a "(" character 
+# check whether current line is copyright line, the criteria is whether there is case insensitive keyword "Copyright"
+# followed by zero or more white space characters followed by a "(" character
 #
 # @param LineContent:  the line need to be checked
 # @return: True if current line is copyright line, False else
@@ -218,11 +213,11 @@ def ParseHeaderCommentSection(CommentList, FileName = None):
 def _IsCopyrightLine (LineContent):
     LineContent = LineContent.upper()
     Result = False
-    
+
     ReIsCopyrightRe = re.compile(r"""(^|\s)COPYRIGHT *\(""", re.DOTALL)
     if ReIsCopyrightRe.search(LineContent):
         Result = True
-        
+
     return Result
 
 
@@ -232,7 +227,7 @@ def _IsCopyrightLine (LineContent):
 # Remove spaces
 #
 # @param Line:              The string to be cleaned
-# @param CommentCharacter:  Comment char, used to ignore comment content, 
+# @param CommentCharacter:  Comment char, used to ignore comment content,
 #                           default is DataType.TAB_COMMENT_SPLIT
 #
 def CleanString2(Line, CommentCharacter='#', AllowCppStyleComment=False):

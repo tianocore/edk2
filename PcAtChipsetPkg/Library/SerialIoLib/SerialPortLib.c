@@ -1,14 +1,8 @@
 /** @file
   UART Serial Port library functions
 
-  Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -58,13 +52,13 @@ UINT8   gBreakSet = 0;
 
 /**
   Initialize the serial device hardware.
-  
+
   If no initialization is required, then return RETURN_SUCCESS.
   If the serial device was successfully initialized, then return RETURN_SUCCESS.
   If the serial device could not be initialized, then return RETURN_DEVICE_ERROR.
-  
+
   @retval RETURN_SUCCESS        The serial device was initialized.
-  @retval RETURN_DEVICE_ERROR   The serail device could not be initialized.
+  @retval RETURN_DEVICE_ERROR   The serial device could not be initialized.
 
 **/
 RETURN_STATUS
@@ -86,7 +80,7 @@ SerialPortInitialize (
   // Calculate divisor for baud generator
   //
   Divisor = 115200 / gBps;
-  
+
   //
   // Set communications format
   //
@@ -102,20 +96,20 @@ SerialPortInitialize (
   //
   // Switch back to bank 0
   //
-  OutputData = (UINT8) ((~DLAB << 7) | (gBreakSet << 6) | (gParity << 3) | (gStop << 2) | Data);
+  OutputData = (UINT8) ( (gBreakSet << 6) | (gParity << 3) | (gStop << 2) | Data);
   IoWrite8 (gUartBase + LCR_OFFSET, OutputData);
 
   return RETURN_SUCCESS;
 }
 
 /**
-  Write data from buffer to serial device. 
- 
-  Writes NumberOfBytes data bytes from Buffer to the serial device.  
+  Write data from buffer to serial device.
+
+  Writes NumberOfBytes data bytes from Buffer to the serial device.
   The number of bytes actually written to the serial device is returned.
   If the return value is less than NumberOfBytes, then the write operation failed.
 
-  If Buffer is NULL, then ASSERT(). 
+  If Buffer is NULL, then ASSERT().
 
   If NumberOfBytes is zero, then return 0.
 
@@ -123,7 +117,7 @@ SerialPortInitialize (
   @param  NumberOfBytes    Number of bytes to written to the serial device.
 
   @retval 0                NumberOfBytes is 0.
-  @retval >0               The number of bytes written to the serial device.  
+  @retval >0               The number of bytes written to the serial device.
                            If this value is less than NumberOfBytes, then the write operation failed.
 
 **/
@@ -145,7 +139,7 @@ SerialPortWrite (
 
   while ((NumberOfBytes--) != 0) {
     //
-    // Wait for the serail port to be ready.
+    // Wait for the serial port to be ready.
     //
     do {
       Data = IoRead8 ((UINT16) gUartBase + LSR_OFFSET);
@@ -164,7 +158,7 @@ SerialPortWrite (
   @param  NumberOfBytes    Number of bytes to read from the serial device.
 
   @retval 0                NumberOfBytes is 0.
-  @retval >0               The number of bytes read from the serial device.  
+  @retval >0               The number of bytes read from the serial device.
                            If this value is less than NumberOfBytes, then the read operation failed.
 
 **/
@@ -186,7 +180,7 @@ SerialPortRead (
 
   while ((NumberOfBytes--) != 0) {
     //
-    // Wait for the serail port to be ready.
+    // Wait for the serial port to be ready.
     //
     do {
       Data = IoRead8 ((UINT16) gUartBase + LSR_OFFSET);
@@ -201,7 +195,7 @@ SerialPortRead (
 /**
   Polls a serial device to see if there is any data waiting to be read.
 
-  Polls aserial device to see if there is any data waiting to be read.
+  Polls a serial device to see if there is any data waiting to be read.
   If there is data waiting to be read from the serial device, then TRUE is returned.
   If there is no data waiting to be read from the serial device, then FALSE is returned.
 
@@ -345,13 +339,13 @@ SerialPortGetControl (
 }
 
 /**
-  Sets the baud rate, receive FIFO depth, transmit/receice time out, parity,
+  Sets the baud rate, receive FIFO depth, transmit/receive time out, parity,
   data bits, and stop bits on a serial device.
 
   @param BaudRate           The requested baud rate. A BaudRate value of 0 will use the
                             device's default interface speed.
                             On output, the value actually set.
-  @param ReveiveFifoDepth   The requested depth of the FIFO on the receive side of the
+  @param ReceiveFifoDepth   The requested depth of the FIFO on the receive side of the
                             serial interface. A ReceiveFifoDepth value of 0 will use
                             the device's default FIFO depth.
                             On output, the value actually set.
@@ -364,7 +358,7 @@ SerialPortGetControl (
                             DefaultParity will use the device's default parity value.
                             On output, the value actually set.
   @param DataBits           The number of data bits to use on the serial device. A DataBits
-                            vaule of 0 will use the device's default data bit setting.
+                            value of 0 will use the device's default data bit setting.
                             On output, the value actually set.
   @param StopBits           The number of stop bits to use on this serial device. A StopBits
                             value of DefaultStopBits will use the device's default number of
@@ -481,7 +475,7 @@ SerialPortSetAttributes (
   //
   // Switch back to bank 0
   //
-  OutputData = (UINT8) ((~DLAB << 7) | (gBreakSet << 6) | (LcrParity << 3) | (LcrStop << 2) | LcrData);
+  OutputData = (UINT8) ((gBreakSet << 6) | (LcrParity << 3) | (LcrStop << 2) | LcrData);
   IoWrite8 (gUartBase + LCR_OFFSET, OutputData);
 
   return RETURN_SUCCESS;

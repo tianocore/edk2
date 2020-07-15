@@ -3,14 +3,8 @@
   based on the "Universal Serial Bus Mass Storage Class Bulk-Only
   Transport" Revision 1.0, September 31, 1999.
 
-Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -20,14 +14,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 extern USB_MASS_TRANSPORT mUsbBotTransport;
 
 //
-// Usb Bulk-Only class specfic request
+// Usb Bulk-Only class specific request
 //
 #define USB_BOT_RESET_REQUEST    0xFF       ///< Bulk-Only Mass Storage Reset
 #define USB_BOT_GETLUN_REQUEST   0xFE       ///< Get Max Lun
 #define USB_BOT_CBW_SIGNATURE    0x43425355 ///< dCBWSignature, tag the packet as CBW
 #define USB_BOT_CSW_SIGNATURE    0x53425355 ///< dCSWSignature, tag the packet as CSW
 #define USB_BOT_MAX_LUN          0x0F       ///< Lun number is from 0 to 15
-#define USB_BOT_MAX_CMDLEN       16         ///< Maxium number of command from command set
+#define USB_BOT_MAX_CMDLEN       16         ///< Maximum number of command from command set
 
 //
 // Usb BOT command block status values
@@ -43,7 +37,7 @@ extern USB_MASS_TRANSPORT mUsbBotTransport;
 
 //
 // Usb Bot wait device reset complete, set by experience
-//  
+//
 #define USB_BOT_RESET_DEVICE_STALL  (100 * USB_MASS_1_MILLISECOND)
 
 //

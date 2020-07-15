@@ -1,15 +1,9 @@
 /** @file
   EDK II specific HII relative definition.
 
-  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials are licensed and made available
-  under the terms and conditions of the BSD License which accompanies this
-  distribution.  The full text of the license may be found at
-    http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -207,15 +201,33 @@ typedef struct _EFI_IFR_GUID_VAREQNAME {
   /// For vareqval (0x100), NameId is 0x100.
   /// This value will convert to a Unicode String following this rule;
   ///            sprintf(StringBuffer, "%d", NameId) .
-  /// The the Unicode String will be used as a EFI Variable Name.
+  /// The Unicode String will be used as a EFI Variable Name.
   ///
   UINT16              NameId;
 } EFI_IFR_GUID_VAREQNAME;
+
+///
+/// EDKII implementation extension GUID, used to indicate there are bit fields in the varstore.
+///
+#define EDKII_IFR_BIT_VARSTORE_GUID \
+  { 0x82DDD68B, 0x9163, 0x4187, {0x9B, 0x27, 0x20, 0xA8, 0xFD, 0x60 ,0xA7, 0x1D}}
+
+///
+/// EDKII implementation extension flags, used to indicate the display style and bit width for bit filed storage.
+/// Two high bits for display style and the low six bits for bit width.
+///
+#define EDKII_IFR_DISPLAY_BIT            0xC0
+#define EDKII_IFR_DISPLAY_INT_DEC_BIT    0x00
+#define EDKII_IFR_DISPLAY_UINT_DEC_BIT   0x40
+#define EDKII_IFR_DISPLAY_UINT_HEX_BIT   0x80
+
+#define EDKII_IFR_NUMERIC_SIZE_BIT       0x3F
 
 #pragma pack()
 
 extern EFI_GUID gEfiIfrTianoGuid;
 extern EFI_GUID gEfiIfrFrameworkGuid;
+extern EFI_GUID gEdkiiIfrBitVarStoreGuid;
 
 #endif
 

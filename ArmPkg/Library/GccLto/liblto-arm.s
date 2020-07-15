@@ -1,13 +1,7 @@
 //
 // Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
 //
-// This program and the accompanying materials are licensed and made available under
-// the terms and conditions of the BSD License that accompanies this distribution.
-// The full text of the license may be found at
-// http://opensource.org/licenses/bsd-license.php.
-//
-// THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-// WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+// SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 
 //
@@ -21,41 +15,41 @@
 // pruned again if no other references to them exist.
 //
 
-	.long	memcpy - .
-	.long	memset - .
-	.long	__stack_chk_fail - .
-	.long	__stack_chk_guard - .
-	.long __ashrdi3 - .
-	.long __ashldi3 - .
-	.long __aeabi_idiv - .
-	.long __aeabi_idivmod - .
-	.long __aeabi_uidiv - .
-	.long __aeabi_uidivmod - .
-	.long __divdi3 - .
-	.long __divsi3 - .
-	.long __lshrdi3 - .
-	.long __aeabi_memcpy - .
-	.long __aeabi_memset - .
-	.long memmove - .
-	.long __modsi3 - .
-	.long __moddi3 - .
-	.long __muldi3 - .
-	.long __aeabi_lmul - .
-	.long __ARM_ll_mullu - .
-	.long __udivsi3 - .
-	.long __umodsi3 - .
-	.long __udivdi3 - .
-	.long __umoddi3 - .
-	.long __udivmoddi4 - .
-	.long __clzsi2 - .
-	.long __ctzsi2 - .
-	.long __ucmpdi2 - .
-	.long __switch8 - .
-	.long __switchu8 - .
-	.long __switch16 - .
-	.long __switch32 - .
-	.long __aeabi_ulcmp - .
-	.long __aeabi_uldivmod - .
-	.long __aeabi_ldivmod - .
-	.long __aeabi_llsr - .
-	.long __aeabi_llsl - .
+  .long memcpy - .
+  .long memset - .
+  .long __stack_chk_fail - .
+  .long __stack_chk_guard - .
+  .long __ashrdi3 - .
+  .long __ashldi3 - .
+  .long __aeabi_idiv - .
+  .long __aeabi_idivmod - .
+  .long __aeabi_uidiv - .
+  .long __aeabi_uidivmod - .
+  .long __divdi3 - .
+  .long __divsi3 - .
+  .long __lshrdi3 - .
+  .long __aeabi_memcpy - .
+  .long __aeabi_memset - .
+  .long memmove - .
+  .long __modsi3 - .
+  .long __moddi3 - .
+  .long __muldi3 - .
+  .long __aeabi_lmul - .
+  .long __ARM_ll_mullu - .
+  .long __udivsi3 - .
+  .long __umodsi3 - .
+  .long __udivdi3 - .
+  .long __umoddi3 - .
+  .long __udivmoddi4 - .
+  .long __clzsi2 - .
+  .long __ctzsi2 - .
+  .long __ucmpdi2 - .
+  .long __switch8 - .
+  .long __switchu8 - .
+  .long __switch16 - .
+  .long __switch32 - .
+  .long __aeabi_ulcmp - .
+  .long __aeabi_uldivmod - .
+  .long __aeabi_ldivmod - .
+  .long __aeabi_llsr - .
+  .long __aeabi_llsl - .

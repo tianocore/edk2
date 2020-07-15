@@ -2,14 +2,8 @@
 
     Unified interface for RootHub and Hub.
 
-Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR> 
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -201,42 +195,7 @@ UsbHubCtrlClearTTBuffer (
 }
 
 /**
-  Usb hub control transfer to get the super speed hub descriptor.
-
-  @param  HubDev                The hub device.
-  @param  Buf                   The buffer to hold the descriptor.
-
-  @retval EFI_SUCCESS           The hub descriptor is retrieved.
-  @retval Others                Failed to retrieve the hub descriptor.
-
-**/
-EFI_STATUS
-UsbHubCtrlGetSuperSpeedHubDesc (
-  IN  USB_DEVICE          *HubDev,
-  OUT VOID                *Buf
-  )
-{
-  EFI_STATUS              Status;
-  
-  Status = EFI_INVALID_PARAMETER;
-  
-  Status = UsbCtrlRequest (
-             HubDev,
-             EfiUsbDataIn,
-             USB_REQ_TYPE_CLASS,
-             USB_HUB_TARGET_HUB,
-             USB_HUB_REQ_GET_DESC,
-             (UINT16) (USB_DESC_TYPE_HUB_SUPER_SPEED << 8),
-             0,
-             Buf,
-             32
-             );
-
-  return Status;
-}
-
-/**
-  Usb hub control transfer to get the hub descriptor.
+  Usb hub control transfer to get the (super speed) hub descriptor.
 
   @param  HubDev                The hub device.
   @param  Buf                   The buffer to hold the descriptor.
@@ -254,6 +213,11 @@ UsbHubCtrlGetHubDesc (
   )
 {
   EFI_STATUS              Status;
+  UINT8                   DescType;
+
+  DescType = (HubDev->Speed == EFI_USB_SPEED_SUPER) ?
+             USB_DESC_TYPE_HUB_SUPER_SPEED :
+             USB_DESC_TYPE_HUB;
 
   Status = UsbCtrlRequest (
              HubDev,
@@ -261,7 +225,7 @@ UsbHubCtrlGetHubDesc (
              USB_REQ_TYPE_CLASS,
              USB_HUB_TARGET_HUB,
              USB_HUB_REQ_GET_DESC,
-             (UINT16) (USB_DESC_TYPE_HUB << 8),
+             (UINT16) (DescType << 8),
              0,
              Buf,
              Len
@@ -348,74 +312,6 @@ UsbHubCtrlGetPortStatus (
 
 
 /**
-  Usb hub control transfer to reset the TT (Transaction Transaltor).
-
-  @param  HubDev                The hub device.
-  @param  Port                  The port of the hub.
-
-  @retval EFI_SUCCESS           The TT of the hub is reset.
-  @retval Others                Failed to reset the port.
-
-**/
-EFI_STATUS
-UsbHubCtrlResetTT (
-  IN  USB_DEVICE          *HubDev,
-  IN  UINT8               Port
-  )
-{
-  EFI_STATUS              Status;
-
-  Status = UsbCtrlRequest (
-             HubDev,
-             EfiUsbNoData,
-             USB_REQ_TYPE_CLASS,
-             USB_HUB_TARGET_HUB,
-             USB_HUB_REQ_RESET_TT,
-             0,
-             (UINT16) (Port + 1),
-             NULL,
-             0
-             );
-
-  return Status;
-}
-
-
-/**
-  Usb hub control transfer to set the hub feature.
-
-  @param  HubDev                The hub device.
-  @param  Feature               The feature to set.
-
-  @retval EFI_SUCESS            The feature is set for the hub.
-  @retval Others                Failed to set the feature.
-
-**/
-EFI_STATUS
-UsbHubCtrlSetHubFeature (
-  IN  USB_DEVICE          *HubDev,
-  IN  UINT8               Feature
-  )
-{
-  EFI_STATUS              Status;
-
-  Status = UsbCtrlRequest (
-             HubDev,
-             EfiUsbNoData,
-             USB_REQ_TYPE_CLASS,
-             USB_HUB_TARGET_HUB,
-             USB_HUB_REQ_SET_FEATURE,
-             Feature,
-             0,
-             NULL,
-             0
-             );
-
-  return Status;
-}
-
-
-/**
   Usb hub control transfer to set the port feature.
 
   @param  HubDev                The Usb hub device.
@@ -475,29 +371,19 @@ UsbHubReadDesc (
 {
   EFI_STATUS              Status;
 
-  if (HubDev->Speed == EFI_USB_SPEED_SUPER) {
-    //
-    // Get the super speed hub descriptor
-    //
-    Status = UsbHubCtrlGetSuperSpeedHubDesc (HubDev, HubDesc);
-  } else {
+  //
+  // First get the hub descriptor length
+  //
+  Status = UsbHubCtrlGetHubDesc (HubDev, HubDesc, 2);
 
-    //
-    // First get the hub descriptor length
-    //
-    Status = UsbHubCtrlGetHubDesc (HubDev, HubDesc, 2);
-
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
-
-    //
-    // Get the whole hub descriptor
-    //
-    Status = UsbHubCtrlGetHubDesc (HubDev, HubDesc, HubDesc->Length);
+  if (EFI_ERROR (Status)) {
+    return Status;
   }
 
-  return Status;
+  //
+  // Get the whole hub descriptor
+  //
+  return UsbHubCtrlGetHubDesc (HubDev, HubDesc, HubDesc->Length);
 }
 
 
@@ -659,7 +545,7 @@ UsbOnHubInterrupt (
   // OK, actually something is changed, save the change map
   // then signal the HUB to do enumeration. This is a good
   // practise since UsbOnHubInterrupt is called in the context
-  // of host contrller's AsyncInterrupt monitor.
+  // of host controller's AsyncInterrupt monitor.
   //
   HubIf->ChangeMap = AllocateZeroPool (DataLength);
 
@@ -690,7 +576,8 @@ UsbHubInit (
   IN USB_INTERFACE        *HubIf
   )
 {
-  EFI_USB_HUB_DESCRIPTOR  HubDesc;
+  UINT8                   HubDescBuffer[256];
+  EFI_USB_HUB_DESCRIPTOR  *HubDesc;
   USB_ENDPOINT_DESC       *EpDesc;
   USB_INTERFACE_SETTING   *Setting;
   EFI_USB_IO_PROTOCOL     *UsbIo;
@@ -725,20 +612,25 @@ UsbHubInit (
     return EFI_DEVICE_ERROR;
   }
 
-  Status = UsbHubReadDesc (HubDev, &HubDesc);
+  //
+  // The length field of descriptor is UINT8 type, so the buffer
+  // with 256 bytes is enough to hold the descriptor data.
+  //
+  HubDesc = (EFI_USB_HUB_DESCRIPTOR *) HubDescBuffer;
+  Status = UsbHubReadDesc (HubDev, HubDesc);
 
   if (EFI_ERROR (Status)) {
     DEBUG (( EFI_D_ERROR, "UsbHubInit: failed to read HUB descriptor %r\n", Status));
     return Status;
   }
 
-  HubIf->NumOfPort = HubDesc.NumPorts;
+  HubIf->NumOfPort = HubDesc->NumPorts;
 
   DEBUG (( EFI_D_INFO, "UsbHubInit: hub %d has %d ports\n", HubDev->Address,HubIf->NumOfPort));
 
   //
   // OK, set IsHub to TRUE. Now usb bus can handle this device
-  // as a working HUB. If failed eariler, bus driver will not
+  // as a working HUB. If failed earlier, bus driver will not
   // recognize it as a hub. Other parts of the bus should be able
   // to work.
   //
@@ -750,24 +642,24 @@ UsbHubInit (
     Depth = (UINT16)(HubIf->Device->Tier - 1);
     DEBUG ((EFI_D_INFO, "UsbHubInit: Set Hub Depth as 0x%x\n", Depth));
     UsbHubCtrlSetHubDepth (HubIf->Device, Depth);
-    
-    for (Index = 0; Index < HubDesc.NumPorts; Index++) {
+
+    for (Index = 0; Index < HubDesc->NumPorts; Index++) {
       UsbHubCtrlSetPortFeature (HubIf->Device, Index, USB_HUB_PORT_REMOTE_WAKE_MASK);
-    }    
+    }
   } else {
     //
     // Feed power to all the hub ports. It should be ok
     // for both gang/individual powered hubs.
     //
-    for (Index = 0; Index < HubDesc.NumPorts; Index++) {
+    for (Index = 0; Index < HubDesc->NumPorts; Index++) {
       UsbHubCtrlSetPortFeature (HubIf->Device, Index, (EFI_USB_PORT_FEATURE) USB_HUB_PORT_POWER);
     }
 
     //
     // Update for the usb hub has no power on delay requirement
     //
-    if (HubDesc.PwrOn2PwrGood > 0) {
-      gBS->Stall (HubDesc.PwrOn2PwrGood * USB_SET_PORT_POWER_STALL);
+    if (HubDesc->PwrOn2PwrGood > 0) {
+      gBS->Stall (HubDesc->PwrOn2PwrGood * USB_SET_PORT_POWER_STALL);
     }
     UsbHubAckHubStatus (HubIf->Device);
   }

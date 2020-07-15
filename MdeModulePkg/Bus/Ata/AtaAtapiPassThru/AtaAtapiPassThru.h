@@ -1,14 +1,8 @@
 /** @file
   Header file for ATA/ATAPI PASS THRU driver.
 
-  Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 #ifndef __ATA_ATAPI_PASS_THRU_H__
@@ -24,6 +18,7 @@
 #include <Protocol/IdeControllerInit.h>
 #include <Protocol/AtaPassThru.h>
 #include <Protocol/ScsiPassThruExt.h>
+#include <Protocol/AtaAtapiPolicy.h>
 
 #include <Library/DebugLib.h>
 #include <Library/BaseLib.h>
@@ -44,6 +39,8 @@
 extern EFI_DRIVER_BINDING_PROTOCOL  gAtaAtapiPassThruDriverBinding;
 extern EFI_COMPONENT_NAME_PROTOCOL  gAtaAtapiPassThruComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL gAtaAtapiPassThruComponentName2;
+
+extern EDKII_ATA_ATAPI_POLICY_PROTOCOL *mAtaAtapiPolicy;
 
 #define ATA_ATAPI_PASS_THRU_SIGNATURE  SIGNATURE_32 ('a', 'a', 'p', 't')
 #define ATA_ATAPI_DEVICE_SIGNATURE     SIGNATURE_32 ('a', 'd', 'e', 'v')
@@ -100,6 +97,7 @@ typedef struct {
   // The attached device list
   //
   LIST_ENTRY                        DeviceList;
+  UINT64                            EnabledPciAttributes;
   UINT64                            OriginalPciAttributes;
 
   //
@@ -147,6 +145,7 @@ struct _ATA_NONBLOCK_TASK {
 // It means 3 second span.
 //
 #define ATA_ATAPI_TIMEOUT           EFI_TIMER_PERIOD_SECONDS(3)
+#define ATA_SPINUP_TIMEOUT          EFI_TIMER_PERIOD_SECONDS(10)
 
 #define IS_ALIGNED(addr, size)      (((UINTN) (addr) & (size - 1)) == 0)
 
@@ -385,7 +384,7 @@ AtaAtapiPassThruSupported (
   @retval EFI_SUCCESS              The device was started.
   @retval EFI_DEVICE_ERROR         The device could not be started due to a device error.Currently not implemented.
   @retval EFI_OUT_OF_RESOURCES     The request could not be completed due to a lack of resources.
-  @retval Others                   The driver failded to start the device.
+  @retval Others                   The driver failed to start the device.
 
 **/
 EFI_STATUS
@@ -522,7 +521,7 @@ EnumerateAttachedDevice (
   );
 
 /**
-  Call back funtion when the timer event is signaled.
+  Call back function when the timer event is signaled.
 
   @param[in]  Event     The Event this notify function registered to.
   @param[in]  Context   Pointer to the context data registered to the

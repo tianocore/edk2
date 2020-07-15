@@ -4,14 +4,8 @@
   Notice: it is being obsoleted by the standard body in favor of the BOT
   (Bulk-Only Transport).
 
-Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -147,7 +141,7 @@ UsbCbiInit (
   } else {
     FreePool (UsbCbi);
   }
- 
+
   return EFI_SUCCESS;
 
 ON_ERROR:
@@ -311,7 +305,7 @@ UsbCbiDataTransfer (
       if (TransStatus == EFI_USB_ERR_NAK) {
         //
         // The device can NAK the host if either the data/buffer isn't
-        // aviable or the command is in-progress.
+        // available or the command is in-progress.
         // If data are partially transferred, we just ignore NAK and continue.
         // If all data have been transferred and status is NAK, then we retry for several times.
         // If retry exceeds the USB_CBI_MAX_RETRY, then return error status.
@@ -384,7 +378,7 @@ UsbCbiGetStatus (
   Timeout   = Timeout / USB_MASS_1_MILLISECOND;
 
   //
-  // Attemp to the read the result from interrupt endpoint
+  // Attempt to the read the result from interrupt endpoint
   //
   for (Retry = 0; Retry < USB_CBI_MAX_RETRY; Retry++) {
     TransStatus = 0;

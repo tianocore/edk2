@@ -2,51 +2,13 @@
 //  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
 //  Copyright (c) 2015-2016, Linaro Limited. All rights reserved.
 //
-//  This program and the accompanying materials
-//  are licensed and made available under the terms and conditions of the BSD License
-//  which accompanies this distribution.  The full text of the license may be found at
-//  http://opensource.org/licenses/bsd-license.php
-//
-//  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-//  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+//  SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 //
 
 #include <AsmMacroIoLib.h>
 
 ASM_FUNC(_ModuleEntryPoint)
-  //
-  // We are built as a ET_DYN PIE executable, so we need to process all
-  // relative relocations if we are executing from a different offset than we
-  // were linked at. This is only possible if we are running from RAM.
-  //
-  ADRL  (r4, __reloc_base)
-  ADRL  (r5, __reloc_start)
-  ADRL  (r6, __reloc_end)
-
-.Lreloc_loop:
-  cmp   r5, r6
-  bhs   .Lreloc_done
-
-  //
-  // AArch32 uses the ELF32 REL format, which means each entry in the
-  // relocation table consists of
-  //
-  //   UINT32 offset          : the relative offset of the value that needs to
-  //                            be relocated
-  //   UINT32 info            : relocation type and symbol index (the latter is
-  //                            not used for R_ARM_RELATIVE relocations)
-  //
-  ldrd  r8, r9, [r5], #8      // read offset into r8 and info into r9
-  cmp   r9, #23               // check info == R_ARM_RELATIVE?
-  bne   .Lreloc_loop          // not a relative relocation? then skip
-
-  ldr   r9, [r8, r4]          // read addend into r9
-  add   r9, r9, r1            // add image base to addend to get relocated value
-  str   r9, [r8, r4]          // write relocated value at offset
-  b     .Lreloc_loop
-.Lreloc_done:
-
   // Do early platform specific actions
   bl    ASM_PFX(ArmPlatformPeiBootAction)
 
@@ -120,29 +82,12 @@ _GetBaseUefiMemory:
 
 _GetStackBase:
   // r1 = The top of the Mpcore Stacks
+  mov   sp, r1
+
   // Stack for the primary core = PrimaryCoreStack
   MOV32 (r2, FixedPcdGet32(PcdCPUCorePrimaryStackSize))
   sub   r9, r1, r2
 
-  // Stack for the secondary core = Number of Cores - 1
-  MOV32 (r1, (FixedPcdGet32(PcdCoreCount) - 1) * FixedPcdGet32(PcdCPUCoreSecondaryStackSize))
-  sub   r9, r9, r1
-
-  // r9 = The base of the MpCore Stacks (primary stack & secondary stacks)
-  mov   r0, r9
-  mov   r1, r10
-  //ArmPlatformStackSet(StackBase, MpId, PrimaryStackSize, SecondaryStackSize)
-  MOV32 (r2, FixedPcdGet32(PcdCPUCorePrimaryStackSize))
-  MOV32 (r3, FixedPcdGet32(PcdCPUCoreSecondaryStackSize))
-  bl    ASM_PFX(ArmPlatformStackSet)
-
-  // Is it the Primary Core ?
-  mov   r0, r10
-  bl    ASM_PFX(ArmPlatformIsPrimaryCore)
-  cmp   r0, #1
-  bne   _PrepareArguments
-
-_PrepareArguments:
   mov   r0, r10
   mov   r1, r11
   mov   r2, r9
@@ -155,3 +100,83 @@ _PrepareArguments:
 
 _NeverReturn:
   b _NeverReturn
+
+ASM_PFX(ArmPlatformPeiBootAction):
+  //
+  // If we are booting from RAM using the Linux kernel boot protocol, r0 will
+  // point to the DTB image in memory. Otherwise, use the default value defined
+  // by the platform.
+  //
+  teq   r0, #0
+  bne   0f
+  LDRL  (r0, PcdGet64 (PcdDeviceTreeInitialBaseAddress))
+
+0:mov   r11, r14            // preserve LR
+  mov   r10, r0             // preserve DTB pointer
+  mov   r9, r1              // preserve base of image pointer
+
+  //
+  // The base of the runtime image has been preserved in r1. Check whether
+  // the expected magic number can be found in the header.
+  //
+  ldr   r8, .LArm32LinuxMagic
+  ldr   r7, [r1, #0x24]
+  cmp   r7, r8
+  bne   .Lout
+
+  //
+  //
+  // OK, so far so good. We have confirmed that we likely have a DTB and are
+  // booting via the ARM Linux boot protocol. Update the base-of-image PCD
+  // to the actual relocated value, and add the shift of PcdFdBaseAddress to
+  // PcdFvBaseAddress as well
+  //
+  ADRL  (r8, PcdGet64 (PcdFdBaseAddress))
+  ADRL  (r7, PcdGet64 (PcdFvBaseAddress))
+  ldr   r6, [r8]
+  ldr   r5, [r7]
+  sub   r5, r5, r6
+  add   r5, r5, r1
+  str   r1, [r8]
+  str   r5, [r7]
+
+  //
+  // The runtime address may be different from the link time address so fix
+  // up the PE/COFF relocations. Since we are calling a C function, use the
+  // window at the beginning of the FD image as a temp stack.
+  //
+  mov   r0, r5
+  ADRL  (r1, PeCoffLoaderImageReadFromMemory)
+  mov   sp, r5
+  bl    RelocatePeCoffImage
+
+  //
+  // Discover the memory size and offset from the DTB, and record in the
+  // respective PCDs. This will also return false if a corrupt DTB is
+  // encountered.
+  //
+  mov   r0, r10
+  ADRL  (r1, PcdGet64 (PcdSystemMemoryBase))
+  ADRL  (r2, PcdGet64 (PcdSystemMemorySize))
+  bl    FindMemnode
+  teq   r0, #0
+  beq   .Lout
+
+  //
+  // Copy the DTB to the slack space right after the 64 byte arm64/Linux style
+  // image header at the base of this image (defined in the FDF), and record the
+  // pointer in PcdDeviceTreeInitialBaseAddress.
+  //
+  ADRL  (r8, PcdGet64 (PcdDeviceTreeInitialBaseAddress))
+  add   r9, r9, #0x40
+  str   r9, [r8]
+
+  mov   r0, r9
+  mov   r1, r10
+  bl    CopyFdt
+
+.Lout:
+  bx    r11
+
+.LArm32LinuxMagic:
+  .byte   0x18, 0x28, 0x6f, 0x01

@@ -1,14 +1,8 @@
 /** @file
   HMAC-SHA256 Wrapper Implementation over OpenSSL.
 
-Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2016 - 2020, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -16,40 +10,59 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <openssl/hmac.h>
 
 /**
-  Retrieves the size, in bytes, of the context buffer required for HMAC-SHA256 operations.
+  Allocates and initializes one HMAC_CTX context for subsequent HMAC-SHA256 use.
 
-  @return  The size, in bytes, of the context buffer required for HMAC-SHA256 operations.
+  @return  Pointer to the HMAC_CTX context that has been initialized.
+           If the allocations fails, HmacSha256New() returns NULL.
 
 **/
-UINTN
+VOID *
 EFIAPI
-HmacSha256GetContextSize (
+HmacSha256New (
   VOID
   )
 {
   //
-  // Retrieves the OpenSSL HMAC-SHA256 Context Size
+  // Allocates & Initializes HMAC_CTX Context by OpenSSL HMAC_CTX_new()
   //
-  return (UINTN) (sizeof (HMAC_CTX));
+  return (VOID *) HMAC_CTX_new ();
 }
 
 /**
-  Initializes user-supplied memory pointed by HmacSha256Context as HMAC-SHA256 context for
-  subsequent use.
+  Release the specified HMAC_CTX context.
+
+  @param[in]  HmacSha256Ctx  Pointer to the HMAC_CTX context to be released.
+
+**/
+VOID
+EFIAPI
+HmacSha256Free (
+  IN  VOID  *HmacSha256Ctx
+  )
+{
+  //
+  // Free OpenSSL HMAC_CTX Context
+  //
+  HMAC_CTX_free ((HMAC_CTX *)HmacSha256Ctx);
+}
+
+/**
+  Set user-supplied key for subsequent use. It must be done before any
+  calling to HmacSha256Update().
 
   If HmacSha256Context is NULL, then return FALSE.
 
-  @param[out]  HmacSha256Context  Pointer to HMAC-SHA256 context being initialized.
+  @param[out]  HmacSha256Context  Pointer to HMAC-SHA256 context.
   @param[in]   Key                Pointer to the user-supplied key.
   @param[in]   KeySize            Key size in bytes.
 
-  @retval TRUE   HMAC-SHA256 context initialization succeeded.
-  @retval FALSE  HMAC-SHA256 context initialization failed.
+  @retval TRUE   The Key is set successfully.
+  @retval FALSE  The Key is set unsuccessfully.
 
 **/
 BOOLEAN
 EFIAPI
-HmacSha256Init (
+HmacSha256SetKey (
   OUT  VOID         *HmacSha256Context,
   IN   CONST UINT8  *Key,
   IN   UINTN        KeySize
@@ -62,11 +75,9 @@ HmacSha256Init (
     return FALSE;
   }
 
-  //
-  // OpenSSL HMAC-SHA256 Context Initialization
-  //
-  HMAC_CTX_init (HmacSha256Context);
-  HMAC_Init_ex (HmacSha256Context, Key, (UINT32) KeySize, EVP_sha256(), NULL);
+  if (HMAC_Init_ex ((HMAC_CTX *)HmacSha256Context, Key, (UINT32) KeySize, EVP_sha256(), NULL) != 1) {
+    return FALSE;
+  }
 
   return TRUE;
 }
@@ -98,7 +109,9 @@ HmacSha256Duplicate (
     return FALSE;
   }
 
-  CopyMem (NewHmacSha256Context, HmacSha256Context, sizeof (HMAC_CTX));
+  if (HMAC_CTX_copy ((HMAC_CTX *)NewHmacSha256Context, (HMAC_CTX *)HmacSha256Context) != 1) {
+    return FALSE;
+  }
 
   return TRUE;
 }
@@ -108,8 +121,8 @@ HmacSha256Duplicate (
 
   This function performs HMAC-SHA256 digest on a data buffer of the specified size.
   It can be called multiple times to compute the digest of long or discontinuous data streams.
-  HMAC-SHA256 context should be already correctly initialized by HmacSha256Init(), and should not
-  be finalized by HmacSha256Final(). Behavior with invalid context is undefined.
+  HMAC-SHA256 context should be initialized by HmacSha256New(), and should not be finalized
+  by HmacSha256Final(). Behavior with invalid context is undefined.
 
   If HmacSha256Context is NULL, then return FALSE.
 
@@ -146,7 +159,9 @@ HmacSha256Update (
   //
   // OpenSSL HMAC-SHA256 digest update
   //
-  HMAC_Update (HmacSha256Context, Data, DataSize);
+  if (HMAC_Update ((HMAC_CTX *)HmacSha256Context, Data, DataSize) != 1) {
+    return FALSE;
+  }
 
   return TRUE;
 }
@@ -157,8 +172,8 @@ HmacSha256Update (
   This function completes HMAC-SHA256 hash computation and retrieves the digest value into
   the specified memory. After this function has been called, the HMAC-SHA256 context cannot
   be used again.
-  HMAC-SHA256 context should be already correctly initialized by HmacSha256Init(), and should
-  not be finalized by HmacSha256Final(). Behavior with invalid HMAC-SHA256 context is undefined.
+  HMAC-SHA256 context should be initialized by HmacSha256New(), and should not be finalized
+  by HmacSha256Final(). Behavior with invalid HMAC-SHA256 context is undefined.
 
   If HmacSha256Context is NULL, then return FALSE.
   If HmacValue is NULL, then return FALSE.
@@ -190,8 +205,12 @@ HmacSha256Final (
   //
   // OpenSSL HMAC-SHA256 digest finalization
   //
-  HMAC_Final (HmacSha256Context, HmacValue, &Length);
-  HMAC_CTX_cleanup (HmacSha256Context);
+  if (HMAC_Final ((HMAC_CTX *)HmacSha256Context, HmacValue, &Length) != 1) {
+    return FALSE;
+  }
+  if (HMAC_CTX_reset ((HMAC_CTX *)HmacSha256Context) != 1) {
+    return FALSE;
+  }
 
   return TRUE;
 }

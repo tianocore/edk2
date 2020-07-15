@@ -1,5 +1,5 @@
 /** @file
-  XenBus Bus driver implemtation.
+  XenBus Bus driver implementation.
 
   This file implement the necessary to discover and enumerate Xen PV devices
   through XenStore.
@@ -14,23 +14,7 @@
   This file may be distributed separately from the Linux kernel, or
   incorporated into other software packages, subject to the following license:
 
-  Permission is hereby granted, free of charge, to any person obtaining a copy
-  of this source file (the "Software"), to deal in the Software without
-  restriction, including without limitation the rights to use, copy, modify,
-  merge, publish, distribute, sublicense, and/or sell copies of the Software,
-  and to permit persons to whom the Software is furnished to do so, subject to
-  the following conditions:
-
-  The above copyright notice and this permission notice shall be included in
-  all copies or substantial portions of the Software.
-
-  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
-  IN THE SOFTWARE.
+  SPDX-License-Identifier: MIT
 **/
 
 #include <Library/PrintLib.h>
@@ -164,7 +148,7 @@ XenBusAddDevice (
        * happen if a device is going away after
        * switching to Closed.
        */
-      DEBUG ((EFI_D_INFO, "XenBus: Device %a ignored. "
+      DEBUG ((DEBUG_INFO, "XenBus: Device %a ignored. "
               "State %d\n", DevicePath, State));
       Status = EFI_SUCCESS;
       goto out;
@@ -173,7 +157,7 @@ XenBusAddDevice (
     StatusXenStore = XenStoreRead (XST_NIL, DevicePath, "backend",
                                    NULL, (VOID **) &BackendPath);
     if (StatusXenStore != XENSTORE_STATUS_SUCCESS) {
-      DEBUG ((EFI_D_ERROR, "xenbus: %a no backend path.\n", DevicePath));
+      DEBUG ((DEBUG_ERROR, "xenbus: %a no backend path.\n", DevicePath));
       Status = EFI_NOT_FOUND;
       goto out;
     }
@@ -213,12 +197,12 @@ XenBusAddDevice (
                Private->Handle,
                EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER);
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "open by child controller fail (%r)\n",
+      DEBUG ((DEBUG_ERROR, "open by child controller fail (%r)\n",
               Status));
       goto ErrorOpenProtocolByChild;
     }
   } else {
-    DEBUG ((EFI_D_ERROR, "XenBus: does not exist: %a\n", DevicePath));
+    DEBUG ((DEBUG_ERROR, "XenBus: does not exist: %a\n", DevicePath));
     Status = EFI_NOT_FOUND;
   }
 
@@ -226,7 +210,7 @@ XenBusAddDevice (
 
 ErrorOpenProtocolByChild:
   gBS->UninstallMultipleProtocolInterfaces (
-    &Private->Handle,
+    Private->Handle,
     &gEfiDevicePathProtocolGuid, Private->DevicePath,
     &gXenBusProtocolGuid, &Private->XenBusIo,
     NULL);
@@ -328,7 +312,7 @@ XenBusSetState (
   XENSTORE_STATUS Status;
   CHAR8 *Temp;
 
-  DEBUG ((EFI_D_INFO, "XenBus: Set state to %d\n", NewState));
+  DEBUG ((DEBUG_INFO, "XenBus: Set state to %d\n", NewState));
 
   Status = XenStoreRead (Transaction, This->Node, "state", NULL, (VOID **)&Temp);
   if (Status != XENSTORE_STATUS_SUCCESS) {
@@ -344,10 +328,10 @@ XenBusSetState (
     Status = XenStoreSPrint (Transaction, This->Node, "state", "%d", NewState);
   } while (Status == XENSTORE_STATUS_EAGAIN);
   if (Status != XENSTORE_STATUS_SUCCESS) {
-    DEBUG ((EFI_D_ERROR, "XenBus: failed to write new state\n"));
+    DEBUG ((DEBUG_ERROR, "XenBus: failed to write new state\n"));
     goto Out;
   }
-  DEBUG ((EFI_D_INFO, "XenBus: Set state to %d, done\n", NewState));
+  DEBUG ((DEBUG_INFO, "XenBus: Set state to %d, done\n", NewState));
 
 Out:
   return Status;

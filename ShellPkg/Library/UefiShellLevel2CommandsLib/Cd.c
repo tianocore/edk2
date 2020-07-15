@@ -3,14 +3,9 @@
 
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2018, Dell Technologies. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -102,7 +97,7 @@ IsCurrentFileSystem (
   if (((UINTN) Splitter1 - (UINTN) FullPath) != ((UINTN) Splitter2 - (UINTN) Cwd)) {
     return FALSE;
   } else {
-    if (StrniCmp (FullPath, Cwd, ((UINTN) Splitter1 - (UINTN) FullPath) / sizeof (CHAR16)) == NULL) {
+    if (StrniCmp (FullPath, Cwd, ((UINTN) Splitter1 - (UINTN) FullPath) / sizeof (CHAR16)) == 0) {
       return TRUE;
     } else {
       return FALSE;
@@ -217,7 +212,7 @@ ShellCommandRunCd (
   Status = ShellCommandLineParse (EmptyParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR(Status)) {
     if (Status == EFI_VOLUME_CORRUPTED && ProblemParam != NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"cd", ProblemParam);  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"cd", ProblemParam);
       FreePool(ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -231,7 +226,7 @@ ShellCommandRunCd (
   if (ShellCommandLineGetFlag(Package, L"-?")) {
     ASSERT(FALSE);
   } else if (ShellCommandLineGetRawValue(Package, 2) != NULL) {
-    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"cd");  
+    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"cd");
     ShellStatus = SHELL_INVALID_PARAMETER;
   } else {
     //
@@ -261,9 +256,6 @@ ShellCommandRunCd (
 
         if (Param1Copy != NULL && IsCurrentFileSystem (Param1Copy, Cwd)) {
           Status = ReplaceDriveWithCwd (&Param1Copy,Cwd);
-          if (!EFI_ERROR (Status)) {
-            Param1Copy = PathCleanUpDirectories (Param1Copy);
-          }
         } else {
           //
           // Can't use cd command to change filesystem.
@@ -302,13 +294,15 @@ ShellCommandRunCd (
                 StrCatS (TempBuffer, TotalSize / sizeof (CHAR16), Param1Copy);
 
                 FreePool (Param1Copy);
-                Param1Copy = PathCleanUpDirectories (TempBuffer);
+                Param1Copy = TempBuffer;
+                TempBuffer = NULL;
               }
             }
           }
         }
 
         if (!EFI_ERROR(Status)) {
+          Param1Copy = PathCleanUpDirectories (Param1Copy);
           Status = ExtractDriveAndPath (Param1Copy, &Drive, &Path);
         }
 

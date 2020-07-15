@@ -1,14 +1,8 @@
 /** @file
   Serial driver for PCI or SIO UARTS.
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -94,7 +88,7 @@ SERIAL_DEV  gSerialDevTemplate = {
   Check the device path node whether it's the Flow Control node or not.
 
   @param[in] FlowControl    The device path node to be checked.
-  
+
   @retval TRUE              It's the Flow Control node.
   @retval FALSE             It's not.
 
@@ -114,9 +108,9 @@ IsUartFlowControlDevicePathNode (
 /**
   The user Entry Point for module PciSioSerial. The user code starts with this function.
 
-  @param[in] ImageHandle    The firmware allocated handle for the EFI image.  
+  @param[in] ImageHandle    The firmware allocated handle for the EFI image.
   @param[in] SystemTable    A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS       The entry point is executed successfully.
   @retval other             Some error occurs when executing this entry point.
 
@@ -396,7 +390,7 @@ SerialControllerDriverSupported (
   if (EFI_ERROR (Status)) {
     Status = IsPciSerialController (Controller);
   }
-  return Status;  
+  return Status;
 }
 
 /**
@@ -671,7 +665,7 @@ CreateSerialDevice (
 
   if (EFI_ERROR (Status)) {
     gBS->UninstallMultipleProtocolInterfaces (
-           &SerialDevice->Handle,
+           SerialDevice->Handle,
            &gEfiDevicePathProtocolGuid, SerialDevice->DevicePath,
            &gEfiSerialIoProtocolGuid, &SerialDevice->SerialIo,
            NULL

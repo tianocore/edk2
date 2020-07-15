@@ -2,14 +2,8 @@
   Routines implements SIMPLE_TEXT_IN protocol's interfaces based on 8042 interfaces
   provided by Ps2KbdCtrller.c.
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -83,7 +77,7 @@ PushEfikeyBufTail (
 }
 
 /**
-  Judge whether is a registed key
+  Judge whether is a registered key
 
   @param RegsiteredData       A pointer to a buffer that is filled in with the keystroke
                               state data for the key that was registered.
@@ -91,7 +85,7 @@ PushEfikeyBufTail (
                               state data for the key that was pressed.
 
   @retval TRUE                Key be pressed matches a registered key.
-  @retval FLASE               Match failed.
+  @retval FALSE               Match failed.
 
 **/
 BOOLEAN
@@ -126,7 +120,7 @@ IsKeyRegistered (
 
 /**
     Reads the next keystroke from the input device. The WaitForKey Event can
-    be used to test for existance of a keystroke via WaitForEvent () call.
+    be used to test for existence of a keystroke via WaitForEvent () call.
 
     @param ConsoleInDev          Ps2 Keyboard private structure
     @param KeyData               A pointer to a buffer that is filled in with the keystroke
@@ -134,7 +128,7 @@ IsKeyRegistered (
 
 
     @retval EFI_SUCCESS             The keystroke information was returned.
-    @retval EFI_NOT_READY           There was no keystroke data availiable.
+    @retval EFI_NOT_READY           There was no keystroke data available.
     @retval EFI_DEVICE_ERROR        The keystroke information was not returned due to
                                     hardware errors.
     @retval EFI_INVALID_PARAMETER   KeyData is NULL.
@@ -165,6 +159,10 @@ KeyboardReadKeyStrokeWorker (
     Status = EFI_DEVICE_ERROR;
   } else {
     Status = PopEfikeyBufHead (&ConsoleInDev->EfiKeyQueue, KeyData);
+    if (Status == EFI_NOT_READY) {
+      ZeroMem (&KeyData->Key, sizeof (KeyData->Key));
+      InitializeKeyState (ConsoleInDev, &KeyData->KeyState);
+    }
   }
 
   gBS->RestoreTPL (OldTpl);
@@ -310,7 +308,7 @@ KeyboardReadKeyStroke (
   Signal the event if there is key available
 
   @param Event    the event object
-  @param Context  waitting context
+  @param Context  waiting context
 
 **/
 VOID
@@ -335,7 +333,7 @@ KeyboardWaitForKey (
 
   if (!ConsoleIn->KeyboardErr) {
     //
-    // WaitforKey doesn't suppor the partial key.
+    // WaitforKey doesn't support the partial key.
     // Considering if the partial keystroke is enabled, there maybe a partial
     // keystroke in the queue, so here skip the partial keystroke and get the
     // next key from the queue
@@ -383,7 +381,7 @@ KeyboardWaitForKeyEx (
 }
 
 /**
-  Reset the input device and optionaly run diagnostics
+  Reset the input device and optionally run diagnostics
 
   @param This                     Protocol instance pointer.
   @param ExtendedVerification     Driver may perform diagnostics on reset.
@@ -413,7 +411,7 @@ KeyboardEfiResetEx (
 
 /**
     Reads the next keystroke from the input device. The WaitForKey Event can
-    be used to test for existance of a keystroke via WaitForEvent () call.
+    be used to test for existence of a keystroke via WaitForEvent () call.
 
 
     @param This         Protocol instance pointer.
@@ -421,7 +419,7 @@ KeyboardEfiResetEx (
                         state data for the key that was pressed.
 
     @retval EFI_SUCCESS           The keystroke information was returned.
-    @retval EFI_NOT_READY         There was no keystroke data availiable.
+    @retval EFI_NOT_READY         There was no keystroke data available.
     @retval EFI_DEVICE_ERROR      The keystroke information was not returned due to
                                   hardware errors.
     @retval EFI_INVALID_PARAMETER KeyData is NULL.
@@ -533,13 +531,16 @@ Exit:
 
     @param This                       Protocol instance pointer.
     @param KeyData                    A pointer to a buffer that is filled in with the keystroke
-                                      information data for the key that was pressed.
+                                      information data for the key that was pressed. If KeyData.Key,
+                                      KeyData.KeyState.KeyToggleState and KeyData.KeyState.KeyShiftState are 0,
+                                      then any incomplete keystroke will trigger a notification of the KeyNotificationFunction.
     @param KeyNotificationFunction    Points to the function to be called when the key
-                                      sequence is typed specified by KeyData.
+                                      sequence is typed specified by KeyData. This notification function
+                                      should be called at <=TPL_CALLBACK.
     @param NotifyHandle               Points to the unique handle assigned to the registered notification.
 
     @retval EFI_SUCCESS               The notification function was registered successfully.
-    @retval EFI_OUT_OF_RESOURCES      Unable to allocate resources for necesssary data structures.
+    @retval EFI_OUT_OF_RESOURCES      Unable to allocate resources for necessary data structures.
     @retval EFI_INVALID_PARAMETER     KeyData or NotifyHandle or KeyNotificationFunction is NULL.
 
 **/
@@ -711,7 +712,7 @@ KeyNotifyProcessHandler (
   while (TRUE) {
     //
     // Enter critical section
-    //  
+    //
     OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
     Status = PopEfikeyBufHead (&ConsoleIn->EfiKeyQueueForNotify, &KeyData);
     //

@@ -1,15 +1,9 @@
 /** @file
   Contains all EFI_UDP6_PROTOCOL interfaces.
 
-  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -110,7 +104,7 @@ Udp6GetModeData (
 
   @retval EFI_SUCCESS            The configuration settings were set, changed, or
                                  reset successfully.
-  @retval EFI_NO_MAPPING         When the UdpConifgData.UseAnyStationAddress is set
+  @retval EFI_NO_MAPPING         When the UdpConfigData.UseAnyStationAddress is set
                                  to true and there is no address available for the IP6
                                  driver to bind a source address to this instance.
   @retval EFI_INVALID_PARAMETER  One or more following conditions are TRUE:
@@ -284,7 +278,7 @@ Udp6Configure (
 
     ASSERT (IsListEmpty (&Instance->DeliveredDgramQue));
   }
- 
+
 ON_EXIT:
 
   gBS->RestoreTPL (OldTpl);
@@ -351,6 +345,9 @@ Udp6Groups (
 
   Instance = UDP6_INSTANCE_DATA_FROM_THIS (This);
   if (!Instance->Configured) {
+    if (McastIp != NULL) {
+      FreePool (McastIp);
+    }
     return EFI_NOT_STARTED;
   }
 
@@ -371,14 +368,17 @@ Udp6Groups (
   // Keep a local copy of the configured multicast IPs because IpIo receives
   // datagrams from the 0 station address IP instance and then UDP delivers to
   // the matched instance. This copy of multicast IPs is used to avoid receive
-  // the mutlicast datagrams destinated to multicast IPs the other instances configured.
+  // the multicast datagrams destinated to multicast IPs the other instances configured.
   //
   if (JoinFlag) {
 
     Status = NetMapInsertTail (&Instance->McastIps, (VOID *) McastIp, NULL);
   } else {
 
-    NetMapIterate (&Instance->McastIps, Udp6LeaveGroup, MulticastAddress);
+    Status = NetMapIterate (&Instance->McastIps, Udp6LeaveGroup, MulticastAddress);
+    if ((MulticastAddress != NULL) && (Status == EFI_ABORTED)) {
+      Status = EFI_SUCCESS;
+    }
   }
 
 ON_EXIT:
@@ -423,13 +423,13 @@ ON_EXIT:
                                  One or more of the
                                  Token.Packet.TxData.FragmentTable[].FragmentBuffer
                                  fields is NULL. One or more of the
-                                 Token.Packet.TxData.UdpSessionData.DestinationAddres
+                                 Token.Packet.TxData.UdpSessionData.DestinationAddress
                                  are not valid unicast IPv6
                                  addresses if the  UdpSessionData is not NULL.
                                  Token.Packet.TxData.UdpSessionData.
                                  DestinationAddress is NULL
                                  Token.Packet.TxData.UdpSessionData.
-                                 DestinatioPort
+                                 DestinationPort
                                  is zero.
                                  Token.Packet.TxData.UdpSessionData is NULL and this
                                  instance's UdpConfigData.RemoteAddress  is unspecified.
@@ -525,6 +525,11 @@ Udp6Transmit (
 
   Udp6Header = (EFI_UDP_HEADER *) NetbufAllocSpace (Packet, UDP6_HEADER_SIZE, TRUE);
   ASSERT (Udp6Header != NULL);
+  if (Udp6Header == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto ON_EXIT;
+  }
+
   ConfigData = &Instance->ConfigData;
 
   //
@@ -577,11 +582,11 @@ Udp6Transmit (
         //
         // If the calculated checksum is 0, fill the Checksum field with all ones.
         //
-        Udp6Header->Checksum = 0XFFFF;
+        Udp6Header->Checksum = 0xffff;
       }
     } else {
       //
-      // Set the checksum is zero if the ConfigData->StationAddress is unspcified
+      // Set the checksum is zero if the ConfigData->StationAddress is unspecified
       // and the Ipv6 will fill the correct value of this checksum.
       //
       Udp6Header->Checksum = 0;
@@ -802,7 +807,7 @@ Udp6Cancel (
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   //
-  // Cancle the tokens specified by Token for this instance.
+  // Cancel the tokens specified by Token for this instance.
   //
   Status = Udp6InstanceCancelToken (Instance, Token);
 

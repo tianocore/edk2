@@ -1,16 +1,10 @@
 /** @file
   The X64 entrypoint is used to process capsule in long mode.
 
-Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -165,7 +159,7 @@ PageFaultHandler (
   //
   // Get the IDT Descriptor.
   //
-  AsmReadIdtr ((IA32_DESCRIPTOR *) &Idtr); 
+  AsmReadIdtr ((IA32_DESCRIPTOR *) &Idtr);
   //
   // Then get page fault context by IDT Descriptor.
   //
@@ -233,7 +227,7 @@ _ModuleEntryPoint (
   //
   // Save the IA32 IDT Descriptor
   //
-  AsmReadIdtr ((IA32_DESCRIPTOR *) &Ia32Idtr); 
+  AsmReadIdtr ((IA32_DESCRIPTOR *) &Ia32Idtr);
 
   //
   // Setup X64 IDT table
@@ -241,7 +235,7 @@ _ModuleEntryPoint (
   ZeroMem (PageFaultIdtTable.IdtEntryTable, sizeof (IA32_IDT_GATE_DESCRIPTOR) * EXCEPTION_VECTOR_NUMBER);
   X64Idtr.Base = (UINTN) PageFaultIdtTable.IdtEntryTable;
   X64Idtr.Limit = (UINT16) (sizeof (IA32_IDT_GATE_DESCRIPTOR) * EXCEPTION_VECTOR_NUMBER - 1);
-  AsmWriteIdtr ((IA32_DESCRIPTOR *) &X64Idtr);  
+  AsmWriteIdtr ((IA32_DESCRIPTOR *) &X64Idtr);
 
   //
   // Setup the default CPU exception handlers
@@ -272,7 +266,7 @@ _ModuleEntryPoint (
              (VOID **) (UINTN) EntrypointContext->MemoryBase64Ptr,
              (UINTN *) (UINTN) EntrypointContext->MemorySize64Ptr
              );
-  
+
   ReturnContext->ReturnStatus = Status;
 
   DEBUG ((
@@ -290,8 +284,8 @@ _ModuleEntryPoint (
   //
   // Restore IA32 IDT table
   //
-  AsmWriteIdtr ((IA32_DESCRIPTOR *) &Ia32Idtr);  
-  
+  AsmWriteIdtr ((IA32_DESCRIPTOR *) &Ia32Idtr);
+
   //
   // Finish to coalesce capsule, and return to 32-bit mode.
   //
@@ -301,8 +295,8 @@ _ModuleEntryPoint (
     (UINT32) (UINTN) EntrypointContext,
     (UINT32) (UINTN) ReturnContext,
     (UINT32) (EntrypointContext->StackBufferBase + EntrypointContext->StackBufferLength)
-    );  
-  
+    );
+
   //
   // Should never be here.
   //

@@ -1,16 +1,9 @@
 /** @file
-Common Libarary for PEI USB
+Common Library for PEI USB
 
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved. <BR>
-  
-This program and the accompanying materials
-are licensed and made available under the terms and conditions
-of the BSD License which accompanies this distribution.  The
-full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved. <BR>
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -148,28 +141,6 @@ PeiUsbSetDeviceAddress (
   IN UINT16                   AddressValue
   );
 
-/**
-  Clear a given usb feature.
-
-  @param  PeiServices       General-purpose services that are available to every PEIM.
-  @param  UsbIoPpi          Indicates the PEI_USB_IO_PPI instance.
-  @param  Recipient         The recipient of ClearFeature Request, should be one of Device/Interface/Endpoint.
-  @param  Value             Request Value.
-  @param  Target            Request Index.
-
-  @retval EFI_SUCCESS       Usb feature is cleared successfully.
-  @retval EFI_DEVICE_ERROR  Cannot clear the usb feature due to a hardware error.
-  @retval Others            Other failure occurs.
-
-**/
-EFI_STATUS
-PeiUsbClearDeviceFeature (
-  IN EFI_PEI_SERVICES         **PeiServices,
-  IN PEI_USB_IO_PPI           *UsbIoPpi,
-  IN EFI_USB_RECIPIENT        Recipient,
-  IN UINT16                   Value,
-  IN UINT16                   Target
-  );
 
 /**
   Configure a usb device to Configuration 1.
@@ -215,17 +186,4 @@ PeiUsbGetDeviceSpeed (
   IN UINT16 PortStatus
   );
 
-/**
-  Judge if the port is in "connection change" status or not.
-
-  @param  PortChangeStatus  The usb port change status gotten.
-
-  @retval TRUE              The port is in "connection change" status.
-  @retval FALSE             The port is NOT in "connection change" status.
-
-**/
-BOOLEAN
-IsPortConnectChange (
-  IN UINT16  PortChangeStatus
-  );
 #endif

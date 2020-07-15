@@ -1,0 +1,50 @@
+## @file
+#
+# A hook-in library for NetworkPkg/TlsAuthConfigDxe, in order to set volatile
+# variables related to TLS configuration, before TlsAuthConfigDxe or HttpDxe
+# (which is a UEFI_DRIVER) consume them.
+#
+# Copyright (C) 2013, 2015, 2018, Red Hat, Inc.
+# Copyright (c) 2008 - 2012, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.26
+  BASE_NAME                      = TlsAuthConfigLib
+  FILE_GUID                      = 660AB627-4C5F-4D42-A3B6-BD021E9028BD
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = TlsAuthConfigLib|DXE_DRIVER
+  CONSTRUCTOR                    = TlsAuthConfigInit
+
+#
+# The following information is for reference only and not required by the build
+# tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64
+#
+
+[Sources]
+  TlsAuthConfigLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  NetworkPkg/NetworkPkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  MemoryAllocationLib
+  QemuFwCfgLib
+  UefiRuntimeServicesTableLib
+
+[Guids]
+  gEdkiiHttpTlsCipherListGuid ## PRODUCES ## Variable:L"HttpTlsCipherList"
+  gEfiTlsCaCertificateGuid    ## PRODUCES ## Variable:L"TlsCaCertificate"
+
+[Depex]
+  gEfiVariableWriteArchProtocolGuid

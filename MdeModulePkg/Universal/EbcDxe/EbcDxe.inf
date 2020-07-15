@@ -1,20 +1,14 @@
 ## @file
 #  Module that produces EBC Interprete and EBC Debug Support protocols.
-#  
-#  This module implements EFI Byte Code (EBC) Virtual Machine that can provide 
+#
+#  This module implements EFI Byte Code (EBC) Virtual Machine that can provide
 #  platform and processor-independent mechanisms for loading and executing EFI
 #  device drivers.
 #
 #  Copyright (c) 2015, The Linux Foundation. All rights reserved.
-#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
-#  This program and the accompanying materials
-#  are licensed and made available under the terms and conditions of the BSD License
-#  which accompanies this distribution.  The full text of the license may be found at
-#  http://opensource.org/licenses/bsd-license.php
-#  
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-#  
+#  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
 ##
 
 [Defines]
@@ -29,7 +23,7 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF AARCH64
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
 #
 
 [Sources]
@@ -43,19 +37,10 @@
 [Sources.Ia32]
   Ia32/EbcSupport.c
   Ia32/EbcLowLevel.nasm
-  Ia32/EbcLowLevel.S
-  Ia32/EbcLowLevel.asm
 
 [Sources.X64]
   X64/EbcSupport.c
   X64/EbcLowLevel.nasm
-  X64/EbcLowLevel.S
-  X64/EbcLowLevel.asm
-
-[Sources.IPF]
-  Ipf/EbcSupport.h
-  Ipf/EbcSupport.c
-  Ipf/EbcLowLevel.s
 
 [Sources.AARCH64]
   AArch64/EbcSupport.c
@@ -66,7 +51,9 @@
   MdeModulePkg/MdeModulePkg.dec
 
 [LibraryClasses]
+  CacheMaintenanceLib
   MemoryAllocationLib
+  PeCoffLib
   UefiBootServicesTableLib
   BaseMemoryLib
   UefiDriverEntryPoint
@@ -77,6 +64,7 @@
 [Protocols]
   gEfiDebugSupportProtocolGuid                  ## PRODUCES
   gEfiEbcProtocolGuid                           ## PRODUCES
+  gEdkiiPeCoffImageEmulatorProtocolGuid         ## PRODUCES
   gEfiEbcVmTestProtocolGuid                     ## SOMETIMES_PRODUCES
   gEfiEbcSimpleDebuggerProtocolGuid             ## SOMETIMES_CONSUMES
 

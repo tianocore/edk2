@@ -1,0 +1,37 @@
+## @file
+# Decide whether the firmware should expose an ACPI- and/or a Device Tree-based
+# hardware description to the operating system.
+#
+# Copyright (c) 2017, Red Hat, Inc.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 1.25
+  BASE_NAME                      = XenPlatformHasAcpiDtDxe
+  FILE_GUID                      = 6914c46f-d46e-48dc-9998-8a5f64f02553
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = XenPlatformHasAcpiDt
+
+[Sources]
+  XenPlatformHasAcpiDtDxe.c
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Guids]
+  gEdkiiPlatformHasAcpiGuid       ## SOMETIMES_PRODUCES ## PROTOCOL
+  gEdkiiPlatformHasDeviceTreeGuid ## PRODUCES           ## PROTOCOL
+
+[Depex]
+  TRUE

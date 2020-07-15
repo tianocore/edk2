@@ -1,0 +1,37 @@
+## @file
+#  PE/COFF emulator protocol implementation to start Linux kernel
+#  images from non-native firmware
+#
+#  Copyright (c) 2020, ARM Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.27
+  BASE_NAME                      = CompatImageLoaderDxe
+  FILE_GUID                      = 1019f54a-2560-41b2-87b0-6750b98f3eff
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = CompatImageLoaderDxeEntryPoint
+
+[Sources]
+  CompatImageLoaderDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  PeCoffLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gEdkiiPeCoffImageEmulatorProtocolGuid   ## PRODUCES
+
+[Depex]
+  TRUE

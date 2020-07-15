@@ -1,12 +1,6 @@
 ;------------------------------------------------------------------------------ ;
-; Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
-; This program and the accompanying materials
-; are licensed and made available under the terms and conditions of the BSD License
-; which accompanies this distribution.  The full text of the license may be found at
-; http://opensource.org/licenses/bsd-license.php.
-;
-; THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-; WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+; Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
+; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;
 ; Module Name:
 ;
@@ -18,20 +12,23 @@
 ;
 ;-------------------------------------------------------------------------------
 
+%include "StuffRsbNasm.inc"
+
 extern ASM_PFX(SmmInitHandler)
 extern ASM_PFX(mRebasedFlag)
 extern ASM_PFX(mSmmRelocationOriginalAddress)
 
-global ASM_PFX(gSmmCr3)
-global ASM_PFX(gSmmCr4)
-global ASM_PFX(gSmmCr0)
-global ASM_PFX(gSmmJmpAddr)
-global ASM_PFX(gSmmInitStack)
+global ASM_PFX(gPatchSmmCr3)
+global ASM_PFX(gPatchSmmCr4)
+global ASM_PFX(gPatchSmmCr0)
+global ASM_PFX(gPatchSmmInitStack)
 global ASM_PFX(gcSmiInitGdtr)
 global ASM_PFX(gcSmmInitSize)
 global ASM_PFX(gcSmmInitTemplate)
-global ASM_PFX(mRebasedFlagAddr32)
-global ASM_PFX(mSmmRelocationOriginalAddressPtr32)
+global ASM_PFX(gPatchRebasedFlagAddr32)
+global ASM_PFX(gPatchSmmRelocationOriginalAddressPtr32)
+
+%define LONG_MODE_CS 0x38
 
     DEFAULT REL
     SECTION .text
@@ -41,32 +38,41 @@ ASM_PFX(gcSmiInitGdtr):
             DQ      0
 
 global ASM_PFX(SmmStartup)
+
+BITS 16
 ASM_PFX(SmmStartup):
-    DB      0x66, 0xb8                   ; mov eax, imm32
-ASM_PFX(gSmmCr3): DD 0
-    mov     cr3, rax
-    DB      0x66, 0x2e
-    lgdt    [ebp + (ASM_PFX(gcSmiInitGdtr) - ASM_PFX(SmmStartup))]
-    DB      0x66, 0xb8                   ; mov eax, imm32
-ASM_PFX(gSmmCr4): DD 0
+    mov     eax, 0x80000001             ; read capability
+    cpuid
+    mov     ebx, edx                    ; rdmsr will change edx. keep it in ebx.
+    mov     eax, strict dword 0         ; source operand will be patched
+ASM_PFX(gPatchSmmCr3):
+    mov     cr3, eax
+o32 lgdt    [cs:ebp + (ASM_PFX(gcSmiInitGdtr) - ASM_PFX(SmmStartup))]
+    mov     eax, strict dword 0         ; source operand will be patched
+ASM_PFX(gPatchSmmCr4):
     or      ah,  2                      ; enable XMM registers access
-    mov     cr4, rax
-    DB      0x66
+    mov     cr4, eax
     mov     ecx, 0xc0000080             ; IA32_EFER MSR
     rdmsr
-    or      ah, 1                       ; set LME bit
+    or      ah, BIT0                    ; set LME bit
+    test    ebx, BIT20                  ; check NXE capability
+    jz      .1
+    or      ah, BIT3                    ; set NXE bit
+.1:
     wrmsr
-    DB      0x66, 0xb8                   ; mov eax, imm32
-ASM_PFX(gSmmCr0): DD 0
-    mov     cr0, rax                    ; enable protected mode & paging
-    DB      0x66, 0xea                   ; far jmp to long mode
-ASM_PFX(gSmmJmpAddr): DQ @LongMode
+    mov     eax, strict dword 0         ; source operand will be patched
+ASM_PFX(gPatchSmmCr0):
+    mov     cr0, eax                    ; enable protected mode & paging
+    jmp     LONG_MODE_CS : dword 0      ; offset will be patched to @LongMode
+@PatchLongModeOffset:
+
+BITS 64
 @LongMode:                              ; long-mode starts here
-    DB      0x48, 0xbc                   ; mov rsp, imm64
-ASM_PFX(gSmmInitStack): DQ 0
+    mov     rsp, strict qword 0         ; source operand will be patched
+ASM_PFX(gPatchSmmInitStack):
     and     sp, 0xfff0                  ; make sure RSP is 16-byte aligned
     ;
-    ; Accoring to X64 calling convention, XMM0~5 are volatile, we need to save
+    ; According to X64 calling convention, XMM0~5 are volatile, we need to save
     ; them before calling C-function.
     ;
     sub     rsp, 0x60
@@ -91,6 +97,7 @@ ASM_PFX(gSmmInitStack): DQ 0
     movdqa  xmm4, [rsp + 0x40]
     movdqa  xmm5, [rsp + 0x50]
 
+    StuffRsb64
     rsm
 
 BITS 16
@@ -99,7 +106,7 @@ ASM_PFX(gcSmmInitTemplate):
     sub ebp, 0x30000
     jmp ebp
 @L1:
-    DQ      ASM_PFX(SmmStartup)
+    DQ     0; ASM_PFX(SmmStartup)
 
 ASM_PFX(gcSmmInitSize): DW $ - ASM_PFX(gcSmmInitTemplate)
 
@@ -115,16 +122,25 @@ ASM_PFX(SmmRelocationSemaphoreComplete):
 ;
 ; Semaphore code running in 32-bit mode
 ;
+BITS 32
 global ASM_PFX(SmmRelocationSemaphoreComplete32)
 ASM_PFX(SmmRelocationSemaphoreComplete32):
-    ;
-    ; mov byte ptr [], 1
-    ;
-    db      0xc6, 0x5
-ASM_PFX(mRebasedFlagAddr32): dd 0
-    db      1
-    ;
-    ; jmp dword ptr []
-    ;
-    db      0xff, 0x25
-ASM_PFX(mSmmRelocationOriginalAddressPtr32): dd 0
+    push    eax
+    mov     eax, strict dword 0                ; source operand will be patched
+ASM_PFX(gPatchRebasedFlagAddr32):
+    mov     byte [eax], 1
+    pop     eax
+    jmp     dword [dword 0]                    ; destination will be patched
+ASM_PFX(gPatchSmmRelocationOriginalAddressPtr32):
+
+BITS 64
+global ASM_PFX(PiSmmCpuSmmInitFixupAddress)
+ASM_PFX(PiSmmCpuSmmInitFixupAddress):
+    lea    rax, [@LongMode]
+    lea    rcx, [@PatchLongModeOffset - 6]
+    mov    dword [rcx], eax
+
+    lea    rax, [ASM_PFX(SmmStartup)]
+    lea    rcx, [@L1]
+    mov    qword [rcx], rax
+    ret

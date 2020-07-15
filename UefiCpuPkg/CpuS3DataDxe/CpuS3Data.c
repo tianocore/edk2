@@ -9,16 +9,10 @@ number of CPUs reported by the MP Services Protocol, so this module does not
 support hot plug CPUs.  This module can be copied into a CPU specific package
 and customized if these additional features are required.
 
-Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2013 - 2017, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2015, Red Hat, Inc.
 
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -31,6 +25,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MtrrLib.h>
+#include <Library/MemoryAllocationLib.h>
 
 #include <Protocol/MpService.h>
 #include <Guid/EventGroup.h>
@@ -46,9 +41,7 @@ typedef struct {
 } ACPI_CPU_DATA_EX;
 
 /**
-  Allocate EfiACPIMemoryNVS below 4G memory address.
-
-  This function allocates EfiACPIMemoryNVS below 4G memory address.
+  Allocate EfiACPIMemoryNVS memory.
 
   @param[in] Size   Size of memory to allocate.
 
@@ -56,7 +49,7 @@ typedef struct {
 
 **/
 VOID *
-AllocateAcpiNvsMemoryBelow4G (
+AllocateAcpiNvsMemory (
   IN UINTN  Size
   )
 {
@@ -64,9 +57,8 @@ AllocateAcpiNvsMemoryBelow4G (
   EFI_STATUS            Status;
   VOID                  *Buffer;
 
-  Address = BASE_4GB - 1;
   Status  = gBS->AllocatePages (
-                   AllocateMaxAddress,
+                   AllocateAnyPages,
                    EfiACPIMemoryNVS,
                    EFI_SIZE_TO_PAGES (Size),
                    &Address
@@ -81,6 +73,28 @@ AllocateAcpiNvsMemoryBelow4G (
   return Buffer;
 }
 
+/**
+  Allocate memory and clean it with zero.
+
+  @param[in] Size   Size of memory to allocate.
+
+  @return       Allocated address for output.
+
+**/
+VOID *
+AllocateZeroPages (
+  IN UINTN  Size
+  )
+{
+  VOID                  *Buffer;
+
+  Buffer = AllocatePages (EFI_SIZE_TO_PAGES (Size));
+  if (Buffer != NULL) {
+    ZeroMem (Buffer, Size);
+  }
+
+  return Buffer;
+}
 /**
   Callback function executed when the EndOfDxe event group is signaled.
 
@@ -160,15 +174,18 @@ CpuS3DataInitialize (
   VOID                       *Gdt;
   VOID                       *Idt;
   EFI_EVENT                  Event;
+  ACPI_CPU_DATA              *OldAcpiCpuData;
 
   if (!PcdGetBool (PcdAcpiS3Enable)) {
     return EFI_UNSUPPORTED;
   }
 
   //
-  // Allocate ACPI NVS memory below 4G memory for use on ACPI S3 resume.
+  // Set PcdCpuS3DataAddress to the base address of the ACPI_CPU_DATA structure
   //
-  AcpiCpuDataEx = AllocateAcpiNvsMemoryBelow4G (sizeof (ACPI_CPU_DATA_EX));
+  OldAcpiCpuData = (ACPI_CPU_DATA *) (UINTN) PcdGet64 (PcdCpuS3DataAddress);
+
+  AcpiCpuDataEx = AllocateZeroPages (sizeof (ACPI_CPU_DATA_EX));
   ASSERT (AcpiCpuDataEx != NULL);
   AcpiCpuData = &AcpiCpuDataEx->AcpiCpuData;
 
@@ -204,9 +221,13 @@ CpuS3DataInitialize (
   AcpiCpuData->MtrrTable    = (EFI_PHYSICAL_ADDRESS)(UINTN)&AcpiCpuDataEx->MtrrTable;
 
   //
-  // Allocate stack space for all CPUs
+  // Allocate stack space for all CPUs.
+  // Use ACPI NVS memory type because this data will be directly used by APs
+  // in S3 resume phase in long mode. Also during S3 resume, the stack buffer
+  // will only be used as scratch space. i.e. we won't read anything from it
+  // before we write to it, in PiSmmCpuDxeSmm.
   //
-  Stack = AllocateAcpiNvsMemoryBelow4G (NumberOfCpus * AcpiCpuData->StackSize);
+  Stack = AllocateAcpiNvsMemory (NumberOfCpus * AcpiCpuData->StackSize);
   ASSERT (Stack != NULL);
   AcpiCpuData->StackAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)Stack;
 
@@ -217,11 +238,11 @@ CpuS3DataInitialize (
   AsmReadIdtr (&AcpiCpuDataEx->IdtrProfile);
 
   //
-  // Allocate GDT and IDT in ACPI NVS and copy current GDT and IDT contents
+  // Allocate GDT and IDT and copy current GDT and IDT contents
   //
   GdtSize = AcpiCpuDataEx->GdtrProfile.Limit + 1;
   IdtSize = AcpiCpuDataEx->IdtrProfile.Limit + 1;
-  Gdt = AllocateAcpiNvsMemoryBelow4G (GdtSize + IdtSize);
+  Gdt = AllocateZeroPages (GdtSize + IdtSize);
   ASSERT (Gdt != NULL);
   Idt = (VOID *)((UINTN)Gdt + GdtSize);
   CopyMem (Gdt, (VOID *)AcpiCpuDataEx->GdtrProfile.Base, GdtSize);
@@ -229,32 +250,40 @@ CpuS3DataInitialize (
   AcpiCpuDataEx->GdtrProfile.Base = (UINTN)Gdt;
   AcpiCpuDataEx->IdtrProfile.Base = (UINTN)Idt;
 
-  //
-  // Allocate buffer for empty RegisterTable and PreSmmInitRegisterTable for all CPUs
-  //
-  TableSize = 2 * NumberOfCpus * sizeof (CPU_REGISTER_TABLE);
-  RegisterTable = (CPU_REGISTER_TABLE *)AllocateAcpiNvsMemoryBelow4G (TableSize);
-  ASSERT (RegisterTable != NULL);
-  for (Index = 0; Index < NumberOfCpus; Index++) {
-    Status = MpServices->GetProcessorInfo (
+  if (OldAcpiCpuData != NULL) {
+    AcpiCpuData->RegisterTable           = OldAcpiCpuData->RegisterTable;
+    AcpiCpuData->PreSmmInitRegisterTable = OldAcpiCpuData->PreSmmInitRegisterTable;
+    AcpiCpuData->ApLocation              = OldAcpiCpuData->ApLocation;
+    CopyMem (&AcpiCpuData->CpuStatus, &OldAcpiCpuData->CpuStatus, sizeof (CPU_STATUS_INFORMATION));
+  } else {
+    //
+    // Allocate buffer for empty RegisterTable and PreSmmInitRegisterTable for all CPUs
+    //
+    TableSize = 2 * NumberOfCpus * sizeof (CPU_REGISTER_TABLE);
+    RegisterTable = (CPU_REGISTER_TABLE *)AllocateZeroPages (TableSize);
+    ASSERT (RegisterTable != NULL);
+
+    for (Index = 0; Index < NumberOfCpus; Index++) {
+      Status = MpServices->GetProcessorInfo (
                            MpServices,
                            Index,
                            &ProcessorInfoBuffer
                            );
-    ASSERT_EFI_ERROR (Status);
+      ASSERT_EFI_ERROR (Status);
 
-    RegisterTable[Index].InitialApicId      = (UINT32)ProcessorInfoBuffer.ProcessorId;
-    RegisterTable[Index].TableLength        = 0;
-    RegisterTable[Index].AllocatedSize      = 0;
-    RegisterTable[Index].RegisterTableEntry = NULL;
+      RegisterTable[Index].InitialApicId      = (UINT32)ProcessorInfoBuffer.ProcessorId;
+      RegisterTable[Index].TableLength        = 0;
+      RegisterTable[Index].AllocatedSize      = 0;
+      RegisterTable[Index].RegisterTableEntry = 0;
 
-    RegisterTable[NumberOfCpus + Index].InitialApicId      = (UINT32)ProcessorInfoBuffer.ProcessorId;
-    RegisterTable[NumberOfCpus + Index].TableLength        = 0;
-    RegisterTable[NumberOfCpus + Index].AllocatedSize      = 0;
-    RegisterTable[NumberOfCpus + Index].RegisterTableEntry = NULL;
+      RegisterTable[NumberOfCpus + Index].InitialApicId      = (UINT32)ProcessorInfoBuffer.ProcessorId;
+      RegisterTable[NumberOfCpus + Index].TableLength        = 0;
+      RegisterTable[NumberOfCpus + Index].AllocatedSize      = 0;
+      RegisterTable[NumberOfCpus + Index].RegisterTableEntry = 0;
+    }
+    AcpiCpuData->RegisterTable           = (EFI_PHYSICAL_ADDRESS)(UINTN)RegisterTable;
+    AcpiCpuData->PreSmmInitRegisterTable = (EFI_PHYSICAL_ADDRESS)(UINTN)(RegisterTable + NumberOfCpus);
   }
-  AcpiCpuData->RegisterTable           = (EFI_PHYSICAL_ADDRESS)(UINTN)RegisterTable;
-  AcpiCpuData->PreSmmInitRegisterTable = (EFI_PHYSICAL_ADDRESS)(UINTN)(RegisterTable + NumberOfCpus);
 
   //
   // Set PcdCpuS3DataAddress to the base address of the ACPI_CPU_DATA structure

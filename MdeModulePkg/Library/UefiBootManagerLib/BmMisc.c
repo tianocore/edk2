@@ -1,15 +1,9 @@
 /** @file
   Misc library functions.
 
-Copyright (c) 2011 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2019, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -122,7 +116,7 @@ BmMatchDevicePaths (
 }
 
 /**
-  This routine adjust the memory information for different memory type and 
+  This routine adjust the memory information for different memory type and
   save them into the variables for next boot. It resets the system when
   memory information is updated and the current boot option belongs to
   boot category instead of application category. It doesn't count the
@@ -163,7 +157,7 @@ BmSetMemoryTypeInformationVariable (
   }
 
   //
-  // Only check the the Memory Type Information variable in the boot mode 
+  // Only check the the Memory Type Information variable in the boot mode
   // other than BOOT_WITH_DEFAULT_SETTINGS because the Memory Type
   // Information is not valid in this boot mode.
   //
@@ -172,8 +166,8 @@ BmSetMemoryTypeInformationVariable (
     Status = gRT->GetVariable (
                     EFI_MEMORY_TYPE_INFORMATION_VARIABLE_NAME,
                     &gEfiMemoryTypeInformationGuid,
-                    NULL, 
-                    &VariableSize, 
+                    NULL,
+                    &VariableSize,
                     NULL
                     );
     if (Status == EFI_BUFFER_TOO_SMALL) {
@@ -304,15 +298,14 @@ BmSetMemoryTypeInformationVariable (
                                  then EFI_INVALID_PARAMETER is returned.
   @param  VendorGuid             A unique identifier for the vendor.
   @param  Attributes             Attributes bitmask to set for the variable.
-  @param  DataSize               The size in bytes of the Data buffer. Unless the EFI_VARIABLE_APPEND_WRITE, 
-                                 EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS, or 
-                                 EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS attribute is set, a size of zero 
-                                 causes the variable to be deleted. When the EFI_VARIABLE_APPEND_WRITE attribute is 
-                                 set, then a SetVariable() call with a DataSize of zero will not cause any change to 
-                                 the variable value (the timestamp associated with the variable may be updated however 
-                                 even if no new data value is provided,see the description of the 
-                                 EFI_VARIABLE_AUTHENTICATION_2 descriptor below. In this case the DataSize will not 
-                                 be zero since the EFI_VARIABLE_AUTHENTICATION_2 descriptor will be populated). 
+  @param  DataSize               The size in bytes of the Data buffer. Unless the EFI_VARIABLE_APPEND_WRITE,
+                                 or EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS attribute is set, a size of zero
+                                 causes the variable to be deleted. When the EFI_VARIABLE_APPEND_WRITE attribute is
+                                 set, then a SetVariable() call with a DataSize of zero will not cause any change to
+                                 the variable value (the timestamp associated with the variable may be updated however
+                                 even if no new data value is provided,see the description of the
+                                 EFI_VARIABLE_AUTHENTICATION_2 descriptor below. In this case the DataSize will not
+                                 be zero since the EFI_VARIABLE_AUTHENTICATION_2 descriptor will be populated).
   @param  Data                   The contents for the variable.
 
   @retval EFI_SUCCESS            The firmware has successfully stored the variable and its data as
@@ -324,9 +317,8 @@ BmSetMemoryTypeInformationVariable (
   @retval EFI_DEVICE_ERROR       The variable could not be retrieved due to a hardware error.
   @retval EFI_WRITE_PROTECTED    The variable in question is read-only.
   @retval EFI_WRITE_PROTECTED    The variable in question cannot be deleted.
-  @retval EFI_SECURITY_VIOLATION The variable could not be written due to EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS 
-                                 or EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACESS being set, but the AuthInfo 
-                                 does NOT pass the validation check carried out by the firmware.
+  @retval EFI_SECURITY_VIOLATION The variable could not be written due to EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACESS
+                                 being set, but the AuthInfo does NOT pass the validation check carried out by the firmware.
 
   @retval EFI_NOT_FOUND          The variable trying to be updated or deleted was not found.
 **/
@@ -420,7 +412,6 @@ BmCharToUint (
     return (Char - L'A' + 0xA);
   }
 
-  ASSERT (FALSE);
   return (UINTN) -1;
 }
 
@@ -448,8 +439,6 @@ EfiBootManagerDispatchDeferredImages (
   UINTN                              ImageSize;
   BOOLEAN                            BootOption;
   EFI_HANDLE                         ImageHandle;
-  UINTN                              ExitDataSize;
-  CHAR16                             *ExitData;
   UINTN                              ImageCount;
   UINTN                              LoadCount;
 
@@ -504,17 +493,24 @@ EfiBootManagerDispatchDeferredImages (
         0,
         &ImageHandle
       );
-      if (!EFI_ERROR (Status)) {
+      if (EFI_ERROR (Status)) {
+        //
+        // With EFI_SECURITY_VIOLATION retval, the Image was loaded and an ImageHandle was created
+        // with a valid EFI_LOADED_IMAGE_PROTOCOL, but the image can not be started right now.
+        // If the caller doesn't have the option to defer the execution of an image, we should
+        // unload image for the EFI_SECURITY_VIOLATION to avoid resource leak.
+        //
+        if (Status == EFI_SECURITY_VIOLATION) {
+          gBS->UnloadImage (ImageHandle);
+        }
+      } else {
         LoadCount++;
         //
         // Before calling the image, enable the Watchdog Timer for
         // a 5 Minute period
         //
         gBS->SetWatchdogTimer (5 * 60, 0x0000, 0x00, NULL);
-        Status = gBS->StartImage (ImageHandle, &ExitDataSize, &ExitData);
-        if (ExitData != NULL) {
-          FreePool (ExitData);
-        }
+        gBS->StartImage (ImageHandle, NULL, NULL);
 
         //
         // Clear the Watchdog Timer after the image returns.

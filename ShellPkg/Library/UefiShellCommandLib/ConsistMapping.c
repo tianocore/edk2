@@ -1,14 +1,8 @@
 /** @file
   Main file for support of shell consist mapping.
 
-  Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution. The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include "UefiShellCommandLib.h"
@@ -56,10 +50,10 @@ typedef struct {
   @retval EFI_OUT_OF_RESOURCES    Out of resources.
   @retval EFI_SUCCESS             The appending was successful.
 **/
-typedef 
-EFI_STATUS 
+typedef
+EFI_STATUS
 (*SERIAL_DECODE_FUNCTION) (
-  EFI_DEVICE_PATH_PROTOCOL    *DevPath, 
+  EFI_DEVICE_PATH_PROTOCOL    *DevPath,
   DEVICE_CONSIST_MAPPING_INFO *MapInfo,
   EFI_DEVICE_PATH_PROTOCOL    *OrigDevPath
   );
@@ -640,7 +634,7 @@ DevPathSerialUsb (
     UsbIo = NULL;
     if (!EFI_ERROR(Status)) {
       Status = gBS->OpenProtocol(TempHandle, &gEfiUsbIoProtocolGuid, (VOID**)&UsbIo, gImageHandle, NULL, EFI_OPEN_PROTOCOL_GET_PROTOCOL);
-    } 
+    }
 
     if (!EFI_ERROR(Status)) {
       ASSERT(UsbIo != NULL);
@@ -661,7 +655,7 @@ DevPathSerialUsb (
           }
         }
       }
-    } 
+    }
   }
   return Status;
 }
@@ -1520,13 +1514,13 @@ ShellCommandConsistMappingInitialize (
       continue;
     }
 
-    Status = gBS->HandleProtocol( HandleBuffer[HandleLoop], 
-                                  &gEfiBlockIoProtocolGuid, 
+    Status = gBS->HandleProtocol( HandleBuffer[HandleLoop],
+                                  &gEfiBlockIoProtocolGuid,
                                   (VOID **)&BlockIo
                                   );
     if (EFI_ERROR(Status)) {
-      Status = gBS->HandleProtocol( HandleBuffer[HandleLoop], 
-                                    &gEfiSimpleFileSystemProtocolGuid, 
+      Status = gBS->HandleProtocol( HandleBuffer[HandleLoop],
+                                    &gEfiSimpleFileSystemProtocolGuid,
                                     (VOID **)&SimpleFileSystem
                                     );
       if (EFI_ERROR(Status)) {
@@ -1610,7 +1604,6 @@ ShellCommandConsistMappingGenMappingName (
   DEVICE_CONSIST_MAPPING_INFO MappingInfo;
   EFI_DEVICE_PATH_PROTOCOL    *HIDevicePath;
   UINTN                       Index;
-  CHAR16                      *NewStr;
 
   ASSERT(DevicePath         != NULL);
   ASSERT(Table  != NULL);
@@ -1667,13 +1660,7 @@ ShellCommandConsistMappingGenMappingName (
     return NULL;
   }
 
-  NewStr = ReallocatePool (Str.Len * sizeof (CHAR16), (Str.Len + 1) * sizeof (CHAR16), Str.Str);
-  if (NewStr == NULL) {
-    SHELL_FREE_NON_NULL (Str.Str);
-    return (NULL);
-  }
-  NewStr[Str.Len] = CHAR_NULL;
-  return NewStr;
+  return Str.Str;
 }
 
 /**

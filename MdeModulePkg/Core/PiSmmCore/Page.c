@@ -1,14 +1,8 @@
 /** @file
   SMM Memory page management functions.
 
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials are licensed and made available
-  under the terms and conditions of the BSD License which accompanies this
-  distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -64,6 +58,8 @@ LIST_ENTRY   mFreeMemoryMapEntryList = INITIALIZE_LIST_HEAD_VARIABLE (mFreeMemor
   @param[out]  Memory                 A pointer to receive the base allocated memory
                                       address.
   @param[in]   AddRegion              If this memory is new added region.
+  @param[in]   NeedGuard              Flag to indicate Guard page is needed
+                                      or not
 
   @retval EFI_INVALID_PARAMETER  Parameters violate checking rules defined in spec.
   @retval EFI_NOT_FOUND          Could not allocate pages match the requirement.
@@ -77,7 +73,8 @@ SmmInternalAllocatePagesEx (
   IN  EFI_MEMORY_TYPE       MemoryType,
   IN  UINTN                 NumberOfPages,
   OUT EFI_PHYSICAL_ADDRESS  *Memory,
-  IN  BOOLEAN               AddRegion
+  IN  BOOLEAN               AddRegion,
+  IN  BOOLEAN               NeedGuard
   );
 
 /**
@@ -86,7 +83,7 @@ SmmInternalAllocatePagesEx (
   Please Note this algorithm to allocate the memory map descriptor has a property
   that the memory allocated for memory entries always grows, and will never really be freed.
 
-  @return The Memory map descriptor dequed from the mFreeMemoryMapEntryList
+  @return The Memory map descriptor dequeued from the mFreeMemoryMapEntryList
 
 **/
 MEMORY_MAP *
@@ -112,14 +109,15 @@ AllocateMemoryMapEntry (
                EfiRuntimeServicesData,
                EFI_SIZE_TO_PAGES (RUNTIME_PAGE_ALLOCATION_GRANULARITY),
                &Mem,
-               TRUE
+               TRUE,
+               FALSE
                );
     ASSERT_EFI_ERROR (Status);
     if(!EFI_ERROR (Status)) {
       FreeDescriptorEntries = (MEMORY_MAP *)(UINTN)Mem;
       //DEBUG((DEBUG_INFO, "New FreeDescriptorEntries - 0x%x\n", FreeDescriptorEntries));
       //
-      // Enque the free memmory map entries into the list
+      // Enqueue the free memory map entries into the list
       //
       for (Index = 0; Index< RUNTIME_PAGE_ALLOCATION_GRANULARITY / sizeof(MEMORY_MAP); Index++) {
         FreeDescriptorEntries[Index].Signature = MEMORY_MAP_SIGNATURE;
@@ -242,6 +240,8 @@ RemoveOldEntry (
   )
 {
   RemoveEntryList (&Entry->Link);
+  Entry->Link.ForwardLink = NULL;
+
   if (!Entry->FromStack) {
     InsertTailList (&mFreeMemoryMapEntryList, &Entry->Link);
   }
@@ -445,128 +445,7 @@ GetSmmMemoryMapEntryCount (
   return Count;
 }
 
-/**
-  Dump Smm memory map entry.
-**/
-VOID
-DumpSmmMemoryMapEntry (
-  VOID
-  )
-{
-  LIST_ENTRY               *Link;
-  MEMORY_MAP               *Entry;
-  EFI_PHYSICAL_ADDRESS     Last;
 
-  Last = 0;
-  DEBUG ((DEBUG_INFO, "DumpSmmMemoryMapEntry:\n"));
-  Link = gMemoryMap.ForwardLink;
-  while (Link != &gMemoryMap) {
-    Entry = CR (Link, MEMORY_MAP, Link, MEMORY_MAP_SIGNATURE);
-    Link  = Link->ForwardLink;
-
-    if ((Last != 0) && (Last != (UINT64)-1)) {
-      if (Last + 1 != Entry->Start) {
-        Last = (UINT64)-1;
-      } else {
-        Last = Entry->End;
-      }
-    } else if (Last == 0) {
-      Last = Entry->End;
-    }
-
-    DEBUG ((DEBUG_INFO, "Entry (Link - 0x%x)\n", &Entry->Link));
-    DEBUG ((DEBUG_INFO, "  Signature         - 0x%x\n", Entry->Signature));
-    DEBUG ((DEBUG_INFO, "  Link.ForwardLink  - 0x%x\n", Entry->Link.ForwardLink));
-    DEBUG ((DEBUG_INFO, "  Link.BackLink     - 0x%x\n", Entry->Link.BackLink));
-    DEBUG ((DEBUG_INFO, "  Type              - 0x%x\n", Entry->Type));
-    DEBUG ((DEBUG_INFO, "  Start             - 0x%016lx\n", Entry->Start));
-    DEBUG ((DEBUG_INFO, "  End               - 0x%016lx\n", Entry->End));
-  }
-
-  ASSERT (Last != (UINT64)-1);
-}
-
-/**
-  Dump Smm memory map.
-**/
-VOID
-DumpSmmMemoryMap (
-  VOID
-  )
-{
-  LIST_ENTRY      *Node;
-  FREE_PAGE_LIST  *Pages;
-
-  DEBUG ((DEBUG_INFO, "DumpSmmMemoryMap\n"));
-
-  Pages = NULL;
-  Node = mSmmMemoryMap.ForwardLink;
-  while (Node != &mSmmMemoryMap) {
-    Pages = BASE_CR (Node, FREE_PAGE_LIST, Link);
-    DEBUG ((DEBUG_INFO, "Pages - 0x%x\n", Pages));
-    DEBUG ((DEBUG_INFO, "Pages->NumberOfPages - 0x%x\n", Pages->NumberOfPages));
-    Node = Node->ForwardLink;
-  }
-}
-
-/**
-  Check if a Smm base~length is in Smm memory map.
-
-  @param[in] Base   The base address of Smm memory to be checked.
-  @param[in] Length THe length of Smm memory to be checked.
-
-  @retval TRUE  Smm base~length is in smm memory map.
-  @retval FALSE Smm base~length is in smm memory map.
-**/
-BOOLEAN
-SmmMemoryMapConsistencyCheckRange (
-  IN EFI_PHYSICAL_ADDRESS Base,
-  IN UINTN                Length
-  )
-{
-  LIST_ENTRY               *Link;
-  MEMORY_MAP               *Entry;
-  BOOLEAN                  Result;
-
-  Result = FALSE;
-  Link = gMemoryMap.ForwardLink;
-  while (Link != &gMemoryMap) {
-    Entry = CR (Link, MEMORY_MAP, Link, MEMORY_MAP_SIGNATURE);
-    Link  = Link->ForwardLink;
-
-    if (Entry->Type != EfiConventionalMemory) {
-      continue;
-    }
-    if (Entry->Start == Base && Entry->End == Base + Length - 1) {
-      Result = TRUE;
-      break;
-    }
-  }
-
-  return Result;
-}
-
-/**
-  Check the consistency of Smm memory map.
-**/
-VOID
-SmmMemoryMapConsistencyCheck (
-  VOID
-  )
-{
-  LIST_ENTRY      *Node;
-  FREE_PAGE_LIST  *Pages;
-  BOOLEAN         Result;
-
-  Pages = NULL;
-  Node = mSmmMemoryMap.ForwardLink;
-  while (Node != &mSmmMemoryMap) {
-    Pages = BASE_CR (Node, FREE_PAGE_LIST, Link);
-    Result = SmmMemoryMapConsistencyCheckRange ((EFI_PHYSICAL_ADDRESS)(UINTN)Pages, (UINTN)EFI_PAGES_TO_SIZE(Pages->NumberOfPages));
-    ASSERT (Result);
-    Node = Node->ForwardLink;
-  }
-}
 
 /**
   Internal Function. Allocate n pages from given free page node.
@@ -688,6 +567,8 @@ InternalAllocAddress (
   @param[out]  Memory                 A pointer to receive the base allocated memory
                                       address.
   @param[in]   AddRegion              If this memory is new added region.
+  @param[in]   NeedGuard              Flag to indicate Guard page is needed
+                                      or not
 
   @retval EFI_INVALID_PARAMETER  Parameters violate checking rules defined in spec.
   @retval EFI_NOT_FOUND          Could not allocate pages match the requirement.
@@ -701,7 +582,8 @@ SmmInternalAllocatePagesEx (
   IN  EFI_MEMORY_TYPE       MemoryType,
   IN  UINTN                 NumberOfPages,
   OUT EFI_PHYSICAL_ADDRESS  *Memory,
-  IN  BOOLEAN               AddRegion
+  IN  BOOLEAN               AddRegion,
+  IN  BOOLEAN               NeedGuard
   )
 {
   UINTN  RequestedAddress;
@@ -723,6 +605,21 @@ SmmInternalAllocatePagesEx (
     case AllocateAnyPages:
       RequestedAddress = (UINTN)(-1);
     case AllocateMaxAddress:
+      if (NeedGuard) {
+        *Memory = InternalAllocMaxAddressWithGuard (
+                      &mSmmMemoryMap,
+                      NumberOfPages,
+                      RequestedAddress,
+                      MemoryType
+                      );
+        if (*Memory == (UINTN)-1) {
+          return EFI_OUT_OF_RESOURCES;
+        } else {
+          ASSERT (VerifyMemoryGuard (*Memory, NumberOfPages) == TRUE);
+          return EFI_SUCCESS;
+        }
+      }
+
       *Memory = InternalAllocMaxAddress (
                   &mSmmMemoryMap,
                   NumberOfPages,
@@ -766,6 +663,8 @@ SmmInternalAllocatePagesEx (
   @param[in]   NumberOfPages          The number of pages to allocate.
   @param[out]  Memory                 A pointer to receive the base allocated memory
                                       address.
+  @param[in]   NeedGuard              Flag to indicate Guard page is needed
+                                      or not
 
   @retval EFI_INVALID_PARAMETER  Parameters violate checking rules defined in spec.
   @retval EFI_NOT_FOUND          Could not allocate pages match the requirement.
@@ -779,10 +678,12 @@ SmmInternalAllocatePages (
   IN  EFI_ALLOCATE_TYPE     Type,
   IN  EFI_MEMORY_TYPE       MemoryType,
   IN  UINTN                 NumberOfPages,
-  OUT EFI_PHYSICAL_ADDRESS  *Memory
+  OUT EFI_PHYSICAL_ADDRESS  *Memory,
+  IN  BOOLEAN               NeedGuard
   )
 {
-  return SmmInternalAllocatePagesEx (Type, MemoryType, NumberOfPages, Memory, FALSE);
+  return SmmInternalAllocatePagesEx (Type, MemoryType, NumberOfPages, Memory,
+                                     FALSE, NeedGuard);
 }
 
 /**
@@ -811,8 +712,11 @@ SmmAllocatePages (
   )
 {
   EFI_STATUS  Status;
+  BOOLEAN     NeedGuard;
 
-  Status = SmmInternalAllocatePages (Type, MemoryType, NumberOfPages, Memory);
+  NeedGuard = IsPageTypeToGuard (MemoryType, Type);
+  Status = SmmInternalAllocatePages (Type, MemoryType, NumberOfPages, Memory,
+                                     NeedGuard);
   if (!EFI_ERROR (Status)) {
     SmmCoreUpdateProfile (
       (EFI_PHYSICAL_ADDRESS) (UINTN) RETURN_ADDRESS (0),
@@ -931,6 +835,7 @@ SmmInternalFreePagesEx (
 
   @param[in]  Memory                 Base address of memory being freed.
   @param[in]  NumberOfPages          The number of pages to free.
+  @param[in]  IsGuarded              Is the memory to free guarded or not.
 
   @retval EFI_NOT_FOUND          Could not find the entry that covers the range.
   @retval EFI_INVALID_PARAMETER  Address not aligned, Address is zero or NumberOfPages is zero.
@@ -941,10 +846,49 @@ EFI_STATUS
 EFIAPI
 SmmInternalFreePages (
   IN EFI_PHYSICAL_ADDRESS  Memory,
+  IN UINTN                 NumberOfPages,
+  IN BOOLEAN               IsGuarded
+  )
+{
+  if (IsGuarded) {
+    return SmmInternalFreePagesExWithGuard (Memory, NumberOfPages, FALSE);
+  }
+  return SmmInternalFreePagesEx (Memory, NumberOfPages, FALSE);
+}
+
+/**
+  Check whether the input range is in memory map.
+
+  @param  Memory                 Base address of memory being inputed.
+  @param  NumberOfPages          The number of pages.
+
+  @retval TRUE   In memory map.
+  @retval FALSE  Not in memory map.
+
+**/
+BOOLEAN
+InMemMap (
+  IN EFI_PHYSICAL_ADDRESS  Memory,
   IN UINTN                 NumberOfPages
   )
 {
-  return SmmInternalFreePagesEx (Memory, NumberOfPages, FALSE);
+  LIST_ENTRY               *Link;
+  MEMORY_MAP               *Entry;
+  EFI_PHYSICAL_ADDRESS     Last;
+
+  Last = Memory + EFI_PAGES_TO_SIZE (NumberOfPages) - 1;
+
+  Link = gMemoryMap.ForwardLink;
+  while (Link != &gMemoryMap) {
+    Entry = CR (Link, MEMORY_MAP, Link, MEMORY_MAP_SIGNATURE);
+    Link  = Link->ForwardLink;
+
+    if ((Entry->Start <= Memory) && (Entry->End >= Last)) {
+      return TRUE;
+    }
+  }
+
+  return FALSE;
 }
 
 /**
@@ -966,8 +910,14 @@ SmmFreePages (
   )
 {
   EFI_STATUS  Status;
+  BOOLEAN     IsGuarded;
 
-  Status = SmmInternalFreePages (Memory, NumberOfPages);
+  if (!InMemMap(Memory, NumberOfPages)) {
+    return EFI_NOT_FOUND;
+  }
+
+  IsGuarded = IsHeapGuardEnabled () && IsMemoryGuarded (Memory);
+  Status = SmmInternalFreePages (Memory, NumberOfPages, IsGuarded);
   if (!EFI_ERROR (Status)) {
     SmmCoreUpdateProfile (
       (EFI_PHYSICAL_ADDRESS) (UINTN) RETURN_ADDRESS (0),

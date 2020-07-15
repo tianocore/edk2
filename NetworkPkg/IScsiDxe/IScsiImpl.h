@@ -1,14 +1,8 @@
 /** @file
   The shared head file for iSCSI driver.
 
-Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -39,6 +33,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/IScsiInitiatorName.h>
 #include <Protocol/ScsiPassThruExt.h>
 #include <Protocol/AdapterInformation.h>
+#include <Protocol/NetworkInterfaceIdentifier.h>
 
 #include <Library/HiiLib.h>
 #include <Library/UefiHiiServicesLib.h>
@@ -200,7 +195,7 @@ struct _ISCSI_DRIVER_DATA {
   EFI_EXT_SCSI_PASS_THRU_MODE     ExtScsiPassThruMode;
   EFI_HANDLE                      ExtScsiPassThruHandle;
   EFI_DEVICE_PATH_PROTOCOL        *DevicePath;
-  EFI_HANDLE                      ChildHandle;  
+  EFI_HANDLE                      ChildHandle;
   ISCSI_SESSION                   *Session;
 };
 

@@ -1,16 +1,9 @@
 /** @file
 The module to produce Usb Bus PPI.
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
-  
-This program and the accompanying materials
-are licensed and made available under the terms and conditions
-of the BSD License which accompanies this distribution.  The
-full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -37,7 +30,7 @@ EFI_PEI_PPI_DESCRIPTOR mUsbIoPpiList = {
 
 /**
   The enumeration routine to detect device change.
-  
+
   @param  PeiServices            Describes the list of possible PEI Services.
   @param  UsbHcPpi               The pointer of PEI_USB_HOST_CONTROLLER_PPI instance.
   @param  Usb2HcPpi              The pointer of PEI_USB2_HOST_CONTROLLER_PPI instance.
@@ -56,7 +49,7 @@ PeiUsbEnumeration (
 
 /**
   Configure new detected usb device.
-  
+
   @param  PeiServices            Describes the list of possible PEI Services.
   @param  PeiUsbDevice           The pointer of PEI_USB_DEVICE instance.
   @param  Port                   The port to be configured.
@@ -77,7 +70,7 @@ PeiConfigureUsbDevice (
 
 /**
   Get all configurations from a detected usb device.
-  
+
   @param  PeiServices            Describes the list of possible PEI Services.
   @param  PeiUsbDevice           The pointer of PEI_USB_DEVICE instance.
 
@@ -94,7 +87,7 @@ PeiUsbGetAllConfiguration (
 
 /**
   Get the start position of next wanted descriptor.
-  
+
   @param  Buffer            Buffer containing data to parse.
   @param  Length            Buffer length.
   @param  DescType          Descriptor type.
@@ -116,7 +109,7 @@ GetExpectedDescriptor (
 
 /**
   The entrypoint of the module, it will enumerate all HCs.
-  
+
   @param  FileHandle             Handle of the file being invoked.
   @param  PeiServices            Describes the list of possible PEI Services.
 
@@ -142,7 +135,7 @@ PeimInitializeUsb (
   }
 
   //
-  // gPeiUsbHostControllerPpiGuid and gPeiUsb2HostControllerPpiGuid should not 
+  // gPeiUsbHostControllerPpiGuid and gPeiUsb2HostControllerPpiGuid should not
   // be produced at the same time
   //
   Index = 0;
@@ -176,18 +169,18 @@ PeimInitializeUsb (
                  Index,
                  NULL,
                  (VOID **) &Usb2HcPpi
-                 );    
+                 );
       if (EFI_ERROR (Status)) {
         //
         // No more host controller, break out
         //
         break;
-      }   
-      PeiUsbEnumeration ((EFI_PEI_SERVICES **) PeiServices, NULL, Usb2HcPpi);   
+      }
+      PeiUsbEnumeration ((EFI_PEI_SERVICES **) PeiServices, NULL, Usb2HcPpi);
       Index++;
     }
   }
-  
+
   if (Index == 0) {
     return EFI_UNSUPPORTED;
   }
@@ -198,7 +191,7 @@ PeimInitializeUsb (
 /**
   The Hub Enumeration just scans the hub ports one time. It also
   doesn't support hot-plug.
-  
+
   @param  PeiServices            Describes the list of possible PEI Services.
   @param  PeiUsbDevice           The pointer of PEI_USB_DEVICE instance.
   @param  CurrentAddress         The DeviceAddress of usb device.
@@ -289,13 +282,13 @@ PeiHubEnumeration (
         NewPeiUsbDevice->IsHub            = 0x0;
         NewPeiUsbDevice->DownStreamPortNo = 0x0;
 
-        if (((PortStatus.PortChangeStatus & USB_PORT_STAT_C_RESET) == 0) || 
+        if (((PortStatus.PortChangeStatus & USB_PORT_STAT_C_RESET) == 0) ||
              ((PortStatus.PortStatus & (USB_PORT_STAT_CONNECTION | USB_PORT_STAT_ENABLE)) == 0)) {
           //
-          // If the port already has reset change flag and is connected and enabled, skip the port reset logic. 
+          // If the port already has reset change flag and is connected and enabled, skip the port reset logic.
           //
           PeiResetHubPort (PeiServices, UsbIoPpi, (UINT8)(Index + 1));
-  
+
           PeiHubGetPortStatus (
              PeiServices,
              UsbIoPpi,
@@ -406,7 +399,7 @@ PeiHubEnumeration (
 
 /**
   The enumeration routine to detect device change.
-  
+
   @param  PeiServices            Describes the list of possible PEI Services.
   @param  UsbHcPpi               The pointer of PEI_USB_HOST_CONTROLLER_PPI instance.
   @param  Usb2HcPpi              The pointer of PEI_USB2_HOST_CONTROLLER_PPI instance.
@@ -440,7 +433,7 @@ PeiUsbEnumeration (
                 PeiServices,
                 Usb2HcPpi,
                 (UINT8 *) &NumOfRootPort
-                );    
+                );
   } else if (UsbHcPpi != NULL) {
     UsbHcPpi->GetRootHubPortNumber (
                 PeiServices,
@@ -464,7 +457,7 @@ PeiUsbEnumeration (
                   Usb2HcPpi,
                   (UINT8) Index,
                   &PortStatus
-                  );      
+                  );
     } else {
       UsbHcPpi->GetRootHubPortStatus (
                   PeiServices,
@@ -515,10 +508,10 @@ PeiUsbEnumeration (
         PeiUsbDevice->IsHub             = 0x0;
         PeiUsbDevice->DownStreamPortNo  = 0x0;
 
-        if (((PortStatus.PortChangeStatus & USB_PORT_STAT_C_RESET) == 0) || 
+        if (((PortStatus.PortChangeStatus & USB_PORT_STAT_C_RESET) == 0) ||
              ((PortStatus.PortStatus & (USB_PORT_STAT_CONNECTION | USB_PORT_STAT_ENABLE)) == 0)) {
           //
-          // If the port already has reset change flag and is connected and enabled, skip the port reset logic. 
+          // If the port already has reset change flag and is connected and enabled, skip the port reset logic.
           //
           ResetRootPort (
             PeiServices,
@@ -550,7 +543,7 @@ PeiUsbEnumeration (
                         Usb2HcPpi,
                         (UINT8) Index,
                         EfiUsbPortResetChange
-                        );        
+                        );
           } else {
             UsbHcPpi->ClearRootHubPortFeature (
                         PeiServices,
@@ -650,7 +643,7 @@ PeiUsbEnumeration (
 
 /**
   Configure new detected usb device.
-  
+
   @param  PeiServices            Describes the list of possible PEI Services.
   @param  PeiUsbDevice           The pointer of PEI_USB_DEVICE instance.
   @param  Port                   The port to be configured.
@@ -767,7 +760,7 @@ PeiConfigureUsbDevice (
 
 /**
   Get all configurations from a detected usb device.
-  
+
   @param  PeiServices            Describes the list of possible PEI Services.
   @param  PeiUsbDevice           The pointer of PEI_USB_DEVICE instance.
 
@@ -815,6 +808,20 @@ PeiUsbGetAllConfiguration (
 
   ConfigDesc        = (EFI_USB_CONFIG_DESCRIPTOR *) PeiUsbDevice->ConfigurationData;
   ConfigDescLength  = ConfigDesc->TotalLength;
+
+  //
+  // Reject if TotalLength even cannot cover itself.
+  //
+  if (ConfigDescLength < OFFSET_OF (EFI_USB_CONFIG_DESCRIPTOR, TotalLength) + sizeof (ConfigDesc->TotalLength)) {
+    return EFI_DEVICE_ERROR;
+  }
+
+  //
+  // Reject if TotalLength exceeds the PeiUsbDevice->ConfigurationData.
+  //
+  if (ConfigDescLength > sizeof (PeiUsbDevice->ConfigurationData)) {
+    return EFI_DEVICE_ERROR;
+  }
 
   //
   // Then we get the total descriptors for this configuration
@@ -920,7 +927,7 @@ PeiUsbGetAllConfiguration (
 
 /**
   Get the start position of next wanted descriptor.
-  
+
   @param  Buffer            Buffer containing data to parse.
   @param  Length            Buffer length.
   @param  DescType          Descriptor type.
@@ -940,65 +947,70 @@ GetExpectedDescriptor (
   OUT UINTN       *ParsedBytes
   )
 {
-  UINT16  DescriptorHeader;
-  UINT8   Len;
-  UINT8   *Ptr;
-  UINTN   Parsed;
+  USB_DESC_HEAD   *Head;
+  UINTN           Offset;
 
-  Parsed  = 0;
-  Ptr     = Buffer;
+  //
+  // Total length is too small that cannot hold the single descriptor header plus data.
+  //
+  if (Length <= sizeof (USB_DESC_HEAD)) {
+    DEBUG ((DEBUG_ERROR, "GetExpectedDescriptor: met mal-format descriptor, total length = %d!\n", Length));
+    return EFI_DEVICE_ERROR;
+  }
 
-  while (TRUE) {
+  //
+  // All the descriptor has a common LTV (Length, Type, Value)
+  // format. Skip the descriptor that isn't of this Type
+  //
+  Offset = 0;
+  Head   = (USB_DESC_HEAD *)Buffer;
+  while (Offset < Length - sizeof (USB_DESC_HEAD)) {
     //
-    // Buffer length should not less than Desc length
+    // Above condition make sure Head->Len and Head->Type are safe to access
     //
-    if (Length < DescLength) {
+    Head = (USB_DESC_HEAD *)&Buffer[Offset];
+
+    if (Head->Len == 0) {
+      DEBUG ((DEBUG_ERROR, "GetExpectedDescriptor: met mal-format descriptor, Head->Len = 0!\n"));
       return EFI_DEVICE_ERROR;
     }
 
-    DescriptorHeader  = (UINT16) (*Ptr + ((*(Ptr + 1)) << 8));
-
-    Len               = Buffer[0];
-
     //
-    // Check to see if it is a start of expected descriptor
+    // Make sure no overflow when adding Head->Len to Offset.
     //
-    if (DescriptorHeader == ((DescType << 8) | DescLength)) {
+    if (Head->Len > MAX_UINTN - Offset) {
+      DEBUG ((DEBUG_ERROR, "GetExpectedDescriptor: met mal-format descriptor, Head->Len = %d!\n", Head->Len));
+      return EFI_DEVICE_ERROR;
+    }
+
+    if (Head->Type == DescType) {
       break;
     }
 
-    if ((UINT8) (DescriptorHeader >> 8) == DescType) {
-      if (Len > DescLength) {
-        return EFI_DEVICE_ERROR;
-      }
-    }
-    //
-    // Descriptor length should be at least 2
-    // and should not exceed the buffer length
-    //
-    if (Len < 2) {
-      return EFI_DEVICE_ERROR;
-    }
-
-    if (Len > Length) {
-      return EFI_DEVICE_ERROR;
-    }
-    //
-    // Skip this mismatch descriptor
-    //
-    Length -= Len;
-    Ptr += Len;
-    Parsed += Len;
+    Offset += Head->Len;
   }
 
-  *ParsedBytes = Parsed;
+  //
+  // Head->Len is invalid resulting data beyond boundary, or
+  // Descriptor cannot be found: No such type.
+  //
+  if (Length < Offset) {
+    DEBUG ((DEBUG_ERROR, "GetExpectedDescriptor: met mal-format descriptor, Offset/Len = %d/%d!\n", Offset, Length));
+    return EFI_DEVICE_ERROR;
+  }
 
+  if ((Head->Type != DescType) || (Head->Len < DescLength)) {
+    DEBUG ((DEBUG_ERROR, "GetExpectedDescriptor: descriptor cannot be found, Header(T/L) = %d/%d!\n", Head->Type, Head->Len));
+    return EFI_DEVICE_ERROR;
+  }
+
+  *ParsedBytes = Offset;
   return EFI_SUCCESS;
 }
 
 /**
   Send reset signal over the given root hub port.
-  
+
   @param  PeiServices       Describes the list of possible PEI Services.
   @param  UsbHcPpi          The pointer of PEI_USB_HOST_CONTROLLER_PPI instance.
   @param  Usb2HcPpi         The pointer of PEI_USB2_HOST_CONTROLLER_PPI instance.
@@ -1022,7 +1034,7 @@ ResetRootPort (
 
   if (Usb2HcPpi != NULL) {
     MicroSecondDelay (200 * 1000);
-    
+
     //
     // reset root port
     //
@@ -1032,12 +1044,12 @@ ResetRootPort (
                          PortNum,
                          EfiUsbPortReset
                          );
-    
+
     if (EFI_ERROR (Status)) {
       DEBUG ((EFI_D_ERROR, "SetRootHubPortFeature EfiUsbPortReset Failed\n"));
       return;
     }
-    
+
     //
     // Drive the reset signal for at least 50ms. Check USB 2.0 Spec
     // section 7.1.7.5 for timing requirements.
@@ -1053,7 +1065,7 @@ ResetRootPort (
                          PortNum,
                          EfiUsbPortReset
                          );
-    
+
     if (EFI_ERROR (Status)) {
       DEBUG ((EFI_D_ERROR, "ClearRootHubPortFeature EfiUsbPortReset Failed\n"));
       return;
@@ -1073,7 +1085,7 @@ ResetRootPort (
                             Usb2HcPpi,
                             PortNum,
                             &PortStatus
-                            ); 
+                            );
       if (EFI_ERROR (Status)) {
         return;
       }
@@ -1103,7 +1115,7 @@ ResetRootPort (
                 PortNum,
                 EfiUsbPortConnectChange
                 );
-    
+
     //
     // Set port enable
     //
@@ -1113,18 +1125,18 @@ ResetRootPort (
                 PortNum,
                 EfiUsbPortEnable
                 );
-    
+
     Usb2HcPpi->ClearRootHubPortFeature (
                 PeiServices,
                 Usb2HcPpi,
                 PortNum,
                 EfiUsbPortEnableChange
                 );
-    
+
     MicroSecondDelay ((RetryIndex + 1) * 50 * 1000);
   } else {
     MicroSecondDelay (200 * 1000);
-    
+
     //
     // reset root port
     //
@@ -1134,18 +1146,18 @@ ResetRootPort (
                          PortNum,
                          EfiUsbPortReset
                          );
-    
+
     if (EFI_ERROR (Status)) {
       DEBUG ((EFI_D_ERROR, "SetRootHubPortFeature EfiUsbPortReset Failed\n"));
       return;
     }
-    
+
     //
     // Drive the reset signal for at least 50ms. Check USB 2.0 Spec
     // section 7.1.7.5 for timing requirements.
     //
     MicroSecondDelay (USB_SET_ROOT_PORT_RESET_STALL);
-    
+
     //
     // clear reset root port
     //
@@ -1155,12 +1167,12 @@ ResetRootPort (
                          PortNum,
                          EfiUsbPortReset
                          );
-    
+
     if (EFI_ERROR (Status)) {
       DEBUG ((EFI_D_ERROR, "ClearRootHubPortFeature EfiUsbPortReset Failed\n"));
       return;
     }
-    
+
     MicroSecondDelay (USB_CLR_ROOT_PORT_RESET_STALL);
 
     //
@@ -1175,7 +1187,7 @@ ResetRootPort (
                            UsbHcPpi,
                            PortNum,
                            &PortStatus
-                           ); 
+                           );
       if (EFI_ERROR (Status)) {
         return;
       }
@@ -1205,7 +1217,7 @@ ResetRootPort (
                 PortNum,
                 EfiUsbPortConnectChange
                 );
-    
+
     //
     // Set port enable
     //
@@ -1215,14 +1227,14 @@ ResetRootPort (
                 PortNum,
                 EfiUsbPortEnable
                 );
-    
+
     UsbHcPpi->ClearRootHubPortFeature (
                 PeiServices,
                 UsbHcPpi,
                 PortNum,
                 EfiUsbPortEnableChange
                 );
-    
+
     MicroSecondDelay ((RetryIndex + 1) * 50 * 1000);
   }
   return;

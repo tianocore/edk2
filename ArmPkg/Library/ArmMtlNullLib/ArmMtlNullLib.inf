@@ -1,0 +1,20 @@
+#/** @file
+#  Copyright (c) 2017-2018, Arm Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010019
+  BASE_NAME                      = ArmMtlNullLib
+  FILE_GUID                      = 05810525-FDEC-4006-9F1F-37609B3675FA
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ArmMtlLib
+
+[Sources.common]
+  ArmMtlNullLib.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  MdePkg/MdePkg.dec

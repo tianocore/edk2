@@ -3,13 +3,7 @@
   This file contains the definination for host controller register operation routines.
 
 Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -137,19 +131,28 @@ EhcReadCapRegister (
   );
 
 /**
-  Read EHCI debug port register.
+  Check whether the host controller has an in-use debug port.
 
-  @param  Ehc          The EHCI device.
-  @param  Offset       Debug port register address.
+  @param[in] Ehc         The Enhanced Host Controller to query.
 
-  @return The register content read.
-  @retval If err, return 0xffff.
+  @param[in] PortNumber  If PortNumber is not NULL, then query whether
+                         PortNumber is an in-use debug port on Ehc. (PortNumber
+                         is taken in UEFI notation, i.e., zero-based.)
+                         Otherwise, query whether Ehc has any in-use debug
+                         port.
 
+  @retval TRUE   PortNumber is an in-use debug port on Ehc (if PortNumber is
+                 not NULL), or some port on Ehc is an in-use debug port
+                 (otherwise).
+
+  @retval FALSE  PortNumber is not an in-use debug port on Ehc (if PortNumber
+                 is not NULL), or no port on Ehc is an in-use debug port
+                 (otherwise).
 **/
-UINT32
-EhcReadDbgRegister (
-  IN  USB2_HC_DEV         *Ehc,
-  IN  UINT32              Offset
+BOOLEAN
+EhcIsDebugPortInUse (
+  IN CONST USB2_HC_DEV *Ehc,
+  IN CONST UINT8       *PortNumber OPTIONAL
   );
 
 /**

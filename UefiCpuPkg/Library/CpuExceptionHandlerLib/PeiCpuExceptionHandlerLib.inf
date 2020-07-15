@@ -1,15 +1,9 @@
 ## @file
 #  CPU Exception Handler library instance for PEI module.
 #
-#  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
-#  This program and the accompanying materials
-#  are licensed and made available under the terms and conditions of the BSD License
-#  which accompanies this distribution.  The full text of the license may be found at
-#  http://opensource.org/licenses/bsd-license.php
-#  
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-#  
+#  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
 ##
 
 [Defines]
@@ -28,16 +22,13 @@
 #
 
 [Sources.Ia32]
-  Ia32/ExceptionHandlerAsm.asm
   Ia32/ExceptionHandlerAsm.nasm
-  Ia32/ExceptionHandlerAsm.S
+  Ia32/ExceptionTssEntryAsm.nasm
   Ia32/ArchExceptionHandler.c
   Ia32/ArchInterruptDefs.h
 
 [Sources.X64]
-  X64/ExceptionHandlerAsm.asm
-  X64/ExceptionHandlerAsm.nasm
-  X64/ExceptionHandlerAsm.S
+  X64/Xcode5ExceptionHandlerAsm.nasm
   X64/ArchExceptionHandler.c
   X64/ArchInterruptDefs.h
 
@@ -61,3 +52,7 @@
   HobLib
   MemoryAllocationLib
   SynchronizationLib
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard    # CONSUMES
+

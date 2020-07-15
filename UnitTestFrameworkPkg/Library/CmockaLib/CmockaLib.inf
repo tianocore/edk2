@@ -1,0 +1,35 @@
+## @file
+#  This module provides Cmocka Library implementation.
+#
+#  Copyright (c) 2019 - 2020, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION     = 0x00010005
+  BASE_NAME       = CmockaLib
+  MODULE_UNI_FILE = CmockaLib.uni
+  FILE_GUID       = F1662152-3399-49AC-BE44-CAA97575FACE
+  MODULE_TYPE     = BASE
+  VERSION_STRING  = 0.1
+  LIBRARY_CLASS   = CmockaLib|HOST_APPLICATION
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64
+#
+
+[Sources]
+  cmocka/src/cmocka.c
+
+[Packages]
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+
+[BuildOptions]
+  MSFT:*_*_*_CC_FLAGS     == /c -DHAVE_VSNPRINTF -DHAVE_SNPRINTF
+  MSFT:NOOPT_*_*_CC_FLAGS =  /Od
+
+  GCC:*_*_*_CC_FLAGS     == -g -DHAVE_SIGNAL_H
+  GCC:NOOPT_*_*_CC_FLAGS =  -O0
+  GCC:*_*_IA32_CC_FLAGS  =  -m32
+  GCC:*_*_X64_CC_FLAGS   =  -m64

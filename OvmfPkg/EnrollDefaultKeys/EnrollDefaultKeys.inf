@@ -1,0 +1,52 @@
+## @file
+#  Enroll default PK, KEK, db, dbx.
+#
+#  Copyright (C) 2014-2019, Red Hat, Inc.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 1.28
+  BASE_NAME                      = EnrollDefaultKeys
+  FILE_GUID                      = A0BAA8A3-041D-48A8-BC87-C36D121B5E3D
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 0.1
+  ENTRY_POINT                    = ShellCEntryLib
+
+[Sources]
+  AuthData.c
+  EnrollDefaultKeys.c
+  EnrollDefaultKeys.h
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+  SecurityPkg/SecurityPkg.dec
+  ShellPkg/ShellPkg.dec
+
+[Guids]
+  gEfiCertPkcs7Guid
+  gEfiCertSha256Guid
+  gEfiCertX509Guid
+  gEfiCustomModeEnableGuid
+  gEfiGlobalVariableGuid
+  gEfiImageSecurityDatabaseGuid
+  gEfiSecureBootEnableDisableGuid
+  gMicrosoftVendorGuid
+  gOvmfPkKek1AppPrefixGuid
+
+[Protocols]
+  gEfiSmbiosProtocolGuid ## CONSUMES
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  PrintLib
+  ShellCEntryLib
+  UefiBootServicesTableLib
+  UefiLib
+  UefiRuntimeServicesTableLib

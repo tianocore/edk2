@@ -166,7 +166,7 @@ ExceptionGroup *eg;
         };
       };
 
-      /*  ocurs at a later pass then for the exception_label       */
+      /*  occurs at a later pass then for the exception_label      */
       /*  if an outerEG has been found then fill in the outer EG   */
       /*  remove if from the list when the BlkLevel gets smaller   */
 

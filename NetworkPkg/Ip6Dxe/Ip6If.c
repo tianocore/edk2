@@ -1,15 +1,9 @@
 /** @file
-  Implement IP6 pesudo interface.
+  Implement IP6 pseudo interface.
 
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -166,7 +160,7 @@ Ip6SetAddress (
 
 
   //
-  // Node should delay joining the solicited-node mulitcast address by a random delay
+  // Node should delay joining the solicited-node multicast address by a random delay
   // between 0 and MAX_RTR_SOLICITATION_DELAY (1 second).
   // Thus queue the address to be processed in Duplicate Address Detection module
   // after the delay time (in milliseconds).
@@ -503,7 +497,7 @@ Ip6OnFrameReceivedDpc (
   }
 
   //
-  // Wrap the frame in a net buffer then deliever it to IP input.
+  // Wrap the frame in a net buffer then deliver it to IP input.
   // IP will reassemble the packet, and deliver it to upper layer
   //
   Netfrag.Len  = MnpRxData->DataLength;
@@ -554,7 +548,7 @@ Ip6OnFrameReceived (
 
   @retval EFI_ALREADY_STARTED   There is already a pending receive request.
   @retval EFI_OUT_OF_RESOURCES  Failed to allocate resource to receive.
-  @retval EFI_SUCCESS           The recieve request has been started.
+  @retval EFI_SUCCESS           The receive request has been started.
 
 **/
 EFI_STATUS
@@ -565,7 +559,7 @@ Ip6ReceiveFrame (
 {
   EFI_STATUS                Status;
   IP6_LINK_RX_TOKEN         *Token;
-  
+
   NET_CHECK_SIGNATURE (IpSb, IP6_SERVICE_SIGNATURE);
 
   Token           = &IpSb->RecvRequest;
@@ -581,7 +575,7 @@ Ip6ReceiveFrame (
 }
 
 /**
-  Callback funtion when frame transmission is finished. It will
+  Callback function when frame transmission is finished. It will
   call the frame owner's callback function to tell it the result.
 
   @param[in]  Context        Context which points to the token.

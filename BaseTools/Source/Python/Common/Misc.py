@@ -1,57 +1,75 @@
 ## @file
 # Common routines used by all tools
 #
-# Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
-# This program and the accompanying materials
-# are licensed and made available under the terms and conditions of the BSD License
-# which accompanies this distribution.  The full text of the license may be found at
-# http://opensource.org/licenses/bsd-license.php
-#
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# Copyright (c) 2007 - 2019, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
 ##
 # Import Modules
 #
-import Common.LongFilePathOs as os
+from __future__ import absolute_import
+
 import sys
 import string
-import thread
 import threading
 import time
 import re
-import cPickle
+import pickle
 import array
 import shutil
+import filecmp
+from random import sample
 from struct import pack
-from UserDict import IterableUserDict
-from UserList import UserList
+import uuid
+import subprocess
+import tempfile
+from collections import OrderedDict
 
+import Common.LongFilePathOs as os
 from Common import EdkLogger as EdkLogger
 from Common import GlobalData as GlobalData
-from DataType import *
-from BuildToolError import *
+from Common.DataType import *
+from Common.BuildToolError import *
 from CommonDataClass.DataClass import *
-from Parsing import GetSplitValueList
+from Common.Parsing import GetSplitValueList
 from Common.LongFilePathSupport import OpenLongFilePath as open
+from Common.LongFilePathSupport import CopyLongFilePath as CopyLong
+from Common.LongFilePathSupport import LongFilePath as LongFilePath
 from Common.MultipleWorkspace import MultipleWorkspace as mws
+from CommonDataClass.Exceptions import BadExpression
+from Common.caching import cached_property
+import struct
 
+ArrayIndex = re.compile("\[\s*[0-9a-fA-FxX]*\s*\]")
 ## Regular expression used to find out place holders in string template
 gPlaceholderPattern = re.compile("\$\{([^$()\s]+)\}", re.MULTILINE | re.UNICODE)
 
-## Dictionary used to store file time stamp for quick re-access
-gFileTimeStampCache = {}    # {file path : file time stamp}
+## regular expressions for map file processing
+startPatternGeneral = re.compile("^Start[' ']+Length[' ']+Name[' ']+Class")
+addressPatternGeneral = re.compile("^Address[' ']+Publics by Value[' ']+Rva\+Base")
+valuePatternGcc = re.compile('^([\w_\.]+) +([\da-fA-Fx]+) +([\da-fA-Fx]+)$')
+pcdPatternGcc = re.compile('^([\da-fA-Fx]+) +([\da-fA-Fx]+)')
+secReGeneral = re.compile('^([\da-fA-F]+):([\da-fA-F]+) +([\da-fA-F]+)[Hh]? +([.\w\$]+) +(\w+)', re.UNICODE)
+
+StructPattern = re.compile(r'[_a-zA-Z][0-9A-Za-z_]*$')
 
 ## Dictionary used to store dependencies of files
 gDependencyDatabase = {}    # arch : {file path : [dependent files list]}
 
+#
+# If a module is built more than once with different PCDs or library classes
+# a temporary INF file with same content is created, the temporary file is removed
+# when build exits.
+#
+_TempInfs = []
+
 def GetVariableOffset(mapfilepath, efifilepath, varnames):
-    """ Parse map file to get variable offset in current EFI file 
+    """ Parse map file to get variable offset in current EFI file
     @param mapfilepath    Map file absolution path
     @param efifilepath:   EFI binary file full path
     @param varnames       iteratable container whose elements are variable names to be searched
-    
+
     @return List whos elements are tuple with variable name and raw offset
     """
     lines = []
@@ -61,13 +79,35 @@ def GetVariableOffset(mapfilepath, efifilepath, varnames):
         f.close()
     except:
         return None
-    
+
     if len(lines) == 0: return None
     firstline = lines[0].strip()
+    if re.match('^\s*Address\s*Size\s*Align\s*Out\s*In\s*Symbol\s*$', firstline):
+        return _parseForXcodeAndClang9(lines, efifilepath, varnames)
     if (firstline.startswith("Archive member included ") and
         firstline.endswith(" file (symbol)")):
         return _parseForGCC(lines, efifilepath, varnames)
+    if firstline.startswith("# Path:"):
+        return _parseForXcodeAndClang9(lines, efifilepath, varnames)
     return _parseGeneral(lines, efifilepath, varnames)
+
+def _parseForXcodeAndClang9(lines, efifilepath, varnames):
+    status = 0
+    ret = []
+    for line in lines:
+        line = line.strip()
+        if status == 0 and (re.match('^\s*Address\s*Size\s*Align\s*Out\s*In\s*Symbol\s*$', line) \
+            or line == "# Symbols:"):
+            status = 1
+            continue
+        if status == 1 and len(line) != 0:
+            for varname in varnames:
+                if varname in line:
+                    # cannot pregenerate this RegEx since it uses varname from varnames.
+                    m = re.match('^([\da-fA-FxX]+)([\s\S]*)([_]*%s)$' % varname, line)
+                    if m is not None:
+                        ret.append((varname, m.group(1)))
+    return ret
 
 def _parseForGCC(lines, efifilepath, varnames):
     """ Parse map file generated by GCC linker """
@@ -89,28 +129,28 @@ def _parseForGCC(lines, efifilepath, varnames):
 
         # status handler
         if status == 3:
-            m = re.match('^([\w_\.]+) +([\da-fA-Fx]+) +([\da-fA-Fx]+)$', line)
-            if m != None:
+            m = valuePatternGcc.match(line)
+            if m is not None:
                 sections.append(m.groups(0))
             for varname in varnames:
                 Str = ''
                 m = re.match("^.data.(%s)" % varname, line)
-                if m != None:
+                if m is not None:
                     m = re.match(".data.(%s)$" % varname, line)
-                    if m != None:
+                    if m is not None:
                         Str = lines[index + 1]
                     else:
                         Str = line[len(".data.%s" % varname):]
                     if Str:
-                        m = re.match('^([\da-fA-Fx]+) +([\da-fA-Fx]+)', Str.strip())
-                        if m != None:
-                            varoffset.append((varname, int(m.groups(0)[0], 16) , int(sections[-1][1], 16), sections[-1][0]))
+                        m = pcdPatternGcc.match(Str.strip())
+                        if m is not None:
+                            varoffset.append((varname, int(m.groups(0)[0], 16), int(sections[-1][1], 16), sections[-1][0]))
 
     if not varoffset:
         return []
     # get section information from efi file
     efisecs = PeImageClass(efifilepath).SectionHeaderList
-    if efisecs == None or len(efisecs) == 0:
+    if efisecs is None or len(efisecs) == 0:
         return []
     #redirection
     redirection = 0
@@ -130,35 +170,35 @@ def _parseGeneral(lines, efifilepath, varnames):
     status = 0    #0 - beginning of file; 1 - PE section definition; 2 - symbol table
     secs  = []    # key = section name
     varoffset = []
-    secRe = re.compile('^([\da-fA-F]+):([\da-fA-F]+) +([\da-fA-F]+)[Hh]? +([.\w\$]+) +(\w+)', re.UNICODE)
-    symRe = re.compile('^([\da-fA-F]+):([\da-fA-F]+) +([\.:\\\\\w\?@\$]+) +([\da-fA-F]+)', re.UNICODE)
+    symRe = re.compile('^([\da-fA-F]+):([\da-fA-F]+) +([\.:\\\\\w\?@\$-]+) +([\da-fA-F]+)', re.UNICODE)
 
     for line in lines:
         line = line.strip()
-        if re.match("^Start[' ']+Length[' ']+Name[' ']+Class", line):
+        if startPatternGeneral.match(line):
             status = 1
             continue
-        if re.match("^Address[' ']+Publics by Value[' ']+Rva\+Base", line):
+        if addressPatternGeneral.match(line):
             status = 2
             continue
-        if re.match("^entry point at", line):
+        if line.startswith("entry point at"):
             status = 3
-            continue        
+            continue
         if status == 1 and len(line) != 0:
-            m =  secRe.match(line)
-            assert m != None, "Fail to parse the section in map file , line is %s" % line
+            m =  secReGeneral.match(line)
+            assert m is not None, "Fail to parse the section in map file , line is %s" % line
             sec_no, sec_start, sec_length, sec_name, sec_class = m.groups(0)
             secs.append([int(sec_no, 16), int(sec_start, 16), int(sec_length, 16), sec_name, sec_class])
         if status == 2 and len(line) != 0:
             for varname in varnames:
                 m = symRe.match(line)
-                assert m != None, "Fail to parse the symbol in map file, line is %s" % line
+                assert m is not None, "Fail to parse the symbol in map file, line is %s" % line
                 sec_no, sym_offset, sym_name, vir_addr = m.groups(0)
                 sec_no     = int(sec_no,     16)
                 sym_offset = int(sym_offset, 16)
                 vir_addr   = int(vir_addr,   16)
+                # cannot pregenerate this RegEx since it uses varname from varnames.
                 m2 = re.match('^[_]*(%s)' % varname, sym_name)
-                if m2 != None:
+                if m2 is not None:
                     # fond a binary pcd entry in map file
                     for sec in secs:
                         if sec[0] == sec_no and (sym_offset >= sec[1] and sym_offset < sec[1] + sec[2]):
@@ -168,7 +208,7 @@ def _parseGeneral(lines, efifilepath, varnames):
 
     # get section information from efi file
     efisecs = PeImageClass(efifilepath).SectionHeaderList
-    if efisecs == None or len(efisecs) == 0:
+    if efisecs is None or len(efisecs) == 0:
         return []
 
     ret = []
@@ -212,17 +252,12 @@ def ProcessDuplicatedInf(Path, BaseName, Workspace):
     else:
         Filename = BaseName + Path.BaseName
 
-    #
-    # If -N is specified on command line, cache is disabled
-    # The directory has to be created
-    #
     DbDir = os.path.split(GlobalData.gDatabasePath)[0]
-    if not os.path.exists(DbDir):
-        os.makedirs(DbDir)
+
     #
     # A temporary INF is copied to database path which must have write permission
     # The temporary will be removed at the end of build
-    # In case of name conflict, the file name is 
+    # In case of name conflict, the file name is
     # FILE_GUIDBaseName (0D1B936F-68F3-4589-AFCC-FB8B7AEBC836module.inf)
     #
     TempFullPath = os.path.join(DbDir,
@@ -233,7 +268,7 @@ def ProcessDuplicatedInf(Path, BaseName, Workspace):
     #
     # To build same module more than once, the module path with FILE_GUID overridden has
     # the file name FILE_GUIDmodule.inf, but the relative path (self.MetaFile.File) is the real path
-    # in DSC which is used as relative path by C files and other files in INF. 
+    # in DSC which is used as relative path by C files and other files in INF.
     # A trick was used: all module paths are PathClass instances, after the initialization
     # of PathClass, the PathClass.Path is overridden by the temporary INF path.
     #
@@ -248,50 +283,25 @@ def ProcessDuplicatedInf(Path, BaseName, Workspace):
     #
     RtPath.Path = TempFullPath
     RtPath.BaseName = BaseName
+    RtPath.OriginalPath = Path
     #
     # If file exists, compare contents
     #
     if os.path.exists(TempFullPath):
-        with open(str(Path), 'rb') as f1: Src = f1.read()
-        with open(TempFullPath, 'rb') as f2: Dst = f2.read()
-        if Src == Dst:
-            return RtPath
-    GlobalData.gTempInfs.append(TempFullPath)
+        with open(str(Path), 'rb') as f1, open(TempFullPath, 'rb') as f2:
+            if f1.read() == f2.read():
+                return RtPath
+    _TempInfs.append(TempFullPath)
     shutil.copy2(str(Path), TempFullPath)
     return RtPath
 
-## Remove temporary created INFs whose paths were saved in gTempInfs
+## Remove temporary created INFs whose paths were saved in _TempInfs
 #
 def ClearDuplicatedInf():
-    for File in GlobalData.gTempInfs:
+    while _TempInfs:
+        File = _TempInfs.pop()
         if os.path.exists(File):
             os.remove(File)
-
-## callback routine for processing variable option
-#
-# This function can be used to process variable number of option values. The
-# typical usage of it is specify architecure list on command line.
-# (e.g. <tool> -a IA32 X64 IPF)
-#
-# @param  Option        Standard callback function parameter
-# @param  OptionString  Standard callback function parameter
-# @param  Value         Standard callback function parameter
-# @param  Parser        Standard callback function parameter
-#
-# @retval
-#
-def ProcessVariableArgument(Option, OptionString, Value, Parser):
-    assert Value is None
-    Value = []
-    RawArgs = Parser.rargs
-    while RawArgs:
-        Arg = RawArgs[0]
-        if (Arg[:2] == "--" and len(Arg) > 2) or \
-           (Arg[:1] == "-" and len(Arg) > 1 and Arg[1] != "-"):
-            break
-        Value.append(Arg)
-        del RawArgs[0]
-    setattr(Parser.values, Option.dest, Value)
 
 ## Convert GUID string in xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx style to C structure style
 #
@@ -351,6 +361,8 @@ def GuidStructureByteArrayToGuidString(GuidValue):
 #   @retval     string      The GUID value in xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx format
 #
 def GuidStructureStringToGuidString(GuidValue):
+    if not GlobalData.gGuidCFormatPattern.match(GuidValue):
+        return ''
     guidValueString = GuidValue.lower().replace("{", "").replace("}", "").replace(" ", "").replace(";", "")
     guidValueList = guidValueString.split(",")
     if len(guidValueList) != 11:
@@ -403,7 +415,7 @@ def GuidStructureStringToGuidValueName(GuidValue):
 #   @param      Directory   The directory name
 #
 def CreateDirectory(Directory):
-    if Directory == None or Directory.strip() == "":
+    if Directory is None or Directory.strip() == "":
         return True
     try:
         if not os.access(Directory, os.F_OK):
@@ -417,7 +429,7 @@ def CreateDirectory(Directory):
 #   @param      Directory   The directory name
 #
 def RemoveDirectory(Directory, Recursively=False):
-    if Directory == None or Directory.strip() == "" or not os.path.exists(Directory):
+    if Directory is None or Directory.strip() == "" or not os.path.exists(Directory):
         return
     if Recursively:
         CurrentDirectory = os.getcwd()
@@ -429,32 +441,6 @@ def RemoveDirectory(Directory, Recursively=False):
                 os.remove(File)
         os.chdir(CurrentDirectory)
     os.rmdir(Directory)
-
-## Check if given file is changed or not
-#
-#  This method is used to check if a file is changed or not between two build
-#  actions. It makes use a cache to store files timestamp.
-#
-#   @param      File    The path of file
-#
-#   @retval     True    If the given file is changed, doesn't exist, or can't be
-#                       found in timestamp cache
-#   @retval     False   If the given file is changed
-#
-def IsChanged(File):
-    if not os.path.exists(File):
-        return True
-
-    FileState = os.stat(File)
-    TimeStamp = FileState[-2]
-
-    if File in gFileTimeStampCache and TimeStamp == gFileTimeStampCache[File]:
-        FileChanged = False
-    else:
-        FileChanged = True
-        gFileTimeStampCache[File] = TimeStamp
-
-    return FileChanged
 
 ## Store content in file
 #
@@ -468,16 +454,26 @@ def IsChanged(File):
 #   @retval     True            If the file content is changed and the file is renewed
 #   @retval     False           If the file content is the same
 #
-def SaveFileOnChange(File, Content, IsBinaryFile=True):
-    if not IsBinaryFile:
-        Content = Content.replace("\n", os.linesep)
+def SaveFileOnChange(File, Content, IsBinaryFile=True, FileLock=None):
+
+    # Convert to long file path format
+    File = LongFilePath(File)
 
     if os.path.exists(File):
-        try:
-            if Content == open(File, "rb").read():
-                return False
-        except:
-            EdkLogger.error(None, FILE_OPEN_FAILURE, ExtraData=File)
+        if IsBinaryFile:
+            try:
+                with open(File, "rb") as f:
+                    if Content == f.read():
+                        return False
+            except:
+                EdkLogger.error(None, FILE_OPEN_FAILURE, ExtraData=File)
+        else:
+            try:
+                with open(File, "r") as f:
+                    if Content == f.read():
+                        return False
+            except:
+                EdkLogger.error(None, FILE_OPEN_FAILURE, ExtraData=File)
 
     DirName = os.path.dirname(File)
     if not CreateDirectory(DirName):
@@ -488,61 +484,101 @@ def SaveFileOnChange(File, Content, IsBinaryFile=True):
         if not os.access(DirName, os.W_OK):
             EdkLogger.error(None, PERMISSION_FAILURE, "Do not have write permission on directory %s" % DirName)
 
-    try:
-        if GlobalData.gIsWindows:
-            try:
-                from PyUtility import SaveFileToDisk
-                if not SaveFileToDisk(File, Content):
-                    EdkLogger.error(None, FILE_CREATE_FAILURE, ExtraData=File)
-            except:
-                Fd = open(File, "wb")
+    OpenMode = "w"
+    if IsBinaryFile:
+        OpenMode = "wb"
+
+    # use default file_lock if no input new lock
+    if not FileLock:
+        FileLock = GlobalData.file_lock
+    if FileLock:
+        FileLock.acquire()
+
+
+    if GlobalData.gIsWindows and not os.path.exists(File):
+        try:
+            with open(File, OpenMode) as tf:
+                tf.write(Content)
+        except IOError as X:
+            if GlobalData.gBinCacheSource:
+                EdkLogger.quiet("[cache error]:fails to save file with error: %s" % (X))
+            else:
+                EdkLogger.error(None, FILE_CREATE_FAILURE, ExtraData='IOError %s' % X)
+        finally:
+            if FileLock:
+                FileLock.release()
+    else:
+        try:
+            with open(File, OpenMode) as Fd:
                 Fd.write(Content)
-                Fd.close()
-        else:
-            Fd = open(File, "wb")
-            Fd.write(Content)
-            Fd.close()
-    except IOError, X:
-        EdkLogger.error(None, FILE_CREATE_FAILURE, ExtraData='IOError %s' % X)
+        except IOError as X:
+            if GlobalData.gBinCacheSource:
+                EdkLogger.quiet("[cache error]:fails to save file with error: %s" % (X))
+            else:
+                EdkLogger.error(None, FILE_CREATE_FAILURE, ExtraData='IOError %s' % X)
+        finally:
+            if FileLock:
+                FileLock.release()
 
     return True
 
-## Make a Python object persistent on file system
+## Copy source file only if it is different from the destination file
 #
-#   @param      Data    The object to be stored in file
-#   @param      File    The path of file to store the object
+#  This method is used to copy file only if the source file and destination
+#  file content are different. This is quite useful to avoid duplicated
+#  file writing.
 #
-def DataDump(Data, File):
-    Fd = None
-    try:
-        Fd = open(File, 'wb')
-        cPickle.dump(Data, Fd, cPickle.HIGHEST_PROTOCOL)
-    except:
-        EdkLogger.error("", FILE_OPEN_FAILURE, ExtraData=File, RaiseError=False)
-    finally:
-        if Fd != None:
-            Fd.close()
+#   @param      SrcFile   The path of source file
+#   @param      Dst       The path of destination file or folder
+#
+#   @retval     True      The two files content are different and the file is copied
+#   @retval     False     No copy really happen
+#
+def CopyFileOnChange(SrcFile, Dst, FileLock=None):
 
-## Restore a Python object from a file
-#
-#   @param      File    The path of file stored the object
-#
-#   @retval     object  A python object
-#   @retval     None    If failure in file operation
-#
-def DataRestore(File):
-    Data = None
-    Fd = None
+    # Convert to long file path format
+    SrcFile = LongFilePath(SrcFile)
+    Dst = LongFilePath(Dst)
+
+    if os.path.isdir(SrcFile):
+        EdkLogger.error(None, FILE_COPY_FAILURE, ExtraData='CopyFileOnChange SrcFile is a dir, not a file: %s' % SrcFile)
+        return False
+
+    if os.path.isdir(Dst):
+        DstFile = os.path.join(Dst, os.path.basename(SrcFile))
+    else:
+        DstFile = Dst
+
+    if os.path.exists(DstFile) and filecmp.cmp(SrcFile, DstFile, shallow=False):
+        return False
+
+    DirName = os.path.dirname(DstFile)
+    if not CreateDirectory(DirName):
+        EdkLogger.error(None, FILE_CREATE_FAILURE, "Could not create directory %s" % DirName)
+    else:
+        if DirName == '':
+            DirName = os.getcwd()
+        if not os.access(DirName, os.W_OK):
+            EdkLogger.error(None, PERMISSION_FAILURE, "Do not have write permission on directory %s" % DirName)
+
+    # use default file_lock if no input new lock
+    if not FileLock:
+        FileLock = GlobalData.file_lock
+    if FileLock:
+        FileLock.acquire()
+
     try:
-        Fd = open(File, 'rb')
-        Data = cPickle.load(Fd)
-    except Exception, e:
-        EdkLogger.verbose("Failed to load [%s]\n\t%s" % (File, str(e)))
-        Data = None
+        CopyLong(SrcFile, DstFile)
+    except IOError as X:
+        if GlobalData.gBinCacheSource:
+            EdkLogger.quiet("[cache error]:fails to copy file with error: %s" % (X))
+        else:
+            EdkLogger.error(None, FILE_COPY_FAILURE, ExtraData='IOError %s' % X)
     finally:
-        if Fd != None:
-            Fd.close()
-    return Data
+        if FileLock:
+            FileLock.release()
+
+    return True
 
 ## Retrieve and cache the real path name in file system
 #
@@ -615,47 +651,6 @@ class DirCache:
             return os.path.join(self._Root, self._UPPER_CACHE_[UpperPath])
         return None
 
-## Get all files of a directory
-#
-# @param Root:       Root dir
-# @param SkipList :  The files need be skipped
-#
-# @retval  A list of all files
-#
-def GetFiles(Root, SkipList=None, FullPath=True):
-    OriPath = Root
-    FileList = []
-    for Root, Dirs, Files in os.walk(Root):
-        if SkipList:
-            for Item in SkipList:
-                if Item in Dirs:
-                    Dirs.remove(Item)
-
-        for File in Files:
-            File = os.path.normpath(os.path.join(Root, File))
-            if not FullPath:
-                File = File[len(OriPath) + 1:]
-            FileList.append(File)
-
-    return FileList
-
-## Check if gvien file exists or not
-#
-#   @param      File    File name or path to be checked
-#   @param      Dir     The directory the file is relative to
-#
-#   @retval     True    if file exists
-#   @retval     False   if file doesn't exists
-#
-def ValidFile(File, Ext=None):
-    if Ext != None:
-        Dummy, FileExt = os.path.splitext(File)
-        if FileExt.lower() != Ext.lower():
-            return False
-    if not os.path.exists(File):
-        return False
-    return True
-
 def RealPath(File, Dir='', OverrideDir=''):
     NewFile = os.path.normpath(os.path.join(Dir, File))
     NewFile = GlobalData.gAllFiles[NewFile]
@@ -663,141 +658,6 @@ def RealPath(File, Dir='', OverrideDir=''):
         NewFile = os.path.normpath(os.path.join(OverrideDir, File))
         NewFile = GlobalData.gAllFiles[NewFile]
     return NewFile
-
-def RealPath2(File, Dir='', OverrideDir=''):
-    NewFile = None
-    if OverrideDir:
-        NewFile = GlobalData.gAllFiles[os.path.normpath(os.path.join(OverrideDir, File))]
-        if NewFile:
-            if OverrideDir[-1] == os.path.sep:
-                return NewFile[len(OverrideDir):], NewFile[0:len(OverrideDir)]
-            else:
-                return NewFile[len(OverrideDir) + 1:], NewFile[0:len(OverrideDir)]
-    if GlobalData.gAllFiles:
-        NewFile = GlobalData.gAllFiles[os.path.normpath(os.path.join(Dir, File))]
-    if not NewFile:
-        NewFile = os.path.normpath(os.path.join(Dir, File))
-        if not os.path.exists(NewFile):
-            return None, None
-    if NewFile:
-        if Dir:
-            if Dir[-1] == os.path.sep:
-                return NewFile[len(Dir):], NewFile[0:len(Dir)]
-            else:
-                return NewFile[len(Dir) + 1:], NewFile[0:len(Dir)]
-        else:
-            return NewFile, ''
-
-    return None, None
-
-## Check if gvien file exists or not
-#
-#
-def ValidFile2(AllFiles, File, Ext=None, Workspace='', EfiSource='', EdkSource='', Dir='.', OverrideDir=''):
-    NewFile = File
-    if Ext != None:
-        Dummy, FileExt = os.path.splitext(File)
-        if FileExt.lower() != Ext.lower():
-            return False, File
-
-    # Replace the Edk macros
-    if OverrideDir != '' and OverrideDir != None:
-        if OverrideDir.find('$(EFI_SOURCE)') > -1:
-            OverrideDir = OverrideDir.replace('$(EFI_SOURCE)', EfiSource)
-        if OverrideDir.find('$(EDK_SOURCE)') > -1:
-            OverrideDir = OverrideDir.replace('$(EDK_SOURCE)', EdkSource)
-
-    # Replace the default dir to current dir
-    if Dir == '.':
-        Dir = os.getcwd()
-        Dir = Dir[len(Workspace) + 1:]
-
-    # First check if File has Edk definition itself
-    if File.find('$(EFI_SOURCE)') > -1 or File.find('$(EDK_SOURCE)') > -1:
-        NewFile = File.replace('$(EFI_SOURCE)', EfiSource)
-        NewFile = NewFile.replace('$(EDK_SOURCE)', EdkSource)
-        NewFile = AllFiles[os.path.normpath(NewFile)]
-        if NewFile != None:
-            return True, NewFile
-
-    # Second check the path with override value
-    if OverrideDir != '' and OverrideDir != None:
-        NewFile = AllFiles[os.path.normpath(os.path.join(OverrideDir, File))]
-        if NewFile != None:
-            return True, NewFile
-
-    # Last check the path with normal definitions
-    File = os.path.join(Dir, File)
-    NewFile = AllFiles[os.path.normpath(File)]
-    if NewFile != None:
-        return True, NewFile
-
-    return False, File
-
-## Check if gvien file exists or not
-#
-#
-def ValidFile3(AllFiles, File, Workspace='', EfiSource='', EdkSource='', Dir='.', OverrideDir=''):
-    # Replace the Edk macros
-    if OverrideDir != '' and OverrideDir != None:
-        if OverrideDir.find('$(EFI_SOURCE)') > -1:
-            OverrideDir = OverrideDir.replace('$(EFI_SOURCE)', EfiSource)
-        if OverrideDir.find('$(EDK_SOURCE)') > -1:
-            OverrideDir = OverrideDir.replace('$(EDK_SOURCE)', EdkSource)
-
-    # Replace the default dir to current dir
-    # Dir is current module dir related to workspace
-    if Dir == '.':
-        Dir = os.getcwd()
-        Dir = Dir[len(Workspace) + 1:]
-
-    NewFile = File
-    RelaPath = AllFiles[os.path.normpath(Dir)]
-    NewRelaPath = RelaPath
-
-    while(True):
-        # First check if File has Edk definition itself
-        if File.find('$(EFI_SOURCE)') > -1 or File.find('$(EDK_SOURCE)') > -1:
-            File = File.replace('$(EFI_SOURCE)', EfiSource)
-            File = File.replace('$(EDK_SOURCE)', EdkSource)
-            NewFile = AllFiles[os.path.normpath(File)]
-            if NewFile != None:
-                NewRelaPath = os.path.dirname(NewFile)
-                File = os.path.basename(NewFile)
-                #NewRelaPath = NewFile[:len(NewFile) - len(File.replace("..\\", '').replace("../", '')) - 1]
-                break
-
-        # Second check the path with override value
-        if OverrideDir != '' and OverrideDir != None:
-            NewFile = AllFiles[os.path.normpath(os.path.join(OverrideDir, File))]
-            if NewFile != None:
-                #NewRelaPath = os.path.dirname(NewFile)
-                NewRelaPath = NewFile[:len(NewFile) - len(File.replace("..\\", '').replace("../", '')) - 1]
-                break
-
-        # Last check the path with normal definitions
-        NewFile = AllFiles[os.path.normpath(os.path.join(Dir, File))]
-        if NewFile != None:
-            break
-
-        # No file found
-        break
-
-    return NewRelaPath, RelaPath, File
-
-
-def GetRelPath(Path1, Path2):
-    FileName = os.path.basename(Path2)
-    L1 = os.path.normpath(Path1).split(os.path.normpath('/'))
-    L2 = os.path.normpath(Path2).split(os.path.normpath('/'))
-    for Index in range(0, len(L1)):
-        if L1[Index] != L2[Index]:
-            FileName = '../' * (len(L1) - Index)
-            for Index2 in range(Index, len(L2)):
-                FileName = os.path.join(FileName, L2[Index2])
-            break
-    return os.path.normpath(FileName)
-
 
 ## Get GUID value from given packages
 #
@@ -810,50 +670,12 @@ def GetRelPath(Path1, Path2):
 #
 def GuidValue(CName, PackageList, Inffile = None):
     for P in PackageList:
-        GuidKeys = P.Guids.keys()
+        GuidKeys = list(P.Guids.keys())
         if Inffile and P._PrivateGuids:
             if not Inffile.startswith(P.MetaFile.Dir):
-                GuidKeys = (dict.fromkeys(x for x in P.Guids if x not in P._PrivateGuids)).keys()
+                GuidKeys = [x for x in P.Guids if x not in P._PrivateGuids]
         if CName in GuidKeys:
             return P.Guids[CName]
-    return None
-
-## Get Protocol value from given packages
-#
-#   @param      CName           The CName of the GUID
-#   @param      PackageList     List of packages looking-up in
-#   @param      Inffile         The driver file
-#
-#   @retval     GuidValue   if the CName is found in any given package
-#   @retval     None        if the CName is not found in all given packages
-#
-def ProtocolValue(CName, PackageList, Inffile = None):
-    for P in PackageList:
-        ProtocolKeys = P.Protocols.keys()
-        if Inffile and P._PrivateProtocols:
-            if not Inffile.startswith(P.MetaFile.Dir):
-                ProtocolKeys = (dict.fromkeys(x for x in P.Protocols if x not in P._PrivateProtocols)).keys()
-        if CName in ProtocolKeys:
-            return P.Protocols[CName]
-    return None
-
-## Get PPI value from given packages
-#
-#   @param      CName           The CName of the GUID
-#   @param      PackageList     List of packages looking-up in
-#   @param      Inffile         The driver file
-#
-#   @retval     GuidValue   if the CName is found in any given package
-#   @retval     None        if the CName is not found in all given packages
-#
-def PpiValue(CName, PackageList, Inffile = None):
-    for P in PackageList:
-        PpiKeys = P.Ppis.keys()
-        if Inffile and P._PrivatePpis:
-            if not Inffile.startswith(P.MetaFile.Dir):
-                PpiKeys = (dict.fromkeys(x for x in P.Ppis if x not in P._PrivatePpis)).keys()
-        if CName in PpiKeys:
-            return P.Ppis[CName]
     return None
 
 ## A string template class
@@ -949,7 +771,7 @@ class TemplateString(object):
 
     ## Constructor
     def __init__(self, Template=None):
-        self.String = ''
+        self.String = []
         self.IsBinary = False
         self._Template = Template
         self._TemplateSectionList = self._Parse(Template)
@@ -959,7 +781,7 @@ class TemplateString(object):
     #   @retval     string  The string replaced
     #
     def __str__(self):
-        return self.String
+        return "".join(self.String)
 
     ## Split the template string into fragments per the ${BEGIN} and ${END} flags
     #
@@ -1007,9 +829,12 @@ class TemplateString(object):
     def Append(self, AppendString, Dictionary=None):
         if Dictionary:
             SectionList = self._Parse(AppendString)
-            self.String += "".join([S.Instantiate(Dictionary) for S in SectionList])
+            self.String.append( "".join(S.Instantiate(Dictionary) for S in SectionList))
         else:
-            self.String += AppendString
+            if isinstance(AppendString,list):
+                self.String.extend(AppendString)
+            else:
+                self.String.append(AppendString)
 
     ## Replace the string template with dictionary of placeholders
     #
@@ -1018,7 +843,7 @@ class TemplateString(object):
     #   @retval     str             The string replaced with placeholder values
     #
     def Replace(self, Dictionary=None):
-        return "".join([S.Instantiate(Dictionary) for S in self._TemplateSectionList])
+        return "".join(S.Instantiate(Dictionary) for S in self._TemplateSectionList)
 
 ## Progress indicator class
 #
@@ -1032,39 +857,39 @@ class Progressor:
 
     ## Constructor
     #
-    #   @param      OpenMessage     The string printed before progress charaters
-    #   @param      CloseMessage    The string printed after progress charaters
-    #   @param      ProgressChar    The charater used to indicate the progress
-    #   @param      Interval        The interval in seconds between two progress charaters
+    #   @param      OpenMessage     The string printed before progress characters
+    #   @param      CloseMessage    The string printed after progress characters
+    #   @param      ProgressChar    The character used to indicate the progress
+    #   @param      Interval        The interval in seconds between two progress characters
     #
     def __init__(self, OpenMessage="", CloseMessage="", ProgressChar='.', Interval=1.0):
         self.PromptMessage = OpenMessage
         self.CodaMessage = CloseMessage
         self.ProgressChar = ProgressChar
         self.Interval = Interval
-        if Progressor._StopFlag == None:
+        if Progressor._StopFlag is None:
             Progressor._StopFlag = threading.Event()
 
-    ## Start to print progress charater
+    ## Start to print progress character
     #
-    #   @param      OpenMessage     The string printed before progress charaters
+    #   @param      OpenMessage     The string printed before progress characters
     #
     def Start(self, OpenMessage=None):
-        if OpenMessage != None:
+        if OpenMessage is not None:
             self.PromptMessage = OpenMessage
         Progressor._StopFlag.clear()
-        if Progressor._ProgressThread == None:
+        if Progressor._ProgressThread is None:
             Progressor._ProgressThread = threading.Thread(target=self._ProgressThreadEntry)
             Progressor._ProgressThread.setDaemon(False)
             Progressor._ProgressThread.start()
 
-    ## Stop printing progress charater
+    ## Stop printing progress character
     #
-    #   @param      CloseMessage    The string printed after progress charaters
+    #   @param      CloseMessage    The string printed after progress characters
     #
     def Stop(self, CloseMessage=None):
         OriginalCodaMessage = self.CodaMessage
-        if CloseMessage != None:
+        if CloseMessage is not None:
             self.CodaMessage = CloseMessage
         self.Abort()
         self.CodaMessage = OriginalCodaMessage
@@ -1087,171 +912,12 @@ class Progressor:
     ## Abort the progress display
     @staticmethod
     def Abort():
-        if Progressor._StopFlag != None:
+        if Progressor._StopFlag is not None:
             Progressor._StopFlag.set()
-        if Progressor._ProgressThread != None:
+        if Progressor._ProgressThread is not None:
             Progressor._ProgressThread.join()
             Progressor._ProgressThread = None
 
-## A dict which can access its keys and/or values orderly
-#
-#  The class implements a new kind of dict which its keys or values can be
-#  accessed in the order they are added into the dict. It guarantees the order
-#  by making use of an internal list to keep a copy of keys.
-#
-class sdict(IterableUserDict):
-    ## Constructor
-    def __init__(self):
-        IterableUserDict.__init__(self)
-        self._key_list = []
-
-    ## [] operator
-    def __setitem__(self, key, value):
-        if key not in self._key_list:
-            self._key_list.append(key)
-        IterableUserDict.__setitem__(self, key, value)
-
-    ## del operator
-    def __delitem__(self, key):
-        self._key_list.remove(key)
-        IterableUserDict.__delitem__(self, key)
-
-    ## used in "for k in dict" loop to ensure the correct order
-    def __iter__(self):
-        return self.iterkeys()
-
-    ## len() support
-    def __len__(self):
-        return len(self._key_list)
-
-    ## "in" test support
-    def __contains__(self, key):
-        return key in self._key_list
-
-    ## indexof support
-    def index(self, key):
-        return self._key_list.index(key)
-
-    ## insert support
-    def insert(self, key, newkey, newvalue, order):
-        index = self._key_list.index(key)
-        if order == 'BEFORE':
-            self._key_list.insert(index, newkey)
-            IterableUserDict.__setitem__(self, newkey, newvalue)
-        elif order == 'AFTER':
-            self._key_list.insert(index + 1, newkey)
-            IterableUserDict.__setitem__(self, newkey, newvalue)
-
-    ## append support
-    def append(self, sdict):
-        for key in sdict:
-            if key not in self._key_list:
-                self._key_list.append(key)
-            IterableUserDict.__setitem__(self, key, sdict[key])
-
-    def has_key(self, key):
-        return key in self._key_list
-
-    ## Empty the dict
-    def clear(self):
-        self._key_list = []
-        IterableUserDict.clear(self)
-
-    ## Return a copy of keys
-    def keys(self):
-        keys = []
-        for key in self._key_list:
-            keys.append(key)
-        return keys
-
-    ## Return a copy of values
-    def values(self):
-        values = []
-        for key in self._key_list:
-            values.append(self[key])
-        return values
-
-    ## Return a copy of (key, value) list
-    def items(self):
-        items = []
-        for key in self._key_list:
-            items.append((key, self[key]))
-        return items
-
-    ## Iteration support
-    def iteritems(self):
-        return iter(self.items())
-
-    ## Keys interation support
-    def iterkeys(self):
-        return iter(self.keys())
-
-    ## Values interation support
-    def itervalues(self):
-        return iter(self.values())
-
-    ## Return value related to a key, and remove the (key, value) from the dict
-    def pop(self, key, *dv):
-        value = None
-        if key in self._key_list:
-            value = self[key]
-            self.__delitem__(key)
-        elif len(dv) != 0 :
-            value = kv[0]
-        return value
-
-    ## Return (key, value) pair, and remove the (key, value) from the dict
-    def popitem(self):
-        key = self._key_list[-1]
-        value = self[key]
-        self.__delitem__(key)
-        return key, value
-
-    def update(self, dict=None, **kwargs):
-        if dict != None:
-            for k, v in dict.items():
-                self[k] = v
-        if len(kwargs):
-            for k, v in kwargs.items():
-                self[k] = v
-
-## Dictionary with restricted keys
-#
-class rdict(dict):
-    ## Constructor
-    def __init__(self, KeyList):
-        for Key in KeyList:
-            dict.__setitem__(self, Key, "")
-
-    ## []= operator
-    def __setitem__(self, key, value):
-        if key not in self:
-            EdkLogger.error("RestrictedDict", ATTRIBUTE_SET_FAILURE, "Key [%s] is not allowed" % key,
-                            ExtraData=", ".join(dict.keys(self)))
-        dict.__setitem__(self, key, value)
-
-    ## =[] operator
-    def __getitem__(self, key):
-        if key not in self:
-            return ""
-        return dict.__getitem__(self, key)
-
-    ## del operator
-    def __delitem__(self, key):
-        EdkLogger.error("RestrictedDict", ATTRIBUTE_ACCESS_DENIED, ExtraData="del")
-
-    ## Empty the dict
-    def clear(self):
-        for Key in self:
-            self.__setitem__(Key, "")
-
-    ## Return value related to a key, and remove the (key, value) from the dict
-    def pop(self, key, *dv):
-        EdkLogger.error("RestrictedDict", ATTRIBUTE_ACCESS_DENIED, ExtraData="pop")
-
-    ## Return (key, value) pair, and remove the (key, value) from the dict
-    def popitem(self):
-        EdkLogger.error("RestrictedDict", ATTRIBUTE_ACCESS_DENIED, ExtraData="popitem")
 
 ## Dictionary using prioritized list as key
 #
@@ -1259,7 +925,7 @@ class tdict:
     _ListType = type([])
     _TupleType = type(())
     _Wildcard = 'COMMON'
-    _ValidWildcardList = ['COMMON', 'DEFAULT', 'ALL', '*', 'PLATFORM']
+    _ValidWildcardList = ['COMMON', 'DEFAULT', 'ALL', TAB_STAR, 'PLATFORM']
 
     def __init__(self, _Single_=False, _Level_=2):
         self._Level_ = _Level_
@@ -1281,7 +947,7 @@ class tdict:
             if self._Level_ > 1:
                 RestKeys = [self._Wildcard for i in range(0, self._Level_ - 1)]
 
-        if FirstKey == None or str(FirstKey).upper() in self._ValidWildcardList:
+        if FirstKey is None or str(FirstKey).upper() in self._ValidWildcardList:
             FirstKey = self._Wildcard
 
         if self._Single_:
@@ -1296,24 +962,24 @@ class tdict:
             if FirstKey == self._Wildcard:
                 if FirstKey in self.data:
                     Value = self.data[FirstKey][RestKeys]
-                if Value == None:
+                if Value is None:
                     for Key in self.data:
                         Value = self.data[Key][RestKeys]
-                        if Value != None: break
+                        if Value is not None: break
             else:
                 if FirstKey in self.data:
                     Value = self.data[FirstKey][RestKeys]
-                if Value == None and self._Wildcard in self.data:
+                if Value is None and self._Wildcard in self.data:
                     #print "Value=None"
                     Value = self.data[self._Wildcard][RestKeys]
         else:
             if FirstKey == self._Wildcard:
                 if FirstKey in self.data:
                     Value = self.data[FirstKey]
-                if Value == None:
+                if Value is None:
                     for Key in self.data:
                         Value = self.data[Key]
-                        if Value != None: break
+                        if Value is not None: break
             else:
                 if FirstKey in self.data:
                     Value = self.data[FirstKey]
@@ -1391,53 +1057,29 @@ class tdict:
                 keys |= self.data[Key].GetKeys(KeyIndex - 1)
             return keys
 
-## Boolean chain list
-#
-class Blist(UserList):
-    def __init__(self, initlist=None):
-        UserList.__init__(self, initlist)
-    def __setitem__(self, i, item):
-        if item not in [True, False]:
-            if item == 0:
-                item = False
-            else:
-                item = True
-        self.data[i] = item
-    def _GetResult(self):
-        Value = True
-        for item in self.data:
-            Value &= item
-        return Value
-    Result = property(_GetResult)
-
-def ParseConsoleLog(Filename):
-    Opr = open(os.path.normpath(Filename), 'r')
-    Opw = open(os.path.normpath(Filename + '.New'), 'w+')
-    for Line in Opr.readlines():
-        if Line.find('.efi') > -1:
-            Line = Line[Line.rfind(' ') : Line.rfind('.efi')].strip()
-            Opw.write('%s\n' % Line)
-
-    Opr.close()
-    Opw.close()
-
 def AnalyzePcdExpression(Setting):
-    Setting = Setting.strip()
-    # There might be escaped quote in a string: \", \\\"
-    Data = Setting.replace('\\\\', '//').replace('\\\"', '\\\'')
+    RanStr = ''.join(sample(string.ascii_letters + string.digits, 8))
+    Setting = Setting.replace('\\\\', RanStr).strip()
+    # There might be escaped quote in a string: \", \\\" , \', \\\'
+    Data = Setting
     # There might be '|' in string and in ( ... | ... ), replace it with '-'
     NewStr = ''
-    InStr = False
+    InSingleQuoteStr = False
+    InDoubleQuoteStr = False
     Pair = 0
-    for ch in Data:
-        if ch == '"':
-            InStr = not InStr
-        elif ch == '(' and not InStr:
+    for Index, ch in enumerate(Data):
+        if ch == '"' and not InSingleQuoteStr:
+            if Data[Index - 1] != '\\':
+                InDoubleQuoteStr = not InDoubleQuoteStr
+        elif ch == "'" and not InDoubleQuoteStr:
+            if Data[Index - 1] != '\\':
+                InSingleQuoteStr = not InSingleQuoteStr
+        elif ch == '(' and not (InSingleQuoteStr or InDoubleQuoteStr):
             Pair += 1
-        elif ch == ')' and not InStr:
+        elif ch == ')' and not (InSingleQuoteStr or InDoubleQuoteStr):
             Pair -= 1
 
-        if (Pair > 0 or InStr) and ch == TAB_VALUE_SPLIT:
+        if (Pair > 0 or InSingleQuoteStr or InDoubleQuoteStr) and ch == TAB_VALUE_SPLIT:
             NewStr += '-'
         else:
             NewStr += ch
@@ -1450,15 +1092,177 @@ def AnalyzePcdExpression(Setting):
             break
         FieldList.append(Setting[StartPos:Pos].strip())
         StartPos = Pos + 1
-
+    for i, ch in enumerate(FieldList):
+        if RanStr in ch:
+            FieldList[i] = ch.replace(RanStr,'\\\\')
     return FieldList
+
+def ParseFieldValue (Value):
+    def ParseDevPathValue (Value):
+        if '\\' in Value:
+            Value.replace('\\', '/').replace(' ', '')
+
+        Cmd = 'DevicePath ' + '"' + Value + '"'
+        try:
+            p = subprocess.Popen(Cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+            out, err = p.communicate()
+        except Exception as X:
+            raise BadExpression("DevicePath: %s" % (str(X)) )
+        finally:
+            subprocess._cleanup()
+            p.stdout.close()
+            p.stderr.close()
+        if err:
+            raise BadExpression("DevicePath: %s" % str(err))
+        out = out.decode()
+        Size = len(out.split())
+        out = ','.join(out.split())
+        return '{' + out + '}', Size
+
+    if "{CODE(" in Value:
+        return Value, len(Value.split(","))
+    if isinstance(Value, type(0)):
+        return Value, (Value.bit_length() + 7) // 8
+    if not isinstance(Value, type('')):
+        raise BadExpression('Type %s is %s' %(Value, type(Value)))
+    Value = Value.strip()
+    if Value.startswith(TAB_UINT8) and Value.endswith(')'):
+        Value, Size = ParseFieldValue(Value.split('(', 1)[1][:-1])
+        if Size > 1:
+            raise BadExpression('Value (%s) Size larger than %d' %(Value, Size))
+        return Value, 1
+    if Value.startswith(TAB_UINT16) and Value.endswith(')'):
+        Value, Size = ParseFieldValue(Value.split('(', 1)[1][:-1])
+        if Size > 2:
+            raise BadExpression('Value (%s) Size larger than %d' %(Value, Size))
+        return Value, 2
+    if Value.startswith(TAB_UINT32) and Value.endswith(')'):
+        Value, Size = ParseFieldValue(Value.split('(', 1)[1][:-1])
+        if Size > 4:
+            raise BadExpression('Value (%s) Size larger than %d' %(Value, Size))
+        return Value, 4
+    if Value.startswith(TAB_UINT64) and Value.endswith(')'):
+        Value, Size = ParseFieldValue(Value.split('(', 1)[1][:-1])
+        if Size > 8:
+            raise BadExpression('Value (%s) Size larger than %d' % (Value, Size))
+        return Value, 8
+    if Value.startswith(TAB_GUID) and Value.endswith(')'):
+        Value = Value.split('(', 1)[1][:-1].strip()
+        if Value[0] == '{' and Value[-1] == '}':
+            TmpValue = GuidStructureStringToGuidString(Value)
+            if not TmpValue:
+                raise BadExpression("Invalid GUID value string %s" % Value)
+            Value = TmpValue
+        if Value[0] == '"' and Value[-1] == '"':
+            Value = Value[1:-1]
+        try:
+            Value = uuid.UUID(Value).bytes_le
+            ValueL, ValueH = struct.unpack('2Q', Value)
+            Value = (ValueH << 64 ) | ValueL
+
+        except ValueError as Message:
+            raise BadExpression(Message)
+        return Value, 16
+    if Value.startswith('L"') and Value.endswith('"'):
+        # Unicode String
+        # translate escape character
+        Value = Value[1:]
+        try:
+            Value = eval(Value)
+        except:
+            Value = Value[1:-1]
+        List = list(Value)
+        List.reverse()
+        Value = 0
+        for Char in List:
+            Value = (Value << 16) | ord(Char)
+        return Value, (len(List) + 1) * 2
+    if Value.startswith('"') and Value.endswith('"'):
+        # ASCII String
+        # translate escape character
+        try:
+            Value = eval(Value)
+        except:
+            Value = Value[1:-1]
+        List = list(Value)
+        List.reverse()
+        Value = 0
+        for Char in List:
+            Value = (Value << 8) | ord(Char)
+        return Value, len(List) + 1
+    if Value.startswith("L'") and Value.endswith("'"):
+        # Unicode Character Constant
+        # translate escape character
+        Value = Value[1:]
+        try:
+            Value = eval(Value)
+        except:
+            Value = Value[1:-1]
+        List = list(Value)
+        if len(List) == 0:
+            raise BadExpression('Length %s is %s' % (Value, len(List)))
+        List.reverse()
+        Value = 0
+        for Char in List:
+            Value = (Value << 16) | ord(Char)
+        return Value, len(List) * 2
+    if Value.startswith("'") and Value.endswith("'"):
+        # Character constant
+        # translate escape character
+        try:
+            Value = eval(Value)
+        except:
+            Value = Value[1:-1]
+        List = list(Value)
+        if len(List) == 0:
+            raise BadExpression('Length %s is %s' % (Value, len(List)))
+        List.reverse()
+        Value = 0
+        for Char in List:
+            Value = (Value << 8) | ord(Char)
+        return Value, len(List)
+    if Value.startswith('{') and Value.endswith('}'):
+        # Byte array
+        Value = Value[1:-1]
+        List = [Item.strip() for Item in Value.split(',')]
+        List.reverse()
+        Value = 0
+        RetSize = 0
+        for Item in List:
+            ItemValue, Size = ParseFieldValue(Item)
+            RetSize += Size
+            for I in range(Size):
+                Value = (Value << 8) | ((ItemValue >> 8 * I) & 0xff)
+        return Value, RetSize
+    if Value.startswith('DEVICE_PATH(') and Value.endswith(')'):
+        Value = Value.replace("DEVICE_PATH(", '').rstrip(')')
+        Value = Value.strip().strip('"')
+        return ParseDevPathValue(Value)
+    if Value.lower().startswith('0x'):
+        try:
+            Value = int(Value, 16)
+        except:
+            raise BadExpression("invalid hex value: %s" % Value)
+        if Value == 0:
+            return 0, 1
+        return Value, (Value.bit_length() + 7) // 8
+    if Value[0].isdigit():
+        Value = int(Value, 10)
+        if Value == 0:
+            return 0, 1
+        return Value, (Value.bit_length() + 7) // 8
+    if Value.lower() == 'true':
+        return 1, 1
+    if Value.lower() == 'false':
+        return 0, 1
+    return Value, 1
 
 ## AnalyzeDscPcd
 #
 #  Analyze DSC PCD value, since there is no data type info in DSC
-#  This fuction is used to match functions (AnalyzePcdData, AnalyzeHiiPcdData, AnalyzeVpdPcdData) used for retrieving PCD value from database
+#  This function is used to match functions (AnalyzePcdData) used for retrieving PCD value from database
 #  1. Feature flag: TokenSpace.PcdCName|PcdValue
-#  2. Fix and Patch:TokenSpace.PcdCName|PcdValue[|MaxSize]
+#  2. Fix and Patch:TokenSpace.PcdCName|PcdValue[|VOID*[|MaxSize]]
 #  3. Dynamic default:
 #     TokenSpace.PcdCName|PcdValue[|VOID*[|MaxSize]]
 #     TokenSpace.PcdCName|PcdValue
@@ -1466,7 +1270,7 @@ def AnalyzePcdExpression(Setting):
 #     TokenSpace.PcdCName|VpdOffset[|VpdValue]
 #     TokenSpace.PcdCName|VpdOffset[|MaxSize[|VpdValue]]
 #  5. Dynamic HII:
-#     TokenSpace.PcdCName|HiiString|VaiableGuid|VariableOffset[|HiiValue]
+#     TokenSpace.PcdCName|HiiString|VariableGuid|VariableOffset[|HiiValue]
 #  PCD value needs to be located in such kind of string, and the PCD value might be an expression in which
 #    there might have "|" operator, also in string value.
 #
@@ -1482,49 +1286,37 @@ def AnalyzeDscPcd(Setting, PcdType, DataType=''):
     FieldList = AnalyzePcdExpression(Setting)
 
     IsValid = True
-    if PcdType in (MODEL_PCD_FIXED_AT_BUILD, MODEL_PCD_PATCHABLE_IN_MODULE, MODEL_PCD_FEATURE_FLAG):
+    if PcdType in (MODEL_PCD_FIXED_AT_BUILD, MODEL_PCD_PATCHABLE_IN_MODULE, MODEL_PCD_DYNAMIC_DEFAULT, MODEL_PCD_DYNAMIC_EX_DEFAULT):
         Value = FieldList[0]
         Size = ''
-        if len(FieldList) > 1:
-            Type = FieldList[1]
-            # Fix the PCD type when no DataType input
-            if Type == 'VOID*':
-                DataType = 'VOID*'
+        if len(FieldList) > 1 and FieldList[1]:
+            DataType = FieldList[1]
+            if FieldList[1] != TAB_VOID and StructPattern.match(FieldList[1]) is None:
+                IsValid = False
+        if len(FieldList) > 2:
+            Size = FieldList[2]
+        if IsValid:
+            if DataType == "":
+                IsValid = (len(FieldList) <= 1)
             else:
-                Size = FieldList[1]
-        if len(FieldList) > 2:
-            Size = FieldList[2]
-        if DataType == 'VOID*':
-            IsValid = (len(FieldList) <= 3)
-        else:
-            IsValid = (len(FieldList) <= 1)
-        return [Value, '', Size], IsValid, 0
-    elif PcdType in (MODEL_PCD_DYNAMIC_DEFAULT, MODEL_PCD_DYNAMIC_EX_DEFAULT):
+                IsValid = (len(FieldList) <= 3)
+
+        if Size:
+            try:
+                int(Size, 16) if Size.upper().startswith("0X") else int(Size)
+            except:
+                IsValid = False
+                Size = -1
+        return [str(Value), DataType, str(Size)], IsValid, 0
+    elif PcdType == MODEL_PCD_FEATURE_FLAG:
         Value = FieldList[0]
-        Size = Type = ''
-        if len(FieldList) > 1:
-            Type = FieldList[1]
-        else:
-            Type = DataType
-        if len(FieldList) > 2:
-            Size = FieldList[2]
-        else:
-            if Type == 'VOID*':
-                if Value.startswith("L"):
-                    Size = str((len(Value)- 3 + 1) * 2)
-                elif Value.startswith("{"):
-                    Size = str(len(Value.split(",")))
-                else:
-                    Size = str(len(Value) -2 + 1 )
-        if DataType == 'VOID*':
-            IsValid = (len(FieldList) <= 3)
-        else:
-            IsValid = (len(FieldList) <= 1)
-        return [Value, Type, Size], IsValid, 0
+        Size = ''
+        IsValid = (len(FieldList) <= 1)
+        return [Value, DataType, str(Size)], IsValid, 0
     elif PcdType in (MODEL_PCD_DYNAMIC_VPD, MODEL_PCD_DYNAMIC_EX_VPD):
         VpdOffset = FieldList[0]
         Value = Size = ''
-        if not DataType == 'VOID*':
+        if not DataType == TAB_VOID:
             if len(FieldList) > 1:
                 Value = FieldList[1]
         else:
@@ -1532,12 +1324,19 @@ def AnalyzeDscPcd(Setting, PcdType, DataType=''):
                 Size = FieldList[1]
             if len(FieldList) > 2:
                 Value = FieldList[2]
-        if DataType == 'VOID*':
-            IsValid = (len(FieldList) <= 3)
+        if DataType == "":
+            IsValid = (len(FieldList) <= 1)
         else:
-            IsValid = (len(FieldList) <= 2)
-        return [VpdOffset, Size, Value], IsValid, 2
+            IsValid = (len(FieldList) <= 3)
+        if Size:
+            try:
+                int(Size, 16) if Size.upper().startswith("0X") else int(Size)
+            except:
+                IsValid = False
+                Size = -1
+        return [VpdOffset, str(Size), Value], IsValid, 2
     elif PcdType in (MODEL_PCD_DYNAMIC_HII, MODEL_PCD_DYNAMIC_EX_HII):
+        IsValid = (3 <= len(FieldList) <= 5)
         HiiString = FieldList[0]
         Guid = Offset = Value = Attribute = ''
         if len(FieldList) > 1:
@@ -1548,7 +1347,6 @@ def AnalyzeDscPcd(Setting, PcdType, DataType=''):
             Value = FieldList[3]
         if len(FieldList) > 4:
             Attribute = FieldList[4]
-        IsValid = (3 <= len(FieldList) <= 5)
         return [HiiString, Guid, Offset, Value, Attribute], IsValid, 3
     return [], False, 0
 
@@ -1558,87 +1356,41 @@ def AnalyzeDscPcd(Setting, PcdType, DataType=''):
 #  Used to avoid split issue while the value string contain "|" character
 #
 #  @param[in] Setting:  A String contain value/datum type/token number information;
-#  
-#  @retval   ValueList: A List contain value, datum type and toke number. 
+#
+#  @retval   ValueList: A List contain value, datum type and toke number.
 #
 def AnalyzePcdData(Setting):
     ValueList = ['', '', '']
 
     ValueRe = re.compile(r'^\s*L?\".*\|.*\"')
     PtrValue = ValueRe.findall(Setting)
-    
+
     ValueUpdateFlag = False
-    
+
     if len(PtrValue) >= 1:
         Setting = re.sub(ValueRe, '', Setting)
         ValueUpdateFlag = True
 
     TokenList = Setting.split(TAB_VALUE_SPLIT)
     ValueList[0:len(TokenList)] = TokenList
-    
+
     if ValueUpdateFlag:
         ValueList[0] = PtrValue[0]
-        
-    return ValueList   
- 
-## AnalyzeHiiPcdData
-#
-#  Analyze the pcd Value, variable name, variable Guid and variable offset.
-#  Used to avoid split issue while the value string contain "|" character
-#
-#  @param[in] Setting:  A String contain VariableName, VariableGuid, VariableOffset, DefaultValue information;
-#  
-#  @retval   ValueList: A List contaian VariableName, VariableGuid, VariableOffset, DefaultValue. 
-#
-def AnalyzeHiiPcdData(Setting):
-    ValueList = ['', '', '', '']
-
-    TokenList = GetSplitValueList(Setting)
-    ValueList[0:len(TokenList)] = TokenList
 
     return ValueList
-
-## AnalyzeVpdPcdData
-#
-#  Analyze the vpd pcd VpdOffset, MaxDatumSize and InitialValue.
-#  Used to avoid split issue while the value string contain "|" character
-#
-#  @param[in] Setting:  A String contain VpdOffset/MaxDatumSize/InitialValue information;
-#  
-#  @retval   ValueList: A List contain VpdOffset, MaxDatumSize and InitialValue. 
-#
-def AnalyzeVpdPcdData(Setting):
-    ValueList = ['', '', '']
-
-    ValueRe = re.compile(r'\s*L?\".*\|.*\"\s*$')
-    PtrValue = ValueRe.findall(Setting)
-    
-    ValueUpdateFlag = False
-    
-    if len(PtrValue) >= 1:
-        Setting = re.sub(ValueRe, '', Setting)
-        ValueUpdateFlag = True
-
-    TokenList = Setting.split(TAB_VALUE_SPLIT)
-    ValueList[0:len(TokenList)] = TokenList
-    
-    if ValueUpdateFlag:
-        ValueList[2] = PtrValue[0]
-        
-    return ValueList     
 
 ## check format of PCD value against its the datum type
 #
 # For PCD value setting
 #
 def CheckPcdDatum(Type, Value):
-    if Type == "VOID*":
+    if Type == TAB_VOID:
         ValueRe = re.compile(r'\s*L?\".*\"\s*$')
         if not (((Value.startswith('L"') or Value.startswith('"')) and Value.endswith('"'))
-                or (Value.startswith('{') and Value.endswith('}'))
+                or (Value.startswith('{') and Value.endswith('}')) or (Value.startswith("L'") or Value.startswith("'") and Value.endswith("'"))
                ):
             return False, "Invalid value [%s] of type [%s]; must be in the form of {...} for array"\
-                          ", or \"...\" for string, or L\"...\" for unicode string" % (Value, Type)
+                          ", \"...\" or \'...\' for string, L\"...\" or L\'...\' for unicode string" % (Value, Type)
         elif ValueRe.match(Value):
             # Check the chars in UnicodeString or CString is printable
             if Value.startswith("L"):
@@ -1650,99 +1402,36 @@ def CheckPcdDatum(Type, Value):
             Printset.add(TAB_PRINTCHAR_BS)
             Printset.add(TAB_PRINTCHAR_NUL)
             if not set(Value).issubset(Printset):
-                PrintList = list(Printset)
-                PrintList.sort()
+                PrintList = sorted(Printset)
                 return False, "Invalid PCD string value of type [%s]; must be printable chars %s." % (Type, PrintList)
     elif Type == 'BOOLEAN':
         if Value not in ['TRUE', 'True', 'true', '0x1', '0x01', '1', 'FALSE', 'False', 'false', '0x0', '0x00', '0']:
             return False, "Invalid value [%s] of type [%s]; must be one of TRUE, True, true, 0x1, 0x01, 1"\
                           ", FALSE, False, false, 0x0, 0x00, 0" % (Value, Type)
     elif Type in [TAB_UINT8, TAB_UINT16, TAB_UINT32, TAB_UINT64]:
+        if Value.startswith('0') and not Value.lower().startswith('0x') and len(Value) > 1 and Value.lstrip('0'):
+            Value = Value.lstrip('0')
         try:
-            Value = long(Value, 0)
+            if Value and int(Value, 0) < 0:
+                return False, "PCD can't be set to negative value[%s] for datum type [%s]" % (Value, Type)
+            Value = int(Value, 0)
+            if Value > MAX_VAL_TYPE[Type]:
+                return False, "Too large PCD value[%s] for datum type [%s]" % (Value, Type)
         except:
             return False, "Invalid value [%s] of type [%s];"\
                           " must be a hexadecimal, decimal or octal in C language format." % (Value, Type)
     else:
-        return False, "Invalid type [%s]; must be one of VOID*, BOOLEAN, UINT8, UINT16, UINT32, UINT64." % (Type)
+        return True, "StructurePcd"
 
     return True, ""
-
-## Split command line option string to list
-#
-# subprocess.Popen needs the args to be a sequence. Otherwise there's problem
-# in non-windows platform to launch command
-#
-def SplitOption(OptionString):
-    OptionList = []
-    LastChar = " "
-    OptionStart = 0
-    QuotationMark = ""
-    for Index in range(0, len(OptionString)):
-        CurrentChar = OptionString[Index]
-        if CurrentChar in ['"', "'"]:
-            if QuotationMark == CurrentChar:
-                QuotationMark = ""
-            elif QuotationMark == "":
-                QuotationMark = CurrentChar
-            continue
-        elif QuotationMark:
-            continue
-
-        if CurrentChar in ["/", "-"] and LastChar in [" ", "\t", "\r", "\n"]:
-            if Index > OptionStart:
-                OptionList.append(OptionString[OptionStart:Index - 1])
-            OptionStart = Index
-        LastChar = CurrentChar
-    OptionList.append(OptionString[OptionStart:])
-    return OptionList
 
 def CommonPath(PathList):
     P1 = min(PathList).split(os.path.sep)
     P2 = max(PathList).split(os.path.sep)
-    for Index in xrange(min(len(P1), len(P2))):
+    for Index in range(min(len(P1), len(P2))):
         if P1[Index] != P2[Index]:
             return os.path.sep.join(P1[:Index])
     return os.path.sep.join(P1)
-
-#
-# Convert string to C format array
-#
-def ConvertStringToByteArray(Value):
-    Value = Value.strip()
-    if not Value:
-        return None
-    if Value[0] == '{':
-        if not Value.endswith('}'):
-            return None
-        Value = Value.replace(' ', '').replace('{', '').replace('}', '')
-        ValFields = Value.split(',')
-        try:
-            for Index in range(len(ValFields)):
-                ValFields[Index] = str(int(ValFields[Index], 0))
-        except ValueError:
-            return None
-        Value = '{' + ','.join(ValFields) + '}'
-        return Value
-
-    Unicode = False
-    if Value.startswith('L"'):
-        if not Value.endswith('"'):
-            return None
-        Value = Value[1:]
-        Unicode = True
-    elif not Value.startswith('"') or not Value.endswith('"'):
-        return None
-
-    Value = eval(Value)         # translate escape character
-    NewValue = '{'
-    for Index in range(0,len(Value)):
-        if Unicode:
-            NewValue = NewValue + str(ord(Value[Index]) % 0x10000) + ','
-        else:
-            NewValue = NewValue + str(ord(Value[Index]) % 0x100) + ','
-    Value = NewValue + '0}'
-    return Value
 
 class PathClass(object):
     def __init__(self, File='', Root='', AlterRoot='', Type='', IsBinary=False,
@@ -1793,8 +1482,7 @@ class PathClass(object):
         self.TagName = TagName
         self.ToolCode = ToolCode
         self.ToolChainFamily = ToolChainFamily
-
-        self._Key = None
+        self.OriginalPath = self
 
     ## Convert the object of this class to a string
     #
@@ -1813,24 +1501,18 @@ class PathClass(object):
     # @retval True  The two PathClass are the same
     #
     def __eq__(self, Other):
-        if type(Other) == type(self):
-            return self.Path == Other.Path
-        else:
-            return self.Path == str(Other)
+        return self.Path == str(Other)
 
     ## Override __cmp__ function
     #
-    # Customize the comparsion operation of two PathClass
+    # Customize the comparison operation of two PathClass
     #
     # @retval 0     The two PathClass are different
     # @retval -1    The first PathClass is less than the second PathClass
     # @retval 1     The first PathClass is Bigger than the second PathClass
     def __cmp__(self, Other):
-        if type(Other) == type(self):
-            OtherKey = Other.Path
-        else:
-            OtherKey = str(Other)
-            
+        OtherKey = str(Other)
+
         SelfKey = self.Path
         if SelfKey == OtherKey:
             return 0
@@ -1848,15 +1530,41 @@ class PathClass(object):
     def __hash__(self):
         return hash(self.Path)
 
-    def _GetFileKey(self):
-        if self._Key == None:
-            self._Key = self.Path.upper()   # + self.ToolChainFamily + self.TagName + self.ToolCode + self.Target
-        return self._Key
+    @cached_property
+    def Key(self):
+        return self.Path.upper()
 
-    def _GetTimeStamp(self):
+    @property
+    def TimeStamp(self):
         return os.stat(self.Path)[8]
 
     def Validate(self, Type='', CaseSensitive=True):
+        def RealPath2(File, Dir='', OverrideDir=''):
+            NewFile = None
+            if OverrideDir:
+                NewFile = GlobalData.gAllFiles[os.path.normpath(os.path.join(OverrideDir, File))]
+                if NewFile:
+                    if OverrideDir[-1] == os.path.sep:
+                        return NewFile[len(OverrideDir):], NewFile[0:len(OverrideDir)]
+                    else:
+                        return NewFile[len(OverrideDir) + 1:], NewFile[0:len(OverrideDir)]
+            if GlobalData.gAllFiles:
+                NewFile = GlobalData.gAllFiles[os.path.normpath(os.path.join(Dir, File))]
+            if not NewFile:
+                NewFile = os.path.normpath(os.path.join(Dir, File))
+                if not os.path.exists(NewFile):
+                    return None, None
+            if NewFile:
+                if Dir:
+                    if Dir[-1] == os.path.sep:
+                        return NewFile[len(Dir):], NewFile[0:len(Dir)]
+                    else:
+                        return NewFile[len(Dir) + 1:], NewFile[0:len(Dir)]
+                else:
+                    return NewFile, ''
+
+            return None, None
+
         if GlobalData.gCaseInsensitive:
             CaseSensitive = False
         if Type and Type.lower() != self.Type:
@@ -1892,10 +1600,7 @@ class PathClass(object):
             self.Path = os.path.join(RealRoot, RealFile)
         return ErrorCode, ErrorInfo
 
-    Key = property(_GetFileKey)
-    TimeStamp = property(_GetTimeStamp)
-
-## Parse PE image to get the required PE informaion.
+## Parse PE image to get the required PE information.
 #
 class PeImageClass():
     ## Constructor
@@ -1930,7 +1635,7 @@ class PeImageClass():
         ByteArray = array.array('B')
         ByteArray.fromfile(PeObject, 4)
         # PE signature should be 'PE\0\0'
-        if ByteArray.tostring() != 'PE\0\0':
+        if ByteArray.tostring() != b'PE\0\0':
             self.ErrorInfo = self.FileName + ' has no valid PE signature PE00'
             return
 
@@ -1968,7 +1673,7 @@ class PeImageClass():
     def _ByteListToStr(self, ByteList):
         String = ''
         for index in range(len(ByteList)):
-            if ByteList[index] == 0: 
+            if ByteList[index] == 0:
                 break
             String += chr(ByteList[index])
         return String
@@ -1979,76 +1684,195 @@ class PeImageClass():
             Value = (Value << 8) | int(ByteList[index])
         return Value
 
+class DefaultStore():
+    def __init__(self, DefaultStores ):
+
+        self.DefaultStores = DefaultStores
+    def DefaultStoreID(self, DefaultStoreName):
+        for key, value in self.DefaultStores.items():
+            if value == DefaultStoreName:
+                return key
+        return None
+    def GetDefaultDefault(self):
+        if not self.DefaultStores or "0" in self.DefaultStores:
+            return "0", TAB_DEFAULT_STORES_DEFAULT
+        else:
+            minvalue = min(int(value_str) for value_str in self.DefaultStores)
+            return (str(minvalue), self.DefaultStores[str(minvalue)])
+    def GetMin(self, DefaultSIdList):
+        if not DefaultSIdList:
+            return TAB_DEFAULT_STORES_DEFAULT
+        storeidset = {storeid for storeid, storename in self.DefaultStores.values() if storename in DefaultSIdList}
+        if not storeidset:
+            return ""
+        minid = min(storeidset )
+        for sid, name in self.DefaultStores.values():
+            if sid == minid:
+                return name
 
 class SkuClass():
-    
     DEFAULT = 0
     SINGLE = 1
     MULTIPLE =2
-    
-    def __init__(self,SkuIdentifier='', SkuIds={}):
-        
-        self.AvailableSkuIds = sdict()
+
+    def __init__(self,SkuIdentifier='', SkuIds=None):
+        if SkuIds is None:
+            SkuIds = {}
+
+        for SkuName in SkuIds:
+            SkuId = SkuIds[SkuName][0]
+            skuid_num = int(SkuId, 16) if SkuId.upper().startswith("0X") else int(SkuId)
+            if skuid_num > 0xFFFFFFFFFFFFFFFF:
+                EdkLogger.error("build", PARAMETER_INVALID,
+                            ExtraData = "SKU-ID [%s] value %s exceeds the max value of UINT64"
+                                      % (SkuName, SkuId))
+
+        self.AvailableSkuIds = OrderedDict()
         self.SkuIdSet = []
         self.SkuIdNumberSet = []
+        self.SkuData = SkuIds
+        self._SkuInherit = {}
+        self._SkuIdentifier = SkuIdentifier
         if SkuIdentifier == '' or SkuIdentifier is None:
             self.SkuIdSet = ['DEFAULT']
             self.SkuIdNumberSet = ['0U']
         elif SkuIdentifier == 'ALL':
-            self.SkuIdSet = SkuIds.keys()
-            self.SkuIdNumberSet = [num.strip() + 'U' for num in SkuIds.values()]
+            self.SkuIdSet = list(SkuIds.keys())
+            self.SkuIdNumberSet = [num[0].strip() + 'U' for num in SkuIds.values()]
         else:
-            r = SkuIdentifier.split('|') 
-            self.SkuIdSet=[r[k].strip() for k in range(len(r))]      
+            r = SkuIdentifier.split('|')
+            self.SkuIdSet=[(r[k].strip()).upper() for k in range(len(r))]
             k = None
-            try: 
-                self.SkuIdNumberSet = [SkuIds[k].strip() + 'U' for k in self.SkuIdSet]   
+            try:
+                self.SkuIdNumberSet = [SkuIds[k][0].strip() + 'U' for k in self.SkuIdSet]
             except Exception:
                 EdkLogger.error("build", PARAMETER_INVALID,
                             ExtraData = "SKU-ID [%s] is not supported by the platform. [Valid SKU-ID: %s]"
-                                      % (k, " ".join(SkuIds.keys())))
-        if len(self.SkuIdSet) == 2 and 'DEFAULT' in self.SkuIdSet and SkuIdentifier != 'ALL':
-            self.SkuIdSet.remove('DEFAULT')
-            self.SkuIdNumberSet.remove('0U')
+                                      % (k, " | ".join(SkuIds.keys())))
         for each in self.SkuIdSet:
             if each in SkuIds:
-                self.AvailableSkuIds[each] = SkuIds[each]
+                self.AvailableSkuIds[each] = SkuIds[each][0]
             else:
                 EdkLogger.error("build", PARAMETER_INVALID,
                             ExtraData="SKU-ID [%s] is not supported by the platform. [Valid SKU-ID: %s]"
-                                      % (each, " ".join(SkuIds.keys())))
-        
-    def __SkuUsageType(self): 
-        
+                                      % (each, " | ".join(SkuIds.keys())))
+        if self.SkuUsageType != SkuClass.SINGLE:
+            self.AvailableSkuIds.update({'DEFAULT':0, 'COMMON':0})
+        if self.SkuIdSet:
+            GlobalData.gSkuids = (self.SkuIdSet)
+            if 'COMMON' in GlobalData.gSkuids:
+                GlobalData.gSkuids.remove('COMMON')
+            if self.SkuUsageType == self.SINGLE:
+                if len(GlobalData.gSkuids) != 1:
+                    if 'DEFAULT' in GlobalData.gSkuids:
+                        GlobalData.gSkuids.remove('DEFAULT')
+            if GlobalData.gSkuids:
+                GlobalData.gSkuids.sort()
+
+    def GetNextSkuId(self, skuname):
+        if not self._SkuInherit:
+            self._SkuInherit = {}
+            for item in self.SkuData.values():
+                self._SkuInherit[item[1]]=item[2] if item[2] else "DEFAULT"
+        return self._SkuInherit.get(skuname, "DEFAULT")
+
+    def GetSkuChain(self, sku):
+        if sku == "DEFAULT":
+            return ["DEFAULT"]
+        skulist = [sku]
+        nextsku = sku
+        while True:
+            nextsku = self.GetNextSkuId(nextsku)
+            skulist.append(nextsku)
+            if nextsku == "DEFAULT":
+                break
+        skulist.reverse()
+        return skulist
+    def SkuOverrideOrder(self):
+        skuorderset = []
+        for skuname in self.SkuIdSet:
+            skuorderset.append(self.GetSkuChain(skuname))
+
+        skuorder = []
+        for index in range(max(len(item) for item in skuorderset)):
+            for subset in skuorderset:
+                if index > len(subset)-1:
+                    continue
+                if subset[index] in skuorder:
+                    continue
+                skuorder.append(subset[index])
+
+        return skuorder
+
+    @property
+    def SkuUsageType(self):
+        if self._SkuIdentifier.upper() == "ALL":
+            return SkuClass.MULTIPLE
+
         if len(self.SkuIdSet) == 1:
             if self.SkuIdSet[0] == 'DEFAULT':
                 return SkuClass.DEFAULT
-            else:
-                return SkuClass.SINGLE
-        else:
-            return SkuClass.MULTIPLE
+            return SkuClass.SINGLE
+        if len(self.SkuIdSet) == 2 and 'DEFAULT' in self.SkuIdSet:
+            return SkuClass.SINGLE
+        return SkuClass.MULTIPLE
 
-    def __GetAvailableSkuIds(self):
+    def DumpSkuIdArrary(self):
+        if self.SkuUsageType == SkuClass.SINGLE:
+            return "{0x0}"
+        ArrayStrList = []
+        for skuname in self.AvailableSkuIds:
+            if skuname == "COMMON":
+                continue
+            while skuname != "DEFAULT":
+                ArrayStrList.append(hex(int(self.AvailableSkuIds[skuname])))
+                skuname = self.GetNextSkuId(skuname)
+            ArrayStrList.append("0x0")
+        return "{{{myList}}}".format(myList=",".join(ArrayStrList))
+
+    @property
+    def AvailableSkuIdSet(self):
         return self.AvailableSkuIds
-    
-    def __GetSystemSkuID(self):
-        if self.__SkuUsageType() == SkuClass.SINGLE:
-            return self.SkuIdSet[0]
+
+    @property
+    def SystemSkuId(self):
+        if self.SkuUsageType == SkuClass.SINGLE:
+            if len(self.SkuIdSet) == 1:
+                return self.SkuIdSet[0]
+            else:
+                return self.SkuIdSet[0] if self.SkuIdSet[0] != 'DEFAULT' else self.SkuIdSet[1]
         else:
             return 'DEFAULT'
-    def __GetAvailableSkuIdNumber(self):
-        return self.SkuIdNumberSet
-    SystemSkuId = property(__GetSystemSkuID)
-    AvailableSkuIdSet = property(__GetAvailableSkuIds)
-    SkuUsageType = property(__SkuUsageType)
-    AvailableSkuIdNumSet = property(__GetAvailableSkuIdNumber)
+
+##  Get the integer value from string like "14U" or integer like 2
+#
+#   @param      Input   The object that may be either a integer value or a string
+#
+#   @retval     Value    The integer value that the input represents
+#
+def GetIntegerValue(Input):
+    if not isinstance(Input, str):
+        return Input
+    String = Input
+    if String.endswith("U"):
+        String = String[:-1]
+    if String.endswith("ULL"):
+        String = String[:-3]
+    if String.endswith("LL"):
+        String = String[:-2]
+
+    if String.startswith("0x") or String.startswith("0X"):
+        return int(String, 16)
+    elif String == '':
+        return 0
+    else:
+        return int(String)
 
 #
-# Pack a registry format GUID
+# Pack a GUID (registry format) list into a buffer and return it
 #
-def PackRegistryFormatGuid(Guid):
-    Guid = Guid.split('-')
-    return pack('=LHHBBBBBBBB',
+def PackGUID(Guid):
+    return pack(PACK_PATTERN_GUID,
                 int(Guid[0], 16),
                 int(Guid[1], 16),
                 int(Guid[2], 16),
@@ -2062,11 +1886,44 @@ def PackRegistryFormatGuid(Guid):
                 int(Guid[4][-2:], 16)
                 )
 
-##
 #
-# This acts like the main() function for the script, unless it is 'import'ed into another
-# script.
+# Pack a GUID (byte) list into a buffer and return it
 #
-if __name__ == '__main__':
-    pass
+def PackByteFormatGUID(Guid):
+    return pack(PACK_PATTERN_GUID,
+                Guid[0],
+                Guid[1],
+                Guid[2],
+                Guid[3],
+                Guid[4],
+                Guid[5],
+                Guid[6],
+                Guid[7],
+                Guid[8],
+                Guid[9],
+                Guid[10],
+                )
 
+## DeepCopy dict/OrderedDict recusively
+#
+#   @param      ori_dict    a nested dict or ordereddict
+#
+#   @retval     new dict or orderdict
+#
+def CopyDict(ori_dict):
+    dict_type = ori_dict.__class__
+    if dict_type not in (dict,OrderedDict):
+        return ori_dict
+    new_dict = dict_type()
+    for key in ori_dict:
+        if isinstance(ori_dict[key],(dict,OrderedDict)):
+            new_dict[key] = CopyDict(ori_dict[key])
+        else:
+            new_dict[key] = ori_dict[key]
+    return new_dict
+
+#
+# Remove the c/c++ comments: // and /* */
+#
+def RemoveCComments(ctext):
+    return re.sub('//.*?\n|/\*.*?\*/', '\n', ctext, flags=re.S)

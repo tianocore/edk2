@@ -4,13 +4,7 @@
   Copyright (C) 2013, Red Hat, Inc.
   Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -28,7 +22,7 @@
 
 /**
   Selects a firmware configuration item for reading.
-  
+
   Following this call, any data read from this item will start from
   the beginning of the configuration item's data.
 
@@ -41,81 +35,9 @@ QemuFwCfgSelectItem (
   IN FIRMWARE_CONFIG_ITEM   QemuFwCfgItem
   )
 {
-  DEBUG ((EFI_D_INFO, "Select Item: 0x%x\n", (UINT16)(UINTN) QemuFwCfgItem));
+  DEBUG ((DEBUG_INFO, "Select Item: 0x%x\n", (UINT16)(UINTN) QemuFwCfgItem));
   IoWrite16 (FW_CFG_IO_SELECTOR, (UINT16)(UINTN) QemuFwCfgItem);
 }
-
-
-/**
-  Transfer an array of bytes, or skip a number of bytes, using the DMA
-  interface.
-
-  @param[in]     Size     Size in bytes to transfer or skip.
-
-  @param[in,out] Buffer   Buffer to read data into or write data from. Ignored,
-                          and may be NULL, if Size is zero, or Control is
-                          FW_CFG_DMA_CTL_SKIP.
-
-  @param[in]     Control  One of the following:
-                          FW_CFG_DMA_CTL_WRITE - write to fw_cfg from Buffer.
-                          FW_CFG_DMA_CTL_READ  - read from fw_cfg into Buffer.
-                          FW_CFG_DMA_CTL_SKIP  - skip bytes in fw_cfg.
-**/
-VOID
-InternalQemuFwCfgDmaBytes (
-  IN     UINT32   Size,
-  IN OUT VOID     *Buffer OPTIONAL,
-  IN     UINT32   Control
-  )
-{
-  volatile FW_CFG_DMA_ACCESS Access;
-  UINT32                     AccessHigh, AccessLow;
-  UINT32                     Status;
-
-  ASSERT (Control == FW_CFG_DMA_CTL_WRITE || Control == FW_CFG_DMA_CTL_READ ||
-    Control == FW_CFG_DMA_CTL_SKIP);
-
-  if (Size == 0) {
-    return;
-  }
-
-  Access.Control = SwapBytes32 (Control);
-  Access.Length  = SwapBytes32 (Size);
-  Access.Address = SwapBytes64 ((UINTN)Buffer);
-
-  //
-  // Delimit the transfer from (a) modifications to Access, (b) in case of a
-  // write, from writes to Buffer by the caller.
-  //
-  MemoryFence ();
-
-  //
-  // Start the transfer.
-  //
-  AccessHigh = (UINT32)RShiftU64 ((UINTN)&Access, 32);
-  AccessLow  = (UINT32)(UINTN)&Access;
-  IoWrite32 (FW_CFG_IO_DMA_ADDRESS,     SwapBytes32 (AccessHigh));
-  IoWrite32 (FW_CFG_IO_DMA_ADDRESS + 4, SwapBytes32 (AccessLow));
-
-  //
-  // Don't look at Access.Control before starting the transfer.
-  //
-  MemoryFence ();
-
-  //
-  // Wait for the transfer to complete.
-  //
-  do {
-    Status = SwapBytes32 (Access.Control);
-    ASSERT ((Status & FW_CFG_DMA_CTL_ERROR) == 0);
-  } while (Status != 0);
-
-  //
-  // After a read, the caller will want to use Buffer.
-  //
-  MemoryFence ();
-}
-
 
 /**
   Reads firmware configuration bytes into a buffer

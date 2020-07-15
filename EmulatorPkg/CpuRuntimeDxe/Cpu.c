@@ -3,13 +3,7 @@
 
 Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2011 - 2012, Apple Inc. All rights reserved.
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -63,7 +57,7 @@ SMBIOS_TABLE_TYPE4 mCpuSmbiosType4 = {
       0, //  ProcessorXModel:    4;
       0, //  ProcessorXFamily:   8;
       0, //  ProcessorReserved2: 4;
-    }, 
+    },
     {  // PROCESSOR_FEATURE_FLAGS
       0, //  ProcessorFpu       :1;
       0, //  ProcessorVme       :1;
@@ -100,13 +94,13 @@ SMBIOS_TABLE_TYPE4 mCpuSmbiosType4 = {
   },
   3,                    // ProcessorVersion String;
   {                     // Voltage;
-    1,  // ProcessorVoltageCapability5V        :1; 
-    1,  // ProcessorVoltageCapability3_3V      :1;  
-    1,  // ProcessorVoltageCapability2_9V      :1;  
+    1,  // ProcessorVoltageCapability5V        :1;
+    1,  // ProcessorVoltageCapability3_3V      :1;
+    1,  // ProcessorVoltageCapability2_9V      :1;
     0,  // ProcessorVoltageCapabilityReserved  :1; ///< Bit 3, must be zero.
     0,  // ProcessorVoltageReserved            :3; ///< Bits 4-6, must be zero.
     0   // ProcessorVoltageIndicateLegacy      :1;
-  },              
+  },
   0,                      // ExternalClock;
   0,                      // MaxSpeed;
   0,                      // CurrentSpeed;
@@ -151,26 +145,26 @@ CHAR8 *mCpuSmbiosType4Strings[] = {
     "Not Found",
     NULL
   };
-  
+
   ...
   LogSmbiosData (
-    (EFI_SMBIOS_TABLE_HEADER*)&gSmbiosType12, 
+    (EFI_SMBIOS_TABLE_HEADER*)&gSmbiosType12,
     gSmbiosType12Strings
     );
 
   @param  Template    Fixed SMBIOS structure, required.
-  @param  StringArray Array of strings to convert to an SMBIOS string pack. 
+  @param  StringArray Array of strings to convert to an SMBIOS string pack.
                       NULL is OK.
 
 **/
 EFI_STATUS
 LogSmbiosData (
   IN  EFI_SMBIOS_TABLE_HEADER *Template,
-  IN  CHAR8                   **StringPack 
+  IN  CHAR8                   **StringPack
   )
 {
   EFI_STATUS                Status;
-  EFI_SMBIOS_PROTOCOL       *Smbios;  
+  EFI_SMBIOS_PROTOCOL       *Smbios;
   EFI_SMBIOS_HANDLE         SmbiosHandle;
   EFI_SMBIOS_TABLE_HEADER   *Record;
   UINTN                     Index;
@@ -219,7 +213,7 @@ LogSmbiosData (
     Str += StringSize;
   }
   *Str = 0;
-  
+
   SmbiosHandle = SMBIOS_HANDLE_PI_RESERVED;
   Status = Smbios->Add (
                      Smbios,
@@ -228,7 +222,7 @@ LogSmbiosData (
                      Record
                      );
   ASSERT_EFI_ERROR (Status);
-  
+
   FreePool (Record);
   return Status;
 }
@@ -244,7 +238,10 @@ CpuUpdateSmbios (
   mCpuSmbiosType4.CoreCount        = (UINT8) MaxCpus;
   mCpuSmbiosType4.EnabledCoreCount = (UINT8) MaxCpus;
   mCpuSmbiosType4.ThreadCount      = (UINT8) MaxCpus;
-
+  //
+  // The value of 1234 is fake value for CPU frequency
+  //
+  mCpuSmbiosType4.CurrentSpeed = 1234;
   LogSmbiosData ((EFI_SMBIOS_TABLE_HEADER *)&mCpuSmbiosType4, mCpuSmbiosType4Strings);
 }
 

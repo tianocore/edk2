@@ -298,7 +298,7 @@ genDefFile( )
 					/* look in all lexclasses for the reg expr */
 
 /* MR10  Derek Pappas                                                */
-/* MR10     A #tokclass doesn't have associated regular expressiones */
+/* MR10     A #tokclass doesn't have associated regular expressions */
 /* MR10        so don't warn user about it's omission                */
 
                     p = (TermEntry *) hash_get(Tname, TokenString(i));
@@ -640,7 +640,7 @@ Junction *q;
  *
  */
 
-/* MR5 	Jan Mikkelsen 26-May-97 - added initalComma parameter              */
+/* MR5 	Jan Mikkelsen 26-May-97 - added initialComma parameter              */
 
 void
 #ifdef __USE_PROTOS
@@ -696,7 +696,7 @@ FILE *output;
 				  &pSeparator,
 				  &nest);
 
-    /* MR26 Handle rule arguments such as: IIR_Bool (IIR_Decl::*contstraint)()
+    /* MR26 Handle rule arguments such as: IIR_Bool (IIR_Decl::*constraint)()
        For this we need to strip off anything which follows the symbol.
      */
 

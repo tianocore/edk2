@@ -15,15 +15,9 @@
   Tcg2MeasureGptTable() function will receive untrusted GPT partition table, and parse
   partition data carefully.
 
-Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
-This program and the accompanying materials 
-are licensed and made available under the terms and conditions of the BSD License 
-which accompanies this distribution.  The full text of the license may be found at 
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, 
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -70,11 +64,11 @@ MEASURED_HOB_DATA                 *mTcg2MeasuredHobData     = NULL;
 
   @param  FileHandle      Pointer to the file handle to read the PE/COFF image.
   @param  FileOffset      Offset into the PE/COFF image to begin the read operation.
-  @param  ReadSize        On input, the size in bytes of the requested read operation.  
+  @param  ReadSize        On input, the size in bytes of the requested read operation.
                           On output, the number of bytes actually read.
   @param  Buffer          Output buffer that contains the data read from the PE/COFF image.
-  
-  @retval EFI_SUCCESS     The specified portion of the PE/COFF image was read and the size 
+
+  @retval EFI_SUCCESS     The specified portion of the PE/COFF image was read and the size
 **/
 EFI_STATUS
 EFIAPI
@@ -157,11 +151,11 @@ Tcg2MeasureGptTable (
   }
   //
   // Read the EFI Partition Table Header
-  //  
+  //
   PrimaryHeader = (EFI_PARTITION_TABLE_HEADER *) AllocatePool (BlockIo->Media->BlockSize);
   if (PrimaryHeader == NULL) {
     return EFI_OUT_OF_RESOURCES;
-  }  
+  }
   Status = DiskIo->ReadDisk (
                      DiskIo,
                      BlockIo->Media->MediaId,
@@ -173,7 +167,7 @@ Tcg2MeasureGptTable (
     DEBUG ((EFI_D_ERROR, "Failed to Read Partition Table Header!\n"));
     FreePool (PrimaryHeader);
     return EFI_DEVICE_ERROR;
-  }  
+  }
   //
   // Read the partition entry.
   //
@@ -194,7 +188,7 @@ Tcg2MeasureGptTable (
     FreePool (EntryPtr);
     return EFI_DEVICE_ERROR;
   }
-  
+
   //
   // Count the valid partition
   //
@@ -202,15 +196,15 @@ Tcg2MeasureGptTable (
   NumberOfPartition = 0;
   for (Index = 0; Index < PrimaryHeader->NumberOfPartitionEntries; Index++) {
     if (!IsZeroGuid (&PartitionEntry->PartitionTypeGUID)) {
-      NumberOfPartition++;  
+      NumberOfPartition++;
     }
     PartitionEntry = (EFI_PARTITION_ENTRY *)((UINT8 *)PartitionEntry + PrimaryHeader->SizeOfPartitionEntry);
   }
 
   //
   // Prepare Data for Measurement
-  // 
-  EventSize = (UINT32)(sizeof (EFI_GPT_DATA) - sizeof (GptData->Partitions) 
+  //
+  EventSize = (UINT32)(sizeof (EFI_GPT_DATA) - sizeof (GptData->Partitions)
                         + NumberOfPartition * PrimaryHeader->SizeOfPartitionEntry);
   Tcg2Event = (EFI_TCG2_EVENT *) AllocateZeroPool (EventSize + sizeof (EFI_TCG2_EVENT) - sizeof(Tcg2Event->Event));
   if (Tcg2Event == NULL) {
@@ -224,11 +218,11 @@ Tcg2MeasureGptTable (
   Tcg2Event->Header.HeaderVersion = EFI_TCG2_EVENT_HEADER_VERSION;
   Tcg2Event->Header.PCRIndex      = 5;
   Tcg2Event->Header.EventType     = EV_EFI_GPT_EVENT;
-  GptData = (EFI_GPT_DATA *) Tcg2Event->Event;  
+  GptData = (EFI_GPT_DATA *) Tcg2Event->Event;
 
   //
   // Copy the EFI_PARTITION_TABLE_HEADER and NumberOfPartition
-  //  
+  //
   CopyMem ((UINT8 *)GptData, (UINT8*)PrimaryHeader, sizeof (EFI_PARTITION_TABLE_HEADER));
   GptData->NumberOfPartitions = NumberOfPartition;
   //
@@ -286,7 +280,7 @@ Tcg2MeasureGptTable (
 
   @retval EFI_SUCCESS            Successfully measure image.
   @retval EFI_OUT_OF_RESOURCES   No enough resource to measure image.
-  @retval EFI_UNSUPPORTED        ImageType is unsupported or PE image is mal-format.  
+  @retval EFI_UNSUPPORTED        ImageType is unsupported or PE image is mal-format.
   @retval other error value
 
 **/
@@ -368,7 +362,7 @@ Tcg2MeasurePeImage (
   if (Status == EFI_VOLUME_FULL) {
     //
     // Volume full here means the image is hashed and its result is extended to PCR.
-    // But the event log cann't be saved since log area is full.
+    // But the event log can't be saved since log area is full.
     // Just return EFI_SUCCESS in order not to block the image load.
     //
     Status = EFI_SUCCESS;
@@ -381,28 +375,28 @@ Finish:
 }
 
 /**
-  The security handler is used to abstract platform-specific policy 
-  from the DXE core response to an attempt to use a file that returns a 
-  given status for the authentication check from the section extraction protocol.  
+  The security handler is used to abstract platform-specific policy
+  from the DXE core response to an attempt to use a file that returns a
+  given status for the authentication check from the section extraction protocol.
 
-  The possible responses in a given SAP implementation may include locking 
-  flash upon failure to authenticate, attestation logging for all signed drivers, 
-  and other exception operations.  The File parameter allows for possible logging 
+  The possible responses in a given SAP implementation may include locking
+  flash upon failure to authenticate, attestation logging for all signed drivers,
+  and other exception operations.  The File parameter allows for possible logging
   within the SAP of the driver.
 
-  If File is NULL, then EFI_INVALID_PARAMETER is returned.
-
-  If the file specified by File with an authentication status specified by 
+  If the file specified by File with an authentication status specified by
   AuthenticationStatus is safe for the DXE Core to use, then EFI_SUCCESS is returned.
 
-  If the file specified by File with an authentication status specified by 
-  AuthenticationStatus is not safe for the DXE Core to use under any circumstances, 
+  If the file specified by File with an authentication status specified by
+  AuthenticationStatus is not safe for the DXE Core to use under any circumstances,
   then EFI_ACCESS_DENIED is returned.
 
-  If the file specified by File with an authentication status specified by 
-  AuthenticationStatus is not safe for the DXE Core to use right now, but it 
-  might be possible to use it at a future time, then EFI_SECURITY_VIOLATION is 
+  If the file specified by File with an authentication status specified by
+  AuthenticationStatus is not safe for the DXE Core to use right now, but it
+  might be possible to use it at a future time, then EFI_SECURITY_VIOLATION is
   returned.
+
+  If check image specified by FileBuffer and File is NULL meanwhile, return EFI_ACCESS_DENIED.
 
   @param[in]      AuthenticationStatus  This is the authentication status returned
                                         from the securitymeasurement services for the
@@ -422,7 +416,7 @@ EFI_STATUS
 EFIAPI
 DxeTpm2MeasureBootHandler (
   IN  UINT32                           AuthenticationStatus,
-  IN  CONST EFI_DEVICE_PATH_PROTOCOL   *File,
+  IN  CONST EFI_DEVICE_PATH_PROTOCOL   *File, OPTIONAL
   IN  VOID                             *FileBuffer,
   IN  UINTN                            FileSize,
   IN  BOOLEAN                          BootPolicy
@@ -453,7 +447,7 @@ DxeTpm2MeasureBootHandler (
 
   ProtocolCapability.Size = (UINT8) sizeof (ProtocolCapability);
   Status = Tcg2Protocol->GetCapability (
-                           Tcg2Protocol, 
+                           Tcg2Protocol,
                            &ProtocolCapability
                            );
   if (EFI_ERROR (Status) || (!ProtocolCapability.TPMPresentFlag)) {
@@ -468,7 +462,7 @@ DxeTpm2MeasureBootHandler (
   // Copy File Device Path
   //
   OrigDevicePathNode = DuplicateDevicePath (File);
-  
+
   //
   // 1. Check whether this device path support BlockIo protocol.
   // Is so, this device path may be a GPT device path.
@@ -477,7 +471,7 @@ DxeTpm2MeasureBootHandler (
   Status = gBS->LocateDevicePath (&gEfiBlockIoProtocolGuid, &DevicePathNode, &Handle);
   if (!EFI_ERROR (Status) && !mTcg2MeasureGptTableFlag) {
     //
-    // Find the gpt partion on the given devicepath
+    // Find the gpt partition on the given devicepath
     //
     DevicePathNode = OrigDevicePathNode;
     ASSERT (DevicePathNode != NULL);
@@ -489,8 +483,8 @@ DxeTpm2MeasureBootHandler (
             DevicePathSubType (DevicePathNode) == MEDIA_HARDDRIVE_DP) {
         //
         // Check whether it is a gpt partition or not
-        //                           
-        if (((HARDDRIVE_DEVICE_PATH *) DevicePathNode)->MBRType == MBR_TYPE_EFI_PARTITION_TABLE_HEADER && 
+        //
+        if (((HARDDRIVE_DEVICE_PATH *) DevicePathNode)->MBRType == MBR_TYPE_EFI_PARTITION_TABLE_HEADER &&
             ((HARDDRIVE_DEVICE_PATH *) DevicePathNode)->SignatureType == SIGNATURE_TYPE_GUID) {
 
           //
@@ -526,7 +520,7 @@ DxeTpm2MeasureBootHandler (
       DevicePathNode    = NextDevicePathNode (DevicePathNode);
     }
   }
-  
+
   //
   // 2. Measure PE image.
   //
@@ -547,7 +541,7 @@ DxeTpm2MeasureBootHandler (
     }
     //
     // The PE image from unmeasured Firmware volume need be measured
-    // The PE image from measured Firmware volume will be mearsured according to policy below.
+    // The PE image from measured Firmware volume will be measured according to policy below.
     //   If it is driver, do not measure
     //   If it is application, still measure.
     //
@@ -560,7 +554,7 @@ DxeTpm2MeasureBootHandler (
       TempHandle = Handle;
       do {
         Status = gBS->HandleProtocol(
-                        TempHandle, 
+                        TempHandle,
                         &gEfiFirmwareVolumeBlockProtocolGuid,
                         (VOID**)&FvbProtocol
                         );
@@ -615,20 +609,27 @@ DxeTpm2MeasureBootHandler (
   Status = PeCoffLoaderGetImageInfo (&ImageContext);
   if (EFI_ERROR (Status)) {
     //
+    // Check for invalid parameters.
+    //
+    if (File == NULL) {
+      Status = EFI_ACCESS_DENIED;
+    }
+
+    //
     // The information can't be got from the invalid PeImage
     //
     goto Finish;
   }
-  
+
   //
   // Measure only application if Application flag is set
   // Measure drivers and applications if Application flag is not set
   //
-  if ((!ApplicationRequired) || 
-        (ApplicationRequired && ImageContext.ImageType == EFI_IMAGE_SUBSYSTEM_EFI_APPLICATION)) {  
+  if ((!ApplicationRequired) ||
+        (ApplicationRequired && ImageContext.ImageType == EFI_IMAGE_SUBSYSTEM_EFI_APPLICATION)) {
     //
     // Print the image path to be measured.
-    //    
+    //
     DEBUG_CODE_BEGIN ();
       CHAR16                            *ToText;
       ToText = ConvertDevicePathToText (
@@ -647,10 +648,10 @@ DxeTpm2MeasureBootHandler (
     //
     Status = Tcg2MeasurePeImage (
                Tcg2Protocol,
-               (EFI_PHYSICAL_ADDRESS) (UINTN) FileBuffer, 
-               FileSize, 
-               (UINTN) ImageContext.ImageAddress, 
-               ImageContext.ImageType, 
+               (EFI_PHYSICAL_ADDRESS) (UINTN) FileBuffer,
+               FileSize,
+               (UINTN) ImageContext.ImageAddress,
+               ImageContext.ImageType,
                DevicePathNode
                );
     DEBUG ((EFI_D_INFO, "DxeTpm2MeasureBootHandler - Tcg2MeasurePeImage - %r\n", Status));

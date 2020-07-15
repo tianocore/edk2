@@ -1,23 +1,17 @@
 /** @file
 
-  Implement the Fault Tolerant Write (FTW) protocol based on SMM FTW 
+  Implement the Fault Tolerant Write (FTW) protocol based on SMM FTW
   module.
 
-Copyright (c) 2011 - 2013, Intel Corporation. All rights reserved. <BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. 
+Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved. <BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include "FaultTolerantWriteSmmDxe.h"
 
 EFI_HANDLE                         mHandle                   = NULL;
-EFI_SMM_COMMUNICATION_PROTOCOL     *mSmmCommunication        = NULL;
+EFI_MM_COMMUNICATION2_PROTOCOL     *mMmCommunication2        = NULL;
 UINTN                              mPrivateDataSize          = 0;
 
 EFI_FAULT_TOLERANT_WRITE_PROTOCOL  mFaultTolerantWriteDriver = {
@@ -46,28 +40,28 @@ InitCommunicateBuffer (
   IN      UINTN                             Function
   )
 {
-  EFI_SMM_COMMUNICATE_HEADER                *SmmCommunicateHeader;  
-  SMM_FTW_COMMUNICATE_FUNCTION_HEADER       *SmmFtwFunctionHeader; 
+  EFI_MM_COMMUNICATE_HEADER                 *SmmCommunicateHeader;
+  SMM_FTW_COMMUNICATE_FUNCTION_HEADER       *SmmFtwFunctionHeader;
 
   //
   // The whole buffer size: SMM_COMMUNICATE_HEADER_SIZE + SMM_FTW_COMMUNICATE_HEADER_SIZE + DataSize.
   //
   SmmCommunicateHeader = AllocateZeroPool (DataSize + SMM_COMMUNICATE_HEADER_SIZE + SMM_FTW_COMMUNICATE_HEADER_SIZE);
   ASSERT (SmmCommunicateHeader != NULL);
-   
+
   //
   // Prepare data buffer.
   //
   CopyGuid (&SmmCommunicateHeader->HeaderGuid, &gEfiSmmFaultTolerantWriteProtocolGuid);
   SmmCommunicateHeader->MessageLength = DataSize + SMM_FTW_COMMUNICATE_HEADER_SIZE;
- 
+
   SmmFtwFunctionHeader = (SMM_FTW_COMMUNICATE_FUNCTION_HEADER *) SmmCommunicateHeader->Data;
   SmmFtwFunctionHeader->Function = Function;
 
   *CommunicateBuffer = SmmCommunicateHeader;
   if (DataPtr != NULL) {
     *DataPtr = SmmFtwFunctionHeader->Data;
-  }  
+  }
 }
 
 
@@ -76,20 +70,23 @@ InitCommunicateBuffer (
 
   @param[in, out]  SmmCommunicateHeader    The communicate buffer.
   @param[in]       DataSize                The payload size.
-                      
+
 **/
 EFI_STATUS
 SendCommunicateBuffer (
-  IN OUT  EFI_SMM_COMMUNICATE_HEADER        *SmmCommunicateHeader,
+  IN OUT  EFI_MM_COMMUNICATE_HEADER         *SmmCommunicateHeader,
   IN      UINTN                             DataSize
   )
 {
   EFI_STATUS                                Status;
   UINTN                                     CommSize;
-  SMM_FTW_COMMUNICATE_FUNCTION_HEADER       *SmmFtwFunctionHeader; 
- 
+  SMM_FTW_COMMUNICATE_FUNCTION_HEADER       *SmmFtwFunctionHeader;
+
   CommSize = DataSize + SMM_COMMUNICATE_HEADER_SIZE + SMM_FTW_COMMUNICATE_HEADER_SIZE;
-  Status = mSmmCommunication->Communicate (mSmmCommunication, SmmCommunicateHeader, &CommSize);
+  Status = mMmCommunication2->Communicate (mMmCommunication2,
+                                           SmmCommunicateHeader,
+                                           SmmCommunicateHeader,
+                                           &CommSize);
   ASSERT_EFI_ERROR (Status);
 
   SmmFtwFunctionHeader = (SMM_FTW_COMMUNICATE_FUNCTION_HEADER *) SmmCommunicateHeader->Data;
@@ -103,7 +100,7 @@ SendCommunicateBuffer (
   @param[in]   FvbHandle         The handle of FVB protocol that provides services.
   @param[out]  FvbBaseAddress    The base address of the FVB attached with FvbHandle.
   @param[out]  FvbAttributes     The attributes of the FVB attached with FvbHandle.
-    
+
   @retval EFI_SUCCESS            The function completed successfully.
   @retval Others                 The function could not complete successfully.
 
@@ -122,14 +119,14 @@ ConvertFvbHandle (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  
+
   Status = Fvb->GetPhysicalAddress (Fvb, FvbBaseAddress);
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
   Status = Fvb->GetAttributes (Fvb, FvbAttributes);
-  return Status;  
+  return Status;
 }
 
 
@@ -154,7 +151,7 @@ FtwGetMaxBlockSize (
 {
   EFI_STATUS                                Status;
   UINTN                                     PayloadSize;
-  EFI_SMM_COMMUNICATE_HEADER                *SmmCommunicateHeader;  
+  EFI_MM_COMMUNICATE_HEADER                 *SmmCommunicateHeader;
   SMM_FTW_GET_MAX_BLOCK_SIZE_HEADER         *SmmFtwBlockSizeHeader;
 
   //
@@ -162,7 +159,7 @@ FtwGetMaxBlockSize (
   //
   PayloadSize  = sizeof (SMM_FTW_GET_MAX_BLOCK_SIZE_HEADER);
   InitCommunicateBuffer ((VOID **)&SmmCommunicateHeader, (VOID **)&SmmFtwBlockSizeHeader, PayloadSize, FTW_FUNCTION_GET_MAX_BLOCK_SIZE);
-    
+
   //
   // Send data to SMM.
   //
@@ -171,9 +168,9 @@ FtwGetMaxBlockSize (
   //
   // Get data from SMM
   //
-  *BlockSize = SmmFtwBlockSizeHeader->BlockSize; 
+  *BlockSize = SmmFtwBlockSizeHeader->BlockSize;
   FreePool (SmmCommunicateHeader);
-  
+
   return Status;
 }
 
@@ -210,7 +207,7 @@ FtwAllocate (
 {
   EFI_STATUS                                Status;
   UINTN                                     PayloadSize;
-  EFI_SMM_COMMUNICATE_HEADER                *SmmCommunicateHeader;  
+  EFI_MM_COMMUNICATE_HEADER                 *SmmCommunicateHeader;
   SMM_FTW_ALLOCATE_HEADER                   *SmmFtwAllocateHeader;
 
   //
@@ -220,8 +217,8 @@ FtwAllocate (
   InitCommunicateBuffer ((VOID **)&SmmCommunicateHeader, (VOID **)&SmmFtwAllocateHeader, PayloadSize, FTW_FUNCTION_ALLOCATE);
   CopyGuid (&SmmFtwAllocateHeader->CallerId, CallerId);
   SmmFtwAllocateHeader->PrivateDataSize = PrivateDataSize;
-  SmmFtwAllocateHeader->NumberOfWrites  = NumberOfWrites; 
-    
+  SmmFtwAllocateHeader->NumberOfWrites  = NumberOfWrites;
+
   //
   // Send data to SMM.
   //
@@ -276,7 +273,7 @@ FtwWrite (
 {
   EFI_STATUS                                Status;
   UINTN                                     PayloadSize;
-  EFI_SMM_COMMUNICATE_HEADER                *SmmCommunicateHeader;  
+  EFI_MM_COMMUNICATE_HEADER                 *SmmCommunicateHeader;
   SMM_FTW_WRITE_HEADER                      *SmmFtwWriteHeader;
 
   //
@@ -292,7 +289,7 @@ FtwWrite (
   InitCommunicateBuffer ((VOID **)&SmmCommunicateHeader, (VOID **)&SmmFtwWriteHeader, PayloadSize, FTW_FUNCTION_WRITE);
 
   //
-  // FvBlockHandle can not be used in SMM environment. Here we get the FVB protocol first, then get FVB base address 
+  // FvBlockHandle can not be used in SMM environment. Here we get the FVB protocol first, then get FVB base address
   // and its attribute. Send these information to SMM handler, the SMM handler will find the proper FVB to write data.
   //
   Status = ConvertFvbHandle (FvBlockHandle, &SmmFtwWriteHeader->FvbBaseAddress, &SmmFtwWriteHeader->FvbAttributes);
@@ -300,9 +297,9 @@ FtwWrite (
     FreePool (SmmCommunicateHeader);
     return EFI_ABORTED;
   }
-  
+
   SmmFtwWriteHeader->Lba    = Lba;
-  SmmFtwWriteHeader->Offset = Offset; 
+  SmmFtwWriteHeader->Offset = Offset;
   SmmFtwWriteHeader->Length = Length;
   CopyMem (SmmFtwWriteHeader->Data, Buffer, Length);
   if (PrivateData == NULL) {
@@ -316,7 +313,7 @@ FtwWrite (
   // Send data to SMM.
   //
   Status = SendCommunicateBuffer (SmmCommunicateHeader, PayloadSize);
-  FreePool (SmmCommunicateHeader);  
+  FreePool (SmmCommunicateHeader);
   return Status;
 }
 
@@ -342,22 +339,22 @@ FtwRestart (
 {
   EFI_STATUS                                Status;
   UINTN                                     PayloadSize;
-  EFI_SMM_COMMUNICATE_HEADER                *SmmCommunicateHeader;  
+  EFI_MM_COMMUNICATE_HEADER                 *SmmCommunicateHeader;
   SMM_FTW_RESTART_HEADER                    *SmmFtwRestartHeader;
- 
+
   //
   // Initialize the communicate buffer.
   //
   PayloadSize  = sizeof (SMM_FTW_RESTART_HEADER);
-  InitCommunicateBuffer ((VOID **)&SmmCommunicateHeader, (VOID **)&SmmFtwRestartHeader, PayloadSize, FTW_FUNCTION_RESTART); 
+  InitCommunicateBuffer ((VOID **)&SmmCommunicateHeader, (VOID **)&SmmFtwRestartHeader, PayloadSize, FTW_FUNCTION_RESTART);
 
   //
-  // FvBlockHandle can not be used in SMM environment. Here we get the FVB protocol first, then get FVB base address 
+  // FvBlockHandle can not be used in SMM environment. Here we get the FVB protocol first, then get FVB base address
   // and its attribute. Send these information to SMM handler, the SMM handler will find the proper FVB to write data.
   //
   Status = ConvertFvbHandle (FvBlockHandle, &SmmFtwRestartHeader->FvbBaseAddress, &SmmFtwRestartHeader->FvbAttributes);
   if (EFI_ERROR (Status)) {
-    FreePool (SmmCommunicateHeader); 
+    FreePool (SmmCommunicateHeader);
     return EFI_ABORTED;
   }
 
@@ -365,7 +362,7 @@ FtwRestart (
   // Send data to SMM.
   //
   Status = SendCommunicateBuffer (SmmCommunicateHeader, PayloadSize);
-  FreePool (SmmCommunicateHeader);  
+  FreePool (SmmCommunicateHeader);
   return Status;
 }
 
@@ -387,19 +384,19 @@ FtwAbort (
   )
 {
   EFI_STATUS                                Status;
-  EFI_SMM_COMMUNICATE_HEADER                *SmmCommunicateHeader;  
- 
+  EFI_MM_COMMUNICATE_HEADER                 *SmmCommunicateHeader;
+
   //
   // Initialize the communicate buffer.
   //
   InitCommunicateBuffer ((VOID **)&SmmCommunicateHeader, NULL, 0, FTW_FUNCTION_ABORT);
- 
+
   //
   // Send data to SMM.
   //
   Status = SendCommunicateBuffer (SmmCommunicateHeader, 0);
 
-  FreePool (SmmCommunicateHeader);  
+  FreePool (SmmCommunicateHeader);
   return Status;
 }
 
@@ -444,7 +441,7 @@ FtwGetLastWrite (
 {
   EFI_STATUS                                Status;
   UINTN                                     PayloadSize;
-  EFI_SMM_COMMUNICATE_HEADER                *SmmCommunicateHeader;  
+  EFI_MM_COMMUNICATE_HEADER                 *SmmCommunicateHeader;
   SMM_FTW_GET_LAST_WRITE_HEADER             *SmmFtwGetLastWriteHeader;
 
   //
@@ -465,7 +462,7 @@ FtwGetLastWrite (
   *PrivateDataSize = SmmFtwGetLastWriteHeader->PrivateDataSize;
   if (Status == EFI_SUCCESS || Status == EFI_BUFFER_TOO_SMALL) {
     *Lba      = SmmFtwGetLastWriteHeader->Lba;
-    *Offset   = SmmFtwGetLastWriteHeader->Offset; 
+    *Offset   = SmmFtwGetLastWriteHeader->Offset;
     *Length   = SmmFtwGetLastWriteHeader->Length;
     *Complete = SmmFtwGetLastWriteHeader->Complete;
     CopyGuid (CallerId, &SmmFtwGetLastWriteHeader->CallerId);
@@ -476,7 +473,7 @@ FtwGetLastWrite (
     *Complete = SmmFtwGetLastWriteHeader->Complete;
   }
 
-  FreePool (SmmCommunicateHeader);  
+  FreePool (SmmCommunicateHeader);
   return Status;
 }
 
@@ -501,13 +498,13 @@ SmmFtwReady (
   //
   // Just return to avoid install SMM FaultTolerantWriteProtocol again
   // if Fault Tolerant Write protocol had been installed.
-  //  
+  //
   Status = gBS->LocateProtocol (&gEfiFaultTolerantWriteProtocolGuid, NULL, (VOID **)&FtwProtocol);
   if (!EFI_ERROR (Status)) {
     return;
   }
-  
-  Status = gBS->LocateProtocol (&gEfiSmmCommunicationProtocolGuid, NULL, (VOID **) &mSmmCommunication);
+
+  Status = gBS->LocateProtocol (&gEfiMmCommunication2ProtocolGuid, NULL, (VOID **) &mMmCommunication2);
   ASSERT_EFI_ERROR (Status);
 
   //
@@ -520,9 +517,9 @@ SmmFtwReady (
                   &mFaultTolerantWriteDriver
                   );
   ASSERT_EFI_ERROR (Status);
-  
+
   Status = gBS->CloseEvent (Event);
-  ASSERT_EFI_ERROR (Status);  
+  ASSERT_EFI_ERROR (Status);
 }
 
 
@@ -551,12 +548,12 @@ FaultTolerantWriteSmmInitialize (
   //
   EfiCreateProtocolNotifyEvent (
     &gEfiSmmFaultTolerantWriteProtocolGuid,
-    TPL_CALLBACK, 
-    SmmFtwReady, 
-    NULL, 
+    TPL_CALLBACK,
+    SmmFtwReady,
+    NULL,
     &SmmFtwRegistration
     );
-  
+
   return EFI_SUCCESS;
 }
 

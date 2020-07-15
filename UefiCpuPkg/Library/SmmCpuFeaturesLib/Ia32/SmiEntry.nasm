@@ -1,12 +1,6 @@
 ;------------------------------------------------------------------------------ ;
-; Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
-; This program and the accompanying materials
-; are licensed and made available under the terms and conditions of the BSD License
-; which accompanies this distribution.  The full text of the license may be found at
-; http://opensource.org/licenses/bsd-license.php.
-;
-; THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-; WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+; Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
+; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;
 ; Module Name:
 ;
@@ -17,6 +11,8 @@
 ;   Code template of the SMI handler for a particular processor
 ;
 ;-------------------------------------------------------------------------------
+
+%include "StuffRsbNasm.inc"
 
 %define MSR_IA32_MISC_ENABLE 0x1A0
 %define MSR_EFER      0xc0000080
@@ -51,6 +47,11 @@ global ASM_PFX(gStmSmbase)
 global ASM_PFX(gStmXdSupported)
 extern ASM_PFX(gStmSmiHandlerIdtr)
 
+ASM_PFX(gStmSmiCr3)      EQU StmSmiCr3Patch - 4
+ASM_PFX(gStmSmiStack)    EQU StmSmiStackPatch - 4
+ASM_PFX(gStmSmbase)      EQU StmSmbasePatch - 4
+ASM_PFX(gStmXdSupported) EQU StmXdSupportedPatch - 1
+
     SECTION .text
 
 BITS 16
@@ -66,8 +67,8 @@ _StmSmiEntryPoint:
 o32 lgdt    [cs:bx]                       ; lgdt fword ptr cs:[bx]
     mov     ax, PROTECT_MODE_CS
     mov     [cs:bx-0x2],ax
-    DB      0x66, 0xbf                   ; mov edi, SMBASE
-ASM_PFX(gStmSmbase): DD 0
+o32 mov     edi, strict dword 0
+StmSmbasePatch:
     lea     eax, [edi + (@32bit - _StmSmiEntryPoint) + 0x8000]
     mov     [cs:bx-0x6],eax
     mov     ebx, cr0
@@ -87,15 +88,15 @@ o16 mov     es, ax
 o16 mov     fs, ax
 o16 mov     gs, ax
 o16 mov     ss, ax
-    DB      0xbc                   ; mov esp, imm32
-ASM_PFX(gStmSmiStack): DD 0
+    mov     esp, strict dword 0
+StmSmiStackPatch:
     mov     eax, ASM_PFX(gStmSmiHandlerIdtr)
     lidt    [eax]
     jmp     ProtFlatMode
 
 ProtFlatMode:
-    DB      0xb8                        ; mov eax, imm32
-ASM_PFX(gStmSmiCr3): DD 0
+    mov eax, strict dword 0
+StmSmiCr3Patch:
     mov     cr3, eax
 ;
 ; Need to test for CR4 specific bit support
@@ -134,8 +135,8 @@ ASM_PFX(gStmSmiCr3): DD 0
 .6:
 
 ; enable NXE if supported
-    DB      0b0h                        ; mov al, imm8
-ASM_PFX(gStmXdSupported):     DB      1
+    mov     al, strict byte 1
+StmXdSupportedPatch:
     cmp     al, 0
     jz      @SkipXd
 ;
@@ -201,6 +202,7 @@ CommonHandler:
     wrmsr
 
 .7:
+    StuffRsb32
     rsm
 
 
@@ -269,3 +271,6 @@ _StmSmiHandler:
 ASM_PFX(gcStmSmiHandlerSize)   : DW        $ - _StmSmiEntryPoint
 ASM_PFX(gcStmSmiHandlerOffset) : DW        _StmSmiHandler - _StmSmiEntryPoint
 
+global ASM_PFX(SmmCpuFeaturesLibStmSmiEntryFixupAddress)
+ASM_PFX(SmmCpuFeaturesLibStmSmiEntryFixupAddress):
+    ret

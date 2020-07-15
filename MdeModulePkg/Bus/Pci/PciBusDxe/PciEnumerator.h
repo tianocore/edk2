@@ -1,14 +1,8 @@
 /** @file
   PCI bus enumeration logic function declaration for PCI bus module.
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -21,7 +15,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   This routine is used to enumerate entire pci bus system
   in a given platform.
 
-  @param Controller  Parent controller handle.
+  @param Controller          Parent controller handle.
+  @param HostBridgeHandle    Host bridge handle.
 
   @retval EFI_SUCCESS    PCI enumeration finished successfully.
   @retval other          Some error occurred when enumerating the pci bus system.
@@ -29,7 +24,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 EFI_STATUS
 PciEnumerator (
-  IN EFI_HANDLE                    Controller
+  IN EFI_HANDLE                    Controller,
+  IN EFI_HANDLE                    HostBridgeHandle
   );
 
 /**
@@ -107,7 +103,7 @@ DetermineRootBridgeAttributes (
   @return Max size of option rom needed.
 
 **/
-UINT64
+UINT32
 GetMaxOptionRomSize (
   IN PCI_IO_DEVICE   *Bridge
   );
@@ -440,8 +436,8 @@ NotifyPhase (
   @retval EFI_INVALID_PARAMETER    Phase is not a valid phase that is defined in
                                    EFI_PCI_CONTROLLER_RESOURCE_ALLOCATION_PHASE.
   @retval EFI_DEVICE_ERROR         Programming failed due to a hardware error. The PCI enumerator should
-                                    not enumerate this device, including its child devices if it is a PCI-to-PCI
-                                    bridge.
+                                   not enumerate this device, including its child devices if it is a PCI-to-PCI
+                                   bridge.
 
 **/
 EFI_STATUS

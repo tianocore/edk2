@@ -1,0 +1,80 @@
+## @file
+#  This module produces EFI SNP Protocol.
+#
+#  This module produces Simple Network Protocol upon EFI Network Interface
+#  Identifier Protocol, to provide a packet level interface to a network adapter.
+#
+#  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SnpDxe
+  MODULE_UNI_FILE                = SnpDxe.uni
+  FILE_GUID                      = A2f436EA-A127-4EF8-957C-8048606FF670
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = InitializeSnpNiiDriver
+  UNLOAD_IMAGE                   = NetLibDefaultUnload
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+#  DRIVER_BINDING                =  mSimpleNetworkDriverBinding
+#  COMPONENT_NAME                =  gSimpleNetworkComponentName
+#  COMPONENT_NAME2               =  gSimpleNetworkComponentName2
+#
+
+[Sources]
+  Receive.c
+  Snp.h
+  Nvdata.c
+  Get_status.c
+  Start.c
+  Snp.c
+  Stop.c
+  Statistics.c
+  Reset.c
+  Shutdown.c
+  Mcast_ip_to_mac.c
+  Transmit.c
+  WaitForPacket.c
+  Receive_filters.c
+  Initialize.c
+  ComponentName.c
+  Callback.c
+  Station_address.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  NetworkPkg/NetworkPkg.dec
+
+
+[LibraryClasses]
+  UefiLib
+  BaseLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  BaseMemoryLib
+  DebugLib
+  NetLib
+
+[Guids]
+  gEfiEventExitBootServicesGuid                 ## SOMETIMES_CONSUMES ## Event
+
+[Protocols]
+  gEfiSimpleNetworkProtocolGuid                 ## BY_START
+  gEfiDevicePathProtocolGuid                    ## TO_START
+  gEfiNetworkInterfaceIdentifierProtocolGuid_31 ## TO_START
+  gEfiPciIoProtocolGuid                         ## TO_START
+
+[Pcd]
+  gEfiNetworkPkgTokenSpaceGuid.PcdSnpCreateExitBootServicesEvent   ## CONSUMES
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  SnpDxeExtra.uni

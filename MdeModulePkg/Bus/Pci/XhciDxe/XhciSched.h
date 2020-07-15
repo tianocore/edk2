@@ -2,14 +2,8 @@
 
   This file contains the definition for XHCI host controller schedule routines.
 
-Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -80,6 +74,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define TRB_COMPLETION_TRB_ERROR              5
 #define TRB_COMPLETION_STALL_ERROR            6
 #define TRB_COMPLETION_SHORT_PACKET           13
+#define TRB_COMPLETION_STOPPED                26
+#define TRB_COMPLETION_STOPPED_LENGTH_INVALID 27
 
 //
 // The topology string used to present usb device location
@@ -618,7 +614,7 @@ typedef struct _SLOT_CONTEXT_64 {
   UINT32                  RsvdZ9;
   UINT32                  RsvdZ10;
   UINT32                  RsvdZ11;
-  
+
   UINT32                  RsvdZ12;
   UINT32                  RsvdZ13;
   UINT32                  RsvdZ14;
@@ -686,12 +682,12 @@ typedef struct _ENDPOINT_CONTEXT_64 {
   UINT32                  RsvdZ5;
   UINT32                  RsvdZ6;
   UINT32                  RsvdZ7;
-  
+
   UINT32                  RsvdZ8;
   UINT32                  RsvdZ9;
   UINT32                  RsvdZ10;
   UINT32                  RsvdZ11;
-  
+
   UINT32                  RsvdZ12;
   UINT32                  RsvdZ13;
   UINT32                  RsvdZ14;
@@ -848,6 +844,34 @@ XhciDelAsyncIntTransfer (
 VOID
 XhciDelAllAsyncIntTransfers (
   IN USB_XHCI_INSTANCE    *Xhc
+  );
+
+/**
+  Insert a single asynchronous interrupt transfer for
+  the device and endpoint.
+
+  @param Xhc            The XHCI Instance
+  @param BusAddr        The logical device address assigned by UsbBus driver
+  @param EpAddr         Endpoint addrress
+  @param DevSpeed       The device speed
+  @param MaxPacket      The max packet length of the endpoint
+  @param DataLen        The length of data buffer
+  @param Callback       The function to call when data is transferred
+  @param Context        The context to the callback
+
+  @return Created URB or NULL
+
+**/
+URB *
+XhciInsertAsyncIntTransfer (
+  IN USB_XHCI_INSTANCE                  *Xhc,
+  IN UINT8                              BusAddr,
+  IN UINT8                              EpAddr,
+  IN UINT8                              DevSpeed,
+  IN UINTN                              MaxPacket,
+  IN UINTN                              DataLen,
+  IN EFI_ASYNC_USB_TRANSFER_CALLBACK    Callback,
+  IN VOID                               *Context
   );
 
 /**
@@ -1343,6 +1367,7 @@ XhcDequeueTrbFromEndpoint (
   @param  Xhc                   The XHCI Instance.
   @param  SlotId                The slot id to be configured.
   @param  Dci                   The device context index of endpoint.
+  @param  PendingUrb            The pending URB to check completion status when stopping the end point.
 
   @retval EFI_SUCCESS           Stop endpoint successfully.
   @retval Others                Failed to stop endpoint.
@@ -1353,7 +1378,8 @@ EFIAPI
 XhcStopEndpoint (
   IN USB_XHCI_INSTANCE      *Xhc,
   IN UINT8                  SlotId,
-  IN UINT8                  Dci
+  IN UINT8                  Dci,
+  IN URB                    *PendingUrb  OPTIONAL
   );
 
 /**

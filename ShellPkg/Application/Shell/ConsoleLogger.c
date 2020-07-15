@@ -2,15 +2,9 @@
   Provides interface to shell console logger.
 
   (C) Copyright 2013 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2016 Hewlett-Packard Development Company, L.P.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include "Shell.h"
@@ -316,13 +310,13 @@ UpdateDisplayFromHistory(
         StringSegment = &Screen[Column];
 
         //
-        // Find the first char with a different arrribute and make that temporarily NULL
+        // Find the first char with a different attribute and make that temporarily NULL
         // so we can do fewer printout statements.  (later) restore that one and we will
-        // start at that collumn on the next loop.
+        // start at that column on the next loop.
         //
         StringSegmentEndChar = CHAR_NULL;
         for ( StringSegmentEnd = StringSegment
-            ; StringSegmentEnd != CHAR_NULL
+            ; *StringSegmentEnd != CHAR_NULL
             ; StringSegmentEnd++
             , Column++
            ){
@@ -401,7 +395,7 @@ UpdateDisplayFromHistory(
 }
 
 /**
-  Reset the text output device hardware and optionaly run diagnostics
+  Reset the text output device hardware and optionally run diagnostics
 
   @param  This                pointer to EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL
   @param ExtendedVerification Indicates that a more extensive test may be performed
@@ -729,7 +723,7 @@ ConsoleLoggerPrintWithPageBreak(
       ConsoleLoggerOutputStringSplit (LineStart, ConsoleInfo);
 
       //
-      // restore the temp NULL terminator to it's original character
+      // restore the temp NULL terminator to its original character
       //
       *((CHAR16*)(Walker+1)) = TempChar;
 
@@ -776,7 +770,7 @@ ConsoleLoggerPrintWithPageBreak(
         ConsoleLoggerOutputStringSplit (LineStart, ConsoleInfo);
 
         //
-        // restore the temp NULL terminator to it's original character
+        // restore the temp NULL terminator to its original character
         //
         *((CHAR16*)(Walker+1)) = TempChar;
 
@@ -990,7 +984,7 @@ ConsoleLoggerSetMode (
     ConsoleInfo->CurrentStartRow = 0;
     ConsoleInfo->OurConOut.ClearScreen (&ConsoleInfo->OurConOut);
   }
-   
+
   return Status;
 }
 
@@ -1195,7 +1189,7 @@ ConsoleLoggerEnableCursor (
 
   @param[in] ConsoleInfo  The pointer to the instance of the console logger information.
 
-  This will be used when a mode has changed or a reset ocurred to verify all
+  This will be used when a mode has changed or a reset occurred to verify all
   history buffers.
 **/
 EFI_STATUS

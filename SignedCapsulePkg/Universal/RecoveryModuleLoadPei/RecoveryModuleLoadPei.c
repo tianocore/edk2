@@ -9,14 +9,8 @@
   ProcessRecoveryCapsule(), ProcessFmpCapsuleImage(), ProcessRecoveryImage(),
   ValidateFmpCapsule() will receive untrusted input and do basic validation.
 
-Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2016 - 2019, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -26,7 +20,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Uefi.h>
 #include <PiPei.h>
 //
-// The protocols, PPI and GUID defintions for this module
+// The protocols, PPI and GUID definitions for this module
 //
 #include <Ppi/MasterBootMode.h>
 #include <Ppi/BootInRecoveryMode.h>
@@ -150,7 +144,7 @@ IsFmpCapsuleGuid (
 }
 
 /**
-  This function assumes the input Capusule image already passes basic check in
+  This function assumes the input Capsule image already passes basic check in
   ValidateFmpCapsule().
 
   Criteria of system FMP capsule is:
@@ -241,7 +235,7 @@ IsValidCapsuleHeader (
   @param[out]  IsSystemFmp          If it is a system FMP.
   @param[out]  EmbeddedDriverCount  The EmbeddedDriverCount in the FMP capsule.
 
-  @retval EFI_SUCESS             Input capsule is a correct FMP capsule.
+  @retval EFI_SUCCESS            Input capsule is a correct FMP capsule.
   @retval EFI_INVALID_PARAMETER  Input capsule is not a correct FMP capsule.
 **/
 EFI_STATUS
@@ -334,8 +328,14 @@ ValidateFmpCapsule (
       DEBUG((DEBUG_ERROR, "ImageHeader->Version(0x%x) Unknown\n", ImageHeader->Version));
       return EFI_INVALID_PARAMETER;
     }
-    if (ImageHeader->Version < EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER_INIT_VERSION) {
+    ///
+    /// Current Init ImageHeader version is 3. UpdateHardwareInstance field was added in version 2
+    /// and ImageCapsuleSupport field was added in version 3
+    ///
+    if (ImageHeader->Version == 1) {
       FmpImageHeaderSize = OFFSET_OF(EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER, UpdateHardwareInstance);
+    } else if (ImageHeader->Version == 2){
+      FmpImageHeaderSize = OFFSET_OF(EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER, ImageCapsuleSupport);
     }
 
     // No overflow
@@ -404,7 +404,7 @@ InitializeRecoveryModule (
   @param[in]  FvImage         Points to the DXE FV image.
   @param[in]  FvImageSize     The length of the DXE FV image in bytes.
 
-  @retval EFI_SUCESS            Create hob and install FvInfo PPI successfully.
+  @retval EFI_SUCCESS           Create hob and install FvInfo PPI successfully.
   @retval EFI_VOLUME_CORRUPTED  The input data is not an FV.
   @retval EFI_OUT_OF_RESOURCES  No enough resource to process the input data.
 **/
@@ -467,7 +467,7 @@ CreateHobForRecoveryCapsule (
   DEBUG((DEBUG_INFO, "BuildFvHob (FV in recovery) - 0x%lx - 0x%lx\n", (UINT64)(UINTN)FvHeader, FvHeader->FvLength));
 
   PeiServicesInstallFvInfoPpi(
-    NULL,
+    &FvHeader->FileSystemGuid,
     (VOID *)FvHeader,
     (UINT32)FvHeader->FvLength,
     NULL,
@@ -485,7 +485,7 @@ CreateHobForRecoveryCapsule (
   @param[in]  ConfigImage             Points to the config file image.
   @param[in]  ConfigImageSize         The length of the config file image in bytes.
 
-  @retval EFI_SUCESS             Process Recovery Image successfully.
+  @retval EFI_SUCCESS            Process Recovery Image successfully.
 **/
 EFI_STATUS
 RecoverImage (
@@ -560,7 +560,7 @@ RecoverImage (
   @param[in]  Image         Points to the recovery image.
   @param[in]  Length        The length of the recovery image in bytes.
 
-  @retval EFI_SUCESS             Process Recovery Image successfully.
+  @retval EFI_SUCCESS            Process Recovery Image successfully.
   @retval EFI_SECURITY_VIOLATION Recovery image is not processed due to security violation.
 **/
 EFI_STATUS
@@ -613,7 +613,7 @@ ProcessRecoveryImage (
   @param[in]  CapsuleHeader         Points to a capsule header.
   @param[in]  IsSystemFmp           If this capsule is a system FMP capsule.
 
-  @retval EFI_SUCESS            Process Capsule Image successfully.
+  @retval EFI_SUCCESS           Process Capsule Image successfully.
   @retval EFI_UNSUPPORTED       Capsule image is not supported by the firmware.
   @retval EFI_VOLUME_CORRUPTED  FV volume in the capsule is corrupted.
   @retval EFI_OUT_OF_RESOURCES  Not enough memory.
@@ -645,9 +645,14 @@ ProcessFmpCapsuleImage (
     } else {
       //
       // If the EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER is version 1, only match ImageTypeId.
-      // Header should exclude UpdateHardwareInstance field
+      // Header should exclude UpdateHardwareInstance field.
+      // If version is 2 Header should exclude ImageCapsuleSupport field.
       //
-      Image = (UINT8 *)ImageHeader + OFFSET_OF(EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER, UpdateHardwareInstance);
+      if (ImageHeader->Version == 1) {
+        Image = (UINT8 *)ImageHeader + OFFSET_OF(EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER, UpdateHardwareInstance);
+      } else {
+        Image = (UINT8 *)ImageHeader + OFFSET_OF(EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER, ImageCapsuleSupport);
+      }
     }
 
     Status = ProcessRecoveryImage (Image, ImageHeader->UpdateImageSize);
@@ -703,7 +708,7 @@ ProcessRecoveryCapsule (
     }
 
     //
-    // Press EFI FMP Capsule
+    // Process EFI FMP Capsule
     //
     DEBUG((DEBUG_INFO, "ProcessFmpCapsuleImage ...\n"));
     Status = ProcessFmpCapsuleImage(CapsuleHeader, IsSystemFmp);
@@ -772,7 +777,7 @@ LoadRecoveryCapsule (
       Status = DeviceRecoveryPpi->GetRecoveryCapsuleInfo (
                                     (EFI_PEI_SERVICES **)PeiServices,
                                     DeviceRecoveryPpi,
-                                    FeaturePcdGet(PcdFrameworkCompatibilitySupport) ? CapsuleInstance - 1 : CapsuleInstance,
+                                    CapsuleInstance,
                                     &CapsuleSize,
                                     &CapsuleType
                                     );
@@ -789,7 +794,7 @@ LoadRecoveryCapsule (
       Status = DeviceRecoveryPpi->LoadRecoveryCapsule (
                                     (EFI_PEI_SERVICES **)PeiServices,
                                     DeviceRecoveryPpi,
-                                    FeaturePcdGet(PcdFrameworkCompatibilitySupport) ? CapsuleInstance - 1 : CapsuleInstance,
+                                    CapsuleInstance,
                                     CapsuleBuffer
                                     );
       DEBUG ((DEBUG_ERROR, "LoadRecoveryCapsule - LoadRecoveryCapsule (%d) - %r\n", CapsuleInstance, Status));

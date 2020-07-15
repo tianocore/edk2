@@ -2,25 +2,21 @@
 # This file is used to collect all defined strings in Image Definition files
 #
 # Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
-# This program and the accompanying materials
-# are licensed and made available under the terms and conditions of the BSD License
-# which accompanies this distribution.  The full text of the license may be found at
-# http://opensource.org/licenses/bsd-license.php
-#
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
 
 ##
 # Import Modules
 #
+from __future__ import absolute_import
 import Common.EdkLogger as EdkLogger
-import StringIO
 from Common.BuildToolError import *
-from Common.String import GetLineNo
+from Common.StringUtils import GetLineNo
 from Common.Misc import PathClass
 from Common.LongFilePathSupport import LongFilePath
 import re
 import os
+from Common.GlobalData import gIdentifierPattern
+from .UniClassObject import StripComments
 
 IMAGE_TOKEN = re.compile('IMAGE_TOKEN *\(([A-Z0-9_]+) *\)', re.MULTILINE | re.UNICODE)
 
@@ -64,77 +60,51 @@ EFI_HII_PACKAGE_TYPE_SYSTEM_END    = 0xFF
 
 class IdfFileClassObject(object):
     def __init__(self, FileList = []):
-        self.FileList = FileList
         self.ImageFilesDict = {}
         self.ImageIDList = []
-        if len(self.FileList) > 0:
-            self.LoadIdfFiles(FileList)
+        for File in FileList:
+            if File is None:
+                EdkLogger.error("Image Definition File Parser", PARSER_ERROR, 'No Image definition file is given.')
 
-    def LoadIdfFiles(self, FileList):
-        if len(FileList) > 0:
-            for File in FileList:
-                self.LoadIdfFile(File)
+            try:
+                IdfFile = open(LongFilePath(File.Path), mode='r')
+                FileIn = IdfFile.read()
+                IdfFile.close()
+            except:
+                EdkLogger.error("build", FILE_OPEN_FAILURE, ExtraData=File)
 
-    def LoadIdfFile(self, File = None):
-        if File == None:
-            EdkLogger.error("Image Definition File Parser", PARSER_ERROR, 'No Image definition file is given.')
-        self.File = File
+            ImageFileList = []
+            for Line in FileIn.splitlines():
+                Line = Line.strip()
+                Line = StripComments(Line)
+                if len(Line) == 0:
+                    continue
 
-        try:
-            IdfFile = open(LongFilePath(File.Path), mode='r')
-            FileIn = IdfFile.read()
-            IdfFile.close()
-        except:
-            EdkLogger.error("build", FILE_OPEN_FAILURE, ExtraData=File)
+                LineNo = GetLineNo(FileIn, Line, False)
+                if not Line.startswith('#image '):
+                    EdkLogger.error("Image Definition File Parser", PARSER_ERROR, 'The %s in Line %s of File %s is invalid.' % (Line, LineNo, File.Path))
 
-        ImageFileList = []
-        for Line in FileIn.splitlines():
-            Line = Line.strip()
-            Line = self.StripComments(Line)
-            if len(Line) == 0:
-                continue
-
-            LineNo = GetLineNo(FileIn, Line, False)
-            if not Line.startswith('#image '):
-                EdkLogger.error("Image Definition File Parser", PARSER_ERROR, 'The %s in Line %s of File %s is invalid.' % (Line, LineNo, File.Path))
-
-            if Line.find('#image ') >= 0:
-                LineDetails = Line.split()
-                Len = len(LineDetails)
-                if Len != 3 and Len != 4:
-                    EdkLogger.error("Image Definition File Parser", PARSER_ERROR, 'The format is not match #image IMAGE_ID [TRANSPARENT] ImageFileName in Line %s of File %s.' % (LineNo, File.Path))
-                if Len == 4 and LineDetails[2] != 'TRANSPARENT':
-                    EdkLogger.error("Image Definition File Parser", PARSER_ERROR, 'Please use the keyword "TRANSPARENT" to describe the transparency setting in Line %s of File %s.' % (LineNo, File.Path))
-                MatchString = re.match('^[a-zA-Z][a-zA-Z0-9_]*$', LineDetails[1], re.UNICODE)
-                if MatchString == None or MatchString.end(0) != len(LineDetails[1]):
-                    EdkLogger.error('Image Definition  File Parser', FORMAT_INVALID, 'The Image token name %s defined in Idf file %s contains the invalid character.' % (LineDetails[1], File.Path))
-                if LineDetails[1] not in self.ImageIDList:
-                    self.ImageIDList.append(LineDetails[1])
-                else:
-                    EdkLogger.error("Image Definition File Parser", PARSER_ERROR, 'The %s in Line %s of File %s is already defined.' % (LineDetails[1], LineNo, File.Path))
-                if Len == 4:
-                    ImageFile = ImageFileObject(LineDetails[Len-1], LineDetails[1], True)
-                else:
-                    ImageFile = ImageFileObject(LineDetails[Len-1], LineDetails[1], False)
-                ImageFileList.append(ImageFile)
-        if ImageFileList:
-            self.ImageFilesDict[File] = ImageFileList
-
-    def StripComments(self, Line):
-        Comment = '//'
-        CommentPos = Line.find(Comment)
-        while CommentPos >= 0:
-        # if there are non matched quotes before the comment header
-        # then we are in the middle of a string
-        # but we need to ignore the escaped quotes and backslashes.
-            if ((Line.count('"', 0, CommentPos) - Line.count('\\"', 0, CommentPos)) & 1) == 1:
-                CommentPos = Line.find (Comment, CommentPos + 1)
-            else:
-                return Line[:CommentPos].strip()
-        return Line.strip()
-
-    def ImageDecoder(self, File):
-        pass
+                if Line.find('#image ') >= 0:
+                    LineDetails = Line.split()
+                    Len = len(LineDetails)
+                    if Len != 3 and Len != 4:
+                        EdkLogger.error("Image Definition File Parser", PARSER_ERROR, 'The format is not match #image IMAGE_ID [TRANSPARENT] ImageFileName in Line %s of File %s.' % (LineNo, File.Path))
+                    if Len == 4 and LineDetails[2] != 'TRANSPARENT':
+                        EdkLogger.error("Image Definition File Parser", PARSER_ERROR, 'Please use the keyword "TRANSPARENT" to describe the transparency setting in Line %s of File %s.' % (LineNo, File.Path))
+                    MatchString = gIdentifierPattern.match(LineDetails[1])
+                    if MatchString is None:
+                        EdkLogger.error('Image Definition  File Parser', FORMAT_INVALID, 'The Image token name %s defined in Idf file %s contains the invalid character.' % (LineDetails[1], File.Path))
+                    if LineDetails[1] not in self.ImageIDList:
+                        self.ImageIDList.append(LineDetails[1])
+                    else:
+                        EdkLogger.error("Image Definition File Parser", PARSER_ERROR, 'The %s in Line %s of File %s is already defined.' % (LineDetails[1], LineNo, File.Path))
+                    if Len == 4:
+                        ImageFile = ImageFileObject(LineDetails[Len-1], LineDetails[1], True)
+                    else:
+                        ImageFile = ImageFileObject(LineDetails[Len-1], LineDetails[1], False)
+                    ImageFileList.append(ImageFile)
+            if ImageFileList:
+                self.ImageFilesDict[File] = ImageFileList
 
 def SearchImageID(ImageFileObject, FileList):
     if FileList == []:

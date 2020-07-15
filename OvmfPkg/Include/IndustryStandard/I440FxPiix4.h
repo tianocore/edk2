@@ -8,13 +8,7 @@
   Copyright (C) 2015, Red Hat, Inc.
   Copyright (c) 2014, Gabriel L. Somlo <somlo@cmu.edu>
 
-  This program and the accompanying materials are licensed and made available
-  under the terms and conditions of the BSD License which accompanies this
-  distribution.   The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT
-  WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #ifndef __I440FX_PIIX4_H__
@@ -28,6 +22,19 @@
 #define INTEL_82441_DEVICE_ID 0x1237
 
 //
+// B/D/F/Type: 0/0/0/PCI
+//
+#define PMC_REGISTER_PIIX4(Offset) PCI_LIB_ADDRESS (0, 0, 0, (Offset))
+
+#define PIIX4_PAM0              0x59
+#define PIIX4_PAM1              0x5A
+#define PIIX4_PAM2              0x5B
+#define PIIX4_PAM3              0x5C
+#define PIIX4_PAM4              0x5D
+#define PIIX4_PAM5              0x5E
+#define PIIX4_PAM6              0x5F
+
+//
 // B/D/F/Type: 0/1/3/PCI
 //
 #define POWER_MGMT_REGISTER_PIIX4(Offset) PCI_LIB_ADDRESS (0, 1, 3, (Offset))
@@ -38,5 +45,10 @@
 
 #define PIIX4_PMREGMISC        0x80
 #define PIIX4_PMREGMISC_PMIOSE   BIT0
+
+//
+// IO ports
+//
+#define PIIX4_CPU_HOTPLUG_BASE 0xAF00
 
 #endif

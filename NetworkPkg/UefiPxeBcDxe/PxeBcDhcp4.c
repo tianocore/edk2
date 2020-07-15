@@ -1,15 +1,9 @@
 /** @file
   Functions implementation related with DHCPv4 for UefiPxeBc Driver.
 
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -84,7 +78,7 @@ PxeBcParseDhcp4Options (
 
 
 /**
-  Parse the PXE vender options and extract the information from them.
+  Parse the PXE vendor options and extract the information from them.
 
   @param[in]  Dhcp4Option        Pointer to vendor options in buffer.
   @param[in]  VendorOption       Pointer to structure to store information in vendor options.
@@ -318,8 +312,9 @@ PxeBcBuildDhcp4Options (
 
   if (EFI_ERROR (NetLibGetSystemGuid ((EFI_GUID *) OptEnt.Uuid->Guid))) {
     //
-    // Zero the Guid to indicate NOT programable if failed to get system Guid.
+    // Zero the Guid to indicate NOT programmable if failed to get system Guid.
     //
+    DEBUG ((EFI_D_WARN, "PXE: Failed to read system GUID from the smbios table!\n"));
     ZeroMem (OptEnt.Uuid->Guid, sizeof (EFI_GUID));
   }
 
@@ -437,7 +432,7 @@ PxeBcCacheDhcp4Packet (
   if (Dst->Size < Src->Length) {
     return EFI_BUFFER_TOO_SMALL;
   }
-  
+
   CopyMem (&Dst->Dhcp4, &Src->Dhcp4, Src->Length);
   Dst->Length = Src->Length;
 
@@ -491,7 +486,7 @@ PxeBcParseDhcp4Packet (
                        );
   }
   //
-  // Second, Check if bootfilename and serverhostname is overloaded to carry DHCP options refers to rfc-2132. 
+  // Second, Check if bootfilename and serverhostname is overloaded to carry DHCP options refers to rfc-2132.
   // If yes, try to parse options from the BootFileName field, then ServerName field.
   //
   Option = Options[PXEBC_DHCP4_TAG_INDEX_OVERLOAD];
@@ -656,7 +651,7 @@ PxeBcCopyDhcp4Ack (
     CopyMem (&Mode->DhcpAck.Dhcpv4, &Ack->Dhcp4, Ack->Length);
     Mode->DhcpAckReceived = TRUE;
   }
-  
+
   return EFI_SUCCESS;
 }
 
@@ -694,7 +689,7 @@ PxeBcCopyProxyOffer (
   if (EFI_ERROR(Status)) {
     return Status;
   }
-  
+
   PxeBcParseDhcp4Packet (&Private->ProxyOffer.Dhcp4);
 
   //
@@ -870,7 +865,8 @@ PxeBcCacheDhcp4Offer (
         //
         Private->OfferIndex[OfferType][Private->OfferCount[OfferType]] = Private->OfferNum;
         Private->OfferCount[OfferType]++;
-      } else if (Private->OfferCount[OfferType] > 0) {
+      } else if ((OfferType == PxeOfferTypeProxyPxe10 || OfferType == PxeOfferTypeProxyWfm11a) &&
+                 Private->OfferCount[OfferType] < 1) {
         //
         // Only cache the first PXE10/WFM11a offer, and discard the others.
         //
@@ -1129,7 +1125,7 @@ PxeBcHandleDhcp4Offer (
       }
     } else {
       //
-      //  Othewise, the bootfile name must be included in DhcpOnly offer.
+      //  Otherwise, the bootfile name must be included in DhcpOnly offer.
       //
       if (Options[PXEBC_DHCP4_TAG_INDEX_BOOTFILE] == NULL) {
         Status = EFI_NOT_FOUND;
@@ -1209,6 +1205,8 @@ PxeBcDhcp4CallBack (
     return EFI_SUCCESS;
   }
 
+  ASSERT (Packet != NULL);
+
   Private   = (PXEBC_PRIVATE_DATA *) Context;
   Mode      = Private->PxeBc.Mode;
   Callback  = Private->PxeBcCallback;
@@ -1270,15 +1268,16 @@ PxeBcDhcp4CallBack (
       Status = EFI_ABORTED;
       break;
     }
-    
+
     if (Mode->SendGUID) {
       //
       // Send the system Guid instead of the MAC address as the hardware address if required.
       //
       if (EFI_ERROR (NetLibGetSystemGuid ((EFI_GUID *) Packet->Dhcp4.Header.ClientHwAddr))) {
         //
-        // Zero the Guid to indicate NOT programable if failed to get system Guid.
+        // Zero the Guid to indicate NOT programmable if failed to get system Guid.
         //
+        DEBUG ((EFI_D_WARN, "PXE: Failed to read system GUID from the smbios table!\n"));
         ZeroMem (Packet->Dhcp4.Header.ClientHwAddr, sizeof (EFI_GUID));
       }
       Packet->Dhcp4.Header.HwAddrLen = (UINT8) sizeof (EFI_GUID);
@@ -1304,6 +1303,8 @@ PxeBcDhcp4CallBack (
     break;
 
   case Dhcp4SelectOffer:
+    ASSERT (NewPacket != NULL);
+
     //
     // Select offer by the default policy or by order, and record the SelectIndex
     // and SelectProxyType.
@@ -1463,8 +1464,9 @@ PxeBcDhcp4Discover (
   if (Mode->SendGUID) {
     if (EFI_ERROR (NetLibGetSystemGuid ((EFI_GUID *) Token.Packet->Dhcp4.Header.ClientHwAddr))) {
       //
-      // Zero the Guid to indicate NOT programable if failed to get system Guid.
+      // Zero the Guid to indicate NOT programmable if failed to get system Guid.
       //
+      DEBUG ((EFI_D_WARN, "PXE: Failed to read system GUID from the smbios table!\n"));
       ZeroMem (Token.Packet->Dhcp4.Header.ClientHwAddr, sizeof (EFI_GUID));
     }
     Token.Packet->Dhcp4.Header.HwAddrLen = (UINT8)  sizeof (EFI_GUID);
@@ -1578,7 +1580,7 @@ PxeBcDhcp4Discover (
     }
   }
 ON_EXIT:
-  
+
   if (Token.ResponseList != NULL) {
     FreePool (Token.ResponseList);
   }
@@ -1598,7 +1600,7 @@ ON_EXIT:
 
 **/
 EFI_STATUS
-PxeBcSetIp4Policy (   
+PxeBcSetIp4Policy (
   IN PXEBC_PRIVATE_DATA            *Private
   )
 {
@@ -1618,7 +1620,7 @@ PxeBcSetIp4Policy (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  
+
   if (Policy != Ip4Config2PolicyStatic) {
     Policy = Ip4Config2PolicyStatic;
     Status= Ip4Config2->SetData (
@@ -1629,7 +1631,7 @@ PxeBcSetIp4Policy (
                           );
     if (EFI_ERROR (Status)) {
       return Status;
-    } 
+    }
   }
 
   return  EFI_SUCCESS;
@@ -1696,16 +1698,16 @@ PxeBcDhcp4Dora (
   ZeroMem (Private->OfferCount, sizeof (Private->OfferCount));
   ZeroMem (Private->OfferIndex, sizeof (Private->OfferIndex));
 
-  //
-  // Start DHCPv4 D.O.R.A. process to acquire IPv4 address. This may 
-  // have already been done, thus do not leave in error if the return
-  // code is EFI_ALREADY_STARTED.
-  //
   Status = Dhcp4->Start (Dhcp4, NULL);
-  if (EFI_ERROR (Status) && Status != EFI_ALREADY_STARTED) {
+  if (EFI_ERROR (Status)) {
     if (Status == EFI_ICMP_ERROR) {
       PxeMode->IcmpErrorReceived = TRUE;
     }
+
+    if (Status == EFI_TIMEOUT && Private->OfferNum > 0) {
+      Status = EFI_NO_RESPONSE;
+    }
+
     goto ON_EXIT;
   }
 

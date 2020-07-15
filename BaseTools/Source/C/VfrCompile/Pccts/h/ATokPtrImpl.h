@@ -69,7 +69,7 @@ ANTLRTokenPtr::~ANTLRTokenPtr()
 
 //
 //  8-Apr-97	MR1	Make operator -> a const member function
-//			  as weall as some other member functions
+//			  as well as some other member functions
 //
 ANTLRTokenPtr& ANTLRTokenPtr::operator = (const ANTLRTokenPtr & lhs)    // MR1
 {

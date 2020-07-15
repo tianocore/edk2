@@ -1,0 +1,44 @@
+## @file
+#  CPU Features PEIM driver.
+#
+#  Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = CpuFeaturesPei
+  MODULE_UNI_FILE                = CpuFeaturesPei.uni
+  FILE_GUID                      = 183BB3E1-A1E5-4445-8AC9-0E83B6547E0E
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = CpuFeaturesPeimInitialize
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  PeimEntryPoint
+  PeiServicesLib
+  RegisterCpuFeaturesLib
+  HobLib
+
+[Sources]
+  CpuFeaturesPei.c
+
+[Guids]
+  gEdkiiCpuFeaturesInitDoneGuid                       ## PRODUCES ## UNDEFINED # PPI GUID installed
+
+[Pcd]
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuFeaturesInitOnS3Resume          ## CONSUMES
+
+[Depex]
+  TRUE
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  CpuFeaturesPeiExtra.uni

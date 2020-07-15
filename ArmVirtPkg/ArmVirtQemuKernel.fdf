@@ -3,13 +3,7 @@
 #  Copyright (c) 2014, Linaro Limited. All rights reserved.
 #  Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.
 #
-#  This program and the accompanying materials
-#  are licensed and made available under the terms and conditions of the BSD License
-#  which accompanies this distribution.  The full text of the license may be found at
-#  http://opensource.org/licenses/bsd-license.php
-#
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
 ################################################################################
@@ -26,14 +20,22 @@
 #
 ################################################################################
 
+[Defines]
+!if $(FD_SIZE_IN_MB) == 2
+  DEFINE FVMAIN_COMPACT_SIZE  = 0x1f8000
+!endif
+!if $(FD_SIZE_IN_MB) == 3
+  DEFINE FVMAIN_COMPACT_SIZE  = 0x2f8000
+!endif
+
 [FD.QEMU_EFI]
 BaseAddress   = 0x00000000|gArmTokenSpaceGuid.PcdFdBaseAddress  # QEMU assigns 0 - 0x8000000 for a BootROM
-Size          = 0x00200000|gArmTokenSpaceGuid.PcdFdSize         # The size in bytes of the FLASH Device
+Size          = $(FD_SIZE)|gArmTokenSpaceGuid.PcdFdSize         # The size in bytes of the FLASH Device
 ErasePolarity = 1
 
 # This one is tricky, it must be: BlockSize * NumBlocks = Size
 BlockSize     = 0x00001000
-NumBlocks     = 0x200
+NumBlocks     = $(FD_NUM_BLOCKS)
 
 ################################################################################
 #
@@ -52,17 +54,22 @@ NumBlocks     = 0x200
 ################################################################################
 
 #
-# Implement the Linux kernel header layout so that the Xen loader will identify
+# Implement the Linux kernel header layout so that the loader will identify
 # it as something bootable, and execute it with a FDT pointer in x0 or r2.
-# This area will be reused to store a copy of the FDT so round it up to 8 KB.
+# This area will be reused to store a copy of the FDT so round it up to 32 KB.
 #
-0x00000000|0x00002000
+0x00000000|0x00008000
 DATA = {
 !if $(ARCH) == AARCH64
   0x01, 0x00, 0x00, 0x10,                         # code0: adr x1, .
-  0xff, 0x07, 0x00, 0x14,                         # code1: b 0x2000
+  0xff, 0x1f, 0x00, 0x14,                         # code1: b 0x8000
   0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, # text_offset: 512 KB
+!if $(FD_SIZE_IN_MB) == 2
   0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, # image_size: 2 MB
+!endif
+!if $(FD_SIZE_IN_MB) == 3
+  0x00, 0x00, 0x30, 0x00, 0x00, 0x00, 0x00, 0x00, # image_size: 3 MB
+!endif
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, # flags
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, # res2
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, # res3
@@ -79,15 +86,20 @@ DATA = {
   0x00, 0x00, 0xa0, 0xe1, # nop
   0x00, 0x00, 0xa0, 0xe1, # nop
 
-  0xf6, 0x07, 0x00, 0xea, # b 0x2000
+  0xf6, 0x1f, 0x00, 0xea, # b 0x8000
   0x18, 0x28, 0x6f, 0x01, # magic
   0x00, 0x00, 0x00, 0x00, # start
+!if $(FD_SIZE_IN_MB) == 2
   0x00, 0x00, 0x20, 0x00, # image size: 2 MB
+!endif
+!if $(FD_SIZE_IN_MB) == 3
+  0x00, 0x00, 0x30, 0x00, # image size: 3 MB
+!endif
   0x01, 0x02, 0x03, 0x04  # endiannness flag
 !endif
 }
 
-0x00002000|0x001fe000
+0x00008000|$(FVMAIN_COMPACT_SIZE)
 gArmTokenSpaceGuid.PcdFvBaseAddress|gArmTokenSpaceGuid.PcdFvSize
 FV = FVMAIN_COMPACT
 
@@ -124,7 +136,7 @@ READ_STATUS        = TRUE
 READ_LOCK_CAP      = TRUE
 READ_LOCK_STATUS   = TRUE
 
-  INF ArmVirtPkg/PrePi/ArmVirtPrePiUniCoreRelocatable.inf
+  INF RuleOverride = SELF_RELOC ArmVirtPkg/PrePi/ArmVirtPrePiUniCoreRelocatable.inf
 
   FILE FV_IMAGE = 9E21FD93-9C72-4c15-8C4B-E77F1DB2D792 {
     SECTION GUIDED EE4E5898-3914-4259-9D6E-DC7BD79403CF PROCESSING_REQUIRED = TRUE {

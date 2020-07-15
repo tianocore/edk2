@@ -1,14 +1,8 @@
 /** @file
   Var Check Hii bin generation.
 
-Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -120,11 +114,13 @@ DumpHiiPackage (
   EFI_IFR_OP_HEADER             *IfrOpCodeHeader;
   EFI_IFR_VARSTORE              *IfrVarStore;
   EFI_IFR_VARSTORE_EFI          *IfrEfiVarStore;
+  BOOLEAN                       QuestionStoredInBitField;
 
   HiiPackageHeader = (EFI_HII_PACKAGE_HEADER *) HiiPackage;
+  QuestionStoredInBitField = FALSE;
 
-  DEBUG ((EFI_D_INFO, "  HiiPackageHeader->Type   - 0x%02x (%a)\n", HiiPackageHeader->Type, HiiPackageTypeToStr ((UINT8) HiiPackageHeader->Type)));
-  DEBUG ((EFI_D_INFO, "  HiiPackageHeader->Length - 0x%06x\n", HiiPackageHeader->Length));
+  DEBUG ((DEBUG_INFO, "  HiiPackageHeader->Type   - 0x%02x (%a)\n", HiiPackageHeader->Type, HiiPackageTypeToStr ((UINT8) HiiPackageHeader->Type)));
+  DEBUG ((DEBUG_INFO, "  HiiPackageHeader->Length - 0x%06x\n", HiiPackageHeader->Length));
 
   switch (HiiPackageHeader->Type) {
     case EFI_HII_PACKAGE_FORMS:
@@ -134,26 +130,32 @@ DumpHiiPackage (
         switch (IfrOpCodeHeader->OpCode) {
           case EFI_IFR_VARSTORE_OP:
             IfrVarStore = (EFI_IFR_VARSTORE *) IfrOpCodeHeader;
-            DEBUG ((EFI_D_INFO, "    IfrOpCodeHeader->OpCode - 0x%02x (%a)\n", IfrOpCodeHeader->OpCode, IfrOpCodeToStr (IfrOpCodeHeader->OpCode)));
-            DEBUG ((EFI_D_INFO, "    IfrOpCodeHeader->Length - 0x%02x\n", IfrOpCodeHeader->Length));
-            DEBUG ((EFI_D_INFO, "    IfrOpCodeHeader->Scope  - 0x%02x\n", IfrOpCodeHeader->Scope));
-            DEBUG ((EFI_D_INFO, "      Guid       - %g\n", &IfrVarStore->Guid));
-            DEBUG ((EFI_D_INFO, "      VarStoreId - 0x%04x\n", IfrVarStore->VarStoreId));
-            DEBUG ((EFI_D_INFO, "      Size       - 0x%04x\n", IfrVarStore->Size));
-            DEBUG ((EFI_D_INFO, "      Name       - %a\n", IfrVarStore->Name));
+            DEBUG ((DEBUG_INFO, "    IfrOpCodeHeader->OpCode - 0x%02x (%a)\n", IfrOpCodeHeader->OpCode, IfrOpCodeToStr (IfrOpCodeHeader->OpCode)));
+            DEBUG ((DEBUG_INFO, "    IfrOpCodeHeader->Length - 0x%02x\n", IfrOpCodeHeader->Length));
+            DEBUG ((DEBUG_INFO, "    IfrOpCodeHeader->Scope  - 0x%02x\n", IfrOpCodeHeader->Scope));
+            DEBUG ((DEBUG_INFO, "      Guid       - %g\n", &IfrVarStore->Guid));
+            DEBUG ((DEBUG_INFO, "      VarStoreId - 0x%04x\n", IfrVarStore->VarStoreId));
+            DEBUG ((DEBUG_INFO, "      Size       - 0x%04x\n", IfrVarStore->Size));
+            DEBUG ((DEBUG_INFO, "      Name       - %a\n", IfrVarStore->Name));
             break;
 
           case EFI_IFR_VARSTORE_EFI_OP:
             IfrEfiVarStore = (EFI_IFR_VARSTORE_EFI *) IfrOpCodeHeader;
             if (IfrEfiVarStore->Header.Length >= sizeof (EFI_IFR_VARSTORE_EFI)) {
-              DEBUG ((EFI_D_INFO, "    IfrOpCodeHeader->OpCode - 0x%02x (%a)\n", IfrOpCodeHeader->OpCode, IfrOpCodeToStr (IfrOpCodeHeader->OpCode)));
-              DEBUG ((EFI_D_INFO, "    IfrOpCodeHeader->Length - 0x02%x\n", IfrOpCodeHeader->Length));
-              DEBUG ((EFI_D_INFO, "    IfrOpCodeHeader->Scope  - 0x02%x\n", IfrOpCodeHeader->Scope));
-              DEBUG ((EFI_D_INFO, "      Guid       - %g\n", &IfrEfiVarStore->Guid));
-              DEBUG ((EFI_D_INFO, "      VarStoreId - 0x%04x\n", IfrEfiVarStore->VarStoreId));
-              DEBUG ((EFI_D_INFO, "      Size       - 0x%04x\n", IfrEfiVarStore->Size));
-              DEBUG ((EFI_D_INFO, "      Attributes - 0x%08x\n", IfrEfiVarStore->Attributes));
-              DEBUG ((EFI_D_INFO, "      Name       - %a\n", IfrEfiVarStore->Name));
+              DEBUG ((DEBUG_INFO, "    IfrOpCodeHeader->OpCode - 0x%02x (%a)\n", IfrOpCodeHeader->OpCode, IfrOpCodeToStr (IfrOpCodeHeader->OpCode)));
+              DEBUG ((DEBUG_INFO, "    IfrOpCodeHeader->Length - 0x%02x\n", IfrOpCodeHeader->Length));
+              DEBUG ((DEBUG_INFO, "    IfrOpCodeHeader->Scope  - 0x%02x\n", IfrOpCodeHeader->Scope));
+              DEBUG ((DEBUG_INFO, "      Guid       - %g\n", &IfrEfiVarStore->Guid));
+              DEBUG ((DEBUG_INFO, "      VarStoreId - 0x%04x\n", IfrEfiVarStore->VarStoreId));
+              DEBUG ((DEBUG_INFO, "      Size       - 0x%04x\n", IfrEfiVarStore->Size));
+              DEBUG ((DEBUG_INFO, "      Attributes - 0x%08x\n", IfrEfiVarStore->Attributes));
+              DEBUG ((DEBUG_INFO, "      Name       - %a\n", IfrEfiVarStore->Name));
+            }
+            break;
+
+          case EFI_IFR_GUID_OP:
+            if (CompareGuid ((EFI_GUID *)((UINTN)IfrOpCodeHeader + sizeof (EFI_IFR_OP_HEADER)), &gEdkiiIfrBitVarstoreGuid)) {
+              QuestionStoredInBitField = TRUE;
             }
             break;
 
@@ -161,14 +163,14 @@ DumpHiiPackage (
           case EFI_IFR_CHECKBOX_OP:
           case EFI_IFR_NUMERIC_OP:
           case EFI_IFR_ORDERED_LIST_OP:
-            DEBUG ((EFI_D_INFO, "    IfrOpCodeHeader->OpCode - 0x%02x (%a)\n", IfrOpCodeHeader->OpCode, IfrOpCodeToStr (IfrOpCodeHeader->OpCode)));
-            DEBUG ((EFI_D_INFO, "    IfrOpCodeHeader->Length - 0x02%x\n", IfrOpCodeHeader->Length));
-            DEBUG ((EFI_D_INFO, "    IfrOpCodeHeader->Scope  - 0x02%x\n", IfrOpCodeHeader->Scope));
-            DEBUG ((EFI_D_INFO, "      Prompt       - 0x%04x\n", ((EFI_IFR_ONE_OF *) IfrOpCodeHeader)->Question.Header.Prompt));
-            DEBUG ((EFI_D_INFO, "      Help         - 0x%04x\n", ((EFI_IFR_ONE_OF *) IfrOpCodeHeader)->Question.Header.Help));
-            DEBUG ((EFI_D_INFO, "      QuestionId   - 0x%04x\n", ((EFI_IFR_ONE_OF *) IfrOpCodeHeader)->Question.QuestionId));
-            DEBUG ((EFI_D_INFO, "      VarStoreId   - 0x%04x\n", ((EFI_IFR_ONE_OF *) IfrOpCodeHeader)->Question.VarStoreId));
-            DEBUG ((EFI_D_INFO, "      VarStoreInfo - 0x%04x\n", ((EFI_IFR_ONE_OF * )IfrOpCodeHeader)->Question.VarStoreInfo.VarOffset));
+            DEBUG ((DEBUG_INFO, "    IfrOpCodeHeader->OpCode - 0x%02x (%a) (%a)\n", IfrOpCodeHeader->OpCode, IfrOpCodeToStr (IfrOpCodeHeader->OpCode), (QuestionStoredInBitField? "bit level": "byte level")));
+            DEBUG ((DEBUG_INFO, "    IfrOpCodeHeader->Length - 0x%02x\n", IfrOpCodeHeader->Length));
+            DEBUG ((DEBUG_INFO, "    IfrOpCodeHeader->Scope  - 0x%02x\n", IfrOpCodeHeader->Scope));
+            DEBUG ((DEBUG_INFO, "      Prompt       - 0x%04x\n", ((EFI_IFR_ONE_OF *) IfrOpCodeHeader)->Question.Header.Prompt));
+            DEBUG ((DEBUG_INFO, "      Help         - 0x%04x\n", ((EFI_IFR_ONE_OF *) IfrOpCodeHeader)->Question.Header.Help));
+            DEBUG ((DEBUG_INFO, "      QuestionId   - 0x%04x\n", ((EFI_IFR_ONE_OF *) IfrOpCodeHeader)->Question.QuestionId));
+            DEBUG ((DEBUG_INFO, "      VarStoreId   - 0x%04x\n", ((EFI_IFR_ONE_OF *) IfrOpCodeHeader)->Question.VarStoreId));
+            DEBUG ((DEBUG_INFO, "      VarStoreInfo - 0x%04x (%a)\n", ((EFI_IFR_ONE_OF * )IfrOpCodeHeader)->Question.VarStoreInfo.VarOffset, (QuestionStoredInBitField? "bit level": "byte level")));
             {
               EFI_IFR_ONE_OF            *IfrOneOf;
               EFI_IFR_CHECKBOX          *IfrCheckBox;
@@ -178,64 +180,82 @@ DumpHiiPackage (
               switch (IfrOpCodeHeader->OpCode) {
                 case EFI_IFR_ONE_OF_OP:
                   IfrOneOf = (EFI_IFR_ONE_OF *) IfrOpCodeHeader;
-                  DEBUG ((EFI_D_INFO, "      Flags         - 0x%02x\n", IfrOneOf->Flags));
-                  switch (IfrOneOf->Flags & EFI_IFR_NUMERIC_SIZE) {
-                  case EFI_IFR_NUMERIC_SIZE_1:
-                    DEBUG ((EFI_D_INFO, "      MinValue      - 0x%02x\n", IfrOneOf->data.u8.MinValue));
-                    DEBUG ((EFI_D_INFO, "      MaxValue      - 0x%02x\n", IfrOneOf->data.u8.MaxValue));
-                    DEBUG ((EFI_D_INFO, "      Step          - 0x%02x\n", IfrOneOf->data.u8.Step));
-                    break;
-                  case EFI_IFR_NUMERIC_SIZE_2:
-                    DEBUG ((EFI_D_INFO, "      MinValue      - 0x%04x\n", IfrOneOf->data.u16.MinValue));
-                    DEBUG ((EFI_D_INFO, "      MaxValue      - 0x%04x\n", IfrOneOf->data.u16.MaxValue));
-                    DEBUG ((EFI_D_INFO, "      Step          - 0x%04x\n", IfrOneOf->data.u16.Step));
-                    break;
-                  case EFI_IFR_NUMERIC_SIZE_4:
-                    DEBUG ((EFI_D_INFO, "      MinValue      - 0x%08x\n", IfrOneOf->data.u32.MinValue));
-                    DEBUG ((EFI_D_INFO, "      MaxValue      - 0x%08x\n", IfrOneOf->data.u32.MaxValue));
-                    DEBUG ((EFI_D_INFO, "      Step          - 0x%08x\n", IfrOneOf->data.u32.Step));
-                    break;
-                  case EFI_IFR_NUMERIC_SIZE_8:
-                    DEBUG ((EFI_D_INFO, "      MinValue      - 0x%016lx\n", IfrOneOf->data.u64.MinValue));
-                    DEBUG ((EFI_D_INFO, "      MaxValue      - 0x%016lx\n", IfrOneOf->data.u64.MaxValue));
-                    DEBUG ((EFI_D_INFO, "      Step          - 0x%016lx\n", IfrOneOf->data.u64.Step));
-                    break;
+                  DEBUG ((DEBUG_INFO, "      Flags         - 0x%02x\n", IfrOneOf->Flags));
+                  if (QuestionStoredInBitField) {
+                    //
+                    // For OneOf stored in bit field, the option value are saved as UINT32 type.
+                    //
+                    DEBUG ((DEBUG_INFO, "      MinValue      - 0x%08x\n", IfrOneOf->data.u32.MinValue));
+                    DEBUG ((DEBUG_INFO, "      MaxValue      - 0x%08x\n", IfrOneOf->data.u32.MaxValue));
+                    DEBUG ((DEBUG_INFO, "      Step          - 0x%08x\n", IfrOneOf->data.u32.Step));
+                  } else {
+                    switch (IfrOneOf->Flags & EFI_IFR_NUMERIC_SIZE) {
+                    case EFI_IFR_NUMERIC_SIZE_1:
+                      DEBUG ((DEBUG_INFO, "      MinValue      - 0x%02x\n", IfrOneOf->data.u8.MinValue));
+                      DEBUG ((DEBUG_INFO, "      MaxValue      - 0x%02x\n", IfrOneOf->data.u8.MaxValue));
+                      DEBUG ((DEBUG_INFO, "      Step          - 0x%02x\n", IfrOneOf->data.u8.Step));
+                      break;
+                    case EFI_IFR_NUMERIC_SIZE_2:
+                      DEBUG ((DEBUG_INFO, "      MinValue      - 0x%04x\n", IfrOneOf->data.u16.MinValue));
+                      DEBUG ((DEBUG_INFO, "      MaxValue      - 0x%04x\n", IfrOneOf->data.u16.MaxValue));
+                      DEBUG ((DEBUG_INFO, "      Step          - 0x%04x\n", IfrOneOf->data.u16.Step));
+                      break;
+                    case EFI_IFR_NUMERIC_SIZE_4:
+                      DEBUG ((DEBUG_INFO, "      MinValue      - 0x%08x\n", IfrOneOf->data.u32.MinValue));
+                      DEBUG ((DEBUG_INFO, "      MaxValue      - 0x%08x\n", IfrOneOf->data.u32.MaxValue));
+                      DEBUG ((DEBUG_INFO, "      Step          - 0x%08x\n", IfrOneOf->data.u32.Step));
+                      break;
+                    case EFI_IFR_NUMERIC_SIZE_8:
+                      DEBUG ((DEBUG_INFO, "      MinValue      - 0x%016lx\n", IfrOneOf->data.u64.MinValue));
+                      DEBUG ((DEBUG_INFO, "      MaxValue      - 0x%016lx\n", IfrOneOf->data.u64.MaxValue));
+                      DEBUG ((DEBUG_INFO, "      Step          - 0x%016lx\n", IfrOneOf->data.u64.Step));
+                      break;
+                    }
                   }
                   break;
                 case EFI_IFR_CHECKBOX_OP:
                   IfrCheckBox = (EFI_IFR_CHECKBOX *) IfrOpCodeHeader;
-                  DEBUG ((EFI_D_INFO, "      Flags         - 0x%02x\n", IfrCheckBox->Flags));
+                  DEBUG ((DEBUG_INFO, "      Flags         - 0x%02x\n", IfrCheckBox->Flags));
                   break;
                 case EFI_IFR_NUMERIC_OP:
                   IfrNumeric = (EFI_IFR_NUMERIC *) IfrOpCodeHeader;
-                  DEBUG ((EFI_D_INFO, "      Flags         - 0x%02x\n", IfrNumeric->Flags));
-                  switch (IfrNumeric->Flags & EFI_IFR_NUMERIC_SIZE) {
-                  case EFI_IFR_NUMERIC_SIZE_1:
-                    DEBUG ((EFI_D_INFO, "      MinValue      - 0x%02x\n", IfrNumeric->data.u8.MinValue));
-                    DEBUG ((EFI_D_INFO, "      MaxValue      - 0x%02x\n", IfrNumeric->data.u8.MaxValue));
-                    DEBUG ((EFI_D_INFO, "      Step          - 0x%02x\n", IfrNumeric->data.u8.Step));
-                    break;
-                  case EFI_IFR_NUMERIC_SIZE_2:
-                    DEBUG ((EFI_D_INFO, "      MinValue      - 0x%04x\n", IfrNumeric->data.u16.MinValue));
-                    DEBUG ((EFI_D_INFO, "      MaxValue      - 0x%04x\n", IfrNumeric->data.u16.MaxValue));
-                    DEBUG ((EFI_D_INFO, "      Step          - 0x%04x\n", IfrNumeric->data.u16.Step));
-                    break;
-                  case EFI_IFR_NUMERIC_SIZE_4:
-                    DEBUG ((EFI_D_INFO, "      MinValue      - 0x%08x\n", IfrNumeric->data.u32.MinValue));
-                    DEBUG ((EFI_D_INFO, "      MaxValue      - 0x%08x\n", IfrNumeric->data.u32.MaxValue));
-                    DEBUG ((EFI_D_INFO, "      Step          - 0x%08x\n", IfrNumeric->data.u32.Step));
-                    break;
-                  case EFI_IFR_NUMERIC_SIZE_8:
-                    DEBUG ((EFI_D_INFO, "      MinValue      - 0x%016lx\n", IfrNumeric->data.u64.MinValue));
-                    DEBUG ((EFI_D_INFO, "      MaxValue      - 0x%016lx\n", IfrNumeric->data.u64.MaxValue));
-                    DEBUG ((EFI_D_INFO, "      Step          - 0x%016lx\n", IfrNumeric->data.u64.Step));
-                    break;
+                  DEBUG ((DEBUG_INFO, "      Flags         - 0x%02x\n", IfrNumeric->Flags));
+                  if (QuestionStoredInBitField) {
+                    //
+                    // For Numeric stored in bit field, the MinValue,MaxValue and Step are saved as UINT32 type.
+                    //
+                    DEBUG ((DEBUG_INFO, "      MinValue      - 0x%08x\n", IfrNumeric->data.u32.MinValue));
+                    DEBUG ((DEBUG_INFO, "      MaxValue      - 0x%08x\n", IfrNumeric->data.u32.MaxValue));
+                    DEBUG ((DEBUG_INFO, "      Step          - 0x%08x\n", IfrNumeric->data.u32.Step));
+                  } else {
+                    switch (IfrNumeric->Flags & EFI_IFR_NUMERIC_SIZE) {
+                    case EFI_IFR_NUMERIC_SIZE_1:
+                      DEBUG ((DEBUG_INFO, "      MinValue      - 0x%02x\n", IfrNumeric->data.u8.MinValue));
+                      DEBUG ((DEBUG_INFO, "      MaxValue      - 0x%02x\n", IfrNumeric->data.u8.MaxValue));
+                      DEBUG ((DEBUG_INFO, "      Step          - 0x%02x\n", IfrNumeric->data.u8.Step));
+                      break;
+                    case EFI_IFR_NUMERIC_SIZE_2:
+                      DEBUG ((DEBUG_INFO, "      MinValue      - 0x%04x\n", IfrNumeric->data.u16.MinValue));
+                      DEBUG ((DEBUG_INFO, "      MaxValue      - 0x%04x\n", IfrNumeric->data.u16.MaxValue));
+                      DEBUG ((DEBUG_INFO, "      Step          - 0x%04x\n", IfrNumeric->data.u16.Step));
+                      break;
+                    case EFI_IFR_NUMERIC_SIZE_4:
+                      DEBUG ((DEBUG_INFO, "      MinValue      - 0x%08x\n", IfrNumeric->data.u32.MinValue));
+                      DEBUG ((DEBUG_INFO, "      MaxValue      - 0x%08x\n", IfrNumeric->data.u32.MaxValue));
+                      DEBUG ((DEBUG_INFO, "      Step          - 0x%08x\n", IfrNumeric->data.u32.Step));
+                      break;
+                    case EFI_IFR_NUMERIC_SIZE_8:
+                      DEBUG ((DEBUG_INFO, "      MinValue      - 0x%016lx\n", IfrNumeric->data.u64.MinValue));
+                      DEBUG ((DEBUG_INFO, "      MaxValue      - 0x%016lx\n", IfrNumeric->data.u64.MaxValue));
+                      DEBUG ((DEBUG_INFO, "      Step          - 0x%016lx\n", IfrNumeric->data.u64.Step));
+                      break;
+                    }
                   }
                   break;
                 case EFI_IFR_ORDERED_LIST_OP:
                   IfrOrderedList = (EFI_IFR_ORDERED_LIST *) IfrOpCodeHeader;
-                  DEBUG ((EFI_D_INFO, "      MaxContainers - 0x%02x\n", IfrOrderedList->MaxContainers));
-                  DEBUG ((EFI_D_INFO, "      Flags         - 0x%02x\n", IfrOrderedList->Flags));
+                  DEBUG ((DEBUG_INFO, "      MaxContainers - 0x%02x\n", IfrOrderedList->MaxContainers));
+                  DEBUG ((DEBUG_INFO, "      Flags         - 0x%02x\n", IfrOrderedList->Flags));
                   break;
                 default:
                   break;
@@ -251,26 +271,26 @@ DumpHiiPackage (
                   switch (IfrOpCodeHeader->OpCode) {
                     case EFI_IFR_ONE_OF_OPTION_OP:
                       IfrOneOfOption = (EFI_IFR_ONE_OF_OPTION *)IfrOpCodeHeader;
-                      DEBUG ((EFI_D_INFO, "!!!!    IfrOpCodeHeader->OpCode - 0x%02x (%a)\n", (UINTN)IfrOpCodeHeader->OpCode, IfrOpCodeToStr (IfrOpCodeHeader->OpCode)));
-                      DEBUG ((EFI_D_INFO, "!!!!    IfrOpCodeHeader->Scope  - 0x%02x\n", IfrOpCodeHeader->Scope));
-                      DEBUG ((EFI_D_INFO, "!!!!      Option                - 0x%04x\n", IfrOneOfOption->Option));
-                      DEBUG ((EFI_D_INFO, "!!!!      Flags                 - 0x%02x\n", IfrOneOfOption->Flags));
-                      DEBUG ((EFI_D_INFO, "!!!!      Type                  - 0x%02x\n", IfrOneOfOption->Type));
+                      DEBUG ((DEBUG_INFO, "!!!!    IfrOpCodeHeader->OpCode - 0x%02x (%a)\n", (UINTN)IfrOpCodeHeader->OpCode, IfrOpCodeToStr (IfrOpCodeHeader->OpCode)));
+                      DEBUG ((DEBUG_INFO, "!!!!    IfrOpCodeHeader->Scope  - 0x%02x\n", IfrOpCodeHeader->Scope));
+                      DEBUG ((DEBUG_INFO, "!!!!      Option                - 0x%04x\n", IfrOneOfOption->Option));
+                      DEBUG ((DEBUG_INFO, "!!!!      Flags                 - 0x%02x\n", IfrOneOfOption->Flags));
+                      DEBUG ((DEBUG_INFO, "!!!!      Type                  - 0x%02x\n", IfrOneOfOption->Type));
                       switch (IfrOneOfOption->Type) {
                         case EFI_IFR_TYPE_NUM_SIZE_8:
-                          DEBUG ((EFI_D_INFO, "!!!!      Value                 - 0x%02x\n", IfrOneOfOption->Value.u8));
+                          DEBUG ((DEBUG_INFO, "!!!!      Value                 - 0x%02x\n", IfrOneOfOption->Value.u8));
                           break;
                         case EFI_IFR_TYPE_NUM_SIZE_16:
-                          DEBUG ((EFI_D_INFO, "!!!!      Value                 - 0x%04x\n", IfrOneOfOption->Value.u16));
+                          DEBUG ((DEBUG_INFO, "!!!!      Value                 - 0x%04x\n", IfrOneOfOption->Value.u16));
                           break;
                         case EFI_IFR_TYPE_NUM_SIZE_32:
-                          DEBUG ((EFI_D_INFO, "!!!!      Value                 - 0x%08x\n", IfrOneOfOption->Value.u32));
+                          DEBUG ((DEBUG_INFO, "!!!!      Value                 - 0x%08x\n", IfrOneOfOption->Value.u32));
                           break;
                         case EFI_IFR_TYPE_NUM_SIZE_64:
-                          DEBUG ((EFI_D_INFO, "!!!!      Value                 - 0x%016lx\n", IfrOneOfOption->Value.u64));
+                          DEBUG ((DEBUG_INFO, "!!!!      Value                 - 0x%016lx\n", IfrOneOfOption->Value.u64));
                           break;
                         case EFI_IFR_TYPE_BOOLEAN:
-                          DEBUG ((EFI_D_INFO, "!!!!      Value                 - 0x%02x\n", IfrOneOfOption->Value.b));
+                          DEBUG ((DEBUG_INFO, "!!!!      Value                 - 0x%02x\n", IfrOneOfOption->Value.b));
                           break;
                         default:
                           break;
@@ -279,6 +299,7 @@ DumpHiiPackage (
                   }
 
                   if (IfrOpCodeHeader->OpCode == EFI_IFR_END_OP) {
+                    QuestionStoredInBitField = FALSE;
                     ASSERT (Scope > 0);
                     Scope--;
                     if (Scope == 0) {
@@ -318,12 +339,12 @@ DumpHiiDatabase (
   EFI_HII_PACKAGE_LIST_HEADER   *HiiPackageListHeader;
   EFI_HII_PACKAGE_HEADER        *HiiPackageHeader;
 
-  DEBUG ((EFI_D_INFO, "HiiDatabaseSize - 0x%x\n", HiiDatabaseSize));
+  DEBUG ((DEBUG_INFO, "HiiDatabaseSize - 0x%x\n", HiiDatabaseSize));
   HiiPackageListHeader = (EFI_HII_PACKAGE_LIST_HEADER *) HiiDatabase;
 
   while ((UINTN) HiiPackageListHeader < ((UINTN) HiiDatabase + HiiDatabaseSize)) {
-    DEBUG ((EFI_D_INFO, "HiiPackageListHeader->PackageListGuid - %g\n", &HiiPackageListHeader->PackageListGuid));
-    DEBUG ((EFI_D_INFO, "HiiPackageListHeader->PackageLength   - 0x%x\n", (UINTN)HiiPackageListHeader->PackageLength));
+    DEBUG ((DEBUG_INFO, "HiiPackageListHeader->PackageListGuid - %g\n", &HiiPackageListHeader->PackageListGuid));
+    DEBUG ((DEBUG_INFO, "HiiPackageListHeader->PackageLength   - 0x%x\n", (UINTN)HiiPackageListHeader->PackageLength));
     HiiPackageHeader = (EFI_HII_PACKAGE_HEADER *)(HiiPackageListHeader + 1);
 
     while ((UINTN) HiiPackageHeader < (UINTN) HiiPackageListHeader + HiiPackageListHeader->PackageLength) {
@@ -488,6 +509,7 @@ MergeHiiQuestion (
   UINT8                             *Ptr;
   UINT8                             *Ptr1;
   UINT8                             *Ptr2;
+  UINTN                             ArrayIndex;
 
   //
   // Hii Question from Hii Database has high priority.
@@ -498,14 +520,20 @@ MergeHiiQuestion (
     return;
   }
 
-  HiiQuestion1 = HiiVariableNode->HiiQuestionArray[HiiQuestion->VarOffset];
+  if (HiiQuestion->BitFieldStore) {
+    ArrayIndex = HiiQuestion->VarOffset;
+  } else {
+    ArrayIndex = HiiQuestion->VarOffset * 8;
+  }
+
+  HiiQuestion1 = HiiVariableNode->HiiQuestionArray[ArrayIndex];
   HiiQuestion2 = HiiQuestion;
 
   ASSERT ((HiiQuestion1->OpCode == HiiQuestion2->OpCode) && (HiiQuestion1->StorageWidth == HiiQuestion2->StorageWidth));
 
   switch (HiiQuestion1->OpCode) {
     case EFI_IFR_ONE_OF_OP:
-      DEBUG ((EFI_D_INFO, "MergeHiiQuestion - EFI_IFR_ONE_OF_OP VarOffset = 0x%04x\n", HiiQuestion1->VarOffset));
+      DEBUG ((DEBUG_INFO, "MergeHiiQuestion - EFI_IFR_ONE_OF_OP VarOffset = 0x%04x (%a)\n", HiiQuestion1->VarOffset, (HiiQuestion1->BitFieldStore? "bit level": "byte level")));
       //
       // Get the length of Hii Question 1.
       //
@@ -580,17 +608,17 @@ MergeHiiQuestion (
           Ptr2 += HiiQuestion2->StorageWidth;
         }
 
-        HiiVariableNode->HiiQuestionArray[HiiQuestion1->VarOffset] = NewHiiQuestion;
+        HiiVariableNode->HiiQuestionArray[ArrayIndex] = NewHiiQuestion;
         InternalVarCheckFreePool (HiiQuestion1);
       }
       break;
 
     case EFI_IFR_CHECKBOX_OP:
-      DEBUG ((EFI_D_INFO, "MergeHiiQuestion - EFI_IFR_CHECKBOX_OP VarOffset = 0x%04x\n", HiiQuestion1->VarOffset));
+      DEBUG ((DEBUG_INFO, "MergeHiiQuestion - EFI_IFR_CHECKBOX_OP VarOffset = 0x%04x (%a)\n", HiiQuestion1->VarOffset, (HiiQuestion1->BitFieldStore? "bit level": "byte level")));
       break;
 
     case EFI_IFR_NUMERIC_OP:
-      DEBUG ((EFI_D_INFO, "MergeHiiQuestion - EFI_IFR_NUMERIC_OP VarOffset = 0x%04x\n", HiiQuestion1->VarOffset));
+      DEBUG ((DEBUG_INFO, "MergeHiiQuestion - EFI_IFR_NUMERIC_OP VarOffset = 0x%04x (%a)\n", HiiQuestion1->VarOffset, (HiiQuestion1->BitFieldStore? "bit level": "byte level")));
       //
       // Get minimum and maximum of Hii Question 1.
       //
@@ -630,7 +658,7 @@ MergeHiiQuestion (
       break;
 
     case EFI_IFR_ORDERED_LIST_OP:
-      DEBUG ((EFI_D_INFO, "MergeHiiQuestion - EFI_IFR_ORDERED_LIST_OP VarOffset = 0x%04x\n", HiiQuestion1->VarOffset));
+      DEBUG ((DEBUG_INFO, "MergeHiiQuestion - EFI_IFR_ORDERED_LIST_OP VarOffset = 0x%04x\n", HiiQuestion1->VarOffset));
       //
       // Get the length of Hii Question 1.
       //
@@ -705,7 +733,7 @@ MergeHiiQuestion (
           Ptr2 += HiiQuestion2->StorageWidth;
         }
 
-        HiiVariableNode->HiiQuestionArray[HiiQuestion1->VarOffset] = NewHiiQuestion;
+        HiiVariableNode->HiiQuestionArray[ArrayIndex] = NewHiiQuestion;
         InternalVarCheckFreePool (HiiQuestion1);
       }
       break;
@@ -831,13 +859,15 @@ GetOneOfOption (
   Parse Hii Question Oneof.
 
   @param[in] IfrOpCodeHeader    Pointer to Ifr OpCode header.
+  @param[in] StoredInBitField   Whether the OneOf is stored in bit field Storage.
 
   return Pointer to Hii Question.
 
 **/
 VAR_CHECK_HII_QUESTION_HEADER *
 ParseHiiQuestionOneOf (
-  IN EFI_IFR_OP_HEADER  *IfrOpCodeHeader
+  IN EFI_IFR_OP_HEADER  *IfrOpCodeHeader,
+  IN BOOLEAN            StoredInBitField
   )
 {
   EFI_IFR_ONE_OF                *IfrOneOf;
@@ -846,10 +876,21 @@ ParseHiiQuestionOneOf (
   UINT8                         Width;
   UINTN                         OptionCount;
   UINT8                         OptionWidth;
+  UINT8                         BitWidth;
 
   IfrOneOf = (EFI_IFR_ONE_OF *) IfrOpCodeHeader;
+  BitWidth = 0;
 
-  Width = (UINT8) (1 << (IfrOneOf->Flags & EFI_IFR_NUMERIC_SIZE));
+  if (StoredInBitField) {
+    //
+    // When OneOf stored in bit field, the bit width is saved in the lower six bits of the flag.
+    // And the options in the OneOf is saved as UINT32 type.
+    //
+    BitWidth = IfrOneOf->Flags & EDKII_IFR_NUMERIC_SIZE_BIT;
+    Width = sizeof (UINT32);
+  } else {
+    Width = (UINT8) (1 << (IfrOneOf->Flags & EFI_IFR_NUMERIC_SIZE));
+  }
 
   GetOneOfOption (IfrOpCodeHeader, &OptionCount, &OptionWidth, NULL);
   ASSERT (Width == OptionWidth);
@@ -858,10 +899,15 @@ ParseHiiQuestionOneOf (
 
   OneOf = InternalVarCheckAllocateZeroPool (Length);
   ASSERT (OneOf != NULL);
-  OneOf->OpCode       = EFI_IFR_ONE_OF_OP;
-  OneOf->Length       = (UINT8) Length;
-  OneOf->VarOffset    = IfrOneOf->Question.VarStoreInfo.VarOffset;
-  OneOf->StorageWidth = Width;
+  OneOf->OpCode         = EFI_IFR_ONE_OF_OP;
+  OneOf->Length         = (UINT8) Length;
+  OneOf->VarOffset      = IfrOneOf->Question.VarStoreInfo.VarOffset;
+  OneOf->BitFieldStore  = StoredInBitField;
+  if (StoredInBitField) {
+    OneOf->StorageWidth = BitWidth;
+  } else {
+    OneOf->StorageWidth = Width;
+  }
 
   GetOneOfOption (IfrOpCodeHeader, &OptionCount, &OptionWidth, OneOf + 1);
 
@@ -872,13 +918,15 @@ ParseHiiQuestionOneOf (
   Parse Hii Question CheckBox.
 
   @param[in] IfrOpCodeHeader    Pointer to Ifr OpCode header.
+  @param[in] StoredInBitField   Whether the CheckBox is stored in bit field Storage.
 
   return Pointer to Hii Question.
 
 **/
 VAR_CHECK_HII_QUESTION_HEADER *
 ParseHiiQuestionCheckBox (
-  IN EFI_IFR_OP_HEADER  *IfrOpCodeHeader
+  IN EFI_IFR_OP_HEADER  *IfrOpCodeHeader,
+  IN BOOLEAN            StoredInBitField
   )
 {
   EFI_IFR_CHECKBOX                  *IfrCheckBox;
@@ -888,10 +936,15 @@ ParseHiiQuestionCheckBox (
 
   CheckBox = InternalVarCheckAllocateZeroPool (sizeof (*CheckBox));
   ASSERT (CheckBox != NULL);
-  CheckBox->OpCode       = EFI_IFR_CHECKBOX_OP;
-  CheckBox->Length       = (UINT8) sizeof (*CheckBox);;
-  CheckBox->VarOffset    = IfrCheckBox->Question.VarStoreInfo.VarOffset;
-  CheckBox->StorageWidth = (UINT8) sizeof (BOOLEAN);
+  CheckBox->OpCode         = EFI_IFR_CHECKBOX_OP;
+  CheckBox->Length         = (UINT8) sizeof (*CheckBox);;
+  CheckBox->VarOffset      = IfrCheckBox->Question.VarStoreInfo.VarOffset;
+  CheckBox->BitFieldStore  = StoredInBitField;
+  if (StoredInBitField) {
+    CheckBox->StorageWidth = 1;
+  } else {
+    CheckBox->StorageWidth = (UINT8) sizeof (BOOLEAN);
+  }
 
   return (VAR_CHECK_HII_QUESTION_HEADER *) CheckBox;
 }
@@ -900,30 +953,48 @@ ParseHiiQuestionCheckBox (
   Parse Hii Question Numeric.
 
   @param[in] IfrOpCodeHeader    Pointer to Ifr OpCode header.
+  @param[in] StoredInBitField   Whether the Numeric is stored in bit field Storage.
 
   return Pointer to Hii Question.
 
 **/
 VAR_CHECK_HII_QUESTION_HEADER *
 ParseHiiQuestionNumeric (
-  IN EFI_IFR_OP_HEADER  *IfrOpCodeHeader
+  IN EFI_IFR_OP_HEADER  *IfrOpCodeHeader,
+  IN BOOLEAN            StoredInBitField
   )
 {
   EFI_IFR_NUMERIC                   *IfrNumeric;
   VAR_CHECK_HII_QUESTION_NUMERIC    *Numeric;
   UINT8                             Width;
+  UINT8                             BitWidth;
 
   IfrNumeric = (EFI_IFR_NUMERIC *) IfrOpCodeHeader;
+  BitWidth = 0;
 
   Numeric = InternalVarCheckAllocateZeroPool (sizeof (VAR_CHECK_HII_QUESTION_NUMERIC) + 2 * sizeof (UINT64));
   ASSERT (Numeric != NULL);
 
-  Width = (UINT8) (1 << (IfrNumeric->Flags & EFI_IFR_NUMERIC_SIZE));
+  if (StoredInBitField) {
+    //
+    // When Numeric stored in bit field, the bit field width is saved in the lower six bits of the flag.
+    // And the Minimum Maximum of Numeric is saved as UINT32 type.
+    //
+    BitWidth = IfrNumeric->Flags & EDKII_IFR_NUMERIC_SIZE_BIT;
+    Width = sizeof (UINT32);
+  } else {
+    Width = (UINT8) (1 << (IfrNumeric->Flags & EFI_IFR_NUMERIC_SIZE));
+  }
 
-  Numeric->OpCode       = EFI_IFR_NUMERIC_OP;
-  Numeric->Length       = (UINT8) (sizeof (VAR_CHECK_HII_QUESTION_NUMERIC) + 2 * Width);
-  Numeric->VarOffset    = IfrNumeric->Question.VarStoreInfo.VarOffset;
-  Numeric->StorageWidth = Width;
+  Numeric->OpCode         = EFI_IFR_NUMERIC_OP;
+  Numeric->Length         = (UINT8) (sizeof (VAR_CHECK_HII_QUESTION_NUMERIC) + 2 * Width);
+  Numeric->VarOffset      = IfrNumeric->Question.VarStoreInfo.VarOffset;
+  Numeric->BitFieldStore  = StoredInBitField;
+  if (StoredInBitField) {
+    Numeric->StorageWidth = BitWidth;
+  } else {
+    Numeric->StorageWidth = Width;
+  }
 
   CopyMem (Numeric + 1, &IfrNumeric->data, Width * 2);
 
@@ -962,6 +1033,7 @@ ParseHiiQuestionOrderedList (
   OrderedList->VarOffset     = IfrOrderedList->Question.VarStoreInfo.VarOffset;
   OrderedList->StorageWidth  = OptionWidth;
   OrderedList->MaxContainers = IfrOrderedList->MaxContainers;
+  OrderedList->BitFieldStore = FALSE;
 
   GetOneOfOption (IfrOpCodeHeader, &OptionCount, &OptionWidth, OrderedList + 1);
 
@@ -974,28 +1046,34 @@ ParseHiiQuestionOrderedList (
   @param[in] HiiVariableNode    Pointer to Hii Variable node.
   @param[in] IfrOpCodeHeader    Pointer to Ifr OpCode header.
   @param[in] FromFv             Hii Question from FV.
+  @param[in] StoredInBitField   Whether the Question is stored in bit field Storage.
 
 **/
 VOID
 ParseHiiQuestion (
   IN VAR_CHECK_HII_VARIABLE_NODE    *HiiVariableNode,
   IN  EFI_IFR_OP_HEADER             *IfrOpCodeHeader,
-  IN BOOLEAN                        FromFv
+  IN BOOLEAN                        FromFv,
+  IN BOOLEAN                        StoredInBitField
   )
 {
   VAR_CHECK_HII_QUESTION_HEADER *HiiQuestion;
+  UINTN                         ArrayIndex;
 
+  //
+  // Currently only OneOf, CheckBox and Numeric can be stored in bit field.
+  //
   switch (IfrOpCodeHeader->OpCode) {
     case EFI_IFR_ONE_OF_OP:
-      HiiQuestion = ParseHiiQuestionOneOf (IfrOpCodeHeader);
+      HiiQuestion = ParseHiiQuestionOneOf (IfrOpCodeHeader, StoredInBitField);
       break;
 
     case EFI_IFR_CHECKBOX_OP:
-      HiiQuestion = ParseHiiQuestionCheckBox (IfrOpCodeHeader);
+      HiiQuestion = ParseHiiQuestionCheckBox (IfrOpCodeHeader, StoredInBitField);
       break;
 
     case EFI_IFR_NUMERIC_OP:
-      HiiQuestion = ParseHiiQuestionNumeric (IfrOpCodeHeader);
+      HiiQuestion = ParseHiiQuestionNumeric (IfrOpCodeHeader, StoredInBitField);
       break;
 
     case EFI_IFR_ORDERED_LIST_OP:
@@ -1008,10 +1086,15 @@ ParseHiiQuestion (
       break;
   }
 
-  if (HiiVariableNode->HiiQuestionArray[HiiQuestion->VarOffset] != NULL) {
+  if (StoredInBitField) {
+    ArrayIndex = HiiQuestion->VarOffset;
+  } else {
+    ArrayIndex = HiiQuestion->VarOffset * 8;
+  }
+  if (HiiVariableNode->HiiQuestionArray[ArrayIndex] != NULL) {
     MergeHiiQuestion (HiiVariableNode, HiiQuestion, FromFv);
   } else {
-    HiiVariableNode->HiiQuestionArray[HiiQuestion->VarOffset] = HiiQuestion;
+    HiiVariableNode->HiiQuestionArray[ArrayIndex] = HiiQuestion;
   }
 }
 
@@ -1166,7 +1249,7 @@ CreateHiiVariableNode (
     // The variable store identifier, which is unique within the current form set.
     //
     HiiVariableNode->VarStoreId = IfrEfiVarStore->VarStoreId;
-    HiiVariableNode->HiiQuestionArray = InternalVarCheckAllocateZeroPool (IfrEfiVarStore->Size * sizeof (VAR_CHECK_HII_QUESTION_HEADER *));
+    HiiVariableNode->HiiQuestionArray = InternalVarCheckAllocateZeroPool (IfrEfiVarStore->Size * 8 * sizeof (VAR_CHECK_HII_QUESTION_HEADER *));
 
     InsertTailList (&mVarCheckHiiList, &HiiVariableNode->Link);
   } else {
@@ -1239,6 +1322,7 @@ VarCheckParseHiiPackage (
   EFI_HII_PACKAGE_HEADER        *HiiPackageHeader;
   EFI_IFR_OP_HEADER             *IfrOpCodeHeader;
   VAR_CHECK_HII_VARIABLE_NODE   *HiiVariableNode;
+  BOOLEAN                       QuestionStoredInBitField;
 
   //
   // Parse and create Hii Variable node list for this Hii Package.
@@ -1247,12 +1331,24 @@ VarCheckParseHiiPackage (
 
   HiiPackageHeader = (EFI_HII_PACKAGE_HEADER *) HiiPackage;
 
+  QuestionStoredInBitField = FALSE;
+
   switch (HiiPackageHeader->Type) {
     case EFI_HII_PACKAGE_FORMS:
       IfrOpCodeHeader = (EFI_IFR_OP_HEADER *) (HiiPackageHeader + 1);
 
       while ((UINTN) IfrOpCodeHeader < (UINTN) HiiPackageHeader + HiiPackageHeader->Length) {
         switch (IfrOpCodeHeader->OpCode) {
+          case EFI_IFR_GUID_OP:
+            if (CompareGuid ((EFI_GUID *)((UINTN)IfrOpCodeHeader + sizeof (EFI_IFR_OP_HEADER)), &gEdkiiIfrBitVarstoreGuid)) {
+              QuestionStoredInBitField = TRUE;
+            }
+            break;
+
+          case EFI_IFR_END_OP:
+            QuestionStoredInBitField = FALSE;
+            break;
+
           case EFI_IFR_ONE_OF_OP:
           case EFI_IFR_CHECKBOX_OP:
           case EFI_IFR_NUMERIC_OP:
@@ -1270,7 +1366,7 @@ VarCheckParseHiiPackage (
               //
               // Normal IFR
               //
-              ParseHiiQuestion (HiiVariableNode, IfrOpCodeHeader, FromFv);
+              ParseHiiQuestion (HiiVariableNode, IfrOpCodeHeader, FromFv, QuestionStoredInBitField);
             }
           default:
             break;
@@ -1341,7 +1437,7 @@ DestroyHiiVariableNode (
     //
     // Free the allocated buffer.
     //
-    for (Index = 0; Index < HiiVariableNode->HiiVariable->Size; Index++) {
+    for (Index = 0; Index < HiiVariableNode->HiiVariable->Size * (UINTN) 8; Index++) {
       if (HiiVariableNode->HiiQuestionArray[Index] != NULL) {
         InternalVarCheckFreePool (HiiVariableNode->HiiQuestionArray[Index]);
       }
@@ -1389,7 +1485,7 @@ BuildVarCheckHiiBin (
     HiiVariableNode = VAR_CHECK_HII_VARIABLE_FROM_LINK (HiiVariableLink);
     HiiVariableLength = HiiVariableNode->HiiVariable->HeaderLength;
 
-    for (Index = 0; Index < HiiVariableNode->HiiVariable->Size; Index++) {
+    for (Index = 0; Index < HiiVariableNode->HiiVariable->Size * (UINTN) 8; Index++) {
       if (HiiVariableNode->HiiQuestionArray[Index] != NULL) {
         //
         // For Hii Question header align.
@@ -1403,7 +1499,7 @@ BuildVarCheckHiiBin (
     BinSize += HiiVariableLength;
   }
 
-  DEBUG ((EFI_D_INFO, "VarCheckHiiBin - size = 0x%x\n", BinSize));
+  DEBUG ((DEBUG_INFO, "VarCheckHiiBin - size = 0x%x\n", BinSize));
   if (BinSize == 0) {
     *Size = BinSize;
     return NULL;
@@ -1416,7 +1512,11 @@ BuildVarCheckHiiBin (
   //
   Data = AllocateRuntimeZeroPool (BinSize);
   ASSERT (Data != NULL);
-  DEBUG ((EFI_D_INFO, "VarCheckHiiBin - built at 0x%x\n", Data));
+  //
+  // Make sure the allocated buffer for VarCheckHiiBin at required alignment.
+  //
+  ASSERT ((((UINTN) Data) & (HEADER_ALIGNMENT - 1)) == 0);
+  DEBUG ((DEBUG_INFO, "VarCheckHiiBin - built at 0x%x\n", Data));
 
   //
   // Gen Data
@@ -1434,7 +1534,7 @@ BuildVarCheckHiiBin (
     CopyMem (Ptr, HiiVariableNode->HiiVariable, HiiVariableNode->HiiVariable->HeaderLength);
     Ptr += HiiVariableNode->HiiVariable->HeaderLength;
 
-    for (Index = 0; Index < HiiVariableNode->HiiVariable->Size; Index++) {
+    for (Index = 0; Index < HiiVariableNode->HiiVariable->Size * (UINTN) 8; Index++) {
       if (HiiVariableNode->HiiQuestionArray[Index] != NULL) {
         //
         // For Hii Question header align.
@@ -1465,7 +1565,7 @@ VarCheckHiiGen (
 
   mVarCheckHiiBin = BuildVarCheckHiiBin (&mVarCheckHiiBinSize);
   if (mVarCheckHiiBin == NULL) {
-    DEBUG ((EFI_D_INFO, "[VarCheckHii] This driver could be removed from *.dsc and *.fdf\n"));
+    DEBUG ((DEBUG_INFO, "[VarCheckHii] This driver could be removed from *.dsc and *.fdf\n"));
     return;
   }
 

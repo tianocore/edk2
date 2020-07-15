@@ -1,12 +1,6 @@
 ;------------------------------------------------------------------------------ ;
-; Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
-; This program and the accompanying materials
-; are licensed and made available under the terms and conditions of the BSD License
-; which accompanies this distribution.  The full text of the license may be found at
-; http://opensource.org/licenses/bsd-license.php.
-;
-; THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-; WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+; Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;
 ; Module Name:
 ;
@@ -17,6 +11,8 @@
 ;   Exception handlers used in SM mode
 ;
 ;-------------------------------------------------------------------------------
+
+%include "StuffRsbNasm.inc"
 
 global  ASM_PFX(gcStmPsd)
 
@@ -87,7 +83,7 @@ ASM_PFX(OnException):
 
     mov  ebx, eax
     mov  eax, 4
-    DB  0x0f, 0x01, 0x0c1 ; VMCALL
+    vmcall
     jmp $
 
 global ASM_PFX(OnStmSetup)
@@ -130,7 +126,8 @@ ASM_PFX(OnStmSetup):
     wrmsr
 
 .71:
-  rsm
+    StuffRsb32
+    rsm
 
 global  ASM_PFX(OnStmTeardown)
 ASM_PFX(OnStmTeardown):
@@ -172,5 +169,5 @@ ASM_PFX(OnStmTeardown):
     wrmsr
 
 .72:
-  rsm
-
+    StuffRsb32
+    rsm

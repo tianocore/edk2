@@ -1,0 +1,81 @@
+##  @file
+# Provides Shell 'acpiview' command functions
+#
+# Copyright (c) 2016 - 2020, ARM Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010019
+  BASE_NAME                      = UefiShellAcpiViewCommandLib
+  FILE_GUID                      = FB5B305E-84F5-461F-940D-82D345757AFA
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = AcpiViewCommandLib|UEFI_APPLICATION UEFI_DRIVER
+  CONSTRUCTOR                    = UefiShellAcpiViewCommandLibConstructor
+  DESTRUCTOR                     = UefiShellAcpiViewCommandLibDestructor
+
+[Sources.common]
+  AcpiParser.c
+  AcpiParser.h
+  AcpiTableParser.c
+  AcpiTableParser.h
+  AcpiView.c
+  AcpiView.h
+  AcpiViewConfig.c
+  AcpiViewConfig.h
+  Parsers/Bgrt/BgrtParser.c
+  Parsers/Dbg2/Dbg2Parser.c
+  Parsers/Dsdt/DsdtParser.c
+  Parsers/Facs/FacsParser.c
+  Parsers/Fadt/FadtParser.c
+  Parsers/Gtdt/GtdtParser.c
+  Parsers/Iort/IortParser.c
+  Parsers/Madt/MadtParser.c
+  Parsers/Madt/MadtParser.h
+  Parsers/Mcfg/McfgParser.c
+  Parsers/Pptt/PpttParser.c
+  Parsers/Pptt/PpttParser.h
+  Parsers/Rsdp/RsdpParser.c
+  Parsers/Slit/SlitParser.c
+  Parsers/Spcr/SpcrParser.c
+  Parsers/Srat/SratParser.c
+  Parsers/Ssdt/SsdtParser.c
+  Parsers/Xsdt/XsdtParser.c
+  UefiShellAcpiViewCommandLib.c
+  UefiShellAcpiViewCommandLib.uni
+
+[Sources.ARM, Sources.AARCH64]
+  Arm/SbbrValidator.h
+  Arm/SbbrValidator.c
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  ShellPkg/ShellPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  FileHandleLib
+  HiiLib
+  MemoryAllocationLib
+  PcdLib
+  PrintLib
+  ShellCommandLib
+  ShellLib
+  UefiBootServicesTableLib
+  UefiLib
+  UefiRuntimeServicesTableLib
+
+
+[FixedPcd]
+  gEfiShellPkgTokenSpaceGuid.PcdShellProfileMask ## CONSUMES
+
+[Guids]
+  gShellAcpiViewHiiGuid           ## CONSUMES ## HII
+  gEfiAcpiTableGuid               ## SOMETIMES_CONSUMES ## SystemTable

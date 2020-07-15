@@ -1,14 +1,8 @@
 /** @file
   AES Wrapper Implementation over OpenSSL.
 
-Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -81,120 +75,6 @@ AesInit (
   if (AES_set_decrypt_key (Key, (UINT32) KeyLength, AesKey + 1) != 0) {
     return FALSE;
   }
-  return TRUE;
-}
-
-/**
-  Performs AES encryption on a data buffer of the specified size in ECB mode.
-
-  This function performs AES encryption on data buffer pointed by Input, of specified
-  size of InputSize, in ECB mode.
-  InputSize must be multiple of block size (16 bytes). This function does not perform
-  padding. Caller must perform padding, if necessary, to ensure valid input data size.
-  AesContext should be already correctly initialized by AesInit(). Behavior with
-  invalid AES context is undefined.
-
-  If AesContext is NULL, then return FALSE.
-  If Input is NULL, then return FALSE.
-  If InputSize is not multiple of block size (16 bytes), then return FALSE.
-  If Output is NULL, then return FALSE.
-
-  @param[in]   AesContext  Pointer to the AES context.
-  @param[in]   Input       Pointer to the buffer containing the data to be encrypted.
-  @param[in]   InputSize   Size of the Input buffer in bytes.
-  @param[out]  Output      Pointer to a buffer that receives the AES encryption output.
-
-  @retval TRUE   AES encryption succeeded.
-  @retval FALSE  AES encryption failed.
-
-**/
-BOOLEAN
-EFIAPI
-AesEcbEncrypt (
-  IN   VOID         *AesContext,
-  IN   CONST UINT8  *Input,
-  IN   UINTN        InputSize,
-  OUT  UINT8        *Output
-  )
-{
-  AES_KEY  *AesKey;
-
-  //
-  // Check input parameters.
-  //
-  if (AesContext == NULL || Input == NULL || (InputSize % AES_BLOCK_SIZE) != 0 || Output == NULL) {
-    return FALSE;
-  }
-  
-  AesKey = (AES_KEY *) AesContext;
-
-  //
-  // Perform AES data encryption with ECB mode (block-by-block)
-  //
-  while (InputSize > 0) {
-    AES_ecb_encrypt (Input, Output, AesKey, AES_ENCRYPT);
-    Input     += AES_BLOCK_SIZE;
-    Output    += AES_BLOCK_SIZE;
-    InputSize -= AES_BLOCK_SIZE;
-  }
-
-  return TRUE;
-}
-
-/**
-  Performs AES decryption on a data buffer of the specified size in ECB mode.
-
-  This function performs AES decryption on data buffer pointed by Input, of specified
-  size of InputSize, in ECB mode.
-  InputSize must be multiple of block size (16 bytes). This function does not perform
-  padding. Caller must perform padding, if necessary, to ensure valid input data size.
-  AesContext should be already correctly initialized by AesInit(). Behavior with
-  invalid AES context is undefined.
-
-  If AesContext is NULL, then return FALSE.
-  If Input is NULL, then return FALSE.
-  If InputSize is not multiple of block size (16 bytes), then return FALSE.
-  If Output is NULL, then return FALSE.
-
-  @param[in]   AesContext  Pointer to the AES context.
-  @param[in]   Input       Pointer to the buffer containing the data to be decrypted.
-  @param[in]   InputSize   Size of the Input buffer in bytes.
-  @param[out]  Output      Pointer to a buffer that receives the AES decryption output.
-
-  @retval TRUE   AES decryption succeeded.
-  @retval FALSE  AES decryption failed.
-
-**/
-BOOLEAN
-EFIAPI
-AesEcbDecrypt (
-  IN   VOID         *AesContext,
-  IN   CONST UINT8  *Input,
-  IN   UINTN        InputSize,
-  OUT  UINT8        *Output
-  )
-{
-  AES_KEY  *AesKey;
-
-  //
-  // Check input parameters.
-  //
-  if (AesContext == NULL || Input == NULL || (InputSize % AES_BLOCK_SIZE) != 0 || Output == NULL) {
-    return FALSE;
-  }
-
-  AesKey = (AES_KEY *) AesContext;
-
-  //
-  // Perform AES data decryption with ECB mode (block-by-block)
-  //
-  while (InputSize > 0) {
-    AES_ecb_encrypt (Input, Output, AesKey + 1, AES_DECRYPT);
-    Input     += AES_BLOCK_SIZE;
-    Output    += AES_BLOCK_SIZE;
-    InputSize -= AES_BLOCK_SIZE;
-  }
-
   return TRUE;
 }
 

@@ -1,0 +1,72 @@
+///** @file
+//  VLAN configuration formset.
+//
+//  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+//  SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+//**/
+
+#include "VlanConfigNvData.h"
+
+formset
+  guid      = VLAN_CONFIG_FORM_SET_GUID,
+  title     = STRING_TOKEN(STR_VLAN_FORM_SET_TITLE),
+  help      = STRING_TOKEN(STR_VLAN_FORM_SET_TITLE_HELP),
+  classguid = EFI_HII_PLATFORM_SETUP_FORMSET_GUID,
+
+  varstore VLAN_CONFIGURATION,
+    varid = VLAN_CONFIGURATION_VARSTORE_ID,
+    name  = VlanNvData,
+    guid  = VLAN_CONFIG_FORM_SET_GUID;
+
+  form formid = VLAN_HEAD_FORM_ID,
+    title  = STRING_TOKEN(STR_VLAN_FORM_TITLE);
+
+    goto VLAN_CONFIGURATION_FORM_ID,
+    prompt = STRING_TOKEN (STR_GET_CURRENT_SETTING),
+    help   = STRING_TOKEN (STR_GET_CURRENT_SETTING_HELP),
+    flags  = INTERACTIVE,
+    key    = VLAN_UPDATE_QUESTION_ID;
+
+  endform;
+
+  form formid = VLAN_CONFIGURATION_FORM_ID,
+    title = STRING_TOKEN(STR_VLAN_FORM_TITLE);
+
+    subtitle text = STRING_TOKEN(STR_VLAN_CREATE_VLAN);
+
+    numeric varid   = VlanNvData.VlanId,
+            prompt  = STRING_TOKEN(STR_VLAN_VID_PROMPT),
+            help    = STRING_TOKEN(STR_VLAN_VID_HELP),
+            minimum = 0,
+            maximum = 4094,
+    endnumeric;
+
+    numeric varid   = VlanNvData.Priority,
+            prompt  = STRING_TOKEN(STR_VLAN_PRIORITY_PROMPT),
+            help    = STRING_TOKEN(STR_VLAN_PRIORITY_HELP),
+            minimum = 0,
+            maximum = 7,
+    endnumeric;
+
+    text
+      help   = STRING_TOKEN(STR_VLAN_ADD_VLAN_HELP),
+      text   = STRING_TOKEN(STR_VLAN_ADD_VLAN_PROMPT),
+      flags  = INTERACTIVE,
+      key    = VLAN_ADD_QUESTION_ID;
+
+    subtitle text = STRING_TOKEN(STR_VLAN_NULL_STRING);
+    subtitle text = STRING_TOKEN(STR_VLAN_VLAN_LIST);
+
+    label LABEL_VLAN_LIST;
+    label LABEL_END;
+
+    text
+      help   = STRING_TOKEN(STR_VLAN_REMOVE_VLAN_HELP),
+      text   = STRING_TOKEN(STR_VLAN_REMOVE_VLAN_PROMPT),
+      flags  = INTERACTIVE,
+      key    = VLAN_REMOVE_QUESTION_ID;
+
+  endform;
+
+endformset;

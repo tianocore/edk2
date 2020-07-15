@@ -1,0 +1,81 @@
+## @file
+#  WiFi Connection Manager.
+#
+#  This module is an example of how to make use of UEFI WiFi connection capabilities.
+#  User can scan, connect and diconnect to networks through UI operations.
+#
+#  Supported networks include:
+#  1). Open Network
+#  2). WPA2 Personal Network
+#  3). EAP Networks (EAP-TLS, EAP-TTLS/MSCHAPv2 and PEAPv0/MSCHAPv2)
+#
+#  Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION               = 0x00010005
+  BASE_NAME                 = WifiConnectionManagerDxe
+  FILE_GUID                 = c6df98f2-5ec0-4a94-8c11-9a9828ef03f2
+  MODULE_TYPE               = DXE_DRIVER
+  VERSION_STRING            = 0.1
+  ENTRY_POINT               = WifiMgrDxeDriverEntryPoint
+
+[Sources]
+  WifiConnectionMgrDxe.h
+  WifiConnectionMgrDriverBinding.h
+  WifiConnectionMgrConfig.h
+  WifiConnectionMgrMisc.h
+  WifiConnectionMgrImpl.h
+  WifiConnectionMgrConfigNVDataStruct.h
+  WifiConnectionMgrHiiConfigAccess.h
+  WifiConnectionMgrComponentName.h
+  WifiConnectionMgrFileUtil.h
+  WifiConnectionMgrDriver.c
+  WifiConnectionMgrComponentName.c
+  WifiConnectionMgrMisc.c
+  WifiConnectionMgrHiiConfigAccess.c
+  WifiConnectionMgrImpl.c
+  WifiConnectionMgrFileUtil.c
+  WifiConnectionManagerDxeStrings.uni
+  WifiConnectionManagerDxe.vfr
+  EapContext.h
+  WifiConnectionMgrConfigHii.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  NetworkPkg/NetworkPkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  BaseLib
+  UefiLib
+  DevicePathLib
+  DebugLib
+  HiiLib
+  PrintLib
+  UefiHiiServicesLib
+  NetLib
+  FileExplorerLib
+
+[Protocols]
+  gEfiHiiConfigAccessProtocolGuid               ## PRODUCES
+  gEfiWiFi2ProtocolGuid                         ## TO_START
+  gEfiAdapterInformationProtocolGuid            ## SOMETIMES_CONSUMES
+  gEfiSupplicantProtocolGuid                    ## SOMETIMES_CONSUMES
+  gEfiEapConfigurationProtocolGuid              ## SOMETIMES_CONSUMES
+
+[Guids]
+  gWifiConfigGuid                               ## PRODUCES  ## GUID
+  gEfiIfrTianoGuid                              ## CONSUMES  ## GUID (Extended IFR Guid Opcode)
+  gEfiAdapterInfoMediaStateGuid                 ## SOMETIMES_CONSUMES  ## GUID  # Indicate the current media state status
+
+[Depex]
+  gEfiHiiConfigRoutingProtocolGuid

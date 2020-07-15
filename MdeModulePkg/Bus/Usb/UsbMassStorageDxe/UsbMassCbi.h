@@ -1,15 +1,9 @@
 /** @file
-  Defination for the USB mass storage Control/Bulk/Interrupt (CBI) transport,
+  Definition for the USB mass storage Control/Bulk/Interrupt (CBI) transport,
   according to USB Mass Storage Class Control/Bulk/Interrupt (CBI) Transport, Revision 1.1.
 
-Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -27,7 +21,7 @@ extern USB_MASS_TRANSPORT mUsbCbi1Transport;
 #define USB_CBI_MAX_RETRY             3
 //
 // Time to wait for USB CBI reset to complete, set by experience
-//  
+//
 #define USB_CBI_RESET_DEVICE_STALL    (50 * USB_MASS_1_MILLISECOND)
 //
 // USB CBI transport timeout, set by experience

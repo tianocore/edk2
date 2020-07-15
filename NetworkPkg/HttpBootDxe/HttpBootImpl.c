@@ -1,24 +1,96 @@
 /** @file
   The implementation of EFI_LOAD_FILE_PROTOCOL for UEFI HTTP boot.
 
-Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
-The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                          
-    
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include "HttpBootDxe.h"
 
 /**
+  Install HTTP Boot Callback Protocol if not installed before.
+
+  @param[in] Private           Pointer to HTTP Boot private data.
+
+  @retval EFI_SUCCESS          HTTP Boot Callback Protocol installed successfully.
+  @retval Others               Failed to install HTTP Boot Callback Protocol.
+
+**/
+EFI_STATUS
+HttpBootInstallCallback (
+  IN HTTP_BOOT_PRIVATE_DATA           *Private
+  )
+{
+  EFI_STATUS                  Status;
+  EFI_HANDLE                  ControllerHandle;
+
+  if (!Private->UsingIpv6) {
+    ControllerHandle = Private->Ip4Nic->Controller;
+  } else {
+    ControllerHandle = Private->Ip6Nic->Controller;
+  }
+
+  //
+  // Check whether gEfiHttpBootCallbackProtocolGuid already installed.
+  //
+  Status = gBS->HandleProtocol (
+                  ControllerHandle,
+                  &gEfiHttpBootCallbackProtocolGuid,
+                  (VOID **) &Private->HttpBootCallback
+                  );
+  if (Status == EFI_UNSUPPORTED) {
+
+    CopyMem (
+      &Private->LoadFileCallback,
+      &gHttpBootDxeHttpBootCallback,
+      sizeof (EFI_HTTP_BOOT_CALLBACK_PROTOCOL)
+      );
+
+    //
+    // Install a default callback if user didn't offer one.
+    //
+    Status = gBS->InstallProtocolInterface (
+                    &ControllerHandle,
+                    &gEfiHttpBootCallbackProtocolGuid,
+                    EFI_NATIVE_INTERFACE,
+                    &Private->LoadFileCallback
+                    );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+    Private->HttpBootCallback = &Private->LoadFileCallback;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Uninstall HTTP Boot Callback Protocol if it's installed by this driver.
+
+  @param[in] Private           Pointer to HTTP Boot private data.
+
+**/
+VOID
+HttpBootUninstallCallback (
+  IN HTTP_BOOT_PRIVATE_DATA           *Private
+  )
+{
+  if (Private->HttpBootCallback == &Private->LoadFileCallback) {
+    gBS->UninstallProtocolInterface (
+          Private->Controller,
+          &gEfiHttpBootCallbackProtocolGuid,
+          &Private->HttpBootCallback
+          );
+    Private->HttpBootCallback = NULL;
+  }
+}
+
+/**
   Enable the use of UEFI HTTP boot function.
 
-  If the driver has already been started but not satisfy the requirement (IP stack and 
+  If the driver has already been started but not satisfy the requirement (IP stack and
   specified boot file path), this function will stop the driver and start it again.
 
   @param[in]    Private            The pointer to the driver's private data.
@@ -32,7 +104,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @retval EFI_INVALID_PARAMETER    The FilePath doesn't contain a valid URI device path node.
   @retval EFI_ALREADY_STARTED      The driver is already in started state.
   @retval EFI_OUT_OF_RESOURCES     There are not enough resources.
-  
+
 **/
 EFI_STATUS
 HttpBootStart (
@@ -44,21 +116,22 @@ HttpBootStart (
   UINTN                Index;
   EFI_STATUS           Status;
   CHAR8                *Uri;
-  
+
+  Uri = NULL;
 
   if (Private == NULL || FilePath == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   //
   // Check the URI in the input FilePath, in order to see whether it is
-  // required to boot from a new specified boot file. 
+  // required to boot from a new specified boot file.
   //
   Status = HttpBootParseFilePath (FilePath, &Uri);
   if (EFI_ERROR (Status)) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   //
   // Check whether we need to stop and restart the HTTP boot driver.
   //
@@ -69,13 +142,16 @@ HttpBootStart (
     // 2. The specified boot file URI in FilePath is different with the one we have
     // recorded before.
     //
-    if ((UsingIpv6 != Private->UsingIpv6) || 
+    if ((UsingIpv6 != Private->UsingIpv6) ||
         ((Uri != NULL) && (AsciiStrCmp (Private->BootFileUri, Uri) != 0))) {
       //
       // Restart is required, first stop then continue this start function.
       //
       Status = HttpBootStop (Private);
       if (EFI_ERROR (Status)) {
+        if (Uri != NULL) {
+          FreePool (Uri);
+        }
         return Status;
       }
     } else {
@@ -119,7 +195,7 @@ HttpBootStart (
       return Status;
     }
   }
-  
+
   //
   // Init the content of cached DHCP offer list.
   //
@@ -144,6 +220,7 @@ HttpBootStart (
     }
   }
   Private->Started   = TRUE;
+  Print (L"\n>>Start HTTP Boot over IPv%d", Private->UsingIpv6 ? 6 : 4);
 
   return EFI_SUCCESS;
 }
@@ -158,7 +235,7 @@ HttpBootStart (
   @retval EFI_NOT_STARTED          The driver is in stopped state.
   @retval EFI_DEVICE_ERROR         An unexpected network error occurred.
   @retval Others                   Other errors as indicated.
-  
+
 **/
 EFI_STATUS
 HttpBootDhcp (
@@ -170,7 +247,7 @@ HttpBootDhcp (
   if (Private == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   if (!Private->Started) {
     return EFI_NOT_STARTED;
   }
@@ -209,11 +286,11 @@ HttpBootDhcp (
   @retval EFI_INVALID_PARAMETER       Private is NULL, or ImageType is NULL, or BufferSize is NULL.
   @retval EFI_INVALID_PARAMETER       *BufferSize is not zero, and Buffer is NULL.
   @retval EFI_NOT_STARTED             The driver is in stopped state.
-  @retval EFI_BUFFER_TOO_SMALL        The BufferSize is too small to read the boot file. BufferSize has 
+  @retval EFI_BUFFER_TOO_SMALL        The BufferSize is too small to read the boot file. BufferSize has
                                       been updated with the size needed to complete the request.
   @retval EFI_DEVICE_ERROR            An unexpected network error occurred.
   @retval Others                      Other errors as indicated.
-  
+
 **/
 EFI_STATUS
 HttpBootLoadFile (
@@ -232,12 +309,15 @@ HttpBootLoadFile (
   if (*BufferSize != 0 && Buffer == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   if (!Private->Started) {
     return EFI_NOT_STARTED;
   }
 
-  Status = EFI_DEVICE_ERROR;
+  Status = HttpBootInstallCallback (Private);
+  if (EFI_ERROR(Status)) {
+    goto ON_EXIT;
+  }
 
   if (Private->BootFileUri == NULL) {
     //
@@ -245,7 +325,8 @@ HttpBootLoadFile (
     //
     Status = HttpBootDiscoverBootInfo (Private);
     if (EFI_ERROR (Status)) {
-      return Status;
+      AsciiPrint ("\n  Error: Could not retrieve NBP file size from HTTP server.\n");
+      goto ON_EXIT;
     }
   }
 
@@ -255,7 +336,7 @@ HttpBootLoadFile (
     //
     Status = HttpBootCreateHttpIo (Private);
     if (EFI_ERROR (Status)) {
-      return Status;
+      goto ON_EXIT;
     }
   }
 
@@ -287,7 +368,8 @@ HttpBootLoadFile (
                  &Private->ImageType
                  );
       if (EFI_ERROR (Status) && Status != EFI_BUFFER_TOO_SMALL) {
-        return Status;
+        AsciiPrint ("\n  Error: Could not retrieve NBP file size from HTTP server.\n");
+        goto ON_EXIT;
       }
     }
   }
@@ -295,19 +377,43 @@ HttpBootLoadFile (
   if (*BufferSize < Private->BootFileSize) {
     *BufferSize = Private->BootFileSize;
     *ImageType = Private->ImageType;
-    return EFI_BUFFER_TOO_SMALL;
+    Status = EFI_BUFFER_TOO_SMALL;
+    goto ON_EXIT;
   }
 
   //
   // Load the boot file into Buffer
   //
-  return  HttpBootGetBootFile (
-            Private,
-            FALSE,
-            BufferSize,
-            Buffer,
-            ImageType
-            );
+  Status = HttpBootGetBootFile (
+             Private,
+             FALSE,
+             BufferSize,
+             Buffer,
+             ImageType
+             );
+
+ON_EXIT:
+  HttpBootUninstallCallback (Private);
+
+  if (EFI_ERROR (Status)) {
+    if (Status == EFI_ACCESS_DENIED) {
+      AsciiPrint ("\n  Error: Could not establish connection with HTTP server.\n");
+    } else if (Status == EFI_BUFFER_TOO_SMALL && Buffer != NULL) {
+      AsciiPrint ("\n  Error: Buffer size is smaller than the requested file.\n");
+    } else if (Status == EFI_OUT_OF_RESOURCES) {
+      AsciiPrint ("\n  Error: Could not allocate I/O buffers.\n");
+    } else if (Status == EFI_DEVICE_ERROR) {
+      AsciiPrint ("\n  Error: Network device error.\n");
+    } else if (Status == EFI_TIMEOUT) {
+      AsciiPrint ("\n  Error: Server response timeout.\n");
+    } else if (Status == EFI_ABORTED) {
+      AsciiPrint ("\n  Error: Remote boot cancelled.\n");
+    } else if (Status != EFI_BUFFER_TOO_SMALL) {
+      AsciiPrint ("\n  Error: Unexpected network error.\n");
+    }
+  }
+
+  return Status;
 }
 
 /**
@@ -319,7 +425,7 @@ HttpBootLoadFile (
   @retval EFI_NOT_STARTED          The driver is already in stopped state.
   @retval EFI_INVALID_PARAMETER    Private is NULL.
   @retval Others                   Unexpected error when stop the function.
-  
+
 **/
 EFI_STATUS
 HttpBootStop (
@@ -331,16 +437,16 @@ HttpBootStop (
   if (Private == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   if (!Private->Started) {
     return EFI_NOT_STARTED;
   }
-  
+
   if (Private->HttpCreated) {
     HttpIoDestroyIo (&Private->HttpIo);
     Private->HttpCreated = FALSE;
   }
-  
+
   Private->Started = FALSE;
   ZeroMem (&Private->StationIp, sizeof (EFI_IP_ADDRESS));
   ZeroMem (&Private->SubnetMask, sizeof (EFI_IP_ADDRESS));
@@ -350,7 +456,7 @@ HttpBootStop (
   Private->BootFileUriParser = NULL;
   Private->BootFileSize = 0;
   Private->SelectIndex = 0;
-  Private->SelectProxyType = HttpOfferTypeMax; 
+  Private->SelectProxyType = HttpOfferTypeMax;
 
   if (!Private->UsingIpv6) {
     //
@@ -370,12 +476,17 @@ HttpBootStop (
     //
     Private->Dhcp6->Stop (Private->Dhcp6);
     Private->Dhcp6->Configure (Private->Dhcp6, NULL);
-    
+
     for (Index = 0; Index < HTTP_BOOT_OFFER_MAX_NUM; Index++) {
       if (Private->OfferBuffer[Index].Dhcp6.UriParser) {
         HttpUrlFreeParser (Private->OfferBuffer[Index].Dhcp6.UriParser);
       }
     }
+  }
+
+  if (Private->DnsServerIp != NULL) {
+    FreePool (Private->DnsServerIp);
+    Private->DnsServerIp = NULL;
   }
 
   if (Private->FilePathUri!= NULL) {
@@ -384,14 +495,14 @@ HttpBootStop (
     Private->FilePathUri = NULL;
     Private->FilePathUriParser = NULL;
   }
-  
+
   ZeroMem (Private->OfferBuffer, sizeof (Private->OfferBuffer));
   Private->OfferNum = 0;
   ZeroMem (Private->OfferCount, sizeof (Private->OfferCount));
   ZeroMem (Private->OfferIndex, sizeof (Private->OfferIndex));
-  
+
   HttpBootFreeCacheList (Private);
-  
+
   return EFI_SUCCESS;
 }
 
@@ -438,7 +549,7 @@ HttpBootDxeLoadFile (
 {
   HTTP_BOOT_PRIVATE_DATA        *Private;
   HTTP_BOOT_VIRTUAL_NIC         *VirtualNic;
-  BOOLEAN                       MediaPresent;
+  EFI_STATUS                    MediaStatus;
   BOOLEAN                       UsingIpv6;
   EFI_STATUS                    Status;
   HTTP_BOOT_IMAGE_TYPE          ImageType;
@@ -456,16 +567,17 @@ HttpBootDxeLoadFile (
 
   VirtualNic = HTTP_BOOT_VIRTUAL_NIC_FROM_LOADFILE (This);
   Private = VirtualNic->Private;
-  
+
   //
   // Check media status before HTTP boot start
   //
-  MediaPresent = TRUE;
-  NetLibDetectMedia (Private->Controller, &MediaPresent);
-  if (!MediaPresent) {
+  MediaStatus = EFI_SUCCESS;
+  NetLibDetectMediaWaitTimeout (Private->Controller, HTTP_BOOT_CHECK_MEDIA_WAITING_TIME, &MediaStatus);
+  if (MediaStatus != EFI_SUCCESS) {
+    AsciiPrint ("\n  Error: Could not detect network connection.\n");
     return EFI_NO_MEDIA;
   }
-  
+
   //
   // Check whether the virtual nic is using IPv6 or not.
   //
@@ -481,7 +593,7 @@ HttpBootDxeLoadFile (
   if (Status != EFI_SUCCESS && Status != EFI_ALREADY_STARTED) {
     return Status;
   }
-  
+
   //
   // Load the boot file.
   //
@@ -503,6 +615,8 @@ HttpBootDxeLoadFile (
     Status = HttpBootRegisterRamDisk (Private, *BufferSize, Buffer, ImageType);
     if (!EFI_ERROR (Status)) {
       Status = EFI_WARN_FILE_SYSTEM;
+    } else {
+      AsciiPrint ("\n  Error: Could not register RAM disk to the system.\n");
     }
   }
 
@@ -516,7 +630,138 @@ HttpBootDxeLoadFile (
 ///
 /// Load File Protocol instance
 ///
-GLOBAL_REMOVE_IF_UNREFERENCED 
+GLOBAL_REMOVE_IF_UNREFERENCED
 EFI_LOAD_FILE_PROTOCOL  gHttpBootDxeLoadFile = {
   HttpBootDxeLoadFile
+};
+
+/**
+  Callback function that is invoked when the HTTP Boot driver is about to transmit or has received a
+  packet.
+
+  This function is invoked when the HTTP Boot driver is about to transmit or has received packet.
+  Parameters DataType and Received specify the type of event and the format of the buffer pointed
+  to by Data. Due to the polling nature of UEFI device drivers, this callback function should not
+  execute for more than 5 ms.
+  The returned status code determines the behavior of the HTTP Boot driver.
+
+  @param[in]  This                Pointer to the EFI_HTTP_BOOT_CALLBACK_PROTOCOL instance.
+  @param[in]  DataType            The event that occurs in the current state.
+  @param[in]  Received            TRUE if the callback is being invoked due to a receive event.
+                                  FALSE if the callback is being invoked due to a transmit event.
+  @param[in]  DataLength          The length in bytes of the buffer pointed to by Data.
+  @param[in]  Data                A pointer to the buffer of data, the data type is specified by
+                                  DataType.
+
+  @retval EFI_SUCCESS             Tells the HTTP Boot driver to continue the HTTP Boot process.
+  @retval EFI_ABORTED             Tells the HTTP Boot driver to abort the current HTTP Boot process.
+**/
+EFI_STATUS
+EFIAPI
+HttpBootCallback (
+  IN EFI_HTTP_BOOT_CALLBACK_PROTOCOL     *This,
+  IN EFI_HTTP_BOOT_CALLBACK_DATA_TYPE    DataType,
+  IN BOOLEAN                             Received,
+  IN UINT32                              DataLength,
+  IN VOID                                *Data     OPTIONAL
+  )
+{
+  EFI_HTTP_MESSAGE        *HttpMessage;
+  EFI_HTTP_HEADER         *HttpHeader;
+  HTTP_BOOT_PRIVATE_DATA  *Private;
+  UINT32                  Percentage;
+
+  Private = HTTP_BOOT_PRIVATE_DATA_FROM_CALLBACK_PROTOCOL(This);
+
+  switch (DataType) {
+  case HttpBootDhcp4:
+  case HttpBootDhcp6:
+    Print (L".");
+    break;
+
+  case HttpBootHttpRequest:
+    if (Data != NULL) {
+      HttpMessage = (EFI_HTTP_MESSAGE *) Data;
+      if (HttpMessage->Data.Request->Method == HttpMethodGet &&
+          HttpMessage->Data.Request->Url != NULL) {
+        Print (L"\n  URI: %s\n", HttpMessage->Data.Request->Url);
+      }
+    }
+    break;
+
+  case HttpBootHttpResponse:
+    if (Data != NULL) {
+      HttpMessage = (EFI_HTTP_MESSAGE *) Data;
+
+      if (HttpMessage->Data.Response != NULL) {
+        if (HttpBootIsHttpRedirectStatusCode (HttpMessage->Data.Response->StatusCode)) {
+          //
+          // Server indicates the resource has been redirected to a different URL
+          // according to the section 6.4 of RFC7231 and the RFC 7538.
+          // Display the redirect information on the screen.
+          //
+          HttpHeader = HttpFindHeader (
+                 HttpMessage->HeaderCount,
+                 HttpMessage->Headers,
+                 HTTP_HEADER_LOCATION
+                 );
+          if (HttpHeader != NULL) {
+            Print (L"\n  HTTP ERROR: Resource Redirected.\n  New Location: %a\n", HttpHeader->FieldValue);
+          }
+          break;
+        }
+      }
+
+      HttpHeader = HttpFindHeader (
+                     HttpMessage->HeaderCount,
+                     HttpMessage->Headers,
+                     HTTP_HEADER_CONTENT_LENGTH
+                     );
+      if (HttpHeader != NULL) {
+        Private->FileSize = AsciiStrDecimalToUintn (HttpHeader->FieldValue);
+        Private->ReceivedSize = 0;
+        Private->Percentage   = 0;
+      }
+    }
+    break;
+
+  case HttpBootHttpEntityBody:
+    if (DataLength != 0) {
+      if (Private->FileSize != 0) {
+        //
+        // We already know the file size, print in percentage format.
+        //
+        if (Private->ReceivedSize == 0) {
+          Print (L"  File Size: %lu Bytes\n", Private->FileSize);
+        }
+        Private->ReceivedSize += DataLength;
+        Percentage = (UINT32) DivU64x64Remainder (MultU64x32 (Private->ReceivedSize, 100), Private->FileSize, NULL);
+        if (Private->Percentage != Percentage) {
+          Private->Percentage = Percentage;
+          Print (L"\r  Downloading...%d%%", Percentage);
+        }
+      } else {
+        //
+        // In some case we couldn't get the file size from the HTTP header, so we
+        // just print the downloaded file size.
+        //
+        Private->ReceivedSize += DataLength;
+        Print (L"\r  Downloading...%lu Bytes", Private->ReceivedSize);
+      }
+    }
+    break;
+
+  default:
+    break;
+  };
+
+  return EFI_SUCCESS;
+}
+
+///
+/// HTTP Boot Callback Protocol instance
+///
+GLOBAL_REMOVE_IF_UNREFERENCED
+EFI_HTTP_BOOT_CALLBACK_PROTOCOL  gHttpBootDxeHttpBootCallback = {
+  HttpBootCallback
 };

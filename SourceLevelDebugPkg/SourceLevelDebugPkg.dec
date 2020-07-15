@@ -6,14 +6,8 @@
 # and host, PeCoffExtraActionLib instance to report symbol path information,
 # etc.
 #
-# Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
-# This program and the accompanying materials are licensed and made available under 
-# the terms and conditions of the BSD License that accompanies this distribution.  
-# The full text of the license may be found at
-# http://opensource.org/licenses/bsd-license.php.                                                                          
-# 
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.  
+# Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
 
@@ -72,7 +66,7 @@
   # @Expression  0x80000001 | (gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdUsbEhciPciAddress & 0xF0000FFF) == 0
   gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdUsbEhciPciAddress|0x000EF000|UINT32|0x00000003
 
-  ## The mask of exception numbers whose handlers would be ignored and cannot be replaced or 
+  ## The mask of exception numbers whose handlers would be ignored and cannot be replaced or
   #  hooked by Debug Agent Library. Masking INT1/INT3 is invalid.
   # @Prompt Configure exception numbers not to be hooked by Debug Agent.
   # @Expression  0x80000001 | (gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdExceptionsIgnoredByDebugger & 0xA) == 0
@@ -92,9 +86,9 @@
 
   ## The memory BAR of xhci host controller, in which usb debug feature is enabled.
   ## Note that the memory BAR address is only used before Pci bus resource allocation.
-  # @Prompt Configure ehci host controller memory BAR.
+  # @Prompt Configure xhci host controller memory BAR.
   gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdUsbXhciMemorySpaceBase|0xD0000000|UINT64|0x00000007
-  
+
   ## The pci address of xhci host controller, in which usb debug feature is enabled.
   #  The format of pci address is :<BR>
   #      -----------------------------------------------------------------------<BR>
@@ -106,11 +100,18 @@
   # @Prompt Configure xhci host controller pci address.
   # @Expression  0x80000001 | (gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdUsbXhciPciAddress & 0xF0000FFF) == 0
   gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdUsbXhciPciAddress|0x000A0000|UINT32|0x00000008
-  
-  ## Per XHCI spec, software shall impose a timeout between the detection of the Debug Host 
+
+  ## Per XHCI spec, software shall impose a timeout between the detection of the Debug Host
   ## connection and the DbC Run transition to 1. This PCD specifies the timeout value in microsecond.
   # @Prompt Configure debug device detection timeout value.
   gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdUsbXhciDebugDetectTimeout|3000000|UINT64|0x00000009
+
+  ## Default revision of the debug agent transfer protocol.
+  #  The upper 16 bits indicate the major revision and the lower 16 bits indicate the minor revision.
+  #  For example, a value of 0x00000004 stands for revision 0.4.
+  #  Debug packet compression and decompression is supported since revision 0.4.
+  # @Prompt Default revision of the debug agent transfer protocol.
+  gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdTransferProtocolRevision|0x00000004|UINT32|0x0000000a
 
 [UserExtensions.TianoCore."ExtraFiles"]
   SourceLevelDebugPkgExtra.uni

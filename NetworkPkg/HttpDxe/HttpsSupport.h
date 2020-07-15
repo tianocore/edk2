@@ -1,14 +1,8 @@
 /** @file
   The header files of miscellaneous routines specific to Https for HttpDxe driver.
 
-Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -37,6 +31,7 @@ IsHttpsUrl (
   Creates a Tls child handle, open EFI_TLS_PROTOCOL and EFI_TLS_CONFIGURATION_PROTOCOL.
 
   @param[in]  ImageHandle           The firmware allocated handle for the UEFI image.
+  @param[out] TlsSb                 Pointer to the TLS SERVICE_BINDING_PROTOCOL.
   @param[out] TlsProto              Pointer to the EFI_TLS_PROTOCOL instance.
   @param[out] TlsConfiguration      Pointer to the EFI_TLS_CONFIGURATION_PROTOCOL instance.
 
@@ -47,6 +42,7 @@ EFI_HANDLE
 EFIAPI
 TlsCreateChild (
   IN  EFI_HANDLE                     ImageHandle,
+  OUT EFI_SERVICE_BINDING_PROTOCOL   **TlsSb,
   OUT EFI_TLS_PROTOCOL               **TlsProto,
   OUT EFI_TLS_CONFIGURATION_PROTOCOL **TlsConfiguration
   );
@@ -153,7 +149,7 @@ TlsCommonReceive (
   );
 
 /**
-  Receive one TLS PDU. An TLS PDU contains an TLS record header and it's
+  Receive one TLS PDU. An TLS PDU contains an TLS record header and its
   corresponding record data. These two parts will be put into two blocks of buffers in the
   net buffer.
 
@@ -216,10 +212,18 @@ TlsCloseSession (
 
   @param[in]           HttpInstance    Pointer to HTTP_PROTOCOL structure.
   @param[in]           Message         Pointer to the message buffer needed to processed.
+                                       If ProcessMode is EfiTlsEncrypt, the message contain the TLS
+                                       header and plain text TLS APP payload.
+                                       If ProcessMode is EfiTlsDecrypt, the message contain the TLS
+                                       header and cipher text TLS APP payload.
   @param[in]           MessageSize     Pointer to the message buffer size.
   @param[in]           ProcessMode     Process mode.
   @param[in, out]      Fragment        Only one Fragment returned after the Message is
                                        processed successfully.
+                                       If ProcessMode is EfiTlsEncrypt, the fragment contain the TLS
+                                       header and cipher text TLS APP payload.
+                                       If ProcessMode is EfiTlsDecrypt, the fragment contain the TLS
+                                       header and plain text TLS APP payload.
 
   @retval EFI_SUCCESS          Message is processed successfully.
   @retval EFI_OUT_OF_RESOURCES   Can't allocate memory resources.
@@ -258,3 +262,4 @@ HttpsReceive (
   );
 
 #endif
+

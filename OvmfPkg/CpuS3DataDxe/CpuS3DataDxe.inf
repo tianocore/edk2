@@ -1,0 +1,65 @@
+## @file
+#  ACPI CPU Data initialization module
+#
+#  This module initializes the ACPI_CPU_DATA structure and registers the address
+#  of this structure in the PcdCpuS3DataAddress PCD.  This is a generic/simple
+#  version of this module.  It does not provide a machine check handler or CPU
+#  register initialization tables for ACPI S3 resume.  It also only supports the
+#  number of CPUs reported by the MP Services Protocol, so this module does not
+#  support hot plug CPUs.  This module can be copied into a CPU specific package
+#  and customized if these additional features are required.
+#
+#  Copyright (c) 2013-2016, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2015-2020, Red Hat, Inc.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.29
+  BASE_NAME                      = CpuS3DataDxe
+  FILE_GUID                      = 229B7EFD-DA02-46B9-93F4-E20C009F94E9
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = CpuS3DataInitialize
+
+# The following information is for reference only and not required by the build
+# tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+
+[Sources]
+  CpuS3Data.c
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  IoLib
+  MemoryAllocationLib
+  MtrrLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Guids]
+  gEfiEndOfDxeEventGroupGuid         ## CONSUMES   ## Event
+
+[Protocols]
+  gEfiMpServiceProtocolGuid          ## CONSUMES
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable                    ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuApStackSize                       ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber         ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuS3DataAddress                     ## PRODUCES
+  gUefiOvmfPkgTokenSpaceGuid.PcdQ35SmramAtDefaultSmbase             ## CONSUMES
+
+[Depex]
+  gEfiMpServiceProtocolGuid

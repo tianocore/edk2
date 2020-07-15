@@ -4,16 +4,10 @@
 
  Tested on Mac OS X.
 
-Copyright (c) 2004 - 2009, Intel Corporation. All rights reserved.<BR>
-Portitions copyright (c) 2011, Apple Inc. All rights reserved.
+Copyright (c) 2004 - 2019, Intel Corporation. All rights reserved.<BR>
+Portions copyright (c) 2011, Apple Inc. All rights reserved.
 
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -47,8 +41,8 @@ typedef struct {
   VOID                        *CurrentReadPointer;
   VOID                        *EndReadPointer;
 
-	UINT32									    ReceivedPackets;
-	UINT32									    DroppedPackets;
+  UINT32                      ReceivedPackets;
+  UINT32                      DroppedPackets;
 
 } EMU_SNP_PRIVATE;
 
@@ -200,8 +194,8 @@ EmuSnpStart (
   struct ifreq       BoundIf;
   struct bpf_program BpfProgram;
   struct bpf_insn    *FilterProgram;
-	u_int							 Value;
-	u_int  						 ReadBufferSize;
+  u_int               Value;
+  u_int               ReadBufferSize;
   UINT16             Temp16;
   UINT32             Temp32;
 
@@ -222,6 +216,7 @@ EmuSnpStart (
   }
 
   Status = EFI_SUCCESS;
+  Private->ReadBuffer = NULL;
   if (Private->BpfFd == 0) {
     Status = OpenBpfFileDescriptor (Private, &Private->BpfFd);
     if (EFI_ERROR (Status)) {
@@ -229,32 +224,32 @@ EmuSnpStart (
     }
 
     //
-		// Get the read buffer size.
-		//
-		if (ioctl (Private->BpfFd, BIOCGBLEN, &ReadBufferSize) < 0) {
-			goto DeviceErrorExit;
-		}
+    // Get the read buffer size.
+    //
+    if (ioctl (Private->BpfFd, BIOCGBLEN, &ReadBufferSize) < 0) {
+      goto DeviceErrorExit;
+    }
 
-		//
-		// Default value from BIOCGBLEN is usually too small, so use a much larger size, if necessary.
-		//
-		if (ReadBufferSize < FixedPcdGet32 (PcdNetworkPacketFilterSize)) {
-			ReadBufferSize = FixedPcdGet32 (PcdNetworkPacketFilterSize);
-			if (ioctl (Private->BpfFd, BIOCSBLEN, &ReadBufferSize) < 0) {
-				goto DeviceErrorExit;
-			}
-		}
+    //
+    // Default value from BIOCGBLEN is usually too small, so use a much larger size, if necessary.
+    //
+    if (ReadBufferSize < FixedPcdGet32 (PcdNetworkPacketFilterSize)) {
+      ReadBufferSize = FixedPcdGet32 (PcdNetworkPacketFilterSize);
+      if (ioctl (Private->BpfFd, BIOCSBLEN, &ReadBufferSize) < 0) {
+        goto DeviceErrorExit;
+      }
+    }
 
-		//
+    //
     // Associate our interface with this BPF file descriptor.
     //
-    AsciiStrCpy (BoundIf.ifr_name, Private->InterfaceName);
+    AsciiStrCpyS (BoundIf.ifr_name, sizeof (BoundIf.ifr_name), Private->InterfaceName);
     if (ioctl (Private->BpfFd, BIOCSETIF, &BoundIf) < 0) {
       goto DeviceErrorExit;
     }
 
     //
-		// Enable immediate mode.
+    // Enable immediate mode.
     //
     Value = 1;
     if (ioctl (Private->BpfFd, BIOCIMMEDIATE, &Value) < 0) {
@@ -286,8 +281,8 @@ EmuSnpStart (
     //
     // Allocate read buffer.
     //
-		Private->ReadBufferSize = ReadBufferSize;
-		Private->ReadBuffer = malloc (Private->ReadBufferSize);
+    Private->ReadBufferSize = ReadBufferSize;
+    Private->ReadBuffer = malloc (Private->ReadBufferSize);
     if (Private->ReadBuffer == NULL) {
       goto ErrorExit;
     }
@@ -295,7 +290,7 @@ EmuSnpStart (
     Private->CurrentReadPointer = Private->EndReadPointer = Private->ReadBuffer;
 
     //
-		// Install our packet filter: successful reads should only produce broadcast or unicast
+    // Install our packet filter: successful reads should only produce broadcast or unicast
     // packets directed to our fake MAC address.
     //
     FilterProgram = malloc (sizeof (mFilterInstructionTemplate)) ;
@@ -772,10 +767,6 @@ EmuSnpGetStatus (
 
   Private = EMU_SNP_PRIVATE_DATA_FROM_THIS (This);
 
-  if (TxBuf != NULL) {
-    *((UINT8 **)TxBuf) =  (UINT8 *)1;
-  }
-
   if ( InterruptStatus != NULL ) {
     *InterruptStatus = EFI_SIMPLE_NETWORK_TRANSMIT_INTERRUPT;
   }
@@ -906,7 +897,7 @@ EmuSnpReceive (
 {
   EMU_SNP_PRIVATE    *Private;
   struct bpf_hdr     *BpfHeader;
-	struct bpf_stat	   BpfStats;
+  struct bpf_stat     BpfStats;
   ETHERNET_HEADER    *EnetHeader;
   ssize_t            Result;
 
@@ -916,19 +907,19 @@ EmuSnpReceive (
     return EFI_NOT_STARTED;
   }
 
-	ZeroMem (&BpfStats, sizeof( BpfStats));
+  ZeroMem (&BpfStats, sizeof( BpfStats));
 
-	if (ioctl (Private->BpfFd, BIOCGSTATS, &BpfStats) == 0) {
-		Private->ReceivedPackets += BpfStats.bs_recv;
-		if (BpfStats.bs_drop > Private->DroppedPackets) {
-			printf (
-			  "SNP: STATS: RCVD = %d DROPPED = %d.  Probably need to increase BPF PcdNetworkPacketFilterSize?\n",
-				BpfStats.bs_recv,
-				BpfStats.bs_drop - Private->DroppedPackets
-				);
-			Private->DroppedPackets = BpfStats.bs_drop;
-		}
-	}
+  if (ioctl (Private->BpfFd, BIOCGSTATS, &BpfStats) == 0) {
+    Private->ReceivedPackets += BpfStats.bs_recv;
+    if (BpfStats.bs_drop > Private->DroppedPackets) {
+      printf (
+        "SNP: STATS: RCVD = %d DROPPED = %d.  Probably need to increase BPF PcdNetworkPacketFilterSize?\n",
+        BpfStats.bs_recv,
+        BpfStats.bs_drop - Private->DroppedPackets
+        );
+      Private->DroppedPackets = BpfStats.bs_drop;
+    }
+  }
 
   //
   // Do we have any remaining packets from the previous read?
@@ -1004,7 +995,7 @@ GetInterfaceMacAddr (
   EMU_SNP_PRIVATE    *Private
   )
 {
-	EFI_STATUS				  Status;
+  EFI_STATUS          Status;
   struct ifaddrs      *IfAddrs;
   struct ifaddrs      *If;
   struct sockaddr_dl  *IfSdl;
@@ -1022,7 +1013,11 @@ GetInterfaceMacAddr (
     goto Exit;
   }
 
-  UnicodeStrToAsciiStr (Private->Thunk->ConfigString, Private->InterfaceName);
+  UnicodeStrToAsciiStrS (
+    Private->Thunk->ConfigString,
+    Private->InterfaceName,
+    StrSize (Private->Thunk->ConfigString)
+    );
 
   Status = EFI_NOT_FOUND;
   If = IfAddrs;

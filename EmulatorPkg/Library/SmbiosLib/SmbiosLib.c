@@ -4,17 +4,11 @@
 
 
 Copyright (c) 2012, Apple Inc. All rights reserved.
-Portitions Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
-The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Portitions Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
-  
+
 #include <PiDxe.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -29,13 +23,13 @@ EFI_SMBIOS_PROTOCOL *gSmbios = NULL;
 
 
 /**
-  Create an initial SMBIOS Table from an array of SMBIOS_TEMPLATE_ENTRY 
+  Create an initial SMBIOS Table from an array of SMBIOS_TEMPLATE_ENTRY
   entries. SMBIOS_TEMPLATE_ENTRY.NULL indicates the end of the table.
 
   @param  Template   Array of SMBIOS_TEMPLATE_ENTRY entries.
- 
+
   @retval EFI_SUCCESS          New SMBIOS tables were created.
-  @retval EFI_OUT_OF_RESOURCES New SMBIOS tables were not created. 
+  @retval EFI_OUT_OF_RESOURCES New SMBIOS tables were not created.
 **/
 EFI_STATUS
 EFIAPI
@@ -76,15 +70,15 @@ SmbiosLibInitializeFromTemplate (
     "Not Found",
     NULL
   };
-  
+
   ...
   CreateSmbiosEntry (
-    (EFI_SMBIOS_TABLE_HEADER*)&gSmbiosType12, 
+    (EFI_SMBIOS_TABLE_HEADER*)&gSmbiosType12,
     gSmbiosType12Strings
     );
 
   @param  SmbiosEntry   Fixed SMBIOS structure
-  @param  StringArray   Array of strings to convert to an SMBIOS string pack. 
+  @param  StringArray   Array of strings to convert to an SMBIOS string pack.
                         NULL is OK.
 
 **/
@@ -92,7 +86,7 @@ EFI_STATUS
 EFIAPI
 SmbiosLibCreateEntry (
   IN  SMBIOS_STRUCTURE *SmbiosEntry,
-  IN  CHAR8            **StringArray 
+  IN  CHAR8            **StringArray
   )
 {
   EFI_STATUS                Status;
@@ -105,7 +99,7 @@ SmbiosLibCreateEntry (
 
   // Calculate the size of the fixed record and optional string pack
   Size = SmbiosEntry->Length;
-  if (StringArray == NULL) { 
+  if (StringArray == NULL) {
     Size += 2; // Min string section is double null
   } else if (StringArray[0] == NULL) {
     Size += 2; // Min string section is double null
@@ -134,7 +128,7 @@ SmbiosLibCreateEntry (
       Str += StringSize;
     }
     *Str = 0;
-  }  
+  }
 
   SmbiosHandle = SMBIOS_HANDLE_PI_RESERVED;
   Status = gSmbios->Add (
@@ -143,7 +137,7 @@ SmbiosLibCreateEntry (
                      &SmbiosHandle,
                      Record
                      );
-  
+
   FreePool (Record);
   return Status;
 }
@@ -152,18 +146,18 @@ SmbiosLibCreateEntry (
 
 /**
   Update the string associated with an existing SMBIOS record.
-  
+
   This function allows the update of specific SMBIOS strings. The number of valid strings for any
   SMBIOS record is defined by how many strings were present when Add() was called.
-  
+
   @param[in]    SmbiosHandle    SMBIOS Handle of structure that will have its string updated.
   @param[in]    StringNumber    The non-zero string number of the string to update.
   @param[in]    String          Update the StringNumber string with String.
-  
+
   @retval EFI_SUCCESS           SmbiosHandle had its StringNumber String updated.
   @retval EFI_INVALID_PARAMETER SmbiosHandle does not exist. Or String is invalid.
   @retval EFI_UNSUPPORTED       String was not added because it is longer than the SMBIOS Table supports.
-  @retval EFI_NOT_FOUND         The StringNumber.is not valid for this SMBIOS record.    
+  @retval EFI_NOT_FOUND         The StringNumber.is not valid for this SMBIOS record.
 **/
 EFI_STATUS
 EFIAPI
@@ -191,18 +185,18 @@ SmbiosLibUpdateString (
 
 /**
   Update the string associated with an existing SMBIOS record.
-  
+
   This function allows the update of specific SMBIOS strings. The number of valid strings for any
   SMBIOS record is defined by how many strings were present when Add() was called.
-  
+
   @param[in]    SmbiosHandle    SMBIOS Handle of structure that will have its string updated.
   @param[in]    StringNumber    The non-zero string number of the string to update.
   @param[in]    String          Update the StringNumber string with String.
-  
+
   @retval EFI_SUCCESS           SmbiosHandle had its StringNumber String updated.
   @retval EFI_INVALID_PARAMETER SmbiosHandle does not exist. Or String is invalid.
   @retval EFI_UNSUPPORTED       String was not added because it is longer than the SMBIOS Table supports.
-  @retval EFI_NOT_FOUND         The StringNumber.is not valid for this SMBIOS record.    
+  @retval EFI_NOT_FOUND         The StringNumber.is not valid for this SMBIOS record.
 **/
 EFI_STATUS
 EFIAPI
@@ -229,11 +223,11 @@ SmbiosLibUpdateUnicodeString (
   if (Ascii == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
-  UnicodeStrToAsciiStr (String, Ascii);
+  UnicodeStrToAsciiStrS (String, Ascii, StrSize (String));
 
   StringIndex = StringNumber;
   Status = gSmbios->UpdateString (gSmbios, &SmbiosHandle, &StringIndex, Ascii);
-  
+
   FreePool (Ascii);
   return Status;
 }
@@ -241,12 +235,12 @@ SmbiosLibUpdateUnicodeString (
 
 /**
   Allow caller to read a specific SMBIOS string
-  
-  @param[in]    Header          SMBIOS record that contains the string. 
-  @param[in[    StringNumber    Instance of SMBIOS string 1 - N. 
 
-  @retval NULL                  Instance of Type SMBIOS string was not found. 
-  @retval Other                 Pointer to matching SMBIOS string. 
+  @param[in]    Header          SMBIOS record that contains the string.
+  @param[in[    StringNumber    Instance of SMBIOS string 1 - N.
+
+  @retval NULL                  Instance of Type SMBIOS string was not found.
+  @retval Other                 Pointer to matching SMBIOS string.
 **/
 CHAR8 *
 EFIAPI
@@ -257,7 +251,7 @@ SmbiosLibReadString (
 {
   CHAR8       *Data;
   UINTN       Match;
-  
+
   Data = (CHAR8 *)Header + Header->Length;
   for (Match = 1;!(*Data == 0 && *(Data+1) == 0); ) {
     if (StringNumber == Match) {
@@ -267,21 +261,21 @@ SmbiosLibReadString (
     if (*(Data - 1) == '\0') {
       Match++;
     }
-  } 
+  }
 
   return NULL;
 }
 
 
 /**
-  Allow the caller to discover a specific SMBIOS entry, and patch it if necissary. 
-  
-  @param[in]    Type            Type of the next SMBIOS record to return. 
-  @param[in[    Instance        Instance of SMBIOS record 0 - N-1. 
-  @param[out]   SmbiosHandle    Returns SMBIOS handle for the matching record. 
+  Allow the caller to discover a specific SMBIOS entry, and patch it if necissary.
 
-  @retval NULL                  Instance of Type SMBIOS record was not found. 
-  @retval Other                 Pointer to matching SMBIOS record. 
+  @param[in]    Type            Type of the next SMBIOS record to return.
+  @param[in[    Instance        Instance of SMBIOS record 0 - N-1.
+  @param[out]   SmbiosHandle    Returns SMBIOS handle for the matching record.
+
+  @retval NULL                  Instance of Type SMBIOS record was not found.
+  @retval Other                 Pointer to matching SMBIOS record.
 **/
 SMBIOS_STRUCTURE *
 EFIAPI
@@ -313,11 +307,11 @@ SmbiosLibGetRecord (
 
 /**
   Remove an SMBIOS record.
-  
+
   This function removes an SMBIOS record using the handle specified by SmbiosHandle.
-  
+
   @param[in]    SmbiosHandle        The handle of the SMBIOS record to remove.
-  
+
   @retval EFI_SUCCESS               SMBIOS record was removed.
   @retval EFI_INVALID_PARAMETER     SmbiosHandle does not specify a valid SMBIOS record.
 **/
@@ -333,7 +327,7 @@ SmbiosLibRemove (
 
 
 /**
-  
+
   @param  ImageHandle  ImageHandle of the loaded driver.
   @param  SystemTable  Pointer to the EFI System Table.
 

@@ -1,0 +1,40 @@
+## @file
+#  Provides platform policy services used during a capsule update that uses the
+#  services of the EDKII_CAPSULE_UPDATE_POLICY_PROTOCOL.  If the
+#  EDKII_CAPSULE_UPDATE_POLICY_PROTOCOL is not available, then assume the
+#  platform is in a state that supports a firmware update.
+#
+#  Copyright (c) 2016, Microsoft Corporation. All rights reserved.<BR>
+#  Copyright (c) 2018-2019, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION     = 0x00010005
+  BASE_NAME       = CapsuleUpdatePolicyLibOnProtocol
+  MODULE_UNI_FILE = CapsuleUpdatePolicyLibOnProtocol.uni
+  FILE_GUID       = 0EA4C03F-D91B-4929-AAA5-B2FC8D69E2F4
+  MODULE_TYPE     = DXE_DRIVER
+  VERSION_STRING  = 1.0
+  LIBRARY_CLASS   = CapsuleUpdatePolicyLib
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64
+#
+
+[Sources]
+  CapsuleUpdatePolicyLibOnProtocol.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  FmpDevicePkg/FmpDevicePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  UefiBootServicesTableLib
+
+[Protocols]
+  gEdkiiCapsuleUpdatePolicyProtocolGuid  ## CONSUMES

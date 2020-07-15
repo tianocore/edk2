@@ -1,21 +1,14 @@
 ## @file
-#  Component description file for QEMU Flash Fimware Volume Block SMM driver
+#  Component description file for QEMU Flash Firmware Volume Block SMM driver
 #  module.
 #
-#  This SMM driver implements and produces the SMM Fimware Volue Block Protocol
+#  This SMM driver implements and produces the SMM Firmware Volue Block Protocol
 #  for a QEMU flash device.
 #
 #  Copyright (C) 2015, Red Hat, Inc.
 #  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
 #
-#  This program and the accompanying materials are licensed and made available
-#  under the terms and conditions of the BSD License which accompanies this
-#  distribution. The full text of the license may be found at
-#  http://opensource.org/licenses/bsd-license.php
-#
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR
-#  IMPLIED.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
 
@@ -38,8 +31,11 @@
 [Sources]
   FvbInfo.c
   FwBlockService.c
+  FwBlockService.h
   FwBlockServiceSmm.c
   QemuFlash.c
+  QemuFlash.h
+  QemuFlashSmm.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -53,6 +49,7 @@
   DevicePathLib
   DxeServicesTableLib
   MemoryAllocationLib
+  MemEncryptSevLib
   PcdLib
   SmmServicesTableLib
   UefiBootServicesTableLib
@@ -69,19 +66,12 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashNvStorageVariableBase
-  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashNvStorageFtwWorkingBase
-  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashNvStorageFtwSpareBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashNvStorageEventLogSize
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFdBaseAddress
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFirmwareFdSize
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFirmwareBlockSize
 
 [Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase
-  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashNvStorageEventLogBase
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashVariablesEnable
 
 [FeaturePcd]

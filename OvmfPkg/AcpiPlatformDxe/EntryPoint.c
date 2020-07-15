@@ -4,13 +4,7 @@
   Copyright (C) 2015, Red Hat, Inc.
   Copyright (c) 2008 - 2015, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials are licensed and made available
-  under the terms and conditions of the BSD License which accompanies this
-  distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT
-  WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include <Guid/RootBridgesConnectedEventGroup.h>
@@ -45,12 +39,12 @@ OnRootBridgesConnected (
 {
   EFI_STATUS Status;
 
-  DEBUG ((EFI_D_INFO,
+  DEBUG ((DEBUG_INFO,
     "%a: root bridges have been connected, installing ACPI tables\n",
     __FUNCTION__));
   Status = InstallAcpiTables (FindAcpiTableProtocol ());
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "%a: InstallAcpiTables: %r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a: InstallAcpiTables: %r\n", __FUNCTION__, Status));
   }
   gBS->CloseEvent (Event);
 }
@@ -72,7 +66,7 @@ AcpiPlatformEntryPoint (
   // the full functionality.
   //
   if (PcdGetBool (PcdPciDisableBusEnumeration)) {
-    DEBUG ((EFI_D_INFO, "%a: PCI or its enumeration disabled, installing "
+    DEBUG ((DEBUG_INFO, "%a: PCI or its enumeration disabled, installing "
       "ACPI tables\n", __FUNCTION__));
     return InstallAcpiTables (FindAcpiTableProtocol ());
   }
@@ -87,7 +81,7 @@ AcpiPlatformEntryPoint (
                   OnRootBridgesConnected, NULL /* Context */,
                   &gRootBridgesConnectedEventGroupGuid, &RootBridgesConnected);
   if (!EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_INFO,
+    DEBUG ((DEBUG_INFO,
       "%a: waiting for root bridges to be connected, registered callback\n",
       __FUNCTION__));
   }

@@ -1,0 +1,34 @@
+## @file
+# This file contains the Reset Utility functions.
+#
+#  Copyright (c) 2017 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2016, Microsoft Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+[Defines]
+  INF_VERSION         = 0x00010017
+  BASE_NAME           = ResetUtilityLib
+  FILE_GUID           = CAFC3CA1-3E32-449F-9B0E-40BA3CB73A12
+  VERSION_STRING      = 1.0
+  MODULE_TYPE         = BASE
+  LIBRARY_CLASS       = ResetUtilityLib
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  ResetUtility.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  BaseMemoryLib
+  ResetSystemLib

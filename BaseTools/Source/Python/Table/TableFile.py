@@ -1,36 +1,31 @@
 ## @file
 # This file is used to create/update/query/erase table for files
 #
-# Copyright (c) 2008 - 2014, Intel Corporation. All rights reserved.<BR>
-# This program and the accompanying materials
-# are licensed and made available under the terms and conditions of the BSD License
-# which accompanies this distribution.  The full text of the license may be found at
-# http://opensource.org/licenses/bsd-license.php
-#
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
 ##
 # Import Modules
 #
+from __future__ import absolute_import
 import Common.EdkLogger as EdkLogger
-from Table import Table
-from Common.String import ConvertToSqlString
+from Table.Table import Table
+from Common.StringUtils import ConvertToSqlString
 import Common.LongFilePathOs as os
 from CommonDataClass.DataClass import FileClass
 
 ## TableFile
 #
 # This class defined a table used for file
-# 
+#
 # @param object:       Inherited from object class
 #
 class TableFile(Table):
     def __init__(self, Cursor):
         Table.__init__(self, Cursor)
         self.Table = 'File'
-    
+
     ## Create table
     #
     # Create table File
@@ -72,15 +67,15 @@ class TableFile(Table):
         SqlCommand = """insert into %s values(%s, '%s', '%s', '%s', '%s', %s, '%s')""" \
                                            % (self.Table, self.ID, Name, ExtName, Path, FullPath, Model, TimeStamp)
         Table.Insert(self, SqlCommand)
-        
+
         return self.ID
     ## InsertFile
     #
     # Insert one file to table
     #
     # @param FileFullPath:  The full path of the file
-    # @param Model:         The model of the file 
-    # 
+    # @param Model:         The model of the file
+    #
     # @retval FileID:       The ID after record is inserted
     #
     def InsertFile(self, FileFullPath, Model):
@@ -89,7 +84,7 @@ class TableFile(Table):
         TimeStamp = os.stat(FileFullPath)[8]
         File = FileClass(-1, Name, Ext, Filepath, FileFullPath, Model, '', [], [], [])
         return self.Insert(File.Name, File.ExtName, File.Path, File.FullPath, File.Model, TimeStamp)
-    
+
     ## Get ID of a given file
     #
     #   @param  FilePath    Path of file

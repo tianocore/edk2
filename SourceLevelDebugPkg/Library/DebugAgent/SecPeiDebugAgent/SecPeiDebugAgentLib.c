@@ -1,14 +1,8 @@
 /** @file
-  SEC Core Debug Agent Library instance implementition.
+  SEC Core Debug Agent Library instance implementation.
 
   Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -32,7 +26,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_PEI_PPI_DESCRIPTOR           mVectorHandoffInf
   }
 };
 
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_PEI_NOTIFY_DESCRIPTOR mMemoryDiscoveredNotifyList[1] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_PEI_NOTIFY_DESCRIPTOR mDebugAgentMemoryDiscoveredNotifyList[1] = {
   {
     (EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
     &gEfiPeiMemoryDiscoveredPpiGuid,
@@ -204,7 +198,7 @@ GetMailboxPointer (
 
   MailboxLocationInHob = GetMailboxLocationFromHob ();
   //
-  // Compare mailbox in IDT enry with mailbox in HOB,
+  // Compare mailbox in IDT entry with mailbox in HOB,
   // need to fix mailbox location if HOB moved by PEI CORE
   //
   if (MailboxLocationInHob != MailboxLocationInIdt && MailboxLocationInHob != NULL) {
@@ -329,7 +323,7 @@ DebugAgentCallbackMemoryDiscoveredPpi (
 
   This function is used to set up debug environment for SEC and PEI phase.
 
-  If InitFlag is DEBUG_AGENT_INIT_PREMEM_SEC, it will overirde IDT table entries
+  If InitFlag is DEBUG_AGENT_INIT_PREMEM_SEC, it will override IDT table entries
   and initialize debug port. It will enable interrupt to support break-in feature.
   It will set up debug agent Mailbox in cache-as-ramfrom. It will be called before
   physical memory is ready.
@@ -552,9 +546,9 @@ InitializeDebugAgent (
     SetDebugFlag (DEBUG_AGENT_FLAG_INIT_ARCH, DEBUG_ARCH_SYMBOL);
     //
     // Register for a callback once memory has been initialized.
-    // If memery has been ready, the callback funtion will be invoked immediately
+    // If memory has been ready, the callback function will be invoked immediately
     //
-    Status = PeiServicesNotifyPpi (&mMemoryDiscoveredNotifyList[0]);
+    Status = PeiServicesNotifyPpi (&mDebugAgentMemoryDiscoveredNotifyList[0]);
     if (EFI_ERROR (Status)) {
       DEBUG ((EFI_D_ERROR, "DebugAgent: Failed to register memory discovered callback function!\n"));
       CpuDeadLoop ();
@@ -632,7 +626,7 @@ InitializeDebugAgent (
     EnableInterrupts ();
   }
   //
-  // If Function is not NULL, invoke it always whatever debug agent was initialized sucesssfully or not.
+  // If Function is not NULL, invoke it always whatever debug agent was initialized successfully or not.
   //
   if (Function != NULL) {
     Function (Context);

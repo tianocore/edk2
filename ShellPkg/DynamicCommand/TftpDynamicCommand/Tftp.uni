@@ -1,0 +1,94 @@
+// /**
+//
+// (C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
+// Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved. <BR>
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// Module Name:
+//
+// Tftp.uni
+//
+// Abstract:
+//
+// String definitions for UEFI Shell TFTP command
+//
+//
+// **/
+
+/=#
+
+#langdef   en-US "english"
+
+#string STR_GEN_TOO_MANY           #language en-US "%H%s%N: Too many arguments\r\n"
+#string STR_GEN_TOO_FEW            #language en-US "%H%s%N: Too few arguments\r\n"
+#string STR_GEN_PARAM_INV          #language en-US "%H%s%N: Invalid argument - '%H%s%N'\r\n"
+#string STR_GEN_PROBLEM            #language en-US "%H%s%N: Unknown flag - '%H%s%N'\r\n"
+#string STR_GEN_FILE_OPEN_FAIL     #language en-US "%H%s%N: Cannot open file - '%H%s%N'\r\n"
+#string STR_GEN_CRLF               #language en-US "\r\n"
+
+#string STR_TFTP_ERR_NO_NIC        #language en-US "No network interface card found.\r\n"
+#string STR_TFTP_ERR_NIC_NAME      #language en-US "Failed to get the name of the network interface card number %d - %r\r\n"
+#string STR_TFTP_ERR_OPEN_PROTOCOL #language en-US "Unable to open MTFTP4 protocol on '%H%s%N' - %r\r\n"
+#string STR_TFTP_ERR_CONFIGURE     #language en-US "Unable to configure MTFTP4 protocol on '%H%s%N' - %r\r\n"
+#string STR_TFTP_ERR_FILE_SIZE     #language en-US "Unable to get the size of the file '%H%s%N' on '%H%s%N' - %r\r\n"
+#string STR_TFTP_ERR_DOWNLOAD      #language en-US "Unable to download the file '%H%s%N' on '%H%s%N' - %r\r\n"
+#string STR_TFTP_ERR_WRITE         #language en-US "Unable to write into file '%H%s%N' - %r\r\n"
+#string STR_TFTP_ERR_NIC_NOT_FOUND #language en-US "Network Interface Card '%H%s%N' not found.\r\n"
+#string STR_TFTP_DOWNLOADING       #language en-US "Downloading the file '%H%s%N'\r\n"
+#string STR_TFTP_STRING            #language en-US "%s"
+
+#string STR_GET_HELP_TFTP          #language en-US ""
+".TH tftp 0 "Download a file from TFTP server."\r\n"
+".SH NAME\r\n"
+"Download a file from TFTP server.\r\n"
+".SH SYNOPSIS\r\n"
+" \r\n"
+"TFTP [-i interface] [-l <port>] [-r <port>] [-c <retry count>] [-t <timeout>]\r\n"
+"     [-s <block size>] [-w <window size>] host remotefilepath [localfilepath]\r\n"
+".SH OPTIONS\r\n"
+" \r\n"
+"  -i interface     - Specifies an adapter name, i.e., eth0.\r\n"
+"  -l port          - Specifies the local port number. Default value is 0\r\n"
+"                     and the port number is automatically assigned.\r\n"
+"  -r port          - Specifies the remote port number. Default value is 69.\r\n"
+"  -c <retry count> - The number of times to transmit request packets and\r\n"
+"                     wait for a response. The default value is 6. Set to zero\r\n"
+"                     also means to use the default value.\r\n"
+"  -t <timeout>     - The number of seconds to wait for a response after\r\n"
+"                     sending a request packet. Default value is 4s.\r\n"
+"  -s <block size>  - Specifies the TFTP blksize option as defined in RFC 2348.\r\n"
+"                     Valid range is between 8 and 65464, default value is 512.\r\n"
+"  -w <window size> - Specifies the TFTP windowsize option as defined in RFC 7440.\r\n"
+"                     Valid range is between 1 and 64, default value is 1.\r\n"
+"  host             - Specify TFTP Server IPv4 address.\r\n"
+"  remotefilepath   - TFTP server file path to download the file.\r\n"
+"  localfilepath    - Local destination file path.\r\n"
+".SH DESCRIPTION\r\n"
+" \r\n"
+"NOTES:\r\n"
+"  1. The TFTP command allows to get the file specified by its 'remotefilepath'\r\n"
+"     path from the TFTP server specified by its 'host' IPv4 address. If the\r\n"
+"     optional 'localfilepath' parameter is provided, the downloaded file is\r\n"
+"     stored locally using the provided file path. If the local file path is\r\n"
+"     not specified, the file is stored in the current directory using the file\r\n"
+"     server's name.\r\n"
+"  2. Before using the TFTP command, the network interface intended to be\r\n"
+"     used to retrieve the file must be configured. This configuration may be\r\n"
+"     done by means of the 'ifconfig' command.\r\n"
+"  3. If a network interface is defined with the '-i' option then only this\r\n"
+"     interface will be used to retrieve the remote file. Otherwise, all network\r\n"
+"     interfaces are tried in the order they have been discovered during the\r\n"
+"     DXE phase.\r\n"
+".SH EXAMPLES\r\n"
+" \r\n"
+"EXAMPLES:\r\n"
+"  * To get the file "dir1/file1.dat" from the TFTP server 192.168.1.1 and\r\n"
+"    store it as file2.dat in the current directory :\r\n"
+"    fs0:\> tftp 192.168.1.1 dir1/file1.dat file2.dat\r\n"
+".SH RETURNVALUES\r\n"
+" \r\n"
+"RETURN VALUES:\r\n"
+"  SHELL_SUCCESS             The action was completed as requested.\r\n"
+"  SHELL_INVALID_PARAMETER   One of the passed-in parameters was incorrectly\r\n"
+"                            formatted or its value was out of bounds.\r\n"
+

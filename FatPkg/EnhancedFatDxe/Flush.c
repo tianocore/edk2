@@ -2,13 +2,7 @@
   Routines that check references and flush OFiles
 
 Copyright (c) 2005 - 2013, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available
-under the terms and conditions of the BSD License which accompanies this
-distribution. The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 
 **/
@@ -232,7 +226,7 @@ FatOFileFlush (
   //
   do {
     //
-    // If the file has a permanant error, then don't write any
+    // If the file has a permanent error, then don't write any
     // of its data to the device (may be from different media)
     //
     if (EFI_ERROR (OFile->Error)) {
@@ -325,7 +319,7 @@ FatCheckOFileRef (
 
   Check the references of all open files on the volume.
   Any open file (that is checked) that is no longer
-  referenced, is freed - and it's parent open file
+  referenced, is freed - and its parent open file
   is then referenced checked.
 
   @param  Volume                - The volume to check the pending open file list.

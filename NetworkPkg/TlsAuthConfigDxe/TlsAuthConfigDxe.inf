@@ -2,13 +2,8 @@
 #  Provides the capability to configure Tls Authentication in a setup browser
 #  By this module, user may change the content of TlsCaCertificate.
 #
-# Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
-# This program and the accompanying materials
-# are licensed and made available under the terms and conditions of the BSD License
-# which accompanies this distribution. The full text of the license may be found at
-# http://opensource.org/licenses/bsd-license.php
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
 
@@ -25,7 +20,7 @@
 #
 #  VALID_ARCHITECTURES           = IA32 X64
 #
-  
+
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
@@ -53,21 +48,22 @@
   UefiHiiServicesLib
   FileExplorerLib
   PrintLib
-  
+
 [Protocols]
   gEfiDevicePathProtocolGuid                    ## PRODUCES
   gEfiHiiConfigAccessProtocolGuid               ## PRODUCES
-  gEfiSimpleFileSystemProtocolGuid              ## SOMETIMES_CONSUMES
+  gEfiHiiPopupProtocolGuid                      ## CONSUMES
 
 [Guids]
   gTlsAuthConfigGuid                            ## PRODUCES  ## GUID
-  gEfiCertX509Guid                              ## CONSUMES  ## GUID  # Indicate the cert type
-  gEfiIfrTianoGuid                              ## CONSUMES  ## HII
-  gEfiTlsCaCertificateGuid                      ## PRODUCES  ## GUID
+  gEfiCertX509Guid                              ## SOMETIMES_CONSUMES  ## GUID  # Indicate the cert type
+  gEfiIfrTianoGuid                              ## SOMETIMES_PRODUCES  ## HII
+  gEfiTlsCaCertificateGuid                      ## PRODUCES  ## Variable:L"TlsCaCertificate"
 
 [Depex]
   gEfiHiiConfigRoutingProtocolGuid  AND
   gEfiHiiDatabaseProtocolGuid
-  
+
 [UserExtensions.TianoCore."ExtraFiles"]
   TlsAuthConfigDxeExtra.uni
+

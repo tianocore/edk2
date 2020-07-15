@@ -1,14 +1,8 @@
 /** @file
   PS/2 keyboard driver header file
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -300,18 +294,6 @@ InitKeyboard (
   IN BOOLEAN                     ExtendedVerification
   );
 
-/**
-  Disable the keyboard interface of the 8042 controller.
-
-  @param ConsoleIn   - the device instance
-
-  @return status of issuing disable command
-
-**/
-EFI_STATUS
-DisableKeyboard (
-  IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn
-  );
 
 /**
   Timer event handler: read a series of scancodes from 8042
@@ -370,7 +352,7 @@ KeyboardReadKeyStroke (
   Signal the event if there is key available
 
   @param Event    the event object
-  @param Context  waitting context
+  @param Context  waiting context
 
 **/
 VOID
@@ -429,7 +411,7 @@ KeyboardWaitForKeyEx (
 //
 
 /**
-  Reset the input device and optionaly run diagnostics
+  Reset the input device and optionally run diagnostics
 
   @param This                 - Protocol instance pointer.
   @param ExtendedVerification - Driver may perform diagnostics on reset.
@@ -448,7 +430,7 @@ KeyboardEfiResetEx (
 
 /**
     Reads the next keystroke from the input device. The WaitForKey Event can
-    be used to test for existance of a keystroke via WaitForEvent () call.
+    be used to test for existence of a keystroke via WaitForEvent () call.
 
 
     @param This       - Protocol instance pointer.
@@ -456,7 +438,7 @@ KeyboardEfiResetEx (
                  state data for the key that was pressed.
 
     @retval EFI_SUCCESS           - The keystroke information was returned.
-    @retval EFI_NOT_READY         - There was no keystroke data availiable.
+    @retval EFI_NOT_READY         - There was no keystroke data available.
     @retval EFI_DEVICE_ERROR      - The keystroke information was not returned due to
                             hardware errors.
     @retval EFI_INVALID_PARAMETER - KeyData is NULL.
@@ -495,13 +477,16 @@ KeyboardSetState (
 
     @param This                    - Protocol instance pointer.
     @param KeyData                 - A pointer to a buffer that is filled in with the keystroke
-                              information data for the key that was pressed.
+                                     information data for the key that was pressed. If KeyData.Key,
+                                     KeyData.KeyState.KeyToggleState and KeyData.KeyState.KeyShiftState are 0,
+                                     then any incomplete keystroke will trigger a notification of the KeyNotificationFunction.
     @param KeyNotificationFunction - Points to the function to be called when the key
-                              sequence is typed specified by KeyData.
+                                     sequence is typed specified by KeyData. This notification function
+                                     should be called at <=TPL_CALLBACK.
     @param NotifyHandle            - Points to the unique handle assigned to the registered notification.
 
     @retval EFI_SUCCESS             - The notification function was registered successfully.
-    @retval EFI_OUT_OF_RESOURCES    - Unable to allocate resources for necesssary data structures.
+    @retval EFI_OUT_OF_RESOURCES    - Unable to allocate resources for necessary data structures.
     @retval EFI_INVALID_PARAMETER   - KeyData or NotifyHandle is NULL.
 
 **/
@@ -546,7 +531,7 @@ PushEfikeyBufTail (
   );
 
 /**
-  Judge whether is a registed key
+  Judge whether is a registered key
 
   @param RegsiteredData       A pointer to a buffer that is filled in with the keystroke
                               state data for the key that was registered.
@@ -554,13 +539,25 @@ PushEfikeyBufTail (
                               state data for the key that was pressed.
 
   @retval TRUE                Key be pressed matches a registered key.
-  @retval FLASE               Match failed.
+  @retval FALSE               Match failed.
 
 **/
 BOOLEAN
 IsKeyRegistered (
   IN EFI_KEY_DATA  *RegsiteredData,
   IN EFI_KEY_DATA  *InputData
+  );
+
+/**
+  Initialize the key state.
+
+  @param  ConsoleIn     The KEYBOARD_CONSOLE_IN_DEV instance.
+  @param  KeyState      A pointer to receive the key state information.
+**/
+VOID
+InitializeKeyState (
+  IN  KEYBOARD_CONSOLE_IN_DEV *ConsoleIn,
+  OUT EFI_KEY_STATE           *KeyState
   );
 
 #endif

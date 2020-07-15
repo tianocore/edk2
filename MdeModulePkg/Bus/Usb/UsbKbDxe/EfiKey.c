@@ -2,14 +2,8 @@
   USB Keyboard Driver that manages USB keyboard and produces Simple Text Input
   Protocol and Simple Text Input Ex Protocol.
 
-Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -221,7 +215,7 @@ USBKeyboardDriverBindingStart (
   EndpointNumber = UsbKeyboardDevice->InterfaceDescriptor.NumEndpoints;
 
   //
-  // Traverse endpoints to find interrupt endpoint
+  // Traverse endpoints to find interrupt endpoint IN
   //
   Found = FALSE;
   for (Index = 0; Index < EndpointNumber; Index++) {
@@ -232,7 +226,8 @@ USBKeyboardDriverBindingStart (
              &EndpointDescriptor
              );
 
-    if ((EndpointDescriptor.Attributes & (BIT0 | BIT1)) == USB_ENDPOINT_INTERRUPT) {
+    if (((EndpointDescriptor.Attributes & (BIT0 | BIT1)) == USB_ENDPOINT_INTERRUPT) &&
+        ((EndpointDescriptor.EndpointAddress & USB_ENDPOINT_DIR_IN) != 0)) {
       //
       // We only care interrupt endpoint here
       //
@@ -589,7 +584,7 @@ USBKeyboardDriverBindingStop (
                                   data for the key that was pressed.
 
   @retval EFI_SUCCESS             The keystroke information was returned.
-  @retval EFI_NOT_READY           There was no keystroke data availiable.
+  @retval EFI_NOT_READY           There was no keystroke data available.
   @retval EFI_DEVICE_ERROR        The keystroke information was not returned due to
                                   hardware errors.
   @retval EFI_INVALID_PARAMETER   KeyData is NULL.
@@ -607,6 +602,8 @@ USBKeyboardReadKeyStrokeWorker (
   }
 
   if (IsQueueEmpty (&UsbKeyboardDevice->EfiKeyQueue)) {
+    ZeroMem (&KeyData->Key, sizeof (KeyData->Key));
+    InitializeKeyState (UsbKeyboardDevice, &KeyData->KeyState);
     return EFI_NOT_READY;
   }
 
@@ -688,7 +685,7 @@ USBKeyboardReset (
                                information for the key that was pressed.
 
   @retval EFI_SUCCESS          The keystroke information was returned.
-  @retval EFI_NOT_READY        There was no keystroke data availiable.
+  @retval EFI_NOT_READY        There was no keystroke data available.
   @retval EFI_DEVICE_ERROR     The keystroke information was not returned due to
                                hardware errors.
 
@@ -763,11 +760,11 @@ USBKeyboardWaitForKey (
 
   //
   // Enter critical section
-  //  
-  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
-  
   //
-  // WaitforKey doesn't suppor the partial key.
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
+
+  //
+  // WaitforKey doesn't support the partial key.
   // Considering if the partial keystroke is enabled, there maybe a partial
   // keystroke in the queue, so here skip the partial keystroke and get the
   // next key from the queue
@@ -874,7 +871,7 @@ KbdFreeNotifyList (
   @param  InputData         A pointer to keystroke data for the key that was pressed.
 
   @retval TRUE              Key pressed matches a registered key.
-  @retval FLASE             Key pressed does not matches a registered key.
+  @retval FALSE             Key pressed does not matches a registered key.
 
 **/
 BOOLEAN
@@ -1055,10 +1052,14 @@ USBKeyboardSetState (
   Register a notification function for a particular keystroke for the input device.
 
   @param  This                        Protocol instance pointer.
-  @param  KeyData                     A pointer to a buffer that is filled in with the keystroke
-                                      information data for the key that was pressed.
+  @param  KeyData                     A pointer to a buffer that is filled in with
+                                      the keystroke information for the key that was
+                                      pressed. If KeyData.Key, KeyData.KeyState.KeyToggleState
+                                      and KeyData.KeyState.KeyShiftState are 0, then any incomplete
+                                      keystroke will trigger a notification of the KeyNotificationFunction.
   @param  KeyNotificationFunction     Points to the function to be called when the key
-                                      sequence is typed specified by KeyData.
+                                      sequence is typed specified by KeyData. This notification function
+                                      should be called at <=TPL_CALLBACK.
   @param  NotifyHandle                Points to the unique handle assigned to the registered notification.
 
   @retval EFI_SUCCESS                 The notification function was registered successfully.
@@ -1217,7 +1218,7 @@ KeyNotifyProcessHandler (
   while (TRUE) {
     //
     // Enter critical section
-    //  
+    //
     OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
     Status = Dequeue (&UsbKeyboardDevice->EfiKeyQueueForNotify, &KeyData, sizeof (KeyData));
     //

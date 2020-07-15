@@ -3,13 +3,7 @@
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -73,7 +67,7 @@ extern CONST CHAR8 mHexToStr[];
 #define GDB_EBADMEMADDRBUFSIZE   11  // the buffer that stores memory Address to be read from/written to is not the right size
 #define GDB_EBADMEMLENGBUFSIZE   12  // the buffer that stores Length is not the right size
 #define GDB_EBADMEMLENGTH        13  // Length, the given number of bytes to read or write, is not the right size
-#define GDB_EBADMEMDATA          14  // one of the bytes or nibbles of the memory is leess than 0
+#define GDB_EBADMEMDATA          14  // one of the bytes or nibbles of the memory is less than 0
 #define GDB_EBADMEMDATASIZE      15  // the memory data, 'XX..', is too short or too long
 #define GDB_EBADBUFSIZE          21  // the buffer created is not the correct size
 #define GDB_EINVALIDARG          31  // argument is invalid
@@ -105,7 +99,7 @@ extern CONST CHAR8 mHexToStr[];
 
 typedef struct {
   VENDOR_DEVICE_PATH                     VendorDevice;
-  UINT32                                 Index;         // Suport more than one
+  UINT32                                 Index;         // Support more than one
   EFI_DEVICE_PATH_PROTOCOL               End;
 } GDB_SERIAL_DEVICE_PATH;
 
@@ -216,8 +210,8 @@ extern BOOLEAN gCtrlCBreakFlag;
 
 //
 // If the periodic callback is called while we are processing an F packet we need
-// to let the callback know to not read from the serail stream as it could steal
-// characters from the F reponse packet
+// to let the callback know to not read from the serial stream as it could steal
+// characters from the F response packet
 //
 extern BOOLEAN gProcessingFPacket;
 
@@ -302,7 +296,7 @@ EmptyBuffer (
  Converts an 8-bit Hex Char into a INTN.
 
  @param     Char  - the hex character to be converted into UINTN
- @retval    a INTN, from 0 to 15, that corressponds to Char
+ @retval    a INTN, from 0 to 15, that corresponds to Char
  -1 if Char is not a hex character
  **/
 INTN
@@ -329,6 +323,7 @@ SendError (
  Send 'OK' when the function is done executing successfully.
  **/
 VOID
+EFIAPI
 SendSuccess (
   VOID
   );
@@ -338,6 +333,7 @@ SendSuccess (
  Send empty packet to specify that particular command/functionality is not supported.
  **/
 VOID
+EFIAPI
 SendNotSupported (
   VOID
   );
@@ -359,6 +355,7 @@ ReadNthRegister (
  @param     SystemContext           Register content at time of the exception
  **/
 VOID
+EFIAPI
 ReadGeneralRegisters (
   IN    EFI_SYSTEM_CONTEXT  SystemContext
   );
@@ -370,6 +367,7 @@ ReadGeneralRegisters (
  @param     InBuffer            This is the input buffer received from gdb server
  **/
 VOID
+EFIAPI
 WriteNthRegister (
   IN    EFI_SYSTEM_CONTEXT  SystemContext,
   IN    CHAR8               *InBuffer
@@ -383,6 +381,7 @@ WriteNthRegister (
  **/
 
 VOID
+EFIAPI
 WriteGeneralRegisters (
   IN    EFI_SYSTEM_CONTEXT  SystemContext,
   IN    CHAR8               *InBuffer
@@ -390,26 +389,28 @@ WriteGeneralRegisters (
 
 
 /** ‘m addr,length ’
- Find the Length of the area to read and the start addres. Finally, pass them to
+ Find the Length of the area to read and the start address. Finally, pass them to
  another function, TransferFromMemToOutBufAndSend, that will read from that memory space and
  send it as a packet.
 
  @param  *PacketData  Pointer to Payload data for the packet
  **/
 VOID
+EFIAPI
 ReadFromMemory (
   IN  CHAR8  *PacketData
   );
 
 
 /** ‘M addr,length :XX...’
- Find the Length of the area in bytes to write and the start addres. Finally, pass them to
+ Find the Length of the area in bytes to write and the start address. Finally, pass them to
  another function, TransferFromInBufToMem, that will write to that memory space the info in
  the input buffer.
 
  @param   PacketData     Pointer to Payload data for the packet
  **/
 VOID
+EFIAPI
 WriteToMemory (
   IN CHAR8 *PacketData
   );
@@ -424,6 +425,7 @@ WriteToMemory (
  **/
 
 VOID
+EFIAPI
 ContinueAtAddress (
   IN  EFI_SYSTEM_CONTEXT   SystemContext,
   IN  CHAR8                *PacketData
@@ -438,6 +440,7 @@ ContinueAtAddress (
  @param PacketData      Pointer to Payload data for the packet
  **/
 VOID
+EFIAPI
 SingleStep (
   IN  EFI_SYSTEM_CONTEXT  SystemContext,
   IN  CHAR8               *PacketData
@@ -505,7 +508,7 @@ RemoveBreakPoint(
 
 
 /**
- Exception Hanldler for GDB. It will be called for all exceptions
+ Exception Handler for GDB. It will be called for all exceptions
  registered via the gExceptionType[] array.
 
  @param ExceptionType   Exception that is being processed
@@ -535,7 +538,7 @@ GdbPeriodicCallBack (
 
 
 /**
-  Make two serail consoles: 1) StdIn and StdOut via GDB. 2) StdErr via GDB.
+  Make two serial consoles: 1) StdIn and StdOut via GDB. 2) StdErr via GDB.
 
   These console show up on the remote system running GDB
 
@@ -551,10 +554,10 @@ GdbInitializeSerialConsole (
   Send a GDB Remote Serial Protocol Packet
 
   $PacketData#checksum PacketData is passed in and this function adds the packet prefix '$',
-  the packet teminating character '#' and the two digit checksum.
+  the packet terminating character '#' and the two digit checksum.
 
   If an ack '+' is not sent resend the packet, but timeout eventually so we don't end up
-  in an infinit loop. This is so if you unplug the debugger code just keeps running
+  in an infinite loop. This is so if you unplug the debugger code just keeps running
 
   @param PacketData   Payload data for the packet
 
@@ -571,7 +574,7 @@ SendPacket (
  Receive a GDB Remote Serial Protocol Packet
 
  $PacketData#checksum PacketData is passed in and this function adds the packet prefix '$',
- the packet teminating character '#' and the two digit checksum.
+ the packet terminating character '#' and the two digit checksum.
 
  If host re-starts sending a packet without ending the previous packet, only the last valid packet is processed.
  (In other words, if received packet is '$12345$12345$123456#checksum', only '$123456#checksum' will be processed.)

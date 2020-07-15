@@ -3,21 +3,15 @@
 //
 // It implements the interfaces of monitoring the status of all ports and transferring
 // Control, Bulk, Interrupt and Isochronous requests to Usb2.0 device.
-// 
+//
 // Note that EhciDxe driver is enhanced to guarantee that the EHCI controller get attached
 // to the EHCI controller before the UHCI driver attaches to the companion UHCI controller.
 // This way avoids the control transfer on a shared port between EHCI and companion host
 // controller when UHCI gets attached earlier than EHCI and a USB 2.0 device inserts.
 //
-// Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 //
-// This program and the accompanying materials
-// are licensed and made available under the terms and conditions of the BSD License
-// which accompanies this distribution. The full text of the license may be found at
-// http://opensource.org/licenses/bsd-license.php
-// 
-// THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-// WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+// SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // **/
 

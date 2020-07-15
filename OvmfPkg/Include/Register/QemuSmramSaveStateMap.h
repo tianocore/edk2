@@ -1,7 +1,7 @@
 /** @file
 SMRAM Save State Map Definitions.
 
-SMRAM Save State Map definitions based on contents of the 
+SMRAM Save State Map definitions based on contents of the
 Intel(R) 64 and IA-32 Architectures Software Developer's Manual
   Volume 3C, Section 34.4 SMRAM
   Volume 3C, Section 34.5 SMI Handler Execution Environment
@@ -12,13 +12,7 @@ and the AMD64 Architecture Programmer's Manual
 
 Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2015, Red Hat, Inc.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 

@@ -3,13 +3,7 @@
 
   Copyright (c) 2011-2014, ARM Limited. All rights reserved.
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -19,7 +13,7 @@
 ///
 /// Global ID for the MMC Host Protocol
 ///
-#define EFI_MMC_HOST_PROTOCOL_GUID \
+#define EMBEDDED_MMC_HOST_PROTOCOL_GUID \
   { 0x3e591c00, 0x9e4a, 0x11df, {0x92, 0x44, 0x00, 0x02, 0xA5, 0xD5, 0xC5, 0x1B } }
 
 #define MMC_RESPONSE_TYPE_R1        0
@@ -184,7 +178,7 @@ struct _EFI_MMC_HOST_PROTOCOL {
 #define MMC_HOST_HAS_ISMULTIBLOCK(Host) (Host->Revision >= MMC_HOST_PROTOCOL_REVISION && \
                                          Host->IsMultiBlock != NULL)
 
-extern EFI_GUID gEfiMmcHostProtocolGuid;
+extern EFI_GUID gEmbeddedMmcHostProtocolGuid;
 
 #endif
 

@@ -1,15 +1,9 @@
 /** @file
-  
+
   The definition of CFormPkg's member function
 
-Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2004 - 2019, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -22,9 +16,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
  */
 
 SPendingAssign::SPendingAssign (
-  IN CHAR8  *Key, 
-  IN VOID   *Addr, 
-  IN UINT32 Len, 
+  IN CHAR8  *Key,
+  IN VOID   *Addr,
+  IN UINT32 Len,
   IN UINT32 LineNo,
   IN CONST CHAR8  *Msg
   )
@@ -69,7 +63,7 @@ SPendingAssign::~SPendingAssign (
 
 VOID
 SPendingAssign::SetAddrAndLen (
-  IN VOID   *Addr, 
+  IN VOID   *Addr,
   IN UINT32 LineNo
   )
 {
@@ -79,7 +73,7 @@ SPendingAssign::SetAddrAndLen (
 
 VOID
 SPendingAssign::AssignValue (
-  IN VOID   *Addr, 
+  IN VOID   *Addr,
   IN UINT32 Len
   )
 {
@@ -104,8 +98,13 @@ CFormPkg::CFormPkg (
   SBufferNode *Node;
 
   mPkgLength           = 0;
+  mBufferSize          = 0;
   mBufferNodeQueueHead = NULL;
+  mBufferNodeQueueTail = NULL;
   mCurrBufferNode      = NULL;
+  mReadBufferNode      = NULL;
+  mReadBufferOffset    = 0;
+  PendingAssignList    = NULL;
 
   Node = new SBufferNode;
   if (Node == NULL) {
@@ -139,7 +138,7 @@ CFormPkg::~CFormPkg ()
     pBNode = mBufferNodeQueueHead;
     mBufferNodeQueueHead = mBufferNodeQueueHead->mNext;
     if (pBNode->mBufferStart != NULL) {
-      delete pBNode->mBufferStart;
+      delete[] pBNode->mBufferStart;
       delete pBNode;
     }
   }
@@ -250,7 +249,7 @@ CFormPkg::Close (
 
 UINT32
 CFormPkg::Read (
-  IN CHAR8     *Buffer, 
+  IN CHAR8     *Buffer,
   IN UINT32    Size
   )
 {
@@ -304,7 +303,7 @@ CFormPkg::BuildPkg (
   OUT PACKAGE_DATA &TBuffer
   )
 {
-  
+
   CHAR8  *Temp;
   UINT32 Size;
   CHAR8  Buffer[1024];
@@ -352,7 +351,7 @@ CFormPkg::BuildPkg (
   }
   fwrite (PkgHdr, sizeof (EFI_HII_PACKAGE_HEADER), 1, Output);
   delete PkgHdr;
-  
+
   if (PkgData == NULL) {
     Open ();
     while ((Size = Read (Buffer, 1024)) != 0) {
@@ -422,7 +421,7 @@ UINT32   gAdjustOpcodeOffset = 0;
 BOOLEAN  gNeedAdjustOpcode   = FALSE;
 UINT32   gAdjustOpcodeLen    = 0;
 
-EFI_VFR_RETURN_CODE 
+EFI_VFR_RETURN_CODE
 CFormPkg::GenCFile (
   IN CHAR8 *BaseName,
   IN FILE *pFile,
@@ -445,28 +444,17 @@ CFormPkg::GenCFile (
     return Ret;
   }
 
-  //
-  // For framework vfr file, the extension framework header will be added.
-  //
-  if (VfrCompatibleMode) {
-	  fprintf (pFile, "  // FRAMEWORK PACKAGE HEADER Length\n");
-	  PkgLength = PkgHdr->Length + sizeof (UINT32) + 2;
-	  _WRITE_PKG_LINE(pFile, BYTES_PRE_LINE, "  ", (CHAR8 *)&PkgLength, sizeof (UINT32));	
-	  fprintf (pFile, "\n\n  // FRAMEWORK PACKAGE HEADER Type\n");
-	  PkgLength = 3;
-	  _WRITE_PKG_LINE(pFile, BYTES_PRE_LINE, "  ", (CHAR8 *)&PkgLength, sizeof (UINT16));	
-	} else {
-	  fprintf (pFile, "  // ARRAY LENGTH\n");
-	  PkgLength = PkgHdr->Length + sizeof (UINT32);
-	  _WRITE_PKG_LINE(pFile, BYTES_PRE_LINE, "  ", (CHAR8 *)&PkgLength, sizeof (UINT32));	
-	}
+
+  fprintf (pFile, "  // ARRAY LENGTH\n");
+  PkgLength = PkgHdr->Length + sizeof (UINT32);
+  _WRITE_PKG_LINE(pFile, BYTES_PRE_LINE, "  ", (CHAR8 *)&PkgLength, sizeof (UINT32));
 
   fprintf (pFile, "\n\n  // PACKAGE HEADER\n");
   _WRITE_PKG_LINE(pFile, BYTES_PRE_LINE, "  ", (CHAR8 *)PkgHdr, sizeof (EFI_HII_PACKAGE_HEADER));
   PkgLength = sizeof (EFI_HII_PACKAGE_HEADER);
 
   fprintf (pFile, "\n\n  // PACKAGE DATA\n");
-  
+
   if (PkgData == NULL) {
     Open ();
     while ((ReadSize = Read ((CHAR8 *)Buffer, BYTES_PRE_LINE * 8)) != 0) {
@@ -498,8 +486,8 @@ CFormPkg::GenCFile (
 
 EFI_VFR_RETURN_CODE
 CFormPkg::AssignPending (
-  IN CHAR8  *Key, 
-  IN VOID   *ValAddr, 
+  IN CHAR8  *Key,
+  IN VOID   *ValAddr,
   IN UINT32 ValLen,
   IN UINT32 LineNo,
   IN CONST CHAR8  *Msg
@@ -519,8 +507,8 @@ CFormPkg::AssignPending (
 
 VOID
 CFormPkg::DoPendingAssign (
-  IN CHAR8  *Key, 
-  IN VOID   *ValAddr, 
+  IN CHAR8  *Key,
+  IN VOID   *ValAddr,
   IN UINT32 ValLen
   )
 {
@@ -829,6 +817,9 @@ CFormPkg::DeclarePendingQuestion (
   UINT32         ShrinkSize = 0;
   EFI_VFR_RETURN_CODE  ReturnCode;
   EFI_VFR_VARSTORE_TYPE VarStoreType  = EFI_VFR_VARSTORE_INVALID;
+  UINT8    LFlags;
+  UINT32   MaxValue;
+  CIfrGuid *GuidObj = NULL;
 
   //
   // Declare all questions as Numeric in DisableIf True
@@ -836,22 +827,16 @@ CFormPkg::DeclarePendingQuestion (
   // DisableIf
   CIfrDisableIf DIObj;
   DIObj.SetLineNo (LineNo);
-  *InsertOpcodeAddr = DIObj.GetObjBinAddr ();
-  
+  *InsertOpcodeAddr = DIObj.GetObjBinAddr<CHAR8>();
+
   //TrueOpcode
   CIfrTrue TObj (LineNo);
 
   // Declare Numeric qeustion for each undefined question.
   for (pNode = PendingAssignList; pNode != NULL; pNode = pNode->mNext) {
     if (pNode->mFlag == PENDING) {
-      CIfrNumeric CNObj;
-      EFI_VARSTORE_INFO Info; 
+      EFI_VARSTORE_INFO Info;
       EFI_QUESTION_ID   QId   = EFI_QUESTION_ID_INVALID;
-
-      CNObj.SetLineNo (LineNo);
-      CNObj.SetPrompt (0x0);
-      CNObj.SetHelp (0x0);
-
       //
       // Register this question, assume it is normal question, not date or time question
       //
@@ -861,7 +846,7 @@ CFormPkg::DeclarePendingQuestion (
         gCVfrErrorHandle.HandleError (ReturnCode, pNode->mLineNo, pNode->mKey);
         return ReturnCode;
       }
- 
+
 #ifdef VFREXP_DEBUG
       printf ("Undefined Question name is %s and Id is 0x%x\n", VarStr, QId);
 #endif
@@ -881,14 +866,14 @@ CFormPkg::DeclarePendingQuestion (
         gCVfrErrorHandle.PrintMsg (pNode->mLineNo, FName, "Error", "Var Store Type is not defined");
         return ReturnCode;
       }
-      VarStoreType = lCVfrDataStorage.GetVarStoreType (Info.mVarStoreId); 
+      VarStoreType = lCVfrDataStorage.GetVarStoreType (Info.mVarStoreId);
 
       if (*VarStr == '\0' && ArrayIdx != INVALID_ARRAY_INDEX) {
         ReturnCode = lCVfrDataStorage.GetNameVarStoreInfo (&Info, ArrayIdx);
       } else {
         if (VarStoreType == EFI_VFR_VARSTORE_EFI) {
           ReturnCode = lCVfrDataStorage.GetEfiVarStoreInfo (&Info);
-        } else if (VarStoreType == EFI_VFR_VARSTORE_BUFFER) {
+        } else if (VarStoreType == EFI_VFR_VARSTORE_BUFFER || VarStoreType == EFI_VFR_VARSTORE_BUFFER_BITS) {
           VarStr = pNode->mKey;
           //convert VarStr with store name to VarStr with structure name
           ReturnCode = lCVfrDataStorage.GetBufferVarStoreDataTypeName (Info.mVarStoreId, &SName);
@@ -897,7 +882,7 @@ CFormPkg::DeclarePendingQuestion (
             NewStr[0] = '\0';
             strcpy (NewStr, SName);
             strcat (NewStr, VarStr + strlen (FName));
-            ReturnCode = lCVfrVarDataTypeDB.GetDataFieldInfo (NewStr, Info.mInfo.mVarOffset, Info.mVarType, Info.mVarTotalSize);
+            ReturnCode = lCVfrVarDataTypeDB.GetDataFieldInfo (NewStr, Info.mInfo.mVarOffset, Info.mVarType, Info.mVarTotalSize, Info.mIsBitVar);
             delete[] NewStr;
           }
         } else {
@@ -908,39 +893,63 @@ CFormPkg::DeclarePendingQuestion (
         gCVfrErrorHandle.HandleError (ReturnCode, pNode->mLineNo, pNode->mKey);
         return ReturnCode;
       }
+      //
+      // If the storage is bit fields, create Guid opcode to wrap the numeric opcode.
+      //
+      if (Info.mIsBitVar) {
+        GuidObj = new CIfrGuid(0);
+        GuidObj->SetGuid (&gEdkiiIfrBitVarGuid);
+        GuidObj->SetLineNo(LineNo);
+      }
 
+      CIfrNumeric CNObj;
+      CNObj.SetLineNo (LineNo);
+      CNObj.SetPrompt (0x0);
+      CNObj.SetHelp (0x0);
       CNObj.SetQuestionId (QId);
       CNObj.SetVarStoreInfo (&Info);
+
       //
-      // Numeric doesn't support BOOLEAN data type. 
-      // BOOLEAN type has the same data size to UINT8. 
+      // Set Min/Max/Step Data and flags for the question with bit fields.Min/Max/Step Data are saved as UINT32 type for bit question.
       //
-      if (Info.mVarType == EFI_IFR_TYPE_BOOLEAN) {
-        Info.mVarType = EFI_IFR_TYPE_NUM_SIZE_8;
-      }
-      CNObj.SetFlags (0, Info.mVarType);
-      //
-      // Use maximum value not to limit the vaild value for the undefined question.
-      //
-      switch (Info.mVarType) {
-      case EFI_IFR_TYPE_NUM_SIZE_64:
-        CNObj.SetMinMaxStepData ((UINT64) 0, (UINT64) -1 , (UINT64) 0);
-        ShrinkSize = 0;
-        break;
-      case EFI_IFR_TYPE_NUM_SIZE_32:
-        CNObj.SetMinMaxStepData ((UINT32) 0, (UINT32) -1 , (UINT32) 0);
+      if (Info.mIsBitVar) {
+        MaxValue = (1 << Info.mVarTotalSize) -1;
+        CNObj.SetMinMaxStepData ((UINT32) 0, MaxValue, (UINT32) 0);
         ShrinkSize = 12;
-        break;
-      case EFI_IFR_TYPE_NUM_SIZE_16:
-        CNObj.SetMinMaxStepData ((UINT16) 0, (UINT16) -1 , (UINT16) 0);
-        ShrinkSize = 18;
-        break;
-      case EFI_IFR_TYPE_NUM_SIZE_8:
-        CNObj.SetMinMaxStepData ((UINT8) 0, (UINT8) -1 , (UINT8) 0);
-        ShrinkSize = 21;
-        break;
-      default:
-        break;
+        LFlags = (EDKII_IFR_NUMERIC_SIZE_BIT & Info.mVarTotalSize);
+        CNObj.SetFlagsForBitField (0, LFlags);
+      } else {
+        //
+        // Numeric doesn't support BOOLEAN data type.
+        // BOOLEAN type has the same data size to UINT8.
+        //
+        if (Info.mVarType == EFI_IFR_TYPE_BOOLEAN) {
+          Info.mVarType = EFI_IFR_TYPE_NUM_SIZE_8;
+        }
+        CNObj.SetFlags (0, Info.mVarType);
+        //
+        // Use maximum value not to limit the valid value for the undefined question.
+        //
+        switch (Info.mVarType) {
+        case EFI_IFR_TYPE_NUM_SIZE_64:
+          CNObj.SetMinMaxStepData ((UINT64) 0, (UINT64) -1 , (UINT64) 0);
+          ShrinkSize = 0;
+          break;
+        case EFI_IFR_TYPE_NUM_SIZE_32:
+          CNObj.SetMinMaxStepData ((UINT32) 0, (UINT32) -1 , (UINT32) 0);
+          ShrinkSize = 12;
+          break;
+        case EFI_IFR_TYPE_NUM_SIZE_16:
+          CNObj.SetMinMaxStepData ((UINT16) 0, (UINT16) -1 , (UINT16) 0);
+          ShrinkSize = 18;
+          break;
+        case EFI_IFR_TYPE_NUM_SIZE_8:
+          CNObj.SetMinMaxStepData ((UINT8) 0, (UINT8) -1 , (UINT8) 0);
+          ShrinkSize = 21;
+          break;
+        default:
+          break;
+        }
       }
       CNObj.ShrinkBinSize (ShrinkSize);
 
@@ -948,7 +957,7 @@ CFormPkg::DeclarePendingQuestion (
       // For undefined Efi VarStore type question
       // Append the extended guided opcode to contain VarName
       //
-      if (VarStoreType == EFI_VFR_VARSTORE_EFI || VfrCompatibleMode) {
+      if (VarStoreType == EFI_VFR_VARSTORE_EFI) {
         CIfrVarEqName CVNObj (QId, Info.mInfo.mVarName);
         CVNObj.SetLineNo (LineNo);
       }
@@ -956,8 +965,18 @@ CFormPkg::DeclarePendingQuestion (
       //
       // End for Numeric
       //
-      CIfrEnd CEObj; 
+      CIfrEnd CEObj;
       CEObj.SetLineNo (LineNo);
+      //
+      // End for Guided opcode
+      //
+      if (GuidObj != NULL) {
+        CIfrEnd CEObjGuid;
+        CEObjGuid.SetLineNo (LineNo);
+        GuidObj->SetScope(1);
+        delete GuidObj;
+        GuidObj = NULL;
+      }
     }
   }
 
@@ -1113,10 +1132,10 @@ CIfrRecordInfoDB::IfrRecordOutput (
   )
 {
   CHAR8      *Temp;
-  SIfrRecord *pNode; 
+  SIfrRecord *pNode;
 
   if (TBuffer.Buffer != NULL) {
-    delete TBuffer.Buffer;
+    delete[] TBuffer.Buffer;
   }
 
   TBuffer.Size = 0;
@@ -1125,18 +1144,18 @@ CIfrRecordInfoDB::IfrRecordOutput (
 
   if (mSwitch == FALSE) {
     return;
-  } 
-   
+  }
+
   for (pNode = mIfrRecordListHead; pNode != NULL; pNode = pNode->mNext) {
     TBuffer.Size += pNode->mBinBufLen;
   }
-  
+
   if (TBuffer.Size != 0) {
     TBuffer.Buffer = new CHAR8[TBuffer.Size];
   } else {
     return;
   }
-  
+
   Temp = TBuffer.Buffer;
 
   for (pNode = mIfrRecordListHead; pNode != NULL; pNode = pNode->mNext) {
@@ -1146,8 +1165,8 @@ CIfrRecordInfoDB::IfrRecordOutput (
     }
   }
 
-  return;   
-}   
+  return;
+}
 
 VOID
 CIfrRecordInfoDB::IfrRecordOutput (
@@ -1181,7 +1200,7 @@ CIfrRecordInfoDB::IfrRecordOutput (
       fprintf (File, "\n");
     }
   }
-  
+
   if (LineNo == 0) {
     fprintf (File, "\nTotal Size of all record is 0x%08X\n", TotalSize);
   }
@@ -1228,7 +1247,7 @@ CIfrRecordInfoDB::CheckIdOpCode (
   default:
     return FALSE;
   }
-} 
+}
 
 EFI_QUESTION_ID
 CIfrRecordInfoDB::GetOpcodeQuestionId (
@@ -1236,9 +1255,9 @@ CIfrRecordInfoDB::GetOpcodeQuestionId (
   )
 {
   EFI_IFR_QUESTION_HEADER *QuestionHead;
-  
+
   QuestionHead = (EFI_IFR_QUESTION_HEADER *) (OpHead + 1);
-  
+
   return QuestionHead->QuestionId;
 }
 
@@ -1422,7 +1441,7 @@ CIfrRecordInfoDB::IfrRecordAdjust (
   QuestionScope = 0;
   while (pNode != NULL) {
     OpHead = (EFI_IFR_OP_HEADER *) pNode->mIfrBinBuf;
-    
+
     //
     // make sure the inconsistent opcode in question scope
     //
@@ -1432,7 +1451,7 @@ CIfrRecordInfoDB::IfrRecordAdjust (
         QuestionScope --;
       }
     }
-    
+
     if (CheckQuestionOpCode (OpHead->OpCode)) {
       QuestionScope = 1;
     }
@@ -1445,7 +1464,7 @@ CIfrRecordInfoDB::IfrRecordAdjust (
       //
 
       //
-      // Count inconsistent opcode Scope 
+      // Count inconsistent opcode Scope
       //
       StackCount = OpHead->Scope;
       QuestionId = EFI_QUESTION_ID_INVALID;
@@ -1463,7 +1482,7 @@ CIfrRecordInfoDB::IfrRecordAdjust (
         //
         // by IdEqual opcode to get QuestionId
         //
-        if (QuestionId == EFI_QUESTION_ID_INVALID && 
+        if (QuestionId == EFI_QUESTION_ID_INVALID &&
             CheckIdOpCode (tOpHead->OpCode)) {
           QuestionId = *(EFI_QUESTION_ID *) (tOpHead + 1);
         }
@@ -1479,15 +1498,15 @@ CIfrRecordInfoDB::IfrRecordAdjust (
       }
       //
       // extract inconsistent opcode list
-      // pNode is Incosistent opcode, tNode is End Opcode
+      // pNode is Inconsistent opcode, tNode is End Opcode
       //
-      
+
       //
       // insert inconsistent opcode list into the right question scope by questionid
       //
       for (uNode = mIfrRecordListHead; uNode != NULL; uNode = uNode->mNext) {
         tOpHead = (EFI_IFR_OP_HEADER *) uNode->mIfrBinBuf;
-        if (CheckQuestionOpCode (tOpHead->OpCode) && 
+        if (CheckQuestionOpCode (tOpHead->OpCode) &&
             (QuestionId == GetOpcodeQuestionId (tOpHead))) {
           break;
         }
@@ -1502,7 +1521,7 @@ CIfrRecordInfoDB::IfrRecordAdjust (
           //
           OpHead->OpCode = EFI_IFR_NO_SUBMIT_IF_OP;
         }
-        
+
         //
         // skip the default storage for Date and Time
         //
@@ -1529,7 +1548,7 @@ CIfrRecordInfoDB::IfrRecordAdjust (
         Status = VFR_RETURN_MISMATCHED;
         break;
       }
-    } else if (OpHead->OpCode == EFI_IFR_VARSTORE_OP || 
+    } else if (OpHead->OpCode == EFI_IFR_VARSTORE_OP ||
                OpHead->OpCode == EFI_IFR_VARSTORE_EFI_OP) {
       //
       // for new added group of varstore opcode
@@ -1537,9 +1556,9 @@ CIfrRecordInfoDB::IfrRecordAdjust (
       tNode = pNode;
       while (tNode->mNext != NULL) {
         tOpHead = (EFI_IFR_OP_HEADER *) tNode->mNext->mIfrBinBuf;
-        if (tOpHead->OpCode != EFI_IFR_VARSTORE_OP && 
+        if (tOpHead->OpCode != EFI_IFR_VARSTORE_OP &&
             tOpHead->OpCode != EFI_IFR_VARSTORE_EFI_OP) {
-          break;    
+          break;
         }
         tNode = tNode->mNext;
       }
@@ -1547,22 +1566,22 @@ CIfrRecordInfoDB::IfrRecordAdjust (
       if (tNode->mNext == NULL) {
         //
         // invalid IfrCode, IfrCode end by EndOpCode
-        // 
+        //
         gCVfrErrorHandle.PrintMsg (0, NULL, "Error", "No found End Opcode in the end");
         Status = VFR_RETURN_MISMATCHED;
         break;
       }
-      
+
       if (tOpHead->OpCode != EFI_IFR_END_OP) {
           //
           // not new added varstore, which are not needed to be adjust.
           //
           preNode = tNode;
           pNode   = tNode->mNext;
-          continue;        
+          continue;
       } else {
         //
-        // move new added varstore opcode to the position befor form opcode 
+        // move new added varstore opcode to the position befor form opcode
         // varstore opcode between pNode and tNode
         //
 
@@ -1603,9 +1622,9 @@ CIfrRecordInfoDB::IfrRecordAdjust (
     // next node
     //
     preNode = pNode;
-    pNode = pNode->mNext; 
+    pNode = pNode->mNext;
   }
-  
+
   //
   // Update Ifr Opcode Offset
   //
@@ -1889,7 +1908,7 @@ CIfrRecordInfoDB::IfrCreateDefaultForQuestion (
           Obj = new CIfrObj (pOpHead->OpCode, NULL, pSNode->mBinBufLen, FALSE);
           assert (Obj != NULL);
           Obj->SetLineNo (pSNode->mLineNo);
-          ObjBinBuf = Obj->GetObjBinAddr();
+          ObjBinBuf = Obj->GetObjBinAddr<CHAR8>();
           memcpy (ObjBinBuf, pSNode->mIfrBinBuf, (UINTN)pSNode->mBinBufLen);
           delete Obj;
           pSNode = pSNode->mNext;
@@ -2202,7 +2221,7 @@ CIfrObj::_EMIT_PENDING_OBJ (
   )
 {
   CHAR8  *ObjBinBuf = NULL;
-  
+
   //
   // do nothing
   //
@@ -2218,15 +2237,15 @@ CIfrObj::_EMIT_PENDING_OBJ (
   if (ObjBinBuf != NULL) {
     memmove (ObjBinBuf, mObjBinBuf, mObjBinLen);
   }
-  
+
   //
   // update bin buffer to package data buffer
   //
   if (mObjBinBuf != NULL) {
-    delete mObjBinBuf;
+    delete[] mObjBinBuf;
     mObjBinBuf = ObjBinBuf;
   }
-  
+
   mDelayEmit = FALSE;
 }
 
@@ -2390,6 +2409,7 @@ CIfrObj::CIfrObj (
   mObjBinLen   = (ObjBinLen == 0) ? gOpcodeSizesScopeTable[OpCode].mSize : ObjBinLen;
   mObjBinBuf   = ((DelayEmit == FALSE) && (gCreateOp == TRUE)) ? gCFormPkg.IfrBinBufferGet (mObjBinLen) : new CHAR8[EFI_IFR_MAX_LENGTH];
   mRecordIdx   = (gCreateOp == TRUE) ? gCIfrRecordInfoDB.IfrRecordRegister (0xFFFFFFFF, mObjBinBuf, mObjBinLen, mPkgOffset) : EFI_IFR_RECORDINFO_IDX_INVALUD;
+  mLineNo      = 0;
 
   assert (mObjBinBuf != NULL);
 

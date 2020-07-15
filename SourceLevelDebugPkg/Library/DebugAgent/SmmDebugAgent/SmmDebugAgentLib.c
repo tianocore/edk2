@@ -1,14 +1,8 @@
 /** @file
-  Debug Agent library implementition.
+  Debug Agent library implementation.
 
-  Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -20,6 +14,11 @@ UINTN                       mSavedDebugRegisters[6];
 IA32_IDT_GATE_DESCRIPTOR    mIdtEntryTable[33];
 BOOLEAN                     mSkipBreakpoint = FALSE;
 BOOLEAN                     mSmmDebugIdtInitFlag = FALSE;
+BOOLEAN                     mApicTimerRestore = FALSE;
+BOOLEAN                     mPeriodicMode;
+UINT32                      mTimerCycle;
+UINTN                       mApicTimerDivisor;
+UINT8                       mVector;
 
 CHAR8 mWarningMsgIgnoreSmmEntryBreak[] = "Ignore smmentrybreak setting for SMI issued during DXE debugging!\r\n";
 
@@ -72,7 +71,7 @@ GetMailboxFromHob (
   )
 {
   EFI_HOB_GUID_TYPE        *GuidHob;
-  UINT64                   *MailboxLocation;  
+  UINT64                   *MailboxLocation;
   DEBUG_AGENT_MAILBOX      *Mailbox;
 
   GuidHob = GetFirstGuidHob (&gEfiDebugAgentGuid);
@@ -82,7 +81,7 @@ GetMailboxFromHob (
   MailboxLocation = (UINT64 *) (GET_GUID_HOB_DATA(GuidHob));
   Mailbox = (DEBUG_AGENT_MAILBOX *)(UINTN)(*MailboxLocation);
   VerifyMailboxChecksum (Mailbox);
-  
+
   return Mailbox;
 }
 
@@ -153,13 +152,13 @@ RestoreDebugRegister (
 /**
   Initialize debug agent.
 
-  This function is used to set up debug enviroment for source level debug
+  This function is used to set up debug environment for source level debug
   in SMM code.
 
-  If InitFlag is DEBUG_AGENT_INIT_SMM, it will overirde IDT table entries
+  If InitFlag is DEBUG_AGENT_INIT_SMM, it will override IDT table entries
   and initialize debug port. It will get debug agent Mailbox from GUIDed HOB,
   it it exists, debug agent wiil copied it into the local Mailbox in SMM space.
-  it will overirde IDT table entries and initialize debug port. Context will be
+  it will override IDT table entries and initialize debug port. Context will be
   NULL.
   If InitFlag is DEBUG_AGENT_INIT_ENTER_SMI, debug agent will save Debug
   Registers and get local Mailbox in SMM space. Context will be NULL.
@@ -191,8 +190,6 @@ InitializeDebugAgent (
   DEBUG_AGENT_MAILBOX           *Mailbox;
   UINT64                        *MailboxLocation;
   UINT32                        DebugTimerFrequency;
-  BOOLEAN                       PeriodicMode;
-  UINTN                         TimerCycle;
 
   switch (InitFlag) {
   case DEBUG_AGENT_INIT_SMM:
@@ -221,7 +218,7 @@ InitializeDebugAgent (
     //
     // Check if Debug Agent initialized in SEC/PEI phase
     //
-    Mailbox = GetMailboxFromHob (); 
+    Mailbox = GetMailboxFromHob ();
     if (Mailbox != NULL) {
       mMailboxPointer = Mailbox;
       break;
@@ -234,7 +231,7 @@ InitializeDebugAgent (
     //
     // Save original IDT entries
     //
-    AsmReadIdtr (&IdtDescriptor);      
+    AsmReadIdtr (&IdtDescriptor);
     CopyMem (&IdtEntry, (VOID *)IdtDescriptor.Base, 33 * sizeof(IA32_IDT_GATE_DESCRIPTOR));
     //
     // Initialized Debug Agent
@@ -266,11 +263,11 @@ InitializeDebugAgent (
     }
     //
     // Find and report PE/COFF image info to HOST
-    //  
+    //
     FindAndReportModuleImageInfo (SIZE_4KB);
     //
     // Restore saved IDT entries
-    //     
+    //
     CopyMem ((VOID *)IdtDescriptor.Base, &IdtEntry, 33 * sizeof(IA32_IDT_GATE_DESCRIPTOR));
 
     break;
@@ -289,15 +286,16 @@ InitializeDebugAgent (
     // Check if CPU APIC Timer is working, otherwise initialize it.
     //
     InitializeLocalApicSoftwareEnable (TRUE);
-    GetApicTimerState (NULL, &PeriodicMode, NULL);
-    TimerCycle = GetApicTimerInitCount ();
-    if (!PeriodicMode || TimerCycle == 0) {
+    GetApicTimerState (&mApicTimerDivisor, &mPeriodicMode, &mVector);
+    mTimerCycle = GetApicTimerInitCount ();
+    if (!mPeriodicMode || mTimerCycle == 0) {
+      mApicTimerRestore = TRUE;
       InitializeDebugTimer (NULL, FALSE);
     }
     Mailbox = GetMailboxPointer ();
     if (GetDebugFlag (DEBUG_AGENT_FLAG_AGENT_IN_PROGRESS) == 1) {
       //
-      // If Debug Agent has been communicaton state with HOST, we need skip
+      // If Debug Agent has been communication state with HOST, we need skip
       // any break points set in SMM, set Skip Breakpoint flag
       //
       mSkipBreakpoint = TRUE;
@@ -327,6 +325,13 @@ InitializeDebugAgent (
     //
     mSkipBreakpoint = FALSE;
     RestoreDebugRegister ();
+    //
+    // Restore APIC Timer
+    //
+    if (mApicTimerRestore) {
+      InitializeApicTimer (mApicTimerDivisor, mTimerCycle, mPeriodicMode, mVector);
+      mApicTimerRestore = FALSE;
+    }
     break;
 
   case DEBUG_AGENT_INIT_THUNK_PEI_IA32TOX64:
@@ -370,12 +375,12 @@ InitializeDebugAgent (
 
   default:
     //
-    // Only DEBUG_AGENT_INIT_PREMEM_SEC and DEBUG_AGENT_INIT_POSTMEM_SEC are allowed for this 
+    // Only DEBUG_AGENT_INIT_PREMEM_SEC and DEBUG_AGENT_INIT_POSTMEM_SEC are allowed for this
     // Debug Agent library instance.
     //
     DEBUG ((EFI_D_ERROR, "Debug Agent: The InitFlag value is not allowed!\n"));
     CpuDeadLoop ();
-    break;    
+    break;
   }
 }
 

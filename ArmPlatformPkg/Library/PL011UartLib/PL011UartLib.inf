@@ -1,0 +1,38 @@
+#/** @file
+#
+#  Component description file for PL011Uart module
+#
+#  Copyright (c) 2011-2016, ARM Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PL011UartLib
+  FILE_GUID                      = 6a2c5714-8910-44f0-861f-804abc18ce39
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PL011UartLib
+
+[Sources.common]
+  PL011Uart.h
+  PL011UartLib.c
+
+[LibraryClasses]
+  DebugLib
+  IoLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+
+[FixedPcd]
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultReceiveFifoDepth
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialBaudRate
+
+  gArmPlatformTokenSpaceGuid.PL011UartInteger
+  gArmPlatformTokenSpaceGuid.PL011UartFractional
+  gArmPlatformTokenSpaceGuid.PL011UartRegOffsetVariant

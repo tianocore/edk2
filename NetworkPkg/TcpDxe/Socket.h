@@ -1,15 +1,9 @@
 /** @file
   Common head file for TCP socket.
 
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -113,8 +107,8 @@
 
   @param[in]  Sock           Pointer to the socket.
 
-  @retval TRUE               The socket is unconfigued.
-  @retval FALSE              The socket is not unconfigued.
+  @retval TRUE               The socket is unconfigured.
+  @retval FALSE              The socket is not unconfigured.
 
 **/
 #define SOCK_IS_UNCONFIGURED(Sock)  ((Sock)->ConfigureState == SO_UNCONFIGURED)
@@ -124,8 +118,8 @@
 
   @param[in] Sock            Pointer to the socket
 
-  @retval TRUE               The socket is configued
-  @retval FALSE              The socket is not configued
+  @retval TRUE               The socket is configured
+  @retval FALSE              The socket is not configured
 
 **/
 #define SOCK_IS_CONFIGURED(Sock) \
@@ -137,8 +131,8 @@
 
   @param[in] Sock            Pointer to the socket.
 
-  @retval TRUE               The socket is configued to active mode.
-  @retval FALSE              The socket is not configued to active mode.
+  @retval TRUE               The socket is configured to active mode.
+  @retval FALSE              The socket is not configured to active mode.
 
 **/
 #define SOCK_IS_CONFIGURED_ACTIVE(Sock) ((Sock)->ConfigureState == SO_CONFIGURED_ACTIVE)
@@ -148,8 +142,8 @@
 
   @param[in] Sock            Pointer to the socket.
 
-  @retval TRUE               The socket is configued to passive mode.
-  @retval FALSE              The socket is not configued to passive mode.
+  @retval TRUE               The socket is configured to passive mode.
+  @retval FALSE              The socket is not configured to passive mode.
 
 **/
 #define SOCK_IS_CONNECTED_PASSIVE(Sock) ((Sock)->ConfigureState == SO_CONFIGURED_PASSIVE)
@@ -361,7 +355,7 @@ typedef enum {
 ///
 typedef struct _SOCK_BUFFER {
   UINT32        HighWater;  ///< The buffersize upper limit of sock_buffer
-  UINT32        LowWater;   ///< The low warter mark of sock_buffer
+  UINT32        LowWater;   ///< The low water mark of sock_buffer
   NET_BUF_QUEUE *DataQueue; ///< The queue to buffer data
 } SOCK_BUFFER;
 
@@ -386,13 +380,13 @@ EFI_STATUS
   );
 
 /**
-  The Callback funtion called after the TCP socket is created.
+  The Callback function called after the TCP socket is created.
 
   @param[in]  This            Pointer to the socket just created.
   @param[in]  Context         Context of the socket.
 
   @retval EFI_SUCCESS         This protocol installed successfully.
-  @retval other               Some error occured.
+  @retval other               Some error occurred.
 
 **/
 typedef
@@ -425,8 +419,8 @@ typedef struct _SOCK_INIT_DATA {
 
   SOCKET                 *Parent;        ///< The parent of this socket
   UINT32                 BackLog;        ///< The connection limit for listening socket
-  UINT32                 SndBufferSize;  ///< The high warter mark of send buffer
-  UINT32                 RcvBufferSize;  ///< The high warter mark of receive buffer
+  UINT32                 SndBufferSize;  ///< The high water mark of send buffer
+  UINT32                 RcvBufferSize;  ///< The high water mark of receive buffer
   UINT8                  IpVersion;
   VOID                   *Protocol;      ///< The pointer to protocol function template
                                          ///< wanted to install on socket
@@ -435,7 +429,7 @@ typedef struct _SOCK_INIT_DATA {
   // Callbacks after socket is created and before socket is to be destroyed.
   //
   SOCK_CREATE_CALLBACK   CreateCallback;  ///< Callback after created
-  SOCK_DESTROY_CALLBACK  DestroyCallback; ///< Callback before destroied
+  SOCK_DESTROY_CALLBACK  DestroyCallback; ///< Callback before destroyed
   VOID                   *Context;        ///< The context of the callback
 
   //
@@ -450,7 +444,7 @@ typedef struct _SOCK_INIT_DATA {
 } SOCK_INIT_DATA;
 
 ///
-///  The union type of TCP and UDP protocol.
+///  The union type of TCP4 and TCP6 protocol.
 ///
 typedef union _NET_PROTOCOL {
   EFI_TCP4_PROTOCOL      Tcp4Protocol;    ///< Tcp4 protocol
@@ -502,12 +496,12 @@ struct _TCP_SOCKET {
   SOCK_PROTO_HANDLER        ProtoHandler;     ///< The request handler of protocol
   UINT8                     ProtoReserved[PROTO_RESERVED_LEN];  ///< Data fields reserved for protocol
   UINT8                     IpVersion;
-  NET_PROTOCOL              NetProtocol;                        ///< TCP or UDP protocol socket used
+  NET_PROTOCOL              NetProtocol;                        ///< TCP4 or TCP6 protocol socket used
   //
   // Callbacks after socket is created and before socket is to be destroyed.
   //
   SOCK_CREATE_CALLBACK      CreateCallback;   ///< Callback after created
-  SOCK_DESTROY_CALLBACK     DestroyCallback;  ///< Callback before destroied
+  SOCK_DESTROY_CALLBACK     DestroyCallback;  ///< Callback before destroyed
   VOID                      *Context;         ///< The context of the callback
 };
 
@@ -518,7 +512,7 @@ typedef struct _SOCK_TOKEN {
   LIST_ENTRY            TokenList;      ///< The entry to add in the token list
   SOCK_COMPLETION_TOKEN *Token;         ///< The application's token
   UINT32                RemainDataLen;  ///< Unprocessed data length
-  SOCKET                *Sock;          ///< The poninter to the socket this token
+  SOCKET                *Sock;          ///< The pointer to the socket this token
                                         ///< belongs to
 } SOCK_TOKEN;
 
@@ -530,7 +524,7 @@ typedef struct _TCP_RSV_DATA {
 } TCP_RSV_DATA;
 
 //
-// Socket provided oprerations for low layer protocol implemented in SockImpl.c
+// Socket provided operations for low layer protocol implemented in SockImpl.c
 //
 
 /**
@@ -682,12 +676,12 @@ SockNoMoreData (
 
 /**
   Create a socket and its associated protocol control block
-  with the intial data SockInitData and protocol specific
+  with the initial data SockInitData and protocol specific
   data ProtoData.
 
-  @param[in]  SockInitData         Inital data to setting the socket.
+  @param[in]  SockInitData         Initial data to setting the socket.
 
-  @return Pointer to the newly created socket. If NULL, an error condition occured.
+  @return Pointer to the newly created socket. If NULL, an error condition occurred.
 
 **/
 SOCKET *
@@ -729,7 +723,7 @@ SockConfigure (
 /**
   Initiate a connection establishment process.
 
-  @param[in]  Sock             Pointer to the socket to initiate the initate the
+  @param[in]  Sock             Pointer to the socket to initiate the
                                connection.
   @param[in]  Token            Pointer to the token used for the connection
                                operation.
@@ -897,25 +891,6 @@ EFI_STATUS
 SockGetMode (
   IN     SOCKET *Sock,
   IN OUT VOID   *Mode
-  );
-
-/**
-  Configure the low level protocol to join a multicast group for
-  this socket's connection.
-
-  @param[in]  Sock             Pointer to the socket of the connection to join the
-                               specific multicast group.
-  @param[in]  GroupInfo        Pointer to the multicast group information.
-
-  @retval EFI_SUCCESS          The configuration completed successfully.
-  @retval EFI_ACCESS_DENIED    Failed to get the lock to access the socket.
-  @retval EFI_NOT_STARTED      The socket is not configured.
-
-**/
-EFI_STATUS
-SockGroup (
-  IN SOCKET *Sock,
-  IN VOID   *GroupInfo
   );
 
 /**

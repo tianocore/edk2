@@ -4,13 +4,7 @@
 
   Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -114,7 +108,7 @@ Mtftp6DriverBindingStop (
                               then a new handle is created. If it is a pointer to an existing
                               UEFI handle, then the protocol is added to the existing UEFI handle.
 
-  @retval EFI_SUCCES            The protocol was added to ChildHandle.
+  @retval EFI_SUCCESS           The protocol was added to ChildHandle.
   @retval EFI_INVALID_PARAMETER ChildHandle is NULL.
   @retval Others                The child handle was not created.
 
@@ -136,7 +130,7 @@ Mtftp6ServiceBindingCreateChild (
   @param[in]  This        Pointer to the EFI_SERVICE_BINDING_PROTOCOL instance.
   @param[in]  ChildHandle Handle of the child to destroy.
 
-  @retval EFI_SUCCES            The protocol was removed from ChildHandle.
+  @retval EFI_SUCCESS           The protocol was removed from ChildHandle.
   @retval EFI_UNSUPPORTED       ChildHandle does not support the protocol that is being removed.
   @retval EFI_INVALID_PARAMETER Child handle is NULL.
   @retval Others                The child handle was not destroyed

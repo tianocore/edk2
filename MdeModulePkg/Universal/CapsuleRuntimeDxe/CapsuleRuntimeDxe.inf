@@ -1,18 +1,13 @@
 ## @file
 #  Capsule Runtime Driver produces two UEFI capsule runtime services: (UpdateCapsule, QueryCapsuleCapabilities).
 #
-#  It installs the Capsule Architectural Protocol defined in PI1.0a to signify 
+#  It installs the Capsule Architectural Protocol defined in PI1.0a to signify
 #  the capsule runtime services are ready.
-#  
-#  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
-#  This program and the accompanying materials
-#  are licensed and made available under the terms and conditions of the BSD License
-#  which accompanies this distribution.  The full text of the license may be found at
-#  http://opensource.org/licenses/bsd-license.php
-#  
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-#  
+#
+#  Copyright (c) 2006 - 2020, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
 ##
 
 [Defines]
@@ -27,14 +22,27 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#  VALID_ARCHITECTURES           = IA32 X64 EBC ARM AARCH64 RISCV64
 #
 
 [Sources]
   CapsuleService.c
+  CapsuleService.h
 
-[Sources.Ia32, Sources.IPF, Sources.EBC, Sources.ARM, Sources.AARCH64]
+[Sources.Ia32, Sources.EBC, Sources.ARM, Sources.AARCH64, Sources.RISCV64]
   SaveLongModeContext.c
+
+[Sources.Ia32, Sources.X64, Sources.ARM, Sources.AARCH64, Sources.RISCV64]
+  CapsuleCache.c
+
+[Sources.Ia32, Sources.X64, Sources.EBC, Sources.RISCV64]
+  CapsuleReset.c
+
+[Sources.ARM, Sources.AARCH64]
+  Arm/CapsuleReset.c
+
+[Sources.EBC]
+  CapsuleCacheNull.c
 
 [Sources.X64]
   X64/SaveLongModeContext.c
@@ -54,6 +62,7 @@
   BaseLib
   PrintLib
   BaseMemoryLib
+  CacheMaintenanceLib
 
 [LibraryClasses.X64]
   UefiLib
@@ -74,14 +83,16 @@
   gEdkiiVariableLockProtocolGuid
 
 [FeaturePcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSupportUpdateCapsuleReset   ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSupportUpdateCapsuleReset        ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSupportProcessCapsuleAtRuntime   ## CONSUMES
 
 [FeaturePcd.X64]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode      ## CONSUMES
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxSizeNonPopulateCapsule   ## SOMETIMES_CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxSizePopulateCapsule || gEfiMdeModulePkgTokenSpaceGuid.PcdSupportUpdateCapsuleReset ## SOMETIMES_CONSUMES # Populate Image requires reset support.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxSizePopulateCapsule      ## SOMETIMES_CONSUMES # Populate Image requires reset support.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleInRamSupport         ## CONSUMES
 
 [Pcd.X64]
   gEfiMdeModulePkgTokenSpaceGuid.PcdCapsulePeiLongModeStackSize   ## SOMETIMES_CONSUMES

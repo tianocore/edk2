@@ -4,14 +4,7 @@ which is used to enable recovery function from USB Drivers.
 
 Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
 
-This program and the accompanying materials
-are licensed and made available under the terms and conditions
-of the BSD License which accompanies this distribution.  The
-full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -31,6 +24,9 @@ UsbHcAllocMemBlock (
   )
 {
   USBHC_MEM_BLOCK       *Block;
+  VOID                  *BufHost;
+  VOID                  *Mapping;
+  EFI_PHYSICAL_ADDRESS  MappedAddr;
   EFI_STATUS            Status;
   UINTN                 PageNumber;
   EFI_PHYSICAL_ADDRESS  TempPtr;
@@ -71,18 +67,20 @@ UsbHcAllocMemBlock (
 
   Block->Bits = (UINT8 *) (UINTN) TempPtr;
 
-  Status = PeiServicesAllocatePages (
-             EfiBootServicesData,
+  Status = IoMmuAllocateBuffer (
              Pages,
-             &TempPtr
+             &BufHost,
+             &MappedAddr,
+             &Mapping
              );
   if (EFI_ERROR (Status)) {
     return NULL;
   }
-  ZeroMem ((VOID *) (UINTN) TempPtr, EFI_PAGES_TO_SIZE (Pages));
+  ZeroMem ((VOID *) (UINTN) BufHost, EFI_PAGES_TO_SIZE (Pages));
 
-  Block->BufHost = (UINT8 *) (UINTN) TempPtr;;
-  Block->Buf = (UINT8 *) (UINTN) TempPtr;
+  Block->BufHost = (UINT8 *) (UINTN) BufHost;
+  Block->Buf = (UINT8 *) (UINTN) MappedAddr;
+  Block->Mapping  = Mapping;
   Block->Next = NULL;
 
   return Block;
@@ -102,6 +100,9 @@ UsbHcFreeMemBlock (
   )
 {
   ASSERT ((Pool != NULL) && (Block != NULL));
+
+  IoMmuFreeBuffer (EFI_SIZE_TO_PAGES (Block->BufLen), Block->BufHost, Block->Mapping);
+
   //
   // No free memory in PEI.
   //
@@ -320,31 +321,7 @@ UsbHcIsMemBlockEmpty (
   return TRUE;
 }
 
-/**
-  Unlink the memory block from the pool's list.
 
-  @param  Head          The block list head of the memory's pool.
-  @param  BlockToUnlink The memory block to unlink.
-
-**/
-VOID
-UsbHcUnlinkMemBlock (
-  IN USBHC_MEM_BLOCK    *Head,
-  IN USBHC_MEM_BLOCK    *BlockToUnlink
-  )
-{
-  USBHC_MEM_BLOCK       *Block;
-
-  ASSERT ((Head != NULL) && (BlockToUnlink != NULL));
-
-  for (Block = Head; Block != NULL; Block = Block->Next) {
-    if (Block->Next == BlockToUnlink) {
-      Block->Next         = BlockToUnlink->Next;
-      BlockToUnlink->Next = NULL;
-      break;
-    }
-  }
-}
 
 /**
   Initialize the memory management pool for the host controller.
@@ -567,6 +544,7 @@ UsbHcFreeMem (
   @param  HostAddress           The system memory address to map to the PCI controller.
   @param  DeviceAddress         The resulting map address for the bus master PCI controller to
                                 use to access the hosts HostAddress.
+  @param  Mapping               A resulting value to pass to Unmap().
 
   @retval EFI_SUCCESS           Success to allocate aligned pages.
   @retval EFI_INVALID_PARAMETER Pages or Alignment is not valid.
@@ -578,14 +556,13 @@ UsbHcAllocateAlignedPages (
   IN UINTN                      Pages,
   IN UINTN                      Alignment,
   OUT VOID                      **HostAddress,
-  OUT EFI_PHYSICAL_ADDRESS      *DeviceAddress
+  OUT EFI_PHYSICAL_ADDRESS      *DeviceAddress,
+  OUT VOID                      **Mapping
   )
 {
   EFI_STATUS            Status;
-  EFI_PHYSICAL_ADDRESS  Memory;
-  UINTN                 AlignedMemory;
-  UINTN                 AlignmentMask;
-  UINTN                 RealPages;
+  VOID                  *Memory;
+  EFI_PHYSICAL_ADDRESS  DeviceMemory;
 
   //
   // Alignment must be a power of two or zero.
@@ -601,42 +578,33 @@ UsbHcAllocateAlignedPages (
   }
 
   if (Alignment > EFI_PAGE_SIZE) {
-    //
-    // Calculate the total number of pages since alignment is larger than page size.
-    //
-    AlignmentMask  = Alignment - 1;
-    RealPages      = Pages + EFI_SIZE_TO_PAGES (Alignment);
-    //
-    // Make sure that Pages plus EFI_SIZE_TO_PAGES (Alignment) does not overflow.
-    //
-    ASSERT (RealPages > Pages);
-
-    Status = PeiServicesAllocatePages (
-               EfiBootServicesData,
+    Status = IoMmuAllocateAlignedBuffer (
                Pages,
-               &Memory
+               Alignment,
+               &Memory,
+               &DeviceMemory,
+               Mapping
                );
     if (EFI_ERROR (Status)) {
       return EFI_OUT_OF_RESOURCES;
     }
-    AlignedMemory = ((UINTN) Memory + AlignmentMask) & ~AlignmentMask;
   } else {
     //
     // Do not over-allocate pages in this case.
     //
-    Status = PeiServicesAllocatePages (
-               EfiBootServicesData,
+    Status = IoMmuAllocateBuffer (
                Pages,
-               &Memory
+               &Memory,
+               &DeviceMemory,
+               Mapping
                );
     if (EFI_ERROR (Status)) {
       return EFI_OUT_OF_RESOURCES;
     }
-    AlignedMemory = (UINTN) Memory;
   }
 
-  *HostAddress = (VOID *) AlignedMemory;
-  *DeviceAddress = (EFI_PHYSICAL_ADDRESS) AlignedMemory;
+  *HostAddress = Memory;
+  *DeviceAddress = DeviceMemory;
 
   return EFI_SUCCESS;
 }
@@ -646,17 +614,18 @@ UsbHcAllocateAlignedPages (
 
   @param  HostAddress           The system memory address to map to the PCI controller.
   @param  Pages                 The number of pages to free.
+  @param  Mapping               The mapping value returned from Map().
 
 **/
 VOID
 UsbHcFreeAlignedPages (
   IN VOID               *HostAddress,
-  IN UINTN              Pages
+  IN UINTN              Pages,
+  IN VOID               *Mapping
   )
 {
   ASSERT (Pages != 0);
-  //
-  // No free memory in PEI.
-  //
+
+  IoMmuFreeBuffer (Pages, HostAddress, Mapping);
 }
 

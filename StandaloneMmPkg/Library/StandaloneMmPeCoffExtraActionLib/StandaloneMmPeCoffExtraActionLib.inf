@@ -1,0 +1,36 @@
+#/** @file
+# PeCoff extra action library for DXE phase that run Unix emulator.
+#
+# Lib to provide memory journal status code reporting Routines
+# Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+# Portions copyright (c) 2010, Apple Inc. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x0001000A
+  BASE_NAME                      = StandaloneMmPeCoffExtraActionLib
+  FILE_GUID                      = 8B40543B-9588-48F8-840C-5A60E6DB1B03
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PeCoffExtraActionLib
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = ARM
+#
+
+[Sources.common]
+  AArch64/StandaloneMmPeCoffExtraActionLib.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  MdePkg/MdePkg.dec
+  StandaloneMmPkg/StandaloneMmPkg.dec
+
+[LibraryClasses]
+  StandaloneMmMmuLib
+  PcdLib

@@ -3,14 +3,8 @@
   It wraps Lzma decompress interfaces to GUIDed Section Extraction interfaces
   and registers them into GUIDed handler table.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -20,16 +14,16 @@
   Examines a GUIDed section and returns the size of the decoded buffer and the
   size of an scratch buffer required to actually decode the data in a GUIDed section.
 
-  Examines a GUIDed section specified by InputSection.  
+  Examines a GUIDed section specified by InputSection.
   If GUID for InputSection does not match the GUID that this handler supports,
-  then RETURN_UNSUPPORTED is returned.  
+  then RETURN_UNSUPPORTED is returned.
   If the required information can not be retrieved from InputSection,
   then RETURN_INVALID_PARAMETER is returned.
   If the GUID of InputSection does match the GUID that this handler supports,
   then the size required to hold the decoded buffer is returned in OututBufferSize,
   the size of an optional scratch buffer is returned in ScratchSize, and the Attributes field
   from EFI_GUID_DEFINED_SECTION header of InputSection is returned in SectionAttribute.
-  
+
   If InputSection is NULL, then ASSERT().
   If OutputBufferSize is NULL, then ASSERT().
   If ScratchBufferSize is NULL, then ASSERT().
@@ -98,16 +92,16 @@ LzmaGuidedSectionGetInfo (
 
 /**
   Decompress a LZAM compressed GUIDed section into a caller allocated output buffer.
-  
-  Decodes the GUIDed section specified by InputSection.  
-  If GUID for InputSection does not match the GUID that this handler supports, then RETURN_UNSUPPORTED is returned.  
+
+  Decodes the GUIDed section specified by InputSection.
+  If GUID for InputSection does not match the GUID that this handler supports, then RETURN_UNSUPPORTED is returned.
   If the data in InputSection can not be decoded, then RETURN_INVALID_PARAMETER is returned.
   If the GUID of InputSection does match the GUID that this handler supports, then InputSection
   is decoded into the buffer specified by OutputBuffer and the authentication status of this
   decode operation is returned in AuthenticationStatus.  If the decoded buffer is identical to the
   data in InputSection, then OutputBuffer is set to point at the data in InputSection.  Otherwise,
   the decoded data will be placed in caller allocated buffer specified by OutputBuffer.
-  
+
   If InputSection is NULL, then ASSERT().
   If OutputBuffer is NULL, then ASSERT().
   If ScratchBuffer is NULL and this decode operation requires a scratch buffer, then ASSERT().
@@ -115,10 +109,10 @@ LzmaGuidedSectionGetInfo (
 
 
   @param[in]  InputSection  A pointer to a GUIDed section of an FFS formatted file.
-  @param[out] OutputBuffer  A pointer to a buffer that contains the result of a decode operation. 
+  @param[out] OutputBuffer  A pointer to a buffer that contains the result of a decode operation.
   @param[out] ScratchBuffer A caller allocated buffer that may be required by this function
-                            as a scratch buffer to perform the decode operation. 
-  @param[out] AuthenticationStatus 
+                            as a scratch buffer to perform the decode operation.
+  @param[out] AuthenticationStatus
                             A pointer to the authentication status of the decoded output buffer.
                             See the definition of authentication status in the EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI
                             section of the PI Specification. EFI_AUTH_STATUS_PLATFORM_OVERRIDE must
@@ -190,12 +184,13 @@ LzmaGuidedSectionExtraction (
 EFI_STATUS
 EFIAPI
 LzmaDecompressLibConstructor (
+  VOID
   )
 {
   return ExtractGuidedSectionRegisterHandlers (
           &gLzmaCustomDecompressGuid,
           LzmaGuidedSectionGetInfo,
           LzmaGuidedSectionExtraction
-          );      
+          );
 }
 

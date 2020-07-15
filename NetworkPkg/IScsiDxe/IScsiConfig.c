@@ -1,22 +1,14 @@
 /** @file
   Helper functions for configuring or getting the parameters relating to iSCSI.
 
-Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2004 - 2019, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include "IScsiImpl.h"
 
 CHAR16          mVendorStorageName[]     = L"ISCSI_CONFIG_IFR_NVDATA";
-BOOLEAN         mIScsiDeviceListUpdated  = FALSE;
-UINTN           mNumberOfIScsiDevices    = 0;
 ISCSI_FORM_CALLBACK_INFO  *mCallbackInfo = NULL;
 
 HII_VENDOR_DEVICE_PATH  mIScsiHiiVendorDevicePath = {
@@ -34,7 +26,7 @@ HII_VENDOR_DEVICE_PATH  mIScsiHiiVendorDevicePath = {
   {
     END_DEVICE_PATH_TYPE,
     END_ENTIRE_DEVICE_PATH_SUBTYPE,
-    { 
+    {
       (UINT8) (END_DEVICE_PATH_LENGTH),
       (UINT8) ((END_DEVICE_PATH_LENGTH) >> 8)
     }
@@ -205,11 +197,11 @@ IScsiParseIsIdFromString (
 
   IsIdStr = (CHAR16 *) String;
 
-  if (StrLen (IsIdStr) != 6) {
+  if (StrLen (IsIdStr) != 6 && StrLen (IsIdStr) != 12) {
     UnicodeSPrint (
       PortString,
       (UINTN) ISCSI_NAME_IFR_MAX_SIZE,
-      L"Error! Input is incorrect, please input 6 hex numbers!\n"
+      L"Error! Only last 3 bytes are configurable, please input 6 hex numbers for last 3 bytes only or 12 hex numbers for full SSID!\n"
       );
 
     CreatePopUp (
@@ -220,6 +212,10 @@ IScsiParseIsIdFromString (
       );
 
     return EFI_INVALID_PARAMETER;
+  }
+
+  if (StrLen (IsIdStr) == 12) {
+    IsIdStr += 6;
   }
 
   for (Index = 3; Index < 6; Index++) {
@@ -297,7 +293,7 @@ IScsiConvertIsIdToString (
   @param[in]  String             The string is "&OFFSET=".
   @param[out] Value              The Offset value.
 
-  @retval EFI_OUT_OF_RESOURCES   Insufficient resources to store neccessary
+  @retval EFI_OUT_OF_RESOURCES   Insufficient resources to store necessary
                                  structures.
   @retval EFI_SUCCESS            Value of <Number> is outputted in Number
                                  successfully.
@@ -537,6 +533,7 @@ IScsiConvertAttemptConfigDataToIfrNvData (
     IScsiIpToStr (&Ip, FALSE, IfrNvData->SubnetMask);
     CopyMem (&Ip.v4, &SessionConfigData->Gateway, sizeof (EFI_IPv4_ADDRESS));
     IScsiIpToStr (&Ip, FALSE, IfrNvData->Gateway);
+    ZeroMem (IfrNvData->TargetIp, sizeof (IfrNvData->TargetIp));
     if (SessionConfigData->TargetIp.v4.Addr[0] != '\0') {
       CopyMem (&Ip.v4, &SessionConfigData->TargetIp, sizeof (EFI_IPv4_ADDRESS));
       IScsiIpToStr (&Ip, FALSE, IfrNvData->TargetIp);
@@ -628,10 +625,13 @@ IScsiConvertAttemptConfigDataToIfrNvDataByKeyword (
   ISCSI_SESSION_CONFIG_NVDATA   *SessionConfigData;
   ISCSI_CHAP_AUTH_CONFIG_NVDATA *AuthConfigData;
   CHAR16                        AttemptNameList[ATTEMPT_NAME_LIST_SIZE];
+  ISCSI_NIC_INFO                *NicInfo;
+  CHAR16                        MacString[ISCSI_MAX_MAC_STRING_LEN];
   EFI_IP_ADDRESS                Ip;
   UINTN                         Index;
   UINTN                         StringLen;
 
+  NicInfo = NULL;
   ZeroMem (AttemptNameList, sizeof (AttemptNameList));
 
   if ((mPrivate != NULL) && (mPrivate->AttemptCount != 0)) {
@@ -702,8 +702,8 @@ IScsiConvertAttemptConfigDataToIfrNvDataByKeyword (
       if (SessionConfigData->DnsMode) {
         AsciiStrToUnicodeStrS (
           SessionConfigData->TargetUrl,
-          IfrNvData->TargetIp,
-          sizeof (IfrNvData->TargetIp) / sizeof (IfrNvData->TargetIp[0])
+          IfrNvData->Keyword[Index].ISCSITargetIpAddress,
+          sizeof (IfrNvData->Keyword[Index].ISCSITargetIpAddress) / sizeof (IfrNvData->Keyword[Index].ISCSITargetIpAddress[0])
           );
       }
 
@@ -740,8 +740,30 @@ IScsiConvertAttemptConfigDataToIfrNvDataByKeyword (
           );
       }
     }
-
     CopyMem(IfrNvData->ISCSIDisplayAttemptList, AttemptNameList, ATTEMPT_NAME_LIST_SIZE);
+
+    ZeroMem (IfrNvData->ISCSIMacAddr, sizeof (IfrNvData->ISCSIMacAddr));
+    NET_LIST_FOR_EACH (Entry, &mPrivate->NicInfoList) {
+      NicInfo = NET_LIST_USER_STRUCT (Entry, ISCSI_NIC_INFO, Link);
+      IScsiMacAddrToStr (
+        &NicInfo->PermanentAddress,
+        NicInfo->HwAddressSize,
+        NicInfo->VlanId,
+        MacString
+        );
+      CopyMem (
+        IfrNvData->ISCSIMacAddr + StrLen (IfrNvData->ISCSIMacAddr),
+        MacString,
+        StrLen (MacString) * sizeof (CHAR16)
+        );
+
+      *(IfrNvData->ISCSIMacAddr + StrLen (IfrNvData->ISCSIMacAddr)) = L'/';
+    }
+
+    StringLen = StrLen (IfrNvData->ISCSIMacAddr);
+    if (StringLen > 0) {
+      *(IfrNvData->ISCSIMacAddr + StringLen - 1) = L'\0';
+    }
   }
 }
 
@@ -909,7 +931,7 @@ IScsiConvertIfrNvDataToAttemptConfigData (
           L"CHAP Name or CHAP Secret is invalid!",
           NULL
           );
-        
+
         return EFI_INVALID_PARAMETER;
       }
 
@@ -921,7 +943,7 @@ IScsiConvertIfrNvDataToAttemptConfigData (
           &Key,
           L"Reverse CHAP Name or Reverse CHAP Secret is invalid!",
           NULL
-          );        
+          );
         return EFI_INVALID_PARAMETER;
       }
     }
@@ -940,7 +962,7 @@ IScsiConvertIfrNvDataToAttemptConfigData (
       if (AttemptName2 == NULL) {
         FreePool (AttemptName1);
         return EFI_OUT_OF_RESOURCES;
-      }      
+      }
 
       AsciiStrToUnicodeStrS (Attempt->AttemptName, AttemptName1, ATTEMPT_NAME_SIZE);
       AsciiStrToUnicodeStrS (SameNicAttempt->AttemptName, AttemptName2, ATTEMPT_NAME_SIZE);
@@ -958,7 +980,7 @@ IScsiConvertIfrNvDataToAttemptConfigData (
         &Key,
         mPrivate->PortString,
         NULL
-        );       
+        );
 
       FreePool (AttemptName1);
       FreePool (AttemptName2);
@@ -1195,6 +1217,8 @@ IScsiConvertlfrNvDataToAttemptConfigDataByKeyword (
   ISCSI_ATTEMPT_CONFIG_NVDATA      *Attempt;
   UINT8                            AttemptIndex;
   UINT8                            Index;
+  UINT8                            ChapSecretLen;
+  UINT8                            ReverseChapSecretLen;
   CHAR16                           *AttemptName1;
   CHAR16                           *AttemptName2;
   ISCSI_ATTEMPT_CONFIG_NVDATA      *SameNicAttempt;
@@ -1344,10 +1368,17 @@ IScsiConvertlfrNvDataToAttemptConfigDataByKeyword (
     if (Attempt == NULL) {
       return EFI_INVALID_PARAMETER;
     }
-    Attempt->SessionConfigData.ConnectRetryCount = IfrNvData->ISCSIConnectRetry[AttemptIndex - 1];
-    if (Attempt->SessionConfigData.ConnectRetryCount == 0) {
-      Attempt->SessionConfigData.ConnectRetryCount = CONNECT_MIN_RETRY;
+
+    if (IfrNvData->ISCSIConnectRetry[AttemptIndex - 1] > CONNECT_MAX_RETRY) {
+      CreatePopUp (
+          EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+          &Key,
+          L"The minimum value is 0 and the maximum is 16. 0 means no retry.",
+          NULL
+          );
+      return EFI_INVALID_PARAMETER;
     }
+    Attempt->SessionConfigData.ConnectRetryCount = IfrNvData->ISCSIConnectRetry[AttemptIndex - 1];
 
   } else if ((OffSet >= ATTEMPT_CONNECT_TIMEOUT_VAR_OFFSET) && (OffSet < ATTEMPT_INITIATOR_VIA_DHCP_VAR_OFFSET)) {
     AttemptIndex = (UINT8) ((OffSet - ATTEMPT_CONNECT_TIMEOUT_VAR_OFFSET) / 2 + 1);
@@ -1355,21 +1386,21 @@ IScsiConvertlfrNvDataToAttemptConfigDataByKeyword (
     if (Attempt == NULL) {
       return EFI_INVALID_PARAMETER;
     }
+
+    if ((IfrNvData->ISCSIConnectTimeout[AttemptIndex - 1] < CONNECT_MIN_TIMEOUT) ||
+        (IfrNvData->ISCSIConnectTimeout[AttemptIndex - 1] > CONNECT_MAX_TIMEOUT)) {
+      CreatePopUp (
+        EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+        &Key,
+        L"The minimum value is 100 milliseconds and the maximum is 20 seconds.",
+        NULL
+        );
+      return EFI_INVALID_PARAMETER;
+    }
+
     Attempt->SessionConfigData.ConnectTimeout = IfrNvData->ISCSIConnectTimeout[AttemptIndex - 1];
     if (Attempt->SessionConfigData.ConnectTimeout == 0) {
       Attempt->SessionConfigData.ConnectTimeout = CONNECT_DEFAULT_TIMEOUT;
-    }
-
-    if (Attempt->SessionConfigData.Enabled != ISCSI_DISABLED) {
-      if (Attempt->SessionConfigData.ConnectTimeout < CONNECT_MIN_TIMEOUT) {
-        CreatePopUp (
-          EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
-          &Key,
-          L"Connection Establishing Timeout is less than minimum value 100ms.",
-          NULL
-          );
-        return EFI_INVALID_PARAMETER;
-      }
     }
 
   } else if ((OffSet >= ATTEMPT_INITIATOR_VIA_DHCP_VAR_OFFSET) && (OffSet < ATTEMPT_TARGET_VIA_DHCP_VAR_OFFSET)) {
@@ -1623,7 +1654,7 @@ IScsiConvertlfrNvDataToAttemptConfigDataByKeyword (
           );
 
         if (Attempt->SessionConfigData.Enabled != ISCSI_DISABLED) {
-          if (IfrNvData->CHAPName[0] == L'\0') {
+          if (IfrNvData->Keyword[Index].ISCSIChapUsername[0] == L'\0') {
             CreatePopUp (
               EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
               &Key,
@@ -1645,6 +1676,7 @@ IScsiConvertlfrNvDataToAttemptConfigDataByKeyword (
 
     } else if ((OffSet >= ATTEMPT_CHAR_SECRET_VAR_OFFSET) && (OffSet < ATTEMPT_CHAR_REVERSE_USER_NAME_VAR_OFFSET)) {
       if (Attempt->AuthenticationType == ISCSI_AUTH_TYPE_CHAP) {
+        ChapSecretLen = (UINT8)StrLen (IfrNvData->Keyword[Index].ISCSIChapSecret);
         UnicodeStrToAsciiStrS (
           IfrNvData->Keyword[Index].ISCSIChapSecret,
           Attempt->AuthConfigData.CHAP.CHAPSecret,
@@ -1652,11 +1684,11 @@ IScsiConvertlfrNvDataToAttemptConfigDataByKeyword (
           );
 
         if (Attempt->SessionConfigData.Enabled != ISCSI_DISABLED) {
-          if (IfrNvData->CHAPSecret[0] == L'\0') {
+          if ((ChapSecretLen < ISCSI_CHAP_SECRET_MIN_LEN) || (ChapSecretLen > ISCSI_CHAP_SECRET_MAX_LEN)) {
             CreatePopUp (
               EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
               &Key,
-              L"CHAP Secret is invalid!",
+              L"The Chap Secret minimum length is 12 bytes and the maximum length is 16 bytes.",
               NULL
               );
             return EFI_INVALID_PARAMETER;
@@ -1680,7 +1712,7 @@ IScsiConvertlfrNvDataToAttemptConfigDataByKeyword (
           ISCSI_CHAP_NAME_STORAGE
           );
         if (Attempt->SessionConfigData.Enabled != ISCSI_DISABLED) {
-          if (IfrNvData->ReverseCHAPName[0] == L'\0') {
+          if (IfrNvData->Keyword[Index].ISCSIReverseChapUsername[0] == L'\0') {
             CreatePopUp (
               EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
               &Key,
@@ -1702,6 +1734,7 @@ IScsiConvertlfrNvDataToAttemptConfigDataByKeyword (
 
     } else if (OffSet >= ATTEMPT_CHAR_REVERSE_SECRET_VAR_OFFSET) {
       if (Attempt->AuthConfigData.CHAP.CHAPType == ISCSI_CHAP_MUTUAL) {
+        ReverseChapSecretLen = (UINT8)StrLen (IfrNvData->Keyword[Index].ISCSIReverseChapSecret);
         UnicodeStrToAsciiStrS (
           IfrNvData->Keyword[Index].ISCSIReverseChapSecret,
           Attempt->AuthConfigData.CHAP.ReverseCHAPSecret,
@@ -1709,11 +1742,11 @@ IScsiConvertlfrNvDataToAttemptConfigDataByKeyword (
           );
 
         if (Attempt->SessionConfigData.Enabled != ISCSI_DISABLED) {
-          if (IfrNvData->ReverseCHAPSecret[0] == L'\0') {
+          if ((ReverseChapSecretLen < ISCSI_CHAP_SECRET_MIN_LEN) || (ReverseChapSecretLen > ISCSI_CHAP_SECRET_MAX_LEN)) {
             CreatePopUp (
               EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
               &Key,
-              L"Reverse CHAP Secret is invalid!",
+              L"The Reverse CHAP Secret minimum length is 12 bytes and the maximum length is 16 bytes.",
               NULL
               );
             return EFI_INVALID_PARAMETER;
@@ -1985,7 +2018,7 @@ IScsiConfigAddAttempt (
     PortTitleHelpToken = HiiSetString (mCallbackInfo->RegisteredHandle, 0, mPrivate->PortString, NULL);
     if (PortTitleHelpToken == 0) {
       Status = EFI_INVALID_PARAMETER;
-      goto Exit;      
+      goto Exit;
     }
 
     HiiCreateGotoOpCode (
@@ -2009,14 +2042,14 @@ IScsiConfigAddAttempt (
 Exit:
   HiiFreeOpCodeHandle (StartOpCodeHandle);
   HiiFreeOpCodeHandle (EndOpCodeHandle);
-  
+
   return Status;
 }
 
 /**
   Add the attempts by keyword 'iSCSIAddAttempts', you can use this keyword with
   value 'attempt:1 attempt:2' etc to add one or more attempts once. This is different
-  with IScsiConfigAddAttempt function which is used to add attempt by UI configuration. 
+  with IScsiConfigAddAttempt function which is used to add attempt by UI configuration.
 
   @param[in]  AttemptList        The new attempt List will be added.
 
@@ -2196,7 +2229,7 @@ IScsiConfigAddAttemptsByKeywords (
 
   @retval EFI_NOT_FOUND          Cannot find the corresponding variable.
   @retval EFI_SUCCESS            The operation is completed successfully.
-  @retval EFI_ABOTRED            This operation is aborted cause of error
+  @retval EFI_ABORTED            This operation is aborted cause of error
                                  configuration.
   @retval EFI_OUT_OF_RESOURCES   Fail to finish the operation due to lack of
                                  resources.
@@ -2253,10 +2286,6 @@ IScsiConfigDeleteAttempts (
     //
 
     AttemptConfigData = NET_LIST_USER_STRUCT (Entry, ISCSI_ATTEMPT_CONFIG_NVDATA, Link);
-    if (AttemptConfigData == NULL) {
-      Status = EFI_NOT_FOUND;
-      goto Error;
-    }
 
     //
     // Remove this attempt from UI configured attempt list.
@@ -2464,7 +2493,7 @@ IScsiConfigDisplayDeleteAttempts (
              FORMID_DELETE_FORM,              // Form ID
              StartOpCodeHandle,               // Label for where to insert opcodes
              EndOpCodeHandle                  // Replace data
-             );    
+             );
 
   HiiFreeOpCodeHandle (StartOpCodeHandle);
   HiiFreeOpCodeHandle (EndOpCodeHandle);
@@ -2495,8 +2524,8 @@ IScsiConfigDisplayOrderAttempts (
   EFI_IFR_GUID_LABEL          *StartLabel;
   VOID                        *EndOpCodeHandle;
   EFI_IFR_GUID_LABEL          *EndLabel;
-  VOID                        *OptionsOpCodeHandle;  
-  
+  VOID                        *OptionsOpCodeHandle;
+
   Status = IScsiCreateOpCode (
              ORDER_ENTRY_LABEL,
              &StartOpCodeHandle,
@@ -2548,14 +2577,14 @@ IScsiConfigDisplayOrderAttempts (
     DYNAMIC_ORDERED_LIST_QUESTION_ID,           // Question ID
     CONFIGURATION_VARSTORE_ID,                  // VarStore ID
     DYNAMIC_ORDERED_LIST_VAR_OFFSET,            // Offset in Buffer Storage
-    STRING_TOKEN (STR_ORDER_ATTEMPT_ENTRY),     // Question prompt text        
-    STRING_TOKEN (STR_ORDER_ATTEMPT_ENTRY),     // Question help text       
+    STRING_TOKEN (STR_ORDER_ATTEMPT_ENTRY),     // Question prompt text
+    STRING_TOKEN (STR_ORDER_ATTEMPT_ENTRY),     // Question help text
     0,                                          // Question flag
     EFI_IFR_UNIQUE_SET,                         // Ordered list flag, e.g. EFI_IFR_UNIQUE_SET
     EFI_IFR_NUMERIC_SIZE_1,                     // Data type of Question value
     ISCSI_MAX_ATTEMPTS_NUM,                     // Maximum container
-    OptionsOpCodeHandle,                        // Option Opcode list                        
-    NULL                                        // Default Opcode is NULL                               
+    OptionsOpCodeHandle,                        // Option Opcode list
+    NULL                                        // Default Opcode is NULL
     );
 
 Exit:
@@ -2565,11 +2594,11 @@ Exit:
              FORMID_ORDER_FORM,               // Form ID
              StartOpCodeHandle,               // Label for where to insert opcodes
              EndOpCodeHandle                  // Replace data
-             );             
+             );
 
 Error:
   HiiFreeOpCodeHandle (StartOpCodeHandle);
-  HiiFreeOpCodeHandle (EndOpCodeHandle);  
+  HiiFreeOpCodeHandle (EndOpCodeHandle);
   if (OptionsOpCodeHandle != NULL) {
     HiiFreeOpCodeHandle (OptionsOpCodeHandle);
   }
@@ -2780,10 +2809,10 @@ IScsiConfigProcessDefault (
       if (AttemptConfigData == NULL || AttemptConfigData->Actived == ISCSI_ACTIVE_ENABLED) {
         continue;
       }
-    
+
       break;
     }
-    
+
     if (Index > PcdGet8 (PcdMaxIScsiAttemptNumber)) {
       CreatePopUp (
         EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
@@ -2817,7 +2846,7 @@ IScsiConfigProcessDefault (
     // Generate OUI-format ISID based on MAC address.
     //
     CopyMem (AttemptConfigData->SessionConfigData.IsId, &NicInfo->PermanentAddress, 6);
-    AttemptConfigData->SessionConfigData.IsId[0] = 
+    AttemptConfigData->SessionConfigData.IsId[0] =
       (UINT8) (AttemptConfigData->SessionConfigData.IsId[0] & 0x3F);
 
     //
@@ -2867,7 +2896,7 @@ IScsiConfigProcessDefault (
     ZeroMem (IfrNvData->ReverseCHAPName, sizeof (IfrNvData->ReverseCHAPName));
     ZeroMem (IfrNvData->ReverseCHAPSecret, sizeof (IfrNvData->ReverseCHAPSecret));
   }
-  
+
   IScsiConvertAttemptConfigDataToIfrNvData (AttemptConfigData, IfrNvData);
 
   //
@@ -2880,7 +2909,7 @@ IScsiConfigProcessDefault (
 
 
 /**
-   
+
   This function allows the caller to request the current
   configuration for one or more named elements. The resulting
   string is in <ConfigAltResp> format. Also, any and all alternative
@@ -2909,7 +2938,7 @@ IScsiConfigProcessDefault (
                          to the most recent "&" before the first
                          failing name / value pair (or the beginning
                          of the string if the failure is in the first
-                         name / value pair) if the request was not successful.                        
+                         name / value pair) if the request was not successful.
 
   @param[out] Results    A null-terminated Unicode string in
                          <ConfigAltResp> format which has all values
@@ -2930,7 +2959,7 @@ IScsiConfigProcessDefault (
                                   would result in this type of
                                   error. In this case, the
                                   Progress parameter would be
-                                  set to NULL. 
+                                  set to NULL.
 
   @retval EFI_NOT_FOUND           Routing data doesn't match any
                                   known driver. Progress set to the
@@ -2995,7 +3024,7 @@ IScsiFormExtractConfig (
   }
 
   //
-  // Extract all AttemptConfigData to Keyword stroage of IfrNvData.
+  // Extract all AttemptConfigData to Keyword storage of IfrNvData.
   //
   IScsiConvertAttemptConfigDataToIfrNvDataByKeyword (IfrNvData);
 
@@ -3005,7 +3034,7 @@ IScsiFormExtractConfig (
     FreePool (IfrNvData);
     return EFI_OUT_OF_RESOURCES;
   }
-    
+
   Status = gIScsiInitiatorName.Get (&gIScsiInitiatorName, &BufferSize, InitiatorName);
   if (EFI_ERROR (Status)) {
     IfrNvData->InitiatorName[0] = L'\0';
@@ -3073,7 +3102,7 @@ IScsiFormExtractConfig (
 
 
 /**
-   
+
   This function applies changes in a driver's configuration.
   Input is a Configuration, which has the routing data for this
   driver followed by name / value configuration pairs. The driver
@@ -3086,8 +3115,8 @@ IScsiFormExtractConfig (
   @param[in]  This           Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
 
   @param[in]  Configuration  A null-terminated Unicode string in
-                             <ConfigString> format. 
-  
+                             <ConfigString> format.
+
   @param[out] Progress       A pointer to a string filled in with the
                              offset of the most recent '&' before the
                              first failing name / value pair (or the
@@ -3098,16 +3127,16 @@ IScsiFormExtractConfig (
 
   @retval EFI_SUCCESS             The results have been distributed or are
                                   awaiting distribution.
-  
+
   @retval EFI_OUT_OF_RESOURCES    Not enough memory to store the
                                   parts of the results that must be
                                   stored awaiting possible future
                                   protocols.
-  
+
   @retval EFI_INVALID_PARAMETERS  Passing in a NULL for the
                                   Results parameter would result
                                   in this type of error.
-  
+
   @retval EFI_NOT_FOUND           Target for the specified routing data
                                   was not found.
 
@@ -3333,7 +3362,7 @@ Exit:
 }
 
 /**
-   
+
   This function is called to provide results data to the driver.
   This data consists of a unique key that is used to identify
   which data is either being passed back or being asked for.
@@ -3342,7 +3371,7 @@ Exit:
   @param[in]       Action        Specifies the type of action taken by the browser.
   @param[in]       QuestionId    A unique value which is sent to the original
                                  exporting driver so that it can identify the type
-                                 of data to expect. The format of the data tends to 
+                                 of data to expect. The format of the data tends to
                                  vary based on the opcode that generated the callback.
   @param[in]       Type          The type of value for the question.
   @param[in, out]  Value         A pointer to the data being sent to the original
@@ -3381,6 +3410,9 @@ IScsiFormCallback (
   ISCSI_CONFIG_IFR_NVDATA     OldIfrNvData;
   EFI_STATUS                  Status;
   EFI_INPUT_KEY               Key;
+  ISCSI_NIC_INFO              *NicInfo;
+
+  NicInfo = NULL;
 
   if ((Action == EFI_BROWSER_ACTION_FORM_OPEN) || (Action == EFI_BROWSER_ACTION_FORM_CLOSE)) {
     //
@@ -3401,29 +3433,29 @@ IScsiFormCallback (
   }
 
   Private = ISCSI_FORM_CALLBACK_INFO_FROM_FORM_CALLBACK (This);
-  
+
   //
   // Retrieve uncommitted data from Browser
   //
-  
+
   BufferSize = sizeof (ISCSI_CONFIG_IFR_NVDATA);
   IfrNvData = AllocateZeroPool (BufferSize);
   if (IfrNvData == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
-  
+
   IScsiName = (CHAR8 *) AllocateZeroPool (ISCSI_NAME_MAX_SIZE);
   if (IScsiName == NULL) {
     FreePool (IfrNvData);
     return EFI_OUT_OF_RESOURCES;
   }
-  
+
   Status = EFI_SUCCESS;
-  
+
   ZeroMem (&OldIfrNvData, BufferSize);
-  
+
   HiiGetBrowserData (NULL, NULL, BufferSize, (UINT8 *) IfrNvData);
-  
+
   CopyMem (&OldIfrNvData, IfrNvData, BufferSize);
 
   if (Action == EFI_BROWSER_ACTION_CHANGING) {
@@ -3444,10 +3476,10 @@ IScsiFormCallback (
           &Key,
           L"Error: please configure iSCSI initiator name first!",
           NULL
-          );        
+          );
         break;
       }
-      
+
       Status = IScsiConfigAddAttempt ();
       break;
 
@@ -3471,12 +3503,12 @@ IScsiFormCallback (
         );
       IScsiConfigDisplayOrderAttempts ();
       break;
-    
+
     default:
       Status = IScsiConfigProcessDefault (QuestionId, IfrNvData);
       break;
     }
-  } else if (Action == EFI_BROWSER_ACTION_CHANGED) {  
+  } else if (Action == EFI_BROWSER_ACTION_CHANGED) {
     switch (QuestionId) {
     case KEY_INITIATOR_NAME:
       UnicodeStrToAsciiStrS (IfrNvData->InitiatorName, IScsiName, ISCSI_NAME_MAX_SIZE);
@@ -3489,12 +3521,12 @@ IScsiFormCallback (
           &Key,
           L"Invalid iSCSI Name!",
           NULL
-          );      
+          );
       }
 
       *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_APPLY;
       break;
-      
+
     case KEY_SAVE_ATTEMPT_CONFIG:
       Status = IScsiConvertIfrNvDataToAttemptConfigData (IfrNvData, Private->Current);
       if (EFI_ERROR (Status)) {
@@ -3551,9 +3583,35 @@ IScsiFormCallback (
     case KEY_IP_MODE:
       switch (Value->u8) {
       case IP_MODE_IP6:
+        NicInfo = IScsiGetNicInfoByIndex (Private->Current->NicIndex);
+        if(NicInfo == NULL) {
+          break;
+        }
+
+        if(!NicInfo->Ipv6Available) {
+          //
+          // Current NIC doesn't Support IPv6, hence use IPv4.
+          //
+          IfrNvData->IpMode = IP_MODE_IP4;
+
+          CreatePopUp (
+            EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+            &Key,
+            L"Current NIC doesn't Support IPv6!",
+            NULL
+            );
+        }
+
       case IP_MODE_IP4:
+        ZeroMem (IfrNvData->LocalIp, sizeof (IfrNvData->LocalIp));
+        ZeroMem (IfrNvData->SubnetMask, sizeof (IfrNvData->SubnetMask));
+        ZeroMem (IfrNvData->Gateway, sizeof (IfrNvData->Gateway));
         ZeroMem (IfrNvData->TargetIp, sizeof (IfrNvData->TargetIp));
         Private->Current->AutoConfigureMode = 0;
+        ZeroMem (&Private->Current->SessionConfigData.LocalIp, sizeof (EFI_IP_ADDRESS));
+        ZeroMem (&Private->Current->SessionConfigData.SubnetMask, sizeof (EFI_IPv4_ADDRESS));
+        ZeroMem (&Private->Current->SessionConfigData.Gateway, sizeof (EFI_IP_ADDRESS));
+        ZeroMem (&Private->Current->SessionConfigData.TargetIp, sizeof (EFI_IP_ADDRESS));
 
         break;
       }
@@ -3562,16 +3620,16 @@ IScsiFormCallback (
 
     case KEY_LOCAL_IP:
       Status = NetLibStrToIp4 (IfrNvData->LocalIp, &HostIp.v4);
-      if (EFI_ERROR (Status) || 
-          ((Private->Current->SessionConfigData.SubnetMask.Addr[0] != 0) && 
+      if (EFI_ERROR (Status) ||
+          ((Private->Current->SessionConfigData.SubnetMask.Addr[0] != 0) &&
            !NetIp4IsUnicast (NTOHL (HostIp.Addr[0]), NTOHL(*(UINT32*)Private->Current->SessionConfigData.SubnetMask.Addr)))) {
         CreatePopUp (
           EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
           &Key,
           L"Invalid IP address!",
           NULL
-          ); 
-        
+          );
+
         Status = EFI_INVALID_PARAMETER;
       } else {
         CopyMem (&Private->Current->SessionConfigData.LocalIp, &HostIp.v4, sizeof (HostIp.v4));
@@ -3587,8 +3645,8 @@ IScsiFormCallback (
           &Key,
           L"Invalid Subnet Mask!",
           NULL
-          ); 
-        
+          );
+
         Status = EFI_INVALID_PARAMETER;
       } else {
         CopyMem (&Private->Current->SessionConfigData.SubnetMask, &SubnetMask.v4, sizeof (SubnetMask.v4));
@@ -3598,16 +3656,16 @@ IScsiFormCallback (
 
     case KEY_GATE_WAY:
       Status = NetLibStrToIp4 (IfrNvData->Gateway, &Gateway.v4);
-      if (EFI_ERROR (Status) || 
-          ((Gateway.Addr[0] != 0) && 
-           (Private->Current->SessionConfigData.SubnetMask.Addr[0] != 0) && 
+      if (EFI_ERROR (Status) ||
+          ((Gateway.Addr[0] != 0) &&
+           (Private->Current->SessionConfigData.SubnetMask.Addr[0] != 0) &&
            !NetIp4IsUnicast (NTOHL (Gateway.Addr[0]), NTOHL(*(UINT32*)Private->Current->SessionConfigData.SubnetMask.Addr)))) {
         CreatePopUp (
           EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
           &Key,
           L"Invalid Gateway!",
           NULL
-          );       
+          );
         Status = EFI_INVALID_PARAMETER;
       } else {
         CopyMem (&Private->Current->SessionConfigData.Gateway, &Gateway.v4, sizeof (Gateway.v4));
@@ -3664,7 +3722,7 @@ IScsiFormCallback (
           &Key,
           L"Invalid LUN string!",
           NULL
-          );       
+          );
       } else {
         CopyMem (Private->Current->SessionConfigData.BootLun, &Lun, sizeof (Lun));
       }
@@ -3781,7 +3839,7 @@ IScsiConfigFormInit (
                   NULL
                   );
   ASSERT_EFI_ERROR (Status);
-  
+
   //
   // Publish our HII data.
   //
@@ -3794,7 +3852,7 @@ IScsiConfigFormInit (
                                      );
   if (CallbackInfo->RegisteredHandle == NULL) {
     gBS->UninstallMultipleProtocolInterfaces (
-           &CallbackInfo->DriverHandle,
+           CallbackInfo->DriverHandle,
            &gEfiDevicePathProtocolGuid,
            &mIScsiHiiVendorDevicePath,
            &gEfiHiiConfigAccessProtocolGuid,

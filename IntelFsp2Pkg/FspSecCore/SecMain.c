@@ -1,13 +1,7 @@
 /** @file
 
-  Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2014 - 2020, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -19,6 +13,11 @@ EFI_PEI_TEMPORARY_RAM_SUPPORT_PPI gSecTemporaryRamSupportPpi = {
 };
 
 EFI_PEI_PPI_DESCRIPTOR            mPeiSecPlatformInformationPpi[] = {
+  {
+    EFI_PEI_PPI_DESCRIPTOR_PPI,
+    &gFspInApiModePpiGuid,
+    NULL
+  },
   {
     (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
     &gEfiTemporaryRamSupportPpiGuid,
@@ -65,6 +64,7 @@ SecStartup (
   UINT32                      Index;
   FSP_GLOBAL_DATA             PeiFspData;
   UINT64                      ExceptionHandler;
+  UINTN                       IdtSize;
 
   //
   // Process all libraries constructor function linked to SecCore.
@@ -77,7 +77,29 @@ SecStartup (
   //
   InitializeFloatingPointUnits ();
 
+  //
+  // Scenario 1 memory map when running on bootloader stack
+  //
+  // |-------------------|---->
+  // |Idt Table          |
+  // |-------------------|
+  // |PeiService Pointer |
+  // |-------------------|
+  // |                   |
+  // |                   |
+  // |      Heap         |
+  // |                   |
+  // |                   |
+  // |-------------------|---->  TempRamBase
+  //
+  //
+  // |-------------------|
+  // |Bootloader stack   |----> somewhere in memory, FSP will share this stack.
+  // |-------------------|
 
+  //
+  // Scenario 2 memory map when running FSP on a separate stack
+  //
   // |-------------------|---->
   // |Idt Table          |
   // |-------------------|
@@ -88,18 +110,31 @@ SecStartup (
   // |-------------------|---->
   // |                   |
   // |                   |
-  // |      Heap         |    PeiTemporayRamSize
+  // |      Heap         |    PeiTemporaryRamSize
   // |                   |
   // |                   |
   // |-------------------|---->  TempRamBase
-  IdtTableInStack.PeiService  = NULL;
-  ExceptionHandler = FspGetExceptionHandler(mIdtEntryTemplate);
-  for (Index = 0; Index < SEC_IDT_ENTRY_COUNT; Index ++) {
-    CopyMem ((VOID*)&IdtTableInStack.IdtTable[Index], (VOID*)&ExceptionHandler, sizeof (UINT64));
+  IdtTableInStack.PeiService = 0;
+  AsmReadIdtr (&IdtDescriptor);
+  if (IdtDescriptor.Base == 0) {
+    ExceptionHandler = FspGetExceptionHandler(mIdtEntryTemplate);
+    for (Index = 0; Index < FixedPcdGet8(PcdFspMaxInterruptSupported); Index ++) {
+      CopyMem ((VOID*)&IdtTableInStack.IdtTable[Index], (VOID*)&ExceptionHandler, sizeof (UINT64));
+    }
+    IdtSize = sizeof (IdtTableInStack.IdtTable);
+  } else {
+    IdtSize = IdtDescriptor.Limit + 1;
+    if (IdtSize > sizeof (IdtTableInStack.IdtTable)) {
+      //
+      // ERROR: IDT table size from boot loader is larger than FSP can support, DeadLoop here!
+      //
+      CpuDeadLoop();
+    } else {
+      CopyMem ((VOID *) (UINTN) &IdtTableInStack.IdtTable, (VOID *) IdtDescriptor.Base, IdtSize);
+    }
   }
-
   IdtDescriptor.Base  = (UINTN) &IdtTableInStack.IdtTable;
-  IdtDescriptor.Limit = (UINT16)(sizeof (IdtTableInStack.IdtTable) - 1);
+  IdtDescriptor.Limit = (UINT16)(IdtSize - 1);
 
   AsmWriteIdtr (&IdtDescriptor);
 
@@ -116,11 +151,19 @@ SecStartup (
   SecCoreData.BootFirmwareVolumeSize = (UINT32)((EFI_FIRMWARE_VOLUME_HEADER *)BootFirmwareVolume)->FvLength;
 
   SecCoreData.TemporaryRamBase       = (VOID*)(UINTN) TempRamBase;
-  SecCoreData.TemporaryRamSize       = SizeOfRam;
-  SecCoreData.PeiTemporaryRamBase    = SecCoreData.TemporaryRamBase;
-  SecCoreData.PeiTemporaryRamSize    = SecCoreData.TemporaryRamSize * PcdGet8 (PcdFspHeapSizePercentage) / 100;
-  SecCoreData.StackBase              = (VOID*)(UINTN)((UINTN)SecCoreData.TemporaryRamBase + SecCoreData.PeiTemporaryRamSize);
-  SecCoreData.StackSize              = SecCoreData.TemporaryRamSize - SecCoreData.PeiTemporaryRamSize;
+  if (PcdGet8 (PcdFspHeapSizePercentage) == 0) {
+    SecCoreData.TemporaryRamSize       = SizeOfRam; // stack size that is going to be copied to the permanent memory
+    SecCoreData.PeiTemporaryRamBase    = SecCoreData.TemporaryRamBase;
+    SecCoreData.PeiTemporaryRamSize    = SecCoreData.TemporaryRamSize;
+    SecCoreData.StackBase              = (VOID *)GetFspEntryStack(); // Share the same boot loader stack
+    SecCoreData.StackSize              = 0;
+  } else {
+    SecCoreData.TemporaryRamSize       = SizeOfRam;
+    SecCoreData.PeiTemporaryRamBase    = SecCoreData.TemporaryRamBase;
+    SecCoreData.PeiTemporaryRamSize    = SecCoreData.TemporaryRamSize * PcdGet8 (PcdFspHeapSizePercentage) / 100;
+    SecCoreData.StackBase              = (VOID*)(UINTN)((UINTN)SecCoreData.TemporaryRamBase + SecCoreData.PeiTemporaryRamSize);
+    SecCoreData.StackSize              = SecCoreData.TemporaryRamSize - SecCoreData.PeiTemporaryRamSize;
+  }
 
   DEBUG ((DEBUG_INFO, "Fsp BootFirmwareVolumeBase - 0x%x\n", SecCoreData.BootFirmwareVolumeBase));
   DEBUG ((DEBUG_INFO, "Fsp BootFirmwareVolumeSize - 0x%x\n", SecCoreData.BootFirmwareVolumeSize));
@@ -133,7 +176,7 @@ SecStartup (
 
   //
   // Call PeiCore Entry
-  //  
+  //
   PeiCore (&SecCoreData, mPeiSecPlatformInformationPpi);
 
   //
@@ -175,15 +218,43 @@ SecTemporaryRamSupport (
   UINTN             HeapSize;
   UINTN             StackSize;
 
-  HeapSize   = CopySize * PcdGet8 (PcdFspHeapSizePercentage) / 100 ;
-  StackSize  = CopySize - HeapSize;
-    
-  OldHeap = (VOID*)(UINTN)TemporaryMemoryBase;
-  NewHeap = (VOID*)((UINTN)PermanentMemoryBase + StackSize);
+  UINTN             CurrentStack;
+  UINTN             FspStackBase;
 
-  OldStack = (VOID*)((UINTN)TemporaryMemoryBase + HeapSize);
-  NewStack = (VOID*)(UINTN)PermanentMemoryBase;
+  //
+  // Override OnSeparateStack to 1 because this function will switch stack to permanent memory
+  // which makes FSP running on different stack from bootloader temporary ram stack.
+  //
+  GetFspGlobalDataPointer ()->OnSeparateStack = 1;
 
+  if (PcdGet8 (PcdFspHeapSizePercentage) == 0) {
+
+    CurrentStack = AsmReadEsp();
+    FspStackBase = (UINTN)GetFspEntryStack();
+
+    StackSize = FspStackBase - CurrentStack;
+    HeapSize  = CopySize;
+
+    OldHeap = (VOID*)(UINTN)TemporaryMemoryBase;
+    NewHeap = (VOID*)((UINTN)PermanentMemoryBase);
+
+    OldStack = (VOID*)CurrentStack;
+    //
+    //The old stack is copied at the end of the stack region because stack grows down.
+    //
+    NewStack = (VOID*)((UINTN)PermanentMemoryBase - StackSize);
+
+  } else {
+    HeapSize   = CopySize * PcdGet8 (PcdFspHeapSizePercentage) / 100 ;
+    StackSize  = CopySize - HeapSize;
+
+    OldHeap = (VOID*)(UINTN)TemporaryMemoryBase;
+    NewHeap = (VOID*)((UINTN)PermanentMemoryBase + StackSize);
+
+    OldStack = (VOID*)((UINTN)TemporaryMemoryBase + HeapSize);
+    NewStack = (VOID*)(UINTN)PermanentMemoryBase;
+
+  }
   //
   // Migrate Heap
   //

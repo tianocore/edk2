@@ -10,15 +10,9 @@
   for Security Protocol Specific layout. This implementation uses big endian for
   Cylinder register.
 
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 
 **/
@@ -542,7 +536,7 @@ TransferAtaDevice (
   //
   // As AtaBus is used to manage ATA devices, we have to use the lowest transfer rate to
   // calculate the possible maximum timeout value for each read/write operation.
-  // The timout value is rounded up to nearest integar and here an additional 30s is added
+  // The timeout value is rounded up to nearest integer and here an additional 30s is added
   // to follow ATA spec in which it mentioned that the device may take up to 30s to respond
   // commands in the Standby/Idle mode.
   //
@@ -633,14 +627,14 @@ AtaTerminateNonBlockingTask (
 
   //
   // Aborting operation has been done. From now on, don't need to abort normal operation.
-  //  
+  //
   OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
   AtaDevice->Abort = FALSE;
   gBS->RestoreTPL (OldTpl);
 }
 
 /**
-  Call back funtion when the event is signaled.
+  Call back function when the event is signaled.
 
   @param[in]  Event     The Event this notify function registered to.
   @param[in]  Context   Pointer to the context data registered to the

@@ -1,15 +1,9 @@
 ## @file InfPomAlignmentMisc.py
 # This file contained the routines for InfPomAlignment
 #
-# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
-# This program and the accompanying materials are licensed and made available 
-# under the terms and conditions of the BSD License which accompanies this 
-# distribution. The full text of the license may be found at 
-# http://opensource.org/licenses/bsd-license.php
-#
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
 '''
@@ -24,7 +18,7 @@ from Library import DataType as DT
 from Library.Misc import ConvertArchList
 from Object.POM.ModuleObject import BinaryFileObject
 from Object.POM import CommonObject
-from Library.String import FORMAT_INVALID
+from Library.StringUtils import FORMAT_INVALID
 from Library.Misc import CheckGuidRegFormat
 from Logger import StringTable as ST
 
@@ -45,7 +39,7 @@ def GenModuleHeaderUserExt(DefineObj, ArchString):
     CustomMakefile = DefineObj.GetCustomMakefile()
     UefiHiiResourceSection = DefineObj.GetUefiHiiResourceSection()
 
-    if EdkReleaseVersion != None:
+    if EdkReleaseVersion is not None:
         Name = DT.TAB_INF_DEFINES_EDK_RELEASE_VERSION
         Value = EdkReleaseVersion.GetValue()
         Statement = _GenInfDefineStateMent(EdkReleaseVersion.Comments.GetHeaderComments(),
@@ -54,7 +48,7 @@ def GenModuleHeaderUserExt(DefineObj, ArchString):
                                            EdkReleaseVersion.Comments.GetTailComments())
         DefinesDictNew[Statement] = ArchString
 
-    if Shadow != None:
+    if Shadow is not None:
         Name = DT.TAB_INF_DEFINES_SHADOW
         Value = Shadow.GetValue()
         Statement = _GenInfDefineStateMent(Shadow.Comments.GetHeaderComments(),
@@ -63,7 +57,7 @@ def GenModuleHeaderUserExt(DefineObj, ArchString):
                                            Shadow.Comments.GetTailComments())
         DefinesDictNew[Statement] = ArchString
 
-    if DpxSource != None:
+    if DpxSource is not None:
         Name = DT.TAB_INF_DEFINES_DPX_SOURCE
         for DpxSourceItem in DpxSource:
             Value = DpxSourceItem[0]
@@ -73,7 +67,7 @@ def GenModuleHeaderUserExt(DefineObj, ArchString):
                                                DpxSourceItem[1].GetTailComments())
             DefinesDictNew[Statement] = ArchString
 
-    if PciVendorId != None:
+    if PciVendorId is not None:
         Name = DT.TAB_INF_DEFINES_PCI_VENDOR_ID
         Value = PciVendorId.GetValue()
         Statement = _GenInfDefineStateMent(PciVendorId.Comments.GetHeaderComments(),
@@ -82,7 +76,7 @@ def GenModuleHeaderUserExt(DefineObj, ArchString):
                                            PciVendorId.Comments.GetTailComments())
         DefinesDictNew[Statement] = ArchString
 
-    if PciDeviceId != None:
+    if PciDeviceId is not None:
         Name = DT.TAB_INF_DEFINES_PCI_DEVICE_ID
         Value = PciDeviceId.GetValue()
         Statement = _GenInfDefineStateMent(PciDeviceId.Comments.GetHeaderComments(),
@@ -91,7 +85,7 @@ def GenModuleHeaderUserExt(DefineObj, ArchString):
                                            PciDeviceId.Comments.GetTailComments())
         DefinesDictNew[Statement] = ArchString
 
-    if PciClassCode != None:
+    if PciClassCode is not None:
         Name = DT.TAB_INF_DEFINES_PCI_CLASS_CODE
         Value = PciClassCode.GetValue()
         Statement = _GenInfDefineStateMent(PciClassCode.Comments.GetHeaderComments(),
@@ -100,7 +94,7 @@ def GenModuleHeaderUserExt(DefineObj, ArchString):
                                            PciClassCode.Comments.GetTailComments())
         DefinesDictNew[Statement] = ArchString
 
-    if PciRevision != None:
+    if PciRevision is not None:
         Name = DT.TAB_INF_DEFINES_PCI_REVISION
         Value = PciRevision.GetValue()
         Statement = _GenInfDefineStateMent(PciRevision.Comments.GetHeaderComments(),
@@ -109,7 +103,7 @@ def GenModuleHeaderUserExt(DefineObj, ArchString):
                                            PciRevision.Comments.GetTailComments())
         DefinesDictNew[Statement] = ArchString
 
-    if PciCompress != None:
+    if PciCompress is not None:
         Name = DT.TAB_INF_DEFINES_PCI_COMPRESS
         Value = PciCompress.GetValue()
         Statement = _GenInfDefineStateMent(PciCompress.Comments.GetHeaderComments(),
@@ -138,7 +132,7 @@ def GenModuleHeaderUserExt(DefineObj, ArchString):
 
             DefinesDictNew[Statement] = ArchString
 
-    if UefiHiiResourceSection != None:
+    if UefiHiiResourceSection is not None:
         Name = DT.TAB_INF_DEFINES_UEFI_HII_RESOURCE_SECTION
         Value = UefiHiiResourceSection.GetValue()
         HeaderComment = UefiHiiResourceSection.Comments.GetHeaderComments()
@@ -155,10 +149,10 @@ def GenModuleHeaderUserExt(DefineObj, ArchString):
 ## Generate the define statement that will be put into userextension
 #  Not support comments.
 #
-# @param HeaderComment: the original header comment (# not remvoed)
+# @param HeaderComment: the original header comment (# not removed)
 # @param Name: the definition keyword, should not be empty or none
 # @param Value: the definition keyword value
-# @param TailComment: the original Tail comment (# not remvoed)
+# @param TailComment: the original Tail comment (# not removed)
 #
 # @return: the regenerated define statement
 #
@@ -184,18 +178,17 @@ def GenBinaryData(BinaryData, BinaryObj, BinariesDict, AsBuildIns, BinaryFileObj
         else:
             TagName = ''
             Family = ''
-        
+
         FFE = ItemObj.GetFeatureFlagExp()
 
         #
         # If have architecturie specified, then use the specified architecturie;
         # If the section tag does not have an architecture modifier or the modifier is "common" (case in-sensitive),
-        # and the VALID_ARCHITECTURES comment exists, the list from the VALID_ARCHITECTURES comment 
+        # and the VALID_ARCHITECTURES comment exists, the list from the VALID_ARCHITECTURES comment
         # can be used for the attribute.
         # If both not have VALID_ARCHITECTURE comment and no architecturie specified, then keep it empty.
-        #        
-        SupArchList = ConvertArchList(ItemObj.GetSupArchList())
-        SupArchList.sort()
+        #
+        SupArchList = sorted(ConvertArchList(ItemObj.GetSupArchList()))
         if len(SupArchList) == 1 and SupArchList[0] == 'COMMON':
             if not (len(OriSupArchList) == 1 or OriSupArchList[0] == 'COMMON'):
                 SupArchList = OriSupArchList
@@ -209,7 +202,7 @@ def GenBinaryData(BinaryData, BinaryObj, BinariesDict, AsBuildIns, BinaryFileObj
         #
         # Get GUID value of the GUID CName in the DEC file
         #
-        if ItemObj.GetType() == DT.SUBTYPE_GUID_BINARY_FILE_TYPE:                
+        if ItemObj.GetType() == DT.SUBTYPE_GUID_BINARY_FILE_TYPE:
             if not CheckGuidRegFormat(ItemObj.GetGuidValue()):
                 if not DecObjList:
                     if DT.TAB_HORIZON_LINE_SPLIT in ItemObj.GetGuidValue() or \
@@ -232,12 +225,12 @@ def GenBinaryData(BinaryData, BinaryObj, BinariesDict, AsBuildIns, BinaryFileObj
                                 FileNameObj.SetGuidValue(GuidObj.GetGuid())
                                 break
 
-                    if not FileNameObj.GetGuidValue():                        
+                    if not FileNameObj.GetGuidValue():
                         Logger.Error("\nMkPkg",
                                          FORMAT_INVALID,
                                          ST.ERR_DECPARSE_CGUID_NOT_FOUND % \
                                          (ItemObj.GetGuidValue()),
-                                         RaiseError=True)  
+                                         RaiseError=True)
             else:
                 FileNameObj.SetGuidValue(ItemObj.GetGuidValue().strip())
 

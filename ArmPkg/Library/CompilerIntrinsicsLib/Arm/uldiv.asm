@@ -1,21 +1,37 @@
 //------------------------------------------------------------------------------
 //
 // Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
+// Copyright (c) 2018, Pete Batard. All rights reserved.<BR>
 //
-// This program and the accompanying materials
-// are licensed and made available under the terms and conditions of the BSD License
-// which accompanies this distribution.  The full text of the license may be found at
-// http://opensource.org/licenses/bsd-license.php
-//
-// THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-// WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+// SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 //------------------------------------------------------------------------------
 
 
+    EXPORT  __aeabi_uldivmod
+    EXPORT  __rt_udiv64
 
+    AREA  s___aeabi_uldivmod, CODE, READONLY, ARM
 
-    INCLUDE AsmMacroExport.inc
+    ARM
+
+;
+;UINT64
+;EFIAPI
+;__rt_udiv64 (
+;  IN  UINT64   Divisor
+;  IN  UINT64   Dividend
+;  )
+;
+__rt_udiv64
+  ; Swap r0-r1 and r2-r3
+  mov     r12, r0
+  mov     r0, r2
+  mov     r2, r12
+  mov     r12, r1
+  mov     r1, r3
+  mov     r3, r12
+  b       __aeabi_uldivmod
 
 ;
 ;UINT64
@@ -25,7 +41,7 @@
 ;  IN  UINT64   Divisor
 ;  )
 ;
- RVCT_ASM_EXPORT __aeabi_uldivmod
+__aeabi_uldivmod
   stmdb   sp!, {r4, r5, r6, lr}
   mov     r4, r1
   mov     r5, r0
@@ -261,7 +277,6 @@ _ll_div0
   b       __aeabi_ldiv0
 
 __aeabi_ldiv0
-  BX        r14
+  bx        r14
 
   END
-

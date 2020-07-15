@@ -1,14 +1,8 @@
 /** @file
   Implement TPM2 NVStorage related command.
 
-Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved. <BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved. <BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -162,7 +156,7 @@ typedef struct {
   @param[in]  NvIndex            The NV Index.
   @param[out] NvPublic           The public area of the index.
   @param[out] NvName             The Name of the nvIndex.
-  
+
   @retval EFI_SUCCESS            Operation completed successfully.
   @retval EFI_DEVICE_ERROR       The command was unsuccessful.
   @retval EFI_NOT_FOUND          The command was returned successfully, but NvIndex is not found.
@@ -192,7 +186,7 @@ Tpm2NvReadPublic (
   SendBuffer.Header.commandCode = SwapBytes32(TPM_CC_NV_ReadPublic);
 
   SendBuffer.NvIndex = SwapBytes32 (NvIndex);
- 
+
   SendBufferSize = (UINT32) sizeof (SendBuffer);
   SendBuffer.Header.paramSize = SwapBytes32 (SendBufferSize);
 
@@ -234,10 +228,19 @@ Tpm2NvReadPublic (
   // Basic check
   //
   NvPublicSize = SwapBytes16 (RecvBuffer.NvPublic.size);
+  if (NvPublicSize > sizeof(TPMS_NV_PUBLIC)) {
+    DEBUG ((DEBUG_ERROR, "Tpm2NvReadPublic - NvPublic.size error %x\n", NvPublicSize));
+    return EFI_DEVICE_ERROR;
+  }
+
   NvNameSize = SwapBytes16 (ReadUnaligned16 ((UINT16 *)((UINT8 *)&RecvBuffer + sizeof(TPM2_RESPONSE_HEADER) + sizeof(UINT16) + NvPublicSize)));
+  if (NvNameSize > sizeof(TPMU_NAME)){
+    DEBUG ((DEBUG_ERROR, "Tpm2NvReadPublic - NvNameSize error %x\n", NvNameSize));
+    return EFI_DEVICE_ERROR;
+  }
 
   if (RecvBufferSize != sizeof(TPM2_RESPONSE_HEADER) + sizeof(UINT16) + NvPublicSize + sizeof(UINT16) + NvNameSize) {
-    DEBUG ((EFI_D_ERROR, "Tpm2NvReadPublic - RecvBufferSize Error - NvPublicSize %x, NvNameSize %x\n", RecvBufferSize, NvNameSize));
+    DEBUG ((EFI_D_ERROR, "Tpm2NvReadPublic - RecvBufferSize Error - NvPublicSize %x\n", RecvBufferSize));
     return EFI_NOT_FOUND;
   }
 
@@ -256,7 +259,7 @@ Tpm2NvReadPublic (
 
   CopyMem (NvName->name, (UINT8 *)&RecvBuffer + sizeof(TPM2_RESPONSE_HEADER) + sizeof(UINT16) + NvPublicSize + sizeof(UINT16), NvNameSize);
   NvName->size = NvNameSize;
-  
+
   return EFI_SUCCESS;
 }
 
@@ -269,7 +272,7 @@ Tpm2NvReadPublic (
   @param[in]  AuthSession        Auth Session context
   @param[in]  Auth               The authorization data.
   @param[in]  NvPublic           The public area of the index.
-  
+
   @retval EFI_SUCCESS            Operation completed successfully.
   @retval EFI_DEVICE_ERROR       The command was unsuccessful.
   @retval EFI_ALREADY_STARTED    The command was returned successfully, but NvIndex is already defined.
@@ -405,7 +408,7 @@ Done:
   @param[in]  AuthHandle         TPM_RH_OWNER or TPM_RH_PLATFORM+{PP}.
   @param[in]  NvIndex            The NV Index.
   @param[in]  AuthSession        Auth Session context
-  
+
   @retval EFI_SUCCESS            Operation completed successfully.
   @retval EFI_DEVICE_ERROR       The command was unsuccessful.
   @retval EFI_NOT_FOUND          The command was returned successfully, but NvIndex is not found.
@@ -512,7 +515,7 @@ Done:
   @param[in]     Size               Number of bytes to read.
   @param[in]     Offset             Byte offset into the area.
   @param[in,out] OutData            The data read.
-  
+
   @retval EFI_SUCCESS            Operation completed successfully.
   @retval EFI_DEVICE_ERROR       The command was unsuccessful.
   @retval EFI_NOT_FOUND          The command was returned successfully, but NvIndex is not found.
@@ -632,8 +635,14 @@ Tpm2NvRead (
   // Return the response
   //
   OutData->size = SwapBytes16 (RecvBuffer.Data.size);
+  if (OutData->size > MAX_DIGEST_BUFFER) {
+    DEBUG ((DEBUG_ERROR, "Tpm2NvRead - OutData->size error %x\n", OutData->size));
+    Status = EFI_DEVICE_ERROR;
+    goto Done;
+  }
+
   CopyMem (OutData->buffer, &RecvBuffer.Data.buffer, OutData->size);
-  
+
 Done:
   //
   // Clear AuthSession Content
@@ -651,7 +660,7 @@ Done:
   @param[in]  AuthSession        Auth Session context
   @param[in]  InData             The data to write.
   @param[in]  Offset             The offset into the NV Area.
-  
+
   @retval EFI_SUCCESS            Operation completed successfully.
   @retval EFI_DEVICE_ERROR       The command was unsuccessful.
   @retval EFI_NOT_FOUND          The command was returned successfully, but NvIndex is not found.

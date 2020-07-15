@@ -1,15 +1,9 @@
 ## @file
 # Common routines used by all tools
 #
-# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2019, Intel Corporation. All rights reserved.<BR>
 #
-# This program and the accompanying materials are licensed and made available 
-# under the terms and conditions of the BSD License which accompanies this 
-# distribution. The full text of the license may be found at 
-# http://opensource.org/licenses/bsd-license.php
-#
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
 '''
@@ -32,7 +26,7 @@ from os import linesep
 from os import walk
 from os import environ
 import re
-from UserDict import IterableUserDict
+from collections import OrderedDict as Sdict
 
 import Logger.Log as Logger
 from Logger import StringTable as ST
@@ -45,14 +39,14 @@ from Library.DataType import TAB_LANGUAGE_EN_US
 from Library.DataType import TAB_LANGUAGE_EN
 from Library.DataType import TAB_LANGUAGE_EN_X
 from Library.DataType import TAB_UNI_FILE_SUFFIXS
-from Library.String import GetSplitValueList
+from Library.StringUtils import GetSplitValueList
 from Library.ParserValidate import IsValidHexVersion
 from Library.ParserValidate import IsValidPath
 from Object.POM.CommonObject import TextObject
 from Core.FileHook import __FileHookOpen__
 from Common.MultipleWorkspace import MultipleWorkspace as mws
 
-## Convert GUID string in xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx style to C 
+## Convert GUID string in xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx style to C
 # structure style
 #
 # @param      Guid:    The GUID string
@@ -87,7 +81,7 @@ def CheckGuidRegFormat(GuidValue):
         return False
 
 
-## Convert GUID string in C structure style to 
+## Convert GUID string in C structure style to
 # xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 #
 # @param      GuidValue:   The GUID value in C structure format
@@ -120,7 +114,7 @@ def GuidStructureStringToGuidString(GuidValue):
 # @param      Directory:   The directory name
 #
 def CreateDirectory(Directory):
-    if Directory == None or Directory.strip() == "":
+    if Directory is None or Directory.strip() == "":
         return True
     try:
         if not access(Directory, F_OK):
@@ -134,7 +128,7 @@ def CreateDirectory(Directory):
 # @param      Directory:   The directory name
 #
 def RemoveDirectory(Directory, Recursively=False):
-    if Directory == None or Directory.strip() == "" or not \
+    if Directory is None or Directory.strip() == "" or not \
     os.path.exists(Directory):
         return
     if Recursively:
@@ -151,32 +145,44 @@ def RemoveDirectory(Directory, Recursively=False):
 ## Store content in file
 #
 # This method is used to save file only when its content is changed. This is
-# quite useful for "make" system to decide what will be re-built and what 
+# quite useful for "make" system to decide what will be re-built and what
 # won't.
 #
 # @param      File:            The path of file
 # @param      Content:         The new content of the file
-# @param      IsBinaryFile:    The flag indicating if the file is binary file 
+# @param      IsBinaryFile:    The flag indicating if the file is binary file
 #                              or not
 #
 def SaveFileOnChange(File, Content, IsBinaryFile=True):
-    if not IsBinaryFile:
-        Content = Content.replace("\n", linesep)
-
     if os.path.exists(File):
-        try:
-            if Content == __FileHookOpen__(File, "rb").read():
-                return False
-        except BaseException:
-            Logger.Error(None, ToolError.FILE_OPEN_FAILURE, ExtraData=File)
+        if IsBinaryFile:
+            try:
+                if Content == __FileHookOpen__(File, "rb").read():
+                    return False
+            except BaseException:
+                Logger.Error(None, ToolError.FILE_OPEN_FAILURE, ExtraData=File)
+        else:
+            try:
+                if Content == __FileHookOpen__(File, "r").read():
+                    return False
+            except BaseException:
+                Logger.Error(None, ToolError.FILE_OPEN_FAILURE, ExtraData=File)
 
     CreateDirectory(os.path.dirname(File))
-    try:
-        FileFd = __FileHookOpen__(File, "wb")
-        FileFd.write(Content)
-        FileFd.close()
-    except BaseException:
-        Logger.Error(None, ToolError.FILE_CREATE_FAILURE, ExtraData=File)
+    if IsBinaryFile:
+        try:
+            FileFd = __FileHookOpen__(File, "wb")
+            FileFd.write(Content)
+            FileFd.close()
+        except BaseException:
+            Logger.Error(None, ToolError.FILE_CREATE_FAILURE, ExtraData=File)
+    else:
+        try:
+            FileFd = __FileHookOpen__(File, "w")
+            FileFd.write(Content)
+            FileFd.close()
+        except BaseException:
+            Logger.Error(None, ToolError.FILE_CREATE_FAILURE, ExtraData=File)
 
     return True
 
@@ -216,7 +222,7 @@ def GetFiles(Root, SkipList=None, FullPath=True):
 # @param FullPath:  True if the returned file should be full path
 # @param PrefixPath: the path that need to be added to the files found
 # @return: the list of files found
-#  
+#
 def GetNonMetaDataFiles(Root, SkipList, FullPath, PrefixPath):
     FileList = GetFiles(Root, SkipList, FullPath)
     NewFileList = []
@@ -237,7 +243,7 @@ def GetNonMetaDataFiles(Root, SkipList, FullPath, PrefixPath):
 #
 def ValidFile(File, Ext=None):
     File = File.replace('\\', '/')
-    if Ext != None:
+    if Ext is not None:
         FileExt = os.path.splitext(File)[1]
         if FileExt.lower() != Ext.lower():
             return False
@@ -288,148 +294,6 @@ def RealPath2(File, Dir='', OverrideDir=''):
 
     return None, None
 
-## A dict which can access its keys and/or values orderly
-#
-#  The class implements a new kind of dict which its keys or values can be
-#  accessed in the order they are added into the dict. It guarantees the order
-#  by making use of an internal list to keep a copy of keys.
-#
-class Sdict(IterableUserDict):
-    ## Constructor
-    #
-    def __init__(self):
-        IterableUserDict.__init__(self)
-        self._key_list = []
-
-    ## [] operator
-    #
-    def __setitem__(self, Key, Value):
-        if Key not in self._key_list:
-            self._key_list.append(Key)
-        IterableUserDict.__setitem__(self, Key, Value)
-
-    ## del operator
-    #
-    def __delitem__(self, Key):
-        self._key_list.remove(Key)
-        IterableUserDict.__delitem__(self, Key)
-
-    ## used in "for k in dict" loop to ensure the correct order
-    #
-    def __iter__(self):
-        return self.iterkeys()
-
-    ## len() support
-    #
-    def __len__(self):
-        return len(self._key_list)
-
-    ## "in" test support
-    #
-    def __contains__(self, Key):
-        return Key in self._key_list
-
-    ## indexof support
-    #
-    def index(self, Key):
-        return self._key_list.index(Key)
-
-    ## insert support
-    #
-    def insert(self, Key, Newkey, Newvalue, Order):
-        Index = self._key_list.index(Key)
-        if Order == 'BEFORE':
-            self._key_list.insert(Index, Newkey)
-            IterableUserDict.__setitem__(self, Newkey, Newvalue)
-        elif Order == 'AFTER':
-            self._key_list.insert(Index + 1, Newkey)
-            IterableUserDict.__setitem__(self, Newkey, Newvalue)
-
-    ## append support
-    #
-    def append(self, Sdict2):
-        for Key in Sdict2:
-            if Key not in self._key_list:
-                self._key_list.append(Key)
-            IterableUserDict.__setitem__(self, Key, Sdict2[Key])
-    ## hash key
-    #
-    def has_key(self, Key):
-        return Key in self._key_list
-
-    ## Empty the dict
-    #
-    def clear(self):
-        self._key_list = []
-        IterableUserDict.clear(self)
-
-    ## Return a copy of keys
-    #
-    def keys(self):
-        Keys = []
-        for Key in self._key_list:
-            Keys.append(Key)
-        return Keys
-
-    ## Return a copy of values
-    #
-    def values(self):
-        Values = []
-        for Key in self._key_list:
-            Values.append(self[Key])
-        return Values
-
-    ## Return a copy of (key, value) list
-    #
-    def items(self):
-        Items = []
-        for Key in self._key_list:
-            Items.append((Key, self[Key]))
-        return Items
-
-    ## Iteration support
-    #
-    def iteritems(self):
-        return iter(self.items())
-
-    ## Keys interation support
-    #
-    def iterkeys(self):
-        return iter(self.keys())
-
-    ## Values interation support
-    #
-    def itervalues(self):
-        return iter(self.values())
-
-    ## Return value related to a key, and remove the (key, value) from the dict
-    #
-    def pop(self, Key, *Dv):
-        Value = None
-        if Key in self._key_list:
-            Value = self[Key]
-            self.__delitem__(Key)
-        elif len(Dv) != 0 :
-            Value = Dv[0]
-        return Value
-
-    ## Return (key, value) pair, and remove the (key, value) from the dict
-    #
-    def popitem(self):
-        Key = self._key_list[-1]
-        Value = self[Key]
-        self.__delitem__(Key)
-        return Key, Value
-    ## update method
-    #
-    def update(self, Dict=None, **Kwargs):
-        if Dict != None:
-            for Key1, Val1 in Dict.items():
-                self[Key1] = Val1
-        if len(Kwargs):
-            for Key1, Val1 in Kwargs.items():
-                self[Key1] = Val1
-
 ## CommonPath
 #
 # @param PathList: PathList
@@ -437,7 +301,7 @@ class Sdict(IterableUserDict):
 def CommonPath(PathList):
     Path1 = min(PathList).split(os.path.sep)
     Path2 = max(PathList).split(os.path.sep)
-    for Index in xrange(min(len(Path1), len(Path2))):
+    for Index in range(min(len(Path1), len(Path2))):
         if Path1[Index] != Path2[Index]:
             return os.path.sep.join(Path1[:Index])
     return os.path.sep.join(Path1)
@@ -514,7 +378,7 @@ class PathClass(object):
     # Check whether PathClass are the same
     #
     def __eq__(self, Other):
-        if type(Other) == type(self):
+        if isinstance(Other, type(self)):
             return self.Path == Other.Path
         else:
             return self.Path == str(Other)
@@ -529,7 +393,7 @@ class PathClass(object):
     ## _GetFileKey
     #
     def _GetFileKey(self):
-        if self._Key == None:
+        if self._Key is None:
             self._Key = self.Path.upper()
         return self._Key
     ## Validate
@@ -602,25 +466,25 @@ def GetWorkspace():
 ## Get relative path
 #
 #  use full path and workspace to get relative path
-#  the destination of this function is mainly to resolve the root path issue(like c: or c:\)  
+#  the destination of this function is mainly to resolve the root path issue(like c: or c:\)
 #
 #  @param Fullpath: a string of fullpath
 #  @param Workspace: a string of workspace
 #
 def GetRelativePath(Fullpath, Workspace):
-    
+
     RelativePath = ''
     if Workspace.endswith(os.sep):
         RelativePath = Fullpath[Fullpath.upper().find(Workspace.upper())+len(Workspace):]
     else:
         RelativePath = Fullpath[Fullpath.upper().find(Workspace.upper())+len(Workspace)+1:]
-        
+
     return RelativePath
-    
+
 ## Check whether all module types are in list
 #
 # check whether all module types (SUP_MODULE_LIST) are in list
-#  
+#
 # @param ModuleList:  a list of ModuleType
 #
 def IsAllModuleList(ModuleList):
@@ -632,9 +496,9 @@ def IsAllModuleList(ModuleList):
         return True
 
 ## Dictionary that use comment(GenericComment, TailComment) as value,
-# if a new comment which key already in the dic is inserted, then the 
+# if a new comment which key already in the dic is inserted, then the
 # comment will be merged.
-# Key is (Statement, SupArch), when TailComment is added, it will ident 
+# Key is (Statement, SupArch), when TailComment is added, it will ident
 # according to Statement
 #
 class MergeCommentDict(dict):
@@ -671,7 +535,7 @@ def GenDummyHelpTextObj():
 # <Major>               ::=  (a-fA-F0-9){4}
 # <Minor>               ::=  (a-fA-F0-9){4}
 # <DecVersion>          ::=  (0-65535) ["." (0-99)]
-# 
+#
 # @param StringIn:  The string contains version defined in INF file.
 #                   It can be Decimal or Hex
 #
@@ -764,7 +628,7 @@ def ConvertPath(Path):
 
 ## ConvertSpec
 #
-# during install, convert the Spec string extract from UPD into INF allowable definition, 
+# during install, convert the Spec string extract from UPD into INF allowable definition,
 # the difference is period is allowed in the former (not the first letter) but not in the latter.
 # return converted Spec string
 #
@@ -787,7 +651,7 @@ def ConvertSpec(SpecStr):
 # The rule is elements in List A are in List B and elements in List B are in List A.
 #
 # @param ListA, ListB  Lists need to be judged.
-# 
+#
 # @return True  ListA and ListB are identical
 # @return False ListA and ListB are different with each other
 #
@@ -808,10 +672,10 @@ def IsEqualList(ListA, ListB):
 ## ConvertArchList
 #
 # Convert item in ArchList if the start character is lower case.
-# In UDP spec, Arch is only allowed as: [A-Z]([a-zA-Z0-9])* 
+# In UDP spec, Arch is only allowed as: [A-Z]([a-zA-Z0-9])*
 #
 # @param ArchList The ArchList need to be converted.
-# 
+#
 # @return NewList  The ArchList been converted.
 #
 def ConvertArchList(ArchList):
@@ -819,11 +683,11 @@ def ConvertArchList(ArchList):
     if not ArchList:
         return NewArchList
 
-    if type(ArchList) == list:
+    if isinstance(ArchList, list):
         for Arch in ArchList:
             Arch = Arch.upper()
             NewArchList.append(Arch)
-    elif type(ArchList) == str:
+    elif isinstance(ArchList, str):
         ArchList = ArchList.upper()
         NewArchList.append(ArchList)
 
@@ -835,7 +699,7 @@ def ConvertArchList(ArchList):
 # If one line ends with a line extender, then it will be combined together with next line.
 #
 # @param LineList The LineList need to be processed.
-# 
+#
 # @return NewList  The ArchList been processed.
 #
 def ProcessLineExtender(LineList):
@@ -854,11 +718,11 @@ def ProcessLineExtender(LineList):
 
 ## ProcessEdkComment
 #
-# Process EDK style comment in LineList: c style /* */ comment or cpp style // comment 
+# Process EDK style comment in LineList: c style /* */ comment or cpp style // comment
 #
 #
 # @param LineList The LineList need to be processed.
-# 
+#
 # @return LineList  The LineList been processed.
 # @return FirstPos  Where Edk comment is first found, -1 if not found
 #
@@ -868,7 +732,7 @@ def ProcessEdkComment(LineList):
     StartPos = -1
     EndPos = -1
     FirstPos = -1
-    
+
     while(Count < len(LineList)):
         Line = LineList[Count].strip()
         if Line.startswith("/*"):
@@ -886,11 +750,11 @@ def ProcessEdkComment(LineList):
                     FindEdkBlockComment = True
                     break
                 Count = Count + 1
-            
+
             if FindEdkBlockComment:
                 if FirstPos == -1:
                     FirstPos = StartPos
-                for Index in xrange(StartPos, EndPos+1):
+                for Index in range(StartPos, EndPos+1):
                     LineList[Index] = ''
                 FindEdkBlockComment = False
         elif Line.find("//") != -1 and not Line.startswith("#"):
@@ -900,9 +764,9 @@ def ProcessEdkComment(LineList):
             LineList[Count] = Line.replace("//", '#')
             if FirstPos == -1:
                 FirstPos = Count
-        
+
         Count = Count + 1
-    
+
     return LineList, FirstPos
 
 ## GetLibInstanceInfo
@@ -918,7 +782,7 @@ def GetLibInstanceInfo(String, WorkSpace, LineNo):
     FileGuidString = ""
     VerString = ""
 
-    OrignalString = String
+    OriginalString = String
     String = String.strip()
     if not String:
         return None, None
@@ -938,7 +802,7 @@ def GetLibInstanceInfo(String, WorkSpace, LineNo):
                      ST.ERR_FILELIST_EXIST % (String),
                      File=GlobalData.gINF_MODULE_NAME,
                      Line=LineNo,
-                     ExtraData=OrignalString)
+                     ExtraData=OriginalString)
 
     #
     # Validate file exist/format.
@@ -951,13 +815,13 @@ def GetLibInstanceInfo(String, WorkSpace, LineNo):
                      ST.ERR_INF_PARSER_FILE_NOT_EXIST_OR_NAME_INVALID % (String),
                      File=GlobalData.gINF_MODULE_NAME,
                      Line=LineNo,
-                     ExtraData=OrignalString)
+                     ExtraData=OriginalString)
         return False
     if IsValidFileFlag:
         FileLinesList = []
 
         try:
-            FInputfile = open(FullFileName, "rb", 0)
+            FInputfile = open(FullFileName, "r")
             try:
                 FileLinesList = FInputfile.readlines()
             except BaseException:
@@ -994,13 +858,13 @@ def GetLibInstanceInfo(String, WorkSpace, LineNo):
 ## GetLocalValue
 #
 # Generate the local value for INF and DEC file. If Lang attribute not present, then use this value.
-# If present, and there is no element without the Lang attribute, and one of the elements has the rfc1766 code is 
-# "en-x-tianocore", or "en-US" if "en-x-tianocore" was not found, or "en" if "en-US" was not found, or startswith 'en' 
+# If present, and there is no element without the Lang attribute, and one of the elements has the rfc1766 code is
+# "en-x-tianocore", or "en-US" if "en-x-tianocore" was not found, or "en" if "en-US" was not found, or startswith 'en'
 # if 'en' was not found, then use this value.
 # If multiple entries of a tag exist which have the same language code, use the last entry.
 #
 # @param ValueList  A list need to be processed.
-# @param UseFirstValue: True to use the first value, False to use the last value 
+# @param UseFirstValue: True to use the first value, False to use the last value
 #
 # @return LocalValue
 def GetLocalValue(ValueList, UseFirstValue=False):
@@ -1040,7 +904,7 @@ def GetLocalValue(ValueList, UseFirstValue=False):
                     Value5 = Value
             else:
                 Value5 = Value
-            
+
     if Value1:
         return Value1
     if Value2:
@@ -1051,7 +915,7 @@ def GetLocalValue(ValueList, UseFirstValue=False):
         return Value4
     if Value5:
         return Value5
-    
+
     return ''
 
 
@@ -1088,29 +952,29 @@ def GetCharIndexOutStr(CommentCharacter, Line):
 #
 # Check the UNI file path
 #
-# @param FilePath: The UNI file path 
+# @param FilePath: The UNI file path
 #
 def ValidateUNIFilePath(Path):
     Suffix = Path[Path.rfind(TAB_SPLIT):]
-    
+
     #
-    # Check if the suffix is one of the '.uni', '.UNI', '.Uni' 
+    # Check if the suffix is one of the '.uni', '.UNI', '.Uni'
     #
     if Suffix not in TAB_UNI_FILE_SUFFIXS:
-        Logger.Error("Unicode File Parser", 
-                        ToolError.FORMAT_INVALID, 
-                        Message=ST.ERR_UNI_FILE_SUFFIX_WRONG, 
-                        ExtraData=Path)    
-    
+        Logger.Error("Unicode File Parser",
+                        ToolError.FORMAT_INVALID,
+                        Message=ST.ERR_UNI_FILE_SUFFIX_WRONG,
+                        ExtraData=Path)
+
     #
-    # Check if '..' in the file name(without suffixe)
+    # Check if '..' in the file name(without suffix)
     #
     if (TAB_SPLIT + TAB_SPLIT) in Path:
-        Logger.Error("Unicode File Parser", 
-                        ToolError.FORMAT_INVALID, 
-                        Message=ST.ERR_UNI_FILE_NAME_INVALID, 
-                        ExtraData=Path)    
-    
+        Logger.Error("Unicode File Parser",
+                        ToolError.FORMAT_INVALID,
+                        Message=ST.ERR_UNI_FILE_NAME_INVALID,
+                        ExtraData=Path)
+
     #
     # Check if the file name is valid according to the DEC and INF specification
     #
@@ -1118,8 +982,8 @@ def ValidateUNIFilePath(Path):
     FileName = Path.replace(Suffix, '')
     InvalidCh = re.sub(Pattern, '', FileName)
     if InvalidCh:
-        Logger.Error("Unicode File Parser", 
-                        ToolError.FORMAT_INVALID, 
-                        Message=ST.ERR_INF_PARSER_FILE_NOT_EXIST_OR_NAME_INVALID, 
-                        ExtraData=Path)    
+        Logger.Error("Unicode File Parser",
+                        ToolError.FORMAT_INVALID,
+                        Message=ST.ERR_INF_PARSER_FILE_NOT_EXIST_OR_NAME_INVALID,
+                        ExtraData=Path)
 

@@ -3,13 +3,7 @@
   conforming to EFI driver model.
 
 Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -593,8 +587,8 @@ MouseReset (
 
   Status = EFI_SUCCESS;
   //
-  // The PS2 mouse driver reset behavior is always successfully return no matter wheater or not there is mouse connected to system.
-  // This behavior is needed by performance speed. The following mouse command only succeessfully finish when mouse device is
+  // The PS2 mouse driver reset behavior is always successfully return no matter whether or not there is mouse connected to system.
+  // This behavior is needed by performance speed. The following mouse command only successfully finish when mouse device is
   // connected to system, so if PS2 mouse device not connect to system or user not ask for, we skip the mouse configuration and enabling
   //
   if (ExtendedVerification && CheckMouseConnect (MouseDev)) {

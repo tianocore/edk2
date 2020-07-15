@@ -3,13 +3,7 @@
 
   Copyright (C) 2015, Red Hat, Inc.
 
-  This program and the accompanying materials are licensed and made available
-  under the terms and conditions of the BSD License which accompanies this
-  distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT
-  WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include <Library/DebugLib.h>
@@ -222,7 +216,7 @@ CreateExtraRootBusMap (
     ASSERT (Entry != NULL);
     Acpi = OrderedCollectionUserStruct (Entry);
     Map->BusNumbers[Idx] = Acpi->UID;
-    DEBUG ((EFI_D_VERBOSE,
+    DEBUG ((DEBUG_VERBOSE,
       "%a: extra bus position 0x%Lx maps to bus number (UID) 0x%x\n",
       __FUNCTION__, (UINT64)(Idx + 1), Acpi->UID));
     ++Idx;

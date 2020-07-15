@@ -1,0 +1,11 @@
+## @file
+# Set shell variable BASE_TOOL_PATH to this folder
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+{
+  "scope": "global",
+  "flags": ["set_shell_var"],
+  "var_name": "BASE_TOOLS_PATH"
+}

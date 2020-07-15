@@ -2,19 +2,13 @@
   Build a table, each item is (Key, Info) pair.
   And give a interface of query a string out of a table.
 
-  Copyright (c) 2005 - 2017, Intel Corporation. All rights reserved.<BR>
-  (C) Copyright 2016-2017 Hewlett Packard Enterprise Development LP<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2005 - 2019, Intel Corporation. All rights reserved.<BR>
+  (C) Copyright 2016-2019 Hewlett Packard Enterprise Development LP<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include "../UefiShellDebug1CommandsLib.h"
+#include "UefiShellDebug1CommandsLib.h"
 #include "QueryTable.h"
 #include "PrintInfo.h"
 
@@ -579,6 +573,22 @@ TABLE_ITEM  ProcessorUpgradeTable[] = {
   {
     0x38,
     L"Socket SP3r2"
+  },
+  {
+    0x39,
+    L"Socket LGA2066"
+  },
+  {
+    0x3A,
+    L"Socket BGA1392"
+  },
+  {
+    0x3B,
+    L"Socket BGA1510"
+  },
+  {
+    0x3C,
+    L"Socket BGA1528"
   }
 };
 
@@ -610,6 +620,10 @@ TABLE_ITEM  ProcessorCharacteristicsTable[] = {
   {
     7,
     L" Power/Performance Control"
+  },
+  {
+    8,
+    L" 128-bit Capable"
   }
 };
 
@@ -1089,6 +1103,10 @@ TABLE_ITEM  PortConnectorTypeTable[] = {
     L"SAS/SATA Plug Receptacle"
   },
   {
+    0x23,
+    L"USB Type-C Receptacle"
+  },
+  {
     0xA0,
     L"PC-98"
   },
@@ -1252,6 +1270,14 @@ TABLE_ITEM  PortTypeTable[] = {
     L"SAS Port"
   },
   {
+    0x22,
+    L"Multi-Function Display Port (MFDP)"
+  },
+  {
+    0x23,
+    L"Thunderbolt"
+  },
+  {
     0xA0,
     L"8251 Compatible"
   },
@@ -1407,6 +1433,10 @@ TABLE_ITEM  SystemSlotTypeTable[] = {
     L"PCI Express Mini 76-pin (CEM spec. 2.0) Corresponds to Display-Mini card"
   },
   {
+    SlotTypeCXLFlexbus10,
+    L"CXL Flexbus 1.0"
+  },
+  {
     0xA0,
     L"PC-98/C20 "
   },
@@ -1497,6 +1527,30 @@ TABLE_ITEM  SystemSlotTypeTable[] = {
   {
     0xB6,
     L"PCI Express Gen 3 X16"
+  },
+  {
+    SlotTypePciExpressGen4,
+    L"PCI Express Gen 4"
+  },
+  {
+    SlotTypePciExpressGen4X1,
+    L"PCI Express Gen 4 X1"
+  },
+  {
+    SlotTypePciExpressGen4X2,
+    L"PCI Express Gen 4 X2"
+  },
+  {
+    SlotTypePciExpressGen4X4,
+    L"PCI Express Gen 4 X4"
+  },
+  {
+    SlotTypePciExpressGen4X8,
+    L"PCI Express Gen 4 X8"
+  },
+  {
+    SlotTypePciExpressGen4X16,
+    L"PCI Express Gen 4 X16"
   }
 };
 
@@ -1576,6 +1630,10 @@ TABLE_ITEM  SystemSlotCurrentUsageTable[] = {
     0x04,
     L" In use"
   },
+  {
+    0x05,
+    L" Unavailable"
+  }
 };
 
 TABLE_ITEM  SystemSlotLengthTable[] = {
@@ -1645,6 +1703,10 @@ TABLE_ITEM  SlotCharacteristics2Table[] = {
   {
     2,
     L" PCI slot supports SMBus signal"
+  },
+  {
+    3,
+    L" PCIe slot supports bifurcation"
   }
 };
 
@@ -2232,6 +2294,10 @@ TABLE_ITEM  PMALocationTable[] = {
   {
     0xA3,
     L"  PC-98/Local bus add-on card"
+  },
+  {
+    MemoryArrayLocationCXLFlexbus10AddonCard,
+    L"  CXL Flexbus 1.0 add-on card"
   }
 };
 
@@ -2357,6 +2423,10 @@ TABLE_ITEM  MemoryDeviceFormFactorTable[] = {
   {
     0x0F,
     L"  FB-DIMM"
+  },
+  {
+    MemoryFormFactorDie,
+    L"  Die"
   }
 };
 
@@ -2468,6 +2538,18 @@ TABLE_ITEM  MemoryDeviceTypeTable[] = {
   {
     0x1E,
     L"  LPDDR4"
+  },
+  {
+    0x1F,
+    L"  Logical non-volatile device"
+  },
+  {
+    MemoryTypeHBM,
+    L"  HBM (High Bandwidth Memory)"
+  },
+  {
+    MemoryTypeHBM2,
+    L"  HBM2 (High Bandwidth Memory Generation 2)"
   }
 };
 
@@ -2529,6 +2611,61 @@ TABLE_ITEM  MemoryDeviceTypeDetailTable[] = {
     L" Unbuffered(Unregistered)"
   }
 };
+
+TABLE_ITEM  MemoryDeviceMemoryTechnologyTable[] = {
+  {
+    0x01,
+    L" Other"
+  },
+  {
+    0x02,
+    L" Unknown"
+  },
+  {
+    0x03,
+    L" DRAM"
+  },
+  {
+    0x04,
+    L" NVDIMM-N"
+  },
+  {
+    0x05,
+    L" NVDIMM-F"
+  },
+  {
+    0x06,
+    L" NVDIMM-P"
+  },
+  {
+    MemoryTechnologyIntelPersistentMemory,
+    L" Intel Optane DC Persistent Memory"
+  }
+};
+
+TABLE_ITEM  MemoryDeviceMemoryOperatingModeCapabilityTable[] = {
+  {
+    1,
+    L" Other"
+  },
+  {
+    2,
+    L" Unknown"
+  },
+  {
+    3,
+    L" Volatile memory"
+  },
+  {
+    4,
+    L" Byte-accessible persistent memory"
+  },
+  {
+    5,
+    L" Block-accessible persistent memory"
+  }
+};
+
 
 TABLE_ITEM  MemoryErrorTypeTable[] = {
   {
@@ -3155,7 +3292,11 @@ TABLE_ITEM  IPMIDIBMCInterfaceTypeTable[] = {
     L" BT: Block Transfer "
   },
   {
-    0xFF04,
+    0x04,
+    L" SSIF: SMBus System Interface "
+  },
+  {
+    0xFF05,
     L" Reserved for future assignment by this specification "
   },
 };
@@ -3175,6 +3316,44 @@ TABLE_ITEM  MCHostInterfaceTypeTable[] = {
   },
 };
 
+TABLE_ITEM  ProcessorArchitectureTypesTable[] = {
+  {
+    0,
+    L" Reserved "
+  },
+  {
+    1,
+    L" IA32 (x86) "
+  },
+  {
+    2,
+    L" x64 (x86-64, intel64, AMD64, EM64T) "
+  },
+  {
+    3,
+    L" Intel Itanium architecture "
+  },
+  {
+    4,
+    L" 32-bit ARM (Aarch32) "
+  },
+  {
+    5,
+    L" 64-bit ARM (Aarch64) "
+  },
+  {
+    6,
+    L" 32-bit RISC-V (RV32) "
+  },
+  {
+    7,
+    L" 64-bit RISC-V (RV64) "
+  },
+  {
+    8,
+    L" 128-bit RISC-V (RV128) "
+  }
+};
 
 TABLE_ITEM  StructureTypeInfoTable[] = {
   {
@@ -3354,6 +3533,10 @@ TABLE_ITEM  StructureTypeInfoTable[] = {
     L" TPM Device"
   },
   {
+    44,
+    L" Processor Additional Information"
+  },
+  {
     0x7E,
     L" Inactive"
   },
@@ -3412,7 +3595,7 @@ QueryTable (
     // Check if Key is in the range
     // or if Key == Value in the table
     //
-    if ((High > Low && Key >= Low && Key <= High) 
+    if ((High > Low && Key >= Low && Key <= High)
       || (Table[Index].Key == Key)) {
       StrnCpyS (Info, InfoLen, Table[Index].Info, InfoLen - 1);
       StrnCatS (Info, InfoLen, L"\n", InfoLen - 1 - StrLen(Info));
@@ -4223,6 +4406,40 @@ DisplayMemoryDeviceTypeDetail (
 }
 
 /**
+  Display Memory Device (Type 17) memory technology.
+
+  @param[in] Para     The key of the structure.
+  @param[in] Option   The optional information.
+**/
+VOID
+DisplayMemoryDeviceMemoryTechnology (
+  IN UINT8  Para,
+  IN UINT8  Option
+  )
+{
+  ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_MEM_DEVICE_MEMORY_TECHNOLOGY), gShellDebug1HiiHandle);
+  PRINT_INFO_OPTION (Para, Option);
+  PRINT_TABLE_ITEM (MemoryDeviceMemoryTechnologyTable, Para);
+}
+
+/**
+  Display Memory Device (Type 17) memory operating mode capability.
+
+  @param[in] Para     The key of the structure.
+  @param[in] Option   The optional information.
+**/
+VOID
+DisplayMemoryDeviceMemoryOperatingModeCapability (
+  IN UINT16  Para,
+  IN UINT8   Option
+  )
+{
+  ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_MEM_DEVICE_MEM_OPER_MODE_CAPA), gShellDebug1HiiHandle);
+  PRINT_INFO_OPTION (Para, Option);
+  PRINT_BITS_INFO (MemoryDeviceMemoryOperatingModeCapabilityTable, Para);
+}
+
+/**
   Display 32-bit Memory Error Information (Type 18) type.
 
   @param[in] ErrorType  The key of the structure.
@@ -4567,6 +4784,23 @@ DisplayMCHostInterfaceType (
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_MC_HOST_INTERFACE_TYPE), gShellDebug1HiiHandle);
   PRINT_INFO_OPTION (Key, Option);
   PRINT_TABLE_ITEM (MCHostInterfaceTypeTable, Key);
+}
+
+/**
+  Display Processor Architecture Type (Type 44).
+
+  @param[in] Key            The key of the structure.
+  @param[in] Option         The optional information.
+**/
+VOID
+DisplayProcessorArchitectureType (
+  IN UINT8 Key,
+  IN UINT8 Option
+  )
+{
+  ShellPrintHiiEx (-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_PROCESSOR_ARCH_TYPE), gShellDebug1HiiHandle);
+  PRINT_INFO_OPTION (Key, Option);
+  PRINT_TABLE_ITEM (ProcessorArchitectureTypesTable, Key);
 }
 
 /**

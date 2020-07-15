@@ -2,15 +2,9 @@
   This driver is a sample implementation of the Graphics Output Protocol for
   the QEMU (Cirrus Logic 5446) video controller.
 
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution. The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -28,35 +22,53 @@ EFI_DRIVER_BINDING_PROTOCOL gQemuVideoDriverBinding = {
 
 QEMU_VIDEO_CARD gQemuVideoCardList[] = {
     {
+        PCI_CLASS_DISPLAY_VGA,
         CIRRUS_LOGIC_VENDOR_ID,
         CIRRUS_LOGIC_5430_DEVICE_ID,
         QEMU_VIDEO_CIRRUS_5430,
         L"Cirrus 5430"
     },{
+        PCI_CLASS_DISPLAY_VGA,
         CIRRUS_LOGIC_VENDOR_ID,
         CIRRUS_LOGIC_5430_ALTERNATE_DEVICE_ID,
         QEMU_VIDEO_CIRRUS_5430,
         L"Cirrus 5430"
     },{
+        PCI_CLASS_DISPLAY_VGA,
         CIRRUS_LOGIC_VENDOR_ID,
         CIRRUS_LOGIC_5446_DEVICE_ID,
         QEMU_VIDEO_CIRRUS_5446,
         L"Cirrus 5446"
     },{
+        PCI_CLASS_DISPLAY_VGA,
         0x1234,
         0x1111,
         QEMU_VIDEO_BOCHS_MMIO,
         L"QEMU Standard VGA"
     },{
+        PCI_CLASS_DISPLAY_OTHER,
+        0x1234,
+        0x1111,
+        QEMU_VIDEO_BOCHS_MMIO,
+        L"QEMU Standard VGA (secondary)"
+    },{
+        PCI_CLASS_DISPLAY_VGA,
         0x1b36,
         0x0100,
         QEMU_VIDEO_BOCHS,
         L"QEMU QXL VGA"
     },{
+        PCI_CLASS_DISPLAY_VGA,
         0x1af4,
         0x1050,
         QEMU_VIDEO_BOCHS_MMIO,
         L"QEMU VirtIO VGA"
+    },{
+        PCI_CLASS_DISPLAY_VGA,
+        0x15ad,
+        0x0405,
+        QEMU_VIDEO_VMWARE_SVGA,
+        L"QEMU VMWare SVGA"
     },{
         0 /* end of list */
     }
@@ -64,6 +76,7 @@ QEMU_VIDEO_CARD gQemuVideoCardList[] = {
 
 static QEMU_VIDEO_CARD*
 QemuVideoDetect(
+  IN UINT8 SubClass,
   IN UINT16 VendorId,
   IN UINT16 DeviceId
   )
@@ -71,7 +84,8 @@ QemuVideoDetect(
   UINTN Index = 0;
 
   while (gQemuVideoCardList[Index].VendorId != 0) {
-    if (gQemuVideoCardList[Index].VendorId == VendorId &&
+    if (gQemuVideoCardList[Index].SubClass == SubClass &&
+        gQemuVideoCardList[Index].VendorId == VendorId &&
         gQemuVideoCardList[Index].DeviceId == DeviceId) {
       return gQemuVideoCardList + Index;
     }
@@ -134,12 +148,12 @@ QemuVideoControllerDriverSupported (
   }
 
   Status = EFI_UNSUPPORTED;
-  if (!IS_PCI_VGA (&Pci)) {
+  if (!IS_PCI_DISPLAY (&Pci)) {
     goto Done;
   }
-  Card = QemuVideoDetect(Pci.Hdr.VendorId, Pci.Hdr.DeviceId);
+  Card = QemuVideoDetect(Pci.Hdr.ClassCode[1], Pci.Hdr.VendorId, Pci.Hdr.DeviceId);
   if (Card != NULL) {
-    DEBUG ((EFI_D_INFO, "QemuVideo: %s detected\n", Card->Name));
+    DEBUG ((DEBUG_INFO, "QemuVideo: %s detected\n", Card->Name));
     Status = EFI_SUCCESS;
   }
 
@@ -187,11 +201,12 @@ QemuVideoControllerDriverStart (
   PCI_TYPE00                        Pci;
   QEMU_VIDEO_CARD                   *Card;
   EFI_PCI_IO_PROTOCOL               *ChildPciIo;
+  UINT64                            SupportedVgaIo;
 
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   //
-  // Allocate Private context data for GOP inteface.
+  // Allocate Private context data for GOP interface.
   //
   Private = AllocateZeroPool (sizeof (QEMU_VIDEO_PRIVATE_DATA));
   if (Private == NULL) {
@@ -236,7 +251,7 @@ QemuVideoControllerDriverStart (
   //
   // Determine card variant.
   //
-  Card = QemuVideoDetect(Pci.Hdr.VendorId, Pci.Hdr.DeviceId);
+  Card = QemuVideoDetect(Pci.Hdr.ClassCode[1], Pci.Hdr.VendorId, Pci.Hdr.DeviceId);
   if (Card == NULL) {
     Status = EFI_DEVICE_ERROR;
     goto ClosePciIo;
@@ -264,12 +279,31 @@ QemuVideoControllerDriverStart (
   }
 
   //
+  // Get supported PCI attributes
+  //
+  Status = Private->PciIo->Attributes (
+                             Private->PciIo,
+                             EfiPciIoAttributeOperationSupported,
+                             0,
+                             &SupportedVgaIo
+                             );
+  if (EFI_ERROR (Status)) {
+    goto ClosePciIo;
+  }
+
+  SupportedVgaIo &= (UINT64)(EFI_PCI_IO_ATTRIBUTE_VGA_IO | EFI_PCI_IO_ATTRIBUTE_VGA_IO_16);
+  if (SupportedVgaIo == 0 && IS_PCI_VGA (&Pci)) {
+    Status = EFI_UNSUPPORTED;
+    goto ClosePciIo;
+  }
+
+  //
   // Set new PCI attributes
   //
   Status = Private->PciIo->Attributes (
                             Private->PciIo,
                             EfiPciIoAttributeOperationEnable,
-                            EFI_PCI_DEVICE_ENABLE | EFI_PCI_IO_ATTRIBUTE_VGA_MEMORY | EFI_PCI_IO_ATTRIBUTE_VGA_IO,
+                            EFI_PCI_DEVICE_ENABLE | EFI_PCI_IO_ATTRIBUTE_VGA_MEMORY | SupportedVgaIo,
                             NULL
                             );
   if (EFI_ERROR (Status)) {
@@ -290,16 +324,24 @@ QemuVideoControllerDriverStart (
                         );
     if (EFI_ERROR (Status) ||
         MmioDesc->ResType != ACPI_ADDRESS_SPACE_TYPE_MEM) {
-      DEBUG ((EFI_D_INFO, "QemuVideo: No mmio bar, fallback to port io\n"));
+      DEBUG ((DEBUG_INFO, "QemuVideo: No mmio bar, fallback to port io\n"));
       Private->Variant = QEMU_VIDEO_BOCHS;
     } else {
-      DEBUG ((EFI_D_INFO, "QemuVideo: Using mmio bar @ 0x%lx\n",
+      DEBUG ((DEBUG_INFO, "QemuVideo: Using mmio bar @ 0x%lx\n",
               MmioDesc->AddrRangeMin));
     }
 
     if (!EFI_ERROR (Status)) {
       FreePool (MmioDesc);
     }
+  }
+
+  //
+  // VMWare SVGA is handled like Bochs (with port IO only).
+  //
+  if (Private->Variant == QEMU_VIDEO_VMWARE_SVGA) {
+    Private->Variant = QEMU_VIDEO_BOCHS;
+    Private->FrameBufferVramBarIndex = PCI_BAR_IDX1;
   }
 
   //
@@ -310,7 +352,7 @@ QemuVideoControllerDriverStart (
     UINT16 BochsId;
     BochsId = BochsRead(Private, VBE_DISPI_INDEX_ID);
     if ((BochsId & 0xFFF0) != VBE_DISPI_ID0) {
-      DEBUG ((EFI_D_INFO, "QemuVideo: BochsID mismatch (got 0x%x)\n", BochsId));
+      DEBUG ((DEBUG_INFO, "QemuVideo: BochsID mismatch (got 0x%x)\n", BochsId));
       Status = EFI_DEVICE_ERROR;
       goto RestoreAttributes;
     }
@@ -750,7 +792,7 @@ ClearScreen (
   Private->PciIo->Mem.Write (
                         Private->PciIo,
                         EfiPciIoWidthFillUint32,
-                        0,
+                        Private->FrameBufferVramBarIndex,
                         0,
                         0x400000 >> 2,
                         &Color
@@ -917,7 +959,7 @@ InitializeBochsGraphicsMode (
   QEMU_VIDEO_BOCHS_MODES  *ModeData
   )
 {
-  DEBUG ((EFI_D_INFO, "InitializeBochsGraphicsMode: %dx%d @ %d\n",
+  DEBUG ((DEBUG_INFO, "InitializeBochsGraphicsMode: %dx%d @ %d\n",
           ModeData->Width, ModeData->Height, ModeData->ColorDepth));
 
   /* unblank */
@@ -958,19 +1000,6 @@ InitializeQemuVideo (
              &gQemuVideoComponentName,
              &gQemuVideoComponentName2
              );
-  ASSERT_EFI_ERROR (Status);
-
-  //
-  // Install EFI Driver Supported EFI Version Protocol required for
-  // EFI drivers that are on PCI and other plug in cards.
-  //
-  gQemuVideoDriverSupportedEfiVersion.FirmwareVersion = PcdGet32 (PcdDriverSupportedEfiVersion);
-  Status = gBS->InstallMultipleProtocolInterfaces (
-                  &ImageHandle,
-                  &gEfiDriverSupportedEfiVersionProtocolGuid,
-                  &gQemuVideoDriverSupportedEfiVersion,
-                  NULL
-                  );
   ASSERT_EFI_ERROR (Status);
 
   return Status;

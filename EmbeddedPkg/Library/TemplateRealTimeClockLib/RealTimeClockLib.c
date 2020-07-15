@@ -5,13 +5,7 @@
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -141,7 +135,7 @@ LibRtcInitialize (
   )
 {
   //
-  // Do some initialization if reqruied to turn on the RTC
+  // Do some initialization if required to turn on the RTC
   //
   return EFI_SUCCESS;
 }
@@ -165,7 +159,7 @@ LibRtcVirtualNotifyEvent (
   //
   // Only needed if you are going to support the OS calling RTC functions in virtual mode.
   // You will need to call EfiConvertPointer (). To convert any stored physical addresses
-  // to virtual address. After the OS transistions to calling in virtual mode, all future
+  // to virtual address. After the OS transitions to calling in virtual mode, all future
   // runtime calls will be made in virtual mode.
   //
   return;

@@ -1,19 +1,14 @@
 ## @file
 #   Fault Tolerant Write Smm Driver.
 #
-#   This driver installs SMM Fault Tolerant Write (FTW) protocol, which provides fault 
-#   tolerant write capability in SMM environment for block devices. Its implementation 
-#   depends on the full functionality SMM FVB protocol that support read, write/erase 
+#   This driver installs SMM Fault Tolerant Write (FTW) protocol, which provides fault
+#   tolerant write capability in SMM environment for block devices. Its implementation
+#   depends on the full functionality SMM FVB protocol that support read, write/erase
 #   flash access.
 #
-# Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 #
-#  This program and the accompanying materials
-#  are licensed and made available under the terms and conditions of the BSD License
-#  which accompanies this distribution. The full text of the license may be found at
-#  http://opensource.org/licenses/bsd-license.php
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
 
@@ -37,6 +32,7 @@
   FtwMisc.c
   UpdateWorkingBlock.c
   FaultTolerantWrite.c
+  FaultTolerantWriteTraditionalMm.c
   FaultTolerantWriteSmm.c
   FaultTolerantWrite.h
   FaultTolerantWriteSmmCommon.h
@@ -46,7 +42,7 @@
   MdeModulePkg/MdeModulePkg.dec
 
 [LibraryClasses]
-  SmmServicesTableLib
+  MmServicesTableLib
   MemoryAllocationLib
   BaseMemoryLib
   UefiDriverEntryPoint
@@ -55,6 +51,7 @@
   PcdLib
   ReportStatusCodeLib
   SmmMemLib
+  BaseLib
 
 [Guids]
   #
@@ -72,7 +69,7 @@
   ## PRODUCES
   ## UNDEFINED # SmiHandlerRegister
   gEfiSmmFaultTolerantWriteProtocolGuid
-  gEfiSmmEndOfDxeProtocolGuid                      ## CONSUMES
+  gEfiMmEndOfDxeProtocolGuid                      ## CONSUMES
 
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFullFtwServiceEnable    ## CONSUMES

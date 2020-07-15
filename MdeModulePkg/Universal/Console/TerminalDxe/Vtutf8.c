@@ -1,14 +1,8 @@
 /** @file
   Implementation of translation upon VT-UTF8.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -177,10 +171,10 @@ GetOneValidUtf8Char (
   Translate VT-UTF8 characters into one Unicode character.
 
   UTF8 Encoding Table
-  Bits per Character | Unicode Character Range | Unicode Binary  Encoding |	UTF8 Binary Encoding
-        0-7	         |     0x0000 - 0x007F	   |     00000000 0xxxxxxx	  |   0xxxxxxx
-        8-11 	       |     0x0080 - 0x07FF	   |     00000xxx xxxxxxxx 	  |   110xxxxx 10xxxxxx
-       12-16	       |     0x0800 - 0xFFFF	   |     xxxxxxxx xxxxxxxx	  |   1110xxxx 10xxxxxx 10xxxxxx
+  Bits per Character | Unicode Character Range | Unicode Binary  Encoding |  UTF8 Binary Encoding
+        0-7           |     0x0000 - 0x007F     |     00000000 0xxxxxxx    |   0xxxxxxx
+        8-11          |     0x0080 - 0x07FF     |     00000xxx xxxxxxxx     |   110xxxxx 10xxxxxx
+       12-16         |     0x0800 - 0xFFFF     |     xxxxxxxx xxxxxxxx    |   1110xxxx 10xxxxxx 10xxxxxx
 
 
   @param  Utf8Char         VT-UTF8 character set needs translating.
@@ -250,10 +244,10 @@ Utf8ToUnicode (
   Translate one Unicode character into VT-UTF8 characters.
 
   UTF8 Encoding Table
-  Bits per Character | Unicode Character Range | Unicode Binary  Encoding |	UTF8 Binary Encoding
-        0-7	         |     0x0000 - 0x007F	   |     00000000 0xxxxxxx	  |   0xxxxxxx
-        8-11 	       |     0x0080 - 0x07FF	   |     00000xxx xxxxxxxx 	  |   110xxxxx 10xxxxxx
-       12-16	       |     0x0800 - 0xFFFF	   |     xxxxxxxx xxxxxxxx	  |   1110xxxx 10xxxxxx 10xxxxxx
+  Bits per Character | Unicode Character Range | Unicode Binary  Encoding |  UTF8 Binary Encoding
+        0-7           |     0x0000 - 0x007F     |     00000000 0xxxxxxx    |   0xxxxxxx
+        8-11          |     0x0080 - 0x07FF     |     00000xxx xxxxxxxx     |   110xxxxx 10xxxxxx
+       12-16         |     0x0800 - 0xFFFF     |     xxxxxxxx xxxxxxxx    |   1110xxxx 10xxxxxx 10xxxxxx
 
 
   @param  Unicode          Unicode character need translating.

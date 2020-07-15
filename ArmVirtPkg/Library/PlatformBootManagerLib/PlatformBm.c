@@ -3,22 +3,18 @@
 
   Copyright (C) 2015-2016, Red Hat, Inc.
   Copyright (c) 2014, ARM Ltd. All rights reserved.<BR>
-  Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials are licensed and made available
-  under the terms and conditions of the BSD License which accompanies this
-  distribution. The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT
-  WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include <IndustryStandard/Pci22.h>
+#include <IndustryStandard/Virtio095.h>
 #include <Library/BootLogoLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/PcdLib.h>
+#include <Library/PlatformBmPrintScLib.h>
 #include <Library/QemuBootOrderLib.h>
 #include <Library/UefiBootManagerLib.h>
 #include <Protocol/DevicePath.h>
@@ -27,8 +23,11 @@
 #include <Protocol/LoadedImage.h>
 #include <Protocol/PciIo.h>
 #include <Protocol/PciRootBridgeIo.h>
+#include <Protocol/VirtioDevice.h>
 #include <Guid/EventGroup.h>
+#include <Guid/GlobalVariable.h>
 #include <Guid/RootBridgesConnectedEventGroup.h>
+#include <Guid/SerialPortLibVendor.h>
 
 #include "PlatformBm.h"
 
@@ -44,18 +43,13 @@ typedef struct {
 } PLATFORM_SERIAL_CONSOLE;
 #pragma pack ()
 
-#define SERIAL_DXE_FILE_GUID { \
-          0xD3987D4B, 0x971A, 0x435F, \
-          { 0x8C, 0xAF, 0x49, 0x67, 0xEB, 0x62, 0x72, 0x41 } \
-          }
-
 STATIC PLATFORM_SERIAL_CONSOLE mSerialConsole = {
   //
   // VENDOR_DEVICE_PATH SerialDxe
   //
   {
     { HARDWARE_DEVICE_PATH, HW_VENDOR_DP, DP_NODE_LEN (VENDOR_DEVICE_PATH) },
-    SERIAL_DXE_FILE_GUID
+    EDKII_SERIAL_PORT_LIB_VENDOR_GUID
   },
 
   //
@@ -257,6 +251,121 @@ IsPciDisplay (
   }
 
   return IS_PCI_DISPLAY (&Pci);
+}
+
+
+/**
+  This FILTER_FUNCTION checks if a handle corresponds to a Virtio RNG device at
+  the VIRTIO_DEVICE_PROTOCOL level.
+**/
+STATIC
+BOOLEAN
+EFIAPI
+IsVirtioRng (
+  IN EFI_HANDLE   Handle,
+  IN CONST CHAR16 *ReportText
+  )
+{
+  EFI_STATUS             Status;
+  VIRTIO_DEVICE_PROTOCOL *VirtIo;
+
+  Status = gBS->HandleProtocol (Handle, &gVirtioDeviceProtocolGuid,
+                  (VOID**)&VirtIo);
+  if (EFI_ERROR (Status)) {
+    return FALSE;
+  }
+  return (BOOLEAN)(VirtIo->SubSystemDeviceId ==
+                   VIRTIO_SUBSYSTEM_ENTROPY_SOURCE);
+}
+
+
+/**
+  This FILTER_FUNCTION checks if a handle corresponds to a Virtio RNG device at
+  the EFI_PCI_IO_PROTOCOL level.
+**/
+STATIC
+BOOLEAN
+EFIAPI
+IsVirtioPciRng (
+  IN EFI_HANDLE   Handle,
+  IN CONST CHAR16 *ReportText
+  )
+{
+  EFI_STATUS          Status;
+  EFI_PCI_IO_PROTOCOL *PciIo;
+  UINT16              VendorId;
+  UINT16              DeviceId;
+  UINT8               RevisionId;
+  BOOLEAN             Virtio10;
+  UINT16              SubsystemId;
+
+  Status = gBS->HandleProtocol (Handle, &gEfiPciIoProtocolGuid,
+                  (VOID**)&PciIo);
+  if (EFI_ERROR (Status)) {
+    return FALSE;
+  }
+
+  //
+  // Read and check VendorId.
+  //
+  Status = PciIo->Pci.Read (PciIo, EfiPciIoWidthUint16, PCI_VENDOR_ID_OFFSET,
+                        1, &VendorId);
+  if (EFI_ERROR (Status)) {
+    goto PciError;
+  }
+  if (VendorId != VIRTIO_VENDOR_ID) {
+    return FALSE;
+  }
+
+  //
+  // Read DeviceId and RevisionId.
+  //
+  Status = PciIo->Pci.Read (PciIo, EfiPciIoWidthUint16, PCI_DEVICE_ID_OFFSET,
+                        1, &DeviceId);
+  if (EFI_ERROR (Status)) {
+    goto PciError;
+  }
+  Status = PciIo->Pci.Read (PciIo, EfiPciIoWidthUint8, PCI_REVISION_ID_OFFSET,
+                        1, &RevisionId);
+  if (EFI_ERROR (Status)) {
+    goto PciError;
+  }
+
+  //
+  // From DeviceId and RevisionId, determine whether the device is a
+  // modern-only Virtio 1.0 device. In case of Virtio 1.0, DeviceId can
+  // immediately be restricted to VIRTIO_SUBSYSTEM_ENTROPY_SOURCE, and
+  // SubsystemId will only play a sanity-check role. Otherwise, DeviceId can
+  // only be sanity-checked, and SubsystemId will decide.
+  //
+  if (DeviceId == 0x1040 + VIRTIO_SUBSYSTEM_ENTROPY_SOURCE &&
+      RevisionId >= 0x01) {
+    Virtio10 = TRUE;
+  } else if (DeviceId >= 0x1000 && DeviceId <= 0x103F && RevisionId == 0x00) {
+    Virtio10 = FALSE;
+  } else {
+    return FALSE;
+  }
+
+  //
+  // Read and check SubsystemId as dictated by Virtio10.
+  //
+  Status = PciIo->Pci.Read (PciIo, EfiPciIoWidthUint16,
+                        PCI_SUBSYSTEM_ID_OFFSET, 1, &SubsystemId);
+  if (EFI_ERROR (Status)) {
+    goto PciError;
+  }
+  if (Virtio10 && SubsystemId >= 0x40) {
+    return TRUE;
+  }
+  if (!Virtio10 && SubsystemId == VIRTIO_SUBSYSTEM_ENTROPY_SOURCE) {
+    return TRUE;
+  }
+  return FALSE;
+
+PciError:
+  DEBUG ((DEBUG_ERROR, "%a: %s: %r\n", __FUNCTION__, ReportText, Status));
+  return FALSE;
 }
 
 
@@ -578,7 +687,9 @@ PlatformBootManagerBeforeConsole (
   VOID
   )
 {
+  UINT16        FrontPageTimeout;
   RETURN_STATUS PcdStatus;
+  EFI_STATUS    Status;
 
   //
   // Signal EndOfDxe PI Event
@@ -636,25 +747,57 @@ PlatformBootManagerBeforeConsole (
   //
   // Set the front page timeout from the QEMU configuration.
   //
-  PcdStatus = PcdSet16S (PcdPlatformBootTimeOut,
-                GetFrontPageTimeoutFromQemu ());
+  FrontPageTimeout = GetFrontPageTimeoutFromQemu ();
+  PcdStatus = PcdSet16S (PcdPlatformBootTimeOut, FrontPageTimeout);
   ASSERT_RETURN_ERROR (PcdStatus);
+  //
+  // Reflect the PCD in the standard Timeout variable.
+  //
+  Status = gRT->SetVariable (
+                  EFI_TIME_OUT_VARIABLE_NAME,
+                  &gEfiGlobalVariableGuid,
+                  (EFI_VARIABLE_NON_VOLATILE |
+                   EFI_VARIABLE_BOOTSERVICE_ACCESS |
+                   EFI_VARIABLE_RUNTIME_ACCESS),
+                  sizeof FrontPageTimeout,
+                  &FrontPageTimeout
+                  );
+  DEBUG ((
+    EFI_ERROR (Status) ? DEBUG_ERROR : DEBUG_VERBOSE,
+    "%a: SetVariable(%s, %u): %r\n",
+    __FUNCTION__,
+    EFI_TIME_OUT_VARIABLE_NAME,
+    FrontPageTimeout,
+    Status
+    ));
 
   //
   // Register platform-specific boot options and keyboard shortcuts.
   //
   PlatformRegisterOptionsAndKeys ();
+
+  //
+  // At this point, VIRTIO_DEVICE_PROTOCOL instances exist only for Virtio MMIO
+  // transports. Install EFI_RNG_PROTOCOL instances on Virtio MMIO RNG devices.
+  //
+  FilterAndProcess (&gVirtioDeviceProtocolGuid, IsVirtioRng, Connect);
+
+  //
+  // Install both VIRTIO_DEVICE_PROTOCOL and (dependent) EFI_RNG_PROTOCOL
+  // instances on Virtio PCI RNG devices.
+  //
+  FilterAndProcess (&gEfiPciIoProtocolGuid, IsVirtioPciRng, Connect);
 }
 
 /**
   Do the platform specific action after the console is ready
   Possible things that can be done in PlatformBootManagerAfterConsole:
   > Console post action:
-    > Dynamically switch output mode from 100x31 to 80x25 for certain senarino
+    > Dynamically switch output mode from 100x31 to 80x25 for certain scenario
     > Signal console ready platform customized event
   > Run diagnostics like memory testing
   > Connect certain devices
-  > Dispatch aditional option roms
+  > Dispatch additional option roms
   > Special boot: e.g.: USB boot, enter UI
 **/
 VOID
@@ -663,23 +806,31 @@ PlatformBootManagerAfterConsole (
   VOID
   )
 {
+  RETURN_STATUS Status;
+
   //
   // Show the splash screen.
   //
   BootLogoEnableLogo ();
 
   //
-  // Connect the rest of the devices.
-  //
-  EfiBootManagerConnectAll ();
-
-  //
-  // Process QEMU's -kernel command line option. Note that the kernel booted
-  // this way should receive ACPI tables, which is why we connect all devices
-  // first (see above) -- PCI enumeration blocks ACPI table installation, if
-  // there is a PCI host.
+  // Process QEMU's -kernel command line option. The kernel booted this way
+  // will receive ACPI tables: in PlatformBootManagerBeforeConsole(), we
+  // connected any and all PCI root bridges, and then signaled the ACPI
+  // platform driver.
   //
   TryRunningQemuKernel ();
+
+  //
+  // Connect the purported boot devices.
+  //
+  Status = ConnectDevicesFromQemu ();
+  if (RETURN_ERROR (Status)) {
+    //
+    // Connect the rest of the devices.
+    //
+    EfiBootManagerConnectAll ();
+  }
 
   //
   // Enumerate all possible boot options, then filter and reorder them based on
@@ -691,11 +842,13 @@ PlatformBootManagerAfterConsole (
   // Register UEFI Shell
   //
   PlatformRegisterFvBootOption (
-    PcdGetPtr (PcdShellFile), L"EFI Internal Shell", LOAD_OPTION_ACTIVE
+    &gUefiShellFileGuid, L"EFI Internal Shell", LOAD_OPTION_ACTIVE
     );
 
   RemoveStaleFvFileOptions ();
   SetBootOrderFromQemu ();
+
+  PlatformBmPrintScRegisterHandler ();
 }
 
 /**
@@ -712,9 +865,17 @@ PlatformBootManagerWaitCallback (
 {
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL_UNION Black;
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL_UNION White;
-  UINT16                              Timeout;
+  UINT16                              TimeoutInitial;
 
-  Timeout = PcdGet16 (PcdPlatformBootTimeOut);
+  TimeoutInitial = PcdGet16 (PcdPlatformBootTimeOut);
+
+  //
+  // If PcdPlatformBootTimeOut is set to zero, then we consider
+  // that no progress update should be enacted.
+  //
+  if (TimeoutInitial == 0) {
+    return;
+  }
 
   Black.Raw = 0x00000000;
   White.Raw = 0x00FFFFFF;
@@ -724,7 +885,67 @@ PlatformBootManagerWaitCallback (
     Black.Pixel,
     L"Start boot option",
     White.Pixel,
-    (Timeout - TimeoutRemain) * 100 / Timeout,
+    (TimeoutInitial - TimeoutRemain) * 100 / TimeoutInitial,
     0
     );
+}
+
+/**
+  The function is called when no boot option could be launched,
+  including platform recovery options and options pointing to applications
+  built into firmware volumes.
+
+  If this function returns, BDS attempts to enter an infinite loop.
+**/
+VOID
+EFIAPI
+PlatformBootManagerUnableToBoot (
+  VOID
+  )
+{
+  EFI_STATUS                   Status;
+  EFI_INPUT_KEY                Key;
+  EFI_BOOT_MANAGER_LOAD_OPTION BootManagerMenu;
+  UINTN                        Index;
+
+  //
+  // BootManagerMenu doesn't contain the correct information when return status
+  // is EFI_NOT_FOUND.
+  //
+  Status = EfiBootManagerGetBootManagerMenu (&BootManagerMenu);
+  if (EFI_ERROR (Status)) {
+    return;
+  }
+  //
+  // Normally BdsDxe does not print anything to the system console, but this is
+  // a last resort -- the end-user will likely not see any DEBUG messages
+  // logged in this situation.
+  //
+  // AsciiPrint() will NULL-check gST->ConOut internally. We check gST->ConIn
+  // here to see if it makes sense to request and wait for a keypress.
+  //
+  if (gST->ConIn != NULL) {
+    AsciiPrint (
+      "%a: No bootable option or device was found.\n"
+      "%a: Press any key to enter the Boot Manager Menu.\n",
+      gEfiCallerBaseName,
+      gEfiCallerBaseName
+      );
+    Status = gBS->WaitForEvent (1, &gST->ConIn->WaitForKey, &Index);
+    ASSERT_EFI_ERROR (Status);
+    ASSERT (Index == 0);
+
+    //
+    // Drain any queued keys.
+    //
+    while (!EFI_ERROR (gST->ConIn->ReadKeyStroke (gST->ConIn, &Key))) {
+      //
+      // just throw away Key
+      //
+    }
+  }
+
+  for (;;) {
+    EfiBootManagerBoot (&BootManagerMenu);
+  }
 }

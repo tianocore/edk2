@@ -2,13 +2,7 @@
   Platform BDS customizations include file.
 
   Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 Module Name:
 
@@ -30,6 +24,7 @@ Abstract:
 #include <IndustryStandard/Acpi.h>
 #include <IndustryStandard/SmBios.h>
 #include <IndustryStandard/PeImage.h>
+#include <IndustryStandard/Virtio095.h>
 
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -62,7 +57,6 @@ Abstract:
 
 #include <Guid/Acpi.h>
 #include <Guid/SmBios.h>
-#include <Guid/Mps.h>
 #include <Guid/HobList.h>
 #include <Guid/GlobalVariable.h>
 #include <Guid/EventGroup.h>
@@ -171,6 +165,7 @@ typedef struct {
 #define CONSOLE_IN  BIT1
 #define STD_ERROR   BIT2
 extern PLATFORM_CONSOLE_CONNECT_ENTRY  gPlatformConsole[];
+extern PLATFORM_CONSOLE_CONNECT_ENTRY  gXenPlatformConsole[];
 
 //
 // Platform BDS Functions

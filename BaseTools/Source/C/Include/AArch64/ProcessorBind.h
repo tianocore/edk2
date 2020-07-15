@@ -1,17 +1,11 @@
 /** @file
   Processor or Compiler specific defines and types for AArch64.
 
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
   Portions copyright (c) 2013, ARM Ltd. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -32,7 +26,7 @@
 
 #if _MSC_EXTENSIONS
   //
-  // use Microsoft* C complier dependent integer width types 
+  // use Microsoft* C compiler dependent integer width types
   //
   typedef unsigned __int64    UINT64;
   typedef __int64             INT64;
@@ -47,21 +41,21 @@
   typedef signed char         INT8;
 #else
   //
-  // Assume standard AARCH64 alignment.
+  // Use ANSI C 2000 stdint.h integer width declarations
   //
-  typedef unsigned long long  UINT64;
-  typedef long long           INT64;
-  typedef unsigned int        UINT32;
-  typedef int                 INT32;
-  typedef unsigned short      UINT16;
-  typedef unsigned short      CHAR16;
-  typedef short               INT16;
-  typedef unsigned char       BOOLEAN;
-  typedef unsigned char       UINT8;
-  typedef char                CHAR8;
-  typedef signed char         INT8;
+  #include <stdint.h>
+  typedef uint8_t   BOOLEAN;
+  typedef int8_t    INT8;
+  typedef uint8_t   UINT8;
+  typedef int16_t   INT16;
+  typedef uint16_t  UINT16;
+  typedef int32_t   INT32;
+  typedef uint32_t  UINT32;
+  typedef int64_t   INT64;
+  typedef uint64_t  UINT64;
+  typedef char      CHAR8;
+  typedef uint16_t  CHAR16;
 
-  #define UINT8_MAX 0xff
 #endif
 
 ///
@@ -89,11 +83,6 @@ typedef INT64   INTN;
 /// A value of native width with the two highest bits set.
 ///
 #define MAX_2_BITS   0xC000000000000000
-
-///
-/// Maximum legal AARCH64  address
-///
-#define MAX_ADDRESS  0xFFFFFFFFFFFFFFFF
 
 ///
 /// The stack alignment required for AARCH64
@@ -124,21 +113,21 @@ typedef INT64   INTN;
 
     #define GCC_ASM_EXPORT(func__)  \
              .global  _CONCATENATE (__USER_LABEL_PREFIX__, func__)    ;\
-             .type ASM_PFX(func__), %function  
+             .type ASM_PFX(func__), %function
 
     #define GCC_ASM_IMPORT(func__)  \
              .extern  _CONCATENATE (__USER_LABEL_PREFIX__, func__)
-             
+
   #else
     //
-    // .type not supported by Apple Xcode tools 
+    // .type not supported by Apple Xcode tools
     //
-    #define INTERWORK_FUNC(func__)  
+    #define INTERWORK_FUNC(func__)
 
     #define GCC_ASM_EXPORT(func__)  \
              .globl  _CONCATENATE (__USER_LABEL_PREFIX__, func__)    \
-  
-    #define GCC_ASM_IMPORT(name)  
+
+    #define GCC_ASM_IMPORT(name)
 
   #endif
 #endif

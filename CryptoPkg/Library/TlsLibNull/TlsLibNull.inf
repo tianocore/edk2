@@ -1,0 +1,38 @@
+## @file
+#  SSL/TLS Wrapper Null Library Instance.
+#
+#  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
+#  (C) Copyright 2016-2020 Hewlett Packard Enterprise Development LP<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = TlsLibNull
+  MODULE_UNI_FILE                = TlsLibNull.uni
+  FILE_GUID                      = 705a5b3b-cfa5-42ea-87f0-f2b8d44ec521
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = TlsLib
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64 RISCV64
+#
+
+[Sources]
+  InternalTlsLib.h
+  TlsInitNull.c
+  TlsConfigNull.c
+  TlsProcessNull.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  CryptoPkg/CryptoPkg.dec
+
+[LibraryClasses]
+  BaseCryptLib
+  DebugLib
+  BaseLib

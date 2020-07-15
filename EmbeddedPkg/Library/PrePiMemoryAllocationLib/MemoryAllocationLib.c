@@ -3,19 +3,14 @@
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include <PiPei.h>
 
 #include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
 #include <Library/PrePiLib.h>
 #include <Library/DebugLib.h>
 
@@ -185,13 +180,44 @@ AllocatePool (
   // Verify that there is sufficient memory to satisfy the allocation
   //
   if (AllocationSize > 0x10000) {
-    // Please call AllcoatePages for big allocations
+    // Please call AllocatePages for big allocations
     return 0;
   } else {
 
     Hob = (EFI_HOB_MEMORY_POOL *)CreateHob (EFI_HOB_TYPE_MEMORY_POOL, (UINT16)(sizeof (EFI_HOB_TYPE_MEMORY_POOL) + AllocationSize));
     return (VOID *)(Hob + 1);
   }
+}
+
+/**
+  Allocates and zeros a buffer of type EfiBootServicesData.
+
+  Allocates the number bytes specified by AllocationSize of type EfiBootServicesData, clears the
+  buffer with zeros, and returns a pointer to the allocated buffer.  If AllocationSize is 0, then a
+  valid buffer of 0 size is returned.  If there is not enough memory remaining to satisfy the
+  request, then NULL is returned.
+
+  @param  AllocationSize        The number of bytes to allocate and zero.
+
+  @return A pointer to the allocated buffer or NULL if allocation fails.
+
+**/
+VOID *
+EFIAPI
+AllocateZeroPool (
+  IN UINTN  AllocationSize
+  )
+{
+  VOID *Buffer;
+
+  Buffer = AllocatePool (AllocationSize);
+  if (Buffer == NULL) {
+    return NULL;
+  }
+
+  ZeroMem (Buffer, AllocationSize);
+
+  return Buffer;
 }
 
 /**

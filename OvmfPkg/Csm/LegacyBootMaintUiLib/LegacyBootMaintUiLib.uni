@@ -1,0 +1,20 @@
+// /** @file
+// Legacy Boot Maintenance UI module is library for BDS phase.
+//
+// Legacy Boot Maintenance UI module is library for BDS phase.
+//
+// Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+#string STR_MODULE_ABSTRACT
+#language en-US
+"Legacy Boot Maintenance UI module is library for BDS phase."
+
+#string STR_MODULE_DESCRIPTION
+#language en-US
+"Legacy Boot Maintenance UI module is library for BDS phase."
+
+

@@ -2,14 +2,9 @@
 
   EHCI transfer scheduling routines.
 
-Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) Microsoft Corporation.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -583,7 +578,7 @@ EhcCheckUrbResult (
     goto ON_EXIT;
   }
 
-  EFI_LIST_FOR_EACH (Entry, &Urb->Qh->Qtds) {
+  BASE_LIST_FOR_EACH (Entry, &Urb->Qh->Qtds) {
     Qtd   = EFI_LIST_CONTAINER (Entry, EHC_QTD, QtdList);
     QtdHw = &Qtd->QtdHw;
     State = (UINT8) QtdHw->Status;
@@ -763,7 +758,7 @@ EhciDelAsyncIntTransfer (
   Direction = (((EpNum & 0x80) != 0) ? EfiUsbDataIn : EfiUsbDataOut);
   EpNum    &= 0x0F;
 
-  EFI_LIST_FOR_EACH_SAFE (Entry, Next, &Ehc->AsyncIntTransfers) {
+  BASE_LIST_FOR_EACH_SAFE (Entry, Next, &Ehc->AsyncIntTransfers) {
     Urb = EFI_LIST_CONTAINER (Entry, URB, UrbList);
 
     if ((Urb->Ep.DevAddr == DevAddr) && (Urb->Ep.EpAddr == EpNum) &&
@@ -803,7 +798,7 @@ EhciDelAllAsyncIntTransfers (
   LIST_ENTRY              *Next;
   URB                     *Urb;
 
-  EFI_LIST_FOR_EACH_SAFE (Entry, Next, &Ehc->AsyncIntTransfers) {
+  BASE_LIST_FOR_EACH_SAFE (Entry, Next, &Ehc->AsyncIntTransfers) {
     Urb = EFI_LIST_CONTAINER (Entry, URB, UrbList);
 
     EhcUnlinkQhFromPeriod (Ehc, Urb->Qh);
@@ -814,6 +809,82 @@ EhciDelAllAsyncIntTransfers (
   }
 }
 
+/**
+  Insert a single asynchronous interrupt transfer for
+  the device and endpoint.
+
+  @param  Ehc               The EHCI device.
+  @param  DevAddr           The device address.
+  @param  EpAddr            Endpoint addrress & its direction.
+  @param  DevSpeed          The device speed.
+  @param  Toggle            Initial data toggle to use.
+  @param  MaxPacket         The max packet length of the endpoint.
+  @param  Hub               The transaction translator to use.
+  @param  DataLen           The length of data buffer.
+  @param  Callback          The function to call when data is transferred.
+  @param  Context           The context to the callback.
+  @param  Interval          The interval for interrupt transfer.
+
+  @return Created URB or NULL.
+
+**/
+URB *
+EhciInsertAsyncIntTransfer (
+  IN USB2_HC_DEV                        *Ehc,
+  IN UINT8                              DevAddr,
+  IN UINT8                              EpAddr,
+  IN UINT8                              DevSpeed,
+  IN UINT8                              Toggle,
+  IN UINTN                              MaxPacket,
+  IN EFI_USB2_HC_TRANSACTION_TRANSLATOR *Hub,
+  IN UINTN                              DataLen,
+  IN EFI_ASYNC_USB_TRANSFER_CALLBACK    Callback,
+  IN VOID                               *Context,
+  IN UINTN                              Interval
+  )
+{
+  VOID      *Data;
+  URB       *Urb;
+
+  Data = AllocatePool (DataLen);
+
+  if (Data == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a: failed to allocate buffer\n", __FUNCTION__));
+    return NULL;
+  }
+
+  Urb = EhcCreateUrb (
+          Ehc,
+          DevAddr,
+          EpAddr,
+          DevSpeed,
+          Toggle,
+          MaxPacket,
+          Hub,
+          EHC_INT_TRANSFER_ASYNC,
+          NULL,
+          Data,
+          DataLen,
+          Callback,
+          Context,
+          Interval
+          );
+
+  if (Urb == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a: failed to create URB\n", __FUNCTION__));
+    gBS->FreePool (Data);
+    return NULL;
+  }
+
+  //
+  // New asynchronous transfer must inserted to the head.
+  // Check the comments in EhcMoniteAsyncRequests
+  //
+  EhcLinkQhToPeriod (Ehc, Urb->Qh);
+  InsertHeadList (&Ehc->AsyncIntTransfers, &Urb->UrbList);
+
+  return Urb;
+}
 
 /**
   Flush data from PCI controller specific address to mapped system
@@ -895,7 +966,7 @@ EhcUpdateAsyncRequest (
   if (Urb->Result == EFI_USB_NOERROR) {
     FirstQtd = NULL;
 
-    EFI_LIST_FOR_EACH (Entry, &Urb->Qh->Qtds) {
+    BASE_LIST_FOR_EACH (Entry, &Urb->Qh->Qtds) {
       Qtd = EFI_LIST_CONTAINER (Entry, EHC_QTD, QtdList);
 
       if (FirstQtd == NULL) {
@@ -918,7 +989,7 @@ EhcUpdateAsyncRequest (
       //
       // calculate physical address by offset.
       //
-      PciAddr = (UINTN)Urb->DataPhy + ((UINTN)Qtd->Data - (UINTN)Urb->Data); 
+      PciAddr = (UINTN)Urb->DataPhy + ((UINTN)Qtd->Data - (UINTN)Urb->Data);
       QtdHw->Page[0]    = EHC_LOW_32BIT (PciAddr);
       QtdHw->PageHigh[0]= EHC_HIGH_32BIT (PciAddr);
     }
@@ -979,7 +1050,7 @@ EhcMonitorAsyncRequests (
   OldTpl  = gBS->RaiseTPL (EHC_TPL);
   Ehc     = (USB2_HC_DEV *) Context;
 
-  EFI_LIST_FOR_EACH_SAFE (Entry, Next, &Ehc->AsyncIntTransfers) {
+  BASE_LIST_FOR_EACH_SAFE (Entry, Next, &Ehc->AsyncIntTransfers) {
     Urb = EFI_LIST_CONTAINER (Entry, URB, UrbList);
 
     //
@@ -1009,9 +1080,12 @@ EhcMonitorAsyncRequests (
     ProcBuf = NULL;
 
     if (Urb->Result == EFI_USB_NOERROR) {
-      ASSERT (Urb->Completed <= Urb->DataLen);
-
-      ProcBuf = AllocatePool (Urb->Completed);
+      //
+      // Make sure the data received from HW is no more than expected.
+      //
+      if (Urb->Completed <= Urb->DataLen) {
+        ProcBuf = AllocatePool (Urb->Completed);
+      }
 
       if (ProcBuf == NULL) {
         EhcUpdateAsyncRequest (Ehc, Urb);

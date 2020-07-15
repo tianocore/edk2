@@ -1,15 +1,9 @@
 /** @file
   Implementation for EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL protocol.
 
-Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 Copyright (C) 2016 Silicon Graphics, Inc. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -66,15 +60,15 @@ UNICODE_TO_CHAR  UnicodeToPcAnsiOrAscii[] = {
   { BLOCKELEMENT_FULL_BLOCK,            0xdb, L'*' },
   { BLOCKELEMENT_LIGHT_SHADE,           0xb0, L'+' },
 
-  { GEOMETRICSHAPE_UP_TRIANGLE,         0x1e, L'^' },
-  { GEOMETRICSHAPE_RIGHT_TRIANGLE,      0x10, L'>' },
-  { GEOMETRICSHAPE_DOWN_TRIANGLE,       0x1f, L'v' },
-  { GEOMETRICSHAPE_LEFT_TRIANGLE,       0x11, L'<' },
+  { GEOMETRICSHAPE_UP_TRIANGLE,         '^', L'^' },
+  { GEOMETRICSHAPE_RIGHT_TRIANGLE,      '>', L'>' },
+  { GEOMETRICSHAPE_DOWN_TRIANGLE,       'v', L'v' },
+  { GEOMETRICSHAPE_LEFT_TRIANGLE,       '<', L'<' },
 
-  { ARROW_LEFT,                         0x3c, L'<' },
-  { ARROW_UP,                           0x18, L'^' },
-  { ARROW_RIGHT,                        0x3e, L'>' },
-  { ARROW_DOWN,                         0x19, L'v' },
+  { ARROW_LEFT,                         '<', L'<' },
+  { ARROW_UP,                           '^', L'^' },
+  { ARROW_RIGHT,                        '>', L'>' },
+  { ARROW_DOWN,                         'v', L'v' },
 
   { 0x0000,                             0x00, L'\0' }
 };
@@ -228,6 +222,10 @@ TerminalConOutOutputString (
     case TerminalTypeVt100:
     case TerminalTypeVt100Plus:
     case TerminalTypeTtyTerm:
+    case TerminalTypeLinux:
+    case TerminalTypeXtermR6:
+    case TerminalTypeVt400:
+    case TerminalTypeSCO:
 
       if (!TerminalIsValidTextGraphics (*WString, &GraphicChar, &AsciiChar)) {
         //
@@ -451,7 +449,7 @@ TerminalConOutQueryMode (
   //
   // Get Terminal device data structure pointer.
   //
-  TerminalDevice = TERMINAL_CON_OUT_DEV_FROM_THIS (This);  
+  TerminalDevice = TERMINAL_CON_OUT_DEV_FROM_THIS (This);
   *Columns = TerminalDevice->TerminalConsoleModeData[ModeNumber].Columns;
   *Rows    = TerminalDevice->TerminalConsoleModeData[ModeNumber].Rows;
 
@@ -469,7 +467,7 @@ TerminalConOutQueryMode (
   @param ModeNumber    The text mode to set.
 
   @retval EFI_SUCCESS       The requested text mode is set.
-  @retval EFI_DEVICE_ERROR  The requested text mode cannot be set 
+  @retval EFI_DEVICE_ERROR  The requested text mode cannot be set
                             because of serial device error.
   @retval EFI_UNSUPPORTED   The text mode number is not valid.
 
@@ -911,7 +909,7 @@ TerminalIsValidTextGraphics (
   Detects if a valid ASCII char.
 
   @param  Ascii        An ASCII character.
-                       
+
   @retval TRUE         If it is a valid ASCII character.
   @retval FALSE        If it is not a valid ASCII character.
 
@@ -935,7 +933,7 @@ TerminalIsValidAscii (
   Detects if a valid EFI control character.
 
   @param  CharC        An input EFI Control character.
-                       
+
   @retval TRUE         If it is a valid EFI control character.
   @retval FALSE        If it is not a valid EFI control character.
 

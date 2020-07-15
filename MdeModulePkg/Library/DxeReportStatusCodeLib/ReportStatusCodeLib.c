@@ -1,14 +1,8 @@
 /** @file
   Report Status Code Library for DXE Phase.
 
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -109,7 +103,7 @@ InternalReportStatusCode (
     //
     return mReportStatusCodeLibStatusCodeProtocol->ReportStatusCode (Type, Value, Instance, (EFI_GUID *)CallerId, Data);
   }
-  
+
   return EFI_UNSUPPORTED;
 }
 
@@ -496,37 +490,34 @@ ReportStatusCodeEx (
   ASSERT (!((ExtendedData == NULL) && (ExtendedDataSize != 0)));
   ASSERT (!((ExtendedData != NULL) && (ExtendedDataSize == 0)));
 
-  if (gBS == NULL || gBS->AllocatePool == NULL || gBS->FreePool == NULL) {
-    return EFI_UNSUPPORTED;
-  }
+  if (ExtendedDataSize <= (MAX_EXTENDED_DATA_SIZE - sizeof (EFI_STATUS_CODE_DATA))) {
+    //
+    // Use Buffer instead of allocating if possible.
+    //
+    StatusCodeData = (EFI_STATUS_CODE_DATA *)Buffer;
+  } else {
+    if (gBS == NULL || gBS->AllocatePool == NULL || gBS->FreePool == NULL) {
+      return EFI_UNSUPPORTED;
+    }
 
-  //
-  // Retrieve the current TPL
-  //
-  Tpl = gBS->RaiseTPL (TPL_HIGH_LEVEL);
-  gBS->RestoreTPL (Tpl);
-  
-  StatusCodeData = NULL;
-  if (Tpl <= TPL_NOTIFY) {
+    //
+    // Retrieve the current TPL
+    //
+    Tpl = gBS->RaiseTPL (TPL_HIGH_LEVEL);
+    gBS->RestoreTPL (Tpl);
+
+    if (Tpl > TPL_NOTIFY) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+
     //
     // Allocate space for the Status Code Header and its buffer
     //
+    StatusCodeData = NULL;
     gBS->AllocatePool (EfiBootServicesData, sizeof (EFI_STATUS_CODE_DATA) + ExtendedDataSize, (VOID **)&StatusCodeData);
-  }
-
-  if (StatusCodeData == NULL) {
-    //
-    // If a buffer could not be allocated, then see if the local variable Buffer can be used
-    //
-    if (ExtendedDataSize > (MAX_EXTENDED_DATA_SIZE - sizeof (EFI_STATUS_CODE_DATA))) {
-      //
-      // The local variable Buffer not large enough to hold the extended data associated
-      // with the status code being reported.
-      //
-      DEBUG ((EFI_D_ERROR, "Status code extended data is too large to be reported!\n"));
+    if (StatusCodeData == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
-    StatusCodeData = (EFI_STATUS_CODE_DATA  *)Buffer;
   }
 
   //

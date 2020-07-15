@@ -6,13 +6,7 @@
   Copyright (C) 2013, Red Hat, Inc.
   Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials are licensed and made available
-  under the terms and conditions of the BSD License which accompanies this
-  distribution. The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT
-  WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -61,11 +55,12 @@ VirtioNetGetStatus (
   OUT VOID                       **TxBuf OPTIONAL
   )
 {
-  VNET_DEV   *Dev;
-  EFI_TPL    OldTpl;
-  EFI_STATUS Status;
-  UINT16     RxCurUsed;
-  UINT16     TxCurUsed;
+  VNET_DEV             *Dev;
+  EFI_TPL              OldTpl;
+  EFI_STATUS           Status;
+  UINT16               RxCurUsed;
+  UINT16               TxCurUsed;
+  EFI_PHYSICAL_ADDRESS DeviceAddress;
 
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -141,14 +136,34 @@ VirtioNetGetStatus (
       ASSERT (DescIdx < (UINT32) (2 * Dev->TxMaxPending - 1));
 
       //
-      // report buffer address to caller that has been enqueued by caller
+      // get the device address that has been enqueued for the caller's
+      // transmit buffer
       //
-      *TxBuf = (VOID *)(UINTN) Dev->TxRing.Desc[DescIdx + 1].Addr;
+      DeviceAddress = Dev->TxRing.Desc[DescIdx + 1].Addr;
 
       //
       // now this descriptor can be used again to enqueue a transmit buffer
       //
       Dev->TxFreeStack[--Dev->TxCurPending] = (UINT16) DescIdx;
+
+      //
+      // Unmap the device address and perform the reverse mapping to find the
+      // caller buffer address.
+      //
+      Status = VirtioNetUnmapTxBuf (
+                 Dev,
+                 TxBuf,
+                 DeviceAddress
+                 );
+      if (EFI_ERROR (Status)) {
+        //
+        // VirtioNetUnmapTxBuf should never fail, if we have reached here
+        // that means our internal state has been corrupted
+        //
+        ASSERT (FALSE);
+        Status = EFI_DEVICE_ERROR;
+        goto Exit;
+      }
     }
   }
 

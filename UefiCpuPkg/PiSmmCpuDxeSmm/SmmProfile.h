@@ -1,14 +1,8 @@
 /** @file
 SMM profile header file.
 
-Copyright (c) 2012 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2012 - 2019, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -88,7 +82,7 @@ PageFaultIdtHandlerSmmProfile (
 
 
 /**
-  Check if XD feature is supported by a processor.
+  Check if feature is supported by a processor.
 
 **/
 VOID
@@ -114,6 +108,17 @@ GetCpuIndex (
   VOID
   );
 
+/**
+  Handler for Page Fault triggered by Guard page.
+
+  @param  ErrorCode  The Error code of exception.
+
+**/
+VOID
+GuardPagePFHandler (
+  UINTN ErrorCode
+  );
+
 //
 // The flag indicates if execute-disable is supported by processor.
 //
@@ -122,5 +127,9 @@ extern BOOLEAN    mXdSupported;
 // The flag indicates if execute-disable is enabled on processor.
 //
 extern BOOLEAN    mXdEnabled;
+//
+// The flag indicates if #DB will be setup in #PF handler.
+//
+extern BOOLEAN    mSetupDebugTrap;
 
 #endif // _SMM_PROFILE_H_

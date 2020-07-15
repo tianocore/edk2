@@ -5,14 +5,8 @@
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
   Copyright (C) 2014, Red Hat, Inc.
   (C) Copyright 2013 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -75,13 +69,13 @@ FindEndOfParameter(
   This will also remove all remaining ^ characters after processing.
 
   @param[in, out] Walker          pointer to string of command line.  Adjusted to
-                                  reminaing command line on return
+                                  remaining command line on return
   @param[in, out] TempParameter   pointer to string of command line item extracted.
   @param[in]      Length          buffer size of TempParameter.
   @param[in]      StripQuotation  if TRUE then strip the quotation marks surrounding
                                   the parameters.
 
-  @return   EFI_INALID_PARAMETER  A required parameter was NULL or pointed to a NULL or empty string.
+  @return   EFI_INVALID_PARAMETER A required parameter was NULL or pointed to a NULL or empty string.
   @return   EFI_NOT_FOUND         A closing " could not be found on the specified string
 **/
 EFI_STATUS
@@ -132,7 +126,7 @@ DEBUG_CODE_END();
   StrnCpyS(*TempParameter, Length / sizeof(CHAR16), (*Walker), NextDelim - *Walker);
 
   //
-  // Add a CHAR_NULL if we didnt get one via the copy
+  // Add a CHAR_NULL if we didn't get one via the copy
   //
   if (*NextDelim != CHAR_NULL) {
     (*TempParameter)[NextDelim - *Walker] = CHAR_NULL;
@@ -147,8 +141,8 @@ DEBUG_CODE_END();
   // Remove any non-escaped quotes in the string
   // Remove any remaining escape characters in the string
   //
-  for (NextDelim = FindFirstCharacter(*TempParameter, L"\"^", CHAR_NULL) 
-    ; *NextDelim != CHAR_NULL 
+  for (NextDelim = FindFirstCharacter(*TempParameter, L"\"^", CHAR_NULL)
+    ; *NextDelim != CHAR_NULL
     ; NextDelim = FindFirstCharacter(NextDelim, L"\"^", CHAR_NULL)
     ) {
     if (*NextDelim == L'^') {
@@ -165,9 +159,9 @@ DEBUG_CODE_END();
       //
       if (StripQuotation) {
         CopyMem ((CHAR16*)NextDelim, NextDelim + 1, StrSize (NextDelim + 1));
-	  } else{
+    } else{
         NextDelim++;
-	  }
+    }
     }
   }
 
@@ -181,7 +175,7 @@ DEBUG_CODE_END();
   parameters for inclusion in EFI_SHELL_PARAMETERS_PROTOCOL.  this supports space
   delimited and quote surrounded parameter definition.
 
-  All special character processing (alias, environment variable, redirection, 
+  All special character processing (alias, environment variable, redirection,
   etc... must be complete before calling this API.
 
   @param[in] CommandLine          String of command line to parse
@@ -190,7 +184,8 @@ DEBUG_CODE_END();
   @param[in, out] Argv            pointer to array of strings; one for each parameter
   @param[in, out] Argc            pointer to number of strings in Argv array
 
-  @return EFI_SUCCESS           the operation was sucessful
+  @return EFI_SUCCESS           the operation was successful
+  @return EFI_INVALID_PARAMETER some parameters are invalid
   @return EFI_OUT_OF_RESOURCES  a memory allocation failed.
 **/
 EFI_STATUS
@@ -269,7 +264,7 @@ ParseCommandLineToArgs(
   }
   ASSERT(Count >= (*Argc));
   Status = EFI_SUCCESS;
-  
+
 Done:
   SHELL_FREE_NON_NULL(TempParameter);
   SHELL_FREE_NON_NULL(NewCommandLine);
@@ -422,7 +417,7 @@ CreatePopulateInstallShellParametersProtocol (
 }
 
 /**
-  frees all memory used by createion and installation of shell parameters protocol
+  frees all memory used by creation and installation of shell parameters protocol
   and if there was an old version installed it will restore that one.
 
   @param NewShellParameters the interface of EFI_SHELL_PARAMETERS_PROTOCOL that is
@@ -472,7 +467,7 @@ CleanUpShellParametersProtocol (
 }
 
 /**
-  Determin if a file name represents a unicode file.
+  Determine if a file name represents a unicode file.
 
   @param[in] FileName     Pointer to the filename to open.
 
@@ -503,7 +498,7 @@ IsUnicodeFile(
   }
   gEfiShellProtocol->SetFilePosition(Handle, OriginalFilePosition);
   gEfiShellProtocol->CloseFile(Handle);
-  return (Status);  
+  return (Status);
 }
 
 /**
@@ -532,7 +527,7 @@ StripQuotes (
 }
 
 /**
-  Calcualte the 32-bit CRC in a EFI table using the service provided by the
+  Calculate the 32-bit CRC in a EFI table using the service provided by the
   gRuntime service.
 
   @param  Hdr                    Pointer to an EFI standard header
@@ -580,7 +575,7 @@ FixFileName (
     Copy = FileName+1;
     if ((TempLocation = StrStr(Copy , L"\"")) != NULL) {
       TempLocation[0] = CHAR_NULL;
-    }    
+    }
   } else {
     Copy = FileName;
     while(Copy[0] == L' ') {
@@ -588,7 +583,7 @@ FixFileName (
     }
     if ((TempLocation = StrStr(Copy , L" ")) != NULL) {
       TempLocation[0] = CHAR_NULL;
-    }    
+    }
   }
 
   if (Copy[0] == CHAR_NULL) {
@@ -620,36 +615,12 @@ FixVarName (
     Copy = FileName+1;
     if ((TempLocation = StrStr(Copy , L"%")) != NULL) {
       TempLocation[0] = CHAR_NULL;
-    }    
+    }
   }
 
   return (FixFileName(Copy));
 }
 
-/**
-  Remove the unicode file tag from the begining of the file buffer since that will not be
-  used by StdIn.
-  
-  @param[in]  Handle    Pointer to the handle of the file to be processed.
-  
-  @retval EFI_SUCCESS   The unicode file tag has been moved successfully.
-**/
-EFI_STATUS
-RemoveFileTag(
-  IN SHELL_FILE_HANDLE *Handle
-  )
-{
-  UINTN             CharSize;
-  CHAR16            CharBuffer;
-
-  CharSize    = sizeof(CHAR16);
-  CharBuffer  = 0;
-  gEfiShellProtocol->ReadFile(*Handle, &CharSize, &CharBuffer);
-  if (CharBuffer != gUnicodeFileTag) {
-    gEfiShellProtocol->SetFilePosition(*Handle, 0);
-  }
-  return (EFI_SUCCESS);
-}
 
 /**
   Write the unicode file tag to the specified file.
@@ -681,7 +652,7 @@ WriteFileTag (
 
 
 /**
-  Funcion will replace the current StdIn and StdOut in the ShellParameters protocol
+  Function will replace the current StdIn and StdOut in the ShellParameters protocol
   structure by parsing NewCommandLine.  The current values are returned to the
   user.
 
@@ -694,7 +665,7 @@ WriteFileTag (
   @param[out] OldStdErr                  Pointer to old StdErr.
   @param[out] SystemTableInfo            Pointer to old system table information.
 
-  @retval   EFI_SUCCESS                 Operation was sucessful, Argv and Argc are valid.
+  @retval   EFI_SUCCESS                 Operation was successful, Argv and Argc are valid.
   @retval   EFI_OUT_OF_RESOURCES        A memory allocation failed.
 **/
 EFI_STATUS
@@ -837,7 +808,7 @@ UpdateStdInStdOutStdErr(
     if (StrStr(CommandLineWalker, L" 1>> ") != NULL) {
       Status = EFI_NOT_FOUND;
     }
-  } 
+  }
   if (!EFI_ERROR(Status) && (CommandLineWalker = StrStr(CommandLineCopy, L" >> ")) != NULL) {
     FirstLocation = MIN(CommandLineWalker, FirstLocation);
     SetMem16(CommandLineWalker, 8, L' ');
@@ -864,7 +835,7 @@ UpdateStdInStdOutStdErr(
     if (StrStr(CommandLineWalker, L" >>a ") != NULL) {
       Status = EFI_NOT_FOUND;
     }
-  } 
+  }
   if (!EFI_ERROR(Status) && (CommandLineWalker = StrStr(CommandLineCopy, L" 1>a ")) != NULL) {
     FirstLocation = MIN(CommandLineWalker, FirstLocation);
     SetMem16(CommandLineWalker, 10, L' ');
@@ -878,7 +849,7 @@ UpdateStdInStdOutStdErr(
     if (StrStr(CommandLineWalker, L" 1>a ") != NULL) {
       Status = EFI_NOT_FOUND;
     }
-  } 
+  }
   if (!EFI_ERROR(Status) && (CommandLineWalker = StrStr(CommandLineCopy, L" >a ")) != NULL) {
     FirstLocation = MIN(CommandLineWalker, FirstLocation);
     SetMem16(CommandLineWalker, 8, L' ');
@@ -1107,7 +1078,7 @@ UpdateStdInStdOutStdErr(
       //
       // Cant redirect during a reconnect operation.
       //
-      ||(StrStr(NewCommandLine, L"connect -r") != NULL 
+      ||(StrStr(NewCommandLine, L"connect -r") != NULL
          && (StdOutVarName != NULL || StdOutFileName != NULL || StdErrFileName != NULL || StdErrVarName != NULL))
       //
       // Check that filetypes (Unicode/Ascii) do not change during an append
@@ -1287,7 +1258,7 @@ UpdateStdInStdOutStdErr(
 }
 
 /**
-  Funcion will replace the current StdIn and StdOut in the ShellParameters protocol
+  Function will replace the current StdIn and StdOut in the ShellParameters protocol
   structure with StdIn and StdOut.  The current values are de-allocated.
 
   @param[in, out] ShellParameters      Pointer to parameter structure to modify.
@@ -1307,7 +1278,7 @@ RestoreStdInStdOutStdErr (
 {
   SPLIT_LIST        *Split;
 
-  if (ShellParameters == NULL 
+  if (ShellParameters == NULL
     ||OldStdIn        == NULL
     ||OldStdOut       == NULL
     ||OldStdErr       == NULL
@@ -1357,7 +1328,7 @@ RestoreStdInStdOutStdErr (
   return (EFI_SUCCESS);
 }
 /**
-  Funcion will replace the current Argc and Argv in the ShellParameters protocol
+  Function will replace the current Argc and Argv in the ShellParameters protocol
   structure by parsing NewCommandLine.  The current values are returned to the
   user.
 
@@ -1369,7 +1340,9 @@ RestoreStdInStdOutStdErr (
   @param[out] OldArgv                    Pointer to old list of parameters.
   @param[out] OldArgc                    Pointer to old number of items in Argv list.
 
-  @retval   EFI_SUCCESS                 Operation was sucessful, Argv and Argc are valid.
+
+  @retval   EFI_SUCCESS                 Operation was successful, Argv and Argc are valid.
+  @return   EFI_INVALID_PARAMETER       Some parameters are invalid.
   @retval   EFI_OUT_OF_RESOURCES        A memory allocation failed.
 **/
 EFI_STATUS
@@ -1382,7 +1355,7 @@ UpdateArgcArgv(
   )
 {
   BOOLEAN                 StripParamQuotation;
-  
+
   ASSERT(ShellParameters != NULL);
   StripParamQuotation = TRUE;
 
@@ -1396,16 +1369,16 @@ UpdateArgcArgv(
   if (Type == Script_File_Name) {
     StripParamQuotation = FALSE;
   }
-  
-  return ParseCommandLineToArgs( NewCommandLine, 
-                                 StripParamQuotation, 
-                                 &(ShellParameters->Argv), 
+
+  return ParseCommandLineToArgs( NewCommandLine,
+                                 StripParamQuotation,
+                                 &(ShellParameters->Argv),
                                  &(ShellParameters->Argc)
                                 );
 }
 
 /**
-  Funcion will replace the current Argc and Argv in the ShellParameters protocol
+  Function will replace the current Argc and Argv in the ShellParameters protocol
   structure with Argv and Argc.  The current values are de-allocated and the
   OldArgv must not be deallocated by the caller.
 

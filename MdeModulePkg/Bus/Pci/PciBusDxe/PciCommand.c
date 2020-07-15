@@ -1,14 +1,8 @@
 /** @file
   PCI command register operations supporting functions implementation for PCI Bus module.
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -75,12 +69,12 @@ PciOperateRegister (
 }
 
 /**
-  Check the cpability supporting by given device.
+  Check the capability supporting by given device.
 
   @param PciIoDevice   Pointer to instance of PCI_IO_DEVICE.
 
-  @retval TRUE         Cpability supportted.
-  @retval FALSE        Cpability not supportted.
+  @retval TRUE         Capability supported.
+  @retval FALSE        Capability not supported.
 
 **/
 BOOLEAN
@@ -103,7 +97,7 @@ PciCapabilitySupport (
   @param Offset            A pointer to the offset returned.
   @param NextRegBlock      A pointer to the next block returned.
 
-  @retval EFI_SUCCESS      Successfuly located capability register block.
+  @retval EFI_SUCCESS      Successfully located capability register block.
   @retval EFI_UNSUPPORTED  Pci device does not support capability.
   @retval EFI_NOT_FOUND    Pci device support but can not find register block.
 
@@ -121,7 +115,7 @@ LocateCapabilityRegBlock (
   UINT8   CapabilityID;
 
   //
-  // To check the cpability of this device supports
+  // To check the capability of this device supports
   //
   if (!PciCapabilitySupport (PciIoDevice)) {
     return EFI_UNSUPPORTED;
@@ -195,7 +189,7 @@ LocateCapabilityRegBlock (
   @param Offset            A pointer to the offset returned.
   @param NextRegBlock      A pointer to the next block returned.
 
-  @retval EFI_SUCCESS      Successfuly located capability register block.
+  @retval EFI_SUCCESS      Successfully located capability register block.
   @retval EFI_UNSUPPORTED  Pci device does not support capability.
   @retval EFI_NOT_FOUND    Pci device support but can not find register block.
 
@@ -239,6 +233,19 @@ LocatePciExpressCapabilityRegBlock (
                                       &CapabilityEntry
                                       );
     if (EFI_ERROR (Status)) {
+      break;
+    }
+
+    if (CapabilityEntry == MAX_UINT32) {
+      DEBUG ((
+        DEBUG_WARN,
+        "%a: [%02x|%02x|%02x] failed to access config space at offset 0x%x\n",
+        __FUNCTION__,
+        PciIoDevice->BusNumber,
+        PciIoDevice->DeviceNumber,
+        PciIoDevice->FunctionNumber,
+        CapabilityPtr
+        ));
       break;
     }
 

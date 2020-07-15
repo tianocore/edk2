@@ -1,0 +1,31 @@
+#/** @file
+#
+#  Copyright (c) 2017 - 2018, ARM Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = ArmMmuStandaloneMmCoreLib
+  FILE_GUID                      = da8f0232-fb14-42f0-922c-63104d2c70bd
+  MODULE_TYPE                    = MM_CORE_STANDALONE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = StandaloneMmMmuLib
+  PI_SPECIFICATION_VERSION       = 0x00010032
+
+[Sources.AARCH64]
+  AArch64/ArmMmuStandaloneMmLib.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  ArmLib
+  CacheMaintenanceLib
+  MemoryAllocationLib
+
+

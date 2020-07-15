@@ -2,14 +2,8 @@
   EFI SMM Variable Protocol is related to EDK II-specific implementation of variables
   and intended for use as a means to store data in the EFI SMM environment.
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -24,7 +18,7 @@
 typedef struct _EFI_SMM_VARIABLE_PROTOCOL  EFI_SMM_VARIABLE_PROTOCOL;
 
 ///
-/// EFI SMM Variable Protocol is intended for use as a means 
+/// EFI SMM Variable Protocol is intended for use as a means
 /// to store data in the EFI SMM environment.
 ///
 struct _EFI_SMM_VARIABLE_PROTOCOL {
@@ -36,4 +30,4 @@ struct _EFI_SMM_VARIABLE_PROTOCOL {
 
 extern EFI_GUID gEfiSmmVariableProtocolGuid;
 
-#endif  
+#endif

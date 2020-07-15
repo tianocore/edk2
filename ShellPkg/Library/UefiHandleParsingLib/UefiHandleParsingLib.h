@@ -1,16 +1,10 @@
 /** @file
   Provides interface to advanced shell functionality for parsing both handle and protocol database.
 
-  Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
   (C) Copyright 2013-2016 Hewlett-Packard Development Company, L.P.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -138,6 +132,7 @@
 #include <Protocol/AdapterInformation.h>
 #include <Protocol/ShellDynamicCommand.h>
 #include <Protocol/DiskInfo.h>
+#include <Protocol/PartitionInfo.h>
 
 #include <Library/HandleParsingLib.h>
 #include <Library/UefiBootServicesTableLib.h>
@@ -153,6 +148,7 @@
 #include <Library/ShellLib.h>
 #include <Library/SortLib.h>
 #include <Library/ShellCommandLib.h>
+#include <Library/PeCoffGetEntryPointLib.h>
 
 #define   EFI_FIRMWARE_IMAGE_DESCRIPTOR_VERSION_V1   1
 #define   EFI_FIRMWARE_IMAGE_DESCRIPTOR_VERSION_V2   2
@@ -161,53 +157,53 @@
 /// EFI_FIRMWARE_IMAGE_DESCRIPTOR in UEFI spec < 2.4a
 ///
 typedef struct {
-  /// 
-  /// A unique number identifying the firmware image within the device.  The number is 
+  ///
+  /// A unique number identifying the firmware image within the device.  The number is
   /// between 1 and DescriptorCount.
-  /// 
+  ///
   UINT8                            ImageIndex;
   ///
-  /// A unique number identifying the firmware image type.  
-  /// 
+  /// A unique number identifying the firmware image type.
+  ///
   EFI_GUID                         ImageTypeId;
-  /// 
-  /// A unique number identifying the firmware image. 
-  /// 
+  ///
+  /// A unique number identifying the firmware image.
+  ///
   UINT64                           ImageId;
-  /// 
-  /// A pointer to a null-terminated string representing the firmware image name.  
-  /// 
+  ///
+  /// A pointer to a null-terminated string representing the firmware image name.
+  ///
   CHAR16                           *ImageIdName;
-  /// 
-  /// Identifies the version of the device firmware. The format is vendor specific and new 
+  ///
+  /// Identifies the version of the device firmware. The format is vendor specific and new
   /// version must have a greater value than an old version.
-  /// 
+  ///
   UINT32                           Version;
-  /// 
+  ///
   /// A pointer to a null-terminated string representing the firmware image version name.
-  /// 
+  ///
   CHAR16                           *VersionName;
-  /// 
+  ///
   /// Size of the image in bytes.  If size=0, then only ImageIndex and ImageTypeId are valid.
-  /// 
+  ///
   UINTN                            Size;
-  /// 
-  /// Image attributes that are supported by this device.  See 'Image Attribute Definitions' 
-  /// for possible returned values of this parameter.  A value of 1 indicates the attribute is 
-  /// supported and the current setting value is indicated in AttributesSetting.  A 
-  /// value of 0 indicates the attribute is not supported and the current setting value in 
+  ///
+  /// Image attributes that are supported by this device.  See 'Image Attribute Definitions'
+  /// for possible returned values of this parameter.  A value of 1 indicates the attribute is
+  /// supported and the current setting value is indicated in AttributesSetting.  A
+  /// value of 0 indicates the attribute is not supported and the current setting value in
   /// AttributesSetting is meaningless.
-  /// 
+  ///
   UINT64                           AttributesSupported;
-  /// 
-  /// Image attributes.  See 'Image Attribute Definitions' for possible returned values of 
+  ///
+  /// Image attributes.  See 'Image Attribute Definitions' for possible returned values of
   /// this parameter.
-  /// 
+  ///
   UINT64                           AttributesSetting;
-  /// 
-  /// Image compatibilities.  See 'Image Compatibility Definitions' for possible returned 
+  ///
+  /// Image compatibilities.  See 'Image Compatibility Definitions' for possible returned
   /// values of this parameter.
-  /// 
+  ///
   UINT64                           Compatibilities;
 } EFI_FIRMWARE_IMAGE_DESCRIPTOR_V1;
 
@@ -216,53 +212,53 @@ typedef struct {
 /// EFI_FIRMWARE_IMAGE_DESCRIPTOR in UEFI spec > 2.4a and < 2.5
 ///
 typedef struct {
-  /// 
-  /// A unique number identifying the firmware image within the device.  The number is 
+  ///
+  /// A unique number identifying the firmware image within the device.  The number is
   /// between 1 and DescriptorCount.
-  /// 
+  ///
   UINT8                            ImageIndex;
   ///
-  /// A unique number identifying the firmware image type.  
-  /// 
+  /// A unique number identifying the firmware image type.
+  ///
   EFI_GUID                         ImageTypeId;
-  /// 
-  /// A unique number identifying the firmware image. 
-  /// 
+  ///
+  /// A unique number identifying the firmware image.
+  ///
   UINT64                           ImageId;
-  /// 
-  /// A pointer to a null-terminated string representing the firmware image name.  
-  /// 
+  ///
+  /// A pointer to a null-terminated string representing the firmware image name.
+  ///
   CHAR16                           *ImageIdName;
-  /// 
-  /// Identifies the version of the device firmware. The format is vendor specific and new 
+  ///
+  /// Identifies the version of the device firmware. The format is vendor specific and new
   /// version must have a greater value than an old version.
-  /// 
+  ///
   UINT32                           Version;
-  /// 
+  ///
   /// A pointer to a null-terminated string representing the firmware image version name.
-  /// 
+  ///
   CHAR16                           *VersionName;
-  /// 
+  ///
   /// Size of the image in bytes.  If size=0, then only ImageIndex and ImageTypeId are valid.
-  /// 
+  ///
   UINTN                            Size;
-  /// 
-  /// Image attributes that are supported by this device.  See 'Image Attribute Definitions' 
-  /// for possible returned values of this parameter.  A value of 1 indicates the attribute is 
-  /// supported and the current setting value is indicated in AttributesSetting.  A 
-  /// value of 0 indicates the attribute is not supported and the current setting value in 
+  ///
+  /// Image attributes that are supported by this device.  See 'Image Attribute Definitions'
+  /// for possible returned values of this parameter.  A value of 1 indicates the attribute is
+  /// supported and the current setting value is indicated in AttributesSetting.  A
+  /// value of 0 indicates the attribute is not supported and the current setting value in
   /// AttributesSetting is meaningless.
-  /// 
+  ///
   UINT64                           AttributesSupported;
-  /// 
-  /// Image attributes.  See 'Image Attribute Definitions' for possible returned values of 
+  ///
+  /// Image attributes.  See 'Image Attribute Definitions' for possible returned values of
   /// this parameter.
-  /// 
+  ///
   UINT64                           AttributesSetting;
-  /// 
-  /// Image compatibilities.  See 'Image Compatibility Definitions' for possible returned 
+  ///
+  /// Image compatibilities.  See 'Image Compatibility Definitions' for possible returned
   /// values of this parameter.
-  /// 
+  ///
   UINT64                           Compatibilities;
   ///
   /// Describes the lowest ImageDescriptor version that the device will accept. Only

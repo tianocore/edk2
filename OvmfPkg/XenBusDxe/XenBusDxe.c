@@ -1,7 +1,7 @@
 /** @file
   This driver produces XenBus Protocol instances for each Xen PV devices.
 
-  This XenBus bus driver will first initialize differente services in order to
+  This XenBus bus driver will first initialize different services in order to
   enumerate the ParaVirtualized devices available.
 
   Those services are:
@@ -13,13 +13,7 @@
 
   Copyright (C) 2014, Citrix Ltd.
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -303,8 +297,8 @@ NotifyExitBoot (
   @retval EFI_DEVICE_ERROR         The device could not be started due to a device error.Currently not implemented.
   @retval EFI_OUT_OF_RESOURCES     The request could not be completed due to a lack of resources.
   @retval EFI_UNSUPPORTED          Something is missing on the system that
-                                   prevent to start the edvice.
-  @retval Others                   The driver failded to start the device.
+                                   prevent to start the device.
+  @retval Others                   The driver failed to start the device.
 
 **/
 EFI_STATUS
@@ -368,7 +362,7 @@ XenBusDxeDriverBindingStart (
 
   Status = XenGetSharedInfoPage (Dev);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "XenBus: Unable to get the shared info page.\n"));
+    DEBUG ((DEBUG_ERROR, "XenBus: Unable to get the shared info page.\n"));
     Status = EFI_UNSUPPORTED;
     goto ErrorAllocated;
   }
@@ -448,16 +442,14 @@ XenBusDxeDriverBindingStop (
                ControllerHandle,
                EFI_OPEN_PROTOCOL_GET_PROTOCOL);
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "XenBusDxe: get children protocol failed: %r\n", Status));
+      DEBUG ((DEBUG_ERROR, "XenBusDxe: get children protocol failed: %r\n", Status));
       continue;
     }
     ChildData = XENBUS_PRIVATE_DATA_FROM_THIS (XenBusIo);
-    Status = gBS->DisconnectController (ChildData->Handle, NULL, NULL);
-    if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "XenBusDxe: error disconnecting child: %r\n",
-              Status));
-      continue;
-    }
+
+    Status = gBS->CloseProtocol (Dev->ControllerHandle, &gXenIoProtocolGuid,
+                    Dev->This->DriverBindingHandle, ChildData->Handle);
+    ASSERT_EFI_ERROR (Status);
 
     Status = gBS->UninstallMultipleProtocolInterfaces (
                ChildData->Handle,

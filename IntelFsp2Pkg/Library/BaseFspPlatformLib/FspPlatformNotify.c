@@ -1,13 +1,7 @@
 /** @file
 
-  Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -117,6 +111,9 @@ FspSiliconInitDone2 (
   IN EFI_STATUS Status
   )
 {
+  volatile EFI_STATUS FspStatus;
+
+  FspStatus = Status;
   //
   // Convert to FSP EAS defined API return codes
   //
@@ -139,13 +136,15 @@ FspSiliconInitDone2 (
   DEBUG ((DEBUG_INFO | DEBUG_INIT, "FspSiliconInitApi() - [Status: 0x%08X] - End\n", Status));
   PERF_END_EX (&gFspPerformanceDataGuid, "EventRec", NULL, 0, FSP_STATUS_CODE_SILICON_INIT | FSP_STATUS_CODE_COMMON_CODE | FSP_STATUS_CODE_API_EXIT);
   REPORT_STATUS_CODE (EFI_PROGRESS_CODE, FSP_STATUS_CODE_COMMON_CODE | FSP_STATUS_CODE_API_EXIT);
-  do {
-    SetFspApiReturnStatus (Status);
-    Pei2LoaderSwitchStack ();
-    if (Status != EFI_SUCCESS) {
-      DEBUG ((DEBUG_ERROR, "!!!ERROR: FspSiliconInitApi() - [Status: 0x%08X] - Error encountered during previous API and cannot proceed further\n", Status));
-    }
-  } while (Status != EFI_SUCCESS);
+  if (GetFspGlobalDataPointer ()->FspMode == FSP_IN_API_MODE) {
+    do {
+      SetFspApiReturnStatus (Status);
+      Pei2LoaderSwitchStack ();
+      if (Status != EFI_SUCCESS) {
+        DEBUG ((DEBUG_ERROR, "!!!ERROR: FspSiliconInitApi() - [Status: 0x%08X] - Error encountered during previous API and cannot proceed further\n", Status));
+      }
+    } while (FspStatus != EFI_SUCCESS);
+  }
 }
 
 /**
@@ -162,6 +161,9 @@ FspMemoryInitDone2 (
   )
 {
   FSP_GLOBAL_DATA   *FspData;
+  volatile EFI_STATUS FspStatus;
+
+  FspStatus = Status;
   //
   // Calling use FspMemoryInit API
   // Update HOB and return the control directly
@@ -199,13 +201,15 @@ FspMemoryInitDone2 (
   PERF_START_EX(&gFspPerformanceDataGuid, "EventRec", NULL, (FspData->PerfData[2] & FSP_PERFORMANCE_DATA_TIMER_MASK), FSP_STATUS_CODE_MEMORY_INIT | FSP_STATUS_CODE_COMMON_CODE | FSP_STATUS_CODE_API_ENTRY);
   PERF_END_EX(&gFspPerformanceDataGuid, "EventRec", NULL, 0, FSP_STATUS_CODE_MEMORY_INIT | FSP_STATUS_CODE_COMMON_CODE | FSP_STATUS_CODE_API_EXIT);
   REPORT_STATUS_CODE (EFI_PROGRESS_CODE, FSP_STATUS_CODE_MEMORY_INIT | FSP_STATUS_CODE_COMMON_CODE | FSP_STATUS_CODE_API_EXIT);
-  do {
-    SetFspApiReturnStatus (Status);
-    Pei2LoaderSwitchStack ();
-    if (Status != EFI_SUCCESS) {
-      DEBUG ((DEBUG_ERROR, "!!!ERROR: FspMemoryInitApi() - [Status: 0x%08X] - Error encountered during previous API and cannot proceed further\n", Status));
-    }
-  } while (Status != EFI_SUCCESS);
+  if (GetFspGlobalDataPointer ()->FspMode == FSP_IN_API_MODE) {
+    do {
+      SetFspApiReturnStatus (Status);
+      Pei2LoaderSwitchStack ();
+      if (Status != EFI_SUCCESS) {
+        DEBUG ((DEBUG_ERROR, "!!!ERROR: FspMemoryInitApi() - [Status: 0x%08X] - Error encountered during previous API and cannot proceed further\n", Status));
+      }
+    } while (FspStatus != EFI_SUCCESS);
+  }
 
   //
   // The TempRamExitApi is called
@@ -238,6 +242,9 @@ FspTempRamExitDone2 (
   )
 {
   //
+  volatile EFI_STATUS FspStatus;
+
+  FspStatus = Status;
   // Convert to FSP EAS defined API return codes
   //
   switch (Status) {
@@ -259,13 +266,15 @@ FspTempRamExitDone2 (
   SetFspMeasurePoint (FSP_PERF_ID_API_TEMP_RAM_EXIT_EXIT);
   PERF_END_EX(&gFspPerformanceDataGuid, "EventRec", NULL, 0, FSP_STATUS_CODE_TEMP_RAM_EXIT | FSP_STATUS_CODE_COMMON_CODE | FSP_STATUS_CODE_API_EXIT);
   REPORT_STATUS_CODE (EFI_PROGRESS_CODE, FSP_STATUS_CODE_TEMP_RAM_EXIT | FSP_STATUS_CODE_COMMON_CODE | FSP_STATUS_CODE_API_EXIT);
-  do {
-    SetFspApiReturnStatus (Status);
-    Pei2LoaderSwitchStack ();
-    if (Status != EFI_SUCCESS) {
-      DEBUG ((DEBUG_ERROR, "!!!ERROR: TempRamExitApi() - [Status: 0x%08X] - Error encountered during previous API and cannot proceed further\n", Status));
-    }
-  } while (Status != EFI_SUCCESS);
+  if (GetFspGlobalDataPointer ()->FspMode == FSP_IN_API_MODE) {
+    do {
+      SetFspApiReturnStatus (Status);
+      Pei2LoaderSwitchStack ();
+      if (Status != EFI_SUCCESS) {
+        DEBUG ((DEBUG_ERROR, "!!!ERROR: TempRamExitApi() - [Status: 0x%08X] - Error encountered during previous API and cannot proceed further\n", Status));
+      }
+    } while (FspStatus != EFI_SUCCESS);
+  }
   SetPhaseStatusCode (FSP_STATUS_CODE_SILICON_INIT);
   SetFspMeasurePoint (FSP_PERF_ID_API_FSP_SILICON_INIT_ENTRY);
   PERF_START_EX(&gFspPerformanceDataGuid, "EventRec", NULL, 0, FSP_STATUS_CODE_SILICON_INIT | FSP_STATUS_CODE_COMMON_CODE | FSP_STATUS_CODE_API_ENTRY);
@@ -289,6 +298,7 @@ FspWaitForNotify (
   UINT32                     NotificationValue;
   UINT32                     NotificationCount;
   UINT8                      Count;
+  volatile EFI_STATUS        FspStatus;
 
   NotificationCount = 0;
   while (NotificationCount < sizeof(mFspNotifySequence) / sizeof(UINT32)) {
@@ -341,15 +351,17 @@ FspWaitForNotify (
       PERF_END_EX(&gFspPerformanceDataGuid, "EventRec", NULL, 0, FSP_STATUS_CODE_END_OF_FIRMWARE_NOTIFICATION | FSP_STATUS_CODE_COMMON_CODE | FSP_STATUS_CODE_API_EXIT);
       REPORT_STATUS_CODE (EFI_PROGRESS_CODE, FSP_STATUS_CODE_END_OF_FIRMWARE_NOTIFICATION | FSP_STATUS_CODE_COMMON_CODE | FSP_STATUS_CODE_API_EXIT);
     }
-    do {
-      SetFspApiReturnStatus(Status);
-      Pei2LoaderSwitchStack();
-      if (Status != EFI_SUCCESS) {
-        DEBUG ((DEBUG_ERROR, "!!!ERROR: NotifyPhaseApi() [Phase: %08X] - Failed - [Status: 0x%08X]\n", NotificationValue, Status));
-      }
-    } while (Status != EFI_SUCCESS);
+    if (GetFspGlobalDataPointer ()->FspMode == FSP_IN_API_MODE) {
+      FspStatus = Status;
+      do {
+        SetFspApiReturnStatus(Status);
+        Pei2LoaderSwitchStack();
+        if (Status != EFI_SUCCESS) {
+          DEBUG ((DEBUG_ERROR, "!!!ERROR: NotifyPhaseApi() [Phase: %08X] - Failed - [Status: 0x%08X]\n", NotificationValue, Status));
+        }
+      } while (FspStatus != EFI_SUCCESS);
+    }
   }
-
   //
   // Control goes back to the PEI Core and it dispatches further PEIMs.
   // DXEIPL is the final one to transfer control back to the boot loader.

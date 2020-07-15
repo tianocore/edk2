@@ -2,15 +2,9 @@
   Driver Binding functions and Service Binding functions
   implementation for Mtftp6 Driver.
 
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -238,7 +232,7 @@ Mtftp6CreateInstance (
 
 /**
   Callback function which provided by user to remove one node in NetDestroyLinkList process.
-  
+
   @param[in]    Entry           The entry to be removed.
   @param[in]    Context         Pointer to the callback context corresponds to the Context in NetDestroyLinkList.
 
@@ -473,7 +467,7 @@ Mtftp6DriverBindingStop (
   EFI_STATUS                                 Status;
   LIST_ENTRY                                 *List;
   MTFTP6_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT Context;
-  
+
   //
   // Locate the Nic handle to retrieve the Mtftp6 private data.
   //
@@ -544,7 +538,7 @@ Mtftp6DriverBindingStop (
                               then a new handle is created. If it is a pointer to an existing
                               UEFI handle, then the protocol is added to the existing UEFI handle.
 
-  @retval EFI_SUCCES            The protocol was added to ChildHandle.
+  @retval EFI_SUCCESS           The protocol was added to ChildHandle.
   @retval EFI_INVALID_PARAMETER ChildHandle is NULL.
   @retval Others                The child handle was not created.
 
@@ -643,7 +637,7 @@ ON_ERROR:
   @param[in]  This        Pointer to the EFI_SERVICE_BINDING_PROTOCOL instance.
   @param[in]  ChildHandle Handle of the child to destroy.
 
-  @retval EFI_SUCCES            The protocol was removed from ChildHandle.
+  @retval EFI_SUCCESS           The protocol was removed from ChildHandle.
   @retval EFI_UNSUPPORTED       ChildHandle does not support the protocol that is being removed.
   @retval EFI_INVALID_PARAMETER Child handle is NULL.
   @retval Others                The child handle was not destroyed

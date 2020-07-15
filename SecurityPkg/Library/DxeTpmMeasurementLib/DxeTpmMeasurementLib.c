@@ -1,14 +1,8 @@
 /** @file
   This library is used by other modules to measure data to TPM.
 
-Copyright (c) 2012 - 2015, Intel Corporation. All rights reserved. <BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2012 - 2018, Intel Corporation. All rights reserved. <BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -62,7 +56,7 @@ Tpm12MeasureAndLogData (
   TcgEvent = NULL;
 
   //
-  // Tpm active/deactive state is checked in HashLogExtendEvent
+  // Tpm activation state is checked in HashLogExtendEvent
   //
   Status = gBS->LocateProtocol (&gEfiTcgProtocolGuid, NULL, (VOID **) &TcgProtocol);
   if (EFI_ERROR(Status)){
@@ -171,7 +165,7 @@ Tpm20MeasureAndLogData (
   @retval EFI_DEVICE_ERROR      The operation was unsuccessful.
 **/
 EFI_STATUS
-EFIAPI 
+EFIAPI
 TpmMeasureAndLogData (
   IN UINT32             PcrIndex,
   IN UINT32             EventType,
@@ -184,21 +178,22 @@ TpmMeasureAndLogData (
   EFI_STATUS  Status;
 
   //
-  // Try to measure using Tpm1.2 protocol
+  // Try to measure using Tpm20 protocol
   //
-  Status = Tpm12MeasureAndLogData(
-               PcrIndex,
-               EventType,
-               EventLog,
-               LogLen,
-               HashData,
-               HashDataLen
-               );
+  Status = Tpm20MeasureAndLogData(
+             PcrIndex,
+             EventType,
+             EventLog,
+             LogLen,
+             HashData,
+             HashDataLen
+             );
+
   if (EFI_ERROR (Status)) {
     //
-    // Try to measure using Tpm20 protocol
+    // Try to measure using Tpm1.2 protocol
     //
-    Status = Tpm20MeasureAndLogData(
+    Status = Tpm12MeasureAndLogData(
                PcrIndex,
                EventType,
                EventLog,

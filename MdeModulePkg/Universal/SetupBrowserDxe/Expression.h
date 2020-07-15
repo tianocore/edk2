@@ -1,14 +1,8 @@
 /** @file
 Private structure, MACRO and function definitions for User Interface related functionalities.
 
-Copyright (c) 2004 - 2013, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -17,15 +11,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 /**
   Get the expression list count.
-  
-  @param  Level                  Which type this expression belong to. Form, 
+
+  @param  Level                  Which type this expression belong to. Form,
                                  statement or option?
 
   @retval >=0                    The expression count
   @retval -1                     Input parameter error.
 
 **/
-INTN 
+INTN
 GetConditionalExpressionCount (
   IN EXPRESS_LEVEL       Level
   );
@@ -74,8 +68,8 @@ PushScope (
 
 /**
   Get the expression Buffer pointer.
-  
-  @param  Level                  Which type this expression belong to. Form, 
+
+  @param  Level                  Which type this expression belong to. Form,
                                  statement or option?
 
   @retval  The start pointer of the expression buffer or NULL.
@@ -144,7 +138,7 @@ ExtendValueToU64 (
   Push the expression options onto the Stack.
 
   @param  Pointer                Pointer to the current expression.
-  @param  Level                  Which type this expression belong to. Form, 
+  @param  Level                  Which type this expression belong to. Form,
                                  statement or option?
 
   @retval EFI_SUCCESS            The value was pushed onto the stack.
@@ -160,7 +154,7 @@ PushConditionalExpression (
 /**
   Pop the expression options from the Stack
 
-  @param  Level                  Which type this expression belong to. Form, 
+  @param  Level                  Which type this expression belong to. Form,
                                  statement or option?
 
   @retval EFI_SUCCESS            The value was pushed onto the stack.
@@ -225,20 +219,20 @@ EvaluateExpression (
   IN OUT FORM_EXPRESSION   *Expression
   );
 /**
-  Return the result of the expression list. Check the expression list and 
-  return the highest priority express result.  
+  Return the result of the expression list. Check the expression list and
+  return the highest priority express result.
   Priority: DisableIf > SuppressIf > GrayOutIf > FALSE
 
   @param  ExpList             The input expression list.
   @param  Evaluate            Whether need to evaluate the expression first.
   @param  FormSet             FormSet associated with this expression.
-  @param  Form                Form associated with this expression.  
+  @param  Form                Form associated with this expression.
 
-  @retval EXPRESS_RESULT      Return the higher priority express result. 
+  @retval EXPRESS_RESULT      Return the higher priority express result.
                               DisableIf > SuppressIf > GrayOutIf > FALSE
 
 **/
-EXPRESS_RESULT 
+EXPRESS_RESULT
 EvaluateExpressionList (
   IN FORM_EXPRESSION_LIST *ExpList,
   IN BOOLEAN              Evaluate,

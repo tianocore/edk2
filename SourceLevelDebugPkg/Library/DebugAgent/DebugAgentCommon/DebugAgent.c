@@ -1,17 +1,11 @@
 /** @file
-  Commond Debug Agent library implementition. It mainly includes
+  Commond Debug Agent library implementation. It mainly includes
   the first C function called by exception/interrupt handlers,
   read/write debug packet to communication with HOST based on transfer
   protocol.
 
-  Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -201,55 +195,17 @@ FindAndReportModuleImageInfo (
   )
 {
   UINTN                                Pe32Data;
-  EFI_IMAGE_DOS_HEADER                 *DosHdr;
-  EFI_IMAGE_OPTIONAL_HEADER_PTR_UNION  Hdr;
   PE_COFF_LOADER_IMAGE_CONTEXT         ImageContext;
 
   //
   // Find Image Base
   //
-  Pe32Data = ((UINTN)mErrorMsgVersionAlert) & ~(AlignSize - 1);
-  while (Pe32Data != 0) {
-    DosHdr = (EFI_IMAGE_DOS_HEADER *) Pe32Data;
-    if (DosHdr->e_magic == EFI_IMAGE_DOS_SIGNATURE) {
-      //
-      // DOS image header is present, so read the PE header after the DOS image header.
-      //
-      Hdr.Pe32 = (EFI_IMAGE_NT_HEADERS32 *)(Pe32Data + (UINTN) ((DosHdr->e_lfanew) & 0x0ffff));
-      //
-      // Make sure PE header address does not overflow and is less than the initial address.
-      //
-      if (((UINTN)Hdr.Pe32 > Pe32Data) && ((UINTN)Hdr.Pe32 < (UINTN)mErrorMsgVersionAlert)) {
-        if (Hdr.Pe32->Signature == EFI_IMAGE_NT_SIGNATURE) {
-          //
-          // It's PE image.
-          //
-          break;
-        }
-      }
-    } else {
-      //
-      // DOS image header is not present, TE header is at the image base.
-      //
-      Hdr.Pe32 = (EFI_IMAGE_NT_HEADERS32 *)Pe32Data;
-      if ((Hdr.Te->Signature == EFI_TE_IMAGE_HEADER_SIGNATURE) &&
-          ((Hdr.Te->Machine == IMAGE_FILE_MACHINE_I386) || Hdr.Te->Machine == IMAGE_FILE_MACHINE_X64)) {
-        //
-        // It's TE image, it TE header and Machine type match
-        //
-        break;
-      }
-    }
-
-    //
-    // Not found the image base, check the previous aligned address
-    //
-    Pe32Data -= AlignSize;
+  Pe32Data = PeCoffSearchImageBase ((UINTN) mErrorMsgVersionAlert);
+  if (Pe32Data != 0) {
+    ImageContext.ImageAddress = Pe32Data;
+    ImageContext.PdbPointer = PeCoffLoaderGetPdbPointer ((VOID*) (UINTN) ImageContext.ImageAddress);
+    PeCoffLoaderRelocateImageExtraAction (&ImageContext);
   }
-
-  ImageContext.ImageAddress = Pe32Data;
-  ImageContext.PdbPointer = PeCoffLoaderGetPdbPointer ((VOID*) (UINTN) ImageContext.ImageAddress);
-  PeCoffLoaderRelocateImageExtraAction (&ImageContext);
 }
 
 /**
@@ -421,9 +377,9 @@ DebugAgentReadBuffer (
   UINT32                   TimerRound;
   UINT32                   TimerFrequency;
   UINT32                   TimerCycle;
-  
+
   Begin         = 0;
-  TimeoutTicker = 0;  
+  TimeoutTicker = 0;
   TimerRound    = 0;
   TimerFrequency = GetMailboxPointer()->DebugTimerFrequency;
   TimerCycle = GetApicTimerInitCount ();
@@ -443,7 +399,7 @@ DebugAgentReadBuffer (
   while (Index < NumberOfBytes) {
     if (DebugPortPollBuffer (Handle)) {
       DebugPortReadBuffer (Handle, Buffer + Index, 1, 0);
-      Index ++; 
+      Index ++;
       continue;
     }
     if (Timeout != 0) {
@@ -638,7 +594,7 @@ DebugAgentDataMsgPrint (
     Index ++;
     if (Index >= Length) {
       //
-      // The last character of debug message has been foramtted in buffer
+      // The last character of debug message has been formatted in buffer
       //
       DestBuffer += AsciiSPrint(DestBuffer, DEBUG_DATA_MAXIMUM_REAL_DATA - (DestBuffer - Buffer), "]\n");
       SendDebugMsgPacket (Buffer, DestBuffer - Buffer);
@@ -690,7 +646,7 @@ ReadRemainingBreakPacket (
   if (IS_REQUEST (DebugHeader)) {
     if (DebugHeader->SequenceNo == (UINT8) (Mailbox->HostSequenceNo + 1)) {
       //
-      // Only updagte HostSequenceNo for new command packet 
+      // Only updagte HostSequenceNo for new command packet
       //
       UpdateMailboxContent (Mailbox, DEBUG_MAILBOX_HOST_SEQUENCE_NO_INDEX, DebugHeader->SequenceNo);
       return EFI_SUCCESS;
@@ -767,7 +723,7 @@ SetDebugSetting (
 }
 
 /**
-  Exectue GO command.
+  Execute GO command.
 
   @param[in] CpuContext        Pointer to saved CPU context.
 
@@ -1125,12 +1081,12 @@ DecompressDataInPlace (
   @param[out] IncompatibilityFlag If IncompatibilityFlag is not NULL, return
                                   TRUE:  Compatible packet received.
                                   FALSE: Incompatible packet received.
-  @param[in]  Timeout             Time out value to wait for acknowlege from HOST.
+  @param[in]  Timeout             Time out value to wait for acknowledge from HOST.
                                   The unit is microsecond.
   @param[in]  SkipStartSymbol     TRUE:  Skip time out when reading start symbol.
                                   FALSE: Does not Skip time out when reading start symbol.
 
-  @retval RETURN_SUCCESS   A valid package was reveived in InputPacket.
+  @retval RETURN_SUCCESS   A valid package was received in InputPacket.
   @retval RETURN_TIMEOUT   Timeout occurs.
 
 **/
@@ -1234,17 +1190,17 @@ ReceivePacket (
   Receive acknowledge packet OK from HOST in specified time.
 
   @param[in]  Command             The command type issued by TARGET.
-  @param[in]  Timeout             Time out value to wait for acknowlege from HOST.
+  @param[in]  Timeout             Time out value to wait for acknowledge from HOST.
                                   The unit is microsecond.
   @param[out] BreakReceived       If BreakReceived is not NULL,
-                                  TRUE is retured if break-in symbol received.
-                                  FALSE is retured if break-in symbol not received.
+                                  TRUE is returned if break-in symbol received.
+                                  FALSE is returned if break-in symbol not received.
   @param[out] IncompatibilityFlag If IncompatibilityFlag is not NULL, return
                                   TRUE:  Compatible packet received.
                                   FALSE: Incompatible packet received.
 
-  @retval  RETRUEN_SUCCESS  Succeed to receive acknowlege packet from HOST,
-                            the type of acknowlege packet saved in Ack.
+  @retval  RETURN_SUCCESS   Succeed to receive acknowledge packet from HOST,
+                            the type of acknowledge packet saved in Ack.
   @retval  RETURN_TIMEOUT   Specified timeout value was up.
 
 **/
@@ -1514,7 +1470,7 @@ CompressData (
         if (Send) {
           DebugPortWriteBuffer (Handle, &LastChar, 1);
         }
-        
+
       } else if (LastCharCount >= 2) {
         CompressedIndex += 3;
         LastCharCount -= 2;
@@ -1541,7 +1497,7 @@ CompressData (
 }
 
 /**
-  Read memory with speicifed width and send packet with response data to HOST.
+  Read memory with specified width and send packet with response data to HOST.
 
   @param[in] Data        Pointer to response data buffer.
   @param[in] Count       The number of data with specified Width.
@@ -1602,7 +1558,7 @@ ReadMemoryAndSendResponsePacket (
     // Compression/decompression support was added since revision 0.4.
     // Revision 0.3 shouldn't compress the packet.
     //
-    if (DEBUG_AGENT_REVISION >= DEBUG_AGENT_REVISION_04) {
+    if (PcdGet32(PcdTransferProtocolRevision) >= DEBUG_AGENT_REVISION_04) {
       //
       // Get the compressed data size without modifying the packet.
       //
@@ -1713,16 +1669,16 @@ SendDataResponsePacket (
   Try to attach the HOST.
 
   Send init break packet to HOST:
-  If no acknowlege received in specified Timeout, return RETURN_TIMEOUT.
-  If received acknowlege, check the revision of HOST.
+  If no acknowledge received in specified Timeout, return RETURN_TIMEOUT.
+  If received acknowledge, check the revision of HOST.
   Set Attach Flag if attach successfully.
 
   @param[in]  BreakCause     Break cause of this break event.
-  @param[in]  Timeout        Time out value to wait for acknowlege from HOST.
+  @param[in]  Timeout        Time out value to wait for acknowledge from HOST.
                              The unit is microsecond.
   @param[out] BreakReceived  If BreakReceived is not NULL,
-                             TRUE is retured if break-in symbol received.
-                             FALSE is retured if break-in symbol not received.
+                             TRUE is returned if break-in symbol received.
+                             FALSE is returned if break-in symbol not received.
 **/
 RETURN_STATUS
 AttachHost (
@@ -1749,7 +1705,7 @@ AttachHost (
   }
   if (IncompatibilityFlag) {
     //
-    // If the incompatible Debug Packet received, the HOST should be running transfer protocol before DEBUG_AGENT_REVISION.
+    // If the incompatible Debug Packet received, the HOST should be running transfer protocol before PcdTransferProtocolRevision.
     // It could be UDK Debugger for Windows v1.1/v1.2 or for Linux v0.8/v1.2.
     //
     DebugPortWriteBuffer (Handle, (UINT8 *) mErrorMsgVersionAlert, AsciiStrLen (mErrorMsgVersionAlert));
@@ -1776,8 +1732,8 @@ AttachHost (
   @param[in]  BreakCause     Break cause of this break event.
   @param[in]  ProcessorIndex Processor index value.
   @param[out] BreakReceived  If BreakReceived is not NULL,
-                             TRUE is retured if break-in symbol received.
-                             FALSE is retured if break-in symbol not received.
+                             TRUE is returned if break-in symbol received.
+                             FALSE is returned if break-in symbol not received.
 
 **/
 VOID
@@ -1821,7 +1777,7 @@ SendBreakPacketToHost (
 
   It received the command packet from HOST, and sent response data packet to HOST.
 
-  @param[in]      Vector         Vector value of exception or interrutp.
+  @param[in]      Vector         Vector value of exception or interrupt.
   @param[in, out] CpuContext     Pointer to saved CPU context.
   @param[in]      BreakReceived  TRUE means break-in symbol received.
                                  FALSE means break-in symbol not received.
@@ -1925,20 +1881,20 @@ CommandCommunication (
 
     Mailbox = GetMailboxPointer ();
     if (DebugHeader->SequenceNo == Mailbox->HostSequenceNo) {
-      DebugAgentMsgPrint (DEBUG_AGENT_WARNING, "TARGET: Receive one old command[%x] agaist command[%x]\n", DebugHeader->SequenceNo, Mailbox->HostSequenceNo);
+      DebugAgentMsgPrint (DEBUG_AGENT_WARNING, "TARGET: Receive one old command[%x] against command[%x]\n", DebugHeader->SequenceNo, Mailbox->HostSequenceNo);
       SendAckPacket (Mailbox->LastAck);
       ReleaseMpSpinLock (&mDebugMpContext.DebugPortSpinLock);
       continue;
     } else if (DebugHeader->SequenceNo == (UINT8) (Mailbox->HostSequenceNo + 1)) {
       UpdateMailboxContent (Mailbox, DEBUG_MAILBOX_HOST_SEQUENCE_NO_INDEX, (UINT8) DebugHeader->SequenceNo);
     } else {
-      DebugAgentMsgPrint (DEBUG_AGENT_WARNING, "Receive one invalid comamnd[%x] agaist command[%x]\n", DebugHeader->SequenceNo, Mailbox->HostSequenceNo);
+      DebugAgentMsgPrint (DEBUG_AGENT_WARNING, "Receive one invalid command[%x] against command[%x]\n", DebugHeader->SequenceNo, Mailbox->HostSequenceNo);
       ReleaseMpSpinLock (&mDebugMpContext.DebugPortSpinLock);
       continue;
     }
 
     //
-    // Save CPU content before executing HOST commond
+    // Save CPU content before executing HOST command
     //
     UpdateMailboxContent (Mailbox, DEBUG_MAILBOX_EXCEPTION_BUFFER_POINTER_INDEX, (UINT64)(UINTN) &AgentExceptionBuffer.JumpBuffer);
     if (SetJump (&AgentExceptionBuffer.JumpBuffer) != 0) {
@@ -2063,7 +2019,7 @@ CommandCommunication (
 
       } else {
         //
-        // If reveived HALT command, need to defer the GO command
+        // If received HALT command, need to defer the GO command
         //
         SendAckPacket (DEBUG_COMMAND_HALT_PROCESSED);
         HaltDeferred = FALSE;
@@ -2230,7 +2186,7 @@ CommandCommunication (
       break;
 
     case DEBUG_COMMAND_GET_REVISION:
-      DebugAgentRevision.Revision = DEBUG_AGENT_REVISION;
+      DebugAgentRevision.Revision = PcdGet32(PcdTransferProtocolRevision);
       DebugAgentRevision.Capabilities = DEBUG_AGENT_CAPABILITIES;
       Status = SendDataResponsePacket ((UINT8 *) &DebugAgentRevision, (UINT16) sizeof (DEBUG_DATA_RESPONSE_GET_REVISION), DebugHeader);
       break;
@@ -2344,7 +2300,7 @@ CommandCommunication (
 /**
   C function called in interrupt handler.
 
-  @param[in] Vector      Vector value of exception or interrutp.
+  @param[in] Vector      Vector value of exception or interrupt.
   @param[in] CpuContext  Pointer to save CPU context.
 
 **/
@@ -2385,7 +2341,7 @@ InterruptProcess (
   if (MultiProcessorDebugSupport()) {
     ProcessorIndex = GetProcessorIndex ();
     //
-    // If this processor has alreay halted before, need to check it later
+    // If this processor has already halted before, need to check it later
     //
     if (IsCpuStopped (ProcessorIndex)) {
       IssuedViewPoint = ProcessorIndex;
@@ -2416,7 +2372,7 @@ InterruptProcess (
 
   if (MultiProcessorDebugSupport()) {
     //
-    // If RUN commmand is executing, wait for it done.
+    // If RUN command is executing, wait for it done.
     //
     while (mDebugMpContext.RunCommandSet) {
       CpuPause ();
@@ -2523,7 +2479,7 @@ InterruptProcess (
     AcquireMpSpinLock (&mDebugMpContext.DebugPortSpinLock);
 
     if (MultiProcessorDebugSupport()) {
-      if (IsBsp (ProcessorIndex)) {
+      if (DebugAgentIsBsp (ProcessorIndex)) {
         //
         // If current processor is BSP, check Apic timer's init count if changed,
         // it may be re-written when switching BSP.
@@ -2536,7 +2492,7 @@ InterruptProcess (
         }
       }
 
-      if (!IsBsp (ProcessorIndex) || mDebugMpContext.IpiSentByAp) {
+      if (!DebugAgentIsBsp (ProcessorIndex) || mDebugMpContext.IpiSentByAp) {
         ReleaseMpSpinLock (&mDebugMpContext.DebugPortSpinLock);
         //
         // If current processor is not BSP or this is one IPI sent by AP

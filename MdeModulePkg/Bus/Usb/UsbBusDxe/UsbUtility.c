@@ -2,14 +2,8 @@
 
     Wrapper function for usb host controller interface.
 
-Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -90,90 +84,12 @@ UsbHcGetCapability (
 }
 
 
-/**
-  Reset the host controller.
-
-  @param  UsbBus                The usb bus driver.
-  @param  Attributes            The reset type, only global reset is used by this driver.
-
-  @retval EFI_SUCCESS           The reset operation succeeded.
-  @retval EFI_INVALID_PARAMETER Attributes is not valid.
-  @retval EFI_UNSUPPOURTED      The type of reset specified by Attributes is
-                                not currently supported by the host controller.
-  @retval EFI_DEVICE_ERROR      Host controller isn't halted to reset.
-**/
-EFI_STATUS
-UsbHcReset (
-  IN USB_BUS              *UsbBus,
-  IN UINT16               Attributes
-  )
-{
-  EFI_STATUS              Status;
-
-  if (UsbBus->Usb2Hc != NULL) {
-    Status = UsbBus->Usb2Hc->Reset (UsbBus->Usb2Hc, Attributes);
-  } else {
-    Status = UsbBus->UsbHc->Reset (UsbBus->UsbHc, Attributes);
-  }
-
-  return Status;
-}
 
 
-/**
-  Get the current operation state of the host controller.
-
-  @param  UsbBus           The USB bus driver.
-  @param  State            The host controller operation state.
-
-  @retval EFI_SUCCESS      The operation state is returned in State.
-  @retval Others           Failed to get the host controller state.
-
-**/
-EFI_STATUS
-UsbHcGetState (
-  IN  USB_BUS             *UsbBus,
-  OUT EFI_USB_HC_STATE    *State
-  )
-{
-  EFI_STATUS              Status;
-
-  if (UsbBus->Usb2Hc != NULL) {
-    Status = UsbBus->Usb2Hc->GetState (UsbBus->Usb2Hc, State);
-  } else {
-    Status = UsbBus->UsbHc->GetState (UsbBus->UsbHc, State);
-  }
-
-  return Status;
-}
 
 
-/**
-  Set the host controller operation state.
 
-  @param  UsbBus           The USB bus driver.
-  @param  State            The state to set.
 
-  @retval EFI_SUCCESS      The host controller is now working at State.
-  @retval Others           Failed to set operation state.
-
-**/
-EFI_STATUS
-UsbHcSetState (
-  IN USB_BUS              *UsbBus,
-  IN EFI_USB_HC_STATE     State
-  )
-{
-  EFI_STATUS              Status;
-
-  if (UsbBus->Usb2Hc != NULL) {
-    Status = UsbBus->Usb2Hc->SetState (UsbBus->Usb2Hc, State);
-  } else {
-    Status = UsbBus->UsbHc->SetState (UsbBus->UsbHc, State);
-  }
-
-  return Status;
-}
 
 
 /**
@@ -563,78 +479,10 @@ UsbHcSyncInterruptTransfer (
 }
 
 
-/**
-  Execute a synchronous Isochronous USB transfer.
-
-  @param  UsbBus           The USB bus driver.
-  @param  DevAddr          The target device address.
-  @param  EpAddr           The target endpoint address, with direction encoded in
-                           bit 7.
-  @param  DevSpeed         The device's speed.
-  @param  MaxPacket        The endpoint's max packet size.
-  @param  BufferNum        The number of data buffer.
-  @param  Data             Array of pointers to data buffer.
-  @param  DataLength       The length of data buffer.
-  @param  Translator       The transaction translator for low/full speed device.
-  @param  UsbResult        The result of USB execution.
-
-  @retval EFI_UNSUPPORTED  The isochronous transfer isn't supported now.
-
-**/
-EFI_STATUS
-UsbHcIsochronousTransfer (
-  IN  USB_BUS                             *UsbBus,
-  IN  UINT8                               DevAddr,
-  IN  UINT8                               EpAddr,
-  IN  UINT8                               DevSpeed,
-  IN  UINTN                               MaxPacket,
-  IN  UINT8                               BufferNum,
-  IN  OUT VOID                            *Data[EFI_USB_MAX_ISO_BUFFER_NUM],
-  IN  UINTN                               DataLength,
-  IN  EFI_USB2_HC_TRANSACTION_TRANSLATOR  *Translator,
-  OUT UINT32                              *UsbResult
-  )
-{
-  return EFI_UNSUPPORTED;
-}
 
 
-/**
-  Queue an asynchronous isochronous transfer.
 
-  @param  UsbBus           The USB bus driver.
-  @param  DevAddr          The target device address.
-  @param  EpAddr           The target endpoint address, with direction encoded in
-                           bit 7.
-  @param  DevSpeed         The device's speed.
-  @param  MaxPacket        The endpoint's max packet size.
-  @param  BufferNum        The number of data buffer.
-  @param  Data             Array of pointers to data buffer.
-  @param  DataLength       The length of data buffer.
-  @param  Translator       The transaction translator for low/full speed device.
-  @param  Callback         The function to call when data is transferred.
-  @param  Context          The context to the callback function.
 
-  @retval EFI_UNSUPPORTED  The asynchronous isochronous transfer isn't supported.
-
-**/
-EFI_STATUS
-UsbHcAsyncIsochronousTransfer (
-  IN  USB_BUS                             *UsbBus,
-  IN  UINT8                               DevAddr,
-  IN  UINT8                               EpAddr,
-  IN  UINT8                               DevSpeed,
-  IN  UINTN                               MaxPacket,
-  IN  UINT8                               BufferNum,
-  IN OUT VOID                             *Data[EFI_USB_MAX_ISO_BUFFER_NUM],
-  IN  UINTN                               DataLength,
-  IN  EFI_USB2_HC_TRANSACTION_TRANSLATOR  *Translator,
-  IN  EFI_ASYNC_USB_TRANSFER_CALLBACK     Callback,
-  IN  VOID                                *Context
-  )
-{
-  return EFI_UNSUPPORTED;
-}
 
 
 /**
@@ -936,7 +784,7 @@ MatchUsbClass (
   // If connect class policy, determine whether to create device handle by the five fields
   // in class device path node.
   //
-  // In addtion, hub interface is always matched for this policy.
+  // In addition, hub interface is always matched for this policy.
   //
   if ((ActIfDesc->InterfaceClass == USB_HUB_CLASS_CODE) &&
       (ActIfDesc->InterfaceSubClass == USB_HUB_SUBCLASS_CODE)) {
@@ -1163,15 +1011,15 @@ UsbBusAddWantedUsbIoDP (
     DevicePathPtr = DuplicateDevicePath ((EFI_DEVICE_PATH_PROTOCOL *) &mAllUsbClassDevicePath);
   } else if (!IsDevicePathEnd (RemainingDevicePath)) {
     //
-    // If RemainingDevicePath isn't the End of Device Path Node, 
+    // If RemainingDevicePath isn't the End of Device Path Node,
     // Create new Usb device path according to the usb part in remaining device path
     //
     DevicePathPtr = GetUsbDPFromFullDP (RemainingDevicePath);
   } else {
     //
     // If RemainingDevicePath is the End of Device Path Node,
-    // skip enumerate any device and return EFI_SUCESSS
-    // 
+    // skip enumerate any device and return EFI_SUCCESS
+    //
     return EFI_SUCCESS;
   }
 
@@ -1186,7 +1034,7 @@ UsbBusAddWantedUsbIoDP (
   Check whether a usb child device is the wanted device in a bus.
 
   @param  Bus     The Usb bus's private data pointer.
-  @param  UsbIf   The usb child device inferface.
+  @param  UsbIf   The usb child device interface.
 
   @retval True    If a usb child device is the wanted device in a bus.
   @retval False   If a usb child device is *NOT* the wanted device in a bus.
@@ -1288,7 +1136,7 @@ UsbBusIsWantedUsbIO (
 }
 
 /**
-  Recursively connnect every wanted usb child device to ensure they all fully connected.
+  Recursively connect every wanted usb child device to ensure they all fully connected.
   Check all the child Usb IO handles in this bus, recursively connecte if it is wanted usb child device.
 
   @param  UsbBusId                  Point to EFI_USB_BUS_PROTOCOL interface.
@@ -1364,10 +1212,10 @@ UsbBusRecursivelyConnectWantedUsbIo (
         //
         // Recursively connect the wanted Usb Io handle
         //
-        DEBUG ((EFI_D_INFO, "UsbConnectDriver: TPL before connect is %d\n", (UINT32)UsbGetCurrentTpl ()));
+        DEBUG ((EFI_D_INFO, "UsbBusRecursivelyConnectWantedUsbIo: TPL before connect is %d\n", (UINT32)UsbGetCurrentTpl ()));
         Status            = gBS->ConnectController (UsbIf->Handle, NULL, NULL, TRUE);
         UsbIf->IsManaged  = (BOOLEAN)!EFI_ERROR (Status);
-        DEBUG ((EFI_D_INFO, "UsbConnectDriver: TPL after connect is %d\n", (UINT32)UsbGetCurrentTpl()));
+        DEBUG ((EFI_D_INFO, "UsbBusRecursivelyConnectWantedUsbIo: TPL after connect is %d\n", (UINT32)UsbGetCurrentTpl()));
       }
     }
   }

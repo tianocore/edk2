@@ -1,0 +1,12 @@
+// /** @file
+// Provides platform policy services used during a capsule update.
+//
+// Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+#string STR_MODULE_ABSTRACT     #language en-US  "Provides platform policy services used during a capsule update."
+
+#string STR_MODULE_DESCRIPTION  #language en-US  "Provides platform policy services used during a capsule update."

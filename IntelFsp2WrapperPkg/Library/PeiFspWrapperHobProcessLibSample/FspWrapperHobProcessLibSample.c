@@ -1,14 +1,8 @@
 /** @file
   Sample to provide FSP wrapper hob process related function.
 
-  Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2014 - 2019, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -35,11 +29,11 @@
 #define PEI_ADDITIONAL_MEMORY_SIZE    (16 * EFI_PAGE_SIZE)
 
 /**
-  Get the mem size in memory type infromation table.
+  Get the mem size in memory type information table.
 
   @param[in] PeiServices  PEI Services table.
 
-  @return the mem size in memory type infromation table.
+  @return the mem size in memory type information table.
 **/
 UINT64
 GetMemorySizeInMemoryTypeInformation (
@@ -359,7 +353,7 @@ ProcessFspHobList (
       //
       // Skip FSP binary creates PcdDataBaseHobGuid
       //
-      if (!CompareGuid(&FspHob.Guid->Name, &gPcdDataBaseHobGuid)) { 
+      if (!CompareGuid(&FspHob.Guid->Name, &gPcdDataBaseHobGuid)) {
         BuildGuidDataHob (
           &FspHob.Guid->Name,
           GET_GUID_HOB_DATA(FspHob),
@@ -384,7 +378,19 @@ PostFspsHobProcess (
   IN VOID                 *FspHobList
   )
 {
-  ProcessFspHobList (FspHobList);
-
+  //
+  // PostFspsHobProcess () will be called in both FSP API and Dispatch modes to
+  // align the same behavior and support a variety of boot loader implementations.
+  // Boot loader provided library function is recommended to support both API and
+  // Dispatch modes by checking PcdFspModeSelection.
+  //
+  if (PcdGet8 (PcdFspModeSelection) == 1) {
+    //
+    // Only in FSP API mode the wrapper has to build hobs basing on FSP output data.
+    // In this case FspHobList cannot be NULL.
+    //
+    ASSERT (FspHobList != NULL);
+    ProcessFspHobList (FspHobList);
+  }
   return EFI_SUCCESS;
 }

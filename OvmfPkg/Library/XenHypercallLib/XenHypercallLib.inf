@@ -2,13 +2,7 @@
 #  Xen Hypercall abstraction lib for Intel and ARM architectures
 #
 #  Copyright (c) 2014, Linaro Ltd. All rights reserved.<BR>
-#  This program and the accompanying materials
-#  are licensed and made available under the terms and conditions of the BSD License
-#  which accompanies this distribution.  The full text of the license may be found at
-#  http://opensource.org/licenses/bsd-license.php
-#
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
 
@@ -18,10 +12,10 @@
   FILE_GUID                      = B5EE9A32-CA5A-49A8-82E3-ADA4CCB77C7C
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  CONSTRUCTOR                    = XenHypercallLibInit
+  CONSTRUCTOR                    = XenHypercallLibConstruct
 
 [Defines.IA32, Defines.X64]
-  LIBRARY_CLASS                  = XenHypercallLib|DXE_DRIVER UEFI_DRIVER
+  LIBRARY_CLASS                  = XenHypercallLib|PEIM DXE_DRIVER UEFI_DRIVER
 
 [Defines.ARM, Defines.AARCH64]
   LIBRARY_CLASS                  = XenHypercallLib
@@ -64,3 +58,6 @@
 
 [Guids.IA32, Guids.X64]
   gEfiXenInfoGuid
+
+[BuildOptions.ARM]
+  RVCT:*_*_ARM_PLATFORM_FLAGS == --cpu Cortex-A15

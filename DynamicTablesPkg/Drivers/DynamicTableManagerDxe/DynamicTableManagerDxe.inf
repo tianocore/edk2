@@ -1,0 +1,47 @@
+## @file
+# Module that drives the table generation and installation process.
+#
+#  Copyright (c) 2017 - 2019, ARM Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010019
+  BASE_NAME                      = DynamicTableManagerDxe
+  FILE_GUID                      = 89122868-BCFD-49E8-88A3-06635CB7B3CF
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = DynamicTableManagerDxeInitialize
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = ARM AARCH64
+#
+
+[Sources]
+  DynamicTableManagerDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  DynamicTablesPkg/DynamicTablesPkg.dec
+
+[LibraryClasses]
+  PrintLib
+  TableHelperLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gEfiAcpiTableProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
+
+  gEdkiiConfigurationManagerProtocolGuid        # PROTOCOL ALWAYS_CONSUMED
+  gEdkiiDynamicTableFactoryProtocolGuid         # PROTOCOL ALWAYS_CONSUMED
+
+[Depex]
+  gEfiAcpiTableProtocolGuid AND
+  gEdkiiConfigurationManagerProtocolGuid AND
+  gEdkiiDynamicTableFactoryProtocolGuid
+

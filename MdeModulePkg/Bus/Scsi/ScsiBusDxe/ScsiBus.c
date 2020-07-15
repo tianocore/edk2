@@ -2,14 +2,8 @@
   SCSI Bus driver that layers on every SCSI Pass Thru and
   Extended SCSI Pass Thru protocol in the system.
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -188,7 +182,7 @@ SCSIBusDriverBindingSupported (
   SetMem (TargetId, TARGET_MAX_BYTES, 0xFF);
 
   //
-  // To keep backward compatibility, UEFI ExtPassThru Protocol is supported as well as 
+  // To keep backward compatibility, UEFI ExtPassThru Protocol is supported as well as
   // EFI PassThru Protocol. From priority perspective, ExtPassThru Protocol is firstly
   // tried to open on host controller handle. If fails, then PassThru Protocol is tried instead.
   //
@@ -217,7 +211,7 @@ SCSIBusDriverBindingSupported (
              &gEfiExtScsiPassThruProtocolGuid,
              This->DriverBindingHandle,
              Controller
-             );      
+             );
       return EFI_SUCCESS;
     } else {
       //
@@ -232,7 +226,7 @@ SCSIBusDriverBindingSupported (
              &gEfiExtScsiPassThruProtocolGuid,
              This->DriverBindingHandle,
              Controller
-             );      
+             );
       if (!EFI_ERROR(Status)) {
         return EFI_SUCCESS;
       }
@@ -240,7 +234,7 @@ SCSIBusDriverBindingSupported (
   }
 
   //
-  // Come here in 2 condition: 
+  // Come here in 2 condition:
   // 1. ExtPassThru doesn't exist.
   // 2. ExtPassThru exists but RemainingDevicePath is invalid.
   //
@@ -252,22 +246,22 @@ SCSIBusDriverBindingSupported (
                   Controller,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
-  
+
   if (Status == EFI_ALREADY_STARTED) {
     return EFI_SUCCESS;
   }
-  
+
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  
+
   //
   // Test RemainingDevicePath is valid or not.
   //
   if ((RemainingDevicePath != NULL) && !IsDevicePathEnd (RemainingDevicePath)) {
     Status = PassThru->GetTargetLun (PassThru, RemainingDevicePath, &ScsiTargetId.ScsiId.Scsi, &Lun);
   }
-  
+
   gBS->CloseProtocol (
          Controller,
          &gEfiScsiPassThruProtocolGuid,
@@ -325,10 +319,10 @@ SCSIBusDriverBindingStart (
   FromFirstTarget = FALSE;
   ExtScsiSupport  = FALSE;
   PassThruStatus  = EFI_SUCCESS;
-  
+
   TargetId = &ScsiTargetId.ScsiId.ExtScsi[0];
   SetMem (TargetId, TARGET_MAX_BYTES, 0xFF);
-  
+
   DevicePathStatus = gBS->OpenProtocol (
                             Controller,
                             &gEfiDevicePathProtocolGuid,
@@ -348,10 +342,10 @@ SCSIBusDriverBindingStart (
     EFI_PROGRESS_CODE,
     (EFI_IO_BUS_SCSI | EFI_IOB_PC_INIT),
     ParentDevicePath
-    );  
+    );
 
   //
-  // To keep backward compatibility, UEFI ExtPassThru Protocol is supported as well as 
+  // To keep backward compatibility, UEFI ExtPassThru Protocol is supported as well as
   // EFI PassThru Protocol. From priority perspective, ExtPassThru Protocol is firstly
   // tried to open on host controller handle. If fails, then PassThru Protocol is tried instead.
   //
@@ -386,13 +380,13 @@ SCSIBusDriverBindingStart (
                This->DriverBindingHandle,
                Controller
                );
-      } 
+      }
       return Status;
-    } 
+    }
   } else {
     //
-    // Succeed to open ExtPassThru Protocol, and meanwhile open PassThru Protocol 
-    // with BY_DRIVER if it is also present on the handle. The intent is to prevent 
+    // Succeed to open ExtPassThru Protocol, and meanwhile open PassThru Protocol
+    // with BY_DRIVER if it is also present on the handle. The intent is to prevent
     // another SCSI Bus Driver to work on the same host handle.
     //
     ExtScsiSupport = TRUE;
@@ -405,7 +399,7 @@ SCSIBusDriverBindingStart (
                             EFI_OPEN_PROTOCOL_BY_DRIVER
                             );
   }
-    
+
   if (Status != EFI_ALREADY_STARTED) {
     //
     // Go through here means either ExtPassThru or PassThru Protocol is successfully opened
@@ -423,14 +417,14 @@ SCSIBusDriverBindingStart (
     if (ScsiBusDev->ExtScsiSupport) {
       ScsiBusDev->ExtScsiInterface = ExtScsiInterface;
     } else {
-      ScsiBusDev->ScsiInterface    = ScsiInterface;    
+      ScsiBusDev->ScsiInterface    = ScsiInterface;
     }
 
     //
     // Install EFI_SCSI_BUS_PROTOCOL to the controller handle, So ScsiBusDev could be
     // retrieved on this controller handle. With ScsiBusDev, we can know which PassThru
     // Protocol is present on the handle, UEFI ExtPassThru Protocol or EFI PassThru Protocol.
-    // 
+    //
     Status = gBS->InstallProtocolInterface (
                     &Controller,
                     &gEfiCallerIdGuid,
@@ -472,17 +466,17 @@ SCSIBusDriverBindingStart (
   Lun  = 0;
   if (RemainingDevicePath == NULL) {
     //
-    // If RemainingDevicePath is NULL, 
+    // If RemainingDevicePath is NULL,
     // must enumerate all SCSI devices anyway
     //
     FromFirstTarget = TRUE;
   } else if (!IsDevicePathEnd (RemainingDevicePath)) {
     //
-    // If RemainingDevicePath isn't the End of Device Path Node, 
+    // If RemainingDevicePath isn't the End of Device Path Node,
     // only scan the specified device by RemainingDevicePath
     //
     if (ScsiBusDev->ExtScsiSupport) {
-      Status = ScsiBusDev->ExtScsiInterface->GetTargetLun (ScsiBusDev->ExtScsiInterface, RemainingDevicePath, &TargetId, &Lun);  
+      Status = ScsiBusDev->ExtScsiInterface->GetTargetLun (ScsiBusDev->ExtScsiInterface, RemainingDevicePath, &TargetId, &Lun);
     } else {
       Status = ScsiBusDev->ScsiInterface->GetTargetLun (ScsiBusDev->ScsiInterface, RemainingDevicePath, &ScsiTargetId.ScsiId.Scsi, &Lun);
     }
@@ -493,8 +487,8 @@ SCSIBusDriverBindingStart (
   } else {
     //
     // If RemainingDevicePath is the End of Device Path Node,
-    // skip enumerate any device and return EFI_SUCESSS
-    // 
+    // skip enumerate any device and return EFI_SUCCESS
+    //
     ScanOtherPuns = FALSE;
   }
 
@@ -539,11 +533,11 @@ SCSIBusDriverBindingStart (
   return EFI_SUCCESS;
 
 ErrorExit:
-  
+
   if (ScsiBusDev != NULL) {
     FreePool (ScsiBusDev);
   }
-  
+
   if (ExtScsiSupport) {
     gBS->CloseProtocol (
            Controller,
@@ -578,7 +572,7 @@ ErrorExit:
   restrictions for this service. DisconnectController() must follow these
   calling restrictions. If any other agent wishes to call Stop() it must also
   follow these calling restrictions.
-  
+
   @param  This              Protocol instance pointer.
   @param  ControllerHandle  Handle of device to stop driver on
   @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
@@ -650,7 +644,7 @@ SCSIBusDriverBindingStop (
              );
       //
       // When Start() succeeds to open ExtPassThru, it always tries to open PassThru BY_DRIVER.
-      // Its intent is to prevent another SCSI Bus Driver from woking on the same host handle. 
+      // Its intent is to prevent another SCSI Bus Driver from working on the same host handle.
       // So Stop() needs to try to close PassThru if present here.
       //
       gBS->CloseProtocol (
@@ -763,11 +757,11 @@ SCSIBusDriverBindingStop (
 
   @param  This          Protocol instance pointer.
   @param  DeviceType    A pointer to the device type information retrieved from
-                        the SCSI Controller. 
+                        the SCSI Controller.
 
   @retval EFI_SUCCESS             Retrieves the device type information successfully.
   @retval EFI_INVALID_PARAMETER   The DeviceType is NULL.
-  
+
 **/
 EFI_STATUS
 EFIAPI
@@ -833,7 +827,7 @@ ScsiGetDeviceLocation (
   @retval  EFI_DEVICE_ERROR  Errors encountered when resetting the SCSI bus.
   @retval  EFI_UNSUPPORTED   The bus reset operation is not supported by the
                              SCSI Host Controller.
-  @retval  EFI_TIMEOUT       A timeout occurred while attempting to reset 
+  @retval  EFI_TIMEOUT       A timeout occurred while attempting to reset
                              the SCSI bus.
 **/
 EFI_STATUS
@@ -893,7 +887,7 @@ ScsiResetDevice (
     (EFI_IO_BUS_ATA_ATAPI | EFI_IOB_PC_RESET),
     ScsiIoDevice->ScsiBusDeviceData->DevicePath
     );
-  
+
   CopyMem (Target,&ScsiIoDevice->Pun, TARGET_MAX_BYTES);
 
 
@@ -917,47 +911,47 @@ ScsiResetDevice (
   Sends a SCSI Request Packet to the SCSI Controller for execution.
 
   @param  This            Protocol instance pointer.
-  @param  CommandPacket   The SCSI request packet to send to the SCSI 
+  @param  CommandPacket   The SCSI request packet to send to the SCSI
                           Controller specified by the device handle.
   @param  Event           If the SCSI bus where the SCSI device is attached
-                          does not support non-blocking I/O, then Event is 
-                          ignored, and blocking I/O is performed.  
+                          does not support non-blocking I/O, then Event is
+                          ignored, and blocking I/O is performed.
                           If Event is NULL, then blocking I/O is performed.
-                          If Event is not NULL and non-blocking I/O is 
+                          If Event is not NULL and non-blocking I/O is
                           supported, then non-blocking I/O is performed,
                           and Event will be signaled when the SCSI Request
                           Packet completes.
 
-  @retval EFI_SUCCESS         The SCSI Request Packet was sent by the host 
-                              successfully, and TransferLength bytes were 
-                              transferred to/from DataBuffer.See 
-                              HostAdapterStatus, TargetStatus, 
+  @retval EFI_SUCCESS         The SCSI Request Packet was sent by the host
+                              successfully, and TransferLength bytes were
+                              transferred to/from DataBuffer.See
+                              HostAdapterStatus, TargetStatus,
                               SenseDataLength, and SenseData in that order
                               for additional status information.
-  @retval EFI_BAD_BUFFER_SIZE The SCSI Request Packet was executed, 
+  @retval EFI_BAD_BUFFER_SIZE The SCSI Request Packet was executed,
                               but the entire DataBuffer could not be transferred.
                               The actual number of bytes transferred is returned
-                              in TransferLength. See HostAdapterStatus, 
-                              TargetStatus, SenseDataLength, and SenseData in 
+                              in TransferLength. See HostAdapterStatus,
+                              TargetStatus, SenseDataLength, and SenseData in
                               that order for additional status information.
-  @retval EFI_NOT_READY       The SCSI Request Packet could not be sent because 
-                              there are too many SCSI Command Packets already 
+  @retval EFI_NOT_READY       The SCSI Request Packet could not be sent because
+                              there are too many SCSI Command Packets already
                               queued.The caller may retry again later.
-  @retval EFI_DEVICE_ERROR    A device error occurred while attempting to send 
-                              the SCSI Request Packet. See HostAdapterStatus, 
-                              TargetStatus, SenseDataLength, and SenseData in 
+  @retval EFI_DEVICE_ERROR    A device error occurred while attempting to send
+                              the SCSI Request Packet. See HostAdapterStatus,
+                              TargetStatus, SenseDataLength, and SenseData in
                               that order for additional status information.
-  @retval EFI_INVALID_PARAMETER  The contents of CommandPacket are invalid.  
-                                 The SCSI Request Packet was not sent, so no 
+  @retval EFI_INVALID_PARAMETER  The contents of CommandPacket are invalid.
+                                 The SCSI Request Packet was not sent, so no
                                  additional status information is available.
   @retval EFI_UNSUPPORTED     The command described by the SCSI Request Packet
-                              is not supported by the SCSI initiator(i.e., SCSI 
+                              is not supported by the SCSI initiator(i.e., SCSI
                               Host Controller). The SCSI Request Packet was not
-                              sent, so no additional status information is 
+                              sent, so no additional status information is
                               available.
-  @retval EFI_TIMEOUT         A timeout occurred while waiting for the SCSI 
+  @retval EFI_TIMEOUT         A timeout occurred while waiting for the SCSI
                               Request Packet to execute. See HostAdapterStatus,
-                              TargetStatus, SenseDataLength, and SenseData in 
+                              TargetStatus, SenseDataLength, and SenseData in
                               that order for additional status information.
 **/
 EFI_STATUS
@@ -973,10 +967,10 @@ ScsiExecuteSCSICommand (
   UINT8                                       Target[TARGET_MAX_BYTES];
   EFI_EVENT                                   PacketEvent;
   EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET  *ExtRequestPacket;
-  SCSI_EVENT_DATA                             EventData;                                     
+  SCSI_EVENT_DATA                             EventData;
 
   PacketEvent = NULL;
-  
+
   if (Packet == NULL) {
     return EFI_INVALID_PARAMETER;
   }
@@ -1105,7 +1099,7 @@ ScsiExecuteSCSICommand (
 
   @param  This           Protocol instance pointer
   @param  Controller     Controller handle
-  @param  TargetId       Tartget to be scanned
+  @param  TargetId       Target to be scanned
   @param  Lun            The Lun of the SCSI device on the SCSI channel.
   @param  ScsiBusDev     The pointer of SCSI_BUS_DEVICE
 
@@ -1258,7 +1252,7 @@ ScsiScanCreateDevice (
   return EFI_SUCCESS;
 
 ErrorExit:
-  
+
   //
   // The memory space for ScsiDevicePath is allocated in
   // ScsiPassThru->BuildDevicePath() function; It is no longer used
@@ -1298,15 +1292,26 @@ DiscoverScsiDevice (
   UINT8                 HostAdapterStatus;
   UINT8                 TargetStatus;
   EFI_SCSI_INQUIRY_DATA *InquiryData;
+  EFI_SCSI_SENSE_DATA   *SenseData;
   UINT8                 MaxRetry;
   UINT8                 Index;
   BOOLEAN               ScsiDeviceFound;
 
   HostAdapterStatus = 0;
   TargetStatus      = 0;
+  SenseData         = NULL;
 
   InquiryData = AllocateAlignedBuffer (ScsiIoDevice, sizeof (EFI_SCSI_INQUIRY_DATA));
   if (InquiryData == NULL) {
+    ScsiDeviceFound = FALSE;
+    goto Done;
+  }
+
+  SenseData = AllocateAlignedBuffer (
+                ScsiIoDevice,
+                sizeof (EFI_SCSI_SENSE_DATA)
+                );
+  if (SenseData == NULL) {
     ScsiDeviceFound = FALSE;
     goto Done;
   }
@@ -1315,15 +1320,16 @@ DiscoverScsiDevice (
   // Using Inquiry command to scan for the device
   //
   InquiryDataLength = sizeof (EFI_SCSI_INQUIRY_DATA);
-  SenseDataLength   = 0;
+  SenseDataLength   = sizeof (EFI_SCSI_SENSE_DATA);
   ZeroMem (InquiryData, InquiryDataLength);
+  ZeroMem (SenseData, SenseDataLength);
 
   MaxRetry = 2;
   for (Index = 0; Index < MaxRetry; Index++) {
     Status = ScsiInquiryCommand (
               &ScsiIoDevice->ScsiIo,
               SCSI_BUS_TIMEOUT,
-              NULL,
+              SenseData,
               &SenseDataLength,
               &HostAdapterStatus,
               &TargetStatus,
@@ -1332,10 +1338,18 @@ DiscoverScsiDevice (
               FALSE
               );
     if (!EFI_ERROR (Status)) {
+      if ((HostAdapterStatus == EFI_SCSI_IO_STATUS_HOST_ADAPTER_OK) &&
+          (TargetStatus == EFI_SCSI_IO_STATUS_TARGET_CHECK_CONDITION) &&
+          (SenseData->Error_Code == 0x70) &&
+          (SenseData->Sense_Key == EFI_SCSI_SK_ILLEGAL_REQUEST)) {
+        ScsiDeviceFound = FALSE;
+        goto Done;
+      }
       break;
-    } else if ((Status == EFI_BAD_BUFFER_SIZE) || 
-               (Status == EFI_INVALID_PARAMETER) ||
-               (Status == EFI_UNSUPPORTED)) {
+    }
+    if ((Status == EFI_BAD_BUFFER_SIZE) ||
+        (Status == EFI_INVALID_PARAMETER) ||
+        (Status == EFI_UNSUPPORTED)) {
       ScsiDeviceFound = FALSE;
       goto Done;
     }
@@ -1345,24 +1359,17 @@ DiscoverScsiDevice (
     ScsiDeviceFound = FALSE;
     goto Done;
   }
-  
+
   //
   // Retrieved inquiry data successfully
   //
-  if ((InquiryData->Peripheral_Qualifier != 0) &&
-      (InquiryData->Peripheral_Qualifier != 3)) {
+  if (InquiryData->Peripheral_Qualifier != 0) {
     ScsiDeviceFound = FALSE;
     goto Done;
   }
 
-  if (InquiryData->Peripheral_Qualifier == 3) {
-    if (InquiryData->Peripheral_Type != 0x1f) {
-      ScsiDeviceFound = FALSE;
-      goto Done;
-    }
-  }
-
-  if (0x1e >= InquiryData->Peripheral_Type && InquiryData->Peripheral_Type >= 0xa) {
+  if ((InquiryData->Peripheral_Type >= EFI_SCSI_TYPE_RESERVED_LOW) &&
+      (InquiryData->Peripheral_Type <= EFI_SCSI_TYPE_RESERVED_HIGH)) {
     ScsiDeviceFound = FALSE;
     goto Done;
   }
@@ -1384,6 +1391,7 @@ DiscoverScsiDevice (
   ScsiDeviceFound = TRUE;
 
 Done:
+  FreeAlignedBuffer (SenseData, sizeof (EFI_SCSI_SENSE_DATA));
   FreeAlignedBuffer (InquiryData, sizeof (EFI_SCSI_INQUIRY_DATA));
 
   return ScsiDeviceFound;

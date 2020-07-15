@@ -7,13 +7,7 @@
   Copyright (C) 2013, 2015, Red Hat, Inc.
   Copyright (c) 2008 - 2012, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials are licensed and made available
-  under the terms and conditions of the BSD License which accompanies this
-  distribution. The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT
-  WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -86,7 +80,7 @@ DetectSmbiosVersion (
     SmbiosVersion = (UINT16)(QemuAnchor.V3.MajorVersion << 8 |
                              QemuAnchor.V3.MinorVersion);
 
-    DEBUG ((EFI_D_INFO, "%a: SMBIOS 3.x DocRev from QEMU: 0x%02x\n",
+    DEBUG ((DEBUG_INFO, "%a: SMBIOS 3.x DocRev from QEMU: 0x%02x\n",
       __FUNCTION__, QemuAnchor.V3.DocRev));
     PcdStatus = PcdSet8S (PcdSmbiosDocRev, QemuAnchor.V3.DocRev);
     ASSERT_RETURN_ERROR (PcdStatus);
@@ -96,7 +90,7 @@ DetectSmbiosVersion (
     return RETURN_SUCCESS;
   }
 
-  DEBUG ((EFI_D_INFO, "%a: SMBIOS version from QEMU: 0x%04x\n", __FUNCTION__,
+  DEBUG ((DEBUG_INFO, "%a: SMBIOS version from QEMU: 0x%04x\n", __FUNCTION__,
     SmbiosVersion));
   PcdStatus = PcdSet16S (PcdSmbiosVersion, SmbiosVersion);
   ASSERT_RETURN_ERROR (PcdStatus);

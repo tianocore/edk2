@@ -1,0 +1,66 @@
+## @file
+#  This module produces EFI DHCPv4 Protocol and EFI DHCPv4 Service Binding Protocol.
+#
+#  This module produces EFI DHCPv4 Protocol upon EFI UDPv4 Protocol, to provide the
+#  capability to collect configuration information for the EFI IPv4 Protocol drivers
+#  and to provide DHCPv4 server and PXE boot server discovery services.
+#
+#  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Dhcp4Dxe
+  MODULE_UNI_FILE                = Dhcp4Dxe.uni
+  FILE_GUID                      = 94734718-0BBC-47fb-96A5-EE7A5AE6A2AD
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = Dhcp4DriverEntryPoint
+  UNLOAD_IMAGE                   = NetLibDefaultUnload
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+#  DRIVER_BINDING                =  gDhcp4DriverBinding
+#  COMPONENT_NAME                =  gDhcp4ComponentName
+#  COMPONENT_NAME2               =  gDhcp4ComponentName2
+#
+
+[Sources]
+  Dhcp4Impl.c
+  Dhcp4Io.c
+  Dhcp4Io.h
+  ComponentName.c
+  Dhcp4Driver.h
+  Dhcp4Driver.c
+  Dhcp4Option.c
+  Dhcp4Option.h
+  Dhcp4Impl.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  NetworkPkg/NetworkPkg.dec
+
+
+[LibraryClasses]
+  BaseLib
+  UefiLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  DebugLib
+  NetLib
+  UdpIoLib
+
+
+[Protocols]
+  gEfiDhcp4ServiceBindingProtocolGuid           ## BY_START
+  gEfiUdp4ServiceBindingProtocolGuid            ## TO_START
+  gEfiDhcp4ProtocolGuid                         ## BY_START
+  gEfiUdp4ProtocolGuid                          ## TO_START
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  Dhcp4DxeExtra.uni

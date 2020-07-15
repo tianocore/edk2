@@ -1,15 +1,9 @@
 /** @file
   Interface function of the Socket.
 
-  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -169,18 +163,6 @@ SockDestroyChild (
 
   ASSERT (Tcb != NULL);
 
-  Status            = EfiAcquireLockOrFail (&(Sock->Lock));
-  if (EFI_ERROR (Status)) {
-
-    DEBUG (
-      (EFI_D_ERROR,
-      "SockDestroyChild: Get the lock to access socket failed with %r\n",
-      Status)
-      );
-
-    return EFI_ACCESS_DENIED;
-  }
-
   //
   // Close the IP protocol.
   //
@@ -226,6 +208,19 @@ SockDestroyChild (
         NULL
         );
 
+
+  Status            = EfiAcquireLockOrFail (&(Sock->Lock));
+  if (EFI_ERROR (Status)) {
+
+    DEBUG (
+      (EFI_D_ERROR,
+      "SockDestroyChild: Get the lock to access socket failed with %r\n",
+      Status)
+      );
+
+    return EFI_ACCESS_DENIED;
+  }
+
   //
   // force protocol layer to detach the PCB
   //
@@ -260,12 +255,12 @@ SockDestroyChild (
 
 /**
   Create a socket and its associated protocol control block
-  with the intial data SockInitData and protocol specific
+  with the initial data SockInitData and protocol specific
   data ProtoData.
 
-  @param[in]  SockInitData         Inital data to setting the socket.
+  @param[in]  SockInitData         Initial data to setting the socket.
 
-  @return Pointer to the newly created socket. If NULL, an error condition occured.
+  @return Pointer to the newly created socket. If NULL, an error condition occurred.
 
 **/
 SOCKET *
@@ -402,7 +397,7 @@ OnExit:
 /**
   Initiate a connection establishment process.
 
-  @param[in]  Sock             Pointer to the socket to initiate the initate the
+  @param[in]  Sock             Pointer to the socket to initiate the
                                connection.
   @param[in]  Token            Pointer to the token used for the connection
                                operation.
@@ -479,7 +474,7 @@ OnExit:
   @param[in]  Sock             Pointer to the socket to accept connections.
   @param[in]  Token            The token to accept a connection.
 
-  @retval EFI_SUCCESS          Either a connection is accpeted or the Token is
+  @retval EFI_SUCCESS          Either a connection is accepted or the Token is
                                buffered for further acception.
   @retval EFI_ACCESS_DENIED    Failed to get the lock to access the socket, or the
                                socket is closed, or the socket is not configured to
@@ -984,7 +979,7 @@ EFI_STATUS
 SockCancel (
   IN OUT SOCKET  *Sock,
   IN     VOID    *Token
-  ) 
+  )
 {
   EFI_STATUS     Status;
 
@@ -1007,7 +1002,7 @@ SockCancel (
     Status = EFI_NOT_STARTED;
     goto Exit;
   }
-  
+
   //
   // 1. Check ConnectionToken.
   //
@@ -1038,7 +1033,7 @@ SockCancel (
   if (Token != NULL && !EFI_ERROR (Status)) {
     goto Exit;
   }
-  
+
   //
   // 4. Check SndTokenList.
   //
@@ -1051,7 +1046,7 @@ SockCancel (
   // 5. Check ProcessingSndTokenList.
   //
   Status = SockCancelToken (Token, &Sock->ProcessingSndTokenList);
-  
+
 Exit:
   EfiReleaseLock (&(Sock->Lock));
   return Status;
@@ -1076,52 +1071,6 @@ SockGetMode (
   )
 {
   return Sock->ProtoHandler (Sock, SOCK_MODE, Mode);
-}
-
-/**
-  Configure the low level protocol to join a multicast group for
-  this socket's connection.
-
-  @param[in]  Sock             Pointer to the socket of the connection to join the
-                               specific multicast group.
-  @param[in]  GroupInfo        Pointer to the multicast group info.
-
-  @retval EFI_SUCCESS          The configuration completed successfully.
-  @retval EFI_ACCESS_DENIED    Failed to get the lock to access the socket.
-  @retval EFI_NOT_STARTED      The socket is not configured.
-
-**/
-EFI_STATUS
-SockGroup (
-  IN SOCKET *Sock,
-  IN VOID   *GroupInfo
-  )
-{
-  EFI_STATUS  Status;
-
-  Status = EfiAcquireLockOrFail (&(Sock->Lock));
-
-  if (EFI_ERROR (Status)) {
-
-    DEBUG (
-      (EFI_D_ERROR,
-      "SockGroup: Get the access for socket failed with %r",
-      Status)
-      );
-
-    return EFI_ACCESS_DENIED;
-  }
-
-  if (SOCK_IS_UNCONFIGURED (Sock)) {
-    Status = EFI_NOT_STARTED;
-    goto Exit;
-  }
-
-  Status = Sock->ProtoHandler (Sock, SOCK_GROUP, GroupInfo);
-
-Exit:
-  EfiReleaseLock (&(Sock->Lock));
-  return Status;
 }
 
 /**

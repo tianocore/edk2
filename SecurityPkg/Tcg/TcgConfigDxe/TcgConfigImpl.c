@@ -1,14 +1,8 @@
 /** @file
   HII Config Access protocol implementation of TCG configuration module.
 
-Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials 
-are licensed and made available under the terms and conditions of the BSD License 
-which accompanies this distribution.  The full text of the license may be found at 
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, 
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2011 - 2019, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -40,7 +34,7 @@ HII_VENDOR_DEVICE_PATH          mTcgHiiVendorDevicePath = {
   {
     END_DEVICE_PATH_TYPE,
     END_ENTIRE_DEVICE_PATH_SUBTYPE,
-    { 
+    {
       (UINT8) (END_DEVICE_PATH_LENGTH),
       (UINT8) ((END_DEVICE_PATH_LENGTH) >> 8)
     }
@@ -73,7 +67,7 @@ GetTpmState (
   UINT8                         CmdBuf[64];
 
   ASSERT (TcgProtocol != NULL);
-  
+
   //
   // Get TPM Permanent flags (TpmEnable, TpmActivate)
   //
@@ -82,7 +76,7 @@ GetTpmState (
     *(UINT16*)&CmdBuf[0]  = SwapBytes16 (TPM_TAG_RQU_COMMAND);
     *(UINT32*)&CmdBuf[2]  = SwapBytes32 (TpmSendSize);
     *(UINT32*)&CmdBuf[6]  = SwapBytes32 (TPM_ORD_GetCapability);
-  
+
     *(UINT32*)&CmdBuf[10] = SwapBytes32 (TPM_CAP_FLAG);
     *(UINT32*)&CmdBuf[14] = SwapBytes32 (sizeof (TPM_CAP_FLAG_PERMANENT));
     *(UINT32*)&CmdBuf[18] = SwapBytes32 (TPM_CAP_FLAG_PERMANENT);
@@ -93,12 +87,12 @@ GetTpmState (
                             CmdBuf,
                             sizeof (CmdBuf),
                             CmdBuf
-                            ); 
+                            );
     TpmRsp = (TPM_RSP_COMMAND_HDR *) &CmdBuf[0];
     if (EFI_ERROR (Status) || (TpmRsp->tag != SwapBytes16 (TPM_TAG_RSP_COMMAND)) || (TpmRsp->returnCode != 0)) {
       return EFI_DEVICE_ERROR;
     }
-  
+
     TpmPermanentFlags = (TPM_PERMANENT_FLAGS *) &CmdBuf[sizeof (TPM_RSP_COMMAND_HDR) + sizeof (UINT32)];
 
     if (TpmEnable != NULL) {
@@ -109,8 +103,8 @@ GetTpmState (
       *TpmActivate = (BOOLEAN) !TpmPermanentFlags->deactivated;
     }
   }
- 
-  return EFI_SUCCESS;  
+
+  return EFI_SUCCESS;
 }
 
 /**
@@ -175,8 +169,8 @@ TcgExtractConfig (
 
   //
   // Convert buffer data to <ConfigResp> by helper function BlockToConfig()
-  //  
-  PrivateData->Configuration->TpmOperation = PHYSICAL_PRESENCE_ENABLE;
+  //
+  PrivateData->Configuration->TpmOperation = PHYSICAL_PRESENCE_NO_ACTION;
 
   //
   // Get current TPM state.
@@ -321,8 +315,8 @@ SavePpRequest (
                   );
   if (EFI_ERROR (Status)) {
     return Status;
-  }                
-                  
+  }
+
   PpData.PPRequest = PpRequest;
   Status = gRT->SetVariable (
                   PHYSICAL_PRESENCE_VARIABLE,
@@ -400,7 +394,7 @@ TcgCallback (
 
   SavePpRequest (Value->u8);
   *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
-  
+
   return EFI_SUCCESS;
 }
 
@@ -458,14 +452,14 @@ InstallTcgConfigForm (
            &gEfiHiiConfigAccessProtocolGuid,
            ConfigAccess,
            NULL
-           );  
+           );
 
     return EFI_OUT_OF_RESOURCES;
   }
-  
+
   PrivateData->HiiHandle = HiiHandle;
 
-  return EFI_SUCCESS;  
+  return EFI_SUCCESS;
 }
 
 /**

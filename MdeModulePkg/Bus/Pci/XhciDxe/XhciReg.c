@@ -3,13 +3,7 @@
   The XHCI register operation routines.
 
 Copyright (c) 2011 - 2017, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -158,75 +152,9 @@ XhcWriteOpReg (
   }
 }
 
-/**
-  Write the data to the 2-bytes width XHCI operational register.
 
-  @param  Xhc          The XHCI Instance.
-  @param  Offset       The offset of the 2-bytes width operational register.
-  @param  Data         The data to write.
 
-**/
-VOID
-XhcWriteOpReg16 (
-  IN USB_XHCI_INSTANCE    *Xhc,
-  IN UINT32               Offset,
-  IN UINT16               Data
-  )
-{
-  EFI_STATUS              Status;
 
-  ASSERT (Xhc->CapLength != 0);
-
-  Status = Xhc->PciIo->Mem.Write (
-                             Xhc->PciIo,
-                             EfiPciIoWidthUint16,
-                             XHC_BAR_INDEX,
-                             Xhc->CapLength + Offset,
-                             1,
-                             &Data
-                             );
-
-  if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "XhcWriteOpReg16: Pci Io Write error: %r at %d\n", Status, Offset));
-  }
-}
-
-/**
-  Read XHCI door bell register.
-
-  @param  Xhc          The XHCI Instance.
-  @param  Offset       The offset of the door bell register.
-
-  @return The register content read
-
-**/
-UINT32
-XhcReadDoorBellReg (
-  IN  USB_XHCI_INSTANCE   *Xhc,
-  IN  UINT32              Offset
-  )
-{
-  UINT32                  Data;
-  EFI_STATUS              Status;
-
-  ASSERT (Xhc->DBOff != 0);
-
-  Status = Xhc->PciIo->Mem.Read (
-                             Xhc->PciIo,
-                             EfiPciIoWidthUint32,
-                             XHC_BAR_INDEX,
-                             Xhc->DBOff + Offset,
-                             1,
-                             &Data
-                             );
-
-  if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "XhcReadDoorBellReg: Pci Io Read error - %r at %d\n", Status, Offset));
-    Data = 0xFFFFFFFF;
-  }
-
-  return Data;
-}
 
 /**
   Write the data to the XHCI door bell register.
@@ -653,6 +581,39 @@ XhcIsSysError (
 }
 
 /**
+  Set USBCMD Host System Error Enable(HSEE) Bit if PCICMD SERR# Enable Bit is set.
+
+  The USBCMD HSEE Bit will be reset to default 0 by USBCMD Host Controller Reset(HCRST).
+  This function is to set USBCMD HSEE Bit if PCICMD SERR# Enable Bit is set.
+
+  @param Xhc            The XHCI Instance.
+
+**/
+VOID
+XhcSetHsee (
+  IN USB_XHCI_INSTANCE  *Xhc
+  )
+{
+  EFI_STATUS            Status;
+  EFI_PCI_IO_PROTOCOL   *PciIo;
+  UINT16                XhciCmd;
+
+  PciIo = Xhc->PciIo;
+  Status = PciIo->Pci.Read (
+                        PciIo,
+                        EfiPciIoWidthUint16,
+                        PCI_COMMAND_OFFSET,
+                        sizeof (XhciCmd) / sizeof (UINT16),
+                        &XhciCmd
+                        );
+  if (!EFI_ERROR (Status)) {
+    if ((XhciCmd & EFI_PCI_COMMAND_SERR) != 0) {
+      XhcSetOpRegBit (Xhc, XHC_USBCMD_OFFSET, XHC_USBCMD_HSEE);
+    }
+  }
+}
+
+/**
   Reset the XHCI host controller.
 
   @param  Xhc          The XHCI Instance.
@@ -694,6 +655,14 @@ XhcResetHC (
     //
     gBS->Stall (XHC_1_MILLISECOND);
     Status = XhcWaitOpRegBit (Xhc, XHC_USBCMD_OFFSET, XHC_USBCMD_RESET, FALSE, Timeout);
+
+    if (!EFI_ERROR (Status)) {
+      //
+      // The USBCMD HSEE Bit will be reset to default 0 by USBCMD HCRST.
+      // Set USBCMD HSEE Bit if PCICMD SERR# Enable Bit is set.
+      //
+      XhcSetHsee (Xhc);
+    }
   }
 
   return Status;

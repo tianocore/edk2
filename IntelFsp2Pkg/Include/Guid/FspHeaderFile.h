@@ -1,15 +1,9 @@
 /** @file
   Intel FSP Header File definition from Intel Firmware Support Package External
-  Architecture Specification v2.0.
+  Architecture Specification v2.0 and above.
 
-  Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2014 - 2020, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -116,6 +110,12 @@ typedef struct {
   /// Byte 0x44: The offset for the API to initialize the CPU and chipset.
   ///
   UINT32  FspSiliconInitEntryOffset;
+  ///
+  /// Byte 0x48: Offset for the API for the optional Multi-Phase processor and chipset initialization.
+  ///            This value is only valid if FSP HeaderRevision is >= 5.
+  ///            If the value is set to 0x00000000, then this API is not available in this component.
+  ///
+  UINT32  FspMultiPhaseSiInitEntryOffset;
 } FSP_INFO_HEADER;
 
 ///
@@ -144,7 +144,7 @@ typedef struct {
   ///
   UINT8   Reserved;
   ///
-  /// Byte 0x0A: FSP producer identification string 
+  /// Byte 0x0A: FSP producer identification string
   ///
   CHAR8   FspProducerId[6];
   ///

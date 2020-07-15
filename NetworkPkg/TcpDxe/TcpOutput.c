@@ -1,15 +1,9 @@
 /** @file
   TCP output process routines.
 
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -292,7 +286,11 @@ TcpTransmitSegment (
   BOOLEAN   Syn;
   UINT32    DataLen;
 
-  ASSERT ((Nbuf != NULL) && (Nbuf->Tcp == NULL) && (TcpVerifySegment (Nbuf) != 0));
+  ASSERT ((Nbuf != NULL) && (Nbuf->Tcp == NULL));
+
+  if (TcpVerifySegment (Nbuf) == 0) {
+    return -1;
+  }
 
   DataLen = Nbuf->TotalSize;
 
@@ -479,7 +477,7 @@ TcpGetSegmentSndQue (
 
   //
   // If SYN is set and out of the range, clear the flag.
-  // Becuase the sequence of the first byte is SEG.SEQ+1,
+  // Because the sequence of the first byte is SEG.SEQ+1,
   // adjust Offset by -1. If SYN is in the range, copy
   // one byte less.
   //
@@ -634,7 +632,11 @@ TcpGetSegment (
     Nbuf = TcpGetSegmentSock (Tcb, Seq, Len);
   }
 
-  ASSERT (TcpVerifySegment (Nbuf) != 0);
+  if (TcpVerifySegment (Nbuf) == 0) {
+    NetbufFree (Nbuf);
+    return NULL;
+  }
+
   return Nbuf;
 }
 
@@ -658,13 +660,33 @@ TcpRetransmit (
   UINT32  Len;
 
   //
-  // Compute the maxium length of retransmission. It is
+  // Compute the maximum length of retransmission. It is
   // limited by three factors:
   // 1. Less than SndMss
   // 2. Must in the current send window
   // 3. Will not change the boundaries of queued segments.
   //
-  if (TCP_SEQ_LT (Tcb->SndWl2 + Tcb->SndWnd, Seq)) {
+
+  //
+  // Handle the Window Retraction if TCP window scale is enabled according to RFC7323:
+  //   On first retransmission, or if the sequence number is out of
+  //   window by less than 2^Rcv.Wind.Shift, then do normal
+  //   retransmission(s) without regard to the receiver window as long
+  //   as the original segment was in window when it was sent.
+  //
+  if ((Tcb->SndWndScale != 0) &&
+      (TCP_SEQ_GT (Seq, Tcb->RetxmitSeqMax) || TCP_SEQ_BETWEEN (Tcb->SndWl2 + Tcb->SndWnd, Seq, Tcb->SndWl2 + Tcb->SndWnd + (1 << Tcb->SndWndScale)))) {
+    Len = TCP_SUB_SEQ (Tcb->SndNxt, Seq);
+    DEBUG (
+      (EFI_D_WARN,
+      "TcpRetransmit: retransmission without regard to the receiver window for TCB %p\n",
+      Tcb)
+      );
+
+  } else if (TCP_SEQ_GEQ (Tcb->SndWl2 + Tcb->SndWnd, Seq)) {
+    Len = TCP_SUB_SEQ (Tcb->SndWl2 + Tcb->SndWnd, Seq);
+
+  } else {
     DEBUG (
       (EFI_D_WARN,
       "TcpRetransmit: retransmission cancelled because send window too small for TCB %p\n",
@@ -674,18 +696,23 @@ TcpRetransmit (
     return 0;
   }
 
-  Len   = TCP_SUB_SEQ (Tcb->SndWl2 + Tcb->SndWnd, Seq);
-  Len   = MIN (Len, Tcb->SndMss);
+  Len = MIN (Len, Tcb->SndMss);
 
-  Nbuf  = TcpGetSegmentSndQue (Tcb, Seq, Len);
+  Nbuf = TcpGetSegmentSndQue (Tcb, Seq, Len);
   if (Nbuf == NULL) {
     return -1;
   }
 
-  ASSERT (TcpVerifySegment (Nbuf) != 0);
+  if (TcpVerifySegment (Nbuf) == 0) {
+    goto OnError;
+  }
 
   if (TcpTransmitSegment (Tcb, Nbuf) != 0) {
     goto OnError;
+  }
+
+  if (TCP_SEQ_GT (Seq, Tcb->RetxmitSeqMax)) {
+    Tcb->RetxmitSeqMax = Seq;
   }
 
   //
@@ -863,8 +890,14 @@ TcpToSendData (
     Seg->End  = End;
     Seg->Flag = Flag;
 
-    ASSERT (TcpVerifySegment (Nbuf) != 0);
-    ASSERT (TcpCheckSndQue (&Tcb->SndQue) != 0);
+    if (TcpVerifySegment (Nbuf) == 0 || TcpCheckSndQue (&Tcb->SndQue) == 0) {
+      DEBUG (
+        (EFI_D_ERROR,
+        "TcpToSendData: discard a broken segment for TCB %p\n",
+        Tcb)
+        );
+      goto OnError;
+    }
 
     //
     // Don't send an empty segment here.
@@ -876,8 +909,7 @@ TcpToSendData (
         Tcb)
         );
 
-      NetbufFree (Nbuf);
-      return Sent;
+      goto OnError;
     }
 
     if (TcpTransmitSegment (Tcb, Nbuf) != 0) {

@@ -1,15 +1,9 @@
 /** @file
-  
+
   VfrCompiler error handler.
 
-Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -45,13 +39,14 @@ static SVFR_ERROR_HANDLE VFR_ERROR_HANDLE_TABLE [] = {
   { VFR_RETURN_DATA_STRING_ERROR, ": data field string error or not support"},
   { VFR_RETURN_DEFAULT_VALUE_REDEFINED, ": default value re-defined with different value"},
   { VFR_RETURN_CONSTANT_ONLY, ": only constant is allowed in the expression"},
-  { VFR_RETURN_VARSTORE_NAME_REDEFINED_ERROR, ": Varstore name is defined by more than one varstores, it can't be referred as varstore, only varstore strucure name could be used."},
+  { VFR_RETURN_VARSTORE_NAME_REDEFINED_ERROR, ": Varstore name is defined by more than one varstores, it can't be referred as varstore, only varstore structure name could be used."},
+  { VFR_RETURN_BIT_WIDTH_ERROR, ": bit width must be <= sizeof (type) * 8 and the max width can not > 32" },
+  { VFR_RETURN_STRING_TO_UINT_OVERFLOW, ": String to UINT* Overflow"},
   { VFR_RETURN_CODEUNDEFINED, ": undefined Error Code" }
 };
 
 static SVFR_WARNING_HANDLE VFR_WARNING_HANDLE_TABLE [] = {
   { VFR_WARNING_DEFAULT_VALUE_REDEFINED, ": default value re-defined with different value"},
-  { VFR_WARNING_STRING_TO_UINT_OVERFLOW, ": String to UINT* Overflow"},
   { VFR_WARNING_ACTION_WITH_TEXT_TWO, ": Action opcode should not have TextTwo part"},
   { VFR_WARNING_OBSOLETED_FRAMEWORK_OPCODE, ": Not recommend to use obsoleted framework opcode"},
   { VFR_WARNING_CODEUNDEFINED, ": undefined Warning Code" }
@@ -66,6 +61,7 @@ CVfrErrorHandle::CVfrErrorHandle (
   mScopeRecordListTail   = NULL;
   mVfrErrorHandleTable   = VFR_ERROR_HANDLE_TABLE;
   mVfrWarningHandleTable = VFR_WARNING_HANDLE_TABLE;
+  mWarningAsError        = FALSE;
 }
 
 CVfrErrorHandle::~CVfrErrorHandle (
@@ -75,7 +71,7 @@ CVfrErrorHandle::~CVfrErrorHandle (
   SVfrFileScopeRecord *pNode = NULL;
 
   if (mInputFileName != NULL) {
-    delete mInputFileName;
+    delete[] mInputFileName;
   }
 
   while (mScopeRecordListHead != NULL) {
@@ -110,7 +106,7 @@ CVfrErrorHandle::SetInputFile (
 }
 
 SVfrFileScopeRecord::SVfrFileScopeRecord (
-  IN CHAR8    *Record, 
+  IN CHAR8    *Record,
   IN UINT32   LineNum
   )
 {
@@ -151,7 +147,7 @@ SVfrFileScopeRecord::~SVfrFileScopeRecord (
 
 VOID
 CVfrErrorHandle::ParseFileScopeRecord (
-  IN CHAR8     *Record, 
+  IN CHAR8     *Record,
   IN UINT32    WholeScopeLine
   )
 {
@@ -220,7 +216,7 @@ CVfrErrorHandle::PrintMsg (
 {
   CHAR8                  *FileName = NULL;
   UINT32                 FileLine;
-  
+
   if (strncmp ("Warning", MsgType, strlen ("Warning")) == 0) {
     VerboseMsg ((CHAR8 *) ErrorMsg);
     return;

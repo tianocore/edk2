@@ -1,14 +1,8 @@
 /** @file
   System Firmware update header file.
 
-  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -36,7 +30,6 @@
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/DevicePathLib.h>
 #include <Library/HobLib.h>
-#include <Library/DxeServicesLib.h>
 #include <Library/DxeServicesTableLib.h>
 #include <Library/PlatformFlashAccessLib.h>
 #include <Library/EdkiiSystemCapsuleLib.h>
@@ -120,7 +113,7 @@ typedef struct {
 
 #define  ABORT_REASON_MAX_SIZE              0x40  // UnicodeStringSize including final L'\0'
 
-#define  CAPSULE_IMAGE_ADDITIONAL_MAX_SIZE  (0x20020 + 0xA0000) // Addtional size for Capsule Header, FV block alignment + DispatchImage.
+#define  CAPSULE_IMAGE_ADDITIONAL_MAX_SIZE  (0x20020 + 0xA0000) // Additional size for Capsule Header, FV block alignment + DispatchImage.
 
 typedef struct {
   UINT8       ImageIndex;
@@ -203,7 +196,7 @@ FmpGetImageInfo (
   @retval EFI_INVALID_PARAMETER  The Image was NULL.
   @retval EFI_NOT_FOUND          The current image is not copied to the buffer.
   @retval EFI_UNSUPPORTED        The operation is not supported.
-  @retval EFI_SECURITY_VIOLATIO  The operation could not be performed due to an authentication failure.
+  @retval EFI_SECURITY_VIOLATION The operation could not be performed due to an authentication failure.
 
 **/
 EFI_STATUS
@@ -258,7 +251,7 @@ FmpGetImage (
   @retval EFI_ABORTED            The operation is aborted.
   @retval EFI_INVALID_PARAMETER  The Image was NULL.
   @retval EFI_UNSUPPORTED        The operation is not supported.
-  @retval EFI_SECURITY_VIOLATIO  The operation could not be performed due to an authentication failure.
+  @retval EFI_SECURITY_VIOLATION The operation could not be performed due to an authentication failure.
 
 **/
 EFI_STATUS
@@ -290,7 +283,7 @@ FmpSetImage (
   @retval EFI_SUCCESS            The image was successfully checked.
   @retval EFI_INVALID_PARAMETER  The Image was NULL.
   @retval EFI_UNSUPPORTED        The operation is not supported.
-  @retval EFI_SECURITY_VIOLATIO  The operation could not be performed due to an authentication failure.
+  @retval EFI_SECURITY_VIOLATION The operation could not be performed due to an authentication failure.
 
 **/
 EFI_STATUS
@@ -374,7 +367,7 @@ FmpGetPackageInfo (
   @retval EFI_INVALID_PARAMETER  The PackageVersionName length is longer than the value
                                  returned in PackageVersionNameMaxLen.
   @retval EFI_UNSUPPORTED        The operation is not supported.
-  @retval EFI_SECURITY_VIOLATIO  The operation could not be performed due to an authentication failure.
+  @retval EFI_SECURITY_VIOLATION The operation could not be performed due to an authentication failure.
 
 **/
 EFI_STATUS

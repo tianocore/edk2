@@ -2,14 +2,9 @@
   Implement ReadOnly Variable Services required by PEIM and install
   PEI ReadOnly Varaiable2 PPI. These services operates the non volatile storage space.
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) Microsoft Corporation.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -57,7 +52,7 @@ PeimInitializeVariableServices (
 
   @param VarStoreHeader  Pointer to the Variable Store Header.
 
-  @return Pointer to the first variable header
+  @return Pointer to the first variable header.
 
 **/
 VARIABLE_HEADER *
@@ -66,18 +61,22 @@ GetStartPointer (
   )
 {
   //
-  // The end of variable store
+  // The start of variable store
   //
   return (VARIABLE_HEADER *) HEADER_ALIGN (VarStoreHeader + 1);
 }
 
 
 /**
-  This code gets the pointer to the last variable memory pointer byte.
 
-  @param  VarStoreHeader  Pointer to the Variable Store Header.
+  Gets the pointer to the end of the variable storage area.
 
-  @return VARIABLE_HEADER* pointer to last unavailable Variable Header.
+  This function gets pointer to the end of the variable storage
+  area, according to the input variable store header.
+
+  @param VarStoreHeader  Pointer to the Variable Store Header.
+
+  @return Pointer to the end of the variable storage area.
 
 **/
 VARIABLE_HEADER *
@@ -496,6 +495,58 @@ CompareWithValidVariable (
 }
 
 /**
+  Get HOB variable store.
+
+  @param[out] StoreInfo             Return the store info.
+  @param[out] VariableStoreHeader   Return variable store header.
+
+**/
+VOID
+GetHobVariableStore (
+  OUT VARIABLE_STORE_INFO        *StoreInfo,
+  OUT VARIABLE_STORE_HEADER      **VariableStoreHeader
+  )
+{
+  EFI_HOB_GUID_TYPE              *GuidHob;
+
+  //
+  // Make sure there is no more than one Variable HOB.
+  //
+  DEBUG_CODE (
+    GuidHob = GetFirstGuidHob (&gEfiAuthenticatedVariableGuid);
+    if (GuidHob != NULL) {
+      if ((GetNextGuidHob (&gEfiAuthenticatedVariableGuid, GET_NEXT_HOB (GuidHob)) != NULL)) {
+        DEBUG ((DEBUG_ERROR, "ERROR: Found two Auth Variable HOBs\n"));
+        ASSERT (FALSE);
+      } else if (GetFirstGuidHob (&gEfiVariableGuid) != NULL) {
+        DEBUG ((DEBUG_ERROR, "ERROR: Found one Auth + one Normal Variable HOBs\n"));
+        ASSERT (FALSE);
+      }
+    } else {
+      GuidHob = GetFirstGuidHob (&gEfiVariableGuid);
+      if (GuidHob != NULL) {
+        if ((GetNextGuidHob (&gEfiVariableGuid, GET_NEXT_HOB (GuidHob)) != NULL)) {
+          DEBUG ((DEBUG_ERROR, "ERROR: Found two Normal Variable HOBs\n"));
+          ASSERT (FALSE);
+        }
+      }
+    }
+  );
+
+  GuidHob = GetFirstGuidHob (&gEfiAuthenticatedVariableGuid);
+  if (GuidHob != NULL) {
+    *VariableStoreHeader = (VARIABLE_STORE_HEADER *) GET_GUID_HOB_DATA (GuidHob);
+    StoreInfo->AuthFlag = TRUE;
+  } else {
+    GuidHob = GetFirstGuidHob (&gEfiVariableGuid);
+    if (GuidHob != NULL) {
+      *VariableStoreHeader = (VARIABLE_STORE_HEADER *) GET_GUID_HOB_DATA (GuidHob);
+      StoreInfo->AuthFlag = FALSE;
+    }
+  }
+}
+
+/**
   Return the variable store header and the store info based on the Index.
 
   @param Type       The type of the variable store.
@@ -523,23 +574,14 @@ GetVariableStore (
   VariableStoreHeader = NULL;
   switch (Type) {
     case VariableStoreTypeHob:
-      GuidHob = GetFirstGuidHob (&gEfiAuthenticatedVariableGuid);
-      if (GuidHob != NULL) {
-        VariableStoreHeader = (VARIABLE_STORE_HEADER *) GET_GUID_HOB_DATA (GuidHob);
-        StoreInfo->AuthFlag = TRUE;
-      } else {
-        GuidHob = GetFirstGuidHob (&gEfiVariableGuid);
-        if (GuidHob != NULL) {
-          VariableStoreHeader = (VARIABLE_STORE_HEADER *) GET_GUID_HOB_DATA (GuidHob);
-          StoreInfo->AuthFlag = FALSE;
-        }
-      }
+      GetHobVariableStore (StoreInfo, &VariableStoreHeader);
+
       break;
 
     case VariableStoreTypeNv:
-      if (GetBootModeHob () != BOOT_IN_RECOVERY_MODE) {
+      if (!PcdGetBool (PcdEmuVariableNvModeEnable)) {
         //
-        // The content of NV storage for variable is not reliable in recovery boot mode.
+        // Emulated non-volatile variable mode is not enabled.
         //
 
         NvStorageSize = PcdGet32 (PcdFlashNvStorageVariableSize);
@@ -547,6 +589,8 @@ GetVariableStore (
                                                 PcdGet64 (PcdFlashNvStorageVariableBase64) :
                                                 PcdGet32 (PcdFlashNvStorageVariableBase)
                                                );
+        ASSERT (NvStorageBase != 0);
+
         //
         // First let FvHeader point to NV storage base.
         //
@@ -853,7 +897,7 @@ FindVariableEx (
       //
       if ((IndexTable != NULL) && !StopRecord) {
         Offset = (UINTN) Variable - (UINTN) LastVariable;
-        if ((Offset > 0x0FFFF) || (IndexTable->Length == sizeof (IndexTable->Index) / sizeof (IndexTable->Index[0]))) {
+        if ((Offset > 0x0FFFF) || (IndexTable->Length >= sizeof (IndexTable->Index) / sizeof (IndexTable->Index[0]))) {
           //
           // Stop to record if the distance of two neighbouring VAR_ADDED variable is larger than the allowable scope(UINT16),
           // or the record buffer is full.
@@ -947,9 +991,10 @@ FindVariable (
   @param  DataSize              On entry, points to the size in bytes of the Data buffer.
                                 On return, points to the size of the data returned in Data.
   @param  Data                  Points to the buffer which will hold the returned variable value.
+                                May be NULL with a zero DataSize in order to determine the size of the buffer needed.
 
   @retval EFI_SUCCESS           The variable was read successfully.
-  @retval EFI_NOT_FOUND         The variable could not be found.
+  @retval EFI_NOT_FOUND         The variable was be found.
   @retval EFI_BUFFER_TOO_SMALL  The DataSize is too small for the resulting data.
                                 DataSize is updated with the size required for
                                 the specified variable.
@@ -965,7 +1010,7 @@ PeiGetVariable (
   IN CONST  EFI_GUID                        *VariableGuid,
   OUT       UINT32                          *Attributes,
   IN OUT    UINTN                           *DataSize,
-  OUT       VOID                            *Data
+  OUT       VOID                            *Data OPTIONAL
   )
 {
   VARIABLE_POINTER_TRACK  Variable;
@@ -1003,17 +1048,17 @@ PeiGetVariable (
     }
 
     GetVariableNameOrData (&StoreInfo, GetVariableDataPtr (Variable.CurrPtr, VariableHeader, StoreInfo.AuthFlag), VarDataSize, Data);
-
-    if (Attributes != NULL) {
-      *Attributes = VariableHeader->Attributes;
-    }
-
-    *DataSize = VarDataSize;
-    return EFI_SUCCESS;
+    Status = EFI_SUCCESS;
   } else {
-    *DataSize = VarDataSize;
-    return EFI_BUFFER_TOO_SMALL;
+    Status = EFI_BUFFER_TOO_SMALL;
   }
+
+  if (Attributes != NULL) {
+    *Attributes = VariableHeader->Attributes;
+  }
+  *DataSize = VarDataSize;
+
+  return Status;
 }
 
 /**

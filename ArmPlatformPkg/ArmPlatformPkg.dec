@@ -1,15 +1,9 @@
 #/** @file
 #
-#  Copyright (c) 2011-2016, ARM Limited. All rights reserved.
+#  Copyright (c) 2011-2018, ARM Limited. All rights reserved.
 #  Copyright (c) 2015, Intel Corporation. All rights reserved.
 #
-#  This program and the accompanying materials
-#  are licensed and made available under the terms and conditions of the BSD License
-#  which accompanies this distribution.  The full text of the license may be found at
-#  http://opensource.org/licenses/bsd-license.php
-#
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 #**/
 
@@ -31,21 +25,18 @@
 [Includes.common]
   Include                        # Root include for the package
 
+[LibraryClasses]
+  ArmPlatformLib|Include/Library/ArmPlatformLib.h
+  LcdHwLib|Include/Library/LcdHwLib.h
+  LcdPlatformLib|Include/Library/LcdPlatformLib.h
+  NorFlashPlatformLib|Include/Library/NorFlashPlatformLib.h
+  PL011UartClockLib|Include/Library/PL011UartClockLib.h
+  PL011UartLib|Include/Library/PL011UartLib.h
+
 [Guids.common]
   gArmPlatformTokenSpaceGuid   = { 0x9c0aaed4, 0x74c5, 0x4043, { 0xb4, 0x17, 0xa3, 0x22, 0x38, 0x14, 0xce, 0x76 } }
-  #
-  # Following Guid must match FILE_GUID in MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
-  #
-  gVariableRuntimeDxeFileGuid = { 0xcbd2e4d5, 0x7068, 0x4ff5, { 0xb4, 0x62, 0x98, 0x22, 0xb4, 0xad, 0x8d, 0x60 } }
-
-  gArmBootMonFsFileInfoGuid   = { 0x41e26b9c, 0xada6, 0x45b3, { 0x80, 0x8e, 0x23, 0x57, 0xa3, 0x5b, 0x60, 0xd6 } }
 
 [PcdsFeatureFlag.common]
-  # Set this PCD to TRUE to map NORFlash at 0x0. FALSE means the DRAM is mapped at 0x0.
-  gArmPlatformTokenSpaceGuid.PcdNorFlashRemapping|FALSE|BOOLEAN|0x00000012
-
-  gArmPlatformTokenSpaceGuid.PcdStandalone|TRUE|BOOLEAN|0x00000001
-  gArmPlatformTokenSpaceGuid.PcdSystemMemoryInitializeInSec|FALSE|BOOLEAN|0x00000002
   gArmPlatformTokenSpaceGuid.PcdSendSgiToBringUpSecondaryCores|FALSE|BOOLEAN|0x00000004
 
   gArmPlatformTokenSpaceGuid.PcdNorFlashCheckBlockLocked|FALSE|BOOLEAN|0x0000003C
@@ -54,17 +45,9 @@
   # we assume the OS will handle the FrameBuffer from the UEFI GOP information.
   gArmPlatformTokenSpaceGuid.PcdGopDisableOnExitBootServices|FALSE|BOOLEAN|0x0000003D
 
-  # Enable Legacy Linux support in the BDS
-  gArmPlatformTokenSpaceGuid.PcdBdsLinuxSupport|FALSE|BOOLEAN|0x0000002E
-
 [PcdsFixedAtBuild.common]
   gArmPlatformTokenSpaceGuid.PcdCoreCount|1|UINT32|0x00000039
   gArmPlatformTokenSpaceGuid.PcdClusterCount|1|UINT32|0x00000038
-
-  # Stack for CPU Cores in Secure Mode
-  gArmPlatformTokenSpaceGuid.PcdCPUCoresSecStackBase|0|UINT64|0x00000005
-  gArmPlatformTokenSpaceGuid.PcdCPUCoreSecPrimaryStackSize|0x10000|UINT32|0x00000036
-  gArmPlatformTokenSpaceGuid.PcdCPUCoreSecSecondaryStackSize|0x1000|UINT32|0x00000006
 
   # Stack for CPU Cores in Non Secure Mode
   gArmPlatformTokenSpaceGuid.PcdCPUCoresStackBase|0|UINT64|0x00000009
@@ -74,29 +57,21 @@
   # Size of the region used by UEFI in permanent memory (Reserved 128MB by default)
   gArmPlatformTokenSpaceGuid.PcdSystemMemoryUefiRegionSize|0x08000000|UINT32|0x00000015
 
-  # Boot Monitor FileSystem
-  gArmPlatformTokenSpaceGuid.PcdBootMonFsSupportedDevicePaths|L""|VOID*|0x0000003A
-
   #
   # ARM Primecells
   #
 
-  ## SP804 DualTimer
-  gArmPlatformTokenSpaceGuid.PcdSP804TimerFrequencyInMHz|1|UINT32|0x0000001D
-  gArmPlatformTokenSpaceGuid.PcdSP804TimerPeriodicInterruptNum|0|UINT32|0x0000001E
-  gArmPlatformTokenSpaceGuid.PcdSP804TimerPeriodicBase|0|UINT32|0x0000002A
-  gArmPlatformTokenSpaceGuid.PcdSP804TimerPerformanceBase|0|UINT32|0x0000002B
-  gArmPlatformTokenSpaceGuid.PcdSP804TimerMetronomeBase|0|UINT32|0x0000002C
-
   ## SP805 Watchdog
   gArmPlatformTokenSpaceGuid.PcdSP805WatchdogBase|0x0|UINT32|0x00000023
   gArmPlatformTokenSpaceGuid.PcdSP805WatchdogClockFrequencyInHz|32000|UINT32|0x00000021
+  gArmPlatformTokenSpaceGuid.PcdSP805WatchdogInterrupt|0|UINT32|0x0000002E
 
   ## PL011 UART
   gArmPlatformTokenSpaceGuid.PL011UartClkInHz|24000000|UINT32|0x0000001F
   gArmPlatformTokenSpaceGuid.PL011UartInteger|0|UINT32|0x00000020
   gArmPlatformTokenSpaceGuid.PL011UartFractional|0|UINT32|0x0000002D
   gArmPlatformTokenSpaceGuid.PL011UartInterrupt|0x00000000|UINT32|0x0000002F
+  gArmPlatformTokenSpaceGuid.PL011UartRegOffsetVariant|0|UINT8|0x0000003E
 
   ## PL011 Serial Debug UART
   gArmPlatformTokenSpaceGuid.PcdSerialDbgRegisterBase|0x00000000|UINT64|0x00000030
@@ -110,35 +85,28 @@
   gArmPlatformTokenSpaceGuid.PcdPL111LcdBase|0x0|UINT32|0x00000026
   gArmPlatformTokenSpaceGuid.PcdArmHdLcdBase|0x0|UINT32|0x00000027
 
-  ## PL180 MCI
-  gArmPlatformTokenSpaceGuid.PcdPL180SysMciRegAddress|0x00000000|UINT32|0x00000028
-  gArmPlatformTokenSpaceGuid.PcdPL180MciBaseAddress|0x00000000|UINT32|0x00000029
+  ## Default size for display modes upto 1920x1080 (1920 * 1080 * 4 Bytes Per Pixel)
+  gArmPlatformTokenSpaceGuid.PcdArmLcdDdrFrameBufferSize|0x7E9000|UINT32|0x00000043
+  ## If set, framebuffer memory will be reserved and mapped in the system RAM
+  gArmPlatformTokenSpaceGuid.PcdArmLcdDdrFrameBufferBase|0x0|UINT64|0x00000044
 
-  #
-  # BDS - Boot Manager
-  #
-  gArmPlatformTokenSpaceGuid.PcdFirmwareVendor|"ARM Platform"|VOID*|0x00000019
-  gArmPlatformTokenSpaceGuid.PcdDefaultBootDescription|L"Default Boot Device"|VOID*|0x0000000C
-  gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath|L""|VOID*|0x0000000D
-  gArmPlatformTokenSpaceGuid.PcdDefaultBootArgument|L""|VOID*|0x000000F
+  ## ARM Mali Display Processor DP500/DP550/DP650
+  gArmPlatformTokenSpaceGuid.PcdArmMaliDpBase|0x0|UINT64|0x00000050
+  gArmPlatformTokenSpaceGuid.PcdArmMaliDpMemoryRegionLength|0x0|UINT32|0x00000051
 
-  gArmPlatformTokenSpaceGuid.PcdDefaultConInPaths|L""|VOID*|0x0000001B
-  gArmPlatformTokenSpaceGuid.PcdDefaultConOutPaths|L""|VOID*|0x0000001C
+  # Graphics Output Pixel format
+  # 0 : PixelRedGreenBlueReserved8BitPerColor
+  # 1 : PixelBlueGreenRedReserved8BitPerColor
+  # 2 : PixelBitMask
+  # Default is set to UEFI console font format PixelBlueGreenRedReserved8BitPerColor
+  gArmPlatformTokenSpaceGuid.PcdGopPixelFormat|0x00000001|UINT32|0x00000040
+
+  ## If set, this will swap settings for HDLCD RED_SELECT and BLUE_SELECT registers
+  gArmPlatformTokenSpaceGuid.PcdArmHdLcdSwapBlueRedSelect|FALSE|BOOLEAN|0x00000045
 
 [PcdsFixedAtBuild.common,PcdsDynamic.common]
   ## PL031 RealTimeClock
   gArmPlatformTokenSpaceGuid.PcdPL031RtcBase|0x0|UINT32|0x00000024
   gArmPlatformTokenSpaceGuid.PcdPL031RtcPpmAccuracy|300000000|UINT32|0x00000022
 
-[PcdsFixedAtBuild.ARM]
-  # Stack for CPU Cores in Secure Monitor Mode
-  gArmPlatformTokenSpaceGuid.PcdCPUCoresSecMonStackBase|0|UINT64|0x00000007
-  gArmPlatformTokenSpaceGuid.PcdCPUCoreSecMonStackSize|0x1000|UINT32|0x00000008
-
-[PcdsFixedAtBuild.AARCH64]
-  # The Secure World is only running in EL3. Only one set of stacks is needed for AArch64.
-  # The Secure stacks are described by PcdCPUCoresSecStackBase, PcdCPUCoreSecPrimaryStackSize
-  # and PcdCPUCoreSecSecondaryStackSize
-  gArmPlatformTokenSpaceGuid.PcdCPUCoresSecMonStackBase|0|UINT64|0x00000007
-  gArmPlatformTokenSpaceGuid.PcdCPUCoreSecMonStackSize|0x0|UINT32|0x00000008
-
+  gArmPlatformTokenSpaceGuid.PcdWatchdogCount|0x0|UINT32|0x00000033

@@ -4,17 +4,10 @@
   This module will execute the boot script saved during last boot and after that,
   control is passed to OS waking up handler.
 
-  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions
-  of the BSD License which accompanies this distribution.  The
-  full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -22,16 +15,17 @@
 
 #include <Guid/AcpiS3Context.h>
 #include <Guid/BootScriptExecutorVariable.h>
-#include <Guid/Performance.h>
-#include <Ppi/ReadOnlyVariable2.h>
+#include <Guid/ExtendedFirmwarePerformance.h>
+#include <Guid/EndOfS3Resume.h>
+#include <Guid/S3SmmInitDone.h>
 #include <Ppi/S3Resume2.h>
 #include <Ppi/SmmAccess.h>
 #include <Ppi/PostBootScriptTable.h>
 #include <Ppi/EndOfPeiPhase.h>
+#include <Ppi/SmmCommunication.h>
 
 #include <Library/DebugLib.h>
 #include <Library/BaseLib.h>
-#include <Library/TimerLib.h>
 #include <Library/PeimEntryPoint.h>
 #include <Library/PeiServicesLib.h>
 #include <Library/HobLib.h>
@@ -44,7 +38,7 @@
 #include <Library/DebugAgentLib.h>
 #include <Library/LocalApicLib.h>
 #include <Library/ReportStatusCodeLib.h>
-#include <Library/PrintLib.h>
+
 #include <Library/HobLib.h>
 #include <Library/LockBoxLib.h>
 #include <IndustryStandard/Acpi.h>
@@ -115,7 +109,7 @@ typedef union {
     UINT64  CacheDisabled:1;          // 0 = Cached, 1=Non-Cached
     UINT64  Accessed:1;               // 0 = Not accessed, 1 = Accessed (set by CPU)
     UINT64  Dirty:1;                  // 0 = Not Dirty, 1 = written by processor on access to page
-    UINT64  MustBe1:1;                // Must be 1 
+    UINT64  MustBe1:1;                // Must be 1
     UINT64  Global:1;                 // 0 = Not global page, 1 = global page TLB not cleared on CR3 write
     UINT64  Available:3;              // Available for use by system software
     UINT64  PAT:1;                    //
@@ -139,7 +133,7 @@ typedef union {
     UINT64  CacheDisabled:1;          // 0 = Cached, 1=Non-Cached
     UINT64  Accessed:1;               // 0 = Not accessed, 1 = Accessed (set by CPU)
     UINT64  Dirty:1;                  // 0 = Not Dirty, 1 = written by processor on access to page
-    UINT64  MustBe1:1;                // Must be 1 
+    UINT64  MustBe1:1;                // Must be 1
     UINT64  Global:1;                 // 0 = Not global page, 1 = global page TLB not cleared on CR3 write
     UINT64  Available:3;              // Available for use by system software
     UINT64  PAT:1;                    //
@@ -151,6 +145,22 @@ typedef union {
   UINT64    Uint64;
 } PAGE_TABLE_1G_ENTRY;
 
+//
+// Define two type of smm communicate headers.
+// One for 32 bits PEI + 64 bits DXE, the other for 32 bits PEI + 32 bits DXE case.
+//
+typedef struct {
+  EFI_GUID  HeaderGuid;
+  UINT32    MessageLength;
+  UINT8     Data[1];
+} SMM_COMMUNICATE_HEADER_32;
+
+typedef struct {
+  EFI_GUID  HeaderGuid;
+  UINT64    MessageLength;
+  UINT8     Data[1];
+} SMM_COMMUNICATE_HEADER_64;
+
 #pragma pack()
 
 //
@@ -158,9 +168,9 @@ typedef union {
 //
 /**
   a ASM function to transfer control to OS.
-  
+
   @param  S3WakingVector  The S3 waking up vector saved in ACPI Facs table
-  @param  AcpiLowMemoryBase a buffer under 1M which could be used during the transfer             
+  @param  AcpiLowMemoryBase a buffer under 1M which could be used during the transfer
 **/
 typedef
 VOID
@@ -241,6 +251,12 @@ EFI_PEI_PPI_DESCRIPTOR mPpiListEndOfPeiTable = {
   0
 };
 
+EFI_PEI_PPI_DESCRIPTOR mPpiListS3SmmInitDoneTable = {
+  (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
+  &gEdkiiS3SmmInitDoneGuid,
+  0
+};
+
 //
 // Global Descriptor Table (GDT)
 //
@@ -267,132 +283,6 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST IA32_DESCRIPTOR mGdt = {
   (UINTN) mGdtEntries
   };
 
-/**
-  Performance measure function to get S3 detailed performance data.
-
-  This function will getS3 detailed performance data and saved in pre-reserved ACPI memory.
-**/
-VOID
-WriteToOsS3PerformanceData (
-  VOID
-  )
-{
-  EFI_STATUS                                    Status;
-  EFI_PHYSICAL_ADDRESS                          mAcpiLowMemoryBase;
-  PERF_HEADER                                   *PerfHeader;
-  PERF_DATA                                     *PerfData;
-  UINT64                                        Ticker;
-  UINTN                                         Index;
-  EFI_PEI_READ_ONLY_VARIABLE2_PPI               *VariableServices;
-  UINTN                                         VarSize;
-  UINTN                                         LogEntryKey;
-  CONST VOID                                    *Handle;
-  CONST CHAR8                                   *Token;
-  CONST CHAR8                                   *Module;
-  UINT64                                        StartTicker;
-  UINT64                                        EndTicker;
-  UINT64                                        StartValue;
-  UINT64                                        EndValue;
-  BOOLEAN                                       CountUp;
-  UINT64                                        Freq;
-
-  //
-  // Retrieve time stamp count as early as possible
-  //
-  Ticker = GetPerformanceCounter ();
-
-  Freq   = GetPerformanceCounterProperties (&StartValue, &EndValue);
-
-  Freq   = DivU64x32 (Freq, 1000);
-
-  Status = PeiServicesLocatePpi (
-             &gEfiPeiReadOnlyVariable2PpiGuid,
-             0,
-             NULL,
-             (VOID **) &VariableServices
-             );
-  if (EFI_ERROR (Status)) {
-    return;
-  }
-
-  VarSize   = sizeof (EFI_PHYSICAL_ADDRESS);
-  Status = VariableServices->GetVariable (
-                               VariableServices,
-                               L"PerfDataMemAddr",
-                               &gPerformanceProtocolGuid,
-                               NULL,
-                               &VarSize,
-                               &mAcpiLowMemoryBase
-                               );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Fail to retrieve variable to log S3 performance data \n"));
-    return;
-  }
-
-  PerfHeader = (PERF_HEADER *) (UINTN) mAcpiLowMemoryBase;
-
-  if (PerfHeader->Signiture != PERFORMANCE_SIGNATURE) {
-    DEBUG ((EFI_D_ERROR, "Performance data in ACPI memory get corrupted! \n"));
-    return;
-  }
-
-  //
-  // Record total S3 resume time.
-  //
-  if (EndValue >= StartValue) {
-    PerfHeader->S3Resume = Ticker - StartValue;
-    CountUp              = TRUE;
-  } else {
-    PerfHeader->S3Resume = StartValue - Ticker;
-    CountUp              = FALSE;
-  }
-
-  //
-  // Get S3 detailed performance data
-  //
-  Index = 0;
-  LogEntryKey = 0;
-  while ((LogEntryKey = GetPerformanceMeasurement (
-                          LogEntryKey,
-                          &Handle,
-                          &Token,
-                          &Module,
-                          &StartTicker,
-                          &EndTicker)) != 0) {
-    if (EndTicker != 0) {
-      PerfData = &PerfHeader->S3Entry[Index];
-
-      //
-      // Use File Handle to specify the different performance log for PEIM.
-      // File Handle is the base address of PEIM FFS file.
-      //
-      if ((AsciiStrnCmp (Token, "PEIM", PEI_PERFORMANCE_STRING_SIZE) == 0) && (Handle != NULL)) {
-        AsciiSPrint (PerfData->Token, PERF_TOKEN_LENGTH, "0x%11p", Handle);
-      } else {
-        AsciiStrnCpyS (PerfData->Token, PERF_TOKEN_SIZE, Token, PERF_TOKEN_LENGTH);
-      }
-      if (StartTicker == 1) {
-        StartTicker = StartValue;
-      }
-      if (EndTicker == 1) {
-        EndTicker = StartValue;
-      }
-      Ticker = CountUp? (EndTicker - StartTicker) : (StartTicker - EndTicker);
-      PerfData->Duration = (UINT32) DivU64x32 (Ticker, (UINT32) Freq);
-
-      //
-      // Only Record > 1ms performance data so that more big performance can be recorded.
-      //
-      if ((Ticker > Freq) && (++Index >= PERF_PEI_ENTRY_MAX_NUM)) {
-        //
-        // Reach the maximum number of PEI performance log entries.
-        //
-        break;
-      }
-    }
-  }
-  PerfHeader->S3EntryNum = (UINT32) Index;
-}
 
 /**
   The function will check if current waking vector is long mode.
@@ -419,7 +309,7 @@ IsLongModeWakingVector (
   if (Facs->XFirmwareWakingVector != 0) {
     if ((Facs->Version == EFI_ACPI_4_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_VERSION) &&
         ((Facs->Flags & EFI_ACPI_4_0_64BIT_WAKE_SUPPORTED_F) != 0) &&
-        ((Facs->Flags & EFI_ACPI_4_0_OSPM_64BIT_WAKE__F) != 0)) {
+        ((Facs->OspmFlags & EFI_ACPI_4_0_OSPM_64BIT_WAKE__F) != 0)) {
       // Both BIOS and OS wants 64bit vector
       if (FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
         return TRUE;
@@ -427,6 +317,67 @@ IsLongModeWakingVector (
     }
   }
   return FALSE;
+}
+
+/**
+  Signal to SMM through communication buffer way.
+
+  @param[in]  HandlerType       SMI handler type to be signaled.
+
+**/
+VOID
+SignalToSmmByCommunication (
+  IN EFI_GUID   *HandlerType
+  )
+{
+  EFI_STATUS                         Status;
+  EFI_PEI_SMM_COMMUNICATION_PPI      *SmmCommunicationPpi;
+  UINTN                              CommSize;
+  SMM_COMMUNICATE_HEADER_32          Header32;
+  SMM_COMMUNICATE_HEADER_64          Header64;
+  VOID                               *CommBuffer;
+
+  DEBUG ((DEBUG_INFO, "Signal %g to SMM - Enter\n", HandlerType));
+
+  //
+  // This buffer consumed in DXE phase, so base on DXE mode to prepare communicate buffer.
+  // Detect whether DXE is 64 bits mode.
+  // if (sizeof(UINTN) == sizeof(UINT64), PEI already 64 bits, assume DXE also 64 bits.
+  // or (FeaturePcdGet (PcdDxeIplSwitchToLongMode)), DXE will switch to 64 bits.
+  //
+  if ((sizeof(UINTN) == sizeof(UINT64)) || (FeaturePcdGet (PcdDxeIplSwitchToLongMode))) {
+    CommBuffer = &Header64;
+    Header64.MessageLength = 0;
+    CommSize = OFFSET_OF (SMM_COMMUNICATE_HEADER_64, Data);
+  } else {
+    CommBuffer = &Header32;
+    Header32.MessageLength = 0;
+    CommSize = OFFSET_OF (SMM_COMMUNICATE_HEADER_32, Data);
+  }
+  CopyGuid (CommBuffer, HandlerType);
+
+  Status = PeiServicesLocatePpi (
+             &gEfiPeiSmmCommunicationPpiGuid,
+             0,
+             NULL,
+             (VOID **)&SmmCommunicationPpi
+             );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Locate Smm Communicate Ppi failed (%r)!\n", Status));
+    return;
+  }
+
+  Status = SmmCommunicationPpi->Communicate (
+                                  SmmCommunicationPpi,
+                                  (VOID *)CommBuffer,
+                                  &CommSize
+                                  );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "SmmCommunicationPpi->Communicate return failure (%r)!\n", Status));
+  }
+
+  DEBUG ((DEBUG_INFO, "Signal %g to SMM - Exit (%r)\n", HandlerType, Status));
+  return;
 }
 
 /**
@@ -465,18 +416,22 @@ S3ResumeBootOs (
   }
 
   //
-  // NOTE: Because Debug Timer interrupt and system interrupts will be disabled 
+  // NOTE: Because Debug Timer interrupt and system interrupts will be disabled
   // in BootScriptExecuteDxe, the rest code in S3ResumeBootOs() cannot be halted
   // by soft debugger.
   //
 
-  PERF_END (NULL, "ScriptExec", NULL, 0);
+  PERF_INMODULE_END ("ScriptExec");
 
   //
   // Install BootScriptDonePpi
   //
+  PERF_INMODULE_BEGIN ("BootScriptDonePpi");
+
   Status = PeiServicesInstallPpi (&mPpiListPostScriptTable);
   ASSERT_EFI_ERROR (Status);
+
+  PERF_INMODULE_END ("BootScriptDonePpi");
 
   //
   // Get ACPI Table Address
@@ -500,17 +455,27 @@ S3ResumeBootOs (
   //
   // Install EndOfPeiPpi
   //
+  PERF_INMODULE_BEGIN("EndOfPeiPpi");
+
   Status = PeiServicesInstallPpi (&mPpiListEndOfPeiTable);
   ASSERT_EFI_ERROR (Status);
+
+  PERF_INMODULE_END("EndOfPeiPpi");
+
+  PERF_INMODULE_BEGIN("EndOfS3Resume");
+
+  DEBUG ((DEBUG_INFO, "Signal EndOfS3Resume\n"));
+  //
+  // Signal EndOfS3Resume to SMM.
+  //
+  SignalToSmmByCommunication (&gEdkiiEndOfS3ResumeGuid);
+
+  PERF_INMODULE_END ("EndOfS3Resume");
 
   //
   // report status code on S3 resume
   //
   REPORT_STATUS_CODE (EFI_PROGRESS_CODE, EFI_SOFTWARE_PEI_MODULE | EFI_SW_PEI_PC_OS_WAKE);
-
-  PERF_CODE (
-    WriteToOsS3PerformanceData ();
-    );
 
   AsmTransferControl = (ASM_TRANSFER_CONTROL)(UINTN)PeiS3ResumeState->AsmTransferControl;
   if (Facs->XFirmwareWakingVector != 0) {
@@ -527,11 +492,11 @@ S3ResumeBootOs (
       ));
     if ((Facs->Version == EFI_ACPI_4_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_VERSION) &&
         ((Facs->Flags & EFI_ACPI_4_0_64BIT_WAKE_SUPPORTED_F) != 0) &&
-        ((Facs->Flags & EFI_ACPI_4_0_OSPM_64BIT_WAKE__F) != 0)) {
+        ((Facs->OspmFlags & EFI_ACPI_4_0_OSPM_64BIT_WAKE__F) != 0)) {
       //
       // X64 long mode waking vector
       //
-      DEBUG (( EFI_D_ERROR, "Transfer to 64bit OS waking vector - %x\r\n", (UINTN)Facs->XFirmwareWakingVector));
+      DEBUG ((DEBUG_INFO, "Transfer to 64bit OS waking vector - %x\r\n", (UINTN)Facs->XFirmwareWakingVector));
       if (FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
         AsmEnablePaging64 (
           0x38,
@@ -557,7 +522,7 @@ S3ResumeBootOs (
       //
       // IA32 protected mode waking vector (Page disabled)
       //
-      DEBUG (( EFI_D_ERROR, "Transfer to 32bit OS waking vector - %x\r\n", (UINTN)Facs->XFirmwareWakingVector));
+      DEBUG ((DEBUG_INFO, "Transfer to 32bit OS waking vector - %x\r\n", (UINTN)Facs->XFirmwareWakingVector));
       SwitchStack (
         (SWITCH_STACK_ENTRY_POINT) (UINTN) Facs->XFirmwareWakingVector,
         NULL,
@@ -569,7 +534,7 @@ S3ResumeBootOs (
     //
     // 16bit Realmode waking vector
     //
-    DEBUG (( EFI_D_ERROR, "Transfer to 16bit OS waking vector - %x\r\n", (UINTN)Facs->FirmwareWakingVector));
+    DEBUG ((DEBUG_INFO, "Transfer to 16bit OS waking vector - %x\r\n", (UINTN)Facs->FirmwareWakingVector));
     AsmTransferControl (Facs->FirmwareWakingVector, 0x0);
   }
 
@@ -589,7 +554,7 @@ S3ResumeBootOs (
 
 /**
   Restore S3 page table because we do not trust ACPINvs content.
-  If BootScriptExector driver will not run in 64-bit mode, this function will do nothing. 
+  If BootScriptExector driver will not run in 64-bit mode, this function will do nothing.
 
   @param S3NvsPageTableAddress   PageTableAddress in ACPINvs
   @param Build4GPageTableOnly    If BIOS just build 4G page table only
@@ -630,14 +595,14 @@ RestoreS3PageTables (
     //
     // The assumption is : whole page table is allocated in CONTINUOUS memory and CR3 points to TOP page.
     //
-    DEBUG ((EFI_D_ERROR, "S3NvsPageTableAddress - %x (%x)\n", (UINTN)S3NvsPageTableAddress, (UINTN)Build4GPageTableOnly));
+    DEBUG ((DEBUG_INFO, "S3NvsPageTableAddress - %x (%x)\n", (UINTN)S3NvsPageTableAddress, (UINTN)Build4GPageTableOnly));
 
     //
     // By architecture only one PageMapLevel4 exists - so lets allocate storage for it.
     //
     PageMap = (PAGE_MAP_AND_DIRECTORY_POINTER *)S3NvsPageTableAddress;
     S3NvsPageTableAddress += SIZE_4KB;
-    
+
     Page1GSupport = FALSE;
     if (PcdGetBool(PcdUse1GPageTable)) {
       AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
@@ -648,7 +613,7 @@ RestoreS3PageTables (
         }
       }
     }
-    
+
     //
     // Get physical address bits supported.
     //
@@ -664,7 +629,7 @@ RestoreS3PageTables (
         PhysicalAddressBits = 36;
       }
     }
-    
+
     //
     // IA-32e paging translates 48-bit linear addresses to 52-bit physical addresses.
     //
@@ -691,7 +656,7 @@ RestoreS3PageTables (
       NumberOfPml4EntriesNeeded = (UINT32)LShiftU64 (1, (PhysicalAddressBits - 39));
       NumberOfPdpEntriesNeeded = 512;
     }
-    
+
     PageMapLevel4Entry = PageMap;
     PageAddress        = 0;
     for (IndexOfPml4Entries = 0; IndexOfPml4Entries < NumberOfPml4EntriesNeeded; IndexOfPml4Entries++, PageMapLevel4Entry++) {
@@ -701,7 +666,7 @@ RestoreS3PageTables (
       //
       PageDirectoryPointerEntry = (PAGE_MAP_AND_DIRECTORY_POINTER *)S3NvsPageTableAddress;
       S3NvsPageTableAddress += SIZE_4KB;
-    
+
       //
       // Make a PML4 Entry
       //
@@ -711,7 +676,7 @@ RestoreS3PageTables (
 
       if (Page1GSupport) {
         PageDirectory1GEntry = (VOID *) PageDirectoryPointerEntry;
-    
+
         for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectory1GEntry++, PageAddress += SIZE_1GB) {
           //
           // Fill in the Page Directory entries
@@ -726,17 +691,17 @@ RestoreS3PageTables (
           //
           // Each Directory Pointer entries points to a page of Page Directory entires.
           // So allocate space for them and fill them in in the IndexOfPageDirectoryEntries loop.
-          //       
+          //
           PageDirectoryEntry = (PAGE_TABLE_ENTRY *)S3NvsPageTableAddress;
           S3NvsPageTableAddress += SIZE_4KB;
-    
+
           //
           // Fill in a Page Directory Pointer Entries
           //
           PageDirectoryPointerEntry->Uint64 = (UINT64)(UINTN)PageDirectoryEntry | AddressEncMask;
           PageDirectoryPointerEntry->Bits.ReadWrite = 1;
           PageDirectoryPointerEntry->Bits.Present = 1;
-    
+
           for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectoryEntry++, PageAddress += SIZE_2MB) {
             //
             // Fill in the Page Directory entries
@@ -751,9 +716,9 @@ RestoreS3PageTables (
     }
     return ;
   } else {
-  	//
-  	// If DXE is running 32-bit mode, no need to establish page table.
-  	//
+    //
+    // If DXE is running 32-bit mode, no need to establish page table.
+    //
     return ;
   }
 }
@@ -778,12 +743,10 @@ S3ResumeExecuteBootScript (
   PEI_SMM_ACCESS_PPI         *SmmAccess;
   UINTN                      Index;
   VOID                       *GuidHob;
-  IA32_DESCRIPTOR            *IdtDescriptor;
-  VOID                       *IdtBuffer;
   PEI_S3_RESUME_STATE        *PeiS3ResumeState;
   BOOLEAN                    InterruptStatus;
 
-  DEBUG ((EFI_D_ERROR, "S3ResumeExecuteBootScript()\n"));
+  DEBUG ((DEBUG_INFO, "S3ResumeExecuteBootScript()\n"));
 
   //
   // Attempt to use content from SMRAM first
@@ -796,7 +759,7 @@ S3ResumeExecuteBootScript (
 
     //
     // Send SMI to APs
-    //    
+    //
     SendSmiIpiAllExcludingSelf ();
     //
     // Send SMI to BSP
@@ -810,50 +773,33 @@ S3ResumeExecuteBootScript (
                               (VOID **) &SmmAccess
                               );
     if (!EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "Close all SMRAM regions before executing boot script\n"));
-  
+      DEBUG ((DEBUG_INFO, "Close all SMRAM regions before executing boot script\n"));
+
       for (Index = 0, Status = EFI_SUCCESS; !EFI_ERROR (Status); Index++) {
         Status = SmmAccess->Close ((EFI_PEI_SERVICES **)GetPeiServicesTablePointer (), SmmAccess, Index);
       }
 
-      DEBUG ((EFI_D_ERROR, "Lock all SMRAM regions before executing boot script\n"));
-  
+      DEBUG ((DEBUG_INFO, "Lock all SMRAM regions before executing boot script\n"));
+
       for (Index = 0, Status = EFI_SUCCESS; !EFI_ERROR (Status); Index++) {
         Status = SmmAccess->Lock ((EFI_PEI_SERVICES **)GetPeiServicesTablePointer (), SmmAccess, Index);
       }
     }
+
+    DEBUG ((DEBUG_INFO, "Signal S3SmmInitDone\n"));
+    //
+    // Install S3SmmInitDone PPI.
+    //
+    Status = PeiServicesInstallPpi (&mPpiListS3SmmInitDoneTable);
+    ASSERT_EFI_ERROR (Status);
+    //
+    // Signal S3SmmInitDone to SMM.
+    //
+    SignalToSmmByCommunication (&gEdkiiS3SmmInitDoneGuid);
   }
 
   if (FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
     AsmWriteCr3 ((UINTN)AcpiS3Context->S3NvsPageTableAddress);
-  }
-
-  if (FeaturePcdGet (PcdFrameworkCompatibilitySupport)) {
-    //
-    // On some platform, such as ECP, a dispatch node in boot script table may execute a 32-bit PEIM which may need PeiServices
-    // pointer. So PeiServices need preserve in (IDTBase- sizeof (UINTN)). 
-    //
-    IdtDescriptor = (IA32_DESCRIPTOR *) (UINTN) (AcpiS3Context->IdtrProfile);
-    //
-    // Make sure the newly allocated IDT align with 16-bytes
-    // 
-    IdtBuffer = AllocatePages (EFI_SIZE_TO_PAGES((IdtDescriptor->Limit + 1) + 16));
-    if (IdtBuffer == NULL) {
-      REPORT_STATUS_CODE (
-        EFI_ERROR_CODE | EFI_ERROR_MAJOR,
-        (EFI_SOFTWARE_PEI_MODULE | EFI_SW_PEI_EC_S3_RESUME_FAILED)
-        );
-      ASSERT (FALSE);
-    }
-    //
-    // Additional 16 bytes allocated to save IA32 IDT descriptor and Pei Service Table Pointer
-    // IA32 IDT descriptor will be used to setup IA32 IDT table for 32-bit Framework Boot Script code
-    // 
-    ZeroMem (IdtBuffer, 16);
-    AsmReadIdtr ((IA32_DESCRIPTOR *)IdtBuffer);
-    CopyMem ((VOID*)((UINT8*)IdtBuffer + 16),(VOID*)(IdtDescriptor->Base), (IdtDescriptor->Limit + 1));
-    IdtDescriptor->Base = (UINTN)((UINT8*)IdtBuffer + 16);
-    *(UINTN*)(IdtDescriptor->Base - sizeof(UINTN)) = (UINTN)GetPeiServicesTablePointer ();
   }
 
   InterruptStatus = SaveAndDisableInterrupts ();
@@ -881,7 +827,7 @@ S3ResumeExecuteBootScript (
       );
     ASSERT (FALSE);
   }
-  DEBUG (( EFI_D_ERROR, "PeiS3ResumeState - %x\r\n", PeiS3ResumeState));
+  DEBUG ((DEBUG_INFO, "PeiS3ResumeState - %x\r\n", PeiS3ResumeState));
   PeiS3ResumeState->ReturnCs           = 0x10;
   PeiS3ResumeState->ReturnEntryPoint   = (EFI_PHYSICAL_ADDRESS)(UINTN)S3ResumeBootOs;
   PeiS3ResumeState->ReturnStackPointer = (EFI_PHYSICAL_ADDRESS)STACK_ALIGN_DOWN (&Status);
@@ -889,19 +835,19 @@ S3ResumeExecuteBootScript (
   // Save IDT
   //
   AsmReadIdtr (&PeiS3ResumeState->Idtr);
-  
+
   //
   // Report Status Code to indicate S3 boot script execution
   //
   REPORT_STATUS_CODE (EFI_PROGRESS_CODE, EFI_SOFTWARE_PEI_MODULE | EFI_SW_PEI_PC_S3_BOOT_SCRIPT);
 
-  PERF_START (NULL, "ScriptExec", NULL, 0);
+  PERF_INMODULE_BEGIN ("ScriptExec");
 
   if (FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
     //
     // X64 S3 Resume
     //
-    DEBUG (( EFI_D_ERROR, "Enable X64 and transfer control to Standalone Boot Script Executor\r\n"));
+    DEBUG ((DEBUG_INFO, "Enable X64 and transfer control to Standalone Boot Script Executor\r\n"));
 
     //
     // Switch to long mode to complete resume.
@@ -917,7 +863,7 @@ S3ResumeExecuteBootScript (
     //
     // IA32 S3 Resume
     //
-    DEBUG (( EFI_D_ERROR, "transfer control to Standalone Boot Script Executor\r\n"));
+    DEBUG ((DEBUG_INFO, "transfer control to Standalone Boot Script Executor\r\n"));
     SwitchStack (
       (SWITCH_STACK_ENTRY_POINT) (UINTN) EfiBootScriptExecutorVariable->BootScriptExecutorEntrypoint,
       (VOID *)AcpiS3Context,
@@ -981,11 +927,12 @@ S3RestoreConfig2 (
   VOID                                          *GuidHob;
   BOOLEAN                                       Build4GPageTableOnly;
   BOOLEAN                                       InterruptStatus;
+  IA32_CR0                                      Cr0;
 
   TempAcpiS3Context = 0;
   TempEfiBootScriptExecutorVariable = 0;
 
-  DEBUG ((EFI_D_ERROR, "Enter S3 PEIM\r\n"));
+  DEBUG ((DEBUG_INFO, "Enter S3 PEIM\r\n"));
 
   VarSize = sizeof (EFI_PHYSICAL_ADDRESS);
   Status = RestoreLockBox (
@@ -1023,15 +970,15 @@ S3RestoreConfig2 (
   EfiBootScriptExecutorVariable = (BOOT_SCRIPT_EXECUTOR_VARIABLE *) (UINTN) TempEfiBootScriptExecutorVariable;
   ASSERT (EfiBootScriptExecutorVariable != NULL);
 
-  DEBUG (( EFI_D_ERROR, "AcpiS3Context = %x\n", AcpiS3Context));
-  DEBUG (( EFI_D_ERROR, "Waking Vector = %x\n", ((EFI_ACPI_2_0_FIRMWARE_ACPI_CONTROL_STRUCTURE *) ((UINTN) (AcpiS3Context->AcpiFacsTable)))->FirmwareWakingVector));
-  DEBUG (( EFI_D_ERROR, "AcpiS3Context->AcpiFacsTable = %x\n", AcpiS3Context->AcpiFacsTable));
-  DEBUG (( EFI_D_ERROR, "AcpiS3Context->IdtrProfile = %x\n", AcpiS3Context->IdtrProfile));  
-  DEBUG (( EFI_D_ERROR, "AcpiS3Context->S3NvsPageTableAddress = %x\n", AcpiS3Context->S3NvsPageTableAddress));
-  DEBUG (( EFI_D_ERROR, "AcpiS3Context->S3DebugBufferAddress = %x\n", AcpiS3Context->S3DebugBufferAddress));
-  DEBUG (( EFI_D_ERROR, "AcpiS3Context->BootScriptStackBase = %x\n", AcpiS3Context->BootScriptStackBase));
-  DEBUG (( EFI_D_ERROR, "AcpiS3Context->BootScriptStackSize = %x\n", AcpiS3Context->BootScriptStackSize));
-  DEBUG (( EFI_D_ERROR, "EfiBootScriptExecutorVariable->BootScriptExecutorEntrypoint = %x\n", EfiBootScriptExecutorVariable->BootScriptExecutorEntrypoint));
+  DEBUG (( DEBUG_INFO, "AcpiS3Context = %x\n", AcpiS3Context));
+  DEBUG (( DEBUG_INFO, "Waking Vector = %x\n", ((EFI_ACPI_2_0_FIRMWARE_ACPI_CONTROL_STRUCTURE *) ((UINTN) (AcpiS3Context->AcpiFacsTable)))->FirmwareWakingVector));
+  DEBUG (( DEBUG_INFO, "AcpiS3Context->AcpiFacsTable = %x\n", AcpiS3Context->AcpiFacsTable));
+  DEBUG (( DEBUG_INFO, "AcpiS3Context->IdtrProfile = %x\n", AcpiS3Context->IdtrProfile));
+  DEBUG (( DEBUG_INFO, "AcpiS3Context->S3NvsPageTableAddress = %x\n", AcpiS3Context->S3NvsPageTableAddress));
+  DEBUG (( DEBUG_INFO, "AcpiS3Context->S3DebugBufferAddress = %x\n", AcpiS3Context->S3DebugBufferAddress));
+  DEBUG (( DEBUG_INFO, "AcpiS3Context->BootScriptStackBase = %x\n", AcpiS3Context->BootScriptStackBase));
+  DEBUG (( DEBUG_INFO, "AcpiS3Context->BootScriptStackSize = %x\n", AcpiS3Context->BootScriptStackSize));
+  DEBUG (( DEBUG_INFO, "EfiBootScriptExecutorVariable->BootScriptExecutorEntrypoint = %x\n", EfiBootScriptExecutorVariable->BootScriptExecutorEntrypoint));
 
   //
   // Additional step for BootScript integrity - we only handle BootScript and BootScriptExecutor.
@@ -1062,6 +1009,13 @@ S3RestoreConfig2 (
   //
   GuidHob = GetFirstGuidHob (&gEfiAcpiVariableGuid);
   if (GuidHob != NULL) {
+    //
+    // Below SwitchStack/AsmEnablePaging64 function has
+    // assumption that it's in 32 bits mode now.
+    // Add ASSERT code to indicate this assumption.
+    //
+    ASSERT(sizeof (UINTN) == sizeof (UINT32));
+
     Status = PeiServicesLocatePpi (
                               &gPeiSmmAccessPpiGuid,
                               0,
@@ -1081,19 +1035,19 @@ S3RestoreConfig2 (
     SmmS3ResumeState->ReturnContext2     = (EFI_PHYSICAL_ADDRESS)(UINTN)EfiBootScriptExecutorVariable;
     SmmS3ResumeState->ReturnStackPointer = (EFI_PHYSICAL_ADDRESS)STACK_ALIGN_DOWN (&Status);
 
-    DEBUG (( EFI_D_ERROR, "SMM S3 Signature                = %x\n", SmmS3ResumeState->Signature));
-    DEBUG (( EFI_D_ERROR, "SMM S3 Stack Base               = %x\n", SmmS3ResumeState->SmmS3StackBase));
-    DEBUG (( EFI_D_ERROR, "SMM S3 Stack Size               = %x\n", SmmS3ResumeState->SmmS3StackSize));
-    DEBUG (( EFI_D_ERROR, "SMM S3 Resume Entry Point       = %x\n", SmmS3ResumeState->SmmS3ResumeEntryPoint));
-    DEBUG (( EFI_D_ERROR, "SMM S3 CR0                      = %x\n", SmmS3ResumeState->SmmS3Cr0));
-    DEBUG (( EFI_D_ERROR, "SMM S3 CR3                      = %x\n", SmmS3ResumeState->SmmS3Cr3));
-    DEBUG (( EFI_D_ERROR, "SMM S3 CR4                      = %x\n", SmmS3ResumeState->SmmS3Cr4));
-    DEBUG (( EFI_D_ERROR, "SMM S3 Return CS                = %x\n", SmmS3ResumeState->ReturnCs));
-    DEBUG (( EFI_D_ERROR, "SMM S3 Return Entry Point       = %x\n", SmmS3ResumeState->ReturnEntryPoint));
-    DEBUG (( EFI_D_ERROR, "SMM S3 Return Context1          = %x\n", SmmS3ResumeState->ReturnContext1));
-    DEBUG (( EFI_D_ERROR, "SMM S3 Return Context2          = %x\n", SmmS3ResumeState->ReturnContext2));
-    DEBUG (( EFI_D_ERROR, "SMM S3 Return Stack Pointer     = %x\n", SmmS3ResumeState->ReturnStackPointer));
-    DEBUG (( EFI_D_ERROR, "SMM S3 Smst                     = %x\n", SmmS3ResumeState->Smst));
+    DEBUG (( DEBUG_INFO, "SMM S3 Signature                = %x\n", SmmS3ResumeState->Signature));
+    DEBUG (( DEBUG_INFO, "SMM S3 Stack Base               = %x\n", SmmS3ResumeState->SmmS3StackBase));
+    DEBUG (( DEBUG_INFO, "SMM S3 Stack Size               = %x\n", SmmS3ResumeState->SmmS3StackSize));
+    DEBUG (( DEBUG_INFO, "SMM S3 Resume Entry Point       = %x\n", SmmS3ResumeState->SmmS3ResumeEntryPoint));
+    DEBUG (( DEBUG_INFO, "SMM S3 CR0                      = %x\n", SmmS3ResumeState->SmmS3Cr0));
+    DEBUG (( DEBUG_INFO, "SMM S3 CR3                      = %x\n", SmmS3ResumeState->SmmS3Cr3));
+    DEBUG (( DEBUG_INFO, "SMM S3 CR4                      = %x\n", SmmS3ResumeState->SmmS3Cr4));
+    DEBUG (( DEBUG_INFO, "SMM S3 Return CS                = %x\n", SmmS3ResumeState->ReturnCs));
+    DEBUG (( DEBUG_INFO, "SMM S3 Return Entry Point       = %x\n", SmmS3ResumeState->ReturnEntryPoint));
+    DEBUG (( DEBUG_INFO, "SMM S3 Return Context1          = %x\n", SmmS3ResumeState->ReturnContext1));
+    DEBUG (( DEBUG_INFO, "SMM S3 Return Context2          = %x\n", SmmS3ResumeState->ReturnContext2));
+    DEBUG (( DEBUG_INFO, "SMM S3 Return Stack Pointer     = %x\n", SmmS3ResumeState->ReturnStackPointer));
+    DEBUG (( DEBUG_INFO, "SMM S3 Smst                     = %x\n", SmmS3ResumeState->Smst));
 
     if (SmmS3ResumeState->Signature == SMM_S3_RESUME_SMM_32) {
       SwitchStack (
@@ -1115,13 +1069,22 @@ S3RestoreConfig2 (
       AsmWriteGdtr (&mGdt);
       //
       // update segment selectors per the new GDT.
-      //      
+      //
       AsmSetDataSelectors (DATA_SEGEMENT_SELECTOR);
       //
       // Restore interrupt state.
       //
       SetInterruptState (InterruptStatus);
 
+      Cr0.UintN = AsmReadCr0 ();
+      if (Cr0.Bits.PG != 0) {
+        //
+        // We're in 32-bit mode, with paging enabled. We can't set CR3 to
+        // the 64-bit page tables without first disabling paging.
+        //
+        Cr0.Bits.PG = 0;
+        AsmWriteCr0 (Cr0.UintN);
+      }
       AsmWriteCr3 ((UINTN)SmmS3ResumeState->SmmS3Cr3);
 
       //
@@ -1149,7 +1112,7 @@ S3RestoreConfig2 (
   Main entry for S3 Resume PEIM.
 
   This routine is to install EFI_PEI_S3_RESUME2_PPI.
-  
+
   @param  FileHandle              Handle of the file being invoked.
   @param  PeiServices             Pointer to PEI Services table.
 

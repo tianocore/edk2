@@ -3,13 +3,7 @@
 
   Copyright (c) 2011-2013, ARM Limited. All rights reserved.
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -171,6 +165,9 @@ EFI_STATUS DestroyMmcHostInstance (
   if (MmcHostInstance->BlockIo.Media) {
     FreePool(MmcHostInstance->BlockIo.Media);
   }
+  if (MmcHostInstance->CardInfo.ECSDData) {
+    FreePages (MmcHostInstance->CardInfo.ECSDData, EFI_SIZE_TO_PAGES (sizeof (ECSD)));
+  }
   FreePool (MmcHostInstance);
 
   return Status;
@@ -219,7 +216,7 @@ MmcDriverBindingSupported (
   //
   Status = gBS->OpenProtocol (
                 Controller,
-                &gEfiMmcHostProtocolGuid,
+                &gEmbeddedMmcHostProtocolGuid,
                 (VOID **) &MmcHost,
                 This->DriverBindingHandle,
                 Controller,
@@ -237,7 +234,7 @@ MmcDriverBindingSupported (
   //
   gBS->CloseProtocol (
       Controller,
-      &gEfiMmcHostProtocolGuid,
+      &gEmbeddedMmcHostProtocolGuid,
       This->DriverBindingHandle,
       Controller
       );
@@ -278,7 +275,7 @@ MmcDriverBindingStart (
   //
   Status = gBS->OpenProtocol (
                 Controller,
-                &gEfiMmcHostProtocolGuid,
+                &gEmbeddedMmcHostProtocolGuid,
                 (VOID **) &MmcHost,
                 This->DriverBindingHandle,
                 Controller,
@@ -329,11 +326,12 @@ MmcDriverBindingStop (
     MmcHostInstance = MMC_HOST_INSTANCE_FROM_LINK(CurrentLink);
     ASSERT(MmcHostInstance != NULL);
 
-    // Close gEfiMmcHostProtocolGuid
+    // Close gEmbeddedMmcHostProtocolGuid
     Status = gBS->CloseProtocol (
                 Controller,
-                &gEfiMmcHostProtocolGuid,(VOID **) &MmcHostInstance->MmcHost,
-                This->DriverBindingHandle
+                &gEmbeddedMmcHostProtocolGuid,
+                This->DriverBindingHandle,
+                Controller
                 );
 
     // Remove MMC Host Instance from the pool

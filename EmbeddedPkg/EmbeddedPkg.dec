@@ -4,14 +4,9 @@
 # This Package provides headers and libraries that conform to EFI/PI Industry standards.
 # Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) 2012-2015, ARM Ltd. All rights reserved.<BR>
+# Copyright (c) 2017, Linaro Ltd. All rights reserved.<BR>
 #
-#    This program and the accompanying materials are licensed and made available under
-#    the terms and conditions of the BSD License which accompanies this distribution.
-#    The full text of the license may be found at
-#    http://opensource.org/licenses/bsd-license.php
-#
-#    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-#    WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#    SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 #**/
 
@@ -35,16 +30,14 @@
   Include                        # Root include for the package
 
 [LibraryClasses.common]
-  EfiFileLib|Include/Library/EfiFileLib.h
   PrePiLib|Include/Library/PrePiLib.h
   RealTimeClockLib|Include/Library/RealTimeClockLib.h
   EfiResetSystemLib|Include/Library/EfiResetSystemLib.h
-  EblCmdLib|Include/Library/EblCmdLib.h
-  EblAddExternalCommandLib|Include/Library/EblAddExternalCommandLib.h
-  EblNetworkLib|Include/Library/EblNetworkLib.h
   GdbSerialLib|Include/Library/GdbSerialLib.h
   DebugAgentTimerLib|Include/Library/DebugAgentTimerLib.h
+  NorFlashInfoLib|Include/Library/NorFlashInfoLib.h
 
+  DtPlatformDtbLoaderLib|Include/Library/DtPlatformDtbLoaderLib.h
 
 [Guids.common]
   gEmbeddedTokenSpaceGuid       = { 0xe0d8ca17, 0x4276, 0x4386, { 0xbb, 0x79, 0x48, 0xcb, 0x81, 0x3d, 0x3c, 0x4f }}
@@ -56,47 +49,45 @@
   gFdtHobGuid   = { 0x16958446, 0x19B7, 0x480B, { 0xB0, 0x47, 0x74, 0x85, 0xAD, 0x3F, 0x71, 0x6D } }
   gFdtVariableGuid = { 0x25a4fd4a, 0x9703, 0x4ba9, { 0xa1, 0x90, 0xb7, 0xc8, 0x4e, 0xfb, 0x3e, 0x57 } }
 
+  ## Include/Guid/PlatformHasDeviceTree.h
+  gEdkiiPlatformHasDeviceTreeGuid = { 0x7ebb920d, 0x1aaf, 0x46d9, { 0xb2, 0xaf, 0x54, 0x1e, 0x1d, 0xce, 0x14, 0x8b } }
+
+  # HII form set GUID for DtPlatformDxe driver
+  gDtPlatformFormSetGuid = { 0x2b7a240d, 0xd5ad, 0x4fd6, { 0xbe, 0x1c, 0xdf, 0xa4, 0x41, 0x5f, 0x55, 0x26 } }
+
+  # File GUID for default DTB image embedded in the firmware volume
+  gDtPlatformDefaultDtbFileGuid = { 0x25462cda, 0x221f, 0x47df, { 0xac, 0x1d, 0x25, 0x9c, 0xfa, 0xa4, 0xe3, 0x26 } }
+
+  # HII form set GUID for ConsolePrefDxe driver
+  gConsolePrefFormSetGuid = { 0x2d2358b4, 0xe96c, 0x484d, { 0xb2, 0xdd, 0x7c, 0x2e, 0xdf, 0xc7, 0xd5, 0x6f } }
+
+  ## Include/Guid/NvVarStoreFormatted.h
+  gEdkiiNvVarStoreFormattedGuid = { 0xd1a86e3f, 0x0707, 0x4c35, { 0x83, 0xcd, 0xdc, 0x2c, 0x29, 0xc8, 0x91, 0xa3 } }
+
 [Protocols.common]
   gHardwareInterruptProtocolGuid =  { 0x2890B3EA, 0x053D, 0x1643, { 0xAD, 0x0C, 0xD6, 0x48, 0x08, 0xDA, 0x3F, 0xF1 } }
-  gEfiDebugSupportPeriodicCallbackProtocolGuid = { 0x9546e07c, 0x2cbb, 0x4c88, { 0x98, 0x6c, 0xcd, 0x34, 0x10, 0x86, 0xf0, 0x44 } }
-  gEfiEblAddCommandProtocolGuid =   { 0xaeda2428, 0x9a22, 0x4637, { 0x9b, 0x21, 0x54, 0x5e, 0x28, 0xfb, 0xb8, 0x29 } }
+  gHardwareInterrupt2ProtocolGuid = { 0x32898322, 0x2da1, 0x474a, { 0xba, 0xaa, 0xf3, 0xf7, 0xcf, 0x56, 0x94, 0x70 } }
   gEmbeddedDeviceGuid =   { 0xbf4b9d10, 0x13ec, 0x43dd, { 0x88, 0x80, 0xe9, 0xb, 0x71, 0x8f, 0x27, 0xde } }
   gEmbeddedExternalDeviceProtocolGuid = { 0x735F8C64, 0xD696, 0x44D0, { 0xBD, 0xF2, 0x44, 0x7F, 0xD0, 0x5A, 0x54, 0x06 }}
   gEmbeddedGpioProtocolGuid           = { 0x17a0a3d7, 0xc0a5, 0x4635, { 0xbb, 0xd5, 0x07, 0x21, 0x87, 0xdf, 0xe2, 0xee }}
   gPeCoffLoaderProtocolGuid =  { 0xB323179B, 0x97FB, 0x477E, { 0xB0, 0xFE, 0xD8, 0x85, 0x91, 0xFA, 0x11, 0xAB } }
-  gEfiMmcHostProtocolGuid              = { 0x3e591c00, 0x9e4a, 0x11df, {0x92, 0x44, 0x00, 0x02, 0xA5, 0xD5, 0xC5, 0x1B }}
+  gEmbeddedMmcHostProtocolGuid         = { 0x3e591c00, 0x9e4a, 0x11df, {0x92, 0x44, 0x00, 0x02, 0xA5, 0xD5, 0xC5, 0x1B }}
   gAndroidFastbootTransportProtocolGuid = { 0x74bd9fe0, 0x8902, 0x11e3, {0xb9, 0xd3, 0xf7, 0x22, 0x38, 0xfc, 0x9a, 0x31}}
   gAndroidFastbootPlatformProtocolGuid =  { 0x524685a0, 0x89a0, 0x11e3, {0x9d, 0x4d, 0xbf, 0xa9, 0xf6, 0xa4, 0x03, 0x08}}
   gUsbDeviceProtocolGuid =  { 0x021bd2ca, 0x51d2, 0x11e3, {0x8e, 0x56, 0xb7, 0x54, 0x17, 0xc7,  0x0b, 0x44 }}
+  gPlatformBootManagerProtocolGuid = { 0x7197c8a7, 0x6559, 0x4c93, { 0x93, 0xd5, 0x8a, 0x84, 0xf9, 0x88, 0x79, 0x8b }}
   gPlatformGpioProtocolGuid = { 0x52ce9845, 0x5af4, 0x43e2, {0xba, 0xfd, 0x23, 0x08, 0x12, 0x54, 0x7a, 0xc2 }}
+  gPlatformVirtualKeyboardProtocolGuid = { 0x0e3606d2, 0x1dc3, 0x4e6f, { 0xbe, 0x65, 0x39, 0x49, 0x82, 0xa2, 0x65, 0x47 }}
+  gAndroidBootImgProtocolGuid = { 0x9859bb19, 0x407c, 0x4f8b, {0xbc, 0xe1, 0xf8, 0xda, 0x65, 0x65, 0xf4, 0xa5 }}
+
+[Ppis]
+  gEdkiiEmbeddedGpioPpiGuid = { 0x21c3b115, 0x4e0b, 0x470c, { 0x85, 0xc7, 0xe1, 0x05, 0xa5, 0x75, 0xc9, 0x7b }}
 
 [PcdsFeatureFlag.common]
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedMacBoot|FALSE|BOOLEAN|0x00000001
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedDirCmd|TRUE|BOOLEAN|0x00000002
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedHobCmd|TRUE|BOOLEAN|0x00000003
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedHwDebugCmd|TRUE|BOOLEAN|0x00000004
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedIoEnable|FALSE|BOOLEAN|0x00000005
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedScriptCmd|FALSE|BOOLEAN|0x00000006
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedPciDebugCmd|FALSE|BOOLEAN|0x00000041
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedProbeRemovable|TRUE|BOOLEAN|0x00000052
-
   gEmbeddedTokenSpaceGuid.PcdPrePiProduceMemoryTypeInformationHob|FALSE|BOOLEAN|0x0000001b
-  gEmbeddedTokenSpaceGuid.PcdCacheEnable|FALSE|BOOLEAN|0x00000042
   gEmbeddedTokenSpaceGuid.PcdGdbSerial|FALSE|BOOLEAN|0x00000053
-  # Enable the development specific features
-  gEmbeddedTokenSpaceGuid.PcdOverridePlatformFdt|TRUE|BOOLEAN|0x00000054
-  # Add 'dumpfdt' EFI Shell command
-  gEmbeddedTokenSpaceGuid.PcdDumpFdtShellCommand|TRUE|BOOLEAN|0x00000056
-
-  gEmbeddedTokenSpaceGuid.PcdSataSiI3132FeaturePMPSupport|FALSE|BOOLEAN|0x00000050
-  gEmbeddedTokenSpaceGuid.PcdSataSiI3132FeatureDirectCommandIssuing|FALSE|BOOLEAN|0x00000051
 
 [PcdsFixedAtBuild.common]
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedAutomaticBootCommand|L""|VOID*|0x00000007
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedDefaultTextColor|0x07|UINT32|0x00000008
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedMemVariableStoreSize|0x10000|UINT32|0x00000009
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedPrompt|"Ebl"|VOID*|0x00000034
-
   gEmbeddedTokenSpaceGuid.PcdPrePiStackBase|0|UINT32|0x0000000b
   gEmbeddedTokenSpaceGuid.PcdPrePiStackSize|131072|UINT32|0x0000000c
 
@@ -131,9 +122,6 @@
   gEmbeddedTokenSpaceGuid.PcdEmbeddedPerformanceCounterFrequencyInHz|0x0000000|UINT64|0x00000032
   gEmbeddedTokenSpaceGuid.PcdEmbeddedPerformanceCounterPeriodInNanoseconds|0x0000000|UINT32|0x00000033
 
-# Shell characteristics
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedShellCharacterEcho|TRUE|BOOLEAN|0x00000046
-
   gEmbeddedTokenSpaceGuid.PcdGdbBaudRate|115200|UINT64|0x00000047
   gEmbeddedTokenSpaceGuid.PcdGdbDataBits|8|UINT8|0x00000048
   gEmbeddedTokenSpaceGuid.PcdGdbParity|1|UINT8|0x00000049
@@ -141,14 +129,6 @@
   gEmbeddedTokenSpaceGuid.PcdGdbUartPort|0x3f8|UINT32|0x0000004b
   gEmbeddedTokenSpaceGuid.PcdGdbMaxPacketRetryCount|10000000|UINT32|0x0000004c
   gEmbeddedTokenSpaceGuid.PcdGdbTimerPeriodMilliseconds|250|UINT32|0x0000004d
-
-  # LAN9118 Ethernet Driver PCDs
-  gEmbeddedTokenSpaceGuid.PcdLan9118DxeBaseAddress|0x0|UINT32|0x00000025
-  gEmbeddedTokenSpaceGuid.PcdLan9118DefaultMacAddress|0x0|UINT64|0x00000026
-  gEmbeddedTokenSpaceGuid.PcdLan9118DefaultNegotiationTimeout|4000|UINT32|0x00000027
-  # The default feature mask below disables full duplex negotiation, since full
-  # duplex operation is suspected to be broken in the driver.
-  gEmbeddedTokenSpaceGuid.PcdLan9118NegotiationFeatureMask|0xFFFFFEBF|UINT32|0x00000028
 
   #
   # Android FastBoot
@@ -161,28 +141,35 @@
   gEmbeddedTokenSpaceGuid.PcdAndroidFastbootUsbProductId|0xbeef|UINT32|0x00000023
   gEmbeddedTokenSpaceGuid.PcdAndroidFastbootTcpPort|1234|UINT32|0x00000024
 
+  gEmbeddedTokenSpaceGuid.PcdAndroidBootDevicePath|L""|VOID*|0x00000057
 
 [PcdsFixedAtBuild.ARM]
-  gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize|32|UINT8|0x00000010
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize|0|UINT8|0x00000011
-
-  # ISP1761 USB OTG Controller
-  gEmbeddedTokenSpaceGuid.PcdIsp1761BaseAddress|0|UINT32|0x00000021
 
 [PcdsFixedAtBuild.AARCH64]
-  gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize|48|UINT8|0x00000010
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize|0|UINT8|0x00000011
 
-  # ISP1761 USB OTG Controller
-  gEmbeddedTokenSpaceGuid.PcdIsp1761BaseAddress|0|UINT64|0x00000021
-
 [PcdsFixedAtBuild.IA32]
-  gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize|36|UINT8|0x00000010
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize|16|UINT8|0x00000011
 
 [PcdsFixedAtBuild.X64]
-  gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize|52|UINT8|0x00000010
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize|16|UINT8|0x00000011
 
 [PcdsFixedAtBuild.common, PcdsDynamic.common]
-  gEmbeddedTokenSpaceGuid.PcdFdtDevicePaths|L""|VOID*|0x00000055
+  #
+  # Value to add to a host address to obtain a device address, using
+  # unsigned 64-bit integer arithmetic. This means we can rely on
+  # truncation on overflow to specify negative offsets.
+  #
+  gEmbeddedTokenSpaceGuid.PcdDmaDeviceOffset|0x0|UINT64|0x0000058
+
+  #
+  # Highest address value supported by the device for DMA addressing. Note
+  # that this value should be strictly greater than PcdDmaDeviceOffset.
+  #
+  gEmbeddedTokenSpaceGuid.PcdDmaDeviceLimit|0xFFFFFFFFFFFFFFFF|UINT64|0x000005A
+
+  #
+  # Selection between DT and ACPI as a default
+  #
+  gEmbeddedTokenSpaceGuid.PcdDefaultDtPref|TRUE|BOOLEAN|0x0000059

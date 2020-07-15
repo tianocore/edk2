@@ -1,0 +1,44 @@
+## @file
+#  This library instance provides TCP services by EFI TCPv4/TCPv6 Protocols.
+#
+#  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxeTcpIoLib
+  MODULE_UNI_FILE                = DxeTcpIoLib.uni
+  FILE_GUID                      = D4608509-1AB0-4cc7-827A-AB8E1E7BD3E6
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = TcpIoLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  DxeTcpIoLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  NetworkPkg/NetworkPkg.dec
+
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  BaseMemoryLib
+
+[Protocols]
+  gEfiTcp4ServiceBindingProtocolGuid            ## SOMETIMES_CONSUMES
+  gEfiTcp4ProtocolGuid                          ## SOMETIMES_CONSUMES
+  gEfiTcp6ServiceBindingProtocolGuid            ## SOMETIMES_CONSUMES
+  gEfiTcp6ProtocolGuid                          ## SOMETIMES_CONSUMES

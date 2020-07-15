@@ -2,14 +2,8 @@
   Main file for goto shell level 1 function.
 
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -83,14 +77,14 @@ ShellCommandRunGoto (
       if (!MoveToTag(GetNextNode, L"endfor", L"for", CompareString, ShellCommandGetCurrentScriptFile(), FALSE, FALSE, TRUE)) {
         CurrentScriptFile = ShellCommandGetCurrentScriptFile();
         ShellPrintHiiEx(
-          -1, 
-          -1, 
-          NULL, 
-          STRING_TOKEN (STR_SYNTAX_NO_MATCHING), 
-          gShellLevel1HiiHandle, 
-          CompareString, 
-          L"Goto", 
-          CurrentScriptFile!=NULL 
+          -1,
+          -1,
+          NULL,
+          STRING_TOKEN (STR_SYNTAX_NO_MATCHING),
+          gShellLevel1HiiHandle,
+          CompareString,
+          L"Goto",
+          CurrentScriptFile!=NULL
             && CurrentScriptFile->CurrentCommand!=NULL
             ? CurrentScriptFile->CurrentCommand->Line:0);
         ShellStatus = SHELL_NOT_FOUND;

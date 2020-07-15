@@ -1,0 +1,15 @@
+// /** @file
+// Caspule On Disk Load module.
+//
+// Load Capsule On Disk and build CV hob.
+//
+// Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Caspule On Disk Load module."
+
+#string STR_MODULE_DESCRIPTION          #language en-US "Load Capsule On Disk and build CV hob."

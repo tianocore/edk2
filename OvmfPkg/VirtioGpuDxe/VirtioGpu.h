@@ -4,13 +4,7 @@
 
   Copyright (C) 2016, Red Hat, Inc.
 
-  This program and the accompanying materials are licensed and made available
-  under the terms and conditions of the BSD License which accompanies this
-  distribution. The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT
-  WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -18,6 +12,7 @@
 #define _VIRTIO_GPU_DXE_H_
 
 #include <IndustryStandard/VirtioGpu.h>
+#include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/UefiLib.h>
 #include <Protocol/GraphicsOutput.h>
@@ -54,6 +49,12 @@ typedef struct {
   // VirtIo ring used for VirtIo communication.
   //
   VRING                    Ring;
+
+  //
+  // Token associated with Ring's mapping for bus master common buffer
+  // operation, from VirtioRingMap().
+  //
+  VOID                     *RingMap;
 
   //
   // Event to be signaled at ExitBootServices().
@@ -143,6 +144,13 @@ struct VGPU_GOP_STRUCT {
   //
   UINT32                               *BackingStore;
   UINTN                                NumberOfPages;
+
+  //
+  // Token associated with BackingStore's mapping for bus master common
+  // buffer operation. BackingStoreMap is valid if, and only if,
+  // BackingStore is non-NULL.
+  //
+  VOID                                 *BackingStoreMap;
 };
 
 //
@@ -184,6 +192,73 @@ VirtioGpuUninit (
   );
 
 /**
+  Allocate, zero and map memory, for bus master common buffer operation, to be
+  attached as backing store to a host-side VirtIo GPU resource.
+
+  @param[in]  VgpuDev        The VGPU_DEV object that represents the VirtIo GPU
+                             device.
+
+  @param[in]  NumberOfPages  The number of whole pages to allocate and map.
+
+  @param[out] HostAddress    The system memory address of the allocated area.
+
+  @param[out] DeviceAddress  The bus master device address of the allocated
+                             area. The VirtIo GPU device may be programmed to
+                             access the allocated area through DeviceAddress;
+                             DeviceAddress is to be passed to the
+                             VirtioGpuResourceAttachBacking() function, as the
+                             BackingStoreDeviceAddress parameter.
+
+  @param[out] Mapping        A resulting token to pass to
+                             VirtioGpuUnmapAndFreeBackingStore().
+
+  @retval EFI_SUCCESS  The requested number of pages has been allocated, zeroed
+                       and mapped.
+
+  @return              Status codes propagated from
+                       VgpuDev->VirtIo->AllocateSharedPages() and
+                       VirtioMapAllBytesInSharedBuffer().
+**/
+EFI_STATUS
+VirtioGpuAllocateZeroAndMapBackingStore (
+  IN  VGPU_DEV             *VgpuDev,
+  IN  UINTN                NumberOfPages,
+  OUT VOID                 **HostAddress,
+  OUT EFI_PHYSICAL_ADDRESS *DeviceAddress,
+  OUT VOID                 **Mapping
+  );
+
+/**
+  Unmap and free memory originally allocated and mapped with
+  VirtioGpuAllocateZeroAndMapBackingStore().
+
+  If the memory allocated and mapped with
+  VirtioGpuAllocateZeroAndMapBackingStore() was attached to a host-side VirtIo
+  GPU resource with VirtioGpuResourceAttachBacking(), then the caller is
+  responsible for detaching the backing store from the same resource, with
+  VirtioGpuResourceDetachBacking(), before calling this function.
+
+  @param[in] VgpuDev        The VGPU_DEV object that represents the VirtIo GPU
+                            device.
+
+  @param[in] NumberOfPages  The NumberOfPages parameter originally passed to
+                            VirtioGpuAllocateZeroAndMapBackingStore().
+
+  @param[in] HostAddress    The HostAddress value originally output by
+                            VirtioGpuAllocateZeroAndMapBackingStore().
+
+  @param[in] Mapping        The token that was originally output by
+                            VirtioGpuAllocateZeroAndMapBackingStore().
+**/
+VOID
+VirtioGpuUnmapAndFreeBackingStore (
+  IN VGPU_DEV *VgpuDev,
+  IN UINTN    NumberOfPages,
+  IN VOID     *HostAddress,
+  IN VOID     *Mapping
+  );
+
+/**
   EFI_EVENT_NOTIFY function for the VGPU_DEV.ExitBoot event. It resets the
   VirtIo device, causing it to release its resources and to forget its
   configuration.
@@ -220,7 +295,7 @@ VirtioGpuExitBoot (
   @retval EFI_SUCCESS            Operation successful.
 
   @retval EFI_DEVICE_ERROR       The host rejected the request. The host error
-                                 code has been logged on the EFI_D_ERROR level.
+                                 code has been logged on the DEBUG_ERROR level.
 
   @return                        Codes for unexpected errors in VirtIo
                                  messaging.
@@ -246,10 +321,10 @@ VirtioGpuResourceUnref (
 
 EFI_STATUS
 VirtioGpuResourceAttachBacking (
-  IN OUT VGPU_DEV *VgpuDev,
-  IN     UINT32   ResourceId,
-  IN     VOID     *FirstBackingPage,
-  IN     UINTN    NumberOfPages
+  IN OUT VGPU_DEV             *VgpuDev,
+  IN     UINT32               ResourceId,
+  IN     EFI_PHYSICAL_ADDRESS BackingStoreDeviceAddress,
+  IN     UINTN                NumberOfPages
   );
 
 EFI_STATUS

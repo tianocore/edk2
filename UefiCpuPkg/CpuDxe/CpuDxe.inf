@@ -1,16 +1,10 @@
 ## @file
 #  CPU driver installs CPU Architecture Protocol and CPU MP protocol.
 #
-#  Copyright (c) 2008 - 2017, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2008 - 2019, Intel Corporation. All rights reserved.<BR>
 #  Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 #
-#  This program and the accompanying materials
-#  are licensed and made available under the terms and conditions of the BSD License
-#  which accompanies this distribution.  The full text of the license may be found at
-#  http://opensource.org/licenses/bsd-license.php
-#
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
 
@@ -46,6 +40,7 @@
   ReportStatusCodeLib
   MpInitLib
   TimerLib
+  PeCoffGetEntryPointLib
 
 [Sources]
   CpuDxe.c
@@ -58,18 +53,17 @@
   CpuPageTable.c
 
 [Sources.IA32]
-  Ia32/CpuAsm.asm
   Ia32/CpuAsm.nasm
-  Ia32/CpuAsm.S
+  Ia32/PagingAttribute.c
 
 [Sources.X64]
-  X64/CpuAsm.asm
   X64/CpuAsm.nasm
-  X64/CpuAsm.S
+  X64/PagingAttribute.c
 
 [Protocols]
   gEfiCpuArchProtocolGuid                       ## PRODUCES
   gEfiMpServiceProtocolGuid                     ## PRODUCES
+  gEfiSmmBase2ProtocolGuid                      ## SOMETIMES_CONSUMES
 
 [Guids]
   gIdleLoopEventGuid                            ## CONSUMES           ## Event
@@ -81,6 +75,11 @@
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPteMemoryEncryptionAddressOrMask    ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard                       ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHeapGuardPropertyMask               ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdNullPointerDetectionPropertyMask    ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuStackSwitchExceptionList              ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuKnownGoodStackSize                    ## CONSUMES
 
 [Depex]
   TRUE

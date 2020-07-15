@@ -1,16 +1,9 @@
 /** @file
 Private Header file for Usb Host Controller PEIM
 
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
-  
-This program and the accompanying materials
-are licensed and made available under the terms and conditions
-of the BSD License which accompanies this distribution.  The
-full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -22,6 +15,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Ppi/UsbController.h>
 #include <Ppi/UsbHostController.h>
+#include <Ppi/IoMmu.h>
+#include <Ppi/EndOfPeiPhase.h>
 
 #include <Library/DebugLib.h>
 #include <Library/PeimEntryPoint.h>
@@ -177,7 +172,13 @@ struct _MEMORY_MANAGE_HEADER {
 typedef struct {
   UINTN                       Signature;
   PEI_USB_HOST_CONTROLLER_PPI UsbHostControllerPpi;
+  EDKII_IOMMU_PPI             *IoMmu;
   EFI_PEI_PPI_DESCRIPTOR      PpiDescriptor;
+  //
+  // EndOfPei callback is used to stop the UHC DMA operation
+  // after exit PEI phase.
+  //
+  EFI_PEI_NOTIFY_DESCRIPTOR   EndOfPeiNotifyList;
 
   UINT32                      UsbHostControllerBaseAddress;
   FRAMELIST_ENTRY             *FrameListEntry;
@@ -191,15 +192,16 @@ typedef struct {
 } USB_UHC_DEV;
 
 #define PEI_RECOVERY_USB_UHC_DEV_FROM_UHCI_THIS(a)  CR (a, USB_UHC_DEV, UsbHostControllerPpi, USB_UHC_DEV_SIGNATURE)
+#define PEI_RECOVERY_USB_UHC_DEV_FROM_THIS_NOTIFY(a) CR (a, USB_UHC_DEV, EndOfPeiNotifyList, USB_UHC_DEV_SIGNATURE)
 
 /**
   Submits control transfer to a target USB device.
-  
+
   @param  PeiServices            The pointer of EFI_PEI_SERVICES.
   @param  This                   The pointer of PEI_USB_HOST_CONTROLLER_PPI.
   @param  DeviceAddress          The target device address.
   @param  DeviceSpeed            Target device speed.
-  @param  MaximumPacketLength    Maximum packet size the default control transfer 
+  @param  MaximumPacketLength    Maximum packet size the default control transfer
                                  endpoint is capable of sending or receiving.
   @param  Request                USB device request to send.
   @param  TransferDirection      Specifies the data direction for the data stage.
@@ -233,18 +235,18 @@ UhcControlTransfer (
 
 /**
   Submits bulk transfer to a bulk endpoint of a USB device.
-  
+
   @param  PeiServices           The pointer of EFI_PEI_SERVICES.
   @param  This                  The pointer of PEI_USB_HOST_CONTROLLER_PPI.
   @param  DeviceAddress         Target device address.
   @param  EndPointAddress       Endpoint number and its direction in bit 7.
-  @param  MaximumPacketLength   Maximum packet size the endpoint is capable of 
+  @param  MaximumPacketLength   Maximum packet size the endpoint is capable of
                                 sending or receiving.
-  @param  Data                  Array of pointers to the buffers of data to transmit 
+  @param  Data                  Array of pointers to the buffers of data to transmit
                                 from or receive into.
   @param  DataLength            The lenght of the data buffer.
   @param  DataToggle            On input, the initial data toggle for the transfer;
-                                On output, it is updated to to next data toggle to use of 
+                                On output, it is updated to to next data toggle to use of
                                 the subsequent bulk transfer.
   @param  TimeOut               Indicates the maximum time, in millisecond, which the
                                 transfer is allowed to complete.
@@ -277,10 +279,10 @@ UhcBulkTransfer (
   Retrieves the number of root hub ports.
 
   @param[in]  PeiServices   The pointer to the PEI Services Table.
-  @param[in]  This          The pointer to this instance of the 
+  @param[in]  This          The pointer to this instance of the
                             PEI_USB_HOST_CONTROLLER_PPI.
-  @param[out] PortNumber    The pointer to the number of the root hub ports.                                
-                                
+  @param[out] PortNumber    The pointer to the number of the root hub ports.
+
   @retval EFI_SUCCESS           The port number was retrieved successfully.
   @retval EFI_INVALID_PARAMETER PortNumber is NULL.
 
@@ -295,10 +297,10 @@ UhcGetRootHubPortNumber (
 
 /**
   Retrieves the current status of a USB root hub port.
-  
+
   @param  PeiServices            The pointer of EFI_PEI_SERVICES.
   @param  This                   The pointer of PEI_USB_HOST_CONTROLLER_PPI.
-  @param  PortNumber             The root hub port to retrieve the state from.  
+  @param  PortNumber             The root hub port to retrieve the state from.
   @param  PortStatus             Variable to receive the port state.
 
   @retval EFI_SUCCESS            The status of the USB root hub port specified.
@@ -317,7 +319,7 @@ UhcGetRootHubPortStatus (
 
 /**
   Sets a feature for the specified root hub port.
-  
+
   @param  PeiServices           The pointer of EFI_PEI_SERVICES
   @param  This                  The pointer of PEI_USB_HOST_CONTROLLER_PPI
   @param  PortNumber            Root hub port to set.
@@ -339,7 +341,7 @@ UhcSetRootHubPortFeature (
 
 /**
   Clears a feature for the specified root hub port.
-  
+
   @param  PeiServices           The pointer of EFI_PEI_SERVICES.
   @param  This                  The pointer of PEI_USB_HOST_CONTROLLER_PPI.
   @param  PortNumber            Specifies the root hub port whose feature
@@ -347,7 +349,7 @@ UhcSetRootHubPortFeature (
   @param  PortFeature           Indicates the feature selector associated with the
                                 feature clear request.
 
-  @retval EFI_SUCCESS            The feature specified by PortFeature was cleared 
+  @retval EFI_SUCCESS            The feature specified by PortFeature was cleared
                                  for the USB root hub port specified by PortNumber.
   @retval EFI_INVALID_PARAMETER  PortNumber is invalid or PortFeature is invalid.
 
@@ -391,7 +393,7 @@ CreateFrameList (
 
 /**
   Read a 16bit width data from Uhc HC IO space register.
-  
+
   @param  UhcDev  The UHCI device.
   @param  Port    The IO space address of the register.
 
@@ -406,7 +408,7 @@ USBReadPortW (
 
 /**
   Write a 16bit width data into Uhc HC IO space register.
-  
+
   @param  UhcDev  The UHCI device.
   @param  Port    The IO space address of the register.
   @param  Data    The data written into the register.
@@ -421,7 +423,7 @@ USBWritePortW (
 
 /**
   Write a 32bit width data into Uhc HC IO space register.
-  
+
   @param  UhcDev  The UHCI device.
   @param  Port    The IO space address of the register.
   @param  Data    The data written into the register.
@@ -436,7 +438,7 @@ USBWritePortDW (
 
 /**
   Clear the content of UHCI's Status Register.
-  
+
   @param  UhcDev       The UHCI device.
   @param  StatusAddr   The IO space address of the register.
 
@@ -461,21 +463,6 @@ BOOLEAN
 IsStatusOK (
   IN USB_UHC_DEV     *UhcDev,
   IN UINT32          StatusRegAddr
-  );
-
-/**
-  Get Current Frame Number.
-
-  @param  UhcDev          The UHCI device.
-  @param  FrameNumberAddr The address of frame list register.
-
-  @retval The content of the frame list register.
-
-**/
-UINT16
-GetCurrentFrameNumber (
-  IN USB_UHC_DEV   *UhcDev,
-  IN UINT32        FrameNumberAddr
   );
 
 /**
@@ -520,19 +507,6 @@ VOID
 SetQHHorizontalLinkPtr (
   IN QH_STRUCT  *PtrQH,
   IN VOID       *PtrNext
-  );
-
-/**
-  Get the horizontal link pointer in QH.
-
-  @param  PtrQH     Place to store QH_STRUCT pointer.
-
-  @retval The horizontal link pointer in QH.
-
-**/
-VOID  *
-GetQHHorizontalLinkPtr (
-  IN QH_STRUCT  *PtrQH
   );
 
 /**
@@ -600,18 +574,6 @@ SetQHVerticalValidorInvalid (
   IN BOOLEAN    IsValid
   );
 
-/**
-  Get the vertical validor bit in QH.
-
-  @param  PtrQH      Place to store QH_STRUCT pointer.
-
-  @retval The vertical linker is valid or not.
-
-**/
-BOOLEAN
-GetQHHorizontalValidorInvalid (
-  IN QH_STRUCT  *PtrQH
-  );
 
 /**
   Allocate TD or QH Struct.
@@ -654,7 +616,8 @@ CreateTD (
   @param  DevAddr      Device address.
   @param  Endpoint     Endpoint number.
   @param  DeviceSpeed  Device Speed.
-  @param  DevRequest   Device reuquest.
+  @param  DevRequest   CPU memory address of request structure buffer to transfer.
+  @param  RequestPhy   PCI memory address of request structure buffer to transfer.
   @param  RequestLen   Request length.
   @param  PtrTD        TD_STRUCT generated.
 
@@ -669,6 +632,7 @@ GenSetupStageTD (
   IN  UINT8           Endpoint,
   IN  UINT8           DeviceSpeed,
   IN  UINT8           *DevRequest,
+  IN  UINT8           *RequestPhy,
   IN  UINT8           RequestLen,
   OUT TD_STRUCT       **PtrTD
   );
@@ -679,7 +643,8 @@ GenSetupStageTD (
   @param  UhcDev       The UHCI device.
   @param  DevAddr      Device address.
   @param  Endpoint     Endpoint number.
-  @param  PtrData      Data buffer.
+  @param  PtrData      CPU memory address of user data buffer to transfer.
+  @param  DataPhy      PCI memory address of user data buffer to transfer.
   @param  Len          Data length.
   @param  PktID        PacketID.
   @param  Toggle       Data toggle value.
@@ -696,6 +661,7 @@ GenDataTD (
   IN  UINT8           DevAddr,
   IN  UINT8           Endpoint,
   IN  UINT8           *PtrData,
+  IN  UINT8           *DataPhy,
   IN  UINT8           Len,
   IN  UINT8           PktID,
   IN  UINT8           Toggle,
@@ -792,19 +758,6 @@ GetTDLinkPtr (
   IN  TD_STRUCT *PtrTDStruct
   );
 
-/**
-  Get the information about whether the Link Pointer field pointing to
-  a QH or a TD.
-
-  @param  PtrTDStruct     Place to store TD_STRUCT pointer.
-
-  @retval whether the Link Pointer field pointing to a QH or a TD.
-
-**/
-BOOLEAN
-IsTDLinkPtrQHOrTD (
-  IN  TD_STRUCT *PtrTDStruct
-  );
 
 /**
   Enable/Disable short packet detection mechanism.
@@ -1304,30 +1257,134 @@ InsertMemoryHeaderToList (
   IN MEMORY_MANAGE_HEADER  *NewMemoryHeader
   );
 
+
 /**
-  Judge the memory block in the memory header is empty or not.
+  Map address of request structure buffer.
 
-  @param  MemoryHeaderPtr   A pointer to the memory header list.
+  @param  Uhc                The UHCI device.
+  @param  Request            The user request buffer.
+  @param  MappedAddr         Mapped address of request.
+  @param  Map                Identificaion of this mapping to return.
 
-  @retval Whether the memory block in the memory header is empty or not.
+  @return EFI_SUCCESS        Success.
+  @return EFI_DEVICE_ERROR   Fail to map the user request.
 
 **/
-BOOLEAN
-IsMemoryBlockEmptied (
-  IN MEMORY_MANAGE_HEADER  *MemoryHeaderPtr
+EFI_STATUS
+UhciMapUserRequest (
+  IN  USB_UHC_DEV         *Uhc,
+  IN  OUT VOID            *Request,
+  OUT UINT8               **MappedAddr,
+  OUT VOID                **Map
   );
 
 /**
-  remove a memory header from list.
+  Map address of user data buffer.
 
-  @param  FirstMemoryHeader   A pointer to the memory header list.
-  @param  FreeMemoryHeader    A memory header to be removed into the list.
+  @param  Uhc                The UHCI device.
+  @param  Direction          Direction of the data transfer.
+  @param  Data               The user data buffer.
+  @param  Len                Length of the user data.
+  @param  PktId              Packet identificaion.
+  @param  MappedAddr         Mapped address to return.
+  @param  Map                Identificaion of this mapping to return.
+
+  @return EFI_SUCCESS        Success.
+  @return EFI_DEVICE_ERROR   Fail to map the user data.
+
+**/
+EFI_STATUS
+UhciMapUserData (
+  IN  USB_UHC_DEV             *Uhc,
+  IN  EFI_USB_DATA_DIRECTION  Direction,
+  IN  VOID                    *Data,
+  IN  OUT UINTN               *Len,
+  OUT UINT8                   *PktId,
+  OUT UINT8                   **MappedAddr,
+  OUT VOID                    **Map
+  );
+
+/**
+  Provides the controller-specific addresses required to access system memory from a
+  DMA bus master.
+
+  @param IoMmu                  Pointer to IOMMU PPI.
+  @param Operation              Indicates if the bus master is going to read or write to system memory.
+  @param HostAddress            The system memory address to map to the PCI controller.
+  @param NumberOfBytes          On input the number of bytes to map. On output the number of bytes
+                                that were mapped.
+  @param DeviceAddress          The resulting map address for the bus master PCI controller to use to
+                                access the hosts HostAddress.
+  @param Mapping                A resulting value to pass to Unmap().
+
+  @retval EFI_SUCCESS           The range was mapped for the returned NumberOfBytes.
+  @retval EFI_UNSUPPORTED       The HostAddress cannot be mapped as a common buffer.
+  @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
+  @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a lack of resources.
+  @retval EFI_DEVICE_ERROR      The system hardware could not map the requested address.
+
+**/
+EFI_STATUS
+IoMmuMap (
+  IN EDKII_IOMMU_PPI        *IoMmu,
+  IN EDKII_IOMMU_OPERATION  Operation,
+  IN VOID                   *HostAddress,
+  IN OUT UINTN              *NumberOfBytes,
+  OUT EFI_PHYSICAL_ADDRESS  *DeviceAddress,
+  OUT VOID                  **Mapping
+  );
+
+/**
+  Completes the Map() operation and releases any corresponding resources.
+
+  @param IoMmu              Pointer to IOMMU PPI.
+  @param Mapping            The mapping value returned from Map().
 
 **/
 VOID
-DelinkMemoryBlock (
-  IN MEMORY_MANAGE_HEADER    *FirstMemoryHeader,
-  IN MEMORY_MANAGE_HEADER    *FreeMemoryHeader
+IoMmuUnmap (
+  IN EDKII_IOMMU_PPI        *IoMmu,
+  IN VOID                  *Mapping
+  );
+
+/**
+  Allocates pages that are suitable for an OperationBusMasterCommonBuffer or
+  OperationBusMasterCommonBuffer64 mapping.
+
+  @param IoMmu                  Pointer to IOMMU PPI.
+  @param Pages                  The number of pages to allocate.
+  @param HostAddress            A pointer to store the base system memory address of the
+                                allocated range.
+  @param DeviceAddress          The resulting map address for the bus master PCI controller to use to
+                                access the hosts HostAddress.
+  @param Mapping                A resulting value to pass to Unmap().
+
+  @retval EFI_SUCCESS           The requested memory pages were allocated.
+  @retval EFI_UNSUPPORTED       Attributes is unsupported. The only legal attribute bits are
+                                MEMORY_WRITE_COMBINE and MEMORY_CACHED.
+  @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
+  @retval EFI_OUT_OF_RESOURCES  The memory pages could not be allocated.
+
+**/
+EFI_STATUS
+IoMmuAllocateBuffer (
+  IN EDKII_IOMMU_PPI        *IoMmu,
+  IN UINTN                  Pages,
+  OUT VOID                  **HostAddress,
+  OUT EFI_PHYSICAL_ADDRESS  *DeviceAddress,
+  OUT VOID                  **Mapping
+  );
+
+
+/**
+  Initialize IOMMU.
+
+  @param IoMmu              Pointer to pointer to IOMMU PPI.
+
+**/
+VOID
+IoMmuInit (
+  OUT EDKII_IOMMU_PPI       **IoMmu
   );
 
 #endif

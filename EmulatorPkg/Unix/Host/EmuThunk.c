@@ -6,18 +6,12 @@
   The mUnixThunkTable exists so that a change to EFI_EMU_THUNK_PROTOCOL
   will cause an error in initializing the array if all the member functions
   are not added. It looks like adding a element to end and not initializing
-  it may cause the table to be initaliized with the members at the end being
+  it may cause the table to be initialized with the members at the end being
   set to zero. This is bad as jumping to zero will crash.
 
-Copyright (c) 2004 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2019, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2008 - 2011, Apple Inc. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -36,7 +30,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 int settimer_initialized;
 struct timeval settimer_timeval;
-void (*settimer_callback)(UINT64 delta);
+UINTN  settimer_callback = 0;
 
 BOOLEAN gEmulatorInterruptEnabled = FALSE;
 
@@ -200,7 +194,7 @@ SecSetTimer (
   if (setitimer (ITIMER_REAL, &timerval, NULL) != 0) {
     printf ("SetTimer: setitimer error %s\n", strerror (errno));
   }
-  settimer_callback = CallBack;
+  settimer_callback = (UINTN)CallBack;
 }
 
 
@@ -267,15 +261,15 @@ QueryPerformanceCounter (
   // Convert to nanoseconds.
 
   // If this is the first time we've run, get the timebase.
-  // We can use denom == 0 to indicate that sTimebaseInfo is 
-  // uninitialised because it makes no sense to have a zero 
+  // We can use denom == 0 to indicate that sTimebaseInfo is
+  // uninitialised because it makes no sense to have a zero
   // denominator is a fraction.
 
   if ( sTimebaseInfo.denom == 0 ) {
       (void) mach_timebase_info(&sTimebaseInfo);
   }
 
-  // Do the maths. We hope that the multiplication doesn't 
+  // Do the maths. We hope that the multiplication doesn't
   // overflow; the price you pay for working in fixed point.
 
   return (Start * sTimebaseInfo.numer) / sTimebaseInfo.denom;
@@ -369,7 +363,7 @@ SecGetTime (
   Time->Minute = tm->tm_min;
   Time->Second = tm->tm_sec;
   Time->Nanosecond = 0;
-  Time->TimeZone = timezone;
+  Time->TimeZone = timezone / 60;
   Time->Daylight = (daylight ? EFI_TIME_ADJUST_DAYLIGHT : 0)
     | (tm->tm_isdst > 0 ? EFI_TIME_IN_DAYLIGHT : 0);
 

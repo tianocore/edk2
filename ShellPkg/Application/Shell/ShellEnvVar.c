@@ -1,14 +1,8 @@
 /** @file
   function declarations for shell environment functions.
 
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -124,7 +118,7 @@ FreeEnvironmentVariableList(
   @param[in, out] ListHead       The pointer to pointer to LIST ENTRY object for
                                  storing this list.
 
-  @retval EFI_SUCCESS           the list was created sucessfully.
+  @retval EFI_SUCCESS           the list was created successfully.
 **/
 EFI_STATUS
 GetEnvironmentVariableList(
@@ -143,9 +137,9 @@ GetEnvironmentVariableList(
   if (ListHead == NULL) {
     return (EFI_INVALID_PARAMETER);
   }
-  
+
   Status = EFI_SUCCESS;
-  
+
   ValBufferSize = INIT_DATA_BUFFER_SIZE;
   NameBufferSize = INIT_NAME_BUFFER_SIZE;
   VariableName = AllocateZeroPool(NameBufferSize);
@@ -171,7 +165,7 @@ GetEnvironmentVariableList(
       NameSize = NameBufferSize;
       Status = gRT->GetNextVariableName(&NameSize, VariableName, &Guid);
     }
-    
+
     if (!EFI_ERROR(Status) && CompareGuid(&Guid, &gShellVariableGuid)){
       VarList = AllocateZeroPool(sizeof(ENV_VAR_LIST));
       if (VarList == NULL) {
@@ -200,7 +194,7 @@ GetEnvironmentVariableList(
             Status = EFI_OUT_OF_RESOURCES;
             break;
           }
-          
+
           ValSize = ValBufferSize;
           Status = SHELL_GET_ENVIRONMENT_VARIABLE_AND_ATTRIBUTES(VariableName, &VarList->Atts, &ValSize, VarList->Val);
         }
@@ -239,7 +233,7 @@ GetEnvironmentVariableList(
   @param[in] ListHead           The pointer to LIST_ENTRY from
                                 GetShellEnvVarList().
 
-  @retval EFI_SUCCESS           the list was Set sucessfully.
+  @retval EFI_SUCCESS           the list was Set successfully.
 **/
 EFI_STATUS
 SetEnvironmentVariableList(
@@ -272,7 +266,7 @@ SetEnvironmentVariableList(
   FreeEnvironmentVariableList(&VarList.Link);
 
   //
-  // set all the variables fron the list
+  // set all the variables from the list
   //
   for ( Node = (ENV_VAR_LIST*)GetFirstNode(ListHead)
       ; !IsNull(ListHead, &Node->Link)
@@ -348,8 +342,8 @@ SetEnvironmentVariables(
     //
     // Copy the string into the Key, leaving the last character allocated as NULL to terminate
     //
-    StrnCpyS( Node->Key, 
-              StrStr(CurrentString, L"=") - CurrentString + 1, 
+    StrnCpyS( Node->Key,
+              StrStr(CurrentString, L"=") - CurrentString + 1,
               CurrentString,
               StrStr(CurrentString, L"=") - CurrentString
               );
@@ -413,7 +407,7 @@ ShellFindEnvVarInList (
   )
 {
   ENV_VAR_LIST      *Node;
-  
+
   if (Key == NULL || Value == NULL || ValueSize == NULL) {
     return SHELL_INVALID_PARAMETER;
   }
@@ -459,7 +453,7 @@ ShellAddEnvVarToList (
   ENV_VAR_LIST      *Node;
   CHAR16            *LocalKey;
   CHAR16            *LocalValue;
-  
+
   if (Key == NULL || Value == NULL || ValueSize == 0) {
     return EFI_INVALID_PARAMETER;
   }
@@ -485,7 +479,7 @@ ShellAddEnvVarToList (
   }
 
   //
-  // If the environment varialbe key doesn't exist in list just insert
+  // If the environment variable key doesn't exist in list just insert
   // a new node.
   //
   LocalKey = AllocateCopyPool (StrSize(Key), Key);
@@ -511,7 +505,7 @@ ShellAddEnvVarToList (
   Remove a specified environment variable in gShellEnvVarList.
 
   @param Key        The name of the environment variable.
-  
+
   @retval EFI_SUCCESS       The command executed successfully.
   @retval EFI_NOT_FOUND     The environment variable is not found in
                             gShellEnvVarList.
@@ -546,7 +540,7 @@ ShellRemvoeEnvVarFromList (
 /**
   Initialize the gShellEnvVarList and cache all Shell-Guid-based environment
   variables.
-  
+
 **/
 EFI_STATUS
 ShellInitEnvVarList (

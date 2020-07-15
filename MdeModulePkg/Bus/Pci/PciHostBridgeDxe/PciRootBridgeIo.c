@@ -2,14 +2,8 @@
 
   PCI Root Bridge Io Protocol code.
 
-Copyright (c) 1999 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 1999 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -18,6 +12,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "PciHostResource.h"
 
 #define NO_MAPPING  (VOID *) (UINTN) -1
+
+#define RESOURCE_VALID(Resource) ((Resource)->Base <= (Resource)->Limit)
 
 //
 // Lookup table for increment values based on transfer widths
@@ -84,35 +80,61 @@ CreateRootBridge (
           (Bridge->AllocationAttributes & EFI_PCI_HOST_BRIDGE_COMBINE_MEM_PMEM) != 0 ? L"CombineMemPMem " : L"",
           (Bridge->AllocationAttributes & EFI_PCI_HOST_BRIDGE_MEM64_DECODE) != 0 ? L"Mem64Decode" : L""
           ));
-  DEBUG ((EFI_D_INFO, "           Bus: %lx - %lx\n", Bridge->Bus.Base, Bridge->Bus.Limit));
-  DEBUG ((EFI_D_INFO, "            Io: %lx - %lx\n", Bridge->Io.Base, Bridge->Io.Limit));
-  DEBUG ((EFI_D_INFO, "           Mem: %lx - %lx\n", Bridge->Mem.Base, Bridge->Mem.Limit));
-  DEBUG ((EFI_D_INFO, "    MemAbove4G: %lx - %lx\n", Bridge->MemAbove4G.Base, Bridge->MemAbove4G.Limit));
-  DEBUG ((EFI_D_INFO, "          PMem: %lx - %lx\n", Bridge->PMem.Base, Bridge->PMem.Limit));
-  DEBUG ((EFI_D_INFO, "   PMemAbove4G: %lx - %lx\n", Bridge->PMemAbove4G.Base, Bridge->PMemAbove4G.Limit));
+  DEBUG ((
+    EFI_D_INFO, "           Bus: %lx - %lx Translation=%lx\n",
+    Bridge->Bus.Base, Bridge->Bus.Limit, Bridge->Bus.Translation
+    ));
+  //
+  // Translation for bus is not supported.
+  //
+  ASSERT (Bridge->Bus.Translation == 0);
+  if (Bridge->Bus.Translation != 0) {
+    return NULL;
+  }
+
+  DEBUG ((
+    DEBUG_INFO, "            Io: %lx - %lx Translation=%lx\n",
+    Bridge->Io.Base, Bridge->Io.Limit, Bridge->Io.Translation
+    ));
+  DEBUG ((
+    DEBUG_INFO, "           Mem: %lx - %lx Translation=%lx\n",
+    Bridge->Mem.Base, Bridge->Mem.Limit, Bridge->Mem.Translation
+    ));
+  DEBUG ((
+    DEBUG_INFO, "    MemAbove4G: %lx - %lx Translation=%lx\n",
+    Bridge->MemAbove4G.Base, Bridge->MemAbove4G.Limit, Bridge->MemAbove4G.Translation
+    ));
+  DEBUG ((
+    DEBUG_INFO, "          PMem: %lx - %lx Translation=%lx\n",
+    Bridge->PMem.Base, Bridge->PMem.Limit, Bridge->PMem.Translation
+    ));
+  DEBUG ((
+    DEBUG_INFO, "   PMemAbove4G: %lx - %lx Translation=%lx\n",
+    Bridge->PMemAbove4G.Base, Bridge->PMemAbove4G.Limit, Bridge->PMemAbove4G.Translation
+    ));
 
   //
   // Make sure Mem and MemAbove4G apertures are valid
   //
-  if (Bridge->Mem.Base <= Bridge->Mem.Limit) {
+  if (RESOURCE_VALID (&Bridge->Mem)) {
     ASSERT (Bridge->Mem.Limit < SIZE_4GB);
     if (Bridge->Mem.Limit >= SIZE_4GB) {
       return NULL;
     }
   }
-  if (Bridge->MemAbove4G.Base <= Bridge->MemAbove4G.Limit) {
+  if (RESOURCE_VALID (&Bridge->MemAbove4G)) {
     ASSERT (Bridge->MemAbove4G.Base >= SIZE_4GB);
     if (Bridge->MemAbove4G.Base < SIZE_4GB) {
       return NULL;
     }
   }
-  if (Bridge->PMem.Base <= Bridge->PMem.Limit) {
+  if (RESOURCE_VALID (&Bridge->PMem)) {
     ASSERT (Bridge->PMem.Limit < SIZE_4GB);
     if (Bridge->PMem.Limit >= SIZE_4GB) {
       return NULL;
     }
   }
-  if (Bridge->PMemAbove4G.Base <= Bridge->PMemAbove4G.Limit) {
+  if (RESOURCE_VALID (&Bridge->PMemAbove4G)) {
     ASSERT (Bridge->PMemAbove4G.Base >= SIZE_4GB);
     if (Bridge->PMemAbove4G.Base < SIZE_4GB) {
       return NULL;
@@ -129,11 +151,9 @@ CreateRootBridge (
       // support separate windows for Non-prefetchable and Prefetchable
       // memory.
       //
-      ASSERT (Bridge->PMem.Base > Bridge->PMem.Limit);
-      ASSERT (Bridge->PMemAbove4G.Base > Bridge->PMemAbove4G.Limit);
-      if ((Bridge->PMem.Base <= Bridge->PMem.Limit) ||
-          (Bridge->PMemAbove4G.Base <= Bridge->PMemAbove4G.Limit)
-          ) {
+      ASSERT (!RESOURCE_VALID (&Bridge->PMem));
+      ASSERT (!RESOURCE_VALID (&Bridge->PMemAbove4G));
+      if (RESOURCE_VALID (&Bridge->PMem) || RESOURCE_VALID (&Bridge->PMemAbove4G)) {
         return NULL;
       }
     }
@@ -143,11 +163,9 @@ CreateRootBridge (
       // If this bit is not set, then the PCI Root Bridge does not support
       // 64 bit memory windows.
       //
-      ASSERT (Bridge->MemAbove4G.Base > Bridge->MemAbove4G.Limit);
-      ASSERT (Bridge->PMemAbove4G.Base > Bridge->PMemAbove4G.Limit);
-      if ((Bridge->MemAbove4G.Base <= Bridge->MemAbove4G.Limit) ||
-          (Bridge->PMemAbove4G.Base <= Bridge->PMemAbove4G.Limit)
-          ) {
+      ASSERT (!RESOURCE_VALID (&Bridge->MemAbove4G));
+      ASSERT (!RESOURCE_VALID (&Bridge->PMemAbove4G));
+      if (RESOURCE_VALID (&Bridge->MemAbove4G) || RESOURCE_VALID (&Bridge->PMemAbove4G)) {
         return NULL;
       }
     }
@@ -204,7 +222,12 @@ CreateRootBridge (
     }
     RootBridge->ResAllocNode[Index].Type     = Index;
     if (Bridge->ResourceAssigned && (Aperture->Limit >= Aperture->Base)) {
-      RootBridge->ResAllocNode[Index].Base   = Aperture->Base;
+      //
+      // Base in ResAllocNode is a host address, while Base in Aperture is a
+      // device address.
+      //
+      RootBridge->ResAllocNode[Index].Base   = TO_HOST_ADDRESS (Aperture->Base,
+        Aperture->Translation);
       RootBridge->ResAllocNode[Index].Length = Aperture->Limit - Aperture->Base + 1;
       RootBridge->ResAllocNode[Index].Status = ResAllocated;
     } else {
@@ -268,6 +291,8 @@ CreateRootBridge (
 
   @retval EFI_INVALID_PARAMETER  Buffer is NULL.
 
+  @retval EFI_INVALID_PARAMETER  Address or Count is invalid.
+
   @retval EFI_UNSUPPORTED        The Buffer is not aligned for the given Width.
 
   @retval EFI_UNSUPPORTED        The address range specified by Address, Width,
@@ -288,6 +313,7 @@ RootBridgeIoCheckParameter (
   UINT64                                       Base;
   UINT64                                       Limit;
   UINT32                                       Size;
+  UINT64                                       Length;
 
   //
   // Check to see if Buffer is NULL
@@ -304,7 +330,7 @@ RootBridgeIoCheckParameter (
   }
 
   //
-  // For FIFO type, the target address won't increase during the access,
+  // For FIFO type, the device address won't increase during the access,
   // so treat Count as 1
   //
   if (Width >= EfiPciWidthFifoUint8 && Width <= EfiPciWidthFifoUint64) {
@@ -315,10 +341,25 @@ RootBridgeIoCheckParameter (
   Size  = 1 << Width;
 
   //
+  // Make sure (Count * Size) doesn't exceed MAX_UINT64
+  //
+  if (Count > DivU64x32 (MAX_UINT64, Size)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
   // Check to see if Address is aligned
   //
   if ((Address & (Size - 1)) != 0) {
     return EFI_UNSUPPORTED;
+  }
+
+  //
+  // Make sure (Address + Count * Size) doesn't exceed MAX_UINT64
+  //
+  Length = MultU64x32 (Count, Size);
+  if (Address > MAX_UINT64 - Length) {
+    return EFI_INVALID_PARAMETER;
   }
 
   RootBridge = ROOT_BRIDGE_FROM_THIS (This);
@@ -339,7 +380,7 @@ RootBridgeIoCheckParameter (
     //
     // Allow Legacy IO access
     //
-    if (Address + MultU64x32 (Count, Size) <= 0x1000) {
+    if (Address + Length <= 0x1000) {
       if ((RootBridge->Attributes & (
            EFI_PCI_ATTRIBUTE_ISA_IO | EFI_PCI_ATTRIBUTE_VGA_PALETTE_IO | EFI_PCI_ATTRIBUTE_VGA_IO |
            EFI_PCI_ATTRIBUTE_IDE_PRIMARY_IO | EFI_PCI_ATTRIBUTE_IDE_SECONDARY_IO |
@@ -353,7 +394,7 @@ RootBridgeIoCheckParameter (
     //
     // Allow Legacy MMIO access
     //
-    if ((Address >= 0xA0000) && (Address + MultU64x32 (Count, Size)) <= 0xC0000) {
+    if ((Address >= 0xA0000) && (Address + Length) <= 0xC0000) {
       if ((RootBridge->Attributes & EFI_PCI_ATTRIBUTE_VGA_MEMORY) != 0) {
         return EFI_SUCCESS;
       }
@@ -362,12 +403,18 @@ RootBridgeIoCheckParameter (
     // By comparing the Address against Limit we know which range to be used
     // for checking
     //
-    if (Address + MultU64x32 (Count, Size) <= RootBridge->Mem.Limit + 1) {
-      Base = RootBridge->Mem.Base;
+    if ((Address >= RootBridge->Mem.Base) && (Address + Length <= RootBridge->Mem.Limit + 1)) {
+      Base  = RootBridge->Mem.Base;
       Limit = RootBridge->Mem.Limit;
-    } else {
-      Base = RootBridge->MemAbove4G.Base;
+    } else if ((Address >= RootBridge->PMem.Base) && (Address + Length <= RootBridge->PMem.Limit + 1)) {
+      Base  = RootBridge->PMem.Base;
+      Limit = RootBridge->PMem.Limit;
+    } else if ((Address >= RootBridge->MemAbove4G.Base) && (Address + Length <= RootBridge->MemAbove4G.Limit + 1)) {
+      Base  = RootBridge->MemAbove4G.Base;
       Limit = RootBridge->MemAbove4G.Limit;
+    } else {
+      Base  = RootBridge->PMemAbove4G.Base;
+      Limit = RootBridge->PMemAbove4G.Limit;
     }
   } else {
     PciRbAddr = (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_PCI_ADDRESS*) &Address;
@@ -394,11 +441,124 @@ RootBridgeIoCheckParameter (
       return EFI_INVALID_PARAMETER;
   }
 
-  if (Address + MultU64x32 (Count, Size) > Limit + 1) {
+  if (Address + Length > Limit + 1) {
     return EFI_INVALID_PARAMETER;
   }
 
   return EFI_SUCCESS;
+}
+
+/**
+  Use address to match apertures of memory type and then get the corresponding
+  translation.
+
+  @param RootBridge              The root bridge instance.
+  @param Address                 The address used to match aperture.
+  @param Translation             Pointer containing the output translation.
+
+  @return EFI_SUCCESS            Get translation successfully.
+  @return EFI_INVALID_PARAMETER  No matched memory aperture; the input Address
+                                 must be invalid.
+**/
+EFI_STATUS
+RootBridgeIoGetMemTranslationByAddress (
+  IN PCI_ROOT_BRIDGE_INSTANCE               *RootBridge,
+  IN UINT64                                 Address,
+  IN OUT UINT64                             *Translation
+  )
+{
+  if (Address >= RootBridge->Mem.Base && Address <= RootBridge->Mem.Limit) {
+    *Translation = RootBridge->Mem.Translation;
+  } else if (Address >= RootBridge->PMem.Base && Address <= RootBridge->PMem.Limit) {
+    *Translation = RootBridge->PMem.Translation;
+  } else if (Address >= RootBridge->MemAbove4G.Base && Address <= RootBridge->MemAbove4G.Limit) {
+    *Translation = RootBridge->MemAbove4G.Translation;
+  } else if (Address >= RootBridge->PMemAbove4G.Base && Address <= RootBridge->PMemAbove4G.Limit) {
+    *Translation = RootBridge->PMemAbove4G.Translation;
+  } else {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Return the result of (Multiplicand * Multiplier / Divisor).
+
+  @param Multiplicand A 64-bit unsigned value.
+  @param Multiplier   A 64-bit unsigned value.
+  @param Divisor      A 32-bit unsigned value.
+  @param Remainder    A pointer to a 32-bit unsigned value. This parameter is
+                      optional and may be NULL.
+
+  @return Multiplicand * Multiplier / Divisor.
+**/
+UINT64
+MultThenDivU64x64x32 (
+  IN      UINT64                    Multiplicand,
+  IN      UINT64                    Multiplier,
+  IN      UINT32                    Divisor,
+  OUT     UINT32                    *Remainder  OPTIONAL
+  )
+{
+  UINT64                            Uint64;
+  UINT32                            LocalRemainder;
+  UINT32                            Uint32;
+  if (Multiplicand > DivU64x64Remainder (MAX_UINT64, Multiplier, NULL)) {
+    //
+    // Make sure Multiplicand is the bigger one.
+    //
+    if (Multiplicand < Multiplier) {
+      Uint64       = Multiplicand;
+      Multiplicand = Multiplier;
+      Multiplier   = Uint64;
+    }
+    //
+    // Because Multiplicand * Multiplier overflows,
+    //   Multiplicand * Multiplier / Divisor
+    // = (2 * Multiplicand' + 1) * Multiplier / Divisor
+    // = 2 * (Multiplicand' * Multiplier / Divisor) + Multiplier / Divisor
+    //
+    Uint64 = MultThenDivU64x64x32 (RShiftU64 (Multiplicand, 1), Multiplier, Divisor, &LocalRemainder);
+    Uint64 = LShiftU64 (Uint64, 1);
+    Uint32 = 0;
+    if ((Multiplicand & 0x1) == 1) {
+      Uint64 += DivU64x32Remainder (Multiplier, Divisor, &Uint32);
+    }
+    return Uint64 + DivU64x32Remainder (Uint32 + LShiftU64 (LocalRemainder, 1), Divisor, Remainder);
+  } else {
+    return DivU64x32Remainder (MultU64x64 (Multiplicand, Multiplier), Divisor, Remainder);
+  }
+}
+
+/**
+  Return the elapsed tick count from CurrentTick.
+
+  @param  CurrentTick  On input, the previous tick count.
+                       On output, the current tick count.
+  @param  StartTick    The value the performance counter starts with when it
+                       rolls over.
+  @param  EndTick      The value that the performance counter ends with before
+                       it rolls over.
+
+  @return  The elapsed tick count from CurrentTick.
+**/
+UINT64
+GetElapsedTick (
+  UINT64  *CurrentTick,
+  UINT64  StartTick,
+  UINT64  EndTick
+  )
+{
+  UINT64  PreviousTick;
+
+  PreviousTick = *CurrentTick;
+  *CurrentTick = GetPerformanceCounter();
+  if (StartTick < EndTick) {
+    return *CurrentTick - PreviousTick;
+  } else {
+    return PreviousTick - *CurrentTick;
+  }
 }
 
 /**
@@ -450,6 +610,11 @@ RootBridgeIoPollMem (
   EFI_STATUS  Status;
   UINT64      NumberOfTicks;
   UINT32      Remainder;
+  UINT64      StartTick;
+  UINT64      EndTick;
+  UINT64      CurrentTick;
+  UINT64      ElapsedTick;
+  UINT64      Frequency;
 
   if (Result == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -475,28 +640,18 @@ RootBridgeIoPollMem (
     return EFI_SUCCESS;
 
   } else {
-
     //
-    // Determine the proper # of metronome ticks to wait for polling the
-    // location.  The nuber of ticks is Roundup (Delay /
-    // mMetronome->TickPeriod)+1
-    // The "+1" to account for the possibility of the first tick being short
-    // because we started in the middle of a tick.
+    // NumberOfTicks = Frenquency * Delay / EFI_TIMER_PERIOD_SECONDS(1)
     //
-    // BugBug: overriding mMetronome->TickPeriod with UINT32 until Metronome
-    // protocol definition is updated.
-    //
-    NumberOfTicks = DivU64x32Remainder (Delay, (UINT32) mMetronome->TickPeriod,
-                      &Remainder);
-    if (Remainder != 0) {
-      NumberOfTicks += 1;
+    Frequency     = GetPerformanceCounterProperties (&StartTick, &EndTick);
+    NumberOfTicks = MultThenDivU64x64x32 (Frequency, Delay, (UINT32)EFI_TIMER_PERIOD_SECONDS(1), &Remainder);
+    if (Remainder >= (UINTN)EFI_TIMER_PERIOD_SECONDS(1) / 2) {
+      NumberOfTicks++;
     }
-    NumberOfTicks += 1;
-
-    while (NumberOfTicks != 0) {
-
-      mMetronome->WaitForTick (mMetronome, 1);
-
+    for ( ElapsedTick = 0, CurrentTick = GetPerformanceCounter()
+        ; ElapsedTick <= NumberOfTicks
+        ; ElapsedTick += GetElapsedTick (&CurrentTick, StartTick, EndTick)
+        ) {
       Status = This->Mem.Read (This, Width, Address, 1, Result);
       if (EFI_ERROR (Status)) {
         return Status;
@@ -505,8 +660,6 @@ RootBridgeIoPollMem (
       if ((*Result & Mask) == Value) {
         return EFI_SUCCESS;
       }
-
-      NumberOfTicks -= 1;
     }
   }
   return EFI_TIMEOUT;
@@ -559,6 +712,11 @@ RootBridgeIoPollIo (
   EFI_STATUS  Status;
   UINT64      NumberOfTicks;
   UINT32      Remainder;
+  UINT64      StartTick;
+  UINT64      EndTick;
+  UINT64      CurrentTick;
+  UINT64      ElapsedTick;
+  UINT64      Frequency;
 
   //
   // No matter what, always do a single poll.
@@ -584,25 +742,18 @@ RootBridgeIoPollIo (
     return EFI_SUCCESS;
 
   } else {
-
     //
-    // Determine the proper # of metronome ticks to wait for polling the
-    // location.  The number of ticks is Roundup (Delay /
-    // mMetronome->TickPeriod)+1
-    // The "+1" to account for the possibility of the first tick being short
-    // because we started in the middle of a tick.
+    // NumberOfTicks = Frenquency * Delay / EFI_TIMER_PERIOD_SECONDS(1)
     //
-    NumberOfTicks = DivU64x32Remainder (Delay, (UINT32)mMetronome->TickPeriod,
-                      &Remainder);
-    if (Remainder != 0) {
-      NumberOfTicks += 1;
+    Frequency     = GetPerformanceCounterProperties (&StartTick, &EndTick);
+    NumberOfTicks = MultThenDivU64x64x32 (Frequency, Delay, (UINT32)EFI_TIMER_PERIOD_SECONDS(1), &Remainder);
+    if (Remainder >= (UINTN)EFI_TIMER_PERIOD_SECONDS(1) / 2) {
+      NumberOfTicks++;
     }
-    NumberOfTicks += 1;
-
-    while (NumberOfTicks != 0) {
-
-      mMetronome->WaitForTick (mMetronome, 1);
-
+    for ( ElapsedTick = 0, CurrentTick = GetPerformanceCounter()
+        ; ElapsedTick <= NumberOfTicks
+        ; ElapsedTick += GetElapsedTick (&CurrentTick, StartTick, EndTick)
+        ) {
       Status = This->Io.Read (This, Width, Address, 1, Result);
       if (EFI_ERROR (Status)) {
         return Status;
@@ -611,8 +762,6 @@ RootBridgeIoPollIo (
       if ((*Result & Mask) == Value) {
         return EFI_SUCCESS;
       }
-
-      NumberOfTicks -= 1;
     }
   }
   return EFI_TIMEOUT;
@@ -656,13 +805,25 @@ RootBridgeIoMemRead (
   )
 {
   EFI_STATUS                             Status;
+  PCI_ROOT_BRIDGE_INSTANCE               *RootBridge;
+  UINT64                                 Translation;
 
   Status = RootBridgeIoCheckParameter (This, MemOperation, Width, Address,
                                        Count, Buffer);
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  return mCpuIo->Mem.Read (mCpuIo, (EFI_CPU_IO_PROTOCOL_WIDTH) Width, Address, Count, Buffer);
+
+  RootBridge = ROOT_BRIDGE_FROM_THIS (This);
+  Status = RootBridgeIoGetMemTranslationByAddress (RootBridge, Address, &Translation);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  // Address passed to CpuIo->Mem.Read needs to be a host address instead of
+  // device address.
+  return mCpuIo->Mem.Read (mCpuIo, (EFI_CPU_IO_PROTOCOL_WIDTH) Width,
+      TO_HOST_ADDRESS (Address, Translation), Count, Buffer);
 }
 
 /**
@@ -703,13 +864,25 @@ RootBridgeIoMemWrite (
   )
 {
   EFI_STATUS                             Status;
+  PCI_ROOT_BRIDGE_INSTANCE               *RootBridge;
+  UINT64                                 Translation;
 
   Status = RootBridgeIoCheckParameter (This, MemOperation, Width, Address,
                                        Count, Buffer);
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  return mCpuIo->Mem.Write (mCpuIo, (EFI_CPU_IO_PROTOCOL_WIDTH) Width, Address, Count, Buffer);
+
+  RootBridge = ROOT_BRIDGE_FROM_THIS (This);
+  Status = RootBridgeIoGetMemTranslationByAddress (RootBridge, Address, &Translation);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  // Address passed to CpuIo->Mem.Write needs to be a host address instead of
+  // device address.
+  return mCpuIo->Mem.Write (mCpuIo, (EFI_CPU_IO_PROTOCOL_WIDTH) Width,
+      TO_HOST_ADDRESS (Address, Translation), Count, Buffer);
 }
 
 /**
@@ -744,6 +917,8 @@ RootBridgeIoIoRead (
   )
 {
   EFI_STATUS                                    Status;
+  PCI_ROOT_BRIDGE_INSTANCE                      *RootBridge;
+
   Status = RootBridgeIoCheckParameter (
              This, IoOperation, Width,
              Address, Count, Buffer
@@ -751,7 +926,13 @@ RootBridgeIoIoRead (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  return mCpuIo->Io.Read (mCpuIo, (EFI_CPU_IO_PROTOCOL_WIDTH) Width, Address, Count, Buffer);
+
+  RootBridge = ROOT_BRIDGE_FROM_THIS (This);
+
+  // Address passed to CpuIo->Io.Read needs to be a host address instead of
+  // device address.
+  return mCpuIo->Io.Read (mCpuIo, (EFI_CPU_IO_PROTOCOL_WIDTH) Width,
+      TO_HOST_ADDRESS (Address, RootBridge->Io.Translation), Count, Buffer);
 }
 
 /**
@@ -786,6 +967,8 @@ RootBridgeIoIoWrite (
   )
 {
   EFI_STATUS                                    Status;
+  PCI_ROOT_BRIDGE_INSTANCE                      *RootBridge;
+
   Status = RootBridgeIoCheckParameter (
              This, IoOperation, Width,
              Address, Count, Buffer
@@ -793,7 +976,13 @@ RootBridgeIoIoWrite (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  return mCpuIo->Io.Write (mCpuIo, (EFI_CPU_IO_PROTOCOL_WIDTH) Width, Address, Count, Buffer);
+
+  RootBridge = ROOT_BRIDGE_FROM_THIS (This);
+
+  // Address passed to CpuIo->Io.Write needs to be a host address instead of
+  // device address.
+  return mCpuIo->Io.Write (mCpuIo, (EFI_CPU_IO_PROTOCOL_WIDTH) Width,
+      TO_HOST_ADDRESS (Address, RootBridge->Io.Translation), Count, Buffer);
 }
 
 /**
@@ -1072,6 +1261,26 @@ RootBridgeIoMap (
 
   RootBridge = ROOT_BRIDGE_FROM_THIS (This);
 
+  if (mIoMmu != NULL) {
+    if (!RootBridge->DmaAbove4G) {
+      //
+      // Clear 64bit support
+      //
+      if (Operation > EfiPciOperationBusMasterCommonBuffer) {
+        Operation = (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_OPERATION) (Operation - EfiPciOperationBusMasterRead64);
+      }
+    }
+    Status = mIoMmu->Map (
+                       mIoMmu,
+                       (EDKII_IOMMU_OPERATION) Operation,
+                       HostAddress,
+                       NumberOfBytes,
+                       DeviceAddress,
+                       Mapping
+                       );
+    return Status;
+  }
+
   PhysicalAddress = (EFI_PHYSICAL_ADDRESS) (UINTN) HostAddress;
   if ((!RootBridge->DmaAbove4G ||
        (Operation != EfiPciOperationBusMasterRead64 &&
@@ -1194,8 +1403,18 @@ RootBridgeIoUnmap (
   MAP_INFO                 *MapInfo;
   LIST_ENTRY               *Link;
   PCI_ROOT_BRIDGE_INSTANCE *RootBridge;
+  EFI_STATUS                Status;
+
+  if (mIoMmu != NULL) {
+    Status = mIoMmu->Unmap (
+                       mIoMmu,
+                       Mapping
+                       );
+    return Status;
+  }
 
   RootBridge = ROOT_BRIDGE_FROM_THIS (This);
+
   //
   // See if the Map() operation associated with this Unmap() required a mapping
   // buffer. If a mapping buffer was not required, then this function simply
@@ -1312,6 +1531,24 @@ RootBridgeIoAllocateBuffer (
 
   RootBridge = ROOT_BRIDGE_FROM_THIS (This);
 
+  if (mIoMmu != NULL) {
+    if (!RootBridge->DmaAbove4G) {
+      //
+      // Clear DUAL_ADDRESS_CYCLE
+      //
+      Attributes &= ~((UINT64) EFI_PCI_ATTRIBUTE_DUAL_ADDRESS_CYCLE);
+    }
+    Status = mIoMmu->AllocateBuffer (
+                       mIoMmu,
+                       Type,
+                       MemoryType,
+                       Pages,
+                       HostAddress,
+                       Attributes
+                       );
+    return Status;
+  }
+
   AllocateType = AllocateAnyPages;
   if (!RootBridge->DmaAbove4G ||
       (Attributes & EFI_PCI_ATTRIBUTE_DUAL_ADDRESS_CYCLE) == 0) {
@@ -1356,6 +1593,17 @@ RootBridgeIoFreeBuffer (
   OUT VOID                             *HostAddress
   )
 {
+  EFI_STATUS                Status;
+
+  if (mIoMmu != NULL) {
+    Status = mIoMmu->FreeBuffer (
+                       mIoMmu,
+                       Pages,
+                       HostAddress
+                       );
+    return Status;
+  }
+
   return gBS->FreePages ((EFI_PHYSICAL_ADDRESS) (UINTN) HostAddress, Pages);
 }
 
@@ -1499,20 +1747,19 @@ RootBridgeIoSetAttributes (
 
 /**
   Retrieves the current resource settings of this PCI root bridge in the form
-  of a set of ACPI 2.0 resource descriptors.
+  of a set of ACPI resource descriptors.
 
   There are only two resource descriptor types from the ACPI Specification that
   may be used to describe the current resources allocated to a PCI root bridge.
-  These are the QWORD Address Space Descriptor (ACPI 2.0 Section 6.4.3.5.1),
-  and the End Tag (ACPI 2.0 Section 6.4.2.8). The QWORD Address Space
-  Descriptor can describe memory, I/O, and bus number ranges for dynamic or
-  fixed resources. The configuration of a PCI root bridge is described with one
-  or more QWORD Address Space Descriptors followed by an End Tag.
+  These are the QWORD Address Space Descriptor, and the End Tag. The QWORD
+  Address Space Descriptor can describe memory, I/O, and bus number ranges for
+  dynamic or fixed resources. The configuration of a PCI root bridge is described
+  with one or more QWORD Address Space Descriptors followed by an End Tag.
 
   @param[in]   This        A pointer to the EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
-  @param[out]  Resources   A pointer to the ACPI 2.0 resource descriptors that
+  @param[out]  Resources   A pointer to the resource descriptors that
                            describe the current configuration of this PCI root
-                           bridge. The storage for the ACPI 2.0 resource
+                           bridge. The storage for the resource
                            descriptors is allocated by this function. The
                            caller must treat the return buffer as read-only
                            data, and the buffer must not be freed by the
@@ -1555,9 +1802,17 @@ RootBridgeIoConfiguration (
 
     Descriptor->Desc = ACPI_ADDRESS_SPACE_DESCRIPTOR;
     Descriptor->Len  = sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) - 3;
+    // According to UEFI 2.7, RootBridgeIo->Configuration should return address
+    // range in CPU view (host address), and ResAllocNode->Base is already a CPU
+    // view address (host address).
     Descriptor->AddrRangeMin  = ResAllocNode->Base;
     Descriptor->AddrRangeMax  = ResAllocNode->Base + ResAllocNode->Length - 1;
     Descriptor->AddrLen       = ResAllocNode->Length;
+    Descriptor->AddrTranslationOffset = GetTranslationByResourceType (
+      RootBridge,
+      ResAllocNode->Type
+      );
+
     switch (ResAllocNode->Type) {
 
     case TypeIo:

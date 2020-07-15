@@ -5,14 +5,8 @@
   verify data signed using PKCS7 structure. The PKCS7 data to be verified must
   be ASN.1 (DER) encoded.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -110,6 +104,82 @@ _Exit:
     FreePool (HashCtx);
   }
 
+  return Status;
+}
+
+/**
+  Check whether the hash of data content is revoked by the revocation database.
+
+  @param[in]  Hash          Pointer to the hash that is searched for.
+  @param[in]  HashSize      The size of the hash in bytes.
+  @param[in]  RevokedDb     Pointer to a list of pointers to EFI_SIGNATURE_LIST
+                            structure which contains list of X.509 certificates
+                            of revoked signers and revoked content hashes.
+
+  @return TRUE   The matched content hash is found in the revocation database.
+  @return FALSE  The matched content hash is not found in the revocation database.
+
+**/
+BOOLEAN
+IsContentHashRevokedByHash (
+  IN  UINT8              *Hash,
+  IN  UINTN              HashSize,
+  IN  EFI_SIGNATURE_LIST **RevokedDb
+  )
+{
+  EFI_SIGNATURE_LIST  *SigList;
+  EFI_SIGNATURE_DATA  *SigData;
+  UINTN               Index;
+  UINTN               EntryIndex;
+  UINTN               EntryCount;
+  BOOLEAN             Status;
+
+  if (RevokedDb == NULL) {
+    return FALSE;
+  }
+
+  Status = FALSE;
+  //
+  // Check if any hash matching content hash can be found in RevokedDB
+  //
+  for (Index = 0; ; Index++) {
+    SigList = (EFI_SIGNATURE_LIST *)(RevokedDb[Index]);
+
+    //
+    // The list is terminated by a NULL pointer.
+    //
+    if (SigList == NULL) {
+      break;
+    }
+
+    //
+    // Search the signature database to search the revoked content hash
+    //
+    SigData    = (EFI_SIGNATURE_DATA *) ((UINT8 *) SigList + sizeof (EFI_SIGNATURE_LIST) +
+                                        SigList->SignatureHeaderSize);
+    EntryCount = (SigList->SignatureListSize - SigList->SignatureHeaderSize -
+                 sizeof (EFI_SIGNATURE_LIST)) / SigList->SignatureSize;
+    for (EntryIndex = 0; EntryIndex < EntryCount; EntryIndex++) {
+      //
+      // The problem case.  There's a revocation hash but the sizes
+      // don't match, meaning it's a different hash algorithm and we
+      // can't tell if it's revoking our binary or not.  Assume not.
+      //
+      if (SigList->SignatureSize - sizeof(EFI_GUID) == HashSize) {
+        //
+        // Compare Data Hash with Signature Data
+        //
+        if (CompareMem (SigData->SignatureData, Hash, HashSize) == 0) {
+          Status = TRUE;
+          goto _Exit;
+        }
+      }
+
+      SigData = (EFI_SIGNATURE_DATA *) ((UINT8 *) SigData + SigList->SignatureSize);
+    }
+  }
+
+_Exit:
   return Status;
 }
 
@@ -424,7 +494,7 @@ IsValidTimestamp (
     TsaCertSize = SigList->SignatureSize - sizeof (EFI_GUID);
 
     //
-    // Each TSA Certificate will normally be in a seperate EFI_SIGNATURE_LIST
+    // Each TSA Certificate will normally be in a separate EFI_SIGNATURE_LIST
     // Leverage ImageTimestampVerify interface for Timestamp counterSignature Verification
     //
     if (ImageTimestampVerify (SignedData, SignedDataSize, TsaCert, TsaCertSize, &SigningTime)) {
@@ -444,7 +514,172 @@ IsValidTimestamp (
 /**
   Check whether the PKCS7 signedData is revoked by verifying with the revoked
   certificates database, and if the signedData is timestamped, the embedded timestamp
-  couterSignature will be checked with the supplied timestamp database.
+  counterSignature will be checked with the supplied timestamp database.
+
+  @param[in]  SignedData      Pointer to buffer containing ASN.1 DER-encoded PKCS7
+                              signature.
+  @param[in]  SignedDataSize  The size of SignedData buffer in bytes.
+  @param[in]  InHash          Pointer to the buffer containing the hash of the message data
+                              previously signed and to be verified.
+  @param[in]  InHashSize      The size of InHash buffer in bytes.
+  @param[in]  RevokedDb       Pointer to a list of pointers to EFI_SIGNATURE_LIST
+                              structure which contains list of X.509 certificates
+                              of revoked signers and revoked content hashes.
+  @param[in]  TimeStampDb     Pointer to a list of pointers to EFI_SIGNATURE_LIST
+                              structures which is used to pass a list of X.509
+                              certificates of trusted timestamp signers.
+
+  @retval  EFI_SUCCESS             The PKCS7 signedData is revoked.
+  @retval  EFI_SECURITY_VIOLATION  Fail to verify the signature in PKCS7 signedData.
+  @retval  EFI_INVALID_PARAMETER   SignedData is NULL or SignedDataSize is zero.
+                                   AllowedDb is NULL.
+                                   Content is not NULL and ContentSize is NULL.
+  @retval  EFI_NOT_FOUND           Content not found because InData is NULL and no
+                                   content embedded in PKCS7 signedData.
+  @retval  EFI_UNSUPPORTED         The PKCS7 signedData was not correctly formatted.
+
+**/
+EFI_STATUS
+P7CheckRevocationByHash (
+  IN UINT8                *SignedData,
+  IN UINTN                SignedDataSize,
+  IN UINT8                *InHash,
+  IN UINTN                InHashSize,
+  IN EFI_SIGNATURE_LIST   **RevokedDb,
+  IN EFI_SIGNATURE_LIST   **TimeStampDb
+  )
+{
+  EFI_STATUS          Status;
+  EFI_SIGNATURE_LIST  *SigList;
+  EFI_SIGNATURE_DATA  *SigData;
+  UINT8               *RevokedCert;
+  UINTN               RevokedCertSize;
+  UINTN               Index;
+  UINT8               *CertBuffer;
+  UINTN               BufferLength;
+  UINT8               *TrustedCert;
+  UINTN               TrustedCertLength;
+  UINT8               CertNumber;
+  UINT8               *CertPtr;
+  UINT8               *Cert;
+  UINTN               CertSize;
+  EFI_TIME            RevocationTime;
+
+  Status          = EFI_SECURITY_VIOLATION;
+  SigData         = NULL;
+  RevokedCert     = NULL;
+  RevokedCertSize = 0;
+  CertBuffer      = NULL;
+  TrustedCert     = NULL;
+
+  //
+  // The signedData is revoked if the hash of content existed in RevokedDb
+  //
+  if (IsContentHashRevokedByHash (InHash, InHashSize, RevokedDb)) {
+    Status = EFI_SUCCESS;
+    goto _Exit;
+  }
+
+  //
+  // Check if the signer's certificate can be found in Revoked database
+  //
+  for (Index = 0; ; Index++) {
+    SigList = (EFI_SIGNATURE_LIST *)(RevokedDb[Index]);
+
+    //
+    // The list is terminated by a NULL pointer.
+    //
+    if (SigList == NULL) {
+      break;
+    }
+
+    //
+    // Ignore any non-X509-format entry in the list.
+    //
+    if (!CompareGuid (&SigList->SignatureType, &gEfiCertX509Guid)) {
+      continue;
+    }
+
+    SigData = (EFI_SIGNATURE_DATA *) ((UINT8 *) SigList + sizeof (EFI_SIGNATURE_LIST) +
+                                      SigList->SignatureHeaderSize);
+
+    RevokedCert     = SigData->SignatureData;
+    RevokedCertSize = SigList->SignatureSize - sizeof (EFI_GUID);
+
+    //
+    // Verifying the PKCS#7 SignedData with the revoked certificate in RevokedDb
+    //
+    if (AuthenticodeVerify (SignedData, SignedDataSize, RevokedCert, RevokedCertSize, InHash, InHashSize)) {
+      //
+      // The signedData was verified by one entry in Revoked Database
+      //
+      Status = EFI_SUCCESS;
+      break;
+    }
+  }
+
+  if (!EFI_ERROR (Status)) {
+    //
+    // The signedData was revoked, since it was hit by RevokedDb
+    //
+    goto _Exit;
+  }
+
+  //
+  // Now we will continue to check the X.509 Certificate Hash & Possible Timestamp
+  //
+  if ((TimeStampDb == NULL) || (*TimeStampDb == NULL)) {
+    goto _Exit;
+  }
+
+  Pkcs7GetSigners (SignedData, SignedDataSize, &CertBuffer, &BufferLength, &TrustedCert, &TrustedCertLength);
+  if ((BufferLength == 0) || (CertBuffer == NULL)) {
+    Status = EFI_SUCCESS;
+    goto _Exit;
+  }
+
+  //
+  // Check if any hash of certificates embedded in P7 data is in the revoked database.
+  //
+  CertNumber = (UINT8) (*CertBuffer);
+  CertPtr    = CertBuffer + 1;
+  for (Index = 0; Index < CertNumber; Index++) {
+    //
+    // Retrieve the Certificate data
+    //
+    CertSize = (UINTN) ReadUnaligned32 ((UINT32 *) CertPtr);
+    Cert     = (UINT8 *)CertPtr + sizeof (UINT32);
+
+    if (IsCertHashRevoked (Cert, CertSize, RevokedDb, &RevocationTime)) {
+      //
+      // Check the timestamp signature and signing time to determine if p7 data can be trusted.
+      //
+      Status = EFI_SUCCESS;
+      if (IsValidTimestamp (SignedData, SignedDataSize, TimeStampDb, &RevocationTime)) {
+        //
+        // Use EFI_NOT_READY to identify the P7Data is not revoked, because the timestamping
+        // occurred prior to the time of certificate revocation.
+        //
+        Status = EFI_NOT_READY;
+      }
+
+      goto _Exit;
+    }
+
+    CertPtr = CertPtr + sizeof (UINT32) + CertSize;
+  }
+
+_Exit:
+  Pkcs7FreeSigners (CertBuffer);
+  Pkcs7FreeSigners (TrustedCert);
+
+  return Status;
+}
+
+/**
+  Check whether the PKCS7 signedData is revoked by verifying with the revoked
+  certificates database, and if the signedData is timestamped, the embedded timestamp
+  counterSignature will be checked with the supplied timestamp database.
 
   @param[in]  SignedData      Pointer to buffer containing ASN.1 DER-encoded PKCS7
                               signature.
@@ -587,8 +822,8 @@ P7CheckRevocation (
       Status = EFI_SUCCESS;
       if (IsValidTimestamp (SignedData, SignedDataSize, TimeStampDb, &RevocationTime)) {
         //
-        // Use EFI_NOT_READY to identify the P7Data is not reovked, because the timestamping
-        // occured prior to the time of certificate revocation.
+        // Use EFI_NOT_READY to identify the P7Data is not revoked, because the timestamping
+        // occurred prior to the time of certificate revocation.
         //
         Status = EFI_NOT_READY;
       }
@@ -602,6 +837,100 @@ P7CheckRevocation (
 _Exit:
   Pkcs7FreeSigners (CertBuffer);
   Pkcs7FreeSigners (TrustedCert);
+
+  return Status;
+}
+
+/**
+  Check whether the PKCS7 signedData can be verified by the trusted certificates
+  database, and return the content of the signedData if requested.
+
+  @param[in]  SignedData      Pointer to buffer containing ASN.1 DER-encoded PKCS7
+                              signature.
+  @param[in]  SignedDataSize  The size of SignedData buffer in bytes.
+  @param[in]  InHash          Pointer to the buffer containing the hash of the message data
+                              previously signed and to be verified.
+  @param[in]  InHashSize      The size of InHash buffer in bytes.
+  @param[in]  AllowedDb       Pointer to a list of pointers to EFI_SIGNATURE_LIST
+                              structures which contains lists of X.509 certificates
+                              of approved signers.
+
+  @retval  EFI_SUCCESS             The PKCS7 signedData is trusted.
+  @retval  EFI_SECURITY_VIOLATION  Fail to verify the signature in PKCS7 signedData.
+  @retval  EFI_INVALID_PARAMETER   SignedData is NULL or SignedDataSize is zero.
+                                   AllowedDb is NULL.
+                                   Content is not NULL and ContentSize is NULL.
+  @retval  EFI_NOT_FOUND           Content not found because InData is NULL and no
+                                   content embedded in PKCS7 signedData.
+  @retval  EFI_UNSUPPORTED         The PKCS7 signedData was not correctly formatted.
+  @retval  EFI_BUFFER_TOO_SMALL    The size of buffer indicated by ContentSize is too
+                                   small to hold the content. ContentSize updated to
+                                   the required size.
+
+**/
+EFI_STATUS
+P7CheckTrustByHash (
+  IN UINT8               *SignedData,
+  IN UINTN               SignedDataSize,
+  IN UINT8               *InHash,
+  IN UINTN               InHashSize,
+  IN EFI_SIGNATURE_LIST  **AllowedDb
+  )
+{
+  EFI_STATUS          Status;
+  EFI_SIGNATURE_LIST  *SigList;
+  EFI_SIGNATURE_DATA  *SigData;
+  UINT8               *TrustCert;
+  UINTN               TrustCertSize;
+  UINTN               Index;
+
+  Status        = EFI_SECURITY_VIOLATION;
+  SigData       = NULL;
+  TrustCert     = NULL;
+  TrustCertSize = 0;
+
+  if (AllowedDb == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Build Certificate Stack with all valid X509 certificates in the supplied
+  // Signature List for PKCS7 Verification.
+  //
+  for (Index = 0; ; Index++) {
+    SigList = (EFI_SIGNATURE_LIST *)(AllowedDb[Index]);
+
+    //
+    // The list is terminated by a NULL pointer.
+    //
+    if (SigList == NULL) {
+      break;
+    }
+
+    //
+    // Ignore any non-X509-format entry in the list.
+    //
+    if (!CompareGuid (&SigList->SignatureType, &gEfiCertX509Guid)) {
+      continue;
+    }
+
+    SigData = (EFI_SIGNATURE_DATA *) ((UINT8 *) SigList + sizeof (EFI_SIGNATURE_LIST) +
+                                      SigList->SignatureHeaderSize);
+
+    TrustCert     = SigData->SignatureData;
+    TrustCertSize = SigList->SignatureSize - sizeof (EFI_GUID);
+
+    //
+    // Verifying the PKCS#7 SignedData with the trusted certificate from AllowedDb
+    //
+    if (AuthenticodeVerify (SignedData, SignedDataSize, TrustCert, TrustCertSize, InHash, InHashSize)) {
+      //
+      // The SignedData was verified successfully by one entry in Trusted Database
+      //
+      Status = EFI_SUCCESS;
+      break;
+    }
+  }
 
   return Status;
 }
@@ -801,11 +1130,13 @@ VerifyBuffer (
   IN OUT UINTN                    *ContentSize
   )
 {
-  EFI_STATUS  Status;
-  UINT8       *AttachedData;
-  UINTN       AttachedDataSize;
-  UINT8       *DataPtr;
-  UINTN       DataSize;
+  EFI_STATUS          Status;
+  EFI_SIGNATURE_LIST  *SigList;
+  UINTN               Index;
+  UINT8               *AttachedData;
+  UINTN               AttachedDataSize;
+  UINT8               *DataPtr;
+  UINTN               DataSize;
 
   //
   // Parameters Checking
@@ -815,6 +1146,58 @@ VerifyBuffer (
   }
   if ((Content != NULL) && (ContentSize == NULL)) {
     return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Check if any invalid entry format in AllowedDb list contents
+  //
+  for (Index = 0; ; Index++) {
+    SigList = (EFI_SIGNATURE_LIST *)(AllowedDb[Index]);
+
+    if (SigList == NULL) {
+      break;
+    }
+    if (SigList->SignatureListSize < sizeof (EFI_SIGNATURE_LIST) +
+                                     SigList->SignatureHeaderSize +
+                                     SigList->SignatureSize) {
+      return EFI_ABORTED;
+    }
+  }
+
+  //
+  // Check if any invalid entry format in RevokedDb list contents
+  //
+  if (RevokedDb != NULL) {
+    for (Index = 0; ; Index++) {
+      SigList = (EFI_SIGNATURE_LIST *)(RevokedDb[Index]);
+
+      if (SigList == NULL) {
+        break;
+      }
+      if (SigList->SignatureListSize < sizeof (EFI_SIGNATURE_LIST) +
+                                       SigList->SignatureHeaderSize +
+                                       SigList->SignatureSize) {
+        return EFI_ABORTED;
+      }
+    }
+  }
+
+  //
+  // Check if any invalid entry format in TimeStampDb list contents
+  //
+  if (TimeStampDb != NULL) {
+    for (Index = 0; ; Index++) {
+      SigList = (EFI_SIGNATURE_LIST *)(TimeStampDb[Index]);
+
+      if (SigList == NULL) {
+        break;
+      }
+      if (SigList->SignatureListSize < sizeof (EFI_SIGNATURE_LIST) +
+                                       SigList->SignatureHeaderSize +
+                                       SigList->SignatureSize) {
+        return EFI_ABORTED;
+      }
+    }
   }
 
   //
@@ -878,7 +1261,7 @@ VerifyBuffer (
                );
     if (!EFI_ERROR (Status)) {
       //
-      // The PKCS7 SignedData is reovked
+      // The PKCS7 SignedData is revoked
       //
       Status = EFI_SECURITY_VIOLATION;
       goto _Exit;
@@ -931,6 +1314,14 @@ _Exit:
   The hash of the signed data content is calculated and passed by the caller. Function
   verifies the signature of the content is valid and signing certificate was not revoked
   and is contained within a list of trusted signers.
+
+  Note: because this function uses hashes and the specification contains a variety of
+        hash choices, you should be aware that the check against the RevokedDb list
+        will improperly succeed if the signature is revoked using a different hash
+        algorithm.  For this reason, you should either cycle through all UEFI supported
+        hashes to see if one is forbidden, or rely on a single hash choice only if the
+        UEFI signature authority only signs and revokes with a single hash (at time
+        of writing, this hash choice is SHA256).
 
   @param[in]     This                 Pointer to EFI_PKCS7_VERIFY_PROTOCOL instance.
   @param[in]     Signature            Points to buffer containing ASN.1 DER-encoded PKCS
@@ -997,11 +1388,49 @@ VerifySignature (
   IN EFI_SIGNATURE_LIST           **TimeStampDb     OPTIONAL
   )
 {
+  EFI_STATUS  Status;
+
   //
-  // NOTE: Current EDKII-OpenSSL interface cannot support VerifySignature
-  //       directly. EFI_UNSUPPORTED is returned in this version.
+  // Parameters Checking
   //
-  return EFI_UNSUPPORTED;
+  if ((Signature == NULL) || (SignatureSize == 0) || (AllowedDb == NULL)
+      || (InHash == NULL) || (InHashSize == 0)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Verify PKCS7 SignedData with Revoked database
+  //
+  if (RevokedDb != NULL) {
+    Status = P7CheckRevocationByHash (
+               Signature,
+               SignatureSize,
+               InHash,
+               InHashSize,
+               RevokedDb,
+               TimeStampDb
+               );
+
+    if (!EFI_ERROR (Status)) {
+      //
+      // The PKCS7 SignedData is revoked
+      //
+      return EFI_SECURITY_VIOLATION;
+    }
+  }
+
+  //
+  // Verify PKCS7 SignedData with AllowedDB
+  //
+  Status = P7CheckTrustByHash (
+             Signature,
+             SignatureSize,
+             InHash,
+             InHashSize,
+             AllowedDb
+             );
+
+  return Status;
 }
 
 //
@@ -1030,8 +1459,17 @@ Pkcs7VerifyDriverEntry (
   IN EFI_SYSTEM_TABLE    *SystemTable
   )
 {
-  EFI_STATUS    Status;
-  EFI_HANDLE    Handle;
+  EFI_STATUS                 Status;
+  EFI_HANDLE                 Handle;
+  EFI_PKCS7_VERIFY_PROTOCOL  Useless;
+
+  //
+  // Avoid loading a second copy if this is built as an external module
+  //
+  Status = gBS->LocateProtocol (&gEfiPkcs7VerifyProtocolGuid, NULL, (VOID **)&Useless);
+  if (!EFI_ERROR (Status)) {
+    return EFI_ABORTED;
+  }
 
   //
   // Install UEFI Pkcs7 Verification Protocol

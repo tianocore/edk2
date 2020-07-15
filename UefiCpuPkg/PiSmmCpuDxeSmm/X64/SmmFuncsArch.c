@@ -1,14 +1,8 @@
 /** @file
   SMM CPU misc functions for x64 arch specific.
-  
-Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2015 - 2019, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -16,6 +10,18 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 EFI_PHYSICAL_ADDRESS                mGdtBuffer;
 UINTN                               mGdtBufferSize;
+
+extern BOOLEAN mCetSupported;
+extern UINTN mSmmShadowStackSize;
+
+X86_ASSEMBLY_PATCH_LABEL mPatchCetPl0Ssp;
+X86_ASSEMBLY_PATCH_LABEL mPatchCetInterruptSsp;
+X86_ASSEMBLY_PATCH_LABEL mPatchCetInterruptSspTable;
+UINT32 mCetPl0Ssp;
+UINT32 mCetInterruptSsp;
+UINT32 mCetInterruptSspTable;
+
+UINTN  mSmmInterruptSspTables;
 
 /**
   Initialize IDT for SMM Stack Guard.
@@ -40,7 +46,7 @@ InitializeIDTSmmStackGuard (
 
 /**
   Initialize Gdt for all processors.
-  
+
   @param[in]   Cr3          CR3 value.
   @param[out]  GdtStepSize  The step size for GDT table.
 
@@ -96,54 +102,6 @@ InitGdt (
 }
 
 /**
-  This function sets GDT/IDT buffer to be RO and XP.
-**/
-VOID
-PatchGdtIdtMap (
-  VOID
-  )
-{
-  EFI_PHYSICAL_ADDRESS       BaseAddress;
-  UINTN                      Size;
-
-  //
-  // GDT
-  //
-  DEBUG ((DEBUG_INFO, "PatchGdtIdtMap - GDT:\n"));
-
-  BaseAddress = mGdtBuffer;
-  Size = ALIGN_VALUE(mGdtBufferSize, SIZE_4KB);
-  SmmSetMemoryAttributes (
-    BaseAddress,
-    Size,
-    EFI_MEMORY_RO
-    );
-  SmmSetMemoryAttributes (
-    BaseAddress,
-    Size,
-    EFI_MEMORY_XP
-    );
-
-  //
-  // IDT
-  //
-  DEBUG ((DEBUG_INFO, "PatchGdtIdtMap - IDT:\n"));
-
-  BaseAddress = gcSmiIdtr.Base;
-  Size = ALIGN_VALUE(gcSmiIdtr.Limit + 1, SIZE_4KB);
-  SmmSetMemoryAttributes (
-    BaseAddress,
-    Size,
-    EFI_MEMORY_RO
-    );
-  SmmSetMemoryAttributes (
-    BaseAddress,
-    Size,
-    EFI_MEMORY_XP
-    );
-}
-
-/**
   Get Protected mode code segment from current GDT table.
 
   @return  Protected mode code segment value.
@@ -158,7 +116,6 @@ GetProtectedModeCS (
   UINTN                    GdtEntryCount;
   UINT16                   Index;
 
-  Index = (UINT16) -1;
   AsmReadGdtr (&GdtrDesc);
   GdtEntryCount = (GdtrDesc.Limit + 1) / sizeof (IA32_SEGMENT_DESCRIPTOR);
   GdtEntry = (IA32_SEGMENT_DESCRIPTOR *) GdtrDesc.Base;
@@ -170,7 +127,7 @@ GetProtectedModeCS (
     }
     GdtEntry++;
   }
-  ASSERT (Index != -1);
+  ASSERT (Index != GdtEntryCount);
   return Index * 8;
 }
 
@@ -200,5 +157,49 @@ TransferApToSafeState (
   // It should never reach here
   //
   ASSERT (FALSE);
+}
+
+/**
+  Initialize the shadow stack related data structure.
+
+  @param CpuIndex     The index of CPU.
+  @param ShadowStack  The bottom of the shadow stack for this CPU.
+**/
+VOID
+InitShadowStack (
+  IN UINTN  CpuIndex,
+  IN VOID   *ShadowStack
+  )
+{
+  UINTN       SmmShadowStackSize;
+  UINT64      *InterruptSspTable;
+
+  if ((PcdGet32 (PcdControlFlowEnforcementPropertyMask) != 0) && mCetSupported) {
+    SmmShadowStackSize = EFI_PAGES_TO_SIZE (EFI_SIZE_TO_PAGES (PcdGet32 (PcdCpuSmmShadowStackSize)));
+    if (FeaturePcdGet (PcdCpuSmmStackGuard)) {
+      SmmShadowStackSize += EFI_PAGES_TO_SIZE (2);
+    }
+    mCetPl0Ssp = (UINT32)((UINTN)ShadowStack + SmmShadowStackSize - sizeof(UINT64));
+    PatchInstructionX86 (mPatchCetPl0Ssp, mCetPl0Ssp, 4);
+    DEBUG ((DEBUG_INFO, "mCetPl0Ssp - 0x%x\n", mCetPl0Ssp));
+    DEBUG ((DEBUG_INFO, "ShadowStack - 0x%x\n", ShadowStack));
+    DEBUG ((DEBUG_INFO, "  SmmShadowStackSize - 0x%x\n", SmmShadowStackSize));
+
+    if (FeaturePcdGet (PcdCpuSmmStackGuard)) {
+      if (mSmmInterruptSspTables == 0) {
+        mSmmInterruptSspTables = (UINTN)AllocateZeroPool(sizeof(UINT64) * 8 * gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus);
+        ASSERT (mSmmInterruptSspTables != 0);
+        DEBUG ((DEBUG_INFO, "mSmmInterruptSspTables - 0x%x\n", mSmmInterruptSspTables));
+      }
+      mCetInterruptSsp = (UINT32)((UINTN)ShadowStack + EFI_PAGES_TO_SIZE(1) - sizeof(UINT64));
+      mCetInterruptSspTable = (UINT32)(UINTN)(mSmmInterruptSspTables + sizeof(UINT64) * 8 * CpuIndex);
+      InterruptSspTable = (UINT64 *)(UINTN)mCetInterruptSspTable;
+      InterruptSspTable[1] = mCetInterruptSsp;
+      PatchInstructionX86 (mPatchCetInterruptSsp, mCetInterruptSsp, 4);
+      PatchInstructionX86 (mPatchCetInterruptSspTable, mCetInterruptSspTable, 4);
+      DEBUG ((DEBUG_INFO, "mCetInterruptSsp - 0x%x\n", mCetInterruptSsp));
+      DEBUG ((DEBUG_INFO, "mCetInterruptSspTable - 0x%x\n", mCetInterruptSspTable));
+    }
+  }
 }
 

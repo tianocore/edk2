@@ -1,0 +1,17 @@
+// /** @file
+// PEI CPU Timer Library
+//
+// Provides basic timer support using CPUID Leaf 0x15 XTAL frequency.  The performance
+// counter features are provided by the processors time stamp counter.
+//
+// Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "CPU Timer Library"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "Provides basic timer support using CPUID Leaf 0x15 XTAL frequency."
+

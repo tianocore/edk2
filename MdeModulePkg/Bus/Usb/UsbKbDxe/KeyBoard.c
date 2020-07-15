@@ -1,14 +1,8 @@
 /** @file
   Helper functions for USB Keyboard Driver.
 
-Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -259,7 +253,7 @@ UINT8 EfiKeyToUsbKeyCodeConvertionTable[] = {
 };
 
 //
-// Keyboard modifier value to EFI Scan Code convertion table
+// Keyboard modifier value to EFI Scan Code conversion table
 // EFI Scan Code and the modifier values are defined in UEFI spec.
 //
 UINT8 ModifierValueToEfiScanCodeConvertionTable[] = {
@@ -575,7 +569,7 @@ FindPhysicalKey (
 
   This function is registered to event of EFI_HII_SET_KEYBOARD_LAYOUT_EVENT_GUID
   group type, which will be triggered by EFI_HII_DATABASE_PROTOCOL.SetKeyboardLayout().
-  It tries to get curent keyboard layout from HII database.
+  It tries to get current keyboard layout from HII database.
 
   @param  Event        Event being signaled.
   @param  Context      Points to USB_KB_DEV instance.
@@ -1059,6 +1053,10 @@ KeyboardHandler (
   // Byte 1 is reserved.
   // Bytes 2 to 7 are keycodes.
   //
+  if (DataLength < 8) {
+    return EFI_DEVICE_ERROR;
+  }
+
   CurKeyCodeBuffer  = (UINT8 *) Data;
   OldKeyCodeBuffer  = UsbKeyboardDevice->LastKeyCodeArray;
 
@@ -1086,7 +1084,7 @@ KeyboardHandler (
 
   //
   // Handle modifier key's pressing or releasing situation.
-  // According to USB HID Firmware spec, Byte 0 uses folloing map of Modifier keys:
+  // According to USB HID Firmware spec, Byte 0 uses following map of Modifier keys:
   // Bit0: Left Control,  Keycode: 0xe0
   // Bit1: Left Shift,    Keycode: 0xe1
   // Bit2: Left Alt,      Keycode: 0xe2
@@ -1484,6 +1482,65 @@ USBParseKey (
   return EFI_NOT_READY;
 }
 
+/**
+  Initialize the key state.
+
+  @param  UsbKeyboardDevice     The USB_KB_DEV instance.
+  @param  KeyState              A pointer to receive the key state information.
+**/
+VOID
+InitializeKeyState (
+  IN  USB_KB_DEV           *UsbKeyboardDevice,
+  OUT EFI_KEY_STATE        *KeyState
+  )
+{
+  KeyState->KeyShiftState  = EFI_SHIFT_STATE_VALID;
+  KeyState->KeyToggleState = EFI_TOGGLE_STATE_VALID;
+
+  if (UsbKeyboardDevice->LeftCtrlOn) {
+    KeyState->KeyShiftState |= EFI_LEFT_CONTROL_PRESSED;
+  }
+  if (UsbKeyboardDevice->RightCtrlOn) {
+    KeyState->KeyShiftState |= EFI_RIGHT_CONTROL_PRESSED;
+  }
+  if (UsbKeyboardDevice->LeftAltOn) {
+    KeyState->KeyShiftState |= EFI_LEFT_ALT_PRESSED;
+  }
+  if (UsbKeyboardDevice->RightAltOn) {
+    KeyState->KeyShiftState |= EFI_RIGHT_ALT_PRESSED;
+  }
+  if (UsbKeyboardDevice->LeftShiftOn) {
+    KeyState->KeyShiftState |= EFI_LEFT_SHIFT_PRESSED;
+  }
+  if (UsbKeyboardDevice->RightShiftOn) {
+    KeyState->KeyShiftState |= EFI_RIGHT_SHIFT_PRESSED;
+  }
+  if (UsbKeyboardDevice->LeftLogoOn) {
+    KeyState->KeyShiftState |= EFI_LEFT_LOGO_PRESSED;
+  }
+  if (UsbKeyboardDevice->RightLogoOn) {
+    KeyState->KeyShiftState |= EFI_RIGHT_LOGO_PRESSED;
+  }
+  if (UsbKeyboardDevice->MenuKeyOn) {
+    KeyState->KeyShiftState |= EFI_MENU_KEY_PRESSED;
+  }
+  if (UsbKeyboardDevice->SysReqOn) {
+    KeyState->KeyShiftState |= EFI_SYS_REQ_PRESSED;
+  }
+
+  if (UsbKeyboardDevice->ScrollOn) {
+    KeyState->KeyToggleState |= EFI_SCROLL_LOCK_ACTIVE;
+  }
+  if (UsbKeyboardDevice->NumLockOn) {
+    KeyState->KeyToggleState |= EFI_NUM_LOCK_ACTIVE;
+  }
+  if (UsbKeyboardDevice->CapsOn) {
+    KeyState->KeyToggleState |= EFI_CAPS_LOCK_ACTIVE;
+  }
+  if (UsbKeyboardDevice->IsSupportPartialKey) {
+    KeyState->KeyToggleState |= EFI_KEY_STATE_EXPOSED;
+  }
+}
 
 /**
   Converts USB Keycode ranging from 0x4 to 0x65 to EFI_INPUT_KEY.
@@ -1556,7 +1613,8 @@ UsbKeyCodeToEfiInputKey (
       // Need not return associated shift state if a class of printable characters that
       // are normally adjusted by shift modifiers. e.g. Shift Key + 'f' key = 'F'
       //
-      if ((KeyDescriptor->AffectedAttribute & EFI_AFFECTED_BY_CAPS_LOCK) != 0) {
+      if ((KeyDescriptor->Unicode != CHAR_NULL) && (KeyDescriptor->ShiftedUnicode != CHAR_NULL) &&
+          (KeyDescriptor->Unicode != KeyDescriptor->ShiftedUnicode)) {
         UsbKeyboardDevice->LeftShiftOn = FALSE;
         UsbKeyboardDevice->RightShiftOn = FALSE;
       }
@@ -1619,52 +1677,8 @@ UsbKeyCodeToEfiInputKey (
   //
   // Save Shift/Toggle state
   //
-  KeyData->KeyState.KeyShiftState  = EFI_SHIFT_STATE_VALID;
-  KeyData->KeyState.KeyToggleState = EFI_TOGGLE_STATE_VALID;
+  InitializeKeyState (UsbKeyboardDevice, &KeyData->KeyState);
 
-  if (UsbKeyboardDevice->LeftCtrlOn) {
-    KeyData->KeyState.KeyShiftState |= EFI_LEFT_CONTROL_PRESSED;
-  }
-  if (UsbKeyboardDevice->RightCtrlOn) {
-    KeyData->KeyState.KeyShiftState |= EFI_RIGHT_CONTROL_PRESSED;
-  }
-  if (UsbKeyboardDevice->LeftAltOn) {
-    KeyData->KeyState.KeyShiftState |= EFI_LEFT_ALT_PRESSED;
-  }
-  if (UsbKeyboardDevice->RightAltOn) {
-    KeyData->KeyState.KeyShiftState |= EFI_RIGHT_ALT_PRESSED;
-  }
-  if (UsbKeyboardDevice->LeftShiftOn) {
-    KeyData->KeyState.KeyShiftState |= EFI_LEFT_SHIFT_PRESSED;
-  }
-  if (UsbKeyboardDevice->RightShiftOn) {
-    KeyData->KeyState.KeyShiftState |= EFI_RIGHT_SHIFT_PRESSED;
-  }
-  if (UsbKeyboardDevice->LeftLogoOn) {
-    KeyData->KeyState.KeyShiftState |= EFI_LEFT_LOGO_PRESSED;
-  }
-  if (UsbKeyboardDevice->RightLogoOn) {
-    KeyData->KeyState.KeyShiftState |= EFI_RIGHT_LOGO_PRESSED;
-  }
-  if (UsbKeyboardDevice->MenuKeyOn) {
-    KeyData->KeyState.KeyShiftState |= EFI_MENU_KEY_PRESSED;
-  }
-  if (UsbKeyboardDevice->SysReqOn) {
-    KeyData->KeyState.KeyShiftState |= EFI_SYS_REQ_PRESSED;
-  }
-
-  if (UsbKeyboardDevice->ScrollOn) {
-    KeyData->KeyState.KeyToggleState |= EFI_SCROLL_LOCK_ACTIVE;
-  }
-  if (UsbKeyboardDevice->NumLockOn) {
-    KeyData->KeyState.KeyToggleState |= EFI_NUM_LOCK_ACTIVE;
-  }
-  if (UsbKeyboardDevice->CapsOn) {
-    KeyData->KeyState.KeyToggleState |= EFI_CAPS_LOCK_ACTIVE;
-  }
-  if (UsbKeyboardDevice->IsSupportPartialKey) {
-    KeyData->KeyState.KeyToggleState |= EFI_KEY_STATE_EXPOSED;
-  }
   //
   // Signal KeyNotify process event if this key pressed matches any key registered.
   //
@@ -1679,6 +1693,7 @@ UsbKeyCodeToEfiInputKey (
       //
       Enqueue (&UsbKeyboardDevice->EfiKeyQueueForNotify, KeyData, sizeof (*KeyData));
       gBS->SignalEvent (UsbKeyboardDevice->KeyNotifyProcessEvent);
+      break;
     }
   }
 

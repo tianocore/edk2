@@ -11,15 +11,10 @@
     synchronous requests and EFI_BLOCK_IO_PROTOCOL for now.
 
   Copyright (C) 2012, Red Hat, Inc.
-  Copyright (c) 2012 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2012 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2017, AMD Inc, All rights reserved.<BR>
 
-  This program and the accompanying materials are licensed and made available
-  under the terms and conditions of the BSD License which accompanies this
-  distribution. The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT
-  WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -231,7 +226,8 @@ VerifyReadWriteRequest (
 
   @retval EFI_DEVICE_ERROR     Failed to notify host side via VirtIo write, or
                                unable to parse host response, or host response
-                               is not VIRTIO_BLK_S_OK.
+                               is not VIRTIO_BLK_S_OK or failed to map Buffer
+                               for a bus master operation.
 
 **/
 
@@ -248,10 +244,26 @@ SynchronousRequest (
 {
   UINT32                  BlockSize;
   volatile VIRTIO_BLK_REQ Request;
-  volatile UINT8          HostStatus;
+  volatile UINT8          *HostStatus;
+  VOID                    *HostStatusBuffer;
   DESC_INDICES            Indices;
+  VOID                    *RequestMapping;
+  VOID                    *StatusMapping;
+  VOID                    *BufferMapping;
+  EFI_PHYSICAL_ADDRESS    BufferDeviceAddress;
+  EFI_PHYSICAL_ADDRESS    HostStatusDeviceAddress;
+  EFI_PHYSICAL_ADDRESS    RequestDeviceAddress;
+  EFI_STATUS              Status;
+  EFI_STATUS              UnmapStatus;
 
   BlockSize = Dev->BlockIoMedia.BlockSize;
+
+  //
+  // Set BufferMapping and BufferDeviceAddress to suppress incorrect
+  // compiler/analyzer warnings.
+  //
+  BufferMapping       = NULL;
+  BufferDeviceAddress = 0;
 
   //
   // ensured by VirtioBlkInit()
@@ -274,12 +286,82 @@ SynchronousRequest (
   Request.IoPrio = 0;
   Request.Sector = MultU64x32(Lba, BlockSize / 512);
 
-  VirtioPrepare (&Dev->Ring, &Indices);
+  //
+  // Host status is bi-directional (we preset with a value and expect the
+  // device to update it). Allocate a host status buffer which can be mapped
+  // to access equally by both processor and the device.
+  //
+  Status = Dev->VirtIo->AllocateSharedPages (
+                          Dev->VirtIo,
+                          EFI_SIZE_TO_PAGES (sizeof *HostStatus),
+                          &HostStatusBuffer
+                          );
+  if (EFI_ERROR (Status)) {
+    return EFI_DEVICE_ERROR;
+  }
+
+  HostStatus = HostStatusBuffer;
+
+  //
+  // Map virtio-blk request header (must be done after request header is
+  // populated)
+  //
+  Status = VirtioMapAllBytesInSharedBuffer (
+             Dev->VirtIo,
+             VirtioOperationBusMasterRead,
+             (VOID *) &Request,
+             sizeof Request,
+             &RequestDeviceAddress,
+             &RequestMapping
+             );
+  if (EFI_ERROR (Status)) {
+    Status = EFI_DEVICE_ERROR;
+    goto FreeHostStatusBuffer;
+  }
+
+  //
+  // Map data buffer
+  //
+  if (BufferSize > 0) {
+    Status = VirtioMapAllBytesInSharedBuffer (
+               Dev->VirtIo,
+               (RequestIsWrite ?
+                VirtioOperationBusMasterRead :
+                VirtioOperationBusMasterWrite),
+               (VOID *) Buffer,
+               BufferSize,
+               &BufferDeviceAddress,
+               &BufferMapping
+               );
+    if (EFI_ERROR (Status)) {
+      Status = EFI_DEVICE_ERROR;
+      goto UnmapRequestBuffer;
+    }
+  }
 
   //
   // preset a host status for ourselves that we do not accept as success
   //
-  HostStatus = VIRTIO_BLK_S_IOERR;
+  *HostStatus = VIRTIO_BLK_S_IOERR;
+
+  //
+  // Map the Status Buffer with VirtioOperationBusMasterCommonBuffer so that
+  // both processor and device can access it.
+  //
+  Status = VirtioMapAllBytesInSharedBuffer (
+             Dev->VirtIo,
+             VirtioOperationBusMasterCommonBuffer,
+             HostStatusBuffer,
+             sizeof *HostStatus,
+             &HostStatusDeviceAddress,
+             &StatusMapping
+             );
+  if (EFI_ERROR (Status)) {
+    Status = EFI_DEVICE_ERROR;
+    goto UnmapDataBuffer;
+  }
+
+  VirtioPrepare (&Dev->Ring, &Indices);
 
   //
   // ensured by VirtioBlkInit() -- this predicate, in combination with the
@@ -290,8 +372,13 @@ SynchronousRequest (
   //
   // virtio-blk header in first desc
   //
-  VirtioAppendDesc (&Dev->Ring, (UINTN) &Request, sizeof Request,
-    VRING_DESC_F_NEXT, &Indices);
+  VirtioAppendDesc (
+    &Dev->Ring,
+    RequestDeviceAddress,
+    sizeof Request,
+    VRING_DESC_F_NEXT,
+    &Indices
+    );
 
   //
   // data buffer for read/write in second desc
@@ -310,27 +397,61 @@ SynchronousRequest (
     //
     // VRING_DESC_F_WRITE is interpreted from the host's point of view.
     //
-    VirtioAppendDesc (&Dev->Ring, (UINTN) Buffer, (UINT32) BufferSize,
+    VirtioAppendDesc (
+      &Dev->Ring,
+      BufferDeviceAddress,
+      (UINT32) BufferSize,
       VRING_DESC_F_NEXT | (RequestIsWrite ? 0 : VRING_DESC_F_WRITE),
-      &Indices);
+      &Indices
+      );
   }
 
   //
   // host status in last (second or third) desc
   //
-  VirtioAppendDesc (&Dev->Ring, (UINTN) &HostStatus, sizeof HostStatus,
-    VRING_DESC_F_WRITE, &Indices);
+  VirtioAppendDesc (
+    &Dev->Ring,
+    HostStatusDeviceAddress,
+    sizeof *HostStatus,
+    VRING_DESC_F_WRITE,
+    &Indices
+    );
 
   //
   // virtio-blk's only virtqueue is #0, called "requestq" (see Appendix D).
   //
   if (VirtioFlush (Dev->VirtIo, 0, &Dev->Ring, &Indices,
         NULL) == EFI_SUCCESS &&
-      HostStatus == VIRTIO_BLK_S_OK) {
-    return EFI_SUCCESS;
+      *HostStatus == VIRTIO_BLK_S_OK) {
+    Status = EFI_SUCCESS;
+  } else {
+    Status = EFI_DEVICE_ERROR;
   }
 
-  return EFI_DEVICE_ERROR;
+  Dev->VirtIo->UnmapSharedBuffer (Dev->VirtIo, StatusMapping);
+
+UnmapDataBuffer:
+  if (BufferSize > 0) {
+    UnmapStatus = Dev->VirtIo->UnmapSharedBuffer (Dev->VirtIo, BufferMapping);
+    if (EFI_ERROR (UnmapStatus) && !RequestIsWrite && !EFI_ERROR (Status)) {
+      //
+      // Data from the bus master may not reach the caller; fail the request.
+      //
+      Status = EFI_DEVICE_ERROR;
+    }
+  }
+
+UnmapRequestBuffer:
+  Dev->VirtIo->UnmapSharedBuffer (Dev->VirtIo, RequestMapping);
+
+FreeHostStatusBuffer:
+  Dev->VirtIo->FreeSharedPages (
+                 Dev->VirtIo,
+                 EFI_SIZE_TO_PAGES (sizeof *HostStatus),
+                 HostStatusBuffer
+                 );
+
+  return Status;
 }
 
 
@@ -579,7 +700,8 @@ VirtioBlkDriverBindingSupported (
                            virtio-blk attributes the host provides.
 
   @return                  Error codes from VirtioRingInit() or
-                           VIRTIO_CFG_READ() / VIRTIO_CFG_WRITE().
+                           VIRTIO_CFG_READ() / VIRTIO_CFG_WRITE or
+                           VirtioRingMap().
 
 **/
 
@@ -600,6 +722,7 @@ VirtioBlkInit (
   UINT8      AlignmentOffset;
   UINT32     OptIoSize;
   UINT16     QueueSize;
+  UINT64     RingBaseShift;
 
   PhysicalBlockExp = 0;
   AlignmentOffset = 0;
@@ -693,7 +816,8 @@ VirtioBlkInit (
   }
 
   Features &= VIRTIO_BLK_F_BLK_SIZE | VIRTIO_BLK_F_TOPOLOGY | VIRTIO_BLK_F_RO |
-              VIRTIO_BLK_F_FLUSH | VIRTIO_F_VERSION_1;
+              VIRTIO_BLK_F_FLUSH | VIRTIO_F_VERSION_1 |
+              VIRTIO_F_IOMMU_PLATFORM;
 
   //
   // In virtio-1.0, feature negotiation is expected to complete before queue
@@ -722,31 +846,48 @@ VirtioBlkInit (
     goto Failed;
   }
 
-  Status = VirtioRingInit (QueueSize, &Dev->Ring);
+  Status = VirtioRingInit (Dev->VirtIo, QueueSize, &Dev->Ring);
   if (EFI_ERROR (Status)) {
     goto Failed;
   }
 
   //
-  // Additional steps for MMIO: align the queue appropriately, and set the
-  // size. If anything fails from here on, we must release the ring resources.
+  // If anything fails from here on, we must release the ring resources
   //
-  Status = Dev->VirtIo->SetQueueNum (Dev->VirtIo, QueueSize);
+  Status = VirtioRingMap (
+             Dev->VirtIo,
+             &Dev->Ring,
+             &RingBaseShift,
+             &Dev->RingMap
+             );
   if (EFI_ERROR (Status)) {
     goto ReleaseQueue;
   }
 
+  //
+  // Additional steps for MMIO: align the queue appropriately, and set the
+  // size. If anything fails from here on, we must unmap the ring resources.
+  //
+  Status = Dev->VirtIo->SetQueueNum (Dev->VirtIo, QueueSize);
+  if (EFI_ERROR (Status)) {
+    goto UnmapQueue;
+  }
+
   Status = Dev->VirtIo->SetQueueAlign (Dev->VirtIo, EFI_PAGE_SIZE);
   if (EFI_ERROR (Status)) {
-    goto ReleaseQueue;
+    goto UnmapQueue;
   }
 
   //
   // step 4c -- Report GPFN (guest-physical frame number) of queue.
   //
-  Status = Dev->VirtIo->SetQueueAddress (Dev->VirtIo, &Dev->Ring);
+  Status = Dev->VirtIo->SetQueueAddress (
+                          Dev->VirtIo,
+                          &Dev->Ring,
+                          RingBaseShift
+                          );
   if (EFI_ERROR (Status)) {
-    goto ReleaseQueue;
+    goto UnmapQueue;
   }
 
 
@@ -754,10 +895,10 @@ VirtioBlkInit (
   // step 5 -- Report understood features.
   //
   if (Dev->VirtIo->Revision < VIRTIO_SPEC_REVISION (1, 0, 0)) {
-    Features &= ~(UINT64)VIRTIO_F_VERSION_1;
+    Features &= ~(UINT64)(VIRTIO_F_VERSION_1 | VIRTIO_F_IOMMU_PLATFORM);
     Status = Dev->VirtIo->SetGuestFeatures (Dev->VirtIo, Features);
     if (EFI_ERROR (Status)) {
-      goto ReleaseQueue;
+      goto UnmapQueue;
     }
   }
 
@@ -767,7 +908,7 @@ VirtioBlkInit (
   NextDevStat |= VSTAT_DRIVER_OK;
   Status = Dev->VirtIo->SetDeviceStatus (Dev->VirtIo, NextDevStat);
   if (EFI_ERROR (Status)) {
-    goto ReleaseQueue;
+    goto UnmapQueue;
   }
 
   //
@@ -810,8 +951,11 @@ VirtioBlkInit (
   }
   return EFI_SUCCESS;
 
+UnmapQueue:
+  Dev->VirtIo->UnmapSharedBuffer (Dev->VirtIo, Dev->RingMap);
+
 ReleaseQueue:
-  VirtioRingUninit (&Dev->Ring);
+  VirtioRingUninit (Dev->VirtIo, &Dev->Ring);
 
 Failed:
   //
@@ -848,7 +992,8 @@ VirtioBlkUninit (
   //
   Dev->VirtIo->SetDeviceStatus (Dev->VirtIo, 0);
 
-  VirtioRingUninit (&Dev->Ring);
+  Dev->VirtIo->UnmapSharedBuffer (Dev->VirtIo, Dev->RingMap);
+  VirtioRingUninit (Dev->VirtIo, &Dev->Ring);
 
   SetMem (&Dev->BlockIo,      sizeof Dev->BlockIo,      0x00);
   SetMem (&Dev->BlockIoMedia, sizeof Dev->BlockIoMedia, 0x00);
@@ -875,6 +1020,7 @@ VirtioBlkExitBoot (
 {
   VBLK_DEV *Dev;
 
+  DEBUG ((DEBUG_VERBOSE, "%a: Context=0x%p\n", __FUNCTION__, Context));
   //
   // Reset the device. This causes the hypervisor to forget about the virtio
   // ring.

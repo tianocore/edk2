@@ -2,21 +2,16 @@
 # This file is used to create/update/query/erase table for Queries
 #
 # Copyright (c) 2008, Intel Corporation. All rights reserved.<BR>
-# This program and the accompanying materials
-# are licensed and made available under the terms and conditions of the BSD License
-# which accompanies this distribution.  The full text of the license may be found at
-# http://opensource.org/licenses/bsd-license.php
-#
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
 ##
 # Import Modules
 #
+from __future__ import absolute_import
 import Common.EdkLogger as EdkLogger
-from Common.String import ConvertToSqlString
-from Table import Table
+from Common.StringUtils import ConvertToSqlString
+from Table.Table import Table
 
 ## TableQuery
 #
@@ -36,7 +31,7 @@ class TableQuery(Table):
     #
     # @param ID:                 ID of a Query
     # @param Name:               Name of a Query
-    # @param Modifer:            Modifier of a Query
+    # @param Modifier:           Modifier of a Query
     # @param Value:              Type of a Query
     # @param Model:              Model of a Query
     #

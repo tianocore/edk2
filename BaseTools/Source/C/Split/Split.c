@@ -2,14 +2,8 @@
 
   Split a file into two pieces at the request offset.
 
-Copyright (c) 1999 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available
-under the terms and conditions of the BSD License which accompanies this
-distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 1999 - 2017, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -80,7 +74,7 @@ Returns:
 --*/
 {
   Version();
-  printf ("Copyright (c) 1999-2016 Intel Corporation. All rights reserved.\n");
+  printf ("Copyright (c) 1999-2017 Intel Corporation. All rights reserved.\n");
   printf ("\n  SplitFile creates two Binary files either in the same directory as the current working\n");
   printf ("  directory or in the specified directory.\n");
   printf ("\nUsage: \n\
@@ -103,12 +97,16 @@ GetSplitValue (
   OUT UINT64 *ReturnValue
 )
 {
-  UINT64 len = strlen(SplitValueString);
+  UINT64 len = 0;
   UINT64 base = 1;
   UINT64 index = 0;
   UINT64 number = 0;
   CHAR8 lastCHAR = 0;
   EFI_STATUS Status = EFI_SUCCESS;
+
+  if (SplitValueString != NULL){
+    len = strlen(SplitValueString);
+  }
 
   if (len == 0) {
     return EFI_ABORTED;
@@ -324,7 +322,7 @@ Returns:
       if (strlen(argv[0]) > 2) {
         Status = CountVerboseLevel (&argv[0][2], strlen(argv[0]) - 2, &VerboseLevel);
         if (EFI_ERROR (Status)) {
-          Error (NULL, 0, 0x1003, NULL, "%s is invaild parameter!", argv[0]);
+          Error (NULL, 0, 0x1003, NULL, "%s is invalid parameter!", argv[0]);
           return STATUS_ERROR;
         }
       }
@@ -347,7 +345,7 @@ Returns:
     //
     // Don't recognize the parameter.
     //
-    Error (NULL, 0, 0x1003, NULL, "%s is invaild parameter!", argv[0]);
+    Error (NULL, 0, 0x1003, NULL, "%s is invalid parameter!", argv[0]);
     return STATUS_ERROR;
   }
 

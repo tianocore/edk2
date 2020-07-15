@@ -1,0 +1,28 @@
+#/** @file
+#  Implement ArmGenericTimerCounterLib for Xen using the virtual timer
+#
+#  Copyright (c) 2014 - 2018, Linaro Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = XenArmGenericTimerVirtCounterLib
+  FILE_GUID                      = e3913319-96ac-4ac0-808b-8edb8776a51c
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ArmGenericTimerCounterLib
+
+[Sources]
+  XenArmGenericTimerVirtCounterLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  ArmPkg/ArmPkg.dec
+
+[LibraryClasses]
+  ArmLib
+  BaseLib

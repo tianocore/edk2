@@ -1,15 +1,9 @@
 /** @file
   Graphics Output Protocol functions for the QEMU video controller.
 
-  Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution. The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -36,7 +30,7 @@ QemuVideoCompleteModeInfo (
     Info->PixelInformation.BlueMask = PIXEL24_BLUE_MASK;
     Info->PixelInformation.ReservedMask = 0;
   } else if (ModeData->ColorDepth == 32) {
-    DEBUG ((EFI_D_INFO, "PixelBlueGreenRedReserved8BitPerColor\n"));
+    DEBUG ((DEBUG_INFO, "PixelBlueGreenRedReserved8BitPerColor\n"));
     Info->PixelFormat = PixelBlueGreenRedReserved8BitPerColor;
   }
   Info->PixelsPerScanLine = Info->HorizontalResolution;
@@ -60,7 +54,7 @@ QemuVideoCompleteModeData (
 
   Private->PciIo->GetBarAttributes (
                         Private->PciIo,
-                        0,
+                        Private->FrameBufferVramBarIndex,
                         NULL,
                         (VOID**) &FrameBufDesc
                         );
@@ -68,13 +62,15 @@ QemuVideoCompleteModeData (
   Mode->FrameBufferBase = FrameBufDesc->AddrRangeMin;
   Mode->FrameBufferSize = Info->HorizontalResolution * Info->VerticalResolution;
   Mode->FrameBufferSize = Mode->FrameBufferSize * ((ModeData->ColorDepth + 7) / 8);
-  DEBUG ((EFI_D_INFO, "FrameBufferBase: 0x%Lx, FrameBufferSize: 0x%Lx\n",
+  Mode->FrameBufferSize = EFI_PAGES_TO_SIZE (
+                            EFI_SIZE_TO_PAGES (Mode->FrameBufferSize)
+                            );
+  DEBUG ((DEBUG_INFO, "FrameBufferBase: 0x%Lx, FrameBufferSize: 0x%Lx\n",
     Mode->FrameBufferBase, (UINT64)Mode->FrameBufferSize));
 
   FreePool (FrameBufDesc);
   return EFI_SUCCESS;
 }
-
 
 //
 // Graphics Output Protocol Member Functions
@@ -155,9 +151,10 @@ Routine Description:
 
 --*/
 {
-  QEMU_VIDEO_PRIVATE_DATA    *Private;
-  QEMU_VIDEO_MODE_DATA       *ModeData;
-  RETURN_STATUS              Status;
+  QEMU_VIDEO_PRIVATE_DATA       *Private;
+  QEMU_VIDEO_MODE_DATA          *ModeData;
+  RETURN_STATUS                 Status;
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL Black;
 
   Private = QEMU_VIDEO_PRIVATE_DATA_FROM_GRAPHICS_OUTPUT_THIS (This);
 
@@ -219,6 +216,21 @@ Routine Description:
                 );
   }
   ASSERT (Status == RETURN_SUCCESS);
+
+  //
+  // Per UEFI Spec, need to clear the visible portions of the output display to black.
+  //
+  ZeroMem (&Black, sizeof (Black));
+  Status = FrameBufferBlt (
+             Private->FrameBufferBltConfigure,
+             &Black,
+             EfiBltVideoFill,
+             0, 0,
+             0, 0,
+             This->Mode->Info->HorizontalResolution, This->Mode->Info->VerticalResolution,
+             0
+             );
+  ASSERT_RETURN_ERROR (Status);
 
   return EFI_SUCCESS;
 }
@@ -299,7 +311,7 @@ Returns:
 
   default:
     Status = EFI_INVALID_PARAMETER;
-    ASSERT (FALSE);
+    break;
   }
 
   gBS->RestoreTPL (OriginalTPL);

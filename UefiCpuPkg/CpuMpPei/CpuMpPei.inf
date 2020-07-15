@@ -1,14 +1,8 @@
 ## @file
 #  CPU driver installs CPU PI Multi-processor PPI.
 #
-#  Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
-#  This program and the accompanying materials
-#  are licensed and made available under the terms and conditions of the BSD License
-#  which accompanies this distribution.  The full text of the license may be found at
-#  http://opensource.org/licenses/bsd-license.php
-#
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  Copyright (c) 2015 - 2019, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
 
@@ -31,6 +25,8 @@
   CpuMpPei.h
   CpuMpPei.c
   CpuBist.c
+  CpuPaging.c
+  CpuMp2Pei.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -48,6 +44,7 @@
   CpuExceptionHandlerLib
   MpInitLib
   BaseMemoryLib
+  CpuLib
 
 [Ppis]
   gEfiPeiMpServicesPpiGuid                      ## PRODUCES
@@ -57,9 +54,18 @@
   ## UNDEFINED # HOB
   gEfiSecPlatformInformation2PpiGuid
   gEfiVectorHandoffInfoPpiGuid                  ## SOMETIMES_CONSUMES
+  gEfiPeiMemoryDiscoveredPpiGuid                ## CONSUMES
+  gEdkiiPeiMpServices2PpiGuid                   ## PRODUCES
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPteMemoryEncryptionAddressOrMask    ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard                       ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuStackSwitchExceptionList              ## SOMETIMES_CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuKnownGoodStackSize                    ## SOMETIMES_CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuApStackSize                           ## SOMETIMES_CONSUMES
 
 [Depex]
-  gEfiPeiMemoryDiscoveredPpiGuid
+  TRUE
 
 [UserExtensions.TianoCore."ExtraFiles"]
   CpuMpPeiExtra.uni

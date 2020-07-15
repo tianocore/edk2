@@ -1,15 +1,9 @@
 # # @file
 # Test Install distribution package
 #
-# Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
 #
-# This program and the accompanying materials are licensed and made available
-# under the terms and conditions of the BSD License which accompanies this
-# distribution. The full text of the license may be found at
-# http://opensource.org/licenses/bsd-license.php
-#
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 """
 Test Install multiple distribution package
@@ -68,18 +62,18 @@ def Main(Options=None):
         else:
             Logger.Quiet(ST.MSG_TEST_INSTALL_FAIL)
 
-    except TE.FatalError, XExcept:
+    except TE.FatalError as XExcept:
         ReturnCode = XExcept.args[0]
         if Logger.GetLevel() <= Logger.DEBUG_9:
             Logger.Quiet(ST.MSG_PYTHON_ON % (python_version(), platform) + format_exc())
 
-    except Exception, x:
+    except Exception as x:
         ReturnCode = TE.CODE_ERROR
         Logger.Error(
                     "\nTestInstallPkg",
                     TE.CODE_ERROR,
                     ST.ERR_UNKNOWN_FATAL_INSTALL_ERR % Options.DistFiles,
-                    ExtraData=ST.MSG_SEARCH_FOR_HELP,
+                    ExtraData=ST.MSG_SEARCH_FOR_HELP % ST.MSG_EDKII_MAIL_ADDR,
                     RaiseError=False
                     )
         Logger.Quiet(ST.MSG_PYTHON_ON % (python_version(), platform) + format_exc())
@@ -90,9 +84,9 @@ def Main(Options=None):
             DistFile.Close()
         if ContentZipFile:
             ContentZipFile.Close()
-        if GlobalData.gUNPACK_DIR:
-            shutil.rmtree(GlobalData.gUNPACK_DIR)
-            GlobalData.gUNPACK_DIR = None
+        for TempDir in GlobalData.gUNPACK_DIR:
+            shutil.rmtree(TempDir)
+        GlobalData.gUNPACK_DIR = []
         Logger.Quiet(ST.MSG_REMOVE_TEMP_FILE_DONE)
     if ReturnCode == 0:
         Logger.Quiet(ST.MSG_FINISH)

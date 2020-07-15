@@ -2,13 +2,7 @@
   Produce Load File Protocol for UEFI Applications in Firmware Volumes
 
   Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -42,7 +36,7 @@ typedef struct {
 #define LOAD_FILE_ON_FV2_PRIVATE_DATA_FROM_THIS(a) CR (a, LOAD_FILE_ON_FV2_PRIVATE_DATA, LoadFile, LOAD_FILE_ON_FV2_PRIVATE_DATA_SIGNATURE)
 #define LOAD_FILE_ON_FV2_PRIVATE_DATA_FROM_LINK(a) CR (a, LOAD_FILE_ON_FV2_PRIVATE_DATA, Link, LOAD_FILE_ON_FV2_PRIVATE_DATA_SIGNATURE)
 
-EFI_EVENT  mFvRegistration;
+VOID       *mFvRegistration;
 LIST_ENTRY mPrivateDataList;
 
 /**

@@ -4,13 +4,7 @@
   Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2011, Andrei Warkentin <andreiw@motorola.com>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -33,26 +27,17 @@
 #include <Library/PeiServicesLib.h>
 #include <Library/QemuFwCfgLib.h>
 #include <Library/QemuFwCfgS3Lib.h>
+#include <Library/QemuFwCfgSimpleParserLib.h>
 #include <Library/ResourcePublicationLib.h>
-#include <Guid/MemoryTypeInformation.h>
 #include <Ppi/MasterBootMode.h>
+#include <IndustryStandard/I440FxPiix4.h>
 #include <IndustryStandard/Pci22.h>
+#include <IndustryStandard/Q35MchIch9.h>
+#include <IndustryStandard/QemuCpuHotplug.h>
 #include <OvmfPlatforms.h>
 
 #include "Platform.h"
 #include "Cmos.h"
-
-EFI_MEMORY_TYPE_INFORMATION mDefaultMemoryTypeInformation[] = {
-  { EfiACPIMemoryNVS,       0x004 },
-  { EfiACPIReclaimMemory,   0x008 },
-  { EfiReservedMemoryType,  0x004 },
-  { EfiRuntimeServicesData, 0x024 },
-  { EfiRuntimeServicesCode, 0x030 },
-  { EfiBootServicesCode,    0x180 },
-  { EfiBootServicesData,    0xF00 },
-  { EfiMaxMemoryType,       0x000 }
-};
-
 
 EFI_PEI_PPI_DESCRIPTOR   mPpiBootMode[] = {
   {
@@ -166,15 +151,6 @@ MemMapInitialization (
   PciIoSize = 0x4000;
 
   //
-  // Create Memory Type Information HOB
-  //
-  BuildGuidDataHob (
-    &gEfiMemoryTypeInformationGuid,
-    mDefaultMemoryTypeInformation,
-    sizeof(mDefaultMemoryTypeInformation)
-    );
-
-  //
   // Video memory + Legacy BIOS region
   //
   AddIoMemoryRangeHob (0x0A0000, BASE_1MB);
@@ -197,7 +173,8 @@ MemMapInitialization (
       ASSERT (PciExBarBase <= MAX_UINT32 - SIZE_256MB);
       PciBase = (UINT32)(PciExBarBase + SIZE_256MB);
     } else {
-      PciBase = (TopOfLowRam < BASE_2GB) ? BASE_2GB : TopOfLowRam;
+      ASSERT (TopOfLowRam <= mQemuUc32Base);
+      PciBase = mQemuUc32Base;
     }
 
     //
@@ -278,56 +255,12 @@ MemMapInitialization (
   ASSERT_RETURN_ERROR (PcdStatus);
 }
 
-EFI_STATUS
-GetNamedFwCfgBoolean (
-  IN  CHAR8   *FwCfgFileName,
-  OUT BOOLEAN *Setting
-  )
-{
-  EFI_STATUS           Status;
-  FIRMWARE_CONFIG_ITEM FwCfgItem;
-  UINTN                FwCfgSize;
-  UINT8                Value[3];
-
-  Status = QemuFwCfgFindFile (FwCfgFileName, &FwCfgItem, &FwCfgSize);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-  if (FwCfgSize > sizeof Value) {
-    return EFI_BAD_BUFFER_SIZE;
-  }
-  QemuFwCfgSelectItem (FwCfgItem);
-  QemuFwCfgReadBytes (FwCfgSize, Value);
-
-  if ((FwCfgSize == 1) ||
-      (FwCfgSize == 2 && Value[1] == '\n') ||
-      (FwCfgSize == 3 && Value[1] == '\r' && Value[2] == '\n')) {
-    switch (Value[0]) {
-      case '0':
-      case 'n':
-      case 'N':
-        *Setting = FALSE;
-        return EFI_SUCCESS;
-
-      case '1':
-      case 'y':
-      case 'Y':
-        *Setting = TRUE;
-        return EFI_SUCCESS;
-
-      default:
-        break;
-    }
-  }
-  return EFI_PROTOCOL_ERROR;
-}
-
 #define UPDATE_BOOLEAN_PCD_FROM_FW_CFG(TokenName)                   \
           do {                                                      \
             BOOLEAN       Setting;                                  \
             RETURN_STATUS PcdStatus;                                \
                                                                     \
-            if (!EFI_ERROR (GetNamedFwCfgBoolean (                  \
+            if (!RETURN_ERROR (QemuFwCfgParseBool (                 \
                               "opt/ovmf/" #TokenName, &Setting))) { \
               PcdStatus = PcdSetBoolS (TokenName, Setting);         \
               ASSERT_RETURN_ERROR (PcdStatus);                      \
@@ -339,7 +272,6 @@ NoexecDxeInitialization (
   VOID
   )
 {
-  UPDATE_BOOLEAN_PCD_FROM_FW_CFG (PcdPropertiesTableEnable);
   UPDATE_BOOLEAN_PCD_FROM_FW_CFG (PcdSetNxForStack);
 }
 
@@ -430,7 +362,7 @@ MiscInitialization (
       AcpiEnBit  = ICH9_ACPI_CNTL_ACPI_EN;
       break;
     default:
-      DEBUG ((EFI_D_ERROR, "%a: Unknown Host Bridge Device ID: 0x%04x\n",
+      DEBUG ((DEBUG_ERROR, "%a: Unknown Host Bridge Device ID: 0x%04x\n",
         __FUNCTION__, mHostBridgeDevId));
       ASSERT (FALSE);
       return;
@@ -513,11 +445,10 @@ ReserveEmuVariableNvStore (
   //
   VariableStore =
     (EFI_PHYSICAL_ADDRESS)(UINTN)
-      AllocateAlignedRuntimePages (
-        EFI_SIZE_TO_PAGES (2 * PcdGet32 (PcdFlashNvStorageFtwSpareSize)),
-        PcdGet32 (PcdFlashNvStorageFtwSpareSize)
+      AllocateRuntimePages (
+        EFI_SIZE_TO_PAGES (2 * PcdGet32 (PcdFlashNvStorageFtwSpareSize))
         );
-  DEBUG ((EFI_D_INFO,
+  DEBUG ((DEBUG_INFO,
           "Reserved variable store memory: 0x%lX; size: %dkb\n",
           VariableStore,
           (2 * PcdGet32 (PcdFlashNvStorageFtwSpareSize)) / 1024
@@ -534,15 +465,15 @@ DebugDumpCmos (
 {
   UINT32 Loop;
 
-  DEBUG ((EFI_D_INFO, "CMOS:\n"));
+  DEBUG ((DEBUG_INFO, "CMOS:\n"));
 
   for (Loop = 0; Loop < 0x80; Loop++) {
     if ((Loop % 0x10) == 0) {
-      DEBUG ((EFI_D_INFO, "%02x:", Loop));
+      DEBUG ((DEBUG_INFO, "%02x:", Loop));
     }
-    DEBUG ((EFI_D_INFO, " %02x", CmosRead8 (Loop)));
+    DEBUG ((DEBUG_INFO, " %02x", CmosRead8 (Loop)));
     if ((Loop % 0x10) == 0xf) {
-      DEBUG ((EFI_D_INFO, "\n"));
+      DEBUG ((DEBUG_INFO, "\n"));
     }
   }
 }
@@ -555,12 +486,12 @@ S3Verification (
 {
 #if defined (MDE_CPU_X64)
   if (FeaturePcdGet (PcdSmmSmramRequire) && mS3Supported) {
-    DEBUG ((EFI_D_ERROR,
+    DEBUG ((DEBUG_ERROR,
       "%a: S3Resume2Pei doesn't support X64 PEI + SMM yet.\n", __FUNCTION__));
-    DEBUG ((EFI_D_ERROR,
+    DEBUG ((DEBUG_ERROR,
       "%a: Please disable S3 on the QEMU command line (see the README),\n",
       __FUNCTION__));
-    DEBUG ((EFI_D_ERROR,
+    DEBUG ((DEBUG_ERROR,
       "%a: or build OVMF with \"OvmfPkgIa32X64.dsc\".\n", __FUNCTION__));
     ASSERT (FALSE);
     CpuDeadLoop ();
@@ -569,44 +500,184 @@ S3Verification (
 }
 
 
+VOID
+Q35BoardVerification (
+  VOID
+  )
+{
+  if (mHostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID) {
+    return;
+  }
+
+  DEBUG ((
+    DEBUG_ERROR,
+    "%a: no TSEG (SMRAM) on host bridge DID=0x%04x; "
+    "only DID=0x%04x (Q35) is supported\n",
+    __FUNCTION__,
+    mHostBridgeDevId,
+    INTEL_Q35_MCH_DEVICE_ID
+    ));
+  ASSERT (FALSE);
+  CpuDeadLoop ();
+}
+
+
 /**
-  Fetch the number of boot CPUs from QEMU and expose it to UefiCpuPkg modules.
-  Set the mMaxCpuCount variable.
+  Fetch the boot CPU count and the possible CPU count from QEMU, and expose
+  them to UefiCpuPkg modules. Set the mMaxCpuCount variable.
 **/
 VOID
 MaxCpuCountInitialization (
   VOID
   )
 {
-  UINT16        ProcessorCount;
+  UINT16        BootCpuCount;
   RETURN_STATUS PcdStatus;
 
+  //
+  // Try to fetch the boot CPU count.
+  //
   QemuFwCfgSelectItem (QemuFwCfgItemSmpCpuCount);
-  ProcessorCount = QemuFwCfgRead16 ();
-  //
-  // If the fw_cfg key or fw_cfg entirely is unavailable, load mMaxCpuCount
-  // from the PCD default. No change to PCDs.
-  //
-  if (ProcessorCount == 0) {
+  BootCpuCount = QemuFwCfgRead16 ();
+  if (BootCpuCount == 0) {
+    //
+    // QEMU doesn't report the boot CPU count. (BootCpuCount == 0) will let
+    // MpInitLib count APs up to (PcdCpuMaxLogicalProcessorNumber - 1), or
+    // until PcdCpuApInitTimeOutInMicroSeconds elapses (whichever is reached
+    // first).
+    //
+    DEBUG ((DEBUG_WARN, "%a: boot CPU count unavailable\n", __FUNCTION__));
     mMaxCpuCount = PcdGet32 (PcdCpuMaxLogicalProcessorNumber);
-    return;
+  } else {
+    //
+    // We will expose BootCpuCount to MpInitLib. MpInitLib will count APs up to
+    // (BootCpuCount - 1) precisely, regardless of timeout.
+    //
+    // Now try to fetch the possible CPU count.
+    //
+    UINTN CpuHpBase;
+    UINT32 CmdData2;
+
+    CpuHpBase = ((mHostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID) ?
+                 ICH9_CPU_HOTPLUG_BASE : PIIX4_CPU_HOTPLUG_BASE);
+
+    //
+    // If only legacy mode is available in the CPU hotplug register block, or
+    // the register block is completely missing, then the writes below are
+    // no-ops.
+    //
+    // 1. Switch the hotplug register block to modern mode.
+    //
+    IoWrite32 (CpuHpBase + QEMU_CPUHP_W_CPU_SEL, 0);
+    //
+    // 2. Select a valid CPU for deterministic reading of
+    //    QEMU_CPUHP_R_CMD_DATA2.
+    //
+    //    CPU#0 is always valid; it is the always present and non-removable
+    //    BSP.
+    //
+    IoWrite32 (CpuHpBase + QEMU_CPUHP_W_CPU_SEL, 0);
+    //
+    // 3. Send a command after which QEMU_CPUHP_R_CMD_DATA2 is specified to
+    //    read as zero, and which does not invalidate the selector. (The
+    //    selector may change, but it must not become invalid.)
+    //
+    //    Send QEMU_CPUHP_CMD_GET_PENDING, as it will prove useful later.
+    //
+    IoWrite8 (CpuHpBase + QEMU_CPUHP_W_CMD, QEMU_CPUHP_CMD_GET_PENDING);
+    //
+    // 4. Read QEMU_CPUHP_R_CMD_DATA2.
+    //
+    //    If the register block is entirely missing, then this is an unassigned
+    //    IO read, returning all-bits-one.
+    //
+    //    If only legacy mode is available, then bit#0 stands for CPU#0 in the
+    //    "CPU present bitmap". CPU#0 is always present.
+    //
+    //    Otherwise, QEMU_CPUHP_R_CMD_DATA2 is either still reserved (returning
+    //    all-bits-zero), or it is specified to read as zero after the above
+    //    steps. Both cases confirm modern mode.
+    //
+    CmdData2 = IoRead32 (CpuHpBase + QEMU_CPUHP_R_CMD_DATA2);
+    DEBUG ((DEBUG_VERBOSE, "%a: CmdData2=0x%x\n", __FUNCTION__, CmdData2));
+    if (CmdData2 != 0) {
+      //
+      // QEMU doesn't support the modern CPU hotplug interface. Assume that the
+      // possible CPU count equals the boot CPU count (precluding hotplug).
+      //
+      DEBUG ((DEBUG_WARN, "%a: modern CPU hotplug interface unavailable\n",
+        __FUNCTION__));
+      mMaxCpuCount = BootCpuCount;
+    } else {
+      //
+      // Grab the possible CPU count from the modern CPU hotplug interface.
+      //
+      UINT32 Present, Possible, Selected;
+
+      Present = 0;
+      Possible = 0;
+
+      //
+      // We've sent QEMU_CPUHP_CMD_GET_PENDING last; this ensures
+      // QEMU_CPUHP_RW_CMD_DATA can now be read usefully. However,
+      // QEMU_CPUHP_CMD_GET_PENDING may have selected a CPU with actual pending
+      // hotplug events; therefore, select CPU#0 forcibly.
+      //
+      IoWrite32 (CpuHpBase + QEMU_CPUHP_W_CPU_SEL, Possible);
+
+      do {
+        UINT8 CpuStatus;
+
+        //
+        // Read the status of the currently selected CPU. This will help with a
+        // sanity check against "BootCpuCount".
+        //
+        CpuStatus = IoRead8 (CpuHpBase + QEMU_CPUHP_R_CPU_STAT);
+        if ((CpuStatus & QEMU_CPUHP_STAT_ENABLED) != 0) {
+          ++Present;
+        }
+        //
+        // Attempt to select the next CPU.
+        //
+        ++Possible;
+        IoWrite32 (CpuHpBase + QEMU_CPUHP_W_CPU_SEL, Possible);
+        //
+        // If the selection is successful, then the following read will return
+        // the selector (which we know is positive at this point). Otherwise,
+        // the read will return 0.
+        //
+        Selected = IoRead32 (CpuHpBase + QEMU_CPUHP_RW_CMD_DATA);
+        ASSERT (Selected == Possible || Selected == 0);
+      } while (Selected > 0);
+
+      //
+      // Sanity check: fw_cfg and the modern CPU hotplug interface should
+      // return the same boot CPU count.
+      //
+      if (BootCpuCount != Present) {
+        DEBUG ((DEBUG_WARN, "%a: QEMU v2.7 reset bug: BootCpuCount=%d "
+          "Present=%u\n", __FUNCTION__, BootCpuCount, Present));
+        //
+        // The handling of QemuFwCfgItemSmpCpuCount, across CPU hotplug plus
+        // platform reset (including S3), was corrected in QEMU commit
+        // e3cadac073a9 ("pc: fix FW_CFG_NB_CPUS to account for -device added
+        // CPUs", 2016-11-16), part of release v2.8.0.
+        //
+        BootCpuCount = (UINT16)Present;
+      }
+
+      mMaxCpuCount = Possible;
+    }
   }
-  //
-  // Otherwise, set mMaxCpuCount to the value reported by QEMU.
-  //
-  mMaxCpuCount = ProcessorCount;
-  //
-  // Additionally, tell UefiCpuPkg modules (a) the exact number of VCPUs, (b)
-  // to wait, in the initial AP bringup, exactly as long as it takes for all of
-  // the APs to report in. For this, we set the longest representable timeout
-  // (approx. 71 minutes).
-  //
-  PcdStatus = PcdSet32S (PcdCpuMaxLogicalProcessorNumber, ProcessorCount);
+
+  DEBUG ((DEBUG_INFO, "%a: BootCpuCount=%d mMaxCpuCount=%u\n", __FUNCTION__,
+    BootCpuCount, mMaxCpuCount));
+  ASSERT (BootCpuCount <= mMaxCpuCount);
+
+  PcdStatus = PcdSet32S (PcdCpuBootLogicalProcessorNumber, BootCpuCount);
   ASSERT_RETURN_ERROR (PcdStatus);
-  PcdStatus = PcdSet32S (PcdCpuApInitTimeOutInMicroSeconds, MAX_UINT32);
+  PcdStatus = PcdSet32S (PcdCpuMaxLogicalProcessorNumber, mMaxCpuCount);
   ASSERT_RETURN_ERROR (PcdStatus);
-  DEBUG ((DEBUG_INFO, "%a: QEMU reports %d processor(s)\n", __FUNCTION__,
-    ProcessorCount));
 }
 
 
@@ -628,14 +699,14 @@ InitializePlatform (
 {
   EFI_STATUS    Status;
 
-  DEBUG ((EFI_D_ERROR, "Platform PEIM Loaded\n"));
+  DEBUG ((DEBUG_INFO, "Platform PEIM Loaded\n"));
 
   DebugDumpCmos ();
 
   XenDetect ();
 
   if (QemuFwCfgS3Enabled ()) {
-    DEBUG ((EFI_D_INFO, "S3 support was detected on QEMU\n"));
+    DEBUG ((DEBUG_INFO, "S3 support was detected on QEMU\n"));
     mS3Supported = TRUE;
     Status = PcdSetBoolS (PcdAcpiS3Enable, TRUE);
     ASSERT_EFI_ERROR (Status);
@@ -644,29 +715,43 @@ InitializePlatform (
   S3Verification ();
   BootModeInitialization ();
   AddressWidthInitialization ();
-  MaxCpuCountInitialization ();
-
-  PublishPeiMemory ();
-
-  InitializeRamRegions ();
-
-  if (mXen) {
-    DEBUG ((EFI_D_INFO, "Xen was detected\n"));
-    InitializeXen ();
-  }
 
   //
   // Query Host Bridge DID
   //
   mHostBridgeDevId = PciRead16 (OVMF_HOSTBRIDGE_DID);
 
+  MaxCpuCountInitialization ();
+
+  if (FeaturePcdGet (PcdSmmSmramRequire)) {
+    Q35BoardVerification ();
+    Q35TsegMbytesInitialization ();
+    Q35SmramAtDefaultSmbaseInitialization ();
+  }
+
+  PublishPeiMemory ();
+
+  QemuUc32BaseInitialization ();
+
+  InitializeRamRegions ();
+
+  if (mXen) {
+    DEBUG ((DEBUG_INFO, "Xen was detected\n"));
+    InitializeXen ();
+  }
+
   if (mBootMode != BOOT_ON_S3_RESUME) {
-    ReserveEmuVariableNvStore ();
+    if (!FeaturePcdGet (PcdSmmSmramRequire)) {
+      ReserveEmuVariableNvStore ();
+    }
     PeiFvInitialization ();
+    MemTypeInfoInitialization ();
     MemMapInitialization ();
     NoexecDxeInitialization ();
   }
 
+  InstallClearCacheCallback ();
+  AmdSevInitialize ();
   MiscInitialization ();
   InstallFeatureControlCallback ();
 

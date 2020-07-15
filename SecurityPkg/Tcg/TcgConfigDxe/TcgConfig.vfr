@@ -1,14 +1,8 @@
 /** @file
   VFR file used by the TCG configuration component.
 
-Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials 
-are licensed and made available under the terms and conditions of the BSD License 
-which accompanies this distribution.  The full text of the license may be found at 
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, 
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2011 - 2019, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -43,6 +37,10 @@ formset
           help   = STRING_TOKEN(STR_TPM_OPERATION_HELP),
           flags  = INTERACTIVE | RESET_REQUIRED,
           //
+          // Default the form to NO ACTION to allow toggling other options
+          //
+          option text = STRING_TOKEN(STR_NO_ACTION), value = PHYSICAL_PRESENCE_NO_ACTION, flags = DEFAULT;
+          //
           // Disable (TPM_ORD_PhysicalDisable) command is not available when disabled.
           // Activate/deactivate (TPM_ORD_physicalSetDeactivated) command is not available when disabled.
           //
@@ -53,7 +51,7 @@ formset
             option text = STRING_TOKEN(STR_TPM_DEACTIVATE_DISABLE), value = PHYSICAL_PRESENCE_DEACTIVATE_DISABLE, flags = 0;
           endif
           //
-          // Clear (TPM_ORD_ForceClear) command is not available when disabled or deactivated. 
+          // Clear (TPM_ORD_ForceClear) command is not available when disabled or deactivated.
           //
           suppressif ideqval TCG_CONFIGURATION.TpmEnable == 0 OR
                      ideqval TCG_CONFIGURATION.TpmActivate == 0;
@@ -61,8 +59,8 @@ formset
             option text = STRING_TOKEN(STR_TPM_CLEAR_ENABLE_ACTIVATE), value = PHYSICAL_PRESENCE_CLEAR_ENABLE_ACTIVATE, flags = 0;
           endif
 
-          option text = STRING_TOKEN(STR_ENABLE), value = PHYSICAL_PRESENCE_ENABLE, flags = DEFAULT;
-          option text = STRING_TOKEN(STR_TPM_ENABLE_ACTIVATE), value = PHYSICAL_PRESENCE_ENABLE_ACTIVATE, flags = 0;          
+          option text = STRING_TOKEN(STR_ENABLE), value = PHYSICAL_PRESENCE_ENABLE, flags = 0;
+          option text = STRING_TOKEN(STR_TPM_ENABLE_ACTIVATE), value = PHYSICAL_PRESENCE_ENABLE_ACTIVATE, flags = 0;
           option text = STRING_TOKEN(STR_TPM_ENABLE_ACTIVATE_CLEAR), value = PHYSICAL_PRESENCE_ENABLE_ACTIVATE_CLEAR, flags = 0;
           option text = STRING_TOKEN(STR_TPM_ENABLE_ACTIVATE_CLEAR_E_A), value = PHYSICAL_PRESENCE_ENABLE_ACTIVATE_CLEAR_ENABLE_ACTIVATE, flags = 0;
     endoneof;

@@ -4,12 +4,7 @@ Filename: DistributionPackage.xsd
 
 Copyright (c) 2008 - 2012, Intel Corporation. All rights reserved.
 
-This program and the accompanying materials are licensed and made available 
-under the terms and conditions of the BSD License which may be found at 
-    http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified"
@@ -145,7 +140,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <xs:documentation xml:lang="en-us">
               The UserExtensions section is used to disseminate processing
               instructions that may be custom to the content provided by the distribution. This section
-              contains information that is common to all aspects of this disribution.
+              contains information that is common to all aspects of this distribution.
             </xs:documentation>
           </xs:annotation>
         </xs:element>
@@ -171,7 +166,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
               Package.
             </xs:documentation>
             <xs:documentation xml:lang="en-us">
-              Each Distribution Package is uniquely identified by it's
+              Each Distribution Package is uniquely identified by its
               GUID and Version number.
             </xs:documentation>
           </xs:annotation>
@@ -328,7 +323,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
               important to reflect the present state of the matter
             </xs:documentation>
             <xs:documentation xml:lang="en-us">
-              #2 Added definition/enumeration of UNDEFIND type 2 is
+              #2 Added definition/enumeration of UNDEFINED type 2 is
               important since there is a large body of legacy code for which the GUID’s and other
               code/data objects were not decorated with their usage. This document will allow for
               importing today’s source artifacts and producing decorations using the ‘Undefined’ versus
@@ -368,7 +363,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         Modules.
       </xs:documentation>
       <xs:documentation xml:lang="en-us">
-        Each package is uniquely identified by it's GUID and Version number.
+        Each package is uniquely identified by its GUID and Version number.
         Backward compatible releases of a package need only change the version number, while non-backward
         compatible changes require the GUID to change (resetting the version number to 1.0 is optional.)
       </xs:documentation>
@@ -696,7 +691,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             </xs:sequence>
           </xs:complexType>
         </xs:element>
-        <!-- End of PackageSurfaceArea PackageIncluces element.  -->
+        <!-- End of PackageSurfaceArea PackageIncludes element.  -->
 
         <xs:element minOccurs="0" maxOccurs="1" name="Modules">
           <xs:complexType>
@@ -962,8 +957,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
                               <xs:annotation>
                                 <xs:documentation xml:lang="en-us">
                                   The PCD must be within a
-                                  specifed range of numeric values. Restricted to C style
-                                  Relational, Equality and Logicial Operators and parenthesis
+                                  specified range of numeric values. Restricted to C style
+                                  Relational, Equality and Logical Operators and parenthesis
                                   are valid. Only the CName for this PCD is permitted in the
                                   ValidValueRange expression. All other values must be
                                   numeric.
@@ -1006,7 +1001,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
                               <xs:documentation xml:lang="en-us">
                                 This string should be
                                 defined by specifications. There are pre-defined error
-                                number ranges in the UEFI/PI specificaiton.
+                                number ranges in the UEFI/PI specification.
                               </xs:documentation>
                             </xs:annotation>
                             <xs:complexType>
@@ -1173,7 +1168,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   <xs:element name="ModuleSurfaceArea">
     <xs:annotation>
       <xs:documentation xml:lang="en-us">
-        Each module is uniquely identified by it's GUID and Version number.
+        Each module is uniquely identified by its GUID and Version number.
         Backward compatible releases of a module need only change the version number, while non-backward
         compatible changes require the GUID to change (resetting the version number to 1.0 is optional.)
       </xs:documentation>
@@ -1452,7 +1447,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
                           <xs:annotation>
                             <xs:documentation xml:lang="en-us">
                               The module will change the
-                              boot mode on some exection paths.
+                              boot mode on some execution paths.
                             </xs:documentation>
                           </xs:annotation>
                         </xs:enumeration>
@@ -2835,7 +2830,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <xs:anyAttribute processContents="lax"/>
     </xs:complexType>
   </xs:element>
-  <!-- The following elsements are common definitions used with the ref attribute for elements. -->
+  <!-- The following elements are common definitions used with the ref attribute for elements. -->
 
   <xs:element name="HelpText">
     <xs:complexType>
@@ -3097,7 +3092,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <xs:documentation xml:lang="en-us">
             The Patch PCD is a #define that is set at build time, and that
             can be modified within a binary file. Additional information, such as the offset location of the
-            value, along with it's length may need to be provided.
+            value, along with its length may need to be provided.
           </xs:documentation>
         </xs:annotation>
       </xs:enumeration>

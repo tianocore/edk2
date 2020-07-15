@@ -690,7 +690,7 @@
 
       The first line of the makefiles require a definition of PCCTS_HOME.
 
-      These are in additiion to the AntlrMSVC50.* and DlgMSVC50.*
+      These are in addition to the AntlrMSVC50.* and DlgMSVC50.*
       supplied by Jeff Vincent (JVincent@novell.com).
 
 #137. (Changed in MR11) Token getType(), getText(), getLine() const members
@@ -1681,7 +1681,7 @@
       the variable [zz]traceOptionValueDefault is set to 0 or 1.  When
       the parser is initialized or [zz]traceReset() is called the
       value of [zz]traceOptionValueDefault is copied to [zz]traceOptionValue.
-      The value of [zz]traceGuessOptionValue is always initialzed to 1,
+      The value of [zz]traceGuessOptionValue is always initialized to 1,
       but, as noted earlier, nothing will be reported unless
       [zz]traceOptionValue is also positive.
 
@@ -2028,7 +2028,7 @@
 
       The syntax of the class statement ("class parser-name {")
       has been extended to allow for the specification of base
-      classes.  An arbirtrary number of tokens may now appear
+      classes.  An arbitrary number of tokens may now appear
       between the class name and the "{".  They are output
       again when the class declaration is generated.  For
       example:
@@ -2225,7 +2225,7 @@
         This is especially important for predicates formed by rules
         like the following:
 
-            uppperCaseVowel : <<isUpperCase(LATEXT(1))>>?  vowel;
+            upperCaseVowel  : <<isUpperCase(LATEXT(1))>>?  vowel;
             vowel:          : <<isVowel(LATEXT(1))>>? LETTERS;
 
         These predicates are combined using AND since both must be
@@ -2492,7 +2492,7 @@
       a predicate expression tree.  Prior to 1.33MR10 this link was never
       cleared and the next time the guard was used to construct a new
       tree the link could contain a spurious reference to another element
-      which had previosly been joined to it in the semantic predicate tree.
+      which had previously been joined to it in the semantic predicate tree.
 
       For example:
 
@@ -2565,7 +2565,7 @@
       tokens.  They may not contain references to (...)+ and
       (...)* blocks.  This is now checked.  This replaces the
       fatal error message in item #78 with an appropriate
-      (non-fatal) error messge.
+      (non-fatal) error message.
 
       In theory, context guards should be allowed to reference
       rules.  However, I have not had time to fix this.
@@ -2581,7 +2581,7 @@
       correctly when the sets were of unequal sizes.  Rewrote
       set_equ to make it simpler and remove unnecessary and
       expensive calls to set_deg().  This routine was not used
-      in 1.33 vanila.
+      in 1.33 vanilla.
 
 #85.  (Changed in 1.33MR10) Allow redefinition of MaxNumFiles
 
@@ -2617,7 +2617,7 @@
 
       There were no changes in antlr or dlg output from the revised version.
 
-      The following fragment demonstates the problem by giving different
+      The following fragment demonstrates the problem by giving different
       follow sets (option -pa) for var_access when built with k=1 and ck=2 on
       1.33 vanilla and 1.33MR10:
 
@@ -2658,7 +2658,7 @@
 
          1. start : r:rule t:Token <<$start=$r;>>
 
-                The $r refrence will not work when combined with
+                The $r reference will not work when combined with
                 the -gt option.
 
          2. start : t:Token         <<$start=$t;>>
@@ -3010,7 +3010,7 @@
             parse by "falling through".  The parse can still be easily
             resumed in other ways, but not in the most natural fashion.
 
-            This results in an inconsistentcy between named exception
+            This results in an inconsistency between named exception
             handlers and exception handlers for alternatives.  When
             an exception handler for an alternative "falls through"
             it goes to the nextmost outer handler - not the "normal
@@ -3062,7 +3062,7 @@
             zzconsumeUntil()
             zzconsumeUntilToken()
 
-#58.  (Changed in 1.33MR7) Added defintion of zzbufsize to dlgauto.h
+#58.  (Changed in 1.33MR7) Added definition of zzbufsize to dlgauto.h
 
 #57.  (Changed in 1.33MR7) Format of #line directive
 
@@ -3073,9 +3073,9 @@
 
 #56.  (Added in 1.33MR7) Jan Mikkelsen <janm@zeta.org.au>
 
-        Move PURIFY macro invocaton to after rule's init action.
+        Move PURIFY macro invocation to after rule's init action.
 
-#55.  (Fixed in 1.33MR7) Unitialized variables in ANTLRParser
+#55.  (Fixed in 1.33MR7) Uninitialized variables in ANTLRParser
 
         Member variables inf_labase and inf_last were not initialized.
         (See item #50.)
@@ -3115,7 +3115,7 @@
         The reason for "Normal Action" is that the normal flow of the
         program after a user-written exception handler is to "drop through".
         In the case of an exception handler for a rule this results in
-        the exection of a "return" statement.  In the case of an
+        the execution of a "return" statement.  In the case of an
         exception handler attached to an alternative, rule, or token
         this is the code that would have executed had there been no
         exception.
@@ -3332,7 +3332,7 @@
 
         Repair bug introduced by 1.33MR1 for #tokdefs.  The original fix
         placed "DLGmaxToken=9999" and "DLGminToken=0" in the TokenType enum
-        in order to fix a problem with an aggresive compiler assigning an 8
+        in order to fix a problem with an aggressive compiler assigning an 8
         bit enum which might be too narrow.  This caused #tokdefs to assume
         that there were 9999 real tokens.  The repair to the fix causes antlr to
         ignore TokenTypes "DLGmaxToken" and "DLGminToken" in a #tokdefs file.

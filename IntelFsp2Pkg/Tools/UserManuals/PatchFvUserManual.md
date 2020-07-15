@@ -30,7 +30,7 @@ FSP tree.
 
 The example used contains Windows batch script %VARIABLES%.
 
-#FvFileBaseNames (Argument 2: 0ptional Part 1)
+#FvFileBaseNames (Argument 2: Optional Part 1)
 The firmware volume file base names (**_FvFileBaseNames_**) are the independent
 Fv?s that are to be patched within the FD. (0 or more in the form
 **FVFILEBASENAME:**) The colon **:** is used for delimiting the single

@@ -1,0 +1,81 @@
+## @file
+# This module provide an SMM CIS compliant implementation of SMM Core.
+#
+# Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2016 - 2018, ARM Limited. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = StandaloneMmCore
+  FILE_GUID                      = 6E14B6FD-3600-4DD6-A17A-206B3B6DCE16
+  MODULE_TYPE                    = MM_CORE_STANDALONE
+  VERSION_STRING                 = 1.0
+  PI_SPECIFICATION_VERSION       = 0x00010032
+  ENTRY_POINT                    = StandaloneMmMain
+
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
+
+[Sources]
+  StandaloneMmCore.c
+  StandaloneMmCore.h
+  StandaloneMmCorePrivateData.h
+  Page.c
+  Pool.c
+  Handle.c
+  Locate.c
+  Notify.c
+  Dependency.c
+  Dispatcher.c
+  Mmi.c
+  InstallConfigurationTable.c
+  FwVol.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  StandaloneMmPkg/StandaloneMmPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  CacheMaintenanceLib
+  DebugLib
+  ExtractGuidedSectionLib
+  FvLib
+  HobLib
+  MemoryAllocationLib
+  MemLib
+  PeCoffLib
+  ReportStatusCodeLib
+  StandaloneMmCoreEntryPoint
+
+[Protocols]
+  gEfiDxeMmReadyToLockProtocolGuid             ## UNDEFINED # SmiHandlerRegister
+  gEfiMmReadyToLockProtocolGuid                ## PRODUCES
+  gEfiMmEndOfDxeProtocolGuid                   ## PRODUCES
+  gEfiLoadedImageProtocolGuid                   ## PRODUCES
+  gEfiMmConfigurationProtocolGuid               ## CONSUMES
+
+[Guids]
+  gAprioriGuid                                  ## SOMETIMES_CONSUMES   ## File
+  gEfiEventDxeDispatchGuid                      ## PRODUCES             ## GUID # SmiHandlerRegister
+  gEfiEndOfDxeEventGroupGuid                    ## PRODUCES             ## GUID # SmiHandlerRegister
+  ## SOMETIMES_CONSUMES   ## GUID # Locate protocol
+  ## SOMETIMES_PRODUCES   ## GUID # SmiHandlerRegister
+  gEdkiiMemoryProfileGuid
+  gZeroGuid                                     ## SOMETIMES_CONSUMES   ## GUID
+  gEfiHobListGuid
+  gEfiHobMemoryAllocModuleGuid
+  gMmCoreDataHobGuid
+  gMmFvDispatchGuid
+  gEfiEventLegacyBootGuid
+  gEfiEventExitBootServicesGuid
+  gEfiEventReadyToBootGuid
+
+[BuildOptions]
+  GCC:*_*_*_CC_FLAGS = -fpie
+  GCC:*_*_*_DLINK_FLAGS = -Wl,-z,text,-Bsymbolic,-pie

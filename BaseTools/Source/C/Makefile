@@ -1,37 +1,28 @@
 ## @file
 # Windows makefile for C tools build.
 #
-# Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
-# This program and the accompanying materials
-# are licensed and made available under the terms and conditions of the BSD License
-# which accompanies this distribution.  The full text of the license may be found at
-# http://opensource.org/licenses/bsd-license.php
+# Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
 #
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-#
-ARCH = IA32
+HOST_ARCH = IA32
 
 !INCLUDE Makefiles\ms.common
 
 LIBRARIES = Common
 APPLICATIONS = \
-  BootSectImage \
-  EfiLdrImage \
+  VfrCompile \
+  BrotliCompress \
   EfiRom \
-  GenBootSector \
   GenCrc32 \
   GenFfs \
   GenFv \
   GenFw \
-  GenPage \
   GenSec \
-  GenVtf \
   LzmaCompress \
   Split \
   TianoCompress \
   VolInfo \
-  VfrCompile
+  DevicePath
 
 all: libs apps install
 
@@ -41,7 +32,8 @@ libs: $(LIBRARIES)
 	@echo # Build libraries
 	@echo ######################
 	@if not exist $(LIB_PATH) mkdir $(LIB_PATH)
-	@Makefiles\NmakeSubdirs.bat all $**
+  @if defined PYTHON_COMMAND $(PYTHON_COMMAND) Makefiles\NmakeSubdirs.py all $**
+  @if not defined PYTHON_COMMAND $(PYTHON_HOME)\python.exe Makefiles\NmakeSubdirs.py all $**
 
 apps: $(APPLICATIONS)
 	@echo.
@@ -49,7 +41,8 @@ apps: $(APPLICATIONS)
 	@echo # Build executables
 	@echo ######################
 	@if not exist $(BIN_PATH) mkdir $(BIN_PATH)
-	@Makefiles\NmakeSubdirs.bat all $**
+  @if defined PYTHON_COMMAND $(PYTHON_COMMAND) Makefiles\NmakeSubdirs.py all $**
+  @if not defined PYTHON_COMMAND $(PYTHON_HOME)\python.exe Makefiles\NmakeSubdirs.py all $**
 
 install: $(LIB_PATH) $(BIN_PATH)
 	@echo.
@@ -63,11 +56,15 @@ install: $(LIB_PATH) $(BIN_PATH)
 
 .PHONY: clean
 clean:
-  @Makefiles\NmakeSubdirs.bat clean $(LIBRARIES) $(APPLICATIONS)
+  @if defined PYTHON_COMMAND $(PYTHON_COMMAND) Makefiles\NmakeSubdirs.py clean $(LIBRARIES) $(APPLICATIONS)
+  @if not defined PYTHON_COMMAND $(PYTHON_HOME)\python.exe Makefiles\NmakeSubdirs.py clean $(LIBRARIES) $(APPLICATIONS)
 
 .PHONY: cleanall
 cleanall:
-  @Makefiles\NmakeSubdirs.bat cleanall $(LIBRARIES) $(APPLICATIONS)
+  @if defined PYTHON_COMMAND $(PYTHON_COMMAND) Makefiles\NmakeSubdirs.py cleanall $(LIBRARIES) $(APPLICATIONS)
+  @if not defined PYTHON_COMMAND $(PYTHON_HOME)\python.exe Makefiles\NmakeSubdirs.py cleanall $(LIBRARIES) $(APPLICATIONS)
+# Next line protects the libs pseudo target from inadvertent GNU make activity
+  if exist libs RMDIR /S /Q libs
 
 !INCLUDE Makefiles\ms.rule
 

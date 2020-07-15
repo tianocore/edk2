@@ -4,12 +4,7 @@
 #  Copyright (c) 2009, Apple Inc. All rights reserved.<BR>
 #  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
 #
-#  This program and the accompanying materials
-#  are licensed and made available under the terms and conditions of the BSD License
-#  which accompanies this distribution. The full text of the license may be found at
-#  http://opensource.org/licenses/bsd-license.php
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 #
 #**/
@@ -23,8 +18,16 @@
   LIBRARY_CLASS                  = CompilerIntrinsicsLib
 
 [Sources]
-  memcpy.c
-  memset.c
+  memcpy.c             | RVCT
+  memset.c             | RVCT
+
+  memcpy.c             | GCC
+  memset.c             | GCC
+
+  memcpy_ms.c          | MSFT
+  memset_ms.c          | MSFT
+  memcmp_ms.c          | MSFT
+  memmove_ms.c         | MSFT
 
 [Sources.ARM]
   Arm/mullu.asm        | RVCT
@@ -39,65 +42,50 @@
   Arm/uldiv.asm        | RVCT
   Arm/ldivmod.asm      | RVCT
 
+  Arm/ashrdi3.S        | GCC
+  Arm/ashldi3.S        | GCC
+  Arm/div.S            | GCC
+  Arm/divdi3.S         | GCC
+  Arm/divsi3.S         | GCC
+  Arm/lshrdi3.S        | GCC
+  Arm/memmove.S        | GCC
+  Arm/modsi3.S         | GCC
+  Arm/moddi3.S         | GCC
+  Arm/muldi3.S         | GCC
+  Arm/mullu.S          | GCC
+  Arm/udivsi3.S        | GCC
+  Arm/umodsi3.S        | GCC
+  Arm/udivdi3.S        | GCC
+  Arm/umoddi3.S        | GCC
+  Arm/udivmoddi4.S     | GCC
+  Arm/clzsi2.S         | GCC
+  Arm/ctzsi2.S         | GCC
+  Arm/ucmpdi2.S        | GCC
+  Arm/switch8.S        | GCC
+  Arm/switchu8.S       | GCC
+  Arm/switch16.S       | GCC
+  Arm/switch32.S       | GCC
+  Arm/sourcery.S       | GCC
+  Arm/uldiv.S          | GCC
+  Arm/ldivmod.S        | GCC
+  Arm/lasr.S           | GCC
+  Arm/llsr.S           | GCC
+  Arm/llsl.S           | GCC
+  Arm/uread.S          | GCC
+  Arm/uwrite.S         | GCC
 
-#
-# Move .c to .s to work around LLVM issues
-#
-#  Arm/ashrdi3.c    | GCC
-#  Arm/ashldi3.c    | GCC
-#  Arm/divdi3.c     | GCC
-#  Arm/divsi3.c     | GCC
-#  Arm/lshrdi3.c    | GCC
-  Arm/ashrdi3.S    | GCC
-  Arm/ashldi3.S    | GCC
-  Arm/div.S        | GCC
-  Arm/divdi3.S     | GCC
-  Arm/divsi3.S     | GCC
-  Arm/lshrdi3.S    | GCC
+  Arm/div.asm          | MSFT
+  Arm/uldiv.asm        | MSFT
+  Arm/ldivmod.asm      | MSFT
+  Arm/llsr.asm         | MSFT
 
-  Arm/memmove.S    | GCC
-
-#  Arm/modsi3.c     | GCC
-#  Arm/moddi3.c     | GCC
-#  Arm/muldi3.c     | GCC
-  Arm/modsi3.S     | GCC
-  Arm/moddi3.S     | GCC
-  Arm/muldi3.S     | GCC
-  Arm/mullu.S      | GCC
-
-#  Arm/udivsi3.c    | GCC
-#  Arm/umodsi3.c    | GCC
-#  Arm/udivdi3.c    | GCC
-#  Arm/umoddi3.c    | GCC
-#  Arm/udivmoddi4.c | GCC
-  Arm/udivsi3.S    | GCC
-  Arm/umodsi3.S    | GCC
-  Arm/udivdi3.S    | GCC
-  Arm/umoddi3.S    | GCC
-  Arm/udivmoddi4.S | GCC
-
-#  Arm/clzsi2.c     | GCC
-#  Arm/ctzsi2.c     | GCC
-#  Arm/ucmpdi2.c    | GCC
-  Arm/clzsi2.S     | GCC
-  Arm/ctzsi2.S     | GCC
-  Arm/ucmpdi2.S    | GCC
-  Arm/switch8.S    | GCC
-  Arm/switchu8.S   | GCC
-  Arm/switch16.S   | GCC
-  Arm/switch32.S   | GCC
-
-  Arm/sourcery.S   | GCC
-  Arm/uldiv.S      | GCC
-  Arm/ldivmod.S    | GCC
-
-  Arm/llsr.S       | GCC
-  Arm/llsl.S       | GCC
-
+[Sources.AARCH64]
+  AArch64/Atomics.S    | GCC
 
 [Packages]
   MdePkg/MdePkg.dec
   ArmPkg/ArmPkg.dec
 
-[LibraryClasses]
-
+[BuildOptions]
+  MSFT:*_*_*_CC_FLAGS = /GL-
+  MSFT:*_*_ARM_ASM_FLAGS = /oldit

@@ -1,15 +1,9 @@
 ## @file
 # This file is used to define helper class and function for DEC parser
 #
-# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
-# This program and the accompanying materials are licensed and made available 
-# under the terms and conditions of the BSD License which accompanies this 
-# distribution. The full text of the license may be found at 
-# http://opensource.org/licenses/bsd-license.php
-#
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
 
 '''
 DecParserMisc
@@ -104,7 +98,7 @@ def StripRoot(Root, Path):
 # Remove spaces
 #
 # @param Line:              The string to be cleaned
-# @param CommentCharacter:  Comment char, used to ignore comment content, 
+# @param CommentCharacter:  Comment char, used to ignore comment content,
 #                           default is DataType.TAB_COMMENT_SPLIT
 #
 def CleanString(Line, CommentCharacter=TAB_COMMENT_SPLIT, \
@@ -151,7 +145,7 @@ def IsValidNumValUint8(Token):
     else:
         Base = 10
     try:
-        TokenValue = long(Token, Base)
+        TokenValue = int(Token, Base)
     except BaseException:
         Valid, Cause = IsValidLogicalExpr(Token, True)
         if Cause:
@@ -262,36 +256,16 @@ def IsValidPcdDatum(Type, Value):
                 Value = Value.lstrip('0')
                 if not Value:
                     return True, ""
-            Value = long(Value, 0)
-            TypeLenMap = {
-                #
-                # 0x00 - 0xff
-                #
-                'UINT8'  : 2,
-                #
-                # 0x0000 - 0xffff
-                #
-                'UINT16' : 4,
-                #
-                # 0x00000000 - 0xffffffff
-                #
-                'UINT32' : 8,
-                #
-                # 0x0 - 0xffffffffffffffff
-                #
-                'UINT64' : 16
-            }
-            HexStr = hex(Value)
-            #
-            # First two chars of HexStr are 0x and tail char is L
-            #
-            if TypeLenMap[Type] < len(HexStr) - 3:
+            Value = int(Value, 0)
+            MAX_VAL_TYPE = {"BOOLEAN": 0x01, 'UINT8': 0xFF, 'UINT16': 0xFFFF, 'UINT32': 0xFFFFFFFF,
+                            'UINT64': 0xFFFFFFFFFFFFFFFF}
+            if Value > MAX_VAL_TYPE[Type]:
                 return False, ST.ERR_DECPARSE_PCD_INT_EXCEED % (StrVal, Type)
         except BaseException:
             Valid, Cause = IsValidLogicalExpr(Value, True)
         if not Valid:
             return False, Cause
-        
+
     return True, ""
 
 ## ParserHelper
@@ -366,7 +340,7 @@ class ParserHelper:
 
     ## AssertChar
     #
-    # Assert char at current index of string is AssertChar, or will report 
+    # Assert char at current index of string is AssertChar, or will report
     # error message
     #
     # @param AssertChar: AssertChar

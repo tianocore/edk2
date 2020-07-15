@@ -1,0 +1,134 @@
+
+## @file
+# File steps.yml
+#
+# template file containing the steps to build
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+parameters:
+- name: tool_chain_tag
+  type: string
+  default: ''
+- name: build_pkg
+  type: string
+  default: ''
+- name: build_target
+  type: string
+  default: ''
+- name: build_arch
+  type: string
+  default: ''
+- name: build_file
+  type: string
+  default: ''
+- name: build_flags
+  type: string
+  default: ''
+- name: run_flags
+  type: string
+  default: ''
+
+- name: extra_install_step
+  type: stepList
+  default: []
+
+steps:
+- checkout: self
+  clean: true
+  fetchDepth: 1
+
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: "3.8.x"
+    architecture: "x64"
+
+- script: pip install -r pip-requirements.txt --upgrade
+  displayName: 'Install/Upgrade pip modules'
+
+# Set default
+- bash: echo "##vso[task.setvariable variable=pkg_count]${{ 1 }}"
+
+# trim the package list if this is a PR
+- task: CmdLine@1
+  displayName: Check if ${{ parameters.build_pkg }} need testing
+  inputs:
+    filename: stuart_pr_eval
+    arguments: -c ${{ parameters.build_file }} -t ${{ parameters.build_target}} -a ${{ parameters.build_arch}} --pr-target origin/$(System.PullRequest.targetBranch) --output-count-format-string "##vso[task.setvariable variable=pkg_count;isOutpout=true]{pkgcount}"
+  condition: eq(variables['Build.Reason'], 'PullRequest')
+
+ # Setup repo
+- task: CmdLine@1
+  displayName: Setup
+  inputs:
+    filename: stuart_setup
+    arguments: -c ${{ parameters.build_file }} TOOL_CHAIN_TAG=${{ parameters.tool_chain_tag}} -t ${{ parameters.build_target}} -a ${{ parameters.build_arch}} ${{ parameters.build_flags}}
+  condition: and(gt(variables.pkg_count, 0), succeeded())
+
+# Stuart Update
+- task: CmdLine@1
+  displayName: Update
+  inputs:
+    filename: stuart_update
+    arguments: -c ${{ parameters.build_file }} TOOL_CHAIN_TAG=${{ parameters.tool_chain_tag}} -t ${{ parameters.build_target}} -a ${{ parameters.build_arch}} ${{ parameters.build_flags}}
+  condition: and(gt(variables.pkg_count, 0), succeeded())
+
+# build basetools
+#   do this after setup and update so that code base dependencies
+#   are all resolved.
+- template: basetools-build-steps.yml
+  parameters:
+    tool_chain_tag: ${{ parameters.tool_chain_tag }}
+
+# Potential Extra steps
+- ${{ parameters.extra_install_step }}
+
+# Build
+- task: CmdLine@1
+  displayName: Build
+  inputs:
+    filename: stuart_build
+    arguments: -c ${{ parameters.build_file }} TOOL_CHAIN_TAG=${{ parameters.tool_chain_tag}} TARGET=${{ parameters.build_target}} -a ${{ parameters.build_arch}} ${{ parameters.build_flags}}
+  condition: and(gt(variables.pkg_count, 0), succeeded())
+
+# Run
+- task: CmdLine@1
+  displayName: Run to shell
+  inputs:
+    filename: stuart_build
+    arguments: -c ${{ parameters.build_file }} TOOL_CHAIN_TAG=${{ parameters.tool_chain_tag}} TARGET=${{ parameters.build_target}} -a ${{ parameters.build_arch}} ${{ parameters.build_flags}} ${{ parameters.run_flags }} --FlashOnly
+  condition: and(and(gt(variables.pkg_count, 0), succeeded()), eq(variables['Run'], true))
+  timeoutInMinutes: 1
+
+# Copy the build logs to the artifact staging directory
+- task: CopyFiles@2
+  displayName: "Copy build logs"
+  inputs:
+    targetFolder: "$(Build.ArtifactStagingDirectory)"
+    SourceFolder: "Build"
+    contents: |
+      BUILDLOG_*.txt
+      BUILDLOG_*.md
+      CI_*.txt
+      CI_*.md
+      CISETUP.txt
+      SETUPLOG.txt
+      UPDATE_LOG.txt
+      PREVALLOG.txt
+      TestSuites.xml
+      **/BUILD_TOOLS_REPORT.html
+      **/OVERRIDELOG.TXT
+      BASETOOLS_BUILD*.*
+    flattenFolders: true
+  condition: succeededOrFailed()
+
+# Publish build artifacts to Azure Artifacts/TFS or a file share
+- task: PublishBuildArtifacts@1
+  continueOnError: true
+  displayName: "Publish build logs"
+  inputs:
+    pathtoPublish: "$(Build.ArtifactStagingDirectory)"
+    artifactName: "Build Logs $(System.JobName)"
+  condition: succeededOrFailed()

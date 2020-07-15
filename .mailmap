@@ -1,0 +1,73 @@
+#
+# This list is used by git-shortlog to update a few name translations
+# in the git archive to adjust for job changes or incorrect/inconsistent
+# name usage.
+#
+# Please keep this file sorted alphabetically, and email in lowercase.
+# The format used is:
+#
+#   Firstname Lastname <email@domain.tld>
+#
+
+Aaron Li <aaron.li@intel.com> <songpeng.li@intel.com>
+Antoine Cœur <coeur@gmx.fr>
+Antoine Cœur <coeur@gmx.fr> <Coeur@gmx.fr>
+Ard Biesheuvel <ard.biesheuvel@linaro.org> <abiesheuvel@Edk2>
+Ashley DeSimone <ashley.e.desimone@intel.com> <ashdesimone@6f19259b-4bc3-4df7-8a09-765794883524>
+Baraneedharan Anbazhagan <anbazhagan@hp.com>
+Chasel Chiu <chasel.chiu@intel.com>
+Christopher J Zurcher <christopher.j.zurcher@intel.com>
+Eric Dong <eric.dong@intel.com>
+Eric Dong <eric.dong@intel.com> Eric Dong <eirc.dong@intel.com>
+Eric Dong <eric.dong@intel.com> <ydong10@6f19259b-4bc3-4df7-8a09-765794883524>
+Eric Dong <eric.dong@intel.com> <ydong10@Edk2>
+Erik Bjorge <erik.c.bjorge@intel.com> <geekboy15a@6f19259b-4bc3-4df7-8a09-765794883524>
+Eugene Cohen <eugene@nuviainc.com>
+Eugene Cohen <eugene@nuviainc.com> <eugene@hp.com>
+Hao A Wu <hao.a.wu@intel.com>
+Hao A Wu <hao.a.wu@intel.com> <hwu1225@Edk2>
+Hot Tian <hot.tian@intel.com>
+Hot Tian <hot.tian@intel.com> <hhtian@6f19259b-4bc3-4df7-8a09-765794883524>
+Jiewen Yao <jiewen.yao@intel.com>
+Jiewen Yao <jiewen.yao@intel.com> <Jiewen.yao@intel.com>
+Jiewen Yao <jiewen.yao@intel.com> <Jiewen.Yao@intel.com>
+Jiewen Yao <jiewen.yao@intel.com> <jyao1>
+Jiewen Yao <jiewen.yao@intel.com> <jyao1@6f19259b-4bc3-4df7-8a09-765794883524>
+Jiewen Yao <jiewen.yao@intel.com> <jyao1@Edk2>
+Jim Dailey <Jim.Dailey@Dell.com>
+Jim Dailey <Jim.Dailey@Dell.com> <Jim_Dailey@Dell.com>
+Laszlo Ersek <lersek@redhat.com> <lersek@6f19259b-4bc3-4df7-8a09-765794883524>
+Laszlo Ersek <lersek@redhat.com> <lersek@Edk2>
+Liming Gao <liming.gao@intel.com> <Gao, Liming liming.gao@intel.com>
+Liming Gao <liming.gao@intel.com> <lgao4@6f19259b-4bc3-4df7-8a09-765794883524>
+Liming Gao <liming.gao@intel.com> <lgao4@Edk2>
+Liming Gao <liming.gao@intel.com> <liming.gao@intel.com>
+Maciej Rabeda <maciej.rabeda@intel.com>
+Marc-André Lureau <marcandre.lureau@redhat.com> <marcandre.lureau@redhat.com>
+Marvin Häuser <Marvin.Haeuser@outlook.com>
+Marvin Häuser <Marvin.Haeuser@outlook.com> edk2-devel <edk2-devel-bounces@lists.01.org>
+Marvin Häuser <mhaeuser@outlook.de>
+Maurice Ma <maurice.ma@intel.com>
+Michael Kubacki <michael.a.kubacki@intel.com>
+Michael Kubacki <michael.a.kubacki@intel.com> </o=Intel/ou=External (FYDIBOHF25SPDLT)/cn=Recipients/cn=3c8b0226e75f4ab08d20c151cb7a8a72>
+Ming Tan <ming.tan@intel.com>
+Nikolai Saoukh <nms@otdel-1.org>
+Philippe Mathieu-Daudé <philmd@redhat.com>
+Ray Ni <ray.ni@intel.com>
+Ray Ni <ray.ni@intel.com> <C:/Program Files (x86)/Git/O=Intel/OU=Pacifica02/cn=Recipients/cn=rni2>
+Ray Ni <ray.ni@intel.com> <niruiyu@6f19259b-4bc3-4df7-8a09-765794883524>
+Ray Ni <ray.ni@intel.com> <niruiyu@Edk2>
+Ray Ni <ray.ni@intel.com> <ruiyu.ni@intel.com>
+Ray Ni <ray.ni@intel.com> <Ruiyu.ni@Intel.com>
+Ray Ni <ray.ni@intel.com> <ruyu.ni@intel.com>
+Samer El-Haj-Mahmoud <samer@elhajmahmoud.com> <elhaj@hpe.com>
+Samer El-Haj-Mahmoud <samer@elhajmahmoud.com> <Samer El-Haj-Mahmoud elhaj@hp.com>
+Shenglei Zhang <shenglei.zhang@intel.com>
+Star Zeng <star.zeng@intel.com>
+Star Zeng <star.zeng@intel.com> <lzeng14@6f19259b-4bc3-4df7-8a09-765794883524>
+Star Zeng <star.zeng@intel.com> <lzeng14@Edk2>
+Vitaly Cheptsov <vit9696@protonmail.com> Vitaly Cheptsov via Groups.Io <vit9696=protonmail.com@groups.io>
+Vladimir Olovyannikov <vladimir.olovyannikov@broadcom.com> Vladimir Olovyannikov via edk2-devel <edk2-devel@lists.01.org>
+Yonghong Zhu <yonghong.zhu@intel.com>
+Yonghong Zhu <yonghong.zhu@intel.com> <yzhu52@Edk2>
+Yu-Chen Lin <yuchenlin@synology.com>

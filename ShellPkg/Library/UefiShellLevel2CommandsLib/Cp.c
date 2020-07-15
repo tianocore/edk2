@@ -2,14 +2,8 @@
   Main file for cp shell level 2 function.
 
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2009 - 2019, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -107,6 +101,9 @@ CopySingleFile(
     // possibly return based on response
     //
     if (!SilentMode) {
+      if (Response == NULL) {
+        return SHELL_ABORTED;
+      }
       switch (*(SHELL_PROMPT_RESPONSE*)Response) {
         case ShellPromptResponseNo:
           //
@@ -132,7 +129,7 @@ CopySingleFile(
   if (ShellIsDirectory(Source) == EFI_SUCCESS) {
     Status = ShellCreateDirectory(Dest, &DestHandle);
     if (EFI_ERROR(Status)) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CP_DEST_DIR_FAIL), gShellLevel2HiiHandle, CmdName, Dest);  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CP_DEST_DIR_FAIL), gShellLevel2HiiHandle, CmdName, Dest);
       return (SHELL_ACCESS_DENIED);
     }
 
@@ -161,7 +158,7 @@ CopySingleFile(
     //
     Status = ShellOpenFileByName(Dest, &DestHandle, EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE|EFI_FILE_MODE_CREATE, 0);
     if (EFI_ERROR(Status)) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CP_DEST_OPEN_FAIL), gShellLevel2HiiHandle, CmdName, Dest);  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CP_DEST_OPEN_FAIL), gShellLevel2HiiHandle, CmdName, Dest);
       return (SHELL_ACCESS_DENIED);
     }
 
@@ -220,7 +217,7 @@ CopySingleFile(
       //not enough space on destination directory to copy file
       //
       SHELL_FREE_NON_NULL(DestVolumeInfo);
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_CPY_FAIL), gShellLevel2HiiHandle, CmdName);  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_CPY_FAIL), gShellLevel2HiiHandle, CmdName);
       return(SHELL_VOLUME_FULL);
     } else {
       //
@@ -237,19 +234,19 @@ CopySingleFile(
           Status = ShellWriteFile(DestHandle, &ReadSize, Buffer);
           if (EFI_ERROR(Status)) {
             ShellStatus = (SHELL_STATUS) (Status & (~MAX_BIT));
-            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_CPY_WRITE_ERROR), gShellLevel2HiiHandle, CmdName, Dest);   
+            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_CPY_WRITE_ERROR), gShellLevel2HiiHandle, CmdName, Dest);
             break;
           }
         } else {
           ShellStatus = (SHELL_STATUS) (Status & (~MAX_BIT));
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_CPY_READ_ERROR), gShellLevel2HiiHandle, CmdName, Source);  
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_CPY_READ_ERROR), gShellLevel2HiiHandle, CmdName, Source);
           break;
         }
       }
     }
     SHELL_FREE_NON_NULL(DestVolumeInfo);
   }
-  
+
   //
   // close files
   //
@@ -324,7 +321,7 @@ ValidateAndCopyFiles(
   ASSERT(FileList != NULL);
   ASSERT(DestDir  != NULL);
 
-  
+
   Status = ShellLevel2StripQuotes (DestDir, &CleanFilePathStr);
   if (EFI_ERROR (Status)) {
     if (Status == EFI_OUT_OF_RESOURCES) {
@@ -333,7 +330,7 @@ ValidateAndCopyFiles(
       return SHELL_INVALID_PARAMETER;
     }
   }
-  
+
   ASSERT (CleanFilePathStr != NULL);
 
   //
@@ -343,7 +340,7 @@ ValidateAndCopyFiles(
     //
     // Error for destination not a directory
     //
-    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NOT_DIR), gShellLevel2HiiHandle, L"cp", CleanFilePathStr); 
+    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NOT_DIR), gShellLevel2HiiHandle, L"cp", CleanFilePathStr);
     FreePool (CleanFilePathStr);
     return (SHELL_INVALID_PARAMETER);
   }
@@ -369,7 +366,7 @@ ValidateAndCopyFiles(
     // Make sure got -r if required
     //
     if (!RecursiveMode && !EFI_ERROR(ShellIsDirectory(Node->FullName))) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CP_DIR_REQ), gShellLevel2HiiHandle, L"cp");  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CP_DIR_REQ), gShellLevel2HiiHandle, L"cp");
       FreePool (CleanFilePathStr);
       return (SHELL_INVALID_PARAMETER);
     }
@@ -381,7 +378,7 @@ ValidateAndCopyFiles(
       //
       // Error for destination not a directory
       //
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NOT_DIR), gShellLevel2HiiHandle, L"cp", CleanFilePathStr);  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NOT_DIR), gShellLevel2HiiHandle, L"cp", CleanFilePathStr);
       FreePool (CleanFilePathStr);
       return (SHELL_INVALID_PARAMETER);
     }
@@ -430,7 +427,7 @@ ValidateAndCopyFiles(
           StrCpyS(DestPath, PathSize / sizeof(CHAR16), Cwd);
           StrCatS(DestPath, PathSize / sizeof(CHAR16), L"\\");
         } else {
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_DIR_NF), gShellLevel2HiiHandle, L"cp", CleanFilePathStr);  
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_DIR_NF), gShellLevel2HiiHandle, L"cp", CleanFilePathStr);
           FreePool (CleanFilePathStr);
           return (SHELL_INVALID_PARAMETER);
         }
@@ -447,7 +444,7 @@ ValidateAndCopyFiles(
       //
       // we have multiple files or a directory in the DestDir
       //
-      
+
       //
       // Check for leading slash
       //
@@ -459,7 +456,7 @@ ValidateAndCopyFiles(
           StrCpyS(DestPath, PathSize/sizeof(CHAR16), Cwd);
           StrCatS(DestPath, PathSize/sizeof(CHAR16), L"\\");
         } else {
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_DIR_NF), gShellLevel2HiiHandle, L"cp",  CleanFilePathStr); 
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_DIR_NF), gShellLevel2HiiHandle, L"cp",  CleanFilePathStr);
           FreePool(CleanFilePathStr);
           return (SHELL_INVALID_PARAMETER);
         }
@@ -471,7 +468,7 @@ ValidateAndCopyFiles(
           StrCpyS(DestPath, PathSize/sizeof(CHAR16), Cwd);
           StrCatS(DestPath, PathSize/sizeof(CHAR16), L"\\");
         } else {
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_DIR_NF), gShellLevel2HiiHandle, L"cp", CleanFilePathStr);  
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_DIR_NF), gShellLevel2HiiHandle, L"cp", CleanFilePathStr);
           FreePool(CleanFilePathStr);
           return (SHELL_INVALID_PARAMETER);
         }
@@ -498,26 +495,26 @@ ValidateAndCopyFiles(
         StrCatS(DestPath, PathSize/sizeof(CHAR16), Node->FileName);
       }
     }
-    
+
     //
     // Make sure the path exists
     //
     if (EFI_ERROR(VerifyIntermediateDirectories(DestPath))) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CP_DIR_WNF), gShellLevel2HiiHandle, L"cp", DestPath);  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CP_DIR_WNF), gShellLevel2HiiHandle, L"cp", DestPath);
       ShellStatus = SHELL_DEVICE_ERROR;
       break;
     }
 
     if ( !EFI_ERROR(ShellIsDirectory(Node->FullName))
       && !EFI_ERROR(ShellIsDirectory(DestPath))
-      && StrniCmp(Node->FullName, DestPath, StrLen(DestPath)) == NULL
+      && StrniCmp(Node->FullName, DestPath, StrLen(DestPath)) == 0
       ){
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CP_SD_PARENT), gShellLevel2HiiHandle, L"cp");  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CP_SD_PARENT), gShellLevel2HiiHandle, L"cp");
       ShellStatus = SHELL_INVALID_PARAMETER;
       break;
     }
     if (StringNoCaseCompare(&Node->FullName, &DestPath) == 0) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CP_SD_SAME), gShellLevel2HiiHandle, L"cp");  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CP_SD_SAME), gShellLevel2HiiHandle, L"cp");
       ShellStatus = SHELL_INVALID_PARAMETER;
       break;
     }
@@ -525,7 +522,7 @@ ValidateAndCopyFiles(
     if ((StrniCmp(Node->FullName, DestPath, StrLen(Node->FullName)) == 0)
       && (DestPath[StrLen(Node->FullName)] == CHAR_NULL || DestPath[StrLen(Node->FullName)] == L'\\')
       ) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CP_SD_SAME), gShellLevel2HiiHandle, L"cp");  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CP_SD_SAME), gShellLevel2HiiHandle, L"cp");
       ShellStatus = SHELL_INVALID_PARAMETER;
       break;
     }
@@ -561,7 +558,7 @@ ValidateAndCopyFiles(
 }
 
 /**
-  Validate and if successful copy all the files from the list into 
+  Validate and if successful copy all the files from the list into
   destination directory.
 
   @param[in] FileList       The list of files to copy.
@@ -591,7 +588,7 @@ ProcessValidateAndCopyFiles(
 
   ShellOpenFileMetaArg((CHAR16*)DestDir, EFI_FILE_MODE_READ, &List);
   if (List != NULL && List->Link.ForwardLink != List->Link.BackLink) {
-    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_MARG_ERROR), gShellLevel2HiiHandle, L"cp", DestDir);  
+    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_MARG_ERROR), gShellLevel2HiiHandle, L"cp", DestDir);
     ShellStatus = SHELL_INVALID_PARAMETER;
     ShellCloseFileMetaArg(&List);
   } else if (List != NULL) {
@@ -604,7 +601,7 @@ ProcessValidateAndCopyFiles(
     if ((FileInfo->Attribute & EFI_FILE_READ_ONLY) == 0) {
       ShellStatus = ValidateAndCopyFiles(FileList, FullName, SilentMode, RecursiveMode, NULL);
     } else {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CP_DEST_ERROR), gShellLevel2HiiHandle, L"cp");  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_CP_DEST_ERROR), gShellLevel2HiiHandle, L"cp");
       ShellStatus = SHELL_ACCESS_DENIED;
     }
   } else {
@@ -668,7 +665,7 @@ ShellCommandRunCp (
   Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR(Status)) {
     if (Status == EFI_VOLUME_CORRUPTED && ProblemParam != NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"cp", ProblemParam);  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"cp", ProblemParam);
       FreePool(ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -698,7 +695,7 @@ ShellCommandRunCp (
         //
         // we have insufficient parameters
         //
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel2HiiHandle, L"cp");  
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel2HiiHandle, L"cp");
         ShellStatus = SHELL_INVALID_PARAMETER;
         break;
       case 2:
@@ -707,12 +704,12 @@ ShellCommandRunCp (
         //
         Cwd = ShellGetCurrentDir(NULL);
         if (Cwd == NULL){
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_CWD), gShellLevel2HiiHandle, L"cp");  
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_CWD), gShellLevel2HiiHandle, L"cp");
           ShellStatus = SHELL_INVALID_PARAMETER;
         } else {
           Status = ShellOpenFileMetaArg((CHAR16*)ShellCommandLineGetRawValue(Package, 1), EFI_FILE_MODE_WRITE|EFI_FILE_MODE_READ, &FileList);
           if (FileList == NULL || IsListEmpty(&FileList->Link) || EFI_ERROR(Status)) {
-            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_NF), gShellLevel2HiiHandle, L"cp", ShellCommandLineGetRawValue(Package, 1));  
+            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_NF), gShellLevel2HiiHandle, L"cp", ShellCommandLineGetRawValue(Package, 1));
             ShellStatus = SHELL_NOT_FOUND;
           } else  {
             FullCwd = AllocateZeroPool(StrSize(Cwd) + sizeof(CHAR16));
@@ -738,7 +735,7 @@ ShellCommandRunCp (
           }
           Status = ShellOpenFileMetaArg((CHAR16*)ShellCommandLineGetRawValue(Package, LoopCounter), EFI_FILE_MODE_WRITE|EFI_FILE_MODE_READ, &FileList);
           if (EFI_ERROR(Status) || FileList == NULL || IsListEmpty(&FileList->Link)) {
-            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_NF), gShellLevel2HiiHandle, L"cp", ShellCommandLineGetRawValue(Package, LoopCounter));  
+            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_NF), gShellLevel2HiiHandle, L"cp", ShellCommandLineGetRawValue(Package, LoopCounter));
             ShellStatus = SHELL_NOT_FOUND;
           }
         }
@@ -752,7 +749,7 @@ ShellCommandRunCp (
             ShellStatus = ProcessValidateAndCopyFiles(FileList, PathCleanUpDirectories((CHAR16*)ShellCommandLineGetRawValue(Package, ParamCount)), SilentMode, RecursiveMode);
             Status = ShellCloseFileMetaArg(&FileList);
             if (EFI_ERROR(Status) && ShellStatus == SHELL_SUCCESS) {
-              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_FILE), gShellLevel2HiiHandle, L"cp", ShellCommandLineGetRawValue(Package, ParamCount), ShellStatus|MAX_BIT);  
+              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_FILE), gShellLevel2HiiHandle, L"cp", ShellCommandLineGetRawValue(Package, ParamCount), ShellStatus|MAX_BIT);
               ShellStatus = SHELL_ACCESS_DENIED;
             }
           }

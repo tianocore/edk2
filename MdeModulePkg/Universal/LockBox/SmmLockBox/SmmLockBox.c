@@ -1,24 +1,17 @@
 /** @file
   LockBox SMM driver.
-  
+
   Caution: This module requires additional review when modified.
   This driver will have external input - communicate buffer in SMM mode.
   This external input must be validated carefully to avoid security issue like
   buffer overflow, integer overflow.
-  
+
   SmmLockBoxHandler(), SmmLockBoxRestore(), SmmLockBoxUpdate(), SmmLockBoxSave()
   will receive untrusted input and do basic validation.
 
-Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 
-This program and the accompanying materials
-are licensed and made available under the terms and conditions
-of the BSD License which accompanies this distribution.  The
-full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -47,7 +40,7 @@ BOOLEAN              mLocked = FALSE;
   Restore buffer and length are external input, so this function will validate
   it is in SMRAM.
 
-  @param LockBoxParameterSave  parameter of lock box save 
+  @param LockBoxParameterSave  parameter of lock box save
 **/
 VOID
 SmmLockBoxSave (
@@ -76,6 +69,11 @@ SmmLockBoxSave (
     LockBoxParameterSave->Header.ReturnStatus = (UINT64)EFI_ACCESS_DENIED;
     return ;
   }
+  //
+  // The SpeculationBarrier() call here is to ensure the above range check for
+  // the CommBuffer have been completed before calling into SaveLockBox().
+  //
+  SpeculationBarrier ();
 
   //
   // Save data
@@ -131,7 +129,7 @@ SmmLockBoxSetAttributes (
   Restore buffer and length are external input, so this function will validate
   it is in SMRAM.
 
-  @param LockBoxParameterUpdate  parameter of lock box update 
+  @param LockBoxParameterUpdate  parameter of lock box update
 **/
 VOID
 SmmLockBoxUpdate (
@@ -160,6 +158,11 @@ SmmLockBoxUpdate (
     LockBoxParameterUpdate->Header.ReturnStatus = (UINT64)EFI_ACCESS_DENIED;
     return ;
   }
+  //
+  // The SpeculationBarrier() call here is to ensure the above range check for
+  // the CommBuffer have been completed before calling into UpdateLockBox().
+  //
+  SpeculationBarrier ();
 
   //
   // Update data
@@ -181,7 +184,7 @@ SmmLockBoxUpdate (
   Restore buffer and length are external input, so this function will validate
   it is in SMRAM.
 
-  @param LockBoxParameterRestore  parameter of lock box restore 
+  @param LockBoxParameterRestore  parameter of lock box restore
 **/
 VOID
 SmmLockBoxRestore (
@@ -217,6 +220,12 @@ SmmLockBoxRestore (
                (VOID *)(UINTN)TempLockBoxParameterRestore.Buffer,
                (UINTN *)&TempLockBoxParameterRestore.Length
                );
+    if ((Status == EFI_BUFFER_TOO_SMALL) || (Status == EFI_SUCCESS)) {
+      //
+      // Return the actual Length value.
+      //
+      LockBoxParameterRestore->Length = TempLockBoxParameterRestore.Length;
+    }
   }
   LockBoxParameterRestore->Header.ReturnStatus = (UINT64)Status;
   return ;
@@ -267,7 +276,7 @@ SmmLockBoxHandler (
   EFI_SMM_LOCK_BOX_PARAMETER_HEADER *LockBoxParameterHeader;
   UINTN                             TempCommBufferSize;
 
-  DEBUG ((EFI_D_ERROR, "SmmLockBox SmmLockBoxHandler Enter\n"));
+  DEBUG ((DEBUG_INFO, "SmmLockBox SmmLockBoxHandler Enter\n"));
 
   //
   // If input is invalid, stop processing this SMI
@@ -294,9 +303,9 @@ SmmLockBoxHandler (
 
   LockBoxParameterHeader->ReturnStatus = (UINT64)-1;
 
-  DEBUG ((EFI_D_ERROR, "SmmLockBox LockBoxParameterHeader - %x\n", (UINTN)LockBoxParameterHeader));
+  DEBUG ((DEBUG_INFO, "SmmLockBox LockBoxParameterHeader - %x\n", (UINTN)LockBoxParameterHeader));
 
-  DEBUG ((EFI_D_ERROR, "SmmLockBox Command - %x\n", (UINTN)LockBoxParameterHeader->Command));
+  DEBUG ((DEBUG_INFO, "SmmLockBox Command - %x\n", (UINTN)LockBoxParameterHeader->Command));
 
   switch (LockBoxParameterHeader->Command) {
   case EFI_SMM_LOCK_BOX_COMMAND_SAVE:
@@ -341,7 +350,7 @@ SmmLockBoxHandler (
 
   LockBoxParameterHeader->Command = (UINT32)-1;
 
-  DEBUG ((EFI_D_ERROR, "SmmLockBox SmmLockBoxHandler Exit\n"));
+  DEBUG ((DEBUG_INFO, "SmmLockBox SmmLockBoxHandler Exit\n"));
 
   return EFI_SUCCESS;
 }
@@ -350,7 +359,7 @@ SmmLockBoxHandler (
   Smm Ready To Lock event notification handler.
 
   It sets a flag indicating that SMRAM has been locked.
-  
+
   @param[in] Protocol   Points to the protocol's unique identifier.
   @param[in] Interface  Points to the interface instance.
   @param[in] Handle     The handle on which the interface was installed.
@@ -375,7 +384,7 @@ SmmReadyToLockEventNotify (
   @param[in] ImageHandle  Image handle of this driver.
   @param[in] SystemTable  A Pointer to the EFI System Table.
 
-  @retval EFI_SUCEESS     
+  @retval EFI_SUCEESS
   @return Others          Some error occurs.
 **/
 EFI_STATUS

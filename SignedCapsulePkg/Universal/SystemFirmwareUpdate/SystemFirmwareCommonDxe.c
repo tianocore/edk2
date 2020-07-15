@@ -1,14 +1,8 @@
 /** @file
   Produce FMP instance for system firmware.
 
-  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -166,7 +160,7 @@ FmpGetImageInfo (
   @retval EFI_INVALID_PARAMETER  The Image was NULL.
   @retval EFI_NOT_FOUND          The current image is not copied to the buffer.
   @retval EFI_UNSUPPORTED        The operation is not supported.
-  @retval EFI_SECURITY_VIOLATIO  The operation could not be performed due to an authentication failure.
+  @retval EFI_SECURITY_VIOLATION The operation could not be performed due to an authentication failure.
 
 **/
 EFI_STATUS
@@ -198,7 +192,7 @@ FmpGetImage (
   @retval EFI_SUCCESS            The image was successfully checked.
   @retval EFI_INVALID_PARAMETER  The Image was NULL.
   @retval EFI_UNSUPPORTED        The operation is not supported.
-  @retval EFI_SECURITY_VIOLATIO  The operation could not be performed due to an authentication failure.
+  @retval EFI_SECURITY_VIOLATION The operation could not be performed due to an authentication failure.
 
 **/
 EFI_STATUS
@@ -288,7 +282,7 @@ FmpGetPackageInfo (
   @retval EFI_INVALID_PARAMETER  The PackageVersionName length is longer than the value
                                  returned in PackageVersionNameMaxLen.
   @retval EFI_UNSUPPORTED        The operation is not supported.
-  @retval EFI_SECURITY_VIOLATIO  The operation could not be performed due to an authentication failure.
+  @retval EFI_SECURITY_VIOLATION The operation could not be performed due to an authentication failure.
 
 **/
 EFI_STATUS
@@ -337,37 +331,10 @@ InitializePrivateData (
                      &VarSize,
                      &SystemFmpPrivate->LastAttempt
                      );
-  DEBUG((DEBUG_INFO, "GetLastAttemp - %r\n", VarStatus));
-  DEBUG((DEBUG_INFO, "GetLastAttemp Version - 0x%x, State - 0x%x\n", SystemFmpPrivate->LastAttempt.LastAttemptVersion, SystemFmpPrivate->LastAttempt.LastAttemptStatus));
+  DEBUG((DEBUG_INFO, "GetLastAttempt - %r\n", VarStatus));
+  DEBUG((DEBUG_INFO, "GetLastAttempt Version - 0x%x, State - 0x%x\n", SystemFmpPrivate->LastAttempt.LastAttemptVersion, SystemFmpPrivate->LastAttempt.LastAttemptStatus));
 
   return EFI_SUCCESS;
 }
 
-/**
-  Return if this FMP is a system FMP or a device FMP, based upon FmpImageInfo.
 
-  @param[in] FmpImageInfo A pointer to EFI_FIRMWARE_IMAGE_DESCRIPTOR
-
-  @retval TRUE  It is a system FMP.
-  @retval FALSE It is a device FMP.
-**/
-BOOLEAN
-IsSystemFmp (
-  IN EFI_FIRMWARE_IMAGE_DESCRIPTOR   *FmpImageInfo
-  )
-{
-  GUID      *Guid;
-  UINTN     Count;
-  UINTN     Index;
-
-  Guid = PcdGetPtr(PcdSystemFmpCapsuleImageTypeIdGuid);
-  Count = PcdGetSize(PcdSystemFmpCapsuleImageTypeIdGuid) / sizeof(GUID);
-
-  for (Index = 0; Index < Count; Index++, Guid++) {
-    if (CompareGuid(&FmpImageInfo->ImageTypeId, Guid)) {
-      return TRUE;
-    }
-  }
-
-  return FALSE;
-}

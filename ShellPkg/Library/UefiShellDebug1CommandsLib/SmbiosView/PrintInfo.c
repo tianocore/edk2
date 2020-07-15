@@ -1,20 +1,14 @@
 /** @file
   Module for clarifying the content of the smbios structure element information.
 
-  Copyright (c) 2005 - 2017, Intel Corporation. All rights reserved.<BR>
-  (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>  
-  (C) Copyright 2015-2017 Hewlett Packard Enterprise Development LP<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
+  (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
+  (C) Copyright 2015-2019 Hewlett Packard Enterprise Development LP<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include "../UefiShellDebug1CommandsLib.h"
+#include "UefiShellDebug1CommandsLib.h"
 #include "PrintInfo.h"
 #include "LibSmbiosView.h"
 #include "QueryTable.h"
@@ -55,7 +49,7 @@
 #define PRINT_STRUCT_VALUE(pStruct, type, element) \
   do { \
     ShellPrintEx(-1,-1,L"%a",#element); \
-    ShellPrintEx(-1,-1,L": %d\n", (pStruct->type->element)); \
+    ShellPrintEx(-1,-1,L": %u\n", (pStruct->type->element)); \
   } while (0);
 
 #define PRINT_STRUCT_VALUE_H(pStruct, type, element) \
@@ -316,7 +310,7 @@ SmbiosPrintStructure (
   case 0:
     PRINT_PENDING_STRING (Struct, Type0, Vendor);
     PRINT_PENDING_STRING (Struct, Type0, BiosVersion);
-    PRINT_STRUCT_VALUE (Struct, Type0, BiosSegment);
+    PRINT_STRUCT_VALUE_H (Struct, Type0, BiosSegment);
     PRINT_PENDING_STRING (Struct, Type0, BiosReleaseDate);
     ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_BIOS_SIZE), gShellDebug1HiiHandle, 64 * (Struct->Type0->BiosSize + 1));
 
@@ -543,22 +537,45 @@ SmbiosPrintStructure (
   // System Slots (Type 9)
   //
   case 9:
-    PRINT_PENDING_STRING (Struct, Type9, SlotDesignation);
-    DisplaySystemSlotType (Struct->Type9->SlotType, Option);
-    DisplaySystemSlotDataBusWidth (Struct->Type9->SlotDataBusWidth, Option);
-    DisplaySystemSlotCurrentUsage (Struct->Type9->CurrentUsage, Option);
-    DisplaySystemSlotLength (Struct->Type9->SlotLength, Option);
-    DisplaySystemSlotId (
-      Struct->Type9->SlotID,
-      Struct->Type9->SlotType,
-      Option
-     );
-    DisplaySlotCharacteristics1 (*(UINT8 *) &(Struct->Type9->SlotCharacteristics1), Option);
-    DisplaySlotCharacteristics2 (*(UINT8 *) &(Struct->Type9->SlotCharacteristics2), Option);
-    if (AE_SMBIOS_VERSION (0x2, 0x6) && (Struct->Hdr->Length > 0xD)) {
-      PRINT_STRUCT_VALUE_H (Struct, Type9, SegmentGroupNum);
-      PRINT_STRUCT_VALUE_H (Struct, Type9, BusNum);
-      PRINT_STRUCT_VALUE_H (Struct, Type9, DevFuncNum);
+    {
+      MISC_SLOT_PEER_GROUP  *PeerGroupPtr;
+      UINT8                 PeerGroupCount;
+
+      PRINT_PENDING_STRING (Struct, Type9, SlotDesignation);
+      DisplaySystemSlotType (Struct->Type9->SlotType, Option);
+      DisplaySystemSlotDataBusWidth (Struct->Type9->SlotDataBusWidth, Option);
+      DisplaySystemSlotCurrentUsage (Struct->Type9->CurrentUsage, Option);
+      DisplaySystemSlotLength (Struct->Type9->SlotLength, Option);
+      DisplaySystemSlotId (
+        Struct->Type9->SlotID,
+        Struct->Type9->SlotType,
+        Option
+       );
+      DisplaySlotCharacteristics1 (*(UINT8 *) &(Struct->Type9->SlotCharacteristics1), Option);
+      DisplaySlotCharacteristics2 (*(UINT8 *) &(Struct->Type9->SlotCharacteristics2), Option);
+      if (AE_SMBIOS_VERSION (0x2, 0x6) && (Struct->Hdr->Length > 0xD)) {
+        PRINT_STRUCT_VALUE_H (Struct, Type9, SegmentGroupNum);
+        PRINT_STRUCT_VALUE_H (Struct, Type9, BusNum);
+        PRINT_STRUCT_VALUE_H (Struct, Type9, DevFuncNum);
+      }
+      if (AE_SMBIOS_VERSION (0x3, 0x2)) {
+        if (Struct->Hdr->Length > 0x11) {
+          PRINT_STRUCT_VALUE (Struct, Type9, DataBusWidth);
+        }
+        if (Struct->Hdr->Length > 0x12) {
+          PRINT_STRUCT_VALUE (Struct, Type9, PeerGroupingCount);
+
+          PeerGroupCount = Struct->Type9->PeerGroupingCount;
+          PeerGroupPtr   = Struct->Type9->PeerGroups;
+          for (Index = 0; Index < PeerGroupCount; Index++) {
+            ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_SLOT_PEER_GROUPS), gShellDebug1HiiHandle, Index + 1);
+            ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_SEGMENT_GROUP_NUM), gShellDebug1HiiHandle, PeerGroupPtr[Index].SegmentGroupNum);
+            ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_BUS_NUM), gShellDebug1HiiHandle, PeerGroupPtr[Index].BusNum);
+            ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_DEV_FUNC_NUM), gShellDebug1HiiHandle, PeerGroupPtr[Index].DevFuncNum);
+            ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_DATA_BUS_WIDTH), gShellDebug1HiiHandle, PeerGroupPtr[Index].DataBusWidth);
+          }
+        }
+      }
     }
     break;
 
@@ -617,8 +634,8 @@ SmbiosPrintStructure (
       NumOfItem = (Struct->Type14->Hdr.Length - 5) / 3;
       PRINT_PENDING_STRING (Struct, Type14, GroupName);
       for (Index = 0; Index < NumOfItem; Index++) {
-        ShellPrintEx(-1,-1,L"ItemType %d: %d\n", Index + 1, Struct->Type14->Group[Index].ItemType);
-        ShellPrintEx(-1,-1,L"ItemHandle %d: %d\n", Index + 1, Struct->Type14->Group[Index].ItemHandle);
+        ShellPrintEx(-1,-1,L"ItemType %u: %u\n", Index + 1, Struct->Type14->Group[Index].ItemType);
+        ShellPrintEx(-1,-1,L"ItemHandle %u: %u\n", Index + 1, Struct->Type14->Group[Index].ItemHandle);
       }
     }
     break;
@@ -754,6 +771,29 @@ SmbiosPrintStructure (
       PRINT_STRUCT_VALUE (Struct, Type17, MinimumVoltage);
       PRINT_STRUCT_VALUE (Struct, Type17, MaximumVoltage);
       PRINT_STRUCT_VALUE (Struct, Type17, ConfiguredVoltage);
+    }
+    if (AE_SMBIOS_VERSION (0x3, 0x2)) {
+      if (Struct->Hdr->Length > 0x28) {
+        DisplayMemoryDeviceMemoryTechnology (Struct->Type17->MemoryTechnology, Option);
+        DisplayMemoryDeviceMemoryOperatingModeCapability (Struct->Type17->MemoryOperatingModeCapability.Uint16, Option);
+        PRINT_PENDING_STRING (Struct, Type17, FirwareVersion);
+        PRINT_STRUCT_VALUE_H (Struct, Type17, ModuleManufacturerID);
+        PRINT_STRUCT_VALUE_H (Struct, Type17, ModuleProductID);
+        PRINT_STRUCT_VALUE_H (Struct, Type17, MemorySubsystemControllerManufacturerID);
+        PRINT_STRUCT_VALUE_H (Struct, Type17, MemorySubsystemControllerProductID);
+      }
+      if (Struct->Hdr->Length > 0x34) {
+        PRINT_STRUCT_VALUE_H (Struct, Type17, NonVolatileSize);
+      }
+      if (Struct->Hdr->Length > 0x3C) {
+        PRINT_STRUCT_VALUE_H (Struct, Type17, VolatileSize);
+      }
+      if (Struct->Hdr->Length > 0x44) {
+        PRINT_STRUCT_VALUE_H (Struct, Type17, CacheSize);
+      }
+      if (Struct->Hdr->Length > 0x4C) {
+        PRINT_STRUCT_VALUE_H (Struct, Type17, LogicalSize);
+      }
     }
     break;
 
@@ -1108,6 +1148,10 @@ SmbiosPrintStructure (
   //
   case 42:
     DisplayMCHostInterfaceType (Struct->Type42->InterfaceType, Option);
+    if (AE_SMBIOS_VERSION (0x3, 0x2)) {
+      PRINT_STRUCT_VALUE_H (Struct, Type42, InterfaceTypeSpecificDataLength);
+      PRINT_BIT_FIELD (Struct, Type42, InterfaceTypeSpecificData, Struct->Type42->InterfaceTypeSpecificDataLength);
+    }
     break;
 
   //
@@ -1122,6 +1166,13 @@ SmbiosPrintStructure (
     PRINT_PENDING_STRING (Struct, Type43, Description);
     DisplayTpmDeviceCharacteristics (ReadUnaligned64 ((UINT64 *) (UINTN) &(Struct->Type43->Characteristics)), Option);
     PRINT_STRUCT_VALUE_H (Struct, Type43, OemDefined);
+    break;
+
+  //
+  // Processor Additional Information (Type 44)
+  //
+  case 44:
+    DisplayProcessorArchitectureType (Struct->Type44->ProcessorSpecificBlock.ProcessorArchType, Option);
     break;
 
   //
@@ -2111,6 +2162,10 @@ DisplayProcessorFamily (
     Print (L"Intel Core i3 processor\n");
     break;
 
+  case 0xCF:
+    Print (L"Intel Core i9 processor\n");
+    break;
+
   case 0xD2:
     Print (L"ViaC7M\n");
     break;
@@ -2300,6 +2355,18 @@ DisplayProcessorFamily2 (
 
     case 0x1F4:
       Print (L"Video Processor\n");
+      break;
+
+    case 0x200:
+      Print (L"RISC-V RV32\n");
+      break;
+
+    case 0x201:
+      Print (L"RISC-V RV64\n");
+      break;
+
+    case 0x202:
+      Print (L"RISC-V RV128\n");
       break;
 
     default:
@@ -2892,7 +2959,7 @@ DisplaySBDSManufactureDate (
 /**
   Display System Reset (Type 23) information.
 
-  
+
 Identifies the system-reset capabilities for the system.
  Bits 7:6 Reserved for future assignment via this specification, set to 00b.
  Bit 5  System contains a watchdog timer, either True (1) or False (0).
@@ -2996,7 +3063,7 @@ DisplaySystemResetCapabilities (
 /**
   Display Hardware Security (Type 24) information.
 
-    
+
 Identifies the password and reset status for the system:
 
 Bits 7:6    Power-on Password Status, one of:

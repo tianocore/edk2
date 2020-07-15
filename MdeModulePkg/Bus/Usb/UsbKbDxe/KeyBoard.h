@@ -1,14 +1,8 @@
 /** @file
   Function prototype for USB Keyboard Driver.
 
-Copyright (c) 2004 - 2013, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -114,7 +108,7 @@ ReleaseKeyboardLayoutResources (
 
   This function is the handler function for USB keyboard's asynchronous interrupt transfer
   to manage the keyboard. It parses the USB keyboard input report, and inserts data to
-  keyboard buffer according to state of modifer keys and normal keys. Timer for repeat key
+  keyboard buffer according to state of modifier keys and normal keys. Timer for repeat key
   is also set accordingly.
 
   @param  Data             A pointer to a buffer that is filled with key data which is
@@ -315,6 +309,18 @@ USBKeyboardRepeatHandler (
 VOID
 SetKeyLED (
   IN  USB_KB_DEV    *UsbKeyboardDevice
+  );
+
+/**
+  Initialize the key state.
+
+  @param  UsbKeyboardDevice     The USB_KB_DEV instance.
+  @param  KeyState              A pointer to receive the key state information.
+**/
+VOID
+InitializeKeyState (
+  IN  USB_KB_DEV           *UsbKeyboardDevice,
+  OUT EFI_KEY_STATE        *KeyState
   );
 
 #endif

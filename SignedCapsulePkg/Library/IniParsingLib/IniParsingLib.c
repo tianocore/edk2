@@ -14,7 +14,7 @@
          3.1) an ASCII String. The valid format is [A-Za-z0-9_]+
          3.2) a GUID. The valid format is xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx, where x is [A-Fa-f0-9]
          3.3) a decimal value. The valid format is [0-9]+
-         3.4) a heximal value. The valid format is 0x[A-Fa-f0-9]+
+         3.4) a hexadecimal value. The valid format is 0x[A-Fa-f0-9]+
       4) '#' or ';' can be used as comment at anywhere.
       5) TAB(0x20) or SPACE(0x9) can be used as separator.
       6) LF(\n, 0xA) or CR(\r, 0xD) can be used as line break.
@@ -27,14 +27,7 @@
 
   Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions
-  of the BSD License which accompanies this distribution.  The
-  full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -172,13 +165,13 @@ IsValidDecimalString (
 }
 
 /**
-  Return if the heximal string is valid.
+  Return if the hexadecimal string is valid.
 
-  @param[in] Hex     The heximal string to be checked.
-  @param[in] Length  The length of heximal string in bytes.
+  @param[in] Hex     The hexadecimal string to be checked.
+  @param[in] Length  The length of hexadecimal string in bytes.
 
-  @retval TRUE   The heximal string is valid.
-  @retval FALSE  The heximal string is invalid.
+  @retval TRUE   The hexadecimal string is valid.
+  @retval FALSE  The hexadecimal string is invalid.
 **/
 BOOLEAN
 IsValidHexString (
@@ -395,7 +388,7 @@ ProfileGetLine (
 /**
   Trim Buffer by removing all CR, LF, TAB, and SPACE chars in its head and tail.
 
-  @param[in, out] Buffer          On input,  buffer data to be trimed.
+  @param[in, out] Buffer          On input,  buffer data to be trimmed.
                                   On output, the trimmed buffer.
   @param[in, out] BufferSize      On input,  size of original buffer data.
                                   On output, size of the trimmed buffer.
@@ -1173,14 +1166,14 @@ GetDecimalUintnFromDataFile (
 }
 
 /**
-  Get section entry heximal UINTN value.
+  Get section entry hexadecimal UINTN value.
 
   @param[in]  Context         INI Config file context.
   @param[in]  SectionName     Section name.
   @param[in]  EntryName       Section entry name.
-  @param[out] Data            Point to the got heximal UINTN value.
+  @param[out] Data            Point to the got hexadecimal UINTN value.
 
-  @retval EFI_SUCCESS    Section entry heximal UINTN value is got.
+  @retval EFI_SUCCESS    Section entry hexadecimal UINTN value is got.
   @retval EFI_NOT_FOUND  Section is not found.
 **/
 EFI_STATUS
@@ -1217,14 +1210,14 @@ GetHexUintnFromDataFile (
 }
 
 /**
-  Get section entry heximal UINT64 value.
+  Get section entry hexadecimal UINT64 value.
 
   @param[in]  Context         INI Config file context.
   @param[in]  SectionName     Section name.
   @param[in]  EntryName       Section entry name.
-  @param[out] Data            Point to the got heximal UINT64 value.
+  @param[out] Data            Point to the got hexadecimal UINT64 value.
 
-  @retval EFI_SUCCESS    Section entry heximal UINT64 value is got.
+  @retval EFI_SUCCESS    Section entry hexadecimal UINT64 value is got.
   @retval EFI_NOT_FOUND  Section is not found.
 **/
 EFI_STATUS

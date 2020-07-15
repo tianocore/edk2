@@ -1,14 +1,9 @@
 /** @file
-  Supporting functions implementaion for PCI devices management.
+  Supporting functions implementation for PCI devices management.
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+(C) Copyright 2018 Hewlett Packard Enterprise Development LP<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -65,7 +60,7 @@ InsertPciDevice (
 }
 
 /**
-  Destroy root bridge and remove it from deivce tree.
+  Destroy root bridge and remove it from device tree.
 
   @param RootBridge     The bridge want to be removed.
 
@@ -85,7 +80,7 @@ DestroyRootBridge (
 
   All direct or indirect allocated resource for this node will be freed.
 
-  @param PciIoDevice  A pointer to the PCI_IO_DEVICE to be destoried.
+  @param PciIoDevice  A pointer to the PCI_IO_DEVICE to be destroyed.
 
 **/
 VOID
@@ -103,6 +98,10 @@ FreePciDevice (
 
   if (PciIoDevice->DevicePath != NULL) {
     FreePool (PciIoDevice->DevicePath);
+  }
+
+  if (PciIoDevice->BusNumberRanges != NULL) {
+    FreePool (PciIoDevice->BusNumberRanges);
   }
 
   FreePool (PciIoDevice);
@@ -150,7 +149,7 @@ DestroyPciDeviceTree (
 
   @param  Controller    Root bridge handle.
 
-  @retval EFI_SUCCESS   Destory all devcie nodes successfully.
+  @retval EFI_SUCCESS   Destroy all device nodes successfully.
   @retval EFI_NOT_FOUND Cannot find any PCI device under specified
                         root bridge.
 
@@ -211,7 +210,6 @@ RegisterPciDevice (
   EFI_STATUS          Status;
   VOID                *PlatformOpRomBuffer;
   UINTN               PlatformOpRomSize;
-  UINT8               PciExpressCapRegOffset;
   EFI_PCI_IO_PROTOCOL *PciIo;
   UINT8               Data8;
   BOOLEAN             HasEfiImage;
@@ -232,26 +230,12 @@ RegisterPciDevice (
   }
 
   //
-  // Detect if PCI Express Device
-  //
-  PciExpressCapRegOffset = 0;
-  Status = LocateCapabilityRegBlock (
-             PciIoDevice,
-             EFI_PCI_CAPABILITY_ID_PCIEXP,
-             &PciExpressCapRegOffset,
-             NULL
-             );
-  if (!EFI_ERROR (Status)) {
-    PciIoDevice->IsPciExp = TRUE;
-  }
-
-  //
   // Force Interrupt line to "Unknown" or "No Connection"
   //
   PciIo = &(PciIoDevice->PciIo);
   Data8 = PCI_INT_LINE_UNKNOWN;
   PciIo->Pci.Write (PciIo, EfiPciIoWidthUint8, 0x3C, 1, &Data8);
- 
+
   //
   // Process OpRom
   //
@@ -269,7 +253,7 @@ RegisterPciDevice (
                                        );
       if (!EFI_ERROR (Status)) {
         PciIoDevice->EmbeddedRom    = FALSE;
-        PciIoDevice->RomSize        = PlatformOpRomSize;
+        PciIoDevice->RomSize        = (UINT32) PlatformOpRomSize;
         PciIoDevice->PciIo.RomSize  = PlatformOpRomSize;
         PciIoDevice->PciIo.RomImage = PlatformOpRomBuffer;
         //
@@ -282,7 +266,7 @@ RegisterPciDevice (
           PciIoDevice->BusNumber,
           PciIoDevice->DeviceNumber,
           PciIoDevice->FunctionNumber,
-          (UINT64) (UINTN) PciIoDevice->PciIo.RomImage,
+          PciIoDevice->PciIo.RomImage,
           PciIoDevice->PciIo.RomSize
           );
       }
@@ -295,7 +279,7 @@ RegisterPciDevice (
                                        );
       if (!EFI_ERROR (Status)) {
         PciIoDevice->EmbeddedRom    = FALSE;
-        PciIoDevice->RomSize        = PlatformOpRomSize;
+        PciIoDevice->RomSize        = (UINT32) PlatformOpRomSize;
         PciIoDevice->PciIo.RomSize  = PlatformOpRomSize;
         PciIoDevice->PciIo.RomImage = PlatformOpRomBuffer;
         //
@@ -308,10 +292,10 @@ RegisterPciDevice (
           PciIoDevice->BusNumber,
           PciIoDevice->DeviceNumber,
           PciIoDevice->FunctionNumber,
-          (UINT64) (UINTN) PciIoDevice->PciIo.RomImage,
+          PciIoDevice->PciIo.RomImage,
           PciIoDevice->PciIo.RomSize
           );
-      }   
+      }
     }
   }
 
@@ -329,7 +313,7 @@ RegisterPciDevice (
                     );
     if (EFI_ERROR (Status)) {
       gBS->UninstallMultipleProtocolInterfaces (
-             &PciIoDevice->Handle,
+             PciIoDevice->Handle,
              &gEfiDevicePathProtocolGuid,
              PciIoDevice->DevicePath,
              &gEfiPciIoProtocolGuid,
@@ -367,7 +351,7 @@ RegisterPciDevice (
                     );
     if (EFI_ERROR (Status)) {
       gBS->UninstallMultipleProtocolInterfaces (
-             &PciIoDevice->Handle,
+             PciIoDevice->Handle,
              &gEfiDevicePathProtocolGuid,
              PciIoDevice->DevicePath,
              &gEfiPciIoProtocolGuid,
@@ -376,7 +360,7 @@ RegisterPciDevice (
              );
       if (HasEfiImage) {
         gBS->UninstallMultipleProtocolInterfaces (
-               &PciIoDevice->Handle,
+               PciIoDevice->Handle,
                &gEfiLoadFile2ProtocolGuid,
                &PciIoDevice->LoadFile2,
                NULL
@@ -834,7 +818,7 @@ StartPciDevices (
 /**
   Create root bridge device.
 
-  @param RootBridgeHandle    Specified root bridge hanle.
+  @param RootBridgeHandle    Specified root bridge handle.
 
   @return The crated root bridge device instance, NULL means no
           root bridge device instance created.
@@ -947,9 +931,9 @@ GetRootBridgeByHandle (
 }
 
 /**
-  Judege whether Pci device existed.
+  Judge whether Pci device existed.
 
-  @param Bridge       Parent bridege instance.
+  @param Bridge       Parent bridge instance.
   @param PciIoDevice  Device instance.
 
   @retval TRUE        Pci device existed.
@@ -989,33 +973,33 @@ PciDeviceExisted (
 }
 
 /**
-  Get the active VGA device on the same segment.
+  Get the active VGA device on the specified Host Bridge.
 
-  @param VgaDevice    PCI IO instance for the VGA device.
+  @param HostBridgeHandle    Host Bridge handle.
 
-  @return The active VGA device on the same segment.
+  @return The active VGA device on the specified Host Bridge.
 
 **/
 PCI_IO_DEVICE *
-ActiveVGADeviceOnTheSameSegment (
-  IN PCI_IO_DEVICE        *VgaDevice
+LocateVgaDeviceOnHostBridge (
+  IN EFI_HANDLE           HostBridgeHandle
   )
 {
   LIST_ENTRY      *CurrentLink;
-  PCI_IO_DEVICE   *Temp;
+  PCI_IO_DEVICE   *PciIoDevice;
 
   CurrentLink = mPciDevicePool.ForwardLink;
 
   while (CurrentLink != NULL && CurrentLink != &mPciDevicePool) {
 
-    Temp = PCI_IO_DEVICE_FROM_LINK (CurrentLink);
+    PciIoDevice = PCI_IO_DEVICE_FROM_LINK (CurrentLink);
 
-    if (Temp->PciRootBridgeIo->SegmentNumber == VgaDevice->PciRootBridgeIo->SegmentNumber) {
+    if (PciIoDevice->PciRootBridgeIo->ParentHandle== HostBridgeHandle) {
 
-      Temp = ActiveVGADeviceOnTheRootBridge (Temp);
+      PciIoDevice = LocateVgaDevice (PciIoDevice);
 
-      if (Temp != NULL) {
-        return Temp;
+      if (PciIoDevice != NULL) {
+        return PciIoDevice;
       }
     }
 
@@ -1026,41 +1010,41 @@ ActiveVGADeviceOnTheSameSegment (
 }
 
 /**
-  Get the active VGA device on the root bridge.
+  Locate the active VGA device under the bridge.
 
-  @param RootBridge  PCI IO instance for the root bridge.
+  @param Bridge  PCI IO instance for the bridge.
 
   @return The active VGA device.
 
 **/
 PCI_IO_DEVICE *
-ActiveVGADeviceOnTheRootBridge (
-  IN PCI_IO_DEVICE        *RootBridge
+LocateVgaDevice (
+  IN PCI_IO_DEVICE        *Bridge
   )
 {
   LIST_ENTRY      *CurrentLink;
-  PCI_IO_DEVICE   *Temp;
+  PCI_IO_DEVICE   *PciIoDevice;
 
-  CurrentLink = RootBridge->ChildList.ForwardLink;
+  CurrentLink = Bridge->ChildList.ForwardLink;
 
-  while (CurrentLink != NULL && CurrentLink != &RootBridge->ChildList) {
+  while (CurrentLink != NULL && CurrentLink != &Bridge->ChildList) {
 
-    Temp = PCI_IO_DEVICE_FROM_LINK (CurrentLink);
+    PciIoDevice = PCI_IO_DEVICE_FROM_LINK (CurrentLink);
 
-    if (IS_PCI_VGA(&Temp->Pci) &&
-        (Temp->Attributes &
+    if (IS_PCI_VGA(&PciIoDevice->Pci) &&
+        (PciIoDevice->Attributes &
          (EFI_PCI_IO_ATTRIBUTE_VGA_MEMORY |
           EFI_PCI_IO_ATTRIBUTE_VGA_IO     |
           EFI_PCI_IO_ATTRIBUTE_VGA_IO_16)) != 0) {
-      return Temp;
+      return PciIoDevice;
     }
 
-    if (IS_PCI_BRIDGE (&Temp->Pci)) {
+    if (IS_PCI_BRIDGE (&PciIoDevice->Pci)) {
 
-      Temp = ActiveVGADeviceOnTheRootBridge (Temp);
+      PciIoDevice = LocateVgaDevice (PciIoDevice);
 
-      if (Temp != NULL) {
-        return Temp;
+      if (PciIoDevice != NULL) {
+        return PciIoDevice;
       }
     }
 
@@ -1068,88 +1052,5 @@ ActiveVGADeviceOnTheRootBridge (
   }
 
   return NULL;
-}
-
-
-/**
-  Get HPC PCI address according to its device path.
-
-  @param RootBridge           Root bridege Io instance.
-  @param RemainingDevicePath  Given searching device path.
-  @param PciAddress           Buffer holding searched result.
-
-  @retval EFI_SUCCESS         PCI address was stored in PciAddress
-  @retval EFI_NOT_FOUND       Can not find the specific device path.
-
-**/
-EFI_STATUS
-GetHpcPciAddressFromRootBridge (
-  IN  PCI_IO_DEVICE                    *RootBridge,
-  IN  EFI_DEVICE_PATH_PROTOCOL         *RemainingDevicePath,
-  OUT UINT64                           *PciAddress
-  )
-{
-  EFI_DEV_PATH_PTR          Node;
-  PCI_IO_DEVICE             *Temp;
-  EFI_DEVICE_PATH_PROTOCOL  *CurrentDevicePath;
-  LIST_ENTRY                *CurrentLink;
-  BOOLEAN                   MisMatch;
-
-  MisMatch          = FALSE;
-
-  CurrentDevicePath = RemainingDevicePath;
-  Node.DevPath      = CurrentDevicePath;
-  Temp              = NULL;
-
-  while (!IsDevicePathEnd (CurrentDevicePath)) {
-
-    CurrentLink   = RootBridge->ChildList.ForwardLink;
-    Node.DevPath  = CurrentDevicePath;
-
-    while (CurrentLink != NULL && CurrentLink != &RootBridge->ChildList) {
-      Temp = PCI_IO_DEVICE_FROM_LINK (CurrentLink);
-
-      if (Node.Pci->Device   == Temp->DeviceNumber &&
-          Node.Pci->Function == Temp->FunctionNumber) {
-        RootBridge = Temp;
-        break;
-      }
-
-      CurrentLink = CurrentLink->ForwardLink;
-    }
-
-    //
-    // Check if we find the bridge
-    //
-    if (CurrentLink == &RootBridge->ChildList) {
-
-      MisMatch = TRUE;
-      break;
-
-    }
-
-    CurrentDevicePath = NextDevicePathNode (CurrentDevicePath);
-  }
-
-  if (MisMatch) {
-
-    CurrentDevicePath = NextDevicePathNode (CurrentDevicePath);
-
-    if (IsDevicePathEnd (CurrentDevicePath)) {
-      *PciAddress = EFI_PCI_ADDRESS (RootBridge->BusNumber, Node.Pci->Device, Node.Pci->Function, 0);
-      return EFI_SUCCESS;
-    }
-
-    return EFI_NOT_FOUND;
-  }
-
-  if (Temp != NULL) {
-    *PciAddress = EFI_PCI_ADDRESS (Temp->BusNumber, Temp->DeviceNumber, Temp->FunctionNumber, 0);
-  } else {
-    return EFI_NOT_FOUND;
-  }
-
-  return EFI_SUCCESS;
-
 }
 

@@ -1,0 +1,27 @@
+## @file
+# Parse the contents of named fw_cfg files as simple (scalar) data types.
+#
+# Copyright (C) 2020, Red Hat, Inc.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 1.29
+  BASE_NAME                      = QemuFwCfgSimpleParserLib
+  FILE_GUID                      = a9a1211d-061e-4b64-af30-5dd0cac9dc99
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = QemuFwCfgSimpleParserLib
+  CONSTRUCTOR                    = QemuFwCfgSimpleParserInit
+
+[Sources]
+  QemuFwCfgSimpleParser.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  QemuFwCfgLib

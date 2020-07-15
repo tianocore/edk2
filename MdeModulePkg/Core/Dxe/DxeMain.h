@@ -2,14 +2,8 @@
   The internal header file includes the common header files, defines
   internal structure and functions used by DxeCore module.
 
-Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -42,7 +36,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/LoadPe32Image.h>
 #include <Protocol/Security.h>
 #include <Protocol/Security2.h>
-#include <Protocol/Ebc.h>
 #include <Protocol/Reset.h>
 #include <Protocol/Cpu.h>
 #include <Protocol/Metronome.h>
@@ -53,6 +46,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/TcgService.h>
 #include <Protocol/HiiPackageList.h>
 #include <Protocol/SmmBase2.h>
+#include <Protocol/PeCoffImageEmulator.h>
 #include <Guid/MemoryTypeInformation.h>
 #include <Guid/FirmwareFileSystem2.h>
 #include <Guid/FirmwareFileSystem3.h>
@@ -89,7 +83,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/DevicePathLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/ReportStatusCodeLib.h>
-#include <Library/TimerLib.h>
 #include <Library/DxeServicesLib.h>
 #include <Library/DebugAgentLib.h>
 #include <Library/CpuExceptionHandlerLib.h>
@@ -198,43 +191,43 @@ typedef struct {
 typedef struct {
   UINTN                       Signature;
   /// Image handle
-  EFI_HANDLE                  Handle;   
+  EFI_HANDLE                  Handle;
   /// Image type
-  UINTN                       Type;           
+  UINTN                       Type;
   /// If entrypoint has been called
-  BOOLEAN                     Started;        
+  BOOLEAN                     Started;
   /// The image's entry point
-  EFI_IMAGE_ENTRY_POINT       EntryPoint;     
+  EFI_IMAGE_ENTRY_POINT       EntryPoint;
   /// loaded image protocol
-  EFI_LOADED_IMAGE_PROTOCOL   Info;           
+  EFI_LOADED_IMAGE_PROTOCOL   Info;
   /// Location in memory
-  EFI_PHYSICAL_ADDRESS        ImageBasePage;  
+  EFI_PHYSICAL_ADDRESS        ImageBasePage;
   /// Number of pages
-  UINTN                       NumberOfPages;  
+  UINTN                       NumberOfPages;
   /// Original fixup data
-  CHAR8                       *FixupData;     
+  CHAR8                       *FixupData;
   /// Tpl of started image
-  EFI_TPL                     Tpl;            
+  EFI_TPL                     Tpl;
   /// Status returned by started image
-  EFI_STATUS                  Status;         
+  EFI_STATUS                  Status;
   /// Size of ExitData from started image
-  UINTN                       ExitDataSize;   
+  UINTN                       ExitDataSize;
   /// Pointer to exit data from started image
-  VOID                        *ExitData;      
+  VOID                        *ExitData;
   /// Pointer to pool allocation for context save/restore
-  VOID                        *JumpBuffer;    
+  VOID                        *JumpBuffer;
   /// Pointer to buffer for context save/restore
-  BASE_LIBRARY_JUMP_BUFFER    *JumpContext;  
+  BASE_LIBRARY_JUMP_BUFFER    *JumpContext;
   /// Machine type from PE image
-  UINT16                      Machine;        
-  /// EBC Protocol pointer
-  EFI_EBC_PROTOCOL            *Ebc;           
+  UINT16                      Machine;
+  /// PE/COFF Image Emulator Protocol pointer
+  EDKII_PECOFF_IMAGE_EMULATOR_PROTOCOL  *PeCoffEmu;
   /// Runtime image list
-  EFI_RUNTIME_IMAGE_ENTRY     *RuntimeData;   
+  EFI_RUNTIME_IMAGE_ENTRY     *RuntimeData;
   /// Pointer to Loaded Image Device Path Protocol
-  EFI_DEVICE_PATH_PROTOCOL    *LoadedImageDevicePath;  
+  EFI_DEVICE_PATH_PROTOCOL    *LoadedImageDevicePath;
   /// PeCoffLoader ImageContext
-  PE_COFF_LOADER_IMAGE_CONTEXT  ImageContext; 
+  PE_COFF_LOADER_IMAGE_CONTEXT  ImageContext;
   /// Status returned by LoadImage() service.
   EFI_STATUS                  LoadImageStatus;
 } LOADED_IMAGE_PRIVATE_DATA;
@@ -1180,8 +1173,8 @@ CoreConnectHandlesByKey (
   @retval EFI_NOT_FOUND         1) There are no EFI_DRIVER_BINDING_PROTOCOL instances
                                 present in the system.
                                 2) No drivers were connected to ControllerHandle.
-  @retval EFI_SECURITY_VIOLATION 
-                                The user has no permission to start UEFI device drivers on the device path 
+  @retval EFI_SECURITY_VIOLATION
+                                The user has no permission to start UEFI device drivers on the device path
                                 associated with the ControllerHandle or specified by the RemainingDevicePath.
 
 **/
@@ -1426,10 +1419,10 @@ CoreInternalFreePool (
   @retval EFI_LOAD_ERROR          Image was not loaded because the image format was corrupt or not
                                   understood.
   @retval EFI_DEVICE_ERROR        Image was not loaded because the device returned a read error.
-  @retval EFI_ACCESS_DENIED       Image was not loaded because the platform policy prohibits the 
+  @retval EFI_ACCESS_DENIED       Image was not loaded because the platform policy prohibits the
                                   image from being loaded. NULL is returned in *ImageHandle.
-  @retval EFI_SECURITY_VIOLATION  Image was loaded and an ImageHandle was created with a 
-                                  valid EFI_LOADED_IMAGE_PROTOCOL. However, the current 
+  @retval EFI_SECURITY_VIOLATION  Image was loaded and an ImageHandle was created with a
+                                  valid EFI_LOADED_IMAGE_PROTOCOL. However, the current
                                   platform policy specifies that the image should not be started.
 
 **/
@@ -1836,7 +1829,7 @@ CoreGetMemorySpaceDescriptor (
   @param  Attributes             Specified attributes
 
   @retval EFI_SUCCESS           The attributes were set for the memory region.
-  @retval EFI_INVALID_PARAMETER Length is zero. 
+  @retval EFI_INVALID_PARAMETER Length is zero.
   @retval EFI_UNSUPPORTED       The processor does not support one or more bytes of the memory
                                 resource range specified by BaseAddress and Length.
   @retval EFI_UNSUPPORTED       The bit mask of attributes is not support for the memory resource
@@ -2177,19 +2170,6 @@ CoreDisplayDiscoveredNotDispatched (
   VOID
   );
 
-
-/**
-  Place holder function until all the Boot Services and Runtime Services are
-  available.
-
-  @return EFI_NOT_AVAILABLE_YET
-
-**/
-EFI_STATUS
-EFIAPI
-CoreEfiNotAvailableYetArg0 (
-  VOID
-  );
 
 
 /**
@@ -2671,7 +2651,7 @@ CoreReleaseLock (
   );
 
 /**
-  Read data from Firmware Block by FVB protocol Read. 
+  Read data from Firmware Block by FVB protocol Read.
   The data may cross the multi block ranges.
 
   @param  Fvb                   The FW_VOL_BLOCK_PROTOCOL instance from which to read data.
@@ -2836,15 +2816,6 @@ CoreUpdateMemoryAttributes (
   );
 
 /**
-  Initialize PropertiesTable support.
-**/
-VOID
-EFIAPI
-CoreInitializePropertiesTable (
-  VOID
-  );
-
-/**
   Initialize MemoryAttrubutesTable support.
 **/
 VOID
@@ -2946,6 +2917,24 @@ ApplyMemoryProtectionPolicy (
   IN  EFI_MEMORY_TYPE       NewType,
   IN  EFI_PHYSICAL_ADDRESS  Memory,
   IN  UINT64                Length
+  );
+
+/**
+  Merge continous memory map entries whose have same attributes.
+
+  @param  MemoryMap       A pointer to the buffer in which firmware places
+                          the current memory map.
+  @param  MemoryMapSize   A pointer to the size, in bytes, of the
+                          MemoryMap buffer. On input, this is the size of
+                          the current memory map.  On output,
+                          it is the size of new memory map after merge.
+  @param  DescriptorSize  Size, in bytes, of an individual EFI_MEMORY_DESCRIPTOR.
+**/
+VOID
+MergeMemoryMap (
+  IN OUT EFI_MEMORY_DESCRIPTOR  *MemoryMap,
+  IN OUT UINTN                  *MemoryMapSize,
+  IN UINTN                      DescriptorSize
   );
 
 #endif

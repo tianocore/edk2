@@ -2,15 +2,9 @@
 
   String definitions for UEFI Shell network 2 commands
   Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+  (C) Copyright 2017 Hewlett Packard Enterprise Development LP<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions
-  of the BSD License which accompanies this distribution.  The full
-  text of the license may be found at<BR>
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
   Module Name:
 
@@ -32,6 +26,7 @@
 #string STR_PING6_INVALID_BUFFER_SIZE      #language en-US  "%Ping6: Invalid buffer size, %s\r\n"
 #string STR_PING6_INVALID_SOURCE           #language en-US  "%Ping6: Require source interface option\r\n"
 #string STR_PING6_IP6_CONFIG               #language en-US  "%Ping6: The process of Ip6 Configure %r\r\n"
+#string STR_PING6_IP6_RECEIVE              #language en-US  "%Ping6: Place the receive token %r\r\n"
 #string STR_PING6_IP6CFG_GETDATA           #language en-US  "%Ping6: Get data of the interface information %r\r\n"
 #string STR_PING6_SEND_REQUEST             #language en-US  "Echo request sequence %d fails.\r\n"
 #string STR_PING6_CONFIGD_NIC_NF           #language en-US  "%Ping6: No configured interfaces were found.\r\n"
@@ -92,7 +87,7 @@
                                                                   "Hint: Please type 'IfConfig6 -?' for help info.\r\n"
 #string STR_IFCONFIG6_ERR_UNKNOWN_COMMAND      #language en-US    "Unknown commands. Bad command %H%s%N is skipped.\r\n"
                                                                   "Hint: Please type 'IfConfig6 -?' for help info.\r\n"
-#string STR_IFCONFIG6_ERR_ADDRESS_FAILED       #language en-US    "It failed to set .\r\n"
+#string STR_IFCONFIG6_ERR_ADDRESS_FAILED       #language en-US    "Failed to configure IPv6 address: "
 
 
 #string STR_GET_HELP_PING6                     #language en-US ""

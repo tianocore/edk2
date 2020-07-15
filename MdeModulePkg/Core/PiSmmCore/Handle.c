@@ -1,14 +1,8 @@
 /** @file
   SMM handle & protocol handling.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials are licensed and made available 
-  under the terms and conditions of the BSD License which accompanies this 
-  distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -287,11 +281,12 @@ SmmInstallProtocolInterfaceNotify (
     // in the system
     //
     InsertTailList (&gHandleList, &Handle->AllHandles);
-  }
-
-  Status = SmmValidateHandle (Handle);
-  if (EFI_ERROR (Status)) {
-    goto Done;
+  } else {
+    Status = SmmValidateHandle (Handle);
+    if (EFI_ERROR (Status)) {
+      DEBUG((DEBUG_ERROR, "SmmInstallProtocolInterface: input handle at 0x%x is invalid\n", Handle));
+      goto Done;
+    }
   }
 
   //
@@ -340,6 +335,7 @@ Done:
     if (Prot != NULL) {
       FreePool (Prot);
     }
+    DEBUG((DEBUG_ERROR, "SmmInstallProtocolInterface: %g %p failed with %r\n", Protocol, Interface, Status));
   }
   return Status;
 }

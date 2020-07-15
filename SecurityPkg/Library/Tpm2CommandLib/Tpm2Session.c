@@ -1,14 +1,8 @@
 /** @file
   Implement TPM2 Session related command.
 
-Copyright (c) 2014, Intel Corporation. All rights reserved. <BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved. <BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -53,7 +47,7 @@ typedef struct {
   @param[in]  AuthHash           Hash algorithm to use for the session.
   @param[out] SessionHandle      Handle for the newly created session.
   @param[out] NonceTPM           The initial nonce from the TPM, used in the computation of the sessionKey.
-  
+
   @retval EFI_SUCCESS            Operation completed successfully.
   @retval EFI_DEVICE_ERROR       The command was unsuccessful.
 **/
@@ -136,7 +130,7 @@ Tpm2StartAuthSession (
 
   WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (AuthHash));
   Buffer += sizeof(UINT16);
- 
+
   SendBufferSize = (UINT32) ((UINTN)Buffer - (UINTN)&SendBuffer);
   SendBuffer.Header.paramSize = SwapBytes32 (SendBufferSize);
 
@@ -163,6 +157,11 @@ Tpm2StartAuthSession (
   //
   *SessionHandle = SwapBytes32 (RecvBuffer.SessionHandle);
   NonceTPM->size = SwapBytes16 (RecvBuffer.NonceTPM.size);
+  if (NonceTPM->size > sizeof(TPMU_HA)) {
+    DEBUG ((DEBUG_ERROR, "Tpm2StartAuthSession - NonceTPM->size error %x\n", NonceTPM->size));
+    return EFI_DEVICE_ERROR;
+  }
+
   CopyMem (NonceTPM->buffer, &RecvBuffer.NonceTPM.buffer, NonceTPM->size);
 
   return EFI_SUCCESS;

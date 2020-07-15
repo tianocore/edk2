@@ -1,14 +1,8 @@
 /** @file
   Implement TPM2 Hierarchy related command.
 
-Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved. <BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved. <BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -214,7 +208,7 @@ Done:
 
   @param[in] AuthHandle        TPM_RH_LOCKOUT or TPM_RH_PLATFORM+{PP}
   @param[in] AuthSession       Auth Session context
- 
+
   @retval EFI_SUCCESS      Operation completed successfully.
   @retval EFI_DEVICE_ERROR Unexpected device behavior.
 **/
@@ -441,7 +435,7 @@ Tpm2HierarchyChangeAuth (
   WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16(NewAuth->size));
   Buffer += sizeof(UINT16);
 
-  // New Authorizeation
+  // New Authorization
   CopyMem(Buffer, NewAuth->buffer, NewAuth->size);
   Buffer += NewAuth->size;
 
@@ -455,8 +449,8 @@ Tpm2HierarchyChangeAuth (
   // Call the TPM
   //
   Status = Tpm2SubmitCommand (
-             CmdSize, 
-             (UINT8 *)&Cmd, 
+             CmdSize,
+             (UINT8 *)&Cmd,
              &ResultBufSize,
              ResultBuf
              );
@@ -553,8 +547,8 @@ Tpm2ChangeEPS (
   // Call the TPM
   //
   Status = Tpm2SubmitCommand (
-             CmdSize, 
-             (UINT8 *)&Cmd, 
+             CmdSize,
+             (UINT8 *)&Cmd,
              &ResultBufSize,
              ResultBuf
              );
@@ -651,8 +645,8 @@ Tpm2ChangePPS (
   // Call the TPM
   //
   Status = Tpm2SubmitCommand (
-             CmdSize, 
-             (UINT8 *)&Cmd, 
+             CmdSize,
+             (UINT8 *)&Cmd,
              &ResultBufSize,
              ResultBuf
              );
@@ -759,8 +753,8 @@ Tpm2HierarchyControl (
   // Call the TPM
   //
   Status = Tpm2SubmitCommand (
-             CmdSize, 
-             (UINT8 *)&Cmd, 
+             CmdSize,
+             (UINT8 *)&Cmd,
              &ResultBufSize,
              ResultBuf
              );

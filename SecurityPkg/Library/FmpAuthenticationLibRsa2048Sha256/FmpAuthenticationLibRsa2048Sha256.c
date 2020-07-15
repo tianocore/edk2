@@ -10,14 +10,8 @@
   FmpAuthenticatedHandlerRsa2048Sha256(), AuthenticateFmpImage() will receive
   untrusted input and do basic validation.
 
-  Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -133,7 +127,7 @@ FmpAuthenticatedHandlerRsa2048Sha256 (
   }
 
   //
-  // Fail if the PublicKey is not one of the public keys in PcdRsa2048Sha256PublicKeyBuffer
+  // Fail if the PublicKey is not one of the public keys in the input PublicKeyData.
   //
   PublicKey = (VOID *)PublicKeyData;
   PublicKeyBufferSize = PublicKeyDataLength;

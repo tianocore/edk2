@@ -1,0 +1,18 @@
+## @file
+# Azure Pipeline build file for a build using Windows and VS2019
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+trigger:
+- master
+
+pr:
+- master
+
+jobs:
+- template: templates/pr-gate-build-job.yml
+  parameters:
+    tool_chain_tag: 'VS2019'
+    vm_image: 'windows-latest'
+    arch_list: "IA32,X64"

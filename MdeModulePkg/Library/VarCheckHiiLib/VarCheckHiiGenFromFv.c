@@ -2,13 +2,7 @@
   Var Check Hii generation from FV.
 
 Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -219,8 +213,8 @@ ParseFfs (
                         &AuthenticationStatus
                         );
         if (!EFI_ERROR (Status)) {
-          DEBUG ((EFI_D_INFO, "FfsNameGuid - %g\n", DriverGuid));
-          DEBUG ((EFI_D_INFO, "NumberofMatchingVfrBin - 0x%02x\n", NumberofMatchingVfrBin));
+          DEBUG ((DEBUG_INFO , "FfsNameGuid - %g\n", DriverGuid));
+          DEBUG ((DEBUG_INFO , "NumberofMatchingVfrBin - 0x%02x\n", NumberofMatchingVfrBin));
 
           for (VfrBinIndex = 0; VfrBinIndex < NumberofMatchingVfrBin; VfrBinIndex++) {
 #ifdef DUMP_HII_DATA
@@ -284,7 +278,7 @@ ParseFv (
   // Search all FVs
   //
   for (Index = 0; Index < HandleCount; Index++) {
-    DEBUG ((EFI_D_INFO, "FvIndex - %x\n", Index));
+    DEBUG ((DEBUG_INFO , "FvIndex - %x\n", Index));
     Status = gBS->HandleProtocol (
                     HandleBuffer[Index],
                     &gEfiFirmwareVolume2ProtocolGuid,
@@ -305,9 +299,9 @@ ParseFv (
       ASSERT_EFI_ERROR (Status);
       Status = Fvb2->GetPhysicalAddress (Fvb2, &FvAddress);
       if (!EFI_ERROR (Status)) {
-        DEBUG ((EFI_D_INFO, "FvAddress - 0x%08x\n", FvAddress));
+        DEBUG ((DEBUG_INFO , "FvAddress - 0x%08x\n", FvAddress));
         FvSize = ((EFI_FIRMWARE_VOLUME_HEADER *) (UINTN) FvAddress)->FvLength;
-        DEBUG ((EFI_D_INFO, "FvSize    - 0x%08x\n", FvSize));
+        DEBUG ((DEBUG_INFO , "FvSize    - 0x%08x\n", FvSize));
       }
     );
 
@@ -373,7 +367,7 @@ CreateVfrDriverList (
   VAR_CHECK_VFR_DRIVER_INFO     *VfrDriverInfo;
 
   for (Index = 0; !IsZeroGuid (&DriverGuidArray[Index]); Index++) {
-     DEBUG ((EFI_D_INFO, "CreateVfrDriverList: %g\n", &DriverGuidArray[Index]));
+     DEBUG ((DEBUG_INFO , "CreateVfrDriverList: %g\n", &DriverGuidArray[Index]));
      VfrDriverInfo = InternalVarCheckAllocateZeroPool (sizeof (*VfrDriverInfo));
      ASSERT (VfrDriverInfo != NULL);
      VfrDriverInfo->Signature = VAR_CHECK_VFR_DRIVER_INFO_SIGNATURE;
@@ -414,7 +408,7 @@ VarCheckHiiGenFromFv (
   EFI_GUID      *DriverGuidArray;
   BOOLEAN       ScanAll;
 
-  DEBUG ((EFI_D_INFO, "VarCheckHiiGenDxeFromFv\n"));
+  DEBUG ((DEBUG_INFO , "VarCheckHiiGenDxeFromFv\n"));
 
   //
   // Get vfr driver guid array from PCD.

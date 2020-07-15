@@ -4,14 +4,8 @@
   It consumes FV HOBs and creates read-only Firmare Volume Block protocol
   instances for each of them.
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -517,9 +511,7 @@ ProduceFVBProtocolOnBuffer (
   FvbDev->BaseAddress   = BaseAddress;
   FvbDev->FvbAttributes = FwVolHeader->Attributes;
   FvbDev->FwVolBlockInstance.ParentHandle = ParentHandle;
-  if (ParentHandle != NULL) {
-    FvbDev->AuthenticationStatus = AuthenticationStatus;
-  }
+  FvbDev->AuthenticationStatus = AuthenticationStatus;
 
   //
   // Init the block caching fields of the device
@@ -544,7 +536,7 @@ ProduceFVBProtocolOnBuffer (
     CoreFreePool (FvbDev);
     return EFI_OUT_OF_RESOURCES;
   }
-  
+
   //
   // Last, fill in the cache with the linear address of the blocks
   //
@@ -584,11 +576,11 @@ ProduceFVBProtocolOnBuffer (
       return EFI_OUT_OF_RESOURCES;
     }
     CopyGuid (
-      &((FV_PIWG_DEVICE_PATH *)FvbDev->DevicePath)->FvDevPath.FvName, 
+      &((FV_PIWG_DEVICE_PATH *)FvbDev->DevicePath)->FvDevPath.FvName,
       (GUID *)(UINTN)(BaseAddress + FwVolHeader->ExtHeaderOffset)
       );
   }
-  
+
   //
   //
   // Attach FvVolBlock Protocol to new handle
@@ -630,16 +622,31 @@ FwVolBlockDriverInit (
   )
 {
   EFI_PEI_HOB_POINTERS          FvHob;
+  EFI_PEI_HOB_POINTERS          Fv3Hob;
+  UINT32                        AuthenticationStatus;
 
   //
   // Core Needs Firmware Volumes to function
   //
   FvHob.Raw = GetHobList ();
   while ((FvHob.Raw = GetNextHob (EFI_HOB_TYPE_FV, FvHob.Raw)) != NULL) {
+    AuthenticationStatus = 0;
+    //
+    // Get the authentication status propagated from PEI-phase to DXE.
+    //
+    Fv3Hob.Raw = GetHobList ();
+    while ((Fv3Hob.Raw = GetNextHob (EFI_HOB_TYPE_FV3, Fv3Hob.Raw)) != NULL) {
+      if ((Fv3Hob.FirmwareVolume3->BaseAddress == FvHob.FirmwareVolume->BaseAddress) &&
+          (Fv3Hob.FirmwareVolume3->Length == FvHob.FirmwareVolume->Length)) {
+        AuthenticationStatus = Fv3Hob.FirmwareVolume3->AuthenticationStatus;
+        break;
+      }
+      Fv3Hob.Raw = GET_NEXT_HOB (Fv3Hob);
+    }
     //
     // Produce an FVB protocol for it
     //
-    ProduceFVBProtocolOnBuffer (FvHob.FirmwareVolume->BaseAddress, FvHob.FirmwareVolume->Length, NULL, 0, NULL);
+    ProduceFVBProtocolOnBuffer (FvHob.FirmwareVolume->BaseAddress, FvHob.FirmwareVolume->Length, NULL, AuthenticationStatus, NULL);
     FvHob.Raw = GET_NEXT_HOB (FvHob);
   }
 

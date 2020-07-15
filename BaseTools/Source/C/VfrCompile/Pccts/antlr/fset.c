@@ -353,7 +353,7 @@ set *rk_out;
 		set_orin(&a, b);
 		set_free(b);
 	}
-	set_free(rk);				/* this has no members, but free it's memory */
+	set_free(rk);				/* this has no members, but free its memory */
 	set_orin(rk_out, rk2);		/* remember what we couldn't do */
 	set_free(rk2);
     if (MR_MaintainBackTrace) MR_pointerStackPop(&MR_BackTraceStack);
@@ -937,7 +937,7 @@ int jtype;
     long    n;
     int     thisOverflow=0;             /* MR9 */
     long    set_deg_value;              /* MR10 */
-    long    threshhold;                 /* MR10 */
+    long    threshold;                 /* MR10 */
 
 	require(block!=NULL, "NULL block");
 	require(block->ntype==nJunction, "invalid block");
@@ -954,8 +954,8 @@ int jtype;
          		b = set_and(alt1->fset[i], alt2->fset[i]);
 /* MR9 */       set_deg_value = set_deg(b);
 /* MR10 */      if (n > 0) {
-/* MR10 */        threshhold = LONG_MAX / n;
-/* MR10 */        if (set_deg_value <= threshhold) {
+/* MR10 */        threshold = LONG_MAX / n;
+/* MR10 */        if (set_deg_value <= threshold) {
 /* MR10 */       	n *= set_deg_value;
 /* MR10 */        } else {
 /* MR10 */          n=LONG_MAX;

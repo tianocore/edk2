@@ -2,14 +2,8 @@
 
     The definition for USB hub.
 
-Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -96,14 +90,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define USB_HUB_SUBCLASS_CODE       0x00
 
 //
-// Host software return timeout if port status doesn't change 
+// Host software return timeout if port status doesn't change
 // after 500ms(LOOP * STALL = 5000 * 0.1ms), set by experience
 //
 #define USB_WAIT_PORT_STS_CHANGE_LOOP  5000
 
 #pragma pack(1)
 //
-// Hub descriptor, the last two fields are of variable lenght.
+// Hub descriptor, the last two fields are of variable length.
 //
 typedef struct {
   UINT8           Length;
@@ -114,18 +108,6 @@ typedef struct {
   UINT8           HubContrCurrent;
   UINT8           Filler[16];
 } EFI_USB_HUB_DESCRIPTOR;
-
-typedef struct {
-  UINT8           Length;
-  UINT8           DescType;
-  UINT8           NumPorts;
-  UINT16          HubCharacter;
-  UINT8           PwrOn2PwrGood;
-  UINT8           HubContrCurrent;
-  UINT8           HubHdrDecLat;
-  UINT8           HubDelay;
-  UINT8           DeviceRemovable;
-} EFI_USB_SUPER_SPEED_HUB_DESCRIPTOR;
 
 #pragma pack()
 

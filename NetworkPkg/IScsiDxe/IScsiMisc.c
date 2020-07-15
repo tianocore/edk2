@@ -1,14 +1,8 @@
 /** @file
   Miscellaneous routines for iSCSI driver.
 
-Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -20,7 +14,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8  IScsiHexString[] = "0123456789ABCDEFa
   Removes (trims) specified leading and trailing characters from a string.
 
   @param[in, out] Str   Pointer to the null-terminated string to be trimmed.
-                        On return, Str will hold the trimmed string. 
+                        On return, Str will hold the trimmed string.
 
   @param[in]      CharC Character will be trimmed from str.
 
@@ -33,18 +27,18 @@ IScsiStrTrim (
 {
   CHAR16  *Pointer1;
   CHAR16  *Pointer2;
-  
+
   if (*Str == 0) {
     return ;
   }
-  
+
   //
   // Trim off the leading and trailing characters c
   //
   for (Pointer1 = Str; (*Pointer1 != 0) && (*Pointer1 == CharC); Pointer1++) {
     ;
   }
-  
+
   Pointer2 = Str;
   if (Pointer2 == Pointer1) {
     while (*Pointer1 != 0) {
@@ -52,19 +46,19 @@ IScsiStrTrim (
       Pointer1++;
     }
   } else {
-    while (*Pointer1 != 0) {    
-    *Pointer2 = *Pointer1;    
+    while (*Pointer1 != 0) {
+    *Pointer2 = *Pointer1;
     Pointer1++;
     Pointer2++;
     }
     *Pointer2 = 0;
   }
-  
-  
+
+
   for (Pointer1 = Str + StrLen(Str) - 1; Pointer1 >= Str && *Pointer1 == CharC; Pointer1--) {
     ;
   }
-  if  (Pointer1 !=  Str + StrLen(Str) - 1) { 
+  if  (Pointer1 !=  Str + StrLen(Str) - 1) {
     *(Pointer1 + 1) = 0;
   }
 }
@@ -131,11 +125,11 @@ IScsiAsciiStrToLun (
   CHAR8   TemStr[2];
   UINT8   TemValue;
   UINT16  Value[4];
-  
+
   ZeroMem (Lun, 8);
   ZeroMem (TemStr, 2);
   ZeroMem ((UINT8 *) Value, sizeof (Value));
-  SizeStr    = AsciiStrLen (Str);  
+  SizeStr    = AsciiStrLen (Str);
   IndexValue = 0;
   IndexNum   = 0;
 
@@ -150,7 +144,7 @@ IScsiAsciiStrToLun (
         return EFI_INVALID_PARAMETER;
       }
     }
-    
+
     if ((TemValue == 0) && (TemStr[0] == '-')) {
       //
       // Next Lun value.
@@ -167,24 +161,24 @@ IScsiAsciiStrToLun (
       IndexNum = 0;
       continue;
     }
-    
+
     if (++IndexNum > 4) {
-      //     
+      //
       // Each Lun Str can't exceed size 4, because it will be as UINT16 value.
       //
       return EFI_INVALID_PARAMETER;
     }
-    
+
     //
     // Combine UINT16 value.
     //
     Value[IndexValue] = (UINT16) ((Value[IndexValue] << 4) + TemValue);
   }
- 
+
   for (Index = 0; Index <= IndexValue; Index ++) {
     *((UINT16 *) &Lun[Index * 2]) =  HTONS (Value[Index]);
   }
-  
+
   return EFI_SUCCESS;
 }
 
@@ -278,7 +272,7 @@ IScsiAsciiStrToIp (
 }
 
 /**
-  Convert the mac address into a hexadecimal encoded "-" seperated string.
+  Convert the mac address into a hexadecimal encoded "-" separated string.
 
   @param[in]  Mac     The mac address.
   @param[in]  Len     Length in bytes of the mac address.
@@ -319,7 +313,7 @@ IScsiMacAddrToStr (
   @param[in, out]  HexStr      Pointer to the string.
   @param[in, out]  HexLength   The length of the string.
 
-  @retval EFI_SUCCESS          The binary data is converted to the hexadecimal string 
+  @retval EFI_SUCCESS          The binary data is converted to the hexadecimal string
                                and the length of the string is updated.
   @retval EFI_BUFFER_TOO_SMALL The string is too small.
   @retval EFI_INVALID_PARAMETER The IP string is malformatted.
@@ -385,7 +379,7 @@ IScsiHexToBin (
   UINTN   Length;
   UINT8   Digit;
   CHAR8   TemStr[2];
-  
+
   ZeroMem (TemStr, sizeof (TemStr));
 
   //
@@ -394,7 +388,7 @@ IScsiHexToBin (
   if ((HexStr[0] == '0') && ((HexStr[1] == 'x') || (HexStr[1] == 'X'))) {
     HexStr += 2;
   }
-  
+
   Length = AsciiStrLen (HexStr);
 
   for (Index = 0; Index < Length; Index ++) {
@@ -412,7 +406,7 @@ IScsiHexToBin (
       BinBuffer [Index/2] = (UINT8) ((BinBuffer [Index/2] << 4) + Digit);
     }
   }
-  
+
   *BinLength = (UINT32) ((Index + 1)/2);
 
   return EFI_SUCCESS;
@@ -466,9 +460,114 @@ IScsiGenRandom (
 
 
 /**
+  Check whether UNDI protocol supports IPv6.
+
+  @param[in]   ControllerHandle    Controller handle.
+  @param[in]   Image               Handle of the image.
+  @param[out]  Ipv6Support         TRUE if UNDI supports IPv6.
+
+  @retval EFI_SUCCESS            Get the result whether UNDI supports IPv6 by NII or AIP protocol successfully.
+  @retval EFI_NOT_FOUND          Don't know whether UNDI supports IPv6 since NII or AIP is not available.
+
+**/
+EFI_STATUS
+IScsiCheckIpv6Support (
+  IN  EFI_HANDLE                   ControllerHandle,
+  IN  EFI_HANDLE                   Image,
+  OUT BOOLEAN                      *Ipv6Support
+  )
+{
+  EFI_HANDLE                       Handle;
+  EFI_ADAPTER_INFORMATION_PROTOCOL *Aip;
+  EFI_STATUS                       Status;
+  EFI_GUID                         *InfoTypesBuffer;
+  UINTN                            InfoTypeBufferCount;
+  UINTN                            TypeIndex;
+  BOOLEAN                          Supported;
+  VOID                             *InfoBlock;
+  UINTN                            InfoBlockSize;
+
+  EFI_NETWORK_INTERFACE_IDENTIFIER_PROTOCOL *Nii;
+
+  ASSERT (Ipv6Support != NULL);
+
+  //
+  // Check whether the UNDI supports IPv6 by NII protocol.
+  //
+  Status = gBS->OpenProtocol (
+                  ControllerHandle,
+                  &gEfiNetworkInterfaceIdentifierProtocolGuid_31,
+                  (VOID **) &Nii,
+                  Image,
+                  ControllerHandle,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+  if (Status == EFI_SUCCESS) {
+    *Ipv6Support = Nii->Ipv6Supported;
+    return EFI_SUCCESS;
+  }
+
+  //
+  // Get the NIC handle by SNP protocol.
+  //
+  Handle = NetLibGetSnpHandle (ControllerHandle, NULL);
+  if (Handle == NULL) {
+    return EFI_NOT_FOUND;
+  }
+
+  Aip    = NULL;
+  Status = gBS->HandleProtocol (
+                  Handle,
+                  &gEfiAdapterInformationProtocolGuid,
+                  (VOID *) &Aip
+                  );
+  if (EFI_ERROR (Status) || Aip == NULL) {
+    return EFI_NOT_FOUND;
+  }
+
+  InfoTypesBuffer     = NULL;
+  InfoTypeBufferCount = 0;
+  Status = Aip->GetSupportedTypes (Aip, &InfoTypesBuffer, &InfoTypeBufferCount);
+  if (EFI_ERROR (Status) || InfoTypesBuffer == NULL) {
+    FreePool (InfoTypesBuffer);
+    return EFI_NOT_FOUND;
+  }
+
+  Supported = FALSE;
+  for (TypeIndex = 0; TypeIndex < InfoTypeBufferCount; TypeIndex++) {
+    if (CompareGuid (&InfoTypesBuffer[TypeIndex], &gEfiAdapterInfoUndiIpv6SupportGuid)) {
+      Supported = TRUE;
+      break;
+    }
+  }
+
+  FreePool (InfoTypesBuffer);
+  if (!Supported) {
+    return EFI_NOT_FOUND;
+  }
+
+  //
+  // We now have adapter information block.
+  //
+  InfoBlock     = NULL;
+  InfoBlockSize = 0;
+  Status = Aip->GetInformation (Aip, &gEfiAdapterInfoUndiIpv6SupportGuid, &InfoBlock, &InfoBlockSize);
+  if (EFI_ERROR (Status) || InfoBlock == NULL) {
+    FreePool (InfoBlock);
+    return EFI_NOT_FOUND;
+  }
+
+  *Ipv6Support = ((EFI_ADAPTER_INFO_UNDI_IPV6_SUPPORT *) InfoBlock)->Ipv6Support;
+  FreePool (InfoBlock);
+
+  return EFI_SUCCESS;
+}
+
+/**
   Record the NIC info in global structure.
 
   @param[in]  Controller         The handle of the controller.
+  @param[in]  Image              Handle of the image.
 
   @retval EFI_SUCCESS            The operation is completed.
   @retval EFI_OUT_OF_RESOURCES   Do not have sufficient resources to finish this
@@ -477,7 +576,8 @@ IScsiGenRandom (
 **/
 EFI_STATUS
 IScsiAddNic (
-  IN EFI_HANDLE  Controller
+  IN EFI_HANDLE  Controller,
+  IN EFI_HANDLE  Image
   )
 {
   EFI_STATUS                  Status;
@@ -509,6 +609,19 @@ IScsiAddNic (
         CompareMem (&NicInfo->PermanentAddress, MacAddr.Addr, HwAddressSize) == 0 &&
         NicInfo->VlanId == VlanId) {
       mPrivate->CurrentNic = NicInfo->NicIndex;
+
+      //
+      // Set IPv6 available flag.
+      //
+      Status = IScsiCheckIpv6Support (Controller, Image, &NicInfo->Ipv6Available);
+      if (EFI_ERROR (Status)) {
+        //
+        // Fail to get the data whether UNDI supports IPv6.
+        // Set default value to TRUE.
+        //
+        NicInfo->Ipv6Available = TRUE;
+      }
+
       return EFI_SUCCESS;
     }
 
@@ -530,6 +643,18 @@ IScsiAddNic (
   NicInfo->VlanId         = VlanId;
   NicInfo->NicIndex       = (UINT8) (mPrivate->MaxNic + 1);
   mPrivate->MaxNic        = NicInfo->NicIndex;
+
+  //
+  // Set IPv6 available flag.
+  //
+  Status = IScsiCheckIpv6Support (Controller, Image, &NicInfo->Ipv6Available);
+  if (EFI_ERROR (Status)) {
+    //
+    // Fail to get the data whether UNDI supports IPv6.
+    // Set default value to TRUE.
+    //
+    NicInfo->Ipv6Available = TRUE;
+  }
 
   //
   // Get the PCI location.
@@ -714,6 +839,10 @@ IScsiCreateAttempts (
                     );
     FreePool (AttemptConfigOrder);
     if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR,
+        "%a: Failed to set 'InitialAttemptOrder' with Guid (%g): "
+        "%r\n",
+        __FUNCTION__, &gIScsiConfigGuid, Status));
       return Status;
     }
 
@@ -756,6 +885,10 @@ IScsiCreateAttempts (
                     );
     FreePool (AttemptConfigData);
     if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_ERROR,
+          "%a: Failed to set variable (mPrivate->PortString) with Guid (%g): "
+          "%r\n",
+          __FUNCTION__, &gEfiIScsiInitiatorNameProtocolGuid, Status));
       return Status;
     }
   }
@@ -952,7 +1085,7 @@ IScsiCreateKeywords (
       CONFIGURATION_VARSTORE_ID,
       (UINT16) (ATTEMPT_ISID_VAR_OFFSET + sizeof (KEYWORD_STR) * (Index - 1)),
       StringToken,
-      StringToken,
+      STRING_TOKEN (STR_ISCSI_ISID_HELP),
       0,
       0,
       ISID_CONFIGURABLE_MIN_LEN,
@@ -1009,7 +1142,7 @@ IScsiCreateKeywords (
       0,
       0,
       IP4_MIN_SIZE,
-      IP4_MAX_SIZE,
+      IP4_STR_MAX_SIZE,
       NULL
       );
 
@@ -1035,7 +1168,7 @@ IScsiCreateKeywords (
       0,
       0,
       IP4_MIN_SIZE,
-      IP4_MAX_SIZE,
+      IP4_STR_MAX_SIZE,
       NULL
       );
 
@@ -1061,7 +1194,7 @@ IScsiCreateKeywords (
       0,
       0,
       IP4_MIN_SIZE,
-      IP4_MAX_SIZE,
+      IP4_STR_MAX_SIZE,
       NULL
       );
 
@@ -1167,7 +1300,7 @@ IScsiCreateKeywords (
       0,
       0,
       IP_MIN_SIZE,
-      IP_MAX_SIZE,
+      IP_STR_MAX_SIZE,
       NULL
       );
 
@@ -1667,8 +1800,9 @@ IScsiCleanDriverData (
   }
 
 EXIT:
-
-  gBS->CloseEvent (Private->ExitBootServiceEvent);
+  if (Private->ExitBootServiceEvent != NULL) {
+    gBS->CloseEvent (Private->ExitBootServiceEvent);
+  }
 
   mCallbackInfo->Current = NULL;
 
@@ -1681,10 +1815,10 @@ EXIT:
 
   @param[in]  Controller           The handle of the controller.
   @param[in]  IpVersion            IP_VERSION_4 or IP_VERSION_6.
-  
+
   @retval TRUE                     The handle of the controller need the Dhcp protocol.
   @retval FALSE                    The handle of the controller does not need the Dhcp protocol.
-  
+
 **/
 BOOLEAN
 IScsiDhcpIsConfigured (
@@ -1703,7 +1837,7 @@ IScsiDhcpIsConfigured (
   CHAR16                      MacString[ISCSI_MAX_MAC_STRING_LEN];
   CHAR16                      AttemptMacString[ISCSI_MAX_MAC_STRING_LEN];
   CHAR16                      AttemptName[ISCSI_NAME_IFR_MAX_SIZE];
-  
+
   AttemptConfigOrder = IScsiGetVariableAndSize (
                          L"AttemptOrder",
                          &gIScsiConfigGuid,
@@ -1712,7 +1846,7 @@ IScsiDhcpIsConfigured (
   if (AttemptConfigOrder == NULL || AttemptConfigOrderSize == 0) {
     return FALSE;
   }
-  
+
   //
   // Get MAC address of this network device.
   //
@@ -1725,7 +1859,7 @@ IScsiDhcpIsConfigured (
   //
   VlanId = NetLibGetVlanId (Controller);
   IScsiMacAddrToStr (&MacAddr, (UINT32) HwAddressSize, VlanId, MacString);
-  
+
   for (Index = 0; Index < AttemptConfigOrderSize / sizeof (UINT8); Index++) {
     UnicodeSPrint (
       AttemptName,
@@ -1742,7 +1876,7 @@ IScsiDhcpIsConfigured (
     if(AttemptTmp == NULL || EFI_ERROR (Status)) {
       continue;
     }
-    
+
     ASSERT (AttemptConfigOrder[Index] == AttemptTmp->AttemptConfigIndex);
 
     if (AttemptTmp->SessionConfigData.Enabled == ISCSI_DISABLED) {
@@ -1750,7 +1884,7 @@ IScsiDhcpIsConfigured (
       continue;
     }
 
-    if (AttemptTmp->SessionConfigData.IpMode != IP_MODE_AUTOCONFIG && 
+    if (AttemptTmp->SessionConfigData.IpMode != IP_MODE_AUTOCONFIG &&
         AttemptTmp->SessionConfigData.IpMode != ((IpVersion == IP_VERSION_4) ? IP_MODE_IP4 : IP_MODE_IP6)) {
       FreePool (AttemptTmp);
       continue;
@@ -1764,7 +1898,7 @@ IScsiDhcpIsConfigured (
 
     if(AttemptTmp->SessionConfigData.IpMode == IP_MODE_AUTOCONFIG ||
        AttemptTmp->SessionConfigData.InitiatorInfoFromDhcp == TRUE ||
-       AttemptTmp->SessionConfigData.TargetInfoFromDhcp == TRUE) { 
+       AttemptTmp->SessionConfigData.TargetInfoFromDhcp == TRUE) {
       FreePool (AttemptTmp);
       FreePool (AttemptConfigOrder);
       return TRUE;
@@ -1772,7 +1906,7 @@ IScsiDhcpIsConfigured (
 
     FreePool (AttemptTmp);
   }
-  
+
   FreePool (AttemptConfigOrder);
   return FALSE;
 }
@@ -1781,10 +1915,10 @@ IScsiDhcpIsConfigured (
   Check whether the Controller handle is configured to use DNS protocol.
 
   @param[in]  Controller           The handle of the controller.
-  
+
   @retval TRUE                     The handle of the controller need the Dns protocol.
   @retval FALSE                    The handle of the controller does not need the Dns protocol.
-  
+
 **/
 BOOLEAN
 IScsiDnsIsConfigured (
@@ -1802,7 +1936,7 @@ IScsiDnsIsConfigured (
   CHAR16                      AttemptMacString[ISCSI_MAX_MAC_STRING_LEN];
   CHAR16                      MacString[ISCSI_MAX_MAC_STRING_LEN];
   CHAR16                      AttemptName[ISCSI_NAME_IFR_MAX_SIZE];
-  
+
   AttemptConfigOrder = IScsiGetVariableAndSize (
                          L"AttemptOrder",
                          &gIScsiConfigGuid,
@@ -1811,7 +1945,7 @@ IScsiDnsIsConfigured (
   if (AttemptConfigOrder == NULL || AttemptConfigOrderSize == 0) {
     return FALSE;
   }
-  
+
   //
   // Get MAC address of this network device.
   //
@@ -1824,7 +1958,7 @@ IScsiDnsIsConfigured (
   //
   VlanId = NetLibGetVlanId (Controller);
   IScsiMacAddrToStr (&MacAddr, (UINT32) HwAddressSize, VlanId, MacString);
-  
+
   for (Index = 0; Index < AttemptConfigOrderSize / sizeof (UINT8); Index++) {
     UnicodeSPrint (
       AttemptName,
@@ -1842,7 +1976,7 @@ IScsiDnsIsConfigured (
     if(AttemptTmp == NULL || EFI_ERROR (Status)) {
       continue;
     }
-    
+
     ASSERT (AttemptConfigOrder[Index] == AttemptTmp->AttemptConfigIndex);
 
     AsciiStrToUnicodeStrS (AttemptTmp->MacString, AttemptMacString, sizeof (AttemptMacString) / sizeof (AttemptMacString[0]));
@@ -1851,8 +1985,8 @@ IScsiDnsIsConfigured (
       FreePool (AttemptTmp);
       continue;
     }
-    
-    if (AttemptTmp->SessionConfigData.DnsMode) {
+
+    if (AttemptTmp->SessionConfigData.DnsMode || AttemptTmp->SessionConfigData.TargetInfoFromDhcp) {
       FreePool (AttemptTmp);
       FreePool (AttemptConfigOrder);
       return TRUE;
@@ -1928,7 +2062,7 @@ IScsiGetConfigData (
     //
     // Check whether the attempt exists in AttemptConfig.
     //
-    AttemptTmp = IScsiConfigGetAttemptByConfigIndex (AttemptConfigOrder[Index]);    
+    AttemptTmp = IScsiConfigGetAttemptByConfigIndex (AttemptConfigOrder[Index]);
     if (AttemptTmp != NULL && AttemptTmp->SessionConfigData.Enabled == ISCSI_DISABLED) {
       continue;
     } else if (AttemptTmp != NULL && AttemptTmp->SessionConfigData.Enabled != ISCSI_DISABLED) {
@@ -1994,9 +2128,12 @@ IScsiGetConfigData (
 
           continue;
         }
-      } else if (AttemptTmp->SessionConfigData.InitiatorInfoFromDhcp && !AttemptTmp->ValidPath) {
+      } else if (AttemptTmp->SessionConfigData.InitiatorInfoFromDhcp &&
+                 !AttemptTmp->ValidPath &&
+                 AttemptTmp->NicIndex == mPrivate->CurrentNic) {
         //
-        // Get DHCP information for already added, but failed, attempt.
+        // If the attempt associates with the current NIC, we can
+        // get DHCP information for already added, but failed, attempt.
         //
         AttemptTmp->DhcpSuccess = FALSE;
         if (!mPrivate->Ipv6Flag && (AttemptTmp->SessionConfigData.IpMode == IP_MODE_IP4)) {
@@ -2078,7 +2215,7 @@ IScsiGetConfigData (
         (UINT8) (mPrivate->Ipv6Flag ? IP_MODE_AUTOCONFIG_IP6 : IP_MODE_AUTOCONFIG_IP4);
       AttemptConfigData->AutoConfigureSuccess = FALSE;
     }
-    
+
     //
     // Get some information from dhcp server.
     //
@@ -2249,7 +2386,7 @@ IScsiGetTcpConnDevicePath (
                   Conn->TcpIo.Handle,
                   &gEfiDevicePathProtocolGuid,
                   (VOID **) &DevicePath
-                  );  
+                  );
   if (EFI_ERROR (Status)) {
     return NULL;
   }
@@ -2268,20 +2405,20 @@ IScsiGetTcpConnDevicePath (
       if (!Conn->Ipv6Flag && DevicePathSubType (&DPathNode->DevPath) == MSG_IPv4_DP) {
         DPathNode->Ipv4.LocalPort       = 0;
 
-        DPathNode->Ipv4.StaticIpAddress = 
+        DPathNode->Ipv4.StaticIpAddress =
           (BOOLEAN) (!Session->ConfigData->SessionConfigData.InitiatorInfoFromDhcp);
 
         //
         //  Add a judgement here to support previous versions of IPv4_DEVICE_PATH.
         //  In previous versions of IPv4_DEVICE_PATH, GatewayIpAddress and SubnetMask
         //  do not exist.
-        //  In new version of IPv4_DEVICE_PATH, structcure length is 27.
+        //  In new version of IPv4_DEVICE_PATH, structure length is 27.
         //
 
         PathLen = DevicePathNodeLength (&DPathNode->Ipv4);
-        
-        if (PathLen == IP4_NODE_LEN_NEW_VERSIONS) {  
-            
+
+        if (PathLen == IP4_NODE_LEN_NEW_VERSIONS) {
+
           IP4_COPY_ADDRESS (
             &DPathNode->Ipv4.GatewayIpAddress,
             &Session->ConfigData->SessionConfigData.Gateway
@@ -2292,7 +2429,7 @@ IScsiGetTcpConnDevicePath (
             &Session->ConfigData->SessionConfigData.SubnetMask
             );
         }
-        
+
         break;
       } else if (Conn->Ipv6Flag && DevicePathSubType (&DPathNode->DevPath) == MSG_IPv6_DP) {
         DPathNode->Ipv6.LocalPort       = 0;
@@ -2301,28 +2438,28 @@ IScsiGetTcpConnDevicePath (
         //  Add a judgement here to support previous versions of IPv6_DEVICE_PATH.
         //  In previous versions of IPv6_DEVICE_PATH, IpAddressOrigin, PrefixLength
         //  and GatewayIpAddress do not exist.
-        //  In new version of IPv6_DEVICE_PATH, structure length is 60, while in 
+        //  In new version of IPv6_DEVICE_PATH, structure length is 60, while in
         //  old versions, the length is 43.
         //
 
         PathLen = DevicePathNodeLength (&DPathNode->Ipv6);
-        
-        if (PathLen == IP6_NODE_LEN_NEW_VERSIONS ) { 
+
+        if (PathLen == IP6_NODE_LEN_NEW_VERSIONS ) {
 
           DPathNode->Ipv6.IpAddressOrigin = 0;
           DPathNode->Ipv6.PrefixLength    = IP6_PREFIX_LENGTH;
           ZeroMem (&DPathNode->Ipv6.GatewayIpAddress, sizeof (EFI_IPv6_ADDRESS));
         }
-        else if (PathLen == IP6_NODE_LEN_OLD_VERSIONS) { 
+        else if (PathLen == IP6_NODE_LEN_OLD_VERSIONS) {
 
           //
-          //  StaticIPAddress is a field in old versions of IPv6_DEVICE_PATH, while ignored in new 
+          //  StaticIPAddress is a field in old versions of IPv6_DEVICE_PATH, while ignored in new
           //  version. Set StaticIPAddress through its' offset in old IPv6_DEVICE_PATH.
           //
-          *((UINT8 *)(&DPathNode->Ipv6) + IP6_OLD_IPADDRESS_OFFSET) = 
+          *((UINT8 *)(&DPathNode->Ipv6) + IP6_OLD_IPADDRESS_OFFSET) =
             (BOOLEAN) (!Session->ConfigData->SessionConfigData.InitiatorInfoFromDhcp);
         }
-        
+
         break;
       }
     }
@@ -2351,7 +2488,9 @@ IScsiOnExitBootService (
   ISCSI_DRIVER_DATA *Private;
 
   Private = (ISCSI_DRIVER_DATA *) Context;
+
   gBS->CloseEvent (Private->ExitBootServiceEvent);
+  Private->ExitBootServiceEvent = NULL;
 
   if (Private->Session != NULL) {
     IScsiSessionAbort (Private->Session);
@@ -2363,9 +2502,9 @@ IScsiOnExitBootService (
 
   This function tests whether the driver specified by DriverBindingHandle is
   currently managing the controller specified by ControllerHandle.  This test
-  is performed by evaluating if the the protocol specified by ProtocolGuid is
+  is performed by evaluating if the protocol specified by ProtocolGuid is
   present on ControllerHandle and is was opened by DriverBindingHandle and Nic
-  Device handle with an attribute of EFI_OPEN_PROTOCOL_BY_DRIVER. 
+  Device handle with an attribute of EFI_OPEN_PROTOCOL_BY_DRIVER.
   If ProtocolGuid is NULL, then ASSERT().
 
   @param  ControllerHandle     A handle for a controller to test.

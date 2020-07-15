@@ -7,17 +7,13 @@
 #     such as clock registers, and system unique information, such as
 #     asset numbers or serial numbers, MUST NOT be measured into PCR [1],
 #     or any other PCR.
+# The OEM types are skipped and platform code can measure them by self if required.
 #
 # A platform may use its own policy to filter some fields in SMBIOS table.
 #
-# Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2015 - 2019, Intel Corporation. All rights reserved.<BR>
 #
-#  This program and the accompanying materials
-#  are licensed and made available under the terms and conditions of the BSD License
-#  which accompanies this distribution. The full text of the license may be found at
-#  http://opensource.org/licenses/bsd-license.php
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 #
 ##
@@ -34,7 +30,7 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC ARM AARCH64
+#  VALID_ARCHITECTURES           = IA32 X64 EBC ARM AARCH64
 #
 
 [Sources]
@@ -52,6 +48,7 @@
   UefiLib
   UefiDriverEntryPoint
   DebugLib
+  PcdLib
   TpmMeasurementLib
 
 [Protocols]
@@ -60,6 +57,9 @@
 [Guids]
   gEfiSmbiosTableGuid                               ## SOMETIMES_CONSUMES ## SystemTable
   gEfiSmbios3TableGuid                              ## SOMETIMES_CONSUMES ## SystemTable
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTcgPfpMeasurementRevision            ## CONSUMES
 
 [Depex]
   gEfiSmbiosProtocolGuid

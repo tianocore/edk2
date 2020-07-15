@@ -1,15 +1,9 @@
 /** @file
   This EFI_DHCP6_PROTOCOL interface implementation.
 
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -19,10 +13,8 @@
 // Well-known multi-cast address defined in section-24.1 of rfc-3315
 //
 //   ALL_DHCP_Relay_Agents_and_Servers address: FF02::1:2
-//   ALL_DHCP_Servers address:                  FF05::1:3
 //
 EFI_IPv6_ADDRESS   mAllDhcpRelayAndServersAddress = {{0xFF, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 2}};
-EFI_IPv6_ADDRESS   mAllDhcpServersAddress         = {{0xFF, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 3}};
 
 EFI_DHCP6_PROTOCOL gDhcp6ProtocolTemplate = {
   EfiDhcp6GetModeData,
@@ -76,6 +68,7 @@ EfiDhcp6Start (
   EFI_TPL                      OldTpl;
   DHCP6_INSTANCE               *Instance;
   DHCP6_SERVICE                *Service;
+  EFI_STATUS                   MediaStatus;
 
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -101,6 +94,17 @@ EfiDhcp6Start (
   }
 
   OldTpl           = gBS->RaiseTPL (TPL_CALLBACK);
+
+  //
+  // Check Media Status.
+  //
+  MediaStatus = EFI_SUCCESS;
+  NetLibDetectMediaWaitTimeout (Service->Controller, DHCP_CHECK_MEDIA_WAITING_TIME, &MediaStatus);
+  if (MediaStatus != EFI_SUCCESS) {
+    Status = EFI_NO_MEDIA;
+    goto ON_ERROR;
+  }
+
   Instance->UdpSts = EFI_ALREADY_STARTED;
 
   //
@@ -216,7 +220,7 @@ EfiDhcp6Stop (
   }
 
   //
-  // Poll udp out of the net tpl if synchoronus call.
+  // Poll udp out of the net tpl if synchronous call.
   //
   if (Instance->Config->IaInfoEvent == NULL) {
     ASSERT (Udp6 != NULL);
@@ -225,7 +229,7 @@ EfiDhcp6Stop (
     }
     Status = Instance->UdpSts;
   }
-  
+
 ON_EXIT:
   //
   // Clean up the session data for the released Ia.
@@ -666,7 +670,7 @@ EfiDhcp6InfoRequest (
       return Status;
     }
 
-    do {  
+    do {
       TimerStatus = gBS->CheckEvent (Timer);
       if (!EFI_ERROR (TimerStatus)) {
         Status = Dhcp6StartInfoRequest (
@@ -682,7 +686,7 @@ EfiDhcp6InfoRequest (
                    );
       }
     } while (TimerStatus == EFI_NOT_READY);
-    
+
     gBS->CloseEvent (Timer);
   }
   if (EFI_ERROR (Status)) {
@@ -690,7 +694,7 @@ EfiDhcp6InfoRequest (
   }
 
   //
-  // Poll udp out of the net tpl if synchoronus call.
+  // Poll udp out of the net tpl if synchronous call.
   //
   if (TimeoutEvent == NULL) {
 
@@ -819,7 +823,7 @@ EfiDhcp6RenewRebind (
   gBS->RestoreTPL (OldTpl);
 
   //
-  // Poll udp out of the net tpl if synchoronus call.
+  // Poll udp out of the net tpl if synchronous call.
   //
   if (Instance->Config->IaInfoEvent == NULL) {
 
@@ -954,7 +958,7 @@ EfiDhcp6Decline (
   gBS->RestoreTPL (OldTpl);
 
   //
-  // Poll udp out of the net tpl if synchoronus call.
+  // Poll udp out of the net tpl if synchronous call.
   //
   if (Instance->Config->IaInfoEvent == NULL) {
 
@@ -1095,7 +1099,7 @@ EfiDhcp6Release (
   gBS->RestoreTPL (OldTpl);
 
   //
-  // Poll udp out of the net tpl if synchoronus call.
+  // Poll udp out of the net tpl if synchronous call.
   //
   if (Instance->Config->IaInfoEvent == NULL) {
     while (Instance->UdpSts == EFI_ALREADY_STARTED) {

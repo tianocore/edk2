@@ -1,0 +1,44 @@
+## @file
+#  Instance of MM memory check library.
+#
+#  MM memory check library library implementation. This library consumes MM_ACCESS_PROTOCOL
+#  to get MMRAM information. In order to use this library instance, the platform should produce
+#  all MMRAM range via MM_ACCESS_PROTOCOL, including the range for firmware (like MM Core
+#  and MM driver) and/or specific dedicated hardware.
+#
+#  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2016 - 2018, ARM Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = MemLib
+  FILE_GUID                      = EA355F14-6409-4716-829F-37B3BC7C7F26
+  MODULE_TYPE                    = MM_STANDALONE
+  VERSION_STRING                 = 1.0
+  PI_SPECIFICATION_VERSION       = 0x00010032
+  LIBRARY_CLASS                  = MemLib|MM_STANDALONE MM_CORE_STANDALONE
+  CONSTRUCTOR                    = MemLibConstructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = AARCH64
+#
+
+[Sources.Common]
+  StandaloneMmMemLib.c
+
+[Sources.AARCH64]
+  AArch64/StandaloneMmMemLibInternal.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  StandaloneMmPkg/StandaloneMmPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib

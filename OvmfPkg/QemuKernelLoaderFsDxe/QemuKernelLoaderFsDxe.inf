@@ -1,0 +1,50 @@
+##  @file
+#  DXE driver to expose the 'kernel', 'initrd' and 'cmdline' blobs
+#  provided by QEMU as files in an abstract file system
+#
+#  Copyright (C) 2014-2016, Red Hat, Inc.
+#  Copyright (C) 2020, Arm, Limited.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 1.27
+  BASE_NAME                      = QemuKernelLoaderFsDxe
+  FILE_GUID                      = 806040ca-dad9-4978-a3b4-2d2ab0c8a48f
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = QemuKernelLoaderFsDxeEntrypoint
+
+[Sources]
+  QemuKernelLoaderFsDxe.c
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  DevicePathLib
+  MemoryAllocationLib
+  QemuFwCfgLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiRuntimeServicesTableLib
+
+[Guids]
+  gEfiFileInfoGuid
+  gEfiFileSystemInfoGuid
+  gEfiFileSystemVolumeLabelInfoIdGuid
+  gQemuKernelLoaderFsMediaGuid
+
+[Protocols]
+  gEfiDevicePathProtocolGuid                ## PRODUCES
+  gEfiLoadFile2ProtocolGuid                 ## PRODUCES
+  gEfiSimpleFileSystemProtocolGuid          ## PRODUCES
+
+[Depex]
+  gEfiRealTimeClockArchProtocolGuid

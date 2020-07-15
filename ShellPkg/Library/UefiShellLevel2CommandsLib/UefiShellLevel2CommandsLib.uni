@@ -1,14 +1,8 @@
 // /**
 //
 // (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
-// Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
-// This program and the accompanying materials
-// are licensed and made available under the terms and conditions of the BSD License
-// which accompanies this distribution. The full text of the license may be found at
-// http://opensource.org/licenses/bsd-license.php
-//
-// THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-// WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+// Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+// SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Module Name:
 //
@@ -107,24 +101,24 @@
 #string STR_TIMEZONE_M6           #language en-US "UTC-06:00, Central America, Central Time(US & Canada)\r\n"
 #string STR_TIMEZONE_M5           #language en-US "UTC-05:00, Bogota, Lima, Quito, Eastern Time(US & Canada)\r\n"
 #string STR_TIMEZONE_M430         #language en-US "UTC-04:30, Caracas\r\n"
-#string STR_TIMEZONE_M4           #language en-US "UTC-04:00, Atlantic Time(Canada), Caracas, Santiago\r\n"
+#string STR_TIMEZONE_M4           #language en-US "UTC-04:00, Atlantic Time(Canada), Caracas, Santiago, Georgetown\r\n"
 #string STR_TIMEZONE_M330         #language en-US "UTC-03:30, Newfoundland\r\n"
-#string STR_TIMEZONE_M3           #language en-US "UTC-03:00, Brasilia, Buenos Aires, Georgetown, Greenland\r\n"
+#string STR_TIMEZONE_M3           #language en-US "UTC-03:00, Brasilia, Buenos Aires, Greenland\r\n"
 #string STR_TIMEZONE_M2           #language en-US "UTC-02:00, Mid-Atlantic\r\n"
 #string STR_TIMEZONE_M1           #language en-US "UTC-01:00, Azores, Cape Verde Is.\r\n"
 #string STR_TIMEZONE_0            #language en-US "UTC      , Greenwich Mean Time, Casablanca, Monrovia, Dublin, London\r\n"
 #string STR_TIMEZONE_P1           #language en-US "UTC+01:00, Amsterdam, Berlin, Bern, Rome, Paris, West Central Africa\r\n"
-#string STR_TIMEZONE_P2           #language en-US "UTC+02:00, Athens, Istanbul, Bucharest, Cairo, Jerusalem\r\n"
-#string STR_TIMEZONE_P3           #language en-US "UTC+03:00, Baghdad, Kuwait, Riyadh, Moscow, Nairobi\r\n"
+#string STR_TIMEZONE_P2           #language en-US "UTC+02:00, Athens, Bucharest, Cairo, Jerusalem\r\n"
+#string STR_TIMEZONE_P3           #language en-US "UTC+03:00, Baghdad, Kuwait, Riyadh, Moscow, Nairobi, Istanbul\r\n"
 #string STR_TIMEZONE_P330         #language en-US "UTC+03:30, Tehran\r\n"
 #string STR_TIMEZONE_P4           #language en-US "UTC+04:00, Abu Dhabi, Muscat, Baku, Tbilisi, Yerevan\r\n"
 #string STR_TIMEZONE_P430         #language en-US "UTC+04:30, Kabul\r\n"
 #string STR_TIMEZONE_P5           #language en-US "UTC+05:00, Ekaterinburg, Islamabad, Karachi, Tashkent\r\n"
 #string STR_TIMEZONE_P530         #language en-US "UTC+05:30, Chennai, Kolkata, Mumbai, New Delhi\r\n"
 #string STR_TIMEZONE_P545         #language en-US "UTC+05:45, Kathmandu\r\n"
-#string STR_TIMEZONE_P6           #language en-US "UTC+06:00, Almaty, Novosibirsk, Astana, Dhaka, Sri Jayawardenepura\r\n"
+#string STR_TIMEZONE_P6           #language en-US "UTC+06:00, Almaty, Astana, Dhaka, Sri Jayawardenepura\r\n"
 #string STR_TIMEZONE_P630         #language en-US "UTC+06:30, Rangoon\r\n"
-#string STR_TIMEZONE_P7           #language en-US "UTC+07:00, Bangkok, Hanio, Jakarta, Krasnoyarsk\r\n"
+#string STR_TIMEZONE_P7           #language en-US "UTC+07:00, Bangkok, Hanio, Jakarta, Krasnoyarsk, Novosibirsk\r\n"
 #string STR_TIMEZONE_P8           #language en-US "UTC+08:00, Beijing, Chongqing, Hong Kong, Urumqi, Taipei, Perth\r\n"
 #string STR_TIMEZONE_P9           #language en-US "UTC+09:00, Osaka, Sapporo, Tokyo, Seoul, Yakutsk\r\n"
 #string STR_TIMEZONE_P930         #language en-US "UTC+09:30, Adelaide, Darwin\r\n"
@@ -271,7 +265,7 @@
 "     variable %cwd%.\r\n"
 ".SH EXAMPLES\r\n"
 " \r\n"
-"EXAMPLES:\r\n"     
+"EXAMPLES:\r\n"
 "  * To change the current file system to the mapped fs0 file system:\r\n"
 "    Shell> fs0:\r\n"
 " \r\n"
@@ -294,7 +288,7 @@
 "    fs1:\> cd Tmp\r\n"
 ".SH RETURNVALUES\r\n"
 " \r\n"
-"RETURN VALUES:\r\n"     
+"RETURN VALUES:\r\n"
 "  SHELL_SUCCESS             The action was completed as requested.\r\n"
 "  SHELL_SECURITY_VIOLATION  This function was not performed due to a security\r\n"
 "                            violation.\r\n"
@@ -464,18 +458,15 @@
 "MKDIR dir [dir...]\r\n"
 ".SH OPTIONS\r\n"
 " \r\n"
-"  dir - Specifies the name of a directory or directories to create. (Wildcards are not\r\n"
-"        allowed) \r\n"
+"  dir - Specifies the name of a directory or directories to create.\r\n"
+"        (Wildcards are not allowed)\r\n"
 ".SH DESCRIPTION\r\n"
 " \r\n"
 "NOTES:\r\n"
-"  1. The parent directory must already exist.\r\n"
-"  2. If the directory already exists, mkdir will abort.\r\n"
-"  3. Specifying additional directory parameters dependent on previous\r\n"
-"     directory parameters is not allowed:\r\n"
-"     For example, mkdir new new\Test is not allowed.\r\n"
-"  4. Redirecting output to a file that exists under the directory specified\r\n"
-"     by this command is not allowed.\r\n"
+"  1. Mkdir can create one or more new directories.\r\n"
+"  2. If dir includes nested directories, then parent directories will be\r\n"
+"     created before child directories.\r\n"
+"  3. If the directory already exists, mkdir will exit with an error.\r\n"
 ".SH EXAMPLES\r\n"
 " \r\n"
 "EXAMPLES:\r\n"
@@ -726,7 +717,7 @@
 "     is specified by sname is deleted.\r\n"
 ".SH EXAMPLES\r\n"
 " \r\n"
-"EXAMPLES:\r\n"  
+"EXAMPLES:\r\n"
 "  * To add an environment variable:\r\n"
 "    Shell> set DiagnosticPath fs0:\efi\diag;fs1:\efi\diag\r\n"
 " \r\n"

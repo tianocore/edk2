@@ -1,0 +1,38 @@
+/** @file
+*
+*  Copyright (c) 2017, Linaro, Ltd. All rights reserved.
+*
+*  SPDX-License-Identifier: BSD-2-Clause-Patent
+*
+**/
+
+#include <Uefi/UefiMultiPhase.h>
+#include "ConsolePrefDxe.h"
+
+formset
+  guid      = CONSOLE_PREF_FORMSET_GUID,
+  title     = STRING_TOKEN(STR_FORM_SET_TITLE),
+  help      = STRING_TOKEN(STR_FORM_SET_TITLE_HELP),
+  classguid = EFI_HII_PLATFORM_SETUP_FORMSET_GUID,
+
+  efivarstore CONSOLE_PREF_VARSTORE_DATA,
+    attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE,  // EFI variable attributes
+    name  = ConsolePref,
+    guid  = CONSOLE_PREF_FORMSET_GUID;
+
+  form formid = 0x1000,
+    title  = STRING_TOKEN(STR_MAIN_FORM_TITLE);
+
+    oneof varid = ConsolePref.Console,
+        prompt      = STRING_TOKEN(STR_CONSOLE_PREF_SELECT_PROMPT),
+        help        = STRING_TOKEN(STR_CONSOLE_PREF_SELECT_HELP),
+        flags       = NUMERIC_SIZE_1 | INTERACTIVE,
+        option text = STRING_TOKEN(STR_CONSOLE_PREF_GRAPHICAL), value = CONSOLE_PREF_GRAPHICAL, flags = DEFAULT;
+        option text = STRING_TOKEN(STR_CONSOLE_PREF_SERIAL), value = CONSOLE_PREF_SERIAL, flags = 0;
+    endoneof;
+
+    subtitle text = STRING_TOKEN(STR_NULL_STRING);
+
+  endform;
+
+endformset;

@@ -1,14 +1,8 @@
 /** @file
 The CPU specific programming for PiSmmCpuDxeSmm module.
 
-Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2010 - 2019, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -19,8 +13,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/PcdLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DebugLib.h>
-#include <Register/Cpuid.h>
-#include <Register/SmramSaveStateMap.h>
+#include <Register/Intel/Cpuid.h>
+#include <Register/Intel/SmramSaveStateMap.h>
 
 //
 // Machine Specific Registers (MSRs)
@@ -296,7 +290,9 @@ SmmCpuFeaturesInitializeProcessor (
   // Intel(R) Core(TM) Processor Family MSRs.
   //
   if (FamilyId == 0x06) {
-    if (ModelId == 0x3C || ModelId == 0x45 || ModelId == 0x46) {
+    if (ModelId == 0x3C || ModelId == 0x45 || ModelId == 0x46 ||
+        ModelId == 0x3D || ModelId == 0x47 || ModelId == 0x4E || ModelId == 0x4F ||
+        ModelId == 0x3F || ModelId == 0x56 || ModelId == 0x57 || ModelId == 0x5C) {
       //
       // Check to see if the CPU supports the SMM Code Access Check feature
       // Do not access this MSR unless the CPU supports the SmmRegFeatureControl
@@ -544,7 +540,7 @@ SmmCpuFeaturesSetSmmRegister (
                         from the save state.
 
   @retval EFI_SUCCESS           The register was read from Save State.
-  @retval EFI_INVALID_PARAMTER  Buffer is NULL.
+  @retval EFI_INVALID_PARAMETER  Buffer is NULL.
   @retval EFI_UNSUPPORTED       This function does not support reading Register.
 
 **/
@@ -573,7 +569,7 @@ SmmCpuFeaturesReadSaveStateRegister (
   @param[in] Buffer    Upon entry, this holds the new CPU register value.
 
   @retval EFI_SUCCESS           The register was written to Save State.
-  @retval EFI_INVALID_PARAMTER  Buffer is NULL.
+  @retval EFI_INVALID_PARAMETER  Buffer is NULL.
   @retval EFI_UNSUPPORTED       This function does not support writing Register.
 **/
 EFI_STATUS

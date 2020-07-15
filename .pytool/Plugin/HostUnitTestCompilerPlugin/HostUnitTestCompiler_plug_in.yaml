@@ -1,0 +1,12 @@
+##
+# CiBuildPlugin used to build anything that identifies
+# as a unit test.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+{
+  "scope": "host-based-test",
+  "name": "Host Unit Test Compiler Plugin",
+  "module": "HostUnitTestCompilerPlugin"
+}

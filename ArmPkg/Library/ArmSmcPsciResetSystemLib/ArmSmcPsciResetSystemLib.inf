@@ -1,0 +1,29 @@
+#/** @file
+#  ResetSystemLib implementation using PSCI calls
+#
+#  Copyright (c) 2017, Linaro Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010019
+  BASE_NAME                      = ArmSmcPsciResetSystemLib
+  FILE_GUID                      = 18B12C83-7718-4D83-ADA4-87F2FE698DD4
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ResetSystemLib
+
+[Sources]
+  ArmSmcPsciResetSystemLib.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  ArmSmcLib
+  BaseLib
+  DebugLib

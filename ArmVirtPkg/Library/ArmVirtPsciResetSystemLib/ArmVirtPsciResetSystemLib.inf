@@ -4,12 +4,7 @@
 # Copyright (c) 2008, Apple Inc. All rights reserved.<BR>
 # Copyright (c) 2014, Linaro Ltd. All rights reserved.<BR>
 #
-#  This program and the accompanying materials
-#  are licensed and made available under the terms and conditions of the BSD License
-#  which accompanies this distribution. The full text of the license may be found at
-#  http://opensource.org/licenses/bsd-license.php
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 #
 #**/
@@ -20,7 +15,7 @@
   FILE_GUID                      = c81d76ed-66fa-44a3-ac4a-f163120187a9
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = EfiResetSystemLib|DXE_DRIVER DXE_RUNTIME_DRIVER
+  LIBRARY_CLASS                  = ResetSystemLib|DXE_DRIVER DXE_RUNTIME_DRIVER
   CONSTRUCTOR                    = ArmPsciResetSystemLibConstructor
 
 [Sources]
@@ -29,8 +24,8 @@
 [Packages]
   ArmPkg/ArmPkg.dec
   ArmVirtPkg/ArmVirtPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
-  EmbeddedPkg/EmbeddedPkg.dec
 
 [LibraryClasses]
   ArmSmcLib

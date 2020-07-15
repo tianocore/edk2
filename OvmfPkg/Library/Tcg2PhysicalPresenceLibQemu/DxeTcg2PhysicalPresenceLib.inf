@@ -1,0 +1,71 @@
+## @file
+#  Executes TPM 2.0 requests from OS or BIOS
+#
+#  This library will check and execute TPM 2.0 request from OS or
+#  BIOS. The request may ask for user confirmation before
+#  execution. It is a clone of
+#  "SecurityPkg/Library/DxeTcg2PhysicalPresenceLib" with:
+#
+#  - removed all the functions that are unreachable from
+#    Tcg2PhysicalPresenceLibProcessRequest() [called from platform
+#    BDS], or SubmitRequestToPreOSFunction() and
+#    ReturnOperationResponseToOsFunction() [called from Tcg2Dxe].
+#
+#  - replaced everything that's related to the
+#    TCG2_PHYSICAL_PRESENCE*_VARIABLE variables, with direct access to
+#    the QEMU structures.
+#
+#  Caution: This module requires additional review when modified.
+#  This driver will have external input - variable.
+#  This external input must be validated carefully to avoid security issue.
+#
+# Copyright (C) 2018, Red Hat, Inc.
+# Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Tcg2PhysicalPresenceLibQemu
+  FILE_GUID                      = 41D3E698-9EEC-41FF-9CBB-5FE79A0CF326
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = Tcg2PhysicalPresenceLib|DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_APPLICATION UEFI_DRIVER
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  DxeTcg2PhysicalPresenceLib.c
+  PhysicalPresenceStrings.uni
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  OvmfPkg/OvmfPkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  DxeServicesTableLib
+  HiiLib
+  HobLib
+  MemoryAllocationLib
+  PrintLib
+  QemuFwCfgLib
+  Tpm2CommandLib
+  UefiBootServicesTableLib
+  UefiLib
+  UefiRuntimeServicesTableLib
+
+[Protocols]
+  gEfiTcg2ProtocolGuid                 ## SOMETIMES_CONSUMES
+
+[Guids]
+  ## SOMETIMES_CONSUMES ## HII
+  gEfiTcg2PhysicalPresenceGuid

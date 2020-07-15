@@ -3,18 +3,13 @@
 # It also provides the definitions(including PPIs/PROTOCOLs/GUIDs and library classes)
 # and libraries instances, which are used for those modules.
 #
-# Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2019, NVIDIA CORPORATION. All rights reserved.
+# Copyright (c) 2007 - 2020, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
-# (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
+# (C) Copyright 2016 - 2019 Hewlett Packard Enterprise Development LP<BR>
 # Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
-#
-# This program and the accompanying materials are licensed and made available under
-# the terms and conditions of the BSD License that accompanies this distribution.
-# The full text of the license may be found at
-# http://opensource.org/licenses/bsd-license.php.
-#
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# Copyright (c) 2016, Microsoft Corporation<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
 
@@ -24,54 +19,26 @@
   PACKAGE_NAME                   = MdeModulePkg
   PACKAGE_UNI_FILE               = MdeModulePkg.uni
   PACKAGE_GUID                   = BA0D78D6-2CAF-414b-BD4D-B6762A894288
-  PACKAGE_VERSION                = 0.96
+  PACKAGE_VERSION                = 0.98
 
 [Includes]
   Include
 
+[Includes.Common.Private]
+  Library/BrotliCustomDecompressLib/brotli/c/include
 
 [LibraryClasses]
-  ##  @libraryclass  IpIo layer upon EFI IP4 Protocol.
-  #   This library is only intended to be used by UEFI network stack modules.
-  IpIoLib|Include/Library/IpIoLib.h
-
-  ##  @libraryclass  Basic function for UEFI network stack.
-  #   This library is only intended to be used by UEFI network stack modules.
-  NetLib|Include/Library/NetLib.h
-
-  ##  @libraryclass  The helper routines to access UDP service.
-  #   This library is only intended to be used by UEFI network stack modules.
-  UdpIoLib|Include/Library/UdpIoLib.h
-
-  ##  @libraryclass  The helper routines to access TCP service.
-  #   This library is only intended to be used by UEFI network stack modules.
-  TcpIoLib|Include/Library/TcpIoLib.h
-
-  ##  @libraryclass  The helper routines to access HTTP service.
-  #   This library is only intended to be used by UEFI network stack modules.
-  HttpLib|Include/Library/HttpLib.h
-
   ##  @libraryclass  Defines a set of methods to reset whole system.
   ResetSystemLib|Include/Library/ResetSystemLib.h
 
-  ##  @libraryclass  Defines a set of methods related do S3 mode.
-  #   This library class is no longer used and modules using this library should
-  #   directly locate EFI_PEI_S3_RESUME_PPI defined in PI 1.2 specification.
-  S3Lib|Include/Library/S3Lib.h
-
-  ##  @libraryclass  Defines a set of methods related recovery mode.
-  #   This library class is no longer used and modules using this library should
-  #   directly locate EFI_PEI_RECOVERY_MODULE_PPI defined in PI 1.2 specification.
-  RecoveryLib|Include/Library/RecoveryLib.h
+  ##  @libraryclass  Defines a set of helper functions for resetting the system.
+  ResetUtilityLib|Include/Library/ResetUtilityLib.h
 
   ##  @libraryclass  Provides HII related functions.
   HiiLib|Include/Library/HiiLib.h
 
   ##  @libraryclass  Defines a set of interfaces on how to process capusle image update.
   CapsuleLib|Include/Library/CapsuleLib.h
-
-  ##  @libraryclass  Library for Deferred Procedure Calls.
-  DpcLib|Include/Library/DpcLib.h
 
   ##  @libraryclass    Provides global variables that are pointers
   #   to the UEFI HII related protocols.
@@ -167,6 +134,18 @@
   ##
   NonDiscoverableDeviceRegistrationLib|Include/Library/NonDiscoverableDeviceRegistrationLib.h
 
+  ## @libraryclass  Provides services to convert a BMP graphics image to a GOP BLT buffer
+  #  and to convert a GOP BLT buffer to a BMP graphics image.
+  #
+  BmpSupportLib|Include/Library/BmpSupportLib.h
+
+  ## @libraryclass  Provides services to display completion progress when
+  #  processing a firmware update that updates the firmware image in a firmware
+  #  device.  A platform may provide its own instance of this library class to
+  #  customize how a user is informed of completion progress.
+  #
+  DisplayUpdateProgressLib|Include/Library/DisplayUpdateProgressLib.h
+
 [Guids]
   ## MdeModule package token space guid
   # Include/Guid/MdeModulePkgTokenSpace.h
@@ -183,6 +162,10 @@
   ## Guid for EDKII implementation GUIDed opcodes
   #  Include/Guid/MdeModuleHii.h
   gEfiIfrTianoGuid      = { 0xf0b1735, 0x87a0, 0x4193, {0xb2, 0x66, 0x53, 0x8c, 0x38, 0xaf, 0x48, 0xce }}
+
+  ## Guid for EDKII implementation extension, used to indaicate there are bit fields in the varstore.
+  #  Include/Guid/MdeModuleHii.h
+  gEdkiiIfrBitVarstoreGuid  = {0x82DDD68B, 0x9163, 0x4187, {0x9B, 0x27, 0x20, 0xA8, 0xFD, 0x60,0xA7, 0x1D}}
 
   ## Guid for Framework vfr GUIDed opcodes.
   #  Include/Guid/MdeModuleHii.h
@@ -241,6 +224,9 @@
   gSmmPerformanceProtocolGuid    = { 0xf866226a, 0xeaa5, 0x4f5a, { 0xa9, 0xa,  0x6c, 0xfb, 0xa5, 0x7c, 0x58, 0x8e } }
   gPerformanceExProtocolGuid     = { 0x1ea81bec, 0xf01a, 0x4d98, { 0xa2, 0x1,  0x4a, 0x61, 0xce, 0x2f, 0xc0, 0x22 } }
   gSmmPerformanceExProtocolGuid  = { 0x931fc048, 0xc71d, 0x4455, { 0x89, 0x30, 0x47, 0x6,  0x30, 0xe3, 0xe,  0xe5 } }
+  #  Include/Guid/PerformanceMeasurement.h
+  gEdkiiPerformanceMeasurementProtocolGuid      = { 0xc85d06be, 0x5f75, 0x48ce, { 0xa8, 0x0f, 0x12, 0x36, 0xba, 0x3b, 0x87, 0xb1 } }
+  gEdkiiSmmPerformanceMeasurementProtocolGuid   = { 0xd56b6d73, 0x1a7b, 0x4015, { 0x9b, 0xb4, 0x7b, 0x07, 0x17, 0x29, 0xed, 0x24 } }
 
   ## Guid is defined for CRC32 encapsulation scheme.
   #  Include/Guid/Crc32GuidedSectionExtraction.h
@@ -281,6 +267,9 @@
   ## Include/Guid/RecoveryDevice.h
   gRecoveryOnDataCdGuid              = { 0x5CAC0099, 0x0DC9, 0x48E5, { 0x80, 0x68, 0xBB, 0x95, 0xF5, 0x40, 0x0A, 0x9F }}
 
+  ## Include/Guid/RecoveryDevice.h
+  gRecoveryOnFatNvmeDiskGuid         = { 0xC770A27F, 0x956A, 0x497A, { 0x85, 0x48, 0xE0, 0x61, 0x97, 0x58, 0x8B, 0xF6 }}
+
   ## Include/Guid/SmmLockBox.h
   gEfiSmmLockBoxCommunicationGuid    = { 0x2a3cfebd, 0x27e8, 0x4d0a, { 0x8b, 0x79, 0xd6, 0x88, 0xc2, 0xa3, 0xe1, 0xc0 }}
 
@@ -309,16 +298,6 @@
   ## Include/Guid/PlatDriOverrideHii.h
   gPlatformOverridesManagerGuid      = { 0x8614567d, 0x35be, 0x4415, { 0x8d, 0x88, 0xbd, 0x7d, 0xc, 0x9c, 0x70, 0xc0 }}
 
-  ## Include/Guid/Ip4Config2Hii.h
-  gIp4Config2NvDataGuid              = { 0x9b942747, 0x154e, 0x4d29, { 0xa4, 0x36, 0xbf, 0x71, 0x0, 0xc8, 0xb5, 0x3b }}
-
-  ## Include/Guid/VlanConfigHii.h
-  gVlanConfigFormSetGuid             = { 0xd79df6b0, 0xef44, 0x43bd, { 0x97, 0x97, 0x43, 0xe9, 0x3b, 0xcf, 0x5f, 0xa8 }}
-
-  ## Include/Guid/Ip4IScsiConfigHii.h
-  gIp4IScsiConfigGuid                = { 0x6456ed61, 0x3579, 0x41c9, { 0x8a, 0x26, 0x0a, 0x0b, 0xd6, 0x2b, 0x78, 0xfc }}
-  gIScsiCHAPAuthInfoGuid             = { 0x786ec0ac, 0x65ae, 0x4d1b, { 0xb1, 0x37, 0xd, 0x11, 0xa, 0x48, 0x37, 0x97 }}
-
   ## Include/Guid/ZeroGuid.h
   gZeroGuid                          = { 0x0, 0x0, 0x0, {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}}
 
@@ -346,6 +325,9 @@
   ## Include/Protocol/VarErrorFlag.h
   gEdkiiVarErrorFlagGuid               = { 0x4b37fe8, 0xf6ae, 0x480b, { 0xbd, 0xd5, 0x37, 0xd9, 0x8c, 0x5e, 0x89, 0xaa } }
 
+  ## GUID indicates the BROTLI custom compress/decompress algorithm.
+  gBrotliCustomDecompressGuid      = { 0x3D532050, 0x5CDA, 0x4FD0, { 0x87, 0x9E, 0x0F, 0x7F, 0x63, 0x0D, 0x5A, 0xFB }}
+
   ## GUID indicates the LZMA custom compress/decompress algorithm.
   #  Include/Guid/LzmaDecompress.h
   gLzmaCustomDecompressGuid      = { 0xEE4E5898, 0x3914, 0x4259, { 0x9D, 0x6E, 0xDC, 0x7B, 0xD7, 0x94, 0x03, 0xCF }}
@@ -353,6 +335,10 @@
 
   ## Include/Guid/TtyTerm.h
   gEfiTtyTermGuid                = { 0x7d916d80, 0x5bb1, 0x458c, {0xa4, 0x8f, 0xe2, 0x5f, 0xdd, 0x51, 0xef, 0x94 }}
+  gEdkiiLinuxTermGuid            = { 0xe4364a7f, 0xf825, 0x430e, {0x9d, 0x3a, 0x9c, 0x9b, 0xe6, 0x81, 0x7c, 0xa5 }}
+  gEdkiiXtermR6Guid              = { 0xfbfca56b, 0xbb36, 0x4b78, {0xaa, 0xab, 0xbe, 0x1b, 0x97, 0xec, 0x7c, 0xcb }}
+  gEdkiiVT400Guid                = { 0x8e46dddd, 0x3d49, 0x4a9d, {0xb8, 0x75, 0x3c, 0x08, 0x6f, 0x6a, 0xa2, 0xbd }}
+  gEdkiiSCOTermGuid              = { 0xfc7dd6e0, 0x813c, 0x434d, {0xb4, 0xda, 0x3b, 0xd6, 0x49, 0xe9, 0xe1, 0x5a }}
 
   ## Include/Guid/HiiBootMaintenanceFormset.h
   gEfiIfrBootMaintenanceGuid      = { 0xb2dedc91, 0xd59f, 0x48d2, { 0x89, 0x8a, 0x12, 0x49, 0xc, 0x74, 0xa4, 0xe0 }}
@@ -381,6 +367,27 @@
   gEdkiiNonDiscoverableUfsDeviceGuid = { 0x2EA77912, 0x80A8, 0x4947, {0xBE, 0x69, 0xCD, 0xD0, 0x0A, 0xFB, 0xE5, 0x56 } }
   gEdkiiNonDiscoverableUhciDeviceGuid = { 0xA8CDA0A2, 0x4F37, 0x4A1B, {0x8E, 0x10, 0x8E, 0xF3, 0xCC, 0x3B, 0xF3, 0xA8 } }
   gEdkiiNonDiscoverableXhciDeviceGuid = { 0xB1BE0BC5, 0x6C28, 0x442D, {0xAA, 0x37, 0x15, 0x1B, 0x42, 0x57, 0xBD, 0x78 } }
+
+  ## Include/Guid/PlatformHasAcpi.h
+  gEdkiiPlatformHasAcpiGuid = { 0xf0966b41, 0xc23f, 0x41b9, { 0x96, 0x04, 0x0f, 0xf7, 0xe1, 0x11, 0x96, 0x5a } }
+
+  ## Include/Guid/ExtendedFirmwarePerformance.h
+  gEdkiiFpdtExtendedFirmwarePerformanceGuid = { 0x3b387bfd, 0x7abc, 0x4cf2, { 0xa0, 0xca, 0xb6, 0xa1, 0x6c, 0x1b, 0x1b, 0x25 } }
+
+  ## Include/Guid/EndofS3Resume.h
+  gEdkiiEndOfS3ResumeGuid = { 0x96f5296d, 0x05f7, 0x4f3c, {0x84, 0x67, 0xe4, 0x56, 0x89, 0x0e, 0x0c, 0xb5 } }
+
+  ## Include/Guid/S3SmmInitDone.h
+  gEdkiiS3SmmInitDoneGuid = { 0x8f9d4825, 0x797d, 0x48fc, { 0x84, 0x71, 0x84, 0x50, 0x25, 0x79, 0x2e, 0xf6 } }
+
+  ## Include/Guid/S3StorageDeviceInitList.h
+  gS3StorageDeviceInitListGuid = { 0x310e9b8c, 0xcf90, 0x421e, { 0x8e, 0x9b, 0x9e, 0xef, 0xb6, 0x17, 0xc8, 0xef } }
+
+  ## Include/Guid/SerialPortLibVendor.h
+  gEdkiiSerialPortLibVendorGuid = { 0xD3987D4B, 0x971A, 0x435F, { 0x8C, 0xAF, 0x49, 0x67, 0xEB, 0x62, 0x72, 0x41 } }
+
+  ## GUID indicates the capsule is to store Capsule On Disk file names.
+  gEdkiiCapsuleOnDiskNameGuid = { 0x98c80a4f, 0xe16b, 0x4d11, { 0x93, 0x9a, 0xab, 0xe5, 0x61, 0x26, 0x3, 0x30 } }
 
 [Ppis]
   ## Include/Ppi/AtaController.h
@@ -425,6 +432,40 @@
   ## Include/Ppi/SdMmcHostController.h
   gEdkiiPeiSdMmcHostControllerPpiGuid = { 0xb30dfeed, 0x947f, 0x4396, { 0xb1, 0x5a, 0xdf, 0xbd, 0xb9, 0x16, 0xdc, 0x24 }}
 
+  ## Include/Ppi/IoMmu.h
+  gEdkiiIoMmuPpiGuid = { 0x70b0af26, 0xf847, 0x4bb6, { 0xaa, 0xb9, 0xcd, 0xe8, 0x4f, 0xc6, 0x14, 0x31 } }
+
+  ## Include/Ppi/PlatformSpecificResetFilter.h
+  gEdkiiPlatformSpecificResetFilterPpiGuid = { 0x8c9f4de3, 0x7b90, 0x47ef, { 0x93, 0x8, 0x28, 0x7c, 0xec, 0xd6, 0x6d, 0xe8 } }
+
+  ## Include/Ppi/PlatformSpecificResetNotification.h
+  gEdkiiPlatformSpecificResetNotificationPpiGuid = { 0xe09f355d, 0xdae8, 0x4910, { 0xb1, 0x4a, 0x92, 0x78, 0xf, 0xdc, 0xf7, 0xcb } }
+
+  ## Include/Ppi/PlatformSpecificResetHandler.h
+  gEdkiiPlatformSpecificResetHandlerPpiGuid = { 0x75cf14ae, 0x3441, 0x49dc, { 0xaa, 0x10, 0xbb, 0x35, 0xa7, 0xba, 0x8b, 0xab } }
+
+  ## Include/Ppi/NvmExpressHostController.h
+  gEdkiiPeiNvmExpressHostControllerPpiGuid  = { 0xcae3aa63, 0x676f, 0x4da3, { 0xbd, 0x50, 0x6c, 0xc5, 0xed, 0xde, 0x9a, 0xad } }
+
+  ## Include/Ppi/AtaAhciController.h
+  gEdkiiPeiAtaAhciHostControllerPpiGuid     = { 0x61dd33ea, 0x421f, 0x4cc0, { 0x89, 0x29, 0xff, 0xee, 0xa9, 0xa1, 0xa2, 0x61 } }
+
+  ## Include/Ppi/StorageSecurityCommand.h
+  gEdkiiPeiStorageSecurityCommandPpiGuid    = { 0x35de0b4e, 0x30fb, 0x46c3, { 0xbd, 0x84, 0x1f, 0xdb, 0xa1, 0x58, 0xbb, 0x56 } }
+
+  ## Include/Ppi/AtaPassThru.h
+  gEdkiiPeiAtaPassThruPpiGuid               = { 0xa16473fd, 0xd474, 0x4c89, { 0xae, 0xc7, 0x90, 0xb8, 0x3c, 0x73, 0x86, 0x9  } }
+
+  ## Include/Ppi/Debug.h
+  gEdkiiDebugPpiGuid                        = { 0x999e699c, 0xb013, 0x475e, { 0xb1, 0x7b, 0xf3, 0xa8, 0xae, 0x5c, 0x48, 0x75 } }
+
+  ## Include/Ppi/NvmExpressPassThru.h
+  gEdkiiPeiNvmExpressPassThruPpiGuid    = { 0x6af31b2c, 0x3be, 0x46c1, { 0xb1, 0x2d, 0xea, 0x4a, 0x36, 0xdf, 0xa7, 0x4c } }
+
+  ## Include/Ppi/CapsuleOnDisk.h
+  gEdkiiPeiCapsuleOnDiskPpiGuid             = { 0x71a9ea61, 0x5a35, 0x4a5d, { 0xac, 0xef, 0x9c, 0xf8, 0x6d, 0x6d, 0x67, 0xe0 } }
+  gEdkiiPeiBootInCapsuleOnDiskModePpiGuid   = { 0xb08a11e4, 0xe2b7, 0x4b75, { 0xb5, 0x15, 0xaf, 0x61, 0x6, 0x68, 0xbf, 0xd1  } }
+
 [Protocols]
   ## Load File protocol provides capability to load and unload EFI image into memory and execute it.
   #  Include/Protocol/LoadPe32Image.h
@@ -444,9 +485,6 @@
   ## This protocol defines the Debugger Configuration interface.
   # Include/Protocol/DebuggerConfiguration.h
   gEfiDebuggerConfigurationProtocolGuid = { 0x577d959c, 0xe967, 0x4546, { 0x86, 0x20, 0xc7, 0x78, 0xfa, 0xe5, 0xda, 0x05 }}
-
-  ## Include/Protocol/Dpc.h
-  gEfiDpcProtocolGuid            = {0x480f8ae9, 0xc46, 0x4aa9,  { 0xbc, 0x89, 0xdb, 0x9f, 0xba, 0x61, 0x98, 0x6 }}
 
   ## Fault Tolerant Write protocol provides boot-time service to do fault tolerant write capability for block devices.
   #  Include/Protocol/FaultTolerantWrite.h
@@ -490,7 +528,6 @@
   gEfiLockBoxProtocolGuid        = { 0xbd445d79, 0xb7ad, 0x4f04, { 0x9a, 0xd8, 0x29, 0xbd, 0x20, 0x40, 0xeb, 0x3c }}
 
   ## Include/Protocol/FormBrowserEx.h
-  gEfiFormBrowserExProtocolGuid = { 0x1f73b18d, 0x4630, 0x43c1, { 0xa1, 0xde, 0x6f, 0x80, 0x85, 0x5d, 0x7d, 0xa4 } }
   gEdkiiFormBrowserExProtocolGuid = { 0x1f73b18d, 0x4630, 0x43c1, { 0xa1, 0xde, 0x6f, 0x80, 0x85, 0x5d, 0x7d, 0xa4 } }
 
   ## Include/Protocol/EbcVmTest.h
@@ -502,6 +539,9 @@
   ## Include/Protocol/BootLogo.h
   gEfiBootLogoProtocolGuid = { 0xcdea2bd3, 0xfc25, 0x4c1c, { 0xb9, 0x7c, 0xb3, 0x11, 0x86, 0x6, 0x49, 0x90 } }
 
+  # Include/Protocol/BootLogo2.h
+  gEdkiiBootLogo2ProtocolGuid = { 0x4b5dc1df, 0x1eaa, 0x48b2, { 0xa7, 0xe9, 0xea, 0xc4, 0x89, 0xa0, 0xb, 0x5c } }
+
   ## Include/Protocol/DisplayProtocol.h
   gEdkiiFormDisplayEngineProtocolGuid = { 0x9bbe29e9, 0xfda1, 0x41ec, { 0xad, 0x52, 0x45, 0x22, 0x13, 0x74, 0x2d, 0x2e } }
 
@@ -510,6 +550,9 @@
 
   ## Include/Protocol/UfsHostController.h
   gEdkiiUfsHostControllerProtocolGuid = { 0xebc01af5, 0x7a9, 0x489e, { 0xb7, 0xce, 0xdc, 0x8, 0x9e, 0x45, 0x9b, 0x2f } }
+
+  ## Include/Protocol/UfsHostControllerPlatform.h
+  gEdkiiUfsHcPlatformProtocolGuid = { 0x3d18ba13, 0xd9b1, 0x4dd4, {0xb9, 0x16, 0xd3, 0x07, 0x96, 0x53, 0x9e, 0xd8}}
 
   ## Include/Protocol/EsrtManagement.h
   gEsrtManagementProtocolGuid         = { 0xa340c064, 0x723c, 0x4a9c, { 0xa4, 0xdd, 0xd5, 0xb4, 0x7a, 0x26, 0xfb, 0xb0 }}
@@ -539,6 +582,37 @@
 
   ## Include/Protocol/NonDiscoverableDevice.h
   gEdkiiNonDiscoverableDeviceProtocolGuid = { 0x0d51905b, 0xb77e, 0x452a, {0xa2, 0xc0, 0xec, 0xa0, 0xcc, 0x8d, 0x51, 0x4a } }
+
+  ## Include/Protocol/IoMmu.h
+  gEdkiiIoMmuProtocolGuid = { 0x4e939de9, 0xd948, 0x4b0f, { 0x88, 0xed, 0xe6, 0xe1, 0xce, 0x51, 0x7c, 0x1e } }
+
+  ## Include/Protocol/DeviceSecurity.h
+  gEdkiiDeviceSecurityProtocolGuid  = { 0x5d6b38c8, 0x5510, 0x4458, { 0xb4, 0x8d, 0x95, 0x81, 0xcf, 0xa7, 0xb0, 0xd } }
+  gEdkiiDeviceIdentifierTypePciGuid = { 0x2509b2f1, 0xa022, 0x4cca, { 0xaf, 0x70, 0xf9, 0xd3, 0x21, 0xfb, 0x66, 0x49 } }
+  gEdkiiDeviceIdentifierTypeUsbGuid = { 0x7394f350, 0x394d, 0x488c, { 0xbb, 0x75, 0xc, 0xab, 0x7b, 0x12, 0xa, 0xc5 } }
+
+  ## Include/Protocol/SmmMemoryAttribute.h
+  gEdkiiSmmMemoryAttributeProtocolGuid = { 0x69b792ea, 0x39ce, 0x402d, { 0xa2, 0xa6, 0xf7, 0x21, 0xde, 0x35, 0x1d, 0xfe } }
+
+  ## Include/Protocol/SdMmcOverride.h
+  gEdkiiSdMmcOverrideProtocolGuid = { 0xeaf9e3c1, 0xc9cd, 0x46db, { 0xa5, 0xe5, 0x5a, 0x12, 0x4c, 0x83, 0x23, 0x23 } }
+
+  ## Include/Protocol/PlatformSpecificResetFilter.h
+  gEdkiiPlatformSpecificResetFilterProtocolGuid  = { 0x695d7835, 0x8d47, 0x4c11, { 0xab, 0x22, 0xfa, 0x8a, 0xcc, 0xe7, 0xae, 0x7a } }
+  ## Include/Protocol/PlatformSpecificResetHandler.h
+  gEdkiiPlatformSpecificResetHandlerProtocolGuid = { 0x2df6ba0b, 0x7092, 0x440d, { 0xbd, 0x4, 0xfb, 0x9, 0x1e, 0xc3, 0xf3, 0xc1 } }
+
+  ## Include/Protocol/FirmwareManagementProgress.h
+  gEdkiiFirmwareManagementProgressProtocolGuid = { 0x1849bda2, 0x6952, 0x4e86, { 0xa1, 0xdb, 0x55, 0x9a, 0x3c, 0x47, 0x9d, 0xf1 } }
+
+  ## Include/Protocol/AtaAtapiPolicy.h
+  gEdkiiAtaAtapiPolicyProtocolGuid = { 0xe59cd769, 0x5083, 0x4f26,{ 0x90, 0x94, 0x6c, 0x91, 0x9f, 0x91, 0x6c, 0x4e } }
+
+  ## Include/Protocol/PeCoffImageEmulator.h
+  gEdkiiPeCoffImageEmulatorProtocolGuid = { 0x96f46153, 0x97a7, 0x4793, { 0xac, 0xc1, 0xfa, 0x19, 0xbf, 0x78, 0xea, 0x97 } }
+
+  ## Include/Protocol/PlatformBootManager.h
+  gEdkiiPlatformBootManagerProtocolGuid = { 0xaa17add4, 0x756c, 0x460d, { 0x94, 0xb8, 0x43, 0x88, 0xd7, 0xfb, 0x3e, 0x59 } }
 
 #
 # [Error.gEfiMdeModulePkgTokenSpaceGuid]
@@ -576,6 +650,18 @@
   #   FALSE - Device Path From Text Protocol will not be produced.<BR>
   # @Prompt Enable Device Path From Text support.
   gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathFromText|TRUE|BOOLEAN|0x00010038
+
+  ## Indicates if the UEFI variable runtime cache should be enabled.
+  #  This setting only applies if SMM variables are enabled. When enabled, all variable
+  #  data for Runtime Service GetVariable () and GetNextVariableName () calls is retrieved
+  #  from a runtime data buffer referred to as the "runtime cache". An SMI is not triggered
+  #  at all for these requests. Variables writes still trigger an SMI. This can greatly
+  #  reduce overall system SMM usage as most boots tend to issue far more variable reads
+  #  than writes.<BR><BR>
+  #   TRUE  - The UEFI variable runtime cache is enabled.<BR>
+  #   FALSE - The UEFI variable runtime cache is disabled.<BR>
+  # @Prompt Enable the UEFI variable runtime cache.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEnableVariableRuntimeCache|TRUE|BOOLEAN|0x00010039
 
   ## Indicates if the statistics about variable usage will be collected. This information is
   #  stored as a vendor configuration table into the EFI system table.
@@ -643,14 +729,6 @@
   # @Prompt Disable default keyboard layout in USB KeyBoard Driver.
   gEfiMdeModulePkgTokenSpaceGuid.PcdDisableDefaultKeyboardLayoutInUsbKbDriver|FALSE|BOOLEAN|0x00010200
 
-  ## Indicates if backward compatibility to Framework HII and Framework FvHob is supported.<BR><BR>
-  #   TRUE  - Setup Browser supports GUID opcodes generated from Framework HII VFR file by VFR compiler.
-  #           the PeiCore will handle the framework FvHob and install FvInfo PPI for it.<BR>
-  #   FALSE - Setup Browser doesn't support GUID opcodes generated from Framework HII VFR file by VFR compiler.
-  #           the PeiCore will not handle the framework FvHob and install FvInfo PPI for it.<BR>
-  # @Prompt Enable framework backward compatibility support.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFrameworkCompatibilitySupport|FALSE|BOOLEAN|0x00012009
-
   ## Indicates if HelloWorld Application will print the verbose information.
   #  This PCD is a sample to explain FeatureFlag PCD usage.<BR><BR>
   #   TRUE  - HelloWorld Application will print the verbose information.<BR>
@@ -681,19 +759,6 @@
   #   FALSE - PciBus driver doesn't probe non-standard granularity for PCI to PCI bridge I/O window.<BR>
   # @Prompt Enable PCI bridge IO alignment probe.
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciBridgeIoAlignmentProbe|FALSE|BOOLEAN|0x0001004e
-
-  ## Indicates if StatusCode is reported via Serial port.<BR><BR>
-  #   TRUE  - Reports StatusCode via Serial port.<BR>
-  #   FALSE - Does not report StatusCode via Serial port.<BR>
-  # @Prompt Enable StatusCode via Serial port.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial|TRUE|BOOLEAN|0x00010022
-
-  ## Indicates if StatusCode is stored in memory.
-  #  The memory is boot time memory in PEI Phase and is runtime memory in DXE Phase.<BR><BR>
-  #   TRUE  - Stores StatusCode in memory.<BR>
-  #   FALSE - Does not store StatusCode in memory.<BR>
-  # @Prompt Enable StatusCode via memory.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory|FALSE|BOOLEAN|0x00010023
 
   ## Indicates if PEI phase StatusCode will be replayed in DXE phase.<BR><BR>
   #   TRUE  - Replays PEI phase StatusCode in DXE phased.<BR>
@@ -793,6 +858,12 @@
   # @Prompt Degrade 64-bit PCI MMIO BARs for legacy BIOS option ROMs
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciDegradeResourceForOptionRom|TRUE|BOOLEAN|0x0001003a
 
+  ## Indicates if the platform can support process non-reset capsule image at runtime.<BR><BR>
+  #   TRUE  - Supports process non-reset capsule image at runtime.<BR>
+  #   FALSE - Does not support process non-reset capsule image at runtime.<BR>
+  # @Prompt Enable process non-reset capsule image at runtime.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSupportProcessCapsuleAtRuntime|FALSE|BOOLEAN|0x00010079
+
 [PcdsFeatureFlag.IA32, PcdsFeatureFlag.ARM, PcdsFeatureFlag.AARCH64]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciDegradeResourceForOptionRom|FALSE|BOOLEAN|0x0001003a
 
@@ -851,6 +922,119 @@
   # @ValidList  0x80000006 | 0x03058002
   gEfiMdeModulePkgTokenSpaceGuid.PcdErrorCodeSetVariable|0x03058002|UINT32|0x30001040
 
+  ## Mask to control the NULL address detection in code for different phases.
+  #  If enabled, accessing NULL address in UEFI or SMM code can be caught.<BR><BR>
+  #    BIT0    - Enable NULL pointer detection for UEFI.<BR>
+  #    BIT1    - Enable NULL pointer detection for SMM.<BR>
+  #    BIT2..5 - Reserved for future uses.<BR>
+  #    BIT6    - Enable non-stop mode.<BR>
+  #    BIT7    - Disable NULL pointer detection just after EndOfDxe. <BR>
+  #              This is a workaround for those unsolvable NULL access issues in
+  #              OptionROM, boot loader, etc. It can also help to avoid unnecessary
+  #              exception caused by legacy memory (0-4095) access after EndOfDxe,
+  #              such as Windows 7 boot on Qemu.<BR>
+  # @Prompt Enable NULL address detection.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdNullPointerDetectionPropertyMask|0x0|UINT8|0x30001050
+
+  ## Init Value in Temp Stack to be shared between SEC and PEI_CORE
+  # SEC fills the full temp stack with this values. When switch stack, PeiCore can check
+  # this value in the temp stack to know how many stack has been used.
+  # @Prompt Init Value in Temp Stack
+  gEfiMdeModulePkgTokenSpaceGuid.PcdInitValueInTempStack|0x5AA55AA5|UINT32|0x30001051
+
+  ## Indicates which type allocation need guard page.
+  #
+  # If a bit is set, a head guard page and a tail guard page will be added just
+  # before and after corresponding type of pages allocated if there's enough
+  # free pages for all of them. The page allocation for the type related to
+  # cleared bits keeps the same as ususal.
+  #
+  # This PCD is only valid if BIT0 and/or BIT2 are set in PcdHeapGuardPropertyMask.
+  #
+  # Below is bit mask for this PCD: (Order is same as UEFI spec)<BR>
+  #  EfiReservedMemoryType             0x0000000000000001<BR>
+  #  EfiLoaderCode                     0x0000000000000002<BR>
+  #  EfiLoaderData                     0x0000000000000004<BR>
+  #  EfiBootServicesCode               0x0000000000000008<BR>
+  #  EfiBootServicesData               0x0000000000000010<BR>
+  #  EfiRuntimeServicesCode            0x0000000000000020<BR>
+  #  EfiRuntimeServicesData            0x0000000000000040<BR>
+  #  EfiConventionalMemory             0x0000000000000080<BR>
+  #  EfiUnusableMemory                 0x0000000000000100<BR>
+  #  EfiACPIReclaimMemory              0x0000000000000200<BR>
+  #  EfiACPIMemoryNVS                  0x0000000000000400<BR>
+  #  EfiMemoryMappedIO                 0x0000000000000800<BR>
+  #  EfiMemoryMappedIOPortSpace        0x0000000000001000<BR>
+  #  EfiPalCode                        0x0000000000002000<BR>
+  #  EfiPersistentMemory               0x0000000000004000<BR>
+  #  OEM Reserved                      0x4000000000000000<BR>
+  #  OS Reserved                       0x8000000000000000<BR>
+  # e.g. LoaderCode+LoaderData+BootServicesCode+BootServicesData are needed, 0x1E should be used.<BR>
+  # @Prompt The memory type mask for Page Guard.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHeapGuardPageType|0x0|UINT64|0x30001052
+
+  ## Indicates which type allocation need guard page.
+  #
+  # If a bit is set, a head guard page and a tail guard page will be added just
+  # before and after corresponding type of pages which the allocated pool occupies,
+  # if there's enough free memory for all of them. The pool allocation for the
+  # type related to cleared bits keeps the same as ususal.
+  #
+  # This PCD is only valid if BIT1 and/or BIT3 are set in PcdHeapGuardPropertyMask.
+  #
+  # Below is bit mask for this PCD: (Order is same as UEFI spec)<BR>
+  #  EfiReservedMemoryType             0x0000000000000001<BR>
+  #  EfiLoaderCode                     0x0000000000000002<BR>
+  #  EfiLoaderData                     0x0000000000000004<BR>
+  #  EfiBootServicesCode               0x0000000000000008<BR>
+  #  EfiBootServicesData               0x0000000000000010<BR>
+  #  EfiRuntimeServicesCode            0x0000000000000020<BR>
+  #  EfiRuntimeServicesData            0x0000000000000040<BR>
+  #  EfiConventionalMemory             0x0000000000000080<BR>
+  #  EfiUnusableMemory                 0x0000000000000100<BR>
+  #  EfiACPIReclaimMemory              0x0000000000000200<BR>
+  #  EfiACPIMemoryNVS                  0x0000000000000400<BR>
+  #  EfiMemoryMappedIO                 0x0000000000000800<BR>
+  #  EfiMemoryMappedIOPortSpace        0x0000000000001000<BR>
+  #  EfiPalCode                        0x0000000000002000<BR>
+  #  EfiPersistentMemory               0x0000000000004000<BR>
+  #  OEM Reserved                      0x4000000000000000<BR>
+  #  OS Reserved                       0x8000000000000000<BR>
+  # e.g. LoaderCode+LoaderData+BootServicesCode+BootServicesData are needed, 0x1E should be used.<BR>
+  # @Prompt The memory type mask for Pool Guard.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHeapGuardPoolType|0x0|UINT64|0x30001053
+
+  ## This mask is to control Heap Guard behavior.
+  #
+  # Note:
+  #   a) Heap Guard is for debug purpose and should not be enabled in product
+  #      BIOS.
+  #   b) Due to the limit of pool memory implementation and the alignment
+  #      requirement of UEFI spec, BIT7 is a try-best setting which cannot
+  #      guarantee that the returned pool is exactly adjacent to head guard
+  #      page or tail guard page.
+  #   c) UEFI freed-memory guard and UEFI pool/page guard cannot be enabled
+  #      at the same time.
+  #
+  #   BIT0 - Enable UEFI page guard.<BR>
+  #   BIT1 - Enable UEFI pool guard.<BR>
+  #   BIT2 - Enable SMM page guard.<BR>
+  #   BIT3 - Enable SMM pool guard.<BR>
+  #   BIT4 - Enable UEFI freed-memory guard (Use-After-Free memory detection).<BR>
+  #   BIT6 - Enable non-stop mode.<BR>
+  #   BIT7 - The direction of Guard Page for Pool Guard.
+  #          0 - The returned pool is near the tail guard page.<BR>
+  #          1 - The returned pool is near the head guard page.<BR>
+  # @Prompt The Heap Guard feature mask
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHeapGuardPropertyMask|0x0|UINT8|0x30001054
+
+  ## Indicates if UEFI Stack Guard will be enabled.
+  #  If enabled, stack overflow in UEFI can be caught, preventing chaotic consequences.<BR><BR>
+  #   TRUE  - UEFI Stack Guard will be enabled.<BR>
+  #   FALSE - UEFI Stack Guard will be disabled.<BR>
+  # @Prompt Enable UEFI Stack Guard.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard|FALSE|BOOLEAN|0x30001055
+
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   ## Dynamic type PCD can be registered callback function for Pcd setting action.
   #  PcdMaxPeiPcdCallBackNumberPerPcdEntry indicates the maximum number of callback function
@@ -863,22 +1047,9 @@
   # @Prompt VPD base address.
   gEfiMdeModulePkgTokenSpaceGuid.PcdVpdBaseAddress|0x0|UINT32|0x00010010
 
-  ## Maximum number of FV is supported by PeiCore's dispatching.
-  # @Prompt Maximum number of FV supported by PeiCore.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxFvSupported|6|UINT32|0x00010030
-
-  ## Maximum File count in every FV is supported by PeiCore's dispatching.
-  #  PeiCore supported File type includes PEIM, Combined PEIM and FV.
-  # @Prompt Maximum File count per FV supported by PeiCore.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPeimPerFv|32|UINT32|0x00010031
-
   ## Maximum stack size for PeiCore.
   # @Prompt Maximum stack size for PeiCore.
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPeiStackSize|0x20000|UINT32|0x00010032
-
-  ## Maximum PPI count is supported by PeiCore's PPI database.
-  # @Prompt Maximum PPI count supported by PeiCore.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPpiSupported|64|UINT32|0x00010033
 
   ## The maximum size of a single non-HwErr type variable.
   # @Prompt Maximum variable size.
@@ -888,6 +1059,14 @@
   # The value is 0 as default for compatibility that maximum authenticated variable size is specified by PcdMaxVariableSize.
   # @Prompt Maximum authenticated variable size.
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxAuthVariableSize|0x00|UINT32|0x30000009
+
+  ## The maximum size of a single non-authenticated volatile variable.
+  # The default value is 0 for compatibility: in that case, the maximum
+  # non-authenticated volatile variable size remains specified by
+  # PcdMaxVariableSize. Only the MdeModulePkg/Universal/Variable/RuntimeDxe
+  # driver supports this PCD.
+  # @Prompt Maximum non-authenticated volatile variable size.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVolatileVariableSize|0x00|UINT32|0x3000000a
 
   ## The maximum size of single hardware error record variable.<BR><BR>
   # In IA32/X64 platforms, this value should be larger than 1KB.<BR>
@@ -958,15 +1137,18 @@
   # @Prompt Maximum number of PEI performance log entries.
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxPeiPerformanceLogEntries16|0|UINT16|0x00010035
 
-  ## RTC Update Timeout Value(microsecond).
-  # @Prompt RTC Update Timeout Value.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdRealTimeClockUpdateTimeout|100000|UINT32|0x00010034
-
   ## Indicates the 16550 serial port registers are in MMIO space, or in I/O space. Default is I/O space.<BR><BR>
   #   TRUE  - 16550 serial port registers are in MMIO space.<BR>
   #   FALSE - 16550 serial port registers are in I/O space.<BR>
   # @Prompt Serial port registers use MMIO.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialUseMmio|FALSE|BOOLEAN|0x00020000
+
+  ## Indicates the access width for 16550 serial port registers.
+  # Default is 8-bit access mode.<BR><BR>
+  #    8  - 16550 serial port registers are accessed in 8-bit width.<BR>
+  #   32 - 16550 serial port registers are accessed in 32-bit width.<BR>
+  # @Prompt Serial port register access width.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterAccessWidth|8|UINT8|0x00020007
 
   ## Indicates if the 16550 serial port hardware flow control will be enabled. Default is FALSE.<BR><BR>
   #   TRUE  - 16550 serial port hardware flow control will be enabled.<BR>
@@ -1013,12 +1195,6 @@
   # @Prompt Serial port FIFO Control settings.
   # @Expression 0x80000002 | (gEfiMdeModulePkgTokenSpaceGuid.PcdSerialFifoControl & 0xD8) == 0
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialFifoControl|0x07|UINT8|0x00020005
-
-  ## This setting can override the default TFTP block size. A value of 0 computes
-  # the default from MTU information. A non-zero value will be used as block size
-  # in bytes.
-  # @Prompt TFTP block size.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdTftpBlockSize|0x0|UINT64|0x30001026
 
   ## Maximum address that the DXE Core will allocate the EFI_SYSTEM_TABLE_POINTER
   #  structure. The default value for this PCD is 0, which means that the DXE Core
@@ -1102,17 +1278,23 @@
   ## Set image protection policy. The policy is bitwise.
   #  If a bit is set, the image will be protected by DxeCore if it is aligned.
   #   The code section becomes read-only, and the data section becomes non-executable.
-  #  If a bit is clear, the image will not be protected.<BR><BR>
+  #  If a bit is clear, nothing will be done to image code/data sections.<BR><BR>
   #    BIT0       - Image from unknown device. <BR>
   #    BIT1       - Image from firmware volume.<BR>
+  #  <BR>
+  #  Note: If a bit is cleared, the data section could be still non-executable if
+  #  PcdDxeNxMemoryProtectionPolicy is enabled for EfiLoaderData, EfiBootServicesData
+  #  and/or EfiRuntimeServicesData.<BR>
+  #  <BR>
   # @Prompt Set image protection policy.
   # @ValidRange 0x80000002 | 0x00000000 - 0x0000001F
   gEfiMdeModulePkgTokenSpaceGuid.PcdImageProtectionPolicy|0x00000002|UINT32|0x00001047
 
   ## Set DXE memory protection policy. The policy is bitwise.
   #  If a bit is set, memory regions of the associated type will be mapped
-  #  non-executable.<BR><BR>
-  #
+  #  non-executable.<BR>
+  #  If a bit is cleared, nothing will be done to associated type of memory.<BR>
+  #  <BR>
   # Below is bit mask for this PCD: (Order is same as UEFI spec)<BR>
   #  EfiReservedMemoryType          0x0001<BR>
   #  EfiLoaderCode                  0x0002<BR>
@@ -1285,6 +1467,32 @@
   # @Prompt CapsuleMax value in capsule report variable.
   gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleMax|0xFFFF|UINT16|0x00000107
 
+  ## Control which FPDT record format will be used to store the performance entry.
+  # On TRUE, the string FPDT record will be used to store every performance entry.
+  # On FALSE, the different FPDT record will be used to store the different performance entries.
+  # @Prompt String FPDT Record Enable Only
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEdkiiFpdtStringRecordEnableOnly|FALSE|BOOLEAN|0x00000109
+
+  ## Indicates the allowable maximum number of Reset Filters, Reset Notifications or Reset Handlers in PEI phase.
+  # @Prompt Maximum Number of PEI Reset Filters, Reset Notifications or Reset Handlers.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaximumPeiResetNotifies|0x10|UINT32|0x0000010A
+
+  ## Capsule On Disk is to deliver capsules via files on Mass Storage device.<BR><BR>
+  #  This PCD indicates if the Capsule On Disk is supported.<BR>
+  #   TRUE  - Capsule On Disk is supported.<BR>
+  #   FALSE - Capsule On Disk is not supported.<BR>
+  #  If platform does not use this feature, this PCD should be set to FALSE.<BR><BR>
+  #  Two sulotions to deliver Capsule On Disk:<BR>
+  #    a) If PcdCapsuleInRamSupport = TRUE, Load Capsule On Disk image out of TCB, and reuse
+  #       Capsule In Ram to deliver capsule.<BR>
+  #    b) If PcdCapsuleInRamSupport = FALSE, Relocate Capsule On Disk image to RootDir out
+  #       of TCB, and reuse FatPei to load capsules from external storage.<BR>
+  #  Note:<BR>
+  #    If Both Capsule In Ram and Capsule On Disk are provisioned at the same time, the Capsule
+  #  On Disk will be bypassed.
+  # @Prompt Enable Capsule On Disk support.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleOnDiskSupport|FALSE|BOOLEAN|0x0000002d
+
 [PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## This PCD defines the Console output row. The default value is 25 according to UEFI spec.
   #  This PCD could be set to 0 then console output would be at max column and max row.
@@ -1328,6 +1536,9 @@
   ## Specify the console output row of text setup.
   # @Prompt Console Output Row of Text Setup
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetupConOutRow|25|UINT32|0x4000000e
+
+[PcdsFixedAtBuild.AARCH64, PcdsPatchableInModule.AARCH64]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiExposedTableVersions|0x20|UINT32|0x0001004c
 
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## UART clock frequency is for the baud rate configuration.
@@ -1385,9 +1596,17 @@
   # @Prompt 64-bit Base address of flash FTW working block range.
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase64|0x0|UINT64|0x80000010
 
-  ## This PCD defines a reserved memory range for the EMU Variable driver's NV Variable Store.
-  #  The range is valid if non-zero. The memory range size must be PcdVariableStoreSize.
-  # @Prompt Reserved memory range for EMU variable NV storage.
+  ## Indicates if Variable driver will enable emulated variable NV mode.<BR><BR>
+  #  If this PCD is configured to dynamic, its value should be set before Variable driver starts to work,<BR>
+  #  otherwise default value will take effect.<BR>
+  #   TRUE  - An EMU variable NV storage will be allocated or reserved for NV variables.<BR>
+  #   FALSE - No EMU variable NV storage will be allocated or reserved for NV variables.<BR>
+  # @Prompt EMU variable NV mode enable.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable|FALSE|BOOLEAN|0x01100001
+
+  ## This PCD defines the base address of reserved memory range for EMU variable NV storage.
+  #  A non-ZERO value indicates a valid range reserved with size given by PcdVariableStoreSize.
+  # @Prompt Base of reserved memory range for EMU variable NV storage.
   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved|0|UINT64|0x40000008
 
   ## This PCD defines the times to print hello world string.
@@ -1438,6 +1657,12 @@
   #   FALSE - Does not reset system when memory type information changes.<BR>
   # @Prompt Reset on memory type information change.
   gEfiMdeModulePkgTokenSpaceGuid.PcdResetOnMemoryTypeInformationChange|TRUE|BOOLEAN|0x00010056
+
+  ## Indicates if the BDS supports Platform Recovery.<BR><BR>
+  #   TRUE  - BDS supports Platform Recovery.<BR>
+  #   FALSE - BDS does not support Platform Recovery.<BR>
+  # @Prompt Support Platform Recovery.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPlatformRecoverySupport|TRUE|BOOLEAN|0x00010078
 
   ## Specify the foreground color for Subtile text in HII Form Browser. The default value is EFI_BLUE.
   #  Only following values defined in UEFI specification are valid:<BR><BR>
@@ -1569,11 +1794,11 @@
 
   ## SMBIOS version.
   # @Prompt SMBIOS version.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosVersion|0x0301|UINT16|0x00010055
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosVersion|0x0303|UINT16|0x00010055
 
   ## SMBIOS Docrev field in SMBIOS 3.0 (64-bit) Entry Point Structure.
   # @Prompt SMBIOS Docrev field in SMBIOS 3.0 (64-bit) Entry Point Structure.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosDocRev|0x1|UINT8|0x0001006A
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosDocRev|0x0|UINT8|0x0001006A
 
   ## SMBIOS produce method.
   #  BIT0 set indicates 32-bit entry point and table are produced.<BR>
@@ -1584,7 +1809,7 @@
   ## This PCD specifies the additional pad size in FPDT Basic Boot Performance Table for
   #  the extension FPDT boot records received after ReadyToBoot and before ExitBootService.
   # @Prompt Pad size for extension FPDT boot records.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdExtFpdtBootRecordPadSize|0x0|UINT32|0x0001005F
+  gEfiMdeModulePkgTokenSpaceGuid.PcdExtFpdtBootRecordPadSize|0x20000|UINT32|0x0001005F
 
   ## Indicates if ConIn device are connected on demand.<BR><BR>
   #   TRUE  - ConIn device are not connected during BDS and ReadKeyStroke/ReadKeyStrokeEx produced
@@ -1632,30 +1857,6 @@
   # @Prompt Flag to request system reboot after processing capsule.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSystemRebootAfterCapsuleProcessFlag|0x0001|UINT16|0x0000006d
 
-  ## Publish PropertiesTable or not.
-  #
-  # If this PCD is TRUE, DxeCore publishs PropertiesTable.
-  # DxeCore evaluates if all runtime drivers has 4K aligned PE sections. If all
-  # PE sections in runtime drivers are 4K aligned, DxeCore sets BIT0 in
-  # PropertiesTable. Or DxeCore clears BIT0 in PropertiesTable.
-  # If this PCD is FALSE, DxeCore does not publish PropertiesTable.
-  #
-  # If PropertiesTable has BIT0 set, DxeCore uses below policy in UEFI memory map:
-  #   1) Use EfiRuntimeServicesCode for runtime driver PE image code section and
-  #      use EfiRuntimeServicesData for runtime driver PE image header and other section.
-  #   2) Set EfiRuntimeServicesCode to be EFI_MEMORY_RO.
-  #   3) Set EfiRuntimeServicesData to be EFI_MEMORY_XP.
-  #   4) Set EfiMemoryMappedIO and EfiMemoryMappedIOPortSpace to be EFI_MEMORY_XP.
-  #
-  # NOTE: Platform need gurantee this PCD is set correctly. Platform should set
-  # this PCD to be TURE if and only if all runtime driver has seperated Code/Data
-  # section. If PE code/data sections are merged, the result is unpredictable.
-  #
-  # UEFI 2.6 specification does not recommend to use this BIT0 attribute.
-  #
-  # @Prompt Publish UEFI PropertiesTable.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPropertiesTableEnable|FALSE|BOOLEAN|0x0000006e
-
   ## Default OEM ID for ACPI table creation, its length must be 0x6 bytes to follow ACPI specification.
   # @Prompt Default OEM ID for ACPI table creation.
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemId|"INTEL "|VOID*|0x30001034
@@ -1694,8 +1895,13 @@
   #  For the DxeIpl and the DxeCore are both X64, set NX for stack feature also require PcdDxeIplBuildPageTables be TRUE.<BR>
   #  For the DxeIpl and the DxeCore are both IA32 (PcdDxeIplSwitchToLongMode is FALSE), set NX for stack feature also require
   #  IA32 PAE is supported and Execute Disable Bit is available.<BR>
-  #   TRUE  - to set NX for stack.<BR>
-  #   FALSE - Not to set NX for stack.<BR>
+  #  <BR>
+  #   TRUE  - Set NX for stack.<BR>
+  #   FALSE - Do nothing for stack.<BR>
+  #  <BR>
+  #  Note: If this PCD is set to FALSE, NX could be still applied to stack due to PcdDxeNxMemoryProtectionPolicy enabled for
+  #  EfiBootServicesData.<BR>
+  #  <BR>
   # @Prompt Set NX for stack.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack|FALSE|BOOLEAN|0x0001006f
 
@@ -1712,7 +1918,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable|TRUE|BOOLEAN|0x01100000
 
   ## Specify memory size for boot script executor stack usage in S3 phase.
-  #  The default size 32K. When changing the value make sure the memory size is large enough 
+  #  The default size 32K. When changing the value make sure the memory size is large enough
   #  to meet boot script executor requirement in the S3 phase.
   # @Prompt Reserved S3 Boot Script Stack ACPI Memory Size
   gEfiMdeModulePkgTokenSpaceGuid.PcdS3BootScriptStackSize|0x8000|UINT32|0x02000000
@@ -1731,6 +1937,17 @@
   # @Prompt Recover file name in PEI phase
   gEfiMdeModulePkgTokenSpaceGuid.PcdRecoveryFileName|L"FVMAIN.FV"|VOID*|0x30001045
 
+  ## This is Capsule Temp Relocation file name in PEI phase.
+  #  The file must be in the root directory.
+  #  The file name must be the 8.3 format.
+  #  The PCD data must be in UNICODE format.
+  #  CapsuleOnDiskLoadPei PEI module will set value of this PCD to PcdRecoveryFileName, then
+  #  leverage recovery to get Capsule On Disk Temp Relocation file.
+  #  Note: The file name must be shorter than PcdRecoveryFileName, otherwise CapsuleOnDiskLoadPei
+  #  PEI module will fail to get Capsule On Disk Temp Relocation file.
+  # @Prompt Capsule On Disk Temp Relocation file name in PEI phase
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCoDRelocationFileName|L"Cod.tmp"|VOID*|0x30001048
+
   ## This PCD hold a list GUIDs for the ImageTypeId to indicate the
   #  FMP capsule is a system FMP.
   # @Prompt A list of system FMP ImageTypeId GUIDs
@@ -1741,6 +1958,48 @@
   #  This mask should be applied when creating 1:1 virtual to physical mapping tables.
   # @Prompt The address mask when memory encryption is enabled.
   gEfiMdeModulePkgTokenSpaceGuid.PcdPteMemoryEncryptionAddressOrMask|0x0|UINT64|0x30001047
+
+  ## Indicates if 5-Level Paging will be enabled in long mode. 5-Level Paging will not be enabled
+  #  when the PCD is TRUE but CPU doesn't support 5-Level Paging.
+  #   TRUE  - 5-Level Paging will be enabled.<BR>
+  #   FALSE - 5-Level Paging will not be enabled.<BR>
+  # @Prompt Enable 5-Level Paging support in long mode.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUse5LevelPageTable|FALSE|BOOLEAN|0x0001105F
+
+  ## Capsule In Ram is to use memory to deliver the capsules that will be processed after system
+  #  reset.<BR><BR>
+  #  This PCD indicates if the Capsule In Ram is supported.<BR>
+  #   TRUE  - Capsule In Ram is supported.<BR>
+  #   FALSE - Capsule In Ram is not supported.
+  # @Prompt Enable Capsule In Ram support.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleInRamSupport|TRUE|BOOLEAN|0x0000002e
+
+  ## Full device path of plaform specific device to store Capsule On Disk temp relocation file.<BR>
+  #  If this PCD is set, Capsule On Disk temp relocation file will be stored in the device specified
+  #  by this PCD, instead of the EFI System Partition that stores capsule image file.
+  # @Prompt Capsule On Disk relocation device path.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCodRelocationDevPath|{0xFF}|VOID*|0x0000002f
+
+  ## Indicates which TCG Platform Firmware Profile revision the EDKII firmware follows.
+  #  The revision number is defined in MdePkg/Include/IndustryStandard/UefiTcgPlatform.h
+  #  0:   This is for compatiblity support.
+  #  105: This is the first revision to support 800-155 is related event, such as
+  #       EV_EFI_PLATFORM_FIRMWARE_BLOB2 and EV_EFI_HANDOFF_TABLES2.
+  # @Prompt TCG Platform Firmware Profile revision.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTcgPfpMeasurementRevision|0|UINT32|0x00010077
+
+  ## Indicates if StatusCode is reported via Serial port.<BR><BR>
+  #   TRUE  - Reports StatusCode via Serial port.<BR>
+  #   FALSE - Does not report StatusCode via Serial port.<BR>
+  # @Prompt Enable StatusCode via Serial port.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial|TRUE|BOOLEAN|0x00010022
+
+  ## Indicates if StatusCode is stored in memory.
+  #  The memory is boot time memory in PEI Phase and is runtime memory in DXE Phase.<BR><BR>
+  #   TRUE  - Stores StatusCode in memory.<BR>
+  #   FALSE - Does not store StatusCode in memory.<BR>
+  # @Prompt Enable StatusCode via memory.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory|FALSE|BOOLEAN|0x00010023
 
 [PcdsPatchableInModule]
   ## Specify memory size with page number for PEI code when
@@ -1788,15 +2047,28 @@
   # @ValidList  0x80000001 | 0x0
   gEfiMdeModulePkgTokenSpaceGuid.PcdS3BootScriptTablePrivateSmmDataPtr|0x0|UINT64|0x00030001
 
-  ## This dynamic PCD hold an address to point to the memory of page table. The page table establishes a 1:1
-  #  Virtual to Physical mapping according to the processor physical address bits.
-  # @Prompt Identify Mapping Page Table pointer.
-  # @ValidList  0x80000001 | 0x0
-  gEfiMdeModulePkgTokenSpaceGuid.PcdIdentifyMappingPageTablePtr|0x0|UINT64|0x00030002
-
   ## This dynamic PCD holds the information if there is any test key used by the platform.
   # @Prompt If there is any test key used by the platform.
   gEfiMdeModulePkgTokenSpaceGuid.PcdTestKeyUsed|FALSE|BOOLEAN|0x00030003
+
+[PcdsDynamicEx]
+  ## This dynamic PCD enables the default variable setting.
+  #  Its value is the default store ID value. The default value is zero as Standard default.
+  #  When its value is set in PEI, it will trig the default setting to be applied as the default EFI variable.
+  # @Prompt NV Storage DefaultId
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetNvStoreDefaultId|0x0|UINT16|0x00030004
+
+  ## This dynamic PCD holds the DynamicHii PCD value. Its value is the auto generated.
+  # @Prompt NV Storage Default Value Buffer
+  gEfiMdeModulePkgTokenSpaceGuid.PcdNvStoreDefaultValueBuffer|{0x0}|VOID*|0x00030005
+
+  ## VPD type PCD allows a developer to point to an absolute physical address PcdVpdBaseAddress64
+  #  to store PCD value. It will be DynamicExDefault only.
+  #  It is used to set VPD region base address. So, it can't be DynamicExVpd PCD. Its value is
+  #  required to be accessed in PcdDxe driver entry point. So, its value must be set in PEI phase.
+  #  It can't depend on EFI variable service, and can't be DynamicExHii PCD.
+  # @Prompt 64bit VPD base address.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVpdBaseAddress64|0x0|UINT64|0x00030006
 
 [UserExtensions.TianoCore."ExtraFiles"]
   MdeModulePkgExtra.uni

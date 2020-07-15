@@ -5,14 +5,8 @@
   if a driver can be scheduled for execution.  The criteria for
   schedulability is that the dependency expression is satisfied.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials are licensed and made available 
-  under the terms and conditions of the BSD License which accompanies this 
-  distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -194,11 +188,11 @@ SmmIsSchedulable (
   }
 
   DEBUG ((DEBUG_DISPATCH, "Evaluate SMM DEPEX for FFS(%g)\n", &DriverEntry->FileName));
-  
+
   if (DriverEntry->Depex == NULL) {
     //
-    // A NULL Depex means that the SMM driver is not built correctly.  
-    // All SMM drivers must have a valid depex expressiion.
+    // A NULL Depex means that the SMM driver is not built correctly.
+    // All SMM drivers must have a valid depex expression.
     //
     DEBUG ((DEBUG_DISPATCH, "  RESULT = FALSE (Depex is empty)\n"));
     ASSERT (FALSE);
@@ -377,7 +371,7 @@ SmmIsSchedulable (
     // The math is done out of order, but it should not matter. That is
     // we may add in the sizeof (EFI_GUID) before we account for the OP Code.
     // This is not an issue, since we just need the correct end result. You
-    // need to be careful using Iterator in the loop as it's intermediate value
+    // need to be careful using Iterator in the loop as its intermediate value
     // may be strange.
     //
     Iterator++;

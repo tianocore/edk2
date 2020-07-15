@@ -1,0 +1,15 @@
+// /** @file
+// Provides platform policy services used during a capsule update that uses the
+// services of the EDKII_CAPSULE_UPDATE_POLICY_PROTOCOL.  If the
+// EDKII_CAPSULE_UPDATE_POLICY_PROTOCOL is not available, then assume the
+// platform is in a state that supports a firmware update.
+//
+// Copyright (c) 2018-2019, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+#string STR_MODULE_ABSTRACT     #language en-US  "Provides platform policy services used during a capsule update that uses the services of the EDKII_CAPSULE_UPDATE_POLICY_PROTOCOL."
+
+#string STR_MODULE_DESCRIPTION  #language en-US  "Provides platform policy services used during a capsule update that uses the services of the EDKII_CAPSULE_UPDATE_POLICY_PROTOCOL."

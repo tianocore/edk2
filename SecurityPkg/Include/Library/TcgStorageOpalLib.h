@@ -1,14 +1,28 @@
 /** @file
   Public API for Opal Core library.
 
-Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+  (TCG Storage Architecture Core Specification, Version 2.01, Revision 1.00,
+  https://trustedcomputinggroup.org/tcg-storage-architecture-core-specification/
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Storage Work Group Storage Security Subsystem Class: Pyrite, Specification Version 2.00, Revision 1.00,
+  https://trustedcomputinggroup.org/resource/tcg-storage-security-subsystem-class-pyrite/
+
+  Storage Work Group Storage Security Subsystem Class: Opal, Version 2.01 Final, Revision 1.00,
+  https://trustedcomputinggroup.org/storage-work-group-storage-security-subsystem-class-opal/
+
+  TCG Storage Security Subsystem Class: Opalite Version 1.00 Revision 1.00,
+  https://trustedcomputinggroup.org/tcg-storage-security-subsystem-class-opalite/
+
+  TCG Storage Feature Set: Block SID Authentication, Version 1.00 Final, Revision 1.00,
+  https://trustedcomputinggroup.org/tcg-storage-feature-set-block-sid-authentication-specification/
+
+  TCG Storage Opal SSC Feature Set: PSID Version 1.00, Revision 1.00,
+  https://trustedcomputinggroup.org/tcg-storage-opal-feature-set-psid/)
+
+  Check http://trustedcomputinggroup.org for latest specification updates.
+
+Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -82,6 +96,15 @@ typedef struct {
     //
     UINT32 BlockSid : 1;
 
+    //
+    // Pyrite SSC V2 support  (0 - not supported, 1 - supported)
+    //
+    UINT32 PyriteSscV2 : 1;
+
+    //
+    // Supported Data Removal Mechanism support  (0 - not supported, 1 - supported)
+    //
+    UINT32 DataRemoval : 1;
 } OPAL_DISK_SUPPORT_ATTRIBUTE;
 
 //
@@ -832,6 +855,38 @@ EFIAPI
 OpalUtilAdminPasswordExists(
   IN  UINT16                           OwnerShip,
   IN  TCG_LOCKING_FEATURE_DESCRIPTOR   *LockingFeature
+  );
+
+/**
+  Get Active Data Removal Mechanism Value.
+
+  @param[in]      Session,                       The session info for one opal device.
+  @param[in]      GeneratedSid                   Generated SID of disk
+  @param[in]      SidLength                      Length of generatedSid in bytes
+  @param[out]     ActiveDataRemovalMechanism     Return the active data removal mechanism.
+
+**/
+TCG_RESULT
+EFIAPI
+OpalUtilGetActiveDataRemovalMechanism (
+  OPAL_SESSION      *Session,
+  const VOID        *GeneratedSid,
+  UINT32            SidLength,
+  UINT8             *ActiveDataRemovalMechanism
+  );
+
+/**
+  Get the supported Data Removal Mechanism list.
+
+  @param[in]      Session,                       The session info for one opal device.
+  @param[out]     RemovalMechanismLists          Return the supported data removal mechanism lists.
+
+**/
+TCG_RESULT
+EFIAPI
+OpalUtilGetDataRemovalMechanismLists (
+  IN  OPAL_SESSION      *Session,
+  OUT UINT32            *RemovalMechanismLists
   );
 
 #endif // _OPAL_CORE_H_

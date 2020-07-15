@@ -4,22 +4,50 @@
 
   Copyright (C) 2015, Red Hat, Inc.
 
-  This program and the accompanying materials are licensed and made available
-  under the terms and conditions of the BSD License which accompanies this
-  distribution. The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT
-  WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include <Guid/AcpiS3Context.h>
 #include <IndustryStandard/Q35MchIch9.h>
 #include <Library/DebugLib.h>
+#include <Library/PcdLib.h>
 #include <Library/PciLib.h>
 
 #include "SmramInternal.h"
+
+//
+// The value of PcdQ35TsegMbytes is saved into this variable at module startup.
+//
+UINT16 mQ35TsegMbytes;
+
+//
+// The value of PcdQ35SmramAtDefaultSmbase is saved into this variable at
+// module startup.
+//
+STATIC BOOLEAN mQ35SmramAtDefaultSmbase;
+
+/**
+  Save PcdQ35TsegMbytes into mQ35TsegMbytes.
+**/
+VOID
+InitQ35TsegMbytes (
+  VOID
+  )
+{
+  mQ35TsegMbytes = PcdGet16 (PcdQ35TsegMbytes);
+}
+
+/**
+  Save PcdQ35SmramAtDefaultSmbase into mQ35SmramAtDefaultSmbase.
+**/
+VOID
+InitQ35SmramAtDefaultSmbase (
+  VOID
+  )
+{
+  mQ35SmramAtDefaultSmbase = PcdGetBool (PcdQ35SmramAtDefaultSmbase);
+}
 
 /**
   Read the MCH_SMRAM and ESMRAMC registers, and update the LockState and
@@ -114,6 +142,14 @@ SmramAccessLock (
   PciOr8 (DRAMC_REGISTER_Q35 (MCH_ESMRAMC), MCH_ESMRAMC_T_EN);
   PciOr8 (DRAMC_REGISTER_Q35 (MCH_SMRAM),   MCH_SMRAM_D_LCK);
 
+  //
+  // Close & lock the SMRAM at the default SMBASE, if it exists.
+  //
+  if (mQ35SmramAtDefaultSmbase) {
+    PciWrite8 (DRAMC_REGISTER_Q35 (MCH_DEFAULT_SMBASE_CTL),
+      MCH_DEFAULT_SMBASE_LCK);
+  }
+
   GetStates (LockState, OpenState);
   if (*OpenState || !*LockState) {
     return EFI_DEVICE_ERROR;
@@ -181,7 +217,9 @@ SmramAccessGetCapabilities (
   SmramMap[DescIdxMain].PhysicalSize =
     (TsegSizeBits == MCH_ESMRAMC_TSEG_8MB ? SIZE_8MB :
      TsegSizeBits == MCH_ESMRAMC_TSEG_2MB ? SIZE_2MB :
-     SIZE_1MB) - SmramMap[DescIdxSmmS3ResumeState].PhysicalSize;
+     TsegSizeBits == MCH_ESMRAMC_TSEG_1MB ? SIZE_1MB :
+     mQ35TsegMbytes * SIZE_1MB) -
+    SmramMap[DescIdxSmmS3ResumeState].PhysicalSize;
   SmramMap[DescIdxMain].RegionState = CommonRegionState;
 
   return EFI_SUCCESS;

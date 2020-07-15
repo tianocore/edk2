@@ -3,14 +3,9 @@
   VirtIo GPU initialization, and commands (primitives) for the GPU device.
 
   Copyright (C) 2016, Red Hat, Inc.
+  Copyright (c) 2017, AMD Inc, All rights reserved.<BR>
 
-  This program and the accompanying materials are licensed and made available
-  under the terms and conditions of the BSD License which accompanies this
-  distribution. The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT
-  WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -43,6 +38,7 @@ VirtioGpuInit (
   EFI_STATUS Status;
   UINT64     Features;
   UINT16     QueueSize;
+  UINT64     RingBaseShift;
 
   //
   // Execute virtio-v1.0-cs04, 3.1.1 Driver Requirements: Device
@@ -88,7 +84,7 @@ VirtioGpuInit (
   //
   // We only want the most basic 2D features.
   //
-  Features &= VIRTIO_F_VERSION_1;
+  Features &= VIRTIO_F_VERSION_1 | VIRTIO_F_IOMMU_PLATFORM;
 
   //
   // ... and write the subset of feature bits understood by the [...] driver to
@@ -127,13 +123,32 @@ VirtioGpuInit (
   //
   // [...] population of virtqueues [...]
   //
-  Status = VirtioRingInit (QueueSize, &VgpuDev->Ring);
+  Status = VirtioRingInit (VgpuDev->VirtIo, QueueSize, &VgpuDev->Ring);
   if (EFI_ERROR (Status)) {
     goto Failed;
   }
-  Status = VgpuDev->VirtIo->SetQueueAddress (VgpuDev->VirtIo, &VgpuDev->Ring);
+  //
+  // If anything fails from here on, we have to release the ring.
+  //
+  Status = VirtioRingMap (
+             VgpuDev->VirtIo,
+             &VgpuDev->Ring,
+             &RingBaseShift,
+             &VgpuDev->RingMap
+             );
   if (EFI_ERROR (Status)) {
     goto ReleaseQueue;
+  }
+  //
+  // If anything fails from here on, we have to unmap the ring.
+  //
+  Status = VgpuDev->VirtIo->SetQueueAddress (
+                              VgpuDev->VirtIo,
+                              &VgpuDev->Ring,
+                              RingBaseShift
+                              );
+  if (EFI_ERROR (Status)) {
+    goto UnmapQueue;
   }
 
   //
@@ -142,13 +157,16 @@ VirtioGpuInit (
   NextDevStat |= VSTAT_DRIVER_OK;
   Status = VgpuDev->VirtIo->SetDeviceStatus (VgpuDev->VirtIo, NextDevStat);
   if (EFI_ERROR (Status)) {
-    goto ReleaseQueue;
+    goto UnmapQueue;
   }
 
   return EFI_SUCCESS;
 
+UnmapQueue:
+  VgpuDev->VirtIo->UnmapSharedBuffer (VgpuDev->VirtIo, VgpuDev->RingMap);
+
 ReleaseQueue:
-  VirtioRingUninit (&VgpuDev->Ring);
+  VirtioRingUninit (VgpuDev->VirtIo, &VgpuDev->Ring);
 
 Failed:
   //
@@ -183,7 +201,128 @@ VirtioGpuUninit (
   // configuration.
   //
   VgpuDev->VirtIo->SetDeviceStatus (VgpuDev->VirtIo, 0);
-  VirtioRingUninit (&VgpuDev->Ring);
+  VgpuDev->VirtIo->UnmapSharedBuffer (VgpuDev->VirtIo, VgpuDev->RingMap);
+  VirtioRingUninit (VgpuDev->VirtIo, &VgpuDev->Ring);
+}
+
+/**
+  Allocate, zero and map memory, for bus master common buffer operation, to be
+  attached as backing store to a host-side VirtIo GPU resource.
+
+  @param[in]  VgpuDev        The VGPU_DEV object that represents the VirtIo GPU
+                             device.
+
+  @param[in]  NumberOfPages  The number of whole pages to allocate and map.
+
+  @param[out] HostAddress    The system memory address of the allocated area.
+
+  @param[out] DeviceAddress  The bus master device address of the allocated
+                             area. The VirtIo GPU device may be programmed to
+                             access the allocated area through DeviceAddress;
+                             DeviceAddress is to be passed to the
+                             VirtioGpuResourceAttachBacking() function, as the
+                             BackingStoreDeviceAddress parameter.
+
+  @param[out] Mapping        A resulting token to pass to
+                             VirtioGpuUnmapAndFreeBackingStore().
+
+  @retval EFI_SUCCESS  The requested number of pages has been allocated, zeroed
+                       and mapped.
+
+  @return              Status codes propagated from
+                       VgpuDev->VirtIo->AllocateSharedPages() and
+                       VirtioMapAllBytesInSharedBuffer().
+**/
+EFI_STATUS
+VirtioGpuAllocateZeroAndMapBackingStore (
+  IN  VGPU_DEV             *VgpuDev,
+  IN  UINTN                NumberOfPages,
+  OUT VOID                 **HostAddress,
+  OUT EFI_PHYSICAL_ADDRESS *DeviceAddress,
+  OUT VOID                 **Mapping
+  )
+{
+  EFI_STATUS Status;
+  VOID       *NewHostAddress;
+
+  Status = VgpuDev->VirtIo->AllocateSharedPages (
+                              VgpuDev->VirtIo,
+                              NumberOfPages,
+                              &NewHostAddress
+                              );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Avoid exposing stale data to the device even temporarily: zero the area
+  // before mapping it.
+  //
+  ZeroMem (NewHostAddress, EFI_PAGES_TO_SIZE (NumberOfPages));
+
+  Status = VirtioMapAllBytesInSharedBuffer (
+             VgpuDev->VirtIo,                      // VirtIo
+             VirtioOperationBusMasterCommonBuffer, // Operation
+             NewHostAddress,                       // HostAddress
+             EFI_PAGES_TO_SIZE (NumberOfPages),    // NumberOfBytes
+             DeviceAddress,                        // DeviceAddress
+             Mapping                               // Mapping
+             );
+  if (EFI_ERROR (Status)) {
+    goto FreeSharedPages;
+  }
+
+  *HostAddress = NewHostAddress;
+  return EFI_SUCCESS;
+
+FreeSharedPages:
+  VgpuDev->VirtIo->FreeSharedPages (
+                     VgpuDev->VirtIo,
+                     NumberOfPages,
+                     NewHostAddress
+                     );
+  return Status;
+}
+
+/**
+  Unmap and free memory originally allocated and mapped with
+  VirtioGpuAllocateZeroAndMapBackingStore().
+
+  If the memory allocated and mapped with
+  VirtioGpuAllocateZeroAndMapBackingStore() was attached to a host-side VirtIo
+  GPU resource with VirtioGpuResourceAttachBacking(), then the caller is
+  responsible for detaching the backing store from the same resource, with
+  VirtioGpuResourceDetachBacking(), before calling this function.
+
+  @param[in] VgpuDev        The VGPU_DEV object that represents the VirtIo GPU
+                            device.
+
+  @param[in] NumberOfPages  The NumberOfPages parameter originally passed to
+                            VirtioGpuAllocateZeroAndMapBackingStore().
+
+  @param[in] HostAddress    The HostAddress value originally output by
+                            VirtioGpuAllocateZeroAndMapBackingStore().
+
+  @param[in] Mapping        The token that was originally output by
+                            VirtioGpuAllocateZeroAndMapBackingStore().
+**/
+VOID
+VirtioGpuUnmapAndFreeBackingStore (
+  IN VGPU_DEV *VgpuDev,
+  IN UINTN    NumberOfPages,
+  IN VOID     *HostAddress,
+  IN VOID     *Mapping
+  )
+{
+  VgpuDev->VirtIo->UnmapSharedBuffer (
+                     VgpuDev->VirtIo,
+                     Mapping
+                     );
+  VgpuDev->VirtIo->FreeSharedPages (
+                     VgpuDev->VirtIo,
+                     NumberOfPages,
+                     HostAddress
+                     );
 }
 
 /**
@@ -208,6 +347,7 @@ VirtioGpuExitBoot (
 {
   VGPU_DEV *VgpuDev;
 
+  DEBUG ((DEBUG_VERBOSE, "%a: Context=0x%p\n", __FUNCTION__, Context));
   VgpuDev = Context;
   VgpuDev->VirtIo->SetDeviceStatus (VgpuDev->VirtIo, 0);
 }
@@ -249,10 +389,11 @@ VirtioGpuExitBoot (
   @retval EFI_SUCCESS            Operation successful.
 
   @retval EFI_DEVICE_ERROR       The host rejected the request. The host error
-                                 code has been logged on the EFI_D_ERROR level.
+                                 code has been logged on the DEBUG_ERROR level.
 
   @return                        Codes for unexpected errors in VirtIo
-                                 messaging.
+                                 messaging, or request/response
+                                 mapping/unmapping.
 **/
 STATIC
 EFI_STATUS
@@ -268,6 +409,10 @@ VirtioGpuSendCommand (
   volatile VIRTIO_GPU_CONTROL_HEADER Response;
   EFI_STATUS                         Status;
   UINT32                             ResponseSize;
+  EFI_PHYSICAL_ADDRESS               RequestDeviceAddress;
+  VOID                               *RequestMap;
+  EFI_PHYSICAL_ADDRESS               ResponseDeviceAddress;
+  VOID                               *ResponseMap;
 
   //
   // Initialize Header.
@@ -287,13 +432,49 @@ VirtioGpuSendCommand (
   ASSERT (RequestSize <= MAX_UINT32);
 
   //
+  // Map request and response to bus master device addresses.
+  //
+  Status = VirtioMapAllBytesInSharedBuffer (
+             VgpuDev->VirtIo,
+             VirtioOperationBusMasterRead,
+             (VOID *)Header,
+             RequestSize,
+             &RequestDeviceAddress,
+             &RequestMap
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  Status = VirtioMapAllBytesInSharedBuffer (
+             VgpuDev->VirtIo,
+             VirtioOperationBusMasterWrite,
+             (VOID *)&Response,
+             sizeof Response,
+             &ResponseDeviceAddress,
+             &ResponseMap
+             );
+  if (EFI_ERROR (Status)) {
+    goto UnmapRequest;
+  }
+
+  //
   // Compose the descriptor chain.
   //
   VirtioPrepare (&VgpuDev->Ring, &Indices);
-  VirtioAppendDesc (&VgpuDev->Ring, (UINTN)Header, (UINT32)RequestSize,
-    VRING_DESC_F_NEXT, &Indices);
-  VirtioAppendDesc (&VgpuDev->Ring, (UINTN)&Response, sizeof Response,
-    VRING_DESC_F_WRITE, &Indices);
+  VirtioAppendDesc (
+    &VgpuDev->Ring,
+    RequestDeviceAddress,
+    (UINT32)RequestSize,
+    VRING_DESC_F_NEXT,
+    &Indices
+    );
+  VirtioAppendDesc (
+    &VgpuDev->Ring,
+    ResponseDeviceAddress,
+    (UINT32)sizeof Response,
+    VRING_DESC_F_WRITE,
+    &Indices
+    );
 
   //
   // Send the command.
@@ -301,25 +482,51 @@ VirtioGpuSendCommand (
   Status = VirtioFlush (VgpuDev->VirtIo, VIRTIO_GPU_CONTROL_QUEUE,
              &VgpuDev->Ring, &Indices, &ResponseSize);
   if (EFI_ERROR (Status)) {
+    goto UnmapResponse;
+  }
+
+  //
+  // Verify response size.
+  //
+  if (ResponseSize != sizeof Response) {
+    DEBUG ((DEBUG_ERROR, "%a: malformed response to Request=0x%x\n",
+      __FUNCTION__, (UINT32)RequestType));
+    Status = EFI_PROTOCOL_ERROR;
+    goto UnmapResponse;
+  }
+
+  //
+  // Unmap response and request, in reverse order of mapping. On error, the
+  // respective mapping is invalidated anyway, only the data may not have been
+  // committed to system memory (in case of VirtioOperationBusMasterWrite).
+  //
+  Status = VgpuDev->VirtIo->UnmapSharedBuffer (VgpuDev->VirtIo, ResponseMap);
+  if (EFI_ERROR (Status)) {
+    goto UnmapRequest;
+  }
+  Status = VgpuDev->VirtIo->UnmapSharedBuffer (VgpuDev->VirtIo, RequestMap);
+  if (EFI_ERROR (Status)) {
     return Status;
   }
 
   //
   // Parse the response.
   //
-  if (ResponseSize != sizeof Response) {
-    DEBUG ((EFI_D_ERROR, "%a: malformed response to Request=0x%x\n",
-      __FUNCTION__, (UINT32)RequestType));
-    return EFI_PROTOCOL_ERROR;
-  }
-
   if (Response.Type == VirtioGpuRespOkNodata) {
     return EFI_SUCCESS;
   }
 
-  DEBUG ((EFI_D_ERROR, "%a: Request=0x%x Response=0x%x\n", __FUNCTION__,
+  DEBUG ((DEBUG_ERROR, "%a: Request=0x%x Response=0x%x\n", __FUNCTION__,
     (UINT32)RequestType, Response.Type));
   return EFI_DEVICE_ERROR;
+
+UnmapResponse:
+  VgpuDev->VirtIo->UnmapSharedBuffer (VgpuDev->VirtIo, ResponseMap);
+
+UnmapRequest:
+  VgpuDev->VirtIo->UnmapSharedBuffer (VgpuDev->VirtIo, RequestMap);
+
+  return Status;
 }
 
 /**
@@ -339,7 +546,7 @@ VirtioGpuSendCommand (
   @retval EFI_SUCCESS            Operation successful.
 
   @retval EFI_DEVICE_ERROR       The host rejected the request. The host error
-                                 code has been logged on the EFI_D_ERROR level.
+                                 code has been logged on the DEBUG_ERROR level.
 
   @return                        Codes for unexpected errors in VirtIo
                                  messaging.
@@ -403,10 +610,10 @@ VirtioGpuResourceUnref (
 
 EFI_STATUS
 VirtioGpuResourceAttachBacking (
-  IN OUT VGPU_DEV *VgpuDev,
-  IN     UINT32   ResourceId,
-  IN     VOID     *FirstBackingPage,
-  IN     UINTN    NumberOfPages
+  IN OUT VGPU_DEV             *VgpuDev,
+  IN     UINT32               ResourceId,
+  IN     EFI_PHYSICAL_ADDRESS BackingStoreDeviceAddress,
+  IN     UINTN                NumberOfPages
   )
 {
   volatile VIRTIO_GPU_RESOURCE_ATTACH_BACKING Request;
@@ -417,7 +624,7 @@ VirtioGpuResourceAttachBacking (
 
   Request.ResourceId    = ResourceId;
   Request.NrEntries     = 1;
-  Request.Entry.Addr    = (UINTN)FirstBackingPage;
+  Request.Entry.Addr    = BackingStoreDeviceAddress;
   Request.Entry.Length  = (UINT32)EFI_PAGES_TO_SIZE (NumberOfPages);
   Request.Entry.Padding = 0;
 

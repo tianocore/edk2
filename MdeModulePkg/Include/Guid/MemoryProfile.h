@@ -1,14 +1,8 @@
 /** @file
   Memory profile data structure.
 
-  Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -213,10 +207,10 @@ typedef struct _EDKII_MEMORY_PROFILE_PROTOCOL EDKII_MEMORY_PROFILE_PROTOCOL;
   @param[in, out] ProfileSize       On entry, points to the size in bytes of the ProfileBuffer.
                                     On return, points to the size of the data returned in ProfileBuffer.
   @param[out]     ProfileBuffer     Profile buffer.
-                      
+
   @return EFI_SUCCESS               Get the memory profile data successfully.
   @return EFI_UNSUPPORTED           Memory profile is unsupported.
-  @return EFI_BUFFER_TO_SMALL       The ProfileSize is too small for the resulting data. 
+  @return EFI_BUFFER_TO_SMALL       The ProfileSize is too small for the resulting data.
                                     ProfileSize is updated with the size required.
 
 **/

@@ -2,14 +2,8 @@
 
    Internal functions to operate Working Block Space.
 
-Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. 
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -29,8 +23,6 @@ InitializeLocalWorkSpaceHeader (
   VOID
   )
 {
-  EFI_STATUS                              Status;
-
   //
   // Check signature with gEdkiiWorkingBlockSignatureGuid.
   //
@@ -64,12 +56,8 @@ InitializeLocalWorkSpaceHeader (
   //
   // Calculate the Crc of woking block header
   //
-  Status = gBS->CalculateCrc32 (
-                  &mWorkingBlockHeader,
-                  sizeof (EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER),
-                  &mWorkingBlockHeader.Crc
-                  );
-  ASSERT_EFI_ERROR (Status);
+  mWorkingBlockHeader.Crc = FtwCalculateCrc32 (&mWorkingBlockHeader,
+                              sizeof (EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER));
 
   mWorkingBlockHeader.WorkingBlockValid    = FTW_VALID_STATE;
   mWorkingBlockHeader.WorkingBlockInvalid  = FTW_INVALID_STATE;

@@ -1,19 +1,13 @@
 /** @file
   The header file for Boot Script Executer module.
-  
-  This driver is dispatched by Dxe core and the driver will reload itself to ACPI reserved memory 
-  in the entry point. The functionality is to interpret and restore the S3 boot script 
-  
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+
+  This driver is dispatched by Dxe core and the driver will reload itself to ACPI reserved memory
+  in the entry point. The functionality is to interpret and restore the S3 boot script
+
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 #ifndef _BOOT_SCRIPT_EXECUTOR_H_
@@ -38,6 +32,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/LockBoxLib.h>
 #include <Library/CpuExceptionHandlerLib.h>
 #include <Library/DevicePathLib.h>
+#include <Library/DxeServicesTableLib.h>
 
 #include <Guid/AcpiS3Context.h>
 #include <Guid/BootScriptExecutorVariable.h>
@@ -50,9 +45,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 /**
   a ASM function to transfer control to OS.
-  
+
   @param  S3WakingVector  The S3 waking up vector saved in ACPI Facs table
-  @param  AcpiLowMemoryBase a buffer under 1M which could be used during the transfer             
+  @param  AcpiLowMemoryBase a buffer under 1M which could be used during the transfer
 **/
 VOID
 AsmTransferControl (
@@ -61,9 +56,9 @@ AsmTransferControl (
   );
 /**
   a 32bit ASM function to transfer control to OS.
-  
+
   @param  S3WakingVector  The S3 waking up vector saved in ACPI Facs table
-  @param  AcpiLowMemoryBase a buffer under 1M which could be used during the transfer             
+  @param  AcpiLowMemoryBase a buffer under 1M which could be used during the transfer
 **/
 VOID
 AsmTransferControl32 (
@@ -78,13 +73,13 @@ AsmTransferControl16 (
   VOID
   );
 /**
-  Set a IDT entry for interrupt vector 3 for debug purpose.  
-  
-  @param  AcpiS3Context  a pointer to a structure of ACPI_S3_CONTEXT  
-              
+  Set a IDT entry for interrupt vector 3 for debug purpose.
+
+  @param  AcpiS3Context  a pointer to a structure of ACPI_S3_CONTEXT
+
 **/
 VOID
-SetIdtEntry ( 
+SetIdtEntry (
   IN ACPI_S3_CONTEXT     *AcpiS3Context
   );
 

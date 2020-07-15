@@ -1,15 +1,9 @@
 ///** @file
 //  String definitions for Boot Maintenance Utility.
 //
-//  Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
-//  This program and the accompanying materials
-//  are licensed and made available under the terms and conditions of the BSD License
-//  which accompanies this distribution.  The full text of the license may be found at
-//  http://opensource.org/licenses/bsd-license.php
-//  
-//  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-//  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-//  
+//  Copyright (c) 2004 - 2019, Intel Corporation. All rights reserved.<BR>
+//  SPDX-License-Identifier: BSD-2-Clause-Patent
+//
 //**/
 
 /=#
@@ -71,9 +65,9 @@
                                            #language fr-FR "UEFI Optimized Boot"
 #string STR_FORM_UEFI_OPTIMIZED_BOOT_HELP  #language en-US "Modify the UEFI Optimized Boot setting"
                                            #language fr-FR "Modify the UEFI Optimized Boot setting"
-#string UEFI_OPTIMIZED_BOOT_DESCRIPTION	   #language en-US "UEFI Optimized Boot"
+#string UEFI_OPTIMIZED_BOOT_DESCRIPTION     #language en-US "UEFI Optimized Boot"
                                            #language fr-FR "UEFI Optimized Boot"
-#string UEFI_OPTIMIZED_BOOT_HELP	       #language en-US "Check to enable UEFI Optimized Boot"
+#string UEFI_OPTIMIZED_BOOT_HELP         #language en-US "Check to enable UEFI Optimized Boot"
                                            #language fr-FR "Check to enable UEFI Optimized Boot"
 #string STR_FORM_CON_MAIN_TITLE        #language en-US  "Console Options"
                                        #language fr-FR  "Console Options"
@@ -239,6 +233,14 @@
                                        #language fr-FR  "VT_UTF8"
 #string STR_COM_TYPE_4                 #language en-US  "TTY_TERM"
                                        #language fr-FR  "TTY_TERM"
+#string STR_COM_TYPE_5                 #language en-US  "LINUX"
+                                       #language fr-FR  "LINUX"
+#string STR_COM_TYPE_6                 #language en-US  "XTERM_R6"
+                                       #language fr-FR  "XTERM_R6"
+#string STR_COM_TYPE_7                 #language en-US  "VT_400"
+                                       #language fr-FR  "VT_400"
+#string STR_COM_TYPE_8                 #language en-US  "SCO"
+                                       #language fr-FR  "SCO"
 #string STR_RESET                      #language en-US  "Reset System"
                                        #language fr-FR  "Reset System"
 #string STR_FORM_GOTO_MAIN             #language en-US  "Go Back To Main Page"

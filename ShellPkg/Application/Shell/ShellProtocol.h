@@ -3,14 +3,8 @@
   manipulation, and initialization of EFI_SHELL_PROTOCOL.
 
   (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -36,7 +30,7 @@ typedef struct {
 
   This must be removed via calling CleanUpShellProtocol().
 
-  @param[in, out] NewShell   The pointer to the pointer to the structure 
+  @param[in, out] NewShell   The pointer to the pointer to the structure
   to install.
 
   @retval EFI_SUCCESS     The operation was successful.
@@ -289,8 +283,8 @@ EfiShellBatchIsActive (
   @param Attributes               the File Attributes to use when creating a new file
 
   @retval EFI_SUCCESS             the file is open and FileHandle is valid
-  @retval EFI_UNSUPPORTED         the device path cotained non-path elements
-  @retval other                   an error ocurred.
+  @retval EFI_UNSUPPORTED         the device path contained non-path elements
+  @retval other                   an error occurred.
 **/
 EFI_STATUS
 InternalOpenFileDevicePath(
@@ -315,7 +309,7 @@ InternalOpenFileDevicePath(
   already exists and is non-volatile then EFI_INVALID_PARAMETER is returned.
 
   @param FileName           Pointer to NULL-terminated file path
-  @param FileAttribs        The new file's attrbiutes.  the different attributes are
+  @param FileAttribs        The new file's attributes.  the different attributes are
                             described in EFI_FILE_PROTOCOL.Open().
   @param FileHandle         On return, points to the created file handle or directory's handle
 
@@ -740,7 +734,7 @@ EfiShellGetCurDir(
                                 directory is changed.
   @param Dir                    Points to the NULL-terminated directory on the device specified by FileSystem.
 
-  @retval EFI_SUCCESS           The operation was sucessful
+  @retval EFI_SUCCESS           The operation was successful
 **/
 EFI_STATUS
 EFIAPI
@@ -819,12 +813,12 @@ EfiShellIsRootShell(
                                 aliases will be returned in ReturnedData.
   @param[out] Volatile          upon return of a single command if TRUE indicates
                                 this is stored in a volatile fashion.  FALSE otherwise.
-  @return                      	If Alias is not NULL, it will return a pointer to
+  @return                        If Alias is not NULL, it will return a pointer to
                                 the NULL-terminated command for that alias.
                                 If Alias is NULL, ReturnedData points to a ';'
                                 delimited list of alias (e.g.
                                 ReturnedData = "dir;del;copy;mfp") that is NULL-terminated.
-  @retval NULL                  an error ocurred
+  @retval NULL                  an error occurred
   @retval NULL                  Alias was not a valid Alias
 **/
 CONST CHAR16 *
@@ -917,11 +911,11 @@ InternalEfiShellSetEnv(
   );
 
 /**
-  Function to start monitoring for CTRL-C using SimpleTextInputEx.  This 
+  Function to start monitoring for CTRL-C using SimpleTextInputEx.  This
   feature's enabled state was not known when the shell initially launched.
 
   @retval EFI_SUCCESS           The feature is enabled.
-  @retval EFI_OUT_OF_RESOURCES  There is not enough mnemory available.
+  @retval EFI_OUT_OF_RESOURCES  There is not enough memory available.
 **/
 EFI_STATUS
 InernalEfiShellStartMonitor(

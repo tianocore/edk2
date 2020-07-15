@@ -1,0 +1,16 @@
+// /** @file
+// This module produces Deferred Procedure Call Protocol.
+//
+// This module produces Deferred Procedure Call Protocol.
+//
+// Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Produces Deferred Procedure Call Protocol"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This module produces Deferred Procedure Call Protocol."
+

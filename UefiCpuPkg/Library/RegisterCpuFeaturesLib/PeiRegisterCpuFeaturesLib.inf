@@ -1,0 +1,58 @@
+## @file
+#  Register CPU Features Library PEI instance.
+#
+#  Copyright (c) 2017 - 2019, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeiRegisterCpuFeaturesLib
+  MODULE_UNI_FILE                = RegisterCpuFeaturesLib.uni
+  FILE_GUID                      = D8855DB3-8348-41B5-BDA4-385351767D41
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = RegisterCpuFeaturesLib|PEIM
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources.common]
+  PeiRegisterCpuFeaturesLib.c
+  RegisterCpuFeaturesLib.c
+  RegisterCpuFeatures.h
+  CpuFeaturesInitialize.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  PcdLib
+  LocalApicLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  SynchronizationLib
+  HobLib
+  PeiServicesLib
+  PeiServicesTablePointerLib
+  IoLib
+
+[Ppis]
+  gEfiPeiMpServicesPpiGuid                                             ## CONSUMES
+  gEdkiiPeiMpServices2PpiGuid                                          ## CONSUMES
+
+[Pcd]
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuS3DataAddress                        ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuFeaturesSupport                      ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuFeaturesCapability                   ## PRODUCES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuFeaturesSetting                      ## CONSUMES ## PRODUCES
+
+[Depex]
+  gEfiPeiMpServicesPpiGuid AND gEdkiiCpuFeaturesSetDoneGuid

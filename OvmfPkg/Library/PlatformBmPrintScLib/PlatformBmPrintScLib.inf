@@ -1,0 +1,60 @@
+## @file
+# Register a status code handler for printing the Boot Manager's LoadImage()
+# and StartImage() preparations, and return codes, to the UEFI console.
+#
+# This feature enables users that are not accustomed to analyzing the firmware
+# log to glean some information about UEFI boot option processing (loading and
+# starting).
+#
+# This library instance filters out (ignores) status codes that are not
+# reported by the containing firmware module. The intent is to link this
+# library instance into BdsDxe via PlatformBootManagerLib (which BdsDxe depends
+# upon), then catch only those status codes that BdsDxe reports (which happens
+# via UefiBootManagerLib). Status codes reported by other modules (such as
+# UiApp), via UefiBootManagerLib or otherwise, are meant to be ignored.
+#
+# Copyright (C) 2019, Red Hat, Inc.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 1.27
+  BASE_NAME      = PlatformBmPrintScLib
+  FILE_GUID      = 3417c705-903e-41a7-9485-3fafebf60917
+  MODULE_TYPE    = DXE_DRIVER
+  VERSION_STRING = 1.0
+  LIBRARY_CLASS  = PlatformBmPrintScLib|DXE_DRIVER
+
+[Sources]
+  StatusCodeHandler.c
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  DevicePathLib
+  MemoryAllocationLib
+  PcdLib
+  PrintLib
+  UefiBootManagerLib
+  UefiBootServicesTableLib
+  UefiLib
+  UefiRuntimeServicesTableLib
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdProgressCodeOsLoaderLoad  ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdProgressCodeOsLoaderStart ## CONSUMES
+
+[Protocols]
+  gEfiRscHandlerProtocolGuid                                  ## CONSUMES
+
+[Guids]
+  gEfiGlobalVariableGuid                                      ## CONSUMES
+  gEfiStatusCodeSpecificDataGuid                              ## CONSUMES
+
+[Depex.common.DXE_DRIVER]
+  gEfiRscHandlerProtocolGuid AND gEfiVariableArchProtocolGuid

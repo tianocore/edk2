@@ -1,14 +1,8 @@
 /** @file
   Set up ROM Table for PCI Bus module.
 
-Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -23,9 +17,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @param Bus            Bus NO of PCI space.
   @param Dev            Dev NO of PCI space.
   @param Func           Func NO of PCI space.
-  @param RomAddress     Base address of OptionRom.
-  @param RomLength      Length of rom image.
-
+  @param RomImage       Option Rom buffer.
+  @param RomSize        Size of Option Rom buffer.
 **/
 VOID
 PciRomAddImageMapping (
@@ -34,8 +27,8 @@ PciRomAddImageMapping (
   IN  UINT8       Bus,
   IN  UINT8       Dev,
   IN  UINT8       Func,
-  IN  UINT64      RomAddress,
-  IN  UINT64      RomLength
+  IN  VOID        *RomImage,
+  IN  UINT64      RomSize
   );
 
 /**

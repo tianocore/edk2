@@ -1,15 +1,9 @@
 /** @file
   Load option library functions which relate with creating and processing load options.
 
-Copyright (c) 2011 - 2017, Intel Corporation. All rights reserved.<BR>
-(C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+Copyright (c) 2011 - 2019, Intel Corporation. All rights reserved.<BR>
+(C) Copyright 2015-2018 Hewlett Packard Enterprise Development LP<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -90,7 +84,7 @@ BmGetFreeOptionNumber (
   OUT UINT16                            *FreeOptionNumber
   )
 {
-  
+
   UINTN         OptionNumber;
   UINTN         Index;
   UINT16        *OptionOrder;
@@ -98,7 +92,7 @@ BmGetFreeOptionNumber (
   UINT16        *BootNext;
 
   ASSERT (FreeOptionNumber != NULL);
-  ASSERT (LoadOptionType == LoadOptionTypeDriver || 
+  ASSERT (LoadOptionType == LoadOptionTypeDriver ||
           LoadOptionType == LoadOptionTypeBoot ||
           LoadOptionType == LoadOptionTypeSysPrep);
 
@@ -110,9 +104,9 @@ BmGetFreeOptionNumber (
     GetEfiGlobalVariable2 (L"BootNext", (VOID**) &BootNext, NULL);
   }
 
-  for (OptionNumber = 0; 
+  for (OptionNumber = 0;
        OptionNumber < OptionOrderSize / sizeof (UINT16)
-                    + ((BootNext != NULL) ? 1 : 0); 
+                    + ((BootNext != NULL) ? 1 : 0);
        OptionNumber++
        ) {
     //
@@ -125,10 +119,10 @@ BmGetFreeOptionNumber (
     }
 
     //
-    // We didn't find it in the ****Order array and it doesn't equal to BootNext 
+    // We didn't find it in the ****Order array and it doesn't equal to BootNext
     // Otherwise, OptionNumber equals to OptionOrderSize / sizeof (UINT16) + 1
     //
-    if ((Index == OptionOrderSize / sizeof (UINT16)) && 
+    if ((Index == OptionOrderSize / sizeof (UINT16)) &&
         ((BootNext == NULL) || (OptionNumber != *BootNext))
         ) {
       break;
@@ -203,12 +197,12 @@ EfiBootManagerLoadOptionToVariable (
   EFI_DEVICE_PATH_PROTOCOL    FilePathList[];
   UINT8                       OptionalData[];
 TODO: FilePathList[] IS:
-A packed array of UEFI device paths.  The first element of the 
-array is a device path that describes the device and location of the 
-Image for this load option.  The FilePathList[0] is specific 
-to the device type.  Other device paths may optionally exist in the 
-FilePathList, but their usage is OSV specific. Each element 
-in the array is variable length, and ends at the device path end 
+A packed array of UEFI device paths.  The first element of the
+array is a device path that describes the device and location of the
+Image for this load option.  The FilePathList[0] is specific
+to the device type.  Other device paths may optionally exist in the
+FilePathList, but their usage is OSV specific. Each element
+in the array is variable length, and ends at the device path end
 structure.
   */
   VariableSize = sizeof (Option->Attributes)
@@ -250,13 +244,16 @@ structure.
     VariableAttributes = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS;
   }
 
-  return gRT->SetVariable (
-                OptionName,
-                &gEfiGlobalVariableGuid,
-                VariableAttributes,
-                VariableSize,
-                Variable
-                );
+  Status = gRT->SetVariable (
+                  OptionName,
+                  &gEfiGlobalVariableGuid,
+                  VariableAttributes,
+                  VariableSize,
+                  Variable
+                  );
+  FreePool (Variable);
+
+  return Status;
 }
 
 /**
@@ -329,7 +326,11 @@ BmAddOptionNumberToOrderVariable (
   This function will register the new Boot####, Driver#### or SysPrep#### option.
   After the *#### is updated, the *Order will also be updated.
 
-  @param  Option            Pointer to load option to add.
+  @param  Option            Pointer to load option to add. If on input
+                            Option->OptionNumber is LoadOptionNumberUnassigned,
+                            then on output Option->OptionNumber is updated to
+                            the number of the new Boot####,
+                            Driver#### or SysPrep#### option.
   @param  Position          Position of the new load option to put in the ****Order variable.
 
   @retval EFI_SUCCESS           The *#### have been successfully registered.
@@ -338,14 +339,14 @@ BmAddOptionNumberToOrderVariable (
                                 Note: this API only adds new load option, no replacement support.
   @retval EFI_OUT_OF_RESOURCES  There is no free option number that can be used when the
                                 option number specified in the Option is LoadOptionNumberUnassigned.
-  @retval EFI_STATUS            Return the status of gRT->SetVariable ().
+  @return                       Status codes of gRT->SetVariable ().
 
 **/
 EFI_STATUS
 EFIAPI
 EfiBootManagerAddLoadOptionVariable (
-  IN EFI_BOOT_MANAGER_LOAD_OPTION *Option,
-  IN UINTN                        Position
+  IN OUT EFI_BOOT_MANAGER_LOAD_OPTION *Option,
+  IN     UINTN                        Position
   )
 {
   EFI_STATUS                      Status;
@@ -355,7 +356,7 @@ EfiBootManagerAddLoadOptionVariable (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (Option->OptionType != LoadOptionTypeDriver && 
+  if (Option->OptionType != LoadOptionTypeDriver &&
       Option->OptionType != LoadOptionTypeSysPrep &&
       Option->OptionType != LoadOptionTypeBoot
       ) {
@@ -395,7 +396,7 @@ EfiBootManagerAddLoadOptionVariable (
 }
 
 /**
-  Sort the load option. The DriverOrder or BootOrder will be re-created to 
+  Sort the load option. The DriverOrder or BootOrder will be re-created to
   reflect the new order.
 
   @param OptionType             Load option type
@@ -510,7 +511,7 @@ EfiBootManagerInitializeLoadOption (
 /**
   Return the index of the load option in the load option array.
 
-  The function consider two load options are equal when the 
+  The function consider two load options are equal when the
   OptionType, Attributes, Description, FilePath and OptionalData are equal.
 
   @param Key    Pointer to the load option to be found.
@@ -614,15 +615,15 @@ EfiBootManagerDeleteLoadOptionVariable (
 /**
   Returns the size of a device path in bytes.
 
-  This function returns the size, in bytes, of the device path data structure 
-  specified by DevicePath including the end of device path node. If DevicePath 
+  This function returns the size, in bytes, of the device path data structure
+  specified by DevicePath including the end of device path node. If DevicePath
   is NULL, then 0 is returned. If the length of the device path is bigger than
   MaxSize, also return 0 to indicate this is an invalidate device path.
 
   @param  DevicePath         A pointer to a device path data structure.
-  @param  MaxSize            Max valid device path size. If big than this size, 
+  @param  MaxSize            Max valid device path size. If big than this size,
                              return error.
-  
+
   @retval 0                  An invalid device path.
   @retval Others             The size of a device path in bytes.
 
@@ -664,12 +665,12 @@ BmGetDevicePathSizeEx (
 }
 
 /**
-  Returns the length of a Null-terminated Unicode string. If the length is 
-  bigger than MaxStringLen, return length 0 to indicate that this is an 
+  Returns the length of a Null-terminated Unicode string. If the length is
+  bigger than MaxStringLen, return length 0 to indicate that this is an
   invalidate string.
 
   This function returns the number of Unicode characters in the Null-terminated
-  Unicode string specified by String. 
+  Unicode string specified by String.
 
   If String is NULL, then ASSERT().
   If String is not aligned on a 16-bit boundary, then ASSERT().
@@ -712,7 +713,7 @@ BmStrSizeEx (
   @retval FALSE                 The variable data is corrupted.
 
 **/
-BOOLEAN 
+BOOLEAN
 BmValidateOption (
   UINT8                     *Variable,
   UINTN                     VariableSize
@@ -785,6 +786,8 @@ EfiBootManagerIsValidLoadOptionVariableName (
   UINTN                             VariableNameLen;
   UINTN                             Index;
   UINTN                             Uint;
+  EFI_BOOT_MANAGER_LOAD_OPTION_TYPE LocalOptionType;
+  UINT16                            LocalOptionNumber;
 
   if (VariableName == NULL) {
     return FALSE;
@@ -792,39 +795,52 @@ EfiBootManagerIsValidLoadOptionVariableName (
 
   VariableNameLen = StrLen (VariableName);
 
+  //
+  // Return FALSE when the variable name length is too small.
+  //
   if (VariableNameLen <= 4) {
     return FALSE;
   }
 
-  for (Index = 0; Index < ARRAY_SIZE (mBmLoadOptionName); Index++) {
-    if ((VariableNameLen - 4 == StrLen (mBmLoadOptionName[Index])) &&
-        (StrnCmp (VariableName, mBmLoadOptionName[Index], VariableNameLen - 4) == 0)
+  //
+  // Return FALSE when the variable name doesn't start with Driver/SysPrep/Boot/PlatformRecovery.
+  //
+  for (LocalOptionType = 0; LocalOptionType < ARRAY_SIZE (mBmLoadOptionName); LocalOptionType++) {
+    if ((VariableNameLen - 4 == StrLen (mBmLoadOptionName[LocalOptionType])) &&
+        (StrnCmp (VariableName, mBmLoadOptionName[LocalOptionType], VariableNameLen - 4) == 0)
         ) {
       break;
     }
   }
+  if (LocalOptionType == ARRAY_SIZE (mBmLoadOptionName)) {
+    return FALSE;
+  }
 
-  if (Index == ARRAY_SIZE (mBmLoadOptionName)) {
+  //
+  // Return FALSE when the last four characters are not hex digits.
+  //
+  LocalOptionNumber = 0;
+  for (Index = VariableNameLen - 4; Index < VariableNameLen; Index++) {
+    Uint = BmCharToUint (VariableName[Index]);
+    if (Uint == -1) {
+      break;
+    } else {
+      LocalOptionNumber = (UINT16) Uint + LocalOptionNumber * 0x10;
+    }
+  }
+  if (Index != VariableNameLen) {
     return FALSE;
   }
 
   if (OptionType != NULL) {
-    *OptionType = (EFI_BOOT_MANAGER_LOAD_OPTION_TYPE) Index;
+    *OptionType = LocalOptionType;
   }
 
   if (OptionNumber != NULL) {
-    *OptionNumber = 0;
-    for (Index = VariableNameLen - 4; Index < VariableNameLen; Index++) {
-      Uint = BmCharToUint (VariableName[Index]);
-      if (Uint == -1) {
-        break;
-      } else {
-        *OptionNumber = (UINT16) Uint + *OptionNumber * 0x10;
-      }
-    }
+    *OptionNumber = LocalOptionNumber;
   }
 
-  return (BOOLEAN) (Index == VariableNameLen);
+  return TRUE;
 }
 
 /**
@@ -843,7 +859,7 @@ EFIAPI
 EfiBootManagerVariableToLoadOptionEx (
   IN CHAR16                           *VariableName,
   IN EFI_GUID                         *VendorGuid,
-  IN OUT EFI_BOOT_MANAGER_LOAD_OPTION *Option  
+  IN OUT EFI_BOOT_MANAGER_LOAD_OPTION *Option
   )
 {
   EFI_STATUS                         Status;
@@ -1015,7 +1031,7 @@ BmCollectLoadOptions (
 /**
   Returns an array of load options based on the EFI variable
   L"BootOrder"/L"DriverOrder" and the L"Boot####"/L"Driver####" variables impled by it.
-  #### is the hex value of the UINT16 in each BootOrder/DriverOrder entry. 
+  #### is the hex value of the UINT16 in each BootOrder/DriverOrder entry.
 
   @param  LoadOptionCount   Returns number of entries in the array.
   @param  LoadOptionType    The type of the load option.
@@ -1103,8 +1119,8 @@ EfiBootManagerGetLoadOptions (
 
   @param  LoadOption   Pointer to boot option to Free.
 
-  @return EFI_SUCCESS   BootOption was freed 
-  @return EFI_NOT_FOUND BootOption == NULL 
+  @return EFI_SUCCESS   BootOption was freed
+  @return EFI_NOT_FOUND BootOption == NULL
 
 **/
 EFI_STATUS
@@ -1131,14 +1147,14 @@ EfiBootManagerFreeLoadOption (
 }
 
 /**
-  Free an EFI_BOOT_MANGER_LOAD_OPTION array that was allocated by 
+  Free an EFI_BOOT_MANGER_LOAD_OPTION array that was allocated by
   EfiBootManagerGetLoadOptions().
 
   @param  Option       Pointer to boot option array to free.
   @param  OptionCount  Number of array entries in BootOption
 
-  @return EFI_SUCCESS   BootOption was freed 
-  @return EFI_NOT_FOUND BootOption == NULL 
+  @return EFI_SUCCESS   BootOption was freed
+  @return EFI_NOT_FOUND BootOption == NULL
 
 **/
 EFI_STATUS
@@ -1167,6 +1183,10 @@ EfiBootManagerFreeLoadOptions (
   Return whether the PE header of the load option is valid or not.
 
   @param[in] Type       The load option type.
+                        It's used to check whether the load option is valid.
+                        When it's LoadOptionTypeMax, the routine only guarantees
+                        the load option is a valid PE image but doesn't guarantee
+                        the PE's subsystem type is valid.
   @param[in] FileBuffer The PE file buffer of the load option.
   @param[in] FileSize   The size of the load option file.
 
@@ -1207,17 +1227,16 @@ BmIsLoadOptionPeHeaderValid (
       // Check PE32 or PE32+ magic, and machine type
       //
       OptionalHeader = (EFI_IMAGE_OPTIONAL_HEADER32 *) &PeHeader->Pe32.OptionalHeader;
-      if ((OptionalHeader->Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC || 
-           OptionalHeader->Magic == EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC) &&
-          EFI_IMAGE_MACHINE_TYPE_SUPPORTED (PeHeader->Pe32.FileHeader.Machine)
-          ) {
+      if (OptionalHeader->Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC ||
+          OptionalHeader->Magic == EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC) {
         //
         // Check the Subsystem:
         //   Driver#### must be of type BootServiceDriver or RuntimeDriver
         //   SysPrep####, Boot####, OsRecovery####, PlatformRecovery#### must be of type Application
         //
         Subsystem = OptionalHeader->Subsystem;
-        if ((Type == LoadOptionTypeDriver && Subsystem == EFI_IMAGE_SUBSYSTEM_EFI_BOOT_SERVICE_DRIVER) ||
+        if ((Type == LoadOptionTypeMax) ||
+            (Type == LoadOptionTypeDriver && Subsystem == EFI_IMAGE_SUBSYSTEM_EFI_BOOT_SERVICE_DRIVER) ||
             (Type == LoadOptionTypeDriver && Subsystem == EFI_IMAGE_SUBSYSTEM_EFI_RUNTIME_DRIVER) ||
             (Type == LoadOptionTypeSysPrep && Subsystem == EFI_IMAGE_SUBSYSTEM_EFI_APPLICATION) ||
             (Type == LoadOptionTypeBoot && Subsystem == EFI_IMAGE_SUBSYSTEM_EFI_APPLICATION) ||
@@ -1233,11 +1252,96 @@ BmIsLoadOptionPeHeaderValid (
 }
 
 /**
+  Return the next matched load option buffer.
+  The routine keeps calling BmGetNextLoadOptionDevicePath() until a valid
+  load option is read.
+
+  @param Type      The load option type.
+                   It's used to check whether the load option is valid.
+                   When it's LoadOptionTypeMax, the routine only guarantees
+                   the load option is a valid PE image but doesn't guarantee
+                   the PE's subsystem type is valid.
+  @param FilePath  The device path pointing to a load option.
+                   It could be a short-form device path.
+  @param FullPath  Return the next full device path of the load option after
+                   short-form device path expanding.
+                   Caller is responsible to free it.
+                   NULL to return the first matched full device path.
+  @param FileSize  Return the load option size.
+
+  @return The load option buffer. Caller is responsible to free the memory.
+**/
+VOID *
+BmGetNextLoadOptionBuffer (
+  IN  EFI_BOOT_MANAGER_LOAD_OPTION_TYPE Type,
+  IN  EFI_DEVICE_PATH_PROTOCOL          *FilePath,
+  OUT EFI_DEVICE_PATH_PROTOCOL          **FullPath,
+  OUT UINTN                             *FileSize
+  )
+{
+  VOID                                  *FileBuffer;
+  EFI_DEVICE_PATH_PROTOCOL              *PreFullPath;
+  EFI_DEVICE_PATH_PROTOCOL              *CurFullPath;
+  UINTN                                 LocalFileSize;
+  UINT32                                AuthenticationStatus;
+  EFI_DEVICE_PATH_PROTOCOL              *RamDiskDevicePath;
+
+  LocalFileSize = 0;
+  FileBuffer  = NULL;
+  CurFullPath = *FullPath;
+  do {
+    PreFullPath = CurFullPath;
+    CurFullPath = BmGetNextLoadOptionDevicePath (FilePath, CurFullPath);
+    //
+    // Only free the full path created *inside* this routine
+    //
+    if ((PreFullPath != NULL) && (PreFullPath != *FullPath)) {
+      FreePool (PreFullPath);
+    }
+    if (CurFullPath == NULL) {
+      break;
+    }
+    FileBuffer = GetFileBufferByFilePath (TRUE, CurFullPath, &LocalFileSize, &AuthenticationStatus);
+    if ((FileBuffer != NULL) && !BmIsLoadOptionPeHeaderValid (Type, FileBuffer, LocalFileSize)) {
+      //
+      // Free the RAM disk file system if the load option is invalid.
+      //
+      RamDiskDevicePath = BmGetRamDiskDevicePath (FilePath);
+      if (RamDiskDevicePath != NULL) {
+        BmDestroyRamDisk (RamDiskDevicePath);
+        FreePool (RamDiskDevicePath);
+      }
+
+      //
+      // Free the invalid load option buffer.
+      //
+      FreePool (FileBuffer);
+      FileBuffer = NULL;
+    }
+  } while (FileBuffer == NULL);
+
+  if (FileBuffer == NULL) {
+    CurFullPath = NULL;
+    LocalFileSize = 0;
+  }
+
+  DEBUG ((DEBUG_INFO, "[Bds] Expand "));
+  BmPrintDp (FilePath);
+  DEBUG ((DEBUG_INFO, " -> "));
+  BmPrintDp (CurFullPath);
+  DEBUG ((DEBUG_INFO, "\n"));
+
+  *FullPath = CurFullPath;
+  *FileSize = LocalFileSize;
+  return FileBuffer;
+}
+
+/**
   Process (load and execute) the load option.
 
   @param LoadOption  Pointer to the load option.
 
-  @retval EFI_INVALID_PARAMETER  The load option type is invalid, 
+  @retval EFI_INVALID_PARAMETER  The load option type is invalid,
                                  or the load option file path doesn't point to a valid file.
   @retval EFI_UNSUPPORTED        The load option type is of LoadOptionTypeBoot.
   @retval EFI_SUCCESS            The load option is inactive, or successfully loaded and executed.
@@ -1249,7 +1353,8 @@ EfiBootManagerProcessLoadOption (
   )
 {
   EFI_STATUS                        Status;
-  EFI_DEVICE_PATH_PROTOCOL          *FilePath;
+  EFI_DEVICE_PATH_PROTOCOL          *PreFullPath;
+  EFI_DEVICE_PATH_PROTOCOL          *CurFullPath;
   EFI_HANDLE                        ImageHandle;
   EFI_LOADED_IMAGE_PROTOCOL         *ImageInfo;
   VOID                              *FileBuffer;
@@ -1271,8 +1376,6 @@ EfiBootManagerProcessLoadOption (
     return EFI_SUCCESS;
   }
 
-  Status = EFI_INVALID_PARAMETER;
-
   //
   // Load and start the load option.
   //
@@ -1282,54 +1385,72 @@ EfiBootManagerProcessLoadOption (
     LoadOption->Description
     ));
   ImageHandle = NULL;
-  FileBuffer = EfiBootManagerGetLoadOptionBuffer (LoadOption->FilePath, &FilePath, &FileSize);
-  DEBUG_CODE (
-    if (FileBuffer != NULL && CompareMem (LoadOption->FilePath, FilePath, GetDevicePathSize (FilePath)) != 0) {
-      DEBUG ((EFI_D_INFO, "[Bds] DevicePath expand: "));
-      BmPrintDp (LoadOption->FilePath);
-      DEBUG ((EFI_D_INFO, " -> "));
-      BmPrintDp (FilePath);
-      DEBUG ((EFI_D_INFO, "\n"));
+  CurFullPath = NULL;
+  EfiBootManagerConnectDevicePath (LoadOption->FilePath, NULL);
+
+  //
+  // while() loop is to keep starting next matched load option if the PlatformRecovery#### returns failure status.
+  //
+  while (TRUE) {
+    Status      = EFI_INVALID_PARAMETER;
+    PreFullPath = CurFullPath;
+    FileBuffer  = BmGetNextLoadOptionBuffer (LoadOption->OptionType, LoadOption->FilePath, &CurFullPath, &FileSize);
+    if (PreFullPath != NULL) {
+      FreePool (PreFullPath);
     }
-  );
-  if (BmIsLoadOptionPeHeaderValid (LoadOption->OptionType, FileBuffer, FileSize)) {
+    if (FileBuffer == NULL) {
+      break;
+    }
     Status = gBS->LoadImage (
                     FALSE,
                     gImageHandle,
-                    FilePath,
+                    CurFullPath,
                     FileBuffer,
                     FileSize,
                     &ImageHandle
                     );
-  }
-  if (FilePath != NULL) {
-    FreePool (FilePath);
-  }
-  if (FileBuffer != NULL) {
     FreePool (FileBuffer);
-  }
 
-  if (!EFI_ERROR (Status)) {
-    Status = gBS->HandleProtocol (ImageHandle, &gEfiLoadedImageProtocolGuid, (VOID **) &ImageInfo);
-    ASSERT_EFI_ERROR (Status);
+    if (EFI_ERROR (Status)) {
+      //
+      // With EFI_SECURITY_VIOLATION retval, the Image was loaded and an ImageHandle was created
+      // with a valid EFI_LOADED_IMAGE_PROTOCOL, but the image can not be started right now.
+      // If the caller doesn't have the option to defer the execution of an image, we should
+      // unload image for the EFI_SECURITY_VIOLATION to avoid resource leak.
+      //
+      if (Status == EFI_SECURITY_VIOLATION) {
+        gBS->UnloadImage (ImageHandle);
+      }
+    } else {
+      Status = gBS->HandleProtocol (ImageHandle, &gEfiLoadedImageProtocolGuid, (VOID **)&ImageInfo);
+      ASSERT_EFI_ERROR (Status);
 
-    ImageInfo->LoadOptionsSize = LoadOption->OptionalDataSize;
-    ImageInfo->LoadOptions = LoadOption->OptionalData;
-    //
-    // Before calling the image, enable the Watchdog Timer for the 5-minute period
-    //
-    gBS->SetWatchdogTimer (5 * 60, 0, 0, NULL);
+      ImageInfo->LoadOptionsSize = LoadOption->OptionalDataSize;
+      ImageInfo->LoadOptions = LoadOption->OptionalData;
+      //
+      // Before calling the image, enable the Watchdog Timer for the 5-minute period
+      //
+      gBS->SetWatchdogTimer (5 * 60, 0, 0, NULL);
 
-    LoadOption->Status = gBS->StartImage (ImageHandle, &LoadOption->ExitDataSize, &LoadOption->ExitData);
-    DEBUG ((
-      DEBUG_INFO | DEBUG_LOAD, "%s%04x Return Status = %r\n",
-      mBmLoadOptionName[LoadOption->OptionType], LoadOption->OptionNumber, LoadOption->Status
+      LoadOption->Status = gBS->StartImage (ImageHandle, &LoadOption->ExitDataSize, &LoadOption->ExitData);
+      DEBUG ((
+        DEBUG_INFO | DEBUG_LOAD, "%s%04x Return Status = %r\n",
+        mBmLoadOptionName[LoadOption->OptionType], LoadOption->OptionNumber, LoadOption->Status
       ));
 
-    //
-    // Clear the Watchdog Timer after the image returns
-    //
-    gBS->SetWatchdogTimer (0, 0, 0, NULL);
+      //
+      // Clear the Watchdog Timer after the image returns
+      //
+      gBS->SetWatchdogTimer (0, 0, 0, NULL);
+
+      if ((LoadOption->OptionType != LoadOptionTypePlatformRecovery) || (LoadOption->Status == EFI_SUCCESS)) {
+        break;
+      }
+    }
+  }
+
+  if (CurFullPath != NULL) {
+    FreePool (CurFullPath);
   }
 
   return Status;

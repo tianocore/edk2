@@ -1,0 +1,12 @@
+## @file
+# Build Plugin used to set the path
+# for the GCC5 ARM/AARCH64 downloaded compilers
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+{
+  "scope": "global-nix",
+  "name": "Linux GCC5 Tool Chain Support",
+  "module": "LinuxGcc5ToolChain"
+}

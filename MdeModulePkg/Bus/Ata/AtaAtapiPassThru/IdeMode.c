@@ -2,13 +2,7 @@
   Header file for AHCI mode of ATA host controller.
 
   Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -52,7 +46,7 @@ IdeReadPortB (
   write a 1-byte data to a specific IDE port.
 
   @param  PciIo  A pointer to EFI_PCI_IO_PROTOCOL data structure
-  @param  Port   The IDE port to be writen
+  @param  Port   The IDE port to be written
   @param  Data   The data to write to the port
 **/
 VOID
@@ -82,7 +76,7 @@ IdeWritePortB (
   write a 1-word data to a specific IDE port.
 
   @param  PciIo  A pointer to EFI_PCI_IO_PROTOCOL data structure
-  @param  Port   The IDE port to be writen
+  @param  Port   The IDE port to be written
   @param  Data   The data to write to the port
 **/
 VOID
@@ -112,7 +106,7 @@ IdeWritePortW (
   write a 2-word data to a specific IDE port.
 
   @param  PciIo  A pointer to EFI_PCI_IO_PROTOCOL data structure
-  @param  Port   The IDE port to be writen
+  @param  Port   The IDE port to be written
   @param  Data   The data to write to the port
 **/
 VOID
@@ -627,146 +621,8 @@ DRQReady2 (
   return EFI_TIMEOUT;
 }
 
-/**
-  This function is used to poll for the DRDY bit set in the Status Register. DRDY
-  bit is set when the device is ready to accept command. Most ATA commands must be
-  sent after DRDY set except the ATAPI Packet Command.
 
-  @param PciIo            A pointer to EFI_PCI_IO_PROTOCOL data structure.
-  @param IdeRegisters     A pointer to EFI_IDE_REGISTERS data structure.
-  @param Timeout          The time to complete the command, uses 100ns as a unit.
 
-  @retval EFI_SUCCESS         DRDY bit set within the time out.
-  @retval EFI_TIMEOUT         DRDY bit not set within the time out.
-
-  @note  Read Status Register will clear interrupt status.
-**/
-EFI_STATUS
-EFIAPI
-DRDYReady (
-  IN  EFI_PCI_IO_PROTOCOL  *PciIo,
-  IN  EFI_IDE_REGISTERS    *IdeRegisters,
-  IN  UINT64               Timeout
-  )
-{
-  UINT64  Delay;
-  UINT8   StatusRegister;
-  UINT8   ErrorRegister;
-  BOOLEAN InfiniteWait;
-
-  ASSERT (PciIo != NULL);
-  ASSERT (IdeRegisters != NULL);
-
-  if (Timeout == 0) {
-    InfiniteWait = TRUE;
-  } else {
-    InfiniteWait = FALSE;
-  }
-
-  Delay = DivU64x32(Timeout, 1000) + 1;
-  do {
-    StatusRegister = IdeReadPortB (PciIo, IdeRegisters->CmdOrStatus);
-    //
-    // Wait for BSY == 0, then judge if DRDY is set or ERR is set
-    //
-    if ((StatusRegister & ATA_STSREG_BSY) == 0) {
-      if ((StatusRegister & ATA_STSREG_ERR) == ATA_STSREG_ERR) {
-        ErrorRegister = IdeReadPortB (PciIo, IdeRegisters->ErrOrFeature);
-
-        if ((ErrorRegister & ATA_ERRREG_ABRT) == ATA_ERRREG_ABRT) {
-          return EFI_ABORTED;
-        }
-        return EFI_DEVICE_ERROR;
-      }
-
-      if ((StatusRegister & ATA_STSREG_DRDY) == ATA_STSREG_DRDY) {
-        return EFI_SUCCESS;
-      } else {
-        return EFI_DEVICE_ERROR;
-      }
-    }
-
-    //
-    // Stall for 100 microseconds.
-    //
-    MicroSecondDelay (100);
-
-    Delay--;
-  } while (InfiniteWait || (Delay > 0));
-
-  return EFI_TIMEOUT;
-}
-
-/**
-  This function is used to poll for the DRDY bit set in the Alternate Status Register.
-  DRDY bit is set when the device is ready to accept command. Most ATA commands must
-  be sent after DRDY set except the ATAPI Packet Command.
-
-  @param PciIo            A pointer to EFI_PCI_IO_PROTOCOL data structure.
-  @param IdeRegisters     A pointer to EFI_IDE_REGISTERS data structure.
-  @param Timeout          The time to complete the command, uses 100ns as a unit.
-
-  @retval EFI_SUCCESS      DRDY bit set within the time out.
-  @retval EFI_TIMEOUT      DRDY bit not set within the time out.
-
-  @note  Read Alternate Status Register will clear interrupt status.
-
-**/
-EFI_STATUS
-EFIAPI
-DRDYReady2 (
-  IN  EFI_PCI_IO_PROTOCOL  *PciIo,
-  IN  EFI_IDE_REGISTERS    *IdeRegisters,
-  IN  UINT64               Timeout
-  )
-{
-  UINT64  Delay;
-  UINT8   AltRegister;
-  UINT8   ErrorRegister;
-  BOOLEAN InfiniteWait;
-
-  ASSERT (PciIo != NULL);
-  ASSERT (IdeRegisters != NULL);
-
-  if (Timeout == 0) {
-    InfiniteWait = TRUE;
-  } else {
-    InfiniteWait = FALSE;
-  }
-
-  Delay = DivU64x32(Timeout, 1000) + 1;
-  do {
-    AltRegister = IdeReadPortB (PciIo, IdeRegisters->AltOrDev);
-    //
-    // Wait for BSY == 0, then judge if DRDY is set or ERR is set
-    //
-    if ((AltRegister & ATA_STSREG_BSY) == 0) {
-      if ((AltRegister & ATA_STSREG_ERR) == ATA_STSREG_ERR) {
-        ErrorRegister = IdeReadPortB (PciIo, IdeRegisters->ErrOrFeature);
-
-        if ((ErrorRegister & ATA_ERRREG_ABRT) == ATA_ERRREG_ABRT) {
-          return EFI_ABORTED;
-        }
-        return EFI_DEVICE_ERROR;
-      }
-
-      if ((AltRegister & ATA_STSREG_DRDY) == ATA_STSREG_DRDY) {
-        return EFI_SUCCESS;
-      } else {
-        return EFI_DEVICE_ERROR;
-      }
-    }
-
-    //
-    // Stall for 100 microseconds.
-    //
-    MicroSecondDelay (100);
-
-    Delay--;
-  } while (InfiniteWait || (Delay > 0));
-
-  return EFI_TIMEOUT;
-}
 
 /**
   This function is used to poll for the BSY bit clear in the Status Register. BSY
@@ -822,59 +678,6 @@ WaitForBSYClear (
   return EFI_TIMEOUT;
 }
 
-/**
-  This function is used to poll for the BSY bit clear in the Status Register. BSY
-  is clear when the device is not busy. Every command must be sent after device is not busy.
-
-  @param PciIo            A pointer to ATA_ATAPI_PASS_THRU_INSTANCE data structure.
-  @param IdeRegisters     A pointer to EFI_IDE_REGISTERS data structure.
-  @param Timeout          The time to complete the command, uses 100ns as a unit.
-
-  @retval EFI_SUCCESS          BSY bit clear within the time out.
-  @retval EFI_TIMEOUT          BSY bit not clear within the time out.
-
-  @note Read Status Register will clear interrupt status.
-**/
-EFI_STATUS
-EFIAPI
-WaitForBSYClear2 (
-  IN  EFI_PCI_IO_PROTOCOL  *PciIo,
-  IN  EFI_IDE_REGISTERS    *IdeRegisters,
-  IN  UINT64               Timeout
-  )
-{
-  UINT64  Delay;
-  UINT8   AltStatusRegister;
-  BOOLEAN InfiniteWait;
-
-  ASSERT (PciIo != NULL);
-  ASSERT (IdeRegisters != NULL);
-
-  if (Timeout == 0) {
-    InfiniteWait = TRUE;
-  } else {
-    InfiniteWait = FALSE;
-  }
-
-  Delay = DivU64x32(Timeout, 1000) + 1;
-  do {
-    AltStatusRegister = IdeReadPortB (PciIo, IdeRegisters->AltOrDev);
-
-    if ((AltStatusRegister & ATA_STSREG_BSY) == 0x00) {
-      return EFI_SUCCESS;
-    }
-
-    //
-    // Stall for 100 microseconds.
-    //
-    MicroSecondDelay (100);
-
-    Delay--;
-
-  } while (InfiniteWait || (Delay > 0));
-
-  return EFI_TIMEOUT;
-}
 
 /**
   Get IDE i/o port registers' base addresses by mode.
@@ -915,12 +718,12 @@ WaitForBSYClear2 (
   Table 2. BARs for Register Mapping
 
   @param[in]      PciIo          Pointer to the EFI_PCI_IO_PROTOCOL instance
-  @param[in, out] IdeRegisters    Pointer to EFI_IDE_REGISTERS which is used to
+  @param[in, out] IdeRegisters   Pointer to EFI_IDE_REGISTERS which is used to
                                  store the IDE i/o port registers' base addresses
 
   @retval EFI_UNSUPPORTED        Return this value when the BARs is not IO type
   @retval EFI_SUCCESS            Get the Base address successfully
-  @retval Other                  Read the pci configureation data error
+  @retval Other                  Read the pci configuration data error
 
 **/
 EFI_STATUS
@@ -1017,72 +820,6 @@ GetIdeRegisterIoAddr (
   return EFI_SUCCESS;
 }
 
-/**
-  This function is used to implement the Soft Reset on the specified device. But,
-  the ATA Soft Reset mechanism is so strong a reset method that it will force
-  resetting on both devices connected to the same cable.
-
-  It is called by IdeBlkIoReset(), a interface function of Block
-  I/O protocol.
-
-  This function can also be used by the ATAPI device to perform reset when
-  ATAPI Reset command is failed.
-
-  @param PciIo            A pointer to ATA_ATAPI_PASS_THRU_INSTANCE data structure.
-  @param IdeRegisters     A pointer to EFI_IDE_REGISTERS data structure.
-  @param Timeout          The time to complete the command, uses 100ns as a unit.
-
-  @retval EFI_SUCCESS       Soft reset completes successfully.
-  @retval EFI_DEVICE_ERROR  Any step during the reset process is failed.
-
-  @note  The registers initial values after ATA soft reset are different
-         to the ATA device and ATAPI device.
-**/
-EFI_STATUS
-EFIAPI
-AtaSoftReset (
-  IN  EFI_PCI_IO_PROTOCOL  *PciIo,
-  IN  EFI_IDE_REGISTERS    *IdeRegisters,
-  IN  UINT64               Timeout
-  )
-{
-  UINT8 DeviceControl;
-
-  DeviceControl = 0;
-  //
-  // disable Interrupt and set SRST bit to initiate soft reset
-  //
-  DeviceControl = ATA_CTLREG_SRST | ATA_CTLREG_IEN_L;
-
-  IdeWritePortB (PciIo, IdeRegisters->AltOrDev, DeviceControl);
-
-  //
-  // SRST should assert for at least 5 us, we use 10 us for
-  // better compatibility
-  //
-  MicroSecondDelay (10);
-
-  //
-  // Enable interrupt to support UDMA, and clear SRST bit
-  //
-  DeviceControl = 0;
-  IdeWritePortB (PciIo, IdeRegisters->AltOrDev, DeviceControl);
-
-  //
-  // Wait for at least 10 ms to check BSY status, we use 10 ms
-  // for better compatibility
-  //
-  MicroSecondDelay (10000);
-
-  //
-  // slave device needs at most 31ms to clear BSY
-  //
-  if (WaitForBSYClear (PciIo, IdeRegisters, Timeout) == EFI_TIMEOUT) {
-    return EFI_DEVICE_ERROR;
-  }
-
-  return EFI_SUCCESS;
-}
 
 /**
   Send ATA Ext command into device with NON_DATA protocol.
@@ -1246,7 +983,7 @@ AtaPioDataInOut (
   Increment = 256;
 
   //
-  // used to record bytes of currently transfered data
+  // used to record bytes of currently transferred data
   //
   WordCount = 0;
 
@@ -1951,7 +1688,7 @@ AtaPacketReadWrite (
   RequiredWordCount = *ByteCount >> 1;
 
   //
-  // No data transfer is premitted.
+  // No data transfer is permitted.
   //
   if (RequiredWordCount == 0) {
     return EFI_SUCCESS;
@@ -2772,7 +2509,7 @@ DetectAndConfigIdeDevice (
     }
 
     //
-    // Set supported DMA mode on this IDE device. Note that UDMA & MDMA cann't
+    // Set supported DMA mode on this IDE device. Note that UDMA & MDMA can't
     // be set together. Only one DMA mode can be set to a device. If setting
     // DMA mode operation fails, we can continue moving on because we only use
     // PIO mode at boot time. DMA modes are used by certain kind of OS booting

@@ -1,15 +1,9 @@
 /** @file
   Functions declaration related with DHCPv4 for UefiPxeBc Driver.
 
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -66,7 +60,7 @@
 
 //
 // Dhcp4 and Dhcp6 share this definition, and corresponding
-// relatioinship is as follows:
+// relationship is as follows:
 //
 //   Dhcp4Discover <> Dhcp6Solicit
 //   Dhcp4Offer    <> Dhcp6Advertise
@@ -108,7 +102,7 @@ typedef enum {
 
 #define IS_VALID_BOOT_SERVERS(x) \
   ((((x)[0]) & BIT (PXEBC_VENDOR_TAG_BOOT_SERVERS)) \
-   == BIT (PXEBC_VENDOR_TAG_BOOT_SERVERS))  
+   == BIT (PXEBC_VENDOR_TAG_BOOT_SERVERS))
 
 #define IS_VALID_BOOT_PROMPT(x) \
   ((((x)[0]) & BIT (PXEBC_VENDOR_TAG_MENU_PROMPT)) \
@@ -346,7 +340,7 @@ PxeBcDhcp4Discover (
 
 **/
 EFI_STATUS
-PxeBcSetIp4Policy (   
+PxeBcSetIp4Policy (
   IN PXEBC_PRIVATE_DATA            *Private
   );
 

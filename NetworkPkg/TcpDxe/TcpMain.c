@@ -2,15 +2,9 @@
   Implementation of EFI_TCP4_PROTOCOL and EFI_TCP6_PROTOCOL.
 
   (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php.
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -40,6 +34,9 @@ TcpChkDataBuf (
   UINT32 Len;
 
   for (Index = 0, Len = 0; Index < FragmentCount; Index++) {
+    if (FragmentTable[Index].FragmentBuffer == NULL) {
+      return EFI_INVALID_PARAMETER;
+    }
     Len = Len + FragmentTable[Index].FragmentLength;
   }
 
@@ -150,7 +147,7 @@ Tcp4Configure (
     if (IP4_IS_LOCAL_BROADCAST (NTOHL (Ip))) {
       return EFI_INVALID_PARAMETER;
     }
-    
+
     if (TcpConfigData->AccessPoint.ActiveFlag && (0 == TcpConfigData->AccessPoint.RemotePort || (Ip == 0))) {
       return EFI_INVALID_PARAMETER;
     }
@@ -159,7 +156,8 @@ Tcp4Configure (
 
       CopyMem (&Ip, &TcpConfigData->AccessPoint.StationAddress, sizeof (IP4_ADDR));
       CopyMem (&SubnetMask, &TcpConfigData->AccessPoint.SubnetMask, sizeof (IP4_ADDR));
-      if (!IP4_IS_VALID_NETMASK (NTOHL (SubnetMask)) || !NetIp4IsUnicast (NTOHL (Ip), NTOHL (SubnetMask))) {
+      if (!IP4_IS_VALID_NETMASK (NTOHL (SubnetMask)) ||
+          (SubnetMask != 0 && !NetIp4IsUnicast (NTOHL (Ip), NTOHL (SubnetMask)))) {
         return EFI_INVALID_PARAMETER;
       }
     }
@@ -284,7 +282,7 @@ Tcp4Connect (
   @retval EFI_SUCCESS              The listen token was queued successfully.
   @retval EFI_NOT_STARTED          The EFI_TCP4_PROTOCOL instance hasn't been
                                    configured.
-  @retval EFI_ACCESS_DENIED        The instatnce is not a passive one or it is not
+  @retval EFI_ACCESS_DENIED        The instance is not a passive one or it is not
                                    in Tcp4StateListen state or a same listen token
                                    has already existed in the listen token queue of
                                    this TCP instance.
@@ -797,7 +795,7 @@ Tcp6Connect (
   @retval EFI_INVALID_PARAMETER  One or more of the following are TRUE:
                                  - This is NULL.
                                  - ListenToken is NULL.
-                                 - ListentToken->CompletionToken.Event is NULL.
+                                 - ListenToken->CompletionToken.Event is NULL.
   @retval EFI_OUT_OF_RESOURCES   Could not allocate enough resource to finish the operation.
   @retval EFI_DEVICE_ERROR       Any unexpected error not belonging to a category listed above.
 

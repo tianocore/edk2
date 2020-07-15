@@ -1,16 +1,9 @@
 /** @file
 BOT Transportation implementation.
 
-Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
-  
-This program and the accompanying materials
-are licensed and made available under the terms and conditions
-of the BSD License which accompanies this distribution.  The
-full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -199,7 +192,7 @@ BotDataPhase (
   TransferredSize = 0;
 
   //
-  // retrieve the the max packet length of the given endpoint
+  // retrieve the max packet length of the given endpoint
   //
   if (Direction == EfiUsbDataIn) {
     MaxPacketLen  = (PeiBotDev->BulkInEndpoint)->MaxPacketSize;

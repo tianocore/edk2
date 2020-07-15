@@ -3,13 +3,7 @@
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
   Copyright (c) 2011 - 2016, ARM Ltd. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -41,6 +35,14 @@ typedef enum {
   ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_UNCACHED_UNBUFFERED,
   ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK,
   ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_WRITE_BACK,
+
+  // On some platforms, memory mapped flash region is designed as not supporting
+  // shareable attribute, so WRITE_BACK_NONSHAREABLE is added for such special
+  // need.
+  // Do NOT use below two attributes if you are not sure.
+  ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK_NONSHAREABLE,
+  ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_WRITE_BACK_NONSHAREABLE,
+
   ARM_MEMORY_REGION_ATTRIBUTE_WRITE_THROUGH,
   ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_WRITE_THROUGH,
   ARM_MEMORY_REGION_ATTRIBUTE_DEVICE,
@@ -207,24 +209,6 @@ VOID
 EFIAPI
 ArmCleanInvalidateDataCacheEntryByMVA (
   IN  UINTN   Address
-  );
-
-VOID
-EFIAPI
-ArmInvalidateDataCacheEntryBySetWay (
-  IN  UINTN  SetWayFormat
-  );
-
-VOID
-EFIAPI
-ArmCleanDataCacheEntryBySetWay (
-  IN  UINTN  SetWayFormat
-  );
-
-VOID
-EFIAPI
-ArmCleanInvalidateDataCacheEntryBySetWay (
-  IN  UINTN   SetWayFormat
   );
 
 VOID
@@ -550,6 +534,12 @@ ArmReadSctlr (
   VOID
   );
 
+VOID
+EFIAPI
+ArmWriteSctlr (
+  IN  UINT32   Value
+  );
+
 UINTN
 EFIAPI
 ArmReadHVBar (
@@ -717,6 +707,12 @@ VOID
 EFIAPI
 ArmWriteCntvOff (
   UINT64   Val
+  );
+
+UINTN
+EFIAPI
+ArmGetPhysicalAddressBits (
+  VOID
   );
 
 #endif // __ARM_LIB__

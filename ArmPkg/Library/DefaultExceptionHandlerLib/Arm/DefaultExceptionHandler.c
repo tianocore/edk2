@@ -4,13 +4,7 @@
   Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
   Copyright (c) 2012, ARM Ltd. All rights reserved.<BR>
 
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
-  http://opensource.org/licenses/bsd-license.php
-
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -21,6 +15,8 @@
 #include <Library/PrintLib.h>
 #include <Library/ArmDisassemblerLib.h>
 #include <Library/SerialPortLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Library/UefiLib.h>
 
 #include <Guid/DebugImageInfoTable.h>
 
@@ -172,7 +168,7 @@ STATIC CHAR8 *gExceptionTypeString[] = {
 /**
   This is the default action to take on an unexpected exception
 
-  Since this is exception context don't do anything crazy like try to allcoate memory.
+  Since this is exception context don't do anything crazy like try to allocate memory.
 
   @param  ExceptionType    Type of the exception
   @param  SystemContext    Register state at the time of the Exception
@@ -194,7 +190,10 @@ DefaultExceptionHandler (
 
   CharCount = AsciiSPrint (Buffer,sizeof (Buffer),"\n%a Exception PC at 0x%08x  CPSR 0x%08x ",
          gExceptionTypeString[ExceptionType], SystemContext.SystemContextArm->PC, SystemContext.SystemContextArm->CPSR);
-  SerialPortWrite ((UINT8 *) Buffer, CharCount);
+  SerialPortWrite ((UINT8 *)Buffer, CharCount);
+  if (gST->ConOut != NULL) {
+    AsciiPrint (Buffer);
+  }
 
   DEBUG_CODE_BEGIN ();
     CHAR8   *Pdb;
@@ -266,6 +265,8 @@ DefaultExceptionHandler (
 
   DEBUG ((EFI_D_ERROR, "\n"));
   ASSERT (FALSE);
+
+  CpuDeadLoop ();   // may return if executing under a debugger
 
   // Clear the error registers that we have already displayed incase some one wants to keep going
   SystemContext.SystemContextArm->DFSR = 0;
