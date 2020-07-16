@@ -46,25 +46,17 @@ class MetaFileTable():
             self.TableName = "_%s_%s" % (FileType, len(DB.TblFile))
 
     def IsIntegrity(self):
+        Result = False
         try:
             TimeStamp = self.MetaFile.TimeStamp
             if not self.CurrentContent:
                 Result = False
             else:
                 Result = self.CurrentContent[-1][0] < 0
-            if not Result:
-                # update the timestamp in database
-                self.DB.SetFileTimeStamp(self.FileId, TimeStamp)
-                return False
-
-            if TimeStamp != self.DB.GetFileTimeStamp(self.FileId):
-                # update the timestamp in database
-                self.DB.SetFileTimeStamp(self.FileId, TimeStamp)
-                return False
         except Exception as Exc:
             EdkLogger.debug(EdkLogger.DEBUG_5, str(Exc))
             return False
-        return True
+        return Result
 
     def SetEndFlag(self):
         self.CurrentContent.append(self._DUMMY_)
