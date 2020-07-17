@@ -12,6 +12,18 @@
 #ifndef _LSI_SCSI_DXE_H_
 #define _LSI_SCSI_DXE_H_
 
+typedef struct {
+  UINT32                          Signature;
+  EFI_EXT_SCSI_PASS_THRU_MODE     PassThruMode;
+  EFI_EXT_SCSI_PASS_THRU_PROTOCOL PassThru;
+} LSI_SCSI_DEV;
+
+#define LSI_SCSI_DEV_SIGNATURE SIGNATURE_32 ('L','S','I','S')
+
+#define LSI_SCSI_FROM_PASS_THRU(PassThruPtr) \
+  CR (PassThruPtr, LSI_SCSI_DEV, PassThru, LSI_SCSI_DEV_SIGNATURE)
+
+
 //
 // Probe, start and stop functions of this driver, called by the DXE core for
 // specific devices.
@@ -44,6 +56,72 @@ LsiScsiControllerStop (
   IN EFI_HANDLE                  ControllerHandle,
   IN UINTN                       NumberOfChildren,
   IN EFI_HANDLE                  *ChildHandleBuffer
+  );
+
+
+//
+// The next seven functions implement EFI_EXT_SCSI_PASS_THRU_PROTOCOL
+// for the LSI 53C895A SCSI Controller. Refer to UEFI Spec 2.3.1 + Errata C,
+// sections
+// - 14.1 SCSI Driver Model Overview,
+// - 14.7 Extended SCSI Pass Thru Protocol.
+//
+
+EFI_STATUS
+EFIAPI
+LsiScsiPassThru (
+  IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL                *This,
+  IN UINT8                                          *Target,
+  IN UINT64                                         Lun,
+  IN OUT EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET *Packet,
+  IN EFI_EVENT                                      Event     OPTIONAL
+  );
+
+EFI_STATUS
+EFIAPI
+LsiScsiGetNextTargetLun (
+  IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL *This,
+  IN OUT UINT8                       **TargetPointer,
+  IN OUT UINT64                      *Lun
+  );
+
+EFI_STATUS
+EFIAPI
+LsiScsiBuildDevicePath (
+  IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL *This,
+  IN UINT8                           *Target,
+  IN UINT64                          Lun,
+  IN OUT EFI_DEVICE_PATH_PROTOCOL    **DevicePath
+  );
+
+EFI_STATUS
+EFIAPI
+LsiScsiGetTargetLun (
+  IN  EFI_EXT_SCSI_PASS_THRU_PROTOCOL *This,
+  IN  EFI_DEVICE_PATH_PROTOCOL        *DevicePath,
+  OUT UINT8                           **TargetPointer,
+  OUT UINT64                          *Lun
+  );
+
+EFI_STATUS
+EFIAPI
+LsiScsiResetChannel (
+  IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL *This
+  );
+
+EFI_STATUS
+EFIAPI
+LsiScsiResetTargetLun (
+  IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL *This,
+  IN UINT8                           *Target,
+  IN UINT64                          Lun
+  );
+
+EFI_STATUS
+EFIAPI
+LsiScsiGetNextTarget (
+  IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL *This,
+  IN OUT UINT8                       **TargetPointer
   );
 
 
