@@ -45,6 +45,60 @@ Out8 (
 
 STATIC
 EFI_STATUS
+Out32 (
+  IN LSI_SCSI_DEV       *Dev,
+  IN UINT32             Addr,
+  IN UINT32             Data
+  )
+{
+  return Dev->PciIo->Io.Write (
+                          Dev->PciIo,
+                          EfiPciIoWidthUint32,
+                          PCI_BAR_IDX0,
+                          Addr,
+                          1,
+                          &Data
+                          );
+}
+
+STATIC
+EFI_STATUS
+In8 (
+  IN  LSI_SCSI_DEV *Dev,
+  IN  UINT32       Addr,
+  OUT UINT8        *Data
+  )
+{
+  return Dev->PciIo->Io.Read (
+                          Dev->PciIo,
+                          EfiPciIoWidthUint8,
+                          PCI_BAR_IDX0,
+                          Addr,
+                          1,
+                          Data
+                          );
+}
+
+STATIC
+EFI_STATUS
+In32 (
+  IN  LSI_SCSI_DEV *Dev,
+  IN  UINT32       Addr,
+  OUT UINT32       *Data
+  )
+{
+  return Dev->PciIo->Io.Read (
+                          Dev->PciIo,
+                          EfiPciIoWidthUint32,
+                          PCI_BAR_IDX0,
+                          Addr,
+                          1,
+                          Data
+                          );
+}
+
+STATIC
+EFI_STATUS
 LsiScsiReset (
   IN LSI_SCSI_DEV *Dev
   )
@@ -141,6 +195,357 @@ LsiScsiCheckRequest (
   return EFI_SUCCESS;
 }
 
+/**
+
+  Interpret the request packet from the Extended SCSI Pass Thru Protocol and
+  compose the script to submit the command and data to the controller.
+
+  @param[in] Dev          The LSI 53C895A SCSI device the packet targets.
+
+  @param[in] Target       The SCSI target controlled by the LSI 53C895A SCSI
+                          device.
+
+  @param[in] Lun          The Logical Unit Number under the SCSI target.
+
+  @param[in out] Packet   The Extended SCSI Pass Thru Protocol packet.
+
+
+  @retval EFI_SUCCESS  The Extended SCSI Pass Thru Protocol packet was valid.
+
+  @return              Otherwise, invalid or unsupported parameters were
+                       detected. Status codes are meant for direct forwarding
+                       by the EFI_EXT_SCSI_PASS_THRU_PROTOCOL.PassThru()
+                       implementation.
+
+ **/
+STATIC
+EFI_STATUS
+LsiScsiProcessRequest (
+  IN LSI_SCSI_DEV                                   *Dev,
+  IN UINT8                                          Target,
+  IN UINT64                                         Lun,
+  IN OUT EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET *Packet
+  )
+{
+  EFI_STATUS Status;
+  UINT32     *Script;
+  UINT8      *Cdb;
+  UINT8      *MsgOut;
+  UINT8      *MsgIn;
+  UINT8      *ScsiStatus;
+  UINT8      *Data;
+  UINT8      DStat;
+  UINT8      SIst0;
+  UINT8      SIst1;
+  UINT32     Csbc;
+  UINT32     CsbcBase;
+  UINT32     Transferred;
+
+  Script      = Dev->Dma->Script;
+  Cdb         = Dev->Dma->Cdb;
+  Data        = Dev->Dma->Data;
+  MsgIn       = Dev->Dma->MsgIn;
+  MsgOut      = &Dev->Dma->MsgOut;
+  ScsiStatus  = &Dev->Dma->Status;
+
+  *ScsiStatus = 0xFF;
+
+  DStat = 0;
+  SIst0 = 0;
+  SIst1 = 0;
+
+  SetMem (Cdb, sizeof Dev->Dma->Cdb, 0x00);
+  CopyMem (Cdb, Packet->Cdb, Packet->CdbLength);
+
+  //
+  // Fetch the first Cumulative SCSI Byte Count (CSBC).
+  //
+  // CSBC is a cumulative counter of the actual number of bytes that have been
+  // transferred across the SCSI bus during data phases, i.e. it will not
+  // count bytes sent in command, status, message in and out phases.
+  //
+  Status = In32 (Dev, LSI_REG_CSBC, &CsbcBase);
+  if (EFI_ERROR (Status)) {
+    goto Error;
+  }
+
+  //
+  // Clean up the DMA buffer for the script.
+  //
+  SetMem (Script, sizeof Dev->Dma->Script, 0x00);
+
+  //
+  // Compose the script to transfer data between the host and the device.
+  //
+  // References:
+  //   * LSI53C895A PCI to Ultra2 SCSI Controller Version 2.2
+  //     - Chapter 5 SCSI SCRIPT Instruction Set
+  //   * SEABIOS lsi-scsi driver
+  //
+  // All instructions used here consist of 2 32bit words. The first word
+  // contains the command to execute. The second word is loaded into the
+  // DMA SCRIPTS Pointer Save (DSPS) register as either the DMA address
+  // for data transmission or the address/offset for the jump command.
+  // Some commands, such as the selection of the target, don't need to
+  // transfer data through DMA or jump to another instruction, then DSPS
+  // has to be zero.
+  //
+  // There are 3 major parts in this script. The first part (1~3) contains
+  // the instructions to select target and LUN and send the SCSI command
+  // from the request packet. The second part (4~7) is to handle the
+  // potential disconnection and prepare for the data transmission. The
+  // instructions in the third part (8~10) transmit the given data and
+  // collect the result. Instruction 11 raises the interrupt and marks the
+  // end of the script.
+  //
+
+  //
+  // 1. Select target.
+  //
+  *Script++ = LSI_INS_TYPE_IO | LSI_INS_IO_OPC_SEL | (UINT32)Target << 16;
+  *Script++ = 0x00000000;
+
+  //
+  // 2. Select LUN.
+  //
+  *MsgOut   = 0x80 | (UINT8) Lun; // 0x80: Identify bit
+  *Script++ = LSI_INS_TYPE_BLK | LSI_INS_BLK_SCSIP_MSG_OUT |
+              (UINT32)sizeof Dev->Dma->MsgOut;
+  *Script++ = LSI_SCSI_DMA_ADDR (Dev, MsgOut);
+
+  //
+  // 3. Send the SCSI Command.
+  //
+  *Script++ = LSI_INS_TYPE_BLK | LSI_INS_BLK_SCSIP_CMD |
+              (UINT32)sizeof Dev->Dma->Cdb;
+  *Script++ = LSI_SCSI_DMA_ADDR (Dev, Cdb);
+
+  //
+  // 4. Check whether the current SCSI phase is "Message In" or not
+  //    and jump to 7 if it is.
+  //    Note: LSI_INS_TC_RA stands for "Relative Address Mode", so the
+  //          offset 0x18 in the second word means jumping forward
+  //          3 (0x18/8) instructions.
+  //
+  *Script++ = LSI_INS_TYPE_TC | LSI_INS_TC_OPC_JMP |
+              LSI_INS_TC_SCSIP_MSG_IN | LSI_INS_TC_RA |
+              LSI_INS_TC_CP;
+  *Script++ = 0x00000018;
+
+  //
+  // 5. Read "Message" from the initiator to trigger reselect.
+  //
+  *Script++ = LSI_INS_TYPE_BLK | LSI_INS_BLK_SCSIP_MSG_IN |
+              (UINT32)sizeof Dev->Dma->MsgIn;
+  *Script++ = LSI_SCSI_DMA_ADDR (Dev, MsgIn);
+
+  //
+  // 6. Wait reselect.
+  //
+  *Script++ = LSI_INS_TYPE_IO | LSI_INS_IO_OPC_WAIT_RESEL;
+  *Script++ = 0x00000000;
+
+  //
+  // 7. Read "Message" from the initiator again
+  //
+  *Script++ = LSI_INS_TYPE_BLK | LSI_INS_BLK_SCSIP_MSG_IN |
+              (UINT32)sizeof Dev->Dma->MsgIn;
+  *Script++ = LSI_SCSI_DMA_ADDR (Dev, MsgIn);
+
+  //
+  // 8. Set the DMA command for the read/write operations.
+  //    Note: Some requests, e.g. "TEST UNIT READY", do not come with
+  //          allocated InDataBuffer or OutDataBuffer. We skip the DMA
+  //          data command for those requests or this script would fail
+  //          with LSI_SIST0_SGE due to the zero data length.
+  //
+  // LsiScsiCheckRequest() prevents both integer overflows in the command
+  // opcodes, and buffer overflows.
+  //
+  if (Packet->InTransferLength > 0) {
+    ASSERT (Packet->DataDirection == EFI_EXT_SCSI_DATA_DIRECTION_READ);
+    ASSERT (Packet->InTransferLength <= sizeof Dev->Dma->Data);
+    *Script++ = LSI_INS_TYPE_BLK | LSI_INS_BLK_SCSIP_DAT_IN |
+                Packet->InTransferLength;
+    *Script++ = LSI_SCSI_DMA_ADDR (Dev, Data);
+  } else if (Packet->OutTransferLength > 0) {
+    ASSERT (Packet->DataDirection == EFI_EXT_SCSI_DATA_DIRECTION_WRITE);
+    ASSERT (Packet->OutTransferLength <= sizeof Dev->Dma->Data);
+    CopyMem (Data, Packet->OutDataBuffer, Packet->OutTransferLength);
+    *Script++ = LSI_INS_TYPE_BLK | LSI_INS_BLK_SCSIP_DAT_OUT |
+                Packet->OutTransferLength;
+    *Script++ = LSI_SCSI_DMA_ADDR (Dev, Data);
+  }
+
+  //
+  // 9. Get the SCSI status.
+  //
+  *Script++ = LSI_INS_TYPE_BLK | LSI_INS_BLK_SCSIP_STAT |
+              (UINT32)sizeof Dev->Dma->Status;
+  *Script++ = LSI_SCSI_DMA_ADDR (Dev, Status);
+
+  //
+  // 10. Get the SCSI message.
+  //
+  *Script++ = LSI_INS_TYPE_BLK | LSI_INS_BLK_SCSIP_MSG_IN |
+              (UINT32)sizeof Dev->Dma->MsgIn;
+  *Script++ = LSI_SCSI_DMA_ADDR (Dev, MsgIn);
+
+  //
+  // 11. Raise the interrupt to end the script.
+  //
+  *Script++ = LSI_INS_TYPE_TC | LSI_INS_TC_OPC_INT |
+              LSI_INS_TC_SCSIP_DAT_OUT | LSI_INS_TC_JMP;
+  *Script++ = 0x00000000;
+
+  //
+  // Make sure the size of the script doesn't exceed the buffer.
+  //
+  ASSERT (Script <= Dev->Dma->Script + ARRAY_SIZE (Dev->Dma->Script));
+
+  //
+  // The controller starts to execute the script once the DMA Script
+  // Pointer (DSP) register is set.
+  //
+  Status = Out32 (Dev, LSI_REG_DSP, LSI_SCSI_DMA_ADDR (Dev, Script));
+  if (EFI_ERROR (Status)) {
+    goto Error;
+  }
+
+  //
+  // Poll the device registers (DSTAT, SIST0, and SIST1) until the SIR
+  // bit sets.
+  //
+  for(;;) {
+    Status = In8 (Dev, LSI_REG_DSTAT, &DStat);
+    if (EFI_ERROR (Status)) {
+      goto Error;
+    }
+    Status = In8 (Dev, LSI_REG_SIST0, &SIst0);
+    if (EFI_ERROR (Status)) {
+      goto Error;
+    }
+    Status = In8 (Dev, LSI_REG_SIST1, &SIst1);
+    if (EFI_ERROR (Status)) {
+      goto Error;
+    }
+
+    if (SIst0 != 0 || SIst1 != 0) {
+      goto Error;
+    }
+
+    //
+    // Check the SIR (SCRIPTS Interrupt Instruction Received) bit.
+    //
+    if (DStat & LSI_DSTAT_SIR) {
+      break;
+    }
+
+    gBS->Stall (Dev->StallPerPollUsec);
+  }
+
+  //
+  // Check if everything is good.
+  //   SCSI Message Code 0x00: COMMAND COMPLETE
+  //   SCSI Status  Code 0x00: Good
+  //
+  if (MsgIn[0] != 0 || *ScsiStatus != 0) {
+    goto Error;
+  }
+
+  //
+  // Fetch CSBC again to calculate the transferred bytes and update
+  // InTransferLength/OutTransferLength.
+  //
+  // Note: The number of transferred bytes is bounded by
+  //       "sizeof Dev->Dma->Data", so it's safe to subtract CsbcBase
+  //       from Csbc. If the CSBC register wraps around, the correct
+  //       difference is ensured by the standard C modular arithmetic.
+  //
+  Status = In32 (Dev, LSI_REG_CSBC, &Csbc);
+  if (EFI_ERROR (Status)) {
+    goto Error;
+  }
+
+  Transferred = Csbc - CsbcBase;
+  if (Packet->InTransferLength > 0) {
+    if (Transferred <= Packet->InTransferLength) {
+      Packet->InTransferLength = Transferred;
+    } else {
+      goto Error;
+    }
+  } else if (Packet->OutTransferLength > 0) {
+    if (Transferred <= Packet->OutTransferLength) {
+      Packet->OutTransferLength = Transferred;
+    } else {
+      goto Error;
+    }
+  }
+
+  //
+  // Copy Data to InDataBuffer if necessary.
+  //
+  if (Packet->DataDirection == EFI_EXT_SCSI_DATA_DIRECTION_READ) {
+    CopyMem (Packet->InDataBuffer, Data, Packet->InTransferLength);
+  }
+
+  //
+  // Always set SenseDataLength to 0.
+  // The instructions of LSI53C895A don't reply sense data. Instead, it
+  // relies on the SCSI command, "REQUEST SENSE", to get sense data. We set
+  // SenseDataLength to 0 to notify ScsiDiskDxe that there is no sense data
+  // written even if this request is processed successfully, so that It will
+  // issue "REQUEST SENSE" later to retrieve sense data.
+  //
+  Packet->SenseDataLength   = 0;
+  Packet->HostAdapterStatus = EFI_EXT_SCSI_STATUS_HOST_ADAPTER_OK;
+  Packet->TargetStatus      = EFI_EXT_SCSI_STATUS_TARGET_GOOD;
+
+  return EFI_SUCCESS;
+
+Error:
+  DEBUG ((DEBUG_VERBOSE, "%a: dstat: %02X, sist0: %02X, sist1: %02X\n",
+    __FUNCTION__, DStat, SIst0, SIst1));
+  //
+  // Update the request packet to reflect the status.
+  //
+  if (*ScsiStatus != 0xFF) {
+    Packet->TargetStatus    = *ScsiStatus;
+  } else {
+    Packet->TargetStatus    = EFI_EXT_SCSI_STATUS_TARGET_TASK_ABORTED;
+  }
+
+  if (SIst0 & LSI_SIST0_PAR) {
+    Packet->HostAdapterStatus = EFI_EXT_SCSI_STATUS_HOST_ADAPTER_PARITY_ERROR;
+  } else if (SIst0 & LSI_SIST0_RST) {
+    Packet->HostAdapterStatus = EFI_EXT_SCSI_STATUS_HOST_ADAPTER_BUS_RESET;
+  } else if (SIst0 & LSI_SIST0_UDC) {
+    //
+    // The target device is disconnected unexpectedly. According to UEFI spec,
+    // this is TIMEOUT_COMMAND.
+    //
+    Packet->HostAdapterStatus = EFI_EXT_SCSI_STATUS_HOST_ADAPTER_TIMEOUT_COMMAND;
+  } else if (SIst0 & LSI_SIST0_SGE) {
+    Packet->HostAdapterStatus = EFI_EXT_SCSI_STATUS_HOST_ADAPTER_DATA_OVERRUN_UNDERRUN;
+  } else if (SIst1 & LSI_SIST1_HTH) {
+    Packet->HostAdapterStatus = EFI_EXT_SCSI_STATUS_HOST_ADAPTER_TIMEOUT;
+  } else if (SIst1 & LSI_SIST1_GEN) {
+    Packet->HostAdapterStatus = EFI_EXT_SCSI_STATUS_HOST_ADAPTER_TIMEOUT;
+  } else if (SIst1 & LSI_SIST1_STO) {
+    Packet->HostAdapterStatus = EFI_EXT_SCSI_STATUS_HOST_ADAPTER_SELECTION_TIMEOUT;
+  } else {
+    Packet->HostAdapterStatus = EFI_EXT_SCSI_STATUS_HOST_ADAPTER_OTHER;
+  }
+
+  //
+  // SenseData may be used to inspect the error. Since we don't set sense data,
+  // SenseDataLength has to be 0.
+  //
+  Packet->SenseDataLength = 0;
+
+  return EFI_DEVICE_ERROR;
+}
+
 //
 // The next seven functions implement EFI_EXT_SCSI_PASS_THRU_PROTOCOL
 // for the LSI 53C895A SCSI Controller. Refer to UEFI Spec 2.3.1 + Errata C,
@@ -168,7 +573,7 @@ LsiScsiPassThru (
     return Status;
   }
 
-  return EFI_UNSUPPORTED;
+  return LsiScsiProcessRequest (Dev, *Target, Lun, Packet);
 }
 
 EFI_STATUS
@@ -474,6 +879,7 @@ LsiScsiControllerStart (
     );
   Dev->MaxTarget = PcdGet8 (PcdLsiScsiMaxTargetLimit);
   Dev->MaxLun = PcdGet8 (PcdLsiScsiMaxLunLimit);
+  Dev->StallPerPollUsec = PcdGet32 (PcdLsiScsiStallPerPollUsec);
 
   Status = gBS->OpenProtocol (
                   ControllerHandle,

@@ -41,3 +41,6 @@
 [FixedPcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdLsiScsiMaxTargetLimit   ## CONSUMES
   gUefiOvmfPkgTokenSpaceGuid.PcdLsiScsiMaxLunLimit      ## CONSUMES
+
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdLsiScsiStallPerPollUsec ## CONSUMES

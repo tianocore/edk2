@@ -179,6 +179,9 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdLsiScsiMaxTargetLimit|7|UINT8|0x3b
   gUefiOvmfPkgTokenSpaceGuid.PcdLsiScsiMaxLunLimit|0|UINT8|0x3c
 
+  ## Microseconds to stall between polling for LsiScsi request result
+  gUefiOvmfPkgTokenSpaceGuid.PcdLsiScsiStallPerPollUsec|5|UINT32|0x3d
+
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashNvStorageEventLogBase|0x0|UINT32|0x8
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashNvStorageEventLogSize|0x0|UINT32|0x9
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFirmwareFdSize|0x0|UINT32|0xa
