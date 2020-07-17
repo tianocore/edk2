@@ -25,6 +25,33 @@
 
 #include "LsiScsi.h"
 
+STATIC
+EFI_STATUS
+Out8 (
+  IN LSI_SCSI_DEV *Dev,
+  IN UINT32       Addr,
+  IN UINT8        Data
+  )
+{
+  return Dev->PciIo->Io.Write (
+                          Dev->PciIo,
+                          EfiPciIoWidthUint8,
+                          PCI_BAR_IDX0,
+                          Addr,
+                          1,
+                          &Data
+                          );
+}
+
+STATIC
+EFI_STATUS
+LsiScsiReset (
+  IN LSI_SCSI_DEV *Dev
+  )
+{
+  return Out8 (Dev, LSI_REG_ISTAT0, LSI_ISTAT0_SRST);
+}
+
 //
 // The next seven functions implement EFI_EXT_SCSI_PASS_THRU_PROTOCOL
 // for the LSI 53C895A SCSI Controller. Refer to UEFI Spec 2.3.1 + Errata C,
@@ -243,6 +270,21 @@ LsiScsiGetNextTarget (
   return EFI_NOT_FOUND;
 }
 
+STATIC
+VOID
+EFIAPI
+LsiScsiExitBoot (
+  IN  EFI_EVENT Event,
+  IN  VOID      *Context
+  )
+{
+  LSI_SCSI_DEV *Dev;
+
+  Dev = Context;
+  DEBUG ((DEBUG_VERBOSE, "%a: Context=0x%p\n", __FUNCTION__, Context));
+  LsiScsiReset (Dev);
+}
+
 //
 // Probe, start and stop functions of this driver, called by the DXE core for
 // specific devices.
@@ -333,6 +375,58 @@ LsiScsiControllerStart (
   Dev->MaxTarget = PcdGet8 (PcdLsiScsiMaxTargetLimit);
   Dev->MaxLun = PcdGet8 (PcdLsiScsiMaxLunLimit);
 
+  Status = gBS->OpenProtocol (
+                  ControllerHandle,
+                  &gEfiPciIoProtocolGuid,
+                  (VOID **)&Dev->PciIo,
+                  This->DriverBindingHandle,
+                  ControllerHandle,
+                  EFI_OPEN_PROTOCOL_BY_DRIVER
+                  );
+  if (EFI_ERROR (Status)) {
+    goto FreePool;
+  }
+
+  Status = Dev->PciIo->Attributes (
+                         Dev->PciIo,
+                         EfiPciIoAttributeOperationGet,
+                         0,
+                         &Dev->OrigPciAttrs
+                         );
+  if (EFI_ERROR (Status)) {
+    goto CloseProtocol;
+  }
+
+  //
+  // Enable I/O Space & Bus-Mastering
+  //
+  Status = Dev->PciIo->Attributes (
+                         Dev->PciIo,
+                         EfiPciIoAttributeOperationEnable,
+                         (EFI_PCI_IO_ATTRIBUTE_IO |
+                          EFI_PCI_IO_ATTRIBUTE_BUS_MASTER),
+                         NULL
+                         );
+  if (EFI_ERROR (Status)) {
+    goto CloseProtocol;
+  }
+
+  Status = LsiScsiReset (Dev);
+  if (EFI_ERROR (Status)) {
+    goto RestoreAttributes;
+  }
+
+  Status = gBS->CreateEvent (
+                  EVT_SIGNAL_EXIT_BOOT_SERVICES,
+                  TPL_CALLBACK,
+                  &LsiScsiExitBoot,
+                  Dev,
+                  &Dev->ExitBoot
+                  );
+  if (EFI_ERROR (Status)) {
+    goto UninitDev;
+  }
+
   //
   // Host adapter channel, doesn't exist
   //
@@ -357,10 +451,32 @@ LsiScsiControllerStart (
                   &Dev->PassThru
                   );
   if (EFI_ERROR (Status)) {
-    goto FreePool;
+    goto CloseExitBoot;
   }
 
   return EFI_SUCCESS;
+
+CloseExitBoot:
+  gBS->CloseEvent (Dev->ExitBoot);
+
+UninitDev:
+  LsiScsiReset (Dev);
+
+RestoreAttributes:
+  Dev->PciIo->Attributes (
+                Dev->PciIo,
+                EfiPciIoAttributeOperationSet,
+                Dev->OrigPciAttrs,
+                NULL
+                );
+
+CloseProtocol:
+  gBS->CloseProtocol (
+         ControllerHandle,
+         &gEfiPciIoProtocolGuid,
+         This->DriverBindingHandle,
+         ControllerHandle
+         );
 
 FreePool:
   FreePool (Dev);
@@ -403,6 +519,24 @@ LsiScsiControllerStop (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
+  gBS->CloseEvent (Dev->ExitBoot);
+
+  LsiScsiReset (Dev);
+
+  Dev->PciIo->Attributes (
+                Dev->PciIo,
+                EfiPciIoAttributeOperationSet,
+                Dev->OrigPciAttrs,
+                NULL
+                );
+
+  gBS->CloseProtocol (
+         ControllerHandle,
+         &gEfiPciIoProtocolGuid,
+         This->DriverBindingHandle,
+         ControllerHandle
+         );
 
   FreePool (Dev);
 

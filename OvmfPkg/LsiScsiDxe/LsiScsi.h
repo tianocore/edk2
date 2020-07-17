@@ -14,6 +14,9 @@
 
 typedef struct {
   UINT32                          Signature;
+  UINT64                          OrigPciAttrs;
+  EFI_EVENT                       ExitBoot;
+  EFI_PCI_IO_PROTOCOL             *PciIo;
   UINT8                           MaxTarget;
   UINT8                           MaxLun;
   EFI_EXT_SCSI_PASS_THRU_MODE     PassThruMode;
