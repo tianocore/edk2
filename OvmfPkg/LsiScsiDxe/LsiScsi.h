@@ -46,4 +46,35 @@ LsiScsiControllerStop (
   IN EFI_HANDLE                  *ChildHandleBuffer
   );
 
+
+//
+// The purpose of the following scaffolding (EFI_COMPONENT_NAME_PROTOCOL and
+// EFI_COMPONENT_NAME2_PROTOCOL implementation) is to format the driver's name
+// in English, for display on standard console devices. This is recommended for
+// UEFI drivers that follow the UEFI Driver Model. Refer to the Driver Writer's
+// Guide for UEFI 2.3.1 v1.01, 11 UEFI Driver and Controller Names.
+//
+// Device type names ("LSI 53C895A SCSI Controller") are not formatted because
+// the driver supports only that device type. Therefore the driver name
+// suffices for unambiguous identification.
+//
+
+EFI_STATUS
+EFIAPI
+LsiScsiGetDriverName (
+  IN  EFI_COMPONENT_NAME_PROTOCOL *This,
+  IN  CHAR8                       *Language,
+  OUT CHAR16                      **DriverName
+  );
+
+EFI_STATUS
+EFIAPI
+LsiScsiGetDeviceName (
+  IN  EFI_COMPONENT_NAME_PROTOCOL *This,
+  IN  EFI_HANDLE                  DeviceHandle,
+  IN  EFI_HANDLE                  ChildHandle,
+  IN  CHAR8                       *Language,
+  OUT CHAR16                      **ControllerName
+  );
+
 #endif // _LSI_SCSI_DXE_H_

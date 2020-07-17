@@ -75,6 +75,71 @@ EFI_DRIVER_BINDING_PROTOCOL gDriverBinding = {
 
 
 //
+// The purpose of the following scaffolding (EFI_COMPONENT_NAME_PROTOCOL and
+// EFI_COMPONENT_NAME2_PROTOCOL implementation) is to format the driver's name
+// in English, for display on standard console devices. This is recommended for
+// UEFI drivers that follow the UEFI Driver Model. Refer to the Driver Writer's
+// Guide for UEFI 2.3.1 v1.01, 11 UEFI Driver and Controller Names.
+//
+// Device type names ("LSI 53C895A SCSI Controller") are not formatted because
+// the driver supports only that device type. Therefore the driver name
+// suffices for unambiguous identification.
+//
+
+STATIC
+EFI_UNICODE_STRING_TABLE mDriverNameTable[] = {
+  { "eng;en", L"LSI 53C895A SCSI Controller Driver" },
+  { NULL,     NULL                                  }
+};
+
+STATIC
+EFI_COMPONENT_NAME_PROTOCOL gComponentName;
+
+EFI_STATUS
+EFIAPI
+LsiScsiGetDriverName (
+  IN  EFI_COMPONENT_NAME_PROTOCOL *This,
+  IN  CHAR8                       *Language,
+  OUT CHAR16                      **DriverName
+  )
+{
+  return LookupUnicodeString2 (
+           Language,
+           This->SupportedLanguages,
+           mDriverNameTable,
+           DriverName,
+           (BOOLEAN)(This == &gComponentName) // Iso639Language
+           );
+}
+
+EFI_STATUS
+EFIAPI
+LsiScsiGetDeviceName (
+  IN  EFI_COMPONENT_NAME_PROTOCOL *This,
+  IN  EFI_HANDLE                  DeviceHandle,
+  IN  EFI_HANDLE                  ChildHandle,
+  IN  CHAR8                       *Language,
+  OUT CHAR16                      **ControllerName
+  )
+{
+  return EFI_UNSUPPORTED;
+}
+
+STATIC
+EFI_COMPONENT_NAME_PROTOCOL gComponentName = {
+  &LsiScsiGetDriverName,
+  &LsiScsiGetDeviceName,
+  "eng" // SupportedLanguages, ISO 639-2 language codes
+};
+
+STATIC
+EFI_COMPONENT_NAME2_PROTOCOL gComponentName2 = {
+  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)     &LsiScsiGetDriverName,
+  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) &LsiScsiGetDeviceName,
+  "en" // SupportedLanguages, RFC 4646 language codes
+};
+
+//
 // Entry point of this driver
 //
 EFI_STATUS
@@ -89,7 +154,7 @@ LsiScsiEntryPoint (
            SystemTable,
            &gDriverBinding,
            ImageHandle, // The handle to install onto
-           NULL, // TODO Component name
-           NULL  // TODO Component name
+           &gComponentName,
+           &gComponentName2
            );
 }
