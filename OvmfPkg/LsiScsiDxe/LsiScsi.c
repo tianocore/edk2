@@ -52,6 +52,95 @@ LsiScsiReset (
   return Out8 (Dev, LSI_REG_ISTAT0, LSI_ISTAT0_SRST);
 }
 
+STATIC
+EFI_STATUS
+ReportHostAdapterOverrunError (
+  OUT EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET *Packet
+  )
+{
+  Packet->SenseDataLength = 0;
+  Packet->HostAdapterStatus =
+            EFI_EXT_SCSI_STATUS_HOST_ADAPTER_DATA_OVERRUN_UNDERRUN;
+  Packet->TargetStatus = EFI_EXT_SCSI_STATUS_TARGET_GOOD;
+  return EFI_BAD_BUFFER_SIZE;
+}
+
+/**
+
+  Check the request packet from the Extended SCSI Pass Thru Protocol. The
+  request packet is modified, to be forwarded outwards by LsiScsiPassThru(),
+  if invalid or unsupported parameters are detected.
+
+  @param[in] Dev          The LSI 53C895A SCSI device the packet targets.
+
+  @param[in] Target       The SCSI target controlled by the LSI 53C895A SCSI
+                          device.
+
+  @param[in] Lun          The Logical Unit Number under the SCSI target.
+
+  @param[in out] Packet   The Extended SCSI Pass Thru Protocol packet.
+
+
+  @retval EFI_SUCCESS  The Extended SCSI Pass Thru Protocol packet was valid.
+
+  @return              Otherwise, invalid or unsupported parameters were
+                       detected. Status codes are meant for direct forwarding
+                       by the EFI_EXT_SCSI_PASS_THRU_PROTOCOL.PassThru()
+                       implementation.
+
+ **/
+STATIC
+EFI_STATUS
+LsiScsiCheckRequest (
+  IN LSI_SCSI_DEV                                   *Dev,
+  IN UINT8                                          Target,
+  IN UINT64                                         Lun,
+  IN OUT EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET *Packet
+  )
+{
+  if (Target > Dev->MaxTarget || Lun > Dev->MaxLun ||
+      Packet->DataDirection > EFI_EXT_SCSI_DATA_DIRECTION_BIDIRECTIONAL ||
+      //
+      // Trying to receive, but destination pointer is NULL, or contradicting
+      // transfer direction
+      //
+      (Packet->InTransferLength > 0 &&
+       (Packet->InDataBuffer == NULL ||
+        Packet->DataDirection == EFI_EXT_SCSI_DATA_DIRECTION_WRITE
+         )
+        ) ||
+
+      //
+      // Trying to send, but source pointer is NULL, or contradicting transfer
+      // direction
+      //
+      (Packet->OutTransferLength > 0 &&
+       (Packet->OutDataBuffer == NULL ||
+        Packet->DataDirection == EFI_EXT_SCSI_DATA_DIRECTION_READ
+         )
+        )
+    ) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (Packet->DataDirection == EFI_EXT_SCSI_DATA_DIRECTION_BIDIRECTIONAL ||
+      (Packet->InTransferLength > 0 && Packet->OutTransferLength > 0) ||
+      Packet->CdbLength > sizeof Dev->Dma->Cdb) {
+    return EFI_UNSUPPORTED;
+  }
+
+  if (Packet->InTransferLength > sizeof Dev->Dma->Data) {
+    Packet->InTransferLength = sizeof Dev->Dma->Data;
+    return ReportHostAdapterOverrunError (Packet);
+  }
+  if (Packet->OutTransferLength > sizeof Dev->Dma->Data) {
+    Packet->OutTransferLength = sizeof Dev->Dma->Data;
+    return ReportHostAdapterOverrunError (Packet);
+  }
+
+  return EFI_SUCCESS;
+}
+
 //
 // The next seven functions implement EFI_EXT_SCSI_PASS_THRU_PROTOCOL
 // for the LSI 53C895A SCSI Controller. Refer to UEFI Spec 2.3.1 + Errata C,
@@ -70,6 +159,15 @@ LsiScsiPassThru (
   IN EFI_EVENT                                      Event     OPTIONAL
   )
 {
+  EFI_STATUS   Status;
+  LSI_SCSI_DEV *Dev;
+
+  Dev = LSI_SCSI_FROM_PASS_THRU (This);
+  Status = LsiScsiCheckRequest (Dev, *Target, Lun, Packet);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
   return EFI_UNSUPPORTED;
 }
 
