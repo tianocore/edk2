@@ -26,9 +26,12 @@
 
 [LibraryClasses]
   BaseLib
+  BaseMemoryLib
+  MemoryAllocationLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
   UefiLib
 
 [Protocols]
+  gEfiExtScsiPassThruProtocolGuid        ## BY_START
   gEfiPciIoProtocolGuid                  ## TO_START

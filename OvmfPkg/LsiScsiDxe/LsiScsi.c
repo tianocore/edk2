@@ -11,13 +11,104 @@
 
 #include <IndustryStandard/LsiScsi.h>
 #include <IndustryStandard/Pci.h>
+#include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/DebugLib.h>
+#include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>
 #include <Protocol/PciIo.h>
 #include <Protocol/PciRootBridgeIo.h>
+#include <Protocol/ScsiPassThruExt.h>
 #include <Uefi/UefiSpec.h>
 
 #include "LsiScsi.h"
+
+//
+// The next seven functions implement EFI_EXT_SCSI_PASS_THRU_PROTOCOL
+// for the LSI 53C895A SCSI Controller. Refer to UEFI Spec 2.3.1 + Errata C,
+// sections
+// - 14.1 SCSI Driver Model Overview,
+// - 14.7 Extended SCSI Pass Thru Protocol.
+//
+
+EFI_STATUS
+EFIAPI
+LsiScsiPassThru (
+  IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL                *This,
+  IN UINT8                                          *Target,
+  IN UINT64                                         Lun,
+  IN OUT EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET *Packet,
+  IN EFI_EVENT                                      Event     OPTIONAL
+  )
+{
+  return EFI_UNSUPPORTED;
+}
+
+EFI_STATUS
+EFIAPI
+LsiScsiGetNextTargetLun (
+  IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL *This,
+  IN OUT UINT8                       **TargetPointer,
+  IN OUT UINT64                      *Lun
+  )
+{
+  return EFI_NOT_FOUND;
+}
+
+EFI_STATUS
+EFIAPI
+LsiScsiBuildDevicePath (
+  IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL *This,
+  IN UINT8                           *Target,
+  IN UINT64                          Lun,
+  IN OUT EFI_DEVICE_PATH_PROTOCOL    **DevicePath
+  )
+{
+  return EFI_NOT_FOUND;
+}
+
+EFI_STATUS
+EFIAPI
+LsiScsiGetTargetLun (
+  IN  EFI_EXT_SCSI_PASS_THRU_PROTOCOL *This,
+  IN  EFI_DEVICE_PATH_PROTOCOL        *DevicePath,
+  OUT UINT8                           **TargetPointer,
+  OUT UINT64                          *Lun
+  )
+{
+  return EFI_UNSUPPORTED;
+}
+
+EFI_STATUS
+EFIAPI
+LsiScsiResetChannel (
+  IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL *This
+  )
+{
+  return EFI_UNSUPPORTED;
+}
+
+EFI_STATUS
+EFIAPI
+LsiScsiResetTargetLun (
+  IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL *This,
+  IN UINT8                           *Target,
+  IN UINT64                          Lun
+  )
+{
+  return EFI_UNSUPPORTED;
+}
+
+EFI_STATUS
+EFIAPI
+LsiScsiGetNextTarget (
+  IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL *This,
+  IN OUT UINT8                       **TargetPointer
+  )
+{
+  return EFI_NOT_FOUND;
+}
 
 //
 // Probe, start and stop functions of this driver, called by the DXE core for
@@ -88,7 +179,49 @@ LsiScsiControllerStart (
   IN EFI_DEVICE_PATH_PROTOCOL    *RemainingDevicePath OPTIONAL
   )
 {
+  EFI_STATUS           Status;
+  LSI_SCSI_DEV         *Dev;
+
+  Dev = AllocateZeroPool (sizeof (*Dev));
+  if (Dev == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  Dev->Signature = LSI_SCSI_DEV_SIGNATURE;
+
+  //
+  // Host adapter channel, doesn't exist
+  //
+  Dev->PassThruMode.AdapterId = MAX_UINT32;
+  Dev->PassThruMode.Attributes =
+    EFI_EXT_SCSI_PASS_THRU_ATTRIBUTES_PHYSICAL |
+    EFI_EXT_SCSI_PASS_THRU_ATTRIBUTES_LOGICAL;
+
+  Dev->PassThru.Mode = &Dev->PassThruMode;
+  Dev->PassThru.PassThru = &LsiScsiPassThru;
+  Dev->PassThru.GetNextTargetLun = &LsiScsiGetNextTargetLun;
+  Dev->PassThru.BuildDevicePath = &LsiScsiBuildDevicePath;
+  Dev->PassThru.GetTargetLun = &LsiScsiGetTargetLun;
+  Dev->PassThru.ResetChannel = &LsiScsiResetChannel;
+  Dev->PassThru.ResetTargetLun = &LsiScsiResetTargetLun;
+  Dev->PassThru.GetNextTarget = &LsiScsiGetNextTarget;
+
+  Status = gBS->InstallProtocolInterface (
+                  &ControllerHandle,
+                  &gEfiExtScsiPassThruProtocolGuid,
+                  EFI_NATIVE_INTERFACE,
+                  &Dev->PassThru
+                  );
+  if (EFI_ERROR (Status)) {
+    goto FreePool;
+  }
+
   return EFI_SUCCESS;
+
+FreePool:
+  FreePool (Dev);
+
+  return Status;
 }
 
 EFI_STATUS
@@ -100,7 +233,36 @@ LsiScsiControllerStop (
   IN EFI_HANDLE                  *ChildHandleBuffer
   )
 {
-  return EFI_SUCCESS;
+  EFI_STATUS                      Status;
+  EFI_EXT_SCSI_PASS_THRU_PROTOCOL *PassThru;
+  LSI_SCSI_DEV                    *Dev;
+
+  Status = gBS->OpenProtocol (
+                  ControllerHandle,
+                  &gEfiExtScsiPassThruProtocolGuid,
+                  (VOID **)&PassThru,
+                  This->DriverBindingHandle,
+                  ControllerHandle,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL // Lookup only
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Dev = LSI_SCSI_FROM_PASS_THRU (PassThru);
+
+  Status = gBS->UninstallProtocolInterface (
+                  ControllerHandle,
+                  &gEfiExtScsiPassThruProtocolGuid,
+                  &Dev->PassThru
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  FreePool (Dev);
+
+  return Status;
 }
 
 //
