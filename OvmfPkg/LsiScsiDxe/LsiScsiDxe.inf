@@ -22,7 +22,13 @@
 
 [Packages]
   MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
+  BaseLib
+  UefiBootServicesTableLib
   UefiDriverEntryPoint
   UefiLib
+
+[Protocols]
+  gEfiPciIoProtocolGuid                  ## TO_START
