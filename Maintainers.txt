@@ -401,6 +401,10 @@ OvmfPkg: CSM modules
 F: OvmfPkg/Csm/
 R: David Woodhouse <dwmw2@infradead.org>
 
+OvmfPkg: LsiScsi driver
+F: OvmfPkg/LsiScsiDxe/
+R: Gary Lin <glin@suse.com>
+
 OvmfPkg: MptScsi and PVSCSI driver
 F: OvmfPkg/MptScsiDxe/
 F: OvmfPkg/PvScsiDxe/
