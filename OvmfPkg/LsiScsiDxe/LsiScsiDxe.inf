@@ -27,7 +27,9 @@
 [LibraryClasses]
   BaseLib
   BaseMemoryLib
+  DebugLib
   MemoryAllocationLib
+  PcdLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
   UefiLib
@@ -35,3 +37,7 @@
 [Protocols]
   gEfiExtScsiPassThruProtocolGuid        ## BY_START
   gEfiPciIoProtocolGuid                  ## TO_START
+
+[FixedPcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdLsiScsiMaxTargetLimit   ## CONSUMES
+  gUefiOvmfPkgTokenSpaceGuid.PcdLsiScsiMaxLunLimit      ## CONSUMES

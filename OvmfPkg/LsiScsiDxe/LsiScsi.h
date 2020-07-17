@@ -14,6 +14,8 @@
 
 typedef struct {
   UINT32                          Signature;
+  UINT8                           MaxTarget;
+  UINT8                           MaxLun;
   EFI_EXT_SCSI_PASS_THRU_MODE     PassThruMode;
   EFI_EXT_SCSI_PASS_THRU_PROTOCOL PassThru;
 } LSI_SCSI_DEV;
