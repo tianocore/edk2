@@ -18,9 +18,11 @@
 
 [Sources]
   LsiScsi.c
+  LsiScsi.h
 
 [Packages]
   MdePkg/MdePkg.dec
 
 [LibraryClasses]
   UefiDriverEntryPoint
+  UefiLib
