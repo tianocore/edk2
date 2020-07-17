@@ -15,6 +15,7 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/PcdLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>
 #include <Protocol/PciIo.h>
@@ -53,6 +54,49 @@ LsiScsiGetNextTargetLun (
   IN OUT UINT64                      *Lun
   )
 {
+  LSI_SCSI_DEV *Dev;
+  UINTN        Idx;
+  UINT8        *Target;
+  UINT16       LastTarget;
+
+  //
+  // the TargetPointer input parameter is unnecessarily a pointer-to-pointer
+  //
+  Target = *TargetPointer;
+
+  //
+  // Search for first non-0xFF byte. If not found, return first target & LUN.
+  //
+  for (Idx = 0; Idx < TARGET_MAX_BYTES && Target[Idx] == 0xFF; ++Idx)
+    ;
+  if (Idx == TARGET_MAX_BYTES) {
+    SetMem (Target, TARGET_MAX_BYTES, 0x00);
+    *Lun = 0;
+    return EFI_SUCCESS;
+  }
+
+  CopyMem (&LastTarget, Target, sizeof LastTarget);
+
+  //
+  // increment (target, LUN) pair if valid on input
+  //
+  Dev = LSI_SCSI_FROM_PASS_THRU (This);
+  if (LastTarget > Dev->MaxTarget || *Lun > Dev->MaxLun) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (*Lun < Dev->MaxLun) {
+    ++*Lun;
+    return EFI_SUCCESS;
+  }
+
+  if (LastTarget < Dev->MaxTarget) {
+    *Lun = 0;
+    ++LastTarget;
+    CopyMem (Target, &LastTarget, sizeof LastTarget);
+    return EFI_SUCCESS;
+  }
+
   return EFI_NOT_FOUND;
 }
 
@@ -65,7 +109,34 @@ LsiScsiBuildDevicePath (
   IN OUT EFI_DEVICE_PATH_PROTOCOL    **DevicePath
   )
 {
-  return EFI_NOT_FOUND;
+  UINT16           TargetValue;
+  LSI_SCSI_DEV     *Dev;
+  SCSI_DEVICE_PATH *ScsiDevicePath;
+
+  if (DevicePath == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  CopyMem (&TargetValue, Target, sizeof TargetValue);
+  Dev = LSI_SCSI_FROM_PASS_THRU (This);
+  if (TargetValue > Dev->MaxTarget || Lun > Dev->MaxLun || Lun > 0xFFFF) {
+    return EFI_NOT_FOUND;
+  }
+
+  ScsiDevicePath = AllocatePool (sizeof *ScsiDevicePath);
+  if (ScsiDevicePath == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  ScsiDevicePath->Header.Type      = MESSAGING_DEVICE_PATH;
+  ScsiDevicePath->Header.SubType   = MSG_SCSI_DP;
+  ScsiDevicePath->Header.Length[0] = (UINT8)  sizeof *ScsiDevicePath;
+  ScsiDevicePath->Header.Length[1] = (UINT8) (sizeof *ScsiDevicePath >> 8);
+  ScsiDevicePath->Pun              = TargetValue;
+  ScsiDevicePath->Lun              = (UINT16) Lun;
+
+  *DevicePath = &ScsiDevicePath->Header;
+  return EFI_SUCCESS;
 }
 
 EFI_STATUS
@@ -77,7 +148,33 @@ LsiScsiGetTargetLun (
   OUT UINT64                          *Lun
   )
 {
-  return EFI_UNSUPPORTED;
+  SCSI_DEVICE_PATH *ScsiDevicePath;
+  LSI_SCSI_DEV     *Dev;
+  UINT8            *Target;
+
+  if (DevicePath == NULL || TargetPointer == NULL || *TargetPointer == NULL ||
+      Lun == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (DevicePath->Type    != MESSAGING_DEVICE_PATH ||
+      DevicePath->SubType != MSG_SCSI_DP) {
+    return EFI_UNSUPPORTED;
+  }
+
+  ScsiDevicePath = (SCSI_DEVICE_PATH *) DevicePath;
+  Dev = LSI_SCSI_FROM_PASS_THRU (This);
+  if (ScsiDevicePath->Pun > Dev->MaxTarget ||
+      ScsiDevicePath->Lun > Dev->MaxLun) {
+    return EFI_NOT_FOUND;
+  }
+
+  Target = *TargetPointer;
+  ZeroMem (Target, TARGET_MAX_BYTES);
+  CopyMem (Target, &ScsiDevicePath->Pun, sizeof ScsiDevicePath->Pun);
+  *Lun = ScsiDevicePath->Lun;
+
+  return EFI_SUCCESS;
 }
 
 EFI_STATUS
@@ -107,6 +204,42 @@ LsiScsiGetNextTarget (
   IN OUT UINT8                       **TargetPointer
   )
 {
+  LSI_SCSI_DEV *Dev;
+  UINTN        Idx;
+  UINT8        *Target;
+  UINT16       LastTarget;
+
+  //
+  // the TargetPointer input parameter is unnecessarily a pointer-to-pointer
+  //
+  Target = *TargetPointer;
+
+  //
+  // Search for first non-0xFF byte. If not found, return first target.
+  //
+  for (Idx = 0; Idx < TARGET_MAX_BYTES && Target[Idx] == 0xFF; ++Idx)
+    ;
+  if (Idx == TARGET_MAX_BYTES) {
+    SetMem (Target, TARGET_MAX_BYTES, 0x00);
+    return EFI_SUCCESS;
+  }
+
+  CopyMem (&LastTarget, Target, sizeof LastTarget);
+
+  //
+  // increment target if valid on input
+  //
+  Dev = LSI_SCSI_FROM_PASS_THRU (This);
+  if (LastTarget > Dev->MaxTarget) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (LastTarget < Dev->MaxTarget) {
+    ++LastTarget;
+    CopyMem (Target, &LastTarget, sizeof LastTarget);
+    return EFI_SUCCESS;
+  }
+
   return EFI_NOT_FOUND;
 }
 
@@ -188,6 +321,17 @@ LsiScsiControllerStart (
   }
 
   Dev->Signature = LSI_SCSI_DEV_SIGNATURE;
+
+  STATIC_ASSERT (
+    FixedPcdGet8 (PcdLsiScsiMaxTargetLimit) < 8,
+    "LSI 53C895A supports targets [0..7]"
+    );
+  STATIC_ASSERT (
+    FixedPcdGet8 (PcdLsiScsiMaxLunLimit) < 128,
+    "LSI 53C895A supports LUNs [0..127]"
+    );
+  Dev->MaxTarget = PcdGet8 (PcdLsiScsiMaxTargetLimit);
+  Dev->MaxLun = PcdGet8 (PcdLsiScsiMaxLunLimit);
 
   //
   // Host adapter channel, doesn't exist
