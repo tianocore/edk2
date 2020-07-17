@@ -13,12 +13,26 @@
 #define _LSI_SCSI_DXE_H_
 
 typedef struct {
+  //
+  // Allocate 64KB for read/write buffer. It seems sufficient for the common
+  // boot scenarios.
+  //
+  // NOTE: The number of bytes for data transmission is bounded by DMA Byte
+  //       Count (DBC), a 24-bit register, so the maximum is 0xFFFFFF (16MB-1).
+  //
+  UINT8                           Data[SIZE_64KB];
+} LSI_SCSI_DMA_BUFFER;
+
+typedef struct {
   UINT32                          Signature;
   UINT64                          OrigPciAttrs;
   EFI_EVENT                       ExitBoot;
   EFI_PCI_IO_PROTOCOL             *PciIo;
   UINT8                           MaxTarget;
   UINT8                           MaxLun;
+  LSI_SCSI_DMA_BUFFER             *Dma;
+  EFI_PHYSICAL_ADDRESS            DmaPhysical;
+  VOID                            *DmaMapping;
   EFI_EXT_SCSI_PASS_THRU_MODE     PassThruMode;
   EFI_EXT_SCSI_PASS_THRU_PROTOCOL PassThru;
 } LSI_SCSI_DEV;
