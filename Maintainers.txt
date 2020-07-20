@@ -381,6 +381,7 @@ F: MdePkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/MdePkg
 M: Michael D Kinney <michael.d.kinney@intel.com>
 M: Liming Gao <liming.gao@intel.com>
+R: Zhiguang Liu <zhiguang.liu@intel.com>
 
 NetworkPkg
 F: NetworkPkg/
