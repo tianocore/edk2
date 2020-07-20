@@ -268,7 +268,14 @@ class CommitMessageCheck:
         for i in range(2, count):
             if (len(lines[i]) >= 76 and
                 len(lines[i].split()) > 1 and
-                not lines[i].startswith('git-svn-id:')):
+                not lines[i].startswith('git-svn-id:') and
+                not lines[i].startswith('Reviewed-by') and
+                not lines[i].startswith('Acked-by:') and
+                not lines[i].startswith('Tested-by:') and
+                not lines[i].startswith('Reported-by:') and
+                not lines[i].startswith('Suggested-by:') and
+                not lines[i].startswith('Signed-off-by:') and
+                not lines[i].startswith('Cc:')):
                 #
                 # Print a warning if body line is longer than 75 characters
                 #
