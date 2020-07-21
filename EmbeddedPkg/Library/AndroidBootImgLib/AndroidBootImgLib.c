@@ -97,7 +97,7 @@ AndroidBootImgGetKernelInfo (
   ASSERT (IS_VALID_ANDROID_PAGE_SIZE (Header->PageSize));
 
   *KernelSize = Header->KernelSize;
-  *Kernel = BootImg + Header->PageSize;
+  *Kernel = (VOID *)((UINTN)BootImg + Header->PageSize);
   return EFI_SUCCESS;
 }
 
@@ -341,7 +341,7 @@ AndroidBootImgUpdateFdt (
 
   Status = AndroidBootImgSetProperty64 (UpdatedFdtBase, ChosenNode,
                                         "linux,initrd-end",
-                                        (UINTN)(RamdiskData + RamdiskSize));
+                                        (UINTN)RamdiskData + RamdiskSize);
   if (EFI_ERROR (Status)) {
     goto Fdt_Exit;
   }
