@@ -502,7 +502,7 @@ class GitDiffCheck:
 
         stripped = line.rstrip()
 
-        if self.force_crlf and eol != '\r\n':
+        if self.force_crlf and eol != '\r\n' and (line.find('Subproject commit') == -1):
             self.added_line_error('Line ending (%s) is not CRLF' % repr(eol),
                                   line)
         if self.force_notabs and '\t' in line:
