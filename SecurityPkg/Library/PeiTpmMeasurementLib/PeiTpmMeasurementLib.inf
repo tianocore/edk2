@@ -1,0 +1,50 @@
+## @file
+#  Provides TPM measurement functions for TPM1.2 and TPM 2.0
+#
+#  This library provides TpmMeasureAndLogData() to measure and log data, and
+#  extend the measurement result into a specific PCR.
+#
+# Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeiTpmMeasurementLib
+  FILE_GUID                      = 9A62C49D-C45A-4322-9F3C-45958DF0056B
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = TpmMeasurementLib|PEIM
+  MODULE_UNI_FILE                = PeiTpmMeasurementLib.uni
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  PeiTpmMeasurementLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  HobLib
+  DebugLib
+  PcdLib
+  PrintLib
+  PeiServicesLib
+  PeiServicesTablePointerLib
+
+[Ppis]
+  gEdkiiTcgPpiGuid                                                     ## CONSUMES
+
+[Depex]
+  gEfiPeiMasterBootModePpiGuid AND
+  gEfiTpmDeviceSelectedGuid
