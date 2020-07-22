@@ -2274,6 +2274,10 @@
   # @Prompt PCI Express Base Address.
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0xE0000000|UINT64|0x0000000a
 
+  ## This value is used to set the size of PCI express hierarchy. The default is 256 MB.
+  # @Prompt PCI Express Base Size.
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseSize|0x10000000|UINT64|0x0000000f
+
   ## Default current ISO 639-2 language: English & French.
   # @Prompt Default Value of LangCodes Variable.
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangCodes|"engfraengfra"|VOID*|0x0000001c
