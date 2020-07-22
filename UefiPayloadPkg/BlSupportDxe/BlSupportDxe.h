@@ -10,6 +10,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <PiDxe.h>
 
+#include <Protocol/Smbios.h>
+
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DxeServicesTableLib.h>
@@ -26,5 +28,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Guid/GraphicsInfoHob.h>
 
 #include <IndustryStandard/Acpi.h>
+#include <IndustryStandard/SmBios.h>
 
 #endif

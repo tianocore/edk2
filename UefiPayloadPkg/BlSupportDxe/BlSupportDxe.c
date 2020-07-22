@@ -130,15 +130,6 @@ BlDxeEntryPoint (
   }
 
   //
-  // Install Smbios Table
-  //
-  if (SystemTableInfo->SmbiosTableBase != 0 && SystemTableInfo->SmbiosTableSize != 0) {
-    DEBUG ((DEBUG_ERROR, "Install Smbios Table at 0x%lx, length 0x%x\n", SystemTableInfo->SmbiosTableBase, SystemTableInfo->SmbiosTableSize));
-    Status = gBS->InstallConfigurationTable (&gEfiSmbiosTableGuid, (VOID *)(UINTN)SystemTableInfo->SmbiosTableBase);
-    ASSERT_EFI_ERROR (Status);
-  }
-
-  //
   // Find the frame buffer information and update PCDs
   //
   GuidHob = GetFirstGuidHob (&gEfiGraphicsInfoHobGuid);

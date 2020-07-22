@@ -43,7 +43,6 @@
 
 [Guids]
   gEfiAcpiTableGuid
-  gEfiSmbiosTableGuid
   gUefiSystemTableInfoGuid
   gUefiAcpiBoardInfoGuid
   gEfiGraphicsInfoHobGuid
@@ -56,5 +55,6 @@
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseSize
 
+# The Depex must be kept as TRUE to always dispatch the DXE
 [Depex]
   TRUE

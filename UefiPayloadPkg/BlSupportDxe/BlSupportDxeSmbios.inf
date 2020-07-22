@@ -1,0 +1,50 @@
+## @file
+# Bootloader SMBIOS Support DXE Module
+#
+# Installes SMBIOS tables provided by bootloader.
+#
+#  Copyright (c) 2014 - 2021, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BlSupportDxeSmbios
+  FILE_GUID                      = 6AE2136E-5CB2-41E5-996A-BAA0E7252211
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = BlDxeSmbiosEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  Smbios.c
+  BlSupportDxe.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiPayloadPkg/UefiPayloadPkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  DebugLib
+  BaseMemoryLib
+  UefiLib
+  HobLib
+
+[Guids]
+  gEfiSmbiosTableGuid
+  gUefiSystemTableInfoGuid
+
+[Protocols]
+  gEfiSmbiosProtocolGuid
+
+[Depex]
+  gEfiSmbiosProtocolGuid

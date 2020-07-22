@@ -439,6 +439,7 @@
   # SMBIOS Support
   #
   MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
+  UefiPayloadPkg/BlSupportDxe/BlSupportDxeSmbios.inf
 
   #
   # ACPI Support
