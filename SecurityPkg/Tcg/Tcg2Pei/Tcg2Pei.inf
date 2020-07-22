@@ -8,7 +8,7 @@
 #
 #  This module will initialize TPM device, measure reported FVs and BIOS version.
 #
-# Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2015 - 2020, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) 2017, Microsoft Corporation.  All rights reserved. <BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -72,6 +72,7 @@
   gPeiTpmInitializationDonePpiGuid                                     ## PRODUCES
   gEfiEndOfPeiSignalPpiGuid                                            ## SOMETIMES_CONSUMES     ## NOTIFY
   gEdkiiPeiFirmwareVolumeInfoPrehashedFvPpiGuid                        ## SOMETIMES_CONSUMES
+  gEdkiiTcgPpiGuid                                                     ## PRODUCES
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString              ## SOMETIMES_CONSUMES
