@@ -724,8 +724,8 @@ EXIT:
   //
   // Advance event ring to last available entry
   //
-  // Some 3rd party XHCI external cards don't support single 64-bytes width register access,
-  // So divide it to two 32-bytes width register access.
+  // Some 3rd party XHCI external cards don't support single 64-bits width register access,
+  // So divide it to two 32-bits width register access.
   //
   Low  = XhcPeiReadRuntimeReg (Xhc, XHC_ERDP_OFFSET);
   High = XhcPeiReadRuntimeReg (Xhc, XHC_ERDP_OFFSET + 4);
@@ -735,8 +735,8 @@ EXIT:
 
   if ((XhcDequeue & (~0x0F)) != (PhyAddr & (~0x0F))) {
     //
-    // Some 3rd party XHCI external cards don't support single 64-bytes width register access,
-    // So divide it to two 32-bytes width register access.
+    // Some 3rd party XHCI external cards don't support single 64-bits width register access,
+    // So divide it to two 32-bits width register access.
     //
     XhcPeiWriteRuntimeReg (Xhc, XHC_ERDP_OFFSET, XHC_LOW_32BIT (PhyAddr) | BIT3);
     XhcPeiWriteRuntimeReg (Xhc, XHC_ERDP_OFFSET + 4, XHC_HIGH_32BIT (PhyAddr));
@@ -2644,8 +2644,8 @@ XhcPeiCreateEventRing (
   //
   // Program the Interrupter Event Ring Dequeue Pointer (ERDP) register (5.5.2.3.3)
   //
-  // Some 3rd party XHCI external cards don't support single 64-bytes width register access,
-  // So divide it to two 32-bytes width register access.
+  // Some 3rd party XHCI external cards don't support single 64-bits width register access,
+  // So divide it to two 32-bits width register access.
   //
   XhcPeiWriteRuntimeReg (
     Xhc,
@@ -2660,8 +2660,8 @@ XhcPeiCreateEventRing (
   //
   // Program the Interrupter Event Ring Segment Table Base Address (ERSTBA) register (5.5.2.3.2)
   //
-  // Some 3rd party XHCI external cards don't support single 64-bytes width register access,
-  // So divide it to two 32-bytes width register access.
+  // Some 3rd party XHCI external cards don't support single 64-bits width register access,
+  // So divide it to two 32-bits width register access.
   //
   XhcPeiWriteRuntimeReg (
     Xhc,
@@ -2897,8 +2897,8 @@ XhcPeiInitSched (
   //
   Xhc->DCBAA = (UINT64 *) (UINTN) Dcbaa;
   //
-  // Some 3rd party XHCI external cards don't support single 64-bytes width register access,
-  // So divide it to two 32-bytes width register access.
+  // Some 3rd party XHCI external cards don't support single 64-bits width register access,
+  // So divide it to two 32-bits width register access.
   //
   DcbaaPhy = UsbHcGetPciAddrForHostAddr (Xhc->MemPool, Dcbaa, Size);
   XhcPeiWriteOpReg (Xhc, XHC_DCBAAP_OFFSET, XHC_LOW_32BIT (DcbaaPhy));
@@ -2922,8 +2922,8 @@ XhcPeiInitSched (
   ASSERT ((CmdRingPhy & 0x3F) == 0);
   CmdRingPhy |= XHC_CRCR_RCS;
   //
-  // Some 3rd party XHCI external cards don't support single 64-bytes width register access,
-  // So divide it to two 32-bytes width register access.
+  // Some 3rd party XHCI external cards don't support single 64-bits width register access,
+  // So divide it to two 32-bits width register access.
   //
   XhcPeiWriteOpReg (Xhc, XHC_CRCR_OFFSET, XHC_LOW_32BIT (CmdRingPhy));
   XhcPeiWriteOpReg (Xhc, XHC_CRCR_OFFSET + 4, XHC_HIGH_32BIT (CmdRingPhy));
