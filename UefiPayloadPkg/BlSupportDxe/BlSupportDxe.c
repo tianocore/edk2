@@ -155,12 +155,14 @@ BlDxeEntryPoint (
   }
 
   //
-  // Set PcdPciExpressBaseAddress by HOB info
+  // Set PcdPciExpressBaseAddress and PcdPciExpressBaseSize by HOB info
   //
   GuidHob = GetFirstGuidHob (&gUefiAcpiBoardInfoGuid);
   if (GuidHob != NULL) {
     AcpiBoardInfo = (ACPI_BOARD_INFO *)GET_GUID_HOB_DATA (GuidHob);
     Status = PcdSet64S (PcdPciExpressBaseAddress, AcpiBoardInfo->PcieBaseAddress);
+    ASSERT_EFI_ERROR (Status);
+    Status = PcdSet64S (PcdPciExpressBaseSize, AcpiBoardInfo->PcieBaseSize);
     ASSERT_EFI_ERROR (Status);
   }
 
