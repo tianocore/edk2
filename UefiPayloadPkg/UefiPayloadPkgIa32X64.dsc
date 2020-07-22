@@ -365,6 +365,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow|31
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn|100
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseSize|0
 
 ################################################################################
 #
