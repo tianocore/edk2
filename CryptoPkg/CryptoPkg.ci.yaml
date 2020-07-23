@@ -18,7 +18,9 @@
         ],
         ## Both file path and directory path are accepted.
         "IgnoreFiles": [
-            "Library/OpensslLib/openssl"
+            "Library/OpensslLib/openssl",
+            # this has OpenSSL interfaces that aren't UEFI spec compliant
+            "Library/OpensslLib/rand_pool.c"
         ]
     },
     "CompilerPlugin": {
