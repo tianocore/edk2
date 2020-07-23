@@ -587,68 +587,6 @@ InitializeApData (
   SetApState (&CpuMpData->CpuData[ProcessorNumber], CpuStateIdle);
 }
 
-STATIC
-UINT8
-GetDcuMode (
-  )
-{
-  MSR_DCU_MODE_REGISTER       DcuModeMsr;
-  MSR_PLATFORM_INFO_REGISTER  PlatformInfoMsr;
-
-  PlatformInfoMsr.Uint64 = AsmReadMsr64 (MSR_PLATFORM_INFO);
-  if (PlatformInfoMsr.Bits.DcuModeSelectSupport == 0) {
-    // If DCU mode select is not supported then MSR_DCU_MODE
-    // is not even readable
-    return 0;
-  }
-
-  DcuModeMsr.Uint64 = AsmReadMsr64 (MSR_DCU_MODE);
-  return (UINT8)DcuModeMsr.Bits.DcuModeSelect;
-}
-
-/**
-  Set AP DCU mode same as BSP. Executed on each AP.
-
-  DCU mode setting requires:
-    . The processor supports DCU mode change
-    . During the whole boot process till now, on each logical processor
-      CR0.CD has never been changed from 1 to 0 before setting DCU mode
-    . DCU_MODE MSR is core scope, need to program for each core
-    . BSP DCU mode may already be set 1 in SEC, or kept as default value (0)
-  **/
-STATIC
-VOID
-ApSetDcuMode (
-  IN UINT8 DcuModeIntent
-  )
-{
-  IA32_CR0                    RegCr0;
-  MSR_PLATFORM_INFO_REGISTER  PlatformInfoMsr;
-  MSR_DCU_MODE_REGISTER       DcuModeMsr;
-
-  if (DcuModeIntent == 0) {
-    // Reset default value is 0
-    return;
-  }
-
-  RegCr0.UintN = AsmReadCr0 ();
-  if (RegCr0.Bits.CD == 0) {
-    // Skip the thread whose companion thread has executed 
-    // its wake up function where CR0.CD is updated.
-    return;
-  }
-
-  PlatformInfoMsr.Uint64 = AsmReadMsr64 (MSR_PLATFORM_INFO);
-  if (PlatformInfoMsr.Bits.DcuModeSelectSupport == 0) {
-    // DCU mode select is not supported
-    return;
-  }
-
-  DcuModeMsr.Uint64 = AsmReadMsr64 (MSR_DCU_MODE);
-  DcuModeMsr.Bits.DcuModeSelect = DcuModeIntent;
-  AsmWriteMsr64 (MSR_DCU_MODE, DcuModeMsr.Uint64);
-}
-
 /**
   This function will be called from AP reset code if BSP uses WakeUpAP.
 
@@ -701,10 +639,6 @@ ApWakeupFunction (
       //
       ApTopOfStack  = CpuMpData->Buffer + (ProcessorNumber + 1) * CpuMpData->CpuApStackSize;
       BistData = *(UINT32 *) ((UINTN) ApTopOfStack - sizeof (UINTN));
-
-      // This is where CR0.CD bit isn't updated yet during boot process
-      ApSetDcuMode (CpuMpData->DcuMode);
-
       //
       // CpuMpData->CpuData[0].VolatileRegisters is initialized based on BSP environment,
       //   to initialize AP in InitConfig path.
@@ -1818,9 +1752,6 @@ MpInitLibInitialize (
 
   if (OldCpuMpData == NULL) {
     if (MaxLogicalProcessorNumber > 1) {
-      // Get BSP DCU Mode which will be applied to all APs
-      CpuMpData->DcuMode = GetDcuMode ();
-
       //
       // Wakeup all APs and calculate the processor count in system
       //
