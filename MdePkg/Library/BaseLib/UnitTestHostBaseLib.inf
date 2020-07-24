@@ -66,6 +66,22 @@
   UnitTestHost.h
 
 [Sources.Ia32]
+  Ia32/WriteMm7.c | MSFT
+  Ia32/WriteMm6.c | MSFT
+  Ia32/WriteMm5.c | MSFT
+  Ia32/WriteMm4.c | MSFT
+  Ia32/WriteMm3.c | MSFT
+  Ia32/WriteMm2.c | MSFT
+  Ia32/WriteMm1.c | MSFT
+  Ia32/WriteMm0.c | MSFT
+  Ia32/ReadMm7.c | MSFT
+  Ia32/ReadMm6.c | MSFT
+  Ia32/ReadMm5.c | MSFT
+  Ia32/ReadMm4.c | MSFT
+  Ia32/ReadMm3.c | MSFT
+  Ia32/ReadMm2.c | MSFT
+  Ia32/ReadMm1.c | MSFT
+  Ia32/ReadMm0.c | MSFT
   Ia32/SwapBytes64.c | MSFT
   Ia32/RRotU64.c | MSFT
   Ia32/RShiftU64.c | MSFT
@@ -104,6 +120,7 @@
   Ia32/InternalSwitchStack.nasm | GCC
   Ia32/Non-existing.c
   Unaligned.c
+  X86MemoryFence.c | MSFT
   X86FxSave.c
   X86FxRestore.c
   X86Msr.c
@@ -118,12 +135,29 @@
   X64/CpuBreakpoint.c | MSFT
   X64/CpuPause.nasm| MSFT
   X64/ReadTsc.nasm| MSFT
+  X64/WriteMm7.nasm| MSFT
+  X64/WriteMm6.nasm| MSFT
+  X64/WriteMm5.nasm| MSFT
+  X64/WriteMm4.nasm| MSFT
+  X64/WriteMm3.nasm| MSFT
+  X64/WriteMm2.nasm| MSFT
+  X64/WriteMm1.nasm| MSFT
+  X64/WriteMm0.nasm| MSFT
+  X64/ReadMm7.nasm| MSFT
+  X64/ReadMm6.nasm| MSFT
+  X64/ReadMm5.nasm| MSFT
+  X64/ReadMm4.nasm| MSFT
+  X64/ReadMm3.nasm| MSFT
+  X64/ReadMm2.nasm| MSFT
+  X64/ReadMm1.nasm| MSFT
+  X64/ReadMm0.nasm| MSFT
   X64/FxRestore.nasm| MSFT
   X64/FxSave.nasm| MSFT
   X64/ReadEflags.nasm| MSFT
   X64/Non-existing.c
   Math64.c
   Unaligned.c
+  X86MemoryFence.c | MSFT
   X86FxSave.c
   X86FxRestore.c
   X86Msr.c
