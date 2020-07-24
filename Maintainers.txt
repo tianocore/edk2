@@ -157,6 +157,7 @@ F: BaseTools/
 W: https://github.com/tianocore/tianocore.github.io/wiki/BaseTools
 M: Bob Feng <bob.c.feng@intel.com>
 M: Liming Gao <liming.gao@intel.com>
+R: Yuwei Chen <yuwei.chen@intel.com>
 
 CryptoPkg
 F: CryptoPkg/
