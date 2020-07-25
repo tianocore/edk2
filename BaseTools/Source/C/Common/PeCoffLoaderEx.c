@@ -127,10 +127,7 @@ PeCoffLoaderRelocateRiscVImage (
 {
   UINT32 Value;
   UINT32 Value2;
-  UINT32 OrgValue;
 
-  OrgValue = *(UINT32 *) Fixup;
-  OrgValue = OrgValue;
   switch ((*Reloc) >> 12) {
   case EFI_IMAGE_REL_BASED_RISCV_HI20:
       RiscVHi20Fixup = (UINT32 *) Fixup;
