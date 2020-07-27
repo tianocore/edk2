@@ -1,7 +1,7 @@
 ## @file
 #  Dsc include file for Dynamic Tables Framework.
 #
-#  Copyright (c) 2017 - 2019, ARM Limited. All rights reserved.<BR>
+#  Copyright (c) 2017 - 2020, Arm Limited. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -10,7 +10,6 @@
 [Defines]
 
 [BuildOptions]
-  *_*_*_ASL_FLAGS          = -tc -li -so
 
 [LibraryClasses.common]
   TableHelperLib|DynamicTablesPkg/Library/Common/TableHelperLib/TableHelperLib.inf
