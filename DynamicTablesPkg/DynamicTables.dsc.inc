@@ -10,6 +10,7 @@
 [Defines]
 
 [BuildOptions]
+  RELEASE_*_*_CC_FLAGS     = -DMDEPKG_NDEBUG
 
 [LibraryClasses.common]
   TableHelperLib|DynamicTablesPkg/Library/Common/TableHelperLib/TableHelperLib.inf
