@@ -68,22 +68,6 @@ information file is planned.
 Also support for generating SMBIOS tables is planned and will be added
 subsequently.
 
-Related Modules
----------------
-
-### ACPICA iASL compiler
-The RAW table generator, used to process the DSDT/SSDT files depends on
-the iASL compiler to convert the DSDT/SSDT ASL files to a C array containing
-the hex AML code. The "-tc" option of the iASL compiler has been enhanced to
-support generation of an AML hex file (C header) with a unique symbol name
-so that it is suitable for inclusion from a C source file.
-
-Related Links
---------------
-
-<https://github.com/acpica/acpica.git>
-
-
 Supported Platforms
 -------------------
 1. Juno
@@ -120,16 +104,9 @@ or
 
 Prerequisites
 -------------
-ACPICA iASL compiler with the enhanced "-tc" option to support generation of
-AML hex (C header) files with unique symbol names.
-
-A patch *'[iASL: Enhance the -tc option (create AML hex file in C)](https://github.com/acpica/acpica/commit/f9a88a4c1cd020b6a5475d63b29626852a0b5f37)'*, dated 16 March 2018 (2018-03-16),
-to enable this support has been integrated to the ACPICA source repository.
-
-Ensure that the iASL compiler used for building *Dynamic Tables Framework* has this feature enabled.
-
-This feature was made available in the *ACPICA Compiler update
-[Version 20180508](https://www.acpica.org/node/156)*, dated 8 May 2018 (2018-05-08).
+Ensure that the latest ACPICA iASL compiler is used for building *Dynamic Tables Framework*.
+*Dynamic Tables Framework* has been tested using the following iASL compiler version:
+[Version 20200717](https://www.acpica.org/node/183)*, dated 17 July, 2020.
 
 
 Running CI builds locally
