@@ -1,5 +1,4 @@
-Dynamic Tables Framework
-------------------------
+# Dynamic Tables Framework
 
 Dynamic Tables Framework provides mechanisms to reduce the amount
 of effort required in porting firmware to new platforms. The aim is
@@ -10,8 +9,8 @@ be generated from the system construction.  This initial release
 does not fully implement that - the configuration is held in local
 UEFI modules.
 
-Feature Summary
----------------
+# Feature Summary
+
 The dynamic tables framework is designed to generate standardised
 firmware tables that describe the hardware information at
 run-time. A goal of standardised firmware is to have a common
@@ -58,8 +57,105 @@ The framework currently supports the following table generators for ARM:
 * SSDT - Secondary System Description Table. This is essentially
          a RAW table generator.
 
-Roadmap
--------
+## Dynamic AML
+
+ACPI Definition block (e.g. DSDT or SSDT) tables are used to describe system
+devices along with other control and power management information. These tables
+are written using ACPI Source Language (ASL). The ASL code is compiled using an
+ASL compiler (e.g. Intel iASL compiler) to generate ACPI Machine Language (AML)
+bytecode.
+
+Since, definition blocks are represented using AML grammar, run-time generation
+of definition blocks is complex. Dynamic AML is a feature of Dynamic Tables
+framework that provides a solution for dynamic generation of ACPI Definition
+block tables.
+
+Dynamic AML introduces the following techniques:
+* AML Fixup
+* AML Codegen
+* AML Fixup + Codegen
+
+### AML Fixup
+AML fixup is a technique that involves compiling an ASL template file to
+generate AML bytecode. This template AML bytecode can be parsed at run-time
+and a fixup code can update the required fields in the AML template.
+
+To simplify AML Fixup, the Dynamic Tables Framework provides an *AmlLib*
+library with a rich set of APIs that can be used to fixup the AML code.
+
+### AML Codegen
+AML Codegen employs generating small segments of AML code. The *AmlLib*
+library provides AML Codegen APIs that generate the AML code segments.
+
+    Example: The following table depicts the AML Codegen APIs and the
+             corresponding ASL code that would be generated.
+
+    | AML Codegen API                | ASL Code                       |
+    |--------------------------------|--------------------------------|
+    |  AmlCodeGenDefinitionBlock (   |  DefinitionBlock (             |
+    |    ..,                         |    ...                         |
+    |    &RootNode);                 |  ) {                           |
+    |  AmlCodeGenScope (             |    Scope (_SB) {               |
+    |    "\_SB",                     |                                |
+    |    RootNode,                   |                                |
+    |    &ScopeNode);                |                                |
+    |  AmlCodeGenDevice (            |    Device (CPU0) {             |
+    |    "CPU0",                     |                                |
+    |    ScopeNode,                  |                                |
+    |    &CpuNode);                  |                                |
+    |  AmlCodeGenNameString (        |      Name (_HID, "ACPI0007")   |
+    |    "_HID",                     |                                |
+    |    "ACPI0007",                 |                                |
+    |    CpuNode,                    |                                |
+    |    &HidNode);                  |                                |
+    |  AmlCodeGenNameInteger (       |      Name (_UID, Zero)         |
+    |    "_UID",                     |                                |
+    |    0,                          |                                |
+    |    CpuNode,                    |                                |
+    |    &UidNode);                  |                                |
+    |                                |      } // Device               |
+    |                                |    } // Scope                  |
+    |                                |  } // DefinitionBlock          |
+
+### AML Fixup + Codegen
+A combination of AML Fixup and AML Codegen could be used for generating
+Definition Blocks. For example the AML Fixup could be used to fixup certain
+parts of the AML template while the AML Codegen APIs could be used to inserted
+small fragments of AML code in the AML template.
+
+### AmlLib Library
+Since, AML bytecode represents complex AML grammar, an **AmlLib** library is
+introduced to assist parsing and traversing of the AML bytecode at run-time.
+
+The AmlLib library parses a definition block and represents it as an AML
+tree. This tree representation is based on the AML grammar defined by the
+ACPI 6.3 specification, section - 20 'ACPI Machine Language (AML)
+Specification'.
+
+AML objects, methods and data are represented as tree nodes. Since the AML
+data is represented as tree nodes, it is possible to traverse the tree, locate
+a node and modify the node data. The tree can then be serialized to a buffer
+(that represents the definition block). This definition block containing
+the fixed up AML code can then be installed as an ACPI table (DSDT/SSDT).
+
+AmlLib provides a rich API to operate on AML data. For example it provides
+APIs to update a device's name, the value of a "_UID" object, and the memory
+and interrupt number stored in a "_CRS" node.
+
+Although the AmlLib performs checks to a reasonable extent while modifying a
+definition block, these checks may not cover all aspects due to the complexity
+of the ASL/AML language. It is therefore recommended to review any operation
+performed, and validate the generated output.
+
+    Example: The serialized AML code could be validated by
+     - Saving the generated AML to a file and comparing with
+       a reference output.
+     or
+     - Disassemble the generated AML using the iASL compiler
+       and verifying the output.
+
+# Roadmap
+
 The current implementation of the Configuration Manager populates the
 platform information statically as a C structure. Further enhancements
 to introduce runtime loading of platform information from a platform
@@ -68,13 +164,13 @@ information file is planned.
 Also support for generating SMBIOS tables is planned and will be added
 subsequently.
 
-Supported Platforms
--------------------
+# Supported Platforms
+
 1. Juno
 2. FVP Models
 
-Build Instructions
-------------------
+# Build Instructions
+
 1. Set path for the iASL compiler with support for generating a C header
    file as output.
 
@@ -102,15 +198,14 @@ or
 >build -a AARCH64 -p Platform\ARM\VExpressPkg\ArmVExpress-FVP-AArch64.dsc
    -t GCC5 **-D DYNAMIC_TABLES_FRAMEWORK**
 
-Prerequisites
--------------
+# Prerequisites
+
 Ensure that the latest ACPICA iASL compiler is used for building *Dynamic Tables Framework*.
 *Dynamic Tables Framework* has been tested using the following iASL compiler version:
-[Version 20200717](https://www.acpica.org/node/183)*, dated 17 July, 2020.
+[Version 20200717](https://www.acpica.org/node/183), dated 17 July, 2020.
 
 
-Running CI builds locally
--------------------------
+#Running CI builds locally
 
 The TianoCore EDKII project has introduced Core CI infrastructure using TianoCore EDKII Tools PIP modules:
 
@@ -178,8 +273,7 @@ The instructions to setup the CI environment are in *'edk2\\.pytool\\Readme.md'*
     - use `stuart_build -c .pytool/CISettings.py -h` option to see help on additional options.
 
 
-Documentation
--------------
+# Documentation
 
 Refer to the following presentation from *UEFI Plugfest Seattle 2018*:
 
