@@ -229,6 +229,8 @@ https://api.cmocka.org/
 
 ## Development
 
+### Iterating on a Single Test
+
 When using the EDK2 Pytools for CI testing, the host-based unit tests will be built and run on any build that includes
 the `NOOPT` build target.
 
@@ -238,6 +240,169 @@ the following command will build only the SafeIntLib host-based test from the Md
 ```bash
 stuart_ci_build -c .pytool/CISettings.py TOOL_CHAIN_TAG=VS2017 -p MdePkg -t NOOPT BUILDMODULE=MdePkg/Test/UnitTest/Library/BaseSafeIntLib/TestBaseSafeIntLib.inf
 ```
+
+### Hooking BaseLib
+
+Most unit test mocking can be performed by the functions provided in the UnitTestFramework libraries, but since
+BaseLib is consumed by the Framework itself, it requires different techniques to substitute parts of the
+functionality.
+
+To solve some of this, the UnitTestFramework consumes a special implementation of BaseLib for host-based tests.
+This implementation contains a [hook table](https://github.com/tianocore/edk2/blob/e188ecc8b4aed8fdd26b731d43883861f5e5e7b4/MdePkg/Test/UnitTest/Include/Library/UnitTestHostBaseLib.h#L507)
+that can be used to substitute test functionality for any of the BaseLib functions. By default, this implementation
+will use the underlying BaseLib implementation, so the unit test writer only has to supply minimal code to test a
+particular case.
+
+### Debugging the Framework Itself
+
+While most of the tests that are produced by the UnitTestFramework are easy to step through in a debugger, the Framework
+itself consumes code (mostly Cmocka) that sets its own build flags. These flags cause parts of the Framework to not
+export symbols and captures exceptions, and as such are harder to debug. We have provided a Stuart parameter to force
+symbolic debugging to be enabled.
+
+You can run a build by adding the `BLD_*_UNIT_TESTING_DEBUG=TRUE` parameter to enable this build option.
+
+```bash
+stuart_ci_build -c .pytool/CISettings.py TOOL_CHAIN_TAG=VS2019 -p MdePkg -t NOOPT BLD_*_UNIT_TESTING_DEBUG=TRUE
+```
+
+## Building and Running Host-Based Tests
+
+The EDK2 CI infrastructure provides a convenient way to run all host-based tests -- in the the entire tree or just
+selected packages -- and aggregate all the the reports, including highlighting any failures. This functionality is
+provided through the Stuart build system (published by EDK2-PyTools) and the `NOOPT` build target.
+
+### Building Locally
+
+First, to make sure you're working with the latest PyTools, run the following command:
+
+```bash
+# Would recommend to run this in a Python venv, but that's out of scope for this doc.
+python -m pip install --upgrade -r ./pip-requirements.txt
+```
+
+After that, the following commands will set up the build and run the host-based tests.
+
+```bash
+# Setup repo for building
+# stuart_setup -c ./.pytool/CISettings.py TOOL_CHAIN_TAG=<GCC5, VS2019, etc.>
+stuart_setup -c ./.pytool/CISettings.py TOOL_CHAIN_TAG=VS2019
+
+# Update all binary dependencies
+# stuart_update -c ./.pytool/CISettings.py TOOL_CHAIN_TAG=<GCC5, VS2019, etc.>
+stuart_update -c ./.pytool/CISettings.py TOOL_CHAIN_TAG=VS2019
+
+# Build and run the tests
+# stuart_ci_build -c ./.pytool/CISettings.py TOOL_CHAIN_TAG=<GCC5, VS2019, etc.> -t NOOPT [-p <Package Name>]
+stuart_ci_build -c ./.pytool/CISettings.py TOOL_CHAIN_TAG=VS2019 -t NOOPT -p MdePkg
+```
+
+### Evaluating the Results
+
+In your immediate output, any build failures will be highlighted. You can see these below as "WARNING" and "ERROR" messages.
+
+```text
+(edk_env) PS C:\_uefi\edk2> stuart_ci_build -c .\.pytool\CISettings.py TOOL_CHAIN_TAG=VS2019 -t NOOPT -p MdePkg
+
+SECTION - Init SDE
+SECTION - Loading Plugins
+SECTION - Start Invocable Tool
+SECTION - Getting Environment
+SECTION - Loading plugins
+SECTION - Building MdePkg Package
+PROGRESS - --Running MdePkg: Host Unit Test Compiler Plugin NOOPT --
+WARNING - Allowing Override for key TARGET_ARCH
+PROGRESS - Start time: 2020-07-27 17:18:08.521672
+PROGRESS - Setting up the Environment
+PROGRESS - Running Pre Build
+PROGRESS - Running Build NOOPT
+PROGRESS - Running Post Build
+SECTION - Run Host based Unit Tests
+SUBSECTION - Testing for architecture: X64
+WARNING - TestBaseSafeIntLibHost.exe Test Failed
+WARNING -   Test SafeInt8ToUint8 - UT_ASSERT_EQUAL(0x5b:5b, Result:5c)
+c:\_uefi\edk2\MdePkg\Test\UnitTest\Library\BaseSafeIntLib\TestBaseSafeIntLib.c:35: error: Failure!
+ERROR - Plugin Failed: Host-Based Unit Test Runner returned 1
+CRITICAL - Post Build failed
+PROGRESS - End time: 2020-07-27 17:18:19.792313  Total time Elapsed: 0:00:11
+ERROR - --->Test Failed: Host Unit Test Compiler Plugin NOOPT returned 1
+ERROR - Overall Build Status: Error
+PROGRESS - There were 1 failures out of 1 attempts
+SECTION - Summary
+ERROR - Error
+
+(edk_env) PS C:\_uefi\edk2>
+```
+
+If a test fails, you can run it manually to get more details...
+
+```text
+(edk_env) PS C:\_uefi\edk2> .\Build\MdePkg\HostTest\NOOPT_VS2019\X64\TestBaseSafeIntLibHost.exe
+
+Int Safe Lib Unit Test Application v0.1
+---------------------------------------------------------
+------------     RUNNING ALL TEST SUITES   --------------
+---------------------------------------------------------
+---------------------------------------------------------
+RUNNING TEST SUITE: Int Safe Conversions Test Suite
+---------------------------------------------------------
+[==========] Running 71 test(s).
+[ RUN      ] Test SafeInt8ToUint8
+[  ERROR   ] --- UT_ASSERT_EQUAL(0x5b:5b, Result:5c)
+[   LINE   ] --- c:\_uefi\edk2\MdePkg\Test\UnitTest\Library\BaseSafeIntLib\TestBaseSafeIntLib.c:35: error: Failure!
+[  FAILED  ] Test SafeInt8ToUint8
+[ RUN      ] Test SafeInt8ToUint16
+[       OK ] Test SafeInt8ToUint16
+[ RUN      ] Test SafeInt8ToUint32
+[       OK ] Test SafeInt8ToUint32
+[ RUN      ] Test SafeInt8ToUintn
+[       OK ] Test SafeInt8ToUintn
+...
+```
+
+You can also, if you are so inclined, read the output from the exact instance of the test that was run during
+`stuart_ci_build`. The ouput file can be found on a path that looks like:
+
+`Build/<Package>/HostTest/<Arch>/<TestName>.<TestSuiteName>.<Arch>.result.xml`
+
+A sample of this output looks like:
+
+```xml
+<!--
+  Excerpt taken from:
+  Build\MdePkg\HostTest\NOOPT_VS2019\X64\TestBaseSafeIntLibHost.exe.Int Safe Conversions Test Suite.X64.result.xml
+  -->
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites>
+  <testsuite name="Int Safe Conversions Test Suite" time="0.000" tests="71" failures="1" errors="0" skipped="0" >
+    <testcase name="Test SafeInt8ToUint8" time="0.000" >
+      <failure><![CDATA[UT_ASSERT_EQUAL(0x5c:5c, Result:5b)
+c:\_uefi\MdePkg\Test\UnitTest\Library\BaseSafeIntLib\TestBaseSafeIntLib.c:35: error: Failure!]]></failure>
+    </testcase>
+    <testcase name="Test SafeInt8ToUint16" time="0.000" >
+    </testcase>
+    <testcase name="Test SafeInt8ToUint32" time="0.000" >
+    </testcase>
+    <testcase name="Test SafeInt8ToUintn" time="0.000" >
+    </testcase>
+```
+
+### XML Reporting Mode
+
+Since these applications are built using the CMocka framework, they can also use the following env variables to output
+in a structured XML rather than text:
+
+```text
+CMOCKA_MESSAGE_OUTPUT=xml
+CMOCKA_XML_FILE=<absolute or relative path to output file>
+```
+
+This mode is used by the test running plugin to aggregate the results for CI test status reporting in the web view.
+
+### Important Note
+
+This works on both Windows and Linux, but is currently limited to x64 architectures. Working on getting others, but we
+also welcome contributions.
 
 ## Known Limitations
 
