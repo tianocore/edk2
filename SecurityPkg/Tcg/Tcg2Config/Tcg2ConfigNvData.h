@@ -70,6 +70,7 @@ typedef struct {
   UINT8    TpmDeviceInterfaceAttempt;
   BOOLEAN  TpmDeviceInterfacePtpFifoSupported;
   BOOLEAN  TpmDeviceInterfacePtpCrbSupported;
+  BOOLEAN  ChangeEPSSupported;
 } TCG2_CONFIGURATION_INFO;
 
 //

@@ -788,6 +788,7 @@ InstallTcg2ConfigForm (
   CHAR16                          TempBuffer[1024];
   TCG2_CONFIGURATION_INFO         Tcg2ConfigInfo;
   TPM2_PTP_INTERFACE_TYPE         TpmDeviceInterfaceDetected;
+  BOOLEAN                         IsCmdImp = FALSE;
 
   DriverHandle = NULL;
   ConfigAccess = &PrivateData->ConfigAccess;
@@ -869,6 +870,12 @@ InstallTcg2ConfigForm (
     }
     HiiSetString (PrivateData->HiiHandle, STRING_TOKEN (STR_TPM2_SUPPORTED_HASH_ALGO_CONTENT), TempBuffer, NULL);
   }
+
+  Status = Tpm2GetCapabilityIsCommandImplemented (TPM_CC_ChangeEPS, &IsCmdImp);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Tpm2GetCapabilityIsCmdImpl fails %r\n", Status));
+  }
+  Tcg2ConfigInfo.ChangeEPSSupported = IsCmdImp;
 
   FillBufferWithBootHashAlg (TempBuffer, sizeof(TempBuffer), PcdGet32 (PcdTcg2HashAlgorithmBitmap));
   HiiSetString (PrivateData->HiiHandle, STRING_TOKEN (STR_BIOS_HASH_ALGO_CONTENT), TempBuffer, NULL);
