@@ -66,6 +66,8 @@
             "Library/CmockaLib/cmocka/**/*.*"  # not going to spell check a submodule
         ],
         "ExtendWords": [             # words to extend to the dictionary for this package
+            "testcase",
+            "testsuites",
             "cmocka",
             "buildmodule",
             "criterium",
