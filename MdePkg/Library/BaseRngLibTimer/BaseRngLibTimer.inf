@@ -1,0 +1,37 @@
+## @file
+#  Instance of RNG (Random Number Generator) Library.
+#
+#  BaseRng Library that uses the TimerLib to provide reasonably random numbers.
+#  Do not use this on a production system.
+#
+#  Copyright (c) Microsoft Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BaseRngLibTimer
+  MODULE_UNI_FILE                = BaseRngLibTimer.uni
+  FILE_GUID                      = 74950C45-10FC-4AB5-B114-49C87C17409B
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = RngLib
+  CONSTRUCTOR                    = BaseRngLibConstructor
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  RngLibTimer.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  TimerLib
