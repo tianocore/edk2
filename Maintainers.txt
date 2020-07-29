@@ -165,6 +165,7 @@ W: https://github.com/tianocore/tianocore.github.io/wiki/CryptoPkg
 M: Jiewen Yao <jiewen.yao@intel.com>
 M: Jian J Wang <jian.j.wang@intel.com>
 R: Xiaoyu Lu <xiaoyux.lu@intel.com>
+R: Guomin Jiang <guomin.jiang@intel.com>
 
 DynamicTablesPkg
 F: DynamicTablesPkg/
@@ -198,6 +199,7 @@ F: FmpDevicePkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/FmpDevicePkg
 M: Liming Gao <liming.gao@intel.com>
 M: Michael D Kinney <michael.d.kinney@intel.com>
+R: Guomin Jiang <guomin.jiang@intel.com>
 
 IntelFsp2Pkg
 F: IntelFsp2Pkg/
@@ -322,6 +324,7 @@ F: MdeModulePkg/Library/FmpAuthenticationLibNull/
 F: MdeModulePkg/Universal/Esrt*/
 R: Hao A Wu <hao.a.wu@intel.com>
 R: Liming Gao <liming.gao@intel.com>
+R: Guomin Jiang <guomin.jiang@intel.com>
 
 MdeModulePkg: HII and UI modules
 F: MdeModulePkg/*FileExplorer*/
