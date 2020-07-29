@@ -12,25 +12,15 @@
 DEFINE FD_BASE       = 0x00800000
 DEFINE FD_BLOCK_SIZE = 0x00001000
 
-!if $(TARGET) == "NOOPT"
-DEFINE PEI_FV_SIZE = 0x00050000
-DEFINE DXE_FV_SIZE = 0x00800000
-DEFINE FD_SIZE     = 0x00850000
-DEFINE NUM_BLOCKS  = 0x850
-!else
-DEFINE PEI_FV_SIZE = 0x30000
-DEFINE DXE_FV_SIZE = 0x3E0000
-DEFINE FD_SIZE     = 0x00410000
-DEFINE NUM_BLOCKS  = 0x410
-!endif
+DEFINE PEI_FV_SIZE = $(PEI_SIZE)
+DEFINE DXE_FV_SIZE = $(DXE_SIZE)
+DEFINE FD_SIZE     = $(PAYLOAD_SIZE)
 
 ################################################################################
 [FD.UefiPayload]
 BaseAddress   = $(FD_BASE) | gUefiPayloadPkgTokenSpaceGuid.PcdPayloadFdMemBase
 Size          = $(FD_SIZE) | gUefiPayloadPkgTokenSpaceGuid.PcdPayloadFdMemSize
 ErasePolarity = 1
-BlockSize     = $(FD_BLOCK_SIZE)
-NumBlocks     = $(NUM_BLOCKS)
 
 0x00000000|$(PEI_FV_SIZE)
 FV = PEIFV

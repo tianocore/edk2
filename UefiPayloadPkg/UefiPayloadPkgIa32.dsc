@@ -33,6 +33,22 @@
   DEFINE   BOOTLOADER = SBL
 
   #
+  # Payload size
+  #
+  # PEI_SIZE and DXE_SIZE have to be multiples of 0x1000 and the sum must be
+  # less than or equal to PAYLOAD_SIZE.
+  #
+  !if $(TARGET) == "NOOPT"
+  DEFINE PAYLOAD_SIZE = 0x00850000
+  DEFINE PEI_SIZE     = 0x00050000
+  DEFINE DXE_SIZE     = 0x00800000
+  !else
+  DEFINE PAYLOAD_SIZE = 0x00410000
+  DEFINE PEI_SIZE     = 0x00030000
+  DEFINE DXE_SIZE     = 0x003E0000
+  !endif
+
+  #
   # CPU options
   #
   DEFINE MAX_LOGICAL_PROCESSORS       = 64
