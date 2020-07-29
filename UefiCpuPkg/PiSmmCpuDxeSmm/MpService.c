@@ -40,14 +40,18 @@ WaitForSemaphore (
 {
   UINT32                            Value;
 
-  do {
+  for (;;) {
     Value = *Sem;
-  } while (Value == 0 ||
-           InterlockedCompareExchange32 (
-             (UINT32*)Sem,
-             Value,
-             Value - 1
-             ) != Value);
+    if (Value != 0 &&
+        InterlockedCompareExchange32 (
+          (UINT32*)Sem,
+          Value,
+          Value - 1
+          ) == Value) {
+      break;
+    }
+    CpuPause ();
+  }
   return Value - 1;
 }
 
