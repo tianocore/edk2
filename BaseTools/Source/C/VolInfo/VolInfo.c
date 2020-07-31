@@ -1077,7 +1077,7 @@ Returns:
   }
 
   if (VolumeHeader.FvLength != Size) {
-    printf ("ERROR: Volume Size not consistant with Block Maps!\n");
+    printf ("ERROR: Volume Size not consistent with Block Maps!\n");
     return EFI_ABORTED;
   }
 
