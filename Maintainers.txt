@@ -454,6 +454,11 @@ F: OvmfPkg/XenTimerDxe/
 R: Anthony Perard <anthony.perard@citrix.com>
 R: Julien Grall <julien@xen.org>
 
+OvmfPkg: bhyve
+F: OvmfPkg/Bhyve/
+R: Rebecca Cran <rebecca@bsdio.com>
+R: Peter Grehan <grehan@freebsd.org>
+
 PcAtChipsetPkg
 F: PcAtChipsetPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/PcAtChipsetPkg
