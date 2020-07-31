@@ -218,7 +218,7 @@ EFI_DEBUGGER_COMMAND_SET  mDebuggerCommandSet[] = {
     L"TRACE              - show/clear trace instruction branch\n",
     L"The trace command will show or clear the latest instruction branch.\n\n",
     L"TRACE [c]\n"
-    L"  (No Argument) - Show current instrcution branch\n"
+    L"  (No Argument) - Show current instruction branch\n"
     L"  c             - Clear current instruction branch\n",
     L"",
     {SCAN_NULL, CHAR_NULL},
