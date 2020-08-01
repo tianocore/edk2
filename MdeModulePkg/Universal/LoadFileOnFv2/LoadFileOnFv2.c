@@ -317,7 +317,7 @@ InstallFileLoadProtocol (
   EFI_FIRMWARE_VOLUME_PROTOCOL on the handle of the FFS. This notification function
   also handles the situation when LZMA decoder driver loaded later than FirmwareVolume driver.
 
-  @param  Event                 The event that occured
+  @param  Event                 The event that occurred
   @param  Context               Context of event. Not used in this nofication function.
 
 **/
