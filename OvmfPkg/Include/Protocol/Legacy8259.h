@@ -58,7 +58,7 @@ typedef enum {
   @param  SlaveBase             The base vector for the Slave PIC in the 8259 controller.
 
   @retval EFI_SUCCESS           The new bases were programmed.
-  @retval EFI_DEVICE_ERROR      A device error occured programming the vector bases.
+  @retval EFI_DEVICE_ERROR      A device error occurred programming the vector bases.
 
 **/
 typedef
