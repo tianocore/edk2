@@ -29,7 +29,7 @@
 
 [Packages]
   MdePkg/MdePkg.dec
-  OvmfPkg/Bhyve/BhyvePkg.dec
+  OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
   BaseLib

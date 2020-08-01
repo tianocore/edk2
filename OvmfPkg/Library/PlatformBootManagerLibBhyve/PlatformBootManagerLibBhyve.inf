@@ -10,7 +10,7 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = PlatformBootManagerLib
+  BASE_NAME                      = PlatformBootManagerLibBhyve
   FILE_GUID                      = b0de5f0d-f676-42da-8d00-86997ee0dbb4
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
