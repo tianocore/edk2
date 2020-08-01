@@ -1,7 +1,9 @@
 ## @file
 #  EFI/Framework Open Virtual Machine Firmware (OVMF) platform
 #
+#  Copyright (c) 2020, Rebecca Cran <rebecca@bsdio.com>
 #  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2014, Pluribus Networks, Inc.
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -18,6 +20,9 @@
   Csm/Include
 
 [LibraryClasses]
+  ##  @libraryclass  Access bhyve's firmware control interface.
+  BhyveFwCtlLib|Include/Library/BhyveFwCtlLib.h
+
   ##  @libraryclass  Loads and boots a Linux kernel image
   #
   LoadLinuxLib|Include/Library/LoadLinuxLib.h
