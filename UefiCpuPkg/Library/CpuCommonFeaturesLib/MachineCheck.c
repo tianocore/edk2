@@ -287,7 +287,7 @@ LmceSupport (
 
   McgCap.Uint64 = AsmReadMsr64 (MSR_IA32_MCG_CAP);
   if (ProcessorNumber == 0) {
-    DEBUG ((EFI_D_INFO, "LMCE eanble = %x\n", (BOOLEAN) (McgCap.Bits.MCG_LMCE_P != 0)));
+    DEBUG ((DEBUG_INFO, "LMCE enable = %x\n", (BOOLEAN) (McgCap.Bits.MCG_LMCE_P != 0)));
   }
   return (BOOLEAN) (McgCap.Bits.MCG_LMCE_P != 0);
 }
