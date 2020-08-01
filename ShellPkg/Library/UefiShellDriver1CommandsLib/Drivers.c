@@ -22,7 +22,7 @@ STATIC CONST SHELL_PARAM_ITEM ParamList[] = {
 
   @param[in] TheHandle      The handle to get the device path for.
 
-  @retval NULL    An error occured.
+  @retval NULL    An error occurred.
   @return         A pointer to the driver path as a string.  The callee must
                   free this memory.
 **/

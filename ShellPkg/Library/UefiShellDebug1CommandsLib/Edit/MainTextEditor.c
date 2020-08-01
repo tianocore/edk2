@@ -40,7 +40,7 @@ EFI_EDITOR_GLOBAL_EDITOR      MainEditor;
   Load a file from disk to editor
 
   @retval EFI_SUCCESS             The operation was successful.
-  @retval EFI_LOAD_ERROR          A load error occured.
+  @retval EFI_LOAD_ERROR          A load error occurred.
   @retval EFI_OUT_OF_RESOURCES    A memory allocation failed.
 **/
 EFI_STATUS
@@ -74,7 +74,7 @@ MainCommandGotoLine (
 
   @retval EFI_SUCCESS           The file was saved correctly.
   @retval EFI_OUT_OF_RESOURCES  A memory allocation failed.
-  @retval EFI_LOAD_ERROR          A file access error occured.
+  @retval EFI_LOAD_ERROR          A file access error occurred.
 **/
 EFI_STATUS
 MainCommandSaveFile (
@@ -96,7 +96,7 @@ MainCommandDisplayHelp (
 
   @retval EFI_SUCCESS             The operation was successful.
   @retval EFI_OUT_OF_RESOURCES    A memory allocation failed.
-  @retval EFI_LOAD_ERROR          A load error occured.
+  @retval EFI_LOAD_ERROR          A load error occurred.
 **/
 EFI_STATUS
 MainCommandExit (
@@ -108,7 +108,7 @@ MainCommandExit (
 
   @retval EFI_SUCCESS             The operation was successful.
   @retval EFI_OUT_OF_RESOURCES    A memory allocation failed.
-  @retval EFI_LOAD_ERROR          A load error occured.
+  @retval EFI_LOAD_ERROR          A load error occurred.
 **/
 EFI_STATUS
 MainCommandSearch (
@@ -120,7 +120,7 @@ MainCommandSearch (
 
   @retval EFI_SUCCESS             The operation was successful.
   @retval EFI_OUT_OF_RESOURCES    A memory allocation failed.
-  @retval EFI_LOAD_ERROR          A load error occured.
+  @retval EFI_LOAD_ERROR          A load error occurred.
 **/
 EFI_STATUS
 MainCommandSearchReplace (
@@ -132,7 +132,7 @@ MainCommandSearchReplace (
 
   @retval EFI_SUCCESS             The operation was successful.
   @retval EFI_OUT_OF_RESOURCES    A memory allocation failed.
-  @retval EFI_LOAD_ERROR          A load error occured.
+  @retval EFI_LOAD_ERROR          A load error occurred.
 **/
 EFI_STATUS
 MainCommandCutLine (
@@ -144,7 +144,7 @@ MainCommandCutLine (
 
   @retval EFI_SUCCESS             The operation was successful.
   @retval EFI_OUT_OF_RESOURCES    A memory allocation failed.
-  @retval EFI_LOAD_ERROR          A load error occured.
+  @retval EFI_LOAD_ERROR          A load error occurred.
 **/
 EFI_STATUS
 MainCommandPasteLine (
@@ -277,7 +277,7 @@ EDITOR_MENU_ITEM  MainMenuItems[] = {
   Load a file from disk to editor
 
   @retval EFI_SUCCESS             The operation was successful.
-  @retval EFI_LOAD_ERROR          A load error occured.
+  @retval EFI_LOAD_ERROR          A load error occurred.
   @retval EFI_OUT_OF_RESOURCES    A memory allocation failed.
 **/
 EFI_STATUS
@@ -465,7 +465,7 @@ MainCommandSwitchFileType (
 
   @retval EFI_SUCCESS             The operation was successful.
   @retval EFI_OUT_OF_RESOURCES    A memory allocation failed.
-  @retval EFI_LOAD_ERROR          A load error occured.
+  @retval EFI_LOAD_ERROR          A load error occurred.
 **/
 EFI_STATUS
 MainCommandCutLine (
@@ -503,7 +503,7 @@ MainCommandCutLine (
 
   @retval EFI_SUCCESS             The operation was successful.
   @retval EFI_OUT_OF_RESOURCES    A memory allocation failed.
-  @retval EFI_LOAD_ERROR          A load error occured.
+  @retval EFI_LOAD_ERROR          A load error occurred.
 **/
 EFI_STATUS
 MainCommandPasteLine (
@@ -535,7 +535,7 @@ MainCommandPasteLine (
 
   @retval EFI_SUCCESS             The operation was successful.
   @retval EFI_OUT_OF_RESOURCES    A memory allocation failed.
-  @retval EFI_LOAD_ERROR          A load error occured.
+  @retval EFI_LOAD_ERROR          A load error occurred.
 **/
 EFI_STATUS
 MainCommandSearch (
@@ -676,7 +676,7 @@ MainCommandSearch (
 
   @retval EFI_SUCCESS             The operation was successful.
   @retval EFI_OUT_OF_RESOURCES    A memory allocation failed.
-  @retval EFI_LOAD_ERROR          A load error occured.
+  @retval EFI_LOAD_ERROR          A load error occurred.
 **/
 EFI_STATUS
 MainCommandSearchReplace (
@@ -979,7 +979,7 @@ MainCommandSearchReplace (
 
   @retval EFI_SUCCESS             The operation was successful.
   @retval EFI_OUT_OF_RESOURCES    A memory allocation failed.
-  @retval EFI_LOAD_ERROR          A load error occured.
+  @retval EFI_LOAD_ERROR          A load error occurred.
 **/
 EFI_STATUS
 MainCommandExit (
@@ -1133,7 +1133,7 @@ MainCommandGotoLine (
 
   @retval EFI_SUCCESS           The file was saved correctly.
   @retval EFI_OUT_OF_RESOURCES  A memory allocation failed.
-  @retval EFI_LOAD_ERROR          A file access error occured.
+  @retval EFI_LOAD_ERROR          A file access error occurred.
 **/
 EFI_STATUS
 MainCommandSaveFile (
@@ -1439,7 +1439,7 @@ EFI_EDITOR_GLOBAL_EDITOR      MainEditorConst = {
   The initialization function for MainEditor.
 
   @retval EFI_SUCCESS             The operation was successful.
-  @retval EFI_LOAD_ERROR          A load error occured.
+  @retval EFI_LOAD_ERROR          A load error occurred.
 **/
 EFI_STATUS
 MainEditorInit (
@@ -1585,7 +1585,7 @@ MainEditorInit (
   The cleanup function for MainEditor.
 
   @retval EFI_SUCCESS             The operation was successful.
-  @retval EFI_LOAD_ERROR          A load error occured.
+  @retval EFI_LOAD_ERROR          A load error occurred.
 **/
 EFI_STATUS
 MainEditorCleanup (
@@ -1823,7 +1823,7 @@ MainEditorHandleMouseInput (
   Handle user key input. This routes to other functions for the actions.
 
   @retval EFI_SUCCESS             The operation was successful.
-  @retval EFI_LOAD_ERROR          A load error occured.
+  @retval EFI_LOAD_ERROR          A load error occurred.
   @retval EFI_OUT_OF_RESOURCES    A memory allocation failed.
 **/
 EFI_STATUS
