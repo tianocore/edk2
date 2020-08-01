@@ -34,7 +34,7 @@ HEFI_EDITOR_MEM_IMAGE             HMemImageConst = {
   Initialization function for HDiskImage.
 
   @retval EFI_SUCCESS       The operation was successful.
-  @retval EFI_LOAD_ERROR    A load error occured.
+  @retval EFI_LOAD_ERROR    A load error occurred.
 **/
 EFI_STATUS
 HMemImageInit (
@@ -106,7 +106,7 @@ HMemImageSetMemOffsetSize (
   @param[in] Size     The size.
   @param[in] Recover  if is for recover, no information print.
 
-  @retval EFI_LOAD_ERROR        A load error occured.
+  @retval EFI_LOAD_ERROR        A load error occurred.
   @retval EFI_SUCCESS           The operation was successful.
   @retval EFI_OUT_OF_RESOURCES  A memory allocation failed.
 **/
@@ -217,7 +217,7 @@ HMemImageRead (
   @param[in] Offset   The offset.
   @param[in] Size     The size.
 
-  @retval EFI_LOAD_ERROR        A load error occured.
+  @retval EFI_LOAD_ERROR        A load error occurred.
   @retval EFI_SUCCESS           The operation was successful.
   @retval EFI_OUT_OF_RESOURCES  A memory allocation failed.
 **/

@@ -18,7 +18,7 @@
   Init function for MainEditor
 
   @retval EFI_SUCCESS             The operation was successful.
-  @retval EFI_LOAD_ERROR          A load error occured.
+  @retval EFI_LOAD_ERROR          A load error occurred.
 **/
 EFI_STATUS
 HMainEditorInit (
@@ -29,7 +29,7 @@ HMainEditorInit (
   Cleanup function for MainEditor.
 
   @retval EFI_SUCCESS             The operation was successful.
-  @retval EFI_LOAD_ERROR          A load error occured.
+  @retval EFI_LOAD_ERROR          A load error occurred.
 **/
 EFI_STATUS
 HMainEditorCleanup (
@@ -50,8 +50,8 @@ HMainEditorRefresh (
   Handle user key input. will route it to other components handle function.
 
   @retval EFI_SUCCESS             The operation was successful.
-  @retval EFI_OUT_OF_RESOURCES    A memory allocation occured.
-  @retval EFI_LOAD_ERROR          A load error occured.
+  @retval EFI_OUT_OF_RESOURCES    A memory allocation occurred.
+  @retval EFI_LOAD_ERROR          A load error occurred.
 **/
 EFI_STATUS
 HMainEditorKeyInput (

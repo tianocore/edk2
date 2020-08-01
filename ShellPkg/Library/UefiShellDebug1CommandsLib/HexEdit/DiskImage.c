@@ -35,7 +35,7 @@ HEFI_EDITOR_DISK_IMAGE            HDiskImageConst = {
   Initialization function for HDiskImage.
 
   @retval EFI_SUCCESS     The operation was successful.
-  @retval EFI_LOAD_ERROR  A load error occured.
+  @retval EFI_LOAD_ERROR  A load error occurred.
 **/
 EFI_STATUS
 HDiskImageInit (
@@ -147,7 +147,7 @@ HDiskImageSetDiskNameOffsetSize (
 
   @retval EFI_SUCCESS           The operation was successful.
   @retval EFI_OUT_OF_RESOURCES  A memory allocation failed.
-  @retval EFI_LOAD_ERROR        A load error occured.
+  @retval EFI_LOAD_ERROR        A load error occurred.
   @retval EFI_INVALID_PARAMETER A parameter was invalid.
 **/
 EFI_STATUS
@@ -319,7 +319,7 @@ HDiskImageRead (
 
   @retval EFI_SUCCESS           The operation was successful.
   @retval EFI_OUT_OF_RESOURCES  A memory allocation failed.
-  @retval EFI_LOAD_ERROR        A load error occured.
+  @retval EFI_LOAD_ERROR        A load error occurred.
   @retval EFI_INVALID_PARAMETER A parameter was invalid.
 **/
 EFI_STATUS

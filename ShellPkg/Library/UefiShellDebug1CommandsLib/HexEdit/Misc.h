@@ -18,7 +18,7 @@
                             >0 : advance
                             <0: retreat
 
-  @retval NULL An error occured.
+  @retval NULL An error occurred.
   @return A pointer to the line after move.
 **/
 HEFI_EDITOR_LINE *
@@ -33,7 +33,7 @@ HMoveLine (
                           >0 : advance
                           <0: retreat
 
-  @retval NULL An error occured.
+  @retval NULL An error occurred.
   @return A pointer to the line after move.
 **/
 HEFI_EDITOR_LINE *
