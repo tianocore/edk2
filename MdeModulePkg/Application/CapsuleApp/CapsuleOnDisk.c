@@ -795,7 +795,7 @@ ProcessCapsuleOnDisk (
 
   Status = GetUpdateFileSystem (Map, &BootNext, &Fs, &UpdateBootNext);
   if (EFI_ERROR (Status)) {
-    Print (L"CapsuleApp: cannot find a valid file system on boot devies. Status = %r\n", Status);
+    Print (L"CapsuleApp: cannot find a valid file system on boot devices. Status = %r\n", Status);
     return Status;
   }
 
