@@ -548,7 +548,7 @@ HiiConfirmDataRemovalAction (
         Unicode,
         L" System should not be powered off until action completion ",
         L" ",
-        L" Press 'Y/y' to continue, press 'N/n' to cancal ",
+        L" Press 'Y/y' to continue, press 'N/n' to cancel ",
         NULL
     );
   } while (
