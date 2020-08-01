@@ -177,7 +177,7 @@ Returns:
   fprintf (stdout, "  -l GuidHeaderLength, --HeaderLength GuidHeaderLength\n\
                         GuidHeaderLength is the size of header of guided data\n");
   fprintf (stdout, "  -r GuidAttr, --attributes GuidAttr\n\
-                        GuidAttr is guid section atttributes, which may be\n\
+                        GuidAttr is guid section attributes, which may be\n\
                         PROCESSING_REQUIRED, AUTH_STATUS_VALID and NONE. \n\
                         if -r option is not given, default PROCESSING_REQUIRED\n");
   fprintf (stdout, "  -n String, --name String\n\
