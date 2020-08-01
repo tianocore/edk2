@@ -785,7 +785,7 @@ BdsEntry (
 
   FilePath = FileDevicePath (NULL, EFI_REMOVABLE_MEDIA_FILE_NAME);
   if (FilePath == NULL) {
-    DEBUG ((DEBUG_ERROR, "Fail to allocate memory for defualt boot file path. Unable to boot.\n"));
+    DEBUG ((DEBUG_ERROR, "Fail to allocate memory for default boot file path. Unable to boot.\n"));
     CpuDeadLoop ();
   }
   Status = EfiBootManagerInitializeLoadOption (
