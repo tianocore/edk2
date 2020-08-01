@@ -887,7 +887,7 @@ BootScriptCompare (
 
   @retval EFI_OUT_OF_RESOURCES  No enough resource
   @retval EFI_SUCCESS           Succesfully installed the ScriptSave driver.
-  @retval other                 Errors occured.
+  @retval other                 Errors occurred.
 
 **/
 EFI_STATUS
