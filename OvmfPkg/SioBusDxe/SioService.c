@@ -265,7 +265,7 @@ SioModify (
   @param[in] DeviceIndex       Index of the device supported by this driver.
 
   @retval EFI_SUCCESS          The child device has been created successfully.
-  @retval Others               Error occured during the child device creation.
+  @retval Others               Error occurred during the child device creation.
 
 **/
 EFI_STATUS
