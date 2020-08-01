@@ -1465,7 +1465,7 @@ IsAllowedByDb (
 
   //
   // Fetch 'dbx' content. If 'dbx' doesn't exist, continue to check 'db'.
-  // If any other errors occured, no need to check 'db' but just return
+  // If any other errors occurred, no need to check 'db' but just return
   // not-allowed-by-db (FALSE) to avoid bypass.
   //
   DbxDataSize = 0;
