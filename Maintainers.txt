@@ -403,6 +403,19 @@ M: Laszlo Ersek <lersek@redhat.com>
 M: Ard Biesheuvel <ard.biesheuvel@arm.com>
 S: Maintained
 
+OvmfPkg: bhyve-related modules
+F: OvmfPkg/Bhyve/
+F: OvmfPkg/Include/IndustryStandard/Bhyve.h
+F: OvmfPkg/Include/Library/BhyveFwCtlLib.h
+F: OvmfPkg/Library/AcpiTimerLib/BaseAcpiTimerLibBhyve.c
+F: OvmfPkg/Library/AcpiTimerLib/BaseAcpiTimerLibBhyve.inf
+F: OvmfPkg/Library/BhyveFwCtlLib/
+F: OvmfPkg/Library/PlatformBootManagerLibBhyve/
+F: OvmfPkg/Library/ResetSystemLib/BaseResetShutdownBhyve.c
+F: OvmfPkg/Library/ResetSystemLib/BaseResetSystemLibBhyve.inf
+R: Rebecca Cran <rebecca@bsdio.com>
+R: Peter Grehan <grehan@freebsd.org>
+
 OvmfPkg: CSM modules
 F: OvmfPkg/Csm/
 R: David Woodhouse <dwmw2@infradead.org>
