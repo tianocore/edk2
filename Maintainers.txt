@@ -292,14 +292,12 @@ R: Liming Gao <liming.gao@intel.com>
 
 MdeModulePkg: Device and Peripheral modules
 F: MdeModulePkg/*PciHostBridge*/
-F: MdeModulePkg/*Serial*/
 F: MdeModulePkg/Bus/
 F: MdeModulePkg/Include/*Ata*.h
 F: MdeModulePkg/Include/*IoMmu*.h
 F: MdeModulePkg/Include/*NonDiscoverableDevice*.h
 F: MdeModulePkg/Include/*NvmExpress*.h
 F: MdeModulePkg/Include/*SdMmc*.h
-F: MdeModulePkg/Include/*SerialPort*.h
 F: MdeModulePkg/Include/*Ufs*.h
 F: MdeModulePkg/Include/*Usb*.h
 F: MdeModulePkg/Include/Guid/RecoveryDevice.h
@@ -308,10 +306,15 @@ F: MdeModulePkg/Include/Library/PciHostBridgeLib.h
 F: MdeModulePkg/Include/Ppi/StorageSecurityCommand.h
 F: MdeModulePkg/Include/Protocol/Ps2Policy.h
 F: MdeModulePkg/Library/NonDiscoverableDeviceRegistrationLib/
-F: MdeModulePkg/Universal/Disk/
 F: MdeModulePkg/Universal/PcatSingleSegmentPciCfg2Pei/
 R: Hao A Wu <hao.a.wu@intel.com>
 R: Ray Ni <ray.ni@intel.com>
+
+MdeModulePkg: Disk modules
+F: MdeModulePkg/Universal/Disk/
+R: Hao A Wu <hao.a.wu@intel.com>
+R: Ray Ni <ray.ni@intel.com>
+R: Zhichao Gao <zhichao.gao@intel.com>
 
 MdeModulePkg: Firmware Update modules
 F: MdeModulePkg/*Capsule*/
@@ -366,10 +369,18 @@ F: MdeModulePkg/Include/*Reset*.h
 R: Zhichao Gao <zhichao.gao@intel.com>
 R: Ray Ni <ray.ni@intel.com>
 
+MdeModulePkg: Serial modules
+F: MdeModulePkg/*Serial*/
+F: MdeModulePkg/Include/*SerialPort*.h
+R: Hao A Wu <hao.a.wu@intel.com>
+R: Ray Ni <ray.ni@intel.com>
+R: Zhichao Gao <zhichao.gao@intel.com>
+
 MdeModulePkg: SMBIOS modules
 F: MdeModulePkg/Universal/Smbios*/
 R: Dandan Bi <dandan.bi@intel.com>
 R: Star Zeng <star.zeng@intel.com>
+R: Zhichao Gao <zhichao.gao@intel.com>
 
 MdeModulePkg: UEFI Variable modules
 F: MdeModulePkg/*Var*/
