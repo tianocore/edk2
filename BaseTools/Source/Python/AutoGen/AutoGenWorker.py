@@ -24,6 +24,7 @@ import traceback
 import sys
 from AutoGen.DataPipe import MemoryDataPipe
 import logging
+import time
 
 def clearQ(q):
     try:
@@ -111,7 +112,11 @@ class AutoGenManager(threading.Thread):
                     break
                 if badnews == "Done":
                     fin_num += 1
+                elif badnews == "QueueEmpty":
+                    EdkLogger.debug(EdkLogger.DEBUG_9, "Worker %s: %s" % (os.getpid(), badnews))
+                    self.TerminateWorkers()
                 else:
+                    EdkLogger.debug(EdkLogger.DEBUG_9, "Worker %s: %s" % (os.getpid(), badnews))
                     self.Status = False
                     self.TerminateWorkers()
                 if fin_num == len(self.autogen_workers):
@@ -227,12 +232,21 @@ class AutoGenWorkerInProcess(mp.Process):
             PlatformMetaFile = self.GetPlatformMetaFile(self.data_pipe.Get("P_Info").get("ActivePlatform"),
                                              self.data_pipe.Get("P_Info").get("WorkspaceDir"))
             while True:
-                if self.module_queue.empty():
-                    break
                 if self.error_event.is_set():
                     break
                 module_count += 1
-                module_file,module_root,module_path,module_basename,module_originalpath,module_arch,IsLib = self.module_queue.get_nowait()
+                try:
+                    module_file,module_root,module_path,module_basename,module_originalpath,module_arch,IsLib = self.module_queue.get_nowait()
+                except Empty:
+                    EdkLogger.debug(EdkLogger.DEBUG_9, "Worker %s: %s" % (os.getpid(), "Fake Empty."))
+                    time.sleep(0.01)
+                    continue
+                if module_file is None:
+                    EdkLogger.debug(EdkLogger.DEBUG_9, "Worker %s: %s" % (os.getpid(), "Worker get the last item in the queue."))
+                    self.feedback_q.put("QueueEmpty")
+                    time.sleep(0.01)
+                    continue
+
                 modulefullpath = os.path.join(module_root,module_file)
                 taskname = " : ".join((modulefullpath,module_arch))
                 module_metafile = PathClass(module_file,module_root)
@@ -280,11 +294,11 @@ class AutoGenWorkerInProcess(mp.Process):
                     else:
                         self.cache_q.put((Ma.MetaFile.Path, Ma.Arch, "MakeCache", False))
 
-        except Empty:
-            pass
-        except:
+        except Exception as e:
+            EdkLogger.debug(EdkLogger.DEBUG_9, "Worker %s: %s" % (os.getpid(), str(e)))
             self.feedback_q.put(taskname)
         finally:
+            EdkLogger.debug(EdkLogger.DEBUG_9, "Worker %s: %s" % (os.getpid(), "Done"))
             self.feedback_q.put("Done")
             self.cache_q.put("CacheDone")
 
