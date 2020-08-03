@@ -1217,7 +1217,7 @@ class Build():
             mqueue = mp.Queue()
             for m in AutoGenObject.GetAllModuleInfo:
                 mqueue.put(m)
-
+            mqueue.put((None,None,None,None,None,None,None))
             AutoGenObject.DataPipe.DataContainer = {"CommandTarget": self.Target}
             AutoGenObject.DataPipe.DataContainer = {"Workspace_timestamp": AutoGenObject.Workspace._SrcTimeStamp}
             AutoGenObject.CreateLibModuelDirs()
@@ -2174,6 +2174,7 @@ class Build():
             data_pipe_file = os.path.join(Pa.BuildDir, "GlobalVar_%s_%s.bin" % (str(Pa.Guid),Pa.Arch))
             Pa.DataPipe.dump(data_pipe_file)
 
+            mqueue.put((None,None,None,None,None,None,None))
             autogen_rt, errorcode = self.StartAutoGen(mqueue, Pa.DataPipe, self.SkipAutoGen, PcdMaList, cqueue)
 
             if not autogen_rt:
