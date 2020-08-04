@@ -200,6 +200,7 @@ W: https://github.com/tianocore/tianocore.github.io/wiki/FmpDevicePkg
 M: Liming Gao <liming.gao@intel.com>
 M: Michael D Kinney <michael.d.kinney@intel.com>
 R: Guomin Jiang <guomin.jiang@intel.com>
+R: Wei6 Xu <wei6.xu@intel.com>
 
 IntelFsp2Pkg
 F: IntelFsp2Pkg/
