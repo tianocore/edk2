@@ -1635,7 +1635,7 @@ class PeImageClass():
         ByteArray = array.array('B')
         ByteArray.fromfile(PeObject, 4)
         # PE signature should be 'PE\0\0'
-        if ByteArray.tostring() != b'PE\0\0':
+        if ByteArray.tolist() != [ord('P'), ord('E'), 0, 0]:
             self.ErrorInfo = self.FileName + ' has no valid PE signature PE00'
             return
 
