@@ -1,8 +1,9 @@
 /** @file
   Table Helper
 
-Copyright (c) 2017 - 2019, ARM Limited. All rights reserved.
-SPDX-License-Identifier: BSD-2-Clause-Patent
+  Copyright (c) 2017 - 2020, Arm Limited. All rights reserved.<BR>
+
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include <Protocol/AcpiTable.h>
@@ -243,4 +244,29 @@ FindDuplicateValue (
     }
   }
   return FALSE;
+}
+
+/** Convert a hex number to its ASCII code.
+
+ @param [in]  x   Hex number to convert.
+                  Must be 0 <= x < 16.
+
+ @return The ASCII code corresponding to x.
+**/
+UINT8
+EFIAPI
+AsciiFromHex (
+  IN  UINT8   x
+  )
+{
+  if (x < 10) {
+    return (UINT8)(x + '0');
+  }
+
+  if (x < 16) {
+    return (UINT8)(x - 10 + 'A');
+  }
+
+  ASSERT (FALSE);
+  return (UINT8)0;
 }
