@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2017 - 2019, ARM Limited. All rights reserved.
+  Copyright (c) 2017 - 2020, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -105,6 +105,19 @@ FindDuplicateValue (
   IN  CONST UINTN           Count,
   IN  CONST UINTN           ElementSize,
   IN        PFN_IS_EQUAL    EqualTestFunction
+  );
+
+/** Convert a hex number to its ASCII code.
+
+ @param [in]  x   Hex number to convert.
+                  Must be 0 <= x < 16.
+
+ @return The ASCII code corresponding to x.
+**/
+UINT8
+EFIAPI
+AsciiFromHex (
+  IN  UINT8   x
   );
 
 #endif // TABLE_HELPER_LIB_H_
