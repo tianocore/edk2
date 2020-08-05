@@ -1,0 +1,76 @@
+## @file
+#  AML Generation Library
+#
+#  Copyright (c) 2019 - 2020, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x0001001B
+  BASE_NAME      = DynamicAmlLib
+  FILE_GUID      = 23A6AFDA-F2A5-45EC-BEFF-420639D345B9
+  VERSION_STRING = 1.0
+  MODULE_TYPE    = DXE_DRIVER
+  LIBRARY_CLASS  = AmlLib
+
+[Sources]
+  AmlCoreInterface.h
+  AmlDefines.h
+  AmlInclude.h
+  AmlNodeDefines.h
+  AmlDbgPrint/AmlDbgPrint.c
+  AmlDbgPrint/AmlDbgPrint.h
+  AmlEncoding/Aml.c
+  AmlEncoding/Aml.h
+  Api/AmlApi.c
+  Api/AmlApiHelper.c
+  Api/AmlApiHelper.h
+  Api/AmlResourceDataApi.c
+  CodeGen/AmlCodeGen.c
+  CodeGen/AmlResourceDataCodeGen.c
+  CodeGen/AmlResourceDataCodeGen.h
+  NameSpace/AmlNameSpace.c
+  NameSpace/AmlNameSpace.h
+  Parser/AmlFieldListParser.c
+  Parser/AmlFieldListParser.h
+  Parser/AmlMethodParser.c
+  Parser/AmlMethodParser.h
+  Parser/AmlParser.c
+  Parser/AmlParser.h
+  Parser/AmlResourceDataParser.c
+  Parser/AmlResourceDataParser.h
+  ResourceData/AmlResourceData.c
+  ResourceData/AmlResourceData.h
+  Serialize/AmlSerialize.c
+  Stream/AmlStream.c
+  Stream/AmlStream.h
+  String/AmlString.c
+  String/AmlString.h
+  Tree/AmlClone.c
+  Tree/AmlTreeIterator.h
+  Tree/AmlNode.c
+  Tree/AmlNode.h
+  Tree/AmlNodeInterface.c
+  Tree/AmlTree.c
+  Tree/AmlTree.h
+  Tree/AmlTreeEnumerator.c
+  Tree/AmlTreeIterator.c
+  Tree/AmlTreeTraversal.c
+  Tree/AmlTreeTraversal.h
+  Utils/AmlUtility.c
+  Utils/AmlUtility.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  DynamicTablesPkg/DynamicTablesPkg.dec
+
+[LibraryClasses]
+  BaseLib
+
+[BuildOptions]
+  *_*_*_CC_FLAGS = -DAML_HANDLE
+
+[Protocols]
+
+[Guids]
