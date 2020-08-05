@@ -680,59 +680,6 @@ FreeUnicodeStringTable (
   IN EFI_UNICODE_STRING_TABLE  *UnicodeStringTable
   );
 
-#ifndef DISABLE_NEW_DEPRECATED_INTERFACES
-
-/**
-  [ATTENTION] This function will be deprecated for security reason.
-
-  Returns a pointer to an allocated buffer that contains the contents of a
-  variable retrieved through the UEFI Runtime Service GetVariable().  The
-  returned buffer is allocated using AllocatePool().  The caller is responsible
-  for freeing this buffer with FreePool().
-
-  If Name is NULL, then ASSERT().
-  If Guid is NULL, then ASSERT().
-
-  @param[in]  Name  The pointer to a Null-terminated Unicode string.
-  @param[in]  Guid  The pointer to an EFI_GUID structure.
-
-  @retval NULL   The variable could not be retrieved.
-  @retval NULL   There are not enough resources available for the variable contents.
-  @retval Other  A pointer to allocated buffer containing the variable contents.
-
-**/
-VOID *
-EFIAPI
-GetVariable (
-  IN CONST CHAR16    *Name,
-  IN CONST EFI_GUID  *Guid
-  );
-
-/**
-  [ATTENTION] This function will be deprecated for security reason.
-
-  Returns a pointer to an allocated buffer that contains the contents of a
-  variable retrieved through the UEFI Runtime Service GetVariable().  This
-  function always uses the EFI_GLOBAL_VARIABLE GUID to retrieve variables.
-  The returned buffer is allocated using AllocatePool().  The caller is
-  responsible for freeing this buffer with FreePool().
-
-  If Name is NULL, then ASSERT().
-
-  @param[in]  Name  The pointer to a Null-terminated Unicode string.
-
-  @retval NULL   The variable could not be retrieved.
-  @retval NULL   There are not enough resources available for the variable contents.
-  @retval Other  A pointer to allocated buffer containing the variable contents.
-
-**/
-VOID *
-EFIAPI
-GetEfiGlobalVariable (
-  IN CONST CHAR16  *Name
-  );
-#endif
-
 
 /**
   Returns the status whether get the variable success. The function retrieves
