@@ -18,6 +18,11 @@ typedef struct _EDKII_TCG_PPI EDKII_TCG_PPI;
 //
 #define EDKII_TCG_PRE_HASH  0x0000000000000001
 
+//
+// This bit is shall be set when HashData is the pre-hash digest and log only.
+//
+#define EDKII_TCG_PRE_HASH_LOG_ONLY  0x0000000000000002
+
 /**
   Tpm measure and log data, and extend the measurement result into a specific PCR.
 
