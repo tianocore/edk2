@@ -13,6 +13,7 @@
   RELEASE_*_*_CC_FLAGS     = -DMDEPKG_NDEBUG
 
 [LibraryClasses.common]
+  AmlLib|DynamicTablesPkg/Library/Common/AmlLib/AmlLib.inf
   TableHelperLib|DynamicTablesPkg/Library/Common/TableHelperLib/TableHelperLib.inf
 
 [Components.common]
