@@ -69,6 +69,8 @@
         "IgnoreFiles": [],           # use gitignore syntax to ignore errors
                                      # in matching files
         "ExtendWords": [
+           "ARMHB",                  # ARMHB000
+           "ARMLTD",
            "EISAID",
            "CCIDX",
            "CCSIDR",
@@ -81,6 +83,7 @@
            "MPIDR",
            "pytool",
            "Roadmap",
+           "ssdtserialporttemplate",
            "SMMUV",
            "standardised",
            "TABLEEX",
