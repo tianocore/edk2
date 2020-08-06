@@ -37,6 +37,7 @@
 
 [Components.common]
   DynamicTablesPkg/Library/Common/AmlLib/AmlLib.inf
+  DynamicTablesPkg/Library/Common/SsdtSerialPortFixupLib/SsdtSerialPortFixupLib.inf
   DynamicTablesPkg/Library/Common/TableHelperLib/TableHelperLib.inf
 
 [BuildOptions]
