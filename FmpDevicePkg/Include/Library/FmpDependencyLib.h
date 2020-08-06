@@ -2,6 +2,7 @@
   Fmp Capsule Dependency support functions for Firmware Management Protocol based
   firmware updates.
 
+  Copyright (c) Microsoft Corporation.<BR>
   Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -29,8 +30,8 @@ typedef struct {
   @param[in]   MaxDepexSize   Max size of the dependency.
   @param[out]  DepexSize      Size of dependency.
 
-  @retval TRUE    The capsule is valid.
-  @retval FALSE   The capsule is invalid.
+  @retval TRUE    The dependency expression is valid.
+  @retval FALSE   The dependency expression is invalid.
 
 **/
 BOOLEAN
