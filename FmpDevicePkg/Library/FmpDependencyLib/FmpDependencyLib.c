@@ -421,7 +421,7 @@ EvaluateDependency (
     Iterator++;
   }
 
-  DEBUG ((DEBUG_ERROR, "EvaluateDependency: No EFI_FMP_DEP_END Opcode in exression!\n"));
+  DEBUG ((DEBUG_ERROR, "EvaluateDependency: No EFI_FMP_DEP_END Opcode in expression!\n"));
 
 Error:
   return FALSE;
