@@ -1,7 +1,7 @@
 /** @file
   Header file for ACPI table parser
 
-  Copyright (c) 2016 - 2018, ARM Limited. All rights reserved.
+  Copyright (c) 2016 - 2020, Arm Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
@@ -11,7 +11,7 @@
 /**
   The maximum number of ACPI table parsers.
 */
-#define MAX_ACPI_TABLE_PARSERS          16
+#define MAX_ACPI_TABLE_PARSERS          32
 
 /** An invalid/NULL signature value.
 */
