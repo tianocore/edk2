@@ -286,6 +286,7 @@ EvaluateDependency (
       Iterator += AsciiStrnLenS ((CHAR8 *) Iterator, DependenciesSize - (Iterator - Dependencies->Dependencies));
       if (Iterator == (UINT8 *) Dependencies->Dependencies + DependenciesSize) {
         DEBUG ((DEBUG_ERROR, "EvaluateDependency: STRING extends beyond end of dependency expression!\n"));
+        goto Error;
       }
       break;
     case EFI_FMP_DEP_AND:
