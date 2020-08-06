@@ -3,7 +3,7 @@
   image stored in a firmware device with platform and firmware device specific
   information provided through PCDs and libraries.
 
-  Copyright (c) 2016, Microsoft Corporation. All rights reserved.<BR>
+  Copyright (c) Microsoft Corporation.<BR>
   Copyright (c) 2018 - 2020, Intel Corporation. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -179,7 +179,7 @@ GetImageTypeIdGuid (
     if (ImageTypeIdGuidSize == sizeof (EFI_GUID)) {
       FmpDeviceLibGuid = (EFI_GUID *)PcdGetPtr (PcdFmpDeviceImageTypeIdGuid);
     } else {
-      DEBUG ((DEBUG_INFO, "FmpDxe(%s): Fall back to ImageTypeIdGuid of gEfiCallerIdGuid\n", mImageIdName));
+      DEBUG ((DEBUG_WARN, "FmpDxe(%s): Fall back to ImageTypeIdGuid of gEfiCallerIdGuid\n", mImageIdName));
       FmpDeviceLibGuid = &gEfiCallerIdGuid;
     }
   }
