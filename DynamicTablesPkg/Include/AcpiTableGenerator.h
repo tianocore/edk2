@@ -59,6 +59,10 @@ The Dynamic Tables Framework implements the following ACPI table generators:
             The SSDT Serial generator collates the Serial port information
             from the Configuration Manager and patches the SSDT Serial Port
             template to build the SSDT Serial port table.
+  - SSDT CMN-600:
+            The SSDT CMN-600 generator collates the CMN-600 information
+            from the Configuration Manager and patches the SSDT CMN-600
+            template to build the SSDT CMN-600 table.
 */
 
 /** The ACPI_TABLE_GENERATOR_ID type describes ACPI table generator ID.
@@ -83,6 +87,7 @@ typedef enum StdAcpiTableId {
   EStdAcpiTableIdPptt,                          ///< PPTT Generator
   EStdAcpiTableIdSrat,                          ///< SRAT Generator
   EStdAcpiTableIdSsdtSerialPort,                ///< SSDT Serial-Port Generator
+  EStdAcpiTableIdSsdtCmn600,                    ///< SSDT Cmn-600 Generator
   EStdAcpiTableIdMax
 } ESTD_ACPI_TABLE_ID;
 
