@@ -1,7 +1,7 @@
 ## @file
 #  SPCR Table Generator
 #
-#  Copyright (c) 2017 - 2018, ARM Limited. All rights reserved.
+#  Copyright (c) 2017 - 2020, Arm Limited. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
@@ -27,6 +27,7 @@
 
 [LibraryClasses]
   BaseLib
+  SsdtSerialPortFixupLib
 
 [Pcd]
 
