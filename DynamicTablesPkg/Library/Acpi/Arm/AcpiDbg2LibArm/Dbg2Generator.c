@@ -1,7 +1,8 @@
 /** @file
   DBG2 Table Generator
 
-  Copyright (c) 2017 - 2020, ARM Limited. All rights reserved.
+  Copyright (c) 2017 - 2020, Arm Limited. All rights reserved.<BR>
+
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -12,6 +13,7 @@
 #include <IndustryStandard/DebugPort2Table.h>
 #include <Library/AcpiLib.h>
 #include <Library/DebugLib.h>
+#include <Library/MemoryAllocationLib.h>
 #include <Library/PL011UartLib.h>
 #include <Protocol/AcpiTable.h>
 #include <Protocol/SerialIo.h>
@@ -20,6 +22,7 @@
 #include <AcpiTableGenerator.h>
 #include <ConfigurationManagerObject.h>
 #include <ConfigurationManagerHelper.h>
+#include <Library/SsdtSerialPortFixupLib.h>
 #include <Library/TableHelperLib.h>
 #include <Protocol/ConfigurationManagerProtocol.h>
 
@@ -44,17 +47,21 @@ Requirements:
 */
 #define DBG2_NUMBER_OF_GENERIC_ADDRESS_REGISTERS   1
 
-/** The index for the debug port 1 in the Debug port information list.
+/** The index for the debug port 0 in the Debug port information list.
 */
-#define DBG_PORT_INDEX_PORT1                       0
+#define INDEX_DBG_PORT0                            0
 
-/** A string representing the name of the debug port 1.
+/** A string representing the name of the debug port 0.
 */
-#define NAME_STR_PORT1                            "COM1"
+#define NAME_STR_DBG_PORT0                         "COM0"
+
+/** An UID representing the debug port 0.
+*/
+#define UID_DBG_PORT0                              0
 
 /** The length of the namespace string.
 */
-#define DBG2_NAMESPACESTRING_FIELD_SIZE            sizeof (NAME_STR_PORT1)
+#define DBG2_NAMESPACESTRING_FIELD_SIZE            sizeof (NAME_STR_DBG_PORT0)
 
 /** The PL011 UART address range length.
 */
@@ -159,7 +166,7 @@ DBG2_TABLE AcpiDbg2 = {
       0,                    // {Template}: Serial Port Subtype
       0,                    // {Template}: Serial Port Base Address
       PL011_UART_LENGTH,
-      NAME_STR_PORT1
+      NAME_STR_DBG_PORT0
       )
   }
 };
@@ -217,58 +224,115 @@ SetupDebugUart (
              &StopBits
              );
 
-  DEBUG ((DEBUG_INFO, "Debug UART Configuration:\n"));
-  DEBUG ((DEBUG_INFO, "UART Base  = 0x%lx\n", SerialPortInfo->BaseAddress));
-  DEBUG ((DEBUG_INFO, "Clock      = %d\n", SerialPortInfo->Clock));
-  DEBUG ((DEBUG_INFO, "Baudrate   = %ld\n", BaudRate));
-  DEBUG ((DEBUG_INFO, "Configuring Debug UART. Status = %r\n", Status));
-
   ASSERT_EFI_ERROR (Status);
   return Status;
 }
 
-/** Construct the DBG2 ACPI table
+/** Free any resources allocated for constructing the tables.
 
-    The BuildDbg2Table function is called by the Dynamic Table Manager
-    to construct the DBG2 ACPI table.
+  @param [in]      This           Pointer to the ACPI table generator.
+  @param [in]      AcpiTableInfo  Pointer to the ACPI Table Info.
+  @param [in]      CfgMgrProtocol Pointer to the Configuration Manager
+                                  Protocol Interface.
+  @param [in, out] Table          Pointer to an array of pointers
+                                  to ACPI Table(s).
+  @param [in]      TableCount     Number of ACPI table(s).
+
+  @retval EFI_SUCCESS           The resources were freed successfully.
+  @retval EFI_INVALID_PARAMETER The table pointer is NULL or invalid.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+FreeDbg2TableEx (
+  IN      CONST ACPI_TABLE_GENERATOR                   * CONST This,
+  IN      CONST CM_STD_OBJ_ACPI_TABLE_INFO             * CONST AcpiTableInfo,
+  IN      CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL   * CONST CfgMgrProtocol,
+  IN OUT        EFI_ACPI_DESCRIPTION_HEADER          *** CONST Table,
+  IN      CONST UINTN                                          TableCount
+  )
+{
+  EFI_STATUS                        Status;
+  EFI_ACPI_DESCRIPTION_HEADER    ** TableList;
+
+  ASSERT (This != NULL);
+  ASSERT (AcpiTableInfo != NULL);
+  ASSERT (CfgMgrProtocol != NULL);
+  ASSERT (AcpiTableInfo->TableGeneratorId == This->GeneratorID);
+  ASSERT (AcpiTableInfo->AcpiTableSignature == This->AcpiTableSignature);
+
+  if ((Table == NULL)   ||
+      (*Table == NULL)  ||
+      (TableCount != 2)) {
+    DEBUG ((DEBUG_ERROR, "ERROR: DBG2: Invalid Table Pointer\n"));
+    return EFI_INVALID_PARAMETER;
+  }
+
+  TableList = *Table;
+
+  if ((TableList[1] == NULL) ||
+      (TableList[1]->Signature !=
+       EFI_ACPI_6_3_SECONDARY_SYSTEM_DESCRIPTION_TABLE_SIGNATURE)) {
+    DEBUG ((DEBUG_ERROR, "ERROR: DBG2: Invalid SSDT table pointer.\n"));
+    return EFI_INVALID_PARAMETER;
+  }
+
+  // Only need to free the SSDT table at index 1. The DBG2 table is static.
+  Status = FreeSsdtSerialPortTable (TableList[1]);
+  ASSERT_EFI_ERROR (Status);
+
+  // Free the table list.
+  FreePool (*Table);
+
+  return Status;
+}
+
+/** Construct the DBG2 ACPI table and its associated SSDT table.
 
   This function invokes the Configuration Manager protocol interface
   to get the required hardware information for generating the ACPI
   table.
 
   If this function allocates any resources then they must be freed
-  in the FreeXXXXTableResources function.
+  in the FreeXXXXTableResourcesEx function.
 
-  @param [in]  This           Pointer to the table generator.
-  @param [in]  AcpiTableInfo  Pointer to the ACPI Table Info.
-  @param [in]  CfgMgrProtocol Pointer to the Configuration Manager
-                              Protocol Interface.
-  @param [out] Table          Pointer to the constructed ACPI Table.
+  @param [in]  This            Pointer to the ACPI table generator.
+  @param [in]  AcpiTableInfo   Pointer to the ACPI table information.
+  @param [in]  CfgMgrProtocol  Pointer to the Configuration Manager
+                               Protocol interface.
+  @param [out] Table           Pointer to a list of generated ACPI table(s).
+  @param [out] TableCount      Number of generated ACPI table(s).
 
-  @retval EFI_SUCCESS           Table generated successfully.
-  @retval EFI_INVALID_PARAMETER A parameter is invalid.
-  @retval EFI_NOT_FOUND         The required object was not found.
-  @retval EFI_BAD_BUFFER_SIZE   The size returned by the Configuration
-                                Manager is less than the Object size for the
-                                requested object.
+  @retval EFI_SUCCESS            Table generated successfully.
+  @retval EFI_BAD_BUFFER_SIZE    The size returned by the Configuration
+                                 Manager is less than the Object size for
+                                 the requested object.
+  @retval EFI_INVALID_PARAMETER  A parameter is invalid.
+  @retval EFI_NOT_FOUND          Could not find information.
+  @retval EFI_OUT_OF_RESOURCES   Could not allocate memory.
+  @retval EFI_UNSUPPORTED        Unsupported configuration.
 **/
 STATIC
 EFI_STATUS
 EFIAPI
-BuildDbg2Table (
-  IN  CONST ACPI_TABLE_GENERATOR                  * CONST This,
-  IN  CONST CM_STD_OBJ_ACPI_TABLE_INFO            * CONST AcpiTableInfo,
-  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  * CONST CfgMgrProtocol,
-  OUT       EFI_ACPI_DESCRIPTION_HEADER          ** CONST Table
+BuildDbg2TableEx (
+  IN  CONST ACPI_TABLE_GENERATOR                   *       This,
+  IN  CONST CM_STD_OBJ_ACPI_TABLE_INFO             * CONST AcpiTableInfo,
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL   * CONST CfgMgrProtocol,
+  OUT       EFI_ACPI_DESCRIPTION_HEADER          ***       Table,
+  OUT       UINTN                                  * CONST TableCount
   )
 {
-  EFI_STATUS                 Status;
-  CM_ARM_SERIAL_PORT_INFO  * SerialPortInfo;
+  EFI_STATUS                      Status;
+  CM_ARM_SERIAL_PORT_INFO       * SerialPortInfo;
+  UINT32                          SerialPortCount;
+  EFI_ACPI_DESCRIPTION_HEADER  ** TableList;
 
   ASSERT (This != NULL);
   ASSERT (AcpiTableInfo != NULL);
   ASSERT (CfgMgrProtocol != NULL);
   ASSERT (Table != NULL);
+  ASSERT (TableCount != NULL);
   ASSERT (AcpiTableInfo->TableGeneratorId == This->GeneratorID);
   ASSERT (AcpiTableInfo->AcpiTableSignature == This->AcpiTableSignature);
 
@@ -291,7 +355,7 @@ BuildDbg2Table (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
              &SerialPortInfo,
-             NULL
+             &SerialPortCount
              );
   if (EFI_ERROR (Status)) {
     DEBUG ((
@@ -299,34 +363,41 @@ BuildDbg2Table (
       "ERROR: DBG2: Failed to get serial port information. Status = %r\n",
       Status
       ));
-    goto error_handler;
+    return Status;
   }
 
-  if (SerialPortInfo->BaseAddress == 0) {
-    Status = EFI_INVALID_PARAMETER;
+  if (SerialPortCount == 0) {
     DEBUG ((
       DEBUG_ERROR,
-      "ERROR: DBG2: Uart port base address is invalid. BaseAddress = 0x%lx\n",
-      SerialPortInfo->BaseAddress
+      "ERROR: DBG2: Serial port information not found. Status = %r\n",
+      EFI_NOT_FOUND
       ));
-    goto error_handler;
+    return EFI_NOT_FOUND;
   }
 
-  if ((SerialPortInfo->PortSubtype !=
-      EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_ARM_PL011_UART) &&
-      (SerialPortInfo->PortSubtype !=
-      EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_ARM_SBSA_GENERIC_UART_2X) &&
-      (SerialPortInfo->PortSubtype !=
-      EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_ARM_SBSA_GENERIC_UART) &&
-      (SerialPortInfo->PortSubtype !=
-      EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_DCC)) {
-    Status = EFI_INVALID_PARAMETER;
+  // Only use the first DBG2 port information.
+  Status = ValidateSerialPortInfo (SerialPortInfo, 1);
+  if (EFI_ERROR (Status)) {
     DEBUG ((
       DEBUG_ERROR,
-      "ERROR: DBG2: Uart port subtype is invalid. PortSubtype = 0x%x\n",
-      SerialPortInfo->PortSubtype
+      "ERROR: DBG2: Invalid serial port information. Status = %r\n",
+      Status
       ));
-    goto error_handler;
+    return Status;
+  }
+
+  // Allocate a table to store pointers to the DBG2 and SSDT tables.
+  TableList = (EFI_ACPI_DESCRIPTION_HEADER**)
+              AllocateZeroPool (sizeof (EFI_ACPI_DESCRIPTION_HEADER*) * 2);
+  if (TableList == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    DEBUG ((
+      DEBUG_ERROR,
+      "ERROR: DBG2: Failed to allocate memory for Table List," \
+      " Status = %r\n",
+      Status
+      ));
+    return Status;
   }
 
   Status = AddAcpiHeader (
@@ -346,11 +417,11 @@ BuildDbg2Table (
   }
 
   // Update the base address
-  AcpiDbg2.Dbg2DeviceInfo[DBG_PORT_INDEX_PORT1].BaseAddressRegister.Address =
+  AcpiDbg2.Dbg2DeviceInfo[INDEX_DBG_PORT0].BaseAddressRegister.Address =
     SerialPortInfo->BaseAddress;
 
   // Update the serial port subtype
-  AcpiDbg2.Dbg2DeviceInfo[DBG_PORT_INDEX_PORT1].Dbg2Device.PortSubtype =
+  AcpiDbg2.Dbg2DeviceInfo[INDEX_DBG_PORT0].Dbg2Device.PortSubtype =
     SerialPortInfo->PortSubtype;
 
   if ((SerialPortInfo->PortSubtype ==
@@ -371,9 +442,35 @@ BuildDbg2Table (
     }
   }
 
-  *Table = (EFI_ACPI_DESCRIPTION_HEADER*)&AcpiDbg2;
+  TableList[0] = (EFI_ACPI_DESCRIPTION_HEADER*)&AcpiDbg2;
+
+  // Build a SSDT table describing the serial port.
+  Status = BuildSsdtSerialPortTable (
+             AcpiTableInfo,
+             SerialPortInfo,
+             NAME_STR_DBG_PORT0,
+             UID_DBG_PORT0,
+             &TableList[1]
+             );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "ERROR: DBG2: Failed to build associated SSDT table. Status = %r\n",
+      Status
+      ));
+    goto error_handler;
+  }
+
+  *TableCount = 2;
+  *Table = TableList;
+
+  return Status;
 
 error_handler:
+  if (TableList != NULL) {
+    FreePool (TableList);
+  }
+
   return Status;
 }
 
@@ -391,7 +488,7 @@ ACPI_TABLE_GENERATOR Dbg2Generator = {
   // Generator Description
   L"ACPI.STD.DBG2.GENERATOR",
   // ACPI Table Signature
-  EFI_ACPI_6_2_DEBUG_PORT_2_TABLE_SIGNATURE,
+  EFI_ACPI_6_3_DEBUG_PORT_2_TABLE_SIGNATURE,
   // ACPI Table Revision supported by this Generator
   EFI_ACPI_DBG2_DEBUG_DEVICE_INFORMATION_STRUCT_REVISION,
   // Minimum supported ACPI Table Revision
@@ -400,16 +497,14 @@ ACPI_TABLE_GENERATOR Dbg2Generator = {
   TABLE_GENERATOR_CREATOR_ID_ARM,
   // Creator Revision
   DBG2_GENERATOR_REVISION,
-  // Build Table function
-  BuildDbg2Table,
-  // No additional resources are allocated by the generator.
-  // Hence the Free Resource function is not required.
+  // Build table function. Use the extended version instead.
   NULL,
-  // Extended build function not needed
+  // Free table function. Use the extended version instead.
   NULL,
-  // Extended build function not implemented by the generator.
-  // Hence extended free resource function is not required.
-  NULL
+  // Extended Build table function.
+  BuildDbg2TableEx,
+  // Extended free function.
+  FreeDbg2TableEx
 };
 
 /** Register the Generator with the ACPI Table Factory.
@@ -433,7 +528,6 @@ AcpiDbg2LibConstructor (
   Status = RegisterAcpiTableGenerator (&Dbg2Generator);
   DEBUG ((DEBUG_INFO, "DBG2: Register Generator. Status = %r\n", Status));
   ASSERT_EFI_ERROR (Status);
-
   return Status;
 }
 
