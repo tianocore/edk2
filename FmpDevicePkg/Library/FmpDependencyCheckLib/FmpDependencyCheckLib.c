@@ -2,6 +2,7 @@
   Provides FMP capsule dependency check services when updating the firmware
   image of a FMP device.
 
+  Copyright (c) Microsoft Corporation.<BR>
   Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -75,6 +76,7 @@ CheckFmpDependency (
                 );
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "CheckFmpDependency: Get Firmware Management Protocol failed. (%r)", Status));
+    IsSatisfied = FALSE;
     goto cleanup;
   }
 
