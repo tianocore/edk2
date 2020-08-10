@@ -35,11 +35,19 @@ EFI_DRIVER_BINDING_PROTOCOL gPartitionDriverBinding = {
 
 //
 // Prioritized function list to detect partition table.
+// Refer to UEFI Spec 13.3.2 Partition Discovery, the block device
+// should be scanned in below order:
+// 1. GPT
+// 2. ISO 9660 (El Torito) (or UDF)
+// 3. MBR
+// 4. no partiton found
+// Note: UDF is using a same method as booting from CD-ROM, so put it along
+//        with CD-ROM check.
 //
 PARTITION_DETECT_ROUTINE mPartitionDetectRoutineTable[] = {
   PartitionInstallGptChildHandles,
-  PartitionInstallMbrChildHandles,
   PartitionInstallUdfChildHandles,
+  PartitionInstallMbrChildHandles,
   NULL
 };
 
