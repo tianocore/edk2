@@ -35,16 +35,53 @@ STATIC UINTN mTimerFrequencyHz = 0;
    It is therefore stored here. 0 means the timer is not running. */
 STATIC UINT64 mNumTimerTicks = 0;
 
+STATIC UINT32 mWatchDogRev = 0;
+
+STATIC UINT64 mWatchdogMaxOffsetVal = MAX_UINT32;
+
 STATIC EFI_HARDWARE_INTERRUPT2_PROTOCOL *mInterruptProtocol;
 STATIC EFI_WATCHDOG_TIMER_NOTIFY        mWatchdogNotify;
 
 STATIC
-VOID
-WatchdogWriteOffsetRegister (
-  UINT32  Value
+inline
+UINT32
+WatchdogReadRevisionRegister (
+  VOID
   )
 {
-  MmioWrite32 (GENERIC_WDOG_OFFSET_REG, Value);
+  return MmioRead32 (GENERIC_WDOG_IIDR_REG);
+}
+
+STATIC
+inline
+UINT32
+WatchdogGetRevision (
+  VOID
+  )
+{
+  UINT32 IidrRegVal;
+
+  IidrRegVal = WatchdogReadRevisionRegister();
+
+  return ((IidrRegVal >> GENERIC_WDOG_ARCH_REV_OFFSET) & GENERIC_WDOG_ARCH_REV_MASK);
+}
+
+STATIC
+VOID
+WatchdogWriteOffsetRegister (
+  UINT64  Value
+  )
+{
+  if(Value >> SBSA_WDOG_WOR_WIDTH) {
+    return;
+  }
+
+  MmioWrite32 (GENERIC_WDOG_OFFSET_REG_LOW, ((UINT32)Value & MAX_UINT32));
+  if (mWatchDogRev) {
+    MmioWrite32 (GENERIC_WDOG_OFFSET_REG_HIGH, (Value >> 32) & MAX_UINT32);
+  } else {
+    MmioWrite32 (GENERIC_WDOG_OFFSET_REG_HIGH, 0);
+  }
 }
 
 STATIC
@@ -207,12 +244,12 @@ WatchdogSetTimerPeriod (
   /* If the number of required ticks is greater than the max the watchdog's
      offset register (WOR) can hold, we need to manually compute and set
      the compare register (WCV) */
-  if (mNumTimerTicks > MAX_UINT32) {
+  if (mNumTimerTicks > mWatchdogMaxOffsetVal) {
     /* We need to enable the watchdog *before* writing to the compare register,
        because enabling the watchdog causes an "explicit refresh", which
        clobbers the compare register (WCV). In order to make sure this doesn't
        trigger an interrupt, set the offset to max. */
-    WatchdogWriteOffsetRegister (MAX_UINT32);
+    WatchdogWriteOffsetRegister (MAX_OFFSET_REG_VAL);
     WatchdogEnable ();
     SystemCount = ArmGenericTimerGetSystemCount ();
     WatchdogWriteCompareRegister (SystemCount + mNumTimerTicks);
@@ -318,6 +355,14 @@ GenericWatchdogEntry (
 
   mTimerFrequencyHz = ArmGenericTimerGetTimerFreq ();
   ASSERT (mTimerFrequencyHz != 0);
+
+  mWatchDogRev = WatchdogGetRevision();
+
+  if (mWatchDogRev) {
+    mWatchdogMaxOffsetVal = MAX_OFFSET_REG_VAL;
+  } else {
+    mWatchdogMaxOffsetVal = MAX_UINT32;
+  }
 
   // Install interrupt handler
   Status = mInterruptProtocol->RegisterInterruptSource (mInterruptProtocol,
