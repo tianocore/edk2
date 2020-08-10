@@ -7,6 +7,10 @@
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
+#  @par Reference(s):
+#    - ARM Architecture Reference Manual Supplement Morello for A-profile Architecture
+#      [https://developer.arm.com/documentation/ddi0606/latest]
+#
 #------------------------------------------------------------------------------
 
 #include <AArch64/AArch64.h>
@@ -258,9 +262,22 @@ ASM_FUNC(ArmInstructionSynchronizationBarrier)
 
 ASM_FUNC(ArmWriteVBar)
    EL1_OR_EL2(x1)
-1: msr   vbar_el1, x0            // Set the Address of the EL1 Vector Table in the VBAR register
+1:
+#if !defined(ENABLE_MORELLO_CAP)
+   msr   vbar_el1, x0            // Set the Address of the EL1 Vector Table in the VBAR register
+#else
+   cvtp  c0, x0
+   msr   cvbar_el1, c0
+#endif
    b     4f
-2: msr   vbar_el2, x0            // Set the Address of the EL2 Vector Table in the VBAR register
+2:
+#if !defined(ENABLE_MORELLO_CAP)
+   msr   vbar_el2, x0            // Set the Address of the EL2 Vector Table in the VBAR register
+#else
+   cvtp  c0, x0
+   msr   cvbar_el2, c0
+#endif
+   b     4f
 4: isb
    ret
 
