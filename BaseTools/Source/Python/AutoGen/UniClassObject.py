@@ -152,7 +152,7 @@ class Ucs2Codec(codecs.Codec):
 
 TheUcs2Codec = Ucs2Codec()
 def Ucs2Search(name):
-    if name == 'ucs-2':
+    if name in ['ucs-2', 'ucs_2']:
         return codecs.CodecInfo(
             name=name,
             encode=TheUcs2Codec.encode,
