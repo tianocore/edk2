@@ -226,7 +226,10 @@ SwitchToRealProcStart:
 SwitchToRealProcEnd:
 
 ;-------------------------------------------------------------------------------------
-;  AsmRelocateApLoop (MwaitSupport, ApTargetCState, PmCodeSegment, TopOfApStack, CountTofinish);
+;  AsmRelocateApLoop (MwaitSupport, ApTargetCState, PmCodeSegment, TopOfApStack, CountTofinish, Pm16CodeSegment, SevEsAPJumpTable, WakeupBuffer);
+;
+;  The last three parameters (Pm16CodeSegment, SevEsAPJumpTable and WakeupBuffer) are
+;  specific to SEV-ES support and are not applicable on IA32.
 ;-------------------------------------------------------------------------------------
 global ASM_PFX(AsmRelocateApLoop)
 ASM_PFX(AsmRelocateApLoop):
