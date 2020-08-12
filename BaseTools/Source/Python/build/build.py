@@ -873,7 +873,7 @@ class Build():
 
                     PcdMa.CreateCodeFile(False)
                     PcdMa.CreateMakeFile(False,GenFfsList = DataPipe.Get("FfsCommand").get((PcdMa.MetaFile.Path, PcdMa.Arch),[]))
-
+                    PcdMa.CreateAsBuiltInf()
                     # Force cache miss for PCD driver
                     if GlobalData.gBinCacheSource and self.Target in [None, "", "all"]:
                         cqueue.put((PcdMa.MetaFile.Path, PcdMa.Arch, "MakeCache", False))
@@ -1265,7 +1265,6 @@ class Build():
         if BuildModule:
             BuildCommand = BuildCommand + [Target]
             LaunchCommand(BuildCommand, AutoGenObject.MakeFileDir)
-            self.CreateAsBuiltInf()
             if GlobalData.gBinCacheDest:
                 self.GenDestCache()
             elif GlobalData.gUseHashCache and not GlobalData.gBinCacheSource:
@@ -2276,7 +2275,6 @@ class Build():
                 #
                 ExitFlag.set()
                 BuildTask.WaitForComplete()
-                self.CreateAsBuiltInf()
                 if GlobalData.gBinCacheDest:
                     self.GenDestCache()
                 elif GlobalData.gUseHashCache and not GlobalData.gBinCacheSource:

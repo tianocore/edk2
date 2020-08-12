@@ -280,7 +280,7 @@ class AutoGenWorkerInProcess(mp.Process):
 
                 Ma.CreateCodeFile(False)
                 Ma.CreateMakeFile(False,GenFfsList=FfsCmd.get((Ma.MetaFile.Path, Ma.Arch),[]))
-
+                Ma.CreateAsBuiltInf()
                 if GlobalData.gBinCacheSource and CommandTarget in [None, "", "all"]:
                     try:
                         CacheResult = Ma.CanSkipbyMakeCache()
