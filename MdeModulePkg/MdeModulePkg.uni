@@ -1303,3 +1303,11 @@
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdTcgPfpMeasurementRevision_PROMPT #language en-US "TCG Platform Firmware Profile revision"
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdTcgPfpMeasurementRevision_HELP #language en-US "Indicates which TCG Platform Firmware Profile revision the EDKII firmware follows."
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdGhcbBase_PROMPT #language en-US "Guest-Hypervisor Communication Block (GHCB) Pool Base Address"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdGhcbBase_HELP #language en-US "Used with SEV-ES support to identify an address range that is not to be encrypted."
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdGhcbSize_PROMPT #language en-US "Guest-Hypervisor Communication Block (GHCB) Pool Base Size"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdGhcbSize_HELP #language en-US "Used with SEV-ES support to identify the size of the address range that is not to be encrypted."
