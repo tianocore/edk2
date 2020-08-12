@@ -22,6 +22,7 @@
   MtrrLibUnitTest.c
   MtrrLibUnitTest.h
   Support.c
+  RandomNumber.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -37,3 +38,6 @@
 
 [Pcd]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuNumberOfReservedVariableMtrrs   ## SOMETIMES_CONSUMES
+
+[BuildOptions]
+  MSFT:*_*_*_CC_FLAGS = -D _CRT_SECURE_NO_WARNINGS
