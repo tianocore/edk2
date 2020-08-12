@@ -164,6 +164,14 @@
   # @Prompt Specify the count of pre allocated SMM MP tokens per chunk.
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmMpTokenCountPerChunk|64|UINT32|0x30002002
 
+  ## Area of memory where the SEV-ES work area block lives.
+  # @Prompt Configure the SEV-ES work area base
+  gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaBase|0x0|UINT32|0x30002005
+
+  ## Size of teh area of memory where the SEV-ES work area block lives.
+  # @Prompt Configure the SEV-ES work area base
+  gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaSize|0x0|UINT32|0x30002006
+
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   ## This value is the CPU Local APIC base address, which aligns the address on a 4-KByte boundary.
   # @Prompt Configure base address of CPU Local APIC
