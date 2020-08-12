@@ -21,6 +21,11 @@ BITS    32
 %define PAGE_2M_MBO            0x080
 %define PAGE_2M_PAT          0x01000
 
+%define PAGE_4K_PDE_ATTR (PAGE_ACCESSED + \
+                          PAGE_DIRTY + \
+                          PAGE_READ_WRITE + \
+                          PAGE_PRESENT)
+
 %define PAGE_2M_PDE_ATTR (PAGE_2M_MBO + \
                           PAGE_ACCESSED + \
                           PAGE_DIRTY + \
@@ -74,6 +79,37 @@ NoSev:
 
 SevExit:
     OneTimeCallRet CheckSevFeature
+
+; Check if Secure Encrypted Virtualization - Encrypted State (SEV-ES) feature
+; is enabled.
+;
+; Modified:  EAX, EBX, ECX
+;
+; If SEV-ES is enabled then EAX will be non-zero.
+; If SEV-ES is disabled then EAX will be zero.
+;
+CheckSevEsFeature:
+    xor       eax, eax
+
+    ; SEV-ES can't be enabled if SEV isn't, so first check the encryption
+    ; mask.
+    test      edx, edx
+    jz        NoSevEs
+
+    ; Save current value of encryption mask
+    mov       ebx, edx
+
+    ; Check if SEV-ES is enabled
+    ;  MSR_0xC0010131 - Bit 1 (SEV-ES enabled)
+    mov       ecx, 0xc0010131
+    rdmsr
+    and       eax, 2
+
+    ; Restore encryption mask
+    mov       edx, ebx
+
+NoSevEs:
+    OneTimeCallRet CheckSevEsFeature
 
 ;
 ; Modified:  EAX, EBX, ECX, EDX
@@ -139,6 +175,46 @@ pageTableEntriesLoop:
     mov     [(ecx * 8 + PT_ADDR (0x2000 - 8)) + 4], edx
     loop    pageTableEntriesLoop
 
+    OneTimeCall   CheckSevEsFeature
+    test    eax, eax
+    jz      SetCr3
+
+    ;
+    ; The initial GHCB will live at GHCB_BASE and needs to be un-encrypted.
+    ; This requires the 2MB page for this range be broken down into 512 4KB
+    ; pages.  All will be marked encrypted, except for the GHCB.
+    ;
+    mov     ecx, (GHCB_BASE >> 21)
+    mov     eax, GHCB_PT_ADDR + PAGE_PDP_ATTR
+    mov     [ecx * 8 + PT_ADDR (0x2000)], eax
+
+    ;
+    ; Page Table Entries (512 * 4KB entries => 2MB)
+    ;
+    mov     ecx, 512
+pageTableEntries4kLoop:
+    mov     eax, ecx
+    dec     eax
+    shl     eax, 12
+    add     eax, GHCB_BASE & 0xFFE0_0000
+    add     eax, PAGE_4K_PDE_ATTR
+    mov     [ecx * 8 + GHCB_PT_ADDR - 8], eax
+    mov     [(ecx * 8 + GHCB_PT_ADDR - 8) + 4], edx
+    loop    pageTableEntries4kLoop
+
+    ;
+    ; Clear the encryption bit from the GHCB entry
+    ;
+    mov     ecx, (GHCB_BASE & 0x1F_FFFF) >> 12
+    mov     [ecx * 8 + GHCB_PT_ADDR + 4], strict dword 0
+
+    mov     ecx, GHCB_SIZE / 4
+    xor     eax, eax
+clearGhcbMemoryLoop:
+    mov     dword[ecx * 4 + GHCB_BASE - 4], eax
+    loop    clearGhcbMemoryLoop
+
+SetCr3:
     ;
     ; Set CR3 now that the paging structures are available
     ;
