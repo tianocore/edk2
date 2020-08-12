@@ -859,6 +859,40 @@ MmioExit (
 }
 
 /**
+  Handle a MONITOR event.
+
+  Use the VMGEXIT instruction to handle a MONITOR event.
+
+  @param[in, out] Ghcb             Pointer to the Guest-Hypervisor Communication
+                                   Block
+  @param[in, out] Regs             x64 processor context
+  @param[in]      InstructionData  Instruction parsing context
+
+  @retval 0                        Event handled successfully
+  @return                          New exception value to propagate
+
+**/
+STATIC
+UINT64
+MonitorExit (
+  IN OUT GHCB                     *Ghcb,
+  IN OUT EFI_SYSTEM_CONTEXT_X64   *Regs,
+  IN     SEV_ES_INSTRUCTION_DATA  *InstructionData
+  )
+{
+  DecodeModRm (Regs, InstructionData);
+
+  Ghcb->SaveArea.Rax = Regs->Rax;  // Identity mapped, so VA = PA
+  GhcbSetRegValid (Ghcb, GhcbRax);
+  Ghcb->SaveArea.Rcx = Regs->Rcx;
+  GhcbSetRegValid (Ghcb, GhcbRcx);
+  Ghcb->SaveArea.Rdx = Regs->Rdx;
+  GhcbSetRegValid (Ghcb, GhcbRdx);
+
+  return VmgExit (Ghcb, SVM_EXIT_MONITOR, 0, 0);
+}
+
+/**
   Handle a WBINVD event.
 
   Use the VMGEXIT instruction to handle a WBINVD event.
@@ -1494,6 +1528,10 @@ VmgExitHandleVc (
 
   case SVM_EXIT_WBINVD:
     NaeExit = WbinvdExit;
+    break;
+
+  case SVM_EXIT_MONITOR:
+    NaeExit = MonitorExit;
     break;
 
   case SVM_EXIT_NPF:
