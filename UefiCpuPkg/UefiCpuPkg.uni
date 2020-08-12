@@ -281,3 +281,11 @@
 
 #string STR_gUefiCpuPkgTokenSpaceGuid_PcdSevEsIsEnabled_PROMPT  #language en-US "Specifies whether SEV-ES is enabled"
 #string STR_gUefiCpuPkgTokenSpaceGuid_PcdSevEsIsEnabled_HELP    #language en-US "Set to TRUE when running as an SEV-ES guest, FALSE otherwise."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdSevEsWorkAreaBase_PROMPT  #language en-US "Specify the address of the SEV-ES work area"
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdSevEsWorkAreaBase_HELP    #language en-US "Specifies the address of the work area used by an SEV-ES guest."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdSevEsWorkAreaSize_PROMPT  #language en-US "Specify the size of the SEV-ES work area"
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdSevEsWorkAreaSize_HELP    #language en-US "Specifies the size of the work area used by an SEV-ES guest."
