@@ -281,6 +281,25 @@ GetModeTransitionBuffer (
 }
 
 /**
+  Return the address of the SEV-ES AP jump table.
+
+  This buffer is required in order for an SEV-ES guest to transition from
+  UEFI into an OS.
+
+  @return         Return SEV-ES AP jump table buffer
+**/
+UINTN
+GetSevEsAPMemory (
+  VOID
+  )
+{
+  //
+  // PEI phase doesn't need to do such transition. So simply return 0.
+  //
+  return 0;
+}
+
+/**
   Checks APs status and updates APs status if needed.
 
 **/
