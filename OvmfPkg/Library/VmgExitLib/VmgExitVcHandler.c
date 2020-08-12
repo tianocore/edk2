@@ -375,6 +375,67 @@ UnsupportedExit (
 }
 
 /**
+  Handle an MSR event.
+
+  Use the VMGEXIT instruction to handle either a RDMSR or WRMSR event.
+
+  @param[in, out] Ghcb             Pointer to the Guest-Hypervisor Communication
+                                   Block
+  @param[in, out] Regs             x64 processor context
+  @param[in]      InstructionData  Instruction parsing context
+
+  @retval 0                        Event handled successfully
+  @return                          New exception value to propagate
+
+**/
+STATIC
+UINT64
+MsrExit (
+  IN OUT GHCB                     *Ghcb,
+  IN OUT EFI_SYSTEM_CONTEXT_X64   *Regs,
+  IN     SEV_ES_INSTRUCTION_DATA  *InstructionData
+  )
+{
+  UINT64  ExitInfo1, Status;
+
+  ExitInfo1 = 0;
+
+  switch (*(InstructionData->OpCodes + 1)) {
+  case 0x30: // WRMSR
+    ExitInfo1 = 1;
+    Ghcb->SaveArea.Rax = Regs->Rax;
+    GhcbSetRegValid (Ghcb, GhcbRax);
+    Ghcb->SaveArea.Rdx = Regs->Rdx;
+    GhcbSetRegValid (Ghcb, GhcbRdx);
+    //
+    // fall through
+    //
+  case 0x32: // RDMSR
+    Ghcb->SaveArea.Rcx = Regs->Rcx;
+    GhcbSetRegValid (Ghcb, GhcbRcx);
+    break;
+  default:
+    return UnsupportedExit (Ghcb, Regs, InstructionData);
+  }
+
+  Status = VmgExit (Ghcb, SVM_EXIT_MSR, ExitInfo1, 0);
+  if (Status != 0) {
+    return Status;
+  }
+
+  if (ExitInfo1 == 0) {
+    if (!GhcbIsRegValid (Ghcb, GhcbRax) ||
+        !GhcbIsRegValid (Ghcb, GhcbRdx)) {
+      return UnsupportedExit (Ghcb, Regs, InstructionData);
+    }
+    Regs->Rax = Ghcb->SaveArea.Rax;
+    Regs->Rdx = Ghcb->SaveArea.Rdx;
+  }
+
+  return 0;
+}
+
+/**
   Build the IOIO event information.
 
   The IOIO event information identifies the type of IO operation to be performed
@@ -703,6 +764,10 @@ VmgExitHandleVc (
 
   case SVM_EXIT_IOIO_PROT:
     NaeExit = IoioExit;
+    break;
+
+  case SVM_EXIT_MSR:
+    NaeExit = MsrExit;
     break;
 
   default:
