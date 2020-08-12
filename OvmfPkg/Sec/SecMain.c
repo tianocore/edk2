@@ -906,6 +906,13 @@ SecCoreStartupWithStack (
     // For non SEV-ES guests, just load the IDTR.
     //
     AsmWriteIdtr (&IdtDescriptor);
+  } else {
+    //
+    // Under SEV-ES, the hypervisor can't modify CR0 and so can't enable
+    // caching in order to speed up the boot. Enable caching early for
+    // an SEV-ES guest.
+    //
+    AsmEnableCache ();
   }
 
   DEBUG ((DEBUG_INFO,
