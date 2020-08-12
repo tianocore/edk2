@@ -1055,8 +1055,6 @@ UnitTestingEntry (
   GetFirmwareVariableMtrrCountContext.SystemParameter = &mDefaultSystemParameter;
   Framework = NULL;
 
-  DEBUG ((DEBUG_INFO, "%a v%a\n", UNIT_TEST_APP_NAME, UNIT_TEST_APP_VERSION));
-
   //
   // Setup the test framework for running the tests.
   //
@@ -1100,7 +1098,6 @@ UnitTestingEntry (
   //
   // Execute the tests.
   //
-  srand ((unsigned int) time (NULL));
   Status = RunAllTestSuites (Framework);
 
 EXIT:
@@ -1125,15 +1122,42 @@ main (
   CHAR8 *Argv[]
   )
 {
-  UINTN    Iteration;
+  UINTN    Count;
+
+  DEBUG ((DEBUG_INFO, "%a v%a\n", UNIT_TEST_APP_NAME, UNIT_TEST_APP_VERSION));
+  srand ((unsigned int) time (NULL));
 
   //
-  // First parameter specifies the test iterations.
-  // Default is 10.
+  // MtrrLibUnitTest generate-random-numbers <path to MtrrLib/UnitTest/RandomNumber.c> <random-number count>
   //
-  Iteration = 10;
-  if (Argc == 2) {
-    Iteration = atoi (Argv[1]);
+  if ((Argc == 4) && (AsciiStriCmp ("generate-random-numbers", Argv[1]) == 0)) {
+    Count = atoi (Argv[3]);
+    DEBUG ((DEBUG_INFO, "Generate %d random numbers to %a.\n", Count, Argv[2]));
+    GenerateRandomNumbers (Argv[2], Count);
+    return 0;
   }
-  return UnitTestingEntry (Iteration);
+
+  //
+  // MtrrLibUnitTest [<iterations>]
+  //                 <iterations> [fixed|random]
+  //   Default <iterations> is 10.
+  //   Default uses fixed inputs.
+  //
+  Count        = 10;
+  mRandomInput = FALSE;
+  if ((Argc == 2) || (Argc == 3)) {
+    Count = atoi (Argv[1]);
+    if (Argc == 3) {
+      if (AsciiStriCmp ("fixed", Argv[2]) == 0) {
+        mRandomInput = FALSE;
+      } else if (AsciiStriCmp ("random", Argv[2]) == 0) {
+        mRandomInput = TRUE;
+      }
+    }
+  }
+
+  DEBUG ((DEBUG_INFO, "Iterations = %d\n", Count));
+  DEBUG ((DEBUG_INFO, "Input      = %a\n", mRandomInput ? "random" : "fixed"));
+
+  return UnitTestingEntry (Count);
 }

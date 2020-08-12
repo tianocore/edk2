@@ -43,6 +43,7 @@ typedef struct {
 } MTRR_LIB_SYSTEM_PARAMETER;
 
 extern UINT32                           mFixedMtrrsIndex[];
+extern BOOLEAN                          mRandomInput;
 
 /**
   Initialize the MTRR registers.
@@ -178,5 +179,17 @@ UINT32
 Random32 (
   UINT32  Start,
   UINT32  Limit
+  );
+
+/**
+  Generate Count random numbers in FilePath.
+
+  @param FilePath  The file path to put the generated random numbers.
+  @param Count     Count of random numbers.
+**/
+VOID
+GenerateRandomNumbers (
+  CHAR8         *FilePath,
+  UINTN         Count
   );
 #endif
