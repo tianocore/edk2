@@ -53,3 +53,4 @@
   PrintLib
   LocalApicLib
   PeCoffGetEntryPointLib
+  VmgExitLib
