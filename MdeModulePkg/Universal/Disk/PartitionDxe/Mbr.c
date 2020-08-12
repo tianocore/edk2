@@ -39,7 +39,6 @@ PartitionValidMbr (
   UINT32  StartingLBA;
   UINT32  EndingLBA;
   UINT32  NewEndingLBA;
-  UINT32  SizeInLBA;
   INTN    Index1;
   INTN    Index2;
   BOOLEAN MbrValid;
@@ -52,34 +51,13 @@ PartitionValidMbr (
   //
   MbrValid = FALSE;
   for (Index1 = 0; Index1 < MAX_MBR_PARTITIONS; Index1++) {
-    StartingLBA = UNPACK_UINT32 (Mbr->Partition[Index1].StartingLBA);
-    SizeInLBA   = UNPACK_UINT32 (Mbr->Partition[Index1].SizeInLBA);
-
-    //
-    // If the MBR with partition entry covering the ENTIRE disk, i.e. start at LBA0
-    // with whole disk size, we treat it as an invalid MBR partition.
-    //
-    if ((StartingLBA == 0) &&
-        (SizeInLBA == (LastLba + 1))) {
-      //
-      // Refer to the http://manpages.ubuntu.com/manpages/bionic/man8/mkudffs.8.html
-      // "WHOLE DISK VS PARTITION"
-      // Some linux ISOs may put the MBR table in the first 512 bytes for compatibility reasons with Windows.
-      // Linux  kernel  ignores MBR table if contains partition which starts at sector 0.
-      // Skip it because we don't have the partition check for UDF(El Torito compatible).
-      // It would continue to do the whole disk check in the UDF routine.
-      //
-      DEBUG ((DEBUG_INFO, "PartitionValidMbr: MBR table has partition entry covering the ENTIRE disk. Don't treat it as a valid MBR.\n"));
-
-      return FALSE;
-    }
-
-    if (Mbr->Partition[Index1].OSIndicator == 0x00 || SizeInLBA == 0) {
+    if (Mbr->Partition[Index1].OSIndicator == 0x00 || UNPACK_UINT32 (Mbr->Partition[Index1].SizeInLBA) == 0) {
       continue;
     }
 
     MbrValid    = TRUE;
-    EndingLBA   = StartingLBA + SizeInLBA - 1;
+    StartingLBA = UNPACK_UINT32 (Mbr->Partition[Index1].StartingLBA);
+    EndingLBA   = StartingLBA + UNPACK_UINT32 (Mbr->Partition[Index1].SizeInLBA) - 1;
     if (EndingLBA > LastLba) {
       //
       // Compatibility Errata:
@@ -99,15 +77,12 @@ PartitionValidMbr (
     }
 
     for (Index2 = Index1 + 1; Index2 < MAX_MBR_PARTITIONS; Index2++) {
-      StartingLBA = UNPACK_UINT32 (Mbr->Partition[Index2].StartingLBA);
-      SizeInLBA   = UNPACK_UINT32 (Mbr->Partition[Index2].SizeInLBA);
-
-      if (Mbr->Partition[Index2].OSIndicator == 0x00 || SizeInLBA == 0) {
+      if (Mbr->Partition[Index2].OSIndicator == 0x00 || UNPACK_UINT32 (Mbr->Partition[Index2].SizeInLBA) == 0) {
         continue;
       }
 
-      NewEndingLBA = StartingLBA + SizeInLBA - 1;
-      if (NewEndingLBA >= StartingLBA && StartingLBA <= EndingLBA) {
+      NewEndingLBA = UNPACK_UINT32 (Mbr->Partition[Index2].StartingLBA) + UNPACK_UINT32 (Mbr->Partition[Index2].SizeInLBA) - 1;
+      if (NewEndingLBA >= StartingLBA && UNPACK_UINT32 (Mbr->Partition[Index2].StartingLBA) <= EndingLBA) {
         //
         // This region overlaps with the Index1'th region
         //
