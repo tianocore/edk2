@@ -1043,6 +1043,7 @@ SetTheImage (
   UINT32                            DependenciesSize;
 
   Status             = EFI_SUCCESS;
+  Private            = NULL;
   Updateable         = 0;
   BooleanValue       = FALSE;
   FmpHeaderSize      = 0;
@@ -1293,7 +1294,10 @@ SetTheImage (
 
 cleanup:
   mProgressFunc = NULL;
-  SetLastAttemptStatusInVariable (Private, LastAttemptStatus);
+
+  if (Private != NULL) {
+    SetLastAttemptStatusInVariable (Private, LastAttemptStatus);
+  }
 
   if (Progress != NULL) {
     //
@@ -1306,7 +1310,9 @@ cleanup:
   // Need repopulate after SetImage is called to
   // update LastAttemptVersion and LastAttemptStatus.
   //
-  Private->DescriptorPopulated = FALSE;
+  if (Private != NULL) {
+    Private->DescriptorPopulated = FALSE;
+  }
 
   return Status;
 }
