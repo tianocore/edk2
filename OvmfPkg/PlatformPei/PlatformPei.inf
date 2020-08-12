@@ -75,6 +75,10 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamSize
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPageTablesBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPageTablesSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbPageTableBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbPageTableSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbSize
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfLockBoxStorageBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfLockBoxStorageSize
   gUefiOvmfPkgTokenSpaceGuid.PcdGuidedExtractHandlerTableSize
