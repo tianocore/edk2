@@ -181,6 +181,8 @@ EnableExecuteDisableBit (
   @param Size         Size of the given physical memory.
   @param StackBase    Base address of stack.
   @param StackSize    Size of stack.
+  @param GhcbBase     Base address of GHCB pages.
+  @param GhcbSize     Size of GHCB area.
 
   @retval TRUE      Page table should be split.
   @retval FALSE     Page table should not be split.
@@ -190,7 +192,9 @@ ToSplitPageTable (
   IN EFI_PHYSICAL_ADDRESS               Address,
   IN UINTN                              Size,
   IN EFI_PHYSICAL_ADDRESS               StackBase,
-  IN UINTN                              StackSize
+  IN UINTN                              StackSize,
+  IN EFI_PHYSICAL_ADDRESS               GhcbBase,
+  IN UINTN                              GhcbSize
   )
 {
   if (IsNullDetectionEnabled () && Address == 0) {
@@ -205,6 +209,12 @@ ToSplitPageTable (
 
   if (PcdGetBool (PcdSetNxForStack)) {
     if ((Address < StackBase + StackSize) && ((Address + Size) > StackBase)) {
+      return TRUE;
+    }
+  }
+
+  if (GhcbBase != 0) {
+    if ((Address < GhcbBase + GhcbSize) && ((Address + Size) > GhcbBase)) {
       return TRUE;
     }
   }
@@ -322,6 +332,8 @@ AllocatePageTableMemory (
   @param[in, out] PageEntry2M           Pointer to 2M page entry.
   @param[in]      StackBase             Stack base address.
   @param[in]      StackSize             Stack size.
+  @param[in]      GhcbBase              GHCB page area base address.
+  @param[in]      GhcbSize              GHCB page area size.
 
 **/
 VOID
@@ -329,7 +341,9 @@ Split2MPageTo4K (
   IN EFI_PHYSICAL_ADDRESS               PhysicalAddress,
   IN OUT UINT64                         *PageEntry2M,
   IN EFI_PHYSICAL_ADDRESS               StackBase,
-  IN UINTN                              StackSize
+  IN UINTN                              StackSize,
+  IN EFI_PHYSICAL_ADDRESS               GhcbBase,
+  IN UINTN                              GhcbSize
   )
 {
   EFI_PHYSICAL_ADDRESS                  PhysicalAddress4K;
@@ -355,7 +369,20 @@ Split2MPageTo4K (
     //
     // Fill in the Page Table entries
     //
-    PageTableEntry->Uint64 = (UINT64) PhysicalAddress4K | AddressEncMask;
+    PageTableEntry->Uint64 = (UINT64) PhysicalAddress4K;
+
+    //
+    // The GHCB range consists of two pages per CPU, the GHCB and a
+    // per-CPU variable page. The GHCB page needs to be mapped as an
+    // unencrypted page while the per-CPU variable page needs to be
+    // mapped encrypted. These pages alternate in assignment.
+    //
+    if ((GhcbBase == 0)
+        || (PhysicalAddress4K < GhcbBase)
+        || (PhysicalAddress4K >= GhcbBase + GhcbSize)
+        || (((PhysicalAddress4K - GhcbBase) & SIZE_4KB) != 0)) {
+      PageTableEntry->Uint64 |= AddressEncMask;
+    }
     PageTableEntry->Bits.ReadWrite = 1;
 
     if ((IsNullDetectionEnabled () && PhysicalAddress4K == 0) ||
@@ -383,6 +410,8 @@ Split2MPageTo4K (
   @param[in, out] PageEntry1G           Pointer to 1G page entry.
   @param[in]      StackBase             Stack base address.
   @param[in]      StackSize             Stack size.
+  @param[in]      GhcbBase              GHCB page area base address.
+  @param[in]      GhcbSize              GHCB page area size.
 
 **/
 VOID
@@ -390,7 +419,9 @@ Split1GPageTo2M (
   IN EFI_PHYSICAL_ADDRESS               PhysicalAddress,
   IN OUT UINT64                         *PageEntry1G,
   IN EFI_PHYSICAL_ADDRESS               StackBase,
-  IN UINTN                              StackSize
+  IN UINTN                              StackSize,
+  IN EFI_PHYSICAL_ADDRESS               GhcbBase,
+  IN UINTN                              GhcbSize
   )
 {
   EFI_PHYSICAL_ADDRESS                  PhysicalAddress2M;
@@ -413,11 +444,11 @@ Split1GPageTo2M (
 
   PhysicalAddress2M = PhysicalAddress;
   for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectoryEntry++, PhysicalAddress2M += SIZE_2MB) {
-    if (ToSplitPageTable (PhysicalAddress2M, SIZE_2MB, StackBase, StackSize)) {
+    if (ToSplitPageTable (PhysicalAddress2M, SIZE_2MB, StackBase, StackSize, GhcbBase, GhcbSize)) {
       //
       // Need to split this 2M page that covers NULL or stack range.
       //
-      Split2MPageTo4K (PhysicalAddress2M, (UINT64 *) PageDirectoryEntry, StackBase, StackSize);
+      Split2MPageTo4K (PhysicalAddress2M, (UINT64 *) PageDirectoryEntry, StackBase, StackSize, GhcbBase, GhcbSize);
     } else {
       //
       // Fill in the Page Directory entries
@@ -616,6 +647,8 @@ EnablePageTableProtection (
 
   @param[in] StackBase  Stack base address.
   @param[in] StackSize  Stack size.
+  @param[in] GhcbBase   GHCB base address.
+  @param[in] GhcbSize   GHCB size.
 
   @return The address of 4 level page map.
 
@@ -623,7 +656,9 @@ EnablePageTableProtection (
 UINTN
 CreateIdentityMappingPageTables (
   IN EFI_PHYSICAL_ADDRESS   StackBase,
-  IN UINTN                  StackSize
+  IN UINTN                  StackSize,
+  IN EFI_PHYSICAL_ADDRESS   GhcbBase,
+  IN UINTN                  GhcbSize
   )
 {
   UINT32                                        RegEax;
@@ -809,8 +844,8 @@ CreateIdentityMappingPageTables (
         PageDirectory1GEntry = (VOID *) PageDirectoryPointerEntry;
 
         for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectory1GEntry++, PageAddress += SIZE_1GB) {
-          if (ToSplitPageTable (PageAddress, SIZE_1GB, StackBase, StackSize)) {
-            Split1GPageTo2M (PageAddress, (UINT64 *) PageDirectory1GEntry, StackBase, StackSize);
+          if (ToSplitPageTable (PageAddress, SIZE_1GB, StackBase, StackSize, GhcbBase, GhcbSize)) {
+            Split1GPageTo2M (PageAddress, (UINT64 *) PageDirectory1GEntry, StackBase, StackSize, GhcbBase, GhcbSize);
           } else {
             //
             // Fill in the Page Directory entries
@@ -840,11 +875,11 @@ CreateIdentityMappingPageTables (
           PageDirectoryPointerEntry->Bits.Present = 1;
 
           for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectoryEntry++, PageAddress += SIZE_2MB) {
-            if (ToSplitPageTable (PageAddress, SIZE_2MB, StackBase, StackSize)) {
+            if (ToSplitPageTable (PageAddress, SIZE_2MB, StackBase, StackSize, GhcbBase, GhcbSize)) {
               //
               // Need to split this 2M page that covers NULL or stack range.
               //
-              Split2MPageTo4K (PageAddress, (UINT64 *) PageDirectoryEntry, StackBase, StackSize);
+              Split2MPageTo4K (PageAddress, (UINT64 *) PageDirectoryEntry, StackBase, StackSize, GhcbBase, GhcbSize);
             } else {
               //
               // Fill in the Page Directory entries
