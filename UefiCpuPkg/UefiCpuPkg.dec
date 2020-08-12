@@ -373,5 +373,11 @@
   # @ValidRange  0x80000001 | 0 - 1
   gUefiCpuPkgTokenSpaceGuid.PcdCpuProcTraceOutputScheme|0x0|UINT8|0x60000015
 
+  ## This dynamic PCD indicates whether SEV-ES is enabled
+  #   TRUE  - SEV-ES is enabled
+  #   FALSE - SEV-ES is not enabled
+  # @Prompt SEV-ES Status
+  gUefiCpuPkgTokenSpaceGuid.PcdSevEsIsEnabled|FALSE|BOOLEAN|0x60000016
+
 [UserExtensions.TianoCore."ExtraFiles"]
   UefiCpuPkgExtra.uni
