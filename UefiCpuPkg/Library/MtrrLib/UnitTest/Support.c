@@ -20,6 +20,70 @@ MSR_IA32_MTRRCAP_REGISTER        mMtrrCapMsr;
 CPUID_VERSION_INFO_EDX           mCpuidVersionInfoEdx;
 CPUID_VIR_PHY_ADDRESS_SIZE_EAX   mCpuidVirPhyAddressSizeEax;
 
+BOOLEAN                          mRandomInput;
+UINTN                            mNumberIndex = 0;
+extern UINTN                     mNumbers[];
+extern UINTN                     mNumberCount;
+
+/**
+  Return a random number between 0 and RAND_MAX.
+
+  If mRandomInput is TRUE, the routine directly calls rand().
+  Otherwise, the routine returns the pre-generated numbers.
+
+  @return a number between 0 and RAND_MAX.
+**/
+UINTN
+Rand (
+  VOID
+  )
+{
+  if (mRandomInput) {
+    return rand ();
+  } else {
+    DEBUG ((DEBUG_INFO, "random: %d\n", mNumberIndex));
+    return mNumbers[mNumberIndex++ % (mNumberCount - 1)];
+  }
+}
+
+CHAR8  mContentTemplate[] = {
+  "/** @file\n"
+  "  Pre-generated random number used by MtrrLib test.\n"
+  "\n"
+  "  Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>\n"
+  "  SPDX-License-Identifier: BSD-2-Clause-Patent\n"
+  "**/\n"
+  "UINTN mNumberCount = %d;\n"
+  "UINTN mNumbers[] = {"
+};
+
+/**
+  Generate Count random numbers in FilePath.
+
+  @param FilePath  The file path to put the generated random numbers.
+  @param Count     Count of random numbers.
+**/
+VOID
+GenerateRandomNumbers (
+  CHAR8         *FilePath,
+  UINTN         Count
+  )
+{
+  FILE   *File;
+  UINTN  Index;
+
+  File = fopen (FilePath, "w");
+  fprintf (File, mContentTemplate, Count);
+  for (Index = 0; Index < Count; Index++) {
+    if (Index % 10 == 0) {
+      fprintf (File, "\n ");
+    }
+    fprintf (File, " %d,", rand ());
+  }
+  fprintf (File, "\n};\n");
+  fclose (File);
+}
+
 /**
   Retrieves CPUID information.
 
@@ -328,7 +392,7 @@ Random32 (
   UINT32  Limit
   )
 {
-  return (UINT32) (((double) rand () / RAND_MAX) * (Limit - Start)) + Start;
+  return (UINT32) (((double) Rand () / RAND_MAX) * (Limit - Start)) + Start;
 }
 
 /**
@@ -344,7 +408,7 @@ Random64 (
   UINT64  Limit
   )
 {
-  return (UINT64) (((double) rand () / RAND_MAX) * (Limit - Start)) + Start;
+  return (UINT64) (((double) Rand () / RAND_MAX) * (Limit - Start)) + Start;
 }
 
 /**
