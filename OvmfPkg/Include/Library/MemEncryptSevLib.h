@@ -14,6 +14,18 @@
 #include <Base.h>
 
 /**
+  Returns a boolean to indicate whether SEV-ES is enabled.
+
+  @retval TRUE           SEV-ES is enabled
+  @retval FALSE          SEV-ES is not enabled
+**/
+BOOLEAN
+EFIAPI
+MemEncryptSevEsIsEnabled (
+  VOID
+  );
+
+/**
   Returns a boolean to indicate whether SEV is enabled
 
   @retval TRUE           SEV is enabled
