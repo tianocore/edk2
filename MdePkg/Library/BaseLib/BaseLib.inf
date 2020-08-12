@@ -184,6 +184,7 @@
   Ia32/DisableCache.nasm| GCC
   Ia32/RdRand.nasm
   Ia32/XGetBv.nasm
+  Ia32/VmgExit.nasm
 
   Ia32/DivS64x64Remainder.c
   Ia32/InternalSwitchStack.c | MSFT
@@ -317,6 +318,7 @@
   X64/DisablePaging64.nasm
   X64/RdRand.nasm
   X64/XGetBv.nasm
+  X64/VmgExit.nasm
   ChkStkGcc.c  | GCC
 
 [Sources.EBC]
