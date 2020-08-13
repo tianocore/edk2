@@ -110,6 +110,9 @@ if /I "%1"=="VS2015" goto SetWinDDK
 
 :SetVS2017
 if not defined VS150COMNTOOLS (
+  @REM clear two envs so that vcvars32.bat can run successfully.
+  set VSINSTALLDIR=
+  set VCToolsVersion=
   if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" (
     if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\BuildTools" (
       call "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" -products Microsoft.VisualStudio.Product.BuildTools -version 15,16 > vswhereInfo
@@ -166,6 +169,9 @@ if not defined WINSDK_PATH_FOR_RC_EXE (
 
 :SetVS2019
 if not defined VS160COMNTOOLS (
+  @REM clear two envs so that vcvars32.bat can run successfully.
+  set VSINSTALLDIR=
+  set VCToolsVersion=
   if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" (
     if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\2019\BuildTools" (
       call "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" -products Microsoft.VisualStudio.Product.BuildTools -version 16,17 > vswhereInfo
