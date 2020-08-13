@@ -167,6 +167,8 @@ if not defined WINSDK_PATH_FOR_RC_EXE (
   )
 )
 
+if /I "%1"=="VS2017" goto SetWinDDK
+
 :SetVS2019
 if not defined VS160COMNTOOLS (
   @REM clear two envs so that vcvars32.bat can run successfully.
@@ -225,6 +227,8 @@ if not defined WINSDK_PATH_FOR_RC_EXE (
     set "WINSDK_PATH_FOR_RC_EXE=%WINSDK10_PREFIX%x86"
   )
 )
+
+if /I "%1"=="VS2019" goto SetWinDDK
 
 :SetWinDDK
 if not defined WINDDK3790_PREFIX (
