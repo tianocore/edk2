@@ -84,6 +84,9 @@
   #
   VariableKeyLib|Include/Library/VariableKeyLib.h
 
+  ## @libraryclass  Provides interfaces about firmware TPM measurement.
+  #
+  TcgEventLogRecordLib|Include/Library/TcgEventLogRecordLib.h
 [Guids]
   ## Security package token space guid.
   # Include/Guid/SecurityPkgTokenSpace.h
