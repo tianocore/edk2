@@ -66,6 +66,7 @@
   ResetSystemLib|MdeModulePkg/Library/BaseResetSystemLibNull/BaseResetSystemLibNull.inf
   VariableKeyLib|SecurityPkg/Library/VariableKeyLibNull/VariableKeyLibNull.inf
   RpmcLib|SecurityPkg/Library/RpmcLibNull/RpmcLibNull.inf
+  TcgEventLogRecordLib|SecurityPkg/Library/TcgEventLogRecordLib/TcgEventLogRecordLib.inf
 
 [LibraryClasses.ARM]
   #
@@ -240,6 +241,7 @@
   SecurityPkg/Library/PlatformSecureLibNull/PlatformSecureLibNull.inf
   SecurityPkg/Library/Tcg2PpVendorLibNull/Tcg2PpVendorLibNull.inf
   SecurityPkg/Library/TcgPpVendorLibNull/TcgPpVendorLibNull.inf
+  SecurityPkg/Library/TcgEventLogRecordLib/TcgEventLogRecordLib.inf
 
 [Components.IA32, Components.X64, Components.ARM, Components.AARCH64]
   SecurityPkg/Library/AuthVariableLib/AuthVariableLib.inf
