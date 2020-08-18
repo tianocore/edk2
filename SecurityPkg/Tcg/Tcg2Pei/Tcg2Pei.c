@@ -453,13 +453,15 @@ HashLogExtendEvent (
     return EFI_DEVICE_ERROR;
   }
 
-  if(Flags & EDKII_TCG_PRE_HASH) {
+  if ((Flags & EDKII_TCG_PRE_HASH) != 0 || (Flags & EDKII_TCG_PRE_HASH_LOG_ONLY) != 0) {
     ZeroMem (&DigestList, sizeof(DigestList));
     CopyMem (&DigestList, HashData, sizeof(DigestList));
-    Status = Tpm2PcrExtend (
-             0,
-             &DigestList
-             );
+    if ((Flags & EDKII_TCG_PRE_HASH) !=0 ) {
+      Status = Tpm2PcrExtend (
+               NewEventHdr->PCRIndex,
+               &DigestList
+               );
+    }
   } else {
     Status = HashAndExtend (
                NewEventHdr->PCRIndex,
