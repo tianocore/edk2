@@ -11,7 +11,7 @@
 ################################################################################
 
 [Defines]
-!include OvmfPkg/Bhyve/BhyvePkgDefines.fdf.inc
+!include OvmfPkg/Bhyve/BhyveDefines.fdf.inc
 
 #
 # Build the variable store and the firmware code as one unified flash device

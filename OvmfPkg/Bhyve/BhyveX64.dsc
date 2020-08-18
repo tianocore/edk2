@@ -22,7 +22,7 @@
   SUPPORTED_ARCHITECTURES        = X64
   BUILD_TARGETS                  = NOOPT|DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
-  FLASH_DEFINITION               = OvmfPkg/Bhyve/BhyvePkgX64.fdf
+  FLASH_DEFINITION               = OvmfPkg/Bhyve/BhyveX64.fdf
 
   #
   # Defines for default states.  These can be changed on the command line.
