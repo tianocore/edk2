@@ -3,7 +3,7 @@
   register TemporaryRamDonePpi to call TempRamExit API, and register MemoryDiscoveredPpi
   notify to call FspSiliconInit API.
 
-  Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2020, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -25,11 +25,14 @@
 #include <Library/FspWrapperPlatformLib.h>
 #include <Library/FspWrapperHobProcessLib.h>
 #include <Library/FspWrapperApiLib.h>
+#include <Library/FspMeasurementLib.h>
 
 #include <Ppi/FspSiliconInitDone.h>
 #include <Ppi/EndOfPeiPhase.h>
 #include <Ppi/MemoryDiscovered.h>
 #include <Ppi/SecPlatformInformation.h>
+#include <Ppi/Tcg.h>
+#include <Ppi/FirmwareVolumeInfoMeasurementExcluded.h>
 #include <Library/FspWrapperApiTestLib.h>
 #include <FspEas.h>
 #include <FspStatusCode.h>
@@ -147,7 +150,21 @@ FspmWrapperInit (
   VOID
   )
 {
-  EFI_STATUS           Status;
+  EFI_STATUS                                            Status;
+  EFI_PEI_FIRMWARE_VOLUME_INFO_MEASUREMENT_EXCLUDED_PPI *MeasurementExcludedFvPpi;
+  EFI_PEI_PPI_DESCRIPTOR                                *MeasurementExcludedPpiList;
+
+  MeasurementExcludedFvPpi = AllocatePool (sizeof(*MeasurementExcludedFvPpi));
+  ASSERT(MeasurementExcludedFvPpi != NULL);
+  MeasurementExcludedFvPpi->Count = 1;
+  MeasurementExcludedFvPpi->Fv[0].FvBase = PcdGet32 (PcdFspmBaseAddress);
+  MeasurementExcludedFvPpi->Fv[0].FvLength = ((EFI_FIRMWARE_VOLUME_HEADER *) (UINTN) PcdGet32 (PcdFspmBaseAddress))->FvLength;
+
+  MeasurementExcludedPpiList = AllocatePool (sizeof(*MeasurementExcludedPpiList));
+  ASSERT(MeasurementExcludedPpiList != NULL);
+  MeasurementExcludedPpiList->Flags = EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST;
+  MeasurementExcludedPpiList->Guid  = &gEfiPeiFirmwareVolumeInfoMeasurementExcludedPpiGuid;
+  MeasurementExcludedPpiList->Ppi   = MeasurementExcludedFvPpi;
 
   Status = EFI_SUCCESS;
 
@@ -155,6 +172,9 @@ FspmWrapperInit (
     Status = PeiFspMemoryInit ();
     ASSERT_EFI_ERROR (Status);
   } else {
+    Status = PeiServicesInstallPpi (MeasurementExcludedPpiList);
+    ASSERT_EFI_ERROR (Status);
+
     PeiServicesInstallFvInfoPpi (
       NULL,
       (VOID *)(UINTN) PcdGet32 (PcdFspmBaseAddress),
@@ -165,6 +185,67 @@ FspmWrapperInit (
   }
 
   return Status;
+}
+
+/**
+  This function is called after TCG installed PPI.
+
+  @param[in] PeiServices    Pointer to PEI Services Table.
+  @param[in] NotifyDesc     Pointer to the descriptor for the Notification event that
+                            caused this function to execute.
+  @param[in] Ppi            Pointer to the PPI data associated with this function.
+
+  @retval EFI_STATUS        Always return EFI_SUCCESS
+**/
+EFI_STATUS
+EFIAPI
+TcgPpiNotify (
+  IN EFI_PEI_SERVICES          **PeiServices,
+  IN EFI_PEI_NOTIFY_DESCRIPTOR *NotifyDesc,
+  IN VOID                      *Ppi
+  );
+
+EFI_PEI_NOTIFY_DESCRIPTOR mTcgPpiNotifyDesc = {
+  (EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
+  &gEdkiiTcgPpiGuid,
+  TcgPpiNotify
+};
+
+/**
+  This function is called after TCG installed PPI.
+
+  @param[in] PeiServices    Pointer to PEI Services Table.
+  @param[in] NotifyDesc     Pointer to the descriptor for the Notification event that
+                            caused this function to execute.
+  @param[in] Ppi            Pointer to the PPI data associated with this function.
+
+  @retval EFI_STATUS        Always return EFI_SUCCESS
+**/
+EFI_STATUS
+EFIAPI
+TcgPpiNotify (
+  IN EFI_PEI_SERVICES          **PeiServices,
+  IN EFI_PEI_NOTIFY_DESCRIPTOR *NotifyDesc,
+  IN VOID                      *Ppi
+  )
+{
+  UINT32                    FspMeasureMask;
+
+  DEBUG ((DEBUG_INFO, "TcgPpiNotify FSPM\n"));
+
+  FspMeasureMask = PcdGet32 (PcdFspMeasurementConfig);
+
+  if ((FspMeasureMask & FSP_MEASURE_FSPT) != 0) {
+    MeasureFspFirmwareBlob (0, "FSPT", PcdGet32(PcdFsptBaseAddress),
+                            (UINT32)((EFI_FIRMWARE_VOLUME_HEADER *) (UINTN) PcdGet32 (PcdFsptBaseAddress))->FvLength);
+  }
+
+  if ((FspMeasureMask & FSP_MEASURE_FSPM) != 0) {
+    MeasureFspFirmwareBlob (0, "FSPM", PcdGet32(PcdFspmBaseAddress),
+                            (UINT32)((EFI_FIRMWARE_VOLUME_HEADER *) (UINTN) PcdGet32 (PcdFspmBaseAddress))->FvLength);
+  }
+
+  return EFI_SUCCESS;
 }
 
 /**
@@ -182,7 +263,12 @@ FspmWrapperPeimEntryPoint (
   IN CONST EFI_PEI_SERVICES     **PeiServices
   )
 {
+  EFI_STATUS  Status;
+
   DEBUG((DEBUG_INFO, "FspmWrapperPeimEntryPoint\n"));
+
+  Status = PeiServicesNotifyPpi (&mTcgPpiNotifyDesc);
+  ASSERT_EFI_ERROR (Status);
 
   FspmWrapperInit ();
 
