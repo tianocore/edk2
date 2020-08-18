@@ -40,9 +40,9 @@
   Hash/CryptSha256.c
   Hash/CryptSm3.c
   Hash/CryptSha512Null.c
-  Hmac/CryptHmacSha256Null.c
-  Kdf/CryptHkdfNull.c
-  Cipher/CryptAesNull.c
+  Hmac/CryptHmacSha256.c
+  Kdf/CryptHkdf.c
+  Cipher/CryptAes.c
   Pk/CryptRsaBasic.c
   Pk/CryptRsaExtNull.c
   Pk/CryptPkcs1OaepNull.c
