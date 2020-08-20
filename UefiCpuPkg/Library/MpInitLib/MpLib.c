@@ -885,9 +885,7 @@ ApWakeupFunction (
           UINT64                    Status;
           BOOLEAN                   DoDecrement;
 
-          if (CpuMpData->InitFlag == ApInitConfig) {
-            DoDecrement = TRUE;
-          }
+          DoDecrement = (BOOLEAN) (CpuMpData->InitFlag == ApInitConfig);
 
           while (TRUE) {
             Msr.GhcbPhysicalAddress = AsmReadMsr64 (MSR_SEV_ES_GHCB);
