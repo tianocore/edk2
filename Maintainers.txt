@@ -80,7 +80,7 @@ W: https://github.com/tianocore/tianocore.github.io/wiki/Security
 EDK II Releases:
 ----------------
 W: https://github.com/tianocore/tianocore.github.io/wiki/EDK-II-Release-Planning
-M: Liming Gao <liming.gao@intel.com>
+M: Liming Gao <gaoliming@byosoft.com.cn>
 
 UEFI Shell Binaries (ShellBinPkg.zip) from EDK II Releases:
 -----------------------------------------------------------
@@ -105,12 +105,12 @@ F: .azurepipelines/
 M: Sean Brogan <sean.brogan@microsoft.com>
 M: Bret Barkelew <Bret.Barkelew@microsoft.com>
 R: Michael D Kinney <michael.d.kinney@intel.com>
-R: Liming Gao <liming.gao@intel.com>
+R: Liming Gao <gaoliming@byosoft.com.cn>
 
 .mergify/
 F: .mergify/
 M: Michael D Kinney <michael.d.kinney@intel.com>
-M: Liming Gao <liming.gao@intel.com>
+M: Liming Gao <gaoliming@byosoft.com.cn>
 R: Sean Brogan <sean.brogan@microsoft.com>
 R: Bret Barkelew <Bret.Barkelew@microsoft.com>
 
@@ -119,7 +119,7 @@ F: .pytool/
 M: Sean Brogan <sean.brogan@microsoft.com>
 M: Bret Barkelew <Bret.Barkelew@microsoft.com>
 R: Michael D Kinney <michael.d.kinney@intel.com>
-R: Liming Gao <liming.gao@intel.com>
+R: Liming Gao <gaoliming@byosoft.com.cn>
 
 EDK II Packages:
 ----------------
@@ -156,7 +156,7 @@ BaseTools
 F: BaseTools/
 W: https://github.com/tianocore/tianocore.github.io/wiki/BaseTools
 M: Bob Feng <bob.c.feng@intel.com>
-M: Liming Gao <liming.gao@intel.com>
+M: Liming Gao <gaoliming@byosoft.com.cn>
 R: Yuwei Chen <yuwei.chen@intel.com>
 
 CryptoPkg
@@ -197,7 +197,7 @@ T: git - https://github.com/tianocore/edk2-FatPkg.git
 FmpDevicePkg
 F: FmpDevicePkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/FmpDevicePkg
-M: Liming Gao <liming.gao@intel.com>
+M: Liming Gao <gaoliming@byosoft.com.cn>
 M: Michael D Kinney <michael.d.kinney@intel.com>
 R: Guomin Jiang <guomin.jiang@intel.com>
 R: Wei6 Xu <wei6.xu@intel.com>
@@ -226,7 +226,7 @@ MdeModulePkg: ACPI modules
 F: MdeModulePkg/Include/*Acpi*.h
 F: MdeModulePkg/Universal/Acpi/
 R: Dandan Bi <dandan.bi@intel.com>
-R: Liming Gao <liming.gao@intel.com>
+R: Liming Gao <gaoliming@byosoft.com.cn>
 
 MdeModulePkg: ACPI modules related to S3
 F: MdeModulePkg/*LockBox*/
@@ -288,7 +288,7 @@ F: MdeModulePkg/Universal/PCD/
 F: MdeModulePkg/Universal/PlatformDriOverrideDxe/
 F: MdeModulePkg/Universal/SecurityStubDxe/SecurityStub.c
 R: Dandan Bi <dandan.bi@intel.com>
-R: Liming Gao <liming.gao@intel.com>
+R: Liming Gao <gaoliming@byosoft.com.cn>
 
 MdeModulePkg: Device and Peripheral modules
 F: MdeModulePkg/*PciHostBridge*/
@@ -327,7 +327,7 @@ F: MdeModulePkg/Library/DisplayUpdateProgressLib*/
 F: MdeModulePkg/Library/FmpAuthenticationLibNull/
 F: MdeModulePkg/Universal/Esrt*/
 R: Hao A Wu <hao.a.wu@intel.com>
-R: Liming Gao <liming.gao@intel.com>
+R: Liming Gao <gaoliming@byosoft.com.cn>
 R: Guomin Jiang <guomin.jiang@intel.com>
 
 MdeModulePkg: HII and UI modules
@@ -358,7 +358,7 @@ R: Ray Ni <ray.ni@intel.com>
 MdeModulePkg: Pei Core
 F: MdeModulePkg/Core/Pei/
 R: Dandan Bi <dandan.bi@intel.com>
-R: Liming Gao <liming.gao@intel.com>
+R: Liming Gao <gaoliming@byosoft.com.cn>
 R: Debkumar De <debkumar.de@intel.com>
 R: Harry Han <harry.han@intel.com>
 R: Catharine West <catharine.west@intel.com>
@@ -390,13 +390,13 @@ F: MdeModulePkg/Include/Guid/SystemNvDataGuid.h
 F: MdeModulePkg/Include/Protocol/SwapAddressRange.h
 F: MdeModulePkg/Universal/FaultTolerantWrite*/
 R: Hao A Wu <hao.a.wu@intel.com>
-R: Liming Gao <liming.gao@intel.com>
+R: Liming Gao <gaoliming@byosoft.com.cn>
 
 MdePkg
 F: MdePkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/MdePkg
 M: Michael D Kinney <michael.d.kinney@intel.com>
-M: Liming Gao <liming.gao@intel.com>
+M: Liming Gao <gaoliming@byosoft.com.cn>
 R: Zhiguang Liu <zhiguang.liu@intel.com>
 
 NetworkPkg
