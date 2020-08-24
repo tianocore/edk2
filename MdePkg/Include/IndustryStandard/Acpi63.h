@@ -2,7 +2,7 @@
   ACPI 6.3 definitions from the ACPI Specification Revision 6.3 Jan, 2019.
 
   Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
-  Copyright (c) 2019 - 2020, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2019 - 2020, Arm Ltd. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -2644,6 +2644,11 @@ typedef struct {
 /// "RSD PTR " Root System Description Pointer
 ///
 #define EFI_ACPI_6_3_ROOT_SYSTEM_DESCRIPTION_POINTER_SIGNATURE  SIGNATURE_64('R', 'S', 'D', ' ', 'P', 'T', 'R', ' ')
+
+///
+/// "AEST" Arm Error Source Table
+///
+#define EFI_ACPI_6_3_ARM_ERROR_SOURCE_TABLE_SIGNATURE  SIGNATURE_32('A', 'E', 'S', 'T')
 
 ///
 /// "APIC" Multiple APIC Description Table
