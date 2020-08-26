@@ -220,14 +220,37 @@ SmbaseRelocate (
   //
   // Boot the hot-added CPU.
   //
-  // If the OS is benign, and so the hot-added CPU is still in RESET state,
-  // then the broadcast SMI is still pending for it; it will now launch
-  // directly into SMM.
+  // There are 2*2 cases to consider:
   //
-  // If the OS is malicious, the hot-added CPU has been booted already, and so
-  // it is already spinning on the APIC ID gate. In that case, the
-  // INIT-SIPI-SIPI below will be ignored.
+  // (1) The CPU was hot-added before the SMI was broadcast.
   //
+  // (1.1) The OS is benign.
+  //
+  //       The hot-added CPU is in RESET state, with the broadcast SMI pending
+  //       for it. The directed SMI below will be ignored (it's idempotent),
+  //       and the INIT-SIPI-SIPI will launch the CPU directly into SMM.
+  //
+  // (1.2) The OS is malicious.
+  //
+  //       The hot-added CPU has been booted, by the OS. Thus, the hot-added
+  //       CPU is spinning on the APIC ID gate. In that case, both the SMI and
+  //       the INIT-SIPI-SIPI below will be ignored.
+  //
+  // (2) The CPU was hot-added after the SMI was broadcast.
+  //
+  // (2.1) The OS is benign.
+  //
+  //       The hot-added CPU is in RESET state, with no SMI pending for it. The
+  //       directed SMI will latch the SMI for the CPU. Then the INIT-SIPI-SIPI
+  //       will launch the CPU into SMM.
+  //
+  // (2.2) The OS is malicious.
+  //
+  //       The hot-added CPU is executing OS code. The directed SMI will pull
+  //       the hot-added CPU into SMM, where it will start spinning on the APIC
+  //       ID gate. The INIT-SIPI-SIPI will be ignored.
+  //
+  SendSmiIpi (ApicId);
   SendInitSipiSipi (ApicId, PenAddress);
 
   //
