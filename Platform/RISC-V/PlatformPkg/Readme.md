@@ -1,49 +1,62 @@
 # Introduction
 
-## EDK2 RISC-V Platform Packages
-RISC-V platform package provides the generic and common modules for RISC-V
-platforms. RISC-V platform package could include RiscPlatformPkg.dec to
-use the common drivers, libraries, definitions, PCDs and etc. for the
-platform development.
+## EDK2 RISC-V Platform Project
 
-There are two packages to support RISC-V:
-- `edk2-platforms/Silicon/RISC-V/ProcessorPkg/RiscVProcessorPkg.dec`
-- `edk2-platforms/Platform/RISC-V/PlatformPkg/RiscVPlatformPkg.dec`
+### EDK2 Build Architecture for RISC-V
+The edk2 build architecture which is supported and verified on edk2 code base for
+RISC-V platforms is `RISCV64`.
 
-`RiscVPlatformPkg` provides SEC phase and NULL libs.
-`RiscVProcessorPkg` provides many libraries, PEIMs and DXE drivers.
+### Toolchain for RISC-V
+The toolchain is on RISC-V GitHub (https://github.com/riscv/riscv-gnu-toolchain)
+for building edk2 RISC-V binary. The corresponding edk2 Toolchain tag for building
+RISC-V platform is "GCC5" declared in `tools_def.txt`.
 
-### Download the sources ###
+### Packages
+There are two packages to support RISC-V edk2 platforms:
+- `Silicon/RISC-V/ProcessorPkg/RiscVProcessorPkg.dec`
+- `Platform/RISC-V/PlatformPkg/RiscVPlatformPkg.dec`
+
+`RiscVPlatformPkg` currently provides the generic SEC driver for all RISC-V platforms,
+and some platform level libraries.
+`RiscVProcessorPkg` currently provides RISC-V processor related libraries, PEI modules,
+DXE drivers and industrial standard header files.
+
+## EDK2 RISC-V Platform Package
+RISC-V platform package provides the common modules for RISC-V platforms. RISC-V
+platform vendors could include RiscPlatformPkg.dec to use the common drivers, libraries,
+definitions, PCDs and etc. for the RISC-V platforms development.
+
+### Download the Source Code ###
 ```
 git clone https://github.com/tianocore/edk2.git
-
-git clone https://github.com/changab/edk2-platforms.git
-# Check out branch: riscv-smode-lib
-```
-
-To build it, you have to follow the regular steps for EDK2 and additionally set
-an environmen variable to point to your RISC-V toolchain installation,
-including the binary prefixes:
+git clone https://github.com/tianocore/edk2-platforms.git
 
 ```
+
+You have to follow the build steps for
+EDK2 (https://github.com/tianocore/tianocore.github.io/wiki/Getting-Started-with-EDK-II)
+and additionally set an environment variable to point to your RISC-V toolchain binaries
+for building RISC-V platforms,
+```
+# e.g. If the toolchain binaries are under /riscv-gnu-toolchain-binaries/bin
 export GCC5_RISCV64_PREFIX=/riscv-gnu-toolchain-binaries/bin/riscv64-unknown-elf-
 ```
 
-Then you can build the image for the SiFive HifiveUnleashed platform:
+Then you can build the edk2 firmware image for RISC-V platforms.
 
 ```
+# e.g. For building SiFive Hifive Unleashed platform:
 build -a RISCV64 -t GCC5 -p Platform/SiFive/U5SeriesPkg/FreedomU540HiFiveUnleashedBoard/U540.dsc
 ```
 
-### EDK2 project
-All changes in edk2 are upstream, however, most of the RISC-V code is in
-edk2-platforms. Therefore you have to check out the branch `riscv-smode-lib` on
-`github.com/changab/edk2-platforms`.
-
-The build architecture which is supported and verified so far is `RISCV64`.
-The latest master of the RISC-V toolchain https://github.com/riscv/riscv-gnu-toolchain
-should work but the latest verified commit is `b468107e701433e1caca3dbc8aef8d40`.
-Toolchain tag is "GCC5" declared in `tools_def.txt`
+## RISC-V OpenSBI Library
+RISC-V [OpenSBI](https://github.com/riscv/opensbi) is the implementation of
+[RISC-V SBI (Supervisor Binary Interface) specification](https://github.com/riscv/riscv-sbi-doc).
+For EDK2 UEFI firmware solution, RISC-V OpenSBI is integrated as a library
+[(submoudule)](Silicon/RISC-V/ProcessorPkg/Library/RiscVOpensbiLib/opensbi) in EDK2
+RISC-V Processor Package. The RISC-V OpenSBI library is built in SEC driver without
+any modifications and provides the interfaces for supervisor mode execution environment
+to execute privileged operations.
 
 ## RISC-V Platform PCD settings
 ### EDK2 Firmware Volume Settings
@@ -54,9 +67,9 @@ EDK2 Firmware volume related PCDs which declared in platform FDF file.
 |PcdRiscVSecFvBase| The base address of SEC Firmware Volume|
 |PcdRiscVSecFvSize| The size of SEC Firmware Volume|
 |PcdRiscVPeiFvBase| The base address of PEI Firmware Volume|
-|PcdRiscVPeiFvSize| The size of SEC Firmware Volume|
+|PcdRiscVPeiFvSize| The size of PEI Firmware Volume|
 |PcdRiscVDxeFvBase| The base address of DXE Firmware Volume|
-|PcdRiscVDxeFvSize| The size of SEC Firmware Volume|
+|PcdRiscVDxeFvSize| The size of DXE Firmware Volume|
 
 ### EDK2 EFI Variable Region Settings
 The PCD settings regard to EFI Variable
@@ -84,21 +97,24 @@ Below PCDs could be set in platform FDF file.
 |--------------|---------|
 |PcdHartCount| Number of RISC-V HARTs, the value is processor-implementation specific|
 |PcdBootHartId| The ID of RISC-V HART to execute main fimrware code and boot system to OS|
+|PcdBootableHartNumber|The bootable HART number, which is incorporate with RISC-V OpenSBI platform hart_index2id value|
 
 ### RISC-V OpenSBI Settings
 
 | **PCD name** |**Usage**|
 |--------------|---------|
-|PcdScratchRamBase| The base address of OpenSBI scratch buffer for all RISC-V HARTs|
-|PcdScratchRamSize| The total size of OpenSBI scratch buffer for all RISC-V HARTs|
-|PcdOpenSbiStackSize| The size of initial stack of each RISC-V HART for booting system use OpenSBI|
+|PcdScratchRamBase| The base address of RISC-V OpenSBI scratch buffer for all RISC-V HARTs|
+|PcdScratchRamSize| The total size of RISC-V OpenSBI scratch buffer for all RISC-V HARTs|
+|PcdOpenSbiStackSize| The size of initial stack of each RISC-V HART for booting system use RISC-V OpenSBI|
 |PcdTemporaryRamBase| The base address of temporary memory for PEI phase|
 |PcdTemporaryRamSize| The temporary memory size for PEI phase|
+|PcdPeiCorePrivilegeMode|The target RISC-V privilege mode for edk2 PEI phase|
 
 ## Supported Operating Systems
-Only support to boot to EFI Shell so far.
-
-Porting GRUB2 and Linux EFISTUB is in progress.
+Currently support boot to EFI Shell and Linux kernel.
+Refer to below link for more information,
+https://github.com/riscv/riscv-uefi-edk2-docs
 
 ## Known Issues and Limitations
-Only RISC-V RV64 is verified.
+Only RISC-V RV64 is verified on edk2.
+
