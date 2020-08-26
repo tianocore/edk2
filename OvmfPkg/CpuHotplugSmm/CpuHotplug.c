@@ -193,9 +193,28 @@ CpuHotplugMmi (
   NewSlot = 0;
   while (PluggedIdx < PluggedCount) {
     APIC_ID NewApicId;
+    UINT32  CheckSlot;
     UINTN   NewProcessorNumberByProtocol;
 
     NewApicId = mPluggedApicIds[PluggedIdx];
+
+    //
+    // Check if the supposedly hot-added CPU is already known to us.
+    //
+    for (CheckSlot = 0;
+         CheckSlot < mCpuHotPlugData->ArrayLength;
+         CheckSlot++) {
+      if (mCpuHotPlugData->ApicId[CheckSlot] == NewApicId) {
+        break;
+      }
+    }
+    if (CheckSlot < mCpuHotPlugData->ArrayLength) {
+      DEBUG ((DEBUG_VERBOSE, "%a: APIC ID " FMT_APIC_ID " was hot-plugged "
+        "before; ignoring it\n", __FUNCTION__, NewApicId));
+      PluggedIdx++;
+      continue;
+    }
+
     //
     // Find the first empty slot in CPU_HOT_PLUG_DATA.
     //
