@@ -358,7 +358,7 @@ typedef struct {
 #define EFI_ACPI_DMA_TRANSFER_TYPE_MASK                 0x03
 #define   EFI_ACPI_DMA_TRANSFER_TYPE_8_BIT              0x00
 #define   EFI_ACPI_DMA_TRANSFER_TYPE_8_BIT_AND_16_BIT   0x01
-#define   EFI_ACPI_DMA_TRANSFER_TYPE_16_BIT             0x10
+#define   EFI_ACPI_DMA_TRANSFER_TYPE_16_BIT             0x02
 
 //
 // IO Information
