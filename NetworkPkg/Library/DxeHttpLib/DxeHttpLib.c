@@ -1122,6 +1122,7 @@ HttpParseMessageBody (
   CHAR8                 *Char;
   UINTN                 RemainderLengthInThis;
   UINTN                 LengthForCallback;
+  UINTN                 PortionLength;
   EFI_STATUS            Status;
   HTTP_BODY_PARSER      *Parser;
 
@@ -1173,19 +1174,31 @@ HttpParseMessageBody (
       //
       // Identity transfer-coding, just notify user to save the body data.
       //
+      PortionLength = MIN (
+                        BodyLength,
+                        Parser->ContentLength - Parser->ParsedBodyLength
+                        );
+      if (PortionLength == 0) {
+        //
+        // Got BodyLength, but no ContentLength. Use BodyLength.
+        //
+        PortionLength = BodyLength;
+        Parser->ContentLength = PortionLength;
+      }
+
       if (Parser->Callback != NULL) {
         Status = Parser->Callback (
                            BodyParseEventOnData,
                            Char,
-                           MIN (BodyLength, Parser->ContentLength - Parser->ParsedBodyLength),
+                           PortionLength,
                            Parser->Context
                            );
         if (EFI_ERROR (Status)) {
           return Status;
         }
       }
-      Char += MIN (BodyLength, Parser->ContentLength - Parser->ParsedBodyLength);
-      Parser->ParsedBodyLength += MIN (BodyLength, Parser->ContentLength - Parser->ParsedBodyLength);
+      Char += PortionLength;
+      Parser->ParsedBodyLength += PortionLength;
       if (Parser->ParsedBodyLength == Parser->ContentLength) {
         Parser->State = BodyParserComplete;
         if (Parser->Callback != NULL) {
