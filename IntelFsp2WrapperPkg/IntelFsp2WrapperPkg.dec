@@ -26,6 +26,8 @@
   ##  @libraryclass  Provide FSP platform related function.
   FspWrapperPlatformLib|Include/Library/FspWrapperPlatformLib.h
 
+  ##  @libraryclass  Provide FSP TPM measurement related function.
+  FspMeasurementLib|Include/Library/FspMeasurementLib.h
 [Guids]
   #
   # GUID defined in package
