@@ -577,7 +577,7 @@ Returns:
     //
     // Save the size of the memory and make a Unicode filename SystemMemory00, ...
     //
-    gSystemMemory[Index].Size = _wtoi (MemorySizeStr) * SIZE_1MB;
+    gSystemMemory[Index].Size = ((UINT64)_wtoi (MemorySizeStr)) * ((UINT64)SIZE_1MB);
 
     //
     // Find the next region
