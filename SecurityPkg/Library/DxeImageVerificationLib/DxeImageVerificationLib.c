@@ -1860,7 +1860,9 @@ DxeImageVerificationHandler (
       break;
     }
     WinCertificate = (WIN_CERTIFICATE *) (mImageBase + OffSet);
-    if (SecDataDirLeft < WinCertificate->dwLength) {
+    if (SecDataDirLeft < WinCertificate->dwLength ||
+        (SecDataDirLeft - WinCertificate->dwLength <
+         ALIGN_SIZE (WinCertificate->dwLength))) {
       break;
     }
 
