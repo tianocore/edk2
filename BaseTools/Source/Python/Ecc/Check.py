@@ -1103,11 +1103,11 @@ class Check(object):
                     InfPathList.append(Item[0])
             SqlCommand = """
                          select ID, Path, FullPath from File where upper(FullPath) not in
-                            (select upper(A.Path) || '\\' || upper(B.Value1) from File as A, INF as B
+                            (select upper(A.Path) || '%s' || upper(B.Value1) from File as A, INF as B
                             where A.ID in (select BelongsToFile from INF where Model = %s group by BelongsToFile) and
                             B.BelongsToFile = A.ID and B.Model = %s)
                             and (Model = %s or Model = %s)
-                        """ % (MODEL_EFI_SOURCE_FILE, MODEL_EFI_SOURCE_FILE, MODEL_FILE_C, MODEL_FILE_H)
+                        """ % (os.sep, MODEL_EFI_SOURCE_FILE, MODEL_EFI_SOURCE_FILE, MODEL_FILE_C, MODEL_FILE_H)
             RecordSet = EccGlobalData.gDb.TblInf.Exec(SqlCommand)
             for Record in RecordSet:
                 Path = Record[1]
@@ -1132,9 +1132,9 @@ class Check(object):
                 BelongsToFile = Pcd[4]
                 SqlCommand = """
                              select ID from File where FullPath in
-                            (select B.Path || '\\' || A.Value1 from INF as A, File as B where A.Model = %s and A.BelongsToFile = %s
+                            (select B.Path || '%s' || A.Value1 from INF as A, File as B where A.Model = %s and A.BelongsToFile = %s
                              and B.ID = %s and (B.Model = %s or B.Model = %s))
-                             """ % (MODEL_EFI_SOURCE_FILE, BelongsToFile, BelongsToFile, MODEL_FILE_C, MODEL_FILE_H)
+                             """ % (os.sep, MODEL_EFI_SOURCE_FILE, BelongsToFile, BelongsToFile, MODEL_FILE_C, MODEL_FILE_H)
                 TableSet = EccGlobalData.gDb.TblFile.Exec(SqlCommand)
                 for Tbl in TableSet:
                     TblName = 'Identifier' + str(Tbl[0])
