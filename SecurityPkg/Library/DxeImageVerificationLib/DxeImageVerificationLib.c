@@ -1855,10 +1855,12 @@ DxeImageVerificationHandler (
   for (OffSet = SecDataDir->VirtualAddress;
        OffSet < SecDataDirEnd;
        OffSet += (WinCertificate->dwLength + ALIGN_SIZE (WinCertificate->dwLength))) {
-    WinCertificate = (WIN_CERTIFICATE *) (mImageBase + OffSet);
     SecDataDirLeft = SecDataDirEnd - OffSet;
-    if (SecDataDirLeft <= sizeof (WIN_CERTIFICATE) ||
-        SecDataDirLeft < WinCertificate->dwLength) {
+    if (SecDataDirLeft <= sizeof (WIN_CERTIFICATE)) {
+      break;
+    }
+    WinCertificate = (WIN_CERTIFICATE *) (mImageBase + OffSet);
+    if (SecDataDirLeft < WinCertificate->dwLength) {
       break;
     }
 
