@@ -456,6 +456,7 @@ HashLogExtendEvent (
   if ((Flags & EDKII_TCG_PRE_HASH) != 0 || (Flags & EDKII_TCG_PRE_HASH_LOG_ONLY) != 0) {
     ZeroMem (&DigestList, sizeof(DigestList));
     CopyMem (&DigestList, HashData, sizeof(DigestList));
+    Status = EFI_SUCCESS;
     if ((Flags & EDKII_TCG_PRE_HASH) !=0 ) {
       Status = Tpm2PcrExtend (
                NewEventHdr->PCRIndex,
