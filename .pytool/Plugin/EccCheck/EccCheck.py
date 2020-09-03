@@ -301,7 +301,6 @@ class EccCheck(ICiBuildPlugin):
                              "10011",
                              "10012",
                              "10013",
-                             "10014", #need to be removed after BZ2904 is fixed
                              "10015",
                              "10016",
                              "10017",
