@@ -90,10 +90,10 @@ FreeSsdtSerialPortTableEx (
   UINTN                             Index;
 
   ASSERT (This != NULL);
+  ASSERT (AcpiTableInfo != NULL);
+  ASSERT (CfgMgrProtocol != NULL);
   ASSERT (AcpiTableInfo->TableGeneratorId == This->GeneratorID);
   ASSERT (AcpiTableInfo->AcpiTableSignature == This->AcpiTableSignature);
-  ASSERT (CfgMgrProtocol != NULL);
-  ASSERT (AcpiTableInfo != NULL);
 
   if ((Table == NULL)   ||
       (*Table == NULL)  ||
