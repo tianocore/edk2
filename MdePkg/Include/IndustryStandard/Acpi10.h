@@ -2,6 +2,7 @@
   ACPI 1.0b definitions from the ACPI Specification, revision 1.0b
 
 Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2020, Arm Limited. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
@@ -375,6 +376,90 @@ typedef struct {
 #define EFI_ACPI_MEMORY_WRITE_STATUS_MASK               0x01
 #define   EFI_ACPI_MEMORY_WRITABLE                      0x01
 #define   EFI_ACPI_MEMORY_NON_WRITABLE                  0x00
+
+//
+// Interrupt Vector Flags definitions for Extended Interrupt Descriptor
+// Ref ACPI specification 6.4.3.6
+//
+#define EFI_ACPI_EXTENDED_INTERRUPT_FLAG_PRODUCER_CONSUMER_MASK   BIT0
+#define   EFI_ACPI_EXTENDED_INTERRUPT_FLAG_PRODUCER               0
+#define   EFI_ACPI_EXTENDED_INTERRUPT_FLAG_CONSUMER               BIT0
+
+#define EFI_ACPI_EXTENDED_INTERRUPT_FLAG_MODE_MASK                BIT1
+#define   EFI_ACPI_EXTENDED_INTERRUPT_FLAG_LEVEL_TRIGGERED        0
+#define   EFI_ACPI_EXTENDED_INTERRUPT_FLAG_EDGE_TRIGGERED         BIT1
+
+#define EFI_ACPI_EXTENDED_INTERRUPT_FLAG_POLARITY_MASK            BIT2
+#define   EFI_ACPI_EXTENDED_INTERRUPT_FLAG_ACTIVE_HIGH            0
+#define   EFI_ACPI_EXTENDED_INTERRUPT_FLAG_ACTIVE_LOW             BIT2
+
+#define EFI_ACPI_EXTENDED_INTERRUPT_FLAG_SHARABLE_MASK            BIT3
+#define   EFI_ACPI_EXTENDED_INTERRUPT_FLAG_EXCLUSIVE              0
+#define   EFI_ACPI_EXTENDED_INTERRUPT_FLAG_SHARED                 BIT3
+
+#define EFI_ACPI_EXTENDED_INTERRUPT_FLAG_WAKE_CAPABLITY_MASK      BIT4
+#define   EFI_ACPI_EXTENDED_INTERRUPT_FLAG_NOT_WAKE_CAPABLE       0
+#define   EFI_ACPI_EXTENDED_INTERRUPT_FLAG_WAKE_CAPABLE           BIT4
+
+/* Helper macros to test Extended Interrupt Resource descriptor flags.
+*/
+
+/** Test the Extended Interrupt flags to determine if the Device
+    is an Interrupt Consumer or Producer.
+
+  @param [in]  Flag       Extended Interrupt Resource descriptor flag.
+
+  @retval TRUE            Device is Interrupt Consumer.
+  @retval FALSE           Device is Interrupt Producer.
+*/
+#define IS_EXTENDED_INTERRUPT_CONSUMER(Flag)                      \
+  (((Flag) & EFI_ACPI_EXTENDED_INTERRUPT_FLAG_CONSUMER) ==        \
+    EFI_ACPI_EXTENDED_INTERRUPT_FLAG_CONSUMER)
+
+/** Test if the Extended Interrupt is Edge or Level triggered.
+
+  @param [in]  Flag       Extended Interrupt Resource descriptor flag.
+
+  @retval TRUE            Interrupt is Edge triggered.
+  @retval FALSE           Interrupt is Level triggered.
+*/
+#define IS_EXTENDED_INTERRUPT_EDGE_TRIGGERED(Flag)                \
+  (((Flag) & EFI_ACPI_EXTENDED_INTERRUPT_FLAG_EDGE_TRIGGERED) ==  \
+    EFI_ACPI_EXTENDED_INTERRUPT_FLAG_EDGE_TRIGGERED)
+
+/** Test if the Extended Interrupt is Active Low or Active High.
+
+  @param [in]  Flag       Extended Interrupt Resource descriptor flag.
+
+  @retval TRUE            Interrupt is Active Low.
+  @retval FALSE           Interrupt is Active High.
+*/
+#define IS_EXTENDED_INTERRUPT_ACTIVE_LOW(Flag)                    \
+  (((Flag) & EFI_ACPI_EXTENDED_INTERRUPT_FLAG_ACTIVE_LOW) ==      \
+    EFI_ACPI_EXTENDED_INTERRUPT_FLAG_ACTIVE_LOW)
+
+/** Test if the Extended Interrupt is Shared or Exclusive.
+
+  @param [in]  Flag       Extended Interrupt Resource descriptor flag.
+
+  @retval TRUE            Interrupt is Shared.
+  @retval FALSE           Interrupt is Exclusive.
+*/
+#define IS_EXTENDED_INTERRUPT_SHARED(Flag)                        \
+  (((Flag) & EFI_ACPI_EXTENDED_INTERRUPT_FLAG_SHARED) ==          \
+    EFI_ACPI_EXTENDED_INTERRUPT_FLAG_SHARED)
+
+/** Test the Extended Interrupt flags to determine if the Device
+    is Wake capable or not.
+
+  @param [in]  Flag       Extended Interrupt Resource descriptor flag.
+
+  @retval TRUE            Interrupt is Wake Capable.
+  @retval FALSE           Interrupt is not Wake Capable.
+*/
+#define IS_EXTENDED_INTERRUPT_WAKE_CAPABLE(Flag)                  \
+  (((Flag) & EFI_ACPI_EXTENDED_INTERRUPT_FLAG_WAKE_CAPABLE) ==    \
+    EFI_ACPI_EXTENDED_INTERRUPT_FLAG_WAKE_CAPABLE)
 
 //
 // Ensure proper structure formats
