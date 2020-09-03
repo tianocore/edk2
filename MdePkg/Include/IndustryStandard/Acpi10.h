@@ -2,6 +2,7 @@
   ACPI 1.0b definitions from the ACPI Specification, revision 1.0b
 
 Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2020, Arm Limited. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
@@ -375,6 +376,16 @@ typedef struct {
 #define EFI_ACPI_MEMORY_WRITE_STATUS_MASK               0x01
 #define   EFI_ACPI_MEMORY_WRITABLE                      0x01
 #define   EFI_ACPI_MEMORY_NON_WRITABLE                  0x00
+
+//
+// Interrupt Vector Flags definitions for Extended Interrupt Descriptor
+// Ref ACPI specification 6.4.3.6
+//
+#define EFI_ACPI_EXTENDED_INTERRUPT_FLAG_PRODUCER_CONSUMER_MASK   BIT0
+#define EFI_ACPI_EXTENDED_INTERRUPT_FLAG_MODE_MASK                BIT1
+#define EFI_ACPI_EXTENDED_INTERRUPT_FLAG_POLARITY_MASK            BIT2
+#define EFI_ACPI_EXTENDED_INTERRUPT_FLAG_SHARABLE_MASK            BIT3
+#define EFI_ACPI_EXTENDED_INTERRUPT_FLAG_WAKE_CAPABLITY_MASK      BIT4
 
 //
 // Ensure proper structure formats
