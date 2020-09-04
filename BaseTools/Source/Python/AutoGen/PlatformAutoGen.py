@@ -253,7 +253,7 @@ class PlatformAutoGen(AutoGen):
         VariableInfo.SetVpdRegionMaxSize(VpdRegionSize)
         VariableInfo.SetVpdRegionOffset(VpdRegionBase)
         Index = 0
-        for Pcd in DynamicPcdSet:
+        for Pcd in sorted(DynamicPcdSet):
             pcdname = ".".join((Pcd.TokenSpaceGuidCName, Pcd.TokenCName))
             for SkuName in Pcd.SkuInfoList:
                 Sku = Pcd.SkuInfoList[SkuName]
