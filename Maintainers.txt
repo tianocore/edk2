@@ -98,6 +98,11 @@ F: */Arm/
 M: Leif Lindholm <leif@nuviainc.com>
 M: Ard Biesheuvel <ard.biesheuvel@arm.com>
 
+RISCV64
+F: */RiscV64/
+M: Abner Chang <abner.chang@hpe.com>
+R: Daniel Schaefer <daniel.schaefer@hpe.com>
+
 EDK II Continuous Integration:
 ------------------------------
 .azurepipelines/
