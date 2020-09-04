@@ -51,8 +51,6 @@
 #define SEC_PER_MIN                                     ((UINTN)    60)
 #define SEC_PER_HOUR                                    ((UINTN)  3600)
 #define SEC_PER_DAY                                     ((UINTN) 86400)
-#define SEC_PER_MONTH                                   ((UINTN)  2,592,000)
-#define SEC_PER_YEAR                                    ((UINTN) 31,536,000)
 
 BOOLEAN
 EFIAPI
