@@ -8,6 +8,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "FormDisplay.h"
 
+STATIC CONST INTN mDayOfMonth[12] = {
+  31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31
+};
+
 /**
   Get maximum and minimum info from this opcode.
 
@@ -929,6 +933,13 @@ EnterCarriageReturn:
         switch (MenuOption->Sequence) {
         case 0:
           QuestionValue->Value.date.Month = (UINT8) EditValue;
+          //
+          // Check whether the number of days corresponding to the current month is legal.
+          // and reset to the minimum number of days if illegal.
+          //
+          if ( QuestionValue->Value.date.Day > mDayOfMonth[QuestionValue->Value.date.Month - 1]) {
+            QuestionValue->Value.date.Day = (UINT8)Minimum;
+          }
           break;
 
         case 1:
