@@ -2584,7 +2584,7 @@ class DscBuildData(PlatformBuildClassObject):
         CApp = CApp + '\n'
         for Pcd in StructuredPcds.values():
             CApp = CApp + self.GenerateArrayAssignment(Pcd)
-        for PcdName in StructuredPcds:
+        for PcdName in sorted(StructuredPcds.keys()):
             Pcd = StructuredPcds[PcdName]
             CApp = CApp + self.GenerateSizeFunction(Pcd)
             CApp = CApp + self.GenerateDefaultValueAssignFunction(Pcd)
