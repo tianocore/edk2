@@ -1,7 +1,7 @@
 /** @file
   CPU Register Table Library functions.
 
-  Copyright (c) 2016 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2020, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -11,7 +11,6 @@
 #include <Library/HobLib.h>
 #include <Library/PeiServicesLib.h>
 #include <Library/PeiServicesTablePointerLib.h>
-#include <Ppi/MpServices.h>
 #include <Ppi/MpServices2.h>
 
 #include "RegisterCpuFeatures.h"
@@ -75,10 +74,10 @@ GetMpService (
   MP_SERVICES                MpService;
 
   //
-  // Get MP Services Protocol
+  // Get MP Services2 Ppi
   //
   Status = PeiServicesLocatePpi (
-             &gEfiPeiMpServicesPpiGuid,
+             &gEdkiiPeiMpServices2PpiGuid,
              0,
              NULL,
              (VOID **)&MpService.Ppi
@@ -100,17 +99,17 @@ GetProcessorIndex (
   )
 {
   EFI_STATUS                 Status;
-  EFI_PEI_MP_SERVICES_PPI    *CpuMpPpi;
+  EDKII_PEI_MP_SERVICES2_PPI *CpuMp2Ppi;
   UINTN                      ProcessorIndex;
 
-  CpuMpPpi = CpuFeaturesData->MpService.Ppi;
+  CpuMp2Ppi = CpuFeaturesData->MpService.Ppi;
 
   //
   // For two reasons which use NULL for WhoAmI:
   // 1. This function will be called by APs and AP should not use PeiServices Table
   // 2. Check WhoAmI implementation, this parameter will not be used.
   //
-  Status = CpuMpPpi->WhoAmI(NULL, CpuMpPpi, &ProcessorIndex);
+  Status = CpuMp2Ppi->WhoAmI (CpuMp2Ppi, &ProcessorIndex);
   ASSERT_EFI_ERROR (Status);
   return ProcessorIndex;
 }
@@ -131,16 +130,15 @@ GetProcessorInformation (
   OUT EFI_PROCESSOR_INFORMATION        *ProcessorInfoBuffer
   )
 {
-  EFI_PEI_MP_SERVICES_PPI    *CpuMpPpi;
+  EDKII_PEI_MP_SERVICES2_PPI *CpuMp2Ppi;
   EFI_STATUS                 Status;
   CPU_FEATURES_DATA          *CpuFeaturesData;
 
   CpuFeaturesData = GetCpuFeaturesData ();
-  CpuMpPpi = CpuFeaturesData->MpService.Ppi;
+  CpuMp2Ppi = CpuFeaturesData->MpService.Ppi;
 
-  Status = CpuMpPpi->GetProcessorInfo (
-               GetPeiServicesTablePointer(),
-               CpuMpPpi,
+  Status = CpuMp2Ppi->GetProcessorInfo (
+               CpuMp2Ppi,
                ProcessorNumber,
                ProcessorInfoBuffer
                );
@@ -162,18 +160,17 @@ StartupAllAPsWorker (
   )
 {
   EFI_STATUS                           Status;
-  EFI_PEI_MP_SERVICES_PPI              *CpuMpPpi;
+  EDKII_PEI_MP_SERVICES2_PPI           *CpuMp2Ppi;
   CPU_FEATURES_DATA                    *CpuFeaturesData;
 
   CpuFeaturesData = GetCpuFeaturesData ();
-  CpuMpPpi = CpuFeaturesData->MpService.Ppi;
+  CpuMp2Ppi = CpuFeaturesData->MpService.Ppi;
 
   //
   // Wakeup all APs for data collection.
   //
-  Status = CpuMpPpi->StartupAllAPs (
-                 GetPeiServicesTablePointer (),
-                 CpuMpPpi,
+  Status = CpuMp2Ppi->StartupAllAPs (
+                 CpuMp2Ppi,
                  Procedure,
                  FALSE,
                  0,
@@ -203,17 +200,7 @@ StartupAllCPUsWorker (
   //
   // Get MP Services2 Ppi
   //
-  Status = PeiServicesLocatePpi (
-             &gEdkiiPeiMpServices2PpiGuid,
-             0,
-             NULL,
-             (VOID **)&CpuMp2Ppi
-             );
-  ASSERT_EFI_ERROR (Status);
-
-  //
-  // Wakeup all APs for data collection.
-  //
+  CpuMp2Ppi = CpuFeaturesData->MpService.Ppi;
   Status = CpuMp2Ppi->StartupAllCPUs (
                  CpuMp2Ppi,
                  Procedure,
@@ -234,18 +221,17 @@ SwitchNewBsp (
   )
 {
   EFI_STATUS                           Status;
-  EFI_PEI_MP_SERVICES_PPI              *CpuMpPpi;
+  EDKII_PEI_MP_SERVICES2_PPI           *CpuMp2Ppi;
   CPU_FEATURES_DATA                    *CpuFeaturesData;
 
   CpuFeaturesData = GetCpuFeaturesData ();
-  CpuMpPpi = CpuFeaturesData->MpService.Ppi;
+  CpuMp2Ppi = CpuFeaturesData->MpService.Ppi;
 
   //
   // Wakeup all APs for data collection.
   //
-  Status = CpuMpPpi->SwitchBSP (
-                 GetPeiServicesTablePointer (),
-                 CpuMpPpi,
+  Status = CpuMp2Ppi->SwitchBSP (
+                 CpuMp2Ppi,
                  ProcessorNumber,
                  TRUE
                  );
@@ -269,18 +255,17 @@ GetNumberOfProcessor (
   )
 {
   EFI_STATUS                 Status;
-  EFI_PEI_MP_SERVICES_PPI    *CpuMpPpi;
+  EDKII_PEI_MP_SERVICES2_PPI *CpuMp2Ppi;
   CPU_FEATURES_DATA          *CpuFeaturesData;
 
   CpuFeaturesData = GetCpuFeaturesData ();
-  CpuMpPpi = CpuFeaturesData->MpService.Ppi;
+  CpuMp2Ppi = CpuFeaturesData->MpService.Ppi;
 
   //
   // Get the number of CPUs
   //
-  Status = CpuMpPpi->GetNumberOfProcessors (
-                         GetPeiServicesTablePointer (),
-                         CpuMpPpi,
+  Status = CpuMp2Ppi->GetNumberOfProcessors (
+                         CpuMp2Ppi,
                          NumberOfCpus,
                          NumberOfEnabledProcessors
                          );
