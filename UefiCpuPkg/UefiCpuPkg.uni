@@ -140,9 +140,13 @@
 
 #string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuHotPlugDataAddress_HELP  #language en-US "Contains the pointer to a CPU Hot Plug Data structure if CPU hot-plug is supported."
 
-#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuNumberOfReservedVariableMtrrs_PROMPT  #language en-US "Number of reserved variable MTRRs"
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuDisableMtrrProgramming_PROMPT  #language en-US "Number of reserved variable MTRRs"
 
-#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuNumberOfReservedVariableMtrrs_HELP  #language en-US "Specifies the number of variable MTRRs reserved for OS use."
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuDisableMtrrProgramming_HELP  #language en-US "Specifies the number of variable MTRRs reserved for OS use."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuNumberOfReservedVariableMtrrs_PROMPT  #language en-US "Disable MTRR programming."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuNumberOfReservedVariableMtrrs_HELP  #language en-US "Disables MTRR programming in case it's already programmed by FSB."
 
 #string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuApLoopMode_PROMPT  #language en-US "The AP wait loop state"
 

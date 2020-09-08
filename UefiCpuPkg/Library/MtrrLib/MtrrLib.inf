@@ -37,4 +37,4 @@
 
 [Pcd]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuNumberOfReservedVariableMtrrs   ## SOMETIMES_CONSUMES
-
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuDisableMtrrProgramming ## CONSUMES
