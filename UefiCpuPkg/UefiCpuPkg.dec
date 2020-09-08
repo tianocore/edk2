@@ -217,6 +217,10 @@
   # @Prompt SMM Code Access Check.
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmCodeAccessCheckEnable|TRUE|BOOLEAN|0x60000013
 
+  ## Disables MTRR programming in case it's already programmed by FSB.
+  # @Prompt Disable MTRR programming.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuDisableMtrrProgramming|FALSE|BOOLEAN|0x00000017
+
   ## Specifies the number of variable MTRRs reserved for OS use. The default number of
   #  MTRRs reserved for OS use is 2.
   # @Prompt Number of reserved variable MTRRs.

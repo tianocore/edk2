@@ -15,7 +15,6 @@
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = MtrrLib
 
-
 #
 # The following information is for reference only and not required by the build tools.
 #
@@ -37,4 +36,5 @@
 
 [Pcd]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuNumberOfReservedVariableMtrrs   ## SOMETIMES_CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuDisableMtrrProgramming          ## CONSUMES
 

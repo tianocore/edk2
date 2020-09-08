@@ -2845,6 +2845,10 @@ IsMtrrSupported (
   CPUID_VERSION_INFO_EDX     Edx;
   MSR_IA32_MTRRCAP_REGISTER  MtrrCap;
 
+  if (PcdGetBool (PcdCpuDisableMtrrProgramming)) {
+    return FALSE;
+  }
+
   //
   // Check CPUID(1).EDX[12] for MTRR capability
   //
