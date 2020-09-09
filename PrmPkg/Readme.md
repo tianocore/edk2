@@ -13,6 +13,14 @@ to be leveraged by platform firmware with minimal overhead to integrate PRM func
 formal design and is not validated at product quality. The development of this feature is shared in the edk2-staging
 branch to simplify collaboration by allowing direct code contributions and early feedback throughout its development.
 
+> By default, the build makes use of a new ACPI OperationRegion type specifically introduced for PRM called
+`PlatformRtMechanism`. Support for this OperationRegion is planned for the next release of the ACPI specification.
+However, support for `PlatformRtMechanism` is already included in the iASL Compiler/Disassembler for early prototyping
+(i.e. this package). If you would like the default build to work and/or to use PRM handlers that are invoked
+through ACPI, iASL compiler [20200528](https://acpica.org/node/181) or greater must be used. If you are only
+interested in compiling the code and/or using direct call style PRM handlers, you can simply remove
+`PrmSsdtInstallDxe` from `PrmPkg.dsc`.
+
 ## How to Build PrmPkg
 As noted earlier, resources in `PrmPkg` are intended to be referenced by a platform firmware so it can adopt support
 for PRM. In that case, the platform firmware should add the `PrmConfigDxe` and `PrmLoaderDxe` drivers to its DSC and
@@ -59,6 +67,21 @@ To build `PrmPkg` as a standalone package:
    ``build -p PrmPkg/PrmPkg.dsc -a IA32 -a X64``
    > __*Note*__: Due to the way PRM modules are compiled with exports, **only building on Visual Studio compiler tool
    chains is currently supported**.
+
+In the future, each new terminal session can start at step #4. Within a terminal session, start at step #8.
+
+> __*Note*__: \
+> This package has been used without modification in several environments including client, server,
+> and virtual systems.
+>
+> A functional example of how to integrate this code into a platform is available here:
+> https://github.com/makubacki/edk2/tree/sample_ovmfpkg_prmpkg_integration
+>
+> That build will load the drivers and PRM sample modules provided in this package in the open source emulator
+> [QEMU](https://www.qemu.org/) by including it in the [`OvmfPkg`](https://github.com/tianocore/edk2/tree/master/OvmfPkg) build.
+>
+> You can add your own PRM modules into the build and check them with the `PrmInfo` UEFI application described
+> later in this document and dump the PRMT table in the OS to check if your PRM module is represented as expected.
 
 ### Build Flags
 As PRM is a new feature at a proof-of-concept (POC) level of maturity, there's some changes to the normal build
