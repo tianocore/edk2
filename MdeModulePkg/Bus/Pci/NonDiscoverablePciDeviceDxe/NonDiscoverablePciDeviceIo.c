@@ -856,6 +856,10 @@ CoherentPciIoAllocateBuffer (
     return EFI_UNSUPPORTED;
   }
 
+  if (HostAddress == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   if ((MemoryType != EfiBootServicesData) &&
       (MemoryType != EfiRuntimeServicesData)) {
     return EFI_INVALID_PARAMETER;
