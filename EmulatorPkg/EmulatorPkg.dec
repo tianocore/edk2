@@ -11,7 +11,7 @@
 ##
 
 [Defines]
-  DEC_VERSION                    = 0x00010005
+  DEC_SPECIFICATION              = 0x00010005
   PACKAGE_NAME                   = EmulatorPkg
   PACKAGE_GUID                   = 36E48BD7-7D92-5A47-A2CD-513F072E3300
   PACKAGE_VERSION                = 0.1
