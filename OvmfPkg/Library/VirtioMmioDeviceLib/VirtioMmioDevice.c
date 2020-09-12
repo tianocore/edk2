@@ -58,7 +58,6 @@ VirtioMmioInit (
   )
 {
   UINT32     MagicValue;
-  UINT32     VendorId;
   UINT32     Version;
 
   //
@@ -82,20 +81,6 @@ VirtioMmioInit (
   Version = VIRTIO_CFG_READ (Device, VIRTIO_MMIO_OFFSET_VERSION);
   if (Version != 1) {
     return EFI_UNSUPPORTED;
-  }
-
-  //
-  // Double-check MMIO-specific values
-  //
-  VendorId = VIRTIO_CFG_READ (Device, VIRTIO_MMIO_OFFSET_VENDOR_ID);
-  if (VendorId != VIRTIO_VENDOR_ID) {
-    //
-    // The ARM Base and Foundation Models do not report a valid VirtIo VendorId.
-    // They return a value of 0x0 for the VendorId.
-    //
-    DEBUG((DEBUG_WARN, "VirtioMmioInit: Warning: The VendorId (0x%X) does not "
-                       "match the VirtIo VendorId (0x%X).\n",
-                       VendorId, VIRTIO_VENDOR_ID));
   }
 
   return EFI_SUCCESS;
