@@ -1,0 +1,93 @@
+## @file
+#  This is the first module for UEFI payload.
+#
+#  Copyright (c) 2006 - 2020, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PayloadEntry
+  FILE_GUID                      = 2119BBD7-9432-4f47-B5E2-5C4EA31B6BDC
+  MODULE_TYPE                    = SEC
+  VERSION_STRING                 = 1.0
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  UefiPayloadEntry.c
+  LoadDxeCore.c
+  MemoryAllocation.c
+
+[Sources.Ia32]
+  X64/VirtualMemory.h
+  X64/VirtualMemory.c
+  Ia32/DxeLoadFunc.c
+  Ia32/IdtVectorAsm.nasm
+  Ia32/SecEntry.nasm
+
+[Sources.X64]
+  X64/VirtualMemory.h
+  X64/VirtualMemory.c
+  X64/DxeLoadFunc.c
+  X64/SecEntry.nasm
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+  UefiPayloadPkg/UefiPayloadPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  BaseLib
+  SerialPortLib
+  IoLib
+  BlParseLib
+  HobLib
+  PeCoffLib
+  PlatformSupportLib
+  UefiCpuLib
+
+[Guids]
+  gEfiMemoryTypeInformationGuid
+  gEfiFirmwareFileSystem2Guid
+  gUefiSystemTableInfoGuid
+  gEfiGraphicsInfoHobGuid
+  gEfiGraphicsDeviceInfoHobGuid
+  gUefiAcpiBoardInfoGuid
+
+[FeaturePcd.IA32]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode      ## CONSUMES
+
+[FeaturePcd.X64]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplBuildPageTables       ## CONSUMES
+
+
+[Pcd.IA32,Pcd.X64]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable                      ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPteMemoryEncryptionAddressOrMask    ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdNullPointerDetectionPropertyMask    ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHeapGuardPropertyMask               ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard                       ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUse5LevelPageTable                  ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdGhcbBase                            ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdGhcbSize                            ## CONSUMES
+
+  gUefiPayloadPkgTokenSpaceGuid.PcdPayloadFdMemBase
+  gUefiPayloadPkgTokenSpaceGuid.PcdPayloadFdMemSize
+  gUefiPayloadPkgTokenSpaceGuid.PcdPayloadStackTop
+  gUefiPayloadPkgTokenSpaceGuid.PcdSystemMemoryUefiRegionSize
+
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack               ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeNxMemoryProtectionPolicy ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdImageProtectionPolicy       ## SOMETIMES_CONSUMES
+
