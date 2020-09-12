@@ -1,6 +1,6 @@
 ================================================================================
 Build And Integration Instructions
-2019 March 27th
+2020 Aug 1st
 ================================================================================
 
 ================================================================================
@@ -35,26 +35,24 @@ integrate it into coreboot or Slim Bootloader firmware.
 B. HOW TO BUILD
 ================================================================================
 1. Run the below two commands in windows command prompt window:
-   edksetup.bat
+   > edksetup.bat
 
-   For debug ia32 build:
-   build -a IA32 -p UefiPayloadPkg\UefiPayloadPkgIa32.dsc -b DEBUG -t <ToolChain> -D BOOTLOADER=<Bootloader>
+   For pure X64 build:
+   > build -a x64 -p UefiPayloadPkg\UefiPayloadPkg.dsc -b <BuildType> -t <ToolChain>
+     -D BOOTLOADER=<Bootloader>
 
-   For release ia32 build:
-   build -a IA32 -p UefiPayloadPkg\UefiPayloadPkgIa32.dsc -b RELEASE -t <ToolChain> -D BOOTLOADER=<Bootloader>
+   For X64 build with IA32 entry point:
+   > build -a IA32 -a X64 -p UefiPayloadPkg\UefiPayloadPkg.dsc -b <BuildType> -t <ToolChain>
+     -D BOOTLOADER=<Bootloader>
 
-   For debug X64 build:
-   build -a IA32 -a X64 -p UefiPayloadPkg\UefiPayloadPkgIa32X64.dsc -b DEBUG -t <ToolChain> -D BOOTLOADER=<Bootloader>
-
-   For release X64 build:
-   build -a IA32 -a X64 -p UefiPayloadPkg\UefiPayloadPkgIa32X64.dsc -b RELEASE -t <ToolChain> -D BOOTLOADER=<Bootloader>
-
-   <ToolChain> is the EDK II build environment on your host. Currently it was tested
-   with VS2015x86 toolchain.
+   <BuildType> support 'DEBUG', 'RELEASE' and 'NOOPT'.
+   <ToolChain> is the EDK II build environment on your host. Tested with VS2015x86 toolchain.
    <Bootloader> could be "SBL" for Slim Bootloader and "COREBOOT" for coreboot.
 
    Refer to https://github.com/tianocore/tianocore.github.io/wiki/UDK2018-How-to-Build for
    details about EDK II build steps.
+
+   NOTE: Pure 32bit UEFI payload support could be added if required later.
 
 2. If build is successfully, the payload image (UEFIPAYLOAD.fd) will be generated inside the
    folder of Build\UefiPayloadPkg.
@@ -65,9 +63,9 @@ C. HOW TO INTEGRATE INTO COREBOOT
 1. Copy the payload image (UEFIPAYLOAD.fd) into the top-level directory of Coreboot source tree.
 2. Run "make menuconfig" in linux console to start Coreboot configuration surface.
 3. In the Payload section,
-   1) Choose "An ELF executable payload" for the option of "Add a payload".
-   2) Type the path of payload image for the option of "Payload path and filename".
-   3) Select the option of "Use LZMA compression for payloads".
+   1) Choose "Tianocore Payload" for the option of "Add a payload".
+   2) Update the path of payload image for the option of "Tianocore binary".
+   3) Choose "UEFIPayload" for the option of "Tianocore Payload".
 4. If the graphics console is required in UEFI payload, enable framebuffer initialization in coreboot.
    This could be done by enabling native graphics or using VGA BIOS option rom.
 5. Build the coreboot firmware image.
