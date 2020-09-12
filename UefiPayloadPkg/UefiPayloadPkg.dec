@@ -3,7 +3,7 @@
 #
 # Provides drivers and definitions to create uefi payload for bootloaders.
 #
-# Copyright (c) 2014 - 2019, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2014 - 2020, Intel Corporation. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -68,4 +68,5 @@ gUefiPayloadPkgTokenSpaceGuid.PcdMemoryTypeEfiReservedMemoryType|0x04|UINT32|0x0
 gUefiPayloadPkgTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData|0xC0|UINT32|0x00000015
 gUefiPayloadPkgTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesCode|0x80|UINT32|0x00000016
 
-
+# Size of the region used by UEFI in permanent memory
+gUefiPayloadPkgTokenSpaceGuid.PcdSystemMemoryUefiRegionSize|0x02000000|UINT32|0x00000017
