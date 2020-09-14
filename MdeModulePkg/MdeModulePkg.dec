@@ -2091,5 +2091,12 @@
   # @Prompt 64bit VPD base address.
   gEfiMdeModulePkgTokenSpaceGuid.PcdVpdBaseAddress64|0x0|UINT64|0x00030006
 
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTestStructPcd|{0}|WALTZ_TEST_MAP|0x80000014 {
+    <HeaderFiles>
+      Pcd/TestPcd.h
+    <Packages>
+      MdeModulePkg/MdeModulePkg.dec
+  }
+
 [UserExtensions.TianoCore."ExtraFiles"]
   MdeModulePkgExtra.uni

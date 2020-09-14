@@ -487,8 +487,16 @@
   MdeModulePkg/Universal/SmmCommunicationBufferDxe/SmmCommunicationBufferDxe.inf
   MdeModulePkg/Universal/Disk/RamDiskDxe/RamDiskDxe.inf
 
+  MdeModulePkg/Library/TestPcdNullLib/TestPcdNullLib.inf
+
 [Components.X64]
   MdeModulePkg/Universal/CapsulePei/CapsuleX64.inf
+
+[PcdsDynamicExDefault]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTestStructPcd.Tango[0].Dance[0]  |0x1
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTestStructPcd.Tango[0].Dance[1]  |0x2
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTestStructPcd.Tango[0].Dance[2]  |0x3
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTestStructPcd.Tango[0].Dance[3]  |0x4
 
 [BuildOptions]
   *_*_*_CC_FLAGS = -D DISABLE_NEW_DEPRECATED_INTERFACES
