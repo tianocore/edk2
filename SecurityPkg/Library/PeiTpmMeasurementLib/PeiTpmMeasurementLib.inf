@@ -46,5 +46,4 @@
   gEdkiiTcgPpiGuid                                                     ## CONSUMES
 
 [Depex]
-  gEfiPeiMasterBootModePpiGuid AND
-  gEfiTpmDeviceSelectedGuid
+  gEfiPeiMasterBootModePpiGuid
