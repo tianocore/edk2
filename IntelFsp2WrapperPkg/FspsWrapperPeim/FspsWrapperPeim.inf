@@ -77,5 +77,4 @@
   FspsWrapperPeim.c
 
 [Depex]
-  gEfiPeiMemoryDiscoveredPpiGuid AND
-  gPeiTpmInitializationDonePpiGuid
+  gEfiPeiMemoryDiscoveredPpiGuid
