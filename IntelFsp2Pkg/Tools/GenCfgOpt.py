@@ -1177,6 +1177,7 @@ EndList
         UpdSignatureCheck = ['FSPT_UPD_SIGNATURE', 'FSPM_UPD_SIGNATURE', 'FSPS_UPD_SIGNATURE']
         ExcludedSpecificUpd = ['FSPT_ARCH_UPD', 'FSPM_ARCH_UPD', 'FSPS_ARCH_UPD']
 
+        IncLines = []
         if InputHeaderFile != '':
             if not os.path.exists(InputHeaderFile):
                  self.Error = "Input header file '%s' does not exist" % InputHeaderFile
