@@ -186,12 +186,13 @@ INF  MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
 INF  MdeModulePkg/Universal/PrintDxe/PrintDxe.inf
 INF  MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
 !if "XCODE5" not in $(TOOL_CHAIN_TAG)
-INF  MdeModulePkg/Logo/LogoDxe.inf
+INF  RuleOverride = BrotliCompression MdeModulePkg/Logo/LogoDxe.inf
 !endif
 INF  MdeModulePkg/Universal/LoadFileOnFv2/LoadFileOnFv2.inf
 INF  RuleOverride = UI MdeModulePkg/Application/UiApp/UiApp.inf
 INF  MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp.inf
 INF  MdeModulePkg/Universal/DriverSampleDxe/DriverSampleDxe.inf
+INF  MdeModulePkg/Universal/FvSimpleFileSystemDxe/FvSimpleFileSystemDxe.inf
 
 #
 # Secure Boot Key Enroll
@@ -268,6 +269,16 @@ INF  ShellPkg/Application/Shell/Shell.inf
         UI       STRING="$(MODULE_NAME)" Optional
         VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
       }
+    }
+  }
+
+[Rule.Common.DXE_DRIVER.BrotliCompression]
+  FILE DRIVER = $(NAMED_GUID) {
+    DXE_DEPEX    DXE_DEPEX Optional      $(INF_OUTPUT)/$(MODULE_NAME).depex
+    GUIDED 3D532050-5CDA-4FD0-879E-0F7F630D5AFB {
+      PE32     PE32                    $(INF_OUTPUT)/$(MODULE_NAME).efi
+      UI       STRING="$(MODULE_NAME)" Optional
+      VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
     }
   }
 
