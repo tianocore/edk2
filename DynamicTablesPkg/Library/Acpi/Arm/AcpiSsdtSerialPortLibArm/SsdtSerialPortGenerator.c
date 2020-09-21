@@ -171,7 +171,7 @@ BuildSsdtSerialPortTableEx (
   CM_ARM_SERIAL_PORT_INFO       * SerialPortInfo;
   UINT32                          SerialPortCount;
   UINTN                           Index;
-  CHAR8                           NewName[] = "COMx";
+  CHAR8                           NewName[5];
   UINT64                          Uid;
   EFI_ACPI_DESCRIPTION_HEADER  ** TableList;
 
@@ -243,6 +243,10 @@ BuildSsdtSerialPortTableEx (
   // can be done in case of failure.
   *Table = TableList;
 
+  NewName[0] = 'C';
+  NewName[1] = 'O';
+  NewName[2] = 'M';
+  NewName[4] = '\0';
   for (Index = 0; Index < SerialPortCount; Index++) {
     Uid = SERIAL_PORT_START_UID + Index;
     NewName[3] = AsciiFromHex ((UINT8)(Uid));
