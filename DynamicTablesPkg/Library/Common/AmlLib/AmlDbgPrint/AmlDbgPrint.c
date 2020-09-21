@@ -163,11 +163,11 @@ AmlDbgPrintNameString (
   }
 
   if (SegCount != 0) {
-    AmlDbgPrintNameSeg (Buffer);
+    AMLDBG_PRINT_NAMESEG (Buffer);
     Buffer += AML_NAME_SEG_SIZE;
     for (Index = 0; Index < SegCount - 1; Index++) {
       DEBUG ((DEBUG_INFO, "."));
-      AmlDbgPrintNameSeg (Buffer);
+      AMLDBG_PRINT_NAMESEG (Buffer);
       Buffer += AML_NAME_SEG_SIZE;
     }
   }
@@ -232,7 +232,7 @@ AmlDbgPrintDataNode (
 
   if ((DataNode->DataType == EAmlNodeDataTypeNameString) ||
       (DataNode->DataType == EAmlNodeDataTypeString)) {
-    AmlDbgPrintChars (
+    AMLDBG_PRINT_CHARS (
       DEBUG_INFO,
       (CONST CHAR8*)DataNode->Buffer,
       DataNode->Size
@@ -316,7 +316,7 @@ AmlDbgPrintObjectNode (
   DEBUG ((DEBUG_INFO, "0x%08x | ", ObjectNode->AmlByteEncoding->Attribute));
   DEBUG ((DEBUG_INFO, "0x%04x | ", ObjectNode->PkgLen));
   if (AmlNodeHasAttribute (ObjectNode, AML_IN_NAMESPACE)) {
-    AmlDbgPrintNameString (
+    AMLDBG_PRINT_NAMESTR (
       AmlNodeGetName ((CONST AML_OBJECT_NODE*)ObjectNode),
       FALSE
       );
@@ -488,7 +488,7 @@ AmlDbgPrintTree (
 **/
 VOID
 EFIAPI
-DumpRaw (
+AmlDbgDumpRaw (
   IN  CONST UINT8   * Ptr,
   IN        UINT32    Length
   )
