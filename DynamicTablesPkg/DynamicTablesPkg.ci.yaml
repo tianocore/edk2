@@ -71,6 +71,7 @@
         "ExtendWords": [
            "ARMHB",                  # ARMHB000
            "ARMLTD",
+           "AMLDBG",
            "EISAID",
            "CCIDX",
            "CCSIDR",

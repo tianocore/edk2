@@ -1140,13 +1140,13 @@ AmlEnumeratePathCallback (
     "Comparing search path with current node path.\n"
     ));
   DEBUG ((DEBUG_VERBOSE, "Search path:"));
-  AmlDbgPrintChars (
+  AMLDBG_PRINT_CHARS (
     DEBUG_VERBOSE,
     (CHAR8*)AmlStreamGetCurrPos (SearchPathBStream),
     AmlStreamGetIndex (SearchPathBStream)
     );
   DEBUG ((DEBUG_VERBOSE, "\nPath of the current node: "));
-  AmlDbgPrintChars (
+  AMLDBG_PRINT_CHARS (
     DEBUG_VERBOSE,
     (CHAR8*)AmlStreamGetCurrPos (CurrNodePathBStream),
     AmlStreamGetIndex (CurrNodePathBStream)
