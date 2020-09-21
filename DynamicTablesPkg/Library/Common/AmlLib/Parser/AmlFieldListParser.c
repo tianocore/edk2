@@ -82,7 +82,7 @@ AmlParseFieldElement (
   }
 
   // Skip the field opcode (1 byte) as it is already in the FieldByteEncoding.
-  DumpRaw (CurrPos, 1);
+  AMLDBG_DUMP_RAW (CurrPos, 1);
   Status = AmlStreamProgress (FStream, 1);
   if (EFI_ERROR (Status)) {
     ASSERT (0);
@@ -106,7 +106,7 @@ AmlParseFieldElement (
     }
 
     // Move stream forward as the PkgLen has been read.
-    DumpRaw (CurrPos, PkgLenOffset);
+    AMLDBG_DUMP_RAW (CurrPos, PkgLenOffset);
     Status = AmlStreamProgress (FStream, PkgLenOffset);
     if (EFI_ERROR (Status)) {
       ASSERT (0);

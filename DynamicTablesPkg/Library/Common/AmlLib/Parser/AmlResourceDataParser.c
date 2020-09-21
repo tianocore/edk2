@@ -310,7 +310,7 @@ AmlParseResourceData (
       return Status;
     }
 
-    DumpRaw (CurrRdElement, CurrRdElementSize);
+    AMLDBG_DUMP_RAW (CurrRdElement, CurrRdElementSize);
 
     // Exit the loop when finding the resource data end tag.
     if (AmlRdCompareDescId (

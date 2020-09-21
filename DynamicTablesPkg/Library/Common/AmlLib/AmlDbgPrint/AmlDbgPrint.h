@@ -45,7 +45,7 @@
 **/
 VOID
 EFIAPI
-DumpRaw (
+AmlDbgDumpRaw (
   IN  CONST UINT8   * Ptr,
   IN        UINT32    Length
   );
@@ -133,21 +133,45 @@ AmlDbgPrintNameSpace (
   IN  AML_ROOT_NODE_HANDLE  RootNode
   );
 
+/* Macros to encapsulate Aml Debug Print APIs.
+*/
+
+#define AMLDBG_DUMP_RAW(Ptr, Length)                  \
+          AmlDbgDumpRaw (Ptr, Length)
+
+#define AMLDBG_PRINT_CHARS(ErrorLevel, Buffer, Size)  \
+          AmlDbgPrintChars (ErrorLevel, Buffer, Size)
+
+#define AMLDBG_PRINT_NAMESEG(Buffer)                  \
+          AmlDbgPrintNameSeg (Buffer)
+
+#define AMLDBG_PRINT_NAMESTR(Buffer,NewLine)          \
+          AmlDbgPrintNameString (Buffer,NewLine)
+
+#define AMLDBG_PRINT_NODE(Node)                       \
+          AmlDbgPrintNode (Node)
+
+#define AMLDBG_PRINT_TREE(Node)                       \
+          AmlDbgPrintTree (Node)
+
+#define AMLDBG_PRINT_NAMESPACE(RootNode)              \
+          AmlDbgPrintNameSpace (RootNode)
+
 #else
 
-#define DumpRaw(Ptr, Length)
+#define AMLDBG_DUMP_RAW(Ptr, Length)
 
-#define AmlDbgPrintChars(ErrorLevel, Buffer, Size)
+#define AMLDBG_PRINT_CHARS(ErrorLevel, Buffer, Size)
 
-#define AmlDbgPrintNameSeg(Buffer)
+#define AMLDBG_PRINT_NAMESEG(Buffer)
 
-#define AmlDbgPrintNameString(Buffer,NewLine)
+#define AMLDBG_PRINT_NAMESTR(Buffer,NewLine)
 
-#define AmlDbgPrintNode(Node)
+#define AMLDBG_PRINT_NODE(Node)
 
-#define AmlDbgPrintTree(Node)
+#define AMLDBG_PRINT_TREE(Node)
 
-#define AmlDbgPrintNameSpace(RootNode)
+#define AMLDBG_PRINT_NAMESPACE(RootNode)
 
 #endif // MDEPKG_NDEBUG
 

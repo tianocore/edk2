@@ -173,7 +173,7 @@ AmlDbgPrintNameSpaceRefList (
   while (CurrLink != NameSpaceRefList) {
     CurrNameSpaceNode = (AML_NAMESPACE_REF_NODE*)CurrLink;
 
-    AmlDbgPrintChars (
+    AMLDBG_PRINT_CHARS (
       DEBUG_INFO,
       CurrNameSpaceNode->RawAbsolutePath,
       CurrNameSpaceNode->RawAbsolutePathSize
@@ -749,7 +749,7 @@ AmlFindMethodDefinition (
   }
 
   DEBUG ((DEBUG_VERBOSE, "AmlMethodParser: Checking absolute name: "));
-  AmlDbgPrintChars (
+  AMLDBG_PRINT_CHARS (
     DEBUG_VERBOSE,
     (CONST CHAR8*)AmlStreamGetCurrPos (RawAbsolutePathFStream),
     AmlStreamGetMaxBufferSize (RawAbsolutePathFStream)
@@ -768,7 +768,7 @@ AmlFindMethodDefinition (
     ProbedNameSpaceRefNode = (AML_NAMESPACE_REF_NODE*)NextLink;
 
     // Print the raw absolute path of the probed node.
-    AmlDbgPrintChars (
+    AMLDBG_PRINT_CHARS (
       DEBUG_VERBOSE,
       ProbedNameSpaceRefNode->RawAbsolutePath,
       ProbedNameSpaceRefNode->RawAbsolutePathSize
@@ -1067,7 +1067,7 @@ AmlIsMethodInvocation (
       DEBUG_VERBOSE,
       "AmlMethodParser: Corresponding method definition: "
       ));
-    AmlDbgPrintChars (
+    AMLDBG_PRINT_CHARS (
       DEBUG_VERBOSE,
       NameSpaceRefNode->RawAbsolutePath,
       NameSpaceRefNode->RawAbsolutePathSize
@@ -1230,7 +1230,7 @@ AmlAddNameSpaceReference (
     DEBUG_VERBOSE,
     "AmlMethodParser: Adding namespace reference with name:\n"
     ));
-  AmlDbgPrintChars (
+  AMLDBG_PRINT_CHARS (
     DEBUG_VERBOSE,
     (CONST CHAR8*)AmlStreamGetCurrPos (&RawAbsolutePathBStream),
     AmlStreamGetIndex (&RawAbsolutePathBStream)
