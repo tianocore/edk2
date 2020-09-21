@@ -15,9 +15,9 @@
 #include <IndustryStandard/AcpiAml.h>
 
 #if !defined (MDEPKG_NDEBUG)
-#define AML_DEBUG_STR(str) str,
+#define AML_OPCODE_DEF(str, OpCode) str, OpCode
 #else
-#define AML_DEBUG_STR(x)
+#define AML_OPCODE_DEF(str, OpCode) OpCode
 #endif // MDEPKG_NDEBUG
 
 /** AML types.
