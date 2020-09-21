@@ -1,7 +1,7 @@
 /** @file
   SRAT Table Generator
 
-  Copyright (c) 2019 - 2020, ARM Limited. All rights reserved.
+  Copyright (c) 2019 - 2020, Arm Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -107,7 +107,7 @@ GET_OBJECT_LIST (
     @param [in]  DeviceHandlePci   Pointer to the PCI Device Handle.
 
     @retval BDF value corresponding to the PCI Device Handle.
-*/
+**/
 STATIC
 UINT16
 GetBdf (
