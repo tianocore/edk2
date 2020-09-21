@@ -52,7 +52,7 @@ AmlStreamInit (
   in the ClonedStream.
 
   @param  [in]  Stream          Pointer to the stream to clone.
-  @param  [in]  ClonedStream    Pointer to the stream to initialize.
+  @param  [out] ClonedStream    Pointer to the stream to initialize.
 
   @retval EFI_SUCCESS             The function completed successfully.
   @retval EFI_INVALID_PARAMETER   Invalid parameter.
@@ -97,7 +97,7 @@ AmlStreamClone (
 
   @param  [in]  Stream      Pointer to the stream from which a sub-stream is
                             created.
-  @param  [in]  SubStream   Pointer to the stream to initialize.
+  @param  [out] SubStream   Pointer to the stream to initialize.
 
   @retval EFI_SUCCESS             The function completed successfully.
   @retval EFI_INVALID_PARAMETER   Invalid parameter.

@@ -33,7 +33,7 @@ EFIAPI
 LinkNode (
   IN  AML_OBJECT_NODE    * Node,
   IN  AML_NODE_HEADER    * ParentNode,
-  IN  AML_OBJECT_NODE   ** NewObjectNode
+  OUT AML_OBJECT_NODE   ** NewObjectNode
   )
 {
   EFI_STATUS    Status;
@@ -71,7 +71,7 @@ LinkNode (
   @param[in]  OemId                6-character string OEM identifier.
   @param[in]  OemTableId           8-character string OEM table identifier.
   @param[in]  OemRevision          OEM revision number.
-  @param[out] DefinitionBlockTerm  The ASL Term handle representing a
+  @param[out] NewRootNode          Pointer to the root node representing a
                                    Definition Block.
 
   @retval EFI_SUCCESS             Success.
