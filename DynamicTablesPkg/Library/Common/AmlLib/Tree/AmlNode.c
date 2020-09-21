@@ -464,7 +464,7 @@ AmlNodeCompareOpCode (
 
   @retval TRUE  The Node is an integer node.
   @retval FALSE Otherwise.
-*/
+**/
 BOOLEAN
 EFIAPI
 IsIntegerNode (
@@ -499,7 +499,7 @@ IsIntegerNode (
 
   @retval TRUE  The Node is a ZeroOp or OneOp.
   @retval FALSE Otherwise.
-*/
+**/
 BOOLEAN
 EFIAPI
 IsSpecialIntegerNode (
@@ -556,7 +556,7 @@ AmlIsMethodDefinitionNode (
     // DefExternal := ExternalOp NameString ObjectType ArgumentCount
     // ExternalOp := 0x15
     // ObjectType := ByteData
-    // ArgumentCount := ByteData (0 – 7)
+    // ArgumentCount := ByteData (0 - 7)
     ObjectType = (AML_DATA_NODE*)AmlGetFixedArgument (
                                    (AML_OBJECT_NODE*)Node,
                                    EAmlParseIndexTerm1
