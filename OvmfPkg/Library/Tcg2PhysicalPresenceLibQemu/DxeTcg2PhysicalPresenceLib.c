@@ -27,8 +27,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/HobLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PrintLib.h>
-#include <Library/QemuFwCfgLib.h>
 #include <Library/Tpm2CommandLib.h>
+#include <Library/Tcg2PhysicalPresencePlatformLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
@@ -42,40 +42,6 @@ EFI_HII_HANDLE mTcg2PpStringPackHandle;
 #define TPM_PPI_FLAGS (QEMU_TPM_PPI_FUNC_ALLOWED_USR_REQ)
 
 STATIC volatile QEMU_TPM_PPI *mPpi;
-
-
-/**
-  Reads QEMU PPI config from fw_cfg.
-
-  @param[out]  The Config structure to read to.
-
-  @retval EFI_SUCCESS           Operation completed successfully.
-  @retval EFI_PROTOCOL_ERROR    Invalid fw_cfg entry size.
-**/
-STATIC
-EFI_STATUS
-QemuTpmReadConfig (
-  OUT QEMU_FWCFG_TPM_CONFIG *Config
-  )
-{
-  EFI_STATUS           Status;
-  FIRMWARE_CONFIG_ITEM FwCfgItem;
-  UINTN                FwCfgSize;
-
-  Status = QemuFwCfgFindFile ("etc/tpm/config", &FwCfgItem, &FwCfgSize);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  if (FwCfgSize != sizeof (*Config)) {
-    return EFI_PROTOCOL_ERROR;
-  }
-
-  QemuFwCfgSelectItem (FwCfgItem);
-  QemuFwCfgReadBytes (sizeof (*Config), Config);
-  return EFI_SUCCESS;
-}
-
 
 /**
   Initializes QEMU PPI memory region.
@@ -91,6 +57,7 @@ QemuTpmInitPPI (
 {
   EFI_STATUS                      Status;
   QEMU_FWCFG_TPM_CONFIG           Config;
+  BOOLEAN                         PPIinMMIO;
   EFI_PHYSICAL_ADDRESS            PpiAddress64;
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR Descriptor;
   UINTN                           Idx;
@@ -99,7 +66,7 @@ QemuTpmInitPPI (
     return EFI_SUCCESS;
   }
 
-  Status = QemuTpmReadConfig (&Config);
+  Status = TpmPPIPlatformReadConfig (&Config, &PPIinMMIO);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -123,12 +90,22 @@ QemuTpmInitPPI (
     ASSERT_EFI_ERROR (Status);
     goto InvalidPpiAddress;
   }
-  if (!EFI_ERROR (Status) &&
-      (Descriptor.GcdMemoryType != EfiGcdMemoryTypeMemoryMappedIo &&
-       Descriptor.GcdMemoryType != EfiGcdMemoryTypeNonExistent)) {
-    DEBUG ((DEBUG_ERROR, "[TPM2PP] mPpi has an invalid memory type\n"));
-    goto InvalidPpiAddress;
+  if (PPIinMMIO) {
+    if (!EFI_ERROR (Status) &&
+        (Descriptor.GcdMemoryType != EfiGcdMemoryTypeMemoryMappedIo &&
+        Descriptor.GcdMemoryType != EfiGcdMemoryTypeNonExistent)) {
+      DEBUG ((DEBUG_ERROR, "[TPM2PP] mPpi has an invalid memory type\n"));
+      goto InvalidPpiAddress;
+    }
+  } else {
+    if (!EFI_ERROR (Status) &&
+      (Descriptor.GcdMemoryType != EfiGcdMemoryTypeReserved &&
+       Descriptor.GcdMemoryType != EfiGcdMemoryTypeSystemMemory)) {
+      DEBUG ((DEBUG_ERROR, "[TPM2PP] mPpi has an invalid memory type\n"));
+      goto InvalidPpiAddress;
+    }
   }
+
 
   for (Idx = 0; Idx < ARRAY_SIZE (mPpi->Func); Idx++) {
     mPpi->Func[Idx] = 0;
