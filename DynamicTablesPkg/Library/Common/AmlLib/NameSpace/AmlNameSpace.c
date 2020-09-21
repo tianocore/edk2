@@ -674,7 +674,7 @@ AmlAddPrefix (
 
   @retval EFI_SUCCESS             The function completed successfully.
   @retval EFI_INVALID_PARAMETER   Invalid parameter.
-*/
+**/
 STATIC
 EFI_STATUS
 EFIAPI

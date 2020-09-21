@@ -40,7 +40,7 @@ EFIAPI
 LinkRdNode (
   IN  AML_DATA_NODE      * RdNode,
   IN  AML_OBJECT_NODE    * ParentNode,
-  IN  AML_DATA_NODE     ** NewRdNode
+  OUT AML_DATA_NODE     ** NewRdNode
   )
 {
   EFI_STATUS    Status;

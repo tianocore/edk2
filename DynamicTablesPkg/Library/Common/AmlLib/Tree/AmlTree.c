@@ -41,7 +41,7 @@ AmlGetParent (
 
   @return The root node of the tree.
           NULL if error.
-*/
+**/
 AML_ROOT_NODE *
 EFIAPI
 AmlGetRootNode (
