@@ -41,7 +41,7 @@
   @retval EFI_BUFFER_TOO_SMALL    No space left in the buffer.
   @retval EFI_INVALID_PARAMETER   Invalid parameter.
   @retval EFI_OUT_OF_RESOURCES    Could not allocate memory.
-*/
+**/
 STATIC
 EFI_STATUS
 EFIAPI
@@ -177,7 +177,7 @@ AmlParseFieldElement (
   @retval EFI_BUFFER_TOO_SMALL    No space left in the buffer.
   @retval EFI_INVALID_PARAMETER   Invalid parameter.
   @retval EFI_OUT_OF_RESOURCES    Could not allocate memory.
-*/
+**/
 STATIC
 EFI_STATUS
 EFIAPI

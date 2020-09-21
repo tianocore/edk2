@@ -1320,7 +1320,7 @@ AmlCreateMethodInvocationNode (
     //  DefExternal := ExternalOp NameString ObjectType ArgumentCount
     //  ExternalOp := 0x15
     //  ObjectType := ByteData
-    //  ArgumentCount := ByteData (0 – 7)
+    //  ArgumentCount := ByteData (0 - 7)
 
     // Read the ArgumentCount.
     ArgCountNode = (AML_DATA_NODE*)FixedArgs[EAmlParseIndexTerm2];
@@ -1334,7 +1334,7 @@ AmlCreateMethodInvocationNode (
   // MethodInvocation := MethodInvocationOp NameString ArgumentCount
   // MethodInvocationOp := Pseudo Opcode for Method Invocation
   // NameString := Method Name
-  // ArgumentCount := ByteData (0 – 7)
+  // ArgumentCount := ByteData (0 - 7)
   Status = AmlCreateObjectNode (
              AmlGetByteEncodingByOpCode (AML_METHOD_INVOC_OP, 0),
              0,
@@ -1411,7 +1411,7 @@ error_handler:
   @retval EFI_BUFFER_TOO_SMALL    No space left in the buffer.
   @retval EFI_INVALID_PARAMETER   Invalid parameter.
   @retval EFI_OUT_OF_RESOURCES    Could not allocate memory.
-*/
+**/
 EFI_STATUS
 EFIAPI
 AmlGetMethodInvocationArgCount (
