@@ -27,8 +27,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/HobLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PrintLib.h>
-#include <Library/QemuFwCfgLib.h>
 #include <Library/Tpm2CommandLib.h>
+#include <Library/Tcg2PhysicalPresencePlatformLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
@@ -40,41 +40,14 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 EFI_HII_HANDLE  mTcg2PpStringPackHandle;
 
+//
+// Wait 3 minutes for user input.
+//
+#define TCG2_PHYSICAL_PRESENCE_USER_CONFIRM_TIMEOUT_100NS  (3ULL * 60ULL * 10000000ULL)
+
 #define TPM_PPI_FLAGS  (QEMU_TPM_PPI_FUNC_ALLOWED_USR_REQ)
 
 STATIC volatile QEMU_TPM_PPI  *mPpi;
-
-/**
-  Reads QEMU PPI config from fw_cfg.
-
-  @param[out]  The Config structure to read to.
-
-  @retval EFI_SUCCESS           Operation completed successfully.
-  @retval EFI_PROTOCOL_ERROR    Invalid fw_cfg entry size.
-**/
-STATIC
-EFI_STATUS
-QemuTpmReadConfig (
-  OUT QEMU_FWCFG_TPM_CONFIG  *Config
-  )
-{
-  EFI_STATUS            Status;
-  FIRMWARE_CONFIG_ITEM  FwCfgItem;
-  UINTN                 FwCfgSize;
-
-  Status = QemuFwCfgFindFile ("etc/tpm/config", &FwCfgItem, &FwCfgSize);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  if (FwCfgSize != sizeof (*Config)) {
-    return EFI_PROTOCOL_ERROR;
-  }
-
-  QemuFwCfgSelectItem (FwCfgItem);
-  QemuFwCfgReadBytes (sizeof (*Config), Config);
-  return EFI_SUCCESS;
-}
 
 /**
   Initializes QEMU PPI memory region.
@@ -90,6 +63,7 @@ QemuTpmInitPPI (
 {
   EFI_STATUS                       Status;
   QEMU_FWCFG_TPM_CONFIG            Config;
+  BOOLEAN                          PpiInMmio;
   EFI_PHYSICAL_ADDRESS             PpiAddress64;
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR  Descriptor;
   UINTN                            Idx;
@@ -98,7 +72,7 @@ QemuTpmInitPPI (
     return EFI_SUCCESS;
   }
 
-  Status = QemuTpmReadConfig (&Config);
+  Status = TpmPpiPlatformReadConfig (&Config, &PpiInMmio);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -124,12 +98,22 @@ QemuTpmInitPPI (
     goto InvalidPpiAddress;
   }
 
-  if (!EFI_ERROR (Status) &&
-      ((Descriptor.GcdMemoryType != EfiGcdMemoryTypeMemoryMappedIo) &&
-       (Descriptor.GcdMemoryType != EfiGcdMemoryTypeNonExistent)))
-  {
-    DEBUG ((DEBUG_ERROR, "[TPM2PP] mPpi has an invalid memory type\n"));
-    goto InvalidPpiAddress;
+  if (PpiInMmio) {
+    if (!EFI_ERROR (Status) &&
+        (Descriptor.GcdMemoryType != EfiGcdMemoryTypeMemoryMappedIo &&
+         Descriptor.GcdMemoryType != EfiGcdMemoryTypeNonExistent))
+    {
+      DEBUG ((DEBUG_ERROR, "[TPM2PP] mPpi has an invalid memory type\n"));
+      goto InvalidPpiAddress;
+    }
+  } else {
+    if (!EFI_ERROR (Status) &&
+        (Descriptor.GcdMemoryType != EfiGcdMemoryTypeReserved &&
+         Descriptor.GcdMemoryType != EfiGcdMemoryTypeSystemMemory))
+    {
+      DEBUG ((DEBUG_ERROR, "[TPM2PP] mPpi has an invalid memory type\n"));
+      goto InvalidPpiAddress;
+    }
   }
 
   for (Idx = 0; Idx < ARRAY_SIZE (mPpi->Func); Idx++) {
@@ -359,31 +343,70 @@ Tcg2ExecutePhysicalPresence (
 STATIC
 BOOLEAN
 Tcg2ReadUserKey (
-  IN     BOOLEAN  CautionKey
+  IN  BOOLEAN  CautionKey,
+  IN  UINT64   Timeout100ns
   )
 {
   EFI_STATUS     Status;
   EFI_INPUT_KEY  Key;
   UINT16         InputKey;
+  EFI_EVENT      TimeoutEvent;
+  EFI_EVENT      WaitList[2];
+  UINTN          WaitIndex;
 
-  InputKey = 0;
-  do {
-    Status = gBS->CheckEvent (gST->ConIn->WaitForKey);
-    if (!EFI_ERROR (Status)) {
-      Status = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
-      if (Key.ScanCode == SCAN_ESC) {
-        InputKey = Key.ScanCode;
-      }
+  InputKey     = 0;
+  TimeoutEvent = NULL;
 
-      if ((Key.ScanCode == SCAN_F10) && !CautionKey) {
-        InputKey = Key.ScanCode;
-      }
+  Status = gBS->CreateEvent (EVT_TIMER, TPL_CALLBACK, NULL, NULL, &TimeoutEvent);
+  if (EFI_ERROR (Status)) {
+    return FALSE;
+  }
 
-      if ((Key.ScanCode == SCAN_F12) && CautionKey) {
-        InputKey = Key.ScanCode;
-      }
+  Status = gBS->SetTimer (TimeoutEvent, TimerRelative, Timeout100ns);
+  if (EFI_ERROR (Status)) {
+    gBS->CloseEvent (TimeoutEvent);
+    return FALSE;
+  }
+
+  WaitList[0] = gST->ConIn->WaitForKey;
+  WaitList[1] = TimeoutEvent;
+
+  while (InputKey == 0) {
+    Status = gBS->WaitForEvent (ARRAY_SIZE (WaitList), WaitList, &WaitIndex);
+    if (EFI_ERROR (Status)) {
+      continue;
     }
-  } while (InputKey == 0);
+
+    if (WaitIndex == 1) {
+      break;
+    }
+
+    Status = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
+    if (EFI_ERROR (Status)) {
+      continue;
+    }
+
+    if (Key.ScanCode == SCAN_ESC) {
+      InputKey = Key.ScanCode;
+      break;
+    }
+
+    if ((Key.ScanCode == SCAN_F10) && !CautionKey) {
+      InputKey = Key.ScanCode;
+      break;
+    }
+
+    if ((Key.ScanCode == SCAN_F12) && CautionKey) {
+      InputKey = Key.ScanCode;
+      break;
+    }
+  }
+
+  gBS->CloseEvent (TimeoutEvent);
+
+  if (InputKey == 0) {
+    return FALSE;
+  }
 
   if (InputKey != SCAN_ESC) {
     return TRUE;
@@ -652,7 +675,7 @@ Tcg2UserConfirm (
   FreePool (ConfirmText);
   HiiRemovePackages (mTcg2PpStringPackHandle);
 
-  if (Tcg2ReadUserKey (CautionKey)) {
+  if (Tcg2ReadUserKey (CautionKey, TCG2_PHYSICAL_PRESENCE_USER_CONFIRM_TIMEOUT_100NS)) {
     return TRUE;
   }
 
