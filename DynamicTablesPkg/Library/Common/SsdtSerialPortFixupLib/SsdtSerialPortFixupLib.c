@@ -130,9 +130,9 @@ STATIC
 EFI_STATUS
 EFIAPI
 FixupIds (
-  IN  OUT       AML_ROOT_NODE_HANDLE        RootNodeHandle,
-  IN      CONST UINT64                      Uid,
-  IN      CONST CM_ARM_SERIAL_PORT_INFO   * SerialPortInfo
+  IN        AML_ROOT_NODE_HANDLE        RootNodeHandle,
+  IN  CONST UINT64                      Uid,
+  IN  CONST CM_ARM_SERIAL_PORT_INFO   * SerialPortInfo
   )
 {
   EFI_STATUS                Status;
@@ -243,8 +243,8 @@ STATIC
 EFI_STATUS
 EFIAPI
 FixupCrs (
-  IN  OUT       AML_ROOT_NODE_HANDLE        RootNodeHandle,
-  IN      CONST CM_ARM_SERIAL_PORT_INFO   * SerialPortInfo
+  IN        AML_ROOT_NODE_HANDLE        RootNodeHandle,
+  IN  CONST CM_ARM_SERIAL_PORT_INFO   * SerialPortInfo
   )
 {
   EFI_STATUS                Status;
@@ -318,9 +318,9 @@ STATIC
 EFI_STATUS
 EFIAPI
 FixupName (
-  IN  OUT       AML_ROOT_NODE_HANDLE        RootNodeHandle,
-  IN      CONST CM_ARM_SERIAL_PORT_INFO   * SerialPortInfo,
-  IN      CONST CHAR8                     * Name
+  IN        AML_ROOT_NODE_HANDLE        RootNodeHandle,
+  IN  CONST CM_ARM_SERIAL_PORT_INFO   * SerialPortInfo,
+  IN  CONST CHAR8                     * Name
   )
 {
   EFI_STATUS                Status;
@@ -362,7 +362,7 @@ STATIC
 EFI_STATUS
 EFIAPI
 FixupSerialPortInfo (
-  IN  OUT       AML_ROOT_NODE_HANDLE              RootNodeHandle,
+  IN            AML_ROOT_NODE_HANDLE              RootNodeHandle,
   IN      CONST CM_ARM_SERIAL_PORT_INFO         * SerialPortInfo,
   IN      CONST CHAR8                           * Name,
   IN      CONST UINT64                            Uid,
