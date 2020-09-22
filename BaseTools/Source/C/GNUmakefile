@@ -26,6 +26,9 @@ ifndef HOST_ARCH
   else ifneq (,$(findstring arm,$(uname_m)))
     HOST_ARCH=ARM
   endif
+  ifneq (,$(findstring riscv64,$(uname_m)))
+    HOST_ARCH=RISCV64
+  endif
   ifndef HOST_ARCH
     $(info Could not detected HOST_ARCH from uname results)
     $(error HOST_ARCH is not defined!)
