@@ -1,0 +1,45 @@
+## @file VariablePolicyUnitTest.inf
+# UnitTest for...
+# Business logic for Variable Policy enforcement.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = VariablePolicyUnitTest
+  FILE_GUID                      = 1200A2E4-D756-418C-9768-528C2D181A98
+  MODULE_TYPE                    = HOST_APPLICATION
+  VERSION_STRING                 = 1.0
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64
+#
+
+[Sources]
+  VariablePolicyUnitTest.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  UnitTestLib
+  PrintLib
+  VariablePolicyLib
+  BaseMemoryLib
+  MemoryAllocationLib
+
+
+[BuildOptions]
+  MSFT:NOOPT_*_*_CC_FLAGS   = -DINTERNAL_UNIT_TEST
+  GCC:NOOPT_*_*_CC_FLAGS    = -DINTERNAL_UNIT_TEST
