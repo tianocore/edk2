@@ -1254,14 +1254,15 @@ EXIT:
 /**
   Execute the transfer by polling the URB. This is a synchronous operation.
 
-  @param  Xhc               The XHCI Instance.
-  @param  CmdTransfer       The executed URB is for cmd transfer or not.
-  @param  Urb               The URB to execute.
-  @param  Timeout           The time to wait before abort, in millisecond.
+  @param  Xhc                    The XHCI Instance.
+  @param  CmdTransfer            The executed URB is for cmd transfer or not.
+  @param  Urb                    The URB to execute.
+  @param  Timeout                The time to wait before abort, in millisecond.
 
-  @return EFI_DEVICE_ERROR  The transfer failed due to transfer error.
-  @return EFI_TIMEOUT       The transfer failed due to time out.
-  @return EFI_SUCCESS       The transfer finished OK.
+  @return EFI_DEVICE_ERROR       The transfer failed due to transfer error.
+  @return EFI_TIMEOUT            The transfer failed due to time out.
+  @return EFI_SUCCESS            The transfer finished OK.
+  @retval EFI_OUT_OF_RESOURCES   Memory for the timer event could not be allocated.
 
 **/
 EFI_STATUS
@@ -1273,11 +1274,16 @@ XhcExecTransfer (
   )
 {
   EFI_STATUS              Status;
-  UINTN                   Index;
-  UINT64                  Loop;
   UINT8                   SlotId;
   UINT8                   Dci;
   BOOLEAN                 Finished;
+  EFI_EVENT               TimeoutEvent;
+  BOOLEAN                 IndefiniteTimeout;
+
+  Status            = EFI_SUCCESS;
+  Finished          = FALSE;
+  TimeoutEvent      = NULL;
+  IndefiniteTimeout = FALSE;
 
   if (CmdTransfer) {
     SlotId = 0;
@@ -1291,27 +1297,54 @@ XhcExecTransfer (
     ASSERT (Dci < 32);
   }
 
-  Status = EFI_SUCCESS;
-  Loop   = Timeout * XHC_1_MILLISECOND;
   if (Timeout == 0) {
-    Loop = 0xFFFFFFFF;
+    IndefiniteTimeout = TRUE;
+    goto RINGDOORBELL;
   }
 
+  Status = gBS->CreateEvent (
+                  EVT_TIMER,
+                  TPL_CALLBACK,
+                  NULL,
+                  NULL,
+                  &TimeoutEvent
+                  );
+
+  if (EFI_ERROR (Status)) {
+    goto DONE;
+  }
+
+  Status = gBS->SetTimer (TimeoutEvent,
+                          TimerRelative,
+                          EFI_TIMER_PERIOD_MILLISECONDS(Timeout));
+
+  if (EFI_ERROR (Status)) {
+    goto DONE;
+  }
+
+RINGDOORBELL:
   XhcRingDoorBell (Xhc, SlotId, Dci);
 
-  for (Index = 0; Index < Loop; Index++) {
+  do {
     Finished = XhcCheckUrbResult (Xhc, Urb);
     if (Finished) {
       break;
     }
     gBS->Stall (XHC_1_MICROSECOND);
-  }
+  } while (IndefiniteTimeout || EFI_ERROR(gBS->CheckEvent (TimeoutEvent)));
 
-  if (Index == Loop) {
+DONE:
+  if (EFI_ERROR(Status)) {
+    Urb->Result = EFI_USB_ERR_NOTEXECUTE;
+  } else if (!Finished) {
     Urb->Result = EFI_USB_ERR_TIMEOUT;
     Status      = EFI_TIMEOUT;
   } else if (Urb->Result != EFI_USB_NOERROR) {
     Status      = EFI_DEVICE_ERROR;
+  }
+
+  if (TimeoutEvent != NULL) {
+    gBS->CloseEvent (TimeoutEvent);
   }
 
   return Status;
