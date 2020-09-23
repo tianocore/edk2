@@ -58,6 +58,7 @@
   VariableExLib.c
   TcgMorLockSmm.c
   SpeculationBarrierSmm.c
+  VariableLockRequestToLock.c
 
 [Packages]
   MdePkg/MdePkg.dec
