@@ -786,8 +786,10 @@ cleanlib:
 
     def ReplaceMacro(self, str):
         for Macro in self.MacroList:
-            if self._AutoGenObject.Macros[Macro] and self._AutoGenObject.Macros[Macro] in str:
-                str = str.replace(self._AutoGenObject.Macros[Macro], '$(' + Macro + ')')
+            if self._AutoGenObject.Macros[Macro] and os.path.normcase(self._AutoGenObject.Macros[Macro]) in os.path.normcase(str):
+                replace_dir = str[os.path.normcase(str).index(os.path.normcase(self._AutoGenObject.Macros[Macro])): os.path.normcase(str).index(
+                    os.path.normcase(self._AutoGenObject.Macros[Macro])) + len(self._AutoGenObject.Macros[Macro])]
+                str = str.replace(replace_dir, '$(' + Macro + ')')
         return str
 
     def CommandExceedLimit(self):
