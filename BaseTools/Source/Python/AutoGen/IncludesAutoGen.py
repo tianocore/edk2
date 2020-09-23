@@ -103,7 +103,7 @@ ${END}
                     if os.path.normpath(dependency_file +".deps") == abspath:
                         continue
                     filename = os.path.basename(dependency_file).strip()
-                    if filename not in self.SourceFileList and filename not in targetname:
+                    if filename not in targetname:
                         includes.add(dependency_file.strip())
 
                 for item in lines[1:]:
@@ -116,8 +116,6 @@ ${END}
                     if os.path.normpath(dependency_file +".deps") == abspath:
                         continue
                     filename = os.path.basename(dependency_file).strip()
-                    if filename in self.SourceFileList:
-                        continue
                     if filename in targetname:
                         continue
                     includes.add(dependency_file.strip())
