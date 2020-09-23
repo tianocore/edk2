@@ -1822,9 +1822,6 @@ class ModuleAutoGen(AutoGen):
             for LibraryAutoGen in self.LibraryAutoGenList:
                 LibraryAutoGen.CreateCodeFile()
 
-        # CanSkip uses timestamps to determine build skipping
-        if self.CanSkip():
-            return
         self.LibraryAutoGenList
         AutoGenList = []
         IgoredAutoGenList = []
