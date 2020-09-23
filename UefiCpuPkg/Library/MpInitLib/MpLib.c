@@ -1142,20 +1142,6 @@ RestoreWakeupBuffer(
 }
 
 /**
-  Calculate the size of the reset stack.
-
-  @return                 Total amount of memory required for stacks
-**/
-STATIC
-UINTN
-GetApResetStackSize (
-  VOID
-  )
-{
-  return AP_RESET_STACK_SIZE * PcdGet32(PcdCpuMaxLogicalProcessorNumber);
-}
-
-/**
   Calculate the size of the reset vector.
 
   @param[in]  AddressMap  The pointer to Address Map structure.
@@ -1170,11 +1156,23 @@ GetApResetVectorSize (
 {
   UINTN  Size;
 
-  Size = ALIGN_VALUE (AddressMap->RendezvousFunnelSize +
-                        AddressMap->SwitchToRealSize +
-                        sizeof (MP_CPU_EXCHANGE_INFO),
-                      CPU_STACK_ALIGNMENT);
-  Size += GetApResetStackSize ();
+  Size = AddressMap->RendezvousFunnelSize +
+           AddressMap->SwitchToRealSize +
+           sizeof (MP_CPU_EXCHANGE_INFO);
+
+  //
+  // The AP reset stack is only used by SEV-ES guests. Do not add to the
+  // allocation if SEV-ES is not enabled.
+  //
+  if (PcdGetBool (PcdSevEsIsEnabled)) {
+    //
+    // Stack location is based on APIC ID, so use the total number of
+    // processors for calculating the total stack area.
+    //
+    Size += AP_RESET_STACK_SIZE * PcdGet32 (PcdCpuMaxLogicalProcessorNumber);
+
+    Size = ALIGN_VALUE (Size, CPU_STACK_ALIGNMENT);
+  }
 
   return Size;
 }
