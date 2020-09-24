@@ -1,11 +1,12 @@
 /** @file
   Support routines for RDRAND instruction access.
 
-Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
-(C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
-SPDX-License-Identifier: BSD-2-Clause-Patent
+  Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
+  (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
+
 #include <Library/RngLib.h>
 
 #include "RdRand.h"

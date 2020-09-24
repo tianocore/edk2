@@ -1,13 +1,13 @@
 /** @file
   Function prototype for AES Block Cipher support.
 
-Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
-SPDX-License-Identifier: BSD-2-Clause-Patent
+  Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __AES_CORE_H__
-#define __AES_CORE_H__
+#ifndef AES_CORE_H_
+#define AES_CORE_H_
 
 /**
   Encrypts one single block data (128 bits) with AES algorithm.
@@ -28,4 +28,4 @@ AesEncrypt (
   OUT UINT8        *OutData
   );
 
-#endif  // __AES_CORE_H__
+#endif  // AES_CORE_H_

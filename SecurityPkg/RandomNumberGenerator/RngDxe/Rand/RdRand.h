@@ -8,14 +8,14 @@
   -generator-drng-software-implementation-guide/ for more information about Intel
   Secure Key technology.
 
-Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
-(C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
-SPDX-License-Identifier: BSD-2-Clause-Patent
+  Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
+  (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __RD_RAND_H__
-#define __RD_RAND_H__
+#ifndef RD_RAND_H_
+#define RD_RAND_H_
 
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -57,4 +57,4 @@ RdRandGenerateEntropy (
   OUT UINT8        *Entropy
   );
 
-#endif  // __RD_RAND_H__
+#endif  // RD_RAND_H_

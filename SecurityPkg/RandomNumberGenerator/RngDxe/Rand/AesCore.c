@@ -3,8 +3,8 @@
   Refer to FIPS PUB 197 ("Advanced Encryption Standard (AES)") for detailed algorithm
   description of AES.
 
-Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
-SPDX-License-Identifier: BSD-2-Clause-Patent
+  Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
