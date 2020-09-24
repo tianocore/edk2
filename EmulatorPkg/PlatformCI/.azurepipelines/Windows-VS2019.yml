@@ -6,6 +6,7 @@
 # Toolchain: VS2019
 #
 # Copyright (c) Microsoft Corporation.
+# Copyright (c) 2020, Intel Corporation. All rights reserved.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 trigger:
@@ -63,6 +64,48 @@ jobs:
             Build.File: "$(package)/PlatformCI/PlatformBuild.py"
             Build.Arch: "IA32 "
             Build.Flags: ""
+            Build.Target: "NOOPT"
+            Run.Flags: $(run_flags)
+            Run: $(should_run)
+          EmulatorPkg_X64_FULL_DEBUG:
+            Build.File: "$(package)/PlatformCI/PlatformBuild.py"
+            Build.Arch: "X64"
+            Build.Flags: "BLD_*_SECURE_BOOT_ENABLE=TRUE"
+            Build.Target: "DEBUG"
+            Run.Flags: $(run_flags)
+            Run: $(should_run)
+          EmulatorPkg_X64_FULL_RELEASE:
+            Build.File: "$(package)/PlatformCI/PlatformBuild.py"
+            Build.Arch: "X64"
+            Build.Flags: "BLD_*_SECURE_BOOT_ENABLE=TRUE"
+            Build.Target: "RELEASE"
+            Run.Flags: $(run_flags)
+            Run: $(should_run)
+          EmulatorPkg_X64_FULL_NOOPT:
+            Build.File: "$(package)/PlatformCI/PlatformBuild.py"
+            Build.Arch: "X64"
+            Build.Flags: "BLD_*_SECURE_BOOT_ENABLE=TRUE"
+            Build.Target: "NOOPT"
+            Run.Flags: $(run_flags)
+            Run: $(should_run)
+          EmulatorPkg_IA32_FULL_DEBUG:
+            Build.File: "$(package)/PlatformCI/PlatformBuild.py"
+            Build.Arch: "IA32"
+            Build.Flags: "BLD_*_SECURE_BOOT_ENABLE=TRUE"
+            Build.Target: "DEBUG"
+            Run.Flags: $(run_flags)
+            Run: $(should_run)
+          EmulatorPkg_IA32_FULL_RELEASE:
+            Build.File: "$(package)/PlatformCI/PlatformBuild.py"
+            Build.Arch: "IA32"
+            Build.Flags: "BLD_*_SECURE_BOOT_ENABLE=TRUE"
+            Build.Target: "RELEASE"
+            Run.Flags: $(run_flags)
+            Run: $(should_run)
+          EmulatorPkg_IA32_FULL_NOOPT:
+            Build.File: "$(package)/PlatformCI/PlatformBuild.py"
+            Build.Arch: "IA32"
+            Build.Flags: "BLD_*_SECURE_BOOT_ENABLE=TRUE"
             Build.Target: "NOOPT"
             Run.Flags: $(run_flags)
             Run: $(should_run)
