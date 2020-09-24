@@ -6,13 +6,15 @@ to use the same Pytools based build infrastructure locally.
 ## Supported Configuration Details
 
 This solution for building and running EmulatorPkg has only been validated with Windows 10
-with VS2019 and Ubuntu 18.04 with GCC5 toolchain. Two different firmware builds are
+with VS2019 and Ubuntu 18.04 with GCC5 toolchain. Four different firmware builds are
 supported and are described below.
 
 | Configuration name      | Architectures      | DSC File         |Additional Flags |
 | :----                   | :-----             | :----            | :----           |
 | IA32                    | IA32               | EmulatorPkg.dsc  | None            |
 | X64                     | X64                | EmulatorPkg.dsc  | None            |
+| IA32 Full               | IA32               | EmulatorPkg.dsc  | SECURE_BOOT_ENABLE=TRUE |
+| X64 Full                | X64                | EmulatorPkg.dsc  | SECURE_BOOT_ENABLE=TRUE |
 
 ## EDK2 Developer environment
 
