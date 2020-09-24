@@ -1,0 +1,57 @@
+##  @file
+# Provides Shell 'http' standalone application.
+#
+# Copyright (c) 2010 - 2019, Intel Corporation. All rights reserved. <BR>
+# Copyright (c) 2015, ARM Ltd. All rights reserved.<BR>
+# Copyright (c) 2020, Broadcom. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = http
+  FILE_GUID                      = 56B00FB7-91D2-869B-CE5C-26CD1A89C73C
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = HttpAppInitialize
+#
+#  This flag specifies whether HII resource section is generated into PE image.
+#
+  UEFI_HII_RESOURCE_SECTION      = TRUE
+
+[Sources.common]
+  Http.c
+  HttpApp.c
+  Http.h
+  Http.uni
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  NetworkPkg/NetworkPkg.dec
+  ShellPkg/ShellPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  FileHandleLib
+  HiiLib
+  HttpLib
+  MemoryAllocationLib
+  NetLib
+  ShellLib
+  UefiApplicationEntryPoint
+  UefiBootServicesTableLib
+  UefiHiiServicesLib
+  UefiLib
+  UefiRuntimeServicesTableLib
+
+[Protocols]
+  gEfiHiiPackageListProtocolGuid                 ## CONSUMES
+  gEfiHttpProtocolGuid                         ## CONSUMES
+  gEfiHttpServiceBindingProtocolGuid           ## CONSUMES
+  gEfiManagedNetworkServiceBindingProtocolGuid   ## CONSUMES
