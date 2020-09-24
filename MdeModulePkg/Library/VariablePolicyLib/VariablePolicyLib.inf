@@ -1,7 +1,6 @@
 ## @file VariablePolicyLib.inf
 # Business logic for Variable Policy enforcement.
 #
-##
 # Copyright (c) Microsoft Corporation.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##

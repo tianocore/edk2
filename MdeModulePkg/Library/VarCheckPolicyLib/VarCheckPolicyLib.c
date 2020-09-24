@@ -41,6 +41,11 @@ VariableServiceGetVariable (
 
 UINT8     mSecurityEvalBuffer[VAR_CHECK_POLICY_MM_COMM_BUFFER_SIZE];
 
+// Pagination Cache Variables
+UINT8       *mPaginationCache = NULL;
+UINTN       mPaginationCacheSize = 0;
+UINT32      mCurrentPaginationCommand = 0;
+
 
 /**
   MM Communication Handler to recieve commands from the DXE protocol for
@@ -83,10 +88,6 @@ VarCheckPolicyLibMmiHandler (
   VARIABLE_POLICY_ENTRY                     *PolicyEntry;
   UINTN                                     ExpectedSize;
   UINT32                                    TempSize;
-  // Pagination Cache Variables
-  static UINT8                              *PaginationCache = NULL;
-  static UINTN                              PaginationCacheSize = 0;
-  static UINT32                             CurrentPaginationCommand = 0;
 
   Status = EFI_SUCCESS;
 
@@ -131,11 +132,11 @@ VarCheckPolicyLibMmiHandler (
 
   // If we're in the middle of a paginated dump and any other command is sent,
   // pagination cache must be cleared.
-  if (PaginationCache != NULL && InternalPolicyCommmHeader->Command != CurrentPaginationCommand) {
-    FreePool (PaginationCache);
-    PaginationCache = NULL;
-    PaginationCacheSize = 0;
-    CurrentPaginationCommand = 0;
+  if (mPaginationCache != NULL && InternalPolicyCommmHeader->Command != mCurrentPaginationCommand) {
+    FreePool (mPaginationCache);
+    mPaginationCache = NULL;
+    mPaginationCacheSize = 0;
+    mCurrentPaginationCommand = 0;
   }
 
   //
@@ -204,9 +205,9 @@ VarCheckPolicyLibMmiHandler (
 
       // If we're requesting the first page, initialize the cache and get the sizes.
       if (DumpParamsIn->PageRequested == 0) {
-        if (PaginationCache != NULL) {
-          FreePool (PaginationCache);
-          PaginationCache = NULL;
+        if (mPaginationCache != NULL) {
+          FreePool (mPaginationCache);
+          mPaginationCache = NULL;
         }
 
         // Determine what the required size is going to be.
@@ -215,31 +216,31 @@ VarCheckPolicyLibMmiHandler (
         DumpParamsOut->HasMore = FALSE;
         SubCommandStatus = DumpVariablePolicy (NULL, &TempSize);
         if (SubCommandStatus == EFI_BUFFER_TOO_SMALL && TempSize > 0) {
-          CurrentPaginationCommand = VAR_CHECK_POLICY_COMMAND_DUMP;
-          PaginationCacheSize = TempSize;
+          mCurrentPaginationCommand = VAR_CHECK_POLICY_COMMAND_DUMP;
+          mPaginationCacheSize = TempSize;
           DumpParamsOut->TotalSize = TempSize;
-          PaginationCache = AllocatePool (PaginationCacheSize);
-          if (PaginationCache == NULL) {
+          mPaginationCache = AllocatePool (mPaginationCacheSize);
+          if (mPaginationCache == NULL) {
             SubCommandStatus = EFI_OUT_OF_RESOURCES;
           }
         }
 
         // If we've allocated our pagination cache, we're good to cache.
-        if (PaginationCache != NULL) {
-          SubCommandStatus = DumpVariablePolicy (PaginationCache, &TempSize);
+        if (mPaginationCache != NULL) {
+          SubCommandStatus = DumpVariablePolicy (mPaginationCache, &TempSize);
         }
 
         // Populate the remaining fields and we can boogie.
-        if (!EFI_ERROR (SubCommandStatus) && PaginationCache != NULL) {
+        if (!EFI_ERROR (SubCommandStatus) && mPaginationCache != NULL) {
           DumpParamsOut->HasMore = TRUE;
         }
-      } else if (PaginationCache != NULL) {
-        DumpParamsOut->TotalSize = (UINT32)PaginationCacheSize;
+      } else if (mPaginationCache != NULL) {
+        DumpParamsOut->TotalSize = (UINT32)mPaginationCacheSize;
         DumpOutputBuffer = (UINT8*)(DumpParamsOut + 1);
 
         // Make sure that we don't over-index the cache.
-        DumpTotalPages = PaginationCacheSize / VAR_CHECK_POLICY_MM_DUMP_BUFFER_SIZE;
-        if (PaginationCacheSize % VAR_CHECK_POLICY_MM_DUMP_BUFFER_SIZE) {
+        DumpTotalPages = mPaginationCacheSize / VAR_CHECK_POLICY_MM_DUMP_BUFFER_SIZE;
+        if (mPaginationCacheSize % VAR_CHECK_POLICY_MM_DUMP_BUFFER_SIZE != 0) {
           DumpTotalPages++;
         }
         if (DumpParamsIn->PageRequested > DumpTotalPages) {
@@ -247,21 +248,21 @@ VarCheckPolicyLibMmiHandler (
         } else {
           // Figure out how far into the page cache we need to go for our next page.
           // We know the blind subtraction won't be bad because we already checked for page 0.
-          DumpInputBuffer = &PaginationCache[VAR_CHECK_POLICY_MM_DUMP_BUFFER_SIZE * (DumpParamsIn->PageRequested - 1)];
+          DumpInputBuffer = &mPaginationCache[VAR_CHECK_POLICY_MM_DUMP_BUFFER_SIZE * (DumpParamsIn->PageRequested - 1)];
           TempSize = VAR_CHECK_POLICY_MM_DUMP_BUFFER_SIZE;
           // If we're getting the last page, adjust the PageSize.
           if (DumpParamsIn->PageRequested == DumpTotalPages) {
-            TempSize = PaginationCacheSize % VAR_CHECK_POLICY_MM_DUMP_BUFFER_SIZE;
+            TempSize = mPaginationCacheSize % VAR_CHECK_POLICY_MM_DUMP_BUFFER_SIZE;
           }
           CopyMem (DumpOutputBuffer, DumpInputBuffer, TempSize);
           DumpParamsOut->PageSize = TempSize;
           // If we just got the last page, settle up the cache.
           if (DumpParamsIn->PageRequested == DumpTotalPages) {
             DumpParamsOut->HasMore = FALSE;
-            FreePool (PaginationCache);
-            PaginationCache = NULL;
-            PaginationCacheSize = 0;
-            CurrentPaginationCommand = 0;
+            FreePool (mPaginationCache);
+            mPaginationCache = NULL;
+            mPaginationCacheSize = 0;
+            mCurrentPaginationCommand = 0;
           // Otherwise, we could do more here.
           } else {
             DumpParamsOut->HasMore = TRUE;
