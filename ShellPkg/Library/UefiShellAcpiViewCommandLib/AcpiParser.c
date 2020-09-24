@@ -1,7 +1,7 @@
 /** @file
   ACPI parser
 
-  Copyright (c) 2016 - 2020, ARM Limited. All rights reserved.
+  Copyright (c) 2016 - 2020, Arm Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
@@ -596,13 +596,12 @@ ParseAcpi (
               Parser[Index].Length
               );
         } // switch
-
-        // Validating only makes sense if we are tracing
-        // the parsed table entries, to report by table name.
-        if (GetConsistencyChecking () &&
-            (Parser[Index].FieldValidator != NULL)) {
-          Parser[Index].FieldValidator (Ptr, Parser[Index].Context);
-        }
+      }
+      // Validating only makes sense if we are tracing
+      // the parsed table entries, to report by table name.
+      if (GetConsistencyChecking () &&
+          (Parser[Index].FieldValidator != NULL)) {
+        Parser[Index].FieldValidator (Ptr, Parser[Index].Context);
       }
       Print (L"\n");
     } // if (Trace)
