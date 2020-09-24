@@ -451,57 +451,6 @@ InitMmCommonCommBuffer (
 
 
 /**
-  This helper is responsible for telemetry and any other actions that
-  need to be taken if the VariablePolicy fails to lock.
-
-  NOTE: It's possible that parts of this handling will need to become
-        part of a platform policy.
-
-  @param[in]  FailureStatus   The failure that was reported by LockVariablePolicy
-
-**/
-STATIC
-VOID
-VariablePolicyHandleFailureToLock (
-  IN  EFI_STATUS      FailureStatus
-  )
-{
-  // For now, there's no agreed-upon policy for this.
-  return;
-}
-
-
-/**
-  EndOfDxe Callback
-  Lock the VariablePolicy interface if it hasn't already been locked.
-
-  @param[in]  Event     Event whose notification function is being invoked
-  @param[in]  Context   Pointer to the notification function's context
-
-**/
-STATIC
-VOID
-EFIAPI
-LockPolicyInterfaceAtEndOfDxe (
-  IN      EFI_EVENT                 Event,
-  IN      VOID                      *Context
-  )
-{
-  EFI_STATUS  Status;
-
-  Status = ProtocolLockVariablePolicy();
-
-  if (EFI_ERROR( Status )) {
-    VariablePolicyHandleFailureToLock( Status );
-  }
-  else {
-    gBS->CloseEvent( Event );
-  }
-
-}
-
-
-/**
   Convert internal pointer addresses to virtual addresses.
 
   @param[in] Event      Event whose notification function is being invoked.
@@ -540,14 +489,11 @@ VariablePolicySmmDxeMain (
 {
   EFI_STATUS              Status;
   BOOLEAN                 ProtocolInstalled;
-  BOOLEAN                 CallbackRegistered;
   BOOLEAN                 VirtualAddressChangeRegistered;
-  EFI_EVENT               EndOfDxeEvent;
   EFI_EVENT               VirtualAddressChangeEvent;
 
   Status = EFI_SUCCESS;
   ProtocolInstalled = FALSE;
-  CallbackRegistered = FALSE;
   VirtualAddressChangeRegistered = FALSE;
 
   // Update the minimum buffer size.
@@ -588,22 +534,10 @@ VariablePolicySmmDxeMain (
     ProtocolInstalled = TRUE;
   }
 
-  //
-  // Register a callback for EndOfDxe so that the interface is at least locked before
-  // dispatching any bootloaders or UEFI apps.
-  Status = gBS->CreateEventEx( EVT_NOTIFY_SIGNAL,
-                               TPL_CALLBACK,
-                               LockPolicyInterfaceAtEndOfDxe,
-                               NULL,
-                               &gEfiEndOfDxeEventGroupGuid,
-                               &EndOfDxeEvent );
-  if (EFI_ERROR( Status )) {
-    DEBUG(( DEBUG_ERROR, "%a - Failed to create EndOfDxe event! %r\n", __FUNCTION__, Status ));
-    goto Exit;
-  }
-  else {
-    CallbackRegistered = TRUE;
-  }
+  // Normally, we might want to register a callback
+  // to lock the interface, but this is integrated
+  // into the existing callbacks in VaraiableSmm.c
+  // and VariableDxe.c.
 
   //
   // Register a VirtualAddressChange callback for the MmComm protocol and Comm buffer.
@@ -629,9 +563,6 @@ Exit:
   if (EFI_ERROR( Status )) {
     if (ProtocolInstalled) {
       gBS->UninstallProtocolInterface( &ImageHandle, &gEdkiiVariablePolicyProtocolGuid, &mVariablePolicyProtocol );
-    }
-    if (CallbackRegistered) {
-      gBS->CloseEvent( EndOfDxeEvent );
     }
     if (VirtualAddressChangeRegistered) {
       gBS->CloseEvent( VirtualAddressChangeEvent );
