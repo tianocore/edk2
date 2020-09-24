@@ -29,7 +29,6 @@
   Http.uni
 
 [Packages]
-  EmbeddedPkg/EmbeddedPkg.dec
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
   NetworkPkg/NetworkPkg.dec

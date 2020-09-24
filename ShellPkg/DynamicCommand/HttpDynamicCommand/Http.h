@@ -37,7 +37,9 @@
 #define REQ_OK           0
 #define REQ_NEED_REPEAT  1
 
-// Download Flags
+//
+// Download Flags.
+//
 #define DL_FLAG_TIME     BIT0 // Show elapsed time.
 #define DL_FLAG_KEEP_BAD BIT1 // Keep files even if download failed.
 
@@ -52,7 +54,7 @@ typedef struct {
   UINTN                 Flags;
   UINT8                 *Buffer;
   CHAR16                *ServerAddrAndProto;
-  CHAR16                *URI;
+  CHAR16                *Uri;
   EFI_HTTP_TOKEN        ResponseToken;
   EFI_HTTP_TOKEN        RequestToken;
   EFI_HTTP_PROTOCOL     *Http;
@@ -77,14 +79,14 @@ RunHttp (
   );
 
 /**
-  Retrive HII package list from ImageHandle and publish to HII database.
+  Retrieve HII package list from ImageHandle and publish to HII database.
 
-  @param ImageHandle            The image handle of the process.
+  @param[in] ImageHandle            The image handle of the process.
 
-  @return HII handle.
+  @retval HII handle.
 **/
 EFI_HII_HANDLE
 InitializeHiiPackage (
-  EFI_HANDLE                  ImageHandle
+  IN EFI_HANDLE                  ImageHandle
   );
 #endif // _HTTP_H_

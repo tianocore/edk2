@@ -13,25 +13,29 @@
 
 #define IP4_CONFIG2_INTERFACE_INFO_NAME_LENGTH 32
 
-/*
-   Constant strings and definitions related to the message
-   indicating the amount of progress in the dowloading of a HTTP file.
-*/
+//
+// Constant strings and definitions related to the message
+// indicating the amount of progress in the dowloading of a HTTP file.
+//
 
-// Number of steps in the progression slider
+//
+// Number of steps in the progression slider.
+//
 #define HTTP_PROGRESS_SLIDER_STEPS  \
   ((sizeof (HTTP_PROGR_FRAME) / sizeof (CHAR16)) - 3)
 
+//
 // Size in number of characters plus one (final zero) of the message to
 // indicate the progress of an HTTP download. The format is "[(progress slider:
 // 40 characters)] (nb of KBytes downloaded so far: 7 characters) Kb". There
 // are thus the number of characters in HTTP_PROGR_FRAME[] plus 11 characters
 // (2 // spaces, "Kb" and seven characters for the number of KBytes).
+//
 #define HTTP_PROGRESS_MESSAGE_SIZE  \
   ((sizeof (HTTP_PROGR_FRAME) / sizeof (CHAR16)) + 12)
 
 //
-// Buffer size. Note that larger buffer does not mean better speed!
+// Buffer size. Note that larger buffer does not mean better speed.
 //
 #define DEFAULT_BUF_SIZE      SIZE_32KB
 #define MAX_BUF_SIZE          SIZE_4MB
@@ -57,31 +61,39 @@
   } while (0)
 
 typedef enum {
-  HDR_HOST,
-  HDR_CONN,
-  HDR_AGENT,
-  HDR_MAX
+  HdrHost,
+  HdrConn,
+  HdrAgent,
+  HdrMax
 } HDR_TYPE;
 
 #define USER_AGENT_HDR  "Mozilla/5.0 (EDK2; Linux) Gecko/20100101 Firefox/79.0"
 
 #define TIMER_MAX_TIMEOUT_S   10
 
-// File name to use when URI ends with "/"
+//
+// File name to use when Uri ends with "/".
+//
 #define DEFAULT_HTML_FILE     L"index.html"
 #define DEFAULT_HTTP_PROTO    L"http"
 
+//
 // String to delete the HTTP progress message to be able to update it :
-// (HTTP_PROGRESS_MESSAGE_SIZE-1) '\b'
+// (HTTP_PROGRESS_MESSAGE_SIZE-1) '\b'.
+//
 #define HTTP_PROGRESS_DEL \
   L"\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\
 \b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
 
 #define HTTP_KB              L"\b\b\b\b\b\b\b\b\b\b"
-// Frame for the progression slider
+//
+// Frame for the progression slider.
+//
 #define HTTP_PROGR_FRAME     L"[                                        ]"
 
-// Improve readability by using these macros
+//
+// Improve readability by using these macros.
+//
 #define PRINT_HII(token,...) \
   ShellPrintHiiEx (\
       -1, -1, NULL, token, mHttpHiiHandle, __VA_ARGS__)
@@ -91,19 +103,24 @@ typedef enum {
 
 //
 // TimeBaseLib.h constants.
-// TODO: remove once the library gets fixed.
+// These will be removed once the library gets fixed.
 //
 
-// Define EPOCH (1970-JANUARY-01) in the Julian Date representation
+//
+// Define EPOCH (1970-JANUARY-01) in the Julian Date representation.
+//
 #define EPOCH_JULIAN_DATE                               2440588
 
-// Seconds per unit
+//
+// Seconds per unit.
+//
 #define SEC_PER_MIN                                     ((UINTN)    60)
 #define SEC_PER_HOUR                                    ((UINTN)  3600)
 #define SEC_PER_DAY                                     ((UINTN) 86400)
 
-
-// String descriptions for server errors
+//
+// String descriptions for server errors.
+//
 STATIC CONST CHAR16 *ErrStatusDesc[] =
 {
   L"400 Bad Request",
@@ -142,10 +159,14 @@ STATIC CONST SHELL_PARAM_ITEM ParamList[] = {
   {NULL , TypeMax}
 };
 
-// Local File Handle
+//
+// Local File Handle.
+//
 STATIC SHELL_FILE_HANDLE   mFileHandle = NULL;
 
-// Path of the local file, Unicode encoded
+//
+// Path of the local file, Unicode encoded.
+//
 STATIC CONST CHAR16        *mLocalFilePath;
 
 STATIC BOOLEAN             gRequestCallbackComplete = FALSE;
@@ -155,15 +176,18 @@ STATIC BOOLEAN             gHttpError;
 
 EFI_HII_HANDLE             mHttpHiiHandle;
 
-// Functions declarations
+//
+// Functions declarations.
+//
+
 /**
-  Check and convert the UINT16 option values of the 'http' command
+  Check and convert the UINT16 option values of the 'http' command.
 
-  @param[in]  ValueStr  Value as an Unicode encoded string
-  @param[out] Value     UINT16 value
+  @param[in]  ValueStr  Value as an Unicode encoded string.
+  @param[out] Value     UINT16 value.
 
-  @return     TRUE      The value was returned.
-  @return     FALSE     A parsing error occured.
+  @retval     TRUE      The value was returned.
+  @retval     FALSE     A parsing error occured.
 **/
 STATIC
 BOOLEAN
@@ -182,8 +206,8 @@ StringToUint16 (
                                  IP4_CONFIG2_INTERFACE_INFO_NAME_LENGTH
                                  double byte wide.
 
-  @return  EFI_SUCCESS  The name of the NIC was returned.
-  @return  Others       The creation of the child for the Managed
+  @retval  EFI_SUCCESS  The name of the NIC was returned.
+  @retval  Others       The creation of the child for the Managed
                         Network Service failed or the opening of
                         the Managed Network Protocol failed or
                         the operational parameters for the
@@ -213,8 +237,8 @@ GetNicName (
                                            protocol interface is returned in
                                            case of success.
 
-  @return  EFI_SUCCESS  The child was created and the protocol opened.
-  @return  Others       Either the creation of the child or the opening
+  @retval  EFI_SUCCESS  The child was created and the protocol opened.
+  @retval  Others       Either the creation of the child or the opening
                         of the protocol failed.
 **/
 STATIC
@@ -258,7 +282,6 @@ CloseProtocolAndDestroyServiceChild (
   @retval  EFI_OUT_OF_RESOURCES  A memory allocation failed.
   @retval  Others                The downloading of the file
                                  from the server failed.
-
 **/
 STATIC
 EFI_STATUS
@@ -271,7 +294,10 @@ DownloadFile (
 /**
   Cleans off leading and trailing spaces and tabs.
 
-  @param[in] String pointer to the string to trim them off.
+  @param[in]                      String pointer to the string to trim them off.
+
+  @retval EFI_SUCCESS             No errors.
+  @retval EFI_INVALID_PARAMETER   String pointer is NULL.
 **/
 STATIC
 EFI_STATUS
@@ -284,7 +310,7 @@ TrimSpaces (
 
   ASSERT (String != NULL);
 
-  if (!String) {
+  if (String == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -314,11 +340,19 @@ TrimSpaces (
   return EFI_SUCCESS;
 }
 
+//
+// Callbacks for request and response.
+// We just acknowledge that operation has completed here.
+//
 
-/*
- * Callbacks for request and response.
- * We just acknowledge that operation has completed here.
- */
+/**
+  Callback to set the request completion flag.
+
+  @param[in] Event:   The event.
+  @param[in] Context: pointer to Notification Context.
+
+  @retval:            VOID function.
+ **/
 STATIC
 VOID
 EFIAPI
@@ -330,6 +364,13 @@ RequestCallback (
   gRequestCallbackComplete = TRUE;
 }
 
+/**
+  Callback to set the response completion flag.
+  @param[in] Event:   The event.
+  @param[in] Context: pointer to Notification Context.
+
+  @retval:            VOID function.
+ **/
 STATIC
 VOID
 EFIAPI
@@ -343,11 +384,15 @@ ResponseCallback (
 
 //
 // Set of functions from TimeBaseLib.
-// TODO: remove once TimeBaseLib gets fixed, and enabled for ShellPkg.
+// This will be removed once TimeBaseLib is enabled for ShellPkg.
 //
 
 /**
-  Calculate Epoch days
+  Calculate Epoch days.
+
+  @param[in] Time - a pointer to the EFI_TIME abstraction.
+
+  @retval           Number of days elapsed since EPOCH_JULIAN_DAY.
  **/
 STATIC
 UINTN
@@ -358,8 +403,14 @@ EfiGetEpochDays (
   UINTN a;
   UINTN y;
   UINTN m;
-  UINTN JulianDate; // Absolute Julian Date representation of the supplied Time
-  UINTN EpochDays;  // Number of days elapsed since EPOCH_JULIAN_DAY
+  //
+  // Absolute Julian Date representation of the supplied Time.
+  //
+  UINTN JulianDate;
+  //
+  // Number of days elapsed since EPOCH_JULIAN_DAY.
+  //
+  UINTN EpochDays;
 
   a = (14 - Time->Month) / 12 ;
   y = Time->Year + 4800 - a;
@@ -376,7 +427,9 @@ EfiGetEpochDays (
 
 /**
   Converts EFI_TIME to Epoch seconds
-  (elapsed since 1970 JANUARY 01, 00:00:00 UTC)
+  (elapsed since 1970 JANUARY 01, 00:00:00 UTC).
+
+  @param[in] Time: a pointer to EFI_TIME abstraction.
  **/
 STATIC
 UINTN
@@ -385,7 +438,10 @@ EfiTimeToEpoch (
   IN  EFI_TIME  *Time
   )
 {
-  UINTN EpochDays;   // Number of days elapsed since EPOCH_JULIAN_DAY
+  //
+  // Number of days elapsed since EPOCH_JULIAN_DAY.
+  //
+  UINTN EpochDays;
   UINTN EpochSeconds;
 
   EpochDays = EfiGetEpochDays (Time);
@@ -403,16 +459,15 @@ EfiTimeToEpoch (
   @param[in] ImageHandle  Handle to the Image (NULL if Internal).
   @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
 
-  @return  SHELL_SUCCESS            The 'http' command completed successfully.
-  @return  SHELL_ABORTED            The Shell Library initialization failed.
-  @return  SHELL_INVALID_PARAMETER  At least one of the command's arguments is
+  @retval  SHELL_SUCCESS            The 'http' command completed successfully.
+  @retval  SHELL_ABORTED            The Shell Library initialization failed.
+  @retval  SHELL_INVALID_PARAMETER  At least one of the command's arguments is
                                     not valid.
-  @return  SHELL_OUT_OF_RESOURCES   A memory allocation failed.
-  @return  SHELL_NOT_FOUND          Network Interface Card not found.
-  @return  SHELL_UNSUPPORTED        Command was valid, but the server returned
+  @retval  SHELL_OUT_OF_RESOURCES   A memory allocation failed.
+  @retval  SHELL_NOT_FOUND          Network Interface Card not found.
+  @retval  SHELL_UNSUPPORTED        Command was valid, but the server returned
                                     a status code indicating some error.
                                     Examine the file requested for error body.
-
 **/
 SHELL_STATUS
 RunHttp (
@@ -448,7 +503,7 @@ RunHttp (
   Handles             = NULL;
 
   //
-  // Initialize the Shell library (we must be in non-auto-init...)
+  // Initialize the Shell library (we must be in non-auto-init...).
   //
   ParamOffset = 0;
   gHttpError  = FALSE;
@@ -484,7 +539,7 @@ RunHttp (
   }
 
   //
-  // Check the number of parameters
+  // Check the number of parameters.
   //
   Status = EFI_INVALID_PARAMETER;
 
@@ -507,7 +562,7 @@ RunHttp (
   Context.HttpConfigData.AccessPoint.IPv4Node = &IPv4Node;
 
   //
-  // Get the host address (not necessarily IPv4 format)
+  // Get the host address (not necessarily IPv4 format).
   //
   ValueStr = ShellCommandLineGetRawValue (CheckPackage, 1);
   if (!ValueStr) {
@@ -560,7 +615,9 @@ RunHttp (
   if (!RemoteFilePath) {
     RemoteFilePath = ShellCommandLineGetRawValue (CheckPackage, 2);
     if (!RemoteFilePath) {
-      // If no path given, assume just "/"
+      //
+      // If no path given, assume just "/".
+      //
       RemoteFilePath = L"/";
     }
   }
@@ -589,13 +646,13 @@ RunHttp (
   }
 
   InitialSize = 0;
-  Context.URI = StrnCatGrow (
-                  &Context.URI,
+  Context.Uri = StrnCatGrow (
+                  &Context.Uri,
                   &InitialSize,
                   RemoteFilePath,
                   StrLen (RemoteFilePath)
                   );
-  if (!Context.URI) {
+  if (!Context.Uri) {
     Status = EFI_OUT_OF_RESOURCES;
     goto Error;
   }
@@ -633,7 +690,7 @@ RunHttp (
   }
 
   //
-  // Locate all HTTP Service Binding protocols
+  // Locate all HTTP Service Binding protocols.
   //
   Status = gBS->LocateHandleBuffer (
                   ByProtocol,
@@ -693,7 +750,10 @@ RunHttp (
         NicName,
         Status
         );
-      // If a user aborted the operation, do not try another controller.
+      //
+      // If a user aborted the operation,
+      // do not try another controller.
+      //
       if (Status == EFI_ABORTED) {
         goto Error;
       }
@@ -716,7 +776,7 @@ Error:
   ShellCommandLineFreeVarList (CheckPackage);
   SHELL_FREE_NON_NULL (Handles);
   SHELL_FREE_NON_NULL (Context.ServerAddrAndProto);
-  SHELL_FREE_NON_NULL (Context.URI);
+  SHELL_FREE_NON_NULL (Context.Uri);
 
   return Status & ~MAX_BIT;
 }
@@ -727,8 +787,8 @@ Error:
   @param[in]  ValueStr  Value as an Unicode encoded string
   @param[out] Value     UINT16 value
 
-  @return     TRUE      The value was returned.
-  @return     FALSE     A parsing error occured.
+  @retval     TRUE      The value was returned.
+  @retval     FALSE     A parsing error occured.
 **/
 STATIC
 BOOLEAN
@@ -759,8 +819,8 @@ StringToUint16 (
                                  IP4_CONFIG2_INTERFACE_INFO_NAME_LENGTH
                                  double byte wide.
 
-  @return  EFI_SUCCESS  The name of the NIC was returned.
-  @return  Others       The creation of the child for the Managed
+  @retval  EFI_SUCCESS  The name of the NIC was returned.
+  @retval  Others       The creation of the child for the Managed
                         Network Service failed or the opening of
                         the Managed Network Protocol failed or
                         the operational parameters for the
@@ -834,8 +894,8 @@ Error:
                                            protocol interface is returned in
                                            case of success.
 
-  @return  EFI_SUCCESS  The child was created and the protocol opened.
-  @return  Others       Either the creation of the child or the opening
+  @retval  EFI_SUCCESS  The child was created and the protocol opened.
+  @retval  Others       Either the creation of the child or the opening
                         of the protocol failed.
 **/
 STATIC
@@ -890,7 +950,6 @@ CreateServiceChildAndOpenProtocol (
                                           service to be destroyed.
   @param[in]  ProtocolGuid                GUID of the protocol to be closed.
   @param[in]  ChildHandle                 Handle of the child to be destroyed.
-
 **/
 STATIC
 VOID
@@ -924,9 +983,9 @@ CloseProtocolAndDestroyServiceChild (
   @param[in]   CallBackComplete    A pointer to the callback completion
                                    variable set by the callback.
 
-  @return  EFI_SUCCESS             Callback signalled completion.
-  @return  EFI_TIMEOUT             Timed out waiting for completion.
-  @return  Others                  Error waiting for completion.
+  @retval  EFI_SUCCESS             Callback signalled completion.
+  @retval  EFI_TIMEOUT             Timed out waiting for completion.
+  @retval  Others                  Error waiting for completion.
 **/
 STATIC
 EFI_STATUS
@@ -940,7 +999,9 @@ WaitForCompletion (
 
   Status = EFI_SUCCESS;
 
+  //
   // Use a timer to measure timeout. Cannot use Stall here!
+  //
   Status = gBS->CreateEvent (
                   EVT_TIMER,
                   TPL_CALLBACK,
@@ -1007,15 +1068,14 @@ WaitForCompletion (
   @param[in]   Context           HTTP download context.
   @param[in]   DownloadUrl       Fully qualified URL to be downloaded.
 
-  @return EFI_SUCCESS            Request has been sent successfully.
-  @return EFI_INVALID_PARAMETER  Invalid URL.
-  @return EFI_OUT_OF_RESOURCES   Out of memory.
-  @return EFI_DEVICE_ERROR       If HTTPS is used, this probably
+  @retval EFI_SUCCESS            Request has been sent successfully.
+  @retval EFI_INVALID_PARAMETER  Invalid URL.
+  @retval EFI_OUT_OF_RESOURCES   Out of memory.
+  @retval EFI_DEVICE_ERROR       If HTTPS is used, this probably
                                  means that TLS support either was not
                                  installed or not configured.
-  @return Others                 Error sending the request.
+  @retval Others                 Error sending the request.
 **/
-
 STATIC
 EFI_STATUS
 SendRequest (
@@ -1024,7 +1084,7 @@ SendRequest (
   )
 {
   EFI_HTTP_REQUEST_DATA       RequestData;
-  EFI_HTTP_HEADER             RequestHeader[HDR_MAX];
+  EFI_HTTP_HEADER             RequestHeader[HdrMax];
   EFI_HTTP_MESSAGE            RequestMessage;
   EFI_STATUS                  Status;
   CHAR16                      *Host;
@@ -1035,9 +1095,9 @@ SendRequest (
   ZeroMem (&RequestMessage, sizeof (RequestMessage));
   ZeroMem (&Context->RequestToken, sizeof (Context->RequestToken));
 
-  RequestHeader[HDR_HOST].FieldName = "Host";
-  RequestHeader[HDR_CONN].FieldName = "Connection";
-  RequestHeader[HDR_AGENT].FieldName = "User-Agent";
+  RequestHeader[HdrHost].FieldName = "Host";
+  RequestHeader[HdrConn].FieldName = "Connection";
+  RequestHeader[HdrAgent].FieldName = "User-Agent";
 
   Host = (CHAR16 *)Context->ServerAddrAndProto;
   while (*Host != CHAR_NULL && *Host != L'/') {
@@ -1049,29 +1109,29 @@ SendRequest (
   }
 
   //
-  // Get the next slash
+  // Get the next slash.
   //
   Host++;
   //
-  // And now the host name
+  // And now the host name.
   //
   Host++;
 
   StringSize = StrLen (Host) + 1;
-  RequestHeader[HDR_HOST].FieldValue = AllocatePool (StringSize);
-  if (!RequestHeader[HDR_HOST].FieldValue) {
+  RequestHeader[HdrHost].FieldValue = AllocatePool (StringSize);
+  if (!RequestHeader[HdrHost].FieldValue) {
     return EFI_OUT_OF_RESOURCES;
   }
 
   UnicodeStrToAsciiStrS (
     Host,
-    RequestHeader[HDR_HOST].FieldValue,
+    RequestHeader[HdrHost].FieldValue,
     StringSize
     );
 
-  RequestHeader[HDR_CONN].FieldValue = "close";
-  RequestHeader[HDR_AGENT].FieldValue = USER_AGENT_HDR;
-  RequestMessage.HeaderCount = HDR_MAX;
+  RequestHeader[HdrConn].FieldValue = "close";
+  RequestHeader[HdrAgent].FieldValue = USER_AGENT_HDR;
+  RequestMessage.HeaderCount = HdrMax;
 
   RequestData.Method = HttpMethodGet;
   RequestData.Url = DownloadUrl;
@@ -1108,7 +1168,7 @@ SendRequest (
   }
 
 Error:
-  SHELL_FREE_NON_NULL (RequestHeader[HDR_HOST].FieldValue);
+  SHELL_FREE_NON_NULL (RequestHeader[HdrHost].FieldValue);
   if (Context->RequestToken.Event) {
     gBS->CloseEvent (Context->RequestToken.Event);
     ZeroMem (&Context->RequestToken, sizeof (Context->RequestToken));
@@ -1127,7 +1187,6 @@ Error:
 
   @retval  EFI_SUCCESS     Portion saved.
   @retval  Other           Error saving the portion.
-
 **/
 STATIC
 EFI_STATUS
@@ -1217,7 +1276,7 @@ SavePortion (
 }
 
 /**
-  Replace the original Host and URI with Host and URI returned by the
+  Replace the original Host and Uri with Host and Uri returned by the
   HTTP server in 'Location' header (redirection).
 
   @param[in]   Location           A pointer to the 'Location' string
@@ -1225,10 +1284,9 @@ SavePortion (
   @param[in]   Context            A pointer to HTTP download context.
   @param[in]   DownloadUrl        Fully qualified HTTP URL.
 
-  @return  EFI_SUCCESS            Host and URI were successfully set.
-  @return  EFI_OUT_OF_RESOURCES   Error setting Host or URI.
+  @retval  EFI_SUCCESS            Host and Uri were successfully set.
+  @retval  EFI_OUT_OF_RESOURCES   Error setting Host or Uri.
 **/
-
 STATIC
 EFI_STATUS
 SetHostURI (
@@ -1279,10 +1337,14 @@ SetHostURI (
   }
 
   if (AsciiStrLen (Location) > 2) {
+    //
     // Some servers return 'Location: //server/resource'
+    //
     IsAbEmptyUrl = (Location[0] == '/') && (Location[1] == '/');
     if (IsAbEmptyUrl) {
+      //
       // Skip first "//"
+      //
       Location += 2;
       FirstStep = 1;
     }
@@ -1315,7 +1377,7 @@ SetHostURI (
     CopyMem (Tmp, Location, Idx);
 
     //
-    // Location now points to URI
+    // Location now points to Uri
     //
     Location += Idx;
     StringSize = (Idx + 1) * sizeof (CHAR16);
@@ -1361,21 +1423,21 @@ SetHostURI (
     }
   }
 
-  SHELL_FREE_NON_NULL (Context->URI);
+  SHELL_FREE_NON_NULL (Context->Uri);
 
   StringSize = AsciiStrSize (Location) * sizeof (CHAR16);
-  Context->URI = AllocateZeroPool (StringSize);
-  if (!Context->URI) {
+  Context->Uri = AllocateZeroPool (StringSize);
+  if (!Context->Uri) {
     Status = EFI_OUT_OF_RESOURCES;
     goto Error;
   }
 
   //
-  // Now make changes to the URI part.
+  // Now make changes to the Uri part.
   //
   Status = AsciiStrToUnicodeStrS (
              (CONST CHAR8 *)Location,
-             Context->URI,
+             Context->Uri,
              StringSize
              );
 Error:
@@ -1395,10 +1457,9 @@ Error:
   @param[in]   Length          Data length of this portion.
   @param[in]   Context         A pointer to the HTTP download context.
 
-  @return      EFI_SUCCESS    The portion was processed successfully.
-  @return      Other          Error returned by SavePortion.
+  @retval      EFI_SUCCESS    The portion was processed successfully.
+  @retval      Other          Error returned by SavePortion.
 **/
-
 STATIC
 EFI_STATUS
 EFIAPI
@@ -1409,7 +1470,10 @@ ParseMsg (
   IN VOID                       *Context
   )
 {
-  if (!Data || (EventType == BodyParseEventOnComplete) || !Context) {
+  if ((Data == NULL)
+   || (EventType == BodyParseEventOnComplete)
+   || (Context == NULL))
+  {
     return EFI_SUCCESS;
   }
 
@@ -1424,15 +1488,15 @@ ParseMsg (
   the body as well. This body will be collected in the resultant file.
 
   @param[in]   Context         A pointer to the HTTP download context.
-  @param[in]   DownloadedUrl   A pointer to the fully qualified URL to download.
+  @param[in]   DownloadUrl     A pointer to the fully qualified URL to download.
 
-  @return  EFI_SUCCESS         Valid file. Body successfully collected.
-  @return  EFI_HTTP_ERROR      Response is a valid HTTP response, but the
+  @retval  EFI_SUCCESS         Valid file. Body successfully collected.
+  @retval  EFI_HTTP_ERROR      Response is a valid HTTP response, but the
                                HTTP server
                                indicated an error (HTTP code >= 400).
                                Response body MAY contain full
                                HTTP server response.
-  @return Others               Error getting the reponse from the HTTP server.
+  @retval Others               Error getting the reponse from the HTTP server.
                                Response body is not collected.
 **/
 STATIC
@@ -1536,7 +1600,7 @@ GetResponse (
               STRING_TOKEN (STR_HTTP_ERR_STATUSCODE),
               Context->ServerAddrAndProto,
               L"Recursive HTTP server relocation",
-              Context->URI
+              Context->Uri
               );
           }
         } else {
@@ -1597,7 +1661,7 @@ GetResponse (
             STRING_TOKEN (STR_HTTP_ERR_STATUSCODE),
             Context->ServerAddrAndProto,
             Desc,
-            Context->URI
+            Context->Uri
             );
 
           //
@@ -1609,7 +1673,9 @@ GetResponse (
       }
     }
 
+    //
     // Do NOT try to parse an empty body.
+    //
     if (ResponseMessage.BodyLength || IsTrunked) {
       Status = HttpParseMessageBody (
                  MsgParser,
@@ -1649,17 +1715,16 @@ GetResponse (
   the path of the file and its size.
 
   @param[in]   Context           A pointer to the HTTP download context.
-  @param[in]   Controllerhandle  The handle of the network interface controller
+  @param[in]   ControllerHandle  The handle of the network interface controller
   @param[in]   NicName           NIC name
 
   @retval  EFI_SUCCESS           The file was downloaded.
   @retval  EFI_OUT_OF_RESOURCES  A memory allocation failed.
-  #retval  EFI_HTTP_ERROR        The server returned a valid HTTP error.
+  #return  EFI_HTTP_ERROR        The server returned a valid HTTP error.
                                  Examine the mLocalFilePath file
                                  to get error body.
   @retval  Others                The downloading of the file from the server
                                  failed.
-
 **/
 STATIC
 EFI_STATUS
@@ -1675,7 +1740,7 @@ DownloadFile (
   EFI_HANDLE                 HttpChildHandle;
 
   ASSERT (Context);
-  if (!Context) {
+  if (Context == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1683,13 +1748,13 @@ DownloadFile (
   HttpChildHandle = NULL;
 
   Context->Buffer = AllocatePool (Context->BufferSize);
-  if (!Context->Buffer) {
+  if (Context->Buffer == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto ON_EXIT;
   }
 
   //
-  // OPEN FILE
+  // Open the file.
   //
   if (!EFI_ERROR (ShellFileExists (mLocalFilePath))) {
     ShellDeleteFileByName (mLocalFilePath);
@@ -1739,7 +1804,7 @@ DownloadFile (
                     Context->ServerAddrAndProto,
                     StrLen (Context->ServerAddrAndProto)
                     );
-    if (Context->URI[0] != L'/') {
+    if (Context->Uri[0] != L'/') {
       DownloadUrl = StrnCatGrow (
                       &DownloadUrl,
                       &UrlSize,
@@ -1751,8 +1816,8 @@ DownloadFile (
     DownloadUrl = StrnCatGrow (
                     &DownloadUrl,
                     &UrlSize,
-                    Context->URI,
-                    StrLen (Context->URI));
+                    Context->Uri,
+                    StrLen (Context->Uri));
 
     PRINT_HII (STRING_TOKEN (STR_HTTP_DOWNLOADING), DownloadUrl);
 
@@ -1775,9 +1840,9 @@ DownloadFile (
 
 ON_EXIT:
   //
-  // CLOSE FILE
+  // Close the file.
   //
-  if (mFileHandle) {
+  if (mFileHandle != NULL) {
     if (EFI_ERROR (Status) && !(Context->Flags & DL_FLAG_KEEP_BAD)) {
       ShellDeleteFile (&mFileHandle);
     } else {
@@ -1796,13 +1861,13 @@ ON_EXIT:
 /**
   Retrive HII package list from ImageHandle and publish to HII database.
 
-  @param ImageHandle            The image handle of the process.
+  @param[in] ImageHandle            The image handle of the process.
 
-  @return HII handle.
+  @retval HII handle.
 **/
 EFI_HII_HANDLE
 InitializeHiiPackage (
-  EFI_HANDLE                  ImageHandle
+  IN EFI_HANDLE                  ImageHandle
   )
 {
   EFI_STATUS                  Status;
@@ -1810,7 +1875,7 @@ InitializeHiiPackage (
   EFI_HII_HANDLE              HiiHandle;
 
   //
-  // Retrieve HII package list from ImageHandle
+  // Retrieve HII package list from ImageHandle.
   //
   Status = gBS->OpenProtocol (
                   ImageHandle,
