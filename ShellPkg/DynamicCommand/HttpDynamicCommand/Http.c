@@ -350,8 +350,6 @@ TrimSpaces (
 
   @param[in] Event:   The event.
   @param[in] Context: pointer to Notification Context.
-
-  @retval:            VOID function.
  **/
 STATIC
 VOID
@@ -368,8 +366,6 @@ RequestCallback (
   Callback to set the response completion flag.
   @param[in] Event:   The event.
   @param[in] Context: pointer to Notification Context.
-
-  @retval:            VOID function.
  **/
 STATIC
 VOID
@@ -979,13 +975,13 @@ CloseProtocolAndDestroyServiceChild (
   Wait until operation completes. Completion is indicated by
   setting of an appropriate variable.
 
-  @param[in]   Context             A pointer to the HTTP download context.
-  @param[in]   CallBackComplete    A pointer to the callback completion
-                                   variable set by the callback.
+  @param[in]      Context             A pointer to the HTTP download context.
+  @param[in, out]  CallBackComplete   A pointer to the callback completion
+                                      variable set by the callback.
 
-  @retval  EFI_SUCCESS             Callback signalled completion.
-  @retval  EFI_TIMEOUT             Timed out waiting for completion.
-  @retval  Others                  Error waiting for completion.
+  @retval  EFI_SUCCESS                Callback signalled completion.
+  @retval  EFI_TIMEOUT                Timed out waiting for completion.
+  @retval  Others                     Error waiting for completion.
 **/
 STATIC
 EFI_STATUS
