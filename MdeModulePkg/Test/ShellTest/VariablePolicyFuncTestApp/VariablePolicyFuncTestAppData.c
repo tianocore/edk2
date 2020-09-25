@@ -1,13 +1,12 @@
-/** @file -- VarPolicyTestAuthVar.h
+/** @file -- VariablePolicyFuncTestAppData.h
 Payload to be used to create an Authenticated Variable for testing.
 
 Copyright (c) Microsoft Corporation.
 SPDX-License-Identifier: BSD-2-Clause-Patent
-
 **/
 
-#ifndef _VAR_POLICY_TEST_AUTH_VAR_H_
-#define _VAR_POLICY_TEST_AUTH_VAR_H_
+#include <Uefi.h>
+
 
 UINT8     mTestAuthVarPayload[] = {
   // EFI_VARIABLE_AUTHENTICATION_2
@@ -124,5 +123,3 @@ UINT8     mTestAuthVarPayload[] = {
   0xEF, 0xBE, 0xAD, 0xDE
 };
 UINTN     mTestAuthVarPayloadSize = sizeof(mTestAuthVarPayload);
-
-#endif // _VAR_POLICY_TEST_AUTH_VAR_H_

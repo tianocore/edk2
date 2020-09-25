@@ -21,7 +21,8 @@
 
 [Sources]
   VariablePolicyFuncTestApp.c
-  VariablePolicyTestAuthVar.h
+  VariablePolicyFuncTestAppData.c
+  VariablePolicyFuncTestInternal.h
 
 [Packages]
   MdePkg/MdePkg.dec

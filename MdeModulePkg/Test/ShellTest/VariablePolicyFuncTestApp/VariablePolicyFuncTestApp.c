@@ -3,7 +3,7 @@ UEFI Shell based application for unit testing the Variable Policy Protocol.
 
 Copyright (c) Microsoft Corporation.
 SPDX-License-Identifier: BSD-2-Clause-Patent
-**/
+***/
 
 #include <Uefi.h>
 #include <Library/UefiLib.h>
@@ -18,7 +18,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 
-#include "VariablePolicyTestAuthVar.h"
+#include "VariablePolicyFuncTestInternal.h"
 
 // TODO: Need to add to the UnitTestFrameworkPkg
 // #include <Library/UnitTestBootLib.h>
@@ -44,7 +44,10 @@ EFI_GUID mTestAuthNamespaceGuid = { 0xb6c5a2c6, 0x3ece, 0x4b9b, { 0x8c, 0xc8, 0x
 
 /**
   Prerequisite for most test cases.
-**/
+  Makes sure that the protocol can be located prior to the test case.
+
+  @param        Context
+  **/
 UNIT_TEST_STATUS
 EFIAPI
 LocateVarPolicyPreReq (
@@ -62,8 +65,13 @@ LocateVarPolicyPreReq (
   }
 
   return UNIT_TEST_PASSED;
-} // LocateVarPolicyPreReq
+}
 
+/**
+  Prerequisite to make sure that VarPolicy is also enabled.
+
+  @param        Context
+  **/
 UNIT_TEST_STATUS
 EFIAPI
 VarPolicyEnabledPreReq (
@@ -81,6 +89,11 @@ VarPolicyEnabledPreReq (
   return UNIT_TEST_PASSED;
 }
 
+/**
+  Prerequisite to make sure that VarPolicy is also disabled.
+
+  @param        Context
+  **/
 UNIT_TEST_STATUS
 EFIAPI
 VarPolicyDisabledPreReq (
@@ -98,8 +111,15 @@ VarPolicyDisabledPreReq (
   return UNIT_TEST_PASSED;
 }
 
+//=============================================================================
+//
+// GETTING STARTED TEST SUITE
+//
+//=============================================================================
 /**
-  Getting Started tests.
+  Unit test.
+
+  @param        Context
 **/
 UNIT_TEST_STATUS
 EFIAPI
@@ -116,8 +136,13 @@ CheckVpEnabled (
   UT_ASSERT_EQUAL (State, TRUE);
 
   return UNIT_TEST_PASSED;
-} // CheckVpEnabled
+}
 
+/**
+  CheckVpRevision test.
+
+  @param        Context
+  **/
 UNIT_TEST_STATUS
 EFIAPI
 CheckVpRevision (
@@ -128,7 +153,7 @@ CheckVpRevision (
   UT_LOG_INFO ("VP Revision: 0x%x\n", mVarPol->Revision);
 
   return UNIT_TEST_PASSED;
-} // CheckVpRevision
+}
 
 /**
   NOTE: Copied from SecureBootConfigImpl.c, then modified.
@@ -151,7 +176,7 @@ CheckVpRevision (
   @retval EFI_INVALID_PARAMETER    The parameter is invalid.
   @retval Others                   Unexpected error happens.
 
-**/
+  **/
 STATIC
 EFI_STATUS
 CreateEmptyTimeBasedPayload (
@@ -229,9 +254,16 @@ CreateEmptyTimeBasedPayload (
   return EFI_SUCCESS;
 }
 
+//=============================================================================
+//
+// NO_LOCK POLICY TEST SUITE
+//
+//=============================================================================
 /**
-  NoLock Policy tests.
-**/
+  TestMinSizeNoLock test.
+
+  @param        Context
+  **/
 UNIT_TEST_STATUS
 EFIAPI
 TestMinSizeNoLock (
@@ -310,8 +342,13 @@ TestMinSizeNoLock (
   FreePool (Buffer);
 
   return UNIT_TEST_PASSED;
-} // TestMinSizeNoLock
+}
 
+/**
+  TestMaxSizeNoLock test.
+
+  @param        Context
+**/
 UNIT_TEST_STATUS
 EFIAPI
 TestMaxSizeNoLock (
@@ -390,8 +427,13 @@ TestMaxSizeNoLock (
   FreePool (Buffer);
 
   return UNIT_TEST_PASSED;
-} // TestMaxSizeNoLock
+}
 
+/**
+  TestMustHaveAttrNoLock test.
+
+  @param        Context
+**/
 UNIT_TEST_STATUS
 EFIAPI
 TestMustHaveAttrNoLock (
@@ -464,8 +506,13 @@ TestMustHaveAttrNoLock (
                              NULL);
   UT_ASSERT_NOT_EFI_ERROR (Status);
   return UNIT_TEST_PASSED;
-} // TestMustHaveAttrNoLock
+}
 
+/**
+  TestCantHaveAttrNoLock test.
+
+  @param        Context
+**/
 UNIT_TEST_STATUS
 EFIAPI
 TestCantHaveAttrNoLock (
@@ -517,8 +564,13 @@ TestCantHaveAttrNoLock (
   UT_ASSERT_NOT_EFI_ERROR (Status);
 
   return UNIT_TEST_PASSED;
-} // TestCantHaveAttrNoLock
+}
 
+/**
+  TestMaxSizeNamespaceNoLock test.
+
+  @param        Context
+**/
 UNIT_TEST_STATUS
 EFIAPI
 TestMaxSizeNamespaceNoLock (
@@ -600,8 +652,13 @@ TestMaxSizeNamespaceNoLock (
   FreePool (Buffer);
 
   return UNIT_TEST_PASSED;
-} // TestMaxSizeNamespaceNoLock
+}
 
+/**
+  TestMustHaveAttrWildcardNoLock test.
+
+  @param        Context
+**/
 UNIT_TEST_STATUS
 EFIAPI
 TestMustHaveAttrWildcardNoLock (
@@ -675,8 +732,13 @@ TestMustHaveAttrWildcardNoLock (
   UT_ASSERT_NOT_EFI_ERROR (Status);
 
   return UNIT_TEST_PASSED;
-} // TestMustHaveAttrWildcardNoLock
+}
 
+/**
+  TestPolicyprioritizationNoLock test.
+
+  @param        Context
+**/
 UNIT_TEST_STATUS
 EFIAPI
 TestPolicyprioritizationNoLock (
@@ -793,10 +855,17 @@ TestPolicyprioritizationNoLock (
   UT_ASSERT_NOT_EFI_ERROR (Status);
 
   return UNIT_TEST_PASSED;
-} // TestPolicyprioritizationNoLock
+}
 
+//=============================================================================
+//
+// LOCK_NOW POLICY TEST SUITE
+//
+//=============================================================================
 /**
-  LockNow Policy tests.
+  TestExistingVarLockNow test.
+
+  @param        Context
 **/
 UNIT_TEST_STATUS
 EFIAPI
@@ -857,8 +926,13 @@ TestExistingVarLockNow (
   //
 
   return UNIT_TEST_PASSED;
-} // TestExistingVarLockNow
+}
 
+/**
+  TestNonexistentVarLockNow test.
+
+  @param        Context
+**/
 UNIT_TEST_STATUS
 EFIAPI
 TestNonexistentVarLockNow (
@@ -905,10 +979,17 @@ TestNonexistentVarLockNow (
   UT_ASSERT_STATUS_EQUAL (Status, EFI_WRITE_PROTECTED);
 
   return UNIT_TEST_PASSED;
-} // TestNonexistentVarLockNow
+}
 
+//=============================================================================
+//
+// LOCK_ON_CREATE POLICY TEST SUITE
+//
+//=============================================================================
 /**
-  LockOnCreate Policy tests.
+  TestExistingVarLockOnCreate test.
+
+  @param        Context
 **/
 UNIT_TEST_STATUS
 EFIAPI
@@ -969,8 +1050,13 @@ TestExistingVarLockOnCreate (
   //
 
   return UNIT_TEST_PASSED;
-} // TestExistingVarLockOnCreate
+}
 
+/**
+  TestNonexistentVarLockOnCreate test.
+
+  @param        Context
+**/
 UNIT_TEST_STATUS
 EFIAPI
 TestNonexistentVarLockOnCreate (
@@ -1065,10 +1151,17 @@ TestNonexistentVarLockOnCreate (
   //
 
   return UNIT_TEST_PASSED;
-} // TestNonexistentVarLockOnCreate
+}
 
+//=============================================================================
+//
+// LOCK_ON_VAR_STATE POLICY TEST SUITE
+//
+//=============================================================================
 /**
-  LockOnVarState Policy tests.
+  TestLockOnVarStateBeforeCreate test.
+
+  @param        Context
 **/
 UNIT_TEST_STATUS
 EFIAPI
@@ -1168,8 +1261,13 @@ TestLockOnVarStateBeforeCreate (
   UT_ASSERT_NOT_EFI_ERROR (Status);
 
   return UNIT_TEST_PASSED;
-} // TestLockOnVarStateBeforeCreate
+}
 
+/**
+  TestLockOnVarStateAfterCreate test.
+
+  @param        Context
+**/
 UNIT_TEST_STATUS
 EFIAPI
 TestLockOnVarStateAfterCreate (
@@ -1256,8 +1354,13 @@ TestLockOnVarStateAfterCreate (
   UT_ASSERT_NOT_EFI_ERROR (Status);
 
   return UNIT_TEST_PASSED;
-} // TestLockOnVarStateAfterCreate
+}
 
+/**
+  TestLockOnVarStateInvalidLargeTrigger test.
+
+  @param        Context
+**/
 UNIT_TEST_STATUS
 EFIAPI
 TestLockOnVarStateInvalidLargeTrigger (
@@ -1322,8 +1425,13 @@ TestLockOnVarStateInvalidLargeTrigger (
   UT_ASSERT_NOT_EFI_ERROR (Status);
 
   return UNIT_TEST_PASSED;
-} // TestLockOnVarStateInvalidLargeTrigger
+}
 
+/**
+  TestLockOnVarStateWrongValueTrigger test.
+
+  @param        Context
+**/
 UNIT_TEST_STATUS
 EFIAPI
 TestLockOnVarStateWrongValueTrigger (
@@ -1388,10 +1496,17 @@ TestLockOnVarStateWrongValueTrigger (
   UT_ASSERT_NOT_EFI_ERROR (Status);
 
   return UNIT_TEST_PASSED;
-} // TestLockOnVarStateWrongValueTrigger
+}
 
+//=============================================================================
+//
+// INVALID POLICY TEST SUITE
+//
+//=============================================================================
 /**
-  Invalid policy tests.
+  TestInvalidAttributesPolicy test.
+
+  @param        Context
 **/
 UNIT_TEST_STATUS
 EFIAPI
@@ -1502,8 +1617,13 @@ TestInvalidAttributesPolicy (
   UT_LOG_INFO ("Setting cant have attr to 0x4000 returned %r\n", Status);
 
   return UNIT_TEST_PASSED;
-} // TestInvalidAttributesPolicy
+}
 
+/**
+  TestLargeMinSizePolicy test.
+
+  @param        Context
+**/
 UNIT_TEST_STATUS
 EFIAPI
 TestLargeMinSizePolicy (
@@ -1527,8 +1647,13 @@ TestLargeMinSizePolicy (
   UT_LOG_INFO ("Setting min size to 0x80000000 returned %r\n", Status);
 
   return UNIT_TEST_PASSED;
-} // TestLargeMinSizePolicy
+}
 
+/**
+  TestZeroMaxSizePolicy test.
+
+  @param        Context
+**/
 UNIT_TEST_STATUS
 EFIAPI
 TestZeroMaxSizePolicy (
@@ -1552,8 +1677,13 @@ TestZeroMaxSizePolicy (
   UT_LOG_INFO ("Setting max size to 0 returned %r\n", Status);
 
   return UNIT_TEST_PASSED;
-} // TestZeroMaxSizePolicy
+}
 
+/**
+  TestInvalidPolicyTypePolicy test.
+
+  @param        Context
+**/
 UNIT_TEST_STATUS
 EFIAPI
 TestInvalidPolicyTypePolicy (
@@ -1591,10 +1721,17 @@ TestInvalidPolicyTypePolicy (
   UT_ASSERT_NOT_EQUAL (Status, EFI_SUCCESS);
 
   return UNIT_TEST_PASSED;
-} // TestInvalidPolicyTypePolicy
+}
 
+//=============================================================================
+//
+// DUMP POLICY TEST SUITE
+//
+//=============================================================================
 /**
-  Test dumping policy.
+  TestDumpPolicy test.
+
+  @param        Context
 **/
 UNIT_TEST_STATUS
 EFIAPI
@@ -1627,10 +1764,17 @@ TestDumpPolicy (
   UT_ASSERT_NOT_EFI_ERROR (Status);
 
   return UNIT_TEST_PASSED;
-} // TestDumpPolicy
+}
 
+//=============================================================================
+//
+// POLICY VERSION TEST SUITE
+//
+//=============================================================================
 /**
-  Test policy version.
+  TestPolicyVersion test.
+
+  @param        Context
 **/
 UNIT_TEST_STATUS
 EFIAPI
@@ -1662,10 +1806,17 @@ TestPolicyVersion (
   FreePool (NewEntry);
 
   return UNIT_TEST_PASSED;
-} // TestPolicyVersion
+}
 
+//=============================================================================
+//
+// LOCK VAR_POLICY TEST SUITE
+//
+//=============================================================================
 /**
-  Lock Policy Tests.
+  LockPolicyEngineTests test.
+
+  @param        Context
 **/
 UNIT_TEST_STATUS
 EFIAPI
@@ -1774,11 +1925,11 @@ LockPolicyEngineTests (
   UT_ASSERT_NOT_EQUAL (Status, EFI_SUCCESS);
 
   return UNIT_TEST_PASSED;
-} // LockPolicyEngineTests
+}
 
 /**
   Save context and reboot after the lock policy test suite.
-**/
+  **/
 STATIC
 VOID
 EFIAPI
@@ -1816,10 +1967,16 @@ SaveStateAndReboot (
   }
 
   return;
-} // SaveContextAndReboot
+}
 
+/**
+  Reboot System and Trash the Context.
+
+  @param            Context
+  **/
 STATIC
 VOID
+EFIAPI
 IgnoreContextAndReboot (
   IN UNIT_TEST_CONTEXT           Context
   )
@@ -1830,7 +1987,9 @@ IgnoreContextAndReboot (
 
 /**
   Disable policy tests.
-**/
+
+  @param        Context
+  **/
 UNIT_TEST_STATUS
 EFIAPI
 DisablePolicyEngineTests (
@@ -1872,12 +2031,15 @@ DisablePolicyEngineTests (
   UT_ASSERT_NOT_EFI_ERROR (Status);
 
   return UNIT_TEST_PASSED;
-} // DisablePolicyEngineTests
+}
 
-//
-// Pre-Disable Setup and Test for Authenticated Variables
-//
+/**
+  Pre-Disable Setup and Test for Authenticated Variables test.
+
+  @param        Context
+**/
 UNIT_TEST_STATUS
+EFIAPI
 TestAuthVarPart1 (
   IN UNIT_TEST_CONTEXT           Context
   )
@@ -1923,10 +2085,13 @@ TestAuthVarPart1 (
   return UNIT_TEST_PASSED;
 }
 
-//
-// Post-Disable Test for Authenticated Variables
-//
+/**
+  Post-Disable Test for Authenticated Variables test.
+
+  @param        Context
+**/
 UNIT_TEST_STATUS
+EFIAPI
 TestAuthVarPart2 (
   IN UNIT_TEST_CONTEXT           Context
   )
@@ -1974,7 +2139,9 @@ TestAuthVarPart2 (
 
 /**
   Final Cleanup: delete some variables earlier test cases created.
-**/
+
+  @param            Context
+  **/
 STATIC
 VOID
 EFIAPI
@@ -2032,12 +2199,17 @@ FinalCleanup (
                              0,
                              NULL);
   UT_LOG_INFO ("Delete ExistingLockOnVarStateVar status: %r\n", Status);
-} // FinalCleanup
+}
+
 
 /**
+  The driver's entry point.
 
-  Main fuction sets up the unit test environment.
+  @param[in] ImageHandle  The firmware allocated handle for the EFI image.
+  @param[in] SystemTable  A pointer to the EFI System Table.
 
+  @retval EFI_SUCCESS     The entry point executed successfully.
+  @retval other           Some error occured when executing this entry point.
 **/
 EFI_STATUS
 EFIAPI
@@ -2223,4 +2395,4 @@ EXIT:
   }
 
   return Status;
-} // UefiMain
+}
