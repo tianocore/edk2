@@ -1,7 +1,7 @@
 /** @file
   IORT Table Generator
 
-  Copyright (c) 2017 - 2020, ARM Limited. All rights reserved.
+  Copyright (c) 2017 - 2021, Arm Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -870,9 +870,9 @@ AddNamedComponentNodes (
     NcNode->Node.NumIdMappings = NodeList->IdMappingCount;
 
     ObjectNameLength = AsciiStrLen (NodeList->ObjectName) + 1;
-    NcNode->Node.IdReference =
-      (UINT32)(sizeof (EFI_ACPI_6_0_IO_REMAPPING_NAMED_COMP_NODE) +
-        (ALIGN_VALUE (ObjectNameLength, 4)));
+    NcNode->Node.IdReference = (NodeList->IdMappingCount == 0) ?
+      0 : ((UINT32)(sizeof (EFI_ACPI_6_0_IO_REMAPPING_NAMED_COMP_NODE) +
+           (ALIGN_VALUE (ObjectNameLength, 4))));
 
     // Named Component specific data
     NcNode->Flags = NodeList->Flags;
@@ -1001,7 +1001,8 @@ AddRootComplexNodes (
     RcNode->Node.Revision = 1;
     RcNode->Node.Reserved = EFI_ACPI_RESERVED_DWORD;
     RcNode->Node.NumIdMappings = NodeList->IdMappingCount;
-    RcNode->Node.IdReference = sizeof (EFI_ACPI_6_0_IO_REMAPPING_RC_NODE);
+    RcNode->Node.IdReference = (NodeList->IdMappingCount == 0) ?
+      0 : sizeof (EFI_ACPI_6_0_IO_REMAPPING_RC_NODE);
 
     // Root Complex specific data
     RcNode->CacheCoherent = NodeList->CacheCoherent;
@@ -1182,11 +1183,12 @@ AddSmmuV1V2Nodes (
     SmmuNode->Node.Revision = 0;
     SmmuNode->Node.Reserved = EFI_ACPI_RESERVED_DWORD;
     SmmuNode->Node.NumIdMappings = NodeList->IdMappingCount;
-    SmmuNode->Node.IdReference = sizeof (EFI_ACPI_6_0_IO_REMAPPING_SMMU_NODE) +
-      (NodeList->ContextInterruptCount *
-      sizeof (EFI_ACPI_6_0_IO_REMAPPING_SMMU_INT)) +
-      (NodeList->PmuInterruptCount *
-      sizeof (EFI_ACPI_6_0_IO_REMAPPING_SMMU_INT));
+    SmmuNode->Node.IdReference = (NodeList->IdMappingCount == 0) ?
+      0 : (sizeof (EFI_ACPI_6_0_IO_REMAPPING_SMMU_NODE) +
+           (NodeList->ContextInterruptCount *
+           sizeof (EFI_ACPI_6_0_IO_REMAPPING_SMMU_INT)) +
+           (NodeList->PmuInterruptCount *
+           sizeof (EFI_ACPI_6_0_IO_REMAPPING_SMMU_INT)));
 
     // SMMU v1/v2 specific data
     SmmuNode->Base = NodeList->BaseAddress;
@@ -1352,8 +1354,8 @@ AddSmmuV3Nodes (
     SmmuV3Node->Node.Revision = 2;
     SmmuV3Node->Node.Reserved = EFI_ACPI_RESERVED_DWORD;
     SmmuV3Node->Node.NumIdMappings = NodeList->IdMappingCount;
-    SmmuV3Node->Node.IdReference =
-      sizeof (EFI_ACPI_6_0_IO_REMAPPING_SMMU3_NODE);
+    SmmuV3Node->Node.IdReference = (NodeList->IdMappingCount == 0) ?
+      0 : sizeof (EFI_ACPI_6_0_IO_REMAPPING_SMMU3_NODE);
 
     // SMMUv3 specific data
     SmmuV3Node->Base = NodeList->BaseAddress;
@@ -1482,7 +1484,8 @@ AddPmcgNodes (
     PmcgNode->Node.Revision = 1;
     PmcgNode->Node.Reserved = EFI_ACPI_RESERVED_DWORD;
     PmcgNode->Node.NumIdMappings = NodeList->IdMappingCount;
-    PmcgNode->Node.IdReference = sizeof (EFI_ACPI_6_0_IO_REMAPPING_PMCG_NODE);
+    PmcgNode->Node.IdReference = (NodeList->IdMappingCount == 0) ?
+      0 : sizeof (EFI_ACPI_6_0_IO_REMAPPING_PMCG_NODE);
 
     // PMCG specific data
     PmcgNode->Base = NodeList->BaseAddress;
