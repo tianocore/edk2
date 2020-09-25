@@ -4,7 +4,6 @@ Business logic for Variable Policy enforcement.
 
 Copyright (c) Microsoft Corporation.
 SPDX-License-Identifier: BSD-2-Clause-Patent
-
 **/
 
 #include <stdio.h>
@@ -96,8 +95,7 @@ EFI_GUID    mTestGuid3 = TEST_GUID_3;
 
   @retval     TRUE
   @retval     FALSE
-
-**/
+  **/
 STATIC
 BOOLEAN
 InitExpVarPolicyStrings (
@@ -133,7 +131,13 @@ InitExpVarPolicyStrings (
 
 /**
   Mocked version of GetVariable, for testing.
-**/
+
+  @param        VariableName
+  @param        VendorGuid
+  @param        Attributes
+  @param        DataSize
+  @param        Data
+  **/
 EFI_STATUS
 EFIAPI
 StubGetVariableNull (
@@ -179,7 +183,9 @@ StubGetVariableNull (
   with the stubbed GetVariable.
 
   Not used by all test cases, but by most.
-**/
+
+  @param    Context
+  **/
 STATIC
 UNIT_TEST_STATUS
 EFIAPI
@@ -193,7 +199,9 @@ LibInitMocked (
 /**
   Common cleanup function to make sure that the library is always de-initialized prior
   to the next test case.
-*/
+
+  @param    Context
+  **/
 STATIC
 VOID
 EFIAPI
@@ -210,8 +218,10 @@ LibCleanup (
 ///===== ARCHITECTURAL SUITE ==================================================
 
 /**
-  Test Case
-*/
+  Test Case.
+
+  @param    Context
+  **/
 UNIT_TEST_STATUS
 EFIAPI
 ShouldBeAbleToInitAndDeinitTheLibrary (
@@ -233,8 +243,10 @@ ShouldBeAbleToInitAndDeinitTheLibrary (
 }
 
 /**
-  Test Case
-*/
+  Test Case.
+
+  @param        Context
+  **/
 UNIT_TEST_STATUS
 EFIAPI
 ShouldNotBeAbleToInitializeTheLibraryTwice (
@@ -250,8 +262,10 @@ ShouldNotBeAbleToInitializeTheLibraryTwice (
 }
 
 /**
-  Test Case
-*/
+  Test Case.
+
+  @param        Context
+  **/
 UNIT_TEST_STATUS
 EFIAPI
 ShouldFailDeinitWithoutInit (
@@ -265,14 +279,18 @@ ShouldFailDeinitWithoutInit (
 }
 
 /**
-  Test Case
-*/
+  Test Case.
+
+  @param        Context
+  **/
 UNIT_TEST_STATUS
 EFIAPI
 ApiCommandsShouldNotRespondIfLibIsUninitialized (
   IN UNIT_TEST_CONTEXT      Context
   )
 {
+  UINT8     DummyData[8];
+  UINT32    DummyDataSize = sizeof(DummyData);
   SIMPLE_VARIABLE_POLICY_ENTRY   TestPolicy = {
     {
       VARIABLE_POLICY_ENTRY_REVISION,
@@ -287,8 +305,6 @@ ApiCommandsShouldNotRespondIfLibIsUninitialized (
     },
     TEST_VAR_1_NAME
   };
-  UINT8     DummyData[8];
-  UINT32    DummyDataSize = sizeof(DummyData);
 
   // This test should not start with an initialized library.
 
@@ -322,8 +338,10 @@ EvaluatePolicyMatch (
   );
 
 /**
-  Test Case
-*/
+  Test Case.
+
+  @param        Context
+  **/
 UNIT_TEST_STATUS
 EFIAPI
 PoliciesShouldMatchByNameAndGuid (
@@ -360,8 +378,10 @@ PoliciesShouldMatchByNameAndGuid (
 }
 
 /**
-  Test Case
-*/
+  Test Case.
+
+  @param        Context
+  **/
 UNIT_TEST_STATUS
 EFIAPI
 WildcardPoliciesShouldMatchDigits (
@@ -407,8 +427,10 @@ WildcardPoliciesShouldMatchDigits (
 }
 
 /**
-  Test Case
-*/
+  Test Case.
+
+  @param        Context
+  **/
 UNIT_TEST_STATUS
 EFIAPI
 WildcardPoliciesShouldMatchDigitsAdvanced (
@@ -464,8 +486,10 @@ WildcardPoliciesShouldMatchDigitsAdvanced (
 }
 
 /**
-  Test Case
-*/
+  Test Case.
+
+  @param        Context
+  **/
 UNIT_TEST_STATUS
 EFIAPI
 WildcardPoliciesShouldMatchNamespaces (
@@ -502,8 +526,10 @@ WildcardPoliciesShouldMatchNamespaces (
 }
 
 /**
-  Test Case
-*/
+  Test Case.
+
+  @param        Context
+  **/
 UNIT_TEST_STATUS
 EFIAPI
 MatchPrioritiesShouldFollowRules (
@@ -561,8 +587,10 @@ MatchPrioritiesShouldFollowRules (
 ///=== POLICY MANIPULATION SUITE ==============================================
 
 /**
-  Test Case
-*/
+  Test Case.
+
+  @param        Context
+  **/
 UNIT_TEST_STATUS
 EFIAPI
 RegisterShouldAllowNamespaceWildcards (
@@ -590,8 +618,10 @@ RegisterShouldAllowNamespaceWildcards (
 }
 
 /**
-  Test Case
-*/
+  Test Case.
+
+  @param        Context
+  **/
 UNIT_TEST_STATUS
 EFIAPI
 RegisterShouldAllowStateVarsForNamespaces (
@@ -626,8 +656,10 @@ RegisterShouldAllowStateVarsForNamespaces (
 }
 
 /**
-  Test Case
-*/
+  Test Case.
+
+  @param        Context
+  **/
 UNIT_TEST_STATUS
 EFIAPI
 RegisterShouldRejectNullPointers (
@@ -639,8 +671,10 @@ RegisterShouldRejectNullPointers (
 }
 
 /**
-  Test Case
-*/
+  Test Case.
+
+  @param        Context
+  **/
 UNIT_TEST_STATUS
 EFIAPI
 RegisterShouldRejectBadRevisions (
@@ -669,8 +703,10 @@ RegisterShouldRejectBadRevisions (
 }
 
 /**
-  Test Case
-*/
+  Test Case.
+
+  @param        Context
+  **/
 UNIT_TEST_STATUS
 EFIAPI
 RegisterShouldRejectBadSizes (
@@ -699,8 +735,10 @@ RegisterShouldRejectBadSizes (
 }
 
 /**
-  Test Case
-*/
+  Test Case.
+
+  @param        Context
+  **/
 UNIT_TEST_STATUS
 EFIAPI
 RegisterShouldRejectBadOffsets (
@@ -749,8 +787,10 @@ RegisterShouldRejectBadOffsets (
 }
 
 /**
-  Test Case
-*/
+  Test Case.
+
+  @param        Context
+  **/
 UNIT_TEST_STATUS
 EFIAPI
 RegisterShouldRejectMissingStateStrings (
@@ -792,8 +832,10 @@ RegisterShouldRejectMissingStateStrings (
 }
 
 /**
-  Test Case
-*/
+  Test Case.
+
+  @param        Context
+  **/
 UNIT_TEST_STATUS
 EFIAPI
 RegisterShouldRejectStringsMissingNull (
@@ -836,8 +878,10 @@ RegisterShouldRejectStringsMissingNull (
 }
 
 /**
-  Test Case
-*/
+  Test Case.
+
+  @param        Context
+  **/
 UNIT_TEST_STATUS
 EFIAPI
 RegisterShouldRejectMalformedStrings (
@@ -880,8 +924,10 @@ RegisterShouldRejectMalformedStrings (
 }
 
 /**
-  Test Case
-*/
+  Test Case.
+
+  @param        Context
+  **/
 UNIT_TEST_STATUS
 EFIAPI
 RegisterShouldRejectUnpackedPolicies (
@@ -928,8 +974,10 @@ RegisterShouldRejectUnpackedPolicies (
 }
 
 /**
-  Test Case
-*/
+  Test Case.
+
+  @param        Context
+  **/
 UNIT_TEST_STATUS
 EFIAPI
 RegisterShouldRejectInvalidNameCharacters (
@@ -964,8 +1012,10 @@ RegisterShouldRejectInvalidNameCharacters (
 }
 
 /**
-  Test Case
-*/
+  Test Case.
+
+  @param        Context
+  **/
 UNIT_TEST_STATUS
 EFIAPI
 RegisterShouldRejectBadPolicyConstraints (
@@ -995,8 +1045,10 @@ RegisterShouldRejectBadPolicyConstraints (
 }
 
 /**
-  Test Case
-*/
+  Test Case.
+
+  @param        Context
+  **/
 UNIT_TEST_STATUS
 EFIAPI
 RegisterShouldRejectUnknownLockPolicies (
@@ -1027,8 +1079,10 @@ RegisterShouldRejectUnknownLockPolicies (
 }
 
 /**
-  Test Case
-*/
+  Test Case.
+
+  @param        Context
+  **/
 UNIT_TEST_STATUS
 EFIAPI
 RegisterShouldRejectPolicesWithTooManyWildcards (
@@ -1057,8 +1111,10 @@ RegisterShouldRejectPolicesWithTooManyWildcards (
 }
 
 /**
-  Test Case
-*/
+  Test Case.
+
+  @param        Context
+  **/
 UNIT_TEST_STATUS
 EFIAPI
 RegisterShouldRejectDuplicatePolicies (
@@ -1087,8 +1143,10 @@ RegisterShouldRejectDuplicatePolicies (
 }
 
 /**
-  Test Case
-*/
+  Test Case.
+
+  @param        Context
+  **/
 UNIT_TEST_STATUS
 EFIAPI
 MinAndMaxSizePoliciesShouldBeHonored (
@@ -1152,8 +1210,10 @@ MinAndMaxSizePoliciesShouldBeHonored (
 }
 
 /**
-  Test Case
-*/
+  Test Case.
+
+  @param        Context
+  **/
 UNIT_TEST_STATUS
 EFIAPI
 AttributeMustPoliciesShouldBeHonored (
@@ -1225,8 +1285,10 @@ AttributeMustPoliciesShouldBeHonored (
 }
 
 /**
-  Test Case
-*/
+  Test Case.
+
+  @param        Context
+  **/
 UNIT_TEST_STATUS
 EFIAPI
 AttributeCantPoliciesShouldBeHonored (
@@ -1290,8 +1352,10 @@ AttributeCantPoliciesShouldBeHonored (
 }
 
 /**
-  Test Case
-*/
+  Test Case.
+
+  @param        Context
+  **/
 UNIT_TEST_STATUS
 EFIAPI
 VariablesShouldBeDeletableRegardlessOfSize (
@@ -1338,8 +1402,10 @@ VariablesShouldBeDeletableRegardlessOfSize (
 }
 
 /**
-  Test Case
-*/
+  Test Case.
+
+  @param        Context
+  **/
 UNIT_TEST_STATUS
 EFIAPI
 LockNowPoliciesShouldBeHonored (
@@ -1387,8 +1453,10 @@ LockNowPoliciesShouldBeHonored (
 }
 
 /**
-  Test Case
-*/
+  Test Case.
+
+  @param        Context
+  **/
 UNIT_TEST_STATUS
 EFIAPI
 LockOnCreatePoliciesShouldBeHonored (
@@ -1459,8 +1527,10 @@ LockOnCreatePoliciesShouldBeHonored (
 }
 
 /**
-  Test Case
-*/
+  Test Case.
+
+  @param        Context
+  **/
 UNIT_TEST_STATUS
 EFIAPI
 LockOnStatePoliciesShouldBeHonored (
@@ -1578,8 +1648,10 @@ LockOnStatePoliciesShouldBeHonored (
 }
 
 /**
-  Test Case
-*/
+  Test Case.
+
+  @param        Context
+  **/
 UNIT_TEST_STATUS
 EFIAPI
 LockOnStatePoliciesShouldApplyToNamespaces (
@@ -1685,8 +1757,10 @@ LockOnStatePoliciesShouldApplyToNamespaces (
 }
 
 /**
-  Test Case
-*/
+  Test Case.
+
+  @param        Context
+  **/
 UNIT_TEST_STATUS
 EFIAPI
 LockOnStateShouldHandleErrorsGracefully (
@@ -1785,8 +1859,10 @@ LockOnStateShouldHandleErrorsGracefully (
 }
 
 /**
-  Test Case
-*/
+  Test Case.
+
+  @param        Context
+  **/
 UNIT_TEST_STATUS
 EFIAPI
 BestMatchPriorityShouldBeObeyed (
@@ -1926,8 +2002,10 @@ BestMatchPriorityShouldBeObeyed (
 ///=== POLICY UTILITY SUITE ===================================================
 
 /**
-  Test Case
-*/
+  Test Case.
+
+  @param        Context
+  **/
 UNIT_TEST_STATUS
 EFIAPI
 ShouldBeAbleToLockInterface (
@@ -1965,8 +2043,10 @@ ShouldBeAbleToLockInterface (
 }
 
 /**
-  Test Case
-*/
+  Test Case.
+
+  @param        Context
+  **/
 UNIT_TEST_STATUS
 EFIAPI
 ShouldBeAbleToDisablePolicyEnforcement (
@@ -2011,8 +2091,10 @@ ShouldBeAbleToDisablePolicyEnforcement (
 }
 
 /**
-  Test Case
-*/
+  Test Case.
+
+  @param        Context
+  **/
 UNIT_TEST_STATUS
 EFIAPI
 ShouldNotBeAbleToDisablePoliciesTwice (
@@ -2032,8 +2114,10 @@ ShouldNotBeAbleToDisablePoliciesTwice (
 }
 
 /**
-  Test Case
-*/
+  Test Case.
+
+  @param        Context
+  **/
 UNIT_TEST_STATUS
 EFIAPI
 ShouldBeAbleToAddNewPoliciesAfterDisabled (
@@ -2069,8 +2153,10 @@ ShouldBeAbleToAddNewPoliciesAfterDisabled (
 }
 
 /**
-  Test Case
-*/
+  Test Case.
+
+  @param        Context
+  **/
 UNIT_TEST_STATUS
 EFIAPI
 ShouldBeAbleToLockAfterDisabled (
@@ -2091,8 +2177,10 @@ ShouldBeAbleToLockAfterDisabled (
 }
 
 /**
-  Test Case
-*/
+  Test Case.
+
+  @param        Context
+  **/
 UNIT_TEST_STATUS
 EFIAPI
 ShouldBeAbleToDumpThePolicyTable (
@@ -2157,8 +2245,10 @@ ShouldBeAbleToDumpThePolicyTable (
 }
 
 /**
-  Test Case
-*/
+  Test Case.
+
+  @param        Context
+  **/
 UNIT_TEST_STATUS
 EFIAPI
 ShouldBeAbleToDumpThePolicyTableAfterDisabled (
@@ -2241,17 +2331,12 @@ ShouldBeAbleToDumpThePolicyTableAfterDisabled (
 ///=== TEST ENGINE ================================================================================
 
 /**
-  SampleUnitTestApp
-
-  @param[in] ImageHandle  The firmware allocated handle for the EFI image.
-  @param[in] SystemTable  A pointer to the EFI System Table.
-
-  @retval EFI_SUCCESS     The entry point executed successfully.
-  @retval other           Some error occured when executing this entry point.
-
-**/
-int
-main (
+  Unit Test Entry Point.
+  **/
+VOID
+EFIAPI
+UnitTestMain (
+  VOID
   )
 {
   EFI_STATUS                  Status;
@@ -2441,6 +2526,7 @@ main (
   // Execute the tests.
   //
   Status = RunAllTestSuites( Framework );
+  ASSERT_EFI_ERROR (Status);
 
 EXIT:
   if (Framework != NULL)
@@ -2448,5 +2534,5 @@ EXIT:
     FreeUnitTestFramework( Framework );
   }
 
-  return Status;
+  return;
 }

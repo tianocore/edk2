@@ -21,6 +21,7 @@
 
 [LibraryClasses]
   SafeIntLib|MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
+  HostUnitTestEntryPoint|UnitTestFrameworkPkg/Library/HostUnitTestEntryPoint/HostUnitTestEntryPoint.inf
 
 [Components]
   MdeModulePkg/Library/DxeResetSystemLib/UnitTest/MockUefiRuntimeServicesTableLib.inf

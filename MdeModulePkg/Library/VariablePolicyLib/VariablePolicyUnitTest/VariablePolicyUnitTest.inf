@@ -38,6 +38,7 @@
   VariablePolicyLib
   BaseMemoryLib
   MemoryAllocationLib
+  HostUnitTestEntryPoint
 
 
 [BuildOptions]
