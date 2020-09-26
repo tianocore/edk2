@@ -18,7 +18,8 @@
         ],
         ## Both file path and directory path are accepted.
         "IgnoreFiles": [
-            "Library/CmockaLib/cmocka"
+            "Library/CmockaLib/cmocka",
+            "Library/HostUnitTestEntryPoint/HostUnitTestEntryPoint.c"
         ]
     },
     ## options defined .pytool/Plugin/CompilerPlugin
