@@ -305,5 +305,6 @@ class EccCheck(ICiBuildPlugin):
                              "10016",
                              "10017",
                              "10022",
+                             "5007"
                             }
         return ignore_error_code
