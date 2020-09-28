@@ -78,6 +78,12 @@
   # Define if the GICv3 controller should use the GICv2 legacy
   gArmTokenSpaceGuid.PcdArmGicV3WithV2Legacy|FALSE|BOOLEAN|0x00000042
 
+  ## Used to select method for requesting services from S-EL1.<BR><BR
+  #   TRUE  - Selects FF-A calls for communication between S-EL0 and SPMC.<BR>
+  #   FALSE - Selects SVC calls for communication between S-EL0 and SPMC.<BR>
+  # @Prompt Enable FF-A support.
+  gArmTokenSpaceGuid.PcdFfaEnable|FALSE|BOOLEAN|0x0000005B
+
 [PcdsFeatureFlag.ARM]
   # Whether to map normal memory as non-shareable. FALSE is the safe choice, but
   # TRUE may be appropriate to fix performance problems if you don't care about
