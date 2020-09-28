@@ -873,6 +873,7 @@ HttpCleanProtocol (
     // Destroy the TLS instance.
     //
     HttpInstance->TlsSb->DestroyChild (HttpInstance->TlsSb, HttpInstance->TlsChildHandle);
+    HttpInstance->TlsChildHandle = NULL;
   }
 
   if (HttpInstance->Tcp4ChildHandle != NULL) {
