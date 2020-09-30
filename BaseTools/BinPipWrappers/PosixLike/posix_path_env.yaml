@@ -1,11 +1,11 @@
 ## @file
-# Add this folder to the path on Windows
+# Set this folder on the path for all linux builds
 #
 # Copyright (c) Microsoft Corporation.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 {
-  "id": "binwrappers",
-  "scope": "global-win",
+  "scope": "pipbuild-unix",
+  "override_id": "binwrappers",
   "flags": ["set_path"]
 }
