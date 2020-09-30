@@ -862,6 +862,12 @@ InternalX86RdRand64  (
   OUT     UINT64                    *Rand
   );
 
+#elif defined (MDE_CPU_AARCH64)
+
+// RNDR, Random Number
+#define RNDR      S3_3_C2_C4_0
+#define RNDRRS    S3_3_C2_C4_1
+
 #else
 
 #endif

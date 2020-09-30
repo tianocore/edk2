@@ -7519,4 +7519,50 @@ PatchInstructionX86 (
   );
 
 #endif // defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
+
+#if defined (MDE_CPU_AARCH64)
+
+/**
+  Reads the ID_AA64ISAR0 Register.
+
+  @return The contents of the ID_AA64ISAR0 Register
+
+**/
+UINT64
+EFIAPI
+ArmReadIdIsar0 (
+  VOID
+  );
+
+/**
+  Generates a random number using the RNDR instruction.
+
+  @param[out]  The generated random number
+
+  @retval TRUE  Success: a random number was successfully generated
+  @retval FALSE Failure: a random number was unable to be generated
+
+**/
+BOOLEAN
+EFIAPI
+ArmRndr (
+  OUT UINT64 *Rand
+  );
+
+/**
+  Generates a random number using the RNDRRS instruction.
+
+  @param[out]  The generated random number
+
+  @retval TRUE  Success: a random number was successfully generated
+  @retval FALSE Failure: a random number was unable to be generated
+
+**/
+BOOLEAN
+ArmRndrrs (
+  OUT UINT64 *Rand
+  );
+
+#endif // defined (MDE_CPU_AARCH64)
+
 #endif // !defined (__BASE_LIB__)

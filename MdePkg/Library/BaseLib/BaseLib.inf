@@ -380,6 +380,8 @@
   AArch64/SetJumpLongJump.S         | GCC
   AArch64/CpuBreakpoint.S           | GCC
   AArch64/SpeculationBarrier.S      | GCC
+  AArch64/ArmRng.S                  | GCC
+  AArch64/ArmReadIdIsar0.S          | GCC
 
   AArch64/MemoryFence.asm           | MSFT
   AArch64/SwitchStack.asm           | MSFT
@@ -389,6 +391,8 @@
   AArch64/SetJumpLongJump.asm       | MSFT
   AArch64/CpuBreakpoint.asm         | MSFT
   AArch64/SpeculationBarrier.asm    | MSFT
+  AArch64/ArmRng.asm                | MSFT
+  AArch64/ArmReadIdIsar0.asm        | MSFT
 
 [Sources.RISCV64]
   Math64.c
