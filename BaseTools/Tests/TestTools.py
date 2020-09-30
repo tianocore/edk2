@@ -53,7 +53,7 @@ def GetBaseToolsPaths():
         return [
                 os.path.join(BaseToolsDir, 'Bin', uname),
                 os.path.join(BaseToolsDir, 'BinWrappers', uname),
-                os.path.join(BaseToolsDir, 'BinWrappers', 'PosixLike')
+                os.path.join(BaseToolsDir, 'BinWrappers', 'PosixLike'),
             ]
 
 BaseToolsBinPaths = GetBaseToolsPaths()

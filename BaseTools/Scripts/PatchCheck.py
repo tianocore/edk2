@@ -359,6 +359,7 @@ class GitDiffCheck:
                 self.force_notabs = True
                 if self.filename.endswith('.sh') or \
                     self.filename.startswith('BaseTools/BinWrappers/PosixLike/') or \
+                    self.filename.startswith('BaseTools/BinPipWrappers/PosixLike/') or \
                     self.filename.startswith('BaseTools/Bin/CYGWIN_NT-5.1-i686/') or \
                     self.filename == 'BaseTools/BuildEnv':
                     #
