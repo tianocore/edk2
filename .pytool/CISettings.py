@@ -22,6 +22,7 @@ class Settings(CiBuildSettingsManager, UpdateSettingsManager, SetupSettingsManag
         self.ActualTargets = []
         self.ActualArchitectures = []
         self.ActualToolChainTag = ""
+        self.UseBuiltInBaseTools = None
 
     # ####################################################################################### #
     #                             Extra CmdLine configuration                                 #
@@ -131,7 +132,24 @@ class Settings(CiBuildSettingsManager, UpdateSettingsManager, SetupSettingsManag
 
         self.ActualToolChainTag = shell_environment.GetBuildVars().GetValue("TOOL_CHAIN_TAG", "")
 
-        if GetHostInfo().os.upper() == "LINUX" and self.ActualToolChainTag.upper().startswith("GCC"):
+        is_linux = GetHostInfo().os.upper() == "LINUX"
+
+        if self.UseBuiltInBaseTools is None:
+            is_linux = GetHostInfo().os.upper() == "LINUX"
+            # try and import the pip module for basetools
+            try:
+                import edk2basetools
+                self.UseBuiltInBaseTools = True
+                logging.info("Using Pip Tools based BaseTools")
+            except ImportError:
+                logging.warning("Falling back to using in-tree BaseTools")
+                self.UseBuiltInBaseTools = False
+                pass
+
+        if self.UseBuiltInBaseTools == True:
+            scopes += ('pipbuild-unix',) if is_linux else ('pipbuild-win',)
+
+        if is_linux and self.ActualToolChainTag.upper().startswith("GCC"):
             if "AARCH64" in self.ActualArchitectures:
                 scopes += ("gcc_aarch64_linux",)
             if "ARM" in self.ActualArchitectures:
