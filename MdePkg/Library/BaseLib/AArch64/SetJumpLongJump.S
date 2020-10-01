@@ -46,6 +46,14 @@ GCC_ASM_EXPORT(InternalLongJump)
 #
 ASM_PFX(SetJump):
         AARCH64_BTI(c)
+#ifndef MDEPKG_NDEBUG
+        stp     x29, x30, [sp, #-32]!
+        mov     x29, sp
+        str     x0, [sp, #16]
+        bl      InternalAssertJumpBuffer
+        ldr     x0, [sp, #16]
+        ldp     x29, x30, [sp], #32
+#endif
         mov     x16, sp // use IP0 so save SP
 #define REG_PAIR(REG1, REG2, OFFS)      stp REG1, REG2, [x0, OFFS]
 #define REG_ONE(REG1, OFFS)             str REG1, [x0, OFFS]
