@@ -57,6 +57,8 @@ SetJump
 InternalLongJump
   LDM   R0, {R3-R12,R14}
   MOV   R13, R3
+  CMP   R1, #0
+  MOVEQ R1, #1
   MOV   R0, R1
   BX    LR
 
