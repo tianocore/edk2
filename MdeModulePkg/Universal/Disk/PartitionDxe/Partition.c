@@ -1149,8 +1149,8 @@ PartitionInstallChildHandle (
 
   Private->Signature        = PARTITION_PRIVATE_DATA_SIGNATURE;
 
-  Private->Start            = MultU64x32 (Start, BlockSize);
-  Private->End              = MultU64x32 (End + 1, BlockSize);
+  Private->Start            = MultU64x32 (Start, ParentBlockIo->Media->BlockSize);
+  Private->End              = MultU64x32 (End + 1, ParentBlockIo->Media->BlockSize);
 
   Private->BlockSize        = BlockSize;
   Private->ParentBlockIo    = ParentBlockIo;
@@ -1187,7 +1187,13 @@ PartitionInstallChildHandle (
 
   Private->Media.IoAlign   = 0;
   Private->Media.LogicalPartition = TRUE;
-  Private->Media.LastBlock = End - Start;
+  Private->Media.LastBlock = DivU64x32 (
+                               MultU64x32 (
+                                 End - Start + 1,
+                                 ParentBlockIo->Media->BlockSize
+                                 ),
+                                BlockSize
+                               ) - 1;
 
   Private->Media.BlockSize = (UINT32) BlockSize;
 
