@@ -33,7 +33,7 @@ GCC_ASM_EXPORT(InternalLongJump)
 ASM_PFX(SetJump):
   mov   r3, r13
   stmia r0, {r3-r12,r14}
-  eor   r0, r0, r0
+  mov   r0, #0
   bx    lr
 
 #/**
