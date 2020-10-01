@@ -61,7 +61,7 @@ ASM_PFX(SetJump):
         FPR_LAYOUT
 #undef REG_PAIR
 #undef REG_ONE
-        mov     w0, #0
+        mov     x0, #0
         ret
 
 #/**
@@ -91,9 +91,9 @@ ASM_PFX(InternalLongJump):
 #undef REG_PAIR
 #undef REG_ONE
         mov     sp, x16
-        cmp     w1, #0
-        mov     w0, #1
-        csel    w0, w1, w0, ne
+        cmp     x1, #0
+        mov     x0, #1
+        csel    x0, x1, x0, ne
         ret
 
 ASM_FUNCTION_REMOVE_IF_UNREFERENCED

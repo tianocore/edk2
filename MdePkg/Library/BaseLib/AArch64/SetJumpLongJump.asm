@@ -59,7 +59,7 @@ SetJump
         FPR_LAYOUT
 #undef REG_PAIR
 #undef REG_ONE
-        mov     w0, #0
+        mov     x0, #0
         ret
 
 ;/**
@@ -88,10 +88,10 @@ InternalLongJump
 #undef REG_PAIR
 #undef REG_ONE
         mov     sp, x16
-        cmp     w1, #0
-        mov     w0, #1
+        cmp     x1, #0
+        mov     x0, #1
         beq     exit
-        mov     w0, w1
+        mov     x0, x1
 exit
         // use br not ret, as ret is guaranteed to mispredict
         br      x30
