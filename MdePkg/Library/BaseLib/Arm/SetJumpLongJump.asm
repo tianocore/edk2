@@ -33,7 +33,7 @@
 SetJump
   MOV  R3, R13
   STM  R0, {R3-R12,R14}
-  EOR  R0, R0
+  MOV  RO, #0
   BX   LR
 
 ;/**
