@@ -1,0 +1,42 @@
+## @file
+#  FDT client library for motorola,mc146818 RTC driver
+#
+#  Copyright (c) 2020, ARM Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = KvmtoolRtcFdtClientLib
+  FILE_GUID                      = 3254B4F7-30B5-48C6-B06A-D8FF97F3EF95
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = KvmtoolRtcFdtClientLib|DXE_DRIVER DXE_RUNTIME_DRIVER
+  CONSTRUCTOR                    = KvmtoolRtcFdtClientLibConstructor
+
+[Sources]
+  KvmtoolRtcFdtClientLib.c
+
+[Packages]
+  ArmVirtPkg/ArmVirtPkg.dec
+  MdePkg/MdePkg.dec
+  PcAtChipsetPkg/PcAtChipsetPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  PcdLib
+  UefiBootServicesTableLib
+  DxeServicesTableLib
+
+[Protocols]
+  gFdtClientProtocolGuid                                ## CONSUMES
+
+[Pcd]
+  gPcAtChipsetPkgTokenSpaceGuid.PcdRtcIndexRegister64
+  gPcAtChipsetPkgTokenSpaceGuid.PcdRtcTargetRegister64
+
+[Depex]
+  gFdtClientProtocolGuid
