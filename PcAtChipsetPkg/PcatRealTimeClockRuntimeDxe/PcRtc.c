@@ -3,12 +3,16 @@
 
 Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Inc. All rights reserved.<BR>
+Copyright (c) 2018 - 2020, ARM Limited. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include "PcRtc.h"
+
+extern UINTN  mRtcIndexRegister;
+extern UINTN  mRtcTargetRegister;
 
 //
 // Days of month.
@@ -54,38 +58,132 @@ IsWithinOneDay (
   );
 
 /**
-  Read RTC content through its registers.
+  Read RTC content through its registers using IO access.
 
-  @param  Address  Address offset of RTC. It is recommended to use macros such as
-                   RTC_ADDRESS_SECONDS.
+  @param  Address   Address offset of RTC. It is recommended to use
+                    macros such as RTC_ADDRESS_SECONDS.
 
   @return The data of UINT8 type read from RTC.
 **/
+STATIC
 UINT8
-RtcRead (
-  IN  UINT8 Address
+IoRtcRead (
+  IN  UINTN Address
   )
 {
-  IoWrite8 (PcdGet8 (PcdRtcIndexRegister), (UINT8) (Address | (UINT8) (IoRead8 (PcdGet8 (PcdRtcIndexRegister)) & 0x80)));
+  IoWrite8 (
+    PcdGet8 (PcdRtcIndexRegister),
+    (UINT8)(Address | (UINT8)(IoRead8 (PcdGet8 (PcdRtcIndexRegister)) & 0x80))
+    );
   return IoRead8 (PcdGet8 (PcdRtcTargetRegister));
+}
+
+/**
+  Write RTC through its registers  using IO access.
+
+  @param  Address   Address offset of RTC. It is recommended to use
+                    macros such as RTC_ADDRESS_SECONDS.
+  @param  Data      The content you want to write into RTC.
+
+**/
+STATIC
+VOID
+IoRtcWrite (
+  IN  UINTN   Address,
+  IN  UINT8   Data
+  )
+{
+  IoWrite8 (
+    PcdGet8 (PcdRtcIndexRegister),
+    (UINT8)(Address | (UINT8)(IoRead8 (PcdGet8 (PcdRtcIndexRegister)) & 0x80))
+    );
+  IoWrite8 (PcdGet8 (PcdRtcTargetRegister), Data);
+}
+
+/**
+  Read RTC content through its registers using MMIO access.
+
+  @param  Address   Address offset of RTC. It is recommended to use
+                    macros such as RTC_ADDRESS_SECONDS.
+
+  @return The data of UINT8 type read from RTC.
+**/
+STATIC
+UINT8
+MmioRtcRead (
+  IN  UINTN Address
+  )
+{
+  MmioWrite8 (
+    mRtcIndexRegister,
+    (UINT8)(Address | (UINT8)(MmioRead8 (mRtcIndexRegister) & 0x80))
+    );
+  return MmioRead8 (mRtcTargetRegister);
+}
+
+/**
+  Write RTC through its registers using MMIO access.
+
+  @param  Address   Address offset of RTC. It is recommended to use
+                    macros such as RTC_ADDRESS_SECONDS.
+  @param  Data      The content you want to write into RTC.
+
+**/
+STATIC
+VOID
+MmioRtcWrite (
+  IN  UINTN   Address,
+  IN  UINT8   Data
+  )
+{
+  MmioWrite8 (
+    mRtcIndexRegister,
+    (UINT8)(Address | (UINT8)(MmioRead8 (mRtcIndexRegister) & 0x80))
+    );
+  MmioWrite8 (mRtcTargetRegister, Data);
+}
+
+/**
+  Read RTC content through its registers.
+
+  @param  Address   Address offset of RTC. It is recommended to use
+                    macros such as RTC_ADDRESS_SECONDS.
+
+  @return The data of UINT8 type read from RTC.
+**/
+STATIC
+UINT8
+RtcRead (
+  IN  UINTN Address
+  )
+{
+  if (FeaturePcdGet (PcdRtcUseMmio)) {
+    return MmioRtcRead (Address);
+  }
+
+  return IoRtcRead (Address);
 }
 
 /**
   Write RTC through its registers.
 
-  @param  Address  Address offset of RTC. It is recommended to use macros such as
-                   RTC_ADDRESS_SECONDS.
-  @param  Data     The content you want to write into RTC.
+  @param  Address   Address offset of RTC. It is recommended to use
+                    macros such as RTC_ADDRESS_SECONDS.
+  @param  Data      The content you want to write into RTC.
 
 **/
+STATIC
 VOID
 RtcWrite (
-  IN  UINT8   Address,
+  IN  UINTN   Address,
   IN  UINT8   Data
   )
 {
-  IoWrite8 (PcdGet8 (PcdRtcIndexRegister), (UINT8) (Address | (UINT8) (IoRead8 (PcdGet8 (PcdRtcIndexRegister)) & 0x80)));
-  IoWrite8 (PcdGet8 (PcdRtcTargetRegister), Data);
+  if (FeaturePcdGet (PcdRtcUseMmio)) {
+    MmioRtcWrite (Address, Data);
+  } else {
+    IoRtcWrite (Address, Data);
+  }
 }
 
 /**
