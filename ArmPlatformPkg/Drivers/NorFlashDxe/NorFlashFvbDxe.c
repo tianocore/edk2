@@ -1,6 +1,6 @@
 /*++ @file  NorFlashFvbDxe.c
 
- Copyright (c) 2011 - 2014, ARM Ltd. All rights reserved.<BR>
+ Copyright (c) 2011 - 2020, ARM Ltd. All rights reserved.<BR>
 
  SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -736,7 +736,7 @@ NorFlashFvbInitialize (
       EFI_MEMORY_UC | EFI_MEMORY_RUNTIME);
   ASSERT_EFI_ERROR (Status);
 
-  mFlashNvStorageVariableBase = FixedPcdGet32 (PcdFlashNvStorageVariableBase);
+  mFlashNvStorageVariableBase = PcdGet32 (PcdFlashNvStorageVariableBase);
 
   // Set the index of the first LBA for the FVB
   Instance->StartLba = (PcdGet32 (PcdFlashNvStorageVariableBase) - Instance->RegionBaseAddress) / Instance->Media.BlockSize;
