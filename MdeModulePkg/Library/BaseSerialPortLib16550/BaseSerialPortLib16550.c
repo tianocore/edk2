@@ -4,6 +4,7 @@
   (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2018, AMD Incorporated. All rights reserved.<BR>
+  Copyright (c) 2020, ARM Limited. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -1102,3 +1103,18 @@ SerialPortSetAttributes (
   return RETURN_SUCCESS;
 }
 
+/** Base Serial Port 16550 Library Constructor
+
+  @retval RETURN_SUCCESS  Success.
+**/
+EFI_STATUS
+EFIAPI
+BaseSerialPortLib16550 (
+  VOID
+  )
+{
+  // Nothing to do here. This constructor is added to
+  // enable the chain of constructor invocation for
+  // dependent libraries.
+  return RETURN_SUCCESS;
+}
