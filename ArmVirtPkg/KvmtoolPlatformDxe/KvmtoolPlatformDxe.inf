@@ -1,0 +1,43 @@
+## @file
+#  The KvmtoolPlatformDxe performs the platform specific initialization like:
+#  - It decides if the firmware should expose ACPI or Device Tree-based
+#    hardware description to the operating system.
+#
+#  Copyright (c) 2018 - 2020, ARM Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = KvmtoolPlatformDxe
+  FILE_GUID                      = 7479CCCD-D721-442A-8C73-A72DBB886669
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = KvmtoolPlatformDxeEntryPoint
+
+[Sources]
+  KvmtoolPlatformDxe.c
+
+[Packages]
+  ArmVirtPkg/ArmVirtPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Guids]
+  gEdkiiPlatformHasAcpiGuid       ## SOMETIMES_PRODUCES ## PROTOCOL
+  gEdkiiPlatformHasDeviceTreeGuid ## SOMETIMES_PRODUCES ## PROTOCOL
+
+[Pcd]
+  gArmVirtTokenSpaceGuid.PcdForceNoAcpi
+
+[Depex]
+  TRUE
