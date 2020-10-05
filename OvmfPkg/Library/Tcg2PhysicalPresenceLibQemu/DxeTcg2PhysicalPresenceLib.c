@@ -37,6 +37,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #define CONFIRM_BUFFER_SIZE         4096
 
+/* Wait 3 minutes for user input */
+#define TIMEOUT                     (1000 * 1000 * 60 * 3)
+
 EFI_HII_HANDLE mTcg2PpStringPackHandle;
 
 #define TPM_PPI_FLAGS (QEMU_TPM_PPI_FUNC_ALLOWED_USR_REQ)
@@ -337,12 +340,16 @@ Tcg2ExecutePhysicalPresence (
 STATIC
 BOOLEAN
 Tcg2ReadUserKey (
-  IN     BOOLEAN                    CautionKey
+  IN     BOOLEAN                    CautionKey,
+  IN     UINTN                      Timeout
   )
 {
   EFI_STATUS                        Status;
   EFI_INPUT_KEY                     Key;
   UINT16                            InputKey;
+  UINTN                             Delay;
+
+  Delay = Timeout / 50;
 
   InputKey = 0;
   do {
@@ -359,7 +366,13 @@ Tcg2ReadUserKey (
         InputKey = Key.ScanCode;
       }
     }
-  } while (InputKey == 0);
+    gBS->Stall (50);
+    Delay--;
+  } while (InputKey == 0 && Delay > 0);
+
+  if (Delay == 0) {
+    return FALSE;
+  }
 
   if (InputKey != SCAN_ESC) {
     return TRUE;
@@ -615,7 +628,7 @@ Tcg2UserConfirm (
   FreePool (ConfirmText);
   HiiRemovePackages (mTcg2PpStringPackHandle);
 
-  if (Tcg2ReadUserKey (CautionKey)) {
+  if (Tcg2ReadUserKey (CautionKey, TIMEOUT)) {
     return TRUE;
   }
 
