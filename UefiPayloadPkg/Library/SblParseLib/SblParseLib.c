@@ -238,3 +238,21 @@ ParseSMMSTOREInfo (
 {
   return RETURN_NOT_FOUND;
 }
+
+/**
+  Find the Tcg Physical Presence store information
+
+  @param  PPIInfo       Pointer to the TCG_PHYSICAL_PRESENCE_INFO structure
+
+  @retval RETURN_SUCCESS     Successfully find the SMM store buffer information.
+  @retval RETURN_NOT_FOUND   Failed to find the SMM store buffer information .
+
+**/
+RETURN_STATUS
+EFIAPI
+ParseTPMPPIInfo (
+  OUT TCG_PHYSICAL_PRESENCE_INFO       *PPIInfo
+  )
+{
+  return RETURN_NOT_FOUND;
+}

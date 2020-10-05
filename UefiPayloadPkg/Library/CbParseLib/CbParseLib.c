@@ -600,3 +600,53 @@ ParseSMMSTOREInfo (
 
   return RETURN_SUCCESS;
 }
+
+
+/**
+  Find the Tcg Physical Presence store information
+
+  @param  PPIInfo       Pointer to the TCG_PHYSICAL_PRESENCE_INFO structure
+
+  @retval RETURN_SUCCESS     Successfully find the SMM store buffer information.
+  @retval RETURN_NOT_FOUND   Failed to find the SMM store buffer information .
+
+**/
+RETURN_STATUS
+EFIAPI
+ParseTPMPPIInfo (
+  OUT TCG_PHYSICAL_PRESENCE_INFO       *PPIInfo
+  )
+{
+  struct cb_tpm_physical_presence       *CbTPPRec;
+  UINT8 VersionMajor;
+  UINT8 VersionMinor;
+
+  if (PPIInfo == NULL) {
+    return RETURN_INVALID_PARAMETER;
+  }
+
+  CbTPPRec = FindCbTag (CB_TAG_TPM_PPI_HANDOFF);
+  if (CbTPPRec == NULL) {
+    return RETURN_NOT_FOUND;
+  }
+
+  VersionMajor = CbTPPRec->ppi_version >> 4;
+  VersionMinor = CbTPPRec->ppi_version & 0xF;
+
+  DEBUG ((DEBUG_INFO, "Found Tcg Physical Presence information\n"));
+  DEBUG ((DEBUG_INFO, "PpiAddress: 0x%x\n", CbTPPRec->ppi_address));
+  DEBUG ((DEBUG_INFO, "TpmVersion: 0x%x\n", CbTPPRec->tpm_version));
+  DEBUG ((DEBUG_INFO, "PpiVersion: %x.%x\n", VersionMajor, VersionMinor));
+
+  PPIInfo->PpiAddress = CbTPPRec->ppi_address;
+  if (CbTPPRec->tpm_version == LB_TPM_VERSION_TPM_VERSION_1_2) {
+    PPIInfo->TpmVersion = UEFIPAYLOAD_TPM_VERSION_1_2;
+  } else if (CbTPPRec->tpm_version == LB_TPM_VERSION_TPM_VERSION_2) {
+    PPIInfo->TpmVersion = UEFIPAYLOAD_TPM_VERSION_2;
+  }
+  if (VersionMajor == 1 && VersionMinor >= 3) {
+    PPIInfo->PpiVersion = UEFIPAYLOAD_TPM_PPI_VERSION_1_30;
+  }
+
+  return RETURN_SUCCESS;
+}

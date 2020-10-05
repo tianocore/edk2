@@ -66,6 +66,7 @@
   gEfiGraphicsDeviceInfoHobGuid
   gUefiAcpiBoardInfoGuid
   gEfiSMMSTOREInfoHobGuid
+  gEfiTcgPhysicalPresenceInfoHobGuid
 
 [FeaturePcd.IA32]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode      ## CONSUMES
