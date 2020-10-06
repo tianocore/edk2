@@ -31,7 +31,7 @@ jobs:
         Build.Pkgs: 'MdeModulePkg'
         Build.Targets: 'RELEASE,NO-TARGET'
       TARGET_NETWORK:
-        Build.Pkgs: 'NetworkPkg'
+        Build.Pkgs: 'NetworkPkg,RedfishPkg'
         Build.Targets: 'DEBUG,RELEASE,NO-TARGET'
       TARGET_OTHER:
         Build.Pkgs: 'PcAtChipsetPkg,ShellPkg'
