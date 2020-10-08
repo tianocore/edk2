@@ -202,14 +202,14 @@ LibGetTime (
   // Because we use the performance counter, we can fill the Nanosecond attribute
   // provided that the remainder doesn't overflow 64-bit during multiplication.
   if (Remainder <= 18446744073U) {
-    Time->Nanosecond = MultU64x64 (Remainder, 1000000000U) / Freq;
+    Time->Nanosecond = (UINT32)(MultU64x64 (Remainder, 1000000000U) / Freq);
   } else {
     DEBUG ((DEBUG_WARN, "LibGetTime: Nanosecond value not set (64-bit overflow).\n"));
   }
 
   if (Capabilities) {
     Capabilities->Accuracy   = 0;
-    Capabilities->Resolution = Freq;
+    Capabilities->Resolution = 1;
     Capabilities->SetsToZero = FALSE;
   }
 
