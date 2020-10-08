@@ -19,12 +19,20 @@
         ## Both file path and directory path are accepted.
         "IgnoreFiles": [
             "Library/OpensslLib/openssl",
+            # The unit testing folder is not to be checked
+            "Test/UnitTest",
+            # This has OpenSSL interfaces that aren't UEFI spec compliant
+            "Library/BaseCryptLib/SysCall/UnitTestHostCrtWrapper.c",
             # this has OpenSSL interfaces that aren't UEFI spec compliant
             "Library/OpensslLib/rand_pool.c"
         ]
     },
     "CompilerPlugin": {
         "DscPath": "CryptoPkg.dsc"
+    },
+    ## options defined .pytool/Plugin/HostUnitTestCompilerPlugin
+    "HostUnitTestCompilerPlugin": {
+        "DscPath": "Test/CryptoPkgHostUnitTest.dsc"
     },
     "CharEncodingCheck": {
         "IgnoreFiles": []
