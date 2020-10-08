@@ -22,6 +22,7 @@
 #include <Guid/ZeroGuid.h>
 #include <Guid/MmramMemoryReserve.h>
 
+#include <IndustryStandard/ArmFfaSvc.h>
 #include <IndustryStandard/ArmStdSmc.h>
 
 #include "StandaloneMmCpu.h"
@@ -78,7 +79,8 @@ PiMmStandaloneArmTfCpuDriverEntry (
   // receipt of a synchronous MM request. Use the Event ID to distinguish
   // between synchronous and asynchronous events.
   //
-  if (ARM_SMC_ID_MM_COMMUNICATE_AARCH64 != EventId) {
+  if ((ARM_SMC_ID_MM_COMMUNICATE_AARCH64 != EventId) &&
+      (ARM_SVC_ID_FFA_MSG_SEND_DIRECT_REQ_AARCH64 != EventId)) {
     DEBUG ((DEBUG_INFO, "UnRecognized Event - 0x%x\n", EventId));
     return EFI_INVALID_PARAMETER;
   }
