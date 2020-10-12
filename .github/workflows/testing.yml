@@ -1,0 +1,43 @@
+---
+
+name: Testing
+
+on:
+  - push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install dependencies
+        run: |
+          DEBIAN_FRONTEND=noninteractive sudo apt-get -qq update
+          DEBIAN_FRONTEND=noninteractive sudo apt-get -qqy install \
+          git python3 python3-distutils-extra build-essential nasm iasl uuid-dev
+          DEBIAN_FRONTEND=noninteractive sudo apt-get clean
+          sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 1337
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Update submodules
+        run: |
+          git submodule init
+          git submodule sync --recursive
+          git submodule update --recursive
+
+      - name: Build BaseTools
+        run: |
+          make -C BaseTools
+
+      - name: Build default X64 UefiPayload
+        run: |
+          export extraFlags=""
+          source ./edksetup.sh
+          build $extraFlags -D BOOTLOADER=COREBOOT -a IA32 -a X64 -t GCC5 -b DEBUG -p UefiPayloadPkg/UefiPayloadPkgIa32X64.dsc
+
+      - name: Upload default X64 UefiPayload
+        uses: actions/upload-artifact@v2
+        with:
+          name: DEFAULT_UEFIPAYLOAD.fd
+          path: Build/UefiPayloadPkgX64/DEBUG_GCC5/FV/UEFIPAYLOAD.fd
