@@ -30,6 +30,7 @@ typedef struct {
   UINT64                                Signature;
   UINT16                                Revision;
   UINT16                                NumberPrmHandlers;
+  GUID                                  PlatformGuid;
   GUID                                  ModuleGuid;
 } PRM_MODULE_EXPORT_DESCRIPTOR_STRUCT_HEADER;
 
@@ -98,6 +99,7 @@ typedef struct {
       PRM_MODULE_EXPORT_DESCRIPTOR_SIGNATURE,                                                             \
       PRM_MODULE_EXPORT_REVISION,                                                                         \
       VA_ARG_COUNT(__VA_ARGS__),                                                                          \
+      EDKII_DSC_PLATFORM_GUID,                                                                            \
       EFI_CALLER_ID_GUID                                                                                  \
     },                                                                                                    \
     { __VA_ARGS__ }                                                                                       \
