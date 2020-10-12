@@ -65,13 +65,3 @@
   #  report PRM handler execution time in the application. If such a TimerLib
   #  instance is not available, set this PCD to FALSE in the package DSC file.
   gPrmPkgTokenSpaceGuid.PcdPrmInfoPrintHandlerExecutionTime|TRUE|BOOLEAN|0x00000003
-
-  ## PRM Platform GUID
-  #
-  #  Uniquely identifies a specific platform targeted for PRM module updates. Each
-  #  platform MUST provide a new GUID. This GUID is checked against the platform
-  #  GUID in the PRM module export descriptor during PRM runtime updates to determine
-  #  if a given PRM module update is valid for a given system. Even if PRM runtime
-  #  updates are not planned for a given platform, this value should still be given
-  #  a unique value in the platform DSC.
-  gPrmPkgTokenSpaceGuid.PcdPrmPlatformGuid|{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}|VOID*|0x00000004
