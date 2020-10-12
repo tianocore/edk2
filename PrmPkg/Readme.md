@@ -13,6 +13,10 @@ to be leveraged by platform firmware with minimal overhead to integrate PRM func
 formal design and is not validated at product quality. The development of this feature is shared in the edk2-staging
 branch to simplify collaboration by allowing direct code contributions and early feedback throughout its development.
 
+> **Use recent edk2/master** - This code makes use of a very recent change in edk2 BaseTools. Specifically, commit
+[b65afdd](https://github.com/tianocore/edk2/commit/b65afdde74d6c1fac1cdbd2efdad23ba26295808). Ensure you have that
+change to build the code in this repo as-is.
+
 > By default, the build makes use of a new ACPI OperationRegion type specifically introduced for PRM called
 `PlatformRtMechanism`. Support for this OperationRegion is planned for the next release of the ACPI specification.
 However, support for `PlatformRtMechanism` is already included in the iASL Compiler/Disassembler for early prototyping
@@ -100,14 +104,21 @@ The following list are the currently defined build flags (if any) that may be pa
 ### PRM Platform GUID
 **IMPORTANT**
 
-A configuration item that requires user attention is the PRM platform GUID. Each platform that uses PRM must be
-uniquely identifiable so that various instances of a PRM module can target the correct platform in PRM module updates.
+PRM has a concept of a "Platform GUID" which associates a specific platform with a set of PRM modules built for
+that platform. This GUID is used to ensure system compatibility for a given collection of PRM modules.
 
-To apply a unique platform GUID set the following PCD to a unique value in your platform DSC file.
-  ``gPrmPkgTokenSpaceGuid.PcdPrmPlatformGuid``
+Therefore, each PRM module must only target a single platform and each platform must have a unique GUID. Even if a
+PRM module is unchanged between two different platforms now, there is no guarantee that will remain the case so always
+assign a unique Platform GUID for each platform.
 
-The default value assigned in [PrmPkg.dec](PrmPkg/PrmPkg.dec) is zero. By design, this is an invalid value that will
-cause an ASSERT if it is not updated.
+The PRM Platform GUID is primarily used during PRM module runtime updates in the OS to ensure that the Platform GUID
+in the system's ACPI table (PRMT) matches the Platform GUID of the module requested for update. Even if runtime
+updates are not a planned feature for a given platform, still assign a unique Platform GUID for binary module
+identification (the Platform GUID is in the module's export descriptor) and to ensure such updates can be seamlessly
+supported in the future if needed.
+
+In the `PrmPkg` implementation, the Platform GUID is automatically derived from the PLATFORM_GUID in the DSC file of
+the package being built.
 
 ## Overview
 At a high-level, PRM can be viewed from three levels of granularity:
