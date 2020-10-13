@@ -1,22 +1,16 @@
 ---
 
-name: Sync Fork
+name: Sync Tianocore master
 
 on:
-  - workflow_dispatch   # on button click
+  schedule:
+    - cron: '0 6 * * *'   # every day at 6:00 a.m.
+  workflow_dispatch:   # on button click
 
 jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - name: Rebase master-rebase
-        uses: tgymnich/fork-sync@v1.2
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          owner: tianocore
-          base: master-rebase
-          head: master
-          merge_method: rebase
       - name: Merge master
         uses: tgymnich/fork-sync@v1.2
         with:
