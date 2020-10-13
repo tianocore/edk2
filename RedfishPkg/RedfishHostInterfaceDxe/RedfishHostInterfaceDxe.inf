@@ -1,0 +1,50 @@
+## @file
+#  RedfishHostInterfaceDxe builds up SMBIOS Type 42h host interface
+#  record for Redfish service host interface using SMBIOS Protocol.
+#  RedfishHostInterfacePlatformLib is the platform-level library which
+#  provides the content of Redfish host interface type 42h record.
+#
+#  Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+#  (C) Copyright 2020 Hewlett Packard Enterprise Development LP<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001000b
+  BASE_NAME                      = RedfishHostInterfaceDxe
+  FILE_GUID                      = 592626DA-4A1E-8B39-28BA-FEAD92C4A0A4
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = RedfishHostInterfaceDxeEntryPoint
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64 RISCV64
+#
+
+[Sources]
+  RedfishHostInterfaceDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  RedfishPkg/RedfishPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  PrintLib
+  RedfishPlatformHostInterfaceLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
+
+[Protocols]
+  gEfiSmbiosProtocolGuid                ## TO_START
+
+[Depex]
+  gEfiSmbiosProtocolGuid
+
