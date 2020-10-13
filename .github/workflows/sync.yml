@@ -1,0 +1,27 @@
+---
+
+name: Sync Fork
+
+on:
+  - workflow_dispatch   # on button click
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Rebase master-rebase
+        uses: tgymnich/fork-sync@v1.2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          owner: tianocore
+          base: master
+          head: master-rebase
+          merge_method: rebase
+      - name: Merge master
+        uses: tgymnich/fork-sync@v1.2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          owner: tianocore
+          base: master
+          head: master
+          merge_method: merge
