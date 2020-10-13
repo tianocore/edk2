@@ -14,8 +14,8 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           owner: tianocore
-          base: master
-          head: master-rebase
+          base: master-rebase
+          head: master
           merge_method: rebase
       - name: Merge master
         uses: tgymnich/fork-sync@v1.2
