@@ -163,7 +163,7 @@ class Symbols:
         # If the fvDir is not a directory, then raise an exception
         #
         if not os.path.isdir(fvDir):
-            raise Exception ("'%s' is not a valid directory!" % FvDir)
+            raise Exception ("'%s' is not a valid directory!" % fvDir)
 
         #
         # If the Guid.xref is not existing in fvDir, then raise an exception
