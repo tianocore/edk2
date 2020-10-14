@@ -491,5 +491,4 @@
   MdeModulePkg/Universal/CapsulePei/CapsuleX64.inf
 
 [BuildOptions]
-  *_*_*_CC_FLAGS = -D DISABLE_NEW_DEPRECATED_INTERFACES
 
