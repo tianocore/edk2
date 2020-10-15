@@ -59,6 +59,8 @@ typedef enum ArmObjectID {
   EArmObjSerialPortInfo,               ///< 35 - Generic Serial Port Info
   EArmObjCmn600Info,                   ///< 36 - CMN-600 Info
   EArmObjLpiInfo,                      ///< 37 - Lpi Info
+  EArmObjRmr,                          ///< 38 - Reserved Memory Range Node
+  EArmObjMemoryRangeDescriptor,        ///< 39 - Memory Range Descriptor
   EArmObjMax
 } EARM_OBJECT_ID;
 
@@ -467,6 +469,9 @@ typedef struct CmArmItsGroupNode {
   UINT32            ItsIdCount;
   /// Reference token for the ITS identifier array
   CM_OBJECT_TOKEN   ItsIdToken;
+
+  /// Unique identifier for this node.
+  UINT32            Identifier;
 } CM_ARM_ITS_GROUP_NODE;
 
 /** A structure that describes the
@@ -498,6 +503,9 @@ typedef struct CmArmNamedComponentNode {
       the entry in the namespace for this object.
   */
   CHAR8*            ObjectName;
+
+  /// Unique identifier for this node.
+  UINT32            Identifier;
 } CM_ARM_NAMED_COMPONENT_NODE;
 
 /** A structure that describes the
@@ -526,6 +534,9 @@ typedef struct CmArmRootComplexNode {
   UINT32            PciSegmentNumber;
   /// Memory address size limit
   UINT8             MemoryAddressSize;
+
+  /// Unique identifier for this node.
+  UINT32            Identifier;
 } CM_ARM_ROOT_COMPLEX_NODE;
 
 /** A structure that describes the
@@ -568,6 +579,9 @@ typedef struct CmArmSmmuV1SmmuV2Node {
   UINT32            SMMU_NSgCfgIrpt;
   /// SMMU_NSgCfgIrpt interrupt flags
   UINT32            SMMU_NSgCfgIrptFlags;
+
+  /// Unique identifier for this node.
+  UINT32            Identifier;
 } CM_ARM_SMMUV1_SMMUV2_NODE;
 
 /** A structure that describes the
@@ -604,6 +618,9 @@ typedef struct CmArmSmmuV3Node {
   UINT32            ProximityDomain;
   /// Index into the array of ID mapping
   UINT32            DeviceIdMappingIndex;
+
+  /// Unique identifier for this node.
+  UINT32            Identifier;
 } CM_ARM_SMMUV3_NODE;
 
 /** A structure that describes the
@@ -628,6 +645,9 @@ typedef struct CmArmPmcgNode {
 
   /// Reference token for the IORT node associated with this node
   CM_OBJECT_TOKEN   ReferenceToken;
+
+  /// Unique identifier for this node.
+  UINT32            Identifier;
 } CM_ARM_PMCG_NODE;
 
 /** A structure that describes the
@@ -945,6 +965,46 @@ typedef struct CmArmLpiInfo {
   */
   CHAR8                                   StateName[16];
 } CM_ARM_LPI_INFO;
+
+/** A structure that describes the
+    RMR node for the Platform.
+
+    ID: EArmObjRmr
+*/
+typedef struct CmArmRmrNode {
+  /// An unique token used to identify this object
+  CM_OBJECT_TOKEN   Token;
+  /// Number of ID mappings
+  UINT32            IdMappingCount;
+  /// Reference token for the ID mapping array
+  CM_OBJECT_TOKEN   IdMappingToken;
+
+  /// Unique identifier for this node.
+  UINT32            Identifier;
+
+  /// Reserved Memory Range flags.
+  UINT32            Flags;
+
+  /// Memory range descriptor count.
+  UINT32            MemRangeDescCount;
+  /// Reference token for the Memory Range descriptor array
+  CM_OBJECT_TOKEN   MemRangeDescToken;
+} CM_ARM_RMR_NODE;
+
+/** A structure that describes the
+    Memory Range descriptor.
+
+    ID: EArmObjMemoryRangeDescriptor
+*/
+typedef struct CmArmRmrDescriptor {
+  /// Base address of Reserved Memory Range,
+  /// aligned to a page size of 64K.
+  UINT64            BaseAddress;
+
+  /// Length of the Reserved Memory range.
+  /// Must be a multiple of the page size of 64K.
+  UINT64            Length;
+} CM_ARM_MEMORY_RANGE_DESCRIPTOR;
 
 #pragma pack()
 
