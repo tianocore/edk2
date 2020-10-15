@@ -14,7 +14,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #define __FIELD_SIZE(TYPE, Field) (sizeof((TYPE *)0)->Field)
 #define __ARRAY_ELEMENT_SIZE(TYPE, Field) (sizeof((TYPE *)0)->Field[0])
-#define __OFFSET_OF(TYPE, Field) ((UINT32) &(((TYPE *)0)->Field))
+#define __OFFSET_OF(TYPE, Field) ((UINT32)(size_t) &(((TYPE *)0)->Field))
 #define __FLEXIBLE_SIZE(Size, TYPE, Field, MaxIndex)   if (__FIELD_SIZE(TYPE, Field) == 0) Size = MAX((__OFFSET_OF(TYPE, Field) + __ARRAY_ELEMENT_SIZE(TYPE, Field) * (MaxIndex)), Size)
 #define __ARRAY_SIZE(Array) (sizeof(Array)/sizeof(Array[0]))
 
