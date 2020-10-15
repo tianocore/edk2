@@ -29,7 +29,8 @@
         "AcceptableDependencies": [
             "MdePkg/MdePkg.dec",
             "MdeModulePkg/MdeModulePkg.dec",
-            "NetworkPkg/NetworkPkg.dec"
+            "NetworkPkg/NetworkPkg.dec",
+            "RedfishPkg/RedfishPkg.dec"
         ],
         # For host based unit tests
         "AcceptableDependencies-HOST_APPLICATION":[],
