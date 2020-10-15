@@ -1,11 +1,14 @@
 /** @file
   IORT table parser
 
-  Copyright (c) 2016 - 2020, ARM Limited. All rights reserved.
+  Copyright (c) 2016 - 2021, Arm Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
-    - IO Remapping Table, Platform Design Document, Revision D, March 2018
+  - IO Remapping Table, Platform Design Document, Revision D, March 2018
+
+  @par Glossary:
+    - Ref  - Reference
 **/
 
 #include <IndustryStandard/IoRemappingTable.h>
@@ -144,15 +147,15 @@ STATIC CONST ACPI_PARSER IortNodeSmmuV1V2Parser[] = {
   {L"Span", 8, 24, L"0x%lx", NULL, NULL, NULL, NULL},
   {L"Model", 4, 32, L"%d", NULL, NULL, NULL, NULL},
   {L"Flags", 4, 36, L"0x%x", NULL, NULL, NULL, NULL},
-  {L"Reference to Global Interrupt Array", 4, 40, L"0x%x", NULL, NULL, NULL,
+  {L"Global Interrupt Array Ref", 4, 40, L"0x%x", NULL, NULL, NULL,
    NULL},
   {L"Number of context interrupts", 4, 44, L"%d", NULL,
    (VOID**)&InterruptContextCount, NULL, NULL},
-  {L"Reference to Context Interrupt Array", 4, 48, L"0x%x", NULL,
+  {L"Context Interrupt Array Ref", 4, 48, L"0x%x", NULL,
    (VOID**)&InterruptContextOffset, NULL, NULL},
   {L"Number of PMU Interrupts", 4, 52, L"%d", NULL,
    (VOID**)&PmuInterruptCount, NULL, NULL},
-  {L"Reference to PMU Interrupt Array", 4, 56, L"0x%x", NULL,
+  {L"PMU Interrupt Array Ref", 4, 56, L"0x%x", NULL,
    (VOID**)&PmuInterruptOffset, NULL, NULL},
 
   // Interrupt Array
