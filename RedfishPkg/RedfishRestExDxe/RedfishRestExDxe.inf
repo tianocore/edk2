@@ -27,6 +27,7 @@
 [Sources]
   ComponentName.c
   RedfishRestExDriver.c
+  RedfishRestExDriver.h
   RedfishRestExImpl.c
   RedfishRestExProtocol.c
   RedfishRestExInternal.h
