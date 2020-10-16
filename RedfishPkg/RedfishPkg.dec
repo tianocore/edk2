@@ -19,3 +19,21 @@
 [Guids]
   gEfiRedfishPkgTokenSpaceGuid      = { 0x4fdbccb7, 0xe829, 0x4b4c, { 0x88, 0x87, 0xb2, 0x3f, 0xd7, 0x25, 0x4b, 0x85 }}
 
+[PcdsFixedAtBuild, PcdsPatchableInModule]
+  #
+  # This PCD is the UEFI device path of network device which should be used as the Redfish host interface.
+  #
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishRestExServiceDevicePath|{0x0}|REST_EX_SERVICE_DEVICE_PATH_DATA|0x00001003 {
+  <HeaderFiles>
+    Pcd/RestExServiceDevicePath.h
+  <Packages>
+    MdePkg/MdePkg.dec
+    MdeModulePkg/MdeModulePkg.dec
+    RedfishPkg/RedfishPkg.dec
+  }
+  #
+  # This PCD indicates the EFI REST EX access mode to Redfish service.
+  # Default is set to out of band access.
+  #
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishRestExServiceAccessModeInBand|FALSE|BOOLEAN|0x00001004
+
