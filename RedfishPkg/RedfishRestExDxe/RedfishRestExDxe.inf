@@ -1,0 +1,63 @@
+## @file
+#  Implementation of Redfish EFI_REST_EX_PROTOCOL interfaces.
+#
+#  Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+#  (C) Copyright 2020 Hewlett Packard Enterprise Development LP<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION               = 0x0001001b
+  BASE_NAME                 = RedfishRestExDxe
+  FILE_GUID                 = B64702DA-E6B5-43c8-8CE8-D253071E9D6C
+  MODULE_TYPE               = UEFI_DRIVER
+  VERSION_STRING            = 1.0
+  ENTRY_POINT               = RedfishRestExDriverEntryPoint
+  UNLOAD_IMAGE              = NetLibDefaultUnload
+  MODULE_UNI_FILE           = RedfishRestExDxe.uni
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  NetworkPkg/NetworkPkg.dec
+  RedfishPkg/RedfishPkg.dec
+
+[Sources]
+  ComponentName.c
+  RedfishRestExDriver.c
+  RedfishRestExDriver.h
+  RedfishRestExImpl.c
+  RedfishRestExProtocol.c
+  RedfishRestExInternal.h
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  DevicePathLib
+  DpcLib
+  HttpLib
+  HttpIoLib
+  PrintLib
+  MemoryAllocationLib
+  NetLib
+  UefiLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiRuntimeServicesTableLib
+
+[Protocols]
+  gEfiRestExServiceBindingProtocolGuid            ## BY_START
+  gEfiRestExProtocolGuid                          ## BY_START
+  gEfiHttpServiceBindingProtocolGuid              ## TO_START
+  gEfiHttpProtocolGuid                            ## TO_START
+  gEfiDevicePathProtocolGuid                      ## TO_START
+
+[Pcd]
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishRestExServiceAccessModeInBand   ## CONSUMES
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  RedfishRestExDxeExtra.uni
+
