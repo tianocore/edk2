@@ -1745,19 +1745,29 @@ AcpiTableAcpiTableConstructor (
     RsdpTableSize += sizeof (EFI_ACPI_1_0_ROOT_SYSTEM_DESCRIPTION_POINTER);
   }
 
-  PageAddress = 0xFFFFFFFF;
-  Status = gBS->AllocatePages (
-                  mAcpiTableAllocType,
-                  EfiACPIReclaimMemory,
-                  EFI_SIZE_TO_PAGES (RsdpTableSize),
-                  &PageAddress
-                  );
+  if (mAcpiTableAllocType != AllocateAnyPages) {
+    PageAddress = 0xFFFFFFFF;
+    Status = gBS->AllocatePages (
+                    mAcpiTableAllocType,
+                    EfiACPIReclaimMemory,
+                    EFI_SIZE_TO_PAGES (RsdpTableSize),
+                    &PageAddress
+                    );
+  } else {
+    Status = gBS->AllocatePool (
+                    EfiACPIReclaimMemory,
+                    RsdpTableSize,
+                    (VOID **)&Pointer
+                    );
+  }
 
   if (EFI_ERROR (Status)) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  Pointer = (UINT8 *) (UINTN) PageAddress;
+  if (mAcpiTableAllocType != AllocateAnyPages) {
+    Pointer = (UINT8 *)(UINTN)PageAddress;
+  }
   ZeroMem (Pointer, RsdpTableSize);
 
   AcpiTableInstance->Rsdp1 = (EFI_ACPI_1_0_ROOT_SYSTEM_DESCRIPTION_POINTER *) Pointer;
@@ -1805,7 +1815,12 @@ AcpiTableAcpiTableConstructor (
   }
 
   if (EFI_ERROR (Status)) {
-    gBS->FreePages ((EFI_PHYSICAL_ADDRESS)(UINTN)AcpiTableInstance->Rsdp1, EFI_SIZE_TO_PAGES (RsdpTableSize));
+    if (mAcpiTableAllocType != AllocateAnyPages) {
+      gBS->FreePages ((EFI_PHYSICAL_ADDRESS)(UINTN)AcpiTableInstance->Rsdp1,
+             EFI_SIZE_TO_PAGES (RsdpTableSize));
+    } else {
+      gBS->FreePool (AcpiTableInstance->Rsdp1);
+    }
     return EFI_OUT_OF_RESOURCES;
   }
 
