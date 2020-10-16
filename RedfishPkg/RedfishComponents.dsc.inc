@@ -15,4 +15,5 @@
 !if $(REDFISH_ENABLE) == TRUE
   RedfishPkg/RestJsonStructureDxe/RestJsonStructureDxe.inf
   RedfishPkg/RedfishHostInterfaceDxe/RedfishHostInterfaceDxe.inf
+  RedfishPkg/RedfishRestExDxe/RedfishRestExDxe.inf
 !endif
