@@ -32,6 +32,10 @@
   DebugPrintErrorLevelLib|MdePkg/Library/BaseDebugPrintErrorLevelLib/BaseDebugPrintErrorLevelLib.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   RedfishPlatformHostInterfaceLib|RedfishPkg/Library/PlatformHostInterfaceLibNull/PlatformHostInterfaceLibNull.inf
+  HttpLib|NetworkPkg/Library/DxeHttpLib/DxeHttpLib.inf
+  HttpIoLib|NetworkPkg/Library/DxeHttpIoLib/DxeHttpIoLib.inf
+  NetLib|NetworkPkg/Library/DxeNetLib/DxeNetLib.inf
+  DpcLib|NetworkPkg/Library/DxeDpcLib/DxeDpcLib.inf
 
 [LibraryClasses.ARM, LibraryClasses.AARCH64]
   #
