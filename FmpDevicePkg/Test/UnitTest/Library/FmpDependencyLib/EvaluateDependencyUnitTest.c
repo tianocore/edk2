@@ -2,6 +2,7 @@
   Unit tests of EvaluateDependency API in FmpDependencyLib.
 
   Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) Microsoft Corporation.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -162,6 +163,7 @@ EvaluateDependencyTest (
 {
   BASIC_TEST_CONTEXT  *TestContext;
   BOOLEAN             EvaluationResult;
+  UINT32              LastAttemptStatus;
 
   TestContext = (BASIC_TEST_CONTEXT *)Context;
 
@@ -169,8 +171,9 @@ EvaluateDependencyTest (
                        (EFI_FIRMWARE_IMAGE_DEP *)TestContext->Dependencies,
                        TestContext->DependenciesSize,
                        mFmpVersions,
-                       sizeof(mFmpVersions)/sizeof(FMP_DEPEX_CHECK_VERSION_DATA)
-                     );
+                       sizeof(mFmpVersions)/sizeof(FMP_DEPEX_CHECK_VERSION_DATA),
+                       &LastAttemptStatus
+                       );
 
   UT_ASSERT_EQUAL (EvaluationResult, TestContext->ExpectedResult);
 

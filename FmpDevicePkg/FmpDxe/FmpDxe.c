@@ -730,6 +730,15 @@ GetAllHeaderSize (
                                  LAST_ATTEMPT_STATUS_DRIVER_MIN_ERROR_CODE_VALUE
                                  to LAST_ATTEMPT_STATUS_DRIVER_MAX_ERROR_CODE_VALUE.
 
+                                 This function might also return error codes that occur within libraries
+                                 linked against this module that return last attempt error codes such as:
+
+                                 LAST_ATTEMPT_STATUS_FMP_DEPENDENCY_LIB_MIN_ERROR_CODE_VALUE to
+                                 LAST_ATTEMPT_STATUS_FMP_DEPENDENCY_LIB_MAX_ERROR_CODE_VALUE
+
+                                 LAST_ATTEMPT_STATUS_FMP_DEPENDENCY_CHECK_LIB_MIN_ERROR_CODE_VALUE to
+                                 LAST_ATTEMPT_STATUS_FMP_DEPENDENCY_CHECK_LIB_MAX_ERROR_CODE_VALUE
+
   @retval EFI_SUCCESS            The image was successfully checked.
   @retval EFI_ABORTED            The operation is aborted.
   @retval EFI_INVALID_PARAMETER  The Image was NULL.
@@ -925,7 +934,16 @@ CheckTheImageInternal (
   //
   // Get the dependency from Image.
   //
-  Dependencies = GetImageDependency ((EFI_FIRMWARE_IMAGE_AUTHENTICATION *)Image, ImageSize, &DependenciesSize);
+  Dependencies =  GetImageDependency (
+                    (EFI_FIRMWARE_IMAGE_AUTHENTICATION *) Image,
+                    ImageSize,
+                    &DependenciesSize,
+                    LastAttemptStatus
+                    );
+  if (*LastAttemptStatus != LAST_ATTEMPT_STATUS_SUCCESS) {
+    Status = EFI_ABORTED;
+    goto cleanup;
+  }
 
   //
   // Check the FmpPayloadHeader
@@ -964,11 +982,18 @@ CheckTheImageInternal (
   //
   // Evaluate dependency expression
   //
-  Private->DependenciesSatisfied = CheckFmpDependency (Private->Descriptor.ImageTypeId, Version, Dependencies, DependenciesSize);
+  Private->DependenciesSatisfied =  CheckFmpDependency (
+                                      Private->Descriptor.ImageTypeId,
+                                      Version,
+                                      Dependencies,
+                                      DependenciesSize,
+                                      &LocalLastAttemptStatus
+                                      );
   if (!Private->DependenciesSatisfied) {
     DEBUG ((DEBUG_ERROR, "FmpDxe(%s): CheckTheImage() - Dependency check failed.\n", mImageIdName));
     *ImageUpdatable = IMAGE_UPDATABLE_INVALID;
     Status = EFI_SUCCESS;
+    *LastAttemptStatus = LocalLastAttemptStatus;
     goto cleanup;
   }
 
@@ -1181,7 +1206,7 @@ SetTheImage (
   //
   // Get the dependency from Image.
   //
-  Dependencies = GetImageDependency ((EFI_FIRMWARE_IMAGE_AUTHENTICATION *)Image, ImageSize, &DependenciesSize);
+  Dependencies = GetImageDependency ((EFI_FIRMWARE_IMAGE_AUTHENTICATION *)Image, ImageSize, &DependenciesSize, &LastAttemptStatus);
 
   //
   // No functional error in CheckTheImage.  Attempt to get the Version to

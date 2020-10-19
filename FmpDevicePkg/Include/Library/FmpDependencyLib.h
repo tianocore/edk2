@@ -26,9 +26,13 @@ typedef struct {
 /**
   Validate the dependency expression and output its size.
 
-  @param[in]   Dependencies   Pointer to the EFI_FIRMWARE_IMAGE_DEP.
-  @param[in]   MaxDepexSize   Max size of the dependency.
-  @param[out]  DepexSize      Size of dependency.
+  @param[in]   Dependencies       Pointer to the EFI_FIRMWARE_IMAGE_DEP.
+  @param[in]   MaxDepexSize       Max size of the dependency.
+  @param[out]  DepexSize          Size of dependency.
+  @param[out]  LastAttemptStatus  An optional pointer to a UINT32 that holds the
+                                  last attempt status to report back to the caller.
+                                  If a last attempt status error code is not returned,
+                                  this function will not modify the LastAttemptStatus value.
 
   @retval TRUE    The dependency expression is valid.
   @retval FALSE   The dependency expression is invalid.
@@ -39,16 +43,20 @@ EFIAPI
 ValidateDependency (
   IN  EFI_FIRMWARE_IMAGE_DEP  *Dependencies,
   IN  UINTN                   MaxDepexSize,
-  OUT UINT32                  *DepexSize
+  OUT UINT32                  *DepexSize,
+  OUT UINT32                  *LastAttemptStatus OPTIONAL
   );
 
 /**
   Get dependency from firmware image.
 
-  @param[in]  Image       Points to the firmware image.
-  @param[in]  ImageSize   Size, in bytes, of the firmware image.
-  @param[out] DepexSize   Size, in bytes, of the dependency.
-
+  @param[in]  Image               Points to the firmware image.
+  @param[in]  ImageSize           Size, in bytes, of the firmware image.
+  @param[out] DepexSize           Size, in bytes, of the dependency.
+  @param[out] LastAttemptStatus   An optional pointer to a UINT32 that holds the
+                                  last attempt status to report back to the caller.
+                                  If a last attempt status error code is not returned,
+                                  this function will not modify the LastAttemptStatus value.
   @retval  The pointer to dependency.
   @retval  Null
 
@@ -56,9 +64,10 @@ ValidateDependency (
 EFI_FIRMWARE_IMAGE_DEP*
 EFIAPI
 GetImageDependency (
-  IN  EFI_FIRMWARE_IMAGE_AUTHENTICATION  *Image,
-  IN  UINTN                              ImageSize,
-  OUT UINT32                             *DepexSize
+  IN  EFI_FIRMWARE_IMAGE_AUTHENTICATION *Image,
+  IN  UINTN                             ImageSize,
+  OUT UINT32                            *DepexSize,
+  OUT UINT32                            *LastAttemptStatus  OPTIONAL
   );
 
 /**
@@ -73,6 +82,10 @@ GetImageDependency (
                                   parameter is optional and can be set to NULL.
   @param[in]   FmpVersionsCount   Element count of the array. When FmpVersions
                                   is NULL, FmpVersionsCount must be 0.
+  @param[out]  LastAttemptStatus  An optional pointer to a UINT32 that holds the
+                                  last attempt status to report back to the caller.
+                                  This function will set the value to LAST_ATTEMPT_STATUS_SUCCESS
+                                  if an error code is not set.
 
   @retval TRUE    Dependency expressions evaluate to TRUE.
   @retval FALSE   Dependency expressions evaluate to FALSE.
@@ -81,10 +94,11 @@ GetImageDependency (
 BOOLEAN
 EFIAPI
 EvaluateDependency (
-  IN EFI_FIRMWARE_IMAGE_DEP        *Dependencies,
-  IN UINTN                         DependenciesSize,
-  IN FMP_DEPEX_CHECK_VERSION_DATA  *FmpVersions      OPTIONAL,
-  IN UINTN                         FmpVersionsCount
+  IN  EFI_FIRMWARE_IMAGE_DEP        *Dependencies,
+  IN  UINTN                         DependenciesSize,
+  IN  FMP_DEPEX_CHECK_VERSION_DATA  *FmpVersions,      OPTIONAL
+  IN  UINTN                         FmpVersionsCount,
+  OUT UINT32                        *LastAttemptStatus OPTIONAL
   );
 
 #endif
