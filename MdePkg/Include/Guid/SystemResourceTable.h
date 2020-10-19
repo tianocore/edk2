@@ -2,6 +2,7 @@
   Guid & data structure used for EFI System Resource Table (ESRT)
 
   Copyright (c) 2015 - 2020, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) Microsoft Corporation.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Revision Reference:
@@ -43,6 +44,18 @@
 #define LAST_ATTEMPT_STATUS_ERROR_PWR_EVT_AC                0x00000006
 #define LAST_ATTEMPT_STATUS_ERROR_PWR_EVT_BATT              0x00000007
 #define LAST_ATTEMPT_STATUS_ERROR_UNSATISFIED_DEPENDENCIES  0x00000008
+
+///
+/// LAST_ATTEMPT_STATUS_ERROR_UNSUCCESSFUL_VENDOR_RANGE_MAX is defined as
+/// 0x4000 as of UEFI Specification 2.8B. This will be modified in the
+/// future to the correct value 0x3FFF. To ensure correct implementation,
+/// this change is preemptively made in the value defined below.
+///
+/// When the UEFI Specification is updated, this comment block can be
+/// removed.
+///
+#define LAST_ATTEMPT_STATUS_ERROR_UNSUCCESSFUL_VENDOR_RANGE_MIN 0x00001000
+#define LAST_ATTEMPT_STATUS_ERROR_UNSUCCESSFUL_VENDOR_RANGE_MAX 0x00003FFF
 
 typedef struct {
   ///
