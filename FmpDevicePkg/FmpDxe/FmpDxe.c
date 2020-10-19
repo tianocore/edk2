@@ -721,6 +721,14 @@ GetAllHeaderSize (
   @param[in]  ImageSize          Size of the new image in bytes.
   @param[out] ImageUpdatable     Indicates if the new image is valid for update. It also provides,
                                  if available, additional information if the image is invalid.
+  @param[out] LastAttemptStatus  A pointer to a UINT32 that holds the last attempt status to report
+                                 back to the ESRT table in case of error.  If an error does not occur,
+                                 this function will set the value to LAST_ATTEMPT_STATUS_SUCCESS.
+
+                                 This function will return error codes that occur within this function
+                                 implementation within a driver range of last attempt error codes from
+                                 LAST_ATTEMPT_STATUS_DRIVER_MIN_ERROR_CODE_VALUE
+                                 to LAST_ATTEMPT_STATUS_DRIVER_MAX_ERROR_CODE_VALUE.
 
   @retval EFI_SUCCESS            The image was successfully checked.
   @retval EFI_ABORTED            The operation is aborted.
@@ -731,15 +739,17 @@ GetAllHeaderSize (
 **/
 EFI_STATUS
 EFIAPI
-CheckTheImage (
+CheckTheImageInternal (
   IN  EFI_FIRMWARE_MANAGEMENT_PROTOCOL  *This,
   IN  UINT8                             ImageIndex,
   IN  CONST VOID                        *Image,
   IN  UINTN                             ImageSize,
-  OUT UINT32                            *ImageUpdatable
+  OUT UINT32                            *ImageUpdatable,
+  OUT UINT32                            *LastAttemptStatus
   )
 {
   EFI_STATUS                        Status;
+  UINT32                            LocalLastAttemptStatus;
   FIRMWARE_MANAGEMENT_PRIVATE_DATA  *Private;
   UINTN                             RawSize;
   VOID                              *FmpPayloadHeader;
@@ -755,23 +765,37 @@ CheckTheImage (
   EFI_FIRMWARE_IMAGE_DEP            *Dependencies;
   UINT32                            DependenciesSize;
 
-  Status           = EFI_SUCCESS;
-  RawSize          = 0;
-  FmpPayloadHeader = NULL;
-  FmpPayloadSize   = 0;
-  Version          = 0;
-  FmpHeaderSize    = 0;
-  AllHeaderSize    = 0;
-  Dependencies     = NULL;
-  DependenciesSize = 0;
+  Status                  = EFI_SUCCESS;
+  LocalLastAttemptStatus  = LAST_ATTEMPT_STATUS_SUCCESS;
+  RawSize                 = 0;
+  FmpPayloadHeader        = NULL;
+  FmpPayloadSize          = 0;
+  Version                 = 0;
+  FmpHeaderSize           = 0;
+  AllHeaderSize           = 0;
+  Dependencies            = NULL;
+  DependenciesSize        = 0;
 
   if (!FeaturePcdGet (PcdFmpDeviceStorageAccessEnable)) {
     return EFI_UNSUPPORTED;
   }
 
+  if (LastAttemptStatus == NULL) {
+    DEBUG ((DEBUG_ERROR, "FmpDxe(%s): CheckTheImageInternal() - LastAttemptStatus is NULL.\n", mImageIdName));
+    Status = EFI_INVALID_PARAMETER;
+    goto cleanup;
+  }
+
+  //
+  // A last attempt status error code will always override the success
+  // value before returning from the function
+  //
+  *LastAttemptStatus = LAST_ATTEMPT_STATUS_SUCCESS;
+
   if (This == NULL) {
     DEBUG ((DEBUG_ERROR, "FmpDxe(%s): CheckImage() - This is NULL.\n", mImageIdName));
     Status = EFI_INVALID_PARAMETER;
+    *LastAttemptStatus = LAST_ATTEMPT_STATUS_DRIVER_ERROR_PROTOCOL_ARG_MISSING;
     goto cleanup;
   }
 
@@ -789,6 +813,7 @@ CheckTheImage (
   if (ImageUpdatable == NULL) {
     DEBUG ((DEBUG_ERROR, "FmpDxe(%s): CheckImage() - ImageUpdatable Pointer Parameter is NULL.\n", mImageIdName));
     Status = EFI_INVALID_PARAMETER;
+    *LastAttemptStatus = LAST_ATTEMPT_STATUS_DRIVER_ERROR_IMAGE_NOT_UPDATABLE;
     goto cleanup;
   }
 
@@ -808,6 +833,7 @@ CheckTheImage (
     // not sure if this is needed
     //
     *ImageUpdatable = IMAGE_UPDATABLE_INVALID;
+    *LastAttemptStatus = LAST_ATTEMPT_STATUS_DRIVER_ERROR_IMAGE_NOT_PROVIDED;
     return EFI_INVALID_PARAMETER;
   }
 
@@ -817,6 +843,7 @@ CheckTheImage (
   if (PublicKeyDataXdr == NULL || (PublicKeyDataXdr == PublicKeyDataXdrEnd)) {
     DEBUG ((DEBUG_ERROR, "FmpDxe(%s): Invalid certificate, skipping it.\n", mImageIdName));
     Status = EFI_ABORTED;
+    LocalLastAttemptStatus = LAST_ATTEMPT_STATUS_DRIVER_ERROR_INVALID_CERTIFICATE;
   } else {
     //
     // Try each key from PcdFmpDevicePkcs7CertBufferXdr
@@ -839,6 +866,7 @@ CheckTheImage (
         //
         DEBUG ((DEBUG_ERROR, "FmpDxe(%s): Certificate size extends beyond end of PCD, skipping it.\n", mImageIdName));
         Status = EFI_ABORTED;
+        LocalLastAttemptStatus = LAST_ATTEMPT_STATUS_DRIVER_ERROR_INVALID_KEY_LENGTH_VALUE;
         break;
       }
       //
@@ -855,6 +883,7 @@ CheckTheImage (
         //
         DEBUG ((DEBUG_ERROR, "FmpDxe(%s): Certificate extends beyond end of PCD, skipping it.\n", mImageIdName));
         Status = EFI_ABORTED;
+        LocalLastAttemptStatus = LAST_ATTEMPT_STATUS_DRIVER_ERROR_INVALID_KEY_LENGTH;
         break;
       }
       PublicKeyData = PublicKeyDataXdr;
@@ -874,6 +903,11 @@ CheckTheImage (
 
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "FmpDxe(%s): CheckTheImage() - Authentication Failed %r.\n", mImageIdName, Status));
+    if (LocalLastAttemptStatus != LAST_ATTEMPT_STATUS_SUCCESS) {
+      *LastAttemptStatus = LocalLastAttemptStatus;
+    } else {
+      *LastAttemptStatus = LAST_ATTEMPT_STATUS_DRIVER_ERROR_IMAGE_AUTH_FAILURE;
+    }
     goto cleanup;
   }
 
@@ -884,6 +918,7 @@ CheckTheImage (
     DEBUG ((DEBUG_ERROR, "FmpDxe(%s): CheckImage() - Image Index Invalid.\n", mImageIdName));
     *ImageUpdatable = IMAGE_UPDATABLE_INVALID_TYPE;
     Status = EFI_INVALID_PARAMETER;
+    *LastAttemptStatus = LAST_ATTEMPT_STATUS_DRIVER_ERROR_INVALID_IMAGE_INDEX;
     goto cleanup;
   }
 
@@ -899,6 +934,7 @@ CheckTheImage (
   if (FmpPayloadHeader == NULL) {
     DEBUG ((DEBUG_ERROR, "FmpDxe(%s): CheckTheImage() - GetFmpHeader failed.\n", mImageIdName));
     Status = EFI_ABORTED;
+    *LastAttemptStatus = LAST_ATTEMPT_STATUS_DRIVER_ERROR_GET_FMP_HEADER;
     goto cleanup;
   }
   Status = GetFmpPayloadHeaderVersion (FmpPayloadHeader, FmpPayloadSize, &Version);
@@ -906,6 +942,7 @@ CheckTheImage (
     DEBUG ((DEBUG_ERROR, "FmpDxe(%s): CheckTheImage() - GetFmpPayloadHeaderVersion failed %r.\n", mImageIdName, Status));
     *ImageUpdatable = IMAGE_UPDATABLE_INVALID;
     Status = EFI_SUCCESS;
+    *LastAttemptStatus = LAST_ATTEMPT_STATUS_DRIVER_ERROR_GET_FMP_HEADER_VERSION;
     goto cleanup;
   }
 
@@ -920,6 +957,7 @@ CheckTheImage (
       );
     *ImageUpdatable = IMAGE_UPDATABLE_INVALID_OLD;
     Status = EFI_SUCCESS;
+    *LastAttemptStatus = LAST_ATTEMPT_STATUS_DRIVER_ERROR_VERSION_TOO_LOW;
     goto cleanup;
   }
 
@@ -942,6 +980,7 @@ CheckTheImage (
     DEBUG ((DEBUG_ERROR, "FmpDxe: CheckTheImage() - GetFmpPayloadHeaderSize failed %r.\n", Status));
     *ImageUpdatable = IMAGE_UPDATABLE_INVALID;
     Status = EFI_SUCCESS;
+    *LastAttemptStatus = LAST_ATTEMPT_STATUS_DRIVER_ERROR_GET_FMP_HEADER_SIZE;
     goto cleanup;
   }
 
@@ -953,6 +992,7 @@ CheckTheImage (
   if (AllHeaderSize == 0) {
     DEBUG ((DEBUG_ERROR, "FmpDxe(%s): CheckTheImage() - GetAllHeaderSize failed.\n", mImageIdName));
     Status = EFI_ABORTED;
+    *LastAttemptStatus = LAST_ATTEMPT_STATUS_DRIVER_ERROR_GET_ALL_HEADER_SIZE;
     goto cleanup;
   }
   RawSize = ImageSize - AllHeaderSize;
@@ -967,6 +1007,42 @@ CheckTheImage (
 
 cleanup:
   return Status;
+}
+
+/**
+  Checks if the firmware image is valid for the device.
+
+  This function allows firmware update application to validate the firmware image without
+  invoking the SetImage() first.
+
+  @param[in]  This               A pointer to the EFI_FIRMWARE_MANAGEMENT_PROTOCOL instance.
+  @param[in]  ImageIndex         A unique number identifying the firmware image(s) within the device.
+                                 The number is between 1 and DescriptorCount.
+  @param[in]  Image              Points to the new image.
+  @param[in]  ImageSize          Size of the new image in bytes.
+  @param[out] ImageUpdatable     Indicates if the new image is valid for update. It also provides,
+                                 if available, additional information if the image is invalid.
+
+  @retval EFI_SUCCESS            The image was successfully checked.
+  @retval EFI_ABORTED            The operation is aborted.
+  @retval EFI_INVALID_PARAMETER  The Image was NULL.
+  @retval EFI_UNSUPPORTED        The operation is not supported.
+  @retval EFI_SECURITY_VIOLATION The operation could not be performed due to an authentication failure.
+
+**/
+EFI_STATUS
+EFIAPI
+CheckTheImage (
+  IN  EFI_FIRMWARE_MANAGEMENT_PROTOCOL  *This,
+  IN  UINT8                             ImageIndex,
+  IN  CONST VOID                        *Image,
+  IN  UINTN                             ImageSize,
+  OUT UINT32                            *ImageUpdatable
+  )
+{
+  UINT32  LastAttemptStatus;
+
+  return CheckTheImageInternal (This, ImageIndex, Image, ImageSize, ImageUpdatable, &LastAttemptStatus);
 }
 
 /**
