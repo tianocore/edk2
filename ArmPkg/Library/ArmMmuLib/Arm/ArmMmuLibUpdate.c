@@ -152,7 +152,7 @@ UpdatePageEntries (
   FirstLevelTable = (ARM_FIRST_LEVEL_DESCRIPTOR *)ArmGetTTBR0BaseAddress ();
 
   // Calculate number of 4KB page table entries to change
-  NumPageEntries = Length / TT_DESCRIPTOR_PAGE_SIZE;
+  NumPageEntries = (UINT32)(Length / TT_DESCRIPTOR_PAGE_SIZE);
 
   // Iterate for the number of 4KB pages to change
   Offset = 0;
@@ -288,7 +288,7 @@ UpdateSectionEntries (
   ASSERT (FirstLevelIdx < TRANSLATION_TABLE_SECTION_COUNT);
 
   // calculate number of 1MB first level entries this applies to
-  NumSections = Length / TT_DESCRIPTOR_SECTION_SIZE;
+  NumSections = (UINT32)(Length / TT_DESCRIPTOR_SECTION_SIZE);
 
   // iterate through each descriptor
   for(i=0; i<NumSections; i++) {
