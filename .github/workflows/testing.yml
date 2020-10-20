@@ -4,8 +4,36 @@ name: Testing
 
 on:
   - push
-
 jobs:
+  EmulatorPkg:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install dependencies
+        run: |
+          DEBIAN_FRONTEND=noninteractive sudo apt-get -qq update
+          DEBIAN_FRONTEND=noninteractive sudo apt-get -qqy install \
+          git python3 python3-distutils-extra build-essential nasm iasl uuid-dev libxext-dev libx11-dev 
+          DEBIAN_FRONTEND=noninteractive sudo apt-get clean
+          sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 1337
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Update submodules
+        run: |
+          git submodule init
+          git submodule sync --recursive
+          git submodule update --recursive
+
+      - name: Build BaseTools
+        run: |
+          make -C BaseTools
+
+      - name: Build EmulatorPkg
+        run: |
+          source ./edksetup.sh
+          build -p EmulatorPkg/EmulatorPkg.dsc -t GCC5 -a X64
+
   OvmfPkgIa32X64:
     runs-on: ubuntu-latest
     steps:
