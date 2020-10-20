@@ -624,6 +624,10 @@ TABLE_ITEM  ProcessorCharacteristicsTable[] = {
   {
     8,
     L" 128-bit Capable"
+  },
+  {
+    9,
+    L" ARM64 SoC ID"
   }
 };
 
