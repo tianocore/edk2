@@ -2,6 +2,7 @@
 #  This modules produce the Load File Protocol for UEFI HTTP boot.
 #
 #  Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+#  (C) Copyright 2020 Hewlett-Packard Development Company, L.P.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -52,6 +53,7 @@
   DebugLib
   NetLib
   HttpLib
+  HttpIoLib
   HiiLib
   PrintLib
   DpcLib
