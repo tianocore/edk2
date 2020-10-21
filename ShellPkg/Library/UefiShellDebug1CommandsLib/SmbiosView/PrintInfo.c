@@ -1284,7 +1284,7 @@ DisplayBiosCharacteristics (
   }
 
   if (BIT (Chara, 15) != 0) {
-    ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_BOOT_FORM_CD_SUPPORTED), gShellDebug1HiiHandle);
+    ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_BOOT_FROM_CD_SUPPORTED), gShellDebug1HiiHandle);
   }
 
   if (BIT (Chara, 16) != 0) {
