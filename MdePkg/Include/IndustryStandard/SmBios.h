@@ -871,7 +871,8 @@ typedef struct {
   UINT32  ProcessorEnhancedVirtulization :1;
   UINT32  ProcessorPowerPerformanceCtrl  :1;
   UINT32  Processor128bitCapble          :1;
-  UINT32  ProcessorReserved2             :7;
+  UINT32  ProcessorArm64SocId            :1;
+  UINT32  ProcessorReserved2             :6;
 } PROCESSOR_CHARACTERISTIC_FLAGS;
 
 typedef struct {
