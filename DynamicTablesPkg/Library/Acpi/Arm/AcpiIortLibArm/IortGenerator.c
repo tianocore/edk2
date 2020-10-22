@@ -1158,6 +1158,7 @@ AddSmmuV1V2Nodes (
   EFI_ACPI_6_0_IO_REMAPPING_SMMU_INT  * ContextInterruptArray;
   EFI_ACPI_6_0_IO_REMAPPING_SMMU_INT  * PmuInterruptArray;
   UINT64                                NodeLength;
+  UINT32                                Offset;
 
   ASSERT (Iort != NULL);
 
@@ -1200,47 +1201,74 @@ AddSmmuV1V2Nodes (
     SmmuNode->GlobalInterruptArrayRef =
       OFFSET_OF (EFI_ACPI_6_0_IO_REMAPPING_SMMU_NODE, SMMU_NSgIrpt);
 
+    Offset = sizeof (EFI_ACPI_6_0_IO_REMAPPING_SMMU_NODE);
     // Context Interrupt
     SmmuNode->NumContextInterrupts = NodeList->ContextInterruptCount;
-    SmmuNode->ContextInterruptArrayRef =
-      sizeof (EFI_ACPI_6_0_IO_REMAPPING_SMMU_NODE);
-    ContextInterruptArray =
-      (EFI_ACPI_6_0_IO_REMAPPING_SMMU_INT*)((UINT8*)SmmuNode +
-      sizeof (EFI_ACPI_6_0_IO_REMAPPING_SMMU_NODE));
+    if (NodeList->ContextInterruptCount != 0) {
+      SmmuNode->ContextInterruptArrayRef = Offset;
+      ContextInterruptArray =
+        (EFI_ACPI_6_0_IO_REMAPPING_SMMU_INT*)((UINT8*)SmmuNode + Offset);
+      Offset += (NodeList->ContextInterruptCount *
+        sizeof (EFI_ACPI_6_0_IO_REMAPPING_SMMU_INT));
+    }
 
     // PMU Interrupt
     SmmuNode->NumPmuInterrupts = NodeList->PmuInterruptCount;
-    SmmuNode->PmuInterruptArrayRef = SmmuNode->ContextInterruptArrayRef +
-      (NodeList->ContextInterruptCount *
-      sizeof (EFI_ACPI_6_0_IO_REMAPPING_SMMU_INT));
-    PmuInterruptArray =
-      (EFI_ACPI_6_0_IO_REMAPPING_SMMU_INT*)((UINT8*)SmmuNode +
-      SmmuNode->PmuInterruptArrayRef);
+    if (NodeList->PmuInterruptCount != 0) {
+      SmmuNode->PmuInterruptArrayRef = Offset;
+      PmuInterruptArray =
+        (EFI_ACPI_6_0_IO_REMAPPING_SMMU_INT*)((UINT8*)SmmuNode + Offset);
+    }
 
     SmmuNode->SMMU_NSgIrpt = NodeList->SMMU_NSgIrpt;
     SmmuNode->SMMU_NSgIrptFlags = NodeList->SMMU_NSgIrptFlags;
     SmmuNode->SMMU_NSgCfgIrpt = NodeList->SMMU_NSgCfgIrpt;
     SmmuNode->SMMU_NSgCfgIrptFlags = NodeList->SMMU_NSgCfgIrptFlags;
 
-    // Add Context Interrupt Array
-    Status = AddSmmuInterruptArray (
-               CfgMgrProtocol,
-               ContextInterruptArray,
-               SmmuNode->NumContextInterrupts,
-               NodeList->ContextInterruptToken
-               );
-    if (EFI_ERROR (Status)) {
-      DEBUG ((
-        DEBUG_ERROR,
-        "ERROR: IORT: Failed to Context Interrupt Array. Status = %r\n",
-        Status
-        ));
-      return Status;
+    if (NodeList->ContextInterruptCount != 0) {
+      if (NodeList->ContextInterruptToken == CM_NULL_TOKEN) {
+        Status = EFI_INVALID_PARAMETER;
+        DEBUG ((
+          DEBUG_ERROR,
+          "ERROR: IORT: Invalid Context Interrupt token,"
+          " Token = 0x%x, Status =%r\n",
+          NodeList->ContextInterruptToken,
+          Status
+          ));
+        return Status;
+      }
+
+      // Add Context Interrupt Array
+      Status = AddSmmuInterruptArray (
+                 CfgMgrProtocol,
+                 ContextInterruptArray,
+                 SmmuNode->NumContextInterrupts,
+                 NodeList->ContextInterruptToken
+                 );
+      if (EFI_ERROR (Status)) {
+        DEBUG ((
+          DEBUG_ERROR,
+          "ERROR: IORT: Failed to Context Interrupt Array. Status = %r\n",
+          Status
+          ));
+        return Status;
+      }
     }
 
     // Add PMU Interrupt Array
-    if ((SmmuNode->NumPmuInterrupts > 0) &&
-        (NodeList->PmuInterruptToken != CM_NULL_TOKEN)) {
+    if (SmmuNode->NumPmuInterrupts != 0) {
+      if (NodeList->PmuInterruptToken == CM_NULL_TOKEN) {
+        Status = EFI_INVALID_PARAMETER;
+        DEBUG ((
+          DEBUG_ERROR,
+          "ERROR: IORT: Invalid PMU Interrupt token,"
+          " Token = 0x%x, Status =%r\n",
+          NodeList->PmuInterruptToken,
+          Status
+          ));
+        return Status;
+      }
+
       Status = AddSmmuInterruptArray (
                  CfgMgrProtocol,
                  PmuInterruptArray,
