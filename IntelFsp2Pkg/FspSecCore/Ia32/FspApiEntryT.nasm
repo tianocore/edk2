@@ -307,10 +307,6 @@ AdvanceFixedSize:
    add   esi, dword  1024
 
 CheckAddress:
-   ; Is valid Microcode start point ?
-   cmp   dword [esi + MicrocodeHdr.MicrocodeHdrVersion], 0ffffffffh
-   jz    Done
-
    ; Check UPD header revision
    cmp    byte [esp + LoadMicrocodeParamsFsp22.FspUpdHeaderRevision], 2
    jae    Fsp22UpdHeader1
@@ -341,6 +337,10 @@ Fsp22UpdHeader1:
    jmp   CheckMainHeader
 
 LoadMicrocodeDefault4:
+   ; Is valid Microcode start point ?
+   cmp   dword [esi + MicrocodeHdr.MicrocodeHdrVersion], 0ffffffffh
+   jz    Done
+
 LoadCheck:
    ; Get the revision of the current microcode update loaded
    mov   ecx, MSR_IA32_BIOS_SIGN_ID
