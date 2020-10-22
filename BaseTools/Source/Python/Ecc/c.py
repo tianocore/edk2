@@ -2,6 +2,7 @@
 # This file is used to be the c coding style checking of ECC tool
 #
 # Copyright (c) 2009 - 2019, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2020, Arm Limited. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
@@ -64,7 +65,9 @@ def GetIdType(Str):
     Type = DataClass.MODEL_UNKNOWN
     Str = Str.replace('#', '# ')
     List = Str.split()
-    if List[1] == 'include':
+    if len(List) < 2:
+        pass
+    elif List[1] == 'include':
         Type = DataClass.MODEL_IDENTIFIER_INCLUDE
     elif List[1] == 'define':
         Type = DataClass.MODEL_IDENTIFIER_MACRO_DEFINE
