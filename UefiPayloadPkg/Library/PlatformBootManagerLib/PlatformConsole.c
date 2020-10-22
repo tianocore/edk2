@@ -109,7 +109,7 @@ EFI_DEVICE_PATH_PROTOCOL          *gPlatformRootBridges[] = {
   NULL
 };
 
-BOOLEAN       mDetectVgaOnly;
+BOOLEAN       mDetectDisplayOnly;
 
 /**
   Add IsaKeyboard to ConIn; add IsaSerial to ConOut, ConIn, ErrOut.
@@ -159,130 +159,6 @@ PrepareLpcBridgeDevicePath (
   EfiBootManagerUpdateConsoleVariable (ConOut, DevicePath, NULL);
   EfiBootManagerUpdateConsoleVariable (ConIn, DevicePath, NULL);
   EfiBootManagerUpdateConsoleVariable (ErrOut, DevicePath, NULL);
-
-  return EFI_SUCCESS;
-}
-
-/**
-  Return the GOP device path in the platform.
-
-  @param[in]   PciDevicePath - Device path for the PCI graphics device.
-  @param[out]  GopDevicePath - Return the device path with GOP installed.
-
-  @retval EFI_SUCCESS  - PCI VGA is added to ConOut.
-  @retval EFI_INVALID_PARAMETER   - The device path parameter is invalid.
-  @retval EFI_STATUS   - No GOP device found.
-**/
-EFI_STATUS
-GetGopDevicePath (
-  IN  EFI_DEVICE_PATH_PROTOCOL *PciDevicePath,
-  OUT EFI_DEVICE_PATH_PROTOCOL **GopDevicePath
-)
-{
-  UINTN                           Index;
-  EFI_STATUS                      Status;
-  EFI_HANDLE                      PciDeviceHandle;
-  EFI_DEVICE_PATH_PROTOCOL        *TempDevicePath;
-  EFI_DEVICE_PATH_PROTOCOL        *TempPciDevicePath;
-  UINTN                           GopHandleCount;
-  EFI_HANDLE                      *GopHandleBuffer;
-
-  if (PciDevicePath == NULL || GopDevicePath == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  //
-  // Initialize the GopDevicePath to be PciDevicePath
-  //
-  *GopDevicePath    = PciDevicePath;
-  TempPciDevicePath = PciDevicePath;
-
-  Status = gBS->LocateDevicePath (
-             &gEfiDevicePathProtocolGuid,
-             &TempPciDevicePath,
-             &PciDeviceHandle
-           );
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  gBS->ConnectController (PciDeviceHandle, NULL, NULL, FALSE);
-
-  Status = gBS->LocateHandleBuffer (
-             ByProtocol,
-             &gEfiGraphicsOutputProtocolGuid,
-             NULL,
-             &GopHandleCount,
-             &GopHandleBuffer
-           );
-  if (!EFI_ERROR (Status)) {
-    //
-    // Add all the child handles as possible Console Device
-    //
-    for (Index = 0; Index < GopHandleCount; Index++) {
-      Status = gBS->HandleProtocol (GopHandleBuffer[Index], &gEfiDevicePathProtocolGuid, (VOID*)&TempDevicePath);
-      if (EFI_ERROR (Status)) {
-        continue;
-      }
-      if (CompareMem (
-            PciDevicePath,
-            TempDevicePath,
-            GetDevicePathSize (PciDevicePath) - END_DEVICE_PATH_LENGTH
-          ) == 0) {
-        //
-        // In current implementation, we only enable one of the child handles
-        // as console device, i.e. sotre one of the child handle's device
-        // path to variable "ConOut"
-        // In future, we could select all child handles to be console device
-        //
-        *GopDevicePath = TempDevicePath;
-
-        //
-        // Delete the PCI device's path that added by GetPlugInPciVgaDevicePath()
-        // Add the integrity GOP device path.
-        //
-        EfiBootManagerUpdateConsoleVariable (ConOut, NULL, PciDevicePath);
-        EfiBootManagerUpdateConsoleVariable (ConOut, TempDevicePath, NULL);
-      }
-    }
-    gBS->FreePool (GopHandleBuffer);
-  }
-
-  return EFI_SUCCESS;
-}
-
-/**
-  Add PCI VGA to ConOut, ConIn, ErrOut.
-
-  @param[in]  DeviceHandle - Handle of PciIo protocol.
-
-  @retval EFI_SUCCESS  - PCI VGA is added to ConOut.
-  @retval EFI_STATUS   - No PCI VGA device is added.
-
-**/
-EFI_STATUS
-PreparePciVgaDevicePath (
-  IN EFI_HANDLE                DeviceHandle
-)
-{
-  EFI_STATUS                Status;
-  EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
-  EFI_DEVICE_PATH_PROTOCOL  *GopDevicePath;
-
-  DevicePath = NULL;
-  Status = gBS->HandleProtocol (
-             DeviceHandle,
-             &gEfiDevicePathProtocolGuid,
-             (VOID*)&DevicePath
-           );
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  GetGopDevicePath (DevicePath, &GopDevicePath);
-  DevicePath = GopDevicePath;
-
-  EfiBootManagerUpdateConsoleVariable (ConOut, DevicePath, NULL);
 
   return EFI_SUCCESS;
 }
@@ -483,7 +359,7 @@ DetectAndPreparePlatformPciDevicePath (
            );
   ASSERT_EFI_ERROR (Status);
 
-  if (!mDetectVgaOnly) {
+  if (!mDetectDisplayOnly) {
     //
     // Here we decide whether it is LPC Bridge
     //
@@ -514,14 +390,15 @@ DetectAndPreparePlatformPciDevicePath (
   }
 
   //
-  // Here we decide which VGA device to enable in PCI bus
+  // Enable all display devices
   //
-  if (IS_PCI_VGA (Pci)) {
+  if (IS_PCI_DISPLAY (Pci)) {
     //
     // Add them to ConOut.
     //
-    DEBUG ((DEBUG_INFO, "Found PCI VGA device\n"));
-    PreparePciVgaDevicePath (Handle);
+    DEBUG ((DEBUG_INFO, "Found PCI Display device\n"));
+    EfiBootManagerConnectVideoController(Handle);
+
     return EFI_SUCCESS;
   }
 
@@ -532,7 +409,7 @@ DetectAndPreparePlatformPciDevicePath (
 /**
   Do platform specific PCI Device check and add them to ConOut, ConIn, ErrOut
 
-  @param[in]  DetectVgaOnly - Only detect VGA device if it's TRUE.
+  @param[in]  DetectDisplayOnly - Only detect display device if it's TRUE.
 
   @retval EFI_SUCCESS - PCI Device check and Console variable update successfully.
   @retval EFI_STATUS - PCI Device check or Console variable update fail.
@@ -540,10 +417,10 @@ DetectAndPreparePlatformPciDevicePath (
 **/
 EFI_STATUS
 DetectAndPreparePlatformPciDevicePaths (
-  BOOLEAN DetectVgaOnly
+  BOOLEAN DetectDisplayOnly
 )
 {
-  mDetectVgaOnly = DetectVgaOnly;
+  mDetectDisplayOnly = DetectDisplayOnly;
 
   EfiBootManagerUpdateConsoleVariable (
     ConIn,
