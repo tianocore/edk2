@@ -676,11 +676,13 @@ NorFlashWriteBlocks (
   )
 {
   UINT32          *pWriteBuffer;
-  EFI_STATUS      Status = EFI_SUCCESS;
+  EFI_STATUS      Status;
   EFI_LBA         CurrentBlock;
   UINT32          BlockSizeInWords;
   UINT32          NumBlocks;
   UINT32          BlockCount;
+
+  Status = EFI_SUCCESS;
 
   // The buffer must be valid
   if (Buffer == NULL) {
