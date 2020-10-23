@@ -171,7 +171,7 @@ Get (
   OUT UINTN             *Value
   )
 {
-  EFI_STATUS    Status = EFI_SUCCESS;
+  EFI_STATUS    Status;
   UINTN         Index, Offset, RegisterBase;
 
   Status = PL061Locate (Gpio, &Index, &Offset, &RegisterBase);
@@ -216,7 +216,7 @@ Set (
   IN  EMBEDDED_GPIO_MODE  Mode
   )
 {
-  EFI_STATUS    Status = EFI_SUCCESS;
+  EFI_STATUS    Status;
   UINTN         Index, Offset, RegisterBase;
 
   Status = PL061Locate (Gpio, &Index, &Offset, &RegisterBase);
@@ -278,7 +278,7 @@ GetMode (
   OUT EMBEDDED_GPIO_MODE  *Mode
   )
 {
-  EFI_STATUS    Status = EFI_SUCCESS;
+  EFI_STATUS    Status;
   UINTN         Index, Offset, RegisterBase;
 
   Status = PL061Locate (Gpio, &Index, &Offset, &RegisterBase);
