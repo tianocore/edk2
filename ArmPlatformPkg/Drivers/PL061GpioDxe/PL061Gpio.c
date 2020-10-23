@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011, ARM Limited. All rights reserved.
+*  Copyright (c) 2011 - 2020, Arm Limited. All rights reserved.<BR>
 *  Copyright (c) 2016, Linaro Limited. All rights reserved.
 *
 *  SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -181,7 +181,7 @@ Get (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (PL061GetPins (RegisterBase, GPIO_PIN_MASK(Offset))) {
+  if (PL061GetPins (RegisterBase, GPIO_PIN_MASK(Offset)) != 0) {
     *Value = 1;
   } else {
     *Value = 0;
@@ -292,7 +292,7 @@ GetMode (
   // Check if it is input or output
   if (MmioRead8 (RegisterBase + PL061_GPIO_DIR_REG) & GPIO_PIN_MASK(Offset)) {
     // Pin set to output
-    if (PL061GetPins (RegisterBase, GPIO_PIN_MASK(Offset))) {
+    if (PL061GetPins (RegisterBase, GPIO_PIN_MASK(Offset)) != 0) {
       *Mode = GPIO_MODE_OUTPUT_1;
     } else {
       *Mode = GPIO_MODE_OUTPUT_0;
