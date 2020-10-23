@@ -2,7 +2,7 @@
   Implement EFI RealTimeClock runtime services via RTC Lib.
 
   Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
-  Copyright (c) 2011 - 2014, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2011 - 2020, Arm Limited. All rights reserved.<BR>
   Copyright (c) 2019, Linaro Ltd. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -121,7 +121,7 @@ LibGetTime (
   OUT EFI_TIME_CAPABILITIES   *Capabilities
   )
 {
-  EFI_STATUS  Status = EFI_SUCCESS;
+  EFI_STATUS  Status;
   UINT32      EpochSeconds;
 
   // Ensure Time is a valid pointer
