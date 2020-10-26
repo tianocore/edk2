@@ -604,14 +604,14 @@ NvmeCreateIoCompletionQueue (
     CommandPacket.CommandTimeout = NVME_GENERIC_TIMEOUT;
     CommandPacket.QueueType      = NVME_ADMIN_QUEUE;
 
-    if (Index == 1) {
+    if (PcdGetBool (PcdSupportAlternativeQueueSize)) {
+      QueueSize = MIN (NVME_ALTERNATIVE_MAX_QUEUE_SIZE, Private->Cap.Mqes);
+    } else if (Index == 1) {
       QueueSize = NVME_CCQ_SIZE;
+    } else if (Private->Cap.Mqes > NVME_ASYNC_CCQ_SIZE) {
+      QueueSize = NVME_ASYNC_CCQ_SIZE;
     } else {
-      if (Private->Cap.Mqes > NVME_ASYNC_CCQ_SIZE) {
-        QueueSize = NVME_ASYNC_CCQ_SIZE;
-      } else {
-        QueueSize = Private->Cap.Mqes;
-      }
+      QueueSize = Private->Cap.Mqes;
     }
 
     CrIoCq.Qid   = Index;
@@ -676,14 +676,14 @@ NvmeCreateIoSubmissionQueue (
     CommandPacket.CommandTimeout = NVME_GENERIC_TIMEOUT;
     CommandPacket.QueueType      = NVME_ADMIN_QUEUE;
 
-    if (Index == 1) {
-      QueueSize = NVME_CSQ_SIZE;
+    if (PcdGetBool (PcdSupportAlternativeQueueSize)) {
+      QueueSize = MIN (NVME_ALTERNATIVE_MAX_QUEUE_SIZE, Private->Cap.Mqes);
+    } else if (Index == 1) {
+      QueueSize = NVME_CCQ_SIZE;
+    } else if (Private->Cap.Mqes > NVME_ASYNC_CCQ_SIZE) {
+      QueueSize = NVME_ASYNC_CCQ_SIZE;
     } else {
-      if (Private->Cap.Mqes > NVME_ASYNC_CSQ_SIZE) {
-        QueueSize = NVME_ASYNC_CSQ_SIZE;
-      } else {
-        QueueSize = Private->Cap.Mqes;
-      }
+      QueueSize = Private->Cap.Mqes;
     }
 
     CrIoSq.Qid   = Index;
@@ -826,9 +826,9 @@ NvmeControllerInit (
   //
   // set number of entries admin submission & completion queues.
   //
-  Aqa.Asqs  = NVME_ASQ_SIZE;
+  Aqa.Asqs  = PcdGetBool (PcdSupportAlternativeQueueSize) ? MIN (NVME_ALTERNATIVE_MAX_QUEUE_SIZE, Private->Cap.Mqes) : NVME_ASQ_SIZE;
   Aqa.Rsvd1 = 0;
-  Aqa.Acqs  = NVME_ACQ_SIZE;
+  Aqa.Acqs  = PcdGetBool (PcdSupportAlternativeQueueSize) ? MIN (NVME_ALTERNATIVE_MAX_QUEUE_SIZE, Private->Cap.Mqes) : NVME_ACQ_SIZE;
   Aqa.Rsvd2 = 0;
 
   //
@@ -839,24 +839,44 @@ NvmeControllerInit (
   //
   // Address of admin completion queue.
   //
-  Acq = (UINT64)(UINTN)(Private->BufferPciAddr + EFI_PAGE_SIZE) & ~0xFFF;
+  if (PcdGetBool (PcdSupportAlternativeQueueSize)) {
+    Acq = (UINT64)(UINTN)(Private->BufferPciAddr + 4 * EFI_PAGE_SIZE) & ~0xFFF;
+  } else {
+    Acq = (UINT64)(UINTN)(Private->BufferPciAddr + EFI_PAGE_SIZE) & ~0xFFF;
+  }
 
   //
   // Address of I/O submission & completion queue.
   //
-  ZeroMem (Private->Buffer, EFI_PAGES_TO_SIZE (6));
-  Private->SqBuffer[0]        = (NVME_SQ *)(UINTN)(Private->Buffer);
-  Private->SqBufferPciAddr[0] = (NVME_SQ *)(UINTN)(Private->BufferPciAddr);
-  Private->CqBuffer[0]        = (NVME_CQ *)(UINTN)(Private->Buffer + 1 * EFI_PAGE_SIZE);
-  Private->CqBufferPciAddr[0] = (NVME_CQ *)(UINTN)(Private->BufferPciAddr + 1 * EFI_PAGE_SIZE);
-  Private->SqBuffer[1]        = (NVME_SQ *)(UINTN)(Private->Buffer + 2 * EFI_PAGE_SIZE);
-  Private->SqBufferPciAddr[1] = (NVME_SQ *)(UINTN)(Private->BufferPciAddr + 2 * EFI_PAGE_SIZE);
-  Private->CqBuffer[1]        = (NVME_CQ *)(UINTN)(Private->Buffer + 3 * EFI_PAGE_SIZE);
-  Private->CqBufferPciAddr[1] = (NVME_CQ *)(UINTN)(Private->BufferPciAddr + 3 * EFI_PAGE_SIZE);
-  Private->SqBuffer[2]        = (NVME_SQ *)(UINTN)(Private->Buffer + 4 * EFI_PAGE_SIZE);
-  Private->SqBufferPciAddr[2] = (NVME_SQ *)(UINTN)(Private->BufferPciAddr + 4 * EFI_PAGE_SIZE);
-  Private->CqBuffer[2]        = (NVME_CQ *)(UINTN)(Private->Buffer + 5 * EFI_PAGE_SIZE);
-  Private->CqBufferPciAddr[2] = (NVME_CQ *)(UINTN)(Private->BufferPciAddr + 5 * EFI_PAGE_SIZE);
+  if (PcdGetBool (PcdSupportAlternativeQueueSize)) {
+    ZeroMem (Private->Buffer, EFI_PAGES_TO_SIZE (NVME_ALTERNATIVE_TOTAL_QUEUE_BUFFER_IN_PAGES));
+    Private->SqBuffer[0]        = (NVME_SQ *)(UINTN)(Private->Buffer);
+    Private->SqBufferPciAddr[0] = (NVME_SQ *)(UINTN)(Private->BufferPciAddr);
+    Private->CqBuffer[0]        = (NVME_CQ *)(UINTN)(Private->Buffer + 4 * EFI_PAGE_SIZE);
+    Private->CqBufferPciAddr[0] = (NVME_CQ *)(UINTN)(Private->BufferPciAddr + 4 * EFI_PAGE_SIZE);
+    Private->SqBuffer[1]        = (NVME_SQ *)(UINTN)(Private->Buffer + 5 * EFI_PAGE_SIZE);
+    Private->SqBufferPciAddr[1] = (NVME_SQ *)(UINTN)(Private->BufferPciAddr + 5 * EFI_PAGE_SIZE);
+    Private->CqBuffer[1]        = (NVME_CQ *)(UINTN)(Private->Buffer + 9 * EFI_PAGE_SIZE);
+    Private->CqBufferPciAddr[1] = (NVME_CQ *)(UINTN)(Private->BufferPciAddr + 9 * EFI_PAGE_SIZE);
+    Private->SqBuffer[2]        = (NVME_SQ *)(UINTN)(Private->Buffer + 10 * EFI_PAGE_SIZE);
+    Private->SqBufferPciAddr[2] = (NVME_SQ *)(UINTN)(Private->BufferPciAddr + 10 * EFI_PAGE_SIZE);
+    Private->CqBuffer[2]        = (NVME_CQ *)(UINTN)(Private->Buffer + 14 * EFI_PAGE_SIZE);
+    Private->CqBufferPciAddr[2] = (NVME_CQ *)(UINTN)(Private->BufferPciAddr + 14 * EFI_PAGE_SIZE);
+  } else {
+    ZeroMem (Private->Buffer, EFI_PAGES_TO_SIZE (6));
+    Private->SqBuffer[0]        = (NVME_SQ *)(UINTN)(Private->Buffer);
+    Private->SqBufferPciAddr[0] = (NVME_SQ *)(UINTN)(Private->BufferPciAddr);
+    Private->CqBuffer[0]        = (NVME_CQ *)(UINTN)(Private->Buffer + 1 * EFI_PAGE_SIZE);
+    Private->CqBufferPciAddr[0] = (NVME_CQ *)(UINTN)(Private->BufferPciAddr + 1 * EFI_PAGE_SIZE);
+    Private->SqBuffer[1]        = (NVME_SQ *)(UINTN)(Private->Buffer + 2 * EFI_PAGE_SIZE);
+    Private->SqBufferPciAddr[1] = (NVME_SQ *)(UINTN)(Private->BufferPciAddr + 2 * EFI_PAGE_SIZE);
+    Private->CqBuffer[1]        = (NVME_CQ *)(UINTN)(Private->Buffer + 3 * EFI_PAGE_SIZE);
+    Private->CqBufferPciAddr[1] = (NVME_CQ *)(UINTN)(Private->BufferPciAddr + 3 * EFI_PAGE_SIZE);
+    Private->SqBuffer[2]        = (NVME_SQ *)(UINTN)(Private->Buffer + 4 * EFI_PAGE_SIZE);
+    Private->SqBufferPciAddr[2] = (NVME_SQ *)(UINTN)(Private->BufferPciAddr + 4 * EFI_PAGE_SIZE);
+    Private->CqBuffer[2]        = (NVME_CQ *)(UINTN)(Private->Buffer + 5 * EFI_PAGE_SIZE);
+    Private->CqBufferPciAddr[2] = (NVME_CQ *)(UINTN)(Private->BufferPciAddr + 5 * EFI_PAGE_SIZE);
+  }
 
   DEBUG ((DEBUG_INFO, "Private->Buffer = [%016X]\n", (UINT64)(UINTN)Private->Buffer));
   DEBUG ((DEBUG_INFO, "Admin     Submission Queue size (Aqa.Asqs) = [%08X]\n", Aqa.Asqs));

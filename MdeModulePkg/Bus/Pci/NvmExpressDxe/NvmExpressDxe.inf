@@ -77,6 +77,9 @@
   gMediaSanitizeProtocolGuid                  ## PRODUCES
   gEfiResetNotificationProtocolGuid           ## CONSUMES
 
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSupportAlternativeQueueSize ## CONSUMES
+
 # [Event]
 # EVENT_TYPE_RELATIVE_TIMER ## SOMETIMES_CONSUMES
 #
