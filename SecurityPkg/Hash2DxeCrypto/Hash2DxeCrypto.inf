@@ -44,7 +44,6 @@
   UefiLib
 
 [Guids]
-  gEfiHashAlgorithmSha1Guid             ## CONSUMES               ## GUID
   gEfiHashAlgorithmSha256Guid           ## CONSUMES               ## GUID
   gEfiHashAlgorithmSha384Guid           ## CONSUMES               ## GUID
   gEfiHashAlgorithmSha512Guid           ## CONSUMES               ## GUID
