@@ -29,11 +29,11 @@ https://github.com/tianocore/tianocore.github.io/wiki/EmulatorPkg
 
   * 32bit emulator in Linux:
 
-    `build -p EmulatorPkg\EmulatorPkg.dsc -t GCC5 -a IA32`
+    `build -p EmulatorPkg/EmulatorPkg.dsc -t GCC5 -a IA32`
 
   * 64bit emulator in Linux:
 
-    `build -p EmulatorPkg\EmulatorPkg.dsc -t GCC5 -a X64`
+    `build -p EmulatorPkg/EmulatorPkg.dsc -t GCC5 -a X64`
 
 **You can start/run the emulator using the following command:**
   * 32bit emulator in Windows:
