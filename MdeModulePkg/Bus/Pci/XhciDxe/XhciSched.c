@@ -2,7 +2,7 @@
 
   XHCI transfer scheduling routines.
 
-Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2020, Intel Corporation. All rights reserved.<BR>
 Copyright (c) Microsoft Corporation.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -2279,6 +2279,9 @@ XhcInitializeDeviceSlot (
     DeviceAddress = (UINT8) ((DEVICE_CONTEXT *) OutputContext)->Slot.DeviceAddress;
     DEBUG ((EFI_D_INFO, "    Address %d assigned successfully\n", DeviceAddress));
     Xhc->UsbDevContext[SlotId].XhciDevAddr = DeviceAddress;
+  } else {
+    DEBUG ((DEBUG_INFO, "    Address %d assigned unsuccessfully\n"));
+    XhcDisableSlotCmd (Xhc, SlotId);
   }
 
   return Status;
@@ -2489,7 +2492,11 @@ XhcInitializeDeviceSlot64 (
     DeviceAddress = (UINT8) ((DEVICE_CONTEXT_64 *) OutputContext)->Slot.DeviceAddress;
     DEBUG ((EFI_D_INFO, "    Address %d assigned successfully\n", DeviceAddress));
     Xhc->UsbDevContext[SlotId].XhciDevAddr = DeviceAddress;
+  } else {
+    DEBUG ((DEBUG_INFO, "    Address %d assigned unsuccessfully\n"));
+    XhcDisableSlotCmd64 (Xhc, SlotId);
   }
+
   return Status;
 }
 
