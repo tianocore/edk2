@@ -32,7 +32,7 @@ PAGE_ATTRIBUTE_TABLE mPageAttributeTable[] = {
   {Page1G,  SIZE_1GB, PAGING_1G_ADDRESS_MASK_64},
 };
 
-UINTN  mInternalGr3;
+UINTN  mInternalCr3;
 
 /**
   Set the internal page table base address.
@@ -46,7 +46,7 @@ SetPageTableBase (
   IN UINTN   Cr3
   )
 {
-  mInternalGr3 = Cr3;
+  mInternalCr3 = Cr3;
 }
 
 /**
@@ -59,8 +59,8 @@ GetPageTableBase (
   VOID
   )
 {
-  if (mInternalGr3 != 0) {
-    return mInternalGr3;
+  if (mInternalCr3 != 0) {
+    return mInternalCr3;
   }
   return (AsmReadCr3 () & PAGING_4K_ADDRESS_MASK_64);
 }
@@ -252,7 +252,7 @@ ConvertPageEntryAttribute (
   if ((Attributes & EFI_MEMORY_RO) != 0) {
     if (IsSet) {
       NewPageEntry &= ~(UINT64)IA32_PG_RW;
-      if (mInternalGr3 != 0) {
+      if (mInternalCr3 != 0) {
         // Environment setup
         // ReadOnly page need set Dirty bit for shadow stack
         NewPageEntry |= IA32_PG_D;
