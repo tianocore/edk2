@@ -2098,6 +2098,60 @@ CalculateTotalMemoryBinSizeNeeded (
 }
 
 /**
+   Find the largest region in the specified region that is not covered by an existing memory allocation
+
+   @param BaseAddress   On input start of the region to check.
+                        On output start of the largest free region.
+   @param Length        On input size of region to check.
+                        On output size of the largest free region.
+   @param MemoryHob     Hob pointer for the first memory allocation pointer to check
+**/
+VOID
+FindLargestFreeRegion (
+    IN OUT EFI_PHYSICAL_ADDRESS  *BaseAddress,
+    IN OUT UINT64                *Length,
+    IN EFI_HOB_MEMORY_ALLOCATION *MemoryHob
+    )
+{
+  EFI_PHYSICAL_ADDRESS TopAddress;
+  EFI_PHYSICAL_ADDRESS AllocatedTop;
+  EFI_PHYSICAL_ADDRESS LowerBase;
+  UINT64               LowerSize;
+  EFI_PHYSICAL_ADDRESS UpperBase;
+  UINT64               UpperSize;
+
+  TopAddress = *BaseAddress + *Length;
+  while (MemoryHob != NULL) {
+    AllocatedTop = MemoryHob->AllocDescriptor.MemoryBaseAddress + MemoryHob->AllocDescriptor.MemoryLength;
+
+    if ((MemoryHob->AllocDescriptor.MemoryBaseAddress >= *BaseAddress) &&
+        (AllocatedTop <= TopAddress)) {
+      LowerBase = *BaseAddress;
+      LowerSize = MemoryHob->AllocDescriptor.MemoryBaseAddress - *BaseAddress;
+      UpperBase = AllocatedTop;
+      UpperSize = TopAddress - AllocatedTop;
+
+      if (LowerSize != 0) {
+        FindLargestFreeRegion (&LowerBase, &LowerSize, (EFI_HOB_MEMORY_ALLOCATION *) GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, GET_NEXT_HOB (MemoryHob)));
+      }
+      if (UpperSize != 0) {
+        FindLargestFreeRegion (&UpperBase, &UpperSize, (EFI_HOB_MEMORY_ALLOCATION *) GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, GET_NEXT_HOB (MemoryHob)));
+      }
+
+      if (UpperSize >= LowerSize) {
+        *Length = UpperSize;
+        *BaseAddress = UpperBase;
+      } else {
+        *Length = LowerSize;
+        *BaseAddress = LowerBase;
+      }
+      return;
+    }
+    MemoryHob = GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, GET_NEXT_HOB (MemoryHob));
+  }
+}
+
+/**
   External function. Initializes memory services based on the memory
   descriptor HOBs.  This function is responsible for priming the memory
   map, so memory allocations and resource allocations can be made.
@@ -2235,6 +2289,7 @@ CoreInitializeMemoryServices (
     Attributes  = PhitResourceHob->ResourceAttribute;
     BaseAddress = PageAlignAddress (PhitHob->EfiMemoryTop);
     Length      = PageAlignLength  (ResourceHob->PhysicalStart + ResourceHob->ResourceLength - BaseAddress);
+    FindLargestFreeRegion (&BaseAddress, &Length, (EFI_HOB_MEMORY_ALLOCATION *)GetFirstHob (EFI_HOB_TYPE_MEMORY_ALLOCATION));
     if (Length < MinimalMemorySizeNeeded) {
       //
       // If that range is not large enough to intialize the DXE Core, then
@@ -2242,6 +2297,7 @@ CoreInitializeMemoryServices (
       //
       BaseAddress = PageAlignAddress (PhitHob->EfiFreeMemoryBottom);
       Length      = PageAlignLength  (PhitHob->EfiFreeMemoryTop - BaseAddress);
+      //This region is required to have no memory allocation inside it, skip check for entries in HOB List
       if (Length < MinimalMemorySizeNeeded) {
         //
         // If that range is not large enough to intialize the DXE Core, then
@@ -2249,6 +2305,7 @@ CoreInitializeMemoryServices (
         //
         BaseAddress = PageAlignAddress (ResourceHob->PhysicalStart);
         Length      = PageAlignLength  ((UINT64)((UINTN)*HobStart - BaseAddress));
+        FindLargestFreeRegion (&BaseAddress, &Length, (EFI_HOB_MEMORY_ALLOCATION *)GetFirstHob (EFI_HOB_TYPE_MEMORY_ALLOCATION));
       }
     }
     break;
@@ -2312,6 +2369,7 @@ CoreInitializeMemoryServices (
       //
       TestedMemoryBaseAddress = PageAlignAddress (ResourceHob->PhysicalStart);
       TestedMemoryLength      = PageAlignLength  (ResourceHob->PhysicalStart + ResourceHob->ResourceLength - TestedMemoryBaseAddress);
+      FindLargestFreeRegion (&TestedMemoryBaseAddress, &TestedMemoryLength, (EFI_HOB_MEMORY_ALLOCATION *)GetFirstHob (EFI_HOB_TYPE_MEMORY_ALLOCATION));
       if (TestedMemoryLength < MinimalMemorySizeNeeded) {
         continue;
       }
