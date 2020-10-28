@@ -1,7 +1,7 @@
 /** @file
   Implements functions to read firmware file
 
-Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2020, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -143,9 +143,9 @@ FvGetNextFile (
     return EFI_ACCESS_DENIED;
   }
 
-  if (*FileType > EFI_FV_FILETYPE_SMM_CORE) {
+  if (*FileType > EFI_FV_FILETYPE_MM_CORE_STANDALONE) {
     //
-    // File type needs to be in 0 - 0x0D
+    // File type needs to be in 0 - 0x0F
     //
     return EFI_NOT_FOUND;
   }
