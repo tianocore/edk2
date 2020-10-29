@@ -50,6 +50,28 @@
 #define CACHE_ARCHITECTURE_UNIFIED            (0UL)
 #define CACHE_ARCHITECTURE_SEPARATE           (1UL)
 
+typedef union {
+  struct {
+    UINT32    InD           :1;
+    UINT32    Level         :3;
+    UINT32    Reserved      :28;
+  } Bits;
+  UINT32 Data;
+} CSSELR_DATA;
+
+typedef union {
+  struct {
+    UINT32    LineSize           :3;
+    UINT32    Associativity      :10;
+    UINT32    NumSets            :15;
+    UINT32    Wa                 :1;
+    UINT32    Ra                 :1;
+    UINT32    Wb                 :1;
+    UINT32    Wt                 :1;
+  } Bits;
+  UINT32 Data;
+} CCSIDR_DATA;
+
 VOID
 CPSRMaskInsert (
   IN  UINT32  Mask,
