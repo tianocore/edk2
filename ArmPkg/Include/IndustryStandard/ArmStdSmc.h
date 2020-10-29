@@ -1,5 +1,6 @@
 /** @file
 *
+*  Copyright (c) 2020, NUVIA Inc. All rights reserved.
 *  Copyright (c) 2012-2017, ARM Limited. All rights reserved.
 *
 *  SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -28,13 +29,6 @@
 #define ARM_SMC_STD_UUID3       0xe2f64156
 
 /*
- * ARM Standard Service Calls revision numbers
- * The current revision is:  0.1
- */
-#define ARM_SMC_STD_REVISION_MAJOR    0x0
-#define ARM_SMC_STD_REVISION_MINOR    0x1
-
-/*
  * Management Mode (MM) calls cover a subset of the Standard Service Call range.
  * The list below is not exhaustive.
  */
@@ -51,6 +45,18 @@
 #define ARM_SMC_MM_RET_INVALID_PARAMS      -2
 #define ARM_SMC_MM_RET_DENIED              -3
 #define ARM_SMC_MM_RET_NO_MEMORY           -4
+
+// ARM Architecture Calls
+#define ARM_SMC_ID_ARCH_VERSION      0x80000000
+#define ARM_SMC_ID_ARCH_FEATURES     0x80000001
+#define ARM_SMC_ID_ARCH_SOC_ID       0x80000002
+#define ARM_SMC_ID_ARCH_WORKAROUND_1 0x80008000
+#define ARM_SMC_ID_ARCH_WORKAROUND_2 0x80007FFF
+
+#define ARM_SMC_ARCH_RET_SUCCESS            0
+#define ARM_SMC_ARCH_RET_NOT_SUPPORTED     -1
+#define ARM_SMC_ARCH_RET_NOT_REQUIRED      -2
+#define ARM_SMC_ARCH_RET_INVALID_PARAMETER -3
 
 /*
  * Power State Coordination Interface (PSCI) calls cover a subset of the
@@ -69,12 +75,6 @@
 #define ARM_SMC_ID_PSCI_MIGRATE_AARCH32        0x84000005
 #define ARM_SMC_ID_PSCI_SYSTEM_OFF             0x84000008
 #define ARM_SMC_ID_PSCI_SYSTEM_RESET           0x84000009
-
-/* The current PSCI version is:  0.2 */
-#define ARM_SMC_PSCI_VERSION_MAJOR  0
-#define ARM_SMC_PSCI_VERSION_MINOR  2
-#define ARM_SMC_PSCI_VERSION  \
-  ((ARM_SMC_PSCI_VERSION_MAJOR << 16) | ARM_SMC_PSCI_VERSION_MINOR)
 
 /* PSCI return error codes */
 #define ARM_SMC_PSCI_RET_SUCCESS            0
