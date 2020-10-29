@@ -9,46 +9,76 @@
 #ifndef __ARM_LIB_PRIVATE_H__
 #define __ARM_LIB_PRIVATE_H__
 
-#define CACHE_SIZE_4_KB             (3UL)
-#define CACHE_SIZE_8_KB             (4UL)
-#define CACHE_SIZE_16_KB            (5UL)
-#define CACHE_SIZE_32_KB            (6UL)
-#define CACHE_SIZE_64_KB            (7UL)
-#define CACHE_SIZE_128_KB           (8UL)
+typedef union {
+  struct {
+    UINT32    InD           :1;
+    UINT32    Level         :3;
+    UINT32    TnD           :1;
+    UINT32    Reserved      :27;
+  } Bits;
+  UINT32 Data;
+} CSSELR_DATA;
 
-#define CACHE_ASSOCIATIVITY_DIRECT  (0UL)
-#define CACHE_ASSOCIATIVITY_4_WAY   (2UL)
-#define CACHE_ASSOCIATIVITY_8_WAY   (3UL)
+typedef enum
+{
+  CSSELR_CACHE_TYPE_DATA_OR_UNIFIED = 0,
+  CSSELR_CACHE_TYPE_INSTRUCTION = 1
+} CSSELR_CACHE_TYPE;
 
-#define CACHE_PRESENT               (0UL)
-#define CACHE_NOT_PRESENT           (1UL)
+typedef union {
+  struct {
+    UINT64    LineSize           :3;
+    UINT64    Associativity      :10;
+    UINT64    NumSets            :15;
+    UINT64    Unknown            :4;
+    UINT64    Reserved           :32;
+  } BitsNonCcidx;
+  struct {
+    UINT64    LineSize           :3;
+    UINT64    Associativity      :21;
+    UINT64    Reserved1          :8;
+    UINT64    NumSets            :24;
+    UINT64    Reserved2          :8;
+  } BitsCcidx;
+  UINT64 Data;
+} CCSIDR_DATA;
 
-#define CACHE_LINE_LENGTH_32_BYTES  (2UL)
+typedef union {
+  struct {
+    UINT32 NumSets               :24;
+    UINT32 Reserved              :8;
+  } Bits;
+  UINT32 Data;
+} CSSIDR2_DATA;
 
-#define SIZE_FIELD_TO_CACHE_SIZE(x)           (((x) >> 6) & 0x0F)
-#define SIZE_FIELD_TO_CACHE_ASSOCIATIVITY(x)  (((x) >> 3) & 0x07)
-#define SIZE_FIELD_TO_CACHE_PRESENCE(x)       (((x) >> 2) & 0x01)
-#define SIZE_FIELD_TO_CACHE_LINE_LENGTH(x)    (((x) >> 0) & 0x03)
+// The lower 32 bits are the same for both AARCH32 and AARCH64
+// so we can use the same structure for both.
+typedef union {
+  struct {
+    UINT32    Ctype1   : 3;
+    UINT32    Ctype2   : 3;
+    UINT32    Ctype3   : 3;
+    UINT32    Ctype4   : 3;
+    UINT32    Ctype5   : 3;
+    UINT32    Ctype6   : 3;
+    UINT32    Ctype7   : 3;
+    UINT32    LoUIS    : 3;
+    UINT32    LoC      : 3;
+    UINT32    LoUU     : 3;
+    UINT32    Icb      : 3;
+  } Bits;
+  UINT32 Data;
+} CLIDR_DATA;
 
-#define DATA_CACHE_SIZE_FIELD(x)              (((x) >> 12) & 0x0FFF)
-#define INSTRUCTION_CACHE_SIZE_FIELD(x)       (((x) >>  0) & 0x0FFF)
+typedef enum {
+  CLIDR_CACHE_TYPE_NONE = 0,
+  CLIDR_CACHE_TYPE_INSTRUCTION_ONLY = 1,
+  CLIDR_CACHE_TYPE_DATA_ONLY = 2,
+  CLIDR_CACHE_TYPE_SEPARATE = 3,
+  CLIDR_CACHE_TYPE_UNIFIED = 4
+} CLIDR_CACHE_TYPE;
 
-#define DATA_CACHE_SIZE(x)                    (SIZE_FIELD_TO_CACHE_SIZE(DATA_CACHE_SIZE_FIELD(x)))
-#define DATA_CACHE_ASSOCIATIVITY(x)           (SIZE_FIELD_TO_CACHE_ASSOCIATIVITY(DATA_CACHE_SIZE_FIELD(x)))
-#define DATA_CACHE_PRESENT(x)                 (SIZE_FIELD_TO_CACHE_PRESENCE(DATA_CACHE_SIZE_FIELD(x)))
-#define DATA_CACHE_LINE_LENGTH(x)             (SIZE_FIELD_TO_CACHE_LINE_LENGTH(DATA_CACHE_SIZE_FIELD(x)))
-
-#define INSTRUCTION_CACHE_SIZE(x)             (SIZE_FIELD_TO_CACHE_SIZE(INSTRUCTION_CACHE_SIZE_FIELD(x)))
-#define INSTRUCTION_CACHE_ASSOCIATIVITY(x)    (SIZE_FIELD_TO_CACHE_ASSOCIATIVITY(INSTRUCTION_CACHE_SIZE_FIELD(x)))
-#define INSTRUCTION_CACHE_PRESENT(x)          (SIZE_FIELD_TO_CACHE_PRESENCE(INSTRUCTION_CACHE_SIZE_FIELD(x)))
-#define INSTRUCTION_CACHE_LINE_LENGTH(x)      (SIZE_FIELD_TO_CACHE_LINE_LENGTH(INSTRUCTION_CACHE_SIZE_FIELD(x)))
-
-#define CACHE_TYPE(x)                         (((x) >> 25) & 0x0F)
-#define CACHE_TYPE_WRITE_BACK                 (0x0EUL)
-
-#define CACHE_ARCHITECTURE(x)                 (((x) >> 24) & 0x01)
-#define CACHE_ARCHITECTURE_UNIFIED            (0UL)
-#define CACHE_ARCHITECTURE_SEPARATE           (1UL)
+#define CLIDR_GET_CACHE_TYPE(x, level) ((x >> (3 * level)) & 0b111)
 
 VOID
 CPSRMaskInsert (
@@ -61,7 +91,7 @@ CPSRRead (
   VOID
   );
 
-UINT32
+UINTN
 ReadCCSIDR (
   IN UINT32 CSSELR
   );

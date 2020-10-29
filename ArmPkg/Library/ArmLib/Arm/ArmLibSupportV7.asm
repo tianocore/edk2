@@ -64,7 +64,11 @@
   isb
   bx      LR
 
-// UINT32
+ RVCT_ASM_EXPORT ArmReadIdMmfr4
+  mrc    p15,0,r0,c0,c2,6     ; Read ID_MMFR2 Register
+  bx
+
+// UINTN
 // ReadCCSIDR (
 //   IN UINT32 CSSELR
 //   )
