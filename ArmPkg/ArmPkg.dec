@@ -45,6 +45,8 @@
   # Include/Guid/ArmMpCoreInfo.h
   gArmMpCoreInfoGuid = { 0xa4ee0728, 0xe5d7, 0x4ac5,  {0xb2, 0x1e, 0x65, 0x8e, 0xd8, 0x57, 0xe8, 0x34} }
 
+  gVersionInfoHobGuid = { 0xe13a14c, 0x859c, 0x4f22, {0x82, 0xbd, 0x18, 0xe, 0xe1, 0x42, 0x12, 0xbf } }
+
 [Protocols.common]
   ## Arm System Control and Management Interface(SCMI) Base protocol
   ## ArmPkg/Include/Protocol/ArmScmiBaseProtocol.h
@@ -114,6 +116,20 @@
   gArmTokenSpaceGuid.PcdArmPrimaryCoreMask|0xF03|UINT32|0x00000031
   # The Primary Core is ClusterId[0] & CoreId[0]
   gArmTokenSpaceGuid.PcdArmPrimaryCore|0|UINT32|0x00000037
+
+  #
+  # SMBIOS PCDs
+  #
+  gArmTokenSpaceGuid.PcdSystemProductName|L""|VOID*|0x30000053
+  gArmTokenSpaceGuid.PcdSystemVersion|L""|VOID*|0x30000054
+  gArmTokenSpaceGuid.PcdBaseBoardManufacturer|L""|VOID*|0x30000055
+  gArmTokenSpaceGuid.PcdBaseBoardProductName|L""|VOID*|0x30000056
+  gArmTokenSpaceGuid.PcdBaseBoardVersion|L""|VOID*|0x30000057
+  gArmTokenSpaceGuid.PcdProcessorManufacturer|L""|VOID*|0x30000071
+  gArmTokenSpaceGuid.PcdProcessorVersion|L""|VOID*|0x30000072
+  gArmTokenSpaceGuid.PcdProcessorSerialNumber|L""|VOID*|0x30000073
+  gArmTokenSpaceGuid.PcdProcessorAssetTag|L""|VOID*|0x30000074
+  gArmTokenSpaceGuid.PcdProcessorPartNumber|L""|VOID*|0x30000075
 
   #
   # ARM L2x0 PCDs
