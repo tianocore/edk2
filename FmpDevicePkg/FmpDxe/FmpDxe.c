@@ -1025,9 +1025,24 @@ CheckTheImageInternal (
   //
   // FmpDeviceLib CheckImage function to do any specific checks
   //
-  Status = FmpDeviceCheckImage ((((UINT8 *)Image) + AllHeaderSize), RawSize, ImageUpdatable);
+  Status = FmpDeviceCheckImageWithStatus ((((UINT8 *) Image) + AllHeaderSize), RawSize, ImageUpdatable, LastAttemptStatus);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "FmpDxe(%s): CheckTheImage() - FmpDeviceLib CheckImage failed. Status = %r\n", mImageIdName, Status));
+
+    //
+    // LastAttemptStatus returned from the device library should fall within the designated error range
+    // [LAST_ATTEMPT_STATUS_DEVICE_LIBRARY_MIN_ERROR_CODE_VALUE, LAST_ATTEMPT_STATUS_DEVICE_LIBRARY_MAX_ERROR_CODE_VALUE]
+    //
+    if ((*LastAttemptStatus < LAST_ATTEMPT_STATUS_DEVICE_LIBRARY_MIN_ERROR_CODE_VALUE) ||
+        (*LastAttemptStatus > LAST_ATTEMPT_STATUS_DEVICE_LIBRARY_MAX_ERROR_CODE_VALUE)) {
+      DEBUG (
+        (DEBUG_ERROR,
+        "FmpDxe(%s): CheckTheImage() - LastAttemptStatus %d from FmpDeviceCheckImageWithStatus() is invalid.\n",
+        mImageIdName,
+        *LastAttemptStatus)
+        );
+      *LastAttemptStatus = LAST_ATTEMPT_STATUS_ERROR_UNSUCCESSFUL;
+    }
   }
 
 cleanup:
@@ -1353,16 +1368,33 @@ SetTheImage (
   //
   //Copy the requested image to the firmware using the FmpDeviceLib
   //
-  Status = FmpDeviceSetImage (
-             (((UINT8 *)Image) + AllHeaderSize),
+  Status = FmpDeviceSetImageWithStatus (
+             (((UINT8 *) Image) + AllHeaderSize),
              ImageSize - AllHeaderSize,
              VendorCode,
              FmpDxeProgress,
              IncomingFwVersion,
-             AbortReason
+             AbortReason,
+             &LastAttemptStatus
              );
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "FmpDxe(%s): SetTheImage() SetImage from FmpDeviceLib failed. Status =  %r.\n", mImageIdName, Status));
+
+    //
+    // LastAttemptStatus returned from the device library should fall within the designated error range
+    // [LAST_ATTEMPT_STATUS_DEVICE_LIBRARY_MIN_ERROR_CODE_VALUE, LAST_ATTEMPT_STATUS_DEVICE_LIBRARY_MAX_ERROR_CODE_VALUE]
+    //
+    if ((LastAttemptStatus < LAST_ATTEMPT_STATUS_DEVICE_LIBRARY_MIN_ERROR_CODE_VALUE) ||
+        (LastAttemptStatus > LAST_ATTEMPT_STATUS_DEVICE_LIBRARY_MAX_ERROR_CODE_VALUE)) {
+      DEBUG (
+        (DEBUG_ERROR,
+        "FmpDxe(%s): SetTheImage() - LastAttemptStatus %d from FmpDeviceSetImageWithStatus() is invalid.\n",
+        mImageIdName,
+        LastAttemptStatus)
+        );
+      LastAttemptStatus = LAST_ATTEMPT_STATUS_ERROR_UNSUCCESSFUL;
+    }
+
     goto cleanup;
   }
 
