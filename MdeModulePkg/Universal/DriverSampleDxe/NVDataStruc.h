@@ -1,6 +1,7 @@
 /** @file
 
-Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>*
+(C) Copyright 2020 Hewlett Packard Enterprise Development LP<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 Module Name:
@@ -92,6 +93,8 @@ typedef struct {
   UINT16  BitNumeric  : 12;
   MY_BITS_DATA  MyBitData;
   MY_EFI_UNION_DATA MyUnionData;
+  UINT8   QuestionXUefiKeywordRestStyle;
+  UINT8   QuestionNonXUefiKeywordRestStyle;
 } DRIVER_SAMPLE_CONFIGURATION;
 
 //
