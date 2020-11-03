@@ -2,7 +2,7 @@
   UEFI HTTP boot driver's private data structure and interfaces declaration.
 
 Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
-(C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
+(C) Copyright 2016 - 2020 Hewlett Packard Enterprise Development LP<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -28,6 +28,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/DebugLib.h>
 #include <Library/NetLib.h>
 #include <Library/HttpLib.h>
+#include <Library/HttpIoLib.h>
 #include <Library/HiiLib.h>
 #include <Library/PrintLib.h>
 #include <Library/DpcLib.h>
