@@ -12,7 +12,7 @@ jobs:
         run: |
           DEBIAN_FRONTEND=noninteractive sudo apt-get -qq update
           DEBIAN_FRONTEND=noninteractive sudo apt-get -qqy install \
-          git python3 python3-distutils-extra build-essential nasm iasl uuid-dev libxext-dev libx11-dev 
+          git python3 python3-distutils-extra build-essential nasm iasl uuid-dev libxext-dev libx11-dev
           DEBIAN_FRONTEND=noninteractive sudo apt-get clean
           sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 1337
 
@@ -70,7 +70,7 @@ jobs:
         run: |
           DEBIAN_FRONTEND=noninteractive sudo apt-get -qq update
           DEBIAN_FRONTEND=noninteractive sudo apt-get -qqy install \
-          git python3 python3-distutils-extra build-essential nasm iasl uuid-dev
+          git python3 python3-distutils-extra build-essential nasm iasl uuid-dev qemu-system-x86 xz
           DEBIAN_FRONTEND=noninteractive sudo apt-get clean
           sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 1337
 
@@ -98,6 +98,10 @@ jobs:
           name: UEFIPAYLOAD_IA32.fd
           path: Build/UefiPayloadPkgIA32/DEBUG_GCC5/FV/UEFIPAYLOAD.fd
 
+      - name: Run binary in QEMU
+        run: |
+          ./Testing/test_UefiPayloadPkgQemu.sh Build/UefiPayloadPkgIA32/DEBUG_GCC5/FV/UEFIPAYLOAD.fd
+
   UefiPayloadPkgX64:
     runs-on: ubuntu-latest
     steps:
@@ -105,7 +109,7 @@ jobs:
         run: |
           DEBIAN_FRONTEND=noninteractive sudo apt-get -qq update
           DEBIAN_FRONTEND=noninteractive sudo apt-get -qqy install \
-          git python3 python3-distutils-extra build-essential nasm iasl uuid-dev
+          git python3 python3-distutils-extra build-essential nasm iasl uuid-dev qemu-system-x86 xz
           DEBIAN_FRONTEND=noninteractive sudo apt-get clean
           sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 1337
 
@@ -132,3 +136,7 @@ jobs:
         with:
           name: UEFIPAYLOAD_X64.fd
           path: Build/UefiPayloadPkgX64/DEBUG_GCC5/FV/UEFIPAYLOAD.fd
+
+      - name: Run binary in QEMU
+        run: |
+          ./Testing/test_UefiPayloadPkgQemu.sh Build/UefiPayloadPkgX64/DEBUG_GCC5/FV/UEFIPAYLOAD.fd
