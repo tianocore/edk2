@@ -4,7 +4,7 @@
 # This package provides network modules that conform to UEFI 2.4 specification.
 #
 # Copyright (c) 2009 - 2019, Intel Corporation. All rights reserved.<BR>
-# (C) Copyright 2015-2017 Hewlett Packard Enterprise Development LP<BR>
+# (C) Copyright 2015-2020 Hewlett Packard Enterprise Development LP<BR>
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -40,6 +40,10 @@
   ##  @libraryclass  The helper routines to access HTTP service.
   #   This library is only intended to be used by UEFI network stack modules.
   HttpLib|Include/Library/HttpLib.h
+
+  ##  @libraryclass  Http IO helper routines for HTTP transfer.
+  #   This library is only intended to be used by UEFI network stack modules.
+  HttpIoLib|Include/Library/HttpIoLib.h
 
   ##  @libraryclass  Library for Deferred Procedure Calls.
   DpcLib|Include/Library/DpcLib.h
@@ -88,6 +92,10 @@
   ## The max attempt number will be created by iSCSI driver.
   # @Prompt Max attempt number.
   gEfiNetworkPkgTokenSpaceGuid.PcdMaxIScsiAttemptNumber|0x08|UINT8|0x0000000D
+
+  ## The maximum size of total HTTP chunk transfer.
+  # @Prompt Max size of total HTTP chunk transfer. the default value is 12MB.
+  gEfiNetworkPkgTokenSpaceGuid.PcdMaxHttpChunkTransfer|0x0C00000|UINT32|0x0000000E
 
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   ## Indicates whether HTTP connections (i.e., unsecured) are permitted or not.
