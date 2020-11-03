@@ -2,6 +2,7 @@
   Support functions declaration for UEFI HTTP boot driver.
 
 Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+(C) Copyright 2020 Hewlett-Packard Development Company, L.P.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -139,102 +140,6 @@ HttpBootSetHeader (
   IN  CHAR8                *FieldValue
   );
 
-///
-/// HTTP_IO_CALLBACK_EVENT
-///
-typedef enum {
-  HttpIoRequest,
-  HttpIoResponse
-} HTTP_IO_CALLBACK_EVENT;
-
-/**
-  HttpIo Callback function which will be invoked when specified HTTP_IO_CALLBACK_EVENT happened.
-
-  @param[in]    EventType      Indicate the Event type that occurs in the current callback.
-  @param[in]    Message        HTTP message which will be send to, or just received from HTTP server.
-  @param[in]    Context        The Callback Context pointer.
-
-  @retval EFI_SUCCESS          Tells the HttpIo to continue the HTTP process.
-  @retval Others               Tells the HttpIo to abort the current HTTP process.
-**/
-typedef
-EFI_STATUS
-(EFIAPI * HTTP_IO_CALLBACK) (
-  IN  HTTP_IO_CALLBACK_EVENT    EventType,
-  IN  EFI_HTTP_MESSAGE          *Message,
-  IN  VOID                      *Context
-  );
-
-//
-// HTTP_IO configuration data for IPv4
-//
-typedef struct {
-  EFI_HTTP_VERSION          HttpVersion;
-  UINT32                    RequestTimeOut;  // In milliseconds.
-  UINT32                    ResponseTimeOut; // In milliseconds.
-  BOOLEAN                   UseDefaultAddress;
-  EFI_IPv4_ADDRESS          LocalIp;
-  EFI_IPv4_ADDRESS          SubnetMask;
-  UINT16                    LocalPort;
-} HTTP4_IO_CONFIG_DATA;
-
-//
-// HTTP_IO configuration data for IPv6
-//
-typedef struct {
-  EFI_HTTP_VERSION          HttpVersion;
-  UINT32                    RequestTimeOut;  // In milliseconds.
-  BOOLEAN                   UseDefaultAddress;
-  EFI_IPv6_ADDRESS          LocalIp;
-  UINT16                    LocalPort;
-} HTTP6_IO_CONFIG_DATA;
-
-
-//
-// HTTP_IO configuration
-//
-typedef union {
-  HTTP4_IO_CONFIG_DATA       Config4;
-  HTTP6_IO_CONFIG_DATA       Config6;
-} HTTP_IO_CONFIG_DATA;
-
-//
-// HTTP_IO wrapper of the EFI HTTP service.
-//
-typedef struct {
-  UINT8                     IpVersion;
-  EFI_HANDLE                Image;
-  EFI_HANDLE                Controller;
-  EFI_HANDLE                Handle;
-
-  EFI_HTTP_PROTOCOL         *Http;
-
-  HTTP_IO_CALLBACK          Callback;
-  VOID                      *Context;
-
-  EFI_HTTP_TOKEN            ReqToken;
-  EFI_HTTP_MESSAGE          ReqMessage;
-  EFI_HTTP_TOKEN            RspToken;
-  EFI_HTTP_MESSAGE          RspMessage;
-
-  BOOLEAN                   IsTxDone;
-  BOOLEAN                   IsRxDone;
-
-  EFI_EVENT                 TimeoutEvent;
-} HTTP_IO;
-
-//
-// A wrapper structure to hold the received HTTP response data.
-//
-typedef struct {
-  EFI_HTTP_RESPONSE_DATA      Response;
-  UINTN                       HeaderCount;
-  EFI_HTTP_HEADER             *Headers;
-  UINTN                       BodyLength;
-  CHAR8                       *Body;
-  EFI_STATUS                  Status;
-} HTTP_IO_RESPONSE_DATA;
-
 /**
   Retrieve the host address using the EFI_DNS6_PROTOCOL.
 
@@ -265,98 +170,6 @@ EFIAPI
 HttpBootCommonNotify (
   IN EFI_EVENT           Event,
   IN VOID                *Context
-  );
-
-/**
-  Create a HTTP_IO to access the HTTP service. It will create and configure
-  a HTTP child handle.
-
-  @param[in]  Image          The handle of the driver image.
-  @param[in]  Controller     The handle of the controller.
-  @param[in]  IpVersion      IP_VERSION_4 or IP_VERSION_6.
-  @param[in]  ConfigData     The HTTP_IO configuration data.
-  @param[in]  Callback       Callback function which will be invoked when specified
-                             HTTP_IO_CALLBACK_EVENT happened.
-  @param[in]  Context        The Context data which will be passed to the Callback function.
-  @param[out] HttpIo         The HTTP_IO.
-
-  @retval EFI_SUCCESS            The HTTP_IO is created and configured.
-  @retval EFI_INVALID_PARAMETER  One or more parameters are invalid.
-  @retval EFI_UNSUPPORTED        One or more of the control options are not
-                                 supported in the implementation.
-  @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory.
-  @retval Others                 Failed to create the HTTP_IO or configure it.
-
-**/
-EFI_STATUS
-HttpIoCreateIo (
-  IN EFI_HANDLE             Image,
-  IN EFI_HANDLE             Controller,
-  IN UINT8                  IpVersion,
-  IN HTTP_IO_CONFIG_DATA    *ConfigData,
-  IN HTTP_IO_CALLBACK       Callback,
-  IN VOID                   *Context,
-  OUT HTTP_IO               *HttpIo
-  );
-
-/**
-  Destroy the HTTP_IO and release the resources.
-
-  @param[in]  HttpIo          The HTTP_IO which wraps the HTTP service to be destroyed.
-
-**/
-VOID
-HttpIoDestroyIo (
-  IN HTTP_IO                *HttpIo
-  );
-
-/**
-  Synchronously send a HTTP REQUEST message to the server.
-
-  @param[in]   HttpIo           The HttpIo wrapping the HTTP service.
-  @param[in]   Request          A pointer to storage such data as URL and HTTP method.
-  @param[in]   HeaderCount      Number of HTTP header structures in Headers list.
-  @param[in]   Headers          Array containing list of HTTP headers.
-  @param[in]   BodyLength       Length in bytes of the HTTP body.
-  @param[in]   Body             Body associated with the HTTP request.
-
-  @retval EFI_SUCCESS            The HTTP request is transmitted.
-  @retval EFI_INVALID_PARAMETER  One or more parameters are invalid.
-  @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory.
-  @retval EFI_DEVICE_ERROR       An unexpected network or system error occurred.
-  @retval Others                 Other errors as indicated.
-
-**/
-EFI_STATUS
-HttpIoSendRequest (
-  IN  HTTP_IO                *HttpIo,
-  IN  EFI_HTTP_REQUEST_DATA  *Request,      OPTIONAL
-  IN  UINTN                  HeaderCount,
-  IN  EFI_HTTP_HEADER        *Headers,      OPTIONAL
-  IN  UINTN                  BodyLength,
-  IN  VOID                   *Body          OPTIONAL
-  );
-
-/**
-  Synchronously receive a HTTP RESPONSE message from the server.
-
-  @param[in]   HttpIo           The HttpIo wrapping the HTTP service.
-  @param[in]   RecvMsgHeader    TRUE to receive a new HTTP response (from message header).
-                                FALSE to continue receive the previous response message.
-  @param[out]  ResponseData     Point to a wrapper of the received response data.
-
-  @retval EFI_SUCCESS            The HTTP response is received.
-  @retval EFI_INVALID_PARAMETER  One or more parameters are invalid.
-  @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory.
-  @retval EFI_DEVICE_ERROR       An unexpected network or system error occurred.
-  @retval Others                 Other errors as indicated.
-
-**/
-EFI_STATUS
-HttpIoRecvResponse (
-  IN      HTTP_IO                  *HttpIo,
-  IN      BOOLEAN                  RecvMsgHeader,
-     OUT  HTTP_IO_RESPONSE_DATA    *ResponseData
   );
 
 /**
