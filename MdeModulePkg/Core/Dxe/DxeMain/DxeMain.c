@@ -299,6 +299,14 @@ DxeMain (
   PERF_CROSSMODULE_BEGIN ("DXE");
 
   //
+  // Log MemoryBaseAddress and MemoryLength again (from
+  // CoreInitializeMemoryServices()), now that library constructors have
+  // executed.
+  //
+  DEBUG ((DEBUG_INFO, "%a: MemoryBaseAddress=0x%Lx MemoryLength=0x%Lx\n",
+    __FUNCTION__, MemoryBaseAddress, MemoryLength));
+
+  //
   // Report DXE Core image information to the PE/COFF Extra Action Library
   //
   ZeroMem (&ImageContext, sizeof (ImageContext));
