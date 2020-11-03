@@ -1,6 +1,6 @@
 // /**
 //
-// Copyright (c) 2016 - 2020, ARM Limited. All rights reserved.<BR>
+// Copyright (c) 2016 - 2020, Arm Limited. All rights reserved.<BR>
 // SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Module Name:
@@ -78,6 +78,7 @@
 "     other than AcpiTable header. The actual header can refer to the ACPI spec\r\n"
 "     6.2\r\n"
 "     Extra A. Particular types:\r\n"
+"       AEST  - Arm Error Source Table\r\n"
 "       APIC  - Multiple APIC Description Table (MADT)\r\n"
 "       BGRT  - Boot Graphics Resource Table\r\n"
 "       DBG2  - Debug Port Table 2\r\n"
