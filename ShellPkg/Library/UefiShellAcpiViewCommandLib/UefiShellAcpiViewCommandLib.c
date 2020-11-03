@@ -7,6 +7,7 @@
 
 #include <Guid/ShellLibHiiGuid.h>
 #include <IndustryStandard/Acpi.h>
+#include <IndustryStandard/ArmErrorSourceTable.h>
 
 #include <Library/BaseMemoryLib.h>
 #include <Library/HiiLib.h>
@@ -46,6 +47,7 @@ STATIC CONST SHELL_PARAM_ITEM ParamList[] = {
 STATIC
 CONST
 ACPI_TABLE_PARSER ParserList[] = {
+  {EFI_ACPI_6_3_ARM_ERROR_SOURCE_TABLE_SIGNATURE, ParseAcpiAest},
   {EFI_ACPI_6_2_BOOT_GRAPHICS_RESOURCE_TABLE_SIGNATURE, ParseAcpiBgrt},
   {EFI_ACPI_6_2_DEBUG_PORT_2_TABLE_SIGNATURE, ParseAcpiDbg2},
   {EFI_ACPI_6_2_DIFFERENTIATED_SYSTEM_DESCRIPTION_TABLE_SIGNATURE,
