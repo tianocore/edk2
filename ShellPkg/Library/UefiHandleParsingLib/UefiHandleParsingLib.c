@@ -3,7 +3,7 @@
 
   Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
-  (C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
+  (C) Copyright 2015-2021 Hewlett Packard Enterprise Development LP<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -2249,6 +2249,12 @@ STATIC CONST GUID_INFO_BLOCK mGuidStringList[] = {
   {STRING_TOKEN(STR_RESET_NOTI),            &gEfiResetNotificationProtocolGuid,                NULL},
   {STRING_TOKEN(STR_PARTITION_INFO),        &gEfiPartitionInfoProtocolGuid,                    PartitionInfoProtocolDumpInformation},
   {STRING_TOKEN(STR_HII_POPUP),             &gEfiHiiPopupProtocolGuid,                         NULL},
+
+//
+// UEFI 2.8
+//
+  {STRING_TOKEN(STR_REST_EX),               &gEfiRestExProtocolGuid,                          NULL},
+  {STRING_TOKEN(STR_REDFISH_DISCOVER),      &gEfiRedfishDiscoverProtocolGuid,                 NULL},
 
 //
 // PI Spec ones
