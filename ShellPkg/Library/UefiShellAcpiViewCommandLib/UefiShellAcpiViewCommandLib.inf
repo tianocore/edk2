@@ -27,6 +27,7 @@
   AcpiView.h
   AcpiViewConfig.c
   AcpiViewConfig.h
+  Parsers/Aest/AestParser.c
   Parsers/Bgrt/BgrtParser.c
   Parsers/Dbg2/Dbg2Parser.c
   Parsers/Dsdt/DsdtParser.c
