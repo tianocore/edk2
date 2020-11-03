@@ -1,19 +1,18 @@
 /** @file
   This file defines the EFI Redfish Discover Protocol interface.
 
-  (C) Copyright 2020 Hewlett Packard Enterprise Development LP<BR>
+  (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
+
+  @par Revision Reference:
+  - Some corrections and revises are added to UEFI Specification 2.9.
+  - This Protocol is introduced in UEFI Specification 2.8.
 
 **/
 
 #ifndef EFI_REDFISH_DISCOVER_PROTOCOL_H_
 #define EFI_REDFISH_DISCOVER_PROTOCOL_H_
-
-#include <IndustryStandard/Http11.h>
-#include <Protocol/Http.h>
-#include <Protocol/RestEx.h>
-#include <Uefi.h>
 
 //
 // GUID definitions
@@ -40,24 +39,21 @@ typedef UINT32 EFI_REDFISH_DISCOVER_FLAG;
                                                        ///< 3 to 15. The corresponding duration is 8 to 2^15 seconds.
                                                        ///< Duration is only valid when EFI_REDFISH_DISCOVER_KEEP_ALIVE
                                                        ///< is set to 1.
-#define EFI_REDFISH_DISCOVER_DURATION_BIT_POS 8
-
 typedef struct _EFI_REDFISH_DISCOVER_PROTOCOL EFI_REDFISH_DISCOVER_PROTOCOL;
-typedef struct _EFI_REDFISH_DISCOVERED_INFORMATION EFI_REDFISH_DISCOVERED_INFORMATION;
 
-typedef struct _EFI_REDFISH_DISCOVERED_INFORMATION {
-  EFI_HANDLE RedfishRestExHandle;           ///< REST EX EFI handle associated with this Redfish service.
-  BOOLEAN         IsUdp6;                   ///< Indicates it's IP versino 6.
-  EFI_IP_ADDRESS  RedfishHostIpAddress;     ///< IP address of Redfish service.
-  UINTN RedfishVersion;                     ///< Redfish service version.
-  CHAR16 *Location;                         ///< Redfish service location.
-  CHAR16 *Uuid;                             ///< Redfish service UUID.
-  CHAR16 *Os;                               ///< Redfish service OS.
-  CHAR16 *OSVersion;                        ///< Redfish service OS version.
-  CHAR16 *Product;                          ///< Redfish service product name.
-  CHAR16 *ProductVer;                       ///< Redfish service product version.
-  BOOLEAN UseHttps;                         ///< Using HTTPS.
-};
+typedef struct {
+  EFI_HANDLE        RedfishRestExHandle;    ///< REST EX EFI handle associated with this Redfish service.
+  BOOLEAN           IsUdp6;                 ///< Indicates it's IP versino 6.
+  EFI_IP_ADDRESS    RedfishHostIpAddress;   ///< IP address of Redfish service.
+  UINTN             RedfishVersion;         ///< Redfish service version.
+  CHAR16            *Location;              ///< Redfish service location.
+  CHAR16            *Uuid;                  ///< Redfish service UUID.
+  CHAR16            *Os;                    ///< Redfish service OS.
+  CHAR16            *OsVersion;             ///< Redfish service OS version.
+  CHAR16            *Product;               ///< Redfish service product name.
+  CHAR16            *ProductVer;            ///< Redfish service product version.
+  BOOLEAN           UseHttps;               ///< Using HTTPS.
+} EFI_REDFISH_DISCOVERED_INFORMATION;
 
 typedef struct {
   EFI_STATUS Status;                                ///< Status of Redfish service discovery.
@@ -75,7 +71,7 @@ typedef struct {
     EFI_IP_ADDRESS        SubnetId;               ///< Subnet ID.
     UINT8                 SubnetPrefixLength;     ///< Subnet prefix-length for IPv4 and IPv6.
     UINT16                VlanId;                 ///< VLAN ID.
-} EFI_REDFISH_DISCOVER_NETWORK_INSTANCE;
+} EFI_REDFISH_DISCOVER_NETWORK_INTERFACE;
 
 typedef struct {
   UINT32    Signature;            ///< Token signature.
@@ -112,10 +108,10 @@ typedef struct {
 typedef
 EFI_STATUS
 (EFIAPI *EFI_REDFISH_DISCOVER_NETWORK_LIST)(
-  IN EFI_REDFISH_DISCOVER_PROTOCOL   *This,
-  IN EFI_HANDLE                      ImageHandle,
-  OUT UINTN                          *NumberOfNetworkInterfaces,
-  OUT EFI_REDFISH_DISCOVER_NETWORK_INSTANCE **NetworkInterfaces
+  IN EFI_REDFISH_DISCOVER_PROTOCOL           *This,
+  IN EFI_HANDLE                              ImageHandle,
+  OUT UINTN                                  *NumberOfNetworkInterfaces,
+  OUT EFI_REDFISH_DISCOVER_NETWORK_INTERFACE **NetworkInterfaces
 );
 
 /**
@@ -147,7 +143,7 @@ EFI_STATUS
 (EFIAPI *EFI_REDFISH_DISCOVER_ACQUIRE_SERVICE)(
   IN EFI_REDFISH_DISCOVER_PROTOCOL          *This,
   IN EFI_HANDLE                             ImageHandle,
-  IN EFI_REDFISH_DISCOVER_NETWORK_INSTANCE  *TargetNetworkInterface,
+  IN EFI_REDFISH_DISCOVER_NETWORK_INTERFACE *TargetNetworkInterface OPTIONAL,
   IN EFI_REDFISH_DISCOVER_FLAG              Flags,
   IN EFI_REDFISH_DISCOVERED_TOKEN           *Token
 );
@@ -155,8 +151,8 @@ EFI_STATUS
 /**
   This function aborts Redfish service discovery on the given network interface.
 
-  @param[in]    This          EFI_REDFISH_DISCOVER_PROTOCOL instance.
-  @param[in]    TargetNetworkInterface     Target NIC to do the discovery.
+  @param[in]    This                    EFI_REDFISH_DISCOVER_PROTOCOL instance.
+  @param[in]    TargetNetworkInterface  Target NIC to do the discovery.
 
   @retval EFI_SUCCESS             REST EX instance of discovered Redfish services are returned.
   @retval Others                  Fail to abort Redfish service discovery.
@@ -165,15 +161,15 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_REDFISH_DISCOVER_ABORT_ACQUIRE)(
-  IN EFI_REDFISH_DISCOVER_PROTOCOL      *This,
-  IN EFI_REDFISH_DISCOVER_NETWORK_INSTANCE  *TargetNetworkInterface OPTIONAL
+  IN EFI_REDFISH_DISCOVER_PROTOCOL          *This,
+  IN EFI_REDFISH_DISCOVER_NETWORK_INTERFACE *TargetNetworkInterface OPTIONAL
 );
 
 /**
   This function releases Redfish services found by RedfishServiceAcquire().
 
   @param[in]    This         EFI_REDFISH_DISCOVER_PROTOCOL instance.
-  @param[in]    InstanceList The Redfish service to release.
+  @param[in]    List         The Redfish service to release.
 
   @retval EFI_SUCCESS        REST EX instances of discovered Redfish are released.
   @retval Others             Fail to remove the entry
@@ -183,17 +179,15 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_REDFISH_DISCOVER_RELEASE_SERVICE)(
   IN EFI_REDFISH_DISCOVER_PROTOCOL   *This,
-  IN EFI_REDFISH_DISCOVERED_LIST *InstanceList
+  IN EFI_REDFISH_DISCOVERED_LIST     *List
 );
 
-typedef struct _EFI_REDFISH_DISCOVER_PROTOCOL {
+struct _EFI_REDFISH_DISCOVER_PROTOCOL {
   EFI_REDFISH_DISCOVER_NETWORK_LIST    GetNetworkInterfaceList;
   EFI_REDFISH_DISCOVER_ACQUIRE_SERVICE AcquireRedfishService;
   EFI_REDFISH_DISCOVER_ABORT_ACQUIRE   AbortAcquireRedfishService;
   EFI_REDFISH_DISCOVER_RELEASE_SERVICE ReleaseRedfishService;
-} EFI_REDFISH_DISCOVER_PROTOCOL;
+};
 
-extern EFI_GUID gEfiRestExProtocolGuid;
-extern EFI_GUID gEfiRestExServiceBindingProtocolGuid;
 extern EFI_GUID gEfiRedfishDiscoverProtocolGuid;
 #endif
