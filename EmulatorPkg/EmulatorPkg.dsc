@@ -34,6 +34,11 @@
   DEFINE NETWORK_ISCSI_ENABLE     = FALSE
   DEFINE SECURE_BOOT_ENABLE       = FALSE
 
+  #
+  # Redfish definition
+  #
+  DEFINE REDFISH_ENABLE = FALSE
+
 [SkuIds]
   0|DEFAULT
 
@@ -95,7 +100,9 @@
   #
   PlatformBootManagerLib|EmulatorPkg/Library/PlatformBmLib/PlatformBmLib.inf
   KeyMapLib|EmulatorPkg/Library/KeyMapLibNull/KeyMapLibNull.inf
-
+  !if $(REDFISH_ENABLE) == TRUE
+    RedfishPlatformHostInterfaceLib|EmulatorPkg/Library/RedfishPlatformHostInterfaceLib/RedfishPlatformHostInterfaceLib.inf
+  !endif
   #
   # Misc
   #
@@ -248,6 +255,18 @@
 
   #  0-PCANSI, 1-VT100, 2-VT00+, 3-UTF8, 4-TTYTERM
   gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType|1
+
+!if $(REDFISH_ENABLE) == TRUE
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishRestExServiceDevicePath.DevicePathMatchMode|DEVICE_PATH_MATCH_MAC_NODE
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishRestExServiceDevicePath.DevicePathNum|1
+  #
+  # Below is the MAC address of network adapter on EDK2 Emulator platform.
+  # You can use ifconfig under EFI shell to get the MAC address of network adapter on EDK2 Emulator platform.
+  #
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishRestExServiceDevicePath.DevicePath|{DEVICE_PATH("MAC(000000000000,0x1)")}
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishRestExServiceAccessModeInBand|False
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishDiscoverAccessModeInBand|False
+!endif
 
 [PcdsDynamicDefault.common.DEFAULT]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase64|0
@@ -446,6 +465,11 @@
 !endif
 
 !include NetworkPkg/Network.dsc.inc
+
+!if $(REDFISH_ENABLE) == TRUE
+  EmulatorPkg/Application/RedfishPlatformConfig/RedfishPlatformConfig.inf
+!endif
+!include RedfishPkg/Redfish.dsc.inc
 
 [BuildOptions]
   #

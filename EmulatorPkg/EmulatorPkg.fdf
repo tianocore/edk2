@@ -208,6 +208,11 @@ INF  EmulatorPkg/EmuSnpDxe/EmuSnpDxe.inf
 !endif
 !include NetworkPkg/Network.fdf.inc
 
+#
+# EFI Redfish drivers
+#
+!include RedfishPkg/Redfish.fdf.inc
+
 INF FatPkg/EnhancedFatDxe/Fat.inf
 
 !if "XCODE5" not in $(TOOL_CHAIN_TAG)
