@@ -72,9 +72,10 @@ class MemoryDataPipe(DataPipe):
         #Platform Module Pcds
         ModulePcds = {}
         for m in PlatformInfo.Platform.Modules:
-            m_pcds =  PlatformInfo.Platform.Modules[m].Pcds
+            module = PlatformInfo.Platform.Modules[m]
+            m_pcds =  module.Pcds
             if m_pcds:
-                ModulePcds[(m.File,m.Root,m.Arch)] = [PCD_DATA(
+                ModulePcds[module.Guid] = [PCD_DATA(
             pcd.TokenCName,pcd.TokenSpaceGuidCName,pcd.Type,
             pcd.DatumType,pcd.SkuInfoList,pcd.DefaultValue,
             pcd.MaxDatumSize,pcd.UserDefinedDefaultStoresFlag,pcd.validateranges,
