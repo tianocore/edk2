@@ -1,5 +1,5 @@
 /** @file
-  Industry Standard Definitions of SMBIOS Table Specification v3.3.0.
+  Industry Standard Definitions of SMBIOS Table Specification v3.4.0.
 
 Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015-2017 Hewlett Packard Enterprise Development LP<BR>
@@ -874,6 +874,19 @@ typedef struct {
   UINT16  ProcessorArm64SocId            :1;
   UINT16  ProcessorReserved2             :6;
 } PROCESSOR_CHARACTERISTIC_FLAGS;
+
+///
+/// Processor Information - Status
+///
+typedef union {
+  struct {
+    UINT8 CpuStatus       :3; ///< Indicates the status of the processor.
+    UINT8 Reserved1       :3; ///< Reserved for future use. Must be set to zero.
+    UINT8 SocketPopulated :1; ///< Indicates if the processor socket is populated or not.
+    UINT8 Reserved2       :1; ///< Reserved for future use. Must be set to zero.
+  } Bits;
+  UINT8 Data;
+} PROCESSOR_STATUS_DATA;
 
 typedef struct {
   PROCESSOR_SIGNATURE     Signature;
