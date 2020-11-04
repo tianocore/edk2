@@ -696,7 +696,7 @@ class ModuleReport(object):
         FileWrite(File, gSectionSep)
 
         if "PCD" in ReportType:
-            GlobalPcdReport.GenerateReport(File, self.ModulePcdSet)
+            GlobalPcdReport.GenerateReport(File, self.ModulePcdSet,self.FileGuid)
 
         if "LIBRARY" in ReportType:
             self.LibraryReport.GenerateReport(File)
@@ -881,7 +881,7 @@ class PcdReport(object):
                 if DscDefaultValue:
                     self.DscPcdDefault[(TokenCName, TokenSpaceGuidCName)] = DscDefaultValue
 
-    def GenerateReport(self, File, ModulePcdSet):
+    def GenerateReport(self, File, ModulePcdSet,ModuleGuid=None):
         if not ModulePcdSet:
             if self.ConditionalPcds:
                 self.GenerateReportDetail(File, ModulePcdSet, 1)
@@ -897,7 +897,7 @@ class PcdReport(object):
                         break
                 if not IsEmpty:
                     self.GenerateReportDetail(File, ModulePcdSet, 2)
-        self.GenerateReportDetail(File, ModulePcdSet)
+        self.GenerateReportDetail(File, ModulePcdSet,ModuleGuid = ModuleGuid)
 
     ##
     # Generate report for PCD information
@@ -913,7 +913,7 @@ class PcdReport(object):
     #                        directives section report, 2 means Unused Pcds section report
     # @param DscOverridePcds Module DSC override PCDs set
     #
-    def GenerateReportDetail(self, File, ModulePcdSet, ReportSubType = 0):
+    def GenerateReportDetail(self, File, ModulePcdSet, ReportSubType = 0,ModuleGuid=None):
         PcdDict = self.AllPcds
         if ReportSubType == 1:
             PcdDict = self.ConditionalPcds
@@ -993,10 +993,12 @@ class PcdReport(object):
                 #The DefaultValue of StructurePcd already be the latest, no need to update.
                 if not self.IsStructurePcd(Pcd.TokenCName, Pcd.TokenSpaceGuidCName):
                     Pcd.DefaultValue = PcdValue
+                PcdComponentValue = None
                 if ModulePcdSet is not None:
                     if (Pcd.TokenCName, Pcd.TokenSpaceGuidCName, Type) not in ModulePcdSet:
                         continue
-                    InfDefaultValue, PcdValue = ModulePcdSet[Pcd.TokenCName, Pcd.TokenSpaceGuidCName, Type]
+                    InfDefaultValue, PcdComponentValue = ModulePcdSet[Pcd.TokenCName, Pcd.TokenSpaceGuidCName, Type]
+                    PcdValue = PcdComponentValue
                     #The DefaultValue of StructurePcd already be the latest, no need to update.
                     if not self.IsStructurePcd(Pcd.TokenCName, Pcd.TokenSpaceGuidCName):
                         Pcd.DefaultValue = PcdValue
@@ -1081,6 +1083,11 @@ class PcdReport(object):
                     if TypeName in ('DYNVPD', 'DEXVPD'):
                         SkuInfoList = Pcd.SkuInfoList
                     Pcd = GlobalData.gStructurePcd[self.Arch][(Pcd.TokenCName, Pcd.TokenSpaceGuidCName)]
+                    if ModulePcdSet and ModulePcdSet.get((Pcd.TokenCName, Pcd.TokenSpaceGuidCName, Type)):
+                        InfDefaultValue, PcdComponentValue = ModulePcdSet[Pcd.TokenCName, Pcd.TokenSpaceGuidCName, Type]
+                        DscDefaultValBak = Pcd.DefaultValue
+                        Pcd.DefaultValue = PcdComponentValue
+
                     Pcd.DatumType = Pcd.StructName
                     if TypeName in ('DYNVPD', 'DEXVPD'):
                         Pcd.SkuInfoList = SkuInfoList
@@ -1091,48 +1098,53 @@ class PcdReport(object):
                         DscDefaultValue = True
                         DscMatch = True
                         DecMatch = False
-                    elif Pcd.SkuOverrideValues:
-                        DscOverride = False
-                        if Pcd.DefaultFromDSC:
-                            DscOverride = True
-                        else:
-                            DictLen = 0
-                            for item in Pcd.SkuOverrideValues:
-                                DictLen += len(Pcd.SkuOverrideValues[item])
-                            if not DictLen:
-                                DscOverride = False
-                            else:
-                                if not Pcd.SkuInfoList:
-                                    OverrideValues = Pcd.SkuOverrideValues
-                                    if OverrideValues:
-                                        for Data in OverrideValues.values():
-                                            Struct = list(Data.values())
-                                            if Struct:
-                                                DscOverride = self.ParseStruct(Struct[0])
-                                                break
-                                else:
-                                    SkuList = sorted(Pcd.SkuInfoList.keys())
-                                    for Sku in SkuList:
-                                        SkuInfo = Pcd.SkuInfoList[Sku]
-                                        if SkuInfo.DefaultStoreDict:
-                                            DefaultStoreList = sorted(SkuInfo.DefaultStoreDict.keys())
-                                            for DefaultStore in DefaultStoreList:
-                                                OverrideValues = Pcd.SkuOverrideValues[Sku]
-                                                DscOverride = self.ParseStruct(OverrideValues[DefaultStore])
-                                                if DscOverride:
-                                                    break
-                                        if DscOverride:
-                                            break
-                        if DscOverride:
-                            DscDefaultValue = True
-                            DscMatch = True
-                            DecMatch = False
-                        else:
-                            DecMatch = True
                     else:
-                        DscDefaultValue = True
-                        DscMatch = True
-                        DecMatch = False
+                        if Pcd.Type in PCD_DYNAMIC_TYPE_SET | PCD_DYNAMIC_EX_TYPE_SET:
+                            DscOverride = False
+                            if Pcd.DefaultFromDSC:
+                                DscOverride = True
+                            else:
+                                DictLen = 0
+                                for item in Pcd.SkuOverrideValues:
+                                    DictLen += len(Pcd.SkuOverrideValues[item])
+                                if not DictLen:
+                                    DscOverride = False
+                                else:
+                                    if not Pcd.SkuInfoList:
+                                        OverrideValues = Pcd.SkuOverrideValues
+                                        if OverrideValues:
+                                            for Data in OverrideValues.values():
+                                                Struct = list(Data.values())
+                                                if Struct:
+                                                    DscOverride = self.ParseStruct(Struct[0])
+                                                    break
+                                    else:
+                                        SkuList = sorted(Pcd.SkuInfoList.keys())
+                                        for Sku in SkuList:
+                                            SkuInfo = Pcd.SkuInfoList[Sku]
+                                            if SkuInfo.DefaultStoreDict:
+                                                DefaultStoreList = sorted(SkuInfo.DefaultStoreDict.keys())
+                                                for DefaultStore in DefaultStoreList:
+                                                    OverrideValues = Pcd.SkuOverrideValues[Sku]
+                                                    DscOverride = self.ParseStruct(OverrideValues[DefaultStore])
+                                                    if DscOverride:
+                                                        break
+                                            if DscOverride:
+                                                break
+                            if DscOverride:
+                                DscDefaultValue = True
+                                DscMatch = True
+                                DecMatch = False
+                            else:
+                                DecMatch = True
+                        else:
+                            if Pcd.DscRawValue or (ModuleGuid and ModuleGuid.replace("-","S") in Pcd.PcdValueFromComponents):
+                                DscDefaultValue = True
+                                DscMatch = True
+                                DecMatch = False
+                            else:
+                                DscDefaultValue = False
+                                DecMatch = True
 
                 #
                 # Report PCD item according to their override relationship
@@ -1153,13 +1165,14 @@ class PcdReport(object):
                 elif BuildOptionMatch:
                     self.PrintPcdValue(File, Pcd, PcdTokenCName, TypeName, IsStructure, DscMatch, DscDefaultValBak, InfMatch, InfDefaultValue, DecMatch, DecDefaultValue, '*B')
                 else:
-                    if DscDefaultValue and DscMatch:
+                    if PcdComponentValue:
+                        self.PrintPcdValue(File, Pcd, PcdTokenCName, TypeName, IsStructure, DscMatch, DscDefaultValBak, InfMatch, PcdComponentValue, DecMatch, DecDefaultValue, '*M', ModuleGuid)
+                    elif DscDefaultValue and DscMatch:
                         if (Pcd.TokenCName, Key, Field) in self.FdfPcdSet:
                             self.PrintPcdValue(File, Pcd, PcdTokenCName, TypeName, IsStructure, DscMatch, DscDefaultValBak, InfMatch, InfDefaultValue, DecMatch, DecDefaultValue, '*F')
                         else:
                             self.PrintPcdValue(File, Pcd, PcdTokenCName, TypeName, IsStructure, DscMatch, DscDefaultValBak, InfMatch, InfDefaultValue, DecMatch, DecDefaultValue, '*P')
-                    else:
-                        self.PrintPcdValue(File, Pcd, PcdTokenCName, TypeName, IsStructure, DscMatch, DscDefaultValBak, InfMatch, InfDefaultValue, DecMatch, DecDefaultValue, '*M')
+
 
                 if ModulePcdSet is None:
                     if IsStructure:
@@ -1265,7 +1278,7 @@ class PcdReport(object):
             for filedvalues in Pcd.DefaultValues.values():
                 self.PrintStructureInfo(File, filedvalues)
 
-    def PrintPcdValue(self, File, Pcd, PcdTokenCName, TypeName, IsStructure, DscMatch, DscDefaultValue, InfMatch, InfDefaultValue, DecMatch, DecDefaultValue, Flag = '  '):
+    def PrintPcdValue(self, File, Pcd, PcdTokenCName, TypeName, IsStructure, DscMatch, DscDefaultValue, InfMatch, InfDefaultValue, DecMatch, DecDefaultValue, Flag = '  ',ModuleGuid=None):
         if not Pcd.SkuInfoList:
             Value = Pcd.DefaultValue
             IsByteArray, ArrayList = ByteArrayForamt(Value)
@@ -1288,14 +1301,20 @@ class PcdReport(object):
                     OverrideValues = GlobalData.gPcdSkuOverrides[(Pcd.TokenCName,Pcd.TokenSpaceGuidCName)]
                 else:
                     OverrideValues = Pcd.SkuOverrideValues
+                FieldOverrideValues = None
                 if OverrideValues:
                     for Data in OverrideValues.values():
                         Struct = list(Data.values())
                         if Struct:
-                            OverrideFieldStruct = self.OverrideFieldValue(Pcd, Struct[0])
-                            self.PrintStructureInfo(File, OverrideFieldStruct)
+                            FieldOverrideValues = Struct[0]
                             FiledOverrideFlag = True
                             break
+                if Pcd.PcdFiledValueFromDscComponent and ModuleGuid and ModuleGuid.replace("-","S") in Pcd.PcdFiledValueFromDscComponent:
+                    FieldOverrideValues = Pcd.PcdFiledValueFromDscComponent[ModuleGuid.replace("-","S")]
+                if FieldOverrideValues:
+                    OverrideFieldStruct = self.OverrideFieldValue(Pcd, FieldOverrideValues)
+                    self.PrintStructureInfo(File, OverrideFieldStruct)
+
                 if not FiledOverrideFlag and (Pcd.PcdFieldValueFromComm or Pcd.PcdFieldValueFromFdf):
                     OverrideFieldStruct = self.OverrideFieldValue(Pcd, {})
                     self.PrintStructureInfo(File, OverrideFieldStruct)
