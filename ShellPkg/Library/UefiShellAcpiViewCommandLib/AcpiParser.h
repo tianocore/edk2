@@ -613,6 +613,32 @@ ParseAcpiGtdt (
   );
 
 /**
+  This function parses the ACPI HMAT table.
+  When trace is enabled this function parses the HMAT table and
+  traces the ACPI table fields.
+
+  This function parses the following HMAT structures:
+    - Memory Proximity Domain Attributes Structure (Type 0)
+    - System Locality Latency and Bandwidth Info Structure (Type 1)
+    - Memory Side Cache Info structure (Type 2)
+
+  This function also performs validation of the ACPI table fields.
+
+  @param [in] Trace              If TRUE, trace the ACPI fields.
+  @param [in] Ptr                Pointer to the start of the buffer.
+  @param [in] AcpiTableLength    Length of the ACPI table.
+  @param [in] AcpiTableRevision  Revision of the ACPI table.
+**/
+VOID
+EFIAPI
+ParseAcpiHmat (
+  IN BOOLEAN Trace,
+  IN UINT8*  Ptr,
+  IN UINT32  AcpiTableLength,
+  IN UINT8   AcpiTableRevision
+  );
+
+/**
   This function parses the ACPI IORT table.
   When trace is enabled this function parses the IORT table and
   traces the ACPI fields.
