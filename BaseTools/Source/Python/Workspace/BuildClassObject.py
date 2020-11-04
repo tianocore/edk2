@@ -70,6 +70,7 @@ class PcdClassObject(object):
             self.DscDefaultValue = Value
         self.PcdValueFromComm = ""
         self.PcdValueFromFdf = ""
+        self.PcdValueFromComponents = {} #{ModuleGuid:value, file_path,lineNo}
         self.CustomAttribute = {}
         self.UserDefinedDefaultStoresFlag = UserDefinedDefaultStoresFlag
         self._Capacity = None
@@ -298,6 +299,7 @@ class StructurePcd(PcdClassObject):
         self.PcdFieldValueFromComm = OrderedDict()
         self.PcdFieldValueFromFdf = OrderedDict()
         self.DefaultFromDSC=None
+        self.PcdFiledValueFromDscComponent = OrderedDict()
     def __repr__(self):
         return self.TypeName
 
@@ -323,6 +325,12 @@ class StructurePcd(PcdClassObject):
             del self.SkuOverrideValues[SkuName][DefaultStoreName][DimensionAttr][FieldName]
         self.SkuOverrideValues[SkuName][DefaultStoreName][DimensionAttr][FieldName] = [Value.strip(), FileName, LineNo]
         return self.SkuOverrideValues[SkuName][DefaultStoreName][DimensionAttr][FieldName]
+
+    def AddComponentOverrideValue(self,FieldName, Value, ModuleGuid, FileName="", LineNo=0, DimensionAttr = '-1'):
+        self.PcdFiledValueFromDscComponent.setdefault(ModuleGuid, OrderedDict())
+        self.PcdFiledValueFromDscComponent[ModuleGuid].setdefault(DimensionAttr,OrderedDict())
+        self.PcdFiledValueFromDscComponent[ModuleGuid][DimensionAttr][FieldName] =  [Value.strip(), FileName, LineNo]
+        return self.PcdFiledValueFromDscComponent[ModuleGuid][DimensionAttr][FieldName]
 
     def SetPcdMode (self, PcdMode):
         self.PcdMode = PcdMode
@@ -365,6 +373,7 @@ class StructurePcd(PcdClassObject):
             self.ValueChain = PcdObject.ValueChain if PcdObject.ValueChain else self.ValueChain
             self.PcdFieldValueFromComm = PcdObject.PcdFieldValueFromComm if PcdObject.PcdFieldValueFromComm else self.PcdFieldValueFromComm
             self.PcdFieldValueFromFdf = PcdObject.PcdFieldValueFromFdf if PcdObject.PcdFieldValueFromFdf else self.PcdFieldValueFromFdf
+            self.PcdFiledValueFromDscComponent = PcdObject.PcdFiledValueFromDscComponent if PcdObject.PcdFiledValueFromDscComponent else self.PcdFiledValueFromDscComponent
 
     def __deepcopy__(self,memo):
         new_pcd = StructurePcd()
@@ -383,6 +392,7 @@ class StructurePcd(PcdClassObject):
         new_pcd.SkuOverrideValues = CopyDict(self.SkuOverrideValues)
         new_pcd.PcdFieldValueFromComm = CopyDict(self.PcdFieldValueFromComm)
         new_pcd.PcdFieldValueFromFdf = CopyDict(self.PcdFieldValueFromFdf)
+        new_pcd.PcdFiledValueFromDscComponent = CopyDict(self.PcdFiledValueFromDscComponent)
         new_pcd.ValueChain = {item for item in self.ValueChain}
         return new_pcd
 
@@ -463,6 +473,8 @@ class ModuleBuildClassObject(object):
         self.Pcds                    = {}
         self.BuildOptions            = {}
         self.Depex                   = {}
+        self.StrPcdSet               = []
+        self.StrPcdOverallValue      = {}
 
     ## Convert the class to a string
     #
