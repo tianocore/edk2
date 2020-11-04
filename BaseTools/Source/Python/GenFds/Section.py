@@ -140,22 +140,6 @@ class Section (SectionClassObject):
                     FileList.append(File.Path)
 
         if (not IsMakefile and Suffix is not None and os.path.exists(FfsInf.EfiOutputPath)) or (IsMakefile and Suffix is not None):
-            #
-            # Get Makefile path and time stamp
-            #
-            MakefileDir = FfsInf.EfiOutputPath[:-len('OUTPUT')]
-            Makefile = os.path.join(MakefileDir, 'Makefile')
-            if not os.path.exists(Makefile):
-                Makefile = os.path.join(MakefileDir, 'GNUmakefile')
-            if os.path.exists(Makefile):
-                # Update to search files with suffix in all sub-dirs.
-                Tuple = os.walk(FfsInf.EfiOutputPath)
-                for Dirpath, Dirnames, Filenames in Tuple:
-                    for F in Filenames:
-                        if os.path.splitext(F)[1] == Suffix:
-                            FullName = os.path.join(Dirpath, F)
-                            if os.path.getmtime(FullName) > os.path.getmtime(Makefile):
-                                FileList.append(FullName)
             if not FileList:
                 SuffixMap = FfsInf.GetFinalTargetSuffixMap()
                 if Suffix in SuffixMap:
