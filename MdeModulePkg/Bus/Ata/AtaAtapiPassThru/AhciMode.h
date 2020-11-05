@@ -114,6 +114,7 @@ typedef union {
 #define   EFI_AHCI_PORT_IS_CLEAR               0xFFFFFFFF
 #define   EFI_AHCI_PORT_IS_FIS_CLEAR           0x0000000F
 #define   EFI_AHCI_PORT_IS_ERROR_MASK          (EFI_AHCI_PORT_IS_INFS | EFI_AHCI_PORT_IS_IFS | EFI_AHCI_PORT_IS_HBDS | EFI_AHCI_PORT_IS_HBFS | EFI_AHCI_PORT_IS_TFES)
+#define   EFI_AHCI_PORT_IS_FATAL_ERROR_MASK    (EFI_AHCI_PORT_IS_IFS | EFI_AHCI_PORT_IS_HBDS | EFI_AHCI_PORT_IS_HBFS | EFI_AHCI_PORT_IS_TFES)
 
 #define EFI_AHCI_PORT_IE                       0x0014
 #define EFI_AHCI_PORT_CMD                      0x0018
@@ -122,9 +123,11 @@ typedef union {
 #define   EFI_AHCI_PORT_CMD_SUD                BIT1
 #define   EFI_AHCI_PORT_CMD_POD                BIT2
 #define   EFI_AHCI_PORT_CMD_CLO                BIT3
-#define   EFI_AHCI_PORT_CMD_CR                 BIT15
 #define   EFI_AHCI_PORT_CMD_FRE                BIT4
+#define   EFI_AHCI_PORT_CMD_CCS_MASK           (BIT8 | BIT9 | BIT10 | BIT11 | BIT12)
+#define   EFI_AHCI_PORT_CMD_CCS_SHIFT          8
 #define   EFI_AHCI_PORT_CMD_FR                 BIT14
+#define   EFI_AHCI_PORT_CMD_CR                 BIT15
 #define   EFI_AHCI_PORT_CMD_MASK               ~(EFI_AHCI_PORT_CMD_ST | EFI_AHCI_PORT_CMD_FRE | EFI_AHCI_PORT_CMD_COL)
 #define   EFI_AHCI_PORT_CMD_PMA                BIT17
 #define   EFI_AHCI_PORT_CMD_HPCP               BIT18
