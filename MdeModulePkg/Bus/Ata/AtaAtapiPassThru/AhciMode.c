@@ -897,6 +897,7 @@ AhciPioTransfer (
   EFI_AHCI_COMMAND_FIS          CFis;
   EFI_AHCI_COMMAND_LIST         CmdList;
   UINT32                        PrdCount;
+  UINT32                        Retry;
 
   if (Read) {
     Flag = EfiPciIoOperationBusMasterWrite;
@@ -931,49 +932,56 @@ AhciPioTransfer (
   CmdList.AhciCmdCfl = EFI_AHCI_FIS_REGISTER_H2D_LENGTH / 4;
   CmdList.AhciCmdW   = Read ? 0 : 1;
 
-  AhciBuildCommand (
-    PciIo,
-    AhciRegisters,
-    Port,
-    PortMultiplier,
-    &CFis,
-    &CmdList,
-    AtapiCommand,
-    AtapiCommandLength,
-    0,
-    (VOID *)(UINTN)PhyAddr,
-    DataCount
-    );
+  for (Retry = 0; Retry < AHCI_COMMAND_RETRIES; Retry++) {
+    AhciBuildCommand (
+      PciIo,
+      AhciRegisters,
+      Port,
+      PortMultiplier,
+      &CFis,
+      &CmdList,
+      AtapiCommand,
+      AtapiCommandLength,
+      0,
+      (VOID *)(UINTN)PhyAddr,
+      DataCount
+      );
 
-  Status = AhciStartCommand (
-             PciIo,
-             Port,
-             0,
-             Timeout
-             );
-  if (EFI_ERROR (Status)) {
-    goto Exit;
-  }
-
-  if (Read && (AtapiCommand == 0)) {
-    Status = AhciWaitUntilFisReceived (PciIo, Port, Timeout, SataFisPioSetup);
-    if (Status == EFI_SUCCESS) {
-      PrdCount = *(volatile UINT32 *) (&(AhciRegisters->AhciCmdList[0].AhciCmdPrdbc));
-      if (PrdCount == DataCount) {
-        Status = EFI_SUCCESS;
-      } else {
-        Status = EFI_DEVICE_ERROR;
-      }
+    Status = AhciStartCommand (
+              PciIo,
+              Port,
+              0,
+              Timeout
+              );
+    if (EFI_ERROR (Status)) {
+      break;
     }
-  } else {
-    Status = AhciWaitUntilFisReceived (PciIo, Port, Timeout, SataFisD2H);
+
+    if (Read && (AtapiCommand == 0)) {
+      Status = AhciWaitUntilFisReceived (PciIo, Port, Timeout, SataFisPioSetup);
+      if (Status == EFI_SUCCESS) {
+        PrdCount = *(volatile UINT32 *) (&(AhciRegisters->AhciCmdList[0].AhciCmdPrdbc));
+        if (PrdCount == DataCount) {
+          Status = EFI_SUCCESS;
+        } else {
+          Status = EFI_DEVICE_ERROR;
+        }
+      }
+    } else {
+      Status = AhciWaitUntilFisReceived (PciIo, Port, Timeout, SataFisD2H);
+    }
+
+    if (Status == EFI_DEVICE_ERROR) {
+      DEBUG ((DEBUG_ERROR, "PIO command failed at retry %d\n", Retry));
+      Status = AhciRecoverPortError (PciIo, Port);
+      if (EFI_ERROR (Status)) {
+        break;
+      }
+    } else {
+      break;
+    }
   }
 
-  if (Status == EFI_DEVICE_ERROR) {
-    AhciRecoverPortError (PciIo, Port);
-  }
-
-Exit:
   AhciStopCommand (
     PciIo,
     Port,
@@ -992,7 +1000,6 @@ Exit:
     );
 
   AhciDumpPortStatus (PciIo, AhciRegisters, Port, AtaStatusBlock);
-
   return Status;
 }
 
@@ -1046,9 +1053,9 @@ AhciDmaTransfer (
   EFI_PCI_IO_PROTOCOL_OPERATION Flag;
   EFI_AHCI_COMMAND_FIS          CFis;
   EFI_AHCI_COMMAND_LIST         CmdList;
-
   EFI_PCI_IO_PROTOCOL           *PciIo;
   EFI_TPL                       OldTpl;
+  UINT32                        Retry;
 
   Map   = NULL;
   PciIo = Instance->PciIo;
@@ -1058,36 +1065,16 @@ AhciDmaTransfer (
   }
 
   //
-  // Before starting the Blocking BlockIO operation, push to finish all non-blocking
-  // BlockIO tasks.
-  // Delay 100us to simulate the blocking time out checking.
+  // DMA buffer allocation. Needs to be done only once for both sync and async
+  // DMA transfers irrespective of number of retries.
   //
-  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
-  while ((Task == NULL) && (!IsListEmpty (&Instance->NonBlockingTaskList))) {
-    AsyncNonBlockingTransferRoutine (NULL, Instance);
-    //
-    // Stall for 100us.
-    //
-    MicroSecondDelay (100);
-  }
-  gBS->RestoreTPL (OldTpl);
-
-  if ((Task == NULL) || ((Task != NULL) && (!Task->IsStart))) {
-    //
-    // Mark the Task to indicate that it has been started.
-    //
-    if (Task != NULL) {
-      Task->IsStart      = TRUE;
-    }
+  if ((Task == NULL) || ((Task != NULL) && (Task->Map == NULL))) {
     if (Read) {
       Flag = EfiPciIoOperationBusMasterWrite;
     } else {
       Flag = EfiPciIoOperationBusMasterRead;
     }
 
-    //
-    // Construct command list and command table with pci bus address.
-    //
     MapLength = DataCount;
     Status = PciIo->Map (
                       PciIo,
@@ -1101,63 +1088,123 @@ AhciDmaTransfer (
     if (EFI_ERROR (Status) || (DataCount != MapLength)) {
       return EFI_BAD_BUFFER_SIZE;
     }
-
     if (Task != NULL) {
       Task->Map = Map;
     }
-    //
-    // Package read needed
-    //
+  }
+
+  if (Task == NULL || (Task != NULL && !Task->IsStart)) {
     AhciBuildCommandFis (&CFis, AtaCommandBlock);
 
     ZeroMem (&CmdList, sizeof (EFI_AHCI_COMMAND_LIST));
 
     CmdList.AhciCmdCfl = EFI_AHCI_FIS_REGISTER_H2D_LENGTH / 4;
     CmdList.AhciCmdW   = Read ? 0 : 1;
-
-    AhciBuildCommand (
-      PciIo,
-      AhciRegisters,
-      Port,
-      PortMultiplier,
-      &CFis,
-      &CmdList,
-      AtapiCommand,
-      AtapiCommandLength,
-      0,
-      (VOID *)(UINTN)PhyAddr,
-      DataCount
-      );
-
-    Status = AhciStartCommand (
-               PciIo,
-               Port,
-               0,
-               Timeout
-               );
-    if (EFI_ERROR (Status)) {
-      goto Exit;
-    }
   }
 
-  if (Task != NULL) {
-    Status = AhciCheckFisReceived (PciIo, Port, SataFisD2H);
-    if (Status == EFI_NOT_READY) {
-      if (!Task->InfiniteWait && Task->RetryTimes == 0) {
-        Status = EFI_TIMEOUT;
+  if (Task == NULL) {
+    //
+    // Before starting the Blocking BlockIO operation, push to finish all non-blocking
+    // BlockIO tasks.
+    // Delay 100us to simulate the blocking time out checking.
+    //
+    OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
+    while (!IsListEmpty (&Instance->NonBlockingTaskList)) {
+      AsyncNonBlockingTransferRoutine (NULL, Instance);
+      //
+      // Stall for 100us.
+      //
+      MicroSecondDelay (100);
+    }
+    gBS->RestoreTPL (OldTpl);
+    for (Retry = 0; Retry < AHCI_COMMAND_RETRIES; Retry++) {
+      AhciBuildCommand (
+        PciIo,
+        AhciRegisters,
+        Port,
+        PortMultiplier,
+        &CFis,
+        &CmdList,
+        AtapiCommand,
+        AtapiCommandLength,
+        0,
+        (VOID *)(UINTN)PhyAddr,
+        DataCount
+        );
+
+      Status = AhciStartCommand (
+                PciIo,
+                Port,
+                0,
+                Timeout
+                );
+      if (EFI_ERROR (Status)) {
+        break;
+      }
+      Status = AhciWaitUntilFisReceived (PciIo, Port, Timeout, SataFisD2H);
+      if (Status == EFI_DEVICE_ERROR) {
+        DEBUG ((DEBUG_ERROR, "DMA command failed at retry: %d\n", Retry));
+        Status = AhciRecoverPortError (PciIo, Port);
+        if (EFI_ERROR (Status)) {
+          break;
+        }
       } else {
-        Task->RetryTimes--;
+        break;
       }
     }
   } else {
-    Status = AhciWaitUntilFisReceived (PciIo, Port, Timeout, SataFisD2H);
+    if (!Task->IsStart) {
+      AhciBuildCommand (
+        PciIo,
+        AhciRegisters,
+        Port,
+        PortMultiplier,
+        &CFis,
+        &CmdList,
+        AtapiCommand,
+        AtapiCommandLength,
+        0,
+        (VOID *)(UINTN)PhyAddr,
+        DataCount
+        );
+
+      Status = AhciStartCommand (
+                PciIo,
+                Port,
+                0,
+                Timeout
+                );
+      if (!EFI_ERROR (Status)) {
+        Task->IsStart = TRUE;
+      }
+    }
+    if (Task->IsStart) {
+      Status = AhciCheckFisReceived (PciIo, Port, SataFisD2H);
+      if (Status == EFI_DEVICE_ERROR) {
+        DEBUG ((DEBUG_ERROR, "DMA command failed at retry: %d\n", Task->RetryTimes));
+        Status = AhciRecoverPortError (PciIo, Port);
+        //
+        // If recovery passed mark the Task as not started and change the status
+        // to EFI_NOT_READY. This will make the higher level call this function again
+        // and on next call the command will be re-issued due to IsStart being FALSE.
+        // This also makes the next condition decrement the RetryTimes.
+        //
+        if (Status == EFI_SUCCESS) {
+          Task->IsStart = FALSE;
+          Status = EFI_NOT_READY;
+        }
+      }
+
+      if (Status == EFI_NOT_READY) {
+        if (!Task->InfiniteWait && Task->RetryTimes == 0) {
+          Status = EFI_TIMEOUT;
+        } else {
+          Task->RetryTimes--;
+        }
+      }
+    }
   }
 
-  if (Status == EFI_DEVICE_ERROR) {
-    AhciRecoverPortError (PciIo, Port);
-  }
-
-Exit:
   //
   // For Blocking mode, the command should be stopped, the Fis should be disabled
   // and the PciIo should be unmapped.
@@ -1234,6 +1281,7 @@ AhciNonDataTransfer (
   EFI_STATUS                   Status;
   EFI_AHCI_COMMAND_FIS         CFis;
   EFI_AHCI_COMMAND_LIST        CmdList;
+  UINT32                       Retry;
 
   //
   // Package read needed
@@ -1244,36 +1292,43 @@ AhciNonDataTransfer (
 
   CmdList.AhciCmdCfl = EFI_AHCI_FIS_REGISTER_H2D_LENGTH / 4;
 
-  AhciBuildCommand (
-    PciIo,
-    AhciRegisters,
-    Port,
-    PortMultiplier,
-    &CFis,
-    &CmdList,
-    AtapiCommand,
-    AtapiCommandLength,
-    0,
-    NULL,
-    0
-    );
+  for (Retry = 0; Retry < AHCI_COMMAND_RETRIES; Retry++) {
+    AhciBuildCommand (
+      PciIo,
+      AhciRegisters,
+      Port,
+      PortMultiplier,
+      &CFis,
+      &CmdList,
+      AtapiCommand,
+      AtapiCommandLength,
+      0,
+      NULL,
+      0
+      );
 
-  Status = AhciStartCommand (
-             PciIo,
-             Port,
-             0,
-             Timeout
-             );
-  if (EFI_ERROR (Status)) {
-    goto Exit;
+    Status = AhciStartCommand (
+                PciIo,
+                Port,
+                0,
+                Timeout
+                );
+    if (EFI_ERROR (Status)) {
+      break;
+    }
+
+    Status = AhciWaitUntilFisReceived (PciIo, Port, Timeout, SataFisD2H);
+    if (Status == EFI_DEVICE_ERROR) {
+      DEBUG ((DEBUG_ERROR, "Non data transfer failed at retry %d\n", Retry));
+      Status = AhciRecoverPortError (PciIo, Port);
+      if (EFI_ERROR (Status)) {
+        break;
+      }
+    } else {
+      break;
+    }
   }
 
-  Status = AhciWaitUntilFisReceived (PciIo, Port, Timeout, SataFisD2H);
-  if (Status == EFI_DEVICE_ERROR) {
-    AhciRecoverPortError (PciIo, Port);
-  }
-
-Exit:
   AhciStopCommand (
     PciIo,
     Port,
