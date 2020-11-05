@@ -1,7 +1,7 @@
 /** @file
   The file for AHCI mode of ATA host controller.
 
-  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2020, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -248,31 +248,22 @@ AhciWaitMemSet (
 /**
   Check the memory status to the test value.
 
-  @param[in]       Address           The memory address to test.
-  @param[in]       MaskValue         The mask value of memory.
-  @param[in]       TestValue         The test value of memory.
-  @param[in, out]  Task              Optional. Pointer to the ATA_NONBLOCK_TASK used by
-                                     non-blocking mode. If NULL, then just try once.
+  @param[in] Address    The memory address to test.
+  @param[in] MaskValue  The mask value of memory.
+  @param[in] TestValue  The test value of memory.
 
-  @retval EFI_NOTREADY      The memory is not set.
-  @retval EFI_TIMEOUT       The memory setting retry times out.
+  @retval EFI_NOT_READY     The memory is not set.
   @retval EFI_SUCCESS       The memory is correct set.
-
 **/
 EFI_STATUS
 EFIAPI
 AhciCheckMemSet (
   IN     UINTN                     Address,
   IN     UINT32                    MaskValue,
-  IN     UINT32                    TestValue,
-  IN OUT ATA_NONBLOCK_TASK         *Task
+  IN     UINT32                    TestValue
   )
 {
   UINT32     Value;
-
-  if (Task != NULL) {
-    Task->RetryTimes--;
-  }
 
   Value  = *(volatile UINT32 *) Address;
   Value &= MaskValue;
@@ -281,11 +272,7 @@ AhciCheckMemSet (
     return EFI_SUCCESS;
   }
 
-  if ((Task != NULL) && !Task->InfiniteWait && (Task->RetryTimes == 0)) {
-    return EFI_TIMEOUT;
-  } else {
-    return EFI_NOT_READY;
-  }
+  return EFI_NOT_READY;
 }
 
 
@@ -357,7 +344,7 @@ AhciDumpPortStatus (
     FisBaseAddr = (UINTN)AhciRegisters->AhciRFis + Port * sizeof (EFI_AHCI_RECEIVED_FIS);
     Offset      = FisBaseAddr + EFI_AHCI_D2H_FIS_OFFSET;
 
-    Status = AhciCheckMemSet (Offset, EFI_AHCI_FIS_TYPE_MASK, EFI_AHCI_FIS_REGISTER_D2H, NULL);
+    Status = AhciCheckMemSet (Offset, EFI_AHCI_FIS_TYPE_MASK, EFI_AHCI_FIS_REGISTER_D2H);
     if (!EFI_ERROR (Status)) {
       //
       // If D2H FIS is received, update StatusBlock with its content.
@@ -622,6 +609,102 @@ AhciBuildCommandFis (
 }
 
 /**
+  Checks if specified FIS has been received.
+
+  @param[in] PciIo    Pointer to AHCI controller PciIo.
+  @param[in] Port     SATA port index on which to check.
+  @param[in] FisType  FIS type for which to check.
+
+  @retval EFI_SUCCESS       FIS received.
+  @retval EFI_NOT_READY     FIS not received yet.
+  @retval EFI_DEVICE_ERROR  AHCI controller reported an error on port.
+**/
+EFI_STATUS
+AhciCheckFisReceived (
+  IN EFI_PCI_IO_PROTOCOL  *PciIo,
+  IN UINT8                Port,
+  IN SATA_FIS_TYPE        FisType
+  )
+{
+  UINT32      Offset;
+  UINT32      PortInterrupt;
+  UINT32      PortTfd;
+
+  Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_IS;
+  PortInterrupt = AhciReadReg (PciIo, Offset);
+  if ((PortInterrupt & EFI_AHCI_PORT_IS_ERROR_MASK) != 0) {
+    DEBUG ((DEBUG_ERROR, "AHCI: Error interrupt reported PxIS: %X\n", PortInterrupt));
+    return EFI_DEVICE_ERROR;
+  }
+  //
+  // For PIO setup FIS - According to SATA 2.6 spec section 11.7, D2h FIS means an error encountered.
+  // But Qemu and Marvel 9230 sata controller may just receive a D2h FIS from device
+  // after the transaction is finished successfully.
+  // To get better device compatibilities, we further check if the PxTFD's ERR bit is set.
+  // By this way, we can know if there is a real error happened.
+  //
+  if (((FisType == SataFisD2H) && ((PortInterrupt & EFI_AHCI_PORT_IS_DHRS) != 0)) ||
+      ((FisType == SataFisPioSetup) && (PortInterrupt & (EFI_AHCI_PORT_IS_PSS | EFI_AHCI_PORT_IS_DHRS)) != 0) ||
+      ((FisType == SataFisDmaSetup) && (PortInterrupt & (EFI_AHCI_PORT_IS_DSS | EFI_AHCI_PORT_IS_DHRS)) != 0)) {
+    Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_TFD;
+    PortTfd = AhciReadReg (PciIo, (UINT32) Offset);
+    if ((PortTfd & EFI_AHCI_PORT_TFD_ERR) != 0) {
+      return EFI_DEVICE_ERROR;
+    } else {
+      return EFI_SUCCESS;
+    }
+  }
+
+  return EFI_NOT_READY;
+}
+
+/**
+  Waits until specified FIS has been received.
+
+  @param[in] PciIo    Pointer to AHCI controller PciIo.
+  @param[in] Port     SATA port index on which to check.
+  @param[in] Timeout  Time after which function should stop polling.
+  @param[in] FisType  FIS type for which to check.
+
+  @retval EFI_SUCCESS       FIS received.
+  @retval EFI_TIMEOUT       FIS failed to arrive within a specified time period.
+  @retval EFI_DEVICE_ERROR  AHCI controller reported an error on port.
+**/
+EFI_STATUS
+AhciWaitUntilFisReceived (
+  IN EFI_PCI_IO_PROTOCOL  *PciIo,
+  IN UINT8                Port,
+  IN UINT64               Timeout,
+  IN SATA_FIS_TYPE        FisType
+  )
+{
+  EFI_STATUS  Status;
+  BOOLEAN     InfiniteWait;
+  UINT64      Delay;
+
+  Delay =  DivU64x32 (Timeout, 1000) + 1;
+  if (Timeout == 0) {
+    InfiniteWait = TRUE;
+  } else {
+    InfiniteWait = FALSE;
+  }
+
+  do {
+    Status = AhciCheckFisReceived (PciIo, Port, FisType);
+    if (Status != EFI_NOT_READY) {
+      return Status;
+    }
+    //
+    // Stall for 100 microseconds.
+    //
+    MicroSecondDelay (100);
+    Delay--;
+  } while (InfiniteWait || (Delay > 0));
+
+  return EFI_TIMEOUT;
+}
+
+/**
   Start a PIO data transfer on specific port.
 
   @param[in]       PciIo               The PCI IO protocol instance.
@@ -665,26 +748,13 @@ AhciPioTransfer (
   )
 {
   EFI_STATUS                    Status;
-  UINTN                         FisBaseAddr;
-  UINTN                         Offset;
   EFI_PHYSICAL_ADDRESS          PhyAddr;
   VOID                          *Map;
   UINTN                         MapLength;
   EFI_PCI_IO_PROTOCOL_OPERATION Flag;
-  UINT64                        Delay;
   EFI_AHCI_COMMAND_FIS          CFis;
   EFI_AHCI_COMMAND_LIST         CmdList;
-  UINT32                        PortTfd;
   UINT32                        PrdCount;
-  BOOLEAN                       InfiniteWait;
-  BOOLEAN                       PioFisReceived;
-  BOOLEAN                       D2hFisReceived;
-
-  if (Timeout == 0) {
-    InfiniteWait = TRUE;
-  } else {
-    InfiniteWait = FALSE;
-  }
 
   if (Read) {
     Flag = EfiPciIoOperationBusMasterWrite;
@@ -743,87 +813,18 @@ AhciPioTransfer (
     goto Exit;
   }
 
-  //
-  // Check the status and wait the driver sending data
-  //
-  FisBaseAddr = (UINTN)AhciRegisters->AhciRFis + Port * sizeof (EFI_AHCI_RECEIVED_FIS);
-
   if (Read && (AtapiCommand == 0)) {
-    //
-    // Wait device sends the PIO setup fis before data transfer
-    //
-    Status = EFI_TIMEOUT;
-    Delay  = DivU64x32 (Timeout, 1000) + 1;
-    do {
-      PioFisReceived = FALSE;
-      D2hFisReceived = FALSE;
-      Offset = FisBaseAddr + EFI_AHCI_PIO_FIS_OFFSET;
-      Status = AhciCheckMemSet (Offset, EFI_AHCI_FIS_TYPE_MASK, EFI_AHCI_FIS_PIO_SETUP, NULL);
-      if (!EFI_ERROR (Status)) {
-        PioFisReceived = TRUE;
+    Status = AhciWaitUntilFisReceived (PciIo, Port, Timeout, SataFisPioSetup);
+    if (Status == EFI_SUCCESS) {
+      PrdCount = *(volatile UINT32 *) (&(AhciRegisters->AhciCmdList[0].AhciCmdPrdbc));
+      if (PrdCount == DataCount) {
+        Status = EFI_SUCCESS;
+      } else {
+        Status = EFI_DEVICE_ERROR;
       }
-      //
-      // According to SATA 2.6 spec section 11.7, D2h FIS means an error encountered.
-      // But Qemu and Marvel 9230 sata controller may just receive a D2h FIS from device
-      // after the transaction is finished successfully.
-      // To get better device compatibilities, we further check if the PxTFD's ERR bit is set.
-      // By this way, we can know if there is a real error happened.
-      //
-      Offset = FisBaseAddr + EFI_AHCI_D2H_FIS_OFFSET;
-      Status = AhciCheckMemSet (Offset, EFI_AHCI_FIS_TYPE_MASK, EFI_AHCI_FIS_REGISTER_D2H, NULL);
-      if (!EFI_ERROR (Status)) {
-        D2hFisReceived = TRUE;
-      }
-
-      if (PioFisReceived || D2hFisReceived) {
-        Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_TFD;
-        PortTfd = AhciReadReg (PciIo, (UINT32) Offset);
-        //
-        // PxTFD will be updated if there is a D2H or SetupFIS received.
-        //
-        if ((PortTfd & EFI_AHCI_PORT_TFD_ERR) != 0) {
-          Status = EFI_DEVICE_ERROR;
-          break;
-        }
-
-        PrdCount = *(volatile UINT32 *) (&(AhciRegisters->AhciCmdList[0].AhciCmdPrdbc));
-        if (PrdCount == DataCount) {
-          Status = EFI_SUCCESS;
-          break;
-        }
-      }
-
-      //
-      // Stall for 100 microseconds.
-      //
-      MicroSecondDelay(100);
-
-      Delay--;
-      if (Delay == 0) {
-        Status = EFI_TIMEOUT;
-      }
-    } while (InfiniteWait || (Delay > 0));
+    }
   } else {
-    //
-    // Wait for D2H Fis is received
-    //
-    Offset = FisBaseAddr + EFI_AHCI_D2H_FIS_OFFSET;
-    Status = AhciWaitMemSet (
-               Offset,
-               EFI_AHCI_FIS_TYPE_MASK,
-               EFI_AHCI_FIS_REGISTER_D2H,
-               Timeout
-               );
-
-    if (EFI_ERROR (Status)) {
-      goto Exit;
-    }
-
-    Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_TFD;
-    PortTfd = AhciReadReg (PciIo, (UINT32) Offset);
-    if ((PortTfd & EFI_AHCI_PORT_TFD_ERR) != 0) {
-      Status = EFI_DEVICE_ERROR;
-    }
+    Status = AhciWaitUntilFisReceived (PciIo, Port, Timeout, SataFisD2H);
   }
 
 Exit:
@@ -893,15 +894,12 @@ AhciDmaTransfer (
   )
 {
   EFI_STATUS                    Status;
-  UINTN                         Offset;
   EFI_PHYSICAL_ADDRESS          PhyAddr;
   VOID                          *Map;
   UINTN                         MapLength;
   EFI_PCI_IO_PROTOCOL_OPERATION Flag;
   EFI_AHCI_COMMAND_FIS          CFis;
   EFI_AHCI_COMMAND_LIST         CmdList;
-  UINTN                         FisBaseAddr;
-  UINT32                        PortTfd;
 
   EFI_PCI_IO_PROTOCOL           *PciIo;
   EFI_TPL                       OldTpl;
@@ -996,38 +994,17 @@ AhciDmaTransfer (
     }
   }
 
-  //
-  // Wait for command complete
-  //
-  FisBaseAddr = (UINTN)AhciRegisters->AhciRFis + Port * sizeof (EFI_AHCI_RECEIVED_FIS);
-  Offset      = FisBaseAddr + EFI_AHCI_D2H_FIS_OFFSET;
   if (Task != NULL) {
-    //
-    // For Non-blocking
-    //
-    Status = AhciCheckMemSet (
-               Offset,
-               EFI_AHCI_FIS_TYPE_MASK,
-               EFI_AHCI_FIS_REGISTER_D2H,
-               Task
-               );
+    Status = AhciCheckFisReceived (PciIo, Port, SataFisD2H);
+    if (Status == EFI_NOT_READY) {
+      if (!Task->InfiniteWait && Task->RetryTimes == 0) {
+        Status = EFI_TIMEOUT;
+      } else {
+        Task->RetryTimes--;
+      }
+    }
   } else {
-    Status = AhciWaitMemSet (
-               Offset,
-               EFI_AHCI_FIS_TYPE_MASK,
-               EFI_AHCI_FIS_REGISTER_D2H,
-               Timeout
-               );
-  }
-
-  if (EFI_ERROR (Status)) {
-    goto Exit;
-  }
-
-  Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_TFD;
-  PortTfd = AhciReadReg (PciIo, (UINT32) Offset);
-  if ((PortTfd & EFI_AHCI_PORT_TFD_ERR) != 0) {
-    Status = EFI_DEVICE_ERROR;
+    Status = AhciWaitUntilFisReceived (PciIo, Port, Timeout, SataFisD2H);
   }
 
 Exit:
@@ -1105,9 +1082,6 @@ AhciNonDataTransfer (
   )
 {
   EFI_STATUS                   Status;
-  UINTN                        FisBaseAddr;
-  UINTN                        Offset;
-  UINT32                       PortTfd;
   EFI_AHCI_COMMAND_FIS         CFis;
   EFI_AHCI_COMMAND_LIST        CmdList;
 
@@ -1144,27 +1118,7 @@ AhciNonDataTransfer (
     goto Exit;
   }
 
-  //
-  // Wait device sends the Response Fis
-  //
-  FisBaseAddr = (UINTN)AhciRegisters->AhciRFis + Port * sizeof (EFI_AHCI_RECEIVED_FIS);
-  Offset      = FisBaseAddr + EFI_AHCI_D2H_FIS_OFFSET;
-  Status      = AhciWaitMemSet (
-                  Offset,
-                  EFI_AHCI_FIS_TYPE_MASK,
-                  EFI_AHCI_FIS_REGISTER_D2H,
-                  Timeout
-                  );
-
-  if (EFI_ERROR (Status)) {
-    goto Exit;
-  }
-
-  Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_TFD;
-  PortTfd = AhciReadReg (PciIo, (UINT32) Offset);
-  if ((PortTfd & EFI_AHCI_PORT_TFD_ERR) != 0) {
-    Status = EFI_DEVICE_ERROR;
-  }
+  Status = AhciWaitUntilFisReceived (PciIo, Port, Timeout, SataFisD2H);
 
 Exit:
   AhciStopCommand (
