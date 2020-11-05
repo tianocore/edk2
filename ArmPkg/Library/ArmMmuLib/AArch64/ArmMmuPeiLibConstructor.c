@@ -1,10 +1,10 @@
-#/* @file
-#
-#  Copyright (c) 2016, Linaro Limited. All rights reserved.
-#
-#  SPDX-License-Identifier: BSD-2-Clause-Patent
-#
-#*/
+/** @file
+
+  Copyright (c) 2016, Linaro Limited. All rights reserved.
+  Copyright (c) 2021, Arm Limited. All rights reserved.<BR>
+
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+*/
 
 #include <Base.h>
 
