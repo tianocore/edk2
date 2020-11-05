@@ -847,6 +847,54 @@ AhciWaitUntilFisReceived (
 }
 
 /**
+  Prints contents of the ATA command block into the debug port.
+
+  @param[in] AtaCommandBlock  AtaCommandBlock to print.
+  @param[in] DebugLevel       Debug level on which to print.
+**/
+VOID
+AhciPrintCommandBlock (
+  IN EFI_ATA_COMMAND_BLOCK  *AtaCommandBlock,
+  IN UINT32                 DebugLevel
+  )
+{
+  DEBUG ((DebugLevel, "ATA COMMAND BLOCK:\n"));
+  DEBUG ((DebugLevel, "AtaCommand: %d\n", AtaCommandBlock->AtaCommand));
+  DEBUG ((DebugLevel, "AtaFeatures: %X\n", AtaCommandBlock->AtaFeatures));
+  DEBUG ((DebugLevel, "AtaSectorNumber: %d\n", AtaCommandBlock->AtaSectorNumber));
+  DEBUG ((DebugLevel, "AtaCylinderLow: %X\n", AtaCommandBlock->AtaCylinderHigh));
+  DEBUG ((DebugLevel, "AtaCylinderHigh: %X\n", AtaCommandBlock->AtaCylinderHigh));
+  DEBUG ((DebugLevel, "AtaDeviceHead: %d\n", AtaCommandBlock->AtaDeviceHead));
+  DEBUG ((DebugLevel, "AtaSectorNumberExp: %d\n", AtaCommandBlock->AtaSectorNumberExp));
+  DEBUG ((DebugLevel, "AtaCylinderLowExp: %X\n", AtaCommandBlock->AtaCylinderLowExp));
+  DEBUG ((DebugLevel, "AtaCylinderHighExp: %X\n", AtaCommandBlock->AtaCylinderHighExp));
+  DEBUG ((DebugLevel, "AtaFeaturesExp: %X\n", AtaCommandBlock->AtaFeaturesExp));
+  DEBUG ((DebugLevel, "AtaSectorCount: %d\n", AtaCommandBlock->AtaSectorCount));
+  DEBUG ((DebugLevel, "AtaSectorCountExp: %d\n", AtaCommandBlock->AtaSectorCountExp));
+}
+
+/**
+  Prints contents of the ATA status block into the debug port.
+
+  @param[in] AtaStatusBlock   AtaStatusBlock to print.
+  @param[in] DebugLevel       Debug level on which to print.
+**/
+VOID
+AhciPrintStatusBlock (
+  IN EFI_ATA_STATUS_BLOCK  *AtaStatusBlock,
+  IN UINT32                DebugLevel
+  )
+{
+  //
+  // Only print status and error since we have all of the rest printed as
+  // a part of command block print.
+  //
+  DEBUG ((DebugLevel, "ATA STATUS BLOCK:\n"));
+  DEBUG ((DebugLevel, "AtaStatus: %d\n", AtaStatusBlock->AtaStatus));
+  DEBUG ((DebugLevel, "AtaError: %d\n", AtaStatusBlock->AtaError));
+}
+
+/**
   Start a PIO data transfer on specific port.
 
   @param[in]       PciIo               The PCI IO protocol instance.
@@ -947,6 +995,8 @@ AhciPioTransfer (
       DataCount
       );
 
+    DEBUG ((DEBUG_VERBOSE, "Starting command for PIO transfer:\n"));
+    AhciPrintCommandBlock (AtaCommandBlock, DEBUG_VERBOSE);
     Status = AhciStartCommand (
               PciIo,
               Port,
@@ -1000,6 +1050,19 @@ AhciPioTransfer (
     );
 
   AhciDumpPortStatus (PciIo, AhciRegisters, Port, AtaStatusBlock);
+
+  if (Status == EFI_DEVICE_ERROR) {
+    DEBUG ((DEBUG_ERROR, "Failed to execute command for PIO transfer:\n"));
+    //
+    // Repeat command block here to make sure it is printed on
+    // device error debug level.
+    //
+    AhciPrintCommandBlock (AtaCommandBlock, DEBUG_ERROR);
+    AhciPrintStatusBlock (AtaStatusBlock, DEBUG_ERROR);
+  } else {
+    AhciPrintStatusBlock (AtaStatusBlock, DEBUG_VERBOSE);
+  }
+
   return Status;
 }
 
@@ -1132,6 +1195,8 @@ AhciDmaTransfer (
         DataCount
         );
 
+      DEBUG ((DEBUG_VERBOSE, "Starting command for sync DMA transfer:\n"));
+      AhciPrintCommandBlock (AtaCommandBlock, DEBUG_VERBOSE);
       Status = AhciStartCommand (
                 PciIo,
                 Port,
@@ -1168,6 +1233,8 @@ AhciDmaTransfer (
         DataCount
         );
 
+      DEBUG ((DEBUG_VERBOSE, "Starting command for async DMA transfer:\n"));
+      AhciPrintCommandBlock (AtaCommandBlock, DEBUG_VERBOSE);
       Status = AhciStartCommand (
                 PciIo,
                 Port,
@@ -1238,6 +1305,19 @@ AhciDmaTransfer (
   }
 
   AhciDumpPortStatus (PciIo, AhciRegisters, Port, AtaStatusBlock);
+
+  if (Status == EFI_DEVICE_ERROR) {
+    DEBUG ((DEBUG_ERROR, "Failed to execute command for DMA transfer:\n"));
+    //
+    // Repeat command block here to make sure it is printed on
+    // device error debug level.
+    //
+    AhciPrintCommandBlock (AtaCommandBlock, DEBUG_ERROR);
+    AhciPrintStatusBlock (AtaStatusBlock, DEBUG_ERROR);
+  } else {
+    AhciPrintStatusBlock (AtaStatusBlock, DEBUG_VERBOSE);
+  }
+
   return Status;
 }
 
@@ -1307,6 +1387,8 @@ AhciNonDataTransfer (
       0
       );
 
+    DEBUG ((DEBUG_VERBOSE, "Starting command for non data transfer:\n"));
+    AhciPrintCommandBlock (AtaCommandBlock, DEBUG_VERBOSE);
     Status = AhciStartCommand (
                 PciIo,
                 Port,
@@ -1342,6 +1424,18 @@ AhciNonDataTransfer (
     );
 
   AhciDumpPortStatus (PciIo, AhciRegisters, Port, AtaStatusBlock);
+
+  if (Status == EFI_DEVICE_ERROR) {
+    DEBUG ((DEBUG_ERROR, "Failed to execute command for non data transfer:\n"));
+    //
+    // Repeat command block here to make sure it is printed on
+    // device error debug level.
+    //
+    AhciPrintCommandBlock (AtaCommandBlock, DEBUG_ERROR);
+    AhciPrintStatusBlock (AtaStatusBlock, DEBUG_ERROR);
+  } else {
+    AhciPrintStatusBlock (AtaStatusBlock, DEBUG_VERBOSE);
+  }
 
   return Status;
 }
