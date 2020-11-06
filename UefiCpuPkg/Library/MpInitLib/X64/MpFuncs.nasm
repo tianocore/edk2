@@ -533,6 +533,12 @@ BITS 64
 
     mov        rax, 0x80000004   ; VMGEXIT AP_RESET_HOLD
     mov        [rdx + 0x390], rax
+    mov        rax, 114          ; Set SwExitCode valid bit
+    bts        [rdx + 0x3f0], rax
+    inc        rax               ; Set SwExitInfo1 valid bit
+    bts        [rdx + 0x3f0], rax
+    inc        rax               ; Set SwExitInfo2 valid bit
+    bts        [rdx + 0x3f0], rax
 
     pop        rdx
     pop        rcx
