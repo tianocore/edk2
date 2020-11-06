@@ -66,6 +66,7 @@ QemuFlashPtrWrite (
     VmgInit (Ghcb);
     Ghcb->SharedBuffer[0] = Value;
     Ghcb->SaveArea.SwScratch = (UINT64) (UINTN) Ghcb->SharedBuffer;
+    VmgSetOffsetValid (Ghcb, GhcbSwScratch);
     VmgExit (Ghcb, SVM_EXIT_MMIO_WRITE, (UINT64) (UINTN) Ptr, 1);
     VmgDone (Ghcb);
   } else {
