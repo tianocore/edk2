@@ -680,10 +680,15 @@ MpInitLibSevEsAPReset (
   IN CPU_MP_DATA                  *CpuMpData
   )
 {
+  EFI_STATUS       Status;
+  UINTN            ProcessorNumber;
   UINT16           Code16, Code32;
   AP_RESET         *APResetFn;
   UINTN            BufferStart;
   UINTN            StackStart;
+
+  Status = GetProcessorNumber (CpuMpData, &ProcessorNumber);
+  ASSERT_EFI_ERROR (Status);
 
   Code16 = GetProtectedMode16CS ();
   Code32 = GetProtectedMode32CS ();
@@ -696,7 +701,7 @@ MpInitLibSevEsAPReset (
 
   BufferStart = CpuMpData->MpCpuExchangeInfo->BufferStart;
   StackStart = CpuMpData->SevEsAPResetStackStart -
-                 (AP_RESET_STACK_SIZE * GetApicId ());
+                 (AP_RESET_STACK_SIZE * ProcessorNumber);
 
   //
   // This call never returns.
