@@ -57,15 +57,16 @@ VmgExit (
   Performs the necessary steps in preparation for invoking VMGEXIT. Must be
   called before setting any fields within the GHCB.
 
-  The base library function does nothing.
-
-  @param[in, out]  Ghcb       A pointer to the GHCB
+  @param[in, out]  Ghcb            A pointer to the GHCB
+  @param[in, out]  InterruptState  A pointer to hold the current interrupt
+                                   state, used for restoring in VmgDone ()
 
 **/
 VOID
 EFIAPI
 VmgInit (
-  IN OUT GHCB                *Ghcb
+  IN OUT GHCB                *Ghcb,
+  IN OUT BOOLEAN             *InterruptState
   )
 {
 }
@@ -76,15 +77,16 @@ VmgInit (
   Performs the necessary steps to cleanup after invoking VMGEXIT. Must be
   called after obtaining needed fields within the GHCB.
 
-  The base library function does nothing.
-
-  @param[in, out]  Ghcb       A pointer to the GHCB
+  @param[in, out]  Ghcb            A pointer to the GHCB
+  @param[in]       InterruptState  An indicator to conditionally (re)enable
+                                   interrupts
 
 **/
 VOID
 EFIAPI
 VmgDone (
-  IN OUT GHCB                *Ghcb
+  IN OUT GHCB                *Ghcb,
+  IN     BOOLEAN             InterruptState
   )
 {
 }
