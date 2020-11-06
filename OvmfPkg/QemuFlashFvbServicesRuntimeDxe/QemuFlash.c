@@ -232,8 +232,8 @@ QemuFlashEraseBlock (
   }
 
   Ptr = QemuFlashPtr (Lba, 0);
-  *Ptr = BLOCK_ERASE_CMD;
-  *Ptr = BLOCK_ERASE_CONFIRM_CMD;
+  QemuFlashPtrWrite (Ptr, BLOCK_ERASE_CMD);
+  QemuFlashPtrWrite (Ptr, BLOCK_ERASE_CONFIRM_CMD);
   return EFI_SUCCESS;
 }
 
