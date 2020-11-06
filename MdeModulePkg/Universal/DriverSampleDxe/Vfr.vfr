@@ -3,6 +3,7 @@
 //    Sample Setup formset.
 //
 //  Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
+// (C) Copyright 2020 Hewlett Packard Enterprise Development LP<BR>
 //  SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 //**/
@@ -288,6 +289,41 @@ formset
       option text = STRING_TOKEN(STR_ONE_OF_TEXT2), value = 1, flags = DEFAULT;
       option text = STRING_TOKEN(STR_ONE_OF_TEXT3), value = 3, flags = 0;
     endoneof;
+
+    //
+    // This is an HII option which has REST_STYLE flag and x-UEFI namespace
+    // UNI string associated. This HII option could be configured by either in-band
+    // edk2 setup browser or the remote management in out-of-band such as Redfish
+    // service. This HII option is configured through EFI_KEYWORD_HANDLER_PROTOCOL.
+    //
+    oneof varid  = MyIfrNVData.QuestionXUefiKeywordRestStyle,
+      prompt      = STRING_TOKEN(STR_ONE_OF_PROMPT_X_UEFI),
+      help        = STRING_TOKEN(STR_ONE_OF_PROMPT_X_UEFI_HELP),
+      flags       = RESET_REQUIRED | REST_STYLE,
+      option text = STRING_TOKEN(STR_ONE_OF_TEXT1), value = 0, flags = 0;
+      option text = STRING_TOKEN(STR_ONE_OF_TEXT2), value = 1, flags = DEFAULT;
+      option text = STRING_TOKEN(STR_ONE_OF_TEXT3), value = 3, flags = 0;
+    endoneof;
+
+
+    //
+    // This is a HII option which has REST_STYLE flag but without the x-UEFI namespace
+    // UNI string associated. This HII option could be configured by either
+    // setup browser or the remote management in out-of-band such as Redfish
+    // service. This HII option is configured through EFI HII Configuration Routing
+    // Protocol becasue it doesn't have x-UEFI namespace UNI string.
+    //
+    numeric varid  = MyIfrNVData.QuestionNonXUefiKeywordRestStyle,
+      prompt       = STRING_TOKEN(STR_ONE_OF_PROMPT_NON_X_UEFI),
+      help         = STRING_TOKEN(STR_ONE_OF_PROMPT_NON_X_UEFI_HELP),
+      flags        = RESET_REQUIRED | REST_STYLE,
+      minimum      = 0,
+      maximum      = 0xf0,
+      step         = 0,          // Stepping of 0 equates to a manual entering
+                                 // of a value, otherwise it will be adjusted by "+"/"-"
+      default      = 0,          // defaultstore could be used to specify the default type
+                                 // If no defaultstore is specified, it implies Standard Default
+    endnumeric;
 
     //
     // Define a string (EFI_IFR_STRING)
