@@ -171,6 +171,7 @@ GetSevEsAPMemory (
   EFI_PHYSICAL_ADDRESS      StartAddress;
   MSR_SEV_ES_GHCB_REGISTER  Msr;
   GHCB                      *Ghcb;
+  BOOLEAN                   InterruptState;
 
   //
   // Allocate 1 page for AP jump table page
@@ -192,9 +193,9 @@ GetSevEsAPMemory (
   Msr.GhcbPhysicalAddress = AsmReadMsr64 (MSR_SEV_ES_GHCB);
   Ghcb = Msr.Ghcb;
 
-  VmgInit (Ghcb);
+  VmgInit (Ghcb, &InterruptState);
   VmgExit (Ghcb, SVM_EXIT_AP_JUMP_TABLE, 0, (UINT64) (UINTN) StartAddress);
-  VmgDone (Ghcb);
+  VmgDone (Ghcb, InterruptState);
 
   return (UINTN) StartAddress;
 }
