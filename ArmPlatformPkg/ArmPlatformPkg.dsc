@@ -2,7 +2,7 @@
 # ARM platform package.
 #
 # Copyright (c) 2009 - 2010, Apple Inc. All rights reserved.<BR>
-# Copyright (c) 2011 - 2018, ARM Ltd. All rights reserved.<BR>
+# Copyright (c) 2011 - 2020, Arm Limited. All rights reserved.<BR>
 # Copyright (c) 2016 - 2017, Linaro Ltd. All rights reserved.<BR>
 # Copyright (c) Microsoft Corporation.<BR>
 #
@@ -58,10 +58,13 @@
   PeCoffExtraActionLib|MdePkg/Library/BasePeCoffExtraActionLibNull/BasePeCoffExtraActionLibNull.inf
   PeCoffLib|MdePkg/Library/BasePeCoffLib/BasePeCoffLib.inf
   PerformanceLib|MdePkg/Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
+  PL011UartClockLib|ArmPlatformPkg/Library/PL011UartClockLib/PL011UartClockLib.inf
+  PL011UartLib|ArmPlatformPkg/Library/PL011UartLib/PL011UartLib.inf
   PlatformPeiLib|ArmPlatformPkg/PlatformPei/PlatformPeiLib.inf
   PrePiLib|EmbeddedPkg/Library/PrePiLib/PrePiLib.inf
   PrintLib|MdePkg/Library/BasePrintLib/BasePrintLib.inf
   SerialPortLib|MdePkg/Library/BaseSerialPortLibNull/BaseSerialPortLibNull.inf
+  TimeBaseLib|EmbeddedPkg/Library/TimeBaseLib/TimeBaseLib.inf
   TimerLib|MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
   UefiBootServicesTableLib|MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
   UefiDecompressLib|MdePkg/Library/BaseUefiDecompressLib/BaseUefiDecompressLib.inf
