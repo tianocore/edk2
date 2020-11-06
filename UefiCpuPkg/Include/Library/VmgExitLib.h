@@ -75,6 +75,43 @@ VmgDone (
   );
 
 /**
+  Marks a specified offset as valid in the GHCB.
+
+  The ValidBitmap area represents the areas of the GHCB that have been marked
+  valid. Set the bit in ValidBitmap for the input offset.
+
+  @param[in, out]  Ghcb       A pointer to the GHCB
+  @param[in]       Offset     Qword offset in the GHCB to mark valid
+
+**/
+VOID
+EFIAPI
+VmgSetOffsetValid (
+  IN OUT GHCB                *Ghcb,
+  IN     GHCB_REGISTER       Offset
+  );
+
+/**
+  Checks if a specified offset is valid in the GHCB.
+
+  The ValidBitmap area represents the areas of the GHCB that have been marked
+  valid. Return whether the bit in the ValidBitmap is set for the input offset.
+
+  @param[in]  Ghcb            A pointer to the GHCB
+  @param[in]  Offset          Qword offset in the GHCB to mark valid
+
+  @retval TRUE                Offset is marked valid in the GHCB
+  @retval FALSE               Offset is not marked valid in the GHCB
+
+**/
+BOOLEAN
+EFIAPI
+VmgIsOffsetValid (
+  IN GHCB                    *Ghcb,
+  IN GHCB_REGISTER           Offset
+  );
+
+/**
   Handle a #VC exception.
 
   Performs the necessary processing to handle a #VC exception.
