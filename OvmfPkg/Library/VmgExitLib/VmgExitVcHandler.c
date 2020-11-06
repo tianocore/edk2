@@ -1568,6 +1568,7 @@ VmgExitHandleVc (
   SEV_ES_INSTRUCTION_DATA   InstructionData;
   UINT64                    ExitCode, Status;
   EFI_STATUS                VcRet;
+  BOOLEAN                   InterruptState;
 
   VcRet = EFI_SUCCESS;
 
@@ -1578,7 +1579,7 @@ VmgExitHandleVc (
   Regs = SystemContext.SystemContextX64;
   Ghcb = Msr.Ghcb;
 
-  VmgInit (Ghcb);
+  VmgInit (Ghcb, &InterruptState);
 
   ExitCode = Regs->ExceptionData;
   switch (ExitCode) {
@@ -1662,7 +1663,7 @@ VmgExitHandleVc (
     VcRet = EFI_PROTOCOL_ERROR;
   }
 
-  VmgDone (Ghcb);
+  VmgDone (Ghcb, InterruptState);
 
   return VcRet;
 }

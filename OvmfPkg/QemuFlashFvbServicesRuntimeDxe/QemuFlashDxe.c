@@ -52,6 +52,7 @@ QemuFlashPtrWrite (
   if (MemEncryptSevEsIsEnabled ()) {
     MSR_SEV_ES_GHCB_REGISTER  Msr;
     GHCB                      *Ghcb;
+    BOOLEAN                   InterruptState;
 
     Msr.GhcbPhysicalAddress = AsmReadMsr64 (MSR_SEV_ES_GHCB);
     Ghcb = Msr.Ghcb;
@@ -63,12 +64,12 @@ QemuFlashPtrWrite (
     // #VC exception. Instead, use the the VMGEXIT MMIO write support directly
     // to perform the update.
     //
-    VmgInit (Ghcb);
+    VmgInit (Ghcb, &InterruptState);
     Ghcb->SharedBuffer[0] = Value;
     Ghcb->SaveArea.SwScratch = (UINT64) (UINTN) Ghcb->SharedBuffer;
     VmgSetOffsetValid (Ghcb, GhcbSwScratch);
     VmgExit (Ghcb, SVM_EXIT_MMIO_WRITE, (UINT64) (UINTN) Ptr, 1);
-    VmgDone (Ghcb);
+    VmgDone (Ghcb, InterruptState);
   } else {
     *Ptr = Value;
   }
