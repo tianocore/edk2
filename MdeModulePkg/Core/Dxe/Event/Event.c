@@ -194,6 +194,13 @@ CoreDispatchEventNotifies (
     Event->NotifyFunction (Event, Event->NotifyContext);
 
     //
+    //Restore Tpl to Priority in case some timer event change the Tpl to higher level than Priority.
+    //
+    if (gEfiCurrentTpl != Priority) {
+      gEfiCurrentTpl = Priority;
+    }
+
+    //
     // Check for next pending event
     //
     CoreAcquireEventLock ();
