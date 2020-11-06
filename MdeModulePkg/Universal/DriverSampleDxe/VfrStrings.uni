@@ -1,6 +1,7 @@
 // *++
   //
 // Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+// (C) Copyright 2020 Hewlett Packard Enterprise Development LP<BR>
 // SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Module Name:
@@ -56,6 +57,13 @@
                                        #language x-UEFI-ns "iSCSIBootEnable"
 #string STR_CHECK_KEYWORD_SUPPORT      #language en-US "Check iSCSI Boot Enable"
                                        #language fr-FR "Check iSCSI Boot Enable"
+#string STR_ONE_OF_PROMPT_X_UEFI       #language en-US "x-UEFI HII Option"
+                                       #language fr-FR "x-UEFI HII Option"
+                                       #language x-UEFI-ns "xUefiHiiOption"
+#string STR_ONE_OF_PROMPT_X_UEFI_HELP  #language en-US "This is an HII option which has REST_STYLE flag and x-UEFI namespace UNI string associated. This HII option could be configured by either in-band edk2 setup browser or the remote management in out-of-band such as Redfish service. This HII option is configured through EFI_KEYWORD_HANDLER_PROTOCOL."
+#string STR_ONE_OF_PROMPT_NON_X_UEFI       #language en-US "Non x-UEFI HII Option"
+                                           #language fr-FR "Non x-UEFI HII Option"
+#string STR_ONE_OF_PROMPT_NON_X_UEFI_HELP  #language en-US "This is a HII option which has REST_STYLE flag but without the x-UEFI namespace UNI string associated. This HII option could be configured by either setup browser or the remote management in out-of-band such as Redfish service. This HII option is configured through EFI HII Configuration Routing Protocol becasue it doesn't have x-UEFI namespace UNI string."
 #string STR_ONE_OF_HELP                #language en-US "My one-of help is going to be a long string to test out the efficiency of the ability of the I am tired of typing capabilities"
                                        #language fr-FR "Mi uno- de ayuda va a ser una cadena larga a probar fuera de la eficacia de la capacidad del yo es cansada de capacidades el pulsar."
 #string STR_ONE_OF_TEXT1               #language en-US "My one-of text #1"
