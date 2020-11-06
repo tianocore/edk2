@@ -1233,6 +1233,7 @@ IoioExit (
       }
 
       Ghcb->SaveArea.SwScratch = (UINT64) Ghcb->SharedBuffer;
+      VmgSetOffsetValid (Ghcb, GhcbSwScratch);
       Status = VmgExit (Ghcb, SVM_EXIT_IOIO_PROT, ExitInfo1, ExitInfo2);
       if (Status != 0) {
         return Status;
