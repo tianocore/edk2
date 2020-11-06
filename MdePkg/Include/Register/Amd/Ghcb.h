@@ -82,35 +82,10 @@
 #define IOIO_SEG_DS         (BIT11 | BIT10)
 
 
-typedef enum {
-  GhcbCpl              = 25,
-  GhcbRflags           = 46,
-  GhcbRip,
-  GhcbRsp              = 59,
-  GhcbRax              = 63,
-  GhcbRcx              = 97,
-  GhcbRdx,
-  GhcbRbx,
-  GhcbRbp              = 101,
-  GhcbRsi,
-  GhcbRdi,
-  GhcbR8,
-  GhcbR9,
-  GhcbR10,
-  GhcbR11,
-  GhcbR12,
-  GhcbR13,
-  GhcbR14,
-  GhcbR15,
-  GhcbXCr0             = 125,
-} GHCB_REGISTER;
-
 typedef PACKED struct {
   UINT8                  Reserved1[203];
   UINT8                  Cpl;
-  UINT8                  Reserved2[148];
-  UINT64                 Dr7;
-  UINT8                  Reserved3[144];
+  UINT8                  Reserved8[300];
   UINT64                 Rax;
   UINT8                  Reserved4[264];
   UINT64                 Rcx;
@@ -135,6 +110,22 @@ typedef PACKED struct {
   UINT16                 ProtocolVersion;
   UINT32                 GhcbUsage;
 } GHCB;
+
+#define GHCB_SAVE_AREA_QWORD_OFFSET(RegisterField) \
+  (OFFSET_OF (GHCB, SaveArea.RegisterField) / sizeof (UINT64))
+
+typedef enum {
+  GhcbCpl          = GHCB_SAVE_AREA_QWORD_OFFSET (Cpl),
+  GhcbRax          = GHCB_SAVE_AREA_QWORD_OFFSET (Rax),
+  GhcbRbx          = GHCB_SAVE_AREA_QWORD_OFFSET (Rbx),
+  GhcbRcx          = GHCB_SAVE_AREA_QWORD_OFFSET (Rcx),
+  GhcbRdx          = GHCB_SAVE_AREA_QWORD_OFFSET (Rdx),
+  GhcbXCr0         = GHCB_SAVE_AREA_QWORD_OFFSET (XCr0),
+  GhcbSwExitCode   = GHCB_SAVE_AREA_QWORD_OFFSET (SwExitCode),
+  GhcbSwExitInfo1  = GHCB_SAVE_AREA_QWORD_OFFSET (SwExitInfo1),
+  GhcbSwExitInfo2  = GHCB_SAVE_AREA_QWORD_OFFSET (SwExitInfo2),
+  GhcbSwScratch    = GHCB_SAVE_AREA_QWORD_OFFSET (SwScratch),
+} GHCB_REGISTER;
 
 typedef union {
   struct {
