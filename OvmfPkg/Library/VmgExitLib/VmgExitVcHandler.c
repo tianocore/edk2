@@ -136,62 +136,6 @@ typedef struct {
 
 
 /**
-  Checks the GHCB to determine if the specified register has been marked valid.
-
-  The ValidBitmap area represents the areas of the GHCB that have been marked
-  valid. Return an indication of whether the area of the GHCB that holds the
-  specified register has been marked valid.
-
-  @param[in] Ghcb    Pointer to the Guest-Hypervisor Communication Block
-  @param[in] Reg     Offset in the GHCB of the register to check
-
-  @retval TRUE       Register has been marked vald in the GHCB
-  @retval FALSE      Register has not been marked valid in the GHCB
-
-**/
-STATIC
-BOOLEAN
-GhcbIsRegValid (
-  IN GHCB                *Ghcb,
-  IN GHCB_REGISTER       Reg
-  )
-{
-  UINT32  RegIndex;
-  UINT32  RegBit;
-
-  RegIndex = Reg / 8;
-  RegBit   = Reg & 0x07;
-
-  return ((Ghcb->SaveArea.ValidBitmap[RegIndex] & (1 << RegBit)) != 0);
-}
-
-/**
-  Marks a register as valid in the GHCB.
-
-  The ValidBitmap area represents the areas of the GHCB that have been marked
-  valid. Set the area of the GHCB that holds the specified register as valid.
-
-  @param[in, out] Ghcb    Pointer to the Guest-Hypervisor Communication Block
-  @param[in] Reg          Offset in the GHCB of the register to mark valid
-
-**/
-STATIC
-VOID
-GhcbSetRegValid (
-  IN OUT GHCB                *Ghcb,
-  IN     GHCB_REGISTER       Reg
-  )
-{
-  UINT32  RegIndex;
-  UINT32  RegBit;
-
-  RegIndex = Reg / 8;
-  RegBit   = Reg & 0x07;
-
-  Ghcb->SaveArea.ValidBitmap[RegIndex] |= (1 << RegBit);
-}
-
-/**
   Return a pointer to the contents of the specified register.
 
   Based upon the input register, return a pointer to the registers contents
@@ -891,9 +835,9 @@ MwaitExit (
   DecodeModRm (Regs, InstructionData);
 
   Ghcb->SaveArea.Rax = Regs->Rax;
-  GhcbSetRegValid (Ghcb, GhcbRax);
+  VmgSetOffsetValid (Ghcb, GhcbRax);
   Ghcb->SaveArea.Rcx = Regs->Rcx;
-  GhcbSetRegValid (Ghcb, GhcbRcx);
+  VmgSetOffsetValid (Ghcb, GhcbRcx);
 
   return VmgExit (Ghcb, SVM_EXIT_MWAIT, 0, 0);
 }
@@ -923,11 +867,11 @@ MonitorExit (
   DecodeModRm (Regs, InstructionData);
 
   Ghcb->SaveArea.Rax = Regs->Rax;  // Identity mapped, so VA = PA
-  GhcbSetRegValid (Ghcb, GhcbRax);
+  VmgSetOffsetValid (Ghcb, GhcbRax);
   Ghcb->SaveArea.Rcx = Regs->Rcx;
-  GhcbSetRegValid (Ghcb, GhcbRcx);
+  VmgSetOffsetValid (Ghcb, GhcbRcx);
   Ghcb->SaveArea.Rdx = Regs->Rdx;
-  GhcbSetRegValid (Ghcb, GhcbRdx);
+  VmgSetOffsetValid (Ghcb, GhcbRdx);
 
   return VmgExit (Ghcb, SVM_EXIT_MONITOR, 0, 0);
 }
@@ -988,9 +932,9 @@ RdtscpExit (
     return Status;
   }
 
-  if (!GhcbIsRegValid (Ghcb, GhcbRax) ||
-      !GhcbIsRegValid (Ghcb, GhcbRcx) ||
-      !GhcbIsRegValid (Ghcb, GhcbRdx)) {
+  if (!VmgIsOffsetValid (Ghcb, GhcbRax) ||
+      !VmgIsOffsetValid (Ghcb, GhcbRcx) ||
+      !VmgIsOffsetValid (Ghcb, GhcbRdx)) {
     return UnsupportedExit (Ghcb, Regs, InstructionData);
   }
   Regs->Rax = Ghcb->SaveArea.Rax;
@@ -1027,16 +971,16 @@ VmmCallExit (
   DecodeModRm (Regs, InstructionData);
 
   Ghcb->SaveArea.Rax = Regs->Rax;
-  GhcbSetRegValid (Ghcb, GhcbRax);
+  VmgSetOffsetValid (Ghcb, GhcbRax);
   Ghcb->SaveArea.Cpl = (UINT8) (Regs->Cs & 0x3);
-  GhcbSetRegValid (Ghcb, GhcbCpl);
+  VmgSetOffsetValid (Ghcb, GhcbCpl);
 
   Status = VmgExit (Ghcb, SVM_EXIT_VMMCALL, 0, 0);
   if (Status != 0) {
     return Status;
   }
 
-  if (!GhcbIsRegValid (Ghcb, GhcbRax)) {
+  if (!VmgIsOffsetValid (Ghcb, GhcbRax)) {
     return UnsupportedExit (Ghcb, Regs, InstructionData);
   }
   Regs->Rax = Ghcb->SaveArea.Rax;
@@ -1074,15 +1018,15 @@ MsrExit (
   case 0x30: // WRMSR
     ExitInfo1 = 1;
     Ghcb->SaveArea.Rax = Regs->Rax;
-    GhcbSetRegValid (Ghcb, GhcbRax);
+    VmgSetOffsetValid (Ghcb, GhcbRax);
     Ghcb->SaveArea.Rdx = Regs->Rdx;
-    GhcbSetRegValid (Ghcb, GhcbRdx);
+    VmgSetOffsetValid (Ghcb, GhcbRdx);
     //
     // fall through
     //
   case 0x32: // RDMSR
     Ghcb->SaveArea.Rcx = Regs->Rcx;
-    GhcbSetRegValid (Ghcb, GhcbRcx);
+    VmgSetOffsetValid (Ghcb, GhcbRcx);
     break;
   default:
     return UnsupportedExit (Ghcb, Regs, InstructionData);
@@ -1094,8 +1038,8 @@ MsrExit (
   }
 
   if (ExitInfo1 == 0) {
-    if (!GhcbIsRegValid (Ghcb, GhcbRax) ||
-        !GhcbIsRegValid (Ghcb, GhcbRdx)) {
+    if (!VmgIsOffsetValid (Ghcb, GhcbRax) ||
+        !VmgIsOffsetValid (Ghcb, GhcbRdx)) {
       return UnsupportedExit (Ghcb, Regs, InstructionData);
     }
     Regs->Rax = Ghcb->SaveArea.Rax;
@@ -1311,7 +1255,7 @@ IoioExit (
     } else {
       CopyMem (&Ghcb->SaveArea.Rax, &Regs->Rax, IOIO_DATA_BYTES (ExitInfo1));
     }
-    GhcbSetRegValid (Ghcb, GhcbRax);
+    VmgSetOffsetValid (Ghcb, GhcbRax);
 
     Status = VmgExit (Ghcb, SVM_EXIT_IOIO_PROT, ExitInfo1, 0);
     if (Status != 0) {
@@ -1319,7 +1263,7 @@ IoioExit (
     }
 
     if ((ExitInfo1 & IOIO_TYPE_IN) != 0) {
-      if (!GhcbIsRegValid (Ghcb, GhcbRax)) {
+      if (!VmgIsOffsetValid (Ghcb, GhcbRax)) {
         return UnsupportedExit (Ghcb, Regs, InstructionData);
       }
       CopyMem (&Regs->Rax, &Ghcb->SaveArea.Rax, IOIO_DATA_BYTES (ExitInfo1));
@@ -1379,15 +1323,15 @@ CpuidExit (
   UINT64  Status;
 
   Ghcb->SaveArea.Rax = Regs->Rax;
-  GhcbSetRegValid (Ghcb, GhcbRax);
+  VmgSetOffsetValid (Ghcb, GhcbRax);
   Ghcb->SaveArea.Rcx = Regs->Rcx;
-  GhcbSetRegValid (Ghcb, GhcbRcx);
+  VmgSetOffsetValid (Ghcb, GhcbRcx);
   if (Regs->Rax == CPUID_EXTENDED_STATE) {
     IA32_CR4  Cr4;
 
     Cr4.UintN = AsmReadCr4 ();
     Ghcb->SaveArea.XCr0 = (Cr4.Bits.OSXSAVE == 1) ? AsmXGetBv (0) : 1;
-    GhcbSetRegValid (Ghcb, GhcbXCr0);
+    VmgSetOffsetValid (Ghcb, GhcbXCr0);
   }
 
   Status = VmgExit (Ghcb, SVM_EXIT_CPUID, 0, 0);
@@ -1395,10 +1339,10 @@ CpuidExit (
     return Status;
   }
 
-  if (!GhcbIsRegValid (Ghcb, GhcbRax) ||
-      !GhcbIsRegValid (Ghcb, GhcbRbx) ||
-      !GhcbIsRegValid (Ghcb, GhcbRcx) ||
-      !GhcbIsRegValid (Ghcb, GhcbRdx)) {
+  if (!VmgIsOffsetValid (Ghcb, GhcbRax) ||
+      !VmgIsOffsetValid (Ghcb, GhcbRbx) ||
+      !VmgIsOffsetValid (Ghcb, GhcbRcx) ||
+      !VmgIsOffsetValid (Ghcb, GhcbRdx)) {
     return UnsupportedExit (Ghcb, Regs, InstructionData);
   }
   Regs->Rax = Ghcb->SaveArea.Rax;
@@ -1434,15 +1378,15 @@ RdpmcExit (
   UINT64  Status;
 
   Ghcb->SaveArea.Rcx = Regs->Rcx;
-  GhcbSetRegValid (Ghcb, GhcbRcx);
+  VmgSetOffsetValid (Ghcb, GhcbRcx);
 
   Status = VmgExit (Ghcb, SVM_EXIT_RDPMC, 0, 0);
   if (Status != 0) {
     return Status;
   }
 
-  if (!GhcbIsRegValid (Ghcb, GhcbRax) ||
-      !GhcbIsRegValid (Ghcb, GhcbRdx)) {
+  if (!VmgIsOffsetValid (Ghcb, GhcbRax) ||
+      !VmgIsOffsetValid (Ghcb, GhcbRdx)) {
     return UnsupportedExit (Ghcb, Regs, InstructionData);
   }
   Regs->Rax = Ghcb->SaveArea.Rax;
@@ -1480,8 +1424,8 @@ RdtscExit (
     return Status;
   }
 
-  if (!GhcbIsRegValid (Ghcb, GhcbRax) ||
-      !GhcbIsRegValid (Ghcb, GhcbRdx)) {
+  if (!VmgIsOffsetValid (Ghcb, GhcbRax) ||
+      !VmgIsOffsetValid (Ghcb, GhcbRdx)) {
     return UnsupportedExit (Ghcb, Regs, InstructionData);
   }
   Regs->Rax = Ghcb->SaveArea.Rax;
@@ -1531,7 +1475,7 @@ Dr7WriteExit (
   // Using a value of 0 for ExitInfo1 means RAX holds the value
   //
   Ghcb->SaveArea.Rax = *Register;
-  GhcbSetRegValid (Ghcb, GhcbRax);
+  VmgSetOffsetValid (Ghcb, GhcbRax);
 
   Status = VmgExit (Ghcb, SVM_EXIT_DR7_WRITE, 0, 0);
   if (Status != 0) {
