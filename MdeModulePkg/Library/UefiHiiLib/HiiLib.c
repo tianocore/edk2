@@ -3605,7 +3605,7 @@ HiiCreateCheckBoxOpCode (
   EFI_IFR_CHECKBOX  OpCode;
   UINTN             Position;
 
-  ASSERT ((QuestionFlags & (~(EFI_IFR_FLAG_READ_ONLY | EFI_IFR_FLAG_CALLBACK | EFI_IFR_FLAG_RESET_REQUIRED))) == 0);
+  ASSERT ((QuestionFlags & (~(EFI_IFR_FLAG_READ_ONLY | EFI_IFR_FLAG_CALLBACK | EFI_IFR_FLAG_RESET_REQUIRED | EFI_IFR_FLAG_REST_STYLE))) == 0);
 
   ZeroMem (&OpCode, sizeof (OpCode));
   OpCode.Question.QuestionId             = QuestionId;
@@ -3674,7 +3674,7 @@ HiiCreateNumericOpCode (
   UINTN            Position;
   UINTN            Length;
 
-  ASSERT ((QuestionFlags & (~(EFI_IFR_FLAG_READ_ONLY | EFI_IFR_FLAG_CALLBACK | EFI_IFR_FLAG_RESET_REQUIRED))) == 0);
+  ASSERT ((QuestionFlags & (~(EFI_IFR_FLAG_READ_ONLY | EFI_IFR_FLAG_CALLBACK | EFI_IFR_FLAG_RESET_REQUIRED | EFI_IFR_FLAG_REST_STYLE))) == 0);
 
   Length  = 0;
   ZeroMem (&OpCode, sizeof (OpCode));
@@ -3773,7 +3773,7 @@ HiiCreateStringOpCode (
   EFI_IFR_STRING  OpCode;
   UINTN           Position;
 
-  ASSERT ((QuestionFlags & (~(EFI_IFR_FLAG_READ_ONLY | EFI_IFR_FLAG_CALLBACK | EFI_IFR_FLAG_RESET_REQUIRED))) == 0);
+  ASSERT ((QuestionFlags & (~(EFI_IFR_FLAG_READ_ONLY | EFI_IFR_FLAG_CALLBACK | EFI_IFR_FLAG_RESET_REQUIRED | EFI_IFR_FLAG_REST_STYLE))) == 0);
 
   ZeroMem (&OpCode, sizeof (OpCode));
   OpCode.Question.Header.Prompt          = Prompt;
@@ -3841,7 +3841,7 @@ HiiCreateOneOfOpCode (
   UINTN           Length;
 
   ASSERT (OptionsOpCodeHandle != NULL);
-  ASSERT ((QuestionFlags & (~(EFI_IFR_FLAG_READ_ONLY | EFI_IFR_FLAG_CALLBACK | EFI_IFR_FLAG_RESET_REQUIRED | EFI_IFR_FLAG_OPTIONS_ONLY))) == 0);
+  ASSERT ((QuestionFlags & (~(EFI_IFR_FLAG_READ_ONLY | EFI_IFR_FLAG_CALLBACK | EFI_IFR_FLAG_RESET_REQUIRED | EFI_IFR_FLAG_REST_STYLE | EFI_IFR_FLAG_OPTIONS_ONLY))) == 0);
 
   ZeroMem (&OpCode, sizeof (OpCode));
   OpCode.Question.Header.Prompt          = Prompt;
@@ -3912,7 +3912,7 @@ HiiCreateOrderedListOpCode (
   UINTN                 Position;
 
   ASSERT (OptionsOpCodeHandle != NULL);
-  ASSERT ((QuestionFlags & (~(EFI_IFR_FLAG_READ_ONLY | EFI_IFR_FLAG_CALLBACK | EFI_IFR_FLAG_RESET_REQUIRED | EFI_IFR_FLAG_OPTIONS_ONLY))) == 0);
+  ASSERT ((QuestionFlags & (~(EFI_IFR_FLAG_READ_ONLY | EFI_IFR_FLAG_CALLBACK | EFI_IFR_FLAG_RESET_REQUIRED | EFI_IFR_FLAG_REST_STYLE | EFI_IFR_FLAG_OPTIONS_ONLY))) == 0);
 
   ZeroMem (&OpCode, sizeof (OpCode));
   OpCode.Question.Header.Prompt          = Prompt;
@@ -4009,7 +4009,7 @@ HiiCreateDateOpCode (
   EFI_IFR_DATE    OpCode;
   UINTN           Position;
 
-  ASSERT ((QuestionFlags & (~(EFI_IFR_FLAG_READ_ONLY | EFI_IFR_FLAG_CALLBACK | EFI_IFR_FLAG_RESET_REQUIRED))) == 0);
+  ASSERT ((QuestionFlags & (~(EFI_IFR_FLAG_READ_ONLY | EFI_IFR_FLAG_CALLBACK | EFI_IFR_FLAG_RESET_REQUIRED | EFI_IFR_FLAG_REST_STYLE))) == 0);
   ASSERT ((DateFlags & (~(EFI_QF_DATE_YEAR_SUPPRESS | EFI_QF_DATE_MONTH_SUPPRESS | EFI_QF_DATE_DAY_SUPPRESS | EFI_QF_DATE_STORAGE))) == 0);
 
   ZeroMem (&OpCode, sizeof (OpCode));
@@ -4074,7 +4074,7 @@ HiiCreateTimeOpCode (
   EFI_IFR_TIME    OpCode;
   UINTN           Position;
 
-  ASSERT ((QuestionFlags & (~(EFI_IFR_FLAG_READ_ONLY | EFI_IFR_FLAG_CALLBACK | EFI_IFR_FLAG_RESET_REQUIRED))) == 0);
+  ASSERT ((QuestionFlags & (~(EFI_IFR_FLAG_READ_ONLY | EFI_IFR_FLAG_CALLBACK | EFI_IFR_FLAG_RESET_REQUIRED | EFI_IFR_FLAG_REST_STYLE))) == 0);
   ASSERT ((TimeFlags & (~(QF_TIME_HOUR_SUPPRESS | QF_TIME_MINUTE_SUPPRESS | QF_TIME_SECOND_SUPPRESS | QF_TIME_STORAGE))) == 0);
 
   ZeroMem (&OpCode, sizeof (OpCode));
