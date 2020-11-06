@@ -884,6 +884,7 @@ ApWakeupFunction (
           GHCB                      *Ghcb;
           UINT64                    Status;
           BOOLEAN                   DoDecrement;
+          BOOLEAN                   InterruptState;
 
           DoDecrement = (BOOLEAN) (CpuMpData->InitFlag == ApInitConfig);
 
@@ -891,7 +892,7 @@ ApWakeupFunction (
             Msr.GhcbPhysicalAddress = AsmReadMsr64 (MSR_SEV_ES_GHCB);
             Ghcb = Msr.Ghcb;
 
-            VmgInit (Ghcb);
+            VmgInit (Ghcb, &InterruptState);
 
             if (DoDecrement) {
               DoDecrement = FALSE;
@@ -905,11 +906,11 @@ ApWakeupFunction (
 
             Status = VmgExit (Ghcb, SVM_EXIT_AP_RESET_HOLD, 0, 0);
             if ((Status == 0) && (Ghcb->SaveArea.SwExitInfo2 != 0)) {
-              VmgDone (Ghcb);
+              VmgDone (Ghcb, InterruptState);
               break;
             }
 
-            VmgDone (Ghcb);
+            VmgDone (Ghcb, InterruptState);
           }
 
           //
