@@ -110,6 +110,10 @@ VmgExit (
   Ghcb->SaveArea.SwExitInfo1 = ExitInfo1;
   Ghcb->SaveArea.SwExitInfo2 = ExitInfo2;
 
+  VmgSetOffsetValid (Ghcb, GhcbSwExitCode);
+  VmgSetOffsetValid (Ghcb, GhcbSwExitInfo1);
+  VmgSetOffsetValid (Ghcb, GhcbSwExitInfo2);
+
   //
   // Guest memory is used for the guest-hypervisor communication, so fence
   // the invocation of the VMGEXIT instruction to ensure GHCB accesses are
