@@ -82,35 +82,10 @@
 #define IOIO_SEG_DS         (BIT11 | BIT10)
 
 
-typedef enum {
-  GhcbCpl              = 25,
-  GhcbRflags           = 46,
-  GhcbRip,
-  GhcbRsp              = 59,
-  GhcbRax              = 63,
-  GhcbRcx              = 97,
-  GhcbRdx,
-  GhcbRbx,
-  GhcbRbp              = 101,
-  GhcbRsi,
-  GhcbRdi,
-  GhcbR8,
-  GhcbR9,
-  GhcbR10,
-  GhcbR11,
-  GhcbR12,
-  GhcbR13,
-  GhcbR14,
-  GhcbR15,
-  GhcbXCr0             = 125,
-} GHCB_REGISTER;
-
 typedef PACKED struct {
   UINT8                  Reserved1[203];
   UINT8                  Cpl;
-  UINT8                  Reserved2[148];
-  UINT64                 Dr7;
-  UINT8                  Reserved3[144];
+  UINT8                  Reserved8[300];
   UINT64                 Rax;
   UINT8                  Reserved4[264];
   UINT64                 Rcx;
@@ -135,6 +110,19 @@ typedef PACKED struct {
   UINT16                 ProtocolVersion;
   UINT32                 GhcbUsage;
 } GHCB;
+
+typedef enum {
+  GhcbCpl          = OFFSET_OF (GHCB, SaveArea.Cpl) / 8,
+  GhcbRax          = OFFSET_OF (GHCB, SaveArea.Rax) / 8,
+  GhcbRbx          = OFFSET_OF (GHCB, SaveArea.Rbx) / 8,
+  GhcbRcx          = OFFSET_OF (GHCB, SaveArea.Rcx) / 8,
+  GhcbRdx          = OFFSET_OF (GHCB, SaveArea.Rdx) / 8,
+  GhcbXCr0         = OFFSET_OF (GHCB, SaveArea.XCr0) / 8,
+  GhcbSwExitCode   = OFFSET_OF (GHCB, SaveArea.SwExitCode) / 8,
+  GhcbSwExitInfo1  = OFFSET_OF (GHCB, SaveArea.SwExitInfo1) / 8,
+  GhcbSwExitInfo2  = OFFSET_OF (GHCB, SaveArea.SwExitInfo2) / 8,
+  GhcbSwScratch    = OFFSET_OF (GHCB, SaveArea.SwScratch) / 8,
+} GHCB_REGISTER;
 
 typedef union {
   struct {
