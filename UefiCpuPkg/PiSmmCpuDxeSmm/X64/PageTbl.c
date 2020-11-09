@@ -105,6 +105,35 @@ Is5LevelPagingNeeded (
 }
 
 /**
+  Get page table base address and the depth of the page table.
+
+  @param[out] Base        Page table base address.
+  @param[out] FiveLevels  TRUE means 5 level paging. FALSE means 4 level paging.
+**/
+VOID
+GetPageTable (
+  OUT UINTN   *Base,
+  OUT BOOLEAN *FiveLevels OPTIONAL
+  )
+{
+  IA32_CR4 Cr4;
+
+  if (mInternalCr3 == 0) {
+    *Base = AsmReadCr3 () & PAGING_4K_ADDRESS_MASK_64;
+    if (FiveLevels != NULL) {
+      Cr4.UintN = AsmReadCr4 ();
+      *FiveLevels = (BOOLEAN)(Cr4.Bits.LA57 == 1);
+    }
+    return;
+  }
+
+  *Base = mInternalCr3;
+  if (FiveLevels != NULL) {
+    *FiveLevels = m5LevelPagingNeeded;
+  }
+}
+
+/**
   Set sub-entries number in entry.
 
   @param[in, out] Entry        Pointer to entry
@@ -1111,14 +1140,11 @@ SetPageTableAttributes (
   UINT64                *L3PageTable;
   UINT64                *L4PageTable;
   UINT64                *L5PageTable;
+  UINTN                 PageTableBase;
   BOOLEAN               IsSplitted;
   BOOLEAN               PageTableSplitted;
   BOOLEAN               CetEnabled;
-  IA32_CR4              Cr4;
   BOOLEAN               Enable5LevelPaging;
-
-  Cr4.UintN = AsmReadCr4 ();
-  Enable5LevelPaging = (BOOLEAN) (Cr4.Bits.LA57 == 1);
 
   //
   // Don't mark page table memory as read-only if
@@ -1163,9 +1189,12 @@ SetPageTableAttributes (
     DEBUG ((DEBUG_INFO, "Start...\n"));
     PageTableSplitted = FALSE;
     L5PageTable = NULL;
+
+    GetPageTable (&PageTableBase, &Enable5LevelPaging);
+
     if (Enable5LevelPaging) {
-      L5PageTable = (UINT64 *)GetPageTableBase ();
-      SmmSetMemoryAttributesEx ((EFI_PHYSICAL_ADDRESS)(UINTN)L5PageTable, SIZE_4KB, EFI_MEMORY_RO, &IsSplitted);
+      L5PageTable = (UINT64 *)PageTableBase;
+      SmmSetMemoryAttributesEx ((EFI_PHYSICAL_ADDRESS)PageTableBase, SIZE_4KB, EFI_MEMORY_RO, &IsSplitted);
       PageTableSplitted = (PageTableSplitted || IsSplitted);
     }
 
@@ -1176,7 +1205,7 @@ SetPageTableAttributes (
           continue;
         }
       } else {
-        L4PageTable = (UINT64 *)GetPageTableBase ();
+        L4PageTable = (UINT64 *)PageTableBase;
       }
       SmmSetMemoryAttributesEx ((EFI_PHYSICAL_ADDRESS)(UINTN)L4PageTable, SIZE_4KB, EFI_MEMORY_RO, &IsSplitted);
       PageTableSplitted = (PageTableSplitted || IsSplitted);
