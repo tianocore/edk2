@@ -46,7 +46,10 @@ UPSTREAMS = [
      'list': 'devel@edk2.groups.io', 'prefix': 'edk2-platforms'},
     {'name': 'edk2-non-osi',
      'repo': 'https://github.com/tianocore/edk2-non-osi.git',
-     'list': 'devel@edk2.groups.io', 'prefix': 'edk2-non-osi'}
+     'list': 'devel@edk2.groups.io', 'prefix': 'edk2-non-osi'},
+    {'name': 'edk2-test',
+     'repo': 'https://github.com/tianocore/edk2-test.git',
+     'list': 'devel@edk2.groups.io', 'prefix': 'edk2-test'}
     ]
 
 # The minimum version required for all of the below options to work
