@@ -27,6 +27,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Protocol/SmmVarCheck.h>
 
 #include <Library/MmServicesTableLib.h>
+#include <Library/VariablePolicyLib.h>
 
 #include <Guid/SmmVariableCommon.h>
 #include "Variable.h"
@@ -689,6 +690,8 @@ SmmVariableHandler (
       }
       if (!mEndOfDxe) {
         MorLockInitAtEndOfDxe ();
+        Status = LockVariablePolicy ();
+        ASSERT_EFI_ERROR (Status);
         mEndOfDxe = TRUE;
         VarCheckLibInitializeAtEndOfDxe (NULL);
         //
@@ -974,8 +977,12 @@ SmmEndOfDxeCallback (
   IN EFI_HANDLE                           Handle
   )
 {
+  EFI_STATUS    Status;
+
   DEBUG ((EFI_D_INFO, "[Variable]SMM_END_OF_DXE is signaled\n"));
   MorLockInitAtEndOfDxe ();
+  Status = LockVariablePolicy ();
+  ASSERT_EFI_ERROR (Status);
   mEndOfDxe = TRUE;
   VarCheckLibInitializeAtEndOfDxe (NULL);
   //
