@@ -60,7 +60,7 @@ gPcdGuidPattern = re.compile(r"PCD\((\w+)[.](\w+)\)")
 gOffsetGuidPattern = re.compile(r"(0x[0-9A-Fa-f]+) ([-A-Fa-f0-9]+)")
 
 ## Pattern to find module base address and entry point in fixed flash map file
-gModulePattern = r"\n[-\w]+\s*\(([^,]+),\s*BaseAddress=%(Address)s,\s*EntryPoint=%(Address)s\)\s*\(GUID=([-0-9A-Fa-f]+)[^)]*\)"
+gModulePattern = r"\n[-\w]+\s*\(([^,]+),\s*BaseAddress=%(Address)s,\s*EntryPoint=%(Address)s,\s*Type=\w+\)\s*\(GUID=([-0-9A-Fa-f]+)[^)]*\)"
 gMapFileItemPattern = re.compile(gModulePattern % {"Address" : "(-?0[xX][0-9A-Fa-f]+)"})
 
 ## Pattern to find all module referenced header files in source files
