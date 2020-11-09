@@ -49,6 +49,7 @@
   VarCheck.c
   VariableExLib.c
   SpeculationBarrierDxe.c
+  VariableLockRequestToLock.c
 
 [Packages]
   MdePkg/MdePkg.dec
