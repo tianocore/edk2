@@ -5,6 +5,7 @@
   This module adds Variable Hook and check MemoryOverwriteRequestControlLock.
 
 Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) Microsoft Corporation.
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -16,6 +17,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include "Variable.h"
+
+#include <Protocol/VariablePolicy.h>
+
+#include <Library/VariablePolicyLib.h>
 
 typedef struct {
   CHAR16                                 *VariableName;
@@ -338,6 +343,11 @@ SetVariableCheckHandlerMor (
   // do not handle non-MOR variable
   //
   if (!IsAnyMorVariable (VariableName, VendorGuid)) {
+    return EFI_SUCCESS;
+  }
+
+  // Permit deletion when policy is disabled.
+  if (!IsVariablePolicyEnabled() && ((Attributes == 0) || (DataSize == 0))) {
     return EFI_SUCCESS;
   }
 
