@@ -104,7 +104,9 @@
             "FVMAIN",
             "VARCHECKPCD",
             "Getxx",
-            "lzturbo"
+            "lzturbo",
+            "musthave",
+            "canthave"
         ],
         "AdditionalIncludePaths": [] # Additional paths to spell check relative to package root (wildcards supported)
     }

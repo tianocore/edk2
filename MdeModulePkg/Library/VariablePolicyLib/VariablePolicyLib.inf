@@ -1,0 +1,48 @@
+## @file VariablePolicyLib.inf
+# Business logic for Variable Policy enforcement.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+
+[Defines]
+  INF_VERSION         = 0x00010017
+  BASE_NAME           = VariablePolicyLib
+  FILE_GUID           = E9ECD342-159A-4F24-9FDF-65724027C594
+  VERSION_STRING      = 1.0
+  MODULE_TYPE         = DXE_DRIVER
+  LIBRARY_CLASS       = VariablePolicyLib|DXE_DRIVER DXE_SMM_DRIVER MM_STANDALONE
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = ANY
+#
+
+
+[Sources]
+  VariablePolicyLib.c
+  VariablePolicyExtraInitNull.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+
+[LibraryClasses]
+  DebugLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  SafeIntLib
+  PcdLib
+
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAllowVariablePolicyEnforcementDisable     ## CONSUMES
+
+
+[BuildOptions]
+  MSFT:NOOPT_*_*_CC_FLAGS   = -DINTERNAL_UNIT_TEST
+  GCC:NOOPT_*_*_CC_FLAGS    = -DINTERNAL_UNIT_TEST
