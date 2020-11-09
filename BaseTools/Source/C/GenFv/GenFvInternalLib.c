@@ -903,7 +903,12 @@ Returns:
     fprintf (FvMapFile, "BaseAddress=0x%010llx, ", (unsigned long long) (ImageBaseAddress + Offset));
   }
 
-  fprintf (FvMapFile, "EntryPoint=0x%010llx", (unsigned long long) (ImageBaseAddress + AddressOfEntryPoint));
+  fprintf (FvMapFile, "EntryPoint=0x%010llx, ", (unsigned long long) (ImageBaseAddress + AddressOfEntryPoint));
+  if (!pImageContext->IsTeImage) {
+    fprintf (FvMapFile, "Type=PE");
+  } else {
+    fprintf (FvMapFile, "Type=TE");
+  }
   fprintf (FvMapFile, ")\n");
 
   fprintf (FvMapFile, "(GUID=%s", FileGuidName);
