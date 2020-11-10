@@ -201,7 +201,17 @@ ${END}
                             cc_options = line[len(cc_cmd)+2:].split()
                         else:
                             cc_options = line[len(cc_cmd):].split()
-                        SourceFileAbsPathMap = {os.path.basename(item):item for item in cc_options if not item.startswith("/") and os.path.exists(item)}
+                        for item in cc_options:
+                            if not item.startswith("/"):
+                                if item.endswith(".txt") and item.startswith("@"):
+                                    with open(item[1:], "r") as file:
+                                        source_files = file.readlines()[0].split()
+                                        SourceFileAbsPathMap = {os.path.basename(file): file for file in source_files if
+                                                                os.path.exists(file)}
+                                else:
+                                    if os.path.exists(item):
+                                        SourceFileAbsPathMap.update({os.path.basename(item): item.strip()})
+                        # SourceFileAbsPathMap = {os.path.basename(item):item for item in cc_options if not item.startswith("/") and os.path.exists(item)}
             if line in SourceFileAbsPathMap:
                 current_source = line
                 if current_source not in ModuleDepDict:
