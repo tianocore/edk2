@@ -576,7 +576,7 @@ cleanlib:
             EdkLogger.error("build", AUTOGEN_ERROR, "Nothing to build",
                             ExtraData="[%s]" % str(MyAgo))
 
-        self.ProcessBuildTargetList()
+        self.ProcessBuildTargetList(MyAgo.OutputDir, ToolsDef)
         self.ParserGenerateFfsCmd()
 
         # Generate macros used to represent input files
@@ -903,7 +903,7 @@ cleanlib:
                                     BuildTargets[Target].Commands[i] = SingleCommand.replace('$(INC)', '').replace(FlagDict[Flag]['Macro'], RespMacro)
         return RespDict
 
-    def ProcessBuildTargetList(self):
+    def ProcessBuildTargetList(self, RespFile, ToolsDef):
         #
         # Search dependency file list for each source file
         #
@@ -1004,6 +1004,7 @@ cleanlib:
                     self.ObjTargetDict[T.Target.SubDir] = set()
                 self.ObjTargetDict[T.Target.SubDir].add(NewFile)
         for Type in self._AutoGenObject.Targets:
+            resp_file_number = 0
             for T in self._AutoGenObject.Targets[Type]:
                 # Generate related macros if needed
                 if T.GenFileListMacro and T.FileListMacro not in self.FileListMacros:
@@ -1045,7 +1046,10 @@ cleanlib:
                         Deps.append("$(%s)" % T.ListFileMacro)
 
                 if self._AutoGenObject.BuildRuleFamily == TAB_COMPILER_MSFT and Type == TAB_C_CODE_FILE:
-                    T, CmdTarget, CmdTargetDict, CmdCppDict = self.ParserCCodeFile(T, Type, CmdSumDict, CmdTargetDict, CmdCppDict, DependencyDict)
+                    T, CmdTarget, CmdTargetDict, CmdCppDict = self.ParserCCodeFile(T, Type, CmdSumDict, CmdTargetDict,
+                                                                                   CmdCppDict, DependencyDict, RespFile,
+                                                                                   ToolsDef, resp_file_number)
+                    resp_file_number += 1
                     TargetDict = {"target": self.PlaceMacro(T.Target.Path, self.Macros), "cmd": "\n\t".join(T.Commands),"deps": CCodeDeps}
                     CmdLine = self._BUILD_TARGET_TEMPLATE.Replace(TargetDict).rstrip().replace('\t$(OBJLIST', '$(OBJLIST')
                     if T.Commands:
@@ -1062,7 +1066,9 @@ cleanlib:
                         AnnexeTargetDict = {"target": self.PlaceMacro(i.Path, self.Macros), "cmd": "", "deps": self.PlaceMacro(T.Target.Path, self.Macros)}
                         self.BuildTargetList.append(self._BUILD_TARGET_TEMPLATE.Replace(AnnexeTargetDict))
 
-    def ParserCCodeFile(self, T, Type, CmdSumDict, CmdTargetDict, CmdCppDict, DependencyDict):
+    def ParserCCodeFile(self, T, Type, CmdSumDict, CmdTargetDict, CmdCppDict, DependencyDict, RespFile, ToolsDef,
+                            resp_file_number):
+        SaveFilePath = os.path.join(RespFile, "cc_resp_%s.txt" % resp_file_number)
         if not CmdSumDict:
             for item in self._AutoGenObject.Targets[Type]:
                 CmdSumDict[item.Target.SubDir] = item.Target.BaseName
@@ -1089,17 +1095,36 @@ cleanlib:
                         if Temp.startswith('/Fo'):
                             CmdSign = '%s%s' % (Temp.rsplit(TAB_SLASH, 1)[0], TAB_SLASH)
                             break
-                    else: continue
-                    if CmdSign not in list(CmdTargetDict.keys()):
-                        CmdTargetDict[CmdSign] = Item.replace(Temp, CmdSign)
                     else:
-                        CmdTargetDict[CmdSign] = "%s %s" % (CmdTargetDict[CmdSign], SingleCommandList[-1])
+                        continue
+                    if CmdSign not in list(CmdTargetDict.keys()):
+                        cmd = Item.replace(Temp, CmdSign)
+                        if SingleCommandList[-1] in cmd:
+                            CmdTargetDict[CmdSign] = [cmd.replace(SingleCommandList[-1], "").rstrip(), SingleCommandList[-1]]
+                    else:
+                        # CmdTargetDict[CmdSign] = "%s %s" % (CmdTargetDict[CmdSign], SingleCommandList[-1])
+                        CmdTargetDict[CmdSign].append(SingleCommandList[-1])
                     Index = CommandList.index(Item)
                     CommandList.pop(Index)
                     if SingleCommandList[-1].endswith("%s%s.c" % (TAB_SLASH, CmdSumDict[CmdSign[3:].rsplit(TAB_SLASH, 1)[0]])):
                         Cpplist = CmdCppDict[T.Target.SubDir]
                         Cpplist.insert(0, '$(OBJLIST_%d): ' % list(self.ObjTargetDict.keys()).index(T.Target.SubDir))
-                        T.Commands[Index] = '%s\n\t%s' % (' \\\n\t'.join(Cpplist), CmdTargetDict[CmdSign])
+                        source_files = CmdTargetDict[CmdSign][1:]
+                        source_files.insert(0, " ")
+                        if len(source_files)>2:
+                            SaveFileOnChange(SaveFilePath, " ".join(source_files), False)
+                            T.Commands[Index] = '%s\n\t%s $(cc_resp_%s)' % (
+                            ' \\\n\t'.join(Cpplist), CmdTargetDict[CmdSign][0], resp_file_number)
+                            ToolsDef.append("cc_resp_%s = @%s" % (resp_file_number, SaveFilePath))
+
+                        elif len(source_files)<=2 and len(" ".join(CmdTargetDict[CmdSign][:2]))>GlobalData.gCommandMaxLength:
+                            SaveFileOnChange(SaveFilePath, " ".join(source_files), False)
+                            T.Commands[Index] = '%s\n\t%s $(cc_resp_%s)' % (
+                                ' \\\n\t'.join(Cpplist), CmdTargetDict[CmdSign][0], resp_file_number)
+                            ToolsDef.append("cc_resp_%s = @%s" % (resp_file_number, SaveFilePath))
+
+                        else:
+                            T.Commands[Index] = '%s\n\t%s' % (' \\\n\t'.join(Cpplist), " ".join(CmdTargetDict[CmdSign]))
                     else:
                         T.Commands.pop(Index)
         return T, CmdSumDict, CmdTargetDict, CmdCppDict
