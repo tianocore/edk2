@@ -6,10 +6,10 @@
 #
 MAKEROOT ?= ..
 
-APPNAME = Brotli
+APPNAME = BrotliCompress
 
 OBJECTS = \
-  brotli/c/tools/brotli.o \
+  BrotliCompress.o \
   brotli/c/common/dictionary.o \
   brotli/c/common/transform.o \
   brotli/c/dec/bit_reader.o \
