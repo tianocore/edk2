@@ -1,0 +1,192 @@
+---
+
+name: Testing
+
+on:
+  - push
+jobs:
+  EmulatorPkg:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install dependencies
+        run: |
+          DEBIAN_FRONTEND=noninteractive sudo apt-get -qq update
+          DEBIAN_FRONTEND=noninteractive sudo apt-get -qqy install \
+          git python3 python3-distutils-extra build-essential nasm iasl uuid-dev libxext-dev libx11-dev
+          DEBIAN_FRONTEND=noninteractive sudo apt-get clean
+          sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 1337
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Update submodules
+        run: |
+          git submodule init
+          git submodule sync --recursive
+          git submodule update --recursive
+
+      - name: Build BaseTools
+        run: |
+          make -C BaseTools
+
+      - name: Build EmulatorPkg
+        run: |
+          source ./edksetup.sh
+          build -p EmulatorPkg/EmulatorPkg.dsc -t GCC5 -a X64
+
+  OvmfPkgIa32X64:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install dependencies
+        run: |
+          DEBIAN_FRONTEND=noninteractive sudo apt-get -qq update
+          DEBIAN_FRONTEND=noninteractive sudo apt-get -qqy install \
+          git python3 python3-distutils-extra build-essential nasm iasl uuid-dev
+          DEBIAN_FRONTEND=noninteractive sudo apt-get clean
+          sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 1337
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Update submodules
+        run: |
+          git submodule init
+          git submodule sync --recursive
+          git submodule update --recursive
+
+      - name: Build BaseTools
+        run: |
+          make -C BaseTools
+
+      - name: Build IA32X64 OvmfPkg
+        run: |
+          source ./edksetup.sh
+          build -DSOURCE_DEBUG_ENABLE=TRUE -DSECURE_BOOT_ENABLE=TRUE -DTPM_ENABLE=TRUE -DTPM_CONFIG_ENABLE=TRUE -DNETWORK_HTTP_BOOT_ENABLE=TRUE -a IA32 -a X64 -t GCC5 -b DEBUG -p OvmfPkg/OvmfPkgIa32X64.dsc
+
+  UefiPayloadPkgIA32Cb:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install dependencies
+        run: |
+          DEBIAN_FRONTEND=noninteractive sudo apt-get -qq update
+          DEBIAN_FRONTEND=noninteractive sudo apt-get -qqy install \
+          git python3 python3-distutils-extra build-essential nasm iasl uuid-dev qemu-system-x86 xz-utils
+          DEBIAN_FRONTEND=noninteractive sudo apt-get clean
+          sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 1337
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Update submodules
+        run: |
+          git submodule init
+          git submodule sync --recursive
+          git submodule update --recursive
+
+      - name: Build BaseTools
+        run: |
+          make -C BaseTools
+
+      - name: Build IA32 UefiPayload
+        run: |
+          source ./edksetup.sh
+          build -D BOOTLOADER=COREBOOT -a IA32 -t GCC5 -b DEBUG -p UefiPayloadPkg/UefiPayloadPkgIa32.dsc
+
+      - name: Run binary in QEMU
+        run: |
+          ./Testing/test_UefiPayloadPkgQemu.sh Build/UefiPayloadPkgIA32/DEBUG_GCC5/FV/UEFIPAYLOAD.fd
+
+  UefiPayloadPkgIA32Sbl:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install dependencies
+        run: |
+          DEBIAN_FRONTEND=noninteractive sudo apt-get -qq update
+          DEBIAN_FRONTEND=noninteractive sudo apt-get -qqy install \
+          git python3 python3-distutils-extra build-essential nasm iasl uuid-dev qemu-system-x86 xz-utils
+          DEBIAN_FRONTEND=noninteractive sudo apt-get clean
+          sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 1337
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Update submodules
+        run: |
+          git submodule init
+          git submodule sync --recursive
+          git submodule update --recursive
+
+      - name: Build BaseTools
+        run: |
+          make -C BaseTools
+
+      - name: Build IA32 UefiPayload
+        run: |
+          source ./edksetup.sh
+          build -D BOOTLOADER=SBL -a IA32 -t GCC5 -b DEBUG -p UefiPayloadPkg/UefiPayloadPkgIa32.dsc
+
+  UefiPayloadPkgX64Cb:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install dependencies
+        run: |
+          DEBIAN_FRONTEND=noninteractive sudo apt-get -qq update
+          DEBIAN_FRONTEND=noninteractive sudo apt-get -qqy install \
+          git python3 python3-distutils-extra build-essential nasm iasl uuid-dev qemu-system-x86 xz-utils
+          DEBIAN_FRONTEND=noninteractive sudo apt-get clean
+          sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 1337
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Update submodules
+        run: |
+          git submodule init
+          git submodule sync --recursive
+          git submodule update --recursive
+
+      - name: Build BaseTools
+        run: |
+          make -C BaseTools
+
+      - name: Build X64 UefiPayload
+        run: |
+          source ./edksetup.sh
+          build -D BOOTLOADER=COREBOOT -a IA32 -a X64 -t GCC5 -b DEBUG -p UefiPayloadPkg/UefiPayloadPkgIa32X64.dsc
+
+      - name: Run binary in QEMU
+        run: |
+          ./Testing/test_UefiPayloadPkgQemu.sh Build/UefiPayloadPkgX64/DEBUG_GCC5/FV/UEFIPAYLOAD.fd
+
+  UefiPayloadPkgX64Sbl:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install dependencies
+        run: |
+          DEBIAN_FRONTEND=noninteractive sudo apt-get -qq update
+          DEBIAN_FRONTEND=noninteractive sudo apt-get -qqy install \
+          git python3 python3-distutils-extra build-essential nasm iasl uuid-dev qemu-system-x86 xz-utils
+          DEBIAN_FRONTEND=noninteractive sudo apt-get clean
+          sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 1337
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Update submodules
+        run: |
+          git submodule init
+          git submodule sync --recursive
+          git submodule update --recursive
+
+      - name: Build BaseTools
+        run: |
+          make -C BaseTools
+
+      - name: Build X64 UefiPayload
+        run: |
+          source ./edksetup.sh
+          build -D BOOTLOADER=SBL -a IA32 -a X64 -t GCC5 -b DEBUG -p UefiPayloadPkg/UefiPayloadPkgIa32X64.dsc
+
+      - name: Run binary in QEMU
+        run: |
+          ./Testing/test_UefiPayloadPkgQemu.sh Build/UefiPayloadPkgX64/DEBUG_GCC5/FV/UEFIPAYLOAD.fd
