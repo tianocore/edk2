@@ -9,7 +9,7 @@
 INC = -I .\brotli\c\include $(INC)
 CFLAGS = $(CFLAGS) /W2
 
-APPNAME = Brotli
+APPNAME = BrotliCompress
 
 #LIBS = $(LIB_PATH)\Common.lib
 
@@ -40,7 +40,7 @@ ENC_OBJ = \
   brotli\c\enc\utf8_util.obj
 
 OBJECTS = \
-  brotli\c\tools\brotli.obj \
+  BrotliCompress.obj \
   $(COMMON_OBJ) \
   $(DEC_OBJ) \
   $(ENC_OBJ)
