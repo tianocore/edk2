@@ -32,6 +32,40 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 #pragma pack(1)
 
+/**
+  Macro used to verify the size of a data type at compile time and trigger a
+  STATIC_ASSERT() with an error message if the size of the data type does not
+  match the expected size.
+
+  @param  TypeName      Type name of data type to verify.
+  @param  ExpectedSize  The expected size, in bytes, of the data type specified
+                        by TypeName.
+**/
+#define CXL_11_SIZE_ASSERT(TypeName, ExpectedSize)        \
+  STATIC_ASSERT (                                         \
+    sizeof (TypeName) == ExpectedSize,                    \
+    "Size of " #TypeName                                  \
+    " does not meet CXL 1.1 Specification requirements."  \
+    )
+
+/**
+  Macro used to verify the offset of a field in a data type at compile time and
+  trigger a STATIC_ASSERT() with an error message if the offset of the field in
+  the data type does not match the expected offset.
+
+  @param  TypeName        Type name of data type to verify.
+  @param  FieldName       Field name in the data type specified by TypeName to
+                          verify.
+  @param  ExpectedOffset  The expected offset, in bytes, of the field specified
+                          by TypeName and FieldName.
+**/
+#define CXL_11_OFFSET_ASSERT(TypeName, FieldName, ExpectedOffset)  \
+  STATIC_ASSERT (                                                  \
+    OFFSET_OF (TypeName, FieldName) == ExpectedOffset,             \
+    "Offset of " #TypeName "." #FieldName                          \
+    " does not meet CXL 1.1 Specification requirements."           \
+    )
+
 ///
 /// The PCIe DVSEC for Flex Bus Device
 ///@{
@@ -201,6 +235,25 @@ typedef struct {
   CXL_DVSEC_FLEX_BUS_DEVICE_RANGE2_BASE_HIGH                    DeviceRange2BaseHigh;             // offset 48
   CXL_DVSEC_FLEX_BUS_DEVICE_RANGE2_BASE_LOW                     DeviceRange2BaseLow;              // offset 52
 } CXL_1_1_DVSEC_FLEX_BUS_DEVICE;
+
+CXL_11_OFFSET_ASSERT (CXL_1_1_DVSEC_FLEX_BUS_DEVICE, Header                         , 0x00);
+CXL_11_OFFSET_ASSERT (CXL_1_1_DVSEC_FLEX_BUS_DEVICE, DesignatedVendorSpecificHeader1, 0x04);
+CXL_11_OFFSET_ASSERT (CXL_1_1_DVSEC_FLEX_BUS_DEVICE, DesignatedVendorSpecificHeader2, 0x08);
+CXL_11_OFFSET_ASSERT (CXL_1_1_DVSEC_FLEX_BUS_DEVICE, DeviceCapability               , 0x0A);
+CXL_11_OFFSET_ASSERT (CXL_1_1_DVSEC_FLEX_BUS_DEVICE, DeviceControl                  , 0x0C);
+CXL_11_OFFSET_ASSERT (CXL_1_1_DVSEC_FLEX_BUS_DEVICE, DeviceStatus                   , 0x0E);
+CXL_11_OFFSET_ASSERT (CXL_1_1_DVSEC_FLEX_BUS_DEVICE, DeviceControl2                 , 0x10);
+CXL_11_OFFSET_ASSERT (CXL_1_1_DVSEC_FLEX_BUS_DEVICE, DeviceStatus2                  , 0x12);
+CXL_11_OFFSET_ASSERT (CXL_1_1_DVSEC_FLEX_BUS_DEVICE, DeviceLock                     , 0x14);
+CXL_11_OFFSET_ASSERT (CXL_1_1_DVSEC_FLEX_BUS_DEVICE, DeviceRange1SizeHigh           , 0x18);
+CXL_11_OFFSET_ASSERT (CXL_1_1_DVSEC_FLEX_BUS_DEVICE, DeviceRange1SizeLow            , 0x1C);
+CXL_11_OFFSET_ASSERT (CXL_1_1_DVSEC_FLEX_BUS_DEVICE, DeviceRange1BaseHigh           , 0x20);
+CXL_11_OFFSET_ASSERT (CXL_1_1_DVSEC_FLEX_BUS_DEVICE, DeviceRange1BaseLow            , 0x24);
+CXL_11_OFFSET_ASSERT (CXL_1_1_DVSEC_FLEX_BUS_DEVICE, DeviceRange2SizeHigh           , 0x28);
+CXL_11_OFFSET_ASSERT (CXL_1_1_DVSEC_FLEX_BUS_DEVICE, DeviceRange2SizeLow            , 0x2C);
+CXL_11_OFFSET_ASSERT (CXL_1_1_DVSEC_FLEX_BUS_DEVICE, DeviceRange2BaseHigh           , 0x30);
+CXL_11_OFFSET_ASSERT (CXL_1_1_DVSEC_FLEX_BUS_DEVICE, DeviceRange2BaseLow            , 0x34);
+CXL_11_SIZE_ASSERT   (CXL_1_1_DVSEC_FLEX_BUS_DEVICE                                 , 0x38);
 ///@}
 
 ///
@@ -265,6 +318,14 @@ typedef struct {
   CXL_1_1_DVSEC_FLEX_BUS_PORT_CONTROL                           PortControl;                      // offset 12
   CXL_1_1_DVSEC_FLEX_BUS_PORT_STATUS                            PortStatus;                       // offset 14
 } CXL_1_1_DVSEC_FLEX_BUS_PORT;
+
+CXL_11_OFFSET_ASSERT (CXL_1_1_DVSEC_FLEX_BUS_PORT, Header                         , 0x00);
+CXL_11_OFFSET_ASSERT (CXL_1_1_DVSEC_FLEX_BUS_PORT, DesignatedVendorSpecificHeader1, 0x04);
+CXL_11_OFFSET_ASSERT (CXL_1_1_DVSEC_FLEX_BUS_PORT, DesignatedVendorSpecificHeader2, 0x08);
+CXL_11_OFFSET_ASSERT (CXL_1_1_DVSEC_FLEX_BUS_PORT, PortCapability                 , 0x0A);
+CXL_11_OFFSET_ASSERT (CXL_1_1_DVSEC_FLEX_BUS_PORT, PortControl                    , 0x0C);
+CXL_11_OFFSET_ASSERT (CXL_1_1_DVSEC_FLEX_BUS_PORT, PortStatus                     , 0x0E);
+CXL_11_SIZE_ASSERT   (CXL_1_1_DVSEC_FLEX_BUS_PORT                                 , 0x10);
 ///@}
 
 ///
@@ -423,6 +484,15 @@ typedef struct {
   UINT32                                                        HeaderLog[16];
 } CXL_1_1_RAS_CAPABILITY_STRUCTURE;
 
+CXL_11_OFFSET_ASSERT (CXL_1_1_RAS_CAPABILITY_STRUCTURE, UncorrectableErrorStatus   , 0x00);
+CXL_11_OFFSET_ASSERT (CXL_1_1_RAS_CAPABILITY_STRUCTURE, UncorrectableErrorMask     , 0x04);
+CXL_11_OFFSET_ASSERT (CXL_1_1_RAS_CAPABILITY_STRUCTURE, UncorrectableErrorSeverity , 0x08);
+CXL_11_OFFSET_ASSERT (CXL_1_1_RAS_CAPABILITY_STRUCTURE, CorrectableErrorStatus     , 0x0C);
+CXL_11_OFFSET_ASSERT (CXL_1_1_RAS_CAPABILITY_STRUCTURE, CorrectableErrorMask       , 0x10);
+CXL_11_OFFSET_ASSERT (CXL_1_1_RAS_CAPABILITY_STRUCTURE, ErrorCapabilitiesAndControl, 0x14);
+CXL_11_OFFSET_ASSERT (CXL_1_1_RAS_CAPABILITY_STRUCTURE, HeaderLog                  , 0x18);
+CXL_11_SIZE_ASSERT   (CXL_1_1_RAS_CAPABILITY_STRUCTURE                             , 0x58);
+
 typedef union {
   struct {
     UINT32 DeviceTrustLevel                                     :  2; // bit 0..1
@@ -434,6 +504,9 @@ typedef union {
 typedef struct {
   CXL_1_1_SECURITY_POLICY                                       SecurityPolicy;
 } CXL_1_1_SECURITY_CAPABILITY_STRUCTURE;
+
+CXL_11_OFFSET_ASSERT (CXL_1_1_SECURITY_CAPABILITY_STRUCTURE, SecurityPolicy, 0x0);
+CXL_11_SIZE_ASSERT   (CXL_1_1_SECURITY_CAPABILITY_STRUCTURE,                 0x4);
 
 typedef union {
   struct {
@@ -460,7 +533,7 @@ typedef union {
     UINT16 LlRetryBufferConsumed                                :  8; // bit 5..12
     UINT16 Reserved                                             :  3; // bit 13..15
   } Bits;
-  UINT16                                                        Uint16;
+  UINT64                                                        Uint64;
 } CXL_LINK_LAYER_CONTROL_AND_STATUS;
 
 typedef union {
@@ -501,7 +574,7 @@ typedef union {
     UINT32 AckForceThreshold                                    :  8; // bit 0..7
     UINT32 AckFLushRetimer                                      : 10; // bit 8..17
   } Bits;
-  UINT32                                                        Uint32;
+  UINT64                                                        Uint64;
 } CXL_LINK_LAYER_ACK_TIMER_CONTROL;
 
 typedef union {
@@ -509,7 +582,7 @@ typedef union {
     UINT32 MdhDisable                                           :  1; // bit 0..0
     UINT32 Reserved                                             : 31; // bit 1..31
   } Bits;
-  UINT32                                                        Uint32;
+  UINT64                                                        Uint64;
 } CXL_LINK_LAYER_DEFEATURE;
 
 typedef struct {
@@ -522,6 +595,15 @@ typedef struct {
   CXL_LINK_LAYER_DEFEATURE                                      LinkLayerDefeature;
 } CXL_1_1_LINK_CAPABILITY_STRUCTURE;
 
+CXL_11_OFFSET_ASSERT (CXL_1_1_LINK_CAPABILITY_STRUCTURE, LinkLayerCapability          , 0x00);
+CXL_11_OFFSET_ASSERT (CXL_1_1_LINK_CAPABILITY_STRUCTURE, LinkLayerControlStatus       , 0x08);
+CXL_11_OFFSET_ASSERT (CXL_1_1_LINK_CAPABILITY_STRUCTURE, LinkLayerRxCreditControl     , 0x10);
+CXL_11_OFFSET_ASSERT (CXL_1_1_LINK_CAPABILITY_STRUCTURE, LinkLayerRxCreditReturnStatus, 0x18);
+CXL_11_OFFSET_ASSERT (CXL_1_1_LINK_CAPABILITY_STRUCTURE, LinkLayerTxCreditStatus      , 0x20);
+CXL_11_OFFSET_ASSERT (CXL_1_1_LINK_CAPABILITY_STRUCTURE, LinkLayerAckTimerControl     , 0x28);
+CXL_11_OFFSET_ASSERT (CXL_1_1_LINK_CAPABILITY_STRUCTURE, LinkLayerDefeature           , 0x30);
+CXL_11_SIZE_ASSERT   (CXL_1_1_LINK_CAPABILITY_STRUCTURE                               , 0x38);
+
 #define CXL_IO_ARBITRATION_CONTROL_OFFSET                       0x180
 typedef union {
   struct {
@@ -532,6 +614,8 @@ typedef union {
   UINT32                                                        Uint32;
 } CXL_IO_ARBITRATION_CONTROL;
 
+CXL_11_SIZE_ASSERT (CXL_IO_ARBITRATION_CONTROL, 0x4);
+
 #define CXL_CACHE_MEMORY_ARBITRATION_CONTROL_OFFSET             0x1C0
 typedef union {
   struct {
@@ -541,6 +625,9 @@ typedef union {
   } Bits;
   UINT32                                                        Uint32;
 } CXL_CACHE_MEMORY_ARBITRATION_CONTROL;
+
+CXL_11_SIZE_ASSERT (CXL_CACHE_MEMORY_ARBITRATION_CONTROL, 0x4);
+
 ///@}
 
 /// The CXL.RCRB base register definition
@@ -554,6 +641,9 @@ typedef union {
   } Bits;
   UINT64                                                        Uint64;
 } CXL_RCRB_BASE;
+
+CXL_11_SIZE_ASSERT (CXL_RCRB_BASE, 0x8);
+
 ///@}
 
 #pragma pack()
