@@ -48,7 +48,7 @@ jobs:
       TARGET_PLATFORMS:
         # For Platforms only check code. Leave it to Platform CI
         # to build them.
-        Build.Pkgs: 'ArmVirtPkg,EmulatorPkg,OvmfPkg'
+        Build.Pkgs: 'ArmVirtPkg,EmulatorPkg,OvmfPkg,UefiPayloadPkg'
         Build.Targets: 'NO-TARGET'
 
   workspace:
