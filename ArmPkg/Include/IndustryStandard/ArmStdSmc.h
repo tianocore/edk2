@@ -1,9 +1,13 @@
 /** @file
 *
+*  Copyright (c) 2020, NUVIA Inc. All rights reserved.<BR>
 *  Copyright (c) 2012-2017, ARM Limited. All rights reserved.
 *
 *  SPDX-License-Identifier: BSD-2-Clause-Patent
 *
+* @par Revision Reference:
+*  - SMC Calling Convention version 1.2
+*    (https://developer.arm.com/documentation/den0028/c/?lang=en)
 **/
 
 #ifndef __ARM_STD_SMC_H__
@@ -51,6 +55,18 @@
 #define ARM_SMC_MM_RET_INVALID_PARAMS      -2
 #define ARM_SMC_MM_RET_DENIED              -3
 #define ARM_SMC_MM_RET_NO_MEMORY           -4
+
+// ARM Architecture Calls
+#define SMCCC_VERSION           0x80000000
+#define SMCCC_ARCH_FEATURES     0x80000001
+#define SMCCC_ARCH_SOC_ID       0x80000002
+#define SMCCC_ARCH_WORKAROUND_1 0x80008000
+#define SMCCC_ARCH_WORKAROUND_2 0x80007FFF
+
+#define SMC_ARCH_CALL_SUCCESS            0
+#define SMC_ARCH_CALL_NOT_SUPPORTED     -1
+#define SMC_ARCH_CALL_NOT_REQUIRED      -2
+#define SMC_ARCH_CALL_INVALID_PARAMETER -3
 
 /*
  * Power State Coordination Interface (PSCI) calls cover a subset of the
