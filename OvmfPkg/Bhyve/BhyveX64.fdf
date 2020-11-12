@@ -117,7 +117,7 @@ READ_LOCK_STATUS   = TRUE
 #
 INF  OvmfPkg/Sec/SecMain.inf
 
-INF  RuleOverride=RESET_VECTOR OvmfPkg/ResetVector/ResetVector.inf
+INF  RuleOverride=RESET_VECTOR OvmfPkg/Bhyve/ResetVector/ResetVector.inf
 
 ################################################################################
 [FV.PEIFV]
