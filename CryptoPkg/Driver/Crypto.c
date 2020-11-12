@@ -243,7 +243,7 @@ DeprecatedCryptoServiceMd4HashAll (
   return BaseCryptLibServiceDeprecated ("Md4HashAll"), FALSE;
 }
 
-#ifdef DISABLE_MD5_DEPRECATED_INTERFACES
+#ifndef ENABLE_MD5_DEPRECATED_INTERFACES
 /**
   Retrieves the size, in bytes, of the context buffer required for MD5 hash operations.
 
@@ -4494,7 +4494,7 @@ const EDKII_CRYPTO_PROTOCOL mEdkiiCrypto = {
   DeprecatedCryptoServiceMd4Update,
   DeprecatedCryptoServiceMd4Final,
   DeprecatedCryptoServiceMd4HashAll,
-#ifdef DISABLE_MD5_DEPRECATED_INTERFACES
+#ifndef ENABLE_MD5_DEPRECATED_INTERFACES
   /// Md5 - deprecated and unsupported
   DeprecatedCryptoServiceMd5GetContextSize,
   DeprecatedCryptoServiceMd5Init,
