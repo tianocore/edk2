@@ -63,6 +63,7 @@
     },
 
     "Defines": {
-        "BLD_*_CONTINUOUS_INTEGRATION": "TRUE"
+        "BLD_*_CONTINUOUS_INTEGRATION": "TRUE",
+        "BLD_*_REDFISH_ENABLE": "TRUE"
     }
 }
