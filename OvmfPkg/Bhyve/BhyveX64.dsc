@@ -225,6 +225,7 @@
 
 [LibraryClasses.common]
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
+  VmgExitLib|UefiCpuPkg/Library/VmgExitLibNull/VmgExitLibNull.inf
 
 [LibraryClasses.common.SEC]
 !ifdef $(DEBUG_ON_SERIAL_PORT)
@@ -571,7 +572,7 @@
 #
 ################################################################################
 [Components]
-  OvmfPkg/ResetVector/ResetVector.inf
+  OvmfPkg/Bhyve/ResetVector/ResetVector.inf
 
   #
   # SEC Phase modules
