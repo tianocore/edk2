@@ -17,7 +17,7 @@
 #   DEFINE NETWORK_TLS_ENABLE             = TRUE
 #   DEFINE NETWORK_HTTP_BOOT_ENABLE       = TRUE
 #   DEFINE NETWORK_ALLOW_HTTP_CONNECTIONS = FALSE
-#   DEFINE NETWORK_ISCSI_ENABLE           = TRUE
+#   DEFINE NETWORK_ISCSI_ENABLE           = FALSE
 #   DEFINE NETWORK_VLAN_ENABLE            = TRUE
 #
 # Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
@@ -101,7 +101,7 @@
   #       Both OpensslLib.inf and OpensslLibCrypto.inf library instance can be used
   #       since libssl is not required for iSCSI.
   #
-  DEFINE NETWORK_ISCSI_ENABLE = TRUE
+  DEFINE NETWORK_ISCSI_ENABLE = FALSE
 !endif
 
 !if $(NETWORK_ENABLE) == TRUE
