@@ -7,7 +7,7 @@
 # This file defines one build flag PLATFORMX64_ENABLE to support
 # IA32 PEI and X64 DXE platform. Its default value is FALSE.
 #
-# Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2019 - 2020, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 #
 #    SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -29,6 +29,9 @@
 
 [LibraryClasses]
 !include NetworkPkg/NetworkLibs.dsc.inc
+
+[BuildOptions]
+!include NetworkPkg/NetworkBuildOptions.dsc.inc
 
 !if $(PLATFORMX64_ENABLE) == TRUE
 [Components.X64]
