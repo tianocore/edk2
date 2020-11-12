@@ -14,6 +14,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 /**
   Requests the monotonic counter from the designated RPMC counter.
 
+  @param[in]    CounterIndex            The RPMC index
   @param[out]   CounterValue            A pointer to a buffer to store the RPMC value.
 
   @retval       EFI_SUCCESS             The operation completed successfully.
@@ -23,11 +24,14 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 EFI_STATUS
 EFIAPI
 RequestMonotonicCounter (
+  IN  UINT8   CounterIndex,
   OUT UINT32  *CounterValue
   );
 
 /**
   Increments the monotonic counter in the SPI flash device by 1.
+
+  @param[in]    CounterIndex            The RPMC index
 
   @retval       EFI_SUCCESS             The operation completed successfully.
   @retval       EFI_DEVICE_ERROR        A device error occurred while attempting to update the counter.
@@ -36,7 +40,7 @@ RequestMonotonicCounter (
 EFI_STATUS
 EFIAPI
 IncrementMonotonicCounter (
-  VOID
+  IN  UINT8   CounterIndex
   );
 
 #endif
