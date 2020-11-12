@@ -677,8 +677,12 @@ class PeTeImage:
         else:
             offset  = self.Offset + self.DosHdr.e_lfanew
             offset += EFI_IMAGE_NT_HEADERS32.OptionalHeader.offset
-            offset += EFI_IMAGE_OPTIONAL_HEADER32.ImageBase.offset
-            size    = EFI_IMAGE_OPTIONAL_HEADER32.ImageBase.size
+            if self.PeHdr.OptionalHeader.PePlusOptHdr.Magic == 0x20b: # PE32+ image
+                offset += EFI_IMAGE_OPTIONAL_HEADER32_PLUS.ImageBase.offset
+                size    = EFI_IMAGE_OPTIONAL_HEADER32_PLUS.ImageBase.size
+            else:
+                offset += EFI_IMAGE_OPTIONAL_HEADER32.ImageBase.offset
+                size    = EFI_IMAGE_OPTIONAL_HEADER32.ImageBase.size
 
         value  = Bytes2Val(fdbin[offset:offset+size]) + delta
         fdbin[offset:offset+size] = Val2Bytes(value, size)
