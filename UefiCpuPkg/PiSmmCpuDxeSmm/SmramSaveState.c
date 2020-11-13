@@ -315,12 +315,12 @@ ReadSaveStateRegisterByIndex (
     }
 
     //
-    // Write lower 32-bits of return buffer
+    // Write at most 4 of the lower bytes of the return buffer
     //
     CopyMem(Buffer, (UINT8 *)CpuSaveState + mSmmCpuWidthOffset[RegisterIndex].Offset64Lo, MIN(4, Width));
-    if (Width >= 4) {
+    if (Width > 4) {
       //
-      // Write upper 32-bits of return buffer
+      // Write at most 4 of the upper bytes of the return buffer
       //
       CopyMem((UINT8 *)Buffer + 4, (UINT8 *)CpuSaveState + mSmmCpuWidthOffset[RegisterIndex].Offset64Hi, Width - 4);
     }
@@ -546,12 +546,12 @@ WriteSaveStateRegister (
     }
 
     //
-    // Write lower 32-bits of SMM State register
+    // Write at most 4 of the lower bytes of SMM State register
     //
     CopyMem((UINT8 *)CpuSaveState + mSmmCpuWidthOffset[RegisterIndex].Offset64Lo, Buffer, MIN (4, Width));
-    if (Width >= 4) {
+    if (Width > 4) {
       //
-      // Write upper 32-bits of SMM State register
+      // Write at most 4 of the upper bytes of SMM State register
       //
       CopyMem((UINT8 *)CpuSaveState + mSmmCpuWidthOffset[RegisterIndex].Offset64Hi, (UINT8 *)Buffer + 4, Width - 4);
     }
