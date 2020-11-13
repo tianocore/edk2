@@ -374,18 +374,18 @@ GetBytesPerPixel (
   )
 {
   switch (Bpp) {
-  case LCD_BITS_PER_PIXEL_24:
+  case LcdBitsPerPixel_24:
     return 4;
 
-  case LCD_BITS_PER_PIXEL_16_565:
-  case LCD_BITS_PER_PIXEL_16_555:
-  case LCD_BITS_PER_PIXEL_12_444:
+  case LcdBitsPerPixel_16_565:
+  case LcdBitsPerPixel_16_555:
+  case LcdBitsPerPixel_12_444:
     return 2;
 
-  case LCD_BITS_PER_PIXEL_8:
-  case LCD_BITS_PER_PIXEL_4:
-  case LCD_BITS_PER_PIXEL_2:
-  case LCD_BITS_PER_PIXEL_1:
+  case LcdBitsPerPixel_8:
+  case LcdBitsPerPixel_4:
+  case LcdBitsPerPixel_2:
+  case LcdBitsPerPixel_1:
     return 1;
 
   default:
