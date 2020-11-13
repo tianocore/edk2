@@ -361,9 +361,11 @@ class Symbols:
         foundModHdr = False
         while (rptLine != "" ):
             if rptLine[0] != ' ':
-                #DxeIpl (Fixed Flash Address, BaseAddress=0x00fffb4310, EntryPoint=0x00fffb4958)
-                #(GUID=86D70125-BAA3-4296-A62F-602BEBBB9081 .textbaseaddress=0x00fffb4398 .databaseaddress=0x00fffb4178)
-                match = re.match("([_a-zA-Z0-9\-]+)\s\(.+BaseAddress=(0x[0-9a-fA-F]+),\s+EntryPoint=(0x[0-9a-fA-F]+)\)", rptLine)
+                #DxeIpl (Fixed Flash Address, BaseAddress=0x00fffb4310, EntryPoint=0x00fffb4958,Type=PE)
+                match = re.match("([_a-zA-Z0-9\-]+)\s\(.+BaseAddress=(0x[0-9a-fA-F]+),\s+EntryPoint=(0x[0-9a-fA-F]+),\s*Type=\w+\)", rptLine)
+                if match is None:
+                    #DxeIpl (Fixed Flash Address, BaseAddress=0x00fffb4310, EntryPoint=0x00fffb4958)
+                    match = re.match("([_a-zA-Z0-9\-]+)\s\(.+BaseAddress=(0x[0-9a-fA-F]+),\s+EntryPoint=(0x[0-9a-fA-F]+)\)", rptLine)
                 if match is not None:
                     foundModHdr = True
                     modName = match.group(1)
@@ -371,6 +373,7 @@ class Symbols:
                        modName = self.dictGuidNameXref[modName.upper()]
                     self.dictModBase['%s:BASE'  % modName] = int (match.group(2), 16)
                     self.dictModBase['%s:ENTRY' % modName] = int (match.group(3), 16)
+                #(GUID=86D70125-BAA3-4296-A62F-602BEBBB9081 .textbaseaddress=0x00fffb4398 .databaseaddress=0x00fffb4178)
                 match = re.match("\(GUID=([A-Z0-9\-]+)\s+\.textbaseaddress=(0x[0-9a-fA-F]+)\s+\.databaseaddress=(0x[0-9a-fA-F]+)\)", rptLine)
                 if match is not None:
                     if foundModHdr:
