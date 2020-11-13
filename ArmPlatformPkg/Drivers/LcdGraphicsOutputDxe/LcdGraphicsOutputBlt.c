@@ -61,7 +61,7 @@ VideoCopyNoHorizontalOverlap (
 
   switch (BitsPerPixel) {
 
-  case LCD_BITS_PER_PIXEL_24:
+  case LcdBitsPerPixel_24:
 
     WidthInBytes = Width * 4;
 
@@ -79,9 +79,9 @@ VideoCopyNoHorizontalOverlap (
     }
     break;
 
-  case LCD_BITS_PER_PIXEL_16_555:
-  case LCD_BITS_PER_PIXEL_16_565:
-  case LCD_BITS_PER_PIXEL_12_444:
+  case LcdBitsPerPixel_16_555:
+  case LcdBitsPerPixel_16_565:
+  case LcdBitsPerPixel_12_444:
 
     WidthInBytes = Width * 2;
 
@@ -99,10 +99,10 @@ VideoCopyNoHorizontalOverlap (
     }
     break;
 
-  case LCD_BITS_PER_PIXEL_8:
-  case LCD_BITS_PER_PIXEL_4:
-  case LCD_BITS_PER_PIXEL_2:
-  case LCD_BITS_PER_PIXEL_1:
+  case LcdBitsPerPixel_8:
+  case LcdBitsPerPixel_4:
+  case LcdBitsPerPixel_2:
+  case LcdBitsPerPixel_1:
   default:
     // Can't handle this case
     DEBUG((DEBUG_ERROR, "ArmVeGraphics_Blt: EfiBltVideoToVideo: INVALID Number of Bits Per Pixel: %d\n", BitsPerPixel));
@@ -149,7 +149,7 @@ VideoCopyHorizontalOverlap (
 
   switch (BitsPerPixel) {
 
-  case LCD_BITS_PER_PIXEL_24:
+  case LcdBitsPerPixel_24:
     // Allocate a temporary buffer
 
     PixelBuffer32bit = (UINT32 *) AllocatePool((Height * Width) * sizeof(UINT32));
@@ -191,9 +191,9 @@ VideoCopyHorizontalOverlap (
     break;
 
 
-  case LCD_BITS_PER_PIXEL_16_555:
-  case LCD_BITS_PER_PIXEL_16_565:
-  case LCD_BITS_PER_PIXEL_12_444:
+  case LcdBitsPerPixel_16_555:
+  case LcdBitsPerPixel_16_565:
+  case LcdBitsPerPixel_12_444:
     // Allocate a temporary buffer
     PixelBuffer16bit = (UINT16 *) AllocatePool((Height * Width) * sizeof(UINT16));
 
@@ -236,10 +236,10 @@ VideoCopyHorizontalOverlap (
     break;
 
 
-  case LCD_BITS_PER_PIXEL_8:
-  case LCD_BITS_PER_PIXEL_4:
-  case LCD_BITS_PER_PIXEL_2:
-  case LCD_BITS_PER_PIXEL_1:
+  case LcdBitsPerPixel_8:
+  case LcdBitsPerPixel_4:
+  case LcdBitsPerPixel_2:
+  case LcdBitsPerPixel_1:
   default:
     // Can't handle this case
     DEBUG((DEBUG_ERROR, "ArmVeGraphics_Blt: EfiBltVideoToVideo: INVALID Number of Bits Per Pixel: %d\n", BitsPerPixel));
@@ -287,7 +287,7 @@ BltVideoFill (
   LcdPlatformGetBpp (This->Mode->Mode,&BitsPerPixel);
 
   switch (BitsPerPixel) {
-  case LCD_BITS_PER_PIXEL_24:
+  case LcdBitsPerPixel_24:
     WidthInBytes = Width * 4;
 
     // Copy the SourcePixel into every pixel inside the target rectangle
@@ -303,7 +303,7 @@ BltVideoFill (
     }
     break;
 
-  case LCD_BITS_PER_PIXEL_16_555:
+  case LcdBitsPerPixel_16_555:
     // Convert the EFI pixel at the start of the BltBuffer(0,0) into a video display pixel
     Pixel16bit = (UINT16) (
         ( (EfiSourcePixel->Red      <<  7) & PixelInformation->RedMask      )
@@ -330,7 +330,7 @@ BltVideoFill (
     }
     break;
 
-  case LCD_BITS_PER_PIXEL_16_565:
+  case LcdBitsPerPixel_16_565:
     // Convert the EFI pixel at the start of the BltBuffer(0,0) into a video display pixel
     Pixel16bit = (UINT16) (
         ( (EfiSourcePixel->Red      <<  8) & PixelInformation->RedMask      )
@@ -356,7 +356,7 @@ BltVideoFill (
     }
     break;
 
-  case LCD_BITS_PER_PIXEL_12_444:
+  case LcdBitsPerPixel_12_444:
     // Convert the EFI pixel at the start of the BltBuffer(0,0) into a video display pixel
     Pixel16bit = (UINT16) (
         ( (EfiSourcePixel->Red      >> 4) & PixelInformation->RedMask      )
@@ -382,10 +382,10 @@ BltVideoFill (
     }
     break;
 
-  case LCD_BITS_PER_PIXEL_8:
-  case LCD_BITS_PER_PIXEL_4:
-  case LCD_BITS_PER_PIXEL_2:
-  case LCD_BITS_PER_PIXEL_1:
+  case LcdBitsPerPixel_8:
+  case LcdBitsPerPixel_4:
+  case LcdBitsPerPixel_2:
+  case LcdBitsPerPixel_1:
   default:
     // Can't handle this case
     DEBUG((DEBUG_ERROR, "LcdGraphicsBlt: EfiBltVideoFill: INVALID Number of Bits Per Pixel: %d\n", BitsPerPixel));
@@ -443,7 +443,7 @@ BltVideoToBltBuffer (
   LcdPlatformGetBpp (This->Mode->Mode,&BitsPerPixel);
 
   switch (BitsPerPixel) {
-  case LCD_BITS_PER_PIXEL_24:
+  case LcdBitsPerPixel_24:
     WidthInBytes = Width * 4;
 
     // Access each line inside the Video Memory
@@ -460,7 +460,7 @@ BltVideoToBltBuffer (
     }
     break;
 
-  case LCD_BITS_PER_PIXEL_16_555:
+  case LcdBitsPerPixel_16_555:
     // Access each pixel inside the Video Memory
     for (SourceLine = SourceY, DestinationLine = DestinationY;
          SourceLine < SourceY + Height;
@@ -487,7 +487,7 @@ BltVideoToBltBuffer (
     }
     break;
 
-  case LCD_BITS_PER_PIXEL_16_565:
+  case LcdBitsPerPixel_16_565:
     // Access each pixel inside the Video Memory
     for (SourceLine = SourceY, DestinationLine = DestinationY;
          SourceLine < SourceY + Height;
@@ -515,7 +515,7 @@ BltVideoToBltBuffer (
     }
     break;
 
-  case LCD_BITS_PER_PIXEL_12_444:
+  case LcdBitsPerPixel_12_444:
     // Access each pixel inside the Video Memory
     for (SourceLine = SourceY, DestinationLine = DestinationY;
          SourceLine < SourceY + Height;
@@ -542,10 +542,10 @@ BltVideoToBltBuffer (
     }
     break;
 
-  case LCD_BITS_PER_PIXEL_8:
-  case LCD_BITS_PER_PIXEL_4:
-  case LCD_BITS_PER_PIXEL_2:
-  case LCD_BITS_PER_PIXEL_1:
+  case LcdBitsPerPixel_8:
+  case LcdBitsPerPixel_4:
+  case LcdBitsPerPixel_2:
+  case LcdBitsPerPixel_1:
   default:
     // Can't handle this case
     DEBUG((DEBUG_ERROR, "LcdGraphicsBlt: EfiBltVideoToBltBuffer: INVALID Number of Bits Per Pixel: %d\n", BitsPerPixel));
@@ -601,7 +601,7 @@ BltBufferToVideo (
   LcdPlatformGetBpp (This->Mode->Mode,&BitsPerPixel);
 
   switch (BitsPerPixel) {
-  case LCD_BITS_PER_PIXEL_24:
+  case LcdBitsPerPixel_24:
     WidthInBytes = Width * 4;
 
     // Access each pixel inside the BltBuffer Memory
@@ -618,7 +618,7 @@ BltBufferToVideo (
     }
     break;
 
-  case LCD_BITS_PER_PIXEL_16_555:
+  case LcdBitsPerPixel_16_555:
     // Access each pixel inside the BltBuffer Memory
     for (SourceLine = SourceY, DestinationLine = DestinationY;
        SourceLine < SourceY + Height;
@@ -645,7 +645,7 @@ BltBufferToVideo (
     }
     break;
 
-  case LCD_BITS_PER_PIXEL_16_565:
+  case LcdBitsPerPixel_16_565:
     // Access each pixel inside the BltBuffer Memory
     for (SourceLine = SourceY, DestinationLine = DestinationY;
          SourceLine < SourceY + Height;
@@ -672,7 +672,7 @@ BltBufferToVideo (
     }
     break;
 
-  case LCD_BITS_PER_PIXEL_12_444:
+  case LcdBitsPerPixel_12_444:
     // Access each pixel inside the BltBuffer Memory
     for (SourceLine = SourceY, DestinationLine = DestinationY;
          SourceLine < SourceY + Height;
@@ -699,10 +699,10 @@ BltBufferToVideo (
     }
     break;
 
-  case LCD_BITS_PER_PIXEL_8:
-  case LCD_BITS_PER_PIXEL_4:
-  case LCD_BITS_PER_PIXEL_2:
-  case LCD_BITS_PER_PIXEL_1:
+  case LcdBitsPerPixel_8:
+  case LcdBitsPerPixel_4:
+  case LcdBitsPerPixel_2:
+  case LcdBitsPerPixel_1:
   default:
     // Can't handle this case
     DEBUG((DEBUG_ERROR, "LcdGraphicsBlt: EfiBltBufferToVideo: INVALID Number of Bits Per Pixel: %d\n", BitsPerPixel));

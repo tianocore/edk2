@@ -1,6 +1,6 @@
 /** @file
 
- Copyright (c) 2011-2018, ARM Ltd. All rights reserved.<BR>
+ Copyright (c) 2011-2020, Arm Limited. All rights reserved.<BR>
  SPDX-License-Identifier: BSD-2-Clause-Patent
 
  **/
@@ -197,14 +197,15 @@
   Register
 **/
 typedef enum {
-  LCD_BITS_PER_PIXEL_1 = 0,
-  LCD_BITS_PER_PIXEL_2,
-  LCD_BITS_PER_PIXEL_4,
-  LCD_BITS_PER_PIXEL_8,
-  LCD_BITS_PER_PIXEL_16_555,
-  LCD_BITS_PER_PIXEL_24,
-  LCD_BITS_PER_PIXEL_16_565,
-  LCD_BITS_PER_PIXEL_12_444
+  LcdBitsPerPixel_1 = 0,
+  LcdBitsPerPixel_2,
+  LcdBitsPerPixel_4,
+  LcdBitsPerPixel_8,
+  LcdBitsPerPixel_16_555,
+  LcdBitsPerPixel_24,
+  LcdBitsPerPixel_16_565,
+  LcdBitsPerPixel_12_444,
+  LcdBitsPerPixel_Max
 } LCD_BPP;
 
 // Display timing settings.
