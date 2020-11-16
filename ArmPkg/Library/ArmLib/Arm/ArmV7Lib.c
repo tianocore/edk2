@@ -71,3 +71,15 @@ ArmCleanDataCache (
   ArmDataSynchronizationBarrier ();
   ArmV7DataCacheOperation (ArmCleanDataCacheEntryBySetWay);
 }
+
+BOOLEAN
+EFIAPI
+ArmIsCcidxImplemented (
+  VOID
+  )
+{
+  UINTN Mmfr4;
+
+  Mmfr4 = ArmReadIdMmfr4 ();
+  return (((Mmfr4 >> 24) & 0xF) == 1) ? TRUE : FALSE;
+}

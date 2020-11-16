@@ -132,6 +132,12 @@ ArmIsArchTimerImplemented (
   VOID
   );
 
+BOOLEAN
+EFIAPI
+ArmIsCcidxImplemented (
+  VOID
+  );
+
 UINTN
 EFIAPI
 ArmReadIdPfr0 (
