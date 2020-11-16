@@ -61,7 +61,13 @@ CPSRRead (
   VOID
   );
 
-UINT32
+/** Reads the CCSIDR_EL1 for the specified cache.
+
+  @param CSSELR The CSSELR_EL1 cache selection register value
+
+  @return The contents of the CCSIDR_EL1 register for the specified cache.
+**/
+UINTN
 ReadCCSIDR (
   IN UINT32 CSSELR
   );
