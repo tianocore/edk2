@@ -74,7 +74,18 @@
   ## Size of the packet filter
   gEmulatorPkgTokenSpaceGuid.PcdNetworkPacketFilterSize|524288|UINT32|0x0000101c
 
-
+  ## Platform level Redfish Service control PCD
+  # These PCDs are used to stop the Redfish sevice when secure boot is disabled
+  # or exit boot service.
+  gEmulatorPkgTokenSpaceGuid.PcdRedfishServieStopIfSecureBootDisabled|TRUE|BOOLEAN|0x00001020
+  gEmulatorPkgTokenSpaceGuid.PcdRedfishServieStopIfExitbootService|TRUE|BOOLEAN|0x00001021
+  ##
+  # edk2 Redfish implementation on Emulator package is designed to access
+  # to Redfish simulator.
+  # https://github.com/DMTF/Redfish-Profile-Simulator
+  # The user ID and password are fixed as below.
+  gEmulatorPkgTokenSpaceGuid.PcdRedfishServieUserId|"admin"|VOID*|0x00001022
+  gEmulatorPkgTokenSpaceGuid.PcdRedfishServiePassword|"pwd123456"|VOID*|0x00001023
 
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   gEmulatorPkgTokenSpaceGuid.PcdEmuBootMode|1|UINT32|0x00001006
