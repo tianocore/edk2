@@ -15,7 +15,6 @@
 #include <PrmDataBuffer.h>
 #include <PrmExportDescriptor.h>
 #include <PrmMmio.h>
-#include <PrmOsServices.h>
 
 /**
   Macro that provides a condensed form of a PRM Handler.
