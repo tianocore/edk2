@@ -32,7 +32,6 @@
 [LibraryClasses]
   BaseLib
   MtrrLib
-  PrintLib
   UefiDriverEntryPoint
   UefiLib
 
