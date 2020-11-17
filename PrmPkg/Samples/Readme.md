@@ -21,7 +21,7 @@ Note that the build command does provide the option to build a specific module i
 faster build time. If you would like to just build a single PRM module that can be done by specifying the path to
 the module INF file with the "-m" argument to `build`. For example, this command builds 32-bit and 64-bit binaries
 with Visual Studio 2019: \
-``build -p PrmPkg/PrmPkg.dsc -m PrmPkg/Samples/PrmSamplePrintModule/PrmSamplePrintModule.inf -a IA32 -a X64 -t VS2019``
+``build -p PrmPkg/PrmPkg.dsc -m PrmPkg/Samples/PrmSampleContextBufferModule/PrmSampleContextBufferModule.inf -a IA32 -a X64 -t VS2019``
 
 ## PRM Sample Module User's Guide
 
@@ -33,77 +33,6 @@ It is recommended that all PRM authors write a similar set of documentation for 
 and interact with their PRM modules.
 
 ---
-### Module: PRM Sample Print Module
->* Name: `PrmSamplePrintModule`
->* GUID: `1652b3c2-a7a1-46ac-af93-dd6dee446669`
-> * Purpose:
->   * Simplest PRM module example
->   * Example of a PRM module with multiple PRM handlers
-
-**Handlers:**
-#### Handler: PRM Handler 1
-* Name: `PrmHandler1`
-* GUID: `d5f2ad5f-a347-4d3e-87bc-c2ce63029cc8`
-* Actions:
-  * Use an OS-provided function pointer (pointer at the beginning of the parameter buffer) to write the message
-    “PRM1 handler sample message!”
-
-* Parameter Buffer Required: Yes
-* Parameter Buffer Contents:
-  ```c
-  typedef struct {
-
-    PRM_OS_SERVICE_DEBUG_PRINT *
-
-  } SAMPLE_OSDEBUGPRINT_PARAMETER_BUFFER;
-  ```
-
-* Context Buffer Required: No
-
-* Runtime MMIO Range(s) Required: No
-
-#### Handler: PRM Handler 2
-* Name: `PrmHandler2`
-* GUID: `a9e7adc3-8cd0-429a-8915-10946ebde318`
-* Actions:
-  * Use an OS-provided function pointer (pointer at the beginning of the parameter buffer) to write the message
-    “PRM2 handler sample message!”
-
-* Parameter Buffer Required: Yes
-* Parameter Buffer Contents:
-  ```c
-  typedef struct {
-
-    PRM_OS_SERVICE_DEBUG_PRINT *
-
-  } SAMPLE_OSDEBUGPRINT_PARAMETER_BUFFER;
-  ```
-
-* Context Buffer Required: No
-
-* Runtime MMIO Range(s) Required: No
-
-#### Handler: PRM Handler N
-* Name: `PrmHandlerN`
-* GUID: `b688c214-4081-4eeb-8d26-1eb5a3bcf11a`
-* Actions:
-  * Use an OS-provided function pointer (pointer at the beginning of the parameter buffer) to write the message
-    “PRMN handler sample message!”
-
-* Parameter Buffer Required: Yes
-* Parameter Buffer Contents:
-  ```c
-  typedef struct {
-
-    PRM_OS_SERVICE_DEBUG_PRINT *
-
-  } SAMPLE_OSDEBUGPRINT_PARAMETER_BUFFER;
-  ```
-
-* Context Buffer Required: No
-
-* Runtime MMIO Range(s) Required: No
-
 ### Module: PRM Sample ACPI Parameter Buffer
 >* Name: `PrmSampleAcpiParameterBufferModule`
 >* GUID: `dc2a58a6-5927-4776-b995-d118a27335a2`
