@@ -141,14 +141,6 @@
   #
   $(PLATFORM_PACKAGE)/Application/PrmInfo/PrmInfo.inf
 
-  #
-  # The SampleMemoryAllocationModule was used during a time in the POC when the OS
-  # provided memory allocation services. This module was successful in using those services.
-  # Since OS services have been removed (aside from debug prints), this module is no longer
-  # relevant but kept around for archival purposes.
-  #
-  #$(PLATFORM_PACKAGE)/Samples/PrmSampleMemoryAllocationModule/PrmSampleMemoryAllocationModule.inf
-
 [BuildOptions]
 # Force deprecated interfaces off
   *_*_*_CC_FLAGS = -D DISABLE_NEW_DEPRECATED_INTERFACES
