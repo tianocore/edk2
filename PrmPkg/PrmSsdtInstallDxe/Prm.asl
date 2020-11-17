@@ -25,11 +25,6 @@ DefinitionBlock (
             Name (_CID, "80860223")
             Name (_DDN, "PRM Test Device")
 
-            // PrmSamplePrintModule handler GUIDs
-            Name (BUF1, ToUUID("d5f2ad5f-a347-4d3e-87bc-c2ce63029cc8"))
-            Name (BUF2, ToUUID("a9e7adc3-8cd0-429a-8915-10946ebde318"))
-            Name (BUFN, ToUUID("b688c214-4081-4eeb-8d26-1eb5a3bcf11a"))
-
             //PRM operation region format
             OperationRegion (PRMR, PlatformRtMechanism, 0, 1)
             Field (PRMR, BufferAcc, NoLock, Preserve) //Make it ByteAcc for parameter validation

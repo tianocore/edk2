@@ -128,7 +128,6 @@
   #
   # PRM Sample Modules
   #
-  $(PLATFORM_PACKAGE)/Samples/PrmSamplePrintModule/PrmSamplePrintModule.inf
   $(PLATFORM_PACKAGE)/Samples/PrmSampleAcpiParameterBufferModule/PrmSampleAcpiParameterBufferModule.inf
   $(PLATFORM_PACKAGE)/Samples/PrmSampleHardwareAccessModule/PrmSampleHardwareAccessModule.inf {
     <LibraryClasses>
