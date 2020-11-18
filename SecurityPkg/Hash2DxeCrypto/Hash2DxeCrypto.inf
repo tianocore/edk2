@@ -4,7 +4,7 @@
 #  This module will use EDKII crypto library to HASH2 protocol.
 #
 #  (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
-#  Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2015 - 2020, Intel Corporation. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -44,8 +44,6 @@
   UefiLib
 
 [Guids]
-  gEfiHashAlgorithmMD5Guid              ## CONSUMES               ## GUID
-  gEfiHashAlgorithmSha1Guid             ## CONSUMES               ## GUID
   gEfiHashAlgorithmSha256Guid           ## CONSUMES               ## GUID
   gEfiHashAlgorithmSha384Guid           ## CONSUMES               ## GUID
   gEfiHashAlgorithmSha512Guid           ## CONSUMES               ## GUID
