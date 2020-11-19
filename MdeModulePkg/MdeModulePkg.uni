@@ -1160,6 +1160,12 @@
                                                                                            "Note:<BR>"
                                                                                            "If Both Capsule In Ram and Capsule On Disk are provisioned at the same time, the Capsule On Disk will be bypassed."
 
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdFwVolDxeMaxEncapsulationDepth_PROMPT #language en-US "Maximum permitted FwVol section nesting depth (exclusive)."
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdFwVolDxeMaxEncapsulationDepth_HELP   #language en-US "Maximum permitted encapsulation levels of sections in a firmware volume,<BR>"
+                                                                                                   "in the DXE phase. Minimum value is 1. Sections nested more deeply are<BR>"
+                                                                                                   "rejected."
+
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdCapsuleInRamSupport_PROMPT  #language en-US "Enable Capsule In Ram support"
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdCapsuleInRamSupport_HELP  #language en-US   "Capsule In Ram is to use memory to deliver the capsules that will be processed after system reset.<BR><BR>"
