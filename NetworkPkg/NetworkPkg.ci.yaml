@@ -3,6 +3,7 @@
 #
 # Copyright (c) Microsoft Corporation
 # Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+# (C) Copyright 2020 Hewlett Packard Enterprise Development LP<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 {
@@ -71,6 +72,7 @@
         "BLD_*_NETWORK_IP4_ENABLE": "TRUE",
         "BLD_*_NETWORK_IP6_ENABLE": "TRUE",
         "BLD_*_NETWORK_TLS_ENABLE": "TRUE",
+        "BLD_*_NETWORK_HTTP_ENABLE": "FALSE",
         "BLD_*_NETWORK_HTTP_BOOT_ENABLE": "TRUE",
         "BLD_*_NETWORK_ISCSI_ENABLE": "TRUE",
     }
