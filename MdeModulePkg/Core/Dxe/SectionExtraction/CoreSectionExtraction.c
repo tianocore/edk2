@@ -952,8 +952,8 @@ CreateChildNode (
                                  search.
   @param  SearchType             Indicates the type of section to search for.
   @param  SectionInstance        Indicates which instance of section to find.
-                                 This is an in/out parameter to deal with
-                                 recursions.
+                                 This is an in/out parameter and it is 1-based,
+                                 to deal with recursions.
   @param  SectionDefinitionGuid  Guid of section definition
   @param  FoundChild             Output indicating the child node that is found.
   @param  FoundStream            Output indicating which section stream the child
@@ -987,6 +987,8 @@ FindChildNode (
   UINT32                                        NextChildOffset;
   EFI_STATUS                                    ErrorStatus;
   EFI_STATUS                                    Status;
+
+  ASSERT (*SectionInstance > 0);
 
   CurrentChildNode = NULL;
   ErrorStatus = EFI_NOT_FOUND;
@@ -1037,6 +1039,11 @@ FindChildNode (
       }
     }
 
+    //
+    // Type mismatch, or we haven't found the desired instance yet.
+    //
+    ASSERT (*SectionInstance > 0);
+
     if (CurrentChildNode->EncapsulatedStreamHandle != NULL_STREAM_HANDLE) {
       //
       // If the current node is an encapsulating node, recurse into it...
@@ -1050,16 +1057,20 @@ FindChildNode (
                 &RecursedFoundStream,
                 AuthenticationStatus
                 );
-      //
-      // If the status is not EFI_SUCCESS, just save the error code and continue
-      // to find the request child node in the rest stream.
-      //
       if (*SectionInstance == 0) {
+        //
+        // The recursive FindChildNode() call decreased (*SectionInstance) to
+        // zero.
+        //
         ASSERT_EFI_ERROR (Status);
         *FoundChild = RecursedChildNode;
         *FoundStream = RecursedFoundStream;
         return EFI_SUCCESS;
       } else {
+        //
+        // If the status is not EFI_SUCCESS, just save the error code and
+        // continue to find the request child node in the rest stream.
+        //
         ErrorStatus = Status;
       }
     } else if ((CurrentChildNode->Type == EFI_SECTION_GUID_DEFINED) && (SearchType != EFI_SECTION_GUID_DEFINED)) {
