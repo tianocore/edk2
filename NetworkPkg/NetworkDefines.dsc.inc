@@ -15,12 +15,14 @@
 #   DEFINE NETWORK_IP4_ENABLE             = TRUE
 #   DEFINE NETWORK_IP6_ENABLE             = TRUE
 #   DEFINE NETWORK_TLS_ENABLE             = TRUE
+#   DEFINE NETWORK_HTTP_ENABLE            = FALSE
 #   DEFINE NETWORK_HTTP_BOOT_ENABLE       = TRUE
 #   DEFINE NETWORK_ALLOW_HTTP_CONNECTIONS = FALSE
 #   DEFINE NETWORK_ISCSI_ENABLE           = FALSE
 #   DEFINE NETWORK_VLAN_ENABLE            = TRUE
 #
 # Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+# (C) Copyright 2020 Hewlett Packard Enterprise Development LP<BR>
 #
 #    SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -73,9 +75,20 @@
   DEFINE NETWORK_TLS_ENABLE = TRUE
 !endif
 
+!ifndef NETWORK_HTTP_ENABLE
+  #
+  # This flag is to enable or disable HTTP(S) feature.
+  # The default is set to FALSE to not affecting the existing
+  # platforms.
+  # NETWORK_HTTP_ENABLE set to FALSE is not affecting NETWORK_HTTP_BOOT_ENABLE
+  # when NETWORK_HTTP_BOOT_ENABLE is TRUE.
+  DEFINE NETWORK_HTTP_ENABLE = FALSE
+!endif
+
 !ifndef NETWORK_HTTP_BOOT_ENABLE
   #
   # This flag is to enable or disable HTTP(S) boot feature.
+  #
   #
   DEFINE NETWORK_HTTP_BOOT_ENABLE = TRUE
 !endif
@@ -112,7 +125,9 @@
     !error "Must enable at least IP4 or IP6 stack if NETWORK_ENABLE is set to TRUE!"
   !endif
 
-  !if ($(NETWORK_HTTP_BOOT_ENABLE) == TRUE) AND ($(NETWORK_TLS_ENABLE) == FALSE) AND ($(NETWORK_ALLOW_HTTP_CONNECTIONS) == FALSE)
-    !error "Must enable TLS to support HTTPS, or allow unsecured HTTP connection, if NETWORK_HTTP_BOOT_ENABLE is set to TRUE!"
+  !if ($(NETWORK_HTTP_BOOT_ENABLE) == TRUE) OR ($(NETWORK_HTTP_ENABLE) == TRUE)
+    !if ($(NETWORK_TLS_ENABLE) == FALSE) AND ($(NETWORK_ALLOW_HTTP_CONNECTIONS) == FALSE)
+      !error "Must enable TLS to support HTTPS, or allow unsecured HTTP connection, if NETWORK_HTTP_BOOT_ENABLE or NETWORK_HTTP_ENABLE is set to TRUE!"
+    !endif
   !endif
 !endif
