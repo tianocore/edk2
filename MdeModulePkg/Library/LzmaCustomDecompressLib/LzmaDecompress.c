@@ -127,6 +127,10 @@ GetDecodedSizeOfBuf(
                           in DestinationSize and the size of the scratch
                           buffer was returned in ScratchSize.
 
+  @retval RETURN_UNSUPPORTED  DestinationSize cannot be output because the
+                              uncompressed buffer size (in bytes) does not fit
+                              in a UINT32. Output parameters have not been
+                              modified.
 **/
 RETURN_STATUS
 EFIAPI
@@ -142,6 +146,9 @@ LzmaUefiDecompressGetInfo (
   ASSERT(SourceSize >= LZMA_HEADER_SIZE);
 
   DecodedSize = GetDecodedSizeOfBuf((UINT8*)Source);
+  if (DecodedSize > MAX_UINT32) {
+    return RETURN_UNSUPPORTED;
+  }
 
   *DestinationSize = (UINT32)DecodedSize;
   *ScratchSize = SCRATCH_BUFFER_REQUEST_SIZE;
