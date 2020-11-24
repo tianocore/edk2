@@ -155,6 +155,10 @@ XenPvBlockFrontInitialization (
   ASSERT (NodeName != NULL);
 
   Dev = AllocateZeroPool (sizeof (XEN_BLOCK_FRONT_DEVICE));
+  if (Dev == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
   Dev->Signature = XEN_BLOCK_FRONT_SIGNATURE;
   Dev->NodeName = NodeName;
   Dev->XenBusIo = XenBusIo;
