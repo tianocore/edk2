@@ -349,7 +349,8 @@ MiscInitialization (
   // Determine platform type and save Host Bridge DID to PCD
   //
   switch (mHostBridgeDevId) {
-    case 0x1275: // BHYVE
+    case 0x7432: // BHYVE (AMD hostbridge)
+    case 0x1275: // BHYVE (Intel hostbridge)
     case INTEL_82441_DEVICE_ID:
       PmCmd      = POWER_MGMT_REGISTER_PIIX4 (PCI_COMMAND_OFFSET);
       Pmba       = POWER_MGMT_REGISTER_PIIX4 (PIIX4_PMBA);
