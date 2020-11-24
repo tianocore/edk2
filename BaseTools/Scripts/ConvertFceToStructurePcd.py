@@ -370,7 +370,7 @@ class PATH(object):
   def __init__(self,path):
     self.path=path
     self.rootdir=self.get_root_dir()
-    self.usefuldir=[]
+    self.usefuldir=set()
     self.lstinf = {}
     for path in self.rootdir:
       for o_root, o_dir, o_file in os.walk(os.path.join(path, "OUTPUT"), topdown=True, followlinks=False):
@@ -381,7 +381,7 @@ class PATH(object):
               for LST in l_file:
                 if os.path.splitext(LST)[1] == '.lst':
                   self.lstinf[os.path.join(l_root, LST)] = os.path.join(o_root, INF)
-                  self.usefuldir.append(path)
+                  self.usefuldir.add(path)
 
   def get_root_dir(self):
     rootdir=[]
@@ -410,7 +410,7 @@ class PATH(object):
 
   def header(self,struct):
     header={}
-    head_re = re.compile('typedef.*} %s;[\n]+(.*?)(?:typedef|formset)'%struct,re.M|re.S)
+    head_re = re.compile('typedef.*} %s;[\n]+(.*)(?:typedef|formset)'%struct,re.M|re.S)
     head_re2 = re.compile(r'#line[\s\d]+"(\S+h)"')
     for i in list(self.lstinf.keys()):
       with open(i,'r') as lst:
@@ -421,9 +421,21 @@ class PATH(object):
         if head:
           format = head[0].replace('\\\\','/').replace('\\','/')
           name =format.split('/')[-1]
-          head = self.makefile(name).replace('\\','/')
-          header[struct] = head
+          head = self.headerfileset.get(name)
+          if head:
+            head = head.replace('\\','/')
+            header[struct] = head
     return header
+  @property
+  def headerfileset(self):
+    headerset = dict()
+    for root,dirs,files in os.walk(self.path):
+      for file in files:
+        if os.path.basename(file) == 'deps.txt':
+          with open(os.path.join(root,file),"r") as fr:
+            for line in fr.readlines():
+              headerset[os.path.basename(line).strip()] = line.strip()
+    return headerset
 
   def makefile(self,filename):
     re_format = re.compile(r'DEBUG_DIR.*(?:\S+Pkg)\\(.*\\%s)'%filename)
@@ -433,6 +445,7 @@ class PATH(object):
       dir = re_format.findall(read)
       if dir:
         return dir[0]
+    return None
 
 class mainprocess(object):
 
@@ -479,7 +492,7 @@ class mainprocess(object):
               WARNING.append("Warning: No <HeaderFiles> for struct %s"%struct)
               title2 = '%s%s|{0}|%s|0xFCD00000{\n <HeaderFiles>\n  %s\n <Packages>\n%s\n}\n' % (PCD_NAME, c_name, struct, '', self.LST.package()[self.lst_dict[lstfile]])
             header_list.append(title2)
-          else:
+          elif struct not in lst._ignore:
             struct_dict ={}
             print("ERROR: Struct %s can't found in lst file" %struct)
             ERRORMSG.append("ERROR: Struct %s can't found in lst file" %struct)
