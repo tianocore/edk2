@@ -1177,6 +1177,10 @@
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdSdMmcGenericTimeoutValue_HELP   #language en-US "Indicates the default timeout value for SD/MMC Host Controller operations in microseconds."
 
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdPrioritizeInternal_PROMPT #language en-US "Enable booting from internal devices before external devices."
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdPrioritizeInternal_HELP   #language en-US "Indicates the if internal devices will be prioritized in boot order."
+
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdCodRelocationDevPath_PROMPT  #language en-US "Capsule On Disk relocation device path."
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdCodRelocationDevPath_HELP  #language en-US   "Full device path of platform specific device to store Capsule On Disk temp relocation file.<BR>"
