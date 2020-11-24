@@ -2108,6 +2108,9 @@
   # @ValidList  0x80000001 | 0
   gEfiMdeModulePkgTokenSpaceGuid.PcdLoadFixAddressSmmCodePageNumber|0|UINT32|0x0000002c
 
+  # Prioritise Internal Devices
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPrioritizeInternal
+
 [PcdsDynamic, PcdsDynamicEx]
   ## This dynamic PCD hold an address to point to private data structure used in DxeS3BootScriptLib library
   #  instance which records the S3 boot script table start address, length, etc. To introduce this PCD is
