@@ -31,3 +31,12 @@ steps:
 
 - script: git branch
   displayName: test git env3
+
+- script: git diff --name-only HEAD..refs/remotes/origin/HEAD
+  displayName: test git env4
+
+- script: git diff --name-only HEAD..refs/remotes/origin/master
+  displayName: test git env5
+
+- script: git diff --name-only HEAD..origin/master
+  displayName: test git env6
