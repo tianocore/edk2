@@ -1,7 +1,7 @@
 /** @file
   MADT table parser
 
-  Copyright (c) 2016 - 2020, ARM Limited. All rights reserved.
+  Copyright (c) 2016 - 2020, Arm Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -13,6 +13,9 @@
 
 #include <IndustryStandard/Acpi.h>
 #include <Library/UefiLib.h>
+#if defined(MDE_CPU_ARM) || defined(MDE_CPU_AARCH64)
+#include <Library/ArmLib.h>
+#endif
 #include "AcpiParser.h"
 #include "AcpiTableParser.h"
 #include "AcpiViewConfig.h"
@@ -22,6 +25,11 @@
 STATIC CONST UINT8* MadtInterruptControllerType;
 STATIC CONST UINT8* MadtInterruptControllerLength;
 STATIC ACPI_DESCRIPTION_HEADER_INFO AcpiHdrInfo;
+
+#if defined(MDE_CPU_ARM) || defined(MDE_CPU_AARCH64)
+STATIC UINT64 BootMpidr;
+STATIC BOOLEAN HasBootCpuGicc = FALSE;
+#endif
 
 /**
   This function validates the System Vector Base in the GICD.
@@ -96,6 +104,33 @@ ValidateSpeOverflowInterrupt (
 }
 
 /**
+  This function validates that the GICC structure contains an entry for
+  the Boot CPU.
+
+  @param [in] Ptr     Pointer to the start of the field data.
+  @param [in] Context Pointer to context specific information e.g. this
+                      could be a pointer to the ACPI table header.
+**/
+STATIC
+VOID
+EFIAPI
+ValidateBootMpidr (
+  IN UINT8* Ptr,
+  IN VOID*  Context
+  )
+{
+#if defined(MDE_CPU_ARM) || defined(MDE_CPU_AARCH64)
+  UINT64 CurrentMpidr;
+
+  CurrentMpidr = *(UINT64*)Ptr;
+
+  if (CurrentMpidr == BootMpidr) {
+    HasBootCpuGicc = TRUE;
+  }
+#endif
+}
+
+/**
   An ACPI_PARSER array describing the GICC Interrupt Controller Structure.
 **/
 STATIC CONST ACPI_PARSER GicCParser[] = {
@@ -115,7 +150,7 @@ STATIC CONST ACPI_PARSER GicCParser[] = {
   {L"GICH", 8, 48, L"0x%lx", NULL, NULL, NULL, NULL},
   {L"VGIC Maintenance interrupt", 4, 56, L"0x%x", NULL, NULL, NULL, NULL},
   {L"GICR Base Address", 8, 60, L"0x%lx", NULL, NULL, NULL, NULL},
-  {L"MPIDR", 8, 68, L"0x%lx", NULL, NULL, NULL, NULL},
+  {L"MPIDR", 8, 68, L"0x%lx", NULL, NULL, ValidateBootMpidr, NULL},
   {L"Processor Power Efficiency Class", 1, 76, L"0x%x", NULL, NULL, NULL,
    NULL},
   {L"Reserved", 1, 77, L"0x%x", NULL, NULL, NULL, NULL},
@@ -233,6 +268,11 @@ ParseAcpiMadt (
   UINT32 Offset;
   UINT8* InterruptContollerPtr;
   UINT32 GICDCount;
+
+#if defined(MDE_CPU_ARM) || defined(MDE_CPU_AARCH64)
+  BootMpidr = ArmReadMpidr () &
+              (ARM_CORE_AFF0 | ARM_CORE_AFF1 | ARM_CORE_AFF2 | ARM_CORE_AFF3);
+#endif
 
   GICDCount = 0;
 
@@ -371,4 +411,14 @@ ParseAcpiMadt (
     InterruptContollerPtr += *MadtInterruptControllerLength;
     Offset += *MadtInterruptControllerLength;
   } // while
+
+#if defined(MDE_CPU_ARM) || defined(MDE_CPU_AARCH64)
+  if (!HasBootCpuGicc) {
+    IncrementErrorCount ();
+    Print (
+      L"ERROR: No GICC present for Boot CPU (MPIDR: 0x%lx)",
+      BootMpidr
+      );
+  }
+#endif
 }
