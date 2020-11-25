@@ -1,7 +1,7 @@
 /** @file
 Elf32 Convert solution
 
-Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2021, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2013, ARM Ltd. All rights reserved.<BR>
 Portions Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 
@@ -143,8 +143,7 @@ InitializeElf32 (
     return FALSE;
   }
   if (!((mEhdr->e_machine == EM_386) || (mEhdr->e_machine == EM_ARM) || (mEhdr->e_machine == EM_RISCV))) {
-    Error (NULL, 0, 3000, "Unsupported", "ELF e_machine is not Elf32 machine.");
-    return FALSE;
+    Warning (NULL, 0, 3000, "Unsupported", "ELF e_machine is not Elf32 machine.");
   }
   if (mEhdr->e_version != EV_CURRENT) {
     Error (NULL, 0, 3000, "Unsupported", "ELF e_version (%u) not EV_CURRENT (%d)", (unsigned) mEhdr->e_version, EV_CURRENT);
