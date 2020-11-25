@@ -1,7 +1,7 @@
 /** @file
   Application for Hash Primitives Validation.
 
-Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2020, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -21,10 +21,11 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8 *HashData = "abc";
 //
 // Result for MD5("abc"). (From "A.5 Test suite" of IETF RFC1321)
 //
+#ifdef ENABLE_MD5_DEPRECATED_INTERFACES
 GLOBAL_REMOVE_IF_UNREFERENCED CONST UINT8 Md5Digest[MD5_DIGEST_SIZE] = {
   0x90, 0x01, 0x50, 0x98, 0x3c, 0xd2, 0x4f, 0xb0, 0xd6, 0x96, 0x3f, 0x7d, 0x28, 0xe1, 0x7f, 0x72
-
   };
+#endif
 
 //
 // Result for SHA-1("abc"). (From "A.1 SHA-1 Example" of NIST FIPS 180-2)
@@ -107,7 +108,9 @@ typedef struct {
   VOID                       *HashCtx;
 } HASH_TEST_CONTEXT;
 
+#ifdef ENABLE_MD5_DEPRECATED_INTERFACES
 HASH_TEST_CONTEXT       mMd5TestCtx    = {MD5_DIGEST_SIZE,    Md5GetContextSize,    Md5Init,    Md5Update,    Md5Final,    Md5HashAll,    Md5Digest};
+#endif
 HASH_TEST_CONTEXT       mSha1TestCtx   = {SHA1_DIGEST_SIZE,   Sha1GetContextSize,   Sha1Init,   Sha1Update,   Sha1Final,   Sha1HashAll,   Sha1Digest};
 HASH_TEST_CONTEXT       mSha256TestCtx = {SHA256_DIGEST_SIZE, Sha256GetContextSize, Sha256Init, Sha256Update, Sha256Final, Sha256HashAll, Sha256Digest};
 HASH_TEST_CONTEXT       mSha384TestCtx = {SHA384_DIGEST_SIZE, Sha384GetContextSize, Sha384Init, Sha384Update, Sha384Final, Sha384HashAll, Sha384Digest};
@@ -187,7 +190,9 @@ TEST_DESC mHashTest[] = {
     //
     // -----Description----------------Class---------------------Function---------------Pre------------------Post------------Context
     //
+#ifdef ENABLE_MD5_DEPRECATED_INTERFACES
     {"TestVerifyMd5()",    "CryptoPkg.BaseCryptLib.Hash",   TestVerifyHash, TestVerifyHashPreReq, TestVerifyHashCleanUp, &mMd5TestCtx},
+#endif
     {"TestVerifySha1()",   "CryptoPkg.BaseCryptLib.Hash",   TestVerifyHash, TestVerifyHashPreReq, TestVerifyHashCleanUp, &mSha1TestCtx},
     {"TestVerifySha256()", "CryptoPkg.BaseCryptLib.Hash",   TestVerifyHash, TestVerifyHashPreReq, TestVerifyHashCleanUp, &mSha256TestCtx},
     {"TestVerifySha384()", "CryptoPkg.BaseCryptLib.Hash",   TestVerifyHash, TestVerifyHashPreReq, TestVerifyHashCleanUp, &mSha384TestCtx},
