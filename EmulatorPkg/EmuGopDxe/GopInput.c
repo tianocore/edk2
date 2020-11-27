@@ -283,7 +283,7 @@ EmuGopSimpleTextInExResetEx (
 /*++
 
   Routine Description:
-    Reset the input device and optionaly run diagnostics
+    Reset the input device and optionally run diagnostics
 
   Arguments:
     This                 - Protocol instance pointer.

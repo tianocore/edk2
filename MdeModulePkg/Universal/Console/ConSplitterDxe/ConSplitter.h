@@ -1251,7 +1251,7 @@ ConSplitterTextOutDeleteDevice (
 //
 
 /**
-  Reset the input device and optionaly run diagnostics
+  Reset the input device and optionally run diagnostics
 
   @param  This                     Protocol instance pointer.
   @param  ExtendedVerification     Driver may perform diagnostics on reset.
@@ -1325,7 +1325,7 @@ ConSplitterTextInExDeleteDevice (
 //
 
 /**
-  Reset the input device and optionaly run diagnostics
+  Reset the input device and optionally run diagnostics
 
   @param  This                     Protocol instance pointer.
   @param  ExtendedVerification     Driver may perform diagnostics on reset.
@@ -1482,7 +1482,7 @@ ConSplitterTextInPrivateReadKeyStroke (
   );
 
 /**
-  Reset the input device and optionaly run diagnostics
+  Reset the input device and optionally run diagnostics
 
   @param  This                     Protocol instance pointer.
   @param  ExtendedVerification     Driver may perform diagnostics on reset.
@@ -1541,7 +1541,7 @@ ConSplitterSimplePointerWaitForInput (
 //
 
 /**
-  Reset the text output device hardware and optionaly run diagnostics
+  Reset the text output device hardware and optionally run diagnostics
 
   @param  This                     Protocol instance pointer.
   @param  ExtendedVerification     Driver may perform more exhaustive verfication
