@@ -9,7 +9,7 @@
 ##
 
 [Defines]
-  INF_VERSION                    = 0x00010005
+  INF_VERSION                    = 1.29
   BASE_NAME                      = BhyveFwCtlLib
   FILE_GUID                      = fd982666-67f9-11e5-a42a-0025908602f6
   MODULE_TYPE                    = BASE
@@ -35,7 +35,6 @@
   BaseLib
   BaseMemoryLib
   DebugLib
+  IntrinsicLib
   IoLib
   MemoryAllocationLib
-  IntrinsicLib
-
