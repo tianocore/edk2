@@ -13,14 +13,13 @@
 #define _SMBIOS_PLATFORM_DXE_H_
 
 #include <PiDxe.h>
-
 #include <Protocol/Smbios.h>
 #include <IndustryStandard/SmBios.h>
-#include <Library/DebugLib.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
-#include <Library/UefiBootServicesTableLib.h>
+#include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/UefiBootServicesTableLib.h>
 
 
 /**
@@ -49,4 +48,4 @@ IsEntryPointStructureValid (
   IN SMBIOS_TABLE_ENTRY_POINT  *EntryPointStructure
   );
 
-#endif
+#endif /* _SMBIOS_PLATFORM_DXE_H_ */

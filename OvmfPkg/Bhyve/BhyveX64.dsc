@@ -17,7 +17,7 @@
   PLATFORM_NAME                  = Bhyve
   PLATFORM_GUID                  = 562b76ee-ceb2-4f4f-adfe-a4c8dc46e4ff
   PLATFORM_VERSION               = 0.1
-  DSC_SPECIFICATION              = 0x00010005
+  DSC_SPECIFICATION              = 1.30
   OUTPUT_DIRECTORY               = Build/BhyveX64
   SUPPORTED_ARCHITECTURES        = X64
   BUILD_TARGETS                  = NOOPT|DEBUG|RELEASE
