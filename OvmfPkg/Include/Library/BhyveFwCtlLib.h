@@ -8,8 +8,8 @@
 
 **/
 
-#ifndef __BHYVE_FW_CTL_LIB__
-#define __BHYVE_FW_CTL_LIB__
+#ifndef _BHYVE_FW_CTL_LIB_
+#define _BHYVE_FW_CTL_LIB_
 
 /**
   Sysctl-like interface to read host information via a dot-separated
@@ -29,19 +29,19 @@
   @param[]  Data    - return buffer pointer
   @param[]  Size    - pointer to length
 
-  @return    RETURN_SUCCESS          Valid data/len returned.
-          RETURN_UNSUPPORTED        f/w interface not present.
-          RETURN_NOT_FOUND      OID not found.
-        RETURN_BUFFER_TOO_SMALL      Return message truncated.
-        RETURN_INVALID_PARAMETER  Buffer too large
-        RETURN_PROTOCOL_ERROR     Unknown error from host
+  @return RETURN_SUCCESS           Valid data/len returned.
+          RETURN_UNSUPPORTED       f/w interface not present.
+          RETURN_NOT_FOUND         OID not found.
+          RETURN_BUFFER_TOO_SMALL  Return message truncated.
+          RETURN_INVALID_PARAMETER Buffer too large.
+          RETURN_PROTOCOL_ERROR    Unknown error from host.
  **/
 RETURN_STATUS
 EFIAPI
 BhyveFwCtlGet (
-  IN   CONST CHAR8    *Name,
-  OUT  VOID        *Item,
-  IN OUT  UINTN        *Size
+  IN   CONST CHAR8  *Name,
+  OUT  VOID         *Item,
+  IN OUT  UINTN     *Size
   );
 
-#endif
+#endif /* _BHYVE_FW_CTL_LIB_ */
