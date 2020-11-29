@@ -11,7 +11,7 @@
 ##
 
 [Defines]
-  INF_VERSION                    = 0x00010005
+  INF_VERSION                    = 1.29
   BASE_NAME                      = PlatformPei
   FILE_GUID                      = aa89d903-345b-4ab2-9abf-030b5efb5d50
   MODULE_TYPE                    = PEIM
@@ -51,15 +51,15 @@
   DebugLib
   HobLib
   IoLib
+  LocalApicLib
+  MemEncryptSevLib
+  MtrrLib
   PciLib
-  ResourcePublicationLib
+  PeimEntryPoint
   PeiServicesLib
   PeiServicesTablePointerLib
-  PeimEntryPoint
-  MtrrLib
-  MemEncryptSevLib
   PcdLib
-  LocalApicLib
+  ResourcePublicationLib
 
 [Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfPeiMemFvBase
