@@ -1,0 +1,18 @@
+// *++
+//
+// Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2015, Hisilicon Limited. All rights reserved.<BR>
+// Copyright (c) 2015, Linaro Limited. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// Based on files under Nt32Pkg/MiscSubClassPlatformDxe/
+// --*/
+
+/=#
+
+#string STR_MISC_BIOS_VENDOR           #language en-US  "Not Specified"
+#string STR_MISC_BIOS_VERSION          #language en-US  "Not Specified"
+#string STR_MISC_BIOS_RELEASE_DATE     #language en-US  "Not Specified"
+#string STR_MISC_BIOS_VENDOR           #language en-US  "Not Specified"
+#string STR_MISC_BIOS_RELEASE_DATE     #language en-US  "01/01/2020"
