@@ -245,10 +245,10 @@ QemuCpuhpCollectApicIds (
     if ((CpuStatus & QEMU_CPUHP_STAT_INSERT) != 0) {
       //
       // The "insert" event guarantees the "enabled" status; plus it excludes
-      // the "remove" event.
+      // the "fw_remove" event.
       //
       if ((CpuStatus & QEMU_CPUHP_STAT_ENABLED) == 0 ||
-          (CpuStatus & QEMU_CPUHP_STAT_REMOVE) != 0) {
+          (CpuStatus & QEMU_CPUHP_STAT_FW_REMOVE) != 0) {
         DEBUG ((DEBUG_ERROR, "%a: CurrentSelector=%u CpuStatus=0x%x: "
           "inconsistent CPU status\n", __FUNCTION__, CurrentSelector,
           CpuStatus));
@@ -260,12 +260,31 @@ QemuCpuhpCollectApicIds (
 
       ExtendIds   = PluggedApicIds;
       ExtendCount = PluggedCount;
-    } else if ((CpuStatus & QEMU_CPUHP_STAT_REMOVE) != 0) {
-      DEBUG ((DEBUG_VERBOSE, "%a: CurrentSelector=%u: remove\n", __FUNCTION__,
+    } else if ((CpuStatus & QEMU_CPUHP_STAT_FW_REMOVE) != 0) {
+      //
+      // "fw_remove" event guarantees "enabled".
+      //
+      if ((CpuStatus & QEMU_CPUHP_STAT_ENABLED) == 0) {
+        DEBUG ((DEBUG_ERROR, "%a: CurrentSelector=%u CpuStatus=0x%x: "
+          "inconsistent CPU status\n", __FUNCTION__, CurrentSelector,
+          CpuStatus));
+        return EFI_PROTOCOL_ERROR;
+      }
+
+      DEBUG ((DEBUG_VERBOSE, "%a: CurrentSelector=%u: fw_remove\n", __FUNCTION__,
         CurrentSelector));
 
       ExtendIds   = ToUnplugApicIds;
       ExtendCount = ToUnplugCount;
+    } else if ((CpuStatus & QEMU_CPUHP_STAT_REMOVE) != 0) {
+      //
+      // Let the OSPM deal with the "remove" event.
+      //
+      DEBUG ((DEBUG_INFO, "%a: CurrentSelector=%u: remove (ignored)\n", __FUNCTION__,
+        CurrentSelector));
+
+      CurrentSelector++;
+      continue;
     } else {
       DEBUG ((DEBUG_VERBOSE, "%a: CurrentSelector=%u: no event\n",
         __FUNCTION__, CurrentSelector));
