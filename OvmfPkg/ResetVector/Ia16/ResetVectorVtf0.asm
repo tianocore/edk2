@@ -48,6 +48,25 @@ TIMES (15 - ((guidedStructureEnd - guidedStructureStart + 15) % 16)) DB 0
 guidedStructureStart:
 
 ;
+; SEV Secret block
+;
+; This describes the guest ram area where the hypervisor should
+; inject the secret.  The data format is:
+;
+; base physical address (32 bit word)
+; table length (32 bit word)
+;
+; GUID (SEV secret block): 4c2eb361-7d9b-4cc3-8081-127c90d3d294
+;
+sevSecretBlockStart:
+    DD      SEV_LAUNCH_SECRET_BASE
+    DD      SEV_LAUNCH_SECRET_SIZE
+    DW      sevSecretBlockEnd - sevSecretBlockStart
+    DB      0x61, 0xB3, 0x2E, 0x4C, 0x9B, 0x7D, 0xC3, 0x4C
+    DB      0x80, 0x81, 0x12, 0x7C, 0x90, 0xD3, 0xD2, 0x94
+sevSecretBlockEnd:
+
+;
 ; SEV-ES Processor Reset support
 ;
 ; sevEsResetBlock:
