@@ -30,6 +30,12 @@ QemuCpuhpReadCpuStatus (
   IN CONST EFI_MM_CPU_IO_PROTOCOL *MmCpuIo
   );
 
+VOID
+QemuCpuhpWriteCpuStatus (
+  IN CONST EFI_MM_CPU_IO_PROTOCOL *MmCpuIo,
+  IN UINT8                        CpuStatus
+  );
+
 UINT32
 QemuCpuhpReadCommandData (
   IN CONST EFI_MM_CPU_IO_PROTOCOL *MmCpuIo
