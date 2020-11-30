@@ -62,122 +62,29 @@ STATIC UINT32 mPostSmmPenAddress;
 //
 STATIC EFI_HANDLE mDispatchHandle;
 
-
 /**
-  CPU Hotplug MMI handler function.
+  CPU Hotplug handler function.
 
-  This is a root MMI handler.
+  @param[in] mPluggedApicIds     List of APIC IDs to be plugged.
 
-  @param[in] DispatchHandle      The unique handle assigned to this handler by
-                                 EFI_MM_SYSTEM_TABLE.MmiHandlerRegister().
+  @param[in] PluggedCount        Count of APIC IDs to be plugged.
 
-  @param[in] Context             Context passed in by
-                                 EFI_MM_SYSTEM_TABLE.MmiManage(). Due to
-                                 CpuHotplugMmi() being a root MMI handler,
-                                 Context is ASSERT()ed to be NULL.
+  @retval EFI_SUCCESS            Some of the requested APIC IDs were hot-plugged.
 
-  @param[in,out] CommBuffer      Ignored, due to CpuHotplugMmi() being a root
-                                 MMI handler.
+  @retval EFI_INTERRUPT_PENDING  Fatal error while hot-plugging.
 
-  @param[in,out] CommBufferSize  Ignored, due to CpuHotplugMmi() being a root
-                                 MMI handler.
-
-  @retval EFI_SUCCESS                       The MMI was handled and the MMI
-                                            source was quiesced. When returned
-                                            by a non-root MMI handler,
-                                            EFI_SUCCESS terminates the
-                                            processing of MMI handlers in
-                                            EFI_MM_SYSTEM_TABLE.MmiManage().
-                                            For a root MMI handler (i.e., for
-                                            the present function too),
-                                            EFI_SUCCESS behaves identically to
-                                            EFI_WARN_INTERRUPT_SOURCE_QUIESCED,
-                                            as further root MMI handlers are
-                                            going to be called by
-                                            EFI_MM_SYSTEM_TABLE.MmiManage()
-                                            anyway.
-
-  @retval EFI_WARN_INTERRUPT_SOURCE_QUIESCED  The MMI source has been quiesced,
-                                              but other handlers should still
-                                              be called.
-
-  @retval EFI_WARN_INTERRUPT_SOURCE_PENDING   The MMI source is still pending,
-                                              and other handlers should still
-                                              be called.
-
-  @retval EFI_INTERRUPT_PENDING               The MMI source could not be
-                                              quiesced.
 **/
 STATIC
 EFI_STATUS
 EFIAPI
-CpuHotplugMmi (
-  IN EFI_HANDLE DispatchHandle,
-  IN CONST VOID *Context        OPTIONAL,
-  IN OUT VOID   *CommBuffer     OPTIONAL,
-  IN OUT UINTN  *CommBufferSize OPTIONAL
+PlugCpus(
+  IN APIC_ID                      *mPluggedApicIds,
+  IN UINT32                       PluggedCount
   )
 {
   EFI_STATUS Status;
-  UINT8      ApmControl;
-  UINT32     PluggedCount;
-  UINT32     ToUnplugCount;
   UINT32     PluggedIdx;
   UINT32     NewSlot;
-
-  //
-  // Assert that we are entering this function due to our root MMI handler
-  // registration.
-  //
-  ASSERT (DispatchHandle == mDispatchHandle);
-  //
-  // When MmiManage() is invoked to process root MMI handlers, the caller (the
-  // MM Core) is expected to pass in a NULL Context. MmiManage() then passes
-  // the same NULL Context to individual handlers.
-  //
-  ASSERT (Context == NULL);
-  //
-  // Read the MMI command value from the APM Control Port, to see if this is an
-  // MMI we should care about.
-  //
-  Status = mMmCpuIo->Io.Read (mMmCpuIo, MM_IO_UINT8, ICH9_APM_CNT, 1,
-                          &ApmControl);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: failed to read ICH9_APM_CNT: %r\n", __FUNCTION__,
-      Status));
-    //
-    // We couldn't even determine if the MMI was for us or not.
-    //
-    goto Fatal;
-  }
-
-  if (ApmControl != ICH9_APM_CNT_CPU_HOTPLUG) {
-    //
-    // The MMI is not for us.
-    //
-    return EFI_WARN_INTERRUPT_SOURCE_QUIESCED;
-  }
-
-  //
-  // Collect the CPUs with pending events.
-  //
-  Status = QemuCpuhpCollectApicIds (
-             mMmCpuIo,
-             mCpuHotPlugData->ArrayLength,     // PossibleCpuCount
-             mCpuHotPlugData->ArrayLength - 1, // ApicIdCount
-             mPluggedApicIds,
-             &PluggedCount,
-             mToUnplugApicIds,
-             &ToUnplugCount
-             );
-  if (EFI_ERROR (Status)) {
-    goto Fatal;
-  }
-  if (ToUnplugCount > 0) {
-    DEBUG ((DEBUG_ERROR, "%a: hot-unplug is not supported yet\n",
-      __FUNCTION__));
-    goto Fatal;
-  }
 
   //
   // Process hot-added CPUs.
@@ -263,12 +170,143 @@ CpuHotplugMmi (
   }
 
   //
-  // We've handled this MMI.
+  // We've handled this hotplug.
   //
   return EFI_SUCCESS;
 
 RevokeNewSlot:
   mCpuHotPlugData->ApicId[NewSlot] = MAX_UINT64;
+
+Fatal:
+  return EFI_INTERRUPT_PENDING;
+}
+
+/**
+  CPU Hotplug MMI handler function.
+
+  This is a root MMI handler.
+
+  @param[in] DispatchHandle      The unique handle assigned to this handler by
+                                 EFI_MM_SYSTEM_TABLE.MmiHandlerRegister().
+
+  @param[in] Context             Context passed in by
+                                 EFI_MM_SYSTEM_TABLE.MmiManage(). Due to
+                                 CpuHotplugMmi() being a root MMI handler,
+                                 Context is ASSERT()ed to be NULL.
+
+  @param[in,out] CommBuffer      Ignored, due to CpuHotplugMmi() being a root
+                                 MMI handler.
+
+  @param[in,out] CommBufferSize  Ignored, due to CpuHotplugMmi() being a root
+                                 MMI handler.
+
+  @retval EFI_SUCCESS                       The MMI was handled and the MMI
+                                            source was quiesced. When returned
+                                            by a non-root MMI handler,
+                                            EFI_SUCCESS terminates the
+                                            processing of MMI handlers in
+                                            EFI_MM_SYSTEM_TABLE.MmiManage().
+                                            For a root MMI handler (i.e., for
+                                            the present function too),
+                                            EFI_SUCCESS behaves identically to
+                                            EFI_WARN_INTERRUPT_SOURCE_QUIESCED,
+                                            as further root MMI handlers are
+                                            going to be called by
+                                            EFI_MM_SYSTEM_TABLE.MmiManage()
+                                            anyway.
+
+  @retval EFI_WARN_INTERRUPT_SOURCE_QUIESCED  The MMI source has been quiesced,
+                                              but other handlers should still
+                                              be called.
+
+  @retval EFI_WARN_INTERRUPT_SOURCE_PENDING   The MMI source is still pending,
+                                              and other handlers should still
+                                              be called.
+
+  @retval EFI_INTERRUPT_PENDING               The MMI source could not be
+                                              quiesced.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+CpuHotplugMmi (
+  IN EFI_HANDLE DispatchHandle,
+  IN CONST VOID *Context        OPTIONAL,
+  IN OUT VOID   *CommBuffer     OPTIONAL,
+  IN OUT UINTN  *CommBufferSize OPTIONAL
+  )
+{
+  EFI_STATUS Status;
+  UINT8      ApmControl;
+  UINT32     PluggedCount;
+  UINT32     ToUnplugCount;
+
+  //
+  // Assert that we are entering this function due to our root MMI handler
+  // registration.
+  //
+  ASSERT (DispatchHandle == mDispatchHandle);
+  //
+  // When MmiManage() is invoked to process root MMI handlers, the caller (the
+  // MM Core) is expected to pass in a NULL Context. MmiManage() then passes
+  // the same NULL Context to individual handlers.
+  //
+  ASSERT (Context == NULL);
+  //
+  // Read the MMI command value from the APM Control Port, to see if this is an
+  // MMI we should care about.
+  //
+  Status = mMmCpuIo->Io.Read (mMmCpuIo, MM_IO_UINT8, ICH9_APM_CNT, 1,
+                          &ApmControl);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: failed to read ICH9_APM_CNT: %r\n", __FUNCTION__,
+      Status));
+    //
+    // We couldn't even determine if the MMI was for us or not.
+    //
+    goto Fatal;
+  }
+
+  if (ApmControl != ICH9_APM_CNT_CPU_HOTPLUG) {
+    //
+    // The MMI is not for us.
+    //
+    return EFI_WARN_INTERRUPT_SOURCE_QUIESCED;
+  }
+
+  //
+  // Collect the CPUs with pending events.
+  //
+  Status = QemuCpuhpCollectApicIds (
+             mMmCpuIo,
+             mCpuHotPlugData->ArrayLength,     // PossibleCpuCount
+             mCpuHotPlugData->ArrayLength - 1, // ApicIdCount
+             mPluggedApicIds,
+             &PluggedCount,
+             mToUnplugApicIds,
+             &ToUnplugCount
+             );
+  if (EFI_ERROR (Status)) {
+    goto Fatal;
+  }
+  if (ToUnplugCount > 0) {
+    DEBUG ((DEBUG_ERROR, "%a: hot-unplug is not supported yet\n",
+      __FUNCTION__));
+    goto Fatal;
+  }
+
+  if (PluggedCount > 0) {
+    Status = PlugCpus(mPluggedApicIds, PluggedCount);
+  }
+
+  if (EFI_ERROR(Status)) {
+    goto Fatal;
+  }
+
+  //
+  // We've handled this MMI.
+  //
+  return EFI_SUCCESS;
 
 Fatal:
   ASSERT (FALSE);
