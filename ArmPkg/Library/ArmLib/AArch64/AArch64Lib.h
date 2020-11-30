@@ -35,5 +35,11 @@ ArmCleanInvalidateDataCacheEntryBySetWay (
   IN  UINTN   SetWayFormat
   );
 
+UINTN
+EFIAPI
+ArmReadIdMmfr2 (
+  VOID
+  );
+
 #endif // __AARCH64_LIB_H__
 
