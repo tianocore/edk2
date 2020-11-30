@@ -613,6 +613,7 @@
   OvmfPkg/PlatformPei/PlatformPei.inf
   UefiCpuPkg/Universal/Acpi/S3Resume2Pei/S3Resume2Pei.inf
   UefiCpuPkg/CpuMpPei/CpuMpPei.inf
+  OvmfPkg/AmdSev/SecretPei/SecretPei.inf
 
 !if $(TPM_ENABLE) == TRUE
   OvmfPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf
