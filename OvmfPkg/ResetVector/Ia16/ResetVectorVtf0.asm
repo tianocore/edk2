@@ -26,20 +26,39 @@ ALIGN   16
 %endif
 
 ;
+; Padding to ensure first guid starts at 0xffffffd0
+;
+TIMES (15 - ((guidedStructureEnd - guidedStructureStart + 15) % 16)) DB 0
+
+; GUIDed structure.  To traverse this you should first verify the
+; presence of the table footer guid
+; (96b582de-1fb2-45f7-baea-a366c55a082d) at 0xffffffd0.  If that
+; is found, the two bytes at 0xffffffce are the entire table length.
+;
+; The table is composed of structures with the form:
+;
+; Data (arbitrary bytes identified by guid)
+; length from start of data to end of guid (2 bytes)
+; guid (16 bytes)
+;
+; so work back from the footer using the length to traverse until you
+; either find the guid you're looking for or run off the beginning of
+; the table.
+;
+guidedStructureStart:
+
+;
 ; SEV-ES Processor Reset support
 ;
 ; sevEsResetBlock:
 ;   For the initial boot of an AP under SEV-ES, the "reset" RIP must be
-;   programmed to the RAM area defined by SEV_ES_AP_RESET_IP. A known offset
-;   and GUID will be used to locate this block in the firmware and extract
-;   the build time RIP value. The GUID must always be 48 bytes from the
-;   end of the firmware.
+;   programmed to the RAM area defined by SEV_ES_AP_RESET_IP. The data
+;   format is:
 ;
-;   0xffffffca (-0x36) - IP value
-;   0xffffffcc (-0x34) - CS segment base [31:16]
-;   0xffffffce (-0x32) - Size of the SEV-ES reset block
-;   0xffffffd0 (-0x30) - SEV-ES reset block GUID
-;                        (00f771de-1a7e-4fcb-890e-68c77e2fb44e)
+;   IP value [0:15]
+;   CS segment base [31:16]
+;
+;   GUID (SEV-ES reset block): 00f771de-1a7e-4fcb-890e-68c77e2fb44e
 ;
 ;   A hypervisor reads the CS segement base and IP value. The CS segment base
 ;   value represents the high order 16-bits of the CS segment base, so the
@@ -48,14 +67,24 @@ ALIGN   16
 ;   program the EIP register with the IP value as read.
 ;
 
-TIMES (32 - (sevEsResetBlockEnd - sevEsResetBlockStart)) DB 0
-
 sevEsResetBlockStart:
     DD      SEV_ES_AP_RESET_IP
     DW      sevEsResetBlockEnd - sevEsResetBlockStart
     DB      0xDE, 0x71, 0xF7, 0x00, 0x7E, 0x1A, 0xCB, 0x4F
     DB      0x89, 0x0E, 0x68, 0xC7, 0x7E, 0x2F, 0xB4, 0x4E
 sevEsResetBlockEnd:
+
+;
+; Table footer:
+;
+; length of whole table (16 bit word)
+; GUID (table footer): 96b582de-1fb2-45f7-baea-a366c55a082d
+;
+    DW      guidedStructureEnd - guidedStructureStart
+    DB      0xDE, 0x82, 0xB5, 0x96, 0xB2, 0x1F, 0xF7, 0x45
+    DB      0xBA, 0xEA, 0xA3, 0x66, 0xC5, 0x5A, 0x08, 0x2D
+
+guidedStructureEnd:
 
 ALIGN   16
 
