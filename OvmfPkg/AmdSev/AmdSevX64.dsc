@@ -778,6 +778,7 @@
       gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize|FALSE
   }
 !endif
+  OvmfPkg/AmdSev/SecretDxe/SecretDxe.inf
   OvmfPkg/AmdSev/Grub/Grub.inf
 !if $(BUILD_SHELL) == TRUE
   ShellPkg/Application/Shell/Shell.inf {
