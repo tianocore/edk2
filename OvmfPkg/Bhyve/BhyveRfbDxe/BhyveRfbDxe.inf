@@ -10,7 +10,7 @@
 ##
 
 [Defines]
-  INF_VERSION                    = 0x00010005
+  INF_VERSION                    = 1.29
   BASE_NAME                      = EmuGopDxe
   FILE_GUID                      = 1b290126-5760-424e-8aa2-3faf4d0d7978
   MODULE_TYPE                    = UEFI_DRIVER
@@ -29,11 +29,10 @@
 
 [Sources]
   ComponentName.c
-  GopScreen.c
-  GopDriver.c
   Gop.h
+  GopDriver.c
+  GopScreen.c
   VbeShim.c
-
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -54,7 +53,6 @@
   UefiLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
-
 
 [Protocols]
   gEfiGraphicsOutputProtocolGuid   # PROTOCOL BY_START

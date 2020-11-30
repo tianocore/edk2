@@ -1,8 +1,9 @@
 /** @file
-  OVMF ACPI Platform Driver
+  bhyve ACPI Platform Driver
 
   Copyright (c) 2020, Rebecca Cran <rebecca@bsdio.com>
   Copyright (c) 2008 - 2012, Intel Corporation. All rights reserved.<BR>
+
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/

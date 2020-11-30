@@ -14,8 +14,8 @@
 #define _Platform_h_INCLUDED_
 
 #include <IndustryStandard/Acpi.h>
-#include <IndustryStandard/SerialPortConsoleRedirectionTable.h>
 #include <IndustryStandard/MemoryMappedConfigurationSpaceAccessTable.h>
+#include <IndustryStandard/SerialPortConsoleRedirectionTable.h>
 
 //
 // ACPI table information used to initialize tables.
