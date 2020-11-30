@@ -45,7 +45,7 @@
   # Include/Guid/ArmMpCoreInfo.h
   gArmMpCoreInfoGuid = { 0xa4ee0728, 0xe5d7, 0x4ac5,  {0xb2, 0x1e, 0x65, 0x8e, 0xd8, 0x57, 0xe8, 0x34} }
 
-  gFirmwareInfoHobGuid = { 0x78ba5a73, 0x04d0, 0x4adf, {0xb6, 0x14, 0x04, 0xa6, 0xa3, 0xd8, 0xa2, 0x57} }
+  gFirmwareVersionInfoHobGuid = { 0x78ba5a73, 0x04d0, 0x4adf, {0xb6, 0x14, 0x04, 0xa6, 0xa3, 0xd8, 0xa2, 0x57} }
 
 
 [Protocols.common]
@@ -117,6 +117,20 @@
   gArmTokenSpaceGuid.PcdArmPrimaryCoreMask|0xF03|UINT32|0x00000031
   # The Primary Core is ClusterId[0] & CoreId[0]
   gArmTokenSpaceGuid.PcdArmPrimaryCore|0|UINT32|0x00000037
+
+  #
+  # SMBIOS PCDs
+  #
+  gArmTokenSpaceGuid.PcdSystemProductName|L""|VOID*|0x30000053
+  gArmTokenSpaceGuid.PcdSystemVersion|L""|VOID*|0x30000054
+  gArmTokenSpaceGuid.PcdBaseBoardManufacturer|L""|VOID*|0x30000055
+  gArmTokenSpaceGuid.PcdBaseBoardProductName|L""|VOID*|0x30000056
+  gArmTokenSpaceGuid.PcdBaseBoardVersion|L""|VOID*|0x30000057
+  gArmTokenSpaceGuid.PcdProcessorManufacturer|L""|VOID*|0x30000071
+  gArmTokenSpaceGuid.PcdProcessorVersion|L""|VOID*|0x30000072
+  gArmTokenSpaceGuid.PcdProcessorSerialNumber|L""|VOID*|0x30000073
+  gArmTokenSpaceGuid.PcdProcessorAssetTag|L""|VOID*|0x30000074
+  gArmTokenSpaceGuid.PcdProcessorPartNumber|L""|VOID*|0x30000075
 
   #
   # ARM L2x0 PCDs
