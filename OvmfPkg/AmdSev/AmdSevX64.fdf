@@ -269,6 +269,7 @@ INF  MdeModulePkg/Universal/Disk/UdfDxe/UdfDxe.inf
 !if $(TOOL_CHAIN_TAG) != "XCODE5" && $(BUILD_SHELL) == TRUE
 INF  OvmfPkg/LinuxInitrdDynamicShellCommand/LinuxInitrdDynamicShellCommand.inf
 !endif
+INF OvmfPkg/AmdSev/SecretDxe/SecretDxe.inf
 INF  OvmfPkg/AmdSev/Grub/Grub.inf
 !if $(BUILD_SHELL) == TRUE
 INF  ShellPkg/Application/Shell/Shell.inf
