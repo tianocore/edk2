@@ -40,12 +40,12 @@ STATIC CONST CHAR8 mBhyveSig[4] = { 'B', 'H', 'Y', 'V' };
 
 STATIC BOOLEAN mBhyveFwCtlSupported = FALSE;
 
-STATIC INTN mBhyveFwCtlTxid = 0xa5;
+STATIC INT32 mBhyveFwCtlTxid = 0xa5;
 
 /* XXX Maybe a better inbuilt version of this ? */
 struct BIoVec {
   VOID        *Base;
-  UINTN        Len;
+  UINT32        Len;
 };
 
 struct MsgRxHdr {
@@ -86,14 +86,14 @@ BhyveFwCtl_CvtErr (
 }
 
 STATIC
-UINTN
+UINT32
 EFIAPI
 BIov_WLen (
    IN struct BIoVec b[]
    )
 {
-  UINTN        i;
-  UINTN        tLen;
+  UINT32        i;
+  UINT32        tLen;
 
   tLen = 0;
 
@@ -106,14 +106,14 @@ BIov_WLen (
 }
 
 /**
-   Utility to send 1-3 bhyes of input as a 4-byte value
+   Utility to send 1-3 bytes of input as a 4-byte value
    with trailing zeroes.
  **/
 STATIC
 UINT32
 BIov_Send_Rem (
    IN UINT32        *Data,
-   IN UINTN        Len
+   IN UINT32        Len
    )
 {
   union {
@@ -121,7 +121,7 @@ BIov_Send_Rem (
     UINT32    w;
   } u;
   UINT8        *cdata;
-  UINTN        i;
+  UINT32        i;
 
   cdata = (UINT8 *)Data;
   u.w = 0;
@@ -140,7 +140,7 @@ STATIC
 VOID
 BIov_Send (
   IN char    *Data,
-  IN UINTN    Len
+  IN UINT32    Len
   )
 {
   UINT32    *LData;
@@ -166,7 +166,7 @@ BIov_SendAll (
    IN  struct BIoVec b[]
    )
 {
-  INTN        i;
+  INT32        i;
 
   if (b != NULL) {
     for (i = 0; b[i].Base; i++) {
@@ -182,13 +182,13 @@ STATIC
 VOID
 EFIAPI
 BhyveFwCtl_MsgSend(
-   IN  UINTN    OpCode,
+   IN  UINT32    OpCode,
    IN  struct BIoVec Data[]
    )
 {
   struct BIoVec hIov[4];
   UINT32        Hdr[3];
-  UINTN         i;
+  UINT32         i;
 
   /* Set up header as an iovec */
   for (i = 0; i < 3; i++) {
@@ -200,7 +200,7 @@ BhyveFwCtl_MsgSend(
 
   /* Initialize header */
   Hdr[0] = BIov_WLen (hIov) + BIov_WLen (Data);
-  Hdr[1] = OpCode;
+  Hdr[1] = (UINT32)OpCode;
   Hdr[2] = mBhyveFwCtlTxid;
 
   /* Send header and data */
@@ -222,8 +222,8 @@ BhyveFwCtl_MsgRecv(
   RETURN_STATUS        Status;
   UINT32        *Dp;
   UINT32        Rd;
-  UINTN         remLen;
-  INTN            oLen, xLen;
+  UINT32         remLen;
+  INT32            oLen, xLen;
 
   Rd = IoRead32 (FW_PORT);
   if (Rd < sizeof(struct MsgRxHdr)) {
@@ -283,7 +283,7 @@ STATIC
 RETURN_STATUS
 EFIAPI
 BhyveFwCtl_Msg(
-   IN   UINTN    OpCode,
+   IN   UINT32    OpCode,
    IN   struct BIoVec Sdata[],
    OUT  struct BIoVec Rdata[]
    )
@@ -306,18 +306,18 @@ RETURN_STATUS
 EFIAPI
 BhyveFwCtlGetLen (
   IN   CONST CHAR8    *Name,
-  IN OUT  UINTN        *Size
+  IN OUT  UINT32        *Size
   )
 {
   struct BIoVec        Req[2], Resp[2];
   RETURN_STATUS        Status;
 
   Req[0].Base = (VOID *)Name;
-  Req[0].Len  = AsciiStrLen (Name) + 1;
+  Req[0].Len  = (UINT32)AsciiStrLen (Name) + 1;
   Req[1].Base = NULL;
 
   Resp[0].Base = Size;
-  Resp[0].Len  = sizeof(UINTN);
+  Resp[0].Len  = sizeof(UINT32);
   Resp[1].Base = NULL;
 
   Status = BhyveFwCtl_Msg (OP_GET_LEN, Req, Resp);
@@ -337,7 +337,7 @@ EFIAPI
 BhyveFwCtlGetVal (
   IN   CONST CHAR8    *Name,
   OUT  VOID        *Item,
-  IN OUT  UINTN        *Size
+  IN OUT  UINT32        *Size
   )
 {
   struct BIoVec        Req[2], Resp[2];
@@ -348,7 +348,7 @@ BhyveFwCtlGetVal (
       return RETURN_INVALID_PARAMETER;
 
   Req[0].Base = (VOID *)Name;
-  Req[0].Len  = AsciiStrLen(Name) + 1;
+  Req[0].Len  = (UINT32)AsciiStrLen(Name) + 1;
   Req[1].Base = NULL;
 
   Resp[0].Base = &FwGetvalBuf;
@@ -363,7 +363,7 @@ BhyveFwCtlGetVal (
    *     multiple iovecs.
    */
   if ((Status == RETURN_SUCCESS) || (Status == RETURN_BUFFER_TOO_SMALL)) {
-    *Size = FwGetvalBuf.fSize;
+    *Size = (UINT32)FwGetvalBuf.fSize;
     CopyMem (Item, FwGetvalBuf.fData, *Size);
   }
 
@@ -387,9 +387,9 @@ BhyveFwCtlGet (
     return RETURN_UNSUPPORTED;
 
   if (Item == NULL) {
-    Status = BhyveFwCtlGetLen (Name, Size);
+    Status = BhyveFwCtlGetLen (Name, (UINT32*)Size);
   } else {
-    Status = BhyveFwCtlGetVal (Name, Item, Size);
+    Status = BhyveFwCtlGetVal (Name, Item, (UINT32*)Size);
   }
 
   return Status;
@@ -406,7 +406,7 @@ BhyveFwCtlInitialize (
           VOID
          )
 {
-  UINTN        i;
+  UINT32        i;
   UINT8        ch;
 
   DEBUG ((DEBUG_INFO, "FwCtlInitialize\n"));
