@@ -12,27 +12,27 @@
 #include "Uefi.h"
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/BhyveFwCtlLib.h>
 #include <Library/DebugLib.h>
 #include <Library/IoLib.h>
-#include <Library/BhyveFwCtlLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 
-#define FW_PORT        0x510
-#define FW_IPORT    0x511
+#define FW_PORT    0x510
+#define FW_IPORT   0x511
 
 /* Transport protocol basic operations */
-#define OP_NULL        1
-#define OP_ECHO        2
-#define OP_GET        3
-#define OP_GET_LEN    4
-#define OP_SET        5
+#define OP_NULL      1
+#define OP_ECHO      2
+#define OP_GET       3
+#define OP_GET_LEN   4
+#define OP_SET       5
 
 /* Transport protocol error returns */
-#define T_ESUCCESS    0
+#define T_ESUCCESS  0
 #define T_ENOENT    2
-#define T_E2BIG        7
-#define T_EMSGSIZE    40
+#define T_E2BIG     7
+#define T_EMSGSIZE  40
 
 #define ROUNDUP(x, y) ((((x)+((y)-1))/(y))*(y))
 
@@ -43,24 +43,24 @@ STATIC BOOLEAN mBhyveFwCtlSupported = FALSE;
 STATIC INT32 mBhyveFwCtlTxid = 0xa5;
 
 /* XXX Maybe a better inbuilt version of this ? */
-struct BIoVec {
-  VOID        *Base;
-  UINT32        Len;
-};
+typedef struct {
+  VOID     *Base;
+  UINT32    Len;
+} BIO_VEC;
 
-struct MsgRxHdr {
+typedef struct {
   UINT32    Sz;
   UINT32    Op;
   UINT32    TxId;
   UINT32    Err;
-};
+} MSG_RX_HDR;
 
 STATIC
 RETURN_STATUS
 EFIAPI
 BhyveFwCtl_CvtErr (
-   IN UINT32    errno
-   )
+  IN UINT32    errno
+  )
 {
   RETURN_STATUS        Status;
 
@@ -89,8 +89,8 @@ STATIC
 UINT32
 EFIAPI
 BIov_WLen (
-   IN struct BIoVec b[]
-   )
+  IN BIO_VEC b[]
+  )
 {
   UINT32        i;
   UINT32        tLen;
@@ -112,9 +112,9 @@ BIov_WLen (
 STATIC
 UINT32
 BIov_Send_Rem (
-   IN UINT32        *Data,
-   IN UINT32        Len
-   )
+  IN UINT32  *Data,
+  IN UINT32   Len
+  )
 {
   union {
     UINT8    c[4];
@@ -140,7 +140,7 @@ STATIC
 VOID
 BIov_Send (
   IN char    *Data,
-  IN UINT32    Len
+  IN UINT32   Len
   )
 {
   UINT32    *LData;
@@ -163,7 +163,7 @@ BIov_Send (
 STATIC
 VOID
 BIov_SendAll (
-   IN  struct BIoVec b[]
+   IN BIO_VEC b[]
    )
 {
   INT32        i;
@@ -182,13 +182,13 @@ STATIC
 VOID
 EFIAPI
 BhyveFwCtl_MsgSend(
-   IN  UINT32    OpCode,
-   IN  struct BIoVec Data[]
-   )
+  IN  UINT32  OpCode,
+  IN  BIO_VEC  Data[]
+  )
 {
-  struct BIoVec hIov[4];
-  UINT32        Hdr[3];
-  UINT32         i;
+  BIO_VEC  hIov[4];
+  UINT32  Hdr[3];
+  UINT32  i;
 
   /* Set up header as an iovec */
   for (i = 0; i < 3; i++) {
@@ -215,18 +215,19 @@ STATIC
 RETURN_STATUS
 EFIAPI
 BhyveFwCtl_MsgRecv(
-   OUT  struct MsgRxHdr    *Rhdr,
-   OUT  struct BIoVec    Data[]
-   )
+  OUT  MSG_RX_HDR *Rhdr,
+  OUT  BIO_VEC    Data[]
+  )
 {
-  RETURN_STATUS        Status;
+  RETURN_STATUS  Status;
   UINT32        *Dp;
-  UINT32        Rd;
+  UINT32         Rd;
   UINT32         remLen;
-  INT32            oLen, xLen;
+  INT32          oLen;
+  INT32          xLen;
 
   Rd = IoRead32 (FW_PORT);
-  if (Rd < sizeof(struct MsgRxHdr)) {
+  if (Rd < sizeof (MSG_RX_HDR)) {
     ;
   }
 
@@ -237,9 +238,9 @@ BhyveFwCtl_MsgRecv(
   Rhdr->Err  = IoRead32 (FW_PORT);
 
   /* Convert transport errno into UEFI error status */
-  Status = BhyveFwCtl_CvtErr(Rhdr->Err);
+  Status = BhyveFwCtl_CvtErr (Rhdr->Err);
 
-  remLen = Rd - sizeof(struct MsgRxHdr);
+  remLen = Rd - sizeof (MSG_RX_HDR);
   xLen = 0;
 
   /*
@@ -258,7 +259,7 @@ BhyveFwCtl_MsgRecv(
     }
     while (remLen > 0) {
       *Dp++ = IoRead32 (FW_PORT);
-      remLen -= sizeof(UINT32);
+      remLen -= sizeof (UINT32);
     }
     Data[0].Len = oLen;
   } else {
@@ -272,7 +273,7 @@ BhyveFwCtl_MsgRecv(
   /* Drop additional data */
   while (xLen > 0) {
     (void) IoRead32 (FW_PORT);
-    xLen -= sizeof(UINT32);
+    xLen -= sizeof (UINT32);
   }
 
   return Status;
@@ -283,13 +284,13 @@ STATIC
 RETURN_STATUS
 EFIAPI
 BhyveFwCtl_Msg(
-   IN   UINT32    OpCode,
-   IN   struct BIoVec Sdata[],
-   OUT  struct BIoVec Rdata[]
+   IN   UINT32 OpCode,
+   IN   BIO_VEC Sdata[],
+   OUT  BIO_VEC Rdata[]
    )
 {
-  struct MsgRxHdr     Rh;
-  RETURN_STATUS        Status;
+  MSG_RX_HDR  Rh;
+  RETURN_STATUS    Status;
 
   Status = RETURN_SUCCESS;
 
@@ -305,19 +306,19 @@ STATIC
 RETURN_STATUS
 EFIAPI
 BhyveFwCtlGetLen (
-  IN   CONST CHAR8    *Name,
-  IN OUT  UINT32        *Size
+  IN CONST CHAR8  *Name,
+  IN OUT   UINT32 *Size
   )
 {
-  struct BIoVec        Req[2], Resp[2];
-  RETURN_STATUS        Status;
+  BIO_VEC         Req[2], Resp[2];
+  RETURN_STATUS  Status;
 
   Req[0].Base = (VOID *)Name;
   Req[0].Len  = (UINT32)AsciiStrLen (Name) + 1;
   Req[1].Base = NULL;
 
   Resp[0].Base = Size;
-  Resp[0].Len  = sizeof(UINT32);
+  Resp[0].Len  = sizeof (UINT32);
   Resp[1].Base = NULL;
 
   Status = BhyveFwCtl_Msg (OP_GET_LEN, Req, Resp);
@@ -335,24 +336,25 @@ STATIC
 RETURN_STATUS
 EFIAPI
 BhyveFwCtlGetVal (
-  IN   CONST CHAR8    *Name,
-  OUT  VOID        *Item,
-  IN OUT  UINT32        *Size
+  IN CONST CHAR8 *Name,
+  OUT      VOID  *Item,
+  IN OUT   UINT32   *Size
   )
 {
-  struct BIoVec        Req[2], Resp[2];
-  RETURN_STATUS        Status;
+  BIO_VEC         Req[2];
+  BIO_VEC         Resp[2];
+  RETURN_STATUS  Status;
 
   /* Make sure temp buffer is larger than passed-in size */
-  if (*Size > sizeof(FwGetvalBuf.fData))
+  if (*Size > sizeof (FwGetvalBuf.fData))
       return RETURN_INVALID_PARAMETER;
 
   Req[0].Base = (VOID *)Name;
-  Req[0].Len  = (UINT32)AsciiStrLen(Name) + 1;
+  Req[0].Len  = (UINT32)AsciiStrLen (Name) + 1;
   Req[1].Base = NULL;
 
   Resp[0].Base = &FwGetvalBuf;
-  Resp[0].Len  = sizeof(UINT64) + *Size;
+  Resp[0].Len  = sizeof (UINT64) + *Size;
   Resp[1].Base = NULL;
 
   Status = BhyveFwCtl_Msg (OP_GET, Req, Resp);
@@ -376,9 +378,9 @@ BhyveFwCtlGetVal (
 RETURN_STATUS
 EFIAPI
 BhyveFwCtlGet (
-  IN   CONST CHAR8    *Name,
+  IN   CONST CHAR8 *Name,
   OUT  VOID        *Item,
-  IN OUT  UINTN        *Size
+  IN OUT  UINTN    *Size
   )
 {
   RETURN_STATUS        Status;
@@ -403,11 +405,11 @@ BhyveFwCtlGet (
 RETURN_STATUS
 EFIAPI
 BhyveFwCtlInitialize (
-          VOID
-         )
+  VOID
+  )
 {
-  UINT32        i;
-  UINT8        ch;
+  UINT32  i;
+  UINT8   ch;
 
   DEBUG ((DEBUG_INFO, "FwCtlInitialize\n"));
 
