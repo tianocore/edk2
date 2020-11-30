@@ -6,8 +6,8 @@
 
 **/
 
-#ifndef __CMOS_H__
-#define __CMOS_H__
+#ifndef _CMOS_H_
+#define _CMOS_H_
 
 /**
   Reads 8-bits of CMOS data.
@@ -46,5 +46,5 @@ CmosWrite8 (
   );
 
 
-#endif
+#endif /* _CMOS_H_ */
 

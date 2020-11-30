@@ -8,7 +8,7 @@
 ##
 
 [Defines]
-  INF_VERSION                    = 0x00010005
+  INF_VERSION                    = 1.29
   BASE_NAME                      = AcpiPlatform
   FILE_GUID                      = D5F92408-BAB5-44CA-8A60-C212F01D7E9D
   MODULE_TYPE                    = DXE_DRIVER
@@ -24,9 +24,9 @@
 [Sources]
   AcpiPlatform.c
   AcpiPlatform.h
+  Bhyve.c
   EntryPoint.c
   PciDecoding.c
-  Bhyve.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -35,17 +35,17 @@
   UefiCpuPkg/UefiCpuPkg.dec
 
 [LibraryClasses]
-  UefiLib
-  PcdLib
+  BaseLib
   BaseMemoryLib
+  BhyveFwCtlLib
   DebugLib
+  DxeServicesTableLib
+  MemoryAllocationLib
+  OrderedCollectionLib
+  PcdLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
-  BhyveFwCtlLib
-  MemoryAllocationLib
-  BaseLib
-  DxeServicesTableLib
-  OrderedCollectionLib
+  UefiLib
 
 [Protocols]
   gEfiAcpiTableProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED

@@ -10,8 +10,8 @@
 #include "Platform.h"
 #include <Library/DebugLib.h>
 #include <Library/HobLib.h>
-#include <Library/PeiServicesLib.h>
 #include <Library/PcdLib.h>
+#include <Library/PeiServicesLib.h>
 
 
 /**
