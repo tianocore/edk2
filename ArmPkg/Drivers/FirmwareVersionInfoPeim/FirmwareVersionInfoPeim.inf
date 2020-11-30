@@ -1,0 +1,47 @@
+#/** @file
+#
+#    Copyright (c) 2020, NUVIA Inc. All rights reserved.
+#    Copyright (c) 2016, Hisilicon Limited. All rights reserved.
+#    Copyright (c) 2016, Linaro Limited. All rights reserved.
+#
+#    SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 1.29
+  BASE_NAME                      = FirmwareVersionInfoPeim
+  FILE_GUID                      = 3d45d0a0-4ded-4c01-b16f-2b3007c1fbe2
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = FirmwareVersionInfoEntry
+
+[Sources.common]
+  FirmwareVersionInfoPeim.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  HobLib
+  PcdLib
+  PeimEntryPoint
+  PrintLib
+  SerialPortLib
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString
+
+[Guids]
+  gFirmwareVersionInfoHobGuid
+
+[Depex]
+  TRUE
+
+[BuildOptions]
+
