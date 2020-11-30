@@ -67,6 +67,29 @@ QemuCpuhpReadCpuStatus (
   return CpuStatus;
 }
 
+UINT8
+QemuCpuhpWriteCpuStatus (
+  IN CONST EFI_MM_CPU_IO_PROTOCOL *MmCpuIo,
+  IN UINT8                        CpuStatus
+  )
+{
+  EFI_STATUS Status;
+
+  Status = MmCpuIo->Io.Write(
+                         MmCpuIo,
+                         MM_IO_UINT8,
+                         ICH9_CPU_HOTPLUG_BASE + QEMU_CPUHP_R_CPU_STAT,
+                         1,
+                         &CpuStatus
+                         );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: %r\n", __FUNCTION__, Status));
+    ASSERT (FALSE);
+    CpuDeadLoop ();
+  }
+  return Status;
+}
+
 UINT32
 QemuCpuhpReadCommandData (
   IN CONST EFI_MM_CPU_IO_PROTOCOL *MmCpuIo
