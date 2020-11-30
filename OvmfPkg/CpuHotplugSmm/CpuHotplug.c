@@ -52,6 +52,7 @@ STATIC CPU_HOT_PLUG_DATA *mCpuHotPlugData;
 //
 STATIC APIC_ID *mPluggedApicIds;
 STATIC APIC_ID *mToUnplugApicIds;
+STATIC UINT32  *mToUnplugSelector;
 //
 // Address of the non-SMRAM reserved memory page that contains the Post-SMM Pen
 // for hot-added CPUs.
@@ -289,6 +290,7 @@ CpuHotplugMmi (
              mPluggedApicIds,
              &PluggedCount,
              mToUnplugApicIds,
+             mToUnplugSelector,
              &ToUnplugCount
              );
   if (EFI_ERROR (Status)) {
@@ -333,7 +335,9 @@ CpuHotplugEntry (
   )
 {
   EFI_STATUS Status;
+  UINTN      Len;
   UINTN      Size;
+  UINTN      SizeSel;
 
   //
   // This module should only be included when SMM support is required.
@@ -387,8 +391,9 @@ CpuHotplugEntry (
   //
   // Allocate the data structures that depend on the possible CPU count.
   //
-  if (RETURN_ERROR (SafeUintnSub (mCpuHotPlugData->ArrayLength, 1, &Size)) ||
-      RETURN_ERROR (SafeUintnMult (sizeof (APIC_ID), Size, &Size))) {
+  if (RETURN_ERROR (SafeUintnSub (mCpuHotPlugData->ArrayLength, 1, &Len)) ||
+      RETURN_ERROR (SafeUintnMult (sizeof (APIC_ID), Len, &Size))||
+      RETURN_ERROR (SafeUintnMult (sizeof (UINT32), Len, &SizeSel))) {
     Status = EFI_ABORTED;
     DEBUG ((DEBUG_ERROR, "%a: invalid CPU_HOT_PLUG_DATA\n", __FUNCTION__));
     goto Fatal;
@@ -405,6 +410,12 @@ CpuHotplugEntry (
     DEBUG ((DEBUG_ERROR, "%a: MmAllocatePool(): %r\n", __FUNCTION__, Status));
     goto ReleasePluggedApicIds;
   }
+  Status = gMmst->MmAllocatePool (EfiRuntimeServicesData, SizeSel,
+                    (VOID **)&mToUnplugSelector);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: MmAllocatePool(): %r\n", __FUNCTION__, Status));
+    goto ReleaseToUnplugApicIds;
+  }
 
   //
   // Allocate the Post-SMM Pen for hot-added CPUs.
@@ -412,7 +423,7 @@ CpuHotplugEntry (
   Status = SmbaseAllocatePostSmmPen (&mPostSmmPenAddress,
              SystemTable->BootServices);
   if (EFI_ERROR (Status)) {
-    goto ReleaseToUnplugApicIds;
+    goto ReleaseToUnplugSelector;
   }
 
   //
@@ -471,6 +482,10 @@ CpuHotplugEntry (
 ReleasePostSmmPen:
   SmbaseReleasePostSmmPen (mPostSmmPenAddress, SystemTable->BootServices);
   mPostSmmPenAddress = 0;
+
+ReleaseToUnplugSelector:
+  gMmst->MmFreePool (mToUnplugSelector);
+  mToUnplugSelector = NULL;
 
 ReleaseToUnplugApicIds:
   gMmst->MmFreePool (mToUnplugApicIds);
