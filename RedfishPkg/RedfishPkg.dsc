@@ -43,5 +43,6 @@
 
 [Components]
   RedfishPkg/Library/PlatformHostInterfaceLibNull/PlatformHostInterfaceLibNull.inf
+  RedfishPkg/Library/JsonLib/JsonLib.inf
 
   !include RedfishPkg/Redfish.dsc.inc

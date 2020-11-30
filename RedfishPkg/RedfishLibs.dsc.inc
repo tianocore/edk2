@@ -11,5 +11,6 @@
 #
 ##
 !if $(REDFISH_ENABLE) == TRUE
+  JsonLib|RedfishPkg/Library/JsonLib/JsonLib.inf
 !endif
 
