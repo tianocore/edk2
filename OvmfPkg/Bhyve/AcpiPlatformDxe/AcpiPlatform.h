@@ -1,5 +1,5 @@
 /** @file
-  Sample ACPI Platform Driver
+  bhyve ACPI Platform Driver
 
   Copyright (c) 2020, Rebecca Cran <rebecca@bsdio.com>
   Copyright (c) 2008 - 2012, Intel Corporation. All rights reserved.<BR>
@@ -11,17 +11,14 @@
 #define _ACPI_PLATFORM_H_INCLUDED_
 
 #include <PiDxe.h>
-
 #include <Protocol/AcpiTable.h>
 #include <Protocol/FirmwareVolume2.h>
 #include <Protocol/PciIo.h>
-
 #include <Library/BaseLib.h>
-#include <Library/UefiBootServicesTableLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
+#include <Library/UefiBootServicesTableLib.h>
 #include <Library/XenPlatformLib.h>
-
 #include <IndustryStandard/Acpi.h>
 
 typedef struct {
@@ -73,5 +70,4 @@ RestorePciDecoding (
   IN UINTN               Count
   );
 
-#endif
-
+#endif /* _ACPI_PLATFORM_H_INCLUDED_ */

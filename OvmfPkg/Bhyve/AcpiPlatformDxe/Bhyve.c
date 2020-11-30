@@ -9,8 +9,8 @@
 #include "AcpiPlatform.h"
 
 #include <Library/BaseMemoryLib.h>
-#include <Library/MemoryAllocationLib.h>
 #include <Library/BhyveFwCtlLib.h>
+#include <Library/MemoryAllocationLib.h>
 
 STATIC
 EFI_STATUS
