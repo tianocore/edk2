@@ -49,5 +49,8 @@
   gEfiStandaloneMmNonSecureBufferGuid
   gEfiArmTfCpuDriverEpDescriptorGuid
 
+[Pcd]
+  gArmTokenSpaceGuid.PcdFfaEnable
+
 [BuildOptions]
   GCC:*_*_*_CC_FLAGS = -fpie
