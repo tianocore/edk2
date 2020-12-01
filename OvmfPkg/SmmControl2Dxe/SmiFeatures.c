@@ -29,6 +29,13 @@
 //
 #define ICH9_LPC_SMI_F_CPU_HOTPLUG BIT1
 
+// The following bit value stands for "enable CPU hot unplug, and inject an SMI
+// with control value ICH9_APM_CNT_CPU_HOT_UNPLUG upon hot unplug", in the
+// "etc/smi/supported-features" and "etc/smi/requested-features" fw_cfg files.
+// Can only be negotiated alongside ICH9_LPC_SMI_F_CPU_HOTPLUG.
+//
+#define ICH9_LPC_SMI_F_CPU_HOT_UNPLUG BIT2
+
 //
 // Provides a scratch buffer (allocated in EfiReservedMemoryType type memory)
 // for the S3 boot script fragment to write to and read from.
@@ -112,7 +119,8 @@ NegotiateSmiFeatures (
   QemuFwCfgReadBytes (sizeof mSmiFeatures, &mSmiFeatures);
 
   //
-  // We want broadcast SMI, SMI on CPU hotplug, and nothing else.
+  // We want broadcast SMI, SMI on CPU hotplug, on CPU hot-unplug
+  // and nothing else.
   //
   RequestedFeaturesMask = ICH9_LPC_SMI_F_BROADCAST;
   if (!MemEncryptSevIsEnabled ()) {
@@ -120,8 +128,18 @@ NegotiateSmiFeatures (
     // For now, we only support hotplug with SEV disabled.
     //
     RequestedFeaturesMask |= ICH9_LPC_SMI_F_CPU_HOTPLUG;
+    RequestedFeaturesMask |= ICH9_LPC_SMI_F_CPU_HOT_UNPLUG;
   }
   mSmiFeatures &= RequestedFeaturesMask;
+
+  if (!(mSmiFeatures & ICH9_LPC_SMI_F_CPU_HOTPLUG) &&
+      (mSmiFeatures & ICH9_LPC_SMI_F_CPU_HOT_UNPLUG)) {
+    DEBUG ((DEBUG_WARN, "%a CPU host-features %Lx, requested mask %Lx\n",
+      __FUNCTION__, mSmiFeatures, RequestedFeaturesMask));
+
+    mSmiFeatures &= ~ICH9_LPC_SMI_F_CPU_HOT_UNPLUG;
+  }
+
   QemuFwCfgSelectItem (mRequestedFeaturesItem);
   QemuFwCfgWriteBytes (sizeof mSmiFeatures, &mSmiFeatures);
 
@@ -162,8 +180,9 @@ NegotiateSmiFeatures (
   if ((mSmiFeatures & ICH9_LPC_SMI_F_CPU_HOTPLUG) == 0) {
     DEBUG ((DEBUG_INFO, "%a: CPU hotplug not negotiated\n", __FUNCTION__));
   } else {
-    DEBUG ((DEBUG_INFO, "%a: CPU hotplug with SMI negotiated\n",
-      __FUNCTION__));
+    DEBUG ((DEBUG_INFO, "%a: CPU hotplug%s with SMI negotiated\n",
+      __FUNCTION__,
+      (mSmiFeatures & ICH9_LPC_SMI_F_CPU_HOT_UNPLUG) ? ", unplug" : ""));
   }
 
   //
