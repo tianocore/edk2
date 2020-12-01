@@ -1256,13 +1256,13 @@ EvacuateTempRam (
   }
   for (FvIndex = 0; FvIndex < Private->FvCount; FvIndex++) {
     if (Private->Fv[FvIndex].FvHandle == PeiCoreFvHandle.FvHandle) {
-      PeiCoreFvHandle = Private->Fv[FvIndex];
+      CopyMem (&PeiCoreFvHandle, &Private->Fv[FvIndex], sizeof (PEI_CORE_FV_HANDLE));
       break;
     }
   }
   Status = EFI_SUCCESS;
 
-  ConvertPeiCorePpiPointers (Private, PeiCoreFvHandle);
+  ConvertPeiCorePpiPointers (Private, &PeiCoreFvHandle);
 
   for (FvIndex = 0; FvIndex < Private->FvCount; FvIndex++) {
     FvHeader = Private->Fv[FvIndex].FvHeader;

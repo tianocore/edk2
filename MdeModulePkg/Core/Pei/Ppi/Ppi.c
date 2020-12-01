@@ -1062,7 +1062,7 @@ ProcessPpiListFromSec (
 VOID
 ConvertPeiCorePpiPointers (
   IN  PEI_CORE_INSTANCE        *PrivateData,
-  PEI_CORE_FV_HANDLE           CoreFvHandle
+  IN  PEI_CORE_FV_HANDLE       *CoreFvHandle
   )
 {
   EFI_FV_FILE_INFO      FileInfo;
@@ -1079,16 +1079,16 @@ ConvertPeiCorePpiPointers (
   //
   // Find the PEI Core in the BFV in temporary memory.
   //
-  Status =  CoreFvHandle.FvPpi->FindFileByType (
-                                  CoreFvHandle.FvPpi,
+  Status =  CoreFvHandle->FvPpi->FindFileByType (
+                                  CoreFvHandle->FvPpi,
                                   EFI_FV_FILETYPE_PEI_CORE,
-                                  CoreFvHandle.FvHandle,
+                                  CoreFvHandle->FvHandle,
                                   &PeiCoreFileHandle
                                   );
   ASSERT_EFI_ERROR (Status);
 
   if (!EFI_ERROR (Status)) {
-    Status = CoreFvHandle.FvPpi->GetFileInfo (CoreFvHandle.FvPpi, PeiCoreFileHandle, &FileInfo);
+    Status = CoreFvHandle->FvPpi->GetFileInfo (CoreFvHandle->FvPpi, PeiCoreFileHandle, &FileInfo);
     ASSERT_EFI_ERROR (Status);
 
     Status = PeiGetPe32Data (PeiCoreFileHandle, &PeiCoreImageBase);
