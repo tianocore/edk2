@@ -542,7 +542,7 @@ ConvertPpiPointersFv (
 VOID
 ConvertPeiCorePpiPointers (
   IN  PEI_CORE_INSTANCE        *PrivateData,
-  PEI_CORE_FV_HANDLE           CoreFvHandle
+  IN  PEI_CORE_FV_HANDLE       *CoreFvHandle
   );
 
 /**
