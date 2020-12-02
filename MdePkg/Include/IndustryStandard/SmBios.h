@@ -862,17 +862,17 @@ typedef struct {
 } PROCESSOR_FEATURE_FLAGS;
 
 typedef struct {
-  UINT16  ProcessorReserved1             :1;
-  UINT16  ProcessorUnknown               :1;
-  UINT16  Processor64BitCapble           :1;
-  UINT16  ProcessorMultiCore             :1;
-  UINT16  ProcessorHardwareThread        :1;
-  UINT16  ProcessorExecuteProtection     :1;
-  UINT16  ProcessorEnhancedVirtulization :1;
-  UINT16  ProcessorPowerPerformanceCtrl  :1;
-  UINT16  Processor128bitCapble          :1;
-  UINT16  ProcessorArm64SocId            :1;
-  UINT16  ProcessorReserved2             :6;
+  UINT16  ProcessorReserved1              :1;
+  UINT16  ProcessorUnknown                :1;
+  UINT16  Processor64BitCapable           :1;
+  UINT16  ProcessorMultiCore              :1;
+  UINT16  ProcessorHardwareThread         :1;
+  UINT16  ProcessorExecuteProtection      :1;
+  UINT16  ProcessorEnhancedVirtualization :1;
+  UINT16  ProcessorPowerPerformanceCtrl   :1;
+  UINT16  Processor128BitCapable          :1;
+  UINT16  ProcessorArm64SocId             :1;
+  UINT16  ProcessorReserved2              :6;
 } PROCESSOR_CHARACTERISTIC_FLAGS;
 
 typedef struct {
