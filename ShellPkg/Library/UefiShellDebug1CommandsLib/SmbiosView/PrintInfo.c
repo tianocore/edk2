@@ -427,7 +427,7 @@ SmbiosPrintStructure (
     } else {
       DisplayProcessorFamily (Struct->Type4->ProcessorFamily, Option);
     }
-    PRINT_PENDING_STRING (Struct, Type4, ProcessorManufacture);
+    PRINT_PENDING_STRING (Struct, Type4, ProcessorManufacturer);
     PRINT_BIT_FIELD (Struct, Type4, ProcessorId, 8);
     PRINT_PENDING_STRING (Struct, Type4, ProcessorVersion);
     DisplayProcessorVoltage (*(UINT8 *) &(Struct->Type4->Voltage), Option);
