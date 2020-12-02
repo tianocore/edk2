@@ -1,7 +1,7 @@
 /** @file
 Code for Processor S3 restoration
 
-Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2020, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -235,11 +235,11 @@ ProgramProcessorRegister (
   CPU_REGISTER_TABLE_ENTRY  *RegisterTableEntryHead;
   volatile UINT32           *SemaphorePtr;
   UINT32                    FirstThread;
-  UINT32                    PackageThreadsCount;
   UINT32                    CurrentThread;
+  UINT32                    CurrentCore;
   UINTN                     ProcessorIndex;
-  UINTN                     ValidThreadCount;
-  UINT32                    *ValidCoreCountPerPackage;
+  UINT32                    *ThreadCountPerPackage;
+  UINT8                     *ThreadCountPerCore;
   EFI_STATUS                Status;
   UINT64                    CurrentValue;
 
@@ -372,35 +372,52 @@ ProgramProcessorRegister (
       //
       ASSERT (
         (ApLocation != NULL) &&
-        (CpuStatus->ValidCoreCountPerPackage != 0) &&
+        (CpuStatus->ThreadCountPerPackage != 0) &&
+        (CpuStatus->ThreadCountPerCore != 0) &&
         (CpuFlags->CoreSemaphoreCount != NULL) &&
         (CpuFlags->PackageSemaphoreCount != NULL)
         );
       switch (RegisterTableEntry->Value) {
       case CoreDepType:
         SemaphorePtr = CpuFlags->CoreSemaphoreCount;
+        ThreadCountPerCore = (UINT8 *)(UINTN)CpuStatus->ThreadCountPerCore;
+
+        CurrentCore = ApLocation->Package * CpuStatus->MaxCoreCount + ApLocation->Core;
         //
         // Get Offset info for the first thread in the core which current thread belongs to.
         //
-        FirstThread = (ApLocation->Package * CpuStatus->MaxCoreCount + ApLocation->Core) * CpuStatus->MaxThreadCount;
+        FirstThread   = CurrentCore * CpuStatus->MaxThreadCount;
         CurrentThread = FirstThread + ApLocation->Thread;
+
         //
-        // First Notify all threads in current Core that this thread has ready.
+        // Different cores may have different valid threads in them. If driver maintail clearly
+        // thread index in different cores, the logic will be much complicated.
+        // Here driver just simply records the max thread number in all cores and use it as expect
+        // thread number for all cores.
+        // In below two steps logic, first current thread will Release semaphore for each thread
+        // in current core. Maybe some threads are not valid in this core, but driver don't
+        // care. Second, driver will let current thread wait semaphore for all valid threads in
+        // current core. Because only the valid threads will do release semaphore for this
+        // thread, driver here only need to wait the valid thread count.
+        //
+
+        //
+        // First Notify ALL THREADs in current Core that this thread is ready.
         //
         for (ProcessorIndex = 0; ProcessorIndex < CpuStatus->MaxThreadCount; ProcessorIndex ++) {
           S3ReleaseSemaphore (&SemaphorePtr[FirstThread + ProcessorIndex]);
         }
         //
-        // Second, check whether all valid threads in current core have ready.
+        // Second, check whether all VALID THREADs (not all threads) in current core are ready.
         //
-        for (ProcessorIndex = 0; ProcessorIndex < CpuStatus->MaxThreadCount; ProcessorIndex ++) {
+        for (ProcessorIndex = 0; ProcessorIndex < ThreadCountPerCore[CurrentCore]; ProcessorIndex ++) {
           S3WaitForSemaphore (&SemaphorePtr[CurrentThread]);
         }
         break;
 
       case PackageDepType:
         SemaphorePtr = CpuFlags->PackageSemaphoreCount;
-        ValidCoreCountPerPackage = (UINT32 *)(UINTN)CpuStatus->ValidCoreCountPerPackage;
+        ThreadCountPerPackage = (UINT32 *)(UINTN)CpuStatus->ThreadCountPerPackage;
         //
         // Get Offset info for the first thread in the package which current thread belongs to.
         //
@@ -408,18 +425,13 @@ ProgramProcessorRegister (
         //
         // Get the possible threads count for current package.
         //
-        PackageThreadsCount = CpuStatus->MaxThreadCount * CpuStatus->MaxCoreCount;
         CurrentThread = FirstThread + CpuStatus->MaxThreadCount * ApLocation->Core + ApLocation->Thread;
-        //
-        // Get the valid thread count for current package.
-        //
-        ValidThreadCount = CpuStatus->MaxThreadCount * ValidCoreCountPerPackage[ApLocation->Package];
 
         //
-        // Different packages may have different valid cores in them. If driver maintail clearly
-        // cores number in different packages, the logic will be much complicated.
-        // Here driver just simply records the max core number in all packages and use it as expect
-        // core number for all packages.
+        // Different packages may have different valid threads in them. If driver maintail clearly
+        // thread index in different packages, the logic will be much complicated.
+        // Here driver just simply records the max thread number in all packages and use it as expect
+        // thread number for all packages.
         // In below two steps logic, first current thread will Release semaphore for each thread
         // in current package. Maybe some threads are not valid in this package, but driver don't
         // care. Second, driver will let current thread wait semaphore for all valid threads in
@@ -428,15 +440,15 @@ ProgramProcessorRegister (
         //
 
         //
-        // First Notify all threads in current package that this thread has ready.
+        // First Notify ALL THREADS in current package that this thread is ready.
         //
-        for (ProcessorIndex = 0; ProcessorIndex < PackageThreadsCount ; ProcessorIndex ++) {
+        for (ProcessorIndex = 0; ProcessorIndex < CpuStatus->MaxThreadCount * CpuStatus->MaxCoreCount; ProcessorIndex ++) {
           S3ReleaseSemaphore (&SemaphorePtr[FirstThread + ProcessorIndex]);
         }
         //
-        // Second, check whether all valid threads in current package have ready.
+        // Second, check whether VALID THREADS (not all threads) in current package are ready.
         //
-        for (ProcessorIndex = 0; ProcessorIndex < ValidThreadCount; ProcessorIndex ++) {
+        for (ProcessorIndex = 0; ProcessorIndex < ThreadCountPerPackage[ApLocation->Package]; ProcessorIndex ++) {
           S3WaitForSemaphore (&SemaphorePtr[CurrentThread]);
         }
         break;
@@ -1059,12 +1071,19 @@ GetAcpiCpuData (
 
   CpuStatus = &mAcpiCpuData.CpuStatus;
   CopyMem (CpuStatus, &AcpiCpuData->CpuStatus, sizeof (CPU_STATUS_INFORMATION));
-  if (AcpiCpuData->CpuStatus.ValidCoreCountPerPackage != 0) {
-    CpuStatus->ValidCoreCountPerPackage = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocateCopyPool (
+  if (AcpiCpuData->CpuStatus.ThreadCountPerPackage != 0) {
+    CpuStatus->ThreadCountPerPackage = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocateCopyPool (
                                             sizeof (UINT32) * CpuStatus->PackageCount,
-                                            (UINT32 *)(UINTN)AcpiCpuData->CpuStatus.ValidCoreCountPerPackage
+                                            (UINT32 *)(UINTN)AcpiCpuData->CpuStatus.ThreadCountPerPackage
                                             );
-    ASSERT (CpuStatus->ValidCoreCountPerPackage != 0);
+    ASSERT (CpuStatus->ThreadCountPerPackage != 0);
+  }
+  if (AcpiCpuData->CpuStatus.ThreadCountPerCore != 0) {
+    CpuStatus->ThreadCountPerCore = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocateCopyPool (
+                                            sizeof (UINT8) * (CpuStatus->PackageCount * CpuStatus->MaxCoreCount),
+                                            (UINT32 *)(UINTN)AcpiCpuData->CpuStatus.ThreadCountPerCore
+                                            );
+    ASSERT (CpuStatus->ThreadCountPerCore != 0);
   }
   if (AcpiCpuData->ApLocation != 0) {
     mAcpiCpuData.ApLocation = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocateCopyPool (
