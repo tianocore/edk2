@@ -894,7 +894,7 @@ typedef struct {
   SMBIOS_TABLE_STRING   Socket;
   UINT8                 ProcessorType;          ///< The enumeration value from PROCESSOR_TYPE_DATA.
   UINT8                 ProcessorFamily;        ///< The enumeration value from PROCESSOR_FAMILY_DATA.
-  SMBIOS_TABLE_STRING   ProcessorManufacture;
+  SMBIOS_TABLE_STRING   ProcessorManufacturer;
   PROCESSOR_ID_DATA     ProcessorId;
   SMBIOS_TABLE_STRING   ProcessorVersion;
   PROCESSOR_VOLTAGE     Voltage;
