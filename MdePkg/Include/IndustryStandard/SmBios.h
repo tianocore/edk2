@@ -1837,7 +1837,7 @@ typedef struct {
   //
   UINT8                                     MemoryTechnology;   ///< The enumeration value from MEMORY_DEVICE_TECHNOLOGY
   MEMORY_DEVICE_OPERATING_MODE_CAPABILITY   MemoryOperatingModeCapability;
-  SMBIOS_TABLE_STRING                       FirwareVersion;
+  SMBIOS_TABLE_STRING                       FirmwareVersion;
   UINT16                                    ModuleManufacturerID;
   UINT16                                    ModuleProductID;
   UINT16                                    MemorySubsystemControllerManufacturerID;
