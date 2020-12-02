@@ -263,7 +263,6 @@ extern UINTN                  mMaxNumberOfCpus;
 extern UINTN                  mNumberOfCpus;
 extern EFI_SMM_CPU_PROTOCOL   mSmmCpu;
 extern EFI_MM_MP_PROTOCOL     mSmmMp;
-extern UINTN                  mInternalCr3;
 
 ///
 /// The mode of the CPU at the time an SMI occurs
@@ -943,15 +942,13 @@ SetPageTableAttributes (
   );
 
 /**
-  Get page table base address and the depth of the page table.
+  Return page table base.
 
-  @param[out] Base        Page table base address.
-  @param[out] FiveLevels  TRUE means 5 level paging. FALSE means 4 level paging.
+  @return page table base.
 **/
-VOID
-GetPageTable (
-  OUT UINTN   *Base,
-  OUT BOOLEAN *FiveLevels OPTIONAL
+UINTN
+GetPageTableBase (
+  VOID
   );
 
 /**

@@ -5,21 +5,11 @@
 Copyright (C) 2013, Red Hat, Inc.
 Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
-Copyright (c) Microsoft Corporation.
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include "Variable.h"
-
-#include <Protocol/VariablePolicy.h>
-#include <Library/VariablePolicyLib.h>
-
-EFI_STATUS
-EFIAPI
-ProtocolIsVariablePolicyEnabled (
-  OUT BOOLEAN *State
-  );
 
 EFI_HANDLE                          mHandle                    = NULL;
 EFI_EVENT                           mVirtualAddressChangeEvent = NULL;
@@ -27,12 +17,6 @@ VOID                                *mFtwRegistration          = NULL;
 VOID                                ***mVarCheckAddressPointer = NULL;
 UINTN                               mVarCheckAddressPointerCount = 0;
 EDKII_VARIABLE_LOCK_PROTOCOL        mVariableLock              = { VariableLockRequestToLock };
-EDKII_VARIABLE_POLICY_PROTOCOL      mVariablePolicyProtocol    = { EDKII_VARIABLE_POLICY_PROTOCOL_REVISION,
-                                                                    DisableVariablePolicy,
-                                                                    ProtocolIsVariablePolicyEnabled,
-                                                                    RegisterVariablePolicy,
-                                                                    DumpVariablePolicy,
-                                                                    LockVariablePolicy };
 EDKII_VAR_CHECK_PROTOCOL            mVarCheck                  = { VarCheckRegisterSetVariableCheckHandler,
                                                                     VarCheckVariablePropertySet,
                                                                     VarCheckVariablePropertyGet };
@@ -298,13 +282,8 @@ OnReadyToBoot (
   VOID                                    *Context
   )
 {
-  EFI_STATUS        Status;
-
   if (!mEndOfDxe) {
     MorLockInitAtEndOfDxe ();
-
-    Status = LockVariablePolicy ();
-    ASSERT_EFI_ERROR (Status);
     //
     // Set the End Of DXE bit in case the EFI_END_OF_DXE_EVENT_GROUP_GUID event is not signaled.
     //
@@ -343,12 +322,8 @@ OnEndOfDxe (
   VOID                                    *Context
   )
 {
-  EFI_STATUS    Status;
-
   DEBUG ((EFI_D_INFO, "[Variable]END_OF_DXE is signaled\n"));
   MorLockInitAtEndOfDxe ();
-  Status = LockVariablePolicy ();
-  ASSERT_EFI_ERROR (Status);
   mEndOfDxe = TRUE;
   mVarCheckAddressPointer = VarCheckLibInitializeAtEndOfDxe (&mVarCheckAddressPointerCount);
   //
@@ -492,28 +467,6 @@ FtwNotificationEvent (
 
 
 /**
-  This API function returns whether or not the policy engine is
-  currently being enforced.
-
-  @param[out]   State       Pointer to a return value for whether the policy enforcement
-                            is currently enabled.
-
-  @retval     EFI_SUCCESS
-  @retval     Others        An error has prevented this command from completing.
-
-**/
-EFI_STATUS
-EFIAPI
-ProtocolIsVariablePolicyEnabled (
-  OUT BOOLEAN *State
-  )
-{
-  *State = IsVariablePolicyEnabled ();
-  return EFI_SUCCESS;
-}
-
-
-/**
   Variable Driver main entry point. The Variable driver places the 4 EFI
   runtime services in the EFI System Table and installs arch protocols
   for variable read and write services being available. It also registers
@@ -621,19 +574,6 @@ VariableServiceInitialize (
                   &gEfiEndOfDxeEventGroupGuid,
                   &EndOfDxeEvent
                   );
-  ASSERT_EFI_ERROR (Status);
-
-  // Register and initialize the VariablePolicy engine.
-  Status = InitVariablePolicyLib (VariableServiceGetVariable);
-  ASSERT_EFI_ERROR (Status);
-  Status = VarCheckRegisterSetVariableCheckHandler (ValidateSetVariable);
-  ASSERT_EFI_ERROR (Status);
-  Status = gBS->InstallMultipleProtocolInterfaces (
-                    &mHandle,
-                    &gEdkiiVariablePolicyProtocolGuid,
-                    &mVariablePolicyProtocol,
-                    NULL
-                    );
   ASSERT_EFI_ERROR (Status);
 
   return EFI_SUCCESS;

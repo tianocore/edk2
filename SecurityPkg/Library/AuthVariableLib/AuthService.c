@@ -19,15 +19,11 @@
   to verify the signature.
 
 Copyright (c) 2009 - 2019, Intel Corporation. All rights reserved.<BR>
-Copyright (c) Microsoft Corporation.
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include "AuthServiceInternal.h"
-
-#include <Protocol/VariablePolicy.h>
-#include <Library/VariablePolicyLib.h>
 
 //
 // Public Exponent of RSA Key.
@@ -221,12 +217,9 @@ NeedPhysicallyPresent(
   IN     EFI_GUID       *VendorGuid
   )
 {
-  // If the VariablePolicy engine is disabled, allow deletion of any authenticated variables.
-  if (IsVariablePolicyEnabled()) {
-    if ((CompareGuid (VendorGuid, &gEfiSecureBootEnableDisableGuid) && (StrCmp (VariableName, EFI_SECURE_BOOT_ENABLE_NAME) == 0))
-      || (CompareGuid (VendorGuid, &gEfiCustomModeEnableGuid) && (StrCmp (VariableName, EFI_CUSTOM_MODE_NAME) == 0))) {
-      return TRUE;
-    }
+  if ((CompareGuid (VendorGuid, &gEfiSecureBootEnableDisableGuid) && (StrCmp (VariableName, EFI_SECURE_BOOT_ENABLE_NAME) == 0))
+    || (CompareGuid (VendorGuid, &gEfiCustomModeEnableGuid) && (StrCmp (VariableName, EFI_CUSTOM_MODE_NAME) == 0))) {
+    return TRUE;
   }
 
   return FALSE;
@@ -849,8 +842,7 @@ ProcessVariable (
              &OrgVariableInfo
              );
 
-  // If the VariablePolicy engine is disabled, allow deletion of any authenticated variables.
-  if ((!EFI_ERROR (Status)) && IsDeleteAuthVariable (OrgVariableInfo.Attributes, Data, DataSize, Attributes) && (UserPhysicalPresent() || !IsVariablePolicyEnabled())) {
+  if ((!EFI_ERROR (Status)) && IsDeleteAuthVariable (OrgVariableInfo.Attributes, Data, DataSize, Attributes) && UserPhysicalPresent()) {
     //
     // Allow the delete operation of common authenticated variable(AT or AW) at user physical presence.
     //
@@ -1928,12 +1920,6 @@ VerifyTimeBasedPayload (
   PayloadPtr = SigData + SigDataSize;
   PayloadSize = DataSize - OFFSET_OF_AUTHINFO2_CERT_DATA - (UINTN) SigDataSize;
 
-  // If the VariablePolicy engine is disabled, allow deletion of any authenticated variables.
-  if (PayloadSize == 0 && (Attributes & EFI_VARIABLE_APPEND_WRITE) == 0 && !IsVariablePolicyEnabled()) {
-    VerifyStatus = TRUE;
-    goto Exit;
-  }
-
   //
   // Construct a serialization buffer of the values of the VariableName, VendorGuid and Attributes
   // parameters of the SetVariable() call and the TimeStamp component of the
@@ -2187,12 +2173,8 @@ VerifyTimeBasedPayload (
 Exit:
 
   if (AuthVarType == AuthVarTypePk || AuthVarType == AuthVarTypePriv) {
-    if (TopLevelCert != NULL) {
-        Pkcs7FreeSigners (TopLevelCert);
-    }
-    if (SignerCerts != NULL) {
-        Pkcs7FreeSigners (SignerCerts);
-    }
+    Pkcs7FreeSigners (TopLevelCert);
+    Pkcs7FreeSigners (SignerCerts);
   }
 
   if (!VerifyStatus) {

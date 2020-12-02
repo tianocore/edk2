@@ -411,7 +411,7 @@ RegisterVariablePolicy (
     }
 
     // Reallocate and copy the table.
-    NewTable = AllocateRuntimePool( NewSize );
+    NewTable = AllocatePool( NewSize );
     if (NewTable == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }

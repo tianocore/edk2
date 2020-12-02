@@ -10,7 +10,6 @@
 #  buffer overflow or integer overflow.
 #
 # Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
-# Copyright (c) Microsoft Corporation.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -49,7 +48,6 @@
   VarCheck.c
   VariableExLib.c
   SpeculationBarrierDxe.c
-  VariableLockRequestToLock.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -71,8 +69,6 @@
   TpmMeasurementLib
   AuthVariableLib
   VarCheckLib
-  VariablePolicyLib
-  VariablePolicyHelperLib
 
 [Protocols]
   gEfiFirmwareVolumeBlockProtocolGuid           ## CONSUMES
@@ -82,7 +78,6 @@
   gEfiVariableWriteArchProtocolGuid             ## PRODUCES
   gEfiVariableArchProtocolGuid                  ## PRODUCES
   gEdkiiVariableLockProtocolGuid                ## PRODUCES
-  gEdkiiVariablePolicyProtocolGuid              ## CONSUMES
   gEdkiiVarCheckProtocolGuid                    ## PRODUCES
 
 [Guids]

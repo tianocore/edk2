@@ -9,7 +9,6 @@
 #ifndef __LZMADECOMPRESSLIB_INTERNAL_H__
 #define __LZMADECOMPRESSLIB_INTERNAL_H__
 
-#include <Base.h>
 #include <PiPei.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -46,10 +45,6 @@
                           in DestinationSize and the size of the scratch
                           buffer was returned in ScratchSize.
 
-  @retval RETURN_UNSUPPORTED  DestinationSize cannot be output because the
-                              uncompressed buffer size (in bytes) does not fit
-                              in a UINT32. Output parameters have not been
-                              modified.
 **/
 RETURN_STATUS
 EFIAPI

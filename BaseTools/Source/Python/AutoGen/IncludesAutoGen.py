@@ -291,8 +291,7 @@ ${END}
                 targetitem = self.GetRealTarget(source_abs.strip(" :"))
 
                 targetitem += ": "
-                if len(lines)>=2:
-                    targetitem += lines[1]
+                targetitem += lines[1]
                 newcontent.append(targetitem)
                 newcontent.extend(lines[2:])
                 newcontent.append("\n")

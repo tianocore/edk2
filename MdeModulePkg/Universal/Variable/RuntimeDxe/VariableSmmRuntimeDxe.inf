@@ -14,7 +14,6 @@
 #  the authentication service provided in this driver will be broken, and the behavior is undefined.
 #
 # Copyright (c) 2010 - 2019, Intel Corporation. All rights reserved.<BR>
-# Copyright (c) Microsoft Corporation.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -43,7 +42,6 @@
   VariableParsing.c
   VariableParsing.h
   Variable.h
-  VariablePolicySmmDxe.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -58,8 +56,6 @@
   DxeServicesTableLib
   UefiDriverEntryPoint
   TpmMeasurementLib
-  SafeIntLib
-  PcdLib
 
 [Protocols]
   gEfiVariableWriteArchProtocolGuid             ## PRODUCES
@@ -71,14 +67,10 @@
   gEfiSmmVariableProtocolGuid
   gEdkiiVariableLockProtocolGuid                ## PRODUCES
   gEdkiiVarCheckProtocolGuid                    ## PRODUCES
-  gEdkiiVariablePolicyProtocolGuid              ## PRODUCES
 
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdEnableVariableRuntimeCache           ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableCollectStatistics            ## CONSUMES
-
-[Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdAllowVariablePolicyEnforcementDisable     ## CONSUMES
 
 [Guids]
   ## PRODUCES             ## GUID # Signature of Variable store header
@@ -106,9 +98,6 @@
   ## SOMETIMES_CONSUMES   ## Variable:L"dbx"
   ## SOMETIMES_CONSUMES   ## Variable:L"dbt"
   gEfiImageSecurityDatabaseGuid
-
-  gVarCheckPolicyLibMmiHandlerGuid
-  gEfiEndOfDxeEventGroupGuid
 
 [Depex]
   gEfiMmCommunication2ProtocolGuid

@@ -29,26 +29,6 @@ EnableCet (
   );
 
 /**
-  Get page table base address and the depth of the page table.
-
-  @param[out] Base        Page table base address.
-  @param[out] FiveLevels  TRUE means 5 level paging. FALSE means 4 level paging.
-**/
-VOID
-GetPageTable (
-  OUT UINTN   *Base,
-  OUT BOOLEAN *FiveLevels OPTIONAL
-  )
-{
-  *Base = ((mInternalCr3 == 0) ?
-            (AsmReadCr3 () & PAGING_4K_ADDRESS_MASK_64) :
-            mInternalCr3);
-  if (FiveLevels != NULL) {
-    *FiveLevels = FALSE;
-  }
-}
-
-/**
   Create PageTable for SMM use.
 
   @return     PageTable Address
@@ -246,7 +226,6 @@ SetPageTableAttributes (
   UINT64                *L1PageTable;
   UINT64                *L2PageTable;
   UINT64                *L3PageTable;
-  UINTN                 PageTableBase;
   BOOLEAN               IsSplitted;
   BOOLEAN               PageTableSplitted;
   BOOLEAN               CetEnabled;
@@ -289,10 +268,9 @@ SetPageTableAttributes (
     DEBUG ((DEBUG_INFO, "Start...\n"));
     PageTableSplitted = FALSE;
 
-    GetPageTable (&PageTableBase, NULL);
-    L3PageTable = (UINT64 *)PageTableBase;
+    L3PageTable = (UINT64 *)GetPageTableBase ();
 
-    SmmSetMemoryAttributesEx ((EFI_PHYSICAL_ADDRESS)PageTableBase, SIZE_4KB, EFI_MEMORY_RO, &IsSplitted);
+    SmmSetMemoryAttributesEx ((EFI_PHYSICAL_ADDRESS)(UINTN)L3PageTable, SIZE_4KB, EFI_MEMORY_RO, &IsSplitted);
     PageTableSplitted = (PageTableSplitted || IsSplitted);
 
     for (Index3 = 0; Index3 < 4; Index3++) {

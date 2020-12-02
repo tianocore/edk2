@@ -508,6 +508,10 @@ Exit:
     free (SignedData);
   }
 
+  if (SignerCert != NULL) {
+    X509_free (SignerCert);
+  }
+
   if (Pkcs7 != NULL) {
     PKCS7_free (Pkcs7);
   }
