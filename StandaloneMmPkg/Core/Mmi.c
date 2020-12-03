@@ -2,7 +2,7 @@
   MMI management.
 
   Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
-  Copyright (c) 2016 - 2018, ARM Limited. All rights reserved.<BR>
+  Copyright (c) 2016 - 2021, Arm Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -220,7 +220,7 @@ MmiManage (
 /**
   Registers a handler to execute within MM.
 
-  @param  Handler        Handler service funtion pointer.
+  @param  Handler        Handler service function pointer.
   @param  HandlerType    Points to the handler type or NULL for root MMI handlers.
   @param  DispatchHandle On return, contains a unique handle which can be used to later unregister the handler function.
 

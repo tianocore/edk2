@@ -6,7 +6,7 @@
   from non-MMRAM to non-MMRAM, or set data in non-MMRAM.
 
   Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
-  Copyright (c) 2016 - 2018, ARM Limited. All rights reserved.<BR>
+  Copyright (c) 2016 - 2021, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -69,7 +69,7 @@ MmCopyMemToMmram (
   @param  SourceBuffer        The pointer to the source buffer of the memory copy.
   @param  Length              The number of bytes to copy from SourceBuffer to DestinationBuffer.
 
-  @retval EFI_SECURITY_VIOLATION The DesinationBuffer is invalid per processor architecture or overlap with MMRAM.
+  @retval EFI_SECURITY_VIOLATION The DestinationBuffer is invalid per processor architecture or overlap with MMRAM.
   @retval EFI_SUCCESS            Memory is copied.
 
 **/
@@ -94,7 +94,7 @@ MmCopyMemFromMmram (
   @param  SourceBuffer        The pointer to the source buffer of the memory copy.
   @param  Length              The number of bytes to copy from SourceBuffer to DestinationBuffer.
 
-  @retval EFI_SECURITY_VIOLATION The DesinationBuffer is invalid per processor architecture or overlap with MMRAM.
+  @retval EFI_SECURITY_VIOLATION The DestinationBuffer is invalid per processor architecture or overlap with MMRAM.
   @retval EFI_SECURITY_VIOLATION The SourceBuffer is invalid per processor architecture or overlap with MMRAM.
   @retval EFI_SUCCESS            Memory is copied.
 
