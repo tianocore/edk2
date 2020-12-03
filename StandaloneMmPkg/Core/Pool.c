@@ -2,7 +2,7 @@
   SMM Memory pool management functions.
 
   Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
-  Copyright (c) 2016 - 2018, ARM Limited. All rights reserved.<BR>
+  Copyright (c) 2016 - 2021, Arm Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -50,7 +50,7 @@ MmInitializeMemoryServices (
       continue;
     }
     DEBUG ((DEBUG_INFO, "MmAddMemoryRegion %d : 0x%016lx - 0x%016lx\n",
-	    Index, MmramRanges[Index].CpuStart, MmramRanges[Index].PhysicalSize));
+      Index, MmramRanges[Index].CpuStart, MmramRanges[Index].PhysicalSize));
     MmAddMemoryRegion (
       MmramRanges[Index].CpuStart,
       MmramRanges[Index].PhysicalSize,
@@ -86,7 +86,7 @@ InternalAllocPoolByIndex (
   Hdr = NULL;
   if (PoolIndex == MAX_POOL_INDEX) {
     Status = MmInternalAllocatePages (
-	             AllocateAnyPages,
+               AllocateAnyPages,
                EfiRuntimeServicesData,
                EFI_SIZE_TO_PAGES (MAX_POOL_SIZE << 1),
                &Address
