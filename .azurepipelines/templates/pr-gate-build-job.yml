@@ -4,7 +4,7 @@
 # template file used to build supported packages.
 #
 # Copyright (c) Microsoft Corporation.
-# Copyright (c) 2020, ARM Limited. All rights reserved.<BR>
+# Copyright (c) 2020 - 2021, ARM Limited. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 
@@ -34,7 +34,7 @@ jobs:
         Build.Pkgs: 'NetworkPkg,RedfishPkg'
         Build.Targets: 'DEBUG,RELEASE,NO-TARGET'
       TARGET_OTHER:
-        Build.Pkgs: 'PcAtChipsetPkg,ShellPkg'
+        Build.Pkgs: 'PcAtChipsetPkg,ShellPkg,StandaloneMmPkg'
         Build.Targets: 'DEBUG,RELEASE,NO-TARGET'
       TARGET_FMP_FAT_TEST:
         Build.Pkgs: 'FmpDevicePkg,FatPkg,UnitTestFrameworkPkg,DynamicTablesPkg'
