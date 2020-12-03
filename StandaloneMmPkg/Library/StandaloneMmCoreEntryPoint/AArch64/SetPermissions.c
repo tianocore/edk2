@@ -2,7 +2,7 @@
   Locate, get and update PE/COFF permissions during Standalone MM
   Foundation Entry point on ARM platforms.
 
-Copyright (c) 2017 - 2018, ARM Ltd. All rights reserved.<BR>
+Copyright (c) 2017 - 2021, Arm Ltd. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -121,9 +121,10 @@ LocateStandaloneMmCorePeCoffData (
   IN  OUT   UINTN                           *TeDataSize
   )
 {
-  EFI_FFS_FILE_HEADER             *FileHeader = NULL;
+  EFI_FFS_FILE_HEADER             *FileHeader;
   EFI_STATUS                      Status;
 
+  FileHeader = NULL;
   Status = FfsFindNextFile (
              EFI_FV_FILETYPE_SECURITY_CORE,
              BfvAddress,
