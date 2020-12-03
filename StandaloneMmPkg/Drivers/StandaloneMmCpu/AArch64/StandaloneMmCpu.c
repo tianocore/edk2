@@ -2,7 +2,7 @@
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
   Copyright (c) 2016 HP Development Company, L.P.
-  Copyright (c) 2016 - 2018, ARM Limited. All rights reserved.
+  Copyright (c) 2016 - 2021, Arm Limited. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -53,16 +53,19 @@ GetGuidedHobData (
 {
   EFI_HOB_GUID_TYPE *Hob;
 
-  if (!HobList || !HobGuid || !HobData)
+  if ((HobList == NULL) || (HobGuid == NULL) || (HobData == NULL)) {
     return EFI_INVALID_PARAMETER;
+  }
 
   Hob = GetNextGuidHob (HobGuid, HobList);
-  if (!Hob)
+  if (Hob == NULL) {
     return EFI_NOT_FOUND;
+  }
 
   *HobData = GET_GUID_HOB_DATA (Hob);
-  if (!HobData)
+  if (*HobData == NULL) {
     return EFI_NOT_FOUND;
+  }
 
   return EFI_SUCCESS;
 }
