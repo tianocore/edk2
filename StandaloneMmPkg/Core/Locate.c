@@ -2,7 +2,7 @@
   Locate handle functions
 
   Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
-  Copyright (c) 2016 - 2018, ARM Limited. All rights reserved.<BR>
+  Copyright (c) 2016 - 2021, Arm Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -173,8 +173,8 @@ MmGetNextLocateByProtocol (
 
 /**
   Return the first Protocol Interface that matches the Protocol GUID. If
-  Registration is pasased in return a Protocol Instance that was just add
-  to the system. If Retistration is NULL return the first Protocol Interface
+  Registration is passed in return a Protocol Instance that was just add
+  to the system. If Registration is NULL return the first Protocol Interface
   you find.
 
   @param  Protocol               The protocol to search for
