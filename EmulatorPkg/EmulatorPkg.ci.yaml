@@ -47,6 +47,7 @@
             "MdeModulePkg/MdeModulePkg.dec",
             "EmulatorPkg/EmulatorPkg.dec",
             "NetworkPkg/NetworkPkg.dec",
+            "RedfishPkg/RedfishPkg.dec",
             "EmbeddedPkg/EmbeddedPkg.dec", ## is this one OK??
         ],
         # For host based unit tests
