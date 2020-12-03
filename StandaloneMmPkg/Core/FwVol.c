@@ -1,7 +1,7 @@
 /**@file
 
 Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
-Copyright (c) 2016 - 2018, ARM Limited. All rights reserved.<BR>
+Copyright (c) 2016 - 2021, Arm Limited. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -42,23 +42,24 @@ FvIsBeingProcessed (
   IN EFI_FIRMWARE_VOLUME_HEADER *FwVolHeader
   );
 
+/**
+  Given the pointer to the Firmware Volume Header find the
+  MM driver and return its PE32 image.
+
+  @param [in] FwVolHeader   Pointer to memory mapped FV
+
+  @retval  EFI_SUCCESS            Success.
+  @retval  EFI_INVALID_PARAMETER  Invalid parameter.
+  @retval  EFI_NOT_FOUND          Could not find section data.
+  @retval  EFI_OUT_OF_RESOURCES   Out of resources.
+  @retval  EFI_VOLUME_CORRUPTED   Firmware volume is corrupted.
+  @retval  EFI_UNSUPPORTED        Operation not supported.
+
+**/
 EFI_STATUS
 MmCoreFfsFindMmDriver (
   IN  EFI_FIRMWARE_VOLUME_HEADER  *FwVolHeader
   )
-/*++
-
-Routine Description:
-  Given the pointer to the Firmware Volume Header find the
-  MM driver and return its PE32 image.
-
-Arguments:
-  FwVolHeader - Pointer to memory mapped FV
-
-Returns:
-  other       - Failure
-
---*/
 {
   EFI_STATUS                              Status;
   EFI_STATUS                              DepexStatus;
