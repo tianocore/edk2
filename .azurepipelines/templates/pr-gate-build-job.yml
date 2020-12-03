@@ -37,7 +37,7 @@ jobs:
         Build.Pkgs: 'PcAtChipsetPkg,ShellPkg'
         Build.Targets: 'DEBUG,RELEASE,NO-TARGET'
       TARGET_FMP_FAT_TEST:
-        Build.Pkgs: 'FmpDevicePkg,FatPkg,UnitTestFrameworkPkg,DynamicTablesPkg'
+        Build.Pkgs: 'FmpDevicePkg,FatPkg,UnitTestFrameworkPkg,DynamicTablesPkg,StandaloneMmPkg'
         Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
       TARGET_CRYPTO:
         Build.Pkgs: 'CryptoPkg'
