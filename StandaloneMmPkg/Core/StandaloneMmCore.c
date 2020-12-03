@@ -149,9 +149,10 @@ MmExitBootServiceHandler (
   )
 {
   EFI_HANDLE  MmHandle;
-  EFI_STATUS  Status = EFI_SUCCESS;
+  EFI_STATUS  Status;
   STATIC BOOLEAN mInExitBootServices = FALSE;
 
+  Status = EFI_SUCCESS;
   if (!mInExitBootServices) {
     MmHandle = NULL;
     Status = MmInstallProtocolInterface (
@@ -187,9 +188,10 @@ MmReadyToBootHandler (
   )
 {
   EFI_HANDLE  MmHandle;
-  EFI_STATUS  Status = EFI_SUCCESS;
+  EFI_STATUS  Status;
   STATIC BOOLEAN mInReadyToBoot = FALSE;
 
+  Status = EFI_SUCCESS;
   if (!mInReadyToBoot) {
     MmHandle = NULL;
     Status = MmInstallProtocolInterface (
