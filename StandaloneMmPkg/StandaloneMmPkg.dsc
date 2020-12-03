@@ -2,7 +2,7 @@
 # Standalone MM Platform.
 #
 # Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
-# Copyright (c) 2016 - 2019, ARM Limited. All rights reserved.<BR>
+# Copyright (c) 2016 - 2021, Arm Limited. All rights reserved.<BR>
 #
 #    SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -53,6 +53,7 @@
   ReportStatusCodeLib|MdePkg/Library/BaseReportStatusCodeLibNull/BaseReportStatusCodeLibNull.inf
   StandaloneMmCoreEntryPoint|StandaloneMmPkg/Library/StandaloneMmCoreEntryPoint/StandaloneMmCoreEntryPoint.inf
   StandaloneMmDriverEntryPoint|MdePkg/Library/StandaloneMmDriverEntryPoint/StandaloneMmDriverEntryPoint.inf
+  VariableMmDependency|StandaloneMmPkg/Library/VariableMmDependency/VariableMmDependency.inf
 
 [LibraryClasses.AARCH64]
   ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
@@ -65,6 +66,9 @@
 
 [LibraryClasses.common.MM_CORE_STANDALONE]
   HobLib|StandaloneMmPkg/Library/StandaloneMmCoreHobLib/StandaloneMmCoreHobLib.inf
+
+[LibraryClasses.common.MM_STANDALONE]
+  MemoryAllocationLib|StandaloneMmPkg/Library/StandaloneMmMemoryAllocationLib/StandaloneMmMemoryAllocationLib.inf
 
 ################################################################################
 #
@@ -99,6 +103,15 @@
   # MM Core
   #
   StandaloneMmPkg/Core/StandaloneMmCore.inf
+  StandaloneMmPkg/Library/FvLib/FvLib.inf
+  StandaloneMmPkg/Library/StandaloneMmCoreEntryPoint/StandaloneMmCoreEntryPoint.inf
+  StandaloneMmPkg/Library/StandaloneMmCoreHobLib/StandaloneMmCoreHobLib.inf
+  StandaloneMmPkg/Library/StandaloneMmCoreMemoryAllocationLib/StandaloneMmCoreMemoryAllocationLib.inf
+  StandaloneMmPkg/Library/StandaloneMmHobLib/StandaloneMmHobLib.inf
+  StandaloneMmPkg/Library/StandaloneMmMemLib/StandaloneMmMemLib.inf
+  StandaloneMmPkg/Library/StandaloneMmMemoryAllocationLib/StandaloneMmMemoryAllocationLib.inf
+  StandaloneMmPkg/Library/StandaloneMmPeCoffExtraActionLib/StandaloneMmPeCoffExtraActionLib.inf
+  StandaloneMmPkg/Library/VariableMmDependency/VariableMmDependency.inf
 
 [Components.AARCH64]
   StandaloneMmPkg/Drivers/StandaloneMmCpu/AArch64/StandaloneMmCpu.inf
