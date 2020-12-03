@@ -65,8 +65,8 @@ PiMmStandaloneArmTfCpuDriverEntry (
   IN UINTN NsCommBufferAddr
   )
 {
-  EFI_MM_COMMUNICATE_HEADER *GuidedEventContext = NULL;
-  EFI_MM_ENTRY_CONTEXT        MmEntryPointContext = {0};
+  EFI_MM_COMMUNICATE_HEADER   *GuidedEventContext;
+  EFI_MM_ENTRY_CONTEXT        MmEntryPointContext;
   EFI_STATUS                  Status;
   UINTN                       NsCommBufferSize;
 
@@ -107,6 +107,7 @@ PiMmStandaloneArmTfCpuDriverEntry (
     return EFI_ACCESS_DENIED;
   }
 
+  GuidedEventContext = NULL;
   // Now that the secure world can see the normal world buffer, allocate
   // memory to copy the communication buffer to the secure world.
   Status = mMmst->MmAllocatePool (
@@ -126,6 +127,8 @@ PiMmStandaloneArmTfCpuDriverEntry (
 
   // Stash the pointer to the allocated Event Context for this CPU
   PerCpuGuidedEventContext[CpuNumber] = GuidedEventContext;
+
+  ZeroMem (&MmEntryPointContext, sizeof (EFI_MM_ENTRY_CONTEXT));
 
   MmEntryPointContext.CurrentlyExecutingCpu = CpuNumber;
   MmEntryPointContext.NumberOfCpus = mMpInformationHobData->NumberOfProcessors;
