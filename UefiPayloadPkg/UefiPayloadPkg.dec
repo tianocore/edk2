@@ -17,6 +17,12 @@
 [Includes]
   Include
 
+[LibraryClasses]
+  ##  @libraryclass  Parse bootloader provided HOBs
+  BlParseLib|Include/Library/BlParseLib.h
+
+  ##  @libraryclass  Parse bootloader platform specific HOBs
+  PlatformSupoortLib|Include/Library/PlatformSupportLib.h
 
 [Guids]
   #
