@@ -24,7 +24,7 @@
 | ShellPkg             | :heavy_check_mark: | :heavy_check_mark: | Spell checking in audit mode, 3 modules are not being built by DSC
 | SignedCapsulePkg     |
 | SourceLevelDebugPkg  |
-| StandaloneMmPkg      |
+| StandaloneMmPkg      | :heavy_check_mark: | :heavy_check_mark: |
 | UefiCpuPkg           | :heavy_check_mark: | :heavy_check_mark: | Spell checking in audit mode, 2 binary modules not being built by DSC
 | UefiPayloadPkg       |
 | UnitTestFrameworkPkg | :heavy_check_mark: | :heavy_check_mark: |
