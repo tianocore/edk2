@@ -15,9 +15,10 @@
 
   Step #3 - Adding to the mScheduledQueue requires that you process Before
             and After dependencies. This is done recursively as the call to add
-            to the mScheduledQueue checks for Before and recursively adds
-            all Befores. It then addes the item that was passed in and then
-            processess the After dependecies by recursively calling the routine.
+            to the mScheduledQueue checks for Before Depexes and recursively
+            adds all Before Depexes. It then adds the item that was passed in
+            and then processess the After dependencies by recursively calling
+            the routine.
 
   Dispatcher Rules:
   The rules for the dispatcher are similar to the DXE dispatcher.
@@ -29,7 +30,7 @@
 
   Copyright (c) 2014, Hewlett-Packard Development Company, L.P.
   Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
-  Copyright (c) 2016 - 2018, ARM Limited. All rights reserved.<BR>
+  Copyright (c) 2016 - 2021, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -60,8 +61,8 @@ MmCoreFfsFindMmDriver (
 /**
   Insert InsertedDriverEntry onto the mScheduledQueue. To do this you
   must add any driver with a before dependency on InsertedDriverEntry first.
-  You do this by recursively calling this routine. After all the Befores are
-  processed you can add InsertedDriverEntry to the mScheduledQueue.
+  You do this by recursively calling this routine. After all the Before Depexes
+  are processed you can add InsertedDriverEntry to the mScheduledQueue.
   Then you can add any driver with an After dependency on InsertedDriverEntry
   by recursively calling this routine.
 
@@ -92,7 +93,7 @@ LIST_ENTRY  mScheduledQueue = INITIALIZE_LIST_HEAD_VARIABLE (mScheduledQueue);
 LIST_ENTRY  mFwVolList = INITIALIZE_LIST_HEAD_VARIABLE (mFwVolList);
 
 //
-// Flag for the MM Dispacher.  TRUE if dispatcher is execuing.
+// Flag for the MM Dispacher.  TRUE if dispatcher is executing.
 //
 BOOLEAN  gDispatcherRunning = FALSE;
 
@@ -110,7 +111,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED    UINT64                *mMmCodeMemoryRangeUsageB
 
 /**
   To check memory usage bit map array to figure out if the memory range in which the image will be loaded
-  is available or not. If memory range is avaliable, the function will mark the correponding bits to 1
+  is available or not. If memory range is avaliable, the function will mark the corresponding bits to 1
   which indicates the memory range is used. The function is only invoked when load modules at fixed address
   feature is enabled.
 
@@ -163,7 +164,7 @@ CheckAndMarkFixLoadingMemoryUsageBitMap (
   }
 
   //
-  // Test if the memory is avalaible or not.
+  // Test if the memory is available or not.
   //
   BaseOffsetPageNumber = (UINTN)EFI_SIZE_TO_PAGES ((UINT32)(ImageBase - MmCodeBase));
   TopOffsetPageNumber  = (UINTN)EFI_SIZE_TO_PAGES ((UINT32)(ImageBase + ImageSize - MmCodeBase));
@@ -328,7 +329,7 @@ MmLoadImage (
   ImageContext.ImageAddress = (EFI_PHYSICAL_ADDRESS)DstBuffer;
 
   //
-  // Align buffer on section boundry
+  // Align buffer on section boundary
   //
   ImageContext.ImageAddress += ImageContext.SectionAlignment - 1;
   ImageContext.ImageAddress &= ~((EFI_PHYSICAL_ADDRESS)(ImageContext.SectionAlignment - 1));
@@ -604,7 +605,7 @@ MmDispatcher (
 
       //
       // Load the MM Driver image into memory. If the Driver was transitioned from
-      // Untrused to Scheduled it would have already been loaded so we may need to
+      // Untrusted to Scheduled it would have already been loaded so we may need to
       // skip the LoadImage
       //
       if (DriverEntry->ImageHandle == NULL) {
@@ -703,8 +704,8 @@ MmDispatcher (
 /**
   Insert InsertedDriverEntry onto the mScheduledQueue. To do this you
   must add any driver with a before dependency on InsertedDriverEntry first.
-  You do this by recursively calling this routine. After all the Befores are
-  processed you can add InsertedDriverEntry to the mScheduledQueue.
+  You do this by recursively calling this routine. After all the Before Depexes
+  are processed you can add InsertedDriverEntry to the mScheduledQueue.
   Then you can add any driver with an After dependency on InsertedDriverEntry
   by recursively calling this routine.
 
@@ -828,9 +829,9 @@ FvIsBeingProcessed (
 
 /**
   Add an entry to the mDiscoveredList. Allocate memory to store the DriverEntry,
-  and initilize any state variables. Read the Depex from the FV and store it
+  and initialise any state variables. Read the Depex from the FV and store it
   in DriverEntry. Pre-process the Depex to set the Before and After state.
-  The Discovered list is never free'ed and contains booleans that represent the
+  The Discovered list is never freed and contains booleans that represent the
   other possible MM driver states.
 
   @param  Fv                    Fv protocol, needed to read Depex info out of
@@ -885,7 +886,7 @@ MmAddToDriverList (
 
 /**
   Traverse the discovered list for any drivers that were discovered but not loaded
-  because the dependency experessions evaluated to false.
+  because the dependency expressions evaluated to false.
 
 **/
 VOID

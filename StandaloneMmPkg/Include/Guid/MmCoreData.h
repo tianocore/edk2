@@ -2,7 +2,7 @@
   MM Core data.
 
 Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
-Copyright (c) 2018, ARM Limited. All rights reserved.<BR>
+Copyright (c) 2018 - 2021, Arm Limited. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -98,14 +98,14 @@ typedef struct {
   EFI_PHYSICAL_ADDRESS            Mmst;
 
   ///
-  /// This field is used by the MM Communicatioon Protocol to pass a buffer into
+  /// This field is used by the MM Communication Protocol to pass a buffer into
   /// a software MMI handler and for the software MMI handler to pass a buffer back to
   /// the caller of the MM Communication Protocol.
   ///
   EFI_PHYSICAL_ADDRESS            CommunicationBuffer;
 
   ///
-  /// This field is used by the MM Communicatioon Protocol to pass the size of a buffer,
+  /// This field is used by the MM Communication Protocol to pass the size of a buffer,
   /// in bytes, into a software MMI handler and for the software MMI handler to pass the
   /// size, in bytes, of a buffer back to the caller of the MM Communication Protocol.
   ///
