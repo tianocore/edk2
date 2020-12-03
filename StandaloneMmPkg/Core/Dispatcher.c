@@ -834,18 +834,14 @@ FvIsBeingProcessed (
   The Discovered list is never freed and contains booleans that represent the
   other possible MM driver states.
 
-  @param  Fv                    Fv protocol, needed to read Depex info out of
-                                FLASH.
-  @param  FvHandle              Handle for Fv, needed in the
-                                EFI_MM_DRIVER_ENTRY so that the PE image can be
-                                read out of the FV at a later time.
-  @param  DriverName            Name of driver to add to mDiscoveredList.
+  @param [in]   FwVolHeader     Pointer to the formware volume header.
+  @param [in]   Pe32Data        Pointer to the PE data.
+  @param [in]   Pe32DataSize    Size of the PE data.
+  @param [in]   Depex           Pointer to the Depex info.
+  @param [in]   DepexSize       Size of the Depex info.
+  @param [in]   DriverName      Name of driver to add to mDiscoveredList.
 
   @retval EFI_SUCCESS           If driver was added to the mDiscoveredList.
-  @retval EFI_ALREADY_STARTED   The driver has already been started. Only one
-                                DriverName may be active in the system at any one
-                                time.
-
 **/
 EFI_STATUS
 MmAddToDriverList (
