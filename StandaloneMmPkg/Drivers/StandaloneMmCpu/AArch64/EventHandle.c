@@ -1,7 +1,7 @@
 /** @file
 
   Copyright (c) 2016 HP Development Company, L.P.
-  Copyright (c) 2016 - 2018, ARM Limited. All rights reserved.
+  Copyright (c) 2016 - 2021, Arm Limited. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -84,12 +84,18 @@ PiMmStandaloneArmTfCpuDriverEntry (
   }
 
   // Perform parameter validation of NsCommBufferAddr
-  if (NsCommBufferAddr && (NsCommBufferAddr < mNsCommBuffer.PhysicalStart))
+  if (NsCommBufferAddr == (UINTN)NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (NsCommBufferAddr < mNsCommBuffer.PhysicalStart) {
     return EFI_ACCESS_DENIED;
+  }
 
   if ((NsCommBufferAddr + sizeof (EFI_MM_COMMUNICATE_HEADER)) >=
-      (mNsCommBuffer.PhysicalStart + mNsCommBuffer.PhysicalSize))
+      (mNsCommBuffer.PhysicalStart + mNsCommBuffer.PhysicalSize)) {
     return EFI_INVALID_PARAMETER;
+  }
 
   // Find out the size of the buffer passed
   NsCommBufferSize = ((EFI_MM_COMMUNICATE_HEADER *) NsCommBufferAddr)->MessageLength +
@@ -97,9 +103,9 @@ PiMmStandaloneArmTfCpuDriverEntry (
 
   // perform bounds check.
   if (NsCommBufferAddr + NsCommBufferSize >=
-      mNsCommBuffer.PhysicalStart + mNsCommBuffer.PhysicalSize)
+      mNsCommBuffer.PhysicalStart + mNsCommBuffer.PhysicalSize) {
     return EFI_ACCESS_DENIED;
-
+  }
 
   // Now that the secure world can see the normal world buffer, allocate
   // memory to copy the communication buffer to the secure world.
@@ -192,8 +198,9 @@ PiMmCpuTpFwRootMmiHandler (
   ASSERT (CommBufferSize == NULL);
 
   CpuNumber = mMmst->CurrentlyExecutingCpu;
-  if (!PerCpuGuidedEventContext[CpuNumber])
+  if (PerCpuGuidedEventContext[CpuNumber] == NULL) {
     return EFI_NOT_FOUND;
+  }
 
   DEBUG ((DEBUG_INFO, "CommBuffer - 0x%x, CommBufferSize - 0x%x\n",
           PerCpuGuidedEventContext[CpuNumber],
