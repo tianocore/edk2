@@ -2,7 +2,7 @@
   MM Core Main Entry Point
 
   Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
-  Copyright (c) 2016 - 2018, ARM Limited. All rights reserved.<BR>
+  Copyright (c) 2016 - 2021, Arm Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -590,9 +590,9 @@ StandaloneMmMain (
 
   //
   // No need to initialize memory service.
-  // It is done in constructor of StandaloneMmCoreMemoryAllocationLib(),
-  // so that the library linked with StandaloneMmCore can use AllocatePool() in constuctor.
-  //
+  // It is done in the constructor of StandaloneMmCoreMemoryAllocationLib(),
+  // so that the library linked with StandaloneMmCore can use AllocatePool() in
+  // the constructor.
 
   DEBUG ((DEBUG_INFO, "MmInstallConfigurationTable For HobList\n"));
   //

@@ -2,7 +2,7 @@
   Module entry point library for Standalone MM Drivers.
 
 Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
-Copyright (c) 2016 - 2018, ARM Limited. All rights reserved.<BR>
+Copyright (c) 2016 - 2021, Arm Limited. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -29,7 +29,7 @@ extern CONST UINT32                   _gMmRevision;
   than zero, then an unload handler must be registered for this image and
   the unload handler must invoke ProcessModuleUnloadList().
   If _gUefiDriverRevision is not zero and SystemTable->Hdr.Revision is
-  less than _gUefiDriverRevison, then return EFI_INCOMPATIBLE_VERSION.
+  less than _gUefiDriverRevision, then return EFI_INCOMPATIBLE_VERSION.
 
   @param  ImageHandle  The image handle of the Standalone MM Driver.
   @param  SystemTable  A pointer to the EFI System Table.

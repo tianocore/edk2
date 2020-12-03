@@ -1,11 +1,11 @@
 ## @file
 # Memory Allocation Library instance dedicated to MM Core.
 # The implementation borrows the MM Core Memory Allocation services as the primitive
-# for memory allocation instead of using MM System Table servces in an indirect way.
+# for memory allocation instead of using MM System Table services in an indirect way.
 # It is assumed that this library instance must be linked with MM Core in this package.
 #
 # Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
-# Copyright (c) 2016 - 2018, ARM Limited. All rights reserved.<BR>
+# Copyright (c) 2016 - 2021, Arm Limited. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #

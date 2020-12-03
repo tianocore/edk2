@@ -1,10 +1,10 @@
 ## @file
-#  Runtime DXE part corresponding to StanaloneMM variable module.
+#  Runtime DXE part corresponding to StandaloneMM variable module.
 #
 #  This module installs variable arch protocol and variable write arch protocol
 #  to StandaloneMM runtime variable service.
 #
-# Copyright (c) 2019, ARM Ltd. All rights reserved.
+# Copyright (c) 2019 - 2021, Arm Ltd. All rights reserved.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
