@@ -131,7 +131,7 @@ ParseDhcp4Ack (
         return EFI_OUT_OF_RESOURCES;
       }
 
-      for(Count=0; Count < ServerCount; Count++){
+      for (Count=0; Count < ServerCount; Count++) {
         CopyMem (ServerList + Count, &OptionList[Index]->Data[4 * Count], sizeof (EFI_IPv4_ADDRESS));
       }
 
@@ -225,7 +225,7 @@ ParseDhcp6Ack (
         return EFI_OUT_OF_RESOURCES;
       }
 
-      for(Count=0; Count < ServerCount; Count++){
+      for (Count=0; Count < ServerCount; Count++) {
         CopyMem (ServerList + Count, &OptionList[Index]->Data[16 * Count], sizeof (EFI_IPv6_ADDRESS));
       }
 
