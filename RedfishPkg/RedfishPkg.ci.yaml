@@ -17,6 +17,39 @@
         ],
         ## Both file path and directory path are accepted.
         "IgnoreFiles": [
+            ## Below are files incorporated with open source which are
+            ## not edk2 coding standard compliant.
+            ##
+            ## For jansson library open source
+            ## load.c is overrided from open source.
+            "Library/JsonLib/load.c",
+            ## C runtime library for EDKII JsonLib.
+            "Library/JsonLib/sys",
+            "Library/JsonLib/assert.h",
+            "Library/JsonLib/errno.h",
+            "Library/JsonLib/jansson_config.h",
+            "Library/JsonLib/jansson_private_config.h",
+            "Library/JsonLib/limits.h",
+            "Library/JsonLib/math.h",
+            "Library/JsonLib/stdarg.h",
+            "Library/JsonLib/stddef.h",
+            "Library/JsonLib/stdio.h",
+            "Library/JsonLib/stdlib.h",
+            "Library/JsonLib/string.h",
+            "Library/JsonLib/time.h",
+            ##
+            ## EDK2 CRT library which is not edk2 coding
+            ## standard compliant.
+            "Include/Library/CrtLib.h",
+            "Library/CrtLib/CrtLib.c",
+            ##
+            ## Below header file is used by open source
+            ## project which uses jansson library. Use this
+            ## header file to map jansson native APIs to
+            ## edk2 JsonLib APIs.This header file doesn't
+            ## have the corresponding library class. This
+            ## header file is not edk2 codingstandard compliant.
+            "Include/JanssonJsonMapping.h"
         ]
     },
     "CompilerPlugin": {
