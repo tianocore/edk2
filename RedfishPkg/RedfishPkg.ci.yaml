@@ -35,7 +35,13 @@
             "Include/Crt/string.h",
             "Include/Crt/time.h",
             "Include/Library/CrtLib.h",
-            "Library/CrtLib/CrtLib.c"
+            "Library/CrtLib/CrtLib.c",
+            ##
+            ## For jansson library open source
+            ## load.c is overrided from open source.
+            "Library/JsonLib/load.c",
+            "Library/JsonLib/jansson_config.h",
+            "Library/JsonLib/jansson_private_config.h"
         ]
     },
     "CompilerPlugin": {
