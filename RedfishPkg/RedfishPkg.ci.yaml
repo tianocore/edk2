@@ -35,7 +35,13 @@
             "PrivateInclude/Crt/string.h",
             "PrivateInclude/Crt/time.h",
             "PrivateInclude/Library/RedfishCrtLib.h",
-            "PrivateLibrary/RedfishCrtLib/RedfishCrtLib.c"
+            "PrivateLibrary/RedfishCrtLib/RedfishCrtLib.c",
+            ##
+            ## For jansson library open source
+            ## load.c is overrided from open source.
+            "Library/JsonLib/load.c",
+            "Library/JsonLib/jansson_config.h",
+            "Library/JsonLib/jansson_private_config.h"
         ]
     },
     "CompilerPlugin": {
