@@ -217,7 +217,7 @@ Dns4Configure (
       Dns4InstanceCancelToken(Instance, NULL);
     }
 
-    if (Instance->UdpIo != NULL){
+    if (Instance->UdpIo != NULL) {
       UdpIoCleanIo (Instance->UdpIo);
     }
 
@@ -1061,7 +1061,7 @@ Dns6Configure (
       Dns6InstanceCancelToken(Instance, NULL);
     }
 
-    if (Instance->UdpIo != NULL){
+    if (Instance->UdpIo != NULL) {
       UdpIoCleanIo (Instance->UdpIo);
     }
 
