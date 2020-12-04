@@ -154,6 +154,11 @@
   #
   VariablePolicyHelperLib|Include/Library/VariablePolicyHelperLib.h
 
+  ##  @libraryclass  This library provides UCS2 to UTF8 manipulation
+  #   functions.
+  #
+  Ucs2Utf8Lib|Include/Library/BaseUcs2Utf8Lib.h
+
 [Guids]
   ## MdeModule package token space guid
   # Include/Guid/MdeModulePkgTokenSpace.h

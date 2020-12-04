@@ -43,6 +43,7 @@
   PeCoffLib|MdePkg/Library/BasePeCoffLib/BasePeCoffLib.inf
   PeCoffGetEntryPointLib|MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
   SortLib|MdeModulePkg/Library/BaseSortLib/BaseSortLib.inf
+  Ucs2Utf8Lib|MdeModulePkg/Library/BaseUcs2Utf8Lib/BaseUcs2Utf8Lib.inf
   #
   # UEFI & PI
   #
@@ -212,6 +213,7 @@
   MdeModulePkg/Application/MemoryProfileInfo/MemoryProfileInfo.inf
 
   MdeModulePkg/Library/UefiSortLib/UefiSortLib.inf
+  MdeModulePkg/Library/BaseUcs2Utf8Lib/BaseUcs2Utf8Lib.inf
   MdeModulePkg/Logo/Logo.inf
   MdeModulePkg/Logo/LogoDxe.inf
   MdeModulePkg/Library/BaseSortLib/BaseSortLib.inf
