@@ -1,0 +1,15 @@
+/** @file
+  Include file to support building the third-party jansson library.
+
+ Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+ (C) Copyright 2020 Hewlett Packard Enterprise Development LP<BR>
+
+    SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+#ifndef CRT_SYS_TIME_H_
+#define CRT_SYS_TIME_H_
+
+#include <Library/CrtLib.h>
+
+#endif

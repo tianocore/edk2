@@ -15,15 +15,23 @@
 
 [Includes]
   Include
+  Include/Crt                   # Header files for C RTL.
 
 [LibraryClasses]
   ##  @libraryclass Platform Redfish Host Interface Library
   #   Platform implementation-specific Redfish Host Interface.
   RedfishPlatformHostInterfaceLib|Include/Library/RedfishHostInterfaceLib.h
+
   ##  @libraryclass  This library provides UCS2 to UTF8 manipulation
   #   functions.
   #
   Ucs2Utf8Lib|Include/Library/BaseUcs2Utf8Lib.h
+
+  ##  @libraryclass  Provides the C runtime library functions
+  #   CRT library is currently used by edk2 JsonLib (open source
+  #   jansson project) and edk2 RedfishLib (libredfish open source
+  #   project).
+  CrtLib|Include/Library/CrtLib.h
 
 [Protocols]
   ## Include/Protocol/RedfishDiscover.h

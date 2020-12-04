@@ -17,6 +17,25 @@
         ],
         ## Both file path and directory path are accepted.
         "IgnoreFiles": [
+            ## Below are files incorporated with open source which are
+            ## not edk2 coding standard compliant.
+            ##
+            ## EDK2 CRT library which is not edk2 coding
+            ## standard compliant.
+            ## C runtime library for EDKII JsonLib.
+            "Include/Crt/sys",
+            "Include/Crt/assert.h",
+            "Include/Crt/errno.h",
+            "Include/Crt/limits.h",
+            "Include/Crt/math.h",
+            "Include/Crt/stdarg.h",
+            "Include/Crt/stddef.h",
+            "Include/Crt/stdio.h",
+            "Include/Crt/stdlib.h",
+            "Include/Crt/string.h",
+            "Include/Crt/time.h",
+            "Include/Library/CrtLib.h",
+            "Library/CrtLib/CrtLib.c"
         ]
     },
     "CompilerPlugin": {
