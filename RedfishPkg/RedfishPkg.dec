@@ -19,6 +19,13 @@
 [Includes.Common.Private]
   PrivateInclude                # Private header files for C RTL.
   PrivateInclude/Crt            # Private header files for C RTL.
+  Library/JsonLib               # Private header files for jansson
+                                # configuration files.
+                                #  - jansson_config.h
+                                #  - jansson_private_config.h
+                                # jansson.h refers to above two configuration
+                                # files for building platform jansson library.
+  Library/JsonLib/jansson/src   # For referring to jannson.h
 
 [LibraryClasses]
   ##  @libraryclass Platform Redfish Host Interface Library
@@ -37,6 +44,11 @@
   ##  @libraryclass  The helper routines to access REST EX service.
   #   This library is only intended to be used by UEFI network stack modules.
   RestExLib|Include/Library/RestExLib.h
+
+  ##  @libraryclass  Provides the library functions based on third party
+  #  jansson library to manipulate JSON data structure.
+  #
+  JsonLib|Include/Library/JsonLib.h
 
 [LibraryClasses.Common.Private]
   ##  @libraryclass  Provides the private C runtime library functions.
