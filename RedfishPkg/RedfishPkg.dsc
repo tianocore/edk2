@@ -50,5 +50,6 @@
   RedfishPkg/Library/PlatformHostInterfaceLibNull/PlatformHostInterfaceLibNull.inf
   RedfishPkg/Library/PlatformCredentialLibNull/PlatformCredentialLibNull.inf
   RedfishPkg/Library/BaseUcs2Utf8Lib/BaseUcs2Utf8Lib.inf
+  RedfishPkg/Library/RedfishCrtLib/RedfishCrtLib.inf
 
   !include RedfishPkg/Redfish.dsc.inc
