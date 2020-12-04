@@ -197,11 +197,11 @@ DnsDestroyService (
 {
   UdpIoFreeIo (DnsSb->ConnectUdp);
 
-  if (DnsSb->TimerToGetMap != NULL){
+  if (DnsSb->TimerToGetMap != NULL) {
     gBS->CloseEvent (DnsSb->TimerToGetMap);
   }
 
-  if (DnsSb->Timer != NULL){
+  if (DnsSb->Timer != NULL) {
     gBS->CloseEvent (DnsSb->Timer);
   }
 

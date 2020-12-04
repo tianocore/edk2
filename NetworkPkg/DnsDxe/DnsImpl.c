@@ -799,7 +799,7 @@ UpdateDns4Cache (
         Item->DnsCache.Timeout = DnsCacheEntry.Timeout;
 
         return EFI_SUCCESS;
-      }else {
+      } else {
         return EFI_ACCESS_DENIED;
       }
     }
@@ -897,7 +897,7 @@ UpdateDns6Cache (
         Item->DnsCache.Timeout = DnsCacheEntry.Timeout;
 
         return EFI_SUCCESS;
-      }else {
+      } else {
         return EFI_ACCESS_DENIED;
       }
     }
@@ -1080,7 +1080,7 @@ IsValidDnsResponse (
   NET_LIST_FOR_EACH (Entry, &TokensMap->Used) {
     *Item = NET_LIST_USER_STRUCT (Entry, NET_MAP_ITEM, Link);
     Packet = (NET_BUF *) ((*Item)->Value);
-    if (Packet == NULL){
+    if (Packet == NULL) {
 
       continue;
     } else {
@@ -2127,7 +2127,7 @@ DnsOnTimerRetransmit (
         }
       }
     }
-  }else {
+  } else {
     //
     // Iterate through all the children of the DNS service instance. Time
     // out the packet. If maximum retries reached, clean the Token up.
