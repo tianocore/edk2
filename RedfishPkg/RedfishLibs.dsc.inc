@@ -11,5 +11,7 @@
 #
 ##
 !if $(REDFISH_ENABLE) == TRUE
+  CrtLib|RedfishPkg/Library/CrtLib/CrtLib.inf
+  JsonLib|RedfishPkg/Library/JsonLib/JsonLib.inf
 !endif
 
