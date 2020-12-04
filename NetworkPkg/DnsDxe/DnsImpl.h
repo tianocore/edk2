@@ -125,7 +125,7 @@ typedef struct {
   EFI_DNS6_COMPLETION_TOKEN  *Token;
 } DNS6_TOKEN_ENTRY;
 
-union _DNS_FLAGS{
+union _DNS_FLAGS {
   struct {
     UINT16     RCode:4;
     UINT16     Zero:3;
