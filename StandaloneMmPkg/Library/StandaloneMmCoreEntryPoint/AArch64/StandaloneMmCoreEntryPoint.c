@@ -31,10 +31,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define SPM_MINOR_VER_MASK        0x0000FFFF
 #define SPM_MAJOR_VER_SHIFT       16
 
-CONST UINT32 SPM_MAJOR_VER = 0;
-CONST UINT32 SPM_MINOR_VER = 1;
+#define SPM_MAJOR_VER             0
+#define SPM_MINOR_VER             1
 
-CONST UINT8 BOOT_PAYLOAD_VERSION = 1;
+#define BOOT_PAYLOAD_VERSION      1
 
 PI_MM_ARM_TF_CPU_DRIVER_ENTRYPOINT      CpuDriverEntryPoint = NULL;
 
