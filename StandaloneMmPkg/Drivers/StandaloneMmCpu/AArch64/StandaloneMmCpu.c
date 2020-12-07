@@ -44,6 +44,16 @@ EFI_MM_SYSTEM_TABLE *mMmst = NULL;
 //
 STATIC EFI_HANDLE            mMmCpuHandle = NULL;
 
+/** Returns the HOB data for the matching HOB GUID.
+
+  @param  [in]  HobList  Pointer to the HOB list.
+  @param  [in]  HobGuid  The GUID for the HOB.
+  @param  [out] HobData  Pointer to the HOB data.
+
+  @retval  EFI_SUCCESS            The function completed successfully.
+  @retval  EFI_INVALID_PARAMETER  Invalid parameter.
+  @retval  EFI_NOT_FOUND          Could not find HOB with matching GUID.
+**/
 EFI_STATUS
 GetGuidedHobData (
   IN  VOID *HobList,
@@ -70,9 +80,20 @@ GetGuidedHobData (
   return EFI_SUCCESS;
 }
 
+/** Entry point for the Standalone MM CPU driver.
+
+  @param  [in]  ImageHandle   Unused. Not actual image handle.
+  @param  [in]  SystemTable   Pointer to MM System table.
+
+  @retval  EFI_SUCCESS            The function completed successfully.
+  @retval  EFI_INVALID_PARAMETER  Invalid parameter.
+  @retval  EFI_OUT_OF_RESOURCES   Out of resources.
+  @retval  EFI_NOT_FOUND          Failed to find the HOB for the CPU
+                                  driver endpoint descriptor.
+**/
 EFI_STATUS
 StandaloneMmCpuInitialize (
-  IN EFI_HANDLE         ImageHandle,  // not actual imagehandle
+  IN EFI_HANDLE            ImageHandle,  // not actual imagehandle
   IN EFI_MM_SYSTEM_TABLE   *SystemTable  // not actual systemtable
   )
 {
