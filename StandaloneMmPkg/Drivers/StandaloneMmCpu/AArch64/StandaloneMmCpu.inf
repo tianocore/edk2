@@ -1,5 +1,4 @@
-#/** @file
-#
+## @file
 #  Standalone MM CPU driver for ARM Standard Platforms
 #
 #  Copyright (c) 2009, Apple Inc. All rights reserved.<BR>
@@ -7,8 +6,7 @@
 #  Copyright (c) 2017 - 2021, Arm Limited. All rights reserved.
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
-#
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 0x0001001A
