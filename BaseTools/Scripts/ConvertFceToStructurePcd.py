@@ -52,6 +52,7 @@ infstatement = '''[Pcd]
 
 SECTION='PcdsDynamicHii'
 PCD_NAME='gStructPcdTokenSpaceGuid.Pcd'
+Max_Pcd_Len = 100
 
 WARNING=[]
 ERRORMSG=[]
@@ -278,6 +279,9 @@ class Config(object):
     part = []
     for x in section[1:]:
         line=x.split('\n')[0]
+        comment_list = value_re.findall(line) # the string \\... in "Q...." line
+        comment_list[0] = comment_list[0].replace('//', '')
+        comment = comment_list[0].strip()
         line=value_re.sub('',line) #delete \\... in "Q...." line
         list1=line.split(' ')
         value=self.value_parser(list1)
@@ -289,7 +293,7 @@ class Config(object):
           if attribute[0] in ['0x3','0x7']:
             offset = int(offset[0], 16)
             #help = help_re.findall(x)
-            text = offset, name[0], guid[0], value, attribute[0]
+            text = offset, name[0], guid[0], value, attribute[0], comment
             part.append(text)
     return(part)
 
@@ -479,7 +483,7 @@ class mainprocess(object):
       tmp_id=[id_key] #['0_0',[(struct,[name...]),(struct,[name...])]]
       tmp_info={} #{name:struct}
       for section in config_dict[id_key]:
-        c_offset,c_name,c_guid,c_value,c_attribute = section
+        c_offset,c_name,c_guid,c_value,c_attribute,c_comment = section
         if c_name in efi_dict:
           struct = efi_dict[c_name]
           title='%s%s|L"%s"|%s|0x00||%s\n'%(PCD_NAME,c_name,c_name,self.guid.guid_parser(c_guid),self.attribute_dict[c_attribute])
@@ -499,9 +503,14 @@ class mainprocess(object):
           if c_offset in struct_dict:
             offset_name=struct_dict[c_offset]
             info = "%s%s.%s|%s\n"%(PCD_NAME,c_name,offset_name,c_value)
+            blank_length = Max_Pcd_Len - len(info)
+            if blank_length <= 0:
+                info_comment = "%s%s.%s|%s%s# %s\n"%(PCD_NAME,c_name,offset_name,c_value,"     ",c_comment)
+            else:
+                info_comment = "%s%s.%s|%s%s# %s\n"%(PCD_NAME,c_name,offset_name,c_value,blank_length*" ",c_comment)
             inf = "%s%s\n"%(PCD_NAME,c_name)
             inf_list.append(inf)
-            tmp_info[info]=title
+            tmp_info[info_comment]=title
           else:
             print("ERROR: Can't find offset %s with struct name %s"%(c_offset,struct))
             ERRORMSG.append("ERROR: Can't find offset %s with name %s"%(c_offset,struct))
