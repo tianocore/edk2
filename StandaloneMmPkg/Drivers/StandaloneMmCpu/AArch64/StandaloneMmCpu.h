@@ -2,7 +2,7 @@
   Private header with declarations and definitions specific to the MM Standalone
   CPU driver
 
-  Copyright (c) 2017 - 2018, ARM Limited. All rights reserved.
+  Copyright (c) 2017 - 2021, Arm Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -33,6 +33,19 @@ extern EFI_MMRAM_DESCRIPTOR          mNsCommBuffer;
 extern MP_INFORMATION_HOB_DATA       *mMpInformationHobData;
 extern EFI_MM_CONFIGURATION_PROTOCOL mMmConfig;
 
+/**
+  The PI Standalone MM entry point for the TF-A CPU driver.
+
+  @param  [in] EventId            The event Id.
+  @param  [in] CpuNumber          The CPU number.
+  @param  [in] NsCommBufferAddr   Address of the NS common buffer.
+
+  @retval   EFI_SUCCESS             Success.
+  @retval   EFI_INVALID_PARAMETER   A parameter was invalid.
+  @retval   EFI_ACCESS_DENIED       Access not permitted.
+  @retval   EFI_OUT_OF_RESOURCES    Out of resources.
+  @retval   EFI_UNSUPPORTED         Operation not supported.
+**/
 EFI_STATUS
 PiMmStandaloneArmTfCpuDriverEntry (
   IN UINTN EventId,
@@ -40,6 +53,22 @@ PiMmStandaloneArmTfCpuDriverEntry (
   IN UINTN NsCommBufferAddr
   );
 
+/**
+  This function is the main entry point for an MM handler dispatch
+  or communicate-based callback.
+
+  @param  DispatchHandle  The unique handle assigned to this handler by
+                          MmiHandlerRegister().
+  @param  Context         Points to an optional handler context which was
+                          specified when the handler was registered.
+  @param  CommBuffer      A pointer to a collection of data in memory that will
+                          be conveyed from a non-MM environment into an
+                          MM environment.
+  @param  CommBufferSize  The size of the CommBuffer.
+
+  @return Status Code
+
+**/
 EFI_STATUS
 EFIAPI
 PiMmCpuTpFwRootMmiHandler (
