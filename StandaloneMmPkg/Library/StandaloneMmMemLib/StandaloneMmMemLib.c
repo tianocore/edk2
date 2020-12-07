@@ -240,8 +240,8 @@ MmSetMem (
 /**
   The constructor function initializes the Mm Mem library
 
-  @param  ImageHandle   The firmware allocated handle for the EFI image.
-  @param  SystemTable   A pointer to the EFI System Table.
+  @param  [in]  ImageHandle     The firmware allocated handle for the EFI image.
+  @param  [in]  MmSystemTable   A pointer to the EFI System Table.
 
   @retval EFI_SUCCESS   The constructor always returns EFI_SUCCESS.
 
