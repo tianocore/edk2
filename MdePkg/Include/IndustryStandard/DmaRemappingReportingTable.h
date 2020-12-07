@@ -2,13 +2,13 @@
   DMA Remapping Reporting (DMAR) ACPI table definition from Intel(R)
   Virtualization Technology for Directed I/O (VT-D) Architecture Specification.
 
-  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2020, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Revision Reference:
     - Intel(R) Virtualization Technology for Directed I/O (VT-D) Architecture
-      Specification v2.5, Dated November 2017.
-      http://www.intel.com/content/dam/www/public/us/en/documents/product-specifications/vt-directed-io-spec.pdf
+      Specification v3.2, Dated October 2020.
+      https://software.intel.com/content/dam/develop/external/us/en/documents/vt-directed-io-spec.pdf
 
   @par Glossary:
     - HPET - High Precision Event Timer
@@ -39,6 +39,7 @@
 #define EFI_ACPI_DMAR_TYPE_ATSR                   0x02
 #define EFI_ACPI_DMAR_TYPE_RHSA                   0x03
 #define EFI_ACPI_DMAR_TYPE_ANDD                   0x04
+#define EFI_ACPI_DMAR_TYPE_SATC                   0x05
 ///@}
 
 ///
@@ -217,6 +218,32 @@ typedef struct {
 } EFI_ACPI_DMAR_ANDD_HEADER;
 
 /**
+  An SoC Integrated Address Translation Cache (SATC) reporting structure is
+  defined in section 8.8.
+**/
+typedef struct {
+  EFI_ACPI_DMAR_STRUCTURE_HEADER  Header;
+  /**
+    - Bit[0]: ATC_REQUIRED:
+              - If Set, indicates that every SoC integrated device enumerated
+                in this table has a functional requirement to enable its ATC
+                (via the ATS capability) for device operation.
+              - If Clear, any device enumerated in this table can operate when
+                its respective ATC is not enabled (albeit with reduced
+                performance or functionality).
+    - Bits[7:1] Reserved.
+  **/
+  UINT8                           Flags;
+  UINT8                           Reserved;
+  ///
+  /// The PCI Segment associated with this SATC structure. All SoC integrated
+  /// devices within a PCI segment with same value for Flags field must be
+  /// enumerated in the same SATC structure.
+  ///
+  UINT16                          SegmentNumber;
+} EFI_ACPI_DMAR_SATC_HEADER;
+
+/**
   DMA Remapping Reporting Structure Header as defined in section 8.1
   This header will be followed by list of Remapping Structures listed below
     - DMA Remapping Hardware Unit Definition (DRHD)
@@ -224,6 +251,7 @@ typedef struct {
     - Root Port ATS Capability Reporting (ATSR)
     - Remapping Hardware Static Affinity (RHSA)
     - ACPI Name-space Device Declaration (ANDD)
+    - SoC Integrated Address Translation Cache reporting (SATC)
   These structure types must by reported in numerical order.
   i.e., All remapping structures of type 0 (DRHD) enumerated before remapping
   structures of type 1 (RMRR), and so forth.
