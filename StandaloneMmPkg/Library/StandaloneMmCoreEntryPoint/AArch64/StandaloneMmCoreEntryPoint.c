@@ -40,9 +40,10 @@ PI_MM_ARM_TF_CPU_DRIVER_ENTRYPOINT      CpuDriverEntryPoint = NULL;
 
 /**
   Retrieve a pointer to and print the boot information passed by privileged
-  secure firmware
+  secure firmware.
 
-  @param  SharedBufAddress The pointer memory shared with privileged firmware
+  @param  [in] SharedBufAddress   The pointer memory shared with privileged
+                                  firmware.
 
 **/
 EFI_SECURE_PARTITION_BOOT_INFO *
