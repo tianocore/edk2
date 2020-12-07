@@ -1,8 +1,9 @@
-/**@file
+/** @file
+    Firmware volume helper interfaces.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
-Copyright (c) 2016 - 2021, Arm Limited. All rights reserved.<BR>
-SPDX-License-Identifier: BSD-2-Clause-Patent
+  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2021, Arm Limited. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
