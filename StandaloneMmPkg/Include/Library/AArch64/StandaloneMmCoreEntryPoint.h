@@ -2,7 +2,7 @@
   Entry point to the Standalone MM Foundation when initialized during the SEC
   phase on ARM platforms
 
-Copyright (c) 2017 - 2018, ARM Ltd. All rights reserved.<BR>
+Copyright (c) 2017 - 2021, Arm Ltd. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -70,13 +70,13 @@ typedef RETURN_STATUS (*REGION_PERMISSION_UPDATE_FUNC) (
   sections in the Standalone MM Core module to be able to access RO and RW data
   and make further progress in the boot process.
 
-  @param  ImageContext           Pointer to PE/COFF image context
-  @param  ImageBase              Base of image in memory
-  @param  SectionHeaderOffset    Offset of PE/COFF image section header
-  @param  NumberOfSections       Number of Sections
-  @param  TextUpdater            Function to change code permissions
-  @param  ReadOnlyUpdater        Function to change RO permissions
-  @param  ReadWriteUpdater       Function to change RW permissions
+  @param  [in] ImageContext           Pointer to PE/COFF image context
+  @param  [in] ImageBase              Base of image in memory
+  @param  [in] SectionHeaderOffset    Offset of PE/COFF image section header
+  @param  [in] NumberOfSections       Number of Sections
+  @param  [in] TextUpdater            Function to change code permissions
+  @param  [in] ReadOnlyUpdater        Function to change RO permissions
+  @param  [in] ReadWriteUpdater       Function to change RW permissions
 
 **/
 EFI_STATUS
@@ -98,11 +98,11 @@ UpdateMmFoundationPeCoffPermissions (
   the Standalone MM Core module to be able to change permissions of the
   individual sections later in the boot process.
 
-  @param  TeData                 Pointer to PE/COFF image data
-  @param  ImageContext           Pointer to PE/COFF image context
-  @param  ImageBase              Pointer to ImageBase variable
-  @param  SectionHeaderOffset    Offset of PE/COFF image section header
-  @param  NumberOfSections       Number of Sections
+  @param  [in]      TeData                Pointer to PE/COFF image data
+  @param  [in, out] ImageContext          Pointer to PE/COFF image context
+  @param  [out]     ImageBase             Pointer to ImageBase variable
+  @param  [in, out] SectionHeaderOffset   Offset of PE/COFF image section header
+  @param  [in, out] NumberOfSections      Number of Sections
 
 **/
 EFI_STATUS
@@ -121,10 +121,10 @@ GetStandaloneMmCorePeCoffSections (
   by the Boot Firmware Volume. This function locates the Standalone MM Core
   module PE/COFF image in the BFV and returns this information.
 
-  @param  BfvAddress             Base Address of Boot Firmware Volume
-  @param  TeData                 Pointer to address for allocating memory for
-                                 PE/COFF image data
-  @param  TeDataSize             Pointer to size of PE/COFF image data
+  @param  [in]      BfvAddress         Base Address of Boot Firmware Volume
+  @param  [in, out] TeData             Pointer to address for allocating memory
+                                       for PE/COFF image data
+  @param  [in, out] TeDataSize         Pointer to size of PE/COFF image data
 
 **/
 EFI_STATUS
