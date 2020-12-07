@@ -214,9 +214,10 @@ GetSpmVersion (VOID)
 /**
   The entry point of Standalone MM Foundation.
 
-  @param  SharedBufAddress  Pointer to the Buffer between SPM and SP.
-  @param  cookie1.
-  @param  cookie2.
+  @param  [in]  SharedBufAddress  Pointer to the Buffer between SPM and SP.
+  @param  [in]  SharedBufSize     Size of the shared buffer.
+  @param  [in]  cookie1           Cookie 1
+  @param  [in]  cookie2           Cookie 2
 
 **/
 VOID

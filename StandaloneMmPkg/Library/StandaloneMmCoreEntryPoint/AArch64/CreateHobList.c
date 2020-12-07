@@ -2,7 +2,7 @@
   Creates HOB during Standalone MM Foundation entry point
   on ARM platforms.
 
-Copyright (c) 2017 - 2018, ARM Ltd. All rights reserved.<BR>
+Copyright (c) 2017 - 2021, Arm Ltd. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -46,7 +46,9 @@ extern EFI_GUID gEfiArmTfCpuDriverEpDescriptorGuid;
   Use the boot information passed by privileged firmware to populate a HOB list
   suitable for consumption by the MM Core and drivers.
 
-  @param  PayloadBootInfo    Boot information passed by privileged firmware
+  @param  [in, out] CpuDriverEntryPoint   Address of MM CPU driver entrypoint
+  @param  [in]      PayloadBootInfo       Boot information passed by privileged
+                                          firmware
 
 **/
 VOID *
