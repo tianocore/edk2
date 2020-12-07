@@ -2,7 +2,7 @@
   Support routines for memory allocation routines based on Standalone MM Core internal functions.
 
   Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
-  Copyright (c) 2016 - 2018, ARM Limited. All rights reserved.<BR>
+  Copyright (c) 2016 - 2021, ARM Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -822,8 +822,8 @@ FreePool (
   The constructor function calls MmInitializeMemoryServices to initialize
   memory in MMRAM and caches EFI_MM_SYSTEM_TABLE pointer.
 
-  @param  ImageHandle   The firmware allocated handle for the EFI image.
-  @param  SystemTable   A pointer to the Management mode System Table.
+  @param  [in]  ImageHandle     The firmware allocated handle for the EFI image.
+  @param  [in]  MmSystemTable   A pointer to the Management mode System Table.
 
   @retval EFI_SUCCESS   The constructor always returns EFI_SUCCESS.
 
