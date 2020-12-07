@@ -58,6 +58,19 @@ EFI_MM_CONFIGURATION_PROTOCOL mMmConfig = {
 
 STATIC EFI_MM_ENTRY_POINT     mMmEntryPoint = NULL;
 
+/**
+  The PI Standalone MM entry point for the TF-A CPU driver.
+
+  @param  [in] EventId            The event Id.
+  @param  [in] CpuNumber          The CPU number.
+  @param  [in] NsCommBufferAddr   Address of the NS common buffer.
+
+  @retval   EFI_SUCCESS             Success.
+  @retval   EFI_INVALID_PARAMETER   A parameter was invalid.
+  @retval   EFI_ACCESS_DENIED       Access not permitted.
+  @retval   EFI_OUT_OF_RESOURCES    Out of resources.
+  @retval   EFI_UNSUPPORTED         Operation not supported.
+**/
 EFI_STATUS
 PiMmStandaloneArmTfCpuDriverEntry (
   IN UINTN EventId,
@@ -159,6 +172,14 @@ PiMmStandaloneArmTfCpuDriverEntry (
   return Status;
 }
 
+/**
+  Registers the MM foundation entry point.
+
+  @param  [in] This               Pointer to the MM Configuration protocol.
+  @param  [in] MmEntryPoint       Function pointer to the MM Entry point.
+
+  @retval   EFI_SUCCESS             Success.
+**/
 EFI_STATUS
 EFIAPI
 MmFoundationEntryRegister (
