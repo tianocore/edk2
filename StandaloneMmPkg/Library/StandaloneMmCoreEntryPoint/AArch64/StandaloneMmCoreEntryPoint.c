@@ -2,7 +2,7 @@
   Entry point to the Standalone MM Foundation when initialized during the SEC
   phase on ARM platforms
 
-Copyright (c) 2017 - 2018, ARM Ltd. All rights reserved.<BR>
+Copyright (c) 2017 - 2021, Arm Ltd. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -101,6 +101,12 @@ GetAndPrintBootinformation (
   return PayloadBootInfo;
 }
 
+/**
+  A loop to delegated events.
+
+  @param  [in] EventCompleteSvcArgs   Pointer to the event completion arguments.
+
+**/
 VOID
 EFIAPI
 DelegatedEventLoop (
@@ -156,6 +162,12 @@ DelegatedEventLoop (
   }
 }
 
+/**
+  Query the SPM version, check compatibility and return success if compatible.
+
+  @retval EFI_SUCCESS       SPM versions compatible.
+  @retval EFI_UNSUPPORTED   SPM versions not compatible.
+**/
 STATIC
 EFI_STATUS
 GetSpmVersion (VOID)
