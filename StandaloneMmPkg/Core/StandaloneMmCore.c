@@ -414,6 +414,15 @@ MmEntryPoint (
   DEBUG ((DEBUG_INFO, "MmEntryPoint Done\n"));
 }
 
+/** Register the MM Entry Point provided by the MM Core with the
+    MM Configuration protocol.
+
+  @param [in]  Protocol   Pointer to the protocol.
+  @param [in]  Interface  Pointer to the MM Configuration protocol.
+  @param [in]  Handle     Handle.
+
+  @retval EFI_SUCCESS             Success.
+**/
 EFI_STATUS
 EFIAPI
 MmConfigurationMmNotify (
@@ -448,6 +457,12 @@ MmConfigurationMmNotify (
   return EFI_SUCCESS;
 }
 
+/** Returns the HOB list size.
+
+  @param [in]  HobStart   Pointer to the start of the HOB list.
+
+  @retval Size of the HOB list.
+**/
 UINTN
 GetHobListSize (
   IN VOID *HobStart
@@ -475,12 +490,10 @@ GetHobListSize (
 
   Note: This function is called for both DXE invocation and MMRAM invocation.
 
-  @param  ImageHandle    The firmware allocated handle for the EFI image.
-  @param  SystemTable    A pointer to the EFI System Table.
+  @param  HobStart       Pointer to the start of the HOB list.
 
-  @retval EFI_SUCCESS    The entry point is executed successfully.
-  @retval Other          Some error occurred when executing this entry point.
-
+  @retval EFI_SUCCESS             Success.
+  @retval EFI_UNSUPPORTED         Unsupported operation.
 **/
 EFI_STATUS
 EFIAPI
