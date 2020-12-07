@@ -313,6 +313,7 @@ EndList
         self._DscFile     = ''
         self._FvDir       = ''
         self._MapVer      = 0
+        self._DscTime     = 0
 
     def ParseMacros (self, MacroDefStr):
         # ['-DABC=1', '-D', 'CFG_DEBUG=1', '-D', 'CFG_OUTDIR=Build']
@@ -423,6 +424,9 @@ EndList
         self._DscFile     = DscFile
         self._FvDir       = FvDir
 
+        # Initial DSC time is parent DSC time.
+        self._DscTime     = os.path.getmtime(DscFile)
+
         IsDefSect       = False
         IsPcdSect       = False
         IsUpdSect       = False
@@ -530,6 +534,12 @@ EndList
                                         if IncludeDsc == None:
                                             print("ERROR: Cannot open file '%s'" % IncludeFilePath)
                                             raise SystemExit
+
+                                        # Update DscTime when newer DSC time found.
+                                        CurrentDscTime = os.path.getmtime(os.path.realpath(IncludeDsc.name))
+                                        if CurrentDscTime > self._DscTime:
+                                            self._DscTime = CurrentDscTime
+
                                         NewDscLines = IncludeDsc.readlines()
                                         IncludeDsc.close()
                                         DscLines = NewDscLines + DscLines
@@ -815,9 +825,8 @@ EndList
         if not os.path.exists(OutPutFile):
             NoFileChange = False
         else:
-            DscTime = os.path.getmtime(self._DscFile)
             OutputTime = os.path.getmtime(OutPutFile)
-            if DscTime > OutputTime:
+            if self._DscTime > OutputTime:
                 NoFileChange = False
         return NoFileChange
 
