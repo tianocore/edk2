@@ -12,5 +12,6 @@
 ##
 !if $(REDFISH_ENABLE) == TRUE
   RestExLib|RedfishPkg/Library/DxeRestExLib/DxeRestExLib.inf
+  Ucs2Utf8Lib|RedfishPkg/Library/BaseUcs2Utf8Lib/BaseUcs2Utf8Lib.inf
 !endif
 
