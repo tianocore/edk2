@@ -153,6 +153,21 @@ SevEncBitLowHlt:
     jmp       SevEncBitLowHlt
 
 NoSev:
+    ;
+    ; Perform an SEV-ES sanity check by seeing if a #VC exception occurred.
+    ;
+    cmp       byte[SEV_ES_WORK_AREA], 0
+    jz        NoSevPass
+
+    ;
+    ; A #VC was received, yet CPUID indicates no SEV-ES support, something
+    ; isn't right.
+    ;
+NoSevEsVcHlt:
+    hlt
+    jmp       NoSevEsVcHlt
+
+NoSevPass:
     xor       eax, eax
 
 SevExit:
