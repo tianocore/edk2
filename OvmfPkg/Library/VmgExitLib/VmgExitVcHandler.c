@@ -128,10 +128,13 @@ UINT64
 
 //
 // Per-CPU data mapping structure
+//   Use UINT32 for cached indicators and compare to a specific value
+//   so that the hypervisor can't indicate a value is cached by just
+//   writing random data to that area.
 //
 typedef struct {
-  BOOLEAN  Dr7Cached;
-  UINT64   Dr7;
+  UINT32  Dr7Cached;
+  UINT64  Dr7;
 } SEV_ES_PER_CPU_DATA;
 
 
@@ -1489,7 +1492,7 @@ Dr7WriteExit (
   }
 
   SevEsData->Dr7 = *Register;
-  SevEsData->Dr7Cached = TRUE;
+  SevEsData->Dr7Cached = 1;
 
   return 0;
 }
@@ -1533,7 +1536,7 @@ Dr7ReadExit (
   // If there is a cached valued for DR7, return that. Otherwise return the
   // DR7 standard reset value of 0x400 (no debug breakpoints set).
   //
-  *Register = (SevEsData->Dr7Cached) ? SevEsData->Dr7 : 0x400;
+  *Register = (SevEsData->Dr7Cached == 1) ? SevEsData->Dr7 : 0x400;
 
   return 0;
 }
