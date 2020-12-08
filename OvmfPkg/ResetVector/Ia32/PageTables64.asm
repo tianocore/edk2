@@ -140,9 +140,17 @@ GetSevEncBit:
     ; Get pte bit position to enable memory encryption
     ; CPUID Fn8000_001F[EBX] - Bits 5:0
     ;
+    and       ebx, 0x3f
     mov       eax, ebx
-    and       eax, 0x3f
-    jmp       SevExit
+
+    ; The encryption bit position is always above 31
+    sub       ebx, 32
+    jns       SevExit
+
+    ; Encryption bit was reported as 31 or below, enter a HLT loop
+SevEncBitLowHlt:
+    hlt
+    jmp       SevEncBitLowHlt
 
 NoSev:
     xor       eax, eax
