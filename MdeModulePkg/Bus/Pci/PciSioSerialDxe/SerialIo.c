@@ -1,7 +1,7 @@
 /** @file
   SerialIo implementation for PCI or SIO UARTs.
 
-Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2020, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -436,6 +436,68 @@ SerialReceiveTransmit (
   return EFI_SUCCESS;
 }
 
+/**
+  Flush the serial hardware transmit FIFO, holding register, and shift register.
+
+  @param SerialDevice  The device to flush.
+
+  @retval  EFI_SUCCESS  The transmit FIFO is completely flushed.
+  @retval  EFI_TIMEOUT  A timeout occured waiting for the transmit FIFO to flush.
+**/
+EFI_STATUS
+SerialFlushTransmitFifo (
+  SERIAL_DEV  *SerialDevice
+  )
+{
+  SERIAL_PORT_LSR  Lsr;
+  UINTN            Timeout;
+  UINTN            Elapsed;
+
+  //
+  // If this is the first time the UART is being configured, then the current
+  // UART settings are not known, so compute a timeout to wait for the Tx FIFO
+  // assuming the worst case current settings.
+  //
+  // Timeout = (Max Bits per Char) * (Max Pending Chars) / (Slowest Baud Rate)
+  //   Max Bits per Char = Start bit + 8 data bits + parity + 2 stop bits = 12
+  //   Max Pending Chars = Largest Tx FIFO + hold + shift = 64 + 1 + 1 = 66
+  //   Slowest Reasonable Baud Rate = 300 baud
+  // Timeout = 12 * 66 / 300 = 2.64 seconds = 2,640,000 uS
+  //
+  Timeout = 2640000;
+
+  //
+  // Use the largest of the computed timeout, the default timeout, and the
+  // currently set timeout.
+  //
+  Timeout = MAX (Timeout, SERIAL_PORT_DEFAULT_TIMEOUT);
+  Timeout = MAX (Timeout, SerialDevice->SerialMode.Timeout);
+
+  //
+  // Wait for the shortest time possible for the serial port to be ready making
+  // sure the transmit FIFO, holding register, and shift register are all
+  // empty.  The actual wait time is expected to be very small because the
+  // number characters currently in the FIFO should be small when a
+  // configuration change is requested.
+  //
+  // NOTE: Do not use any DEBUG() or REPORT_STATUS_CODE() or any other calls
+  // in the rest of this function that may send additional characters to this
+  // UART device invalidating the flush operation.
+  //
+  Elapsed = 0;
+  Lsr.Data = READ_LSR (SerialDevice);
+  while (Lsr.Bits.Temt == 0 || Lsr.Bits.Thre == 0) {
+    if (Elapsed >= Timeout) {
+      return EFI_TIMEOUT;
+    }
+    gBS->Stall (TIMEOUT_STALL_INTERVAL);
+    Elapsed += TIMEOUT_STALL_INTERVAL;
+    Lsr.Data = READ_LSR (SerialDevice);
+  }
+
+  return EFI_SUCCESS;
+}
+
 //
 // Interface Functions
 //
@@ -475,6 +537,15 @@ SerialReset (
     );
 
   Tpl = gBS->RaiseTPL (TPL_NOTIFY);
+
+  //
+  // Wait for all data to be transmitted before changing the UART configuration.
+  //
+  // NOTE: Do not use any DEBUG() or REPORT_STATUS_CODE() or any other calls
+  // that may send additional characters to this UART device until the UART
+  // configuration change is complete.
+  //
+  SerialFlushTransmitFifo (SerialDevice);
 
   //
   // Make sure DLAB is 0.
@@ -655,6 +726,15 @@ SerialSetAttributes (
   Tpl = gBS->RaiseTPL (TPL_NOTIFY);
 
   //
+  // Wait for all data to be transmitted before changing the UART configuration.
+  //
+  // NOTE: Do not use any DEBUG() or REPORT_STATUS_CODE() or any other calls
+  // that may send additional characters to this UART device until the UART
+  // configuration change is complete.
+  //
+  SerialFlushTransmitFifo (SerialDevice);
+
+  //
   // Put serial port on Divisor Latch Mode
   //
   Lcr.Data      = READ_LCR (SerialDevice);
@@ -825,6 +905,15 @@ SerialSetControl (
   }
 
   Tpl = gBS->RaiseTPL (TPL_NOTIFY);
+
+  //
+  // Wait for all data to be transmitted before changing the UART configuration.
+  //
+  // NOTE: Do not use any DEBUG() or REPORT_STATUS_CODE() or any other calls
+  // that may send additional characters to this UART device until the UART
+  // configuration change is complete.
+  //
+  SerialFlushTransmitFifo (SerialDevice);
 
   Mcr.Data = READ_MCR (SerialDevice);
   Mcr.Bits.DtrC = 0;
