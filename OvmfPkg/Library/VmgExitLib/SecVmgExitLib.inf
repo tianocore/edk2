@@ -35,6 +35,7 @@
   BaseLib
   BaseMemoryLib
   DebugLib
+  MemEncryptSevLib
   PcdLib
 
 [FixedPcd]
