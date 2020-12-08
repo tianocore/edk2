@@ -3,6 +3,7 @@
 ; Sets the CR3 register for 64-bit paging
 ;
 ; Copyright (c) 2008 - 2013, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2017 - 2020, Advanced Micro Devices, Inc. All rights reserved.<BR>
 ; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;
 ;------------------------------------------------------------------------------
@@ -62,18 +63,22 @@ BITS    32
 %define CPUID_INSN_LEN              2
 
 
-; Check if Secure Encrypted Virtualization (SEV) feature is enabled
+; Check if Secure Encrypted Virtualization (SEV) features are enabled
+;
+; Register usage is tight in this routine, so multiple calls for the
+; same CPUID and MSR data are performed to keep things simple.
 ;
 ; Modified:  EAX, EBX, ECX, EDX, ESP
 ;
 ; If SEV is enabled then EAX will be at least 32.
 ; If SEV is disabled then EAX will be zero.
 ;
-CheckSevFeature:
+CheckSevFeatures:
     ; Set the first byte of the workarea to zero to communicate to the SEC
     ; phase that SEV-ES is not enabled. If SEV-ES is enabled, the CPUID
     ; instruction will trigger a #VC exception where the first byte of the
-    ; workarea will be set to one.
+    ; workarea will be set to one or, if CPUID is not being intercepted,
+    ; the MSR check below will set the first byte of the workarea to one.
     mov     byte[SEV_ES_WORK_AREA], 0
 
     ;
@@ -97,21 +102,41 @@ CheckSevFeature:
     cmp       eax, 0x8000001f
     jl        NoSev
 
-    ; Check for memory encryption feature:
+    ; Check for SEV memory encryption feature:
     ; CPUID  Fn8000_001F[EAX] - Bit 1
     ;   CPUID raises a #VC exception if running as an SEV-ES guest
-    mov       eax,  0x8000001f
+    mov       eax, 0x8000001f
     cpuid
     bt        eax, 1
     jnc       NoSev
 
-    ; Check if memory encryption is enabled
+    ; Check if SEV memory encryption is enabled
     ;  MSR_0xC0010131 - Bit 0 (SEV enabled)
     mov       ecx, 0xc0010131
     rdmsr
     bt        eax, 0
     jnc       NoSev
 
+    ; Check for SEV-ES memory encryption feature:
+    ; CPUID  Fn8000_001F[EAX] - Bit 3
+    ;   CPUID raises a #VC exception if running as an SEV-ES guest
+    mov       eax, 0x8000001f
+    cpuid
+    bt        eax, 3
+    jnc       GetSevEncBit
+
+    ; Check if SEV-ES is enabled
+    ;  MSR_0xC0010131 - Bit 1 (SEV-ES enabled)
+    mov       ecx, 0xc0010131
+    rdmsr
+    bt        eax, 1
+    jnc       GetSevEncBit
+
+    ; Set the first byte of the workarea to one to communicate to the SEC
+    ; phase that SEV-ES is enabled.
+    mov       byte[SEV_ES_WORK_AREA], 1
+
+GetSevEncBit:
     ; Get pte bit position to enable memory encryption
     ; CPUID Fn8000_001F[EBX] - Bits 5:0
     ;
@@ -132,45 +157,35 @@ SevExit:
     pop       eax
     mov       esp, 0
 
-    OneTimeCallRet CheckSevFeature
+    OneTimeCallRet CheckSevFeatures
 
 ; Check if Secure Encrypted Virtualization - Encrypted State (SEV-ES) feature
 ; is enabled.
 ;
-; Modified:  EAX, EBX, ECX
+; Modified:  EAX
 ;
 ; If SEV-ES is enabled then EAX will be non-zero.
 ; If SEV-ES is disabled then EAX will be zero.
 ;
-CheckSevEsFeature:
+IsSevEsEnabled:
     xor       eax, eax
 
-    ; SEV-ES can't be enabled if SEV isn't, so first check the encryption
-    ; mask.
-    test      edx, edx
-    jz        NoSevEs
+    ; During CheckSevFeatures, the SEV_ES_WORK_AREA was set to 1 if
+    ; SEV-ES is enabled.
+    cmp       byte[SEV_ES_WORK_AREA], 1
+    jne       SevEsDisabled
 
-    ; Save current value of encryption mask
-    mov       ebx, edx
+    mov       eax, 1
 
-    ; Check if SEV-ES is enabled
-    ;  MSR_0xC0010131 - Bit 1 (SEV-ES enabled)
-    mov       ecx, 0xc0010131
-    rdmsr
-    and       eax, 2
-
-    ; Restore encryption mask
-    mov       edx, ebx
-
-NoSevEs:
-    OneTimeCallRet CheckSevEsFeature
+SevEsDisabled:
+    OneTimeCallRet IsSevEsEnabled
 
 ;
 ; Modified:  EAX, EBX, ECX, EDX
 ;
 SetCr3ForPageTables64:
 
-    OneTimeCall   CheckSevFeature
+    OneTimeCall   CheckSevFeatures
     xor     edx, edx
     test    eax, eax
     jz      SevNotActive
@@ -229,7 +244,7 @@ pageTableEntriesLoop:
     mov     [(ecx * 8 + PT_ADDR (0x2000 - 8)) + 4], edx
     loop    pageTableEntriesLoop
 
-    OneTimeCall   CheckSevEsFeature
+    OneTimeCall   IsSevEsEnabled
     test    eax, eax
     jz      SetCr3
 
@@ -336,8 +351,8 @@ SevEsIdtVmmComm:
     ; If we're here, then we are an SEV-ES guest and this
     ; was triggered by a CPUID instruction
     ;
-    ; Set the first byte of the workarea to one to communicate to the SEC
-    ; phase that SEV-ES is enabled.
+    ; Set the first byte of the workarea to one to communicate that
+    ; a #VC was taken.
     mov     byte[SEV_ES_WORK_AREA], 1
 
     pop     ecx                     ; Error code
