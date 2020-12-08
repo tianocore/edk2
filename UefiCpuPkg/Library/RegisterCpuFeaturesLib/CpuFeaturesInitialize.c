@@ -126,8 +126,9 @@ CpuInitDataInitialize (
 
   GetNumberOfProcessor (&NumberOfCpus, &NumberOfEnabledProcessors);
 
-  CpuFeaturesData->InitOrder = AllocateZeroPool (sizeof (CPU_FEATURES_INIT_ORDER) * NumberOfCpus);
+  CpuFeaturesData->InitOrder = AllocatePages (EFI_SIZE_TO_PAGES (sizeof (CPU_FEATURES_INIT_ORDER) * NumberOfCpus));
   ASSERT (CpuFeaturesData->InitOrder != NULL);
+  ZeroMem (CpuFeaturesData->InitOrder, sizeof (CPU_FEATURES_INIT_ORDER) * NumberOfCpus);
 
   //
   // Collect CPU Features information
