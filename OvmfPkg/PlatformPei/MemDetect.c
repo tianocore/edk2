@@ -888,6 +888,11 @@ InitializeRamRegions (
         (UINT64)(UINTN) PcdGet32 (PcdOvmfSecGhcbSize),
         EfiACPIMemoryNVS
         );
+      BuildMemoryAllocationHob (
+        (EFI_PHYSICAL_ADDRESS)(UINTN) PcdGet32 (PcdOvmfSecGhcbBackupBase),
+        (UINT64)(UINTN) PcdGet32 (PcdOvmfSecGhcbBackupSize),
+        EfiACPIMemoryNVS
+        );
     }
 #endif
   }
