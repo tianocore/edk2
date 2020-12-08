@@ -2,7 +2,7 @@
 
   Secure Encrypted Virtualization (SEV) library helper function
 
-  Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
+  Copyright (c) 2017 - 2020, AMD Incorporated. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -18,95 +18,6 @@
 #include <Register/QemuSmramSaveStateMap.h>
 #include <Register/SmramSaveStateMap.h>
 #include <Uefi/UefiBaseType.h>
-
-STATIC BOOLEAN mSevStatus = FALSE;
-STATIC BOOLEAN mSevEsStatus = FALSE;
-STATIC BOOLEAN mSevStatusChecked = FALSE;
-
-/**
-  Reads and sets the status of SEV features.
-
-  **/
-STATIC
-VOID
-EFIAPI
-InternalMemEncryptSevStatus (
-  VOID
-  )
-{
-  UINT32                            RegEax;
-  MSR_SEV_STATUS_REGISTER           Msr;
-  CPUID_MEMORY_ENCRYPTION_INFO_EAX  Eax;
-
-  //
-  // Check if memory encryption leaf exist
-  //
-  AsmCpuid (CPUID_EXTENDED_FUNCTION, &RegEax, NULL, NULL, NULL);
-  if (RegEax >= CPUID_MEMORY_ENCRYPTION_INFO) {
-    //
-    // CPUID Fn8000_001F[EAX] Bit 1 (Sev supported)
-    //
-    AsmCpuid (CPUID_MEMORY_ENCRYPTION_INFO, &Eax.Uint32, NULL, NULL, NULL);
-
-    if (Eax.Bits.SevBit) {
-      //
-      // Check MSR_0xC0010131 Bit 0 (Sev Enabled)
-      //
-      Msr.Uint32 = AsmReadMsr32 (MSR_SEV_STATUS);
-      if (Msr.Bits.SevBit) {
-        mSevStatus = TRUE;
-      }
-
-      //
-      // Check MSR_0xC0010131 Bit 1 (Sev-Es Enabled)
-      //
-      if (Msr.Bits.SevEsBit) {
-        mSevEsStatus = TRUE;
-      }
-    }
-  }
-
-  mSevStatusChecked = TRUE;
-}
-
-/**
-  Returns a boolean to indicate whether SEV-ES is enabled.
-
-  @retval TRUE           SEV-ES is enabled
-  @retval FALSE          SEV-ES is not enabled
-**/
-BOOLEAN
-EFIAPI
-MemEncryptSevEsIsEnabled (
-  VOID
-  )
-{
-  if (!mSevStatusChecked) {
-    InternalMemEncryptSevStatus ();
-  }
-
-  return mSevEsStatus;
-}
-
-/**
-  Returns a boolean to indicate whether SEV is enabled.
-
-  @retval TRUE           SEV is enabled
-  @retval FALSE          SEV is not enabled
-**/
-BOOLEAN
-EFIAPI
-MemEncryptSevIsEnabled (
-  VOID
-  )
-{
-  if (!mSevStatusChecked) {
-    InternalMemEncryptSevStatus ();
-  }
-
-  return mSevStatus;
-}
-
 
 /**
   Locate the page range that covers the initial (pre-SMBASE-relocation) SMRAM
