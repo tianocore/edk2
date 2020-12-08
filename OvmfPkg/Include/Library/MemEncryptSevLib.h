@@ -33,6 +33,16 @@ typedef struct _SEC_SEV_ES_WORK_AREA {
   UINT64   EncryptionMask;
 } SEC_SEV_ES_WORK_AREA;
 
+//
+// Memory encryption address range states.
+//
+typedef enum {
+  MemEncryptSevAddressRangeUnencrypted,
+  MemEncryptSevAddressRangeEncrypted,
+  MemEncryptSevAddressRangeMixed,
+  MemEncryptSevAddressRangeError,
+} MEM_ENCRYPT_SEV_ADDRESS_RANGE_STATE;
+
 /**
   Returns a boolean to indicate whether SEV-ES is enabled.
 
@@ -145,6 +155,29 @@ UINT64
 EFIAPI
 MemEncryptSevGetEncryptionMask (
   VOID
+  );
+
+/**
+  Returns the encryption state of the specified virtual address range
+
+  @param[in]  Cr3BaseAddress          Cr3 Base Address (if zero then use
+                                      current CR3)
+  @param[in]  VirtualAddress          Virtual address to check
+  @param[in]  Length                  Length of virtual address range
+
+  @retval MemEncryptSevAddressRangeUnencrypted  Address range is mapped
+                                                unencrypted
+  @retval MemEncryptSevAddressRangeEncrypted    Address range is mapped
+                                                encrypted
+  @retval MemEncryptSevAddressRangeMixed        Address range is mapped mixed
+  @retval MemEncryptSevAddressRangeError        Address range is not mapped
+**/
+MEM_ENCRYPT_SEV_ADDRESS_RANGE_STATE
+EFIAPI
+MemEncryptSevGetAddressRangeState (
+  IN PHYSICAL_ADDRESS         Cr3BaseAddress,
+  IN VOID                     *VirtualAddress,
+  IN UINTN                    Length
   );
 
 #endif // _MEM_ENCRYPT_SEV_LIB_H_

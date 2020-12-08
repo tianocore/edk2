@@ -3,7 +3,7 @@
   Virtual Memory Management Services to set or clear the memory encryption bit
 
   Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
-  Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
+  Copyright (c) 2017 - 2020, AMD Incorporated. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -178,7 +178,17 @@ typedef struct {
   UINTN           FreePages;
 } PAGE_TABLE_POOL;
 
+/**
+  Return the pagetable memory encryption mask
 
+  @return  The pagetable memory encryption mask.
+
+**/
+UINT64
+EFIAPI
+InternalGetMemEncryptionAddressMask (
+  VOID
+  );
 
 /**
   This function clears memory encryption bit for the memory region specified by
@@ -232,6 +242,29 @@ InternalMemEncryptSevSetMemoryEncrypted (
   IN  PHYSICAL_ADDRESS        PhysicalAddress,
   IN  UINTN                   Length,
   IN  BOOLEAN                 Flush
+  );
+
+/**
+  Returns the encryption state of the specified virtual address range
+
+  @param[in]  Cr3BaseAddress          Cr3 Base Address (if zero then use
+                                      current CR3)
+  @param[in]  VirtualAddress          Virtual address to check
+  @param[in]  Length                  Length of virtual address range
+
+  @retval MemEncryptSevAddressRangeUnencrypted  Address range is mapped
+                                                unencrypted
+  @retval MemEncryptSevAddressRangeEncrypted    Address range is mapped
+                                                encrypted
+  @retval MemEncryptSevAddressRangeMixed        Address range is mapped mixed
+  @retval MemEncryptSevAddressRangeError        Address range is not mapped
+**/
+MEM_ENCRYPT_SEV_ADDRESS_RANGE_STATE
+EFIAPI
+InternalMemEncryptSevGetAddressRangeState (
+  IN PHYSICAL_ADDRESS         Cr3BaseAddress,
+  IN VOID                     *VirtualAddress,
+  IN UINTN                    Length
   );
 
 #endif

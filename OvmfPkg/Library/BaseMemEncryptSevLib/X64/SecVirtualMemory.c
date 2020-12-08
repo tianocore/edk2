@@ -14,6 +14,26 @@
 #include "VirtualMemory.h"
 
 /**
+  Return the pagetable memory encryption mask
+
+  @return  The pagetable memory encryption mask.
+
+**/
+UINT64
+EFIAPI
+InternalGetMemEncryptionAddressMask (
+  VOID
+  )
+{
+  UINT64                            EncryptionMask;
+
+  EncryptionMask = MemEncryptSevGetEncryptionMask ();
+  EncryptionMask &= PAGING_1G_ADDRESS_MASK_64;
+
+  return EncryptionMask;
+}
+
+/**
   This function clears memory encryption bit for the memory region specified by
   PhysicalAddress and Length from the current page table context.
 
