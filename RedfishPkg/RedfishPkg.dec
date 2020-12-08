@@ -20,6 +20,10 @@
   ##  @libraryclass Platform Redfish Host Interface Library
   #   Platform implementation-specific Redfish Host Interface.
   RedfishPlatformHostInterfaceLib|Include/Library/RedfishHostInterfaceLib.h
+  ##  @libraryclass  This library provides UCS2 to UTF8 manipulation
+  #   functions.
+  #
+  Ucs2Utf8Lib|Include/Library/BaseUcs2Utf8Lib.h
 
   ##  @libraryclass Platform Redfish Credential Library
   #   Platform implementation-specific Redfish Credential Interface.
