@@ -9,10 +9,13 @@
 #include <Base.h>
 #include <Uefi.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/MemEncryptSevLib.h>
 #include <Library/VmgExitLib.h>
 #include <Register/Amd/Msr.h>
 #include <Register/Intel/Cpuid.h>
 #include <IndustryStandard/InstructionParsing.h>
+
+#include "VmgExitVcHandler.h"
 
 //
 // Instruction execution mode definition
@@ -125,18 +128,6 @@ UINT64
   EFI_SYSTEM_CONTEXT_X64   *Regs,
   SEV_ES_INSTRUCTION_DATA  *InstructionData
   );
-
-//
-// Per-CPU data mapping structure
-//   Use UINT32 for cached indicators and compare to a specific value
-//   so that the hypervisor can't indicate a value is cached by just
-//   writing random data to that area.
-//
-typedef struct {
-  UINT32  Dr7Cached;
-  UINT64  Dr7;
-} SEV_ES_PER_CPU_DATA;
-
 
 /**
   Return a pointer to the contents of the specified register.
@@ -1546,6 +1537,7 @@ Dr7ReadExit (
 
   Performs the necessary processing to handle a #VC exception.
 
+  @param[in, out]  Ghcb           Pointer to the GHCB
   @param[in, out]  ExceptionType  Pointer to an EFI_EXCEPTION_TYPE to be set
                                   as value to use on error.
   @param[in, out]  SystemContext  Pointer to EFI_SYSTEM_CONTEXT
@@ -1559,14 +1551,13 @@ Dr7ReadExit (
 **/
 EFI_STATUS
 EFIAPI
-VmgExitHandleVc (
+InternalVmgExitHandleVc (
+  IN OUT GHCB                *Ghcb,
   IN OUT EFI_EXCEPTION_TYPE  *ExceptionType,
   IN OUT EFI_SYSTEM_CONTEXT  SystemContext
   )
 {
-  MSR_SEV_ES_GHCB_REGISTER  Msr;
   EFI_SYSTEM_CONTEXT_X64    *Regs;
-  GHCB                      *Ghcb;
   NAE_EXIT                  NaeExit;
   SEV_ES_INSTRUCTION_DATA   InstructionData;
   UINT64                    ExitCode, Status;
@@ -1575,12 +1566,7 @@ VmgExitHandleVc (
 
   VcRet = EFI_SUCCESS;
 
-  Msr.GhcbPhysicalAddress = AsmReadMsr64 (MSR_SEV_ES_GHCB);
-  ASSERT (Msr.GhcbInfo.Function == 0);
-  ASSERT (Msr.Ghcb != 0);
-
   Regs = SystemContext.SystemContextX64;
-  Ghcb = Msr.Ghcb;
 
   VmgInit (Ghcb, &InterruptState);
 
@@ -1669,4 +1655,26 @@ VmgExitHandleVc (
   VmgDone (Ghcb, InterruptState);
 
   return VcRet;
+}
+
+/**
+  Routine to allow ASSERT from within #VC
+
+  @param[in, out]  SevEsData  Pointer to the per-CPU data
+
+**/
+VOID
+EFIAPI
+VmgExitIssueAssert (
+  IN OUT SEV_ES_PER_CPU_DATA  *SevEsData
+  )
+{
+  //
+  // Progress will be halted, so set VcCount to allow for ASSERT output
+  // to be seen.
+  //
+  SevEsData->VcCount = 0;
+
+  ASSERT (FALSE);
+  CpuDeadLoop ();
 }
