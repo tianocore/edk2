@@ -29,6 +29,8 @@ typedef struct _SEC_SEV_ES_WORK_AREA {
   UINT8    Reserved1[7];
 
   UINT64   RandomData;
+
+  UINT64   EncryptionMask;
 } SEC_SEV_ES_WORK_AREA;
 
 /**
@@ -133,4 +135,16 @@ MemEncryptSevLocateInitialSmramSaveStateMapPages (
   OUT UINTN *BaseAddress,
   OUT UINTN *NumberOfPages
   );
+
+/**
+  Returns the SEV encryption mask.
+
+  @return  The SEV pagtable encryption mask
+**/
+UINT64
+EFIAPI
+MemEncryptSevGetEncryptionMask (
+  VOID
+  );
+
 #endif // _MEM_ENCRYPT_SEV_LIB_H_
