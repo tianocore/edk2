@@ -240,7 +240,7 @@ DisassembleArmInstruction (
           if (shift_imm == 0) {
             shift_imm = 32;
           }
-        } else if (shift == 0x12) {
+        } else if (shift == 0x2) {
           Type = "ASR";
         } else if (shift_imm == 0) {
           AsciiSPrint (&Buf[Index], Size - Index, "[%a, #%a%a, %a, RRX]%a", gReg[Rn], SIGN (U), gReg[Rm], WRITE (W));
@@ -270,7 +270,7 @@ DisassembleArmInstruction (
           if (shift_imm == 0) {
             shift_imm = 32;
           }
-        } else if (shift == 0x12) {
+        } else if (shift == 0x2) {
           Type = "ASR";
         } else if (shift_imm == 0) {
           AsciiSPrint (&Buf[Index], Size - Index, "[%a], #%a%a, %a, RRX", gReg[Rn], SIGN (U), gReg[Rm]);
