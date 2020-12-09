@@ -8,11 +8,11 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = VmgExitLib
-  FILE_GUID                      = 0e923c25-13cd-430b-8714-ffe85652a97b
+  BASE_NAME                      = SecVmgExitLib
+  FILE_GUID                      = dafff819-f86c-4cff-a70e-83161e5bcf9a
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = VmgExitLib|PEIM DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER UEFI_DRIVER
+  LIBRARY_CLASS                  = VmgExitLib|SEC
 
 #
 # The following information is for reference only and not required by the build tools.
@@ -24,7 +24,7 @@
   VmgExitLib.c
   VmgExitVcHandler.c
   VmgExitVcHandler.h
-  PeiDxeVmgExitVcHandler.c
+  SecVmgExitVcHandler.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -35,4 +35,9 @@
   BaseLib
   BaseMemoryLib
   DebugLib
+  PcdLib
+
+[FixedPcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBackupBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBackupSize
 
