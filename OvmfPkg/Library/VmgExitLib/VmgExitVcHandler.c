@@ -9,6 +9,7 @@
 #include <Base.h>
 #include <Uefi.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/LocalApicLib.h>
 #include <Library/MemEncryptSevLib.h>
 #include <Library/VmgExitLib.h>
 #include <Register/Amd/Msr.h>
@@ -596,6 +597,61 @@ UnsupportedExit (
 }
 
 /**
+  Validate that the MMIO memory access is not to encrypted memory.
+
+  Examine the pagetable entry for the memory specified. MMIO should not be
+  performed against encrypted memory. MMIO to the APIC page is always allowed.
+
+  @param[in] Ghcb           Pointer to the Guest-Hypervisor Communication Block
+  @param[in] MemoryAddress  Memory address to validate
+  @param[in] MemoryLength   Memory length to validate
+
+  @retval 0          Memory is not encrypted
+  @return            New exception value to propogate
+
+**/
+STATIC
+UINT64
+ValidateMmioMemory (
+  IN GHCB   *Ghcb,
+  IN UINTN  MemoryAddress,
+  IN UINTN  MemoryLength
+  )
+{
+  MEM_ENCRYPT_SEV_ADDRESS_RANGE_STATE  State;
+  GHCB_EVENT_INJECTION                 GpEvent;
+  UINTN                                Address;
+
+  //
+  // Allow APIC accesses (which will have the encryption bit set during
+  // SEC and PEI phases).
+  //
+  Address = MemoryAddress & ~(SIZE_4KB - 1);
+  if (Address == GetLocalApicBaseAddress ()) {
+    return 0;
+  }
+
+  State = MemEncryptSevGetAddressRangeState (
+            0,
+            (VOID *) MemoryAddress,
+            MemoryLength
+            );
+  if (State == MemEncryptSevAddressRangeUnencrypted) {
+    return 0;
+  }
+
+  //
+  // Any state other than unencrypted is an error, issue a #GP.
+  //
+  GpEvent.Uint64 = 0;
+  GpEvent.Elements.Vector = GP_EXCEPTION;
+  GpEvent.Elements.Type   = GHCB_EVENT_INJECTION_TYPE_EXCEPTION;
+  GpEvent.Elements.Valid  = 1;
+
+  return GpEvent.Uint64;
+}
+
+/**
   Handle an MMIO event.
 
   Use the VMGEXIT instruction to handle either an MMIO read or an MMIO write.
@@ -653,6 +709,11 @@ MmioExit (
       return UnsupportedExit (Ghcb, Regs, InstructionData);
     }
 
+    Status = ValidateMmioMemory (Ghcb, InstructionData->Ext.RmData, Bytes);
+    if (Status != 0) {
+      return Status;
+    }
+
     ExitInfo1 = InstructionData->Ext.RmData;
     ExitInfo2 = Bytes;
     CopyMem (Ghcb->SharedBuffer, &InstructionData->Ext.RegData, Bytes);
@@ -682,6 +743,11 @@ MmioExit (
 
     InstructionData->ImmediateSize = Bytes;
     InstructionData->End += Bytes;
+
+    Status = ValidateMmioMemory (Ghcb, InstructionData->Ext.RmData, Bytes);
+    if (Status != 0) {
+      return Status;
+    }
 
     ExitInfo1 = InstructionData->Ext.RmData;
     ExitInfo2 = Bytes;
@@ -717,6 +783,11 @@ MmioExit (
       return UnsupportedExit (Ghcb, Regs, InstructionData);
     }
 
+    Status = ValidateMmioMemory (Ghcb, InstructionData->Ext.RmData, Bytes);
+    if (Status != 0) {
+      return Status;
+    }
+
     ExitInfo1 = InstructionData->Ext.RmData;
     ExitInfo2 = Bytes;
 
@@ -748,6 +819,11 @@ MmioExit (
   case 0xB7:
     Bytes = (Bytes != 0) ? Bytes : 2;
 
+    Status = ValidateMmioMemory (Ghcb, InstructionData->Ext.RmData, Bytes);
+    if (Status != 0) {
+      return Status;
+    }
+
     ExitInfo1 = InstructionData->Ext.RmData;
     ExitInfo2 = Bytes;
 
@@ -773,6 +849,11 @@ MmioExit (
     //
   case 0xBF:
     Bytes = (Bytes != 0) ? Bytes : 2;
+
+    Status = ValidateMmioMemory (Ghcb, InstructionData->Ext.RmData, Bytes);
+    if (Status != 0) {
+      return Status;
+    }
 
     ExitInfo1 = InstructionData->Ext.RmData;
     ExitInfo2 = Bytes;
