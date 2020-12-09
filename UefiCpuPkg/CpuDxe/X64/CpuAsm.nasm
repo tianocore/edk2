@@ -23,8 +23,8 @@ ASM_PFX(SetCodeSelector):
     sub     rsp, 0x10
     lea     rax, [setCodeSelectorLongJump]
     mov     [rsp], rax
-    mov     [rsp+8], cx
-    jmp     qword far [rsp]
+    mov     [rsp+4], cx
+    jmp     dword far [rsp]
 setCodeSelectorLongJump:
     add     rsp, 0x10
     ret
