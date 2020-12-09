@@ -36,6 +36,7 @@
   HttpIoLib|NetworkPkg/Library/DxeHttpIoLib/DxeHttpIoLib.inf
   NetLib|NetworkPkg/Library/DxeNetLib/DxeNetLib.inf
   DpcLib|NetworkPkg/Library/DxeDpcLib/DxeDpcLib.inf
+  RedfishPlatformCredentialLib|RedfishPkg/Library/PlatformCredentialLibNull/PlatformCredentialLibNull.inf
 
 [LibraryClasses.ARM, LibraryClasses.AARCH64]
   #
@@ -47,5 +48,6 @@
 
 [Components]
   RedfishPkg/Library/PlatformHostInterfaceLibNull/PlatformHostInterfaceLibNull.inf
+  RedfishPkg/Library/PlatformCredentialLibNull/PlatformCredentialLibNull.inf
 
   !include RedfishPkg/Redfish.dsc.inc
