@@ -93,6 +93,6 @@ void* memcpy (void *dest, const void *src, unsigned int count)
 
 void* memset (void *dest, char ch, unsigned int count)
 {
-  return SetMem (dest, ch, count);
+  return SetMem (dest, count, ch);
 }
 
