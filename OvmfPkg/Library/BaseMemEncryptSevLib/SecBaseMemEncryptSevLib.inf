@@ -1,7 +1,7 @@
 ## @file
 #  Library provides the helper functions for SEV guest
 #
-# Copyright (c) 2017 - 2020, Advanced Micro Devices. All rights reserved.<BR>
+# Copyright (c) 2020 Advanced Micro Devices. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -10,11 +10,11 @@
 
 [Defines]
   INF_VERSION                    = 1.25
-  BASE_NAME                      = DxeMemEncryptSevLib
-  FILE_GUID                      = c1594631-3888-4be4-949f-9c630dbc842b
+  BASE_NAME                      = SecMemEncryptSevLib
+  FILE_GUID                      = 046388b4-430e-4e61-88f6-51ea21db2632
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = MemEncryptSevLib|DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER UEFI_DRIVER
+  LIBRARY_CLASS                  = MemEncryptSevLib|SEC
 
 #
 # The following information is for reference only and not required by the build
@@ -30,27 +30,25 @@
   UefiCpuPkg/UefiCpuPkg.dec
 
 [Sources.X64]
-  DxeMemEncryptSevLibInternal.c
+  SecMemEncryptSevLibInternal.c
   MemEncryptSevLibInternal.c
   X64/MemEncryptSevLib.c
-  X64/PeiDxeVirtualMemory.c
+  X64/SecVirtualMemory.c
   X64/VirtualMemory.h
 
 [Sources.IA32]
-  DxeMemEncryptSevLibInternal.c
+  SecMemEncryptSevLibInternal.c
   MemEncryptSevLibInternal.c
   Ia32/MemEncryptSevLib.c
 
 [LibraryClasses]
   BaseLib
-  CacheMaintenanceLib
   CpuLib
   DebugLib
-  MemoryAllocationLib
   PcdLib
 
 [FeaturePcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire
 
-[Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPteMemoryEncryptionAddressOrMask
+[FixedPcd]
+  gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaBase
