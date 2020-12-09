@@ -33,12 +33,17 @@ AmdSevEsInitialize (
   VOID
   )
 {
-  VOID              *GhcbBase;
-  PHYSICAL_ADDRESS  GhcbBasePa;
-  UINTN             GhcbPageCount, PageCount;
-  RETURN_STATUS     PcdStatus, DecryptStatus;
-  IA32_DESCRIPTOR   Gdtr;
-  VOID              *Gdt;
+  VOID                 *GhcbBase;
+  PHYSICAL_ADDRESS     GhcbBasePa;
+  UINTN                GhcbPageCount;
+  VOID                 *GhcbBackupBase;
+  VOID                 *GhcbBackupPages;
+  UINTN                GhcbBackupPageCount;
+  SEV_ES_PER_CPU_DATA  *SevEsData;
+  UINTN                PageCount;
+  RETURN_STATUS        PcdStatus, DecryptStatus;
+  IA32_DESCRIPTOR      Gdtr;
+  VOID                 *Gdt;
 
   if (!MemEncryptSevEsIsEnabled ()) {
     return;
@@ -83,6 +88,26 @@ AmdSevEsInitialize (
   DEBUG ((DEBUG_INFO,
     "SEV-ES is enabled, %lu GHCB pages allocated starting at 0x%p\n",
     (UINT64)GhcbPageCount, GhcbBase));
+
+  //
+  // Allocate #VC recursion backup pages. The number of backup pages needed is
+  // one less than the maximum VC count.
+  //
+  GhcbBackupPageCount = mMaxCpuCount * (VMGEXIT_MAXIMUM_VC_COUNT - 1);
+  GhcbBackupBase = AllocatePages (GhcbBackupPageCount);
+  ASSERT (GhcbBackupBase != NULL);
+
+  GhcbBackupPages = GhcbBackupBase;
+  for (PageCount = 1; PageCount < GhcbPageCount; PageCount += 2) {
+    SevEsData = GhcbBase + EFI_PAGES_TO_SIZE (PageCount);
+    SevEsData->GhcbBackupPages = GhcbBackupPages;
+
+    GhcbBackupPages += EFI_PAGE_SIZE * (VMGEXIT_MAXIMUM_VC_COUNT - 1);
+  }
+
+  DEBUG ((DEBUG_INFO,
+    "SEV-ES is enabled, %lu GHCB backup pages allocated starting at 0x%p\n",
+    (UINT64)GhcbBackupPageCount, GhcbBackupBase));
 
   AsmWriteMsr64 (MSR_SEV_ES_GHCB, GhcbBasePa);
 
