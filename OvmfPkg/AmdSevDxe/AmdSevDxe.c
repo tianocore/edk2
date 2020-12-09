@@ -4,7 +4,7 @@
   in APRIORI. It clears C-bit from MMIO and NonExistent Memory space when SEV
   is enabled.
 
-  Copyright (c) 2017, AMD Inc. All rights reserved.<BR>
+  Copyright (c) 2017 - 2020, AMD Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -17,6 +17,7 @@
 #include <Library/MemEncryptSevLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
+#include <IndustryStandard/Q35MchIch9.h>
 
 EFI_STATUS
 EFIAPI
@@ -63,6 +64,23 @@ AmdSevDxeEntryPoint (
     }
 
     FreePool (AllDescMap);
+  }
+
+  //
+  // If PCI Express is enabled, the MMCONFIG area has been reserved, rather
+  // than marked as MMIO, and so the C-bit won't be cleared by the above walk
+  // through the GCD map. Check for the MMCONFIG area and clear the C-bit for
+  // the range.
+  //
+  if (PcdGet16 (PcdOvmfHostBridgePciDevId) == INTEL_Q35_MCH_DEVICE_ID) {
+    Status = MemEncryptSevClearPageEncMask (
+               0,
+               FixedPcdGet64 (PcdPciExpressBaseAddress),
+               EFI_SIZE_TO_PAGES (SIZE_256MB),
+               FALSE
+               );
+
+    ASSERT_EFI_ERROR (Status);
   }
 
   //
