@@ -294,7 +294,7 @@ UpdateRegionMapping (
 {
   UINTN     T0SZ;
 
-  if (((RegionStart | RegionLength) & EFI_PAGE_MASK)) {
+  if (((RegionStart | RegionLength) & EFI_PAGE_MASK) != 0) {
     return EFI_INVALID_PARAMETER;
   }
 
