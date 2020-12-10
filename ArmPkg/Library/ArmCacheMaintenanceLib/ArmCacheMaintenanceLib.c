@@ -1,7 +1,7 @@
 /** @file
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  Copyright (c) 2011 - 2014, ARM Limited. All rights reserved.
+  Copyright (c) 2011 - 2021, ARM Limited. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -20,11 +20,14 @@ CacheRangeOperation (
   IN  UINTN           LineLength
   )
 {
-  UINTN ArmCacheLineAlignmentMask  = LineLength - 1;
-
+  UINTN ArmCacheLineAlignmentMask;
   // Align address (rounding down)
-  UINTN AlignedAddress = (UINTN)Start - ((UINTN)Start & ArmCacheLineAlignmentMask);
-  UINTN EndAddress     = (UINTN)Start + Length;
+  UINTN AlignedAddress;
+  UINTN EndAddress;
+
+  ArmCacheLineAlignmentMask = LineLength - 1;
+  AlignedAddress = (UINTN)Start - ((UINTN)Start & ArmCacheLineAlignmentMask);
+  EndAddress     = (UINTN)Start + Length;
 
   // Perform the line operation on an address in each cache line
   while (AlignedAddress < EndAddress) {
