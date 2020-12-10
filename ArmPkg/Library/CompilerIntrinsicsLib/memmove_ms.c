@@ -18,8 +18,11 @@ void* memmove(void *, const void *, size_t);
 #pragma function(memmove)
 void* memmove(void *dest, const void *src, size_t n)
 {
-  unsigned char *d = dest;
-  unsigned char const *s = src;
+  unsigned char *d;
+  unsigned char const *s;
+
+  d = dest;
+  s = src;
 
   if (d < s) {
     while (n-- != 0) {
