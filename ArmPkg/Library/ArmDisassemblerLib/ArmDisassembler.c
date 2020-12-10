@@ -158,13 +158,15 @@ DisassembleArmInstruction (
   IN  BOOLEAN   Extended
   )
 {
-  UINT32    OpCode = **OpCodePtr;
+  UINT32    OpCode;
   CHAR8     *Type, *Root;
   BOOLEAN   I, P, U, B, W, L, S, H;
   UINT32    Rn, Rd, Rm;
   UINT32    imode, offset_8, offset_12;
   UINT32    Index;
   UINT32    shift_imm, shift;
+
+  OpCode = **OpCodePtr;
 
   I = (OpCode & BIT25) == BIT25;
   P = (OpCode & BIT24) == BIT24;
