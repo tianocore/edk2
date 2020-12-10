@@ -2,6 +2,7 @@
   Serial I/O Port library functions with no library constructor/destructor
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
+  Copyright (c) 2021, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -55,9 +56,12 @@ SerialPortWrite (
 )
 {
   UINT8 PrintBuffer[PRINT_BUFFER_SIZE];
-  UINTN SourceIndex      = 0;
-  UINTN DestinationIndex = 0;
+  UINTN SourceIndex;
+  UINTN DestinationIndex;
   UINT8 CurrentCharacter;
+
+  SourceIndex      = 0;
+  DestinationIndex = 0;
 
   while (SourceIndex < NumberOfBytes)
   {
