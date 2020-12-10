@@ -2,6 +2,7 @@
   Default exception handler
 
   Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
+  Copyright (c) 2021, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -367,7 +368,11 @@ DisassembleArmInstruction (
       AsciiSPrint (Buf, Size, "CPS #0x%x", (OpCode & 0x2f));
     } else {
       imode = (OpCode >> 18) & 0x3;
-      Index = AsciiSPrint (Buf, Size, "CPS%a %a%a%a", (imode == 3) ? "ID":"IE", (OpCode & BIT8) ? "A":"", (OpCode & BIT7) ? "I":"", (OpCode & BIT6) ? "F":"");
+      Index = AsciiSPrint (Buf, Size, "CPS%a %a%a%a",
+                      (imode == 3) ? "ID":"IE",
+                      ((OpCode & BIT8) != 0) ? "A":"",
+                      ((OpCode & BIT7) != 0) ? "I":"",
+                      ((OpCode & BIT6) != 0) ? "F":"");
       if ((OpCode & BIT17) != 0) {
         AsciiSPrint (&Buf[Index], Size - Index, ", #0x%x", OpCode & 0x1f);
       }
