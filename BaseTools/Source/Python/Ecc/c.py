@@ -1560,7 +1560,7 @@ def CheckFuncLayoutLocalVariable(FullFileName):
             continue
 
         for Result in ResultSet:
-            if len(Result[1]) > 0 and 'CONST' not in Result[3]:
+            if len(Result[1]) > 0 and 'CONST' not in Result[3] and 'STATIC' not in Result[3]:
                 PrintErrorMsg(ERROR_C_FUNCTION_LAYOUT_CHECK_NO_INIT_OF_VARIABLE, 'Variable Name: %s' % Result[0], FileTable, Result[2])
 
 def CheckMemberVariableFormat(Name, Value, FileTable, TdId, ModelId):
