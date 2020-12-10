@@ -12,7 +12,9 @@ typedef __SIZE_TYPE__ size_t;
 static __attribute__((__used__))
 void *__memset(void *s, int c, size_t n)
 {
-  unsigned char *d = s;
+  unsigned char *d;
+
+  d = s;
 
   while (n-- != 0) {
     *d++ = c;

@@ -18,8 +18,11 @@ void* memcpy(void *, const void *, size_t);
 #pragma function(memcpy)
 void* memcpy(void *dest, const void *src, size_t n)
 {
-  unsigned char *d = dest;
-  unsigned char const *s = src;
+  unsigned char *d;
+  unsigned char const *s;
+
+  d = dest;
+  s = src;
 
   while (n-- != 0) {
     *d++ = *s++;
