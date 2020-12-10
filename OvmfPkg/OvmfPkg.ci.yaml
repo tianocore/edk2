@@ -22,7 +22,8 @@
         ],
         ## Both file path and directory path are accepted.
         "IgnoreFiles": [
-        ]
+        ],
+        "skip": True
     },
     ## options defined .pytool/Plugin/CompilerPlugin
     "CompilerPlugin": {
