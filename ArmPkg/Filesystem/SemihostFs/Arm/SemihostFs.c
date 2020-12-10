@@ -2,7 +2,7 @@
   Support a Semi Host file system over a debuggers JTAG
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  Portions copyright (c) 2011 - 2014, ARM Ltd. All rights reserved.<BR>
+  Portions copyright (c) 2011 - 2021, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -196,8 +196,8 @@ FileOpen (
     return EFI_INVALID_PARAMETER;
   }
 
-  if ((OpenMode & EFI_FILE_MODE_CREATE) &&
-      (Attributes & EFI_FILE_DIRECTORY)    ) {
+  if (((OpenMode & EFI_FILE_MODE_CREATE) != 0) &&
+      ((Attributes & EFI_FILE_DIRECTORY) != 0)) {
     return EFI_WRITE_PROTECTED;
   }
 
@@ -234,7 +234,7 @@ FileOpen (
   Return = SemihostFileOpen (AsciiFileName, SemihostMode, &SemihostHandle);
 
   if (RETURN_ERROR (Return)) {
-    if (OpenMode & EFI_FILE_MODE_CREATE) {
+    if ((OpenMode & EFI_FILE_MODE_CREATE) != 0) {
       //
       // In the create if does not exist case, if the opening in update
       // mode failed, create it and open it in update mode. The update
@@ -277,7 +277,8 @@ FileOpen (
 
   FileFcb->Info.FileSize     = Length;
   FileFcb->Info.PhysicalSize = Length;
-  FileFcb->Info.Attribute    = (OpenMode & EFI_FILE_MODE_CREATE) ? Attributes : 0;
+  FileFcb->Info.Attribute    = ((OpenMode & EFI_FILE_MODE_CREATE) != 0) ?
+                                 Attributes : 0;
 
   InsertTailList (&gFileList, &FileFcb->Link);
 
