@@ -1,7 +1,7 @@
 /** @file
   Timer Architecture Protocol driver of the ARM flavor
 
-  Copyright (c) 2011-2013 ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2011-2021, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -307,7 +307,7 @@ TimerInterruptHandler (
   // Check if the timer interrupt is active
   if ((ArmGenericTimerGetTimerCtrlReg () ) & ARM_ARCH_TIMER_ISTATUS) {
 
-    if (mTimerNotifyFunction) {
+    if (mTimerNotifyFunction != 0) {
       mTimerNotifyFunction (mTimerPeriod * mElapsedPeriod);
     }
 
