@@ -1,7 +1,7 @@
 /** @file
 *  File managing the MMU for ARMv7 architecture
 *
-*  Copyright (c) 2011-2016, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2021, Arm Limited. All rights reserved.<BR>
 *
 *  SPDX-License-Identifier: BSD-2-Clause-Patent
 *
@@ -105,7 +105,7 @@ UpdatePageEntries (
   // EntryMask: bitmask of values to change (1 = change this value, 0 = leave alone)
   // EntryValue: values at bit positions specified by EntryMask
   EntryMask = TT_DESCRIPTOR_PAGE_TYPE_MASK | TT_DESCRIPTOR_PAGE_AP_MASK;
-  if (Attributes & EFI_MEMORY_XP) {
+  if ((Attributes & EFI_MEMORY_XP) != 0) {
     EntryValue = TT_DESCRIPTOR_PAGE_TYPE_PAGE_XN;
   } else {
     EntryValue = TT_DESCRIPTOR_PAGE_TYPE_PAGE;
@@ -116,33 +116,33 @@ UpdatePageEntries (
   // is irrelevant. If no memory attribute is specified, we preserve whatever
   // memory type is set in the page tables, and update the permission attributes
   // only.
-  if (Attributes & EFI_MEMORY_UC) {
+  if ((Attributes & EFI_MEMORY_UC) != 0) {
     // modify cacheability attributes
     EntryMask |= TT_DESCRIPTOR_PAGE_CACHE_POLICY_MASK;
     // map to strongly ordered
     EntryValue |= TT_DESCRIPTOR_PAGE_CACHE_POLICY_STRONGLY_ORDERED; // TEX[2:0] = 0, C=0, B=0
-  } else if (Attributes & EFI_MEMORY_WC) {
+  } else if ((Attributes & EFI_MEMORY_WC) != 0) {
     // modify cacheability attributes
     EntryMask |= TT_DESCRIPTOR_PAGE_CACHE_POLICY_MASK;
     // map to normal non-cachable
     EntryValue |= TT_DESCRIPTOR_PAGE_CACHE_POLICY_NON_CACHEABLE; // TEX [2:0]= 001 = 0x2, B=0, C=0
-  } else if (Attributes & EFI_MEMORY_WT) {
+  } else if ((Attributes & EFI_MEMORY_WT) != 0) {
     // modify cacheability attributes
     EntryMask |= TT_DESCRIPTOR_PAGE_CACHE_POLICY_MASK;
     // write through with no-allocate
     EntryValue |= TT_DESCRIPTOR_PAGE_CACHE_POLICY_WRITE_THROUGH_NO_ALLOC; // TEX [2:0] = 0, C=1, B=0
-  } else if (Attributes & EFI_MEMORY_WB) {
+  } else if ((Attributes & EFI_MEMORY_WB) != 0) {
     // modify cacheability attributes
     EntryMask |= TT_DESCRIPTOR_PAGE_CACHE_POLICY_MASK;
     // write back (with allocate)
     EntryValue |= TT_DESCRIPTOR_PAGE_CACHE_POLICY_WRITE_BACK_ALLOC; // TEX [2:0] = 001, C=1, B=1
-  } else if (Attributes & CACHE_ATTRIBUTE_MASK) {
+  } else if ((Attributes & CACHE_ATTRIBUTE_MASK) != 0) {
     // catch unsupported memory type attributes
     ASSERT (FALSE);
     return EFI_UNSUPPORTED;
   }
 
-  if (Attributes & EFI_MEMORY_RO) {
+  if ((Attributes & EFI_MEMORY_RO) != 0) {
     EntryValue |= TT_DESCRIPTOR_PAGE_AP_RO_RO;
   } else {
     EntryValue |= TT_DESCRIPTOR_PAGE_AP_RW_RW;
@@ -244,39 +244,39 @@ UpdateSectionEntries (
   // is irrelevant. If no memory attribute is specified, we preserve whatever
   // memory type is set in the page tables, and update the permission attributes
   // only.
-  if (Attributes & EFI_MEMORY_UC) {
+  if ((Attributes & EFI_MEMORY_UC) != 0) {
     // modify cacheability attributes
     EntryMask |= TT_DESCRIPTOR_SECTION_CACHE_POLICY_MASK;
     // map to strongly ordered
     EntryValue |= TT_DESCRIPTOR_SECTION_CACHE_POLICY_STRONGLY_ORDERED; // TEX[2:0] = 0, C=0, B=0
-  } else if (Attributes & EFI_MEMORY_WC) {
+  } else if ((Attributes & EFI_MEMORY_WC) != 0) {
     // modify cacheability attributes
     EntryMask |= TT_DESCRIPTOR_SECTION_CACHE_POLICY_MASK;
     // map to normal non-cachable
     EntryValue |= TT_DESCRIPTOR_SECTION_CACHE_POLICY_NON_CACHEABLE; // TEX [2:0]= 001 = 0x2, B=0, C=0
-  } else if (Attributes & EFI_MEMORY_WT) {
+  } else if ((Attributes & EFI_MEMORY_WT) != 0) {
     // modify cacheability attributes
     EntryMask |= TT_DESCRIPTOR_SECTION_CACHE_POLICY_MASK;
     // write through with no-allocate
     EntryValue |= TT_DESCRIPTOR_SECTION_CACHE_POLICY_WRITE_THROUGH_NO_ALLOC; // TEX [2:0] = 0, C=1, B=0
-  } else if (Attributes & EFI_MEMORY_WB) {
+  } else if ((Attributes & EFI_MEMORY_WB) != 0) {
     // modify cacheability attributes
     EntryMask |= TT_DESCRIPTOR_SECTION_CACHE_POLICY_MASK;
     // write back (with allocate)
     EntryValue |= TT_DESCRIPTOR_SECTION_CACHE_POLICY_WRITE_BACK_ALLOC; // TEX [2:0] = 001, C=1, B=1
-  } else if (Attributes & CACHE_ATTRIBUTE_MASK) {
+  } else if ((Attributes & CACHE_ATTRIBUTE_MASK) != 0) {
     // catch unsupported memory type attributes
     ASSERT (FALSE);
     return EFI_UNSUPPORTED;
   }
 
-  if (Attributes & EFI_MEMORY_RO) {
+  if ((Attributes & EFI_MEMORY_RO) != 0) {
     EntryValue |= TT_DESCRIPTOR_SECTION_AP_RO_RO;
   } else {
     EntryValue |= TT_DESCRIPTOR_SECTION_AP_RW_RW;
   }
 
-  if (Attributes & EFI_MEMORY_XP) {
+  if ((Attributes & EFI_MEMORY_XP) != 0) {
     EntryValue |= TT_DESCRIPTOR_SECTION_XN_MASK;
   }
 
