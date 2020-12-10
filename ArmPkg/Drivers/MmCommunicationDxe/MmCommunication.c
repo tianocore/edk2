@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2016-2019, ARM Limited. All rights reserved.
+  Copyright (c) 2016-2021, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -96,7 +96,7 @@ MmCommunication2Communicate (
                sizeof (CommunicateHeader->MessageLength);
 
   // If the length of the CommBuffer is 0 then return the expected length.
-  if (CommSize) {
+  if (CommSize != 0) {
     // This case can be used by the consumer of this driver to find out the
     // max size that can be used for allocating CommBuffer.
     if ((*CommSize == 0) ||
