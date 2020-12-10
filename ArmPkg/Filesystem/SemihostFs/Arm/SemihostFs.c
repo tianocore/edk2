@@ -764,7 +764,7 @@ GetFileInfo (
   UINTN           ResultSize;
   UINTN           Index;
 
-  if (Fcb->IsRoot == TRUE) {
+  if (Fcb->IsRoot) {
     ResultSize = SIZE_OF_EFI_FILE_INFO + sizeof(CHAR16);
   } else {
     NameSize   = AsciiStrLen (Fcb->FileName) + 1;
@@ -784,7 +784,7 @@ GetFileInfo (
   // Fill in the structure
   Info->Size = ResultSize;
 
-  if (Fcb->IsRoot == TRUE) {
+  if (Fcb->IsRoot) {
     Info->FileName[0]  = L'\0';
   } else {
     for (Index = 0; Index < NameSize; Index++) {
