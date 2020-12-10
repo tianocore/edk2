@@ -2,7 +2,7 @@
 *  Main file supporting the SEC Phase for Versatile Express
 *
 *  Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-*  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2021, Arm Limited. All rights reserved.<BR>
 *  Copyright (c) 2016 HP Development Company, L.P.
 *
 *  SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -253,7 +253,8 @@ RETURN_STATUS
 RegisterCpuInterruptHandler(
   IN EFI_EXCEPTION_TYPE             ExceptionType,
   IN EFI_CPU_INTERRUPT_HANDLER      ExceptionHandler
-  ) {
+  )
+{
   if (ExceptionType > gMaxExceptionNumber) {
     return RETURN_UNSUPPORTED;
   }
