@@ -3,6 +3,7 @@
   secure monitor calls.
 
   Copyright (c) 2018, Linaro Ltd. All rights reserved.<BR>
+  Copyright (c) 2021, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -227,7 +228,7 @@ OpteeOpenSession (
 
   MessageArg->NumParams = 2;
 
-  if (OpteeCallWithArg ((UINTN)MessageArg)) {
+  if (OpteeCallWithArg ((UINTN)MessageArg) != 0) {
     MessageArg->Return = OPTEE_ERROR_COMMUNICATION;
     MessageArg->ReturnOrigin = OPTEE_ORIGIN_COMMUNICATION;
   }
@@ -431,7 +432,7 @@ OpteeInvokeFunction (
 
   MessageArg->NumParams = OPTEE_MAX_CALL_PARAMS;
 
-  if (OpteeCallWithArg ((UINTN)MessageArg)) {
+  if (OpteeCallWithArg ((UINTN)MessageArg) != 0) {
     MessageArg->Return = OPTEE_ERROR_COMMUNICATION;
     MessageArg->ReturnOrigin = OPTEE_ORIGIN_COMMUNICATION;
   }
@@ -440,7 +441,7 @@ OpteeInvokeFunction (
         InvokeFunctionArg->Params,
         OPTEE_MAX_CALL_PARAMS,
         MessageArg->Params
-        )) {
+        ) != 0) {
     MessageArg->Return = OPTEE_ERROR_COMMUNICATION;
     MessageArg->ReturnOrigin = OPTEE_ORIGIN_COMMUNICATION;
   }
