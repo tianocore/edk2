@@ -155,8 +155,8 @@ SyncCacheConfigPage (
   EFI_STATUS                          Status;
   UINT32                              i;
   volatile ARM_PAGE_TABLE_ENTRY       *SecondLevelTable;
-  UINT32                              NextPageAttributes = 0;
-  UINT32                              PageAttributes = 0;
+  UINT32                              NextPageAttributes;
+  UINT32                              PageAttributes;
   UINT32                              BaseAddress;
   UINT64                              GcdAttributes;
 
@@ -226,8 +226,8 @@ SyncCacheConfig (
   UINT32                              i;
   EFI_PHYSICAL_ADDRESS                NextRegionBase;
   UINT64                              NextRegionLength;
-  UINT32                              NextSectionAttributes = 0;
-  UINT32                              SectionAttributes = 0;
+  UINT32                              NextSectionAttributes;
+  UINT32                              SectionAttributes;
   UINT64                              GcdAttributes;
   volatile ARM_FIRST_LEVEL_DESCRIPTOR   *FirstLevelTable;
   UINTN                               NumberOfDescriptors;

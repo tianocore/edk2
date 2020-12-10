@@ -189,7 +189,7 @@ SyncCacheConfig (
   )
 {
   EFI_STATUS                          Status;
-  UINT32                              PageAttribute = 0;
+  UINT32                              PageAttribute;
   UINT64                             *FirstLevelTableAddress;
   UINTN                               TableLevel;
   UINTN                               TableCount;
