@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2017-2018, Arm Limited. All rights reserved.
+  Copyright (c) 2017-2021, Arm Limited. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -189,12 +189,14 @@ ClockDescribeRates (
   CLOCK_DESCRIBE_RATES   *DescribeRates;
   CLOCK_RATE_DWORD       *Rate;
 
-  UINT32                 RequiredArraySize = 0;
-  UINT32                 RateIndex = 0;
+  UINT32                 RequiredArraySize;
+  UINT32                 RateIndex;
   UINT32                 RateNo;
   UINT32                 RateOffset;
 
   *TotalRates = 0;
+  RequiredArraySize = 0;
+  RateIndex = 0;
 
   Status = ScmiCommandGetPayload (&MessageParams);
   if (EFI_ERROR (Status)) {

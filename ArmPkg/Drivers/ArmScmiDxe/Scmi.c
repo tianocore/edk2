@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2017-2018, Arm Limited. All rights reserved.
+  Copyright (c) 2017-2021, Arm Limited. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -161,8 +161,9 @@ ScmiProtocolDiscoveryCommon (
   )
 {
   SCMI_COMMAND  Command;
-  UINT32        PayloadLength = 0;
+  UINT32        PayloadLength;
 
+  PayloadLength = 0;
   Command.ProtocolId = ProtocolId;
   Command.MessageId  = MessageId;
 
