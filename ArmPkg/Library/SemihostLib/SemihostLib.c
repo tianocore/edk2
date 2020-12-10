@@ -1,7 +1,7 @@
 /** @file
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  Copyright (c) 2013 - 2014, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2013 - 2021, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -135,9 +135,7 @@ SemihostFileClose (
   IN UINTN  FileHandle
   )
 {
-  INT32 Result = Semihost_SYS_CLOSE(&FileHandle);
-
-  if (Result == -1) {
+  if (Semihost_SYS_CLOSE (&FileHandle) == -1) {
     return RETURN_INVALID_PARAMETER;
   } else {
     return RETURN_SUCCESS;
