@@ -1,7 +1,7 @@
 /** @file
 *  File managing the MMU for ARMv8 architecture in S-EL0
 *
-*  Copyright (c) 2017 - 2018, ARM Limited. All rights reserved.
+*  Copyright (c) 2017 - 2021, Arm Limited. All rights reserved.<BR>
 *
 *  SPDX-License-Identifier: BSD-2-Clause-Patent
 *
@@ -14,6 +14,7 @@
 #include <Library/ArmMmuLib.h>
 #include <Library/ArmSvcLib.h>
 #include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 
 STATIC
@@ -23,12 +24,12 @@ GetMemoryPermissions (
   OUT UINT32                    *MemoryAttributes
   )
 {
-  ARM_SVC_ARGS  GetMemoryPermissionsSvcArgs = {0};
+  ARM_SVC_ARGS  GetMemoryPermissionsSvcArgs;
+
+  ZeroMem (&GetMemoryPermissionsSvcArgs, sizeof (ARM_SVC_ARGS));
 
   GetMemoryPermissionsSvcArgs.Arg0 = ARM_SVC_ID_SP_GET_MEM_ATTRIBUTES_AARCH64;
   GetMemoryPermissionsSvcArgs.Arg1 = BaseAddress;
-  GetMemoryPermissionsSvcArgs.Arg2 = 0;
-  GetMemoryPermissionsSvcArgs.Arg3 = 0;
 
   ArmCallSvc (&GetMemoryPermissionsSvcArgs);
   if (GetMemoryPermissionsSvcArgs.Arg0 == ARM_SVC_SPM_RET_INVALID_PARAMS) {
@@ -49,7 +50,9 @@ RequestMemoryPermissionChange (
   )
 {
   EFI_STATUS    Status;
-  ARM_SVC_ARGS  ChangeMemoryPermissionsSvcArgs = {0};
+  ARM_SVC_ARGS  ChangeMemoryPermissionsSvcArgs;
+
+  ZeroMem (&ChangeMemoryPermissionsSvcArgs, sizeof (ARM_SVC_ARGS));
 
   ChangeMemoryPermissionsSvcArgs.Arg0 = ARM_SVC_ID_SP_SET_MEM_ATTRIBUTES_AARCH64;
   ChangeMemoryPermissionsSvcArgs.Arg1 = BaseAddress;
