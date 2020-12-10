@@ -1,6 +1,7 @@
 //------------------------------------------------------------------------------
 //
 // Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
+// Copyright (c) 2021, Arm Limited. All rights reserved.<BR>
 //
 // SPDX-License-Identifier: BSD-2-Clause-Patent
 //
@@ -13,8 +14,9 @@ static void __memcpy(void *dest, const void *src, size_t n)
   unsigned char *d = dest;
   unsigned char const *s = src;
 
-  while (n--)
+  while (n-- != 0) {
     *d++ = *s++;
+  }
 }
 
 void *memcpy(void *dest, const void *src, size_t n)
