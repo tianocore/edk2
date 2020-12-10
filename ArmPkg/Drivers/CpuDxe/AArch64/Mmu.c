@@ -2,7 +2,7 @@
 
 Copyright (c) 2009, Hewlett-Packard Company. All rights reserved.<BR>
 Portions copyright (c) 2010, Apple Inc. All rights reserved.<BR>
-Portions copyright (c) 2011-2013, ARM Ltd. All rights reserved.<BR>
+Portions copyright (c) 2011-2021, Arm Limited. All rights reserved.<BR>
 Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -282,12 +282,12 @@ EfiAttributeToArmAttribute (
   ArmAttributes |= TT_AF;
 
   // Determine protection attributes
-  if (EfiAttributes & EFI_MEMORY_RO) {
+  if ((EfiAttributes & EFI_MEMORY_RO) != 0) {
     ArmAttributes |= TT_AP_RO_RO;
   }
 
   // Process eXecute Never attribute
-  if (EfiAttributes & EFI_MEMORY_XP) {
+  if ((EfiAttributes & EFI_MEMORY_XP) != 0) {
     ArmAttributes |= TT_PXN_MASK;
   }
 
