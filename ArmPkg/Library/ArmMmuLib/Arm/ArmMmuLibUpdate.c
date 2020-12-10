@@ -220,7 +220,7 @@ UpdateSectionEntries (
   IN UINT64                    Attributes
   )
 {
-  EFI_STATUS    Status = EFI_SUCCESS;
+  EFI_STATUS    Status;
   UINT32        EntryMask;
   UINT32        EntryValue;
   UINT32        FirstLevelIdx;
@@ -230,6 +230,8 @@ UpdateSectionEntries (
   UINT32        Descriptor;
   VOID          *Mva;
   volatile ARM_FIRST_LEVEL_DESCRIPTOR   *FirstLevelTable;
+
+  Status = EFI_SUCCESS;
 
   // EntryMask: bitmask of values to change (1 = change this value, 0 = leave alone)
   // EntryValue: values at bit positions specified by EntryMask
