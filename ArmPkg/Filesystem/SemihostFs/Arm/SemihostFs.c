@@ -90,8 +90,9 @@ AllocateFCB (
   VOID
   )
 {
-  SEMIHOST_FCB *Fcb = AllocateZeroPool (sizeof (SEMIHOST_FCB));
+  SEMIHOST_FCB *Fcb;
 
+  Fcb = AllocateZeroPool (sizeof (SEMIHOST_FCB));
   if (Fcb != NULL) {
     CopyMem (&Fcb->File, &gSemihostFsFile, sizeof (gSemihostFsFile));
     Fcb->Signature = SEMIHOST_FCB_SIGNATURE;
@@ -122,7 +123,7 @@ VolumeOpen (
   OUT EFI_FILE                        **Root
   )
 {
-  SEMIHOST_FCB *RootFcb = NULL;
+  SEMIHOST_FCB *RootFcb;
 
   if (Root == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -759,12 +760,13 @@ GetFileInfo (
   OUT    VOID          *Buffer
   )
 {
-  EFI_FILE_INFO   *Info = NULL;
-  UINTN           NameSize = 0;
+  EFI_FILE_INFO   *Info;
+  UINTN           NameSize;
   UINTN           ResultSize;
   UINTN           Index;
 
   if (Fcb->IsRoot) {
+    NameSize = 0;
     ResultSize = SIZE_OF_EFI_FILE_INFO + sizeof(CHAR16);
   } else {
     NameSize   = AsciiStrLen (Fcb->FileName) + 1;
