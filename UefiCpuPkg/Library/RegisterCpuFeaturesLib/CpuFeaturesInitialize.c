@@ -105,7 +105,10 @@ CpuInitDataInitialize (
   EFI_CPU_PHYSICAL_LOCATION            *Location;
   UINT32                               PackageIndex;
   UINT32                               CoreIndex;
-  UINT32                               First;
+  UINTN                                Pages;
+  UINT32                               FirstPackage;
+  UINT32                               *FirstCore;
+  UINT32                               *FirstThread;
   ACPI_CPU_DATA                        *AcpiCpuData;
   CPU_STATUS_INFORMATION               *CpuStatus;
   UINT32                               *ThreadCountPerPackage;
@@ -237,74 +240,69 @@ CpuInitDataInitialize (
 
   //
   // Initialize CpuFeaturesData->InitOrder[].CpuInfo.First
+  // Use AllocatePages () instead of AllocatePool () because pool cannot be freed in PEI phase but page can.
   //
+  Pages     = EFI_SIZE_TO_PAGES (CpuStatus->PackageCount * sizeof (UINT32) + CpuStatus->PackageCount * CpuStatus->MaxCoreCount * sizeof (UINT32));
+  FirstCore = AllocatePages (Pages);
+  ASSERT (FirstCore != NULL);
+  FirstThread  = FirstCore + CpuStatus->PackageCount;
 
   //
-  // Set First.Package for each thread belonging to the first package.
+  // Set FirstPackage, FirstCore[], FirstThread[] to maximum package ID, core ID, thread ID.
   //
-  First = MAX_UINT32;
+  FirstPackage = MAX_UINT32;
+  SetMem32 (FirstCore,   CpuStatus->PackageCount * sizeof (UINT32), MAX_UINT32);
+  SetMem32 (FirstThread, CpuStatus->PackageCount * CpuStatus->MaxCoreCount * sizeof (UINT32), MAX_UINT32);
+
   for (ProcessorNumber = 0; ProcessorNumber < NumberOfCpus; ProcessorNumber++) {
     Location = &CpuFeaturesData->InitOrder[ProcessorNumber].CpuInfo.ProcessorInfo.Location;
-    First = MIN (Location->Package, First);
+
+    //
+    // Save the minimum package ID in the platform.
+    //
+    FirstPackage                 = MIN (Location->Package, FirstPackage);
+
+    //
+    // Save the minimum core ID per package.
+    //
+    FirstCore[Location->Package] = MIN (Location->Core, FirstCore[Location->Package]);
+
+    //
+    // Save the minimum thread ID per core.
+    //
+    FirstThread[Location->Package * CpuStatus->MaxCoreCount + Location->Core] = MIN (
+      Location->Thread,
+      FirstThread[Location->Package * CpuStatus->MaxCoreCount + Location->Core]
+    );
   }
+
+  //
+  // Update the First field.
+  //
   for (ProcessorNumber = 0; ProcessorNumber < NumberOfCpus; ProcessorNumber++) {
     Location = &CpuFeaturesData->InitOrder[ProcessorNumber].CpuInfo.ProcessorInfo.Location;
-    if (Location->Package == First) {
+
+    if (Location->Package == FirstPackage) {
       CpuFeaturesData->InitOrder[ProcessorNumber].CpuInfo.First.Package = 1;
     }
-  }
 
-  //
-  // Set First.Die/Tile/Module for each thread assuming:
-  //  single Die under each package, single Tile under each Die, single Module under each Tile
-  //
-  for (ProcessorNumber = 0; ProcessorNumber < NumberOfCpus; ProcessorNumber++) {
+    //
+    // Set First.Die/Tile/Module for each thread assuming:
+    //  single Die under each package, single Tile under each Die, single Module under each Tile
+    //
     CpuFeaturesData->InitOrder[ProcessorNumber].CpuInfo.First.Die = 1;
     CpuFeaturesData->InitOrder[ProcessorNumber].CpuInfo.First.Tile = 1;
     CpuFeaturesData->InitOrder[ProcessorNumber].CpuInfo.First.Module = 1;
-  }
 
-  for (PackageIndex = 0; PackageIndex < CpuStatus->PackageCount; PackageIndex++) {
-    //
-    // Set First.Core for each thread in the first core of each package.
-    //
-    First = MAX_UINT32;
-    for (ProcessorNumber = 0; ProcessorNumber < NumberOfCpus; ProcessorNumber++) {
-      Location = &CpuFeaturesData->InitOrder[ProcessorNumber].CpuInfo.ProcessorInfo.Location;
-      if (Location->Package == PackageIndex) {
-        First = MIN (Location->Core, First);
-      }
+    if (Location->Core == FirstCore[Location->Package]) {
+      CpuFeaturesData->InitOrder[ProcessorNumber].CpuInfo.First.Core = 1;
     }
-
-    for (ProcessorNumber = 0; ProcessorNumber < NumberOfCpus; ProcessorNumber++) {
-      Location = &CpuFeaturesData->InitOrder[ProcessorNumber].CpuInfo.ProcessorInfo.Location;
-      if (Location->Package == PackageIndex && Location->Core == First) {
-        CpuFeaturesData->InitOrder[ProcessorNumber].CpuInfo.First.Core = 1;
-      }
+    if (Location->Thread == FirstThread[Location->Package * CpuStatus->MaxCoreCount + Location->Core]) {
+      CpuFeaturesData->InitOrder[ProcessorNumber].CpuInfo.First.Thread = 1;
     }
   }
 
-  for (PackageIndex = 0; PackageIndex < CpuStatus->PackageCount; PackageIndex++) {
-    for (CoreIndex = 0; CoreIndex < CpuStatus->MaxCoreCount; CoreIndex++) {
-      //
-      // Set First.Thread for the first thread of each core.
-      //
-      First = MAX_UINT32;
-      for (ProcessorNumber = 0; ProcessorNumber < NumberOfCpus; ProcessorNumber++) {
-        Location = &CpuFeaturesData->InitOrder[ProcessorNumber].CpuInfo.ProcessorInfo.Location;
-        if (Location->Package == PackageIndex && Location->Core == CoreIndex) {
-          First = MIN (Location->Thread, First);
-        }
-      }
-
-      for (ProcessorNumber = 0; ProcessorNumber < NumberOfCpus; ProcessorNumber++) {
-        Location = &CpuFeaturesData->InitOrder[ProcessorNumber].CpuInfo.ProcessorInfo.Location;
-        if (Location->Package == PackageIndex && Location->Core == CoreIndex && Location->Thread == First) {
-          CpuFeaturesData->InitOrder[ProcessorNumber].CpuInfo.First.Thread = 1;
-        }
-      }
-    }
-  }
+  FreePages (FirstCore, Pages);
 }
 
 /**
