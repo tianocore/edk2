@@ -51,5 +51,6 @@
   RedfishPkg/Library/PlatformCredentialLibNull/PlatformCredentialLibNull.inf
   RedfishPkg/Library/BaseUcs2Utf8Lib/BaseUcs2Utf8Lib.inf
   RedfishPkg/Library/CrtLib/CrtLib.inf
+  RedfishPkg/Library/JsonLib/JsonLib.inf
 
   !include RedfishPkg/Redfish.dsc.inc

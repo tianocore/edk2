@@ -13,5 +13,6 @@
 !if $(REDFISH_ENABLE) == TRUE
   Ucs2Utf8Lib|RedfishPkg/Library/BaseUcs2Utf8Lib/BaseUcs2Utf8Lib.inf
   CrtLib|RedfishPkg/Library/CrtLib/CrtLib.inf
+  JsonLib|RedfishPkg/Library/JsonLib/JsonLib.inf
 !endif
 
