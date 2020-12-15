@@ -31,6 +31,9 @@ steps:
     echo "##vso[task.setvariable variable=pkgs_to_build]${{ parameters.build_pkgs }}"
     echo "##vso[task.setvariable variable=pkg_count]${{ 1 }}"
 
+# Use altername cmocka repo
+- bash: git config --global url.https://github.com/neverware-mirrors/cmocka.git.insteadOf https://git.cryptomilk.org/projects/cmocka.git
+
 # Fetch the target branch so that pr_eval can diff them.
 # Seems like azure pipelines/github changed checkout process in nov 2020.
 - script: git fetch origin $(System.PullRequest.targetBranch)
