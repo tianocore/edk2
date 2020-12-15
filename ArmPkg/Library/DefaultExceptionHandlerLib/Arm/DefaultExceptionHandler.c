@@ -2,7 +2,7 @@
   Default exception handler
 
   Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
-  Copyright (c) 2012, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2012 - 2021, Arm Ltd. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -34,6 +34,20 @@ typedef struct {
   CHAR8   Char;
 } CPSR_CHAR;
 
+STATIC CONST CPSR_CHAR mCpsrChar[] = {
+  { 31, 'n' },
+  { 30, 'z' },
+  { 29, 'c' },
+  { 28, 'v' },
+
+  { 9,  'e' },
+  { 8,  'a' },
+  { 7,  'i' },
+  { 6,  'f' },
+  { 5,  't' },
+  { 0,  '?' }
+};
+
 CHAR8 *
 GetImageName (
   IN  UINTN  FaultAddress,
@@ -45,7 +59,7 @@ GetImageName (
   Convert the Current Program Status Register (CPSR) to a string. The string is
   a defacto standard in the ARM world.
 
-  It is possible to add extra bits by adding them to CpsrChar array.
+  It is possible to add extra bits by adding them to mCpsrChar array.
 
   @param  Cpsr         ARM CPSR register value
   @param  ReturnStr    CPSR_STRING_SIZE byte string that contains string
@@ -61,25 +75,12 @@ CpsrString (
   UINTN     Index;
   CHAR8*    Str;
   CHAR8*    ModeStr;
-  CPSR_CHAR CpsrChar[] = {
-    { 31, 'n' },
-    { 30, 'z' },
-    { 29, 'c' },
-    { 28, 'v' },
-
-    { 9,  'e' },
-    { 8,  'a' },
-    { 7,  'i' },
-    { 6,  'f' },
-    { 5,  't' },
-    { 0,  '?' }
-  };
 
   Str = ReturnStr;
 
-  for (Index = 0; CpsrChar[Index].BIT != 0; Index++, Str++) {
-    *Str = CpsrChar[Index].Char;
-    if ((Cpsr & (1 << CpsrChar[Index].BIT)) != 0) {
+  for (Index = 0; mCpsrChar[Index].BIT != 0; Index++, Str++) {
+    *Str = mCpsrChar[Index].Char;
+    if ((Cpsr & (1 << mCpsrChar[Index].BIT)) != 0) {
       // Concert to upper case if bit is set
       *Str &= ~0x20;
     }
@@ -186,7 +187,9 @@ DefaultExceptionHandler (
   UINT32    DfsrStatus;
   UINT32    IfsrStatus;
   BOOLEAN   DfsrWrite;
-  UINT32    PcAdjust = 0;
+  UINT32    PcAdjust;
+
+  PcAdjust = 0;
 
   CharCount = AsciiSPrint (Buffer,sizeof (Buffer),"\n%a Exception PC at 0x%08x  CPSR 0x%08x ",
          gExceptionTypeString[ExceptionType], SystemContext.SystemContextArm->PC, SystemContext.SystemContextArm->CPSR);
