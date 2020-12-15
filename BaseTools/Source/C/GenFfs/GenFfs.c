@@ -821,12 +821,11 @@ Returns:
           if (Alignment < 0x400){
             sprintf (AlignmentBuffer, "%d", Alignment);
           }
-          else if (Alignment >= 0x400) {
-            if (Alignment >= 0x100000) {
-              sprintf (AlignmentBuffer, "%dM", Alignment/0x100000);
-            } else {
-              sprintf (AlignmentBuffer, "%dK", Alignment/0x400);
-            }
+          else if (Alignment >= 0x100000) {
+            sprintf (AlignmentBuffer, "%dM", Alignment/0x100000);
+          }
+          else {
+            sprintf (AlignmentBuffer, "%dK", Alignment/0x400);
           }
           Status = StringtoAlignment (AlignmentBuffer, &(InputFileAlign[InputFileNum]));
         }
