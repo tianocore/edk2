@@ -32,7 +32,7 @@ PAGE_ATTRIBUTE_TABLE mPageAttributeTable[] = {
   {Page1G,  SIZE_1GB, PAGING_1G_ADDRESS_MASK_64},
 };
 
-UINTN  mInternalGr3;
+UINTN  mInternalCr3;
 
 /**
   Set the internal page table base address.
@@ -46,23 +46,7 @@ SetPageTableBase (
   IN UINTN   Cr3
   )
 {
-  mInternalGr3 = Cr3;
-}
-
-/**
-  Return page table base.
-
-  @return page table base.
-**/
-UINTN
-GetPageTableBase (
-  VOID
-  )
-{
-  if (mInternalGr3 != 0) {
-    return mInternalGr3;
-  }
-  return (AsmReadCr3 () & PAGING_4K_ADDRESS_MASK_64);
+  mInternalCr3 = Cr3;
 }
 
 /**
@@ -131,8 +115,10 @@ GetPageTableEntry (
   UINT64                *L3PageTable;
   UINT64                *L4PageTable;
   UINT64                *L5PageTable;
-  IA32_CR4              Cr4;
+  UINTN                 PageTableBase;
   BOOLEAN               Enable5LevelPaging;
+
+  GetPageTable (&PageTableBase, &Enable5LevelPaging);
 
   Index5 = ((UINTN)RShiftU64 (Address, 48)) & PAGING_PAE_INDEX_MASK;
   Index4 = ((UINTN)RShiftU64 (Address, 39)) & PAGING_PAE_INDEX_MASK;
@@ -140,12 +126,9 @@ GetPageTableEntry (
   Index2 = ((UINTN)Address >> 21) & PAGING_PAE_INDEX_MASK;
   Index1 = ((UINTN)Address >> 12) & PAGING_PAE_INDEX_MASK;
 
-  Cr4.UintN = AsmReadCr4 ();
-  Enable5LevelPaging = (BOOLEAN) (Cr4.Bits.LA57 == 1);
-
   if (sizeof(UINTN) == sizeof(UINT64)) {
     if (Enable5LevelPaging) {
-      L5PageTable = (UINT64 *)GetPageTableBase ();
+      L5PageTable = (UINT64 *)PageTableBase;
       if (L5PageTable[Index5] == 0) {
         *PageAttribute = PageNone;
         return NULL;
@@ -153,7 +136,7 @@ GetPageTableEntry (
 
       L4PageTable = (UINT64 *)(UINTN)(L5PageTable[Index5] & ~mAddressEncMask & PAGING_4K_ADDRESS_MASK_64);
     } else {
-      L4PageTable = (UINT64 *)GetPageTableBase ();
+      L4PageTable = (UINT64 *)PageTableBase;
     }
     if (L4PageTable[Index4] == 0) {
       *PageAttribute = PageNone;
@@ -162,7 +145,7 @@ GetPageTableEntry (
 
     L3PageTable = (UINT64 *)(UINTN)(L4PageTable[Index4] & ~mAddressEncMask & PAGING_4K_ADDRESS_MASK_64);
   } else {
-    L3PageTable = (UINT64 *)GetPageTableBase ();
+    L3PageTable = (UINT64 *)PageTableBase;
   }
   if (L3PageTable[Index3] == 0) {
     *PageAttribute = PageNone;
@@ -252,7 +235,7 @@ ConvertPageEntryAttribute (
   if ((Attributes & EFI_MEMORY_RO) != 0) {
     if (IsSet) {
       NewPageEntry &= ~(UINT64)IA32_PG_RW;
-      if (mInternalGr3 != 0) {
+      if (mInternalCr3 != 0) {
         // Environment setup
         // ReadOnly page need set Dirty bit for shadow stack
         NewPageEntry |= IA32_PG_D;

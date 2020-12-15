@@ -20,6 +20,7 @@
 #
 # Copyright (c) 2010 - 2019, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) 2018, Linaro, Ltd. All rights reserved.<BR>
+# Copyright (c) Microsoft Corporation.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -57,6 +58,7 @@
   VariableExLib.c
   TcgMorLockSmm.c
   SpeculationBarrierSmm.c
+  VariableLockRequestToLock.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -74,6 +76,8 @@
   StandaloneMmDriverEntryPoint
   SynchronizationLib
   VarCheckLib
+  VariablePolicyLib
+  VariablePolicyHelperLib
 
 [Protocols]
   gEfiSmmFirmwareVolumeBlockProtocolGuid        ## CONSUMES
