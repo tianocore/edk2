@@ -248,6 +248,12 @@ VirtioFsFuseAttrToEfiFileInfo (
      OUT EFI_FILE_INFO                      *FileInfo
   );
 
+EFI_STATUS
+VirtioFsFuseDirentPlusToEfiFileInfo (
+  IN     VIRTIO_FS_FUSE_DIRENTPLUS_RESPONSE *FuseDirent,
+  IN OUT EFI_FILE_INFO                      *FileInfo
+  );
+
 //
 // Wrapper functions for FUSE commands (primitives).
 //
