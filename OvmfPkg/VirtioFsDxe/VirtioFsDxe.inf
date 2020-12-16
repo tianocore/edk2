@@ -86,6 +86,7 @@
   FuseFlush.c
   FuseForget.c
   FuseFsync.c
+  FuseGetAttr.c
   FuseInit.c
   FuseLookup.c
   FuseMkDir.c

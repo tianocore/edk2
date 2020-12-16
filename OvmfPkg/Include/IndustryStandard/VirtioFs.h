@@ -114,6 +114,7 @@ typedef struct {
 typedef enum {
   VirtioFsFuseOpLookup      =  1,
   VirtioFsFuseOpForget      =  2,
+  VirtioFsFuseOpGetAttr     =  3,
   VirtioFsFuseOpMkDir       =  9,
   VirtioFsFuseOpUnlink      = 10,
   VirtioFsFuseOpRmDir       = 11,
@@ -194,6 +195,21 @@ typedef struct {
 typedef struct {
   UINT64 NumberOfLookups;
 } VIRTIO_FS_FUSE_FORGET_REQUEST;
+
+//
+// Headers for VirtioFsFuseOpGetAttr.
+//
+typedef struct {
+  UINT32 GetAttrFlags;
+  UINT32 Dummy;
+  UINT64 FileHandle;
+} VIRTIO_FS_FUSE_GETATTR_REQUEST;
+
+typedef struct {
+  UINT64 AttrValid;
+  UINT32 AttrValidNsec;
+  UINT32 Dummy;
+} VIRTIO_FS_FUSE_GETATTR_RESPONSE;
 
 //
 // Header for VirtioFsFuseOpMkDir.
