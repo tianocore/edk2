@@ -82,6 +82,7 @@
 
 [Sources]
   DriverBinding.c
+  Helpers.c
   SimpleFsOpenVolume.c
   VirtioFsDxe.h
 
@@ -91,6 +92,7 @@
   MemoryAllocationLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
+  VirtioLib
 
 [Protocols]
   gEfiComponentName2ProtocolGuid        ## PRODUCES

@@ -11,11 +11,20 @@
 #define VIRTIO_FS_DXE_H_
 
 #include <Base.h>                      // SIGNATURE_64()
+#include <IndustryStandard/VirtioFs.h> // VIRTIO_FS_TAG_BYTES
 #include <Library/DebugLib.h>          // CR()
 #include <Protocol/SimpleFileSystem.h> // EFI_SIMPLE_FILE_SYSTEM_PROTOCOL
 #include <Protocol/VirtioDevice.h>     // VIRTIO_DEVICE_PROTOCOL
+#include <Uefi/UefiBaseType.h>         // EFI_EVENT
 
 #define VIRTIO_FS_SIG SIGNATURE_64 ('V', 'I', 'R', 'T', 'I', 'O', 'F', 'S')
+
+//
+// Filesystem label encoded in UCS-2, transformed from the UTF-8 representation
+// in "VIRTIO_FS_CONFIG.Tag", and NUL-terminated. Only the printable ASCII code
+// points (U+0020 through U+007E) are supported.
+//
+typedef CHAR16 VIRTIO_FS_LABEL[VIRTIO_FS_TAG_BYTES + 1];
 
 //
 // Main context structure, expressing an EFI_SIMPLE_FILE_SYSTEM_PROTOCOL
@@ -31,11 +40,37 @@ typedef struct {
   //                              -----------   ------------------  ----------
   UINT64                          Signature; // DriverBindingStart  0
   VIRTIO_DEVICE_PROTOCOL          *Virtio;   // DriverBindingStart  0
+  VIRTIO_FS_LABEL                 Label;     // VirtioFsInit        1
+  UINT16                          QueueSize; // VirtioFsInit        1
+  VRING                           Ring;      // VirtioRingInit      2
+  VOID                            *RingMap;  // VirtioRingMap       2
+  EFI_EVENT                       ExitBoot;  // DriverBindingStart  0
   EFI_SIMPLE_FILE_SYSTEM_PROTOCOL SimpleFs;  // DriverBindingStart  0
 } VIRTIO_FS;
 
 #define VIRTIO_FS_FROM_SIMPLE_FS(SimpleFsReference) \
   CR (SimpleFsReference, VIRTIO_FS, SimpleFs, VIRTIO_FS_SIG);
+
+//
+// Initialization and helper routines for the Virtio Filesystem device.
+//
+
+EFI_STATUS
+VirtioFsInit (
+  IN OUT VIRTIO_FS *VirtioFs
+  );
+
+VOID
+VirtioFsUninit (
+  IN OUT VIRTIO_FS *VirtioFs
+  );
+
+VOID
+EFIAPI
+VirtioFsExitBoot (
+  IN EFI_EVENT ExitBootEvent,
+  IN VOID      *VirtioFsAsVoid
+  );
 
 //
 // EFI_SIMPLE_FILE_SYSTEM_PROTOCOL member functions for the Virtio Filesystem
