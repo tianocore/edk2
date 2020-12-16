@@ -6,9 +6,9 @@
 **/
 #include <PiDxe.h>
 #include <Library/UefiBootServicesTableLib.h>
-#include <Guid/SevLaunchSecret.h>
+#include <Guid/ConfidentialComputingSecret.h>
 
-STATIC SEV_LAUNCH_SECRET_LOCATION mSecretDxeTable = {
+STATIC CONFIDENTIAL_COMPUTING_SECRET_LOCATION mSecretDxeTable = {
   FixedPcdGet32 (PcdSevLaunchSecretBase),
   FixedPcdGet32 (PcdSevLaunchSecretSize),
 };
@@ -21,7 +21,7 @@ InitializeSecretDxe(
   )
 {
   return gBS->InstallConfigurationTable (
-                &gSevLaunchSecretGuid,
+                &gConfidentialComputingSecretGuid,
                 &mSecretDxeTable
                 );
 }
