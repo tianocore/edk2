@@ -110,6 +110,7 @@ typedef struct {
   UINT64            Signature;
   EFI_FILE_PROTOCOL SimpleFile;
   BOOLEAN           IsDirectory;
+  BOOLEAN           IsOpenForWriting;
   VIRTIO_FS         *OwnerFs;
   LIST_ENTRY        OpenFilesEntry;
   //

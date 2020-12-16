@@ -62,6 +62,7 @@ VirtioFsOpenVolume (
   VirtioFsFile->SimpleFile.SetInfo     = VirtioFsSimpleFileSetInfo;
   VirtioFsFile->SimpleFile.Flush       = VirtioFsSimpleFileFlush;
   VirtioFsFile->IsDirectory            = TRUE;
+  VirtioFsFile->IsOpenForWriting       = FALSE;
   VirtioFsFile->OwnerFs                = VirtioFs;
   VirtioFsFile->NodeId                 = VIRTIO_FS_FUSE_ROOT_DIR_NODE_ID;
   VirtioFsFile->FuseHandle             = RootDirHandle;
