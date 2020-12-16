@@ -236,6 +236,14 @@ VirtioFsFuseForget (
   );
 
 EFI_STATUS
+VirtioFsFuseOpen (
+  IN OUT VIRTIO_FS *VirtioFs,
+  IN     UINT64    NodeId,
+  IN     BOOLEAN   ReadWrite,
+     OUT UINT64    *FuseHandle
+  );
+
+EFI_STATUS
 VirtioFsFuseReleaseFileOrDir (
   IN OUT VIRTIO_FS *VirtioFs,
   IN     UINT64    NodeId,

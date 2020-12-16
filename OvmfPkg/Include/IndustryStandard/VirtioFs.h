@@ -82,10 +82,17 @@ typedef struct {
 #define VIRTIO_FS_FUSE_ROOT_DIR_NODE_ID 1
 
 //
+// Flags for VirtioFsFuseOpOpen.
+//
+#define VIRTIO_FS_FUSE_OPEN_REQ_F_RDONLY 0
+#define VIRTIO_FS_FUSE_OPEN_REQ_F_RDWR   2
+
+//
 // FUSE operation codes.
 //
 typedef enum {
   VirtioFsFuseOpForget      =  2,
+  VirtioFsFuseOpOpen        = 14,
   VirtioFsFuseOpRelease     = 18,
   VirtioFsFuseOpFsync       = 20,
   VirtioFsFuseOpFlush       = 25,
@@ -122,6 +129,20 @@ typedef struct {
 typedef struct {
   UINT64 NumberOfLookups;
 } VIRTIO_FS_FUSE_FORGET_REQUEST;
+
+//
+// Headers for VirtioFsFuseOpOpen and VirtioFsFuseOpOpenDir.
+//
+typedef struct {
+  UINT32 Flags;
+  UINT32 Unused;
+} VIRTIO_FS_FUSE_OPEN_REQUEST;
+
+typedef struct {
+  UINT64 FileHandle;
+  UINT32 OpenFlags;
+  UINT32 Padding;
+} VIRTIO_FS_FUSE_OPEN_RESPONSE;
 
 //
 // Header for VirtioFsFuseOpRelease and VirtioFsFuseOpReleaseDir.
@@ -175,20 +196,6 @@ typedef struct {
   UINT16 MapAlignment;
   UINT32 Unused[8];
 } VIRTIO_FS_FUSE_INIT_RESPONSE;
-
-//
-// Headers for VirtioFsFuseOpOpenDir.
-//
-typedef struct {
-  UINT32 Flags;
-  UINT32 Unused;
-} VIRTIO_FS_FUSE_OPEN_REQUEST;
-
-typedef struct {
-  UINT64 FileHandle;
-  UINT32 OpenFlags;
-  UINT32 Padding;
-} VIRTIO_FS_FUSE_OPEN_RESPONSE;
 #pragma pack ()
 
 #endif // VIRTIO_FS_H_
