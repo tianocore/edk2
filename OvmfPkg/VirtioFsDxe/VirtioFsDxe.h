@@ -260,6 +260,13 @@ VirtioFsFuseForget (
   );
 
 EFI_STATUS
+VirtioFsFuseGetAttr (
+  IN OUT VIRTIO_FS                          *VirtioFs,
+  IN     UINT64                             NodeId,
+     OUT VIRTIO_FS_FUSE_ATTRIBUTES_RESPONSE *FuseAttr
+  );
+
+EFI_STATUS
 VirtioFsFuseMkDir (
   IN OUT VIRTIO_FS *VirtioFs,
   IN     UINT64    ParentNodeId,
