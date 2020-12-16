@@ -2173,3 +2173,43 @@ VirtioFsFuseDirentPlusToEfiFileInfo (
 
   return EFI_SUCCESS;
 }
+
+/**
+  Given an EFI_FILE_INFO object received in an EFI_FILE_PROTOCOL.SetInfo()
+  call, determine whether updating the size of the file is necessary, relative
+  to an EFI_FILE_INFO object describing the current state of the file.
+
+  @param[in] Info     The EFI_FILE_INFO describing the current state of the
+                      file. The caller is responsible for populating Info on
+                      input with VirtioFsFuseAttrToEfiFileInfo(), from the
+                      current FUSE attributes of the file. The Info->Size and
+                      Info->FileName members are ignored.
+
+  @param[in] NewInfo  The EFI_FILE_INFO object received in the
+                      EFI_FILE_PROTOCOL.SetInfo() call.
+
+  @param[out] Update  Set to TRUE on output if the file size needs to be
+                      updated. Set to FALSE otherwise.
+
+  @param[out] Size    If Update is set to TRUE, then Size provides the new file
+                      size to set. Otherwise, Size is not written to.
+**/
+VOID
+VirtioFsGetFuseSizeUpdate (
+  IN     EFI_FILE_INFO *Info,
+  IN     EFI_FILE_INFO *NewInfo,
+     OUT BOOLEAN       *Update,
+     OUT UINT64        *Size
+  )
+{
+  BOOLEAN IsDirectory;
+
+  IsDirectory = (BOOLEAN)((Info->Attribute & EFI_FILE_DIRECTORY) != 0);
+
+  if (IsDirectory || Info->FileSize == NewInfo->FileSize) {
+    *Update = FALSE;
+    return;
+  }
+  *Update = TRUE;
+  *Size = NewInfo->FileSize;
+}
