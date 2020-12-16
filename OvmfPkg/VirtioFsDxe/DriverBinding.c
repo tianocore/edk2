@@ -84,6 +84,11 @@ VirtioFsBindingStart (
     goto CloseVirtio;
   }
 
+  //
+  // Initialize the FUSE request counter.
+  //
+  VirtioFs->RequestId = 1;
+
   Status = gBS->CreateEvent (EVT_SIGNAL_EXIT_BOOT_SERVICES, TPL_CALLBACK,
                   VirtioFsExitBoot, VirtioFs, &VirtioFs->ExitBoot);
   if (EFI_ERROR (Status)) {

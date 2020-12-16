@@ -49,4 +49,53 @@ typedef struct {
 } VIRTIO_FS_CONFIG;
 #pragma pack ()
 
+//
+// FUSE-related definitions follow.
+//
+// From virtio-v1.1-cs01-87fa6b5d8155, 5.11 File System Device: "[...] The
+// driver acts as the FUSE client mounting the file system. The virtio file
+// system device provides the mechanism for transporting FUSE requests [...]"
+//
+// Unfortunately, the documentation of the FUSE wire protocol is lacking. The
+// Virtio spec (as of this writing) simply defers to
+// "include/uapi/linux/fuse.h" in the Linux kernel source -- see the reference
+// in virtio spec file "introduction.tex", at commit 87fa6b5d8155.
+//
+// Of course, "include/uapi/linux/fuse.h" is a moving target (the virtio spec
+// does not specify a particular FUSE interface version). The OvmfPkg code
+// targets version 7.31, because that's the lowest version that the QEMU
+// virtio-fs daemon supports at this time -- see QEMU commit 72c42e2d6551
+// ("virtiofsd: Trim out compatibility code", 2020-01-23).
+//
+// Correspondingly, Linux's "include/uapi/linux/fuse.h" is consulted as checked
+// out at commit (c6ff213fe5b8^) = d78092e4937d ("fuse: fix page dereference
+// after free", 2020-09-18); that is, right before commit c6ff213fe5b8 ("fuse:
+// add submount support to <uapi/linux/fuse.h>", 2020-09-18) introduces FUSE
+// interface version 7.32.
+//
+#define VIRTIO_FS_FUSE_MAJOR  7
+#define VIRTIO_FS_FUSE_MINOR 31
+
+#pragma pack (1)
+//
+// Request-response headers common to all request types.
+//
+typedef struct {
+  UINT32 Len;
+  UINT32 Opcode;
+  UINT64 Unique;
+  UINT64 NodeId;
+  UINT32 Uid;
+  UINT32 Gid;
+  UINT32 Pid;
+  UINT32 Padding;
+} VIRTIO_FS_FUSE_REQUEST;
+
+typedef struct {
+  UINT32 Len;
+  INT32  Error;
+  UINT64 Unique;
+} VIRTIO_FS_FUSE_RESPONSE;
+#pragma pack ()
+
 #endif // VIRTIO_FS_H_
