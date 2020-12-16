@@ -153,6 +153,7 @@ typedef enum {
   VirtioFsFuseOpRmDir       = 11,
   VirtioFsFuseOpOpen        = 14,
   VirtioFsFuseOpRead        = 15,
+  VirtioFsFuseOpWrite       = 16,
   VirtioFsFuseOpStatFs      = 17,
   VirtioFsFuseOpRelease     = 18,
   VirtioFsFuseOpFsync       = 20,
@@ -281,6 +282,24 @@ typedef struct {
   UINT32 Flags;
   UINT32 Padding;
 } VIRTIO_FS_FUSE_READ_REQUEST;
+
+//
+// Headers for VirtioFsFuseOpWrite.
+//
+typedef struct {
+  UINT64 FileHandle;
+  UINT64 Offset;
+  UINT32 Size;
+  UINT32 WriteFlags;
+  UINT64 LockOwner;
+  UINT32 Flags;
+  UINT32 Padding;
+} VIRTIO_FS_FUSE_WRITE_REQUEST;
+
+typedef struct {
+  UINT32 Size;
+  UINT32 Padding;
+} VIRTIO_FS_FUSE_WRITE_RESPONSE;
 
 //
 // Header for VirtioFsFuseOpStatFs.

@@ -78,6 +78,7 @@ typedef struct {
   VRING                           Ring;      // VirtioRingInit      2
   VOID                            *RingMap;  // VirtioRingMap       2
   UINT64                          RequestId; // FuseInitSession     1
+  UINT32                          MaxWrite;  // FuseInitSession     1
   EFI_EVENT                       ExitBoot;  // DriverBindingStart  0
   LIST_ENTRY                      OpenFiles; // DriverBindingStart  0
   EFI_SIMPLE_FILE_SYSTEM_PROTOCOL SimpleFs;  // DriverBindingStart  0
@@ -332,6 +333,16 @@ VirtioFsFuseReadFileOrDir (
   IN     UINT64    Offset,
   IN OUT UINT32    *Size,
      OUT VOID      *Data
+  );
+
+EFI_STATUS
+VirtioFsFuseWrite (
+  IN OUT VIRTIO_FS *VirtioFs,
+  IN     UINT64    NodeId,
+  IN     UINT64    FuseHandle,
+  IN     UINT64    Offset,
+  IN OUT UINT32    *Size,
+  IN     VOID      *Data
   );
 
 EFI_STATUS

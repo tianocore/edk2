@@ -97,6 +97,7 @@
   FuseRelease.c
   FuseStatFs.c
   FuseUnlink.c
+  FuseWrite.c
   Helpers.c
   SimpleFsClose.c
   SimpleFsDelete.c
