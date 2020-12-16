@@ -94,6 +94,7 @@
   FuseOpenDir.c
   FuseOpenOrCreate.c
   FuseRelease.c
+  FuseStatFs.c
   FuseUnlink.c
   Helpers.c
   SimpleFsClose.c
