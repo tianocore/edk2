@@ -103,6 +103,15 @@ typedef struct {
 #define VIRTIO_FS_FUSE_MODE_PERM_WOTH 0000002u
 
 //
+// Flags for VirtioFsFuseOpSetAttr, in the VIRTIO_FS_FUSE_SETATTR_REQUEST.Valid
+// field.
+//
+#define VIRTIO_FS_FUSE_SETATTR_REQ_F_MODE  BIT0
+#define VIRTIO_FS_FUSE_SETATTR_REQ_F_SIZE  BIT3
+#define VIRTIO_FS_FUSE_SETATTR_REQ_F_ATIME BIT4
+#define VIRTIO_FS_FUSE_SETATTR_REQ_F_MTIME BIT5
+
+//
 // Flags for VirtioFsFuseOpOpen.
 //
 #define VIRTIO_FS_FUSE_OPEN_REQ_F_RDONLY 0
@@ -153,6 +162,7 @@ typedef enum {
   VirtioFsFuseOpLookup      =  1,
   VirtioFsFuseOpForget      =  2,
   VirtioFsFuseOpGetAttr     =  3,
+  VirtioFsFuseOpSetAttr     =  4,
   VirtioFsFuseOpMkDir       =  9,
   VirtioFsFuseOpUnlink      = 10,
   VirtioFsFuseOpRmDir       = 11,
@@ -240,7 +250,8 @@ typedef struct {
 } VIRTIO_FS_FUSE_FORGET_REQUEST;
 
 //
-// Headers for VirtioFsFuseOpGetAttr.
+// Headers for VirtioFsFuseOpGetAttr (VIRTIO_FS_FUSE_GETATTR_RESPONSE is also
+// for VirtioFsFuseOpSetAttr).
 //
 typedef struct {
   UINT32 GetAttrFlags;
@@ -253,6 +264,28 @@ typedef struct {
   UINT32 AttrValidNsec;
   UINT32 Dummy;
 } VIRTIO_FS_FUSE_GETATTR_RESPONSE;
+
+//
+// Header for VirtioFsFuseOpSetAttr.
+//
+typedef struct {
+  UINT32 Valid;
+  UINT32 Padding;
+  UINT64 FileHandle;
+  UINT64 Size;
+  UINT64 LockOwner;
+  UINT64 Atime;
+  UINT64 Mtime;
+  UINT64 Ctime;
+  UINT32 AtimeNsec;
+  UINT32 MtimeNsec;
+  UINT32 CtimeNsec;
+  UINT32 Mode;
+  UINT32 Unused4;
+  UINT32 Uid;
+  UINT32 Gid;
+  UINT32 Unused5;
+} VIRTIO_FS_FUSE_SETATTR_REQUEST;
 
 //
 // Header for VirtioFsFuseOpMkDir.
