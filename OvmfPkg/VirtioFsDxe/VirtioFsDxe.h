@@ -309,6 +309,16 @@ VirtioFsFuseGetAttr (
   );
 
 EFI_STATUS
+VirtioFsFuseSetAttr (
+  IN OUT VIRTIO_FS *VirtioFs,
+  IN     UINT64    NodeId,
+  IN     UINT64    *Size      OPTIONAL,
+  IN     UINT64    *Atime     OPTIONAL,
+  IN     UINT64    *Mtime     OPTIONAL,
+  IN     UINT32    *Mode      OPTIONAL
+  );
+
+EFI_STATUS
 VirtioFsFuseMkDir (
   IN OUT VIRTIO_FS *VirtioFs,
   IN     UINT64    ParentNodeId,

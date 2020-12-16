@@ -96,6 +96,7 @@
   FuseRead.c
   FuseRelease.c
   FuseRename.c
+  FuseSetAttr.c
   FuseStatFs.c
   FuseUnlink.c
   FuseWrite.c
