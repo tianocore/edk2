@@ -46,9 +46,47 @@ VirtioFsSimpleFileDelete (
   // is still valid. Continue with removing the file or directory. The result
   // of this operation determines the return status of the function.
   //
-  // TODO
-  //
-  Status = EFI_WARN_DELETE_FAILURE;
+  if (VirtioFsFile->IsOpenForWriting) {
+    UINT64 ParentNodeId;
+    CHAR8  *LastComponent;
+
+    //
+    // Split our canonical pathname into most specific parent directory
+    // (identified by NodeId), and single-component filename within that
+    // directory. If This stands for the root directory "/", then the following
+    // function call will gracefully fail.
+    //
+    Status = VirtioFsLookupMostSpecificParentDir (
+               VirtioFs,
+               VirtioFsFile->CanonicalPathname,
+               &ParentNodeId,
+               &LastComponent
+               );
+    if (!EFI_ERROR (Status)) {
+      //
+      // Attempt the actual removal. Regardless of the outcome, ParentNodeId
+      // must be forgotten right after (unless it stands for the root
+      // directory).
+      //
+      Status = VirtioFsFuseRemoveFileOrDir (
+                 VirtioFs,
+                 ParentNodeId,
+                 LastComponent,
+                 VirtioFsFile->IsDirectory
+                 );
+      if (ParentNodeId != VIRTIO_FS_FUSE_ROOT_DIR_NODE_ID) {
+        VirtioFsFuseForget (VirtioFs, ParentNodeId);
+      }
+    }
+    if (EFI_ERROR (Status)) {
+      //
+      // Map any failure to the spec-mandated warning code.
+      //
+      Status = EFI_WARN_DELETE_FAILURE;
+    }
+  } else {
+    Status = EFI_WARN_DELETE_FAILURE;
+  }
 
   //
   // Finally, if we've known VirtioFsFile->NodeId from a lookup, then we should
