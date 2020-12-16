@@ -163,6 +163,13 @@ VirtioFsFuseInitSession (
   IN OUT VIRTIO_FS *VirtioFs
   );
 
+EFI_STATUS
+VirtioFsFuseOpenDir (
+  IN OUT VIRTIO_FS *VirtioFs,
+  IN     UINT64    NodeId,
+     OUT UINT64    *FuseHandle
+  );
+
 //
 // EFI_SIMPLE_FILE_SYSTEM_PROTOCOL member functions for the Virtio Filesystem
 // driver.
