@@ -93,6 +93,7 @@
   FuseOpen.c
   FuseOpenDir.c
   FuseOpenOrCreate.c
+  FuseRead.c
   FuseRelease.c
   FuseStatFs.c
   FuseUnlink.c

@@ -26,7 +26,8 @@
 
   @retval EFI_SUCCESS      The FUSE session has been started.
 
-  @retval EFI_UNSUPPORTED  FUSE interface version negotiation failed.
+  @retval EFI_UNSUPPORTED  FUSE interface version or feature negotiation
+                           failed.
 
   @return                  The "errno" value mapped to an EFI_STATUS code, if
                            the Virtio Filesystem device explicitly reported an
@@ -97,7 +98,7 @@ VirtioFsFuseInitSession (
   InitReq.Major        = VIRTIO_FS_FUSE_MAJOR;
   InitReq.Minor        = VIRTIO_FS_FUSE_MINOR;
   InitReq.MaxReadahead = 0;
-  InitReq.Flags        = 0;
+  InitReq.Flags        = VIRTIO_FS_FUSE_INIT_REQ_F_DO_READDIRPLUS;
 
   //
   // Submit the request.
@@ -121,10 +122,11 @@ VirtioFsFuseInitSession (
   }
 
   //
-  // Check FUSE interface version compatibility.
+  // Check FUSE interface version / feature compatibility.
   //
   if (InitResp.Major < InitReq.Major ||
-      (InitResp.Major == InitReq.Major && InitResp.Minor < InitReq.Minor)) {
+      (InitResp.Major == InitReq.Major && InitResp.Minor < InitReq.Minor) ||
+      (InitResp.Flags & VIRTIO_FS_FUSE_INIT_REQ_F_DO_READDIRPLUS) == 0) {
     return EFI_UNSUPPORTED;
   }
 

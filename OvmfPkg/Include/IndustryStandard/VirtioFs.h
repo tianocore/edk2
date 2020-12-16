@@ -109,6 +109,39 @@ typedef struct {
 #define VIRTIO_FS_FUSE_OPEN_REQ_F_RDWR   2
 
 //
+// Flags for VirtioFsFuseOpInit.
+//
+#define VIRTIO_FS_FUSE_INIT_REQ_F_DO_READDIRPLUS BIT13
+
+/**
+  Macro for calculating the size of a directory stream entry.
+
+  The macro may evaluate Namelen multiple times.
+
+  The macro evaluates to a UINTN value that is safe to cast to UINT32.
+
+  @param[in] Namelen  The size of the filename byte array that follows
+                      VIRTIO_FS_FUSE_DIRENTPLUS_RESPONSE in the directory
+                      stream, as reported by
+                      VIRTIO_FS_FUSE_STATFS_RESPONSE.Namelen or
+                      VIRTIO_FS_FUSE_DIRENTPLUS_RESPONSE.Namelen. The filename
+                      byte array is not NUL-terminated.
+
+  @retval 0  Namelen was zero or greater than SIZE_4KB.
+
+  @return    The number of bytes in the directory entry, including the
+             VIRTIO_FS_FUSE_DIRENTPLUS_RESPONSE header.
+**/
+#define VIRTIO_FS_FUSE_DIRENTPLUS_RESPONSE_SIZE(Namelen)             \
+  ((Namelen) == 0 || (Namelen) > SIZE_4KB ?                          \
+   (UINTN)0 :                                                        \
+   ALIGN_VALUE (                                                     \
+     sizeof (VIRTIO_FS_FUSE_DIRENTPLUS_RESPONSE) + (UINTN)(Namelen), \
+     sizeof (UINT64)                                                 \
+     )                                                               \
+   )
+
+//
 // FUSE operation codes.
 //
 typedef enum {
@@ -119,6 +152,7 @@ typedef enum {
   VirtioFsFuseOpUnlink      = 10,
   VirtioFsFuseOpRmDir       = 11,
   VirtioFsFuseOpOpen        = 14,
+  VirtioFsFuseOpRead        = 15,
   VirtioFsFuseOpStatFs      = 17,
   VirtioFsFuseOpRelease     = 18,
   VirtioFsFuseOpFsync       = 20,
@@ -128,6 +162,7 @@ typedef enum {
   VirtioFsFuseOpReleaseDir  = 29,
   VirtioFsFuseOpFsyncDir    = 30,
   VirtioFsFuseOpCreate      = 35,
+  VirtioFsFuseOpReadDirPlus = 44,
 } VIRTIO_FS_FUSE_OPCODE;
 
 #pragma pack (1)
@@ -235,6 +270,19 @@ typedef struct {
 } VIRTIO_FS_FUSE_OPEN_RESPONSE;
 
 //
+// Header for VirtioFsFuseOpRead and VirtioFsFuseOpReadDirPlus.
+//
+typedef struct {
+  UINT64 FileHandle;
+  UINT64 Offset;
+  UINT32 Size;
+  UINT32 ReadFlags;
+  UINT64 LockOwner;
+  UINT32 Flags;
+  UINT32 Padding;
+} VIRTIO_FS_FUSE_READ_REQUEST;
+
+//
 // Header for VirtioFsFuseOpStatFs.
 //
 typedef struct {
@@ -312,6 +360,25 @@ typedef struct {
   UINT32 Umask;
   UINT32 Padding;
 } VIRTIO_FS_FUSE_CREATE_REQUEST;
+
+//
+// Header for VirtioFsFuseOpReadDirPlus.
+//
+// Diverging from the rest of the headers, this structure embeds other
+// structures. The reason is that a scatter list cannot be used to receive
+// NodeResp and AttrResp separately; the record below is followed by a variable
+// size filename byte array, and then such pairs are repeated a number of
+// times. Thus, later header start offsets depend on earlier filename array
+// sizes.
+//
+typedef struct {
+  VIRTIO_FS_FUSE_NODE_RESPONSE       NodeResp;
+  VIRTIO_FS_FUSE_ATTRIBUTES_RESPONSE AttrResp;
+  UINT64                             NodeId;
+  UINT64                             CookieForNextEntry;
+  UINT32                             Namelen;
+  UINT32                             Type;
+} VIRTIO_FS_FUSE_DIRENTPLUS_RESPONSE;
 #pragma pack ()
 
 #endif // VIRTIO_FS_H_
