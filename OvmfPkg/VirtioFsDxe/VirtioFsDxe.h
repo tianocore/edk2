@@ -263,6 +263,14 @@ VirtioFsGetBasename (
   );
 
 EFI_STATUS
+VirtioFsComposeRenameDestination (
+  IN     CHAR8   *LhsPath8,
+  IN     CHAR16  *RhsPath16,
+     OUT CHAR8   **ResultPath8,
+     OUT BOOLEAN *RootEscape
+  );
+
+EFI_STATUS
 VirtioFsFuseAttrToEfiFileInfo (
   IN     VIRTIO_FS_FUSE_ATTRIBUTES_RESPONSE *FuseAttr,
      OUT EFI_FILE_INFO                      *FileInfo
