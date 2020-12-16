@@ -218,6 +218,13 @@ VirtioFsFuseFsyncFileOrDir (
   );
 
 EFI_STATUS
+VirtioFsFuseFlush (
+  IN OUT VIRTIO_FS *VirtioFs,
+  IN     UINT64    NodeId,
+  IN     UINT64    FuseHandle
+  );
+
+EFI_STATUS
 VirtioFsFuseInitSession (
   IN OUT VIRTIO_FS *VirtioFs
   );
