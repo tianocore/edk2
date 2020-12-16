@@ -282,6 +282,14 @@ VirtioFsFuseDirentPlusToEfiFileInfo (
   IN OUT EFI_FILE_INFO                      *FileInfo
   );
 
+VOID
+VirtioFsGetFuseSizeUpdate (
+  IN     EFI_FILE_INFO *Info,
+  IN     EFI_FILE_INFO *NewInfo,
+     OUT BOOLEAN       *Update,
+     OUT UINT64        *Size
+  );
+
 //
 // Wrapper functions for FUSE commands (primitives).
 //
