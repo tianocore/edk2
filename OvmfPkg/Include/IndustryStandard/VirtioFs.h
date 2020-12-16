@@ -87,9 +87,11 @@ typedef struct {
 typedef enum {
   VirtioFsFuseOpForget      =  2,
   VirtioFsFuseOpRelease     = 18,
+  VirtioFsFuseOpFsync       = 20,
   VirtioFsFuseOpInit        = 26,
   VirtioFsFuseOpOpenDir     = 27,
   VirtioFsFuseOpReleaseDir  = 29,
+  VirtioFsFuseOpFsyncDir    = 30,
 } VIRTIO_FS_FUSE_OPCODE;
 
 #pragma pack (1)
@@ -129,6 +131,15 @@ typedef struct {
   UINT32 ReleaseFlags;
   UINT64 LockOwner;
 } VIRTIO_FS_FUSE_RELEASE_REQUEST;
+
+//
+// Header for VirtioFsFuseOpFsync and VirtioFsFuseOpFsyncDir.
+//
+typedef struct {
+  UINT64 FileHandle;
+  UINT32 FsyncFlags;
+  UINT32 Padding;
+} VIRTIO_FS_FUSE_FSYNC_REQUEST;
 
 //
 // Headers for VirtioFsFuseOpInit.
