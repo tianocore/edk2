@@ -2319,3 +2319,98 @@ VirtioFsGetFuseTimeUpdates (
 
   return EFI_SUCCESS;
 }
+
+/**
+  Given an EFI_FILE_INFO object received in an EFI_FILE_PROTOCOL.SetInfo()
+  call, determine whether updating the file mode bits of the file is necessary,
+  relative to an EFI_FILE_INFO object describing the current state of the file.
+
+  @param[in] Info     The EFI_FILE_INFO describing the current state of the
+                      file. The caller is responsible for populating Info on
+                      input with VirtioFsFuseAttrToEfiFileInfo(), from the
+                      current FUSE attributes of the file. The Info->Size and
+                      Info->FileName members are ignored.
+
+  @param[in] NewInfo  The EFI_FILE_INFO object received in the
+                      EFI_FILE_PROTOCOL.SetInfo() call.
+
+  @param[out] Update  Set to TRUE on output if the file mode bits need to be
+                      updated. Set to FALSE otherwise.
+
+  @param[out] Mode    If Update is set to TRUE, then Mode provides the file
+                      mode bits to set. Otherwise, Mode is not written to.
+
+  @retval EFI_SUCCESS        Output parameters have been set successfully.
+
+  @retval EFI_ACCESS_DENIED  NewInfo requests toggling an unknown bit in the
+                             Attribute bitmask.
+
+  @retval EFI_ACCESS_DENIED  NewInfo requests toggling EFI_FILE_DIRECTORY in
+                             the Attribute bitmask.
+**/
+EFI_STATUS
+VirtioFsGetFuseModeUpdate (
+  IN     EFI_FILE_INFO *Info,
+  IN     EFI_FILE_INFO *NewInfo,
+     OUT BOOLEAN       *Update,
+     OUT UINT32        *Mode
+     )
+{
+  UINT64  Toggle;
+  BOOLEAN IsDirectory;
+  BOOLEAN IsWriteable;
+  BOOLEAN WillBeWriteable;
+
+  Toggle = Info->Attribute ^ NewInfo->Attribute;
+  if ((Toggle & ~EFI_FILE_VALID_ATTR) != 0) {
+    //
+    // Unknown attribute requested.
+    //
+    return EFI_ACCESS_DENIED;
+  }
+  if ((Toggle & EFI_FILE_DIRECTORY) != 0) {
+    //
+    // EFI_FILE_DIRECTORY cannot be toggled.
+    //
+    return EFI_ACCESS_DENIED;
+  }
+
+  IsDirectory     = (BOOLEAN)((Info->Attribute    & EFI_FILE_DIRECTORY) != 0);
+  IsWriteable     = (BOOLEAN)((Info->Attribute    & EFI_FILE_READ_ONLY) == 0);
+  WillBeWriteable = (BOOLEAN)((NewInfo->Attribute & EFI_FILE_READ_ONLY) == 0);
+
+  if (IsWriteable == WillBeWriteable) {
+    *Update = FALSE;
+    return EFI_SUCCESS;
+  }
+
+  if (IsDirectory) {
+    if (WillBeWriteable) {
+      *Mode = (VIRTIO_FS_FUSE_MODE_PERM_RWXU |
+               VIRTIO_FS_FUSE_MODE_PERM_RWXG |
+               VIRTIO_FS_FUSE_MODE_PERM_RWXO);
+    } else {
+      *Mode = (VIRTIO_FS_FUSE_MODE_PERM_RUSR |
+               VIRTIO_FS_FUSE_MODE_PERM_XUSR |
+               VIRTIO_FS_FUSE_MODE_PERM_RGRP |
+               VIRTIO_FS_FUSE_MODE_PERM_XGRP |
+               VIRTIO_FS_FUSE_MODE_PERM_ROTH |
+               VIRTIO_FS_FUSE_MODE_PERM_XOTH);
+    }
+  } else {
+    if (WillBeWriteable) {
+      *Mode = (VIRTIO_FS_FUSE_MODE_PERM_RUSR |
+               VIRTIO_FS_FUSE_MODE_PERM_WUSR |
+               VIRTIO_FS_FUSE_MODE_PERM_RGRP |
+               VIRTIO_FS_FUSE_MODE_PERM_WGRP |
+               VIRTIO_FS_FUSE_MODE_PERM_ROTH |
+               VIRTIO_FS_FUSE_MODE_PERM_WOTH);
+    } else {
+      *Mode = (VIRTIO_FS_FUSE_MODE_PERM_RUSR |
+               VIRTIO_FS_FUSE_MODE_PERM_RGRP |
+               VIRTIO_FS_FUSE_MODE_PERM_ROTH);
+    }
+  }
+  *Update = TRUE;
+  return EFI_SUCCESS;
+}

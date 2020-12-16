@@ -300,6 +300,14 @@ VirtioFsGetFuseTimeUpdates (
      OUT UINT64        *Mtime
   );
 
+EFI_STATUS
+VirtioFsGetFuseModeUpdate (
+  IN     EFI_FILE_INFO *Info,
+  IN     EFI_FILE_INFO *NewInfo,
+     OUT BOOLEAN       *Update,
+     OUT UINT32        *Mode
+     );
+
 //
 // Wrapper functions for FUSE commands (primitives).
 //
