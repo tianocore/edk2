@@ -75,6 +75,10 @@ VirtioFsOpenVolume (
   VirtioFsFile->FilePosition           = 0;
   VirtioFsFile->NodeId                 = VIRTIO_FS_FUSE_ROOT_DIR_NODE_ID;
   VirtioFsFile->FuseHandle             = RootDirHandle;
+  VirtioFsFile->FileInfoArray          = NULL;
+  VirtioFsFile->SingleFileInfoSize     = 0;
+  VirtioFsFile->NumFileInfo            = 0;
+  VirtioFsFile->NextFileInfo           = 0;
 
   //
   // One more file open for the filesystem.
