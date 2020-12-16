@@ -698,3 +698,219 @@ Unmap:
 
   return Status;
 }
+
+/**
+  Set up the fields of a new VIRTIO_FS_FUSE_REQUEST object.
+
+  The function may only be called after VirtioFsInit() returns successfully and
+  before VirtioFsUninit() is called.
+
+  @param[in,out] VirtioFs The Virtio Filesystem device that the request is
+                          being prepared for. The "VirtioFs->RequestId" field
+                          will be copied into "Request->Unique". On output (on
+                          successful return), "VirtioFs->RequestId" will be
+                          incremented.
+
+  @param[out] Request     The VIRTIO_FS_FUSE_REQUEST object whose fields are to
+                          be set.
+
+  @param[in] RequestSize  The total size of the request, including
+                          sizeof(VIRTIO_FS_FUSE_REQUEST).
+
+  @param[in] Opcode       The VIRTIO_FS_FUSE_OPCODE that identifies the command
+                          to send.
+
+  @param[in] NodeId       The inode number of the file that the request refers
+                          to.
+
+  @retval EFI_INVALID_PARAMETER  RequestSize is smaller than
+                                 sizeof(VIRTIO_FS_FUSE_REQUEST).
+
+  @retval EFI_OUT_OF_RESOURCES   "VirtioFs->RequestId" is MAX_UINT64, and can
+                                 be incremented no more.
+
+  @retval EFI_SUCCESS            Request has been populated,
+                                 "VirtioFs->RequestId" has been incremented.
+**/
+EFI_STATUS
+VirtioFsFuseNewRequest (
+  IN OUT VIRTIO_FS              *VirtioFs,
+     OUT VIRTIO_FS_FUSE_REQUEST *Request,
+  IN     UINT32                 RequestSize,
+  IN     UINT32                 Opcode,
+  IN     UINT64                 NodeId
+  )
+{
+  if (RequestSize < sizeof *Request) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (VirtioFs->RequestId == MAX_UINT64) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  Request->Len     = RequestSize;
+  Request->Opcode  = Opcode;
+  Request->Unique  = VirtioFs->RequestId++;
+  Request->NodeId  = NodeId;
+  Request->Uid     = 0;
+  Request->Gid     = 0;
+  Request->Pid     = 1;
+  Request->Padding = 0;
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Check the common FUSE response format.
+
+  The first buffer in the response scatter-gather list is assumed a
+  VIRTIO_FS_FUSE_RESPONSE structure. Subsequent response buffers, if any, up to
+  and excluding the last one, are assumed fixed size. The last response buffer
+  may or may not be fixed size, as specified by the caller.
+
+  This function may only be called after VirtioFsSgListsSubmit() returns
+  successfully.
+
+  @param[in] ResponseSgList   The scatter-gather list that describes the
+                              response part of the exchange -- the buffers that
+                              the Virtio Filesystem device filled in during the
+                              virtio transfer.
+
+  @param[in] RequestId        The request identifier to which the response is
+                              expected to belong.
+
+  @param[out] TailBufferFill  If NULL, then the last buffer in ResponseSgList
+                              is considered fixed size. Otherwise, the last
+                              buffer is considered variable size, and on
+                              successful return, TailBufferFill reports the
+                              number of bytes in the last buffer.
+
+  @retval EFI_INVALID_PARAMETER  TailBufferFill is not NULL (i.e., the last
+                                 buffer is considered variable size), and
+                                 ResponseSgList->NumVec is 1.
+
+  @retval EFI_INVALID_PARAMETER  The allocated size of the first buffer does
+                                 not match sizeof(VIRTIO_FS_FUSE_RESPONSE).
+
+  @retval EFI_PROTOCOL_ERROR     The VIRTIO_FS_FUSE_RESPONSE structure in the
+                                 first buffer has not been fully populated.
+
+  @retval EFI_PROTOCOL_ERROR     "VIRTIO_FS_FUSE_RESPONSE.Len" in the first
+                                 buffer does not equal the sum of the
+                                 individual buffer sizes (as populated).
+
+  @retval EFI_PROTOCOL_ERROR     "VIRTIO_FS_FUSE_RESPONSE.Unique" in the first
+                                 buffer does not equal RequestId.
+
+  @retval EFI_PROTOCOL_ERROR     "VIRTIO_FS_FUSE_RESPONSE.Error" in the first
+                                 buffer is zero, but a subsequent fixed size
+                                 buffer has not been fully populated.
+
+  @retval EFI_DEVICE_ERROR       "VIRTIO_FS_FUSE_RESPONSE.Error" in the first
+                                 buffer is nonzero. The caller may investigate
+                                 "VIRTIO_FS_FUSE_RESPONSE.Error". Note that the
+                                 completeness of the subsequent fixed size
+                                 buffers is not verified in this case.
+
+  @retval EFI_SUCCESS            Verification successful.
+**/
+EFI_STATUS
+VirtioFsFuseCheckResponse (
+  IN  VIRTIO_FS_SCATTER_GATHER_LIST *ResponseSgList,
+  IN  UINT64                        RequestId,
+  OUT UINTN                         *TailBufferFill
+  )
+{
+  UINTN                   NumFixedSizeVec;
+  VIRTIO_FS_FUSE_RESPONSE *CommonResp;
+  UINT32                  TotalTransferred;
+  UINTN                   Idx;
+
+  //
+  // Ensured by VirtioFsSgListsValidate().
+  //
+  ASSERT (ResponseSgList->NumVec > 0);
+
+  if (TailBufferFill == NULL) {
+    //
+    // All buffers are considered fixed size.
+    //
+    NumFixedSizeVec = ResponseSgList->NumVec;
+  } else {
+    //
+    // If the last buffer is variable size, then we need that buffer to be
+    // different from the first buffer, which is considered a
+    // VIRTIO_FS_FUSE_RESPONSE (fixed size) structure.
+    //
+    if (ResponseSgList->NumVec == 1) {
+      return EFI_INVALID_PARAMETER;
+    }
+    NumFixedSizeVec = ResponseSgList->NumVec - 1;
+  }
+
+  //
+  // The first buffer is supposed to carry a (fully populated)
+  // VIRTIO_FS_FUSE_RESPONSE structure.
+  //
+  if (ResponseSgList->IoVec[0].Size != sizeof *CommonResp) {
+    return EFI_INVALID_PARAMETER;
+  }
+  if (ResponseSgList->IoVec[0].Transferred != ResponseSgList->IoVec[0].Size) {
+    return EFI_PROTOCOL_ERROR;
+  }
+
+  //
+  // FUSE must report the same number of bytes, written by the Virtio
+  // Filesystem device, as the virtio transport does.
+  //
+  CommonResp = ResponseSgList->IoVec[0].Buffer;
+  TotalTransferred = 0;
+  for (Idx = 0; Idx < ResponseSgList->NumVec; Idx++) {
+    //
+    // Integer overflow and truncation are not possible, based on
+    // VirtioFsSgListsValidate() and VirtioFsSgListsSubmit().
+    //
+    TotalTransferred += (UINT32)ResponseSgList->IoVec[Idx].Transferred;
+  }
+  if (CommonResp->Len != TotalTransferred) {
+    return EFI_PROTOCOL_ERROR;
+  }
+
+  //
+  // Enforce that FUSE match our request ID in the response.
+  //
+  if (CommonResp->Unique != RequestId) {
+    return EFI_PROTOCOL_ERROR;
+  }
+
+  //
+  // If there is an explicit error report, skip checking the transfer
+  // counts for the rest of the fixed size buffers.
+  //
+  if (CommonResp->Error != 0) {
+    return EFI_DEVICE_ERROR;
+  }
+
+  //
+  // There was no error reported, so we require that the Virtio Filesystem
+  // device populate all fixed size buffers. We checked this for the very first
+  // buffer above; let's check the rest (if any).
+  //
+  ASSERT (NumFixedSizeVec >= 1);
+  for (Idx = 1; Idx < NumFixedSizeVec; Idx++) {
+    if (ResponseSgList->IoVec[Idx].Transferred !=
+        ResponseSgList->IoVec[Idx].Size) {
+      return EFI_PROTOCOL_ERROR;
+    }
+  }
+
+  //
+  // If the last buffer is considered variable size, report its filled size.
+  //
+  if (TailBufferFill != NULL) {
+    *TailBufferFill = ResponseSgList->IoVec[NumFixedSizeVec].Transferred;
+  }
+
+  return EFI_SUCCESS;
+}
