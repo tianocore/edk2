@@ -44,7 +44,7 @@ typedef struct {
   UINT16                          QueueSize; // VirtioFsInit        1
   VRING                           Ring;      // VirtioRingInit      2
   VOID                            *RingMap;  // VirtioRingMap       2
-  UINT64                          RequestId; // DriverBindingStart  0
+  UINT64                          RequestId; // FuseInitSession     1
   EFI_EVENT                       ExitBoot;  // DriverBindingStart  0
   EFI_SIMPLE_FILE_SYSTEM_PROTOCOL SimpleFs;  // DriverBindingStart  0
 } VIRTIO_FS;
@@ -138,7 +138,7 @@ VirtioFsFuseNewRequest (
   IN OUT VIRTIO_FS              *VirtioFs,
      OUT VIRTIO_FS_FUSE_REQUEST *Request,
   IN     UINT32                 RequestSize,
-  IN     UINT32                 Opcode,
+  IN     VIRTIO_FS_FUSE_OPCODE  Opcode,
   IN     UINT64                 NodeId
   );
 
@@ -152,6 +152,15 @@ VirtioFsFuseCheckResponse (
 EFI_STATUS
 VirtioFsErrnoToEfiStatus (
   IN INT32 Errno
+  );
+
+//
+// Wrapper functions for FUSE commands (primitives).
+//
+
+EFI_STATUS
+VirtioFsFuseInitSession (
+  IN OUT VIRTIO_FS *VirtioFs
   );
 
 //
