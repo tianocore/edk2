@@ -149,6 +149,11 @@ VirtioFsFuseCheckResponse (
   OUT UINTN                         *TailBufferFill
   );
 
+EFI_STATUS
+VirtioFsErrnoToEfiStatus (
+  IN INT32 Errno
+  );
+
 //
 // EFI_SIMPLE_FILE_SYSTEM_PROTOCOL member functions for the Virtio Filesystem
 // driver.
