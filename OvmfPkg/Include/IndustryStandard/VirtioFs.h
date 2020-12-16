@@ -82,6 +82,11 @@ typedef struct {
 #define VIRTIO_FS_FUSE_ROOT_DIR_NODE_ID 1
 
 //
+// Distinguished errno values.
+//
+#define VIRTIO_FS_FUSE_ERRNO_ENOENT (-2)
+
+//
 // File mode bitmasks.
 //
 #define VIRTIO_FS_FUSE_MODE_TYPE_MASK 0170000u
@@ -107,6 +112,7 @@ typedef struct {
 // FUSE operation codes.
 //
 typedef enum {
+  VirtioFsFuseOpLookup      =  1,
   VirtioFsFuseOpForget      =  2,
   VirtioFsFuseOpMkDir       =  9,
   VirtioFsFuseOpOpen        = 14,
