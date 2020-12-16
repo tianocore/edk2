@@ -16,5 +16,12 @@ VirtioFsSimpleFileGetPosition (
      OUT UINT64            *Position
   )
 {
-  return EFI_DEVICE_ERROR;
+  VIRTIO_FS_FILE *VirtioFsFile;
+
+  VirtioFsFile = VIRTIO_FS_FILE_FROM_SIMPLE_FILE (This);
+  if (VirtioFsFile->IsDirectory) {
+    return EFI_UNSUPPORTED;
+  }
+  *Position = VirtioFsFile->FilePosition;
+  return EFI_SUCCESS;
 }
