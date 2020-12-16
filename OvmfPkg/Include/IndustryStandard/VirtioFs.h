@@ -80,8 +80,10 @@ typedef struct {
 // FUSE operation codes.
 //
 typedef enum {
+  VirtioFsFuseOpRelease     = 18,
   VirtioFsFuseOpInit        = 26,
   VirtioFsFuseOpOpenDir     = 27,
+  VirtioFsFuseOpReleaseDir  = 29,
 } VIRTIO_FS_FUSE_OPCODE;
 
 #pragma pack (1)
@@ -104,6 +106,16 @@ typedef struct {
   INT32  Error;
   UINT64 Unique;
 } VIRTIO_FS_FUSE_RESPONSE;
+
+//
+// Header for VirtioFsFuseOpRelease and VirtioFsFuseOpReleaseDir.
+//
+typedef struct {
+  UINT64 FileHandle;
+  UINT32 Flags;
+  UINT32 ReleaseFlags;
+  UINT64 LockOwner;
+} VIRTIO_FS_FUSE_RELEASE_REQUEST;
 
 //
 // Headers for VirtioFsFuseOpInit.
