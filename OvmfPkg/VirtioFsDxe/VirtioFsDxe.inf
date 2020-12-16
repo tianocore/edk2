@@ -89,6 +89,7 @@
   FuseMkDir.c
   FuseOpen.c
   FuseOpenDir.c
+  FuseOpenOrCreate.c
   FuseRelease.c
   Helpers.c
   SimpleFsClose.c
