@@ -76,6 +76,13 @@ typedef struct {
 #define VIRTIO_FS_FUSE_MAJOR  7
 #define VIRTIO_FS_FUSE_MINOR 31
 
+//
+// FUSE operation codes.
+//
+typedef enum {
+  VirtioFsFuseOpInit        = 26,
+} VIRTIO_FS_FUSE_OPCODE;
+
 #pragma pack (1)
 //
 // Request-response headers common to all request types.
@@ -96,6 +103,30 @@ typedef struct {
   INT32  Error;
   UINT64 Unique;
 } VIRTIO_FS_FUSE_RESPONSE;
+
+//
+// Headers for VirtioFsFuseOpInit.
+//
+typedef struct {
+  UINT32 Major;
+  UINT32 Minor;
+  UINT32 MaxReadahead;
+  UINT32 Flags;
+} VIRTIO_FS_FUSE_INIT_REQUEST;
+
+typedef struct {
+  UINT32 Major;
+  UINT32 Minor;
+  UINT32 MaxReadahead;
+  UINT32 Flags;
+  UINT16 MaxBackground;
+  UINT16 CongestionThreshold;
+  UINT32 MaxWrite;
+  UINT32 TimeGran;
+  UINT16 MaxPages;
+  UINT16 MapAlignment;
+  UINT32 Unused[8];
+} VIRTIO_FS_FUSE_INIT_RESPONSE;
 #pragma pack ()
 
 #endif // VIRTIO_FS_H_
