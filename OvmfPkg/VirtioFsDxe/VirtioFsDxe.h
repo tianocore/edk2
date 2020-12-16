@@ -291,6 +291,13 @@ VirtioFsFuseOpen (
   );
 
 EFI_STATUS
+VirtioFsFuseStatFs (
+  IN OUT VIRTIO_FS                      *VirtioFs,
+  IN     UINT64                         NodeId,
+     OUT VIRTIO_FS_FUSE_STATFS_RESPONSE *FilesysAttr
+     );
+
+EFI_STATUS
 VirtioFsFuseReleaseFileOrDir (
   IN OUT VIRTIO_FS *VirtioFs,
   IN     UINT64    NodeId,

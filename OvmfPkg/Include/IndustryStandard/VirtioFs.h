@@ -119,6 +119,7 @@ typedef enum {
   VirtioFsFuseOpUnlink      = 10,
   VirtioFsFuseOpRmDir       = 11,
   VirtioFsFuseOpOpen        = 14,
+  VirtioFsFuseOpStatFs      = 17,
   VirtioFsFuseOpRelease     = 18,
   VirtioFsFuseOpFsync       = 20,
   VirtioFsFuseOpFlush       = 25,
@@ -232,6 +233,22 @@ typedef struct {
   UINT32 OpenFlags;
   UINT32 Padding;
 } VIRTIO_FS_FUSE_OPEN_RESPONSE;
+
+//
+// Header for VirtioFsFuseOpStatFs.
+//
+typedef struct {
+  UINT64 Blocks;
+  UINT64 Bfree;
+  UINT64 Bavail;
+  UINT64 Files;
+  UINT64 Ffree;
+  UINT32 Bsize;
+  UINT32 Namelen;
+  UINT32 Frsize;
+  UINT32 Padding;
+  UINT32 Spare[6];
+} VIRTIO_FS_FUSE_STATFS_RESPONSE;
 
 //
 // Header for VirtioFsFuseOpRelease and VirtioFsFuseOpReleaseDir.
