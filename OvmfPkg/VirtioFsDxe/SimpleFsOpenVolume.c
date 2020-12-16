@@ -28,6 +28,7 @@ VirtioFsOpenVolume (
   VIRTIO_FS      *VirtioFs;
   VIRTIO_FS_FILE *VirtioFsFile;
   EFI_STATUS     Status;
+  CHAR8          *CanonicalPathname;
   UINT64         RootDirHandle;
 
   VirtioFs = VIRTIO_FS_FROM_SIMPLE_FS (This);
@@ -37,13 +38,19 @@ VirtioFsOpenVolume (
     return EFI_OUT_OF_RESOURCES;
   }
 
+  CanonicalPathname = AllocateCopyPool (sizeof "/", "/");
+  if (CanonicalPathname == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto FreeVirtioFsFile;
+  }
+
   //
   // Open the root directory.
   //
   Status = VirtioFsFuseOpenDir (VirtioFs, VIRTIO_FS_FUSE_ROOT_DIR_NODE_ID,
              &RootDirHandle);
   if (EFI_ERROR (Status)) {
-    goto FreeVirtioFsFile;
+    goto FreeCanonicalPathname;
   }
 
   //
@@ -64,6 +71,7 @@ VirtioFsOpenVolume (
   VirtioFsFile->IsDirectory            = TRUE;
   VirtioFsFile->IsOpenForWriting       = FALSE;
   VirtioFsFile->OwnerFs                = VirtioFs;
+  VirtioFsFile->CanonicalPathname      = CanonicalPathname;
   VirtioFsFile->NodeId                 = VIRTIO_FS_FUSE_ROOT_DIR_NODE_ID;
   VirtioFsFile->FuseHandle             = RootDirHandle;
 
@@ -74,6 +82,9 @@ VirtioFsOpenVolume (
 
   *Root = &VirtioFsFile->SimpleFile;
   return EFI_SUCCESS;
+
+FreeCanonicalPathname:
+  FreePool (CanonicalPathname);
 
 FreeVirtioFsFile:
   FreePool (VirtioFsFile);

@@ -59,6 +59,7 @@ VirtioFsSimpleFileClose (
   //
   RemoveEntryList (&VirtioFsFile->OpenFilesEntry);
 
+  FreePool (VirtioFsFile->CanonicalPathname);
   FreePool (VirtioFsFile);
   return EFI_SUCCESS;
 }
