@@ -6,10 +6,14 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
+#include <IndustryStandard/Virtio.h>          // VIRTIO_SUBSYSTEM_FILESYSTEM
 #include <Library/BaseLib.h>                  // AsciiStrCmp()
+#include <Library/MemoryAllocationLib.h>      // AllocatePool()
 #include <Library/UefiBootServicesTableLib.h> // gBS
 #include <Protocol/ComponentName2.h>          // EFI_COMPONENT_NAME2_PROTOCOL
 #include <Protocol/DriverBinding.h>           // EFI_DRIVER_BINDING_PROTOCOL
+
+#include "VirtioFsDxe.h"
 
 //
 // UEFI Driver Model protocol instances.
@@ -28,7 +32,27 @@ VirtioFsBindingSupported (
   IN EFI_DEVICE_PATH_PROTOCOL    *RemainingDevicePath OPTIONAL
   )
 {
-  return EFI_UNSUPPORTED;
+  EFI_STATUS             Status;
+  VIRTIO_DEVICE_PROTOCOL *Virtio;
+  EFI_STATUS             CloseStatus;
+
+  Status = gBS->OpenProtocol (ControllerHandle, &gVirtioDeviceProtocolGuid,
+                  (VOID **)&Virtio, This->DriverBindingHandle,
+                  ControllerHandle, EFI_OPEN_PROTOCOL_BY_DRIVER);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  if (Virtio->SubSystemDeviceId != VIRTIO_SUBSYSTEM_FILESYSTEM) {
+    Status = EFI_UNSUPPORTED;
+  }
+
+  CloseStatus = gBS->CloseProtocol (ControllerHandle,
+                       &gVirtioDeviceProtocolGuid, This->DriverBindingHandle,
+                       ControllerHandle);
+  ASSERT_EFI_ERROR (CloseStatus);
+
+  return Status;
 }
 
 EFI_STATUS
@@ -39,7 +63,45 @@ VirtioFsBindingStart (
   IN EFI_DEVICE_PATH_PROTOCOL    *RemainingDevicePath OPTIONAL
   )
 {
-  return EFI_DEVICE_ERROR;
+  VIRTIO_FS  *VirtioFs;
+  EFI_STATUS Status;
+  EFI_STATUS CloseStatus;
+
+  VirtioFs = AllocatePool (sizeof *VirtioFs);
+  if (VirtioFs == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+  VirtioFs->Signature = VIRTIO_FS_SIG;
+
+  Status = gBS->OpenProtocol (ControllerHandle, &gVirtioDeviceProtocolGuid,
+                  (VOID **)&VirtioFs->Virtio, This->DriverBindingHandle,
+                  ControllerHandle, EFI_OPEN_PROTOCOL_BY_DRIVER);
+  if (EFI_ERROR (Status)) {
+    goto FreeVirtioFs;
+  }
+
+  VirtioFs->SimpleFs.Revision   = EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_REVISION;
+  VirtioFs->SimpleFs.OpenVolume = VirtioFsOpenVolume;
+
+  Status = gBS->InstallProtocolInterface (&ControllerHandle,
+                  &gEfiSimpleFileSystemProtocolGuid, EFI_NATIVE_INTERFACE,
+                  &VirtioFs->SimpleFs);
+  if (EFI_ERROR (Status)) {
+    goto CloseVirtio;
+  }
+
+  return EFI_SUCCESS;
+
+CloseVirtio:
+  CloseStatus = gBS->CloseProtocol (ControllerHandle,
+                       &gVirtioDeviceProtocolGuid, This->DriverBindingHandle,
+                       ControllerHandle);
+  ASSERT_EFI_ERROR (CloseStatus);
+
+FreeVirtioFs:
+  FreePool (VirtioFs);
+
+  return Status;
 }
 
 EFI_STATUS
@@ -51,7 +113,33 @@ VirtioFsBindingStop (
   IN EFI_HANDLE                  *ChildHandleBuffer OPTIONAL
   )
 {
-  return EFI_DEVICE_ERROR;
+  EFI_STATUS                      Status;
+  EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *SimpleFs;
+  VIRTIO_FS                       *VirtioFs;
+
+  Status = gBS->OpenProtocol (ControllerHandle,
+                  &gEfiSimpleFileSystemProtocolGuid, (VOID **)&SimpleFs,
+                  This->DriverBindingHandle, ControllerHandle,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  VirtioFs = VIRTIO_FS_FROM_SIMPLE_FS (SimpleFs);
+
+  Status = gBS->UninstallProtocolInterface (ControllerHandle,
+                  &gEfiSimpleFileSystemProtocolGuid, SimpleFs);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = gBS->CloseProtocol (ControllerHandle, &gVirtioDeviceProtocolGuid,
+                  This->DriverBindingHandle, ControllerHandle);
+  ASSERT_EFI_ERROR (Status);
+
+  FreePool (VirtioFs);
+
+  return EFI_SUCCESS;
 }
 
 EFI_STATUS
