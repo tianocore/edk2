@@ -23,6 +23,30 @@
   SIGNATURE_64 ('V', 'I', 'O', 'F', 'S', 'F', 'I', 'L')
 
 //
+// The following limit applies to two kinds of pathnames.
+//
+// - The length of a POSIX-style, canonical pathname *at rest* never exceeds
+//   VIRTIO_FS_MAX_PATHNAME_LENGTH. (Length is defined as the number of CHAR8
+//   elements in the canonical pathname, excluding the terminating '\0'.) This
+//   is an invariant that is ensured for canonical pathnames created, and that
+//   is assumed about canonical pathname inputs (which all originate
+//   internally).
+//
+// - If the length of a UEFI-style pathname *argument*, originating directly or
+//   indirectly from the EFI_FILE_PROTOCOL caller, exceeds
+//   VIRTIO_FS_MAX_PATHNAME_LENGTH, then the argument is rejected. (Length is
+//   defined as the number of CHAR16 elements in the UEFI-style pathname,
+//   excluding the terminating L'\0'.) This is a restriction that's checked on
+//   external UEFI-style pathname inputs.
+//
+// The limit is not expected to be a practical limitation; it's only supposed
+// to prevent attempts at overflowing size calculations. For both kinds of
+// pathnames, separate limits could be used; a common limit is used purely for
+// simplicity.
+//
+#define VIRTIO_FS_MAX_PATHNAME_LENGTH ((UINTN)65535)
+
+//
 // Filesystem label encoded in UCS-2, transformed from the UTF-8 representation
 // in "VIRTIO_FS_CONFIG.Tag", and NUL-terminated. Only the printable ASCII code
 // points (U+0020 through U+007E) are supported.
@@ -190,6 +214,14 @@ VirtioFsFuseCheckResponse (
 EFI_STATUS
 VirtioFsErrnoToEfiStatus (
   IN INT32 Errno
+  );
+
+EFI_STATUS
+VirtioFsAppendPath (
+  IN     CHAR8   *LhsPath8,
+  IN     CHAR16  *RhsPath16,
+     OUT CHAR8   **ResultPath8,
+     OUT BOOLEAN *RootEscape
   );
 
 //
