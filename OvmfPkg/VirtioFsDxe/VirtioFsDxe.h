@@ -11,6 +11,7 @@
 #define VIRTIO_FS_DXE_H_
 
 #include <Base.h>                      // SIGNATURE_64()
+#include <Guid/FileInfo.h>             // EFI_FILE_INFO
 #include <IndustryStandard/VirtioFs.h> // VIRTIO_FS_TAG_BYTES
 #include <Library/DebugLib.h>          // CR()
 #include <Protocol/SimpleFileSystem.h> // EFI_SIMPLE_FILE_SYSTEM_PROTOCOL
@@ -223,6 +224,12 @@ VirtioFsAppendPath (
   IN     CHAR16  *RhsPath16,
      OUT CHAR8   **ResultPath8,
      OUT BOOLEAN *RootEscape
+  );
+
+EFI_STATUS
+VirtioFsFuseAttrToEfiFileInfo (
+  IN     VIRTIO_FS_FUSE_ATTRIBUTES_RESPONSE *FuseAttr,
+     OUT EFI_FILE_INFO                      *FileInfo
   );
 
 //
