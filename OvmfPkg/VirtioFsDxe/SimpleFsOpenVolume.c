@@ -72,6 +72,7 @@ VirtioFsOpenVolume (
   VirtioFsFile->IsOpenForWriting       = FALSE;
   VirtioFsFile->OwnerFs                = VirtioFs;
   VirtioFsFile->CanonicalPathname      = CanonicalPathname;
+  VirtioFsFile->FilePosition           = 0;
   VirtioFsFile->NodeId                 = VIRTIO_FS_FUSE_ROOT_DIR_NODE_ID;
   VirtioFsFile->FuseHandle             = RootDirHandle;
 

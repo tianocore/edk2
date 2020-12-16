@@ -479,6 +479,7 @@ VirtioFsSimpleFileOpen (
   NewVirtioFsFile->IsOpenForWriting       = OpenForWriting;
   NewVirtioFsFile->OwnerFs                = VirtioFs;
   NewVirtioFsFile->CanonicalPathname      = NewCanonicalPath;
+  NewVirtioFsFile->FilePosition           = 0;
   NewVirtioFsFile->NodeId                 = NewNodeId;
   NewVirtioFsFile->FuseHandle             = NewFuseHandle;
 
