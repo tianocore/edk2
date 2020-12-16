@@ -309,6 +309,111 @@ FreeDestination:
 }
 
 /**
+  Update the attributes of a VIRTIO_FS_FILE as requested in EFI_FILE_INFO.
+
+  @param[in,out] VirtioFsFile  The VIRTIO_FS_FILE to update the attributes of.
+
+  @param[in] NewFileInfo       The new attributes requested by
+                               EFI_FILE_PROTOCOL.SetInfo(). NewFileInfo->Size
+                               and NewFileInfo->FileName are ignored.
+
+  @retval EFI_SUCCESS        No attributes had to be updated.
+
+  @retval EFI_SUCCESS        The required set of attribute updates has been
+                             determined and performed successfully.
+
+  @retval EFI_ACCESS_DENIED  NewFileInfo requests an update to a property
+                             different from the EFI_FILE_READ_ONLY bit in the
+                             Attribute field, but VirtioFsFile is not open for
+                             writing.
+
+  @return                    Error codes propagated from underlying functions.
+**/
+STATIC
+EFI_STATUS
+UpdateAttributes (
+  IN OUT VIRTIO_FS_FILE *VirtioFsFile,
+  IN     EFI_FILE_INFO  *NewFileInfo
+  )
+{
+  VIRTIO_FS                          *VirtioFs;
+  EFI_STATUS                         Status;
+  VIRTIO_FS_FUSE_ATTRIBUTES_RESPONSE FuseAttr;
+  EFI_FILE_INFO                      FileInfo;
+  BOOLEAN                            UpdateFileSize;
+  UINT64                             FileSize;
+  BOOLEAN                            UpdateAtime;
+  BOOLEAN                            UpdateMtime;
+  UINT64                             Atime;
+  UINT64                             Mtime;
+  BOOLEAN                            UpdateMode;
+  UINT32                             Mode;
+
+  VirtioFs = VirtioFsFile->OwnerFs;
+
+  //
+  // Fetch the current attributes first, so we can build the difference between
+  // them and NewFileInfo.
+  //
+  Status = VirtioFsFuseGetAttr (VirtioFs, VirtioFsFile->NodeId, &FuseAttr);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  Status = VirtioFsFuseAttrToEfiFileInfo (&FuseAttr, &FileInfo);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  //
+  // Collect the updates.
+  //
+  if (VirtioFsFile->IsDirectory) {
+    UpdateFileSize = FALSE;
+  } else {
+    VirtioFsGetFuseSizeUpdate (&FileInfo, NewFileInfo, &UpdateFileSize,
+      &FileSize);
+  }
+
+  Status = VirtioFsGetFuseTimeUpdates (&FileInfo, NewFileInfo, &UpdateAtime,
+             &UpdateMtime, &Atime, &Mtime);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = VirtioFsGetFuseModeUpdate (&FileInfo, NewFileInfo, &UpdateMode,
+             &Mode);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // If no attribute updates are necessary, we're done.
+  //
+  if (!UpdateFileSize && !UpdateAtime && !UpdateMtime && !UpdateMode) {
+    return EFI_SUCCESS;
+  }
+  //
+  // If the file is not open for writing, then only Mode may be updated (for
+  // toggling EFI_FILE_READ_ONLY).
+  //
+  if (!VirtioFsFile->IsOpenForWriting &&
+      (UpdateFileSize || UpdateAtime || UpdateMtime)) {
+    return EFI_ACCESS_DENIED;
+  }
+  //
+  // Send the FUSE_SETATTR request now.
+  //
+  Status = VirtioFsFuseSetAttr (
+             VirtioFs,
+             VirtioFsFile->NodeId,
+             UpdateFileSize ? &FileSize : NULL,
+             UpdateAtime    ? &Atime    : NULL,
+             UpdateMtime    ? &Mtime    : NULL,
+             UpdateMode     ? &Mode     : NULL
+             );
+  return Status;
+}
+
+/**
   Process an EFI_FILE_INFO setting request.
 **/
 STATIC
@@ -350,7 +455,7 @@ SetFileInfo (
   //
   // Update any attributes requested.
   //
-  Status = EFI_UNSUPPORTED;
+  Status = UpdateAttributes (VirtioFsFile, FileInfo);
   //
   // The UEFI spec does not speak about partial failure in
   // EFI_FILE_PROTOCOL.SetInfo(); we won't try to roll back the rename (if
