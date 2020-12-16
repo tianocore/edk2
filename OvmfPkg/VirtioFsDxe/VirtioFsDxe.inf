@@ -78,15 +78,22 @@
 
 [Packages]
   MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
 
 [Sources]
   DriverBinding.c
+  SimpleFsOpenVolume.c
+  VirtioFsDxe.h
 
 [LibraryClasses]
   BaseLib
+  DebugLib
+  MemoryAllocationLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
 
 [Protocols]
   gEfiComponentName2ProtocolGuid        ## PRODUCES
   gEfiDriverBindingProtocolGuid         ## PRODUCES
+  gEfiSimpleFileSystemProtocolGuid      ## BY_START
+  gVirtioDeviceProtocolGuid             ## TO_START
