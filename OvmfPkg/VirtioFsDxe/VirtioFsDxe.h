@@ -290,6 +290,16 @@ VirtioFsGetFuseSizeUpdate (
      OUT UINT64        *Size
   );
 
+EFI_STATUS
+VirtioFsGetFuseTimeUpdates (
+  IN     EFI_FILE_INFO *Info,
+  IN     EFI_FILE_INFO *NewInfo,
+     OUT BOOLEAN       *UpdateAtime,
+     OUT BOOLEAN       *UpdateMtime,
+     OUT UINT64        *Atime,
+     OUT UINT64        *Mtime
+  );
+
 //
 // Wrapper functions for FUSE commands (primitives).
 //
