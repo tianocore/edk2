@@ -236,6 +236,14 @@ VirtioFsFuseForget (
   );
 
 EFI_STATUS
+VirtioFsFuseMkDir (
+  IN OUT VIRTIO_FS *VirtioFs,
+  IN     UINT64    ParentNodeId,
+  IN     CHAR8     *Name,
+     OUT UINT64    *NodeId
+  );
+
+EFI_STATUS
 VirtioFsFuseOpen (
   IN OUT VIRTIO_FS *VirtioFs,
   IN     UINT64    NodeId,

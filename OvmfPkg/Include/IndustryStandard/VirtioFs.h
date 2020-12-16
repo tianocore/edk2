@@ -82,6 +82,13 @@ typedef struct {
 #define VIRTIO_FS_FUSE_ROOT_DIR_NODE_ID 1
 
 //
+// File mode bitmasks.
+//
+#define VIRTIO_FS_FUSE_MODE_PERM_RWXU 0000700u
+#define VIRTIO_FS_FUSE_MODE_PERM_RWXG 0000070u
+#define VIRTIO_FS_FUSE_MODE_PERM_RWXO 0000007u
+
+//
 // Flags for VirtioFsFuseOpOpen.
 //
 #define VIRTIO_FS_FUSE_OPEN_REQ_F_RDONLY 0
@@ -92,6 +99,7 @@ typedef struct {
 //
 typedef enum {
   VirtioFsFuseOpForget      =  2,
+  VirtioFsFuseOpMkDir       =  9,
   VirtioFsFuseOpOpen        = 14,
   VirtioFsFuseOpRelease     = 18,
   VirtioFsFuseOpFsync       = 20,
@@ -124,11 +132,58 @@ typedef struct {
 } VIRTIO_FS_FUSE_RESPONSE;
 
 //
+// Structure with which the Virtio Filesystem device reports a NodeId to the
+// FUSE client (i.e., to the Virtio Filesystem driver). This structure is a
+// part of the response headers for operations that inform the FUSE client of
+// an inode.
+//
+typedef struct {
+  UINT64 NodeId;
+  UINT64 Generation;
+  UINT64 EntryValid;
+  UINT64 AttrValid;
+  UINT32 EntryValidNsec;
+  UINT32 AttrValidNsec;
+} VIRTIO_FS_FUSE_NODE_RESPONSE;
+
+//
+// Structure describing the host-side attributes of an inode. This structure is
+// a part of the response headers for operations that inform the FUSE client of
+// an inode.
+//
+typedef struct {
+  UINT64 Ino;
+  UINT64 Size;
+  UINT64 Blocks;
+  UINT64 Atime;
+  UINT64 Mtime;
+  UINT64 Ctime;
+  UINT32 AtimeNsec;
+  UINT32 MtimeNsec;
+  UINT32 CtimeNsec;
+  UINT32 Mode;
+  UINT32 Nlink;
+  UINT32 Uid;
+  UINT32 Gid;
+  UINT32 Rdev;
+  UINT32 Blksize;
+  UINT32 Padding;
+} VIRTIO_FS_FUSE_ATTRIBUTES_RESPONSE;
+
+//
 // Header for VirtioFsFuseOpForget.
 //
 typedef struct {
   UINT64 NumberOfLookups;
 } VIRTIO_FS_FUSE_FORGET_REQUEST;
+
+//
+// Header for VirtioFsFuseOpMkDir.
+//
+typedef struct {
+  UINT32 Mode;
+  UINT32 Umask;
+} VIRTIO_FS_FUSE_MKDIR_REQUEST;
 
 //
 // Headers for VirtioFsFuseOpOpen and VirtioFsFuseOpOpenDir.
