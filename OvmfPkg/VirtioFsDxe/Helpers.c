@@ -1900,3 +1900,82 @@ VirtioFsFuseAttrToEfiFileInfo (
 
   return EFI_SUCCESS;
 }
+
+/**
+  Convert a VIRTIO_FS_FUSE_DIRENTPLUS_RESPONSE filename to an EFI_FILE_INFO
+  filename.
+
+  @param[in] FuseDirent    The VIRTIO_FS_FUSE_DIRENTPLUS_RESPONSE object to
+                           convert the filename byte array from. The caller is
+                           responsible for ensuring that FuseDirent->Namelen
+                           describe valid storage.
+
+  @param[in,out] FileInfo  The EFI_FILE_INFO structure to modify. On input, the
+                           caller is responsible for setting FileInfo->Size
+                           according to the allocated size. On successful
+                           return, FileInfo->Size is reduced to reflect the
+                           filename converted into FileInfo->FileName.
+                           FileInfo->FileName is set from the filename byte
+                           array that directly follows the FuseDirent header
+                           object. Fields other than FileInfo->Size and
+                           FileInfo->FileName are not modified.
+
+  @retval EFI_SUCCESS            Conversion successful.
+
+  @retval EFI_INVALID_PARAMETER  VIRTIO_FS_FUSE_DIRENTPLUS_RESPONSE_SIZE()
+                                 returns zero for FuseDirent->Namelen.
+
+  @retval EFI_BUFFER_TOO_SMALL   On input, FileInfo->Size does not provide
+                                 enough room for converting the filename byte
+                                 array from FuseDirent.
+
+  @retval EFI_UNSUPPORTED        The FuseDirent filename byte array contains a
+                                 byte that falls outside of the printable ASCII
+                                 range, or is a forward slash or a backslash.
+**/
+EFI_STATUS
+VirtioFsFuseDirentPlusToEfiFileInfo (
+  IN     VIRTIO_FS_FUSE_DIRENTPLUS_RESPONSE *FuseDirent,
+  IN OUT EFI_FILE_INFO                      *FileInfo
+  )
+{
+  UINTN  DirentSize;
+  UINTN  FileInfoSize;
+  UINT8  *DirentName;
+  UINT32 Idx;
+
+  DirentSize = VIRTIO_FS_FUSE_DIRENTPLUS_RESPONSE_SIZE (FuseDirent->Namelen);
+  if (DirentSize == 0) {
+    return EFI_INVALID_PARAMETER;
+  }
+  //
+  // We're now safe from overflow in the calculation below.
+  //
+  FileInfoSize = (OFFSET_OF (EFI_FILE_INFO, FileName) +
+                  ((UINTN)FuseDirent->Namelen + 1) * sizeof (CHAR16));
+  if (FileInfoSize > FileInfo->Size) {
+    return EFI_BUFFER_TOO_SMALL;
+  }
+
+  //
+  // Convert the name.
+  //
+  DirentName = (UINT8 *)(FuseDirent + 1);
+  for (Idx = 0; Idx < FuseDirent->Namelen; Idx++) {
+    UINT8 NameByte;
+
+    NameByte = DirentName[Idx];
+    if (NameByte < 0x20 || NameByte > 0x7E ||
+        NameByte == '/' || NameByte == '\\') {
+      return EFI_UNSUPPORTED;
+    }
+    FileInfo->FileName[Idx] = (CHAR16)NameByte;
+  }
+  FileInfo->FileName[Idx++] = L'\0';
+  //
+  // Set the (possibly reduced) size.
+  //
+  FileInfo->Size = FileInfoSize;
+
+  return EFI_SUCCESS;
+}
