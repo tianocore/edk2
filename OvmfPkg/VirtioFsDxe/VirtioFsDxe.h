@@ -196,6 +196,12 @@ VirtioFsErrnoToEfiStatus (
 //
 
 EFI_STATUS
+VirtioFsFuseForget (
+  IN OUT VIRTIO_FS *VirtioFs,
+  IN     UINT64    NodeId
+  );
+
+EFI_STATUS
 VirtioFsFuseReleaseFileOrDir (
   IN OUT VIRTIO_FS *VirtioFs,
   IN     UINT64    NodeId,
