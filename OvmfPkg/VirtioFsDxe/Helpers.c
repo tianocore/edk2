@@ -1723,6 +1723,67 @@ ForgetNextDirNodeId:
 }
 
 /**
+  Format the last component of a canonical pathname into a caller-provided
+  CHAR16 array.
+
+  @param[in] Path              The canonical pathname (as defined in the
+                               description of VirtioFsAppendPath()) to format
+                               the last component of.
+
+  @param[out] Basename         If BasenameSize is zero on input, Basename may
+                               be NULL. Otherwise, Basename is allocated by the
+                               caller. On successful return, Basename contains
+                               the last component of Path, formatted as a
+                               NUL-terminated CHAR16 string. When Path is "/"
+                               on input, Basename is L"" on output.
+
+  @param[in,out] BasenameSize  On input, the number of bytes the caller
+                               provides in Basename. On output, regardless of
+                               return value, the number of bytes required for
+                               formatting Basename, including the terminating
+                               L'\0'.
+
+  @retval EFI_SUCCESS           Basename has been filled in.
+
+  @retval EFI_BUFFER_TOO_SMALL  BasenameSize was too small on input; Basename
+                                has not been modified.
+**/
+EFI_STATUS
+VirtioFsGetBasename (
+  IN     CHAR8  *Path,
+     OUT CHAR16 *Basename     OPTIONAL,
+  IN OUT UINTN  *BasenameSize
+  )
+{
+  UINTN AllocSize;
+  UINTN LastComponent;
+  UINTN Idx;
+  UINTN PathSize;
+
+  AllocSize = *BasenameSize;
+
+  LastComponent = MAX_UINTN;
+  for (Idx = 0; Path[Idx] != '\0'; Idx++) {
+    if (Path[Idx] == '/') {
+      LastComponent = Idx;
+    }
+  }
+  PathSize = Idx + 1;
+  ASSERT (LastComponent < MAX_UINTN);
+  LastComponent++;
+  *BasenameSize = (PathSize - LastComponent) * sizeof Basename[0];
+
+  if (*BasenameSize > AllocSize) {
+    return EFI_BUFFER_TOO_SMALL;
+  }
+
+  for (Idx = LastComponent; Idx < PathSize; Idx++) {
+    Basename[Idx - LastComponent] = Path[Idx];
+  }
+  return EFI_SUCCESS;
+}
+
+/**
   Convert select fields of a VIRTIO_FS_FUSE_ATTRIBUTES_RESPONSE object to
   corresponding fields in EFI_FILE_INFO.
 
