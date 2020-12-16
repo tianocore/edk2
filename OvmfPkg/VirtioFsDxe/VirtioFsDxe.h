@@ -44,6 +44,7 @@ typedef struct {
   UINT16                          QueueSize; // VirtioFsInit        1
   VRING                           Ring;      // VirtioRingInit      2
   VOID                            *RingMap;  // VirtioRingMap       2
+  UINT64                          RequestId; // DriverBindingStart  0
   EFI_EVENT                       ExitBoot;  // DriverBindingStart  0
   EFI_SIMPLE_FILE_SYSTEM_PROTOCOL SimpleFs;  // DriverBindingStart  0
 } VIRTIO_FS;
@@ -130,6 +131,22 @@ VirtioFsSgListsSubmit (
   IN OUT VIRTIO_FS                     *VirtioFs,
   IN OUT VIRTIO_FS_SCATTER_GATHER_LIST *RequestSgList,
   IN OUT VIRTIO_FS_SCATTER_GATHER_LIST *ResponseSgList OPTIONAL
+  );
+
+EFI_STATUS
+VirtioFsFuseNewRequest (
+  IN OUT VIRTIO_FS              *VirtioFs,
+     OUT VIRTIO_FS_FUSE_REQUEST *Request,
+  IN     UINT32                 RequestSize,
+  IN     UINT32                 Opcode,
+  IN     UINT64                 NodeId
+  );
+
+EFI_STATUS
+VirtioFsFuseCheckResponse (
+  IN  VIRTIO_FS_SCATTER_GATHER_LIST *ResponseSgList,
+  IN  UINT64                        RequestId,
+  OUT UINTN                         *TailBufferFill
   );
 
 //
