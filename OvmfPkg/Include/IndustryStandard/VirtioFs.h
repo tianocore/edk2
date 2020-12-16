@@ -85,8 +85,14 @@ typedef struct {
 // File mode bitmasks.
 //
 #define VIRTIO_FS_FUSE_MODE_PERM_RWXU 0000700u
+#define VIRTIO_FS_FUSE_MODE_PERM_RUSR 0000400u
+#define VIRTIO_FS_FUSE_MODE_PERM_WUSR 0000200u
 #define VIRTIO_FS_FUSE_MODE_PERM_RWXG 0000070u
+#define VIRTIO_FS_FUSE_MODE_PERM_RGRP 0000040u
+#define VIRTIO_FS_FUSE_MODE_PERM_WGRP 0000020u
 #define VIRTIO_FS_FUSE_MODE_PERM_RWXO 0000007u
+#define VIRTIO_FS_FUSE_MODE_PERM_ROTH 0000004u
+#define VIRTIO_FS_FUSE_MODE_PERM_WOTH 0000002u
 
 //
 // Flags for VirtioFsFuseOpOpen.
@@ -108,6 +114,7 @@ typedef enum {
   VirtioFsFuseOpOpenDir     = 27,
   VirtioFsFuseOpReleaseDir  = 29,
   VirtioFsFuseOpFsyncDir    = 30,
+  VirtioFsFuseOpCreate      = 35,
 } VIRTIO_FS_FUSE_OPCODE;
 
 #pragma pack (1)
@@ -251,6 +258,16 @@ typedef struct {
   UINT16 MapAlignment;
   UINT32 Unused[8];
 } VIRTIO_FS_FUSE_INIT_RESPONSE;
+
+//
+// Header for VirtioFsFuseOpCreate.
+//
+typedef struct {
+  UINT32 Flags;
+  UINT32 Mode;
+  UINT32 Umask;
+  UINT32 Padding;
+} VIRTIO_FS_FUSE_CREATE_REQUEST;
 #pragma pack ()
 
 #endif // VIRTIO_FS_H_
