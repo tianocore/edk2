@@ -22,7 +22,10 @@
 
   @param[in,out] VirtioFs  The Virtio Filesystem device to send the FUSE_INIT
                            request to. The FUSE request counter
-                           "VirtioFs->RequestId" is set to 1 on output.
+                           "VirtioFs->RequestId" is set to 1 on output. The
+                           maximum write buffer size exposed in the FUSE_INIT
+                           response is saved in "VirtioFs->MaxWrite", on
+                           output.
 
   @retval EFI_SUCCESS      The FUSE session has been started.
 
@@ -126,9 +129,14 @@ VirtioFsFuseInitSession (
   //
   if (InitResp.Major < InitReq.Major ||
       (InitResp.Major == InitReq.Major && InitResp.Minor < InitReq.Minor) ||
-      (InitResp.Flags & VIRTIO_FS_FUSE_INIT_REQ_F_DO_READDIRPLUS) == 0) {
+      (InitResp.Flags & VIRTIO_FS_FUSE_INIT_REQ_F_DO_READDIRPLUS) == 0 ||
+      InitResp.MaxWrite < SIZE_4KB) {
     return EFI_UNSUPPORTED;
   }
 
+  //
+  // Save the maximum write buffer size for FUSE_WRITE requests.
+  //
+  VirtioFs->MaxWrite = InitResp.MaxWrite;
   return EFI_SUCCESS;
 }
