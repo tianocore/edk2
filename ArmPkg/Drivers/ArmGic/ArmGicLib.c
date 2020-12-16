@@ -201,6 +201,50 @@ ArmGicEndOfInterrupt (
 
 VOID
 EFIAPI
+ArmGicSetInterruptPriority (
+  IN UINTN                  GicDistributorBase,
+  IN UINTN                  GicRedistributorBase,
+  IN UINTN                  Source,
+  IN UINTN                  Priority
+  )
+{
+  UINT32                RegOffset;
+  UINTN                 RegShift;
+  ARM_GIC_ARCH_REVISION Revision;
+  UINTN                 GicCpuRedistributorBase;
+
+  // Calculate register offset and bit position
+  RegOffset = Source / 4;
+  RegShift = (Source % 4) * 8;
+
+  Revision = ArmGicGetSupportedArchRevision ();
+  if ((Revision == ARM_GIC_ARCH_REVISION_2) ||
+      FeaturePcdGet (PcdArmGicV3WithV2Legacy) ||
+      SourceIsSpi (Source)) {
+    MmioAndThenOr32 (
+      GicDistributorBase + ARM_GIC_ICDIPR + (4 * RegOffset),
+      ~(0xff << RegShift),
+      Priority << RegShift
+      );
+  } else {
+    GicCpuRedistributorBase = GicGetCpuRedistributorBase (
+                                GicRedistributorBase,
+                                Revision
+                                );
+    if (GicCpuRedistributorBase == 0) {
+      return;
+    }
+
+    MmioAndThenOr32 (
+      GicCpuRedistributorBase + ARM_GIC_ICDIPR + (4 * RegOffset),
+      ~(0xff << RegShift),
+      Priority << RegShift
+      );
+  }
+}
+
+VOID
+EFIAPI
 ArmGicEnableInterrupt (
   IN UINTN                  GicDistributorBase,
   IN UINTN                  GicRedistributorBase,

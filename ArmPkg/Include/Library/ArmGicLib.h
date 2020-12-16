@@ -210,6 +210,15 @@ ArmGicSetPriorityMask (
 
 VOID
 EFIAPI
+ArmGicSetInterruptPriority (
+  IN UINTN                  GicDistributorBase,
+  IN UINTN                  GicRedistributorBase,
+  IN UINTN                  Source,
+  IN UINTN                  Priority
+  );
+
+VOID
+EFIAPI
 ArmGicEnableInterrupt (
   IN UINTN                  GicDistributorBase,
   IN UINTN                  GicRedistributorBase,
