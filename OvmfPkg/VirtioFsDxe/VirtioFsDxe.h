@@ -396,6 +396,15 @@ VirtioFsFuseOpenOrCreate (
      OUT UINT64    *FuseHandle
   );
 
+EFI_STATUS
+VirtioFsFuseRename (
+  IN OUT VIRTIO_FS *VirtioFs,
+  IN     UINT64    OldParentNodeId,
+  IN     CHAR8     *OldName,
+  IN     UINT64    NewParentNodeId,
+  IN     CHAR8     *NewName
+  );
+
 //
 // EFI_SIMPLE_FILE_SYSTEM_PROTOCOL member functions for the Virtio Filesystem
 // driver.

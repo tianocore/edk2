@@ -142,6 +142,11 @@ typedef struct {
    )
 
 //
+// Flags for VirtioFsFuseOpRename2.
+//
+#define VIRTIO_FS_FUSE_RENAME2_REQ_F_NOREPLACE BIT0
+
+//
 // FUSE operation codes.
 //
 typedef enum {
@@ -164,6 +169,7 @@ typedef enum {
   VirtioFsFuseOpFsyncDir    = 30,
   VirtioFsFuseOpCreate      = 35,
   VirtioFsFuseOpReadDirPlus = 44,
+  VirtioFsFuseOpRename2     = 45,
 } VIRTIO_FS_FUSE_OPCODE;
 
 #pragma pack (1)
@@ -398,6 +404,15 @@ typedef struct {
   UINT32                             Namelen;
   UINT32                             Type;
 } VIRTIO_FS_FUSE_DIRENTPLUS_RESPONSE;
+
+//
+// Header for VirtioFsFuseOpRename2.
+//
+typedef struct {
+  UINT64 NewDir;
+  UINT32 Flags;
+  UINT32 Padding;
+} VIRTIO_FS_FUSE_RENAME2_REQUEST;
 #pragma pack ()
 
 #endif // VIRTIO_FS_H_
