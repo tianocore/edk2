@@ -82,6 +82,7 @@
 
 [Sources]
   DriverBinding.c
+  FuseFlush.c
   FuseForget.c
   FuseFsync.c
   FuseInit.c
