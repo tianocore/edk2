@@ -125,3 +125,8 @@
   gEfiDriverBindingProtocolGuid         ## PRODUCES
   gEfiSimpleFileSystemProtocolGuid      ## BY_START
   gVirtioDeviceProtocolGuid             ## TO_START
+
+[Guids]
+  gEfiFileInfoGuid
+  gEfiFileSystemInfoGuid
+  gEfiFileSystemVolumeLabelInfoIdGuid
