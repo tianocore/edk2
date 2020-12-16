@@ -227,6 +227,14 @@ VirtioFsAppendPath (
   );
 
 EFI_STATUS
+VirtioFsLookupMostSpecificParentDir (
+  IN OUT VIRTIO_FS *VirtioFs,
+  IN OUT CHAR8     *Path,
+     OUT UINT64    *DirNodeId,
+     OUT CHAR8     **LastComponent
+  );
+
+EFI_STATUS
 VirtioFsFuseAttrToEfiFileInfo (
   IN     VIRTIO_FS_FUSE_ATTRIBUTES_RESPONSE *FuseAttr,
      OUT EFI_FILE_INFO                      *FileInfo
