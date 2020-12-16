@@ -1592,6 +1592,137 @@ FreeRhsPath8:
 }
 
 /**
+  For a given canonical pathname (as defined at VirtioFsAppendPath()), look up
+  the NodeId of the most specific parent directory, plus output a pointer to
+  the last pathname component (which is therefore a direct child of said parent
+  directory).
+
+  The function may only be called after VirtioFsFuseInitSession() returns
+  successfully and before VirtioFsUninit() is called.
+
+  @param[in,out] VirtioFs    The Virtio Filesystem device to send FUSE_LOOKUP
+                             and FUSE_FORGET requests to. On output, the FUSE
+                             request counter "VirtioFs->RequestId" will have
+                             been incremented several times.
+
+  @param[in,out] Path        The canonical pathname (as defined in the
+                             description of VirtioFsAppendPath()) to split.
+                             Path is modified in-place temporarily; however, on
+                             return (successful or otherwise), Path reassumes
+                             its original contents.
+
+  @param[out] DirNodeId      The NodeId of the most specific parent directory
+                             identified by Path. The caller is responsible for
+                             sending a FUSE_FORGET request to the Virtio
+                             Filesystem device for DirNodeId -- unless
+                             DirNodeId equals VIRTIO_FS_FUSE_ROOT_DIR_NODE_ID
+                             --, when DirNodeId's use ends.
+
+  @param[out] LastComponent  A pointer into Path, pointing at the start of the
+                             last pathname component.
+
+  @retval EFI_SUCCESS            Splitting successful.
+
+  @retval EFI_INVALID_PARAMETER  Path is "/".
+
+  @retval EFI_ACCESS_DENIED      One of the components on Path before the last
+                                 is not a directory.
+
+  @return                        Error codes propagated from
+                                 VirtioFsFuseLookup() and
+                                 VirtioFsFuseAttrToEfiFileInfo().
+**/
+EFI_STATUS
+VirtioFsLookupMostSpecificParentDir (
+  IN OUT VIRTIO_FS *VirtioFs,
+  IN OUT CHAR8     *Path,
+     OUT UINT64    *DirNodeId,
+     OUT CHAR8     **LastComponent
+  )
+{
+  UINT64     ParentDirNodeId;
+  CHAR8      *Slash;
+  EFI_STATUS Status;
+  UINT64     NextDirNodeId;
+
+  if (AsciiStrCmp (Path, "/") == 0) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  ParentDirNodeId = VIRTIO_FS_FUSE_ROOT_DIR_NODE_ID;
+  Slash           = Path;
+  for (;;) {
+    CHAR8                              *NextSlash;
+    VIRTIO_FS_FUSE_ATTRIBUTES_RESPONSE FuseAttr;
+    EFI_FILE_INFO                      FileInfo;
+
+    //
+    // Find the slash (if any) that terminates the next pathname component.
+    //
+    NextSlash = AsciiStrStr (Slash + 1, "/");
+    if (NextSlash == NULL) {
+      break;
+    }
+
+    //
+    // Temporarily replace the found slash character with a NUL in-place, for
+    // easy construction of the single-component filename that we need to look
+    // up.
+    //
+    *NextSlash = '\0';
+    Status = VirtioFsFuseLookup (VirtioFs, ParentDirNodeId, Slash + 1,
+               &NextDirNodeId, &FuseAttr);
+    *NextSlash = '/';
+
+    //
+    // We're done with the directory inode that was the basis for the lookup.
+    //
+    if (ParentDirNodeId != VIRTIO_FS_FUSE_ROOT_DIR_NODE_ID) {
+      VirtioFsFuseForget (VirtioFs, ParentDirNodeId);
+    }
+
+    //
+    // If we couldn't look up the next *non-final* pathname component, bail.
+    //
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    //
+    // Lookup successful; now check if the next (non-final) component is a
+    // directory. If not, bail.
+    //
+    Status = VirtioFsFuseAttrToEfiFileInfo (&FuseAttr, &FileInfo);
+    if (EFI_ERROR (Status)) {
+      goto ForgetNextDirNodeId;
+    }
+    if ((FileInfo.Attribute & EFI_FILE_DIRECTORY) == 0) {
+      Status = EFI_ACCESS_DENIED;
+      goto ForgetNextDirNodeId;
+    }
+
+    //
+    // Advance.
+    //
+    ParentDirNodeId = NextDirNodeId;
+    Slash           = NextSlash;
+  }
+
+  //
+  // ParentDirNodeId corresponds to the last containing directory. The
+  // remaining single-component filename represents a direct child under that
+  // directory. Said filename starts at (Slash + 1).
+  //
+  *DirNodeId     = ParentDirNodeId;
+  *LastComponent = Slash + 1;
+  return EFI_SUCCESS;
+
+ForgetNextDirNodeId:
+  VirtioFsFuseForget (VirtioFs, NextDirNodeId);
+  return Status;
+}
+
+/**
   Convert select fields of a VIRTIO_FS_FUSE_ATTRIBUTES_RESPONSE object to
   corresponding fields in EFI_FILE_INFO.
 
