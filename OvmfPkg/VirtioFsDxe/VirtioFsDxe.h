@@ -19,6 +19,9 @@
 
 #define VIRTIO_FS_SIG SIGNATURE_64 ('V', 'I', 'R', 'T', 'I', 'O', 'F', 'S')
 
+#define VIRTIO_FS_FILE_SIG \
+  SIGNATURE_64 ('V', 'I', 'O', 'F', 'S', 'F', 'I', 'L')
+
 //
 // Filesystem label encoded in UCS-2, transformed from the UTF-8 representation
 // in "VIRTIO_FS_CONFIG.Tag", and NUL-terminated. Only the printable ASCII code
@@ -46,6 +49,7 @@ typedef struct {
   VOID                            *RingMap;  // VirtioRingMap       2
   UINT64                          RequestId; // FuseInitSession     1
   EFI_EVENT                       ExitBoot;  // DriverBindingStart  0
+  LIST_ENTRY                      OpenFiles; // DriverBindingStart  0
   EFI_SIMPLE_FILE_SYSTEM_PROTOCOL SimpleFs;  // DriverBindingStart  0
 } VIRTIO_FS;
 
@@ -97,6 +101,39 @@ typedef struct {
   //
   UINT32 TotalSize;
 } VIRTIO_FS_SCATTER_GATHER_LIST;
+
+//
+// Private context structure that exposes EFI_FILE_PROTOCOL on top of an open
+// FUSE file reference.
+//
+typedef struct {
+  UINT64            Signature;
+  EFI_FILE_PROTOCOL SimpleFile;
+  BOOLEAN           IsDirectory;
+  VIRTIO_FS         *OwnerFs;
+  LIST_ENTRY        OpenFilesEntry;
+  //
+  // In the FUSE wire protocol, every request except FUSE_INIT refers to a
+  // file, namely by the "VIRTIO_FS_FUSE_REQUEST.NodeId" field; that is, by the
+  // inode number of the file. However, some of the FUSE requests that we need
+  // for some of the EFI_FILE_PROTOCOL member functions require an open file
+  // handle *in addition* to the inode number. For simplicity, whenever a
+  // VIRTIO_FS_FILE object is created, primarily defined by its NodeId field,
+  // we also *open* the referenced file at once, and save the returned file
+  // handle in the FuseHandle field. This way, when an EFI_FILE_PROTOCOL member
+  // function must send a FUSE request that needs the file handle *in addition*
+  // to the inode number, FuseHandle will be at our disposal at once.
+  //
+  UINT64 NodeId;
+  UINT64 FuseHandle;
+} VIRTIO_FS_FILE;
+
+#define VIRTIO_FS_FILE_FROM_SIMPLE_FILE(SimpleFileReference) \
+  CR (SimpleFileReference, VIRTIO_FS_FILE, SimpleFile, VIRTIO_FS_FILE_SIG);
+
+#define VIRTIO_FS_FILE_FROM_OPEN_FILES_ENTRY(OpenFilesEntryReference) \
+  CR (OpenFilesEntryReference, VIRTIO_FS_FILE, OpenFilesEntry, \
+    VIRTIO_FS_FILE_SIG);
 
 //
 // Initialization and helper routines for the Virtio Filesystem device.
@@ -188,6 +225,86 @@ EFIAPI
 VirtioFsOpenVolume (
   IN  EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *This,
   OUT EFI_FILE_PROTOCOL               **Root
+  );
+
+//
+// EFI_FILE_PROTOCOL member functions for the Virtio Filesystem driver.
+//
+
+EFI_STATUS
+EFIAPI
+VirtioFsSimpleFileClose (
+  IN EFI_FILE_PROTOCOL *This
+  );
+
+EFI_STATUS
+EFIAPI
+VirtioFsSimpleFileDelete (
+  IN EFI_FILE_PROTOCOL *This
+  );
+
+EFI_STATUS
+EFIAPI
+VirtioFsSimpleFileFlush (
+  IN EFI_FILE_PROTOCOL *This
+  );
+
+EFI_STATUS
+EFIAPI
+VirtioFsSimpleFileGetInfo (
+  IN     EFI_FILE_PROTOCOL *This,
+  IN     EFI_GUID          *InformationType,
+  IN OUT UINTN             *BufferSize,
+     OUT VOID              *Buffer
+  );
+
+EFI_STATUS
+EFIAPI
+VirtioFsSimpleFileGetPosition (
+  IN     EFI_FILE_PROTOCOL *This,
+     OUT UINT64            *Position
+  );
+
+EFI_STATUS
+EFIAPI
+VirtioFsSimpleFileOpen (
+  IN     EFI_FILE_PROTOCOL *This,
+     OUT EFI_FILE_PROTOCOL **NewHandle,
+  IN     CHAR16            *FileName,
+  IN     UINT64            OpenMode,
+  IN     UINT64            Attributes
+  );
+
+EFI_STATUS
+EFIAPI
+VirtioFsSimpleFileRead (
+  IN     EFI_FILE_PROTOCOL *This,
+  IN OUT UINTN             *BufferSize,
+     OUT VOID              *Buffer
+  );
+
+EFI_STATUS
+EFIAPI
+VirtioFsSimpleFileSetInfo (
+  IN EFI_FILE_PROTOCOL *This,
+  IN EFI_GUID          *InformationType,
+  IN UINTN             BufferSize,
+  IN VOID              *Buffer
+  );
+
+EFI_STATUS
+EFIAPI
+VirtioFsSimpleFileSetPosition (
+  IN EFI_FILE_PROTOCOL *This,
+  IN UINT64            Position
+  );
+
+EFI_STATUS
+EFIAPI
+VirtioFsSimpleFileWrite (
+  IN     EFI_FILE_PROTOCOL *This,
+  IN OUT UINTN             *BufferSize,
+  IN     VOID              *Buffer
   );
 
 #endif // VIRTIO_FS_DXE_H_

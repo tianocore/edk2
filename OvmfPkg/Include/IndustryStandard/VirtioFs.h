@@ -77,6 +77,11 @@ typedef struct {
 #define VIRTIO_FS_FUSE_MINOR 31
 
 //
+// The inode number of the root directory.
+//
+#define VIRTIO_FS_FUSE_ROOT_DIR_NODE_ID 1
+
+//
 // FUSE operation codes.
 //
 typedef enum {
