@@ -721,7 +721,8 @@ Unmap:
                           to send.
 
   @param[in] NodeId       The inode number of the file that the request refers
-                          to.
+                          to. When Opcode is VirtioFsFuseOpInit, NodeId is
+                          ignored by the Virtio Filesystem device.
 
   @retval EFI_INVALID_PARAMETER  RequestSize is smaller than
                                  sizeof(VIRTIO_FS_FUSE_REQUEST).
@@ -737,7 +738,7 @@ VirtioFsFuseNewRequest (
   IN OUT VIRTIO_FS              *VirtioFs,
      OUT VIRTIO_FS_FUSE_REQUEST *Request,
   IN     UINT32                 RequestSize,
-  IN     UINT32                 Opcode,
+  IN     VIRTIO_FS_FUSE_OPCODE  Opcode,
   IN     UINT64                 NodeId
   )
 {
