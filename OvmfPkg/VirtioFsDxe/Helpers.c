@@ -9,6 +9,7 @@
 #include <Library/BaseLib.h>             // StrLen()
 #include <Library/BaseMemoryLib.h>       // CopyMem()
 #include <Library/MemoryAllocationLib.h> // AllocatePool()
+#include <Library/TimeBaseLib.h>         // EpochToEfiTime()
 #include <Library/VirtioLib.h>           // Virtio10WriteFeatures()
 
 #include "VirtioFsDxe.h"
@@ -1588,4 +1589,122 @@ FreeBufferToSanitize:
 FreeRhsPath8:
   FreePool (RhsPath8);
   return Status;
+}
+
+/**
+  Convert select fields of a VIRTIO_FS_FUSE_ATTRIBUTES_RESPONSE object to
+  corresponding fields in EFI_FILE_INFO.
+
+  @param[in] FuseAttr   The VIRTIO_FS_FUSE_ATTRIBUTES_RESPONSE object to
+                        convert the relevant fields from.
+
+  @param[out] FileInfo  The EFI_FILE_INFO structure to modify. Importantly, the
+                        FileInfo->Size and FileInfo->FileName fields are not
+                        overwritten.
+
+  @retval EFI_SUCCESS      Conversion successful.
+
+  @retval EFI_UNSUPPORTED  The allocated size of the file is inexpressible in
+                           EFI_FILE_INFO.
+
+  @retval EFI_UNSUPPORTED  One of the file access times is inexpressible in
+                           EFI_FILE_INFO.
+
+  @retval EFI_UNSUPPORTED  The file type is inexpressible in EFI_FILE_INFO.
+
+  @retval EFI_UNSUPPORTED  The file is a regular file that has multiple names
+                           on the host side (i.e., its hard link count is
+                           greater than one).
+**/
+EFI_STATUS
+VirtioFsFuseAttrToEfiFileInfo (
+  IN     VIRTIO_FS_FUSE_ATTRIBUTES_RESPONSE *FuseAttr,
+     OUT EFI_FILE_INFO                      *FileInfo
+  )
+{
+  UINT64   EpochTime[3];
+  EFI_TIME *ConvertedTime[ARRAY_SIZE (EpochTime)];
+  UINTN    Idx;
+
+  FileInfo->FileSize = FuseAttr->Size;
+
+  //
+  // The unit for FuseAttr->Blocks is 512B.
+  //
+  if (FuseAttr->Blocks >= BIT55) {
+    return EFI_UNSUPPORTED;
+  }
+  FileInfo->PhysicalSize = LShiftU64 (FuseAttr->Blocks, 9);
+
+  //
+  // Convert the timestamps. File creation time is not tracked by the Virtio
+  // Filesystem device, so set FileInfo->CreateTime from FuseAttr->Mtime as
+  // well.
+  //
+  EpochTime[0]     = FuseAttr->Mtime;
+  EpochTime[1]     = FuseAttr->Atime;
+  EpochTime[2]     = FuseAttr->Mtime;
+  ConvertedTime[0] = &FileInfo->CreateTime;
+  ConvertedTime[1] = &FileInfo->LastAccessTime;
+  ConvertedTime[2] = &FileInfo->ModificationTime;
+
+  for (Idx = 0; Idx < ARRAY_SIZE (EpochTime); Idx++) {
+    //
+    // EpochToEfiTime() takes a UINTN for seconds.
+    //
+    if (EpochTime[Idx] > MAX_UINTN) {
+      return EFI_UNSUPPORTED;
+    }
+    //
+    // Set the following fields in the converted time: Year, Month, Day, Hour,
+    // Minute, Second, Nanosecond.
+    //
+    EpochToEfiTime ((UINTN)EpochTime[Idx], ConvertedTime[Idx]);
+    //
+    // The times are all expressed in UTC. Consequently, they are not affected
+    // by daylight saving.
+    //
+    ConvertedTime[Idx]->TimeZone = 0;
+    ConvertedTime[Idx]->Daylight = 0;
+    //
+    // Clear the padding fields.
+    //
+    ConvertedTime[Idx]->Pad1 = 0;
+    ConvertedTime[Idx]->Pad2 = 0;
+  }
+
+  //
+  // Set the attributes.
+  //
+  switch (FuseAttr->Mode & VIRTIO_FS_FUSE_MODE_TYPE_MASK) {
+  case VIRTIO_FS_FUSE_MODE_TYPE_DIR:
+    FileInfo->Attribute = EFI_FILE_DIRECTORY;
+    break;
+  case VIRTIO_FS_FUSE_MODE_TYPE_REG:
+    FileInfo->Attribute = 0;
+    break;
+  default:
+    //
+    // Other file types are not supported.
+    //
+    return EFI_UNSUPPORTED;
+  }
+  //
+  // Report the regular file or directory as read-only if all classes lack
+  // write permission.
+  //
+  if ((FuseAttr->Mode & (VIRTIO_FS_FUSE_MODE_PERM_WUSR |
+                         VIRTIO_FS_FUSE_MODE_PERM_WGRP |
+                         VIRTIO_FS_FUSE_MODE_PERM_WOTH)) == 0) {
+    FileInfo->Attribute |= EFI_FILE_READ_ONLY;
+  }
+
+  //
+  // A hard link count greater than 1 is not supported for regular files.
+  //
+  if ((FileInfo->Attribute & EFI_FILE_DIRECTORY) == 0 && FuseAttr->Nlink > 1) {
+    return EFI_UNSUPPORTED;
+  }
+
+  return EFI_SUCCESS;
 }
