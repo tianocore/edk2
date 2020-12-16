@@ -237,6 +237,15 @@ VirtioFsFuseAttrToEfiFileInfo (
 //
 
 EFI_STATUS
+VirtioFsFuseLookup (
+  IN OUT VIRTIO_FS                          *VirtioFs,
+  IN     UINT64                             DirNodeId,
+  IN     CHAR8                              *Name,
+     OUT UINT64                             *NodeId,
+     OUT VIRTIO_FS_FUSE_ATTRIBUTES_RESPONSE *FuseAttr
+  );
+
+EFI_STATUS
 VirtioFsFuseForget (
   IN OUT VIRTIO_FS *VirtioFs,
   IN     UINT64    NodeId
