@@ -7,6 +7,8 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
+#include <Library/MemoryAllocationLib.h> // FreePool()
+
 #include "VirtioFsDxe.h"
 
 EFI_STATUS
@@ -31,6 +33,13 @@ VirtioFsSimpleFileSetPosition (
       return EFI_UNSUPPORTED;
     }
     VirtioFsFile->FilePosition = 0;
+    if (VirtioFsFile->FileInfoArray != NULL) {
+      FreePool (VirtioFsFile->FileInfoArray);
+      VirtioFsFile->FileInfoArray = NULL;
+    }
+    VirtioFsFile->SingleFileInfoSize = 0;
+    VirtioFsFile->NumFileInfo        = 0;
+    VirtioFsFile->NextFileInfo       = 0;
     return EFI_SUCCESS;
   }
 
