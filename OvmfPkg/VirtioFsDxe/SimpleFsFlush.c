@@ -14,5 +14,29 @@ VirtioFsSimpleFileFlush (
   IN EFI_FILE_PROTOCOL *This
   )
 {
-  return EFI_NO_MEDIA;
+  VIRTIO_FS_FILE *VirtioFsFile;
+  VIRTIO_FS      *VirtioFs;
+  EFI_STATUS     Status;
+
+  VirtioFsFile = VIRTIO_FS_FILE_FROM_SIMPLE_FILE (This);
+  VirtioFs     = VirtioFsFile->OwnerFs;
+
+  if (!VirtioFsFile->IsOpenForWriting) {
+    return EFI_ACCESS_DENIED;
+  }
+
+  //
+  // FUSE_FLUSH is for regular files only.
+  //
+  if (!VirtioFsFile->IsDirectory) {
+    Status = VirtioFsFuseFlush (VirtioFs, VirtioFsFile->NodeId,
+               VirtioFsFile->FuseHandle);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
+
+  Status = VirtioFsFuseFsyncFileOrDir (VirtioFs, VirtioFsFile->NodeId,
+             VirtioFsFile->FuseHandle, VirtioFsFile->IsDirectory);
+  return Status;
 }
