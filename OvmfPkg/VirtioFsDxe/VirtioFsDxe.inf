@@ -86,7 +86,17 @@
   FuseOpenDir.c
   FuseRelease.c
   Helpers.c
+  SimpleFsClose.c
+  SimpleFsDelete.c
+  SimpleFsFlush.c
+  SimpleFsGetInfo.c
+  SimpleFsGetPosition.c
+  SimpleFsOpen.c
   SimpleFsOpenVolume.c
+  SimpleFsRead.c
+  SimpleFsSetInfo.c
+  SimpleFsSetPosition.c
+  SimpleFsWrite.c
   VirtioFsDxe.h
 
 [LibraryClasses]
