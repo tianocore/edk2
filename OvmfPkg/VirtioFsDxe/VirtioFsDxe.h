@@ -159,6 +159,14 @@ VirtioFsErrnoToEfiStatus (
 //
 
 EFI_STATUS
+VirtioFsFuseReleaseFileOrDir (
+  IN OUT VIRTIO_FS *VirtioFs,
+  IN     UINT64    NodeId,
+  IN     UINT64    FuseHandle,
+  IN     BOOLEAN   IsDir
+  );
+
+EFI_STATUS
 VirtioFsFuseInitSession (
   IN OUT VIRTIO_FS *VirtioFs
   );
