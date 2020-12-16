@@ -19,8 +19,8 @@
   }
 
 typedef struct {
-  UINT32 Base;
-  UINT32 Size;
+  UINT64 Base;
+  UINT64 Size;
 } SEV_LAUNCH_SECRET_LOCATION;
 
 extern EFI_GUID gSevLaunchSecretGuid;
