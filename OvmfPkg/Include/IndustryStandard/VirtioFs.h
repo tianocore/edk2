@@ -85,6 +85,7 @@ typedef struct {
 // FUSE operation codes.
 //
 typedef enum {
+  VirtioFsFuseOpForget      =  2,
   VirtioFsFuseOpRelease     = 18,
   VirtioFsFuseOpInit        = 26,
   VirtioFsFuseOpOpenDir     = 27,
@@ -111,6 +112,13 @@ typedef struct {
   INT32  Error;
   UINT64 Unique;
 } VIRTIO_FS_FUSE_RESPONSE;
+
+//
+// Header for VirtioFsFuseOpForget.
+//
+typedef struct {
+  UINT64 NumberOfLookups;
+} VIRTIO_FS_FUSE_FORGET_REQUEST;
 
 //
 // Header for VirtioFsFuseOpRelease and VirtioFsFuseOpReleaseDir.
