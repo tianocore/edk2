@@ -137,6 +137,7 @@ typedef struct {
   BOOLEAN           IsOpenForWriting;
   VIRTIO_FS         *OwnerFs;
   LIST_ENTRY        OpenFilesEntry;
+  CHAR8             *CanonicalPathname;
   //
   // In the FUSE wire protocol, every request except FUSE_INIT refers to a
   // file, namely by the "VIRTIO_FS_FUSE_REQUEST.NodeId" field; that is, by the
