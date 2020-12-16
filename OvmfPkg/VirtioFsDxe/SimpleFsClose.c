@@ -24,19 +24,35 @@ VirtioFsSimpleFileClose (
   VirtioFs     = VirtioFsFile->OwnerFs;
 
   //
-  // At this point, the implementation is only suitable for closing the
-  // VIRTIO_FS_FILE that was created by VirtioFsOpenVolume().
+  // All actions in this function are "best effort"; the UEFI spec requires
+  // EFI_FILE_PROTOCOL.Close() to sync all data to the device, but it also
+  // requires EFI_FILE_PROTOCOL.Close() to release resources unconditionally,
+  // and to return EFI_SUCCESS unconditionally.
   //
-  ASSERT (VirtioFsFile->IsDirectory);
-  ASSERT (VirtioFsFile->NodeId == VIRTIO_FS_FUSE_ROOT_DIR_NODE_ID);
+  // Flush, sync, release, and (if needed) forget. If any action fails, we
+  // still try the others.
   //
-  // Close the root directory.
-  //
-  // Ignore any errors, because EFI_FILE_PROTOCOL.Close() is required to
-  // release the EFI_FILE_PROTOCOL object unconditionally.
-  //
+  if (VirtioFsFile->IsOpenForWriting) {
+    if (!VirtioFsFile->IsDirectory) {
+      VirtioFsFuseFlush (VirtioFs, VirtioFsFile->NodeId,
+        VirtioFsFile->FuseHandle);
+    }
+
+    VirtioFsFuseFsyncFileOrDir (VirtioFs, VirtioFsFile->NodeId,
+      VirtioFsFile->FuseHandle, VirtioFsFile->IsDirectory);
+  }
+
   VirtioFsFuseReleaseFileOrDir (VirtioFs, VirtioFsFile->NodeId,
     VirtioFsFile->FuseHandle, VirtioFsFile->IsDirectory);
+
+  //
+  // VirtioFsFile->FuseHandle is gone at this point, but VirtioFsFile->NodeId
+  // is still valid. If we've known VirtioFsFile->NodeId from a lookup, then
+  // now we should ask the server to forget it *once*.
+  //
+  if (VirtioFsFile->NodeId != VIRTIO_FS_FUSE_ROOT_DIR_NODE_ID) {
+    VirtioFsFuseForget (VirtioFs, VirtioFsFile->NodeId);
+  }
 
   //
   // One fewer file left open for the owner filesystem.
