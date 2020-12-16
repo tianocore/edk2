@@ -6,7 +6,6 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#include <IndustryStandard/Virtio.h>          // VIRTIO_SUBSYSTEM_FILESYSTEM
 #include <Library/BaseLib.h>                  // AsciiStrCmp()
 #include <Library/MemoryAllocationLib.h>      // AllocatePool()
 #include <Library/UefiBootServicesTableLib.h> // gBS
@@ -80,6 +79,17 @@ VirtioFsBindingStart (
     goto FreeVirtioFs;
   }
 
+  Status = VirtioFsInit (VirtioFs);
+  if (EFI_ERROR (Status)) {
+    goto CloseVirtio;
+  }
+
+  Status = gBS->CreateEvent (EVT_SIGNAL_EXIT_BOOT_SERVICES, TPL_CALLBACK,
+                  VirtioFsExitBoot, VirtioFs, &VirtioFs->ExitBoot);
+  if (EFI_ERROR (Status)) {
+    goto UninitVirtioFs;
+  }
+
   VirtioFs->SimpleFs.Revision   = EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_REVISION;
   VirtioFs->SimpleFs.OpenVolume = VirtioFsOpenVolume;
 
@@ -87,10 +97,17 @@ VirtioFsBindingStart (
                   &gEfiSimpleFileSystemProtocolGuid, EFI_NATIVE_INTERFACE,
                   &VirtioFs->SimpleFs);
   if (EFI_ERROR (Status)) {
-    goto CloseVirtio;
+    goto CloseExitBoot;
   }
 
   return EFI_SUCCESS;
+
+CloseExitBoot:
+  CloseStatus = gBS->CloseEvent (VirtioFs->ExitBoot);
+  ASSERT_EFI_ERROR (CloseStatus);
+
+UninitVirtioFs:
+  VirtioFsUninit (VirtioFs);
 
 CloseVirtio:
   CloseStatus = gBS->CloseProtocol (ControllerHandle,
@@ -132,6 +149,11 @@ VirtioFsBindingStop (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
+  Status = gBS->CloseEvent (VirtioFs->ExitBoot);
+  ASSERT_EFI_ERROR (Status);
+
+  VirtioFsUninit (VirtioFs);
 
   Status = gBS->CloseProtocol (ControllerHandle, &gVirtioDeviceProtocolGuid,
                   This->DriverBindingHandle, ControllerHandle);
