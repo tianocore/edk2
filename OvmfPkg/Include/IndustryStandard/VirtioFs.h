@@ -81,6 +81,7 @@ typedef struct {
 //
 typedef enum {
   VirtioFsFuseOpInit        = 26,
+  VirtioFsFuseOpOpenDir     = 27,
 } VIRTIO_FS_FUSE_OPCODE;
 
 #pragma pack (1)
@@ -127,6 +128,20 @@ typedef struct {
   UINT16 MapAlignment;
   UINT32 Unused[8];
 } VIRTIO_FS_FUSE_INIT_RESPONSE;
+
+//
+// Headers for VirtioFsFuseOpOpenDir.
+//
+typedef struct {
+  UINT32 Flags;
+  UINT32 Unused;
+} VIRTIO_FS_FUSE_OPEN_REQUEST;
+
+typedef struct {
+  UINT64 FileHandle;
+  UINT32 OpenFlags;
+  UINT32 Padding;
+} VIRTIO_FS_FUSE_OPEN_RESPONSE;
 #pragma pack ()
 
 #endif // VIRTIO_FS_H_

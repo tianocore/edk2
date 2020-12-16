@@ -83,6 +83,7 @@
 [Sources]
   DriverBinding.c
   FuseInit.c
+  FuseOpenDir.c
   Helpers.c
   SimpleFsOpenVolume.c
   VirtioFsDxe.h
