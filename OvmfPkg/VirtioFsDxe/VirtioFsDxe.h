@@ -48,6 +48,11 @@
 #define VIRTIO_FS_MAX_PATHNAME_LENGTH ((UINTN)65535)
 
 //
+// Maximum value for VIRTIO_FS_FILE.NumFileInfo.
+//
+#define VIRTIO_FS_FILE_MAX_FILE_INFO 256
+
+//
 // Filesystem label encoded in UCS-2, transformed from the UTF-8 representation
 // in "VIRTIO_FS_CONFIG.Tag", and NUL-terminated. Only the printable ASCII code
 // points (U+0020 through U+007E) are supported.
@@ -154,6 +159,20 @@ typedef struct {
   //
   UINT64 NodeId;
   UINT64 FuseHandle;
+  //
+  // EFI_FILE_INFO objects cached for an in-flight directory read.
+  //
+  // For reading through a directory stream with tolerable performance, we have
+  // to call FUSE_READDIRPLUS each time with such a buffer that can deliver a
+  // good number of variable size records (VIRTIO_FS_FUSE_DIRENTPLUS_RESPONSE
+  // elements). Every time we do that, we turn the whole bunch into an array of
+  // EFI_FILE_INFOs immediately. EFI_FILE_PROTOCOL.Read() invocations (on
+  // directories) will be served from this EFI_FILE_INFO cache.
+  //
+  UINT8 *FileInfoArray;
+  UINTN SingleFileInfoSize;
+  UINTN NumFileInfo;
+  UINTN NextFileInfo;
 } VIRTIO_FS_FILE;
 
 #define VIRTIO_FS_FILE_FROM_SIMPLE_FILE(SimpleFileReference) \

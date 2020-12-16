@@ -102,6 +102,9 @@ VirtioFsSimpleFileDelete (
   RemoveEntryList (&VirtioFsFile->OpenFilesEntry);
 
   FreePool (VirtioFsFile->CanonicalPathname);
+  if (VirtioFsFile->FileInfoArray != NULL) {
+    FreePool (VirtioFsFile->FileInfoArray);
+  }
   FreePool (VirtioFsFile);
   return Status;
 }

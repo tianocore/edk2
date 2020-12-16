@@ -482,6 +482,10 @@ VirtioFsSimpleFileOpen (
   NewVirtioFsFile->FilePosition           = 0;
   NewVirtioFsFile->NodeId                 = NewNodeId;
   NewVirtioFsFile->FuseHandle             = NewFuseHandle;
+  NewVirtioFsFile->FileInfoArray          = NULL;
+  NewVirtioFsFile->SingleFileInfoSize     = 0;
+  NewVirtioFsFile->NumFileInfo            = 0;
+  NewVirtioFsFile->NextFileInfo           = 0;
 
   //
   // One more file is now open for the filesystem.
