@@ -299,6 +299,17 @@ VirtioFsFuseOpen (
   );
 
 EFI_STATUS
+VirtioFsFuseReadFileOrDir (
+  IN OUT VIRTIO_FS *VirtioFs,
+  IN     UINT64    NodeId,
+  IN     UINT64    FuseHandle,
+  IN     BOOLEAN   IsDir,
+  IN     UINT64    Offset,
+  IN OUT UINT32    *Size,
+     OUT VOID      *Data
+  );
+
+EFI_STATUS
 VirtioFsFuseStatFs (
   IN OUT VIRTIO_FS                      *VirtioFs,
   IN     UINT64                         NodeId,
