@@ -95,6 +95,7 @@ VirtioFsBindingStart (
     goto UninitVirtioFs;
   }
 
+  InitializeListHead (&VirtioFs->OpenFiles);
   VirtioFs->SimpleFs.Revision   = EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_REVISION;
   VirtioFs->SimpleFs.OpenVolume = VirtioFsOpenVolume;
 
@@ -148,6 +149,10 @@ VirtioFsBindingStop (
   }
 
   VirtioFs = VIRTIO_FS_FROM_SIMPLE_FS (SimpleFs);
+
+  if (!IsListEmpty (&VirtioFs->OpenFiles)) {
+    return EFI_ACCESS_DENIED;
+  }
 
   Status = gBS->UninstallProtocolInterface (ControllerHandle,
                   &gEfiSimpleFileSystemProtocolGuid, SimpleFs);
