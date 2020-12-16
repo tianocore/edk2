@@ -10,6 +10,7 @@
 #include <Guid/FileSystemVolumeLabelInfo.h> // gEfiFileSystemVolumeLabelInfo...
 #include <Library/BaseLib.h>                // StrCmp()
 #include <Library/BaseMemoryLib.h>          // CompareGuid()
+#include <Library/MemoryAllocationLib.h>    // FreePool()
 
 #include "VirtioFsDxe.h"
 
@@ -128,6 +129,237 @@ ValidateInfoStructure (
 }
 
 /**
+  Rename a VIRTIO_FS_FILE as requested in EFI_FILE_INFO.FileName.
+
+  @param[in,out] VirtioFsFile  The VIRTIO_FS_FILE to rename.
+
+  @param[in] NewFileName       The new file name requested by
+                               EFI_FILE_PROTOCOL.SetInfo().
+
+  @retval EFI_SUCCESS        The canonical format destination path that is
+                             determined from the input value of
+                             VirtioFsFile->CanonicalPathname and from
+                             NewFileName is identical to the input value of
+                             VirtioFsFile->CanonicalPathname. This means that
+                             EFI_FILE_INFO does not constitute a rename
+                             request. VirtioFsFile has not been changed.
+
+  @retval EFI_SUCCESS        VirtioFsFile has been renamed.
+                             VirtioFsFile->CanonicalPathname has assumed the
+                             destination pathname in canonical format.
+
+  @retval EFI_ACCESS_DENIED  VirtioFsFile refers to the root directory, and
+                             NewFileName expresses an actual rename/move
+                             request.
+
+  @retval EFI_ACCESS_DENIED  VirtioFsFile is the (possibly indirect) parent
+                             directory of at least one other VIRTIO_FS_FILE
+                             that is open for the same Virtio Filesystem
+                             (identified by VirtioFsFile->OwnerFs). Renaming
+                             VirtioFsFile would invalidate the canonical
+                             pathnames of those VIRTIO_FS_FILE instances;
+                             therefore the request has been rejected.
+
+  @retval EFI_ACCESS_DENIED  VirtioFsFile is not open for writing, but
+                             NewFileName expresses an actual rename/move
+                             request.
+
+  @retval EFI_NOT_FOUND      At least one dot-dot component in NewFileName
+                             attempted to escape the root directory.
+
+  @return                    Error codes propagated from underlying functions.
+**/
+STATIC
+EFI_STATUS
+Rename (
+  IN OUT VIRTIO_FS_FILE *VirtioFsFile,
+  IN     CHAR16         *NewFileName
+  )
+{
+
+  VIRTIO_FS  *VirtioFs;
+  EFI_STATUS Status;
+  CHAR8      *Destination;
+  BOOLEAN    RootEscape;
+  UINT64     OldParentDirNodeId;
+  CHAR8      *OldLastComponent;
+  UINT64     NewParentDirNodeId;
+  CHAR8      *NewLastComponent;
+
+  VirtioFs = VirtioFsFile->OwnerFs;
+
+  //
+  // The root directory cannot be renamed.
+  //
+  if (AsciiStrCmp (VirtioFsFile->CanonicalPathname, "/") == 0) {
+    if (StrCmp (NewFileName, L"") == 0) {
+      //
+      // Not a rename request anyway.
+      //
+      return EFI_SUCCESS;
+    }
+    return EFI_ACCESS_DENIED;
+  }
+
+  //
+  // Compose the canonical pathname for the destination.
+  //
+  Status = VirtioFsComposeRenameDestination (VirtioFsFile->CanonicalPathname,
+             NewFileName, &Destination, &RootEscape);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  if (RootEscape) {
+    Status = EFI_NOT_FOUND;
+    goto FreeDestination;
+  }
+  //
+  // If the rename would leave VirtioFsFile->CanonicalPathname unchanged, then
+  // EFI_FILE_PROTOCOL.SetInfo() isn't asking for a rename actually.
+  //
+  if (AsciiStrCmp (VirtioFsFile->CanonicalPathname, Destination) == 0) {
+    Status = EFI_SUCCESS;
+    goto FreeDestination;
+  }
+  //
+  // Check if the rename would break the canonical pathnames of other
+  // VIRTIO_FS_FILE instances of the same VIRTIO_FS.
+  //
+  if (VirtioFsFile->IsDirectory) {
+    UINTN      PathLen;
+    LIST_ENTRY *OpenFilesEntry;
+
+    PathLen = AsciiStrLen (VirtioFsFile->CanonicalPathname);
+    BASE_LIST_FOR_EACH (OpenFilesEntry, &VirtioFs->OpenFiles) {
+      VIRTIO_FS_FILE *OtherFile;
+
+      OtherFile = VIRTIO_FS_FILE_FROM_OPEN_FILES_ENTRY (OpenFilesEntry);
+      if (OtherFile != VirtioFsFile &&
+          AsciiStrnCmp (VirtioFsFile->CanonicalPathname,
+            OtherFile->CanonicalPathname, PathLen) == 0 &&
+          (OtherFile->CanonicalPathname[PathLen] == '\0' ||
+           OtherFile->CanonicalPathname[PathLen] == '/')) {
+        //
+        // OtherFile refers to the same directory as VirtioFsFile, or is a
+        // (possibly indirect) child of the directory referred to by
+        // VirtioFsFile.
+        //
+        Status = EFI_ACCESS_DENIED;
+        goto FreeDestination;
+      }
+    }
+  }
+  //
+  // From this point on, the file needs to be open for writing.
+  //
+  if (!VirtioFsFile->IsOpenForWriting) {
+    Status = EFI_ACCESS_DENIED;
+    goto FreeDestination;
+  }
+  //
+  // Split both source and destination canonical pathnames into (most specific
+  // parent directory, last component) pairs.
+  //
+  Status = VirtioFsLookupMostSpecificParentDir (VirtioFs,
+             VirtioFsFile->CanonicalPathname, &OldParentDirNodeId,
+             &OldLastComponent);
+  if (EFI_ERROR (Status)) {
+    goto FreeDestination;
+  }
+  Status = VirtioFsLookupMostSpecificParentDir (VirtioFs, Destination,
+             &NewParentDirNodeId, &NewLastComponent);
+  if (EFI_ERROR (Status)) {
+    goto ForgetOldParentDirNodeId;
+  }
+  //
+  // Perform the rename. If the destination path exists, the rename will fail.
+  //
+  Status = VirtioFsFuseRename (VirtioFs, OldParentDirNodeId, OldLastComponent,
+             NewParentDirNodeId, NewLastComponent);
+  if (EFI_ERROR (Status)) {
+    goto ForgetNewParentDirNodeId;
+  }
+
+  //
+  // Swap in the new canonical pathname.
+  //
+  FreePool (VirtioFsFile->CanonicalPathname);
+  VirtioFsFile->CanonicalPathname = Destination;
+  Destination = NULL;
+  Status = EFI_SUCCESS;
+
+  //
+  // Fall through.
+  //
+ForgetNewParentDirNodeId:
+  if (NewParentDirNodeId != VIRTIO_FS_FUSE_ROOT_DIR_NODE_ID) {
+    VirtioFsFuseForget (VirtioFs, NewParentDirNodeId);
+  }
+
+ForgetOldParentDirNodeId:
+  if (OldParentDirNodeId != VIRTIO_FS_FUSE_ROOT_DIR_NODE_ID) {
+    VirtioFsFuseForget (VirtioFs, OldParentDirNodeId);
+  }
+
+FreeDestination:
+  if (Destination != NULL) {
+    FreePool (Destination);
+  }
+  return Status;
+}
+
+/**
+  Process an EFI_FILE_INFO setting request.
+**/
+STATIC
+EFI_STATUS
+SetFileInfo (
+  IN EFI_FILE_PROTOCOL *This,
+  IN UINTN             BufferSize,
+  IN VOID              *Buffer
+  )
+{
+  VIRTIO_FS_FILE *VirtioFsFile;
+  EFI_STATUS     Status;
+  EFI_FILE_INFO  *FileInfo;
+
+  VirtioFsFile = VIRTIO_FS_FILE_FROM_SIMPLE_FILE (This);
+
+  //
+  // Validate if Buffer passes as EFI_FILE_INFO.
+  //
+  Status = ValidateInfoStructure (
+             BufferSize,                    // SizeByProtocolCaller
+             OFFSET_OF (EFI_FILE_INFO,
+               FileName) + sizeof (CHAR16), // MinimumStructSize
+             TRUE,                          // IsSizeByInfoPresent
+             Buffer
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  FileInfo = Buffer;
+
+  //
+  // Perform the rename/move request, if any.
+  //
+  Status = Rename (VirtioFsFile, FileInfo->FileName);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  //
+  // Update any attributes requested.
+  //
+  Status = EFI_UNSUPPORTED;
+  //
+  // The UEFI spec does not speak about partial failure in
+  // EFI_FILE_PROTOCOL.SetInfo(); we won't try to roll back the rename (if
+  // there was one) in case the attribute updates fail.
+  //
+  return Status;
+}
+
+/**
   Process an EFI_FILE_SYSTEM_INFO setting request.
 **/
 STATIC
@@ -230,7 +462,7 @@ VirtioFsSimpleFileSetInfo (
   )
 {
   if (CompareGuid (InformationType, &gEfiFileInfoGuid)) {
-    return EFI_UNSUPPORTED;
+    return SetFileInfo (This, BufferSize, Buffer);
   }
 
   if (CompareGuid (InformationType, &gEfiFileSystemInfoGuid)) {
