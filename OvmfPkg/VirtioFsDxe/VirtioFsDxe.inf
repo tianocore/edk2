@@ -93,6 +93,7 @@
   FuseOpenDir.c
   FuseOpenOrCreate.c
   FuseRelease.c
+  FuseUnlink.c
   Helpers.c
   SimpleFsClose.c
   SimpleFsDelete.c
