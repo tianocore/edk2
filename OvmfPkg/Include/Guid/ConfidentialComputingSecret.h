@@ -6,12 +6,12 @@
    SPDX-License-Identifier: BSD-2-Clause-Patent
  **/
 
-#ifndef SEV_LAUNCH_SECRET_H_
-#define SEV_LAUNCH_SECRET_H_
+#ifndef CONFIDENTIAL_COMPUTING_SECRET_H_
+#define CONFIDENTIAL_COMPUTING_SECRET_H_
 
 #include <Uefi/UefiBaseType.h>
 
-#define SEV_LAUNCH_SECRET_GUID                          \
+#define CONFIDENTIAL_COMPUTING_SECRET_GUID              \
   { 0xadf956ad,                                         \
     0xe98c,                                             \
     0x484c,                                             \
@@ -21,8 +21,8 @@
 typedef struct {
   UINT64 Base;
   UINT64 Size;
-} SEV_LAUNCH_SECRET_LOCATION;
+} CONFIDENTIAL_COMPUTING_SECRET_LOCATION;
 
-extern EFI_GUID gSevLaunchSecretGuid;
+extern EFI_GUID gConfidentialComputingSecretGuid;
 
 #endif // SEV_LAUNCH_SECRET_H_
