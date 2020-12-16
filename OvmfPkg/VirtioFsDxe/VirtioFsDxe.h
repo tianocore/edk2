@@ -235,6 +235,13 @@ VirtioFsLookupMostSpecificParentDir (
   );
 
 EFI_STATUS
+VirtioFsGetBasename (
+  IN     CHAR8  *Path,
+     OUT CHAR16 *Basename     OPTIONAL,
+  IN OUT UINTN  *BasenameSize
+  );
+
+EFI_STATUS
 VirtioFsFuseAttrToEfiFileInfo (
   IN     VIRTIO_FS_FUSE_ATTRIBUTES_RESPONSE *FuseAttr,
      OUT EFI_FILE_INFO                      *FileInfo
