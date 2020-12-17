@@ -4,6 +4,7 @@
 # Device Path Library that layers on top of the Memory Allocation Library.
 #
 # Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) Microsoft Corporation.
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -14,10 +15,11 @@
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = UefiDevicePathLib
   MODULE_UNI_FILE                = UefiDevicePathLib.uni
-  FILE_GUID                      = 91c1677a-e57f-4191-8b8e-eb7711a716e0
-  MODULE_TYPE                    = UEFI_DRIVER
+  FILE_GUID                      = D8E58437-44D3-4154-B7A7-EB794923EF12
+  MODULE_TYPE                    = MM_STANDALONE
+  PI_SPECIFICATION_VERSION       = 0x00010032
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = DevicePathLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER SMM_CORE MM_STANDALONE
+  LIBRARY_CLASS                  = DevicePathLib | MM_STANDALONE MM_CORE_STANDALONE
 
 
 #
@@ -26,7 +28,7 @@
 
 [Sources]
   DevicePathUtilities.c
-  DevicePathUtilitiesDxeSmm.c
+  DevicePathUtilitiesStandaloneMm.c
   DevicePathToText.c
   DevicePathFromText.c
   UefiDevicePathLib.c
@@ -34,7 +36,6 @@
 
 [Packages]
   MdePkg/MdePkg.dec
-
 
 [LibraryClasses]
   BaseLib
@@ -72,4 +73,3 @@
 
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdMaximumDevicePathNodeCount    ## SOMETIMES_CONSUMES
-
