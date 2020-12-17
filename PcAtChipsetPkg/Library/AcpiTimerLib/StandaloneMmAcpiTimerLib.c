@@ -7,7 +7,7 @@
 
 **/
 
-#include <PiDxe.h>
+#include <PiMm.h>
 
 #include "DxeStandaloneMmAcpiTimerLib.h"
 
@@ -22,9 +22,9 @@
 **/
 EFI_STATUS
 EFIAPI
-DxeAcpiTimerLibConstructor (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
+StandaloneMmAcpiTimerLibConstructor (
+  IN EFI_HANDLE           ImageHandle,
+  IN EFI_MM_SYSTEM_TABLE  *SystemTable
   )
 {
   return CommonAcpiTimerLibConstructor ();
