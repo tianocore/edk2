@@ -196,7 +196,7 @@ class Ui(Image):
         return len(self)
 
     def _GetUiString(self):
-        return codecs.utf_16_decode(self[0:-2].tostring())[0]
+        return codecs.utf_16_decode(self[0:-2].tobytes())[0]
 
     String = property(_GetUiString)
 
