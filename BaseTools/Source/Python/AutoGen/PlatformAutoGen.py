@@ -1037,8 +1037,7 @@ class PlatformAutoGen(AutoGen):
                 TokenNumber += 1
 
         for Pcd in self.NonDynamicPcdList:
-            RetVal[Pcd.TokenCName, Pcd.TokenSpaceGuidCName] = TokenNumber
-            TokenNumber += 1
+            RetVal[Pcd.TokenCName, Pcd.TokenSpaceGuidCName] = 0
         return RetVal
 
     @cached_property
