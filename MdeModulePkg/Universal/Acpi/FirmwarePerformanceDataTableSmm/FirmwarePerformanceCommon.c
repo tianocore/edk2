@@ -1,11 +1,11 @@
 /** @file
-  This module collects performance data for SMM driver boot records and S3 Suspend Performance Record.
+  This module collects performance data for MM driver boot records and S3 Suspend Performance Record.
 
   This module registers report status code listener to collect performance data
-  for SMM driver boot records and S3 Suspend Performance Record.
+  for MM driver boot records and S3 Suspend Performance Record.
 
   Caution: This module requires additional review when modified.
-  This driver will have external input - communicate buffer in SMM mode.
+  This driver will have external input - communicate buffer in MM mode.
   This external input must be validated carefully to avoid security issue like
   buffer overflow, integer overflow.
 
@@ -16,13 +16,13 @@
 
 **/
 
-#include <PiSmm.h>
+#include <PiMm.h>
 
-#include <Protocol/SmmReportStatusCodeHandler.h>
+#include <Protocol/MmReportStatusCodeHandler.h>
 
 #include <Guid/FirmwarePerformance.h>
 
-#include <Library/SmmServicesTableLib.h>
+#include <Library/MmServicesTableLib.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/TimerLib.h>
@@ -30,23 +30,22 @@
 #include <Library/PcdLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
-#include <Library/UefiBootServicesTableLib.h>
 #include <Library/SynchronizationLib.h>
-#include <Library/SmmMemLib.h>
+#include "FirmwarePerformanceCommon.h"
 
-SMM_BOOT_PERFORMANCE_TABLE    *mSmmBootPerformanceTable = NULL;
+SMM_BOOT_PERFORMANCE_TABLE    *mMmBootPerformanceTable = NULL;
 
-EFI_SMM_RSC_HANDLER_PROTOCOL  *mRscHandlerProtocol    = NULL;
+EFI_MM_RSC_HANDLER_PROTOCOL   *mRscHandlerProtocol    = NULL;
 UINT64                        mSuspendStartTime       = 0;
 BOOLEAN                       mS3SuspendLockBoxSaved  = FALSE;
 UINT32                        mBootRecordSize = 0;
 UINT8                         *mBootRecordBuffer = NULL;
 
-SPIN_LOCK                     mSmmFpdtLock;
-BOOLEAN                       mSmramIsOutOfResource = FALSE;
+SPIN_LOCK                     mMmFpdtLock;
+BOOLEAN                       mMmramIsOutOfResource = FALSE;
 
 /**
-  Report status code listener for SMM. This is used to record the performance
+  Report status code listener for MM. This is used to record the performance
   data for S3 Suspend Start and S3 Suspend End in FPDT.
 
   @param[in]  CodeType            Indicates the type of status code being reported.
@@ -66,7 +65,7 @@ BOOLEAN                       mSmramIsOutOfResource = FALSE;
 **/
 EFI_STATUS
 EFIAPI
-FpdtStatusCodeListenerSmm (
+FpdtStatusCodeListenerMm (
   IN EFI_STATUS_CODE_TYPE     CodeType,
   IN EFI_STATUS_CODE_VALUE    Value,
   IN UINT32                   Instance,
@@ -89,19 +88,19 @@ FpdtStatusCodeListenerSmm (
   // Collect one or more Boot records in boot time
   //
   if (Data != NULL && CompareGuid (&Data->Type, &gEdkiiFpdtExtendedFirmwarePerformanceGuid)) {
-    AcquireSpinLock (&mSmmFpdtLock);
+    AcquireSpinLock (&mMmFpdtLock);
     //
     // Get the boot performance data.
     //
-    CopyMem (&mSmmBootPerformanceTable, Data + 1, Data->Size);
-    mBootRecordBuffer = ((UINT8 *) (mSmmBootPerformanceTable)) + sizeof (SMM_BOOT_PERFORMANCE_TABLE);
+    CopyMem (&mMmBootPerformanceTable, Data + 1, Data->Size);
+    mBootRecordBuffer = ((UINT8 *) (mMmBootPerformanceTable)) + sizeof (SMM_BOOT_PERFORMANCE_TABLE);
 
-    ReleaseSpinLock (&mSmmFpdtLock);
+    ReleaseSpinLock (&mMmFpdtLock);
     return EFI_SUCCESS;
   }
 
   if (Data != NULL && CompareGuid (&Data->Type, &gEfiFirmwarePerformanceGuid)) {
-    DEBUG ((DEBUG_ERROR, "FpdtStatusCodeListenerSmm: Performance data reported through gEfiFirmwarePerformanceGuid will not be collected by FirmwarePerformanceDataTableSmm\n"));
+    DEBUG ((DEBUG_ERROR, "FpdtStatusCodeListenerMm: Performance data reported through gEfiFirmwarePerformanceGuid will not be collected by FirmwarePerformanceDataTableMm\n"));
     return EFI_UNSUPPORTED;
   }
 
@@ -157,7 +156,7 @@ FpdtStatusCodeListenerSmm (
 /**
   Communication service SMI Handler entry.
 
-  This SMI handler provides services for report SMM boot records.
+  This SMI handler provides services for report MM boot records.
 
   Caution: This function may receive untrusted input.
   Communicate buffer and buffer size are external input, so this function will do basic validation.
@@ -166,7 +165,7 @@ FpdtStatusCodeListenerSmm (
   @param[in]     RegisterContext Points to an optional handler context which was specified when the
                                  handler was registered.
   @param[in, out] CommBuffer     A pointer to a collection of data in memory that will
-                                 be conveyed from a non-SMM environment into an SMM environment.
+                                 be conveyed from a non-MM environment into an MM environment.
   @param[in, out] CommBufferSize The size of the CommBuffer.
 
   @retval EFI_SUCCESS                         The interrupt was handled and quiesced. No other handlers
@@ -207,8 +206,8 @@ FpdtSmiHandler (
     return EFI_SUCCESS;
   }
 
-  if (!SmmIsBufferOutsideSmmValid ((UINTN)CommBuffer, TempCommBufferSize)) {
-    DEBUG ((EFI_D_ERROR, "FpdtSmiHandler: SMM communication data buffer in SMRAM or overflow!\n"));
+  if (!IsBufferOutsideMmValid ((UINTN)CommBuffer, TempCommBufferSize)) {
+    DEBUG ((DEBUG_ERROR, "FpdtSmiHandler: MM communication data buffer in MMRAM or overflow!\n"));
     return EFI_SUCCESS;
   }
 
@@ -218,8 +217,8 @@ FpdtSmiHandler (
 
   switch (SmmCommData->Function) {
     case SMM_FPDT_FUNCTION_GET_BOOT_RECORD_SIZE :
-      if (mSmmBootPerformanceTable != NULL) {
-        mBootRecordSize = mSmmBootPerformanceTable->Header.Length - sizeof (SMM_BOOT_PERFORMANCE_TABLE);
+      if (mMmBootPerformanceTable != NULL) {
+        mBootRecordSize = mMmBootPerformanceTable->Header.Length - sizeof (SMM_BOOT_PERFORMANCE_TABLE);
       }
       SmmCommData->BootRecordSize = mBootRecordSize;
       break;
@@ -244,8 +243,8 @@ FpdtSmiHandler (
         BootRecordSize = mBootRecordSize - BootRecordOffset;
       }
       SmmCommData->BootRecordSize = BootRecordSize;
-      if (!SmmIsBufferOutsideSmmValid ((UINTN)BootRecordData, BootRecordSize)) {
-        DEBUG ((EFI_D_ERROR, "FpdtSmiHandler: SMM Data buffer in SMRAM or overflow!\n"));
+      if (!IsBufferOutsideMmValid ((UINTN)BootRecordData, BootRecordSize)) {
+        DEBUG ((DEBUG_ERROR, "FpdtSmiHandler: MM Data buffer in MMRAM or overflow!\n"));
         Status = EFI_ACCESS_DENIED;
         break;
       }
@@ -267,20 +266,15 @@ FpdtSmiHandler (
 }
 
 /**
-  The module Entry Point of the Firmware Performance Data Table SMM driver.
-
-  @param[in]  ImageHandle    The firmware allocated handle for the EFI image.
-  @param[in]  SystemTable    A pointer to the EFI System Table.
+  The module Entry Point of the Firmware Performance Data Table MM driver.
 
   @retval EFI_SUCCESS    The entry point is executed successfully.
   @retval Other          Some error occurs when executing this entry point.
 
 **/
 EFI_STATUS
-EFIAPI
-FirmwarePerformanceSmmEntryPoint (
-  IN EFI_HANDLE          ImageHandle,
-  IN EFI_SYSTEM_TABLE    *SystemTable
+FirmwarePerformanceCommonEntryPoint (
+  VOID
   )
 {
   EFI_STATUS                Status;
@@ -289,13 +283,13 @@ FirmwarePerformanceSmmEntryPoint (
   //
   // Initialize spin lock
   //
-  InitializeSpinLock (&mSmmFpdtLock);
+  InitializeSpinLock (&mMmFpdtLock);
 
   //
-  // Get SMM Report Status Code Handler Protocol.
+  // Get MM Report Status Code Handler Protocol.
   //
-  Status = gSmst->SmmLocateProtocol (
-                    &gEfiSmmRscHandlerProtocolGuid,
+  Status = gMmst->MmLocateProtocol (
+                    &gEfiMmRscHandlerProtocolGuid,
                     NULL,
                     (VOID **) &mRscHandlerProtocol
                     );
@@ -304,14 +298,14 @@ FirmwarePerformanceSmmEntryPoint (
   //
   // Register report status code listener for BootRecords and S3 Suspend Start and End.
   //
-  Status = mRscHandlerProtocol->Register (FpdtStatusCodeListenerSmm);
+  Status = mRscHandlerProtocol->Register (FpdtStatusCodeListenerMm);
   ASSERT_EFI_ERROR (Status);
 
   //
   // Register SMI handler.
   //
   Handle = NULL;
-  Status = gSmst->SmiHandlerRegister (FpdtSmiHandler, &gEfiFirmwarePerformanceGuid, &Handle);
+  Status = gMmst->MmiHandlerRegister (FpdtSmiHandler, &gEfiFirmwarePerformanceGuid, &Handle);
   ASSERT_EFI_ERROR (Status);
 
   return Status;
