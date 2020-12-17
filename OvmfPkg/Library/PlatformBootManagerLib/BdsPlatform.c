@@ -29,7 +29,10 @@ UINT16        mHostBridgeDevId;
 // (for configuring PCI Interrupt Line register)
 //
 CONST UINT8 PciHostIrqs[] = {
-  0x0a, 0x0a, 0x0b, 0x0b
+  0x0a, // LNKA, LNKE
+  0x0a, // LNKB, LNKF
+  0x0b, // LNKC, LNKG
+  0x0b  // LNKD, LNKH
 };
 
 //
@@ -1211,24 +1214,24 @@ PciAcpiInitialization (
       //
       // 00:01.0 ISA Bridge (PIIX4) LNK routing targets
       //
-      PciWrite8 (PCI_LIB_ADDRESS (0, 1, 0, 0x60), 0x0b); // A
-      PciWrite8 (PCI_LIB_ADDRESS (0, 1, 0, 0x61), 0x0b); // B
-      PciWrite8 (PCI_LIB_ADDRESS (0, 1, 0, 0x62), 0x0a); // C
-      PciWrite8 (PCI_LIB_ADDRESS (0, 1, 0, 0x63), 0x0a); // D
+      PciWrite8 (PCI_LIB_ADDRESS (0, 1, 0, 0x60), PciHostIrqs[0]); // A
+      PciWrite8 (PCI_LIB_ADDRESS (0, 1, 0, 0x61), PciHostIrqs[1]); // B
+      PciWrite8 (PCI_LIB_ADDRESS (0, 1, 0, 0x62), PciHostIrqs[2]); // C
+      PciWrite8 (PCI_LIB_ADDRESS (0, 1, 0, 0x63), PciHostIrqs[3]); // D
       break;
     case INTEL_Q35_MCH_DEVICE_ID:
       Pmba = POWER_MGMT_REGISTER_Q35 (ICH9_PMBASE);
       //
       // 00:1f.0 LPC Bridge (Q35) LNK routing targets
       //
-      PciWrite8 (PCI_LIB_ADDRESS (0, 0x1f, 0, 0x60), 0x0a); // A
-      PciWrite8 (PCI_LIB_ADDRESS (0, 0x1f, 0, 0x61), 0x0a); // B
-      PciWrite8 (PCI_LIB_ADDRESS (0, 0x1f, 0, 0x62), 0x0b); // C
-      PciWrite8 (PCI_LIB_ADDRESS (0, 0x1f, 0, 0x63), 0x0b); // D
-      PciWrite8 (PCI_LIB_ADDRESS (0, 0x1f, 0, 0x68), 0x0a); // E
-      PciWrite8 (PCI_LIB_ADDRESS (0, 0x1f, 0, 0x69), 0x0a); // F
-      PciWrite8 (PCI_LIB_ADDRESS (0, 0x1f, 0, 0x6a), 0x0b); // G
-      PciWrite8 (PCI_LIB_ADDRESS (0, 0x1f, 0, 0x6b), 0x0b); // H
+      PciWrite8 (PCI_LIB_ADDRESS (0, 0x1f, 0, 0x60), PciHostIrqs[0]); // A
+      PciWrite8 (PCI_LIB_ADDRESS (0, 0x1f, 0, 0x61), PciHostIrqs[1]); // B
+      PciWrite8 (PCI_LIB_ADDRESS (0, 0x1f, 0, 0x62), PciHostIrqs[2]); // C
+      PciWrite8 (PCI_LIB_ADDRESS (0, 0x1f, 0, 0x63), PciHostIrqs[3]); // D
+      PciWrite8 (PCI_LIB_ADDRESS (0, 0x1f, 0, 0x68), PciHostIrqs[0]); // E
+      PciWrite8 (PCI_LIB_ADDRESS (0, 0x1f, 0, 0x69), PciHostIrqs[1]); // F
+      PciWrite8 (PCI_LIB_ADDRESS (0, 0x1f, 0, 0x6a), PciHostIrqs[2]); // G
+      PciWrite8 (PCI_LIB_ADDRESS (0, 0x1f, 0, 0x6b), PciHostIrqs[3]); // H
       break;
     default:
       if (XenDetected ()) {
