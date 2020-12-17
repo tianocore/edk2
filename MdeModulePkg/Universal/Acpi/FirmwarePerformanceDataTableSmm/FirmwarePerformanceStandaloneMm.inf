@@ -5,19 +5,19 @@
 #  for SMM boot performance records and S3 Suspend Performance Record.
 #
 #  Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) Microsoft Corporation.
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = FirmwarePerformanceSmm
-  MODULE_UNI_FILE                = FirmwarePerformanceSmm.uni
-  FILE_GUID                      = 044310AB-77FD-402a-AF1A-87D4120E7329
-  MODULE_TYPE                    = DXE_SMM_DRIVER
+  BASE_NAME                      = FirmwarePerformanceStandaloneMm
+  FILE_GUID                      = 827AC29D-E52D-4B1A-874A-C6577E0699CF
+  MODULE_TYPE                    = MM_STANDALONE
   VERSION_STRING                 = 1.0
-  PI_SPECIFICATION_VERSION       = 0x0001000A
-  ENTRY_POINT                    = FirmwarePerformanceSmmEntryPoint
+  PI_SPECIFICATION_VERSION       = 0x00010032
+  ENTRY_POINT                    = FirmwarePerformanceStandaloneMmEntryPoint
 
 #
 # The following information is for reference only and not required by the build tools.
@@ -28,14 +28,15 @@
 [Sources]
   FirmwarePerformanceCommon.c
   FirmwarePerformanceCommon.h
-  FirmwarePerformanceTraditional.c
+  FirmwarePerformanceStandaloneMm.c
 
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
+  StandaloneMmPkg/StandaloneMmPkg.dec
 
 [LibraryClasses]
-  UefiDriverEntryPoint
+  StandaloneMmDriverEntryPoint
   MmServicesTableLib
   BaseLib
   DebugLib
@@ -45,7 +46,7 @@
   BaseMemoryLib
   MemoryAllocationLib
   SynchronizationLib
-  SmmMemLib
+  MemLib
 
 [Protocols]
   gEfiMmRscHandlerProtocolGuid                 ## CONSUMES
@@ -63,6 +64,3 @@
 
 [Depex]
   gEfiMmRscHandlerProtocolGuid
-
-[UserExtensions.TianoCore."ExtraFiles"]
-  FirmwarePerformanceSmmExtra.uni
