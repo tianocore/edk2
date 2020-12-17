@@ -53,6 +53,7 @@
   PcAtChipsetPkg/Library/AcpiTimerLib/BaseAcpiTimerLib.inf
   PcAtChipsetPkg/Library/AcpiTimerLib/DxeAcpiTimerLib.inf
   PcAtChipsetPkg/Library/AcpiTimerLib/PeiAcpiTimerLib.inf
+  PcAtChipsetPkg/Library/AcpiTimerLib/StandaloneMmAcpiTimerLib.inf
   PcAtChipsetPkg/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf
 
 [BuildOptions]
