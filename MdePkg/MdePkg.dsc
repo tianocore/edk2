@@ -109,6 +109,7 @@
   MdePkg/Library/UefiDebugLibDebugPortProtocol/UefiDebugLibDebugPortProtocol.inf
   MdePkg/Library/UefiDebugLibStdErr/UefiDebugLibStdErr.inf
   MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
+  MdePkg/Library/UefiDevicePathLib/UefiDevicePathLibStandaloneMm.inf
   MdePkg/Library/UefiDevicePathLib/UefiDevicePathLibOptionalDevicePathProtocol.inf
   MdePkg/Library/UefiDevicePathLibDevicePathProtocol/UefiDevicePathLibDevicePathProtocol.inf
   MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
