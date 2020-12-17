@@ -8,19 +8,20 @@
 #  This external input must be validated carefully to avoid security issue.
 #
 # Copyright (c) 2015 - 2020, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) Microsoft Corporation.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = SmmTcg2PhysicalPresenceLib
-  MODULE_UNI_FILE                = SmmTcg2PhysicalPresenceLib.uni
-  FILE_GUID                      = AAE02741-858B-4964-9887-CA870489D944
-  MODULE_TYPE                    = DXE_SMM_DRIVER
+  BASE_NAME                      = StandaloneMmTcg2PhysicalPresenceLib
+  FILE_GUID                      = 75E3D07B-689C-4F42-A8A0-46AFAE868A6F
+  MODULE_TYPE                    = MM_STANDALONE
+  PI_SPECIFICATION_VERSION       = 0x00010032
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = Tcg2PhysicalPresenceLib|DXE_SMM_DRIVER
-  CONSTRUCTOR                    = Tcg2PhysicalPresenceLibTraditionalConstructor
+  LIBRARY_CLASS                  = Tcg2PhysicalPresenceLib|MM_STANDALONE
+  CONSTRUCTOR                    = Tcg2PhysicalPresenceLibStandaloneMmConstructor
 
 #
 # The following information is for reference only and not required by the build tools.
@@ -29,7 +30,7 @@
 #
 
 [Sources]
-  SmmTcg2PhysicalPresenceLib.c
+  StandaloneMmTcg2PhysicalPresenceLib.c
   MmTcg2PhysicalPresenceLibCommon.c
   MmTcg2PhysicalPresenceLibCommon.h
 
@@ -49,6 +50,9 @@
   ## SOMETIMES_CONSUMES ## Variable:L"PhysicalPresence"
   ## SOMETIMES_CONSUMES ## Variable:L"PhysicalPresenceFlags"
   gEfiTcg2PhysicalPresenceGuid
+
+[Protocols]
+  gEfiSmmVariableProtocolGuid                                       ## CONSUMES
 
 [Pcd]
   gEfiSecurityPkgTokenSpaceGuid.PcdTcgPhysicalPresenceInterfaceVer  ## CONSUMES

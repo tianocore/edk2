@@ -11,11 +11,12 @@
   will receive untrusted input and do validation.
 
 Copyright (c) 2015 - 2020, Intel Corporation. All rights reserved.<BR>
+Copyright (c) Microsoft Corporation.
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include <PiSmm.h>
+#include <PiMm.h>
 
 #include "MmTcg2PhysicalPresenceLibCommon.h"
 
@@ -32,9 +33,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 EFI_STATUS
 EFIAPI
-Tcg2PhysicalPresenceLibTraditionalConstructor (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
+Tcg2PhysicalPresenceLibStandaloneMmConstructor (
+  IN EFI_HANDLE           ImageHandle,
+  IN EFI_MM_SYSTEM_TABLE  *SystemTable
   )
 {
   return Tcg2PhysicalPresenceLibCommonConstructor ();
