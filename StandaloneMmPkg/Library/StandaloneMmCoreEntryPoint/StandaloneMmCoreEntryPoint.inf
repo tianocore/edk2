@@ -1,7 +1,7 @@
 ## @file
 # Module entry point library for DXE core.
 #
-# Copyright (c) 2017 - 2018, ARM Ltd. All rights reserved.<BR>
+# Copyright (c) 2017 - 2021, Arm Ltd. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -33,7 +33,6 @@
 
 [Packages.AARCH64]
   ArmPkg/ArmPkg.dec
-  ArmPlatformPkg/ArmPlatformPkg.dec
 
 [LibraryClasses]
   BaseLib
