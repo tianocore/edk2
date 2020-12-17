@@ -12,9 +12,17 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Common/UefiBaseTypes.h>
 #include <Common/BuildVersion.h>
 #include <assert.h>
+#ifndef _WIN32
+#include <limits.h>
+#endif
+
 #define PRINTED_GUID_BUFFER_SIZE  37  // including null-termination
 
+#ifdef PATH_MAX
+#define MAX_LONG_FILE_PATH PATH_MAX
+#else
 #define MAX_LONG_FILE_PATH 500
+#endif
 
 #define MAX_UINT64 ((UINT64)0xFFFFFFFFFFFFFFFFULL)
 #define MAX_UINT32 ((UINT32)0xFFFFFFFF)
