@@ -1,0 +1,44 @@
+##  @file
+#   Library for REST EX Protocol
+#
+#   (C) Copyright 2020 Hewlett Packard Enterprise Development LP<BR>
+#   SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001b
+  BASE_NAME                      = DxeRestExLib
+  FILE_GUID                      = E9CBF727-8AF3-4602-9DBD-A3942869B5AE
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = RestExLib | DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_APPLICATION UEFI_DRIVER
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC RISCV64
+#
+
+[Sources.common]
+  DxeRestExLib.c
+
+[Packages]
+  NetworkPkg/NetworkPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  DevicePathLib
+  MemoryAllocationLib
+  NetLib
+  PrintLib
+  UefiLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+
+[Protocols]
+  gEfiRestExServiceBindingProtocolGuid ## PROTOCOL ALWAYS_CONSUMED
+  gEfiRestExProtocolGuid               ## PROTOCOL ALWAYS_CONSUMED
+
