@@ -6,16 +6,16 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include <PiSmm.h>
-#include <Library/SmmServicesTableLib.h>
+#include <PiMm.h>
+#include <Library/MmServicesTableLib.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/LockBoxLib.h>
 #include <Library/DebugLib.h>
 #include <Guid/SmmLockBox.h>
 #include <Guid/EndOfS3Resume.h>
-#include <Protocol/SmmReadyToLock.h>
-#include <Protocol/SmmEndOfDxe.h>
+#include <Protocol/MmReadyToLock.h>
+#include <Protocol/MmEndOfDxe.h>
 #include <Protocol/SmmSxDispatch2.h>
 
 #include "SmmLockBoxLibPrivate.h"
@@ -49,13 +49,13 @@ InternalGetSmmLockBoxContext (
   //
   // Check if gEfiSmmLockBoxCommunicationGuid is installed by someone
   //
-  for (Index = 0; Index < gSmst->NumberOfTableEntries; Index++) {
-    if (CompareGuid (&gSmst->SmmConfigurationTable[Index].VendorGuid, &gEfiSmmLockBoxCommunicationGuid)) {
+  for (Index = 0; Index < gMmst->NumberOfTableEntries; Index++) {
+    if (CompareGuid (&gMmst->MmConfigurationTable[Index].VendorGuid, &gEfiSmmLockBoxCommunicationGuid)) {
       //
       // Found. That means some other library instance is already run.
       // No need to install again, just return.
       //
-      return (SMM_LOCK_BOX_CONTEXT *)gSmst->SmmConfigurationTable[Index].VendorTable;
+      return (SMM_LOCK_BOX_CONTEXT *)gMmst->MmConfigurationTable[Index].VendorTable;
     }
   }
 
@@ -142,8 +142,8 @@ SmmLockBoxSmmEndOfDxeNotify (
   //
   // Locate SmmSxDispatch2 protocol.
   //
-  Status = gSmst->SmmLocateProtocol (
-                    &gEfiSmmSxDispatch2ProtocolGuid,
+  Status = gMmst->MmLocateProtocol (
+                    &gEfiMmSxDispatchProtocolGuid,
                     NULL,
                     (VOID **)&SxDispatch
                     );
@@ -191,29 +191,24 @@ SmmLockBoxEndOfS3ResumeNotify (
   Constructor for SmmLockBox library.
   This is used to set SmmLockBox context, which will be used in PEI phase in S3 boot path later.
 
-  @param[in] ImageHandle  Image handle of this driver.
-  @param[in] SystemTable  A Pointer to the EFI System Table.
-
   @retval EFI_SUCEESS
   @return Others          Some error occurs.
 **/
 EFI_STATUS
-EFIAPI
-SmmLockBoxSmmConstructor (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
+SmmLockBoxMmConstructor (
+  VOID
   )
 {
   EFI_STATUS           Status;
   SMM_LOCK_BOX_CONTEXT *SmmLockBoxContext;
 
-  DEBUG ((DEBUG_INFO, "SmmLockBoxSmmLib SmmLockBoxSmmConstructor - Enter\n"));
+  DEBUG ((DEBUG_INFO, "SmmLockBoxSmmLib SmmLockBoxMmConstructor - Enter\n"));
 
   //
   // Register SmmReadyToLock notification.
   //
-  Status = gSmst->SmmRegisterProtocolNotify (
-                    &gEfiSmmReadyToLockProtocolGuid,
+  Status = gMmst->MmRegisterProtocolNotify (
+                    &gEfiMmReadyToLockProtocolGuid,
                     SmmLockBoxSmmReadyToLockNotify,
                     &mSmmLockBoxRegistrationSmmReadyToLock
                     );
@@ -222,8 +217,8 @@ SmmLockBoxSmmConstructor (
   //
   // Register SmmEndOfDxe notification.
   //
-  Status = gSmst->SmmRegisterProtocolNotify (
-                    &gEfiSmmEndOfDxeProtocolGuid,
+  Status = gMmst->MmRegisterProtocolNotify (
+                    &gEfiMmEndOfDxeProtocolGuid,
                     SmmLockBoxSmmEndOfDxeNotify,
                     &mSmmLockBoxRegistrationSmmEndOfDxe
                     );
@@ -232,7 +227,7 @@ SmmLockBoxSmmConstructor (
   //
   // Register EndOfS3Resume notification.
   //
-  Status = gSmst->SmmRegisterProtocolNotify (
+  Status = gMmst->MmRegisterProtocolNotify (
                     &gEdkiiEndOfS3ResumeGuid,
                     SmmLockBoxEndOfS3ResumeNotify,
                     &mSmmLockBoxRegistrationEndOfS3Resume
@@ -249,7 +244,7 @@ SmmLockBoxSmmConstructor (
     // No need to install again, just return.
     //
     DEBUG ((DEBUG_INFO, "SmmLockBoxSmmLib SmmLockBoxContext - already installed\n"));
-    DEBUG ((DEBUG_INFO, "SmmLockBoxSmmLib SmmLockBoxSmmConstructor - Exit\n"));
+    DEBUG ((DEBUG_INFO, "SmmLockBoxSmmLib SmmLockBoxMmConstructor - Exit\n"));
     return EFI_SUCCESS;
   }
 
@@ -263,8 +258,8 @@ SmmLockBoxSmmConstructor (
   }
   mSmmLockBoxContext.LockBoxDataAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)&mLockBoxQueue;
 
-  Status = gSmst->SmmInstallConfigurationTable (
-                    gSmst,
+  Status = gMmst->MmInstallConfigurationTable (
+                    gMmst,
                     &gEfiSmmLockBoxCommunicationGuid,
                     &mSmmLockBoxContext,
                     sizeof(mSmmLockBoxContext)
@@ -274,7 +269,7 @@ SmmLockBoxSmmConstructor (
 
   DEBUG ((DEBUG_INFO, "SmmLockBoxSmmLib SmmLockBoxContext - %x\n", (UINTN)&mSmmLockBoxContext));
   DEBUG ((DEBUG_INFO, "SmmLockBoxSmmLib LockBoxDataAddress - %x\n", (UINTN)&mLockBoxQueue));
-  DEBUG ((DEBUG_INFO, "SmmLockBoxSmmLib SmmLockBoxSmmConstructor - Exit\n"));
+  DEBUG ((DEBUG_INFO, "SmmLockBoxSmmLib SmmLockBoxMmConstructor - Exit\n"));
 
   return Status;
 }
@@ -284,26 +279,21 @@ SmmLockBoxSmmConstructor (
   This is used to uninstall SmmLockBoxCommunication configuration table
   if it has been installed in Constructor.
 
-  @param[in] ImageHandle    Image handle of this driver.
-  @param[in] SystemTable    A Pointer to the EFI System Table.
-
   @retval EFI_SUCEESS       The destructor always returns EFI_SUCCESS.
 
 **/
 EFI_STATUS
-EFIAPI
-SmmLockBoxSmmDestructor (
-  IN EFI_HANDLE         ImageHandle,
-  IN EFI_SYSTEM_TABLE   *SystemTable
+SmmLockBoxMmDestructor (
+  VOID
   )
 {
   EFI_STATUS            Status;
 
-  DEBUG ((DEBUG_INFO, "SmmLockBoxSmmLib SmmLockBoxSmmDestructor in %a module\n", gEfiCallerBaseName));
+  DEBUG ((DEBUG_INFO, "SmmLockBoxSmmLib SmmLockBoxMmDestructor in %a module\n", gEfiCallerBaseName));
 
   if (mSmmConfigurationTableInstalled) {
-    Status = gSmst->SmmInstallConfigurationTable (
-                      gSmst,
+    Status = gMmst->MmInstallConfigurationTable (
+                      gMmst,
                       &gEfiSmmLockBoxCommunicationGuid,
                       NULL,
                       0
@@ -316,8 +306,8 @@ SmmLockBoxSmmDestructor (
     //
     // Unregister SmmReadyToLock notification.
     //
-    Status = gSmst->SmmRegisterProtocolNotify (
-                      &gEfiSmmReadyToLockProtocolGuid,
+    Status = gMmst->MmRegisterProtocolNotify (
+                      &gEfiMmReadyToLockProtocolGuid,
                       NULL,
                       &mSmmLockBoxRegistrationSmmReadyToLock
                       );
@@ -327,8 +317,8 @@ SmmLockBoxSmmDestructor (
     //
     // Unregister SmmEndOfDxe notification.
     //
-    Status = gSmst->SmmRegisterProtocolNotify (
-                      &gEfiSmmEndOfDxeProtocolGuid,
+    Status = gMmst->MmRegisterProtocolNotify (
+                      &gEfiMmEndOfDxeProtocolGuid,
                       NULL,
                       &mSmmLockBoxRegistrationSmmEndOfDxe
                       );
@@ -338,7 +328,7 @@ SmmLockBoxSmmDestructor (
     //
     // Unregister EndOfS3Resume notification.
     //
-    Status = gSmst->SmmRegisterProtocolNotify (
+    Status = gMmst->MmRegisterProtocolNotify (
                       &gEdkiiEndOfS3ResumeGuid,
                       NULL,
                       &mSmmLockBoxRegistrationEndOfS3Resume
@@ -453,7 +443,7 @@ SaveLockBox (
   //
   // Allocate SMRAM buffer
   //
-  Status = gSmst->SmmAllocatePages (
+  Status = gMmst->MmAllocatePages (
                     AllocateAnyPages,
                     EfiRuntimeServicesData,
                     EFI_SIZE_TO_PAGES (Length),
@@ -468,14 +458,14 @@ SaveLockBox (
   //
   // Allocate LockBox
   //
-  Status = gSmst->SmmAllocatePool (
+  Status = gMmst->MmAllocatePool (
                     EfiRuntimeServicesData,
                     sizeof(*LockBox),
                     (VOID **)&LockBox
                     );
   ASSERT_EFI_ERROR (Status);
   if (EFI_ERROR (Status)) {
-    gSmst->SmmFreePages (SmramBuffer, EFI_SIZE_TO_PAGES (Length));
+    gMmst->MmFreePages (SmramBuffer, EFI_SIZE_TO_PAGES (Length));
     DEBUG ((DEBUG_INFO, "SmmLockBoxSmmLib SaveLockBox - Exit (%r)\n", EFI_OUT_OF_RESOURCES));
     return EFI_OUT_OF_RESOURCES;
   }
@@ -662,7 +652,7 @@ UpdateLockBox (
           DEBUG_INFO,
           "SmmLockBoxSmmLib UpdateLockBox - Allocate new buffer to enlarge.\n"
           ));
-        Status = gSmst->SmmAllocatePages (
+        Status = gMmst->MmAllocatePages (
                           AllocateAnyPages,
                           EfiRuntimeServicesData,
                           EFI_SIZE_TO_PAGES (Offset + Length),
@@ -679,7 +669,7 @@ UpdateLockBox (
         //
         CopyMem ((VOID *)(UINTN)SmramBuffer, (VOID *)(UINTN)LockBox->SmramBuffer, (UINTN)LockBox->Length);
         ZeroMem ((VOID *)(UINTN)LockBox->SmramBuffer, (UINTN)LockBox->Length);
-        gSmst->SmmFreePages (LockBox->SmramBuffer, EFI_SIZE_TO_PAGES ((UINTN)LockBox->Length));
+        gMmst->MmFreePages (LockBox->SmramBuffer, EFI_SIZE_TO_PAGES ((UINTN)LockBox->Length));
 
         LockBox->SmramBuffer = SmramBuffer;
       }
