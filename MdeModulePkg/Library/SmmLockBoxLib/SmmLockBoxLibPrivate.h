@@ -43,5 +43,30 @@ typedef struct {
 
 #pragma pack()
 
+/**
+  Constructor for SmmLockBox library.
+  This is used to set SmmLockBox context, which will be used in PEI phase in S3 boot path later.
+
+  @retval EFI_SUCEESS
+  @return Others          Some error occurs.
+**/
+EFI_STATUS
+SmmLockBoxMmConstructor (
+  VOID
+  );
+
+/**
+  Destructor for SmmLockBox library.
+  This is used to uninstall SmmLockBoxCommunication configuration table
+  if it has been installed in Constructor.
+
+  @retval EFI_SUCEESS       The destructor always returns EFI_SUCCESS.
+
+**/
+EFI_STATUS
+SmmLockBoxMmDestructor (
+  VOID
+  );
+
 #endif
 
