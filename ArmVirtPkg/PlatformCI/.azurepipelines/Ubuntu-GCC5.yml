@@ -17,7 +17,7 @@ jobs:
   - job: Platform_CI
     variables:
       package: 'ArmVirtPkg'
-      vm_image: 'ubuntu-latest'
+      vm_image: 'ubuntu-18.04'
       should_run: true
       run_flags: "MAKE_STARTUP_NSH=TRUE QEMU_HEADLESS=TRUE"
 
