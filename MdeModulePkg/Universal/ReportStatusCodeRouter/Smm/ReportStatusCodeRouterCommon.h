@@ -6,28 +6,26 @@
 
 **/
 
-#ifndef __REPORT_STATUS_CODE_ROUTER_SMM_H__
-#define __REPORT_STATUS_CODE_ROUTER_SMM_H__
+#ifndef __REPORT_STATUS_CODE_ROUTER_COMMON_H__
+#define __REPORT_STATUS_CODE_ROUTER_COMMON_H__
 
-
-#include <Protocol/SmmReportStatusCodeHandler.h>
-#include <Protocol/SmmStatusCode.h>
+#include <Protocol/MmReportStatusCodeHandler.h>
+#include <Protocol/MmStatusCode.h>
 
 #include <Library/BaseLib.h>
 #include <Library/SynchronizationLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
-#include <Library/UefiDriverEntryPoint.h>
-#include <Library/SmmServicesTableLib.h>
+#include <Library/MmServicesTableLib.h>
 #include <Library/MemoryAllocationLib.h>
 
-#define SMM_RSC_HANDLER_CALLBACK_ENTRY_SIGNATURE  SIGNATURE_32 ('s', 'h', 'c', 'e')
+#define MM_RSC_HANDLER_CALLBACK_ENTRY_SIGNATURE  SIGNATURE_32 ('s', 'h', 'c', 'e')
 
 typedef struct {
   UINTN                         Signature;
-  EFI_SMM_RSC_HANDLER_CALLBACK  RscHandlerCallback;
+  EFI_MM_RSC_HANDLER_CALLBACK   RscHandlerCallback;
   LIST_ENTRY                    Node;
-} SMM_RSC_HANDLER_CALLBACK_ENTRY;
+} MM_RSC_HANDLER_CALLBACK_ENTRY;
 
 /**
   Register the callback function for ReportStatusCode() notification.
@@ -48,7 +46,7 @@ typedef struct {
 EFI_STATUS
 EFIAPI
 Register (
-  IN EFI_SMM_RSC_HANDLER_CALLBACK   Callback
+  IN EFI_MM_RSC_HANDLER_CALLBACK    Callback
   );
 
 /**
@@ -67,14 +65,14 @@ Register (
 EFI_STATUS
 EFIAPI
 Unregister (
-  IN EFI_SMM_RSC_HANDLER_CALLBACK Callback
+  IN EFI_MM_RSC_HANDLER_CALLBACK  Callback
   );
 
 /**
   Provides an interface that a software module can call to report a status code.
 
-  @param  This             EFI_SMM_STATUS_CODE_PROTOCOL instance.
-  @param  Type             Indicates the type of status code being reported.
+  @param  This             EFI_MM_STATUS_CODE_PROTOCOL instance.
+  @param  CodeType         Indicates the type of status code being reported.
   @param  Value            Describes the current status of a hardware or software entity.
                            This included information about the class and subclass that is used to
                            classify the entity as well as an operation.
@@ -92,12 +90,26 @@ Unregister (
 EFI_STATUS
 EFIAPI
 ReportDispatcher (
-  IN CONST EFI_SMM_STATUS_CODE_PROTOCOL  *This,
-  IN EFI_STATUS_CODE_TYPE                Type,
+  IN CONST EFI_MM_STATUS_CODE_PROTOCOL   *This,
+  IN EFI_STATUS_CODE_TYPE                CodeType,
   IN EFI_STATUS_CODE_VALUE               Value,
   IN UINT32                              Instance,
-  IN CONST EFI_GUID                      *CallerId  OPTIONAL,
+  IN CONST EFI_GUID                      *CallerId,
   IN EFI_STATUS_CODE_DATA                *Data      OPTIONAL
+  );
+
+/**
+  Entry point of Generic Status Code Driver.
+
+  This function is the common entry point of MM Status Code Router.
+  It produces MM Report Status Code Handler and Status Code protocol.
+
+  @retval EFI_SUCCESS       The entry point is executed successfully.
+
+**/
+EFI_STATUS
+GenericStatusCodeCommonEntry (
+  VOID
   );
 
 #endif

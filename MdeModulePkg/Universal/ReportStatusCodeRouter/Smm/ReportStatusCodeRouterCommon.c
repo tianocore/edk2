@@ -7,7 +7,7 @@
 
 **/
 
-#include "ReportStatusCodeRouterSmm.h"
+#include "ReportStatusCodeRouterCommon.h"
 
 LIST_ENTRY   mCallbackListHead          = INITIALIZE_LIST_HEAD_VARIABLE (mCallbackListHead);
 
@@ -17,11 +17,11 @@ LIST_ENTRY   mCallbackListHead          = INITIALIZE_LIST_HEAD_VARIABLE (mCallba
 //
 UINT32       mStatusCodeNestStatus = 0;
 
-EFI_SMM_STATUS_CODE_PROTOCOL  mSmmStatusCodeProtocol  = {
+EFI_MM_STATUS_CODE_PROTOCOL   mSmmStatusCodeProtocol  = {
   ReportDispatcher
 };
 
-EFI_SMM_RSC_HANDLER_PROTOCOL  mSmmRscHandlerProtocol = {
+EFI_MM_RSC_HANDLER_PROTOCOL   mSmmRscHandlerProtocol = {
   Register,
   Unregister
   };
@@ -45,18 +45,18 @@ EFI_SMM_RSC_HANDLER_PROTOCOL  mSmmRscHandlerProtocol = {
 EFI_STATUS
 EFIAPI
 Register (
-  IN EFI_SMM_RSC_HANDLER_CALLBACK   Callback
+  IN EFI_MM_RSC_HANDLER_CALLBACK    Callback
   )
 {
   LIST_ENTRY                      *Link;
-  SMM_RSC_HANDLER_CALLBACK_ENTRY  *CallbackEntry;
+  MM_RSC_HANDLER_CALLBACK_ENTRY  *CallbackEntry;
 
   if (Callback == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
   for (Link = GetFirstNode (&mCallbackListHead); !IsNull (&mCallbackListHead, Link); Link = GetNextNode (&mCallbackListHead, Link)) {
-    CallbackEntry = CR (Link, SMM_RSC_HANDLER_CALLBACK_ENTRY, Node, SMM_RSC_HANDLER_CALLBACK_ENTRY_SIGNATURE);
+    CallbackEntry = CR (Link, MM_RSC_HANDLER_CALLBACK_ENTRY, Node, MM_RSC_HANDLER_CALLBACK_ENTRY_SIGNATURE);
     if (CallbackEntry->RscHandlerCallback == Callback) {
       //
       // If the function was already registered. It can't be registered again.
@@ -65,10 +65,10 @@ Register (
     }
   }
 
-  CallbackEntry = (SMM_RSC_HANDLER_CALLBACK_ENTRY *)AllocatePool (sizeof (SMM_RSC_HANDLER_CALLBACK_ENTRY));
+  CallbackEntry = (MM_RSC_HANDLER_CALLBACK_ENTRY *)AllocatePool (sizeof (MM_RSC_HANDLER_CALLBACK_ENTRY));
   ASSERT (CallbackEntry != NULL);
 
-  CallbackEntry->Signature          = SMM_RSC_HANDLER_CALLBACK_ENTRY_SIGNATURE;
+  CallbackEntry->Signature          = MM_RSC_HANDLER_CALLBACK_ENTRY_SIGNATURE;
   CallbackEntry->RscHandlerCallback = Callback;
 
   InsertTailList (&mCallbackListHead, &CallbackEntry->Node);
@@ -92,18 +92,18 @@ Register (
 EFI_STATUS
 EFIAPI
 Unregister (
-  IN EFI_SMM_RSC_HANDLER_CALLBACK Callback
+  IN EFI_MM_RSC_HANDLER_CALLBACK  Callback
   )
 {
   LIST_ENTRY                        *Link;
-  SMM_RSC_HANDLER_CALLBACK_ENTRY    *CallbackEntry;
+  MM_RSC_HANDLER_CALLBACK_ENTRY    *CallbackEntry;
 
   if (Callback == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
   for (Link = GetFirstNode (&mCallbackListHead); !IsNull (&mCallbackListHead, Link); Link = GetNextNode (&mCallbackListHead, Link)) {
-    CallbackEntry = CR (Link, SMM_RSC_HANDLER_CALLBACK_ENTRY, Node, SMM_RSC_HANDLER_CALLBACK_ENTRY_SIGNATURE);
+    CallbackEntry = CR (Link, MM_RSC_HANDLER_CALLBACK_ENTRY, Node, MM_RSC_HANDLER_CALLBACK_ENTRY_SIGNATURE);
     if (CallbackEntry->RscHandlerCallback == Callback) {
       //
       // If the function is found in list, delete it and return.
@@ -121,8 +121,8 @@ Unregister (
 /**
   Provides an interface that a software module can call to report a status code.
 
-  @param  This             EFI_SMM_STATUS_CODE_PROTOCOL instance.
-  @param  Type             Indicates the type of status code being reported.
+  @param  This             EFI_MM_STATUS_CODE_PROTOCOL instance.
+  @param  CodeType         Indicates the type of status code being reported.
   @param  Value            Describes the current status of a hardware or software entity.
                            This included information about the class and subclass that is used to
                            classify the entity as well as an operation.
@@ -140,16 +140,16 @@ Unregister (
 EFI_STATUS
 EFIAPI
 ReportDispatcher (
-  IN CONST EFI_SMM_STATUS_CODE_PROTOCOL  *This,
-  IN EFI_STATUS_CODE_TYPE                Type,
+  IN CONST EFI_MM_STATUS_CODE_PROTOCOL   *This,
+  IN EFI_STATUS_CODE_TYPE                CodeType,
   IN EFI_STATUS_CODE_VALUE               Value,
   IN UINT32                              Instance,
-  IN CONST EFI_GUID                      *CallerId  OPTIONAL,
+  IN CONST EFI_GUID                      *CallerId,
   IN EFI_STATUS_CODE_DATA                *Data      OPTIONAL
   )
 {
   LIST_ENTRY                        *Link;
-  SMM_RSC_HANDLER_CALLBACK_ENTRY    *CallbackEntry;
+  MM_RSC_HANDLER_CALLBACK_ENTRY    *CallbackEntry;
 
   //
   // Use atom operation to avoid the reentant of report.
@@ -160,13 +160,13 @@ ReportDispatcher (
   }
 
   for (Link = GetFirstNode (&mCallbackListHead); !IsNull (&mCallbackListHead, Link);) {
-    CallbackEntry = CR (Link, SMM_RSC_HANDLER_CALLBACK_ENTRY, Node, SMM_RSC_HANDLER_CALLBACK_ENTRY_SIGNATURE);
+    CallbackEntry = CR (Link, MM_RSC_HANDLER_CALLBACK_ENTRY, Node, MM_RSC_HANDLER_CALLBACK_ENTRY_SIGNATURE);
     //
     // The handler may remove itself, so get the next handler in advance.
     //
     Link = GetNextNode (&mCallbackListHead, Link);
     CallbackEntry->RscHandlerCallback (
-                     Type,
+                     CodeType,
                      Value,
                      Instance,
                      (EFI_GUID*)CallerId,
@@ -186,20 +186,15 @@ ReportDispatcher (
 /**
   Entry point of Generic Status Code Driver.
 
-  This function is the entry point of SMM Status Code Router .
-  It produces SMM Report Stataus Code Handler and Status Code protocol.
-
-  @param  ImageHandle       The firmware allocated handle for the EFI image.
-  @param  SystemTable       A pointer to the EFI System Table.
+  This function is the common entry point of MM Status Code Router.
+  It produces MM Report Status Code Handler and Status Code protocol.
 
   @retval EFI_SUCCESS       The entry point is executed successfully.
 
 **/
 EFI_STATUS
-EFIAPI
-GenericStatusCodeSmmEntry (
-  IN EFI_HANDLE         ImageHandle,
-  IN EFI_SYSTEM_TABLE   *SystemTable
+GenericStatusCodeCommonEntry (
+  VOID
   )
 {
   EFI_STATUS     Status;
@@ -210,9 +205,9 @@ GenericStatusCodeSmmEntry (
   //
   // Install SmmRscHandler Protocol
   //
-  Status = gSmst->SmmInstallProtocolInterface (
+  Status = gMmst->MmInstallProtocolInterface (
                     &Handle,
-                    &gEfiSmmRscHandlerProtocolGuid,
+                    &gEfiMmRscHandlerProtocolGuid,
                     EFI_NATIVE_INTERFACE,
                     &mSmmRscHandlerProtocol
                     );
@@ -221,9 +216,9 @@ GenericStatusCodeSmmEntry (
   //
   // Install SmmStatusCode Protocol
   //
-  Status = gSmst->SmmInstallProtocolInterface (
+  Status = gMmst->MmInstallProtocolInterface (
                     &Handle,
-                    &gEfiSmmStatusCodeProtocolGuid,
+                    &gEfiMmStatusCodeProtocolGuid,
                     EFI_NATIVE_INTERFACE,
                     &mSmmStatusCodeProtocol
                     );
