@@ -15,27 +15,20 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include <PiSmm.h>
-
-#include "MmTcg2PhysicalPresenceLibCommon.h"
+#ifndef _MM_TCG2_PHYSICAL_PRESENCE_LIB_COMMON_H_
+#define _MM_TCG2_PHYSICAL_PRESENCE_LIB_COMMON_H_
 
 /**
-  The constructor function locates SmmVariable protocol.
+  The constructor function locates MmVariable protocol.
 
   It will ASSERT() if that operation fails and it will always return EFI_SUCCESS.
-
-  @param  ImageHandle   The firmware allocated handle for the EFI image.
-  @param  SystemTable   A pointer to the EFI System Table.
 
   @retval EFI_SUCCESS   The constructor successfully added string package.
   @retval Other value   The constructor can't add string package.
 **/
 EFI_STATUS
-EFIAPI
-Tcg2PhysicalPresenceLibTraditionalConstructor (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
-  )
-{
-  return Tcg2PhysicalPresenceLibCommonConstructor ();
-}
+Tcg2PhysicalPresenceLibCommonConstructor (
+  VOID
+  );
+
+#endif
