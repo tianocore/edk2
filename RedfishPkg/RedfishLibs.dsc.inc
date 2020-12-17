@@ -11,5 +11,6 @@
 #
 ##
 !if $(REDFISH_ENABLE) == TRUE
+  RestExLib|RedfishPkg/Library/DxeRestExLib/DxeRestExLib.inf
 !endif
 

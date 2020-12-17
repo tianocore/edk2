@@ -49,5 +49,6 @@
 [Components]
   RedfishPkg/Library/PlatformHostInterfaceLibNull/PlatformHostInterfaceLibNull.inf
   RedfishPkg/Library/PlatformCredentialLibNull/PlatformCredentialLibNull.inf
+  RedfishPkg/Library/DxeRestExLib/DxeRestExLib.inf
 
   !include RedfishPkg/Redfish.dsc.inc
