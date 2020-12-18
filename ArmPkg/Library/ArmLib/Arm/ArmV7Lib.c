@@ -87,3 +87,18 @@ ArmHasGicSystemRegisters (
 {
   return ((ArmReadIdPfr1 () & ARM_PFR1_GIC) != 0);
 }
+
+/**
+  Check whether the CPU supports the Security extensions
+
+  @return   Whether the Security extensions are implemented
+
+**/
+BOOLEAN
+EFIAPI
+ArmHasSecurityExtensions (
+  VOID
+  )
+{
+  return ((ArmReadIdPfr1 () & ARM_PFR1_SEC) != 0);
+}
