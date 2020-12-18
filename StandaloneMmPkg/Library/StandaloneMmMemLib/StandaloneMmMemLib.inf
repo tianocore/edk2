@@ -26,11 +26,14 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = AARCH64
+#  VALID_ARCHITECTURES           = X64 AARCH64
 #
 
 [Sources.Common]
   StandaloneMmMemLib.c
+
+[Sources.X64]
+  X64/StandaloneMmMemLibInternal.c
 
 [Sources.AARCH64]
   AArch64/StandaloneMmMemLibInternal.c
@@ -42,3 +45,4 @@
 [LibraryClasses]
   BaseMemoryLib
   DebugLib
+  HobLib
