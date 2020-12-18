@@ -13,11 +13,8 @@
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = ArmGicArchLib|SEC
 
-[Sources.ARM]
-  Arm/ArmGicArchLib.c
-
-[Sources.AARCH64]
-  AArch64/ArmGicArchLib.c
+[Sources]
+  ArmGicArchLib.c
 
 [Packages]
   MdePkg/MdePkg.dec
