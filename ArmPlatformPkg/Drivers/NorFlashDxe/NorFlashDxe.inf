@@ -17,9 +17,10 @@
   ENTRY_POINT                    = NorFlashInitialise
 
 [Sources.common]
-  NorFlashDxe.h
+  NorFlash.c
+  NorFlash.h
   NorFlashDxe.c
-  NorFlashFvbDxe.c
+  NorFlashFvb.c
   NorFlashBlockIoDxe.c
 
 [Packages]

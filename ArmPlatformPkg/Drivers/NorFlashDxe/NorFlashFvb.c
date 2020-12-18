@@ -10,22 +10,17 @@
 
 #include <Library/PcdLib.h>
 #include <Library/BaseLib.h>
-#include <Library/HobLib.h>
 #include <Library/UefiLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
-#include <Library/DxeServicesTableLib.h>
-#include <Library/UefiBootServicesTableLib.h>
 
 #include <Guid/VariableFormat.h>
 #include <Guid/SystemNvDataGuid.h>
 #include <Guid/NvVarStoreFormatted.h>
 
-#include "NorFlashDxe.h"
+#include "NorFlash.h"
 
-STATIC EFI_EVENT mFvbVirtualAddrChangeEvent;
-STATIC UINTN     mFlashNvStorageVariableBase;
-
+extern UINTN     mFlashNvStorageVariableBase;
 ///
 /// The Firmware Volume Block Protocol is the low-level interface
 /// to a firmware volume. File-level access to a firmware volume
@@ -700,101 +695,3 @@ FvbVirtualNotifyEvent (
   return;
 }
 
-EFI_STATUS
-EFIAPI
-NorFlashFvbInitialize (
-  IN NOR_FLASH_INSTANCE* Instance
-  )
-{
-  EFI_STATUS  Status;
-  UINT32      FvbNumLba;
-  EFI_BOOT_MODE BootMode;
-  UINTN       RuntimeMmioRegionSize;
-
-  DEBUG((DEBUG_BLKIO,"NorFlashFvbInitialize\n"));
-  ASSERT((Instance != NULL));
-
-  //
-  // Declare the Non-Volatile storage as EFI_MEMORY_RUNTIME
-  //
-
-  // Note: all the NOR Flash region needs to be reserved into the UEFI Runtime memory;
-  //       even if we only use the small block region at the top of the NOR Flash.
-  //       The reason is when the NOR Flash memory is set into program mode, the command
-  //       is written as the base of the flash region (ie: Instance->DeviceBaseAddress)
-  RuntimeMmioRegionSize = (Instance->RegionBaseAddress - Instance->DeviceBaseAddress) + Instance->Size;
-
-  Status = gDS->AddMemorySpace (
-      EfiGcdMemoryTypeMemoryMappedIo,
-      Instance->DeviceBaseAddress, RuntimeMmioRegionSize,
-      EFI_MEMORY_UC | EFI_MEMORY_RUNTIME
-      );
-  ASSERT_EFI_ERROR (Status);
-
-  Status = gDS->SetMemorySpaceAttributes (
-      Instance->DeviceBaseAddress, RuntimeMmioRegionSize,
-      EFI_MEMORY_UC | EFI_MEMORY_RUNTIME);
-  ASSERT_EFI_ERROR (Status);
-
-  mFlashNvStorageVariableBase = PcdGet32 (PcdFlashNvStorageVariableBase);
-
-  // Set the index of the first LBA for the FVB
-  Instance->StartLba = (PcdGet32 (PcdFlashNvStorageVariableBase) - Instance->RegionBaseAddress) / Instance->Media.BlockSize;
-
-  BootMode = GetBootModeHob ();
-  if (BootMode == BOOT_WITH_DEFAULT_SETTINGS) {
-    Status = EFI_INVALID_PARAMETER;
-  } else {
-    // Determine if there is a valid header at the beginning of the NorFlash
-    Status = ValidateFvHeader (Instance);
-  }
-
-  // Install the Default FVB header if required
-  if (EFI_ERROR(Status)) {
-    // There is no valid header, so time to install one.
-    DEBUG ((EFI_D_INFO, "%a: The FVB Header is not valid.\n", __FUNCTION__));
-    DEBUG ((EFI_D_INFO, "%a: Installing a correct one for this volume.\n",
-      __FUNCTION__));
-
-    // Erase all the NorFlash that is reserved for variable storage
-    FvbNumLba = (PcdGet32(PcdFlashNvStorageVariableSize) + PcdGet32(PcdFlashNvStorageFtwWorkingSize) + PcdGet32(PcdFlashNvStorageFtwSpareSize)) / Instance->Media.BlockSize;
-
-    Status = FvbEraseBlocks (&Instance->FvbProtocol, (EFI_LBA)0, FvbNumLba, EFI_LBA_LIST_TERMINATOR);
-    if (EFI_ERROR(Status)) {
-      return Status;
-    }
-
-    // Install all appropriate headers
-    Status = InitializeFvAndVariableStoreHeaders (Instance);
-    if (EFI_ERROR(Status)) {
-      return Status;
-    }
-  }
-
-  //
-  // The driver implementing the variable read service can now be dispatched;
-  // the varstore headers are in place.
-  //
-  Status = gBS->InstallProtocolInterface (
-                  &gImageHandle,
-                  &gEdkiiNvVarStoreFormattedGuid,
-                  EFI_NATIVE_INTERFACE,
-                  NULL
-                  );
-  ASSERT_EFI_ERROR (Status);
-
-  //
-  // Register for the virtual address change event
-  //
-  Status = gBS->CreateEventEx (
-                  EVT_NOTIFY_SIGNAL,
-                  TPL_NOTIFY,
-                  FvbVirtualNotifyEvent,
-                  NULL,
-                  &gEfiEventVirtualAddressChangeGuid,
-                  &mFvbVirtualAddrChangeEvent
-                  );
-  ASSERT_EFI_ERROR (Status);
-
-  return Status;
-}
