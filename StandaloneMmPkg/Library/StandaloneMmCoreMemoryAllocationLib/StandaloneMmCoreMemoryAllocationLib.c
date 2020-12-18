@@ -841,7 +841,7 @@ MemoryAllocationLibConstructor (
   VOID                            *HobStart;
   EFI_MMRAM_HOB_DESCRIPTOR_BLOCK  *MmramRangesHobData;
   EFI_MMRAM_DESCRIPTOR            *MmramRanges;
-  UINT32                           MmramRangeCount;
+  UINTN                            MmramRangeCount;
   EFI_HOB_GUID_TYPE               *MmramRangesHob;
 
   HobStart = GetHobList ();
@@ -868,7 +868,7 @@ MemoryAllocationLibConstructor (
       return EFI_UNSUPPORTED;
     }
 
-    MmramRangeCount = MmramRangesHobData->NumberOfMmReservedRegions;
+    MmramRangeCount = (UINTN) MmramRangesHobData->NumberOfMmReservedRegions;
     if (MmramRanges == NULL) {
       return EFI_UNSUPPORTED;
     }
@@ -877,7 +877,7 @@ MemoryAllocationLibConstructor (
     DataInHob      = GET_GUID_HOB_DATA (GuidHob);
     MmCorePrivate = (MM_CORE_PRIVATE_DATA *)(UINTN)DataInHob->Address;
     MmramRanges     = (EFI_MMRAM_DESCRIPTOR *)(UINTN)MmCorePrivate->MmramRanges;
-    MmramRangeCount = MmCorePrivate->MmramRangeCount;
+    MmramRangeCount = (UINTN) MmCorePrivate->MmramRangeCount;
   }
 
   {
