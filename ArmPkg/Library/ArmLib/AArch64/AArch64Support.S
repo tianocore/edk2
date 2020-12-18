@@ -3,6 +3,7 @@
 # Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
 # Copyright (c) 2011 - 2017, ARM Limited. All rights reserved.
 # Copyright (c) 2016, Linaro Limited. All rights reserved.
+# Copyright (c) 2020, NUVIA Inc. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -395,7 +396,7 @@ ASM_FUNC(ArmReadVBar)
 ASM_FUNC(ArmEnableVFP)
   // Check whether floating-point is implemented in the processor.
   mov   x1, x30                 // Save LR
-  bl    ArmReadIdPfr0           // Read EL1 Processor Feature Register (PFR0)
+  bl    ArmReadIdAA64Pfr0       // Read EL1 Processor Feature Register (PFR0)
   mov   x30, x1                 // Restore LR
   ubfx  x0, x0, #16, #4         // Extract the FP bits 16:19
   cmp   x0, #0xF                // Check if FP bits are '1111b',
@@ -448,7 +449,7 @@ ASM_FUNC(ArmIsArchTimerImplemented)
   ret
 
 
-ASM_FUNC(ArmReadIdPfr0)
+ASM_FUNC(ArmReadIdAA64Pfr0)
   mrs   x0, id_aa64pfr0_el1   // Read ID_AA64PFR0 Register
   ret
 

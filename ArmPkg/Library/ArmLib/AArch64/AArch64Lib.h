@@ -2,6 +2,7 @@
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
   Portions Copyright (c) 2011 - 2013, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2020, NUVIA Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -35,5 +36,10 @@ ArmCleanInvalidateDataCacheEntryBySetWay (
   IN  UINTN   SetWayFormat
   );
 
+UINTN
+EFIAPI
+ArmReadIdAA64Pfr0 (
+  VOID
+  );
 #endif // __AARCH64_LIB_H__
 

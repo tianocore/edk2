@@ -85,5 +85,5 @@ ArmHasGicSystemRegisters (
   VOID
   )
 {
-  return ((ArmReadIdPfr0 () & AARCH64_PFR0_GIC) != 0);
+  return ((ArmReadIdAA64Pfr0 () & AARCH64_PFR0_GIC) != 0);
 }
