@@ -841,7 +841,7 @@ MemoryAllocationLibConstructor (
   VOID                            *HobStart;
   EFI_MMRAM_HOB_DESCRIPTOR_BLOCK  *MmramRangesHobData;
   EFI_MMRAM_DESCRIPTOR            *MmramRanges;
-  UINT32                           MmramRangeCount;
+  UINT64                           MmramRangeCount;
   EFI_HOB_GUID_TYPE               *MmramRangesHob;
 
   HobStart = GetHobList ();
