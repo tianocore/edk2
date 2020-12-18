@@ -453,14 +453,6 @@ ASM_FUNC(ArmReadIdPfr0)
   ret
 
 
-// Q: id_aa64pfr1_el1 not defined yet. What does this function want to access?
-// A: used to setup arch timer. Check if we have security extensions, permissions to set stuff.
-//    See: ArmPkg/Library/ArmArchTimerLib/AArch64/ArmArchTimerLib.c
-//    Not defined yet, but stick in here for now, should read all zeros.
-ASM_FUNC(ArmReadIdPfr1)
-  mrs   x0, id_aa64pfr1_el1   // Read ID_PFR1 Register
-  ret
-
 // VOID ArmWriteHcr(UINTN Hcr)
 ASM_FUNC(ArmWriteHcr)
   msr   hcr_el2, x0        // Write the passed HCR value
