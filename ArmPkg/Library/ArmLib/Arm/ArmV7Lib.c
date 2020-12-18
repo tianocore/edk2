@@ -2,6 +2,7 @@
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
   Copyright (c) 2011 - 2014, ARM Limited. All rights reserved.
+  Copyright (c) 2020, NUVIA Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -70,4 +71,19 @@ ArmCleanDataCache (
 
   ArmDataSynchronizationBarrier ();
   ArmV7DataCacheOperation (ArmCleanDataCacheEntryBySetWay);
+}
+
+/**
+  Check whether the CPU supports the GIC system register interface (any version)
+
+  @return   Whether GIC System Register Interface is supported
+
+**/
+BOOLEAN
+EFIAPI
+ArmHasGicSystemRegisters (
+  VOID
+  )
+{
+  return ((ArmReadIdPfr1 () & ARM_PFR1_GIC) != 0);
 }
