@@ -1,4 +1,4 @@
-/** @file  NorFlashDxe.h
+/** @file  NorFlash.h
 
   Copyright (c) 2011 - 2014, ARM Ltd. All rights reserved.<BR>
 
@@ -6,8 +6,8 @@
 
 **/
 
-#ifndef __NOR_FLASH_DXE_H__
-#define __NOR_FLASH_DXE_H__
+#ifndef __NOR_FLASH_H__
+#define __NOR_FLASH_H__
 
 
 #include <Base.h>
@@ -236,12 +236,6 @@ NorFlashDiskIoWriteDisk (
 
 EFI_STATUS
 EFIAPI
-NorFlashFvbInitialize (
-  IN NOR_FLASH_INSTANCE*                            Instance
-  );
-
-EFI_STATUS
-EFIAPI
 FvbGetAttributes(
   IN CONST  EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL     *This,
   OUT       EFI_FVB_ATTRIBUTES_2                    *Attributes
@@ -297,9 +291,34 @@ FvbEraseBlocks(
   ...
   );
 
+EFI_STATUS
+ValidateFvHeader (
+  IN  NOR_FLASH_INSTANCE *Instance
+  );
+
+EFI_STATUS
+InitializeFvAndVariableStoreHeaders (
+  IN NOR_FLASH_INSTANCE *Instance
+  );
+
+VOID
+EFIAPI
+FvbVirtualNotifyEvent (
+  IN EFI_EVENT        Event,
+  IN VOID             *Context
+  );
+
 //
 // NorFlashDxe.c
 //
+
+EFI_STATUS
+NorFlashWriteFullBlock (
+  IN NOR_FLASH_INSTANCE     *Instance,
+  IN EFI_LBA                Lba,
+  IN UINT32                 *DataBuffer,
+  IN UINT32                 BlockSizeInWords
+  );
 
 EFI_STATUS
 NorFlashUnlockAndEraseSingleBlock (
@@ -307,6 +326,27 @@ NorFlashUnlockAndEraseSingleBlock (
   IN UINTN                  BlockAddress
   );
 
+EFI_STATUS
+NorFlashCreateInstance (
+  IN UINTN                  NorFlashDeviceBase,
+  IN UINTN                  NorFlashRegionBase,
+  IN UINTN                  NorFlashSize,
+  IN UINT32                 Index,
+  IN UINT32                 BlockSize,
+  IN BOOLEAN                SupportFvb,
+  OUT NOR_FLASH_INSTANCE**  NorFlashInstance
+  );
+
+EFI_STATUS
+EFIAPI
+NorFlashFvbInitialize (
+  IN NOR_FLASH_INSTANCE*                            Instance
+  );
+
+
+//
+// NorFlash.c
+//
 EFI_STATUS
 NorFlashWriteSingleBlock (
   IN        NOR_FLASH_INSTANCE   *Instance,
@@ -355,4 +395,30 @@ NorFlashReset (
   IN  NOR_FLASH_INSTANCE *Instance
   );
 
-#endif /* __NOR_FLASH_DXE_H__ */
+EFI_STATUS
+NorFlashEraseSingleBlock (
+  IN NOR_FLASH_INSTANCE     *Instance,
+  IN UINTN                  BlockAddress
+  );
+
+EFI_STATUS
+NorFlashUnlockSingleBlockIfNecessary (
+  IN NOR_FLASH_INSTANCE     *Instance,
+  IN UINTN                  BlockAddress
+  );
+
+EFI_STATUS
+NorFlashWriteSingleWord (
+  IN NOR_FLASH_INSTANCE     *Instance,
+  IN UINTN                  WordAddress,
+  IN UINT32                 WriteData
+  );
+
+VOID
+EFIAPI
+NorFlashVirtualNotifyEvent (
+  IN EFI_EVENT        Event,
+  IN VOID             *Context
+  );
+
+#endif /* __NOR_FLASH_H__ */
