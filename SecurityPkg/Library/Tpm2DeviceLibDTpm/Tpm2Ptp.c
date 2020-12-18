@@ -2,6 +2,7 @@
   PTP (Platform TPM Profile) CRB (Command Response Buffer) interface used by dTPM2.0 library.
 
 Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c), Microsoft Corporation.
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -18,6 +19,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <IndustryStandard/TpmPtp.h>
 #include <IndustryStandard/TpmTis.h>
+
+#include "Tpm2DeviceLibDTpm.h"
 
 //
 // Execution of the command may take from several seconds to minutes for certain
@@ -174,7 +177,7 @@ PtpCrbTpmCommand (
   // STEP 0:
   // if CapCRbIdelByPass == 0, enforce Idle state before sending command
   //
-  if (PcdGet8(PcdCRBIdleByPass) == 0 && (MmioRead32((UINTN)&CrbReg->CrbControlStatus) & PTP_CRB_CONTROL_AREA_STATUS_TPM_IDLE) == 0){
+  if (GetCachedIdleByPass () == 0 && (MmioRead32((UINTN)&CrbReg->CrbControlStatus) & PTP_CRB_CONTROL_AREA_STATUS_TPM_IDLE) == 0){
     Status = PtpCrbWaitRegisterBits (
               &CrbReg->CrbControlStatus,
               PTP_CRB_CONTROL_AREA_STATUS_TPM_IDLE,
@@ -330,7 +333,7 @@ GoReady_Exit:
   // Goto Ready State if command is completed successfully and TPM support IdleBypass
   // If not supported. flow down to GoIdle
   //
-  if (PcdGet8(PcdCRBIdleByPass) == 1) {
+  if (GetCachedIdleByPass () == 1) {
     MmioWrite32((UINTN)&CrbReg->CrbControlRequest, PTP_CRB_CONTROL_AREA_REQUEST_COMMAND_READY);
     return Status;
   }
@@ -350,7 +353,7 @@ GoIdle_Exit:
   // Only enforce Idle state transition if execution fails when CRBIdleBypass==1
   // Leave regular Idle delay at the beginning of next command execution
   //
-  if (PcdGet8(PcdCRBIdleByPass) == 1){
+  if (GetCachedIdleByPass () == 1){
     Status = PtpCrbWaitRegisterBits (
                &CrbReg->CrbControlStatus,
                PTP_CRB_CONTROL_AREA_STATUS_TPM_IDLE,
@@ -519,7 +522,7 @@ DumpPtpInfo (
   Vid = 0xFFFF;
   Did = 0xFFFF;
   Rid = 0xFF;
-  PtpInterface = PcdGet8(PcdActiveTpmInterfaceType);
+  PtpInterface = GetCachedPtpInterface ();
   DEBUG ((EFI_D_INFO, "PtpInterface - %x\n", PtpInterface));
   switch (PtpInterface) {
   case Tpm2PtpInterfaceCrb:
@@ -564,7 +567,7 @@ DTpm2SubmitCommand (
 {
   TPM2_PTP_INTERFACE_TYPE  PtpInterface;
 
-  PtpInterface = PcdGet8(PcdActiveTpmInterfaceType);
+  PtpInterface = GetCachedPtpInterface ();
   switch (PtpInterface) {
   case Tpm2PtpInterfaceCrb:
     return PtpCrbTpmCommand (
@@ -603,7 +606,7 @@ DTpm2RequestUseTpm (
 {
   TPM2_PTP_INTERFACE_TYPE  PtpInterface;
 
-  PtpInterface = PcdGet8(PcdActiveTpmInterfaceType);
+  PtpInterface = GetCachedPtpInterface ();
   switch (PtpInterface) {
   case Tpm2PtpInterfaceCrb:
     return PtpCrbRequestUseTpm ((PTP_CRB_REGISTERS_PTR) (UINTN) PcdGet64 (PcdTpmBaseAddress));
