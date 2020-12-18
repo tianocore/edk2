@@ -733,4 +733,21 @@ ArmHasGicSystemRegisters (
   VOID
   );
 
+#ifdef MDE_CPU_ARM
+///
+/// AArch32-only ID Register Helper functions
+///
+/**
+  Check whether the CPU supports the Security extensions
+
+  @return   Whether the Security extensions are implemented
+
+**/
+BOOLEAN
+EFIAPI
+ArmHasSecurityExtensions (
+  VOID
+  );
+#endif // MDE_CPU_ARM
+
 #endif // __ARM_LIB__
