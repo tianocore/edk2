@@ -2,6 +2,7 @@
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
   Copyright (c) 2011 - 2016, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2020, NUVIA Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -712,6 +713,23 @@ ArmWriteCntvOff (
 UINTN
 EFIAPI
 ArmGetPhysicalAddressBits (
+  VOID
+  );
+
+
+///
+///  ID Register Helper functions
+///
+
+/**
+  Check whether the CPU supports the GIC system register interface (any version)
+
+  @return   Whether GIC System Register Interface is supported
+
+**/
+BOOLEAN
+EFIAPI
+ArmHasGicSystemRegisters (
   VOID
   );
 
