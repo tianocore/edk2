@@ -9,7 +9,7 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 
-#include "NorFlashDxe.h"
+#include "NorFlash.h"
 
 //
 // BlockIO Protocol function EFI_BLOCK_IO_PROTOCOL.Reset
