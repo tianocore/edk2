@@ -135,18 +135,6 @@ ArmIsArchTimerImplemented (
 
 UINTN
 EFIAPI
-ArmReadIdPfr0 (
-  VOID
-  );
-
-UINTN
-EFIAPI
-ArmReadIdPfr1 (
-  VOID
-  );
-
-UINTN
-EFIAPI
 ArmCacheInfo (
   VOID
   );
