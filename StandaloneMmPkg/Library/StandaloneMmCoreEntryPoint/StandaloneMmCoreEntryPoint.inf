@@ -26,6 +26,9 @@
   AArch64/SetPermissions.c
   AArch64/CreateHobList.c
 
+[Sources.X64]
+  X64/StandaloneMmCoreEntryPoint.c
+
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
