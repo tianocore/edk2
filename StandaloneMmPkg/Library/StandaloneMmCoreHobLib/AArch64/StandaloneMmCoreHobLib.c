@@ -13,13 +13,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/HobLib.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/StandaloneMmCoreEntryPoint.h>
 
 #include <Guid/MemoryAllocationHob.h>
-
-//
-// Cache copy of HobList pointer.
-//
-VOID *gHobList = NULL;
 
 /**
   Returns the pointer to the HOB list.
