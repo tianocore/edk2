@@ -118,4 +118,15 @@ RtMemoryStatusCodeReportWorker (
   IN EFI_STATUS_CODE_DATA               *Data OPTIONAL
   );
 
+/**
+  Unregister status code callback functions only available at boot time from
+  report status code router when exiting boot services.
+
+**/
+VOID
+EFIAPI
+UnregisterSerialBootTimeHandlers (
+  VOID
+  );
+
 #endif
