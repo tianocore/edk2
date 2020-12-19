@@ -11,8 +11,10 @@
 ##
 trigger:
   - master
+  - stable/*
 pr:
   - master
+  - stable/*
 
 jobs:
   - job: Platform_CI
