@@ -16,7 +16,7 @@
 # * This file must be checked into the 'default' branch of a repo.  Copies
 #   of this file on other branches of a repo are ignored by Mergify.
 #
-# Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2019 - 2020, Intel Corporation. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 # https://github.com/apps/mergify
@@ -28,7 +28,7 @@ pull_request_rules:
 
   - name: Automatically merge a PR when all required checks pass and 'push' label is present
     conditions:
-      - base=master
+      - base~=(^master|^stable/)
       - label=push
       - author=@tianocore/edk-ii-maintainers
       - status-success=tianocore.PatchCheck
@@ -41,7 +41,7 @@ pull_request_rules:
 
   - name: Automatically close a PR when all required checks pass and 'push' label is not present
     conditions:
-      - base=master
+      - base~=(^master|^stable/)
       - -label=push
       - -closed
       - status-success=tianocore.PatchCheck
@@ -55,7 +55,7 @@ pull_request_rules:
 
   - name: Post a comment on a PR that can not be merged due to a merge conflict
     conditions:
-      - base=master
+      - base~=(^master|^stable/)
       - conflict
     actions:
       comment:
@@ -63,7 +63,7 @@ pull_request_rules:
 
   - name: Automatically close a PR that fails the EDK II Maintainers membership check and 'push' label is present
     conditions:
-      - base=master
+      - base~=(^master|^stable/)
       - label=push
       - -author=@tianocore/edk-ii-maintainers
     actions:
@@ -72,7 +72,7 @@ pull_request_rules:
 
   - name: Post a comment on a PR if PatchCheck fails
     conditions:
-      - base=master
+      - base~=(^master|^stable/)
       - status-failure=tianocore.PatchCheck
     actions:
       comment:
@@ -80,7 +80,7 @@ pull_request_rules:
 
   - name: Post a comment on a PR if Ubuntu GCC5 fails
     conditions:
-      - base=master
+      - base~=(^master|^stable/)
       - status-failure=Ubuntu GCC5 PR
       - status-success=Ubuntu GCC5 PR (FAILED)
     actions:
@@ -89,7 +89,7 @@ pull_request_rules:
 
   - name: Post a comment on a PR if Windows VS2019 fails
     conditions:
-      - base=master
+      - base~=(^master|^stable/)
       - status-failure=Windows VS2019 PR
       - status-success=Windows VS2019 PR (FAILED)
     actions:
