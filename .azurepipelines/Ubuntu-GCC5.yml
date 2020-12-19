@@ -7,8 +7,10 @@
 ##
 trigger:
 - master
+- stable/*
 pr:
 - master
+- stable/*
 
 jobs:
 - template: templates/pr-gate-build-job.yml
