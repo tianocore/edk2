@@ -1476,7 +1476,7 @@ ConSplitterStdErrDriverBindingStart (
   // their MaxMode and QueryData should be the intersection of both.
   //
   Status = ConSplitterTextOutAddDevice (&mStdErr, TextOut, NULL, NULL);
-  ConSplitterTextOutSetAttribute (&mStdErr.TextOut, EFI_TEXT_ATTR (EFI_MAGENTA, EFI_BLACK));
+  ConSplitterTextOutSetAttribute (&mStdErr.TextOut, EFI_TEXT_ATTR (EFI_LIGHTGRAY, EFI_BLACK));
 
   return Status;
 }
