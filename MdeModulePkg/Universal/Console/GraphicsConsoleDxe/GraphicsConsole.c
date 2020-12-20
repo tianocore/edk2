@@ -214,7 +214,7 @@ Error:
 
   @param[in]  HorizontalResolution     The size of video screen in pixels in the X dimension.
   @param[in]  VerticalResolution       The size of video screen in pixels in the Y dimension.
-  @param[in]  GopModeNumber            The graphics mode number which graphis console is based on.
+  @param[in]  GopModeNumber            The graphics mode number which graphics console is based on.
   @param[out] TextModeCount            The total number of text modes that graphics console supports.
   @param[out] TextModeData             The buffer to the text modes column and row information.
                                        Caller is responsible to free it when it's non-NULL.
@@ -491,7 +491,7 @@ GraphicsConsoleControllerDriverStart (
         Mode = Private->GraphicsOutput->Mode;
         if (EFI_ERROR (Status) && Mode->MaxMode != 0) {
           //
-          // Set default mode failed or device don't support default mode, then get the current mode information
+          // If set default mode failed or device doesn't support default mode, then get the current mode information
           //
           HorizontalResolution = Mode->Info->HorizontalResolution;
           VerticalResolution = Mode->Info->VerticalResolution;
@@ -501,7 +501,7 @@ GraphicsConsoleControllerDriverStart (
     }
     if (ModeNumber != Private->GraphicsOutput->Mode->Mode) {
       //
-      // Current graphics mode is not set or is not set to the mode which we has found,
+      // Current graphics mode is not set or is not set to the mode which we have found,
       // set the new graphic mode.
       //
       Status = Private->GraphicsOutput->SetMode (Private->GraphicsOutput, ModeNumber);
@@ -740,7 +740,7 @@ GraphicsConsoleControllerDriverStop (
   Check if the current specific mode supported the user defined resolution
   for the Graphics Console device based on Graphics Output Protocol.
 
-  If yes, set the graphic devcice's current mode to this specific mode.
+  If yes, set the graphic device's current mode to this specific mode.
 
   @param  GraphicsOutput        Graphics Output Protocol instance pointer.
   @param  HorizontalResolution  User defined horizontal resolution
@@ -843,7 +843,7 @@ EfiLocateHiiProtocol (
   Reset the text output device hardware and optionally run diagnostics.
 
   Implements SIMPLE_TEXT_OUTPUT.Reset().
-  If ExtendeVerification is TRUE, then perform dependent Graphics Console
+  If ExtendedVerification is TRUE, then perform dependent Graphics Console
   device reset, and set display mode to mode 0.
   If ExtendedVerification is FALSE, only set display mode to mode 0.
 
@@ -1713,7 +1713,7 @@ GraphicsConsoleConOutEnableCursor (
 }
 
 /**
-  Gets Graphics Console devcie's foreground color and background color.
+  Gets Graphics Console device's foreground color and background color.
 
   @param  This                  Protocol instance pointer.
   @param  Foreground            Returned text foreground color.

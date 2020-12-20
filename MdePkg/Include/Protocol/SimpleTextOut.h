@@ -32,7 +32,7 @@ typedef struct _EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL;
 typedef EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL   SIMPLE_TEXT_OUTPUT_INTERFACE;
 
 //
-// Define's for required EFI Unicode Box Draw characters
+// Defines for required EFI Unicode Box Draw characters
 //
 #define BOXDRAW_HORIZONTAL                  0x2500
 #define BOXDRAW_VERTICAL                    0x2502
@@ -151,7 +151,7 @@ typedef EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL   SIMPLE_TEXT_OUTPUT_INTERFACE;
 #define EFI_WIDE_ATTRIBUTE  0x80
 
 /**
-  Reset the text output device hardware and optionaly run diagnostics
+  Reset the text output device hardware and optionally run diagnostics
 
   @param  This                 The protocol instance pointer.
   @param  ExtendedVerification Driver may perform more exhaustive verification
@@ -373,7 +373,7 @@ typedef struct {
   ///
   INT32   CursorRow;
   ///
-  /// The cursor is currently visbile or not.
+  /// The cursor is currently visible or not.
   ///
   BOOLEAN CursorVisible;
 } EFI_SIMPLE_TEXT_OUTPUT_MODE;
