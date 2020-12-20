@@ -269,6 +269,21 @@ PL011UartSetControl (
 {
   UINT32  Bits;
 
+
+  //
+  // Per UEFI spec, the control bits that can be set are :
+  //     EFI_SERIAL_DATA_TERMINAL_READY
+  //     EFI_SERIAL_REQUEST_TO_SEND
+  //     EFI_SERIAL_HARDWARE_LOOPBACK_ENABLE
+  //     EFI_SERIAL_SOFTWARE_LOOPBACK_ENABLE
+  //     EFI_SERIAL_HARDWARE_FLOW_CONTROL_ENABLE
+  //
+  if ((Control & (~(EFI_SERIAL_REQUEST_TO_SEND | EFI_SERIAL_DATA_TERMINAL_READY |
+                    EFI_SERIAL_HARDWARE_LOOPBACK_ENABLE | EFI_SERIAL_SOFTWARE_LOOPBACK_ENABLE |
+                    EFI_SERIAL_HARDWARE_FLOW_CONTROL_ENABLE))) != 0) {
+    return EFI_UNSUPPORTED;
+  }
+
   if ((Control & mInvalidControlBits) != 0) {
     return RETURN_UNSUPPORTED;
   }
