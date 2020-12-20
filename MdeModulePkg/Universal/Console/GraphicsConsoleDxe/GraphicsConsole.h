@@ -205,7 +205,7 @@ GraphicsConsoleComponentNameGetControllerName (
   Reset the text output device hardware and optionally run diagnostics.
 
   Implements SIMPLE_TEXT_OUTPUT.Reset().
-  If ExtendeVerification is TRUE, then perform dependent Graphics Console
+  If ExtendedVerification is TRUE, then perform dependent Graphics Console
   device reset, and set display mode to mode 0.
   If ExtendedVerification is FALSE, only set display mode to mode 0.
 
@@ -286,7 +286,7 @@ GraphicsConsoleConOutTestString (
   supports
 
   Implements SIMPLE_TEXT_OUTPUT.QueryMode().
-  It returnes information for an available text mode that the Graphics Console supports.
+  It returns information for an available text mode that the Graphics Console supports.
   In this driver,we only support text mode 80x25, which is defined as mode 0.
 
   @param  This                  Protocol instance pointer.
@@ -422,7 +422,7 @@ GraphicsConsoleConOutEnableCursor (
 /**
   Test to see if Graphics Console could be supported on the Controller.
 
-  Graphics Console could be supported if Graphics Output Protocol or UGA Draw
+  Graphics Console could be supported if Graphics Output Protocol or UGADraw
   Protocol exists on the Controller. (UGA Draw Protocol could be skipped
   if PcdUgaConsumeSupport is set to FALSE.)
 
@@ -510,7 +510,7 @@ EfiLocateHiiProtocol (
 
 
 /**
-  Gets Graphics Console devcie's foreground color and background color.
+  Gets Graphics Console device's foreground color and background color.
 
   @param  This                  Protocol instance pointer.
   @param  Foreground            Returned text foreground color.
