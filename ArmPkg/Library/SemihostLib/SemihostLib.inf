@@ -2,7 +2,7 @@
 # Semihosting JTAG lib
 #
 # Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
-# Copyright (c) 2011 - 2013, ARM Ltd. All rights reserved.<BR>
+# Copyright (c) 2011 - 2021, Arm Limited. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -25,6 +25,7 @@
 #
 [Sources.common]
   SemihostLib.c
+  SemihostPrivate.h
 
 [Sources.ARM]
   Arm/GccSemihost.S | GCC
