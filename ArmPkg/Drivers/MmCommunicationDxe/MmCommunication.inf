@@ -2,7 +2,7 @@
 #
 #  DXE MM Communicate driver
 #
-#  Copyright (c) 2016 - 2019, ARM Limited. All rights reserved.
+#  Copyright (c) 2016 - 2021, Arm Limited. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -24,6 +24,7 @@
 #
 
 [Sources.AARCH64]
+  MmCommunicate.h
   MmCommunication.c
 
 [Packages]
