@@ -1,6 +1,6 @@
 #/** @file
 #
-#  Copyright (c) 2017-2018, Arm Limited. All rights reserved.
+#  Copyright (c) 2017-2021, Arm Limited. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -18,11 +18,16 @@
   ENTRY_POINT                    = ArmScmiDxeEntryPoint
 
 [Sources.common]
-  Scmi.c
+  ArmScmiBaseProtocolPrivate.h
+  ArmScmiClockProtocolPrivate.h
+  ArmScmiPerformanceProtocolPrivate.h
   ScmiBaseProtocol.c
+  Scmi.c
   ScmiClockProtocol.c
   ScmiDxe.c
+  ScmiDxe.h
   ScmiPerformanceProtocol.c
+  ScmiPrivate.h
 
 [Packages]
   ArmPkg/ArmPkg.dec
