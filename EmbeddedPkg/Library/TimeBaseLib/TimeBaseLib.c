@@ -99,14 +99,14 @@ EfiGetEpochDays (
 /**
   Converts EFI_TIME to Epoch seconds (elapsed since 1970 JANUARY 01, 00:00:00 UTC)
  **/
-UINT32
+UINTN
 EFIAPI
 EfiTimeToEpoch (
   IN  EFI_TIME  *Time
   )
 {
-  UINT32 EpochDays;   // Number of days elapsed since EPOCH_JULIAN_DAY
-  UINT32 EpochSeconds;
+  UINTN EpochDays;   // Number of days elapsed since EPOCH_JULIAN_DAY
+  UINTN EpochSeconds;
 
   EpochDays = EfiGetEpochDays (Time);
 
