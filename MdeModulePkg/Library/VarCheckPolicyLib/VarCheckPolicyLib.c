@@ -12,7 +12,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/DebugLib.h>
 #include <Library/SafeIntLib.h>
 #include <Library/MmServicesTableLib.h>
-#include <Library/SmmMemLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 
@@ -22,6 +21,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/VariablePolicyLib.h>
 
 #include <Guid/VarCheckPolicyMmi.h>
+
+#include "VarCheckPolicyLib.h"
 
 //================================================
 // As a VarCheck library, we're linked into the VariableServices
@@ -102,7 +103,8 @@ VarCheckPolicyLibMmiHandler (
   // Make sure that the buffer does not overlap SMM.
   // This should be covered by the SmiManage infrastructure, but just to be safe...
   InternalCommBufferSize = *CommBufferSize;
-  if (InternalCommBufferSize > VAR_CHECK_POLICY_MM_COMM_BUFFER_SIZE || !SmmIsBufferOutsideSmmValid((UINTN)CommBuffer, (UINT64)InternalCommBufferSize)) {
+  if (InternalCommBufferSize > VAR_CHECK_POLICY_MM_COMM_BUFFER_SIZE ||
+      !VarCheckPolicyIsBufferOutsideValid((UINTN)CommBuffer, (UINT64)InternalCommBufferSize)) {
     DEBUG ((DEBUG_ERROR, "%a - Invalid CommBuffer supplied! 0x%016lX[0x%016lX]\n", __FUNCTION__, CommBuffer, InternalCommBufferSize));
     return EFI_INVALID_PARAMETER;
   }
@@ -305,17 +307,13 @@ VarCheckPolicyLibMmiHandler (
   Constructor function of VarCheckPolicyLib to register VarCheck handler and
   SW MMI handlers.
 
-  @param[in] ImageHandle    The firmware allocated handle for the EFI image.
-  @param[in] SystemTable    A pointer to the EFI System Table.
-
   @retval EFI_SUCCESS       The constructor executed correctly.
 
 **/
 EFI_STATUS
 EFIAPI
-VarCheckPolicyLibConstructor (
-  IN EFI_HANDLE             ImageHandle,
-  IN EFI_SYSTEM_TABLE       *SystemTable
+VarCheckPolicyLibCommonConstructor (
+  VOID
   )
 {
   EFI_STATUS    Status;
