@@ -200,7 +200,7 @@ LibSetTime (
     }
   }
 
-  EpochSeconds = EfiTimeToEpoch (Time);
+  EpochSeconds = (UINT32)EfiTimeToEpoch (Time);
 
   // Adjust for the correct time zone, i.e. convert to UTC time zone
   // The timezone setting also reflects the DST setting of the clock
