@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2021, Arm Limited. All rights reserved.<BR>
 *
 *  SPDX-License-Identifier: BSD-2-Clause-Patent
 *
@@ -32,7 +32,7 @@ ARM_PROCESSOR_TABLE mArmProcessorTableTemplate = {
 };
 
 /** Publish ARM Processor Data table in UEFI SYSTEM Table.
- * @param:  HobStart               Pointer to the beginning of the HOB List from PEI.
+ * @param  HobStart               Pointer to the beginning of the HOB List from PEI.
  *
  * Description : This function iterates through HOB list and finds ARM processor Table Entry HOB.
  *               If  the ARM processor Table Entry HOB is found, the HOB data is copied to run-time memory
