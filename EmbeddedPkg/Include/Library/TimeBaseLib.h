@@ -83,7 +83,7 @@ EpochToEfiTime (
 /**
   Converts EFI_TIME to Epoch seconds (elapsed since 1970 JANUARY 01, 00:00:00 UTC)
  **/
-UINT32
+UINTN
 EFIAPI
 EfiTimeToEpoch (
   IN  EFI_TIME  *Time
