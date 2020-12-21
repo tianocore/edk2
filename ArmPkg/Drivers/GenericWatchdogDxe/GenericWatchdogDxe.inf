@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2013-2017, ARM Limited. All rights reserved.
+#  Copyright (c) 2013-2021, Arm Limited. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -13,6 +13,7 @@
   ENTRY_POINT                    = GenericWatchdogEntry
 
 [Sources.common]
+  GenericWatchdog.h
   GenericWatchdogDxe.c
 
 [Packages]
