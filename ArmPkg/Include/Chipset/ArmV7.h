@@ -1,7 +1,7 @@
 /** @file
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  Copyright (c) 2011-2015, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2011-2021, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -70,7 +70,7 @@
 // MIDR - Main ID Register definitions
 #define ARM_CPU_TYPE_SHIFT      4
 #define ARM_CPU_TYPE_MASK       0xFFF
-#define ARM_CPU_TYPE_AEMv8      0xD0F
+#define ARM_CPU_TYPE_AEMV8      0xD0F
 #define ARM_CPU_TYPE_A53        0xD03
 #define ARM_CPU_TYPE_A57        0xD07
 #define ARM_CPU_TYPE_A15        0xC0F
