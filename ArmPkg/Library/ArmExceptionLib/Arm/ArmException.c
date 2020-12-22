@@ -2,7 +2,7 @@
 *  Exception handling support specific for ARM
 *
 * Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-* Copyright (c) 2014, ARM Limited. All rights reserved.<BR>
+* Copyright (c) 2014 - 2021, Arm Limited. All rights reserved.<BR>
 * Copyright (c) 2016 HP Development Company, L.P.<BR>
 *
 *  SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -26,7 +26,8 @@ PHYSICAL_ADDRESS        gExceptionVectorAlignmentMask = ARM_VECTOR_TABLE_ALIGNME
 // NOTE: This code assumes vectors are ARM and not Thumb code
 UINTN                   gDebuggerNoHandlerValue = 0xEAFFFFFE;
 
-RETURN_STATUS ArchVectorConfig(
+RETURN_STATUS
+ArchVectorConfig (
   IN  UINTN       VectorBaseAddress
   )
 {
