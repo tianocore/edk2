@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
+#  Copyright (c) 2011-2021, Arm Limited. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -51,22 +51,22 @@ _DefaultSError_t:
   mov  x0, #EXCEPT_AARCH64_SERROR
   TO_HANDLER
 
-VECTOR_ENTRY(PeiVectorTable, ARM_VECTOR_CUR_SPx_SYNC)
+VECTOR_ENTRY(PeiVectorTable, ARM_VECTOR_CUR_SPX_SYNC)
 _DefaultSyncExceptHandler_h:
   mov  x0, #EXCEPT_AARCH64_SYNCHRONOUS_EXCEPTIONS
   TO_HANDLER
 
-VECTOR_ENTRY(PeiVectorTable, ARM_VECTOR_CUR_SPx_IRQ)
+VECTOR_ENTRY(PeiVectorTable, ARM_VECTOR_CUR_SPX_IRQ)
 _DefaultIrq_h:
   mov  x0, #EXCEPT_AARCH64_IRQ
   TO_HANDLER
 
-VECTOR_ENTRY(PeiVectorTable, ARM_VECTOR_CUR_SPx_FIQ)
+VECTOR_ENTRY(PeiVectorTable, ARM_VECTOR_CUR_SPX_FIQ)
 _DefaultFiq_h:
   mov  x0, #EXCEPT_AARCH64_FIQ
   TO_HANDLER
 
-VECTOR_ENTRY(PeiVectorTable, ARM_VECTOR_CUR_SPx_SERR)
+VECTOR_ENTRY(PeiVectorTable, ARM_VECTOR_CUR_SPX_SERR)
 _DefaultSError_h:
   mov  x0, #EXCEPT_AARCH64_SERROR
   TO_HANDLER
