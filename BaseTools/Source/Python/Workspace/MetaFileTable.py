@@ -154,7 +154,7 @@ class ModuleTable(MetaFileTable):
         if BelongsToItem is not None:
             result = [item for item in result if item[7] == BelongsToItem]
 
-        result = [ [r[2],r[3],r[4],r[5],r[6],r[0],r[9]] for r in result ]
+        result = [ [r[2],r[3],r[4],r[5],r[6],r[0],r[8]] for r in result ]
         return result
 
 ## Python class representation of table storing package data
