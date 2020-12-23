@@ -7,7 +7,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
-#define SMBIOS_CORRECT_TYPO
+
 #include "UefiShellDebug1CommandsLib.h"
 #include "PrintInfo.h"
 #include "LibSmbiosView.h"
