@@ -3025,7 +3025,7 @@ DisplaySystemResetCapabilities (
     break;
 
   case 3:
-    ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_DO_NOT_REBOOT_BITS), gShellDebug1HiiHandle);
+    ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_DO_NOT_REBOOT), gShellDebug1HiiHandle);
     break;
   }
   //
