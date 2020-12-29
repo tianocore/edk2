@@ -894,7 +894,7 @@ def CreatePcdDataBase(PcdDBData):
     delta = {}
     for skuname, skuid in PcdDBData:
         if len(PcdDBData[(skuname, skuid)][1]) != len(PcdDBData[(TAB_DEFAULT, "0")][1]):
-            EdkLogger.ERROR("The size of each sku in one pcd are not same")
+            EdkLogger.error("build", AUTOGEN_ERROR, "The size of each sku in one pcd are not same")
     for skuname, skuid in PcdDBData:
         if skuname == TAB_DEFAULT:
             continue
