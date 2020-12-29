@@ -725,6 +725,17 @@ ArmHasGicSystemRegisters (
   VOID
   );
 
+/** Checks if CCIDX is implemented.
+
+   @retval TRUE  CCIDX is implemented.
+   @retval FALSE CCIDX is not implemented.
+**/
+BOOLEAN
+EFIAPI
+ArmHasCcidx (
+  VOID
+  );
+
 #ifdef MDE_CPU_ARM
 ///
 /// AArch32-only ID Register Helper functions
