@@ -102,3 +102,20 @@ ArmHasSecurityExtensions (
 {
   return ((ArmReadIdPfr1 () & ARM_PFR1_SEC) != 0);
 }
+
+/** Checks if CCIDX is implemented.
+
+   @retval TRUE  CCIDX is implemented.
+   @retval FALSE CCIDX is not implemented.
+**/
+BOOLEAN
+EFIAPI
+ArmHasCcidx (
+  VOID
+  )
+{
+  UINTN Mmfr4;
+
+  Mmfr4 = ArmReadIdMmfr4 ();
+  return (((Mmfr4 >> 24) & 0xF) == 1) ? TRUE : FALSE;
+}
