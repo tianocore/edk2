@@ -30,6 +30,8 @@
   DEFINE PS2_KEYBOARD_ENABLE          = FALSE
   DEFINE UNIVERSAL_PAYLOAD            = FALSE
 
+  DEFINE DISABLE_MMX_SSE              = FALSE
+
   #
   # SBL:      UEFI payload for Slim Bootloader
   # COREBOOT: UEFI payload for coreboot
@@ -96,6 +98,9 @@
   *_*_*_CC_FLAGS                 = -D DISABLE_NEW_DEPRECATED_INTERFACES
 !if $(BOOTLOADER) == "LINUXBOOT"
   *_*_*_CC_FLAGS                 = -D LINUXBOOT_PAYLOAD
+!endif
+!if $(DISABLE_MMX_SSE)
+  *_*_*_CC_FLAGS                 = -mno-mmx -mno-sse
 !endif
   GCC:*_UNIXGCC_*_CC_FLAGS       = -DMDEPKG_NDEBUG
   GCC:RELEASE_*_*_CC_FLAGS       = -DMDEPKG_NDEBUG
