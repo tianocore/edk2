@@ -40,8 +40,9 @@ AdjustRootBridgeResource (
   IN  PCI_ROOT_BRIDGE_APERTURE *PMemAbove4G
 )
 {
+#ifndef LINUXBOOT_PAYLOAD
   UINT64  Mask;
-
+#endif
   //
   // For now try to downgrade everything into MEM32 since
   // - coreboot does not assign resource above 4GB
@@ -80,7 +81,7 @@ AdjustRootBridgeResource (
     PMemAbove4G->Base  = MAX_UINT64;
     PMemAbove4G->Limit = 0;
   }
-
+#ifndef LINUXBOOT_PAYLOAD
   //
   // Align IO  resource at 4K  boundary
   //
@@ -98,6 +99,7 @@ AdjustRootBridgeResource (
   if (Mem->Base != MAX_UINT64) {
     Mem->Base &= ~Mask;
   }
+#endif
 }
 
 /**
