@@ -63,11 +63,13 @@ HandOffToDxeCore (
   TopOfStack = (VOID *) ((UINTN) BaseOfStack + EFI_SIZE_TO_PAGES (STACK_SIZE) * EFI_PAGE_SIZE - CPU_STACK_ALIGNMENT);
   TopOfStack = ALIGN_POINTER (TopOfStack, CPU_STACK_ALIGNMENT);
 
+#ifndef LINUXBOOT_PAYLOAD
   //
   // Get the address and size of the GHCB pages
   //
   GhcbBase = (VOID *) PcdGet64 (PcdGhcbBase);
   GhcbSize = PcdGet64 (PcdGhcbSize);
+#endif
 
   PageTables = 0;
   if (FeaturePcdGet (PcdDxeIplBuildPageTables)) {
