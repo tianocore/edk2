@@ -6,7 +6,7 @@
 
 **/
 
-#include "StatusCodeHandlerSmm.h"
+#include "StatusCodeHandlerMm.h"
 
 /**
   Convert status code value and extended data to readable ASCII string, send string to serial I/O device.
