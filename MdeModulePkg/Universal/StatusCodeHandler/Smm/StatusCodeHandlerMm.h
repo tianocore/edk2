@@ -7,10 +7,10 @@
 
 **/
 
-#ifndef __STATUS_CODE_HANDLER_SMM_H__
-#define __STATUS_CODE_HANDLER_SMM_H__
+#ifndef __STATUS_CODE_HANDLER_MM_H__
+#define __STATUS_CODE_HANDLER_MM_H__
 
-#include <Protocol/SmmReportStatusCodeHandler.h>
+#include <Protocol/MmReportStatusCodeHandler.h>
 
 #include <Guid/MemoryStatusCodeRecord.h>
 #include <Guid/StatusCodeDataTypeId.h>
@@ -22,7 +22,7 @@
 #include <Library/PrintLib.h>
 #include <Library/PcdLib.h>
 #include <Library/UefiDriverEntryPoint.h>
-#include <Library/SmmServicesTableLib.h>
+#include <Library/MmServicesTableLib.h>
 #include <Library/SerialPortLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -32,7 +32,7 @@
 //
 #define MAX_DEBUG_MESSAGE_LENGTH 0x100
 
-extern RUNTIME_MEMORY_STATUSCODE_HEADER  *mSmmMemoryStatusCodeTable;
+extern RUNTIME_MEMORY_STATUSCODE_HEADER  *mMmMemoryStatusCodeTable;
 
 /**
   Locates Serial I/O Protocol as initialization for serial status code worker.
@@ -112,6 +112,19 @@ MemoryStatusCodeReportWorker (
   IN UINT32                             Instance,
   IN EFI_GUID                           *CallerId,
   IN EFI_STATUS_CODE_DATA               *Data OPTIONAL
+  );
+
+/**
+  Entry point of Common MM Status Code Driver.
+
+  This function is the entry point of MM Status Code Driver.
+
+  @retval EFI_SUCCESS       The entry point is executed successfully.
+
+**/
+EFI_STATUS
+StatusCodeHandlerCommonEntry (
+  VOID
   );
 
 #endif
