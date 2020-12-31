@@ -7,15 +7,15 @@
 
 **/
 
-#include "StatusCodeHandlerSmm.h"
+#include "StatusCodeHandlerMm.h"
 
-RUNTIME_MEMORY_STATUSCODE_HEADER  *mSmmMemoryStatusCodeTable;
+RUNTIME_MEMORY_STATUSCODE_HEADER  *mMmMemoryStatusCodeTable;
 
 /**
-  Initialize SMM memory status code table as initialization for memory status code worker
+  Initialize MM memory status code table as initialization for memory status code worker
 
-  @retval EFI_SUCCESS  SMM memory status code table successfully initialized.
-  @retval others       Errors from gSmst->SmmInstallConfigurationTable().
+  @retval EFI_SUCCESS  MM memory status code table successfully initialized.
+  @retval others       Errors from gMmst->MmInstallConfigurationTable().
 **/
 EFI_STATUS
 MemoryStatusCodeInitializeWorker (
@@ -25,17 +25,17 @@ MemoryStatusCodeInitializeWorker (
   EFI_STATUS                        Status;
 
   //
-  // Allocate SMM memory status code pool.
+  // Allocate MM memory status code pool.
   //
-  mSmmMemoryStatusCodeTable = (RUNTIME_MEMORY_STATUSCODE_HEADER *)AllocateZeroPool (sizeof (RUNTIME_MEMORY_STATUSCODE_HEADER) + PcdGet16 (PcdStatusCodeMemorySize) * 1024);
-  ASSERT (mSmmMemoryStatusCodeTable != NULL);
+  mMmMemoryStatusCodeTable = (RUNTIME_MEMORY_STATUSCODE_HEADER *)AllocateZeroPool (sizeof (RUNTIME_MEMORY_STATUSCODE_HEADER) + PcdGet16 (PcdStatusCodeMemorySize) * 1024);
+  ASSERT (mMmMemoryStatusCodeTable != NULL);
 
-  mSmmMemoryStatusCodeTable->MaxRecordsNumber = (PcdGet16 (PcdStatusCodeMemorySize) * 1024) / sizeof (MEMORY_STATUSCODE_RECORD);
-  Status = gSmst->SmmInstallConfigurationTable (
-                    gSmst,
+  mMmMemoryStatusCodeTable->MaxRecordsNumber = (PcdGet16 (PcdStatusCodeMemorySize) * 1024) / sizeof (MEMORY_STATUSCODE_RECORD);
+  Status = gMmst->MmInstallConfigurationTable (
+                    gMmst,
                     &gMemoryStatusCodeRecordGuid,
-                    &mSmmMemoryStatusCodeTable,
-                    sizeof (mSmmMemoryStatusCodeTable)
+                    &mMmMemoryStatusCodeTable,
+                    sizeof (mMmMemoryStatusCodeTable)
                     );
   return Status;
 }
@@ -74,8 +74,8 @@ MemoryStatusCodeReportWorker (
   //
   // Locate current record buffer.
   //
-  Record = (MEMORY_STATUSCODE_RECORD *) (mSmmMemoryStatusCodeTable + 1);
-  Record = &Record[mSmmMemoryStatusCodeTable->RecordIndex++];
+  Record = (MEMORY_STATUSCODE_RECORD *) (mMmMemoryStatusCodeTable + 1);
+  Record = &Record[mMmMemoryStatusCodeTable->RecordIndex++];
 
   //
   // Save status code.
@@ -92,12 +92,12 @@ MemoryStatusCodeReportWorker (
   // so the first record is pointed by record index.
   // If it is less then max number, index of the first record is zero.
   //
-  mSmmMemoryStatusCodeTable->NumberOfRecords++;
-  if (mSmmMemoryStatusCodeTable->RecordIndex == mSmmMemoryStatusCodeTable->MaxRecordsNumber) {
+  mMmMemoryStatusCodeTable->NumberOfRecords++;
+  if (mMmMemoryStatusCodeTable->RecordIndex == mMmMemoryStatusCodeTable->MaxRecordsNumber) {
     //
     // Wrap around record index.
     //
-    mSmmMemoryStatusCodeTable->RecordIndex = 0;
+    mMmMemoryStatusCodeTable->RecordIndex = 0;
   }
 
   return EFI_SUCCESS;

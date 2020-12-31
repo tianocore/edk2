@@ -1,15 +1,15 @@
 /** @file
   Status Code Handler Driver which produces general handlers and hook them
-  onto the SMM status code router.
+  onto the MM status code router.
 
   Copyright (c) 2009 - 2020, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include "StatusCodeHandlerSmm.h"
+#include "StatusCodeHandlerMm.h"
 
-EFI_SMM_RSC_HANDLER_PROTOCOL  *mRscHandlerProtocol       = NULL;
+EFI_MM_RSC_HANDLER_PROTOCOL   *mRscHandlerProtocol       = NULL;
 
 
 /**
@@ -42,27 +42,22 @@ InitializationDispatcherWorker (
 }
 
 /**
-  Entry point of SMM Status Code Driver.
+  Entry point of Common MM Status Code Driver.
 
-  This function is the entry point of SMM Status Code Driver.
-
-  @param  ImageHandle       The firmware allocated handle for the EFI image.
-  @param  SystemTable       A pointer to the EFI System Table.
+  This function is the entry point of MM Status Code Driver.
 
   @retval EFI_SUCCESS       The entry point is executed successfully.
 
 **/
 EFI_STATUS
-EFIAPI
-StatusCodeHandlerSmmEntry (
-  IN EFI_HANDLE         ImageHandle,
-  IN EFI_SYSTEM_TABLE   *SystemTable
+StatusCodeHandlerCommonEntry (
+  VOID
   )
 {
   EFI_STATUS                Status;
 
-  Status = gSmst->SmmLocateProtocol (
-                    &gEfiSmmRscHandlerProtocolGuid,
+  Status = gMmst->MmLocateProtocol (
+                    &gEfiMmRscHandlerProtocolGuid,
                     NULL,
                     (VOID **) &mRscHandlerProtocol
                     );
