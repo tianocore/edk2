@@ -1,7 +1,7 @@
 /** @file
   Internal library implementation for PCI Bus module.
 
-Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2021, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -378,6 +378,60 @@ DumpResourceMap (
 }
 
 /**
+  Adjust the Devices' BAR size to minimum value if it support Resizeable BAR capability.
+
+  @param RootBridgeDev  Pointer to instance of PCI_IO_DEVICE..
+
+  @return TRUE if BAR size is adjusted.
+
+**/
+BOOLEAN
+AdjustPciDeviceBarSize (
+  IN PCI_IO_DEVICE *RootBridgeDev
+  )
+{
+  PCI_IO_DEVICE     *PciIoDevice;
+  LIST_ENTRY        *CurrentLink;
+  BOOLEAN           Adjusted;
+  UINTN             Offset;
+  UINTN             BarIndex;
+
+  Adjusted    = FALSE;
+  CurrentLink = RootBridgeDev->ChildList.ForwardLink;
+
+  while (CurrentLink != NULL && CurrentLink != &RootBridgeDev->ChildList) {
+    PciIoDevice = PCI_IO_DEVICE_FROM_LINK (CurrentLink);
+
+    if (IS_PCI_BRIDGE (&PciIoDevice->Pci)) {
+      if (AdjustPciDeviceBarSize (PciIoDevice)) {
+        Adjusted = TRUE;
+      }
+    } else {
+      if (PciIoDevice->ResizableBarOffset != 0) {
+        DEBUG ((
+          DEBUG_ERROR,
+          "PciBus: [%02x|%02x|%02x] Adjust Pci Device Bar Size\n",
+          PciIoDevice->BusNumber, PciIoDevice->DeviceNumber, PciIoDevice->FunctionNumber
+          ));
+        PciProgramResizableBar (PciIoDevice, PciResizableBarMin);
+        //
+        // Start to parse the bars
+        //
+        for (Offset = 0x10, BarIndex = 0; Offset <= 0x24 && BarIndex < PCI_MAX_BAR; BarIndex++) {
+          Offset = PciParseBar (PciIoDevice, Offset, BarIndex);
+        }
+        Adjusted = TRUE;
+        DEBUG_CODE (DumpPciBars (PciIoDevice););
+      }
+    }
+
+    CurrentLink = CurrentLink->ForwardLink;
+  }
+
+  return Adjusted;
+}
+
+/**
   Submits the I/O and memory resource requirements for the specified PCI Host Bridge.
 
   @param PciResAlloc  Point to protocol instance of EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL.
@@ -422,6 +476,10 @@ PciHostBridgeResourceAllocator (
   PCI_RESOURCE_NODE                              PMem64Pool;
   EFI_DEVICE_HANDLE_EXTENDED_DATA_PAYLOAD        HandleExtendedData;
   EFI_RESOURCE_ALLOC_FAILURE_ERROR_DATA_PAYLOAD  AllocFailExtendedData;
+  BOOLEAN                                        ResizableBarNeedAdjust;
+  BOOLEAN                                        ResizableBarAdjusted;
+
+  ResizableBarNeedAdjust = PcdGetBool (PcdPcieResizableBarSupport);
 
   //
   // It may try several times if the resource allocation fails
@@ -703,19 +761,30 @@ PciHostBridgeResourceAllocator (
             sizeof (AllocFailExtendedData)
             );
 
-      Status = PciHostBridgeAdjustAllocation (
-                 &IoPool,
-                 &Mem32Pool,
-                 &PMem32Pool,
-                 &Mem64Pool,
-                 &PMem64Pool,
-                 IoResStatus,
-                 Mem32ResStatus,
-                 PMem32ResStatus,
-                 Mem64ResStatus,
-                 PMem64ResStatus
-                 );
-
+     //
+     // When resource conflict happens, adjust the BAR size first.
+     // Only when adjusting BAR size doesn't help or BAR size cannot be adjusted,
+     // reject the device who requests largest resource that causes conflict.
+     //
+      ResizableBarAdjusted = FALSE;
+      if (ResizableBarNeedAdjust) {
+        ResizableBarAdjusted = AdjustPciDeviceBarSize (RootBridgeDev);
+        ResizableBarNeedAdjust = FALSE;
+      }
+      if (!ResizableBarAdjusted) {
+        Status = PciHostBridgeAdjustAllocation (
+                  &IoPool,
+                  &Mem32Pool,
+                  &PMem32Pool,
+                  &Mem64Pool,
+                  &PMem64Pool,
+                  IoResStatus,
+                  Mem32ResStatus,
+                  PMem32ResStatus,
+                  Mem64ResStatus,
+                  PMem64ResStatus
+                  );
+      }
       //
       // Destroy all the resource tree
       //
@@ -1647,6 +1716,94 @@ PciHostBridgeEnumerator (
     // Record the hostbridge handle
     //
     AddHostBridgeEnumerator (RootBridgeDev->PciRootBridgeIo->ParentHandle);
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  This function is used to program the Resizable BAR Register.
+
+  @param PciIoDevice            A pointer to the PCI_IO_DEVICE.
+  @param ResizableBarOp         PciResizableBarMax: Set BAR to max size
+                                PciResizableBarMin: set BAR to min size.
+
+  @retval EFI_SUCCESS           Successfully enumerated the host bridge.
+  @retval other                 Some error occurred when enumerating the host bridge.
+
+**/
+EFI_STATUS
+PciProgramResizableBar (
+  IN PCI_IO_DEVICE                *PciIoDevice,
+  IN PCI_RESIZABLE_BAR_OPERATION  ResizableBarOp
+  )
+{
+  EFI_PCI_IO_PROTOCOL  *PciIo;
+  UINT64                Capabilities;
+  UINT32                Index;
+  UINT32                Offset;
+  INTN                  Bit;
+  UINTN                 ResizableBarNumber;
+  EFI_STATUS            Status;
+  PCI_EXPRESS_EXTENDED_CAPABILITIES_RESIZABLE_BAR_ENTRY   Entries[PCI_MAX_BAR];
+
+  ASSERT (PciIoDevice->ResizableBarOffset != 0);
+
+  DEBUG ((DEBUG_INFO, "   Programs Resizable BAR register, offset: 0x%08x, number: %d\n",
+        PciIoDevice->ResizableBarOffset, PciIoDevice->ResizableBarNumber));
+
+  ResizableBarNumber = MIN (PciIoDevice->ResizableBarNumber, PCI_MAX_BAR);
+  PciIo = &PciIoDevice->PciIo;
+  Status = PciIo->Pci.Read (
+          PciIo,
+          EfiPciIoWidthUint8,
+          PciIoDevice->ResizableBarOffset + sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_HEADER),
+          sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_RESIZABLE_BAR_ENTRY) * ResizableBarNumber,
+          (VOID *)(&Entries)
+          );
+  ASSERT_EFI_ERROR (Status);
+
+  for (Index = 0; Index < ResizableBarNumber; Index++) {
+
+    //
+    // When the bit of Capabilities Set, indicates that the Function supports
+    // operating with the BAR sized to (2^Bit) MB.
+    // Example:
+    // Bit 0 is set: supports operating with the BAR sized to 1 MB
+    // Bit 1 is set: supports operating with the BAR sized to 2 MB
+    // Bit n is set: supports operating with the BAR sized to (2^n) MB
+    //
+    Capabilities = LShiftU64(Entries[Index].ResizableBarControl.Bits.BarSizeCapability, 28)
+                  | Entries[Index].ResizableBarCapability.Bits.BarSizeCapability;
+
+    if (ResizableBarOp == PciResizableBarMax) {
+      Bit = HighBitSet64(Capabilities);
+    } else if (ResizableBarOp == PciResizableBarMin) {
+      Bit = LowBitSet64(Capabilities);
+    } else {
+      ASSERT ((ResizableBarOp == PciResizableBarMax) || (ResizableBarOp == PciResizableBarMin));
+    }
+
+    ASSERT (Bit >= 0);
+
+    Offset = PciIoDevice->ResizableBarOffset + sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_HEADER)
+            + Index * sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_RESIZABLE_BAR_ENTRY)
+            + OFFSET_OF (PCI_EXPRESS_EXTENDED_CAPABILITIES_RESIZABLE_BAR_ENTRY, ResizableBarControl);
+
+    Entries[Index].ResizableBarControl.Bits.BarSize = (UINT32) Bit;
+    DEBUG ((
+      DEBUG_INFO,
+      "   Resizable Bar: Offset = 0x%x, Bar Size Capability = 0x%016lx, New Bar Size = 0x%lx\n",
+      OFFSET_OF (PCI_TYPE00, Device.Bar[Entries[Index].ResizableBarControl.Bits.BarIndex]),
+      Capabilities, LShiftU64 (SIZE_1MB, Bit)
+      ));
+    PciIo->Pci.Write (
+            PciIo,
+            EfiPciIoWidthUint32,
+            Offset,
+            1,
+            &Entries[Index].ResizableBarControl.Uint32
+            );
   }
 
   return EFI_SUCCESS;
