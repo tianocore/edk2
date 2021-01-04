@@ -4,7 +4,7 @@
 # and libraries instances, which are used for those modules.
 #
 # Copyright (c) 2019, NVIDIA CORPORATION. All rights reserved.
-# Copyright (c) 2007 - 2020, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2021, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
 # (C) Copyright 2016 - 2019 Hewlett Packard Enterprise Development LP<BR>
 # Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
@@ -2042,6 +2042,12 @@
   #   FALSE - Does not store StatusCode in memory.<BR>
   # @Prompt Enable StatusCode via memory.
   gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory|FALSE|BOOLEAN|0x00010023
+
+  ## Indicates if the PCIe Resizable BAR Capability Supported.<BR><BR>
+  #   TRUE  - PCIe Resizable BAR Capability is supported.<BR>
+  #   FALSE - PCIe Resizable BAR Capability is not supported.<BR>
+  # @Prompt Enable PCIe Resizable BAR Capability support.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPcieResizableBarSupport|TRUE|BOOLEAN|0x10000024
 
 [PcdsPatchableInModule]
   ## Specify memory size with page number for PEI code when
