@@ -1,7 +1,7 @@
 /** @file
   Support for the latest PCI standard.
 
-  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2021, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -632,10 +632,30 @@ typedef struct {
 #define PCI_EXPRESS_EXTENDED_CAPABILITY_RESIZABLE_BAR_ID    0x0015
 #define PCI_EXPRESS_EXTENDED_CAPABILITY_RESIZABLE_BAR_VER1  0x1
 
+typedef union {
+  struct {
+    UINT32 Reserved:4;
+    UINT32 BarSizeCapability:28;
+  } Bits;
+  UINT32   Uint32;
+} PCI_EXPRESS_EXTENDED_CAPABILITIES_RESIZABLE_BAR_CAPABILITY;
+
+
+typedef union {
+  struct {
+    UINT32 BarIndex:3;
+    UINT32 Reserved:2;
+    UINT32 ResizableBarNumber:3;
+    UINT32 BarSize:6;
+    UINT32 Reserved2:2;
+    UINT32 BarSizeCapability:16;
+  } Bits;
+  UINT32   Uint32;
+} PCI_EXPRESS_EXTENDED_CAPABILITIES_RESIZABLE_BAR_CONTROL;
+
 typedef struct {
-  UINT32                                                 ResizableBarCapability;
-  UINT16                                                 ResizableBarControl;
-  UINT16                                                 Reserved;
+  PCI_EXPRESS_EXTENDED_CAPABILITIES_RESIZABLE_BAR_CAPABILITY ResizableBarCapability;
+  PCI_EXPRESS_EXTENDED_CAPABILITIES_RESIZABLE_BAR_CONTROL    ResizableBarControl;
 } PCI_EXPRESS_EXTENDED_CAPABILITIES_RESIZABLE_BAR_ENTRY;
 
 typedef struct {
@@ -643,7 +663,7 @@ typedef struct {
   PCI_EXPRESS_EXTENDED_CAPABILITIES_RESIZABLE_BAR_ENTRY  Capability[1];
 } PCI_EXPRESS_EXTENDED_CAPABILITIES_RESIZABLE_BAR;
 
-#define GET_NUMBER_RESIZABLE_BARS(x) (((x->Capability[0].ResizableBarControl) & 0xE0) >> 5)
+#define GET_NUMBER_RESIZABLE_BARS(x) (x->Capability[0].ResizableBarControl.Bits.ResizableBarNumber)
 
 #define PCI_EXPRESS_EXTENDED_CAPABILITY_ARI_CAPABILITY_ID    0x000E
 #define PCI_EXPRESS_EXTENDED_CAPABILITY_ARI_CAPABILITY_VER1  0x1

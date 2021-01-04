@@ -1,7 +1,7 @@
 /** @file
   Main file for Pci shell Debug1 function.
 
-  Copyright (c) 2005 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2005 - 2021, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -5534,8 +5534,8 @@ PrintInterpretedExtendedCompatibilityResizeableBar (
       STRING_TOKEN (STR_PCI_EXT_CAP_RESIZE_BAR),
       gShellDebug1HiiHandle,
       ItemCount+1,
-      Header->Capability[ItemCount].ResizableBarCapability,
-      Header->Capability[ItemCount].ResizableBarControl
+      Header->Capability[ItemCount].ResizableBarCapability.Uint32,
+      Header->Capability[ItemCount].ResizableBarControl.Uint32
       );
   }
 
