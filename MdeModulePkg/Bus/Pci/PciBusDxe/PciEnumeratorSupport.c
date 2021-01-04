@@ -1,7 +1,7 @@
 /** @file
   PCI emumeration support functions implementation for PCI Bus module.
 
-Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2021, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -2423,6 +2423,31 @@ CreatePciIoDevice (
                );
     if (!EFI_ERROR (Status)) {
       DEBUG ((EFI_D_INFO, " MR-IOV: CapOffset = 0x%x\n", PciIoDevice->MrIovCapabilityOffset));
+    }
+  }
+
+  PciIoDevice->ResizableBarOffset = 0;
+  if (PcdGetBool (PcdPcieResizableBarSupport)) {
+    Status = LocatePciExpressCapabilityRegBlock (
+               PciIoDevice,
+               PCI_EXPRESS_EXTENDED_CAPABILITY_RESIZABLE_BAR_ID,
+               &PciIoDevice->ResizableBarOffset,
+               NULL
+               );
+    if (!EFI_ERROR (Status)) {
+      PCI_EXPRESS_EXTENDED_CAPABILITIES_RESIZABLE_BAR_CONTROL ResizableBarControl;
+      UINT32                                                  Offset;
+      Offset = PciIoDevice->ResizableBarOffset + sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_HEADER)
+                + sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_RESIZABLE_BAR_CAPABILITY),
+      PciIo->Pci.Read (
+              PciIo,
+              EfiPciIoWidthUint8,
+              Offset,
+              sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_RESIZABLE_BAR_CONTROL),
+              &ResizableBarControl
+              );
+      PciIoDevice->ResizableBarNumber = ResizableBarControl.Bits.ResizableBarNumber;
+      PciProgramResizableBar (PciIoDevice, PciResizableBarMax);
     }
   }
 

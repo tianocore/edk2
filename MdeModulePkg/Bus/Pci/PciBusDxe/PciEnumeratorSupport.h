@@ -1,7 +1,7 @@
 /** @file
   PCI enumeration support functions declaration for PCI Bus module.
 
-Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2021, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -465,6 +465,16 @@ VOID
 DumpPpbPaddingResource (
   IN PCI_IO_DEVICE                    *PciIoDevice,
   IN PCI_BAR_TYPE                     ResourceType
+  );
+
+/**
+  Dump the PCI BAR information.
+
+  @param PciIoDevice     PCI IO instance.
+**/
+VOID
+DumpPciBars (
+  IN PCI_IO_DEVICE                    *PciIoDevice
   );
 
 #endif
