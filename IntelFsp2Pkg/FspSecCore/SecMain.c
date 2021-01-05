@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2014 - 2020, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2021, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -150,15 +150,18 @@ SecStartup (
   SecCoreData.BootFirmwareVolumeBase = BootFirmwareVolume;
   SecCoreData.BootFirmwareVolumeSize = (UINT32)((EFI_FIRMWARE_VOLUME_HEADER *)BootFirmwareVolume)->FvLength;
 
-  SecCoreData.TemporaryRamBase       = (VOID*)(UINTN) TempRamBase;
+  //
+  // Support FSP reserved temporary memory from the whole temporary memory provided by bootloader.
+  // FSP reserved temporary memory will not be given to PeiCore.
+  //
+  SecCoreData.TemporaryRamBase       = (UINT8 *)(UINTN) TempRamBase  + PcdGet32 (PcdFspPrivateTemporaryRamSize);
+  SecCoreData.TemporaryRamSize       = SizeOfRam - PcdGet32 (PcdFspPrivateTemporaryRamSize);
   if (PcdGet8 (PcdFspHeapSizePercentage) == 0) {
-    SecCoreData.TemporaryRamSize       = SizeOfRam; // stack size that is going to be copied to the permanent memory
     SecCoreData.PeiTemporaryRamBase    = SecCoreData.TemporaryRamBase;
     SecCoreData.PeiTemporaryRamSize    = SecCoreData.TemporaryRamSize;
     SecCoreData.StackBase              = (VOID *)GetFspEntryStack(); // Share the same boot loader stack
     SecCoreData.StackSize              = 0;
   } else {
-    SecCoreData.TemporaryRamSize       = SizeOfRam;
     SecCoreData.PeiTemporaryRamBase    = SecCoreData.TemporaryRamBase;
     SecCoreData.PeiTemporaryRamSize    = SecCoreData.TemporaryRamSize * PcdGet8 (PcdFspHeapSizePercentage) / 100;
     SecCoreData.StackBase              = (VOID*)(UINTN)((UINTN)SecCoreData.TemporaryRamBase + SecCoreData.PeiTemporaryRamSize);
