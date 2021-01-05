@@ -20,7 +20,9 @@
         ## Both file path and directory path are accepted.
         "IgnoreFiles": [
             "Library/BrotliCustomDecompressLib/brotli",
-            "Universal/RegularExpressionDxe/oniguruma"
+            "Universal/RegularExpressionDxe/oniguruma",
+            "Library/LzmaCustomDecompressLib/Sdk/DOC",
+            "Library/LzmaCustomDecompressLib/Sdk/C"
         ]
     },
     ## options defined ci/Plugin/CompilerPlugin
