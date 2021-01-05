@@ -1,9 +1,9 @@
 /** @file
   LZMA Compress/Decompress tool (LzmaCompress)
 
-  Based on LZMA SDK 18.05:
+  Based on LZMA SDK 19.00:
     LzmaUtil.c -- Test application for LZMA compression
-    2018-04-30 : Igor Pavlov : Public domain
+    2019-02-21 : Igor Pavlov : Public domain
 
   Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -39,7 +39,7 @@ const char *kCantAllocateMessage = "Can not allocate memory";
 const char *kDataErrorMessage = "Data error";
 const char *kInvalidParamValMessage = "Invalid parameter value";
 
-static Bool mQuietMode = False;
+static BoolInt mQuietMode = False;
 static CONVERTER_TYPE mConType = NoConverter;
 
 UINT64 mDictionarySize = 28;
@@ -244,7 +244,7 @@ int main2(int numArgs, const char *args[], char *rs)
   CFileOutStream outStream;
   int res;
   int encodeMode = 0;
-  Bool modeWasSet = False;
+  BoolInt modeWasSet = False;
   const char *inputFile = NULL;
   const char *outputFile = "file.tmp";
   int param;
