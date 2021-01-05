@@ -21,6 +21,8 @@
         "IgnoreFiles": [
             "Library/BrotliCustomDecompressLib/brotli",
             "Universal/RegularExpressionDxe/oniguruma"
+            "Library/LzmaCustomDecompressLib/Sdk/DOC"
+            "Library/LzmaCustomDecompressLib/Sdk/C"
         ]
     },
     ## options defined ci/Plugin/CompilerPlugin
