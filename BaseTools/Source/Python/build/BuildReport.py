@@ -1125,10 +1125,11 @@ class PcdReport(object):
                                             if SkuInfo.DefaultStoreDict:
                                                 DefaultStoreList = sorted(SkuInfo.DefaultStoreDict.keys())
                                                 for DefaultStore in DefaultStoreList:
-                                                    OverrideValues = Pcd.SkuOverrideValues[Sku]
-                                                    DscOverride = self.ParseStruct(OverrideValues[DefaultStore])
-                                                    if DscOverride:
-                                                        break
+                                                    OverrideValues = Pcd.SkuOverrideValues.get(Sku)
+                                                    if OverrideValues:
+                                                        DscOverride = self.ParseStruct(OverrideValues[DefaultStore])
+                                                        if DscOverride:
+                                                            break
                                             if DscOverride:
                                                 break
                             if DscOverride:
@@ -1388,9 +1389,10 @@ class PcdReport(object):
                                         FileWrite(File, ' %-*s   : %6s %10s %10s %10s = %s' % (self.MaxLen, ' ', TypeName, '(' + Pcd.DatumType + ')', '(' + SkuIdName + ')', '(' + DefaultStore + ')', Value))
                             FileWrite(File, '%*s: %s: %s' % (self.MaxLen + 4, SkuInfo.VariableGuid, SkuInfo.VariableName, SkuInfo.VariableOffset))
                             if IsStructure:
-                                OverrideValues = Pcd.SkuOverrideValues[Sku]
-                                OverrideFieldStruct = self.OverrideFieldValue(Pcd, OverrideValues[DefaultStore])
-                                self.PrintStructureInfo(File, OverrideFieldStruct)
+                                OverrideValues = Pcd.SkuOverrideValues.get(Sku)
+                                if OverrideValues:
+                                    OverrideFieldStruct = self.OverrideFieldValue(Pcd, OverrideValues[DefaultStore])
+                                    self.PrintStructureInfo(File, OverrideFieldStruct)
                             self.PrintPcdDefault(File, Pcd, IsStructure, DscMatch, DscDefaultValue, InfMatch, InfDefaultValue, DecMatch, DecDefaultValue)
                 else:
                     Value = SkuInfo.DefaultValue
