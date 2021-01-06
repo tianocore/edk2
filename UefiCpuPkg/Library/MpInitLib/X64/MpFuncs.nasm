@@ -303,17 +303,17 @@ GetProcessorNumber:
     ;
     xor         ebx, ebx
     lea         eax, [esi + CpuInfoLocation]
-    mov         edi, [eax]
+    mov         rdi, [eax]
 
 GetNextProcNumber:
-    cmp         dword [edi], edx                      ; APIC ID match?
+    cmp         dword [rdi], edx                      ; APIC ID match?
     jz          ProgramStack
-    add         edi, 20
+    add         rdi, 20
     inc         ebx
     jmp         GetNextProcNumber
 
 ProgramStack:
-    mov         rsp, qword [edi + 12]
+    mov         rsp, qword [rdi + 12]
 
 CProcedureInvoke:
     push       rbp               ; Push BIST data at top of AP stack
