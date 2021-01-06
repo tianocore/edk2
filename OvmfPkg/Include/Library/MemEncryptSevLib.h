@@ -2,7 +2,7 @@
 
   Define Secure Encrypted Virtualization (SEV) base library helper function
 
-  Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
+  Copyright (c) 2017 - 2020, AMD Incorporated. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -12,6 +12,20 @@
 #define _MEM_ENCRYPT_SEV_LIB_H_
 
 #include <Base.h>
+
+//
+// Internal structure for holding SEV-ES information needed during SEC phase
+// and valid only during SEC phase and early PEI during platform
+// initialization.
+//
+// This structure is also used by assembler files:
+//   OvmfPkg/ResetVector/ResetVector.nasmb
+//   OvmfPkg/ResetVector/Ia32/PageTables64.asm
+// any changes must stay in sync with its usage.
+//
+typedef struct _SEC_SEV_ES_WORK_AREA {
+  UINT8    SevEsEnabled;
+} SEC_SEV_ES_WORK_AREA;
 
 /**
   Returns a boolean to indicate whether SEV-ES is enabled.
