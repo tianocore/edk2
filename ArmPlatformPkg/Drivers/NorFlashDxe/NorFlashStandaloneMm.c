@@ -1,6 +1,6 @@
 /** @file  NorFlashStandaloneMm.c
 
-  Copyright (c) 2011 - 2020, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2011 - 2021, Arm Limited. All rights reserved.<BR>
   Copyright (c) 2020, Linaro, Ltd. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -298,9 +298,18 @@ NorFlashInitialise (
 
   for (Index = 0; Index < mNorFlashDeviceCount; Index++) {
     // Check if this NOR Flash device contain the variable storage region
-    ContainVariableStorage =
-        (NorFlashDevices[Index].RegionBaseAddress <= PcdGet32 (PcdFlashNvStorageVariableBase)) &&
-        (PcdGet32 (PcdFlashNvStorageVariableBase) + PcdGet32 (PcdFlashNvStorageVariableSize) <= NorFlashDevices[Index].RegionBaseAddress + NorFlashDevices[Index].Size);
+
+   if (PcdGet64 (PcdFlashNvStorageVariableBase64) != 0) {
+     ContainVariableStorage =
+       (NorFlashDevices[Index].RegionBaseAddress <= PcdGet64 (PcdFlashNvStorageVariableBase64)) &&
+       (PcdGet64 (PcdFlashNvStorageVariableBase64) + PcdGet32 (PcdFlashNvStorageVariableSize) <=
+        NorFlashDevices[Index].RegionBaseAddress + NorFlashDevices[Index].Size);
+   } else {
+     ContainVariableStorage =
+       (NorFlashDevices[Index].RegionBaseAddress <= PcdGet32 (PcdFlashNvStorageVariableBase)) &&
+       (PcdGet32 (PcdFlashNvStorageVariableBase) + PcdGet32 (PcdFlashNvStorageVariableSize) <=
+        NorFlashDevices[Index].RegionBaseAddress + NorFlashDevices[Index].Size);
+  }
 
     Status = NorFlashCreateInstance (
       NorFlashDevices[Index].DeviceBaseAddress,
@@ -330,10 +339,11 @@ NorFlashFvbInitialize (
 
   ASSERT((Instance != NULL));
 
-  mFlashNvStorageVariableBase = PcdGet32 (PcdFlashNvStorageVariableBase);
 
+  mFlashNvStorageVariableBase = (FixedPcdGet64 (PcdFlashNvStorageVariableBase64) != 0) ?
+    FixedPcdGet64 (PcdFlashNvStorageVariableBase64) : FixedPcdGet32 (PcdFlashNvStorageVariableBase);
   // Set the index of the first LBA for the FVB
-  Instance->StartLba = (PcdGet32 (PcdFlashNvStorageVariableBase) - Instance->RegionBaseAddress) / Instance->Media.BlockSize;
+  Instance->StartLba = (mFlashNvStorageVariableBase - Instance->RegionBaseAddress) / Instance->Media.BlockSize;
 
   // Determine if there is a valid header at the beginning of the NorFlash
   Status = ValidateFvHeader (Instance);
