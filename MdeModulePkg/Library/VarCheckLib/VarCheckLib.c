@@ -1,7 +1,7 @@
 /** @file
   Implementation functions and structures for var check services.
 
-Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2021, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -655,6 +655,13 @@ VarCheckLibSetVariableCheck (
                DataSize,
                Data
                );
+    if (Status == EFI_WRITE_PROTECTED && RequestSource == VarCheckFromTrusted) {
+      //
+      // If RequestSource is trusted, then allow variable to be set even if it
+      // is write protected.
+      //
+      continue;
+    }
     if (EFI_ERROR (Status)) {
       DEBUG ((EFI_D_INFO, "Variable Check handler fail %r - %g:%s\n", Status, VendorGuid, VariableName));
       return Status;
