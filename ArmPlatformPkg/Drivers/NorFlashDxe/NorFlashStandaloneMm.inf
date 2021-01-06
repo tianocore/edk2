@@ -2,7 +2,7 @@
 #
 #  Component description file for NorFlashStandaloneMm module
 #
-#  Copyright (c) 2011 - 2014, ARM Ltd. All rights reserved.<BR>
+#  Copyright (c) 2011 - 2021, Arm Limited. All rights reserved.<BR>
 #  Copyright (c) 2020, Linaro, Ltd. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -50,10 +50,13 @@
   gEfiSmmFirmwareVolumeBlockProtocolGuid
 
 [Pcd.common]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase64
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase64
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
 

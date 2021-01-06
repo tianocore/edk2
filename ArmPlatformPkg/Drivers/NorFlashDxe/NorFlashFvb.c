@@ -1,6 +1,6 @@
 /*++ @file  NorFlashFvbDxe.c
 
- Copyright (c) 2011 - 2020, ARM Ltd. All rights reserved.<BR>
+ Copyright (c) 2011 - 2021, Arm Limited. All rights reserved.<BR>
 
  SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -48,23 +48,66 @@ InitializeFvAndVariableStoreHeaders (
   UINTN                               HeadersLength;
   EFI_FIRMWARE_VOLUME_HEADER          *FirmwareVolumeHeader;
   VARIABLE_STORE_HEADER               *VariableStoreHeader;
+  UINT32                              NvStorageFtwSpareSize;
+  UINT32                              NvStorageFtwWorkingSize;
+  UINT32                              NvStorageVariableSize;
+  UINT64                              NvStorageFtwSpareBase;
+  UINT64                              NvStorageFtwWorkingBase;
+  UINT64                              NvStorageVariableBase;
 
   HeadersLength = sizeof(EFI_FIRMWARE_VOLUME_HEADER) + sizeof(EFI_FV_BLOCK_MAP_ENTRY) + sizeof(VARIABLE_STORE_HEADER);
   Headers = AllocateZeroPool(HeadersLength);
 
+  NvStorageFtwWorkingSize = PcdGet32 (PcdFlashNvStorageFtwWorkingSize);
+  NvStorageFtwSpareSize = PcdGet32 (PcdFlashNvStorageFtwSpareSize);
+  NvStorageVariableSize = PcdGet32 (PcdFlashNvStorageVariableSize);
+
+  NvStorageFtwSpareBase = (PcdGet64 (PcdFlashNvStorageFtwSpareBase64) != 0) ?
+    PcdGet64 (PcdFlashNvStorageFtwSpareBase64) : PcdGet32 (PcdFlashNvStorageFtwSpareBase);
+  NvStorageFtwWorkingBase = (PcdGet64 (PcdFlashNvStorageFtwWorkingBase64) != 0) ?
+    PcdGet64 (PcdFlashNvStorageFtwWorkingBase64) : PcdGet32 (PcdFlashNvStorageFtwWorkingBase);
+  NvStorageVariableBase = (PcdGet64 (PcdFlashNvStorageVariableBase64) != 0) ?
+    PcdGet64 (PcdFlashNvStorageVariableBase64) : PcdGet32 (PcdFlashNvStorageVariableBase);
+
   // FirmwareVolumeHeader->FvLength is declared to have the Variable area AND the FTW working area AND the FTW Spare contiguous.
-  ASSERT(PcdGet32(PcdFlashNvStorageVariableBase) + PcdGet32(PcdFlashNvStorageVariableSize) == PcdGet32(PcdFlashNvStorageFtwWorkingBase));
-  ASSERT(PcdGet32(PcdFlashNvStorageFtwWorkingBase) + PcdGet32(PcdFlashNvStorageFtwWorkingSize) == PcdGet32(PcdFlashNvStorageFtwSpareBase));
+  if ((NvStorageVariableBase + NvStorageVariableSize) != NvStorageFtwWorkingBase) {
+    DEBUG ((DEBUG_ERROR, "%a: NvStorageFtwWorkingBase is not contiguous with NvStorageVariableBase region\n",
+          __FUNCTION__));
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if ((NvStorageFtwWorkingBase + NvStorageFtwWorkingSize) != NvStorageFtwSpareBase) {
+    DEBUG ((DEBUG_ERROR, "%a: NvStorageFtwSpareBase is not contiguous with NvStorageFtwWorkingBase region\n",
+        __FUNCTION__));
+    return EFI_INVALID_PARAMETER;
+  }
 
   // Check if the size of the area is at least one block size
-  ASSERT((PcdGet32(PcdFlashNvStorageVariableSize) > 0) && (PcdGet32(PcdFlashNvStorageVariableSize) / Instance->Media.BlockSize > 0));
-  ASSERT((PcdGet32(PcdFlashNvStorageFtwWorkingSize) > 0) && (PcdGet32(PcdFlashNvStorageFtwWorkingSize) / Instance->Media.BlockSize > 0));
-  ASSERT((PcdGet32(PcdFlashNvStorageFtwSpareSize) > 0) && (PcdGet32(PcdFlashNvStorageFtwSpareSize) / Instance->Media.BlockSize > 0));
+  if ((NvStorageVariableSize <= 0) || (NvStorageVariableSize / Instance->Media.BlockSize <= 0)) {
+    DEBUG ((DEBUG_ERROR, "%a: NvStorageVariableSize is 0x%x, should be atleast one block size\n", __FUNCTION__,
+          NvStorageVariableSize));
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if ((NvStorageFtwWorkingSize <= 0) || (NvStorageFtwWorkingSize / Instance->Media.BlockSize <= 0)) {
+    DEBUG ((DEBUG_ERROR, "%a: NvStorageFtwWorkingSize is 0x%x, should be atleast one block size\n", __FUNCTION__,
+          NvStorageFtwWorkingSize));
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if ((NvStorageFtwSpareSize <= 0) || (NvStorageFtwSpareSize / Instance->Media.BlockSize <= 0)) {
+    DEBUG ((DEBUG_ERROR, "%a: NvStorageFtwSpareSize is 0x%x, should be atleast one block size\n", __FUNCTION__,
+          NvStorageFtwSpareSize));
+    return EFI_INVALID_PARAMETER;
+  }
 
   // Ensure the Variable area Base Addresses are aligned on a block size boundaries
-  ASSERT(PcdGet32(PcdFlashNvStorageVariableBase) % Instance->Media.BlockSize == 0);
-  ASSERT(PcdGet32(PcdFlashNvStorageFtwWorkingBase) % Instance->Media.BlockSize == 0);
-  ASSERT(PcdGet32(PcdFlashNvStorageFtwSpareBase) % Instance->Media.BlockSize == 0);
+  if ((NvStorageVariableBase % Instance->Media.BlockSize != 0) ||
+      (NvStorageFtwWorkingBase % Instance->Media.BlockSize != 0) ||
+      (NvStorageFtwSpareBase % Instance->Media.BlockSize != 0)) {
+    DEBUG ((DEBUG_ERROR, "%a: NvStorage Base addresses must be aligned to block size boundaries", __FUNCTION__));
+    return EFI_INVALID_PARAMETER;
+  }
 
   //
   // EFI_FIRMWARE_VOLUME_HEADER
