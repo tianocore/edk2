@@ -211,6 +211,51 @@ IsDayValid (
 }
 
 /**
+  Check if the time zone is valid.
+  Valid values are between -1440 and 1440 or 2047 (EFI_UNSPECIFIED_TIMEZONE).
+
+  @param    TimeZone    The time zone to be checked.
+
+  @retval   TRUE    Valid.
+  @retval   FALSE   Invalid.
+
+**/
+BOOLEAN
+EFIAPI
+IsValidTimeZone (
+  IN  INT16  TimeZone
+  )
+{
+  return TimeZone == EFI_UNSPECIFIED_TIMEZONE ||
+         (TimeZone >= -1440 && TimeZone <= 1440);
+}
+
+/**
+  Check if the daylight is valid.
+  Valid values are:
+    0 : Time is not affected.
+    1 : Time is affected, and has not been adjusted for daylight savings.
+    3 : Time is affected, and has been adjusted for daylight savings.
+  All other values are invalid.
+
+  @param    Daylight    The daylight to be checked.
+
+  @retval   TRUE    Valid.
+  @retval   FALSE   Invalid.
+
+**/
+BOOLEAN
+EFIAPI
+IsValidDaylight (
+  IN  INT8  Daylight
+  )
+{
+  return Daylight == 0 ||
+         Daylight == EFI_TIME_ADJUST_DAYLIGHT ||
+         Daylight == (EFI_TIME_ADJUST_DAYLIGHT | EFI_TIME_IN_DAYLIGHT);
+}
+
+/**
   Check if the UEFI time is valid.
 
   @param    Time    The UEFI time to be checked.
@@ -235,8 +280,8 @@ IsTimeValid (
      (Time->Minute > 59  )              ||
      (Time->Second > 59  )              ||
      (Time->Nanosecond > 999999999)     ||
-     (!((Time->TimeZone == EFI_UNSPECIFIED_TIMEZONE) || ((Time->TimeZone >= -1440) && (Time->TimeZone <= 1440)))) ||
-     (Time->Daylight & (~(EFI_TIME_ADJUST_DAYLIGHT | EFI_TIME_IN_DAYLIGHT)))) {
+     (!IsValidTimeZone(Time->TimeZone)) ||
+     (!IsValidDaylight(Time->Daylight))) {
     return FALSE;
   }
 
