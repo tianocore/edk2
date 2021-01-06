@@ -84,6 +84,42 @@ IsDayValid (
   );
 
 /**
+  Check if the time zone is valid.
+  Valid values are between -1440 and 1440 or 2047 (EFI_UNSPECIFIED_TIMEZONE).
+
+  @param    TimeZone    The time zone to be checked.
+
+  @retval   TRUE    Valid.
+  @retval   FALSE   Invalid.
+
+**/
+BOOLEAN
+EFIAPI
+IsValidTimeZone (
+  IN  INT16  TimeZone
+  );
+
+/**
+  Check if the daylight is valid.
+  Valid values are:
+    0 : Time is not affected.
+    1 : Time is affected, and has not been adjusted for daylight savings.
+    3 : Time is affected, and has been adjusted for daylight savings.
+  All other values are invalid.
+
+  @param    Daylight    The daylight to be checked.
+
+  @retval   TRUE    Valid.
+  @retval   FALSE   Invalid.
+
+**/
+BOOLEAN
+EFIAPI
+IsValidDaylight (
+  IN  INT8  Daylight
+  );
+
+/**
   Check if the UEFI time is valid.
 
   @param    Time    The UEFI time to be checked.
