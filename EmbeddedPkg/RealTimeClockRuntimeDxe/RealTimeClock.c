@@ -3,6 +3,7 @@
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
   Copyright (c) 2017, Linaro, Ltd. All rights reserved.<BR>
+  Copyright (c) 2021, Ampere Computing LLC. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -11,6 +12,7 @@
 #include <PiDxe.h>
 #include <Library/DebugLib.h>
 #include <Library/RealTimeClockLib.h>
+#include <Library/TimeBaseLib.h>
 #include <Library/UefiLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeLib.h>
@@ -30,92 +32,6 @@ typedef struct {
 
 STATIC CONST CHAR16 mTimeSettingsVariableName[] = L"RtcTimeSettings";
 STATIC NON_VOLATILE_TIME_SETTINGS mTimeSettings;
-
-STATIC
-BOOLEAN
-IsValidTimeZone (
-  IN  INT16  TimeZone
-  )
-{
-  return TimeZone == EFI_UNSPECIFIED_TIMEZONE ||
-         (TimeZone >= -1440 && TimeZone <= 1440);
-}
-
-STATIC
-BOOLEAN
-IsValidDaylight (
-  IN  INT8  Daylight
-  )
-{
-  return Daylight == 0 ||
-         Daylight == EFI_TIME_ADJUST_DAYLIGHT ||
-         Daylight == (EFI_TIME_ADJUST_DAYLIGHT | EFI_TIME_IN_DAYLIGHT);
-}
-
-STATIC
-BOOLEAN
-EFIAPI
-IsLeapYear (
-  IN EFI_TIME   *Time
-  )
-{
-  if (Time->Year % 4 == 0) {
-    if (Time->Year % 100 == 0) {
-      if (Time->Year % 400 == 0) {
-        return TRUE;
-      } else {
-        return FALSE;
-      }
-    } else {
-      return TRUE;
-    }
-  } else {
-    return FALSE;
-  }
-}
-
-STATIC CONST INTN mDayOfMonth[12] = {
-  31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31
-};
-
-STATIC
-BOOLEAN
-EFIAPI
-IsDayValid (
-  IN  EFI_TIME  *Time
-  )
-{
-  if (Time->Day < 1 ||
-      Time->Day > mDayOfMonth[Time->Month - 1] ||
-      (Time->Month == 2 && !IsLeapYear (Time) && Time->Day > 28)) {
-    return FALSE;
-  }
-  return TRUE;
-}
-
-STATIC
-BOOLEAN
-EFIAPI
-IsTimeValid(
-  IN EFI_TIME *Time
-  )
-{
-  // Check the input parameters are within the range specified by UEFI
-  if (Time->Year   < 1900               ||
-      Time->Year   > 9999               ||
-      Time->Month  < 1                  ||
-      Time->Month  > 12                 ||
-      !IsDayValid (Time)                ||
-      Time->Hour   > 23                 ||
-      Time->Minute > 59                 ||
-      Time->Second > 59                 ||
-      Time->Nanosecond > 999999999      ||
-      !IsValidTimeZone (Time->TimeZone) ||
-      !IsValidDaylight (Time->Daylight)) {
-    return FALSE;
-  }
-  return TRUE;
-}
 
 /**
   Returns the current time and date information, and the time-keeping capabilities
