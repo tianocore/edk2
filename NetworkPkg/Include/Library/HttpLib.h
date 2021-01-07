@@ -476,6 +476,59 @@ HttpIsValidHttpHeader (
   IN  CHAR8            *FieldName
   );
 
+//
+// A wrapper structure to hold the HTTP headers.
+//
+typedef struct {
+  UINTN                       MaxHeaderCount;
+  UINTN                       HeaderCount;
+  EFI_HTTP_HEADER             *Headers;
+} HTTP_IO_HEADER;
+
+
+/**
+  Create a HTTP_IO_HEADER to hold the HTTP header items.
+
+  @param[in]  MaxHeaderCount         The maximun number of HTTP header in this holder.
+
+  @return    A pointer of the HTTP header holder or NULL if failed.
+
+**/
+HTTP_IO_HEADER *
+HttpIoCreateHeader (
+  UINTN                     MaxHeaderCount
+  );
+
+/**
+  Destroy the HTTP_IO_HEADER and release the resources.
+
+  @param[in]  HttpIoHeader       Point to the HTTP header holder to be destroyed.
+
+**/
+VOID
+HttpIoFreeHeader (
+  IN  HTTP_IO_HEADER       *HttpIoHeader
+  );
+
+/**
+  Set or update a HTTP header with the field name and corresponding value.
+
+  @param[in]  HttpIoHeader       Point to the HTTP header holder.
+  @param[in]  FieldName          Null terminated string which describes a field name.
+  @param[in]  FieldValue         Null terminated string which describes the corresponding field value.
+
+  @retval  EFI_SUCCESS           The HTTP header has been set or updated.
+  @retval  EFI_INVALID_PARAMETER Any input parameter is invalid.
+  @retval  EFI_OUT_OF_RESOURCES  Insufficient resource to complete the operation.
+  @retval  Other                 Unexpected error happened.
+
+**/
+EFI_STATUS
+HttpIoSetHeader (
+  IN  HTTP_IO_HEADER       *HttpIoHeader,
+  IN  CHAR8                *FieldName,
+  IN  CHAR8                *FieldValue
+  );
 
 #endif
 
