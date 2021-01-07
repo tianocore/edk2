@@ -145,13 +145,21 @@ GetSevEncBit:
 
     ; The encryption bit position is always above 31
     sub       ebx, 32
-    jns       SevExit
+    jns       SevSaveMask
 
     ; Encryption bit was reported as 31 or below, enter a HLT loop
 SevEncBitLowHlt:
     cli
     hlt
     jmp       SevEncBitLowHlt
+
+SevSaveMask:
+    xor       edx, edx
+    bts       edx, ebx
+
+    mov       dword[SEV_ES_WORK_AREA_ENC_MASK], 0
+    mov       dword[SEV_ES_WORK_AREA_ENC_MASK + 4], edx
+    jmp       SevExit
 
 NoSev:
     ;
