@@ -2,7 +2,7 @@
 #
 #  Driver clears the encryption attribute from MMIO regions when SEV is enabled
 #
-#  Copyright (c) 2017, AMD Inc. All rights reserved.<BR>
+#  Copyright (c) 2017 - 2020, AMD Inc. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -39,3 +39,9 @@
 
 [FeaturePcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire
+
+[FixedPcd]
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
+
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
