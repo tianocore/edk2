@@ -21,10 +21,14 @@
 // This structure is also used by assembler files:
 //   OvmfPkg/ResetVector/ResetVector.nasmb
 //   OvmfPkg/ResetVector/Ia32/PageTables64.asm
+//   OvmfPkg/ResetVector/Ia32/Flat32ToFlat64.asm
 // any changes must stay in sync with its usage.
 //
 typedef struct _SEC_SEV_ES_WORK_AREA {
   UINT8    SevEsEnabled;
+  UINT8    Reserved1[7];
+
+  UINT64   RandomData;
 } SEC_SEV_ES_WORK_AREA;
 
 /**
