@@ -135,4 +135,16 @@ MemEncryptSevLocateInitialSmramSaveStateMapPages (
   OUT UINTN *BaseAddress,
   OUT UINTN *NumberOfPages
   );
+
+/**
+  Returns the SEV encryption mask.
+
+  @return  The SEV pagetable encryption mask
+**/
+UINT64
+EFIAPI
+MemEncryptSevGetEncryptionMask (
+  VOID
+  );
+
 #endif // _MEM_ENCRYPT_SEV_LIB_H_
