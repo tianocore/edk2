@@ -3,6 +3,7 @@
 
   Copyright (c) 2008 - 2015, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
+  Copyright (c) 2020, Advanced Micro Devices, Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -25,6 +26,7 @@
 #include <Library/ExtractGuidedSectionLib.h>
 #include <Library/LocalApicLib.h>
 #include <Library/CpuExceptionHandlerLib.h>
+#include <Library/MemEncryptSevLib.h>
 #include <Register/Amd/Ghcb.h>
 #include <Register/Amd/Msr.h>
 
@@ -36,10 +38,6 @@ typedef struct _SEC_IDT_TABLE {
   EFI_PEI_SERVICES          *PeiService;
   IA32_IDT_GATE_DESCRIPTOR  IdtTable[SEC_IDT_ENTRY_COUNT];
 } SEC_IDT_TABLE;
-
-typedef struct _SEC_SEV_ES_WORK_AREA {
-  UINT8  SevEsEnabled;
-} SEC_SEV_ES_WORK_AREA;
 
 VOID
 EFIAPI
