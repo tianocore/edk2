@@ -28,14 +28,14 @@ typedef enum {
 } MAP_RANGE_MODE;
 
 /**
-  Get the memory encryption mask
+  Return the pagetable memory encryption mask.
 
-  @param[out]      EncryptionMask        contains the pte mask.
+  @return  The pagetable memory encryption mask.
 
 **/
-STATIC
 UINT64
-GetMemEncryptionAddressMask (
+EFIAPI
+InternalGetMemEncryptionAddressMask (
   VOID
   )
 {
@@ -200,7 +200,7 @@ Split2MPageTo4K (
 
   PageTableEntry1 = PageTableEntry;
 
-  AddressEncMask = GetMemEncryptionAddressMask ();
+  AddressEncMask = InternalGetMemEncryptionAddressMask ();
 
   ASSERT (PageTableEntry != NULL);
   ASSERT (*PageEntry2M & AddressEncMask);
@@ -286,7 +286,7 @@ SetPageTablePoolReadOnly (
   LevelSize[3] = SIZE_1GB;
   LevelSize[4] = SIZE_512GB;
 
-  AddressEncMask  = GetMemEncryptionAddressMask();
+  AddressEncMask  = InternalGetMemEncryptionAddressMask();
   PageTable       = (UINT64 *)(UINTN)PageTableBase;
   PoolUnitSize    = PAGE_TABLE_POOL_UNIT_SIZE;
 
@@ -431,7 +431,7 @@ Split1GPageTo2M (
 
   PageDirectoryEntry = AllocatePageTableMemory(1);
 
-  AddressEncMask = GetMemEncryptionAddressMask ();
+  AddressEncMask = InternalGetMemEncryptionAddressMask ();
   ASSERT (PageDirectoryEntry != NULL);
   ASSERT (*PageEntry1G & AddressEncMask);
   //
@@ -485,7 +485,7 @@ SetOrClearCBit(
 {
   UINT64      AddressEncMask;
 
-  AddressEncMask = GetMemEncryptionAddressMask ();
+  AddressEncMask = InternalGetMemEncryptionAddressMask ();
 
   if (Mode == SetCBit) {
     *PageTablePointer |= AddressEncMask;
@@ -527,6 +527,7 @@ DisableReadOnlyPageWriteProtect (
 /**
  Enable Write Protect on pages marked as read-only.
 **/
+STATIC
 VOID
 EnableReadOnlyPageWriteProtect (
   VOID
@@ -605,7 +606,7 @@ SetMemoryEncDec (
   //
   // Check if we have a valid memory encryption mask
   //
-  AddressEncMask = GetMemEncryptionAddressMask ();
+  AddressEncMask = InternalGetMemEncryptionAddressMask ();
   if (!AddressEncMask) {
     return RETURN_ACCESS_DENIED;
   }

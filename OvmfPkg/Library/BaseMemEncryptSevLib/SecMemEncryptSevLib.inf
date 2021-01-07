@@ -35,6 +35,7 @@
 [Sources.X64]
   X64/MemEncryptSevLib.c
   X64/SecVirtualMemory.c
+  X64/VirtualMemory.c
   X64/VirtualMemory.h
 
 [Sources.IA32]
