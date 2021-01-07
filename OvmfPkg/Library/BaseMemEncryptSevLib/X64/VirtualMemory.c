@@ -192,7 +192,8 @@ Split2MPageTo4K (
 {
   PHYSICAL_ADDRESS                  PhysicalAddress4K;
   UINTN                             IndexOfPageTableEntries;
-  PAGE_TABLE_4K_ENTRY               *PageTableEntry, *PageTableEntry1;
+  PAGE_TABLE_4K_ENTRY               *PageTableEntry;
+  PAGE_TABLE_4K_ENTRY               *PageTableEntry1;
   UINT64                            AddressEncMask;
 
   PageTableEntry = AllocatePageTableMemory(1);
@@ -472,7 +473,7 @@ Split1GPageTo2M (
 /**
   Set or Clear the memory encryption bit
 
-  @param[in]      PagetablePoint        Page table entry pointer (PTE).
+  @param[in, out] PageTablePointer      Page table entry pointer (PTE).
   @param[in]      Mode                  Set or Clear encryption bit
 
 **/
@@ -562,7 +563,6 @@ EnableReadOnlyPageWriteProtect (
   @retval RETURN_UNSUPPORTED          Setting the memory encyrption attribute
                                       is not supported
 **/
-
 STATIC
 RETURN_STATUS
 EFIAPI
@@ -635,7 +635,7 @@ SetMemoryEncDec (
 
   Status = EFI_SUCCESS;
 
-  while (Length)
+  while (Length != 0)
   {
     //
     // If Cr3BaseAddress is not specified then read the current CR3
@@ -683,7 +683,7 @@ SetMemoryEncDec (
       // Valid 1GB page
       // If we have at least 1GB to go, we can just update this entry
       //
-      if (!(PhysicalAddress & (BIT30 - 1)) && Length >= BIT30) {
+      if ((PhysicalAddress & (BIT30 - 1)) == 0 && Length >= BIT30) {
         SetOrClearCBit(&PageDirectory1GEntry->Uint64, Mode);
         DEBUG ((
           DEBUG_VERBOSE,
@@ -744,7 +744,7 @@ SetMemoryEncDec (
         // Valid 2MB page
         // If we have at least 2MB left to go, we can just update this entry
         //
-        if (!(PhysicalAddress & (BIT21-1)) && Length >= BIT21) {
+        if ((PhysicalAddress & (BIT21-1)) == 0 && Length >= BIT21) {
           SetOrClearCBit (&PageDirectory2MEntry->Uint64, Mode);
           PhysicalAddress += BIT21;
           Length -= BIT21;
