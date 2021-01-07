@@ -3,7 +3,7 @@
   Virtual Memory Management Services to set or clear the memory encryption bit
 
   Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
-  Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
+  Copyright (c) 2017 - 2020, AMD Incorporated. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -12,6 +12,7 @@
 **/
 
 #include <Library/CpuLib.h>
+#include <Library/MemEncryptSevLib.h>
 #include <Register/Amd/Cpuid.h>
 #include <Register/Cpuid.h>
 
@@ -39,17 +40,12 @@ GetMemEncryptionAddressMask (
   )
 {
   UINT64                            EncryptionMask;
-  CPUID_MEMORY_ENCRYPTION_INFO_EBX  Ebx;
 
   if (mAddressEncMaskChecked) {
     return mAddressEncMask;
   }
 
-  //
-  // CPUID Fn8000_001F[EBX] Bit 0:5 (memory encryption bit position)
-  //
-  AsmCpuid (CPUID_MEMORY_ENCRYPTION_INFO, NULL, &Ebx.Uint32, NULL, NULL);
-  EncryptionMask = LShiftU64 (1, Ebx.Bits.PtePosBits);
+  EncryptionMask = MemEncryptSevGetEncryptionMask ();
 
   mAddressEncMask = EncryptionMask & PAGING_1G_ADDRESS_MASK_64;
   mAddressEncMaskChecked = TRUE;
@@ -289,8 +285,7 @@ SetPageTablePoolReadOnly (
   LevelSize[3] = SIZE_1GB;
   LevelSize[4] = SIZE_512GB;
 
-  AddressEncMask  = GetMemEncryptionAddressMask() &
-                    PAGING_1G_ADDRESS_MASK_64;
+  AddressEncMask  = GetMemEncryptionAddressMask();
   PageTable       = (UINT64 *)(UINTN)PageTableBase;
   PoolUnitSize    = PAGE_TABLE_POOL_UNIT_SIZE;
 
@@ -437,7 +432,7 @@ Split1GPageTo2M (
 
   AddressEncMask = GetMemEncryptionAddressMask ();
   ASSERT (PageDirectoryEntry != NULL);
-  ASSERT (*PageEntry1G & GetMemEncryptionAddressMask ());
+  ASSERT (*PageEntry1G & AddressEncMask);
   //
   // Fill in 1G page entry.
   //
