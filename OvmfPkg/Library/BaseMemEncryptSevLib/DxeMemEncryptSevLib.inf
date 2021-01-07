@@ -14,7 +14,7 @@
   FILE_GUID                      = c1594631-3888-4be4-949f-9c630dbc842b
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = MemEncryptSevLib|DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER UEFI_DRIVER
+  LIBRARY_CLASS                  = MemEncryptSevLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER UEFI_DRIVER
 
 #
 # The following information is for reference only and not required by the build
