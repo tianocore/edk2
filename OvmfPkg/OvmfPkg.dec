@@ -304,6 +304,8 @@
   ## The base address of the SEC GHCB page used by SEV-ES.
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBase|0|UINT32|0x40
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbSize|0|UINT32|0x41
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBackupBase|0|UINT32|0x44
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBackupSize|0|UINT32|0x45
 
   ## The base address and size of the SEV Launch Secret Area provisioned
   #  after remote attestation.  If this is set in the .fdf, the platform

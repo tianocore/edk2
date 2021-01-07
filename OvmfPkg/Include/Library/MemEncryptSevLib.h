@@ -14,6 +14,29 @@
 #include <Base.h>
 
 //
+// Define the maximum number of #VCs allowed (e.g. the level of nesting
+// that is allowed => 2 allows for 1 nested #VCs). I this value is changed,
+// be sure to increase the size of
+//   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBackupSize
+// in any FDF file using this PCD.
+//
+#define VMGEXIT_MAXIMUM_VC_COUNT   2
+
+//
+// Per-CPU data mapping structure
+//   Use UINT32 for cached indicators and compare to a specific value
+//   so that the hypervisor can't indicate a value is cached by just
+//   writing random data to that area.
+//
+typedef struct {
+  UINT32  Dr7Cached;
+  UINT64  Dr7;
+
+  UINTN   VcCount;
+  VOID    *GhcbBackupPages;
+} SEV_ES_PER_CPU_DATA;
+
+//
 // Internal structure for holding SEV-ES information needed during SEC phase
 // and valid only during SEC phase and early PEI during platform
 // initialization.
