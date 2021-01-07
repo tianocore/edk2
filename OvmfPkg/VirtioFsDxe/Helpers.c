@@ -2244,12 +2244,19 @@ VirtioFsGetFuseSizeUpdate (
                            since the Epoch). Otherwise, Mtime is not written
                            to.
 
-  @retval EFI_SUCCESS        Output parameters have been set successfully.
+  @retval EFI_SUCCESS            Output parameters have been set successfully.
 
-  @retval EFI_ACCESS_DENIED  NewInfo requests changing both CreateTime and
-                             ModificationTime, but to values that differ from
-                             each other. The Virtio Filesystem device does not
-                             support this.
+  @retval EFI_INVALID_PARAMETER  At least one of the CreateTime, LastAccessTime
+                                 and ModificationTime fields in NewInfo
+                                 represents an actual update relative to the
+                                 current state of the file (expressed in Info),
+                                 but does not satisfy the UEFI spec
+                                 requirements on EFI_TIME.
+
+  @retval EFI_ACCESS_DENIED      NewInfo requests changing both CreateTime and
+                                 ModificationTime, but to values that differ
+                                 from each other. The Virtio Filesystem device
+                                 does not support this.
 **/
 EFI_STATUS
 VirtioFsGetFuseTimeUpdates (
@@ -2285,6 +2292,9 @@ VirtioFsGetFuseTimeUpdates (
         CompareMem (NewTime[Idx], Time[Idx], sizeof (EFI_TIME)) == 0) {
       Change[Idx] = FALSE;
     } else {
+      if (!IsTimeValid (NewTime[Idx])) {
+        return EFI_INVALID_PARAMETER;
+      }
       Change[Idx] = TRUE;
       Seconds[Idx] = EfiTimeToEpoch (NewTime[Idx]);
     }
