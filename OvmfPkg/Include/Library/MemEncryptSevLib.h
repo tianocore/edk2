@@ -29,6 +29,8 @@ typedef struct _SEC_SEV_ES_WORK_AREA {
   UINT8    Reserved1[7];
 
   UINT64   RandomData;
+
+  UINT64   EncryptionMask;
 } SEC_SEV_ES_WORK_AREA;
 
 /**
