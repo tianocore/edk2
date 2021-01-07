@@ -35,4 +35,6 @@
   BaseLib
   BaseMemoryLib
   DebugLib
+  LocalApicLib
+  MemEncryptSevLib
 
