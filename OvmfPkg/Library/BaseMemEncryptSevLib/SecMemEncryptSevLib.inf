@@ -10,11 +10,11 @@
 
 [Defines]
   INF_VERSION                    = 1.25
-  BASE_NAME                      = PeiMemEncryptSevLib
-  FILE_GUID                      = 15d9a694-3d2a-4184-9672-ba55c3070e07
+  BASE_NAME                      = SecMemEncryptSevLib
+  FILE_GUID                      = 046388b4-430e-4e61-88f6-51ea21db2632
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = MemEncryptSevLib|PEIM
+  LIBRARY_CLASS                  = MemEncryptSevLib|SEC
 
 #
 # The following information is for reference only and not required by the build
@@ -30,12 +30,11 @@
   UefiCpuPkg/UefiCpuPkg.dec
 
 [Sources]
-  PeiDxeMemEncryptSevLibInternal.c
-  PeiMemEncryptSevLibInternal.c
+  SecMemEncryptSevLibInternal.c
 
 [Sources.X64]
   X64/MemEncryptSevLib.c
-  X64/PeiDxeVirtualMemory.c
+  X64/SecVirtualMemory.c
   X64/VirtualMemory.h
 
 [Sources.IA32]
@@ -43,14 +42,9 @@
 
 [LibraryClasses]
   BaseLib
-  CacheMaintenanceLib
   CpuLib
   DebugLib
-  MemoryAllocationLib
   PcdLib
-
-[FeaturePcd]
-  gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire
 
 [FixedPcd]
   gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaBase
