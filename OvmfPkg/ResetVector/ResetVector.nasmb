@@ -74,6 +74,7 @@
   %define GHCB_SIZE (FixedPcdGet32 (PcdOvmfSecGhcbSize))
   %define SEV_ES_WORK_AREA (FixedPcdGet32 (PcdSevEsWorkAreaBase))
   %define SEV_ES_WORK_AREA_RDRAND (FixedPcdGet32 (PcdSevEsWorkAreaBase) + 8)
+  %define SEV_ES_WORK_AREA_ENC_MASK (FixedPcdGet32 (PcdSevEsWorkAreaBase) + 16)
   %define SEV_ES_VC_TOP_OF_STACK (FixedPcdGet32 (PcdOvmfSecPeiTempRamBase) + FixedPcdGet32 (PcdOvmfSecPeiTempRamSize))
 %include "Ia32/Flat32ToFlat64.asm"
 %include "Ia32/PageTables64.asm"
