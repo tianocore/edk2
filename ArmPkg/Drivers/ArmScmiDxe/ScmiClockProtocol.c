@@ -255,22 +255,26 @@ ClockDescribeRates (
       for (RateNo = 0; RateNo < NUM_RATES (DescribeRates->NumRatesFlags); RateNo++) {
         Rate = &DescribeRates->Rates[RateOffset++];
         // Non-linear discrete rates.
-        RateArray[RateIndex++].Rate = ConvertTo64Bit (Rate->Low, Rate->High);
+        RateArray[RateIndex++].DiscreteRate.Rate =
+          ConvertTo64Bit (Rate->Low, Rate->High);
       }
     } else {
       for (RateNo = 0; RateNo < NUM_RATES (DescribeRates->NumRatesFlags); RateNo++) {
         // Linear clock rates from minimum to maximum in steps
         // Minimum clock rate.
         Rate = &DescribeRates->Rates[RateOffset++];
-        RateArray[RateIndex].Min = ConvertTo64Bit (Rate->Low, Rate->High);
+        RateArray[RateIndex].ContinuousRate.Min =
+          ConvertTo64Bit (Rate->Low, Rate->High);
 
         Rate = &DescribeRates->Rates[RateOffset++];
         // Maximum clock rate.
-        RateArray[RateIndex].Max = ConvertTo64Bit (Rate->Low, Rate->High);
+        RateArray[RateIndex].ContinuousRate.Max =
+          ConvertTo64Bit (Rate->Low, Rate->High);
 
         Rate = &DescribeRates->Rates[RateOffset++];
         // Step.
-        RateArray[RateIndex++].Step = ConvertTo64Bit (Rate->Low, Rate->High);
+        RateArray[RateIndex++].ContinuousRate.Step =
+          ConvertTo64Bit (Rate->Low, Rate->High);
       }
     }
   } while (NUM_REMAIN_RATES (DescribeRates->NumRatesFlags) != 0);
