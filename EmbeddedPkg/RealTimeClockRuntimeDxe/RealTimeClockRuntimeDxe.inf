@@ -38,5 +38,5 @@
   gEfiRealTimeClockArchProtocolGuid
 
 [Depex]
-  TRUE
+  gEfiVariableArchProtocolGuid
 
