@@ -2,6 +2,7 @@
   OP-TEE specific header file.
 
   Copyright (c) 2018, Linaro Ltd. All rights reserved.<BR>
+  Copyright (c) 2021, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -45,12 +46,14 @@ typedef struct {
   UINT64    C;
 } OPTEE_MESSAGE_PARAM_VALUE;
 
+typedef union {
+  OPTEE_MESSAGE_PARAM_MEMORY   Memory;
+  OPTEE_MESSAGE_PARAM_VALUE    Value;
+} OPTEE_MESSAGE_PARAM_UNION;
+
 typedef struct {
   UINT64 Attribute;
-  union {
-    OPTEE_MESSAGE_PARAM_MEMORY   Memory;
-    OPTEE_MESSAGE_PARAM_VALUE    Value;
-  } Union;
+  OPTEE_MESSAGE_PARAM_UNION Union;
 } OPTEE_MESSAGE_PARAM;
 
 #define OPTEE_MAX_CALL_PARAMS       4
