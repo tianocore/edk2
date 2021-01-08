@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2017-2018, Arm Limited. All rights reserved.
+  Copyright (c) 2017-2021, Arm Limited. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -57,12 +57,18 @@ typedef enum {
    either Rate or Min/Max/Step triplet is valid.
 */
 typedef struct {
-  union {
   UINT64 Min;
-  UINT64 Rate;
-  };
   UINT64 Max;
   UINT64 Step;
+} SCMI_CLOCK_RATE_CONTINUOUS;
+
+typedef struct {
+  UINT64 Rate;
+} SCMI_CLOCK_RATE_DISCRETE;
+
+typedef union {
+  SCMI_CLOCK_RATE_CONTINUOUS ContinuousRate;
+  SCMI_CLOCK_RATE_DISCRETE DiscreteRate;
 } SCMI_CLOCK_RATE;
 
 #pragma pack()
