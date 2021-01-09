@@ -98,7 +98,12 @@ INF MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
 INF UefiCpuPkg/CpuDxe/CpuDxe.inf
 INF MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
 INF MdeModulePkg/Application/UiApp/UiApp.inf
+!if $(BOOTLOADER) != "LINUXBOOT"
 INF PcAtChipsetPkg/HpetTimerDxe/HpetTimerDxe.inf
+!else
+INF OvmfPkg/8254TimerDxe/8254Timer.inf
+INF OvmfPkg/8259InterruptControllerDxe/8259.inf
+!endif
 INF MdeModulePkg/Universal/Metronome/Metronome.inf
 INF MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
 INF MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
