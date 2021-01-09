@@ -438,7 +438,13 @@
       NULL|MdeModulePkg/Library/BootMaintenanceManagerUiLib/BootMaintenanceManagerUiLib.inf
   }
 
+!if $(BOOTLOADER) == "LINUXBOOT"
+  OvmfPkg/8254TimerDxe/8254Timer.inf
+  OvmfPkg/8259InterruptControllerDxe/8259.inf
+!else
   PcAtChipsetPkg/HpetTimerDxe/HpetTimerDxe.inf
+!endif
+
   MdeModulePkg/Universal/Metronome/Metronome.inf
   MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
   MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
