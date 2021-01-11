@@ -13,8 +13,8 @@
 
 #include <Uefi.h>
 
-#include <Guid/SmBios.h>
-#include <IndustryStandard/SmBios.h>
+#include <Guid/Smbios.h>
+#include <IndustryStandard/Smbios.h>
 #include <IndustryStandard/Dhcp.h>
 #include <Protocol/NetworkInterfaceIdentifier.h>
 #include <Protocol/Arp.h>

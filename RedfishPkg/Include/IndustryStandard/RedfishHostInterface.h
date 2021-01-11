@@ -10,7 +10,7 @@
 #ifndef REDFISH_HOST_INTERFACE_
 #define REDFISH_HOST_INTERFACE_
 
-#include <IndustryStandard/SmBios.h>
+#include <IndustryStandard/Smbios.h>
 
 #define REDFISH_HOST_INTERFACE_DEVICE_TYPE_USB         0x02 // We don't support this type of interface.
                                                             // Use REDFISH_HOST_INTERFACE_DEVICE_TYPE_USB_V2 instead.

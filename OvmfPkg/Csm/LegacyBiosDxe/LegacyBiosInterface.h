@@ -12,10 +12,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <FrameworkDxe.h>
 #include <IndustryStandard/Pci.h>
-#include <IndustryStandard/SmBios.h>
+#include <IndustryStandard/Smbios.h>
 #include <IndustryStandard/Acpi10.h>
 
-#include <Guid/SmBios.h>
+#include <Guid/Smbios.h>
 #include <Guid/Acpi.h>
 #include <Guid/DxeServices.h>
 #include <Guid/LegacyBios.h>

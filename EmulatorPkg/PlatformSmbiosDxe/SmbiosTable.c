@@ -19,7 +19,7 @@
 **/
 
 #include <PiDxe.h>
-#include <IndustryStandard/SmBios.h>
+#include <IndustryStandard/Smbios.h>
 #include <Protocol/Smbios.h>
 #include <Library/SmbiosLib.h>
 

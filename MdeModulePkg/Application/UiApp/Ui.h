@@ -10,7 +10,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef _BDS_MODULE_H_
 #define _BDS_MODULE_H_
 
-#include <IndustryStandard/SmBios.h>
+#include <IndustryStandard/Smbios.h>
 
 #include <Guid/MdeModuleHii.h>
 #include <Guid/StatusCodeDataTypeId.h>

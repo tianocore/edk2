@@ -12,7 +12,7 @@
 #include <Protocol/PciRootBridgeIo.h>
 #include <Guid/Acpi.h>
 #include <Guid/Mps.h>
-#include <Guid/SmBios.h>
+#include <Guid/Smbios.h>
 
 /**
   Make a printable character.

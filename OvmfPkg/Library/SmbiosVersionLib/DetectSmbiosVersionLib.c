@@ -11,7 +11,7 @@
 
 **/
 
-#include <IndustryStandard/SmBios.h>
+#include <IndustryStandard/Smbios.h>
 
 #include <Base.h>
 #include <Library/BaseMemoryLib.h>

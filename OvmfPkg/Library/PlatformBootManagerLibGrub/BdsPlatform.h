@@ -23,7 +23,7 @@ Abstract:
 
 #include <IndustryStandard/Pci.h>
 #include <IndustryStandard/Acpi.h>
-#include <IndustryStandard/SmBios.h>
+#include <IndustryStandard/Smbios.h>
 #include <IndustryStandard/PeImage.h>
 #include <IndustryStandard/Virtio095.h>
 
@@ -52,7 +52,7 @@ Abstract:
 #include <Protocol/LoadedImage.h>
 
 #include <Guid/Acpi.h>
-#include <Guid/SmBios.h>
+#include <Guid/Smbios.h>
 #include <Guid/HobList.h>
 #include <Guid/GlobalVariable.h>
 #include <Guid/EventGroup.h>

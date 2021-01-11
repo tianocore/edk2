@@ -12,7 +12,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 
 #include <PiDxe.h>
-#include <IndustryStandard/SmBios.h>
+#include <IndustryStandard/Smbios.h>
 
 #include <Protocol/Cpu.h>
 #include <Protocol/Smbios.h>

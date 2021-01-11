@@ -9,7 +9,7 @@
     - Std - Standard
 **/
 
-#include <IndustryStandard/SmBios.h>
+#include <IndustryStandard/Smbios.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>

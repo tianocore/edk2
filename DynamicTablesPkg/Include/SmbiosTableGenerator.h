@@ -9,7 +9,7 @@
 #ifndef SMBIOS_TABLE_GENERATOR_H_
 #define SMBIOS_TABLE_GENERATOR_H_
 
-#include <IndustryStandard/SmBios.h>
+#include <IndustryStandard/Smbios.h>
 
 #include <TableGenerator.h>
 

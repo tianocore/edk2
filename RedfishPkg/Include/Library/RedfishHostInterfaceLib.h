@@ -11,7 +11,7 @@
 
 #include <Uefi.h>
 #include <IndustryStandard/RedfishHostInterface.h>
-#include <IndustryStandard/SmBios.h>
+#include <IndustryStandard/Smbios.h>
 
 #include <Protocol/Smbios.h>
 

@@ -14,7 +14,7 @@
 
 #include <PiDxe.h>
 #include <Protocol/Smbios.h>
-#include <IndustryStandard/SmBios.h>
+#include <IndustryStandard/Smbios.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>

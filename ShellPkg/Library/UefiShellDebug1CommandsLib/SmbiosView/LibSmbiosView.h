@@ -9,7 +9,7 @@
 #ifndef _LIB_SMBIOS_VIEW_H_
 #define _LIB_SMBIOS_VIEW_H_
 
-#include <IndustryStandard/SmBios.h>
+#include <IndustryStandard/Smbios.h>
 
 #define DMI_SUCCESS                     0x00
 #define DMI_UNKNOWN_FUNCTION            0x81

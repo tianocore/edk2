@@ -10,7 +10,7 @@
 #ifndef _SMBIOS_QUERY_TABLE_H_
 #define _SMBIOS_QUERY_TABLE_H_
 
-#include <IndustryStandard/SmBios.h>
+#include <IndustryStandard/Smbios.h>
 
 #define QUERY_TABLE_UNFOUND 0xFF
 

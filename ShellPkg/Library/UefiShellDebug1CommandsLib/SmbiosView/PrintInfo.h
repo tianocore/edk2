@@ -10,7 +10,7 @@
 #ifndef _SMBIOS_PRINT_INFO_H_
 #define _SMBIOS_PRINT_INFO_H_
 
-#include <IndustryStandard/SmBios.h>
+#include <IndustryStandard/Smbios.h>
 
 extern UINT8  SmbiosMajorVersion;
 extern UINT8  SmbiosMinorVersion;

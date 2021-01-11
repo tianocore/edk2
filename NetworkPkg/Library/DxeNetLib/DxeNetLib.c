@@ -8,7 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <Uefi.h>
 
-#include <IndustryStandard/SmBios.h>
+#include <IndustryStandard/Smbios.h>
 
 #include <Protocol/DriverBinding.h>
 #include <Protocol/ServiceBinding.h>
@@ -19,7 +19,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Protocol/ComponentName.h>
 #include <Protocol/ComponentName2.h>
 
-#include <Guid/SmBios.h>
+#include <Guid/Smbios.h>
 
 #include <Library/NetLib.h>
 #include <Library/BaseLib.h>

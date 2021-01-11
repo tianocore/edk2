@@ -21,7 +21,7 @@
 #ifndef __SMBIOS_PROTOCOL_H__
 #define __SMBIOS_PROTOCOL_H__
 
-#include <IndustryStandard/SmBios.h>
+#include <IndustryStandard/Smbios.h>
 
 #define EFI_SMBIOS_PROTOCOL_GUID \
     { 0x3583ff6, 0xcb36, 0x4940, { 0x94, 0x7e, 0xb9, 0xb3, 0x9f, 0x4a, 0xfa, 0xf7 }}
