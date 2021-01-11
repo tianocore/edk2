@@ -1,7 +1,7 @@
 /** @file
 Code for Processor S3 restoration
 
-Copyright (c) 2006 - 2020, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2021, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -487,6 +487,9 @@ SetRegister (
   } else {
     RegisterTables = (CPU_REGISTER_TABLE *)(UINTN)mAcpiCpuData.RegisterTable;
   }
+  if (RegisterTables == NULL) {
+    return;
+  }
 
   InitApicId = GetInitialApicId ();
   RegisterTable = NULL;
@@ -948,7 +951,7 @@ InitSmmS3ResumeState (
 }
 
 /**
-  Copy register table from ACPI NVS memory into SMRAM.
+  Copy register table from non-SMRAM into SMRAM.
 
   @param[in] DestinationRegisterTableList  Points to destination register table.
   @param[in] SourceRegisterTableList       Points to source register table.
@@ -967,7 +970,8 @@ CopyRegisterTable (
 
   CopyMem (DestinationRegisterTableList, SourceRegisterTableList, NumberOfCpus * sizeof (CPU_REGISTER_TABLE));
   for (Index = 0; Index < NumberOfCpus; Index++) {
-    if (DestinationRegisterTableList[Index].AllocatedSize != 0) {
+    if (DestinationRegisterTableList[Index].TableLength != 0) {
+      DestinationRegisterTableList[Index].AllocatedSize = DestinationRegisterTableList[Index].TableLength * sizeof (CPU_REGISTER_TABLE_ENTRY);
       RegisterTableEntry = AllocateCopyPool (
         DestinationRegisterTableList[Index].AllocatedSize,
         (VOID *)(UINTN)SourceRegisterTableList[Index].RegisterTableEntry
@@ -976,6 +980,34 @@ CopyRegisterTable (
       DestinationRegisterTableList[Index].RegisterTableEntry = (EFI_PHYSICAL_ADDRESS)(UINTN)RegisterTableEntry;
     }
   }
+}
+
+/**
+  Check whether the register table is empty or not.
+
+  @param[in] RegisterTable  Point to the register table.
+  @param[in] NumberOfCpus   Number of CPUs.
+
+  @retval TRUE              The register table is empty.
+  @retval FALSE             The register table is not empty.
+**/
+BOOLEAN
+IsRegisterTableEmpty (
+  IN CPU_REGISTER_TABLE     *RegisterTable,
+  IN UINT32                 NumberOfCpus
+  )
+{
+  UINTN                     Index;
+
+  if (RegisterTable != NULL) {
+    for (Index = 0; Index < NumberOfCpus; Index++) {
+      if (RegisterTable[Index].TableLength != 0) {
+        return FALSE;
+      }
+    }
+  }
+
+  return TRUE;
 }
 
 /**
@@ -1032,23 +1064,31 @@ GetAcpiCpuData (
 
   CopyMem ((VOID *)(UINTN)mAcpiCpuData.IdtrProfile, (VOID *)(UINTN)AcpiCpuData->IdtrProfile, sizeof (IA32_DESCRIPTOR));
 
-  mAcpiCpuData.PreSmmInitRegisterTable = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocatePool (mAcpiCpuData.NumberOfCpus * sizeof (CPU_REGISTER_TABLE));
-  ASSERT (mAcpiCpuData.PreSmmInitRegisterTable != 0);
+  if (!IsRegisterTableEmpty ((CPU_REGISTER_TABLE *)(UINTN)AcpiCpuData->PreSmmInitRegisterTable, mAcpiCpuData.NumberOfCpus)) {
+    mAcpiCpuData.PreSmmInitRegisterTable = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocatePool (mAcpiCpuData.NumberOfCpus * sizeof (CPU_REGISTER_TABLE));
+    ASSERT (mAcpiCpuData.PreSmmInitRegisterTable != 0);
 
-  CopyRegisterTable (
-    (CPU_REGISTER_TABLE *)(UINTN)mAcpiCpuData.PreSmmInitRegisterTable,
-    (CPU_REGISTER_TABLE *)(UINTN)AcpiCpuData->PreSmmInitRegisterTable,
-    mAcpiCpuData.NumberOfCpus
-    );
+    CopyRegisterTable (
+      (CPU_REGISTER_TABLE *)(UINTN)mAcpiCpuData.PreSmmInitRegisterTable,
+      (CPU_REGISTER_TABLE *)(UINTN)AcpiCpuData->PreSmmInitRegisterTable,
+      mAcpiCpuData.NumberOfCpus
+      );
+  } else {
+    mAcpiCpuData.PreSmmInitRegisterTable = 0;
+  }
 
-  mAcpiCpuData.RegisterTable = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocatePool (mAcpiCpuData.NumberOfCpus * sizeof (CPU_REGISTER_TABLE));
-  ASSERT (mAcpiCpuData.RegisterTable != 0);
+  if (!IsRegisterTableEmpty ((CPU_REGISTER_TABLE *)(UINTN)AcpiCpuData->RegisterTable, mAcpiCpuData.NumberOfCpus)) {
+    mAcpiCpuData.RegisterTable = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocatePool (mAcpiCpuData.NumberOfCpus * sizeof (CPU_REGISTER_TABLE));
+    ASSERT (mAcpiCpuData.RegisterTable != 0);
 
-  CopyRegisterTable (
-    (CPU_REGISTER_TABLE *)(UINTN)mAcpiCpuData.RegisterTable,
-    (CPU_REGISTER_TABLE *)(UINTN)AcpiCpuData->RegisterTable,
-    mAcpiCpuData.NumberOfCpus
-    );
+    CopyRegisterTable (
+      (CPU_REGISTER_TABLE *)(UINTN)mAcpiCpuData.RegisterTable,
+      (CPU_REGISTER_TABLE *)(UINTN)AcpiCpuData->RegisterTable,
+      mAcpiCpuData.NumberOfCpus
+      );
+  } else {
+    mAcpiCpuData.RegisterTable = 0;
+  }
 
   //
   // Copy AP's GDT, IDT and Machine Check handler into SMRAM.
