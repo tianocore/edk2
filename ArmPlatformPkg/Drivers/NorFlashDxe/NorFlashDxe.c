@@ -422,8 +422,8 @@ NorFlashFvbInitialize (
       EFI_MEMORY_UC | EFI_MEMORY_RUNTIME);
   ASSERT_EFI_ERROR (Status);
 
-  mFlashNvStorageVariableBase = (FixedPcdGet64 (PcdFlashNvStorageVariableBase64) != 0) ?
-    FixedPcdGet64 (PcdFlashNvStorageVariableBase64) : FixedPcdGet32 (PcdFlashNvStorageVariableBase);
+  mFlashNvStorageVariableBase = (PcdGet64 (PcdFlashNvStorageVariableBase64) != 0) ?
+    PcdGet64 (PcdFlashNvStorageVariableBase64) : PcdGet32 (PcdFlashNvStorageVariableBase);
 
   // Set the index of the first LBA for the FVB
   Instance->StartLba = (mFlashNvStorageVariableBase - Instance->RegionBaseAddress) / Instance->Media.BlockSize;
