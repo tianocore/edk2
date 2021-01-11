@@ -49,7 +49,7 @@
 [Protocols]
   gEfiSmmFirmwareVolumeBlockProtocolGuid
 
-[Pcd.common]
+[FixedPcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
@@ -60,6 +60,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
 
+[FeaturePcd]
   gArmPlatformTokenSpaceGuid.PcdNorFlashCheckBlockLocked
 
 [Depex]
