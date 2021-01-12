@@ -9,10 +9,12 @@ This solution for building and running ArmVirtPkg has only been validated with U
 18.04 and the GCC5 toolchain. Two different firmware builds are supported and are
 described below.
 
-| Configuration name      | Architecture       | DSC File         |Additional Flags |
-| :----------             | :-----             | :-----           | :----           |
-| AARCH64                 | AARCH64            | ArmVirtQemu.dsc  | None            |
-| ARM                     | ARM                | ArmVirtQemu.dsc  | None            |
+| Configuration name      | Architecture       | DSC File            |Additional Flags |
+| :----------             | :-----             | :-----              | :----           |
+| AARCH64                 | AARCH64            | ArmVirtQemu.dsc     | None            |
+| ARM                     | ARM                | ArmVirtQemu.dsc     | None            |
+| AARCH64                 | AARCH64            | ArmVirtKvmTool.dsc  | None            |
+| ARM                     | ARM                | ArmVirtKvmTool.dsc  | None            |
 
 ## EDK2 Developer environment
 
