@@ -4,7 +4,7 @@
 // It also provides the definitions(including PPIs/PROTOCOLs/GUIDs and library classes)
 // and libraries instances, which are used for those modules.
 //
-// Copyright (c) 2007 - 2020, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2007 - 2021, Intel Corporation. All rights reserved.<BR>
 //
 // SPDX-License-Identifier: BSD-2-Clause-Patent
 //
@@ -1324,3 +1324,9 @@
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdGhcbSize_PROMPT #language en-US "Guest-Hypervisor Communication Block (GHCB) Pool Base Size"
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdGhcbSize_HELP #language en-US "Used with SEV-ES support to identify the size of the address range that is not to be encrypted."
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdPcieResizableBarSupport_PROMPT #language en-US "Enable PCIe Resizable BAR Capability Supported"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdPcieResizableBarSupport_HELP #language en-US "Indicates if the PCIe Resizable BAR Capability Supported.<BR><BR>\n"
+                                                                                            "TRUE  - PCIe Resizable BAR Capability is supported.<BR>\n"
+                                                                                            "FALSE - PCIe Resizable BAR Capability is not supported.<BR>"
