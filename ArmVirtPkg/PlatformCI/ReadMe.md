@@ -6,13 +6,14 @@ to use the same Pytools based build infrastructure locally.
 ## Supported Configuration Details
 
 This solution for building and running ArmVirtPkg has only been validated with Ubuntu
-18.04 and the GCC5 toolchain. Two different firmware builds are supported and are
-described below.
+18.04 and the GCC5 toolchain. The supported firmware builds are described below.
 
-| Configuration name      | Architecture       | DSC File         |Additional Flags |
-| :----------             | :-----             | :-----           | :----           |
-| AARCH64                 | AARCH64            | ArmVirtQemu.dsc  | None            |
-| ARM                     | ARM                | ArmVirtQemu.dsc  | None            |
+| Configuration name      | Architecture       | DSC File            |Additional Flags |
+| :----------             | :-----             | :-----              | :----           |
+| AARCH64                 | AARCH64            | ArmVirtQemu.dsc     | None            |
+| ARM                     | ARM                | ArmVirtQemu.dsc     | None            |
+| AARCH64                 | AARCH64            | ArmVirtKvmTool.dsc  | None            |
+| ARM                     | ARM                | ArmVirtKvmTool.dsc  | None            |
 
 ## EDK2 Developer environment
 
@@ -79,7 +80,13 @@ Pytools build system.
     ```
 
     - use `stuart_build -c ArmVirtPkg/PlatformCI/PlatformBuild.py -h` option to see additional
-    options like `--clean`
+    options like `--clean`, `--dsc`, etc.
+
+    Example: The `--dsc` option can be used to specify the platform to build.
+
+      ``` bash
+      stuart_build -c ArmVirtPkg/PlatformCI/PlatformBuild.py TOOL_CHAIN_TAG=<TOOL_CHAIN_TAG> -a <TARGET_ARCH> --dsc ArmVirtPkg/ArmVirtKvmTool.dsc
+      ```
 
 8. Running Emulator
     - You can add `--FlashRom` to the end of your build command and the emulator will run after the

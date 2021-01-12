@@ -2,6 +2,7 @@
 # Script to Build ArmVirtPkg UEFI firmware
 #
 # Copyright (c) Microsoft Corporation.
+# Copyright (c) 2021, Arm Limited. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 import os
@@ -139,7 +140,8 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
 
         The tuple should be (<workspace relative path to dsc file>, <input dictionary of dsc key value pairs>)
         '''
-        return (os.path.join("ArmVirtPkg", "ArmVirtQemu.dsc"), {})
+        return (os.path.join("ArmVirtPkg", "ArmVirtQemu.dsc"),
+                os.path.join("ArmVirtPkg", "ArmVirtKvmTool.dsc"), {})
 
 
     # ####################################################################################### #
@@ -150,11 +152,15 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
 class PlatformBuilder(UefiBuilder, BuildSettingsManager):
     def __init__(self):
         UefiBuilder.__init__(self)
+        self.PlatformList = [os.path.join("ArmVirtPkg", "ArmVirtQemu.dsc"),
+                        os.path.join("ArmVirtPkg", "ArmVirtKvmTool.dsc")]
 
     def AddCommandLineOptions(self, parserObj):
         ''' Add command line options to the argparser '''
         parserObj.add_argument('-a', "--arch", dest="build_arch", type=str, default="AARCH64",
                                help="Optional - Architecture to build.  Default = AARCH64")
+        parserObj.add_argument('-d', "--dsc", dest="active_platform", type=str, default=self.PlatformList[0],
+                               help="Optional - Platform to build.  Default = " + self.PlatformList[0])
 
     def RetrieveCommandLineOptions(self, args):
         '''  Retrieve command line options from the argparser '''
@@ -162,8 +168,12 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         shell_environment.GetBuildVars().SetValue(
             "TARGET_ARCH", args.build_arch.upper(), "From CmdLine")
 
-        shell_environment.GetBuildVars().SetValue(
-            "ACTIVE_PLATFORM", "ArmVirtPkg/ArmVirtQemu.dsc", "From CmdLine")
+        if (args.active_platform == self.PlatformList[1]):
+            shell_environment.GetBuildVars().SetValue(
+                "ACTIVE_PLATFORM", self.PlatformList[1], "From CmdLine")
+        else:
+            shell_environment.GetBuildVars().SetValue(
+                "ACTIVE_PLATFORM", self.PlatformList[0], "From CmdLine")
 
     def GetWorkspaceRoot(self):
         ''' get WorkspacePath '''
@@ -207,9 +217,12 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 
     def SetPlatformEnv(self):
         logging.debug("PlatformBuilder SetPlatformEnv")
-        self.env.SetValue("PRODUCT_NAME", "ArmVirtQemu", "Platform Hardcoded")
         self.env.SetValue("MAKE_STARTUP_NSH", "FALSE", "Default to false")
         self.env.SetValue("QEMU_HEADLESS", "FALSE", "Default to false")
+        if (self.env.GetValue("ACTIVE_PLATFORM") == self.PlatformList[1]):
+            self.env.SetValue("PRODUCT_NAME", "ArmVirtKvmtool", "Platform Hardcoded")
+        else:
+            self.env.SetValue("PRODUCT_NAME", "ArmVirtQemu", "Platform Hardcoded")
         return 0
 
     def PlatformPreBuild(self):
@@ -219,58 +232,61 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         return 0
 
     def FlashRomImage(self):
-        VirtualDrive = os.path.join(self.env.GetValue(
-            "BUILD_OUTPUT_BASE"), "VirtualDrive")
-        os.makedirs(VirtualDrive, exist_ok=True)
-        OutputPath_FV = os.path.join(
-            self.env.GetValue("BUILD_OUTPUT_BASE"), "FV")
-        Built_FV = os.path.join(OutputPath_FV, "QEMU_EFI.fd")
-
-        # pad fd to 64mb
-        with open(Built_FV, "ab") as fvfile:
-            fvfile.seek(0, os.SEEK_END)
-            additional = b'\0' * ((64 * 1024 * 1024)-fvfile.tell())
-            fvfile.write(additional)
-
-        # QEMU must be on that path
-
-        # Unique Command and Args parameters per ARCH
-        if (self.env.GetValue("TARGET_ARCH").upper() == "AARCH64"):
-            cmd = "qemu-system-aarch64"
-            args = "-M virt"
-            args += " -cpu cortex-a57"                                          # emulate cpu
-        elif(self.env.GetValue("TARGET_ARCH").upper() == "ARM"):
-            cmd = "qemu-system-arm"
-            args = "-M virt"
-            args += " -cpu cortex-a15"                                          # emulate cpu
+        if (self.env.GetValue("ACTIVE_PLATFORM") == self.PlatformList[1]):
+              return 0
         else:
-            raise NotImplementedError()
+              VirtualDrive = os.path.join(self.env.GetValue(
+                  "BUILD_OUTPUT_BASE"), "VirtualDrive")
+              os.makedirs(VirtualDrive, exist_ok=True)
+              OutputPath_FV = os.path.join(
+                  self.env.GetValue("BUILD_OUTPUT_BASE"), "FV")
+              Built_FV = os.path.join(OutputPath_FV, "QEMU_EFI.fd")
 
-        # Common Args
-        args += " -pflash " + Built_FV                                     # path to fw
-        args += " -m 1024"                                                  # 1gb memory
-        # turn off network
-        args += " -net none"
-        # Serial messages out
-        args += " -serial stdio"
-        # Mount disk with startup.nsh
-        args += f" -drive file=fat:rw:{VirtualDrive},format=raw,media=disk"
+              # pad fd to 64mb
+              with open(Built_FV, "ab") as fvfile:
+                  fvfile.seek(0, os.SEEK_END)
+                  additional = b'\0' * ((64 * 1024 * 1024)-fvfile.tell())
+                  fvfile.write(additional)
 
-        # Conditional Args
-        if (self.env.GetValue("QEMU_HEADLESS").upper() == "TRUE"):
-            args += " -display none"  # no graphics
+              # QEMU must be on that path
 
-        if (self.env.GetValue("MAKE_STARTUP_NSH").upper() == "TRUE"):
-            f = open(os.path.join(VirtualDrive, "startup.nsh"), "w")
-            f.write("BOOT SUCCESS !!! \n")
-            # add commands here
-            f.write("reset -s\n")
-            f.close()
+              # Unique Command and Args parameters per ARCH
+              if (self.env.GetValue("TARGET_ARCH").upper() == "AARCH64"):
+                  cmd = "qemu-system-aarch64"
+                  args = "-M virt"
+                  args += " -cpu cortex-a57"                                          # emulate cpu
+              elif(self.env.GetValue("TARGET_ARCH").upper() == "ARM"):
+                  cmd = "qemu-system-arm"
+                  args = "-M virt"
+                  args += " -cpu cortex-a15"                                          # emulate cpu
+              else:
+                  raise NotImplementedError()
 
-        ret = RunCmd(cmd, args)
+              # Common Args
+              args += " -pflash " + Built_FV                                     # path to fw
+              args += " -m 1024"                                                  # 1gb memory
+              # turn off network
+              args += " -net none"
+              # Serial messages out
+              args += " -serial stdio"
+              # Mount disk with startup.nsh
+              args += f" -drive file=fat:rw:{VirtualDrive},format=raw,media=disk"
 
-        if ret == 0xc0000005:
-            # for some reason getting a c0000005 on successful return
-            return 0
+              # Conditional Args
+              if (self.env.GetValue("QEMU_HEADLESS").upper() == "TRUE"):
+                  args += " -display none"  # no graphics
 
-        return ret
+              if (self.env.GetValue("MAKE_STARTUP_NSH").upper() == "TRUE"):
+                  f = open(os.path.join(VirtualDrive, "startup.nsh"), "w")
+                  f.write("BOOT SUCCESS !!! \n")
+                  # add commands here
+                  f.write("reset -s\n")
+                  f.close()
+
+              ret = RunCmd(cmd, args)
+
+              if ret == 0xc0000005:
+                  # for some reason getting a c0000005 on successful return
+                  return 0
+
+              return ret
