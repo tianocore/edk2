@@ -6,13 +6,14 @@ to use the same Pytools based build infrastructure locally.
 ## Supported Configuration Details
 
 This solution for building and running ArmVirtPkg has only been validated with Ubuntu
-18.04 and the GCC5 toolchain. Two different firmware builds are supported and are
-described below.
+18.04 and the GCC5 toolchain. The supported firmware builds are described below.
 
-| Configuration name      | Architecture       | DSC File         |Additional Flags |
-| :----------             | :-----             | :-----           | :----           |
-| AARCH64                 | AARCH64            | ArmVirtQemu.dsc  | None            |
-| ARM                     | ARM                | ArmVirtQemu.dsc  | None            |
+| Configuration name      | Architecture       | DSC File            |Additional Flags | Platform CI script      |
+| :----------             | :-----             | :-----              | :----           | :----                   |
+| AARCH64                 | AARCH64            | ArmVirtQemu.dsc     | None            | PlatformBuild.py        |
+| ARM                     | ARM                | ArmVirtQemu.dsc     | None            | PlatformBuild.py        |
+| AARCH64                 | AARCH64            | ArmVirtKvmTool.dsc  | None            | PlatformBuildKvmTool.py |
+| ARM                     | ARM                | ArmVirtKvmTool.dsc  | None            | PlatformBuildKvmTool.py |
 
 ## EDK2 Developer environment
 
@@ -57,13 +58,13 @@ Pytools build system.
 4. Initialize & Update Submodules - only when submodules updated
 
     ``` bash
-    stuart_setup -c ArmVirtPkg/PlatformCI/PlatformBuild.py TOOL_CHAIN_TAG=<TOOL_CHAIN_TAG> -a <TARGET_ARCH>
+    stuart_setup -c ArmVirtPkg/PlatformCI/PlatformBuild[KvmTool].py TOOL_CHAIN_TAG=<TOOL_CHAIN_TAG> -a <TARGET_ARCH>
     ```
 
 5. Initialize & Update Dependencies - only as needed when ext_deps change
 
     ``` bash
-    stuart_update -c ArmVirtPkg/PlatformCI/PlatformBuild.py TOOL_CHAIN_TAG=<TOOL_CHAIN_TAG> -a <TARGET_ARCH>
+    stuart_update -c ArmVirtPkg/PlatformCI/PlatformBuild[KvmTool].py TOOL_CHAIN_TAG=<TOOL_CHAIN_TAG> -a <TARGET_ARCH>
     ```
 
 6. Compile the basetools if necessary - only when basetools C source files change
@@ -75,10 +76,10 @@ Pytools build system.
 7. Compile Firmware
 
     ``` bash
-    stuart_build -c ArmVirtPkg/PlatformCI/PlatformBuild.py TOOL_CHAIN_TAG=<TOOL_CHAIN_TAG> -a <TARGET_ARCH>
+    stuart_build -c ArmVirtPkg/PlatformCI/PlatformBuild[KvmTool].py TOOL_CHAIN_TAG=<TOOL_CHAIN_TAG> -a <TARGET_ARCH>
     ```
 
-    - use `stuart_build -c ArmVirtPkg/PlatformCI/PlatformBuild.py -h` option to see additional
+    - use `stuart_build -c ArmVirtPkg/PlatformCI/PlatformBuild[KvmTool].py -h` option to see additional
     options like `--clean`
 
 8. Running Emulator
