@@ -1408,12 +1408,14 @@ LibUpdateFileExplorer (
   if (NewFileContext->IsDir) {
     RemoveEntryList (&NewMenuEntry->Link);
     LibFreeMenu (gFileExplorerPrivate.FsOptionMenu);
-    LibGetFileHandleFromMenu (NewMenuEntry, &FileHandle);
-    Status = LibFindFiles (FileHandle, NewFileContext->FileName, NewFileContext->DeviceHandle);
+    Status = LibGetFileHandleFromMenu (NewMenuEntry, &FileHandle);
     if (!EFI_ERROR (Status)) {
-      LibUpdateFileExplorePage ();
-    } else {
-      LibFreeMenu (gFileExplorerPrivate.FsOptionMenu);
+      Status = LibFindFiles (FileHandle, NewFileContext->FileName, NewFileContext->DeviceHandle);
+      if (!EFI_ERROR (Status)) {
+        LibUpdateFileExplorePage ();
+      } else {
+        LibFreeMenu (gFileExplorerPrivate.FsOptionMenu);
+      }
     }
     LibDestroyMenuEntry (NewMenuEntry);
   }
