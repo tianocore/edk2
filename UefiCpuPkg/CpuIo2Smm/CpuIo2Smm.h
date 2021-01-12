@@ -153,4 +153,16 @@ CpuIoServiceWrite (
   IN VOID                            *Buffer
   );
 
+/**
+  The module Entry Point SmmCpuIoProtocol driver
+
+  @retval EFI_SUCCESS  The entry point is executed successfully.
+  @retval Other        Some error occurs when executing this entry point.
+
+**/
+EFI_STATUS
+CommonCpuIo2Initialize (
+  VOID
+  );
+
 #endif

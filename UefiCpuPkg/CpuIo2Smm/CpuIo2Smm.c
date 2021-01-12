@@ -371,18 +371,13 @@ CpuIoServiceWrite (
 /**
   The module Entry Point SmmCpuIoProtocol driver
 
-  @param[in] ImageHandle  The firmware allocated handle for the EFI image.
-  @param[in] SystemTable  A pointer to the EFI System Table.
-
   @retval EFI_SUCCESS  The entry point is executed successfully.
   @retval Other        Some error occurs when executing this entry point.
 
 **/
 EFI_STATUS
-EFIAPI
-SmmCpuIo2Initialize (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
+CommonCpuIo2Initialize (
+  VOID
   )
 {
   EFI_STATUS  Status;
