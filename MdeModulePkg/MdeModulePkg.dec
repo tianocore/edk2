@@ -2047,7 +2047,7 @@
   #   TRUE  - PCIe Resizable BAR Capability is supported.<BR>
   #   FALSE - PCIe Resizable BAR Capability is not supported.<BR>
   # @Prompt Enable PCIe Resizable BAR Capability support.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPcieResizableBarSupport|TRUE|BOOLEAN|0x10000024
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPcieResizableBarSupport|FALSE|BOOLEAN|0x10000024
 
 [PcdsPatchableInModule]
   ## Specify memory size with page number for PEI code when
