@@ -139,7 +139,8 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
 
         The tuple should be (<workspace relative path to dsc file>, <input dictionary of dsc key value pairs>)
         '''
-        return (os.path.join("ArmVirtPkg", "ArmVirtQemu.dsc"), {})
+        return (os.path.join("ArmVirtPkg", "ArmVirtQemu.dsc"),
+                os.path.join("ArmVirtPkg", "ArmVirtKvmTool.dsc"), {})
 
 
     # ####################################################################################### #
@@ -219,58 +220,61 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         return 0
 
     def FlashRomImage(self):
-        VirtualDrive = os.path.join(self.env.GetValue(
-            "BUILD_OUTPUT_BASE"), "VirtualDrive")
-        os.makedirs(VirtualDrive, exist_ok=True)
-        OutputPath_FV = os.path.join(
-            self.env.GetValue("BUILD_OUTPUT_BASE"), "FV")
-        Built_FV = os.path.join(OutputPath_FV, "QEMU_EFI.fd")
-
-        # pad fd to 64mb
-        with open(Built_FV, "ab") as fvfile:
-            fvfile.seek(0, os.SEEK_END)
-            additional = b'\0' * ((64 * 1024 * 1024)-fvfile.tell())
-            fvfile.write(additional)
-
-        # QEMU must be on that path
-
-        # Unique Command and Args parameters per ARCH
-        if (self.env.GetValue("TARGET_ARCH").upper() == "AARCH64"):
-            cmd = "qemu-system-aarch64"
-            args = "-M virt"
-            args += " -cpu cortex-a57"                                          # emulate cpu
-        elif(self.env.GetValue("TARGET_ARCH").upper() == "ARM"):
-            cmd = "qemu-system-arm"
-            args = "-M virt"
-            args += " -cpu cortex-a15"                                          # emulate cpu
+        if self.env.GetValue("ACTIVE_PLATFORM") == "ArmVirtPkg/ArmVirtKvmTool.dsc":
+              return 0
         else:
-            raise NotImplementedError()
+              VirtualDrive = os.path.join(self.env.GetValue(
+                  "BUILD_OUTPUT_BASE"), "VirtualDrive")
+              os.makedirs(VirtualDrive, exist_ok=True)
+              OutputPath_FV = os.path.join(
+                  self.env.GetValue("BUILD_OUTPUT_BASE"), "FV")
+              Built_FV = os.path.join(OutputPath_FV, "QEMU_EFI.fd")
 
-        # Common Args
-        args += " -pflash " + Built_FV                                     # path to fw
-        args += " -m 1024"                                                  # 1gb memory
-        # turn off network
-        args += " -net none"
-        # Serial messages out
-        args += " -serial stdio"
-        # Mount disk with startup.nsh
-        args += f" -drive file=fat:rw:{VirtualDrive},format=raw,media=disk"
+              # pad fd to 64mb
+              with open(Built_FV, "ab") as fvfile:
+                  fvfile.seek(0, os.SEEK_END)
+                  additional = b'\0' * ((64 * 1024 * 1024)-fvfile.tell())
+                  fvfile.write(additional)
 
-        # Conditional Args
-        if (self.env.GetValue("QEMU_HEADLESS").upper() == "TRUE"):
-            args += " -display none"  # no graphics
+              # QEMU must be on that path
 
-        if (self.env.GetValue("MAKE_STARTUP_NSH").upper() == "TRUE"):
-            f = open(os.path.join(VirtualDrive, "startup.nsh"), "w")
-            f.write("BOOT SUCCESS !!! \n")
-            # add commands here
-            f.write("reset -s\n")
-            f.close()
+              # Unique Command and Args parameters per ARCH
+              if (self.env.GetValue("TARGET_ARCH").upper() == "AARCH64"):
+                  cmd = "qemu-system-aarch64"
+                  args = "-M virt"
+                  args += " -cpu cortex-a57"                                          # emulate cpu
+              elif(self.env.GetValue("TARGET_ARCH").upper() == "ARM"):
+                  cmd = "qemu-system-arm"
+                  args = "-M virt"
+                  args += " -cpu cortex-a15"                                          # emulate cpu
+              else:
+                  raise NotImplementedError()
 
-        ret = RunCmd(cmd, args)
+              # Common Args
+              args += " -pflash " + Built_FV                                     # path to fw
+              args += " -m 1024"                                                  # 1gb memory
+              # turn off network
+              args += " -net none"
+              # Serial messages out
+              args += " -serial stdio"
+              # Mount disk with startup.nsh
+              args += f" -drive file=fat:rw:{VirtualDrive},format=raw,media=disk"
 
-        if ret == 0xc0000005:
-            # for some reason getting a c0000005 on successful return
-            return 0
+              # Conditional Args
+              if (self.env.GetValue("QEMU_HEADLESS").upper() == "TRUE"):
+                  args += " -display none"  # no graphics
 
-        return ret
+              if (self.env.GetValue("MAKE_STARTUP_NSH").upper() == "TRUE"):
+                  f = open(os.path.join(VirtualDrive, "startup.nsh"), "w")
+                  f.write("BOOT SUCCESS !!! \n")
+                  # add commands here
+                  f.write("reset -s\n")
+                  f.close()
+
+              ret = RunCmd(cmd, args)
+
+              if ret == 0xc0000005:
+                  # for some reason getting a c0000005 on successful return
+                  return 0
+
+              return ret
