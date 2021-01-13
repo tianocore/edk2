@@ -42,6 +42,7 @@
   ShellLib
   HiiLib
   HandleParsingLib
+  OrderedCollectionLib
 
 [Protocols]
   gEfiUnicodeCollation2ProtocolGuid                       ## CONSUMES
