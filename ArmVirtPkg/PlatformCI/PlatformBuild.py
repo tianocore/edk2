@@ -151,13 +151,15 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
 class PlatformBuilder(UefiBuilder, BuildSettingsManager):
     def __init__(self):
         UefiBuilder.__init__(self)
+        self.PlatformList = [os.path.join("ArmVirtPkg", "ArmVirtQemu.dsc"),
+                        os.path.join("ArmVirtPkg", "ArmVirtKvmTool.dsc")]
 
     def AddCommandLineOptions(self, parserObj):
         ''' Add command line options to the argparser '''
         parserObj.add_argument('-a', "--arch", dest="build_arch", type=str, default="AARCH64",
                                help="Optional - Architecture to build.  Default = AARCH64")
-        parserObj.add_argument('-p', "--plat", dest="active_platform", type=str, default="ArmVirtPkg/ArmVirtQemu.dsc",
-                               help="Optional - Platform to build.  Default = ArmVirtPkg/ArmVirtQemu.dsc Alternative = ArmVirtPkg/ArmVirtKvmTool.dsc")
+        parserObj.add_argument('-p', "--plat", dest="active_platform", type=str, default=self.PlatformList[0],
+                               help="Optional - Platform to build.  Default = " + self.PlatformList[0])
 
     def RetrieveCommandLineOptions(self, args):
         '''  Retrieve command line options from the argparser '''
@@ -165,8 +167,12 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         shell_environment.GetBuildVars().SetValue(
             "TARGET_ARCH", args.build_arch.upper(), "From CmdLine")
 
-        shell_environment.GetBuildVars().SetValue(
-            "ACTIVE_PLATFORM", args.active_platform.upper(), "From CmdLine")
+        if (args.active_platform == self.PlatformList[1]):
+            shell_environment.GetBuildVars().SetValue(
+                "ACTIVE_PLATFORM", self.PlatformList[1], "From CmdLine")
+        else:
+            shell_environment.GetBuildVars().SetValue(
+                "ACTIVE_PLATFORM", self.PlatformList[0], "From CmdLine")
 
     def GetWorkspaceRoot(self):
         ''' get WorkspacePath '''
@@ -210,9 +216,12 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
 
     def SetPlatformEnv(self):
         logging.debug("PlatformBuilder SetPlatformEnv")
-        self.env.SetValue("PRODUCT_NAME", "ArmVirtQemu", "Platform Hardcoded")
         self.env.SetValue("MAKE_STARTUP_NSH", "FALSE", "Default to false")
         self.env.SetValue("QEMU_HEADLESS", "FALSE", "Default to false")
+        if (self.env.GetValue("ACTIVE_PLATFORM") == self.PlatformList[1]):
+            self.env.SetValue("PRODUCT_NAME", "ArmVirtKvmtool", "Platform Hardcoded")
+        else:
+            self.env.SetValue("PRODUCT_NAME", "ArmVirtQemu", "Platform Hardcoded")
         return 0
 
     def PlatformPreBuild(self):
@@ -222,7 +231,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         return 0
 
     def FlashRomImage(self):
-        if self.env.GetValue("ACTIVE_PLATFORM") == "ArmVirtPkg/ArmVirtKvmTool.dsc":
+        if (self.env.GetValue("ACTIVE_PLATFORM") == self.PlatformList[1]):
               return 0
         else:
               VirtualDrive = os.path.join(self.env.GetValue(
