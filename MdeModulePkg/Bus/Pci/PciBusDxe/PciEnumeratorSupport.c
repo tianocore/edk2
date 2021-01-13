@@ -1168,12 +1168,7 @@ ProcessOptionRomLight (
       ProcessOptionRomLight (Temp);
     }
 
-    PciRomGetImageMapping (Temp);
-
-    //
-    // The OpRom has already been processed in the first round
-    //
-    Temp->AllOpRomProcessed = TRUE;
+    Temp->AllOpRomProcessed = PciRomGetImageMapping (Temp);
 
     CurrentLink = CurrentLink->ForwardLink;
   }
