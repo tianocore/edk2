@@ -113,6 +113,7 @@
   BcfgCommandLib
 
 [Pcd]
+  gEfiShellPkgTokenSpaceGuid.PcdShellFileOperationSize        ## CONSUMES
   gEfiShellPkgTokenSpaceGuid.PcdShellProfileMask              ## CONSUMES
 
 [Protocols]
