@@ -23,6 +23,8 @@ STATIC UINTN mFwCfgSelectorAddress;
 STATIC UINTN mFwCfgDataAddress;
 STATIC UINTN mFwCfgDmaAddress;
 
+BREAK This build
+
 /**
   Reads firmware configuration bytes into a buffer
 
