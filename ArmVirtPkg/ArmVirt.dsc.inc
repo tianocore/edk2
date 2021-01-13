@@ -290,7 +290,7 @@
 [PcdsFixedAtBuild.common]
   gEfiMdePkgTokenSpaceGuid.PcdMaximumUnicodeStringLength|1000000
   gEfiMdePkgTokenSpaceGuid.PcdMaximumAsciiStringLength|1000000
-  gEfiMdePkgTokenSpaceGuid.PcdMaximumLinkedListLength|1000000
+  gEfiMdePkgTokenSpaceGuid.PcdMaximumLinkedListLength|0
   gEfiMdePkgTokenSpaceGuid.PcdSpinLockTimeout|10000000
   gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize|320
 
