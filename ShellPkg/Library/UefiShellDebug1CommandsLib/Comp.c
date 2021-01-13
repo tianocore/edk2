@@ -21,6 +21,16 @@ typedef enum {
   InPrevDiffPoint
 } READ_STATUS;
 
+//
+// Buffer type, for reading both file operands in chunks.
+//
+typedef struct {
+  UINT8 *Data;     // dynamically allocated buffer
+  UINTN Allocated; // the allocated size of Data
+  UINTN Next;      // next position in Data to fetch a byte at
+  UINTN Left;      // number of bytes left in Data for fetching at Next
+} FILE_BUFFER;
+
 /**
   Function to print differnt point data.
 
@@ -77,6 +87,106 @@ PrintDifferentPoint(
 }
 
 /**
+  Initialize a FILE_BUFFER.
+
+  @param[out] FileBuffer  The FILE_BUFFER to initialize. On return, the caller
+                          is responsible for checking FileBuffer->Data: if
+                          FileBuffer->Data is NULL on output, then memory
+                          allocation failed.
+**/
+STATIC
+VOID
+FileBufferInit (
+  OUT FILE_BUFFER *FileBuffer
+  )
+{
+  FileBuffer->Allocated = PcdGet32 (PcdShellFileOperationSize);
+  FileBuffer->Data      = AllocatePool (FileBuffer->Allocated);
+  FileBuffer->Left      = 0;
+}
+
+/**
+  Uninitialize a FILE_BUFFER.
+
+  @param[in,out] FileBuffer  The FILE_BUFFER to uninitialize. The caller is
+                             responsible for making sure FileBuffer was first
+                             initialized with FileBufferInit(), successfully or
+                             unsuccessfully.
+**/
+STATIC
+VOID
+FileBufferUninit (
+  IN OUT FILE_BUFFER *FileBuffer
+  )
+{
+  SHELL_FREE_NON_NULL (FileBuffer->Data);
+}
+
+/**
+  Read a byte from a SHELL_FILE_HANDLE, buffered with a FILE_BUFFER.
+
+  @param[in] FileHandle      The SHELL_FILE_HANDLE to replenish FileBuffer
+                             from, if needed.
+
+  @param[in,out] FileBuffer  The FILE_BUFFER to read a byte from. If FileBuffer
+                             is empty on entry, then FileBuffer is refilled
+                             from FileHandle, before outputting a byte from
+                             FileBuffer to Byte. The caller is responsible for
+                             ensuring that FileBuffer was successfully
+                             initialized with FileBufferInit().
+
+  @param[out] BytesRead      On successful return, BytesRead is set to 1 if the
+                             next byte from FileBuffer has been stored to Byte.
+                             On successful return, BytesRead is set to 0 if
+                             FileBuffer is empty, and FileHandle is at EOF.
+                             When an error is returned, BytesRead is not set.
+
+  @param[out] Byte           On output, the next byte from FileBuffer. Only set
+                             if (a) EFI_SUCCESS is returned and (b) BytesRead
+                             is set to 1 on output.
+
+  @retval EFI_SUCCESS  BytesRead has been set to 0 or 1. In the latter case,
+                       Byte has been set as well.
+
+  @return              Error codes propagated from
+                       gEfiShellProtocol->ReadFile().
+**/
+STATIC
+EFI_STATUS
+FileBufferReadByte (
+  IN     SHELL_FILE_HANDLE FileHandle,
+  IN OUT FILE_BUFFER       *FileBuffer,
+     OUT UINTN             *BytesRead,
+     OUT UINT8             *Byte
+  )
+{
+  UINTN      ReadSize;
+  EFI_STATUS Status;
+
+  if (FileBuffer->Left == 0) {
+    ReadSize = FileBuffer->Allocated;
+    Status = gEfiShellProtocol->ReadFile (FileHandle, &ReadSize,
+                                  FileBuffer->Data);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+    if (ReadSize == 0) {
+      *BytesRead = 0;
+      return EFI_SUCCESS;
+    }
+    FileBuffer->Next = 0;
+    FileBuffer->Left = ReadSize;
+  }
+
+  *BytesRead = 1;
+  *Byte      = FileBuffer->Data[FileBuffer->Next];
+
+  FileBuffer->Next++;
+  FileBuffer->Left--;
+  return EFI_SUCCESS;
+}
+
+/**
   Function for 'comp' command.
 
   @param[in] ImageHandle  Handle to the Image (NULL if Internal).
@@ -107,6 +217,8 @@ ShellCommandRunComp (
   UINT8               OneByteFromFile2;
   UINT8               *DataFromFile1;
   UINT8               *DataFromFile2;
+  FILE_BUFFER         FileBuffer1;
+  FILE_BUFFER         FileBuffer2;
   UINTN               InsertPosition1;
   UINTN               InsertPosition2;
   UINTN               DataSizeFromFile1;
@@ -234,10 +346,15 @@ ShellCommandRunComp (
       if (ShellStatus == SHELL_SUCCESS) {
         DataFromFile1 = AllocateZeroPool ((UINTN)DifferentBytes);
         DataFromFile2 = AllocateZeroPool ((UINTN)DifferentBytes);
-        if (DataFromFile1 == NULL || DataFromFile2 == NULL) {
+        FileBufferInit (&FileBuffer1);
+        FileBufferInit (&FileBuffer2);
+        if (DataFromFile1 == NULL || DataFromFile2 == NULL ||
+            FileBuffer1.Data == NULL || FileBuffer2.Data == NULL) {
           ShellStatus = SHELL_OUT_OF_RESOURCES;
           SHELL_FREE_NON_NULL (DataFromFile1);
           SHELL_FREE_NON_NULL (DataFromFile2);
+          FileBufferUninit (&FileBuffer1);
+          FileBufferUninit (&FileBuffer2);
         }
       }
 
@@ -247,9 +364,11 @@ ShellCommandRunComp (
           DataSizeFromFile2 = 1;
           OneByteFromFile1 = 0;
           OneByteFromFile2 = 0;
-          Status = gEfiShellProtocol->ReadFile (FileHandle1, &DataSizeFromFile1, &OneByteFromFile1);
+          Status = FileBufferReadByte (FileHandle1, &FileBuffer1,
+                     &DataSizeFromFile1, &OneByteFromFile1);
           ASSERT_EFI_ERROR (Status);
-          Status = gEfiShellProtocol->ReadFile (FileHandle2, &DataSizeFromFile2, &OneByteFromFile2);
+          Status = FileBufferReadByte (FileHandle2, &FileBuffer2,
+                     &DataSizeFromFile2, &OneByteFromFile2);
           ASSERT_EFI_ERROR (Status);
 
           TempAddress++;
@@ -346,6 +465,8 @@ ShellCommandRunComp (
 
         SHELL_FREE_NON_NULL (DataFromFile1);
         SHELL_FREE_NON_NULL (DataFromFile2);
+        FileBufferUninit (&FileBuffer1);
+        FileBufferUninit (&FileBuffer2);
 
         if (DiffPointNumber == 0) {
           ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_COMP_FOOTER_PASS), gShellDebug1HiiHandle);
