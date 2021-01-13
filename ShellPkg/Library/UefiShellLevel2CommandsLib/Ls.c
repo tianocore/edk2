@@ -489,6 +489,20 @@ PrintLsOutput(
       PrintSfoVolumeInfoTableEntry(ListHead);
     }
 
+    if (!Sfo) {
+      //
+      // Sort the file list by FileName, stably.
+      //
+      // If the call below fails, then the EFI_SHELL_FILE_INFO list anchored to
+      // ListHead will not be changed in any way.
+      //
+      ShellSortFileList (
+        &ListHead,
+        NULL,                       // Duplicates
+        ShellSortFileListByFileName
+        );
+    }
+
     for ( Node = (EFI_SHELL_FILE_INFO *)GetFirstNode(&ListHead->Link), LongestPath = 0
         ; !IsNull(&ListHead->Link, &Node->Link)
         ; Node = (EFI_SHELL_FILE_INFO *)GetNextNode(&ListHead->Link, &Node->Link)
