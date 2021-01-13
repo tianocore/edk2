@@ -444,6 +444,9 @@
   ## Xen vlapic's frequence is 100 MHz
   gEfiMdePkgTokenSpaceGuid.PcdFSBClock|100000000
 
+  # We populate DXE IPL tables with 1G pages preferably on Xen
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable|TRUE
+
 ################################################################################
 #
 # Pcd Dynamic Section - list of all EDK II PCD Entries defined by this Platform
