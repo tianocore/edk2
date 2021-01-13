@@ -139,7 +139,8 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
 
         The tuple should be (<workspace relative path to dsc file>, <input dictionary of dsc key value pairs>)
         '''
-        return (os.path.join("ArmVirtPkg", "ArmVirtQemu.dsc"), {})
+        return (os.path.join("ArmVirtPkg", "ArmVirtQemu.dsc",
+                os.path.join("ArmVirtPkg", "ArmVirtKvmTool.dsc", {})
 
 
     # ####################################################################################### #
@@ -219,6 +220,9 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         return 0
 
     def FlashRomImage(self):
+      if self.env.GetValue("ACTIVE_PLATFORM") == "ArmVirtPkg/ArmVirtKvmTool.dsc":
+        return 0
+      else
         VirtualDrive = os.path.join(self.env.GetValue(
             "BUILD_OUTPUT_BASE"), "VirtualDrive")
         os.makedirs(VirtualDrive, exist_ok=True)
