@@ -568,6 +568,8 @@
   #
 !include NetworkPkg/NetworkPcds.dsc.inc
 
+  gEfiShellPkgTokenSpaceGuid.PcdShellFileOperationSize|0x20000
+
 !if $(SMM_REQUIRE) == TRUE
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmStackSize|0x4000
 !endif
