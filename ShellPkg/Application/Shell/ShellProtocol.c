@@ -1855,6 +1855,8 @@ EfiShellRemoveDupInFileList(
   IN EFI_SHELL_FILE_INFO **FileList
   )
 {
+  EFI_STATUS          Status;
+  EFI_SHELL_FILE_INFO *Duplicates;
   EFI_SHELL_FILE_INFO *ShellFileListItem;
   EFI_SHELL_FILE_INFO *ShellFileListItem2;
   EFI_SHELL_FILE_INFO *TempNode;
@@ -1862,6 +1864,20 @@ EfiShellRemoveDupInFileList(
   if (FileList == NULL || *FileList == NULL) {
     return (EFI_INVALID_PARAMETER);
   }
+
+  Status = ShellSortFileList (
+             FileList,
+             &Duplicates,
+             ShellSortFileListByFullName
+             );
+  if (!EFI_ERROR (Status)) {
+    EfiShellFreeFileList (&Duplicates);
+    return EFI_SUCCESS;
+  }
+  //
+  // Fall back to the slow method that needs no extra memory, and so cannot
+  // fail.
+  //
   for ( ShellFileListItem = (EFI_SHELL_FILE_INFO*)GetFirstNode(&(*FileList)->Link)
       ; !IsNull(&(*FileList)->Link, &ShellFileListItem->Link)
       ; ShellFileListItem = (EFI_SHELL_FILE_INFO*)GetNextNode(&(*FileList)->Link, &ShellFileListItem->Link)
