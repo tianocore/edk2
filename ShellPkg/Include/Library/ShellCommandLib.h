@@ -714,4 +714,85 @@ CatSDumpHex (
   IN UINTN   DataSize,
   IN VOID    *UserData
   );
+
+//
+// Determines the ordering operation for ShellSortFileList().
+//
+typedef enum {
+  //
+  // Sort the EFI_SHELL_FILE_INFO objects by the FileName field, in increasing
+  // order, using gUnicodeCollation->StriColl().
+  //
+  ShellSortFileListByFileName,
+  //
+  // Sort the EFI_SHELL_FILE_INFO objects by the FullName field, in increasing
+  // order, using gUnicodeCollation->StriColl().
+  //
+  ShellSortFileListByFullName,
+  ShellSortFileListMax
+} SHELL_SORT_FILE_LIST;
+
+/**
+  Sort an EFI_SHELL_FILE_INFO list, optionally moving duplicates to a separate
+  list.
+
+  @param[in,out] FileList  The list of EFI_SHELL_FILE_INFO objects to sort.
+
+                           If FileList is NULL on input, then FileList is
+                           considered an empty, hence already sorted, list.
+
+                           Otherwise, if (*FileList) is NULL on input, then
+                           EFI_INVALID_PARAMETER is returned.
+
+                           Otherwise, the caller is responsible for having
+                           initialized (*FileList)->Link with
+                           InitializeListHead(). No other fields in the
+                           (**FileList) head element are accessed by this
+                           function.
+
+                           On output, (*FileList) is sorted according to Order.
+                           If Duplicates is NULL on input, then duplicate
+                           elements are preserved, sorted stably, on
+                           (*FileList). If Duplicates is not NULL on input,
+                           then duplicates are moved (stably sorted) to the
+                           new, dynamically allocated (*Duplicates) list.
+
+  @param[out] Duplicates   If Duplicates is NULL on input, (*FileList) will be
+                           a monotonically ordered list on output, with
+                           duplicates stably sorted.
+
+                           If Duplicates is not NULL on input, (*FileList) will
+                           be a strictly monotonically oredered list on output,
+                           with duplicates separated (stably sorted) to
+                           (*Duplicates). All fields except Link will be
+                           zero-initialized in the (**Duplicates) head element.
+                           If no duplicates exist, then (*Duplicates) is set to
+                           NULL on output.
+
+  @param[in] Order         Determines the comparison operation between
+                           EFI_SHELL_FILE_INFO objects.
+
+  @retval EFI_INVALID_PARAMETER  (UINTN)Order is greater than or equal to
+                                 (UINTN)ShellSortFileListMax. Neither the
+                                 (*FileList) nor the (*Duplicates) list has
+                                 been modified.
+
+  @retval EFI_INVALID_PARAMETER  (*FileList) was NULL on input. Neither the
+                                 (*FileList) nor the (*Duplicates) list has
+                                 been modified.
+
+  @retval EFI_OUT_OF_RESOURCES   Memory allocation failed. Neither the
+                                 (*FileList) nor the (*Duplicates) list has
+                                 been modified.
+
+  @retval EFI_SUCCESS            Sorting successful, including the case when
+                                 FileList is NULL on input.
+**/
+EFI_STATUS
+EFIAPI
+ShellSortFileList (
+  IN OUT EFI_SHELL_FILE_INFO  **FileList,
+     OUT EFI_SHELL_FILE_INFO  **Duplicates OPTIONAL,
+  IN     SHELL_SORT_FILE_LIST Order
+  );
 #endif //_SHELL_COMMAND_LIB_

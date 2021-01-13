@@ -1909,3 +1909,315 @@ CatSDumpHex (
 
   return RetVal;
 }
+
+/**
+  ORDERED_COLLECTION_USER_COMPARE function for SHELL_SORT_UNIQUE_NAME objects.
+
+  @param[in] Unique1AsVoid  The first SHELL_SORT_UNIQUE_NAME object (Unique1),
+                            passed in as a pointer-to-VOID.
+
+  @param[in] Unique2AsVoid  The second SHELL_SORT_UNIQUE_NAME object (Unique2),
+                            passed in as a pointer-to-VOID.
+
+  @retval <0  If Unique1 compares less than Unique2.
+
+  @retval  0  If Unique1 compares equal to Unique2.
+
+  @retval >0  If Unique1 compares greater than Unique2.
+**/
+STATIC
+INTN
+EFIAPI
+UniqueNameCompare (
+  IN CONST VOID *Unique1AsVoid,
+  IN CONST VOID *Unique2AsVoid
+  )
+{
+  CONST SHELL_SORT_UNIQUE_NAME *Unique1;
+  CONST SHELL_SORT_UNIQUE_NAME *Unique2;
+
+  Unique1 = Unique1AsVoid;
+  Unique2 = Unique2AsVoid;
+
+  //
+  // We need to cast away CONST for EFI_UNICODE_COLLATION_STRICOLL.
+  //
+  return gUnicodeCollation->StriColl (
+                              gUnicodeCollation,
+                              (CHAR16 *)Unique1->Alias,
+                              (CHAR16 *)Unique2->Alias
+                              );
+}
+
+/**
+  ORDERED_COLLECTION_KEY_COMPARE function for SHELL_SORT_UNIQUE_NAME objects.
+
+  @param[in] UniqueAliasAsVoid  The CHAR16 string UniqueAlias, passed in as a
+                                pointer-to-VOID.
+
+  @param[in] UniqueAsVoid       The SHELL_SORT_UNIQUE_NAME object (Unique),
+                                passed in as a pointer-to-VOID.
+
+  @retval <0  If UniqueAlias compares less than Unique->Alias.
+
+  @retval  0  If UniqueAlias compares equal to Unique->Alias.
+
+  @retval >0  If UniqueAlias compares greater than Unique->Alias.
+**/
+STATIC
+INTN
+EFIAPI
+UniqueNameAliasCompare (
+  IN CONST VOID *UniqueAliasAsVoid,
+  IN CONST VOID *UniqueAsVoid
+  )
+{
+  CONST CHAR16                 *UniqueAlias;
+  CONST SHELL_SORT_UNIQUE_NAME *Unique;
+
+  UniqueAlias = UniqueAliasAsVoid;
+  Unique      = UniqueAsVoid;
+
+  //
+  // We need to cast away CONST for EFI_UNICODE_COLLATION_STRICOLL.
+  //
+  return gUnicodeCollation->StriColl (
+                              gUnicodeCollation,
+                              (CHAR16 *)UniqueAlias,
+                              (CHAR16 *)Unique->Alias
+                              );
+}
+
+/**
+  Sort an EFI_SHELL_FILE_INFO list, optionally moving duplicates to a separate
+  list.
+
+  @param[in,out] FileList  The list of EFI_SHELL_FILE_INFO objects to sort.
+
+                           If FileList is NULL on input, then FileList is
+                           considered an empty, hence already sorted, list.
+
+                           Otherwise, if (*FileList) is NULL on input, then
+                           EFI_INVALID_PARAMETER is returned.
+
+                           Otherwise, the caller is responsible for having
+                           initialized (*FileList)->Link with
+                           InitializeListHead(). No other fields in the
+                           (**FileList) head element are accessed by this
+                           function.
+
+                           On output, (*FileList) is sorted according to Order.
+                           If Duplicates is NULL on input, then duplicate
+                           elements are preserved, sorted stably, on
+                           (*FileList). If Duplicates is not NULL on input,
+                           then duplicates are moved (stably sorted) to the
+                           new, dynamically allocated (*Duplicates) list.
+
+  @param[out] Duplicates   If Duplicates is NULL on input, (*FileList) will be
+                           a monotonically ordered list on output, with
+                           duplicates stably sorted.
+
+                           If Duplicates is not NULL on input, (*FileList) will
+                           be a strictly monotonically oredered list on output,
+                           with duplicates separated (stably sorted) to
+                           (*Duplicates). All fields except Link will be
+                           zero-initialized in the (**Duplicates) head element.
+                           If no duplicates exist, then (*Duplicates) is set to
+                           NULL on output.
+
+  @param[in] Order         Determines the comparison operation between
+                           EFI_SHELL_FILE_INFO objects.
+
+  @retval EFI_INVALID_PARAMETER  (UINTN)Order is greater than or equal to
+                                 (UINTN)ShellSortFileListMax. Neither the
+                                 (*FileList) nor the (*Duplicates) list has
+                                 been modified.
+
+  @retval EFI_INVALID_PARAMETER  (*FileList) was NULL on input. Neither the
+                                 (*FileList) nor the (*Duplicates) list has
+                                 been modified.
+
+  @retval EFI_OUT_OF_RESOURCES   Memory allocation failed. Neither the
+                                 (*FileList) nor the (*Duplicates) list has
+                                 been modified.
+
+  @retval EFI_SUCCESS            Sorting successful, including the case when
+                                 FileList is NULL on input.
+**/
+EFI_STATUS
+EFIAPI
+ShellSortFileList (
+  IN OUT EFI_SHELL_FILE_INFO  **FileList,
+     OUT EFI_SHELL_FILE_INFO  **Duplicates OPTIONAL,
+  IN     SHELL_SORT_FILE_LIST Order
+  )
+{
+  LIST_ENTRY               *FilesHead;
+  ORDERED_COLLECTION       *Sort;
+  LIST_ENTRY               *FileEntry;
+  EFI_SHELL_FILE_INFO      *FileInfo;
+  SHELL_SORT_UNIQUE_NAME   *Unique;
+  EFI_STATUS               Status;
+  EFI_SHELL_FILE_INFO      *Dupes;
+  LIST_ENTRY               *NextFileEntry;
+  CONST CHAR16             *Alias;
+  ORDERED_COLLECTION_ENTRY *SortEntry;
+  LIST_ENTRY               *TargetFileList;
+  ORDERED_COLLECTION_ENTRY *NextSortEntry;
+  VOID                     *UniqueAsVoid;
+
+  if ((UINTN)Order >= (UINTN)ShellSortFileListMax) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (FileList == NULL) {
+    //
+    // FileList is considered empty, hence already sorted, with no duplicates.
+    //
+    if (Duplicates != NULL) {
+      *Duplicates = NULL;
+    }
+    return EFI_SUCCESS;
+  }
+
+  if (*FileList == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+  FilesHead = &(*FileList)->Link;
+
+  //
+  // Collect all the unique names.
+  //
+  Sort = OrderedCollectionInit (UniqueNameCompare, UniqueNameAliasCompare);
+  if (Sort == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  BASE_LIST_FOR_EACH (FileEntry, FilesHead) {
+    FileInfo = (EFI_SHELL_FILE_INFO *)FileEntry;
+
+    //
+    // Try to record the name of this file as a unique name.
+    //
+    Unique = AllocatePool (sizeof (*Unique));
+    if (Unique == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto UninitSort;
+    }
+    Unique->Alias = ((Order == ShellSortFileListByFileName) ?
+                     FileInfo->FileName :
+                     FileInfo->FullName);
+    InitializeListHead (&Unique->SameNameList);
+
+    Status = OrderedCollectionInsert (Sort, NULL, Unique);
+    if (EFI_ERROR (Status)) {
+      //
+      // Only two errors are possible: memory allocation failed, or this name
+      // has been encountered before. In either case, the
+      // SHELL_SORT_UNIQUE_NAME object being constructed has to be released.
+      //
+      FreePool (Unique);
+      //
+      // Memory allocation failure is fatal, while having seen the same name
+      // before is normal.
+      //
+      if (Status == EFI_OUT_OF_RESOURCES) {
+        goto UninitSort;
+      }
+      ASSERT (Status == EFI_ALREADY_STARTED);
+    }
+  }
+
+  //
+  // If separation of duplicates has been requested, allocate the list for
+  // them.
+  //
+  if (Duplicates != NULL) {
+    Dupes = AllocateZeroPool (sizeof (*Dupes));
+    if (Dupes == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto UninitSort;
+    }
+    InitializeListHead (&Dupes->Link);
+  }
+
+  //
+  // No memory allocation beyond this point; thus, no chance to fail. We can
+  // now migrate the EFI_SHELL_FILE_INFO objects from (*FileList) to Sort.
+  //
+  BASE_LIST_FOR_EACH_SAFE (FileEntry, NextFileEntry, FilesHead) {
+    FileInfo = (EFI_SHELL_FILE_INFO *)FileEntry;
+    //
+    // Look up the SHELL_SORT_UNIQUE_NAME that matches FileInfo's name.
+    //
+    Alias = ((Order == ShellSortFileListByFileName) ?
+             FileInfo->FileName :
+             FileInfo->FullName);
+    SortEntry = OrderedCollectionFind (Sort, Alias);
+    ASSERT (SortEntry != NULL);
+    Unique = OrderedCollectionUserStruct (SortEntry);
+    //
+    // Move FileInfo from (*FileList) to the end of the list of files whose
+    // names all compare identical to FileInfo's name.
+    //
+    RemoveEntryList (&FileInfo->Link);
+    InsertTailList (&Unique->SameNameList, &FileInfo->Link);
+  }
+
+  //
+  // All EFI_SHELL_FILE_INFO objects originally in (*FileList) have been
+  // distributed to Sort. Now migrate them back to (*FileList), advancing in
+  // unique name order.
+  //
+  for (SortEntry = OrderedCollectionMin (Sort);
+       SortEntry != NULL;
+       SortEntry = OrderedCollectionNext (SortEntry)) {
+    Unique = OrderedCollectionUserStruct (SortEntry);
+    //
+    // The first FileInfo encountered for each unique name goes back on
+    // (*FileList) unconditionally. Further FileInfo instances for the same
+    // unique name -- that is, duplicates -- are either returned to (*FileList)
+    // or separated, dependent on the caller's request.
+    //
+    TargetFileList = FilesHead;
+    BASE_LIST_FOR_EACH_SAFE (FileEntry, NextFileEntry, &Unique->SameNameList) {
+      RemoveEntryList (FileEntry);
+      InsertTailList (TargetFileList, FileEntry);
+      if (Duplicates != NULL) {
+        TargetFileList = &Dupes->Link;
+      }
+    }
+  }
+
+  //
+  // We're done. If separation of duplicates has been requested, output the
+  // list of duplicates -- and free that list at once, if it's empty (i.e., if
+  // no duplicates have been found).
+  //
+  if (Duplicates != NULL) {
+    if (IsListEmpty (&Dupes->Link)) {
+      FreePool (Dupes);
+      *Duplicates = NULL;
+    } else {
+      *Duplicates = Dupes;
+    }
+  }
+  Status = EFI_SUCCESS;
+
+  //
+  // Fall through.
+  //
+UninitSort:
+  for (SortEntry = OrderedCollectionMin (Sort);
+       SortEntry != NULL;
+       SortEntry = NextSortEntry) {
+    NextSortEntry = OrderedCollectionNext (SortEntry);
+    OrderedCollectionDelete (Sort, SortEntry, &UniqueAsVoid);
+    Unique = UniqueAsVoid;
+    ASSERT (IsListEmpty (&Unique->SameNameList));
+    FreePool (Unique);
+  }
+  OrderedCollectionUninit (Sort);
+
+  return Status;
+}

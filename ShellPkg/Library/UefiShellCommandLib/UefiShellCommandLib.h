@@ -39,6 +39,7 @@
 #include <Library/HiiLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>
+#include <Library/OrderedCollectionLib.h>
 
 typedef struct{
   LIST_ENTRY                  Link;
@@ -60,6 +61,24 @@ typedef struct {
   CHAR16            *Path;
 } SHELL_COMMAND_FILE_HANDLE;
 
+//
+// Collects multiple EFI_SHELL_FILE_INFO objects that share the same name.
+//
+typedef struct {
+  //
+  // A string that compares equal to either the FileName or the FullName fields
+  // of all EFI_SHELL_FILE_INFO objects on SameNameList, according to
+  // gUnicodeCollation->StriColl(). The string is not dynamically allocated;
+  // instead, it *aliases* the FileName or FullName field of the
+  // EFI_SHELL_FILE_INFO object that was first encountered with this name.
+  //
+  CONST CHAR16 *Alias;
+  //
+  // A list of EFI_SHELL_FILE_INFO objects whose FileName or FullName fields
+  // compare equal to Alias, according to gUnicodeCollation->StriColl().
+  //
+  LIST_ENTRY SameNameList;
+} SHELL_SORT_UNIQUE_NAME;
 
 #endif //_UEFI_COMMAND_LIB_INTERNAL_HEADER_
 
