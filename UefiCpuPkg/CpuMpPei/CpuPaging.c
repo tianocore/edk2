@@ -605,16 +605,8 @@ MemoryDiscoveredPpiNotifyCallback (
 {
   EFI_STATUS              Status;
   BOOLEAN                 InitStackGuard;
-  BOOLEAN                 InterruptState;
   EDKII_MIGRATED_FV_INFO  *MigratedFvInfo;
   EFI_PEI_HOB_POINTERS    Hob;
-
-  if (PcdGetBool (PcdMigrateTemporaryRamFirmwareVolumes)) {
-    InterruptState = SaveAndDisableInterrupts ();
-    Status = MigrateGdt ();
-    ASSERT_EFI_ERROR (Status);
-    SetInterruptState (InterruptState);
-  }
 
   //
   // Paging must be setup first. Otherwise the exception TSS setup during MP
