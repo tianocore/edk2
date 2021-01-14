@@ -37,7 +37,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/BaseLib.h>
 
 
-#define RAW_FIFO_MAX_NUMBER 256
+#define RAW_FIFO_MAX_NUMBER 255
 #define FIFO_MAX_NUMBER     128
 
 typedef struct {
