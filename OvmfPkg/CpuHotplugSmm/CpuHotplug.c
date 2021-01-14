@@ -200,6 +200,54 @@ CpuEject(
     return;
   }
 
+  if (ApicId == CPU_EJECT_WORKER) {
+    UINT32 CpuIndex;
+
+    for (CpuIndex = 0; CpuIndex < mCpuHotEjectData->ArrayLength; CpuIndex++) {
+      UINT64 RemoveApicId = mCpuHotEjectData->ApicIdMap[CpuIndex];
+
+      if ((RemoveApicId != CPU_EJECT_INVALID &&
+           RemoveApicId != CPU_EJECT_WORKER)) {
+        //
+        // This to-be-ejected-CPU has already received the BSP's SMI exit
+        // signal and, will execute SmmCpuFeaturesSmiRendezvousExit()
+        // followed by this callback or is already waiting in the
+        // CpuDeadLoop() below.
+        //
+        // Tell QEMU to context-switch it out.
+        //
+        QemuCpuhpWriteCpuSelector (mMmCpuIo, RemoveApicId);
+        QemuCpuhpWriteCpuStatus (mMmCpuIo, QEMU_CPUHP_STAT_EJECTED);
+
+        //
+        // Compiler barrier to ensure the next store isn't reordered
+        //
+        MemoryFence();
+
+        //
+        // Clear the eject status for CpuIndex to ensure that an invalid
+        // SMI later does not end up trying to eject it or a newly
+        // hotplugged CpuIndex does not go into the dead loop.
+        //
+        mCpuHotEjectData->ApicIdMap[CpuIndex] = CPU_EJECT_INVALID;
+
+        DEBUG ((DEBUG_INFO, "%a: Unplugged CPU %u -> " FMT_APIC_ID "\n",
+               __FUNCTION__, CpuIndex, RemoveApicId));
+      }
+    }
+
+    //
+    // Clear our own worker status.
+    //
+    mCpuHotEjectData->ApicIdMap[ProcessorNum] = CPU_EJECT_INVALID;
+
+    //
+    // We are done until the next hot-unplug; clear the handler.
+    //
+    mCpuHotEjectData->Handler = NULL;
+    return;
+  }
+
   //
   // CPU(s) being unplugged get here from SmmCpuFeaturesSmiRendezvousExit()
   // after having been cleared to exit the SMI by the monarch and thus have
@@ -296,6 +344,19 @@ UnplugCpus(
   }
 
   if (EjectCount) {
+    UINTN  Worker;
+
+    Status = mMmCpuService->WhoAmI(mMmCpuService, &Worker);
+    ASSERT_EFI_ERROR(Status);
+    //
+    // UnplugCpus() is called via the root MMI handler and thus we are
+    // executing in the BSP context.
+    //
+    // Mark ourselves as the worker CPU.
+    //
+    ASSERT (mCpuHotEjectData->ApicIdMap[Worker] == CPU_EJECT_INVALID);
+    mCpuHotEjectData->ApicIdMap[Worker] = CPU_EJECT_WORKER;
+
     //
     // We have processors to be ejected; install the handler.
     //
@@ -417,11 +478,6 @@ CpuHotplugMmi (
              &ToUnplugCount
              );
   if (EFI_ERROR (Status)) {
-    goto Fatal;
-  }
-  if (ToUnplugCount > 0) {
-    DEBUG ((DEBUG_ERROR, "%a: hot-unplug is not supported yet\n",
-      __FUNCTION__));
     goto Fatal;
   }
 
