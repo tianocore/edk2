@@ -14,7 +14,9 @@
 #include <Library/PcdLib.h>
 #include <Library/SmmCpuFeaturesLib.h>
 #include <Library/SmmServicesTableLib.h>
+#include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/CpuHotEjectData.h>
 #include <PiSmm.h>
 #include <Register/Intel/SmramSaveStateMap.h>
 #include <Register/QemuSmramSaveStateMap.h>
@@ -171,6 +173,70 @@ SmmCpuFeaturesHookReturnFromSmm (
   return OriginalInstructionPointer;
 }
 
+GLOBAL_REMOVE_IF_UNREFERENCED
+CPU_HOT_EJECT_DATA *mCpuHotEjectData = NULL;
+
+/**
+  Initialize CpuHotEjectData if PcdCpuHotPlugSupport is enabled
+  and, if more than 1 CPU is configured.
+
+  Also sets up the corresponding PcdCpuHotEjectDataAddress.
+**/
+STATIC
+VOID
+SmmCpuFeaturesSmmInitHotEject (
+  VOID
+  )
+{
+  UINT32      mMaxNumberOfCpus;
+  EFI_STATUS  Status;
+
+  if (!FeaturePcdGet (PcdCpuHotPlugSupport)) {
+    return;
+  }
+
+  // PcdCpuHotPlugSupport => PcdCpuMaxLogicalProcessorNumber
+  mMaxNumberOfCpus = PcdGet32 (PcdCpuMaxLogicalProcessorNumber);
+
+  // No spare CPUs to hot-eject
+  if (mMaxNumberOfCpus == 1) {
+    return;
+  }
+
+  mCpuHotEjectData =
+    (CPU_HOT_EJECT_DATA *)AllocatePool (sizeof (*mCpuHotEjectData));
+  ASSERT (mCpuHotEjectData != NULL);
+
+  //
+  // Allocate buffer for pointers to array in CPU_HOT_EJECT_DATA.
+  //
+
+  // Revision
+  mCpuHotEjectData->Revision = CPU_HOT_EJECT_DATA_REVISION_1;
+
+  // Array Length of APIC ID
+  mCpuHotEjectData->ArrayLength = mMaxNumberOfCpus;
+
+  // CpuIndex -> APIC ID map
+  mCpuHotEjectData->ApicIdMap = (UINT64 *)AllocatePool
+       (sizeof (*mCpuHotEjectData->ApicIdMap) * mCpuHotEjectData->ArrayLength);
+
+  // Hot-eject handler
+  mCpuHotEjectData->Handler = NULL;
+
+  // Reserved
+  mCpuHotEjectData->Reserved = 0;
+
+  ASSERT (mCpuHotEjectData->ApicIdMap != NULL);
+
+  //
+  // Expose address of CPU Hot eject Data structure
+  //
+  Status = PcdSet64S (PcdCpuHotEjectDataAddress,
+                      (UINT64)(VOID *)mCpuHotEjectData);
+  ASSERT_EFI_ERROR (Status);
+}
+
 /**
   Hook point in normal execution mode that allows the one CPU that was elected
   as monarch during System Management Mode initialization to perform additional
@@ -187,6 +253,9 @@ SmmCpuFeaturesSmmRelocationComplete (
   EFI_STATUS Status;
   UINTN      MapPagesBase;
   UINTN      MapPagesCount;
+
+
+  SmmCpuFeaturesSmmInitHotEject ();
 
   if (!MemEncryptSevIsEnabled ()) {
     return;
@@ -375,6 +444,15 @@ SmmCpuFeaturesRendezvousExit (
   IN UINTN  CpuIndex
   )
 {
+  //
+  // CPU Hot-eject not enabled.
+  //
+  if (mCpuHotEjectData == NULL ||
+      mCpuHotEjectData->Handler == NULL) {
+    return;
+  }
+
+  mCpuHotEjectData->Handler (CpuIndex);
 }
 
 /**
