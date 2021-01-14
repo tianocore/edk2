@@ -472,6 +472,37 @@ SmmCpuFeaturesRendezvousExit (
   // (PcdCpuMaxLogicalProcessorNumber > 1), and hot-eject is needed
   // in this SMI exit (otherwise mCpuHotEjectData->Handler is not armed.)
   //
+  // mCpuHotEjectData itself is stable once setup so it can be
+  // dereferenced without needing any synchronization,
+  // but, mCpuHotEjectData->Handler is updated on the BSP in the
+  // ongoing SMI iteration at two places:
+  //
+  // - UnplugCpus() where the BSP determines if a CPU is under ejection
+  //   or not. As the comment where mCpuHotEjectData->Handler is set-up
+  //   describes any such updates are guaranteed to be ordered-before the
+  //   dereference below.
+  //
+  // - EjectCpu() (which is called via the Handler below), on the BSP
+  //   updates mCpuHotEjectData->Handler once it is done with all ejections.
+  //
+  //   The CPU under ejection: might be executing anywhere between the
+  //   "AllCpusInSync" exit loop in SmiRendezvous() to about to
+  //   dereference the Handler field.
+  //   Given that the BSP ensures that this store only happens after all
+  //   CPUs under ejection have been ejected, this CPU would never see
+  //   the after value.
+  //   (Note that any CPU that is already executing the CpuSleep() loop
+  //   below never raced any updates and always saw the before value.)
+  //
+  //   CPUs not-under ejection: might see either value of the Handler
+  //   which is fine, because the Handler is a NOP for CPUs not-under
+  //   ejection.
+  //
+  //   Lastly, note that we are also guaranteed that any dereferencing
+  //   CPU only sees the before or after value and not an intermediate
+  //   value. This is because mCpuHotEjectData->Handler is aligned at a
+  //   natural boundary.
+  //
 
   if (mCpuHotEjectData != NULL) {
     CPU_HOT_EJECT_HANDLER Handler;
