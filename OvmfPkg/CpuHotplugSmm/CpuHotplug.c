@@ -18,6 +18,7 @@
 #include <Pcd/CpuHotEjectData.h>             // CPU_HOT_EJECT_DATA
 #include <Protocol/MmCpuIo.h>                // EFI_MM_CPU_IO_PROTOCOL
 #include <Protocol/SmmCpuService.h>          // EFI_SMM_CPU_SERVICE_PROTOCOL
+#include <Register/Intel/ArchitecturalMsr.h> // MSR_IA32_APIC_BASE_REGISTER
 #include <Uefi/UefiBaseType.h>               // EFI_STATUS
 
 #include "ApicId.h"                          // APIC_ID
@@ -193,12 +194,40 @@ RevokeNewSlot:
 }
 
 /**
+  EjectCpu needs to know the BSP at SMI exit at a point when
+  some of the EFI_SMM_CPU_SERVICE_PROTOCOL state has been torn
+  down.
+  Reuse the logic from OvmfPkg::PlatformSmmBspElection() to
+  do that.
+
+  @retval TRUE   If the CPU executing this function is the BSP.
+
+  @retval FALSE  If the CPU executing this function is an AP.
+**/
+STATIC
+BOOLEAN
+CheckIfBsp (
+  VOID
+  )
+{
+  MSR_IA32_APIC_BASE_REGISTER ApicBaseMsr;
+  BOOLEAN IsBsp;
+
+  ApicBaseMsr.Uint64 = AsmReadMsr64 (MSR_IA32_APIC_BASE);
+  IsBsp = (BOOLEAN)(ApicBaseMsr.Bits.BSP == 1);
+  return IsBsp;
+}
+
+/**
   CPU Hot-eject handler, called from SmmCpuFeaturesRendezvousExit()
   on each CPU at exit from SMM.
 
-  If, the executing CPU is not being ejected, nothing to be done.
+  If, the executing CPU is neither the BSP, nor being ejected, nothing
+  to be done.
   If, the executing CPU is being ejected, wait in a halted loop
   until ejected.
+  If, the executing CPU is the BSP, set QEMU CPU status to eject
+  for CPUs being ejected.
 
   @param[in] ProcessorNum      ProcessorNum denotes the CPU exiting SMM,
                                and will be used as an index into
@@ -214,6 +243,81 @@ EjectCpu (
 {
   UINT64 QemuSelector;
 
+  if (CheckIfBsp ()) {
+    UINT32 Idx;
+
+    for (Idx = 0; Idx < mCpuHotEjectData->ArrayLength; Idx++) {
+      UINT64 QemuSelector;
+
+      QemuSelector = mCpuHotEjectData->QemuSelectorMap[Idx];
+
+      if (QemuSelector != CPU_EJECT_QEMU_SELECTOR_INVALID) {
+        //
+        // This to-be-ejected-CPU has already received the BSP's SMI exit
+        // signal and will execute SmmCpuFeaturesRendezvousExit()
+        // followed by this callback or is already penned in the
+        // CpuSleep() loop below.
+        //
+        // Tell QEMU to context-switch it out.
+        //
+        QemuCpuhpWriteCpuSelector (mMmCpuIo, (UINT32) QemuSelector);
+        QemuCpuhpWriteCpuStatus (mMmCpuIo, QEMU_CPUHP_STAT_EJECT);
+
+        //
+        // Clear the eject status for this CPU Idx to ensure that an
+        // invalid SMI later does not end up trying to eject it or a
+        // newly hotplugged CPU Idx does not go into the dead loop.
+        //
+        //
+        // Note that the writes to the Qemu address space above use the
+        // EFI_MM_CPU_IO_PROTOCOL and thus would finish the ejection
+        // before the assignment to QemuSelectorMap[Idx], so the CPU Idx
+        // that this store applies to will never see the change in value.
+        //
+        mCpuHotEjectData->QemuSelectorMap[Idx] =
+          CPU_EJECT_QEMU_SELECTOR_INVALID;
+
+        DEBUG ((DEBUG_INFO, "%a: Unplugged ProcessorNum %u, "
+          "QemuSelector %Lu\n", __FUNCTION__, Idx, QemuSelector));
+      }
+    }
+
+    //
+    // We are done until the next hot-unplug; clear the handler.
+    //
+    // mCpuHotEjectData->Handler is a NOP for any CPU not under ejection.
+    // So, once we are done with all the ejections, we can safely reset it
+    // here since any CPU dereferencing it would only see either the old
+    // or the new value (since it is aligned at a natural boundary.)
+    //
+    mCpuHotEjectData->Handler = NULL;
+    return;
+  }
+
+  //
+  // Reached only on APs
+  //
+
+  //
+  // mCpuHotEjectData->QemuSelectorMap[ProcessorNum] is updated
+  // on the BSP in the ongoing SMI at two places:
+  //
+  // - UnplugCpus() where the BSP determines if a CPU is under ejection
+  //   or not. As a comment in UnplugCpus() at set-up, and in
+  //   SmmCpuFeaturesRendezvousExit() where it is dereferenced describe,
+  //   any such updates are guaranteed to be ordered-before the
+  //   dereference below.
+  //
+  // - EjectCpu() on the BSP (above) updates QemuSelectorMap[ProcessorNum]
+  //   for a CPU once it's ejected.
+  //
+  //   The CPU under ejection: might be executing anywhere between the
+  //   AllCpusInSync loop in SmiRendezvous(), to about to dereference
+  //   QemuSelectorMap[ProcessorNum].
+  //   As described in the comment above where we do the reset, this
+  //   is not a problem since the ejected CPU never sees the after value.
+  //   CPUs not-under ejection: never see any changes so they are fine.
+  //
   QemuSelector = mCpuHotEjectData->QemuSelectorMap[ProcessorNum];
   if (QemuSelector == CPU_EJECT_QEMU_SELECTOR_INVALID) {
     return;
@@ -494,11 +598,6 @@ CpuHotplugMmi (
              &ToUnplugCount
              );
   if (EFI_ERROR (Status)) {
-    goto Fatal;
-  }
-  if (ToUnplugCount > 0) {
-    DEBUG ((DEBUG_ERROR, "%a: hot-unplug is not supported yet\n",
-      __FUNCTION__));
     goto Fatal;
   }
 
