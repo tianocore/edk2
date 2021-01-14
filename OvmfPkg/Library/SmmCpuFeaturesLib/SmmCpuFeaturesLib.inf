@@ -35,4 +35,7 @@
   UefiBootServicesTableLib
 
 [Pcd]
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuHotPlugSupport
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber
+  gUefiOvmfPkgTokenSpaceGuid.PcdCpuHotEjectDataAddress
   gUefiOvmfPkgTokenSpaceGuid.PcdQ35SmramAtDefaultSmbase
