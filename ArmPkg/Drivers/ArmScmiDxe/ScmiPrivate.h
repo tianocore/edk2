@@ -23,9 +23,9 @@ typedef enum {
 
 // SCMI message types.
 typedef enum {
-  SCMI_MESSAGE_TYPE_COMMAND          = 0,
-  SCMI_MESSAGE_TYPE_DELAYED_RESPONSE = 2, // Skipping 1 is deliberate.
-  SCMI_MESSAGE_TYPE_NOTIFICATION     = 3
+  ScmiMessageTypeCommand         = 0,
+  ScmiMessageTypeDelayedResponse = 2, // Skipping 1 is deliberate.
+  ScmiMessageTypeNotification    = 3
 } SCMI_MESSAGE_TYPE;
 
 // SCMI response error codes.
