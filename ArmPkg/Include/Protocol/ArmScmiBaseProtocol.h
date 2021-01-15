@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2017-2018, Arm Limited. All rights reserved.
+  Copyright (c) 2017-2021, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -158,10 +158,10 @@ typedef struct _SCMI_BASE_PROTOCOL {
 
 // SCMI Message IDs for Base protocol.
 typedef enum {
-  SCMI_MESSAGE_ID_BASE_DISCOVER_VENDOR                  = 0x3,
-  SCMI_MESSAGE_ID_BASE_DISCOVER_SUB_VENDOR              = 0x4,
-  SCMI_MESSAGE_ID_BASE_DISCOVER_IMPLEMENTATION_VERSION  = 0x5,
-  SCMI_MESSAGE_ID_BASE_DISCOVER_LIST_PROTOCOLS          = 0x6
+  ScmiMessageIdBaseDiscoverVendor                 = 0x3,
+  ScmiMessageIdBaseDiscoverSubVendor              = 0x4,
+  ScmiMessageIdBaseDiscoverImplementationVersion  = 0x5,
+  ScmiMessageIdBaseDiscoverListProtocols          = 0x6
 } SCMI_MESSAGE_ID_BASE;
 
 #endif /* ARM_SCMI_BASE_PROTOCOL_H_ */
