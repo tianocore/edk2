@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2017-2018, Arm Limited. All rights reserved.
+  Copyright (c) 2017-2021, Arm Limited. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -89,10 +89,10 @@ EFI_STATUS
   @param[in] This        A pointer to SCMI_CLOCK2_PROTOCOL Instance.
   @param[in] ClockId     Identifier for the clock device.
 
-  @param[out] Format      SCMI_CLOCK_RATE_FORMAT_DISCRETE: Clock device
+  @param[out] Format      ScmiClockRateFormatDiscrete: Clock device
                           supports range of clock rates which are non-linear.
 
-                          SCMI_CLOCK_RATE_FORMAT_LINEAR: Clock device supports
+                          ScmiClockRateFormatLinear: Clock device supports
                           range of linear clock rates from Min to Max in steps.
 
   @param[out] TotalRates  Total number of rates.
