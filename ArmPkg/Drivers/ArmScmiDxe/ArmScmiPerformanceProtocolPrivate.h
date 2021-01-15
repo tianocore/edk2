@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2017-2018, Arm Limited. All rights reserved.
+  Copyright (c) 2017-2021, Arm Limited. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -22,7 +22,7 @@
 #define NUM_REMAIN_PERF_LEVELS_SHIFT  16
 #define NUM_REMAIN_PERF_LEVELS(Lvls) (Lvls >> NUM_REMAIN_PERF_LEVELS_SHIFT)
 
-/** Return values for SCMI_MESSAGE_ID_PERFORMANCE_DESCRIBE_LEVELS command.
+/** Return values for ScmiMessageIdPerformanceDescribeLevels command.
   SCMI Spec section 4.5.2.5
 **/
 typedef struct {

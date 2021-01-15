@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2017-2018, Arm Limited. All rights reserved.
+  Copyright (c) 2017-2021, Arm Limited. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -247,12 +247,12 @@ typedef struct _SCMI_PERFORMANCE_PROTOCOL {
 } SCMI_PERFORMANCE_PROTOCOL;
 
 typedef enum {
-  SCMI_MESSAGE_ID_PERFORMANCE_DOMAIN_ATTRIBUTES = 0x3,
-  SCMI_MESSAGE_ID_PERFORMANCE_DESCRIBE_LEVELS   = 0x4,
-  SCMI_MESSAGE_ID_PERFORMANCE_LIMITS_SET        = 0x5,
-  SCMI_MESSAGE_ID_PERFORMANCE_LIMITS_GET        = 0x6,
-  SCMI_MESSAGE_ID_PERFORMANCE_LEVEL_SET         = 0x7,
-  SCMI_MESSAGE_ID_PERFORMANCE_LEVEL_GET         = 0x8,
+  ScmiMessageIdPerformanceDomainAttributes = 0x3,
+  ScmiMessageIdPerformanceDescribeLevels   = 0x4,
+  ScmiMessageIdPerformanceLimitsSet        = 0x5,
+  ScmiMessageIdPerformanceLimitsGet        = 0x6,
+  ScmiMessageIdPerformanceLevelSet         = 0x7,
+  ScmiMessageIdPerformanceLevelGet         = 0x8,
 } SCMI_MESSAGE_ID_PERFORMANCE;
 
 #endif /* ARM_SCMI_PERFORMANCE_PROTOCOL_H_ */
