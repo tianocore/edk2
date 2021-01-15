@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2017-2018, Arm Limited. All rights reserved.
+  Copyright (c) 2017-2021, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -24,9 +24,9 @@
 #include "ScmiPrivate.h"
 
 STATIC CONST SCMI_PROTOCOL_ENTRY Protocols[] = {
-  { SCMI_PROTOCOL_ID_BASE, ScmiBaseProtocolInit },
-  { SCMI_PROTOCOL_ID_PERFORMANCE, ScmiPerformanceProtocolInit },
-  { SCMI_PROTOCOL_ID_CLOCK, ScmiClockProtocolInit }
+  { ScmiProtocolIdBase, ScmiBaseProtocolInit },
+  { ScmiProtocolIdPerformance, ScmiPerformanceProtocolInit },
+  { ScmiProtocolIdClock, ScmiClockProtocolInit }
 };
 
 /** ARM SCMI driver entry point function.
@@ -61,7 +61,7 @@ ArmScmiDxeEntryPoint (
   UINT32              SupportedListSize;
 
   // Every SCMI implementation must implement the base protocol.
-  ASSERT (Protocols[0].Id == SCMI_PROTOCOL_ID_BASE);
+  ASSERT (Protocols[0].Id == ScmiProtocolIdBase);
 
   Status = ScmiBaseProtocolInit (&ImageHandle);
   if (EFI_ERROR (Status)) {
