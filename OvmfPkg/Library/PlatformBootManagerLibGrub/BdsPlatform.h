@@ -172,4 +172,15 @@ PlatformInitializeConsole (
   IN PLATFORM_CONSOLE_CONNECT_ENTRY   *PlatformConsole
   );
 
+/**
+  Loads and boots UEFI Linux via the FwCfg interface.
+
+  @retval    EFI_NOT_FOUND - The Linux kernel was not found
+
+**/
+EFI_STATUS
+TryRunningQemuKernel (
+  VOID
+  );
+
 #endif // _PLATFORM_SPECIFIC_BDS_PLATFORM_H_
