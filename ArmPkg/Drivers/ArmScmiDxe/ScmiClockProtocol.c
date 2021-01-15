@@ -152,10 +152,10 @@ ClockGetClockAttributes (
   @param[in] This        A pointer to SCMI_CLOCK_PROTOCOL Instance.
   @param[in] ClockId     Identifier for the clock device.
 
-  @param[out] Format      SCMI_CLOCK_RATE_FORMAT_DISCRETE: Clock device
+  @param[out] Format      ScmiClockRateFormatDiscrete: Clock device
                           supports range of clock rates which are non-linear.
 
-                          SCMI_CLOCK_RATE_FORMAT_LINEAR: Clock device supports
+                          ScmiClockRateFormatLinear: Clock device supports
                           range of linear clock rates from Min to Max in steps.
 
   @param[out] TotalRates  Total number of rates.
@@ -236,7 +236,7 @@ ClockDescribeRates (
       *TotalRates = NUM_RATES (DescribeRates->NumRatesFlags)
                     + NUM_REMAIN_RATES (DescribeRates->NumRatesFlags);
 
-      if (*Format == SCMI_CLOCK_RATE_FORMAT_DISCRETE) {
+      if (*Format == ScmiClockRateFormatDiscrete) {
          RequiredArraySize = (*TotalRates) * sizeof (UINT64);
       } else {
          // We need to return triplet of 64 bit value for each rate
@@ -251,7 +251,7 @@ ClockDescribeRates (
 
     RateOffset = 0;
 
-    if (*Format == SCMI_CLOCK_RATE_FORMAT_DISCRETE) {
+    if (*Format == ScmiClockRateFormatDiscrete) {
       for (RateNo = 0; RateNo < NUM_RATES (DescribeRates->NumRatesFlags); RateNo++) {
         Rate = &DescribeRates->Rates[RateOffset++];
         // Non-linear discrete rates.
