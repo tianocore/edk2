@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2017-2018, Arm Limited. All rights reserved.
+  Copyright (c) 2017-2021, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -13,12 +13,12 @@
 
 // SCMI protocol IDs.
 typedef enum {
-  SCMI_PROTOCOL_ID_BASE         = 0x10,
-  SCMI_PROTOCOL_ID_POWER_DOMAIN = 0x11,
-  SCMI_PROTOCOL_ID_SYSTEM_POWER = 0x12,
-  SCMI_PROTOCOL_ID_PERFORMANCE  = 0x13,
-  SCMI_PROTOCOL_ID_CLOCK        = 0x14,
-  SCMI_PROTOCOL_ID_SENSOR       = 0x15
+  ScmiProtocolIdBase        = 0x10,
+  ScmiProtocolIdPowerDomain = 0x11,
+  ScmiProtocolIdSystemPower = 0x12,
+  ScmiProtocolIdPerformance = 0x13,
+  ScmiProtocolIdClock       = 0x14,
+  ScmiProtocolIdSensor      = 0x15
 } SCMI_PROTOCOL_ID;
 
 // SCMI message types.

@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2017-2018, Arm Limited. All rights reserved.
+  Copyright (c) 2017-2021, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -35,7 +35,7 @@ PerformanceGetVersion (
   OUT UINT32                     *Version
   )
 {
-  return ScmiGetProtocolVersion (SCMI_PROTOCOL_ID_PERFORMANCE, Version);
+  return ScmiGetProtocolVersion (ScmiProtocolIdPerformance, Version);
 }
 
 /** Return protocol attributes of the performance management protocol.
@@ -59,7 +59,7 @@ PerformanceGetAttributes (
   UINT32* ReturnValues;
 
   Status = ScmiGetProtocolAttributes (
-             SCMI_PROTOCOL_ID_PERFORMANCE,
+             ScmiProtocolIdPerformance,
              &ReturnValues
              );
   if (EFI_ERROR (Status)) {
@@ -107,7 +107,7 @@ PerformanceDomainAttributes (
 
   *MessageParams = DomainId;
 
-  Cmd.ProtocolId = SCMI_PROTOCOL_ID_PERFORMANCE;
+  Cmd.ProtocolId = ScmiProtocolIdPerformance;
   Cmd.MessageId  = SCMI_MESSAGE_ID_PERFORMANCE_DOMAIN_ATTRIBUTES;
 
   PayloadLength = sizeof (DomainId);
@@ -179,7 +179,7 @@ PerformanceDescribeLevels (
 
   *MessageParams++ = DomainId;
 
-  Cmd.ProtocolId = SCMI_PROTOCOL_ID_PERFORMANCE;
+  Cmd.ProtocolId = ScmiProtocolIdPerformance;
   Cmd.MessageId  = SCMI_MESSAGE_ID_PERFORMANCE_DESCRIBE_LEVELS;
 
   do {
@@ -258,7 +258,7 @@ PerformanceLimitsSet (
   *MessageParams++ = Limits->RangeMax;
   *MessageParams   = Limits->RangeMin;
 
-  Cmd.ProtocolId = SCMI_PROTOCOL_ID_PERFORMANCE;
+  Cmd.ProtocolId = ScmiProtocolIdPerformance;
   Cmd.MessageId  = SCMI_MESSAGE_ID_PERFORMANCE_LIMITS_SET;
 
   PayloadLength = sizeof (DomainId) + sizeof (SCMI_PERFORMANCE_LIMITS);
@@ -304,7 +304,7 @@ PerformanceLimitsGet (
 
   *MessageParams = DomainId;
 
-  Cmd.ProtocolId = SCMI_PROTOCOL_ID_PERFORMANCE;
+  Cmd.ProtocolId = ScmiProtocolIdPerformance;
   Cmd.MessageId  = SCMI_MESSAGE_ID_PERFORMANCE_LIMITS_GET;
 
   PayloadLength = sizeof (DomainId);
@@ -354,7 +354,7 @@ PerformanceLevelSet (
   *MessageParams++ = DomainId;
   *MessageParams   = Level;
 
-  Cmd.ProtocolId = SCMI_PROTOCOL_ID_PERFORMANCE;
+  Cmd.ProtocolId = ScmiProtocolIdPerformance;
   Cmd.MessageId  = SCMI_MESSAGE_ID_PERFORMANCE_LEVEL_SET;
 
   PayloadLength = sizeof (DomainId) + sizeof (Level);
@@ -399,7 +399,7 @@ PerformanceLevelGet (
 
   *MessageParams = DomainId;
 
-  Cmd.ProtocolId = SCMI_PROTOCOL_ID_PERFORMANCE;
+  Cmd.ProtocolId = ScmiProtocolIdPerformance;
   Cmd.MessageId  = SCMI_MESSAGE_ID_PERFORMANCE_LEVEL_GET;
 
   PayloadLength = sizeof (DomainId);
