@@ -3,7 +3,7 @@
 #
 # This package provides network modules that conform to UEFI 2.4 specification.
 #
-# Copyright (c) 2009 - 2019, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2021, Intel Corporation. All rights reserved.<BR>
 # (C) Copyright 2015-2020 Hewlett Packard Enterprise Development LP<BR>
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -96,6 +96,10 @@
   ## The maximum size of total HTTP chunk transfer.
   # @Prompt Max size of total HTTP chunk transfer. the default value is 12MB.
   gEfiNetworkPkgTokenSpaceGuid.PcdMaxHttpChunkTransfer|0x0C00000|UINT32|0x0000000E
+
+  ## The Timeout value of HTTP IO.
+  # @Prompt The Timeout value of HTTP Io. Default value is 5000.
+  gEfiNetworkPkgTokenSpaceGuid.PcdHttpIoTimeout|5000|UINT32|0x0000000F
 
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   ## Indicates whether HTTP connections (i.e., unsecured) are permitted or not.
