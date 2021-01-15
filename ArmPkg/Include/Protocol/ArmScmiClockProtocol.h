@@ -30,8 +30,8 @@ typedef enum {
 } SCMI_MESSAGE_ID_CLOCK;
 
 typedef enum {
-  SCMI_CLOCK_RATE_FORMAT_DISCRETE, // Non-linear range.
-  SCMI_CLOCK_RATE_FORMAT_LINEAR    // Linear range.
+  ScmiClockRateFormatDiscrete, // Non-linear range.
+  ScmiClockRateFormatLinear    // Linear range.
 } SCMI_CLOCK_RATE_FORMAT;
 
 // Clock management protocol version.
@@ -139,10 +139,10 @@ EFI_STATUS
   @param[in] This        A pointer to SCMI_CLOCK_PROTOCOL Instance.
   @param[in] ClockId     Identifier for the clock device.
 
-  @param[out] Format      SCMI_CLOCK_RATE_FORMAT_DISCRETE: Clock device
+  @param[out] Format      ScmiClockRateFormatDiscrete: Clock device
                           supports range of clock rates which are non-linear.
 
-                          SCMI_CLOCK_RATE_FORMAT_LINEAR: Clock device supports
+                          ScmiClockRateFormatLinear: Clock device supports
                           range of linear clock rates from Min to Max in steps.
 
   @param[out] TotalRates  Total number of rates.
