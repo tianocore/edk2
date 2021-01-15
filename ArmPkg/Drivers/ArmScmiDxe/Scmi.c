@@ -123,7 +123,7 @@ ScmiCommandExecute (
 
   Response = (SCMI_MESSAGE_RESPONSE*)MtlGetChannelPayload (Channel);
 
-  if (Response->Status != SCMI_SUCCESS) {
+  if (Response->Status != ScmiSuccess) {
     DEBUG ((DEBUG_ERROR, "SCMI error: ProtocolId = 0x%x, MessageId = 0x%x, error = %d\n",
       Command->ProtocolId,
       Command->MessageId,
