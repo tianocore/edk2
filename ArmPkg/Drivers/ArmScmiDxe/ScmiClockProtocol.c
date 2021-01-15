@@ -52,7 +52,7 @@ ClockGetVersion (
   OUT UINT32               *Version
   )
 {
-  return ScmiGetProtocolVersion (SCMI_PROTOCOL_ID_CLOCK, Version);
+  return ScmiGetProtocolVersion (ScmiProtocolIdClock, Version);
 }
 
 /** Return total number of clock devices supported by the clock management
@@ -76,7 +76,7 @@ ClockGetTotalClocks (
   EFI_STATUS  Status;
   UINT32     *ReturnValues;
 
-  Status = ScmiGetProtocolAttributes (SCMI_PROTOCOL_ID_CLOCK, &ReturnValues);
+  Status = ScmiGetProtocolAttributes (ScmiProtocolIdClock, &ReturnValues);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -122,7 +122,7 @@ ClockGetClockAttributes (
 
   *MessageParams = ClockId;
 
-  Cmd.ProtocolId = SCMI_PROTOCOL_ID_CLOCK;
+  Cmd.ProtocolId = ScmiProtocolIdClock;
   Cmd.MessageId  = SCMI_MESSAGE_ID_CLOCK_ATTRIBUTES;
 
   PayloadLength = sizeof (ClockId);
@@ -203,7 +203,7 @@ ClockDescribeRates (
     return Status;
   }
 
-  Cmd.ProtocolId = SCMI_PROTOCOL_ID_CLOCK;
+  Cmd.ProtocolId = ScmiProtocolIdClock;
   Cmd.MessageId  = SCMI_MESSAGE_ID_CLOCK_DESCRIBE_RATES;
 
   *MessageParams++  = ClockId;
@@ -320,7 +320,7 @@ ClockRateGet (
   // Fill arguments for clock protocol command.
   *MessageParams  = ClockId;
 
-  Cmd.ProtocolId  = SCMI_PROTOCOL_ID_CLOCK;
+  Cmd.ProtocolId  = ScmiProtocolIdClock;
   Cmd.MessageId   = SCMI_MESSAGE_ID_CLOCK_RATE_GET;
 
   PayloadLength = sizeof (ClockId);
@@ -374,7 +374,7 @@ ClockRateSet (
   ClockRateSetAttributes->Rate.Low   = (UINT32)Rate;
   ClockRateSetAttributes->Rate.High  = (UINT32)(Rate >> 32);
 
-  Cmd.ProtocolId = SCMI_PROTOCOL_ID_CLOCK;
+  Cmd.ProtocolId = ScmiProtocolIdClock;
   Cmd.MessageId  = SCMI_MESSAGE_ID_CLOCK_RATE_SET;
 
   PayloadLength = sizeof (CLOCK_RATE_SET_ATTRIBUTES);
@@ -421,7 +421,7 @@ ClockEnable (
   ClockConfigSetAttributes->ClockId    = ClockId;
   ClockConfigSetAttributes->Attributes = Enable ? BIT0 : 0;
 
-  Cmd.ProtocolId = SCMI_PROTOCOL_ID_CLOCK;
+  Cmd.ProtocolId = ScmiProtocolIdClock;
   Cmd.MessageId  = SCMI_MESSAGE_ID_CLOCK_CONFIG_SET;
 
   PayloadLength = sizeof (CLOCK_CONFIG_SET_ATTRIBUTES);
