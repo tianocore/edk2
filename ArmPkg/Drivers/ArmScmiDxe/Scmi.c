@@ -95,7 +95,7 @@ ScmiCommandExecute (
   // Fill in message header.
   MessageHeader = SCMI_MESSAGE_HEADER (
                     Command->MessageId,
-                    SCMI_MESSAGE_TYPE_COMMAND,
+                    ScmiMessageTypeCommand,
                     Command->ProtocolId
                     );
 
