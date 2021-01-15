@@ -30,17 +30,17 @@ typedef enum {
 
 // SCMI response error codes.
 typedef enum {
-  SCMI_SUCCESS            =  0,
-  SCMI_NOT_SUPPORTED      = -1,
-  SCMI_INVALID_PARAMETERS = -2,
-  SCMI_DENIED             = -3,
-  SCMI_NOT_FOUND          = -4,
-  SCMI_OUT_OF_RANGE       = -5,
-  SCMI_BUSY               = -6,
-  SCMI_COMMS_ERROR        = -7,
-  SCMI_GENERIC_ERROR      = -8,
-  SCMI_HARDWARE_ERROR     = -9,
-  SCMI_PROTOCOL_ERROR     = -10
+  ScmiSuccess           =  0,
+  ScmiNotSupported      = -1,
+  ScmiInvalidParameters = -2,
+  ScmiDenied            = -3,
+  ScmiNotFound          = -4,
+  ScmiOutOfRange        = -5,
+  ScmiBusy              = -6,
+  ScmiCommsError        = -7,
+  ScmiGenericError      = -8,
+  ScmiHardwareError     = -9,
+  ScmiProtocolError     = -10
 } SCMI_STATUS;
 
 // SCMI message IDs common to all protocols.
