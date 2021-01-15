@@ -22,11 +22,11 @@ extern EFI_GUID gArmScmiClockProtocolGuid;
 
 // Message Type for clock management protocol.
 typedef enum {
-  SCMI_MESSAGE_ID_CLOCK_ATTRIBUTES     = 0x3,
-  SCMI_MESSAGE_ID_CLOCK_DESCRIBE_RATES = 0x4,
-  SCMI_MESSAGE_ID_CLOCK_RATE_SET       = 0x5,
-  SCMI_MESSAGE_ID_CLOCK_RATE_GET       = 0x6,
-  SCMI_MESSAGE_ID_CLOCK_CONFIG_SET     = 0x7
+  ScmiMessageIdClockAttributes    = 0x3,
+  ScmiMessageIdClockDescribeRates = 0x4,
+  ScmiMessageIdClockRateSet       = 0x5,
+  ScmiMessageIdClockRateGet       = 0x6,
+  ScmiMessageIdClockConfigSet     = 0x7
 } SCMI_MESSAGE_ID_CLOCK;
 
 typedef enum {
