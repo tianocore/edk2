@@ -45,9 +45,9 @@ typedef enum {
 
 // SCMI message IDs common to all protocols.
 typedef enum {
-  SCMI_MESSAGE_ID_PROTOCOL_VERSION            = 0x0,
-  SCMI_MESSAGE_ID_PROTOCOL_ATTRIBUTES         = 0x1,
-  SCMI_MESSAGE_ID_PROTOCOL_MESSAGE_ATTRIBUTES = 0x2
+  ScmiMessageIdProtocolVersion           = 0x0,
+  ScmiMessageIdProtocolAttributes        = 0x1,
+  ScmiMessageIdProtocolMessageAttributes = 0x2
 } SCMI_MESSAGE_ID;
 
 // Not defined in SCMI specification but will help to identify a message.
