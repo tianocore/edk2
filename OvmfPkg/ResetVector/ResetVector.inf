@@ -47,3 +47,5 @@
 [FixedPcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdSevLaunchSecretBase
   gUefiOvmfPkgTokenSpaceGuid.PcdSevLaunchSecretSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdQemuHashTableBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdQemuHashTableSize
