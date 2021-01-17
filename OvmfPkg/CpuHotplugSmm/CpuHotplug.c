@@ -14,6 +14,7 @@
 #include <Library/MmServicesTableLib.h>      // gMmst
 #include <Library/PcdLib.h>                  // PcdGetBool()
 #include <Library/SafeIntLib.h>              // SafeUintnSub()
+#include <Library/CpuHotEjectData.h>         // CPU_HOT_EJECT_DATA
 #include <Protocol/MmCpuIo.h>                // EFI_MM_CPU_IO_PROTOCOL
 #include <Protocol/SmmCpuService.h>          // EFI_SMM_CPU_SERVICE_PROTOCOL
 #include <Uefi/UefiBaseType.h>               // EFI_STATUS
@@ -32,11 +33,12 @@ STATIC EFI_MM_CPU_IO_PROTOCOL *mMmCpuIo;
 //
 STATIC EFI_SMM_CPU_SERVICE_PROTOCOL *mMmCpuService;
 //
-// This structure is a communication side-channel between the
+// These structures serve as communication side-channels between the
 // EFI_SMM_CPU_SERVICE_PROTOCOL consumer (i.e., this driver) and provider
 // (i.e., PiSmmCpuDxeSmm).
 //
 STATIC CPU_HOT_PLUG_DATA *mCpuHotPlugData;
+STATIC CPU_HOT_EJECT_DATA *mCpuHotEjectData;
 //
 // SMRAM arrays for fetching the APIC IDs of processors with pending events (of
 // known event types), for the time of just one MMI.
@@ -188,11 +190,52 @@ RevokeNewSlot:
 }
 
 /**
+  CPU Hot-eject handler function.
+
+  If, the executing CPU is not being ejected, nothing to be done.
+  If, the executing CPU is being ejected: wait in a CpuDeadLoop()
+  until ejected.
+
+  @param[in] ProcessorNum      Index of executing CPU.
+
+**/
+VOID
+EFIAPI
+CpuEject (
+  IN UINTN ProcessorNum
+  )
+{
+  //
+  // APIC ID is UINT32, but mCpuHotEjectData->ApicIdMap[] is UINT64
+  // so use UINT64 throughout.
+  //
+  UINT64 ApicId;
+
+  ApicId = mCpuHotEjectData->ApicIdMap[ProcessorNum];
+  if (ApicId == CPU_EJECT_INVALID) {
+    return;
+  }
+
+  //
+  // CPU(s) being unplugged get here from SmmCpuFeaturesSmiRendezvousExit()
+  // after having been cleared to exit the SMI by the monarch and thus have
+  // no SMM processing remaining.
+  //
+  // Given that we cannot allow them to escape to the guest, we pen them
+  // here until the SMM monarch tells the HW to unplug them.
+  //
+  CpuDeadLoop ();
+}
+
+/**
   Process to be hot-unplugged CPUs, per QemuCpuhpCollectApicIds().
 
   For each such CPU, report the CPU to PiSmmCpuDxeSmm via
-  EFI_SMM_CPU_SERVICE_PROTOCOL. If the to be hot-unplugged CPU is
-  unknown, skip it silently.
+  EFI_SMM_CPU_SERVICE_PROTOCOL and stash the APIC ID for later ejection.
+  If the to be hot-unplugged CPU is unknown, skip it silently.
+
+  If we do stash any APIC IDs, install a CPU eject handler which would
+  handle the ejection.
 
   @param[in] ToUnplugApicIds    The APIC IDs of the CPUs that are about to be
                                 hot-unplugged.
@@ -216,9 +259,11 @@ UnplugCpus (
 {
   EFI_STATUS Status;
   UINT32     ToUnplugIdx;
+  UINT32     EjectCount;
   UINTN      ProcessorNum;
 
   ToUnplugIdx = 0;
+  EjectCount = 0;
   while (ToUnplugIdx < ToUnplugCount) {
     APIC_ID    RemoveApicId;
 
@@ -255,13 +300,41 @@ UnplugCpus (
       DEBUG ((DEBUG_ERROR, "%a: RemoveProcessor(" FMT_APIC_ID "): %r\n",
         __FUNCTION__, RemoveApicId, Status));
       goto Fatal;
+    } else {
+      //
+      // Stash the APIC IDs so we can do the actual ejection later.
+      //
+      if (mCpuHotEjectData->ApicIdMap[ProcessorNum] != CPU_EJECT_INVALID) {
+        //
+        // Since ProcessorNum and APIC-ID map 1-1, so a valid
+        // mCpuHotEjectData->ApicIdMap[ProcessorNum] means something
+        // is horribly wrong.
+        //
+        DEBUG ((DEBUG_ERROR, "%a: ProcessorNum %u maps to %llx, cannot "
+                "map to " FMT_APIC_ID "\n", __FUNCTION__, ProcessorNum,
+                mCpuHotEjectData->ApicIdMap[ProcessorNum], RemoveApicId));
+
+        Status = EFI_INVALID_PARAMETER;
+        goto Fatal;
+      }
+
+      mCpuHotEjectData->ApicIdMap[ProcessorNum] = (UINT64)RemoveApicId;
+      EjectCount++;
     }
 
     ToUnplugIdx++;
   }
 
+  if (EjectCount != 0) {
+    //
+    // We have processors to be ejected; install the handler.
+    //
+    mCpuHotEjectData->Handler = CpuEject;
+  }
+
   //
-  // We've removed this set of APIC IDs from SMM data structures.
+  // We've removed this set of APIC IDs from SMM data structures and
+  // have installed an ejection handler if needed.
   //
   return EFI_SUCCESS;
 
@@ -458,7 +531,13 @@ CpuHotplugEntry (
   // Our DEPEX on EFI_SMM_CPU_SERVICE_PROTOCOL guarantees that PiSmmCpuDxeSmm
   // has pointed PcdCpuHotPlugDataAddress to CPU_HOT_PLUG_DATA in SMRAM.
   //
+  // Additionally, CPU Hot-unplug is available only if CPU Hotplug is, so
+  // the same DEPEX also guarantees that PcdCpuHotEjectDataAddress points
+  // to CPU_HOT_EJECT_DATA in SMRAM.
+  //
   mCpuHotPlugData = (VOID *)(UINTN)PcdGet64 (PcdCpuHotPlugDataAddress);
+  mCpuHotEjectData = (VOID *)(UINTN)PcdGet64 (PcdCpuHotEjectDataAddress);
+
   if (mCpuHotPlugData == NULL) {
     Status = EFI_NOT_FOUND;
     DEBUG ((DEBUG_ERROR, "%a: CPU_HOT_PLUG_DATA: %r\n", __FUNCTION__, Status));
@@ -470,6 +549,9 @@ CpuHotplugEntry (
   if (mCpuHotPlugData->ArrayLength == 1) {
     return EFI_UNSUPPORTED;
   }
+  ASSERT (mCpuHotEjectData &&
+          (mCpuHotPlugData->ArrayLength == mCpuHotEjectData->ArrayLength));
+
   //
   // Allocate the data structures that depend on the possible CPU count.
   //
@@ -551,6 +633,24 @@ CpuHotplugEntry (
   // Install the handler for the hot-added CPUs' first SMI.
   //
   SmbaseInstallFirstSmiHandler ();
+
+  if (mCpuHotEjectData) {
+  UINT32     Idx;
+    //
+    // For CPU ejection we need to map ProcessorNum -> APIC_ID. By the time
+    // we do that, however, the Processor's APIC ID has already been removed
+    // from SMM data structures. So we will use mCpuHotEjectData->ApicIdMap
+    // to map from ProcessorNum -> APIC_ID.
+    //
+    for (Idx = 0; Idx < mCpuHotEjectData->ArrayLength; Idx++) {
+      mCpuHotEjectData->ApicIdMap[Idx] = CPU_EJECT_INVALID;
+    }
+
+    //
+    // Wait to init the handler until an ejection is warranted
+    //
+    mCpuHotEjectData->Handler = NULL;
+  }
 
   return EFI_SUCCESS;
 
