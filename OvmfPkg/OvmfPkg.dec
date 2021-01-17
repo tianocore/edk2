@@ -106,6 +106,10 @@
   #
   XenPlatformLib|Include/Library/XenPlatformLib.h
 
+  ##  @libraryclass  Share CPU hot-eject state
+  #
+  CpuHotEjectData|Include/Library/CpuHotEjectData.h
+
 [Guids]
   gUefiOvmfPkgTokenSpaceGuid            = {0x93bb96af, 0xb9f2, 0x4eb8, {0x94, 0x62, 0xe0, 0xba, 0x74, 0x56, 0x42, 0x36}}
   gEfiXenInfoGuid                       = {0xd3b46f3b, 0xd441, 0x1244, {0x9a, 0x12, 0x0, 0x12, 0x27, 0x3f, 0xc1, 0x4d}}
@@ -351,6 +355,12 @@
   #
   #  This PCD is only accessed if PcdSmmSmramRequire is TRUE (see below).
   gUefiOvmfPkgTokenSpaceGuid.PcdQ35SmramAtDefaultSmbase|FALSE|BOOLEAN|0x34
+
+  ## This PCD adds a communication channel between PiSmmCpuDxe and
+  #  CpuHotplugSmm.
+  #
+  #  Only accessed if PcdCpuHotPlugSupport is TRUE
+  gUefiOvmfPkgTokenSpaceGuid.PcdCpuHotEjectDataAddress|0|UINT64|0x46
 
 [PcdsFeatureFlag]
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuBootOrderPciTranslation|TRUE|BOOLEAN|0x1c
