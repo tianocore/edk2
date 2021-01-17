@@ -75,6 +75,7 @@
   LockBoxLib|MdeModulePkg/Library/SmmLockBoxLib/SmmLockBoxPeiLib.inf
   MpInitLib|UefiCpuPkg/Library/MpInitLib/PeiMpInitLib.inf
   RegisterCpuFeaturesLib|UefiCpuPkg/Library/RegisterCpuFeaturesLib/PeiRegisterCpuFeaturesLib.inf
+  CpuCacheInfoLib|UefiCpuPkg/Library/CpuCacheInfoLib/PeiCpuCacheInfoLib.inf
 
 [LibraryClasses.IA32.PEIM, LibraryClasses.X64.PEIM]
   PeiServicesTablePointerLib|MdePkg/Library/PeiServicesTablePointerLibIdt/PeiServicesTablePointerLibIdt.inf
@@ -86,6 +87,7 @@
   CpuExceptionHandlerLib|UefiCpuPkg/Library/CpuExceptionHandlerLib/DxeCpuExceptionHandlerLib.inf
   MpInitLib|UefiCpuPkg/Library/MpInitLib/DxeMpInitLib.inf
   RegisterCpuFeaturesLib|UefiCpuPkg/Library/RegisterCpuFeaturesLib/DxeRegisterCpuFeaturesLib.inf
+  CpuCacheInfoLib|UefiCpuPkg/Library/CpuCacheInfoLib/DxeCpuCacheInfoLib.inf
 
 [LibraryClasses.common.DXE_SMM_DRIVER]
   SmmServicesTableLib|MdePkg/Library/SmmServicesTableLib/SmmServicesTableLib.inf
@@ -109,6 +111,8 @@
   UefiCpuPkg/Library/CpuTimerLib/BaseCpuTimerLib.inf
   UefiCpuPkg/Library/CpuTimerLib/DxeCpuTimerLib.inf
   UefiCpuPkg/Library/CpuTimerLib/PeiCpuTimerLib.inf
+  UefiCpuPkg/Library/CpuCacheInfoLib/PeiCpuCacheInfoLib.inf
+  UefiCpuPkg/Library/CpuCacheInfoLib/DxeCpuCacheInfoLib.inf
 
 [Components.IA32, Components.X64]
   UefiCpuPkg/CpuDxe/CpuDxe.inf
