@@ -40,6 +40,7 @@
 [LibraryClasses]
   BaseLib
   BaseMemoryLib
+  CpuLib
   DebugLib
   LocalApicLib
   MmServicesTableLib
@@ -54,6 +55,7 @@
 
 [Pcd]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuHotPlugDataAddress                ## CONSUMES
+  gUefiOvmfPkgTokenSpaceGuid.PcdCpuHotEjectDataAddress              ## CONSUMES
   gUefiOvmfPkgTokenSpaceGuid.PcdQ35SmramAtDefaultSmbase             ## CONSUMES
 
 [FeaturePcd]
