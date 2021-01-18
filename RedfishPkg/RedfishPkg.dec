@@ -2,7 +2,7 @@
 # Redfish Package
 #
 # Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
-# (C) Copyright 2020 Hewlett Packard Enterprise Development LP<BR>
+# (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
@@ -49,6 +49,11 @@
   #  jansson library to manipulate JSON data structure.
   #
   JsonLib|Include/Library/JsonLib.h
+
+  ##  @libraryclass  Provides the library functions to encode/decode
+  #   Redfish packet.
+  #
+  RedfishContentCodingLib|Include/Library/RedfishContentCodingLib.h
 
 [LibraryClasses.Common.Private]
   ##  @libraryclass  Provides the private C runtime library functions.
