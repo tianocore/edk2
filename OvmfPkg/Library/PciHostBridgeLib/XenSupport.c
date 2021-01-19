@@ -17,6 +17,7 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/PcdLib.h>
 #include <Library/PciHostBridgeLib.h>
 #include <Library/PciLib.h>
 #include "PciHostBridge.h"

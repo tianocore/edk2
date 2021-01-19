@@ -19,6 +19,7 @@
 #include <Library/DebugLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/PcdLib.h>
 #include <Library/PciHostBridgeLib.h>
 #include <Library/PciHostBridgeUtilityLib.h>
 #include <Library/PciLib.h>
