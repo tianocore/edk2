@@ -100,6 +100,56 @@ PciHostBridgeUtilityUninitRootBridge (
 
 
 /**
+  Utility function to return all the root bridge instances in an array.
+
+  @param[out] Count            The number of root bridge instances.
+
+  @param[in]  Attributes       Initial attributes.
+
+  @param[in]  AllocAttributes  Allocation attributes.
+
+  @param[in]  Io               IO aperture.
+
+  @param[in]  Mem              MMIO aperture.
+
+  @param[in]  MemAbove4G       MMIO aperture above 4G.
+
+  @param[in]  PMem             Prefetchable MMIO aperture.
+
+  @param[in]  PMemAbove4G      Prefetchable MMIO aperture above 4G.
+
+  @return                      All the root bridge instances in an array.
+**/
+PCI_ROOT_BRIDGE *
+EFIAPI
+PciHostBridgeUtilityGetRootBridges (
+  OUT UINTN                    *Count,
+  IN  UINT64                   Attributes,
+  IN  UINT64                   AllocationAttributes,
+  IN  PCI_ROOT_BRIDGE_APERTURE *Io,
+  IN  PCI_ROOT_BRIDGE_APERTURE *Mem,
+  IN  PCI_ROOT_BRIDGE_APERTURE *MemAbove4G,
+  IN  PCI_ROOT_BRIDGE_APERTURE *PMem,
+  IN  PCI_ROOT_BRIDGE_APERTURE *PMemAbove4G
+  );
+
+
+/**
+  Utility function to free root bridge instances array from
+  PciHostBridgeUtilityGetRootBridges().
+
+  @param[in] Bridges  The root bridge instances array.
+  @param[in] Count    The count of the array.
+**/
+VOID
+EFIAPI
+PciHostBridgeUtilityFreeRootBridges (
+  IN PCI_ROOT_BRIDGE *Bridges,
+  IN UINTN           Count
+  );
+
+
+/**
   Utility function to inform the platform that the resource conflict happens.
 
   @param[in] Configuration  Pointer to PCI I/O and PCI memory resource

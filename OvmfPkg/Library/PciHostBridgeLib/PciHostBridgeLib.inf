@@ -41,7 +41,6 @@
   PcdLib
   PciHostBridgeUtilityLib
   PciLib
-  QemuFwCfgLib
 
 [Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdPciIoBase

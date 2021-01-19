@@ -39,3 +39,9 @@
   DebugLib
   DevicePathLib
   MemoryAllocationLib
+  PcdLib
+  PciLib
+  QemuFwCfgLib
+
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
