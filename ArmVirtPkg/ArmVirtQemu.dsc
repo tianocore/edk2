@@ -489,6 +489,7 @@
     <LibraryClasses>
       NULL|ArmVirtPkg/Library/FdtPciPcdProducerLib/FdtPciPcdProducerLib.inf
   }
+  OvmfPkg/PciHotPlugInitDxe/PciHotPlugInit.inf
   OvmfPkg/VirtioPciDeviceDxe/VirtioPciDeviceDxe.inf
   OvmfPkg/Virtio10Dxe/Virtio10.inf
 
