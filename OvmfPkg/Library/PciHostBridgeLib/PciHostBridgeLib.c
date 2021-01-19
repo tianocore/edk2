@@ -20,6 +20,7 @@
 #include <Library/DevicePathLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PciHostBridgeLib.h>
+#include <Library/PciHostBridgeUtilityLib.h>
 #include <Library/PciLib.h>
 #include <Library/QemuFwCfgLib.h>
 #include "PciHostBridge.h"
@@ -31,12 +32,6 @@ typedef struct {
   EFI_DEVICE_PATH_PROTOCOL EndDevicePath;
 } OVMF_PCI_ROOT_BRIDGE_DEVICE_PATH;
 #pragma pack ()
-
-
-GLOBAL_REMOVE_IF_UNREFERENCED
-CHAR16 *mPciHostBridgeLibAcpiAddressSpaceTypeStr[] = {
-  L"Mem", L"I/O", L"Bus"
-};
 
 
 STATIC
@@ -407,37 +402,5 @@ PciHostBridgeResourceConflict (
   VOID                              *Configuration
   )
 {
-  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *Descriptor;
-  UINTN                             RootBridgeIndex;
-  DEBUG ((DEBUG_ERROR, "PciHostBridge: Resource conflict happens!\n"));
-
-  RootBridgeIndex = 0;
-  Descriptor = (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *) Configuration;
-  while (Descriptor->Desc == ACPI_ADDRESS_SPACE_DESCRIPTOR) {
-    DEBUG ((DEBUG_ERROR, "RootBridge[%d]:\n", RootBridgeIndex++));
-    for (; Descriptor->Desc == ACPI_ADDRESS_SPACE_DESCRIPTOR; Descriptor++) {
-      ASSERT (Descriptor->ResType <
-              ARRAY_SIZE (mPciHostBridgeLibAcpiAddressSpaceTypeStr)
-              );
-      DEBUG ((DEBUG_ERROR, " %s: Length/Alignment = 0x%lx / 0x%lx\n",
-              mPciHostBridgeLibAcpiAddressSpaceTypeStr[Descriptor->ResType],
-              Descriptor->AddrLen, Descriptor->AddrRangeMax
-              ));
-      if (Descriptor->ResType == ACPI_ADDRESS_SPACE_TYPE_MEM) {
-        DEBUG ((DEBUG_ERROR, "     Granularity/SpecificFlag = %ld / %02x%s\n",
-                Descriptor->AddrSpaceGranularity, Descriptor->SpecificFlag,
-                ((Descriptor->SpecificFlag &
-                  EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_CACHEABLE_PREFETCHABLE
-                  ) != 0) ? L" (Prefetchable)" : L""
-                ));
-      }
-    }
-    //
-    // Skip the END descriptor for root bridge
-    //
-    ASSERT (Descriptor->Desc == ACPI_END_TAG_DESCRIPTOR);
-    Descriptor = (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *)(
-                   (EFI_ACPI_END_TAG_DESCRIPTOR *)Descriptor + 1
-                   );
-  }
+  PciHostBridgeUtilityResourceConflict (Configuration);
 }
