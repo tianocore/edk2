@@ -272,8 +272,6 @@ ProcessPciHost (
   return Status;
 }
 
-STATIC PCI_ROOT_BRIDGE mRootBridge;
-
 /**
   Return all the root bridge instances in an array.
 
@@ -361,8 +359,8 @@ PciHostBridgeGetRootBridges (
   PMemAbove4G.Base     = MAX_UINT64;
   PMemAbove4G.Limit    = 0;
 
-  Status = PciHostBridgeUtilityInitRootBridge (
-    Attributes,
+  return PciHostBridgeUtilityGetRootBridges (
+    Count,
     Attributes,
     AllocationAttributes,
     TRUE,
@@ -373,19 +371,8 @@ PciHostBridgeGetRootBridges (
     &Mem,
     &MemAbove4G,
     &PMem,
-    &PMemAbove4G,
-    &mRootBridge
+    &PMemAbove4G
     );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: failed to initialize PCI host bridge: %r\n",
-      __FUNCTION__, Status));
-    *Count = 0;
-    return NULL;
-  }
-
-  *Count = 1;
-
-  return &mRootBridge;
 }
 
 /**
@@ -402,8 +389,7 @@ PciHostBridgeFreeRootBridges (
   UINTN           Count
   )
 {
-  ASSERT (Count == 1);
-  PciHostBridgeUtilityUninitRootBridge (Bridges);
+  PciHostBridgeUtilityFreeRootBridges (Bridges, Count);
 }
 
 /**
