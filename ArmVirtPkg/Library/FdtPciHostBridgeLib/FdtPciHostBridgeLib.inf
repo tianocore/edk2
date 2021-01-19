@@ -34,6 +34,7 @@
   OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
+  BaseMemoryLib
   DebugLib
   DevicePathLib
   DxeServicesTableLib
